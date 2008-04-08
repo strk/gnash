@@ -205,7 +205,13 @@ public:
     bool invoke();
     void dump();
   protected:
-    std::map<const char *, amf::Element *> _variables;
+
+    // this could be reduced to a std::set if there's
+    // never the need to specify a different name from the
+    // one actually found in the Element object
+    typedef std::map<std::string, amf::Element *> Variables;
+    Variables _variables;
+
     amf::Buffer		*_handshake;
     Handler		*_handler;
     int                 _amf_index;

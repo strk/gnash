@@ -62,7 +62,8 @@ AC_DEFUN([AC_PATH_MING], [
     AC_PATH_PROG([MAKESWF], [makeswf], , [$MING_PATH:$PATH])
   fi
 
-  if test x"${MING_CFLAGS}" = x; then
+  dnl if MING_LIBS is empty, no MING_CONFIG found.
+  if test x"${MING_LIBS}" = x; then
     AC_ARG_WITH(ming_incl, AC_HELP_STRING([--with-ming-incl], [Directory where Ming header is]), with_ming_incl=${withval})
     AC_CACHE_VAL(ac_cv_path_ming_incl, [
       if test x"${with_ming_incl}" != x ; then
@@ -74,6 +75,7 @@ AC_DEFUN([AC_PATH_MING], [
       fi
     ])
 
+    dnl if they didn't successfully force it, see if it's not in /usr/include.
     if test x"${ac_cv_path_ming_incl}" = x; then
       for i in $incllist; do
 	      if test -f $i/ming.h; then
@@ -88,6 +90,7 @@ AC_DEFUN([AC_PATH_MING], [
       done
     fi
 
+    dnl if it's not somewhere weird, make sure we can #include it already.
     if test x"${ac_cv_path_ming_incl}" = x; then
       AC_CHECK_HEADERS(ming.h, [ac_cv_path_ming_incl=""])
     fi
@@ -107,25 +110,23 @@ AC_DEFUN([AC_PATH_MING], [
       fi
     ])
 
-    dnl If the header doesn't exist, there is no point looking for the library.
-    if test x"${ac_cv_path_ming_incl}" != x; then
-      for i in $libslist; do
-      	if test -f $i/libming.a -o -f $i/libming.${shlibext}; then
-      	  if test ! x"$i" = x"/usr/lib" -a ! x"$i" = x"/usr/lib64"; then
-      	    ac_cv_path_ming_lib="-L$i -lming"
-      	    break
-          else
-	          ac_cv_path_ming_lib="-lming"
-      	    break
-      	  fi
-    	  fi
-      done
-      if test x"${ac_cv_path_ming_incl}" = x; then
-        AC_CHECK_LIB(ming, ming_init_io, [ac_cv_path_ming_lib=""])
+    dnl look for the library, but don't add -L if it's in a standard place
+    for i in $libslist; do
+      if test -f $i/libming.a -o -f $i/libming.${shlibext}; then
+      	if test ! x"$i" = x"/usr/lib" -a ! x"$i" = x"/usr/lib64"; then
+      	  ac_cv_path_ming_lib="-L$i -lming"
+      	  break
+        else
+	        ac_cv_path_ming_lib="-lming"
+      	  break
+        fi
       fi
-      AC_MSG_CHECKING([for libming library])
-      AC_MSG_RESULT(${ac_cv_path_ming_lib})
+    done
+    if test x"${ac_cv_path_ming_lib}" = x; then
+      AC_CHECK_LIB(ming, ming_init_io, [ac_cv_path_ming_lib=""])
     fi
+    AC_MSG_CHECKING([for libming library])
+    AC_MSG_RESULT(${ac_cv_path_ming_lib})
 
     if test x"${ac_cv_path_ming_incl}" != x ; then
       MING_CFLAGS="${ac_cv_path_ming_incl}"

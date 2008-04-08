@@ -2698,16 +2698,24 @@ fi
 
 dnl don't look for the flash compilers when cross compiling.
 if test x$cross_compiling = xno; then
-  if test x"$MING_LIBS" != x; then
-    echo "        MING version code is $MING_VERSION_CODE"
-    echo "        MING flags are $MING_CFLAGS"
-    echo "        MING libs are $MING_LIBS"
-    echo "        MAKESWF is $MAKESWF"
-else
-    echo "        WARNING: You need to have the Ming development and utilities packages"
-    echo "                 installed to run most of the tests in Gnash testsuite."
+  if test x"$MING_LIBS" == ancientx; then
+    echo "        WARNING: The version of Ming that you have installed is too old for"
+    echo "                 us to use.  If you installed it from a package, uninstall and"
     echo "                 Install it from http://ming.sourceforge.net"
-    echo "                 or .deb users: apt-get install libming-dev"
+    echo "                 If necessary, use --with-ming-incl and --with-ming-lib"
+    echo "        MAKESWF is $MAKESWF"
+  else
+    if test x"$MING_LIBS" != x; then
+      echo "        MING version code is $MING_VERSION_CODE"
+      echo "        MING flags are $MING_CFLAGS"
+      echo "        MING libs are $MING_LIBS"
+      echo "        MAKESWF is $MAKESWF"
+    else
+      echo "        WARNING: You need to have the Ming development and utilities packages"
+      echo "                 installed to run most of the tests in Gnash testsuite."
+      echo "                 Install it from http://ming.sourceforge.net"
+      echo "                 or .deb users: apt-get install libming-dev"
+    fi
   fi
 
   if test x"$SWFDEC_TESTSUITE" != x; then
