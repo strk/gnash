@@ -154,6 +154,12 @@ crash-0.5.5-stylesheet-update-6.swf:ea135a06ae6032fd3cd9e2588ed1be67
 crash-0.5.5-stylesheet-update-7.swf:c112cfe1b313fb437fe45cb0c3a7b665
 crash-0.5.5-stylesheet-update-8.swf:73a61afbd582fabd2dbba360cc3763e4
 crash-0.5.90-empty-action.swf:c564ca09c4bc71fb89b042bc07d247eb
+crash-0.6.2-replaceText-5.swf:f9a3132918e7d3daaca3bb8122b8b847
+crash-0.6.2-replaceText-6.swf:26a8a906a7ab6dc2411d0c72d84cbdfa
+crash-0.6.2-try-and-exception-on-dispose-5.swf:8f84852b71f51a23f9e13ddfdfc2a2c5
+crash-0.6.2-try-and-exception-on-dispose-6.swf:d38fff4fefc1cdce2acd57e86fdce995
+crash-0.6.2-try-and-exception-on-dispose-7.swf:25f0b3acc112898018b1636cc1817cc9
+crash-0.6.2-try-and-exception-on-dispose-8.swf:c06c147bca86960edeb61a76d9397a68
 currentframe.swf:ba479d5adbece0ddafeaa75e68eff052
 dangling-compare-5.swf:7daa85d63e7bf29df6aa1668d21a28a9
 dangling-compare-6.swf:51999fa1cbc988765b5dee03717d22a5
@@ -654,6 +660,7 @@ scope-chain-with-and-scope-chain-6.swf:86bc3cec2ee04706be498f50cd17f5b1
 scope-chain-with-and-scope-chain-7.swf:6287e166df07684fc7b55fb19925280f
 scope-chain-with-and-scope-chain-8.swf:7185d1d16490d2daf41bb1fc444e5fd3
 scope.swf:09ecbb50f2ac03ebf401a1511d4b1334
+selection-focus-events-5.swf:03ef025ff52765706b0154b972fce288
 setinterval2.swf:f2a17dbddcd0a72a672fbb9a63e0ea5b
 setinterval-arguments.swf:bf5653c905e58846b5a9ee8841c3bcb3
 setinterval-clear.swf:7897b1f201377d65dbffe1ae8182479a
