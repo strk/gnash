@@ -440,14 +440,16 @@ character::width_getset(const fn_call& fn)
 	{
 		if ( ! bounds.isFinite() )
 		{
-			log_unimpl(_("FIXME: can't set _width on character with null or world bounds"));
+			log_unimpl(_("FIXME: can't set _width on character %s (%s) with null or world bounds"),
+				ptr->getTarget(), typeName(*ptr));
 			return rv;
 		}
 
 		double oldwidth = bounds.width();
 		if ( oldwidth <= 0 )
 		{
-			log_unimpl(_("FIXME: can't set _height on character with width %d"), oldwidth);
+			log_unimpl(_("FIXME: can't set _width on character %s (%s) with width %d"),
+				ptr->getTarget(), typeName(*ptr), oldwidth);
 			return rv;
 		}
 
@@ -455,7 +457,8 @@ character::width_getset(const fn_call& fn)
 		if ( newwidth <= 0 )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror(_("Setting _width=%g of character %s (%s)"), newwidth/20, ptr->getTarget().c_str(), typeName(*ptr).c_str());
+			log_aserror(_("Setting _width=%g of character %s (%s)"),
+				newwidth/20, ptr->getTarget(), typeName(*ptr));
 			);
 		}
 
@@ -489,14 +492,16 @@ character::height_getset(const fn_call& fn)
 	{
 		if ( ! bounds.isFinite() )
 		{
-			log_unimpl(_("FIXME: can't set _height on character with null or world bounds"));
+			log_unimpl(_("FIXME: can't set _height on character %s (%s) with null or world bounds"),
+				ptr->getTarget(), typeName(*ptr));
 			return rv;
 		}
 
 		double oldheight = bounds.height();
 		if ( oldheight <= 0 )
 		{
-			log_unimpl(_("FIXME: can't set _height on character with height %d"), oldheight);
+			log_unimpl(_("FIXME: can't set _height on character %s (%s) with height %d"),
+				ptr->getTarget(), typeName(*ptr), oldheight);
 			return rv;
 		}
 
