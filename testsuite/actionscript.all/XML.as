@@ -21,7 +21,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: XML.as,v 1.56 2008/03/11 19:31:48 strk Exp $";
+rcsid="$Id: XML.as,v 1.57 2008/04/08 10:09:21 strk Exp $";
 #include "check.as"
 //#include "dejagnu.as"
 #include "utils.as"
@@ -693,7 +693,7 @@ myxml.onLoad = function(success)
 	myxml.status = status_backup;
 
 
-	//note("myxml.toString(): "+myxml.toString());
+	note("myxml.toString(): "+myxml.toString());
 	check_equals(typeof(myxml.attributes), 'object');
 	check(! myxml.attributes instanceof Object);
 	check_equals(typeof(myxml.attributes.__proto__), 'undefined');
@@ -714,7 +714,7 @@ myxml.onLoad = function(success)
 	{
 		check_equals(myxml.childNodes.length, myxml.lastChildNodesCount);
 	}
-	xcheck_equals(myxml.childNodes.length, 3); // gnash fails discarding the comment and the ending blanks
+	check_equals(myxml.childNodes.length, 3); // gnash fails discarding the comment and the ending blanks
 
 	// We're done
 	++this.onLoadCalls;

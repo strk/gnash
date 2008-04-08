@@ -60,6 +60,9 @@ namespace gnash {
 // Define this to enable verbosity of XML loads
 //#define DEBUG_XML_LOADS 1
 
+// Define this to enable verbosity of XML parsing
+//#define DEBUG_XML_PARSE 1
+
 static as_object* getXMLInterface();
 static void attachXMLInterface(as_object& o);
 static void attachXMLProperties(as_object& o);
@@ -83,8 +86,8 @@ static Debugger& debugger = Debugger::getDefaultInstance();
 XML::XML() 
     :
     XMLNode(getXMLInterface()),
-    _doc(0),
-    _firstChild(0),
+    //_doc(0),
+    //_firstChild(0),
     _loaded(-1), 
     _status(sOK),
     _loadThreads(),
@@ -105,8 +108,8 @@ XML::XML()
 XML::XML(const std::string& xml_in)
     :
     XMLNode(getXMLInterface()),
-    _doc(0),
-    _firstChild(0),
+    //_doc(0),
+    //_firstChild(0),
     _loaded(-1), 
     _status(sOK),
     _loadThreads(),
@@ -236,16 +239,18 @@ XML::extractNode(XMLNode& element, xmlNodePtr node, bool mem)
     xmlChar *ptr = NULL;
     boost::intrusive_ptr<XMLNode> child;
 
-//    log_debug(_("Created new element for %s at %p"), node->name, element);
-
-//    log_debug(_("%s: extracting node %s"), __FUNCTION__, node->name);
+#ifdef DEBUG_XML_PARSE
+    log_debug(_("%s: extracting node %s"), __FUNCTION__, node->name);
+#endif
 
     // See if we have any Attributes (properties)
     attr = node->properties;
     while (attr != NULL)
     {
-        //log_debug(_("extractNode %s has property %s, value is %s"),
-        //          node->name, attr->name, attr->children->content);
+#ifdef DEBUG_XML_PARSE
+        log_debug(_("extractNode %s has property %s, value is %s"),
+                  node->name, attr->name, attr->children->content);
+#endif
         
         std::ostringstream name, content;
 
@@ -254,8 +259,11 @@ XML::extractNode(XMLNode& element, xmlNodePtr node, bool mem)
         
         XMLAttr attrib(name.str(), content.str());
 
-        //log_debug(_("\tPushing attribute %s for element %s has value %s"),
-        //        attr->name, node->name, attr->children->content);
+#ifdef DEBUG_XML_PARSE
+        log_debug(_("\tPushing attribute %s for element %s has value %s, next attribute is %p"),
+                attr->name, node->name, attr->children->content, attr->next);
+#endif
+
         element._attributes.push_back(attrib);
         attr = attr->next;
     }
@@ -290,7 +298,9 @@ XML::extractNode(XMLNode& element, xmlNodePtr node, bool mem)
 		{
 			if ( in.str().find_first_not_of(" \n\t\r") == std::string::npos )
 			{
+#ifdef DEBUG_XML_PARSE
 				log_debug("Text node value consists in blanks only, discarding");
+#endif
 				xmlFree(ptr);
 				return false;
 			}
@@ -307,7 +317,10 @@ XML::extractNode(XMLNode& element, xmlNodePtr node, bool mem)
     {
         child = new XMLNode();
         child->setParent(&element);
-        if ( extractNode(*child, childnode, mem) ) element._children.push_back(child);
+        if ( extractNode(*child, childnode, mem) )
+	{
+		element._children.push_back(child);
+	}
         childnode = childnode->next;
     }
 
@@ -316,27 +329,22 @@ XML::extractNode(XMLNode& element, xmlNodePtr node, bool mem)
 
 /*private*/
 bool
-XML::parseDoc(xmlDocPtr document, bool mem)
+XML::parseDoc(xmlNodePtr cur, bool mem)
 {
-    //GNASH_REPORT_FUNCTION;  
+    GNASH_REPORT_FUNCTION;  
 
-    xmlNodePtr cur;
-
-    if (document == 0) {
-        log_error(_("Can't load XML file"));
-        return false;
-    }
-
-    cur = xmlDocGetRootElement(document);
-  
-    if (cur != NULL)
+    while (cur)
     {
         boost::intrusive_ptr<XMLNode> child = new XMLNode();
         child->setParent(this);
+#ifdef DEBUG_XML_PARSE
+        log_debug("\tParsing top-level node %s", cur->name);
+#endif
         if ( extractNode(*child, cur, mem) ) 
 	{
         	_children.push_back(child);
 	}
+	cur = cur->next;
     }  
 
     return true;
@@ -367,16 +375,36 @@ XML::parseXML(const std::string& xml_in)
     
     initParser();
 
-    //_doc = xmlParseMemory(xml_in.c_str(), xml_in.size());
-    _doc = xmlReadMemory(xml_in.c_str(), xml_in.size(), NULL, NULL, getXMLOptions());
-    if (_doc == 0) {
-        log_error(_("Can't parse XML data"));
-        return false;
+    xmlNodePtr firstNode; 
+
+    xmlDocPtr doc = xmlReadMemory(xml_in.c_str(), xml_in.size(), NULL, NULL, getXMLOptions()); // do NOT recover here !
+    if ( doc )
+    {
+        firstNode = doc->children; // xmlDocGetRootElement(doc);
+    }
+    else
+    {
+        log_debug(_("malformed XML, trying to recover"));
+        int ret = xmlParseBalancedChunkMemoryRecover(NULL, NULL, NULL, 0, (const xmlChar*)xml_in.c_str(), &firstNode, 1);
+        log_debug("xmlParseBalancedChunkMemoryRecover returned %d", ret);
+        if ( ! firstNode )
+        {
+            log_error(_("unrecoverable malformed XML (xmlParseBalancedChunkMemoryRecover returned %d)."), ret);
+            return false;
+        }
+        else
+        {
+            log_error(_("recovered malformed XML."));
+        }
     }
 
-    bool ret = parseDoc(_doc, true);
+
+
+    bool ret = parseDoc(firstNode, true);
+
     xmlCleanupParser();
-    xmlFreeDoc(_doc);
+    if ( doc ) xmlFreeDoc(doc); // TOCHECK: can it be freed before ?
+    else if ( firstNode ) xmlFreeNodeList(firstNode);
     xmlMemoryDump();
 
 #ifndef USE_DMALLOC
@@ -1022,23 +1050,22 @@ XML::clear()
 bool
 XML::ignoreWhite() const
 {
-    // TODO: initialize this thing once...
-    std::string propname;
-    if ( VM::get().getSWFVersion() < 7 ) propname = "ignorewhite";
-    else propname = "ignoreWhite";
 
-	string_table::key propnamekey = VM::get().getStringTable().find(propname);
-    as_value val;
-    if (!const_cast<XML*>(this)->get_member(propnamekey, &val) ) return false;
-    return val.to_bool();
+	string_table::key propnamekey = VM::get().getStringTable().find("ignoreWhite");
+	as_value val;
+	if (!const_cast<XML*>(this)->get_member(propnamekey, &val) ) return false;
+	return val.to_bool();
 }
 
 /*private*/
 int
 XML::getXMLOptions() const
 {
-    int options = XML_PARSE_RECOVER | XML_PARSE_NOWARNING
-    		| XML_PARSE_NOERROR | XML_PARSE_NOCDATA;
+    int options = XML_PARSE_NOENT
+		//| XML_PARSE_RECOVER -- don't recover now, we'll call xmlParseBalancedChunkRecover later
+		//| XML_PARSE_NOWARNING
+    		//| XML_PARSE_NOERROR
+		| XML_PARSE_NOCDATA;
     // Using libxml2 to convert CDATA nodes to text seems to be what is
     // required.
     

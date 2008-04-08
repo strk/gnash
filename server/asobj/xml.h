@@ -175,11 +175,8 @@ private:
     //
     /// This is the base method used by both parseXML() and load().
     ///
-    bool parseDoc(xmlDocPtr document, bool mem);
+    bool parseDoc(xmlNodePtr startNode, bool mem);
 
-    xmlDocPtr _doc;
-    xmlNodePtr _firstChild;
-    
     // -1 if never asked to load anything
     //  0 if asked to load but not yet loaded (or failure)
     //  1 if successfully loaded
