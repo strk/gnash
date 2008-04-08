@@ -161,11 +161,18 @@ main(int argc, char** argv)
   check_equals(mo, "etext1.embedFonts", "true");
 
   check_equals(mo, "dtext1.__proto__", "TextField.prototype");
+  check_equals(mo, "etext1.__proto__", "TextField.prototype");
+
   // checks after placing some swf defined TextField
   check(mo, "TextField.prototype.hasOwnProperty('background')");
   check(mo, "TextField.prototype.hasOwnProperty('backgroundColor')");
   xcheck(mo, "TextField.prototype.hasOwnProperty('text')");
   check(mo, "TextField.prototype.hasOwnProperty('textColor')");
+  xcheck(mo, "!TextField.prototype.hasOwnProperty('_parent')");
+  xcheck(mo, "!TextField.prototype.hasOwnProperty('_xmouse')");
+  xcheck(mo, "!TextField.prototype.hasOwnProperty('_ymouse')");
+  xcheck(mo, "!TextField.prototype.hasOwnProperty('_xscale')");
+  xcheck(mo, "!TextField.prototype.hasOwnProperty('_yscale')");
   
   check_equals(mo, "typeof(dtext1)", "'object'");
   check_equals(mo, "typeof(dtext1.text)", "'string'");
@@ -187,6 +194,16 @@ main(int argc, char** argv)
   check_equals(mo, "dtext1.hasOwnProperty('backgroundColor')", "false");
   check_equals(mo, "dtext1.hasOwnProperty('textColor')", "false");
   check_equals(mo, "dtext1.hasOwnProperty('_alpha')", "false");
+  check(mo, "!dtext1.hasOwnProperty('_parent')");
+  check(mo, "!dtext1.hasOwnProperty('_xmouse')");
+  check(mo, "!dtext1.hasOwnProperty('_ymouse')");
+  check(mo, "!dtext1.hasOwnProperty('_xscale')");
+  check(mo, "!dtext1.hasOwnProperty('_yscale')");
+  check(mo, "!etext1.hasOwnProperty('_parent')");
+  check(mo, "!etext1.hasOwnProperty('_xmouse')");
+  check(mo, "!etext1.hasOwnProperty('_ymouse')");
+  check(mo, "!etext1.hasOwnProperty('_xscale')");
+  check(mo, "!etext1.hasOwnProperty('_yscale')");
   
   xcheck_equals(mo, "dtext1.__proto__.hasOwnProperty('text')", "true");
   check_equals(mo, "dtext1.__proto__.hasOwnProperty('background')", "true");
@@ -210,6 +227,16 @@ main(int argc, char** argv)
   check_equals(mo, "dtext1._alpha", "100");
   check_equals(mo, "etext1._alpha", "100");
   check_equals(mo, "dtext2._alpha", "100");
+  check_equals(mo, "etext1._parent", "_root");
+  check_equals(mo, "dtext2._parent", "_root");
+  check_equals(mo, "etext1._xscale", "100");
+  check_equals(mo, "dtext2._xscale", "100");
+  check_equals(mo, "etext1._yscale", "100");
+  check_equals(mo, "dtext2._yscale", "100");
+  check_equals(mo, "typeof(etext1._xmouse)", "'number'");
+  check_equals(mo, "typeof(dtext2._xmouse)", "'number'");
+  check_equals(mo, "typeof(etext1._ymouse)", "'number'"); 
+  check_equals(mo, "typeof(dtext2._ymouse)", "'number'"); 
   
   add_actions(mo, "dtext1.background = true;"
                   "etext1.background = true;"

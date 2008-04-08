@@ -1,3 +1,8 @@
+2008-04-08 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/DefineEditTextTest.c: more tests
+	  for _parent, _xscale, _yscale, _xmouse and _ymouse.
+
 2008-04-08 Russ Nelson <nelson@crynwr.com>
 
 	* configure.ac: suggest "apt-get install swftools"
