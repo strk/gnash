@@ -598,9 +598,7 @@ string_char_at(const fn_call& fn)
     size_t index = static_cast<size_t>(fn.arg(0).to_number());
 
     if (index >= wstr.length()) {
-        as_value rv;
-        rv.set_nan();
-        return rv;
+        return as_value("");
     }
 
     std::string rv;

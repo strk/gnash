@@ -1,5 +1,10 @@
 2008-04-08 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* server/asobj/string.cpp: charAt returns a string.
+	* testsuite/swfdec/PASSING: charat-6 to 8 pass.
+
+2008-04-08 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* testsuite/swfdec/PASSING: update new passing tests.
 
 2008-04-07 Sandro Santilli <strk@keybit.net>
