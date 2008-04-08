@@ -2738,6 +2738,7 @@ if test x$cross_compiling = xno; then
     echo "        WARNING: You need to have 'swfc' from SWFTools installed"
     echo "                 to run some of the tests in Gnash testsuite."
     echo "                 You can install it from http://www.swftools.org/"
+    echo "                 or .deb users: apt-get install swftools"
   fi
 
   if test x"$PYTHON" != x; then
