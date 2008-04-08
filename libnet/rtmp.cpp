@@ -130,10 +130,6 @@ void
 RTMP::addVariable(amf::Element *el)
 {
 //    GNASH_REPORT_FUNCTION;
-    // by using a set we'd just insert the new element
-    // and the comparator would properly maintain the
-    // binary tree. See comment in header about 
-    // the _variables member
     _variables[el->getName()] = el;
 }
 
@@ -141,12 +137,6 @@ void
 RTMP::addVariable(char *name, amf::Element *el)
 { 
 //    GNASH_REPORT_FUNCTION;
-    assert(name); // caller should check for null
-    // NOTE: this method seems the only one preventing
-    // _variables to be a std::set, in that explicitly
-    // specifies a name, which may be different from
-    // the name stored in the amf::Element itself
-    // TODO: check if needed
     _variables[name] = el;
 }
 
@@ -154,8 +144,7 @@ amf::Element *
 RTMP::getVariable(const std::string &name)
 {
 //    GNASH_REPORT_FUNCTION;
-    return _variables[name];
-#if 0
+//    return _variables[name.c_str()];
     map<const char *, amf::Element *>::iterator it;
     for (it = _variables.begin(); it != _variables.end(); it++) {
 	const char *title = it->first;
@@ -165,7 +154,6 @@ RTMP::getVariable(const std::string &name)
 	    return el;
 	}
     }
-#endif
 }
 
 // A request for a handshake is initiated by sending a byte with a
@@ -386,7 +374,7 @@ void
 RTMP::dump()
 {
     cerr << "RTMP packet contains " << _variables.size() << " variables." << endl;
-    Variables::iterator it;
+    map<const char *, amf::Element *>::iterator it;
     for (it = _variables.begin(); it != _variables.end(); it++) {
 //	const char *name = it->first;
 	amf::Element *el = it->second;

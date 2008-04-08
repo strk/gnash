@@ -1,5 +1,9 @@
 2008-04-07 Russ Nelson <nelson@crynwr.com>
 
+	* GAH!  Checked in too much.
+
+2008-04-07 Russ Nelson <nelson@crynwr.com>
+
 	* Make sure that an existing libming is properly detected, so that
 	  we don't tell people to install a libming-dev which is already
 	 there.
