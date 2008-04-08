@@ -265,12 +265,37 @@ textfield_ctor(const fn_call& /* fn */)
 static void
 attachTextFieldInterface(as_object& o)
 {
+	boost::intrusive_ptr<builtin_function> getset;
+
 	int target_version = o.getVM().getSWFVersion();
 
 	// TextField is an AsBroadcaster
         AsBroadcaster::initialize(o);
 
-	// SWF5 or higher
+	int propFlags = as_prop_flags::dontDelete
+		|as_prop_flags::dontEnum
+		|as_prop_flags::readOnly
+		|as_prop_flags::isProtected;
+
+	// Parent seems to not be a normal property
+	getset = new builtin_function(&character::parent_getset, NULL);
+	o.init_property(NSV::PROP_uPARENT, *getset, *getset);
+
+	// Target seems to not be a normal property
+	getset = new builtin_function(&character::target_getset, NULL);
+	o.init_property(NSV::PROP_uTARGET, *getset, *getset);
+
+	// _name should be a property of the instance, not the prototype
+	getset = new builtin_function(&character::name_getset, NULL);
+	o.init_property(NSV::PROP_uNAME, *getset, *getset);
+
+	o.init_property(NSV::PROP_uXMOUSE, character::xmouse_get, character::xmouse_get, propFlags);
+	o.init_property(NSV::PROP_uYMOUSE, character::ymouse_get, character::ymouse_get, propFlags);
+	o.init_property(NSV::PROP_uXSCALE, character::xscale_getset, character::xscale_getset, propFlags);
+	o.init_property(NSV::PROP_uYSCALE, character::yscale_getset, character::yscale_getset, propFlags);
+
+
+	// SWF5 or higher (TODO: check textfields in SWF5 !!! we miss tests here !)
 	if ( target_version  < 6 ) return;
 
 	// SWF6 or higher
@@ -291,7 +316,6 @@ attachTextFieldInterface(as_object& o)
 	// The following properties should only be attached to the prototype
 	// on first textfield creation. We won't get to that detail of compatibility,
 	// seeming not important
-	boost::intrusive_ptr<builtin_function> getset;
 	getset = new builtin_function(textfield_background_getset);
 	o.init_property("background", *getset, *getset);
 	getset = new builtin_function(textfield_backgroundColor_getset);
@@ -314,14 +338,6 @@ attachTextFieldInterface(as_object& o)
 	o.init_property("html", *getset, *getset);
 	getset = new builtin_function(textfield_selectable_getset);
 	o.init_property("selectable", *getset, *getset);
-
-	// Target seems to not be a normal property
-	getset = new builtin_function(&character::target_getset, NULL);
-	o.init_property("_target", *getset, *getset);
-
-	// _name should be a property of the instance, not the prototype
-	getset = new builtin_function(&character::name_getset, NULL);
-	o.init_property("_name", *getset, *getset);
 
 
 	if ( target_version  < 7 ) return;
@@ -993,7 +1009,7 @@ edit_text_character::get_member(string_table::key name, as_value* val,
 
 	// FIXME: Turn all standard members into getter/setter properties
 	//        of the TextField class. See attachTextFieldInterface()
-	
+
 	switch (name)
 	{
 	default:
@@ -1069,6 +1085,7 @@ edit_text_character::get_member(string_table::key name, as_value* val,
 	}	// end switch
 
 	return get_member_default(name, val, nsname);
+	
 }
 	
 

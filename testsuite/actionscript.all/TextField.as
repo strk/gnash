@@ -20,7 +20,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: TextField.as,v 1.49 2008/04/08 19:02:37 strk Exp $";
+rcsid="$Id: TextField.as,v 1.50 2008/04/08 20:23:35 strk Exp $";
 #include "check.as"
 
 #if OUTPUT_VERSION > 5
@@ -383,18 +383,20 @@ check_equals(typeof(tfref), 'object');
 // Check TextField._parent
 //-------------------------------------------------------------------------
 
-xcheck_equals(typeof(tf._parent), 'movieclip');
+check_equals(typeof(tf._parent), 'movieclip');
 check(!tf.hasOwnProperty('_parent'));
-check(!tf.__proto__.hasOwnProperty('_parent'));
-xcheck_equals(tf._parent, _root);
+xcheck(!tf.__proto__.hasOwnProperty('_parent'));
+check_equals(tf._parent, _root);
 bk = tf._parent;
 tf._parent = 23;
-check_equals(tf._parent, 23); // can be overridden !
+xcheck_equals(tf._parent, 23); // can be overridden !
 check_equals(tf._target, "/tf"); // but won't change _target
 r = delete tf._parent;
-check(r);
+xcheck(r);
+r = delete tf._parent;
+check(!r);
 TextField.prototype._parent = "from proto";
-xcheck_equals(tf._parent, _root); // still unchanged
+check_equals(tf._parent, _root); // still unchanged
 delete TextField.prototype._parent;
 tf._parent = bk;
 
@@ -700,22 +702,22 @@ check_equals(tf._x, 20);
 // Check TextField._xmouse
 //-------------------------------------------------------------------------
 
-xcheck_equals(typeof(tf._xmouse), 'number');
+check_equals(typeof(tf._xmouse), 'number');
 check( ! tf.hasOwnProperty('_xmouse') );
-check( ! tf.__proto__.hasOwnProperty('_xmouse') );
+xcheck( ! tf.__proto__.hasOwnProperty('_xmouse') );
 currXmouse = tf._xmouse; // unsafe, if user moves the mouse while running the test
 tf._xmouse = "a string";
-xcheck_equals(typeof(tf._xmouse), 'number');
-xcheck_equals(tf._xmouse, currXmouse); // possibly unsafe, if user moves the mouse while running the test
+check_equals(typeof(tf._xmouse), 'number');
+check_equals(tf._xmouse, currXmouse); // possibly unsafe, if user moves the mouse while running the test
 
 //-------------------------------------------------------------------------
 // Check TextField._xscale
 //-------------------------------------------------------------------------
 
-xcheck_equals(typeof(tf._xscale), 'number');
+check_equals(typeof(tf._xscale), 'number');
 check( ! tf.hasOwnProperty('_xscale') );
-check( ! tf.__proto__.hasOwnProperty('_xscale') );
-xcheck_equals(tf._xscale, 100); 
+xcheck( ! tf.__proto__.hasOwnProperty('_xscale') );
+check_equals(tf._xscale, 100); 
 // check how .textWidth and ._width change when changing _xscale
 currTextWidth = tf.textWidth;
 currWidth = tf._width;
@@ -740,22 +742,22 @@ check_equals(tf._y, 5);
 // Check TextField._ymouse
 //-------------------------------------------------------------------------
 
-xcheck_equals(typeof(tf._ymouse), 'number');
+check_equals(typeof(tf._ymouse), 'number');
 check( ! tf.hasOwnProperty('_ymouse') );
-check( ! tf.__proto__.hasOwnProperty('_ymouse') );
+xcheck( ! tf.__proto__.hasOwnProperty('_ymouse') );
 currYmouse = tf._ymouse;
 tf._ymouse = "a string";
-xcheck_equals(typeof(tf._ymouse), 'number');
-xcheck_equals(tf._ymouse, currYmouse); // possibly unsafe, if user moves the mouse while running the test
+check_equals(typeof(tf._ymouse), 'number');
+check_equals(tf._ymouse, currYmouse); // possibly unsafe, if user moves the mouse while running the test
 
 //-------------------------------------------------------------------------
 // Check TextField._yscale
 //-------------------------------------------------------------------------
 
-xcheck_equals(typeof(tf._yscale), 'number');
+check_equals(typeof(tf._yscale), 'number');
 check( ! tf.hasOwnProperty('_yscale') );
-check( ! tf.__proto__.hasOwnProperty('_yscale') );
-xcheck_equals(tf._yscale, 100); 
+xcheck( ! tf.__proto__.hasOwnProperty('_yscale') );
+check_equals(tf._yscale, 100); 
 // check how .textHeight and ._height change based on _yscale
 currTextHeight = tf.textHeight;
 currHeight = tf._height;
@@ -845,9 +847,9 @@ check_equals(typeof(tf6), 'undefined');
 
 
 #if OUTPUT_VERSION < 8
- check_totals(396);
-#else
  check_totals(397);
+#else
+ check_totals(398);
 #endif
 
 #else // OUTPUT_VERSION <= 5

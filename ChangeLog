@@ -1,5 +1,13 @@
 2008-04-08 Sandro Santilli <strk@keybit.net>
 
+	* server/edit_text_character.cpp (attachTextFieldInterface):
+	  add support for _parent, _{x,y}mouse and _{x,y}scale using
+	  native getter-setter in the prototype.
+	* testsuite/actionscript.all/TextField.as: sane tests pass,
+	  insane fail.
+
+2008-04-08 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/TextField.as: test _parent. 
 	  textfields need some love...
 	* testsuite/swfdec/REALTIME: run netstream-dimensions.swf in
