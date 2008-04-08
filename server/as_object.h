@@ -527,6 +527,10 @@ public:
 			int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum,
 			string_table::key nsname = 0);
 
+	void init_readonly_property(const string_table::key& key, as_function& getter,
+			int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum,
+			string_table::key nsname = 0);
+
 	/// \brief
 	/// Use this method for read-only properties.
 	//
@@ -542,6 +546,10 @@ public:
 	/// The id of the namespace to which this member belongs. 0 is a wildcard
 	/// and will be matched by anything not asking for a specific namespace.
 	void init_readonly_property(const std::string& key, as_c_function_ptr getter,
+			int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum,
+			string_table::key nsname = 0);
+
+	void init_readonly_property(const string_table::key& key, as_c_function_ptr getter,
 			int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum,
 			string_table::key nsname = 0);
 

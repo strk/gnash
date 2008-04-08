@@ -2036,70 +2036,70 @@ attachMovieClipProperties(character& o)
   as_c_function_ptr gettersetter;
 
   gettersetter = character::x_getset;
-  o.init_property("_x", gettersetter, gettersetter);
+  o.init_property(NSV::PROP_uX, gettersetter, gettersetter);
 
   gettersetter = character::y_getset;
-  o.init_property("_y", gettersetter, gettersetter);
+  o.init_property(NSV::PROP_uY, gettersetter, gettersetter);
 
   gettersetter = character::xscale_getset;
-  o.init_property("_xscale", gettersetter, gettersetter);
+  o.init_property(NSV::PROP_uXSCALE, gettersetter, gettersetter);
 
   gettersetter = character::yscale_getset;
-  o.init_property("_yscale", gettersetter, gettersetter);
+  o.init_property(NSV::PROP_uYSCALE, gettersetter, gettersetter);
 
   gettersetter = character::xmouse_get;
-  o.init_readonly_property("_xmouse", gettersetter);
+  o.init_readonly_property(NSV::PROP_uXMOUSE, gettersetter);
 
   gettersetter = character::ymouse_get;
-  o.init_readonly_property("_ymouse", gettersetter);
+  o.init_readonly_property(NSV::PROP_uYMOUSE, gettersetter);
 
   gettersetter = character::alpha_getset;
-  o.init_property("_alpha", gettersetter, gettersetter);
+  o.init_property(NSV::PROP_uALPHA, gettersetter, gettersetter);
 
   gettersetter = character::visible_getset;
-  o.init_property("_visible", gettersetter, gettersetter);
+  o.init_property(NSV::PROP_uVISIBLE, gettersetter, gettersetter);
 
   gettersetter = character::width_getset;
-  o.init_property("_width", gettersetter, gettersetter);
+  o.init_property(NSV::PROP_uWIDTH, gettersetter, gettersetter);
 
   gettersetter = character::height_getset;
-  o.init_property("_height", gettersetter, gettersetter);
+  o.init_property(NSV::PROP_uHEIGHT, gettersetter, gettersetter);
 
   gettersetter = character::rotation_getset;
-  o.init_property("_rotation", gettersetter, gettersetter);
+  o.init_property(NSV::PROP_uROTATION, gettersetter, gettersetter);
 
   gettersetter = character::parent_getset;
-  o.init_property("_parent", gettersetter, gettersetter);
+  o.init_property(NSV::PROP_uPARENT, gettersetter, gettersetter);
 
   gettersetter = sprite_currentframe_get;
-  o.init_property("_currentframe", gettersetter, gettersetter);
+  o.init_property(NSV::PROP_uCURRENTFRAME, gettersetter, gettersetter);
 
   gettersetter = sprite_totalframes_get;
-  o.init_property("_totalframes", gettersetter, gettersetter);
+  o.init_property(NSV::PROP_uTOTALFRAMES, gettersetter, gettersetter);
 
   gettersetter = sprite_framesloaded_get;
-  o.init_property("_framesloaded", gettersetter, gettersetter);
+  o.init_property(NSV::PROP_uFRAMESLOADED, gettersetter, gettersetter);
 
   gettersetter = character::target_getset;
-  o.init_property("_target", gettersetter, gettersetter);
+  o.init_property(NSV::PROP_uTARGET, gettersetter, gettersetter);
 
   gettersetter = character::name_getset;
-  o.init_property("_name", gettersetter, gettersetter);
+  o.init_property(NSV::PROP_uNAME, gettersetter, gettersetter);
 
   gettersetter = sprite_droptarget_getset;
-  o.init_property("_droptarget", gettersetter, gettersetter);
+  o.init_property(NSV::PROP_uDROPTARGET, gettersetter, gettersetter);
 
   gettersetter = sprite_url_getset;
-  o.init_property("_url", gettersetter, gettersetter);
+  o.init_property(NSV::PROP_uURL, gettersetter, gettersetter);
 
   gettersetter = sprite_highquality_getset;
-  o.init_property("_highquality", gettersetter, gettersetter);
+  o.init_property(NSV::PROP_uHIGHQUALITY, gettersetter, gettersetter);
 
   gettersetter = sprite_focusrect_getset;
-  o.init_property("_focusrect", gettersetter, gettersetter);
+  o.init_property(NSV::PROP_uFOCUSRECT, gettersetter, gettersetter);
 
   gettersetter = sprite_soundbuftime_getset;
-  o.init_property("_soundbuftime", gettersetter, gettersetter);
+  o.init_property(NSV::PROP_uSOUNDBUFTIME, gettersetter, gettersetter);
 
 }
 

@@ -818,11 +818,29 @@ as_object::init_readonly_property(const std::string& key, as_function& getter,
 }
 
 void
+as_object::init_readonly_property(const string_table::key& k, as_function& getter,
+	int initflags, string_table::key nsname)
+{
+	init_property(k, getter, getter, initflags | as_prop_flags::readOnly
+		| as_prop_flags::isProtected, nsname);
+	assert(_members.getProperty(k, nsname));
+}
+
+void
 as_object::init_readonly_property(const std::string& key, as_c_function_ptr getter,
 	int initflags, string_table::key nsname)
 {
 	string_table::key k = _vm.getStringTable().find(PROPNAME(key));
 
+	init_property(k, getter, getter, initflags | as_prop_flags::readOnly
+		| as_prop_flags::isProtected, nsname);
+	assert(_members.getProperty(k, nsname));
+}
+
+void
+as_object::init_readonly_property(const string_table::key& k, as_c_function_ptr getter,
+	int initflags, string_table::key nsname)
+{
 	init_property(k, getter, getter, initflags | as_prop_flags::readOnly
 		| as_prop_flags::isProtected, nsname);
 	assert(_members.getProperty(k, nsname));

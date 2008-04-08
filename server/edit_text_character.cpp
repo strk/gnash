@@ -87,6 +87,7 @@ static as_value textfield_type_getset(const fn_call& fn);
 static as_value textfield_wordWrap_getset(const fn_call& fn);
 static as_value textfield_html_getset(const fn_call& fn);
 static as_value textfield_selectable_getset(const fn_call& fn);
+static as_value textfield_length_getset(const fn_call& fn);
 
 
 //
@@ -338,6 +339,8 @@ attachTextFieldInterface(as_object& o)
 	o.init_property("html", *getset, *getset);
 	getset = new builtin_function(textfield_selectable_getset);
 	o.init_property("selectable", *getset, *getset);
+	getset = new builtin_function(textfield_length_getset);
+	o.init_property("length", *getset, *getset);
 
 
 	if ( target_version  < 7 ) return;
@@ -2042,6 +2045,26 @@ textfield_selectable_getset(const fn_call& fn)
 }
 
 static as_value
+textfield_length_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<edit_text_character> ptr = ensureType<edit_text_character>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		const std::string& s = ptr->get_text_value();
+		return as_value(s.length()); // TOCHECK: utf-8 ?
+	}
+	else // setter
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("Attempt to set length property of TextField %s"), ptr->getTarget());
+		);
+	}
+
+	return as_value();
+}
+
+static as_value
 textfield_autoSize_getset(const fn_call& fn)
 {
 	boost::intrusive_ptr<edit_text_character> ptr = ensureType<edit_text_character>(fn.this_ptr);
@@ -2105,15 +2128,17 @@ textfield_type_getset(const fn_call& fn)
 edit_text_character::AutoSizeValue
 edit_text_character::parseAutoSizeValue(const std::string& val)
 {
-	if ( val == "left" )
+	StringNoCaseEqual cmp;
+
+	if ( cmp(val, "left") )
 	{
 		return autoSizeLeft;
 	}
-	if ( val == "right" )
+	if ( cmp(val, "right") )
 	{
 		return autoSizeRight;
 	}
-	if ( val == "center" )
+	if ( cmp(val, "center") )
 	{
 		return autoSizeCenter;
 	}

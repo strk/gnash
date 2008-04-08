@@ -20,7 +20,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: TextField.as,v 1.50 2008/04/08 20:23:35 strk Exp $";
+rcsid="$Id: TextField.as,v 1.51 2008/04/08 21:59:24 strk Exp $";
 #include "check.as"
 
 #if OUTPUT_VERSION > 5
@@ -58,7 +58,7 @@ xcheck( !TextField.prototype.hasOwnProperty('embedFonts') );
 check( !TextField.prototype.hasOwnProperty('hscroll') );
 xcheck( !TextField.prototype.hasOwnProperty('html') );
 check( !TextField.prototype.hasOwnProperty('htmlText') );
-check( !TextField.prototype.hasOwnProperty('length') );
+xcheck( !TextField.prototype.hasOwnProperty('length') );
 check( !TextField.prototype.hasOwnProperty('maxChars') );
 check( !TextField.prototype.hasOwnProperty('maxhscroll') );
 check( !TextField.prototype.hasOwnProperty('maxscroll') );
@@ -133,7 +133,7 @@ check( TextField.prototype.hasOwnProperty('embedFonts') );
 xcheck( TextField.prototype.hasOwnProperty('hscroll') );
 check( TextField.prototype.hasOwnProperty('html') );
 xcheck( TextField.prototype.hasOwnProperty('htmlText') );
-xcheck( TextField.prototype.hasOwnProperty('length') );
+check( TextField.prototype.hasOwnProperty('length') );
 xcheck( TextField.prototype.hasOwnProperty('maxChars') );
 xcheck( TextField.prototype.hasOwnProperty('maxhscroll') );
 xcheck( TextField.prototype.hasOwnProperty('maxscroll') );
@@ -149,6 +149,7 @@ xcheck( TextField.prototype.hasOwnProperty('textWidth') );
 check( TextField.prototype.hasOwnProperty('type') );
 check( TextField.prototype.hasOwnProperty('variable') );
 check( TextField.prototype.hasOwnProperty('wordWrap') );
+check( TextField.prototype.hasOwnProperty('length') );
 
 check( ! TextField.prototype.hasOwnProperty('valueOf') );
 check( ! TextField.prototype.hasOwnProperty('toString') );
@@ -180,7 +181,7 @@ o = new Object(); o.toString = function() { return 'center'; };
 tf.autoSize = o;
 check_equals(tf.autoSize, 'center'); // toString is called for object args
 tf.autoSize = 'lEft';
-xcheck_equals(tf.autoSize, 'left'); // arg is not case sensitive 
+check_equals(tf.autoSize, 'left'); // arg is not case sensitive 
 tf.autoSize = new Boolean(true);
 check_equals(tf.autoSize, 'none'); // a Boolean is the same as any other object
 
@@ -311,18 +312,20 @@ check_equals(tf.text, 'Hello <b>html</b> world');
 tf.text = "Hello world";
 check_equals(tf.htmlText, 'Hello world');
 
+//-------------------------------------------------------------------------
 // Check TextField.length  (number of characters in text)
+//-------------------------------------------------------------------------
 
-xcheck_equals(typeof(tf.length), 'number');
+check_equals(typeof(tf.length), 'number');
 check(!tf.hasOwnProperty('length'));
 tf.text = "";
-xcheck_equals(tf.length, 0);
+check_equals(tf.length, 0);
 tf.length = 10; // you don't change lenght like this, you assign to text instead
-xcheck_equals(tf.length, 0);
+check_equals(tf.length, 0);
 tf.text = "Hello world";
-xcheck_equals(tf.length, 11);
+check_equals(tf.length, 11);
 tf.htmlText = "Hello <b>world</b>";
-xcheck_equals(tf.length, 18); // the tags are also counted
+check_equals(tf.length, 18); // the tags are also counted
 
 // Check TextField.maxChars
 
@@ -514,7 +517,7 @@ check( ! tf.hasOwnProperty('text') );
 check_equals(tf.text, 'Hello World');
 tf.text = "hello world";
 check_equals(tf.text, 'hello world');
-xcheck_equals(tf.length, 11); // number of characters in "hello world"
+check_equals(tf.length, 11); // number of characters in "hello world"
 
 
 // Check TextField.textColor
@@ -847,9 +850,9 @@ check_equals(typeof(tf6), 'undefined');
 
 
 #if OUTPUT_VERSION < 8
- check_totals(397);
-#else
  check_totals(398);
+#else
+ check_totals(399);
 #endif
 
 #else // OUTPUT_VERSION <= 5
