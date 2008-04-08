@@ -1,5 +1,7 @@
 2008-04-08 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/TextField.as: test _parent. 
+	  textfields need some love...
 	* testsuite/swfdec/REALTIME: run netstream-dimensions.swf in
 	  real-time.
 	* utilities/processor.cpp: don't parse rcfiles twice.

@@ -20,7 +20,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: TextField.as,v 1.47 2008/03/11 19:31:48 strk Exp $";
+rcsid="$Id: TextField.as,v 1.48 2008/04/08 18:56:45 strk Exp $";
 #include "check.as"
 
 #if OUTPUT_VERSION > 5
@@ -360,7 +360,9 @@ tf.multiline = true;
 check_equals(tf.multiline, true);
 tf.multiline = false;
 
+//-------------------------------------------------------------------------
 // Check TextField._name
+//-------------------------------------------------------------------------
 
 check_equals(typeof(tf._name), 'string');
 check(!tf.hasOwnProperty('_name'));
@@ -377,14 +379,23 @@ check_equals(typeof(tf), 'object');
 check_equals(typeof(tfref), 'object');
 // TODO: see effects of unloading the textfield ?
 
+//-------------------------------------------------------------------------
 // Check TextField._parent
+//-------------------------------------------------------------------------
 
 xcheck_equals(typeof(tf._parent), 'movieclip');
 check(!tf.hasOwnProperty('_parent'));
 check(!tf.__proto__.hasOwnProperty('_parent'));
 xcheck_equals(tf._parent, _root);
+bk = tf._parent;
+tf._parent = 23;
+check_equals(tf._parent, 23); // can be overridden !
+check_equals(tf._target, "/tf"); // but won't change _target
+tf._parent = bk;
 
+//-------------------------------------------------------------------------
 // Check TextField.password
+//-------------------------------------------------------------------------
 
 xcheck_equals(typeof(tf.password), 'boolean');
 check(!tf.hasOwnProperty('password'));
@@ -827,9 +838,9 @@ check_equals(typeof(tf6), 'undefined');
 
 
 #if OUTPUT_VERSION < 8
- check_totals(392);
+ check_totals(394);
 #else
- check_totals(393);
+ check_totals(395);
 #endif
 
 #else // OUTPUT_VERSION <= 5
