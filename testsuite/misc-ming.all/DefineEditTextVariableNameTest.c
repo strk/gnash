@@ -210,7 +210,7 @@ int
 main(int argc, char** argv)
 {
     SWFMovie mo;
-    SWFMovieClip mc1, mc2, mc3, mc4, mc5, mc6;
+    SWFMovieClip mc1, mc2, mc3, mc4, mc5, mc6, mc7;
     SWFDisplayItem it;
     const char *srcdir=".";
     /* The variable name for textfield */
@@ -387,6 +387,22 @@ main(int argc, char** argv)
     check_equals(mo, "mc6.textfield.text", "'change back'");
     SWFMovie_nextFrame(mo); 
 
+    //
+    //  test protection of textField instance variable.
+    //
+    mc7 = newSWFMovieClip();
+    add_text_field(mc7, (SWFBlock)bfont, "text_var7", "initial_text");
+    it = SWFMovie_add(mo, (SWFBlock)mc7);
+    SWFDisplayItem_setName(it, "mc7");
+    SWFDisplayItem_moveTo(it, 400, 400);
+    check_equals(mo, "typeof(mc7.textfield)", "'object'");
+    check_equals(mo, "typeof(mc7.text_var7)", "'string'");
+    add_actions(mo, 
+        "ASSetPropFlags(_root.mc7, null, 7, 7);" 
+        "mc7.textfield.text = 'new_text';");
+    check_equals(mo, "mc7.text_var7", "'initial_text'");
+    check_equals(mo, "mc7.textfield.text", "'new_text'");
+    SWFMovie_nextFrame(mo); 
     /*********************************************
      *
      * Print test results
