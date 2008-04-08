@@ -197,7 +197,7 @@ main(int argc, char *argv[])
     std::vector<const char*> infiles;
  
     //RcInitFile& rcfile = RcInitFile::getDefaultInstance();
-    rcfile.loadFiles();
+    //rcfile.loadFiles();
     
     if (rcfile.verbosityLevel() > 0) {
         dbglogfile.setVerbosity(rcfile.verbosityLevel());
