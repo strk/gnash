@@ -20,7 +20,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: TextField.as,v 1.48 2008/04/08 18:56:45 strk Exp $";
+rcsid="$Id: TextField.as,v 1.49 2008/04/08 19:02:37 strk Exp $";
 #include "check.as"
 
 #if OUTPUT_VERSION > 5
@@ -391,6 +391,11 @@ bk = tf._parent;
 tf._parent = 23;
 check_equals(tf._parent, 23); // can be overridden !
 check_equals(tf._target, "/tf"); // but won't change _target
+r = delete tf._parent;
+check(r);
+TextField.prototype._parent = "from proto";
+xcheck_equals(tf._parent, _root); // still unchanged
+delete TextField.prototype._parent;
 tf._parent = bk;
 
 //-------------------------------------------------------------------------
@@ -488,7 +493,9 @@ tf.tabIndex = 9;
 check_equals(tf.tabIndex, 9);
 delete(tf.tabIndex);
 
+//-------------------------------------------------------------------------
 // Check TextField._target
+//-------------------------------------------------------------------------
 
 check_equals(typeof(tf._target), 'string');
 check( ! tf.hasOwnProperty('_target') ); 
@@ -838,9 +845,9 @@ check_equals(typeof(tf6), 'undefined');
 
 
 #if OUTPUT_VERSION < 8
- check_totals(394);
+ check_totals(396);
 #else
- check_totals(395);
+ check_totals(397);
 #endif
 
 #else // OUTPUT_VERSION <= 5
