@@ -1818,7 +1818,7 @@ sprite_currentframe_get(const fn_call& fn)
 {
   boost::intrusive_ptr<sprite_instance> ptr = ensureType<sprite_instance>(fn.this_ptr);
 
-  return as_value(ptr->get_current_frame() + 1);
+  return as_value(std::min(ptr->get_loaded_frames(), ptr->get_current_frame() + 1));
 }
 
 static as_value
@@ -2976,7 +2976,7 @@ sprite_instance::execute_frame_tags(size_t frame, int typeflags)
 {
   testInvariant();
 
-  assert(frame < get_loaded_frames());
+  //assert(frame < get_loaded_frames());
 
   assert(typeflags);
 
@@ -3988,6 +3988,7 @@ sprite_instance::stagePlacementCallback()
   // See testsuite/misc-swfmill.all/zeroframe_definesprite.swf
   //m_def->ensure_frame_loaded(0);
 
+#if 0
   // We might have loaded NO frames !
   bool hasFrames = get_loaded_frames();
   if ( ! hasFrames )
@@ -3996,6 +3997,7 @@ sprite_instance::stagePlacementCallback()
     ONCE( log_swferror(_("stagePlacementCallback: no frames loaded for sprite/movie %s"), getTarget()) );
     );
   }
+#endif
 
   // We execute events immediately when the stage-placed character is dynamic.
   // This is becase we assume that this means that the character is placed during
@@ -4039,13 +4041,10 @@ sprite_instance::stagePlacementCallback()
   assert(!_callingFrameActions); // or will not be queuing actions
   if ( get_parent() == 0 )
   {
-    if ( hasFrames )
-    {
 #ifdef GNASH_DEBUG
       log_debug(_("Executing tags of frame0 in sprite %s"), getTarget());
 #endif
       execute_frame_tags(0, TAG_DLIST|TAG_ACTION);
-    }
 
     if ( _vm.getSWFVersion() > 5 )
     {
@@ -4064,13 +4063,10 @@ sprite_instance::stagePlacementCallback()
 #endif
     queueEvent(event_id::LOAD, movie_root::apDOACTION);
 
-    if ( hasFrames )
-    {
 #ifdef GNASH_DEBUG
       log_debug(_("Executing tags of frame0 in sprite %s"), getTarget());
 #endif
       execute_frame_tags(0, TAG_DLIST|TAG_ACTION);
-    }
   }
 
 }

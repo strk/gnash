@@ -10,7 +10,7 @@
   |  - _totalframes reflects what's advertised, no matter number of SHOWFRAME
   |
 -->
-  <Header framerate="12" frames="1">
+  <Header framerate="12" frames="2">
     <size>
       <Rectangle left="0" right="12800" top="0" bottom="9600"/>
     </size>
@@ -39,6 +39,64 @@
        -->
       <DefineSprite objectID="3" frames="2">
         <tags>
+          <End/>
+        </tags>
+      </DefineSprite>
+
+      <!--
+        |  Definition of a 0-advertised frames, with NO SHOWFRAME tag
+	|  but an action in it
+       -->
+      <DefineSprite objectID="4" frames="0">
+        <tags>
+          <DoAction>
+            <actions>
+              <PushData>
+                <items>
+                  <StackString value="_root"/> 
+                </items>
+              </PushData> <!-- [string:_root] -->
+              <GetVariable/> <!-- [movieclip:_root] -->
+              <PushData>
+                <items>
+                  <StackString value="summary"/> 
+                  <StackString value="_root"/> 
+                </items>
+              </PushData> <!-- [movieclip:_root],[string:summary],[string:_root] -->
+              <GetVariable/> <!-- [movieclip:_root],[string:summary],[movieclip:_root] -->
+              <PushData>
+                <items>
+                  <StackString value="summary"/> 
+                </items>
+              </PushData> <!-- [movieclip:_root],[string:summary],[movieclip:_root],[string:summary] -->
+              <GetMember/> <!-- [movieclip:_root],[string:summary],[string:a00b11c22] -->
+              <PushData>
+                <items>
+                  <StackString value="d"/> 
+                  <StackString value="_framesloaded"/> 
+                </items>
+              </PushData> <!-- [movieclip:_root],[string:summary],[string:a00b11c22],[string:d],[string:_framesloaded] -->
+              <GetVariable/> <!-- [movieclip:_root],[string:summary],[string:a00b11c22],[string:d],[number:0] -->
+              <AddTyped/> <!-- [movieclip:_root],[string:summary],[string:a00b11c22],[string:d0] -->
+              <PushData>
+                <items>
+                  <StackString value="_totalframes"/> 
+                </items>
+              </PushData> <!-- [movieclip:_root],[string:summary],[string:a00b11c22],[string:d0],[string:_totalframes] -->
+              <GetVariable/> <!-- [movieclip:_root],[string:summary],[string:a00b11c22],[string:d0],[number:0] -->
+              <AddTyped/> <!-- [movieclip:_root],[string:summary],[string:a00b11c22],[string:d00] -->
+              <PushData>
+                <items>
+                  <StackString value="_currentframe"/> 
+                </items>
+              </PushData> <!-- [movieclip:_root],[string:summary],[string:a00b11c22],[string:d00],[string:_currentframe] -->
+              <GetVariable/> <!-- [movieclip:_root],[string:summary],[string:a00b11c22],[string:d00],[number:0] -->
+              <AddTyped/> <!-- [movieclip:_root],[string:summary],[string:a00b11c22],[string:d000] -->
+              <AddTyped/> <!-- [movieclip:_root],[string:summary],[string:a00b11c22d000] -->
+              <SetMember/> <!-- EMPTY STACK -->
+              <EndAction/>
+            </actions>
+          </DoAction>
           <End/>
         </tags>
       </DefineSprite>
@@ -180,18 +238,27 @@
         </events>
       </PlaceObject2>
 
+      <!--
+        |  Place the zero-frames no-showframe sprite but action tag in it
+       -->
+      <PlaceObject2 replace="0" depth="4" objectID="4" name="zero_zero_doaction" allflags1="0" allflags2="0">
+      </PlaceObject2>
+
+      <!-- Let a frame go by, so actions in object 4 (zero_zero_doaction) are executed before we check here -->
+      <ShowFrame/>
+
       <DoAction>
         <actions>
           <PushData>
             <items>
-              <StackString value="a00b11c22"/>
+              <StackString value="a00b11c22d000"/>
               <StackString value="summary"/>
             </items>
           </PushData>
           <GetVariable/> 
 
           <Duplicate/> <!-- .. debugging .. -->
-          <Trace/> <!-- expect a00b11c22 -->
+          <Trace/> <!-- expect a00b11c22d000 -->
 
 	  <EqualTyped/>
 
@@ -205,27 +272,30 @@
                 // NOTE: the number of characters in the next string push 
                 // DOES matter in the BranchIfTrue tag above, so keep it constant
                 -->
-              <StackString value="FAILED: expected a00b11c22 ...        "/>
+              <StackString value="FAILED: expected a00b11c22d000        "/>
             </items>
           </PushData>
           <Trace/>
-          <BranchAlways byteOffset="27"/> // get to end 
+          <BranchAlways byteOffset="37"/> // get to end 
 
 	  // PASSED tracing
           <PushData>
             <items>
-              <StackString value="PASSED: got a00b11c22"/>
+              <StackString value="PASSED: got a00b11c22d000      "/>
             </items>
           </PushData>
           <Trace/>
 
-	  // END OF TEST tag
+          // END OF TEST tag
           <PushData>
             <items>
               <StackString value="END OF TEST"/>
             </items>
           </PushData>
           <Trace/>
+
+          // don't loop forever..
+          <Stop/>
 
           <EndAction/>
         </actions>

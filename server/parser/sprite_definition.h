@@ -109,41 +109,14 @@ public:
 		_timeline.getFrameDepths(frameno, depths);
 	}
 
-private:
-
-	void read(stream* in);
-
-	/// Tags loader table.
-	//
-	/// TODO: make it a static member, specific to sprite_definition
-	SWF::TagLoadersTable& _tag_loaders;
-
-	/// Top-level movie definition
-	/// (the definition read from SWF stream)
-	movie_definition* m_movie_def;
-
-	typedef std::map<size_t, PlayList> PlayListMap;
-
-	/// movie control events for each frame.
-	PlayListMap m_playlist;
-
-	// stores 0-based frame #'s
-	typedef std::map<std::string, size_t> NamedFrameMap;
-	NamedFrameMap m_named_frames;
-
-	size_t m_frame_count;
-
-	// Number of frames completely parsed 
-	size_t m_loading_frame;
-
-	// overloads from movie_definition
+	// overload from movie_definition
 	virtual float	get_width_pixels() const { return 1; }
+
+	// overload from movie_definition
 	virtual float	get_height_pixels() const { return 1; }
 
-	virtual size_t	get_frame_count() const
-	{
-		return m_frame_count;
-	}
+	// overload from movie_definition
+	virtual size_t	get_frame_count() const { return m_frame_count; }
 
 	/// \brief
 	/// Return total bytes of the movie from which this sprite
@@ -278,6 +251,34 @@ private:
 		character* parent, int id);
 
 
+private:
+
+	void read(stream* in);
+
+	/// Tags loader table.
+	//
+	/// TODO: make it a static member, specific to sprite_definition
+	SWF::TagLoadersTable& _tag_loaders;
+
+	/// Top-level movie definition
+	/// (the definition read from SWF stream)
+	movie_definition* m_movie_def;
+
+	typedef std::map<size_t, PlayList> PlayListMap;
+
+	/// movie control events for each frame.
+	PlayListMap m_playlist;
+
+	// stores 0-based frame #'s
+	typedef std::map<std::string, size_t> NamedFrameMap;
+	NamedFrameMap m_named_frames;
+
+	size_t m_frame_count;
+
+	// Number of frames completely parsed 
+	size_t m_loading_frame;
+
+
 	// See dox in movie_definition.h
 	virtual void	addControlTag(ControlTag* c)
 	{
@@ -295,7 +296,7 @@ private:
 	{
 		// Don't access playlist of a frame which has not been
 		// completely parsed yet.
-		assert(frame_number < m_loading_frame);
+		//assert(frame_number < m_loading_frame);
 
 		PlayListMap::const_iterator it = m_playlist.find(frame_number);
 		if ( it == m_playlist.end() ) return NULL;

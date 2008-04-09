@@ -916,6 +916,12 @@ sprite_loader(stream* in, tag_type tag, movie_definition* m)
     sprite_definition* ch = new sprite_definition(m, in);
     //ch->read(in);
 
+    IF_VERBOSE_MALFORMED_SWF(
+    if ( ! ch->get_frame_count() )
+	log_swferror(_("Sprite %d advertise no frames"), character_id);
+    );
+
+
     m->add_character(character_id, ch);
 }
 

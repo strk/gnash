@@ -1,3 +1,25 @@
+2008-04-09 Sandro Santilli <strk@keybit.net>
+
+	* server/parser/sprite_definition.h: overrides from public virtuals
+	  in base class can as well be public here; comment out the
+	  assertion insisting in getPlaylist requiring a frame number <
+	  the advertised number of frames (we must support advertising
+	  less frames then available, in particular: 0).
+	* server/parser/sprite_definition.cpp (read): always warn about
+	  malformed swf, not just the first time. It will stop at end of
+	  parsing anyway.
+	* server/sprite_instance.cpp:
+	  (stagePlacementCallback): still try to execute tags in first frame,
+	  even if there were no SHOWFRAME tags (fixes bug #22872).
+	  (sprite_currentframe_get): return min between loaded frame
+	  and current frame (well, yes, it seems real current frame may be
+	  > then loaded, in gnash model).
+	* server/swf/tag_loaders.cpp (sprite_loader): warn' here about
+	  no frames advertised (so we have the character id).
+	* testsuite/misc-swfmill.all/zeroframe_definesprite.xml: test
+	  that tags in first frame of a 0-advertised 0-showframe 
+	  sprite are still executed.
+
 2008-04-08 Sandro Santilli <strk@keybit.net>
 
 	* server/as_object.{cpp,h}: add init_readonly_property taking

@@ -156,14 +156,13 @@ sprite_definition::read(stream* in)
         if ( m_frame_count > m_loading_frame )
         {
 		IF_VERBOSE_MALFORMED_SWF(
-		ONCE( log_swferror(_(SIZET_FMT " frames advertised in header, but only " SIZET_FMT " SHOWFRAME tags "
-			"found in define sprite. Is a common thing, will warn only once."), m_frame_count, m_loading_frame) );
+		log_swferror(_("%d frames advertised in header, but only %d SHOWFRAME tags "
+			"found in define sprite."), m_frame_count, m_loading_frame );
 		);
 
 		// this should be safe 
 		m_loading_frame = m_frame_count;
         }
-
 
 		IF_VERBOSE_PARSE (
 	log_parse(_("  -- sprite END --"));
