@@ -1,5 +1,9 @@
 2008-04-09 Sandro Santilli <strk@keybit.net>
 
+	* libbase/GC.cpp: don't need to include builtin_function.h.
+
+2008-04-09 Sandro Santilli <strk@keybit.net>
+
 	* server/parser/sprite_definition.h: overrides from public virtuals
 	  in base class can as well be public here; comment out the
 	  assertion insisting in getPlaylist requiring a frame number <

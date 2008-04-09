@@ -22,7 +22,6 @@
 #endif
 
 #include "GC.h"
-#include "builtin_function.h"
 #include "utility.h" // for typeName()
 
 #ifdef GNASH_GC_DEBUG
