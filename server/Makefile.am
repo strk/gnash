@@ -101,7 +101,6 @@ libgnashserver_la_SOURCES = \
 	stream.cpp \
 	styles.cpp \
 	text.cpp \
-	textformat.cpp \
 	timers.cpp \
 	types.cpp 	\
 	$(FREETYPE_SOURCES) \
@@ -180,7 +179,6 @@ noinst_HEADERS = \
 	swf_event.h \
 	swf_function.h \
 	text.h \
-	textformat.h \
 	timers.h \
 	types.h	\
 	video_stream_instance.h \

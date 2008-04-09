@@ -54,7 +54,7 @@
 #include "Sound.h"
 #include "Stage.h"
 #include "System.h"
-#include "textformat.h"
+#include "TextFormat.h"
 #include "TextSnapshot.h"
 #include "video_stream_instance.h"
 #include "extension.h"

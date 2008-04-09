@@ -21,7 +21,6 @@
 #include "types.h"
 #include "character_def.h" // for inheritance
 #include "rect.h" // for composition
-#include "textformat.h" // for composition
 
 namespace gnash {
 

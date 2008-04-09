@@ -27,7 +27,6 @@
 
 #include "character_def.h" // for inheritance
 #include "text.h" // for text_glyph_record
-#include "textformat.h" // maybe we should include it here
 #include "styles.h" 
 #include "rect.h" // for composition
 

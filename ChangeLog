@@ -1,5 +1,15 @@
 2008-04-09 Sandro Santilli <strk@keybit.net>
 
+	* server/Makefile.am, server/textformat.{cpp,h},
+	  server/asobj/Global.cpp, server/asobj/Makefile.am,
+	  server/asobj/TextFormat.{cpp,h}:
+	  Move TextFormat stuff under asobj/
+	* server/parser/edit_text_character_def.h,
+	  server/parser/text_character_def.h: remove unused (and now
+	  obsoleted) textformat.h include.
+
+2008-04-09 Sandro Santilli <strk@keybit.net>
+
 	* server/textformat.{cpp,h}: stub TextFormat in the up-to-date way
 	* server/asobj/ClassHierarchy.cpp: don't include textformat.h
 	* server/asobj/Global.cpp: initialize TextFormat object in the 
