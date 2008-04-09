@@ -25,6 +25,7 @@
 #include "builtin_function.h" // for getter/setter properties
 #include "namedStrings.h"
 #include "VM.h"
+#include "server/types.h" // for PIXELS_TO_TWIPS
 
 #define ONCE(x) { static bool warned=false; if (!warned) { warned=true; x; } }
 
@@ -175,16 +176,38 @@ TextFormat::color_getset(const fn_call& /*fn*/)
 }
 
 as_value
-TextFormat::size_getset(const fn_call& /*fn*/)
+TextFormat::size_getset(const fn_call& fn)
 {
-	ONCE( log_unimpl("TextField.size") );
+	boost::intrusive_ptr<TextFormat> ptr = ensureType<TextFormat>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		return as_value(TWIPS_TO_PIXELS(ptr->size()));
+	}
+	else // setter
+	{
+		ptr->sizeSet(PIXELS_TO_TWIPS(fn.arg(0).to_int()));
+		ONCE( log_debug("TextField.size setter TESTING") );
+
+	}
+
 	return as_value();
 }
 
 as_value
-TextFormat::font_getset(const fn_call& /*fn*/)
+TextFormat::font_getset(const fn_call& fn)
 {
-	ONCE( log_unimpl("TextField.font") );
+	boost::intrusive_ptr<TextFormat> ptr = ensureType<TextFormat>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		return as_value(ptr->font());
+	}
+	else // setter
+	{
+		ptr->fontSet(fn.arg(0).to_string());
+	}
+
 	return as_value();
 }
 
@@ -213,8 +236,10 @@ attachTextFormatInterface(as_object& o)
 	o.init_readonly_property("target", &TextFormat::target_getset);
 	o.init_readonly_property("url", &TextFormat::url_getset);
 	o.init_readonly_property("color", &TextFormat::color_getset);
-	o.init_readonly_property("size", &TextFormat::size_getset);
-	o.init_readonly_property("font", &TextFormat::font_getset);
+
+	o.init_property("size", &TextFormat::size_getset, &TextFormat::size_getset);
+
+	o.init_property("font", &TextFormat::font_getset, &TextFormat::font_getset);
 }
 
 static as_object*

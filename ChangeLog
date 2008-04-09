@@ -1,5 +1,17 @@
 2008-04-09 Sandro Santilli <strk@keybit.net>
 
+	* libbase/ref_counted.h, libbase/smart_ptr.h: const-correctness.
+	* server/edit_text_character.{cpp,h}: partially implement setTextFormat
+	  and getTextFormat; keep font by intrusive_ptr to avoid leak of
+	  AS-created fonts [should be optimized to leave ownership to fontlib]
+	* server/asobj/Makefile.am: add FREETYPE_CFLAGS
+	* server/asobj/TextFormat.{cpp,h}: implement getter-setters for font
+	  size and name.
+	* testsuite/misc-ming.all/DefineEditTextTest.c: test
+	  getTextFormat()'s font and name.
+
+2008-04-09 Sandro Santilli <strk@keybit.net>
+
 	* server/Makefile.am, server/textformat.{cpp,h},
 	  server/asobj/Global.cpp, server/asobj/Makefile.am,
 	  server/asobj/TextFormat.{cpp,h}:

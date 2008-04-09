@@ -22,6 +22,7 @@
 #define __TEXTFORMAT_H__
 
 #include "as_object.h" // for inheritance of TextFormat
+#include "edit_text_character_def.h" // for edit_text_character_def::alignment enum
 #include <boost/cstdint.hpp> // for boost::uint32_t
 #include <string>
 
@@ -59,7 +60,7 @@ public:
 	/// \brief
 	/// Return ann integer that indicates the indentation from the left
         /// margin to the first character in the paragraph
-	float indent() const { return _indent; }
+	boost::uint16_t indent() const { return _indent; }
 
 	/// Return the alignment of the paragraph, represented as a string.
 	//
@@ -69,41 +70,44 @@ public:
 	///
 	/// FIXME: use an enum !
 	///
-	const std::string& align() const { return _align; }
+	edit_text_character_def::alignment align() const { return _align; }
 
 	/// Return the name of a font for text as a string.
 	const std::string& font() const { return _font; }
 
 	///
-	float blockIndent() { return _block_indent; }
+	boost::uint16_t blockIndent() { return _block_indent; }
 
 	/// Return a number that indicates the amount of leading vertical
 	/// space between lines.
-	float leading()     { return _leading; }
+	boost::uint16_t leading()     { return _leading; }
 
 	/// Indicates the left margin of the paragraph, in points.
-	float leftMargin()  { return _left_margin; }
+	boost::uint16_t leftMargin()  { return _left_margin; }
 
 	/// Indicates the right margin of the paragraph, in points.
-	float RightMargin() { return _right_margin; }
+	boost::uint16_t rightMargin() { return _right_margin; }
 
-	/// Return a float that indicates the point size.
-	float size()        { return _point_size; }
+	/// Return a float that indicates the point size in twips.
+	boost::uint16_t size()        { return _point_size; }
 
 	void underlinedSet(bool x)   { _underline = x; }
 	void italicedSet(bool x)     { _italic = x; }
 	void boldSet(bool x)         { _bold = x; }
 	void bulletSet(bool x)       { _bullet = x; }
 	void colorSet(boost::uint32_t x)      { _color = x; }
-	void indentSet(float x)      { _indent = x; }
+	void indentSet(boost::uint16_t x)      { _indent = x; }
+	void fontSet(const std::string& font) { _font=font; }
 
-	void alignSet(const std::string& x)  { _align = x; }
+	void alignSet(edit_text_character_def::alignment x)  { _align = x; }
 
-	void blockIndentSet(float x)   { _block_indent = x; }
-	void leadingSet(float x)     { _leading = x; }
-	void leftMarginSet(float x)  { _left_margin = x; }
-	void rightMarginSet(float x) { _right_margin = x; }
-	void sizeSet(float x)        { _point_size = x; }
+	void blockIndentSet(boost::uint16_t x)   { _block_indent = x; }
+	void leadingSet(boost::uint16_t x)     { _leading = x; }
+	void leftMarginSet(boost::uint16_t x)  { _left_margin = x; }
+	void rightMarginSet(boost::uint16_t x) { _right_margin = x; }
+
+	/// Set font point size in twips
+	void sizeSet(boost::uint16_t x)        { _point_size = x; }
 
 	static as_value display_getset(const fn_call& fn);
 	static as_value bullet_getset(const fn_call& fn);
@@ -144,14 +148,12 @@ private:
 	//
 	/// If "left", the paragraph is left-aligned. If "center", the
 	/// paragraph is centered. If "right", the paragraph is
-	/// right-aligned.
+	/// right-aligned. If "justify", the paragraph is justified.
 	///
-	/// FIXME: use an enum !
-	///
-	std::string _align;
+	edit_text_character_def::alignment _align;
 
 	// 
-	float		_block_indent;
+	boost::uint16_t		_block_indent;
 
 	/// The color of text using this text format.
 	//
@@ -163,24 +165,24 @@ private:
 	std::string _font;	
 
 	/// An integer that indicates the indentation from the left
-        /// margin to the first character in the paragraph
-	float		_indent;
+        /// margin to the first character in the paragraph (twips)
+	boost::uint16_t _indent;
 
 	/// A number that indicates the amount of leading vertical
-	/// space between lines.
-	float		_leading;
+	/// space between lines (twips)
+	boost::uint16_t _leading;
 
-	/// Indicates the left margin of the paragraph, in points.
-	float		_left_margin;
+	/// Indicates the left margin of the paragraph, in points (twips)
+	boost::uint16_t _left_margin;
 
-	/// Indicates the right margin of the paragraph, in points.
-	float		_right_margin;
+	/// Indicates the right margin of the paragraph, in points (twips).
+	boost::uint16_t _right_margin;
 
-	/// An float that indicates the point size.
-	float		_point_size;
+	/// Point size in twips.
+	boost::uint16_t	_point_size;
 
 	///
-	int		_tab_stops;
+	int _tab_stops;
 
 	/// The target window where the hyperlink is displayed. 
         /// If the target window is an empty string, the text is displayed in

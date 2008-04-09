@@ -23,11 +23,12 @@
 #endif
 
 #include "character.h" // for inheritance
-#include "edit_text_character_def.h" // for inlines
+#include "edit_text_character_def.h" // for inlines and typedefs
 #include "styles.h" // for fill_style and line_style
 #include "text.h" // for text_glyph_record
 #include "Range2d.h"
 #include "rect.h" // for inlines
+#include "font.h" // for visibility of font add_ref/drop_ref
 
 // Forward declarations
 namespace gnash {
@@ -330,6 +331,57 @@ public:
 	///
 	void removeTextField();
 
+	/// Set our font, return previously set one.
+	//
+	/// @param newfont
+	///	Will be stored in an intrusive_ptr
+	///
+	boost::intrusive_ptr<const font> setFont(boost::intrusive_ptr<const font> newfont);
+
+	const font* getFont() { return _font.get(); }
+
+	boost::uint16_t getFontHeight() const
+	{
+		return _fontHeight;
+	}
+
+	void setFontHeight(boost::uint16_t h);
+
+	boost::uint16_t getLeftMargin() const
+	{
+		return _leftMargin;
+	}
+
+	void setLeftMargin(boost::uint16_t h);
+
+	boost::uint16_t getRightMargin() const
+	{
+		return _rightMargin;
+	}
+
+	void setRightMargin(boost::uint16_t h);
+
+	boost::uint16_t getIndent() const
+	{
+		return _indent;
+	}
+
+	void setIndent(boost::uint16_t h);
+
+	edit_text_character_def::alignment getAlignment() const
+	{
+		return _alignment;
+	}
+
+	void setAlignment(edit_text_character_def::alignment h);
+
+	boost::uint16_t getLeading() const
+	{
+		return _leading;
+	}
+
+	void setLeading(boost::uint16_t h);
+
 private:
 
 	/// Set our text to the given string.
@@ -404,12 +456,20 @@ private:
 	float align_line(edit_text_character_def::alignment align,
 			int last_line_start_record, float x);
 
-	/// Set our font, return previously set one.
-	/// This is private for now, but might eventally
-	/// be public, for setting fonts from ActionScript.
-	const font* set_font(const font* newfont);
 
-	const font* _font;
+	boost::uint16_t _leading;
+
+	edit_text_character_def::alignment _alignment;
+
+	boost::uint16_t _indent;
+
+	boost::uint16_t _leftMargin;
+
+	boost::uint16_t _rightMargin;
+
+	boost::uint16_t _fontHeight;
+
+	boost::intrusive_ptr<const font> _font;
 
 	bool m_has_focus;
 	size_t m_cursor;
@@ -493,20 +553,14 @@ private:
 
 protected:
 
-#ifdef GNASH_USE_GC
 	/// Mark reachable reosurces (for GC)
 	//
-	/// Reachable resource is currenlty just our definition,
-	/// plus common character resources
+	/// Reachable resources are:
+	///  - The font being used (m_font) 
+	///  - Our definition
+	///  - Common character resources
 	///
-	void markReachableResources() const
-	{
-		if ( m_def.get() ) m_def->setReachable();
-
-		// recurse to parent...
-		markCharacterReachable();
-	}
-#endif
+	void markReachableResources() const;
 };
 
 /// Initialize the global TextField class

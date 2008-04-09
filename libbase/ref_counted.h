@@ -97,7 +97,7 @@ public:
 	// If this design convinces us we'll be removing these two
 	// methods and all the calls from ref-counted classes.
 	//
-	void setReachable() { assert(m_ref_count > 0); }
+	void setReachable() const { assert(m_ref_count > 0); }
 	bool isReachable() const { return true; }
 };
 

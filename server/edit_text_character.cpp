@@ -39,6 +39,7 @@
 #include "array.h" // for _listeners construction
 #include "AsBroadcaster.h" // for initializing self as a broadcaster
 #include "StringPredicates.h"
+#include "TextFormat.h" // for getTextFormat/setTextFormat
 
 #include <algorithm>
 #include <string>
@@ -58,6 +59,8 @@
 // of rotated or skewed text.
 //
 //#define PP_COMPATIBLE_DEVICE_FONT_HANDLING 1
+
+#define ONCE(x) { static bool warned=false; if (!warned) { warned=true; x; } }
 
 namespace gnash {
 
@@ -114,22 +117,6 @@ textfield_set_variable(const fn_call& fn)
 	text->set_variable_name(newname);
 
 	return as_value();
-}
-
-static as_value
-textfield_setTextFormat(const fn_call& fn)
-{
-	boost::intrusive_ptr<edit_text_character> text = ensureType<edit_text_character>(fn.this_ptr);
-	UNUSED(text);
-
-	static bool warned = false;
-	if ( ! warned ) {
-		log_unimpl("TextField.setTextFormat()");
-		warned = true;
-	}
-
-	return as_value();
-
 }
 
 static as_value
@@ -193,16 +180,94 @@ static as_value
 textfield_getTextFormat(const fn_call& fn)
 {
 	boost::intrusive_ptr<edit_text_character> text = ensureType<edit_text_character>(fn.this_ptr);
-	UNUSED(text);
 
-	static bool warned = false;
-	if ( ! warned ) {
-		log_unimpl("TextField.getTextFormat()");
-		warned = true;
+	boost::intrusive_ptr<TextFormat> tf = new TextFormat();
+	tf->alignSet(text->getTextAlignment());
+	tf->sizeSet(text->getFontHeight());
+	tf->indentSet(text->getIndent());
+	tf->leadingSet(text->getLeading());
+	tf->leftMarginSet(text->getLeftMargin());
+	tf->rightMarginSet(text->getRightMargin());
+
+	const font* font = text->getFont();
+	if (font)
+	{
+		tf->fontSet(font->get_name());
 	}
 
-	return as_value();
+	// TODO: add font name, color and some more
+
+	ONCE( log_unimpl("TextField.getTextFormat() INCOMPLETE") );
+
+	return as_value(tf.get());
 }
+
+static as_value
+textfield_setTextFormat(const fn_call& fn)
+{
+	GNASH_REPORT_FUNCTION;
+
+	boost::intrusive_ptr<edit_text_character> text = ensureType<edit_text_character>(fn.this_ptr);
+
+	if ( ! fn.nargs )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		std::stringstream ss; fn.dump_args(ss);
+		log_aserror("TextField.setTextFormat(%s) : %s", ss.str(), _("missing arg"))
+		);
+		return as_value();
+	}
+	else if ( fn.nargs > 2 )
+	{
+		std::stringstream ss; fn.dump_args(ss);
+		log_debug("TextField.setTextFormat(%s) : args past the first are unhandled by Gnash", ss.str());
+	}
+
+	as_object* obj = fn.arg(0).to_object().get();
+	if ( ! obj )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		std::stringstream ss; fn.dump_args(ss);
+		log_aserror("TextField.setTextFormat(%s) : %s", ss.str(), _("first argument is not an object"))
+		);
+		return as_value();
+	}
+
+	TextFormat* tf = dynamic_cast<TextFormat*>(obj);
+	if ( ! tf )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		std::stringstream ss; fn.dump_args(ss);
+		log_aserror("TextField.setTextFormat(%s) : %s", ss.str(), _("first argument is not a TextFormat"))
+		);
+		return as_value();
+	}
+
+	text->setAlignment(tf->align());
+	text->setFontHeight(tf->size()); // keep twips
+	text->setIndent(tf->indent());
+	text->setLeading(tf->leading());
+	text->setLeftMargin(tf->leftMargin());
+	text->setRightMargin(tf->rightMargin());
+
+	const std::string& fontName = tf->font();
+	if ( ! fontName.empty() )
+	{
+		// TODO: reuse an existing font with this name if known !
+		//       Would need cleanups in the fontlib package
+		//       for proper thread-safety
+		boost::intrusive_ptr<font> f ( new font(fontName) );
+		text->setFont( f );
+	}
+
+	// TODO: add font name, color and some more
+
+	ONCE( log_unimpl("TextField.setTextFormat() TESTING") );
+
+	return as_value();
+
+}
+
 
 static as_value
 textfield_replaceSel(const fn_call& fn)
@@ -397,6 +462,12 @@ edit_text_character::edit_text_character(character* parent,
 	_text(L""),
 	_textDefined(def->has_text()),
 	m_def(def),
+	_leading(m_def->get_leading()),
+	_alignment(def->get_alignment()),
+	_indent(def->get_indent()), 
+	_leftMargin(def->get_left_margin()), 
+	_rightMargin(def->get_right_margin()), 
+	_fontHeight(def->get_font_height()), 
 	_font(0),
 	m_has_focus(false),
 	m_cursor(0u),
@@ -427,7 +498,7 @@ edit_text_character::edit_text_character(character* parent,
 	set_member(NSV::PROP_uLISTENERS, ar);
 
 	// WARNING! remember to set the font *before* setting text value!
-	set_font( m_def->get_font() );
+	setFont( m_def->get_font() );
 
 	// set default text *before* calling registerTextVariable
 	// (if the textvariable already exist and has a value
@@ -496,7 +567,7 @@ edit_text_character::show_cursor(const matrix& mat)
 {
 	boost::uint16_t x = static_cast<boost::uint16_t>(m_xcursor);
 	boost::uint16_t y = static_cast<boost::uint16_t>(m_ycursor);
-	boost::uint16_t h = m_def->get_font_height();
+	boost::uint16_t h = getFontHeight();
 
 	boost::int16_t box[4];
 	box[0] = x;
@@ -714,7 +785,7 @@ edit_text_character::get_topmost_mouse_entity(float x, float y)
 	}
 	
 	// shouldn't this be !can_handle_mouse_event() instead ?
-	if (m_def->get_no_select())
+	if (_selectable)
 	{
 		// not selectable, so don't catch mouse events!
 		return NULL;
@@ -1101,7 +1172,7 @@ edit_text_character::align_line(
 	assert(m_def);
 
 	float width = _bounds.width(); // m_def->width()
-	float right_margin = m_def->get_right_margin();
+	float right_margin = getRightMargin();
 
 	float	extra_space = (width - right_margin) - x - PADDING_TWIPS;
 
@@ -1147,12 +1218,16 @@ edit_text_character::align_line(
 	return shift_right;
 }
 
-const font*
-edit_text_character::set_font(const font* newfont)
+boost::intrusive_ptr<const font>
+edit_text_character::setFont(boost::intrusive_ptr<const font> newfont)
 {
-	const font* oldfont = _font;
-	_font = newfont; // @@ should I add_ref() ?
-	return oldfont;  // @@ should I drop_ref() ?
+	if ( newfont == _font ) return _font;
+
+	boost::intrusive_ptr<const font> oldfont = _font;
+	set_invalidated();
+	_font = newfont; 
+	format_text();
+	return oldfont;  
 }
 
 void
@@ -1193,16 +1268,16 @@ edit_text_character::format_text()
 		return;
 	}
 
-	float scale = m_def->get_font_height() / 1024.0f;	// the EM square is 1024 x 1024
+	boost::uint16_t fontHeight = getFontHeight();
+	float scale = fontHeight / 1024.0f;	// the EM square is 1024 x 1024
 	float fontDescent = _font->get_descent() * scale;
-	float fontLeading = _font->get_leading() * scale;
-	boost::uint16_t fontHeight = m_def->get_font_height();
-	boost::uint16_t leftMargin = m_def->get_left_margin();
-	boost::uint16_t rightMargin = m_def->get_right_margin();
-	boost::uint16_t indent = m_def->get_indent();
+	float fontLeading = _font->get_leading() * scale; 
+	boost::uint16_t leftMargin = getLeftMargin();
+	boost::uint16_t rightMargin = getRightMargin();
+	boost::uint16_t indent = getIndent();
 
 	text_glyph_record	rec;	// one to work on
-	rec.m_style.setFont(_font);
+	rec.m_style.setFont(_font.get());
 	rec.m_style.m_color = getTextColor(); 
 	rec.m_style.m_x_offset = PADDING_TWIPS + std::max(0, leftMargin + indent); 
 	rec.m_style.m_y_offset = PADDING_TWIPS + fontHeight
@@ -1218,7 +1293,7 @@ edit_text_character::format_text()
 	// Start the bbox at the upper-left corner of the first glyph.
 	reset_bounding_box(x, y - fontDescent + fontHeight); 
 
-	float	leading = m_def->get_leading();
+	float leading = getLeading();
 	leading += fontLeading * scale;
 
 	int	last_code = -1; // only used if _embedFonts
@@ -1267,7 +1342,7 @@ edit_text_character::format_text()
 
 			// Start a new record on the next line.
 			rec.m_glyphs.resize(0);
-			rec.m_style.setFont(_font); 
+			rec.m_style.setFont(_font.get()); 
 			rec.m_style.m_color = getTextColor();
 			rec.m_style.m_x_offset = x;
 			rec.m_style.m_y_offset = y;
@@ -1469,17 +1544,17 @@ after_x_advance:
 					// Close out this stretch of glyphs.
 					m_text_glyph_records.push_back(rec);
 					float	previous_x = x;
-					x = m_def->get_left_margin() + PADDING_TWIPS;
-					y += m_def->get_font_height() + leading;
+					x = getLeftMargin() + PADDING_TWIPS;
+					y += getFontHeight() + leading;
 
 
 					// Start a new record on the next line.
 					rec.m_glyphs.resize(0);
-					rec.m_style.setFont(_font);
+					rec.m_style.setFont(_font.get());
 					rec.m_style.m_color = getTextColor();
 					rec.m_style.m_x_offset = x;
 					rec.m_style.m_y_offset = y;
-					rec.m_style.m_text_height = m_def->get_font_height();
+					rec.m_style.m_text_height = getFontHeight();
 					rec.m_style.m_has_x_offset = true;
 					rec.m_style.m_has_y_offset = true;
 					
@@ -1696,7 +1771,6 @@ edit_text_character::set_variable_name(const std::string& newname)
 	{
 		_variable_name = newname;
 		_text_variable_registered = false;
-		//setTextValue(m_def->get_default_text());
 #ifdef DEBUG_DYNTEXT_VARIABLES
 		log_debug("Calling updateText after change of variable name");
 #endif
@@ -1754,8 +1828,6 @@ edit_text_character::pointInShape(float x, float y) const
 	point lp(x, y);
 	wm.transform_by_inverse(lp);
 	return _bounds.contains(lp.x, lp.y);
-	//const rect& def_bounds = m_def->get_bounds();
-	//return def_bounds.point_test(lp.x, lp.y);
 }
 
 bool
@@ -1883,6 +1955,72 @@ edit_text_character::get_world_cxform() const
 #endif
   
   return cf;
+}
+
+void
+edit_text_character::setLeading(uint16_t h)
+{
+	if ( _leading != h )
+	{
+		set_invalidated();
+		_leading = h;
+		format_text();
+	}
+}
+
+void
+edit_text_character::setAlignment(edit_text_character_def::alignment h)
+{
+	if ( _alignment != h )
+	{
+		set_invalidated();
+		_alignment = h;
+		format_text();
+	}
+}
+
+void
+edit_text_character::setIndent(boost::uint16_t h)
+{
+	if ( _indent != h )
+	{
+		set_invalidated();
+		_indent = h;
+		format_text();
+	}
+}
+
+void
+edit_text_character::setRightMargin(boost::uint16_t h)
+{
+	if ( _rightMargin != h )
+	{
+		set_invalidated();
+		_rightMargin = h;
+		format_text();
+	}
+}
+
+void
+edit_text_character::setLeftMargin(boost::uint16_t h)
+{
+	if (_leftMargin != h)
+	{
+		set_invalidated();
+		_leftMargin = h;
+		format_text();
+	}
+}
+
+void
+edit_text_character::setFontHeight(boost::uint16_t h)
+{
+	if ( _fontHeight != h )
+	{
+		set_invalidated();
+		_fontHeight = h;
+		format_text();
+	}
 }
 
 static as_value
@@ -2222,7 +2360,7 @@ edit_text_character::getTextAlignment()
 	// TODO: use a _textAlignment private member to reduce lookups ?
 	// The member would be initialized to m_def->get_alignment and then update
 	// when _autoSize is updated.
-	edit_text_character_def::alignment textAlignment = m_def->get_alignment();
+	edit_text_character_def::alignment textAlignment = getAlignment(); 
 	if ( _autoSize == autoSizeCenter ) textAlignment = edit_text_character_def::ALIGN_CENTER;
 	else if ( _autoSize == autoSizeLeft ) textAlignment = edit_text_character_def::ALIGN_LEFT;
 	else if ( _autoSize == autoSizeRight ) textAlignment = edit_text_character_def::ALIGN_RIGHT;
@@ -2287,6 +2425,17 @@ edit_text_character::killFocus()
 	format_text(); // is this needed ?
 
 	onKillFocus();
+}
+
+void
+edit_text_character::markReachableResources() const
+{
+	if ( m_def.get() ) m_def->setReachable();
+
+	if ( _font ) _font->setReachable();
+
+	// recurse to parent...
+	markCharacterReachable();
 }
 
 } // namespace gnash

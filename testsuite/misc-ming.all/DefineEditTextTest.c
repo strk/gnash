@@ -205,7 +205,7 @@ main(int argc, char** argv)
   check(mo, "!etext1.hasOwnProperty('_xscale')");
   check(mo, "!etext1.hasOwnProperty('_yscale')");
   
-  xcheck_equals(mo, "dtext1.__proto__.hasOwnProperty('text')", "true");
+  xcheck(mo, "dtext1.__proto__.hasOwnProperty('text')");
   check_equals(mo, "dtext1.__proto__.hasOwnProperty('background')", "true");
   check_equals(mo, "dtext1.__proto__.hasOwnProperty('backgroundColor')", "true");
   check_equals(mo, "dtext1.__proto__.hasOwnProperty('textColor')", "true");
@@ -237,9 +237,6 @@ main(int argc, char** argv)
   check_equals(mo, "typeof(dtext2._xmouse)", "'number'");
   check_equals(mo, "typeof(etext1._ymouse)", "'number'"); 
   check_equals(mo, "typeof(dtext2._ymouse)", "'number'"); 
-  // TextFormat objects are created on the fly
-  xcheck_equals(mo, "typeof(etext1.getTextFormat())", "'object'"); 
-  xcheck_equals(mo, "typeof(dtext2.getTextFormat())", "'object'"); 
   
   add_actions(mo, "dtext1.background = true;"
                   "etext1.background = true;"
@@ -253,6 +250,14 @@ main(int argc, char** argv)
                   "dtext1.text += ' world';"
                   "etext1.text += ' world';"
                   "dtext2.text += ' world';" );
+
+  // TextFormat objects are created on the fly
+  check_equals(mo, "typeof(etext1.getTextFormat())", "'object'"); 
+  check_equals(mo, "typeof(dtext2.getTextFormat())", "'object'"); 
+  check_equals(mo, "etext1.getTextFormat().size", "12"); 
+  check_equals(mo, "dtext2.getTextFormat().size", "12"); 
+  check_equals(mo, "etext1.getTextFormat().font", "'Bitstream Vera Sans'");
+  check_equals(mo, "dtext2.getTextFormat().font", "'times'"); 
 
   check_equals(mo, "dtext1.text", "'Hello world'");
   check_equals(mo, "etext1.text", "'Hello world'");

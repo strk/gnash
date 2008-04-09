@@ -54,13 +54,13 @@ namespace boost {
 #endif
 
 inline void
-intrusive_ptr_add_ref(ref_counted* o)
+intrusive_ptr_add_ref(const ref_counted* o)
 {
 	o->add_ref();
 }
 
 inline void
-intrusive_ptr_release(ref_counted* o)
+intrusive_ptr_release(const ref_counted* o)
 {
 	o->drop_ref();
 }
@@ -68,13 +68,13 @@ intrusive_ptr_release(ref_counted* o)
 // These two should not be needed when we switch all GcResource 
 // pointers to use the gc_ptr instead of the intrusive_ptr
 
-inline void intrusive_ptr_add_ref(GcResource* ) { }
-inline void intrusive_ptr_release(GcResource* ) { }
+inline void intrusive_ptr_add_ref(const GcResource* ) { }
+inline void intrusive_ptr_release(const GcResource* ) { }
 
 #ifdef GNASH_USE_GC
 class as_object;
-inline void intrusive_ptr_add_ref(as_object* ) { }
-inline void intrusive_ptr_release(as_object* ) { }
+inline void intrusive_ptr_add_ref(const as_object* ) { }
+inline void intrusive_ptr_release(const as_object* ) { }
 #endif
 
 // The below thing won't work. We'll need a real templated class..
