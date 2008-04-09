@@ -24,27 +24,14 @@
 #include "action.h"
 #include "as_object.h"
 #include "log.h"
-#include "movie_definition.h"
-#include "MovieClipLoader.h"
 #include "as_function.h"
-#include "timers.h"
-#include "textformat.h"
-#include "sound_definition.h"
-#include "array.h"
 #include "types.h"
-#include "sprite_instance.h"
-#include "movie_instance.h"
-//#include "movie_root.h" // to reset root movie from attach_extern_movie
-#include "Global.h"
 #include "swf.h"
-#include "URL.h"
 #include "GnashException.h"
 #include "as_environment.h"
 #include "fn_call.h"
 #include "VM.h"
 #include "StringPredicates.h"
-#include "xml.h"
-#include "xmlsocket.h"
 #include "namedStrings.h"
 
 
@@ -59,59 +46,6 @@ using namespace SWF;
 #define snprintf _snprintf
 #endif // _WIN32
 
-// NOTES:
-//
-// Buttons
-// on (press)                 onPress
-// on (release)               onRelease
-// on (releaseOutside)        onReleaseOutside
-// on (rollOver)              onRollOver
-// on (rollOut)               onRollOut
-// on (dragOver)              onDragOver
-// on (dragOut)               onDragOut
-// on (keyPress"...")         onKeyDown, onKeyUp      <----- IMPORTANT
-//
-// Sprites
-// onClipEvent (load)         onLoad
-// onClipEvent (unload)       onUnload                Hm.
-// onClipEvent (enterFrame)   onEnterFrame
-// onClipEvent (mouseDown)    onMouseDown
-// onClipEvent (mouseUp)      onMouseUp
-// onClipEvent (mouseMove)    onMouseMove
-// onClipEvent (keyDown)      onKeyDown
-// onClipEvent (keyUp)        onKeyUp
-// onClipEvent (data)         onData
-
-// Text fields have event handlers too!
-
-// Sprite built in methods:
-// play()
-// stop()
-// gotoAndStop()
-// gotoAndPlay()
-// nextFrame()
-// startDrag()
-// getURL()
-// getBytesLoaded()
-// getBytesTotal()
-
-// Built-in functions: (do these actually exist in the VM, or are they just opcodes?)
-// Number()
-// String()
-
-
-// TODO builtins
-//
-// Number.toString() -- takes an optional arg that specifies the base
-//
-// Boolean() type cast
-//
-// typeof operator --> "number", "string", "boolean", "object" (also
-// for arrays), "null", "movieclip", "function", "undefined"
-//
-// Number.MAX_VALUE, Number.MIN_VALUE
-//
-// String.fromCharCode()
 
 namespace gnash {
 
@@ -296,30 +230,6 @@ const char*	call_method_parsed(
     s_retval = result.to_string();
     return s_retval.c_str();
 }
-
-void
-movie_load()
-{
-    log_action(_("-- start movie"));
-}
-
-//
-// Built-in objects
-//
-
-
-as_value
-event_test(const fn_call& /*fn*/)
-{
-    log_debug(_("FIXME: %s"), __FUNCTION__);
-    return as_value();
-}
-
-
-//
-// global init
-//
-
 
 
 //
