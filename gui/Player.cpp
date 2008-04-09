@@ -45,6 +45,7 @@
 
 #include "log.h"
 #include <iostream>
+#include <sstream>
 
 using std::endl;
 using std::cerr;
@@ -535,6 +536,32 @@ Player::interfaceEventCallback(const std::string& event, const std::string& arg)
         return "";
     }
     
+    if (event == "System.capabilities.screenResolutionX")
+    {
+        std::ostringstream ss;
+        ss << _gui->getScreenResX();
+        return ss.str();
+    }
+
+    if (event == "System.capabilities.screenResolutionY")
+    {
+        std::ostringstream ss;
+        ss << _gui->getScreenResY();
+        return ss.str();
+    }
+
+    if (event == "System.capabilities.pixelAspectRatio")
+    {
+        std::ostringstream ss;
+        ss << _gui->getPixelAspectRatio();
+        return ss.str();
+    }
+
+    if (event == "System.capabilities.playerType")
+    {
+        return _gui->isPlugin() ? "PlugIn" : "StandAlone";
+    }
+
     log_error(_("Unhandled callback %s with arguments %s"), event, arg);
     return "";
 }

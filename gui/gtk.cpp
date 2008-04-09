@@ -412,6 +412,28 @@ if (_menubar)
 #endif
 }
 
+double
+GtkGui::getPixelAspectRatio()
+{
+    return 0;
+}
+
+int
+GtkGui::getScreenResX()
+{
+    GdkScreen *screen = gdk_screen_get_default();
+    if (!screen) return 0;
+    return gdk_screen_get_width(screen);
+}
+
+int
+GtkGui::getScreenResY()
+{
+    GdkScreen *screen = gdk_screen_get_default();
+    if (!screen) return 0;
+    return gdk_screen_get_height(screen); 
+}
+
 // private
 void
 GtkGui::setupWindowEvents()

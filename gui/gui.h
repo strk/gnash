@@ -158,6 +158,12 @@ public:
     /// Sets the current mouse cursor for the Gui window.
     virtual void setCursor(gnash_cursor_type newcursor);
 
+    // Information for System.capabilities to be reimplemented in
+    // each gui.
+    virtual double getPixelAspectRatio() { return 0; }
+    virtual int getScreenResX() { return 0; }
+    virtual int getScreenResY() { return 0; }
+
     /// @return The value to which the movie width should be scaled.
     float getXScale();
 

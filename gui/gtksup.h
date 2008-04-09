@@ -75,6 +75,11 @@ class GtkGui : public Gui
     
     virtual void setFullscreen();
     virtual void unsetFullscreen();
+
+    /// For System.capabilities information.
+    virtual double getPixelAspectRatio();
+    virtual int getScreenResX();
+    virtual int getScreenResY();
     
     /// Add a listener with default priority that listens for IN and HUP
     /// events on a file descriptor.

@@ -21,6 +21,9 @@
 #include "gnashconfig.h"
 #endif
 
+#include <sstream>
+
+#include "movie_root.h" // interface callback
 #include "log.h"
 #include "System.h"
 #include "fn_call.h"
@@ -68,10 +71,6 @@ getSystemCapabilitiesInterface()
 	// Override in gnashrc
 	const std::string version = VM::get().getPlayerVersion();
 
-	// Flash 7: "StandAlone", "External", "PlugIn", "ActiveX"
-	// TODO: Implement properly
-	const std::string playerType = "StandAlone";
-
 	// "Windows XP", "Windows 2000", "Windows NT", "Windows 98/ME", "Windows 95", "Windows CE", "Linux", "MacOS"
 	// Override in gnashrc
 	const std::string os = VM::get().getOSName();
@@ -80,46 +79,95 @@ getSystemCapabilitiesInterface()
 	// Override in gnashrc
 	const std::string manufacturer = rcfile.getFlashSystemManufacturer();
 
-	/* Human Interface */
-	const std::string language = systemLanguage();
-
-	/* Media */
+    //
+	// Media
+	//
 		
 	// Is audio available?
 	const bool hasAudio = (get_sound_handler() != NULL);
+	const bool avHardwareDisable = false;
 
-	/* A URL-encoded string to send system info to a server.*/
-	/* Boolean values are represented as t or f.		*/
-	/* Privacy concerns should probably be addressed by 	*/
-	/* allowing this string to be sent or not; individual	*/
-	/* values that might affect privacy can be overridden	*/
-	/* in gnashrc.						*/
+    // TODO: these need to be implemented properly
+	const bool hasAudioEncoder = true;
+	const bool hasEmbeddedVideo = true;
+	const bool hasIME = true;
+	const bool hasMP3 = true;
+	const bool hasPrinting = true;
+	const bool hasScreenBroadcast = true;
+	const bool hasScreenPlayback = true;
+	const bool hasStreamingAudio = true;
+	const bool hasStreamingVideo = true;
+	const bool hasVideoEncoder = true;
 
-	std::string serverString =
-		 	+ "OS=" + URL::encode(os) 
-			+ "&A=" + TF(hasAudio)
-			+ "&V=" + URL::encode(version)
-			+ "&PT=" + playerType
-			+ "&L=" + language
-			+ "&AVD="	// avHardwareDisable (bool)
-			+ "&ACC="	// hasAccessibility (bool)
-			+ "&AE="	// hasAudioEncoder (bool)
-			+ "&EV="	// hasEmbeddedVideo (bool)
-			+ "&IME="	// hasIME (bool)
-			+ "&MP3="	// hasMP3 (bool)
-			+ "&PR="	// hasPrinting (bool)
-			+ "&SB="	// hasScreenBroadcast (bool)
-			+ "&SP="	// hasScreenPlayback (bool)
-			+ "&SA="	// hasStreamingAudio (bool)
-			+ "&SV="	// hasStreamingVideo (bool)
-			+ "&VE="	// hasVideoEncoder (bool)
-			+ "&DEB="	// isDebugger (bool)
-			+ "&LFD="	// localFileReadDisable (bool)
-			+ "&M=" + URL::encode(manufacturer)
-			+ "&AR="	// pixelAspectRatio (double)
-			+ "&COL="	// screenColor (?)
-			+ "&DP="	// screenDPI (int?)
-			+ "&R="	// + screenResolutionX + "x" + screenResolutionY
+    //
+    // Human interface
+    //
+
+	const std::string language = systemLanguage();
+
+    // TODO: these need to be implemented properly.
+	const bool hasAccessibility = true;
+	const bool isDebugger = false;
+	const bool localFileReadDisable = false;
+
+	// "StandAlone", "External", "PlugIn", "ActiveX" (get from GUI)
+	std::string playerType;
+
+    // Documented to be a number, but is in fact a string.
+    std::string pixelAspectRatio;
+
+    int screenResolutionX = 0;
+    int screenResolutionY = 0;
+        
+    std::istringstream ss;
+
+    if (movie_root::interfaceHandle) {
+        ss.str((*movie_root::interfaceHandle)("System.capabilities.screenResolutionX", ""));
+        ss >> screenResolutionX;
+        
+        ss.clear();
+        
+        ss.str((*movie_root::interfaceHandle)("System.capabilities.screenResolutionY", ""));
+        ss >> screenResolutionY;
+        
+        ss.clear();
+        
+        pixelAspectRatio = (*movie_root::interfaceHandle)("System.capabilities.pixelAspectRatio", "");
+        playerType = (*movie_root::interfaceHandle)("System.capabilities.playerType", "");
+    }
+
+	// A URL-encoded string to send system info to a server.
+	// Boolean values are represented as t or f.		
+	// Privacy concerns should probably be addressed by 	
+	// allowing this string to be sent or not; individual	
+	// values that might affect privacy can be overridden	
+	// in gnashrc.
+
+	std::ostringstream serverString;
+	serverString << "OS=" << URL::encode(os) 
+			<< "&A="    << TF(hasAudio)
+			<< "&V="    << URL::encode(version)
+			<< "&PT="   << playerType
+			<< "&L="    << language
+			<< "&AVD="	<< avHardwareDisable 
+			<< "&ACC="	<< hasAccessibility 
+			<< "&AE="	<< hasAudioEncoder 
+			<< "&EV="	<< hasEmbeddedVideo 
+			<< "&IME="	<< hasIME 
+			<< "&MP3="	<< hasMP3 
+			<< "&PR="	<< hasPrinting 
+			<< "&SB="	<< hasScreenBroadcast 
+			<< "&SP="	<< hasScreenPlayback 
+			<< "&SA="	<< hasStreamingAudio 
+			<< "&SV="	<< hasStreamingVideo 
+			<< "&VE="	<< hasVideoEncoder 
+			<< "&DEB="	<< isDebugger 
+			<< "&LFD="	<< localFileReadDisable 
+			<< "&M="    << URL::encode(manufacturer)
+			<< "&AR="   << pixelAspectRatio
+			<< "&COL="	// screenColor (?)
+			<< "&DP="	// screenDPI (int?)
+			<< "&R="    << screenResolutionX << "x" << screenResolutionY
 			;
 		
 	static boost::intrusive_ptr<as_object> proto;
@@ -137,8 +185,24 @@ getSystemCapabilitiesInterface()
 		proto->init_member("manufacturer", manufacturer, flags);
 		proto->init_member("language", language, flags);
 		proto->init_member("hasAudio", hasAudio, flags);
-		proto->init_member("serverString", serverString, flags);
-		
+		proto->init_member("screenResolutionX", screenResolutionX, flags);
+		proto->init_member("screenResolutionY", screenResolutionY, flags);
+		proto->init_member("pixelAspectRatio", pixelAspectRatio, flags);
+		proto->init_member("serverString", serverString.str(), flags);
+		proto->init_member("avHardwareDisable", avHardwareDisable, flags);
+		proto->init_member("hasAudioEncoder", hasAudioEncoder, flags);
+		proto->init_member("hasEmbeddedVideo", hasEmbeddedVideo, flags);
+		proto->init_member("hasIME", hasIME, flags);
+		proto->init_member("hasMP3", hasMP3, flags);
+		proto->init_member("hasPrinting", hasPrinting, flags);
+		proto->init_member("hasScreenBroadcast", hasScreenBroadcast, flags);
+		proto->init_member("hasScreenPlayback", hasScreenPlayback, flags);
+		proto->init_member("hasStreamingAudio", hasStreamingAudio, flags);
+		proto->init_member("hasStreamingVideo", hasStreamingVideo, flags);
+		proto->init_member("hasVideoEncoder", hasVideoEncoder, flags);
+		proto->init_member("hasAccessibility", hasAccessibility, flags);
+		proto->init_member("isDebugger", isDebugger, flags);
+		proto->init_member("localFileReadDisable", localFileReadDisable, flags);
 	}
 	return proto.get();
 }

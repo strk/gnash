@@ -1,3 +1,13 @@
+2008-04-09 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/asobj/System.cpp: fetch some information from gui. Put in
+	  default values for other System.capabilities members.
+	* gui/gui.h: virtual methods to fetch screen dimensions
+	  and pixel aspect ratio.
+	* gui/gtk{sup.h,.cpp}: implement getting screen height and width.
+	* gui/Player.h: add System.capabilities to callback function.
+	* testsuite/actionscript.all/System.as: update expected results.
+
 2008-04-09 Sandro Santilli <strk@keybit.net>
 
 	* libbase/GC.cpp: don't need to include builtin_function.h.

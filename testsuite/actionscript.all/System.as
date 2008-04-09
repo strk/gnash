@@ -21,7 +21,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: System.as,v 1.18 2008/03/11 19:31:48 strk Exp $";
+rcsid="$Id: System.as,v 1.19 2008/04/09 11:57:35 bwy Exp $";
 #include "check.as"
 
 check_equals(typeof(System), 'object');
@@ -65,26 +65,26 @@ check_equals(typeof(System.capabilities.os), 'string');
 check_equals(typeof(System.capabilities.manufacturer), 'string');
 check_equals(typeof(System.capabilities.playerType), 'string');
 check_equals(typeof(System.capabilities.serverString), 'string');
-xcheck_equals(typeof(System.capabilities.screenResolutionX), 'number');
-xcheck_equals(typeof(System.capabilities.screenResolutionY), 'number');
+check_equals(typeof(System.capabilities.screenResolutionX), 'number');
+check_equals(typeof(System.capabilities.screenResolutionY), 'number');
 xcheck_equals(typeof(System.capabilities.screenDPI), 'number');
 xcheck_equals(typeof(System.capabilities.screenColor), 'string');
-xcheck_equals(typeof(System.capabilities.pixelAspectRatio), 'string');
-xcheck_equals(typeof(System.capabilities.localFileReadDisable), 'boolean');
+check_equals(typeof(System.capabilities.pixelAspectRatio), 'string');
+check_equals(typeof(System.capabilities.localFileReadDisable), 'boolean');
 check_equals(typeof(System.capabilities.language), 'string');
-xcheck_equals(typeof(System.capabilities.isDebugger), 'boolean');
-xcheck_equals(typeof(System.capabilities.hasVideoEncoder), 'boolean');
-xcheck_equals(typeof(System.capabilities.hasStreamingVideo), 'boolean');
-xcheck_equals(typeof(System.capabilities.hasStreamingAudio), 'boolean');
-xcheck_equals(typeof(System.capabilities.hasScreenPlayback), 'boolean');
-xcheck_equals(typeof(System.capabilities.hasScreenBroadcast), 'boolean');
-xcheck_equals(typeof(System.capabilities.hasPrinting), 'boolean');
-xcheck_equals(typeof(System.capabilities.hasMP3), 'boolean');
-xcheck_equals(typeof(System.capabilities.hasEmbeddedVideo), 'boolean');
-xcheck_equals(typeof(System.capabilities.hasAudioEncoder), 'boolean');
+check_equals(typeof(System.capabilities.isDebugger), 'boolean');
+check_equals(typeof(System.capabilities.hasVideoEncoder), 'boolean');
+check_equals(typeof(System.capabilities.hasStreamingVideo), 'boolean');
+check_equals(typeof(System.capabilities.hasStreamingAudio), 'boolean');
+check_equals(typeof(System.capabilities.hasScreenPlayback), 'boolean');
+check_equals(typeof(System.capabilities.hasScreenBroadcast), 'boolean');
+check_equals(typeof(System.capabilities.hasPrinting), 'boolean');
+check_equals(typeof(System.capabilities.hasMP3), 'boolean');
+check_equals(typeof(System.capabilities.hasEmbeddedVideo), 'boolean');
+check_equals(typeof(System.capabilities.hasAudioEncoder), 'boolean');
 check_equals(typeof(System.capabilities.hasAudio), 'boolean');
-xcheck_equals(typeof(System.capabilities.hasAccessibility), 'boolean');
-xcheck_equals(typeof(System.capabilities.avHardwareDisable), 'boolean');
+check_equals(typeof(System.capabilities.hasAccessibility), 'boolean');
+check_equals(typeof(System.capabilities.avHardwareDisable), 'boolean');
 
 #if OUTPUT_VERSION >= 6
 check(this.hasOwnProperty("$version"));
