@@ -1,5 +1,18 @@
 2008-04-09 Sandro Santilli <strk@keybit.net>
 
+	* server/textformat.{cpp,h}: stub TextFormat in the up-to-date way
+	* server/asobj/ClassHierarchy.cpp: don't include textformat.h
+	* server/asobj/Global.cpp: initialize TextFormat object in the 
+	  proper way (and from swf5 up).
+	* server/parser/edit_text_character_def.h: drop unused functions
+	  referencing textformat.
+	* testsuite/actionscript.all/: Makefile.am, TextFormat.as: initial
+	  simple test for TextFormat object
+	* testsuite/misc-ming.all/DefineEditTextTest.c: test that a TextFormat
+	  is constructed on demand (TextField.getTextFormat).
+
+2008-04-09 Sandro Santilli <strk@keybit.net>
+
 	* server/text.{cpp,h}: don't include textformat.h
 	* server/vm/action.cpp: reduce header inclusion, drop obsoleted
 	  comments and code.

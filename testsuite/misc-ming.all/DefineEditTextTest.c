@@ -237,6 +237,9 @@ main(int argc, char** argv)
   check_equals(mo, "typeof(dtext2._xmouse)", "'number'");
   check_equals(mo, "typeof(etext1._ymouse)", "'number'"); 
   check_equals(mo, "typeof(dtext2._ymouse)", "'number'"); 
+  // TextFormat objects are created on the fly
+  xcheck_equals(mo, "typeof(etext1.getTextFormat())", "'object'"); 
+  xcheck_equals(mo, "typeof(dtext2.getTextFormat())", "'object'"); 
   
   add_actions(mo, "dtext1.background = true;"
                   "etext1.background = true;"

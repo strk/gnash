@@ -50,7 +50,6 @@ public:
 	edit_text_character_def(movie_definition* root_def)
 		:
 		m_root_def(root_def),
-		m_format(),
 
 		m_has_text(true), // For an SWF-defined textfield we'll read
 		                  // this from the tag. Dynamic textfields should
@@ -84,12 +83,6 @@ public:
 		m_color.set(0, 0, 0, 255);
 	}
 
-	/// Set the format of the text
-	void	set_format(text_format &format)
-	{
-		m_format = format;
-	}
-	
 	~edit_text_character_def()
 	{
 	}
@@ -277,7 +270,6 @@ private:
 
 	rect			m_rect;
 	std::string		m_variable_name;
-	text_format		m_format;
 	bool			m_has_text;
 	bool			m_word_wrap;
 	bool			m_multiline;

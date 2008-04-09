@@ -102,6 +102,7 @@ ASTESTS =			\
 	String.as		\
 	System.as		\
 	TextField.as		\
+	TextFormat.as		\
 	TextSnapshot.as		\
 	Video.as		\
 	Object.as		\

@@ -604,13 +604,13 @@ Global::Global(VM& vm, ClassHierarchy *ch)
 	init_member("Infinity", as_value(INFINITY));
 
 	color_class_init(*this);
+	textformat_class_init(*this);
 
 	if ( vm.getSWFVersion() < 6 ) goto extscan;
 	//-----------------------
 	// SWF6
 	//-----------------------
 	init_member("LocalConnection", new builtin_function(localconnection_new));
-	init_member("TextFormat", new builtin_function(textformat_new));
 
 	if ( vm.getSWFVersion() < 7 ) goto extscan;
 	//-----------------------

@@ -19,6 +19,7 @@
 
 
 #include "log.h"
+#include "Object.h" // for getObjectInterface
 #include "textformat.h"
 #include "fn_call.h"
 #include "builtin_function.h" // for getter/setter properties
@@ -27,232 +28,414 @@
 
 #define ONCE(x) { static bool warned=false; if (!warned) { warned=true; x; } }
 
-namespace gnash {  
+namespace gnash {
 
-  text_format::text_format() :
-      _underline(false),
-      _bold(false),
-      _italic(false),
-      _bullet(false),
-      _block_indent(-1),
-      _color(0),
-      _indent(-1),
-      _leading(-1),
-      _left_margin(-1),
-      _right_margin(-1),
-      _point_size(-1),
-      _tab_stops(-1),
-      _target(-1)
+static as_value textformat_new(const fn_call& fn);
+static as_object* getTextFormatInterface();
+static void attachTextFormatInterface(as_object& o);
+
+class DSOEXPORT TextFormat : public as_object
 {
-  //log_debug("%s:", __FUNCTION__);
-}
-
-text_format::~text_format()
-{
-  // don't need to clean up anything
-}
-
-// Copy one text_format object to another.
-text_format *
-text_format::operator = (text_format &format)
-{
-  GNASH_REPORT_FUNCTION;
-
-  _underline = format._underline;
-  _bold = format._bold;
-  _italic = format._italic;
-  _bullet = format._bullet;
+public:
   
-  _align = format._align;
-  _block_indent = format._block_indent;
-  _color = format._color;
-  _font = format._font;
-  _indent = format._indent;
-  _leading = format._leading;
-  _left_margin = format._left_margin;
-  _right_margin = format._right_margin;
-  _point_size = format._point_size;
-  _tab_stops = format._tab_stops;
-  _target = format._target;
-  _url = format._url;
+	TextFormat();
+	~TextFormat() {}
+
+	/// Return a Boolean value that indicates whether the text is underlined.
+	bool underlined()  { return _underline; }
+
+	/// Return a Boolean value that indicates whether the text is italicized.
+	bool italiced()    { return _italic; }
+
+	/// Return a Boolean value that indicates whether the text is boldface.
+	bool bold()        { return _bold; }
+
+	bool bullet()      { return _bullet; }
+
+	/// Return the color of text using this text format.
+	//
+	/// A number containing three 8-bit RGB components; for example,
+        /// 0xFF0000 is red, 0x00FF00 is green.
+	boost::uint32_t color() const { return _color; }
+
+	/// \brief
+	/// Return ann integer that indicates the indentation from the left
+        /// margin to the first character in the paragraph
+	float indent() const { return _indent; }
+
+	/// Return the alignment of the paragraph, represented as a string.
+	//
+	/// If "left", the paragraph is left-aligned. If "center", the
+	/// paragraph is centered. If "right", the paragraph is
+	/// right-aligned.
+	///
+	/// FIXME: use an enum !
+	///
+	const std::string& align() const { return _align; }
+
+	/// Return the name of a font for text as a string.
+	const std::string& font() const { return _font; }
+
+	///
+	float blockIndent() { return _block_indent; }
+
+	/// Return a number that indicates the amount of leading vertical
+	/// space between lines.
+	float leading()     { return _leading; }
+
+	/// Indicates the left margin of the paragraph, in points.
+	float leftMargin()  { return _left_margin; }
+
+	/// Indicates the right margin of the paragraph, in points.
+	float RightMargin() { return _right_margin; }
+
+	/// Return a float that indicates the point size.
+	float size()        { return _point_size; }
+
+	void underlinedSet(bool x)   { _underline = x; }
+	void italicedSet(bool x)     { _italic = x; }
+	void boldSet(bool x)         { _bold = x; }
+	void bulletSet(bool x)       { _bullet = x; }
+	void colorSet(boost::uint32_t x)      { _color = x; }
+	void indentSet(float x)      { _indent = x; }
+
+	void alignSet(const std::string& x)  { _align = x; }
+
+	void blockIndentSet(float x)   { _block_indent = x; }
+	void leadingSet(float x)     { _leading = x; }
+	void leftMarginSet(float x)  { _left_margin = x; }
+	void rightMarginSet(float x) { _right_margin = x; }
+	void sizeSet(float x)        { _point_size = x; }
+
+	// In a paragraph, change the format of a range of characters.
+	void setTextFormat (TextFormat &format);
+	void setTextFormat (int index, TextFormat &format);
+	void setTextFormat (int start, int end, TextFormat &format);
+
+	TextFormat &getTextFormat ();
+	TextFormat &getTextFormat (int index);
+	TextFormat &getTextFormat (int start, int end);
+
+	int getTextExtant();
+
+	static as_value display_getset(const fn_call& fn);
+	static as_value bullet_getset(const fn_call& fn);
+	static as_value tabStops_getset(const fn_call& fn);
+	static as_value blockIndent_getset(const fn_call& fn);
+	static as_value leading_getset(const fn_call& fn);
+	static as_value indent_getset(const fn_call& fn);
+	static as_value rightMargin_getset(const fn_call& fn);
+	static as_value leftMargin_getset(const fn_call& fn);
+	static as_value align_getset(const fn_call& fn);
+	static as_value underline_getset(const fn_call& fn);
+	static as_value italic_getset(const fn_call& fn);
+	static as_value bold_getset(const fn_call& fn);
+	static as_value target_getset(const fn_call& fn);
+	static as_value url_getset(const fn_call& fn);
+	static as_value color_getset(const fn_call& fn);
+	static as_value size_getset(const fn_call& fn);
+	static as_value font_getset(const fn_call& fn);
+	static as_value getTextExtent_method(const fn_call& fn);
+
   
-  return this;
+private:
+
+
+	/// A Boolean value that indicates whether the text is underlined.
+	bool          _underline;
+
+	/// A Boolean value that indicates whether the text is boldface.
+	bool          _bold;	
+
+	/// A Boolean value that indicates whether the text is italicized.
+	bool          _italic;
+
+	// 
+	bool          _bullet;
+  
+	/// The alignment of the paragraph, represented as a string.
+	//
+	/// If "left", the paragraph is left-aligned. If "center", the
+	/// paragraph is centered. If "right", the paragraph is
+	/// right-aligned.
+	///
+	/// FIXME: use an enum !
+	///
+	std::string _align;
+
+	// 
+	float		_block_indent;
+
+	/// The color of text using this text format.
+	//
+	/// A number containing three 8-bit RGB components; for example,
+        /// 0xFF0000 is red, 0x00FF00 is green.
+	boost::uint32_t	_color;	
+
+	// The name of a font for text as a string.
+	std::string _font;	
+
+	/// An integer that indicates the indentation from the left
+        /// margin to the first character in the paragraph
+	float		_indent;
+
+	/// A number that indicates the amount of leading vertical
+	/// space between lines.
+	float		_leading;
+
+	/// Indicates the left margin of the paragraph, in points.
+	float		_left_margin;
+
+	/// Indicates the right margin of the paragraph, in points.
+	float		_right_margin;
+
+	/// An float that indicates the point size.
+	float		_point_size;
+
+	///
+	int		_tab_stops;
+
+	/// The target window where the hyperlink is displayed. 
+        /// If the target window is an empty string, the text is displayed in
+        /// the default target window _self. If the url parameter is
+        /// set to an empty string or to the value null, you can get
+        /// or set this property, but the property will have no effect.
+	int		_target;
+
+	/// The URL to which the text in this text format hyperlinks.
+	/// If url is an empty string, the text does not have a hyperlink
+	std::string	 _url;	
+
+};
+ 
+
+TextFormat::TextFormat()
+	:
+	as_object(getTextFormatInterface()),
+	_underline(false),
+	_bold(false),
+	_italic(false),
+	_bullet(false),
+	_block_indent(-1),
+	_color(0),
+	_indent(-1),
+	_leading(-1),
+	_left_margin(-1),
+	_right_margin(-1),
+	_point_size(-1),
+	_tab_stops(-1),
+	_target(-1)
+{
+	//log_debug("%s:", __FUNCTION__);
+	init_member("getTextExtent", new builtin_function(TextFormat::getTextExtent_method));
 }
 
 // In a paragraph, change the format of a range of characters.
 void
-text_format::setTextFormat (text_format& /*format*/)
+TextFormat::setTextFormat (TextFormat& /*format*/)
 {
   //GNASH_REPORT_FUNCTION;
 }
 
 void
-text_format::setTextFormat (int /*index*/, text_format& /*format*/)
+TextFormat::setTextFormat (int /*index*/, TextFormat& /*format*/)
 {
   //GNASH_REPORT_FUNCTION;
 }
 
 void
-text_format::setTextFormat (int /*start*/, int /*end*/, text_format& /*format*/)
+TextFormat::setTextFormat (int /*start*/, int /*end*/, TextFormat& /*format*/)
 {
   //GNASH_REPORT_FUNCTION;
 }
 
-#if 0
-text_format &
-text_format::getTextFormat ()
-{
-  GNASH_REPORT_FUNCTION;
-}
-
-text_format &
-text_format::getTextFormat (int index)
-{
-  GNASH_REPORT_FUNCTION;
-}
-
-text_format &
-text_format::getTextFormat (int start, int end)
-{
-  GNASH_REPORT_FUNCTION;
-}
-#endif
-
-as_value textformat_new(const fn_call& /* fn */)
+/// new TextFormat([font, [size, [color, [bold, [italic, [underline, [url, [target, [align,[leftMargin, [rightMargin, [indent, [leading]]]]]]]]]]]]])
+static as_value
+textformat_new(const fn_call& /* fn */)
 {
   //GNASH_REPORT_FUNCTION;
   //log_debug(_("%s: args=%d"), __FUNCTION__, nargs);
 
-  boost::intrusive_ptr<textformat_as_object> text_obj = new textformat_as_object;
-  ONCE(log_unimpl("TextFormat"));
-  
-  // tulrich: this looks like it's inserting a method into our
-  // caller's env.  setTextFormat is a method on TextField.  So here
-  // we're hoping our caller is a text field... scary.
-  //
-  // TODO we should handle setTextFormat as a method on TextField,
-  // instead of doing this.
-  //fn.env().set_variable("setTextFormat", new builtin_function(textformat_setformat));
+  boost::intrusive_ptr<TextFormat> text_obj = new TextFormat;
+  ONCE(log_unimpl("TextFormat")); // need to handle args too..
   
   return as_value(text_obj.get());
 }
 
-
-as_value textformat_setformat(const fn_call& fn)
+as_value
+TextFormat::display_getset(const fn_call& /*fn*/)
 {
-  as_value	method;
-  //log_debug(_("%s: args=%d at %p"), __FUNCTION__, nargs, this_ptr);
-
-  boost::intrusive_ptr<textformat_as_object> ptr = ensureType<textformat_as_object>(fn.this_ptr);
-  //double start = fn.arg(0).to_number();
-  //double end = fn.arg(1).to_number();
-  VM& vm = ptr->getVM();
-  string_table& st = vm.getStringTable();
-
-  if ( fn.nargs < 3 )
-  {
-    IF_VERBOSE_ASCODING_ERRORS(
-    log_aserror(_("TextFormat.setFormat() needs at least 3 arguments - ...me thinks"));
-    );
-    return as_value();
-  }
-
-  boost::intrusive_ptr<textformat_as_object> obj = boost::dynamic_pointer_cast<textformat_as_object>(fn.arg(2).to_object());
-  if ( ! obj )
-  {
-    IF_VERBOSE_ASCODING_ERRORS(
-    log_aserror(_("Argument 3 given to TextFormat.setFormat() is not a TextFormat object - ... should it be?"));
-    );
-    return as_value();
-  }
-  assert(obj);
-
-  //log_debug(_("Change from %f for %f characters for object at %p"), start, end, obj);
-
-  // Check for the flags that could be set
-  if (obj->get_member(NSV::PROP_UNDERLINE, &method)) {
-    //log_debug(_("Underline exists and is set to %d"), method.to_bool());
-    obj->obj.underlinedSet(method.to_bool());
-  }
-  
-  if (obj->get_member(NSV::PROP_ITALIC, &method)) {
-    //log_debug(_("Italic exists and is set to %d"), method.to_bool());
-    obj->obj.italicedSet(method.to_bool());
-  }
-  
-  if (obj->get_member(NSV::PROP_BOLD, &method)) {
-    //log_debug(_("Bold exists and is set to %d"), method.to_bool());
-    obj->obj.boldSet(method.to_bool());
-  }
-  
-  if (obj->get_member(NSV::PROP_BULLET, &method)) {
-    //log_debug(_("Bullet exists and is set to %d"), method.to_bool());
-    obj->obj.bulletSet(method.to_bool());
-  }
-
-  // Can't use a named string here with current model, as a "color"
-  // named string would clash with the "Color" class in SWF6 and below
-  // (but not in SWF7 and above)
-  if (obj->get_member(st.find("color"), &method)) {
-    //log_debug(_("Color exists and is set to %f", method.to_number());
-    obj->obj.colorSet((boost::uint32_t)method.to_number());
-  }
-
-  if (obj->get_member(NSV::PROP_INDENT, &method)) {
-    //log_debug(_("Indent exists and is set to %f"), method.to_number());
-    obj->obj.indentSet(float(method.to_number()));
-  }
-
-  if (obj->get_member(NSV::PROP_ALIGN, &method)) {
-    //log_debug(_("Align exists and is set to %s"), method.to_string());
-    const char* align = method.to_string().c_str();
-    if ( align ) obj->obj.alignSet(align);
-  }
-
-  if (obj->get_member(NSV::PROP_BLOCK_INDENT, &method)) {
-    //log_debug(_("BlockIndent exists and is set to %f"), method.to_number());
-    obj->obj.blockIndentSet(float(method.to_number()));
-  }
-  
-  if (obj->get_member(NSV::PROP_LEADING, &method)) {
-    //log_debug(_("Leading exists and is set to %f"), method.to_number());
-    obj->obj.leadingSet(float(method.to_number()));
-  }
-  
-  if (obj->get_member(NSV::PROP_LEFT_MARGIN, &method)) {
-    //log_debug(_("LeftMargin exists and is set to %f"), method.to_number());
-    obj->obj.leftMarginSet(float(method.to_number()));
-  }
-  
-  if (obj->get_member(NSV::PROP_RIGHT_MARGIN, &method)) {
-    //log_debug(_("RightMargin exists and is set to %f"), method.to_number());
-    obj->obj.rightMarginSet(float(method.to_number()));
-  }
-  
-  if (obj->get_member(NSV::PROP_SIZE, &method)) {
-    //log_debug(_("Size exists and is set to %f"), method.to_number());
-    obj->obj.sizeSet(float(method.to_number()));
-  }
-  
-  //ptr->obj.setTextFormat(start, end, obj->obj);
-  //result->set_bool(true);
-  return as_value();
+	ONCE( log_unimpl("TextField.display") );
+	return as_value();
 }
-#if 0
-  void
-  textformat_getformat(gnash::as_value* result, gnash::as_object_interface* this_ptr, gnash::as_environment* env, int nargs, int first_arg)
+
+as_value
+TextFormat::bullet_getset(const fn_call& /*fn*/)
 {
-  log_unimpl(_("%s: args=%d unfinished implementation"), __FUNCTION__, nargs);
-  textformat_as_object*	ptr = (textformat_as_object*)this_ptr;
-  assert(ptr);
-  double start = env->bottom(first_arg).to_number();
-  double end = env->bottom(first_arg-1).to_number();
-  textformat_as_object *obj = (textformat_as_object *)env->bottom(first_arg-2).to_object();
-  assert(obj);
-    
-  ptr->obj = ptr->obj.getTextFormat();
-  result->set_bool(true);
+	ONCE( log_unimpl("TextField.bullet") );
+	return as_value();
 }
-#endif
+
+as_value
+TextFormat::tabStops_getset(const fn_call& /*fn*/)
+{
+	ONCE( log_unimpl("TextField.tabStops") );
+	return as_value();
+}
+
+as_value
+TextFormat::blockIndent_getset(const fn_call& /*fn*/)
+{
+	ONCE( log_unimpl("TextField.blockIndent") );
+	return as_value();
+}
+
+as_value
+TextFormat::leading_getset(const fn_call& /*fn*/)
+{
+	ONCE( log_unimpl("TextField.leading") );
+	return as_value();
+}
+
+as_value
+TextFormat::indent_getset(const fn_call& /*fn*/)
+{
+	ONCE( log_unimpl("TextField.indent") );
+	return as_value();
+}
+
+as_value
+TextFormat::rightMargin_getset(const fn_call& /*fn*/)
+{
+	ONCE( log_unimpl("TextField.rightMargin") );
+	return as_value();
+}
+
+as_value
+TextFormat::leftMargin_getset(const fn_call& /*fn*/)
+{
+	ONCE( log_unimpl("TextField.leftMargin") );
+	return as_value();
+}
+
+as_value
+TextFormat::align_getset(const fn_call& /*fn*/)
+{
+	ONCE( log_unimpl("TextField.align") );
+	return as_value();
+}
+
+as_value
+TextFormat::underline_getset(const fn_call& /*fn*/)
+{
+	ONCE( log_unimpl("TextField.underline") );
+	return as_value();
+}
+
+as_value
+TextFormat::italic_getset(const fn_call& /*fn*/)
+{
+	ONCE( log_unimpl("TextField.italic") );
+	return as_value();
+}
+
+as_value
+TextFormat::bold_getset(const fn_call& /*fn*/)
+{
+	ONCE( log_unimpl("TextField.bold") );
+	return as_value();
+}
+
+as_value
+TextFormat::target_getset(const fn_call& /*fn*/)
+{
+	ONCE( log_unimpl("TextField.target") );
+	return as_value();
+}
+
+as_value
+TextFormat::url_getset(const fn_call& /*fn*/)
+{
+	ONCE( log_unimpl("TextField.url") );
+	return as_value();
+}
+
+as_value
+TextFormat::color_getset(const fn_call& /*fn*/)
+{
+	ONCE( log_unimpl("TextField.color") );
+	return as_value();
+}
+
+as_value
+TextFormat::size_getset(const fn_call& /*fn*/)
+{
+	ONCE( log_unimpl("TextField.size") );
+	return as_value();
+}
+
+as_value
+TextFormat::font_getset(const fn_call& /*fn*/)
+{
+	ONCE( log_unimpl("TextField.font") );
+	return as_value();
+}
+
+as_value
+TextFormat::getTextExtent_method(const fn_call& /*fn*/)
+{
+	ONCE( log_unimpl("TextField.getTextExtent") );
+	return as_value();
+}
+
+static void
+attachTextFormatInterface(as_object& o)
+{
+	o.init_readonly_property("display", &TextFormat::display_getset);
+	o.init_readonly_property("bullet", &TextFormat::bullet_getset);
+	o.init_readonly_property("tabStops", &TextFormat::tabStops_getset);
+	o.init_readonly_property("blockIndent", &TextFormat::blockIndent_getset);
+	o.init_readonly_property("leading", &TextFormat::leading_getset);
+	o.init_readonly_property("indent", &TextFormat::indent_getset);
+	o.init_readonly_property("rightMargin", &TextFormat::rightMargin_getset);
+	o.init_readonly_property("leftMargin", &TextFormat::leftMargin_getset);
+	o.init_readonly_property("align", &TextFormat::align_getset);
+	o.init_readonly_property("underline", &TextFormat::underline_getset);
+	o.init_readonly_property("italic", &TextFormat::italic_getset);
+	o.init_readonly_property("bold", &TextFormat::bold_getset);
+	o.init_readonly_property("target", &TextFormat::target_getset);
+	o.init_readonly_property("url", &TextFormat::url_getset);
+	o.init_readonly_property("color", &TextFormat::color_getset);
+	o.init_readonly_property("size", &TextFormat::size_getset);
+	o.init_readonly_property("font", &TextFormat::font_getset);
+}
+
+static as_object*
+getTextFormatInterface()
+{
+	static boost::intrusive_ptr<as_object> o;
+	if ( ! o )
+	{
+		o = new as_object(getObjectInterface());
+		attachTextFormatInterface(*o);
+	}
+	return o.get();
+}
+
+// extern (used by Global.cpp)
+void textformat_class_init(as_object& global)
+{
+	// This is going to be the global Color "class"/"function"
+	static boost::intrusive_ptr<builtin_function> cl;
+
+	if ( cl == NULL )
+	{
+		cl=new builtin_function(&textformat_new, getTextFormatInterface());
+	}
+
+	// Register _global.Color
+	global.init_member("TextFormat", cl.get());
+
+}
 
 } // end of gnash namespace
