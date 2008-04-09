@@ -21,7 +21,6 @@
 #ifndef GNASH_TEXT_H
 #define GNASH_TEXT_H
 
-#include "textformat.h" // maybe we should include it here
 #include "styles.h" 
 
 namespace gnash {

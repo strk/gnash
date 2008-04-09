@@ -29,7 +29,6 @@
 #include "font.h"
 #include "fontlib.h"
 #include "render.h"
-#include "textformat.h"
 #include "text.h"
 #include "movie_definition.h"
 

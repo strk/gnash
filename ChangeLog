@@ -1,5 +1,6 @@
 2008-04-09 Sandro Santilli <strk@keybit.net>
 
+	* server/text.{cpp,h}: don't include textformat.h
 	* server/vm/action.cpp: reduce header inclusion, drop obsoleted
 	  comments and code.
 	* server/movie_root.cpp (fire_mouse_event): catch ActionLimit
