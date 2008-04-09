@@ -21,7 +21,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Object.as,v 1.62 2008/04/07 18:25:42 strk Exp $";
+rcsid="$Id: Object.as,v 1.63 2008/04/09 09:51:21 zoulunkai Exp $";
 #include "check.as"
 
 // Test things in Class Object (swf5~swf8)
@@ -528,6 +528,44 @@ o.test = 5;
 v = o.test;
 check_equals(v, 5);
 
+///
+/// more sane getter setter test
+///
+obj8 = {};
+obj8_getter_cnt = 0;
+obj8_setter_cnt = 0;
+function obj8_getter () { 
+	obj8_getter_cnt++;
+	return obj8_prop; 
+}
+function obj8_setter (v) { 
+	obj8_setter_cnt++;
+	obj8_prop = v; 
+}
+obj8.addProperty("obj8_prop", obj8_getter, obj8_setter);
+obj8.obj8_prop = 1;
+v = obj8.obj8_prop;
+check_equals(obj8_getter_cnt, 1);
+check_equals(obj8_setter_cnt, 1);
+
+obj9 = {};
+obj9_getter_cnt = 0;
+obj9_setter_cnt = 0;
+function obj9_getter () { 
+	obj9_getter_cnt++;
+	return this.obj9_prop_cache; 
+}
+function obj9_setter (v) { 
+	obj9_setter_cnt++;
+	this.obj9_prop_cache = v; 
+}
+obj9.addProperty("obj9_prop", obj9_getter, obj9_setter);
+obj9.obj9_prop = 10;
+check_equals(obj9_getter_cnt, 0);
+check_equals(obj9_setter_cnt, 1);
+check_equals(obj9.obj9_prop, 10);
+check_equals(obj9_getter_cnt, 1);
+check_equals(obj9_setter_cnt, 1);
 
 // Object.addProperty wasn't in SWF5
 #endif // OUTPUT_VERSION > 5
@@ -789,6 +827,6 @@ totals(79);
 #endif
 
 #if OUTPUT_VERSION >= 6
-totals(251);
+totals(258);
 #endif
 
