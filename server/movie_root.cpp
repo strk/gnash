@@ -843,13 +843,15 @@ movie_root::fire_mouse_event()
 
     }
 
-    bool need_redraw = generate_mouse_button_events(&m_mouse_button_state);
+    bool need_redraw = false;
 
     // FIXME: need_redraw might also depend on actual
     //        actions execution (consider updateAfterEvent).
 
     try
     {
+        need_redraw = generate_mouse_button_events(&m_mouse_button_state);
+
         processActionQueue();
     }
     catch (ActionLimitException& al)
