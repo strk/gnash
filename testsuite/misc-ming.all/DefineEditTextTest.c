@@ -38,10 +38,14 @@
 #define OUTPUT_VERSION 7
 #define OUTPUT_FILENAME "DefineEditTextTest.swf"
 
-SWFDisplayItem add_text_field(SWFMovie mo, SWFBlock font, const char* text, float indent, float leftMargin, float rightMargin, SWFTextFieldAlignment align);
+SWFDisplayItem add_text_field(SWFMovie mo, SWFBlock font, const char* text,
+	float indent, float leftMargin, float rightMargin, SWFTextFieldAlignment align,
+	float lineSpacing);
 
 SWFDisplayItem
-add_text_field(SWFMovie mo, SWFBlock font, const char* text, float indent, float leftMargin, float rightMargin, SWFTextFieldAlignment align)
+add_text_field(SWFMovie mo, SWFBlock font, const char* text, float indent,
+		float leftMargin, float rightMargin,
+		SWFTextFieldAlignment align, float lineSpacing)
 {
   SWFTextField tf;
 
@@ -52,6 +56,7 @@ add_text_field(SWFMovie mo, SWFBlock font, const char* text, float indent, float
   SWFTextField_setLeftMargin(tf, leftMargin);
   SWFTextField_setRightMargin(tf, rightMargin);
   SWFTextField_setAlignment(tf, align);
+  SWFTextField_setLineSpacing(tf, lineSpacing);
 
   /* setting flags seem unneeded */
   /*SWFTextField_setFlags(tf, SWFTEXTFIELD_USEFONT|SWFTEXTFIELD_NOEDIT);*/
@@ -147,15 +152,15 @@ main(int argc, char** argv)
     SWFBrowserFont bfont = newSWFBrowserFont("_sans");
     SWFFont efont = loadSWFFontFromFile(font_file);
 
-    it = add_text_field(mo, (SWFBlock)bfont, "Hello", 1, 2, 3, SWFTEXTFIELD_ALIGN_LEFT);
+    it = add_text_field(mo, (SWFBlock)bfont, "Hello", 1, 2, 3, SWFTEXTFIELD_ALIGN_LEFT, 10);
     SWFDisplayItem_setName(it, "dtext1");
     SWFDisplayItem_moveTo(it, 0, 200);
-    it = add_text_field(mo, (SWFBlock)efont, "Hello", 4, 5, 6, SWFTEXTFIELD_ALIGN_CENTER);
+    it = add_text_field(mo, (SWFBlock)efont, "Hello", 4, 5, 6, SWFTEXTFIELD_ALIGN_CENTER, 11);
     SWFDisplayItem_setName(it, "etext1");
     SWFDisplayItem_moveTo(it, 0, 300);
 
     SWFBrowserFont bfont2 = newSWFBrowserFont("times");
-    it = add_text_field(mo, (SWFBlock)bfont2, "Hello", 7, 8, 9, SWFTEXTFIELD_ALIGN_RIGHT);
+    it = add_text_field(mo, (SWFBlock)bfont2, "Hello", 7, 8, 9, SWFTEXTFIELD_ALIGN_RIGHT, 12);
     SWFDisplayItem_setName(it, "dtext2");
     SWFDisplayItem_moveTo(it, 0, 400);
   }
@@ -290,6 +295,10 @@ main(int argc, char** argv)
   check_equals(mo, "typeof(dtext2.tf.align)", "'string'");
   check_equals(mo, "etext1.tf.align", "'center'");
   check_equals(mo, "dtext2.tf.align", "'right'"); 
+  check_equals(mo, "typeof(etext1.tf.leading)", "'number'");
+  check_equals(mo, "typeof(dtext2.tf.leading)", "'number'");
+  check_equals(mo, "etext1.tf.leading", "11");
+  check_equals(mo, "dtext2.tf.leading", "12"); 
 
   check_equals(mo, "dtext1.text", "'Hello world'");
   check_equals(mo, "etext1.text", "'Hello world'");

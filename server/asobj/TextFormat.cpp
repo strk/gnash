@@ -112,9 +112,19 @@ TextFormat::blockIndent_getset(const fn_call& /*fn*/)
 }
 
 as_value
-TextFormat::leading_getset(const fn_call& /*fn*/)
+TextFormat::leading_getset(const fn_call& fn)
 {
-	ONCE( log_unimpl("TextField.leading") );
+	boost::intrusive_ptr<TextFormat> ptr = ensureType<TextFormat>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		return as_value(TWIPS_TO_PIXELS(ptr->leading()));
+	}
+	else // setter
+	{
+		ptr->leadingSet(PIXELS_TO_TWIPS(fn.arg(0).to_int()));
+	}
+
 	return as_value();
 }
 
