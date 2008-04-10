@@ -231,25 +231,28 @@ textfield_setTextFormat(const fn_call& fn)
 		return as_value();
 	}
 
-	text->setAlignment(tf->align());
-	text->setFontHeight(tf->size()); // keep twips
-	text->setIndent(tf->indent());
-	text->setLeading(tf->leading());
-	text->setLeftMargin(tf->leftMargin());
-	text->setRightMargin(tf->rightMargin());
-	text->setTextColor(tf->color());
+	if ( tf->alignDefined() ) text->setAlignment(tf->align());
+	if ( tf->sizeDefined() ) text->setFontHeight(tf->size()); // keep twips
+	if ( tf->indentDefined() ) text->setIndent(tf->indent());
+	if ( tf->leadingDefined() ) text->setLeading(tf->leading());
+	if ( tf->leftMarginDefined() ) text->setLeftMargin(tf->leftMargin());
+	if ( tf->rightMarginDefined() ) text->setRightMargin(tf->rightMargin());
+	if ( tf->colorDefined() ) text->setTextColor(tf->color());
 
-	const std::string& fontName = tf->font();
-	if ( ! fontName.empty() )
+	if ( tf->fontDefined() )
 	{
-		bool bold = tf->bold();
-		bool italic = tf->italiced();
+		const std::string& fontName = tf->font();
+		if ( ! fontName.empty() )
+		{
+			bool bold = tf->bold();
+			bool italic = tf->italiced();
 
-		// TODO: reuse an existing font with this name if known !
-		//       Would need cleanups in the fontlib package
-		//       for proper thread-safety
-		boost::intrusive_ptr<font> f ( new font(fontName, bold, italic) );
-		text->setFont( f );
+			// TODO: reuse an existing font with this name if known !
+			//       Would need cleanups in the fontlib package
+			//       for proper thread-safety
+			boost::intrusive_ptr<font> f ( new font(fontName, bold, italic) );
+			text->setFont( f );
+		}
 	}
 
 	// TODO: add font color and some more

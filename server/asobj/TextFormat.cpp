@@ -40,18 +40,20 @@ static void attachTextFormatInterface(as_object& o);
 TextFormat::TextFormat()
 	:
 	as_object(getTextFormatInterface()),
+	_flags(0),
 	_underline(false),
 	_bold(false),
 	_italic(false),
 	_bullet(false),
-	_block_indent(-1),
+	_align(edit_text_character_def::ALIGN_LEFT),
+	_blockIndent(-1),
 	_color(),
 	_indent(-1),
 	_leading(-1),
-	_left_margin(-1),
-	_right_margin(-1),
-	_point_size(-1),
-	_tab_stops(-1),
+	_leftMargin(-1),
+	_rightMargin(-1),
+	_pointSize(-1),
+	_tabStops(-1),
 	_target()
 {
 	//log_debug("%s:", __FUNCTION__);
@@ -66,7 +68,7 @@ textformat_new(const fn_call& fn)
 
 	boost::intrusive_ptr<TextFormat> tf = new TextFormat;
 	if ( fn.nargs > 0  ) {	tf->fontSet(fn.arg(0).to_string());
-	if ( fn.nargs > 1  ) {	tf->sizeSet(fn.arg(1).to_int());
+	if ( fn.nargs > 1  ) {	tf->sizeSet(PIXELS_TO_TWIPS(fn.arg(1).to_int()));
 	if ( fn.nargs > 2  ) {	rgba col; col.parseRGB(fn.arg(2).to_int()); tf->colorSet(col); 
 	if ( fn.nargs > 3  ) {	tf->boldSet(fn.arg(3).to_bool()); 
 	if ( fn.nargs > 4  ) {	tf->italicedSet(fn.arg(4).to_bool()); 
@@ -74,10 +76,10 @@ textformat_new(const fn_call& fn)
 	if ( fn.nargs > 6  ) {	tf->urlSet(fn.arg(6).to_string()); 
 	if ( fn.nargs > 7  ) {	tf->targetSet(fn.arg(7).to_string()); 
 	if ( fn.nargs > 8  ) {	tf->alignSet(fn.arg(8).to_string());
-	if ( fn.nargs > 9  ) {	tf->leftMarginSet(fn.arg(9).to_int());
-	if ( fn.nargs > 10 ) {	tf->rightMarginSet(fn.arg(10).to_int());
-	if ( fn.nargs > 11 ) {	tf->indentSet(fn.arg(11).to_int());
-	if ( fn.nargs > 12 ) {	tf->leadingSet(fn.arg(12).to_int());
+	if ( fn.nargs > 9  ) {	tf->leftMarginSet(PIXELS_TO_TWIPS(fn.arg(9).to_int()));
+	if ( fn.nargs > 10 ) {	tf->rightMarginSet(PIXELS_TO_TWIPS(fn.arg(10).to_int()));
+	if ( fn.nargs > 11 ) {	tf->indentSet(PIXELS_TO_TWIPS(fn.arg(11).to_int()));
+	if ( fn.nargs > 12 ) {	tf->leadingSet(PIXELS_TO_TWIPS(fn.arg(12).to_int()));
 	}}}}}}}}}}}}}
 
 	return as_value(tf.get());
@@ -116,16 +118,19 @@ TextFormat::leading_getset(const fn_call& fn)
 {
 	boost::intrusive_ptr<TextFormat> ptr = ensureType<TextFormat>(fn.this_ptr);
 
+	as_value ret;
+
 	if ( fn.nargs == 0 ) // getter
 	{
-		return as_value(TWIPS_TO_PIXELS(ptr->leading()));
+		if ( ptr->leadingDefined() ) ret.set_double(TWIPS_TO_PIXELS(ptr->leading()));
+		else ret.set_null();
 	}
 	else // setter
 	{
 		ptr->leadingSet(PIXELS_TO_TWIPS(fn.arg(0).to_int()));
 	}
 
-	return as_value();
+	return ret;
 }
 
 as_value
@@ -133,16 +138,19 @@ TextFormat::indent_getset(const fn_call& fn)
 {
 	boost::intrusive_ptr<TextFormat> ptr = ensureType<TextFormat>(fn.this_ptr);
 
+	as_value ret;
+
 	if ( fn.nargs == 0 ) // getter
 	{
-		return as_value(TWIPS_TO_PIXELS(ptr->indent()));
+		if ( ptr->indentDefined() ) ret.set_double(TWIPS_TO_PIXELS(ptr->indent()));
+		else ret.set_null();
 	}
 	else // setter
 	{
 		ptr->indentSet(PIXELS_TO_TWIPS(fn.arg(0).to_int()));
 	}
 
-	return as_value();
+	return ret;
 }
 
 as_value
@@ -150,16 +158,19 @@ TextFormat::rightMargin_getset(const fn_call& fn)
 {
 	boost::intrusive_ptr<TextFormat> ptr = ensureType<TextFormat>(fn.this_ptr);
 
+	as_value ret;
+
 	if ( fn.nargs == 0 ) // getter
 	{
-		return as_value(TWIPS_TO_PIXELS(ptr->rightMargin()));
+		if ( ptr->rightMarginDefined() ) ret.set_double(TWIPS_TO_PIXELS(ptr->rightMargin()));
+		else ret.set_null();
 	}
 	else // setter
 	{
 		ptr->rightMarginSet(PIXELS_TO_TWIPS(fn.arg(0).to_int()));
 	}
 
-	return as_value();
+	return ret;
 }
 
 as_value
@@ -167,16 +178,19 @@ TextFormat::leftMargin_getset(const fn_call& fn)
 {
 	boost::intrusive_ptr<TextFormat> ptr = ensureType<TextFormat>(fn.this_ptr);
 
+	as_value ret;
+
 	if ( fn.nargs == 0 ) // getter
 	{
-		return as_value(TWIPS_TO_PIXELS(ptr->leftMargin()));
+		if ( ptr->leftMarginDefined() ) ret.set_double(TWIPS_TO_PIXELS(ptr->leftMargin()));
+		else ret.set_null();
 	}
 	else // setter
 	{
 		ptr->leftMarginSet(PIXELS_TO_TWIPS(fn.arg(0).to_int()));
 	}
 
-	return as_value();
+	return ret;
 }
 
 as_value
@@ -184,16 +198,19 @@ TextFormat::align_getset(const fn_call& fn)
 {
 	boost::intrusive_ptr<TextFormat> ptr = ensureType<TextFormat>(fn.this_ptr);
 
+	as_value ret;
+
 	if ( fn.nargs == 0 ) // getter
 	{
-		return as_value(ptr->getAlignString(ptr->align()));
+		if ( ptr->alignDefined() ) ret.set_string(ptr->getAlignString(ptr->align()));
+		else ret.set_null();
 	}
 	else // setter
 	{
 		ptr->alignSet(fn.arg(0).to_string());
 	}
 
-	return as_value();
+	return ret;
 }
 
 as_value
@@ -208,16 +225,19 @@ TextFormat::italic_getset(const fn_call& fn)
 {
 	boost::intrusive_ptr<TextFormat> ptr = ensureType<TextFormat>(fn.this_ptr);
 
+	as_value ret;
+
 	if ( fn.nargs == 0 ) // getter
 	{
-		return as_value(ptr->italiced());
+		if ( ptr->italicedDefined() ) ret.set_bool(ptr->italiced());
+		else ret.set_null();
 	}
 	else // setter
 	{
 		ptr->italicedSet(fn.arg(0).to_bool());
 	}
 
-	return as_value();
+	return ret;
 }
 
 as_value
@@ -225,16 +245,19 @@ TextFormat::bold_getset(const fn_call& fn)
 {
 	boost::intrusive_ptr<TextFormat> ptr = ensureType<TextFormat>(fn.this_ptr);
 
+	as_value ret;
+
 	if ( fn.nargs == 0 ) // getter
 	{
-		return as_value(ptr->bold());
+		if ( ptr->boldDefined() ) ret.set_bool(ptr->bold());
+		else ret.set_null();
 	}
 	else // setter
 	{
 		ptr->boldSet(fn.arg(0).to_bool());
 	}
 
-	return as_value();
+	return ret;
 }
 
 as_value
@@ -256,9 +279,12 @@ TextFormat::color_getset(const fn_call& fn)
 {
 	boost::intrusive_ptr<TextFormat> ptr = ensureType<TextFormat>(fn.this_ptr);
 
+	as_value ret;
+
 	if ( fn.nargs == 0 ) // getter
 	{
-		return as_value(ptr->color().toRGB());
+		if ( ptr->colorDefined() )  ret.set_double(ptr->color().toRGB());
+		else ret.set_null();
 	}
 	else // setter
 	{
@@ -267,7 +293,7 @@ TextFormat::color_getset(const fn_call& fn)
 		ptr->colorSet(newcolor);
 	}
 
-	return as_value();
+	return ret;
 }
 
 as_value
@@ -275,16 +301,19 @@ TextFormat::size_getset(const fn_call& fn)
 {
 	boost::intrusive_ptr<TextFormat> ptr = ensureType<TextFormat>(fn.this_ptr);
 
+	as_value ret;
+
 	if ( fn.nargs == 0 ) // getter
 	{
-		return as_value(TWIPS_TO_PIXELS(ptr->size()));
+		if ( ptr->sizeDefined() ) ret.set_double(TWIPS_TO_PIXELS(ptr->size()));
+		else ret.set_null();
 	}
 	else // setter
 	{
 		ptr->sizeSet(PIXELS_TO_TWIPS(fn.arg(0).to_int()));
 	}
 
-	return as_value();
+	return ret;
 }
 
 as_value
@@ -292,16 +321,19 @@ TextFormat::font_getset(const fn_call& fn)
 {
 	boost::intrusive_ptr<TextFormat> ptr = ensureType<TextFormat>(fn.this_ptr);
 
+	as_value ret;
+
 	if ( fn.nargs == 0 ) // getter
 	{
-		return as_value(ptr->font());
+		if ( ptr->fontDefined() ) ret.set_string(ptr->font());
+		else ret.set_null();
 	}
 	else // setter
 	{
 		ptr->fontSet(fn.arg(0).to_string());
 	}
 
-	return as_value();
+	return ret;
 }
 
 as_value
