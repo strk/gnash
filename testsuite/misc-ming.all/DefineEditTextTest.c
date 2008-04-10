@@ -294,6 +294,10 @@ main(int argc, char** argv)
   check_equals(mo, "typeof(dtext2.tf.color)", "'number'");
   check_equals(mo, "etext1.tf.color", "7237488");
   check_equals(mo, "dtext2.tf.color", "7895418");
+  check_equals(mo, "typeof(etext1.tf.blockIndent)", "'number'");
+  check_equals(mo, "typeof(dtext2.tf.blockIndent)", "'number'");
+  check_equals(mo, "etext1.tf.blockIndent", "0");
+  check_equals(mo, "dtext2.tf.blockIndent", "0");
 
   add_actions(mo, "dtext1.background = true;"
                   "etext1.background = true;"

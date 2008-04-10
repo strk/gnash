@@ -107,10 +107,23 @@ TextFormat::tabStops_getset(const fn_call& /*fn*/)
 }
 
 as_value
-TextFormat::blockIndent_getset(const fn_call& /*fn*/)
+TextFormat::blockIndent_getset(const fn_call& fn)
 {
-	ONCE( log_unimpl("TextField.blockIndent") );
-	return as_value();
+	boost::intrusive_ptr<TextFormat> ptr = ensureType<TextFormat>(fn.this_ptr);
+
+	as_value ret;
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		if ( ptr->blockIndentDefined() ) ret.set_double(TWIPS_TO_PIXELS(ptr->blockIndent()));
+		else ret.set_null();
+	}
+	else // setter
+	{
+		ptr->blockIndentSet(PIXELS_TO_TWIPS(fn.arg(0).to_int()));
+	}
+
+	return ret;
 }
 
 as_value
@@ -347,6 +360,9 @@ static void
 attachTextFormatInterface(as_object& o)
 {
 	int flags = 0; // for sure we want to enum, dunno about deleting yet
+
+	// TODO: register natives, see
+	// http://osflash.org/flashcoders/undocumented/asnative
 
 	o.init_property("display", &TextFormat::display_getset, &TextFormat::display_getset, flags);
 	o.init_property("bullet", &TextFormat::bullet_getset, &TextFormat::bullet_getset, flags);

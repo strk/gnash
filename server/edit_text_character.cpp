@@ -170,6 +170,7 @@ textfield_getTextFormat(const fn_call& fn)
 	tf->alignSet(text->getTextAlignment());
 	tf->sizeSet(text->getFontHeight());
 	tf->indentSet(text->getIndent());
+	tf->blockIndentSet(text->getBlockIndent());
 	tf->leadingSet(text->getLeading());
 	tf->leftMarginSet(text->getLeftMargin());
 	tf->rightMarginSet(text->getRightMargin());
@@ -234,6 +235,7 @@ textfield_setTextFormat(const fn_call& fn)
 	if ( tf->alignDefined() ) text->setAlignment(tf->align());
 	if ( tf->sizeDefined() ) text->setFontHeight(tf->size()); // keep twips
 	if ( tf->indentDefined() ) text->setIndent(tf->indent());
+	if ( tf->blockIndentDefined() ) text->setBlockIndent(tf->blockIndent());
 	if ( tf->leadingDefined() ) text->setLeading(tf->leading());
 	if ( tf->leftMarginDefined() ) text->setLeftMargin(tf->leftMargin());
 	if ( tf->rightMarginDefined() ) text->setRightMargin(tf->rightMargin());
@@ -471,6 +473,7 @@ edit_text_character::edit_text_character(character* parent,
 	_leading(m_def->get_leading()),
 	_alignment(def->get_alignment()),
 	_indent(def->get_indent()), 
+	_blockIndent(0),
 	_leftMargin(def->get_left_margin()), 
 	_rightMargin(def->get_right_margin()), 
 	_fontHeight(def->get_font_height()), 
@@ -1281,11 +1284,12 @@ edit_text_character::format_text()
 	boost::uint16_t leftMargin = getLeftMargin();
 	boost::uint16_t rightMargin = getRightMargin();
 	boost::uint16_t indent = getIndent();
+	boost::uint16_t blockIndent = getBlockIndent();
 
 	text_glyph_record	rec;	// one to work on
 	rec.m_style.setFont(_font.get());
 	rec.m_style.m_color = getTextColor(); 
-	rec.m_style.m_x_offset = PADDING_TWIPS + std::max(0, leftMargin + indent); 
+	rec.m_style.m_x_offset = PADDING_TWIPS + std::max(0, leftMargin + indent + blockIndent);
 	rec.m_style.m_y_offset = PADDING_TWIPS + fontHeight
 		+ (fontLeading - fontDescent);
 	rec.m_style.m_text_height = fontHeight;
@@ -1550,8 +1554,8 @@ after_x_advance:
 					// Close out this stretch of glyphs.
 					m_text_glyph_records.push_back(rec);
 					float	previous_x = x;
-					x = getLeftMargin() + PADDING_TWIPS;
-					y += getFontHeight() + leading;
+					x = leftMargin + blockIndent + PADDING_TWIPS;
+					y += fontHeight + leading;
 
 
 					// Start a new record on the next line.
@@ -1992,6 +1996,17 @@ edit_text_character::setIndent(boost::uint16_t h)
 	{
 		set_invalidated();
 		_indent = h;
+		format_text();
+	}
+}
+
+void
+edit_text_character::setBlockIndent(boost::uint16_t h)
+{
+	if ( _blockIndent != h )
+	{
+		set_invalidated();
+		_blockIndent = h;
 		format_text();
 	}
 }

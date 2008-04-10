@@ -368,6 +368,13 @@ public:
 
 	void setIndent(boost::uint16_t h);
 
+	boost::uint16_t getBlockIndent() const
+	{
+		return _blockIndent;
+	}
+
+	void setBlockIndent(boost::uint16_t h);
+
 	edit_text_character_def::alignment getAlignment() const
 	{
 		return _alignment;
@@ -462,6 +469,10 @@ private:
 	edit_text_character_def::alignment _alignment;
 
 	boost::uint16_t _indent;
+
+	/// Indentation for every line (including the ones created by
+	/// effect of a word-wrap.
+	boost::uint16_t _blockIndent;
 
 	boost::uint16_t _leftMargin;
 
