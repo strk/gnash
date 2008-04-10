@@ -1,4 +1,10 @@
+2008-04-10 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* libbase/log.{cpp,h}: allow registering callback to receive
+	  log messages.
+
 2008-04-10 Zou Lunkai <zoulunkai@gmail.com>
+
 	* server/parser/movie_def_impl.{h, cpp}, server/parser/movie_definition.h,
 	  server/parser/sprite_definition.{h,cpp},
 	  server/swf/PlaceObject2Tag.cpp, RemoveObjectTag.cpp,

@@ -159,6 +159,10 @@ public:
     bool getWriteDisk () {
         return _write;
     }
+    
+    typedef void (*logListener)(const std::string& s);
+    
+    void registerLogCallback(logListener l) { _listener = l; }
 
 private:
     
@@ -208,12 +212,11 @@ private:
     /// Whether to write the log file to disk.
     bool		 _write;
 
-    std::string		 _filespec;
-
-    /// For the ostream << operator
-    friend std::ostream & operator << (std::ostream &os, LogFile& e);
+    std::string _filespec;
 
     std::string _logFilename;
+    
+    logListener _listener;
 
 };
 

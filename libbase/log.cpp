@@ -173,6 +173,7 @@ processLog_action(const boost::format& fmt)
 void
 LogFile::log(const std::string& msg)
 {
+
 	boost::mutex::scoped_lock lock(_ioMutex);
 
 	if (_stamp == true )
@@ -189,6 +190,11 @@ LogFile::log(const std::string& msg)
 		if (openLogIfNeeded()) {
 			_outstream << msg << endl;
 		}
+	}
+	
+	if (_listener)
+	{
+	    (*_listener)(msg);
 	}
 }
 
@@ -220,7 +226,8 @@ LogFile::LogFile ()
 	_parserdump(false),
 	_state(CLOSED),
 	_stamp(true),
-	_write(false)
+	_write(false),
+	_listener(NULL)
 {
 }
 
