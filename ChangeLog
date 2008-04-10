@@ -1,3 +1,15 @@
+2008-04-10 Sandro Santilli <strk@keybit.net>
+
+	* server/edit_text_character.cpp: add bold,italic and indent support
+	  in getTextFormat and setTextFormat; proxy setNewTextFormat to 
+	  setTextFormat (still unimplemneted but at least would do something)
+	* server/font.{cpp,h}: allow specifying bold and italic modifiers
+	  in the device-font constructor; add getters for them.
+	* server/asobj/TextFormat.{cpp,h}: implement getter-setter for
+	  bold, italic and indent; make properties enumerable.
+	* testsuite/misc-ming.all/DefineEditTextTest.c: test bold, italic
+	  and indent values from TextField.getTextFormat.
+
 2008-04-10 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* libbase/log.{cpp,h}: allow registering callback to receive

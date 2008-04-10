@@ -111,8 +111,18 @@ class font : public resource
 public:
 	font();
 
-	// Create a device-font only font, using the given name to find it
-	font(const std::string& name);
+	/// Create a device-font only font, using the given name to find it
+	//
+	/// @param name
+	///	Name of the font face to look for.
+	///
+	/// @param bold
+	///	Whether to use the bold variant of the font.
+	///
+	/// @param italic
+	///	Whether to use the italic variant of the font.
+	///
+	font(const std::string& name, bool bold=false, bool italic=false);
 
 	~font();
 
@@ -232,6 +242,9 @@ public:
 
 	bool	is_subpixel_font() const { return m_subpixel_font; }
 	void	set_subpixel_font(bool isit) { m_subpixel_font = isit; }
+
+	bool	isBold() const { return m_is_bold; }
+	bool	isItalic() const { return m_is_italic; }
 private:
 
 	/// Read the table that maps from glyph indices to character codes.

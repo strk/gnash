@@ -120,21 +120,6 @@ textfield_set_variable(const fn_call& fn)
 }
 
 static as_value
-textfield_setNewTextFormat(const fn_call& fn)
-{
-	boost::intrusive_ptr<edit_text_character> text = ensureType<edit_text_character>(fn.this_ptr);
-	UNUSED(text);
-
-	static bool warned = false;
-	if ( ! warned ) {
-		log_unimpl("TextField.setNewTextFormat()");
-		warned = true;
-	}
-
-	return as_value();
-}
-
-static as_value
 textfield_getDepth(const fn_call& fn)
 {
 	// TODO: make this a character::getDepth_method function...
@@ -193,11 +178,13 @@ textfield_getTextFormat(const fn_call& fn)
 	if (font)
 	{
 		tf->fontSet(font->get_name());
+		tf->italicedSet(font->isItalic());
+		tf->boldSet(font->isBold());
 	}
 
-	// TODO: add font name, color and some more
+	// TODO: add font color and some more
 
-	ONCE( log_unimpl("TextField.getTextFormat() INCOMPLETE") );
+	ONCE( log_unimpl("TextField.getTextFormat() discards color, url, target, underline, blockIndent, tabStops, bullet and display") );
 
 	return as_value(tf.get());
 }
@@ -253,21 +240,35 @@ textfield_setTextFormat(const fn_call& fn)
 	const std::string& fontName = tf->font();
 	if ( ! fontName.empty() )
 	{
+		bool bold = tf->bold();
+		bool italic = tf->italiced();
+
 		// TODO: reuse an existing font with this name if known !
 		//       Would need cleanups in the fontlib package
 		//       for proper thread-safety
-		boost::intrusive_ptr<font> f ( new font(fontName) );
+		boost::intrusive_ptr<font> f ( new font(fontName, bold, italic) );
 		text->setFont( f );
 	}
 
-	// TODO: add font name, color and some more
+	// TODO: add font color and some more
 
-	ONCE( log_unimpl("TextField.setTextFormat() TESTING") );
+	ONCE( log_unimpl("TextField.setTextFormat() discards color, url, target, underline, blockIndent, tabStops, bullet and display") );
 
 	return as_value();
 
 }
 
+static as_value
+textfield_setNewTextFormat(const fn_call& fn)
+{
+	//boost::intrusive_ptr<edit_text_character> text = ensureType<edit_text_character>(fn.this_ptr);
+	//UNUSED(text);
+
+	ONCE( log_unimpl("TextField.setNewTextFormat(), we'll delegate to setTextFormat") );
+	return textfield_setTextFormat(fn);
+
+	//return as_value();
+}
 
 static as_value
 textfield_replaceSel(const fn_call& fn)

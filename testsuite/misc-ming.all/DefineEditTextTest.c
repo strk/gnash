@@ -252,12 +252,28 @@ main(int argc, char** argv)
                   "dtext2.text += ' world';" );
 
   // TextFormat objects are created on the fly
-  check_equals(mo, "typeof(etext1.getTextFormat())", "'object'"); 
-  check_equals(mo, "typeof(dtext2.getTextFormat())", "'object'"); 
-  check_equals(mo, "etext1.getTextFormat().size", "12"); 
-  check_equals(mo, "dtext2.getTextFormat().size", "12"); 
-  check_equals(mo, "etext1.getTextFormat().font", "'Bitstream Vera Sans'");
-  check_equals(mo, "dtext2.getTextFormat().font", "'times'"); 
+  add_actions(mo,
+	"etext1.tf = etext1.getTextFormat();"
+	"dtext2.tf = dtext2.getTextFormat();"
+	);
+  check_equals(mo, "typeof(etext1.tf)", "'object'"); 
+  check_equals(mo, "typeof(dtext2.tf)", "'object'"); 
+  check_equals(mo, "etext1.tf.size", "12"); 
+  check_equals(mo, "dtext2.tf.size", "12"); 
+  check_equals(mo, "etext1.tf.font", "'Bitstream Vera Sans'");
+  check_equals(mo, "dtext2.tf.font", "'times'"); 
+  check_equals(mo, "typeof(etext1.tf.bold)", "'boolean'");
+  check_equals(mo, "typeof(dtext2.tf.bold)", "'boolean'");
+  check_equals(mo, "etext1.tf.bold", "false");
+  check_equals(mo, "dtext2.tf.bold", "false"); 
+  check_equals(mo, "typeof(etext1.tf.italic)", "'boolean'");
+  check_equals(mo, "typeof(dtext2.tf.italic)", "'boolean'");
+  check_equals(mo, "etext1.tf.italic", "false");
+  check_equals(mo, "dtext2.tf.italic", "false"); 
+  check_equals(mo, "typeof(etext1.tf.indent)", "'number'");
+  check_equals(mo, "typeof(dtext2.tf.indent)", "'number'");
+  check_equals(mo, "etext1.tf.indent", "0");
+  check_equals(mo, "dtext2.tf.indent", "0"); 
 
   check_equals(mo, "dtext1.text", "'Hello world'");
   check_equals(mo, "etext1.text", "'Hello world'");

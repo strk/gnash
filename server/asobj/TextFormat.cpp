@@ -51,7 +51,7 @@ TextFormat::TextFormat()
 	_right_margin(-1),
 	_point_size(-1),
 	_tab_stops(-1),
-	_target(-1)
+	_target()
 {
 	//log_debug("%s:", __FUNCTION__);
 	init_member("getTextExtent", new builtin_function(TextFormat::getTextExtent_method));
@@ -59,15 +59,27 @@ TextFormat::TextFormat()
 
 /// new TextFormat([font, [size, [color, [bold, [italic, [underline, [url, [target, [align,[leftMargin, [rightMargin, [indent, [leading]]]]]]]]]]]]])
 static as_value
-textformat_new(const fn_call& /* fn */)
+textformat_new(const fn_call& fn)
 {
-  //GNASH_REPORT_FUNCTION;
-  //log_debug(_("%s: args=%d"), __FUNCTION__, nargs);
+	//GNASH_REPORT_FUNCTION;
 
-  boost::intrusive_ptr<TextFormat> text_obj = new TextFormat;
-  ONCE(log_unimpl("TextFormat")); // need to handle args too..
-  
-  return as_value(text_obj.get());
+	boost::intrusive_ptr<TextFormat> tf = new TextFormat;
+	if ( fn.nargs > 0  ) {	tf->fontSet(fn.arg(0).to_string());
+	if ( fn.nargs > 1  ) {	tf->sizeSet(fn.arg(1).to_int());
+	if ( fn.nargs > 2  ) {	tf->colorSet(fn.arg(2).to_int()); // TODO: check this...
+	if ( fn.nargs > 3  ) {	tf->boldSet(fn.arg(3).to_bool()); 
+	if ( fn.nargs > 4  ) {	tf->italicedSet(fn.arg(4).to_bool()); 
+	if ( fn.nargs > 5  ) {	tf->underlinedSet(fn.arg(5).to_bool()); 
+	if ( fn.nargs > 6  ) {	tf->urlSet(fn.arg(6).to_string()); 
+	if ( fn.nargs > 7  ) {	tf->targetSet(fn.arg(7).to_string()); 
+	if ( fn.nargs > 8  ) {	ONCE(log_unimpl("align parameter in TextFormat constructor")); // ltf->alignSet(fn.arg(8).to_string()); 
+	if ( fn.nargs > 9  ) {	tf->leftMarginSet(fn.arg(9).to_int());
+	if ( fn.nargs > 10 ) {	tf->rightMarginSet(fn.arg(10).to_int());
+	if ( fn.nargs > 11 ) {	tf->indentSet(fn.arg(11).to_int());
+	if ( fn.nargs > 12 ) {	tf->leadingSet(fn.arg(12).to_int());
+	}}}}}}}}}}}}}
+
+	return as_value(tf.get());
 }
 
 as_value
@@ -106,9 +118,19 @@ TextFormat::leading_getset(const fn_call& /*fn*/)
 }
 
 as_value
-TextFormat::indent_getset(const fn_call& /*fn*/)
+TextFormat::indent_getset(const fn_call& fn)
 {
-	ONCE( log_unimpl("TextField.indent") );
+	boost::intrusive_ptr<TextFormat> ptr = ensureType<TextFormat>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		return as_value(TWIPS_TO_PIXELS(ptr->indent()));
+	}
+	else // setter
+	{
+		ptr->indentSet(PIXELS_TO_TWIPS(fn.arg(0).to_int()));
+	}
+
 	return as_value();
 }
 
@@ -141,16 +163,36 @@ TextFormat::underline_getset(const fn_call& /*fn*/)
 }
 
 as_value
-TextFormat::italic_getset(const fn_call& /*fn*/)
+TextFormat::italic_getset(const fn_call& fn)
 {
-	ONCE( log_unimpl("TextField.italic") );
+	boost::intrusive_ptr<TextFormat> ptr = ensureType<TextFormat>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		return as_value(ptr->italiced());
+	}
+	else // setter
+	{
+		ptr->italicedSet(fn.arg(0).to_bool());
+	}
+
 	return as_value();
 }
 
 as_value
-TextFormat::bold_getset(const fn_call& /*fn*/)
+TextFormat::bold_getset(const fn_call& fn)
 {
-	ONCE( log_unimpl("TextField.bold") );
+	boost::intrusive_ptr<TextFormat> ptr = ensureType<TextFormat>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		return as_value(ptr->bold());
+	}
+	else // setter
+	{
+		ptr->boldSet(fn.arg(0).to_bool());
+	}
+
 	return as_value();
 }
 
@@ -221,25 +263,25 @@ TextFormat::getTextExtent_method(const fn_call& /*fn*/)
 static void
 attachTextFormatInterface(as_object& o)
 {
-	o.init_readonly_property("display", &TextFormat::display_getset);
-	o.init_readonly_property("bullet", &TextFormat::bullet_getset);
-	o.init_readonly_property("tabStops", &TextFormat::tabStops_getset);
-	o.init_readonly_property("blockIndent", &TextFormat::blockIndent_getset);
-	o.init_readonly_property("leading", &TextFormat::leading_getset);
-	o.init_readonly_property("indent", &TextFormat::indent_getset);
-	o.init_readonly_property("rightMargin", &TextFormat::rightMargin_getset);
-	o.init_readonly_property("leftMargin", &TextFormat::leftMargin_getset);
-	o.init_readonly_property("align", &TextFormat::align_getset);
-	o.init_readonly_property("underline", &TextFormat::underline_getset);
-	o.init_readonly_property("italic", &TextFormat::italic_getset);
-	o.init_readonly_property("bold", &TextFormat::bold_getset);
-	o.init_readonly_property("target", &TextFormat::target_getset);
-	o.init_readonly_property("url", &TextFormat::url_getset);
-	o.init_readonly_property("color", &TextFormat::color_getset);
+	int flags = 0; // for sure we want to enum, dunno about deleting yet
 
-	o.init_property("size", &TextFormat::size_getset, &TextFormat::size_getset);
-
-	o.init_property("font", &TextFormat::font_getset, &TextFormat::font_getset);
+	o.init_property("display", &TextFormat::display_getset, &TextFormat::display_getset, flags);
+	o.init_property("bullet", &TextFormat::bullet_getset, &TextFormat::bullet_getset, flags);
+	o.init_property("tabStops", &TextFormat::tabStops_getset, &TextFormat::tabStops_getset, flags);
+	o.init_property("blockIndent", &TextFormat::blockIndent_getset, &TextFormat::blockIndent_getset, flags);
+	o.init_property("leading", &TextFormat::leading_getset, &TextFormat::leading_getset, flags);
+	o.init_property("indent", &TextFormat::indent_getset, &TextFormat::indent_getset, flags);
+	o.init_property("rightMargin", &TextFormat::rightMargin_getset, &TextFormat::rightMargin_getset, flags);
+	o.init_property("leftMargin", &TextFormat::leftMargin_getset, &TextFormat::leftMargin_getset, flags);
+	o.init_property("align", &TextFormat::align_getset, &TextFormat::align_getset, flags);
+	o.init_property("underline", &TextFormat::underline_getset, &TextFormat::underline_getset, flags);
+	o.init_property("italic", &TextFormat::italic_getset, &TextFormat::italic_getset, flags);
+	o.init_property("bold", &TextFormat::bold_getset, &TextFormat::bold_getset, flags);
+	o.init_property("target", &TextFormat::target_getset, &TextFormat::target_getset, flags);
+	o.init_property("url", &TextFormat::url_getset, &TextFormat::url_getset, flags);
+	o.init_property("color", &TextFormat::color_getset, &TextFormat::color_getset, flags);
+	o.init_property("size", &TextFormat::size_getset, &TextFormat::size_getset, flags);
+	o.init_property("font", &TextFormat::font_getset, &TextFormat::font_getset, flags);
 }
 
 static as_object*

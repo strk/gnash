@@ -78,7 +78,7 @@ GlyphInfo::markReachableResources() const
 	{
 	}
 
-	font::font(const std::string& name)
+	font::font(const std::string& name, bool bold, bool italic)
 		:
 		m_name(name),
                 m_display_name(),
@@ -87,8 +87,8 @@ GlyphInfo::markReachableResources() const
 		m_unicode_chars(false),
 		m_shift_jis_chars(false),
 		m_ansi_chars(true),
-		m_is_italic(false),
-		m_is_bold(false),
+		m_is_italic(italic),
+		m_is_bold(bold),
 		m_wide_codes(false),
 		m_subpixel_font(false),
 		m_ascent(0.0f),
@@ -100,6 +100,10 @@ GlyphInfo::markReachableResources() const
 		if ( ! initDeviceFontProvider() )
 		{
 			log_error(_("Could not initialize device font face '%s'"), m_name.c_str());
+		}
+		else
+		{
+			log_debug("Initialized device font face '%s'%s%s", m_name, bold ? " bold" : "", italic ? " italic" : "");
 		}
 	}
 

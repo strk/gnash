@@ -75,6 +75,18 @@ public:
 	/// Return the name of a font for text as a string.
 	const std::string& font() const { return _font; }
 
+	// See doc for _target member
+	const std::string& target() const { return _target; }
+
+	// See doc for _target member
+	void targetSet(const std::string& s) { _target=s; }
+
+	// See doc for _url member
+	const std::string& url() const { return _url; }
+
+	// See doc for _url member
+	void urlSet(const std::string& s) { _url=s; }
+
 	///
 	boost::uint16_t blockIndent() { return _block_indent; }
 
@@ -189,7 +201,7 @@ private:
         /// the default target window _self. If the url parameter is
         /// set to an empty string or to the value null, you can get
         /// or set this property, but the property will have no effect.
-	int		_target;
+	std::string	_target;
 
 	/// The URL to which the text in this text format hyperlinks.
 	/// If url is an empty string, the text does not have a hyperlink
