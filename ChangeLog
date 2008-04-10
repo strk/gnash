@@ -1,5 +1,10 @@
 2008-04-10 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/TextFormat.{cpp,h}: implement align getter-setter
+	* testsuite/misc-ming.all/DefineEditTextTest.c: test align.
+
+2008-04-10 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/TextFormat.cpp: implement leftMargin and rightMargin
 	  getter-setters.
 	* testsuite/misc-ming.all/DefineEditTextTest.c: test leftMargin and

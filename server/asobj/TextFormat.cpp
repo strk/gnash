@@ -26,6 +26,7 @@
 #include "namedStrings.h"
 #include "VM.h"
 #include "server/types.h" // for PIXELS_TO_TWIPS
+#include "StringPredicates.h" // for parseAlignString
 
 #define ONCE(x) { static bool warned=false; if (!warned) { warned=true; x; } }
 
@@ -72,7 +73,7 @@ textformat_new(const fn_call& fn)
 	if ( fn.nargs > 5  ) {	tf->underlinedSet(fn.arg(5).to_bool()); 
 	if ( fn.nargs > 6  ) {	tf->urlSet(fn.arg(6).to_string()); 
 	if ( fn.nargs > 7  ) {	tf->targetSet(fn.arg(7).to_string()); 
-	if ( fn.nargs > 8  ) {	ONCE(log_unimpl("align parameter in TextFormat constructor")); // ltf->alignSet(fn.arg(8).to_string()); 
+	if ( fn.nargs > 8  ) {	tf->alignSet(fn.arg(8).to_string());
 	if ( fn.nargs > 9  ) {	tf->leftMarginSet(fn.arg(9).to_int());
 	if ( fn.nargs > 10 ) {	tf->rightMarginSet(fn.arg(10).to_int());
 	if ( fn.nargs > 11 ) {	tf->indentSet(fn.arg(11).to_int());
@@ -169,9 +170,19 @@ TextFormat::leftMargin_getset(const fn_call& fn)
 }
 
 as_value
-TextFormat::align_getset(const fn_call& /*fn*/)
+TextFormat::align_getset(const fn_call& fn)
 {
-	ONCE( log_unimpl("TextField.align") );
+	boost::intrusive_ptr<TextFormat> ptr = ensureType<TextFormat>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		return as_value(ptr->getAlignString(ptr->align()));
+	}
+	else // setter
+	{
+		ptr->alignSet(fn.arg(0).to_string());
+	}
+
 	return as_value();
 }
 
@@ -331,5 +342,40 @@ void textformat_class_init(as_object& global)
 	global.init_member("TextFormat", cl.get());
 
 }
+
+edit_text_character_def::alignment
+TextFormat::parseAlignString(const std::string& align)
+{
+	StringNoCaseEqual cmp;
+	if ( cmp(align, "right") ) return edit_text_character_def::ALIGN_RIGHT;
+	else if ( cmp(align, "center") ) return edit_text_character_def::ALIGN_CENTER;
+	else if ( cmp(align, "right") ) return edit_text_character_def::ALIGN_RIGHT;
+	else if ( cmp(align, "justify") ) return edit_text_character_def::ALIGN_JUSTIFY;
+	else
+	{
+		log_debug("Invalid align string %s, take as left", align);
+		return edit_text_character_def::ALIGN_JUSTIFY;
+	}
+}
+
+const char* 
+TextFormat::getAlignString(edit_text_character_def::alignment a)
+{
+	switch (a)
+	{
+		case edit_text_character_def::ALIGN_LEFT:
+			return "left";
+		case edit_text_character_def::ALIGN_CENTER:
+			return "center";
+		case edit_text_character_def::ALIGN_RIGHT:
+			return "right";
+		case edit_text_character_def::ALIGN_JUSTIFY:
+			return "justify";
+		default:
+			log_error("Uknown alignment value: %d, take as left", a);
+			return "left";
+	}
+}
+
 
 } // end of gnash namespace

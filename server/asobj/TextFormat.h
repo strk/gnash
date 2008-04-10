@@ -113,6 +113,12 @@ public:
 
 	void alignSet(edit_text_character_def::alignment x)  { _align = x; }
 
+	static edit_text_character_def::alignment parseAlignString(const std::string& align);
+
+	static const char* getAlignString(edit_text_character_def::alignment a);
+
+	void alignSet(const std::string& align) { alignSet(parseAlignString(align)); }
+
 	void blockIndentSet(boost::uint16_t x)   { _block_indent = x; }
 	void leadingSet(boost::uint16_t x)     { _leading = x; }
 	void leftMarginSet(boost::uint16_t x)  { _left_margin = x; }
