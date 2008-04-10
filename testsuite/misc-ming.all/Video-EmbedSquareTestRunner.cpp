@@ -75,14 +75,14 @@ main(int /*argc*/, char** /*argv*/)
 
 		check_equals(root->get_current_frame(), 0); // 0-based
 
-		// Check the color in (1,1) - should be red
-		check_pixel(1, 1, 1, red, 5);
+		// Check the color in (5,5) - should be red
+		check_pixel(5, 5, 2, red, 5);
 
-		// Check the color in (30,1) - should be yellow
-		check_pixel(35*scale_x, 1, 1, yellow, 5);
+		// Check the color in (35,5) - should be yellow
+		check_pixel(35*scale_x, 5, 2, yellow, 5);
 
-		// Check the color in (1,30) - should be yellow
-		check_pixel(1, 35*scale_y, 1, yellow, 5);
+		// Check the color in (5,35) - should be yellow
+		check_pixel(5, 35*scale_y, 2, yellow, 5);
 
 		while (true)
 		{
@@ -93,19 +93,19 @@ main(int /*argc*/, char** /*argv*/)
 			
 			int i = (framenum-1)*10;
 
-			// Check the color in (9+i,1) - should be yellow
-			check_pixel((5 + i)*scale_x, 1, 1, yellow, 5);
+			// Check the color in (5+i,5) - should be yellow
+			check_pixel((5 + i)*scale_x, 5, 2, yellow, 5);
 
-			// Check the color in (25+i,1) - should be red
-			check_pixel((25 + i)*scale_x, 1, 1, red, 5);
+			// Check the color in (25+i,5) - should be red
+			check_pixel((25 + i)*scale_x, 5, 2, red, 5);
 
-			// Check the color in (25+i,30) - should be yellow
+			// Check the color in (25+i,35) - should be yellow
 			check_pixel((25 + i)*scale_x, 35*scale_y, 1, yellow, 5);
 
 			// The video is 128x96 so we don't want to check beyond that
 			if (45+i <= 128) {
-				// Check the color in (40+i,1) - should be yellow
-				check_pixel((45 + i)*scale_x, 1, 1, yellow, 5);
+				// Check the color in (45+i,5) - should be yellow
+				check_pixel((45 + i)*scale_x, 5, 2, yellow, 5);
 			}
 
 			if ( framenum == framecount-1 )
