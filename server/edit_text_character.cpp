@@ -173,6 +173,7 @@ textfield_getTextFormat(const fn_call& fn)
 	tf->leadingSet(text->getLeading());
 	tf->leftMarginSet(text->getLeftMargin());
 	tf->rightMarginSet(text->getRightMargin());
+	tf->colorSet(text->getTextColor());
 
 	const font* font = text->getFont();
 	if (font)
@@ -184,7 +185,7 @@ textfield_getTextFormat(const fn_call& fn)
 
 	// TODO: add font color and some more
 
-	ONCE( log_unimpl("TextField.getTextFormat() discards color, url, target, underline, blockIndent, tabStops, bullet and display") );
+	ONCE( log_unimpl("TextField.getTextFormat() discards url, target, underline, blockIndent, tabStops, bullet and display") );
 
 	return as_value(tf.get());
 }
@@ -236,6 +237,7 @@ textfield_setTextFormat(const fn_call& fn)
 	text->setLeading(tf->leading());
 	text->setLeftMargin(tf->leftMargin());
 	text->setRightMargin(tf->rightMargin());
+	text->setTextColor(tf->color());
 
 	const std::string& fontName = tf->font();
 	if ( ! fontName.empty() )
@@ -252,7 +254,7 @@ textfield_setTextFormat(const fn_call& fn)
 
 	// TODO: add font color and some more
 
-	ONCE( log_unimpl("TextField.setTextFormat() discards color, url, target, underline, blockIndent, tabStops, bullet and display") );
+	ONCE( log_unimpl("TextField.setTextFormat() discards url, target, underline, blockIndent, tabStops, bullet and display") );
 
 	return as_value();
 

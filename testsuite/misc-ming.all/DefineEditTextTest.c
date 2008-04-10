@@ -40,12 +40,15 @@
 
 SWFDisplayItem add_text_field(SWFMovie mo, SWFBlock font, const char* text,
 	float indent, float leftMargin, float rightMargin, SWFTextFieldAlignment align,
-	float lineSpacing);
+	float lineSpacing,
+	unsigned int textR, unsigned int textG, unsigned int textB, unsigned int textA);
 
 SWFDisplayItem
 add_text_field(SWFMovie mo, SWFBlock font, const char* text, float indent,
 		float leftMargin, float rightMargin,
-		SWFTextFieldAlignment align, float lineSpacing)
+		SWFTextFieldAlignment align, float lineSpacing,
+		unsigned int textR, unsigned int textG,
+		unsigned int textB, unsigned int textA)
 {
   SWFTextField tf;
 
@@ -57,6 +60,7 @@ add_text_field(SWFMovie mo, SWFBlock font, const char* text, float indent,
   SWFTextField_setRightMargin(tf, rightMargin);
   SWFTextField_setAlignment(tf, align);
   SWFTextField_setLineSpacing(tf, lineSpacing);
+  SWFTextField_setColor(tf, textR, textG, textB, textA);
 
   /* setting flags seem unneeded */
   /*SWFTextField_setFlags(tf, SWFTEXTFIELD_USEFONT|SWFTEXTFIELD_NOEDIT);*/
@@ -152,15 +156,15 @@ main(int argc, char** argv)
     SWFBrowserFont bfont = newSWFBrowserFont("_sans");
     SWFFont efont = loadSWFFontFromFile(font_file);
 
-    it = add_text_field(mo, (SWFBlock)bfont, "Hello", 1, 2, 3, SWFTEXTFIELD_ALIGN_LEFT, 10);
+    it = add_text_field(mo, (SWFBlock)bfont, "Hello", 1, 2, 3, SWFTEXTFIELD_ALIGN_LEFT, 10, 100, 101, 102, 50);
     SWFDisplayItem_setName(it, "dtext1");
     SWFDisplayItem_moveTo(it, 0, 200);
-    it = add_text_field(mo, (SWFBlock)efont, "Hello", 4, 5, 6, SWFTEXTFIELD_ALIGN_CENTER, 11);
+    it = add_text_field(mo, (SWFBlock)efont, "Hello", 4, 5, 6, SWFTEXTFIELD_ALIGN_CENTER, 11, 110, 111, 112, 51);
     SWFDisplayItem_setName(it, "etext1");
     SWFDisplayItem_moveTo(it, 0, 300);
 
     SWFBrowserFont bfont2 = newSWFBrowserFont("times");
-    it = add_text_field(mo, (SWFBlock)bfont2, "Hello", 7, 8, 9, SWFTEXTFIELD_ALIGN_RIGHT, 12);
+    it = add_text_field(mo, (SWFBlock)bfont2, "Hello", 7, 8, 9, SWFTEXTFIELD_ALIGN_RIGHT, 12, 120, 121, 122, 52);
     SWFDisplayItem_setName(it, "dtext2");
     SWFDisplayItem_moveTo(it, 0, 400);
   }
@@ -230,9 +234,9 @@ main(int argc, char** argv)
   check_equals(mo, "dtext1.backgroundColor", "0xffffff");
   check_equals(mo, "etext1.backgroundColor", "0xffffff");
   check_equals(mo, "dtext2.backgroundColor", "0xffffff");
-  check_equals(mo, "dtext1.textColor", "0x000000");
-  check_equals(mo, "etext1.textColor", "0x000000");
-  check_equals(mo, "dtext2.textColor", "0x000000");
+  check_equals(mo, "dtext1.textColor", "6579558");
+  check_equals(mo, "etext1.textColor", "7237488");
+  check_equals(mo, "dtext2.textColor", "7895418");
   check_equals(mo, "dtext1._alpha", "100");
   check_equals(mo, "etext1._alpha", "100");
   check_equals(mo, "dtext2._alpha", "100");
@@ -246,19 +250,6 @@ main(int argc, char** argv)
   check_equals(mo, "typeof(dtext2._xmouse)", "'number'");
   check_equals(mo, "typeof(etext1._ymouse)", "'number'"); 
   check_equals(mo, "typeof(dtext2._ymouse)", "'number'"); 
-  
-  add_actions(mo, "dtext1.background = true;"
-                  "etext1.background = true;"
-                  "dtext2.background = true;"
-                  "dtext1.backgroundColor = 0xff0000;"
-                  "etext1.backgroundColor = 0x00ff00;"
-                  "dtext2.backgroundColor = 0x0000ff;"
-                  "dtext1.textColor = 0x00ffff;"
-                  "etext1.textColor = 0xff00ff;"
-                  "dtext2.textColor = 0xffff00;"
-                  "dtext1.text += ' world';"
-                  "etext1.text += ' world';"
-                  "dtext2.text += ' world';" );
 
   // TextFormat objects are created on the fly
   add_actions(mo,
@@ -299,6 +290,26 @@ main(int argc, char** argv)
   check_equals(mo, "typeof(dtext2.tf.leading)", "'number'");
   check_equals(mo, "etext1.tf.leading", "11");
   check_equals(mo, "dtext2.tf.leading", "12"); 
+  check_equals(mo, "typeof(etext1.tf.color)", "'number'");
+  check_equals(mo, "typeof(dtext2.tf.color)", "'number'");
+  check_equals(mo, "etext1.tf.color", "7237488");
+  check_equals(mo, "dtext2.tf.color", "7895418");
+
+  add_actions(mo, "dtext1.background = true;"
+                  "etext1.background = true;"
+                  "dtext2.background = true;"
+                  "dtext1.backgroundColor = 0xff0000;"
+                  "etext1.backgroundColor = 0x00ff00;"
+                  "dtext2.backgroundColor = 0x0000ff;"
+                  "dtext1.textColor = 0x00ffff;"
+                  "etext1.textColor = 0xff00ff;"
+                  "dtext2.textColor = 0xffff00;"
+                  "dtext1.text += ' world';"
+                  "etext1.text += ' world';"
+                  "dtext2.text += ' world';" );
+
+  check_equals(mo, "etext1.getTextFormat().color", "0xff00ff");
+  check_equals(mo, "dtext2.getTextFormat().color", "0xffff00"); 
 
   check_equals(mo, "dtext1.text", "'Hello world'");
   check_equals(mo, "etext1.text", "'Hello world'");

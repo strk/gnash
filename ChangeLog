@@ -1,5 +1,11 @@
 2008-04-10 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/TextFormat.{cpp,h}: implement color getter-setter
+	* server/edit_text_character.cpp: fix handling of TextField.color.
+	* testsuite/misc-ming.all/DefineEditTextTest.c: test TextFormat.color.
+
+2008-04-10 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/TextFormat.cpp: implement leading getter-setter.
 	* testsuite/misc-ming.all/DefineEditTextTest.c: test leading.
 

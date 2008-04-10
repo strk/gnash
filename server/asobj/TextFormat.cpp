@@ -45,7 +45,7 @@ TextFormat::TextFormat()
 	_italic(false),
 	_bullet(false),
 	_block_indent(-1),
-	_color(0),
+	_color(),
 	_indent(-1),
 	_leading(-1),
 	_left_margin(-1),
@@ -67,7 +67,7 @@ textformat_new(const fn_call& fn)
 	boost::intrusive_ptr<TextFormat> tf = new TextFormat;
 	if ( fn.nargs > 0  ) {	tf->fontSet(fn.arg(0).to_string());
 	if ( fn.nargs > 1  ) {	tf->sizeSet(fn.arg(1).to_int());
-	if ( fn.nargs > 2  ) {	tf->colorSet(fn.arg(2).to_int()); // TODO: check this...
+	if ( fn.nargs > 2  ) {	rgba col; col.parseRGB(fn.arg(2).to_int()); tf->colorSet(col); 
 	if ( fn.nargs > 3  ) {	tf->boldSet(fn.arg(3).to_bool()); 
 	if ( fn.nargs > 4  ) {	tf->italicedSet(fn.arg(4).to_bool()); 
 	if ( fn.nargs > 5  ) {	tf->underlinedSet(fn.arg(5).to_bool()); 
@@ -252,9 +252,21 @@ TextFormat::url_getset(const fn_call& /*fn*/)
 }
 
 as_value
-TextFormat::color_getset(const fn_call& /*fn*/)
+TextFormat::color_getset(const fn_call& fn)
 {
-	ONCE( log_unimpl("TextField.color") );
+	boost::intrusive_ptr<TextFormat> ptr = ensureType<TextFormat>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		return as_value(ptr->color().toRGB());
+	}
+	else // setter
+	{
+		rgba newcolor;
+		newcolor.parseRGB(fn.arg(0).to_int());
+		ptr->colorSet(newcolor);
+	}
+
 	return as_value();
 }
 
@@ -270,8 +282,6 @@ TextFormat::size_getset(const fn_call& fn)
 	else // setter
 	{
 		ptr->sizeSet(PIXELS_TO_TWIPS(fn.arg(0).to_int()));
-		ONCE( log_debug("TextField.size setter TESTING") );
-
 	}
 
 	return as_value();

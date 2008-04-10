@@ -23,6 +23,7 @@
 
 #include "as_object.h" // for inheritance of TextFormat
 #include "edit_text_character_def.h" // for edit_text_character_def::alignment enum
+#include "types.h" // for rgba
 #include <boost/cstdint.hpp> // for boost::uint32_t
 #include <string>
 
@@ -52,10 +53,7 @@ public:
 	bool bullet()      { return _bullet; }
 
 	/// Return the color of text using this text format.
-	//
-	/// A number containing three 8-bit RGB components; for example,
-        /// 0xFF0000 is red, 0x00FF00 is green.
-	boost::uint32_t color() const { return _color; }
+	const rgba& color() const { return _color; }
 
 	/// \brief
 	/// Return ann integer that indicates the indentation from the left
@@ -107,7 +105,7 @@ public:
 	void italicedSet(bool x)     { _italic = x; }
 	void boldSet(bool x)         { _bold = x; }
 	void bulletSet(bool x)       { _bullet = x; }
-	void colorSet(boost::uint32_t x)      { _color = x; }
+	void colorSet(const rgba& x)      { _color = x; }
 	void indentSet(boost::uint16_t x)      { _indent = x; }
 	void fontSet(const std::string& font) { _font=font; }
 
@@ -177,7 +175,7 @@ private:
 	//
 	/// A number containing three 8-bit RGB components; for example,
         /// 0xFF0000 is red, 0x00FF00 is green.
-	boost::uint32_t	_color;	
+	rgba _color;	
 
 	// The name of a font for text as a string.
 	std::string _font;	
