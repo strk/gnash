@@ -791,7 +791,7 @@ edit_text_character::get_topmost_mouse_entity(float x, float y)
 	}
 	
 	// shouldn't this be !can_handle_mouse_event() instead ?
-	if (_selectable)
+	if (!_selectable)
 	{
 		// not selectable, so don't catch mouse events!
 		return NULL;

@@ -1,3 +1,8 @@
+2008-04-10 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* server/edit_text_character.cpp: get_topmost_mouse_entity() should
+	  return NULL if *not* selectable, not when selectable	
+
 2008-04-10 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* testsuite/actionscript.all: Date constructor tests.
