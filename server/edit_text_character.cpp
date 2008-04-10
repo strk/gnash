@@ -186,7 +186,7 @@ textfield_getTextFormat(const fn_call& fn)
 
 	// TODO: add font color and some more
 
-	ONCE( log_unimpl("TextField.getTextFormat() discards url, target, underline, blockIndent, tabStops, bullet and display") );
+	ONCE( log_unimpl("TextField.getTextFormat() discards url, target, underline, tabStops, bullet and display") );
 
 	return as_value(tf.get());
 }
@@ -259,7 +259,7 @@ textfield_setTextFormat(const fn_call& fn)
 
 	// TODO: add font color and some more
 
-	ONCE( log_unimpl("TextField.setTextFormat() discards url, target, underline, blockIndent, tabStops, bullet and display") );
+	ONCE( log_unimpl("TextField.setTextFormat() discards url, target, underline, tabStops, bullet and display") );
 
 	return as_value();
 
