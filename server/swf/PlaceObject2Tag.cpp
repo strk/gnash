@@ -558,16 +558,6 @@ PlaceObject2Tag::loader(stream* in, tag_type tag, movie_definition* m)
     ch->read(*in, tag);
 
     m->addControlTag(ch);
-
-    int depth = ch->getDepth();
-    if ( depth < 0 && depth >= character::staticDepthOffset )
-    {
-    	m->addTimelineDepth(depth);
-    }
-    else
-    {
-	log_debug("PlaceObject2Tag depth %d is out of static depth zone. Won't register its TimelineDepth.", depth);
-    }
 }
 
 } // namespace gnash::SWF

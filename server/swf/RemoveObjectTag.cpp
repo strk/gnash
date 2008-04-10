@@ -69,15 +69,6 @@ RemoveObjectTag::loader(stream* in, tag_type tag, movie_definition* m)
 	log_parse(_("  remove_object_2(%d)"), depth);
     );
 
-    if ( depth < 0 && depth >= character::staticDepthOffset )
-    {
-        m->removeTimelineDepth(depth);
-    }
-    else
-    {
-	log_debug("RemoveObjectTag depth %d is out of static depth zone. Won't unregister its TimelineDepth.", depth);
-    }
-
     // Ownership transferred to movie_definition
     m->addControlTag(t.release());
 }

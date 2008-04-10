@@ -1,3 +1,10 @@
+2008-04-10 Zou Lunkai <zoulunkai@gmail.com>
+	* server/parser/movie_def_impl.{h, cpp}, server/parser/movie_definition.h,
+	  server/parser/sprite_definition.{h,cpp},
+	  server/swf/PlaceObject2Tag.cpp, RemoveObjectTag.cpp,
+	  server/sprite_instance.cpp: drop obsolete timeline
+	  handling.	  
+
 2008-04-09 Sandro Santilli <strk@keybit.net>
 
 	* libbase/ref_counted.h, libbase/smart_ptr.h: const-correctness.

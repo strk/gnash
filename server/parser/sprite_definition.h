@@ -30,7 +30,6 @@
 #include "stream.h"
 #include "log.h"
 #include "rect.h"
-#include "Timeline.h" // for composition 
 
 namespace gnash
 {
@@ -80,33 +79,6 @@ public:
 	as_function* getRegisteredClass()
 	{
 		return registeredClass.get();
-	}
-
-	// See dox in base class
-	//
-	// TODO: implement in base class ?
-	//
-	void addTimelineDepth(int depth)
-	{
-		_timeline.addDepth(depth);
-	}
-
-	// See dox in base class
-	//
-	// TODO: implement in base class ?
-	//
-	void removeTimelineDepth(int depth)
-	{
-		_timeline.removeDepth(depth);
-	}
-
-	// See dox in base class
-	//
-	// TODO: implement in base class ?
-	//
-	void getTimelineDepths(size_t frameno, std::vector<int>& depths)
-	{
-		_timeline.getFrameDepths(frameno, depths);
 	}
 
 	// overload from movie_definition
@@ -358,12 +330,6 @@ private:
 	/// interface.
 	///
 	boost::intrusive_ptr<as_function> registeredClass;
-
-	/// Timeline depth info
-	//
-	/// TODO: move to base class ?
-	///
-	Timeline _timeline;
 
 protected:
 

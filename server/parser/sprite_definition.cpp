@@ -106,10 +106,6 @@ sprite_definition::read(stream* in)
 			// show frame tag -- advance to the next frame.
 		    	++m_loading_frame;
 
-			// Close current frame definition in Timeline object
-			_timeline.closeFrame();
-
-
 			IF_VERBOSE_PARSE (
 				log_parse(_("  show_frame "
 					SIZET_FMT "/" SIZET_FMT

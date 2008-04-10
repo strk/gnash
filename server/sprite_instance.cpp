@@ -50,7 +50,6 @@
 #include "LoadVariablesThread.h" 
 #include "ExecutableCode.h" // for inheritance of ConstructEvent
 #include "gnash.h" // for point class !
-#include "Timeline.h" // for restoreDisplayList
 #include "Object.h" // for getObjectInterface
 #include "DynamicShape.h" // for composition
 #include "namedStrings.h"

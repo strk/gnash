@@ -28,7 +28,6 @@
 #include "bitmap_character_def.h" // for boost::intrusive_ptr visibility of dtor
 #include "resource.h" // for boost::intrusive_ptr visibility of dtor
 #include "stream.h" // for get_bytes_loaded
-#include "Timeline.h" // for composition 
 #include "StringPredicates.h" // for case-insensitive string comparision (ExportMap)
 
 #include <map> // for CharacterDictionary
@@ -316,12 +315,6 @@ private:
 		_bytes_loaded=bytes;
 	}
 
-	/// Timeline depth info
-	//
-	/// TODO: move to base class ?
-	///
-	Timeline _timeline;
-
 	/// A flag set to true when load cancelation is requested
 	bool _loadingCanceled;
 
@@ -573,33 +566,6 @@ public:
     abort(); // should not be called  
 		static rect unused;
 		return unused;
-	}
-
-	// See dox in base class
-	//
-	// TODO: implement in base class ?
-	//
-	void addTimelineDepth(int depth)
-	{
-		_timeline.addDepth(depth);
-	}
-
-	// See dox in base class
-	//
-	// TODO: implement in base class ?
-	//
-	void removeTimelineDepth(int depth)
-	{
-		_timeline.removeDepth(depth);
-	}
-
-	// See dox in base class
-	//
-	// TODO: implement in base class ?
-	//
-	void getTimelineDepths(size_t frameno, std::vector<int>& depths)
-	{
-		_timeline.getFrameDepths(frameno, depths);
 	}
 
 protected:
