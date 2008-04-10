@@ -135,16 +135,36 @@ TextFormat::indent_getset(const fn_call& fn)
 }
 
 as_value
-TextFormat::rightMargin_getset(const fn_call& /*fn*/)
+TextFormat::rightMargin_getset(const fn_call& fn)
 {
-	ONCE( log_unimpl("TextField.rightMargin") );
+	boost::intrusive_ptr<TextFormat> ptr = ensureType<TextFormat>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		return as_value(TWIPS_TO_PIXELS(ptr->rightMargin()));
+	}
+	else // setter
+	{
+		ptr->rightMarginSet(PIXELS_TO_TWIPS(fn.arg(0).to_int()));
+	}
+
 	return as_value();
 }
 
 as_value
-TextFormat::leftMargin_getset(const fn_call& /*fn*/)
+TextFormat::leftMargin_getset(const fn_call& fn)
 {
-	ONCE( log_unimpl("TextField.leftMargin") );
+	boost::intrusive_ptr<TextFormat> ptr = ensureType<TextFormat>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		return as_value(TWIPS_TO_PIXELS(ptr->leftMargin()));
+	}
+	else // setter
+	{
+		ptr->leftMarginSet(PIXELS_TO_TWIPS(fn.arg(0).to_int()));
+	}
+
 	return as_value();
 }
 

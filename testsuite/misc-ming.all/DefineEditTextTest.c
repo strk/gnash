@@ -38,16 +38,19 @@
 #define OUTPUT_VERSION 7
 #define OUTPUT_FILENAME "DefineEditTextTest.swf"
 
-SWFDisplayItem add_text_field(SWFMovie mo, SWFBlock font, const char* text);
+SWFDisplayItem add_text_field(SWFMovie mo, SWFBlock font, const char* text, float indent, float leftMargin, float rightMargin);
 
 SWFDisplayItem
-add_text_field(SWFMovie mo, SWFBlock font, const char* text)
+add_text_field(SWFMovie mo, SWFBlock font, const char* text, float indent, float leftMargin, float rightMargin)
 {
   SWFTextField tf;
 
   tf = newSWFTextField();
 
   SWFTextField_setFont(tf, font);
+  SWFTextField_setIndentation(tf, indent);
+  SWFTextField_setLeftMargin(tf, leftMargin);
+  SWFTextField_setRightMargin(tf, rightMargin);
 
   /* setting flags seem unneeded */
   /*SWFTextField_setFlags(tf, SWFTEXTFIELD_USEFONT|SWFTEXTFIELD_NOEDIT);*/
@@ -143,15 +146,15 @@ main(int argc, char** argv)
     SWFBrowserFont bfont = newSWFBrowserFont("_sans");
     SWFFont efont = loadSWFFontFromFile(font_file);
 
-    it = add_text_field(mo, (SWFBlock)bfont, "Hello");
+    it = add_text_field(mo, (SWFBlock)bfont, "Hello", 1, 2, 3);
     SWFDisplayItem_setName(it, "dtext1");
     SWFDisplayItem_moveTo(it, 0, 200);
-    it = add_text_field(mo, (SWFBlock)efont, "Hello");
+    it = add_text_field(mo, (SWFBlock)efont, "Hello", 4, 5, 6);
     SWFDisplayItem_setName(it, "etext1");
     SWFDisplayItem_moveTo(it, 0, 300);
 
     SWFBrowserFont bfont2 = newSWFBrowserFont("times");
-    it = add_text_field(mo, (SWFBlock)bfont2, "Hello");
+    it = add_text_field(mo, (SWFBlock)bfont2, "Hello", 7, 8, 9);
     SWFDisplayItem_setName(it, "dtext2");
     SWFDisplayItem_moveTo(it, 0, 400);
   }
@@ -272,8 +275,16 @@ main(int argc, char** argv)
   check_equals(mo, "dtext2.tf.italic", "false"); 
   check_equals(mo, "typeof(etext1.tf.indent)", "'number'");
   check_equals(mo, "typeof(dtext2.tf.indent)", "'number'");
-  check_equals(mo, "etext1.tf.indent", "0");
-  check_equals(mo, "dtext2.tf.indent", "0"); 
+  check_equals(mo, "etext1.tf.indent", "4");
+  check_equals(mo, "dtext2.tf.indent", "7"); 
+  check_equals(mo, "typeof(etext1.tf.leftMargin)", "'number'");
+  check_equals(mo, "typeof(dtext2.tf.leftMargin)", "'number'");
+  check_equals(mo, "etext1.tf.leftMargin", "5");
+  check_equals(mo, "dtext2.tf.leftMargin", "8"); 
+  check_equals(mo, "typeof(etext1.tf.rightMargin)", "'number'");
+  check_equals(mo, "typeof(dtext2.tf.rightMargin)", "'number'");
+  check_equals(mo, "etext1.tf.rightMargin", "6");
+  check_equals(mo, "dtext2.tf.rightMargin", "9"); 
 
   check_equals(mo, "dtext1.text", "'Hello world'");
   check_equals(mo, "etext1.text", "'Hello world'");

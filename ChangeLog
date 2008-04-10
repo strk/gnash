@@ -1,5 +1,12 @@
 2008-04-10 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/TextFormat.cpp: implement leftMargin and rightMargin
+	  getter-setters.
+	* testsuite/misc-ming.all/DefineEditTextTest.c: test leftMargin and
+	  rightMargin, improve test indent.
+
+2008-04-10 Sandro Santilli <strk@keybit.net>
+
 	* server/edit_text_character.cpp: add bold,italic and indent support
 	  in getTextFormat and setTextFormat; proxy setNewTextFormat to 
 	  setTextFormat (still unimplemneted but at least would do something)
