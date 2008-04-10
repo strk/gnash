@@ -1,3 +1,9 @@
+2008-04-10 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* testsuite/actionscript.all: Date constructor tests.
+	* server/asobj/Date.cpp: correct constructor to return
+	  current time when not called with new.
+
 2008-04-10 Sandro Santilli <strk@keybit.net>
 
 	* server/edit_text_character.cpp (setTextFormat): don't

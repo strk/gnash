@@ -361,7 +361,7 @@ date_new(const fn_call& fn)
     }
 
     // TODO: move this to date_as_object constructor
-    if (fn.nargs < 1 || fn.arg(0).is_undefined()) {
+    if (fn.nargs < 1 || fn.arg(0).is_undefined() || !(fn.isInstantiation()) ) {
         // Set from system clock
         date->value = clocktime::getTicks();
     }

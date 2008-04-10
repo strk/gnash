@@ -22,7 +22,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Date.as,v 1.51 2008/04/07 13:14:54 bwy Exp $";
+rcsid="$Id: Date.as,v 1.52 2008/04/10 16:55:11 bwy Exp $";
 #include "check.as"
 
 check_equals(typeof(Date), 'function');
@@ -617,6 +617,13 @@ d.setUTCFullYear(2000, 6, 1);
 d.setUTCHours(0, 0, 0, 0);
 check (Date.UTC(2000,6,1,0,0,0,0) == d.valueOf());
 
+d1 = Date(123);
+d2 = new Date;
+check_equals(d1.toString(), d2.toString());
+
+d1 = Date(2008, 10, 10, 10, 10, 10, 10);
+d2 = new Date;
+check_equals(d1.toString(), d2.toString());
 
 xcheck_equals (Date.UTC(-1000, 20).valueOf(), -33713366400000);
 xcheck_equals (Date.UTC(-70, 0).toString(), "-4417977600000");
@@ -659,7 +666,7 @@ check_equals(typeof(foo), 'string');
 #endif
 
 #if OUTPUT_VERSION == 5
-totals(280);
+totals(282);
 #else
-totals (322);
+totals (324);
 #endif
