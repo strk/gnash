@@ -349,7 +349,7 @@ as_global_parseint(const fn_call& fn)
 static as_value
 as_global_assetpropflags(const fn_call& fn)
 {
-    int version = VM::get().getSWFVersion();
+    //int version = VM::get().getSWFVersion();
 
     //log_debug(_("ASSetPropFlags called with %d args"), fn.nargs);
 
