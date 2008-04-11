@@ -46,6 +46,7 @@
 #include "log.h"
 #include <iostream>
 #include <sstream>
+#include <iomanip>
 
 using std::endl;
 using std::cerr;
@@ -553,7 +554,9 @@ Player::interfaceEventCallback(const std::string& event, const std::string& arg)
     if (event == "System.capabilities.pixelAspectRatio")
     {
         std::ostringstream ss;
-        ss << _gui->getPixelAspectRatio();
+        // Whether the pp actively limits the precision or simply
+        // gets a slightly different result isn't clear.
+        ss << std::setprecision(7) << _gui->getPixelAspectRatio();
         return ss.str();
     }
 

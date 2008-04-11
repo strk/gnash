@@ -415,7 +415,15 @@ if (_menubar)
 double
 GtkGui::getPixelAspectRatio()
 {
-    return 0;
+    GdkScreen* screen = gdk_screen_get_default();
+
+    // Screen size / number of pixels = pixel size.
+    // The physical size of the screen may be reported wrongly by gdk (from X),
+    // but it's the best we have. This method agrees with the pp in my case.
+    double pixelAspectRatio =
+            (gdk_screen_get_height_mm(screen) / static_cast<double>(getScreenResY())) / 
+            (gdk_screen_get_width_mm(screen) / static_cast<double>(getScreenResX()));
+    return pixelAspectRatio;
 }
 
 int

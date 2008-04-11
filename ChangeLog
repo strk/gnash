@@ -1,5 +1,9 @@
 2008-04-11 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* gui/gtk.cpp: a way of getting pixel aspect ratio.
+
+2008-04-11 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* gui/gtk.cpp: cleaner way to get screen size.
 
 2008-04-10 Sandro Santilli <strk@keybit.net>
