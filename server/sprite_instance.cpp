@@ -673,7 +673,7 @@ static as_value sprite_load_movie(const fn_call& fn)
 
   if ( ! sendVars )
   {
-	log_debug("Not sending vars");
+	//log_debug("Not sending vars");
   	mr.loadMovie(url, target); 
   }
   else
