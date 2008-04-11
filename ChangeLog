@@ -1,3 +1,10 @@
+2008-04-11 Sandro Santilli <strk@keybit.net>
+
+	* server/text.{cpp,h}: make has{x,y}offset flags and {x,y}offset
+	  values private.
+	* server/parser/text_character_def.cpp: updated to avoid direct
+	  access to text_style now-private members.
+
 2008-04-11 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* configure.ac: allow disabling movie properties separately from

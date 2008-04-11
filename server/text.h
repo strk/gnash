@@ -36,27 +36,25 @@ namespace gnash {
 	{
 	public:
 		rgba	m_color;
-		float	m_x_offset;
-		float	m_y_offset;
 		float	m_text_height;
-		bool	m_has_x_offset;
-		bool	m_has_y_offset;
-
 
 		text_style()
 			:
-			m_x_offset(0),
-			m_y_offset(0),
 			m_text_height(1.0f),
-			m_has_x_offset(false),
-			m_has_y_offset(false),
+			_hasXOffset(false),
+			_hasYOffset(false),
 			_underlined(false),
-			m_font(NULL)
+			_xOffset(0.0f),
+			_yOffset(0.0f),
+			_font(NULL)
 		{
 		}
 
 		/// Should text be underlined ?
-		bool isUnderlined() const { return _underlined; }
+		bool isUnderlined() const
+		{
+			return _underlined;
+		}
 
 		/// Specify whether text should be underlined or not
 		void setUnderlined(bool v) { _underlined=v; }
@@ -64,16 +62,22 @@ namespace gnash {
 		/// Set an X offset
 		void setXOffset(float o)
 		{
-			// TODO: is this really needed ?
-			m_has_x_offset=true;
-			m_x_offset=o;
+			_hasXOffset=true;
+			_xOffset=o;
+		}
+
+		/// Drop X offset
+		void dropXOffset()
+		{
+			_hasXOffset=false;
+			_xOffset=0; // we shouldn't need this..
 		}
 
 		/// Shift X offset by given amount
 		void shiftXOffset(float xo)
 		{
-			//assert(m_has_x_offset)
-			m_x_offset+=xo;
+			//assert(_hasXOffset)
+			_xOffset+=xo;
 		}
 
 		/// Return true if text has an X offset
@@ -82,48 +86,52 @@ namespace gnash {
 		//
 		bool hasXOffset() const
 		{
-			return m_has_x_offset;
+			return _hasXOffset;
 		}
 
 		/// Return the X offset
 		float getXOffset() const
 		{
-			return m_x_offset;
+			return _xOffset;
 		}
 
 		/// Set an Y offset
 		void setYOffset(float o)
 		{
-			m_has_y_offset=true;
-			m_y_offset=o;
+			_hasYOffset = true;
+			_yOffset=o;
+		}
+
+		/// Drop X offset
+		void dropYOffset()
+		{
+			_hasYOffset = false; 
+			_yOffset=0; // we shouldn't need this..
 		}
 
 		/// Shift Y offset by given amount
 		void shiftYOffset(float yo)
 		{
-			//assert(m_has_y_offset)
-			m_y_offset+=yo;
+			//assert(_hasYOffset)
+			_yOffset+=yo;
 		}
 
 		/// Return true if text has an Y offset
-		//
-		// TODO: is this really needed ?
-		//
 		bool hasYOffset() const
 		{
-			return m_has_y_offset;
+			return _hasYOffset;
 		}
 
 		/// Return the Y offset
 		float getYOffset() const
 		{
-			return m_y_offset;
+			return _yOffset;
 		}
 
 		/// Set font by id and movie_definition
 		//
 		/// This method will perform a lookup from the movie_definition
-		/// and appropriately set the m_font member.
+		/// and appropriately set the _font member.
 		///
 		/// @param id
 		///	The font id.
@@ -144,7 +152,7 @@ namespace gnash {
 		void setFont(const font* fnt)
 		{
 			assert(fnt);
-			m_font = fnt;
+			_font = fnt;
 		}
 
 		/// Return the associated font (possibly NULL).
@@ -156,20 +164,21 @@ namespace gnash {
 		///
 		const font* getFont() const
 		{
-			return m_font;
+			return _font;
 		}
 
 	private:
 
-		// TODO: turn _underlined, has_x_offset and has_y_offset
-		//       into a single bitwise flag.
-		//       Also, check if the has_{x,y}_offset are needed
-		//       at all !
-		bool	_underlined;
+		bool _hasXOffset;
+		bool _hasYOffset;
+		bool _underlined;
 
-		const font* m_font;
+		float	_xOffset;
+		float	_yOffset;
 
-		/// Set m_font based on m_font_id.
+		const font* _font;
+
+		/// Set font based on id
 		//
 		/// @param root_def
 		///	The movie_definition used for looking up font by id

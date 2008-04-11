@@ -77,7 +77,8 @@ void text_character_def::read(stream* in, int tag_type,
 				IF_VERBOSE_PARSE(
 				log_parse(_("  has_font: font id = %d (%p)"), font_id, (const void*)style.getFont());
 				);
-			}
+			} // else reuse previous record font
+
 			if (has_color)
 			{
 				if (tag_type == SWF::DEFINETEXT)
@@ -92,36 +93,34 @@ void text_character_def::read(stream* in, int tag_type,
 				IF_VERBOSE_PARSE(
 				log_parse(_("  has_color"));
 				);
-			}
+			} // else reuse previous record color
+
 			if (has_x_offset)
 			{
-				style.m_has_x_offset = true;
-				
 				in->ensureBytes(2);
-				style.m_x_offset = in->read_s16();
+				style.setXOffset(in->read_s16());
 				IF_VERBOSE_PARSE(
-				log_parse(_("  has_x_offset = %g"), style.m_x_offset);
+				log_parse(_("  has_x_offset = %g"), style.getXOffset());
 				);
 			}
 			else
 			{
-				style.m_has_x_offset = false;
-				style.m_x_offset = 0.0f;
+				// continue where previous record left
+				style.dropXOffset();
 			}
+
 			if (has_y_offset)
 			{
-				style.m_has_y_offset = true;
-				
 				in->ensureBytes(2);
-				style.m_y_offset = in->read_s16();
+				style.setYOffset(in->read_s16());
 				IF_VERBOSE_PARSE(
-				log_parse(_("  has_y_offset = %g"), style.m_y_offset);
+				log_parse(_("  has_y_offset = %g"), style.getYOffset());
 				);
 			}
 			else
 			{
-				style.m_has_y_offset = false;
-				style.m_y_offset = 0.0f;
+				// continue where previous record left
+				style.dropYOffset();
 			}
 			if (has_font)
 			{

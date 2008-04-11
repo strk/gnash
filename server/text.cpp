@@ -52,8 +52,8 @@ namespace gnash {
 	{
 		assert(id >= 0);
 
-		m_font = root_def.get_font(id);
-		if (m_font == NULL)
+		_font = root_def.get_font(id);
+		if (_font == NULL)
 		{
 			IF_VERBOSE_MALFORMED_SWF(
 			log_error(_("text style references unknown font (id = %d)"),
