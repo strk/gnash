@@ -1,5 +1,10 @@
 2008-04-11 Sandro Santilli <strk@keybit.net>
 
+	* server/button_character_instance.cpp (add_invalidated_bounds):
+	  check m_child_invalidated. Partially fixes bug #22904.
+
+2008-04-11 Sandro Santilli <strk@keybit.net>
+
 	* server/text.{cpp,h}: make has{x,y}offset flags and {x,y}offset
 	  values private.
 	* server/parser/text_character_def.cpp: updated to avoid direct

@@ -630,6 +630,7 @@ button_character_instance::set_current_state(e_mouse_state new_state)
 	get_active_characters(new_list, new_state);
 		
 	// see if the two lists differ and restart characters if needed
+	// TODO: FIXME: this is not how you check for equality :/
 	if (new_list.size() != old_list.size())
 		set_invalidated();		// something changed 
   
@@ -672,6 +673,7 @@ button_character_instance::add_invalidated_bounds(InvalidatedRanges& ranges,
 
   // TODO: Instead of using these for loops again and again, wouldn't it be a
   // good idea to have a generic "get_record_character()" method?
+  // NOTE: we do have that method now, it's called get_active_characters(state)
 	for (size_t i = 0; i < m_def->m_button_records.size(); i++)
 	{
 		button_record&	rec = m_def->m_button_records[i];
@@ -687,7 +689,7 @@ button_character_instance::add_invalidated_bounds(InvalidatedRanges& ranges,
 				/*bounds->expand_to_transformed_rect(get_world_matrix(), 
           m_record_character[i]->get_bound());*/
         m_record_character[i]->add_invalidated_bounds(ranges, 
-          force||m_invalidated);        
+          force||m_invalidated||m_child_invalidated);        
 		}
 	}
 
