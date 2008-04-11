@@ -70,7 +70,9 @@ public:
   typedef std::vector<const action_buffer*> BufferList;
   typedef std::map<event_id, BufferList> Events;
   typedef std::pair<std::string, std::string> StringPair; // ifdef USE_MENU...
+#ifdef USE_MENUS
   typedef tree<StringPair> InfoTree; // ifdef USE_MENU
+#endif
 
 private:
 
