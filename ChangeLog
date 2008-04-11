@@ -1,5 +1,11 @@
 2008-04-11 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* testsuite/actionscript.all/System.as: test for hasIME and hasTLS. 
+	  The former doesn't exist on at least one pp version but is
+	  documented.
+
+2008-04-11 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* gui/gtk.cpp: a way of getting pixel aspect ratio.
 
 2008-04-11 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>

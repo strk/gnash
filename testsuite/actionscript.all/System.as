@@ -21,7 +21,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: System.as,v 1.19 2008/04/09 11:57:35 bwy Exp $";
+rcsid="$Id: System.as,v 1.20 2008/04/11 08:06:06 bwy Exp $";
 #include "check.as"
 
 check_equals(typeof(System), 'object');
@@ -85,6 +85,8 @@ check_equals(typeof(System.capabilities.hasAudioEncoder), 'boolean');
 check_equals(typeof(System.capabilities.hasAudio), 'boolean');
 check_equals(typeof(System.capabilities.hasAccessibility), 'boolean');
 check_equals(typeof(System.capabilities.avHardwareDisable), 'boolean');
+xcheck_equals(typeof(System.capabilities.hasIME), 'boolean');
+xcheck_equals(typeof(System.capabilities.hasTLS), 'boolean');
 
 #if OUTPUT_VERSION >= 6
 check(this.hasOwnProperty("$version"));
@@ -92,11 +94,11 @@ check(! MovieClip.prototype.hasOwnProperty("$version") );
 #endif
 
 #if OUTPUT_VERSION > 6
- check_totals(40);
+ check_totals(42);
 #else
 # if OUTPUT_VERSION == 6
-   check_totals(39);
+   check_totals(41);
 # else
-   check_totals(37);
+   check_totals(39);
 # endif
 #endif
