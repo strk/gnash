@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: TextFormat.as,v 1.2 2008/04/10 15:33:19 strk Exp $";
+rcsid="$Id: TextFormat.as,v 1.3 2008/04/11 12:08:39 strk Exp $";
 
 #include "check.as"
 
@@ -62,13 +62,13 @@ xcheck_equals(typeof(tfObj.display), 'string');
 xcheck_equals(tfObj.display, 'block');
 xcheck_equals(typeof(tfObj.bullet), 'null');
 xcheck_equals(typeof(tfObj.tabStops), 'null');
-xcheck_equals(typeof(tfObj.blockIndent), 'null');
+check_equals(typeof(tfObj.blockIndent), 'null');
 check_equals(typeof(tfObj.leading), 'null');
 check_equals(typeof(tfObj.indent), 'null');
 check_equals(typeof(tfObj.rightMargin), 'null');
 check_equals(typeof(tfObj.leftMargin), 'null');
 check_equals(typeof(tfObj.align), 'null');
-xcheck_equals(typeof(tfObj.underline), 'null');
+check_equals(typeof(tfObj.underline), 'null');
 check_equals(typeof(tfObj.italic), 'null');
 check_equals(typeof(tfObj.bold), 'null');
 xcheck_equals(typeof(tfObj.target), 'null');
@@ -84,7 +84,7 @@ xcheck_equals(typeof(tfObj.display), 'string');
 xcheck_equals(tfObj.display, 'block');
 xcheck_equals(typeof(tfObj.bullet), 'null');
 xcheck_equals(typeof(tfObj.tabStops), 'null');
-xcheck_equals(typeof(tfObj.blockIndent), 'null');
+check_equals(typeof(tfObj.blockIndent), 'null');
 check_equals(tfObj.leading, 4);
 check_equals(tfObj.indent, 12);
 check_equals(typeof(tfObj.rightMargin), 'number'); // even if we passed a string to it
@@ -94,7 +94,7 @@ check_equals(tfObj.leftMargin, 23);
 check_equals(tfObj.align, 'center');
 xcheck_equals(tfObj.target, 'tgt');
 xcheck_equals(tfObj.url, 'http');
-xcheck_equals(tfObj.underline, true);
+check_equals(tfObj.underline, true);
 check_equals(typeof(tfObj.italic), 'boolean');
 check_equals(tfObj.italic, false);
 check_equals(tfObj.bold, true);
