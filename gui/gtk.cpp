@@ -421,17 +421,13 @@ GtkGui::getPixelAspectRatio()
 int
 GtkGui::getScreenResX()
 {
-    GdkScreen *screen = gdk_screen_get_default();
-    if (!screen) return 0;
-    return gdk_screen_get_width(screen);
+    return gdk_screen_width();
 }
 
 int
 GtkGui::getScreenResY()
 {
-    GdkScreen *screen = gdk_screen_get_default();
-    if (!screen) return 0;
-    return gdk_screen_get_height(screen); 
+    return gdk_screen_height(); 
 }
 
 // private
