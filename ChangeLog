@@ -1,3 +1,12 @@
+2008-04-11 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/TextFormat.cpp: implement getter-setter for
+	  'underline'
+	* testsuite/misc-ming.all/DefineEditTextTest.c: test 
+	  getTextFormat().underline.
+	* server/edit_text_character.{cpp,h}, server/text.{cpp,h}:
+	  Implement text underlining.
+
 2008-04-11 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* testsuite/actionscript.all/System.as: correct expected results.

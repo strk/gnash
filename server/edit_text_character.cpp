@@ -175,6 +175,7 @@ textfield_getTextFormat(const fn_call& fn)
 	tf->leftMarginSet(text->getLeftMargin());
 	tf->rightMarginSet(text->getRightMargin());
 	tf->colorSet(text->getTextColor());
+	tf->underlinedSet(text->getUnderlined());
 
 	const font* font = text->getFont();
 	if (font)
@@ -186,7 +187,7 @@ textfield_getTextFormat(const fn_call& fn)
 
 	// TODO: add font color and some more
 
-	ONCE( log_unimpl("TextField.getTextFormat() discards url, target, underline, tabStops, bullet and display") );
+	ONCE( log_unimpl("TextField.getTextFormat() discards url, target, tabStops, bullet and display") );
 
 	return as_value(tf.get());
 }
@@ -240,6 +241,7 @@ textfield_setTextFormat(const fn_call& fn)
 	if ( tf->leftMarginDefined() ) text->setLeftMargin(tf->leftMargin());
 	if ( tf->rightMarginDefined() ) text->setRightMargin(tf->rightMargin());
 	if ( tf->colorDefined() ) text->setTextColor(tf->color());
+	if ( tf->underlinedDefined() ) text->setUnderlined(tf->underlined());
 
 	if ( tf->fontDefined() )
 	{
@@ -259,7 +261,7 @@ textfield_setTextFormat(const fn_call& fn)
 
 	// TODO: add font color and some more
 
-	ONCE( log_unimpl("TextField.setTextFormat() discards url, target, underline, tabStops, bullet and display") );
+	ONCE( log_unimpl("TextField.setTextFormat() discards url, target, tabStops, bullet and display") );
 
 	return as_value();
 
@@ -470,6 +472,7 @@ edit_text_character::edit_text_character(character* parent,
 	_text(L""),
 	_textDefined(def->has_text()),
 	m_def(def),
+	_underlined(false),
 	_leading(m_def->get_leading()),
 	_alignment(def->get_alignment()),
 	_indent(def->get_indent()), 
@@ -1219,9 +1222,9 @@ edit_text_character::align_line(
 	{
 		text_glyph_record&	rec = m_text_glyph_records[i];
 
-		if (rec.m_style.m_has_x_offset)
+		if ( rec.m_style.hasXOffset() )
 		{
-			rec.m_style.m_x_offset += shift_right;
+			rec.m_style.shiftXOffset(shift_right); 
 		}
 	}
 	return shift_right;
@@ -1242,7 +1245,7 @@ edit_text_character::setFont(boost::intrusive_ptr<const font> newfont)
 void
 edit_text_character::format_text()
 {
-	m_text_glyph_records.resize(0);
+	m_text_glyph_records.clear();
 
 	// nothing more to do if text is empty
 	if ( _text.empty() ) return;
@@ -1285,26 +1288,24 @@ edit_text_character::format_text()
 	boost::uint16_t rightMargin = getRightMargin();
 	boost::uint16_t indent = getIndent();
 	boost::uint16_t blockIndent = getBlockIndent();
+	bool underlined = getUnderlined();
 
 	text_glyph_record	rec;	// one to work on
 	rec.m_style.setFont(_font.get());
+	rec.m_style.setUnderlined(underlined);
 	rec.m_style.m_color = getTextColor(); 
-	rec.m_style.m_x_offset = PADDING_TWIPS + std::max(0, leftMargin + indent + blockIndent);
-	rec.m_style.m_y_offset = PADDING_TWIPS + fontHeight
-		+ (fontLeading - fontDescent);
+	rec.m_style.setXOffset( PADDING_TWIPS + std::max(0, leftMargin + indent + blockIndent) );
+	rec.m_style.setYOffset( PADDING_TWIPS + fontHeight + (fontLeading - fontDescent) );
 	rec.m_style.m_text_height = fontHeight;
-	rec.m_style.m_has_x_offset = true;
-	rec.m_style.m_has_y_offset = true;
 
-	float	x = rec.m_style.m_x_offset;
-	float	y = rec.m_style.m_y_offset;
-	
+	float	x = rec.m_style.getXOffset();
+	float	y = rec.m_style.getYOffset();
 
 	// Start the bbox at the upper-left corner of the first glyph.
 	reset_bounding_box(x, y - fontDescent + fontHeight); 
 
 	float leading = getLeading();
-	leading += fontLeading * scale;
+	leading += fontLeading * scale; // not sure this is correct...
 
 	int	last_code = -1; // only used if _embedFonts
 	int	last_space_glyph = -1;
@@ -1348,17 +1349,16 @@ edit_text_character::format_text()
 
 			// new paragraphs get the indent.
 			x = std::max(0, leftMargin + indent) + PADDING_TWIPS;
-			y += fontHeight + leading;
+			y += fontHeight + leading; 
 
 			// Start a new record on the next line.
 			rec.m_glyphs.resize(0);
 			rec.m_style.setFont(_font.get()); 
+			rec.m_style.setUnderlined(underlined);
 			rec.m_style.m_color = getTextColor();
-			rec.m_style.m_x_offset = x;
-			rec.m_style.m_y_offset = y;
+			rec.m_style.setXOffset(x);
+			rec.m_style.setYOffset(y);
 			rec.m_style.m_text_height = fontHeight; 
-			rec.m_style.m_has_x_offset = true;
-			rec.m_style.m_has_y_offset = true;
 
 			last_space_glyph = -1;
 			last_line_start_record = m_text_glyph_records.size();
@@ -1561,12 +1561,11 @@ after_x_advance:
 					// Start a new record on the next line.
 					rec.m_glyphs.resize(0);
 					rec.m_style.setFont(_font.get());
+					rec.m_style.setUnderlined(underlined);
 					rec.m_style.m_color = getTextColor();
-					rec.m_style.m_x_offset = x;
-					rec.m_style.m_y_offset = y;
+					rec.m_style.setXOffset(x);
+					rec.m_style.setYOffset(y);
 					rec.m_style.m_text_height = getFontHeight();
-					rec.m_style.m_has_x_offset = true;
-					rec.m_style.m_has_y_offset = true;
 					
 					// TODO : what if m_text_glyph_records is empty ? Is it possible ?
 					assert(!m_text_glyph_records.empty());
@@ -1974,6 +1973,17 @@ edit_text_character::setLeading(uint16_t h)
 	{
 		set_invalidated();
 		_leading = h;
+		format_text();
+	}
+}
+
+void
+edit_text_character::setUnderlined(bool v)
+{
+	if ( _underlined != v )
+	{
+		set_invalidated();
+		_underlined = v;
 		format_text();
 	}
 }

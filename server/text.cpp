@@ -100,17 +100,11 @@ namespace gnash {
 
 		matrix	base_matrix = mat;
 
-		float	scale = 1.0f;
-		float	x = 0.0f;
-		float	y = 0.0f;
-
 		for (unsigned int i = 0; i < records.size(); i++)
 		{
 			// Draw the characters within the current record; i.e. consecutive
 			// chars that share a particular style.
 			const text_glyph_record&	rec = records[i];
-
-			//rec.m_style.resolve_font(root_def);
 
 			const font*	fnt = rec.m_style.getFont();
 			if (fnt == NULL)
@@ -121,36 +115,32 @@ namespace gnash {
 				continue;
 			}
 
+			float	scale = 1.0f;
 			scale = rec.m_style.m_text_height / 1024.0f;	// the EM square is 1024 x 1024
+			if (fnt->is_subpixel_font()) scale*=0.05f; 
 
 #ifdef GNASH_DEBUG_TEXT_RENDERING
-			log_debug("font for record %u == %p", i, (const void*)rec.m_style.getFont());
+			log_debug("font for record %u == %p", i, (const void*)fnt);
 #endif
 
-			if (rec.m_style.m_has_x_offset)
-			{
-				x = rec.m_style.m_x_offset;
-			}
-			if (rec.m_style.m_has_y_offset)
-			{
-				y = rec.m_style.m_y_offset;
-			}
+			float x = rec.m_style.hasXOffset() ? rec.m_style.getXOffset() : 0.0f;
+			float y = rec.m_style.hasYOffset() ? rec.m_style.getYOffset() : 0.0f;
 
 			s_dummy_style[0].set_color(rec.m_style.m_color);
 
 			rgba	transformed_color = cx.transform(rec.m_style.m_color);
 
-			for (unsigned int j = 0; j < rec.m_glyphs.size(); j++)
+			unsigned int nglyphs = rec.m_glyphs.size();
+			for (unsigned int j = 0; j < nglyphs; ++j)
 			{
-				int	index = rec.m_glyphs[j].m_glyph_index;
+				// the glyph entry
+				const text_glyph_record::glyph_entry& ge = rec.m_glyphs[j];
+
+				int	index = ge.m_glyph_index;
 					
 				mat = base_matrix;
 				mat.concatenate_translation(x, y);
-				//mat.concatenate_scale(scale);
-				if (fnt->is_subpixel_font())
-					mat.concatenate_scale(0.05f * scale);
-				else
-					mat.concatenate_scale(scale);
+				mat.concatenate_scale(scale);
 
 				if (index == -1)
 				{
@@ -187,10 +177,37 @@ log_debug(_("render shape glyph using filled outline (render::draw_glyph)"));
 #endif
 
 						gnash::render::draw_glyph(glyph, mat, transformed_color, pixel_scale);
-						
 					}
 				}
-				x += rec.m_glyphs[j].m_glyph_advance;
+				x += ge.m_glyph_advance;
+			}
+
+			bool underline = rec.m_style.isUnderlined(); 
+			if ( nglyphs && underline )
+			{
+				// Starting offset
+				boost::int16_t startX = rec.m_style.hasXOffset() ? (int)rec.m_style.getXOffset() : 0;
+
+				// Underline should end where last displayed glyphs
+				// does. 'x' here is where next glyph would be displayed
+				// which is normally after some space.
+				// For more precise metrics we should substract the advance
+				// of last glyph and add the actual size of it.
+				// This will only be known if a glyph was actually found,
+				// or would be the size of the empty box (arbitrary size)
+				//
+				boost::int16_t endX = (int)x; // - rec.m_glyphs.back().m_glyph_advance + (480.0*scale);
+
+				// The underline is made to be some pixels below the baseline (0)
+				// and scaled so it's further as font size increases.
+				//
+				boost::int16_t posY = int(y+int(256.0*scale)); // some offset far from baseline (should this be scaled on font size?)
+				boost::int16_t underline[2 * 2] =
+				{
+					startX,   posY,
+					  endX,   posY,
+				};
+				render::draw_line_strip(underline, 2, transformed_color, base_matrix);
 			}
 		}
 	}

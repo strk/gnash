@@ -298,6 +298,10 @@ main(int argc, char** argv)
   check_equals(mo, "typeof(dtext2.tf.blockIndent)", "'number'");
   check_equals(mo, "etext1.tf.blockIndent", "0");
   check_equals(mo, "dtext2.tf.blockIndent", "0");
+  check_equals(mo, "typeof(etext1.tf.underline)", "'boolean'");
+  check_equals(mo, "typeof(dtext2.tf.underline)", "'boolean'");
+  check_equals(mo, "etext1.tf.underline", "false");
+  check_equals(mo, "dtext2.tf.underline", "false");
 
   add_actions(mo, "dtext1.background = true;"
                   "etext1.background = true;"

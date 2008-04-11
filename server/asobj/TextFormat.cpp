@@ -227,10 +227,23 @@ TextFormat::align_getset(const fn_call& fn)
 }
 
 as_value
-TextFormat::underline_getset(const fn_call& /*fn*/)
+TextFormat::underline_getset(const fn_call& fn)
 {
-	ONCE( log_unimpl("TextField.underline") );
-	return as_value();
+	boost::intrusive_ptr<TextFormat> ptr = ensureType<TextFormat>(fn.this_ptr);
+
+	as_value ret;
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		if ( ptr->underlinedDefined() ) ret.set_bool(ptr->underlined());
+		else ret.set_null();
+	}
+	else // setter
+	{
+		ptr->underlinedSet(fn.arg(0).to_bool());
+	}
+
+	return ret;
 }
 
 as_value

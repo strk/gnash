@@ -389,6 +389,13 @@ public:
 
 	void setLeading(boost::uint16_t h);
 
+	bool getUnderlined() const
+	{
+		return _underlined;
+	}
+
+	void setUnderlined(bool v);
+
 private:
 
 	/// Set our text to the given string.
@@ -463,6 +470,7 @@ private:
 	float align_line(edit_text_character_def::alignment align,
 			int last_line_start_record, float x);
 
+	bool _underlined;
 
 	boost::uint16_t _leading;
 

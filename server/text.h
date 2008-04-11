@@ -42,6 +42,7 @@ namespace gnash {
 		bool	m_has_x_offset;
 		bool	m_has_y_offset;
 
+
 		text_style()
 			:
 			m_x_offset(0),
@@ -51,6 +52,71 @@ namespace gnash {
 			m_has_y_offset(false),
 			m_font(NULL)
 		{
+		}
+
+		/// Should text be underlined ?
+		bool isUnderlined() const { return _underlined; }
+
+		/// Specify whether text should be underlined or not
+		void setUnderlined(bool v) { _underlined=v; }
+
+		/// Set an X offset
+		void setXOffset(float o)
+		{
+			// TODO: is this really needed ?
+			m_has_x_offset=true;
+			m_x_offset=o;
+		}
+
+		/// Shift X offset by given amount
+		void shiftXOffset(float xo)
+		{
+			//assert(m_has_x_offset)
+			m_x_offset+=xo;
+		}
+
+		/// Return true if text has an X offset
+		//
+		// TODO: is this really needed ?
+		//
+		bool hasXOffset() const
+		{
+			return m_has_x_offset;
+		}
+
+		/// Return the X offset
+		float getXOffset() const
+		{
+			return m_x_offset;
+		}
+
+		/// Set an Y offset
+		void setYOffset(float o)
+		{
+			m_has_y_offset=true;
+			m_y_offset=o;
+		}
+
+		/// Shift Y offset by given amount
+		void shiftYOffset(float yo)
+		{
+			//assert(m_has_y_offset)
+			m_y_offset+=yo;
+		}
+
+		/// Return true if text has an Y offset
+		//
+		// TODO: is this really needed ?
+		//
+		bool hasYOffset() const
+		{
+			return m_has_y_offset;
+		}
+
+		/// Return the Y offset
+		float getYOffset() const
+		{
+			return m_y_offset;
 		}
 
 		/// Set font by id and movie_definition
@@ -93,6 +159,12 @@ namespace gnash {
 		}
 
 	private:
+
+		// TODO: turn _underlined, has_x_offset and has_y_offset
+		//       into a single bitwise flag.
+		//       Also, check if the has_{x,y}_offset are needed
+		//       at all !
+		bool	_underlined;
 
 		const font* m_font;
 
