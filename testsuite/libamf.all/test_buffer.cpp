@@ -151,8 +151,6 @@ main (int argc, char** argv)
         mem->addStats(__LINE__);             // take a sample
     }
 
-// amf::Buffer::empty()
-
     // test creating Buffers
     test_construct();
     // test destroying Buffers
@@ -335,9 +333,55 @@ test_append()
 void
 test_remove()
 {
-// amf::Buffer::remove(unsigned char)
-// amf::Buffer::remove(int)
-// amf::Buffer::remove(int, int)
+    Network::byte_t *data1 = new Network::byte_t[10];
+    memset(data1, 0, 10);
+    Network::byte_t *data2 = new Network::byte_t[10];
+    memset(data2, 0, 10);
+    for (size_t i=0; i< 10; i++) {
+        data1[i] = i + 'a';
+    }
+
+    // Build identical buffer nissing one character
+    memcpy(data2, data1, 6);
+    memcpy(data2 + 6, data1 + 7, 5);
+
+    // Remove a single byte
+    Network::byte_t byte = 'g';
+    Buffer buf1(10);
+    buf1.clear();
+    buf1.copy(data1, 10);
+    buf1.remove(byte);
+    if (memcmp(data2, buf1.reference(), 9) == 0) {
+         runtest.pass ("Buffer::remove(Network::byte_t)");
+    } else {
+         runtest.fail ("Buffer::remove(Network::byte_t)");
+    }
+    
+    Buffer buf2(10);
+    buf2.clear();
+    buf2.copy(data1, 10);
+    buf2.remove(6);
+    if (memcmp(data2, buf2.reference(), 9) == 0) {
+         runtest.pass ("Buffer::remove(int)");
+    } else {
+         runtest.fail ("Buffer::remove(int)");
+    }
+
+    // Remove a range of bytes
+    Network::byte_t *data3 = new Network::byte_t[10];
+    memset(data3, 0, 10);
+    memcpy(data3, data1, 6);
+    memcpy(data3 + 6, data1 + 9, 5);
+    
+    Buffer buf3(10);
+    buf3.clear();
+    buf3.copy(data1, 10);
+    buf3.remove(6, 8);
+    if (memcmp(data3, buf3.reference(), 7) == 0) {
+         runtest.pass ("Buffer::remove(int, int)");
+    } else {
+         runtest.fail ("Buffer::remove(int, int)");
+    }    
 }
 
 void

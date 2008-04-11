@@ -365,14 +365,16 @@ Buffer::remove(Network::byte_t c)
 {
 //    GNASH_REPORT_FUNCTION;
     Network::byte_t *start = find(c);
-    log_debug("FRAME MARK is at %x", (void *)start);
+
+    log_debug("Byte is at %x", (void *)start);
+    
     if (start == 0) {
 	return 0;
     }
-//    std::copy((start + 1), end(), start);
-    *start = '*';
-//    *end() = 0;
-//    _nbytes--;
+    
+    std::copy(start + 1, end(), start);
+    *(end()) = 0;
+    _nbytes--;
 
     return _ptr;
 }
@@ -391,9 +393,9 @@ Network::byte_t *
 Buffer::remove(int start, int stop)
 {
 //    GNASH_REPORT_FUNCTION;
-    std::copy((_ptr + start), end(), (_ptr + stop)),
+    std::copy((_ptr + stop + 1), end(), (_ptr + start)),
 //    *end() = 0;
-    _nbytes--;
+    _nbytes -= stop-start;
     return _ptr;
 }
 

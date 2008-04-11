@@ -42,7 +42,7 @@ public:
     // Delete the allocate memory
     ~Buffer();
     void clear();
-    bool empty() { return (_nbytes)?true:false; };
+    bool empty() { return (_seekptr)?true:false; };
 
     // Resize the buffer that holds the data
     void *resize(size_t nbytes);

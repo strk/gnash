@@ -1,5 +1,10 @@
 2008-04-11  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* libamf/buffer.h: Check _seekptr, not nbytes to determine if a
+	buffer is ::empty().
+	* libamf/buffer.cpp: Fix bugs in ::remove() method.
+	* testsuite/libamf.all/buffer.cpp: Add tests for ::remove().
+ 
 	* libamf/buffer.{h,cpp}: Cleanup minor bugs found by newly
 	expanded test case. Rename empty() to clear().
 	* libamf/amf.cpp: Don't take 1 off the end of the string. Comment
