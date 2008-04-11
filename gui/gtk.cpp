@@ -1968,6 +1968,8 @@ GtkGui::createViewMenu(GtkWidget *obj)
     g_signal_connect(GTK_OBJECT(menuitem_fullscreen), "activate",
                          G_CALLBACK(&menuitem_fullscreen_callback), this);
 
+// Can be disabled at compile time.
+#ifndef DISABLE_REGION_UPDATES_DEBUGGING
     GtkCheckMenuItem *menuitem_show_updated_regions =
         GTK_CHECK_MENU_ITEM(gtk_check_menu_item_new_with_label(_("Show updated ranges")));
    
@@ -1978,7 +1980,7 @@ GtkGui::createViewMenu(GtkWidget *obj)
     gtk_widget_show(GTK_WIDGET(menuitem_show_updated_regions));
     g_signal_connect(GTK_OBJECT(menuitem_show_updated_regions), "activate",
                      G_CALLBACK(&menuitem_show_updated_regions_callback), this);
-
+#endif
 
 }
 

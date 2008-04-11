@@ -36,6 +36,20 @@
 // This is an experimental feature, so it's off by default
 //#define SKIP_RENDERING_IF_LATE
 
+
+/// Define this to disable region updates debugging altogether. If undefined,
+/// debugging will be a runtime option. The flag and flag-setting functions
+/// will not be disabled (too ugly).
+///
+/// This should go in gnashconfig.h
+///
+/// This has the side effect that all frames will be re-rendered completely
+/// but in contrast to FORCE_REDRAW it won't re-render when no motion
+/// has been detected in the movie (for example when the movie is stopped).
+///
+//#define DISABLE_REGION_UPDATES_DEBUGGING 1
+
+
 /// Define this to support keyboard-based pointer movements
 #define ENABLE_KEYBOARD_MOUSE_MOVEMENTS 1
 

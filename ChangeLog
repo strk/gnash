@@ -1,5 +1,10 @@
 2008-04-11 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* gui/gui.{cpp,h}, gui/gtk.cpp: cleanup and rename region debugging
+	  ifdef.
+
+2008-04-11 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* gui/gui.{cpp,h}: add flag for showing invalidated ranges for
 	  runtime option. Enable show invalidated ranges by default, 
 	  check runtime flag.

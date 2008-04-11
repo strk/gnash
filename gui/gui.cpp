@@ -45,26 +45,17 @@
 /// even if no motion has been detected in the movie.
 //#define FORCE_REDRAW 1
 
-/// Define this to have updated regions enclosed in a red rectangle.
-/// In the future, enabling this might actually use a runtime flag
-/// as an additional conditional.
-/// This has the side effect that all frames will be re-rendered completely
-/// but in contrast to FORCE_REDRAW it won't re-render when no motion
-/// has been detected in the movie (for example when the movie is stopped).
-///
-#define ENABLE_REGION_UPDATES_DEBUGGING 1
-
 /// Define this if you want to debug the *detection* of region updates only.
 /// This will disable region updates for the backend (GUI+renderer) completely 
 /// so that only the last region (red frame) will be visible. However, this 
 /// slows down rendering as each frame is fully re-rendered. If you want to 
 /// debug the GUI part, however (see if blitting the region works), then you 
 /// probably won't define this.
-#ifdef ENABLE_REGION_UPDATES_DEBUGGING 
+#ifndef DISABLE_REGION_UPDATES_DEBUGGING 
 //#define REGION_UPDATES_DEBUGGING_FULL_REDRAW 1
 #endif 
 
-#ifdef ENABLE_REGION_UPDATES_DEBUGGING
+#ifndef DISABLE_REGION_UPDATES_DEBUGGING
 // a runtime check would make the { x; } block conditionally executed
 #define IF_DEBUG_REGION_UPDATES(x) { if (_showUpdatedRegions) { x } }
 #else
@@ -353,15 +344,15 @@ void
 Gui::menu_toggle_sound()
 {
 //    GNASH_REPORT_FUNCTION;
-    media::sound_handler* snd_handler = get_sound_handler();
+    media::sound_handler* s = get_sound_handler();
 
-    if (!snd_handler)
+    if (!s)
        return;
 
-    if (snd_handler->is_muted()) {
-       snd_handler->unmute();
+    if (s->is_muted()) {
+       s->unmute();
     } else {
-       snd_handler->mute();
+       s->mute();
     }
 }
 
