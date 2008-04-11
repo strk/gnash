@@ -63,6 +63,8 @@ check_PROGRAMS = \
 	ButtonEventsTest-Runner \
 	SpriteButtonEventsTest \
 	SpriteButtonEventsTest-Runner \
+	DefineTextTest \
+	DefineTextTest-Runner \
 	DefineEditTextTest \
 	DefineEditTextTest-Runner \
 	DefineEditTextVariableNameTest \
@@ -325,6 +327,25 @@ moviecliploader_tests: moviecliploader_test
 	: test absolute url
 	./moviecliploader_test $(top_srcdir)/testsuite/media
 
+DefineTextTest.swf: DefineTextTest
+	./DefineTextTest $(top_srcdir)/testsuite/media
+
+DefineTextTest_SOURCES =  DefineTextTest.c
+DefineTextTest_LDADD = libgnashmingutils.la
+
+DefineTextTest_Runner_SOURCES = \
+	DefineTextTest-Runner.cpp \
+	$(NULL)
+DefineTextTest_Runner_CXXFLAGS = \
+	-DTGTDIR='"$(abs_builddir)"' \
+	$(NULL)
+DefineTextTest_Runner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
+DefineTextTest_Runner_DEPENDENCIES = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	DefineTextTest.swf      \
+	$(NULL)
 
 DefineEditTextTest.swf: DefineEditTextTest
 	./DefineEditTextTest $(top_srcdir)/testsuite/media
@@ -1724,6 +1745,7 @@ TEST_DRIVERS = ../simple.exp
 TEST_CASES = \
 	DefineEditTextVariableNameTest-Runner \
 	DefineEditTextVariableNameTest2-Runner \
+	DefineTextTest-Runner \
 	DefineEditTextTest-Runner \
 	RollOverOutTest-Runner \
 	ButtonEventsTest-Runner \

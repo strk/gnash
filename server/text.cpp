@@ -100,6 +100,9 @@ namespace gnash {
 
 		matrix	base_matrix = mat;
 
+		float x = 0.0f;
+		float y = 0.0f;
+
 		for (unsigned int i = 0; i < records.size(); i++)
 		{
 			// Draw the characters within the current record; i.e. consecutive
@@ -123,8 +126,10 @@ namespace gnash {
 			log_debug("font for record %u == %p", i, (const void*)fnt);
 #endif
 
-			float x = rec.m_style.hasXOffset() ? rec.m_style.getXOffset() : 0.0f;
-			float y = rec.m_style.hasYOffset() ? rec.m_style.getYOffset() : 0.0f;
+			if ( rec.m_style.hasXOffset() ) x = rec.m_style.getXOffset();
+			if ( rec.m_style.hasYOffset() ) y = rec.m_style.getYOffset();
+
+			float startX = x; // for the underline, if any
 
 			s_dummy_style[0].set_color(rec.m_style.m_color);
 
@@ -185,9 +190,6 @@ log_debug(_("render shape glyph using filled outline (render::draw_glyph)"));
 			bool underline = rec.m_style.isUnderlined(); 
 			if ( nglyphs && underline )
 			{
-				// Starting offset
-				boost::int16_t startX = rec.m_style.hasXOffset() ? (int)rec.m_style.getXOffset() : 0;
-
 				// Underline should end where last displayed glyphs
 				// does. 'x' here is where next glyph would be displayed
 				// which is normally after some space.

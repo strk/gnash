@@ -1,3 +1,16 @@
+2008-04-11 Sandro Santilli <strk@keybit.net>
+
+	* server/text.h: don't forget to initialize
+	  the _underline member.
+	* server/text.cpp (display_glyph_records): don't reset
+	  the x/y offsets on every new glyph record (useful for
+	  static text) - was a regression I introduced with last 
+	  commit.
+	* testsuite/misc-ming.all/: DefineTextTest-Runner.cpp,
+	  DefineTextTest.c, Makefile.am: new test for static text
+	  (would fail with the regression introduced in
+	  last commit).
+
 2008-04-11 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* gui/gtk.cpp: explicit cast to int to silence warnings on some

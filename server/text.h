@@ -50,6 +50,7 @@ namespace gnash {
 			m_text_height(1.0f),
 			m_has_x_offset(false),
 			m_has_y_offset(false),
+			_underlined(false),
 			m_font(NULL)
 		{
 		}
