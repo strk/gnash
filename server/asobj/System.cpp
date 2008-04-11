@@ -78,6 +78,9 @@ getSystemCapabilitiesInterface()
 	// "Macromedia Windows", "Macromedia Linux", "Macromedia MacOS"
 	// Override in gnashrc
 	const std::string manufacturer = rcfile.getFlashSystemManufacturer();
+	
+	// Does the NetStream object natively support SSL?
+	const bool hasTLS = false;
 
     //
 	// Media
@@ -126,11 +129,8 @@ getSystemCapabilitiesInterface()
         ss >> screenResolutionX;
         
         ss.clear();
-        
         ss.str((*movie_root::interfaceHandle)("System.capabilities.screenResolutionY", ""));
         ss >> screenResolutionY;
-        
-        ss.clear();
         
         pixelAspectRatio = (*movie_root::interfaceHandle)("System.capabilities.pixelAspectRatio", "");
         playerType = (*movie_root::interfaceHandle)("System.capabilities.playerType", "");
@@ -142,34 +142,46 @@ getSystemCapabilitiesInterface()
 	// allowing this string to be sent or not; individual	
 	// values that might affect privacy can be overridden	
 	// in gnashrc.
-
+	
+	// hasIME seems not to be included in the server string, though
+	// it is documented to have a server string of IME.
+	// Linux player version 9 has no hasIME property (but no need
+	// to emulate that.)
+	
+	// TLS and hasTLS are documented for AS3, player version 9.
+	//
+	// WD is included in the server string for player version 9,
+	// but not documented.
+	
+	// This should be the standard order of parameters in the server
+	// string.
 	std::ostringstream serverString;
-	serverString << "OS=" << URL::encode(os) 
-			<< "&A="    << TF(hasAudio)
-			<< "&V="    << URL::encode(version)
-			<< "&PT="   << playerType
-			<< "&L="    << language
-			<< "&AVD="	<< avHardwareDisable 
-			<< "&ACC="	<< hasAccessibility 
-			<< "&AE="	<< hasAudioEncoder 
-			<< "&EV="	<< hasEmbeddedVideo 
-			<< "&IME="	<< hasIME 
-			<< "&MP3="	<< hasMP3 
-			<< "&PR="	<< hasPrinting 
-			<< "&SB="	<< hasScreenBroadcast 
-			<< "&SP="	<< hasScreenPlayback 
-			<< "&SA="	<< hasStreamingAudio 
+	serverString << "&A="    << TF(hasAudio)
+			<< "&SA="	<< hasStreamingAudio
 			<< "&SV="	<< hasStreamingVideo 
-			<< "&VE="	<< hasVideoEncoder 
+			<< "&EV="	<< hasEmbeddedVideo
+			<< "&MP3="	<< hasMP3 									
+			<< "&AE="	<< hasAudioEncoder
+			<< "&VE="	<< hasVideoEncoder
+			<< "&ACC="	<< hasAccessibility
+			<< "&PR="	<< hasPrinting 
+			<< "&SP="	<< hasScreenPlayback 
+			<< "&SB="	<< hasScreenBroadcast 
 			<< "&DEB="	<< isDebugger 
-			<< "&LFD="	<< localFileReadDisable 
+			<< "&V="    << URL::encode(version)
 			<< "&M="    << URL::encode(manufacturer)
-			<< "&AR="   << pixelAspectRatio
-			<< "&COL="	// screenColor (?)
-			<< "&DP="	// screenDPI (int?)
 			<< "&R="    << screenResolutionX << "x" << screenResolutionY
-			;
-		
+			<< "&DP="	// screenDPI (int?
+			<< "&COL="	// screenColor (?)						
+			<< "&AR="   << pixelAspectRatio
+			<< "OS="    << URL::encode(os)
+			<< "&L="    << language			
+			<< "&PT="   << playerType
+			<< "&AVD="	<< avHardwareDisable 
+			<< "&LFD="	<< localFileReadDisable
+			<< "&WD="
+			<< "&TLS="	<< hasTLS;
+	
 	static boost::intrusive_ptr<as_object> proto;
 	if ( proto == NULL )
 	{
@@ -203,6 +215,7 @@ getSystemCapabilitiesInterface()
 		proto->init_member("hasAccessibility", hasAccessibility, flags);
 		proto->init_member("isDebugger", isDebugger, flags);
 		proto->init_member("localFileReadDisable", localFileReadDisable, flags);
+		proto->init_member("hasTLS", hasTLS, flags);
 	}
 	return proto.get();
 }

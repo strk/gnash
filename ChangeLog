@@ -1,5 +1,10 @@
 2008-04-11 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* server/asobj/System.cpp: add hasTLS property, reorder server string
+	  to match pp and document.
+
+2008-04-11 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* testsuite/actionscript.all/System.as: tests for undocumented
 	  functions.
 
