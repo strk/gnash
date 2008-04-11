@@ -914,8 +914,8 @@ GtkGui::handlePrefs (GtkWidget* dialog, gint response, gpointer data)
         rcfile.useWriteLog(
         	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->writeLogToggle)));
         	
-        rcfile.verbosityLevel(
-        	gtk_range_get_value(GTK_RANGE(prefs->verbosityScale)));
+        rcfile.verbosityLevel(static_cast<int>(
+        	gtk_range_get_value(GTK_RANGE(prefs->verbosityScale))));
 
         rcfile.showASCodingErrors(
         	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->ASCodingErrorToggle)));

@@ -1,5 +1,10 @@
 2008-04-11 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* gui/gtk.cpp: explicit cast to int to silence warnings on some
+	  machines.
+
+2008-04-11 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* gui/gui.{cpp,h}, gui/gtk.cpp: cleanup and rename region debugging
 	  ifdef.
 
