@@ -325,7 +325,7 @@ SOL::readFile(std::string &filespec)
     boost::uint16_t size;
     Network::byte_t *buf;
     Network::byte_t *ptr;
-    int bodysize;
+    size_t bodysize;
 
     // Make sure it's an SOL file
     if (stat(filespec.c_str(), &st) == 0) {
@@ -373,7 +373,7 @@ SOL::readFile(std::string &filespec)
 
         AMF amf_obj;
 	int size = 0;
-        while (size <= bodysize) {
+        while (size <= static_cast<boost::uint16_t>(bodysize)) {
 	    amf::Element *el =  amf_obj.extractVariable(ptr);
             if (el != 0) {
 		size += amf_obj.totalsize();

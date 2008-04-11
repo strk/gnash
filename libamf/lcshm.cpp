@@ -358,7 +358,7 @@ LcShm::formatHeader(const std::string &con, const std::string &host, bool /* dom
 //    Network::byte_t *ptr = data + LC_HEADER_SIZE;
     int size = con.size() + host.size() + 9;
 
-    Buffer *buf;
+//    Buffer *buf;
     
     Network::byte_t *header = new Network::byte_t[size + 1];
     Network::byte_t *ptr = header;
@@ -373,11 +373,11 @@ LcShm::formatHeader(const std::string &con, const std::string &host, bool /* dom
     // Which is then always followed by 3 AMF objects.
     Buffer *buf1 = AMF::encodeString(con);
     memcpy(ptr, buf1->begin(), buf1->size());
-    ptr += buf->size();
+    ptr += buf1->size();
 
     Buffer *buf2 = AMF::encodeString(host);
     memcpy(ptr, buf2->begin(), buf2->size());
-    ptr += buf->size();
+    ptr += buf2->size();
     
     return ptr;
 }
@@ -446,8 +446,8 @@ LcShm::connect(key_t key)
 
 /// \brief Invokes a method on a specified LcShm object.
 void
-LcShm::send(const string &name, const string &domainname,
-            vector<amf::Element *> &data)
+LcShm::send(const string & /* name */, const string & /* domainname */,
+            vector<amf::Element *> &/* data */)
 {
     GNASH_REPORT_FUNCTION;
 
