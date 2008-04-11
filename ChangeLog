@@ -1,3 +1,11 @@
+2008-04-11 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* gui/gui.{cpp,h}: add flag for showing invalidated ranges for
+	  runtime option. Enable show invalidated ranges by default, 
+	  check runtime flag.
+	* gui/gtk{sup.h,.cpp}: menu option to turn on showing invalidated
+	  ranges.
+
 2008-04-11 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/TextFormat.cpp: implement getter-setter for

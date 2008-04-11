@@ -52,7 +52,7 @@
 /// but in contrast to FORCE_REDRAW it won't re-render when no motion
 /// has been detected in the movie (for example when the movie is stopped).
 ///
-//#define ENABLE_REGION_UPDATES_DEBUGGING 1
+#define ENABLE_REGION_UPDATES_DEBUGGING 1
 
 /// Define this if you want to debug the *detection* of region updates only.
 /// This will disable region updates for the backend (GUI+renderer) completely 
@@ -66,7 +66,7 @@
 
 #ifdef ENABLE_REGION_UPDATES_DEBUGGING
 // a runtime check would make the { x; } block conditionally executed
-#define IF_DEBUG_REGION_UPDATES(x) { x; }
+#define IF_DEBUG_REGION_UPDATES(x) { if (_showUpdatedRegions) { x } }
 #else
 #define IF_DEBUG_REGION_UPDATES(x) 
 #endif
@@ -107,6 +107,7 @@ Gui::Gui() :
     ,_stage(0)
     ,_stopped(false)
     ,_started(false)
+    ,_showUpdatedRegions(false)
 #ifdef ENABLE_KEYBOARD_MOUSE_MOVEMENTS 
     ,_xpointer(0)
     ,_ypointer(0)
@@ -145,6 +146,7 @@ Gui::Gui(unsigned long xid, float scale, bool loop, unsigned int depth)
     ,_stage(0)
     ,_stopped(false)
     ,_started(false)
+    ,_showUpdatedRegions(false)
 #ifdef ENABLE_KEYBOARD_MOUSE_MOVEMENTS 
     ,_xpointer(0)
     ,_ypointer(0)
@@ -663,7 +665,7 @@ Gui::display(movie_root* m)
 		if ( ! changed_ranges.isWorld() )
 		{
 		
-			for (int rno=0; rno<changed_ranges.size(); rno++) {
+			for (size_t rno = 0; rno < changed_ranges.size(); rno++) {
 			
 				geometry::Range2d<float> bounds = changed_ranges.getRange(rno);
 

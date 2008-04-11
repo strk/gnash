@@ -280,6 +280,9 @@ public:
     bool isPlugin() const { return (( _xid )); }
     
     void setMaxAdvances(unsigned long ul) { if (ul > 0) _maxAdvances = ul; }
+    
+    void showUpdatedRegions(bool x) { _showUpdatedRegions = x; }
+    bool showUpdatedRegions() { return _showUpdatedRegions; }
 
     /** @name Menu callbacks
      *  These callbacks will be called when a menu item is clicked.
@@ -436,6 +439,9 @@ private:
 
     /// True if the application didn't start yet
     bool            _started;
+    
+    /// If true, updated regions (invalidated ranges) are visibly outlined.
+    bool _showUpdatedRegions;
     
 #ifdef ENABLE_KEYBOARD_MOUSE_MOVEMENTS 
 	int _xpointer;

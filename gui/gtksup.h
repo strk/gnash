@@ -154,7 +154,9 @@ class GtkGui : public Gui
     /// Force redraw (Ctrl-L)
     static void menuitem_refresh_view_callback(GtkMenuItem *menuitem,
                                    gpointer instance);
- 
+    static void menuitem_show_updated_regions_callback(GtkMenuItem *menuitem,
+                                   gpointer instance); 
+
     // GTK Event handlers
     static gboolean realize_event(GtkWidget *widget, GdkEvent *event,
                                   gpointer data);

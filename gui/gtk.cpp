@@ -1657,6 +1657,15 @@ GtkGui::menuitem_refresh_view_callback(GtkMenuItem* /*menuitem*/,
     gui->refreshView();
 }
 
+/// \brief Force redraw
+void
+GtkGui::menuitem_show_updated_regions_callback(GtkMenuItem* /*menuitem*/,
+                                gpointer data)
+{
+    Gui* gui = static_cast<Gui*>(data);
+    gui->showUpdatedRegions(! (gui->showUpdatedRegions()) );
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 ///                                                                         ///
@@ -1922,6 +1931,7 @@ GtkGui::createHelpMenu(GtkWidget *obj)
 void
 GtkGui::createViewMenu(GtkWidget *obj)
 {
+
 //    GNASH_REPORT_FUNCTION;
     GtkWidget *menuitem = gtk_menu_item_new_with_mnemonic (_("_View"));
     gtk_widget_show (menuitem);
@@ -1957,6 +1967,19 @@ GtkGui::createViewMenu(GtkWidget *obj)
     gtk_widget_show(GTK_WIDGET(menuitem_fullscreen));
     g_signal_connect(GTK_OBJECT(menuitem_fullscreen), "activate",
                          G_CALLBACK(&menuitem_fullscreen_callback), this);
+
+    GtkCheckMenuItem *menuitem_show_updated_regions =
+        GTK_CHECK_MENU_ITEM(gtk_check_menu_item_new_with_label(_("Show updated ranges")));
+   
+    gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(menuitem_show_updated_regions),
+                                    showUpdatedRegions() );
+
+    gtk_menu_append(menu, GTK_WIDGET(menuitem_show_updated_regions));
+    gtk_widget_show(GTK_WIDGET(menuitem_show_updated_regions));
+    g_signal_connect(GTK_OBJECT(menuitem_show_updated_regions), "activate",
+                     G_CALLBACK(&menuitem_show_updated_regions_callback), this);
+
+
 }
 
 // Create a Control menu that can be used from the menu bar or the popup.
