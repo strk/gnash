@@ -48,7 +48,7 @@ public:
         int fordblks; // total free space
     };
     Memory();
-    Memory(int size);
+    Memory(size_t size);
     ~Memory();
 
     // Start collecting statistics. This can effect performance

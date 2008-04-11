@@ -45,19 +45,19 @@ const int DATALOG_SIZE = 1024;
 Memory::Memory() 
     : _collecting(false),
       _info(0),
-      _size(0),
+      _size(DATALOG_SIZE),
       _index(0)
 {
 //    GNASH_REPORT_FUNCTION;
 }
 
 
-Memory::Memory(int size) 
+Memory::Memory(size_t size) 
     : _collecting(false)
 {
 //    GNASH_REPORT_FUNCTION;
     _size = size;
-    _info = new struct small_mallinfo[DATALOG_SIZE];
+    _info = new struct small_mallinfo[_size];
     reset();
 }
 
@@ -89,8 +89,8 @@ Memory::startStats()
 //    GNASH_REPORT_FUNCTION;
     _collecting = true;
     if (_info == 0) {
-        log_debug("Allocating buffer for %d data samples", DATALOG_SIZE);
-        _info = new struct small_mallinfo[DATALOG_SIZE];
+        log_debug("Allocating buffer for %d data samples", _size);
+        _info = new struct small_mallinfo[_size];
         reset();
     }
 }
@@ -132,9 +132,10 @@ Memory::addStats(struct small_mallinfo *ptr, int line)
 {
 //    GNASH_REPORT_FUNCTION;
     struct mallinfo mal = mallinfo();
+    int yy = static_cast<int>(_size);
 
 //    dump(&mal);
-    if ((ptr) && (_index < DATALOG_SIZE)) {
+    if ((ptr) && (_index < yy)) {
 	ptr->line = line;
 	clock_gettime (CLOCK_REALTIME, &ptr->stamp);
         ptr->arena = mal.arena;
@@ -171,7 +172,8 @@ int
 Memory::diffStats(int x, int y)
 {
 //    GNASH_REPORT_FUNCTION;
-    if ((_info) && (x < DATALOG_SIZE) && (y < DATALOG_SIZE)) {
+    int yy = static_cast<int>(_size);
+    if ((_info) && (x < DATALOG_SIZE) && (y < yy)) {
         return (_info[x].uordblks - _info[y].uordblks);
     }
     return -1;
@@ -189,7 +191,8 @@ int
 Memory::diffStamp(int x, int y)
 {
 //    GNASH_REPORT_FUNCTION;
-    if ((_info) && (x < DATALOG_SIZE) && (y < DATALOG_SIZE)) {
+    int yy = static_cast<int>(_size);
+    if ((_info) && (x < DATALOG_SIZE) && (y < yy)) {
         return (_info[x].stamp.tv_nsec - _info[y].stamp.tv_nsec);
     }
     return -1;
@@ -220,7 +223,7 @@ Memory::analyze()
         for (int i=1; i<_index; i++) {
             struct small_mallinfo *ptr = _info + i;
 
-	    // Get the time stamp
+//	    // Get the time stamp
             int diff_stamp_sec = (ptr->stamp.tv_sec) - (ptr - 1)->stamp.tv_sec;
             int diff_stamp_nsec = (ptr->stamp.tv_nsec) - (ptr - 1)->stamp.tv_nsec;
 //             if ((diff_stamp_sec > 0) || (diff_stamp_nsec > 0)) {

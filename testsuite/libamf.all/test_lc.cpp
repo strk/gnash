@@ -23,6 +23,7 @@
 
 //#include <netinet/in.h>
 #include <string>
+#include <cerrno>
 #include <sys/types.h>
 #include <sys/stat.h>
 
@@ -129,6 +130,13 @@ test_listen()
     
     //
     shmaddr = lc.getAddr();
+    if (shmaddr == 0) {
+        runtest.unresolved("LcShm::getAddr()");
+        return;
+    } else {
+        runtest.pass("LcShm::getAddr()");
+    }
+    
     char *addr = shmaddr + LC_LISTENERS_START;
     memset(addr, 0, 1024);
     
@@ -209,7 +217,7 @@ test_data()
     vector<amf::Element *> els;
 
     el = new Element(true, 123.456, 987.654, "IAmReplyingNow");
-    el->dump();
+//    el->dump();
     els.push_back(el);
 
 #if 0
@@ -244,10 +252,13 @@ load_data()
     char *shmaddr;
 
     string con1 = "lc_reply";
-    if (lc.connect(con1)) {
-        runtest.pass("LcShm::connect()");
-    } else {
-        runtest.fail("LcShm::connect()");
+    if (!lc.connect(con1)) {
+        if (errno == EACCES) {
+            runtest.untested("Couldn't map input file, permission problems!!");
+        } else {
+            runtest.unresolved("LcShm::connect()");
+        }
+        exit(0);
     }
 
     shmaddr = lc.getAddr();
@@ -261,7 +272,13 @@ load_data()
     if (dataptr != (void*)-1) {
         memcpy(shmaddr, dataptr, 64528);
     } else {
-        cerr << "ERROR: couldn't map input file!" << endl;
+        if (errno == EACCES) {
+            runtest.unresolved("Couldn't map input file, permission problems!!");
+        } else {
+            runtest.unresolved("Couldn't map input file!");
+            log_debug("Error was: %s", strerror(errno));
+        }
+        exit(0);
     }
 
     ::close(fd);
@@ -525,7 +542,7 @@ test_write()
         runtest.fail("localSecPathTime set");
     }
 
-    sol.dump();
+//    sol.dump();
     // now write the data to disk
     sol.writeFile(filespec, "settings");
 #endif
@@ -586,3 +603,31 @@ main(int /*argc*/, char /* *argv[]*/)
     
 #endif // }
 
+// FIXME: more tests! Here's all the methods:
+//
+// gnash::LcShm::parseHeader(unsigned char*)
+// gnash::LcShm::formatHeader(std::string const&, std::string const&, bool)
+// gnash::LcShm::dump()
+// gnash::LcShm::send(std::string const&, std::string const&, std::vector<amf::Element*, std::allocator<amf::Element*> >&)
+// gnash::LcShm::close()
+// gnash::LcShm::connect(std::string const&)
+// gnash::LcShm::connect(int)
+// gnash::LcShm::parseBody(unsigned char*)
+// gnash::LcShm::LcShm(unsigned char*)
+// gnash::LcShm::LcShm(int)
+// gnash::LcShm::LcShm()
+// gnash::LcShm::LcShm(unsigned char*)
+// gnash::LcShm::LcShm(int)
+// gnash::LcShm::LcShm()
+// gnash::LcShm::~LcShm()
+// gnash::LcShm::~LcShm()
+// gnash::Listener::addListener(std::string const&)
+// gnash::Listener::findListener(std::string const&)
+// gnash::Listener::listListeners()
+// gnash::Listener::removeListener(std::string const&)
+// gnash::Listener::Listener(unsigned char*)
+// gnash::Listener::Listener()
+// gnash::Listener::Listener(unsigned char*)
+// gnash::Listener::Listener()
+// gnash::Listener::~Listener()
+// gnash::Listener::~Listener()

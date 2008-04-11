@@ -1,3 +1,18 @@
+2008-04-11  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* libamf/buffer.{h,cpp}: Cleanup minor bugs found by newly
+	expanded test case. Rename empty() to clear().
+	* libamf/amf.cpp: Don't take 1 off the end of the string. Comment
+	out some stuff that will be deleted later, it's been moved to the
+	Element class.
+	* libamf/element.cpp: Add makeNumber that takes a variable name.
+	* testsuite/libamf.all/test_buffer.cpp: Add many new tests for all
+	methods. This makes it much easier to more thoroughly test for
+	memory problems.
+	* testsuite/libamf.all/test_lc.cpp: Clean up error handling.
+	* libbase/shm.cpp: Handle permission errors better.
+	* libbase/gmemory.h, memory.cpp: Use size_t instead of int.
+
 2008-04-11 Sandro Santilli <strk@keybit.net>
 
 	* server/button_character_instance.cpp (add_invalidated_bounds):
@@ -355,7 +370,7 @@
 	singular interators. Not this fixes the abort, but leaks memory as
 	the original buffers aren't removed from the que like they need to
 	be. This at least get make check working for libnet.all.
-	* testsuite/libamf.all/test_sol.cpp: Don't ehck the bogus data for
+	* testsuite/libamf.all/test_sol.cpp: Don't check the bogus data for
 	default camera.
 
 2008-04-07 Sandro Santilli <strk@keybit.net>

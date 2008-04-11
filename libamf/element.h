@@ -75,7 +75,7 @@ public:
     Element &init(std::vector<double> &data);
     Element &init(const std::string &name, const std::string &data);
     Element &init(const std::string &data);
-    Element & init(const std::string &name, bool data);
+    Element &init(const std::string &name, bool data);
     Element &init(bool data);
     // Create a function block for AMF
     Element &init(bool, double, double, const std::string &str);
@@ -139,15 +139,17 @@ public:
     void setName(const std::string &name);
     void setName(gnash::Network::byte_t *name, size_t x);
 
+    // Manipulate the children Elements of an object
     void addChild(Element *el) { _children.push_back(el); };
     Element *popChild() { return _children.front(); };
+    size_t childrenSize() { return _children.size(); };
+
     void dump();
-    
 private:
     char		*_name;
     Buffer		*_buffer;
-    std::vector<Element	*> _children;
     amf_type_e		_type;
+    std::vector<Element	*> _children;
 };                              // end of class definition
 
 

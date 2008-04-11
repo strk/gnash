@@ -244,7 +244,7 @@ public:
     ///         in form of a newly allocated byte array.
     ///         to be deleted by caller using delete [] operator, or NULL
     ///
-    static Buffer *encodeVariable(amf::Element *el);
+    Buffer *encodeVariable(amf::Element *el);
     
     //
     // Methods for extracting data from big endian formatted raw AMF data.

@@ -40,12 +40,11 @@ extern int optind, getopt(int, char *const *, const char *);
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <log.h>
 #include <iostream>
 #include <string>
 
 #include "dejagnu.h"
-
+#include "log.h"
 #include "amf.h"
 #include "buffer.h"
 #include "network.h"
@@ -400,3 +399,17 @@ main(int /*argc*/, char /* *argv[]*/)
 }
 
 #endif
+
+// amf::SOL::formatHeader(std::string const&)
+// amf::SOL::formatHeader(std::string const&, int)
+// amf::SOL::formatHeader(std::vector<unsigned char, std::allocator<unsigned char> > const&)
+// amf::SOL::extractHeader(std::string const&)
+// amf::SOL::extractHeader(std::vector<unsigned char, std::allocator<unsigned char> > const&)
+// amf::SOL::dump()
+// amf::SOL::addObj(amf::Element*)
+// amf::SOL::readFile(std::string&)
+// amf::SOL::writeFile(std::string const&, std::string const&)
+// amf::SOL::SOL()
+// amf::SOL::SOL()
+// amf::SOL::~SOL()
+// amf::SOL::~SOL()

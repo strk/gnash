@@ -37,7 +37,7 @@ Buffer::init(size_t nbytes)
         _nbytes = nbytes;
         // this could be a performance hit, but for debugging we leave it in so we get
         // easier to ready hex dumps in GDB,
-        empty();
+//        clear();
     }
 
 #ifdef USE_STATS_BUFFERS
@@ -93,7 +93,7 @@ Buffer::copy(Network::byte_t *data, size_t nbytes)
 }
 
 void
-Buffer::copy(string &str)
+Buffer::copy(const string &str)
 {    
 //    GNASH_REPORT_FUNCTION;
     std::copy(str.begin(), str.end(), _ptr);
@@ -112,8 +112,10 @@ Network::byte_t *
 Buffer::append(boost::uint16_t length)
 {
 //    GNASH_REPORT_FUNCTION;
-    if ((_seekptr + length) <= (_ptr + _nbytes)) {
-	std::copy(&length, &length + sizeof(boost::uint16_t), _seekptr);
+    
+    if ((_seekptr + sizeof(boost::uint16_t)) <= (_ptr + _nbytes)) {
+	Network::byte_t *data = reinterpret_cast<Network::byte_t *>(&length);
+	std::copy(data, data + sizeof(boost::uint16_t), _seekptr);
 	_seekptr += sizeof(boost::uint16_t);
 	return _seekptr;
     }
@@ -199,16 +201,94 @@ Buffer::append(amf::Element::amf_type_e type)
     return append(static_cast<Network::byte_t>(type));
 }
 
+Network::byte_t *
+Buffer::append(Buffer &buf)
+{
+//    GNASH_REPORT_FUNCTION;
+    if (buf.size() > _nbytes) {
+         resize(buf.size());
+    }
+    
+    if ((_seekptr + buf.size()) <= (_ptr + _nbytes)) {
+	std::copy(buf.begin(), buf.end(), _seekptr);
+	_seekptr += buf.size();
+    }
+    return _seekptr;
+}
+
+Network::byte_t *
+Buffer::append(Buffer *buf)
+{
+//    GNASH_REPORT_FUNCTION;
+    if (buf->size() >= _nbytes) {
+         resize(buf->size());
+    }
+    
+    if ((_seekptr + buf->size()) <= (_ptr + _nbytes)) {
+	std::copy(buf->begin(), buf->end(), _seekptr);
+	_seekptr += buf->size();
+    }
+    return _seekptr;
+}
+
+// make ourselves be able to appended too. If the source
+// buffer is larger than the current buffer has room for,
+// resize ourselves (which copies the data too) to make
+// enough room.
+// note that using this may have a performance hit due to
+// the resize operation, which has to copy data.
+Buffer &
+Buffer::operator+=(Buffer &buf)
+{
+    return operator+=(&buf);
+}
+
+Buffer &
+Buffer::operator+=(Buffer *buf)
+{
+//    GNASH_REPORT_FUNCTION;
+    size_t diff = 0;
+    if (buf->size() >= _nbytes) {
+	diff = _seekptr - _ptr;
+	resize(buf->size() + diff);
+    }
+    
+    if ((_seekptr + buf->size()) <= (_ptr + _nbytes)) {
+	std::copy(buf->begin(), buf->end(), _seekptr);
+	_seekptr += buf->size();
+    }
+    return *this;
+}
+
+Buffer &
+Buffer::operator+=(char byte)
+{
+//    GNASH_REPORT_FUNCTION;
+    return operator+=(static_cast<Network::byte_t>(byte));
+}
+
+Buffer &
+Buffer::operator+=(Network::byte_t byte)
+{
+//    GNASH_REPORT_FUNCTION;
+    if ((_seekptr + 1) <= (_ptr + _nbytes)) {
+	*_seekptr = byte;
+	_seekptr += sizeof(char);
+    }
+    return *this;
+}
+
 // make ourselves be able to be copied.
 Buffer &
 Buffer::operator=(Buffer *buf)
 {
 //    GNASH_REPORT_FUNCTION;
-    if (buf->size() != _nbytes) {
+    if (buf->size() > _nbytes) {
          resize(buf->size());
     }
     
-    std::copy(buf->reference(), buf->reference() + _nbytes, _ptr);
+    std::copy(buf->begin(), buf->end(), _ptr);
+    _seekptr += buf->size();
 
     return *this;
 }
@@ -221,7 +301,7 @@ Buffer::operator=(Buffer &buf)
          resize(buf.size());
     }
     
-    std::copy(buf.reference(), buf.reference() + _nbytes, _ptr);
+    std::copy(buf.begin(), buf.end(), _ptr);
 
     return *this;
 }
@@ -231,8 +311,9 @@ bool
 Buffer::operator==(Buffer *buf)
 { 
 //    GNASH_REPORT_FUNCTION;
-   if (buf->size() == _nbytes) {
-        if (memcmp(buf->reference(), _ptr, _nbytes) == 0)  {
+    Network::byte_t *bufptr = buf->reference();
+    if (buf->size() == _nbytes) {
+        if (memcmp(bufptr, _ptr, _nbytes) == 0)  {
             return true;
         }
     }
@@ -243,54 +324,47 @@ bool
 Buffer::operator==(Buffer &buf)
 {
 //    GNASH_REPORT_FUNCTION;
-    if (buf.size() == _nbytes){
-        if (memcmp(buf.reference(), _ptr, _nbytes) == 0)  {
-            return true;
-        }
-    }
-    return false;
+//     Network::byte_t *bufptr = buf.reference();
+//     size_t max = 0;
+    
+//     if (buf.size() == _nbytes){
+//         if (memcmp(bufptr, _ptr, _nbytes) == 0) {
+//             return true;
+//         }
+//     }
+//     return false;
+    return operator==(&buf);
 }
 
 Network::byte_t *
-Buffer::find(Network::byte_t b, size_t start)
+Buffer::find(Network::byte_t *b, size_t size)
 {
-    GNASH_REPORT_FUNCTION;
-    for (size_t i=start; i< _nbytes; i++) {
-	if ( *(_ptr + i) == b) {
+//    GNASH_REPORT_FUNCTION;
+    for (size_t i=0; i< _nbytes; i++) {
+	if (memcmp((_ptr + i), b, size) == 0) {
 	    return _ptr + i;
 	}
     }
     return 0;
 }
 
-// Find a byte in the buffer
-// Network::byte_t *
-// Buffer::find(char c)
-// {
-// //    GNASH_REPORT_FUNCTION;
-//     return find(static_cast<Network::byte_t>(c), 0);
-// }
-
 Network::byte_t *
 Buffer::find(Network::byte_t c)
 {
 //    GNASH_REPORT_FUNCTION;
-    return find(static_cast<Network::byte_t>(c), 0);
-}   
-
-// // Drop a character or range of characters without resizing
-// Network::byte_t
-// Buffer::remove(char c)
-// {
-// //    GNASH_REPORT_FUNCTION;
-//     return remove(reinterpret_cast<Network::byte_t>(c));
-// }
+    for (size_t i=0; i< _nbytes; i++) {
+	if (*(_ptr + i) == c) {
+	    return _ptr + i;
+	}
+    }
+    return 0;
+}
 
 Network::byte_t *
 Buffer::remove(Network::byte_t c)
 {
-    GNASH_REPORT_FUNCTION;
-    Network::byte_t *start = find(c, 0);
+//    GNASH_REPORT_FUNCTION;
+    Network::byte_t *start = find(c);
     log_debug("FRAME MARK is at %x", (void *)start);
     if (start == 0) {
 	return 0;
@@ -325,12 +399,13 @@ Buffer::remove(int start, int stop)
 
 // Just reset to having no data, but still having storage
 void
-Buffer::empty()
+Buffer::clear()
 {
 //    GNASH_REPORT_FUNCTION;
     if (_ptr) {
         memset(_ptr, 0, _nbytes);
     }
+    _seekptr = _ptr;
 }
 
 // Resize the buffer that holds the data
@@ -339,6 +414,7 @@ Buffer::resize(size_t nbytes)
 {
 //    GNASH_REPORT_FUNCTION;
     // Allocate a new memory block
+    size_t diff = _seekptr - _ptr;
     Network::byte_t *tmp = new Network::byte_t[nbytes];
     // And copy ourselves into it
     if (nbytes > _nbytes) {
@@ -356,6 +432,9 @@ Buffer::resize(size_t nbytes)
 
     // Make the memeory block use the new space
     _ptr = tmp;
+
+    // reset the seek pointer to point into this block
+    _seekptr = _ptr + diff;
 
     return tmp;
 }

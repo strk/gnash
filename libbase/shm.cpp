@@ -214,7 +214,11 @@ Shm::attach(char const *filespec, bool nuke)
     
     filespec = "default";	// this is unused for sysv memory segments
     _shmfd = shmget(_shmkey, _size, shmflg);
-    if (_shmfd < 0 && errno == EEXIST)
+    if (_shmfd <= 0 && errno == EACCES) {
+	log_error("You don't have the proper permisisons to access shared memory");
+	return false;
+    }
+    if (_shmfd <= 0 && errno == EEXIST)
 # else
 #  ifdef __riscos__
     if (0)

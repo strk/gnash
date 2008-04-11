@@ -294,6 +294,11 @@ LcShm::parseHeader(Network::byte_t *data)
 {
 //    GNASH_REPORT_FUNCTION;
     Network::byte_t *ptr = data;
+
+    if (data == 0) {
+        log_debug("No data pointer to parse!");
+        return 0;
+    }
     
     memcpy(&_header, ptr, LC_HEADER_SIZE);
 //     memcpy(&_object, data + LC_HEADER_SIZE, _header.length);

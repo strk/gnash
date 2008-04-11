@@ -429,11 +429,22 @@ Element::makeNumber(Network::byte_t *data)
 Element &
 Element::makeNumber(double num)
 {
+//    GNASH_REPORT_FUNCTION;
     _type = Element::NUMBER;
     _buffer = new Buffer(AMF_NUMBER_SIZE);
     _buffer->append(num);
 
     return *this;
+}
+
+Element &
+Element::makeNumber(const string &name, double num)
+{
+//    GNASH_REPORT_FUNCTION;
+    if (name.size()) {
+        setName(name);
+    }
+    return makeNumber(num);
 }
 
 Element &

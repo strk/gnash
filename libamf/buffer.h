@@ -41,7 +41,8 @@ public:
     
     // Delete the allocate memory
     ~Buffer();
-    void empty();
+    void clear();
+    bool empty() { return (_nbytes)?true:false; };
 
     // Resize the buffer that holds the data
     void *resize(size_t nbytes);
@@ -49,7 +50,7 @@ public:
     // Put data into the buffer. This overwrites all data, and resets the seek ptr.
     void copy(gnash::Network::byte_t *data, size_t nbytes);
     void copy(gnash::Network::byte_t *data) { copy(data, _nbytes); };
-    void copy(std::string &str);
+    void copy(const std::string &str);
     void copy(boost::uint16_t length);
 //     void copy(boost::uint32_t val);
 //     void copy(bool);
@@ -58,6 +59,8 @@ public:
 
     // Append data to the existing data in the buffer. This assume the
     // buffer has been sized to hold the data as it is appended.
+    gnash::Network::byte_t *append(Buffer *buf);
+    gnash::Network::byte_t *append(Buffer &buf);
     gnash::Network::byte_t *append(boost::uint32_t val);
     gnash::Network::byte_t *append(bool);
     gnash::Network::byte_t *append(double num);
@@ -70,7 +73,7 @@ public:
     // Find a byte in the buffer
 //    Network::byte_t *find(char c);
     gnash::Network::byte_t *find(gnash::Network::byte_t b);
-    gnash::Network::byte_t *find(gnash::Network::byte_t b, size_t start);
+    gnash::Network::byte_t *find(gnash::Network::byte_t *b, size_t size);
     
     // Drop a byte or range of characters without resizing
 //    Network::byte_t *remove(char c);
@@ -92,6 +95,10 @@ public:
     // Test against other buffers
     bool operator==(Buffer *buf);
     bool operator==(Buffer &buf);
+    Buffer &operator+=(Buffer *buf);
+    Buffer &operator+=(gnash::Network::byte_t byte);
+    Buffer &operator+=(char byte);
+    Buffer &operator+=(Buffer &buf);
     gnash::Network::byte_t operator[](int x) { return *(_ptr + x); };
     gnash::Network::byte_t *at(int x) { return _ptr + x; };
 
