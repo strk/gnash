@@ -21,7 +21,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: System.as,v 1.21 2008/04/11 08:35:00 bwy Exp $";
+rcsid="$Id: System.as,v 1.22 2008/04/11 09:04:24 bwy Exp $";
 #include "check.as"
 
 check_equals(typeof(System), 'object');
@@ -86,10 +86,10 @@ check_equals(typeof(System.capabilities.hasAccessibility), 'boolean');
 check_equals(typeof(System.capabilities.avHardwareDisable), 'boolean');
 
 // Not present on Linux player version 9,0,115,0, is (?) on windows.
-xcheck_equals(typeof(System.capabilities.hasIME), 'boolean');
+check_equals(typeof(System.capabilities.hasIME), 'boolean');
 
 // Added in Player version 9.
-xcheck_equals(typeof(System.capabilities.hasTLS), 'boolean');
+check_equals(typeof(System.capabilities.hasTLS), 'boolean');
 
 #if OUTPUT_VERSION >= 6
 check(this.hasOwnProperty("$version"));
@@ -103,9 +103,9 @@ check(! MovieClip.prototype.hasOwnProperty("$version") );
 // Directs the player to use Latin1 instead of unicode.
 xcheck_equals(typeof(System.useCodepage), 'boolean');
 System.useCodepage = false;
-xcheck_equals(System.useCodepage, false);
+check_equals(System.useCodepage, false);
 System.useCodepage = true;
-xcheck_equals(System.useCodepage, true);
+check_equals(System.useCodepage, true);
 
 // Pops up settings dialogue box with variable settings.
 // System.showSettings(0): camera / microphone access;
@@ -114,10 +114,9 @@ xcheck_equals(System.useCodepage, true);
 // 3: microphone.
 check_equals(typeof(System.showSettings), 'function');
 
-
-check_equals(typeof(System.Product), 'function');
-check (System.Product.prototype.hasOwnProperty('launch'));
-check (System.Product.prototype.hasOwnProperty('download'));
+xcheck_equals(typeof(System.Product), 'function');
+xcheck (System.Product.prototype.hasOwnProperty('launch'));
+xcheck (System.Product.prototype.hasOwnProperty('download'));
 
 p = new System.Product("whatisthis");
 xcheck_equals(typeof(p), 'object');
