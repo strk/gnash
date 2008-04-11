@@ -333,17 +333,21 @@ test_append()
 void
 test_remove()
 {
-    Network::byte_t *data1 = new Network::byte_t[10];
-    memset(data1, 0, 10);
-    Network::byte_t *data2 = new Network::byte_t[10];
-    memset(data2, 0, 10);
-    for (size_t i=0; i< 10; i++) {
+    Network::byte_t *data1 = new Network::byte_t[12];
+    memset(data1, 0, 12);
+    Network::byte_t *data2 = new Network::byte_t[12];
+    memset(data2, 0, 12);
+    Network::byte_t *data3 = new Network::byte_t[12];
+    memset(data3, 0, 12);
+
+    // populate a buffer with some data
+    for (size_t i=0; i< 12; i++) {
         data1[i] = i + 'a';
     }
 
     // Build identical buffer nissing one character
     memcpy(data2, data1, 6);
-    memcpy(data2 + 6, data1 + 7, 5);
+    memcpy(data2 + 6, data1 + 7, 4);
 
     // Remove a single byte
     Network::byte_t byte = 'g';
@@ -368,10 +372,8 @@ test_remove()
     }
 
     // Remove a range of bytes
-    Network::byte_t *data3 = new Network::byte_t[10];
-    memset(data3, 0, 10);
     memcpy(data3, data1, 6);
-    memcpy(data3 + 6, data1 + 9, 5);
+    memcpy(data3 + 6, data1 + 9, 1);
     
     Buffer buf3(10);
     buf3.clear();

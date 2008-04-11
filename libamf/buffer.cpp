@@ -373,7 +373,7 @@ Buffer::remove(Network::byte_t c)
     }
     
     std::copy(start + 1, end(), start);
-    *(end()) = 0;
+//    *(end()) = 0;
     _nbytes--;
 
     return _ptr;
@@ -384,7 +384,7 @@ Buffer::remove(int start)
 {
 //    GNASH_REPORT_FUNCTION;
     std::copy((_ptr + start + 1), end(), (_ptr + start)),
-    *end() = 0;
+//    *end() = 0;
     _nbytes--;
     return _ptr;
 }
