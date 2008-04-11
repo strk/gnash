@@ -19,7 +19,7 @@
 
 
 #ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
+#include "gnashconfig.h" // USE_SWFTREE
 #endif
 
 #include "character.h"
@@ -31,6 +31,10 @@
 #include "render.h"  // for bounds_in_clipping_area()
 #include "ExecutableCode.h"
 #include "namedStrings.h"
+
+#ifdef USE_SWFTREE
+# include "tree.hh"
+#endif
 
 #include <boost/algorithm/string/case_conv.hpp>
 
@@ -1005,7 +1009,7 @@ character::boundsInClippingArea() const
   return gnash::render::bounds_in_clipping_area(mybounds);  
 }
 
-#ifdef USE_MENUS
+#ifdef USE_SWFTREE
 character::InfoTree::iterator
 character::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
 {

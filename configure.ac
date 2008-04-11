@@ -297,6 +297,22 @@ if test x"$menus" = x"yes"; then
 fi
 AM_CONDITIONAL(MENUS, test x$menus = xyes)
 
+dnl Don't gather SWF information in tree form. This takes
+dnl resources and memory that can be saved if there's no
+dnl need to examine SWF internals.
+AC_ARG_ENABLE(swftree,
+  AC_HELP_STRING([--disable-swftree],[Disable showing SWF properties]),
+[case "${enableval}" in
+  yes) swftree=yes ;;
+  no)  swftree=no ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for --disable-swf-properties option]) ;;
+esac],swftree=yes)
+
+if test x"$swftree" = x"yes"; then
+  AC_DEFINE([USE_SWFTREE], [], [View SWF information])
+fi
+AM_CONDITIONAL(SWFTREE, test x$swftree = xyes)
+
 dnl Disable running any tests for "make check". This may sound stupid, but
 dnl this option is designed to soley be used by maintainers in the 
 dnl DISTCHECK_CONFIGURE_FLAGS when building packages. Gnash's testing infrastructure

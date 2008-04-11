@@ -1,5 +1,15 @@
 2008-04-11 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* configure.ac: allow disabling movie properties separately from
+	  menus. It can't presently be viewed without the menus, but may
+	  be useful for debugging (dumping movie information).
+	* server/character.{h,cpp}, server/movie_root.{cpp,h},
+	  server/sprite_instance.{cpp,h}, gui/gtk{.cpp,sup.h},
+	  gui/gui.{cpp,h}: update ifdefs, make sure all tree-related
+	  code is ifdeffed out.
+
+2008-04-11 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* server/character.h: tree is not defined if tree.hh is not
 	  included.
 

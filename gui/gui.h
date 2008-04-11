@@ -25,8 +25,11 @@
 #include "rect.h"  // for composition
 #include "snappingrange.h"  // for InvalidatedRanges
 #include "gnash.h" // for gnash::key::code type
-#include "tree.hh" // for tree
 #include "smart_ptr.h"
+
+#ifdef USE_SWFTREE
+#include "tree.hh" // for tree
+#endif
 
 #include <string>
 #include <map>
@@ -328,6 +331,8 @@ public:
     }
 #endif // def GNASH_FPS_DEBUG
 
+
+#ifdef USE_SWFTREE
     // TODO: use a tree-like structure (tree.hh?)
     typedef std::pair<std::string, std::string> StringPair;
     typedef tree<StringPair> InfoTree;
@@ -337,6 +342,7 @@ public:
     /// currently being played (or NULL, if the VM isn't initialized yet)
     ///
     std::auto_ptr<InfoTree> getMovieInfo() const;
+#endif
 
     typedef std::map<std::string, std::string> VariableMap;
 

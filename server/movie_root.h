@@ -66,7 +66,7 @@
 #define GNASH_MOVIE_ROOT_H
 
 #ifdef HAVE_CONFIG_H
-#include "gnashconfig.h" // GNASH_USE_GC, USE_MENUS
+#include "gnashconfig.h" // GNASH_USE_GC, USE_SWFTREE
 #endif
 
 #include "dsodefs.h" // DSOEXPORT
@@ -79,7 +79,7 @@
 #include "smart_ptr.h" // for memory management
 #include "URL.h" // for loadMovie
 
-#ifdef USE_MENUS
+#ifdef USE_SWFTREE
 # include "tree.hh"
 #endif
 
@@ -671,7 +671,7 @@ public:
 	   	interfaceHandle = handler;
 	}
 
-#ifdef USE_MENUS
+#ifdef USE_SWFTREE
     typedef std::pair<std::string, std::string> StringPair;
     void getMovieInfo(tree<StringPair>& tr, tree<StringPair>::iterator it);
 #endif

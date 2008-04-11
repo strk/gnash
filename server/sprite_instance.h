@@ -22,7 +22,7 @@
 #define GNASH_SPRITE_INSTANCE_H
 
 #ifdef HAVE_CONFIG_H
-#include "gnashconfig.h" // GNASH_USE_GC
+#include "gnashconfig.h" // GNASH_USE_GC, USE_SWFTREE
 #endif
 
 //#include "edit_text_character.h" // temp hack
@@ -34,6 +34,10 @@
 //#include "LoadVariablesThread.h" // for composition
 #include "Range2d.h"
 #include "dsodefs.h" // for DSOEXPORT
+
+#ifdef USE_SWFTREE
+# include "tree.hh"
+#endif
 
 #include <vector>
 #include <list>
@@ -879,7 +883,7 @@ public:
 	/// Getter-setter for MovieClip._lockroot
 	static as_value lockroot_getset(const fn_call& fn);
 
-#ifdef USE_MENUS
+#ifdef USE_SWFTREE
 	// Override to append display list info, see dox in character.h
 	virtual InfoTree::iterator getMovieInfo(InfoTree& tr, InfoTree::iterator it);
 #endif

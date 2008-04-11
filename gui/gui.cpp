@@ -888,12 +888,12 @@ Gui::setInvalidatedRegions(const InvalidatedRanges& ranges)
 	setInvalidatedRegion(bounds);
 }
 
+#ifdef USE_SWFTREE
+
 std::auto_ptr<Gui::InfoTree>
 Gui::getMovieInfo() const
 {
     std::auto_ptr<InfoTree> tr;
-
-#ifdef USE_MENUS // This could be further expanded to avoid tree entirely.
 
     if ( ! VM::isInitialized() )
     {
@@ -977,10 +977,10 @@ Gui::getMovieInfo() const
 
     tr->sort(firstLevelIter.begin(), firstLevelIter.end());
 
-#endif
-
     return tr;
 }
+
+#endif
 
 #ifdef GNASH_FPS_DEBUG
 void 

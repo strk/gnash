@@ -669,6 +669,8 @@ GtkGui::createPixbuf (const gchar *filename)
     return pixbuf;
 }
 
+#ifdef USE_SWFTREE
+
 // This creates a GtkTree model for displaying movie info.
 GtkTreeModel*
 GtkGui::makeTreeModel (std::auto_ptr<InfoTree> treepointer)
@@ -734,6 +736,8 @@ GtkGui::makeTreeModel (std::auto_ptr<InfoTree> treepointer)
     return GTK_TREE_MODEL(model);
 
 }
+
+#endif
 
 // Adds the Gnash icon to a window.
 void
@@ -1307,6 +1311,8 @@ GtkGui::showPropertiesDialog()
     gtk_container_add (GTK_CONTAINER (
                         GTK_DIALOG(propsDialog)->vbox), propsvbox);
 
+#ifdef USE_SWFTREE
+
     std::auto_ptr<InfoTree> infoptr = getMovieInfo();
 
     GtkWidget *scrollwindow1 = gtk_scrolled_window_new (NULL, NULL);
@@ -1370,6 +1376,8 @@ GtkGui::showPropertiesDialog()
 
     //Add tree to scrollwindow.
     gtk_container_add (GTK_CONTAINER (scrollwindow1), treeview);
+
+#endif
 
     gtk_widget_show_all (propsDialog);
 

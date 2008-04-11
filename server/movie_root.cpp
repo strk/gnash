@@ -44,7 +44,7 @@
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/bind.hpp>
 
-#ifdef USE_MENUS
+#ifdef USE_SWFTREE
 # include "tree.hh"
 #endif
 
@@ -1917,7 +1917,7 @@ movie_root::isLevelTarget(const std::string& name, unsigned int& levelno)
 
 }
 
-#ifdef USE_MENUS
+#ifdef USE_SWFTREE
 void
 movie_root::getMovieInfo(tree<StringPair>& tr, tree<StringPair>::iterator it)
 {

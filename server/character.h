@@ -20,7 +20,7 @@
 #define GNASH_CHARACTER_H
 
 #ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
+#include "gnashconfig.h" // USE_SWFTREE
 #endif
 
 #include "gnash.h"
@@ -34,7 +34,7 @@
 #include "log.h"
 #include "snappingrange.h"
 #include "Range2d.h"
-#ifdef USE_MENUS
+#ifdef USE_SWFTREE
 # include "tree.hh"
 #endif
 
@@ -69,8 +69,9 @@ public:
   // action_buffer is externally owned
   typedef std::vector<const action_buffer*> BufferList;
   typedef std::map<event_id, BufferList> Events;
+
+#ifdef USE_SWFTREE
   typedef std::pair<std::string, std::string> StringPair; // ifdef USE_MENU...
-#ifdef USE_MENUS
   typedef tree<StringPair> InfoTree; // ifdef USE_MENU
 #endif
 
@@ -1169,7 +1170,7 @@ public: // istn't this 'public' reduntant ?
   ///
   virtual bool isSelectableTextField() const { return false; }
 
-#ifdef USE_MENUS
+#ifdef USE_SWFTREE
   /// Append character info in the tree
   //
   /// @param tr

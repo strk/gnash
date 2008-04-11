@@ -55,6 +55,10 @@
 #include "namedStrings.h"
 #include "fill_style.h" // for beginGradientFill
 
+#ifdef USE_SWFTREE
+# include "tree.hh"
+#endif
+
 #include <vector>
 #include <string>
 #include <cmath>
@@ -4600,7 +4604,7 @@ sprite_instance::set_play_state(play_state s)
 	m_play_state = s;
 }
 
-#ifdef USE_MENUS
+#ifdef USE_SWFTREE
 
 class MovieInfoVisitor {
 
@@ -4638,6 +4642,6 @@ sprite_instance::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
 
 }
 
-#endif // USE_MENUS
+#endif // USE_SWFTREE
 
 } // namespace gnash

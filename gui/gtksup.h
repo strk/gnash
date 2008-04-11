@@ -223,9 +223,11 @@ class GtkGui : public Gui
     void setupWindowEvents();
     
     GdkPixbuf* createPixbuf(const gchar *filename);
-    
+
+#ifdef USE_SWFTREE
     // Create a tree model for displaying movie info
     GtkTreeModel* makeTreeModel (std::auto_ptr<InfoTree> treepointer);
+#endif
 
     std::auto_ptr<GtkGlue>     _glue;
 
