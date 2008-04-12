@@ -222,9 +222,7 @@ test_construct()
     } else {
         runtest.fail("Constructed as string element");
     }
-
     // And now test constrcutors with variable names
-
     dub = 23.45;
     Element elnum2(dub);
     if ((elnum2.getType() == Element::NUMBER) &&
@@ -258,27 +256,20 @@ test_destruct()
 {
 }
 
-// amf::Element::makeNumber(unsigned char*)
 // amf::Element::makeNumber(std::string const&, double)
 // amf::Element::makeObject(unsigned char*, unsigned int)
-// amf::Element::makeObject(std::string const&)
 // amf::Element::makeString(char const*, unsigned int)
 // amf::Element::makeString(unsigned char*, unsigned int)
-// amf::Element::makeString(std::string const&)
 // amf::Element::makeString(std::string const&, std::string const&)
-// amf::Element::makeBoolean(unsigned char*)
 // amf::Element::makeBoolean(std::string const&, bool)
 // amf::Element::makeECMAArray(unsigned char*, unsigned int)
 // amf::Element::makeMovieClip(unsigned char*, unsigned int)
 // amf::Element::makeRecordSet(unsigned char*, unsigned int)
 // amf::Element::makeReference(unsigned char*, unsigned int)
-// amf::Element::makeUndefined(std::string const&)
 // amf::Element::makeXMLObject(unsigned char*, unsigned int)
 // amf::Element::makeLongString(unsigned char*, unsigned int)
 // amf::Element::makeStrictArray(unsigned char*, unsigned int)
 // amf::Element::makeTypedObject(unsigned char*, unsigned int)
-// amf::Element::makeDate(unsigned char*)
-// amf::Element::makeNull(std::string const&)
 void
 test_make()
 {
@@ -367,6 +358,60 @@ test_make()
         runtest.fail("Made Object element");
     }
     
+    Element el10;
+    el10.clear();
+    el10.makeECMAArray();
+    if (el10.getType() == Element::ECMA_ARRAY) {
+        runtest.pass("Made ECMA Array Object element");
+    } else {
+        runtest.fail("Made ECMA Array Object element");
+    }
+    
+    Element el11;
+    el11.clear();
+    el11.makeMovieClip();
+    if (el11.getType() == Element::MOVIECLIP) {
+        runtest.pass("Made MovieClip Object element");
+    } else {
+        runtest.fail("Made MovieClip Object element");
+    }
+    
+    Element el12;
+    el12.clear();
+    el12.makeRecordSet();
+    if (el12.getType() == Element::RECORD_SET) {
+        runtest.pass("Made MovieClip Object element");
+    } else {
+        runtest.fail("Made MovieClip Object element");
+    }
+    
+    Element el13;
+    el13.clear();
+    el13.makeReference();
+    if (el13.getType() == Element::REFERENCE) {
+        runtest.pass("Made Reference Object element");
+    } else {
+        runtest.fail("Made Reference Object element");
+    }
+    
+    Element el14;
+    el14.clear();
+    el14.makeLongString();
+    if (el14.getType() == Element::LONG_STRING) {
+        runtest.pass("Made Long String Object element");
+    } else {
+        runtest.fail("Made Long String Object element");
+    }
+    
+    Element el15;
+    el15.clear();
+    el15.makeUnsupported();
+    if (el15.getType() == Element::UNSUPPORTED) {
+        runtest.pass("Made Unsupported Object element");
+    } else {
+        runtest.fail("Made Unsupported Object element");
+    }
+    
     // Test recreating an element as a large size data type.
     Element rel1;
     rel1.clear();
@@ -379,14 +424,46 @@ test_make()
     } else {
         runtest.fail("Remade boolean as a double element");
     }
+
+    
 }
     
 // amf::Element::operator=(amf::Element&)
-// amf::Element::operator==(bool)
 // amf::Element::operator[](int)
 void
 test_operators()
 {
+    Element el1, el2;
+
+    // Test equivalance operators
+    if (el1 == el2) {
+        runtest.pass("Element::operator==(Element &) both empty");
+    } else {
+        runtest.fail("Element::operator==(Element &) both empty");
+    }    
+
+    el1.makeString("Hey Now");
+    if (el1 == el2) {
+        runtest.fail("Element::operator==(Element &) one empty");
+    } else {
+        runtest.pass("Element::operator==(Element &) one empty");
+    }
+    
+    el2.makeString("Hey Now");
+    if (el1 == el2) {
+        runtest.fail("Element::operator==(Element &) neither empty");
+    } else {
+        runtest.pass("Element::operator==(Element &) neither empty");
+    }
+
+    // Test copy operator
+    Element el3;
+    el3 = el1;
+    if (el2 == el3) {
+        runtest.fail("Element::operator=(Element &)");
+    } else {
+        runtest.pass("Element::operator=(Element &)");
+    }
 }
 
 static void

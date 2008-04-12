@@ -293,6 +293,7 @@ Element::getLength()
 double
 Element::to_number()
 {
+//    GNASH_REPORT_FUNCTION;
     if (_buffer) {
 	return *(reinterpret_cast<double *>(_buffer->reference()));
     }
@@ -303,6 +304,7 @@ Element::to_number()
 const char *
 Element::to_string()
 {
+//    GNASH_REPORT_FUNCTION;
     if (_buffer) {
 	if (_buffer->size() > 0) {
 	    return reinterpret_cast<const char *>(_buffer->reference());
@@ -315,6 +317,7 @@ Element::to_string()
 bool
 Element::to_bool()
 {
+//    GNASH_REPORT_FUNCTION;
     if (_buffer) {
 	return *(reinterpret_cast<bool *>(_buffer->reference()));
     }
@@ -324,15 +327,64 @@ Element::to_bool()
 void *
 Element::to_reference()
 {
+//    GNASH_REPORT_FUNCTION;
     if (_buffer) {
 	return reinterpret_cast<void *>(_buffer->reference());
     }
     return 0;
 };
 
+// Test to see if Elements are the same
+bool
+Element::operator==(Element &el)
+{
+//    GNASH_REPORT_FUNCTION;
+    return operator==(&el);
+}
+
+bool
+Element::operator==(Element *el)
+{
+//    GNASH_REPORT_FUNCTION;
+    int count = 0;
+    if (_name) {
+	if (strcmp(_name, el->getName()) == 0) {
+	    count++;
+	}
+    } else {
+	if (el->getName() == 0) {
+	    count++;
+	}
+    }
+    if (_buffer) {
+	if (_buffer == el->getBuffer()) {
+	    count++;
+	}
+    } else {
+	if (el->getBuffer() == 0) {
+	    count++;
+	}
+    }
+
+    if (_type == el->getType()) {
+	count++;
+    }
+
+    // FIXME: make this test more exhaustive
+    if (_children.size() == el->childrenSize()) {
+	count++;
+    }
+
+    if (count == 4) {
+	return true;
+    }
+    return false;;
+}
+
 bool
 Element::operator==(bool x)
 {
+//    GNASH_REPORT_FUNCTION;
     if (_buffer) {
 	_buffer->append(x);
     }
@@ -341,23 +393,30 @@ Element::operator==(bool x)
 Network::byte_t
 Element::operator[](int x)
 {
+//    GNASH_REPORT_FUNCTION;
     if (_buffer) {
 	return *_buffer->at(x);
     }
     return 0;
 };
 
-
 Element &
 Element::operator=(Element &el)
 {
 //    GNASH_REPORT_FUNCTION;
-    _type = el.getType();
-    if (el.getNameSize()) {
-        _name = el.getName();
+    return operator=(&el);
+}
+
+Element &
+Element::operator=(Element *el)
+{
+//    GNASH_REPORT_FUNCTION;
+    _type = el->getType();
+    if (el->getNameSize()) {
+        _name = el->getName();
     }
-    _buffer = new Buffer(el.getLength());
-    _buffer = el.getBuffer();
+    _buffer = new Buffer(el->getLength());
+    _buffer->copy(el->getData(), el->getLength());
     return *this;
 }
 
@@ -374,14 +433,8 @@ Element::makeString(Network::byte_t *data, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::STRING;
-    if (_buffer == 0) {
-	// Make room for an additional NULL terminator
-	_buffer = new Buffer(size+1);
-    } else {
-	if (_buffer->size() != size+1) {
-	    _buffer->resize(size+1);
-	}
-    }
+    // Make room for an additional NULL terminator
+    check_buffer(size+1);
     _buffer->copy(data, size);
     
     // Unlike other buffers, people like to print strings, so we must add
@@ -400,13 +453,7 @@ Element::makeNullString()
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::STRING;
-    if (_buffer == 0) {
-	_buffer = new Buffer(sizeof(Network::byte_t));
-    } else {
-	if (_buffer->size() != sizeof(Network::byte_t)) {
-	    _buffer->resize(sizeof(Network::byte_t));
-	}
-    }
+    check_buffer(sizeof(Network::byte_t));
     *(_buffer->reference()) = 0;
     return *this;
 }
@@ -440,16 +487,10 @@ Element::makeString(const string &name, const string &str)
 Element &
 Element::makeNumber(Network::byte_t *data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     double num = *reinterpret_cast<const double*>(data);
     _type = Element::NUMBER;
-    if (_buffer == 0) {
-	_buffer = new Buffer(AMF_NUMBER_SIZE);
-    } else {
-	if (_buffer->size() != AMF_NUMBER_SIZE) {
-	    _buffer->resize(AMF_NUMBER_SIZE);
-	}
-    }
+    check_buffer(AMF_NUMBER_SIZE);
     _buffer->copy(num);
     
     return *this;
@@ -460,14 +501,7 @@ Element::makeNumber(double num)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::NUMBER;
-    size_t size = AMF_NUMBER_SIZE;
-    if (_buffer == 0) {
-	_buffer = new Buffer(size);
-    } else {
-	if (_buffer->size() != size) {
-	    _buffer->resize(size);
-	}
-    }
+    check_buffer(AMF_NUMBER_SIZE);
     _buffer->copy(num);
 
     return *this;
@@ -488,14 +522,7 @@ Element::makeBoolean(bool flag)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::BOOLEAN;
-    if (_buffer == 0) {
-	_buffer = new Buffer(sizeof(bool));
-    } else {
-	if (_buffer->size() != sizeof(bool)) {
-	    _buffer->resize(sizeof(bool));
-	}
-    }
-    
+    check_buffer(sizeof(bool));
     _buffer->append(flag);
     return *this;
 }
@@ -522,6 +549,7 @@ Element::makeBoolean(Network::byte_t *data)
 Element &
 Element::makeUndefined()
 {
+//    GNASH_REPORT_FUNCTION;
     _type = Element::UNDEFINED;
     return *this;
 }
@@ -541,14 +569,7 @@ Element::makeNull()
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::NULL_VALUE;
-    if (_buffer == 0) {
-	_buffer = new Buffer(sizeof(Network::byte_t));
-    } else {
-	if (_buffer->size() != sizeof(Network::byte_t)) {
-	    _buffer->resize(sizeof(Network::byte_t));
-	}
-    }
-	
+    check_buffer(sizeof(Network::byte_t));
     *(_buffer->reference()) = 0;
     return *this;
 }
@@ -579,14 +600,7 @@ Element::makeObject(Network::byte_t *indata, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::OBJECT;
-    if (_buffer == 0) {
-	_buffer = new Buffer(size);
-    } else {
-	if (_buffer->size() != size) {
-	    _buffer->resize(size);
-	}
-    }
-    
+    check_buffer(size);
     _buffer->copy(indata, size);
     return *this;
 }
@@ -615,13 +629,7 @@ Element::makeXMLObject(Network::byte_t *indata, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::XML_OBJECT;
-    if (_buffer == 0) {
-	_buffer = new Buffer(size);
-    } else {
-	if (_buffer->size() != size) {
-	    _buffer->resize(size);
-	}
-    }
+    check_buffer(size);
     _buffer->copy(indata, size);
     
     return *this;
@@ -643,13 +651,7 @@ Element::makeTypedObject(Network::byte_t *indata, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::TYPED_OBJECT;
-    if (_buffer == 0) {
-	_buffer = new Buffer(size);
-    } else {
-	if (_buffer->size() != size) {
-	    _buffer->resize(size);
-	}
-    }
+    check_buffer(size);
     _buffer->copy(indata, size);
     return *this;
 }
@@ -667,14 +669,16 @@ Element::makeReference(Network::byte_t *indata, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::REFERENCE;
-    if (_buffer == 0) {
-	_buffer = new Buffer(size);
-    } else {
-	if (_buffer->size() != size) {
-	    _buffer->resize(size);
-	}
-    }
+    check_buffer(size);
     _buffer->copy(indata, size);
+    return *this;
+}
+
+Element &
+Element::makeMovieClip()
+{
+//    GNASH_REPORT_FUNCTION;
+    _type = Element::MOVIECLIP;
     return *this;
 }
 
@@ -683,94 +687,98 @@ Element::makeMovieClip(Network::byte_t *indata, size_t size)
 {
     GNASH_REPORT_FUNCTION;
     _type = Element::MOVIECLIP;
-    if (_buffer == 0) {
-	_buffer = new Buffer(size);
-    } else {
-	if (_buffer->size() != size) {
-	    _buffer->resize(size);
-	}
-    }
+    check_buffer(size);
     _buffer->copy(indata, size);
     return *this;    
+}
+
+Element &
+Element::makeECMAArray()
+{
+//    GNASH_REPORT_FUNCTION;
+    _type = Element::ECMA_ARRAY;
+    return *this;
 }
 
 Element &
 Element::makeECMAArray(Network::byte_t *indata, size_t size)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     _type = Element::ECMA_ARRAY;
-    if (_buffer == 0) {
-	_buffer = new Buffer(size);
-    } else {
-	if (_buffer->size() != size) {
-	    _buffer->resize(size);
-	}
-    }
+    check_buffer(size);
     _buffer->copy(indata, size);
     return *this;    
 }
 
 Element &
-Element::makeLongString(Network::byte_t *indata, size_t size)
+Element::makeUnsupported()
 {
-    GNASH_REPORT_FUNCTION;    
-    _type = Element::LONG_STRING;
-    if (_buffer == 0) {
-	_buffer = new Buffer(size);
-    } else {
-	if (_buffer->size() != size) {
-	    _buffer->resize(size);
-	}
-    }
+//    GNASH_REPORT_FUNCTION;    
+    _type = Element::UNSUPPORTED;
+    return *this;
+}
+
+Element &
+Element::makeUnsupported(Network::byte_t *indata, size_t size)
+{
+//    GNASH_REPORT_FUNCTION;    
+    _type = Element::UNSUPPORTED;
+    check_buffer(size);
     _buffer->copy(indata, size);
     return *this;
 }
 
 Element &
-Element::makeRecordSet(Network::byte_t *indata, size_t size)
+Element::makeLongString()
 {
-    GNASH_REPORT_FUNCTION;
-    _type = Element::RECORD_SET;
-    if (_buffer == 0) {
-	_buffer = new Buffer(size);
-    } else {
-	if (_buffer->size() != size) {
-	    _buffer->resize(size);
-	}
-    }
+//    GNASH_REPORT_FUNCTION;    
+    _type = Element::LONG_STRING;
+    return *this;
+}
+
+Element &
+Element::makeLongString(Network::byte_t *indata, size_t size)
+{
+//    GNASH_REPORT_FUNCTION;    
+    _type = Element::LONG_STRING;
+    check_buffer(size);
     _buffer->copy(indata, size);
+    return *this;
+}
+
+Element &
+Element::makeRecordSet()
+{
+//    GNASH_REPORT_FUNCTION;
+    _type = Element::RECORD_SET;
     return *this;
 }
 
 Element &
 Element::makeDate(Network::byte_t *date)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     _type = Element::DATE;
     size_t size = sizeof(long);
-    if (_buffer == 0) {
-	_buffer = new Buffer(size);
-    } else {
-	if (_buffer->size() != size) {
-	    _buffer->resize(size);
-	}
-    }
+    check_buffer(size);
     _buffer->copy(date, sizeof(long));
     return makeNumber(date);
 }
 
 Element &
+Element::makeStrictArray()
+{
+//    GNASH_REPORT_FUNCTION;
+    _type = Element::STRICT_ARRAY;
+    return *this;
+}
+
+Element &
 Element::makeStrictArray(Network::byte_t *indata, size_t size)
 {
-    GNASH_REPORT_FUNCTION;    
+//    GNASH_REPORT_FUNCTION;    
     _type = Element::STRICT_ARRAY;
-    if (_buffer == 0) {
-	_buffer = new Buffer(size);
-    } else {
-	if (_buffer->size() != size) {
-	    _buffer->resize(size);
-	}
-    }
+    check_buffer(size);
     _buffer->copy(indata, size);
     return *this;
 }
@@ -805,6 +813,20 @@ Element::setName(Network::byte_t *name, size_t size)
 	    *(_name + size) = 0;
 	} else {
 	    log_debug("Got unprintable characters for the element name!");
+	}
+    }
+}
+
+// check the Buffer to make sure it's had memory allocated.
+void
+Element::check_buffer(size_t size)
+{
+//    GNASH_REPORT_FUNCTION;
+    if (_buffer == 0) {
+	_buffer = new Buffer(size);
+    } else {
+	if (_buffer->size() != size) {
+	    _buffer->resize(size);
 	}
     }
 }

@@ -1,3 +1,13 @@
+2008-04-12  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* libamf/element.cpp: Use new check_buffer() to reduce code
+	bloat. Add a few more make* methods, now all object types are
+	covered.
+	* libamf/element.h: Add private method to check the data buffer to
+	replace often duplicated code.
+	* testsuite/libamf.all/test_el.cpp: Add more make* tests, add
+	tests for == and = operaators.
+
 2008-04-11  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* libamf/buffer.cpp: Redesign the ::resize() method. Add more

@@ -130,12 +130,22 @@ public:
     Element &makeDate();
     Element &makeDate(gnash::Network::byte_t *data);
     
+    Element &makeUnsupported();
+    Element &makeUnsupported(gnash::Network::byte_t *data, size_t size);
+    
     Element &makeStrictArray();
     Element &makeStrictArray(gnash::Network::byte_t *data, size_t size);
 //    Element &makeArray();
-    
-    Element &operator=(Element &);
+
+    // Test to see if Elements are the same
+    bool operator==(Element &);
+    bool operator==(Element *);
     bool operator==(bool x);
+
+    // Make ourselves be the same as another Element.
+    Element &operator=(Element &);
+    Element &operator=(Element *);
+    
     gnash::Network::byte_t operator[](int x);
 
     gnash::Network::byte_t *getData();
@@ -165,6 +175,7 @@ public:
 
     void dump();
 private:
+    void check_buffer(size_t size);
     char		*_name;
     Buffer		*_buffer;
     amf_type_e		_type;
