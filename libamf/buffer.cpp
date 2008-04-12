@@ -33,11 +33,12 @@ Buffer::init(size_t nbytes)
 {
 //    GNASH_REPORT_FUNCTION;
     if (_ptr == 0) {
-        _seekptr = _ptr = new Network::byte_t[nbytes];
+        _ptr = new Network::byte_t[nbytes];
+	_seekptr = _ptr;
+	if (_ptr == 0) {
+	    return _ptr;
+	}
         _nbytes = nbytes;
-        // this could be a performance hit, but for debugging we leave it in so we get
-        // easier to ready hex dumps in GDB,
-//        clear();
     }
 
 #ifdef USE_STATS_BUFFERS
@@ -78,7 +79,7 @@ Buffer::~Buffer()
 		  (float)((now.tv_sec - _stamp.tv_sec) + ((now.tv_nsec - _stamp.tv_nsec)/1e9)));
 #endif
         delete[] _ptr;
-        _ptr = 0;
+        _seekptr = _ptr = 0;
         _nbytes = 0;
     }
 }
@@ -95,7 +96,7 @@ Buffer::copy(Network::byte_t *data, size_t nbytes)
 void
 Buffer::copy(const string &str)
 {    
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     std::copy(str.begin(), str.end(), _ptr);
     _seekptr = _ptr + str.size();
 }
@@ -103,10 +104,37 @@ Buffer::copy(const string &str)
 void
 Buffer::copy(boost::uint16_t length)
 {
+    GNASH_REPORT_FUNCTION;
     Network::byte_t *data = reinterpret_cast<Network::byte_t *>(&length);
     std::copy(data, data + sizeof(boost::uint16_t), _ptr);    
     _seekptr = _ptr + sizeof(boost::uint16_t);
 }
+
+void
+Buffer::copy(double num)
+{
+    GNASH_REPORT_FUNCTION;
+    Network::byte_t *ptr = reinterpret_cast<Network::byte_t *>(&num);
+    std::copy(ptr, ptr + amf::AMF_NUMBER_SIZE, _ptr);    
+    _seekptr = _ptr + amf::AMF_NUMBER_SIZE;
+}
+
+void
+Buffer::copy(Network::byte_t val)
+{
+    GNASH_REPORT_FUNCTION;
+    *_ptr = val;
+    _seekptr = _ptr + sizeof(bool);
+}
+
+#if 0
+void
+Buffer::copy(bool val)
+{
+    GNASH_REPORT_FUNCTION;
+    return copy(static_cast<Network::byte_t>(val));
+}
+#endif
 
 Network::byte_t *
 Buffer::append(boost::uint16_t length)
@@ -410,35 +438,41 @@ Buffer::clear()
     _seekptr = _ptr;
 }
 
-// Resize the buffer that holds the data
+// Resize the buffer that holds the data.
 void *
-Buffer::resize(size_t nbytes)
+Buffer::resize(size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
     // Allocate a new memory block
-    size_t diff = _seekptr - _ptr;
-    Network::byte_t *tmp = new Network::byte_t[nbytes];
-    // And copy ourselves into it
-    if (nbytes > _nbytes) {
-        std::copy(_ptr, _ptr + _nbytes, tmp);
+    if (_nbytes == 0) {
+	init(size);
+    } else {
+	size_t diff =_seekptr - _ptr;
+	Network::byte_t *tmp = new Network::byte_t[size];
+	// And copy ourselves into it
+	if (size > _nbytes) {
+	    std::copy(_ptr, _ptr + _nbytes, tmp);
+	    // Delete the old block, it's unused now
+	    delete[] _ptr;
+	    // Make the memory block use the new space
+	    _ptr = tmp;
+	    // Make the seekptr point into the new space with the correct offset
+	    _seekptr = tmp + diff;
+	}
+	if (size < _nbytes) {
+	    std::copy(_ptr, _ptr + size, tmp);
+	    // Delete the old block, it's unused now
+	    delete[] _ptr;
+	    // Make the memory block use the new space
+	    _ptr = tmp;
+	    // Make the seekptr point into the new space with the correct offset
+	    _seekptr = _ptr + size;
+	}
     }
+    // Adjust the size
+    _nbytes = size;
     
-    if (nbytes < _nbytes) {
-        std::copy(_ptr, _ptr + nbytes, tmp);
-    }
-
-    _nbytes = nbytes;
-
-    // Delete the old block, it's unused now
-    delete[] _ptr;
-
-    // Make the memeory block use the new space
-    _ptr = tmp;
-
-    // reset the seek pointer to point into this block
-    _seekptr = _ptr + diff;
-
-    return tmp;
+    return _ptr;
 }
 
 void

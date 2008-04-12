@@ -20,6 +20,8 @@
 #include "gnashconfig.h"
 #endif
 
+#ifdef HAVE_DEJAGNU_H
+
 #include <regex.h>
 #include <cstdio>
 #include <cerrno>
@@ -211,7 +213,7 @@ test_copy()
     if (memcmp(ptr2, str, 9) == 0) {
          runtest.pass ("Buffer::copy(const char *)");
     } else {
-         runtest.fail ("Buffer::copy(const char)");
+         runtest.fail ("Buffer::copy(const char *)");
     }
 
     boost::uint16_t length = 12;
@@ -224,6 +226,32 @@ test_copy()
     } else {
          runtest.fail ("Buffer::copy(boost::uint16_t)");
     }
+
+#if 0
+    double num = 1.2345;
+    Buffer buf4;
+    buf4.clear();
+    buf4.copy(num);
+    memcpy(data, &num, amf::AMF_NUMBER_SIZE);
+
+    if (memcmp(data, buf4.reference(), amf::AMF_NUMBER_SIZE) == 0) {
+         runtest.pass ("Buffer::copy(double)");
+    } else {
+         runtest.fail ("Buffer::copy(double)");
+    }   
+#endif
+
+#if 0
+    bool flag = true;
+    Buffer buf5;
+    buf5.clear();
+    buf5.copy(flag);
+    if (*(buf5.reference()) == 1) {
+         runtest.pass ("Buffer::copy(bool)");
+    } else {
+         runtest.fail ("Buffer::copy(bool)");
+    }
+#endif
 }
 
 void
@@ -249,8 +277,8 @@ test_find()
          runtest.fail ("Buffer::find(Network::byte_t)");
     }
 
-    char *sub = "fgh";
-    Network::byte_t *ptr2 = reinterpret_cast<Network::byte_t *>(sub);
+    const char *sub = "fgh";
+    Network::byte_t *ptr2 = const_cast<Network::byte_t *>(reinterpret_cast<const Network::byte_t *>(sub));
     fptr = buf1.find(ptr2, 3);
     if (fptr == (ptr1 + 5)) {
          runtest.pass ("Buffer::find(Network::byte_t *, size_t)");
@@ -266,7 +294,7 @@ test_append()
 {
     Buffer buf1;
     buf1.clear();
-    Network::byte_t *ptr1 = buf1.reference();
+//    Network::byte_t *ptr1 = buf1.reference();
 
     Network::byte_t *data1 = new Network::byte_t[10];
     memset(data1, 0, 10);
@@ -306,6 +334,7 @@ test_append()
          runtest.fail ("Buffer::append(Network::byte_t)");
     }
 
+    // Append a number
     double num = 1.2345;
     Buffer buf3;
     buf3.clear();
@@ -518,6 +547,7 @@ test_operators()
     }
 
     Buffer buf5(10);
+    buf5.clear();
     boost::uint8_t *ptr3 = buf5.reference();
     buf5 += 'a';
     buf5 += 'b';
@@ -529,6 +559,7 @@ test_operators()
     }
 
     Buffer buf6(10);
+    buf6.clear();
     buf6 += 'D';
     buf6 += 'E';
     buf6 += 'F';
@@ -556,3 +587,13 @@ usage()
          << endl;
 }
 
+#else
+
+int
+main(int /*argc*/, char /* *argv[]*/)
+{
+  // nop
+  return 0;  
+}
+
+#endif

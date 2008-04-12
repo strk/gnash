@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -21,22 +21,10 @@
 
 #ifdef HAVE_DEJAGNU_H
 
-//#include <netinet/in.h>
 #include <string>
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include "as_object.h"
-
-extern "C"{
-#include <unistd.h>
-#ifdef HAVE_GETOPT_H
-#include <getopt.h>
-#endif
-#ifndef __GNUC__
-extern int optind, getopt(int, char *const *, const char *);
-#endif
-}
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -45,7 +33,8 @@ extern int optind, getopt(int, char *const *, const char *);
 #include <string>
 
 #include "dejagnu.h"
-
+#include "as_object.h"
+#include "arg_parser.h"
 #include "buffer.h"
 #include "network.h"
 #include "amf.h"
@@ -57,97 +46,359 @@ using namespace std;
 
 static void usage (void);
 
-static TestState runtest;
-
 bool test_read(std::string &filespec);
 bool test_write(std::string &filespec);
 bool test_sol(std::string &filespec);
 
+// Prototypes for test cases
+static void test_construct();
+static void test_destruct();
+static void test_make();
+static void test_operators();
+
+// Enable the display of memory allocation and timing data
+static bool memdebug = false;
+
+TestState runtest;
 LogFile& dbglogfile = LogFile::getDefaultInstance();
+RcInitFile& rcfile = RcInitFile::getDefaultInstance();
 
 int
 main(int argc, char *argv[])
-{
-    int c;
-
-    while ((c = getopt (argc, argv, "hdvsm:")) != -1) {
-        switch (c) {
-          case 'h':
-            usage ();
-            break;
-            
-          case 'v':
-              dbglogfile.setVerbosity();
-            break;
-            
-          default:
-            usage ();
-            break;
+{    const Arg_parser::Option opts[] =
+        {
+            { 'h', "help",          Arg_parser::no  },
+            { 'v', "verbose",       Arg_parser::no  },
+            { 'w', "write",         Arg_parser::no  },
+            { 'm', "memstats",      Arg_parser::no  },
+            { 'd', "dump",          Arg_parser::no  },
+        };
+    
+    Arg_parser parser(argc, argv, opts);
+    if( ! parser.error().empty() ) {
+        cout << parser.error() << endl;
+        exit(EXIT_FAILURE);
+    }
+    
+    for( int i = 0; i < parser.arguments(); ++i ) {
+        const int code = parser.code(i);
+        try {
+            switch( code ) {
+              case 'h':
+                  usage ();
+                  exit(EXIT_SUCCESS);
+              case 'v':
+                    dbglogfile.setVerbosity();
+                    // This happens once per 'v' flag 
+                    log_debug(_("Verbose output turned on"));
+                    break;
+              case 'm':
+                    // This happens once per 'v' flag 
+                    log_debug(_("Enabling memory statistics"));
+                    memdebug = true;
+                    break;
+              case 'w':
+                  rcfile.useWriteLog(true); // dbglogfile.setWriteDisk(true);
+                  log_debug(_("Logging to disk enabled"));
+                  break;
+                  
+	    }
+        }
+        
+        catch (Arg_parser::ArgParserException &e) {
+            cerr << _("Error parsing command line options: ") << e.what() << endl;
+            cerr << _("This is a Gnash bug.") << endl;
         }
     }
 
-    Element el;
-    if (el.getType() == Element::NOTYPE) {
+    // run the tests
+    test_construct();
+    test_make();
+    test_operators();
+    test_destruct();
+}
+
+void
+test_construct()
+{
+    // First test the init method, which is all the constructor does anyway.. First
+    // we test just making regular elements instead of named elements, ie...
+    // AMF "variables".
+    Element el1;
+    if (el1.getType() == Element::NOTYPE) {
         runtest.pass("Created empty element");
     } else {
         runtest.fail("Created empty element");
     }
 
+    Element el2;
     double dub = 54.3;
-    el.init(dub);
-    if ((el.getType() == Element::NUMBER) &&
-        (el.to_number() == dub)) {
-        runtest.pass("Created double element");
+    el2.init(dub);
+    if ((el2.getType() == Element::NUMBER) &&
+        (el2.to_number() == dub)) {
+        runtest.pass("Initialized as double element");
     } else {
-        runtest.fail("Created double element");
+        runtest.fail("Initialized as double element");
     }
 
-//    el.dump();
-    el.clear();
-    
+    Element el3;
+    bool flag = true;
+    el3.init(flag);
+    if ((el3.getType() == Element::BOOLEAN) &&
+        (el3.to_bool() == true)) {
+        runtest.pass("Initialized as bool element");
+    } else {
+        runtest.fail("Initialized as bool element");
+    }
+
+    Element el4;
+    string str = "Hello World";
+    el4.init(str);
+    if ((el4.getType() == Element::STRING) &&
+        (el4.getLength() == str.size())) {
+        runtest.pass("Initialized as string element");
+    } else {
+        runtest.fail("Initialized as string element");
+    }
+
+    // Now test init with the variable name
+    Element el5;
+    dub = 2.456;
+    el5.init("test1", dub);
+    if ((el5.getType() == Element::NUMBER) &&
+        (strcmp(el5.getName(), "test1") == 0) &&
+        (el5.to_number() == dub)) {
+        runtest.pass("Initialized as double element with name");
+    } else {
+        runtest.fail("Initialized as double element with name");
+    }
+
+    Element el6;
+    flag = true;
+    el6.init("test2", flag);
+    if ((el6.getType() == Element::BOOLEAN) &&
+        (strcmp(el6.getName(), "test2") == 0) &&
+        (el6.to_bool() == true)) {
+        runtest.pass("Initialized as bool element with name");
+    } else {
+        runtest.fail("Initialized as bool element with name");
+    }
+
+    Element el7;
+    str = "Hello World";
+    el7.init("test3", str);
+    if ((el7.getType() == Element::STRING) &&
+        (strcmp(el7.getName(), "test3") == 0) &&
+        (el7.getLength() == str.size())) {
+        runtest.pass("Initialized as string element with name");
+    } else {
+        runtest.fail("Initialized as string element with name");
+    }
+
+    // Now test the actual constructor
+    dub = 23.45;
+    Element elnum1(dub);
+    if ((elnum1.getType() == Element::NUMBER) &&
+        (elnum1.to_number() == dub)) {
+        runtest.pass("Constructed as double element");
+    } else {
+        runtest.fail("Constructed as double element");
+    }
+
+    flag = true;
+    Element elbool1(flag);
+    if ((elbool1.getType() == Element::BOOLEAN) &&
+        (elbool1.to_bool() == true)) {
+        runtest.pass("Constructed as bool element");
+    } else {
+        runtest.fail("Constructed as bool element");
+    }
+
+    str = "Guten Tag";
+    Element elstr1(str);
+    if ((elstr1.getType() == Element::STRING) &&
+        (elstr1.getLength() == str.size())) {
+        runtest.pass("Constructed as string element");
+    } else {
+        runtest.fail("Constructed as string element");
+    }
+
+    // And now test constrcutors with variable names
+
+    dub = 23.45;
+    Element elnum2(dub);
+    if ((elnum2.getType() == Element::NUMBER) &&
+        (elnum2.to_number() == dub)) {
+        runtest.pass("Constructed as double element with name");
+    } else {
+        runtest.fail("Constructed as double element with name");
+    }
+
+    flag = true;
+    Element elbool2(flag);
+    if ((elbool2.getType() == Element::BOOLEAN) &&
+        (elbool2.to_bool() == true)) {
+        runtest.pass("Constructed as bool element with name");
+    } else {
+        runtest.fail("Constructed as bool element with name");
+    }
+
+    str = "Aloha";
+    Element elstr2(str);
+    if ((elstr2.getType() == Element::STRING) &&
+        (elstr2.getLength() == str.size())) {
+        runtest.pass("Constructed as string element with name");
+    } else {
+        runtest.fail("Constructed as string element with name");
+    }
+}
+
+void
+test_destruct()
+{
+}
+
+// amf::Element::makeNumber(unsigned char*)
+// amf::Element::makeNumber(std::string const&, double)
+// amf::Element::makeObject(unsigned char*, unsigned int)
+// amf::Element::makeObject(std::string const&)
+// amf::Element::makeString(char const*, unsigned int)
+// amf::Element::makeString(unsigned char*, unsigned int)
+// amf::Element::makeString(std::string const&)
+// amf::Element::makeString(std::string const&, std::string const&)
+// amf::Element::makeBoolean(unsigned char*)
+// amf::Element::makeBoolean(std::string const&, bool)
+// amf::Element::makeECMAArray(unsigned char*, unsigned int)
+// amf::Element::makeMovieClip(unsigned char*, unsigned int)
+// amf::Element::makeRecordSet(unsigned char*, unsigned int)
+// amf::Element::makeReference(unsigned char*, unsigned int)
+// amf::Element::makeUndefined(std::string const&)
+// amf::Element::makeXMLObject(unsigned char*, unsigned int)
+// amf::Element::makeLongString(unsigned char*, unsigned int)
+// amf::Element::makeStrictArray(unsigned char*, unsigned int)
+// amf::Element::makeTypedObject(unsigned char*, unsigned int)
+// amf::Element::makeDate(unsigned char*)
+// amf::Element::makeNull(std::string const&)
+void
+test_make()
+{
+    Element el1;
     string str = "Hello World!";
-    el.makeString("Hello World!");
-    if ((el.getType() == Element::STRING) &&
-        (el.to_string() == str)) {
-        runtest.pass("Created string element");
+    el1.makeString("Hello World!");
+    if ((el1.getType() == Element::STRING) &&
+        (el1.to_string() == str)) {
+        runtest.pass("Made string element");
     } else {
-        runtest.fail("Created string element");
+        runtest.fail("Made string element");
     }
 
-    el.clear();
+    Element el2;
     bool sheet = true;
-    el.makeBoolean(sheet);
-    if ((el.getType() == Element::BOOLEAN) &&
-        (el.to_bool() == sheet)) {
-        runtest.pass("Created bool element");
+    el2.makeBoolean(sheet);
+    if ((el2.getType() == Element::BOOLEAN) &&
+        (el2.to_bool() == sheet)) {
+        runtest.pass("Made bool element");
     } else {
-        runtest.fail("Created bool element");
+        runtest.fail("Made bool element");
     }
 
-    el.clear();
-    el.makeNull();
-    if (el.getType() == Element::NULL_VALUE) {
-        runtest.pass("Created NULL Value element");
+    Element el3;
+    el3.clear();
+    el3.makeNull();
+    if (el3.getType() == Element::NULL_VALUE) {
+        runtest.pass("Made NULL Value element");
     } else {
-        runtest.fail("Created NULL Value element");
+        runtest.fail("Made NULL Value element");
     }
-    el.clear();
-    el.makeUndefined();
-    if (el.getType() == Element::UNDEFINED) {
-        runtest.pass("Created Undefined element");
+
+    Element el4;
+    el4.makeUndefined();
+    if (el4.getType() == Element::UNDEFINED) {
+        runtest.pass("Made Undefined element");
     } else {
-        runtest.fail("Created Undefined element");
+        runtest.fail("Made Undefined element");
     }
+
+    Element el5;
+    el5.clear();
+    el5.makeObjectEnd();
+    if (el5.getType() == Element::OBJECT_END) {
+        runtest.pass("Made Object End element");
+    } else {
+        runtest.fail("Made Object End element");
+    }
+
+    Element el6;
+    el6.clear();
+    el6.makeNullString();
+    if ((el6.getType() == Element::STRING) &&
+        (el6.getLength() == 1)) {
+        runtest.pass("Made NULL String element");
+    } else {
+        runtest.fail("Made NULL String element");
+    }
+    
+    double num = 123.456;
+    Element el7;
+    el7.clear();
+    el7.makeNumber(num);
+    if ((el7.getType() == Element::NUMBER) &&
+        (el7.to_number() == num)) {
+        runtest.pass("Made double element");
+    } else {
+        runtest.fail("Made double element");
+    }
+
+    Element el8;
+    el8.clear();
+    el8.makeObject("app");
+    if (el8.getType() == Element::OBJECT) {
+        runtest.pass("Made Object element");
+    } else {
+        runtest.fail("Made Object element");
+    }
+    
+    Element el9;
+    el9.clear();
+    el9.makeTypedObject("foobar");
+    if (el9.getType() == Element::TYPED_OBJECT) {
+        runtest.pass("Made Object element");
+    } else {
+        runtest.fail("Made Object element");
+    }
+    
+    // Test recreating an element as a large size data type.
+    Element rel1;
+    rel1.clear();
+    rel1.makeBoolean(true);
+    rel1.makeNumber(num);
+    if ((rel1.getType() == Element::NUMBER) &&
+        (rel1.getLength() == amf::AMF_NUMBER_SIZE) &&
+        (rel1.to_number() == num)) {
+        runtest.pass("Remade boolean as a double element");
+    } else {
+        runtest.fail("Remade boolean as a double element");
+    }
+}
+    
+// amf::Element::operator=(amf::Element&)
+// amf::Element::operator==(bool)
+// amf::Element::operator[](int)
+void
+test_operators()
+{
 }
 
 static void
 usage (void)
 {
-    cerr << "This program tests AMF Element support in the AMF library." << endl;
-    cerr << "Usage: test_el [hv]" << endl;
-    cerr << "-h\tHelp" << endl;
-    cerr << "-v\tVerbose" << endl;
-    exit (-1);
+    cerr << "This program tests AMF Element support in the AMF library." << endl
+         << endl
+         << _("Usage: cygnal [options...]") << endl
+         << _("  -h,  --help          Print this help and exit") << endl
+         << _("  -v,  --verbose       Output verbose debug info") << endl
+         << _("  -m,  --memdebug      Output memory statistics") << endl
+         << endl;
 }
 
 #else
@@ -161,70 +412,3 @@ main(int /*argc*/, char /* *argv[]*/)
 
 #endif
 
-
-// amf::Element::makeNumber(unsigned char*)
-// amf::Element::makeNumber(std::string const&, double)
-// amf::Element::makeNumber(double)
-// amf::Element::makeObject(unsigned char*, unsigned int)
-// amf::Element::makeObject(std::string const&)
-// amf::Element::makeString(char const*, unsigned int)
-// amf::Element::makeString(unsigned char*, unsigned int)
-// amf::Element::makeString(std::string const&)
-// amf::Element::makeString(std::string const&, std::string const&)
-// amf::Element::getNameSize()
-// amf::Element::makeBoolean(unsigned char*)
-// amf::Element::makeBoolean(std::string const&, bool)
-// amf::Element::makeBoolean(bool)
-// amf::Element::to_reference()
-// amf::Element::makeECMAArray(unsigned char*, unsigned int)
-// amf::Element::makeMovieClip(unsigned char*, unsigned int)
-// amf::Element::makeObjectEnd()
-// amf::Element::makeRecordSet(unsigned char*, unsigned int)
-// amf::Element::makeReference(unsigned char*, unsigned int)
-// amf::Element::makeUndefined(std::string const&)
-// amf::Element::makeUndefined()
-// amf::Element::makeXMLObject(unsigned char*, unsigned int)
-// amf::Element::makeLongString(unsigned char*, unsigned int)
-// amf::Element::makeNullString()
-// amf::Element::makeStrictArray(unsigned char*, unsigned int)
-// amf::Element::makeTypedObject(unsigned char*, unsigned int)
-// amf::Element::dump()
-// amf::Element::init(std::string const&)
-// amf::Element::init(std::string const&, std::string const&)
-// amf::Element::init(std::string const&, bool)
-// amf::Element::init(std::string const&, double)
-// amf::Element::init(bool)
-// amf::Element::init(bool, double, double, std::string const&)
-// amf::Element::init(double)
-// amf::Element::clear()
-// amf::Element::getData()
-// amf::Element::setName(unsigned char*, unsigned int)
-// amf::Element::setName(std::string const&)
-// amf::Element::to_bool()
-// amf::Element::makeDate(unsigned char*)
-// amf::Element::makeNull(std::string const&)
-// amf::Element::makeNull()
-// amf::Element::getLength()
-// amf::Element::to_number()
-// amf::Element::to_string()
-// amf::Element::Element(unsigned char*)
-// amf::Element::Element(std::string const&)
-// amf::Element::Element(std::string const&, std::string const&)
-// amf::Element::Element(std::string const&, bool)
-// amf::Element::Element(bool)
-// amf::Element::Element(bool, double, double, std::string const&)
-// amf::Element::Element(double)
-// amf::Element::Element()
-// amf::Element::Element(unsigned char*)
-// amf::Element::Element(std::string const&)
-// amf::Element::Element(std::string const&, std::string const&)
-// amf::Element::Element(std::string const&, bool)
-// amf::Element::Element(bool)
-// amf::Element::Element(bool, double, double, std::string const&)
-// amf::Element::Element(double)
-// amf::Element::Element()
-// amf::Element::~Element()
-// amf::Element::~Element()
-// amf::Element::operator=(amf::Element&)
-// amf::Element::operator==(bool)
-// amf::Element::operator[](int)

@@ -51,10 +51,11 @@ public:
     void copy(gnash::Network::byte_t *data, size_t nbytes);
     void copy(gnash::Network::byte_t *data) { copy(data, _nbytes); };
     void copy(const std::string &str);
+    void copy(double num);
     void copy(boost::uint16_t length);
+    void copy(gnash::Network::byte_t byte);
+//    void copy(bool);
 //     void copy(boost::uint32_t val);
-//     void copy(bool);
-//     void copy(double num);
 //     void copy(Element::amf_type_e type);
 
     // Append data to the existing data in the buffer. This assume the

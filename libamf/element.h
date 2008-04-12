@@ -97,21 +97,40 @@ public:
     
     Element &makeUndefined();
     Element &makeUndefined(const std::string &name);
+    
     Element &makeNull();
     Element &makeNull(const std::string &name);
 
     Element &makeObjectEnd();
+
     Element &makeObject(const std::string &name);
     Element &makeObject(gnash::Network::byte_t *data, size_t size);
     
+    Element &makeXMLObject(const std::string &name);
     Element &makeXMLObject(gnash::Network::byte_t *data, size_t size);
+    
+    Element &makeTypedObject(const std::string &name);
     Element &makeTypedObject(gnash::Network::byte_t *data, size_t size);
+    
+    Element &makeReference();
     Element &makeReference(gnash::Network::byte_t *data, size_t size);
+    
+    Element &makeMovieClip();
     Element &makeMovieClip(gnash::Network::byte_t *data, size_t size);
+
+    Element &makeECMAArray();
     Element &makeECMAArray(gnash::Network::byte_t *data, size_t size);
+    
+    Element &makeLongString();
     Element &makeLongString(gnash::Network::byte_t *data, size_t size);
+    
+    Element &makeRecordSet();
     Element &makeRecordSet(gnash::Network::byte_t *data, size_t size);
+    
+    Element &makeDate();
     Element &makeDate(gnash::Network::byte_t *data);
+    
+    Element &makeStrictArray();
     Element &makeStrictArray(gnash::Network::byte_t *data, size_t size);
 //    Element &makeArray();
     

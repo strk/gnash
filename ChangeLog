@@ -1,5 +1,19 @@
 2008-04-11  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* libamf/buffer.cpp: Redesign the ::resize() method. Add more
+	::copy() methods for bool and doubles.
+	* libamf/element.cpp: When invoking one of the make* methods for
+	initializing an object, all allocate memory if none has been done so
+	yet. Implement a few more object creation types.
+	* libamf/element.h: Add a few more object creation methods.
+	* testsuite/libamf.all/test_buffer.cpp: Test new ::copy()
+	methods. Default to a nop if DejaGnu isn't installed. 
+	* testsuite/libamf.all/test_el.cpp: Use	arg_parser instead of
+	getopt. Default to a nop if DejaGnu isn't installed. Add more
+	tests for construction, and the making of Elements.
+	
+2008-04-11  Rob Savoye  <rob@ripple.welcomehome.org>
+
 	* libamf/buffer.h: Check _seekptr, not nbytes to determine if a
 	buffer is ::empty().
 	* libamf/buffer.cpp: Fix bugs in ::remove() method.
