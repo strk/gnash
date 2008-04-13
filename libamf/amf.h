@@ -51,22 +51,22 @@ const size_t AMF_NUMBER_SIZE = 0x08;
 
 // The header of an AMF object is a type filed (1 byte), followed by a
 // length field. (short)
-const char AMF_HEADER_SIZE = 3;
+const gnash::Network::byte_t AMF_HEADER_SIZE = 3;
 
 // A variable is a little different. It always assumes the the first field is
 // a string that's the variable name, then the type byte like a regular AMF
 // object and length is used for the data. So a variable object header is
 // then only 5 bytes instead of the 6 that one assumes would be used.
-const char AMF_VAR_HEADER_SIZE = 5;
+const gnash::Network::byte_t AMF_VAR_HEADER_SIZE = 5;
 
 // FIXME: this should go away
 const int  AMF_PACKET_SIZE = 128;
 
 // Use a zero version till now till we know what this should be.
-const char AMF_VERSION = 0;
+const gnash::Network::byte_t AMF_VERSION = 0;
 
 // For terminating sequences, a byte with value 0x09 is used.
-const char TERMINATOR = 0x09;
+const gnash::Network::byte_t TERMINATOR = 0x09;
 
 // An AMF object is the binary representation of an ActionScript object. AMF
 // is used to send objects, wheather to a SharedObject .sol file, a memory based
@@ -123,6 +123,10 @@ public:
     /// @return a binary AMF packet in big endian format (header,data)
     ///
     static Buffer *encodeString(const std::string &str);
+
+    /// @return a binary AMF packet in big endian format (header,data)
+    ///
+    static Buffer *encodeNullString();
 
     /// Encode a Boolean object
     ///
@@ -206,7 +210,13 @@ public:
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static Buffer *encodeObject(gnash::Network::byte_t *data, int size);
+    static Buffer *encodeObject(Element *el);
+
+    /// Encode the end of an object
+    ///
+    /// @return a binary AMF packet in big endian format (header,data)
+    ///
+    static Buffer *encodeObjectEnd();
 
     /// Encode a 64 bit number
     ///
@@ -223,17 +233,6 @@ public:
     ///
     static Buffer *encodeElement(amf::Element *el);
 
-#if 0    
-    /// Encode an array of elements. 
-    ///
-    /// @return a binary AMF packet in big endian format (header,data)
-
-    /// @return a newly allocated byte array.
-    /// to be deleted by caller using delete [] operator, or NULL
-    ///
-    static std::vector<gnash::Network::byte_t> *encodeElement(std::vector<amf::Element *> &els);
-#endif
-
     /// Encode a variable. 
     //
     /// @param el The element to encode, ownership retained by caller
@@ -245,6 +244,7 @@ public:
     ///         to be deleted by caller using delete [] operator, or NULL
     ///
     Buffer *encodeVariable(amf::Element *el);
+    static Buffer *encodeVariableHeader(const std::string &name);
     
     //
     // Methods for extracting data from big endian formatted raw AMF data.

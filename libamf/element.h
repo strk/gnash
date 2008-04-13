@@ -146,7 +146,7 @@ public:
     Element &operator=(Element &);
     Element &operator=(Element *);
     
-    gnash::Network::byte_t operator[](int x);
+    Element *operator[](int x);
 
     gnash::Network::byte_t *getData();
     boost::uint16_t getLength();
@@ -169,10 +169,14 @@ public:
     void setName(gnash::Network::byte_t *name, size_t x);
 
     // Manipulate the children Elements of an object
+    void addChild(Element &el) { _children.push_back(&el); };
     void addChild(Element *el) { _children.push_back(el); };
     Element *popChild() { return _children.front(); };
     size_t childrenSize() { return _children.size(); };
+//    std::vector<Element	*> &getChildren() { return _children; };
 
+    amf::Buffer *encode();
+    
     void dump();
 private:
     void check_buffer(size_t size);

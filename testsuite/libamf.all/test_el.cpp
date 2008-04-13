@@ -46,15 +46,12 @@ using namespace std;
 
 static void usage (void);
 
-bool test_read(std::string &filespec);
-bool test_write(std::string &filespec);
-bool test_sol(std::string &filespec);
-
 // Prototypes for test cases
 static void test_construct();
 static void test_destruct();
 static void test_make();
 static void test_operators();
+static void test_children();
 
 // Enable the display of memory allocation and timing data
 static bool memdebug = false;
@@ -116,6 +113,30 @@ main(int argc, char *argv[])
     test_make();
     test_operators();
     test_destruct();
+    test_children();
+}
+
+void
+test_children()
+{
+    Element top;
+    top.makeObject("app");
+
+    Element *child1 = new Element;
+    child1->makeString("child one");
+    top.addChild(child1);
+    
+    Element *child2 = new Element;
+    child2->makeString("child two");
+    top.addChild(child2);
+
+    if (top.childrenSize() == 2) {
+        runtest.pass("Adding children");
+    } else {
+        runtest.fail("Adding children");
+    }
+    
+//    top.dump();
 }
 
 void
@@ -256,20 +277,6 @@ test_destruct()
 {
 }
 
-// amf::Element::makeNumber(std::string const&, double)
-// amf::Element::makeObject(unsigned char*, unsigned int)
-// amf::Element::makeString(char const*, unsigned int)
-// amf::Element::makeString(unsigned char*, unsigned int)
-// amf::Element::makeString(std::string const&, std::string const&)
-// amf::Element::makeBoolean(std::string const&, bool)
-// amf::Element::makeECMAArray(unsigned char*, unsigned int)
-// amf::Element::makeMovieClip(unsigned char*, unsigned int)
-// amf::Element::makeRecordSet(unsigned char*, unsigned int)
-// amf::Element::makeReference(unsigned char*, unsigned int)
-// amf::Element::makeXMLObject(unsigned char*, unsigned int)
-// amf::Element::makeLongString(unsigned char*, unsigned int)
-// amf::Element::makeStrictArray(unsigned char*, unsigned int)
-// amf::Element::makeTypedObject(unsigned char*, unsigned int)
 void
 test_make()
 {
@@ -425,6 +432,20 @@ test_make()
         runtest.fail("Remade boolean as a double element");
     }
 
+// amf::Element::makeNumber(std::string const&, double)
+// amf::Element::makeObject(unsigned char*, unsigned int)
+// amf::Element::makeString(char const*, unsigned int)
+// amf::Element::makeString(unsigned char*, unsigned int)
+// amf::Element::makeString(std::string const&, std::string const&)
+// amf::Element::makeBoolean(std::string const&, bool)
+// amf::Element::makeECMAArray(unsigned char*, unsigned int)
+// amf::Element::makeMovieClip(unsigned char*, unsigned int)
+// amf::Element::makeRecordSet(unsigned char*, unsigned int)
+// amf::Element::makeReference(unsigned char*, unsigned int)
+// amf::Element::makeXMLObject(unsigned char*, unsigned int)
+// amf::Element::makeLongString(unsigned char*, unsigned int)
+// amf::Element::makeStrictArray(unsigned char*, unsigned int)
+// amf::Element::makeTypedObject(unsigned char*, unsigned int)
     
 }
     
@@ -471,7 +492,7 @@ usage (void)
 {
     cerr << "This program tests AMF Element support in the AMF library." << endl
          << endl
-         << _("Usage: cygnal [options...]") << endl
+         << _("Usage: test_el [options...]") << endl
          << _("  -h,  --help          Print this help and exit") << endl
          << _("  -v,  --verbose       Output verbose debug info") << endl
          << _("  -m,  --memdebug      Output memory statistics") << endl

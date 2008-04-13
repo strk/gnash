@@ -1,3 +1,15 @@
+2008-04-13  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* libamf/amf.cpp: Boolsa re two bytes for AMF, so use a uint16-t,
+	not a bool when copying data. If the name is set, then it's a
+	variable for encoding.
+`	* libamf/amf.h: Use Network::byte_t instead of char for constants.
+	* libamf/element.cpp: Elements, encode thyself instead of leaving
+	it for an AMF object to do it.
+	* testsuite/libamf.all/test_el.cpp: Test the children too.
+	* testsuite/libamf.all/test_amf.cpp: Test the AMF class.
+	* testsuite/libamf.all
+
 2008-04-13 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/asobj/System.cpp: add windowlessDisable, reorder.
@@ -11,7 +23,7 @@
 	* libamf/element.h: Add private method to check the data buffer to
 	replace often duplicated code.
 	* testsuite/libamf.all/test_el.cpp: Add more make* tests, add
-	tests for == and = operaators.
+	tests for == and = operators.
 
 2008-04-11  Rob Savoye  <rob@ripple.welcomehome.org>
 
@@ -26,6 +38,8 @@
 	* testsuite/libamf.all/test_el.cpp: Use	arg_parser instead of
 	getopt. Default to a nop if DejaGnu isn't installed. Add more
 	tests for construction, and the making of Elements.
+	* testsuite/libamf.all/test_amf.cpp: New test case for AMF class.
+	* testsuite/libamf.all/Makefile.am: Add test_amf.
 	
 2008-04-11  Rob Savoye  <rob@ripple.welcomehome.org>
 

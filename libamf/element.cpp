@@ -80,6 +80,9 @@ Element::~Element()
     for (size_t i=0; i< _children.size(); i++) {
 	delete _children[i];
     }
+    if (_name) {
+	delete[] _name;
+    }
 }
 
 Element::Element(Network::byte_t *indata) 
@@ -390,13 +393,56 @@ Element::operator==(bool x)
     }
     return false;
 };
-Network::byte_t
-Element::operator[](int x)
+
+Buffer *
+Element::encode()
 {
-//    GNASH_REPORT_FUNCTION;
-    if (_buffer) {
-	return *_buffer->at(x);
+    GNASH_REPORT_FUNCTION;
+    Buffer *buf = 0;
+    if (_type == Element::OBJECT) {
+	// FIXME: we probably want a better size, to avoid the other
+	// appends from having to resize and copy the data all the time.
+	buf = new Buffer(AMF_HEADER_SIZE);
+//	buf->clear();
+	buf->append(Element::OBJECT);
+	size_t length = getNameSize();
+	boost::uint16_t enclength = length;
+	swapBytes(&enclength, 2);
+	buf->append(enclength);
+	
+	string name = _name;
+	if (name.size() > 0) {
+	    buf->append(name);
+	}
+
+	for (size_t i=0; i<_children.size(); i++) {
+	    Buffer *partial = AMF::encodeElement(_children[i]);
+//	    log_debug("Encoded partial size is %d", partial->size());
+	    if (partial) {
+		buf->append(partial);
+		delete partial;
+	    } else {
+		break;
+	    }
+	}
+	buf->append(TERMINATOR);
+	_buffer = buf;
+	return buf;
+    } else {
+	return AMF::encodeElement(this);
     }
+    
+    return 0;
+}
+
+Element *
+Element::operator[](int index)
+{
+    GNASH_REPORT_FUNCTION;
+    if (index <= _children.size()) {
+	return _children[index];
+    }
+    
     return 0;
 };
 

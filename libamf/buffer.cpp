@@ -104,7 +104,6 @@ Buffer::copy(const string &str)
 void
 Buffer::copy(boost::uint16_t length)
 {
-    GNASH_REPORT_FUNCTION;
     Network::byte_t *data = reinterpret_cast<Network::byte_t *>(&length);
     std::copy(data, data + sizeof(boost::uint16_t), _ptr);    
     _seekptr = _ptr + sizeof(boost::uint16_t);
@@ -113,7 +112,7 @@ Buffer::copy(boost::uint16_t length)
 void
 Buffer::copy(double num)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     Network::byte_t *ptr = reinterpret_cast<Network::byte_t *>(&num);
     std::copy(ptr, ptr + amf::AMF_NUMBER_SIZE, _ptr);    
     _seekptr = _ptr + amf::AMF_NUMBER_SIZE;
@@ -450,7 +449,7 @@ Buffer::resize(size_t size)
 	size_t diff =_seekptr - _ptr;
 	Network::byte_t *tmp = new Network::byte_t[size];
 	// And copy ourselves into it
-	if (size > _nbytes) {
+	if (size >= _nbytes) {
 	    std::copy(_ptr, _ptr + _nbytes, tmp);
 	    // Delete the old block, it's unused now
 	    delete[] _ptr;

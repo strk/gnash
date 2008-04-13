@@ -49,17 +49,21 @@ INCLUDES = -I.. \
 
 
 check_PROGRAMS = \
+	test_amf \
 	test_buffer \
 	test_el \
 	test_sol \
 	test_lc
 
-test_el_SOURCES = test_el.cpp ../../libamf/element.cpp
+test_el_SOURCES = test_el.cpp
 test_el_LDADD = $(AM_LDFLAGS)
 
 test_sol_SOURCES = test_sol.cpp
 test_sol_LDADD = $(AM_LDFLAGS)
 test_sol_DEPENDENCIES = $(solfiles)
+
+test_amf_SOURCES = test_amf.cpp
+test_amf_LDADD = $(AM_LDFLAGS)
 
 test_lc_SOURCES = test_lc.cpp
 test_lc_LDADD = $(AM_LDFLAGS)

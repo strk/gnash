@@ -312,33 +312,58 @@ AMF::encodeBoolean(bool flag)
     // Encode a boolean value. 0 for false, 1 for true
     Buffer *buf = new Buffer(AMF_HEADER_SIZE);
     buf->append(Element::BOOLEAN);
-    bool x = flag;
+    boost::uint16_t x = flag;
     swapBytes(&x, 2);
     buf->append(x);
     
     return buf;
 }
 
+/// Encode the end of an object
+///
+/// @return a binary AMF packet in big endian format (header,data) which
+/// needs to be deleted[] after being used.
+///
+Buffer *
+AMF::encodeObjectEnd()
+{
+    GNASH_REPORT_FUNCTION;
+    Buffer *buf = new Buffer(1);
+    buf->append(TERMINATOR);
+
+    return buf;
+}
+
+#if 0
 /// Encode an object
 ///
 /// @return a binary AMF packet in big endian format (header,data) which
 /// needs to be deleted[] after being used.
 ///
 Buffer *
-AMF::encodeObject(Network::byte_t *data, int size)
+AMF::encodeObject(Element *el)
 {
-//    GNASH_REPORT_FUNCTION;
-    // Encode an XML object. The data follows a 4 byte length
-    // field. (which must be big-endian)
-    Buffer *buf = new Buffer(AMF_HEADER_SIZE + size);
-    buf->append(Element::OBJECT);
-    boost::uint32_t num = size;
-    swapBytes(&num, 4);
-    buf->append(num);
-    buf->append(data, size);
+    GNASH_REPORT_FUNCTION;
+    AMF amf_obj;
     
-    return buf;
+    for (size_t i=0; i< el->childrenSize(); i++) {
+//	Buffer *var = amf_obj.encodeVariable();
+//	Element *child = el[i];
+#if 0
+	Buffer *buf = new Buffer(AMF_HEADER_SIZE + size);
+	buf->append(Element::OBJECT);
+	boost::uint32_t num = size;
+	swapBytes(&num, 4);
+	buf->append(num);
+	buf->append(data, size);
+	
+	return buf;
+#endif
+//	child.dump();
+    }
+
 }
+#endif
 
 /// Encode an "Undefined" object
 ///
@@ -375,7 +400,8 @@ AMF::encodeUnsupported()
 /// @return a binary AMF packet in big endian format (header,data) which
 /// needs to be deleted[] after being used.
 ///
-Buffer *encodeDate(Network::byte_t *data)
+Buffer *
+AMF::encodeDate(Network::byte_t *data)
 {
 //    GNASH_REPORT_FUNCTION;
     Buffer *buf = new Buffer(AMF_HEADER_SIZE);
@@ -498,7 +524,6 @@ AMF::encodeRecordSet(Network::byte_t * /* data */, int /* size */)
     return 0;
 }
 
-
 /// Encode a Strict Array
 ///
 /// @return a binary AMF packet in big endian format (header,data) which
@@ -521,7 +546,7 @@ AMF::encodeStrictArray(Network::byte_t * /* data */, int /* size */)
 Buffer *
 AMF::encodeString(const string &str)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     boost::uint16_t length;
     
     Buffer *buf = new Buffer(str.size() + AMF_HEADER_SIZE);
@@ -531,10 +556,33 @@ AMF::encodeString(const string &str)
     // doesn't get written when encoding a string as it has a byte count
     // instead.
     length = str.size();
-    log_debug("Encoded data size is going to be %d", length);
+//    log_debug("Encoded data size is going to be %d", length);
     swapBytes(&length, 2);
     buf->append(length);
     buf->append(str);
+    
+    return buf;
+}
+
+/// Encode a NULL string object, which is a string with no data.
+///
+/// @return a binary AMF packet in big endian format (header,data) which
+/// needs to be deleted[] after being used.
+///
+Buffer *
+AMF::encodeNullString()
+{
+//    GNASH_REPORT_FUNCTION;
+    boost::uint16_t length;
+    
+    Buffer *buf = new Buffer(AMF_HEADER_SIZE);
+    buf->append(Element::STRING);
+    // when a string is stored in an element, we add a NULL terminator so
+    // it can be printed by to_string() efficiently. The NULL terminator
+    // doesn't get written when encoding a string as it has a byte count
+    // instead.
+    length = 0;
+    buf->append(length);
     
     return buf;
 }
@@ -560,75 +608,96 @@ Buffer *
 AMF::encodeElement(Element *el)
 {
 //    GNASH_REPORT_FUNCTION;
+    Buffer *buf = 0;
+    Buffer *tmp;
+    
+    size_t outsize = el->getNameSize() + AMF_VAR_HEADER_SIZE;
+    buf = new Buffer(outsize);
+    
+    // If the name field is set, it's a "variable", followed by the data
+    if (el->getName()) {
+	// Add the length of the string for the name of the variable
+	size_t length = el->getNameSize();
+	boost::uint16_t enclength = length;
+	swapBytes(&enclength, 2);
+	buf->copy(enclength);
+	// Now the name itself
+	string name = el->getName();
+	if (name.size() > 0) {
+	    buf->append(name);
+	}
+    }
 
+    // Encode the element's data
     switch (el->getType()) {
       case Element::NOTYPE:
 	  return 0;
 	  break;
       case Element::NUMBER:
-	  return encodeNumber(el->to_number());
+	  tmp = encodeNumber(el->to_number());
           break;
       case Element::BOOLEAN:
-	  return encodeBoolean(el->to_bool());
+	  tmp = encodeBoolean(el->to_bool());
           break;
       case Element::STRING:
-	  return encodeString(el->to_string());
+	  tmp = encodeString(el->to_string());
 	  break;
       case Element::OBJECT:
-	  return encodeObject(el->getData(), el->getLength());
+	  tmp = el->encode();
           break;
       case Element::MOVIECLIP:
-	  return encodeMovieClip(el->getData(), el->getLength());
+	  tmp = encodeMovieClip(el->getData(), el->getLength());
           break;
       case Element::NULL_VALUE: 
-	  return encodeNull();
+	  tmp = encodeNull();
           break;
       case Element::UNDEFINED:
-	  return encodeUndefined();
+	  tmp = encodeUndefined();
 	  break;
       case Element::REFERENCE:
-	  return encodeReference(el->getData(), el->getLength());
+	  tmp = encodeReference(el->getData(), el->getLength());
           break;
       case Element::ECMA_ARRAY:
-	  return encodeECMAArray(el->getData(), el->getLength());
+	  tmp = encodeECMAArray(el->getData(), el->getLength());
           break;
 	  // The Object End gets added when creating the object, so we can jusy ignore it here.
       case Element::OBJECT_END:
+	  tmp = encodeObjectEnd();
           break;
       case Element::STRICT_ARRAY:
-	  return encodeStrictArray(el->getData(), el->getLength());
+	  tmp = encodeStrictArray(el->getData(), el->getLength());
           break;
       case Element::DATE:
-//	  return encodeDate(el->getData());
+	  tmp = encodeDate(el->getData());
           break;
       case Element::LONG_STRING:
-	  return encodeLongString(el->getData(), el->getLength());
+	  tmp = encodeLongString(el->getData(), el->getLength());
           break;
       case Element::UNSUPPORTED:
-	  return encodeUnsupported();
+	  tmp = encodeUnsupported();
           break;
       case Element::RECORD_SET:
-	  return encodeRecordSet(el->getData(), el->getLength());
+	  tmp = encodeRecordSet(el->getData(), el->getLength());
           break;
       case Element::XML_OBJECT:
-	  return encodeXMLObject(el->getData(), el->getLength());
+	  tmp = encodeXMLObject(el->getData(), el->getLength());
           // Encode an XML object. The data follows a 4 byte length
           // field. (which must be big-endian)
           break;
       case Element::TYPED_OBJECT:
-	  return encodeTypedObject(el->getData(), el->getLength());
+//	  tmp = encodeTypedObject(el->getData(), el->getLength());
           break;
 	  // This is a Gnash specific value
       case Element::VARIABLE:
-	  return 0;
-          break;
       case Element::FUNCTION:
-	  return 0;
           break;
     };
 
-    // you should never get here
-    return 0;
+    buf->append(tmp);
+//    log_debug("Encoded buf size is %d", buf->size());
+    delete tmp;
+
+    return buf;
 }
 
 #if 0
@@ -975,10 +1044,13 @@ AMF::encodeVariable(amf::Element *el)
     swapBytes(&enclength, 2);
     buf->copy(enclength);
 
-    string xxx = el->getName();	// FIXME: stupid name
-    if (xxx.size() > 0) {
-	buf->append(xxx);
+    if (el->getName()) {
+	string name = el->getName();
+	if (name.size() > 0) {
+	    buf->append(name);
+	}
     }
+
     // Add the type of the variable's data
     buf->append(el->getType());
     // Booleans appear to be encoded weird. Just a short after
@@ -1156,7 +1228,7 @@ AMF::extractAMF(Network::byte_t *in)
     // characters, then the string value    
     
     // Check the type of the element data
-    Element::amf_type_e type = *(Element::amf_type_e *)tmpptr;
+    Element::amf_type_e type = *(reinterpret_cast<Element::amf_type_e *>(tmpptr));
     tmpptr++;                        // skip the header byte
 
     AMF amf_obj;

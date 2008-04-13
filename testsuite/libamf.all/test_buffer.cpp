@@ -240,18 +240,6 @@ test_copy()
          runtest.fail ("Buffer::copy(double)");
     }   
 #endif
-
-#if 0
-    bool flag = true;
-    Buffer buf5;
-    buf5.clear();
-    buf5.copy(flag);
-    if (*(buf5.reference()) == 1) {
-         runtest.pass ("Buffer::copy(bool)");
-    } else {
-         runtest.fail ("Buffer::copy(bool)");
-    }
-#endif
 }
 
 void
@@ -580,7 +568,7 @@ usage()
 {
     cout << _("test_buffer - test Buffer class") << endl
          << endl
-         << _("Usage: cygnal [options...]") << endl
+         << _("Usage: test_buffer [options...]") << endl
          << _("  -h,  --help          Print this help and exit") << endl
          << _("  -v,  --verbose       Output verbose debug info") << endl
          << _("  -m,  --memdebug      Output memory statistics") << endl

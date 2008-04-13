@@ -88,11 +88,11 @@ test_amf()
 {
     AMF amf_obj;
     int fd, ret;
-    char *buf[AMF_NUMBER_SIZE+1];
     double num;
     Element el;
     boost::uint8_t *ptr;
     
+    char *buf[AMF_NUMBER_SIZE+1];
     memset(buf, 0, AMF_NUMBER_SIZE+1);
     string filespec = SRCDIR;
     filespec += "/f03f.amf";
