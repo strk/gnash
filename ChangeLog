@@ -1,3 +1,8 @@
+2008-04-13 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/asobj/System.cpp: add windowlessDisable, reorder.
+	* testsuite/actionscript.all: test windowlessDisable.
+
 2008-04-12  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* libamf/element.cpp: Use new check_buffer() to reduce code

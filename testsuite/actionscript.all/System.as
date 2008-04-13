@@ -21,7 +21,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: System.as,v 1.22 2008/04/11 09:04:24 bwy Exp $";
+rcsid="$Id: System.as,v 1.23 2008/04/13 18:27:42 bwy Exp $";
 #include "check.as"
 
 check_equals(typeof(System), 'object');
@@ -84,6 +84,7 @@ check_equals(typeof(System.capabilities.hasAudioEncoder), 'boolean');
 check_equals(typeof(System.capabilities.hasAudio), 'boolean');
 check_equals(typeof(System.capabilities.hasAccessibility), 'boolean');
 check_equals(typeof(System.capabilities.avHardwareDisable), 'boolean');
+check_equals(typeof(System.capabilities.windowlessDisable), 'boolean');
 
 // Not present on Linux player version 9,0,115,0, is (?) on windows.
 check_equals(typeof(System.capabilities.hasIME), 'boolean');
@@ -127,11 +128,11 @@ xcheck_equals(typeof(p.download), 'function');
 xcheck_equals(typeof(p.launch), 'function');
 
 #if OUTPUT_VERSION > 6
- check_totals(52);
+ check_totals(53);
 #else
 # if OUTPUT_VERSION == 6
-   check_totals(51);
+   check_totals(52);
 # else
-   check_totals(49);
+   check_totals(50);
 # endif
 #endif

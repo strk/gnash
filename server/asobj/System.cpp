@@ -67,61 +67,46 @@ getSystemCapabilitiesInterface()
 {
 	RcInitFile& rcfile = RcInitFile::getDefaultInstance();
 
-	// "LNX 9,0,22,0", "MAC 8,0,99,0"
-	// Override in gnashrc
-	const std::string version = VM::get().getPlayerVersion();
+    //
+    // Filesystem, access, miscellaneous hardware information
+    //
 
-	// "Windows XP", "Windows 2000", "Windows NT", "Windows 98/ME", "Windows 95", "Windows CE", "Linux", "MacOS"
-	// Override in gnashrc
-	const std::string os = VM::get().getOSName();
+    // "Windows XP", "Windows 2000", "Windows NT", "Windows 98/ME",
+    // "Windows 95", "Windows CE", "Linux", "MacOS"
+    // Override in gnashrc
+    const std::string os = VM::get().getOSName();
 
-	// "Macromedia Windows", "Macromedia Linux", "Macromedia MacOS"
-	// Override in gnashrc
-	const std::string manufacturer = rcfile.getFlashSystemManufacturer();
-	
-	// Does the NetStream object natively support SSL?
+    const std::string language = systemLanguage();
+
+    // FIXME: these need to be implemented properly 
+    // Does the NetStream object natively support SSL?
 	const bool hasTLS = false;
 
-    //
-	// Media
-	//
-		
-	// Is audio available?
-	const bool hasAudio = (get_sound_handler() != NULL);
+    // Microphone and camera access disabled
 	const bool avHardwareDisable = false;
+	
+	// Not sure: seems to be whether the movie can 'float' above web pages,
+	// and is useful for disabling certain annoying adverts.
+	const bool windowlessDisable = false;
 
-    // TODO: these need to be implemented properly
-	const bool hasAudioEncoder = true;
-	const bool hasEmbeddedVideo = true;
-	const bool hasIME = true;
-	const bool hasMP3 = true;
 	const bool hasPrinting = true;
-	const bool hasScreenBroadcast = true;
-	const bool hasScreenPlayback = true;
-	const bool hasStreamingAudio = true;
-	const bool hasStreamingVideo = true;
-	const bool hasVideoEncoder = true;
-
-    //
-    // Human interface
-    //
-
-	const std::string language = systemLanguage();
-
-    // TODO: these need to be implemented properly.
 	const bool hasAccessibility = true;
 	const bool isDebugger = false;
 	const bool localFileReadDisable = false;
 
-	// "StandAlone", "External", "PlugIn", "ActiveX" (get from GUI)
-	std::string playerType;
+    //
+    // Display information (needs active GUI)
+    //
 
     // Documented to be a number, but is in fact a string.
     std::string pixelAspectRatio;
 
+    // "StandAlone", "External", "PlugIn", "ActiveX" (get from GUI)
+    std::string playerType;
+
     int screenResolutionX = 0;
     int screenResolutionY = 0;
-        
+
     std::istringstream ss;
 
     if (movie_root::interfaceHandle) {
@@ -136,6 +121,38 @@ getSystemCapabilitiesInterface()
         playerType = (*movie_root::interfaceHandle)("System.capabilities.playerType", "");
     }
 
+    //
+	// Media
+	//
+		
+	// Is audio available?
+	const bool hasAudio = (get_sound_handler() != NULL);
+
+    // FIXME: these need to be implemented properly. They are mostly
+    // self-explanatory.
+    const bool hasAudioEncoder = true;
+    const bool hasEmbeddedVideo = true;
+    const bool hasIME = true;
+    const bool hasMP3 = true;
+    const bool hasScreenBroadcast = true;
+    const bool hasScreenPlayback = true;
+    const bool hasStreamingAudio = true;
+    const bool hasStreamingVideo = true;
+    const bool hasVideoEncoder = true;
+
+    //
+    // Player version
+    //
+
+    // "LNX 9,0,22,0", "MAC 8,0,99,0"
+    // Override in gnashrc
+    const std::string version = VM::get().getPlayerVersion();
+
+    // "Macromedia Windows", "Macromedia Linux", "Macromedia MacOS"
+    // Override in gnashrc
+    const std::string manufacturer = rcfile.getFlashSystemManufacturer();
+    
+    // serverString
 	// A URL-encoded string to send system info to a server.
 	// Boolean values are represented as t or f.		
 	// Privacy concerns should probably be addressed by 	
@@ -151,23 +168,24 @@ getSystemCapabilitiesInterface()
 	// TLS and hasTLS are documented for AS3, player version 9.
 	//
 	// WD is included in the server string for player version 9,
-	// but not documented.
+	// but not documented. It corresponds to the equally undocumented
+	// windowlessDisable.
 	
 	// This should be the standard order of parameters in the server
 	// string.
 	std::ostringstream serverString;
 	serverString << "&A="    << TF(hasAudio)
-			<< "&SA="	<< hasStreamingAudio
-			<< "&SV="	<< hasStreamingVideo 
-			<< "&EV="	<< hasEmbeddedVideo
-			<< "&MP3="	<< hasMP3 									
-			<< "&AE="	<< hasAudioEncoder
-			<< "&VE="	<< hasVideoEncoder
-			<< "&ACC="	<< hasAccessibility
-			<< "&PR="	<< hasPrinting 
-			<< "&SP="	<< hasScreenPlayback 
-			<< "&SB="	<< hasScreenBroadcast 
-			<< "&DEB="	<< isDebugger 
+			<< "&SA="	<< TF(hasStreamingAudio)
+			<< "&SV="	<< TF(hasStreamingVideo)
+			<< "&EV="	<< TF(hasEmbeddedVideo)
+			<< "&MP3="	<< TF(hasMP3)						
+			<< "&AE="	<< TF(hasAudioEncoder)
+			<< "&VE="	<< TF(hasVideoEncoder)
+			<< "&ACC="	<< TF(hasAccessibility)
+			<< "&PR="	<< TF(hasPrinting)
+			<< "&SP="	<< TF(hasScreenPlayback) 
+			<< "&SB="	<< TF(hasScreenBroadcast) 
+			<< "&DEB="	<< TF(isDebugger)
 			<< "&V="    << URL::encode(version)
 			<< "&M="    << URL::encode(manufacturer)
 			<< "&R="    << screenResolutionX << "x" << screenResolutionY
@@ -177,10 +195,10 @@ getSystemCapabilitiesInterface()
 			<< "OS="    << URL::encode(os)
 			<< "&L="    << language			
 			<< "&PT="   << playerType
-			<< "&AVD="	<< avHardwareDisable 
-			<< "&LFD="	<< localFileReadDisable
-			<< "&WD="
-			<< "&TLS="	<< hasTLS;
+			<< "&AVD="	<< TF(avHardwareDisable) 
+			<< "&LFD="	<< TF(localFileReadDisable)
+			<< "&WD="   << TF(windowlessDisable)
+			<< "&TLS="	<< TF(hasTLS);
 	
 	static boost::intrusive_ptr<as_object> proto;
 	if ( proto == NULL )
@@ -216,6 +234,7 @@ getSystemCapabilitiesInterface()
 		proto->init_member("isDebugger", isDebugger, flags);
 		proto->init_member("localFileReadDisable", localFileReadDisable, flags);
 		proto->init_member("hasTLS", hasTLS, flags);
+		proto->init_member("windowlessDisable", windowlessDisable, flags);
 	}
 	return proto.get();
 }
