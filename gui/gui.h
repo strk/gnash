@@ -180,6 +180,8 @@ public:
     virtual double getPixelAspectRatio() { return 0; }
     virtual int getScreenResX() { return 0; }
     virtual int getScreenResY() { return 0; }
+    virtual double getScreenDPI() { return 0; }
+    virtual std::string getScreenColor() { return ""; }
 
     /// @return The value to which the movie width should be scaled.
     float getXScale();

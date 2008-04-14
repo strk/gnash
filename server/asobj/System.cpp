@@ -180,7 +180,7 @@ getSystemCapabilitiesInterface()
 	// This should be the standard order of parameters in the server
 	// string.
 	std::ostringstream serverString;
-	serverString << "&A="    << TF(hasAudio)
+	serverString << "A="    << TF(hasAudio)
 			<< "&SA="	<< TF(hasStreamingAudio)
 			<< "&SV="	<< TF(hasStreamingVideo)
 			<< "&EV="	<< TF(hasEmbeddedVideo)
@@ -198,7 +198,7 @@ getSystemCapabilitiesInterface()
 			<< "&DP="	<< screenDPI
 			<< "&COL="	<< screenColor					
 			<< "&AR="   << pixelAspectRatio
-			<< "OS="    << URL::encode(os)
+			<< "&OS="   << URL::encode(os)
 			<< "&L="    << language			
 			<< "&PT="   << playerType
 			<< "&AVD="	<< TF(avHardwareDisable) 

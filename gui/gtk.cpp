@@ -438,6 +438,13 @@ GtkGui::getScreenResY()
     return gdk_screen_height(); 
 }
 
+double
+GtkGui::getScreenDPI()
+{
+    GdkScreen* screen = gdk_screen_get_default();
+    return gdk_screen_get_resolution(screen);
+}
+
 // private
 void
 GtkGui::setupWindowEvents()

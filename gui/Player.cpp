@@ -560,6 +560,20 @@ Player::interfaceEventCallback(const std::string& event, const std::string& arg)
         return ss.str();
     }
 
+    if (event == "System.capabilities.screenDPI")
+    {
+        std::ostringstream ss;
+        // Whether the pp actively limits the precision or simply
+        // gets a slightly different result isn't clear.
+        ss << _gui->getScreenDPI();
+        return ss.str();
+    }
+
+    if (event == "System.capabilities.screenColor")
+    {
+        return _gui->getScreenColor();
+    }
+
     if (event == "System.capabilities.playerType")
     {
         return _gui->isPlugin() ? "PlugIn" : "StandAlone";
