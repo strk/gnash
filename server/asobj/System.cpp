@@ -256,10 +256,15 @@ attachSystemInterface(as_object& proto)
 	proto.init_member("setClipboard", new builtin_function(system_setclipboard));
 	proto.init_member("showSettings", new builtin_function(system_showsettings));
 
-	as_c_function_ptr gettersetter;
+	VM& vm = proto.getVM();
+    const int version = vm.getSWFVersion();
 
-	gettersetter = &system_exactsettings;
-	proto.init_property("exactSettings", *gettersetter, *gettersetter);
+	as_c_function_ptr gettersetter;
+    
+    if (version > 5) {
+	    gettersetter = &system_exactsettings;
+	    proto.init_property("exactSettings", *gettersetter, *gettersetter);
+	}
 
 	gettersetter = &system_usecodepage;
 	proto.init_property("useCodepage", *gettersetter, *gettersetter);

@@ -21,10 +21,42 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: System.as,v 1.24 2008/04/14 08:36:19 bwy Exp $";
+rcsid="$Id: System.as,v 1.25 2008/04/14 14:16:39 bwy Exp $";
 #include "check.as"
 
 check_equals(typeof(System), 'object');
+
+#if OUTPUT_VERSION > 5
+check(System.capabilities.hasOwnProperty("version"));
+check(System.capabilities.hasOwnProperty("os"));
+check(System.capabilities.hasOwnProperty("manufacturer"));
+check(System.capabilities.hasOwnProperty("playerType"));
+check(System.capabilities.hasOwnProperty("serverString"));
+check(System.capabilities.hasOwnProperty("screenResolutionX"));
+check(System.capabilities.hasOwnProperty("screenResolutionY"));
+check(System.capabilities.hasOwnProperty("screenDPI"));
+check(System.capabilities.hasOwnProperty("screenColor"));
+check(System.capabilities.hasOwnProperty("pixelAspectRatio"));
+check(System.capabilities.hasOwnProperty("localFileReadDisable"));
+check(System.capabilities.hasOwnProperty("language"));
+check(System.capabilities.hasOwnProperty("isDebugger"));
+check(System.capabilities.hasOwnProperty("hasVideoEncoder"));
+check(System.capabilities.hasOwnProperty("hasStreamingVideo"));
+check(System.capabilities.hasOwnProperty("hasStreamingAudio"));
+check(System.capabilities.hasOwnProperty("hasScreenPlayback"));
+check(System.capabilities.hasOwnProperty("hasScreenBroadcast"));
+check(System.capabilities.hasOwnProperty("hasPrinting"));
+check(System.capabilities.hasOwnProperty("hasMP3"));
+check(System.capabilities.hasOwnProperty("hasEmbeddedVideo"));
+check(System.capabilities.hasOwnProperty("hasAudioEncoder"));
+check(System.capabilities.hasOwnProperty("hasAudio"));
+check(System.capabilities.hasOwnProperty("hasAccessibility"));
+check(System.capabilities.hasOwnProperty("avHardwareDisable"));
+check(System.capabilities.hasOwnProperty("windowlessDisable"));
+
+check(System.hasOwnProperty("exactSettings"));
+#endif
+
 
 // _global.System is NOT a class, just an object 
 var systemObj = new System;
@@ -86,20 +118,25 @@ check_equals(typeof(System.capabilities.hasAccessibility), 'boolean');
 check_equals(typeof(System.capabilities.avHardwareDisable), 'boolean');
 check_equals(typeof(System.capabilities.windowlessDisable), 'boolean');
 
-// Not present on Linux player version 9,0,115,0, is (?) on windows.
+// Not present on Linux player version 9,0,115,0, but is (?) on windows.
 check_equals(typeof(System.capabilities.hasIME), 'boolean');
+note("    System.capabilities.hasIME certainly fails on the pp on\n\
+    some platforms. There's no verification that it exists at all so far.");
 
 // Added in Player version 9.
 check_equals(typeof(System.capabilities.hasTLS), 'boolean');
 
 
 // System.exactSettings
+#if OUTPUT_VERSION > 5
 check_equals(typeof(System.exactSettings), 'boolean');
-value = System.exactSettings;
 System.exactSettings = true;
-check_equals(System.exactSettings, value);
+check_equals(System.exactSettings, true);
 System.exactSettings = false;
-check_equals(System.exactSettings, value);
+xcheck_equals(System.exactSettings, false);
+#else
+check_equals(typeof(System.exactSettings), 'undefined');
+#endif
 
 #if OUTPUT_VERSION >= 6
 check(this.hasOwnProperty("$version"));
@@ -125,8 +162,11 @@ xcheck_equals(System.useCodepage, true);
 check_equals(typeof(System.showSettings), 'function');
 
 xcheck_equals(typeof(System.Product), 'function');
+
+#if OUTPUT_VERSION > 5
 xcheck (System.Product.prototype.hasOwnProperty('launch'));
 xcheck (System.Product.prototype.hasOwnProperty('download'));
+#endif
 
 p = new System.Product("whatisthis");
 xcheck_equals(typeof(p), 'object');
@@ -137,11 +177,11 @@ xcheck_equals(typeof(p.download), 'function');
 xcheck_equals(typeof(p.launch), 'function');
 
 #if OUTPUT_VERSION > 6
- check_totals(56);
+ check_totals(83);
 #else
 # if OUTPUT_VERSION == 6
-   check_totals(55);
+   check_totals(82);
 # else
-   check_totals(53);
+   check_totals(49);
 # endif
 #endif
