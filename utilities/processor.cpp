@@ -144,25 +144,45 @@ std::string eventCallback(const std::string& event,
 							const std::string& arg)
 {
     log_debug(_("eventCallback: %s %s"), event, arg);
-    
-    StringNoCaseEqual ncasecomp;  
 
     static bool mouseShown = true;
 
     // These should return "true" if the mouse was visible before
     // the call.
-    if ( ncasecomp(event, "Mouse.hide") ) {
+    if ( event == "Mouse.hide" ) {
         bool state = mouseShown;
         mouseShown = false;
         return state ? "true" : "false";
     }
 
-    if ( ncasecomp(event, "Mouse.show") ) {
+    if ( event == "Mouse.show" ) {
         bool state = mouseShown;
         mouseShown = true;
         return state ? "true" : "false" ;
     }
     
+    // Some fake values for consistent test results.
+    
+    if ( event == "System.capabilities.screenResolutionX" ) {
+        return "800";
+    }
+
+    if ( event == "System.capabilities.screenResolutionY" ) {
+        return "640";
+    } 
+
+    if ( event == "System.capabilities.screenDPI" ) {
+        return "72";
+    }        
+
+    if ( event == "System.capabilities.screenColor" ) {
+        return "Color";
+    } 
+
+    if ( event == "System.capabilities.playerType" ) {
+        return "StandAlone";
+    } 
+
     return "";
 
 }
