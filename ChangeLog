@@ -1,4 +1,14 @@
+2008-04-14  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* libamf/amf.{h,cpp}: Use size_t instead of int.
+	* libamf/buffer.cpp: Drop bogus size test when copying buffers.
+	* testsuite/libamf.all/test_amf.cpp: Create test object that
+	matches packet captured one.
+
 2008-04-14 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+	
+	* gui/gtk.cpp: gdk_screen_get_resolution only available from
+	version 2.10 onwards (thanks buildbot!).
 
 	* testsuite/actionscript.all/System.as: test hasOwnProperty for
 	  SWF6+, be more selective about testing different versions.
@@ -32,7 +42,7 @@
 
 2008-04-13  Rob Savoye  <rob@ripple.welcomehome.org>
 
-	* libamf/amf.cpp: Boolsa re two bytes for AMF, so use a uint16-t,
+	* libamf/amf.cpp: Bools are two bytes for AMF, so use a uint16_t,
 	not a bool when copying data. If the name is set, then it's a
 	variable for encoding.
 `	* libamf/amf.h: Use Network::byte_t instead of char for constants.
@@ -40,7 +50,7 @@
 	it for an AMF object to do it.
 	* testsuite/libamf.all/test_el.cpp: Test the children too.
 	* testsuite/libamf.all/test_amf.cpp: Test the AMF class.
-	* testsuite/libamf.all
+	* testsuite/libamf.all/Makefile.am: Add test_amf.
 
 2008-04-13 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 

@@ -106,7 +106,7 @@ AMF::~AMF()
 ///
 /// Returns its first parameter, pointing to the (maybe-byte-swapped) data.
 void *
-swapBytes(void *word, int size)
+swapBytes(void *word, size_t size)
 {
     union {
 	boost::uint16_t s;
@@ -432,7 +432,7 @@ AMF::encodeNull()
 /// needs to be deleted[] after being used.
 ///
 Buffer *
-AMF::encodeXMLObject(Network::byte_t * /*data */, int /* size */)
+AMF::encodeXMLObject(Network::byte_t * /*data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
     log_unimpl("XML AMF objects not supported yet");
@@ -446,7 +446,7 @@ AMF::encodeXMLObject(Network::byte_t * /*data */, int /* size */)
 /// needs to be deleted[] after being used.
 ///
 Buffer *
-AMF::encodeTypedObject(Network::byte_t * /* data */, int /* size */)
+AMF::encodeTypedObject(Network::byte_t * /* data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
     log_unimpl("Typed AMF objects not supported yet");
@@ -460,7 +460,7 @@ AMF::encodeTypedObject(Network::byte_t * /* data */, int /* size */)
 /// needs to be deleted[] after being used.
 ///
 Buffer *
-AMF::encodeReference(Network::byte_t * /* data */, int /* size */)
+AMF::encodeReference(Network::byte_t * /* data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
     log_unimpl("Reference AMF objects not supported yet");
@@ -474,7 +474,7 @@ AMF::encodeReference(Network::byte_t * /* data */, int /* size */)
 /// needs to be deleted[] after being used.
 ///
 Buffer *
-AMF::encodeMovieClip(Network::byte_t * /*data */, int /* size */)
+AMF::encodeMovieClip(Network::byte_t * /*data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
     log_unimpl("Movie Clip AMF objects not supported yet");
@@ -488,7 +488,7 @@ AMF::encodeMovieClip(Network::byte_t * /*data */, int /* size */)
 /// needs to be deleted[] after being used.
 ///
 Buffer *
-AMF::encodeECMAArray(Network::byte_t * /*data */, int /* size */)
+AMF::encodeECMAArray(Network::byte_t * /*data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
     log_unimpl("ECMA Array AMF objects not supported yet");
@@ -502,7 +502,7 @@ AMF::encodeECMAArray(Network::byte_t * /*data */, int /* size */)
 /// needs to be deleted[] after being used.
 ///
 Buffer *
-AMF::encodeLongString(Network::byte_t * /* data */, int /* size */)
+AMF::encodeLongString(Network::byte_t * /* data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
     log_unimpl("Long String AMF objects not supported yet");
@@ -516,7 +516,7 @@ AMF::encodeLongString(Network::byte_t * /* data */, int /* size */)
 /// needs to be deleted[] after being used.
 ///
 Buffer *
-AMF::encodeRecordSet(Network::byte_t * /* data */, int /* size */)
+AMF::encodeRecordSet(Network::byte_t * /* data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
     log_unimpl("Reecord Set AMF objects not supported yet");
@@ -530,7 +530,7 @@ AMF::encodeRecordSet(Network::byte_t * /* data */, int /* size */)
 /// needs to be deleted[] after being used.
 ///
 Buffer *
-AMF::encodeStrictArray(Network::byte_t * /* data */, int /* size */)
+AMF::encodeStrictArray(Network::byte_t * /* data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
     log_unimpl("Strict Array AMF objects not supported yet");
@@ -546,20 +546,27 @@ AMF::encodeStrictArray(Network::byte_t * /* data */, int /* size */)
 Buffer *
 AMF::encodeString(const string &str)
 {
-//    GNASH_REPORT_FUNCTION;
+    Network::byte_t *ptr = const_cast<Network::byte_t *>(reinterpret_cast<const Network::byte_t *>(str.c_str()));
+    return encodeString(ptr, str.size());
+}
+
+Buffer *
+AMF::encodeString(Network::byte_t *data, size_t size)
+{
+    GNASH_REPORT_FUNCTION;
     boost::uint16_t length;
     
-    Buffer *buf = new Buffer(str.size() + AMF_HEADER_SIZE);
+    Buffer *buf = new Buffer(size + AMF_HEADER_SIZE);
     buf->append(Element::STRING);
     // when a string is stored in an element, we add a NULL terminator so
     // it can be printed by to_string() efficiently. The NULL terminator
     // doesn't get written when encoding a string as it has a byte count
     // instead.
-    length = str.size();
+    length = size;
 //    log_debug("Encoded data size is going to be %d", length);
     swapBytes(&length, 2);
     buf->append(length);
-    buf->append(str);
+    buf->append(data, size);
     
     return buf;
 }
@@ -613,14 +620,14 @@ AMF::encodeElement(Element *el)
     
     size_t outsize = el->getNameSize() + AMF_VAR_HEADER_SIZE;
     buf = new Buffer(outsize);
-    
+    buf->clear();		// FIXME: temporary, makes buffers cleaner in gdb.
     // If the name field is set, it's a "variable", followed by the data
     if (el->getName()) {
 	// Add the length of the string for the name of the variable
 	size_t length = el->getNameSize();
 	boost::uint16_t enclength = length;
 	swapBytes(&enclength, 2);
-	buf->copy(enclength);
+	buf->append(enclength);
 	// Now the name itself
 	string name = el->getName();
 	if (name.size() > 0) {
@@ -640,7 +647,7 @@ AMF::encodeElement(Element *el)
 	  tmp = encodeBoolean(el->to_bool());
           break;
       case Element::STRING:
-	  tmp = encodeString(el->to_string());
+	  tmp = encodeString(el->getData(), el->getLength()-1);
 	  break;
       case Element::OBJECT:
 	  tmp = el->encode();

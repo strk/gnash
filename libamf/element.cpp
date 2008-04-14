@@ -283,7 +283,7 @@ Element::getData()
     return 0;
 };
 
-boost::uint16_t
+size_t
 Element::getLength()
 {
 //    GNASH_REPORT_FUNCTION;
@@ -402,17 +402,18 @@ Element::encode()
     if (_type == Element::OBJECT) {
 	// FIXME: we probably want a better size, to avoid the other
 	// appends from having to resize and copy the data all the time.
-	buf = new Buffer(AMF_HEADER_SIZE);
-//	buf->clear();
+	buf = new Buffer(128);
+	buf->clear();		// FIXME: temporary, makes buffers cleaner in gdb.
 	buf->append(Element::OBJECT);
-	size_t length = getNameSize();
-	boost::uint16_t enclength = length;
-	swapBytes(&enclength, 2);
-	buf->append(enclength);
-	
-	string name = _name;
-	if (name.size() > 0) {
-	    buf->append(name);
+// 	string name = _name;
+	if (_name > 0) {
+// 	    Buffer *top = AMF::encodeElement(this);
+// 	    buf->append(top);
+	    buf->append(reinterpret_cast<Network::byte_t *>(_name), getNameSize());
+	    size_t length = getNameSize();
+	    boost::uint16_t enclength = length;
+	    swapBytes(&enclength, 2);
+	    buf->append(enclength);
 	}
 
 	for (size_t i=0; i<_children.size(); i++) {
@@ -628,6 +629,14 @@ Element::makeNull(const std::string &name)
         setName(name);
     }
     return makeNull();
+}
+
+Element &
+Element::makeObject()
+{
+//    GNASH_REPORT_FUNCTION;
+    _type = OBJECT;
+    return *this;
 }
 
 Element &

@@ -35,9 +35,9 @@
 #include "dejagnu.h"
 #include "as_object.h"
 #include "arg_parser.h"
+#include "amf.h"
 #include "buffer.h"
 #include "network.h"
-#include "amf.h"
 #include "element.h"
 
 using namespace amf;
@@ -229,41 +229,42 @@ void
 test_object()
 {
     Element top;
-    top.makeObject("app");
+    top.makeObject();
 
     Element *child1 = new Element;
-    child1->makeString("child one");
+    child1->makeString("app", "oflaDemo");
     top.addChild(child1);
     
     Element *child2 = new Element;
-    child2->makeString("child two");
+    child2->makeString("flashVer", "LNX 9,0,31,0");
     top.addChild(child2);
 
-    if (top.childrenSize() == 2) {
+    Element *child3 = new Element;
+    child3->makeString("swfUrl", "http://www.red5.nl/tools/publisher/publisher.swf");
+    top.addChild(child3);
+
+    if (top.childrenSize() == 3) {
         runtest.pass("Adding children");
     } else {
         runtest.fail("Adding children");
     }
 
     // Encode an object
-    string str = "application";
+//    string str = "appl";
     Buffer *encobj = top.encode();
     if (encobj == 0) {
         runtest.unresolved("Encoded Object");
         return;
     }
 
-    const char *x = "03 00 03 61 70 70 02 00 09 63 68 69 6c 64 20 6f 6e 65 02 00 09 63 68 69 6c 64 20 74 77 6f 09";
+    const char *x = "03 00 03 61 70 70 02 00 08 6f 66 6c 61 44 65 6d 6f 00 08 66 6c 61 73 68 56 65 72 02 00 0c 4c 4e 58 20 39 2c 30 2c 33 31 2c 30 00 06 73 77 66 55 72 6c 02 00 30 68 74 74 70 3a 2f 2f 77 77 77 2e 72 65 64 35 2e 6e 6c 2f 74 6f 6f 6c 73 2f 70 75 62 6c 69 73 68 65 72 2f 70 75 62 6c 69 73 68 65 72 2e 73 77 66 09";
     Buffer *buf1 = hex2mem(x);
-
-#if 0
-    if ((*(reinterpret_cast<Element::amf_type_e *>(encobj->reference())) == Element::OBJECT) &&
-        (memcmp(buf1->reference(), encobj->reference(), 31) == 0)) {
+    if ((*encobj->reference() == Element::OBJECT) &&
+        (memcmp(buf1->reference(), encobj->reference(), 102) == 0)) {
         runtest.pass("Encoded Object");
     } else {
         runtest.fail("Encoded Object");
     }
-#endif
     delete buf1;
 }
 

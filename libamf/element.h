@@ -103,6 +103,7 @@ public:
 
     Element &makeObjectEnd();
 
+    Element &makeObject();
     Element &makeObject(const std::string &name);
     Element &makeObject(gnash::Network::byte_t *data, size_t size);
     
@@ -149,7 +150,7 @@ public:
     Element *operator[](int x);
 
     gnash::Network::byte_t *getData();
-    boost::uint16_t getLength();
+    size_t getLength();
     Buffer *getBuffer() { return _buffer; };
     
     // These are all accessors for the various output formats

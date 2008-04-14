@@ -107,7 +107,7 @@ public:
 	FILETYPE_OSCP
     } filetype_e;
     AMF();
-    AMF(int size);
+    AMF(size_t size);
     ~AMF();
 //    size_t size() { return _total_size; };
 
@@ -123,6 +123,7 @@ public:
     /// @return a binary AMF packet in big endian format (header,data)
     ///
     static Buffer *encodeString(const std::string &str);
+    static Buffer *encodeString(gnash::Network::byte_t *data, size_t size);
 
     /// @return a binary AMF packet in big endian format (header,data)
     ///
@@ -156,43 +157,43 @@ public:
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static Buffer *encodeXMLObject(gnash::Network::byte_t *data, int size);
+    static Buffer *encodeXMLObject(gnash::Network::byte_t *data, size_t size);
 
     /// Encode a Typed Object
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static Buffer *encodeTypedObject(gnash::Network::byte_t *data, int size);
+    static Buffer *encodeTypedObject(gnash::Network::byte_t *data, size_t size);
 
     /// Encode a Reference to an object
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static Buffer *encodeReference(gnash::Network::byte_t *data, int size);
+    static Buffer *encodeReference(gnash::Network::byte_t *data, size_t size);
 
     /// Encode a Movie Clip
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static Buffer *encodeMovieClip(gnash::Network::byte_t *data, int size);
+    static Buffer *encodeMovieClip(gnash::Network::byte_t *data, size_t size);
 
     /// Encode an ECMA Array
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static Buffer *encodeECMAArray(gnash::Network::byte_t *data, int size);
+    static Buffer *encodeECMAArray(gnash::Network::byte_t *data, size_t size);
 
     /// Encode a long string
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static Buffer *encodeLongString(gnash::Network::byte_t *data, int size);
+    static Buffer *encodeLongString(gnash::Network::byte_t *data, size_t size);
 
     /// Encode a Record Set
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static Buffer *encodeRecordSet(gnash::Network::byte_t *data, int size);
+    static Buffer *encodeRecordSet(gnash::Network::byte_t *data, size_t size);
 
     /// Encode a Date
     ///
@@ -204,7 +205,7 @@ public:
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static Buffer *encodeStrictArray(gnash::Network::byte_t *data, int size);
+    static Buffer *encodeStrictArray(gnash::Network::byte_t *data, size_t size);
     
     /// Encode an object
     ///
@@ -266,7 +267,7 @@ private:
     size_t _totalsize;
 };
  
-DSOEXPORT void *swapBytes(void *word, int size);
+DSOEXPORT void *swapBytes(void *word, size_t size);
 
 
 } // end of amf namespace

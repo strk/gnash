@@ -232,29 +232,22 @@ Network::byte_t *
 Buffer::append(Buffer &buf)
 {
 //    GNASH_REPORT_FUNCTION;
-    if (buf.size() > _nbytes) {
-         resize(buf.size());
-    }
-    
-    if ((_seekptr + buf.size()) <= (_ptr + _nbytes)) {
-	std::copy(buf.begin(), buf.end(), _seekptr);
-	_seekptr += buf.size();
-    }
-    return _seekptr;
+    return append(&buf);
 }
 
 Network::byte_t *
 Buffer::append(Buffer *buf)
 {
 //    GNASH_REPORT_FUNCTION;
-    if (buf->size() >= _nbytes) {
-         resize(buf->size());
+    size_t diff = _seekptr - _ptr;
+    
+    if (buf->size() > (_nbytes - diff)) {
+         resize(buf->size() + diff);
     }
     
-    if ((_seekptr + buf->size()) <= (_ptr + _nbytes)) {
-	std::copy(buf->begin(), buf->end(), _seekptr);
-	_seekptr += buf->size();
-    }
+    std::copy(buf->begin(), buf->end(), _seekptr);
+    _seekptr += buf->size();
+
     return _seekptr;
 }
 
