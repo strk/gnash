@@ -441,8 +441,12 @@ GtkGui::getScreenResY()
 double
 GtkGui::getScreenDPI()
 {
+#if GTK_CHECK_VERSION(2,10,0)
     GdkScreen* screen = gdk_screen_get_default();
     return gdk_screen_get_resolution(screen);
+#else
+    return 0;
+#endif
 }
 
 // private

@@ -1,5 +1,17 @@
 2008-04-14 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+    * gui/gtk.cpp: gdk_screen_get_resolution only available from
+      version 2.10 onwards (thanks buildbot!).
+
+2008-04-14 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/asobj/System.cpp: correct formatting of serverString.
+	* gui/Player.cpp, gui/gui.h, gui/gtk{sup.h,.cpp}: get screen
+	  resolution in DPI (doesn't agree with the pp, but no idea
+	  which is correct).
+
+2008-04-14 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* utilities/processor.cpp: return some fake values for
 	  System.capabilities requests.
 

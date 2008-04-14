@@ -563,8 +563,6 @@ Player::interfaceEventCallback(const std::string& event, const std::string& arg)
     if (event == "System.capabilities.screenDPI")
     {
         std::ostringstream ss;
-        // Whether the pp actively limits the precision or simply
-        // gets a slightly different result isn't clear.
         ss << _gui->getScreenDPI();
         return ss.str();
     }
