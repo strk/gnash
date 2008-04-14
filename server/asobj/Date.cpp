@@ -77,6 +77,7 @@
 #include "builtin_function.h"
 #include "Object.h" // for getObjectInterface
 #include "ClockTime.h"
+#include "VM.h"
 
 #include <ctime>
 #include <cmath>
@@ -204,52 +205,130 @@ static void attachDateStaticInterface(as_object& o);
 static void
 attachDateInterface(as_object& o)
 {
-    o.init_member("getDate", new builtin_function(date_getdate));
-    o.init_member("getDay", new builtin_function(date_getday));
-    o.init_member("getFullYear", new builtin_function(date_getfullyear));
-    o.init_member("getHours", new builtin_function(date_gethours));
-    o.init_member("getMilliseconds", new builtin_function(date_getmilliseconds));
-    o.init_member("getMinutes", new builtin_function(date_getminutes));
-    o.init_member("getMonth", new builtin_function(date_getmonth));
-    o.init_member("getSeconds", new builtin_function(date_getseconds));
-    o.init_member("getTime", new builtin_function(date_gettime));
-    o.init_member("getTimezoneOffset", new builtin_function(date_gettimezoneoffset));
-    o.init_member("getUTCDate", new builtin_function(date_getutcdate));
-    o.init_member("getUTCDay", new builtin_function(date_getutcday));
-    o.init_member("getUTCFullYear", new builtin_function(date_getutcfullyear));
-    o.init_member("getUTCYear", new builtin_function(date_getutcyear));
-    o.init_member("getUTCHours", new builtin_function(date_getutchours));
-    o.init_member("getUTCMilliseconds", new builtin_function(date_getmilliseconds)); // same
-    o.init_member("getUTCMinutes", new builtin_function(date_getutcminutes));
-    o.init_member("getUTCMonth", new builtin_function(date_getutcmonth));
-    o.init_member("getUTCSeconds", new builtin_function(date_getseconds));
-    o.init_member("getYear", new builtin_function(date_getyear));
-    o.init_member("setDate", new builtin_function(date_setdate));
-    o.init_member("setFullYear", new builtin_function(date_setfullyear));
-    o.init_member("setHours", new builtin_function(date_sethours));
-    o.init_member("setMilliseconds", new builtin_function(date_setmilliseconds));
-    o.init_member("setMinutes", new builtin_function(date_setminutes));
-    o.init_member("setMonth", new builtin_function(date_setmonth));
-    o.init_member("setSeconds", new builtin_function(date_setseconds));
-    o.init_member("setTime", new builtin_function(date_settime));
-    o.init_member("setUTCDate", new builtin_function(date_setutcdate));
-    o.init_member("setUTCFullYear", new builtin_function(date_setutcfullyear));
-    o.init_member("setUTCHours", new builtin_function(date_setutchours));
-    o.init_member("setUTCMilliseconds", new builtin_function(date_setutcmilliseconds));
-    o.init_member("setUTCMinutes", new builtin_function(date_setutcminutes));
-    o.init_member("setUTCMonth", new builtin_function(date_setutcmonth));
-    o.init_member("setUTCSeconds", new builtin_function(date_setutcseconds));
-    o.init_member("setYear", new builtin_function(date_setyear));
-    o.init_member("toString", new builtin_function(date_tostring));
+    VM& vm = o.getVM();
+
+    vm.registerNative(date_getfullyear, 103, 0); 
+    o.init_member("getFullYear", vm.getNative(103, 0));
+
+    vm.registerNative(date_getyear, 103, 1);
+    o.init_member("getYear", vm.getNative(103, 1));
+
+    vm.registerNative(date_getmonth, 103, 2);    
+    o.init_member("getMonth", vm.getNative(103, 2));   
+
+    vm.registerNative(date_getdate, 103, 3);
+    o.init_member("getDate", vm.getNative(103, 3));
+
+    vm.registerNative(date_getday, 103, 4);
+    o.init_member("getDay", vm.getNative(103, 4));
+
+    vm.registerNative(date_gethours, 103, 5); 
+    o.init_member("getHours", vm.getNative(103, 5));
+
+    vm.registerNative(date_getminutes, 103, 6);
+    o.init_member("getMinutes", vm.getNative(103, 6));
+
+    vm.registerNative(date_getseconds, 103, 7);        
+    o.init_member("getSeconds", vm.getNative(103, 7));
+    
+    vm.registerNative(date_getmilliseconds, 103, 8);
+    o.init_member("getMilliseconds", vm.getNative(103, 8));
+
+    vm.registerNative(date_setfullyear, 103, 9);
+    o.init_member("setFullYear", vm.getNative(103, 9));
+
+    vm.registerNative(date_setmonth, 103, 10);
+    o.init_member("setMonth", vm.getNative(103, 10));
+
+    vm.registerNative(date_setdate, 103, 11);
+    o.init_member("setDate", vm.getNative(103, 11));
+
+    vm.registerNative(date_sethours, 103, 12);
+    o.init_member("setHours", vm.getNative(103, 12));
+
+    vm.registerNative(date_setminutes, 103, 13);
+    o.init_member("setMinutes", vm.getNative(103, 13));
+
+    vm.registerNative(date_setseconds, 103, 14);
+    o.init_member("setSeconds", vm.getNative(103, 14));
+
+    vm.registerNative(date_setmilliseconds, 103, 15);
+    o.init_member("setMilliseconds", vm.getNative(103, 15));
+
+    vm.registerNative(date_gettime, 103, 16);     
+    o.init_member("getTime", vm.getNative(103, 16));
+ 
+    vm.registerNative(date_settime, 103, 17);
+    o.init_member("setTime", vm.getNative(103, 17));
+    
+    vm.registerNative(date_gettimezoneoffset, 103, 18);  
+    o.init_member("getTimezoneOffset", vm.getNative(103, 18));
+
+    vm.registerNative(date_tostring, 103, 19);
+    o.init_member("toString", vm.getNative(103, 19));
+
+    vm.registerNative(date_setyear, 103, 20);
+    o.init_member("setYear", vm.getNative(103, 20));
+
+    vm.registerNative(date_getutcfullyear, 103, 128);
+    o.init_member("getUTCFullYear", vm.getNative(103, 128));
+
+    vm.registerNative(date_getutcyear, 103, 129);    
+    o.init_member("getUTCYear", vm.getNative(103, 129));
+ 
+    vm.registerNative(date_getutcmonth, 103, 130);
+    o.init_member("getUTCMonth", vm.getNative(103, 130));
+    
+    vm.registerNative(date_getutcdate, 103, 131);      
+    o.init_member("getUTCDate", vm.getNative(103, 131));
+
+    vm.registerNative(date_getutcday, 103, 132);
+    o.init_member("getUTCDay", vm.getNative(103, 132));
+
+    vm.registerNative(date_getutchours, 103, 133);
+    o.init_member("getUTCHours", vm.getNative(103, 133));
+
+    vm.registerNative(date_getutcminutes, 103, 134);
+    o.init_member("getUTCMinutes", vm.getNative(103, 134));
+
+    vm.registerNative(date_getseconds, 103, 135);
+    o.init_member("getUTCSeconds", vm.getNative(103, 135)); // same
+
+    vm.registerNative(date_getmilliseconds, 103, 136);
+    o.init_member("getUTCMilliseconds", vm.getNative(103, 136)); // same
+
+    vm.registerNative(date_setutcfullyear, 103, 137);
+    o.init_member("setUTCFullYear", vm.getNative(103, 137));
+
+    vm.registerNative(date_setutcmonth, 103, 138);
+    o.init_member("setUTCMonth", vm.getNative(103, 138));
+
+    vm.registerNative(date_setutcdate, 103, 139);
+    o.init_member("setUTCDate", vm.getNative(103, 139));
+
+    vm.registerNative(date_setutchours, 103, 140);
+    o.init_member("setUTCHours", vm.getNative(103, 140));
+
+    vm.registerNative(date_setutcminutes, 103, 141);
+    o.init_member("setUTCMinutes", vm.getNative(103, 141));
+
+    vm.registerNative(date_setutcseconds, 103, 142);
+    o.init_member("setUTCSeconds", vm.getNative(103, 142));
+
+    vm.registerNative(date_setutcmilliseconds, 103, 143);
+    o.init_member("setUTCMilliseconds", vm.getNative(103, 143));
+
     o.init_member("valueOf", new builtin_function(date_valueof));
+
 }   
 
 static void
 attachDateStaticInterface(as_object& o)
 {
-  // This should *only* be available when SWF version is > 6
-  // Are you sure? The online reference say it's in from v5 -martin
-  o.init_member("UTC", new builtin_function(date_utc));
+    VM& vm = o.getVM();
+    
+    vm.registerNative(date_utc, 103, 257);
+    o.init_member("UTC", vm.getNative(103, 257));
 }
 
 static as_object*

@@ -190,6 +190,27 @@ math_as_object::math_as_object()
 	init_member("SQRT1_2", 0.7071067811865475244);
 	init_member("SQRT2", 1.4142135623730950488);
 
+    // 200,0 abs
+    // 200,1 min
+    // 200,2 max
+    // 200,3 sin
+    // 200,4 cos
+    // 200,5 atan2
+    // 200,6 tan
+    // 200,7 exp
+    // 200,8 log
+    // 200,9 sqrt
+    // 200,10 round
+    // 200,11 random
+    // 200,12 floor
+    // 200,13 ceil
+    // 200,14 atan
+    // 200,15 asin
+    // 200,16 acos
+    // 200,17 pow
+    // 200,18 isNaN
+    // 200,19 isFinite
+
 	// math methods, 1-arg
 	init_member("abs", new builtin_function(math_fabs)); // ActionScript "abs" is math "fabs"
 	init_member("acos", new builtin_function(math_acos));

@@ -1,3 +1,7 @@
+2008-04-14 Benjamin Wolsey <bwy@benjaminwolsey.de>
+	
+	* server/asobj/Date.cpp: register date members as native.
+
 2008-04-14  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* libamf/amf.{h,cpp}: Use size_t instead of int.
@@ -7,9 +11,6 @@
 
 2008-04-14 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 	
-	* gui/gtk.cpp: gdk_screen_get_resolution only available from
-	version 2.10 onwards (thanks buildbot!).
-
 	* testsuite/actionscript.all/System.as: test hasOwnProperty for
 	  SWF6+, be more selective about testing different versions.
 	* server/asobj/System.cpp: exactSettings only available in SWF6
