@@ -1,6 +1,7 @@
 2008-04-14 Benjamin Wolsey <bwy@benjaminwolsey.de>
 	
 	* server/asobj/Date.cpp: register date members as native.
+	* server/asobj/Math.cpp: document ASnative functions.
 
 2008-04-14  Rob Savoye  <rob@ripple.welcomehome.org>
 
