@@ -21,7 +21,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: System.as,v 1.23 2008/04/13 18:27:42 bwy Exp $";
+rcsid="$Id: System.as,v 1.24 2008/04/14 08:36:19 bwy Exp $";
 #include "check.as"
 
 check_equals(typeof(System), 'object');
@@ -66,8 +66,8 @@ check_equals(typeof(System.capabilities.playerType), 'string');
 check_equals(typeof(System.capabilities.serverString), 'string');
 check_equals(typeof(System.capabilities.screenResolutionX), 'number');
 check_equals(typeof(System.capabilities.screenResolutionY), 'number');
-xcheck_equals(typeof(System.capabilities.screenDPI), 'number');
-xcheck_equals(typeof(System.capabilities.screenColor), 'string');
+check_equals(typeof(System.capabilities.screenDPI), 'number');
+check_equals(typeof(System.capabilities.screenColor), 'string');
 check_equals(typeof(System.capabilities.pixelAspectRatio), 'string');
 check_equals(typeof(System.capabilities.localFileReadDisable), 'boolean');
 check_equals(typeof(System.capabilities.language), 'string');
@@ -92,6 +92,15 @@ check_equals(typeof(System.capabilities.hasIME), 'boolean');
 // Added in Player version 9.
 check_equals(typeof(System.capabilities.hasTLS), 'boolean');
 
+
+// System.exactSettings
+check_equals(typeof(System.exactSettings), 'boolean');
+value = System.exactSettings;
+System.exactSettings = true;
+check_equals(System.exactSettings, value);
+System.exactSettings = false;
+check_equals(System.exactSettings, value);
+
 #if OUTPUT_VERSION >= 6
 check(this.hasOwnProperty("$version"));
 check(! MovieClip.prototype.hasOwnProperty("$version") );
@@ -102,11 +111,11 @@ check(! MovieClip.prototype.hasOwnProperty("$version") );
 //
 
 // Directs the player to use Latin1 instead of unicode.
-xcheck_equals(typeof(System.useCodepage), 'boolean');
+check_equals(typeof(System.useCodepage), 'boolean');
 System.useCodepage = false;
 check_equals(System.useCodepage, false);
 System.useCodepage = true;
-check_equals(System.useCodepage, true);
+xcheck_equals(System.useCodepage, true);
 
 // Pops up settings dialogue box with variable settings.
 // System.showSettings(0): camera / microphone access;
@@ -128,11 +137,11 @@ xcheck_equals(typeof(p.download), 'function');
 xcheck_equals(typeof(p.launch), 'function');
 
 #if OUTPUT_VERSION > 6
- check_totals(53);
+ check_totals(56);
 #else
 # if OUTPUT_VERSION == 6
-   check_totals(52);
+   check_totals(55);
 # else
-   check_totals(50);
+   check_totals(53);
 # endif
 #endif

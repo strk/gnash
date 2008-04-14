@@ -17,10 +17,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include <sstream>
 
 #include "movie_root.h" // interface callback
@@ -36,14 +32,15 @@
 
 namespace gnash {
 
-const std::string& systemLanguage();
+static const std::string& systemLanguage();
 
 static as_value system_security_allowdomain(const fn_call& fn);
 static as_value system_security_allowinsecuredomain(const fn_call& fn);
 static as_value system_security_loadpolicyfile(const fn_call& fn);
 static as_value system_setclipboard(const fn_call& fn);
 static as_value system_showsettings(const fn_call& fn);
-static as_value system_showsettings(const fn_call& fn);
+static as_value system_exactsettings(const fn_call& fn);
+static as_value system_usecodepage(const fn_call& fn);
 
 static as_object*
 getSystemSecurityInterface()
@@ -103,6 +100,10 @@ getSystemCapabilitiesInterface()
 
     // "StandAlone", "External", "PlugIn", "ActiveX" (get from GUI)
     std::string playerType;
+    
+    std::string screenColor;
+    
+    int screenDPI = 0;
 
     int screenResolutionX = 0;
     int screenResolutionY = 0;
@@ -116,9 +117,14 @@ getSystemCapabilitiesInterface()
         ss.clear();
         ss.str((*movie_root::interfaceHandle)("System.capabilities.screenResolutionY", ""));
         ss >> screenResolutionY;
+
+        ss.clear();
+        ss.str((*movie_root::interfaceHandle)("System.capabilities.screenDPI", ""));
+        ss >> screenDPI;
         
         pixelAspectRatio = (*movie_root::interfaceHandle)("System.capabilities.pixelAspectRatio", "");
         playerType = (*movie_root::interfaceHandle)("System.capabilities.playerType", "");
+        screenColor = (*movie_root::interfaceHandle)("System.capabilities.screenColor", "");
     }
 
     //
@@ -189,8 +195,8 @@ getSystemCapabilitiesInterface()
 			<< "&V="    << URL::encode(version)
 			<< "&M="    << URL::encode(manufacturer)
 			<< "&R="    << screenResolutionX << "x" << screenResolutionY
-			<< "&DP="	// screenDPI (int?
-			<< "&COL="	// screenColor (?)						
+			<< "&DP="	<< screenDPI
+			<< "&COL="	<< screenColor					
 			<< "&AR="   << pixelAspectRatio
 			<< "OS="    << URL::encode(os)
 			<< "&L="    << language			
@@ -217,6 +223,8 @@ getSystemCapabilitiesInterface()
 		proto->init_member("hasAudio", hasAudio, flags);
 		proto->init_member("screenResolutionX", screenResolutionX, flags);
 		proto->init_member("screenResolutionY", screenResolutionY, flags);
+		proto->init_member("screenColor", screenColor, flags);
+		proto->init_member("screenDPI", screenDPI, flags);
 		proto->init_member("pixelAspectRatio", pixelAspectRatio, flags);
 		proto->init_member("serverString", serverString.str(), flags);
 		proto->init_member("avHardwareDisable", avHardwareDisable, flags);
@@ -247,6 +255,14 @@ attachSystemInterface(as_object& proto)
 	proto.init_member("capabilities", getSystemCapabilitiesInterface());
 	proto.init_member("setClipboard", new builtin_function(system_setclipboard));
 	proto.init_member("showSettings", new builtin_function(system_showsettings));
+
+	as_c_function_ptr gettersetter;
+
+	gettersetter = &system_exactsettings;
+	proto.init_property("exactSettings", *gettersetter, *gettersetter);
+
+	gettersetter = &system_usecodepage;
+	proto.init_property("useCodepage", *gettersetter, *gettersetter);
 }
 
 static as_object*
@@ -267,29 +283,86 @@ system_as_object::system_as_object()
 {
 }
 
-as_value system_security_allowdomain(const fn_call& /*fn*/) {
+as_value
+system_security_allowdomain(const fn_call& /*fn*/)
+{
     log_unimpl (__PRETTY_FUNCTION__);
     return as_value();
 }
 
-as_value system_security_allowinsecuredomain(const fn_call& /*fn*/) {
+as_value
+system_security_allowinsecuredomain(const fn_call& /*fn*/)
+{
     log_unimpl (__PRETTY_FUNCTION__);
     return as_value();
 }
 
-as_value system_security_loadpolicyfile(const fn_call& /*fn*/) {
+as_value
+system_security_loadpolicyfile(const fn_call& /*fn*/)
+{
     log_unimpl (__PRETTY_FUNCTION__);
     return as_value();
 }
 
-as_value system_setclipboard(const fn_call& /*fn*/) {
+as_value
+system_setclipboard(const fn_call& /*fn*/)
+{
     log_unimpl (__PRETTY_FUNCTION__);
     return as_value();
 }
 
-as_value system_showsettings(const fn_call& /*fn*/) {
+as_value
+system_showsettings(const fn_call& /*fn*/)
+{
     log_unimpl (__PRETTY_FUNCTION__);
     return as_value();
+}
+
+// FIXME: should return true if shared object files
+// are stored under an exact domain name (www.gnashdev.org or
+// gnashdev.org); false if both are stored under gnashdev.org.
+// Can be set.
+as_value
+system_exactsettings(const fn_call& fn)
+{
+	static boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+
+    // Getter
+    if (fn.nargs == 0)
+    {
+        // Is always true until we implement it.
+        return as_value(true);   
+    }
+    
+    // Setter
+    else 
+    {
+        log_unimpl ("Setting System.exactSettings unimplemented");
+        return as_value();
+    }
+}
+
+// FIXME: if true, SWF6+ should treat characters as Latin
+// charset variants. If false (default), as UTF-8.
+// Can be set.
+as_value
+system_usecodepage(const fn_call& fn)
+{
+	static boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+
+    // Getter
+    if (fn.nargs == 0)
+    {
+        // Is always false until we implement it.
+        return as_value(false);   
+    }
+    
+    // Setter
+    else 
+    {
+        log_unimpl ("Setting System.useCodepage unimplemented");
+        return as_value();
+    }
 }
 
 void
@@ -302,7 +375,8 @@ system_class_init(as_object& global)
 	global.init_member("System", obj.get());
 }
 
-const std::string& systemLanguage()
+const std::string&
+systemLanguage()
 {
 	// Two-letter language code ('en', 'de') corresponding to ISO 639-1
 	// Chinese can be either zh-CN or zh-TW. English used to have a 

@@ -1,3 +1,11 @@
+2008-04-14 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/asobj/System.cpp: add useCodepage and exactSettings
+	  getter-setters. The getters return the notionally correct
+	  values; setters are unimplemented. Pass screenDPI and
+	  screenColor requests on to frontend.
+	* testsuite/actionscript.all/System.as: test new System properties.
+
 2008-04-13  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* libamf/amf.cpp: Boolsa re two bytes for AMF, so use a uint16-t,
