@@ -24,8 +24,8 @@
  * In a movie of 120x120 pixels, it places a movieclip containing a squared
  * button in the middle of the stage, and a text area on top.
  *
- * The movie has 3 frames, with the second adding a shape at a lower depth
- * and the third one at an higher depth respect to the button.
+ * The movie has 4 frames, with the second adding a shape at a lower depth,
+ * the third one at an higher depth, and fourth disabling the button.
  *
  * The following events print the event name in the text area
  * (called _root.textfield) and change the color of the button:
@@ -34,6 +34,23 @@
  * MouseOver : yellow button
  * MouseDown : green button
  * MouseUp   : yellow button (same as MouseOver, but the label on top changes)
+ *
+ * Tests are triggered by events, in particular:
+ * - Test for _target and _name referring to button's parent.
+ * - Test for bounds of buttons being the union of all active state
+ *   characters' bounds.
+ *
+ * Note that you need to play with your mouse on the button for the tests
+ * to be run, and that there's currently no END OF TEST condition.
+ * For gnash test automation, we use the ButtonEventsTest-Runner script
+ * that supposedly triggers all tests (still worth making the test
+ * more explicitly guided, also to provide an end-of-test flags for
+ * consistency checking).
+ *
+ * TODO:
+ *  - Turn the test into a guided interaction, like the DragDropTest.swf one..
+ *  - Add tests for invalidated bounds
+ *  - Add matrix transformation to some child to also test that.
  *
  ***********************************************************************/
 
@@ -86,23 +103,48 @@ add_button(SWFMovie mo)
 {
 	SWFDisplayItem it;
 	SWFMovieClip mc;
-	SWFShape sh1, sh2, sh3, sh4;
+	SWFButtonRecord br;
+	SWFShape sh1, sh2, sh3, sh4, sh1a, sh2a, sh3a, sh4a;
 	SWFButton bu = newSWFButton();
 	mc = newSWFMovieClip();
 
 	sh1 = make_fill_square(0, 0, 40, 40, 0, 0, 0, 0, 0, 0);
+	sh1a = make_fill_square(30, 30, 5, 5, 128, 128, 128, 128, 128, 128);
 	sh2 = make_fill_square(0, 0, 40, 40, 255, 0, 0, 255, 0, 0);
+	sh2a = make_fill_square(30, 30, 5, 5, 128, 0, 0, 128, 0, 0);
 	sh3 = make_fill_square(0, 0, 40, 40, 0, 255, 0, 0, 255, 0);
+	sh3a = make_fill_square(30, 30, 5, 5, 0, 128, 0, 0, 128, 0);
 	sh4 = make_fill_square(0, 0, 40, 40, 255, 255, 0, 255, 255, 0);
+	sh4a = make_fill_square(30, 30, 5, 5, 128, 128, 0, 128, 128, 0);
 
-	SWFButton_addShape(bu, (SWFCharacter)sh1, SWFBUTTON_HIT);
-	SWFButton_addShape(bu, (SWFCharacter)sh2, SWFBUTTON_UP );
-	SWFButton_addShape(bu, (SWFCharacter)sh3, SWFBUTTON_DOWN );
-	SWFButton_addShape(bu, (SWFCharacter)sh4, SWFBUTTON_OVER );
+	/* Higher depth character is intentionally added before lower depth one */
+	br = SWFButton_addCharacter(bu, (SWFCharacter)sh1a, SWFBUTTON_HIT);
+	SWFButtonRecord_setDepth(br, 2);
+	br = SWFButton_addCharacter(bu, (SWFCharacter)sh1, SWFBUTTON_HIT);
+	SWFButtonRecord_setDepth(br, 1);
+
+	/* Higher depth character is intentionally added before lower depth one */
+	br = SWFButton_addCharacter(bu, (SWFCharacter)sh2a, SWFBUTTON_UP );
+	SWFButtonRecord_setDepth(br, 2);
+	br = SWFButton_addCharacter(bu, (SWFCharacter)sh2, SWFBUTTON_UP );
+	SWFButtonRecord_setDepth(br, 1);
+
+	/* Higher depth character is intentionally added before lower depth one */
+	br = SWFButton_addCharacter(bu, (SWFCharacter)sh3a, SWFBUTTON_DOWN );
+	SWFButtonRecord_setDepth(br, 2);
+	br = SWFButton_addCharacter(bu, (SWFCharacter)sh3, SWFBUTTON_DOWN );
+	SWFButtonRecord_setDepth(br, 1);
+
+	/* Higher depth character is intentionally added before lower depth one */
+	br = SWFButton_addCharacter(bu, (SWFCharacter)sh4a, SWFBUTTON_OVER );
+	SWFButtonRecord_setDepth(br, 2);
+	br = SWFButton_addCharacter(bu, (SWFCharacter)sh4, SWFBUTTON_OVER );
+	SWFButtonRecord_setDepth(br, 1);
 
 	SWFButton_addAction(bu, compileSWFActionCode(
 		"_root.msg='MouseOut';"
 		"_root.note('SWFBUTTON_MOUSEOUT');"
+		"_root.check_equals(_root.printBounds(getBounds()), '-0.05,-0.05 40.05,40.05');"
 		// Target of button action is the button's parent sprite
 		"_root.check_equals(_target, '/square1');"
 		"setTarget('/');"
@@ -112,6 +154,7 @@ add_button(SWFMovie mo)
 	SWFButton_addAction(bu, compileSWFActionCode(
 		"_root.msg='MouseOver';"
 		"_root.note('SWFBUTTON_MOUSEOVER');"
+		"_root.check_equals(_root.printBounds(getBounds()), '-0.05,-0.05 40.05,40.05');"
 		// Target of button action is the button's parent sprite
 		"_root.check_equals(_target, '/square1');"
 		"setTarget('/');"
@@ -121,7 +164,8 @@ add_button(SWFMovie mo)
 	SWFButton_addAction(bu, compileSWFActionCode(
 		"_root.msg='MouseDown';"
 		"_root.note('SWFBUTTON_MOUSEDOWN');"
-		// Target (and name) of button action is the button's parent sprite
+		"_root.check_equals(_root.printBounds(getBounds()), '-0.05,-0.05 40.05,40.05');"
+		/* Target (and name) of button action is the button's parent sprite */
 		"_root.check_equals(_target, '/square1');"
 		"_root.check_equals(_name, 'square1');"
 		"setTarget('/');"
@@ -133,17 +177,19 @@ add_button(SWFMovie mo)
 	SWFButton_addAction(bu, compileSWFActionCode(
 		"_root.msg='MouseUp';"
 		"_root.note('SWFBUTTON_MOUSEUP');"
-		// Target of button action is the button's parent sprite
+		"_root.check_equals(_root.printBounds(getBounds()), '-0.05,-0.05 40.05,40.05');"
+		/* Target of button action is the button's parent sprite */
 		"_root.check_equals(_target, '/square1');"
 		"setTarget('/');"
 		"_root.check_equals(_target, '/');"
 		), SWFBUTTON_MOUSEUP);
 
+	/* SWFBUTTON_MOUSEUPOUTSIDE *should* be invoked !! */
 	SWFButton_addAction(bu, compileSWFActionCode(
 		"_root.msg='MouseUpOutside';"
 		"_root.note('SWFBUTTON_MOUSEUPOUTSIDE');"
-		"_root.check(!'SWFBUTTON_MOUSEUPOUTSIDE should never be invoked?');"
-		// Target of button action is the button's parent sprite
+		"_root.check_equals(_root.printBounds(getBounds()), '-0.05,-0.05 40.05,40.05');"
+		/* Target of button action is the button's parent sprite */
 		"_root.check_equals(_target, '/square1');"
 		"_root.check_equals(_name, 'square1');"
 		"setTarget('/');"
@@ -248,6 +294,12 @@ main(int argc, char **argv)
 	SWFDisplayItem_setName(it, "square1");
 	SWFDisplayItem_setDepth(it, 2);
 
+	add_actions(mo,
+		"function printBounds(b) {"
+		"   return ''+Math.round(b.xMin*100)/100+','+Math.round(b.yMin*100)/100+' '+Math.round(b.xMax*100)/100+','+Math.round(b.yMax*100)/100;"
+		"}"
+	);
+
 	//
 	// Mouse pointer events
 	//
@@ -333,7 +385,9 @@ main(int argc, char **argv)
 
 	/*****************************************************
 	 *
-	 * On second frame, add a shape at lower depth 
+	 * On second frame, add a shape at lower depth,
+	 * and check bounds of square1
+	 *
 	 *
 	 *****************************************************/
 
@@ -341,6 +395,8 @@ main(int argc, char **argv)
 		SWFShape sh = make_fill_square(0, 0, 120, 120, 0, 0, 0, 0, 255, 0);
 		SWFDisplayItem itsh = SWFMovie_add(mo, (SWFBlock)sh);
 		SWFDisplayItem_setDepth(itsh, 1);
+
+		check_equals(mo, "printBounds(square1.getBounds())", "'-0.05,-0.05 40.05,40.05'");
 
 		SWFMovie_nextFrame(mo); /* showFrame */
 	}
@@ -362,7 +418,7 @@ main(int argc, char **argv)
 
 	/*****************************************************
 	 *
-	 * On third frame, add a shape at higher depth 
+	 * On fourth frame, disable the button
 	 *
 	 *****************************************************/
 

@@ -37,9 +37,13 @@ void
 test_mouse_activity(MovieTester& tester, const character* text, const character* text2, bool covered, bool enabled)
 {
 	rgba red(255,0,0,255);
+	rgba dark_red(128,0,0,255);
 	rgba covered_red(127,126,0,255); // red, covered by 50% black
+	rgba covered_dark_red(64,120,0,255); // dark red, covered by 50% black
 	rgba yellow(255,255,0,255);
+	rgba dark_yellow(128,128,0,255);
 	rgba covered_yellow(128,255,0,255); // yellow, covered by 50% black
+	rgba covered_dark_yellow(64,184,0,255); // dark yellow, covered by 50% black
 	rgba green(0,255,0,255);
 
 	// roll over the middle of the square, this should change
@@ -49,16 +53,38 @@ test_mouse_activity(MovieTester& tester, const character* text, const character*
 		check_equals(string(text->get_text_value()), string("MouseOver"));
 		check_equals(string(text2->get_text_value()), string("RollOver"));
 		check(tester.isMouseOverMouseEntity());
-		// check that pixel @ 60,60 is yellow !
-		if ( covered ) { check_pixel(60, 60, 2, covered_yellow, 2);  }
-		else { check_pixel(60, 60, 2, yellow, 2);  }
+		if ( covered )
+		{
+			// check that pixel @ 60,60 is yellow (covered)
+			check_pixel(60, 60, 2, covered_yellow, 2); 
+			// check that pixel @ 72,64 is dark_yellow (covered)
+			check_pixel(72, 64, 2, covered_dark_yellow, 2); 
+		}
+		else
+		{
+			// check that pixel @ 60,60 is yellow 
+			check_pixel(60, 60, 2, yellow, 2); 
+			// check that pixel @ 72,64 is dark_yellow 
+			check_pixel(72, 64, 2, dark_yellow, 2); 
+		}
 	} else {
 		check_equals(string(text->get_text_value()), string("MouseOut"));
 		check_equals(string(text2->get_text_value()), string("RollOut"));
 		check(!tester.isMouseOverMouseEntity());
-		// check that pixel @ 60,60 is red !
-		if ( covered ) { check_pixel(60, 60, 2, covered_red, 2);  }
-		else { check_pixel(60, 60, 2, red, 2);  }
+		if ( covered )
+		{
+			// check that pixel @ 60,60 is red  (covered)
+			check_pixel(60, 60, 2, covered_red, 2); 
+			// check that pixel @ 72,64 is dark_red  (covered)
+			check_pixel(72, 64, 2, covered_dark_red, 2); 
+		}
+		else
+		{
+			// check that pixel @ 60,60 is red 
+			check_pixel(60, 60, 2, red, 2); 
+			// check that pixel @ 72,64 is dark_red 
+			check_pixel(72, 64, 2, dark_red, 2); 
+		}
 	}
 
 	// press the mouse button, this should change

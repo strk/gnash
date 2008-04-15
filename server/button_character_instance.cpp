@@ -347,7 +347,7 @@ button_character_instance::on_event(const event_id& id)
 void
 button_character_instance::restart()
 {
-  set_invalidated();
+	set_invalidated();
 	m_last_mouse_flags = IDLE;
 	m_mouse_flags = IDLE;
 	m_mouse_state = UP;
@@ -667,7 +667,12 @@ void
 button_character_instance::add_invalidated_bounds(InvalidatedRanges& ranges, 
 	bool force)
 {
-  if (!m_visible) return; // not visible anyway
+	if (!m_visible)
+	{
+		//log_debug("button %s not visible on add_invalidated_bounds", getTarget());
+		return; // not visible anyway
+	}
+	//log_debug("button %s add_invalidated_bounds called", getTarget());
 
 	ranges.add(m_old_invalidated_ranges);  
 
@@ -698,24 +703,35 @@ button_character_instance::add_invalidated_bounds(InvalidatedRanges& ranges,
 geometry::Range2d<float>
 button_character_instance::getBounds() const
 {
+	typedef geometry::Range2d<float> Range;
+	Range allBounds(geometry::nullRange);
+
 	for (size_t i = 0; i < m_def->m_button_records.size(); i++)
 	{
 		button_record&	rec = m_def->m_button_records[i];
 		assert(m_record_character.size() > i);
-		if (m_record_character[i] == NULL)
-		{
-			continue;
-		}
+		character* ch = m_record_character[i].get();
+
+		if (!ch) continue;
+
 		if ((m_mouse_state == UP && rec.m_up)
 		    || (m_mouse_state == DOWN && rec.m_down)
 		    || (m_mouse_state == OVER && rec.m_over))
 		{
+
 			// TODO: should we consider having multiple characters
 			//       for a single state ?
-			return m_record_character[i]->getBounds();
+			Range lclBounds = ch->getBounds();
+
+			// TODO: we transform the child bounds here, right ?
+			matrix m = ch->get_matrix();
+			m.transform(lclBounds);
+
+			allBounds.expandTo(lclBounds);
 		}
 	}
-	return geometry::Range2d<float>(geometry::nullRange);
+
+	return allBounds;
 }
 
 bool
@@ -800,16 +816,18 @@ button_character_instance::stagePlacementCallback()
 		ch->set_cxform(cx);
 		ch->set_depth(ch_depth);
 		assert(ch->get_parent() == this);
+		assert(ch->get_name().empty()); // no way to specify a name for button chars anyway...
 
-		if (ch->get_name().empty() && ch->wantsInstanceName()) 
+		if ( ch->wantsInstanceName() )
 		{
-			std::string instance_name = getNextUnnamedInstanceName();
-			ch->set_name(instance_name.c_str());
+			//std::string instance_name = getNextUnnamedInstanceName();
+			ch->set_name(getNextUnnamedInstanceName());
 		}
 
 		m_record_character[r] = ch;
 
 		ch->stagePlacementCallback(); // give this character life (TODO: they aren't on stage, are them ?)
+		//log_debug("Character %d of Button %s, with target %s got a life", r, getTarget(), ch->getTarget());
 	}
 
 	// there's no INITIALIZE/CONSTRUCT/LOAD/ENTERFRAME/UNLOAD events for buttons

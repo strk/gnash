@@ -1,5 +1,17 @@
 2008-04-15 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/ButtonEventsTest-Runner.cpp: 
+	  Check rendering of the additional state character.
+	* testsuite/misc-ming.all/ButtonEventsTest.c: add a second
+	  smaller character for each state making sure it's listed 
+	  before the wider but is at higher depth. This is very focused
+	  on testing the just-fixed bug in button's getBOunds.
+	* server/button_character_instance.cpp (getBounds): consider
+	  bounds of all active child characters, not just the first
+	  found, and appropriately transform them with their matrix.
+
+2008-04-15 Sandro Santilli <strk@keybit.net>
+
 	* server/button_character_instance.cpp: revert use of
 	  m_child_invalidated in add_invalidated_bounds as per
 	  Udo's request.
