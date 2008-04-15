@@ -17,10 +17,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "Mouse.h"
 #include "as_object.h" // for inheritance
 #include "log.h"
@@ -34,64 +30,33 @@
 
 namespace gnash {
 
-as_value mouse_hide(const fn_call& fn);
-as_value mouse_show(const fn_call& fn);
-as_value mouse_ctor(const fn_call& fn);
+// Forward declarations
+static as_value mouse_hide(const fn_call& fn);
+static as_value mouse_show(const fn_call& fn);
+static void attachMouseInterface(as_object& o);
 
 static void
 attachMouseInterface(as_object& o)
 {
 	VM& vm = o.getVM();
 
-	// TODO: Mouse is an object, not a constructor ! Attach these interface to
-	//       the singleton Mouse object then !
 	vm.registerNative(mouse_show, 5, 0);
 	o.init_member("show", vm.getNative(5, 0));
 
 	vm.registerNative(mouse_hide, 5, 1);
 	o.init_member("hide", vm.getNative(5, 1));
+	
+	if (vm.getSWFVersion() > 5)
+	{
+		AsBroadcaster::initialize(o);
+	}
 }
 
-static as_object*
-getMouseInterface()
+
+as_value
+mouse_hide(const fn_call& fn)
 {
-	static boost::intrusive_ptr<as_object> o;
-	if ( ! o )
-	{
-		o = new as_object(getObjectInterface());
-		attachMouseInterface(*o);
-	}
-	return o.get();
-}
-
-class mouse_as_object: public as_object
-{
-
-public:
-
-	mouse_as_object()
-		:
-		as_object(getMouseInterface())
-	{
-		int swfversion = _vm.getSWFVersion();
-		if ( swfversion > 5 )
-		{
-			AsBroadcaster::initialize(*this);
-		}
-	}
-
-	// override from as_object ?
-	//std::string get_text_value() const { return "Mouse"; }
-
-	// override from as_object ?
-	//double get_numeric_value() const { return 0; }
-
-};
-
-as_value mouse_hide(const fn_call& fn)
-{
-
-    boost::intrusive_ptr<mouse_as_object> obj=ensureType<mouse_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
     UNUSED(obj);
 
     int success = 0;
@@ -109,9 +74,11 @@ as_value mouse_hide(const fn_call& fn)
     return as_value(success);
 }
 
-as_value mouse_show(const fn_call& fn)
+
+as_value
+mouse_show(const fn_call& fn)
 {
-    boost::intrusive_ptr<mouse_as_object> obj=ensureType<mouse_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> obj=ensureType<as_object>(fn.this_ptr);
     UNUSED(obj);
 
     int success = 0;
@@ -129,27 +96,14 @@ as_value mouse_show(const fn_call& fn)
     return as_value(success);
 }
 
-as_value
-mouse_ctor(const fn_call& /* fn */)
-{
-	boost::intrusive_ptr<as_object> obj = new mouse_as_object;
-	
-	return as_value(obj.get()); // will keep alive
-}
 
 // extern (used by Global.cpp)
-void mouse_class_init(as_object& global)
+void
+mouse_class_init(as_object& global)
 {
 	// This is going to be the global Mouse "class"/"function"
-	static boost::intrusive_ptr<as_object> obj;
-
-	if ( ! obj )
-	{
-		obj = new mouse_as_object();
-		// we shouldn't keep the Mouse object
-		// alive, I think.
-		//VM::get().addStatic(obj.get());
-	}
+	static boost::intrusive_ptr<as_object> obj = new as_object(getObjectInterface());
+	attachMouseInterface(*obj);
 
 	// Register _global.Mouse
 	global.init_member("Mouse", obj.get());

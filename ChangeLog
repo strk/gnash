@@ -1,3 +1,11 @@
+2008-04-15 Benjamin Wolsey <bwy@benjaminwolsey.de>
+	
+	* testsuite/actionscript.all/Mouse.as: tests for mouse prototype
+	  (one fail before this commit).
+	* server/asobj/Mouse.cpp: Mouse is not an instantiatable class.
+	  Drop unused mouse_ctor, drop class constructor. Attach interface
+	  to singleton Mouse object. The new test passes.
+
 2008-04-15 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* gui/gtk.cpp: refresh view when leaving "show updated regions" mode

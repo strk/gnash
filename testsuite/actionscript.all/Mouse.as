@@ -21,7 +21,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Mouse.as,v 1.17 2008/03/11 19:31:47 strk Exp $";
+rcsid="$Id: Mouse.as,v 1.18 2008/04/15 10:06:45 bwy Exp $";
 #include "check.as"
 
 check_equals ( typeof(Mouse), 'object' );
@@ -30,9 +30,12 @@ check_equals ( typeof(Mouse), 'object' );
 var mouseObj = new Mouse;
 check_equals(mouseObj, undefined);
 
+check_equals (typeof(Mouse.__proto__), 'object');
+check_equals (Mouse.__proto__, Object.prototype);
+
 // test the Mouse::hide method
 check_equals ( typeof(Mouse.hide), 'function' );
-
+check_equals ( typeof(Mouse.show), 'function' );
 #if OUTPUT_VERSION > 5
 
  // Mouse was implicitly initialized by ASBroadcaster.initialize !
@@ -49,4 +52,8 @@ check_equals ( typeof(Mouse.hide), 'function' );
 
 // test the Mouse::show method
 check_equals ( typeof(Mouse.show), 'function' );
-totals();
+#if OUTPUT_VERSION > 5
+check_totals(13);
+#else
+check_totals(7);
+#endif
