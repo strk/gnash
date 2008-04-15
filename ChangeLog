@@ -1,3 +1,8 @@
+2008-04-15 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* server/button_character_instance.cpp: call set_invalidated() *before*
+	  changing anything (does not really change anything, but who knows...)
+	  
 2008-04-15 Sandro Santilli <strk@keybit.net>
 
 	* configure.ac, testsuite/misc-ming.all/Makefile.am:
@@ -24,7 +29,7 @@
 2008-04-15 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* gui/gtk.cpp: refresh view when leaving "show updated regions" mode
-
+	  
 2008-04-15 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/ButtonEventsTest-Runner.cpp: 

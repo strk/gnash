@@ -662,8 +662,8 @@ button_character_instance::set_current_state(e_mouse_state new_state)
 		if (!found)
 		{
 			// character (re-)appeared on stage -> restart!
+			set_invalidated();  // note that restart() below will trigger set_invalidated() too
 			newch->restart();
-			set_invalidated();
 		} 
 	}
 
