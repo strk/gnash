@@ -1,3 +1,7 @@
+2008-04-15 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* gui/gtk.cpp: refresh view when leaving "show updated regions" mode
+
 2008-04-15 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/ButtonEventsTest-Runner.cpp: 

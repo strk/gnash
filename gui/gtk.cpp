@@ -1683,6 +1683,10 @@ GtkGui::menuitem_show_updated_regions_callback(GtkMenuItem* /*menuitem*/,
 {
     Gui* gui = static_cast<Gui*>(data);
     gui->showUpdatedRegions(! (gui->showUpdatedRegions()) );
+    
+    // refresh to clear the remaining red lines...
+    if ( ! (gui->showUpdatedRegions()))
+      gui->refreshView();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
