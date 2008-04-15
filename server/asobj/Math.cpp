@@ -49,25 +49,25 @@ namespace gnash {
 
 // Forward declarations
 static void attachMathInterface(as_object& proto);
+static as_value math_fabs(const fn_call& fn);	// Implements AS "abs"
+static as_value math_acos(const fn_call& fn);
+static as_value math_asin(const fn_call& fn);
+static as_value math_atan(const fn_call& fn);
+static as_value math_atan2(const fn_call& fn);
+static as_value math_ceil(const fn_call& fn);
+static as_value math_cos(const fn_call& fn);
+static as_value math_exp(const fn_call& fn);
+static as_value math_floor(const fn_call& fn);
+static as_value math_log(const fn_call& fn);
+static as_value math_max(const fn_call& fn);
+static as_value math_min(const fn_call& fn);
+static as_value math_pow(const fn_call& fn);
+static as_value math_random(const fn_call& fn);
+static as_value math_round(const fn_call& fn);
+static as_value math_sin(const fn_call& fn);
+static as_value math_sqrt(const fn_call& fn);
+static as_value math_tan(const fn_call& fn);
 
-as_value math_fabs(const fn_call& fn);	// Implements AS "abs"
-as_value math_acos(const fn_call& fn);
-as_value math_asin(const fn_call& fn);
-as_value math_atan(const fn_call& fn);
-as_value math_atan2(const fn_call& fn);
-as_value math_ceil(const fn_call& fn);
-as_value math_cos(const fn_call& fn);
-as_value math_exp(const fn_call& fn);
-as_value math_floor(const fn_call& fn);
-as_value math_log(const fn_call& fn);
-as_value math_max(const fn_call& fn);
-as_value math_min(const fn_call& fn);
-as_value math_pow(const fn_call& fn);
-as_value math_random(const fn_call& fn);
-as_value math_round(const fn_call& fn);
-as_value math_sin(const fn_call& fn);
-as_value math_sqrt(const fn_call& fn);
-as_value math_tan(const fn_call& fn);
 
 void
 math_class_init(as_object& global)
@@ -147,6 +147,7 @@ MATH_WRAP_FUNC2_EXP(max, (arg0 > arg1 ? arg0 : arg1))
 MATH_WRAP_FUNC2_EXP(min, (arg0 < arg1 ? arg0 : arg1))
 MATH_WRAP_FUNC2_EXP(pow, (pow(arg0, arg1)))
 
+
 // A couple of oddballs.
 as_value
 math_random(const fn_call& /* fn */)
@@ -161,6 +162,7 @@ math_random(const fn_call& /* fn */)
 	return as_value(uni());
 
 }
+
 
 as_value
 math_round(const fn_call& fn)
@@ -177,8 +179,7 @@ math_round(const fn_call& fn)
 }
 
 
-
-static void
+void
 attachMathInterface(as_object& proto)
 {
 
