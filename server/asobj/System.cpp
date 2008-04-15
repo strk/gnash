@@ -209,9 +209,9 @@ getSystemCapabilitiesInterface()
 	static boost::intrusive_ptr<as_object> proto;
 	if ( proto == NULL )
 	{
-		int flags  = as_prop_flags::dontDelete;
-		    flags |= as_prop_flags::dontEnum;
-		    flags |= as_prop_flags::readOnly;
+		const int flags = as_prop_flags::dontDelete
+		                | as_prop_flags::dontEnum
+		                | as_prop_flags::readOnly;
 
 		proto = new as_object(getObjectInterface());
 
@@ -270,23 +270,6 @@ attachSystemInterface(as_object& proto)
 	proto.init_property("useCodepage", *gettersetter, *gettersetter);
 }
 
-static as_object*
-getSystemInterface()
-{
-	static boost::intrusive_ptr<as_object> proto;
-	if ( proto == NULL )
-	{
-		proto = new as_object(getObjectInterface());
-		attachSystemInterface(*proto);
-	}
-	return proto.get();
-}
-
-system_as_object::system_as_object()
-	:
-	as_object(getSystemInterface()) // pass System inheritence
-{
-}
 
 as_value
 system_security_allowdomain(const fn_call& /*fn*/)
@@ -295,12 +278,14 @@ system_security_allowdomain(const fn_call& /*fn*/)
     return as_value();
 }
 
+
 as_value
 system_security_allowinsecuredomain(const fn_call& /*fn*/)
 {
     log_unimpl (__PRETTY_FUNCTION__);
     return as_value();
 }
+
 
 as_value
 system_security_loadpolicyfile(const fn_call& /*fn*/)
@@ -309,6 +294,7 @@ system_security_loadpolicyfile(const fn_call& /*fn*/)
     return as_value();
 }
 
+
 as_value
 system_setclipboard(const fn_call& /*fn*/)
 {
@@ -316,12 +302,14 @@ system_setclipboard(const fn_call& /*fn*/)
     return as_value();
 }
 
+
 as_value
 system_showsettings(const fn_call& /*fn*/)
 {
     log_unimpl (__PRETTY_FUNCTION__);
     return as_value();
 }
+
 
 // FIXME: should return true if shared object files
 // are stored under an exact domain name (www.gnashdev.org or
@@ -347,6 +335,7 @@ system_exactsettings(const fn_call& fn)
     }
 }
 
+
 // FIXME: if true, SWF6+ should treat characters as Latin
 // charset variants. If false (default), as UTF-8.
 // Can be set.
@@ -370,6 +359,7 @@ system_usecodepage(const fn_call& fn)
     }
 }
 
+
 void
 system_class_init(as_object& global)
 {
@@ -379,6 +369,7 @@ system_class_init(as_object& global)
 	attachSystemInterface(*obj);
 	global.init_member("System", obj.get());
 }
+
 
 const std::string&
 systemLanguage()

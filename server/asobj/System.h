@@ -22,12 +22,8 @@
 #include "fn_call.h"
 
 namespace gnash {
-  
-class system_as_object : public as_object
-{
-public:
-	system_as_object();
-};
+
+// System isn't a proper class, so doesn't need a constructor.
 
 void system_class_init(as_object& global);
 
