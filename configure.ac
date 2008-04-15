@@ -2036,6 +2036,7 @@ cygnal/testsuite/cygnal.all/Makefile
 ###
 
 echo ""
+echo "" >cerr
 echo "Configurable options are:"
 
 if test x"$i810lodbias" = x"yes"; then
@@ -2164,10 +2165,10 @@ if test x$xml != xno; then
     echo "        XML flags are: $LIBXML_CFLAGS"
     echo "        XML libs are: $LIBXML_LIBS"
   else
-    echo "        ERROR: No libxml2 development package installed!"
-    echo "               To compile this project install"
-    echo "               or .deb users: apt-get install libxml2-dev"
-    echo "               or .rpm users: yum install libxml2-devel"
+    echo "        ERROR: No libxml2 development package installed!" >>cerr
+    echo "               To compile this project install" >>cerr
+    echo "               or .deb users: apt-get install libxml2-dev" >>cerr
+    echo "               or .rpm users: yum install libxml2-devel" >>cerr
     nogo=true
   fi
 fi
@@ -2177,16 +2178,16 @@ if test x$build_kde = xyes -o x$kparts = xyes; then
     echo "        KDE flags are: $KDE_CFLAGS"
     echo "        KDE libs are: $KDE_LIBS"
   else
-      echo "        ERROR: No KDE development package installed!"
-      echo "               To disable the KDE gui,"
-      echo "               reconfigure using --enable-gui=<list-of-guis>"
-      echo "               and omit "kde" from the list."
-      echo "               When the option --enable-gui=... is omitted,"
-      echo "               the default is the same of --enable-gui=kde,gtk"
-      echo "               To be able to build the kde gui,"
-      echo "               install the KDE development environment from http://kde.org"
-      echo "               or .deb users: apt-get install kdelibs-dev"
-      echo "               or .rpm users: yum install <something-else>."
+      echo "        ERROR: No KDE development package installed!" >>cerr
+      echo "               To disable the KDE gui," >>cerr
+      echo "               reconfigure using --enable-gui=<list-of-guis>" >>cerr
+      echo "               and omit "kde" from the list." >>cerr
+      echo "               When the option --enable-gui=... is omitted," >>cerr
+      echo "               the default is the same of --enable-gui=kde,gtk" >>cerr
+      echo "               To be able to build the kde gui," >>cerr
+      echo "               install the KDE development environment from http://kde.org" >>cerr
+      echo "               or .deb users: apt-get install kdelibs-dev" >>cerr
+      echo "               or .rpm users: yum install <something-else>." >>cerr
       nogo=true
   fi
   if test x"$has_qt" = xyes; then
@@ -2200,14 +2201,14 @@ if test x$build_kde = xyes -o x$kparts = xyes; then
 	:
       else
 	# This should never happen unless they have a very odd version of KDE
-        echo "        ERROR: No QT development package installed!"
-        echo "               Install a QT development environment from http://trolltech.com"
-        echo "               or .deb users: apt-get install libqt3-mt-dev"
+        echo "        ERROR: No QT development package installed!" >>cerr
+        echo "               Install a QT development environment from http://trolltech.com" >>cerr
+        echo "               or .deb users: apt-get install libqt3-mt-dev" >>cerr
 	if test x$kparts = xyes; then
-          echo "               or reconfigure with --disable-kparts"
+          echo "               or reconfigure with --disable-kparts" >>cerr
 	fi
 	if test x$build_kde = xyes; then
-          echo "               or change to a different gui with --enable-gui=..."
+          echo "               or change to a different gui with --enable-gui=..." >>cerr
 	fi
       fi
       nogo=true
@@ -2224,9 +2225,9 @@ if test x"$build_qtopia" = xyes; then
     fi
     echo "        QTOPIA libs are: $QTOPIA_LIBS"
   else
-    echo "        ERROR: No QTOPIA library development package installed!"
-    echo "               Install it from http://trolltech.com/downloads/"
-    echo "               binary packages are not available."
+    echo "        ERROR: No QTOPIA library development package installed!" >>cerr
+    echo "               Install it from http://trolltech.com/downloads/" >>cerr
+    echo "               binary packages are not available." >>cerr
     nogo=true
   fi
 fi
@@ -2239,10 +2240,10 @@ if test x"${JPEG_LIBS}" != x ; then
   fi
   echo "        JPEG libs are: $JPEG_LIBS"
 else
-  echo "        ERROR: No JPEG library development package installed!"
-  echo "               Install it from http://ijg.org"
-  echo "               or .deb users: apt-get install libjpeg-dev"
-  echo "               or .rpm users: yum install libjpeg-devel"
+  echo "        ERROR: No JPEG library development package installed!" >>cerr
+  echo "               Install it from http://ijg.org" >>cerr
+  echo "               or .deb users: apt-get install libjpeg-dev" >>cerr
+  echo "               or .rpm users: yum install libjpeg-devel" >>cerr
   nogo=true
 fi
 
@@ -2269,7 +2270,7 @@ dnl     echo "        Ogg flags are: default include path"
 dnl   fi
 dnl   echo "        Ogg libs are: $OGG_LIBS"
 dnl else
-dnl   echo "        ERROR: No Ogg Vorbis development package installed!"
+dnl   echo "        ERROR: No Ogg Vorbis development package installed!" >>cerr
 dnl   nogo=true
 dnl fi
 
@@ -2281,7 +2282,7 @@ dnl     echo "        VORBIS flags are: default include path"
 dnl   fi
 dnl   echo "        VORBIS libs are: $VORBIS_LIBS"
 dnl else
-dnl   echo "        ERROR: No VORBIS Vorbis development package installed!"
+dnl   echo "        ERROR: No VORBIS Vorbis development package installed!" >>cerr
 dnl   nogo=true
 dnl fi
 
@@ -2294,11 +2295,11 @@ if test x"$opengl" = x"yes"; then
     fi
     echo "        OpenGL libs are: $OPENGL_LIBS"
     else
-      echo "        ERROR: No OpenGL development package installed!"
-      echo "               You need to install the libmesa development package"
-      echo "               or .deb users: apt-get install libgl1-mesa-dev"
-      echo "               or .rpm users: yum install xorg-x11-Mesa-libGL"
-      echo "               or use a different renderer with --enable-renderer="
+      echo "        ERROR: No OpenGL development package installed!" >>cerr
+      echo "               You need to install the libmesa development package" >>cerr
+      echo "               or .deb users: apt-get install libgl1-mesa-dev" >>cerr
+      echo "               or .rpm users: yum install xorg-x11-Mesa-libGL" >>cerr
+      echo "               or use a different renderer with --enable-renderer=" >>cerr
     nogo=true
   fi
 fi
@@ -2315,12 +2316,12 @@ if test x$build_gtk = xyes -a x$build_ogl = xyes ; then
   else
     if test x$build_gtk = xyes; then
       if test x$build_ogl = xyes; then
-        echo "        ERROR: No GtkGLExt development package installed!"
-	echo "               It is needed to build the GTK/OpenGL GUI/renderer combination."
-	echo "               Either install it from http://gtkglext.sourceforge.net"
-        echo "               or .deb users: apt-get install libgtkglext1-dev"
-        echo "               or .rpm users: yum install gtkglext-devel"
-        echo "               or --enable-gui=sdl or --enable-renderer=agg"
+        echo "        ERROR: No GtkGLExt development package installed!" >>cerr
+	echo "               It is needed to build the GTK/OpenGL GUI/renderer combination." >>cerr
+	echo "               Either install it from http://gtkglext.sourceforge.net" >>cerr
+        echo "               or .deb users: apt-get install libgtkglext1-dev" >>cerr
+        echo "               or .rpm users: yum install gtkglext-devel" >>cerr
+        echo "               or --enable-gui=sdl or --enable-renderer=agg" >>cerr
       nogo=true
       fi
     fi
@@ -2337,11 +2338,11 @@ if test x$build_hildon = xyes; then #{
     fi
       echo "        HILDON libs are: $HILDON_LIBS"
   else
-    echo "        ERROR: No HILDON development package installed!"
-    echo "               Install it from http://gtk.org"
-    #echo "               or .deb users: apt-get install libhildon.0-dev"
-    echo "               or .deb users: apt-get install libhildon-1-dev"
-    echo "               or .rpm users: yum install hildon-devel"
+    echo "        ERROR: No HILDON development package installed!" >>cerr
+    echo "               Install it from http://gtk.org" >>cerr
+    #echo "               or .deb users: apt-get install libhildon.0-dev" >>cerr
+    echo "               or .deb users: apt-get install libhildon-1-dev" >>cerr
+    echo "               or .rpm users: yum install hildon-devel" >>cerr
     nogo=true
   fi
 fi
@@ -2355,10 +2356,10 @@ if test x$build_gtk = xyes; then #{
     fi
       echo "        GTK2 libs are: $GTK2_LIBS"
   else
-    echo "        ERROR: No GTK2 development package installed!"
-    echo "               Install it from http://gtk.org"
-    echo "               or .deb users: apt-get install libgtk2.0-dev"
-    echo "               or .rpm users: yum install gtk2-devel"
+    echo "        ERROR: No GTK2 development package installed!" >>cerr
+    echo "               Install it from http://gtk.org" >>cerr
+    echo "               or .deb users: apt-get install libgtk2.0-dev" >>cerr
+    echo "               or .rpm users: yum install gtk2-devel" >>cerr
 dnl    nogo=true
   fi
 
@@ -2370,10 +2371,10 @@ dnl    nogo=true
     fi
     echo "        Pango libs are: $PANGO_LIBS"
   else
-    echo "        ERROR: No Pango development package installed!"
-    echo "               Install it from http://pango.org"
-    echo "               or .deb users: apt-get install libpango1.0-dev"
-    echo "               or .rpm users: yum install pango-devel"
+    echo "        ERROR: No Pango development package installed!" >>cerr
+    echo "               Install it from http://pango.org" >>cerr
+    echo "               or .deb users: apt-get install libpango1.0-dev" >>cerr
+    echo "               or .rpm users: yum install pango-devel" >>cerr
 dnl    nogo=true
   fi
 
@@ -2385,10 +2386,10 @@ dnl    nogo=true
     fi
     echo "        GLib libs are: $GLIB_LIBS"
   else
-    echo "        ERROR: No GLib development package installed!"
-    echo "               Install it from http://gtk.org"
-    echo "               or .deb users: apt-get install libglib2.0-dev"
-    echo "               or .rpm users: yum install glib2-devel"
+    echo "        ERROR: No GLib development package installed!" >>cerr
+    echo "               Install it from http://gtk.org" >>cerr
+    echo "               or .deb users: apt-get install libglib2.0-dev" >>cerr
+    echo "               or .rpm users: yum install glib2-devel" >>cerr
 dnl    nogo=true
   fi
 
@@ -2400,10 +2401,10 @@ dnl    nogo=true
     fi
       echo "        ATK libs are: $ATK_LIBS"
   else
-    echo "        ERROR: No ATK development package installed!"
-    echo "               Install it from http://gtk.org"
-    echo "               or .deb users: apt-get install libatk1.0-dev"
-    echo "               or .rpm users: yum install atk-devel"
+    echo "        ERROR: No ATK development package installed!" >>cerr
+    echo "               Install it from http://gtk.org" >>cerr
+    echo "               or .deb users: apt-get install libatk1.0-dev" >>cerr
+    echo "               or .rpm users: yum install atk-devel" >>cerr
 dnl    nogo=true
   fi
 
@@ -2422,10 +2423,10 @@ if test "$media_handler" = "gst"; then
     fi
       echo "        Gstreamer libs are: $GSTREAMER_LIBS"
   else
-    echo "        ERROR: GST media handling requested but gstreamer-0.10+ not found"
-    echo "               Install it from http://www.gstreamer.net"
-    echo "               or .deb users: apt-get install libgstreamer0.10-dev"
-    echo "               or .rpm users: yum install gstreamer-devel"
+    echo "        ERROR: GST media handling requested but gstreamer-0.10+ not found" >>cerr
+    echo "               Install it from http://www.gstreamer.net" >>cerr
+    echo "               or .deb users: apt-get install libgstreamer0.10-dev" >>cerr
+    echo "               or .rpm users: yum install gstreamer-devel" >>cerr
     nogo=true
   fi
 fi
@@ -2440,11 +2441,11 @@ fi
       fi
       echo "        MAD libs are: $MAD_LIBS"
     else
-      echo "        ERROR: No libmad development package installed!"
-      echo "               You can install it from http://mad.sourceforge.net"
-      echo "               or .deb users: apt-get install libmad0-dev"
-      echo "               or .rpm users: yum install libmad"
-      echo "               or reconfigure using --enable-media=ffmpeg"
+      echo "        ERROR: No libmad development package installed!" >>cerr
+      echo "               You can install it from http://mad.sourceforge.net" >>cerr
+      echo "               or .deb users: apt-get install libmad0-dev" >>cerr
+      echo "               or .rpm users: yum install libmad" >>cerr
+      echo "               or reconfigure using --enable-media=ffmpeg" >>cerr
       nogo=true
     fi
   fi
@@ -2453,17 +2454,17 @@ fi
     if test x"$FFMPEG_LIBS" != x; then
       echo "        MP3 and video support enabled through ffmpeg"
       if test x"${ffmpeg_version}" != xok; then
-        echo "        ERROR: You have version ${ffmpeg_version} of ffmpeg installed."
-        echo "               This version of ffmpeg may not work!"
-        echo "               Version 51.27.0 or newer is highly recommended."
+        echo "        ERROR: You have version ${ffmpeg_version} of ffmpeg installed." >>cerr
+        echo "               This version of ffmpeg may not work!" >>cerr
+        echo "               Version 51.27.0 or newer is highly recommended." >>cerr
         nogo=true
       else
-	avformat_h=`echo $avcodec_h | sed 's/avcodec.h/avformat.h/'`
+	avformat_h=`echo $avcodec_h | sed 's/avcodec/avformat/g'`
 	if test ! -f "$avformat_h"; then
-	  echo "        ERROR: FFMPEG's libavcodec header is installed but not libavformat."
-          echo "               You can install FFMPEG from http://ffmpeg.mplayerhq.hu"
-          echo "               or .deb users: apt-get install libavformat-dev"
-          echo "               or reconfigure with --enable-media=gst"
+          echo "        ERROR: FFMPEG's libavcodec header is installed but not libavformat." >>cerr
+          echo "               You can install FFMPEG from http://ffmpeg.mplayerhq.hu" >>cerr
+          echo "               or .deb users: apt-get install libavformat-dev" >>cerr
+          echo "               or reconfigure with --enable-media=gst" >>cerr
 	  nogo=true
 	else
           if test x"$FFMPEG_CFLAGS" != x; then
@@ -2475,11 +2476,11 @@ fi
 	fi
       fi
     else
-      echo "        ERROR: No FFMPEG development package installed!"
-      echo "               You can install FFMPEG from http://ffmpeg.mplayerhq.hu"
-      echo "               or .deb users: apt-get install libavformat-dev"
-      echo "               or .rpm users: yum install ffmpeg-devel"
-      echo "               or reconfigure with --enable-media=gst"
+      echo "        ERROR: No FFMPEG development package installed!" >>cerr
+      echo "               You can install FFMPEG from http://ffmpeg.mplayerhq.hu" >>cerr
+      echo "               or .deb users: apt-get install libavformat-dev" >>cerr
+      echo "               or .rpm users: yum install ffmpeg-devel" >>cerr
+      echo "               or reconfigure with --enable-media=gst" >>cerr
       nogo=true
     fi
   fi
@@ -2493,12 +2494,12 @@ if test x$build_cairo = xyes; then
     fi
     echo "        Cairo libs are: $CAIRO_LIBS"
   else
-    echo "        ERROR: No Cairo development package installed!"
-    echo "               You need to have the Cairo development package installed"
-    echo "               if you have used --enable-render=cairo to configure."
-    echo "               Install it from http://cairographics.org"
-    echo "               or .deb users: apt-get install libcairo-dev"
-    echo "               or .rpm users: yum install cairo-devel"
+    echo "        ERROR: No Cairo development package installed!" >>cerr
+    echo "               You need to have the Cairo development package installed" >>cerr
+    echo "               if you have used --enable-render=cairo to configure." >>cerr
+    echo "               Install it from http://cairographics.org" >>cerr
+    echo "               or .deb users: apt-get install libcairo-dev" >>cerr
+    echo "               or .rpm users: yum install cairo-devel" >>cerr
     nogo=true
   fi
 fi
@@ -2512,9 +2513,9 @@ if test x$build_fltk = xyes; then
     fi
       echo "        FLTK libs are: $FLTK2_LIBS"
   else
-    echo "        ERROR: No FLTK2 development package installed!"
-    echo "               There are currently no Debian or RPM packages for FLTK2;"
-    echo "		 see http://www.fltk.org to install it from source."
+    echo "        ERROR: No FLTK2 development package installed!" >>cerr
+    echo "               There are currently no Debian or RPM packages for FLTK2;" >>cerr
+    echo "		 see http://www.fltk.org to install it from source." >>cerr
 dnl What it was for FLTK 1:
 dnl    echo "               or .deb users: apt-get install fltk-1.1-dev"
 dnl    echo "               or .rpm users: yum install fltk-devel"
@@ -2531,10 +2532,10 @@ if test x$build_fltk = xyes; then
     fi
       echo "        Xft libs are: $XFT_LIBS"
 dnl     else
-dnl       echo "        ERROR: No Xft development package installed!"
-dnl       echo "               Install the xft development package"
-dnl       echo "               or .deb users: apt-get install libxft-dev"
-dnl       echo "               or .rpm users: yum install xft-devel"
+dnl       echo "        ERROR: No Xft development package installed!" >>cerr
+dnl       echo "               Install the xft development package" >>cerr
+dnl       echo "               or .deb users: apt-get install libxft-dev" >>cerr
+dnl       echo "               or .rpm users: yum install xft-devel" >>cerr
 dnl    nogo=true
   fi
 fi
@@ -2550,14 +2551,14 @@ if $need_sdl; then
     echo "        SDL flags are: $SDL_CFLAGS"
     echo "        SDL libs are: $SDL_LIBS"
   else
-    echo "        ERROR: No SDL development package installed!"
-    echo "               Install it from http://www.libsdl.org/download-1.2.php"
-    echo "               or .deb users: apt-get install libsdl1.2-dev"
-    echo "               or .rpm users: yum install SDL-devel"
+    echo "        ERROR: No SDL development package installed!" >>cerr
+    echo "               Install it from http://www.libsdl.org/download-1.2.php" >>cerr
+    echo "               or .deb users: apt-get install libsdl1.2-dev" >>cerr
+    echo "               or .rpm users: yum install SDL-devel" >>cerr
     test x$build_sdl = xyes &&
-	echo "               or select a different GUI with --enable-gui= "
+	echo "               or select a different GUI with --enable-gui= " >>cerr
     test x"$media_handler" = x"ffmpeg" -o x"$media_handler" = x"mad" &&
-	echo "               or use --enable-media=gst"
+	echo "               or use --enable-media=gst" >>cerr
     nogo=true
   fi
 fi
@@ -2569,7 +2570,7 @@ dnl    echo "        Firefox flags are: $FIREFOX_CFLAGS"
 dnl    echo "        Firefox libs are: $FIREFOX_LIBS"
     echo "        Plugin will be installed in ${FIREFOX_PLUGINS}"
 dnl  else
-dnl    echo "        ERROR: No Firefox or Mozilla development package installed!"
+dnl    echo "        ERROR: No Firefox or Mozilla development package installed!" >>cerr
 #    nogo=true
 dnl  fi
 fi
@@ -2581,28 +2582,28 @@ if test x"$pthreads" = x"yes"; then
   if test x"$PTHREAD_LIBS" != x; then
     echo "        POSIX Threads lib is: $PTHREAD_LIBS"
   else
-    echo "ERROR: No pthread development package installed!"
+    echo "ERROR: No pthread development package installed!" >>cerr
     nogo=true
   fi
 fi
 
 if test x"$docbook" = x"yes"; then
   if test x"$MAKEINFO" = x; then
-    echo "        ERROR: no makeinfo tools installed!"
-    echo "               Either install it from http://www.gnu.org/software/texinfo/"
-    echo "               or .deb users: apt-get install texinfo"
-    echo "               or configure without --enable-docbook"
+    echo "        ERROR: no makeinfo tools installed!" >>cerr
+    echo "               Either install it from http://www.gnu.org/software/texinfo/" >>cerr
+    echo "               or .deb users: apt-get install texinfo" >>cerr
+    echo "               or configure without --enable-docbook" >>cerr
     nogo=true
   fi
   dnl low-level tools
   if test x"$DB2X_TEXIXML" = x -o x"$DB2X_MANXML" = x -o x"$DB2X_XSLTPROC" = x; then
     dnl high-level tools
     if test x"${DB2X_TEXI}" = x -o x"${DB2X_MAN}" = x; then
-      echo "        ERROR: No DocBook2X tools installed!"
-      echo "               Either install it from http://docbook2x.sourceforge.net"
-      echo "               or .deb users: apt-get install docbook docbook2x docbook-utils"
-      echo "                              docbook-xml docbook-xsl texinfo xsltproc"
-      echo "               or configure without --enable-docbook"
+      echo "        ERROR: No DocBook2X tools installed!" >>cerr
+      echo "               Either install it from http://docbook2x.sourceforge.net" >>cerr
+      echo "               or .deb users: apt-get install docbook docbook2x docbook-utils" >>cerr
+      echo "                              docbook-xml docbook-xsl texinfo xsltproc" >>cerr
+      echo "               or configure without --enable-docbook" >>cerr
       nogo=true
     fi
   else
@@ -2646,11 +2647,11 @@ if test x$build_agg = xyes; then # {
   echo "        AGG Pixel format is: $pixelformat"
     if test x"$AGG_LIBS" != x; then # {
       if test x"${agg25}" != xyes; then # {
-        echo "        ERROR: Your installation of AGG appears to be version 2.4 or older."
-        echo "               Please upgrade to AGG 2.5 or greater."
-        echo "               Install it from http://www.antigrain.com"
-        echo "               or .deb users: apt-get install libagg-dev"
-        echo "               or .rpm users: yum install agg-devel"
+        echo "        ERROR: Your installation of AGG appears to be version 2.4 or older." >>cerr
+        echo "               Please upgrade to AGG 2.5 or greater." >>cerr
+        echo "               Install it from http://www.antigrain.com" >>cerr
+        echo "               or .deb users: apt-get install libagg-dev" >>cerr
+        echo "               or .rpm users: yum install agg-devel" >>cerr
         nogo=true
       else # }{
         if test x"$AGG_CFLAGS" != x; then # {
@@ -2661,10 +2662,10 @@ if test x$build_agg = xyes; then # {
         echo "        AGG libs are: $AGG_LIBS"
       fi # }
     else # }{
-      echo "        ERROR: No AGG development package installed!"
-      echo "               Install it from http://www.antigrain.com"
-      echo "               or .deb users: apt-get install libagg-dev"
-      echo "               or .rpm users: yum install agg-devel"
+      echo "        ERROR: No AGG development package installed!" >>cerr
+      echo "               Install it from http://www.antigrain.com" >>cerr
+      echo "               or .deb users: apt-get install libagg-dev" >>cerr
+      echo "               or .rpm users: yum install agg-devel" >>cerr
       nogo=true
     fi # }
 fi # }
@@ -2680,9 +2681,9 @@ if test x"$BOOST_LIBS" != x; then
     if test x"${missing_headers}" != x; then
       for i in ${missing_headers}; do
 	# They have some boost libs but no date_time and want to compile cygnal.
-	echo "        ERROR: The BOOST $i header file is needed!"
-	echo "               Install it from http://boost.org"
-	echo "               or from a Boost development package"
+	echo "        ERROR: The BOOST $i header file is needed!" >>cerr
+	echo "               Install it from http://boost.org" >>cerr
+	echo "               or from a Boost development package" >>cerr
 	nogo=true
       done
     fi
@@ -2697,20 +2698,20 @@ if test x"$BOOST_LIBS" != x; then
     if test x"${missing_libs}" != x; then
       for i in ${missing_libs}; do
 	# They have some boost libs but no date_time and want to compile cygnal.
-	echo "        ERROR: The BOOST $i library is needed!"
-	echo "               Install it from http://boost.org"
-	echo "               or .deb users: apt-get install libboost-"`echo ${i} | sed 's/_/-/g'`"-dev"
+	echo "        ERROR: The BOOST $i library is needed!" >>cerr
+	echo "               Install it from http://boost.org" >>cerr
+	echo "               or .deb users: apt-get install libboost-"`echo ${i} | sed 's/_/-/g'`"-dev" >>cerr
 	nogo=true
       done
     fi
 else
-    echo "        ERROR: No BOOST development package installed!"
-    echo "               Install it from http://www.boost.org"
-    echo "               or .deb users: apt-get install libboost-dev libboost-thread-dev"
+    echo "        ERROR: No BOOST development package installed!" >>cerr
+    echo "               Install it from http://www.boost.org" >>cerr
+    echo "               or .deb users: apt-get install libboost-dev libboost-thread-dev" >>cerr
     if test x"$cygnal" = xyes; then
-    echo "                              and libboost-date-time-dev (for cygnal)"
+    echo "                              and libboost-date-time-dev (for cygnal)" >>cerr
     fi
-    echo "               or .rpm users: yum install boost-devel"
+    echo "               or .rpm users: yum install boost-devel" >>cerr
  nogo=true
 fi
 
@@ -2823,10 +2824,11 @@ if test x$ext_mysql = xyes; then
       echo "        MYSQL flags are: $MYSQL_CFLAGS"
       echo "        MYSQL libs are: $MYSQL_LIBS"
     else
-      echo "        ERROR: No MySQL development package is installed."
-      echo "               Either reconfigure without --with-extensions=mysql"
-     echo "               or install MySQL header files from http://www.mysql.org"
-      echo "               or .deb users: apt-get install libmysqlclient-dev"
+      echo "        ERROR: No MySQL development package is installed." >>cerr
+      echo "               Either reconfigure without --with-extensions=mysql" >>cerr
+      echo "               or install MySQL header files from http://www.mysql.org" >>cerr
+      echo "               or .deb users: apt-get install libmysqlclient-dev" >>cerr
+      nogo=true
     fi
   fi
 fi
@@ -2837,7 +2839,8 @@ if test x"${build_alp}" = xyes; then
     echo "        ALP flags are: $ALP_CFLAGS"
     echo "        ALP libs are: $ALP_LIBS"
   else
-    echo "        ERROR: No ALP development package is installed."
+    echo "        ERROR: No ALP development package is installed." >>cerr
+    nogo=true
   fi
 fi
 
@@ -2848,6 +2851,8 @@ fi
 dnl If anything critical is missing, don't bother to continue
 if test x"$nogo" = x"true"; then
 echo ""
+  cat cerr
+  rm cerr
   AC_MSG_ERROR([Please install required packages])
 fi
 

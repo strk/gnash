@@ -61,7 +61,7 @@ check-DEJAGNU: site-update $(TEST_CASES)
 	else \
 	  echo "WARNING: could not find \`runtest'" 1>&2; \
           for i in "$(TEST_CASES)"; do \
-	    $(SHELL) $$i; \
+	    ./$$i; \
 	  done; \
 	fi
 
