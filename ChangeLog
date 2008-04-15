@@ -1,3 +1,10 @@
+2008-04-15 Benjamin Wolsey <bwy@benjaminwolsey.de>
+	
+	* testsuite/actionscript.all/Math.as: tests for Math class
+	  instantiation (not a proper class).
+	* testsuite/actionscript.all/System.as: tests for System
+	  object. 
+
 2008-04-14 Benjamin Wolsey <bwy@benjaminwolsey.de>
 	
 	* server/asobj/Date.cpp: register date members as native.

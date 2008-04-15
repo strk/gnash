@@ -21,7 +21,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: System.as,v 1.25 2008/04/14 14:16:39 bwy Exp $";
+rcsid="$Id: System.as,v 1.26 2008/04/15 07:51:20 bwy Exp $";
 #include "check.as"
 
 check_equals(typeof(System), 'object');
@@ -61,6 +61,9 @@ check(System.hasOwnProperty("exactSettings"));
 // _global.System is NOT a class, just an object 
 var systemObj = new System;
 check_equals ( typeof(systemObj), 'undefined' );
+
+check_equals (typeof(System.__proto__), 'object');
+check_equals (System.__proto__, Object.prototype)
 
 // test the System::security.allowDomain method
 check_equals ( typeof(System.security.allowDomain), 'function' );
@@ -177,11 +180,11 @@ xcheck_equals(typeof(p.download), 'function');
 xcheck_equals(typeof(p.launch), 'function');
 
 #if OUTPUT_VERSION > 6
- check_totals(83);
+ check_totals(85);
 #else
 # if OUTPUT_VERSION == 6
-   check_totals(82);
+   check_totals(84);
 # else
-   check_totals(49);
+   check_totals(51);
 # endif
 #endif

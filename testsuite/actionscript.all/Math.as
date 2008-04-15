@@ -31,8 +31,11 @@
 // actually many different bitwise values that represent NaN.
 // Hence we string expected NaN results and compare the strings.
 
-rcsid="$Id: Math.as,v 1.11 2008/03/11 19:31:47 strk Exp $";
+rcsid="$Id: Math.as,v 1.12 2008/04/15 07:51:20 bwy Exp $";
 #include "check.as"
+
+var mathObj = new Math;
+check_equals ( typeof(mathObj), 'undefined' );
 
 check_equals (typeof(Math), 'object');
 check_equals (typeof(Math.__proto__), 'object');
@@ -540,7 +543,7 @@ check_equals (Math.pow(-2, -0.5).toString(), "NaN");
 
 // End of Math testsuite
 #if OUTPUT_VERSION <= 6
- check_totals(271);
+ check_totals(272);
 #else
- check_totals(280);
+ check_totals(281);
 #endif
