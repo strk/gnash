@@ -52,48 +52,8 @@
 #endif
 
 namespace gnash {
-  
-class Math {
-public:
-    Math();
-    ~Math();
-   void abs();
-   void acos();
-   void asin();
-   void atan();
-   void atan2();
-   void ceil();
-   void cos();
-   void exp();
-   void floor();
-   void log();
-   void max();
-   void min();
-   void pow();
-   void random();
-   void round();
-   void sin();
-   void sqrt();
-   void tan();
-private:
-    bool _E;
-    bool _LN2;
-    bool _LN10;
-    bool _LOG2E;
-    bool _LOG10E;
-    bool _PI;
-    bool _SQRT1_2;
-    bool _SQRT2;
-};
 
-class math_as_object : public as_object
-{
-private:
-	//Math obj;
-
-public:
-	math_as_object();
-};
+// Math isn't a proper class, so doesn't need a constructor.
 
 void math_class_init(as_object& global);
 

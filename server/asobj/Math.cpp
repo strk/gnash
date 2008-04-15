@@ -29,8 +29,9 @@
 
 
 #ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
+# include "gnashconfig.h"
 #endif
+
 #include <cmath>
 #include <string>
 #include <boost/random.hpp>
@@ -45,6 +46,9 @@
 using namespace std;
 
 namespace gnash {
+
+// Forward declarations
+static void attachMathInterface(as_object& proto);
 
 as_value math_fabs(const fn_call& fn);	// Implements AS "abs"
 as_value math_acos(const fn_call& fn);
@@ -68,10 +72,10 @@ as_value math_tan(const fn_call& fn);
 void
 math_class_init(as_object& global)
 {
-    // Create built-in math object.
-    as_object*	math_obj = new math_as_object;
-
-    global.init_member("Math", math_obj);
+    // Create built-in math object. It is not a class.
+	static boost::intrusive_ptr<as_object> obj = new as_object(getObjectInterface());
+	attachMathInterface(*obj);
+	global.init_member("Math", obj.get());
 }
 
 //
@@ -173,65 +177,66 @@ math_round(const fn_call& fn)
 }
 
 
-math_as_object::math_as_object()
-	:
-	as_object(getObjectInterface())
+
+static void
+attachMathInterface(as_object& proto)
 {
 
-	// TODO: rely on ineritance, use init_property ?
+	// TODO: rely on inheritance, use init_property ?
+	// All Math members are constant and non-enumerable.
+
+    const int flags = as_prop_flags::dontDelete
+                | as_prop_flags::dontEnum
+                | as_prop_flags::readOnly;
 
 	// constant
-	init_member("E", 2.7182818284590452354);
-	init_member("LN2", 0.69314718055994530942);
-	init_member("LOG2E", 1.4426950408889634074);
-	init_member("LN10", 2.30258509299404568402);
-	init_member("LOG10E", 0.43429448190325182765);
-	init_member("PI", 3.14159265358979323846);
-	init_member("SQRT1_2", 0.7071067811865475244);
-	init_member("SQRT2", 1.4142135623730950488);
+	proto.init_member("E", 2.7182818284590452354, flags);
+	proto.init_member("LN2", 0.69314718055994530942, flags);
+	proto.init_member("LOG2E", 1.4426950408889634074, flags);
+	proto.init_member("LN10", 2.30258509299404568402, flags);
+	proto.init_member("LOG10E", 0.43429448190325182765, flags);
+	proto.init_member("PI", 3.14159265358979323846, flags);
+	proto.init_member("SQRT1_2", 0.7071067811865475244, flags);
+	proto.init_member("SQRT2", 1.4142135623730950488, flags);
 
-    // 200,0 abs
-    // 200,1 min
-    // 200,2 max
-    // 200,3 sin
-    // 200,4 cos
-    // 200,5 atan2
-    // 200,6 tan
-    // 200,7 exp
-    // 200,8 log
-    // 200,9 sqrt
-    // 200,10 round
-    // 200,11 random
-    // 200,12 floor
-    // 200,13 ceil
-    // 200,14 atan
-    // 200,15 asin
-    // 200,16 acos
-    // 200,17 pow
-    // 200,18 isNaN
-    // 200,19 isFinite
-
-	// math methods, 1-arg
-	init_member("abs", new builtin_function(math_fabs)); // ActionScript "abs" is math "fabs"
-	init_member("acos", new builtin_function(math_acos));
-	init_member("asin", new builtin_function(math_asin));
-	init_member("atan", new builtin_function(math_atan));
-	init_member("ceil", new builtin_function(math_ceil));
-	init_member("cos", new builtin_function(math_cos));
-	init_member("exp", new builtin_function(math_exp));
-	init_member("floor", new builtin_function(math_floor));
-	init_member("log", new builtin_function(math_log));
-	init_member("random", new builtin_function(math_random));
-	init_member("round", new builtin_function(math_round));
-	init_member("sin", new builtin_function(math_sin));
-	init_member("sqrt", new builtin_function(math_sqrt));
-	init_member("tan", new builtin_function(math_tan));
-
-	// math methods, 2-arg
-	init_member("atan2", new builtin_function(math_atan2));
-	init_member("max", new builtin_function(math_max));
-	init_member("min", new builtin_function(math_min));
-	init_member("pow", new builtin_function(math_pow));
+    VM& vm = proto.getVM();
+    
+    vm.registerNative(math_fabs, 200, 0);
+    proto.init_member("abs", vm.getNative(200, 0), flags);
+    vm.registerNative(math_min, 200, 1);
+    proto.init_member("min", vm.getNative(200, 1), flags);
+    vm.registerNative(math_max, 200, 2);
+    proto.init_member("max", vm.getNative(200, 2), flags);
+    vm.registerNative(math_sin, 200, 3);
+    proto.init_member("sin", vm.getNative(200, 3), flags);
+    vm.registerNative(math_cos, 200, 4);
+    proto.init_member("cos", vm.getNative(200, 4), flags);
+    vm.registerNative(math_atan2, 200, 5);
+    proto.init_member("atan2", vm.getNative(200, 5), flags);
+    vm.registerNative(math_tan, 200, 6);
+    proto.init_member("tan", vm.getNative(200, 6), flags);
+    vm.registerNative(math_exp, 200, 7);
+    proto.init_member("exp", vm.getNative(200, 7), flags);
+    vm.registerNative(math_log, 200, 8);
+    proto.init_member("log", vm.getNative(200, 8), flags);
+    vm.registerNative(math_sqrt, 200, 9);
+    proto.init_member("sqrt", vm.getNative(200, 9), flags);
+    vm.registerNative(math_round, 200, 10);
+    proto.init_member("round", vm.getNative(200, 10), flags);
+    vm.registerNative(math_random, 200, 11);
+    proto.init_member("random", vm.getNative(200, 11), flags);
+    vm.registerNative(math_floor, 200, 12);
+    proto.init_member("floor", vm.getNative(200, 12), flags);
+    vm.registerNative(math_ceil, 200, 13);
+    proto.init_member("ceil", vm.getNative(200, 13), flags);
+    vm.registerNative(math_atan, 200, 14);
+    proto.init_member("atan", vm.getNative(200, 14), flags);
+    vm.registerNative(math_asin, 200, 15);
+    proto.init_member("asin", vm.getNative(200, 15), flags);
+    vm.registerNative(math_acos, 200, 16);
+	proto.init_member("acos", vm.getNative(200, 16), flags);
+    vm.registerNative(math_pow, 200, 17);
+    proto.init_member("pow", vm.getNative(200, 17), flags);
 }
 
 

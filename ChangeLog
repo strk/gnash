@@ -2,6 +2,10 @@
 	
 	* server/asobj/System.{h,cpp}: System is not a proper class,
 	  so doesn't need a constructor.
+	* server/asobj/{Math.cpp,GMath.h}: Math is not a proper class, so
+	  doesn't need a constructor. Drop unused 'Math' class in
+	  header. Register ASnative functions, make all Math members
+	  read-only.
 
 2008-04-15 Benjamin Wolsey <bwy@benjaminwolsey.de>
 	
