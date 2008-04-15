@@ -274,12 +274,7 @@ public:
 	///
 	void markReachableResources() const;
 
-	void registerNative(as_c_function_ptr fun, unsigned int x, unsigned int y)
-	{
-		assert(fun);
-		assert(!_asNativeTable[x][y]);
-		_asNativeTable[x][y]=fun;
-	}
+	void registerNative(as_c_function_ptr fun, unsigned int x, unsigned int y);
 
 	/// Return a newly created builtin_function or null
 	builtin_function* getNative(unsigned int x, unsigned int y);

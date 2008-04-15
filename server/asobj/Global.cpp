@@ -425,8 +425,8 @@ as_global_asnative(const fn_call& fn)
 		return ret;
 	}
 
-	int sx = fn.arg(0).to_int();
-	int sy = fn.arg(1).to_int();
+	const int sx = fn.arg(0).to_int();
+	const int sy = fn.arg(1).to_int();
 
 	if ( sx < 0 )
 	{
@@ -443,12 +443,15 @@ as_global_asnative(const fn_call& fn)
 		return ret;
 	}
 
-	unsigned x = (unsigned)sx;
-	unsigned y = (unsigned)sy;
+	const unsigned int x = static_cast<unsigned int>(sx);
+	const unsigned int y = static_cast<unsigned int>(sy);
 
 	VM& vm = VM::get();
 	as_function* fun = vm.getNative(x, y);
-	if ( ! fun ) return ret;
+	if ( ! fun ) {
+	    log_debug(_("No ASnative(%d, %d) registered with the VM"), x, y);
+	    return ret;
+	}
 	ret.set_as_function(fun);
 	return ret;
 		
@@ -605,6 +608,7 @@ Global::Global(VM& vm, ClassHierarchy *ch)
 
 	color_class_init(*this);
 	textformat_class_init(*this);
+	math_class_init(*this);
 
 	if ( vm.getSWFVersion() < 6 ) goto extscan;
 	//-----------------------

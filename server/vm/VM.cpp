@@ -250,6 +250,15 @@ VmGcRoot::markReachableResources() const
 	_vm.markReachableResources();
 }
 
+void
+VM::registerNative(as_c_function_ptr fun, unsigned int x, unsigned int y)
+{
+    //log_debug("Registering function %p as ASnative(%d, %d) ", (void*)fun, x, y);
+    assert(fun);
+    assert(!_asNativeTable[x][y]);
+    _asNativeTable[x][y]=fun;
+}
+
 builtin_function*
 VM::getNative(unsigned int x, unsigned int y)
 {

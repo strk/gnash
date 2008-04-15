@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-rcsid="$Id: ASnative.as,v 1.1 2008/04/15 11:41:49 bwy Exp $";
+rcsid="$Id: ASnative.as,v 1.2 2008/04/15 15:18:01 bwy Exp $";
 #include "check.as"
 
 countVO = 0;
@@ -37,53 +37,53 @@ func.toString = function () {
 };
 
 a = ASnative(200, 0);
-xcheck_equals(a(func), 0.3); // abs
-xcheck_equals(a(0.3), 0.3); // abs
+check_equals(a(func), 0.3); // abs
+check_equals(a(0.3), 0.3); // abs
 
 a = ASnative(200, 1);
-xcheck_equals(a(func, func + 1), 0.3); // min
-xcheck_equals(a(0.3, 1.3), 0.3); // min
+check_equals(a(func, func + 1), 0.3); // min
+check_equals(a(0.3, 1.3), 0.3); // min
 
 a = ASnative(200, 2);
-xcheck_equals(a(func, func + 1), 1.3); // max
-xcheck_equals(a(0.3, 1.3), 1.3); // max
+check_equals(a(func, func + 1), 1.3); // max
+check_equals(a(0.3, 1.3), 1.3); // max
 
 a = ASnative(200, 3);
-xcheck_equals(a(func).toString(), "0.29552020666134"); // sin
-xcheck_equals(a(0.3).toString(), "0.29552020666134"); // sin
+check_equals(a(func).toString(), "0.29552020666134"); // sin
+check_equals(a(0.3).toString(), "0.29552020666134"); // sin
 
 a = ASnative(200, 4);
-xcheck_equals(a(func).toString(), "0.955336489125606"); // cos
-xcheck_equals(a(0.3).toString(), "0.955336489125606"); // cos
+check_equals(a(func).toString(), "0.955336489125606"); // cos
+check_equals(a(0.3).toString(), "0.955336489125606"); // cos
 
 a = ASnative(200, 5);
-xcheck_equals(a(func, func + 1).toString(), "0.226798848053886"); // atan2
-xcheck_equals(a(0.3, 1.3).toString(), "0.226798848053886"); // atan2
+check_equals(a(func, func + 1).toString(), "0.226798848053886"); // atan2
+check_equals(a(0.3, 1.3).toString(), "0.226798848053886"); // atan2
 
 a = ASnative(200, 6);
-xcheck_equals(a(func).toString(), "0.309336249609623"); // tan
+check_equals(a(func).toString(), "0.309336249609623"); // tan
 a = ASnative(200, 7);
-xcheck_equals(a(func).toString(), "1.349858807576"); // exp
+check_equals(a(func).toString(), "1.349858807576"); // exp
 a = ASnative(200, 8);
-xcheck_equals(a(func).toString(), "-1.20397280432594"); // log
+check_equals(a(func).toString(), "-1.20397280432594"); // log
 a = ASnative(200, 9);
-xcheck_equals(a(func).toString(), "0.547722557505166"); // sqrt
+check_equals(a(func).toString(), "0.547722557505166"); // sqrt
 a = ASnative(200, 10);
-xcheck_equals(a(func), 0); // round
+check_equals(a(func), 0); // round
 a = ASnative(200, 11);
-xcheck(a(func) >= 0 && a(func < 1)); // random
+check(a(func) >= 0 && a(func < 1)); // random
 a = ASnative(200, 12);
-xcheck_equals(a(func), 0); // floor
+check_equals(a(func), 0); // floor
 a = ASnative(200, 13);
-xcheck_equals(a(func), 1); // ceil
+check_equals(a(func), 1); // ceil
 a = ASnative(200, 14);
-xcheck_equals(a(func).toString(), "0.291456794477867"); // atan
+check_equals(a(func).toString(), "0.291456794477867"); // atan
 a = ASnative(200, 15);
-xcheck_equals(a(func).toString(), "0.304692654015398"); // asin
+check_equals(a(func).toString(), "0.304692654015398"); // asin
 a = ASnative(200, 16);
-xcheck_equals(a(func).toString(), "1.2661036727795"); // acos
+check_equals(a(func).toString(), "1.2661036727795"); // acos
 a = ASnative(200, 17);
-xcheck_equals(a(func, func + 1).toString(), "0.209053590580785"); // pow
+check_equals(a(func, func + 1).toString(), "0.209053590580785"); // pow
 a = ASnative(200, 18);
 xcheck_equals(a(func), false); // isNan
 a = ASnative(200, 19);

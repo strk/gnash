@@ -1,5 +1,13 @@
 2008-04-15 Benjamin Wolsey <bwy@benjaminwolsey.de>
 	
+	* server/vm/VM.{h,cpp}: move implementation of registerNative
+	  (makes debugging friendlier).
+	* server/asobj/Global.cpp: don't only load Math class on demand
+	  or its ASnative functions may not be registered when needed!
+	* testsuite/actionscript.all/ASnative.as: Math tests now pass.
+
+2008-04-15 Benjamin Wolsey <bwy@benjaminwolsey.de>
+	
 	* testsuite/actionscript.all/ASnative.as: 36 tests for ASnative.
 	  All of them fail :-(
 	* testsuite/actionscript.all/Makefile.am: new test.
