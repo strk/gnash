@@ -73,6 +73,7 @@ AM_CPPFLAGS = -I.. \
 ## These are needed to properly set dependencies
 ASTESTS =			\
 	AsBroadcaster.as	\
+	ASnative.as		\
 	array.as		\
 	delete.as		\
 	getvariable.as		\
