@@ -27,12 +27,16 @@
 
 #include <string>
 
+//#define DEBUG_LOAD_VARIABLES 1
+
 namespace gnash {
 
 void
 LoadVariablesThread::completeLoad()
 {
-	//log_debug("completeLoad called");
+#ifdef DEBUG_LOAD_VARIABLES
+	log_debug("completeLoad called");
+#endif
 
 	using std::string;
 
@@ -50,23 +54,31 @@ LoadVariablesThread::completeLoad()
 	unsigned int parsedLines = 0;
 	while ( size_t read = _stream->read_bytes(buf, CHUNK_SIZE) )
 	{
-		//log_debug("Read %u bytes", read);
+#ifdef DEBUG_LOAD_VARIABLES
+		log_debug("Read %u bytes", read);
+#endif
 
 		// TODO: use read_string ?
 		string chunk(buf, read);
 		toparse += chunk;
 
-		//log_debug("toparse: %s", toparse.c_str());
+#ifdef DEBUG_LOAD_VARIABLES
+		log_debug("toparse: %s", toparse.c_str());
+#endif
 
 		// parse remainder
 		size_t lastamp = toparse.rfind('&');
 		if ( lastamp != string::npos )
 		{
 			string parseable = toparse.substr(0, lastamp);
-			//log_debug("parseable: %s", parseable.c_str());
+#ifdef DEBUG_LOAD_VARIABLES
+			log_debug("parseable: %s", parseable.c_str());
+#endif
 			parse(parseable);
 			toparse = toparse.substr(lastamp+1);
-			//log_debug("toparse nextline: %s", toparse.c_str());
+#ifdef DEBUG_LOAD_VARIABLES
+			log_debug("toparse nextline: %s", toparse.c_str());
+#endif
 			++parsedLines;
 		}
 

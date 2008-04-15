@@ -81,6 +81,7 @@ namespace gnash {
 //#define GNASH_DEBUG_REPLACE 1
 //#define  DEBUG_DYNTEXT_VARIABLES 1
 //#define GNASH_DEBUG_HITTEST 1
+//#define DEBUG_LOAD_VARIABLES 1
 
 // Defining the following macro you'll get a DEBUG lien
 // for each call to the drawing API, in a format which is
@@ -4328,7 +4329,9 @@ sprite_instance::processCompletedLoadVariableRequest(LoadVariablesThread& reques
   {
     const string name = PROPNAME(it->first);
     const string& val = it->second;
-    //log_debug(_("Setting variable '%s' to value '%s'"), name, val);
+#ifdef DEBUG_LOAD_VARIABLES
+    log_debug(_("Setting variable '%s' to value '%s'"), name, val);
+#endif
     set_member(st.find(name), val);
   }
 

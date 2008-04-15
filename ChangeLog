@@ -1,3 +1,9 @@
+2008-04-15 Sandro Santilli <strk@keybit.net>
+
+	* server/LoadVariablesThread.cpp, server/sprite_instance.cpp,
+	  server/asobj/LoadVars.cpp: use compile-time defines to enable
+	  debugging of variables load.
+
 2008-04-15 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* server/button_character_instance.cpp: call set_invalidated() *before*

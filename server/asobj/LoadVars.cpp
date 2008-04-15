@@ -42,6 +42,8 @@
 #include <list>
 #include <boost/algorithm/string/case_conv.hpp>
 
+//#define DEBUG_LOADS 1
+
 namespace gnash {
 
 static as_value loadvars_addrequestheader(const fn_call& fn);
@@ -228,7 +230,7 @@ LoadVars::checkLoads()
 {
 #ifdef DEBUG_LOADS
     static int call=0;
-    log_debug("LoadVars %p checkLoads call %d, _loadThreads: %d", (void *)this, _loadThreads.size(), ++call);
+    log_debug("LoadVars %p checkLoads call %d, _loadThreads: %d", (void *)this, ++call, _loadThreads.size());
 #endif
 
     if ( _loadThreads.empty() ) return; // nothing to do
