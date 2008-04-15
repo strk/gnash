@@ -1,3 +1,8 @@
+2008-04-15 Sandro Santilli <strk@keybit.net>
+
+	* server/button_character_instance.cpp (set_current_state):
+	  Cleanup, indent and comment code looking for invalidation.
+
 2008-04-15 Benjamin Wolsey <bwy@benjaminwolsey.de>
 	
 	* testsuite/actionscript.all/Mouse.as: tests for mouse prototype

@@ -619,35 +619,50 @@ button_character_instance::set_current_state(e_mouse_state new_state)
 	if (new_state == m_mouse_state)
 		return;
 		
+	typedef std::vector<character*> CharVect;
+
 	// save current "display list"
-	std::vector<character*> old_list;
+	CharVect old_list;
 	get_active_characters(old_list, m_mouse_state);
 	
 	// load new "display list" 
 	// NOTE: We don't change state yet, so that set_invalidated() can 
 	// load the current bounds first.
-	std::vector<character*> new_list;
+	CharVect new_list;
 	get_active_characters(new_list, new_state);
 		
-	// Call set_invalidated() in case some characters have been removed from the
-	// list. The effective equality check is done in the for loop below.
-	if (new_list.size() != old_list.size())
-		set_invalidated();		// something changed 
-  
-  size_t old_count = old_list.size();
-  size_t new_count = new_list.size();
-  for (size_t i=0; i<new_count; i++) {
+	size_t old_count = old_list.size();
+	size_t new_count = new_list.size();
 
-  	bool found=false;
-  	for (size_t j=0; j<old_count; j++) { 
-	  	if (new_list[i] == old_list[j]) {
+	// If the old and new lists have different size,
+	// then something obviously changed.
+	// (effective equality check done in next loop)
+	//
+	if (new_count != old_count) set_invalidated();
+  
+	// Otherwise, something changed if any character
+	// in the new set was not in the old one.
+	//
+	// In this case, we also restart the new character
+	// so it looks like we just placed it.
+	//
+	for (size_t i=0; i<new_count; i++)
+	{
+		bool found=false;
+		character* newch = new_list[i];
+		for (size_t j=0; j<old_count; j++)
+		{ 
+			character* oldch = old_list[j];
+			if (newch == oldch)
+			{
 				found=true;
 				break; 
 			}
 		}
-		if (!found) {
+		if (!found)
+		{
 			// character (re-)appeared on stage -> restart!
-			new_list[i]->restart();
+			newch->restart();
 			set_invalidated();
 		} 
 	}
