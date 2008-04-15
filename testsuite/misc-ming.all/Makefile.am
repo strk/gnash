@@ -59,8 +59,6 @@ AM_LDFLAGS = $(MING_LIBS)
 
 
 check_PROGRAMS = \
-	ButtonEventsTest \
-	ButtonEventsTest-Runner \
 	SpriteButtonEventsTest \
 	SpriteButtonEventsTest-Runner \
 	DefineTextTest \
@@ -203,6 +201,11 @@ check_PROGRAMS += \
 	streamingSoundTest1-Runner 
 endif
 
+if MING_SUPPORTS_SWFBUTTON_ADD_CHARACTER
+check_PROGRAMS += \
+	ButtonEventsTest \
+	ButtonEventsTest-Runner 
+endif
 
 check_SCRIPTS = \
 	timeline_var_test-Runner \
@@ -1748,7 +1751,6 @@ TEST_CASES = \
 	DefineTextTest-Runner \
 	DefineEditTextTest-Runner \
 	RollOverOutTest-Runner \
-	ButtonEventsTest-Runner \
 	SpriteButtonEventsTest-Runner \
 	timeline_var_test-Runner \
 	root_stop_testrunner \
@@ -1852,6 +1854,12 @@ TEST_CASES += \
 	replace_shapes1test_runner \
 	replace_sprites1test_runner \
 	replace_buttons1test_runner \
+	$(NULL)
+endif
+
+if MING_SUPPORTS_SWFBUTTON_ADD_CHARACTER
+TEST_CASES += \
+	ButtonEventsTest-Runner \
 	$(NULL)
 endif
 

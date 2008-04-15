@@ -1,3 +1,8 @@
+2008-04-15 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac, testsuite/misc-ming.all/Makefile.am:
+	  New code in ButtonEventsTest.c require Ming 0.4.0.beta5.
+
 2008-04-15 Benjamin Wolsey <bwy@benjaminwolsey.de>
 	
 	* server/asobj/Math.cpp: internal functions can have internal
