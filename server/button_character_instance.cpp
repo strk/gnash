@@ -689,7 +689,7 @@ button_character_instance::add_invalidated_bounds(InvalidatedRanges& ranges,
 				/*bounds->expand_to_transformed_rect(get_world_matrix(), 
           m_record_character[i]->get_bound());*/
         m_record_character[i]->add_invalidated_bounds(ranges, 
-          force||m_invalidated||m_child_invalidated);        
+          force||m_invalidated);        
 		}
 	}
 
