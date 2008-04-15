@@ -629,8 +629,8 @@ button_character_instance::set_current_state(e_mouse_state new_state)
 	std::vector<character*> new_list;
 	get_active_characters(new_list, new_state);
 		
-	// see if the two lists differ and restart characters if needed
-	// TODO: FIXME: this is not how you check for equality :/
+	// Call set_invalidated() in case some characters have been removed from the
+	// list. The effective equality check is done in the for loop below.
 	if (new_list.size() != old_list.size())
 		set_invalidated();		// something changed 
   
