@@ -22,7 +22,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: LoadVars.as,v 1.27 2008/03/11 19:31:47 strk Exp $";
+rcsid="$Id: LoadVars.as,v 1.28 2008/04/16 21:35:56 strk Exp $";
 #include "check.as"
 
 #if OUTPUT_VERSION < 6
@@ -72,6 +72,12 @@ o.toString = function() { return "ud5=5"; };
 ret = loadvarsObj.decode(o);
 check_equals( typeof(ret), 'undefined');
 check_equals (loadvarsObj.ud5, 5);
+bomstarting="﻿ud6=6&ud7=7";
+ret = loadvarsObj.decode(bomstarting);
+check_equals( typeof(ret), 'undefined');
+check_equals (loadvarsObj.ud6, undefined);
+check_equals (loadvarsObj['﻿ud6'], 6);
+check_equals (loadvarsObj.ud7, 7);
 
 // test the LoadVars::getbytesloaded method
 check (LoadVars.prototype.hasOwnProperty('getBytesLoaded'));
@@ -157,7 +163,7 @@ loadvarsObj.onLoad = function(success) {
 		// Gnash insists in looking for an ending & char !!		
 		check_equals(loadvarsObj['var3'], 'val3\n');
 
-		check_totals(66);
+		check_totals(70);
 
 		play();
 	}

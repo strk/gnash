@@ -1,5 +1,10 @@
 2008-04-16 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/LoadVars.as: test that LoadVars::decode()
+	  would not skip BOM.
+
+2008-04-16 Sandro Santilli <strk@keybit.net>
+
 	* server/button_character_instance.{cpp,h}: implement movie info
 	  tree filler so to print state and childs.
 
