@@ -591,7 +591,8 @@ Global::Global(VM& vm, ClassHierarchy *ch)
     // functions *must* be registered before this.
 	registerMathNative(*this);
 
-	init_member("trace", new builtin_function(as_global_trace));
+    vm.registerNative(as_global_trace, 100, 4);
+	init_member("trace", vm.getNative(100, 4));
 
 	if ( vm.getSWFVersion() < 5 ) goto extscan;
 	//-----------------------

@@ -1,4 +1,10 @@
 2008-04-16 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/asobj/Global.cpp: trace is ASnative(100, 4).
+	* server/FreetypeGlyphsProvider.cpp: Disable device font debugging
+	  by default again.
+
+2008-04-16 Benjamin Wolsey <bwy@benjaminwolsey.de>
 	
 	* server/asobj/Date.{h,cpp}, server/asobj/Mouse.{cpp,h}: register
 	  Native functions separately.

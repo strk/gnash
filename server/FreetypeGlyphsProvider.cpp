@@ -59,7 +59,7 @@
 //#define DEBUG_OUTLINE_DECOMPOSITION 1
 
 // Define the following to make device font handling verbose
-#define GNASH_DEBUG_DEVICEFONTS 1
+//#define GNASH_DEBUG_DEVICEFONTS 1
 
 namespace gnash {
 
