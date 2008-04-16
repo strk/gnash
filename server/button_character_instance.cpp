@@ -1031,6 +1031,39 @@ button_class_init(as_object& global)
   global.init_member("Button", cl.get());
 }
 
+#ifdef USE_SWFTREE
+character::InfoTree::iterator 
+button_character_instance::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
+{
+	InfoTree::iterator selfIt = character::getMovieInfo(tr, it);
+	std::ostringstream os;
+
+	std::vector<character*> actChars;
+	get_active_characters(actChars);
+	std::sort(actChars.begin(), actChars.end(), charDepthLessThen);
+
+	os << actChars.size() << " active characters for state " << mouseStateName(m_mouse_state);
+	InfoTree::iterator localIter = tr.append_child(selfIt, StringPair(_("Button state"), os.str()));	    
+	std::for_each(actChars.begin(), actChars.end(), boost::bind(&character::getMovieInfo, _1, tr, localIter)); 
+
+	return selfIt;
+
+}
+#endif
+
+const char*
+button_character_instance::mouseStateName(e_mouse_state s)
+{
+	switch (s)
+	{
+		case UP: return "UP";
+		case DOWN: return "DOWN";
+		case OVER: return "OVER";
+		case HIT: return "HIT";
+		default: return "UNKNOWN (error?)";
+	}
+}
+
 } // end of namespace gnash
 
 

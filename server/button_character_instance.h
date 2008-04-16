@@ -59,6 +59,7 @@ public:
 		OUT_DOWN = FLAG_DOWN
 	};
 	int	m_last_mouse_flags, m_mouse_flags;
+
 	enum e_mouse_state
 	{
 		UP = 0,
@@ -66,6 +67,9 @@ public:
 		OVER,
 		HIT
 	};
+
+	static const char* mouseStateName(e_mouse_state s);
+
 	e_mouse_state m_mouse_state;
 
 	button_character_instance(button_character_definition* def,
@@ -163,6 +167,11 @@ public:
 
 	/// Properly unload contained characters
 	bool unload();
+
+#ifdef USE_SWFTREE
+	// Override to append button characters info, see dox in character.h
+	virtual InfoTree::iterator getMovieInfo(InfoTree& tr, InfoTree::iterator it);
+#endif
 
 protected:
 
