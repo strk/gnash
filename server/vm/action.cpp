@@ -245,7 +245,7 @@ event_id::get_function_name() const
 		"INVALID",		 // INVALID
 		"onPress",		 // PRESS
 		"onRelease",		 // RELEASE
-		"onRelease_Outside",	 // RELEASE_OUTSIDE
+		"onReleaseOutside",	 // RELEASE_OUTSIDE
 		"onRollOver",		 // ROLL_OVER
 		"onRollOut",		 // ROLL_OUT
 		"onDragOver",		 // DRAG_OVER

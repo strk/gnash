@@ -1,5 +1,6 @@
 2008-04-16 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/action.cpp: onRelease_Outside -> onReleaseOutside
 	* testsuite/swfdec/PASSING: asnative-create-{5,6,7,8} success.
 
 2008-04-16 Sandro Santilli <strk@keybit.net>
