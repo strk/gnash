@@ -30,10 +30,10 @@
  * The following events print the event name in the text area
  * (called _root.textfield) and change the color of the button:
  *
- * MouseOut  : red button (initial state)
- * MouseOver : yellow button
- * MouseDown : green button
- * MouseUp   : yellow button (same as MouseOver, but the label on top changes)
+ * RollOut  : red button (initial state)
+ * RollOver : yellow button
+ * Press    : green button
+ * Release  : yellow button (same as MouseOver, but the label on top changes)
  *
  ***********************************************************************/
 
@@ -98,13 +98,49 @@ add_button(SWFMovie mo)
 
 	SWFMovieClip_add(bu, (SWFBlock)sh2); // red when idle
 	SWFMovieClip_add(bu, (SWFBlock)compileSWFActionCode(
-				"onRollOut = function() { _root.msg='MouseOut'; _root.msg2='RollOver'; gotoAndStop(1); };"
-				"onRollOver = function() { _root.msg='MouseOver'; _root.msg2='RollOut'; gotoAndStop(3); };"
-				"onMouseDown = function() { _root.msg='MouseDown'; gotoAndStop(2); };"
-				"onRelease = function() { _root.msg='MouseUp'; _root.msg2='Release'; gotoAndStop(1); };"
-				"onReleaseOutside = function() { _root.msg='MouseUpOutside'; _root.msg2='ReleaseOutside'; gotoAndStop(1); };"
-				"stop();"
-			));
+		"onRollOut = function() {"
+		"	_root.note('onRollOut');"
+		"	updateAfterEvent();"
+		"	_root.msg='RollOut';"
+		"	gotoAndStop(1);"
+		"};"
+		"onRollOver = function() {"
+		"	_root.note('onRollOver');"
+		"	updateAfterEvent();"
+		"	_root.msg='RollOver';"
+		"	gotoAndStop(3);"
+		"};"
+		"onMouseDown = function() {"
+		"	_root.note('onMouseDown');"
+		"	updateAfterEvent();"
+		"	_root.msg2='MouseDown';"
+		"};"
+		"onMouseUp = function() {"
+		"	_root.note('onMouseUp');"
+		"	updateAfterEvent();"
+		"	_root.msg2='MouseUp';"
+		"};"
+		"onPress = function() {"
+		"	_root.note('onPress');"
+		"	updateAfterEvent();"
+		"	_root.msg='Press';"
+		"	gotoAndStop(2);"
+		"};"
+		"onRelease = function() {"
+		"	_root.note('onRelease');"
+		"	updateAfterEvent();"
+		"	_root.msg='Release';"
+		"	gotoAndStop(3);"
+		"};"
+		"onReleaseOutside = function() {"
+		"	_root.note('onReleaseOutside');"
+		"	updateAfterEvent();"
+		"	_root.msg='ReleaseOutside';"
+		"	gotoAndStop(1);"
+		"};"
+		"stop();"
+	));
+
 	SWFMovieClip_nextFrame(bu);
 
 	SWFMovieClip_add(bu, (SWFBlock)sh3); // green on button press
@@ -166,6 +202,7 @@ main(int argc, char **argv)
 	SWFDisplayItem it;
 	const char *srcdir=".";
 	char fdbfont[256];
+	SWFMovieClip dejagnuclip;
 
 	/*********************************************
 	 *
@@ -180,7 +217,7 @@ main(int argc, char **argv)
 	Ming_setScale(20.0); 
  
 	mo = newSWFMovie();
-	SWFMovie_setDimension(mo, 120, 120);
+	SWFMovie_setDimension(mo, 800, 600);
 	SWFMovie_setRate(mo, 1);
 
 	if ( argc>1 ) srcdir=argv[1];
@@ -200,9 +237,17 @@ main(int argc, char **argv)
 	/*SWFBrowserFont bfont = newSWFBrowserFont("_sans");*/
 	font = loadSWFFontFromFile(font_file);
 
+	/* Dejagnu equipment */
+	dejagnuclip = get_dejagnu_clip((SWFBlock)font, 10, 0, 0, 800, 600);
+	it = SWFMovie_add(mo, (SWFBlock)dejagnuclip);
+  	SWFDisplayItem_setDepth(it, 200); 
+  	SWFDisplayItem_move(it, 200, 0); 
+
 	add_text_field(mo, "textfield", "_root.msg", "Button events", 10, 0, 5);
 	add_text_field(mo, "textfield2", "_root.msg2", "Mouse events", 11, 0, 100);
 	add_text_field(mo, "textfield3", "_root.msg3", "Key events", 12, 0, 80);
+
+	SWFMovie_nextFrame(mo);
 
 	/*****************************************************
 	 *
@@ -220,7 +265,7 @@ main(int argc, char **argv)
 	//add_actions(mo, "square1.button.onRollOut = function() { _root.msg2 = 'RollOut'; };");
 
 	// Mouse buttons events
-	add_actions(mo, "square1.button.onPress = function() { _root.msg2 = 'Press'; };");
+	//add_actions(mo, "square1.button.onPress = function() { _root.msg2 = 'Press'; };");
 	//add_actions(mo, "square1.button.onRelease = function() { _root.msg2 = 'Release'; gotoAndStop(1); };");
 	//add_actions(mo, "square1.button.onReleaseOutside = function() { _root.msg2 = 'ReleaseOutside'; };");
 
@@ -271,7 +316,12 @@ main(int argc, char **argv)
 
 	{
 
-		add_actions(mo, "square1.button.enabled = false;");
+		add_actions(mo,
+			"square1.button.enabled = false;"
+			//"_root.msg = _root.msg2 = _root.msg3 = 'Idle';"
+			"stop();"
+			"totals();"
+		);
 		SWFMovie_nextFrame(mo); /* showFrame */
 	}
 
