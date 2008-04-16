@@ -1,3 +1,8 @@
+2008-04-16 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* testsuite/swfdec/PASSING: some newly added swfdec tests
+	  pass (_lockroot).
+
 2008-04-16 Sandro Santilli <strk@keybit.net>
 
 	* server/vm/action.cpp: onRelease_Outside -> onReleaseOutside
