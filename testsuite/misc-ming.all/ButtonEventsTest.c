@@ -143,57 +143,81 @@ add_button(SWFMovie mo)
 
 	SWFButton_addAction(bu, compileSWFActionCode(
 		"_root.msg='MouseOut';"
-		"_root.note('SWFBUTTON_MOUSEOUT');"
-		"_root.check_equals(_root.printBounds(getBounds()), '-0.05,-0.05 40.05,40.05');"
-		// Target of button action is the button's parent sprite
-		"_root.check_equals(_target, '/square1');"
-		"setTarget('/');"
-		"_root.check_equals(_target, '/');"
+		"if ( _root.testno == 4 || _root.testno == 9 || _root.testno == 14 ) {"
+		"	_root.check_equals(_root.printBounds(getBounds()), '-0.05,-0.05 40.05,40.05');"
+		/* Target of button action is the button's parent sprite */
+		"	_root.check_equals(_target, '/square1');"
+		"	setTarget('/');"
+		"	_root.check_equals(_target, '/');"
+		"	_root.testno++;"
+		"	_root.note(_root.testno+'. Press mouse button inside the square, and release it outside.');"
+		"} else {"
+		//"	_root.note('SWFBUTTON_MOUSEOUT');"
+		"}"
 		), SWFBUTTON_MOUSEOUT);
 
 	SWFButton_addAction(bu, compileSWFActionCode(
 		"_root.msg='MouseOver';"
-		"_root.note('SWFBUTTON_MOUSEOVER');"
-		"_root.check_equals(_root.printBounds(getBounds()), '-0.05,-0.05 40.05,40.05');"
-		// Target of button action is the button's parent sprite
-		"_root.check_equals(_target, '/square1');"
-		"setTarget('/');"
-		"_root.check_equals(_target, '/');"
+		"if ( _root.testno == 1 || _root.testno == 6 || _root.testno == 11 ) {"
+		"	_root.check_equals(_root.printBounds(getBounds()), '-0.05,-0.05 40.05,40.05');"
+		/* Target of button action is the button's parent sprite */
+		"	_root.check_equals(_target, '/square1');"
+		"	setTarget('/');"
+		"	_root.check_equals(_target, '/');"
+		"	_root.testno++;"
+		"	_root.note(_root.testno+'. Press (and keep pressed) the mouse button inside the square.');"
+		"} else {"
+		//"	_root.note('SWFBUTTON_MOUSEOVER');"
+		"}"
 		), SWFBUTTON_MOUSEOVER);
 
 	SWFButton_addAction(bu, compileSWFActionCode(
 		"_root.msg='MouseDown';"
-		"_root.note('SWFBUTTON_MOUSEDOWN');"
-		"_root.check_equals(_root.printBounds(getBounds()), '-0.05,-0.05 40.05,40.05');"
+		"if ( _root.testno == 2 || _root.testno == 7 || _root.testno == 12 ) {"
+		"	_root.check_equals(_root.printBounds(getBounds()), '-0.05,-0.05 40.05,40.05');"
 		/* Target (and name) of button action is the button's parent sprite */
-		"_root.check_equals(_target, '/square1');"
-		"_root.check_equals(_name, 'square1');"
-		"setTarget('/');"
-		"_root.check_equals(_target, '/');"
-		"_root.check_equals(typeof(_name), 'string');"
-		"_root.check_equals(_name, '');"
+		"	_root.check_equals(_target, '/square1');"
+		"	_root.check_equals(_name, 'square1');"
+		"	setTarget('/');"
+		"	_root.check_equals(_target, '/');"
+		"	_root.check_equals(typeof(_name), 'string');"
+		"	_root.check_equals(_name, '');"
+		"	_root.testno++;"
+		"	_root.note(_root.testno+'. Depress the mouse button inside the square.');"
+		"} else {"
+		//"	_root.note('SWFBUTTON_MOUSEDOWN');"
+		"}"
 		), SWFBUTTON_MOUSEDOWN);
 
 	SWFButton_addAction(bu, compileSWFActionCode(
 		"_root.msg='MouseUp';"
-		"_root.note('SWFBUTTON_MOUSEUP');"
-		"_root.check_equals(_root.printBounds(getBounds()), '-0.05,-0.05 40.05,40.05');"
+		"if ( _root.testno == 3 || _root.testno == 8 || _root.testno == 13 ) {"
+		"	_root.check_equals(_root.printBounds(getBounds()), '-0.05,-0.05 40.05,40.05');"
 		/* Target of button action is the button's parent sprite */
-		"_root.check_equals(_target, '/square1');"
-		"setTarget('/');"
-		"_root.check_equals(_target, '/');"
+		"	_root.check_equals(_target, '/square1');"
+		"	setTarget('/');"
+		"	_root.check_equals(_target, '/');"
+		"	_root.testno++;"
+		"	_root.note(_root.testno+'. Move the mouse pointer off the square.');"
+		"} else {"
+		//"	_root.note('SWFBUTTON_MOUSEUP');"
+		"}"
 		), SWFBUTTON_MOUSEUP);
 
 	/* SWFBUTTON_MOUSEUPOUTSIDE *should* be invoked !! */
 	SWFButton_addAction(bu, compileSWFActionCode(
 		"_root.msg='MouseUpOutside';"
-		"_root.note('SWFBUTTON_MOUSEUPOUTSIDE');"
-		"_root.check_equals(_root.printBounds(getBounds()), '-0.05,-0.05 40.05,40.05');"
+		"if ( _root.testno == 5 || _root.testno == 10 || _root.testno == 15 ) {"
+		"	_root.check_equals(_root.printBounds(getBounds()), '-0.05,-0.05 40.05,40.05');"
 		/* Target of button action is the button's parent sprite */
-		"_root.check_equals(_target, '/square1');"
-		"_root.check_equals(_name, 'square1');"
-		"setTarget('/');"
-		"_root.check_equals(_target, '/');"
+		"	_root.check_equals(_target, '/square1');"
+		"	_root.check_equals(_name, 'square1');"
+		"	setTarget('/');"
+		"	_root.check_equals(_target, '/');"
+		"	_root.nextFrame();"
+		"} else {"
+		//"	_root.note('SWFBUTTON_MOUSEUPOUTSIDE');"
+		"}"
 		), SWFBUTTON_MOUSEUPOUTSIDE);
 
 	it = SWFMovieClip_add(mc, (SWFBlock)bu);
@@ -282,6 +306,8 @@ main(int argc, char **argv)
 	add_text_field(mo, "textfield", "_root.msg", "Button events", 10, 0, 5);
 	add_text_field(mo, "textfield2", "_root.msg2", "Mouse events", 11, 0, 100);
 	add_text_field(mo, "textfield3", "_root.msg3", "Key events", 12, 0, 80);
+
+	SWFMovie_nextFrame(mo); /* showFrame */
 
 	/*****************************************************
 	 *
@@ -380,6 +406,13 @@ main(int argc, char **argv)
 		"};"
 		);
 
+	add_actions(mo,
+		"stop();"
+		"_root.testno=1;"
+		"_root.note('"
+		"1. Roll over the red square."
+		"');");
+
 
 	SWFMovie_nextFrame(mo); /* showFrame */
 
@@ -398,6 +431,13 @@ main(int argc, char **argv)
 
 		check_equals(mo, "printBounds(square1.getBounds())", "'-0.05,-0.05 40.05,40.05'");
 
+		add_actions(mo,
+			"stop();"
+			"_root.note('-- Added shape at lower depth --');"
+			"_root.testno++;"
+			"_root.note(_root.testno+'. Roll over the square.');"
+		);
+
 		SWFMovie_nextFrame(mo); /* showFrame */
 	}
 
@@ -413,6 +453,13 @@ main(int argc, char **argv)
 		SWFDisplayItem_setDepth(itsh, 3);
 		SWFDisplayItem_setColorAdd(itsh, 0, 0, 0, -128);
 
+		add_actions(mo,
+			"stop();"
+			"_root.note('-- Added shape at higher depth --');"
+			"_root.testno++;"
+			"_root.note(_root.testno+'. Roll over the square.');"
+		);
+
 		SWFMovie_nextFrame(mo); /* showFrame */
 	}
 
@@ -424,7 +471,11 @@ main(int argc, char **argv)
 
 	{
 
-		add_actions(mo, "square1.button.enabled = false;");
+		add_actions(mo,
+			"square1.button.enabled = false;"
+			"stop();"
+			"_root.note('-- Button disabled, try playing with it, nothing should happen --');"
+		);
 		SWFMovie_nextFrame(mo); /* showFrame */
 	}
 

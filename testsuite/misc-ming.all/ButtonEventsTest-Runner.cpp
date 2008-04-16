@@ -218,13 +218,9 @@ main(int /*argc*/, char** /*argv*/)
 	sprite_instance* root = tester.getRootMovie();
 	assert(root);
 
-	check_equals(root->get_frame_count(), 4);
+	check_equals(root->get_frame_count(), 5);
 
 	check_equals(root->get_current_frame(), 0);
-
-	const character* mc1 = tester.findDisplayItemByName(*root, "square1");
-	check(mc1);
-	check_equals(mc1->get_depth(), 2+character::staticDepthOffset);
 
 	const character* text = tester.findDisplayItemByName(*root, "textfield");
 	check(text);
@@ -238,27 +234,34 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(string(text->get_text_value()), idleString);
 	check_equals(string(text2->get_text_value()), idleString);
 	check_equals(string(text3->get_text_value()), idleString);
+
+	tester.advance();
+
+	const character* mc1 = tester.findDisplayItemByName(*root, "square1");
+	check(mc1);
+	check_equals(mc1->get_depth(), 2+character::staticDepthOffset);
+
 	check(!tester.isMouseOverMouseEntity());
 	// check that pixel @ 60,60 is red !
 	rgba red(255,0,0,255);
 	check_pixel(60, 60, 2, red, 2);
 
-	for (size_t fno=0; fno<root->get_frame_count(); fno++)
+	for (size_t fno=root->get_current_frame(); fno<root->get_frame_count(); fno++)
 	{
 		const character* square_back = tester.findDisplayItemByDepth(*root, 1+character::staticDepthOffset);
 		const character* square_front = tester.findDisplayItemByDepth(*root, 3+character::staticDepthOffset);
 
 		switch (fno)
 		{
-			case 0:
+			case 1:
 				check(!square_back);
 				check(!square_front);
 				break;
-			case 1:
+			case 2:
 				check(square_back);
 				check(!square_front);
 				break;
-			case 2:
+			case 3:
 				check(square_back);
 				check(square_front);
 				break;
@@ -276,8 +279,9 @@ main(int /*argc*/, char** /*argv*/)
 
 	}
 
-	// last advance should restart the loop...
-	check_equals(root->get_current_frame(), 0);
+	// last advance should not restart the loop (it's in STOP mode)
+        check_equals(root->get_play_state(), sprite_instance::STOP);
+	check_equals(root->get_current_frame(), 4);
 
 }
 

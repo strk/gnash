@@ -1,3 +1,14 @@
+2008-04-16 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/: ButtonEventsTest-Runner.cpp,
+	  ButtonEventsTest.c: cleanup the test so to guide
+	  humans trough non-automated testing. Interestingly
+	  enough gnash seems to support onMouseUpOutside, but
+	  probably just sends an onMouseUp immediately afterwards,
+	  which would explain the failure in test runner.
+	  Another pass at this test might make the failure even
+	  more visible (self-contained).
+
 2008-04-16 Benjamin Wolsey <bwy@benjaminwolsey.de>
 	
 	* server/asobj/Global.cpp: register parseInt, parseFloat,
