@@ -6,7 +6,9 @@
 	  functions for SWF5+ at startup so that they are always available.
 	* testsuite/actionscript.all/Mouse.as: couple of new tests.
 	* testsuite/actionscript.all/Date.as: tests for ASnative(103, 256):
-	  _global.Date. (Will fail, unsurprisingly). 
+	  _global.Date. (Will fail, unsurprisingly).
+	* server/FreetypeGlyphsProvider.cpp: log filename of selected font
+	  when verbosely debugging.
 
 2008-04-16 Benjamin Wolsey <bwy@benjaminwolsey.de>
 	
