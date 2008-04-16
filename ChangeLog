@@ -1,3 +1,12 @@
+2008-04-16 Sandro Santilli <strk@keybit.net>
+
+	* server/sprite_instance.cpp (can_handle_mouse_event):
+	  A MovieClip can't handle mouse event if it's not enabled.
+	  If no 'enabled' member is found, sprite is considered
+	  enabled.
+	* testsuite/misc-ming.all/SpriteButtonEventsTest-Runner.cpp:
+	  success in "active" entity state based on .enabled member.
+
 2008-04-16 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/character.cpp: x and y translation should be

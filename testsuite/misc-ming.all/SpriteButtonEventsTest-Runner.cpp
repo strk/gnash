@@ -59,7 +59,7 @@ test_mouse_activity(MovieTester& tester, const character* text, const character*
 	} else {
 		check_equals(string(text->get_text_value()), tmp); // not enabled...
 		check_equals(string(text2->get_text_value()), tmp2); // would retain last value
-		xcheck(!tester.isMouseOverMouseEntity()); // gnash still considers it active
+		check(!tester.isMouseOverMouseEntity());
 		// check that pixel @ 60,60 is red !
 		if ( covered ) { check_pixel(60, 60, 2, covered_red, 2);  }
 		else { check_pixel(60, 60, 2, red, 2);  }
@@ -77,7 +77,7 @@ test_mouse_activity(MovieTester& tester, const character* text, const character*
 	} else {
 		check_equals(string(text->get_text_value()), tmp); 
 		check_equals(string(text2->get_text_value()), string("MouseDown")); // no matter .enabled
-		xcheck(!tester.isMouseOverMouseEntity()); // Gnash should check .enabled
+		check(!tester.isMouseOverMouseEntity()); 
 		// check that pixel @ 60,60 is red !
 		if ( covered ) { check_pixel(60, 60, 2, covered_red, 2);  }
 		else { check_pixel(60, 60, 2, red, 2);  }
@@ -96,7 +96,7 @@ test_mouse_activity(MovieTester& tester, const character* text, const character*
 	} else {
 		check_equals(string(text->get_text_value()), tmp);
 		check_equals(string(text2->get_text_value()), string("MouseUp")); // no matter .enabled
-		xcheck(!tester.isMouseOverMouseEntity()); // Gnash should check .enabled
+		check(!tester.isMouseOverMouseEntity()); 
 		// check that pixel @ 60,60 is red !
 		if ( covered ) { check_pixel(60, 60, 2, covered_red, 2);  }
 		else { check_pixel(60, 60, 2, red, 2);  }
@@ -157,7 +157,7 @@ test_mouse_activity(MovieTester& tester, const character* text, const character*
 	} else {
 		check_equals(string(text->get_text_value()), tmp);
 		check_equals(string(text2->get_text_value()), tmp2);
-		xcheck(!tester.isMouseOverMouseEntity()); // Gnash should check .enabled
+		check(!tester.isMouseOverMouseEntity()); 
 		// check that pixel @ 60,60 is red !
 		if ( covered ) { check_pixel(60, 60, 2, covered_red, 2); }
 		else { check_pixel(60, 60, 2, red, 2); }
@@ -174,7 +174,7 @@ test_mouse_activity(MovieTester& tester, const character* text, const character*
 	} else {
 		check_equals(string(text->get_text_value()), tmp);
 		check_equals(string(text2->get_text_value()), string("MouseDown"));
-		xcheck(!tester.isMouseOverMouseEntity()); // Gnash should check .enabled
+		check(!tester.isMouseOverMouseEntity()); 
 		// check that pixel @ 60,60 is red !
 		if ( covered ) { check_pixel(60, 60, 2, covered_red, 2); }
 		else { check_pixel(60, 60, 2, red, 2); }

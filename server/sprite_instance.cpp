@@ -3778,6 +3778,8 @@ sprite_instance::findDropTarget(float x, float y, character* dragging) const
 bool
 sprite_instance::can_handle_mouse_event() const
 {
+  if ( ! isEnabled() ) return false;
+
   // Event handlers that qualify as mouse event handlers.
   static const event_id EH[] =
   {
@@ -4426,7 +4428,11 @@ sprite_instance::isEnabled() const
   as_value enabled;
   // const_cast needed due to get_member being non-const due to the 
   // possibility that a getter-setter would actually modify us ...
-  const_cast<sprite_instance*>(this)->get_member(NSV::PROP_ENABLED, &enabled);
+  if ( ! const_cast<sprite_instance*>(this)->get_member(NSV::PROP_ENABLED, &enabled) )
+  {
+     // We're enabled if there's no 'enabled' member...
+     return true;
+  }
   return enabled.to_bool();
 }
 
