@@ -606,9 +606,12 @@ Global::Global(VM& vm, ClassHierarchy *ch)
 	init_member("NaN", as_value(NAN));
 	init_member("Infinity", as_value(INFINITY));
 
+    // The following initializations are necessary
+    // to register ASnative functions
 	color_class_init(*this);
 	textformat_class_init(*this);
 	math_class_init(*this);
+	date_class_init(*this);
 
 	if ( vm.getSWFVersion() < 6 ) goto extscan;
 	//-----------------------

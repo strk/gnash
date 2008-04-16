@@ -15,8 +15,64 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-rcsid="$Id: ASnative.as,v 1.2 2008/04/15 15:18:01 bwy Exp $";
+rcsid="$Id: ASnative.as,v 1.3 2008/04/16 06:54:35 bwy Exp $";
 #include "check.as"
+
+
+// Do this first to make sure ASnative is
+// register before Date class itself is called.
+a = ASnative(103, 257);
+check_equals (a(65, 1, 1, 1, 1, 1, 1), Date.UTC(65, 1, 1, 1, 1, 1, 1));
+
+d = new Date (123456789);
+
+d.a = ASnative(103, 0);
+check_equals (d.a(), d.getFullYear());
+
+d.a = ASnative(103, 1);
+check_equals (d.a(), d.getYear());
+
+d.a = ASnative(103, 2);
+check_equals (d.a(), d.getMonth());
+
+d.a = ASnative(103, 3);
+check_equals (d.a(), d.getDate());
+d.a = ASnative(103, 4);
+check_equals (d.a(), d.getDay());
+d.a = ASnative(103, 5);
+check_equals (d.a(), d.getHours());
+d.a = ASnative(103, 6);
+check_equals (d.a(), d.getMinutes());
+d.a = ASnative(103, 7);
+check_equals (d.a(), d.getSeconds());
+d.a = ASnative(103, 8);
+check_equals (d.a(), d.getMilliseconds());
+d.a = ASnative(103, 16);
+check_equals (d.a(), d.getTime());
+d.a = ASnative(103, 18);
+check_equals (d.a(), d.getTimezoneOffset());
+d.a = ASnative(103, 19);
+check_equals (d.a(), d.toString());
+d.a = ASnative(103, 128);
+check_equals (d.a(), d.getUTCFullYear());
+d.a = ASnative(103, 129);
+check_equals (d.a(), d.getUTCYear());
+d.a = ASnative(103, 130);
+check_equals (d.a(), d.getUTCMonth());
+d.a = ASnative(103, 131);
+check_equals (d.a(), d.getUTCDate());
+d.a = ASnative(103, 132);
+check_equals (d.a(), d.getUTCDay());
+d.a = ASnative(103, 133);
+check_equals (d.a(), d.getUTCHours());
+d.a = ASnative(103, 134);
+check_equals (d.a(), d.getUTCMinutes());
+d.a = ASnative(103, 135);
+check_equals (d.a(), d.getUTCSeconds());
+d.a = ASnative(103, 136);
+check_equals (d.a(), d.getUTCMilliseconds());
+d.a = ASnative(103, 1);
+check_equals (d.a(), d.getYear());
 
 countVO = 0;
 countTS = 0;
@@ -126,7 +182,7 @@ xcheck_equals (countTS, 2);
 xcheck_equals (countVO, 25);
 
 #if OUTPUT_VERSION > 5
-check_totals(36);
+check_totals(59);
 #else
-check_totals(34);
+check_totals(57);
 #endif

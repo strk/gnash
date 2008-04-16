@@ -1,3 +1,10 @@
+2008-04-15 Benjamin Wolsey <bwy@benjaminwolsey.de>
+	
+	* server/asobj/Global.cpp: init Date class at startup
+	  so that its ASnative functions are registered.
+	* testsuite/actionscript.all/ASnative.cpp: test Date
+	  ASnative getter functions (all fine now).
+
 2008-04-15 Russ Nelson <nelson@crynwr.com>
 
 	* consolidate all ERROR messages for display at the end of
