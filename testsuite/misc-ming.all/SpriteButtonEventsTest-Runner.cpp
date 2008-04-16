@@ -187,10 +187,10 @@ test_mouse_activity(MovieTester& tester, const character* text, const character*
 	tester.depressMouseButton();
 
 	if ( enabled ) {
-		xcheck_equals(string(text->get_text_value()), string("ReleaseOutside")); // Gnash doesn't send this event !
+		check_equals(string(text->get_text_value()), string("ReleaseOutside")); 
 		check_equals(string(text2->get_text_value()), "MouseUp");
 	} else {
-		xcheck_equals(string(text->get_text_value()), string("ReleaseOutside")); // Gnash doesn't send this event !
+		check_equals(string(text->get_text_value()), string("ReleaseOutside"));
 		check_equals(string(text2->get_text_value()), "MouseUp");
 	}
 }

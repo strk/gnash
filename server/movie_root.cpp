@@ -713,6 +713,11 @@ generate_mouse_button_events(mouse_button_state* ms)
 
 					// onReleaseOutside
 					active_entity->on_button_event(event_id::RELEASE_OUTSIDE);
+
+					// We got out of active entity
+					//ms->m_mouse_inside_entity_last = false;
+					active_entity = NULL; // so we don't get RollOut next...
+
 					// TODO: have on_button_event return
 					//       wheter the action must trigger
 					//       a redraw.
@@ -721,8 +726,7 @@ generate_mouse_button_events(mouse_button_state* ms)
 			}
 		}
 	}
-
-	if ( ms->m_mouse_button_state_last == mouse_button_state::UP )
+	else if ( ms->m_mouse_button_state_last == mouse_button_state::UP )
 	{
 		// Mouse button was up.
 

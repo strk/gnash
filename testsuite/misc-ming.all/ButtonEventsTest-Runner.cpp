@@ -68,8 +68,8 @@ test_mouse_activity(MovieTester& tester, const character* text, const character*
 			check_pixel(72, 64, 2, dark_yellow, 2); 
 		}
 	} else {
-		check_equals(string(text->get_text_value()), string("MouseOut"));
-		check_equals(string(text2->get_text_value()), string("RollOut"));
+		check_equals(string(text->get_text_value()), string("MouseUpOutside"));
+		check_equals(string(text2->get_text_value()), string("ReleaseOutside"));
 		check(!tester.isMouseOverMouseEntity());
 		if ( covered )
 		{
@@ -97,8 +97,8 @@ test_mouse_activity(MovieTester& tester, const character* text, const character*
 		// check that pixel @ 60,60 is green !
 		check_pixel(60, 60, 2, green, 2);
 	} else {
-		check_equals(string(text->get_text_value()), string("MouseOut"));
-		check_equals(string(text2->get_text_value()), string("RollOut"));
+		check_equals(string(text->get_text_value()), string("MouseUpOutside"));
+		check_equals(string(text2->get_text_value()), string("ReleaseOutside"));
 		check(!tester.isMouseOverMouseEntity());
 		// check that pixel @ 60,60 is red !
 		if ( covered ) { check_pixel(60, 60, 2, covered_red, 2);  }
@@ -116,8 +116,8 @@ test_mouse_activity(MovieTester& tester, const character* text, const character*
 		if ( covered ) { check_pixel(60, 60, 2, covered_yellow, 2);  }
 		else { check_pixel(60, 60, 2, yellow, 2);  }
 	} else {
-		check_equals(string(text->get_text_value()), string("MouseOut"));
-		check_equals(string(text2->get_text_value()), string("RollOut"));
+		check_equals(string(text->get_text_value()), string("MouseUpOutside"));
+		check_equals(string(text2->get_text_value()), string("ReleaseOutside"));
 		check(!tester.isMouseOverMouseEntity());
 		// check that pixel @ 60,60 is red !
 		if ( covered ) { check_pixel(60, 60, 2, covered_red, 2);  }
@@ -127,8 +127,13 @@ test_mouse_activity(MovieTester& tester, const character* text, const character*
 	// roll off the square, this should change
 	// the textfield value, if enabled
 	tester.movePointerTo(39, 60);
-	check_equals(string(text->get_text_value()), string("MouseOut"));
-	check_equals(string(text2->get_text_value()), string("RollOut"));
+	if ( enabled ) {
+		check_equals(string(text->get_text_value()), string("MouseOut"));
+		check_equals(string(text2->get_text_value()), string("RollOut"));
+	} else {
+		check_equals(string(text->get_text_value()), string("MouseUpOutside"));
+		check_equals(string(text2->get_text_value()), string("ReleaseOutside"));
+	}
 	check(!tester.isMouseOverMouseEntity());
 	// check that pixel @ 60,60 is red !
 	if ( covered ) { check_pixel(60, 60, 2, covered_red, 2); }
@@ -137,8 +142,13 @@ test_mouse_activity(MovieTester& tester, const character* text, const character*
 	// press the mouse button, this should not change anything
 	// as we're outside of the button.
 	tester.pressMouseButton();
-	check_equals(string(text->get_text_value()), string("MouseOut"));
-	check_equals(string(text2->get_text_value()), string("RollOut"));
+	if ( enabled ) {
+		check_equals(string(text->get_text_value()), string("MouseOut"));
+		check_equals(string(text2->get_text_value()), string("RollOut"));
+	} else {
+		check_equals(string(text->get_text_value()), string("MouseUpOutside"));
+		check_equals(string(text2->get_text_value()), string("ReleaseOutside"));
+	}
 	check(!tester.isMouseOverMouseEntity());
 	// check that pixel @ 60,60 is red !
 	if ( covered ) { check_pixel(60, 60, 2, covered_red, 2); }
@@ -147,8 +157,13 @@ test_mouse_activity(MovieTester& tester, const character* text, const character*
 	// depress the mouse button, this should not change anything
 	// as we're outside of the button.
 	tester.depressMouseButton();
-	check_equals(string(text->get_text_value()), string("MouseOut"));
-	check_equals(string(text2->get_text_value()), string("RollOut"));
+	if ( enabled ) {
+		check_equals(string(text->get_text_value()), string("MouseOut"));
+		check_equals(string(text2->get_text_value()), string("RollOut"));
+	} else {
+		check_equals(string(text->get_text_value()), string("MouseUpOutside"));
+		check_equals(string(text2->get_text_value()), string("ReleaseOutside"));
+	}
 	check(!tester.isMouseOverMouseEntity());
 	// check that pixel @ 60,60 is red !
 	if ( covered ) { check_pixel(60, 60, 2, covered_red, 2); }
@@ -166,8 +181,8 @@ test_mouse_activity(MovieTester& tester, const character* text, const character*
 		if ( covered ) { check_pixel(60, 60, 2, covered_yellow, 2);  }
 		else { check_pixel(60, 60, 2, yellow, 2);  }
 	} else {
-		check_equals(string(text->get_text_value()), string("MouseOut"));
-		check_equals(string(text2->get_text_value()), string("RollOut"));
+		check_equals(string(text->get_text_value()), string("MouseUpOutside"));
+		check_equals(string(text2->get_text_value()), string("ReleaseOutside"));
 		check(!tester.isMouseOverMouseEntity());
 		// check that pixel @ 60,60 is red !
 		if ( covered ) { check_pixel(60, 60, 2, covered_red, 2); }
@@ -183,8 +198,8 @@ test_mouse_activity(MovieTester& tester, const character* text, const character*
 		// check that pixel @ 60,60 is green !
 		check_pixel(60, 60, 2, rgba(0,255,0,255), 2);
 	} else {
-		check_equals(string(text->get_text_value()), string("MouseOut"));
-		check_equals(string(text2->get_text_value()), string("RollOut"));
+		check_equals(string(text->get_text_value()), string("MouseUpOutside"));
+		check_equals(string(text2->get_text_value()), string("ReleaseOutside"));
 		check(!tester.isMouseOverMouseEntity());
 		// check that pixel @ 60,60 is red !
 		if ( covered ) { check_pixel(60, 60, 2, covered_red, 2); }
@@ -198,11 +213,11 @@ test_mouse_activity(MovieTester& tester, const character* text, const character*
 	tester.depressMouseButton();
 
 	if ( enabled ) {
-		xcheck_equals(string(text->get_text_value()), string("MouseUpOutside"));
-		xcheck_equals(string(text2->get_text_value()), string("ReleaseOutside"));
+		check_equals(string(text->get_text_value()), string("MouseUpOutside"));
+		check_equals(string(text2->get_text_value()), string("ReleaseOutside"));
 	} else {
-		check_equals(string(text->get_text_value()), string("MouseOut"));
-		check_equals(string(text2->get_text_value()), string("RollOut"));
+		check_equals(string(text->get_text_value()), string("MouseUpOutside"));
+		check_equals(string(text2->get_text_value()), string("ReleaseOutside"));
 	}
 }
 

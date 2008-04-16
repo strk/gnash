@@ -1,3 +1,14 @@
+2008-04-16 Sandro Santilli <strk@keybit.net>
+
+	* server/movie_root.cpp (generate_mouse_button_events): don't let
+	  handling of mouse DOWN-to-UP transition handling change the
+	  status and thus trigger further processing of UP-MOVING pointer.
+	* testsuite/misc-ming.all/ButtonEventsTest-Runner.cpp: fix expected
+	  results + successes (we won't send RollOut after ReleaseOutside
+	  now).
+	* testsuite/misc-ming.all/SpriteButtonEventsTest-Runner.cpp:
+	  successes (we won't send RollOut after ReleaseOutside now).
+
 2008-04-16 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* testsuite/swfdec/PASSING: some newly added swfdec tests
