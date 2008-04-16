@@ -153,6 +153,7 @@ add_button(SWFMovie mo)
 		"	_root.note(_root.testno+'. Press mouse button inside the square, and release it outside.');"
 		"} else {"
 		//"	_root.note('SWFBUTTON_MOUSEOUT');"
+		"	_root.xfail('Unexpectedly got SWFBUTTON_MOUSEOUT event (testno:'+_root.testno+')');"
 		"}"
 		), SWFBUTTON_MOUSEOUT);
 
@@ -168,6 +169,10 @@ add_button(SWFMovie mo)
 		"	_root.note(_root.testno+'. Press (and keep pressed) the mouse button inside the square.');"
 		"} else {"
 		//"	_root.note('SWFBUTTON_MOUSEOVER');"
+		// need MOUSEOVER for MOUSEUPOUTSIDE
+		"	if ( _root.testno != 5 && _root.testno != 10 && _root.testno != 15 ) {"
+		"		_root.fail('Unexpectedly got SWFBUTTON_MOUSEOVER event (testno:'+_root.testno+')');"
+		"	}"
 		"}"
 		), SWFBUTTON_MOUSEOVER);
 
@@ -186,6 +191,10 @@ add_button(SWFMovie mo)
 		"	_root.note(_root.testno+'. Depress the mouse button inside the square.');"
 		"} else {"
 		//"	_root.note('SWFBUTTON_MOUSEDOWN');"
+		// need MOUSEDOWN for MOUSEUPOUTSIDE
+		"	if ( _root.testno != 5 && _root.testno != 10 && _root.testno != 15 ) {"
+		"		_root.fail('Unexpectedly got SWFBUTTON_MOUSEDOWN event (testno:'+_root.testno+')');"
+		"	}"
 		"}"
 		), SWFBUTTON_MOUSEDOWN);
 
@@ -201,6 +210,7 @@ add_button(SWFMovie mo)
 		"	_root.note(_root.testno+'. Move the mouse pointer off the square.');"
 		"} else {"
 		//"	_root.note('SWFBUTTON_MOUSEUP');"
+		"	_root.fail('Unexpectedly got SWFBUTTON_MOUSEUP event (testno:'+_root.testno+')');"
 		"}"
 		), SWFBUTTON_MOUSEUP);
 
@@ -217,6 +227,7 @@ add_button(SWFMovie mo)
 		"	_root.nextFrame();"
 		"} else {"
 		//"	_root.note('SWFBUTTON_MOUSEUPOUTSIDE');"
+		"	_root.fail('Unexpectedly got SWFBUTTON_MOUSEUPOUTSIDE event (testno:'+_root.testno+')');"
 		"}"
 		), SWFBUTTON_MOUSEUPOUTSIDE);
 

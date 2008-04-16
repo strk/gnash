@@ -1,5 +1,13 @@
 2008-04-16 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/ButtonEventsTest.c: self-contain
+	  tests for NOT receiving unexpected events, gnash failure
+	  is more explicitly visible now (gets an additional
+	  unexpected MOUSEOUT event when MOUSEUPOUTSIDE is expected).
+
+
+2008-04-16 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/: ButtonEventsTest-Runner.cpp,
 	  ButtonEventsTest.c: cleanup the test so to guide
 	  humans trough non-automated testing. Interestingly
