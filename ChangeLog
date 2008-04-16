@@ -1,3 +1,10 @@
+2008-04-16 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/character.cpp: x and y translation should be
+	  rounded down to next twip.
+	* testsuite/actionscript.all/MovieClip.as: tests for _x and
+	  _y.
+
 2008-04-16 Sandro Santilli <strk@keybit.net>
 
 	* server/movie_root.cpp (generate_mouse_button_events): don't let

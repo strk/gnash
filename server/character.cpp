@@ -237,7 +237,7 @@ character::x_getset(const fn_call& fn)
 	{
 		double newx = fn.arg(0).to_number();
 		matrix m = ptr->get_matrix();
-		m.set_x_translation(std::infinite_to_fzero(PIXELS_TO_TWIPS(newx)));
+		m.set_x_translation(static_cast<int>(std::infinite_to_fzero(PIXELS_TO_TWIPS(newx))));
 		ptr->set_matrix(m);
 		ptr->transformedByScript(); // m_accept_anim_moves = false; 
 	}
@@ -259,8 +259,10 @@ character::y_getset(const fn_call& fn)
 	else // setter
 	{
 		double newy = fn.arg(0).to_number();
+	    log_debug("_y setter called with %d, to twips: %d", newy, PIXELS_TO_TWIPS(newy));
 		matrix m = ptr->get_matrix();
-		m.set_y_translation(std::infinite_to_fzero(PIXELS_TO_TWIPS(newy)));
+		m.set_y_translation(static_cast<int>(std::infinite_to_fzero(PIXELS_TO_TWIPS(newy))));
+		log_debug("_y trans now: %d", m.get_y_translation());
 		ptr->set_matrix(m);
 		ptr->transformedByScript(); // m_accept_anim_moves = false; 
 	}

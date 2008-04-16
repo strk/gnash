@@ -20,28 +20,28 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.123 2008/04/01 19:47:20 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.124 2008/04/16 19:16:58 bwy Exp $";
 
-rcsid="$Id: MovieClip.as,v 1.123 2008/04/01 19:47:20 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.124 2008/04/16 19:16:58 bwy Exp $";
 #include "check.as"
 
 // To be called at end of test
 endOfTest = function() 
 {
 #if OUTPUT_VERSION <= 5
-	check_totals(200); // SWF5
+	check_totals(210); // SWF5
 #endif
 
 #if OUTPUT_VERSION == 6
-	check_totals(614); // SWF6
+	check_totals(624); // SWF6
 #endif
 
 #if OUTPUT_VERSION == 7
-	check_totals(631); // SWF7
+	check_totals(641); // SWF7
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(632); // SWF8+
+	check_totals(642); // SWF8+
 #endif
 
 	play();
@@ -1295,7 +1295,46 @@ if ( typeof(static_clip) == 'movieclip' )
     static_clip._xscale *= 0.5;
     static_clip._yscale *= 2;
 
+    // If it's not one twip, it's nothing
+    static_clip._y += 0.04;
+    check_equals(static_clip._y, 0);
+
+    static_clip._y += 0.04;
+    check_equals(static_clip._y, 0);
+    
+    static_clip._y += 0.04;
+    check_equals(static_clip._y, 0);
+    
+    static_clip._y = 0.09;
+    check(static_clip._y > 0.04999 && static_clip._y < 0.50001);
+
+    // Gnash can't do this because _x and _y are floats at the
+    // moment, but it probably should be able to.
+    xcheck_equals(static_clip._y, 0.05);
+
+    // If it's not one twip, it's nothing
+    static_clip._x += 0.04;
+    check_equals(static_clip._x, 0);
+
+    static_clip._x += 0.04;
+    check_equals(static_clip._x, 0);
+    
+    static_clip._x += 0.04;
+    check_equals(static_clip._x, 0);
+    
+    static_clip._x = 20.09;
+    check(static_clip._x > 20.049999 && static_clip._x < 20.050001);
+    xcheck_equals(static_clip._x, 0.05);
+
     // TODO: try with x/y being getter-setter of the localToGlobal and globalToLocal parameter
+
+    
+/*    static_clip._y = 160;*/
+/*    for (i = 0; )*/
+/*        static_clip._y -= (static_clip._y - 150) / 5;*/
+/*        trace (static_clip._y);*/
+/*    }*/
+    
 }
 else
 {
