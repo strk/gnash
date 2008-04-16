@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-rcsid="$Id: ASnative.as,v 1.4 2008/04/16 07:27:08 bwy Exp $";
+rcsid="$Id: ASnative.as,v 1.5 2008/04/16 11:16:34 bwy Exp $";
 #include "check.as"
 
 a = ASnative (100, 0); // escape
@@ -28,21 +28,26 @@ a = ASnative (100, 3); // parseFloat
 check_equals(a("8.4e6"), 8.4e6);
 
 // Do this first to make sure ASnative is
-// register before Date class itself is called.
+// registered before Date class itself is loaded (Gnash loads
+// on demand).
 a = ASnative(103, 257);
 check_equals (a(65, 1, 1, 1, 1, 1, 1), Date.UTC(65, 1, 1, 1, 1, 1, 1));
+
+e = ASnative(103, 256); // _global.Date
+xcheck_equals(e().valueOf(), Date().valueOf());
+
+f = new e(100000000); // not instantiatable
+xcheck_equals(typeof(f), 'object');
+check_equals(typeof(f.getMilliseconds()), 'undefined');
 
 d = new Date (123456789);
 
 d.a = ASnative(103, 0);
 check_equals (d.a(), d.getFullYear());
-
 d.a = ASnative(103, 1);
 check_equals (d.a(), d.getYear());
-
 d.a = ASnative(103, 2);
 check_equals (d.a(), d.getMonth());
-
 d.a = ASnative(103, 3);
 check_equals (d.a(), d.getDate());
 d.a = ASnative(103, 4);
@@ -190,7 +195,7 @@ xcheck_equals (countTS, 2);
 xcheck_equals (countVO, 25);
 
 #if OUTPUT_VERSION > 5
-check_totals(63);
+check_totals(66);
 #else
-check_totals(61);
+check_totals(64);
 #endif

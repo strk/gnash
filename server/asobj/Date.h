@@ -23,6 +23,7 @@
 
 namespace gnash {
 
+void registerDateNative(as_object& global);
 void date_class_init(as_object& global);
 
 } // end of gnash namespace

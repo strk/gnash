@@ -1,5 +1,15 @@
 2008-04-16 Benjamin Wolsey <bwy@benjaminwolsey.de>
 	
+	* server/asobj/Date.{h,cpp}, server/asobj/Mouse.{cpp,h}: register
+	  Native functions separately.
+	* server/asobj/Global.cpp: register Mouse and Date ASnative
+	  functions for SWF5+ at startup so that they are always available.
+	* testsuite/actionscript.all/Mouse.as: couple of new tests.
+	* testsuite/actionscript.all/Date.as: tests for ASnative(103, 256):
+	  _global.Date. (Will fail, unsurprisingly). 
+
+2008-04-16 Benjamin Wolsey <bwy@benjaminwolsey.de>
+	
 	* server/asobj/{GMath.h,Math.cpp}: split registering native
 	  functions into a separate method (registerMathNative), which
 	  must be called at startup (logical enough...), or at least

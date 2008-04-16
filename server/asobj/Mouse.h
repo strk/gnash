@@ -25,11 +25,11 @@ namespace gnash {
 
 class as_object;
 
+/// Register native functions with the VM
+void registerMouseNative(as_object& global);
+
 /// Initialize the global Mouse class
 void mouse_class_init(as_object& global);
-
-/// Return a Mouse instance (in case the core lib needs it)
-//std::auto_ptr<as_object> init_mouse_instance();
   
 } // end of gnash namespace
 

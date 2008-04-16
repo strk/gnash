@@ -59,7 +59,7 @@
 //#define DEBUG_OUTLINE_DECOMPOSITION 1
 
 // Define the following to make device font handling verbose
-//#define GNASH_DEBUG_DEVICEFONTS 1
+#define GNASH_DEBUG_DEVICEFONTS 1
 
 namespace gnash {
 
@@ -294,6 +294,10 @@ FreetypeGlyphsProvider::getFontFilename(const std::string &name,
 
 			filename = (char *)file;
 			FcFontSetDestroy(fs);
+
+#ifdef GNASH_DEBUG_DEVICEFONTS
+		    log_debug("Loading font from file %d", filename);
+#endif
 			return true;
 
 		}

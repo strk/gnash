@@ -35,15 +35,20 @@ static as_value mouse_hide(const fn_call& fn);
 static as_value mouse_show(const fn_call& fn);
 static void attachMouseInterface(as_object& o);
 
+void registerMouseNative(as_object& o)
+{
+	VM& vm = o.getVM();
+
+	vm.registerNative(mouse_show, 5, 0);
+	vm.registerNative(mouse_hide, 5, 1);
+}
+
 static void
 attachMouseInterface(as_object& o)
 {
 	VM& vm = o.getVM();
 
-	vm.registerNative(mouse_show, 5, 0);
 	o.init_member("show", vm.getNative(5, 0));
-
-	vm.registerNative(mouse_hide, 5, 1);
 	o.init_member("hide", vm.getNative(5, 1));
 	
 	if (vm.getSWFVersion() > 5)

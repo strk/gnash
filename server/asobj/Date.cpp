@@ -153,6 +153,10 @@ getUniversalTime(const double& time, GnashTime& gt)
 // or in localtime, so we always use localtime.
 
 // forward declarations
+static as_object* getDateInterface();
+static void attachDateInterface(as_object& o);
+static void attachDateStaticInterface(as_object& o);
+
 static as_value date_new(const fn_call& fn);
 static as_value date_gettime(const fn_call& fn); 
 static as_value date_settime(const fn_call& fn);
@@ -194,9 +198,54 @@ static as_value date_valueof(const fn_call& fn);
 // Static AS methods
 static as_value date_utc(const fn_call& fn);
 
-static as_object* getDateInterface();
-static void attachDateInterface(as_object& o);
-static void attachDateStaticInterface(as_object& o);
+void registerDateNative(as_object& global)
+{
+    VM& vm = global.getVM();
+
+    vm.registerNative(date_getfullyear, 103, 0); 
+    vm.registerNative(date_getyear, 103, 1);
+    vm.registerNative(date_getmonth, 103, 2);    
+    vm.registerNative(date_getdate, 103, 3);
+    vm.registerNative(date_getday, 103, 4);
+    vm.registerNative(date_gethours, 103, 5); 
+    vm.registerNative(date_getminutes, 103, 6);
+    vm.registerNative(date_getseconds, 103, 7);        
+    vm.registerNative(date_getmilliseconds, 103, 8);
+    vm.registerNative(date_setfullyear, 103, 9);
+    vm.registerNative(date_setmonth, 103, 10);
+    vm.registerNative(date_setdate, 103, 11);
+    vm.registerNative(date_sethours, 103, 12);
+    vm.registerNative(date_setminutes, 103, 13);
+    vm.registerNative(date_setseconds, 103, 14);
+    vm.registerNative(date_setmilliseconds, 103, 15);
+    vm.registerNative(date_gettime, 103, 16);     
+    vm.registerNative(date_settime, 103, 17);
+    vm.registerNative(date_gettimezoneoffset, 103, 18);  
+    vm.registerNative(date_tostring, 103, 19);
+    vm.registerNative(date_setyear, 103, 20);
+    vm.registerNative(date_getutcfullyear, 103, 128);
+    vm.registerNative(date_getutcyear, 103, 129);    
+    vm.registerNative(date_getutcmonth, 103, 130);
+    vm.registerNative(date_getutcdate, 103, 131);      
+    vm.registerNative(date_getutcday, 103, 132);
+    vm.registerNative(date_getutchours, 103, 133);
+    vm.registerNative(date_getutcminutes, 103, 134);
+    
+    // These two are deliberately the same as non-UTC methods
+    // as there should be no difference:
+    vm.registerNative(date_getseconds, 103, 135);
+    vm.registerNative(date_getmilliseconds, 103, 136);
+    vm.registerNative(date_setutcfullyear, 103, 137);
+    vm.registerNative(date_setutcmonth, 103, 138);
+    vm.registerNative(date_setutcdate, 103, 139);
+    vm.registerNative(date_setutchours, 103, 140);
+    vm.registerNative(date_setutcminutes, 103, 141);
+    vm.registerNative(date_setutcseconds, 103, 142);
+    vm.registerNative(date_setutcmilliseconds, 103, 143);
+
+    vm.registerNative(date_utc, 103, 257);
+
+}
 
 // As UTC offset is measured in minutes, we can use the same
 // functions to get seconds and milliseconds in local and utc time.
@@ -207,117 +256,43 @@ attachDateInterface(as_object& o)
 {
     VM& vm = o.getVM();
 
-    vm.registerNative(date_getfullyear, 103, 0); 
     o.init_member("getFullYear", vm.getNative(103, 0));
-
-    vm.registerNative(date_getyear, 103, 1);
     o.init_member("getYear", vm.getNative(103, 1));
-
-    vm.registerNative(date_getmonth, 103, 2);    
     o.init_member("getMonth", vm.getNative(103, 2));   
-
-    vm.registerNative(date_getdate, 103, 3);
     o.init_member("getDate", vm.getNative(103, 3));
-
-    vm.registerNative(date_getday, 103, 4);
     o.init_member("getDay", vm.getNative(103, 4));
-
-    vm.registerNative(date_gethours, 103, 5); 
     o.init_member("getHours", vm.getNative(103, 5));
-
-    vm.registerNative(date_getminutes, 103, 6);
     o.init_member("getMinutes", vm.getNative(103, 6));
-
-    vm.registerNative(date_getseconds, 103, 7);        
     o.init_member("getSeconds", vm.getNative(103, 7));
-    
-    vm.registerNative(date_getmilliseconds, 103, 8);
     o.init_member("getMilliseconds", vm.getNative(103, 8));
-
-    vm.registerNative(date_setfullyear, 103, 9);
     o.init_member("setFullYear", vm.getNative(103, 9));
-
-    vm.registerNative(date_setmonth, 103, 10);
     o.init_member("setMonth", vm.getNative(103, 10));
-
-    vm.registerNative(date_setdate, 103, 11);
     o.init_member("setDate", vm.getNative(103, 11));
-
-    vm.registerNative(date_sethours, 103, 12);
     o.init_member("setHours", vm.getNative(103, 12));
-
-    vm.registerNative(date_setminutes, 103, 13);
     o.init_member("setMinutes", vm.getNative(103, 13));
-
-    vm.registerNative(date_setseconds, 103, 14);
     o.init_member("setSeconds", vm.getNative(103, 14));
-
-    vm.registerNative(date_setmilliseconds, 103, 15);
     o.init_member("setMilliseconds", vm.getNative(103, 15));
-
-    vm.registerNative(date_gettime, 103, 16);     
     o.init_member("getTime", vm.getNative(103, 16));
- 
-    vm.registerNative(date_settime, 103, 17);
     o.init_member("setTime", vm.getNative(103, 17));
-    
-    vm.registerNative(date_gettimezoneoffset, 103, 18);  
     o.init_member("getTimezoneOffset", vm.getNative(103, 18));
-
-    vm.registerNative(date_tostring, 103, 19);
     o.init_member("toString", vm.getNative(103, 19));
-
-    vm.registerNative(date_setyear, 103, 20);
     o.init_member("setYear", vm.getNative(103, 20));
-
-    vm.registerNative(date_getutcfullyear, 103, 128);
     o.init_member("getUTCFullYear", vm.getNative(103, 128));
-
-    vm.registerNative(date_getutcyear, 103, 129);    
     o.init_member("getUTCYear", vm.getNative(103, 129));
- 
-    vm.registerNative(date_getutcmonth, 103, 130);
     o.init_member("getUTCMonth", vm.getNative(103, 130));
-    
-    vm.registerNative(date_getutcdate, 103, 131);      
     o.init_member("getUTCDate", vm.getNative(103, 131));
-
-    vm.registerNative(date_getutcday, 103, 132);
     o.init_member("getUTCDay", vm.getNative(103, 132));
-
-    vm.registerNative(date_getutchours, 103, 133);
     o.init_member("getUTCHours", vm.getNative(103, 133));
-
-    vm.registerNative(date_getutcminutes, 103, 134);
     o.init_member("getUTCMinutes", vm.getNative(103, 134));
-
-    vm.registerNative(date_getseconds, 103, 135);
-    o.init_member("getUTCSeconds", vm.getNative(103, 135)); // same
-
-    vm.registerNative(date_getmilliseconds, 103, 136);
-    o.init_member("getUTCMilliseconds", vm.getNative(103, 136)); // same
-
-    vm.registerNative(date_setutcfullyear, 103, 137);
+    o.init_member("getUTCSeconds", vm.getNative(103, 135));
+    o.init_member("getUTCMilliseconds", vm.getNative(103, 136));
     o.init_member("setUTCFullYear", vm.getNative(103, 137));
-
-    vm.registerNative(date_setutcmonth, 103, 138);
     o.init_member("setUTCMonth", vm.getNative(103, 138));
-
-    vm.registerNative(date_setutcdate, 103, 139);
     o.init_member("setUTCDate", vm.getNative(103, 139));
-
-    vm.registerNative(date_setutchours, 103, 140);
     o.init_member("setUTCHours", vm.getNative(103, 140));
-
-    vm.registerNative(date_setutcminutes, 103, 141);
     o.init_member("setUTCMinutes", vm.getNative(103, 141));
-
-    vm.registerNative(date_setutcseconds, 103, 142);
     o.init_member("setUTCSeconds", vm.getNative(103, 142));
-
-    vm.registerNative(date_setutcmilliseconds, 103, 143);
     o.init_member("setUTCMilliseconds", vm.getNative(103, 143));
-
     o.init_member("valueOf", new builtin_function(date_valueof));
 
 }   
@@ -326,8 +301,6 @@ static void
 attachDateStaticInterface(as_object& o)
 {
     VM& vm = o.getVM();
-    
-    vm.registerNative(date_utc, 103, 257);
     o.init_member("UTC", vm.getNative(103, 257));
 }
 
@@ -1355,7 +1328,7 @@ makeTimeValue(GnashTime& t)
 }
 
 
-#if USE_MATHEMATICAL_ALGORITHM
+#ifdef USE_MATHEMATICAL_ALGORITHM
 /// Helper function for getYearMathematical
 static double
 daysSinceUTCForYear(double year)

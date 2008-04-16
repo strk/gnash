@@ -623,9 +623,8 @@ Global::Global(VM& vm, ClassHierarchy *ch)
 	color_class_init(*this);
 	textformat_class_init(*this);
 
-	date_class_init(*this);
-	ch->getGlobalNs()->stubPrototype(NSV::CLASS_DATE);
-	ch->getGlobalNs()->getClass(NSV::CLASS_DATE)->setDeclared();
+    registerDateNative(*this);
+    registerMouseNative(*this);
 
 	if ( vm.getSWFVersion() < 6 ) goto extscan;
 	//-----------------------

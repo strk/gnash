@@ -21,7 +21,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Mouse.as,v 1.18 2008/04/15 10:06:45 bwy Exp $";
+rcsid="$Id: Mouse.as,v 1.19 2008/04/16 11:16:34 bwy Exp $";
 #include "check.as"
 
 check_equals ( typeof(Mouse), 'object' );
@@ -47,13 +47,16 @@ check_equals ( typeof(Mouse.show), 'function' );
  check_equals(typeof(Mouse._listeners), 'object');
  check(Mouse._listeners instanceof Array);
 
+ check(Mouse.hasOwnProperty("hide"));
+ check(Mouse.hasOwnProperty("show"));
+
 #endif // OUTPUT_VERSION > 5
 
 
 // test the Mouse::show method
 check_equals ( typeof(Mouse.show), 'function' );
 #if OUTPUT_VERSION > 5
-check_totals(13);
+check_totals(15);
 #else
 check_totals(7);
 #endif
