@@ -1,5 +1,10 @@
 2008-04-16 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac, testsuite/misc-ming.all/Makefile.am:
+	  It takes Ming 0.4.0.beta6 for SWFButton_setDepth.
+
+2008-04-16 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.cpp (can_handle_mouse_event):
 	  A MovieClip can't handle mouse event if it's not enabled.
 	  If no 'enabled' member is found, sprite is considered

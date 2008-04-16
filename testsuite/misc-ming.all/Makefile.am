@@ -201,7 +201,7 @@ check_PROGRAMS += \
 	streamingSoundTest1-Runner 
 endif
 
-if MING_SUPPORTS_SWFBUTTON_ADD_CHARACTER
+if MING_SUPPORTS_SWFBUTTON_SET_DEPTH
 check_PROGRAMS += \
 	ButtonEventsTest \
 	ButtonEventsTest-Runner 
@@ -1857,7 +1857,7 @@ TEST_CASES += \
 	$(NULL)
 endif
 
-if MING_SUPPORTS_SWFBUTTON_ADD_CHARACTER
+if MING_SUPPORTS_SWFBUTTON_SET_DEPTH
 TEST_CASES += \
 	ButtonEventsTest-Runner \
 	$(NULL)
