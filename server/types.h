@@ -8,21 +8,10 @@
 #ifndef __TYPES_H__
 #define __TYPES_H__
 
-
-//#include "gnash.h" // what for ?
-
 #include <string>
 #include <boost/cstdint.hpp> // for boost::?int??_t 
 
-
-namespace gnash {
-	extern bool	s_verbose_action;
-	extern bool	s_verbose_parse;
-	extern bool	s_verbose_debug;
-}
-
-
-#define TWIPS_TO_PIXELS(x)	((x) / 20.f)
+#define TWIPS_TO_PIXELS(x)	((x) / 20.0)
 #define PIXELS_TO_TWIPS(x)	((x) * 20)
 
 

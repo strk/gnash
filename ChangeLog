@@ -1,3 +1,11 @@
+2008-04-16 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/types.h: drop some dead code. (PIXELS_TO_TWIPS) don't
+	  divide by a float; it introduces unnecessary inaccuracy.
+	* server/character.cpp: drop debugging calls I forgot to remove.
+	  They weren't that helpful anyway.
+	* testsuite/actionscript.all/MovieClip.as: tests passing.
+
 2008-04-16 Sandro Santilli <strk@keybit.net>
 
 	* configure.ac, testsuite/misc-ming.all/Makefile.am:

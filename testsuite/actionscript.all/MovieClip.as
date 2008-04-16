@@ -20,9 +20,9 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.125 2008/04/16 19:36:17 bwy Exp $";
+rcsid="$Id: MovieClip.as,v 1.126 2008/04/16 21:05:27 bwy Exp $";
 
-rcsid="$Id: MovieClip.as,v 1.125 2008/04/16 19:36:17 bwy Exp $";
+rcsid="$Id: MovieClip.as,v 1.126 2008/04/16 21:05:27 bwy Exp $";
 #include "check.as"
 
 // To be called at end of test
@@ -1310,7 +1310,7 @@ if ( typeof(static_clip) == 'movieclip' )
 
     // Gnash can't do this because _x and _y are floats at the
     // moment, but it probably should be able to.
-    xcheck_equals(static_clip._y, 0.05);
+    check_equals(static_clip._y, 0.05);
 
     // If it's not one twip, it's nothing
     static_clip._x += 0.04;
@@ -1324,16 +1324,9 @@ if ( typeof(static_clip) == 'movieclip' )
     
     static_clip._x = 20.09;
     check(static_clip._x > 20.049999 && static_clip._x < 20.050001);
-    xcheck_equals(static_clip._x, 0.05);
+    check_equals(static_clip._x, 20.05);
 
     // TODO: try with x/y being getter-setter of the localToGlobal and globalToLocal parameter
-
-    
-/*    static_clip._y = 160;*/
-/*    for (i = 0; )*/
-/*        static_clip._y -= (static_clip._y - 150) / 5;*/
-/*        trace (static_clip._y);*/
-/*    }*/
     
 }
 else
