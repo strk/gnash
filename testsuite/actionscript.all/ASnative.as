@@ -15,9 +15,17 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-rcsid="$Id: ASnative.as,v 1.3 2008/04/16 06:54:35 bwy Exp $";
+rcsid="$Id: ASnative.as,v 1.4 2008/04/16 07:27:08 bwy Exp $";
 #include "check.as"
 
+a = ASnative (100, 0); // escape
+check_equals(a(" "), "%20");
+a = ASnative (100, 1); // unescape
+check_equals(a("%20"), " ");
+a = ASnative (100, 2); // parseInt
+check_equals(a("  566765s"), "566765");
+a = ASnative (100, 3); // parseFloat
+check_equals(a("8.4e6"), 8.4e6);
 
 // Do this first to make sure ASnative is
 // register before Date class itself is called.
@@ -141,9 +149,9 @@ check_equals(a(func).toString(), "1.2661036727795"); // acos
 a = ASnative(200, 17);
 check_equals(a(func, func + 1).toString(), "0.209053590580785"); // pow
 a = ASnative(200, 18);
-xcheck_equals(a(func), false); // isNan
+check_equals(a(func), false); // isNan
 a = ASnative(200, 19);
-xcheck_equals(a(func), true); // isFinite
+check_equals(a(func), true); // isFinite
 
 xcheck_equals (countVO, 25); // calls to valueOf.
 check_equals (countTS, 0); // calls to toString.
@@ -182,7 +190,7 @@ xcheck_equals (countTS, 2);
 xcheck_equals (countVO, 25);
 
 #if OUTPUT_VERSION > 5
-check_totals(59);
+check_totals(63);
 #else
-check_totals(57);
+check_totals(61);
 #endif

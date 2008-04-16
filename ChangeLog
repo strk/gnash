@@ -1,4 +1,11 @@
-2008-04-15 Benjamin Wolsey <bwy@benjaminwolsey.de>
+2008-04-16 Benjamin Wolsey <bwy@benjaminwolsey.de>
+	
+	* server/asobj/Global.cpp: register parseInt, parseFloat,
+	  escape, unescape, isNaN and isFinite as ASnative.
+	* testsuite/actionscript.all/ASnative.cpp: test global
+	  ASnative functions
+
+2008-04-16 Benjamin Wolsey <bwy@benjaminwolsey.de>
 	
 	* server/asobj/Global.cpp: init Date class at startup
 	  so that its ASnative functions are registered.

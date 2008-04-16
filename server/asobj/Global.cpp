@@ -593,12 +593,19 @@ Global::Global(VM& vm, ClassHierarchy *ch)
 	// SWF5
 	//-----------------------
 
-	init_member("escape", new builtin_function(as_global_escape));
-	init_member("unescape", new builtin_function(as_global_unescape));
-	init_member("parseFloat", new builtin_function(as_global_parsefloat));
-	init_member("parseInt", new builtin_function(as_global_parseint));
-	init_member("isNaN", new builtin_function(as_global_isnan));
-	init_member("isFinite", new builtin_function(as_global_isfinite));
+    vm.registerNative(as_global_escape, 100, 0);
+	init_member("escape", vm.getNative(100, 0));
+	vm.registerNative(as_global_unescape, 100, 1);
+	init_member("unescape", vm.getNative(100, 1));
+    vm.registerNative(as_global_parseint, 100, 2);
+	init_member("parseInt", vm.getNative(100, 2));
+    vm.registerNative(as_global_parsefloat, 100, 3);
+	init_member("parseFloat", vm.getNative(100, 3));
+	
+	vm.registerNative(as_global_isnan, 200, 18);
+	init_member("isNaN", vm.getNative(200, 18));
+	vm.registerNative(as_global_isfinite, 200, 19);
+	init_member("isFinite", vm.getNative(200, 19));
 
 	// NaN and Infinity should only be in _global since SWF6,
 	// but this is just because SWF5 or lower did not have a "_global"
