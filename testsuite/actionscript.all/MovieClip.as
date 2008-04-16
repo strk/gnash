@@ -20,9 +20,9 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.124 2008/04/16 19:16:58 bwy Exp $";
+rcsid="$Id: MovieClip.as,v 1.125 2008/04/16 19:36:17 bwy Exp $";
 
-rcsid="$Id: MovieClip.as,v 1.124 2008/04/16 19:16:58 bwy Exp $";
+rcsid="$Id: MovieClip.as,v 1.125 2008/04/16 19:36:17 bwy Exp $";
 #include "check.as"
 
 // To be called at end of test
@@ -1306,7 +1306,7 @@ if ( typeof(static_clip) == 'movieclip' )
     check_equals(static_clip._y, 0);
     
     static_clip._y = 0.09;
-    check(static_clip._y > 0.04999 && static_clip._y < 0.50001);
+    check(static_clip._y > 0.04999 && static_clip._y < 0.050001);
 
     // Gnash can't do this because _x and _y are floats at the
     // moment, but it probably should be able to.
