@@ -245,7 +245,7 @@ LoadVars::checkLoads()
 #endif
         if ( lt->completed() )
         {
-            size_t xmlsize = lt->getBytesTotal();
+            size_t xmlsize = _bytesTotal = _bytesLoaded = lt->getBytesTotal();
             boost::scoped_array<char> buf(new char[xmlsize+1]);
             size_t actuallyRead = lt->read(buf.get(), xmlsize);
             if ( actuallyRead != xmlsize )
@@ -259,7 +259,37 @@ LoadVars::checkLoads()
 #endif
 			}
             buf[actuallyRead] = '\0';
-            as_value dataVal(buf.get()); // memory copy here (optimize?)
+            // Strip BOM, if any.
+            // See http://savannah.gnu.org/bugs/?19915
+            char* bufptr = buf.get();
+            log_debug("xmlsize:%d, ptr:%s", xmlsize, bufptr);
+            if ( xmlsize > 2 )
+            {
+                 // need *ptr to be unsigned or cast all 0xNN
+                 unsigned char* ptr = reinterpret_cast<unsigned char*>(bufptr);
+
+                 if ( *ptr == 0xFF && *(ptr+1) == 0xFE )
+                 {
+                     // Text is UTF-16 LE,
+                     // we should convert to UTF-8
+                     log_unimpl("Conversion from UTF-16 LE to UTF-8 (LoadVars)");
+                     bufptr+=2;
+                 }
+                 else if ( *ptr == 0xFE && *(ptr+1) == 0xFF )
+                 {
+                     // Text is UTF-16 BE, 
+                     // we should convert to UTF-8
+                     log_unimpl("Conversion from UTF-16 BE to UTF-8 (LoadVars)");
+                     bufptr+=2;
+                 }
+                 else if ( xmlsize > 3 && *ptr == 0xEF && *(ptr+1) == 0xBB && *(ptr+2) == 0xBF )
+                 {
+                     log_debug("UTF8 bom (LoadVars)");
+                     // Text is UTF-8
+                     bufptr+=3;
+                 }
+            }
+            as_value dataVal(bufptr); // memory copy here (optimize?)
 
             it = _loadThreads.erase(it);
             delete lt; // supposedly joins the thread...
@@ -273,6 +303,7 @@ LoadVars::checkLoads()
         }
         else
         {
+            _bytesLoaded = lt->getBytesLoaded();
             ++it;
         }
     }

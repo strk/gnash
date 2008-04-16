@@ -1,4 +1,4 @@
-var1=val1&var2=val2&
+﻿var1=val1&var2=val2&
 second line (should be discarded)
 second line (should be discarded)
 third line (should be discarded)

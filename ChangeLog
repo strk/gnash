@@ -1,5 +1,13 @@
 2008-04-16 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/LoadVars.as: check that getBytesLoaded()
+	  is bigger then 0 when onLoad is received>
+	* server/asobj/LoadVars.cpp: handle BOM mark in input file.
+	  Fixes bug #19915.
+	* testsuite/media/vars.txt: add UTF8 BOM mark.
+
+2008-04-16 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/LoadVars.as: test that LoadVars::decode()
 	  would not skip BOM.
 

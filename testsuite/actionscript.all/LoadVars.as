@@ -22,7 +22,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: LoadVars.as,v 1.28 2008/04/16 21:35:56 strk Exp $";
+rcsid="$Id: LoadVars.as,v 1.29 2008/04/16 23:07:15 strk Exp $";
 #include "check.as"
 
 #if OUTPUT_VERSION < 6
@@ -136,6 +136,8 @@ loadvarsObj.onLoad = function(success) {
 
 	//delete loadvarsObj; // this to test robustness
 
+	check_equals (loadvarsObj.getBytesTotal(), loadvarsObj.getBytesLoaded());
+	check (loadvarsObj.getBytesLoaded() > 10);
 	check_equals (this, loadvarsObj);
 	check_equals(arguments.length, 1);
 	check_equals(typeof(success), 'boolean');
@@ -163,7 +165,7 @@ loadvarsObj.onLoad = function(success) {
 		// Gnash insists in looking for an ending & char !!		
 		check_equals(loadvarsObj['var3'], 'val3\n');
 
-		check_totals(70);
+		check_totals(72);
 
 		play();
 	}
@@ -178,7 +180,7 @@ loadvarsObj.onData = function(src) {
 	check_equals(arguments.length, 1);
 	check_equals(typeof(src), 'string');
 	check_equals(src.substr(0, 10), 'var1=val1&');
-	check_equals(src.substr(loadvarsObj.getBytesTotal()-10), 'var3=val3\n');
+	check_equals(src.substr(loadvarsObj.getBytesTotal()-13), 'var3=val3\n');
 	check_equals(datareceived, 0);
 	datareceived++; // we expecte it to be called only once ?
 	note("LoadVars.onData called ("+datareceived+"), byte loaded: "
