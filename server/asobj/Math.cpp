@@ -179,6 +179,30 @@ math_round(const fn_call& fn)
 }
 
 
+void registerMathNative(as_object& proto)
+{
+    VM& vm = proto.getVM();
+    
+    vm.registerNative(math_fabs, 200, 0);
+    vm.registerNative(math_min, 200, 1);
+    vm.registerNative(math_max, 200, 2);
+    vm.registerNative(math_sin, 200, 3);
+    vm.registerNative(math_cos, 200, 4);
+    vm.registerNative(math_atan2, 200, 5);
+    vm.registerNative(math_tan, 200, 6);
+    vm.registerNative(math_exp, 200, 7);
+    vm.registerNative(math_log, 200, 8);
+    vm.registerNative(math_sqrt, 200, 9);
+    vm.registerNative(math_round, 200, 10);
+    vm.registerNative(math_random, 200, 11);
+    vm.registerNative(math_floor, 200, 12);
+    vm.registerNative(math_ceil, 200, 13);
+    vm.registerNative(math_atan, 200, 14);
+    vm.registerNative(math_asin, 200, 15);
+    vm.registerNative(math_acos, 200, 16);
+    vm.registerNative(math_pow, 200, 17);
+}
+
 void
 attachMathInterface(as_object& proto)
 {
@@ -202,41 +226,23 @@ attachMathInterface(as_object& proto)
 
     VM& vm = proto.getVM();
     
-    vm.registerNative(math_fabs, 200, 0);
     proto.init_member("abs", vm.getNative(200, 0), flags);
-    vm.registerNative(math_min, 200, 1);
     proto.init_member("min", vm.getNative(200, 1), flags);
-    vm.registerNative(math_max, 200, 2);
     proto.init_member("max", vm.getNative(200, 2), flags);
-    vm.registerNative(math_sin, 200, 3);
     proto.init_member("sin", vm.getNative(200, 3), flags);
-    vm.registerNative(math_cos, 200, 4);
     proto.init_member("cos", vm.getNative(200, 4), flags);
-    vm.registerNative(math_atan2, 200, 5);
     proto.init_member("atan2", vm.getNative(200, 5), flags);
-    vm.registerNative(math_tan, 200, 6);
     proto.init_member("tan", vm.getNative(200, 6), flags);
-    vm.registerNative(math_exp, 200, 7);
     proto.init_member("exp", vm.getNative(200, 7), flags);
-    vm.registerNative(math_log, 200, 8);
     proto.init_member("log", vm.getNative(200, 8), flags);
-    vm.registerNative(math_sqrt, 200, 9);
     proto.init_member("sqrt", vm.getNative(200, 9), flags);
-    vm.registerNative(math_round, 200, 10);
     proto.init_member("round", vm.getNative(200, 10), flags);
-    vm.registerNative(math_random, 200, 11);
     proto.init_member("random", vm.getNative(200, 11), flags);
-    vm.registerNative(math_floor, 200, 12);
     proto.init_member("floor", vm.getNative(200, 12), flags);
-    vm.registerNative(math_ceil, 200, 13);
     proto.init_member("ceil", vm.getNative(200, 13), flags);
-    vm.registerNative(math_atan, 200, 14);
     proto.init_member("atan", vm.getNative(200, 14), flags);
-    vm.registerNative(math_asin, 200, 15);
     proto.init_member("asin", vm.getNative(200, 15), flags);
-    vm.registerNative(math_acos, 200, 16);
 	proto.init_member("acos", vm.getNative(200, 16), flags);
-    vm.registerNative(math_pow, 200, 17);
     proto.init_member("pow", vm.getNative(200, 17), flags);
 }
 

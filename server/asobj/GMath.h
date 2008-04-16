@@ -55,6 +55,7 @@ namespace gnash {
 
 // Math isn't a proper class, so doesn't need a constructor.
 
+void registerMathNative(as_object& global);
 void math_class_init(as_object& global);
 
 } // end of gnash namespace

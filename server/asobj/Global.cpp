@@ -586,6 +586,11 @@ Global::Global(VM& vm, ClassHierarchy *ch)
 	// SWF4
 	//-----------------------
 
+    // The Math class was available from SWF4. It
+    // is initialized on demand, and the native
+    // functions *must* be registered before this.
+	registerMathNative(*this);
+
 	init_member("trace", new builtin_function(as_global_trace));
 
 	if ( vm.getSWFVersion() < 5 ) goto extscan;
@@ -617,8 +622,10 @@ Global::Global(VM& vm, ClassHierarchy *ch)
     // to register ASnative functions
 	color_class_init(*this);
 	textformat_class_init(*this);
-	math_class_init(*this);
+
 	date_class_init(*this);
+	ch->getGlobalNs()->stubPrototype(NSV::CLASS_DATE);
+	ch->getGlobalNs()->getClass(NSV::CLASS_DATE)->setDeclared();
 
 	if ( vm.getSWFVersion() < 6 ) goto extscan;
 	//-----------------------

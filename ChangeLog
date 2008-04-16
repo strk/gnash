@@ -1,10 +1,20 @@
+2008-04-16 Benjamin Wolsey <bwy@benjaminwolsey.de>
+	
+	* server/asobj/{GMath.h,Math.cpp}: split registering native
+	  functions into a separate method (registerMathNative), which
+	  must be called at startup (logical enough...), or at least
+	  before the Math class is initialized.
+	* server/asobj/Global.cpp: register Math ASnative functions
+	  at startup for SWF4+. Return to loading Math class on demand.
+	  Notify ClassHierarchy about Date initialization (though this
+	  can be reverted if Date ASnatives are initialized separately).
+
 2008-04-16 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/ButtonEventsTest.c: self-contain
 	  tests for NOT receiving unexpected events, gnash failure
 	  is more explicitly visible now (gets an additional
 	  unexpected MOUSEOUT event when MOUSEUPOUTSIDE is expected).
-
 
 2008-04-16 Sandro Santilli <strk@keybit.net>
 
