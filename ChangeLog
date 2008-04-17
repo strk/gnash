@@ -1,5 +1,10 @@
 2008-04-17 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/xml.cpp: handle BOM in XML input.
+	* testsuite/media/gnash.xml: add utf8 BOM.
+
+2008-04-17 Sandro Santilli <strk@keybit.net>
+
 	* libbase/utf8.{cpp,h}: add a stripBOM interface and a TextEncoding
 	  enum to deal with BOMs.
 	* server/LoadVariablesThread.cpp: handle BOMs, fixing failure in

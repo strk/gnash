@@ -26,6 +26,7 @@
 #include "as_function.h" // for as_function
 #include "fn_call.h"
 #include "action.h" // for call_method
+#include "utf8.h" // for BOM stripping
 
 #include "xmlattrs.h"
 #include "xmlnode.h"
@@ -514,7 +515,16 @@ XML::checkLoads()
 #endif
 			}
             buf[actuallyRead] = '\0';
-            as_value dataVal(buf.get()); // memory copy here (optimize?)
+            // Strip BOM, if any.
+            // See http://savannah.gnu.org/bugs/?19915
+            utf8::TextEncoding encoding;
+            // NOTE: the call below will possibly change 'xmlsize' parameter
+            char* bufptr = utf8::stripBOM(buf.get(), xmlsize, encoding);
+            if ( encoding != utf8::encUTF8 && encoding != utf8::encUNSPECIFIED )
+            {
+                log_unimpl("%s to utf8 conversion in XML input parsing", utf8::textEncodingName(encoding));
+            }
+            as_value dataVal(bufptr); // memory copy here (optimize?)
 
             it = _loadThreads.erase(it);
             delete lt; // supposedly joins the thread...
