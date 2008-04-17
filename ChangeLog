@@ -1,5 +1,10 @@
 2008-04-17 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: don't leave a stale 'cerr' file around, open
+	  it only once for writing.
+
+2008-04-17 Sandro Santilli <strk@keybit.net>
+
 	* server/FreetypeGlyphsProvider.{cpp,h}: add a unitsPerEM() method
 	  to retrive the nominal EM square size. Currently always 1024
 	  but could theoretically match the underlying freetype EM square.
