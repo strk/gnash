@@ -590,6 +590,9 @@ Global::Global(VM& vm, ClassHierarchy *ch)
     // is initialized on demand, and the native
     // functions *must* be registered before this.
 	registerMathNative(*this);
+	
+	// TODO: When should these be registered?
+	registerSystemNative(*this);
 
     vm.registerNative(as_global_trace, 100, 4);
 	init_member("trace", vm.getNative(100, 4));

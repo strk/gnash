@@ -23,8 +23,9 @@
 
 namespace gnash {
 
-// System isn't a proper class, so doesn't need a constructor.
+void registerSystemNative(as_object& global);
 
+// System isn't a proper class, so doesn't need a constructor.
 void system_class_init(as_object& global);
 
 } // end of gnash namespace

@@ -42,14 +42,34 @@ static as_value system_showsettings(const fn_call& fn);
 static as_value system_exactsettings(const fn_call& fn);
 static as_value system_usecodepage(const fn_call& fn);
 
-static as_object*
-getSystemSecurityInterface()
+void registerSystemNative(as_object& global)
 {
+    VM& vm = global.getVM();
+    
+    vm.registerNative(system_security_allowdomain, 12, 0);
+    vm.registerNative(system_showsettings, 2107, 0);
+    
+    // From http://osflash.org/flashcoders/undocumented/asnative
+    
+    // Run once in startup script then deleted...
+    // System.Capabilities.Query 11, 0    
+    
+    // System.Product.isRunning 2201, 0
+    // System.Product.isInstalled 2201, 1
+    // System.Product.launch 2201, 2
+    // System.Product.download 2201, 3    
+}
+
+static as_object*
+getSystemSecurityInterface(as_object& o)
+{
+    VM& vm = o.getVM();
+
 	static boost::intrusive_ptr<as_object> proto;
 	if ( proto == NULL )
 	{
 		proto = new as_object(getObjectInterface());
-		proto->init_member("allowDomain", new builtin_function(system_security_allowdomain));
+		proto->init_member("allowDomain", vm.getNative(12, 0));
 
 		// TODO: only available when SWF >= 7 
 		proto->init_member("allowInsecureDomain", new builtin_function(system_security_allowinsecuredomain));
@@ -250,13 +270,14 @@ getSystemCapabilitiesInterface()
 static void
 attachSystemInterface(as_object& proto)
 {
+	VM& vm = proto.getVM();
+
 	// Initialize Function prototype
-	proto.init_member("security", getSystemSecurityInterface());
+	proto.init_member("security", getSystemSecurityInterface(proto));
 	proto.init_member("capabilities", getSystemCapabilitiesInterface());
 	proto.init_member("setClipboard", new builtin_function(system_setclipboard));
-	proto.init_member("showSettings", new builtin_function(system_showsettings));
+	proto.init_member("showSettings", vm.getNative(2107, 0));
 
-	VM& vm = proto.getVM();
     const int version = vm.getSWFVersion();
 
 	as_c_function_ptr gettersetter;
