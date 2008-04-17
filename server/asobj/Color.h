@@ -25,11 +25,10 @@ namespace gnash {
 
 class as_object;
 
+void registerColorNative(as_object& global);
+
 /// Initialize the global Color class
 void color_class_init(as_object& global);
-
-/// Return a Color instance (in case the core lib needs it)
-//std::auto_ptr<as_object> init_color_instance();
   
 } // end of gnash namespace
 

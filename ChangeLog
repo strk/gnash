@@ -1,8 +1,18 @@
 2008-04-17 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* server/asobj/Color.{h,cpp}: register ASnative separately.
+	* server/asobj/Global.cpp: only load Color on demand. I think
+	  this won't reintroduce the old string_table lookup bug, but
+	  this is where to revert if it does happen (until a better
+	  solution is found).
+	* testsuite/actionscript.all/Color.as: test variables with same
+	  name as class (case insensitive). Doesn't really get the problem,
+	  but this should be tested as well.
+
+2008-04-17 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* libbase/utf8.h: visibility...
-	* server/character.cpp: replacing rint with floor wasn't a
-	  good idea.
+	* server/character.cpp: use std::floor instead of cast to int.
 
 2008-04-17 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
@@ -10,8 +20,6 @@
 	  add notes for unimplemented ASnatives.
 	* server/asobj/Global.cpp: register System ASnative functions at
 	  startup.
-	* server/character.h: use std::floor instead of rint and cast
-	  to int.
 
 2008-04-17 Sandro Santilli <strk@keybit.net>
 

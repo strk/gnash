@@ -22,7 +22,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Color.as,v 1.14 2008/03/11 19:31:46 strk Exp $";
+rcsid="$Id: Color.as,v 1.15 2008/04/17 10:22:23 bwy Exp $";
 #include "check.as"
 
 //--------------------------------
@@ -239,6 +239,42 @@ check_equals ( trans.ba, 0 );
 check_equals ( trans.bb, 153 );
 check_equals ( trans.aa, 100 );
 check_equals ( trans.ab, 0 );
+
+// Some tests for same-named (case-insensitive) variables in SWF6
+
+#if OUTPUT_VERSION == 6
+color = 8;
+
+c = new Color;
+check_equals(c, undefined);
+c = new color;
+check_equals(c, undefined);
+
+delete color;
+c = new Color;
+check_equals (typeof(c), 'object');
+c = new color;
+check_equals (typeof(c), 'object');
+
+color = 8;
+check_equals (typeof(c), 'object');
+check_equals (typeof(c), 'object');
+
+delete c;
+c = new Color;
+check_equals (typeof(c), 'undefined');
+c = new color;
+check_equals (typeof(c), 'undefined');
+
+delete color; // variable
+delete color; // class
+c = new Color;
+check_equals (typeof(c), 'undefined');
+c = new color;
+check_equals (typeof(c), 'undefined');
+
+// Do not add any tests after here (color deleted).
+#endif
 
 //-----------------------------------------------------------
 // end of test

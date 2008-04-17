@@ -622,9 +622,10 @@ Global::Global(VM& vm, ClassHierarchy *ch)
 	init_member("NaN", as_value(NAN));
 	init_member("Infinity", as_value(INFINITY));
 
+	registerColorNative(*this);
+
     // The following initializations are necessary
     // to register ASnative functions
-	color_class_init(*this);
 	textformat_class_init(*this);
 
     registerDateNative(*this);

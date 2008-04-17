@@ -44,29 +44,28 @@ static as_value color_setrgb(const fn_call& fn);
 static as_value color_settransform(const fn_call& fn);
 static as_value color_ctor(const fn_call& fn);
 
+void registerColorNative(as_object& o)
+{
+	VM& vm = o.getVM();
+
+	vm.registerNative(color_setrgb, 700, 0);
+	vm.registerNative(color_settransform, 700, 1);
+	vm.registerNative(color_getrgb, 700, 2);
+	vm.registerNative(color_gettransform, 700, 3);
+}
+
 static void
 attachColorInterface(as_object& o)
 {
 	VM& vm = o.getVM();
 
 	// Color.setRGB
-	//log_debug("Registering as native 700, 0");
-	vm.registerNative(color_setrgb, 700, 0);
 	o.init_member("setRGB", vm.getNative(700, 0));
-
 	// Color.setTransform
-	//log_debug("Registering as native 700, 1");
-	vm.registerNative(color_settransform, 700, 1);
 	o.init_member("setTransform", vm.getNative(700, 1));
-
 	// Color.getRGB
-	//log_debug("Registering as native 700, 2");
-	vm.registerNative(color_getrgb, 700, 2);
 	o.init_member("getRGB", vm.getNative(700, 2));
-
 	// Color.getTransform
-	//log_debug("Registering as native 700, 3");
-	vm.registerNative(color_gettransform, 700, 3);
 	o.init_member("getTransform", vm.getNative(700, 3));
 
 }
@@ -114,12 +113,6 @@ public:
 		}
 		markAsObjectReachable();
 	}
-
-	// override from as_object ?
-	//std::string get_text_value() const { return "Color"; }
-
-	// override from as_object ?
-	//double get_numeric_value() const { return 0; }
 
 	sprite_instance* getSprite() const
 	{
