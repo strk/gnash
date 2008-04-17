@@ -1,3 +1,10 @@
+2008-04-17 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* testsuite/actionscript.all/case.as: test for case collision
+	  in _global properties.
+	* testsuite/actionscript.all/String.as: test SWF5 properties
+	  too.
+
 2008-04-17 Sandro Santilli <strk@keybit.net>
 
 	* server/parser/movie_def_impl.{cpp,h}:

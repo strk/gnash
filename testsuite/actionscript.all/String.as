@@ -17,7 +17,7 @@
 // Original author: Mike Carlson - June 19th, 2006
 
 
-rcsid="$Id: String.as,v 1.54 2008/03/31 17:17:16 strk Exp $";
+rcsid="$Id: String.as,v 1.55 2008/04/17 12:39:22 bwy Exp $";
 #include "check.as"
 
 check_equals(typeof(String), 'function');
@@ -59,6 +59,9 @@ check_equals(typeof(String.substr), 'undefined');
 check_equals(typeof(String.fromCharCode), 'function');
 
 #if OUTPUT_VERSION > 5
+
+// Tests for SWF5 at the end of the file.
+
 check(String.hasOwnProperty('fromCharCode'));
 check(!String.hasOwnProperty('toString'));
 check(!String.hasOwnProperty('valueOf'));
@@ -77,8 +80,8 @@ check(String.prototype.hasOwnProperty('substring'));
 check(String.prototype.hasOwnProperty('split'));
 check(String.prototype.hasOwnProperty('substr'));
 check(!String.prototype.hasOwnProperty('length'));
-#endif
 
+#endif
 
 check_equals(typeof(String()), 'string');
 
@@ -811,8 +814,37 @@ check_equals(String.__proto__.__proto__, Object.prototype);  // hasOwnProperty d
 a=new Array(); for (v in String) a.push(v); a.sort();
 check_equals(a.toString(), "gotcha,toString"); 
 
+#if OUTPUT_VERSION == 5
+// This here to avoid changing SWF5 String properties
+// before testing them.
+
+String.prototype.hasOwnProperty = ASnative(101, 5);
+String.hasOwnProperty = ASnative(101, 5);
+
+check(!String.hasOwnProperty('toString'));
+check(!String.hasOwnProperty('valueOf'));
+check(String.hasOwnProperty('__proto__'));
+check(String.hasOwnProperty('fromCharCode'));
+
+check(String.prototype.hasOwnProperty('valueOf'));
+check(String.prototype.hasOwnProperty('toString'));
+check(String.prototype.hasOwnProperty('toUpperCase'));
+check(String.prototype.hasOwnProperty('toLowerCase'));
+check(String.prototype.hasOwnProperty('charAt'));
+check(String.prototype.hasOwnProperty('charCodeAt'));
+check(String.prototype.hasOwnProperty('concat'));
+check(String.prototype.hasOwnProperty('indexOf'));
+check(String.prototype.hasOwnProperty('lastIndexOf'));
+check(String.prototype.hasOwnProperty('slice'));
+check(String.prototype.hasOwnProperty('substring'));
+check(String.prototype.hasOwnProperty('split'));
+check(String.prototype.hasOwnProperty('substr'));
+check(!String.prototype.hasOwnProperty('length'));
+
+#endif
+
 #if OUTPUT_VERSION < 6
- check_totals(222);
+ check_totals(240);
 #else
  check_totals(256);
 #endif

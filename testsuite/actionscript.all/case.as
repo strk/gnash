@@ -23,7 +23,7 @@
  */
 
 
-rcsid="$Id: case.as,v 1.19 2008/03/11 19:31:48 strk Exp $";
+rcsid="$Id: case.as,v 1.20 2008/04/17 12:39:22 bwy Exp $";
 #include "check.as"
 
 #if OUTPUT_VERSION <= 6 // {
@@ -297,12 +297,33 @@ check_equals(propRecorder.length, 2);
  check_equals(propRecorder[1], 'a');
 #endif
 
+
+#if OUTPUT_VERSION > 5
+// Check that properties are not overridden by
+// variable names.
+_global.hasOwnProperty = ASnative(101, 5);
+
+check(_global.hasOwnProperty("Date"));
+# if OUTPUT_VERSION == 6
+check(_global.hasOwnProperty("date"));
+# endif
+Color = 5;
+color = 8;
+
+check(_global.hasOwnProperty("Color"));
+# if OUTPUT_VERSION == 6
+check(_global.hasOwnProperty("color"));
+# endif
+
+#endif
+
+
 #if OUTPUT_VERSION <= 5
  check_totals(23);
 #endif
 #if OUTPUT_VERSION == 6
- check_totals(48);
+ check_totals(52);
 #endif
 #if OUTPUT_VERSION >= 7
- check_totals(44);
+ check_totals(46);
 #endif
