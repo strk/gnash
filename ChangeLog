@@ -1,6 +1,8 @@
 2008-04-17 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* libbase/utf8.h: visibility...
+	* server/character.cpp: replacing rint with floor wasn't a
+	  good idea.
 
 2008-04-17 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
