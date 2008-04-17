@@ -133,10 +133,10 @@ namespace utf8
 	/// @returns
 	///	A pointer either equal to 'in' or some bytes inside it.
 	///
-	char* stripBOM(char* in, size_t& size, TextEncoding& encoding);
+	DSOEXPORT char* stripBOM(char* in, size_t& size, TextEncoding& encoding);
 
 	/// Return name of a text encoding
-	const char* textEncodingName(TextEncoding enc);
+	DSOEXPORT const char* textEncodingName(TextEncoding enc);
 }
 
 

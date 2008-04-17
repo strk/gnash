@@ -1,5 +1,9 @@
 2008-04-17 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* libbase/utf8.h: visibility...
+
+2008-04-17 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* server/asobj/System.{h,cpp}: allow registering ASnative functions,
 	  add notes for unimplemented ASnatives.
 	* server/asobj/Global.cpp: register System ASnative functions at
