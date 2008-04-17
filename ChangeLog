@@ -1,3 +1,14 @@
+2008-04-17 Sandro Santilli <strk@keybit.net>
+
+	* server/parser/movie_def_impl.{cpp,h}:
+	  Add a boost::barrier based mechanism to make
+	  sure the loader thread execution waits for 
+	  the _thread member to be assigned-to.
+	  Hopefully fixes bug #22915 and represents
+	  a model for other thread starterts to follow
+	  to avoid time-sensible joins aka segfaults
+	  on exit.
+
 2008-04-17 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/asobj/Color.{h,cpp}: register ASnative separately.

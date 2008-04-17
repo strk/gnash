@@ -75,8 +75,9 @@ namespace gnash
 
 MovieLoader::MovieLoader(movie_def_impl& md)
 	:
-	_movie_def(md)
-	,_thread(NULL)
+	_movie_def(md),
+	_thread(NULL),
+	_barrier(2) // us and the main thread..
 {
 }
 
@@ -113,9 +114,11 @@ MovieLoader::isSelfThread() const
 	return this_thread == *_thread;
 }
 
+// static..
 void
-MovieLoader::execute(movie_def_impl* md)
+MovieLoader::execute(MovieLoader& ml, movie_def_impl* md)
 {
+	ml._barrier.wait(); // let _thread assignment happen before going on
 	md->read_all_swf();
 }
 
@@ -132,7 +135,9 @@ MovieLoader::start()
 	// Those tests do seem a bit redundant, though...
 	boost::mutex::scoped_lock lock(_mutex);
 
-	_thread.reset( new boost::thread(boost::bind(execute, &_movie_def)) );
+	_thread.reset( new boost::thread(boost::bind(execute, boost::ref(*this), &_movie_def)) );
+
+	_barrier.wait(); // let execution start befor returning
 
 	return true;
 }

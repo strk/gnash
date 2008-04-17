@@ -35,6 +35,7 @@
 #include <memory> // for auto_ptr
 #include <boost/thread/thread.hpp>
 #include <boost/thread/condition.hpp>
+#include <boost/thread/barrier.hpp>
 
 //
 // Forward declarations
@@ -113,8 +114,13 @@ private:
 	mutable boost::mutex _mutex;
 	std::auto_ptr<boost::thread> _thread;
 
+	// Barrier to ensure that _thread
+	// is initialized before the loader thread
+	// continues execution
+	boost::barrier _barrier;
+
 	/// Entry point for the actual thread
-	static void execute(movie_def_impl* md);
+	static void execute(MovieLoader& ml, movie_def_impl* md);
 };
 
 /// The Characters dictionary associated with each SWF file.
