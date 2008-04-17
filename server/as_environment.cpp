@@ -558,8 +558,8 @@ as_environment::find_object(const std::string& path_in, const ScopeStack* scopeS
     const char*	p = path.c_str();
     if (*p == '/')
     {
-	// Absolute path.  Start at the root.
-	sprite_instance* root = m_target->get_root();
+	// Absolute path.  Start at the (AS) root (handle _lockroot)
+	sprite_instance* root = const_cast<sprite_instance*>(m_target->getAsRoot());
 	if ( ! *(++p) )
 	{
 #ifdef DEBUG_TARGET_FINDING 

@@ -898,10 +898,8 @@ button_character_instance::get_member(string_table::key name_key, as_value* val,
   //
   if (name_key == NSV::PROP_uROOT)
   {
-
-    // Let ::get_root() take care of _lockroot
-    movie_instance* relRoot = get_root();
-    val->set_as_object( relRoot );
+    // getAsRoot() will take care of _lockroot
+    val->set_as_object( const_cast<sprite_instance*>( getAsRoot() )  );
     return true;
   }
 

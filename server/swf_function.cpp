@@ -233,9 +233,9 @@ swf_function::operator()(const fn_call& fn)
 		if (m_function2_flags & PRELOAD_ROOT) 
 		{
 			// Put '_root' in a register.
-			// NOTE: _lockroot will be hanlded by get_root()
+			// NOTE: _lockroot will be hanlded by getAsRoot()
 			our_env->local_register(current_reg).set_as_object(
-				our_env->get_target()->get_root());
+				const_cast<sprite_instance*>(our_env->get_target()->getAsRoot()));
 			current_reg++;
 		}
 

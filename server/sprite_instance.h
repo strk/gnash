@@ -109,15 +109,16 @@ public:
 		TAG_DLIST  = 1<<1
 	};
 
-	/// \brief
-	/// Return this sprite's root as
-	/// specified at contruction time
+	// Overridden to use the m_root member
+	virtual movie_instance* get_root() const;
+
+	/// Return the _root ActionScript property of this sprite.
 	//
 	/// Relative or absolute is determined by
 	/// the _lockroot property, see getLockRoot
 	/// and setLockRoot.
 	///
-	virtual movie_instance* get_root() const;
+	virtual const sprite_instance* getAsRoot() const;
 
 	/// \brief
 	/// Return the sprite_definition (or movie_definition)
@@ -130,7 +131,7 @@ public:
 	/// Return version of the SWF definition of this instance
 	/// as been parsed from.
 	//
-        int getSWFVersion()
+        int getSWFVersion() const
 	{
                 return m_def->get_version();
         }

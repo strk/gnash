@@ -104,8 +104,8 @@ character::get_path_element_character(string_table::key key)
 {
 	if (key == NSV::PROP_uROOT)
 	{
-		// get_root() will handle _lockroot 
-		return get_root();
+		// getAsRoot() will handle _lockroot 
+		return const_cast<sprite_instance*>(getAsRoot());
 	}
 
 	const std::string& name = _vm.getStringTable().value(key);
@@ -159,9 +159,9 @@ character::set_invalidated()
 void
 character::set_invalidated(const char* debug_file, int debug_line)
 {
-  // Set the invalidated-flag of the parent. Note this does not mean that
-  // the parent must re-draw itself, it just means that one of it's childs
-  // needs to be re-drawn.
+	// Set the invalidated-flag of the parent. Note this does not mean that
+	// the parent must re-draw itself, it just means that one of it's childs
+	// needs to be re-drawn.
 	if ( m_parent ) m_parent->set_child_invalidated(); 
   
   
@@ -177,14 +177,14 @@ character::set_invalidated(const char* debug_file, int debug_line)
 		m_invalidated = true;
 		
 		#ifdef DEBUG_SET_INVALIDATED
-		printf("%p set_invalidated() of %s in %s:%d\n", this, get_name().c_str(),
-			debug_file, debug_line);
+		printf("%p set_invalidated() of %s in %s:%d\n",
+			this, get_name(), debug_file, debug_line);
 		#endif
 		
 		// NOTE: the SnappingRanges instance used here is not initialized by the
-    // GUI and therefore uses the default settings. This should not be a 
-    // problem but special snapping ranges configuration done in gui.cpp
-    // is ignored here... 
+		// GUI and therefore uses the default settings. This should not be a 
+		// problem but special snapping ranges configuration done in gui.cpp
+		// is ignored here... 
 				
 		m_old_invalidated_ranges.setNull();
 		add_invalidated_bounds(m_old_invalidated_ranges, true);
@@ -1052,6 +1052,12 @@ character::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
 	return it;
 }
 #endif
+
+const sprite_instance*
+character::getAsRoot() const
+{
+    return get_root();
+}
 
 
 } // namespace gnash

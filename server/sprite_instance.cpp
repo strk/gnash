@@ -2282,9 +2282,8 @@ bool sprite_instance::get_member(string_table::key name_key, as_value* val,
   if (name_key == NSV::PROP_uROOT)
   {
 
-    // Let ::get_root() take care of _lockroot
-    movie_instance* relRoot = get_root();
-    val->set_as_object( relRoot );
+    // getAsRoot() will take care of _lockroot
+    val->set_as_object( const_cast<sprite_instance*>( getAsRoot() )  );
     return true;
   }
 
@@ -4542,24 +4541,39 @@ sprite_instance::get_world_cxform() const
 movie_instance*
 sprite_instance::get_root() const
 {
-  movie_instance* relRoot = m_root;
-  character* rootParent = relRoot->get_parent();
-  if ( rootParent )
-  {
-    // if the relative root has a parent we descend
-    // to it unless SWF version of the VM is >= 7
-    // AND _lockroot of the relative url is true
-    if ( getVM().getSWFVersion() >= 7 )
-    {
-      if ( relRoot->getLockRoot() )
-      {
-        return relRoot;
-      }
-    }
+	return m_root;
+}
 
-    return rootParent->get_root();
-  }
-  return relRoot;
+const sprite_instance*
+sprite_instance::getAsRoot() const
+{
+	log_debug("getAsRoot called for sprite %s, with _lockroot %d and version %d", getTarget(), getLockRoot(), getSWFVersion());
+
+	// TODO1: as an optimization, if swf version < 7 
+	//        we might as well just return m_root, 
+	//        the whole chain from this sprite to it's
+	//        m_root should have the same version...
+	//
+	// TODO2: implement this with iteration rather
+	//        then recursion.
+	//        
+
+	character* parent = get_parent();
+	if ( ! parent ) return this; // no parent, we're the root
+
+	// If we have a parent, we descend to it unless 
+	// our _lockroot is true AND our or the VM's
+	// SWF version is > 6
+	//
+	if ( getSWFVersion() > 6 || getVM().getSWFVersion() > 6 )
+	{
+		if ( getLockRoot() )
+		{
+			return this; // locked
+		}
+	}
+
+	return parent->getAsRoot();
 }
 
 as_value

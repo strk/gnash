@@ -724,16 +724,11 @@ public:
     return pointInShape(x, y);
   }
 
-  /// Return the relative or absolute root of this character
+  /// Return the relative root of this character
   //
   /// The "relative" is the movie_instance created by
   /// the same SWF definition that contained the
   /// definition of this character.
-  ///
-  /// The "absolute" is top of parent's tree.
-  ///
-  /// TODO: what about programmatically created characters ?
-  ///   which would their "relative" root be ?
   ///
   /// The default implementation is to invoke get_root
   /// against this character's parent.
@@ -741,6 +736,12 @@ public:
   virtual movie_instance* get_root() const {
     return get_parent()->get_root();
   }
+
+  /// Return the _root ActionScript property of this character.
+  //
+  /// By default calls get_root().
+  ///
+  virtual const sprite_instance* getAsRoot() const;
 
   /// Find the object which is one degree removed from us,
   /// given the relative pathname.
