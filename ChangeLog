@@ -21,7 +21,6 @@
 	* server/asobj/LoadVars.cpp: delegate BOM handling to the new
 	  specialized utf8:: interface.
 
->>>>>>> 1.6310
 2008-04-16 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/LoadVars.as: check that getBytesLoaded()
