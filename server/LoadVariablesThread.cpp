@@ -24,6 +24,7 @@
 #include "tu_file.h"
 #include "log.h"
 #include "GnashException.h"
+#include "utf8.h"
 
 #include <string>
 
@@ -50,17 +51,32 @@ LoadVariablesThread::completeLoad()
 	string toparse;
 
 	size_t CHUNK_SIZE = 1024;
-	char *buf = new char[CHUNK_SIZE];
+	char* buf = new char[CHUNK_SIZE];
 	unsigned int parsedLines = 0;
+	// TODO: use read_string ?
 	while ( size_t read = _stream->read_bytes(buf, CHUNK_SIZE) )
 	{
 #ifdef DEBUG_LOAD_VARIABLES
 		log_debug("Read %u bytes", read);
 #endif
 
-		// TODO: use read_string ?
-		string chunk(buf, read);
-		toparse += chunk;
+		if ( _bytesLoaded )
+		{
+			string chunk(buf, read);
+			toparse += chunk;
+		}
+		else
+		{
+			size_t dataSize = read;
+			utf8::TextEncoding encoding;
+			char* ptr = utf8::stripBOM(buf, dataSize, encoding);
+			if ( encoding != utf8::encUTF8 && encoding != utf8::encUNSPECIFIED )
+			{
+				log_unimpl("%s to utf8 conversion in MovieClip.loadVariables input parsing", utf8::textEncodingName(encoding));
+			}
+			string chunk(ptr, dataSize);
+			toparse += chunk;
+		}
 
 #ifdef DEBUG_LOAD_VARIABLES
 		log_debug("toparse: %s", toparse.c_str());

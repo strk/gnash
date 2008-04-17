@@ -244,6 +244,84 @@ utf8::encodeUnicodeCharacter(boost::uint32_t ucs_character)
 	return text;
 }
 
+
+#define ENC_DEFAULT 0
+#define ENC_UTF8 1
+#define ENC_UTF16BE 2
+#define ENC_UTF16LE 3
+
+char*
+utf8::stripBOM(char* in, size_t& size, TextEncoding& encoding)
+{
+	encoding = encUNSPECIFIED;
+	if ( size > 2 )
+	{
+		// need *ptr to be unsigned or cast all 0xNN
+		unsigned char* ptr = reinterpret_cast<unsigned char*>(in);
+
+		if ( *ptr == 0xFF && *(ptr+1) == 0xFE )
+		{
+			// Text is UTF-16 LE
+			encoding = encUTF16LE;
+			in+=2;
+			size-=2;
+		}
+		else if ( *ptr == 0xFE && *(ptr+1) == 0xFF )
+		{
+			// Text is UTF-16 BE
+			encoding = encUTF16BE;
+			in+=2;
+			size-=2;
+		}
+		else if ( size > 3 && *ptr == 0xEF && *(ptr+1) == 0xBB && *(ptr+2) == 0xBF )
+		{
+			// Text is UTF-8
+			encoding = encUTF8;
+			in+=3;
+			size-=3;
+		}
+		else if ( size > 4 && *ptr == 0x00 && *(ptr+1) == 0x00 && *(ptr+2) == 0xFE && *(ptr+3) == 0xFF )
+		{
+			// Text is UTF-32 BE
+			encoding = encUTF32BE;
+			in+=4;
+			size-=4;
+		}
+		else if ( size > 4 && *ptr == 0xFF && *(ptr+1) == 0xFE && *(ptr+2) == 0x00 && *(ptr+3) == 0x00 )
+		{
+			// Text is UTF-32 LE
+			encoding = encUTF32LE;
+			in+=4;
+			size-=4;
+		}
+
+		// TODO: check other kinds of boms !
+		// See http://en.wikipedia.org/wiki/Byte-order_mark#Representations_of_byte_order_marks_by_encoding
+	}
+
+	return in;
+}
+
+const char*
+utf8::textEncodingName(TextEncoding enc)
+{
+	switch (enc)
+	{
+		case encUNSPECIFIED: return "Unspecified";
+		case encUTF8: return "UTF8";
+		case encUTF16BE: return "UTF16BE";
+		case encUTF16LE: return "UTF16LE";
+		case encUTF32BE: return "UTF32BE";
+		case encUTF32LE: return "UTF32LE";
+		case encSCSU: return "SCSU";
+		case encUTF7: return "UTF7";
+		case encUTFEBCDIC: return "UTFEBCDIC";
+		case encBOCU1: return "BOCU1";
+		default: return "INVALID";
+	}
+}
+
+
 // Local Variables:
 // mode: C++
 // c-basic-offset: 8 

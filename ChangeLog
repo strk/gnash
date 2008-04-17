@@ -1,3 +1,12 @@
+2008-04-17 Sandro Santilli <strk@keybit.net>
+
+	* libbase/utf8.{cpp,h}: add a stripBOM interface and a TextEncoding
+	  enum to deal with BOMs.
+	* server/LoadVariablesThread.cpp: handle BOMs, fixing failure in
+	  actionscript.all/MovieClip.as
+	* server/asobj/LoadVars.cpp: delegate BOM handling to the new
+	  specialized utf8:: interface.
+
 2008-04-16 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/LoadVars.as: check that getBytesLoaded()

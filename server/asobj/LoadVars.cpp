@@ -38,6 +38,7 @@
 #include "Object.h" // for getObjectInterface
 #include "LoadThread.h"
 #include "namedStrings.h"
+#include "utf8.h"
 
 #include <list>
 #include <boost/algorithm/string/case_conv.hpp>
@@ -259,35 +260,15 @@ LoadVars::checkLoads()
 #endif
 			}
             buf[actuallyRead] = '\0';
+
             // Strip BOM, if any.
             // See http://savannah.gnu.org/bugs/?19915
-            char* bufptr = buf.get();
-            log_debug("xmlsize:%d, ptr:%s", xmlsize, bufptr);
-            if ( xmlsize > 2 )
+            utf8::TextEncoding encoding;
+            // NOTE: the call below will possibly change 'xmlsize' parameter
+            char* bufptr = utf8::stripBOM(buf.get(), xmlsize, encoding);
+            if ( encoding != utf8::encUTF8 && encoding != utf8::encUNSPECIFIED )
             {
-                 // need *ptr to be unsigned or cast all 0xNN
-                 unsigned char* ptr = reinterpret_cast<unsigned char*>(bufptr);
-
-                 if ( *ptr == 0xFF && *(ptr+1) == 0xFE )
-                 {
-                     // Text is UTF-16 LE,
-                     // we should convert to UTF-8
-                     log_unimpl("Conversion from UTF-16 LE to UTF-8 (LoadVars)");
-                     bufptr+=2;
-                 }
-                 else if ( *ptr == 0xFE && *(ptr+1) == 0xFF )
-                 {
-                     // Text is UTF-16 BE, 
-                     // we should convert to UTF-8
-                     log_unimpl("Conversion from UTF-16 BE to UTF-8 (LoadVars)");
-                     bufptr+=2;
-                 }
-                 else if ( xmlsize > 3 && *ptr == 0xEF && *(ptr+1) == 0xBB && *(ptr+2) == 0xBF )
-                 {
-                     log_debug("UTF8 bom (LoadVars)");
-                     // Text is UTF-8
-                     bufptr+=3;
-                 }
+                log_unimpl("%s to utf8 conversion in LoadVars input parsing", utf8::textEncodingName(encoding));
             }
             as_value dataVal(bufptr); // memory copy here (optimize?)
 

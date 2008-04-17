@@ -95,6 +95,48 @@ namespace utf8
 	/// Allows storage of Latin1 (ISO-8859-1) characters. This
 	/// is the format of SWF5 and below.
 	std::string encodeLatin1Character(boost::uint32_t ucsCharacter);
+
+	enum TextEncoding {
+		encUNSPECIFIED,
+		encUTF8,
+		encUTF16BE,
+		encUTF16LE,
+		encUTF32BE,
+		encUTF32LE,
+		encSCSU,
+		encUTF7,
+		encUTFEBCDIC,
+		encBOCU1
+	};
+
+	/// Interpret (and skip) Byte Order Mark in input stream
+	//
+	/// This function takes a pointer to a buffer and returns
+	/// the start of actual data after an eventual BOM.
+	/// No conversion is performed, no bytes copy, just skipping of
+	/// the BOM snippet and interpretation of it returned to the
+	/// encoding input parameter.
+	///
+	/// See http://en.wikipedia.org/wiki/Byte-order_mark
+	///
+	/// @param in
+	///	The input buffer.
+	///
+	/// @param size
+	///	Size of the input buffer, will be decremented by the
+	///	size of the BOM, if any.
+	///
+	/// @param encoding
+	///	Output parameter, will always be set.
+	///	encUNSPECIFIED if no BOM is found.
+	///
+	/// @returns
+	///	A pointer either equal to 'in' or some bytes inside it.
+	///
+	char* stripBOM(char* in, size_t& size, TextEncoding& encoding);
+
+	/// Return name of a text encoding
+	const char* textEncodingName(TextEncoding enc);
 }
 
 
