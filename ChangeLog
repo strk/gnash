@@ -1,5 +1,9 @@
 2008-04-17 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: drop the trap, messes up with autoconf internals.
+
+2008-04-17 Sandro Santilli <strk@keybit.net>
+
 	* configure.ac: don't leave a stale 'cerr' file around, open
 	  it only once for writing.
 

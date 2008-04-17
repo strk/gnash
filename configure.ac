@@ -2039,7 +2039,7 @@ cygnal/testsuite/cygnal.all/Makefile
 
 echo ""
 
-trap 'rm cerr' 0
+#trap 'rm cerr' 0 # trap isn't a good idea, might override other traps
 exec 3> cerr 
 
 echo "Configurable options are:"
@@ -2863,6 +2863,8 @@ fi
 if test x"$fork" = x"no"; then
   AC_MSG_ERROR([Currently only forking the standalone player works!])
 fi
+
+rm cerr
 
 # Local Variables:
 # c-basic-offset: 2
