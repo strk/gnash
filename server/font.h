@@ -237,6 +237,14 @@ public:
 	///
 	float	get_kerning_adjustment(int last_code, int this_code) const;
 
+	/// Return height of the EM square used for glyphs definition
+	//
+	/// @param embedded
+	///	If true, return is based on the SWF tag the font
+	///	was read from, otherwise will query the FreeTypeGlyphsProvider
+	///
+	unsigned short int unitsPerEM(bool embedded) const;
+
 	float	get_leading() const { return m_leading; }
 	float	get_descent() const { return m_descent; }
 

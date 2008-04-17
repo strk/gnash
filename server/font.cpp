@@ -143,7 +143,9 @@ GlyphInfo::markReachableResources() const
 			assert (tag == SWF::DEFINEFONT2 || tag == SWF::DEFINEFONT3);
 			readDefineFont2_or_3(in, m);
 			if (tag == SWF::DEFINEFONT3)
+			{
 				m_subpixel_font = true;
+			}
 		}
 
 		// TODO: initialize the deviceFontProvider only when needed ?
@@ -544,6 +546,25 @@ GlyphInfo::markReachableResources() const
 		return 0;
 	}
 
+	unsigned short int font::unitsPerEM(bool embed) const
+	{
+		// the EM square is 1024 x 1024 for DefineFont up to 2
+		// and 20 as much for DefineFont3 up
+		if ( embed )
+		{
+			if ( m_subpixel_font ) return 1024*20;
+			else return 1024;
+		}
+		else
+		{
+			if ( ! _ftProvider.get() )
+			{
+				log_error("Device font provider was not initialized, can't get unitsPerEM");
+				return 0; // can't query it..
+			}
+			return _ftProvider->unitsPerEM();
+		}
+	}
 
 	int
 	font::add_os_glyph(boost::uint16_t code)

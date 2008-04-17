@@ -1,3 +1,15 @@
+2008-04-17 Sandro Santilli <strk@keybit.net>
+
+	* server/FreetypeGlyphsProvider.{cpp,h}: add a unitsPerEM() method
+	  to retrive the nominal EM square size. Currently always 1024
+	  but could theoretically match the underlying freetype EM square.
+	* server/font.{cpp,h}: add a unitsPerEM() method workign both
+	  for device and embedde fonts, both DEFINEFONT kinds (small
+	  and largs).
+	* server/edit_text_character.cpp, server/text.cpp:
+	  don't assume EM square is 1024x1024, fetch from font instead.
+	  Fixes bug #22965.
+
 2008-04-17 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* testsuite/actionscript.all/case.as: test for case collision

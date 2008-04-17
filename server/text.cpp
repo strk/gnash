@@ -118,9 +118,10 @@ namespace gnash {
 				continue;
 			}
 
-			float	scale = 1.0f;
-			scale = rec.m_style.m_text_height / 1024.0f;	// the EM square is 1024 x 1024
-			if (fnt->is_subpixel_font()) scale*=0.05f; 
+			// unitsPerEM returns an int, we cast to float to get
+			// a float division
+			float unitsPerEM = fnt->unitsPerEM(useEmbeddedGlyphs);
+			float scale = rec.m_style.m_text_height / unitsPerEM;
 
 #ifdef GNASH_DEBUG_TEXT_RENDERING
 			log_debug("font for record %u == %p", i, (const void*)fnt);
@@ -129,7 +130,7 @@ namespace gnash {
 			if ( rec.m_style.hasXOffset() ) x = rec.m_style.getXOffset();
 			if ( rec.m_style.hasYOffset() ) y = rec.m_style.getYOffset();
 
-			float startX = x; // for the underline, if any
+			boost::int16_t startX = x; // for the underline, if any
 
 			s_dummy_style[0].set_color(rec.m_style.m_color);
 
@@ -158,6 +159,11 @@ log_error(_("invalid glyph (-1)"));
 					// We'll use about half the width, and around 3/4 the height.
 					// Values adjusted by eye.
 					// The Y baseline is at 0; negative Y is up.
+					//
+					// TODO: FIXME (if we'll ever enable it back): the EM
+					//       square is not hard-coded anymore but can be
+					//       queried from the font class
+					//
 					static const boost::int16_t	s_empty_char_box[5 * 2] =
 					{
 						 32,   32,
@@ -203,7 +209,9 @@ log_debug(_("render shape glyph using filled outline (render::draw_glyph)"));
 				// The underline is made to be some pixels below the baseline (0)
 				// and scaled so it's further as font size increases.
 				//
-				boost::int16_t posY = int(y+int(256.0*scale)); // some offset far from baseline (should this be scaled on font size?)
+				// 1/4 the EM square offset far from baseline 
+				boost::int16_t posY = int(y+int((unitsPerEM/4)*scale));
+
 				boost::int16_t underline[2 * 2] =
 				{
 					startX,   posY,

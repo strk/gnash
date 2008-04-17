@@ -80,8 +80,7 @@ public:
 	///
 	/// @param scale
 	///	The scale to apply to coordinates.
-	///	This is to match an EM of 1024x1024 when units_per_EM
-	///	are of a different value.
+	///	This is to match an arbitrary EM 
 	///
 	OutlineWalker(DynamicShape& sh, float scale)
 		:
@@ -386,9 +385,9 @@ FreetypeGlyphsProvider::FreetypeGlyphsProvider(const std::string& name, bool bol
 			break;
 	}
 
-	// We want an EM of 1024, so if units_per_EM is different
+	// We want an EM of unitsPerEM, so if units_per_EM is different
 	// we will scale 
-	scale = 1024.0f/m_face->units_per_EM;
+	scale = (float)unitsPerEM()/m_face->units_per_EM;
 
 #ifdef GNASH_DEBUG_DEVICEFONTS
 	log_debug("EM square for font '%s' is %d, scale is thus %g", name.c_str(), m_face->units_per_EM, scale);

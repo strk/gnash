@@ -86,7 +86,9 @@ public:
 	~FreetypeGlyphsProvider();
 
 
-	/// Return the given character glyph as a shape character definition in 1024 EM coordinates.
+	/// \brief
+	/// Return the given character glyph as a shape character definition
+	/// in unitsPerEM() coordinates.
 	//
 	///
 	/// TODO: allow using a custom EM square ?
@@ -95,14 +97,21 @@ public:
 	/// 	Character code.
 	///
 	/// @param advance
-	///	Output parameter... units to advance horizontally from this glyph to the next,
-	///	in 1024 EM units.
+	///	Output parameter... units to advance horizontally from this
+	///     glyph to the next, in unitsPerEM() units.
 	///
-	/// @return A shape_character_def in 1024 EM coordinates, or a NULL pointer if the given
-	///         character code doesn't exist in this font.
+	/// @return A shape_character_def in unitsPerEM() coordinates,
+	///         or a NULL pointer if the given character code
+	///         doesn't exist in this font.
 	///
 	boost::intrusive_ptr<shape_character_def> getGlyph(boost::uint16_t code, float& advance);
 
+	/// Return the number of units of glyphs EM
+	//
+	/// This is currently hard-coded to 1024, but could in future depend
+	/// on actual font file being used.
+	///
+	unsigned short unitsPerEM() const { return 1024; }
 
 private:
 
@@ -114,8 +123,8 @@ private:
 
 #ifdef USE_FREETYPE 
 
-	/// Scale factor to make the freetype glyph metrix match our 1024 EM square
-	/// coordinate space. Not all font faces have am EM square of 1024, so we
+	/// Scale factor to make the freetype glyph metrix match our unitsPerEM()
+	/// coordinate space. Not all font faces have am EM square of unitsPerEM(), so we
 	/// use this value to scale both coordinates and advance values
 	/// The value is computed by the costructor, as soon as a face is initialized.
 	float scale;

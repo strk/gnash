@@ -651,6 +651,7 @@ edit_text_character::display()
 	}
 	
 	
+	//log_debug("Displaying glyph records for textfield %s", getTarget());
 	display_glyph_records(m, this, m_text_glyph_records,
 			      m_def->get_root_def(), _embedFonts);
 
@@ -1281,16 +1282,18 @@ edit_text_character::format_text()
 	}
 
 	boost::uint16_t fontHeight = getFontHeight();
-	float scale = fontHeight / 1024.0f;	// the EM square is 1024 x 1024
-	float fontDescent = _font->get_descent() * scale;
-	float fontLeading = _font->get_leading() * scale; 
+	float scale = fontHeight / (float)_font->unitsPerEM(_embedFonts); 
+	float fontDescent = _embedFonts ? (_font->get_descent()*scale) : 0; // TODO: fetch descent from device fonts as well ?
+	float fontLeading = _embedFonts ? (_font->get_leading()*scale) : 0;  // TODO: fetch leading from device fonts as well ?
 	boost::uint16_t leftMargin = getLeftMargin();
 	boost::uint16_t rightMargin = getRightMargin();
 	boost::uint16_t indent = getIndent();
 	boost::uint16_t blockIndent = getBlockIndent();
 	bool underlined = getUnderlined();
 
-	text_glyph_record	rec;	// one to work on
+	//log_debug("%s: fontDescent:%g, fontLeading:%g, fontHeight:%g, scale:%g", getTarget(), fontDescent, fontLeading, fontHeight, scale);
+
+	text_glyph_record rec;	// one to work on
 	rec.m_style.setFont(_font.get());
 	rec.m_style.setUnderlined(underlined);
 	rec.m_style.m_color = getTextColor(); 
