@@ -682,28 +682,12 @@ button_character_instance::add_invalidated_bounds(InvalidatedRanges& ranges,
 
 	ranges.add(m_old_invalidated_ranges);  
 
-  // TODO: Instead of using these for loops again and again, wouldn't it be a
-  // good idea to have a generic "get_record_character()" method?
-  // NOTE: we do have that method now, it's called get_active_characters(state)
-	for (size_t i = 0; i < m_def->m_button_records.size(); i++)
-	{
-		button_record&	rec = m_def->m_button_records[i];
-		assert(m_record_character.size() > i);
-		if (m_record_character[i] == NULL)
-		{
-			continue;
-		}
-		if ((m_mouse_state == UP && rec.m_up)
-		    || (m_mouse_state == DOWN && rec.m_down)
-		    || (m_mouse_state == OVER && rec.m_over))
-		{
-				/*bounds->expand_to_transformed_rect(get_world_matrix(), 
-          m_record_character[i]->get_bound());*/
-        m_record_character[i]->add_invalidated_bounds(ranges, 
-          force||m_invalidated);        
-		}
-	}
-
+	std::vector<character*> actChars;
+	get_active_characters(actChars);
+	std::for_each(actChars.begin(), actChars.end(),
+		boost::bind(&character::add_invalidated_bounds, _1,
+			    boost::ref(ranges), force||m_invalidated)
+	);
 }
 
 geometry::Range2d<float>
@@ -712,29 +696,19 @@ button_character_instance::getBounds() const
 	typedef geometry::Range2d<float> Range;
 	Range allBounds(geometry::nullRange);
 
-	for (size_t i = 0; i < m_def->m_button_records.size(); i++)
+	typedef std::vector<character*> CharVect;
+	CharVect actChars;
+	const_cast<button_character_instance*>(this)->get_active_characters(actChars);
+	for(CharVect::iterator i=actChars.begin(),e=actChars.end(); i!=e; ++i)
 	{
-		button_record&	rec = m_def->m_button_records[i];
-		assert(m_record_character.size() > i);
-		character* ch = m_record_character[i].get();
+		const character* ch = *i;
 
-		if (!ch) continue;
+		// Child bounds need be transformed in our coordinate space
+		Range lclBounds = ch->getBounds();
+		matrix m = ch->get_matrix();
+		m.transform(lclBounds);
 
-		if ((m_mouse_state == UP && rec.m_up)
-		    || (m_mouse_state == DOWN && rec.m_down)
-		    || (m_mouse_state == OVER && rec.m_over))
-		{
-
-			// TODO: should we consider having multiple characters
-			//       for a single state ?
-			Range lclBounds = ch->getBounds();
-
-			// TODO: we transform the child bounds here, right ?
-			matrix m = ch->get_matrix();
-			m.transform(lclBounds);
-
-			allBounds.expandTo(lclBounds);
-		}
+		allBounds.expandTo(lclBounds);
 	}
 
 	return allBounds;
@@ -743,24 +717,15 @@ button_character_instance::getBounds() const
 bool
 button_character_instance::pointInShape(float x, float y) const
 {
-	for (size_t i = 0; i < m_def->m_button_records.size(); i++)
+	typedef std::vector<character*> CharVect;
+	CharVect actChars;
+	const_cast<button_character_instance*>(this)->get_active_characters(actChars);
+	for(CharVect::iterator i=actChars.begin(),e=actChars.end(); i!=e; ++i)
 	{
-		button_record&	rec = m_def->m_button_records[i];
-		assert(m_record_character.size() > i);
-		if (m_record_character[i] == NULL)
-		{
-			continue;
-		}
-		if ((m_mouse_state == UP && rec.m_up)
-		    || (m_mouse_state == DOWN && rec.m_down)
-		    || (m_mouse_state == OVER && rec.m_over))
-		{
-			// TODO: should we consider having multiple characters
-			//       for a single state ?
-			return m_record_character[i]->pointInShape(x, y);
-		}
+		const character* ch = *i;
+		if ( ch->pointInShape(x,y) ) return true;
 	}
-	return false; // no shape
+	return false; 
 }
 
 as_object*

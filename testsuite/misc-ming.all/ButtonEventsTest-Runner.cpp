@@ -233,7 +233,7 @@ main(int /*argc*/, char** /*argv*/)
 	sprite_instance* root = tester.getRootMovie();
 	assert(root);
 
-	check_equals(root->get_frame_count(), 6);
+	check_equals(root->get_frame_count(), 7);
 
 	check_equals(root->get_current_frame(), 0);
 
@@ -264,6 +264,13 @@ main(int /*argc*/, char** /*argv*/)
 
 	tester.advance();
 	check_equals(root->get_current_frame(), 2);
+	tester.advance();
+	check_equals(root->get_current_frame(), 2); // need to roll out
+
+	tester.movePointerTo(60, 60); // roll over the square
+	check_equals(root->get_current_frame(), 2); // need to roll out
+	tester.movePointerTo(0, 0); // roll out, should go to next frame
+	check_equals(root->get_current_frame(), 3); 
 
 	for (size_t fno=root->get_current_frame(); fno<root->get_frame_count(); fno++)
 	{
@@ -272,15 +279,15 @@ main(int /*argc*/, char** /*argv*/)
 
 		switch (fno)
 		{
-			case 2:
+			case 3:
 				check(!square_back);
 				check(!square_front);
 				break;
-			case 3:
+			case 4:
 				check(square_back);
 				check(!square_front);
 				break;
-			case 4:
+			case 5:
 				check(square_back);
 				check(square_front);
 				break;
@@ -300,7 +307,7 @@ main(int /*argc*/, char** /*argv*/)
 
 	// last advance should not restart the loop (it's in STOP mode)
         check_equals(root->get_play_state(), sprite_instance::STOP);
-	check_equals(root->get_current_frame(), 5);
+	check_equals(root->get_current_frame(), 6);
 
 }
 

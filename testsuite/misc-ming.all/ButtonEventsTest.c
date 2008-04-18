@@ -340,6 +340,16 @@ add_button(SWFMovie mo)
 		"}"
 		), SWFBUTTON_MOUSEUPOUTSIDE);
 
+	/* Keypress */
+	SWFButton_addAction(bu, compileSWFActionCode(
+		"_root.note('KeyPress: a');"
+		//"_root.check(Key.isDown('a'));"
+	), SWFBUTTON_KEYPRESS('a'));
+	SWFButton_addAction(bu, compileSWFActionCode(
+		"_root.note('KeyPress: b');"
+		//"_root.check(Key.isDown('b'));"
+	), SWFBUTTON_KEYPRESS('b'));
+
 	it = SWFMovieClip_add(mc, (SWFBlock)bu);
 	SWFDisplayItem_setName(it, "button");
 	SWFMovieClip_nextFrame(mc); /* showFrame */
@@ -571,17 +581,36 @@ main(int argc, char **argv)
 	add_actions(mo,
 		"stop();"
 		/*"_root.note('buttonChild is '+dumpObj(_root.buttonChild));"*/
-		"_root.testno=1;"
+		"_root.testno=0;"
+		"_root.square1.onRollOut = function() { _root.testno++; delete _root.square1.onRollOut; nextFrame(); };"
 		"_root.note('"
-		"1. Roll over the red square."
+		"0. Roll over and out the red square, not touching the small dark-red square in it."
 		"');");
 
+	/* hitTest should work on every child, not just first added */
+	check(mo, "_level0.square1.hitTest(60,60,true)");
 
 	SWFMovie_nextFrame(mo); /* showFrame */
 
 	/*****************************************************
 	 *
-	 * On third frame, add a shape at lower depth,
+	 * On third frame, start the button event test
+	 *
+	 *****************************************************/
+
+	add_actions(mo,
+		"stop();"
+		/*"_root.note('buttonChild is '+dumpObj(_root.buttonChild));"*/
+		"_root.testno=1;"
+		"_root.note('"
+		"1. Roll over the red square."
+		"');");
+
+	SWFMovie_nextFrame(mo); /* showFrame */
+
+	/*****************************************************
+	 *
+	 * On fourth frame, add a shape at lower depth,
 	 * and check bounds of square1
 	 *
 	 *
@@ -640,7 +669,7 @@ main(int argc, char **argv)
 
 	/*****************************************************
 	 *
-	 * On fourth frame, add a shape at higher depth 
+	 * On fifth frame, add a shape at higher depth 
 	 *
 	 *****************************************************/
 
@@ -694,7 +723,7 @@ main(int argc, char **argv)
 
 	/*****************************************************
 	 *
-	 * On fifth frame, disable the button
+	 * On sixth frame, disable the button
 	 * and check total tests so far
 	 *
 	 *****************************************************/
@@ -704,7 +733,7 @@ main(int argc, char **argv)
 		add_actions(mo,
 			"square1.button.enabled = false;"
 			"stop();"
-			"_root.totals(155);"
+			"_root.totals(156);"
 			"_root.note('-- Button disabled, try playing with it, nothing should happen --');"
 		);
 		SWFMovie_nextFrame(mo); /* showFrame */

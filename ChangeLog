@@ -1,5 +1,17 @@
 2008-04-18 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/: ButtonEventsTest.c,
+	  ButtonEventsTest-Runner.cpp: Add test for shape-sensible
+	  hitTest agains containing mouse-grabbing sprite, add
+	  test code (not automated) for key events.
+	* server/button_character_instance.cpp:
+	  Reduce direct access to the m_record_character member,
+	  which will need to be changed for proper design.
+	  As a side-effect, fix pointInShape so to consider
+	  all characters for current state, not just the first one.
+
+2008-04-18 Sandro Santilli <strk@keybit.net>
+
 	* server/button_character_instance.cpp,
 	  server/parser/button_character_def.{cpp,h}:
 	  Abstract access to button actions, now parser-private.
