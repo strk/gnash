@@ -2037,10 +2037,13 @@ cygnal/testsuite/cygnal.all/Makefile
 ########################## Final report begins... ############################
 ###
 
+cerr=/tmp/gnash-configure-errors.$$
+cwarn=/tmp/gnash-configure-warnings.$$
 echo ""
 
 #trap 'rm cerr' 0 # trap isn't a good idea, might override other traps
-exec 3> cerr 
+exec 3> $cerr 
+exec 4> $cwarn
 
 echo "Configurable options are:"
 
@@ -2121,8 +2124,8 @@ if test x"$with-top_level" != x; then
 fi
 
 if test x$build_gtk = xyes -a x$pixelformat = xrgb565; then
-  echo "        WARNING: Pixel format RGB565 selected in combination with the"
-  echo "                 GTK GUI. Only a hacked GTK will work (e.g. on the OLPC)."
+  echo "        WARNING: Pixel format RGB565 selected in combination with the" >&4
+  echo "                 GTK GUI. Only a hacked GTK will work (e.g. on the OLPC)." >&4
 fi
 
 if test x"$extensions_list" != x; then
@@ -2163,7 +2166,6 @@ fi
 # set a variable if we shouldn't continue. This way we can print
 # out everything that is missing in one pass, hopefully making it
 # easy for new developers to get everything they need installed.
-nogo=false
 
 if test x$xml != xno; then
   if test x"$LIBXML_CFLAGS" != x; then
@@ -2174,7 +2176,6 @@ if test x$xml != xno; then
     echo "               To compile this project install" >&3
     echo "               or .deb users: apt-get install libxml2-dev" >&3
     echo "               or .rpm users: yum install libxml2-devel" >&3
-    nogo=true
   fi
 fi
 
@@ -2193,7 +2194,6 @@ if test x$build_kde = xyes -o x$kparts = xyes; then
       echo "               install the KDE development environment from http://kde.org" >&3
       echo "               or .deb users: apt-get install kdelibs-dev" >&3
       echo "               or .rpm users: yum install <something-else>." >&3
-      nogo=true
   fi
   if test x"$has_qt" = xyes; then
     echo "        QT flags are: $QT_CFLAGS"
@@ -2216,7 +2216,6 @@ if test x$build_kde = xyes -o x$kparts = xyes; then
           echo "               or change to a different gui with --enable-gui=..." >&3
 	fi
       fi
-      nogo=true
     fi
   fi
 fi
@@ -2233,7 +2232,6 @@ if test x"$build_qtopia" = xyes; then
     echo "        ERROR: No QTOPIA library development package installed!" >&3
     echo "               Install it from http://trolltech.com/downloads/" >&3
     echo "               binary packages are not available." >&3
-    nogo=true
   fi
 fi
 
@@ -2249,7 +2247,6 @@ else
   echo "               Install it from http://ijg.org" >&3
   echo "               or .deb users: apt-get install libjpeg-dev" >&3
   echo "               or .rpm users: yum install libjpeg-devel" >&3
-  nogo=true
 fi
 
 if test x"${PNG_LIBS}" != x ; then
@@ -2260,11 +2257,11 @@ if test x"${PNG_LIBS}" != x ; then
   fi
   echo "        PNG libs are: $PNG_LIBS"
 else
-  echo "        WARNING: No PNG library development package installed!"
-  echo "                 Gnash will be built without support for dynamic loading of PNG files."
-  echo "                 Install it from http://www.libpng.org"
-  echo "                 or .deb users: apt-get install libpng12-dev"
-  echo "                 or .rpm users: yum install libpng-devel"
+  echo "        WARNING: No PNG library development package installed!" >&4
+  echo "                 Gnash will be built without support for dynamic loading of PNG files." >&4
+  echo "                 Install it from http://www.libpng.org" >&4
+  echo "                 or .deb users: apt-get install libpng12-dev" >&4
+  echo "                 or .rpm users: yum install libpng-devel" >&4
 fi
 
 dnl if test x"$OGG_LIBS" != x; then
@@ -2276,7 +2273,6 @@ dnl   fi
 dnl   echo "        Ogg libs are: $OGG_LIBS"
 dnl else
 dnl   echo "        ERROR: No Ogg Vorbis development package installed!" >&3
-dnl   nogo=true
 dnl fi
 
 dnl if test x"$VORBIS_LIBS" != x; then
@@ -2288,7 +2284,6 @@ dnl   fi
 dnl   echo "        VORBIS libs are: $VORBIS_LIBS"
 dnl else
 dnl   echo "        ERROR: No VORBIS Vorbis development package installed!" >&3
-dnl   nogo=true
 dnl fi
 
 if test x"$opengl" = x"yes"; then
@@ -2305,7 +2300,6 @@ if test x"$opengl" = x"yes"; then
       echo "               or .deb users: apt-get install libgl1-mesa-dev" >&3
       echo "               or .rpm users: yum install xorg-x11-Mesa-libGL" >&3
       echo "               or use a different renderer with --enable-renderer=" >&3
-    nogo=true
   fi
 fi
 
@@ -2327,7 +2321,6 @@ if test x$build_gtk = xyes -a x$build_ogl = xyes ; then
         echo "               or .deb users: apt-get install libgtkglext1-dev" >&3
         echo "               or .rpm users: yum install gtkglext-devel" >&3
         echo "               or --enable-gui=sdl or --enable-renderer=agg" >&3
-      nogo=true
       fi
     fi
   fi
@@ -2348,7 +2341,6 @@ if test x$build_hildon = xyes; then #{
     #echo "               or .deb users: apt-get install libhildon.0-dev" >&3
     echo "               or .deb users: apt-get install libhildon-1-dev" >&3
     echo "               or .rpm users: yum install hildon-devel" >&3
-    nogo=true
   fi
 fi
 
@@ -2365,7 +2357,6 @@ if test x$build_gtk = xyes; then #{
     echo "               Install it from http://gtk.org" >&3
     echo "               or .deb users: apt-get install libgtk2.0-dev" >&3
     echo "               or .rpm users: yum install gtk2-devel" >&3
-dnl    nogo=true
   fi
 
   if test x"$PANGO_LIBS" != x; then
@@ -2380,7 +2371,6 @@ dnl    nogo=true
     echo "               Install it from http://pango.org" >&3
     echo "               or .deb users: apt-get install libpango1.0-dev" >&3
     echo "               or .rpm users: yum install pango-devel" >&3
-dnl    nogo=true
   fi
 
   if test x"$GLIB_LIBS" != x; then
@@ -2395,7 +2385,6 @@ dnl    nogo=true
     echo "               Install it from http://gtk.org" >&3
     echo "               or .deb users: apt-get install libglib2.0-dev" >&3
     echo "               or .rpm users: yum install glib2-devel" >&3
-dnl    nogo=true
   fi
 
   if test x"$ATK_LIBS" != x; then
@@ -2410,7 +2399,6 @@ dnl    nogo=true
     echo "               Install it from http://gtk.org" >&3
     echo "               or .deb users: apt-get install libatk1.0-dev" >&3
     echo "               or .rpm users: yum install atk-devel" >&3
-dnl    nogo=true
   fi
 
 fi
@@ -2432,7 +2420,6 @@ if test "$media_handler" = "gst"; then
     echo "               Install it from http://www.gstreamer.net" >&3
     echo "               or .deb users: apt-get install libgstreamer0.10-dev" >&3
     echo "               or .rpm users: yum install gstreamer-devel" >&3
-    nogo=true
   fi
 fi
 
@@ -2451,7 +2438,6 @@ fi
       echo "               or .deb users: apt-get install libmad0-dev" >&3
       echo "               or .rpm users: yum install libmad" >&3
       echo "               or reconfigure using --enable-media=ffmpeg" >&3
-      nogo=true
     fi
   fi
 
@@ -2462,7 +2448,6 @@ fi
         echo "        ERROR: You have version ${ffmpeg_version} of ffmpeg installed." >&3
         echo "               This version of ffmpeg may not work!" >&3
         echo "               Version 51.27.0 or newer is highly recommended." >&3
-        nogo=true
       else
 	avformat_h=`echo $avcodec_h | sed 's/avcodec/avformat/g'`
 	if test ! -f "$avformat_h"; then
@@ -2470,7 +2455,6 @@ fi
           echo "               You can install FFMPEG from http://ffmpeg.mplayerhq.hu" >&3
           echo "               or .deb users: apt-get install libavformat-dev" >&3
           echo "               or reconfigure with --enable-media=gst" >&3
-	  nogo=true
 	else
           if test x"$FFMPEG_CFLAGS" != x; then
             echo "        FFMPEG flags are: $FFMPEG_CFLAGS"
@@ -2486,7 +2470,6 @@ fi
       echo "               or .deb users: apt-get install libavformat-dev" >&3
       echo "               or .rpm users: yum install ffmpeg-devel" >&3
       echo "               or reconfigure with --enable-media=gst" >&3
-      nogo=true
     fi
   fi
 
@@ -2505,7 +2488,6 @@ if test x$build_cairo = xyes; then
     echo "               Install it from http://cairographics.org" >&3
     echo "               or .deb users: apt-get install libcairo-dev" >&3
     echo "               or .rpm users: yum install cairo-devel" >&3
-    nogo=true
   fi
 fi
 
@@ -2524,7 +2506,6 @@ if test x$build_fltk = xyes; then
 dnl What it was for FLTK 1:
 dnl    echo "               or .deb users: apt-get install fltk-1.1-dev"
 dnl    echo "               or .rpm users: yum install fltk-devel"
-    nogo=true
   fi
 fi
 
@@ -2541,7 +2522,6 @@ dnl       echo "        ERROR: No Xft development package installed!" >&3
 dnl       echo "               Install the xft development package" >&3
 dnl       echo "               or .deb users: apt-get install libxft-dev" >&3
 dnl       echo "               or .rpm users: yum install xft-devel" >&3
-dnl    nogo=true
   fi
 fi
 
@@ -2564,7 +2544,6 @@ if $need_sdl; then
 	echo "               or select a different GUI with --enable-gui= " >&3
     test x"$media_handler" = x"ffmpeg" -o x"$media_handler" = x"mad" &&
 	echo "               or use --enable-media=gst" >&3
-    nogo=true
   fi
 fi
 unset need_sdl
@@ -2576,7 +2555,6 @@ dnl    echo "        Firefox libs are: $FIREFOX_LIBS"
     echo "        Plugin will be installed in ${FIREFOX_PLUGINS}"
 dnl  else
 dnl    echo "        ERROR: No Firefox or Mozilla development package installed!" >&3
-#    nogo=true
 dnl  fi
 fi
 
@@ -2588,7 +2566,6 @@ if test x"$pthreads" = x"yes"; then
     echo "        POSIX Threads lib is: $PTHREAD_LIBS"
   else
     echo "ERROR: No pthread development package installed!" >&3
-    nogo=true
   fi
 fi
 
@@ -2598,7 +2575,6 @@ if test x"$docbook" = x"yes"; then
     echo "               Either install it from http://www.gnu.org/software/texinfo/" >&3
     echo "               or .deb users: apt-get install texinfo" >&3
     echo "               or configure without --enable-docbook" >&3
-    nogo=true
   fi
   dnl low-level tools
   if test x"$DB2X_TEXIXML" = x -o x"$DB2X_MANXML" = x -o x"$DB2X_XSLTPROC" = x; then
@@ -2609,7 +2585,6 @@ if test x"$docbook" = x"yes"; then
       echo "               or .deb users: apt-get install docbook docbook2x docbook-utils" >&3
       echo "                              docbook-xml docbook-xsl texinfo xsltproc" >&3
       echo "               or configure without --enable-docbook" >&3
-      nogo=true
     fi
   else
     echo "        You have version $db2x_version of the DocBook2X tools."
@@ -2624,11 +2599,11 @@ if test x"$CURL_LIBS" != x; then
   fi
     echo "        CURL libs are: $CURL_LIBS"
 else
-  echo "        WARNING: CURL library not found."
-  echo "                 Gnash will be built without support for streaming from URLs."
-  echo "                 Why not install libcurl from http://curl.haxx.se/libcurl"
-  echo "                 or .deb users: apt-get install libcurl3-dev"
-  echo "                 or .rpm users: yum install curl-devel"
+  echo "        WARNING: CURL library not found." >&4
+  echo "                 Gnash will be built without support for streaming from URLs." >&4
+  echo "                 Why not install libcurl from http://curl.haxx.se/libcurl" >&4
+  echo "                 or .deb users: apt-get install libcurl3-dev" >&4
+  echo "                 or .rpm users: yum install curl-devel" >&4
 fi
 
 if test x"$ext_dbus" = xyes; then
@@ -2640,11 +2615,11 @@ if test x"$ext_dbus" = xyes; then
     fi
       echo "        DBUS libs are: $DBUS_LIBS"
   else
-    echo "        WARNING: DBUS library not found."
-    echo "                 Gnash will be built without support for remote controls."
-    echo "                 Why not install libdbus from http://www.dbus.org"
-    echo "                 or .deb users: apt-get install dbus-dev"
-    echo "                 or .rpm users: yum install dbus-devel"
+    echo "        WARNING: DBUS library not found." >&4
+    echo "                 Gnash will be built without support for remote controls." >&4
+    echo "                 Why not install libdbus from http://www.dbus.org" >&4
+    echo "                 or .deb users: apt-get install dbus-dev" >&4
+    echo "                 or .rpm users: yum install dbus-devel" >&4
   fi
 fi
 
@@ -2657,7 +2632,6 @@ if test x$build_agg = xyes; then # {
         echo "               Install it from http://www.antigrain.com" >&3
         echo "               or .deb users: apt-get install libagg-dev" >&3
         echo "               or .rpm users: yum install agg-devel" >&3
-        nogo=true
       else # }{
         if test x"$AGG_CFLAGS" != x; then # {
           echo "        AGG flags are: $AGG_CFLAGS"
@@ -2671,7 +2645,6 @@ if test x$build_agg = xyes; then # {
       echo "               Install it from http://www.antigrain.com" >&3
       echo "               or .deb users: apt-get install libagg-dev" >&3
       echo "               or .rpm users: yum install agg-devel" >&3
-      nogo=true
     fi # }
 fi # }
 
@@ -2689,15 +2662,14 @@ if test x"$BOOST_LIBS" != x; then
 	echo "        ERROR: The BOOST $i header file is needed!" >&3
 	echo "               Install it from http://boost.org" >&3
 	echo "               or from a Boost development package" >&3
-	nogo=true
       done
     fi
     if test x"${extra_missing_libs}" != x; then
       for i in ${extra_missing_libs}; do
-	      echo "        WARNING: The BOOST $i library is recommended!"
-        echo "               Install it from http://www.boost.org"
-        echo "               or .deb users: apt-get install libboost-"`echo ${i} | sed 's/_/-/g'`"-dev"
-        echo "               Gnash will compile anyway, but not all tests will work."
+	      echo "        WARNING: The BOOST $i library is recommended!" >&4
+        echo "               Install it from http://www.boost.org" >&4
+        echo "               or .deb users: apt-get install libboost-"`echo ${i} | sed 's/_/-/g'`"-dev" >&4
+        echo "               Gnash will compile anyway, but not all tests will work." >&4
       done
     fi
     if test x"${missing_libs}" != x; then
@@ -2706,7 +2678,6 @@ if test x"$BOOST_LIBS" != x; then
 	echo "        ERROR: The BOOST $i library is needed!" >&3
 	echo "               Install it from http://boost.org" >&3
 	echo "               or .deb users: apt-get install libboost-"`echo ${i} | sed 's/_/-/g'`"-dev" >&3
-	nogo=true
       done
     fi
 else
@@ -2717,7 +2688,6 @@ else
     echo "                              and libboost-date-time-dev (for cygnal)" >&3
     fi
     echo "               or .rpm users: yum install boost-devel" >&3
- nogo=true
 fi
 
 dnl don't look for the flash compilers when cross compiling.
@@ -2728,10 +2698,10 @@ if test x$cross_compiling = xno; then
     echo "        MING libs are $MING_LIBS"
     echo "        MAKESWF is $MAKESWF"
   else
-    echo "        WARNING: You need to have the Ming development and utilities packages"
-    echo "                 installed to run most of the tests in Gnash testsuite."
-    echo "                 Install it from http://ming.sourceforge.net"
-    echo "                 or .deb users: apt-get install libming-dev"
+    echo "        WARNING: You need to have the Ming development and utilities packages" >&4
+    echo "                 installed to run most of the tests in Gnash testsuite." >&4
+    echo "                 Install it from http://ming.sourceforge.net" >&4
+    echo "                 or .deb users: apt-get install libming-dev" >&4
   fi
 
   if test x"$SWFDEC_TESTSUITE" != x; then
@@ -2742,34 +2712,34 @@ if test x$cross_compiling = xno; then
     echo "        MTASC is $MTASC"
     echo "        MTASC CLASSPATH is $MTASC_CLASSPATH"
   else
-    echo "        WARNING: You need to have the MTASC compiler packages installed"
-    echo "                 to run some of the tests in Gnash testsuite."
-    echo "                 You can install it from http://mtasc.org"
-    echo "                 or .deb users: apt-get install mtasc"
+    echo "        WARNING: You need to have the MTASC compiler packages installed" >&4
+    echo "                 to run some of the tests in Gnash testsuite." >&4
+    echo "                 You can install it from http://mtasc.org" >&4
+    echo "                 or .deb users: apt-get install mtasc" >&4
   fi
 
   if test x"$SWFMILL" != x; then
     echo "        SWFMILL is $SWFMILL"
   else
-    echo "        WARNING: You need to have the 'swfmill' tool installed"
-    echo "                 to run some of the tests in Gnash testsuite."
-    echo "                 You can install it from http://swfmill.org/"
+    echo "        WARNING: You need to have the 'swfmill' tool installed" >&4
+    echo "                 to run some of the tests in Gnash testsuite." >&4
+    echo "                 You can install it from http://swfmill.org/" >&4
   fi
 
   if test x"$SWFC" != x; then
     echo "        SWFC is $SWFC"
   else
-    echo "        WARNING: You need to have 'swfc' from SWFTools installed"
-    echo "                 to run some of the tests in Gnash testsuite."
-    echo "                 You can install it from http://www.swftools.org/"
-    echo "                 or .deb users: apt-get install swftools"
+    echo "        WARNING: You need to have 'swfc' from SWFTools installed" >&4
+    echo "                 to run some of the tests in Gnash testsuite." >&4
+    echo "                 You can install it from http://www.swftools.org/" >&4
+    echo "                 or .deb users: apt-get install swftools" >&4
   fi
 
   if test x"$PYTHON" != x; then
     echo "        PYTHON is $PYTHON"
   else
-    echo "        WARNING: You need to have python installed"
-    echo "                 to run some of the tests in Gnash testsuite."
+    echo "        WARNING: You need to have python installed" >&4
+    echo "                 to run some of the tests in Gnash testsuite." >&4
   fi
 
 fi
@@ -2782,13 +2752,13 @@ if test x"$Z_LIBS" != x; then
   fi
   echo "        Z libs are: $Z_LIBS"
 else
-  echo "        WARNING: You need to have the zlib development packages installed"
-  echo "                 to play compressed SWF (most of them from version 6 up)"
-  echo "                 and to display some kinds of JPEG files."
-  echo "                 Install it from http://www.zlib.net"
-  echo "                 or .deb users: apt-get install zlib1g-dev"
-  echo "                 or .rpm users: yum install zlib-dev."
-  echo "                 It may still be possible to configure without zlib."
+  echo "        WARNING: You need to have the zlib development packages installed" >&4
+  echo "                 to play compressed SWF (most of them from version 6 up)" >&4
+  echo "                 and to display some kinds of JPEG files." >&4
+  echo "                 Install it from http://www.zlib.net" >&4
+  echo "                 or .deb users: apt-get install zlib1g-dev" >&4
+  echo "                 or .rpm users: yum install zlib-dev." >&4
+  echo "                 It may still be possible to configure without zlib." >&4
 fi
 
 if test x"$FREETYPE2_LIBS" != x; then
@@ -2799,12 +2769,12 @@ if test x"$FREETYPE2_LIBS" != x; then
   fi
   echo "        FreeType libs are: $FREETYPE2_LIBS"
 else
-  echo "        WARNING: You need to have the freetype development packages installed"
-  echo "                 to use device fonts."
-  echo "                 Install it from http://www.freetype.org"
-  echo "                 or .deb users: apt-get install libfreetype6-dev"
-  echo "                 or .rpm users: yum install libfreetype6-dev (??)"
-  echo "                 It may still be possible to configure without freetype."
+  echo "        WARNING: You need to have the freetype development packages installed" >&4
+  echo "                 to use device fonts." >&4
+  echo "                 Install it from http://www.freetype.org" >&4
+  echo "                 or .deb users: apt-get install libfreetype6-dev" >&4
+  echo "                 or .rpm users: yum install libfreetype6-dev (??)" >&4
+  echo "                 It may still be possible to configure without freetype." >&4
 fi
 
 if test x"$FONTCONFIG_LIBS" != x; then
@@ -2815,12 +2785,12 @@ if test x"$FONTCONFIG_LIBS" != x; then
   fi
   echo "        Fontconfig libs are: $FONTCONFIG_LIBS"
 else
-  echo "        WARNING: You need to have the freetype development packages installed"
-  echo "                 to use device fonts."
-  echo "                 Install it from http://www.fontconfig.org"
-  echo "                 or .deb users: apt-get install libfontconfig1-dev"
-  echo "                 or .rpm users: yum install ??"
-  echo "                 It may still be possible to configure without fontconfig."
+  echo "        WARNING: You need to have the freetype development packages installed" >&4
+  echo "                 to use device fonts." >&4
+  echo "                 Install it from http://www.fontconfig.org" >&4
+  echo "                 or .deb users: apt-get install libfontconfig1-dev" >&4
+  echo "                 or .rpm users: yum install ??" >&4
+  echo "                 It may still be possible to configure without fontconfig." >&4
 fi
 
 if test x$ext_mysql = xyes; then
@@ -2833,7 +2803,6 @@ if test x$ext_mysql = xyes; then
       echo "               Either reconfigure without --with-extensions=mysql" >&3
       echo "               or install MySQL header files from http://www.mysql.org" >&3
       echo "               or .deb users: apt-get install libmysqlclient-dev" >&3
-      nogo=true
     fi
   fi
 fi
@@ -2845,7 +2814,6 @@ if test x"${build_alp}" = xyes; then
     echo "        ALP libs are: $ALP_LIBS"
   else
     echo "        ERROR: No ALP development package is installed." >&3
-    nogo=true
   fi
 fi
 
@@ -2853,18 +2821,26 @@ if test x$cross_compiling = xyes; then
   AC_MSG_NOTICE([This build is setup for cross compiling])
 fi
 
+if test -s $cwarn; then
+  echo ""
+  cat $cwarn
+  rm $cwarn
+  echo ""
+  echo "Gnash should still compile even with these warnings.  If it doesn't,"
+  echo "report the warnings as a bug."
+fi
+
 dnl If anything critical is missing, don't bother to continue
-if test x"$nogo" = x"true"; then
-echo ""
-  cat cerr
+if test -s $cerr; then
+  echo ""
+  cat $cerr
+  rm $cerr
   AC_MSG_ERROR([Please install required packages])
 fi
 
 if test x"$fork" = x"no"; then
   AC_MSG_ERROR([Currently only forking the standalone player works!])
 fi
-
-rm cerr
 
 # Local Variables:
 # c-basic-offset: 2

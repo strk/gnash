@@ -1,3 +1,10 @@
+2008-04-18 Russ Nelson <nelson@crynwr.com>
+
+	* consolidate all WARNING messages for display at the end of
+	  configure's output, along with a notice saying that gnash
+	  should compile anyway.
+	* configure.ac: move cerr and cwarn to /tmp; they're truly temporary.
+
 2008-04-18 Sandro Santilli <strk@keybit.net>
 
 	* server/button_character_instance.cpp: use staticDepthOffset
