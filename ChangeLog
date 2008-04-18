@@ -1,3 +1,11 @@
+2008-04-18 Sandro Santilli <strk@keybit.net>
+
+	* server/sprite_instance.cpp (stop_drag): there's no reason why
+	  stop_drag shouldn't be called on the root movie, that code
+	  will simply ask movie_root to stop dragging whatever is being
+	  dragged currently (independently from on which sprite/movie
+	  it is called). Should fix bug #22970.
+
 2008-04-17 Sandro Santilli <strk@keybit.net>
 
 	* server/character.{cpp,h}: make get_root return m_root no matter

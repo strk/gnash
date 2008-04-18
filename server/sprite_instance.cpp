@@ -3853,7 +3853,7 @@ sprite_instance::get_mouse_state(int& x, int& y, int& buttons)
 void
 sprite_instance::stop_drag()
 {
-  assert(m_parent == NULL); // we must be the root movie!!!
+  //assert(m_parent == NULL); // why should we care ?
   _vm.getRoot().stop_drag();
 }
 
