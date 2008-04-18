@@ -218,22 +218,25 @@ add_button(SWFMovie mo)
 	SWFButton_addAction(bu, compileSWFActionCode(
 		"_root.msg='MouseOver';"
 
-		"if ( _root.testno == 2 ) {" /* ONLY CHECK buttonChild on first frame */
+		"if ( _root.testno == 1 ) {" /* ONLY CHECK buttonChild on first frame */
 
 		/* "_root.note('buttonChild is '+dumpObj(_root.buttonChild));" */
 
 		/* added OVER state char */
-		"	_root.check_equals(_root.buttonChild.realLength(), 3);"
+		"	_root.xcheck_equals(_root.buttonChild.realLength(), 3);"
 
 		/* OVER state char loaded */
 		"	_root.check_equals(typeof(_root.buttonChild[13]), 'object');"
-		"	_root.check_equals(_root.buttonChild[13].nam, '_level0.square1.button.instance7');"
+		"	_root.xcheck_equals(_root.buttonChild[13].nam, '_level0.square1.button.instance7');"
 		"	_root.check_equals(_root.buttonChild[13].exe, 1);" /* OVER state char */
 		"	_root.check_equals(_root.buttonChild[13].uld, 0);" /* OVER state char */
 
 		/* UP state char unloaded */
 		"	_root.check_equals(_root.buttonChild[12].exe, 1);"
-		"	_root.check_equals(_root.buttonChild[12].uld, 1);"
+		"	_root.xcheck_equals(_root.buttonChild[12].uld, 1);"
+		"	_root.check_equals(typeof(_level0.square1.button.instance6), 'movieclip');"
+		"	_root.check_equals(_level0.square1.button.instance6._name, 'instance6');"
+		"	_root.xcheck_equals(_level0.square1.button.instance6.getDepth(), -16398);"
 
 		/* ALL state char still there, not reloaded, not unloaded */
 		"	_root.check_equals(_root.buttonChild[10].exe, 1);"
@@ -556,6 +559,8 @@ main(int argc, char **argv)
 	xcheck_equals(mo, "(_root.buttonChild[12].nam)", "'_level0.square1.button.instance6'"); 
 	check_equals(mo, "(_root.buttonChild[12].exe)", "1");
 	check_equals(mo, "(_root.buttonChild[12].uld)", "0");
+	check_equals(mo, "_level0.square1.button.instance6._name", "'instance6'");
+	xcheck_equals(mo, "_level0.square1.button.instance6.getDepth()", "-16371");
 
 	/* sprite for HIT state not constructed */
 	xcheck_equals(mo, "typeof(_root.buttonChild[11])", "'undefined'");
@@ -690,6 +695,7 @@ main(int argc, char **argv)
 	/*****************************************************
 	 *
 	 * On fifth frame, disable the button
+	 * and check total tests so far
 	 *
 	 *****************************************************/
 
@@ -698,6 +704,7 @@ main(int argc, char **argv)
 		add_actions(mo,
 			"square1.button.enabled = false;"
 			"stop();"
+			"_root.totals(155);"
 			"_root.note('-- Button disabled, try playing with it, nothing should happen --');"
 		);
 		SWFMovie_nextFrame(mo); /* showFrame */
