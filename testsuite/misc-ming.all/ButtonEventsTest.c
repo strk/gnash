@@ -134,10 +134,10 @@ add_button(SWFMovie mo)
 			"var myName = ''+this;"
 			"if ( _root.buttonChild[myDepth] == undefined ) _root.buttonChild[myDepth] = {nam:myName,exe:1,uld:0};"
 			"else _root.buttonChild[myDepth]['exe']++;"
-			/* "_root.note('Actions in frame0 of '+this+' at depth '+myDepth+' executed.');" */
+			 "_root.note('Actions in frame0 of '+this+' at depth '+myDepth+' executed.');" 
 			"this.onUnload = function() {"
 			"	var myDepth = -(getDepth()+32769-16383);"
-			/*"	_root.note(''+this+' at depth '+myDepth+' unloaded.');"*/
+			"	_root.note(''+this+' at depth '+myDepth+' unloaded.');"
 			"	_root.buttonChild[myDepth]['uld']++;"
 			"};"
 			//"_root.note('buttonChilds:'+dumpObj(_root.buttonChild));"
@@ -223,20 +223,20 @@ add_button(SWFMovie mo)
 		/* "_root.note('buttonChild is '+dumpObj(_root.buttonChild));" */
 
 		/* added OVER state char */
-		"	_root.xcheck_equals(_root.buttonChild.realLength(), 3);"
+		"	_root.check_equals(_root.buttonChild.realLength(), 3);"
 
 		/* OVER state char loaded */
 		"	_root.check_equals(typeof(_root.buttonChild[13]), 'object');"
-		"	_root.xcheck_equals(_root.buttonChild[13].nam, '_level0.square1.button.instance7');"
+		"	_root.check_equals(_root.buttonChild[13].nam, '_level0.square1.button.instance7');"
 		"	_root.check_equals(_root.buttonChild[13].exe, 1);" /* OVER state char */
 		"	_root.check_equals(_root.buttonChild[13].uld, 0);" /* OVER state char */
 
 		/* UP state char unloaded */
 		"	_root.check_equals(_root.buttonChild[12].exe, 1);"
-		"	_root.xcheck_equals(_root.buttonChild[12].uld, 1);"
+		"	_root.check_equals(_root.buttonChild[12].uld, 1);"
 		"	_root.check_equals(typeof(_level0.square1.button.instance6), 'movieclip');"
 		"	_root.check_equals(_level0.square1.button.instance6._name, 'instance6');"
-		"	_root.xcheck_equals(_level0.square1.button.instance6.getDepth(), -16398);"
+		"	_root.check_equals(_level0.square1.button.instance6.getDepth(), -16398);"
 
 		/* ALL state char still there, not reloaded, not unloaded */
 		"	_root.check_equals(_root.buttonChild[10].exe, 1);"
@@ -269,17 +269,17 @@ add_button(SWFMovie mo)
 		"if ( _root.testno == 2 ) {" /* ONLY CHECK buttonChild on first frame */
 
 		/* Added DOWN state char */
-		"	_root.xcheck_equals(_root.buttonChild.realLength(), 4);"
+		"	_root.check_equals(_root.buttonChild.realLength(), 4);"
 
 		/* DOWN state char loaded */
-		"	_root.xcheck_equals(typeof(_root.buttonChild[14]), 'object');"
-		"	_root.xcheck_equals(_root.buttonChild[14].nam, '_level0.square1.button.instance8');"
-		"	_root.xcheck_equals(_root.buttonChild[14].exe, 1);" 
-		"	_root.xcheck_equals(_root.buttonChild[14].uld, 0);" 
+		"	_root.check_equals(typeof(_root.buttonChild[14]), 'object');"
+		"	_root.check_equals(_root.buttonChild[14].nam, '_level0.square1.button.instance8');"
+		"	_root.check_equals(_root.buttonChild[14].exe, 1);" 
+		"	_root.check_equals(_root.buttonChild[14].uld, 0);" 
 
 		/* OVER state char unloaded */
 		"	_root.check_equals(_root.buttonChild[13].exe, 1);" 
-		"	_root.xcheck_equals(_root.buttonChild[13].uld, 1);"
+		"	_root.check_equals(_root.buttonChild[13].uld, 1);"
 
 		/* ALL state char still there, not reloaded, not unloaded */
 		"	_root.check_equals(_root.buttonChild[10].exe, 1);"
@@ -556,27 +556,27 @@ main(int argc, char **argv)
 	/* buttonChild was initialized with 2 elements */
 	check_equals(mo, "typeof(_root.buttonChild)", "'object'");
 	check(mo, "_root.buttonChild instanceof Array");
-	xcheck_equals(mo, "_root.buttonChild.realLength()", "2"); /* UP and ALL states */
+	check_equals(mo, "_root.buttonChild.realLength()", "2"); /* UP and ALL states */
 
 	/* sprite for ALL states */
 	check_equals(mo, "typeof(_root.buttonChild[10])", "'object'");
-	xcheck_equals(mo, "(_root.buttonChild[10].nam)", "'_level0.square1.button.instance5'"); 
+	check_equals(mo, "(_root.buttonChild[10].nam)", "'_level0.square1.button.instance5'"); 
 	check_equals(mo, "(_root.buttonChild[10].exe)", "1");
 	check_equals(mo, "(_root.buttonChild[10].uld)", "0");
 
 	/* sprite for UP state */
 	check_equals(mo, "typeof(_root.buttonChild[12])", "'object'");
-	xcheck_equals(mo, "(_root.buttonChild[12].nam)", "'_level0.square1.button.instance6'"); 
+	check_equals(mo, "(_root.buttonChild[12].nam)", "'_level0.square1.button.instance6'"); 
 	check_equals(mo, "(_root.buttonChild[12].exe)", "1");
 	check_equals(mo, "(_root.buttonChild[12].uld)", "0");
 	check_equals(mo, "_level0.square1.button.instance6._name", "'instance6'");
-	xcheck_equals(mo, "_level0.square1.button.instance6.getDepth()", "-16371");
+	check_equals(mo, "_level0.square1.button.instance6.getDepth()", "-16371");
 
 	/* sprite for HIT state not constructed */
-	xcheck_equals(mo, "typeof(_root.buttonChild[11])", "'undefined'");
+	check_equals(mo, "typeof(_root.buttonChild[11])", "'undefined'");
 
 	/* sprite for DOWN state not constructed */
-	xcheck_equals(mo, "typeof(_root.buttonChild[13])", "'undefined'"); 
+	check_equals(mo, "typeof(_root.buttonChild[13])", "'undefined'"); 
 
 	add_actions(mo,
 		"stop();"
@@ -626,34 +626,34 @@ main(int argc, char **argv)
 		/* buttonChild should now have a total of 4 elements (UP,DOWN, OVER and ALL states) */
 		check_equals(mo, "typeof(_root.buttonChild)", "'object'");
 		check(mo, "_root.buttonChild instanceof Array");
-		xcheck_equals(mo, "_root.buttonChild.realLength()", "4"); 
+		check_equals(mo, "_root.buttonChild.realLength()", "4"); 
 
 		/* sprite for ALL states */
 		check_equals(mo, "typeof(_root.buttonChild[10])", "'object'");
-		xcheck_equals(mo, "(_root.buttonChild[10].nam)", "'_level0.square1.button.instance5'"); 
+		check_equals(mo, "(_root.buttonChild[10].nam)", "'_level0.square1.button.instance5'"); 
 		check_equals(mo, "(_root.buttonChild[10].exe)", "1");
 		check_equals(mo, "(_root.buttonChild[10].uld)", "0");
 
 		/* sprite for UP state */
 		check_equals(mo, "typeof(_root.buttonChild[12])", "'object'");
-		xcheck_equals(mo, "(_root.buttonChild[12].nam)", "'_level0.square1.button.instance6'"); 
-		xcheck_equals(mo, "(_root.buttonChild[12].exe)", "3"); 
-		xcheck_equals(mo, "(_root.buttonChild[12].uld)", "2");
+		check_equals(mo, "(_root.buttonChild[12].nam)", "'_level0.square1.button.instance6'"); 
+		check_equals(mo, "(_root.buttonChild[12].exe)", "3"); 
+		check_equals(mo, "(_root.buttonChild[12].uld)", "2");
 
 		/* sprite for OVER state */
 		check_equals(mo, "typeof(_root.buttonChild[13])", "'object'");
-		xcheck_equals(mo, "(_root.buttonChild[13].nam)", "'_level0.square1.button.instance7'"); 
-		xcheck_equals(mo, "(_root.buttonChild[13].exe)", "4");
-		xcheck_equals(mo, "(_root.buttonChild[13].uld)", "4");
+		check_equals(mo, "(_root.buttonChild[13].nam)", "'_level0.square1.button.instance7'"); 
+		check_equals(mo, "(_root.buttonChild[13].exe)", "4");
+		check_equals(mo, "(_root.buttonChild[13].uld)", "4");
 
 		/* sprite for DOWN state */
-		xcheck_equals(mo, "typeof(_root.buttonChild[14])", "'object'");
-		xcheck_equals(mo, "(_root.buttonChild[14].nam)", "'_level0.square1.button.instance8'"); 
-		xcheck_equals(mo, "(_root.buttonChild[14].exe)", "2");
-		xcheck_equals(mo, "(_root.buttonChild[14].uld)", "2");
+		check_equals(mo, "typeof(_root.buttonChild[14])", "'object'");
+		check_equals(mo, "(_root.buttonChild[14].nam)", "'_level0.square1.button.instance8'"); 
+		check_equals(mo, "(_root.buttonChild[14].exe)", "2");
+		check_equals(mo, "(_root.buttonChild[14].uld)", "2");
 
 		/* sprite for HIT state never constructed */
-		xcheck_equals(mo, "typeof(_root.buttonChild[11])", "'undefined'"); 
+		check_equals(mo, "typeof(_root.buttonChild[11])", "'undefined'"); 
 
 
 
@@ -682,34 +682,34 @@ main(int argc, char **argv)
 		/* buttonChild should now have a total of 4 elements (UP,DOWN, OVER and ALL states) */
 		check_equals(mo, "typeof(_root.buttonChild)", "'object'");
 		check(mo, "_root.buttonChild instanceof Array");
-		xcheck_equals(mo, "_root.buttonChild.realLength()", "4"); 
+		check_equals(mo, "_root.buttonChild.realLength()", "4"); 
 
 		/* sprite for ALL states */
 		check_equals(mo, "typeof(_root.buttonChild[10])", "'object'");
-		xcheck_equals(mo, "(_root.buttonChild[10].nam)", "'_level0.square1.button.instance5'"); 
+		check_equals(mo, "(_root.buttonChild[10].nam)", "'_level0.square1.button.instance5'"); 
 		check_equals(mo, "(_root.buttonChild[10].exe)", "1");
 		check_equals(mo, "(_root.buttonChild[10].uld)", "0");
 
 		/* sprite for UP state */
 		check_equals(mo, "typeof(_root.buttonChild[12])", "'object'");
-		xcheck_equals(mo, "(_root.buttonChild[12].nam)", "'_level0.square1.button.instance6'"); 
-		xcheck_equals(mo, "(_root.buttonChild[12].exe)", "5"); 
-		xcheck_equals(mo, "(_root.buttonChild[12].uld)", "4");
+		check_equals(mo, "(_root.buttonChild[12].nam)", "'_level0.square1.button.instance6'"); 
+		check_equals(mo, "(_root.buttonChild[12].exe)", "5"); 
+		check_equals(mo, "(_root.buttonChild[12].uld)", "4");
 
 		/* sprite for OVER state */
 		check_equals(mo, "typeof(_root.buttonChild[13])", "'object'");
-		xcheck_equals(mo, "(_root.buttonChild[13].nam)", "'_level0.square1.button.instance7'"); 
-		xcheck_equals(mo, "(_root.buttonChild[13].exe)", "8");
-		xcheck_equals(mo, "(_root.buttonChild[13].uld)", "8");
+		check_equals(mo, "(_root.buttonChild[13].nam)", "'_level0.square1.button.instance7'"); 
+		check_equals(mo, "(_root.buttonChild[13].exe)", "8");
+		check_equals(mo, "(_root.buttonChild[13].uld)", "8");
 
 		/* sprite for DOWN state */
-		xcheck_equals(mo, "typeof(_root.buttonChild[14])", "'object'");
-		xcheck_equals(mo, "(_root.buttonChild[14].nam)", "'_level0.square1.button.instance8'"); 
-		xcheck_equals(mo, "(_root.buttonChild[14].exe)", "4");
-		xcheck_equals(mo, "(_root.buttonChild[14].uld)", "4");
+		check_equals(mo, "typeof(_root.buttonChild[14])", "'object'");
+		check_equals(mo, "(_root.buttonChild[14].nam)", "'_level0.square1.button.instance8'"); 
+		check_equals(mo, "(_root.buttonChild[14].exe)", "4");
+		check_equals(mo, "(_root.buttonChild[14].uld)", "4");
 
 		/* sprite for HIT state never constructed */
-		xcheck_equals(mo, "typeof(_root.buttonChild[11])", "'undefined'"); 
+		check_equals(mo, "typeof(_root.buttonChild[11])", "'undefined'"); 
 
 		add_actions(mo,
 			"stop();"

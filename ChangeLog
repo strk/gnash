@@ -1,5 +1,16 @@
 2008-04-18 Sandro Santilli <strk@keybit.net>
 
+	* server/button_character_instance.{cpp,h}: 
+	  Redesign buttons' "DisplayList" doing proper
+	  load/unload and depth-shift. Execute statically-defined
+	  button actions by pushing them on stack (movie_root
+	  will take care of processing after event).
+	* testsuite/misc-ming.all/ButtonEventsTest.c:
+	  No more failures in the test. Looking forward for
+	  more tests :)
+
+2008-04-18 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/: ButtonEventsTest.c,
 	  ButtonEventsTest-Runner.cpp: Add test for shape-sensible
 	  hitTest agains containing mouse-grabbing sprite, add

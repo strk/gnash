@@ -24,6 +24,9 @@
 
 #include "character.h" // for inheritance
 
+#include <vector>
+#include <set>
+
 namespace gnash {
 
 // Forward declarations
@@ -43,9 +46,8 @@ class button_character_instance : public character
 public:
 	button_character_definition*	m_def;
 
-	typedef std::vector< boost::intrusive_ptr<character> > CharsVect;
-
-	CharsVect m_record_character;
+	typedef std::vector< character* > CharsVect;
+	typedef std::set<int> RecSet;
 
 	enum mouse_flags
 	{
@@ -91,28 +93,6 @@ public:
 	void	display();
 	
 	void set_current_state(e_mouse_state new_state);
-	
-	/// Returns all characters that are active based on the current state.
-	//
-	/// The "_visible" property does not matter here. 
-	///
-	/// @param list
-	///	The vector to push active characters into
-	///
-	void get_active_characters(std::vector<character*>& list);
-
-	/// Returns all characters that should be active on the given state.
-	//
-	/// The "_visible" property does not matter here. 
-	///
-	/// @param list
-	///	The vector to push active characters into
-	///
-	/// @param state
-	///	The state we're interested in
-	///
-	void get_active_characters(std::vector<character*>& list, e_mouse_state state);
-	
 
 	/// Combine the flags to avoid a conditional.
 	//  It would be faster with a macro.
@@ -181,11 +161,43 @@ protected:
 	/// These are:
 	///	- this char's definition (m_def)
 	///	- the vector of state characters (m_record_character)
+	///	- the vector of hit characters (m_record_character)
 	///
 	void markReachableResources() const;
 #endif // GNASH_USE_GC
 
 private:
+
+	CharsVect m_record_character;
+
+	CharsVect _hitCharacters;
+
+	/// Returns all characters that are active based on the current state.
+	//
+	/// The "_visible" property does not matter here. 
+	///
+	/// @param list
+	///	The vector to push active characters into
+	///
+	/// @param includeUnloaded
+	///	If true, include unloaded but still reachable chars in the records slot.
+	///
+	void get_active_characters(std::vector<character*>& list, bool includeUnloaded=false);
+
+	/// Returns all characters (record nums) that should be active on the given state.
+	//
+	/// @param list
+	///	The set to push active characters record number into
+	///
+	/// @param state
+	///	The state we're interested in
+	///
+	void get_active_records(RecSet& list, e_mouse_state state);
+
+	const CharsVect& getHitCharacters() const
+	{
+		return _hitCharacters;
+	}
 
 
 	/// Return any state character whose name matches the given string

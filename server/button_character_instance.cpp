@@ -365,15 +365,7 @@ button_character_instance::on_event(const event_id& id)
 void
 button_character_instance::restart()
 {
-	set_invalidated();
-	m_last_mouse_flags = IDLE;
-	m_mouse_flags = IDLE;
-	m_mouse_state = UP;
-	size_t r, r_num =  m_record_character.size();
-	for (r = 0; r < r_num; r++)
-	{
-		m_record_character[r]->restart();
-	}
+	log_error("button_character_instance::restart called, from whom??");
 }
 
 void
@@ -383,6 +375,10 @@ button_character_instance::display()
 
 	std::vector<character*> actChars;
 	get_active_characters(actChars);
+
+	//log_debug("At display time, button %s got %d currently active chars", getTarget(), actChars.size());
+
+	// TODO: by keeping chars sorted by depth we'd avoid the sort on display
 	std::sort(actChars.begin(), actChars.end(), charDepthLessThen);
 
 	std::for_each(actChars.begin(), actChars.end(), std::mem_fun(&character::display)); 
@@ -431,8 +427,7 @@ button_character_instance::get_topmost_mouse_entity(float x, float y)
 	//-------------------------------------------------
 
 	// Find hit characters
-	Chars hitChars;
-	get_active_characters(hitChars, HIT);
+	const CharsVect& hitChars = getHitCharacters();
 	if ( hitChars.empty() ) return 0;
 
 	// point is in parent's space,
@@ -446,7 +441,7 @@ button_character_instance::get_topmost_mouse_entity(float x, float y)
 
 	for (size_t i=0, e=hitChars.size(); i<e; ++i)
 	{
-		character* ch = hitChars[i];
+		const character* ch = hitChars[i];
 
 		if ( ch->pointInVisibleShape(wp.x, wp.y) )
 		{
@@ -544,14 +539,15 @@ button_character_instance::on_button_event(const event_id& event)
 
 	// From: "ActionScript - The Definiteve Guide" by Colin Moock
 	// (chapter 10: Events and Event Handlers)
-
+	//
 	// "Event-based code [..] is said to be executed asynchronously
 	//  because the triggering of events can occur at arbitrary times."
+	//
+	// We'll push to the global list. The movie_root will process
+	// the action queue on mouse event.
+	//
 
-	// Immediately execute all events actions (don't append to
-	// parent's action buffer for later execution!)
-
-	ButtonActionExecutor xec(get_environment());
+	ButtonActionPusher xec(getVM().getRoot(), this); 
 	m_def->forEachTrigger(event, xec);
 
 	// check for built-in event handler.
@@ -575,34 +571,58 @@ button_character_instance::on_button_event(const event_id& event)
 }
 
 void 
-button_character_instance::get_active_characters(std::vector<character*>& list)
-{
-	get_active_characters(list, m_mouse_state);
-}
-
-void 
-button_character_instance::get_active_characters(std::vector<character*>& list,
-  e_mouse_state state)
+button_character_instance::get_active_characters(std::vector<character*>& list, bool includeUnloaded)
 {
 	list.clear();
 	
-	for (size_t i = 0; i < m_def->m_button_records.size(); i++)
+	for (size_t i=0,e=m_record_character.size(); i<e; ++i)
+	{
+		character* ch = m_record_character[i];
+		if (ch == NULL) continue;
+		if ( ! includeUnloaded && ch->isUnloaded() ) continue;
+		list.push_back(ch);
+	} 
+}
+
+void 
+button_character_instance::get_active_records(RecSet& list, e_mouse_state state)
+{
+	list.clear();
+	
+	size_t nrecs = m_def->m_button_records.size();
+
+	//log_debug("%s.get_active_records(%s) - def has %d records", getTarget(), mouseStateName(state), m_def->m_button_records.size());
+	for (size_t i=0; i<nrecs; ++i)
 	{
 		button_record&	rec = m_def->m_button_records[i];
-		assert(m_record_character.size() > i);
-		if (m_record_character[i] == NULL)
-		{
-			continue;
-		}
+		//log_debug(" rec %d has hit:%d down:%d over:%d up:%d", i, rec.m_hit_test, rec.m_down, rec.m_over, rec.m_up);
+
 		if ((state == UP && rec.m_up)
 		    || (state == DOWN && rec.m_down)
 		    || (state == OVER && rec.m_over)
 		    || (state == HIT && rec.m_hit_test))
 		{
-			list.push_back(m_record_character[i].get());
+			list.insert(i);
 		}
-	} // for button record	
+	}
 }
+
+#ifdef GNASH_DEBUG_BUTTON_DISPLAYLIST
+static void dump(std::vector< character* >& chars, std::stringstream& ss)
+{
+	for (size_t i=0, e=chars.size(); i<e; ++i)
+	{
+		ss << "Record" << i << ": ";
+		character* ch = chars[i];
+		if ( ! ch ) ss << "NULL.";
+		else
+		{
+			ss << ch->getTarget() << " (depth:" << ch->get_depth()-character::staticDepthOffset-1 << " unloaded:" << ch->isUnloaded() << " destroyed:" << ch->isDestroyed() << ")";
+		}
+		ss << std::endl;
+	}
+}
+#endif
 
 void
 button_character_instance::set_current_state(e_mouse_state new_state)
@@ -610,55 +630,105 @@ button_character_instance::set_current_state(e_mouse_state new_state)
 	if (new_state == m_mouse_state)
 		return;
 		
-	typedef std::vector<character*> CharVect;
+	//set_invalidated(); // TODO: optimize
 
-	// save current "display list"
-	CharVect old_list;
-	get_active_characters(old_list, m_mouse_state);
-	
-	// load new "display list" 
-	// NOTE: We don't change state yet, so that set_invalidated() can 
-	// load the current bounds first.
-	CharVect new_list;
-	get_active_characters(new_list, new_state);
-		
-	size_t old_count = old_list.size();
-	size_t new_count = new_list.size();
+#ifdef GNASH_DEBUG_BUTTON_DISPLAYLIST
+	std::stringstream ss;
+	ss << "at set_current_state enter: " << std::endl;
+	dump(m_record_character, ss);
+	log_debug("%s", ss.str());
+#endif
 
-	// If the old and new lists have different size,
-	// then something obviously changed.
-	// (effective equality check done in next loop)
-	//
-	if (new_count != old_count) set_invalidated();
-  
-	// Otherwise, something changed if any character
-	// in the new set was not in the old one.
-	//
-	// In this case, we also restart the new character
-	// so it looks like we just placed it.
-	//
-	for (size_t i=0; i<new_count; i++)
+	// Get new state records
+	RecSet newChars;
+	get_active_records(newChars, new_state);
+
+	// For each possible record, check if it should still be there
+	for (size_t i=0, e=m_record_character.size(); i<e; ++i)
 	{
-		bool found=false;
-		character* newch = new_list[i];
-		for (size_t j=0; j<old_count; j++)
-		{ 
-			character* oldch = old_list[j];
-			if (newch == oldch)
+		character* oldch = m_record_character[i];
+		bool shouldBeThere = ( newChars.find(i) != newChars.end() );
+
+		if ( ! shouldBeThere )
+		{
+			// is there, but is unloaded: destroy, clear slot and go on
+			if ( oldch && oldch->isUnloaded() )
 			{
-				found=true;
-				break; 
+				if ( ! oldch->isDestroyed() ) oldch->destroy();
+				m_record_character[i] = NULL;
+				oldch = NULL;
+			}
+
+			if ( oldch ) // the one we have should not be there... unload!
+			{
+				set_invalidated();
+
+				if ( ! oldch->unload() )
+				{
+					// No onUnload handler: destroy and clear slot
+					if ( ! oldch->isDestroyed() ) oldch->destroy();
+					m_record_character[i] = NULL;
+				}
+				else
+				{
+					// onUnload handler: shift depth and keep slot
+					int oldDepth = oldch->get_depth();
+					int newDepth = character::removedDepthOffset - oldDepth;
+#ifdef GNASH_DEBUG_BUTTON_DISPLAYLIST
+					log_debug("Removed button record shifted from depth %d to depth %d", oldDepth, newDepth);
+#endif
+					oldch->set_depth(newDepth);
+				}
 			}
 		}
-		if (!found)
+		else // should be there
 		{
-			// character (re-)appeared on stage -> restart!
-			set_invalidated();  // note that restart() below will trigger set_invalidated() too
-			newch->restart();
-		} 
+			// Is there already, but is unloaded: destroy and consider as gone
+			if ( oldch && oldch->isUnloaded() )
+			{
+				if ( ! oldch->isDestroyed() ) oldch->destroy();
+				m_record_character[i] = NULL;
+				oldch = NULL;
+			}
+
+			if ( ! oldch )
+			{
+				// Not there, instantiate
+				button_record& bdef = m_def->m_button_records[i];
+
+				const matrix&	mat = bdef.m_button_matrix;
+				const cxform&	cx = bdef.m_button_cxform;
+				int ch_depth = bdef.m_button_layer+character::staticDepthOffset+1;
+				int ch_id = bdef.m_character_id;
+
+				character* ch = bdef.m_character_def->create_character_instance(this, ch_id);
+				ch->set_matrix(mat); 
+				ch->set_cxform(cx); 
+				ch->set_depth(ch_depth); 
+				assert(ch->get_parent() == this);
+				assert(ch->get_name().empty()); // no way to specify a name for button chars anyway...
+
+				if ( ch->wantsInstanceName() )
+				{
+					//std::string instance_name = getNextUnnamedInstanceName();
+					ch->set_name(getNextUnnamedInstanceName());
+				}
+
+				m_record_character[i] = ch;
+				ch->stagePlacementCallback(); // give this character a life
+
+			}
+		}
 	}
 
-	// effectively change state
+#ifdef GNASH_DEBUG_BUTTON_DISPLAYLIST
+	ss.str("");
+	ss << "at set_current_state end: " << std::endl;
+	dump(m_record_character, ss);
+	log_debug("%s", ss.str());
+#endif
+
+	// Remember current state
 	m_mouse_state=new_state;
 	 
 }
@@ -741,10 +811,17 @@ button_character_instance::get_path_element(string_table::key key)
 character *
 button_character_instance::getChildByName(const std::string& name) const
 {
-	// See if we have a match on the button records list
-	for (size_t i=0, n=m_record_character.size(); i<n; ++i)
+	// Get all currently active characters, including unloaded
+	CharsVect actChars;
+	// TODO: fix the const_cast
+	const_cast<button_character_instance*>(this)->get_active_characters(actChars, true);
+
+	// Lower depth first for duplicated names, so we sort
+	std::sort(actChars.begin(), actChars.end(), charDepthLessThen);
+
+	for (CharsVect::iterator i=actChars.begin(), e=actChars.end(); i!=e; ++i)
 	{
-		character* child = m_record_character[i].get();
+		character* child = *i;
 		const char* pat_c = child->get_name().c_str();
 		const char* nam_c = name.c_str();
 
@@ -770,22 +847,53 @@ button_character_instance::stagePlacementCallback()
 	// do we need this???
 	//_vm.getRoot().addLiveChar(this);
 
-	size_t r, r_num =  m_def->m_button_records.size();
-	m_record_character.resize(r_num);
-
-	for (r = 0; r < r_num; r++)
+	// Instantiate the hit characters
+	RecSet hitChars;
+	get_active_records(hitChars, HIT);
+	for (RecSet::iterator i=hitChars.begin(),e=hitChars.end(); i!=e; ++i)
 	{
-		button_record& bdef = m_def->m_button_records[r];
+		button_record& bdef = m_def->m_button_records[*i];
 
 		const matrix&	mat = bdef.m_button_matrix;
 		const cxform&	cx = bdef.m_button_cxform;
-		int ch_depth = bdef.m_button_layer+character::staticDepthOffset;
+		int ch_depth = bdef.m_button_layer+character::staticDepthOffset+1;
 		int ch_id = bdef.m_character_id;
 
-		boost::intrusive_ptr<character> ch = bdef.m_character_def->create_character_instance(this, ch_id);
-		ch->set_matrix(mat);
-		ch->set_cxform(cx);
-		ch->set_depth(ch_depth);
+		character* ch = bdef.m_character_def->create_character_instance(this, ch_id);
+		ch->set_matrix(mat); 
+		ch->set_cxform(cx); // TODO: who cares about color ?
+		ch->set_depth(ch_depth); // TODO: check if we care about depth, and why ...
+		assert(ch->get_parent() == this);
+		assert(ch->get_name().empty()); // no way to specify a name for button chars anyway...
+
+		_hitCharacters.push_back(ch);
+	}
+
+	// Setup the state characters container
+	// It will have a slot for each character record.
+	// Some slots will probably be never used (consider HIT-only records)
+	// but for now this direct corrispondence between record number
+	// and active character will be handy.
+	m_record_character.resize(m_def->m_button_records.size());
+
+	// Instantiate the default state characters 
+	RecSet upChars;
+	get_active_records(upChars, UP);
+	log_debug("At StagePlacementCallback, button %s got %d active chars for state UP", getTarget(), upChars.size());
+	for (RecSet::iterator i=upChars.begin(),e=upChars.end(); i!=e; ++i)
+	{
+		int rno = *i;
+		button_record& bdef = m_def->m_button_records[rno];
+
+		const matrix&	mat = bdef.m_button_matrix;
+		const cxform&	cx = bdef.m_button_cxform;
+		int ch_depth = bdef.m_button_layer+character::staticDepthOffset+1;
+		int ch_id = bdef.m_character_id;
+
+		character* ch = bdef.m_character_def->create_character_instance(this, ch_id);
+		ch->set_matrix(mat); 
+		ch->set_cxform(cx); 
+		ch->set_depth(ch_depth); 
 		assert(ch->get_parent() == this);
 		assert(ch->get_name().empty()); // no way to specify a name for button chars anyway...
 
@@ -795,10 +903,8 @@ button_character_instance::stagePlacementCallback()
 			ch->set_name(getNextUnnamedInstanceName());
 		}
 
-		m_record_character[r] = ch;
-
-		ch->stagePlacementCallback(); // give this character life (TODO: they aren't on stage, are them ?)
-		//log_debug("Character %d of Button %s, with target %s got a life", r, getTarget(), ch->getTarget());
+		m_record_character[rno] = ch;
+		ch->stagePlacementCallback(); // give this character a life
 	}
 
 	// there's no INITIALIZE/CONSTRUCT/LOAD/ENTERFRAME/UNLOAD events for buttons
@@ -812,11 +918,21 @@ button_character_instance::markReachableResources() const
 
 	m_def->setReachable();
 
-	// Markstate characters as reachable
+	// Mark state characters as reachable
 	for (CharsVect::const_iterator i=m_record_character.begin(), e=m_record_character.end();
 			i!=e; ++i)
 	{
-		(*i)->setReachable();
+		character* ch = *i;
+		if ( ch ) ch->setReachable();
+	}
+
+	// Mark hit characters as reachable
+	for (CharsVect::const_iterator i=_hitCharacters.begin(), e=_hitCharacters.end();
+			i!=e; ++i)
+	{
+		character* ch = *i;
+		assert ( ch );
+		ch->setReachable();
 	}
 
 	// character class members
@@ -833,10 +949,14 @@ button_character_instance::unload()
 	//std::for_each(m_record_character.begin(), m_record_character.end(), boost::bind(&character::unload, _1));
 	for (CharsVect::iterator i=m_record_character.begin(), e=m_record_character.end(); i!=e; ++i)
 	{
-		boost::intrusive_ptr<character> ch = *i;
+		character* ch = *i;
+		if ( ! ch ) continue;
+		if ( ch->isUnloaded() ) continue;
 		if ( ch->unload() ) childsHaveUnload = true;
 		//log_debug("Button child %s (%s) unloaded", ch->getTarget().c_str(), typeName(*ch).c_str());
 	}
+
+	_hitCharacters.clear();
 
 	bool hasUnloadEvent = character::unload();
 
@@ -993,7 +1113,7 @@ button_character_instance::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
 	std::ostringstream os;
 
 	std::vector<character*> actChars;
-	get_active_characters(actChars);
+	get_active_characters(actChars, true);
 	std::sort(actChars.begin(), actChars.end(), charDepthLessThen);
 
 	os << actChars.size() << " active characters for state " << mouseStateName(m_mouse_state);
