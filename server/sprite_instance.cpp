@@ -4547,7 +4547,7 @@ sprite_instance::get_root() const
 const sprite_instance*
 sprite_instance::getAsRoot() const
 {
-	log_debug("getAsRoot called for sprite %s, with _lockroot %d and version %d", getTarget(), getLockRoot(), getSWFVersion());
+	//log_debug("getAsRoot called for sprite %s, with _lockroot %d and version %d", getTarget(), getLockRoot(), getSWFVersion());
 
 	// TODO1: as an optimization, if swf version < 7 
 	//        we might as well just return m_root, 
