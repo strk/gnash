@@ -1,9 +1,22 @@
-// -- Thatcher Ulrich <tu@tulrich.com> 2003
+// button_character_def.h:  Mouse-sensitive SWF buttons, for Gnash.
+//
+//   Copyright (C) 2006, 2007, 2008 Free Software Foundation, Inc.
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
 
-// This source code has been donated to the Public Domain.  Do
-// whatever you want with it.
-
-// SWF buttons.  Mouse-sensitive update/display, actions, etc.
 
 
 #ifndef GNASH_BUTTON_CHARACTER_DEF_H
@@ -29,6 +42,7 @@
 namespace gnash {
 	class sprite_instance;
 	class movie_definition;
+	class event_id;
 }
 
 namespace gnash {
@@ -111,19 +125,6 @@ public:
 class button_action
 {
 public:
-	enum condition
-	{
-		IDLE_TO_OVER_UP = 1 << 0,
-		OVER_UP_TO_IDLE = 1 << 1,
-		OVER_UP_TO_OVER_DOWN = 1 << 2,
-		OVER_DOWN_TO_OVER_UP = 1 << 3,
-		OVER_DOWN_TO_OUT_DOWN = 1 << 4,
-		OUT_DOWN_TO_OVER_DOWN = 1 << 5,
-		OUT_DOWN_TO_IDLE = 1 << 6,
-		IDLE_TO_OVER_DOWN = 1 << 7,
-		OVER_DOWN_TO_IDLE = 1 << 8
-	};
-	int	m_conditions;
 
 	// TODO: define ownership of list elements !!
 	action_buffer m_actions;
@@ -137,18 +138,47 @@ public:
 	///
 	button_action(stream& in, int tag_type, unsigned long endPos, movie_definition& mdef);
 
+	/// Return true if this action should be triggered by the given event.
+	bool triggeredBy(const event_id& ev) const;
+
+	/// Return true if this action is triggered by a keypress
+	bool triggeredByKeyPress() const
+	{
+		return m_conditions&KEYPRESS;
+	}
+
+private:
+
+	/// Return the keycode triggering this action
+	//
+	/// Return 0 if no key is supposed to trigger us
+	///
+	int getKeyCode() const
+	{
+		return (m_conditions&KEYPRESS) >> 9;
+	}
+
+	enum condition
+	{
+		IDLE_TO_OVER_UP = 1 << 0,
+		OVER_UP_TO_IDLE = 1 << 1,
+		OVER_UP_TO_OVER_DOWN = 1 << 2,
+		OVER_DOWN_TO_OVER_UP = 1 << 3,
+		OVER_DOWN_TO_OUT_DOWN = 1 << 4,
+		OUT_DOWN_TO_OVER_DOWN = 1 << 5,
+		OUT_DOWN_TO_IDLE = 1 << 6,
+		IDLE_TO_OVER_DOWN = 1 << 7,
+		OVER_DOWN_TO_IDLE = 1 << 8,
+		KEYPRESS = 0xFE00  // highest 7 bits
+	};
+	int	m_conditions;
+
 };
 
 
 class button_character_definition : public character_def
 {
 public:
-
-  /// Smallest layer number used for button records 
-  int m_min_layer;
-
-  /// Greatest layer number used for button records 
-  int m_max_layer;
 
 	struct sound_info
 	{
@@ -211,17 +241,6 @@ public:
 #endif // GNASH_USE_GC
 	};
 
-
-	bool m_menu;
-
-	typedef std::vector<button_record> ButtonRecVect; 
-	ButtonRecVect m_button_records;
-
-	typedef std::vector<button_action*> ButtonActVect;
-	ButtonActVect m_button_actions;
-
-	boost::scoped_ptr<button_sound_def> m_sound;
-
 	/// \brief
 	/// Construct a character definition as read from
 	/// the given movie_definition (SWF)
@@ -245,27 +264,39 @@ public:
 	void	readDefineButtonSound(stream* in, movie_definition* m);
 	
 	const rect&	get_bound() const {
-    // It is required that get_bound() is implemented in character definition
-    // classes. However, button character definitions do not have shape 
-    // definitions themselves. Instead, they hold a list of shape_character_def.
-    // get_bound() is currently only used by generic_character which normally
-    // is used only shape character definitions. See character_def.h to learn
-    // why it is virtual anyway.
-    // get_button_bound() is used for buttons.
-    abort(); // should not be called  
+		// It is required that get_bound() is implemented in character definition
+		// classes. However, button character definitions do not have shape 
+		// definitions themselves. Instead, they hold a list of shape_character_def.
+		// get_bound() is currently only used by generic_character which normally
+		// is used only shape character definitions. See character_def.h to learn
+		// why it is virtual anyway.
+		// get_button_bound() is used for buttons.
+		abort(); // should not be called  
 		static rect unused;
 		return unused;
-  }
+	}
   
-  const rect&	get_button_bound(int id) const {
-    UNUSED(id);
-    abort(); // not implemented
-  }
-
 	/// \brief
 	/// Return version of the SWF containing
 	/// this button definition.
 	int getSWFVersion() const;
+
+	bool hasKeyPressHandler() const;
+
+	/// Invoke a functor for each action triggered by given event
+	//
+	/// The functor will be passed a const action_buffer&
+	/// and is not expected to return anything.
+	///
+	template <class E>
+	void forEachTrigger(const event_id& ev, E& f) const
+	{
+		for (size_t i = 0, e = m_button_actions.size(); i < e; ++i)
+		{
+			const button_action& ba = *(m_button_actions[i]);
+			if ( ba.triggeredBy(ev) ) f(ba.m_actions);
+		}
+	}
 	
 protected:
 
@@ -287,7 +318,21 @@ protected:
 		if ( m_sound ) m_sound->markReachableResources();
 	}
 #endif // GNASH_USE_GC
+
+public: // TODO: make private
+
+	typedef std::vector<button_record> ButtonRecVect; 
+	ButtonRecVect m_button_records;
+
+	boost::scoped_ptr<button_sound_def> m_sound;
+
 private:
+
+	typedef std::vector<button_action*> ButtonActVect;
+	ButtonActVect m_button_actions;
+
+	/// Currently set but unused (and also unaccessible)
+	bool m_menu;
 
 	/// The movie definition containing definition of this button
 	movie_definition* _movieDef;

@@ -1,5 +1,11 @@
 2008-04-18 Sandro Santilli <strk@keybit.net>
 
+	* server/button_character_instance.cpp,
+	  server/parser/button_character_def.{cpp,h}:
+	  Abstract access to button actions, now parser-private.
+
+2008-04-18 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/ButtonEventsTest.c: enable a test snippet
 	  that was failing to execute. Add constency checking for the
 	  self-contained tests. Add test showing that unloaded (depth-shifted)

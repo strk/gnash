@@ -27,7 +27,9 @@
 #include "movie_definition.h"
 #include "action_buffer.h"
 #include "filter_factory.h"
+#include "gnash.h" // for gnash::key::codeMap
 
+#define ONCE(x) { static bool warned=false; if (!warned) { warned=true; x; } }
 
 namespace gnash {
 
@@ -61,11 +63,33 @@ button_action::button_action(stream& in, int tag_type, unsigned long endPos, mov
 	}
 
 	IF_VERBOSE_PARSE (
-	log_parse(_("-- actions in button")); // @@ need more info about which actions
+	log_parse(_("   button actions for conditions %x"), m_conditions); // @@ need more info about which actions
 	);
 
 	// Read actions.
 	m_actions.read(in, endPos);
+}
+
+bool
+button_action::triggeredBy(const event_id& ev) const
+{
+	switch ( ev.id() )
+	{
+		case event_id::ROLL_OVER: return m_conditions & IDLE_TO_OVER_UP;
+		case event_id::ROLL_OUT: return m_conditions & OVER_UP_TO_IDLE;
+		case event_id::PRESS: return m_conditions & OVER_UP_TO_OVER_DOWN;
+		case event_id::RELEASE: return m_conditions & OVER_DOWN_TO_OVER_UP;
+		case event_id::DRAG_OUT: return m_conditions & OVER_DOWN_TO_OUT_DOWN;
+		case event_id::DRAG_OVER: return m_conditions & OUT_DOWN_TO_OVER_DOWN;
+		case event_id::RELEASE_OUTSIDE: return m_conditions & OUT_DOWN_TO_IDLE;
+		case event_id::KEY_PRESS:
+		{
+			int keycode = getKeyCode();
+			if ( ! keycode ) return false; // not a keypress event
+			return key::codeMap[ev.keyCode][key::SWF] == keycode;
+		}
+		default: return false;
+	}
 }
 
 //
@@ -203,8 +227,6 @@ button_record::read(stream* in, int tag_type,
 
 button_character_definition::button_character_definition(movie_definition* m)
 	:
-	m_min_layer(0),
-	m_max_layer(0),
 	m_sound(NULL),
 	_movieDef(m)
 
@@ -321,16 +343,6 @@ button_character_definition::readDefineButton(stream* in, movie_definition* m)
 	// Read actions.
 	m_button_actions.push_back(new button_action(*in, SWF::DEFINEBUTTON, endTagPos, *m));
 
-	// detect min/max layer number
-	m_min_layer=0;
-	m_max_layer=0;
-	for (unsigned int i=0; i<m_button_records.size(); i++)
-	{
-	  int this_layer = m_button_records[i].m_button_layer;
-
-	  if ((i==0) || (this_layer < m_min_layer))  m_min_layer=this_layer;
-	  if ((i==0) || (this_layer > m_max_layer))  m_max_layer=this_layer;
-	}
 }
 
 void
@@ -338,11 +350,14 @@ button_character_definition::readDefineButton2(stream* in, movie_definition* m)
 {
 	// Character ID has been read already
 
+	in->ensureBytes(1 + 2); // flags + actions offset
+
 	// Read the menu flag
 	// (this is a single bit, the other 7 bits are reserved)
-	in->ensureBytes(1 + 2);
-
 	m_menu = in->read_u8() != 0;
+	if ( m_menu ) ONCE(log_unimpl("DEFINEBUTTON2 'menu' flag"));
+
+	// Read the action offset
 	unsigned button_2_action_offset = in->read_u16();
 
 	unsigned long tagEndPosition = in->get_tag_end_position();
@@ -415,17 +430,6 @@ button_character_definition::readDefineButton2(stream* in, movie_definition* m)
 			// seek to next action.
 			in->set_position(next_action_pos);
 		}
-	}
-
-	// detect min/max layer number
-	m_min_layer=0;
-	m_max_layer=0;
-	for (unsigned int i=0; i<m_button_records.size(); i++)
-	{
-		int this_layer = m_button_records[i].m_button_layer;
-
-		if ((i==0) || (this_layer < m_min_layer))  m_min_layer=this_layer;
-		if ((i==0) || (this_layer > m_max_layer))  m_max_layer=this_layer;
 	}
 }
 
@@ -514,6 +518,17 @@ int
 button_character_definition::getSWFVersion() const
 {
 	return _movieDef->get_version();
+}
+
+bool
+button_character_definition::hasKeyPressHandler() const
+{
+	for (size_t i = 0, e = m_button_actions.size(); i < e; ++i)
+	{
+		const button_action& ba = *(m_button_actions[i]);
+		if ( ba.triggeredByKeyPress() ) return true;
+	}
+	return false;
 }
 
 } // namespace gnash

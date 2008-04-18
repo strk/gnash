@@ -168,6 +168,48 @@ frame loop:
 
 namespace gnash {
 
+namespace {
+
+class ButtonActionExecutor {
+public:
+	ButtonActionExecutor(as_environment& env)
+		:
+		_env(env)
+	{}
+
+	void operator() (const action_buffer& ab)
+	{
+		ActionExec exec(ab, _env);
+		exec();
+	}
+private:
+	as_environment& _env;
+};
+
+class ButtonActionPusher {
+public:
+	ButtonActionPusher(movie_root& mr, character* this_ptr)
+		:
+		called(false),
+		_mr(mr),
+		_tp(this_ptr)
+	{}
+
+	void operator() (const action_buffer& ab)
+	{
+		_mr.pushAction(ab, boost::intrusive_ptr<character>(_tp));
+		called = true;
+	}
+
+	bool called;
+
+private:
+	movie_root& _mr;
+	character* _tp;
+};
+
+}
+
 // Forward declarations
 static as_object* getButtonInterface();
 
@@ -254,15 +296,9 @@ button_character_instance::button_character_instance(
 	set_prototype(getButtonInterface());
 
 	// check up presence Key events
-	// TODO: use a service of button_character_def, not this hard-coded thing here
-	for (size_t i = 0, e = m_def->m_button_actions.size(); i < e; ++i)
+	if ( m_def->hasKeyPressHandler() )
 	{
-		// TODO: use labels, not magic numbers here !!
-		if (m_def->m_button_actions[i]->m_conditions & 0xFE00)	// check up on CondKeyPress: UB[7]
-		{
-			_vm.getRoot().add_key_listener(this);
-			break;
-		}
+		_vm.getRoot().add_key_listener(this);
 	}
 
 }
@@ -314,34 +350,16 @@ button_character_instance::enabled_getset(const fn_call& fn)
 bool
 button_character_instance::on_event(const event_id& id)
 {
+	// We only respond keypress events
+	if ( id.m_id != event_id::KEY_PRESS ) return false;
 
-	if( (id.m_id==event_id::KEY_PRESS) && (id.keyCode == key::INVALID) )
-	{
-		// onKeypress only responds to valid key code
-		return false;
-	}
+	// We only respond to valid key code (should we assert here?)
+	if ( id.keyCode == key::INVALID ) return false;
 
-	bool called = false;
+	ButtonActionPusher xec(getVM().getRoot(), this); 
+	m_def->forEachTrigger(id, xec);
 
-	// Add appropriate actions to the global action list ...
-	// TODO: should we execute immediately instead ?
-	for (size_t i = 0, ie=m_def->m_button_actions.size(); i<ie; ++i)
-	{
-		button_action& ba = *(m_def->m_button_actions[i]);
-
-		int keycode = (ba.m_conditions & 0xFE00) >> 9;
-		
-		// Test match between button action conditions and the SWF code
-		// that maps to id.keyCode (the gnash unique key code). 
-		if (id.m_id == event_id::KEY_PRESS && gnash::key::codeMap[id.keyCode][key::SWF] == keycode)
-		{
-			// Matching action.
-			VM::get().getRoot().pushAction(ba.m_actions, boost::intrusive_ptr<character>(this));
-			called = true;
-		}
-	}
-
-	return called;
+	return xec.called;
 }
 
 void
@@ -524,19 +542,6 @@ button_character_instance::on_button_event(const event_id& event)
 		}
 	}
 
-
-	// @@ eh, should just be a lookup table.
-	int	c = 0;
-	if (event.m_id == event_id::ROLL_OVER) c |= (button_action::IDLE_TO_OVER_UP);
-	else if (event.m_id == event_id::ROLL_OUT) c |= (button_action::OVER_UP_TO_IDLE);
-	else if (event.m_id == event_id::PRESS) c |= (button_action::OVER_UP_TO_OVER_DOWN);
-	else if (event.m_id == event_id::RELEASE) c |= (button_action::OVER_DOWN_TO_OVER_UP);
-	else if (event.m_id == event_id::DRAG_OUT) c |= (button_action::OVER_DOWN_TO_OUT_DOWN);
-	else if (event.m_id == event_id::DRAG_OVER) c |= (button_action::OUT_DOWN_TO_OVER_DOWN);
-	else if (event.m_id == event_id::RELEASE_OUTSIDE) c |= (button_action::OUT_DOWN_TO_IDLE);
-	//IDLE_TO_OVER_DOWN = 1 << 7,
-	//OVER_DOWN_TO_IDLE = 1 << 8,
-
 	// From: "ActionScript - The Definiteve Guide" by Colin Moock
 	// (chapter 10: Events and Event Handlers)
 
@@ -546,22 +551,8 @@ button_character_instance::on_button_event(const event_id& event)
 	// Immediately execute all events actions (don't append to
 	// parent's action buffer for later execution!)
 
-	for (size_t i = 0; i < m_def->m_button_actions.size(); i++)
-	{
-		button_action& ba = *(m_def->m_button_actions[i]);
-
-		if (ba.m_conditions & c)
-		{
-			// Matching action.
-			action_buffer& ab = ba.m_actions;
-			IF_VERBOSE_ACTION(
-				log_action(_("Executing actions for "
-					"button condition %d"), c);
-			);
-			ActionExec exec(ab, get_environment());
-			exec();
-		}
-	}
+	ButtonActionExecutor xec(get_environment());
+	m_def->forEachTrigger(event, xec);
 
 	// check for built-in event handler.
 	std::auto_ptr<ExecutableCode> code ( get_event_handler(event) );
