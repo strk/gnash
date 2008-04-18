@@ -233,7 +233,7 @@ main(int /*argc*/, char** /*argv*/)
 	sprite_instance* root = tester.getRootMovie();
 	assert(root);
 
-	check_equals(root->get_frame_count(), 5);
+	check_equals(root->get_frame_count(), 6);
 
 	check_equals(root->get_current_frame(), 0);
 
@@ -251,6 +251,7 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(string(text3->get_text_value()), idleString);
 
 	tester.advance();
+	check_equals(root->get_current_frame(), 1);
 
 	const character* mc1 = tester.findDisplayItemByName(*root, "square1");
 	check(mc1);
@@ -261,6 +262,9 @@ main(int /*argc*/, char** /*argv*/)
 	rgba red(255,0,0,255);
 	check_pixel(60, 60, 2, red, 2);
 
+	tester.advance();
+	check_equals(root->get_current_frame(), 2);
+
 	for (size_t fno=root->get_current_frame(); fno<root->get_frame_count(); fno++)
 	{
 		const character* square_back = tester.findDisplayItemByDepth(*root, 1+character::staticDepthOffset);
@@ -268,15 +272,15 @@ main(int /*argc*/, char** /*argv*/)
 
 		switch (fno)
 		{
-			case 1:
+			case 2:
 				check(!square_back);
 				check(!square_front);
 				break;
-			case 2:
+			case 3:
 				check(square_back);
 				check(!square_front);
 				break;
-			case 3:
+			case 4:
 				check(square_back);
 				check(square_front);
 				break;
@@ -296,7 +300,7 @@ main(int /*argc*/, char** /*argv*/)
 
 	// last advance should not restart the loop (it's in STOP mode)
         check_equals(root->get_play_state(), sprite_instance::STOP);
-	check_equals(root->get_current_frame(), 4);
+	check_equals(root->get_current_frame(), 5);
 
 }
 

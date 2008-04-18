@@ -823,7 +823,7 @@ button_character_instance::stagePlacementCallback()
 
 		const matrix&	mat = bdef.m_button_matrix;
 		const cxform&	cx = bdef.m_button_cxform;
-		int ch_depth = bdef.m_button_layer;
+		int ch_depth = bdef.m_button_layer+character::staticDepthOffset;
 		int ch_id = bdef.m_character_id;
 
 		boost::intrusive_ptr<character> ch = bdef.m_character_def->create_character_instance(this, ch_id);

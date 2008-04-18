@@ -1,5 +1,13 @@
 2008-04-18 Sandro Santilli <strk@keybit.net>
 
+	* server/button_character_instance.cpp: use staticDepthOffset
+	  for depth-shifting.
+	* testsuite/misc-ming.all/: ButtonEventsTest-Runner.cpp,
+	  ButtonEventsTest.c: Add test for child load/unload.
+	  Gnash is being very wrong here..
+
+2008-04-18 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.cpp (stop_drag): there's no reason why
 	  stop_drag shouldn't be called on the root movie, that code
 	  will simply ask movie_root to stop dragging whatever is being

@@ -106,7 +106,44 @@ add_button(SWFMovie mo)
 	SWFButtonRecord br;
 	SWFShape sh1, sh2, sh3, sh4, sh1a, sh2a, sh3a, sh4a;
 	SWFButton bu = newSWFButton();
+	static SWFMovieClip ermc; /* Events-reporting mc */
 	mc = newSWFMovieClip();
+
+	if ( ! ermc )
+	{
+		ermc = newSWFMovieClip();
+		SWFMovieClip_add(ermc, newSWFAction(
+			"_global.dumpObj = function(o,indent) {"
+			"	var s = '';"
+			"	if ( typeof(o) == 'object' ) {"
+			"		s += '{';"
+			"		var first=1;"
+			"		for (var i in o) {"
+			"			if (!first) s+=',';"
+			"			s+= i+':'+dumpObj(o[i]);"
+			"			first=0;"
+			"		}"
+			"		s += '}';"
+			"	} else {"
+			"		s += o;"
+			"	}"
+			"	return s;"
+			"};"
+			"if ( _root.buttonChild == undefined ) _root.buttonChild = [];"
+			"var myDepth = getDepth()+16383;"
+			"var myName = ''+this;"
+			"if ( _root.buttonChild[myDepth] == undefined ) _root.buttonChild[myDepth] = {nam:myName,exe:1,uld:0};"
+			"else _root.buttonChild[myDepth]['exe']++;"
+			/* "_root.note('Actions in frame0 of '+this+' at depth '+myDepth+' executed.');" */
+			"this.onUnload = function() {"
+			"	var myDepth = -(getDepth()+32769-16383);"
+			/*"	_root.note(''+this+' at depth '+myDepth+' unloaded.');"*/
+			"	_root.buttonChild[myDepth]['uld']++;"
+			"};"
+			//"_root.note('buttonChilds:'+dumpObj(_root.buttonChild));"
+		));
+		SWFMovieClip_nextFrame(ermc);
+	}
 
 	sh1 = make_fill_square(0, 0, 40, 40, 0, 0, 0, 0, 0, 0);
 	sh1a = make_fill_square(30, 30, 5, 5, 128, 128, 128, 128, 128, 128);
@@ -141,6 +178,27 @@ add_button(SWFMovie mo)
 	br = SWFButton_addCharacter(bu, (SWFCharacter)sh4, SWFBUTTON_OVER );
 	SWFButtonRecord_setDepth(br, 1);
 
+	/* Add events reported character in all states at depth 10 */
+	br = SWFButton_addCharacter(bu, (SWFCharacter)ermc, SWFBUTTON_HIT|SWFBUTTON_DOWN|SWFBUTTON_OVER|SWFBUTTON_UP);
+	SWFButtonRecord_setDepth(br, 10);
+
+	/* Add events reported character just HIT state at depth 11 */
+	br = SWFButton_addCharacter(bu, (SWFCharacter)ermc, SWFBUTTON_HIT);
+	SWFButtonRecord_setDepth(br, 11);
+
+	/* Add events reported character just UP state at depth 12 */
+	br = SWFButton_addCharacter(bu, (SWFCharacter)ermc, SWFBUTTON_UP);
+	SWFButtonRecord_setDepth(br, 12);
+
+	/* Add events reported character just OVER state at depth 13 */
+	br = SWFButton_addCharacter(bu, (SWFCharacter)ermc, SWFBUTTON_OVER);
+	SWFButtonRecord_setDepth(br, 13);
+
+	/* Add events reported character just DOWN state at depth 14 */
+	br = SWFButton_addCharacter(bu, (SWFCharacter)ermc, SWFBUTTON_DOWN);
+	SWFButtonRecord_setDepth(br, 14);
+
+
 	SWFButton_addAction(bu, compileSWFActionCode(
 		"_root.msg='MouseOut';"
 		"if ( _root.testno == 4 || _root.testno == 9 || _root.testno == 14 ) {"
@@ -159,7 +217,33 @@ add_button(SWFMovie mo)
 
 	SWFButton_addAction(bu, compileSWFActionCode(
 		"_root.msg='MouseOver';"
+
+		"if ( _root.testno == 2 ) {" /* ONLY CHECK buttonChild on first frame */
+
+		/* "_root.note('buttonChild is '+dumpObj(_root.buttonChild));" */
+
+		/* added OVER state char */
+		"	_root.check_equals(_root.buttonChild.realLength(), 3);"
+
+		/* OVER state char loaded */
+		"	_root.check_equals(typeof(_root.buttonChild[13]), 'object');"
+		"	_root.check_equals(_root.buttonChild[13].nam, '_level0.square1.button.instance7');"
+		"	_root.check_equals(_root.buttonChild[13].exe, 1);" /* OVER state char */
+		"	_root.check_equals(_root.buttonChild[13].uld, 0);" /* OVER state char */
+
+		/* UP state char unloaded */
+		"	_root.check_equals(_root.buttonChild[12].exe, 1);"
+		"	_root.check_equals(_root.buttonChild[12].uld, 1);"
+
+		/* ALL state char still there, not reloaded, not unloaded */
+		"	_root.check_equals(_root.buttonChild[10].exe, 1);"
+		"	_root.check_equals(_root.buttonChild[10].uld, 0);"
+
+		"}"
+
 		"if ( _root.testno == 1 || _root.testno == 6 || _root.testno == 11 ) {"
+
+		//"	_root.note('buttonChild is '+dumpObj(_root.buttonChild));"
 		"	_root.check_equals(_root.printBounds(getBounds()), '-0.05,-0.05 40.05,40.05');"
 		/* Target of button action is the button's parent sprite */
 		"	_root.check_equals(_target, '/square1');"
@@ -178,6 +262,28 @@ add_button(SWFMovie mo)
 
 	SWFButton_addAction(bu, compileSWFActionCode(
 		"_root.msg='MouseDown';"
+
+		"if ( _root.testno == 2 ) {" /* ONLY CHECK buttonChild on first frame */
+
+		/* Added DOWN state char */
+		"	_root.xcheck_equals(_root.buttonChild.realLength(), 4);"
+
+		/* DOWN state char loaded */
+		"	_root.xcheck_equals(typeof(_root.buttonChild[14]), 'object');"
+		"	_root.xcheck_equals(_root.buttonChild[14].nam, '_level0.square1.button.instance8');"
+		"	_root.xcheck_equals(_root.buttonChild[14].exe, 1);" 
+		"	_root.xcheck_equals(_root.buttonChild[14].uld, 0);" 
+
+		/* OVER state char unloaded */
+		"	_root.check_equals(_root.buttonChild[13].exe, 1);" 
+		"	_root.xcheck_equals(_root.buttonChild[13].uld, 1);"
+
+		/* ALL state char still there, not reloaded, not unloaded */
+		"	_root.check_equals(_root.buttonChild[10].exe, 1);"
+		"	_root.check_equals(_root.buttonChild[10].uld, 0);"
+
+		"}"
+
 		"if ( _root.testno == 2 || _root.testno == 7 || _root.testno == 12 ) {"
 		"	_root.check_equals(_root.printBounds(getBounds()), '-0.05,-0.05 40.05,40.05');"
 		/* Target (and name) of button action is the button's parent sprite */
@@ -297,7 +403,7 @@ main(int argc, char **argv)
  
 	mo = newSWFMovie();
 	SWFMovie_setDimension(mo, 800, 600);
-	SWFMovie_setRate(mo, 0.2);
+	SWFMovie_setRate(mo, 12);
 
 	if ( argc>1 ) srcdir=argv[1];
 	else
@@ -417,8 +523,49 @@ main(int argc, char **argv)
 		"};"
 		);
 
+	SWFMovie_nextFrame(mo); /* showFrame */
+
+	/*****************************************************
+	 *
+	 * On second frame, check construction of the button
+	 * character states and give instructions to proceed
+	 *
+	 *
+	 *****************************************************/
+
+	add_actions(mo, "Array.prototype.realLength = function() {"
+		" var l=0; for (var i in this) { "
+		"	if (Number(i) == i) l++;" /* count only numbers */
+		" };"
+		" return l;"
+		"};");
+
+	/* buttonChild was initialized with 2 elements */
+	check_equals(mo, "typeof(_root.buttonChild)", "'object'");
+	check(mo, "_root.buttonChild instanceof Array");
+	xcheck_equals(mo, "_root.buttonChild.realLength()", "2"); /* UP and ALL states */
+
+	/* sprite for ALL states */
+	check_equals(mo, "typeof(_root.buttonChild[10])", "'object'");
+	xcheck_equals(mo, "(_root.buttonChild[10].nam)", "'_level0.square1.button.instance5'"); 
+	check_equals(mo, "(_root.buttonChild[10].exe)", "1");
+	check_equals(mo, "(_root.buttonChild[10].uld)", "0");
+
+	/* sprite for UP state */
+	check_equals(mo, "typeof(_root.buttonChild[12])", "'object'");
+	xcheck_equals(mo, "(_root.buttonChild[12].nam)", "'_level0.square1.button.instance6'"); 
+	check_equals(mo, "(_root.buttonChild[12].exe)", "1");
+	check_equals(mo, "(_root.buttonChild[12].uld)", "0");
+
+	/* sprite for HIT state not constructed */
+	xcheck_equals(mo, "typeof(_root.buttonChild[11])", "'undefined'");
+
+	/* sprite for DOWN state not constructed */
+	xcheck_equals(mo, "typeof(_root.buttonChild[13])", "'undefined'"); 
+
 	add_actions(mo,
 		"stop();"
+		/*"_root.note('buttonChild is '+dumpObj(_root.buttonChild));"*/
 		"_root.testno=1;"
 		"_root.note('"
 		"1. Roll over the red square."
@@ -429,7 +576,7 @@ main(int argc, char **argv)
 
 	/*****************************************************
 	 *
-	 * On second frame, add a shape at lower depth,
+	 * On third frame, add a shape at lower depth,
 	 * and check bounds of square1
 	 *
 	 *
@@ -441,6 +588,40 @@ main(int argc, char **argv)
 		SWFDisplayItem_setDepth(itsh, 1);
 
 		check_equals(mo, "printBounds(square1.getBounds())", "'-0.05,-0.05 40.05,40.05'");
+
+		/* buttonChild should now have a total of 4 elements (UP,DOWN, OVER and ALL states) */
+		check_equals(mo, "typeof(_root.buttonChild)", "'object'");
+		check(mo, "_root.buttonChild instanceof Array");
+		xcheck_equals(mo, "_root.buttonChild.realLength()", "4"); 
+
+		/* sprite for ALL states */
+		check_equals(mo, "typeof(_root.buttonChild[10])", "'object'");
+		xcheck_equals(mo, "(_root.buttonChild[10].nam)", "'_level0.square1.button.instance5'"); 
+		check_equals(mo, "(_root.buttonChild[10].exe)", "1");
+		check_equals(mo, "(_root.buttonChild[10].uld)", "0");
+
+		/* sprite for UP state */
+		check_equals(mo, "typeof(_root.buttonChild[12])", "'object'");
+		xcheck_equals(mo, "(_root.buttonChild[12].nam)", "'_level0.square1.button.instance6'"); 
+		xcheck_equals(mo, "(_root.buttonChild[12].exe)", "3"); 
+		xcheck_equals(mo, "(_root.buttonChild[12].uld)", "2");
+
+		/* sprite for OVER state */
+		check_equals(mo, "typeof(_root.buttonChild[13])", "'object'");
+		xcheck_equals(mo, "(_root.buttonChild[13].nam)", "'_level0.square1.button.instance7'"); 
+		xcheck_equals(mo, "(_root.buttonChild[13].exe)", "4");
+		xcheck_equals(mo, "(_root.buttonChild[13].uld)", "4");
+
+		/* sprite for DOWN state */
+		xcheck_equals(mo, "typeof(_root.buttonChild[14])", "'object'");
+		xcheck_equals(mo, "(_root.buttonChild[14].nam)", "'_level0.square1.button.instance8'"); 
+		xcheck_equals(mo, "(_root.buttonChild[14].exe)", "2");
+		xcheck_equals(mo, "(_root.buttonChild[14].uld)", "2");
+
+		/* sprite for HIT state never constructed */
+		xcheck_equals(mo, "typeof(_root.buttonChild[11])", "'undefined'"); 
+
+
 
 		add_actions(mo,
 			"stop();"
@@ -454,7 +635,7 @@ main(int argc, char **argv)
 
 	/*****************************************************
 	 *
-	 * On third frame, add a shape at higher depth 
+	 * On fourth frame, add a shape at higher depth 
 	 *
 	 *****************************************************/
 
@@ -463,6 +644,38 @@ main(int argc, char **argv)
 		SWFDisplayItem itsh = SWFMovie_add(mo, (SWFBlock)sh);
 		SWFDisplayItem_setDepth(itsh, 3);
 		SWFDisplayItem_setColorAdd(itsh, 0, 0, 0, -128);
+
+		/* buttonChild should now have a total of 4 elements (UP,DOWN, OVER and ALL states) */
+		check_equals(mo, "typeof(_root.buttonChild)", "'object'");
+		check(mo, "_root.buttonChild instanceof Array");
+		xcheck_equals(mo, "_root.buttonChild.realLength()", "4"); 
+
+		/* sprite for ALL states */
+		check_equals(mo, "typeof(_root.buttonChild[10])", "'object'");
+		xcheck_equals(mo, "(_root.buttonChild[10].nam)", "'_level0.square1.button.instance5'"); 
+		check_equals(mo, "(_root.buttonChild[10].exe)", "1");
+		check_equals(mo, "(_root.buttonChild[10].uld)", "0");
+
+		/* sprite for UP state */
+		check_equals(mo, "typeof(_root.buttonChild[12])", "'object'");
+		xcheck_equals(mo, "(_root.buttonChild[12].nam)", "'_level0.square1.button.instance6'"); 
+		xcheck_equals(mo, "(_root.buttonChild[12].exe)", "5"); 
+		xcheck_equals(mo, "(_root.buttonChild[12].uld)", "4");
+
+		/* sprite for OVER state */
+		check_equals(mo, "typeof(_root.buttonChild[13])", "'object'");
+		xcheck_equals(mo, "(_root.buttonChild[13].nam)", "'_level0.square1.button.instance7'"); 
+		xcheck_equals(mo, "(_root.buttonChild[13].exe)", "8");
+		xcheck_equals(mo, "(_root.buttonChild[13].uld)", "8");
+
+		/* sprite for DOWN state */
+		xcheck_equals(mo, "typeof(_root.buttonChild[14])", "'object'");
+		xcheck_equals(mo, "(_root.buttonChild[14].nam)", "'_level0.square1.button.instance8'"); 
+		xcheck_equals(mo, "(_root.buttonChild[14].exe)", "4");
+		xcheck_equals(mo, "(_root.buttonChild[14].uld)", "4");
+
+		/* sprite for HIT state never constructed */
+		xcheck_equals(mo, "typeof(_root.buttonChild[11])", "'undefined'"); 
 
 		add_actions(mo,
 			"stop();"
@@ -476,7 +689,7 @@ main(int argc, char **argv)
 
 	/*****************************************************
 	 *
-	 * On fourth frame, disable the button
+	 * On fifth frame, disable the button
 	 *
 	 *****************************************************/
 
