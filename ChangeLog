@@ -1,5 +1,10 @@
 2008-04-19 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/swfdec/Makefile.am: remove files
+	  in chunks on make clean (too many args to rm!).
+
+2008-04-19 Sandro Santilli <strk@keybit.net>
+
 	* server/button_character_instance.cpp (set_current_state):
 	  Don't forget set_invalidated when characters are *added*
 	  and not *removed* from the set of active ones.

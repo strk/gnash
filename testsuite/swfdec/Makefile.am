@@ -51,9 +51,11 @@ check_SCRIPTS = \
 	run_swfdec_testsuite_z 
 
 clean-local: 
-	rm -f $(check_SCRIPTS) \
-		*.log *.trace-gnash \
-		*.out *.err \
+	rm -f $(check_SCRIPTS)
+	rm -f *.log 
+	rm -f *.out
+	rm -f *.err
+	rm -f *.trace-gnash \
 		site.bak site.exp site.exp.bak testrun.sum \
 		gnash.sum 
 
