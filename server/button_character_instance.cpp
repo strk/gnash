@@ -457,7 +457,7 @@ button_character_instance::get_topmost_mouse_entity(float x, float y)
 void
 button_character_instance::on_button_event(const event_id& event)
 {
-  e_mouse_state new_state = m_mouse_state;
+	e_mouse_state new_state = m_mouse_state;
   
 	// Set our mouse state (so we know how to render).
 	switch (event.m_id)
@@ -547,27 +547,30 @@ button_character_instance::on_button_event(const event_id& event)
 	// the action queue on mouse event.
 	//
 
-	ButtonActionPusher xec(getVM().getRoot(), this); 
+	movie_root& mr = getVM().getRoot();
+
+	ButtonActionPusher xec(mr, this); 
 	m_def->forEachTrigger(event, xec);
 
 	// check for built-in event handler.
 	std::auto_ptr<ExecutableCode> code ( get_event_handler(event) );
 	if ( code.get() )
 	{
-		code->execute();
+		//log_debug(_("Got statically-defined handler for event: %s"), event.get_function_name().c_str());
+		mr.pushAction(code, movie_root::apDOACTION);
+		//code->execute();
 	}
-	else
-	{
-		//log_debug(_("No handler for event: %s"), event.get_function_name().c_str());
-	}
-
+	//else log_debug(_("No statically-defined handler for event: %s"), event.get_function_name().c_str());
 
 	// Call conventional attached method.
 	boost::intrusive_ptr<as_function> method = getUserDefinedEventHandler(event.get_function_key());
 	if ( method )
 	{
-		call_method0(as_value(method.get()), &(get_environment()), this);
+		//log_debug(_("Got user-defined handler for event: %s"), event.get_function_name().c_str());
+		mr.pushAction(method, this, movie_root::apDOACTION);
+		//call_method0(as_value(method.get()), &(get_environment()), this);
 	}
+	//else log_debug(_("No statically-defined handler for event: %s"), event.get_function_name().c_str());
 }
 
 void 
