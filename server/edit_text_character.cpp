@@ -34,6 +34,7 @@
 #include "VM.h"
 #include "builtin_function.h" // for getter/setter properties
 #include "font.h" // for using the _font member
+#include "fontlib.h" // for searching or adding fonts the _font member
 #include "Object.h" // for getObjectInterface
 #include "namedStrings.h"
 #include "array.h" // for _listeners construction
@@ -251,10 +252,7 @@ textfield_setTextFormat(const fn_call& fn)
 			bool bold = tf->bold();
 			bool italic = tf->italiced();
 
-			// TODO: reuse an existing font with this name if known !
-			//       Would need cleanups in the fontlib package
-			//       for proper thread-safety
-			boost::intrusive_ptr<font> f ( new font(fontName, bold, italic) );
+			font* f = fontlib::get_font(fontName, bold, italic);
 			text->setFont( f );
 		}
 	}

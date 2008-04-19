@@ -66,8 +66,7 @@ get_default_font()
 	}
 
 
-	font*	get_font(const std::string& name)
-	// Return the named font.
+	font*	get_font(const std::string& name, bool bold, bool italic)
 	{
 		// Dumb linear search.
 		for (unsigned int i = 0; i < s_fonts.size(); i++)
@@ -77,11 +76,15 @@ get_default_font()
 			{
 				if (f->get_name() == name)
 				{
+					if ( bold && ! f->isBold() ) continue;
+					if ( italic && ! f->isItalic() ) continue;
 					return f;
 				}
 			}
 		}
-		return NULL;
+		font* f = new font(name, bold, italic);
+		s_fonts.push_back(f);
+		return f;
 	}
 
 	void	add_font(font* f)

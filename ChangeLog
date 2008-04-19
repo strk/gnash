@@ -1,5 +1,12 @@
 2008-04-19 Sandro Santilli <strk@keybit.net>
 
+	* server/edit_text_character.cpp (textfield_setTextFormat): use
+	  the fontlib to reuse existing fonts.
+	* server/fontlib.{cpp,h}: have fontlib::get_font(name, bold, italic)
+	  create a new font if none was found.
+
+2008-04-19 Sandro Santilli <strk@keybit.net>
+
 	* server/button_character_instance.cpp (on_button_event):
 	  Push all events to the global queue. Tested this locally, no
 	  automated test.

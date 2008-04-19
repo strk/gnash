@@ -55,7 +55,7 @@ namespace fontlib {
 
 	font*	get_font(int index);
 
-	font*	get_font(const char* name);
+	font*	get_font(const std::string& name, bool bold, bool italic);
 
 	/// Return a default device font.
 	boost::intrusive_ptr<font> get_default_font();
