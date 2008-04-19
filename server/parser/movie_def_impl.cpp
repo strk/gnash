@@ -41,6 +41,7 @@
 #include "ControlTag.h"
 #include "sound_definition.h" // for sound_sample
 #include <boost/bind.hpp>
+#include <boost/version.hpp>
 
 #include <iomanip>
 #include <memory>
@@ -110,8 +111,13 @@ MovieLoader::isSelfThread() const
 	if (!_thread.get()) {
 		return false;
 	}
+#if BOOST_VERSION < 103500
 	boost::thread this_thread;
 	return this_thread == *_thread;
+#else
+	return boost::this_thread::get_id() == _thread->get_id();
+#endif
+
 }
 
 // static..
