@@ -258,6 +258,8 @@ localconnection_send(const fn_call& fn)
     GNASH_REPORT_FUNCTION;
     boost::intrusive_ptr<LocalConnection> ptr = ensureType<LocalConnection>(fn.this_ptr);
 
+    log_unimpl(_("LocalConnection.send unimplemented"));
+
     if (!ptr->connected()) {
         ptr->connect();
     }
