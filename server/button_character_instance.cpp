@@ -630,8 +630,6 @@ button_character_instance::set_current_state(e_mouse_state new_state)
 	if (new_state == m_mouse_state)
 		return;
 		
-	//set_invalidated(); // TODO: optimize
-
 #ifdef GNASH_DEBUG_BUTTON_DISPLAYLIST
 	std::stringstream ss;
 	ss << "at set_current_state enter: " << std::endl;
@@ -713,6 +711,8 @@ button_character_instance::set_current_state(e_mouse_state new_state)
 					//std::string instance_name = getNextUnnamedInstanceName();
 					ch->set_name(getNextUnnamedInstanceName());
 				}
+
+				set_invalidated();
 
 				m_record_character[i] = ch;
 				ch->stagePlacementCallback(); // give this character a life
