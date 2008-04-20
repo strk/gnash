@@ -23,7 +23,25 @@
 
 namespace gnash {
 
+class Date : public as_object
+{
+public:
+    void setTimeValue(const double& value) { _value = value; }
+    double getTimeValue() const { return _value; }
+
+    Date();
+    Date(double value);
+    
+    as_value toString() const;
+    
+    bool isDateObject() { return true; }
+    
+private:
+    double _value;
+};
+
 void registerDateNative(as_object& global);
+
 void date_class_init(as_object& global);
 
 } // end of gnash namespace

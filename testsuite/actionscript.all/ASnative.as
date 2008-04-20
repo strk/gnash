@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-rcsid="$Id: ASnative.as,v 1.5 2008/04/16 11:16:34 bwy Exp $";
+rcsid="$Id: ASnative.as,v 1.6 2008/04/20 17:53:58 bwy Exp $";
 #include "check.as"
 
 a = ASnative (100, 0); // escape
@@ -35,10 +35,19 @@ check_equals (a(65, 1, 1, 1, 1, 1, 1), Date.UTC(65, 1, 1, 1, 1, 1, 1));
 
 e = ASnative(103, 256); // _global.Date
 xcheck_equals(e().valueOf(), Date().valueOf());
+g = e;
+xcheck_equals(typeOf(g().valueOf()), 'string');
+
+xcheck_equals(e(100000).valueOf(), Date().valueOf());
+
+g = e();
+check_equals(typeOf(g.getMilliseconds), 'undefined');
 
 f = new e(100000000); // not instantiatable
 xcheck_equals(typeof(f), 'object');
 check_equals(typeof(f.getMilliseconds()), 'undefined');
+check_equals(typeof(f().getMilliseconds()), 'undefined');
+
 
 d = new Date (123456789);
 
@@ -195,7 +204,7 @@ xcheck_equals (countTS, 2);
 xcheck_equals (countVO, 25);
 
 #if OUTPUT_VERSION > 5
-check_totals(66);
+check_totals(70);
 #else
-check_totals(64);
+check_totals(68);
 #endif
