@@ -1,5 +1,10 @@
 2008-04-21 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/button_character_def.cpp (readDefineButton2):
+	  Check 'next_action_offset' field in DEFINEBUTTON2 action records.
+
+2008-04-21 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/server/: ClassSizes.cpp, Makefile.am:
 	  Add a simple prog to report common class sizes.
 	  It's not a real test so won't be run, but will

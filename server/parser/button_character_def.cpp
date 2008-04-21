@@ -62,7 +62,7 @@ button_action::button_action(stream& in, int tag_type, unsigned long endPos, mov
 	}
 
 	IF_VERBOSE_PARSE (
-	log_parse(_("   button actions for conditions %x"), m_conditions); // @@ need more info about which actions
+	log_parse(_("   button actions for conditions 0x%x"), m_conditions); // @@ need more info about which actions
 	);
 
 	// Read actions.
@@ -404,7 +404,18 @@ button_character_definition::readDefineButton2(stream* in, movie_definition* m)
 		{
 			in->ensureBytes(2);
 			unsigned next_action_offset = in->read_u16();
-			next_action_pos = in->get_position() + next_action_offset - 2;
+			if ( next_action_offset )
+			{
+				next_action_pos = in->get_position() + next_action_offset - 2;
+				if ( next_action_pos > tagEndPosition )
+				{
+					IF_VERBOSE_MALFORMED_SWF(
+					log_swferror(_("Next action offset (%u) in Button2ActionConditions points past the end of tag"),
+						next_action_offset);
+					);
+					next_action_pos = tagEndPosition;
+				}
+			}
 
 			unsigned long endActionPos = next_action_offset ? next_action_pos : tagEndPosition;
 
@@ -413,16 +424,6 @@ button_character_definition::readDefineButton2(stream* in, movie_definition* m)
 			if (next_action_offset == 0 )
 			{
 				// done.
-				break;
-			}
-
-			//was: in->get_position() >= in->get_tag_end_position()
-			if ( next_action_pos >= in->get_tag_end_position() )
-			{
-				IF_VERBOSE_MALFORMED_SWF(
-				log_swferror(_("Next action offset (%u) in Button2ActionConditions points past the end of tag"),
-					next_action_offset);
-				);
 				break;
 			}
 
