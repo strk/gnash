@@ -19,7 +19,7 @@
 
 
 #ifdef HAVE_CONFIG_H
-#include "gnashconfig.h" // SIZET_FMT
+#include "gnashconfig.h" // USE_DEBUGGER
 #endif
 
 #include "ActionExec.h"
@@ -40,6 +40,7 @@
 
 #include <sstream>
 #include <string>
+#include <boost/format.hpp>
 
 #ifndef DEBUG_STACK
 
@@ -171,9 +172,8 @@ ActionExec::operator() ()
 
 #if DEBUG_STACK
 	IF_VERBOSE_ACTION (
-        	log_action(_("at ActionExec operator() start, pc=" SIZET_FMT
-		           ", stop_pc=" SIZET_FMT ", code.size=" SIZET_FMT
-			   "."),
+        	log_action(_("at ActionExec operator() start, pc=%d"
+		           ", stop_pc=%d, code.size=%d."),
 			    pc, stop_pc, code.size());
 		stringstream ss;
 		env.dump_stack(ss, STACK_DUMP_LIMIT);
@@ -311,7 +311,7 @@ ActionExec::operator() ()
 
 	IF_VERBOSE_ACTION (
 		// FIXME, avoid direct dbglogfile access, use log_action
-		log_action("PC:" SIZET_FMT " - EX: %s", pc, code.disasm(pc).c_str());
+		log_action("PC:%d - EX: %s", pc, code.disasm(pc).c_str());
 	);
 
 	// Set default next_pc offset, control flow action handlers
@@ -327,8 +327,8 @@ ActionExec::operator() ()
 		{
 			IF_VERBOSE_MALFORMED_SWF(
 			log_swferror(_("Length %u (%d) of action tag"
-			  " id %u at pc " SIZET_FMT
-		          " overflows actions buffer size " SIZET_FMT),
+			               " id %u at pc %d"
+		                   " overflows actions buffer size %d"),
 			  length, (int)length, (unsigned)action_id, pc,
 			  stop_pc);
 			);
@@ -388,7 +388,7 @@ ActionExec::operator() ()
 	
 #if DEBUG_STACK
 	IF_VERBOSE_ACTION (
-		log_action(_("After execution: PC " SIZET_FMT ", next PC " SIZET_FMT ", stack follows"), pc, next_pc);
+		log_action(_("After execution: PC %d, next PC %d, stack follows"), pc, next_pc);
 		stringstream ss;
 		env.dump_stack(ss, STACK_DUMP_LIMIT);
 		env.dump_global_registers(ss);
@@ -418,10 +418,10 @@ ActionExec::operator() ()
 	{
 		if ( ++branchCount > maxBranchCount )
 		{
-			char buf[256];
-			snprintf(buf, 255, _("Loop iterations count exceeded limit of "SIZET_FMT". Last branch was from pc "SIZET_FMT" to "SIZET_FMT"."),
-				maxBranchCount, oldPc, pc);
-			throw ActionLimitException(buf);
+		    boost::format fmt(_("Loop iterations count exceeded limit of "
+		                        "%d. Last branch was from pc %d to %d."));
+			fmt % maxBranchCount % oldPc % pc;
+			throw ActionLimitException(fmt.str());
 		}
 		//log_debug("Branch count: %u", branchCount);
 	}
@@ -466,7 +466,7 @@ ActionExec::cleanupAfterRun(bool expectInconsistencies)
 		{
 	// We can argue this would be an "size-optimized" SWF instead...
 	IF_VERBOSE_MALFORMED_SWF(
-	    log_swferror(_(SIZET_FMT " elements left on the stack after block execution.  "
+	    log_swferror(_("%d elements left on the stack after block execution.  "
 		    "Cleaning up"), env.stack_size()-_initial_stack_size);
 	    );
 		}
@@ -491,8 +491,8 @@ ActionExec::skip_actions(size_t offset)
 	    if ( next_pc >= stop_pc ) {
 		IF_VERBOSE_MALFORMED_SWF (
 		log_swferror(_("End of DoAction block hit while skipping "
-			  SIZET_FMT " action tags (pc:" SIZET_FMT
-			  ", stop_pc:" SIZET_FMT ") "
+			  "%d action tags (pc:%d"
+			  ", stop_pc:%d) "
 			  "(WaitForFrame, probably)"), offset, next_pc,
 			  stop_pc);
 		)
@@ -527,9 +527,9 @@ ActionExec::pushWithEntry(const with_stack_entry& entry)
 	if (with_stack.size() >= _with_stack_limit)
 	{
 	    IF_VERBOSE_ASCODING_ERRORS (
-	    log_aserror(_("'With' stack depth (" SIZET_FMT ") "
+	    log_aserror(_("'With' stack depth (%d) "
 			"exceeds the allowed limit for current SWF "
-			"target version (" SIZET_FMT " for version %d)."
+			"target version (%d for version %d)."
 			" Don't expect this movie to work with all players."),
 			with_stack.size()+1, _with_stack_limit,
 			env.get_version());
@@ -610,9 +610,9 @@ ActionExec::fixStackUnderrun(size_t required)
 
 	// FIXME, the IF_VERBOSE used to be commented out.  strk, know why?
 	IF_VERBOSE_ASCODING_ERRORS(
-	log_aserror(_("Stack underrun: " SIZET_FMT " elements required, "
-		SIZET_FMT "/" SIZET_FMT " available. "
-		"Fixing by inserting " SIZET_FMT " undefined values on the"
+	log_aserror(_("Stack underrun: %d elements required, "
+		"%d/%d available. "
+		"Fixing by inserting %d undefined values on the"
 		" missing slots."),
 		required, _initial_stack_size, env.stack_size(),
 		missing);

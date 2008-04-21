@@ -19,7 +19,7 @@
 
 
 #ifdef HAVE_CONFIG_H
-#include "gnashconfig.h" // SIZET_FMT
+#include "gnashconfig.h" // USE_DEBUGGER
 #endif
 
 #include "smart_ptr.h" // GNASH_USE_GC
@@ -638,8 +638,8 @@ SWFHandlers::ActionWaitForFrame(ActionExec& thread)
 	if ( tag_len != 3 )
 	{
 		IF_VERBOSE_MALFORMED_SWF (
-		log_swferror(_("ActionWaitForFrame (0x%X) tag length == " SIZET_FMT
-		            " (expected 3)"), SWF::ACTION_WAITFORFRAME, tag_len);
+		log_swferror(_("ActionWaitForFrame (0x%X) tag length == %d "
+		               "(expected 3)"), SWF::ACTION_WAITFORFRAME, tag_len);
 		);
 	}
 
@@ -2038,7 +2038,7 @@ SWFHandlers::ActionPushData(ActionExec& thread)
 						env.push(as_value());
 						IF_VERBOSE_MALFORMED_SWF(
 						log_swferror(_("register %d "
-							"out of local registers bounds (0.."SIZET_FMT")!"), reg, env.num_local_registers());
+							"out of local registers bounds (0..%d)!"), reg, env.num_local_registers());
 						);
 					}
 				}
@@ -2123,11 +2123,11 @@ SWFHandlers::ActionPushData(ActionExec& thread)
 		IF_VERBOSE_ACTION (
 		if ( type == pushDict8 || type == pushDict16 )
 		{
-			log_action(_("\t" SIZET_FMT ") type=%s (%d), value=%s"), count, pushType[type], id, env.top(0).to_debug_string().c_str());
+			log_action(_("\t%d) type=%s (%d), value=%s"), count, pushType[type], id, env.top(0).to_debug_string().c_str());
 		}
 		else
 		{
-			log_action(_("\t" SIZET_FMT ") type=%s, value=%s"), count, pushType[type], env.top(0).to_debug_string().c_str());
+			log_action(_("\t%d) type=%s, value=%s"), count, pushType[type], env.top(0).to_debug_string().c_str());
 		}
 		++count;
 		);
@@ -2467,7 +2467,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 		}
 		if ( (size_t)ret < len )
 		{
-			log_error("Could only write %d bytes over "SIZET_FMT" required to user-provided host requests fd %d",
+			log_error("Could only write %d bytes over %d required to user-provided host requests fd %d",
 				ret, len, hostfd);
 		}
 		//log_debug("Wrote %d bytes of geturl requests (all needed)", ret);
@@ -2564,8 +2564,8 @@ SWFHandlers::ActionBranchIfTrue(ActionExec& thread)
 		if (next_pc > stop_pc)
 		{
 			IF_VERBOSE_MALFORMED_SWF (
-			log_swferror(_("branch to offset " SIZET_FMT "  -- "
-				" this section only runs to " SIZET_FMT),
+			log_swferror(_("branch to offset %d  -- "
+				" this section only runs to %d"),
 			        next_pc, stop_pc);
 			)
 		}
@@ -4052,8 +4052,8 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
 		IF_VERBOSE_MALFORMED_SWF(
 			log_swferror(_("function2 code len (%u) "
 				"overflows DOACTION tag boundaries "
-				"(DOACTION tag len=" SIZET_FMT
-				", function2 code offset=" SIZET_FMT "). "
+				"(DOACTION tag len=%d"
+				", function2 code offset=%d). "
 				"Forcing code len to eat the whole buffer "
 				"(would this work?)."),
 				code_size, actionbuf_size, thread.next_pc);
@@ -4354,7 +4354,7 @@ SWFHandlers::ActionSetRegister(ActionExec& thread)
 		else
 		{
 			IF_VERBOSE_MALFORMED_SWF(
-			log_swferror(_("store_register[%d] -- register out of local registers bounds (0.." SIZET_FMT ")!"), reg, env.num_local_registers());
+			log_swferror(_("store_register[%d] -- register out of local registers bounds (0..%d)!"), reg, env.num_local_registers());
 			);
 		}
 	}
@@ -4382,8 +4382,9 @@ SWFHandlers::action_name(action_type x) const
 {
 	if ( static_cast<size_t>(x) > get_handlers().size() )
 	{
-		log_error(_("at SWFHandlers::action_name(%d) call time, _handlers size is "
-		          SIZET_FMT), x, get_handlers().size());
+		log_error(_("at SWFHandlers::action_name(%d) call time, "
+		            "_handlers size is %d"),
+		            x, get_handlers().size());
 		return NULL;
 	}
 	else

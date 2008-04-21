@@ -7,6 +7,8 @@
 	  include gnashconfig.h).
 	* libbase/log.h: define LOG_ONCE to replace the ONCE implementations
 	  in various server/ files.
+	* server/vm/ActionExec.cpp, server/vm/ASHandlers.cpp: replace
+	  SIZET_FMT.
 
 2008-04-20 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
