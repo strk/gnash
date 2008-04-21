@@ -20,6 +20,7 @@
 
 //#define DEBUG_MEMORY_ALLOCATION 1
 
+#include "smart_ptr.h" // GNASH_USE_GC
 #include "action.h"
 #include "impl.h"
 

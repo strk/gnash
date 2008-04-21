@@ -16,11 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h" // GNASH_USE_GC
-#endif
-
+#include "smart_ptr.h" // GNASH_USE_GC
 #include "log.h"
 #include "fn_call.h"
 #include "builtin_function.h"

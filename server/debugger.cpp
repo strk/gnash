@@ -24,6 +24,7 @@
 #include <map>
 #include <boost/algorithm/string/case_conv.hpp>
 
+#include "smart_ptr.h" // GNASH_USE_GC
 #include "VM.h"
 #include "rc.h"
 #include "debugger.h"

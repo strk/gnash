@@ -19,6 +19,7 @@
 
 // Based on work of Thatcher Ulrich <tu@tulrich.com> 2003
 
+#include "smart_ptr.h" // GNASH_USE_GC
 #include "fill_style.h"
 #include "impl.h"
 #include "log.h"

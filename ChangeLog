@@ -1,3 +1,13 @@
+2008-04-21 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/: (many files) GNASH_USE_GC is defined in smart_ptr.h,
+	  not gnashconfig.h. Make sure it's explicitly included wherever
+	  GNASH_USE_GC is needed. Drop more gnashconfig.h includes. Replace
+	  SIZET_FMT with %d now that we use boost::format (removes need to
+	  include gnashconfig.h).
+	* libbase/log.h: define LOG_ONCE to replace the ONCE implementations
+	  in various server/ files.
+
 2008-04-20 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/asobj/Date.{h,cpp}: make date_as_object into Date class,

@@ -61,8 +61,6 @@
 //
 //#define PP_COMPATIBLE_DEVICE_FONT_HANDLING 1
 
-#define ONCE(x) { static bool warned=false; if (!warned) { warned=true; x; } }
-
 namespace gnash {
 
 // Forward declarations
@@ -188,7 +186,7 @@ textfield_getTextFormat(const fn_call& fn)
 
 	// TODO: add font color and some more
 
-	ONCE( log_unimpl("TextField.getTextFormat() discards url, target, tabStops, bullet and display") );
+	LOG_ONCE( log_unimpl("TextField.getTextFormat() discards url, target, tabStops, bullet and display") );
 
 	return as_value(tf.get());
 }
@@ -259,7 +257,7 @@ textfield_setTextFormat(const fn_call& fn)
 
 	// TODO: add font color and some more
 
-	ONCE( log_unimpl("TextField.setTextFormat() discards url, target, tabStops, bullet and display") );
+	LOG_ONCE( log_unimpl("TextField.setTextFormat() discards url, target, tabStops, bullet and display") );
 
 	return as_value();
 
@@ -271,7 +269,7 @@ textfield_setNewTextFormat(const fn_call& fn)
 	//boost::intrusive_ptr<edit_text_character> text = ensureType<edit_text_character>(fn.this_ptr);
 	//UNUSED(text);
 
-	ONCE( log_unimpl("TextField.setNewTextFormat(), we'll delegate to setTextFormat") );
+	LOG_ONCE( log_unimpl("TextField.setNewTextFormat(), we'll delegate to setTextFormat") );
 	return textfield_setTextFormat(fn);
 
 	//return as_value();

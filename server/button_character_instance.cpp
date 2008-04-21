@@ -18,10 +18,10 @@
 //
 
 #ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
+#include "gnashconfig.h" // USE_SWF_TREE
 #endif
 
-
+#include "smart_ptr.h" // GNASH_USE_GC
 #include "button_character_instance.h"
 #include "button_character_def.h"
 #include "action.h" // for as_standard_member enum

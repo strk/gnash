@@ -27,6 +27,7 @@
 #define __STDC_CONSTANT_MACROS
 #endif
 
+#include "smart_ptr.h" // GNASH_USE_GC
 #include "impl.h"
 #include "video_stream_instance.h"
 #include "NetConnection.h"

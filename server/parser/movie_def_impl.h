@@ -18,7 +18,7 @@
 #ifndef GNASH_MOVIE_DEF_IMPL_H
 #define GNASH_MOVIE_DEF_IMPL_H
 
-#include "smart_ptr.h"
+#include "smart_ptr.h" // GNASH_USE_GC
 #include "fontlib.h"
 #include "font.h"
 #include "jpeg.h"

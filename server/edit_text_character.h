@@ -18,10 +18,6 @@
 #ifndef _GNASH_EDIT_TEXT_CHARACTER_H_
 #define _GNASH_EDIT_TEXT_CHARACTER_H_
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h" // For GNASH_USE_GC
-#endif
-
 #include "character.h" // for inheritance
 #include "edit_text_character_def.h" // for inlines and typedefs
 #include "styles.h" // for fill_style and line_style

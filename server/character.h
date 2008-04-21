@@ -23,6 +23,7 @@
 #include "gnashconfig.h" // USE_SWFTREE
 #endif
 
+#include "smart_ptr.h" // GNASH_USE_GC
 #include "gnash.h"
 #include "types.h"
 #include "utility.h"

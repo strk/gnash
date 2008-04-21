@@ -18,7 +18,7 @@
 //
 
 #ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
+#include "gnashconfig.h" // USE_SWFTREE, SIZET_FMT
 #endif
 
 #include "log.h" 
@@ -39,7 +39,7 @@
 #include "sprite_definition.h"
 #include "ActionExec.h"
 #include "builtin_function.h"
-#include "smart_ptr.h"
+#include "smart_ptr.h" // GNASH_USE_GC
 #include "VM.h"
 #include "Range2d.h" // for getBounds
 #include "GnashException.h"
@@ -92,8 +92,6 @@ namespace gnash {
 // This includes get_topmost_mouse_entity and findDropTarget
 //
 //#define DEBUG_MOUSE_ENTITY_FINDING 1
-
-#define ONCE(x) { static bool warned=false; if (!warned) { warned=true; x; } }
 
 // Forward declarations
 static as_object* getMovieClipInterface();
@@ -290,7 +288,7 @@ static as_value sprite_attach_audio(const fn_call& fn)
   boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
   UNUSED(sprite);
 
-  ONCE( log_unimpl("MovieClip.attachAudio()") );
+  LOG_ONCE( log_unimpl("MovieClip.attachAudio()") );
   return as_value();
 }
 
@@ -300,7 +298,7 @@ static as_value sprite_attach_video(const fn_call& fn)
   boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
   UNUSED(sprite);
 
-  ONCE( log_unimpl("MovieClip.attachVideo()") );
+  LOG_ONCE( log_unimpl("MovieClip.attachVideo()") );
   return as_value();
 }
 
@@ -769,7 +767,7 @@ static as_value sprite_unload_movie(const fn_call& fn)
 
   // See http://sephiroth.it/reference.php?id=429
 
-  ONCE( log_unimpl("MovieClip.unloadMovie()") );
+  LOG_ONCE( log_unimpl("MovieClip.unloadMovie()") );
   return as_value();
 }
 
@@ -925,7 +923,7 @@ sprite_getURL(const fn_call& fn)
   boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
   UNUSED(sprite);
 
-  ONCE( log_unimpl("MovieClip.getURL()") );
+  LOG_ONCE( log_unimpl("MovieClip.getURL()") );
   return as_value();
 }
 
@@ -976,7 +974,7 @@ sprite_getTextSnapshot(const fn_call& fn)
 {
   boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 
-  ONCE( log_unimpl("MovieClip.getTextSnapshot()") );
+  LOG_ONCE( log_unimpl("MovieClip.getTextSnapshot()") );
   return as_value();
 }
 
@@ -1725,7 +1723,7 @@ sprite_beginGradientFill(const fn_call& fn)
     sprite->beginLinearGradientFill(gradients, mat);
   }
 
-  ONCE( log_debug("MovieClip.beginGradientFill() TESTING") );
+  LOG_ONCE( log_debug("MovieClip.beginGradientFill() TESTING") );
   return as_value();
 }
 
@@ -1870,7 +1868,7 @@ sprite_highquality_getset(const fn_call& fn)
   }
   else // setter
   {
-    ONCE( log_unimpl("MovieClip._highquality setting") );
+    LOG_ONCE( log_unimpl("MovieClip._highquality setting") );
   }
   return as_value();
 }
@@ -1890,7 +1888,7 @@ sprite_focusrect_getset(const fn_call& fn)
   }
   else // setter
   {
-    ONCE( log_unimpl("MovieClip._focusrect setting") );
+    LOG_ONCE( log_unimpl("MovieClip._focusrect setting") );
   }
   return as_value();
 }
@@ -1908,7 +1906,7 @@ sprite_soundbuftime_getset(const fn_call& fn)
   }
   else // setter
   {
-    ONCE( log_unimpl("MovieClip._soundbuftime setting") );
+    LOG_ONCE( log_unimpl("MovieClip._soundbuftime setting") );
   }
   return as_value();
 }
@@ -2814,7 +2812,7 @@ void sprite_instance::advance_sprite()
   if ( get_loaded_frames() == 0 )
   {
     IF_VERBOSE_MALFORMED_SWF(
-    ONCE( log_swferror(_("advance_sprite: no frames loaded for sprite/movie %s"), getTarget()) );
+    LOG_ONCE( log_swferror(_("advance_sprite: no frames loaded for sprite/movie %s"), getTarget()) );
     );
     return;
   }
@@ -3999,7 +3997,7 @@ sprite_instance::stagePlacementCallback()
   if ( ! hasFrames )
   {
     IF_VERBOSE_MALFORMED_SWF(
-    ONCE( log_swferror(_("stagePlacementCallback: no frames loaded for sprite/movie %s"), getTarget()) );
+    LOG_ONCE( log_swferror(_("stagePlacementCallback: no frames loaded for sprite/movie %s"), getTarget()) );
     );
   }
 #endif

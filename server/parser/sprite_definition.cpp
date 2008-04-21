@@ -20,6 +20,7 @@
 #include "gnashconfig.h"
 #endif
 
+#include "smart_ptr.h" // GNASH_USE_GC
 #include "sprite_instance.h"
 #include "sprite_definition.h"
 #include "ControlTag.h" // for dtor visibility
@@ -34,8 +35,6 @@ using namespace std;
 // Define the following macro to get a dump the prototype 
 // members of classes registered to definitions.
 //#define DEBUG_REGISTER_CLASS 1
-
-#define ONCE(x) { static bool warned=false; if (!warned) { warned=true; x; } }
 
 namespace gnash {
 

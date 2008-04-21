@@ -20,12 +20,9 @@
 #ifndef GNASH_SPRITE_DEFINITION_H
 #define GNASH_SPRITE_DEFINITION_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
 
 #include <vector>
-
+#include "smart_ptr.h" // GNASH_USE_GC
 #include "movie_definition.h"
 #include "stream.h"
 #include "log.h"

@@ -22,6 +22,7 @@
 #endif
 
 #include "VM.h"
+#include "smart_ptr.h" // GNASH_USE_GC
 #include "builtin_function.h"
 #include "movie_definition.h"
 #include "movie_instance.h"

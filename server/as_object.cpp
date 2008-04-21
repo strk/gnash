@@ -22,6 +22,7 @@
 
 #include "log.h"
 
+#include "smart_ptr.h" // GNASH_USE_GC
 #include "as_object.h"
 #include "as_function.h"
 #include "as_environment.h" // for enumerateProperties
@@ -917,7 +918,7 @@ as_object::prototypeOf(as_object& instance)
 void
 as_object::dump_members() 
 {
-	log_debug(_(SIZET_FMT " members of object %p follow"),
+	log_debug(_("%d members of object %p follow"),
 		_members.size(), (const void*)this);
 	_members.dump(*this);
 }

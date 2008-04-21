@@ -19,7 +19,7 @@
 
 
 #ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
+#include "gnashconfig.h" // SIZET_FMT
 #endif
 
 #include "ActionExec.h"

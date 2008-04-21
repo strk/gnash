@@ -22,7 +22,7 @@
 #ifndef GNASH_BUTTON_CHARACTER_DEF_H
 #define GNASH_BUTTON_CHARACTER_DEF_H
 
-
+#include "smart_ptr.h" // GNASH_USE_GC
 #include "character_def.h"
 #include "sound_definition.h"
 #include "rect.h" // for get_bound

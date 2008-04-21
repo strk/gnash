@@ -23,7 +23,7 @@
 #ifndef GNASH_FONT_H
 #define GNASH_FONT_H
 
-#include "gnashconfig.h" // For GNASH_USE_GC
+#include "smart_ptr.h" // GNASH_USE_GC
 
 #include "types.h"
 #include "resource.h" // for inheritance of font

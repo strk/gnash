@@ -18,6 +18,7 @@
 #ifndef _GNASH_EDIT_TEXT_CHARACTER_DEF_H_
 #define _GNASH_EDIT_TEXT_CHARACTER_DEF_H_
 
+#include "smart_ptr.h" // GNASH_USE_GC
 #include "types.h"
 #include "character_def.h" // for inheritance
 #include "rect.h" // for composition

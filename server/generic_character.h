@@ -18,12 +18,8 @@
 #ifndef GNASH_GENERIC_CHARACTER_H
 #define GNASH_GENERIC_CHARACTER_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h" // GNASH_USE_GC
-#endif
-
+#include "smart_ptr.h" // GNASH_USE_GC
 #include "character.h" // for inheritance
-
 #include "shape_character_def.h" // for add_invalidated_bounds 
 
 #include <cassert>

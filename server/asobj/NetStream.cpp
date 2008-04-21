@@ -24,6 +24,7 @@
 
 #include "NetStream.h"
 
+#include "smart_ptr.h" // GNASH_USE_GC
 #include "log.h"
 #ifdef SOUND_GST
 # include "NetStreamGst.h"

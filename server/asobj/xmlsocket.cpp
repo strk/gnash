@@ -260,7 +260,7 @@ XMLSocket::anydata(int fd, MessageList& msgs)
                 *eom = 0;
             }
             msgs.push_back( packet );
-            log_debug(_("%d: Pushing Packet of size " SIZET_FMT " at %p"), __LINE__, strlen(packet), packet);
+            log_debug(_("%d: Pushing Packet of size %d at %p"), __LINE__, strlen(packet), packet);
             processing(false);
             return true;
         }
@@ -660,10 +660,10 @@ xmlsocket_as_object::checkForIncomingData()
     std::vector<std::string > msgs;
     if (obj.anydata(msgs))
     {
-        log_debug(_("Got " SIZET_FMT " messages: "), msgs.size());
+        log_debug(_("Got %d messages: "), msgs.size());
         for (size_t i=0; i<msgs.size(); ++i)
         {
-            log_debug(_(" Message " SIZET_FMT " : %s "), i, msgs[i].c_str());
+            log_debug(_(" Message %d: %s "), i, msgs[i].c_str());
         }
 
         boost::intrusive_ptr<as_function> onDataHandler = getEventHandler("onData");

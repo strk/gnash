@@ -23,7 +23,7 @@
 #endif
 
 #include "dsodefs.h" // DSOEXPORT
-
+#include "smart_ptr.h" // GNASH_USE_GC
 #include "string_table.h"
 #include "ref_counted.h" // for inheritance  (to drop)
 #include "GC.h" // for inheritance from GcResource (to complete)

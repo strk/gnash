@@ -21,6 +21,7 @@
 #include "gnashconfig.h"
 #endif
 
+#include "smart_ptr.h" // GNASH_USE_GC
 #include "as_value.h"
 #include "array.h"
 #include "log.h"

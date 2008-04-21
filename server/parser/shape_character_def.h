@@ -9,8 +9,8 @@
 #ifndef GNASH_SHAPE_CHARACTER_DEF_H
 #define GNASH_SHAPE_CHARACTER_DEF_H
 
-
 #include "character_def.h" // for inheritance of shape_character_def
+#include "smart_ptr.h" // GNASH_USE_GC
 #include "shape.h" // for path
 #include "rect.h" // for composition
 

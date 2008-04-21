@@ -23,7 +23,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include "smart_ptr.h" // for boost::intrusive_ptr
+#include "smart_ptr.h" // GNASH_USE_GC
 #include "movie_root.h" // for composition
 #include "GC.h" // for ineritance of VmGcRoot
 #include "string_table.h" // for the string table

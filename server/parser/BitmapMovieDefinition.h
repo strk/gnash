@@ -18,6 +18,7 @@
 #ifndef GNASH_BITMAPMOVIEDEFINITION_H
 #define GNASH_BITMAPMOVIEDEFINITION_H
 
+#include "smart_ptr.h" // GNASH_USE_GC
 #include "movie_definition.h" // for inheritance
 #include "rect.h" // for composition
 #include "BitmapMovieInstance.h" // for create_movie_instance

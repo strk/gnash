@@ -19,7 +19,7 @@
 
 
 #ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
+#include "gnashconfig.h" // HAVE_ZLIB_H
 #endif
 
 #include "tu_file.h"
@@ -59,8 +59,6 @@
 #include <zlib.h>
 #endif
 #include <map>
-
-#define ONCE(x) { static bool warned=false; if (!warned) { warned=true; x; } }
 
 namespace gnash {
 
@@ -1269,7 +1267,7 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 		// quoted from
 		// http://www-lehre.informatik.uni-osnabrueck.de/~fbstark/diplom/docs/swf/Sounds.htm
 		//
-		ONCE ( if ( delay_seek ) log_unimpl("MP3 delay seek") );
+		LOG_ONCE ( if ( delay_seek ) log_unimpl("MP3 delay seek") );
 	}
 
 	IF_VERBOSE_PARSE
@@ -1423,7 +1421,7 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
 	{
                 in->ensureBytes(2);
                 latency = in->read_s16(); // UNUSED !!
-		ONCE ( if ( latency ) log_unimpl("MP3 stream latency seek") );
+		LOG_ONCE ( if ( latency ) log_unimpl("MP3 stream latency seek") );
         }
 	catch (ParserException& ex)
 	{
@@ -1495,14 +1493,14 @@ sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
 	// FIXME: use these values !
         unsigned int samplesCount = in->read_u16(); UNUSED(samplesCount);
         unsigned int seekSamples = in->read_u16();
-	ONCE ( if ( seekSamples ) log_unimpl("MP3 soundblock seek samples") );
+	LOG_ONCE ( if ( seekSamples ) log_unimpl("MP3 soundblock seek samples") );
     }
 
     unsigned int data_bytes = in->get_tag_end_position() - in->get_position();
     if ( ! data_bytes )
     {
         IF_VERBOSE_MALFORMED_SWF(
-        ONCE( log_swferror("Empty SOUNDSTREAMBLOCK tag, seems common waste of space") );
+        LOG_ONCE( log_swferror("Empty SOUNDSTREAMBLOCK tag, seems common waste of space") );
         );
         return;
     }

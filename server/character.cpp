@@ -22,6 +22,7 @@
 #include "gnashconfig.h" // USE_SWFTREE
 #endif
 
+#include "smart_ptr.h" // GNASH_USE_GC
 #include "character.h"
 #include "sprite_instance.h"
 #include "drag_state.h" // for do_mouse_drag (to be moved in movie_root)

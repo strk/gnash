@@ -18,10 +18,7 @@
 #ifndef _GNASH_AS_FUNCTION_H_
 #define _GNASH_AS_FUNCTION_H_
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
+#include "smart_ptr.h" // GNASH_USE_GC
 #include "as_object.h" // for inheritance
 
 // Forward declarations

@@ -45,12 +45,9 @@
 #define	_(String) gettext (String)
 #define N_(String) gettext_noop (String)
 
-// This macro should be used to add both boost formatting and
-// internationalization to log messages. The po directory
-// Makefile must also look for the BF macro for gettext
-// processing, otherwise they will not appear in the
-// translation (.po) files.
-//#define BF(x) logFormat(_(x))
+// Macro to prevent repeated logging calls for the same
+// event
+#define LOG_ONCE(x) { static bool warned = false; if (!warned) { warned = true; x; } }
 
 // Define to switch between printf-style log formatting
 // and boost::format

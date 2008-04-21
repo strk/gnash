@@ -21,10 +21,7 @@
 #ifndef GNASH_FILL_STYLE_H
 #define GNASH_FILL_STYLE_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h" // GNASH_USE_GC
-#endif
-
+#include "smart_ptr.h" // GNASH_USE_GC
 #include "types.h"
 #include "matrix.h"
 #include "bitmap_character_def.h"

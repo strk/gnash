@@ -17,15 +17,11 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "LoadVars.h"
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
-#include "smart_ptr.h" // for boost intrusive_ptr
+#include "smart_ptr.h" // GNASH_USE_GC
 #include "builtin_function.h" // need builtin_function
 #include "as_function.h" // for calling event handlers
 #include "as_value.h" // for setting up a fn_call
@@ -279,7 +275,7 @@ LoadVars::checkLoads()
             callMethod(NSV::PROP_ON_DATA, dataVal);
 
 #ifdef DEBUG_LOADS
-            log_debug("Completed load, _loadThreads have now " SIZET_FMT " elements", _loadThreads.size());
+            log_debug("Completed load, _loadThreads have now %d elements", _loadThreads.size());
 #endif
         }
         else
@@ -362,7 +358,7 @@ LoadVars::addLoadVariablesThread(const std::string& urlstr, const char* postdata
 	// 
 	_loadThreads.push_front(lt.get());
 #ifdef DEBUG_LOADS
-	log_debug("Pushed thread %p to _loadThreads, number of LoadVars load threads now: " SIZET_FMT, (void*)lt.get(),  _loadThreads.size());
+	log_debug("Pushed thread %p to _loadThreads, number of LoadVars load threads now: %d", (void*)lt.get(),  _loadThreads.size());
 #endif
 	lt.release();
 

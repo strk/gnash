@@ -21,6 +21,7 @@
 #include "gnashconfig.h"
 #endif
 
+#include "smart_ptr.h" // GNASH_USE_GC
 #include "movie_def_impl.h"
 #include "movie_definition.h" // for inheritance
 #include "sprite_instance.h" // for ??

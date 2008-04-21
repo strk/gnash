@@ -55,8 +55,8 @@ movie_instance::stagePlacementCallback()
 	if ( !_def->ensure_frame_loaded(nextframe) )
 	{
 		IF_VERBOSE_MALFORMED_SWF(
-		log_swferror("Frame " SIZET_FMT " never loaded. Total frames: "
-				SIZET_FMT ".", nextframe, get_frame_count());
+		log_swferror("Frame %d never loaded. Total frames: %d",
+		                nextframe, get_frame_count());
 		);
 	}
 
@@ -81,8 +81,8 @@ movie_instance::advance()
 	if ( !_def->ensure_frame_loaded(nextframe) )
 	{
 		IF_VERBOSE_MALFORMED_SWF(
-		log_swferror("Frame " SIZET_FMT " never loaded. Total frames: "
-				SIZET_FMT ".", nextframe, get_frame_count());
+		log_swferror("Frame %d never loaded. Total frames: %d.",
+		            nextframe, get_frame_count());
 		);
 	}
 

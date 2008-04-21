@@ -439,7 +439,7 @@ XML::queueLoad(std::auto_ptr<tu_file> str)
     // 
     _loadThreads.push_front(lt.get());
 #ifdef DEBUG_XML_LOADS
-    log_debug("Pushed thread %p to _loadThreads, number of XML load threads now: " SIZET_FMT, (void*)lt.get(),  _loadThreads.size());
+    log_debug("Pushed thread %p to _loadThreads, number of XML load threads now: %d", (void*)lt.get(),  _loadThreads.size());
 #endif
     lt.release();
 
@@ -533,7 +533,7 @@ XML::checkLoads()
             callMethod(onDataKey, dataVal);
 
 #ifdef DEBUG_XML_LOADS
-            log_debug("Completed load, _loadThreads have now " SIZET_FMT " elements", _loadThreads.size());
+            log_debug("Completed load, _loadThreads have now %d elements", _loadThreads.size());
 #endif
         }
         else

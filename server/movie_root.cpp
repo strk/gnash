@@ -17,10 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
+#include "smart_ptr.h" // GNASH_USE_GC
 #include "movie_root.h"
 #include "log.h"
 #include "sprite_instance.h"
@@ -988,7 +985,7 @@ movie_root::add_interval_timer(std::auto_ptr<Timer> timer, bool internal)
 	if ( _intervalTimers.size() >= 255 )
 	{
 		// TODO: Why this limitation ? 
-		log_error("FIXME: " SIZET_FMT " timers currently active, won't add another one", _intervalTimers.size());
+		log_error("FIXME: %d timers currently active, won't add another one", _intervalTimers.size());
 	}
 
 	assert(_intervalTimers.find(id) == _intervalTimers.end());
@@ -1161,7 +1158,7 @@ void movie_root::cleanupUnloadedListeners(CharacterList& ll)
 
 void movie_root::notify_key_listeners(key::code k, bool down)
 {
-	// log_debug("Notifying " SIZET_FMT " character Key listeners", 
+	// log_debug("Notifying %d character Key listeners", 
 	//  m_key_listeners.size());
 
 	KeyListeners copy = m_key_listeners;
@@ -1223,7 +1220,7 @@ void movie_root::remove_listener(CharacterList& ll, character* listener)
 void
 movie_root::notify_mouse_listeners(const event_id& event)
 {
-	//log_debug("Notifying " SIZET_FMT " listeners about %s",
+	//log_debug("Notifying %d listeners about %s",
 	//		m_mouse_listeners.size(), event.get_function_name().c_str());
 
 	CharacterList copy = m_mouse_listeners;
@@ -1745,7 +1742,7 @@ movie_root::cleanupDisplayList()
 	if ( _liveChars.size() > maxLiveChars )
 	{
 		maxLiveChars = _liveChars.size();
-		log_debug("Global instance list grew to " SIZET_FMT " entries", maxLiveChars);
+		log_debug("Global instance list grew to %d entries", maxLiveChars);
 	}
 #endif
 

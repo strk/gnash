@@ -17,7 +17,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-
 #include "log.h"
 #include "Object.h" // for getObjectInterface
 #include "TextFormat.h"
@@ -27,8 +26,7 @@
 #include "VM.h"
 #include "server/types.h" // for PIXELS_TO_TWIPS
 #include "StringPredicates.h" // for parseAlignString
-
-#define ONCE(x) { static bool warned=false; if (!warned) { warned=true; x; } }
+#include "smart_ptr.h" // intrusive_ptr
 
 namespace gnash {
 
@@ -88,21 +86,21 @@ textformat_new(const fn_call& fn)
 as_value
 TextFormat::display_getset(const fn_call& /*fn*/)
 {
-	ONCE( log_unimpl("TextField.display") );
+	LOG_ONCE( log_unimpl("TextField.display") );
 	return as_value();
 }
 
 as_value
 TextFormat::bullet_getset(const fn_call& /*fn*/)
 {
-	ONCE( log_unimpl("TextField.bullet") );
+	LOG_ONCE( log_unimpl("TextField.bullet") );
 	return as_value();
 }
 
 as_value
 TextFormat::tabStops_getset(const fn_call& /*fn*/)
 {
-	ONCE( log_unimpl("TextField.tabStops") );
+	LOG_ONCE( log_unimpl("TextField.tabStops") );
 	return as_value();
 }
 
@@ -289,14 +287,14 @@ TextFormat::bold_getset(const fn_call& fn)
 as_value
 TextFormat::target_getset(const fn_call& /*fn*/)
 {
-	ONCE( log_unimpl("TextField.target") );
+	LOG_ONCE( log_unimpl("TextField.target") );
 	return as_value();
 }
 
 as_value
 TextFormat::url_getset(const fn_call& /*fn*/)
 {
-	ONCE( log_unimpl("TextField.url") );
+	LOG_ONCE( log_unimpl("TextField.url") );
 	return as_value();
 }
 
@@ -365,7 +363,7 @@ TextFormat::font_getset(const fn_call& fn)
 as_value
 TextFormat::getTextExtent_method(const fn_call& /*fn*/)
 {
-	ONCE( log_unimpl("TextField.getTextExtent") );
+	LOG_ONCE( log_unimpl("TextField.getTextExtent") );
 	return as_value();
 }
 

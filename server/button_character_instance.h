@@ -22,6 +22,7 @@
 #ifndef GNASH_BUTTON_CHARACTER_INSTANCE_H
 #define GNASH_BUTTON_CHARACTER_INSTANCE_H
 
+#include "smart_ptr.h" // GNASH_USE_GC
 #include "character.h" // for inheritance
 
 #include <vector>

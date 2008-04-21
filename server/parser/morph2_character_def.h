@@ -6,6 +6,7 @@
 #ifndef GNASH_MORPH2_H
 #define GNASH_MORPH2_H
 
+#include "smart_ptr.h" // GNASH_USE_GC
 #include "shape.h"
 #include "shape_character_def.h" // for inheritance of morph2_character_def
 

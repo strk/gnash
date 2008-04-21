@@ -18,10 +18,7 @@
 #ifndef GNASH_AS_ENVIRONMENT_H
 #define GNASH_AS_ENVIRONMENT_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
+#include "smart_ptr.h" // GNASH_USE_GC
 #include "dsodefs.h" // DSOEXPORT
 #include "as_value.h" // for composition (vector + frame_slot)
 #include "StringPredicates.h" // for Variables 

@@ -19,9 +19,10 @@
 
 
 #ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
+#include "gnashconfig.h" // SIZET_FMT
 #endif
 
+#include "smart_ptr.h" // GNASH_USE_GC
 #include "log.h"
 #include "swf.h"
 #include "rc.h"

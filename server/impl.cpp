@@ -22,6 +22,7 @@
 #include "gnashconfig.h"
 #endif
 
+#include "smart_ptr.h" // GNASH_USE_GC
 #include "tu_file.h"
 #include "utility.h"
 #include "action.h"

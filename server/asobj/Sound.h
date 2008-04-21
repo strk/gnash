@@ -27,6 +27,7 @@
 #define __STDC_CONSTANT_MACROS
 #endif
 
+#include "smart_ptr.h" // GNASH_USE_GC
 #include "impl.h"
 #include "as_object.h" // for inheritance
 #include "NetConnection.h"

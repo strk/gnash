@@ -20,6 +20,7 @@
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
+#include "smart_ptr.h" // GNASH_USE_GC
 #include "button_character_def.h"
 #include "button_character_instance.h" // for create_character_instance()
 
@@ -28,8 +29,6 @@
 #include "action_buffer.h"
 #include "filter_factory.h"
 #include "gnash.h" // for gnash::key::codeMap
-
-#define ONCE(x) { static bool warned=false; if (!warned) { warned=true; x; } }
 
 namespace gnash {
 
@@ -355,7 +354,7 @@ button_character_definition::readDefineButton2(stream* in, movie_definition* m)
 	// Read the menu flag
 	// (this is a single bit, the other 7 bits are reserved)
 	m_menu = in->read_u8() != 0;
-	if ( m_menu ) ONCE(log_unimpl("DEFINEBUTTON2 'menu' flag"));
+	if ( m_menu ) LOG_ONCE(log_unimpl("DEFINEBUTTON2 'menu' flag"));
 
 	// Read the action offset
 	unsigned button_2_action_offset = in->read_u16();

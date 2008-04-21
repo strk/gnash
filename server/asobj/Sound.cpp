@@ -43,8 +43,6 @@
 
 #include <string>
 
-#define ONCE(x) { static bool warned=false; if (!warned) { warned=true; x; } }
-
 namespace gnash {
 
 static as_value sound_new(const fn_call& fn);
@@ -384,56 +382,56 @@ sound_attachsound(const fn_call& fn)
 as_value
 sound_getbytesloaded(const fn_call& /*fn*/)
 {
-	ONCE( log_unimpl ("Sound.getBytesLoaded()") );
+	LOG_ONCE( log_unimpl ("Sound.getBytesLoaded()") );
 	return as_value();
 }
 
 as_value
 sound_getbytestotal(const fn_call& /*fn*/)
 {
-	ONCE( log_unimpl ("Sound.getBytesTotal()") );
+	LOG_ONCE( log_unimpl ("Sound.getBytesTotal()") );
 	return as_value();
 }
 
 as_value
 sound_getpan(const fn_call& /*fn*/)
 {
-	ONCE( log_unimpl ("Sound.getDuration()") );
+	LOG_ONCE( log_unimpl ("Sound.getDuration()") );
 	return as_value();
 }
 
 as_value
 sound_getDuration(const fn_call& /*fn*/)
 {
-	ONCE( log_unimpl ("Sound.getDuration()") );
+	LOG_ONCE( log_unimpl ("Sound.getDuration()") );
 	return as_value();
 }
 
 as_value
 sound_setDuration(const fn_call& /*fn*/)
 {
-	ONCE( log_unimpl ("Sound.setDuration()") );
+	LOG_ONCE( log_unimpl ("Sound.setDuration()") );
 	return as_value();
 }
 
 as_value
 sound_getPosition(const fn_call& /*fn*/)
 {
-	ONCE( log_unimpl ("Sound.getPosition()") );
+	LOG_ONCE( log_unimpl ("Sound.getPosition()") );
 	return as_value();
 }
 
 as_value
 sound_setPosition(const fn_call& /*fn*/)
 {
-	ONCE( log_unimpl ("Sound.setPosition()") );
+	LOG_ONCE( log_unimpl ("Sound.setPosition()") );
 	return as_value();
 }
 
 as_value
 sound_gettransform(const fn_call& /*fn*/)
 {
-	ONCE( log_unimpl ("Sound.getTransform()") );
+	LOG_ONCE( log_unimpl ("Sound.getTransform()") );
 	return as_value();
 }
 
@@ -468,14 +466,14 @@ sound_loadsound(const fn_call& fn)
 as_value
 sound_setpan(const fn_call& /*fn*/)
 {
-	ONCE( log_unimpl ("Sound.setPan()") );
+	LOG_ONCE( log_unimpl ("Sound.setPan()") );
 	return as_value();
 }
 
 as_value
 sound_settransform(const fn_call& /*fn*/)
 {
-	ONCE( log_unimpl ("Sound.setTransform()") );
+	LOG_ONCE( log_unimpl ("Sound.setTransform()") );
 	return as_value();
 }
 
@@ -507,7 +505,7 @@ sound_duration(const fn_call& fn)
 as_value
 checkPolicyFile_getset(const fn_call& /*fn*/)
 {
-	ONCE( log_unimpl ("Sound.checkPolicyFile") );
+	LOG_ONCE( log_unimpl ("Sound.checkPolicyFile") );
 	return as_value();
 }
 
@@ -520,7 +518,7 @@ sound_areSoundsInaccessible(const fn_call& /*fn*/)
 	// 
 	// naive test shows this always being undefined..
 	//
-	ONCE( log_unimpl ("Sound.areSoundsInaccessible()") );
+	LOG_ONCE( log_unimpl ("Sound.areSoundsInaccessible()") );
 	return as_value();
 }
 

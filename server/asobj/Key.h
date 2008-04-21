@@ -20,6 +20,7 @@
 #ifndef __KEY_H__
 #define __KEY_H__
 
+#include "smart_ptr.h" // GNASH_USE_GC
 #include "as_object.h" // for inheritance
 #include "fn_call.h"
 #include "event_id.h"

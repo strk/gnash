@@ -18,10 +18,7 @@
 #ifndef GNASH_BITMAP_CHARACTER_DEF_H
 #define GNASH_BITMAP_CHARACTER_DEF_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
+#include "smart_ptr.h" // GNASH_USE_GC
 #include "gnash.h" // for bitmap_info definition
 #include "ref_counted.h" // for character_def inheritance
 #include "types.h"

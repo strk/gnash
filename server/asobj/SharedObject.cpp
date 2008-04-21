@@ -399,7 +399,7 @@ sharedobject_getlocal(const fn_call& fn)
     
     vector<Element *>::iterator it;
     vector<Element *> els = sol.getElements();
-    log_debug("Read "SIZET_FMT" AMF objects from %s", els.size(), newspec.c_str());
+    log_debug("Read %d AMF objects from %s", els.size(), newspec.c_str());
 
     string_table& st = obj->getVM().getStringTable();
     string_table::key dataKey =  obj->getVM().getStringTable().find("data");

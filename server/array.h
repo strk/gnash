@@ -19,6 +19,7 @@
 #define GNASH_ARRAY_H
 
 #include "as_object.h" // for inheritance
+#include "smart_ptr.h" // GNASH_USE_GC
 
 #include <deque>
 #include <vector>

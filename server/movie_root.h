@@ -66,15 +66,14 @@
 #define GNASH_MOVIE_ROOT_H
 
 #ifdef HAVE_CONFIG_H
-#include "gnashconfig.h" // GNASH_USE_GC, USE_SWFTREE
+#include "gnashconfig.h" //USE_SWFTREE
 #endif
 
+#include "smart_ptr.h" // GNASH_USE_GC
 #include "dsodefs.h" // DSOEXPORT
-
 #include "mouse_button_state.h" // for composition
 #include "drag_state.h" // for composition
 #include "movie_instance.h" // for inlines
-//#include "timers.h" // for composition
 #include "asobj/Key.h"
 #include "smart_ptr.h" // for memory management
 #include "URL.h" // for loadMovie
