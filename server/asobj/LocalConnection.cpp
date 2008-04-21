@@ -37,7 +37,6 @@
 #include "amf.h"
 #include "lcshm.h"
 
-using namespace std;
 using namespace amf;
 
 // http://www.osflash.org/localconnection
@@ -127,14 +126,14 @@ LocalConnection::connect(const std::string& name)
         _name = name;
     }
     
-    log_debug("trying to open shared memory segment: \"%s\"", _name.c_str());
+    log_debug("trying to open shared memory segment: \"%s\"", _name);
     
     if (Shm::attach(_name.c_str(), true) == false) {
         return false;
     }
 
     if (Shm::getAddr() <= 0) {
-        log_error("Failed to open shared memory segment: \"%s\"", _name.c_str());
+        log_error("Failed to open shared memory segment: \"%s\"", _name);
         return false; 
     }
     
@@ -161,7 +160,7 @@ LocalConnection::domain(int version)
     }
     
     URL url(getVM().getSWFUrl());
-//    log_debug(_("ORIG URL=%s (%s)"), url.str().c_str(), url.hostname().c_str());
+//    log_debug(_("ORIG URL=%s (%s)"), url.str(), url.hostname());
     if (url.hostname().empty()) {
         _name = "localhost";
     } else {
@@ -172,11 +171,11 @@ LocalConnection::domain(int version)
     // was removed. For v7 or later. the full hostname is returned. The localhost
     // is always just the localhost.
     if (version <= 6) {
-        string::size_type pos;
+        std::string::size_type pos;
         pos = _name.rfind(".", _name.size());
-        if (pos != string::npos) {
+        if (pos != std::string::npos) {
             pos = _name.rfind(".", pos-1);
-            if (pos != string::npos) {
+            if (pos != std::string::npos) {
                 _name = _name.substr(pos+1, _name.size());
             }
         }
@@ -187,7 +186,7 @@ LocalConnection::domain(int version)
         _name =  "localhost";
     }
     
-    log_debug("The domain for this host is: %s", _name.c_str());
+    log_debug("The domain for this host is: %s", _name);
 
     return _name;
 }
@@ -225,9 +224,11 @@ localconnection_connect(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
 //    log_debug("%s: %d args\n", __PRETTY_FUNCTION__, fn.nargs);
-    bool ret;
     boost::intrusive_ptr<LocalConnection> ptr = ensureType<LocalConnection>(fn.this_ptr);
-    string name = fn.arg(0).to_string().c_str();
+
+    std::string name = fn.arg(0).to_string();
+    bool ret;
+
     if (fn.nargs != 0) {
         ret = ptr->connect(name);
         name = "localhost";
@@ -245,10 +246,11 @@ localconnection_domain(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
     boost::intrusive_ptr<LocalConnection> ptr = ensureType<LocalConnection>(fn.this_ptr);
-    VM& vm = ptr->getVM();
-    int swfVersion = vm.getSWFVersion();
 
-    return as_value(ptr->domain(swfVersion).c_str());
+    VM& vm = ptr->getVM();
+    const int swfVersion = vm.getSWFVersion();
+
+    return as_value(ptr->domain(swfVersion));
 }
 
 // \brief The callback for LocalConnection::send()
@@ -258,7 +260,7 @@ localconnection_send(const fn_call& fn)
     GNASH_REPORT_FUNCTION;
     boost::intrusive_ptr<LocalConnection> ptr = ensureType<LocalConnection>(fn.this_ptr);
 
-    log_unimpl(_("LocalConnection.send unimplemented"));
+    LOG_ONCE(log_unimpl(_("LocalConnection.send unimplemented")));
 
     if (!ptr->connected()) {
         ptr->connect();

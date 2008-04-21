@@ -1,3 +1,8 @@
+2008-04-21 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/asobj/LocalConnection.cpp: log unimplemented message only
+	  once, drop c_str() where appropriate and other minor cleanups.
+
 2008-04-21 Sandro Santilli <strk@keybit.net>
 
 	* server/parser/button_character_def.cpp (readDefineButton2):
