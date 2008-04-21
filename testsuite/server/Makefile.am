@@ -43,6 +43,7 @@ check_PROGRAMS = \
 	as_prop_flagsTest \
 	DisplayListTest \
 	AsValueTest \
+	ClassSizes \
 	$(NULL)
 
 CLEANFILES = \
@@ -105,6 +106,11 @@ DisplayListTest_LDADD = \
 
 AsValueTest_SOURCES = AsValueTest.cpp
 AsValueTest_LDADD = \
+	$(GNASH_LIBS) \
+	$(NULL)
+
+ClassSizes_SOURCES = ClassSizes.cpp
+ClassSizes_LDADD = \
 	$(GNASH_LIBS) \
 	$(NULL)
 
