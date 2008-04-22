@@ -67,14 +67,6 @@ public:
 
 	};
 
-	/// mask for flags (bits that can be set by user)
-	//
-	/// TODO: make private.
-	///       Currently used by as_global_assetpropflags in Global.cpp
-	///
-	static const int as_prop_flags_mask = dontEnum|dontDelete|readOnly|onlySWF6Up|ignoreSWF6|onlySWF7Up|onlySWF8Up;
-
-
 	/// Default constructor
 	as_prop_flags() : _flags(0)
 	{
@@ -106,7 +98,10 @@ public:
 	}
 
 	/// Get "static" flag
-	bool get_static() const { return (_flags & staticProp) ? true : false; }
+	bool get_static() const
+	{
+	    return (_flags & staticProp) ? true : false;
+	}
 
 	/// Set "static" flag
 	void set_static() { _flags |= staticProp; }
@@ -115,7 +110,10 @@ public:
 	void clear_static() { _flags &= ~staticProp; }
 
 	/// Get "read-only" flag 
-	bool get_read_only() const { return (((_flags & readOnly)!=0)?true:false); }
+	bool get_read_only() const
+	{
+	    return (((_flags & readOnly) != 0) ? true : false);
+	}
 
 	/// Set "read-only" flag 
 	void set_read_only() { _flags |= readOnly; }
@@ -124,7 +122,10 @@ public:
 	void clear_read_only() { _flags &= ~readOnly; }
 
 	/// Get "don't delete" flag
-	bool get_dont_delete() const { return (((_flags & dontDelete)!=0)?true:false); }
+	bool get_dont_delete() const
+	{
+	    return (((_flags & dontDelete) != 0) ? true : false);
+	}
 
 	/// Set "don't delete" flag
 	void set_dont_delete() { _flags |= dontDelete; }
@@ -133,7 +134,10 @@ public:
 	void clear_dont_delete() { _flags &= ~dontDelete; }
 
 	/// Get "don't enum" flag
-	bool get_dont_enum() const { return (((_flags & dontEnum)!=0)?true:false);	}
+	bool get_dont_enum() const
+	{
+	    return (((_flags & dontEnum) != 0) ? true : false);
+	}
 
 	/// Set "don't enum" flag
 	void set_dont_enum() { _flags |= dontEnum; }
@@ -156,14 +160,15 @@ public:
 	{
 		if ( swfVersion == 6)
 		{
-			// version 6, so let's forget SWFDEC_AS_VARIABLE_VERSION_7_UP flag, oops!
+			// version 6, so let's forget onlySWF7Up flag!
 			// we will still set the value though, even if that flag is set
-			_flags &= ~(onlySWF6Up|ignoreSWF6|onlySWF8Up);
+			_flags &= ~(onlySWF6Up|ignoreSWF6|onlySWF8Up|onlySWF9Up);
 		}
 		else
 		{
-			_flags &= ~(onlySWF6Up|ignoreSWF6|onlySWF7Up|onlySWF8Up);
+			_flags &= ~(onlySWF6Up|ignoreSWF6|onlySWF7Up|onlySWF8Up|onlySWF9Up);
 		}
+		
 	}
 
 	/// accesor to the numerical flags value

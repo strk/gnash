@@ -90,8 +90,6 @@
             log_aserror(_("%s has more than one argument"), __FUNCTION__);	\
     )
 
-using namespace std;
-
 namespace gnash {
 
 static as_value
@@ -144,7 +142,7 @@ as_global_escape(const fn_call& fn)
 {
     ASSERT_FN_ARGS_IS_1
 
-    string input = fn.arg(0).to_string();
+    std::string input = fn.arg(0).to_string();
     URL::encode(input);
     return as_value(input.c_str());
 }
@@ -162,7 +160,7 @@ as_global_unescape(const fn_call& fn)
 {
     ASSERT_FN_ARGS_IS_1
 
-    string input = fn.arg(0).to_string();
+    std::string input = fn.arg(0).to_string();
     URL::decode(input);
     return as_value(input.c_str());
 }
@@ -388,13 +386,22 @@ as_global_assetpropflags(const fn_call& fn)
 
     // list of child names
 
-    as_value& props = fn.arg(1);
+    const as_value& props = fn.arg(1);
+
+    const int flagsMask = ( as_prop_flags::dontEnum |
+    	  as_prop_flags::dontDelete |
+    	  as_prop_flags::readOnly |
+    	  as_prop_flags::onlySWF6Up |
+    	  as_prop_flags::ignoreSWF6 |
+    	  as_prop_flags::onlySWF7Up |
+    	  as_prop_flags::onlySWF8Up |
+    	  as_prop_flags::onlySWF9Up);
 
     // a number which represents three bitwise flags which
     // are used to determine whether the list of child names should be hidden,
     // un-hidden, protected from over-write, un-protected from over-write,
     // protected from deletion and un-protected from deletion
-    int set_true = int(fn.arg(2).to_number()) & as_prop_flags::as_prop_flags_mask;
+    const int set_true = int(fn.arg(2).to_number()) & flagsMask;
 
     // Is another integer bitmask that works like set_true,
     // except it sets the attributes to false. The
@@ -402,8 +409,8 @@ as_global_assetpropflags(const fn_call& fn)
 
     // ASSetPropFlags was exposed in Flash 5, however the fourth argument 'set_false'
     // was not required as it always defaulted to the value '~0'. 
-    int set_false = (fn.nargs < 4 ? 0 : int(fn.arg(3).to_number()))
-	& as_prop_flags::as_prop_flags_mask;
+    const int set_false = (fn.nargs < 4 ? 0 : int(fn.arg(3).to_number())) &
+    	flagsMask;
 
     obj->setPropFlags(props, set_false, set_true);
 

@@ -1,3 +1,16 @@
+2008-04-22 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/as_prop_flags.h: add onlySWF9Up to cleared visible flags
+	  (copied blindly from swfdec, like much of this file). Drop
+	  static const member for flags mask, as it's used exclusively
+	  in Global.cpp.
+	* server/asobj/Global.cpp: move flag mask here, make onlySWF9Up
+	  overridable, which gives new 27 swfdec testsuite passes and
+	  four failures. The only effective change is the addition
+	  of onlySWF9Up to the mask; to revert, remove it.
+	* testsuite/swfdec/PASSING: new passes.
+	* server/vm/CodeStream.h: add brackets to shut gcc 4.3 up.
+
 2008-04-22 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-swfc.all/: Makefile.am, button_test2.sc:

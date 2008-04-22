@@ -152,8 +152,8 @@ public:
 	/// Change the current position by a relative value.
 	void seekBy(int change)
 	{
-		if (change > 0 && change > (mEnd - mCurrent) ||
-			change < 0 && -change > (mCurrent - mRaw))
+		if ((change > 0 && change > (mEnd - mCurrent)) ||
+			(change < 0 && -change > (mCurrent - mRaw)))
 			throw CodeStreamException();
 		mCurrent += change;
 	}
