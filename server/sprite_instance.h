@@ -200,7 +200,7 @@ public:
 	virtual float get_background_alpha() const;
 
 	// delegates to movie_root 
-	virtual void get_mouse_state(int& x, int& y, int& buttons);
+	//virtual void get_mouse_state(int& x, int& y, int& buttons);
 
 	// delegates to movie_root (possibly wrong)
 	void	set_background_color(const rgba& color);

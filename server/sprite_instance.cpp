@@ -3836,11 +3836,13 @@ sprite_instance::get_character(int /* character_id */)
   return NULL;
 }
 
+#if 0
 void
 sprite_instance::get_mouse_state(int& x, int& y, int& buttons)
 {
   _vm.getRoot().get_mouse_state(x, y, buttons);
 }
+#endif
 
 void
 sprite_instance::stop_drag()

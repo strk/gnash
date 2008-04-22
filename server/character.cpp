@@ -90,6 +90,7 @@ character::get_world_cxform() const
 	return m;
 }
 
+#if 0
 void
 character::get_mouse_state(int& x, int& y, int& buttons)
 {
@@ -99,6 +100,7 @@ character::get_mouse_state(int& x, int& y, int& buttons)
 #endif // GNASH_USE_GC
 	get_parent()->get_mouse_state(x, y, buttons);
 }
+#endif
 
 as_object*
 character::get_path_element_character(string_table::key key)

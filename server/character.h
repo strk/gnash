@@ -862,12 +862,12 @@ public:
   /// Use this to retrieve the last state of the mouse, as set via
   /// notify_mouse_state().  Coordinates are in PIXELS, NOT TWIPS.
   ///
-      /// The default implementation calls get_mouse_state against
+  /// The default implementation calls get_mouse_state against
   /// the character's parent. The final parent (a sprite_instance)
   /// will delegate the call to it's associated movie_root, which
   /// does all the work.
   ///
-  virtual void get_mouse_state(int& x, int& y, int& buttons);
+  //virtual void get_mouse_state(int& x, int& y, int& buttons);
 
   /// These have been moved down from movie.h to remove that file
   /// from the inheritance chain. It is probably still a misdesign

@@ -304,7 +304,7 @@ public:
     ///
     bool notify_key_event(key::code k, bool down);
 
-	/// \brief
+    /// \brief
     /// Use this to retrieve the last state of the mouse, as set via
     /// notify_mouse_state(). 
     //
