@@ -114,7 +114,7 @@ video_stream_definition::readDefineVideoFrame(stream* in, SWF::tag_type tag, mov
 
 	unsigned int dataSize = in->get_tag_end_position() - in->get_position();
 	
-	uint8_t* buffer = new uint8_t[dataSize + 8]; // FIXME: catch bad_alloc
+	boost::uint8_t* buffer = new uint8_t[dataSize + 8]; // FIXME: catch bad_alloc
 
 	size_t bytesread = in->read((char*)buffer, dataSize);
 	memset(buffer+bytesread, 0, 8);

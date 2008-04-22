@@ -159,7 +159,7 @@ namespace image
 			image_base(o)
 		{}
 
-		rgb(uint8_t* data, int width, int height, int stride)
+		rgb(boost::uint8_t* data, int width, int height, int stride)
 			: image_base(data, width, height, stride, RGB)
 		{}
 

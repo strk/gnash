@@ -1966,7 +1966,7 @@ edit_text_character::get_world_cxform() const
 }
 
 void
-edit_text_character::setLeading(uint16_t h)
+edit_text_character::setLeading(boost::uint16_t h)
 {
 	if ( _leading != h )
 	{
