@@ -200,9 +200,6 @@ public:
 	virtual float get_background_alpha() const;
 
 	// delegates to movie_root 
-	virtual float	get_pixel_scale() const;
-
-	// delegates to movie_root 
 	virtual void get_mouse_state(int& x, int& y, int& buttons);
 
 	// delegates to movie_root (possibly wrong)

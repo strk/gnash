@@ -1,5 +1,9 @@
 2008-04-22 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.{cpp,h}: drop get_pixel_scale proxy.
+
+2008-04-22 Sandro Santilli <strk@keybit.net>
+
 	* server/swf/StartSoundTag.cpp (read): log unimpl once about
 	  syncNoMultiple flag.
 

@@ -3836,12 +3836,6 @@ sprite_instance::get_character(int /* character_id */)
   return NULL;
 }
 
-float
-sprite_instance::get_pixel_scale() const
-{
-  return _vm.getRoot().get_pixel_scale();
-}
-
 void
 sprite_instance::get_mouse_state(int& x, int& y, int& buttons)
 {
