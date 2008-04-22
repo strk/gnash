@@ -31,12 +31,19 @@
 namespace gnash {
 
 GC* GC::_singleton = NULL;
+unsigned int GC::maxNewCollectablesCount = 50;
 
 GC&
 GC::init(GcRoot& root)
 {
 	assert(!_singleton);
 	_singleton = new GC(root);
+	char *gcgap = getenv("GNASH_GC_TRIGGER_THRESHOLD");
+	if ( gcgap )
+	{
+		unsigned int gap = atoi(gcgap);
+		_singleton->maxNewCollectablesCount = gap;
+	}
 	return *_singleton;
 }
 

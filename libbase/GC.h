@@ -258,8 +258,7 @@ private:
 
 	/// Number of newly registered collectable since last collection run
 	/// triggering next collection.
-	/// Should be made a parameter ?
-	static const unsigned int maxNewCollectablesCount = 50;
+	static unsigned int maxNewCollectablesCount;
 
 	/// Create a garbage collector, using the given root
 	GC(GcRoot& root)

@@ -1,5 +1,11 @@
 2008-04-22 Sandro Santilli <strk@keybit.net>
 
+	* libbase/GC.{cpp,h}: use GNASH_GC_TRIGGER_THRESHOLD environment
+	  variable, if any, to set number of newly registered collectables
+	  since last run before a new collection starts.
+
+2008-04-22 Sandro Santilli <strk@keybit.net>
+
 	* server/button_character_instance.cpp (on_event,
 	  on_button_event): ignore events if unloaded.
 	  Fixes bug #22982.
