@@ -1,5 +1,11 @@
 2008-04-22 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-swfc.all/: Makefile.am, button_test2.sc:
+	  Add zou test for bug #22982 (still not automated - read
+	  comments in it for how to reproduce).
+
+2008-04-22 Sandro Santilli <strk@keybit.net>
+
 	* server/button_character_instance.{cpp,h}: override
 	  ::destroy (every character overriding ::unload should
 	  do this).

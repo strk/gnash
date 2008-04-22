@@ -46,6 +46,7 @@ BOGO_SCTESTS = \
 # These ones are the ones for which a MovieTester-based runner exists
 INTERACTIVE_SCTESTS = \
 	button_test1.sc \
+	button_test2.sc  \
 	$(NULL)
 
 AM_CPPFLAGS = -I.. \
