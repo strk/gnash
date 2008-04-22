@@ -1,5 +1,10 @@
 2008-04-22 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/StartSoundTag.cpp (read): log unimpl once about
+	  syncNoMultiple flag.
+
+2008-04-22 Sandro Santilli <strk@keybit.net>
+
 	* libbase/GC.{cpp,h}: use GNASH_GC_TRIGGER_THRESHOLD environment
 	  variable, if any, to set number of newly registered collectables
 	  since last run before a new collection starts.

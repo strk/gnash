@@ -88,9 +88,11 @@ StartSoundTag::read(stream& in)
 	bool	has_out_point = in.read_bit(); 
 	bool	has_in_point = in.read_bit(); 
 
-	UNUSED(no_multiple);
-	UNUSED(has_envelope);
-	
+	if (no_multiple)
+	{
+		LOG_ONCE( log_unimpl("syncNoMultiple flag in StartSoundTag") );
+	}
+
 	boost::uint32_t	in_point = 0;
 	boost::uint32_t	out_point = 0;
 
