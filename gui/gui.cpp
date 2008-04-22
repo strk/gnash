@@ -234,9 +234,8 @@ Gui::resize_view(int width, int height)
 
 		if ( _stage && _stage->isRescalingAllowed() )
 		{
-
-		    float swfwidth = _movieDef->get_width_pixels();
-		    float swfheight = _movieDef->get_height_pixels();
+			float swfwidth = _movieDef->get_width_pixels();
+			float swfheight = _movieDef->get_height_pixels();
 
 			// set new scale value
 			_xscale = width / swfwidth;
@@ -265,6 +264,8 @@ Gui::resize_view(int width, int height)
 	_height = height;
 	_validbounds.setTo(0, 0, _width-1, _height-1);
 	//log_debug(_("new size (in twips) is: %dx%d"), _width*20, _height*20); 
+
+	if ( _stage ) display(_stage);
 }
 
 void

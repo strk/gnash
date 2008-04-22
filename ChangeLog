@@ -1,5 +1,7 @@
 2008-04-22 Sandro Santilli <strk@keybit.net>
 
+	* gui/gui.cpp (resize_view): immediate display on resize, fixes
+	  that annoying flickering during resizes.
 	* server/sprite_instance.{cpp,h}: drop get_pixel_scale proxy.
 
 2008-04-22 Sandro Santilli <strk@keybit.net>
