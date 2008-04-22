@@ -946,6 +946,8 @@ button_character_instance::markReachableResources() const
 bool
 button_character_instance::unload()
 {
+	//log_debug("Button %s being unloaded", getTarget());
+
 	bool childsHaveUnload = false;
 
 	// We need to unload all childs, or the global instance list will keep growing forever !
@@ -959,11 +961,42 @@ button_character_instance::unload()
 		//log_debug("Button child %s (%s) unloaded", ch->getTarget().c_str(), typeName(*ch).c_str());
 	}
 
+	// NOTE: we don't need to ::unload or ::destroy here
+	//       as the _hitCharacters are never placed on stage.
+	//       As an optimization we might not even instantiate
+	//       them, and only use the definition and the 
+	//       associated transform matrix... (would take
+	//       hit instance off the GC).
 	_hitCharacters.clear();
 
 	bool hasUnloadEvent = character::unload();
 
 	return hasUnloadEvent || childsHaveUnload;
+}
+
+void
+button_character_instance::destroy()
+{
+	//log_debug("Button %s being destroyed", getTarget());
+
+	for (CharsVect::iterator i=m_record_character.begin(), e=m_record_character.end(); i!=e; ++i)
+	{
+		character* ch = *i;
+		if ( ! ch ) continue;
+		if ( ch->isDestroyed() ) continue;
+		ch->destroy();
+		*i = NULL;
+	}
+
+	// NOTE: we don't need to ::unload or ::destroy here
+	//       as the _hitCharacters are never placed on stage.
+	//       As an optimization we might not even instantiate
+	//       them, and only use the definition and the 
+	//       associated transform matrix... (would take
+	//       hit instance off the GC).
+	_hitCharacters.clear();
+
+	character::destroy();
 }
 
 bool

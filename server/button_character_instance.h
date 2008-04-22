@@ -149,6 +149,9 @@ public:
 	/// Properly unload contained characters
 	bool unload();
 
+	/// Properly destroy contained characters
+	void destroy();
+
 #ifdef USE_SWFTREE
 	// Override to append button characters info, see dox in character.h
 	virtual InfoTree::iterator getMovieInfo(InfoTree& tr, InfoTree::iterator it);
