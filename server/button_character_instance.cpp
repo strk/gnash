@@ -350,6 +350,15 @@ button_character_instance::enabled_getset(const fn_call& fn)
 bool
 button_character_instance::on_event(const event_id& id)
 {
+	if ( isUnloaded() )
+	{
+		// We dont' respond to events while unloaded
+		// See bug #22982
+		log_debug("Button %s received %s event while unloaded: ignored",
+			getTarget(), id.get_function_name());
+		return false; 
+	}
+
 	// We only respond keypress events
 	if ( id.m_id != event_id::KEY_PRESS ) return false;
 
@@ -457,6 +466,15 @@ button_character_instance::get_topmost_mouse_entity(float x, float y)
 void
 button_character_instance::on_button_event(const event_id& event)
 {
+	if ( isUnloaded() )
+	{
+		// We dont' respond to events while unloaded
+		// See bug #22982
+		log_debug("Button %s received %s button event while unloaded: ignored",
+			getTarget(), event.get_function_name());
+		return;
+	}
+
 	e_mouse_state new_state = m_mouse_state;
   
 	// Set our mouse state (so we know how to render).
