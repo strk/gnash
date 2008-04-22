@@ -1,3 +1,9 @@
+2008-04-22 Sandro Santilli <strk@keybit.net>
+
+	* server/dlist.h, server/movie_root.{cpp,h}: set
+	  GNASH_PARANOIA_LEVEL if not already set, use it
+	  to engage expensive assertions when > 1.
+
 2008-04-22 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/as_prop_flags.h: add onlySWF9Up to cleared visible flags

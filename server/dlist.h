@@ -37,7 +37,9 @@
 // 1 : quick assertions
 // 2 : add testInvariant
 //
-#define GNASH_PARANOIA_LEVEL 1
+#ifndef GNASH_PARANOIA_LEVEL
+# define GNASH_PARANOIA_LEVEL 1
+#endif
 
 namespace gnash {
 	class cxform;

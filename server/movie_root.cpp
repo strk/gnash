@@ -1611,14 +1611,32 @@ movie_root::markReachableResources() const
     //       should be NOT unloaded and thus marked as reachable by their
     //       parent.
     //std::for_each(_liveChars.begin(), _liveChars.end(), boost::bind(&character::setReachable, _1));
+#if GNASH_PARANOIA_LEVEL > 1
+    for (LiveChars::const_iterator i=_liveChars.begin(), e=_liveChars.end(); i!=e; ++i)
+    {
+        assert((*i)->isReachable());
+    }
+#endif
     
     // NOTE: cleanupUnloadedListeners should have cleaned up all unloaded key listeners 
     //       the remaining ones should be marked by their parents
     //std::for_each(m_key_listeners.begin(), m_key_listeners.end(), boost::bind(&character::setReachable, _1));
+#if GNASH_PARANOIA_LEVEL > 1
+    for (LiveChars::const_iterator i=m_key_listeners.begin(), e=m_key_listeners.end(); i!=e; ++i)
+    {
+        assert((*i)->isReachable());
+    }
+#endif
 
     // NOTE: cleanupUnloadedListeners should have cleaned up all unloaded mouse listeners 
     //       the remaining ones should be marked by their parents
     //std::for_each(m_mouse_listeners.begin(), m_mouse_listeners.end(), boost::bind(&character::setReachable, _1));
+#if GNASH_PARANOIA_LEVEL > 1
+    for (LiveChars::const_iterator i=m_mouse_listeners.begin(), e=m_mouse_listeners.end(); i!=e; ++i)
+    {
+        assert((*i)->isReachable());
+    }
+#endif
 
 }
 #endif // GNASH_USE_GC

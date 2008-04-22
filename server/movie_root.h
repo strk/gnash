@@ -82,6 +82,15 @@
 # include "tree.hh"
 #endif
 
+// GNASH_PARANOIA_LEVEL:
+// 0 : (not unimplemented)
+// 1 : quick assertions
+// 2 : add testInvariant
+//
+#ifndef GNASH_PARANOIA_LEVEL
+# define GNASH_PARANOIA_LEVEL 1
+#endif
+
 #include <vector>
 #include <list>
 #include <set>
@@ -565,7 +574,9 @@ public:
     void addLiveChar(boost::intrusive_ptr<character> ch)
     {
 	// Don't register the object in the list twice 
+#if GNASH_PARANOIA_LEVEL > 1
 	assert(std::find(_liveChars.begin(), _liveChars.end(), ch) == _liveChars.end());
+#endif
         _liveChars.push_front(ch);
     }
 
