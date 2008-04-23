@@ -76,7 +76,6 @@ movie_root::movie_root()
 	m_viewport_y0(0),
 	m_viewport_width(1),
 	m_viewport_height(1),
-	m_pixel_scale(1.0f),
 	m_background_color(255, 255, 255, 255),
 	m_timer(0.0f),
 	m_mouse_x(0),
@@ -160,7 +159,6 @@ movie_root::setRootMovie(movie_instance* movie)
 	                movie->get_movie_definition()->get_width_pixels());
 	m_viewport_height = static_cast<int>(
 	                movie->get_movie_definition()->get_height_pixels());
-	m_pixel_scale = 1;
 
 	// assert(movie->get_depth() == 0); ?
 	movie->set_depth(character::staticDepthOffset);
@@ -453,15 +451,6 @@ movie_root::set_display_viewport(int x0, int y0, int w, int h)
 
     	if ( _allowRescale ) // Recompute pixel scale.
 	{
-		//log_debug("Rescaling allowed");
-
-		// should we cache this ? it's immutable after all !
-		// WARNING: don't allow swapping depth of the root movie !!
-		const rect& frame_size = _rootMovie->get_frame_size();
-
-		float	scale_x = m_viewport_width / TWIPS_TO_PIXELS(frame_size.width());
-		float	scale_y = m_viewport_height / TWIPS_TO_PIXELS(frame_size.height());
-		m_pixel_scale = fmax(scale_x, scale_y);
 
 	}
 	else // rescale not allowed, notify Stage (if any)
@@ -1971,10 +1960,12 @@ movie_root::getMovieInfo(tree<StringPair>& tr, tree<StringPair>::iterator it)
     os << m_viewport_width << "x" << m_viewport_height;
     localIter = tr.append_child(it, StringPair("Rendered dimensions", os.str()));
 
+#if 0
     /// Stage: pixel scale
     os.str("");
     os << m_pixel_scale;
     localIter = tr.append_child(it, StringPair("Pixel scale", os.str()));
+#endif
 
     /// Stage: scaling allowed.
     localIter = tr.append_child(it, StringPair("Scaling allowed",

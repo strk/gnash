@@ -1,3 +1,8 @@
+2008-04-23 Sandro Santilli <strk@keybit.net>
+
+	* server/movie_root.{cpp,h}: drop unused pixel scale
+	  and interfaces to it, update documentation for notify_mouse_moved.
+
 2008-04-23 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* testsuite/swfdec/PASSING: remove the 4 fails from yesterday's

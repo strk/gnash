@@ -263,16 +263,19 @@ public:
     }
 
     /// \brief
-        /// The host app can use this to tell the movie when
-        /// user's mouse pointer has moved.
+    /// The host app can use this to tell the movie when
+    /// user's mouse pointer has moved.
     //
-    /// Coordinates are in pixels.
+    /// Coordinates are in Stage Coordinate Space (pseudo-pixels units).
     ///
     /// This function should return TRUE iff any action triggered
     /// by the event requires redraw, see \ref events_handling for
     /// more info.
     ///
-        bool notify_mouse_moved(int x, int y);
+    /// TODO: take twips (or float pixels), or we won't be able to
+    ///       support sub-pixel accuracy in collision detection.
+    ///
+    bool notify_mouse_moved(int x, int y);
 
     /// \brief
     /// The host app can use this to tell the movie when the
@@ -364,15 +367,6 @@ public:
     size_t get_current_frame() const
     {
 	return getRootMovie()->get_current_frame();
-    }
-
-    /// \brief
-    /// Return the size of a logical movie pixel as
-    /// displayed on-screen, with the current device
-    /// coordinates.
-    float   get_pixel_scale() const
-    {
-        return m_pixel_scale;
     }
 
     void set_background_color(const rgba& color);
@@ -808,8 +802,6 @@ private:
 
     /// Width and height of viewport, in pixels
     int         m_viewport_width, m_viewport_height;
-
-    float       m_pixel_scale;
 
     rgba        m_background_color;
     float       m_timer;
