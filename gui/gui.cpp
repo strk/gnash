@@ -351,6 +351,7 @@ Gui::updateStageMatrix()
 			float defHeight = swfheight *= _yscale;
 			float diffHeight = _height-defHeight;
 			_yoffset = diffHeight/2.0;
+			break;
 		}
 
 		default:
@@ -359,6 +360,8 @@ Gui::updateStageMatrix()
 			break;
 		}
 	}
+
+	//log_debug("updateStageMatrix: scaleMode:%d, valign:%d, halign:%d", scaleMode, valign, halign);
 
 	// TODO: have a generic set_matrix ?
 	_renderer->set_scale(_xscale, _yscale);
