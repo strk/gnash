@@ -21,7 +21,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Stage.as,v 1.27 2008/04/23 16:23:04 strk Exp $";
+rcsid="$Id: Stage.as,v 1.28 2008/04/23 17:04:33 bwy Exp $";
 #include "check.as"
 
 check_equals (typeof(Stage), 'object');
@@ -128,7 +128,7 @@ Stage.scaleMode = 5;
 check_equals(Stage.scaleMode, "showAll");
 
 Stage.scaleMode = "exactFit";
-xcheck_equals(Stage.scaleMode, "exactFit");
+check_equals(Stage.scaleMode, "exactFit");
 
 Stage.scaleMode = "sHOwall";
 check_equals(Stage.scaleMode, "showAll");

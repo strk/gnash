@@ -1,5 +1,9 @@
 2008-04-23 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* testsuite/actionscript.all/Stage.as: update passes.
+
+2008-04-23 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* server/movie_root.h, server/asobj/Stage.cpp: it's exactFit,
 	  not exactFill.
 
