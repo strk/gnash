@@ -248,12 +248,14 @@ MovieTester::resizeStage(int x, int y)
 {
 	_movie_root->set_display_viewport(0, 0, x, y);
 
-	if (_movie_root->isRescalingAllowed() )
+	if (_movie_root->getScaleMode() != movie_root::noScale )
 	{
+		// TODO: fix to deal with all scale modes
+		//       and alignments ?
 
 		// set new scale value
 		float xscale = x / _movie_def->get_width_pixels();
-	    float yscale = y / _movie_def->get_height_pixels();
+		float yscale = y / _movie_def->get_height_pixels();
 		
 		if (xscale < yscale) yscale = xscale;
 		if (yscale < xscale) xscale = yscale;

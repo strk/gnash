@@ -1,5 +1,10 @@
 2008-04-23 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/MovieTester.cpp (resizeStage): don't try
+	  to use what I just dropped (isRescalignAllowed).
+
+2008-04-23 Sandro Santilli <strk@keybit.net>
+
 	* server/movie_root.{cpp,h}: Drop _allowRescale (does more
 	  harm then a rebuild); broadcast a Stage.onResize event when
 	  scaleMode is set to noScale (from something else).
