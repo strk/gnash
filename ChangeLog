@@ -1,3 +1,8 @@
+2008-04-23 Sandro Santilli <strk@keybit.net>
+
+	* gui/gui.cpp (updateStageMatrix): add support for
+	  all scale modes. Query all from movie_root.
+
 2008-04-23 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* testsuite/actionscript.all/Stage.as: update passes.

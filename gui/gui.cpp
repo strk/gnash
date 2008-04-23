@@ -231,63 +231,100 @@ Gui::updateStageMatrix()
 		return;
 	}
 
+	assert(_stage); // when VM is initialized this should hold
+
 	float swfwidth = _movieDef->get_width_pixels();
 	float swfheight = _movieDef->get_height_pixels();
 
-	// TODO: query scaleMode [ noScale,showAll,exactFit,noBorders ]
-	if ( _stage && _stage->isRescalingAllowed() )
+	// Fetch scale mode
+	movie_root::ScaleMode scaleMode = _stage->getScaleMode();
+	switch (scaleMode)
 	{
+		case movie_root::noScale:
+			_xscale = _yscale = 1.0f;
+			break;
 
-		// set new scale value ( user-pixel / pseudo-pixel )
-		_xscale = _width / swfwidth;
-		_yscale = _height / swfheight;
-		
-		// always scale proportionally
-		if (_xscale < _yscale) _yscale = _xscale;
-		else if (_yscale < _xscale) _xscale = _yscale;
-	}
-	else
-	{
-		_xscale = _yscale = 1.0f;
+		case movie_root::showAll:
+		{
+			// set new scale value ( user-pixel / pseudo-pixel )
+			_xscale = _width / swfwidth;
+			_yscale = _height / swfheight;
+			
+			// Scale proportionally, using smallest scale
+			if (_xscale < _yscale) _yscale = _xscale;
+			else if (_yscale < _xscale) _xscale = _yscale;
+
+			break;
+		}
+
+		case movie_root::noBorder:
+		{
+
+			// set new scale value ( user-pixel / pseudo-pixel )
+			_xscale = _width / swfwidth;
+			_yscale = _height / swfheight;
+			
+			// Scale proportionally, using biggest scale
+			if (_xscale > _yscale) _yscale = _xscale;
+			else if (_yscale > _xscale) _xscale = _yscale;
+
+			break;
+		}
+
+		case movie_root::exactFit:
+		{
+			// NOTE: changing aspect ratio is valid!
+			_xscale = _width / swfwidth;
+			_yscale = _height / swfheight;
+			//LOG_ONCE( log_unimpl("Stage.scaleMode=exactFit") );
+			break;
+		}
+
+		default:
+		{
+			log_error("Invalid scaleMode %d", scaleMode);
+			break;
+		}
 	}
 
 	_xoffset=0;
 	_yoffset=0;
 
-	// Align to center
-	// TODO: use _stage.getAlignMode
-	movie_root::StageHorizontalAlign halign = movie_root::STAGE_H_ALIGN_C;
-	movie_root::StageVerticalAlign valign = movie_root::STAGE_V_ALIGN_C;
+	// Fetch align mode
+	movie_root::StageAlign align = _stage->getStageAlignment();
+	movie_root::StageHorizontalAlign halign = align.first;
+	movie_root::StageVerticalAlign valign = align.second;
 
 	// Handle horizontal alignment
 	switch ( halign )
 	{
 		case movie_root::STAGE_H_ALIGN_L:
+		{
 			// _xoffset=0 is fine
 			break;
+		}
 
 		case movie_root::STAGE_H_ALIGN_R:
 		{
 			// Offsets in pixels
 			float defWidth = swfwidth *= _xscale;
-			if ( _width > defWidth )
-			{
-				float diffWidth = _width-defWidth;
-				_xoffset = diffWidth;
-			}
+			float diffWidth = _width-defWidth;
+			_xoffset = diffWidth;
 			break;
 		}
 
 		case movie_root::STAGE_V_ALIGN_C:
-		default:
 		{
 			// Offsets in pixels
 			float defWidth = swfwidth *= _xscale;
-			if ( _width > defWidth )
-			{
-				float diffWidth = _width-defWidth;
-				_xoffset = diffWidth/2.0;
-			}
+			float diffWidth = _width-defWidth;
+			_xoffset = diffWidth/2.0;
+			break;
+		}
+
+		default:
+		{
+			log_error("Invalid horizontal align %d", valign);
 			break;
 		}
 	}
@@ -296,29 +333,30 @@ Gui::updateStageMatrix()
 	switch ( valign )
 	{
 		case movie_root::STAGE_V_ALIGN_T:
+		{
 			// _yoffset=0 is fine
 			break;
+		}
 
 		case movie_root::STAGE_V_ALIGN_B:
 		{
 			float defHeight = swfheight *= _yscale;
-			if ( _height > defHeight )
-			{
-				float diffHeight = _height-defHeight;
-				_yoffset = diffHeight;
-			}
+			float diffHeight = _height-defHeight;
+			_yoffset = diffHeight;
 			break;
 		}
 
 		case movie_root::STAGE_V_ALIGN_C:
-		default:
 		{
 			float defHeight = swfheight *= _yscale;
-			if ( _height > defHeight )
-			{
-				float diffHeight = _height-defHeight;
-				_yoffset = diffHeight/2.0;
-			}
+			float diffHeight = _height-defHeight;
+			_yoffset = diffHeight/2.0;
+		}
+
+		default:
+		{
+			log_error("Invalid vertical align %d", valign);
+			break;
 		}
 	}
 
