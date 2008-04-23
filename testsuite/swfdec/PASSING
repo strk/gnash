@@ -258,7 +258,6 @@ foreach-propflags-7.swf:c016978927cec1c09b89f13a52bacb40
 foreach-propflags-8.swf:9e594d9cc1a8edab1131706bfbc78757
 foreach-propflags-9.swf:ea9662cb58538a05b2dcad3043954fe1
 foreach-propflags-prototype-5.swf:d71d3e1861f00cc36ee3fce27540befb
-foreach-propflags-prototype-7.swf:76b0c7fc65bf5bbabe6c68f1e6640e84
 foreach-propflags-prototype-8.swf:9278f39b43bce469be87b114d7d8a6f5
 foreach-propflags-prototype-9.swf:2d1fa1a81c3f602a831d6d59cb864af1
 foreach-proto-simple-5.swf:63689d87c2e1eb1602b2624fa9a61c3e
@@ -465,7 +464,6 @@ object-hasownproperty-9.swf:1c2d76f1ba3df41216eba9ea315460d0
 object-ispropertyenumerable-5.swf:775ef8e8b0ec09d72adec0bdf64b282e
 object-ispropertyenumerable-5.swf:c30e596479860ddf51fc53c1760cac72
 object-isprototypeof-propflags-5.swf:13a678b4d0e5ec60da85d2599cc6dbbb
-object-isprototypeof-propflags-7.swf:081f60adfd77a2ba4100007df1eb50ef
 object-isprototypeof-propflags-8.swf:406b046ef35dba78aa9a03ac7b794c7a
 object-isprototypeof-propflags-9.swf:03d8c864e892083523ce19f764f21497
 object-math-5.swf:2d509f7b6e94776a2208fcbec80b7a67
@@ -581,7 +579,6 @@ propflags-call-7.swf:849febd3d3a69142fd4a052481cfa795
 propflags-call-8.swf:113917a633d0419acc7048961a87096a
 propflags-call-9.swf:c8d4e3c04fbbb612a2bea6b27d1bd37b
 propflags-call-prototype-5.swf:9f9a6c3d94e1161081e453f2cbc3d53c
-propflags-call-prototype-8.swf:e144d5fa2807272f7d45ad2bd3cb9eb9
 propflags-call-prototype-9.swf:d4a4fd3e2f4727e5cdc4b4ff9c8ed1b5
 propflags-get-5.swf:4e73a87593a538e445fcfaf8fb6b6b8a
 propflags-get-6.swf:530a5c672df1c6d431fa85a12937fdec
@@ -589,7 +586,6 @@ propflags-get-7.swf:a60948313a3b723d89784dd178a48d30
 propflags-get-8.swf:89fa46561b02d5a0a23bde30e1bba133
 propflags-get-9.swf:56b0cf506962343f670d24c4ed64dedf
 propflags-get-prototype-5.swf:7fa60f65a1c0eb1a2f52c4e8e982a91e
-propflags-get-prototype-8.swf:711bd46c4c4a3e62a324c0902ee5b364
 propflags-get-prototype-9.swf:713e3808411e4c89458fae8c082e208f
 propflags-set-native-5.swf:a0c0652f4c7a1626e064ae0dd6a867a8
 propflags-set-native-8.swf:b11c0be85a33c08d588897a99ed35f7f

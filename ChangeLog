@@ -1,3 +1,8 @@
+2008-04-23 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* testsuite/swfdec/PASSING: remove the 4 fails from yesterday's
+	  commit, keep buildbot happy.
+
 2008-04-23 Zou Lunkai <zoulunkai@gmail.com>
 
 	* server/swf/PlaceObject2Tag.h: add some member functions
