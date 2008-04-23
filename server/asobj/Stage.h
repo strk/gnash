@@ -35,17 +35,17 @@ class Stage: public as_object
 
 public:
 
-	typedef enum {
+	enum ScaleMode {
 		showAll,
 		noScale,
 		exactFill,
 		noBorder
-	} ScaleMode;
+	};
     
-    typedef enum {
+    enum DisplayState {
 		normal,
 		fullScreen
-	} DisplayState;
+	};
 
 
 	Stage();
@@ -84,7 +84,7 @@ public:
     const std::string& getAlignMode() const { return _alignMode; }
 
     /// Set align mode
-    void setAlignMode(const std::string& mode) { _alignMode = mode; }
+    void setAlignMode(const std::string& mode);
 
 	/// Set display state 
 	void setDisplayState(DisplayState state);

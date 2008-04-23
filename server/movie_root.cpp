@@ -54,8 +54,7 @@ using namespace std;
 namespace gnash
 {
 
-gnash::interfaceEventCallback
-movie_root::interfaceHandle = NULL;
+gnash::interfaceEventCallback movie_root::interfaceHandle = NULL;
 
 inline bool
 movie_root::testInvariant() const
@@ -1284,6 +1283,14 @@ movie_root::isMouseOverActiveEntity() const
 #endif
 
 	return true;
+}
+
+void
+movie_root::setStageAlignment(StageHorizontalAlign h, StageVerticalAlign v)
+{
+    _valign = v;
+    _halign = h;
+    log_debug("valign: %d, halign: %d", _valign, _halign);
 }
 
 void

@@ -227,6 +227,44 @@ Stage::setDisplayState(DisplayState state)
 
 }
 
+void
+Stage::setAlignMode(const std::string& mode)
+{
+    if (_alignMode == mode) return;
+
+    _alignMode = mode;
+    
+    movie_root::StageVerticalAlign v = movie_root::STAGE_V_ALIGN_C;
+    movie_root::StageHorizontalAlign h = movie_root::STAGE_H_ALIGN_C;
+
+    // Order: LTRB. L and T take precedence.
+
+    for (std::string::const_reverse_iterator it = _alignMode.rbegin();
+        it != _alignMode.rend();
+        ++it)
+    {
+        switch (*it)
+        {
+            case 'R':
+                h = movie_root::STAGE_H_ALIGN_R;
+                break;
+            case 'L':
+                h = movie_root::STAGE_H_ALIGN_L;
+                break;
+            case 'B':
+                v = movie_root::STAGE_V_ALIGN_B;
+                break;
+            case 'T':
+                v = movie_root::STAGE_V_ALIGN_T;
+                break;
+        }
+    }
+
+    movie_root& m = VM::get().getRoot();
+    m.setStageAlignment(h, v);   
+
+}
+
 as_value stage_scalemode_getset(const fn_call& fn)
 {
 	boost::intrusive_ptr<Stage> stage = ensureType<Stage>(fn.this_ptr);
@@ -301,8 +339,7 @@ stage_align_getset(const fn_call& fn)
 	{
 
 		const std::string& str = fn.arg(0).to_string();
-
-        std::string alignMode = "";
+        std::string alignMode;
 
         if (str.find_first_of("lL") != std::string::npos)
         {

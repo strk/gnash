@@ -509,6 +509,21 @@ public:
 
     bool testInvariant() const;
 
+    enum StageHorizontalAlign {
+        STAGE_H_ALIGN_C,
+        STAGE_H_ALIGN_L,
+        STAGE_H_ALIGN_R,
+    };
+
+
+    enum StageVerticalAlign {
+        STAGE_V_ALIGN_C,
+        STAGE_V_ALIGN_T,       
+        STAGE_V_ALIGN_B
+    };    
+
+    void setStageAlignment(StageHorizontalAlign v, StageVerticalAlign h);
+
     /// Action priority levels
     enum ActionPriorityLevel {
 
@@ -973,6 +988,9 @@ private:
     /// -1 if none
     ///
     int _hostfd;
+    
+    StageVerticalAlign _valign;
+    StageHorizontalAlign _halign;
 };
 
 
