@@ -180,8 +180,9 @@ main(int /*argc*/, char** /*argv*/)
 	else
 	{
 		cerr << "Didn't find ENDOFTEST... dumping all members" << endl;
-		root->dump_members();
+		// root->dump_members();
 	}
 
+ return 0;
 }
 

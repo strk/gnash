@@ -74,6 +74,7 @@ main(int /*argc*/, char** /*argv*/)
 	// It's an swf6, so lowercase 'ENDOFTEST'
 	bool endOfTestFound = root->get_member(st.find("endoftest"), &eot);
 	check(endOfTestFound);
+
 	if ( endOfTestFound )
 	{
 		cerr << eot.to_debug_string() << endl;
@@ -82,8 +83,9 @@ main(int /*argc*/, char** /*argv*/)
 	else
 	{
 		cerr << "Didn't find ENDOFTEST... dumping all members" << endl;
-		root->dump_members();
+		// root->dump_members();
 	}
 
+	return 0;
 }
 
