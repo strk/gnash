@@ -99,16 +99,16 @@ public:
     static void loader(stream* in, tag_type tag, movie_definition* m);
 
     int getRatio()    const { return m_ratio; }
-    int getClipDepth() const { return m_clip_depth; };
-    int getID() const { return m_character_id; };
-    const std::string& getName() const { return m_name; };
-    const matrix& getMatrix() const { return m_matrix; };
-    const cxform& getCxform() const { return m_color_transform; };
-    const EventHandlers& getEventHandlers() const { return m_event_handlers; };
+    int getClipDepth() const { return m_clip_depth; }
+    int getID() const { return m_character_id; }
+    const std::string& getName() const { return m_name; }
+    const matrix& getMatrix() const { return m_matrix; }
+    const cxform& getCxform() const { return m_color_transform; }
+    const EventHandlers& getEventHandlers() const { return m_event_handlers; }
     
-    bool hasMatrix() const { return m_has_matrix; };
-    bool hasCxform() const { return m_has_matrix; };
-    bool hasName()   const { return m_has_name; };
+    bool hasMatrix() const { return m_has_matrix; }
+    bool hasCxform() const { return m_has_matrix; }
+    bool hasName()   const { return m_has_name; }
 
 private:
 
