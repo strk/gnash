@@ -1,5 +1,10 @@
 2008-04-23 Sandro Santilli <strk@keybit.net>
 
+	* server/movie_root.cpp (clear): remove key/mouse listeners. Fixes
+	  an assertion failure running levels.swf with PARANOIA_LEVEL > 1.
+
+2008-04-23 Sandro Santilli <strk@keybit.net>
+
 	* server/movie_root.{cpp,h}: add a cleanupAndCollect() private method
 	  so we don't forget to clean key/mouse listeners before invoking
 	  the garbage collector. Fixes a few assertion failures with

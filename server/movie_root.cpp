@@ -421,7 +421,9 @@ movie_root::clear()
 	// remove all intervals
 	clearIntervalTimers();
 
-	// TODO: remove key/mouse listeners
+	// remove key/mouse listeners
+	m_key_listeners.clear();
+	m_mouse_listeners.clear();
 
 #ifdef GNASH_USE_GC
 	// Run the garbage collector again
