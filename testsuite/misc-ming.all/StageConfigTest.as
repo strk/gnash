@@ -41,11 +41,16 @@ createTextField("stf", 97, 10, 150, 200, 50);
 stf.text = "Scale mode: " + Stage.scaleMode;
 
 createTextField("ss", 96, 10, 170, 200, 50);
-ss.text = "Stage size: "+Stage.width+"x"+Stage.height;
+function updateStageSizeReport()
+{
+	ss.text = "Stage size: "+Stage.width+"x"+Stage.height;
+}
+updateStageSizeReport();
 
 onMouseMove = function()
 {
 	s = "Mouse coords:"+_xmouse+"x"+_ymouse;
+	updateStageSizeReport();
 	tf.text = s;
 };
 
@@ -89,6 +94,8 @@ onKeyDown = function()
 	// update mouse too
 	s = _xmouse+"x"+_ymouse;
 	tf.text = s;
+
+	updateStageSizeReport();
 	
 };
 Key.addListener(this);
@@ -96,6 +103,6 @@ Key.addListener(this);
 onResize = function()
 {
         trace("Resize event received, args to handler: "+arguments.length+" Stage.width="+Stage.width+", Stage.height="+Stage.height);
-	ss.text = "Stage size: "+Stage.width+"x"+Stage.height;
+	updateStageSizeReport();
 };
 Stage.addListener(this);
