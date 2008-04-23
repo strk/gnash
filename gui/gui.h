@@ -412,6 +412,12 @@ private:
     /// Height of a window pixel, in stage pseudopixel units.
     float           _yscale;
 
+    /// Window pixel X offset of stage origin
+    float           _xoffset;
+
+    /// Window pixel Y offset of stage origin
+    float           _yoffset;
+
     bool display(movie_root* m);
     
 #ifdef GNASH_FPS_DEBUG

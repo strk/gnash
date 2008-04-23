@@ -1,5 +1,18 @@
 2008-04-23 Sandro Santilli <strk@keybit.net>
 
+	* server/render.{cpp,h}: drop get_scale interface (unused).
+	* backend/render_handler.h: add set_translation method, to
+	  go togheter with set_scale for setting a "stage matrix".
+	* backend/render_handler_agg.cpp, backend/render_handler_ogl.cpp:
+	  Implement set_translation.
+	* gui/gui.{cpp,h}: add x/y offset private member, compute offsets
+	  and scales on resize_view configuring renderer accordingly
+	  (align stage to center).
+	  Use scale/offset in notify_mouse_moved for proper Window-to-Stage
+	  coordinate conversion. 
+
+2008-04-23 Sandro Santilli <strk@keybit.net>
+
 	* server/movie_root.cpp (clear): remove key/mouse listeners. Fixes
 	  an assertion failure running levels.swf with PARANOIA_LEVEL > 1.
 

@@ -1604,11 +1604,6 @@ public:
     _yscale = yscale;
   }
 
-  virtual void get_scale(point& scale) {
-    scale.x = _xscale;
-    scale.y = _yscale;
-  }
-  
   virtual void set_invalidated_regions(const InvalidatedRanges& ranges)
   {
 #if 0

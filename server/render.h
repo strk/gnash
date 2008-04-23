@@ -43,9 +43,6 @@ namespace gnash {
 		/// See render_handler::create_bitmap_info_rgba (in backend/render_handler.h)
 		bitmap_info*	create_bitmap_info_rgba(image::rgba* im);
 
-		/// See render_handler::get_scale (in backend/render_handler.h)
-		void get_scale(point& scale);
-
 		/// See render_handler::delete_bitmap_info (in backend/render_handler.h)
 		void	delete_bitmap_info(bitmap_info* bi);
 

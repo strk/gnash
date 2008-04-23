@@ -84,7 +84,9 @@ Gui::Gui() :
     _mouseShown(true),
     _maxAdvances(0),
     _xscale(1.0f),
-    _yscale(1.0f)
+    _yscale(1.0f),
+    _xoffset(0),
+    _yoffset(0)
 #ifdef GNASH_FPS_DEBUG
     ,fps_counter(0)
     ,fps_counter_total(0)
@@ -123,7 +125,9 @@ Gui::Gui(unsigned long xid, float scale, bool loop, unsigned int depth)
     _mouseShown(true),
     _maxAdvances(0),
     _xscale(scale),
-    _yscale(scale)
+    _yscale(scale),
+    _xoffset(0), // TODO: x and y offset will need update !
+    _yoffset(0)
 #ifdef GNASH_FPS_DEBUG
     ,fps_counter(0)    
     ,fps_counter_total(0)    
@@ -219,7 +223,7 @@ Gui::menu_restart()
 void
 Gui::resize_view(int width, int height)
 {
-//	GNASH_REPORT_FUNCTION;
+	GNASH_REPORT_FUNCTION;
 
 	assert(width>0);
 	assert(height>0);
@@ -232,10 +236,11 @@ Gui::resize_view(int width, int height)
 			_stage->set_display_viewport(0, 0, width, height);
 		}
 
+		float swfwidth = _movieDef->get_width_pixels();
+		float swfheight = _movieDef->get_height_pixels();
+
 		if ( _stage && _stage->isRescalingAllowed() )
 		{
-			float swfwidth = _movieDef->get_width_pixels();
-			float swfheight = _movieDef->get_height_pixels();
 
 			// set new scale value ( user-pixel / pseudo-pixel )
 			_xscale = width / swfwidth;
@@ -244,9 +249,37 @@ Gui::resize_view(int width, int height)
 			// always scale proportionally
 			if (_xscale < _yscale) _yscale = _xscale;
 			else if (_yscale < _xscale) _xscale = _yscale;
-			
-			_renderer->set_scale(_xscale, _yscale);
 		}
+		else
+		{
+			_xscale = _yscale = 1.0f;
+		}
+
+		_xoffset=0;
+		_yoffset=0;
+
+		// TODO: check Stage.getAlignMode
+		{
+			// Align to center
+
+			// Offsets in pixels
+			float defWidth = swfwidth *= _xscale;
+			float defHeight = swfheight *= _yscale;
+			if ( width > defWidth )
+			{
+				float diffWidth = width-defWidth;
+				_xoffset = diffWidth/2.0;
+			}
+			if ( width > defHeight )
+			{
+				float diffHeight = height-defHeight;
+				_yoffset = diffHeight/2.0;
+			}
+		}
+
+		// TODO: have a generic set_matrix ?
+		_renderer->set_scale(_xscale, _yscale);
+		_renderer->set_translation(_xoffset, _yoffset);
 
 	}
 	else
@@ -368,10 +401,10 @@ Gui::notify_mouse_moved(int ux, int uy)
 	if ( _stopped ) return;
 
 	// A stage pseudopixel is user pixel / _xscale wide
-	float x = ux / _xscale;
+	float x = (ux-_xoffset) / _xscale;
 
 	// A stage pseudopixel is user pixel / _xscale high
-	float y = uy / _yscale;
+	float y = (uy-_yoffset) / _yscale;
 
 #ifdef DEBUG_MOUSE_COORDINATES
 	log_debug(_("mouse @ %d,%d"), x, y);

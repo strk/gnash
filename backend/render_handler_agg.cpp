@@ -2014,20 +2014,19 @@ public:
   }
   
   void set_scale(float new_xscale, float new_yscale) {
-    /*xscale = new_xscale/20.0f;
-    yscale = new_yscale/20.0f;*/
     
     scale_set=true;
     
+    log_debug("AGG scale being set, will discard translation");
     stage_matrix.set_identity();
     stage_matrix.set_scale(new_xscale/20.0f, new_yscale/20.0f);
   }
 
-  virtual void get_scale(point& scale) {
-    scale.x = PIXELS_TO_TWIPS(stage_matrix.get_x_scale());
-    scale.y = PIXELS_TO_TWIPS(stage_matrix.get_y_scale());
+  void set_translation(float xoff, float yoff) {
+    log_debug("AGG translation being set, will discard translation");
+    stage_matrix.set_translation(xoff, yoff);
   }
-  
+
   virtual unsigned int getBytesPerPixel() const {
     return bpp/8;
   }  

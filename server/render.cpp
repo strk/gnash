@@ -77,15 +77,6 @@ namespace gnash {
 			if (s_render_handler) s_render_handler->delete_bitmap_info(bi);
 		}
 
-		void get_scale(point& scale) {
-			if (s_render_handler) {
-				s_render_handler->get_scale(scale);
-			} else {
-				scale.x = 1.0;
-				scale.y = 1.0;
-			}
-		}
-
 	 	// Returns the format the current renderer wants videoframes in.
 		int videoFrameFormat() {
 			if (s_render_handler) return s_render_handler->videoFrameFormat();

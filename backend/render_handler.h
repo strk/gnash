@@ -590,9 +590,11 @@ public:
     // nop
   }
 
-  virtual void get_scale(point& /*scale*/) {
+  /// Sets the x/y offset for the movie  
+  virtual void set_translation(float /*xoff*/, float /*yoff*/) {
+    // nop
   }
-    
+
 protected:
 
   /// Cached fill style list with just one entry used for font rendering
