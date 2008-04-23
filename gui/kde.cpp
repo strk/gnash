@@ -423,10 +423,7 @@ qwidget::mouseMoveEvent(QMouseEvent *event)
     assert(_godfather);
     QPoint position = event->pos();
 
-    int newX = static_cast<int> (position.x() / _godfather->getXScale());
-    int newY = static_cast<int> (position.y() / _godfather->getYScale());
-
-    _godfather->notify_mouse_moved(newX, newY);
+    _godfather->notify_mouse_moved(position.x(), position.y());
 }
 
 qwidget::qwidget(KdeGui* godfather)

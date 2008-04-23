@@ -1828,9 +1828,7 @@ GtkGui::motion_notify_event(GtkWidget *const /*widget*/,
 //    GNASH_REPORT_FUNCTION;
     Gui *obj = static_cast<Gui *>(data);
 
-    float xscale = obj->getXScale();
-    float yscale = obj->getYScale();
-    obj->notify_mouse_moved(int(event->x / xscale), int(event->y / yscale));
+    obj->notify_mouse_moved(event->x, event->y);
     return true;
 }
 

@@ -890,9 +890,7 @@ void FBGui::check_mouse()
     
     //log_debug("mouse @ %d / %d, btn %d", mouse_x, mouse_y, mouse_btn);
     
-    float xscale = getXScale();
-    float yscale = getYScale();
-    notify_mouse_moved(int(mouse_x / xscale), int(mouse_y / yscale));
+    notify_mouse_moved(mouse_x, mouse_y);
     
     // button
     if (btn != mouse_btn) {
@@ -994,11 +992,9 @@ void FBGui::check_mouse()
     new_y = (2048-new_y) * m_stage_height / 2048;
     
     if ((new_x!=mouse_x) || (new_y!=mouse_y)) {
-      float xscale = getXScale();
-      float yscale = getYScale();
       mouse_x = new_x;
       mouse_y = new_y;
-      notify_mouse_moved(int(mouse_x / xscale), int(mouse_y / yscale));
+      notify_mouse_moved(mouse_x, mouse_y);
     }
     
     if (new_btn != mouse_btn) {
@@ -1144,8 +1140,8 @@ void FBGui::check_mouse()
   static int new_mouse_y = 0;
   static int new_mouse_btn = 0;
   
-  int notify_x;     // coordinate to be sent via notify_mouse_moved()
-  int notify_y;
+  int notify_x=0;     // coordinate to be sent via notify_mouse_moved()
+  int notify_y=0;
   bool move_pending = false;  // true: notify_mouse_moved() should be called
   
   // this is necessary for our quick'n'dirty touchscreen calibration: 
@@ -1168,9 +1164,6 @@ void FBGui::check_mouse()
         mouse_x = new_mouse_x;
         mouse_y = new_mouse_y;
         
-        float xscale = getXScale();
-        float yscale = getYScale();
-            
         float cx, cy;
         
         if (getenv("TSCALIB"))  // ONLY convert when requested
@@ -1181,8 +1174,8 @@ void FBGui::check_mouse()
         // Don't call notify_mouse_moved() here because this would lead to
         // lots of calls, especially for touchscreens. Instead we save the
         // coordinate and call notify_mouse_moved() only once.
-        notify_x = cx / xscale;
-        notify_y = cy / yscale;
+        notify_x = cx;
+        notify_y = cy;
         move_pending = true;        
       }
       

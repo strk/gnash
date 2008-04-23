@@ -76,15 +76,15 @@ Gui::Gui() :
     _xid(0),
     _width(1),
     _height(1),
-    _xscale(1.0f),
-    _yscale(1.0f),
     _depth(16),
     _interval(0),
     _renderer(NULL),
     _redraw_flag(true),
     _fullscreen(false),
     _mouseShown(true),
-    _maxAdvances(0)
+    _maxAdvances(0),
+    _xscale(1.0f),
+    _yscale(1.0f)
 #ifdef GNASH_FPS_DEBUG
     ,fps_counter(0)
     ,fps_counter_total(0)
@@ -115,15 +115,15 @@ Gui::Gui(unsigned long xid, float scale, bool loop, unsigned int depth)
     _xid(xid),
     _width(1),
     _height(1),
-    _xscale(scale),
-    _yscale(scale),
     _depth(depth),
     _interval(0),
     _renderer(NULL),
     _redraw_flag(true),
     _fullscreen(false),
     _mouseShown(true),
-    _maxAdvances(0)
+    _maxAdvances(0),
+    _xscale(scale),
+    _yscale(scale)
 #ifdef GNASH_FPS_DEBUG
     ,fps_counter(0)    
     ,fps_counter_total(0)    
@@ -237,13 +237,13 @@ Gui::resize_view(int width, int height)
 			float swfwidth = _movieDef->get_width_pixels();
 			float swfheight = _movieDef->get_height_pixels();
 
-			// set new scale value
+			// set new scale value ( user-pixel / pseudo-pixel )
 			_xscale = width / swfwidth;
 			_yscale = height / swfheight;
 			
 			// always scale proportionally
 			if (_xscale < _yscale) _yscale = _xscale;
-			if (_yscale < _xscale) _xscale = _yscale;
+			else if (_yscale < _xscale) _xscale = _yscale;
 			
 			_renderer->set_scale(_xscale, _yscale);
 		}
@@ -359,17 +359,24 @@ Gui::menu_toggle_sound()
 
 
 void
-Gui::notify_mouse_moved(int x, int y) 
+Gui::notify_mouse_moved(int ux, int uy) 
 {
 	movie_root* m = _stage;
 
-    if ( ! _started ) return;
+	if ( ! _started ) return;
 
-    if ( _stopped ) return;
+	if ( _stopped ) return;
+
+	// A stage pseudopixel is user pixel / _xscale wide
+	float x = ux / _xscale;
+
+	// A stage pseudopixel is user pixel / _xscale high
+	float y = uy / _yscale;
 
 #ifdef DEBUG_MOUSE_COORDINATES
 	log_debug(_("mouse @ %d,%d"), x, y);
 #endif
+
 	if ( m->notify_mouse_moved(x, y) )
 	{
 		// any action triggered by the
@@ -395,8 +402,8 @@ Gui::notify_mouse_moved(int x, int y)
 	}
 
 #ifdef ENABLE_KEYBOARD_MOUSE_MOVEMENTS
-	_xpointer = x;
-	_ypointer = y;
+	_xpointer = ux;
+	_ypointer = uy;
 #endif
 
 
@@ -847,18 +854,6 @@ bool
 Gui::want_redraw()
 {
     return false;
-}
-
-float
-Gui::getXScale()
-{
-    return _xscale;
-}
-
-float
-Gui::getYScale()
-{
-    return _yscale;
 }
 
 bool

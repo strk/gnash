@@ -115,9 +115,7 @@ FltkGui::handle(int event)
         if (!_xid && event_y() < static_cast<int>(_menu_height)) {
           return Window::handle(event);
         }
-        int x = static_cast<int>(event_x() / _xscale);
-        int y = static_cast<int>((event_y() - _menu_height) / _yscale);
-        notify_mouse_moved(x, y);
+        notify_mouse_moved(event_x(), event_y()-_menu_height);
         return Window::handle(event);;
       }
       case SHORTCUT:

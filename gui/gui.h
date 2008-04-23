@@ -183,12 +183,6 @@ public:
     virtual double getScreenDPI() { return 0; }
     virtual std::string getScreenColor() { return ""; }
 
-    /// @return The value to which the movie width should be scaled.
-    float getXScale();
-
-    /// @return The value to which the movie height should be scaled.
-    float getYScale();
-
     /// @return Whether or not the movie should be looped indefinitely.
     bool loops();
 
@@ -197,8 +191,8 @@ public:
 
     /// Mouse notification callback to be called when the mouse is moved.
     //
-    /// @param x The mouse coordinate X component in pixels.
-    /// @param y The mouse coordinate Y component in pixels.
+    /// @param x The mouse coordinate X component in user/window coordinate space (pixels).
+    /// @param y The mouse coordinate Y component in user/window coordinate space (pixels).
     ///
     void notify_mouse_moved(int x, int y);
 
@@ -394,10 +388,6 @@ protected:
     /// Desired window height.
     int             _height;
 
-    /// The window width scale.
-    float           _xscale;
-    /// The window height scale.
-    float           _yscale;
     /// Desired colour depth in bits.
     int             _depth;
     /// Main loop interval: the time between successive advance_movie calls.
@@ -415,6 +405,12 @@ protected:
     unsigned long _maxAdvances;
 
 private:
+
+    /// Width of a window pixel, in stage pseudopixel units.
+    float           _xscale;
+
+    /// Height of a window pixel, in stage pseudopixel units.
+    float           _yscale;
 
     bool display(movie_root* m);
     

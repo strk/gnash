@@ -84,7 +84,7 @@ SDLGui::run()
                 if (event.motion.x == x_old && event.motion.y == y_old) { break; }
                 x_old = event.motion.x;
                 y_old = event.motion.y;
-                notify_mouse_moved((int) (x_old / _xscale), (int) (y_old / _yscale));
+                notify_mouse_moved(x_old, y_old);
                 break;
 
             case SDL_MOUSEBUTTONDOWN:
