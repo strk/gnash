@@ -1,5 +1,11 @@
 2008-04-23 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Stage.as: test other valid values
+	  for Stage.scaleMode, and add consistency checking (gnash fails
+	  in NOT sending onResize event on scaleMode=noScale set).
+
+2008-04-23 Sandro Santilli <strk@keybit.net>
+
 	* gui/gui.cpp (updateStageMatrix): add support for all vertical
 	  and horizontal alignments.
 
