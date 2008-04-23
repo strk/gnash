@@ -2017,13 +2017,11 @@ public:
     
     scale_set=true;
     
-    log_debug("AGG scale being set, will discard translation");
     stage_matrix.set_identity();
     stage_matrix.set_scale(new_xscale/20.0f, new_yscale/20.0f);
   }
 
   void set_translation(float xoff, float yoff) {
-    log_debug("AGG translation being set, will discard translation");
     stage_matrix.set_translation(xoff, yoff);
   }
 
