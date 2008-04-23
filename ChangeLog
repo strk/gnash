@@ -1,5 +1,11 @@
 2008-04-23 Sandro Santilli <strk@keybit.net>
 
+	* server/movie_root.cpp (set_display_viewport): use _scaleMode,
+	  not the deprecated (and unmaintained) _allowRescale.
+	  The latter should be dropped, just didn't feel like changing
+	  the header again in this one :) We'll need to add more
+	  methods for obtaining a string representatino of the new
+	  enum values anyway.
 	* gui/gui.cpp (updateStageMatrix): missing break in switch..
 
 2008-04-23 Sandro Santilli <strk@keybit.net>

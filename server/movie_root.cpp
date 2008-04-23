@@ -449,16 +449,12 @@ movie_root::set_display_viewport(int x0, int y0, int w, int h)
 {
 	assert(testInvariant());
 
-    m_viewport_x0 = x0;
-    m_viewport_y0 = y0;
-    m_viewport_width = w;
-    m_viewport_height = h;
+	m_viewport_x0 = x0;
+	m_viewport_y0 = y0;
+	m_viewport_width = w;
+	m_viewport_height = h;
 
-    	if ( _allowRescale ) // Recompute pixel scale.
-	{
-
-	}
-	else // rescale not allowed, notify Stage (if any)
+	if ( _scaleMode == noScale ) // rescale not allowed, notify Stage (if any)
 	{
 		//log_debug("Rescaling disabled");
 		boost::intrusive_ptr<Stage> stage = getStageObject();
@@ -1291,6 +1287,8 @@ movie_root::isMouseOverActiveEntity() const
 void
 movie_root::setStageAlignment(StageHorizontalAlign h, StageVerticalAlign v)
 {
+    if ( _valign == v && _halign == h ) return; // nothing to do
+
     _valign = v;
     _halign = h;
     //log_debug("valign: %d, halign: %d", _valign, _halign);
@@ -1309,8 +1307,17 @@ movie_root::getStageAlignment() const
 void
 movie_root::setScaleMode(ScaleMode sm)
 {
+    if ( _scaleMode == sm ) return; // nothing to do
+
     _scaleMode = sm;
     if (interfaceHandle) (*interfaceHandle)("Stage.align", "");    
+#if 0
+    if ( _scaleMode = noScale ) 
+    {
+        boost::intrusive_ptr<Stage> stage = getStageObject();
+        if ( stage ) stage->onResize();
+    }
+#endif
 }
 
 
