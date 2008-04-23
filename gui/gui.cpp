@@ -234,6 +234,7 @@ Gui::updateStageMatrix()
 	float swfwidth = _movieDef->get_width_pixels();
 	float swfheight = _movieDef->get_height_pixels();
 
+	// TODO: query scaleMode [ noScale,showAll,exactFit,noBorders ]
 	if ( _stage && _stage->isRescalingAllowed() )
 	{
 
@@ -253,22 +254,71 @@ Gui::updateStageMatrix()
 	_xoffset=0;
 	_yoffset=0;
 
-	// TODO: check Stage.getAlignMode
-	{
-		// Align to center
+	// Align to center
+	// TODO: use _stage.getAlignMode
+	movie_root::StageHorizontalAlign halign = movie_root::STAGE_H_ALIGN_C;
+	movie_root::StageVerticalAlign valign = movie_root::STAGE_V_ALIGN_C;
 
-		// Offsets in pixels
-		float defWidth = swfwidth *= _xscale;
-		float defHeight = swfheight *= _yscale;
-		if ( _width > defWidth )
+	// Handle horizontal alignment
+	switch ( halign )
+	{
+		case movie_root::STAGE_H_ALIGN_L:
+			// _xoffset=0 is fine
+			break;
+
+		case movie_root::STAGE_H_ALIGN_R:
 		{
-			float diffWidth = _width-defWidth;
-			_xoffset = diffWidth/2.0;
+			// Offsets in pixels
+			float defWidth = swfwidth *= _xscale;
+			if ( _width > defWidth )
+			{
+				float diffWidth = _width-defWidth;
+				_xoffset = diffWidth;
+			}
+			break;
 		}
-		if ( _height > defHeight )
+
+		case movie_root::STAGE_V_ALIGN_C:
+		default:
 		{
-			float diffHeight = _height-defHeight;
-			_yoffset = diffHeight/2.0;
+			// Offsets in pixels
+			float defWidth = swfwidth *= _xscale;
+			if ( _width > defWidth )
+			{
+				float diffWidth = _width-defWidth;
+				_xoffset = diffWidth/2.0;
+			}
+			break;
+		}
+	}
+
+	// Handle vertical alignment
+	switch ( valign )
+	{
+		case movie_root::STAGE_V_ALIGN_T:
+			// _yoffset=0 is fine
+			break;
+
+		case movie_root::STAGE_V_ALIGN_B:
+		{
+			float defHeight = swfheight *= _yscale;
+			if ( _height > defHeight )
+			{
+				float diffHeight = _height-defHeight;
+				_yoffset = diffHeight;
+			}
+			break;
+		}
+
+		case movie_root::STAGE_V_ALIGN_C:
+		default:
+		{
+			float defHeight = swfheight *= _yscale;
+			if ( _height > defHeight )
+			{
+				float diffHeight = _height-defHeight;
+				_yoffset = diffHeight/2.0;
+			}
 		}
 	}
 
