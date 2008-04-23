@@ -21,7 +21,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Stage.as,v 1.29 2008/04/23 17:47:11 strk Exp $";
+rcsid="$Id: Stage.as,v 1.30 2008/04/23 20:35:37 strk Exp $";
 #include "check.as"
 
 check_equals (typeof(Stage), 'object');
@@ -155,8 +155,11 @@ check_equals (typeof(Stage.removeListener), 'undefined');
 
 
 #if OUTPUT_VERSION > 5
- // an onResize event everytime scaleMode is set to "noScale" (from a different value)
- check_totals(48);
+ // NOTE: proprietary player for linux is bogus here,
+ //       in that it always sends an onResize event
+ //       when scaleMode is set to "noScale" from something else
+ note("NOTE: Linux version of the proprieraty player is known to fail a test (sending a bogus onResize event)");
+ check_totals(47);
 #else
  check_totals(32);
 #endif

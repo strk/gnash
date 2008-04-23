@@ -53,6 +53,9 @@ public:
 	/// Recive a resize event.
 	void onResize();
 
+	/// Notify all listeners about a resize event
+	void notifyResize();
+
 	/// Get current stage width, in pixels
 	unsigned getWidth() const;
 
@@ -87,9 +90,6 @@ public:
 
 private:
 
-	/// Notify all listeners about a resize event
-	void notifyResize();
-	
 	std::string _alignMode;
 	
 	DisplayState _displayState;

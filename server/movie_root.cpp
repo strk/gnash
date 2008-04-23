@@ -155,10 +155,9 @@ movie_root::setRootMovie(movie_instance* movie)
 
 	m_viewport_x0 = 0;
 	m_viewport_y0 = 0;
-	m_viewport_width = static_cast<int>(
-	                movie->get_movie_definition()->get_width_pixels());
-	m_viewport_height = static_cast<int>(
-	                movie->get_movie_definition()->get_height_pixels());
+	movie_definition* md = movie->get_movie_definition();
+	m_viewport_width = static_cast<int>(md->get_width_pixels());
+	m_viewport_height = static_cast<int>(md->get_height_pixels());
 
 	// assert(movie->get_depth() == 0); ?
 	movie->set_depth(character::staticDepthOffset);
@@ -458,7 +457,7 @@ movie_root::set_display_viewport(int x0, int y0, int w, int h)
 	{
 		//log_debug("Rescaling disabled");
 		boost::intrusive_ptr<Stage> stage = getStageObject();
-		if ( stage ) stage->onResize();
+		if ( stage ) stage->notifyResize();
 	}
 
 	assert(testInvariant());
@@ -1309,13 +1308,31 @@ movie_root::setScaleMode(ScaleMode sm)
 {
     if ( _scaleMode == sm ) return; // nothing to do
 
+    bool notifyResize = false;
+    if ( sm == noScale || _scaleMode == noScale )
+    {
+        // If we go from or to noScale, we notify a resize
+        // if and only if display viewport is != then actual
+        // movie size
+	movie_definition* md = _rootMovie->get_movie_definition();
+
+        log_debug("Going to or from scaleMode=noScale. Viewport:%dx%d Def:%dx%d", m_viewport_width, m_viewport_height, md->get_width_pixels(), md->get_height_pixels());
+
+        if (    m_viewport_width  != md->get_width_pixels()
+	     || m_viewport_height != md->get_height_pixels() )
+        {
+            notifyResize = true;
+        }
+    }
+  
+
     _scaleMode = sm;
     if (interfaceHandle) (*interfaceHandle)("Stage.align", "");    
 
-    if ( _scaleMode == noScale ) 
+    if ( notifyResize )
     {
         boost::intrusive_ptr<Stage> stage = getStageObject();
-        if ( stage ) stage->onResize();
+        if ( stage ) stage->notifyResize();
     }
 }
 

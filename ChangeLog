@@ -1,5 +1,14 @@
 2008-04-23 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/Stage.h: make notifyResize a public method.
+	* server/movie_root.cpp: only send onResize event when stage size
+	  actually changes.
+	* testsuite/actionscript.all/Stage.as: don't expect a call to onResize
+	  when just assigning to scaleMode, it is reported to be a bug in
+	  the proprietary player for linux.
+
+2008-04-23 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/: Makefile.am, StageConfigTest.as:
 	  Committed the test grew and used the whole day for stage testing.
 	  It shows we still get Stage size wrong, but is not automated yet.
