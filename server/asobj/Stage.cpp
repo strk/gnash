@@ -22,6 +22,7 @@
 #endif
 
 #include "Stage.h"
+#include "movie_root.h"
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
@@ -108,7 +109,6 @@ attachStageInterface(as_object& o)
 Stage::Stage()
 	:
 	as_object(getObjectInterface()),
-	_scaleMode(showAll),
 	_alignMode(""),
 	_displayState(normal)
 {
@@ -146,7 +146,7 @@ Stage::getWidth() const
 
     movie_root& m = VM::get().getRoot();
 
-    if (_scaleMode == noScale)
+    if (m.getScaleMode() == movie_root::noScale)
     {
         return m.getWidth();    
     }
@@ -160,7 +160,7 @@ Stage::getHeight() const
 
     movie_root& m = VM::get().getRoot();
 
-    if (_scaleMode == noScale)
+    if (m.getScaleMode() == movie_root::noScale)
     {
         return m.getHeight();    
     }
@@ -187,24 +187,19 @@ Stage::getScaleModeString()
 		"exactFill",
 		"noBorder" };
 
-	return modeName[_scaleMode];
+    movie_root& m = VM::get().getRoot();
+
+	return modeName[m.getScaleMode()];
 }
 
 void
-Stage::setScaleMode(ScaleMode mode)
+Stage::setScaleMode(movie_root::ScaleMode mode)
 {
-	if ( _scaleMode == mode ) return; // nothing to do
+    movie_root& m = VM::get().getRoot();
 
-	_scaleMode = mode;
+	if ( m.getScaleMode() == mode ) return; // nothing to do
 
-	if ( _scaleMode == noScale )
-	{
-		VM::get().getRoot().allowRescaling(false);
-	}
-	else
-	{
-		VM::get().getRoot().allowRescaling(true);
-	}
+	m.setScaleMode(mode);
 }
 
 void
@@ -275,12 +270,12 @@ as_value stage_scalemode_getset(const fn_call& fn)
 	}
 	else // setter
 	{
-		Stage::ScaleMode mode = Stage::showAll;
+		movie_root::ScaleMode mode = movie_root::showAll;
 
 		const std::string& str = fn.arg(0).to_string();
-		if ( str == "noScale" ) mode = Stage::noScale;
-		else if ( str == "exactFill" ) mode = Stage::exactFill;
-		else if ( str == "noBorder" ) mode = Stage::noBorder;
+		if ( str == "noScale" ) mode = movie_root::noScale;
+		else if ( str == "exactFill" ) mode = movie_root::exactFill;
+		else if ( str == "noBorder" ) mode = movie_root::noBorder;
 
 		stage->setScaleMode(mode);
 		return as_value();

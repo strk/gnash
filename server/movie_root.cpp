@@ -33,6 +33,7 @@
 #include "sound_handler.h"
 #include "timers.h" // for Timer use
 
+#include <utility>
 #include <iostream>
 #include <string>
 #include <map>
@@ -48,8 +49,6 @@
 //#define GNASH_DEBUG 1
 //#define GNASH_DEBUG_LOADMOVIE_REQUESTS_PROCESSING 1
 //#define GNASH_DEBUG_TIMERS_EXPIRATION 1
-
-using namespace std;
 
 namespace gnash
 {
@@ -90,11 +89,13 @@ movie_root::movie_root()
 	m_drag_state(),
 	_movies(),
 	_rootMovie(),
-	_allowRescale(true),
 	_invalidated(true),
 	_disableScripts(false),
 	_processingActionLevel(movie_root::apSIZE),
-	_hostfd(-1)
+	_hostfd(-1),
+	_valign(STAGE_V_ALIGN_C),
+	_halign(STAGE_H_ALIGN_C),
+	_scaleMode(showAll)
 {
 }
 
@@ -1269,6 +1270,7 @@ movie_root::getEntityUnderPointer() const
 	return dropChar;
 }
 
+
 bool
 movie_root::isMouseOverActiveEntity() const
 {
@@ -1285,6 +1287,7 @@ movie_root::isMouseOverActiveEntity() const
 	return true;
 }
 
+
 void
 movie_root::setStageAlignment(StageHorizontalAlign h, StageVerticalAlign v)
 {
@@ -1294,6 +1297,22 @@ movie_root::setStageAlignment(StageHorizontalAlign h, StageVerticalAlign v)
     
     if (interfaceHandle) (*interfaceHandle)("Stage.align", "");
 }
+
+
+movie_root::StageAlign
+movie_root::getStageAlignment() const
+{
+    return std::make_pair(_halign, _valign);
+}
+
+
+void
+movie_root::setScaleMode(ScaleMode sm)
+{
+    _scaleMode = sm;
+    if (interfaceHandle) (*interfaceHandle)("Stage.align", "");    
+}
+
 
 void
 movie_root::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
@@ -1534,7 +1553,7 @@ movie_root::executeTimers()
 			unsigned long elapsed;
 			if ( timer->expired(now, elapsed) )
 			{
-				expiredTimers.insert( make_pair(elapsed, timer) );
+				expiredTimers.insert( std::make_pair(elapsed, timer) );
 			}
 		}
 
@@ -1831,10 +1850,10 @@ movie_root::findCharacterByTarget(const std::string& tgtstr_orig) const
 	//       case... just not tested)
 	as_object* o = _movies.begin()->second.get();
 
-	string::size_type from = 0;
-	while ( string::size_type to=tgtstr.find_first_of('.', from) )
+	std::string::size_type from = 0;
+	while ( std::string::size_type to=tgtstr.find_first_of('.', from) )
 	{
-		string part(tgtstr, from, to-from);
+		std::string part(tgtstr, from, to-from);
 		o = o->get_path_element(st.find(part));
 		if ( ! o ) {
 #ifdef GNASH_DEBUG_TARGET_RESOLUTION
@@ -1843,7 +1862,7 @@ movie_root::findCharacterByTarget(const std::string& tgtstr_orig) const
 #endif
 			return NULL;
 		}
-		if ( to == string::npos ) break;
+		if ( to == std::string::npos ) break;
 		from = to+1;
 	}
 	return o->to_character();
@@ -1864,7 +1883,7 @@ movie_root::processLoadMovieRequest(const LoadMovieRequest& r)
     bool usePost = r.usePost();
     const std::string& postData = r.getPostData();
 
-    if ( target.compare(0, 6, "_level") == 0 && target.find_first_not_of("0123456789", 7) == string::npos )
+    if ( target.compare(0, 6, "_level") == 0 && target.find_first_not_of("0123456789", 7) == std::string::npos )
     {
         unsigned int levelno = atoi(target.c_str()+6);
         log_debug(_("processLoadMovieRequest: Testing _level loading (level %u)"), levelno);

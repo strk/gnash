@@ -20,6 +20,7 @@
 #define __GNASH_ASOBJ_STAGE_H__
 
 #include "as_object.h" // for inheritance
+#include "movie_root.h" // for access to scaleMode
 
 #include <list>
 
@@ -34,13 +35,6 @@ class Stage: public as_object
 {
 
 public:
-
-	enum ScaleMode {
-		showAll,
-		noScale,
-		exactFill,
-		noBorder
-	};
     
     enum DisplayState {
 		normal,
@@ -66,7 +60,7 @@ public:
 	unsigned getHeight() const;
 
 	/// Set scale mode 
-	void setScaleMode(ScaleMode mode);
+	void setScaleMode(movie_root::ScaleMode mode);
 
 	/// \brief
 	/// Return the string representation for current
@@ -95,8 +89,6 @@ private:
 
 	/// Notify all listeners about a resize event
 	void notifyResize();
-
-	ScaleMode _scaleMode;
 	
 	std::string _alignMode;
 	

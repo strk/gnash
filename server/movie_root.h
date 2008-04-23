@@ -247,21 +247,6 @@ public:
         return m_viewport_height;
     }
 
-    /// Set whether rescaling is allowed or not.
-    //
-    /// When rescaling is not allowed the Stage listeners
-    /// will get notified on any resize attempt.
-    ///
-    void allowRescaling(bool v)
-    {
-        _allowRescale=v;
-    }
-
-    bool isRescalingAllowed()
-    {
-        return _allowRescale;
-    }
-
     /// \brief
     /// The host app can use this to tell the movie when
     /// user's mouse pointer has moved.
@@ -509,6 +494,13 @@ public:
 
     bool testInvariant() const;
 
+    enum ScaleMode {
+        showAll,
+		noScale,
+		exactFill,
+		noBorder
+    };
+
     enum StageHorizontalAlign {
         STAGE_H_ALIGN_C,
         STAGE_H_ALIGN_L,
@@ -522,7 +514,25 @@ public:
         STAGE_V_ALIGN_B
     };    
 
+    /// Set whether rescaling is allowed or not.
+    //
+    /// When rescaling is not allowed the Stage listeners
+    /// will get notified on any resize attempt.
+    ///
+    bool isRescalingAllowed()
+    {
+        return (_allowRescale != noScale);
+    }
+
     void setStageAlignment(StageHorizontalAlign v, StageVerticalAlign h);
+
+    typedef std::pair<StageHorizontalAlign, StageVerticalAlign> StageAlign;
+
+    StageAlign getStageAlignment() const;
+
+    void setScaleMode(ScaleMode sm);
+    
+    ScaleMode getScaleMode() const { return _scaleMode; }
 
     /// Action priority levels
     enum ActionPriorityLevel {
@@ -991,6 +1001,8 @@ private:
     
     StageVerticalAlign _valign;
     StageHorizontalAlign _halign;
+    
+    ScaleMode _scaleMode;
 };
 
 
