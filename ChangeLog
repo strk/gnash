@@ -1,3 +1,8 @@
+2008-04-23 Zou Lunkai <zoulunkai@gmail.com>
+
+	* server/swf/PlaceObject2Tag.h: add some member functions
+	  to access the private data.
+	  
 2008-04-23 Sandro Santilli <strk@keybit.net>
 
 	* server/character.{cpp,h}, server/movie_root.h,
