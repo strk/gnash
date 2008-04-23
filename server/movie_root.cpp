@@ -1311,13 +1311,12 @@ movie_root::setScaleMode(ScaleMode sm)
 
     _scaleMode = sm;
     if (interfaceHandle) (*interfaceHandle)("Stage.align", "");    
-#if 0
-    if ( _scaleMode = noScale ) 
+
+    if ( _scaleMode == noScale ) 
     {
         boost::intrusive_ptr<Stage> stage = getStageObject();
         if ( stage ) stage->onResize();
     }
-#endif
 }
 
 
@@ -1995,11 +1994,13 @@ movie_root::getMovieInfo(tree<StringPair>& tr, tree<StringPair>::iterator it)
     os.str("");
     os << m_pixel_scale;
     localIter = tr.append_child(it, StringPair("Pixel scale", os.str()));
-#endif
 
     /// Stage: scaling allowed.
     localIter = tr.append_child(it, StringPair("Scaling allowed",
                 _allowRescale ? yes : no));
+
+    //  TODO: add _scaleMode, _valign and _haling info
+#endif
 
     // Stage: scripts state (enabled/disabled)
     localIter = tr.append_child(it, StringPair("Scripts",

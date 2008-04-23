@@ -1,5 +1,12 @@
 2008-04-23 Sandro Santilli <strk@keybit.net>
 
+	* server/movie_root.{cpp,h}: Drop _allowRescale (does more
+	  harm then a rebuild); broadcast a Stage.onResize event when
+	  scaleMode is set to noScale (from something else).
+	* testsuite/actionscript.all/Stage.as: XPASS the totals.
+
+2008-04-23 Sandro Santilli <strk@keybit.net>
+
 	* server/movie_root.cpp (set_display_viewport): use _scaleMode,
 	  not the deprecated (and unmaintained) _allowRescale.
 	  The latter should be dropped, just didn't feel like changing

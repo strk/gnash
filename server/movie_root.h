@@ -514,16 +514,6 @@ public:
         STAGE_V_ALIGN_B
     };    
 
-    /// Set whether rescaling is allowed or not.
-    //
-    /// When rescaling is not allowed the Stage listeners
-    /// will get notified on any resize attempt.
-    ///
-    bool isRescalingAllowed()
-    {
-        return (_allowRescale != noScale);
-    }
-
     void setStageAlignment(StageHorizontalAlign v, StageVerticalAlign h);
 
     typedef std::pair<StageHorizontalAlign, StageVerticalAlign> StageAlign;
@@ -887,10 +877,6 @@ private:
     /// more info.
     ///
     bool fire_mouse_event();
-
-    /// If set to false, no rescale should be performed
-    /// when changing viewport size
-    bool _allowRescale;
 
     /// \brief
     /// Return the topmost entity covering the given point

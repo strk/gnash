@@ -21,7 +21,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Stage.as,v 1.28 2008/04/23 17:04:33 bwy Exp $";
+rcsid="$Id: Stage.as,v 1.29 2008/04/23 17:47:11 strk Exp $";
 #include "check.as"
 
 check_equals (typeof(Stage), 'object');
@@ -155,9 +155,8 @@ check_equals (typeof(Stage.removeListener), 'undefined');
 
 
 #if OUTPUT_VERSION > 5
- // gnash is supposed to send an onResize event everytime scaleMode is set to "noScale"
- // (w/out user interaction). pp will run 48 tests due to a test in the onResize handler.
- xcheck_totals(48);
+ // an onResize event everytime scaleMode is set to "noScale" (from a different value)
+ check_totals(48);
 #else
  check_totals(32);
 #endif
