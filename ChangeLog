@@ -1,5 +1,12 @@
 2008-04-23 Sandro Santilli <strk@keybit.net>
 
+	* server/movie_root.{cpp,h}: add a cleanupAndCollect() private method
+	  so we don't forget to clean key/mouse listeners before invoking
+	  the garbage collector. Fixes a few assertion failures with
+	  GNASH_PARANOIA_LEVEL > 1 (others still fail).
+
+2008-04-23 Sandro Santilli <strk@keybit.net>
+
 	* gui/: fb.cpp, fltk.cpp, gtk.cpp, gui.{cpp,h}, kde.cpp, sdl.cpp:
 	  Make pixel scale a Gui private, and drop accessors, Handle
 	  it in Gui::notify_mouse_moved, now taking coordinates in 

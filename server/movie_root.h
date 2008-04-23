@@ -777,6 +777,9 @@ private:
     /// Erase unloaded characters from the given listeners list
     static void cleanupUnloadedListeners(CharacterList& ll);
 
+    /// Cleanup references to unloaded characters and run the garbage collector.
+    void cleanupAndCollect();
+
     /// Push a character listener to the front of given container, if not already present
     static void add_listener(CharacterList& ll, character* elem);
 

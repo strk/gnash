@@ -179,14 +179,15 @@ movie_root::setRootMovie(movie_instance* movie)
 		clearActionQueue();
 	}
 
-	// Delete characters removed from the stage
-	// from the display lists
-	cleanupDisplayList();
+	cleanupAndCollect();
+}
 
-#ifdef GNASH_USE_GC
-	// Run the garbage collector (step back !!)
+void
+movie_root::cleanupAndCollect()
+{
+	cleanupUnloadedListeners();
+	cleanupDisplayList();
 	GC::get().collect();
-#endif
 }
 
 /* private */
@@ -419,6 +420,8 @@ movie_root::clear()
 
 	// remove all intervals
 	clearIntervalTimers();
+
+	// TODO: remove key/mouse listeners
 
 #ifdef GNASH_USE_GC
 	// Run the garbage collector again
@@ -1042,17 +1045,7 @@ movie_root::advance()
 		clearActionQueue();
 	}
 
-	// Delete characters removed from the stage
-	// from the display lists
-	cleanupDisplayList();
-
-	// Delete unloaded characters from the listeners set
-	cleanupUnloadedListeners();
-
-#ifdef GNASH_USE_GC
-	// Run the garbage collector (step back !!)
-	GC::get().collect();
-#endif
+	cleanupAndCollect();
 
 	assert(testInvariant());
 }
