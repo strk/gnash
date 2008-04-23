@@ -1,5 +1,10 @@
 2008-04-23 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* server/movie_root.h, server/asobj/Stage.cpp: it's exactFit,
+	  not exactFill.
+
+2008-04-23 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* server/movie_root.{cpp,h}: store scaleMode in movie_root,
 	  add methods to set and query scale and align mode. Notify
 	  Player when scaleMode changes. The method isRescalingAllowed

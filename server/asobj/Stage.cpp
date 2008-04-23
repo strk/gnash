@@ -184,7 +184,7 @@ Stage::getScaleModeString()
 	static const char* modeName[] = {
 		"showAll",
 		"noScale",
-		"exactFill",
+		"exactFit",
 		"noBorder" };
 
     movie_root& m = VM::get().getRoot();
@@ -274,7 +274,7 @@ as_value stage_scalemode_getset(const fn_call& fn)
 
 		const std::string& str = fn.arg(0).to_string();
 		if ( str == "noScale" ) mode = movie_root::noScale;
-		else if ( str == "exactFill" ) mode = movie_root::exactFill;
+		else if ( str == "exactFit" ) mode = movie_root::exactFit;
 		else if ( str == "noBorder" ) mode = movie_root::noBorder;
 
 		stage->setScaleMode(mode);

@@ -496,9 +496,9 @@ public:
 
     enum ScaleMode {
         showAll,
-		noScale,
-		exactFill,
-		noBorder
+        noScale,
+        exactFit,
+        noBorder
     };
 
     enum StageHorizontalAlign {
