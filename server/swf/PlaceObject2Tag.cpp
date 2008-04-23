@@ -36,151 +36,151 @@ namespace SWF {
 void
 PlaceObject2Tag::readPlaceObject(stream& in)
 {
-	// Original place_object tag; very simple.
-	in.ensureBytes(2 + 2);
-	m_character_id = in.read_u16();
-	m_depth = in.read_u16()+character::staticDepthOffset;
-	m_matrix.read(in);
+    // Original place_object tag; very simple.
+    in.ensureBytes(2 + 2);
+    m_character_id = in.read_u16();
+    m_depth = in.read_u16()+character::staticDepthOffset;
+    m_matrix.read(in);
 
-	IF_VERBOSE_PARSE
-	(
-        	log_parse(_("  PLACEOBJECT: depth=%d(%d) char=%d"),
-			m_depth, m_depth-character::staticDepthOffset,
-			m_character_id);
-		m_matrix.print();
-	);
+    IF_VERBOSE_PARSE
+    (
+            log_parse(_("  PLACEOBJECT: depth=%d(%d) char=%d"),
+            m_depth, m_depth-character::staticDepthOffset,
+            m_character_id);
+        m_matrix.print();
+    );
 
-	if (in.get_position() < in.get_tag_end_position())
-	{
-		m_color_transform.read_rgb(in);
+    if (in.get_position() < in.get_tag_end_position())
+    {
+        m_color_transform.read_rgb(in);
 
-		IF_VERBOSE_PARSE
-		(
-			log_parse(_("  cxform:"));
-			m_color_transform.print();
-		);
+        IF_VERBOSE_PARSE
+        (
+            log_parse(_("  cxform:"));
+            m_color_transform.print();
+        );
 
-	}
+    }
 }
 
 // read placeObject2 actions
 void
 PlaceObject2Tag::readPlaceActions(stream& in)
 {
-	int movie_version = _movie_def.get_version();
+    int movie_version = _movie_def.get_version();
 
-	boost::uint16_t reserved = in.read_u16();
-	IF_VERBOSE_MALFORMED_SWF (
-		if ( reserved != 0 ) // must be 0
-		{
-			log_swferror(_("Reserved field in PlaceObject actions == %u (expected 0)"), reserved);
-		}
-	);
-	
-	// The logical 'or' of all the following handlers.
-	all_event_flags = (movie_version >= 6) ? in.read_u32() : in.read_u16();
+    boost::uint16_t reserved = in.read_u16();
+    IF_VERBOSE_MALFORMED_SWF (
+        if ( reserved != 0 ) // must be 0
+        {
+            log_swferror(_("Reserved field in PlaceObject actions == %u (expected 0)"), reserved);
+        }
+    );
+    
+    // The logical 'or' of all the following handlers.
+    all_event_flags = (movie_version >= 6) ? in.read_u32() : in.read_u16();
 
-	IF_VERBOSE_PARSE (
-		log_parse(_("  actions: flags = 0x%X"), all_event_flags);
-	);
+    IF_VERBOSE_PARSE (
+        log_parse(_("  actions: flags = 0x%X"), all_event_flags);
+    );
 
-	// Read swf_events.
-	for (;;)
-	{
-		// Read event.
-		in.align();
+    // Read swf_events.
+    for (;;)
+    {
+        // Read event.
+        in.align();
 
-		boost::uint32_t flags = (movie_version >= 6) ? in.read_u32() : in.read_u16();
+        boost::uint32_t flags = (movie_version >= 6) ? in.read_u32() : in.read_u16();
 
-		if (flags == 0) // no other events
-		{
-			break;
-		}
+        if (flags == 0) // no other events
+        {
+            break;
+        }
 
-		boost::uint32_t event_length = in.read_u32();
-		if ( in.get_tag_end_position() - in.get_position() <  event_length )
-		{
-			IF_VERBOSE_MALFORMED_SWF(
-			log_swferror(_("swf_event::read(), "
-				"even_length = %u, but only %lu bytes left "
-				"to the end of current tag."
-				" Breaking for safety."),
-				event_length, in.get_tag_end_position() - in.get_position());
-			);
-			break;
-		}
+        boost::uint32_t event_length = in.read_u32();
+        if ( in.get_tag_end_position() - in.get_position() <  event_length )
+        {
+            IF_VERBOSE_MALFORMED_SWF(
+            log_swferror(_("swf_event::read(), "
+                "even_length = %u, but only %lu bytes left "
+                "to the end of current tag."
+                " Breaking for safety."),
+                event_length, in.get_tag_end_position() - in.get_position());
+            );
+            break;
+        }
 
-		boost::uint8_t ch = key::INVALID;
+        boost::uint8_t ch = key::INVALID;
 
-		if (flags & (1 << 17))	// has KeyPress event
-		{
-			ch = in.read_u8();
-			event_length--;
-		}
+        if (flags & (1 << 17))  // has KeyPress event
+        {
+            ch = in.read_u8();
+            event_length--;
+        }
 
-		// Read the actions for event(s)
-		action_buffer* action = new action_buffer(_movie_def); // ownership will be xferred to _actionBuffers
-		_actionBuffers.push_back(action); // take ownership
-		action->read(in, in.get_position()+event_length);
+        // Read the actions for event(s)
+        action_buffer* action = new action_buffer(_movie_def); // ownership will be xferred to _actionBuffers
+        _actionBuffers.push_back(action); // take ownership
+        action->read(in, in.get_position()+event_length);
 
-		assert(action->size() == event_length); 
+        assert(action->size() == event_length); 
 
-		// 13 bits reserved, 19 bits used
-		const int total_known_events = 19;
-		static const event_id s_code_bits[total_known_events] =
-		{
-			event_id::LOAD,
-			event_id::ENTER_FRAME,
-			event_id::UNLOAD,
-			event_id::MOUSE_MOVE,
-			event_id::MOUSE_DOWN,
-			event_id::MOUSE_UP,
-			event_id::KEY_DOWN,
-			event_id::KEY_UP,
+        // 13 bits reserved, 19 bits used
+        const int total_known_events = 19;
+        static const event_id s_code_bits[total_known_events] =
+        {
+            event_id::LOAD,
+            event_id::ENTER_FRAME,
+            event_id::UNLOAD,
+            event_id::MOUSE_MOVE,
+            event_id::MOUSE_DOWN,
+            event_id::MOUSE_UP,
+            event_id::KEY_DOWN,
+            event_id::KEY_UP,
 
-			event_id::DATA,
-			event_id::INITIALIZE,
-			event_id::PRESS,
-			event_id::RELEASE,
-			event_id::RELEASE_OUTSIDE,
-			event_id::ROLL_OVER,
-			event_id::ROLL_OUT,
-			event_id::DRAG_OVER,
+            event_id::DATA,
+            event_id::INITIALIZE,
+            event_id::PRESS,
+            event_id::RELEASE,
+            event_id::RELEASE_OUTSIDE,
+            event_id::ROLL_OVER,
+            event_id::ROLL_OUT,
+            event_id::DRAG_OVER,
 
-			event_id::DRAG_OUT,
-			event_id(event_id::KEY_PRESS, key::CONTROL),
-			event_id::CONSTRUCT
-		};
+            event_id::DRAG_OUT,
+            event_id(event_id::KEY_PRESS, key::CONTROL),
+            event_id::CONSTRUCT
+        };
 
-		// Let's see if the event flag we received is for an event that we know of
+        // Let's see if the event flag we received is for an event that we know of
 
-		// Integrity check: all reserved bits should be zero
-		if( flags >> total_known_events ) 
-		{
-			IF_VERBOSE_MALFORMED_SWF(
-			log_swferror(_("swf_event::read() -- unknown / unhandled event type received, flags = 0x%x"), flags);
-			);
-		}
+        // Integrity check: all reserved bits should be zero
+        if( flags >> total_known_events ) 
+        {
+            IF_VERBOSE_MALFORMED_SWF(
+            log_swferror(_("swf_event::read() -- unknown / unhandled event type received, flags = 0x%x"), flags);
+            );
+        }
 
-		// Aah! same action for multiple events !
-		for (int i = 0, mask = 1; i < total_known_events; i++, mask <<= 1)
-		{
-			if (flags & mask)
-			{
-				std::auto_ptr<swf_event> ev ( new swf_event(s_code_bits[i], *action) );
-				IF_VERBOSE_PARSE (
-				log_parse("---- actions for event %s", ev->event().get_function_name().c_str());
-				);
+        // Aah! same action for multiple events !
+        for (int i = 0, mask = 1; i < total_known_events; i++, mask <<= 1)
+        {
+            if (flags & mask)
+            {
+                std::auto_ptr<swf_event> ev ( new swf_event(s_code_bits[i], *action) );
+                IF_VERBOSE_PARSE (
+                log_parse("---- actions for event %s", ev->event().get_function_name().c_str());
+                );
 
-				if (i == 17)	// has KeyPress event
-				{
-					ev->event().setKeyCode(ch);
-				}
+                if (i == 17)    // has KeyPress event
+                {
+                    ev->event().setKeyCode(ch);
+                }
 
-				m_event_handlers.push_back(ev.release());
-			}
-		}
-	} //end of for(;;)
+                m_event_handlers.push_back(ev.release());
+            }
+        }
+    } //end of for(;;)
 }
 
 // read SWF::PLACEOBJECT2
@@ -329,7 +329,7 @@ PlaceObject2Tag::readPlaceObject3(stream& in)
 
     IF_VERBOSE_PARSE (
         log_parse(_("  PLACEOBJECT3: depth = %d (%d)"), m_depth, m_depth-character::staticDepthOffset);
-	// TODO: add more info here
+    // TODO: add more info here
     );
 
     if (has_char)
@@ -387,19 +387,19 @@ PlaceObject2Tag::readPlaceObject3(stream& in)
 
     IF_VERBOSE_PARSE
     (
-    	if (has_matrix) {
-        	log_parse("   matrix:");
-		m_matrix.print();
-	}
-    	if (has_cxform) {
-        	log_parse("   cxform:");
-        	m_color_transform.print();
-	}
-    	if (has_ratio)  log_parse("   ratio:%d", m_ratio);
-    	if (m_has_name) log_parse("   name:%s", m_name.c_str());
+        if (has_matrix) {
+            log_parse("   matrix:");
+        m_matrix.print();
+    }
+        if (has_cxform) {
+            log_parse("   cxform:");
+            m_color_transform.print();
+    }
+        if (has_ratio)  log_parse("   ratio:%d", m_ratio);
+        if (m_has_name) log_parse("   name:%s", m_name.c_str());
 
-    	if (has_clip_depth)
-		log_parse("   clip_depth:%d(%d)", m_clip_depth, m_clip_depth-character::staticDepthOffset);
+        if (has_clip_depth)
+        log_parse("   clip_depth:%d(%d)", m_clip_depth, m_clip_depth-character::staticDepthOffset);
     );
 
     if (has_filters)
@@ -474,77 +474,58 @@ void
 PlaceObject2Tag::read(stream& in, tag_type tag)
 {
 
-	m_tag_type = tag;
+    m_tag_type = tag;
 
-	if (tag == SWF::PLACEOBJECT)
-	{
-		readPlaceObject(in);
-	}
-	else if ( tag == SWF::PLACEOBJECT2 )
-	{
-		readPlaceObject2(in);
-	}
-	else
-	{
-		readPlaceObject3(in);
-	}
+    if (tag == SWF::PLACEOBJECT)
+    {
+        readPlaceObject(in);
+    }
+    else if ( tag == SWF::PLACEOBJECT2 )
+    {
+        readPlaceObject2(in);
+    }
+    else
+    {
+        readPlaceObject3(in);
+    }
 }
 
 /// Place/move/whatever our object in the given movie.
 void
 PlaceObject2Tag::execute(sprite_instance* m) const
 {
-    switch (m_place_type) {
-
+    switch (m_place_type) 
+    {
       case PLACE:
-          m->add_display_object(
-	      m_character_id,
-	      m_has_name ? &m_name : NULL,
-	      m_event_handlers,
-	      m_depth,
-	      m_color_transform,
-	      m_matrix,
-	      m_ratio,
-	      m_clip_depth);
-	  break;
+          m->add_display_object(this);
+      break;
 
       case MOVE:
-	  m->move_display_object(
-	      m_depth,
-	      m_has_cxform ? &m_color_transform : NULL,
-	      m_has_matrix ? &m_matrix : NULL,
-	      m_ratio,
-	      m_clip_depth);
-	  break;
+          m->move_display_object(this);
+      break;
 
       case REPLACE:
-	  m->replace_display_object(
-	      m_character_id,
-	      m_has_name ? &m_name : NULL,
-	      m_depth,
-	      m_has_cxform ? &m_color_transform : NULL,
-	      m_has_matrix ? &m_matrix : NULL,
-	      m_ratio,
-	      m_clip_depth);
-	  break;
+          m->replace_display_object(this);
+      break;
 
       case REMOVE:
           m->remove_display_object(m_depth, 0); // 0 since it is unused.
+      break;
     }
 }
 
 PlaceObject2Tag::~PlaceObject2Tag()
 {
 
-	for(size_t i=0; i<m_event_handlers.size(); ++i)
-	{
-		delete m_event_handlers[i];
-	}
+    for(size_t i=0; i<m_event_handlers.size(); ++i)
+    {
+        delete m_event_handlers[i];
+    }
 
-	for(size_t i=0; i<_actionBuffers.size(); ++i)
-	{
-		delete _actionBuffers[i];
-	}
+    for(size_t i=0; i<_actionBuffers.size(); ++i)
+    {
+        delete _actionBuffers[i];
+    }
 }
 
 /* public static */

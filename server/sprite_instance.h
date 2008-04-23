@@ -25,7 +25,6 @@
 #include "gnashconfig.h" // GNASH_USE_GC, USE_SWFTREE
 #endif
 
-//#include "edit_text_character.h" // temp hack
 #include "movie_definition.h" // for inlines
 #include "dlist.h" // DisplayList 
 #include "log.h"
@@ -52,6 +51,9 @@ namespace gnash {
 	class LoadVariablesThread;
 	class gradient_record;
 	class edit_text_character;
+	namespace SWF{
+		class PlaceObject2Tag;
+	}
 }
 
 namespace gnash
@@ -356,30 +358,30 @@ public:
 	/// instance's LOAD event.
 	///
 	///
-	/// @param character_id
+	/// character_id
 	///	The ID of the character to be added.
 	///	It will be seeked in the CharacterDictionary
 	///
-	/// @param name
+	/// name
 	///	The name to give to the newly created instance.
 	///	If NULL, the new instance will be assigned a sequential
 	///	name in the form 'instanceN', where N is incremented
 	///	at each call, starting from 1.
 	///
-	/// @param event_handlers
+	/// event_handlers
 	///
-	/// @param depth
+	/// depth
 	///	The depth to assign to the newly created instance.
 	///
-	/// @param color_transform
+	/// color_transform
 	///	The color transform to apply to the newly created instance.
 	///
-	/// @param matrix
+	/// matrix
 	///	The matrix transform to apply to the newly created instance.
 	///
-	/// @param ratio
+	/// ratio
 	///
-	/// @param clip_depth
+	/// clip_depth
 	///	If != character::noClipDepthValue, mark the created instance
 	///	as a clipping layer. The shape of the placed character will be
 	///	used as a mask for all higher depths up to this value.
@@ -389,16 +391,55 @@ public:
 	///	A pointer to the character being added or NULL
 	///	if this call results in a move of an existing character 
 	///	or in a no-op due to is_jumping_back being false. 
-	///       
-	character* add_display_object(
-		boost::uint16_t character_id,
-		const std::string* name,
-		const SWFEventsVector& event_handlers,
-		int depth,
-		const cxform& color_transform,
-		const matrix& matrix,
-		int ratio,
-		int clip_depth);
+	/// 
+	character* add_display_object(const SWF::PlaceObject2Tag* tag);
+	
+	/// See DisplayList::move_display_object, this method is just a proxy to that...
+	//
+	void move_display_object(const SWF::PlaceObject2Tag* tag);
+
+	void replace_display_object(const SWF::PlaceObject2Tag* tag);
+
+	///
+	/// @param color_xform
+	///	The color tranform to assign to the new character.
+	///	If NULL the default color transform will be kept.
+	///
+	/// @param ch
+	///	The character instance that should replace the old one.
+	///
+	/// @param name
+	///	The name to give to the new character (ch).
+	///	If NULL, the new instance will be assigned a sequential
+	///	name in the form 'instanceN', where N is incremented
+	///	at each call, starting from 1.
+	///
+	/// @param mat
+	///	The matrix tranform to assign to the new character.
+	///	If NULL the default matrix will be kept.
+	///
+	void	replace_display_object(
+			character* ch,
+			const std::string* name,
+			int depth,
+			const cxform* color_xform,
+			const matrix* mat,
+			int ratio,
+			int clip_depth);
+
+
+	/// \brief
+	/// Remove the object at the specified depth.
+	//
+	/// NOTE: the id parameter is unused, but currently
+	/// required to avoid break of inheritance from movie.h
+	///
+	void	remove_display_object(int depth, int /* id */)
+	{
+	    set_invalidated();
+		DisplayList& dlist = const_cast<DisplayList &>( getDisplayList() );
+	    dlist.remove_display_object(depth);
+	}
 
 	/// Attach the given character instance to current display list
 	//
@@ -450,96 +491,7 @@ public:
 	/// the sprite as no members or drawable should be needed anymore.
 	///
 	void destroy();
-
-	/// See DisplayList::move_display_object, this method is just a proxy to that...
-	//
-	/// @param color_xform
-	///	The color tranform to assign to the new character.
-	///	If NULL the default color transform will be kept.
-	///
-	/// @param mat
-	///	The matrix tranform to assign to the new character.
-	///	If NULL the default matrix will be kept.
-	///
-	void	move_display_object(
-			int depth,
-			const cxform* color_xform,
-			const matrix* mat,
-			int ratio,
-			int clip_depth)
-	{
-		DisplayList& dlist = const_cast<DisplayList &>( getDisplayList() );
-	    dlist.move_display_object(depth, color_xform, mat, ratio, clip_depth);
-	}
-
-
-	///
-	/// @param color_xform
-	///	The color tranform to assign to the new character.
-	///	If NULL the default color transform will be kept.
-	///
-	/// @param name
-	///	The name to give to the newly created instance.
-	///	If NULL, the new instance will be assigned a sequential
-	///	name in the form 'instanceN', where N is incremented
-	///	at each call, starting from 1.
-	///
-	/// @param mat
-	///	The matrix tranform to assign to the new character.
-	///	If NULL the default matrix will be kept.
-	///
-	void	replace_display_object(
-			boost::uint16_t character_id,
-			const std::string* name,
-			int depth,
-			const cxform* color_xform,
-			const matrix* mat,
-			int ratio,
-			int clip_depth);
-
-
-	///
-	/// @param color_xform
-	///	The color tranform to assign to the new character.
-	///	If NULL the default color transform will be kept.
-	///
-	/// @param ch
-	///	The character instance that should replace the old one.
-	///
-	/// @param name
-	///	The name to give to the new character (ch).
-	///	If NULL, the new instance will be assigned a sequential
-	///	name in the form 'instanceN', where N is incremented
-	///	at each call, starting from 1.
-	///
-	/// @param mat
-	///	The matrix tranform to assign to the new character.
-	///	If NULL the default matrix will be kept.
-	///
-	void	replace_display_object(
-			character* ch,
-			const std::string* name,
-			int depth,
-			const cxform* color_xform,
-			const matrix* mat,
-			int ratio,
-			int clip_depth);
-
-
-	/// \brief
-	/// Remove the object at the specified depth.
-	//
-	/// NOTE: the id parameter is unused, but currently
-	/// required to avoid break of inheritance from movie.h
-	///
-	void	remove_display_object(int depth, int /* id */)
-	{
-	    set_invalidated();
-		DisplayList& dlist = const_cast<DisplayList &>( getDisplayList() );
-	    dlist.remove_display_object(depth);
-	}
-
-
+		
 	/// Add the given action buffer to the list of action
 	/// buffers to be processed at the end of the next
 	/// frame advance.

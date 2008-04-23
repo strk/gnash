@@ -54,6 +54,7 @@
 #include "DynamicShape.h" // for composition
 #include "namedStrings.h"
 #include "fill_style.h" // for beginGradientFill
+#include "PlaceObject2Tag.h" 
 
 #ifdef USE_SWFTREE
 # include "tree.hh"
@@ -3190,116 +3191,116 @@ sprite_instance::attachCharacter(character& newch, int depth)
 }
 
 character*
-sprite_instance::add_display_object(
-    boost::uint16_t character_id,
-    const std::string* name,
-    const std::vector<swf_event*>& event_handlers,
-    int depth, 
-    const cxform& color_transform, const matrix& mat,
-    int ratio, int clip_depth)
+sprite_instance::add_display_object(const SWF::PlaceObject2Tag* tag)
 {
-//GNASH_REPORT_FUNCTION;
     assert(m_def != NULL);
+    assert(tag != NULL);
 
-    character_def*  cdef = m_def->get_character_def(character_id);
+    character_def*  cdef = m_def->get_character_def(tag->getID());
     if (cdef == NULL)
     {
         IF_VERBOSE_MALFORMED_SWF(
             log_swferror(_("sprite_instance::add_display_object(): "
-                "unknown cid = %d"), character_id);
+                "unknown cid = %d"), tag->getID());
         );
         return NULL;
     }
   
-  DisplayList& dlist = const_cast<DisplayList &>( getDisplayList() );
-    character* existing_char = dlist.get_character_at_depth(depth);
+    DisplayList& dlist = const_cast<DisplayList &>( getDisplayList() );
+    character* existing_char = dlist.get_character_at_depth(tag->getDepth());
     
     if(existing_char)
     {
-    return NULL;
+        return NULL;
     }
-  else
-  {
-    boost::intrusive_ptr<character> ch = cdef->create_character_instance(this, character_id);
+    else
+    {
+        boost::intrusive_ptr<character> ch = cdef->create_character_instance(this, tag->getID());
     
-    if(name)
+        if(tag->hasName())
         {
-            ch->set_name(*name);
+            ch->set_name(tag->getName());
         }
-    else if(ch->wantsInstanceName())
+        else if(ch->wantsInstanceName())
         {
             std::string instance_name = getNextUnnamedInstanceName();
             ch->set_name(instance_name);
         }
       
-    // Attach event handlers (if any).
+        // Attach event handlers (if any).
+        const std::vector<swf_event*>& event_handlers = tag->getEventHandlers();
         for (size_t i = 0, n = event_handlers.size(); i < n; i++)
         {
             swf_event* ev = event_handlers[i];
             ch->add_event_handler(ev->event(), ev->action());
         }
 
-    dlist.place_character(
+        dlist.place_character(
             ch.get(),
-            depth,
-            color_transform,
-            mat,
-            ratio,
-            clip_depth);
+            tag->getDepth(),
+            tag->getCxform(),
+            tag->getMatrix(),
+            tag->getRatio(),
+            tag->getClipDepth());
 
         return ch.get();
   }
 }
 
-void
-sprite_instance::replace_display_object(
-        boost::uint16_t character_id,
-        const std::string* name,
-        int depth,
-        const cxform* color_transform,
-        const matrix* mat,
-        int ratio,
-        int clip_depth)
+void 
+sprite_instance::move_display_object(const SWF::PlaceObject2Tag* tag)
+{
+    DisplayList& dlist = const_cast<DisplayList &>( getDisplayList() );
+    dlist.move_display_object(
+        tag->getDepth(), 
+        tag->hasCxform() ? &tag->getCxform() : NULL,
+        tag->hasMatrix() ? &tag->getMatrix() : NULL,
+        tag->getRatio(), 
+        tag->getClipDepth());
+}
+
+void sprite_instance::replace_display_object(const SWF::PlaceObject2Tag* tag)
 {
     assert(m_def != NULL);
+    assert(tag != NULL);
 
-    character_def*  cdef = m_def->get_character_def(character_id);
+    character_def*  cdef = m_def->get_character_def(tag->getID());
     if (cdef == NULL)
     {
         log_error(_("sprite::replace_display_object(): "
-            "unknown cid = %d"), character_id);
+            "unknown cid = %d"), tag->getID());
         return;
     }
     assert(cdef);
 
     DisplayList& dlist = const_cast<DisplayList &>( getDisplayList() );
-    character* existing_char = dlist.get_character_at_depth(depth);
+    character* existing_char = dlist.get_character_at_depth(tag->getDepth());
 
     if (existing_char)
     {
         // if the existing character is not a shape, move it instead of replace
         if ( existing_char->isActionScriptReferenceable() )
         {
-            move_display_object(depth, color_transform, mat, ratio, clip_depth);
+            move_display_object(tag);
             return;
         }
         else
         {
-            boost::intrusive_ptr<character> ch = cdef->create_character_instance(this, character_id);
+            boost::intrusive_ptr<character> ch = cdef->create_character_instance(this, tag->getID());
    
             replace_display_object(
                 ch.get(), 
-        	name, 
-        	depth,
-                color_transform,
-                mat,
-                ratio, 
-        clip_depth);
+                tag->hasName() ? &tag->getName() : NULL,
+                tag->getDepth(),
+                tag->hasCxform() ? &tag->getCxform() : NULL,
+                tag->hasMatrix() ? &tag->getMatrix() : NULL,
+                tag->getRatio(), 
+                tag->getClipDepth());
         }
     }
     else // non-existing character
     {
-    log_error("sprite_instance::replace_display_object: could not find any character at depth %d", depth);
+        log_error("sprite_instance::replace_display_object: could not find any character at depth %d", tag->getDepth());
     } 
 }
 

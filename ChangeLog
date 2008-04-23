@@ -5,6 +5,14 @@
 
 2008-04-23 Zou Lunkai <zoulunkai@gmail.com>
 
+	* server/swf/PlaceObject2Tag.cpp: execute(), use the DLIST tag directly
+	  instead of passing every single field.
+	* server/sprite_instance.{h,cpp}: add_display_object(), move_display_object(),
+	  replace_display_object(), pass the DLIST tag directly instead of the verbose
+	  interface. still a halfway work.
+	  
+2008-04-23 Zou Lunkai <zoulunkai@gmail.com>
+
 	* server/swf/PlaceObject2Tag.h: add some member functions
 	  to access the private data.
 	  
