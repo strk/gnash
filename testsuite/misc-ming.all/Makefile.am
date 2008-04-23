@@ -36,7 +36,8 @@ EXTRA_DIST = VarAndCharClashTest.as \
 	DrawingApiTest.as \
 	FlashVarsTest.as \
 	intervalTest.as \
-	FlashVarsTest.html
+	FlashVarsTest.html \
+	StageConfigTest.as
 
 
 AM_CPPFLAGS = -I.. \

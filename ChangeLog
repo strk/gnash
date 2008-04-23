@@ -1,5 +1,11 @@
 2008-04-23 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/: Makefile.am, StageConfigTest.as:
+	  Committed the test grew and used the whole day for stage testing.
+	  It shows we still get Stage size wrong, but is not automated yet.
+
+2008-04-23 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/MovieTester.cpp (resizeStage): don't try
 	  to use what I just dropped (isRescalignAllowed).
 
