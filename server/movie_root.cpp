@@ -1290,7 +1290,9 @@ movie_root::setStageAlignment(StageHorizontalAlign h, StageVerticalAlign v)
 {
     _valign = v;
     _halign = h;
-    log_debug("valign: %d, halign: %d", _valign, _halign);
+    //log_debug("valign: %d, halign: %d", _valign, _halign);
+    
+    if (interfaceHandle) (*interfaceHandle)("Stage.align", "");
 }
 
 void

@@ -328,9 +328,6 @@ stage_align_getset(const fn_call& fn)
 {
 	boost::intrusive_ptr<Stage> stage = ensureType<Stage>(fn.this_ptr);
 
-    log_unimpl(_("Stage.alignMode goes through the motions but is not "
-            "properly implemented."));
-
 	if ( fn.nargs == 0 ) // getter
 	{
 	    return as_value (stage->getAlignMode());

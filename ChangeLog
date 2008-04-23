@@ -1,5 +1,10 @@
 2008-04-23 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* server/movie_root.cpp: notify Player of Stage.align event.
+	* server/asobj/Stage.cpp: drop unimplemented message for Stage.align.
+
+2008-04-23 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* server/movie_root.{h,cpp}: add private members and enums
 	  to track stage alignment.
 	* server/asobj/Stage.{h,cpp}: set alignment in movie_root
