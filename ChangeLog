@@ -1,5 +1,12 @@
 2008-04-23 Sandro Santilli <strk@keybit.net>
 
+	* gui/gui.{cpp,h}: Put stage matrix computation in its own
+	  method (updateStageMatrix). Call on resize.
+	* gui/Player.cpp: call Gui's updateStageMatrix when 
+	  the Stage.align and Stage.scaleMode events are received.
+
+2008-04-23 Sandro Santilli <strk@keybit.net>
+
 	* server/render.{cpp,h}: drop get_scale interface (unused).
 	* backend/render_handler.h: add set_translation method, to
 	  go togheter with set_scale for setting a "stage matrix".

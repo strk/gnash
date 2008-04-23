@@ -221,6 +221,71 @@ Gui::menu_restart()
 }
 
 void
+Gui::updateStageMatrix()
+{
+	if ( ! VM::isInitialized() )
+	{
+		// When VM initializes, we'll get a call to resize_view, which
+		// would call us again.
+		//log_debug("Can't update stage matrix till VM is initialized");
+		return;
+	}
+
+	float swfwidth = _movieDef->get_width_pixels();
+	float swfheight = _movieDef->get_height_pixels();
+
+	if ( _stage && _stage->isRescalingAllowed() )
+	{
+
+		// set new scale value ( user-pixel / pseudo-pixel )
+		_xscale = _width / swfwidth;
+		_yscale = _height / swfheight;
+		
+		// always scale proportionally
+		if (_xscale < _yscale) _yscale = _xscale;
+		else if (_yscale < _xscale) _xscale = _yscale;
+	}
+	else
+	{
+		_xscale = _yscale = 1.0f;
+	}
+
+	_xoffset=0;
+	_yoffset=0;
+
+	// TODO: check Stage.getAlignMode
+	{
+		// Align to center
+
+		// Offsets in pixels
+		float defWidth = swfwidth *= _xscale;
+		float defHeight = swfheight *= _yscale;
+		if ( _width > defWidth )
+		{
+			float diffWidth = _width-defWidth;
+			_xoffset = diffWidth/2.0;
+		}
+		if ( _height > defHeight )
+		{
+			float diffHeight = _height-defHeight;
+			_yoffset = diffHeight/2.0;
+		}
+	}
+
+	// TODO: have a generic set_matrix ?
+	_renderer->set_scale(_xscale, _yscale);
+	_renderer->set_translation(_xoffset, _yoffset);
+
+	// trigger redraw
+	//_redraw_flag |= (_width!=width) || (_height!=height);
+	_redraw_flag = true; // this fixes bug #21971
+
+
+	if ( _stage ) display(_stage);
+}
+
+
+void
 Gui::resize_view(int width, int height)
 {
 	GNASH_REPORT_FUNCTION;
@@ -236,69 +301,13 @@ Gui::resize_view(int width, int height)
 			_stage->set_display_viewport(0, 0, width, height);
 		}
 
-		float swfwidth = _movieDef->get_width_pixels();
-		float swfheight = _movieDef->get_height_pixels();
-
-		if ( _stage && _stage->isRescalingAllowed() )
-		{
-
-			// set new scale value ( user-pixel / pseudo-pixel )
-			_xscale = width / swfwidth;
-			_yscale = height / swfheight;
-			
-			// always scale proportionally
-			if (_xscale < _yscale) _yscale = _xscale;
-			else if (_yscale < _xscale) _xscale = _yscale;
-		}
-		else
-		{
-			_xscale = _yscale = 1.0f;
-		}
-
-		_xoffset=0;
-		_yoffset=0;
-
-		// TODO: check Stage.getAlignMode
-		{
-			// Align to center
-
-			// Offsets in pixels
-			float defWidth = swfwidth *= _xscale;
-			float defHeight = swfheight *= _yscale;
-			if ( width > defWidth )
-			{
-				float diffWidth = width-defWidth;
-				_xoffset = diffWidth/2.0;
-			}
-			if ( width > defHeight )
-			{
-				float diffHeight = height-defHeight;
-				_yoffset = diffHeight/2.0;
-			}
-		}
-
-		// TODO: have a generic set_matrix ?
-		_renderer->set_scale(_xscale, _yscale);
-		_renderer->set_translation(_xoffset, _yoffset);
-
 	}
-	else
-	{
-		//log_debug(_("Resize request received while there's still"
-		//	" no movie loaded, can't correctly set movie scale"));
-	}
-	
-	// trigger redraw
-	//_redraw_flag |= (_width!=width) || (_height!=height);
-	_redraw_flag = true; // this fixes bug #21971
 
-	// set new size ?
 	_width = width;
 	_height = height;
 	_validbounds.setTo(0, 0, _width-1, _height-1);
-	//log_debug(_("new size (in twips) is: %dx%d"), _width*20, _height*20); 
 
-	if ( _stage ) display(_stage);
+	updateStageMatrix();
 }
 
 void

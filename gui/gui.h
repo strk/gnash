@@ -219,6 +219,14 @@ public:
     /// @param height The desired height in pixels.
     void resize_view(int width, int height);
 
+    /// Update stage matrix accordingly to window size and flash Stage
+    /// configuration (scaleMode, alignment)
+    //
+    /// This method should be called from the core lib when Stage configuration
+    /// change or is called by resize_view.
+    ///
+    void updateStageMatrix();
+
     /// \brief
     /// Advances the movie to the next frame. This is to take place after the
     /// interval specified in the call to setInterval().

@@ -536,6 +536,12 @@ Player::interfaceEventCallback(const std::string& event, const std::string& arg)
         else if (arg == "normal") _gui->unsetFullscreen();
         return "";
     }
+
+    if (event == "Stage.scaleMode" || event == "Stage.align" )
+    {
+        _gui->updateStageMatrix();
+        return "";
+    }
     
     if (event == "System.capabilities.screenResolutionX")
     {
