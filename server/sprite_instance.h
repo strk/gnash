@@ -357,35 +357,9 @@ public:
 	/// Any successful new placement triggers invokation of the newly created
 	/// instance's LOAD event.
 	///
-	///
-	/// character_id
-	///	The ID of the character to be added.
-	///	It will be seeked in the CharacterDictionary
-	///
-	/// name
-	///	The name to give to the newly created instance.
-	///	If NULL, the new instance will be assigned a sequential
-	///	name in the form 'instanceN', where N is incremented
-	///	at each call, starting from 1.
-	///
-	/// event_handlers
-	///
-	/// depth
-	///	The depth to assign to the newly created instance.
-	///
-	/// color_transform
-	///	The color transform to apply to the newly created instance.
-	///
-	/// matrix
-	///	The matrix transform to apply to the newly created instance.
-	///
-	/// ratio
-	///
-	/// clip_depth
-	///	If != character::noClipDepthValue, mark the created instance
-	///	as a clipping layer. The shape of the placed character will be
-	///	used as a mask for all higher depths up to this value.
-	///	TODO: assert(clip_depth > depth) ?
+	/// @param tag
+	/// A swf defined placement tag(PlaceObject, or PlaceObject2, or PlaceObject3)
+	/// No ownership transfer, the tag is still owned by the movie_definition class.
 	///
 	/// @return 
 	///	A pointer to the character being added or NULL

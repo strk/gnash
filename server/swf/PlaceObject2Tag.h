@@ -44,6 +44,8 @@ namespace SWF {
 
 /// SWF Tag PlaceObject (4) or PlaceObject2 (9) 
 //
+/// This tag is owned by the movie_definiton class
+///
 /// The PlaceObject tags can be used to:
 /// - Place a character to a depth. See isPlace().
 /// - Transform the character placed at a depth. See isMove().
@@ -52,6 +54,35 @@ namespace SWF {
 /// In any case a single Timeline depth is affected.
 /// Postcondition of this tag execution is presence of an instance
 /// at the affected depth. See getDepth().
+///
+///
+/// m_character_id:
+///	The ID of the character to be added.
+///	It will be seeked in the CharacterDictionary.
+///
+/// m_name:
+///	The name to give to the newly created instance if m_has_name is true.
+///	If m_has_name is false, the new instance will be assigned a sequential
+///	name in the form 'instanceN', where N is incremented
+///	at each call, starting from 1.
+///
+/// event_handlers
+///
+/// m_depth:
+///	The depth to assign to the newly created instance.
+///
+/// m_color_transform:
+///	The color transform to apply to the newly created instance.
+///
+/// m_matrix:
+///	The matrix transform to apply to the newly created instance.
+///
+/// m_ratio
+///
+/// m_clip_depth:
+///	If != character::noClipDepthValue, mark the created instance
+///	as a clipping layer. The shape of the placed character will be
+///	used as a mask for all higher depths up to this value.
 ///
 class PlaceObject2Tag : public DisplayListTag
 {
