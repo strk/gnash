@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Inheritance.as,v 1.57 2008/03/27 17:55:43 strk Exp $";
+rcsid="$Id: Inheritance.as,v 1.58 2008/04/24 16:39:22 strk Exp $";
 #include "check.as"
 
 check_equals(typeof(Object.prototype.constructor), 'function');
@@ -126,6 +126,8 @@ function TypeChanger(changeit)
 #if OUTPUT_VERSION > 5
 check_equals(TypeChanger.__proto__, Function.prototype);
 #endif
+
+xcheck(! TypeChanger.prototype instanceof TypeChanger);
 
 o1 = new TypeChanger(false);
 check_equals(o1.__proto__, TypeChanger.prototype);
@@ -523,7 +525,7 @@ check(t4 instanceOf Test4);
 check(! t4 instanceOf Test5);
 
 #if OUTPUT_VERSION < 6
- check_totals(101); // SWF5
+ check_totals(102); // SWF5
 #else
- check_totals(158); // SWF6,7,8
+ check_totals(159); // SWF6,7,8
 #endif

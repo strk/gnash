@@ -1,5 +1,10 @@
 2008-04-24 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Inheritance.as:
+	  Add a failing test for 'instanceof'.
+
+2008-04-24 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-mtasc.all/implementsOpTest.as: 
 	  Test instanceof when interfaces are involved
 	  (gnash fails!)
