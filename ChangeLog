@@ -1,5 +1,11 @@
 2008-04-24 Zou Lunkai <zoulunkai@gmail.com>
 
+	* server/sprite_instance.cpp, server/BitmapMovieInstance.cpp:
+	  set ratio value of dynamic characters to zero. All dynamic
+	  characters' ratio should be default to zero in theory.
+	
+2008-04-24 Zou Lunkai <zoulunkai@gmail.com>
+
 	* server/dlist.{h,cpp}: place_character(), simplify the interface, 
 	  drop some unnecessary args.
 	* server/sprite_instance.{h,cpp}, server/BitmapMovieInstance.cpp, 
