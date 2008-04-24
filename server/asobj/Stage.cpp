@@ -45,6 +45,7 @@ as_value stage_width_getset(const fn_call& fn);
 as_value stage_height_getset(const fn_call& fn);
 as_value stage_displaystate_getset(const fn_call& fn);
 
+
 static void
 attachStageInterface(as_object& o)
 {
@@ -106,6 +107,7 @@ attachStageInterface(as_object& o)
 
 }
 
+
 Stage::Stage()
 	:
 	as_object(getObjectInterface()),
@@ -114,12 +116,13 @@ Stage::Stage()
 {
 	attachStageInterface(*this);
 
-	int swfversion = _vm.getSWFVersion();
+	const int swfversion = _vm.getSWFVersion();
 	if ( swfversion > 5 )
 	{
 		AsBroadcaster::initialize(*this);
 	}
 }
+
 
 void
 Stage::onResize()
@@ -131,6 +134,7 @@ Stage::onResize()
 	}
 }
 
+
 void
 Stage::notifyResize()
 {
@@ -140,33 +144,6 @@ Stage::notifyResize()
 
 /// Expected behaviour is that the original movie size is aways returned
 /// as long as scaling is allowed.
-unsigned int
-Stage::getWidth() const
-{
-
-    movie_root& m = VM::get().getRoot();
-
-    if (m.getScaleMode() == movie_root::noScale)
-    {
-        return m.getWidth();    
-    }
-    return static_cast<unsigned int>(m.get_movie_definition()->get_width_pixels());
-	
-}
-
-unsigned int
-Stage::getHeight() const
-{
-
-    movie_root& m = VM::get().getRoot();
-
-    if (m.getScaleMode() == movie_root::noScale)
-    {
-        return m.getHeight();    
-    }
-    return static_cast<unsigned int>(m.get_movie_definition()->get_height_pixels());
-
-}
 
 const char*
 Stage::getDisplayStateString()
@@ -177,6 +154,7 @@ Stage::getDisplayStateString()
 
 	return displayStateName[_displayState];
 }
+
 
 const char*
 Stage::getScaleModeString()
@@ -192,15 +170,6 @@ Stage::getScaleModeString()
 	return modeName[m.getScaleMode()];
 }
 
-void
-Stage::setScaleMode(movie_root::ScaleMode mode)
-{
-    movie_root& m = VM::get().getRoot();
-
-	if ( m.getScaleMode() == mode ) return; // nothing to do
-
-	m.setScaleMode(mode);
-}
 
 void
 Stage::setDisplayState(DisplayState state)
@@ -221,6 +190,7 @@ Stage::setDisplayState(DisplayState state)
 	}
 
 }
+
 
 void
 Stage::setAlignMode(const std::string& mode)
@@ -277,7 +247,11 @@ as_value stage_scalemode_getset(const fn_call& fn)
 		else if ( str == "exactFit" ) mode = movie_root::exactFit;
 		else if ( str == "noBorder" ) mode = movie_root::noBorder;
 
-		stage->setScaleMode(mode);
+        movie_root& m = VM::get().getRoot();
+
+        if ( m.getScaleMode() == mode ) return as_value(); // nothing to do
+
+	    m.setScaleMode(mode);
 		return as_value();
 	}
 }
@@ -286,37 +260,40 @@ as_value
 stage_width_getset(const fn_call& fn)
 {
 	boost::intrusive_ptr<Stage> stage = ensureType<Stage>(fn.this_ptr);
+	UNUSED(stage);
 
-	if ( fn.nargs == 0 ) // getter
-	{
-		return as_value(stage->getWidth());
-	}
-	else // setter
+	if ( fn.nargs > 0 ) // setter
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("Stage.width is a read-only property!"));
 		);
 		return as_value();
 	}
+
+    // getter
+    movie_root& m = VM::get().getRoot();
+    return as_value(m.getStageWidth());
 }
 
 as_value
 stage_height_getset(const fn_call& fn)
 {
 	boost::intrusive_ptr<Stage> stage = ensureType<Stage>(fn.this_ptr);
+	UNUSED(stage);
 
-	if ( fn.nargs == 0 ) // getter
-	{
-		return as_value(stage->getHeight());
-	}
-	else // setter
+	if ( fn.nargs > 0 ) // setter
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("Stage.height is a read-only property!"));
 		);
 		return as_value();
 	}
+
+    // getter
+    movie_root& m = VM::get().getRoot();
+    return as_value(m.getStageHeight());
 }
+
 
 as_value
 stage_align_getset(const fn_call& fn)

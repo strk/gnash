@@ -962,6 +962,28 @@ movie_root::doMouseDrag()
 	dragChar->set_matrix(local);
 }
 
+/// Get current viewport width, in pixels
+unsigned int
+movie_root::getStageWidth() const
+{
+    if (_scaleMode == noScale)
+    {
+        return m_viewport_width;    
+    }
+    return static_cast<unsigned int>(get_movie_definition()->get_width_pixels());
+}
+
+/// Get current viewport height, in pixels
+unsigned int
+movie_root::getStageHeight() const
+{
+    if (_scaleMode == noScale)
+    {
+        return m_viewport_height;    
+    }
+    return static_cast<unsigned int>(get_movie_definition()->get_height_pixels());
+}
+
 unsigned int
 movie_root::add_interval_timer(std::auto_ptr<Timer> timer, bool internal)
 {
@@ -1314,17 +1336,16 @@ movie_root::setScaleMode(ScaleMode sm)
         // If we go from or to noScale, we notify a resize
         // if and only if display viewport is != then actual
         // movie size
-	movie_definition* md = _rootMovie->get_movie_definition();
+        movie_definition* md = _rootMovie->get_movie_definition();
 
         log_debug("Going to or from scaleMode=noScale. Viewport:%dx%d Def:%dx%d", m_viewport_width, m_viewport_height, md->get_width_pixels(), md->get_height_pixels());
 
-        if (    m_viewport_width  != md->get_width_pixels()
-	     || m_viewport_height != md->get_height_pixels() )
+        if ( m_viewport_width != md->get_width_pixels()
+             || m_viewport_height != md->get_height_pixels() )
         {
             notifyResize = true;
         }
     }
-  
 
     _scaleMode = sm;
     if (interfaceHandle) (*interfaceHandle)("Stage.align", "");    

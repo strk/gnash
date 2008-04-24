@@ -235,17 +235,15 @@ public:
     ///
     void set_display_viewport(int x0, int y0, int w, int h);
 
-    /// Get current viewport width, in pixels
-    unsigned getWidth() const
-    {
-        return m_viewport_width;
-    }
+    /// \brief
+    /// Return the notional width of the stage, value depending
+    /// on scaleMode
+    unsigned getStageWidth() const;
 
-    /// Get current viewport height, in pixels
-    unsigned getHeight() const
-    {
-        return m_viewport_height;
-    }
+    /// \brief
+    /// Return the notional height of the stage, actual value depending
+    /// on scaleMode
+    unsigned getStageHeight() const;
 
     /// \brief
     /// The host app can use this to tell the movie when
@@ -494,6 +492,7 @@ public:
 
     bool testInvariant() const;
 
+    /// enum for the values of Stage.scaleMode
     enum ScaleMode {
         showAll,
         noScale,
@@ -501,27 +500,34 @@ public:
         noBorder
     };
 
+    /// enum for horizonal position of the Stage
     enum StageHorizontalAlign {
         STAGE_H_ALIGN_C,
         STAGE_H_ALIGN_L,
         STAGE_H_ALIGN_R,
     };
 
-
+    /// enum for vertical position of the Stage
     enum StageVerticalAlign {
         STAGE_V_ALIGN_C,
         STAGE_V_ALIGN_T,       
         STAGE_V_ALIGN_B
-    };    
+    };
 
+    /// Sets movie_root's horizontal and vertical alignment to one
+    /// of the three possible positions for each dimension.
     void setStageAlignment(StageHorizontalAlign v, StageVerticalAlign h);
 
     typedef std::pair<StageHorizontalAlign, StageVerticalAlign> StageAlign;
 
+    /// Returns the current alignment of the stage (left/right/centre, top/
+    /// bottom/centre) as a std::pair
     StageAlign getStageAlignment() const;
 
+    /// Sets the Stage object's align mode.
     void setScaleMode(ScaleMode sm);
     
+    /// Returns the Stage object's align mode.
     ScaleMode getScaleMode() const { return _scaleMode; }
 
     /// Action priority levels

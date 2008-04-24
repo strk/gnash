@@ -1,3 +1,12 @@
+2008-04-24 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/movie_root.{cpp,h}: rename get{Width,Height} to
+	  getStage{Width,Height}. Move implementation of Stage.width and
+	  Stage.height to movie_root. Add docs.
+	* server/asobj/Stage.{h,cpp}: drop class members moved to movie_root.
+	  Handle setScaleMode in the getter/setter (no need for a duplicated
+	  method in the Stage class). Update docs.
+
 2008-04-24 Zou Lunkai <zoulunkai@gmail.com>
 
 	* server/sprite_instance.cpp, server/BitmapMovieInstance.cpp:

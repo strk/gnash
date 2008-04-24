@@ -28,9 +28,14 @@ namespace gnash {
 
 /// This is the Stage ActionScript object.
 //
-/// It is currently not used as it should, in particular
-/// it should control resize behaviour, while it's not.
+/// Some Stage methods are implemented in movie_root, because
+/// it provides the interface to the Gui and/or all the values
+/// required are necessarily in movie_root:
 ///
+/// - scaleMode
+/// - width
+/// - height
+
 class Stage: public as_object
 {
 
@@ -41,29 +46,13 @@ public:
 		fullScreen
 	};
 
-
 	Stage();
-
-	// override from as_object ?
-	//std::string get_text_value() const { return "Stage"; }
-
-	// override from as_object ?
-	//double get_numeric_value() const { return 0; }
 	
-	/// Recive a resize event.
+	/// Receive a resize event.
 	void onResize();
 
 	/// Notify all listeners about a resize event
 	void notifyResize();
-
-	/// Get current stage width, in pixels
-	unsigned getWidth() const;
-
-	/// Get current stage height, in pixels
-	unsigned getHeight() const;
-
-	/// Set scale mode 
-	void setScaleMode(movie_root::ScaleMode mode);
 
 	/// \brief
 	/// Return the string representation for current
