@@ -66,6 +66,7 @@
 #include "rc.h"
 #include "ClassHierarchy.h"
 #include "namedStrings.h"
+#include "tu_math.h" // for isfinite replacement
 
 #include "fn_call.h"
 #include "sprite_instance.h"

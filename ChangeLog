@@ -1,9 +1,13 @@
+2008-04-24 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/asobj/Global.cpp: include tu_math.h for isfinite on
+	  windows.
+
 2008-04-24 Zou Lunkai <zoulunkai@gmail.com>
 	
 	* server/dlist.{h,cpp}: replace_character(), simplify the interface, 
 	  drop some unnecessary args.
 	* server/sprite_instance.{h,cpp}: adopt the new interface.
-	  
 	
 2008-04-24 Sandro Santilli <strk@keybit.net>
 
