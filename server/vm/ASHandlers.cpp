@@ -1439,11 +1439,21 @@ SWFHandlers::ActionImplementsOp(ActionExec& thread)
 		);
 		return;
 	}
-	obj = obj->get_prototype().get();
-	if (!obj)
+
+	as_value protoval;
+	if ( ! obj->get_member(NSV::PROP_PROTOTYPE, &protoval) )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("Target object for IMPLEMENTSOP has no prototype."));
+		);
+		return;
+	}
+	obj = protoval.to_object().get();
+	if (!obj)
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("IMPLEMENTSOP target object's prototype is not an object (%s)"),
+			protoval.to_debug_string());
 		);
 		return;
 	}
@@ -1459,16 +1469,38 @@ SWFHandlers::ActionImplementsOp(ActionExec& thread)
 	thread.ensureStack(count);
 	while (count--)
 	{
-		as_value funval = env.pop();
-		as_function* fun = funval.to_as_function();
-		if ( ! fun )
+		as_value ctorval = env.pop();
+
+		as_object* ctor = ctorval.to_object().get();
+		if ( ! ctor )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror(_("class found on stack on IMPLEMENTSOP is not a function: %s"), funval.to_debug_string().c_str());
+			log_aserror(_("class found on stack on IMPLEMENTSOP is not an object: %s"), ctorval.to_debug_string());
 			);
 			continue;
 		}
-		as_object *inter = fun->getPrototype().get();
+		if ( ! ctor->get_member(NSV::PROP_PROTOTYPE, &protoval) )
+		{
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror(_("Interface object for IMPLEMENTSOP has no prototype."));
+			);
+			continue;
+		}
+		as_object *inter = protoval.to_object().get();
+		if ( ! inter )
+		{
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror(_("Prototype of interface object for IMPLEMENTSOP is not an object (%s)."),
+				protoval.to_debug_string());
+			);
+			continue;
+		}
+
+		IF_VERBOSE_ACTION(
+		log_action("%s (with .prototype %p) implements %s (with .prototype %p)",
+			objval.to_debug_string(), (void*)obj, ctorval.to_debug_string(),
+			(void*)inter);
+		);
 		obj->add_interface(inter);
 	}
 }
@@ -3736,15 +3768,15 @@ SWFHandlers::ActionInstanceOf(ActionExec& thread)
     thread.ensureStack(2); // super, instance
 
     // Get the "super" function
-    as_function* super = env.top(0).to_as_function();
+    as_object* super = env.top(0).to_object().get();
 
     // Get the "instance" (but avoid implicit conversion of primitive values!)
-    boost::intrusive_ptr<as_object> instance = env.top(1).is_object() ? env.top(1).to_object() : NULL;
+    as_object* instance = env.top(1).is_object() ? env.top(1).to_object().get() : NULL;
 
     // Invalid args!
     if (!super || ! instance) {
-        IF_VERBOSE_ACTION(
-        log_action(_("-- %s instanceof %s (invalid args?)"),
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("-- %s instanceof %s (invalid args?)"),
                 env.top(1).to_debug_string().c_str(),
                 env.top(0).to_debug_string().c_str());
         );

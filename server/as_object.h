@@ -839,12 +839,12 @@ public:
 
 	/// \brief
 	/// Check whether this object is an instance of the given
-	/// as_function constructor
+	/// constructor
 	//
 	/// NOTE: built-in classes should NOT be C_FUNCTIONS for this to
 	/// work
 	///
-	bool instanceOf(as_function* ctor);
+	bool instanceOf(as_object* ctor);
 
 	/// \brief
 	/// Check whether this object is a 'prototype' in the given

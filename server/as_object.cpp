@@ -873,25 +873,66 @@ as_object::add_interface(as_object* obj)
 }
 
 bool
-as_object::instanceOf(as_function* ctor)
+as_object::instanceOf(as_object* ctor)
 {
-	if (this == ctor->getPrototype())
-		return true;
+//#define GNASH_DEBUG_INSTANCE_OF 1
 
-	if (!mInterfaces.empty())
+	as_value protoVal;
+	if ( ! ctor->get_member(NSV::PROP_PROTOTYPE, &protoVal) )
 	{
-		// TODO: Make this work.
-		if (std::find(mInterfaces.begin(), mInterfaces.end(), ctor->getPrototype()) != mInterfaces.end())
-		{
-			return true;
-		}
+#ifdef GNASH_DEBUG_INSTANCE_OF
+		log_debug("Object %p can't be an instance of an object (%p) w/out 'prototype'",
+			(void*)this, (void*)ctor);
+#endif
+		return false;
+	}
+	as_object* ctorProto = protoVal.to_object().get();
+	if ( ! ctorProto )
+	{
+#ifdef GNASH_DEBUG_INSTANCE_OF
+		log_debug("Object %p can't be an instance of an object (%p) with non-object 'prototype' (%s)",
+			(void*)this, (void*)ctor, protoVal.to_debug_string());
+#endif
+		return false;
 	}
 
-	as_object *proto = this->get_prototype().get();
-	if (proto)
-		return proto->instanceOf(ctor);
-	else
-		return false;
+	// TODO: cleanup the iteration, make it more readable ...
+
+	std::set< as_object* > visited;
+
+	as_object* obj = this;
+	while (obj && visited.insert(obj).second )
+	{
+		as_object* thisProto = obj->get_prototype().get();
+		if ( ! thisProto )
+		{
+			break;
+		}
+
+		// Check our proto
+		if ( thisProto == ctorProto )
+		{
+#ifdef GNASH_DEBUG_INSTANCE_OF
+			log_debug("Object %p is an instance of constructor %p as the constructor exposes our __proto__ %p",
+				(void*)obj, (void*)ctor, (void*)thisProto);
+#endif
+			return true;
+		}
+
+		// Check our proto interfaces
+		if (std::find(thisProto->mInterfaces.begin(), thisProto->mInterfaces.end(), ctorProto) != thisProto->mInterfaces.end())
+		{
+#ifdef GNASH_DEBUG_INSTANCE_OF
+			log_debug("Object %p __proto__ %p had one interface matching with the constructor prototype %p",
+				(void*)obj, (void*)thisProto, (void*)ctorProto);
+#endif
+			return true;
+		}
+
+		obj = thisProto;
+	}
+
+	return false;
 }
 
 bool

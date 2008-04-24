@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Inheritance.as,v 1.60 2008/04/24 20:13:33 strk Exp $";
+rcsid="$Id: Inheritance.as,v 1.61 2008/04/24 20:16:18 strk Exp $";
 #include "check.as"
 
 check_equals(typeof(Object.prototype.constructor), 'function');
@@ -127,7 +127,7 @@ function TypeChanger(changeit)
 check_equals(TypeChanger.__proto__, Function.prototype);
 #endif
 
-xcheck(! TypeChanger.prototype instanceof TypeChanger);
+check(! TypeChanger.prototype instanceof TypeChanger);
 
 o1 = new TypeChanger(false);
 check_equals(o1.__proto__, TypeChanger.prototype);
@@ -547,7 +547,7 @@ asm {
 ob = {};
 check (! ob instanceof A ); 
 ob.__proto__ = B.prototype;
-xcheck (  ob instanceof A ); 
+check (  ob instanceof A ); 
 
 // Set A.prototype as a prototype of another object
 // and see if now ob results an instance of that other
@@ -555,7 +555,7 @@ xcheck (  ob instanceof A );
 C = {};
 check (! ob instanceof C ); 
 C.prototype = A.prototype;
-xcheck (  ob instanceof C ); 
+check (  ob instanceof C ); 
 
 a = {}; b = {};
 a.__proto__ = b;

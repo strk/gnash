@@ -36,27 +36,27 @@ class implementsOpTest {
 	
 	function test_all():Void {
 
-		xcheck(!ImplementationA instanceof SimpleInterface);
+		check(!ImplementationA instanceof SimpleInterface);
 		check(!ImplementationA.prototype instanceof SimpleInterface);
-		xcheck(!ImplementationB instanceof SimpleInterface);
+		check(!ImplementationB instanceof SimpleInterface);
 		check(!ImplementationA.prototype instanceof SimpleInterface);
 		check(!BExtendingImplementation instanceof ImplementationB);
 		check(BExtendingImplementation.prototype instanceof ImplementationB);
-		xcheck(BExtendingImplementation.prototype instanceof SimpleInterface);
+		check(BExtendingImplementation.prototype instanceof SimpleInterface);
 
 		objectA = new ImplementationA();
 		objectB = new ImplementationB();
 		objectC = new BExtendingImplementation();
 
 		check(objectA instanceof ImplementationA);
-		xcheck(objectA instanceof SimpleInterface);
+		check(objectA instanceof SimpleInterface);
 
 		check(objectB instanceof ImplementationB);
-		xcheck(objectB instanceof SimpleInterface);
+		check(objectB instanceof SimpleInterface);
 
 		check(objectC instanceof BExtendingImplementation);
 		check(objectC instanceof ImplementationB);
-		xcheck(objectC instanceof SimpleInterface);
+		check(objectC instanceof SimpleInterface);
 	
 
 		// TODO: review the tests below

@@ -1,5 +1,21 @@
 2008-04-24 Sandro Santilli <strk@keybit.net>
 
+	* server/as_object.{cpp,h} (instanceOf): don't consider
+	  ourself as a prototype, use our __proto__ to check
+	  for inheritance and interfaces instead. Accept generic
+	  as_object, not just functions.
+	* server/vm/ASHandlers.cpp (ActionImplementsOp):
+	  Interfaces must be registered to 'prototype', not '__proto__'
+	  of the target. (ActionInstanceOf): don't insist for the constructor
+	  argument to be a function, logaserror for aserrors...
+	* testsuite/misc-mtasc.all/implementsOpTest.as: no more failures here.
+	* testsuite/actionscript.all/Inheritance.as: no more failures about
+	  IMPLEMENTSOP / instanceof.
+	* testsuite/swfdec/PASSING: implements.as succeeds in all versions,
+	  instance-of-propflags succeeds in versions 5,8,9 (fails in 6,7)
+
+2008-04-24 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/Inheritance.as:
 	  Don't run 'implementsop' tests if Ming doesn't
 	  support it. Add a test to ensure we don't
