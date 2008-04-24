@@ -31,10 +31,14 @@
 #include <cassert>
 #include <cmath>
 #include <string>
+#include <memory>
+#include <boost/scoped_ptr.hpp>
 
 #include "check.h"
 
 using namespace gnash;
+using namespace std;
+using namespace boost;
 
 int
 main(int /*argc*/, char** /*argv*/)
@@ -42,7 +46,10 @@ main(int /*argc*/, char** /*argv*/)
 	std::cout << "sizeof(as_value): " << (sizeof(as_value)) << std::endl;
 
 	std::cout << "sizeof(Property): " << (sizeof(Property)) << std::endl;
+	std::cout << "sizeof(Property*): " << (sizeof(Property*)) << std::endl;
 	std::cout << "sizeof(PropertyList): " << (sizeof(PropertyList)) << std::endl;
+	std::cout << "sizeof(auto_ptr<PropertyList>): " << (sizeof(auto_ptr<PropertyList>)) << std::endl;
+	std::cout << "sizeof(scoped_ptr<PropertyList>): " << (sizeof(scoped_ptr<PropertyList>)) << std::endl;
 
 	std::cout << "sizeof(GcResource): " << (sizeof(GcResource)) << std::endl;
 	std::cout << "sizeof(as_object): " << (sizeof(as_object)) << std::endl;

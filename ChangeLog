@@ -1,3 +1,8 @@
+2008-04-24 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/server/ClassSizes.cpp: print sizeof Property* and
+	  smartptr<PropertyList>
+
 2008-04-24 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/movie_root.{cpp,h}: rename get{Width,Height} to
