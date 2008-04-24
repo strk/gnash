@@ -46,6 +46,9 @@ main(int /*argc*/, char** /*argv*/)
 	std::cout << "sizeof(int): " << (sizeof(int)) << std::endl;
 	std::cout << "sizeof(float): " << (sizeof(float)) << std::endl;
 
+	std::cout << "sizeof(long): " << (sizeof(long)) << std::endl;
+	std::cout << "sizeof(double): " << (sizeof(double)) << std::endl;
+
 	std::cout << "sizeof(as_value): " << (sizeof(as_value)) << std::endl;
 
 	std::cout << "sizeof(Property): " << (sizeof(Property)) << std::endl;
