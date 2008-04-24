@@ -397,7 +397,7 @@ Gui::resize_view(int width, int height)
 
 	updateStageMatrix();
 
-	if ( _stage ) display(_stage);
+	if ( _stage && _started ) display(_stage);
 }
 
 void
