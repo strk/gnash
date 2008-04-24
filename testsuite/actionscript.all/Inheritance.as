@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Inheritance.as,v 1.58 2008/04/24 16:39:22 strk Exp $";
+rcsid="$Id: Inheritance.as,v 1.59 2008/04/24 18:29:46 strk Exp $";
 #include "check.as"
 
 check_equals(typeof(Object.prototype.constructor), 'function');
@@ -524,8 +524,43 @@ check(! t5 instanceOf Test4);
 check(t4 instanceOf Test4);
 check(! t4 instanceOf Test5);
 
+//------------------------------------------------
+// Test implements op
+//------------------------------------------------
+
+A = {};
+A.prototype = {}; // need a prototype to set as interface of B.prototype
+B = {};
+B.prototype = {}; // need a prototype to register interfaces on
+
+asm {
+	push "A"
+	getvariable
+	push 1 // 1 interface to register
+	push "B"
+	getvariable
+	implements // will register A.prototype as an interface of B.prototype 
+};
+
+ob = {};
+check (! ob instanceof A ); 
+ob.__proto__ = B.prototype;
+xcheck (  ob instanceof A ); 
+
+// Set A.prototype as a prototype of another object
+// and see if now ob results an instance of that other
+// object.. (it is)
+C = {};
+check (! ob instanceof C ); 
+C.prototype = A.prototype;
+xcheck (  ob instanceof C ); 
+
+//------------------------------------------------
+// END OF TEST
+//------------------------------------------------
+
 #if OUTPUT_VERSION < 6
- check_totals(102); // SWF5
+ check_totals(106); // SWF5
 #else
- check_totals(159); // SWF6,7,8
+ check_totals(163); // SWF6,7,8
 #endif
