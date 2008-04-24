@@ -3212,13 +3212,13 @@ sprite_instance::add_display_object(const SWF::PlaceObject2Tag* tag)
             ch->add_event_handler(ev->event(), ev->action());
         }
 
-		// TODO: check if we should check those has_xxx flags first.
-		ch->set_cxform(tag->getCxform());
-		ch->set_matrix(tag->getMatrix());
-		ch->set_ratio(tag->getRatio());
-		ch->set_clip_depth(tag->getClipDepth());
-		
-		dlist.place_character(ch.get(), tag->getDepth());
+        // TODO: check if we should check those has_xxx flags first.
+        ch->set_cxform(tag->getCxform());
+        ch->set_matrix(tag->getMatrix());
+        ch->set_ratio(tag->getRatio());
+        ch->set_clip_depth(tag->getClipDepth());
+        
+        dlist.place_character(ch.get(), tag->getDepth());
 
         return ch.get();
   }
@@ -3265,32 +3265,32 @@ void sprite_instance::replace_display_object(const SWF::PlaceObject2Tag* tag)
         {
             boost::intrusive_ptr<character> ch = cdef->create_character_instance(this, tag->getID());
 
-			// TODO: check if we can drop this for REPLACE!
-			// should we rename the character when it's REPLACE tag?
-			if(tag->hasName())
-	        {
-    	        ch->set_name(tag->getName());
-        	}
-	        else if(ch->wantsInstanceName())
-    	    {
-        	    std::string instance_name = getNextUnnamedInstanceName();
-            	ch->set_name(instance_name);
-	        }
-			if(tag->getRatio() != character::noRatioValue)
-			{
-				ch->set_ratio(tag->getRatio());
-			}
-			if(tag->hasCxform())
-			{
-				ch->set_cxform(tag->getCxform());
-			}
-			if(tag->hasMatrix())
-			{
-				ch->set_matrix(tag->getMatrix());
-			}
+            // TODO: check if we can drop this for REPLACE!
+            // should we rename the character when it's REPLACE tag?
+            if(tag->hasName())
+            {
+                ch->set_name(tag->getName());
+            }
+            else if(ch->wantsInstanceName())
+            {
+                std::string instance_name = getNextUnnamedInstanceName();
+                ch->set_name(instance_name);
+            }
+            if(tag->getRatio() != character::noRatioValue)
+            {
+                ch->set_ratio(tag->getRatio());
+            }
+            if(tag->hasCxform())
+            {
+                ch->set_cxform(tag->getCxform());
+            }
+            if(tag->hasMatrix())
+            {
+                ch->set_matrix(tag->getMatrix());
+            }
             replace_display_object(ch.get(), tag->getDepth(), 
-				!tag->hasCxform(), // use matrix from the old character if tag doesn't provide one.
-				!tag->hasMatrix());
+                !tag->hasCxform(), // use matrix from the old character if tag doesn't provide one.
+                !tag->hasMatrix());
         }
     }
     else // non-existing character
@@ -3300,10 +3300,10 @@ void sprite_instance::replace_display_object(const SWF::PlaceObject2Tag* tag)
 }
 
 void sprite_instance::replace_display_object(
-		character* ch,	
-		int depth, 
-		bool use_old_cxform, 
-		bool use_old_matrix)
+        character* ch,  
+        int depth, 
+        bool use_old_cxform, 
+        bool use_old_matrix)
 {
     assert(ch != NULL);
 
