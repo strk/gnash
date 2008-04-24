@@ -41,8 +41,6 @@ BitmapMovieInstance::BitmapMovieInstance(BitmapMovieDefinition* def, character* 
 	boost::intrusive_ptr<character> ch = chdef->create_character_instance(this, 1);
 	
 	int depth = 1+character::staticDepthOffset;
-	// TODO: check why should we set ratio to 1 here instead of default 0?
-	// ch->set_ratio(1);
 	place_character(ch.get(), depth);
 }
 

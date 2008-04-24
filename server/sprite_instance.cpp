@@ -3161,10 +3161,7 @@ void sprite_instance::display()
 
 bool
 sprite_instance::attachCharacter(character& newch, int depth)
-{
-
-	// TODO: check why should we set ratio to 65535 here instead of default 0.  
-	// newch.set_ratio(65536);  
+{ 
 	m_display_list.place_character(&newch, depth);  
 
 	return true; // FIXME: check return from place_character above ?
