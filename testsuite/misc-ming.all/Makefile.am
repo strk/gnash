@@ -1531,6 +1531,9 @@ FlashVarsTest-Runner: $(srcdir)/../generic-testrunner.sh FlashVarsTest.swf Makef
 	echo "$(top_builddir)/gui/gnash -1 -r0 -v -P 'FlashVars=?a=a_in_fvars&v=v_in_fvars&MixCaseFvars=mixFvars&dejagnu.nested=chFVars&_root.fqv=fqFVars&complex={a:'1',b:2}' 'FlashVarsTest.swf?a=a_in_qstring&q=q_in_qstring&MixCaseQstr=mixQstr&dejagnu.nested=chQstr&_root.fqv=fqQstr'" > $@
 	chmod 755 $@
 
+StageConfigTest.swf: $(srcdir)/StageConfigTest.as 
+	$(MAKESWF) -o $@ -s 512x512 $(srcdir)/StageConfigTest.as
+
 init_action_test_SOURCES =	\
 	init_action_test.c	\
 	$(NULL)

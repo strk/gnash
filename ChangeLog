@@ -1,5 +1,7 @@
 2008-04-24 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/Makefile.am: add rule to build
+	  StageConfigTest.swf
 	* gui/gui.cpp (resize_view): don't display if not started.
 
 2008-04-24 Sandro Santilli <strk@keybit.net>
