@@ -35,10 +35,24 @@ class implementsOpTest {
 	}
 	
 	function test_all():Void {
+
 		objectA = new ImplementationA();
 		objectB = new ImplementationB();
 		objectC = new BExtendingImplementation();
+
+		check(objectA instanceof ImplementationA);
+		xcheck(objectA instanceof SimpleInterface);
+
+		check(objectB instanceof ImplementationB);
+		xcheck(objectB instanceof SimpleInterface);
+
+		check(objectC instanceof BExtendingImplementation);
+		check(objectC instanceof ImplementationB);
+		xcheck(objectC instanceof SimpleInterface);
 	
+
+		// TODO: review the tests above
+
 		check_equals(100, objectA.doStuff(1, "foo"));
 		check_equals(100, objectA.doStuff(1, "foo"));
 	
@@ -58,7 +72,7 @@ class implementsOpTest {
 		var myTest = new implementsOpTest;
 		myTest.test_all();
 
-		check_totals(7);
+		check_totals(14);
 		Dejagnu.done();
 	}
 }

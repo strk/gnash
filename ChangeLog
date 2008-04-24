@@ -1,5 +1,11 @@
 2008-04-24 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-mtasc.all/implementsOpTest.as: 
+	  Test instanceof when interfaces are involved
+	  (gnash fails!)
+
+2008-04-24 Sandro Santilli <strk@keybit.net>
+
 	* server/swf/PlaceObject2Tag.h (hasCxform): fix typo
 	  (did return hasMatrix). Fixes bug #23037.
 
