@@ -36,6 +36,14 @@ class implementsOpTest {
 	
 	function test_all():Void {
 
+		xcheck(!ImplementationA instanceof SimpleInterface);
+		check(!ImplementationA.prototype instanceof SimpleInterface);
+		xcheck(!ImplementationB instanceof SimpleInterface);
+		check(!ImplementationA.prototype instanceof SimpleInterface);
+		check(!BExtendingImplementation instanceof ImplementationB);
+		check(BExtendingImplementation.prototype instanceof ImplementationB);
+		xcheck(BExtendingImplementation.prototype instanceof SimpleInterface);
+
 		objectA = new ImplementationA();
 		objectB = new ImplementationB();
 		objectC = new BExtendingImplementation();
@@ -51,7 +59,7 @@ class implementsOpTest {
 		xcheck(objectC instanceof SimpleInterface);
 	
 
-		// TODO: review the tests above
+		// TODO: review the tests below
 
 		check_equals(100, objectA.doStuff(1, "foo"));
 		check_equals(100, objectA.doStuff(1, "foo"));
@@ -65,6 +73,14 @@ class implementsOpTest {
 		check_equals(objectB.doStuff(1, "foo"), objectC.doStuff(1, "foo"));
 	
 		check_equals("overriding implementation", objectC.doMoreStuff("foo", 1));
+
+		// TODO: review the tests above
+
+		// drop the __proto_ member
+		objectA.__proto__ = null;
+		check(! objectA instanceof ImplementationA); // drops relation with its constructor
+		check(! objectA instanceof SimpleInterface); // drops relation with interfaces as well
+
 	}
 
 	static function main(mc)
@@ -72,7 +88,7 @@ class implementsOpTest {
 		var myTest = new implementsOpTest;
 		myTest.test_all();
 
-		check_totals(14);
+		check_totals(23);
 		Dejagnu.done();
 	}
 }

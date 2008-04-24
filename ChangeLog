@@ -1,5 +1,10 @@
 2008-04-24 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-mtasc.all/implementsOpTest.as:
+	  More failing tests.
+
+2008-04-24 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/Inheritance.as:
 	  Add a failing test for 'instanceof'.
 
