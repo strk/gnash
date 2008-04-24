@@ -42,10 +42,6 @@ using namespace gnash;
 int
 main(int /*argc*/, char** /*argv*/)
 {
-	cxform color;
-	matrix mat;
-
-
 	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 	dbglogfile.setVerbosity();
 
