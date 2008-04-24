@@ -368,38 +368,16 @@ public:
 	/// 
 	character* add_display_object(const SWF::PlaceObject2Tag* tag);
 	
-	/// See DisplayList::move_display_object, this method is just a proxy to that...
+	/// Proxy of DisplayList::move_display_object()
 	//
 	void move_display_object(const SWF::PlaceObject2Tag* tag);
 
 	void replace_display_object(const SWF::PlaceObject2Tag* tag);
 
-	///
-	/// @param color_xform
-	///	The color tranform to assign to the new character.
-	///	If NULL the default color transform will be kept.
-	///
-	/// @param ch
-	///	The character instance that should replace the old one.
-	///
-	/// @param name
-	///	The name to give to the new character (ch).
-	///	If NULL, the new instance will be assigned a sequential
-	///	name in the form 'instanceN', where N is incremented
-	///	at each call, starting from 1.
-	///
-	/// @param mat
-	///	The matrix tranform to assign to the new character.
-	///	If NULL the default matrix will be kept.
-	///
-	void	replace_display_object(
-			character* ch,
-			const std::string* name,
-			int depth,
-			const cxform* color_xform,
-			const matrix* mat,
-			int ratio,
-			int clip_depth);
+	// Proxy of DisplayList::replace_character()
+	void replace_display_object(character* ch,	int depth,
+		bool use_old_cxform,
+		bool use_old_matrix);
 
 
 	/// \brief

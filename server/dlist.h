@@ -108,30 +108,28 @@ public:
 
 
 	/// \brief
-	/// Puts a new character at the specified depth, replacing any
-	/// existing character.
+	/// Replace the old character at the specified depth with
+	/// the given new character.
 	//
 	/// Calls unload on the removed character.
 	///
-	/// If use_cxform or use_matrix are false, and a character is
-	/// present at the given depth, then keep those respective
-	/// properties from the existing character.
+	/// @param ch 
+	///	the new character to be put
 	///
-	/// @param color_xform
-	///	The color tranform to assign to the new character.
-	///	If NULL the default color transform will be kept.
-	//
-	/// @param mat
-	///	The matrix tranform to assign to the new character.
-	///	If NULL the default matrix will be kept.
+	/// @param depth 
+	///	depth to be replaced
 	///
-	void replace_character(
-		character* ch,
-		int depth,
-		const cxform* color_xform,
-		const matrix* mat,
-		int ratio,
-		int clip_depth);
+	/// @param use_old_cxform
+	/// true:  set the new character's cxform to the old one.
+	/// false: keep the new character's cxform.
+	///
+	/// @param use_old_matrix
+	/// true:  set the new character's transformation matrix to the old one.
+	/// false: keep the new character's transformation matrix.
+	///
+	void replace_character(character* ch, int depth, 
+		bool use_old_cxform,
+		bool use_old_matrix);
 
 	/// \brief
 	/// Change depth of the given characters in the list,

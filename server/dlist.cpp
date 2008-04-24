@@ -258,12 +258,10 @@ DisplayList::addAll(std::vector<character*>& chars, bool replace)
 
 void
 DisplayList::replace_character(
-  character* ch,
-  int depth,
-  const cxform* color_xform,
-  const matrix* mat,
-  int ratio,
-  int clip_depth)
+	character* ch, 
+	int depth, 
+	bool use_old_cxform,
+	bool use_old_matrix)
 {
   testInvariant();
 
@@ -272,13 +270,6 @@ DisplayList::replace_character(
 
   ch->set_invalidated();
   ch->set_depth(depth);
-  if ( color_xform ) ch->set_cxform(*color_xform);
-  if ( mat ) ch->set_matrix(*mat);
-  if(ratio != character::noRatioValue)
-  {
-    ch->set_ratio(ratio);
-  }
-  ch->set_clip_depth(clip_depth);
 
   // NOTE: currently, ::restart also cleans up all property, which include __proto__ !!
   //       For this reason I commented it out. Since no tests in the testsuite are failing
@@ -293,16 +284,7 @@ DisplayList::replace_character(
 
   if ( it == _charsByDepth.end() || (*it)->get_depth() != depth )
   {
-
-    // Error, no existing object found at depth.
-//    IF_VERBOSE_DEBUG(
-//      log_debug(_("dl::replace_display_object()"
-//        " no obj at depth %d"), depth)
-//    );
-
-    // add the new char
     _charsByDepth.insert(it, di);
-
   }
   else
   {
@@ -311,13 +293,13 @@ DisplayList::replace_character(
 
     InvalidatedRanges old_ranges;
   
-    if (!color_xform)
+    if (use_old_cxform)
     {
       // Use the cxform from the old character.
       ch->set_cxform(oldch->get_cxform());
     }
 
-    if (!mat)
+    if (use_old_matrix)
     {
       // Use the matrix from the old character.
       ch->set_matrix(oldch->get_matrix());

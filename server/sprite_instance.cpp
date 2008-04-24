@@ -3264,15 +3264,33 @@ void sprite_instance::replace_display_object(const SWF::PlaceObject2Tag* tag)
         else
         {
             boost::intrusive_ptr<character> ch = cdef->create_character_instance(this, tag->getID());
-   
-            replace_display_object(
-                ch.get(), 
-                tag->hasName() ? &tag->getName() : NULL,
-                tag->getDepth(),
-                tag->hasCxform() ? &tag->getCxform() : NULL,
-                tag->hasMatrix() ? &tag->getMatrix() : NULL,
-                tag->getRatio(), 
-                tag->getClipDepth());
+
+			// TODO: check if we can drop this for REPLACE!
+			// should we rename the character when it's REPLACE tag?
+			if(tag->hasName())
+	        {
+    	        ch->set_name(tag->getName());
+        	}
+	        else if(ch->wantsInstanceName())
+    	    {
+        	    std::string instance_name = getNextUnnamedInstanceName();
+            	ch->set_name(instance_name);
+	        }
+			if(tag->getRatio() != character::noRatioValue)
+			{
+				ch->set_ratio(tag->getRatio());
+			}
+			if(tag->hasCxform())
+			{
+				ch->set_cxform(tag->getCxform());
+			}
+			if(tag->hasMatrix())
+			{
+				ch->set_matrix(tag->getMatrix());
+			}
+            replace_display_object(ch.get(), tag->getDepth(), 
+				!tag->hasCxform(), // use matrix from the old character if tag doesn't provide one.
+				!tag->hasMatrix());
         }
     }
     else // non-existing character
@@ -3282,38 +3300,16 @@ void sprite_instance::replace_display_object(const SWF::PlaceObject2Tag* tag)
 }
 
 void sprite_instance::replace_display_object(
-        character* ch,
-        const std::string* name,
-        int depth,
-        const cxform* color_transform,
-        const matrix* mat,
-        int ratio,
-        int clip_depth)
+		character* ch,	
+		int depth, 
+		bool use_old_cxform, 
+		bool use_old_matrix)
 {
-    //printf("%s: character %s, id is %d\n", __FUNCTION__, name, ch->get_id()); // FIXME:
-
     assert(ch != NULL);
 
-    if (name)
-    {
-	ch->set_name(*name);
-    }
-    else if(ch->wantsInstanceName())
-    {
-	std::string instance_name = getNextUnnamedInstanceName();
-	ch->set_name(instance_name);
-    }
+    DisplayList& dlist = const_cast<DisplayList &>( getDisplayList() );
 
-  DisplayList& dlist = const_cast<DisplayList &>( getDisplayList() );
-
-    dlist.replace_character(
-    ch,
-    depth,
-    color_transform,
-    mat,
-    ratio,
-    clip_depth);
-    
+    dlist.replace_character(ch, depth, use_old_cxform, use_old_matrix);
 }
 
 int sprite_instance::get_id_at_depth(int depth)
@@ -4203,26 +4199,22 @@ sprite_instance::loadMovie(const URL& url, const std::string* postdata)
     save_extern_movie(extern_movie.get());
 
     const std::string& name = get_name();
-    int depth = get_depth();
-    bool use_cxform = false;
-    cxform color_transform = get_cxform();
-    bool use_matrix = false;
-    matrix mat = get_matrix();
-    int ratio = get_ratio();
-    int clip_depth = get_clip_depth();
-
     assert ( parent == extern_movie->get_parent() );
 
     sprite_instance* parent_sp = parent->to_movie();
     assert(parent_sp);
+	if( !name.empty() )
+	{
+		// TODO: check empty != none...
+		extern_movie->set_name(name);
+	}
+	extern_movie->set_clip_depth(get_clip_depth());
+	
     parent_sp->replace_display_object(
            extern_movie.get(),
-           name.empty() ? NULL : &name, // TODO: check empty != none...
-           depth,
-           use_cxform ? &color_transform : NULL,
-           use_matrix ? &mat : NULL,
-           ratio,
-           clip_depth);
+           get_depth(),
+           true, 
+           true);
   }
   else
   {
