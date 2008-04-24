@@ -204,9 +204,10 @@ Stage::setAlignMode(const std::string& mode)
 
     // Order: LTRB. L and T take precedence.
 
-    for (std::string::const_reverse_iterator it = _alignMode.rbegin();
-        it != _alignMode.rend();
-        ++it)
+    for (std::string::const_reverse_iterator it = _alignMode.rbegin(),
+         e = _alignMode.rend();
+         it != e;
+         ++it)
     {
         switch (*it)
         {

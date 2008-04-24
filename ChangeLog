@@ -2,6 +2,8 @@
 
 	* server/asobj/Global.cpp: include tu_math.h for isfinite on
 	  windows.
+	* server/asobj/Stage.cpp: try to fix what looks like a compiler
+	  bug on MinGW.
 
 2008-04-24 Zou Lunkai <zoulunkai@gmail.com>
 	
