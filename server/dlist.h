@@ -87,7 +87,7 @@ public:
 	friend std::ostream& operator<< (std::ostream&, const DisplayList&);
 
 	/// \brief
-	/// Place a new character in this display list
+	/// Place a new character at the specified depth depth,
 	/// replacing any other char at the same depth.
 	//
 	/// If a character is replaced, it's unload() method
@@ -104,29 +104,8 @@ public:
 	///	depth to be assign to the character
 	///	using character::set_depth
 	///
-	/// @param color_xform
-	///	Color transform to be applied to the character
-	///	using character::set_cxform
-	///
-	/// @param mat
-	///	matrix to be assigned to the character
-	///	using character::set_matrix
-	///
-	/// @param ratio
-	///	ratio (scale?) to be assigned to the character
-	///	using character::set_ratio
-	///
-	/// @param clip_depth
-	///	clip_depth (?) to be assigned to the character
-	///	using character::set_clip_depth
-	///
-	void	place_character(
-		character* ch,
-		int depth,
-		const cxform& color_xform,
-		const matrix& mat,
-		int ratio,
-		int clip_depth);
+	void	place_character(character* ch, int depth);
+
 
 	/// \brief
 	/// Puts a new character at the specified depth, replacing any

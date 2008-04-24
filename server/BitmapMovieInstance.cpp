@@ -33,20 +33,19 @@ namespace gnash {
 BitmapMovieInstance::BitmapMovieInstance(BitmapMovieDefinition* def, character* parent)
 	:
 	movie_instance(def, parent)
-{
-	matrix mat;
-	//mat.concatenate_scale(20.0);
-  
+{  
 	// We need to assign a character id to the instance, or an assertion
 	// will fail in character.cpp (parent==NULL || id != -1)
 	character_def* chdef = def->get_character_def(1); 
 	assert(chdef);
 	boost::intrusive_ptr<character> ch = chdef->create_character_instance(this, 1);
-	//log_debug("Created char in BitmapMovieInstance is a %s", typeid(*ch).name());
+	
 	int depth = 1+character::staticDepthOffset;
-	int clip_depth = character::noClipDepthValue;
-	place_character(ch.get(), depth, cxform(), mat, 1, clip_depth);
+	// TODO: check why should we set ratio to 1 here instead of default 0?
+	ch->set_ratio(1);
+	place_character(ch.get(), depth);
 }
 
 
 } // namespace gnash
+

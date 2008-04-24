@@ -980,11 +980,9 @@ private:
 
 protected:
 
-	void place_character(character* ch, int depth,
-			const cxform& color_transform, const matrix& mat,
-			int ratio, int clip_depth)
-	{
-		m_display_list.place_character(ch, depth, color_transform, mat, ratio, clip_depth);
+	void place_character(character* ch, int depth)	
+	{		
+		m_display_list.place_character(ch, depth);	
 	}
 
 	/// Execute the tags associated with the specified frame.

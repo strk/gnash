@@ -173,29 +173,12 @@ DisplayList::get_character_by_name_i(const std::string& name)
   else return it->get();
 }
 
-
 void
-DisplayList::place_character(
-  character* ch, 
-  int depth,
-  const cxform& color_xform, 
-  const matrix& mat, 
-  int ratio,
-  int clip_depth)
+DisplayList::place_character(character* ch, int depth)
 {
-//  GNASH_REPORT_FUNCTION;
-  //log_debug(_("dl::add(%d, '%s')"), depth, ch->get_name());
-
-  //log_debug(_("Before adding, list is:"));
-  //dump();
-
   assert(!ch->isUnloaded());
   ch->set_invalidated();
   ch->set_depth(depth);
-  ch->set_cxform(color_xform);
-  ch->set_matrix(mat);
-  ch->set_ratio(ratio);
-  ch->set_clip_depth(clip_depth);
 
   container_type::iterator it = std::find_if(
       _charsByDepth.begin(), _charsByDepth.end(),
@@ -203,15 +186,11 @@ DisplayList::place_character(
 
   if ( it == _charsByDepth.end() || (*it)->get_depth() != depth )
   {
-    //log_debug(_("place_character: new character at depth %d"), depth);
-    
     // add the new char
     _charsByDepth.insert(it, DisplayItem(ch));
   }
   else
   {
-    //log_debug(_("place_character: replacing existing character at depth %d"), depth);
-    
     // remember bounds of old char
     InvalidatedRanges old_ranges; 
     (*it)->add_invalidated_bounds(old_ranges, true);  

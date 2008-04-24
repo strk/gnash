@@ -2462,9 +2462,6 @@ void sprite_instance::call_frame_actions(const as_value& frame_spec)
 
 character* sprite_instance::add_empty_movieclip(const char* name, int depth)
 {
-  cxform color_transform;
-  matrix matrix;
-
   // empty_sprite_def will be deleted during deliting sprite
   sprite_definition* empty_sprite_def = new sprite_definition(get_movie_definition(), NULL);
 
@@ -2476,13 +2473,7 @@ character* sprite_instance::add_empty_movieclip(const char* name, int depth)
   //       an existing one !
   set_invalidated(); 
 
-  m_display_list.place_character(
-    sprite,
-    depth,
-    color_transform,
-    matrix,
-    0,
-    character::noClipDepthValue); 
+  m_display_list.place_character(sprite, depth);   
 
   return sprite;
 }
@@ -2515,14 +2506,9 @@ sprite_instance::add_textfield(const std::string& name, int depth, float x, floa
       infinite_to_fzero(PIXELS_TO_TWIPS(x)),
       infinite_to_fzero(PIXELS_TO_TWIPS(y)));
 
-  // Here we add the character to the displayList.
-  m_display_list.place_character(
-    txt_char.get(),
-    depth,
-    cxform(),
-    txt_matrix,
-    0,
-    character::noClipDepthValue);
+  txt_char->set_matrix(txt_matrix);  
+  // Here we add the character to the displayList.  
+  m_display_list.place_character(txt_char.get(), depth); 
 
   return txt_char;
 }
@@ -2559,14 +2545,13 @@ sprite_instance::duplicateMovieClip(const std::string& newname, int depth,
 
   // Copy drawable
   newsprite->_drawable = new DynamicShape(*_drawable);
-
-  parent->m_display_list.place_character(
-    newsprite.get(),
-    depth,
-    get_cxform(),
-    get_matrix(),
-    get_ratio(),
-    get_clip_depth());
+  
+  newsprite->set_cxform(get_cxform());  
+  newsprite->set_matrix(get_matrix());  
+  newsprite->set_ratio(get_ratio());  
+  newsprite->set_clip_depth(get_clip_depth());  
+  
+  parent->m_display_list.place_character(newsprite.get(), depth);
   
   return newsprite;
 }
@@ -3178,16 +3163,11 @@ bool
 sprite_instance::attachCharacter(character& newch, int depth)
 {
 
-  // place_character() will set depth on newch
-  m_display_list.place_character(
-    &newch,
-    depth,
-    cxform(),
-    matrix(),
-    65535,
-    character::noClipDepthValue);
+	// TODO: check why should we set ratio to 65535 here instead of default 0.  
+	newch.set_ratio(65536);  
+	m_display_list.place_character(&newch, depth);  
 
-  return true; // FIXME: check return from place_character above ?
+	return true; // FIXME: check return from place_character above ?
 }
 
 character*
@@ -3235,13 +3215,13 @@ sprite_instance::add_display_object(const SWF::PlaceObject2Tag* tag)
             ch->add_event_handler(ev->event(), ev->action());
         }
 
-        dlist.place_character(
-            ch.get(),
-            tag->getDepth(),
-            tag->getCxform(),
-            tag->getMatrix(),
-            tag->getRatio(),
-            tag->getClipDepth());
+		// TODO: check if we should check those has_xxx flags first.
+		ch->set_cxform(tag->getCxform());
+		ch->set_matrix(tag->getMatrix());
+		ch->set_ratio(tag->getRatio());
+		ch->set_clip_depth(tag->getClipDepth());
+		
+		dlist.place_character(ch.get(), tag->getDepth());
 
         return ch.get();
   }

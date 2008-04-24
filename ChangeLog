@@ -1,3 +1,10 @@
+2008-04-24 Zou Lunkai <zoulunkai@gmail.com>
+
+	* server/dlist.{h,cpp}: place_character(), simplify the interface, 
+	  drop some unnecessary args.
+	* server/sprite_instance.{h,cpp}, server/BitmapMovieInstance.cpp, 
+	  testsuite/server/DisplayList.cpp: adopt the new interface of place_character().
+
 2008-04-23 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/Stage.h: make notifyResize a public method.
