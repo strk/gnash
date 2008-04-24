@@ -1,3 +1,8 @@
+2008-04-24 Sandro Santilli <strk@keybit.net>
+
+	* server/swf/PlaceObject2Tag.h (hasCxform): fix typo
+	  (did return hasMatrix). Fixes bug #23037.
+
 2008-04-24 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/asobj/Global.cpp: include tu_math.h for isfinite on

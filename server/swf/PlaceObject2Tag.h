@@ -138,7 +138,7 @@ public:
     const EventHandlers& getEventHandlers() const { return m_event_handlers; }
     
     bool hasMatrix() const { return m_has_matrix; }
-    bool hasCxform() const { return m_has_matrix; }
+    bool hasCxform() const { return m_has_cxform; }
     bool hasName()   const { return m_has_name; }
 
 private:
