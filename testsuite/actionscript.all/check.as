@@ -32,6 +32,9 @@
 #   if MING_VERSION_CODE < 00040006
 #     define MING_LOGICAL_ANDOR_BROKEN
 #   endif
+#   if MING_VERSION_CODE >= 00040005
+#     define MING_SUPPORTS_ASM_IMPLEMENTS
+#   endif
 #  endif
 # endif
 #endif

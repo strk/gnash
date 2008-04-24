@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Inheritance.as,v 1.59 2008/04/24 18:29:46 strk Exp $";
+rcsid="$Id: Inheritance.as,v 1.60 2008/04/24 20:13:33 strk Exp $";
 #include "check.as"
 
 check_equals(typeof(Object.prototype.constructor), 'function');
@@ -528,6 +528,8 @@ check(! t4 instanceOf Test5);
 // Test implements op
 //------------------------------------------------
 
+#ifdef MING_SUPPORTS_ASM_IMPLEMENTS
+
 A = {};
 A.prototype = {}; // need a prototype to set as interface of B.prototype
 B = {};
@@ -555,12 +557,31 @@ check (! ob instanceof C );
 C.prototype = A.prototype;
 xcheck (  ob instanceof C ); 
 
+a = {}; b = {};
+a.__proto__ = b;
+b.__proto__ = a;
+check(!a instanceof b); // really just tests if we survive :)
+
+#endif // MING_SUPPORTS_ASM_IMPLEMENTS
+
 //------------------------------------------------
 // END OF TEST
 //------------------------------------------------
 
 #if OUTPUT_VERSION < 6
- check_totals(106); // SWF5
-#else
- check_totals(163); // SWF6,7,8
+
+# ifdef MING_SUPPORTS_ASM_IMPLEMENTS
+    check_totals(107); 
+# else
+    check_totals(102); 
+# endif
+
+#else // SWF6,7,8
+
+# ifdef MING_SUPPORTS_ASM_IMPLEMENTS
+    check_totals(164);
+# else
+    check_totals(159); 
+# endif
+
 #endif

@@ -1,6 +1,16 @@
 2008-04-24 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/Inheritance.as:
+	  Don't run 'implementsop' tests if Ming doesn't
+	  support it. Add a test to ensure we don't
+	  choke on circular inheritance.
+	* testsuite/actionscript.all/check.as: Ming support
+	  for asm "implements" opcode was introduced in 
+	  0.4.0.beta6
+
+2008-04-24 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/Inheritance.as:
 	  Tests for implementsop (probably need a specific
 	  Ming version, overlooked it for now).
 	* testsuite/misc-mtasc.all/implementsOpTest.as:
