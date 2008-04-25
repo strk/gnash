@@ -113,6 +113,14 @@ NPP_GetMIMEDescription(void)
 NPError
 NS_PluginInitialize()
 {
+	if ( plugInitialized )
+	{
+		cout << "NS_PluginInitialize called, but ignored (we already initialized)" << endl;
+		return NPERR_NO_ERROR;
+	}
+
+	cout << "NS_PluginInitialize call ---------------------------------------------------" << endl;
+
 
 	/* Browser Functionality Checks */
 
@@ -178,6 +186,37 @@ NS_PluginInitialize()
 
 	}
 
+	// Append ~/.gnashpluginrc to GNASHRC
+	do {
+		std::string newGnashRc;
+		bool changed = false;
+		char *gnashrc = getenv("GNASHRC");
+		if ( gnashrc )
+		{
+			newGnashRc.assign(gnashrc);
+			newGnashRc.append(":");
+		}
+
+		char *home = getenv("HOME");
+		if ( home )
+		{
+			newGnashRc.append(home);
+			newGnashRc.append("/.gnashpluginrc");
+		}
+		else
+		{
+			cerr << "WARNING: NPAPI plugin could not find user home dir" << endl;
+			break;
+		}
+
+		if ( setenv("GNASHRC", newGnashRc.c_str(), 1) )
+		{
+			cerr << "WARNING: NPAPI plugin could not append to the GNASHRC env variable" << endl;
+		}
+
+	} while (0);
+
+
 	/* Success */
 
 	plugInitialized = TRUE;
@@ -194,6 +233,7 @@ NS_PluginInitialize()
 void
 NS_PluginShutdown()
 {
+#if 0
 	if (!plugInitialized)
 	{
 		cout << "Plugin already shut down" << endl;
@@ -201,6 +241,7 @@ NS_PluginShutdown()
 	}
 
 	plugInitialized = FALSE;
+#endif
 }
 
 
@@ -312,6 +353,7 @@ nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
 		cerr << "PARAM: " << name << " = " << val << endl;
 		_params[name] = val;
 	}
+
 }
 
 /// \brief Destructor

@@ -1,5 +1,10 @@
 2008-04-25 Sandro Santilli <strk@keybit.net>
 
+	* plugin/plugin.cpp: append ~/.gnashpluginrc to GNASHRC env (creating
+	  that var if non-existing); use a static variable to tell if the
+	  plugin was initialized already or not: this is as epiphany keeps
+	  calling NS_PluginInitialize even if not supposed to (in a single
+	  session). Tests highly welcome.
 	* libbase/rc.cpp (loadFiles): allow GNASHRC env variable to be
 	  a comma-separate list of rcfiles to parse.
 
