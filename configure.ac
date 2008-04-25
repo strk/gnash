@@ -1400,7 +1400,8 @@ AC_CHECK_LIB(c, mremap)
 
 GNASH_PKG_FIND(nspr, [nspr.h], [Netscape Portable Runtime (NSPR)], PR_Init)
 
-AC_PATH_PROG(WINDRES, windres, [], [${pathlist}])
+AC_PATH_PROG(WINDRES, ${host_cpu}-${host_os}-windres windres, [], [${pathlist}])
+
 AC_SUBST(WINDRES)
 
 GNASH_PKG_FIND(z, [zlib.h], [zlib compression library], compress)

@@ -1,3 +1,9 @@
+2008-04-25  Dossy Shiobara <dossy@panoptic.com>
+
+	* configure.ac: Correctly locate windres executable when
+	  cross-compiling for Win32 target.  Fix c/o Robert
+	  Millan <robertmh>.  c.f. bug #20042 comment #7.
+
 2008-04-25 Sandro Santilli <strk@keybit.net>
 
 	* plugin/plugin.cpp: append ~/.gnashpluginrc to GNASHRC env (creating
