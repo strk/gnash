@@ -1,3 +1,8 @@
+2008-04-25 Sandro Santilli <strk@keybit.net>
+
+	* libbase/rc.cpp (loadFiles): allow GNASHRC env variable to be
+	  a comma-separate list of rcfiles to parse.
+
 2008-04-25 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/asobj/Stage.{cpp,h}: register ASnative methods separately,

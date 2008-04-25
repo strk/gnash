@@ -43,6 +43,8 @@
 #include <iostream>
 #include <fstream>
 
+#include <boost/tokenizer.hpp>
+
 #ifndef DEFAULT_STREAMS_TIMEOUT
 // TODO: add a ./configure switch to set this
 # define DEFAULT_STREAMS_TIMEOUT 10
@@ -145,9 +147,18 @@ RcInitFile::loadFiles()
 
     // Check the GNASHRC environment variable
     char *gnashrc = getenv("GNASHRC");
-    if (gnashrc) {
-        loadfile = gnashrc;
-        parseFile(loadfile);
+    if (gnashrc)
+    {
+	std::string paths(gnashrc);
+
+	typedef boost::char_separator<char> Sep;
+	typedef boost::tokenizer< Sep > Tok;
+	Tok t(paths, Sep(":"));
+
+        for(Tok::iterator i=t.begin(), e=t.end(); i!=e; ++i)
+	{
+		parseFile(*i);
+	}
     }
 }
 
@@ -338,12 +349,16 @@ RcInitFile::parseFile(const std::string& filespec)
         return false;
     }
     
-    if (stat(filespec.c_str(), &stats) != 0) return false;
+    if (stat(filespec.c_str(), &stats) != 0)
+    {
+        cerr << "RcInitFile::parseFile: couldn't open file: " << filespec << endl;
+        return false;
+    }
 
     in.open(filespec.c_str());
     
     if (!in) {
-            cerr << "Couldn't open file: " << filespec << endl;
+            cerr << "RcInitFile::parseFile: couldn't open file: " << filespec << endl;
             return false;
     }
 
