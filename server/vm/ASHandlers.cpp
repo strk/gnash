@@ -1254,7 +1254,6 @@ SWFHandlers::ActionTrace(ActionExec& thread)
 
     //std::string val = env.pop().to_string_versioned(VM::get().getSWFVersion(), &env);
     std::string val = env.pop().to_string();
-	std::cout << val << std::endl;
     log_trace("%s", val.c_str());
 }
 
