@@ -26,6 +26,7 @@ addProperty-set-prototypes-8.swf:f5f6a0305a91b7cf09448d60bb86ddae
 and-or-5.swf:a734facbc191156759ad278e25c3f308
 and-or-6.swf:a3a02811b62c07c4d2dd6d6d547f1d2f
 and-or-7.swf:b4c3eb73aa8e0403e8d141516b25c9c6
+array-init.swf:dc3e0f1daa53a2574efdb75f98579f10
 array-movieclip-5.swf:99c50528aa81f1ef5184d6ae35b14419
 array-movieclip-6.swf:dcef7fcaf030813f6e53823231ce16e1
 array-movieclip-7.swf:dc6d1904113fc1827b1936b4dfe4c2f0
@@ -463,6 +464,7 @@ newobject-paths-5.swf:7fe3f8dd1f89838358ba5e92417ac888
 newobject-paths-6.swf:e2e207b7b6966fdffd3a0017cdbf2f1c
 newobject-paths-7.swf:e8af4c2cd51e1b3c5e7ab3121386d0ba
 newobject-paths-8.swf:fc8407413a00bf2e41e27db7e7ec8c9f
+nextframe-stop.swf:8528e3ead382f99f046e6c27aa4fd311
 number.swf:3ef5211bf02f128749453b0ea006061d
 number-tostring-radix-5.swf:9c620b9523efbfc2cd30832d38c3d403
 number-tostring-radix-6.swf:82b91ba51d982a8c27dddffd129051df
@@ -583,6 +585,7 @@ point-5.swf:9e49aa1df7118acccf003ae0648ef439
 point-properties-5.swf:2b1071acd6c53d5342c1946214a3b3df
 point-properties-5.swf:c3439d59fa29fb709630ee3a3ad230b0
 preload.swf:2fd2da9440e29289e83dadd1ed9c99c4
+previousframe-stop.swf:b4bdd96832fc4b7e60f774fa042ae1a0
 print-job-init-5.swf:22889777e5e8230cee8c760c0930b5db
 property-native-5.swf:3609da1095cd97f5373da462b45ead1d
 propflags-call-5.swf:a47cb9d11aa9794160aecd8e03ac32e5
@@ -624,6 +627,12 @@ prototype-recursion-get-6.swf:47fa73c88db1f3acedd832e2ddec6315
 prototype-recursion-get-7.swf:766d65bdfdb4a79073728607ce8dc0d3
 prototype-recursion-get-8.swf:9e1f31c39062dffaa99e9db4ca28838f
 prototypes.swf:21df8d7eda568fd27f19a56fec87a415
+push-different-booleans.swf:9a2096b25e56e765d9166f96198c45ba
+push-weird.swf:c456a73d38fd4f158b232acaeba0a847
+random-negative-5.swf:9e8cbe11614842c969af155f4e67f21f
+random-negative-6.swf:871c11de9362b471e70b237797afc132
+random-negative-7.swf:c37d945ee37e2c79771fc24048c2cb05
+random-negative-8.swf:aa9dea7841d517b54711660bf666da0e
 rectangle-construct-5.swf:346164542dbfc9715da30ee9ea011373
 rectangle-equals-5.swf:a32beb36b2e690320c9d88e3130cb600
 rectangle-properties-5.swf:b9926dc51714320ff06eddb544ae9260
@@ -652,6 +661,10 @@ round-direction-5.swf:3a69581d4483d995a04ab3a2aa005278
 round-direction-6.swf:2f7d7580490e0c4a3ddfb107849dc6d8
 round-direction-7.swf:66f77f46b6695bbb4d2a2e556ed737fa
 round-direction-8.swf:5e9afcedacd32a7438a21469f09cd853
+same-argument-name-5.swf:8a3048b2c4c143f3371caba918e3fa1b
+same-argument-name-6.swf:0814b0f0acc2abdc94f95972ec4db704
+same-argument-name-7.swf:a8db16910cb00b86ee7622e2d878ddc0
+same-argument-name-8.swf:fc161dde1c7da36faa9478e3908c45e3
 scope2.swf:4783478ce98b56c9b34e1a5ee78e2860
 scope-chain-did-you-understand-5.swf:326fc05bde096a72bec25336e67e9e97
 scope-chain-did-you-understand-6.swf:952f5f91c44b10fb23727ad72d62459d

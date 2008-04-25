@@ -1,4 +1,9 @@
-2008-04-24 Benjamin Wolsey <bwy@benjaminwolsey.de>
+2008-04-25 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* testsuite/swfdec/PASSING: update for 13 new tests 
+	  (all pass; nothing to do there).
+
+2008-04-25 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* testsuite/actionscript.all/String.as: tests for String.split.
 
