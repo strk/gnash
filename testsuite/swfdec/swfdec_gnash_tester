@@ -23,13 +23,7 @@ FLAGS="$FLAGS $@"
 out=`basename "${in}"`.trace-gnash
 logout=`basename "${in}"`.out
 logerr=`basename "${in}"`.err
-use_orig=0
 exp="${in}.trace"
-if [ -e "${in}.trace.org" ]; then
-	exp="${in}.trace.org"
-	use_orig=1
-fi
-
 
 echo "Running ${GPROCESSOR} ${FLAGS} ${in}" >&2
 ${GPROCESSOR} ${FLAGS} "$in" > $logout 2> $logerr
@@ -39,10 +33,5 @@ if test "$?" != 0; then
 fi
 
 grep TRACE -A1 ${logout} | sed '/^--$/d; s/.*TRACE: //; /\n*[0-9][0-9]*\].*/d; s/^$//;' > $out
-if [ "$use_orig" != 0 ]; then
-	awk 'BEGIN {body=0;} { if (body) { print $0} else if (/^$/) {body=1} }' "$exp" | diff -u - "$out"
-	exit $?
-else
-	diff -u "$exp" "$out"
-	exit $?
-fi
+diff -u "$exp" "$out"
+exit $?

@@ -1,5 +1,14 @@
 2008-04-25 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/swfdec/swfdec_gnash_tester: don't make use
+	  of .trace.org files, their format is unreliable, and
+	  they are only available when swfdec developers think
+	  complying with the proprietary player would be silly.
+	* testsuite/swfdec/PASSING: 'constantpool-broken' and
+	  'double' succeed (swfdec-expected behaviour).
+
+2008-04-25 Sandro Santilli <strk@keybit.net>
+
 	* server/vm/ASHandlers.cpp (ActionPushData): push undefined
 	  (not 0) when accessing an out-of-bound constant index.
 

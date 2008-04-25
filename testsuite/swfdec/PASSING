@@ -122,6 +122,10 @@ comparisons-4.swf:e0bb89e492f3f35e51b1beb190935a14
 comparisons-5.swf:d4dfeb4ec80ec1f5a7390eb699e269ee
 comparisons-6.swf:5a7bf1ffb3a4dd23828d6e180f1871b0
 comparisons-7.swf:2e53fca820ad47ebb1bfef696f61527a
+constantpool-broken-5.swf:1eaaec599b896ed297221e2ebe1e7362
+constantpool-broken-6.swf:28293941f8a03ad06a418109820ae18a
+constantpool-broken-7.swf:3204fc0a85d367fa6b6c61c1af9d9ac8
+constantpool-broken-8.swf:95bed966f39d04fec9083d62b101acef
 constantpool-when-lookup-5.swf:22da9d1cdefe20b5a397a5f4cbba53e4
 constantpool-when-lookup-6.swf:09a1306832ca16654cceeffa855c48e6
 constantpool-when-lookup-7.swf:c4022b4b258b8d0b168db61d8b5ae6b2
@@ -215,6 +219,7 @@ doaction-after-placeobject.swf:ea4387286e602dd93cf2f75ea6698690
 doaction-before-placeobject.swf:4e8f238ef804fe0d254cd9ed9581e097
 DoInitAction-once.swf:4a95697fd4287b3617268acba457ffdf
 DoInitAction-this.swf:d747ea8f0ead68e586dd4a7aadaded90
+double.swf:8b18d5d6a4168afe60c583c27e704b7d
 drop-shadow-filter-properties-5.swf:68ec26c24ecb04174a484d810dab523f
 drop-shadow-filter-properties-5.swf:827a880fc55b1afb96515f0d64a064b6
 duplicate-names-5.swf:d73096f662cf35b34c15e3f59fb88258
