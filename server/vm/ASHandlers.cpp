@@ -2127,7 +2127,7 @@ SWFHandlers::ActionPushData(ActionExec& thread)
 					log_swferror(_("dict_lookup %d "
 					"is out of bounds"), id);
 					);
-					env.push(0);
+					env.push(as_value());
 				}
 				break;
 			}
@@ -2146,7 +2146,7 @@ SWFHandlers::ActionPushData(ActionExec& thread)
 					log_swferror(_("dict_lookup %d "
 					"is out of bounds"), id);
 					);
-					env.push(0);
+					env.push(as_value());
 				}
 				break;
 			}

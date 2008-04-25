@@ -1,5 +1,10 @@
 2008-04-25 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ASHandlers.cpp (ActionPushData): push undefined
+	  (not 0) when accessing an out-of-bound constant index.
+
+2008-04-25 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/Makefile.am,
 	  testsuite/misc-ming.all/Makefile.am,
 	  testsuite/misc-mtasc.all/Makefile.am,
