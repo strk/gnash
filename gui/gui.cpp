@@ -364,8 +364,14 @@ Gui::updateStageMatrix()
 	//log_debug("updateStageMatrix: scaleMode:%d, valign:%d, halign:%d", scaleMode, valign, halign);
 
 	// TODO: have a generic set_matrix ?
-	_renderer->set_scale(_xscale, _yscale);
-	_renderer->set_translation(_xoffset, _yoffset);
+	if ( _renderer ) {
+		_renderer->set_scale(_xscale, _yscale);
+		_renderer->set_translation(_xoffset, _yoffset);
+	}
+	else
+	{
+		//log_debug("updateStageMatrix: could not signal updated stage matrix to renderer (no renderer registered)");
+	}
 
 	// trigger redraw
 	//_redraw_flag |= (_width!=width) || (_height!=height);
