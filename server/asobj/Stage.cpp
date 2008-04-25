@@ -38,13 +38,30 @@
 
 namespace gnash {
 
-as_value stage_scalemode_getset(const fn_call& fn);
-as_value stage_align_getset(const fn_call& fn);
-as_value stage_showMenu_getset(const fn_call& fn);
-as_value stage_width_getset(const fn_call& fn);
-as_value stage_height_getset(const fn_call& fn);
-as_value stage_displaystate_getset(const fn_call& fn);
+static as_value stage_scalemode_getset(const fn_call& fn);
+static as_value stage_align_getset(const fn_call& fn);
+static as_value stage_showMenu_getset(const fn_call& fn);
+static as_value stage_width_getset(const fn_call& fn);
+static as_value stage_height_getset(const fn_call& fn);
+static as_value stage_displaystate_getset(const fn_call& fn);
+static const char* getScaleModeString(movie_root::ScaleMode sm);
+static const char* getDisplayStateString(Stage::DisplayState ds);
 
+void registerStageNative(as_object& o)
+{
+	VM& vm = o.getVM();
+	
+	vm.registerNative(stage_scalemode_getset, 666, 1);
+    vm.registerNative(stage_scalemode_getset, 666, 2);
+    vm.registerNative(stage_align_getset, 666, 3);
+	vm.registerNative(stage_align_getset, 666, 4);
+	vm.registerNative(stage_width_getset, 666, 5);
+    vm.registerNative(stage_width_getset, 666, 6);
+	vm.registerNative(stage_height_getset, 666, 7);
+    vm.registerNative(stage_height_getset, 666, 8);
+	vm.registerNative(stage_showMenu_getset, 666, 9);
+    vm.registerNative(stage_showMenu_getset, 666, 10);
+}
 
 static void
 attachStageInterface(as_object& o)
@@ -55,54 +72,28 @@ attachStageInterface(as_object& o)
 
 	if ( version < 5 ) return;
 
-	as_c_function_ptr getset;
-
-	// Stage.scaleMode getter-setter
-	getset = stage_scalemode_getset;
-	if ( version > 5)
-    {
-    	vm.registerNative(getset, 666, 1);
-	    vm.registerNative(getset, 666, 2);
-    }
+    as_c_function_ptr getset;
+    
+    getset = stage_scalemode_getset;
 	o.init_property("scaleMode", getset, getset);
 
 	// Stage.align getter-setter
-	getset = stage_align_getset;
-	if ( version > 5)
-    {
-    	vm.registerNative(getset, 666, 3);
-	    vm.registerNative(getset, 666, 4);
-    }
+    getset = stage_align_getset;
 	o.init_property("align", getset, getset);
 
 	// Stage.width getter-setter
-	getset = stage_width_getset;
-	if ( version > 5)
-    {
-    	vm.registerNative(getset, 666, 5);
-	    vm.registerNative(getset, 666, 6);
-    }
+    getset = stage_width_getset;
 	o.init_property("width", getset, getset);
 
 	// Stage.height getter-setter
-	getset = stage_height_getset;
-	if ( version > 5)
-    {
-    	vm.registerNative(getset, 666, 7);
-	    vm.registerNative(getset, 666, 8);
-    }
+    getset = stage_height_getset;
 	o.init_property("height", getset, getset);
 
 	// Stage.showMenu getter-setter
-	getset = stage_showMenu_getset;
-	if ( version > 5)
-    {
-    	vm.registerNative(getset, 666, 9);
-	    vm.registerNative(getset, 666, 10);
-    }
+    getset = stage_showMenu_getset;
 	o.init_property("showMenu", getset, getset);
 
-	getset = stage_displaystate_getset;
+    getset = stage_displaystate_getset;
 	o.init_property("displayState", getset, getset);
 
 }
@@ -140,34 +131,6 @@ Stage::notifyResize()
 {
 	log_debug("notifying Stage listeners about a resize");
 	callMethod(NSV::PROP_BROADCAST_MESSAGE, "onResize");
-}
-
-/// Expected behaviour is that the original movie size is aways returned
-/// as long as scaling is allowed.
-
-const char*
-Stage::getDisplayStateString()
-{
-	static const char* displayStateName[] = {
-		"normal",
-		"fullScreen" };
-
-	return displayStateName[_displayState];
-}
-
-
-const char*
-Stage::getScaleModeString()
-{
-	static const char* modeName[] = {
-		"showAll",
-		"noScale",
-		"exactFit",
-		"noBorder" };
-
-    movie_root& m = VM::get().getRoot();
-
-	return modeName[m.getScaleMode()];
 }
 
 
@@ -231,22 +194,51 @@ Stage::setAlignMode(const std::string& mode)
 
 }
 
-as_value stage_scalemode_getset(const fn_call& fn)
+
+const char*
+getDisplayStateString(Stage::DisplayState ds)
 {
-	boost::intrusive_ptr<Stage> stage = ensureType<Stage>(fn.this_ptr);
+	static const char* displayStateName[] = {
+		"normal",
+		"fullScreen" };
+
+	return displayStateName[ds];
+}
+
+
+const char*
+getScaleModeString(movie_root::ScaleMode sm)
+{
+	static const char* modeName[] = {
+		"showAll",
+		"noScale",
+		"exactFit",
+		"noBorder" };
+
+	return modeName[sm];
+}
+
+
+as_value
+stage_scalemode_getset(const fn_call& fn)
+{
+    const movie_root& m = VM::get().getRoot();
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		return as_value(stage->getScaleModeString());
+		return as_value(getScaleModeString(m.getScaleMode()));
 	}
 	else // setter
 	{
 		movie_root::ScaleMode mode = movie_root::showAll;
 
 		const std::string& str = fn.arg(0).to_string();
-		if ( str == "noScale" ) mode = movie_root::noScale;
-		else if ( str == "exactFit" ) mode = movie_root::exactFit;
-		else if ( str == "noBorder" ) mode = movie_root::noBorder;
+		
+		StringNoCaseEqual noCaseCompare;
+		
+		if ( noCaseCompare(str, "noScale") ) mode = movie_root::noScale;
+		else if ( noCaseCompare(str, "exactFit") ) mode = movie_root::exactFit;
+		else if ( noCaseCompare(str, "noBorder") ) mode = movie_root::noBorder;
 
         movie_root& m = VM::get().getRoot();
 
@@ -369,7 +361,7 @@ stage_displaystate_getset(const fn_call& fn)
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		return as_value(stage->getDisplayStateString());
+		return as_value(getDisplayStateString(stage->getDisplayState()));
 	}
 	else // setter
 	{

@@ -60,7 +60,6 @@ class StringNoCaseEqual {
 public:
 	bool operator() (const std::string& a, const std::string& b) const
 	{
-		if ( a.length() != b.length() ) return false;
 		return boost::iequals(a, b);
 	}
 };

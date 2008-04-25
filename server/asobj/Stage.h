@@ -54,18 +54,6 @@ public:
 	/// Notify all listeners about a resize event
 	void notifyResize();
 
-	/// \brief
-	/// Return the string representation for current
-	/// scale mode.
-	//
-	/// Valid values are:
-	///	- showAll
-	///	- noBorder
-	///	- exactFit
-	///	- noScale
-	///
-	const char* getScaleModeString();
-
     /// Get present align mode
     const std::string& getAlignMode() const { return _alignMode; }
 
@@ -74,8 +62,9 @@ public:
 
 	/// Set display state 
 	void setDisplayState(DisplayState state);
-	
-	const char* getDisplayStateString();	
+
+	/// Set display state 
+	DisplayState getDisplayState() const { return _displayState; }
 
 private:
 
@@ -84,6 +73,8 @@ private:
 	DisplayState _displayState;
 };
 
+/// Register native functions with the VM.
+void registerStageNative(as_object& o);
 
 /// Initialize the global Stage class
 void stage_class_init(as_object& global);

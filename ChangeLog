@@ -1,3 +1,16 @@
+2008-04-25 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/asobj/Stage.{cpp,h}: register ASnative methods separately,
+	  drop methods from Stage class, reduce reliance on Stage class
+	  generally (needs to go completely for ASnative functions, as it's not
+	  necessarily initialized in time). Case insensitive setters (fixes
+	  part of swfdec scalemode test).
+	* server/asobj/Global.cpp: register Stage ASnative functions from SWF5
+	  (fixes another part of swfdec test).
+	* server/StringPredicates.h: drop separate length test
+	  (StringNoCaseEqual).
+	* testsuite/swfdec/PASSING: scalemode tests pass.
+
 2008-04-25 Sandro Santilli <strk@keybit.net>
 
 	* gui/gui.cpp (updateStageMatrix): don't try to tell a NULL renderer

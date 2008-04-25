@@ -601,6 +601,7 @@ Global::Global(VM& vm, ClassHierarchy *ch)
 	
 	// TODO: When should these be registered?
 	registerSystemNative(*this);
+	registerStageNative(*this);
 
     vm.registerNative(as_global_trace, 100, 4);
 	init_member("trace", vm.getNative(100, 4));
