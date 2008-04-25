@@ -17,7 +17,7 @@
 // Original author: Mike Carlson - June 19th, 2006
 
 
-rcsid="$Id: String.as,v 1.55 2008/04/17 12:39:22 bwy Exp $";
+rcsid="$Id: String.as,v 1.56 2008/04/25 11:11:08 bwy Exp $";
 #include "check.as"
 
 check_equals(typeof(String), 'function');
@@ -214,6 +214,61 @@ check_equals(typeof(ret), 'object');
 check_equals(ret.length, 1);
 check_equals(typeof(ret[0]), 'string');
 check_equals(ret[0], 'abcde');
+
+st = "";
+g = st.split("", 0);
+#if OUTPUT_VERSION > 5
+xcheck_equals(g.length, 0);
+xcheck_equals(typeof(g[0]), "undefined");
+xcheck_equals(g[0], undefined);
+#else
+check_equals(g.length, 1);
+check_equals(typeof(g[0]), "string");
+check_equals(g[0], "");
+#endif
+
+st = "";
+g = st.split("x", 0);
+#if OUTPUT_VERSION > 5
+check_equals(g.length, 1);
+check_equals(typeof(g[0]), "string");
+check_equals(g[0], "");
+#else
+check_equals(g.length, 0);
+check_equals(typeof(g[0]), "undefined");
+check_equals(g[0], undefined);
+#endif
+
+st = "";
+g = st.split("x", 1);
+check_equals(g.length, 1);
+check_equals(typeof(g[0]), "string");
+check_equals(g[0], "");
+
+st = "f";
+g = st.split("", 0);
+#if OUTPUT_VERSION > 5
+check_equals(g.length, 0);
+check_equals(typeof(g[0]), "undefined");
+check_equals(g[0], undefined);
+#else
+check_equals(g.length, 1);
+check_equals(typeof(g[0]), "string");
+check_equals(g[0], "f");
+#endif
+
+
+st = "f";
+g = st.split("x", 0);
+check_equals(g.length, 0);
+check_equals(typeof(g[0]), "undefined");
+check_equals(g[0], undefined);
+
+st = "f";
+g = st.split("x", 1);
+check_equals(g.length, 1);
+check_equals(typeof(g[0]), "string");
+check_equals(g[0], "f");
 
 
 //----------------------------------------
@@ -844,7 +899,7 @@ check(!String.prototype.hasOwnProperty('length'));
 #endif
 
 #if OUTPUT_VERSION < 6
- check_totals(240);
+ check_totals(258);
 #else
- check_totals(256);
+ check_totals(274);
 #endif

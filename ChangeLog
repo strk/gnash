@@ -1,3 +1,7 @@
+2008-04-24 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* testsuite/actionscript.all/String.as: tests for String.split.
+
 2008-04-25 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/swfdec/swfdec_gnash_tester: don't make use
