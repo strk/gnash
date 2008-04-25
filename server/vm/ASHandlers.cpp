@@ -166,11 +166,6 @@ ActionHandler::ActionHandler(action_type type, string name,
     _arg_format = format;
 }
 
-ActionHandler::~ActionHandler()
-{
-//    GNASH_REPORT_FUNCTION;
-}
-
 void
 ActionHandler::execute(ActionExec& thread) const
 {
@@ -1259,6 +1254,7 @@ SWFHandlers::ActionTrace(ActionExec& thread)
 
     //std::string val = env.pop().to_string_versioned(VM::get().getSWFVersion(), &env);
     std::string val = env.pop().to_string();
+	std::cout << val << std::endl;
     log_trace("%s", val.c_str());
 }
 

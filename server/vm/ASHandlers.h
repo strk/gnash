@@ -67,7 +67,6 @@ public:
                   action_callback_t func, as_arg_t format);
     ActionHandler(action_type type, std::string name, 
                   action_callback_t func, as_arg_t format, int nargs);
-    ~ActionHandler();
 
     /// Execute the action
     void execute(ActionExec& thread) const;
