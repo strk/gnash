@@ -169,11 +169,11 @@ TEST_CASES = ${check_SCRIPTS}
 check-DEJAGNU: site-update $(check_PROGRAMS)
 	@runtest=$(RUNTEST); \
 	if $(SHELL) -c "$$runtest --version" > /dev/null 2>&1; then \
-	    $$runtest $(RUNTESTFLAGS) $(TEST_DRIVERS); true; \
+	    GNASH_GC_TRIGGER_THRESHOLD=0 GNASHRC=../gnashrc $$runtest $(RUNTESTFLAGS) $(TEST_DRIVERS); true; \
 	else \
 	  echo "WARNING: could not find \`runtest'" 1>&2; \
           for i in "$(TEST_CASES)"; do \
-	    $(SHELL) $$i; \
+	    GNASH_GC_TRIGGER_THRESHOLD=0 GNASHRC=../gnashrc $(SHELL) $$i; \
 	  done; \
 	fi
 
