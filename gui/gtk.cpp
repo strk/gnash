@@ -93,6 +93,17 @@ GtkGui::~GtkGui()
 GtkGui::GtkGui(unsigned long xid, float scale, bool loop, unsigned int depth)
 	:
 	Gui(xid, scale, loop, depth)
+#ifdef GUI_HILDON
+	,_hildon_program(0)
+#endif
+	,_window(0)
+	,_overlay(0)
+	,_drawingArea(0)
+	,_popup_menu(0)
+	,_menubar(0)
+	,_vbox(0)
+	,_drawbounds()
+	,_glue()
 {
 }
 

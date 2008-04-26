@@ -1,5 +1,9 @@
 2008-04-26 Sandro Santilli <strk@keybit.net>
 
+	* gui/gtk.cpp: initialize members in constructor.
+
+2008-04-26 Sandro Santilli <strk@keybit.net>
+
 	* libbase/Makefile.am: provide a SYSCONFDIR define
 	* libbase/rc.cpp: use SYSCONFDIR to find gnashrc, don't guess.
 	* plugin/Makefile.am: provide a SYSCONFDIR define
