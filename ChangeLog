@@ -1,5 +1,11 @@
 2008-04-26 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: Oops, AC_DEFINE can't use variables,
+	  will need to generate sysgnash{plugin}rc on 'make'
+	  (as suggested by automake dox)
+
+2008-04-26 Sandro Santilli <strk@keybit.net>
+
 	* libbase/rc.cpp: explicitly initialize the default
 	  value for _solsafedir to "/tmp/" (will be done
 	  so by SharedObject.cpp for an empty string anyway);

@@ -37,83 +37,67 @@ AM_COMPILER_LIB
 dnl Set the default values for Flash Version. These are converted into
 dnl various strings to make JavaScript or ActionScript detectors
 dnl recognize Gnash as a Flash Player.
-DEFAULT_FLASH_MAJOR_VERSION="9"
-DEFAULT_FLASH_MINOR_VERSION="0"
-DEFAULT_FLASH_REV_NUMBER="999"
-AC_SUBST(DEFAULT_FLASH_MAJOR_VERSION)
-AC_SUBST(DEFAULT_FLASH_MINOR_VERSION)
-AC_SUBST(DEFAULT_FLASH_REV_NUMBER)
-
-AC_DEFINE([DEFAULT_FLASH_MAJOR_VERSION], [${DEFAULT_FLASH_MAJOR_VERSION}], [Default Flash major version])
-AC_DEFINE([DEFAULT_FLASH_MINOR_VERSION], [${DEFAULT_FLASH_MINOR_VERSION}], [Default Flash minor version])
-AC_DEFINE([DEFAULT_FLASH_REV_NUMBER], [${DEFAULT_FLASH_REV_NUMBER}], [Default Flash revision number])
+AC_DEFINE([DEFAULT_FLASH_MAJOR_VERSION], ["9"], [Default Flash major version])
+AC_DEFINE([DEFAULT_FLASH_MINOR_VERSION], ["0"], [Default Flash minor version])
+AC_DEFINE([DEFAULT_FLASH_REV_NUMBER], ["999"], [Default Flash revision number])
 
 dnl TODO: use host/build/target -- whatever is more appropriate
 case "${host}" in
   *-apple-*)
-    DEFAULT_FLASH_PLATFORM_ID="MAC"
-    DEFAULT_FLASH_SYSTEM_OS="MacOS"
+    AC_DEFINE([DEFAULT_FLASH_PLATFORM_ID], ["MAC"], [Default 3-letter platform identifier for version string])
+    AC_DEFINE([DEFAULT_FLASH_SYSTEM_OS], ["MacOS"], [Default value for System.capabilities.os])
     ;;
   *-openbsd*)
-    DEFAULT_FLASH_PLATFORM_ID="BSD"
-    DEFAULT_FLASH_SYSTEM_OS="OpenBSD"
+    AC_DEFINE([DEFAULT_FLASH_PLATFORM_ID], ["BSD"], [Default 3-letter platform identifier for version string])
+    AC_DEFINE([DEFAULT_FLASH_SYSTEM_OS], ["OpenBSD"], [Default value for System.capabilities.os])
     ;;
   *-freebsd*)
-    DEFAULT_FLASH_PLATFORM_ID="BSD"
-    DEFAULT_FLASH_SYSTEM_OS="FreeBSD"
+    AC_DEFINE([DEFAULT_FLASH_PLATFORM_ID], ["BSD"], [Default 3-letter platform identifier for version string])
+    AC_DEFINE([DEFAULT_FLASH_SYSTEM_OS], ["FreeBSD"], [Default value for System.capabilities.os])
     ;;
   *-netbsd*)
-    DEFAULT_FLASH_PLATFORM_ID="BSD"
-    DEFAULT_FLASH_SYSTEM_OS="NetBSD"
+    AC_DEFINE([DEFAULT_FLASH_PLATFORM_ID], ["BSD"], [Default 3-letter platform identifier for version string])
+    AC_DEFINE([DEFAULT_FLASH_SYSTEM_OS], ["NetBSD"], [Default value for System.capabilities.os])
     ;;
   *-linux-gnu)
-    DEFAULT_FLASH_PLATFORM_ID="LNX"
-    DEFAULT_FLASH_SYSTEM_OS="GNU/Linux"
+    AC_DEFINE([DEFAULT_FLASH_PLATFORM_ID], ["LNX"], [Default 3-letter platform identifier for version string])
+    AC_DEFINE([DEFAULT_FLASH_SYSTEM_OS], ["GNU/Linux"], [Default value for System.capabilities.os])
     ;;
   *-linux*)
-    DEFAULT_FLASH_PLATFORM_ID="LNX"
-    DEFAULT_FLASH_SYSTEM_OS="Linux"
+    AC_DEFINE([DEFAULT_FLASH_PLATFORM_ID], ["LNX"], [Default 3-letter platform identifier for version string])
+    AC_DEFINE([DEFAULT_FLASH_SYSTEM_OS], ["Linux"], [Default value for System.capabilities.os])
     ;;
   *-cygwin* | *-mingw* | *-pw32*)
-    DEFAULT_FLASH_PLATFORM_ID="WIN"
-    DEFAULT_FLASH_SYSTEM_OS="Windows"
+    AC_DEFINE([DEFAULT_FLASH_PLATFORM_ID], ["WIN"], [Default 3-letter platform identifier for version string])
+    AC_DEFINE([DEFAULT_FLASH_SYSTEM_OS], ["Windows"], [Default value for System.capabilities.os])
     ;;
   *-*solaris*)
-    DEFAULT_FLASH_PLATFORM_ID="SUN"
-    DEFAULT_FLASH_SYSTEM_OS="Solaris"
+    AC_DEFINE([DEFAULT_FLASH_PLATFORM_ID], ["SUN"], [Default 3-letter platform identifier for version string])
+    AC_DEFINE([DEFAULT_FLASH_SYSTEM_OS], ["Solaris"], [Default value for System.capabilities.os])
     ;;
   *-os2*)
-    DEFAULT_FLASH_PLATFORM_ID="OS2"
-    DEFAULT_FLASH_SYSTEM_OS="OS/2"
+    AC_DEFINE([DEFAULT_FLASH_PLATFORM_ID], ["OS2"], [Default 3-letter platform identifier for version string])
+    AC_DEFINE([DEFAULT_FLASH_SYSTEM_OS], ["OS/2"], [Default value for System.capabilities.os])
     ;;
   *-sco*)
-    DEFAULT_FLASH_PLATFORM_ID="SCO"
-    DEFAULT_FLASH_SYSTEM_OS="SCO/Unix"
+    AC_DEFINE([DEFAULT_FLASH_PLATFORM_ID], ["SCO"], [Default 3-letter platform identifier for version string])
+    AC_DEFINE([DEFAULT_FLASH_SYSTEM_OS], ["SCO/Unix"], [Default value for System.capabilities.os])
     ;;
   *-irix*)
-    DEFAULT_FLASH_PLATFORM_ID="IRX"
-    DEFAULT_FLASH_SYSTEM_OS="IRIX"
+    AC_DEFINE([DEFAULT_FLASH_PLATFORM_ID], ["IRX"], [Default 3-letter platform identifier for version string])
+    AC_DEFINE([DEFAULT_FLASH_SYSTEM_OS], ["IRIX"], [Default value for System.capabilities.os])
     ;;
   *-hpux*)
-    DEFAULT_FLASH_PLATFORM_ID="HPX"
-    DEFAULT_FLASH_SYSTEM_OS="HPUX"
+    AC_DEFINE([DEFAULT_FLASH_PLATFORM_ID], ["HPX"], [Default 3-letter platform identifier for version string])
+    AC_DEFINE([DEFAULT_FLASH_SYSTEM_OS], ["HPUX"], [Default value for System.capabilities.os])
     ;;    
   *)
-    DEFAULT_FLASH_PLATFORM_ID="UNK"
-    DEFAULT_FLASH_SYSTEM_OS="Unknown"
+    AC_DEFINE([DEFAULT_FLASH_PLATFORM_ID], ["UNK"], [Default 3-letter platform identifier for version string])
+    AC_DEFINE([DEFAULT_FLASH_SYSTEM_OS], ["Unknown"], [Default value for System.capabilities.os])
     ;;
 esac
 
-AC_DEFINE([DEFAULT_FLASH_PLATFORM_ID], [${DEFAULT_FLASH_PLATFORM_ID}], [Default 3-letter platform identifier for version string])
-AC_DEFINE([DEFAULT_FLASH_SYSTEM_OS], [${DEFAULT_FLASH_SYSTEM_OS}], [Default value for System.capabilities.os])
-
-AC_SUBST(DEFAULT_FLASH_PLATFORM_ID)
-AC_SUBST(DEFAULT_FLASH_SYSTEM_OS)
-
-DEFAULT_STREAMS_TIMEOUT=10
-AC_SUBST(DEFAULT_STREAMS_TIMEOUT)
-AC_DEFINE([DEFAULT_STREAMS_TIMEOUT], [${DEFAULT_STREAMS_TIMEOUT}], [Default streams timeout in seconds])
-
+AC_DEFINE([DEFAULT_STREAMS_TIMEOUT], [10], [Default streams timeout in seconds])
 
 dnl Some things you can only do by looking at the platform name.
 case "${host}" in
@@ -2005,8 +1989,6 @@ AC_OUTPUT(Makefile
 libmedia/Makefile
 po/Makefile
 libbase/Makefile
-libbase/sysgnashrc
-libbase/sysgnashpluginrc
 libgeometry/Makefile
 server/Makefile
 server/asobj/Makefile
