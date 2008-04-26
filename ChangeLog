@@ -1,5 +1,9 @@
 2008-04-26 Sandro Santilli <strk@keybit.net>
 
+	* libbase/rc.cpp: add support for 'include' directive,
+	  cleanup parser to recognize empty lines and comments
+	  not starting on first column and to be more verbose
+	  about syntax errors (include line number).
 	* gui/gtk.cpp: initialize members in constructor.
 
 2008-04-26 Sandro Santilli <strk@keybit.net>

@@ -351,43 +351,64 @@ RcInitFile::parseFile(const std::string& filespec)
     
     if (stat(filespec.c_str(), &stats) != 0)
     {
-        cerr << "RcInitFile::parseFile: couldn't open file: " << filespec << endl;
+        cerr << "RcInitFile: couldn't open file: " << filespec << endl;
         return false;
     }
 
     in.open(filespec.c_str());
     
     if (!in) {
-            cerr << "RcInitFile::parseFile: couldn't open file: " << filespec << endl;
+            cerr << "RcInitFile: couldn't open file: " << filespec << endl;
             return false;
     }
 
     cout << "RcInitFile: parsing " << filespec << endl;
         
     // Read in each line and parse it
+    size_t lineno=0;
     while (getline(in, line)) {
 
-        // Ignore comment lines        
-        if (line[0] == '#') continue;
+	++lineno;
+	//cout << "Line: " << line << endl;
+
+        // Ignore comment and empty lines
+        if (line.empty() || line[0] == '#') continue;
     
         std::istringstream ss(line);
         
         // Get the first token
-        ss >> action;
+        if ( ! (ss >> action) )
+	{
+		// Empty line 
+		continue;
+	}
+	//cout << " " << lineno << ": '" << action << "'" << endl;
         
+	// 'action' should never be empty, or (ss >> action) above would have failed
+	//if ( action.empty() ) continue;
+
+	if ( action[0] == '#' ) continue; // discard comments
+
         // Get second token
         ss >> variable;
 
-        // The rest of the line is the value
-        if (!getline (ss, value)) continue;
+        if (noCaseCompare(action, "set") || noCaseCompare(action, "append") )
+        {
 
-        // Erase leading spaces.
-        // If there are nothing but spaces in the value,
-        // e.g. "set writelog ", value should be an empty string,
-        // so value.erase(0, string::npos) is correct.
-        value.erase(0, value.find_first_not_of(' '));
+             // The rest of the line is the value
+             if (!getline (ss, value))
+             {
+                 cerr << _("Warning: missing value for variable \"") << variable 
+                      << _("\" in rcfile ") << filespec << " line " << lineno << endl;
+                 continue;
+             }
+     
+             // Erase leading spaces.
+             // If there are nothing but spaces in the value,
+             // e.g. "set writelog ", value should be an empty string,
+             // so value.erase(0, string::npos) is correct.
+             value.erase(0, value.find_first_not_of(' '));
 
-        if (noCaseCompare(action, "set") || noCaseCompare(action, "append") ) {
 
             if (noCaseCompare(variable, "urlOpenerFormat")) {
                 _urlOpenerFormat = value;
@@ -504,9 +525,43 @@ RcInitFile::parseFile(const std::string& filespec)
                  extractSetting(_ignoreFSCommand, "ignoreFsCommand", variable, value)
             ||
                  cerr << _("Warning: unrecognized directive \"") << variable 
-                      << _("\" in rcfile.") << endl;
+                      << _("\" in rcfile ") << filespec << " line " << lineno << endl;
             }
         }
+        else if (noCaseCompare(action, "include") )
+	{
+		//cout << "Include directive in " << filespec << endl; 
+		// TODO: resolve relative paths ?
+		// TODO: skip parsing if already parsed ?
+		//       (would mess up user-requested parsing order, but
+		//       would be safe in case of circular includes)
+		//
+		if ( variable.empty() )
+		{
+                    cerr << _("Warning: empty include specification") 
+                         << " " << _("in rcfile") << " " <<
+                         filespec << " " << _("line") << " " << lineno << endl;
+		}
+		else
+		{
+			if ( variable[0] != '/' )
+			{
+			    cerr << _("Warning: include specification must be an absolute path") 
+				 << " " << _("in rcfile") << " " <<
+				 filespec << " " << _("line") << " " << lineno << endl;
+			}
+			else
+			{
+				parseFile(variable);
+			}
+		}
+	}
+	else
+	{
+            cerr << _("Warning: unrecognized action \"") << action
+                 << "\" " << _("in rcfile") << " " <<
+                 filespec << " " << _("line") << " " << lineno << endl;
+	}
     }
 
     if (in) {
