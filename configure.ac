@@ -1417,8 +1417,7 @@ AC_CHECK_LIB(c, mremap)
 
 GNASH_PKG_FIND(nspr, [nspr.h], [Netscape Portable Runtime (NSPR)], PR_Init)
 
-AC_PATH_PROG(WINDRES, ${host_cpu}-${host_os}-windres windres, [], [${pathlist}])
-
+AC_PATH_TOOL(WINDRES, [windres])
 AC_SUBST(WINDRES)
 
 GNASH_PKG_FIND(z, [zlib.h], [zlib compression library], compress)
@@ -1529,10 +1528,10 @@ if test x$build_gtk = xno -a x$nsapi = xyes; then
 fi
 
 if test x$windows = xyes -a x$nsapi = xyes; then
-  if test x$NSPR_CFLAGS = x -a x$NSPR_LIBS = x; then
+  if test "x$NSPR_CFLAGS" = x -a "x$NSPR_LIBS" = x; then
     AC_MSG_ERROR(["On Win32, NPAPI plugin requires NSPR."])
   fi
-  if test x$WINDRES = x; then
+  if test "x$WINDRES" = x; then
     AC_MSG_ERROR(["On Win32, NPAPI plugin requires windres."])
   fi
 fi

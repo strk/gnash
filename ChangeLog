@@ -1,3 +1,10 @@
+2008-04-26  Dossy Shiobara <dossy@panoptic.com>
+
+	* configure.ac: Use AC_PATH_TOOL instead of
+	  AC_PATH_PROG, which should automatically look for
+	  cross-compiling tools.  Fixed the NSPR_CFLAGS check
+	  and guarded the WINDRES checks, too.
+
 2008-04-26 Sandro Santilli <strk@keybit.net>
 
 	* configure.ac: AC_DEFINE_UNQUOTED saved the day
