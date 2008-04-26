@@ -1,3 +1,11 @@
+2008-04-26 Sandro Santilli <strk@keybit.net>
+
+	* libbase/Makefile.am: provide a SYSCONFDIR define
+	* libbase/rc.cpp: use SYSCONFDIR to find gnashrc, don't guess.
+	* plugin/Makefile.am: provide a SYSCONFDIR define
+	* plugin/plugin.cpp: use SYSCONFIDIR to add a system-wide
+	  gnashpluginrc to GNASHRC.
+
 2008-04-25  Dossy Shiobara <dossy@panoptic.com>
 
 	* configure.ac: Correctly locate windres executable when

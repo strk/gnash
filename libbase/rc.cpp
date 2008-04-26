@@ -130,11 +130,8 @@ RcInitFile::loadFiles()
 // actually exists or not anyway.
 
     // Check the default system location
-    std::string loadfile = "/etc/gnashrc";
-    parseFile(loadfile);
-    
-    // Check the default config location
-    loadfile = "/usr/local/etc/gnashrc";
+    std::string loadfile = SYSCONFDIR;
+    loadfile.append("/gnashrc");
     parseFile(loadfile);
     
     // Check the users home directory
@@ -146,6 +143,9 @@ RcInitFile::loadFiles()
     }
 
     // Check the GNASHRC environment variable
+    // TODO: keep note of the already-parsed files
+    //       to avoid parsign multiple times ?
+    //       (would mess up user-reguested order)
     char *gnashrc = getenv("GNASHRC");
     if (gnashrc)
     {

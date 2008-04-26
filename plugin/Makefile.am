@@ -42,7 +42,8 @@ plugindir   = $(FIREFOX_PLUGINS)
 # XP_UNIX	This needs to get defined for npapi.h on unix platforms.
 # PLUGIN_TRACE	Enable this define to get debug prints whenever the plugin
 #		api gets control.
-AM_CPPFLAGS = -DPLUGIN_TRACE -DXP_UNIX -DMOZ_X11 -DGNASHBINDIR=\"${bindir}\" \
+AM_CPPFLAGS = -DPLUGIN_TRACE -DXP_UNIX -DMOZ_X11 -DGNASHBINDIR=\"$(bindir)\" \
+	-DSYSCONFDIR=\"$(sysconfdir)\" \
         -I.. \
         -I$(srcdir) \
         -I$(top_srcdir)/server \

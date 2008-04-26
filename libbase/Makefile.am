@@ -31,6 +31,7 @@ endif
 pkglib_LTLIBRARIES =  $(LIBLTDLLIB) libgnashbase.la
 
 libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\" \
+	-DSYSCONFDIR=\"$(sysconfdir)\" \
 	-I.. -I$(srcdir) \
 	-I$(top_srcdir)	\
 	-I$(top_srcdir)/libnet	\

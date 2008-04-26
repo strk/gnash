@@ -186,10 +186,12 @@ NS_PluginInitialize()
 
 	}
 
-	// Append ~/.gnashpluginrc to GNASHRC
+	// Append SYSCONFDIR/gnashpluginrc and ~/.gnashpluginrc to GNASHRC
 	do {
+		// TODO: extract content in a set, add to set
+		//       and serialize back (to avoid duplicates)
+
 		std::string newGnashRc;
-		bool changed = false;
 		char *gnashrc = getenv("GNASHRC");
 		if ( gnashrc )
 		{
@@ -197,22 +199,26 @@ NS_PluginInitialize()
 			newGnashRc.append(":");
 		}
 
+		newGnashRc.append(SYSCONFDIR);
+		newGnashRc.append("/gnashpluginrc");
+
 		char *home = getenv("HOME");
 		if ( home )
 		{
+			newGnashRc.append(":");
 			newGnashRc.append(home);
 			newGnashRc.append("/.gnashpluginrc");
 		}
 		else
 		{
 			cerr << "WARNING: NPAPI plugin could not find user home dir" << endl;
-			break;
 		}
 
 		if ( setenv("GNASHRC", newGnashRc.c_str(), 1) )
 		{
 			cerr << "WARNING: NPAPI plugin could not append to the GNASHRC env variable" << endl;
 		}
+		else cout << "NOTE: NPAPI plugin set GNASHRC to " << newGnashRc << endl;
 
 	} while (0);
 
