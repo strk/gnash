@@ -1015,7 +1015,7 @@ void FBGui::check_mouse()
 bool FBGui::init_mouse()
 {
 
-  char* devname = getenv("POINTING_DEVICE");
+  const char* devname = getenv("POINTING_DEVICE");
   if (!devname) devname="/dev/input/event0";
 
   // Try to open mouse device, be error tolerant (FD is kept open all the time)
@@ -1229,7 +1229,7 @@ void FBGui::check_mouse()
 
 bool FBGui::init_keyboard() 
 {
-  char* devname = getenv("KEYBOARD_DEVICE");
+  const char* devname = getenv("KEYBOARD_DEVICE");
   if (!devname) devname="/dev/input/event0";
 
   // Try to open keyboard device, be error tolerant (FD is kept open all the time)
