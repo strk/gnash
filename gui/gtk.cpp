@@ -920,7 +920,7 @@ GtkGui::handlePrefs (GtkWidget* dialog, gint response, gpointer data)
 
     prefData *prefs = static_cast<prefData*>(data);
 
-    if (response == GTK_RESPONSE_APPLY) {
+    if (response == GTK_RESPONSE_OK) {
 
         // If 'Save' was clicked, set all the values in rcfile
         RcInitFile& rcfile = RcInitFile::getDefaultInstance();
@@ -995,17 +995,18 @@ GtkGui::handlePrefs (GtkWidget* dialog, gint response, gpointer data)
     	// that instead. How might that best be done?
     	rcfile.updateFile();
 
+        // Close the window when 'ok' is clicked
+        gtk_widget_destroy(dialog);
     }
 
-    else if (response == GTK_RESPONSE_CLOSE) {
-        // Close the window only when 'close' is clicked
+    else if (response == GTK_RESPONSE_CANCEL) {
+        // Close the window when 'cancel' is clicked
         gtk_widget_destroy(dialog);
-        if (prefs) delete prefs;
     }
     
-    else if (response == GTK_RESPONSE_DELETE_EVENT) {
-        if (prefs) delete prefs;
-    }
+    // response == GTK_RESPONSE_DELETE_EVENT
+
+    if (prefs) delete prefs;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1033,8 +1034,8 @@ GtkGui::showPreferencesDialog()
     				GTK_DIALOG_DESTROY_WITH_PARENT |
     				GTK_DIALOG_NO_SEPARATOR),
     				// The buttons and their response codes:
-    				GTK_STOCK_SAVE, GTK_RESPONSE_APPLY,
-    				GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
+    				GTK_STOCK_OK, GTK_RESPONSE_OK,
+    				GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
     				NULL);
     // Add Gnash icon
     addGnashIcon(GTK_WINDOW(prefsDialog));

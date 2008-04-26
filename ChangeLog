@@ -1,3 +1,8 @@
+2008-04-26 Robert Millan <rmh@aybabtu.com>
+
+    * gui/gtk.cpp: make the preferences menu buttons more
+      intuitive.
+
 2008-04-26 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* gui/fb.cpp: do it again, as getenv is not const.
