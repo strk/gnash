@@ -1014,19 +1014,21 @@ void FBGui::check_mouse()
 #ifdef USE_INPUT_EVENTS   
 bool FBGui::init_mouse()
 {
+  std::string dev;
 
-  const char* devname = getenv("POINTING_DEVICE");
-  if (!devname) devname="/dev/input/event0";
+  char* devname = getenv("POINTING_DEVICE");
+  if (devname) dev = devname;
+  else dev = "/dev/input/event0";
 
   // Try to open mouse device, be error tolerant (FD is kept open all the time)
-  input_fd = open(devname, O_RDONLY);
+  input_fd = open(dev.c_str(), O_RDONLY);
   
   if (input_fd<0) {
-    log_debug("Could not open %s: %s", devname, strerror(errno));    
+    log_debug("Could not open %s: %s", dev.c_str(), strerror(errno));    
     return false;
   }
   
-  log_debug("Pointing device %s open", devname);
+  log_debug("Pointing device %s open", dev.c_str());
   
   if (fcntl(input_fd, F_SETFL, fcntl(input_fd, F_GETFL) | O_NONBLOCK)<0) {
     log_error("Could not set non-blocking mode for pointing device: %s", strerror(errno));
@@ -1229,18 +1231,21 @@ void FBGui::check_mouse()
 
 bool FBGui::init_keyboard() 
 {
-  const char* devname = getenv("KEYBOARD_DEVICE");
-  if (!devname) devname="/dev/input/event0";
+  std::string dev;
+
+  char* devname = getenv("KEYBOARD_DEVICE");
+  if (devname) dev = devname;
+  else dev = "/dev/input/event0";
 
   // Try to open keyboard device, be error tolerant (FD is kept open all the time)
-  keyb_fd = open(devname, O_RDONLY);
+  keyb_fd = open(dev.c_str(), O_RDONLY);
   
   if (keyb_fd<0) {
-    log_debug("Could not open %s: %s", devname, strerror(errno));    
+    log_debug("Could not open %s: %s", dev.c_str(), strerror(errno));    
     return false;
   }
   
-  log_debug("Keyboard device %s open", devname);
+  log_debug("Keyboard device %s open", dev.c_str());
   
   if (fcntl(keyb_fd, F_SETFL, fcntl(keyb_fd, F_GETFL) | O_NONBLOCK)<0) {
     log_error("Could not set non-blocking mode for keyboard device: %s", strerror(errno));
