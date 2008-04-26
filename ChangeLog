@@ -1,5 +1,10 @@
 2008-04-26 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: AC_DEFINE_UNQUOTED saved the day
+	  (rush hacking)
+
+2008-04-26 Sandro Santilli <strk@keybit.net>
+
 	* configure.ac: Oops, AC_DEFINE can't use variables,
 	  will need to generate sysgnash{plugin}rc on 'make'
 	  (as suggested by automake dox)
