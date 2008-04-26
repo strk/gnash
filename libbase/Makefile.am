@@ -15,7 +15,7 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-EXTRA_DIST = 
+EXTRA_DIST = sysgnashrc.in sysgnashpluginrc.in
 
 # this is where Gnash plugins get installed
 pluginsdir = $(prefix)/lib/gnash/plugins

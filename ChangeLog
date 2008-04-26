@@ -1,5 +1,19 @@
 2008-04-26 Sandro Santilli <strk@keybit.net>
 
+	* libbase/rc.cpp: explicitly initialize the default
+	  value for _solsafedir to "/tmp/" (will be done
+	  so by SharedObject.cpp for an empty string anyway);
+	  drop the hard-coded DEFAULT_STREAMS_TIMEOUT as it's
+	  now set at configure time.
+	* configure.ac: provide DEFAULT_STREAMS_TIMEOUT, and
+	  all the FLASH_VERSION macros as substitutable symbols;
+	  generate libbase/sysgnashpluginrc and libbase/sysgnashrc
+	* libbase/: Makefile.am, sysgnashpluginrc.in, sysgnashrc.in:
+	  Provide systemwide default configuration files.
+	  They are created and distributed, but still not installed.
+
+2008-04-26 Sandro Santilli <strk@keybit.net>
+
 	* libbase/rc.cpp: add support for 'include' directive,
 	  cleanup parser to recognize empty lines and comments
 	  not starting on first column and to be more verbose

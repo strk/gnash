@@ -45,11 +45,6 @@
 
 #include <boost/tokenizer.hpp>
 
-#ifndef DEFAULT_STREAMS_TIMEOUT
-// TODO: add a ./configure switch to set this
-# define DEFAULT_STREAMS_TIMEOUT 10
-#endif
-
 using std::endl;
 using std::cout;
 using std::cerr;
@@ -96,6 +91,7 @@ RcInitFile::RcInitFile() : _delay(0),
 			   _startStopped(false),
 			   _insecureSSL(false),
 			   _streamsTimeout(DEFAULT_STREAMS_TIMEOUT),
+                           _solsandbox("/tmp/"),
                            _solreadonly(false),
                            _sollocaldomain(false),
                            _lcdisabled(false),

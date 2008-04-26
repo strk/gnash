@@ -1,0 +1,193 @@
+###########################################################
+#
+# Sat Apr 26 11:47:04 CEST 2008
+#
+# This file will be used as a config file by
+# all gnash processes.
+#
+# At time of writing, the plugin will first parse the
+# systemwide 'gnashrc' file, then the user '.gnashrc'
+# file, then the systemwide 'gnashpluginrc' file and
+# finally user '.gnashpluginrc'.
+#
+###########################################################
+
+
+# Display a splash screen when starting.
+#
+# Default: on
+#
+#set splashScreen off
+
+# Only access remote content from our local domain 
+#
+# Default: off
+#
+#set localdomain on
+
+# Only access content from our local host
+#
+# Default: off
+#
+#set localhost on
+
+# If whitelist is non-empty, only SWF from the given domains
+# are allowed to be loaded.
+#
+# Default: empty
+#
+#set whitelist www.doonesbury.com www.cnn.com
+#append whiteList www.9news.com
+
+# If whitelist is empty, these are the only domains from 
+# which loading SWFs will be forbidden.
+#
+# Default: empty
+#
+#set blacklist www.doubleclick.com www.ebay.com
+#append blacklist www.evil.com
+
+# The delay between frame advance,
+# 0 to use what's specified in the SWF.
+#
+# Default: 0
+#
+#set delay 50
+
+# Gnash verbosity level:
+#  0: no output
+#  1: user traces, internal errors, unimplemented messages
+#  2: debug messages
+#
+# Default: 0
+#
+#set verbosity 1
+
+# Print a lot of info about ActionScript processing
+#
+# Default: off
+# 
+#set actionDump on
+
+# Print a lot of info about SWF parsing
+#
+# Default: off
+# 
+#set parserDump on
+
+# File to send logs to (if writelog is on)
+#
+# Default: gnash-dbg.log (in current working dir)
+#
+#set debuglog /tmp/gnash-dbg.log
+
+# Write a debug log to disk
+#
+# Default: off
+#
+#set writelog on
+
+# Version string to pass to ActionScript
+#
+# Default: @DEFAULT_FLASH_PLATFORM_ID@ @DEFAULT_FLASH_MAJOR_VERSION@,@DEFAULT_FLASH_MINOR_VERSION@,@DEFAULT_FLASH_REV_NUMBER@,0
+#
+#set flashVersionString GSH 9,0,99,0
+
+# Enable the ActionScript debugger (if compile-time support was enabled)
+#
+# Default: off
+#
+#set debugger on
+
+# Activate sound
+#
+# Default: on
+#
+#set sound off
+
+# Activate sound when called as a plugin
+#
+# NOTE: this is a deprecated directive, should
+#       use the gnashpluginrc file for plugin-specific
+#       settings
+#
+# Default: on
+#
+#set pluginSoUND off
+
+# Enable Gnash extensions (custom ActionScript classes in the player API)
+#
+# You shouldn't enable this unless you really know what you're doing
+#
+# Default: off
+#
+#set enableExtensions on
+
+# Start the gui in STOP mode
+#
+# This is a commonly wanted feature for plugin
+# runs, better override in gnashpluginrc
+#
+# Default: off
+#
+#set startStopped on
+
+# Allow unverified SSL connections
+#
+# Default: false
+#
+#set insecureSSL on
+
+# Timeout in seconds for stream download
+#
+# The download will timeout after the given seconds
+# of inactivity. Every activity resets the timer
+#
+# Default: @DEFAULT_STREAMS_TIMEOUT@
+#
+set streamsTimeout 1.5
+
+# A space-separated list of directories you want movies
+# to have access to.
+#
+# Note that the directory from which your swf was loaded
+# (if loaded from local filesystem) will be always appended
+# to the list.
+#
+# Default: empty
+# 
+#set localSandboxPath /tmp/flashsandbox
+#append localSandboxPath /tmp/flashsandbox2
+
+# Use the following command format to open urls if 
+# no host-request FD was given.
+#
+# The '%u' label will be substituted with the url
+# to open.
+# 
+# NOTE that the NPAPI plugin provides an host request FD
+# to send url opening requests to.
+#
+# Default: firefox -remote 'openurl(%u)'
+#
+#set urlOpenerFormat lynx %u
+
+# Directory to store SharedObject files 
+#
+# If the directory doens't exist SharedObject won't work.
+# 
+# Default: /tmp/
+#
+set SOLSafeDir /dev/null
+
+# Never write SharedObject (kind of cookies), only read them
+#
+# Default: false
+#
+#set SOLReadOnly true
+
+# Enable LocalConnection ActionScript class
+#
+# Default: false
+#
+set LocalConnection off

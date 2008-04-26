@@ -1,0 +1,21 @@
+###########################################################
+#
+# Sat Apr 26 11:47:04 CEST 2008
+#
+# This file will be used as a config file by
+# the gnash NPAPI plugin (still not by the KPARTS one)
+#
+# At time of writing, the plugin will first parse the
+# systemwide 'gnashrc' file, then the user '.gnashrc'
+# file, then the systemwide 'gnashpluginrc' file and
+# finally user '.gnashpluginrc'.
+#
+###########################################################
+
+# Start the gui in STOP mode
+#
+# This is a commonly wanted feature for plugin  runs.
+#
+# Default: off
+#
+set startStopped on
