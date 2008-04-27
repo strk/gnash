@@ -1,3 +1,16 @@
+2008-04-27 Sandro Santilli <strk@keybit.net>
+
+	* server/as_object.{cpp,h}, array.{cpp,h},
+	  edit_text_character.{cpp,h}, sprite_instance.{cpp,h},
+	  asobj/xml.{cpp,h}:
+	  Change set_member signature to return bool (did the named
+	  member exist?) and take an additional arg (create a new member
+	  if not found?).
+	* server/as_environment.cpp (set_variable_raw): use set_member for
+	  in-scope-chain seeks (rather then update_member, which was
+	  dropped by this commit).
+	* testsuite/actionscript.all/TextField.as: successes.
+
 2008-04-27 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* gui/gnash.cpp: use boost format for formatting, drop last use

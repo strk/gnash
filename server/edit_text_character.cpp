@@ -363,8 +363,8 @@ attachTextFieldInterface(as_object& o)
 
 	o.init_property(NSV::PROP_uXMOUSE, character::xmouse_get, character::xmouse_get, propFlags);
 	o.init_property(NSV::PROP_uYMOUSE, character::ymouse_get, character::ymouse_get, propFlags);
-	o.init_property(NSV::PROP_uXSCALE, character::xscale_getset, character::xscale_getset, propFlags);
-	o.init_property(NSV::PROP_uYSCALE, character::yscale_getset, character::yscale_getset, propFlags);
+	o.init_property(NSV::PROP_uXSCALE, character::xscale_getset, character::xscale_getset);
+	o.init_property(NSV::PROP_uYSCALE, character::yscale_getset, character::yscale_getset);
 
 
 	// SWF5 or higher (TODO: check textfields in SWF5 !!! we miss tests here !)
@@ -891,9 +891,9 @@ edit_text_character::get_text_value() const
 	return utf8::encodeCanonicalString(_text, version);
 }
 
-void
+bool
 edit_text_character::set_member(string_table::key name,
-		const as_value& val, string_table::key nsname)
+		const as_value& val, string_table::key nsname, bool ifFound)
 {
 	//log_debug("edit_text_character.set_member(%s, %s)", name.c_str(), val.to_string());
 
@@ -910,7 +910,7 @@ edit_text_character::set_member(string_table::key name,
 	{
 		int version = get_parent()->get_movie_definition()->get_version();
 		setTextValue(utf8::decodeCanonicalString(val.to_string_versioned(version), version));
-		return;
+		return true;
 	}
 	case NSV::PROP_HTML_TEXT:
 		//if (name == "htmlText")
@@ -918,7 +918,7 @@ edit_text_character::set_member(string_table::key name,
 		int version = get_parent()->get_movie_definition()->get_version();
 		setTextValue(utf8::decodeCanonicalString(val.to_string_versioned(version), version));
 		format_text();
-		return;
+		return true;
 	}
 	case NSV::PROP_uX:
 		//else if (name == "_x")
@@ -929,7 +929,7 @@ edit_text_character::set_member(string_table::key name,
 
 		// m_accept_anim_moves = false;
 		
-		return;
+		return true;
 	}
 	case NSV::PROP_uY:
 		//else if (name == "_y")
@@ -940,7 +940,7 @@ edit_text_character::set_member(string_table::key name,
 
 		// m_accept_anim_moves = false;
 		
-		return;
+		return true;
 	}
 	case NSV::PROP_uWIDTH:
 	{
@@ -951,7 +951,7 @@ edit_text_character::set_member(string_table::key name,
 			IF_VERBOSE_ASCODING_ERRORS(
 			log_aserror(_("Attempt to set TextField._width to %g"), nw);
 			);
-			return;
+			return true;
 		}
 
 		if ( nw < 0.0f )
@@ -967,7 +967,7 @@ edit_text_character::set_member(string_table::key name,
 #ifdef GNASH_DEBUG_TEXTFIELDS
 			log_debug("TextField width already == %g, nothing to do to change it", nw);
 #endif
-			return; // nothing to do
+			return true; // nothing to do
 		}
 		if ( ! _bounds.isFinite() )
 		{
@@ -975,7 +975,7 @@ edit_text_character::set_member(string_table::key name,
 			std::stringstream ss; ss<<_bounds;
 			log_debug("Non-finite TextField bounds : %s", ss.str().c_str());
 #endif
-			return;
+			return true;
 		}
 
 #ifdef GNASH_DEBUG_TEXTFIELDS
@@ -1002,7 +1002,7 @@ edit_text_character::set_member(string_table::key name,
 		// not need to reformat text here
 		format_text();
 
-		return;
+		return true;
 	}
 	case NSV::PROP_uHEIGHT:
 	{
@@ -1013,7 +1013,7 @@ edit_text_character::set_member(string_table::key name,
 			IF_VERBOSE_ASCODING_ERRORS(
 			log_aserror(_("Attempt to set TextField._height to %g"), nh);
 			);
-			return;
+			return true;
 		}
 
 		if ( nh < 0.0f )
@@ -1029,7 +1029,7 @@ edit_text_character::set_member(string_table::key name,
 #ifdef GNASH_DEBUG_TEXTFIELDS
 			log_debug("TextField height already == %g, nothing to do to change it", nh);
 #endif // GNASH_DEBUG_TEXTFIELDS
-			return; // nothing to do
+			return true; // nothing to do
 		}
 		if ( ! _bounds.isFinite() )
 		{
@@ -1037,7 +1037,7 @@ edit_text_character::set_member(string_table::key name,
 			std::stringstream ss; ss<<_bounds;
 			log_debug("Non-finite TextField bounds : %s", ss.str().c_str());
 #endif // GNASH_DEBUG_TEXTFIELDS
-			return;
+			return true;
 		}
 
 #ifdef GNASH_DEBUG_TEXTFIELDS
@@ -1059,13 +1059,13 @@ edit_text_character::set_member(string_table::key name,
 		// not need to reformat text here
 		format_text();
 
-		return;
+		return true;
 	}
 	case NSV::PROP_uVISIBLE:
 		//else if (name == "_visible")
 	{
 		set_visible(val.to_bool());
-		return;
+		return true;
 	}
 	case NSV::PROP_uALPHA:
 		//else if (name == "_alpha")
@@ -1075,13 +1075,13 @@ edit_text_character::set_member(string_table::key name,
 		cxform	cx = get_cxform();
 		cx.m_[3][0] = fclamp(std::infinite_to_fzero(val.to_number()) / 100.f, 0, 1);
 		set_cxform(cx);
-		return;
+		return true;
 	}
 	// @@ TODO see TextField members in Flash MX docs
 	}	// end switch
 
 
-	set_member_default(name, val, nsname);
+	return set_member_default(name, val, nsname, ifFound);
 }
 
 bool

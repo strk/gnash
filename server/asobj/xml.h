@@ -95,8 +95,8 @@ public:
     /// which are NOT proper properties !
     /// See actionscript.all/XML.as
     ///
-    void set_member(string_table::key name, const as_value& val,
-                string_table::key nsname = 0);
+    bool set_member(string_table::key name, const as_value& val,
+                string_table::key nsname = 0, bool ifFound=false);
 
     // Methods
 

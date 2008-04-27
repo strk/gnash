@@ -20,7 +20,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: TextField.as,v 1.52 2008/04/27 16:26:43 strk Exp $";
+rcsid="$Id: TextField.as,v 1.53 2008/04/27 18:13:16 strk Exp $";
 #include "check.as"
 
 #if OUTPUT_VERSION > 5
@@ -867,20 +867,20 @@ with(tf) {
         _target='fake';
 }
 
-xcheck_equals(_root._x, 0);
-xcheck_equals(_root._y, 0);
-xcheck_equals(_root._visible, true);
+check_equals(_root._x, 0);
+check_equals(_root._y, 0);
+check_equals(_root._visible, true);
 check_equals(_root._xscale, 100);
 check_equals(_root._yscale, 100);
 check_equals(_root._target, '/');
 xcheck_equals(_root._parent, 'fake_parent');
 check_equals(_root._name, '');
 
-xcheck_equals(tf._x, 10);
-xcheck_equals(tf._y, 11);
-xcheck_equals(tf._visible, false);
-xcheck_equals(tf._xscale, 200);
-xcheck_equals(tf._yscale, 201);
+check_equals(tf._x, 10);
+check_equals(tf._y, 11);
+check_equals(tf._visible, false);
+check_equals(tf._xscale, 200);
+check_equals(tf._yscale, 201);
 check_equals(tf._target, '/fake_name');
 check_equals(tf._parent, _level0); 
 check_equals(tf._name, 'fake_name');

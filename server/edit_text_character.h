@@ -116,8 +116,8 @@ public:
 	bool getTextDefined() const { return _textDefined; }
 
 	/// We have a "text" member.
-	void set_member(string_table::key name, const as_value& val, 
-		string_table::key nsname = 0);
+	bool set_member(string_table::key name, const as_value& val, 
+		string_table::key nsname = 0, bool ifFound=false);
 
 	bool get_member(string_table::key name, as_value* val, 
 		string_table::key nsname = 0);

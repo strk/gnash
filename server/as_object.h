@@ -263,12 +263,23 @@ public:
 	/// @param nsname
 	///	Id of the namespace.
 	///
-	virtual void set_member(string_table::key key, const as_value& val,
-		string_table::key nsname = 0)
+	/// @param ifFound
+	///	If true, don't create a new member, but only update
+	///	an existing one.
+	///
+	/// @return true if the given member existed, false otherwise.
+	///	NOTE: the return doesn't tell if the member exists after
+	///	      the call, as watch triggers might have deleted it
+	///	      after setting.
+	///	
+	///
+	virtual bool set_member(string_table::key key, const as_value& val,
+		string_table::key nsname = 0, bool ifFound=false)
 	{
-		return set_member_default(key, val, nsname);
+		return set_member_default(key, val, nsname, ifFound);
 	}
 
+#if 0
 	/// Update an existing member value
 	//
 	/// NOTE that getter-setter in the inheritance chain are
@@ -292,6 +303,7 @@ public:
 	///
 	std::pair<bool,bool> update_member(string_table::key key, const as_value& val,
 		string_table::key nsname = 0);
+#endif
 
 	virtual bool on_event(const event_id& id );
 
@@ -1074,8 +1086,17 @@ protected:
 	/// @param val
 	///	Value to assign to the named property.
 	///
-	void set_member_default(string_table::key name, const as_value& val, 
-		string_table::key nsname);
+	/// @param ifFound
+	///	If true, don't create a new member, but only update
+	///	an existing one.
+	///
+	/// @return true if the given member existed, false otherwise.
+	///	NOTE: the return doesn't tell if the member exists after
+	///	      the call, as watch triggers might have deleted it
+	///	      after setting.
+	///
+	bool set_member_default(string_table::key name, const as_value& val, 
+		string_table::key nsname, bool ifFound);
 
 #ifdef GNASH_USE_GC
 	/// Mark all reachable resources, override from GcResource.

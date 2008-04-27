@@ -549,9 +549,9 @@ as_object::reserveSlot(string_table::key name, string_table::key nsId,
 }
 
 // Handles read_only and static properties properly.
-void
+bool
 as_object::set_member_default(string_table::key key, const as_value& val,
-	string_table::key nsname)
+	string_table::key nsname, bool ifFound)
 {
 	//log_debug(_("set_member_default(%s)"), key.c_str());
 	Property* prop = findUpdatableProperty(key, nsname);
@@ -562,7 +562,7 @@ as_object::set_member_default(string_table::key key, const as_value& val,
 			IF_VERBOSE_ASCODING_ERRORS(log_aserror(_(""
 				"Attempt to set read-only property '%s'"),
 				_vm.getStringTable().value(key).c_str()););
-			return;
+			return true;
 		}
 
 		try
@@ -589,8 +589,9 @@ as_object::set_member_default(string_table::key key, const as_value& val,
 				if ( ! prop )
 				{
 					log_debug("Property %s deleted by trigger on update", _vm.getStringTable().value(key));
-					return;
+					return true;
 				}
+
 				//if ( prop->isGetterSetter() ) prop->setCache(newVal); 
 				prop->setValue(*this, newVal); 
 			}
@@ -601,7 +602,6 @@ as_object::set_member_default(string_table::key key, const as_value& val,
 			}
 
 			prop->clearVisible(_vm.getSWFVersion());
-			return;
 		}
 		catch (ActionException& exc)
 		{
@@ -609,10 +609,11 @@ as_object::set_member_default(string_table::key key, const as_value& val,
 				_vm.getStringTable().value(key).c_str(), exc.what());
 		}
 
-		return;
+		return true;
 	}
 
 	// Else, add new property...
+	if ( ifFound ) return false;
 
 	// Property does not exist, so it won't be read-only. Set it.
 	if (!_members.setValue(key, const_cast<as_value&>(val), *this, nsname))
@@ -621,7 +622,7 @@ as_object::set_member_default(string_table::key key, const as_value& val,
 			log_aserror(_("Unknown failure in setting property '%s' on "
 			"object '%p'"), _vm.getStringTable().value(key).c_str(),
 			(void*) this););
-		return;
+		return false;
 	}
 
 	// Now check if we have a trigger, if so, invoke it
@@ -646,13 +647,17 @@ as_object::set_member_default(string_table::key key, const as_value& val,
 		if ( ! prop )
 		{
 			log_debug("Property %s deleted by trigger on create", _vm.getStringTable().value(key));
-			return;
 		}
-		prop->setValue(*this, newVal);
+		else
+		{
+			prop->setValue(*this, newVal);
+		}
 	}
 
+	return false;
 }
 
+#if 0
 std::pair<bool,bool>
 as_object::update_member(string_table::key key, const as_value& val,
 	string_table::key nsname)
@@ -710,8 +715,8 @@ as_object::update_member(string_table::key key, const as_value& val,
 	}
 
 	return std::make_pair(false, false);
-
 }
+#endif
 
 void
 as_object::init_member(const std::string& key1, const as_value& val, int flags,

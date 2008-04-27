@@ -369,8 +369,8 @@ public:
 		string_table::key nsname = 0);
 
 	/// Overridden to provide array[#]=x semantic
-	virtual void set_member(string_table::key name,
-		const as_value& val, string_table::key nsname = 0);
+	virtual bool set_member(string_table::key name,
+		const as_value& val, string_table::key nsname=0, bool ifFound=false);
 
 	/// Overridden to deal with indexed elements
 	virtual std::pair<bool,bool> delProperty(string_table::key name, string_table::key nsname = 0);

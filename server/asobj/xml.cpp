@@ -143,12 +143,13 @@ XML::get_member(string_table::key name, as_value *val, string_table::key nsname)
         return get_member_default(name, val, nsname);
 }
 
-void
+bool
 XML::set_member(string_table::key name, const as_value& val, 
-	string_table::key nsname)
+	string_table::key nsname, bool ifFound)
 {
         if (name == NSV::PROP_STATUS)
 	{
+		// TODO: this should really be a proper property (see XML.as)
 		if ( ! val.is_number() )
 		{
 			_status = static_cast<XML::Status>(std::numeric_limits<boost::int32_t>::min());
@@ -158,18 +159,19 @@ XML::set_member(string_table::key name, const as_value& val,
 			unsigned int statusNumber = static_cast<int>(val.to_number());
 			_status = XML::Status( static_cast<XML::Status>(statusNumber) );
 		}
-		return;
+		return true;
 	}
         else if (name == NSV::PROP_LOADED)
         {
+		// TODO: this should really be a proper property
                 bool b = val.to_bool();
 		//log_debug(_("set_member 'loaded' (%s) became boolean %d"), val.to_debug_string().c_str(), b);
                 if ( b ) _loaded = 1;
                 else _loaded = 0;
-                return;
+                return true;
         }
 
-        set_member_default(name, val, nsname);
+        return set_member_default(name, val, nsname, ifFound);
 }
 
 XML::~XML()

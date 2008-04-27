@@ -859,9 +859,9 @@ as_array_object::set_indexed(unsigned int index,
 }
 
 /* virtual public, overriding as_object::set_member */
-void
+bool
 as_array_object::set_member(string_table::key name,
-		const as_value& val, string_table::key nsname)
+		const as_value& val, string_table::key nsname, bool ifFound)
 {
 	int index = index_requested(name);
 
@@ -877,11 +877,11 @@ as_array_object::set_member(string_table::key name,
 
 		// set the appropriate index and return
 		elements[index] = val;
-		return;
+		return true;
 	}
 
 
-	as_object::set_member_default(name,val, nsname);
+	return as_object::set_member_default(name,val, nsname, ifFound);
 }
 
 as_array_object*

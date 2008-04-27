@@ -350,7 +350,7 @@ as_environment::set_variable_raw(
         {
             // const_cast needed due to non-const as_object::get_member 
             as_object* obj = const_cast<as_object*>(scopeStack[i-1].get());
-            if (obj && obj->update_member(varkey, val).first )
+            if (obj && obj->set_member(varkey, val, 0, true) )
             {
 		return;
             }
@@ -369,7 +369,7 @@ as_environment::set_variable_raw(
         {
             // const_cast needed due to non-const as_object::get_member 
             as_object* obj = const_cast<as_object*>(scopeStack[i-1].get());
-            if (obj && obj->update_member(varkey, val).first )
+            if (obj && obj->set_member(varkey, val, 0, true))
             {
 		return;
             }

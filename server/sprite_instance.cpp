@@ -2743,8 +2743,9 @@ sprite_instance::get_path_element(string_table::key key)
   return tmp.to_object().get();
 }
 
-void sprite_instance::set_member(string_table::key name,
-    const as_value& val, string_table::key nsname)
+bool
+sprite_instance::set_member(string_table::key name,
+    const as_value& val, string_table::key nsname, bool ifFound)
 {
 #ifdef DEBUG_DYNTEXT_VARIABLES
   //log_debug(_("sprite[%p]::set_member(%s, %s)"), (void*)this, VM::get().getStringTable().value(name), val.to_debug_string());
@@ -2754,6 +2755,8 @@ void sprite_instance::set_member(string_table::key name,
   //{
   //  checkForKeyOrMouseEvent(VM::get().getStringTable().value(name));
   //}
+
+  bool found = false;
 
   // Try textfield variables
   //
@@ -2775,6 +2778,7 @@ void sprite_instance::set_member(string_table::key name,
       TextFieldPtr tf = *i;
       tf->updateText(val.to_string());
     }
+    found = true;
   }
 #ifdef DEBUG_DYNTEXT_VARIABLES
   else
@@ -2784,8 +2788,9 @@ void sprite_instance::set_member(string_table::key name,
 #endif
 
   // If that didn't work call the default set_member
-  set_member_default(name, val, nsname);
+  if (  set_member_default(name, val, nsname, ifFound) ) found=true;
 
+  return found;
 }
 
 void sprite_instance::advance_sprite()
