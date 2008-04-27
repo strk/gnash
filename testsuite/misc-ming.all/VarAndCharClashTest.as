@@ -40,7 +40,7 @@ check_equals(typeof(greenref), 'movieclip');
 
 MovieClip.prototype.stealth = 12;
 // Only own properties hide chars, not inherited ones
-xcheck_equals(typeof(stealth), 'movieclip'); 
+check_equals(typeof(stealth), 'movieclip'); 
 greenref._name = "stealth2";
 check_equals(typeof(stealth), 'number'); 
 

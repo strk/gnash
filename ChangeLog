@@ -1,3 +1,13 @@
+2008-04-28 Sandro Santilli <strk@keybit.net>
+
+	* server/sprite_instance.cpp (get_member): our own properties
+	  have precedence over our child names. Beside correctness
+	  (this fixes a bug in potlatch) I suspect this will
+	  speed up actionscript interpretation on the average.
+	  (did make check did run faster or is it just my impression?).
+	* testsuite/misc-ming.all/VarAndCharClashTest.as: success in 
+	  just-added new test.
+
 2008-04-27 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/VarAndCharClashTest.as: test that

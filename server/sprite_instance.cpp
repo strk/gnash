@@ -2317,44 +2317,23 @@ bool sprite_instance::get_member(string_table::key name_key, as_value* val,
     }
   }
 
-  // Try object members, BEFORE display list items!
+  // Own members take precendence over display list items 
   // (see testcase VarAndCharClash.swf in testsuite/misc-ming.all)
-  //
-  // TODO: simplify the next line when get_member_default takes
-  //       a std::string
-  if (get_member_default(name_key, val, nsname))
+  as_object* owner = NULL;
+  Property* prop = findProperty(name_key, nsname, &owner);
+  if ( prop && owner == this ) 
   {
-
-// ... trying to be useful to Flash coders ...
-// The check should actually be performed before any return
-// prior to the one due to a match in the DisplayList.
-// It's off by default anyway, so not a big deal.
-// See bug #18457
-//#define CHECK_FOR_NAME_CLASHES 1
-#ifdef CHECK_FOR_NAME_CLASHES
-    IF_VERBOSE_ASCODING_ERRORS(
-    if (  m_display_list.get_character_by_name_i(name) )
-    {
-      log_aserror(_("A sprite member (%s) clashes with "
-          "the name of an existing character "
-          "in its display list.  "
-          "The member will hide the "
-          "character"), name);
-    }
-    );
-#endif
-
+    try { *val = prop->getValue(*this); }
+    catch (ActionLimitException&) { throw; }
+    catch (ActionException& ex) { log_error(_("Caught exception: %s"), ex.what()); return false; }
     return true;
   }
-
 
   // Try items on our display list.
   character* ch;
   if ( _vm.getSWFVersion() >= 7 ) ch =  m_display_list.get_character_by_name(name);
   else ch = m_display_list.get_character_by_name_i(name);
-
-  if (ch)
-  {
+  if (ch) {
       // Found object.
 
       // If the object is an ActionScript referenciable one we
@@ -2385,6 +2364,18 @@ bool sprite_instance::get_member(string_table::key name_key, as_value* val,
 	}
     }
   }
+
+  // Inherited members come last 
+  // (see testcase VarAndCharClash.swf in testsuite/misc-ming.all)
+  if ( prop )
+  {
+    assert(owner != this);
+    try { *val = prop->getValue(*this); }
+    catch (ActionLimitException&) { throw; }
+    catch (ActionException& ex) { log_error(_("Caught exception: %s"), ex.what()); return false; }
+    return true;
+  }
+
 
   return false;
 
