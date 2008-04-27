@@ -26,6 +26,21 @@ LIBLTDLLIB = libltdl.la
 LIBLTDLHEAD =  $(top_srcdir)/libltdl/ltdl.h
 endif
 
+sysconf_DATA = sysgnashrc sysgnashpluginrc
+
+edit = sed \
+	-e 's|@DEFAULT_FLASH_PLATFORM_ID[@]|$(DEFAULT_FLASH_PLATFORM_ID)|g' \
+	-e 's|@DEFAULT_FLASH_MAJOR_VERSION[@]|$(DEFAULT_FLASH_MAJOR_VERSION)|g' \
+	-e 's|@DEFAULT_FLASH_MINOR_VERSION[@]|$(DEFAULT_FLASH_MINOR_VERSION)|g' \
+	-e 's|@DEFAULT_FLASH_REV_NUMBER[@]|$(DEFAULT_FLASH_REV_NUMBER)|g' \
+	-e 's|@DEFAULT_STREAMS_TIMEOUT[@]|$(DEFAULT_STREAMS_TIMEOUT)|g' 
+
+sysgnashrc: sysgnashrc.in
+	$(edit) '$(srcdir)/$@.in' >$@
+
+sysgnashpluginrc: sysgnashpluginrc.in
+	$(edit) '$(srcdir)/$@.in' >$@
+
 # If we are using an installable libltdl, then it needs to be built
 # before libgnash, as libgnash depends on it for extensions.
 pkglib_LTLIBRARIES =  $(LIBLTDLLIB) libgnashbase.la
@@ -164,4 +179,4 @@ mudflap:
 	$(MAKE) CXXFLAGS="$(CXXFLAGS) -fmudflap" LDFLAGS="$(LDFLAGS) -lmudflap"
 
 clean-hook:
-	-rm -f core.* *.obj
+	-rm -f core.* *.obj sysgnashrc sysgnashpluginrc

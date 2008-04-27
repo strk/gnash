@@ -2004,8 +2004,6 @@ AC_OUTPUT(Makefile
 libmedia/Makefile
 po/Makefile
 libbase/Makefile
-libbase/sysgnashrc
-libbase/sysgnashpluginrc
 libgeometry/Makefile
 server/Makefile
 server/asobj/Makefile
