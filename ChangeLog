@@ -1,5 +1,11 @@
 2008-04-27 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/VarAndCharClashTest.as: test that
+	  only a sprite own properties hide child characters, but
+	  not inherited properties.
+
+2008-04-27 Sandro Santilli <strk@keybit.net>
+
 	* server/as_object.{cpp,h}, array.{cpp,h},
 	  edit_text_character.{cpp,h}, sprite_instance.{cpp,h},
 	  asobj/xml.{cpp,h}:

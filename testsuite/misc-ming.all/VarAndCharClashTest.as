@@ -10,7 +10,8 @@
 
 // Move the 'green' character on the right 
 // so that Dejagnu.swf xtrace window is visible
-green._x = 200;
+green._x = 500;
+green._xscale = green._yscale = 50;
 
 // Verify that 'green' character is a MovieClip
 check(green instanceOf MovieClip);
@@ -37,6 +38,12 @@ check_equals(typeof(greenref), 'movieclip');
 greenref._name = "stealth";
 check_equals(typeof(greenref), 'movieclip');
 
+MovieClip.prototype.stealth = 12;
+// Only own properties hide chars, not inherited ones
+xcheck_equals(typeof(stealth), 'movieclip'); 
+greenref._name = "stealth2";
+check_equals(typeof(stealth), 'number'); 
+
 // print totals and stop to avoid infinite loops
-totals();
+totals(10);
 stop();
