@@ -20,7 +20,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: TextField.as,v 1.51 2008/04/08 21:59:24 strk Exp $";
+rcsid="$Id: TextField.as,v 1.52 2008/04/27 16:26:43 strk Exp $";
 #include "check.as"
 
 #if OUTPUT_VERSION > 5
@@ -847,12 +847,57 @@ check_equals(tf5._height, 2);
 createTextField("tf6", 103, 10, 10, 160);
 check_equals(typeof(tf6), 'undefined');
 
+//------------------------------------------------------------
+// Test properties
+//------------------------------------------------------------
 
+_root._visible = true; // just to be sure
+_root._xscale = _root._yscale = 100;
+_root.createTextField('htf',0,0,0,0,0);
+check_equals(typeof(htf), 'object');
+tf = htf;
+with(tf) {
+        _x=10;
+        _y=11;
+        _visible=false;
+        _xscale=200;
+        _yscale=201;
+	_parent='fake_parent';
+	_name='fake_name';
+        _target='fake';
+}
+
+xcheck_equals(_root._x, 0);
+xcheck_equals(_root._y, 0);
+xcheck_equals(_root._visible, true);
+check_equals(_root._xscale, 100);
+check_equals(_root._yscale, 100);
+check_equals(_root._target, '/');
+xcheck_equals(_root._parent, 'fake_parent');
+check_equals(_root._name, '');
+
+xcheck_equals(tf._x, 10);
+xcheck_equals(tf._y, 11);
+xcheck_equals(tf._visible, false);
+xcheck_equals(tf._xscale, 200);
+xcheck_equals(tf._yscale, 201);
+check_equals(tf._target, '/fake_name');
+check_equals(tf._parent, _level0); 
+check_equals(tf._name, 'fake_name');
+
+_root._visible = true;
+_root._x = _root._y = 0;
+_root._xscale = _root._yscale = 100;
+
+
+//------------------------------------------------------------
+// END OF TESTS
+//------------------------------------------------------------
 
 #if OUTPUT_VERSION < 8
- check_totals(398);
+ check_totals(415);
 #else
- check_totals(399);
+ check_totals(416);
 #endif
 
 #else // OUTPUT_VERSION <= 5

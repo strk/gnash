@@ -1,5 +1,10 @@
 2008-04-27 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/TextField.as: add test showing a scary
+	  bug with update_member and non-properties.
+
+2008-04-27 Sandro Santilli <strk@keybit.net>
+
 	* server/namedStrings.{cpp,h}: add PROP_USEHANDCURSOR named string.
 	* server/character.h: add virtual allowHandCursor() method.
 	* gui/gui.cpp (notify_mouse_moved): check if active entity under
