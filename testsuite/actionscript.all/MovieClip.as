@@ -20,9 +20,9 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.127 2008/04/27 15:39:40 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.128 2008/04/27 15:49:17 strk Exp $";
 
-rcsid="$Id: MovieClip.as,v 1.127 2008/04/27 15:39:40 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.128 2008/04/27 15:49:17 strk Exp $";
 #include "check.as"
 
 // To be called at end of test
@@ -113,7 +113,7 @@ check(!MovieClip.prototype.hasOwnProperty('loadMovieNum'));
 check(!MovieClip.prototype.hasOwnProperty('valueOf')); 
 check(!MovieClip.prototype.hasOwnProperty('toString')); 
 check(MovieClip.prototype.hasOwnProperty('meth')); 
-xcheck(MovieClip.prototype.hasOwnProperty('useHandCursor')); 
+check(MovieClip.prototype.hasOwnProperty('useHandCursor')); 
 #endif
 check_equals(typeof(mc.valueOf), 'function');
 check_equals(typeof(mc.toString), 'function');
