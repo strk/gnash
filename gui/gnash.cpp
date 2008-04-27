@@ -55,6 +55,8 @@ extern "C" {
 # define gnash_main main
 #endif
 
+#include <boost/format.hpp> // For i18n-friendly cerr
+
 using namespace gnash; // for log_*
 
 using std::cerr;
@@ -281,7 +283,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                     int fd = parser.argument<long>(i);
                     if ( fd < 1 )
                     {
-	                    printf(_("Invalid host communication filedescriptor %d\n"), fd);
+	                    cerr << boost::format(_("Invalid host communication filedescriptor %d\n")) % fd << endl;
 	                    exit(EXIT_FAILURE);
                     }
                     player.setHostFD ( fd );
@@ -293,15 +295,15 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                     log_debug (_("Setting width to " SIZET_FMT), player.getWidth());
                     break;
                 case 'g':
-    #ifdef USE_DEBUGGER
+#ifdef USE_DEBUGGER
                     log_debug (_("Setting debugger ON"));
                     debugger.enabled(true);
     //              debugger.startServer(&debugger);
                     debugger.console();
-    #else
+#else
                     log_error (_("No debugger; disabled at compile time, -g is invalid"));
                     exit(EXIT_FAILURE);
-    #endif
+#endif
                     break;
                 case 'k':
                     heightGiven = true;
@@ -348,12 +350,12 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                     player.setExitTimeout(parser.argument<float>(i));
                     break;
                 case 'f':
-    #ifdef GNASH_FPS_DEBUG
+#ifdef GNASH_FPS_DEBUG
 	                player.setFpsPrintTime(parser.argument<float>(i));
-    #else
+#else
 	                cout << _("FPS debugging disabled at compile time, -f is invalid") << endl;
 	                exit(EXIT_FAILURE);
-    #endif // ndef GNASH_FPS_DEBUG
+#endif // ndef GNASH_FPS_DEBUG
 	                break;
                 case 'P':
                 {
@@ -386,7 +388,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
     }
 
     if ( ! renderflag ) {
-	log_debug (_("No rendering flags specified, using rcfile"));
+        log_debug (_("No rendering flags specified, using rcfile"));
         if ( plugin ) {
             player.setDoSound( rcfile.usePluginSound() );
         } else {
@@ -424,7 +426,7 @@ gnash_main(int argc, char *argv[])
 	}
 	catch (...)
 	{
-		cerr << "Exception thrown during parseCommandLine" << endl;
+		cerr << _("Exception thrown during parseCommandLine") << endl;
 		exit(EXIT_FAILURE);
 	}
 

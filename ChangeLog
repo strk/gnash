@@ -1,3 +1,8 @@
+2008-04-27 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* gui/gnash.cpp: use boost format for formatting, drop last use
+	  of printf among all the couts and cerrs.
+
 2008-04-27 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/TextField.as: add test showing a scary
