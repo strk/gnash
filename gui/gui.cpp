@@ -850,10 +850,11 @@ void
 Gui::stop()
 {
     if ( _stopped ) return;
+    if ( isFullscreen() ) unsetFullscreen();
 
     _stopped = true;
 
-    stopHook ();
+    stopHook();
 }
 
 void

@@ -143,11 +143,7 @@ GtkGui::init(int argc, char **argv[])
 #endif
         log_debug (_("Created top level window"));
     }
-
     
-    // XXXbjacques: why do we need this?
-    //gtk_container_set_reallocate_redraws(GTK_CONTAINER (_window), TRUE);
-
     addGnashIcon(GTK_WINDOW(_window));
 
     _drawingArea = gtk_drawing_area_new();
@@ -158,6 +154,7 @@ GtkGui::init(int argc, char **argv[])
 
     _resumeButton = gtk_button_new();
     gtk_container_add(GTK_CONTAINER(_resumeButton), gtk_label_new(_("Click to play")));
+    gtk_widget_show_all(_resumeButton);
 
     // Same here.
     g_object_ref(G_OBJECT(_resumeButton));
@@ -224,6 +221,10 @@ GtkGui::init(int argc, char **argv[])
     if ( ! _renderer ) return false;
     set_render_handler(_renderer);
 
+    // The first time stop() was called, stopHook() might not have had a chance
+    // to do anything, because GTK+ wasn't garanteed to be initialised.
+    if (isStopped()) stopHook();
+
     return true;
 }
 
@@ -248,10 +249,6 @@ GtkGui::run()
     //
     g_timeout_add_full (G_PRIORITY_LOW, _interval, (GSourceFunc)advance_movie,
                         this, NULL);
-
-    // The first time stop() was called, stopHook() might not have had a chance
-    // to do anything, because GTK+ wasn't garanteed to be initialised.
-    if (isStopped()) stopHook();
 
     gtk_main();
     return true;
@@ -2272,10 +2269,14 @@ lirc_handler(void*, int, void* /*data*/)
     return true;
 }
 
-
+// This assumes that the parent of _drawingArea is _window, which
+// isn't the case in the plugin fullscreen (it's _overlay). Currently
+// we return from fullscreen when Gui::stop() is called, which
+// seems like a good idea, and also avoids this problem.
 void
 GtkGui::stopHook()
 {
+
     // FIXME: this can't work for the stand-alone player, because _drawingArea is
     // packed into a vbox.
     if (! _xid) return;
@@ -2291,7 +2292,6 @@ GtkGui::stopHook()
         gtk_container_add(GTK_CONTAINER(_window), _resumeButton);
     }
 
-    gtk_widget_show_all(_resumeButton);
 }
 
 void
@@ -2311,7 +2311,6 @@ GtkGui::playHook()
         gtk_container_add(GTK_CONTAINER(_window), _drawingArea);
     }
 
-    gtk_widget_show(_drawingArea);
 }
 
 } // end of namespace gnash
