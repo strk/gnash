@@ -122,6 +122,7 @@ install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
 	@echo "Nothing to install here now."
 	@echo "Use \"make install-plugin\" to install the Firefox plugin to $(DESTDIR)$(plugindir)."
 
+if !WIN32
 install-plugin: $(plugin_LTLIBRARIES)
 	@test -d "$(DESTDIR)$(plugindir)" || $(mkinstalldirs) "$(DESTDIR)$(plugindir)"
 	@echo "Installing plugin to $(DESTDIR)$(plugindir)"
@@ -130,9 +131,14 @@ install-plugin: $(plugin_LTLIBRARIES)
 	else \
 	  cp -f libgnashplugin.so* $(DESTDIR)$(plugindir)/libgnashplugin.so; \
 	fi
+else
+install-plugin: 
+	: # do nothing
+endif # WIN32
 
 install-plugins: install-plugin
 	$(MAKE) -C klash install-plugins
+	$(MAKE) -C win32 install-plugins
 
 uninstall-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
 	$(RM) -f $(DESTDIR)$(plugindir)/libgnashplugin.so

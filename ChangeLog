@@ -1,3 +1,9 @@
+2008-04-26  Dossy Shiobara <dossy@panoptic.com>
+
+	* plugin/Makefile.am: install-plugin rule should do
+	  nothing on Win32 in top-level plugin dir, but instead
+	  recurse down to the plugin/win32 dir.
+
 2008-04-26 Robert Millan <rmh@aybabtu.com>
 
     * gui/gtk.cpp: make the preferences menu buttons more
