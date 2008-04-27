@@ -1,3 +1,10 @@
+2008-04-27 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* libbase/rc.{h,cpp}: use boost tokenizer more, parseList doesn't
+	  need to damage the items string. Continue loop if >> variable
+	  fails, or we'll get a nonsense warning (variable kept from last
+	  loop). Boostify warnings (for internationalization).
+
 2008-04-26  Dossy Shiobara <dossy@panoptic.com>
 
 	* plugin/Makefile.am: install-plugin rule should do

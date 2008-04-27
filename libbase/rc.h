@@ -29,6 +29,7 @@
 #include <vector>
 #include <iostream>
 #include <boost/cstdint.hpp>
+#include <boost/tokenizer.hpp>
 
 #ifndef _WIN32
 #include <sys/shm.h>
@@ -237,6 +238,9 @@ public:
 
 private:
 
+    typedef boost::char_separator<char> Sep;
+    typedef boost::tokenizer< Sep > Tok;
+
     /// The timer delay
     boost::uint32_t  _delay;
 
@@ -419,7 +423,7 @@ protected:
     ///         clear the vector.
     /// @param items string of space-separated values. This gets nuked.
     void parseList(std::vector<std::string>& list, const std::string &action,
-			        std::string &items);
+			        const std::string &items);
 
 };
 

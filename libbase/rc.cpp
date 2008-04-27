@@ -34,16 +34,14 @@
 #include <sys/types.h>
 #include <unistd.h> // for getuid()
 #include <sys/stat.h>
-#include <cerrno>
 #include <limits>
 
-#include <cctype>  // for toupper
 #include <string>
 #include <vector>
 #include <iostream>
 #include <fstream>
 
-#include <boost/tokenizer.hpp>
+#include <boost/format.hpp>
 
 using std::endl;
 using std::cout;
@@ -54,58 +52,59 @@ namespace gnash {
 RcInitFile&
 RcInitFile::getDefaultInstance()
 {
-	// TODO: allocate on the heap and provide a destroyDefaultInstance,
-	//       for finer control of destruction order
-	static RcInitFile rcfile;
-	return rcfile;
+    // TODO: allocate on the heap and provide a destroyDefaultInstance,
+    //       for finer control of destruction order
+    static RcInitFile rcfile;
+    return rcfile;
 }
 
 
-RcInitFile::RcInitFile() : _delay(0),
-			   _movieLibraryLimit(8),
-                           _debug(false),
-                           _debugger(false),
-                           _verbosity(-1),
-                           // will be reset to something else if __OS2__x is defined:
-                           _urlOpenerFormat("firefox -remote 'openurl(%u)'"),
-                           _flashVersionString(
-				DEFAULT_FLASH_PLATFORM_ID" "\
-				DEFAULT_FLASH_MAJOR_VERSION","\
-				DEFAULT_FLASH_MINOR_VERSION","\
-				DEFAULT_FLASH_REV_NUMBER ",0"),
-		           // An empty string leaves detection to VM.cpp:
-                           _flashSystemOS(""),
-                           _flashSystemManufacturer("Gnash "DEFAULT_FLASH_SYSTEM_OS),
-                           _actionDump(false),
-                           _parserDump(false),
-			   _verboseASCodingErrors(false),
-			   _verboseMalformedSWF(false),
-                           _splashScreen(true),
-                           _localdomainOnly(false),
-                           _localhostOnly(false),
-                           _log("gnash-dbg.log"),
-			   _writeLog(false),
-                           _sound(true),
-                           _pluginSound(true),
-			   _extensionsEnabled(false),
-			   _startStopped(false),
-			   _insecureSSL(false),
-			   _streamsTimeout(DEFAULT_STREAMS_TIMEOUT),
-                           _solsandbox("/tmp/"),
-                           _solreadonly(false),
-                           _sollocaldomain(false),
-                           _lcdisabled(false),
-                           _lctrace(true),
-                           _ignoreFSCommand(true)
-
+RcInitFile::RcInitFile()
+        :
+    _delay(0),
+    _movieLibraryLimit(8),
+    _debug(false),
+    _debugger(false),
+    _verbosity(-1),
+    // will be reset to something else if __OS2__x is defined:
+    _urlOpenerFormat("firefox -remote 'openurl(%u)'"),
+    _flashVersionString(
+        DEFAULT_FLASH_PLATFORM_ID" "\
+        DEFAULT_FLASH_MAJOR_VERSION","\
+        DEFAULT_FLASH_MINOR_VERSION","\
+        DEFAULT_FLASH_REV_NUMBER ",0"),
+    // An empty string leaves detection to VM.cpp:
+    _flashSystemOS(""),
+    _flashSystemManufacturer("Gnash "DEFAULT_FLASH_SYSTEM_OS),
+    _actionDump(false),
+    _parserDump(false),
+    _verboseASCodingErrors(false),
+    _verboseMalformedSWF(false),
+    _splashScreen(true),
+    _localdomainOnly(false),
+    _localhostOnly(false),
+    _log("gnash-dbg.log"),
+    _writeLog(false),
+    _sound(true),
+    _pluginSound(true),
+    _extensionsEnabled(false),
+    _startStopped(false),
+    _insecureSSL(false),
+    _streamsTimeout(DEFAULT_STREAMS_TIMEOUT),
+    _solsandbox("/tmp/"),
+    _solreadonly(false),
+    _sollocaldomain(false),
+    _lcdisabled(false),
+    _lctrace(true),
+    _ignoreFSCommand(true)
 {
 
     loadFiles();
 
 #ifdef __OS2__x
     _urlOpenerFormat = PrfQueryProfileString( HINI_USER, (PSZ) "WPURLDEFAULTSETTINGS",
-			(PSZ) "DefaultBrowserExe", NULL,
-			(PVOID) browserExe, (LONG)sizeof(browserExe) );
+            (PSZ) "DefaultBrowserExe", NULL,
+            (PVOID) browserExe, (LONG)sizeof(browserExe) );
     _urlOpenerFormat += " -remote 'openurl(%u)'";
 #endif
 
@@ -145,16 +144,14 @@ RcInitFile::loadFiles()
     char *gnashrc = getenv("GNASHRC");
     if (gnashrc)
     {
-	std::string paths(gnashrc);
+        std::string paths(gnashrc);
 
-	typedef boost::char_separator<char> Sep;
-	typedef boost::tokenizer< Sep > Tok;
-	Tok t(paths, Sep(":"));
+        Tok t(paths, Sep(":"));
 
-        for(Tok::iterator i=t.begin(), e=t.end(); i!=e; ++i)
-	{
-		parseFile(*i);
-	}
+        for (Tok::iterator i = t.begin(), e = t.end(); i != e; ++i)
+        {
+            parseFile(*i);
+        }
     }
 }
 
@@ -163,7 +160,7 @@ RcInitFile::extractSetting(bool &var, const std::string &pattern,
                            const std::string &variable, const std::string &value)
 {
     
-	StringNoCaseEqual noCaseCompare;
+    StringNoCaseEqual noCaseCompare;
     if ( noCaseCompare(variable, pattern) ) {
         if ( noCaseCompare(value, "on") || noCaseCompare(value, "yes") ||
              noCaseCompare(value, "true")) {
@@ -189,7 +186,6 @@ RcInitFile::extractNumber(boost::uint32_t &num, const std::string &pattern,
 
     StringNoCaseEqual noCaseCompare;
 
-//        cout << variable << ": " << value << endl;
     if ( noCaseCompare(variable, pattern) ) {
         num = strtoul(value.c_str(), NULL, 0);
         if (static_cast<long>(num) == std::numeric_limits<long>::max()) {
@@ -204,50 +200,46 @@ RcInitFile::extractNumber(boost::uint32_t &num, const std::string &pattern,
 
 void
 RcInitFile::parseList(PathList &list, const std::string &action,
-                     std::string &items)
+                     const std::string &items)
 {
 //    GNASH_REPORT_FUNCTION;
 
     if (action == "set") {
 
-	    // Clear array of hosts in previously parsed
-	    // rc files.
-     	list.clear();
+        // Clear array of hosts in previously parsed
+        // rc files.
+        list.clear();
 
-	    StringNoCaseEqual noCaseCompare;
+        StringNoCaseEqual noCaseCompare;
 
-            if (noCaseCompare(items, "off") || noCaseCompare(items, "no") ||
-                noCaseCompare(items, "false")) {
-	            // Return empty array (allows disabling of global
-	            // whitelists in favour of a blacklist)
-	            return;
-	    }
-    }		
+        if (noCaseCompare(items, "off") || noCaseCompare(items, "no") ||
+            noCaseCompare(items, "false")) {
+            // Return empty array (allows disabling of global
+            // whitelists in favour of a blacklist)
+            return;
+        }
+    }        
 
-    std::string::size_type pos;
+    Tok t(items, Sep(" "));
 
-    const char separator = ' ';
-
-    while (!items.empty()) {
-	pos = items.find(separator, 0);
-    	list.push_back(items.substr(0, pos));
-    	items.erase(0, pos);
-    	if (items.size()) items.erase(0, items.find_first_not_of(separator)); 
+    for (Tok::iterator i = t.begin(), e = t.end(); i != e; ++i)
+    {
+        list.push_back(*i);
     }
 
 }
 
 bool
 RcInitFile::extractDouble(double& out, const std::string &pattern,
-                            const std::string &variable,
-                            const std::string &value)
+                          const std::string &variable,
+                          const std::string &value)
 {
 
     StringNoCaseEqual noCaseCompare;
 
     if ( noCaseCompare(variable, pattern) ) {
         out = strtod(value.c_str(), 0);
-	    return true;
+        return true;
     }
 
     return false;
@@ -320,9 +312,9 @@ void
 RcInitFile::writeList (const PathList& list, std::ostream& o)
 {
     for (PathList::const_iterator it = list.begin();
-    	it != list.end(); ++it) {
-    	    o << *it << " ";
-    	}
+        it != list.end(); ++it) {
+            o << *it << " ";
+        }
     o << endl;
 }
 
@@ -347,63 +339,65 @@ RcInitFile::parseFile(const std::string& filespec)
     
     if (stat(filespec.c_str(), &stats) != 0)
     {
-        cerr << "RcInitFile: couldn't open file: " << filespec << endl;
+        cerr << _("RcInitFile: couldn't open file: ") << filespec << endl;
         return false;
     }
 
     in.open(filespec.c_str());
     
     if (!in) {
-            cerr << "RcInitFile: couldn't open file: " << filespec << endl;
+            cerr << _("RcInitFile: couldn't open file: ") << filespec << endl;
             return false;
     }
 
-    cout << "RcInitFile: parsing " << filespec << endl;
+    cout << _("RcInitFile: parsing ") << filespec << endl;
         
     // Read in each line and parse it
-    size_t lineno=0;
+    size_t lineno = 0;
     while (getline(in, line)) {
 
-	++lineno;
-	//cout << "Line: " << line << endl;
+        ++lineno;
 
         // Ignore comment and empty lines
         if (line.empty() || line[0] == '#') continue;
-    
+
         std::istringstream ss(line);
         
         // Get the first token
         if ( ! (ss >> action) )
-	{
-		// Empty line 
-		continue;
-	}
-	//cout << " " << lineno << ": '" << action << "'" << endl;
-        
-	// 'action' should never be empty, or (ss >> action) above would have failed
-	//if ( action.empty() ) continue;
+        {
+            // Empty line 
+            continue;
+        }
+        //cout << " " << lineno << ": '" << action << "'" << endl;
+            
+        // 'action' should never be empty, or (ss >> action) above would have failed
 
-	if ( action[0] == '#' ) continue; // discard comments
+        if ( action[0] == '#' ) continue; // discard comments
 
         // Get second token
-        ss >> variable;
+        if (! (ss >> variable) )
+        {
+            // Do we need to warn here as well?
+            continue;
+        }
 
         if (noCaseCompare(action, "set") || noCaseCompare(action, "append") )
         {
 
              // The rest of the line is the value
-             if (!getline (ss, value))
-             {
-                 cerr << _("Warning: missing value for variable \"") << variable 
-                      << _("\" in rcfile ") << filespec << " line " << lineno << endl;
-                 continue;
-             }
+            if (!getline (ss, value))
+            {
+                cerr << boost::format(_("Warning: missing value for variable \"%s\" in rcfile %s,"
+                    " line %d")) % variable % filespec % lineno << endl;
+                continue;
+            }
      
-             // Erase leading spaces.
-             // If there are nothing but spaces in the value,
-             // e.g. "set writelog ", value should be an empty string,
-             // so value.erase(0, string::npos) is correct.
-             value.erase(0, value.find_first_not_of(' '));
+            // Erase leading spaces.
+            // If there are nothing but spaces in the value,
+            // e.g. "set writelog ", value should be an empty string,
+            // so value.erase(0, string::npos) is correct.
+            value.erase(0, value.find_first_not_of(' '));
 
 
             if (noCaseCompare(variable, "urlOpenerFormat")) {
@@ -463,101 +457,98 @@ RcInitFile::parseFile(const std::string& filespec)
                 continue;
             }
 
-	        if (noCaseCompare(action , "set") ) {
+            if (noCaseCompare(action , "set") ) {
                  extractSetting(_splashScreen, "splashScreen", variable,
                            value)
-			|| 
+            || 
                  extractSetting(_localhostOnly, "localhost", variable,
                            value)
-			|| 
+            || 
                  extractSetting(_localdomainOnly, "localdomain", variable,
                            value)
-			||
+            ||
                  extractSetting(_insecureSSL, "insecureSSL", variable,
                            value)
-			||
+            ||
                  extractSetting(_debugger, "debugger", variable, value)
-			||
+            ||
                  extractSetting(_actionDump, "actionDump", variable, value)
-			||
+            ||
                  extractSetting(_parserDump, "parserDump", variable, value)
-			||
+            ||
                  extractSetting(_writeLog, "writelog", variable, value)
-			||
+            ||
                  extractSetting(_sound, "sound", variable, value)
-			||
+            ||
                  extractSetting(_pluginSound, "pluginsound", variable, value)
-			||
+            ||
                  extractSetting(_verboseASCodingErrors,
                            "ASCodingErrorsVerbosity", variable, value)
-			||
+            ||
                  extractSetting(_verboseMalformedSWF, "MalformedSWFVerbosity",
                            variable, value)
-			||
+            ||
                  extractSetting(_extensionsEnabled, "EnableExtensions",
                            variable, value)
-			||
+            ||
                  extractSetting(_startStopped, "StartStopped", variable, value)
-			||
+            ||
                  extractSetting(_solreadonly, "SOLReadOnly", variable,
                            value)
-			||
+            ||
                  extractSetting(_lcdisabled, "LocalConnection", variable,
                            value)
-			||
+            ||
                  extractSetting(_lctrace, "LCTrace", variable,
                            value)
-			||
+            ||
                  extractNumber(_movieLibraryLimit, "movieLibraryLimit", variable, value)
-			||
+            ||
                  extractNumber(_delay, "delay", variable, value)
-			||
+            ||
                  extractNumber(_verbosity, "verbosity", variable, value)
-			||
+            ||
                  extractNumber(_lcshmkey, "LCShmkey", variable, value)
-			||
+            ||
                  extractDouble(_streamsTimeout, "StreamsTimeout", variable, value)
             ||
                  extractSetting(_ignoreFSCommand, "ignoreFsCommand", variable, value)
             ||
-                 cerr << _("Warning: unrecognized directive \"") << variable 
-                      << _("\" in rcfile ") << filespec << " line " << lineno << endl;
+                 cerr << boost::format(_("Warning: unrecognized directive \"%s\" "
+                    "in rcfile %s line %d")) % variable % filespec % lineno << endl;
             }
         }
         else if (noCaseCompare(action, "include") )
-	{
-		//cout << "Include directive in " << filespec << endl; 
-		// TODO: resolve relative paths ?
-		// TODO: skip parsing if already parsed ?
-		//       (would mess up user-requested parsing order, but
-		//       would be safe in case of circular includes)
-		//
-		if ( variable.empty() )
-		{
-                    cerr << _("Warning: empty include specification") 
-                         << " " << _("in rcfile") << " " <<
-                         filespec << " " << _("line") << " " << lineno << endl;
-		}
-		else
-		{
-			if ( variable[0] != '/' )
-			{
-			    cerr << _("Warning: include specification must be an absolute path") 
-				 << " " << _("in rcfile") << " " <<
-				 filespec << " " << _("line") << " " << lineno << endl;
-			}
-			else
-			{
-				parseFile(variable);
-			}
-		}
-	}
-	else
-	{
-            cerr << _("Warning: unrecognized action \"") << action
-                 << "\" " << _("in rcfile") << " " <<
-                 filespec << " " << _("line") << " " << lineno << endl;
-	}
+        {
+            //cout << "Include directive in " << filespec << endl; 
+            // TODO: resolve relative paths ?
+            // TODO: skip parsing if already parsed ?
+            //       (would mess up user-requested parsing order, but
+            //       would be safe in case of circular includes)
+            //
+            if ( variable.empty() )
+            {
+                cerr << boost::format(_("Warning: empty include specification in rcfile %s, line %d"))
+                    % filespec % lineno << endl;
+            }
+            else
+            {
+                if ( variable[0] != '/' )
+                {
+                    cerr << boost::format(_("Warning: include specification must be an absolute path"
+                        "in rcfile %s, line %d")) % filespec % lineno << endl;
+                }
+                else
+                {
+                    parseFile(variable);
+                }
+            }
+        }
+        else
+        {
+            cerr << boost::format(_("Warning: unrecognized action \"%s\" in rcfile %s, "
+                "line %d")) % action % filespec % lineno << endl;
+        }
     }
 
     if (in) {
@@ -587,7 +578,7 @@ RcInitFile::updateFile()
     char *home = getenv("HOME");
     if (home) {
         writefile = home;
-        writefile += "/.gnashrc";
+        writefile.append("/.gnashrc");
         return updateFile(writefile);
     }
 
@@ -613,7 +604,7 @@ RcInitFile::updateFile(const std::string& filespec)
     out.open(filespec.c_str());
         
     if (!out) {
-        cerr << "Couldn't open file " << filespec << " for writing" << endl;
+        cerr << boost::format(_("Couldn't open file %s for writing")) % filespec;
         return false;
     }
 
