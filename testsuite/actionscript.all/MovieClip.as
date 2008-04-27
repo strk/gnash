@@ -20,9 +20,9 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.126 2008/04/16 21:05:27 bwy Exp $";
+rcsid="$Id: MovieClip.as,v 1.127 2008/04/27 15:39:40 strk Exp $";
 
-rcsid="$Id: MovieClip.as,v 1.126 2008/04/16 21:05:27 bwy Exp $";
+rcsid="$Id: MovieClip.as,v 1.127 2008/04/27 15:39:40 strk Exp $";
 #include "check.as"
 
 // To be called at end of test
@@ -33,15 +33,15 @@ endOfTest = function()
 #endif
 
 #if OUTPUT_VERSION == 6
-	check_totals(624); // SWF6
+	check_totals(627); // SWF6
 #endif
 
 #if OUTPUT_VERSION == 7
-	check_totals(641); // SWF7
+	check_totals(644); // SWF7
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(642); // SWF8+
+	check_totals(645); // SWF8+
 #endif
 
 	play();
@@ -113,6 +113,7 @@ check(!MovieClip.prototype.hasOwnProperty('loadMovieNum'));
 check(!MovieClip.prototype.hasOwnProperty('valueOf')); 
 check(!MovieClip.prototype.hasOwnProperty('toString')); 
 check(MovieClip.prototype.hasOwnProperty('meth')); 
+xcheck(MovieClip.prototype.hasOwnProperty('useHandCursor')); 
 #endif
 check_equals(typeof(mc.valueOf), 'function');
 check_equals(typeof(mc.toString), 'function');
@@ -258,7 +259,7 @@ check_equals(mc.tabChildren, true);
 check_equals(mc.tabEnabled, undefined);
 check_equals(mc.tabIndex, undefined);
 check_equals(mc.trackAsMenu, undefined);
-xcheck_equals(mc.useHandCursor, true);
+check_equals(mc.useHandCursor, true);
 mc.useHandCursor = false;
 check_equals(mc.useHandCursor, false);
 check_equals(mc._alpha, 100);
@@ -383,7 +384,8 @@ xcheck(!mc.hasOwnProperty("_highquality"));
 // Test createEmptyMovieClip
 //----------------------------------------------
 
-#if OUTPUT_VERSION >= 6
+#if OUTPUT_VERSION >= 6 // {
+
 // Test movieclip creation
 var mc2 = createEmptyMovieClip("mc2_mc", 50, 0, 0, 0);
 check(mc2 != undefined);
@@ -394,30 +396,29 @@ check_equals(mc2.getBytesTotal(), 0);
 
 xcheck(!mc2.hasOwnProperty('_parent'));
 
-#if OUTPUT_VERSION > 6
+#if OUTPUT_VERSION > 6 // {
  check_equals(getInstanceAtDepth(50), mc2);
-#endif
+#endif // }
 
 var mc3 = createEmptyMovieClip("mc3_mc", 50);
 check(mc3 != undefined);
 check_equals(mc3.getDepth(), 50);
 
-#if OUTPUT_VERSION > 6
+#if OUTPUT_VERSION > 6 // {
 check_equals(getInstanceAtDepth(50), mc3);
-#endif
+#endif // }
 
-// By default useHandCursor is false in SWF5 and true in later versions
-#if OUTPUT_VERSION < 6
-check_equals(mc3.useHandCursor, false);
-#else
-xcheck_equals(mc3.useHandCursor, true);
-#endif
+// By default useHandCursor is true 
+check_equals(mc3.useHandCursor, true);
+check(!mc3.hasOwnProperty("useHandCursor"));
 // We add a mouse event handler, and expect this
 // to make useHandCursor true
 mc3.onMouseOver = function() { trace("over"); };
-xcheck_equals(mc3.useHandCursor, true);
+check_equals(mc3.useHandCursor, true);
 mc3.useHandCursor = false;
 check_equals(mc3.useHandCursor, false);
+mc3.useHandCursor = "string";
+check_equals(mc3.useHandCursor, "string");
 
 check_equals(mc3_mc.getBytesLoaded(), 0);
 check_equals(mc3_mc.getBytesTotal(), 0);
@@ -425,7 +426,8 @@ check_equals(mc3.getBytesLoaded(), 0);
 check_equals(mc3.getBytesTotal(), 0);
 check_equals(mc3_mc, _level0.mc3_mc);
 check_equals(String(mc3_mc), "_level0.mc3_mc");
-#endif
+
+#endif // }
 
 
 // Test the _target property
@@ -1325,6 +1327,7 @@ if ( typeof(static_clip) == 'movieclip' )
     static_clip._x = 20.09;
     check(static_clip._x > 20.049999 && static_clip._x < 20.050001);
     check_equals(static_clip._x, 20.05);
+    static_clip._x = 0;
 
     // TODO: try with x/y being getter-setter of the localToGlobal and globalToLocal parameter
     

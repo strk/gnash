@@ -1,3 +1,16 @@
+2008-04-27 Sandro Santilli <strk@keybit.net>
+
+	* server/namedStrings.{cpp,h}: add PROP_USEHANDCURSOR named string.
+	* server/character.h: add virtual allowHandCursor() method.
+	* gui/gui.cpp (notify_mouse_moved): check if active entity under
+	  pointer wants to use an hand cursor or not. (getMovieInfo):
+	  cleanup output, add useHandCursor info for active entity.
+	* server/sprite_instance.{cpp,h}: implement allowHandCursor()
+	  by checking the useHandCursor ActionScript property.
+	* testsuite/actionscript.all/MovieClip.as: test that useHandCursor
+	  can take any value, and that it is a property of
+	  MovieClip.prototype; new successes about it..
+
 2008-04-27 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* libbase/rc.cpp: (updateFile) save to the last file specified

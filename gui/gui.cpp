@@ -529,9 +529,13 @@ Gui::notify_mouse_moved(int ux, int uy)
 		{
 			setCursor(CURSOR_INPUT);
 		}
-		else
+		else if ( activeEntity->allowHandCursor() )
 		{
 			setCursor(CURSOR_HAND);
+		}
+		else
+		{
+			setCursor(CURSOR_NORMAL);
 		}
 	}
 	else
@@ -1074,26 +1078,30 @@ Gui::getMovieInfo() const
     {
 	    std::stringstream ss;
 	    ss << ch->getTarget() << " (" + typeName(*ch)
-            << " - id:" << ch->get_id() << " depth:"
-            << ch->get_depth();
-    	firstLevelIter = tr->append_child(topIter, StringPair("Active mouse entity", ss.str()));
+            << " - id:" << ch->get_id()
+            << " - depth:" << ch->get_depth()
+            << " - useHandCursor:" << ch->allowHandCursor()
+            << ")";
+    	firstLevelIter = tr->append_child(topIter, StringPair("Active entity under mouse pointer", ss.str()));
     }
 
     ch = stage.getEntityUnderPointer();
     if ( ch )
     {
 	    std::stringstream ss;
-	    ss << ch->getTarget() << " (" + typeName(*ch) <<
-            " - id:" << ch->get_id() << " depth:" << ch->get_depth();
-    	firstLevelIter = tr->append_child(topIter, StringPair("Topmost mouse entity", ss.str()));
+	    ss << ch->getTarget() << " (" + typeName(*ch) 
+               << " - id:" << ch->get_id() << " - depth:" << ch->get_depth()
+               << ")";
+	firstLevelIter = tr->append_child(topIter, StringPair("Topmost entity under mouse pointer", ss.str()));
     }
 
     ch = stage.getDraggingCharacter();
     if ( ch ) 
     {
 	    std::stringstream ss;
-	    ss << ch->getTarget() << " (" + typeName(*ch) <<
-            " - id:" << ch->get_id() << " depth:" << ch->get_depth();
+	    ss << ch->getTarget() << " (" + typeName(*ch) 
+               << " - id:" << ch->get_id()
+               << " - depth:" << ch->get_depth() << ")";
     	firstLevelIter = tr->append_child(topIter, StringPair("Dragging character: ", ss.str()));
     }
 

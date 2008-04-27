@@ -813,6 +813,8 @@ private:
 	///
 	bool isEnabled() const;
 
+	// See dox in character.h
+	bool allowHandCursor() const;
 
 	/// Forbid copy
 	sprite_instance(const sprite_instance&);

@@ -1172,6 +1172,12 @@ public: // istn't this 'public' reduntant ?
   ///
   virtual bool isSelectableTextField() const { return false; }
 
+  /// \brief
+  /// Return true if this character allows turning the cursor
+  /// into an hand shape when it happens to be the one receiving
+  /// mouse events.
+  virtual bool allowHandCursor() const { return true; }
+
 #ifdef USE_SWFTREE
   /// Append character info in the tree
   //

@@ -1987,6 +1987,7 @@ attachMovieClipInterface(as_object& o)
   o.init_member("getSWFVersion", new builtin_function(sprite_getSWFVersion));
   o.init_member("meth", new builtin_function(sprite_meth));
   o.init_member("enabled", true); // see MovieClip.as testcase
+  o.init_member("useHandCursor", true); // see MovieClip.as testcase
 
   as_c_function_ptr gettersetter = &sprite_instance::lockroot_getset;
   o.init_property("_lockroot", *gettersetter, *gettersetter); // see MovieClip.as testcase
@@ -4397,6 +4398,20 @@ sprite_instance::isEnabled() const
      return true;
   }
   return enabled.to_bool();
+}
+
+bool
+sprite_instance::allowHandCursor() const
+{
+  as_value val;
+  // const_cast needed due to get_member being non-const due to the 
+  // possibility that a getter-setter would actually modify us ...
+  if ( ! const_cast<sprite_instance*>(this)->get_member(NSV::PROP_USEHANDCURSOR, &val) )
+  {
+     // true if not found..
+     return true;
+  }
+  return val.to_bool();
 }
 
 class EnumerateVisitor {
