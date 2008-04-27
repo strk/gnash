@@ -1,3 +1,8 @@
+2008-04-27 Sandro Santilli <strk@keybit.net>
+
+	* libbase/Makefile.am: clean_hook seems unused, CLEANFILE
+	  is the one...
+
 2008-04-27 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* gui/gui.cpp: leave fullscreen on stop, otherwise the stopped

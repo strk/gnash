@@ -167,7 +167,7 @@ if CONVENIENCE_LTDL
 noinst_LTLIBRARIES = libltdlc.la
 libltdlc_la_SOURCES = $(top_srcdir)/libltdl/ltdl.c
 endif
-CLEANFILES = libltdl.la libltdlc.la
+CLEANFILES = libltdl.la libltdlc.la sysgnashrc sysgnashpluginrc
 
 libltdl_la_SOURCES = $(top_srcdir)/libltdl/ltdl.c
 libltdl_la_LDFLAGS = -no-undefined -version-info 4:4:1
@@ -177,6 +177,3 @@ libltdl_la_LIBADD = $(LIBADD_DL)
 mudflap:
 	@echo "Rebuilding with GCC Mudflap support"
 	$(MAKE) CXXFLAGS="$(CXXFLAGS) -fmudflap" LDFLAGS="$(LDFLAGS) -lmudflap"
-
-clean-hook:
-	-rm -f core.* *.obj sysgnashrc sysgnashpluginrc
