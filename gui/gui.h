@@ -412,6 +412,12 @@ protected:
     // Maximum number of advances before exit; 0 for no limit.
     unsigned long _maxAdvances;
 
+    /// Called by Gui::stop().  This can be used by GUIs to implement pause
+    /// widgets (so that resuming a stopped animation is more user-friendly)
+    virtual void stopHook() {}
+    /// Called by Gui::play().
+    virtual void playHook() {}
+
 private:
 
     /// Width of a window pixel, in stage pseudopixel units.

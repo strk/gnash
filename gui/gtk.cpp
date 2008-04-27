@@ -97,6 +97,7 @@ GtkGui::GtkGui(unsigned long xid, float scale, bool loop, unsigned int depth)
 	,_hildon_program(0)
 #endif
 	,_window(0)
+	,_resumeButton(0)
 	,_overlay(0)
 	,_drawingArea(0)
 	,_popup_menu(0)
@@ -150,6 +151,19 @@ GtkGui::init(int argc, char **argv[])
     addGnashIcon(GTK_WINDOW(_window));
 
     _drawingArea = gtk_drawing_area_new();
+
+    // Increase reference count to prevent its destruction (which could happen
+    // later if we remove it from its container).
+    g_object_ref(G_OBJECT(_drawingArea));
+
+    _resumeButton = gtk_button_new();
+    gtk_container_add(GTK_CONTAINER(_resumeButton), gtk_label_new(_("Click to play")));
+
+    // Same here.
+    g_object_ref(G_OBJECT(_resumeButton));
+
+    // This callback indirectly results in playHook() being called.
+    g_signal_connect(G_OBJECT(_resumeButton), "clicked", G_CALLBACK (menuitem_play_callback), this);
 
     // If we don't set this flag we won't be able to grab focus
     // ( grabFocus() would be a no-op )
@@ -234,6 +248,10 @@ GtkGui::run()
     //
     g_timeout_add_full (G_PRIORITY_LOW, _interval, (GSourceFunc)advance_movie,
                         this, NULL);
+
+    // The first time stop() was called, stopHook() might not have had a chance
+    // to do anything, because GTK+ wasn't garanteed to be initialised.
+    if (isStopped()) stopHook();
 
     gtk_main();
     return true;
@@ -2252,6 +2270,48 @@ lirc_handler(void*, int, void* /*data*/)
   
     // Want to keep this handler
     return true;
+}
+
+
+void
+GtkGui::stopHook()
+{
+    // FIXME: this can't work for the stand-alone player, because _drawingArea is
+    // packed into a vbox.
+    if (! _xid) return;
+
+    // Assert they're either both initialised or both uninitialised
+    assert ((_resumeButton && _drawingArea) || !(_resumeButton || _drawingArea));
+
+    if (_drawingArea) {
+        gtk_container_remove(GTK_CONTAINER(_window), _drawingArea);
+    }
+    
+    if (_resumeButton) {
+        gtk_container_add(GTK_CONTAINER(_window), _resumeButton);
+    }
+
+    gtk_widget_show_all(_resumeButton);
+}
+
+void
+GtkGui::playHook()
+{
+    // FIXME: this can't work for the stand-alone player, because _drawingArea is
+    // packed into a vbox.
+    if (! _xid) return;
+
+    // Assert they're either both initialised or both uninitialised
+    assert ((_resumeButton && _drawingArea) || !(_resumeButton || _drawingArea));
+
+    if (_resumeButton) {
+        gtk_container_remove(GTK_CONTAINER(_window), _resumeButton);
+    }
+    if (_drawingArea) {
+        gtk_container_add(GTK_CONTAINER(_window), _drawingArea);
+    }
+
+    gtk_widget_show(_drawingArea);
 }
 
 } // end of namespace gnash

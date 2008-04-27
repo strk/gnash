@@ -1,3 +1,9 @@
+2008-04-27 Robert Millan <rmh@aybabtu.com>
+
+	* gui/gui.{cpp,h}, gui/gtk{sup.h,.cpp}: add stopHook and playHook for
+	  startStopped (not pause). Implement in gtk with a massive button to
+	  click when starting in stopped mode.
+
 2008-04-27 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* libbase/rc.{h,cpp}: use boost tokenizer more, parseList doesn't

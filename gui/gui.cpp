@@ -842,6 +842,8 @@ Gui::play()
 
     _stopped = false;
     if ( ! _started ) start();
+
+    playHook ();
 }
 
 void
@@ -850,6 +852,8 @@ Gui::stop()
     if ( _stopped ) return;
 
     _stopped = true;
+
+    stopHook ();
 }
 
 void

@@ -200,6 +200,7 @@ class GtkGui : public Gui
     HildonProgram *_hildon_program;
 #endif
     GtkWidget   *_window;
+    GtkWidget	*_resumeButton;
     
     // A window only for rendering the plugin as fullscreen.
     GtkWidget	*_overlay;
@@ -267,6 +268,8 @@ class GtkGui : public Gui
     static void handlePrefs(GtkWidget* widget, gint response, gpointer data);
     static void openFile(GtkWidget* dialog, gpointer data);
 
+    void stopHook();
+    void playHook();
 };
 
 // end of namespace gnash 
