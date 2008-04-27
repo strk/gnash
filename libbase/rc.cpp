@@ -133,7 +133,7 @@ RcInitFile::loadFiles()
     char *home = getenv("HOME");
     if (home) {
         loadfile = home;
-        loadfile += "/.gnashrc";
+        loadfile.append("/.gnashrc");
         parseFile(loadfile);
     }
 
@@ -562,6 +562,12 @@ bool
 RcInitFile::updateFile()
 {
 
+    // We don't want to try writing to /etc/ et cetera, since
+    // these are likely to be system-wide defaults set by administrators
+    // or distros, useful for a model rcfile. They are likely to have
+    // no write permission anyway unless you are running Gnash with
+    // administrative privileges, and that is a bad idea.
+
     std::string writefile;
 
     // The file specified in GNASHRC environment variable
@@ -570,32 +576,45 @@ RcInitFile::updateFile()
     // preferences, you'll obviously overwrite that file.
     char *gnashrc = getenv("GNASHRC");
     if (gnashrc) {
-        writefile = gnashrc;
-        return updateFile(writefile);
+        std::string filelist(gnashrc);
+        
+        if (filelist.empty()) return false;
+        
+        std::string::size_type pos = filelist.find_last_of(':');
+        
+        if (pos == std::string::npos)
+        {
+            // no separator: just one file.
+            writefile = filelist;
+        }
+        else
+        {
+            writefile = filelist.substr(pos + 1);
+        }
     }
-
-    // Check the users home directory
-    char *home = getenv("HOME");
-    if (home) {
-        writefile = home;
-        writefile.append("/.gnashrc");
-        return updateFile(writefile);
+    else
+    {
+        // Check the users home directory    
+        char *home = getenv("HOME");
+        if (home) {
+            writefile = home;
+            writefile.append("/.gnashrc");
+        }
     }
+    
+    if (writefile.empty()) return false;
 
-    // We don't want to try writing to /etc/ et cetera, since
-    // these are likely to be system-wide defaults set by administrators
-    // or distros, useful for a model rcfile. They are likely to have
-    // no write permission anyway unless you are running Gnash with
-    // administrative privileges, and that is a bad idea.
-    return false;
+    return updateFile(writefile);
 
 }
+
+
 // Write the changed settings to the config file
 bool
 RcInitFile::updateFile(const std::string& filespec)
 {
 
-    if (filespec == "") {
+    if (filespec.empty()) {
         return false;
     }
 
@@ -604,7 +623,7 @@ RcInitFile::updateFile(const std::string& filespec)
     out.open(filespec.c_str());
         
     if (!out) {
-        cerr << boost::format(_("Couldn't open file %s for writing")) % filespec;
+        cerr << boost::format(_("Couldn't open file %s for writing")) % filespec << endl;
         return false;
     }
 

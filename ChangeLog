@@ -1,3 +1,8 @@
+2008-04-27 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* libbase/rc.cpp: (updateFile) save to the last file specified
+	  in GNASHRC by default.
+
 2008-04-27 Sandro Santilli <strk@keybit.net>
 
 	* libbase/Makefile.am: clean_hook seems unused, CLEANFILE
