@@ -190,7 +190,7 @@ std::string
 utf8::encodeUnicodeCharacter(boost::uint32_t ucs_character)
 {
 
-	std::string text = "";
+	std::string text;
 
 	if (ucs_character <= 0x7F)
 	{
