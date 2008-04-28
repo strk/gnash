@@ -192,50 +192,38 @@ PlaceObject2Tag::readPlaceObject2(stream& in)
     in.ensureBytes(1 + 2); // PlaceObject2, depth
 
     // PlaceObject2 specific flags
-    boost::uint8_t has_flags2 = in.read_u8();
-
-    bool    has_actions    = has_flags2 & (1 << 7); 
-    bool    has_clip_depth = has_flags2 & (1 << 6); 
-    m_has_name       = has_flags2 & (1 << 5); 
-    bool    has_ratio      = has_flags2 & (1 << 4); 
-    bool    has_cxform     = has_flags2 & (1 << 3); 
-    bool    has_matrix     = has_flags2 & (1 << 2);
-    bool    has_char       = has_flags2 & (1 << 1);
-    bool    flag_move      = has_flags2 & (1 << 0); 
+    m_has_flags2 = in.read_u8();
 
     m_depth = in.read_u16()+character::staticDepthOffset;
 
-    if (has_char)
+    if ( hasCharacter( ))
     {
         in.ensureBytes(2);
         m_character_id = in.read_u16();
     }
 
-    if (has_matrix)
+    if ( hasMatrix() )
     {
-        m_has_matrix = true;
         m_matrix.read(in);
     }
 
-    if (has_cxform)
+    if ( hasCxform() )
     {
-        m_has_cxform = true;
         m_color_transform.read_rgba(in);
     }
 
-    if (has_ratio)
+    if ( hasRatio() )
     {
         in.ensureBytes(2);
         m_ratio = in.read_u16();
     }
-    else
+
+    if ( hasName() ) 
     {
-        m_ratio = character::noRatioValue;
+        in.read_string(m_name);
     }
 
-    if (m_has_name) in.read_string(m_name);
-
-    if (has_clip_depth)
+    if ( hasClipDepth() )
     {
         in.ensureBytes(2);
         m_clip_depth = in.read_u16() + character::staticDepthOffset;
@@ -245,48 +233,28 @@ PlaceObject2Tag::readPlaceObject2(stream& in)
         m_clip_depth = character::noClipDepthValue;
     }
 
-    if (has_actions)
+    if ( hasClipActions() )
     {
         readPlaceActions(in);
     }
 
-    if (has_char == true && flag_move == true)
-    {
-        // Remove whatever's at m_depth, and put m_character there.
-        m_place_type = REPLACE;
-    }
-    else if (has_char == false && flag_move == true)
-    {
-        // Moves the object at m_depth to the new location.
-        m_place_type = MOVE;
-    }
-    else if (has_char == true && flag_move == false)
-    {
-        // Put m_character at m_depth.
-        m_place_type = PLACE;
-    }
-    else if (has_char == false && flag_move == false)
-    {
-        m_place_type = REMOVE;
-    }
-
     IF_VERBOSE_PARSE (
         log_parse(_("  PLACEOBJECT2: depth = %d (%d)"), m_depth, m_depth-character::staticDepthOffset);
-        if ( has_char ) log_parse(_("  char id = %d"), m_character_id);
-        if ( has_matrix )
+        if ( hasCharacter() ) log_parse(_("  char id = %d"), m_character_id);
+        if ( hasMatrix() )
         {
             log_parse(_("  mat:"));
             m_matrix.print();
         }
-        if ( has_cxform )
+        if ( hasCxform() )
         {
             log_parse(_("  cxform:"));
             m_color_transform.print();
         }
-        if ( has_ratio ) log_parse(_("  ratio: %d"), m_ratio);
-        if ( m_has_name ) log_parse(_("  name = %s"), m_name.c_str());
-        if ( has_clip_depth ) log_parse(_("  clip_depth = %d (%d)"), m_clip_depth, m_clip_depth-character::staticDepthOffset);
-        log_parse(_(" m_place_type: %d"), m_place_type);
+        if ( hasRatio() ) log_parse(_("  ratio: %d"), m_ratio);
+        if ( hasName() ) log_parse(_("  name = %s"), m_name.c_str());
+        if ( hasClipDepth() ) log_parse(_("  clip_depth = %d (%d)"), m_clip_depth, m_clip_depth-character::staticDepthOffset);
+        log_parse(_(" m_place_type: %d"), getPlaceType() );
     );
 
     //log_debug("place object at depth %i", m_depth);
@@ -301,26 +269,11 @@ PlaceObject2Tag::readPlaceObject3(stream& in)
     in.ensureBytes(1 + 1 + 2); // PlaceObject2, PlaceObject3, depth
 
     // PlaceObject2 specific flags
-    boost::uint8_t has_flags2 = in.read_u8();
-
-    bool    has_actions    = has_flags2 & (1 << 7); 
-    bool    has_clip_depth = has_flags2 & (1 << 6); 
-    m_has_name       = has_flags2 & (1 << 5); 
-    bool    has_ratio      = has_flags2 & (1 << 4); 
-    bool    has_cxform     = has_flags2 & (1 << 3); 
-    bool    has_matrix     = has_flags2 & (1 << 2);
-    bool    has_char       = has_flags2 & (1 << 1);
-    bool    flag_move      = has_flags2 & (1 << 0); 
+    m_has_flags2 = in.read_u8();
 
     // PlaceObject3 specific flags, first 3 bits are unused
-    boost::uint8_t has_flags3 = in.read_u8();
-
-    bool    hasImage           = has_flags3 & (1 << 4); 
-    bool    hasClassName       = has_flags3 & (1 << 3); 
-    bool    has_bitmap_caching = has_flags3 & (1 << 2); 
-    bool    has_blend_mode     = has_flags3 & (1 << 1); 
-    bool    has_filters        = has_flags3 & (1 << 0);
-
+    m_has_flags3 = in.read_u8();
+    
     boost::uint8_t blend_mode = 0;
     boost::uint8_t bitmask = 0;
     std::string className;
@@ -332,7 +285,7 @@ PlaceObject2Tag::readPlaceObject3(stream& in)
     // TODO: add more info here
     );
 
-    if (has_char)
+    if ( hasCharacter() )
     {
         in.ensureBytes(2);
         m_character_id = in.read_u16();
@@ -341,7 +294,7 @@ PlaceObject2Tag::readPlaceObject3(stream& in)
         );
     }
 
-    if (hasClassName || (hasImage && has_char) )
+    if ( hasClassName() || ( hasImage() && hasCharacter() ) )
     {
         log_unimpl("PLACEOBJECT3 with associated class name");
         in.read_string(className);
@@ -350,32 +303,28 @@ PlaceObject2Tag::readPlaceObject3(stream& in)
         );
     }
 
-    if (has_matrix)
+    if ( hasMatrix() )
     {
-        m_has_matrix = true;
         m_matrix.read(in);
-
     }
 
-    if (has_cxform)
+    if ( hasCxform() )
     {
-        m_has_cxform = true;
         m_color_transform.read_rgba(in);
     }
 
-    if (has_ratio) 
+    if ( hasRatio() ) 
     {
         in.ensureBytes(2);
         m_ratio = in.read_u16();
     }
-    else
-    {
-        m_ratio = character::noRatioValue;
-    }
     
-    if (m_has_name) in.read_string(m_name);
+    if ( hasName() )
+    {
+        in.read_string(m_name);
+    }
 
-    if (has_clip_depth)
+    if ( hasClipDepth() )
     {
         in.ensureBytes(2);
         m_clip_depth = in.read_u16()+character::staticDepthOffset;
@@ -387,34 +336,34 @@ PlaceObject2Tag::readPlaceObject3(stream& in)
 
     IF_VERBOSE_PARSE
     (
-        if (has_matrix) {
+        if ( hasMatrix() ) {
             log_parse("   matrix:");
         m_matrix.print();
     }
-        if (has_cxform) {
+        if ( hasCxform() ) {
             log_parse("   cxform:");
             m_color_transform.print();
     }
-        if (has_ratio)  log_parse("   ratio:%d", m_ratio);
-        if (m_has_name) log_parse("   name:%s", m_name.c_str());
+        if ( hasRatio() )  log_parse("   ratio:%d", m_ratio);
+        if ( hasName() ) log_parse("   name:%s", m_name.c_str());
 
-        if (has_clip_depth)
+        if ( hasClipDepth() )
         log_parse("   clip_depth:%d(%d)", m_clip_depth, m_clip_depth-character::staticDepthOffset);
     );
 
-    if (has_filters)
+    if ( hasFilters() )
     {
         Filters v; // TODO: Attach the filters to the display object.
         filter_factory::read(in, true, &v);
     }
 
-    if (has_blend_mode)
+    if ( hasBlendMode() )
     {
         in.ensureBytes(1);
         blend_mode = in.read_u8();
     }
 
-    if (has_bitmap_caching)
+    if ( hasBitmapCaching() )
     {
         // It is not certain that this actually exists, so if this reader
         // is broken, it is probably here!
@@ -422,49 +371,29 @@ PlaceObject2Tag::readPlaceObject3(stream& in)
         bitmask = in.read_u8();
     }
 
-    if (has_actions)
+    if ( hasClipActions() )
     {
         readPlaceActions(in);
     }
 
-    if (has_char == true && flag_move == true)
-    {
-        // Remove whatever's at m_depth, and put m_character there.
-        m_place_type = REPLACE;
-    }
-    else if (has_char == false && flag_move == true)
-    {
-        // Moves the object at m_depth to the new location.
-        m_place_type = MOVE;
-    }
-    else if (has_char == true && flag_move == false)
-    {
-        // Put m_character at m_depth.
-        m_place_type = PLACE;
-    }
-    else if (has_char == false && flag_move == false)
-    {
-         m_place_type = REMOVE;
-    }
-
     IF_VERBOSE_PARSE (
         log_parse(_("  PLACEOBJECT3: depth = %d (%d)"), m_depth, m_depth-character::staticDepthOffset);
-        if ( has_char ) log_parse(_("  char id = %d"), m_character_id);
-        if ( has_matrix )
+        if ( hasCharacter() ) log_parse(_("  char id = %d"), m_character_id);
+        if ( hasMatrix() )
         {
             log_parse(_("  mat:"));
             m_matrix.print();
         }
-        if ( has_cxform )
+        if ( hasCxform() )
         {
             log_parse(_("  cxform:"));
             m_color_transform.print();
         }
-        if ( has_ratio ) log_parse(_("  ratio: %d"), m_ratio);
-        if ( m_has_name ) log_parse(_("  name = %s"), m_name.c_str());
-        if ( hasClassName ) log_parse(_("  class name = %s"), className.c_str());
-        if ( has_clip_depth ) log_parse(_("  clip_depth = %d (%d)"), m_clip_depth, m_clip_depth-character::staticDepthOffset);
-        log_parse(_(" m_place_type: %d"), m_place_type);
+        if ( hasRatio() ) log_parse(_("  ratio: %d"), m_ratio);
+        if ( hasName() ) log_parse(_("  name = %s"), m_name.c_str());
+        if ( hasClassName() ) log_parse(_("  class name = %s"), className.c_str());
+        if ( hasClipDepth() ) log_parse(_("  clip_depth = %d (%d)"), m_clip_depth, m_clip_depth-character::staticDepthOffset);
+        log_parse(_(" m_place_type: %d"), getPlaceType());
     );
 
     //log_debug("place object at depth %i", m_depth);
@@ -494,7 +423,7 @@ PlaceObject2Tag::read(stream& in, tag_type tag)
 void
 PlaceObject2Tag::execute(sprite_instance* m) const
 {
-    switch (m_place_type) 
+    switch ( getPlaceType() ) 
     {
       case PLACE:
           m->add_display_object(this);

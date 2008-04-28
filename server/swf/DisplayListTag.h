@@ -61,18 +61,6 @@ public:
 		execute(m);
 	}
 
-	/// Return true if this tag removes a character
-	virtual bool isRemove() const { return false; }
-
-	/// Return true if this tag places a character
-	virtual bool isPlace() const { return false; }
-
-	/// Return true if this tag replaces a character
-	virtual bool isReplace() const { return false; }
-
-	/// Return true if this tag transforms a character
-	virtual bool isMove() const { return false; }
-
 	/// Return the depth affected by this DisplayList tag
 	//
 	/// NOTE: the returned depth is always in the

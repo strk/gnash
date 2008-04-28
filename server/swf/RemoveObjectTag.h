@@ -60,9 +60,6 @@ public:
 	/// Remove object at specified depth from sprite_instance DisplayList.
 	void	execute(sprite_instance* m) const;
 
-	// See dox in ControlTag.h
-	bool isRemove() const { return true; }
-
 	static void loader(stream* in, tag_type tag, movie_definition* m);
 
 private:

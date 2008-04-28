@@ -57,32 +57,32 @@ namespace SWF {
 ///
 ///
 /// m_character_id:
-///	The ID of the character to be added.
-///	It will be seeked in the CharacterDictionary.
+/// The ID of the character to be added.
+/// It will be seeked in the CharacterDictionary.
 ///
 /// m_name:
-///	The name to give to the newly created instance if m_has_name is true.
-///	If m_has_name is false, the new instance will be assigned a sequential
-///	name in the form 'instanceN', where N is incremented
-///	at each call, starting from 1.
+/// The name to give to the newly created instance if m_has_name is true.
+/// If m_has_name is false, the new instance will be assigned a sequential
+/// name in the form 'instanceN', where N is incremented
+/// at each call, starting from 1.
 ///
 /// event_handlers
 ///
 /// m_depth:
-///	The depth to assign to the newly created instance.
+/// The depth to assign to the newly created instance.
 ///
 /// m_color_transform:
-///	The color transform to apply to the newly created instance.
+/// The color transform to apply to the newly created instance.
 ///
 /// m_matrix:
-///	The matrix transform to apply to the newly created instance.
+/// The matrix transform to apply to the newly created instance.
 ///
 /// m_ratio
 ///
 /// m_clip_depth:
-///	If != character::noClipDepthValue, mark the created instance
-///	as a clipping layer. The shape of the placed character will be
-///	used as a mask for all higher depths up to this value.
+/// If != character::noClipDepthValue, mark the created instance
+/// as a clipping layer. The shape of the placed character will be
+/// used as a mask for all higher depths up to this value.
 ///
 class PlaceObject2Tag : public DisplayListTag
 {
@@ -95,13 +95,12 @@ public:
         :
         DisplayListTag(0), // why is it 0 here and -1 for RemoveObjectTag ??
         m_tag_type(0),
-        m_name(""),
-        m_ratio(0),
-        m_has_matrix(false),
-        m_has_cxform(false),
+        m_has_flags2(0),
+        m_has_flags3(0),
         m_character_id(0),
+        m_ratio(0),
+        m_name(""),
         m_clip_depth(0),
-        m_place_type(PLACE),
         _movie_def(def)
     {
     }
@@ -114,54 +113,72 @@ public:
     /// Place/move/whatever our object in the given movie.
     void execute(sprite_instance* m) const;
 
-    /// Return true if this tag places a character
-    bool isPlace() const { return m_place_type == PLACE; }
-
-    /// Return true if this tag replaces a character
-    bool isReplace() const { return m_place_type == REPLACE; }
-
-    /// Return true if this tag transforms a character
-    bool isMove() const { return m_place_type == MOVE; }
-
-    /// Return true if this tag removes a character.
-    //  This is set by having no char and no place in the place tag.
-    bool isRemove() const { return m_place_type == REMOVE; }
-
     static void loader(stream* in, tag_type tag, movie_definition* m);
 
-    int getRatio()    const { return m_ratio; }
+    int getPlaceType() const { return m_has_flags2 & (HAS_CHARACTER_MASK | MOVE_MASK); } 
+    int getRatio()     const { return m_ratio; }
     int getClipDepth() const { return m_clip_depth; }
-    int getID() const { return m_character_id; }
+    int getID()        const { return m_character_id; }
     const std::string& getName() const { return m_name; }
-    const matrix& getMatrix() const { return m_matrix; }
-    const cxform& getCxform() const { return m_color_transform; }
+    const matrix& getMatrix()    const { return m_matrix; }
+    const cxform& getCxform()    const { return m_color_transform; }
     const EventHandlers& getEventHandlers() const { return m_event_handlers; }
     
-    bool hasMatrix() const { return m_has_matrix; }
-    bool hasCxform() const { return m_has_cxform; }
-    bool hasName()   const { return m_has_name; }
+    bool hasClipActions() const { return m_has_flags2 & HAS_CLIP_ACTIONS_MASK; }
+    bool hasClipDepth()   const { return m_has_flags2 & HAS_CLIP_DEPTH_MASK; };
+    bool hasName()        const { return m_has_flags2 & HAS_NAME_MASK; }
+    bool hasRatio()       const { return m_has_flags2 & HAS_RATIO_MASK; }
+    bool hasCxform()      const { return m_has_flags2 & HAS_CXFORM_MASK; }
+    bool hasMatrix()      const { return m_has_flags2 & HAS_MATRIX_MASK; }
+    bool hasCharacter()   const { return m_has_flags2 & HAS_CHARACTER_MASK; }
+
+    bool hasImage()         const { return m_has_flags3 & HAS_IMAGE_MASK; }
+    bool hasClassName()     const { return m_has_flags3 & HAS_CLASS_NAME_MASK; }
+    bool hasBitmapCaching() const { return m_has_flags3 & HAS_BITMAP_CACHING_MASK; }
+    bool hasBlendMode()     const { return m_has_flags3 & HAS_BLEND_MODE_MASK; }
+    bool hasFilters()       const { return m_has_flags3 & HAS_FILTERS_MASK; }      
 
 private:
-
     int m_tag_type;
-    std::string m_name;
-    int     m_ratio;
+    boost::uint8_t m_has_flags2;
+    boost::uint8_t m_has_flags3;
+    boost::uint16_t m_character_id;
     cxform  m_color_transform;
     matrix  m_matrix;
-    bool    m_has_matrix;
-    bool    m_has_cxform;
-    bool    m_has_name;
-    boost::uint16_t m_character_id;
+    int     m_ratio;
+    std::string m_name;
     int     m_clip_depth;
     boost::uint32_t all_event_flags; 
-
+    
+    /// NOTE: getPlaceType() is dependent on the enum values.
     enum place_type
     {
-        PLACE,
-        MOVE,
-        REPLACE,
-                REMOVE
-    } m_place_type;
+        REMOVE  = 0, 
+        MOVE    = 1,
+        PLACE   = 2,
+        REPLACE = 3
+    };
+
+    enum has_flags2_mask_e
+    {
+        HAS_CLIP_ACTIONS_MASK = 1 << 7,
+        HAS_CLIP_DEPTH_MASK   = 1 << 6,
+        HAS_NAME_MASK         = 1 << 5,
+        HAS_RATIO_MASK        = 1 << 4,
+        HAS_CXFORM_MASK       = 1 << 3,
+        HAS_MATRIX_MASK       = 1 << 2,
+        HAS_CHARACTER_MASK    = 1 << 1,
+        MOVE_MASK             = 1 << 0
+    };
+
+    enum has_flags3_mask_e
+    {
+        HAS_IMAGE_MASK          = 1 << 4,
+        HAS_CLASS_NAME_MASK     = 1 << 3,
+        HAS_BITMAP_CACHING_MASK = 1 << 2,
+        HAS_BLEND_MODE_MASK     = 1 << 1,
+        HAS_FILTERS_MASK        = 1 << 0
+    };
 
     const movie_definition& _movie_def;
 

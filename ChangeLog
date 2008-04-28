@@ -1,3 +1,12 @@
+2008-04-28 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* server/swf/DisplayListTag.h: isRmove(), isPlace(), isReplace(), isMove(),
+	  drop this four virtual functions, no longer needed.
+	* server/swf/RemoveObjectTag.h: drop isRemove().
+	* server/PlaceObject2Tag.{h, cpp}: keep all swf defined flags, add interfaces
+	  to extract the information from those flags. Drop some unncessary members. The
+	  rational is not discarding any definitions. 	  
+	
 2008-04-28 Sandro Santilli <strk@keybit.net>
 
 	* server/sprite_instance.cpp (get_member): our own properties
