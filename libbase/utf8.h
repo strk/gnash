@@ -84,7 +84,8 @@ namespace utf8
 	/// as output.  Advances string iterator past the character
 	/// returned, unless the returned character is '\0', in which
 	/// case the iterator does not advance.
-	DSOEXPORT boost::uint32_t decodeNextUnicodeCharacter(std::string::const_iterator& it);
+	DSOEXPORT boost::uint32_t decodeNextUnicodeCharacter(std::string::const_iterator& it,
+	                                                     const std::string::const_iterator& e);
 
 	/// \brief Encodes the given wide character into a canonical
 	/// string, theoretically up to 6 chars in length.

@@ -33,11 +33,11 @@ utf8::decodeCanonicalString(const std::string& str, int version)
 	
 	std::wstring wstr = L"";
 	
-	std::string::const_iterator it = str.begin();
+	std::string::const_iterator it = str.begin(), e = str.end();
 	
 	if (version > 5)
 	{
-		while (boost::uint32_t code = decodeNextUnicodeCharacter(it))
+		while (boost::uint32_t code = decodeNextUnicodeCharacter(it, e))
 		{
 		    if (code == utf8::invalid)
 		    {
@@ -88,7 +88,8 @@ utf8::encodeLatin1Character(boost::uint32_t ucsCharacter)
 
 
 boost::uint32_t
-utf8::decodeNextUnicodeCharacter(std::string::const_iterator& it)
+utf8::decodeNextUnicodeCharacter(std::string::const_iterator& it,
+                                 const std::string::const_iterator& e)
 {
 	boost::uint32_t	uc;
 
@@ -112,12 +113,12 @@ utf8::decodeNextUnicodeCharacter(std::string::const_iterator& it)
 
 #define NEXT_BYTE(shift)						\
 					\
-	if (*it == 0) return 0; /* end of buffer, do not advance */	\
+	if (it == e || *it == 0) return 0; /* end of buffer, do not advance */	\
 	if ((*it & 0xC0) != 0x80) return utf8::invalid; /* standard check */	\
 	/* Post-increment iterator: */		\
 	uc |= (*it++ & 0x3F) << shift;
 
-	if (*it == 0) return 0;	// End of buffer.  Do not advance.
+	if (it == e || *it == 0) return 0;	// End of buffer.  Do not advance.
 
 	// Conventional 7-bit ASCII; return and increment iterator:
 	if ((*it & 0x80) == 0) return (boost::uint32_t) *it++;

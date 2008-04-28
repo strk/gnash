@@ -1,3 +1,12 @@
+2008-04-27 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* libbase/utf8.{cpp,h}: decodeNextUnicodeCharacter should know
+	  where the end of the string is, so it doesn't deference 
+	  .end() (thanks zou).
+	* server/vm/ASHanders.cpp: pass end of string iterator to 
+	  decodeNextUnicodeCharacter, cache value generally to save repeated
+	  calls to .end().
+
 2008-04-28 Zou Lunkai <zoulunkai@gmail.com>
 	
 	* server/swf/DisplayListTag.h: isRmove(), isPlace(), isReplace(), isMove(),

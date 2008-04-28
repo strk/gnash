@@ -1570,17 +1570,19 @@ SWFHandlers::guessEncoding(const std::string &str, int &length, std::vector<int>
     bool is_sought = true;
 
     std::string::const_iterator it = str.begin();
+    const std::string::const_iterator e = str.end();
+
     length = 0;
     
     // First, assume it's UTF8 and try to be wrong.
-    while (it != str.end() && is_sought)
+    while (it != e && is_sought)
     {
         ++length;
 
         offsets.push_back(it - str.begin()); // current position
 
         // Advances the iterator to point to the next 
-        boost::uint32_t c = utf8::decodeNextUnicodeCharacter(it);
+        boost::uint32_t c = utf8::decodeNextUnicodeCharacter(it, e);
 
         if (c == utf8::invalid)
         {
@@ -1591,7 +1593,7 @@ SWFHandlers::guessEncoding(const std::string &str, int &length, std::vector<int>
 
     offsets.push_back(it - str.begin()); // current position
 
-    if (it == str.end() && is_sought)
+    if (it == e && is_sought)
     {
         // No characters left, so it's almost certainly UTF8.
         return ENCGUESS_UNICODE;
@@ -1605,7 +1607,7 @@ SWFHandlers::guessEncoding(const std::string &str, int &length, std::vector<int>
     bool was_odd = true;
     bool was_even = true;
     // Now, assume it's SHIFT_JIS and try to be wrong.
-    while (it != str.end() && is_sought)
+    while (it != e && is_sought)
     {
         int c = static_cast<int> (*it);
 
@@ -1862,9 +1864,9 @@ SWFHandlers::ActionMbOrd(ActionExec& thread)
 
     const std::string s = env.top(0).to_string();
     
-    std::string::const_iterator it = s.begin();
+    std::string::const_iterator it = s.begin(), e = s.end();
     
-    boost::uint32_t out = utf8::decodeNextUnicodeCharacter(it);
+    boost::uint32_t out = utf8::decodeNextUnicodeCharacter(it, e);
     
     /// Always valid, or can it be undefined?
     env.top(0).set_int(out);
