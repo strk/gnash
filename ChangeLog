@@ -1,3 +1,10 @@
+2008-04-28 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* server/character.{h,cpp}, server/dlist.{h,cpp}
+	  server/parser/morph2_character_def.cpp,
+	  server/sprite_instance.cpp: drop character::noRatioValue. Now all
+	  character's ratio value are default to 0 if not set explicitly. 
+	
 2008-04-28 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/edit_text_character.{h,cpp}: check for end of string when

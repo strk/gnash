@@ -174,8 +174,8 @@ public:
 		int depth,
 		const cxform* color_xform,
 		const matrix* mat,
-		int ratio,
-		int clip_depth);
+		int* ratio,
+		int* clip_depth);
 
 	/// Removes the object at the specified depth.
 	//

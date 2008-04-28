@@ -49,7 +49,6 @@ const int character::staticDepthOffset;
 const int character::removedDepthOffset;
 const int character::noClipDepthValue;
 const int character::dynClipDepthValue;
-const int character::noRatioValue;
 
 // Initialize unnamed instance count
 unsigned int character::_lastUnnamedInstanceNum=0;
@@ -668,10 +667,6 @@ character::get_event_handler(const event_id& id) const
 
 	handler.reset( new EventCode(this_ptr, it->second) );
 	return handler;
-}
-
-character::~character()
-{
 }
 
 bool

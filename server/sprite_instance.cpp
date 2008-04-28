@@ -3225,12 +3225,14 @@ void
 sprite_instance::move_display_object(const SWF::PlaceObject2Tag* tag)
 {
     DisplayList& dlist = const_cast<DisplayList &>( getDisplayList() );
+	
+	int ratio = tag->getRatio();
     dlist.move_display_object(
         tag->getDepth(), 
         tag->hasCxform() ? &tag->getCxform() : NULL,
         tag->hasMatrix() ? &tag->getMatrix() : NULL,
-        tag->getRatio(), 
-        tag->getClipDepth());
+        tag->hasRatio()  ? &ratio  : NULL,
+        NULL); // clip_depth is not used in MOVE tag(at least no related tests). 
 }
 
 void sprite_instance::replace_display_object(const SWF::PlaceObject2Tag* tag)
@@ -3273,7 +3275,7 @@ void sprite_instance::replace_display_object(const SWF::PlaceObject2Tag* tag)
                 std::string instance_name = getNextUnnamedInstanceName();
                 ch->set_name(instance_name);
             }
-            if(tag->getRatio() != character::noRatioValue)
+            if(tag->hasRatio())
             {
                 ch->set_ratio(tag->getRatio());
             }

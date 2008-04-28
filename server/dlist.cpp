@@ -347,8 +347,8 @@ DisplayList::move_display_object(
   int depth,
   const cxform* color_xform,
   const matrix* mat,
-  int ratio,
-  int /* clip_depth */)
+  int* ratio,
+  int* /* clip_depth */)
 {
   testInvariant();
 
@@ -389,9 +389,9 @@ DisplayList::move_display_object(
   {
     ch->set_matrix(*mat);
   }
-  if(ratio != character::noRatioValue)
+  if(ratio)
   {
-    ch->set_ratio(ratio);
+    ch->set_ratio(*ratio);
   }
 
   testInvariant();
@@ -935,11 +935,8 @@ DisplayList::mergeDisplayList(DisplayList & newList)
             {
                 itOld++;
                 itNew++;
-
-                bool is_ratio_compatible = ( ( chOld->get_ratio() == chNew->get_ratio() )
-                    || ( chOld->get_ratio()==0 && chNew->get_ratio()==character::noRatioValue )
-                    || ( chOld->get_ratio()==character::noRatioValue && chNew->get_ratio()==0 ) );
-                
+				
+                bool is_ratio_compatible = chOld->get_ratio() == chNew->get_ratio();
                 if( !is_ratio_compatible || chOld->isDynamic() || !chOld->isActionScriptReferenceable() )
                 {
                     // replace the character in old list with corresponding character in new list

@@ -364,11 +364,6 @@ public:
     ///
     static const int dynClipDepthValue = -2000000;
 
-  // Maybe it's better to move all these constants to DisplayListTag
-  static const int noRatioValue = -1;
-
-    ~character();
-
     character(character* parent, int id)
   :
   m_id(id),

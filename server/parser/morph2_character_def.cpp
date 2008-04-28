@@ -114,8 +114,7 @@ private:
 //		GNASH_REPORT_FUNCTION;
 
 		unsigned int i = 0;
-		float ratio = (inst->get_ratio()==character::noRatioValue) ? 0 : inst->get_ratio()/65535.0;
-
+		float ratio = inst->get_ratio() / 65535.0;
 		// bounds
 		rect	new_bound;
 		new_bound.set_lerp(m_shape1->get_bound(), m_shape2->get_bound(), ratio);
