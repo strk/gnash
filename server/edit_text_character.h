@@ -458,6 +458,18 @@ private:
 	/// Convert the characters in _text into a series of
 	/// text_glyph_records to be rendered.
 	void	format_text();
+	
+	/// Extracts an HTML tag.
+	///
+	/// @param tag  This string is filled with the extracted HTML tag.
+	/// @param it   An iterator pointing to the first character of the
+	///             HTML tag. It is left pointing to the character after the
+	///             closing tag or the end of the string.
+	/// @param e    An iterator pointing to the end of the string.
+	/// @return     Whether the tag is complete or not (i.e. whether a '>'
+	///             was found).
+	bool parseHTML(std::wstring& tag, std::wstring::const_iterator& it,
+	                      const std::wstring::const_iterator& e);
 
 	/// Does LEFT/CENTER/RIGHT alignment on the records in
 	/// m_text_glyph_records[], starting with

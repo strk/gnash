@@ -1,4 +1,11 @@
-2008-04-27 Benjamin Wolsey <bwy@benjaminwolsey.de>
+2008-04-28 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/edit_text_character.{h,cpp}: check for end of string when
+	  formatting text. Split HTML parsing into a separate function. Use
+	  the magic of boost::format to log custom types directly, and drop
+	  c_str() in logging.
+
+2008-04-28 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* libbase/utf8.{cpp,h}: decodeNextUnicodeCharacter should know
 	  where the end of the string is, so it doesn't deference 

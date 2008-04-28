@@ -61,6 +61,10 @@
 //
 //#define PP_COMPATIBLE_DEVICE_FONT_HANDLING 1
 
+// Define the following to get detailed log information about
+// textfield bounds and HTML tags:
+//#define GNASH_DEBUG_TEXTFIELDS 1
+
 namespace gnash {
 
 // Forward declarations
@@ -549,7 +553,7 @@ edit_text_character::removeTextField()
 		//IF_VERBOSE_ASCODING_ERRORS(
 		log_debug(_("CHECKME: removeTextField(%s): TextField depth (%d) out of the "
 			"'dynamic' zone [0..1048575], won't remove"),
-			getTarget().c_str(), depth);
+			getTarget(), depth);
 		//);
 		return;
 	}
@@ -561,7 +565,7 @@ edit_text_character::removeTextField()
 
 	if ( ! parentSprite )
 	{
-		log_error("FIXME: attempt to remove a TextField being a child of a %s", typeName(*parent).c_str());
+		log_error("FIXME: attempt to remove a TextField being a child of a %s", typeName(*parent));
 		return;
 	}
 
@@ -626,8 +630,7 @@ edit_text_character::display()
 			backgroundColor = cx.transform(backgroundColor);
 		
 #ifdef GNASH_DEBUG_TEXTFIELDS
-	std::stringstream ss; ss << _bounds;
-	log_debug("rendering a Pol composed by corners %s", ss.str().c_str());
+	log_debug("rendering a Pol composed by corners %s", _bounds);
 #endif
 
 		render::draw_poly( &coords[0], 4, backgroundColor, borderColor, wmat, true);
@@ -786,7 +789,7 @@ edit_text_character::on_event(const event_id& id)
 character*
 edit_text_character::get_topmost_mouse_entity(float x, float y)
 {
-	//log_debug("get_topmost_mouse_entity called on edit_text_character %p, labeled '%s'", (void*)this, get_text_value().c_str());
+	//log_debug("get_topmost_mouse_entity called on edit_text_character %p, labeled '%s'", (void*)this, get_text_value());
 
 	if (get_visible() == false)
 	{
@@ -846,7 +849,7 @@ edit_text_character::updateText(const std::wstring& wstr)
 
 	format_text();
 
-	//log_debug(_("Text set to %s"), new_text.c_str());
+	//log_debug(_("Text set to %s"), new_text);
 
 }
 
@@ -870,7 +873,7 @@ edit_text_character::setTextValue(const std::wstring& wstr)
 		else	
 		{
 			// nothing to do (too early ?)
-			log_debug("setTextValue: variable name %s points to an unexisting target, I guess we would not be registered in this was true, or the sprite we've registered our variable name has been unloaded", _variable_name.c_str());
+			log_debug("setTextValue: variable name %s points to an unexisting target, I guess we would not be registered in this was true, or the sprite we've registered our variable name has been unloaded", _variable_name);
 		}
 	}
 }
@@ -895,7 +898,7 @@ bool
 edit_text_character::set_member(string_table::key name,
 		const as_value& val, string_table::key nsname, bool ifFound)
 {
-	//log_debug("edit_text_character.set_member(%s, %s)", name.c_str(), val.to_string());
+	//log_debug("edit_text_character.set_member(%s, %s)", name, val.to_string());
 
 	// FIXME: Turn all standard members into getter/setter properties
 	//        of the TextField class. See attachTextFieldInterface()
@@ -972,8 +975,7 @@ edit_text_character::set_member(string_table::key name,
 		if ( ! _bounds.isFinite() )
 		{
 #ifdef GNASH_DEBUG_TEXTFIELDS
-			std::stringstream ss; ss<<_bounds;
-			log_debug("Non-finite TextField bounds : %s", ss.str().c_str());
+			log_debug("Non-finite TextField bounds : %s", _bounds);
 #endif
 			return true;
 		}
@@ -1034,14 +1036,13 @@ edit_text_character::set_member(string_table::key name,
 		if ( ! _bounds.isFinite() )
 		{
 #ifdef GNASH_DEBUG_TEXTFIELDS
-			std::stringstream ss; ss<<_bounds;
-			log_debug("Non-finite TextField bounds : %s", ss.str().c_str());
+			log_debug("Non-finite TextField bounds : %s", _bounds);
 #endif // GNASH_DEBUG_TEXTFIELDS
 			return true;
 		}
 
 #ifdef GNASH_DEBUG_TEXTFIELDS
-		log_debug("Chaging TextField height to %g", nh);
+		log_debug("Changing TextField height to %g", nh);
 #endif // GNASH_DEBUG_TEXTFIELDS
 		set_invalidated();
 
@@ -1088,7 +1089,7 @@ bool
 edit_text_character::get_member(string_table::key name, as_value* val,
 	string_table::key nsname)
 {
-	//log_debug("edit_text_character.get_member(%s)", name.c_str());
+	//log_debug("edit_text_character.get_member(%s)", name);
 
 	// FIXME: Turn all standard members into getter/setter properties
 	//        of the TextField class. See attachTextFieldInterface()
@@ -1141,7 +1142,7 @@ edit_text_character::get_member(string_table::key name, as_value* val,
 	{
 		val->set_double(TWIPS_TO_PIXELS(get_width()));
 #ifdef GNASH_DEBUG_TEXTFIELDS
-		log_debug("Got TextField width == %s", val->to_debug_string().c_str());
+		log_debug("Got TextField width == %s", val->to_debug_string());
 #endif // GNASH_DEBUG_TEXTFIELDS
 		return true;
 	}
@@ -1149,7 +1150,7 @@ edit_text_character::get_member(string_table::key name, as_value* val,
 	{
 		val->set_double(TWIPS_TO_PIXELS(get_height()));
 #ifdef GNASH_DEBUG_TEXTFIELDS
-		log_debug("Got TextField height == %s", val->to_debug_string().c_str());
+		log_debug("Got TextField height == %s", val->to_debug_string());
 #endif // GNASH_DEBUG_TEXTFIELDS
 		return true;
 	}
@@ -1315,11 +1316,16 @@ edit_text_character::format_text()
 	m_ycursor = y;
 
 	assert(! _text.empty() );
+	
+	boost::uint32_t code = 0;
+    std::wstring::const_iterator it = _text.begin();
+    const std::wstring::const_iterator e = _text.end();
 
-	std::wstring::const_iterator it = _text.begin();
-		
-	while (boost::uint32_t code = *it++)
+	while (it != e)
 	{
+	    code = *it++;
+	    if (!code) break;
+
 		if ( _embedFonts )
 		{
 			x += _font->get_kerning_adjustment(last_code, (int) code) * scale;
@@ -1393,25 +1399,19 @@ edit_text_character::format_text()
 
 		if (code == '<' && _html )
 		{
-			static bool warned = false;
-			if ( ! warned )
-			{
-				log_debug(_("HTML in a text field is unsupported, gnash will just forget the tags and print their content"));
-				warned = true;
-			}
-
-			// HTML tag, just skip it...
-			bool closingTagFound = false;
-			while ( (code = *it++) )
-			{
-				if (code == '>')
-				{
-					closingTagFound = true;
-					break;
-				}
-			}
-			if ( ! closingTagFound ) break;
-			else continue;
+			LOG_ONCE(log_debug(_("HTML in a text field is unsupported, "
+                                 "gnash will just forget the tags and print their content")));
+ 
+            std::wstring discard;
+		    bool complete = parseHTML(discard, it, e);
+		    
+		    //log_debug("HTML tag: %s", utf8::encodeCanonicalString(discard, 7));
+	    
+		    // Check incomplete tag (end of string or NULL character in the text).
+		    // We should stop parsing and not increment the iterator in this case.
+		    if (!complete) break;
+		    
+		    continue;
 		}
 
 		if (code == 9) // tab (ASCII HT)
@@ -1424,7 +1424,7 @@ edit_text_character::format_text()
 					    " Make sure character shapes for font %s are being exported "
 					    "into your SWF file."),
 					    __PRETTY_FUNCTION__,
-					    _font->get_name().c_str());
+					    _font->get_name());
 				);
 			}
 			else
@@ -1476,7 +1476,7 @@ edit_text_character::format_text()
 						"into your SWF file"),
 						__PRETTY_FUNCTION__,
 						code,
-						_font->get_name().c_str());
+						_font->get_name());
 					}
 					else
 					{
@@ -1484,7 +1484,7 @@ edit_text_character::format_text()
 						" Maybe you don't have font '%s' installed in your system?"),
 						__PRETTY_FUNCTION__,
 						code,
-						_font->get_name().c_str());
+						_font->get_name());
 					}
 			    }
 
@@ -1507,7 +1507,7 @@ after_x_advance:
 		float width = _bounds.width(); // m_def->width()
 		if (x >= width - rightMargin - PADDING_TWIPS)
 		{
-			//log_debug("Text in character %s exceeds margins", getTarget().c_str());
+			//log_debug("Text in character %s exceeds margins", getTarget());
 			// Whoops, we just exceeded the box width. 
 			// Do word-wrap if requested to do so.
 			if ( autoSize == autoSizeNone )
@@ -1517,8 +1517,9 @@ after_x_advance:
 					//log_debug(" autoSize=NONE!");
 					// truncate long line, but keep expanding text box
 					bool newlinefound = false;
-					while ( (code = *it++ ) )
+					while ( it != e )
 					{
+					    code = *it++;
 						if ( _embedFonts )
 						{
 							x += _font->get_kerning_adjustment(last_code, (int) code) * scale;
@@ -1528,9 +1529,7 @@ after_x_advance:
 						// even if we don't display it 
 						m_text_bounding_box.expandTo(x, y + fontDescent);
 #ifdef GNASH_DEBUG_TEXTFIELDS
-						std::stringstream ss;
-						ss << "Text bbox expanded to " << m_text_bounding_box << "(width: " << m_text_bounding_box.width() << ")";
-						log_debug("%s", ss.str().c_str());
+						log_debug("Text bbox expanded to %s (width: %f)", m_text_bounding_box, m_text_bounding_box.width());
 #endif
 
 						if (code == 13 || code == 10)
@@ -1644,7 +1643,7 @@ edit_text_character::parseTextVariableRef(const std::string& variableName) const
 	const char* varname = var_str.c_str();
 
 #ifdef DEBUG_DYNTEXT_VARIABLES
-	log_debug(_("VariableName: %s"), var_str.c_str());
+	log_debug(_("VariableName: %s"), var_str);
 #endif
 
 	/// Why isn't get_environment const again ?
@@ -1660,7 +1659,7 @@ edit_text_character::parseTextVariableRef(const std::string& variableName) const
 	if ( as_environment::parse_path(varname, path, var) )
 	{
 #ifdef DEBUG_DYNTEXT_VARIABLES
-		log_debug(_("Variable text Path: %s, Var: %s"), path.c_str(), var.c_str());
+		log_debug(_("Variable text Path: %s, Var: %s"), path, var);
 #endif
 		// find target for the path component
 		// we use our parent's environment for this
@@ -1673,7 +1672,7 @@ edit_text_character::parseTextVariableRef(const std::string& variableName) const
 	if ( ! target )
 	{
 		IF_VERBOSE_MALFORMED_SWF(
-			log_swferror(_("VariableName associated to text field refer to an unknown target (%s). It is possible that the character will be instantiated later in the SWF stream. Gnash will try to register again on next access."), path.c_str());
+			log_swferror(_("VariableName associated to text field refer to an unknown target (%s). It is possible that the character will be instantiated later in the SWF stream. Gnash will try to register again on next access."), path);
 		);
 		return ret;
 	}
@@ -1716,7 +1715,7 @@ edit_text_character::registerTextVariable()
 	{
 		log_debug(_("VariableName associated to text field (%s) refer to an unknown target. "
 				"It is possible that the character will be instantiated later in the SWF stream. "
-				"Gnash will try to register again on next access."), _variable_name.c_str());
+				"Gnash will try to register again on next access."), _variable_name);
 		return;
 	}
 
@@ -1732,7 +1731,7 @@ edit_text_character::registerTextVariable()
 	{
 #ifdef DEBUG_DYNTEXT_VARIABLES
 		log_debug(_("target object (%s @ %p) does have a member named %s"),
-			typeName(*target).c_str(), (void*)target, _vm.getStringTable().value(key).c_str());
+			typeName(*target), (void*)target, _vm.getStringTable().value(key));
 #endif
 		// TODO: pass environment to to_string ?
 		// as_environment& env = get_environment();
@@ -1770,6 +1769,39 @@ edit_text_character::registerTextVariable()
 	}
 	_text_variable_registered=true;
 
+}
+
+/// Parses an HTML tag (between < and >) and puts
+/// the contents into tag. Returns false if the
+/// tag was incomplete. The iterator is moved to
+/// the closing tag or the end of the string.
+bool
+edit_text_character::parseHTML(std::wstring& tag, std::wstring::const_iterator& it,
+	                           const std::wstring::const_iterator& e)
+{
+
+    bool complete = false;
+
+    while (it != e)
+    {
+        if (*it == '>')
+        {
+            ++it;
+            complete = true;
+            break;
+        }
+
+        // Check for NULL character
+        if (*it == 0) break;
+
+        tag.push_back(*it++);
+    }
+    
+#ifdef GNASH_DEBUG_TEXTFIELDS
+    log_debug ("HTML tag: %s", utf8::encodeCanonicalString(tag, 7));
+#endif
+    
+    return complete;
 }
 
 void
@@ -2259,7 +2291,7 @@ textfield_autoSize_getset(const fn_call& fn)
 		{
 			std::string strval = arg.to_string();
 			edit_text_character::AutoSizeValue val = ptr->parseAutoSizeValue(strval);
-			//log_debug("%s => %d", strval.c_str(), val);
+			//log_debug("%s => %d", strval, val);
 			ptr->setAutoSize( val );
 		}
 	}
@@ -2281,11 +2313,11 @@ textfield_type_getset(const fn_call& fn)
 	as_value& arg = fn.arg(0);
 	std::string strval = arg.to_string();
 	edit_text_character::TypeValue val = ptr->parseTypeValue(strval);
-	//log_debug("setting %s.type : %s (toString->%s) => %d", ptr->getTarget().c_str(), arg.to_debug_string().c_str(), strval.c_str(), val);
+	//log_debug("setting %s.type : %s (toString->%s) => %d", ptr->getTarget(), arg.to_debug_string(), strval, val);
 	IF_VERBOSE_ASCODING_ERRORS(
 	if ( val == edit_text_character::typeInvalid )
 	{
-		log_aserror(_("Invalid value given to TextField.type: %s"), strval.c_str());
+		log_aserror(_("Invalid value given to TextField.type: %s"), strval);
 	}
 	);
 	ptr->setType(val);
@@ -2341,15 +2373,15 @@ edit_text_character::parseTypeValue(const std::string& val)
 
 	if ( ! cmp(val, "input") )
 	{
-		//log_debug("parsing type value %s: typeInput", val.c_str());
+		//log_debug("parsing type value %s: typeInput", val);
 		return typeInput;
 	}
 	if ( ! cmp(val, "dynamic") )
 	{
-		//log_debug("parsing type value %s: typeDynamic", val.c_str());
+		//log_debug("parsing type value %s: typeDynamic", val);
 		return typeDynamic;
 	}
-	//log_debug("parsing type value %s: typeInvalid", val.c_str());
+	//log_debug("parsing type value %s: typeInvalid", val);
 	return typeInvalid;
 
 }
