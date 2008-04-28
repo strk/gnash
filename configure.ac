@@ -2824,6 +2824,15 @@ if test x$ext_mysql = xyes; then
   fi
 fi
 
+if test "$GMSGFMT" == ":"; then
+  echo "        WARNING: You need the gettext package installed to use translations." >&4
+  echo "                 Required for building a package or 'make distcheck'" >&4
+  echo "                 Install it from http://www.gnu.org/software/gettext/" >&4
+  echo "                  or deb users: apt-get install gettext" >&4
+  #echo "                 or .rpm users: yum install gettext" >&4
+fi
+
+
 dnl Access Linux Platform
 if test x"${build_alp}" = xyes; then
   if test x"${ALP_CFLAGS}" != x; then

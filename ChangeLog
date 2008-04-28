@@ -1,3 +1,8 @@
+2008-04-28 Russ Nelson <nelson@crynwr.com>
+
+	* Put translations in alphabetic order
+	* Some things rely on gettext, so warn people
+
 2008-04-28 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/as_value.cpp: return undefined instead of throwing an 
