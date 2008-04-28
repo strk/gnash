@@ -25,7 +25,8 @@ namespace gnash {
 	
 line_style::line_style()
     :
-    m_width(0)
+    m_width(0),
+    m_color()
 {
 }
 
@@ -131,6 +132,13 @@ line_style::read(stream* in, int tag_type, movie_definition *md)
 	{
 		m_color.read(in, tag_type);
 	}
+}
+
+void
+line_style::set_lerp(const line_style& ls1, const line_style& ls2, float ratio)
+{
+	m_width = (boost::uint16_t)frnd(flerp(ls1.get_width(), ls2.get_width(), ratio));
+	m_color.set_lerp(ls1.get_color(), ls2.get_color(), ratio);
 }
 
 

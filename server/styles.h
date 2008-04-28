@@ -19,15 +19,8 @@ namespace gnash {
 class stream;
 class movie_definition;
 
-class base_line_style
-{
-public:
-	virtual ~base_line_style(){};
-	
-};
-
 /// For the outside of outline shapes, or just bare lines.
-class line_style : public base_line_style
+class line_style 
 {
 public:
 	line_style();
@@ -68,26 +61,26 @@ public:
 
 	/// Return line color and alpha
 	const rgba&	get_color() const { return m_color; }
+
+	/// Set this style to the interpolation of the given one
+	//
+	/// @param ls1
+	///	First line_style to interpolate.
+	///
+	/// @param ls2
+	///	Second line_style to interpolate.
+	///
+	/// @ratio
+	///	The interpolation factor (0..1).
+	///	When 0, this will be equal to ls1, when 1
+	///	this will be equal to ls2.
+	///
+        void set_lerp(const line_style& ls1, const line_style& ls2, float ratio);
 	
 private:
-	friend class morph2_character_def;
-	friend class triangulating_render_handler;
 	
 	boost::uint16_t	m_width;	// in TWIPS
 	rgba	m_color;
-};
-
-class morph_line_style : public base_line_style
-{
-public:
-	morph_line_style();
-	morph_line_style(stream* in);
-	
-	void read(stream* in);
-	
-private:
-	boost::uint16_t m_width[2];
-	rgba   m_color[2];
 };
 
 } // namespace gnash
