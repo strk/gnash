@@ -21,7 +21,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Object.as,v 1.64 2008/04/28 13:43:00 bwy Exp $";
+rcsid="$Id: Object.as,v 1.65 2008/04/28 13:45:09 bwy Exp $";
 #include "check.as"
 
 // Test things in Class Object (swf5~swf8)
@@ -828,17 +828,17 @@ nothing.toString = function() { return "toString"; };
 check_equals ("string + " + nothing, "string + toString");
 nothing.__proto__ = undefined;
 #if OUTPUT_VERSION < 7
-check_equals ("string + " + nothing, "string + ");
+xcheck_equals ("string + " + nothing, "string + ");
 #else
-check_equals ("string + " + nothing, "string + undefined");
+xcheck_equals ("string + " + nothing, "string + undefined");
 #endif
 
 nothing2 = new Object();
 nothing2.__proto__ = undefined;
 #if OUTPUT_VERSION < 7
-check_equals ("string + " + nothing2, "string + ");
+xcheck_equals ("string + " + nothing2, "string + ");
 #else
-check_equals ("string + " + nothing, "string + undefined");
+xcheck_equals ("string + " + nothing, "string + undefined");
 #endif
 
 nothing2.valueOf = function() { return "valueOf"; };
