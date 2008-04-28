@@ -1,5 +1,13 @@
 2008-04-28 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp: have methods of the DrawingApi 
+	  log an as_error if more args then supported are passed.
+	  This will help finding out when the player API adds support
+	  for additional args (lineStyle takes more args in SWF8 for
+	  instance) -- we should always do this, for every function.
+
+2008-04-28 Sandro Santilli <strk@keybit.net>
+
 	* libbase/LoadThread.cpp: don't trust advertised streamSize
 	  for detecting the "completed" state. Fixes bug #23076.
 

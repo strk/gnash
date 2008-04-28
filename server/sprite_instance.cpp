@@ -1209,6 +1209,13 @@ static as_value
 sprite_endFill(const fn_call& fn)
 {
   boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
+  IF_VERBOSE_ASCODING_ERRORS(
+  if ( fn.nargs )
+  {
+    std::stringstream ss; fn.dump_args(ss);
+    log_aserror(_("MovieClip.endFill(%s): args will be discarded"), ss.str());
+  }
+  );
 #ifdef DEBUG_DRAWING_API
   log_debug("%s.endFill();", sprite->getTarget());
 #endif
@@ -1224,10 +1231,18 @@ sprite_lineTo(const fn_call& fn)
   if ( fn.nargs < 2 )
   {
     IF_VERBOSE_ASCODING_ERRORS(
-      log_aserror(_("MovieClip.lineTo() takes two args"));
+      log_aserror(_("MovieClip.lineTo() needs at least two"));
     );
     return as_value();
   }
+
+  IF_VERBOSE_ASCODING_ERRORS(
+  if ( fn.nargs > 2 )
+  {
+    std::stringstream ss; fn.dump_args(ss);
+    log_aserror(_("MovieClip.lineTo(%s): args after the first two will be discarded"), ss.str());
+  }
+  );
 
   float x = PIXELS_TO_TWIPS(fn.arg(0).to_number());
   float y = PIXELS_TO_TWIPS(fn.arg(1).to_number());
@@ -1274,6 +1289,14 @@ sprite_moveTo(const fn_call& fn)
     );
     return as_value();
   }
+
+  IF_VERBOSE_ASCODING_ERRORS(
+  if ( fn.nargs > 2 )
+  {
+    std::stringstream ss; fn.dump_args(ss);
+    log_aserror(_("MovieClip.moveTo(%s): args after the first two will be discarded"), ss.str());
+  }
+  );
 
   float x = PIXELS_TO_TWIPS(fn.arg(0).to_number());
   float y = PIXELS_TO_TWIPS(fn.arg(1).to_number());
@@ -1340,6 +1363,13 @@ sprite_lineStyle(const fn_call& fn)
     {
       float alphaval = fclamp(fn.arg(2).to_number(), 0, 100);
       a = boost::uint8_t( 255 * (alphaval/100) );
+      IF_VERBOSE_ASCODING_ERRORS(
+      if ( fn.nargs > 3 )
+      {
+        std::stringstream ss; fn.dump_args(ss);
+        log_aserror(_("MovieClip.lineStyle(%s): args after the first three will be discarded"), ss.str());
+      }
+      );
     }
   }
 
@@ -1367,6 +1397,14 @@ sprite_curveTo(const fn_call& fn)
     );
     return as_value();
   }
+
+  IF_VERBOSE_ASCODING_ERRORS(
+  if ( fn.nargs > 4 )
+  {
+    std::stringstream ss; fn.dump_args(ss);
+    log_aserror(_("MovieClip.curveTo(%s): args after the first four will be discarded"), ss.str());
+  }
+  );
 
   float cx = PIXELS_TO_TWIPS(fn.arg(0).to_number());
   float cy = PIXELS_TO_TWIPS(fn.arg(1).to_number());
@@ -1430,6 +1468,14 @@ sprite_clear(const fn_call& fn)
 {
   boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 
+  IF_VERBOSE_ASCODING_ERRORS(
+  if ( fn.nargs )
+  {
+    std::stringstream ss; fn.dump_args(ss);
+    log_aserror(_("MovieClip.clear(%s): args will be discarded"), ss.str());
+  }
+  );
+
 #ifdef DEBUG_DRAWING_API
   log_debug("%s.clear();", sprite->getTarget());
 #endif
@@ -1459,6 +1505,13 @@ sprite_beginFill(const fn_call& fn)
     if ( fn.nargs > 1 )
     {
       a = 255 * iclamp(fn.arg(1).to_int(), 0, 100) / 100;
+      IF_VERBOSE_ASCODING_ERRORS(
+      if ( fn.nargs > 2 )
+      {
+        std::stringstream ss; fn.dump_args(ss);
+        log_aserror(_("MovieClip.beginFill(%s): args after the first will be discarded"), ss.str());
+      }
+      );
     }
 
   }
@@ -1487,6 +1540,14 @@ sprite_beginGradientFill(const fn_call& fn)
     );
     return as_value();
   }
+
+  IF_VERBOSE_ASCODING_ERRORS(
+  if ( fn.nargs > 2 )
+  {
+    std::stringstream ss; fn.dump_args(ss);
+    log_aserror(_("MovieClip.beginGradientFill(%s): args after the first five will be discarded"), ss.str());
+  }
+  );
 
   bool radial = false;
   string typeStr = fn.arg(0).to_string();
