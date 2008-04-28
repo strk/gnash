@@ -1,5 +1,10 @@
 2008-04-28 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp: for lineStyle, since we now know SWF8
+	  support more args, log_unimpl for unhandled ones.
+
+2008-04-28 Sandro Santilli <strk@keybit.net>
+
 	* server/styles.{cpp,h}: add line_style.set_lerp, drop friendliness.
 	* server/parser/morph2_character_def.cpp: use line_style.set_lerp
 	  rather then accessing its private members.

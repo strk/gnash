@@ -1331,6 +1331,12 @@ sprite_moveTo(const fn_call& fn)
   return as_value();
 }
 
+// SWF6,7: lineStyle(thickness:Number, rgb:Number, alpha:Number) : Void
+//
+//  SWF8+: lineStyle(thickness:Number, rgb:Number, alpha:Number,
+//                   pixelHinting:Boolean, noScale:String,
+//                   capsStyle:String, jointStyle:String,
+//                   miterLimit:Number) : Void
 static as_value
 sprite_lineStyle(const fn_call& fn)
 {
@@ -1363,13 +1369,33 @@ sprite_lineStyle(const fn_call& fn)
     {
       float alphaval = fclamp(fn.arg(2).to_number(), 0, 100);
       a = boost::uint8_t( 255 * (alphaval/100) );
-      IF_VERBOSE_ASCODING_ERRORS(
+
       if ( fn.nargs > 3 )
       {
-        std::stringstream ss; fn.dump_args(ss);
-        log_aserror(_("MovieClip.lineStyle(%s): args after the first three will be discarded"), ss.str());
+        int swfVersion = sprite->getVM().getSWFVersion();
+        if ( swfVersion < 8 )
+        {
+          IF_VERBOSE_ASCODING_ERRORS(
+          std::stringstream ss; fn.dump_args(ss);
+          log_aserror(_("MovieClip.lineStyle(%s): args after the first three will be discarded"), ss.str());
+          );
+        }
+        else
+        {
+          log_unimpl(_("pixelHinting arg to MovieClip.lineStyle"));
+          if ( fn.nargs > 4 ) log_unimpl(_("noScale arg to MovieClip.lineStyle"));
+          if ( fn.nargs > 5 ) log_unimpl(_("capsStyle arg to MovieClip.lineStyle"));
+          if ( fn.nargs > 6 ) log_unimpl(_("jointStyle arg to MovieClip.lineStyle"));
+          if ( fn.nargs > 7 ) log_unimpl(_("miterLimit arg to MovieClip.lineStyle"));
+          IF_VERBOSE_ASCODING_ERRORS(
+          if ( fn.nargs > 8 ) 
+          {
+            std::stringstream ss; fn.dump_args(ss);
+            log_aserror(_("MovieClip.lineStyle(%s): args after the first eight will be discarded"), ss.str());
+          }
+          )
+        }
       }
-      );
     }
   }
 
