@@ -21,7 +21,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Object.as,v 1.63 2008/04/09 09:51:21 zoulunkai Exp $";
+rcsid="$Id: Object.as,v 1.64 2008/04/28 13:43:00 bwy Exp $";
 #include "check.as"
 
 // Test things in Class Object (swf5~swf8)
@@ -822,11 +822,33 @@ check(r); // now we can unwatch.. (gnash fails as it removed the watch before)
 #endif // OUTPUT_VERSION > 5
 
 
+nothing = new Object ();
+nothing.toString = function() { return "toString"; };
+
+check_equals ("string + " + nothing, "string + toString");
+nothing.__proto__ = undefined;
+#if OUTPUT_VERSION < 7
+check_equals ("string + " + nothing, "string + ");
+#else
+check_equals ("string + " + nothing, "string + undefined");
+#endif
+
+nothing2 = new Object();
+nothing2.__proto__ = undefined;
+#if OUTPUT_VERSION < 7
+check_equals ("string + " + nothing2, "string + ");
+#else
+check_equals ("string + " + nothing, "string + undefined");
+#endif
+
+nothing2.valueOf = function() { return "valueOf"; };
+check_equals ("string + " + nothing2, "string + valueOf");
+
 #if OUTPUT_VERSION <= 5
-totals(79);
+totals(83);
 #endif
 
 #if OUTPUT_VERSION >= 6
-totals(258);
+totals(262);
 #endif
 
