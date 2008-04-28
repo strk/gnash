@@ -398,7 +398,7 @@ private:
 	//
 	/// This function will also update any registered variable
 	///
-	void	setTextValue(const std::wstring& wstr);
+	void setTextValue(const std::wstring& wstr);
 
 	/// Set our text to the given string by effect of an update of a registered variable name
 	//
@@ -436,7 +436,7 @@ private:
 	/// immutable definition of this object, as read
 	/// from the SWF stream. Assured to be not-NULL
 	/// by constructor. This might change in the future
-	boost::intrusive_ptr<edit_text_character_def>	m_def;
+	boost::intrusive_ptr<edit_text_character_def> m_def;
 
 	/// bounds of dynamic text, as laid out
 	geometry::Range2d<float> m_text_bounding_box;
@@ -469,7 +469,7 @@ private:
 	/// @return     Whether the tag is complete or not (i.e. whether a '>'
 	///             was found).
 	bool parseHTML(std::wstring& tag, std::wstring::const_iterator& it,
-	                      const std::wstring::const_iterator& e);
+	                      const std::wstring::const_iterator& e) const;
 
 	/// Does LEFT/CENTER/RIGHT alignment on the records in
 	/// m_text_glyph_records[], starting with

@@ -1773,11 +1773,11 @@ edit_text_character::registerTextVariable()
 
 /// Parses an HTML tag (between < and >) and puts
 /// the contents into tag. Returns false if the
-/// tag was incomplete. The iterator is moved to
+/// tag was incomplete. The iterator is moved to after
 /// the closing tag or the end of the string.
 bool
 edit_text_character::parseHTML(std::wstring& tag, std::wstring::const_iterator& it,
-	                           const std::wstring::const_iterator& e)
+	                           const std::wstring::const_iterator& e) const
 {
 
     bool complete = false;
