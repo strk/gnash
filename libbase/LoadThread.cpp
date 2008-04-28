@@ -27,6 +27,8 @@
 # include "unistd.h" // for usleep()
 #endif
 
+using namespace gnash;
+
 LoadThread::LoadThread()
 	:
 	_completed(false),
@@ -270,6 +272,7 @@ long LoadThread::getBytesLoaded()
 
 long LoadThread::getBytesTotal()
 {
+	// TODO: proxy to underlying stream instead ?
 	return _streamSize;
 }
 
@@ -287,7 +290,7 @@ void LoadThread::setupCache()
 	_cache.reset( new boost::uint8_t[1024*500] );
 	_cacheSize = 1024*500;
 
-    size_t setupSize = 1024;
+	size_t setupSize = 1024;
 
 	size_t ret = _stream->read_bytes(_cache.get(), setupSize);
 	_cacheStart = 0;
@@ -297,6 +300,9 @@ void LoadThread::setupCache()
 
 	if ( ret < setupSize )
 	{
+#ifdef GNASH_DEBUG_LOAD_THREAD
+		log_debug("LoadThread completed during setupCache");
+#endif
 		_completed = true;
 		if ( _streamSize < _loadPosition ) _streamSize = _loadPosition;
 	}
@@ -321,18 +327,13 @@ void LoadThread::downloadThread(LoadThread* lt)
 
 void LoadThread::fillCache()
 {
-	// TODO: is this needed ? Should it be an assertion ?
-	if (_loadPosition >= _streamSize) {
-		_completed = true;
-		_streamSize = _loadPosition;
-		// I don't see how should this happen...
-		gnash::log_error("LoadThread::fillCache: _loadPosition:%ld, _streamSize:%ld", _loadPosition, _streamSize);
-		return;
-	}
-
 #ifdef THREADED_LOADS
 	boost::mutex::scoped_lock lock(_mutex);
 #endif
+
+
+	// don't call me if download was completed
+	assert(!_completed);
 
 	// If we're not at the reading head, move to it
 	if (_loadPosition != _actualPosition) _stream->set_position(_loadPosition);
@@ -345,11 +346,19 @@ void LoadThread::fillCache()
 
 		_cachedData += ret;
 		if (ret != _cacheSize - _cachedData) {
+#ifdef GNASH_DEBUG_LOAD_THREAD
+			log_debug("LoadThread completed during fillCache (read %d bytes when %d were requested)",
+				ret, _cacheSize-_cachedData);
+#endif
 			_completed = true;
 		} else {
 			_stream->set_position(_loadPosition + _chunkSize);
 			long pos = _stream->get_position();
 			if (pos != _loadPosition + _chunkSize) {
+#ifdef GNASH_DEBUG_LOAD_THREAD
+				log_debug("LoadThread completed during fillCache (attempted to go to position %d, but only got to %d",
+					_loadPosition+_chunkSize, pos);
+#endif
 				_completed = true;
 			}
 			ret += pos - (_loadPosition + _chunkSize);
@@ -358,6 +367,10 @@ void LoadThread::fillCache()
 	} else {
 		ret = _stream->read_bytes(_cache.get() + _cachedData, _chunkSize);
 		if (ret != _chunkSize) {
+#ifdef GNASH_DEBUG_LOAD_THREAD
+			log_debug("LoadThread completed during fillCache (tried to read %d bytes, but read %d)",
+				_chunkSize, ret);
+#endif
 			_completed = true;
 		}
 		_cachedData += ret;
@@ -372,28 +385,31 @@ void LoadThread::fillCache()
 
 void LoadThread::download()
 {
-	// TODO: is this needed ? Should it be an assertion ?
-	if (_loadPosition >= _streamSize) {
-		_loadPosition = _streamSize;
-		_completed = true;
-		_streamSize = _loadPosition;
-		gnash::log_error("LoadThread::download: _loadPosition:%ld, _streamSize:%ld", _loadPosition, _streamSize);
-		return;
-	}
-
 #ifdef THREADED_LOADS
 	boost::mutex::scoped_lock lock(_mutex);
 #endif
 
+	// ::download shouldn't be called if we completed
+	assert ( !_completed );
+
 	long nextpos = _loadPosition + _chunkSize;
-	if ( nextpos > _streamSize ) nextpos = _streamSize;
+
+	// Can't rely on _streamSize right ?
+	//if ( nextpos > _streamSize ) nextpos = _streamSize;
+
 	_stream->set_position(nextpos);
-
 	long pos = _stream->get_position();
-	assert(pos != -1); // TODO: unhandled error !
+	if ( pos == -1 )
+	{
+		log_error("Error in get_position");
+		abort();
+	}
 
-	assert(pos == nextpos);
-	if (pos != _loadPosition + _chunkSize) {
+	if (pos < nextpos) {
+#ifdef GNASH_DEBUG_LOAD_THREAD
+		log_debug("LoadThread completed during download (get_position was %d after set_position(%d))",
+			pos, nextpos);
+#endif
 		_completed = true;
 	}
 

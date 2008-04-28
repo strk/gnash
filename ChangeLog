@@ -1,3 +1,8 @@
+2008-04-28 Sandro Santilli <strk@keybit.net>
+
+	* libbase/LoadThread.cpp: don't trust advertised streamSize
+	  for detecting the "completed" state. Fixes bug #23076.
+
 2008-04-28 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/edit_text_character.{h,cpp}: make parseHTML a const
