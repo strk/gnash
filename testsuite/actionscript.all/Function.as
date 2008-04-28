@@ -22,7 +22,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Function.as,v 1.72 2008/03/29 20:14:41 strk Exp $";
+rcsid="$Id: Function.as,v 1.73 2008/04/28 16:10:00 bwy Exp $";
 #include "check.as"
 
 #if OUTPUT_VERSION >= 6
@@ -744,7 +744,7 @@ function testInFunctionContext(o)
 	ret = localGetThis();
 	check_equals(typeof(ret), 'object');
 #if OUTPUT_VERSION < 6
-	xcheck(ret == testInFunctionContext);
+	check(ret == testInFunctionContext);
 #else
 	check(ret != testInFunctionContext);
 #endif

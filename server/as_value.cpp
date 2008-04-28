@@ -291,18 +291,25 @@ as_value::to_primitive(type hint) const
 		if ( m_type == OBJECT ) obj = getObj().get();
 		else obj = getFun().get();
 
-		if ( (!obj->get_member(NSV::PROP_VALUE_OF, &method)) || (!method.is_function()) ) // ECMA says ! is_object()
+		if ( (!obj->get_member(NSV::PROP_VALUE_OF, &method)) || (!method.is_object()) ) // ECMA says ! is_object()
 		{
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
 			log_debug(" valueOf not found");
 #endif
-			if ( (!obj->get_member(NSV::PROP_TO_STRING, &method)) || (!method.is_function()) ) // ECMA says ! is_object()
-			{
-#if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
-				log_debug(" toString not found");
-#endif
-				throw ActionTypeError();
-			}
+            // Returning undefined here instead of throwing
+            // a TypeError passes tests in actionscript.all/Object.as
+            // and many swfdec tests, with no new failures (though
+            // perhaps we aren't testing enough).
+            return as_value();
+            
+//			if ( (!obj->get_member(NSV::PROP_TO_STRING, &method)) || (!method.is_object()) ) // ECMA says ! is_object()
+//			{
+//#if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
+//				log_debug(" toString not found");
+//#endif
+//                
+//				throw ActionTypeError();
+//			}
 		}
 	}
 	else

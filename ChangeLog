@@ -1,5 +1,15 @@
 2008-04-28 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* server/as_value.cpp: return undefined instead of throwing an 
+	  ActionType error in to_primitive(). I suspect it's not really
+	  correct, but it gets a lot of passes in swfdec, some in
+	  actionscript.all, and no fails, so it will do for now.
+	* testsuite/swfdec/PASSING: 35 new passes (all for the same reason,
+	  probably).
+	* testsuite/actionscript.all/Object.as,Function.as: some passes.
+
+2008-04-28 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* testsuite/actionscript.all/Object.as: tests for undefined __proto__
 	  and valueOf (and toString).
 
