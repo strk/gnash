@@ -241,7 +241,11 @@ inline unsigned long int /* pthread_t */ get_thread_id(void)
 # ifdef __APPLE_CC__
     return reinterpret_cast<unsigned long int>(pthread_self());
 # else
-    return static_cast<unsigned long int>(pthread_self());
+    // This isn't a proper style C++ cast, but FreeBSD has a problem with
+    // static_cast for this as pthread_self() returns a pointer. We can
+    // use that too, this ID is only used for the log file to keep output
+    // from seperare threads clear.
+    return (unsigned long int)pthread_self();
 # endif 
 #else
 # ifdef _WIN32

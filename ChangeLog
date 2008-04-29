@@ -1,3 +1,8 @@
+2008-04-29  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* libbase/utility.h: Use C ctyle cast for pthread_self() to work
+	around BSD compiler bug.
+	
 2008-04-29 Sandro Santilli <strk@keybit.net>
 
 	* server/edit_text_character.cpp: have wordWrap take precedence
