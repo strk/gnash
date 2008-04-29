@@ -1,3 +1,7 @@
+2008-04-29 Sandro Santilli <strk@keybit.net>
+
+	* server/parser/morph2_character_def.h: drop inclusion of "shape.h".
+
 2008-04-29 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/asobj/Stage.{cpp,h}: drop methods from Stage class,
