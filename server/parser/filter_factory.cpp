@@ -44,9 +44,11 @@ typedef enum
     GRADIENT_BEVEL = 7
 } filter_types;
 
-int const filter_factory::read(stream& in, 
-    bool read_multiple, Filters* store)
+int
+filter_factory::read(stream& in, bool read_multiple, Filters* store)
 {
+    //GNASH_REPORT_FUNCTION;
+
     int count = 1;
 
     if (read_multiple)
@@ -118,7 +120,7 @@ bool DropShadowFilter::read(stream& in)
 {
     in.ensureBytes(4 + 8 + 8 + 2 + 1);
 
-    m_color = in.read_u8() << 16 + in.read_u8() << 8 + in.read_u8();
+    m_color = in.read_u8() << (16 + in.read_u8()) << (8 + in.read_u8());
     m_alpha = in.read_u8();
 
     m_blurX = in.read_fixed();
@@ -164,9 +166,11 @@ bool BlurFilter::read(stream& in)
 
 bool GlowFilter::read(stream& in)
 {
+    //GNASH_REPORT_FUNCTION;
+
     in.ensureBytes(4 + 8 + 2 + 1);
 
-    m_color = in.read_u8() << 16 + in.read_u8() << 8 + in.read_u8();
+    m_color = in.read_u8() << (16 + in.read_u8()) << (8 + in.read_u8());
     m_alpha = in.read_u8();
 
     m_blurX = in.read_fixed();
@@ -193,10 +197,10 @@ bool BevelFilter::read(stream& in)
     // TODO: It is possible that the order of these two should be reversed.
     // highlight might come first. Find out for sure and then fix and remove
     // this comment.
-    m_shadowColor = in.read_u8() << 16 + in.read_u8() << 8 + in.read_u8();
+    m_shadowColor = in.read_u8() << (16 + in.read_u8()) << (8 + in.read_u8());
     m_shadowAlpha = in.read_u8();
 
-    m_highlightColor = in.read_u8() << 16 + in.read_u8() << 8 + in.read_u8();
+    m_highlightColor = in.read_u8() << (16 + in.read_u8()) << (8 + in.read_u8());
     m_highlightAlpha = in.read_u8();
 
     m_blurX = in.read_fixed();
@@ -238,7 +242,7 @@ bool GradientGlowFilter::read(stream& in)
 
     for (int i = 0; i < count; ++i)
     {
-        m_colors.push_back(in.read_u8() << 16 + in.read_u8() << 8 + in.read_u8());
+        m_colors.push_back(in.read_u8() << (16 + in.read_u8()) << (8 + in.read_u8()));
         m_alphas.push_back(in.read_u8());
     }
 
@@ -291,7 +295,7 @@ bool ConvolutionFilter::read(stream& in)
         m_matrix.push_back(in.read_long_float());
     }
 
-    m_color = in.read_u8() << 16 + in.read_u8() << 8 + in.read_u8();
+    m_color = in.read_u8() << (16 + in.read_u8()) << (8 + in.read_u8());
     m_alpha = in.read_u8();
 
     static_cast<void> (in.read_uint(6)); // Throw away.
@@ -343,7 +347,7 @@ bool GradientBevelFilter::read(stream& in)
     m_ratios.reserve(count);
     for (int i = 0; i < count; ++i)
     {
-        m_colors.push_back(in.read_u8() << 16 + in.read_u8() << 8 + in.read_u8());
+        m_colors.push_back(in.read_u8() << (16 + in.read_u8()) << (8 + in.read_u8()));
         m_alphas.push_back(in.read_u8());
     }
 

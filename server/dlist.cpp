@@ -149,13 +149,15 @@ DisplayList::get_character_by_name(const std::string& name)
 {
   testInvariant();
 
-  container_type::iterator it = std::find_if(
-      _charsByDepth.begin(),
-      _charsByDepth.end(),
+  const container_type::iterator e = _charsByDepth.end();
+
+  container_type::const_iterator it = std::find_if(
+      _charsByDepth.begin(), e,
       NameEquals(name));
 
-  if ( it == _charsByDepth.end() ) return NULL;
-  else return it->get();
+  if ( it == e ) return NULL;
+  
+  return it->get();
 
 }
 
@@ -164,13 +166,15 @@ DisplayList::get_character_by_name_i(const std::string& name)
 {
   testInvariant();
 
-  container_type::iterator it = std::find_if(
-      _charsByDepth.begin(),
-      _charsByDepth.end(),
+  const container_type::iterator e = _charsByDepth.end();
+
+  container_type::const_iterator it = std::find_if(
+      _charsByDepth.begin(), e,
       NameEqualsNoCase(name));
 
-  if ( it == _charsByDepth.end() ) return NULL;
-  else return it->get();
+  if ( it == e ) return NULL;
+  
+  return it->get();
 }
 
 void
