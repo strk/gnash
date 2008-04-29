@@ -1,5 +1,18 @@
 2008-04-29 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* server/namedStrings.{cpp,h}: add onFullScreen.
+	* server/asobj/Stage.{h,cpp}: drop own onResize member, add
+	  notifyFullScreen.
+	* server/movie_root.cpp: notify onFullScreen listener on
+	  state change.
+	* testsuite/actionscript.all/Stage.as: make number of tests
+	  independent of correctness. Some passes, but I've lost track
+	  a bit of the onResize test - would be grateful if someone
+	  can test with pp (Linux version supposedly broken in this
+	  regard).
+
+2008-04-29 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* testsuite/actionscript.all/Stage.as: test onFullScreen().
 
 2008-04-29 Benjamin Wolsey <bwy@benjaminwolsey.de>

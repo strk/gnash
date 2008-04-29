@@ -114,13 +114,12 @@ Stage::Stage()
 
 
 void
-Stage::onResize()
+Stage::notifyFullScreen(bool fs)
 {
-	as_value v;
-	if (get_member(NSV::PROP_SCALE_MODE, &v) && v.to_string() == "noScale" )
-	{
-		notifyResize();
-	}
+    // Should we notify resize here, or does movie_root do it anyway
+    // when the gui changes size?
+	log_debug("notifying Stage listeners about fullscreen state");
+	callMethod(NSV::PROP_BROADCAST_MESSAGE, "onFullScreen", fs);
 }
 
 

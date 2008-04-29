@@ -21,7 +21,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Stage.as,v 1.31 2008/04/29 14:11:56 bwy Exp $";
+rcsid="$Id: Stage.as,v 1.32 2008/04/29 14:47:26 bwy Exp $";
 #include "check.as"
 
 check_equals (typeof(Stage), 'object');
@@ -112,11 +112,15 @@ check_equals(Stage.displayState, "normal");
 
 #if OUTPUT_VERSION > 5
 
+stageheightcheck = 0;
+rscount = 0;
+
 listener = new Object;
 listener.onResize = function() {
 	_root.note("Resize event received, args to handler: "+arguments.length+" Stage.width="+Stage.width+", Stage.height="+Stage.height);
 	Stage.height = 1;
-	check(Stage.height != 1);
+	stageheightcheck = Stage.height;
+	rscount++;
 	// If we delete the Stage object, events won't arrive anymore, but
 	// the precedent setting of 'scaleMode' will persist !!
 	//delete Stage;
@@ -151,8 +155,22 @@ check_equals(Stage.scaleMode, "noScale");
 
 Stage.displayState = "fullScreen";
 Stage.displayState = "normal";
-xcheck_equals (fscount, 2);
-xcheck_equals (valtype, "boolean");
+
+// number of calls to Stage.onFullScreen()
+check_equals (fscount, 2);
+
+// number of calls to Stage.onResize()
+// NOTE: proprietary player for linux is bogus here,
+//       in that it always sends an onResize event
+//       when scaleMode is set to "noScale" from something else
+note("NOTE: Linux version of the proprietary player is known to fail a test (sending a bogus onResize event)");
+check_equals (rscount, 0);
+
+// Type of onFullScreen argument
+check_equals (valtype, "boolean");
+
+// Try to set in onResize (but it should be read only).
+check(stageheightcheck != 1);
 
 o = new Object();
 o.onResize = function() {
@@ -170,11 +188,7 @@ check_equals (typeof(Stage.removeListener), 'undefined');
 
 
 #if OUTPUT_VERSION > 5
- // NOTE: proprietary player for linux is bogus here,
- //       in that it always sends an onResize event
- //       when scaleMode is set to "noScale" from something else
- note("NOTE: Linux version of the proprieraty player is known to fail a test (sending a bogus onResize event)");
- check_totals(49);
+ check_totals(51);
 #else
  check_totals(32);
 #endif

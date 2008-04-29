@@ -1390,6 +1390,9 @@ movie_root::setStageDisplayState(const DisplayState ds)
 {
     _displayState = ds;
 
+    boost::intrusive_ptr<Stage> stage = getStageObject();
+    if ( stage ) stage->notifyFullScreen( (_displayState == fullScreen) );
+
 	if (!movie_root::interfaceHandle) return; // No registered callback
 	
 	if (_displayState == fullScreen)

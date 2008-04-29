@@ -50,11 +50,10 @@ public:
     
 	Stage();
 	
-	/// Receive a resize event.
-	void onResize();
-
 	/// Notify all listeners about a resize event
 	void notifyResize();
+	
+	void notifyFullScreen(bool fs);
 
 };
 

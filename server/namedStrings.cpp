@@ -71,6 +71,7 @@ static string_table::svt preload_names[] =
 	string_table::svt( "onInitialize", NSV::PROP_ON_INITIALIZE ),
 	string_table::svt( "onData", NSV::PROP_ON_DATA ),
 	string_table::svt( "onResize", NSV::PROP_ON_RESIZE ),
+	string_table::svt( "onFullScreen", NSV::PROP_ON_FULLSCREEN ),
 	string_table::svt( "onPress", NSV::PROP_ON_PRESS ),
 	string_table::svt( "onRelease", NSV::PROP_ON_RELEASE ),
 	string_table::svt( "onReleaseOutside", NSV::PROP_ON_RELEASE_OUTSIDE ),
