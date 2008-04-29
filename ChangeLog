@@ -1,5 +1,12 @@
 2008-04-29 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* server/asobj/Global.cpp: tidy up, register ASnative functions,
+	  as ASnew (still unimplemented). Log once more often, drop 
+	  c_str() usage.
+	* testsuite/ASnative.cpp: tests for ASnative(2, 0) (old ASnew).
+
+2008-04-29 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* testsuite/MovieTester.cpp: function name change.
 
 2008-04-29 Sandro Santilli <strk@keybit.net>

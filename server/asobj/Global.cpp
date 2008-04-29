@@ -104,8 +104,8 @@ as_global_trace(const fn_call& fn)
     //
     // @@ Nothing needs special treatment,
     //    as_value::to_string() will take care of everything
-    const char* arg0 = fn.arg(0).to_string().c_str();
-    log_trace("%s", arg0);
+    log_trace("%s", fn.arg(0).to_string());
+
     return as_value();
 }
 
@@ -123,7 +123,7 @@ as_global_isfinite(const fn_call& fn)
 {
     ASSERT_FN_ARGS_IS_1
 
-    return as_value( (bool)isfinite(fn.arg(0).to_number()) );
+    return as_value( static_cast<bool>(isfinite(fn.arg(0).to_number())) );
 }
 
 /// \brief Encode a string to URL-encoded format
@@ -145,7 +145,7 @@ as_global_escape(const fn_call& fn)
 
     std::string input = fn.arg(0).to_string();
     URL::encode(input);
-    return as_value(input.c_str());
+    return as_value(input);
 }
 
 /// \brief Decode a string from URL-encoded format
@@ -163,7 +163,7 @@ as_global_unescape(const fn_call& fn)
 
     std::string input = fn.arg(0).to_string();
     URL::decode(input);
-    return as_value(input.c_str());
+    return as_value(input);
 }
 
 // parseFloat (string)
@@ -380,7 +380,7 @@ as_global_assetpropflags(const fn_call& fn)
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("Invalid call to ASSetPropFlags: "
 			"first argument is not an object: %s"),
-			fn.arg(0).to_debug_string().c_str());
+			fn.arg(0).to_debug_string());
 		);
 		return as_value();
     }
@@ -428,7 +428,7 @@ as_global_asnative(const fn_call& fn)
 	if (fn.nargs < 2)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(	
-		log_aserror(_("ASNative(%s): needs at least two arguments"), fn.dump_args().c_str());
+		log_aserror(_("ASNative(%s): needs at least two arguments"), fn.dump_args());
 		)
 		return ret;
 	}
@@ -439,14 +439,14 @@ as_global_asnative(const fn_call& fn)
 	if ( sx < 0 )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(	
-		log_aserror(_("ASNative(%s): first arg must be >= 0"), fn.dump_args().c_str());
+		log_aserror(_("ASNative(%s): first arg must be >= 0"), fn.dump_args());
 		)
 		return ret;
 	}
 	if ( sy < 0 )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(	
-		log_aserror(_("ASNative(%s): second arg must be >= 0"), fn.dump_args().c_str());
+		log_aserror(_("ASNative(%s): second arg must be >= 0"), fn.dump_args());
 		)
 		return ret;
 	}
@@ -465,12 +465,20 @@ as_global_asnative(const fn_call& fn)
 		
 }
 
+// Obsolete ASnew function (exists only as ASnative(2, 0))
+static as_value
+as_global_asnew(const fn_call& /*fn*/)
+{
+	LOG_ONCE(log_unimpl("ASNative (2, 0) - old ASnew"));
+	return as_value();
+}
+
 // ASSetNative function
 // TODO: find dox 
 static as_value
 as_global_assetnative(const fn_call& /*fn*/)
 {
-	log_unimpl("ASSetNative");
+	LOG_ONCE(log_unimpl("ASSetNative"));
 	return as_value();
 }
 
@@ -479,7 +487,7 @@ as_global_assetnative(const fn_call& /*fn*/)
 static as_value
 as_global_assetnativeaccessor(const fn_call& /*fn*/)
 {
-	log_unimpl("ASSetNativeAccessor");
+	LOG_ONCE(log_unimpl("ASSetNativeAccessor"));
 	return as_value();
 }
 
@@ -488,7 +496,7 @@ as_global_assetnativeaccessor(const fn_call& /*fn*/)
 static as_value
 as_global_asconstructor(const fn_call& /*fn*/)
 {
-	log_unimpl("ASconstructor");
+	LOG_ONCE(log_unimpl("ASconstructor"));
 	return as_value();
 }
 
@@ -496,12 +504,7 @@ as_global_asconstructor(const fn_call& /*fn*/)
 static as_value
 as_global_updateAfterEvent(const fn_call& /*fn*/)
 {
-	static bool warned=false;
-	if ( ! warned )
-	{
-		log_unimpl("updateAfterEvent()");
-		warned=true;
-	}
+	LOG_ONCE(log_unimpl("updateAfterEvent()"));
 	return as_value();
 }
 
@@ -531,28 +534,27 @@ Global::Global(VM& vm, ClassHierarchy *ch)
 	as_value nullVal; nullVal.set_null();
 	init_member("o", nullVal, as_prop_flags::dontEnum);
 
-	// ASSetPropFlags
+	// ASNew was dropped as a builtin function but exists
+	// as ASnative.
 	vm.registerNative(as_global_assetpropflags, 1, 0);
+	vm.registerNative(as_global_asnew, 2, 0);	
+	vm.registerNative(as_global_assetnative, 4, 0);	
+	vm.registerNative(as_global_assetnativeaccessor, 4, 1);
+	vm.registerNative(as_global_updateAfterEvent, 9, 0);	
+	vm.registerNative(timer_setinterval, 250, 0);
+	vm.registerNative(timer_clearinterval, 250, 1);
+
+    // _global functions.    		
 	init_member("ASSetPropFlags", vm.getNative(1, 0));
-
-	// ASnative
 	init_member("ASnative", new builtin_function(as_global_asnative));
-
-	// ASSetNative
-	init_member("ASSetNative", new builtin_function(as_global_assetnative));
-
-	// ASSetNativeAccessor
-	init_member("ASSetNativeAccessor", new builtin_function(as_global_assetnativeaccessor));
-
-	// ASconstructor
+	init_member("ASSetNative", vm.getNative(4, 0));
+	init_member("ASSetNativeAccessor", vm.getNative(4, 1));
 	init_member("ASconstructor", new builtin_function(as_global_asconstructor));
-
-	// updateAfterEvent
-	init_member("updateAfterEvent", new builtin_function(as_global_updateAfterEvent));
+	init_member("updateAfterEvent", vm.getNative(9, 0));
 
 	// Defined in timers.h
-	init_member("setInterval", new builtin_function(timer_setinterval));
-	init_member("clearInterval", new builtin_function(timer_clearinterval));
+	init_member("setInterval", vm.getNative(250, 0));
+	init_member("clearInterval", vm.getNative(250, 1));
 	init_member("setTimeout", new builtin_function(timer_settimeout));
 	init_member("clearTimeout", new builtin_function(timer_clearinterval));
 
@@ -612,17 +614,17 @@ Global::Global(VM& vm, ClassHierarchy *ch)
 	//-----------------------
 
     vm.registerNative(as_global_escape, 100, 0);
-	init_member("escape", vm.getNative(100, 0));
 	vm.registerNative(as_global_unescape, 100, 1);
-	init_member("unescape", vm.getNative(100, 1));
     vm.registerNative(as_global_parseint, 100, 2);
-	init_member("parseInt", vm.getNative(100, 2));
     vm.registerNative(as_global_parsefloat, 100, 3);
-	init_member("parseFloat", vm.getNative(100, 3));
-	
 	vm.registerNative(as_global_isnan, 200, 18);
-	init_member("isNaN", vm.getNative(200, 18));
 	vm.registerNative(as_global_isfinite, 200, 19);
+
+	init_member("escape", vm.getNative(100, 0));
+	init_member("unescape", vm.getNative(100, 1));
+	init_member("parseInt", vm.getNative(100, 2));
+	init_member("parseFloat", vm.getNative(100, 3));
+	init_member("isNaN", vm.getNative(200, 18));
 	init_member("isFinite", vm.getNative(200, 19));
 
 	// NaN and Infinity should only be in _global since SWF6,

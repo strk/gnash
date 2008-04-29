@@ -15,8 +15,24 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-rcsid="$Id: ASnative.as,v 1.7 2008/04/29 08:53:37 bwy Exp $";
+rcsid="$Id: ASnative.as,v 1.8 2008/04/29 10:23:50 bwy Exp $";
 #include "check.as"
+
+/// Global
+
+// Old ASnew
+a = ASnative(2, 0);
+
+var result = "";
+function func() {
+    if (a()) { result = "true"; }
+    else { result =  "false"; }
+};
+
+func();
+check_equals (result, "false");
+discard = new func();
+xcheck_equals (result, "true");
 
 a = ASnative (100, 0); // escape
 check_equals(a(" "), "%20");
@@ -47,7 +63,6 @@ f = new e(100000000); // not instantiatable
 xcheck_equals(typeof(f), 'object');
 check_equals(typeof(f.getMilliseconds()), 'undefined');
 check_equals(typeof(f().getMilliseconds()), 'undefined');
-
 
 d = new Date (123456789);
 
@@ -232,7 +247,7 @@ xcheck_equals (countTS, 2);
 xcheck_equals (countVO, 25);
 
 #if OUTPUT_VERSION > 5
-check_totals(74);
+check_totals(76);
 #else
-check_totals(72);
+check_totals(74);
 #endif
