@@ -143,7 +143,6 @@ check_PROGRAMS = \
 	eventSoundTest1 \
 	eventSoundTest1-Runner \
 	DrawingApiTestRunner \
-	DragDropTestRunner   \
 	frame_label_test \
 	path_format_test \
 	callFunction_test \
@@ -177,6 +176,7 @@ endif
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
 check_PROGRAMS += \
 	intervalTestRunner \
+	DragDropTestRunner   \
 	PrototypeEventListenersTestRunner \
 	$(NULL)
 endif
@@ -1777,7 +1777,6 @@ TEST_CASES = \
 	loadMovieTestRunner \
 	eventSoundTest1-Runner \
 	DrawingApiTestRunner \
-	DragDropTestRunner   \
 	action_execution_order_test1runner \
 	action_execution_order_test2runner \
 	action_execution_order_test3runner \
@@ -1827,11 +1826,9 @@ TEST_CASES = \
 	loop_test10runner \
 	shape_testrunner \
 	morph_test1runner \
-	registerClassTest2runner \
 	opcode_guard_testrunner \
 	runtime_vm_stack_testrunner \
 	instanceNameTestRunner \
-	PrototypeEventListenersTestRunner \
 	$(NULL)
 
 if MING_VERSION_0_4
@@ -1841,6 +1838,8 @@ endif
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
 TEST_CASES += VarAndCharClashTest-Runner \
+	PrototypeEventListenersTestRunner \
+	DragDropTestRunner   \
 	FlashVarsTest-Runner \
 	intervalTestRunner \
 	gotoFrame2Test-Runner 
@@ -1848,6 +1847,7 @@ endif
 
 if MING_SUPPORTS_INIT_ACTIONS
 TEST_CASES += \
+	registerClassTest2runner \
 	init_action_testrunner \
 	$(NULL)
 endif

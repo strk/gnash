@@ -1,5 +1,11 @@
 2008-04-29 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/Makefile.am: fix build of tests
+	  against Ming-0.3.0 (a lot of tests fail actually, but at
+	  least they build).
+
+2008-04-29 Sandro Santilli <strk@keybit.net>
+
 	* backend/render_handler_agg.cpp, backend/render_handler_cairo.cpp,
 	  backend/render_handler_ogl.cpp: 
 	  Update calls to fetch line_style strokes, implement noScale="none"
