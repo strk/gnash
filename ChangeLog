@@ -1,5 +1,9 @@
 2008-04-29 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* testsuite/actionscript.all/Stage.as: test onFullScreen().
+
+2008-04-29 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* server/parser/filter_factory.{h,cpp}: drop invalid const qualifier
 	  on static int read(), fix the gcc 4.3 bracket warnings that then
 	  appear.

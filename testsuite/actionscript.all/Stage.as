@@ -21,7 +21,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Stage.as,v 1.30 2008/04/23 20:35:37 strk Exp $";
+rcsid="$Id: Stage.as,v 1.31 2008/04/29 14:11:56 bwy Exp $";
 #include "check.as"
 
 check_equals (typeof(Stage), 'object');
@@ -121,6 +121,16 @@ listener.onResize = function() {
 	// the precedent setting of 'scaleMode' will persist !!
 	//delete Stage;
 };
+
+fscount = 0;
+valtype = "";
+
+listener.onFullScreen = function(fs) {
+    _root.note("onFullScreen event received: value " + fs);
+    valtype = typeof(fs);
+    fscount++;
+};
+
 Stage.addListener(listener);
 
 // resize events are not sent unless scaleMode == "noScale"
@@ -138,6 +148,11 @@ check_equals(Stage.scaleMode, "noBorder");
 
 Stage.scaleMode = "noScale";
 check_equals(Stage.scaleMode, "noScale");
+
+Stage.displayState = "fullScreen";
+Stage.displayState = "normal";
+xcheck_equals (fscount, 2);
+xcheck_equals (valtype, "boolean");
 
 o = new Object();
 o.onResize = function() {
@@ -159,7 +174,7 @@ check_equals (typeof(Stage.removeListener), 'undefined');
  //       in that it always sends an onResize event
  //       when scaleMode is set to "noScale" from something else
  note("NOTE: Linux version of the proprieraty player is known to fail a test (sending a bogus onResize event)");
- check_totals(47);
+ check_totals(49);
 #else
  check_totals(32);
 #endif
