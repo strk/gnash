@@ -20,7 +20,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: TextField.as,v 1.53 2008/04/27 18:13:16 strk Exp $";
+rcsid="$Id: TextField.as,v 1.54 2008/04/29 17:22:43 strk Exp $";
 #include "check.as"
 
 #if OUTPUT_VERSION > 5
@@ -785,15 +785,16 @@ check(tf._width > 10);
 check_equals(tf.textWidth, origTextWidth); // textWidth isn't influenced by autoSize 
 tf.autoSize = 'none';
 tf.wordWrap = true;
-note("textWidth: "+tf.textWidth+" origTextWidth:"+origTextWidth);
+note("After setting wordWrap flat: textWidth: "+tf.textWidth+" origTextWidth:"+origTextWidth);
 check_equals(tf.textWidth, origTextWidth);  
 tf._width = 10;
+note("After reducing _width: textWidth: "+tf.textWidth+" origTextWidth:"+origTextWidth);
 check_equals(tf._width, 10);
 
 #if OUTPUT_VERSION < 8
- xcheck_equals(origTextWidth, tf.textWidth); // textWidth isn't influenced by wordWrap
+ check_equals(origTextWidth, tf.textWidth); 
 #else
- check(origTextWidth > tf.textWidth); 
+ xcheck(origTextWidth > tf.textWidth); 
 #endif
 
 // test that adding a newline doesn't change the bounds width

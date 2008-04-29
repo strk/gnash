@@ -608,6 +608,7 @@ edit_text_character::display()
 	{
 
 		point	coords[4];
+
 		float xmin = _bounds.getMinX();
 		float xmax = _bounds.getMaxX();
 		float ymin = _bounds.getMinY();
@@ -997,7 +998,7 @@ edit_text_character::set_member(string_table::key name,
 
 		_bounds.setTo(xmin, ymin, xmax, ymax);
 		
-	    assert( _bounds.width() - nw < 0.001 && _bounds.width() - nw > -0.001);
+		assert( _bounds.width() - nw < 0.001 && _bounds.width() - nw > -0.001);
 
 		// previously truncated text might get visible now
 		// TODO: if nested masks were implemented we would 
@@ -1248,16 +1249,14 @@ edit_text_character::format_text()
 	// nothing more to do if text is empty
 	if ( _text.empty() ) return;
 
+	Range2d<float> defBounds = m_def->get_bounds().getRange();
+
 	AutoSizeValue autoSize = getAutoSize();
 	if ( autoSize != autoSizeNone )
 	{
-		static bool warned = false;
-		if ( ! warned ) {
-			log_debug(_("TextField.autoSize != 'none' TESTING"));
-			warned = true;
-		}
+		LOG_ONCE( log_debug(_("TextField.autoSize != 'none' TESTING")) );
 
-		_bounds.setTo(0,0,0,0);
+		_bounds.setTo(0,0,defBounds.getMaxX(),0); // this is correct for 'true'
 		//_bounds.setNull();
 	}
 
@@ -1504,104 +1503,128 @@ edit_text_character::format_text()
 		
 after_x_advance:
 
-		float width = _bounds.width(); // m_def->width()
+		float width = defBounds.width();
 		if (x >= width - rightMargin - PADDING_TWIPS)
 		{
-			//log_debug("Text in character %s exceeds margins", getTarget());
-			// Whoops, we just exceeded the box width. 
-			// Do word-wrap if requested to do so.
-			if ( autoSize == autoSizeNone )
-			{
-				if ( ! doWordWrap() )
-				{
-					//log_debug(" autoSize=NONE!");
-					// truncate long line, but keep expanding text box
-					bool newlinefound = false;
-					while ( it != e )
-					{
-					    code = *it++;
-						if ( _embedFonts )
-						{
-							x += _font->get_kerning_adjustment(last_code, (int) code) * scale;
-							last_code = static_cast<int>(code);
-						}
-						// Expand the bounding-box to the lower-right corner of each glyph,
-						// even if we don't display it 
-						m_text_bounding_box.expandTo(x, y + fontDescent);
-#ifdef GNASH_DEBUG_TEXTFIELDS
-						log_debug("Text bbox expanded to %s (width: %f)", m_text_bounding_box, m_text_bounding_box.width());
+#ifdef GNASH_DEBUG_TEXT_FORMATTING
+			log_debug("Text in TextField %s exceeds width [ _bounds %s ]", getTarget(), _bounds);
 #endif
 
-						if (code == 13 || code == 10)
-						{
-							newlinefound = true;
-							break;
-						}
-
-						int index = _font->get_glyph_index((boost::uint16_t) code, _embedFonts);
-						x += scale * _font->get_advance(index, _embedFonts);
-
-					}
-					if ( ! newlinefound ) break;
-				}
-				else 
+			// no wrap and no resize --> truncate
+			if ( ! doWordWrap() && autoSize == autoSizeNone )
+			{
+#ifdef GNASH_DEBUG_TEXT_FORMATTING
+				log_debug(" wordWrap=false, autoSize=none");
+#endif 
+				// truncate long line, but keep expanding text box
+				bool newlinefound = false;
+				while ( it != e )
 				{
-
-					// Insert newline.
-
-					// Close out this stretch of glyphs.
-					m_text_glyph_records.push_back(rec);
-					float	previous_x = x;
-					x = leftMargin + blockIndent + PADDING_TWIPS;
-					y += fontHeight + leading;
-
-
-					// Start a new record on the next line.
-					rec.m_glyphs.resize(0);
-					rec.m_style.setFont(_font.get());
-					rec.m_style.setUnderlined(underlined);
-					rec.m_style.m_color = getTextColor();
-					rec.m_style.setXOffset(x);
-					rec.m_style.setYOffset(y);
-					rec.m_style.m_text_height = getFontHeight();
-					
-					// TODO : what if m_text_glyph_records is empty ? Is it possible ?
-					assert(!m_text_glyph_records.empty());
-					text_glyph_record&	last_line = m_text_glyph_records.back();
-					if (last_space_glyph == -1)
+				    code = *it++;
+					if ( _embedFonts )
 					{
-						// Pull the previous glyph down onto the
-						// new line.
-						if (last_line.m_glyphs.size() > 0)
-						{
-							rec.m_glyphs.push_back(last_line.m_glyphs.back());
-							x += last_line.m_glyphs.back().m_glyph_advance;
-							previous_x -= last_line.m_glyphs.back().m_glyph_advance;
-							last_line.m_glyphs.resize(last_line.m_glyphs.size() - 1);
-						}
+						x += _font->get_kerning_adjustment(last_code, (int) code) * scale;
+						last_code = static_cast<int>(code);
 					}
-					else
+					// Expand the bounding-box to the lower-right corner of each glyph,
+					// even if we don't display it 
+					m_text_bounding_box.expandTo(x, y + fontDescent);
+#ifdef GNASH_DEBUG_TEXT_FORMATTING
+					log_debug("Text bbox expanded to %s (width: %f)", m_text_bounding_box, m_text_bounding_box.width());
+#endif
+
+					if (code == 13 || code == 10)
 					{
-						// Move the previous word down onto the next line.
-
-						previous_x -= last_line.m_glyphs[last_space_glyph].m_glyph_advance;
-
-						for (unsigned int i = last_space_glyph + 1; i < last_line.m_glyphs.size(); i++)
-						{
-							rec.m_glyphs.push_back(last_line.m_glyphs[i]);
-							x += last_line.m_glyphs[i].m_glyph_advance;
-							previous_x -= last_line.m_glyphs[i].m_glyph_advance;
-						}
-						last_line.m_glyphs.resize(last_space_glyph);
+						newlinefound = true;
+						break;
 					}
 
-					align_line(textAlignment, last_line_start_record, previous_x);
+					int index = _font->get_glyph_index((boost::uint16_t) code, _embedFonts);
+					x += scale * _font->get_advance(index, _embedFonts);
 
-					last_space_glyph = -1;
-					last_line_start_record = m_text_glyph_records.size();
 				}
+				if ( ! newlinefound ) break;
+			}
+			else if ( doWordWrap() )
+			{
+#ifdef GNASH_DEBUG_TEXT_FORMATTING
+				log_debug(" wordWrap=true");
+#endif // DEBUG_MOUSE_ENTITY_FINDING
+
+				// Insert newline if there's space or autosize != none
+
+				// Close out this stretch of glyphs.
+				m_text_glyph_records.push_back(rec);
+
+				float	previous_x = x;
+				x = leftMargin + blockIndent + PADDING_TWIPS;
+				y += fontHeight + leading;
+
+				// Start a new record on the next line.
+				rec.m_glyphs.resize(0);
+				rec.m_style.setFont(_font.get());
+				rec.m_style.setUnderlined(underlined);
+				rec.m_style.m_color = getTextColor();
+				rec.m_style.setXOffset(x);
+				rec.m_style.setYOffset(y);
+				rec.m_style.m_text_height = getFontHeight();
+
+				// TODO : what if m_text_glyph_records is empty ? Is it possible ?
+				assert(!m_text_glyph_records.empty());
+				text_glyph_record&	last_line = m_text_glyph_records.back();
+				if (last_space_glyph == -1)
+				{
+					// Pull the previous glyph down onto the
+					// new line.
+					if (last_line.m_glyphs.size() > 0)
+					{
+						rec.m_glyphs.push_back(last_line.m_glyphs.back());
+						x += last_line.m_glyphs.back().m_glyph_advance;
+						previous_x -= last_line.m_glyphs.back().m_glyph_advance;
+						last_line.m_glyphs.resize(last_line.m_glyphs.size() - 1);
+					}
+				}
+				else
+				{
+					// Move the previous word down onto the next line.
+
+					previous_x -= last_line.m_glyphs[last_space_glyph].m_glyph_advance;
+
+					for (unsigned int i = last_space_glyph + 1; i < last_line.m_glyphs.size(); i++)
+					{
+						rec.m_glyphs.push_back(last_line.m_glyphs[i]);
+						x += last_line.m_glyphs[i].m_glyph_advance;
+						previous_x -= last_line.m_glyphs[i].m_glyph_advance;
+					}
+					last_line.m_glyphs.resize(last_space_glyph);
+				}
+
+				align_line(textAlignment, last_line_start_record, previous_x);
+
+				last_space_glyph = -1;
+				last_line_start_record = m_text_glyph_records.size();
+				
+			}
+			else
+			{
+#ifdef GNASH_DEBUG_TEXT_FORMATTING
+				log_debug(" wordWrap=%d, autoSize=%d", _wordWrap, _autoSize);
+#endif // DEBUG_MOUSE_ENTITY_FINDING
 			}
 		}
+
+
+		if ( (y) > (defBounds.height() - PADDING_TWIPS) && autoSize == autoSizeNone )
+		{
+#ifdef GNASH_DEBUG_TEXT_FORMATTING
+			log_debug("Text with wordWrap exceeds height of box");
+#endif
+			rec.m_glyphs.clear();
+			// TODO: should still compute m_text_bounds !
+			LOG_ONCE(log_unimpl("Computing text bounds of a TextField containing text that doesn't fit the box vertically"));
+			break;
+		}
+
 
 		if (m_cursor > character_idx)
 		{
@@ -1618,13 +1641,9 @@ after_x_advance:
 	{
 		_bounds.expandTo(x+PADDING_TWIPS, y+PADDING_TWIPS);
 	}
-	else
-	{
-		_bounds.expandTo(_bounds.getMaxX(), y);
-	}
 
 	// Add this line to our output.
-	m_text_glyph_records.push_back(rec);
+	if ( ! rec.m_glyphs.empty() ) m_text_glyph_records.push_back(rec);
 
 	float extra_space = align_line(textAlignment, last_line_start_record, x);
 

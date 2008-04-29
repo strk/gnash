@@ -1,3 +1,11 @@
+2008-04-29 Sandro Santilli <strk@keybit.net>
+
+	* server/edit_text_character.cpp: have wordWrap take precedence
+	  over autoSize, don't let wordWrap make the text box taller
+	  if autoSize is none.
+	* testsuite/actionscript.all/TextField.as: a couple of success
+	  and a failure in effects of _width over textWidth.
+
 2008-04-29  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* configure.ac: Add --enable-jemalloc option to use our own copy of
