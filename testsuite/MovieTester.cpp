@@ -248,7 +248,7 @@ MovieTester::resizeStage(int x, int y)
 {
 	_movie_root->set_display_viewport(0, 0, x, y);
 
-	if (_movie_root->getScaleMode() != movie_root::noScale )
+	if (_movie_root->getStageScaleMode() != movie_root::noScale )
 	{
 		// TODO: fix to deal with all scale modes
 		//       and alignments ?
