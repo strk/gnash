@@ -1,3 +1,8 @@
+2008-04-29 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/MovieClip.as: test influence
+	  of strokes in bounds of shapes.
+
 2008-04-28 Russ Nelson <nelson@crynwr.com>
 
 	* Put translations in alphabetic order

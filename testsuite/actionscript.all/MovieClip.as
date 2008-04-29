@@ -20,9 +20,9 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.128 2008/04/27 15:49:17 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.129 2008/04/29 06:10:02 strk Exp $";
 
-rcsid="$Id: MovieClip.as,v 1.128 2008/04/27 15:49:17 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.129 2008/04/29 06:10:02 strk Exp $";
 #include "check.as"
 
 // To be called at end of test
@@ -33,15 +33,15 @@ endOfTest = function()
 #endif
 
 #if OUTPUT_VERSION == 6
-	check_totals(627); // SWF6
+	check_totals(629); // SWF6
 #endif
 
 #if OUTPUT_VERSION == 7
-	check_totals(644); // SWF7
+	check_totals(646); // SWF7
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(645); // SWF8+
+	check_totals(647); // SWF8+
 #endif
 
 	play();
@@ -1191,6 +1191,26 @@ check(b.xMin - 6710886.35 < 0.0001);
 check(b.xMax - 6710886.35 < 0.0001);
 check(b.yMin - 6710886.35 < 0.0001);
 check(b.yMax - 6710886.35 < 0.0001);
+
+container.createEmptyMovieClip("draw3",13);
+draw = container.draw3;
+with (draw)
+{
+    lineStyle(10, 0x000000);
+    moveTo(10, 10);
+    lineTo(10, 30);
+    lineTo(20, 30);
+    lineTo(20, 10);
+    lineTo(10, 10);
+}
+#if OUTPUT_VERSION < 8
+ check_equals(draw._width, 30);
+ check_equals(draw._height, 40);
+#else
+ // SWF8 results are more correct (half-thickness added on each side)
+ xcheck_equals(draw._width, 20);
+ xcheck_equals(draw._height, 30);
+#endif
 
 #endif // OUTPUT_VERSION >= 6
 
