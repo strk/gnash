@@ -1057,7 +1057,7 @@ static uint64_t	opt_balance_threshold = BALANCE_THRESHOLD_DEFAULT;
 /*
  * this toggles the printing of statistics when the program exists.
  */
-static bool	opt_print_stats = true;
+static bool	opt_print_stats = false;
 static size_t	opt_quantum_2pow = QUANTUM_2POW_MIN;
 static size_t	opt_small_max_2pow = SMALL_MAX_2POW_DEFAULT;
 static size_t	opt_chunk_2pow = CHUNK_2POW_DEFAULT;
@@ -5838,54 +5838,6 @@ free(void *ptr)
 		idalloc(ptr);
 	}
 }
-
-/* /\* */
-/*  * This is a work in progress, which doesn't even get used. */
-/*  *\/ */
-/* #ifdef USE_STATS_MEMORY */
-/* #ifndef DARWIN */
-/* DSOEXPORT */
-/* struct mallinfo */
-/* mallinfo() */
-/* { */
-/*     struct mallinfo mi; */
-/*     size_t allocated = 0; */
-/*     size_t mapped = 0; */
-/*     arena_t *arena; */
-/*     size_t i; */
-
-/*     /\* Calculate and print allocated/mapped stats. *\/ */
-    
-/*     /\* arenas. *\/ */
-/*     for (i = 0; i < narenas; i++) { */
-/*         if (arenas[i] != NULL) { */
-/*             malloc_spin_lock(&arenas[i]->lock); */
-/*              mi.uordblks += */
-/*                 arenas[i]->stats.allocated_small; */
-/*              mi.uordblks += */
-/*                 arenas[i]->stats.allocated_large; */
-/*             malloc_spin_unlock(&arenas[i]->lock); */
-/*         } */
-/*     } */
-
-/* #if 0     */
-/*     avail = chunksize(top(ar_ptr)); */
-/*     navail = ((long)(avail) >= (long)MINSIZE)? 1 : 0; */
-    
-/*     // FIXME: add mutex */
-/*     mi->arena = ar_ptr->size; */
-/*     mi->ordblks = navail; */
-/*     mi->smblks = mi->usmblks = mi->fsmblks = 0; /\* clear unused fields *\/ */
-/*     mi->uordblks = ar_ptr->size - avail; */
-/*     mi->fordblks = avail; */
-/*     mi->hblks = n_mmaps; */
-/*     mi->hblkhd = mmapped_mem; */
-/*     mi->keepcost = chunksize(top(ar_ptr)); */
-/* #endif */
-/*     return mi;     */
-/* } */
-/* # endif */
-/* #endif */
 
 /*
  * End malloc(3)-compatible functions.
