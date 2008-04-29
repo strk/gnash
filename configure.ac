@@ -118,20 +118,45 @@ AC_DEFINE_UNQUOTED([DEFAULT_STREAMS_TIMEOUT], [${DEFAULT_STREAMS_TIMEOUT}], [Def
 dnl Some things you can only do by looking at the platform name.
 case "${host}" in
   powerpc-apple-darwin*)
-    AC_DEFINE([__powerpc64__], [], [this is a 64 bit powerpc])
+    AC_DEFINE([__powerpc64__], [1], [this is a 64 bit powerpc])
     darwin=yes
     ;;
-  i*86-apple-darwin*)
+  *-apple-darwin*)
     darwin=yes
+    AC_DEFINE([DARWIN], [1], [this is a Darwin platform])
     ;;
-  i*86-*-openbsd*)
-    openbsd_os=openbsd
+    dnl Unfortunately, all BSD distributions are not identical, so as tacky as it is
+    dnl to look for the distribution name, we don't have much choice. The use of these
+    dnl should be avoid as much as possible.
+  *-openbsd*)
+    bsd=yes
+    openbsd=yes
+    AC_DEFINE([OPENBSD], [1], [this is an OpenBSD platform])
+    ;;
+  *-freebsd*)
+    bsd=yes
+    freebsd=yes
+    AC_DEFINE([FREEBSD], [1], [this is a FreeBSD platform])
+    ;;
+  *-netbsd*)
+    bsd=yes
+    netbsd=yes
+    AC_DEFINE([NETBSD], [1], [this is a NetBSD platform])
+    ;;
+  *-*solaris*)
+    solaris=yes
+    AC_DEFINE([SOLARIS], [1], [this is a Solaris platform])
+    ;;
+  *-*linux*)
+    linux=yes
+    AC_DEFINE([LINUX], [1], [this is a Linux platform])
     ;;
   *-cygwin* | *-mingw* | *-pw32*)
     windows=yes
+    AC_DEFINE([WIN32], [1], [this is a Win32 platform])
     ;;
-  *64-*-openbsd*)
-    openbsd_os=openbsd 
+  *64-*-*bsd*)
+    bsd_os=bsd 
     AC_DEFINE([WORDSIZE], [64], [this is a 64 platform])
     ;;
 esac
@@ -233,6 +258,38 @@ else
 fi
 LC_KEY=${lckey}
 AC_SUBST(LC_KEY)
+
+# Maybe use jemalloc, which handles memory fragmentation for
+# ECAMscript languages better than the regular system malloc.
+# This seems like a good idea, as both the other player and
+# Mozilla/Firefox both recently switched to using jemalloc.
+AC_ARG_ENABLE(jemalloc,
+  AC_HELP_STRING([--enable-jemalloc],[Enable jemalloc instead of system malloc]),
+[case "${enableval}" in
+  yes) jemalloc=yes ;;
+  no)  jemalloc=no ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for --enable-jemalloc option]) ;;
+esac],jemalloc=no)
+
+dnl There is some weird stuff going on with NetBSD and jemalloc, so don't built it for now.
+if test x"${netbsd}" = x"yes"; then
+  jemalloc=no
+fi
+dnl If the compiler doesn't have local thread storage enabled, don't try to
+dnl use jemalloc.
+if test x"${jemalloc}" = x"yes"; then
+  AC_TRY_COMPILE([], [
+    extern __thread int global_i; ],
+    has_local_thread_storage=yes
+  )
+  if test x"${has_local_thread_storage}" = x"yes"; then
+    AC_DEFINE([HAVE_LOCAL_THREAD_STORAGE], [1], [Has __thread (local thread storage) support])
+    AC_DEFINE([USE_JEMALLOC], [], [Use jemalloc instead of system malloc])
+  else
+    jemalloc=no
+  fi
+fi
+AM_CONDITIONAL(JEMALLOC, test x$jemalloc = xyes)
 
 AC_ARG_ENABLE(debugger,
   AC_HELP_STRING([--enable-debugger],[Enable the Flash debugger]),
@@ -385,21 +442,6 @@ AC_ARG_ENABLE(cygnal,
   *)   AC_MSG_ERROR([bad value ${enableval} for enable-cygnal option]) ;;
 esac],cygnal=no)
 AM_CONDITIONAL(CYGNAL, test x$cygnal = xyes)
-
-dnl Build adding statistics collecting on both memory and performance.
-dnl Warning: this can be a performance hit by itself, due to the overhead
-dnl of collecting and storing the information.
-AC_ARG_ENABLE(statistics,
-  AC_HELP_STRING([--enable-statistics], [Enable statistics gathering]),
-[case "${enableval}" in
-  yes) statistics=yes
-       AC_DEFINE(USE_STATISTICS, [1], [Collect statistics on memopry and performance])
-       ;;
-  no)  statistics=no ;;
-  *)   AC_MSG_ERROR([bad value ${enableval} for enable-statistics option]) ;;
-esac],statistics=no)
-
-AM_CONDITIONAL(STATISTICS, test x$statistics = xyes)
 
 dnl Fix the Intel 810 LOD bias problem
 AC_ARG_ENABLE(i810-lod-bias,
@@ -825,7 +867,7 @@ dnl buffers are the lowest level data storage, this data is the time spent in th
 dnl primarily only used for tuning the queueing API in Gnash. Memoryis the same, it's only used
 dnl by developers for tuning performance of memory allocations in Gnash.
 buffers=no
-que=yes
+que=no
 memory=no
 AC_ARG_WITH(statistics,
   AC_HELP_STRING([--with-statistics=], [Specify which statistics features to enable]),
@@ -1218,6 +1260,7 @@ AC_CHECK_HEADERS(getopt.h)
 AC_CHECK_HEADERS(libgen.h)
 AC_CHECK_HEADERS(pwd.h)
 AC_CHECK_HEADERS(sys/utsname.h)
+AC_CHECK_LIB(lber, der_free)
 AC_CHECK_LIB(m, sqrt)
 AC_CHECK_LIB(c, getpwnam, AC_DEFINE(HAVE_GETPWNAM, 1, [Has getpwnam] ))
 
@@ -1241,7 +1284,7 @@ AC_TRY_COMPILE([#include <malloc.h>], [
   struct mallinfo x = mallinfo(); ],
   AC_DEFINE(HAVE_MALLINFO, [1], [Has mallinfo()])
 )
-AM_CONDITIONAL(HAVE_MALLINFO, [test x$HAVE_MALLINFO = xyes])
+AM_CONDITIONAL(HAVE_MALLINFO, [test x$HAVE_MALLINFO = xyes -a x$jemalloc = xyes])
 
 AC_CHECK_LIB(rt, shm_unlink)
 AC_CHECK_FUNCS(shm_open shm_unlink)

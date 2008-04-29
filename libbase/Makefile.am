@@ -92,10 +92,21 @@ else
 EXTRA_DIST += tu_file_SDL.cpp 
 endif
 
+# Maybe use jemalloc, which handles memory fragmentation for
+# ECAMscript languages better than the regular system malloc.
+# This is controlled by the --enable-jemalloc (disabled by default)
+# configure option.
+if JEMALLOC
+MALLOC = jemalloc.c
+else
+MALLOC = 
+endif
+
 libgnashbase_la_SOURCES = \
 	$(DMALLOC_FILE)	\
 	extension.cpp \
 	image.cpp \
+	$(MALLOC) \
 	jpeg.cpp \
 	log.cpp	\
 	memory.cpp \
@@ -129,6 +140,7 @@ noinst_HEADERS = \
 	gettext.h \
 	grid_index.h \
 	image.h	\
+	jemtree.h \
 	jpeg.h \
 	gmemory.h \
 	log.h \

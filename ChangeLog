@@ -1,3 +1,15 @@
+2008-04-29  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* configure.ac: Add --enable-jemalloc option to use our own copy of
+	jemalloc() instead of the system malloc. Test for local thread
+	storage via __thread. Expand OS specific tests.
+	* libbase/Makefile.am: Optionally build jemalloc.
+	* libbase/jamalloc.c, jemtree.h: Add the jemalloc memory allocator
+	from Mozilla/Firefox/FreeBSD, tweaked to configure and build the
+	way the rest of Gnash does.
+	* libnet/http.cpp: Include unistd.h to keep OpenBSD happy looking
+	for ::read() and ::close().
+
 2008-04-29 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/namedStrings.{cpp,h}: add onFullScreen.
