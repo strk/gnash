@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-rcsid="$Id: ASnative.as,v 1.6 2008/04/20 17:53:58 bwy Exp $";
+rcsid="$Id: ASnative.as,v 1.7 2008/04/29 08:53:37 bwy Exp $";
 #include "check.as"
 
 a = ASnative (100, 0); // escape
@@ -195,6 +195,34 @@ xcheck_equals(func.a(), "GNASH MUST WORK! öÜäÄ€€");
 func.a = ASnative(102, 1); // SWF5 to lower
 xcheck_equals(func.a(), "gnash must work! öÜäÄ€€");
 
+// Stage
+st = ASnative(666, 2);
+st("exactFit");
+st = ASnative(666, 1);
+check_equals (st(), "exactFit");
+
+st = ASnative(666, 4);
+st("BRL");
+
+st = ASnative(666, 3);
+check_equals (st(), "LRB");
+
+//Stage.width - read only!
+st = ASnative(666, 6);
+st(402);
+st = ASnative(666, 5);
+check_equals (st(), 640);
+
+// Stage.height - read only!
+st = ASnative(666, 8);
+st(402);
+st = ASnative(666, 7);
+check_equals (st(), 480);
+
+// Stage.showMenu
+st = ASnative(666, 10);
+st = ASnative(666, 9);
+
 #if OUTPUT_VERSION > 5
 xcheck_equals (countTS, 4);
 #else
@@ -204,7 +232,7 @@ xcheck_equals (countTS, 2);
 xcheck_equals (countVO, 25);
 
 #if OUTPUT_VERSION > 5
-check_totals(70);
+check_totals(74);
 #else
-check_totals(68);
+check_totals(72);
 #endif

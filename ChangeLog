@@ -1,3 +1,15 @@
+2008-04-29 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/asobj/Stage.{cpp,h}: drop methods from Stage class,
+	  implement in movie_root instead. Fixes using ASnative before
+	  Stage has been initialised on demand.
+	* server/movie_root.{cpp,h}: implement displayState, alignMode
+	  here.
+	* testsuite/actionscript.all/ASnative.as: test Stage ASnative
+	  methods, new tests pass with this commit.
+	* gui/gui.cpp: movie_root function name change (getScaleMode ->
+	  getStageScaleMode).
+
 2008-04-29 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/MovieClip.as: test influence

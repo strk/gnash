@@ -93,9 +93,9 @@ movie_root::movie_root()
 	_disableScripts(false),
 	_processingActionLevel(movie_root::apSIZE),
 	_hostfd(-1),
-	_valign(STAGE_V_ALIGN_C),
-	_halign(STAGE_H_ALIGN_C),
-	_scaleMode(showAll)
+	_alignMode(0),
+	_scaleMode(showAll),
+	_displayState(normal)
 {
 }
 
@@ -962,27 +962,6 @@ movie_root::doMouseDrag()
 	dragChar->set_matrix(local);
 }
 
-/// Get current viewport width, in pixels
-unsigned int
-movie_root::getStageWidth() const
-{
-    if (_scaleMode == noScale)
-    {
-        return m_viewport_width;    
-    }
-    return static_cast<unsigned int>(get_movie_definition()->get_width_pixels());
-}
-
-/// Get current viewport height, in pixels
-unsigned int
-movie_root::getStageHeight() const
-{
-    if (_scaleMode == noScale)
-    {
-        return m_viewport_height;    
-    }
-    return static_cast<unsigned int>(get_movie_definition()->get_height_pixels());
-}
 
 unsigned int
 movie_root::add_interval_timer(std::auto_ptr<Timer> timer, bool internal)
@@ -1304,29 +1283,78 @@ movie_root::isMouseOverActiveEntity() const
 	return true;
 }
 
-
-void
-movie_root::setStageAlignment(StageHorizontalAlign h, StageVerticalAlign v)
+/// Get actionscript width of stage, in pixels. The width
+/// returned depends on the scale mode.
+unsigned int
+movie_root::getStageWidth() const
 {
-    if ( _valign == v && _halign == h ) return; // nothing to do
+    if (_scaleMode == noScale)
+    {
+        return m_viewport_width;    
+    }
 
-    _valign = v;
-    _halign = h;
-    //log_debug("valign: %d, halign: %d", _valign, _halign);
-    
+    // If scaling is allowed, always return the original movie size.
+    return static_cast<unsigned int>(get_movie_definition()->get_width_pixels());
+}
+
+/// Get actionscript height of stage, in pixels. The height
+/// returned depends on the scale mode.
+unsigned int
+movie_root::getStageHeight() const
+{
+    if (_scaleMode == noScale)
+    {
+        return m_viewport_height;    
+    }
+
+    // If scaling is allowed, always return the original movie size.
+    return static_cast<unsigned int>(get_movie_definition()->get_height_pixels());
+}
+
+/// Takes a short int bitfield: the four bits correspond
+/// to the AlignMode enum 
+void
+movie_root::setStageAlignment(short s)
+{
+    _alignMode = s;
     if (interfaceHandle) (*interfaceHandle)("Stage.align", "");
 }
 
-
+/// Returns a pair of enum values giving the actual alignment
+/// of the stage after align mode flags are evaluated.
 movie_root::StageAlign
 movie_root::getStageAlignment() const
 {
-    return std::make_pair(_halign, _valign);
+
+    /// L takes precedence over R. Default is centred.
+    StageHorizontalAlign ha = STAGE_H_ALIGN_C;
+    if (_alignMode.test(STAGE_ALIGN_L)) ha = STAGE_H_ALIGN_L;
+    else if (_alignMode.test(STAGE_ALIGN_R)) ha = STAGE_H_ALIGN_R;
+
+    /// T takes precedence over B. Default is centred.
+    StageVerticalAlign va = STAGE_V_ALIGN_C;
+    if (_alignMode.test(STAGE_ALIGN_T)) va = STAGE_V_ALIGN_T;
+    else if (_alignMode.test(STAGE_ALIGN_B)) va = STAGE_V_ALIGN_B;
+
+    return std::make_pair(ha, va);
 }
 
+/// Returns the string representation of the current align mode,
+/// which must always be in the order: LTRB
+std::string
+movie_root::getStageAlignMode() const
+{
+    std::string align;
+    if (_alignMode.test(STAGE_ALIGN_L)) align.push_back('L');
+    if (_alignMode.test(STAGE_ALIGN_T)) align.push_back('T');
+    if (_alignMode.test(STAGE_ALIGN_R)) align.push_back('R');
+    if (_alignMode.test(STAGE_ALIGN_B)) align.push_back('B');
+    
+    return align;
+}
 
 void
-movie_root::setScaleMode(ScaleMode sm)
+movie_root::setStageScaleMode(ScaleMode sm)
 {
     if ( _scaleMode == sm ) return; // nothing to do
 
@@ -1357,6 +1385,22 @@ movie_root::setScaleMode(ScaleMode sm)
     }
 }
 
+void
+movie_root::setStageDisplayState(const DisplayState ds)
+{
+    _displayState = ds;
+
+	if (!movie_root::interfaceHandle) return; // No registered callback
+	
+	if (_displayState == fullScreen)
+	{
+	    (*movie_root::interfaceHandle)("Stage.displayState", "fullScreen");
+	}
+	else if (_displayState == normal)
+	{
+	    (*movie_root::interfaceHandle)("Stage.displayState", "normal");
+	}   
+}
 
 void
 movie_root::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)

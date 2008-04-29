@@ -94,6 +94,7 @@
 #include <vector>
 #include <list>
 #include <set>
+#include <bitset>
 
 // Forward declarations
 namespace gnash {
@@ -492,6 +493,12 @@ public:
 
     bool testInvariant() const;
 
+    /// enum for the values of Stage.displayState
+    enum DisplayState {
+		normal,
+		fullScreen
+	};
+
     /// enum for the values of Stage.scaleMode
     enum ScaleMode {
         showAll,
@@ -514,9 +521,16 @@ public:
         STAGE_V_ALIGN_B
     };
 
+    enum AlignMode {
+        STAGE_ALIGN_L,
+        STAGE_ALIGN_T,
+        STAGE_ALIGN_R,
+        STAGE_ALIGN_B
+    };
+
     /// Sets movie_root's horizontal and vertical alignment to one
     /// of the three possible positions for each dimension.
-    void setStageAlignment(StageHorizontalAlign v, StageVerticalAlign h);
+    void setStageAlignment(short s);
 
     typedef std::pair<StageHorizontalAlign, StageVerticalAlign> StageAlign;
 
@@ -525,10 +539,19 @@ public:
     StageAlign getStageAlignment() const;
 
     /// Sets the Stage object's align mode.
-    void setScaleMode(ScaleMode sm);
+    void setStageScaleMode(ScaleMode sm);
     
     /// Returns the Stage object's align mode.
-    ScaleMode getScaleMode() const { return _scaleMode; }
+    ScaleMode getStageScaleMode() const { return _scaleMode; }
+
+    // The string representation of the current align mode.
+    std::string getStageAlignMode() const;
+
+    /// Returns the Stage object's align mode.
+    DisplayState getStageDisplayState() const { return _displayState; }
+
+    // The string representation of the current align mode.
+    void setStageDisplayState(const DisplayState ds);
 
     /// Action priority levels
     enum ActionPriorityLevel {
@@ -991,10 +1014,11 @@ private:
     ///
     int _hostfd;
     
-    StageVerticalAlign _valign;
-    StageHorizontalAlign _halign;
+    std::bitset<4> _alignMode;
     
     ScaleMode _scaleMode;
+    
+    DisplayState _displayState;
 };
 
 

@@ -35,17 +35,19 @@ namespace gnash {
 /// - scaleMode
 /// - width
 /// - height
+/// - displayState
+/// - alignMode
+//
+/// Most functions are ASnative, which means they cannot rely on
+/// the existence of a load-on-demand Stage object. Only resize events
+/// appear to need this (not ASnative). The ASnative functions
+/// are available from SWF5
 
 class Stage: public as_object
 {
 
 public:
     
-    enum DisplayState {
-		normal,
-		fullScreen
-	};
-
 	Stage();
 	
 	/// Receive a resize event.
@@ -54,23 +56,6 @@ public:
 	/// Notify all listeners about a resize event
 	void notifyResize();
 
-    /// Get present align mode
-    const std::string& getAlignMode() const { return _alignMode; }
-
-    /// Set align mode
-    void setAlignMode(const std::string& mode);
-
-	/// Set display state 
-	void setDisplayState(DisplayState state);
-
-	/// Set display state 
-	DisplayState getDisplayState() const { return _displayState; }
-
-private:
-
-	std::string _alignMode;
-	
-	DisplayState _displayState;
 };
 
 /// Register native functions with the VM.

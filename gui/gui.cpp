@@ -237,7 +237,7 @@ Gui::updateStageMatrix()
 	float swfheight = _movieDef->get_height_pixels();
 
 	// Fetch scale mode
-	movie_root::ScaleMode scaleMode = _stage->getScaleMode();
+	movie_root::ScaleMode scaleMode = _stage->getStageScaleMode();
 	switch (scaleMode)
 	{
 		case movie_root::noScale:

@@ -45,7 +45,7 @@ static as_value stage_width_getset(const fn_call& fn);
 static as_value stage_height_getset(const fn_call& fn);
 static as_value stage_displaystate_getset(const fn_call& fn);
 static const char* getScaleModeString(movie_root::ScaleMode sm);
-static const char* getDisplayStateString(Stage::DisplayState ds);
+static const char* getDisplayStateString(movie_root::DisplayState ds);
 
 void registerStageNative(as_object& o)
 {
@@ -101,9 +101,7 @@ attachStageInterface(as_object& o)
 
 Stage::Stage()
 	:
-	as_object(getObjectInterface()),
-	_alignMode(""),
-	_displayState(normal)
+	as_object(getObjectInterface())
 {
 	attachStageInterface(*this);
 
@@ -134,69 +132,8 @@ Stage::notifyResize()
 }
 
 
-void
-Stage::setDisplayState(DisplayState state)
-{
-	if ( _displayState == state ) return; // nothing to do
-
-	_displayState = state;
-	
-	if (!movie_root::interfaceHandle) return; // No registered callback
-	
-	if (_displayState == Stage::fullScreen)
-	{
-	    (*movie_root::interfaceHandle)("Stage.displayState", "fullScreen");
-	}
-	else if (_displayState == Stage::normal)
-	{
-	    (*movie_root::interfaceHandle)("Stage.displayState", "normal");
-	}
-
-}
-
-
-void
-Stage::setAlignMode(const std::string& mode)
-{
-    if (_alignMode == mode) return;
-
-    _alignMode = mode;
-    
-    movie_root::StageVerticalAlign v = movie_root::STAGE_V_ALIGN_C;
-    movie_root::StageHorizontalAlign h = movie_root::STAGE_H_ALIGN_C;
-
-    // Order: LTRB. L and T take precedence.
-
-    for (std::string::const_reverse_iterator it = _alignMode.rbegin(),
-         e = _alignMode.rend();
-         it != e;
-         ++it)
-    {
-        switch (*it)
-        {
-            case 'R':
-                h = movie_root::STAGE_H_ALIGN_R;
-                break;
-            case 'L':
-                h = movie_root::STAGE_H_ALIGN_L;
-                break;
-            case 'B':
-                v = movie_root::STAGE_V_ALIGN_B;
-                break;
-            case 'T':
-                v = movie_root::STAGE_V_ALIGN_T;
-                break;
-        }
-    }
-
-    movie_root& m = VM::get().getRoot();
-    m.setStageAlignment(h, v);   
-
-}
-
-
 const char*
-getDisplayStateString(Stage::DisplayState ds)
+getDisplayStateString(movie_root::DisplayState ds)
 {
 	static const char* displayStateName[] = {
 		"normal",
@@ -226,10 +163,11 @@ stage_scalemode_getset(const fn_call& fn)
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		return as_value(getScaleModeString(m.getScaleMode()));
+		return as_value(getScaleModeString(m.getStageScaleMode()));
 	}
 	else // setter
 	{
+	    // Defaults to showAll if the string is invalid.
 		movie_root::ScaleMode mode = movie_root::showAll;
 
 		const std::string& str = fn.arg(0).to_string();
@@ -242,9 +180,9 @@ stage_scalemode_getset(const fn_call& fn)
 
         movie_root& m = VM::get().getRoot();
 
-        if ( m.getScaleMode() == mode ) return as_value(); // nothing to do
+        if ( m.getStageScaleMode() == mode ) return as_value(); // nothing to do
 
-	    m.setScaleMode(mode);
+	    m.setStageScaleMode(mode);
 		return as_value();
 	}
 }
@@ -252,8 +190,6 @@ stage_scalemode_getset(const fn_call& fn)
 as_value
 stage_width_getset(const fn_call& fn)
 {
-	boost::intrusive_ptr<Stage> stage = ensureType<Stage>(fn.this_ptr);
-	UNUSED(stage);
 
 	if ( fn.nargs > 0 ) // setter
 	{
@@ -271,13 +207,11 @@ stage_width_getset(const fn_call& fn)
 as_value
 stage_height_getset(const fn_call& fn)
 {
-	boost::intrusive_ptr<Stage> stage = ensureType<Stage>(fn.this_ptr);
-	UNUSED(stage);
 
 	if ( fn.nargs > 0 ) // setter
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("Stage.height is a read-only property!"));
+            log_aserror(_("Stage.height is a read-only property!"));
 		);
 		return as_value();
 	}
@@ -291,39 +225,40 @@ stage_height_getset(const fn_call& fn)
 as_value
 stage_align_getset(const fn_call& fn)
 {
-	boost::intrusive_ptr<Stage> stage = ensureType<Stage>(fn.this_ptr);
-
+    movie_root& m = VM::get().getRoot();
+    
 	if ( fn.nargs == 0 ) // getter
 	{
-	    return as_value (stage->getAlignMode());
+	    return as_value (m.getStageAlignMode());
 	}
 	else // setter
 	{
-
 		const std::string& str = fn.arg(0).to_string();
-        std::string alignMode;
+        short am = 0;
 
+        // Easy enough to do bitwise - std::bitset is not
+        // really necessary!
         if (str.find_first_of("lL") != std::string::npos)
         {
-            alignMode.push_back('L');
+            am |= 1 << movie_root::STAGE_ALIGN_L;
         } 
 
         if (str.find_first_of("tT") != std::string::npos)
         {
-            alignMode.push_back('T');
+            am |= 1 << movie_root::STAGE_ALIGN_T;
         } 
 
         if (str.find_first_of("rR") != std::string::npos)
         {
-            alignMode.push_back('R');
+            am |= 1 << movie_root::STAGE_ALIGN_R;
         } 
     
         if (str.find_first_of("bB") != std::string::npos)
         {
-            alignMode.push_back('B');
+            am |= 1 << movie_root::STAGE_ALIGN_B;
         }
 
-        stage->setAlignMode(alignMode);
+        m.setStageAlignment(am);
 
 		return as_value();
 	}
@@ -336,20 +271,12 @@ stage_showMenu_getset(const fn_call& fn)
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		static bool warned = false;
-		if ( ! warned ) {
-			log_unimpl("Stage.showMenu getter");
-			warned=true;
-		}
+		LOG_ONCE(log_unimpl("Stage.showMenu getter"));
 		return as_value();
 	}
 	else // setter
 	{
-		static bool warned = false;
-		if ( ! warned ) {
-			log_unimpl("Stage.showMenu setter");
-			warned=true;
-		}
+		LOG_ONCE(log_unimpl("Stage.showMenu setter"));
 		return as_value();
 	}
 }
@@ -357,11 +284,12 @@ stage_showMenu_getset(const fn_call& fn)
 as_value
 stage_displaystate_getset(const fn_call& fn)
 {
-	boost::intrusive_ptr<Stage> stage = ensureType<Stage>(fn.this_ptr);
+
+    movie_root& m = VM::get().getRoot();
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		return as_value(getDisplayStateString(stage->getDisplayState()));
+		return as_value(getDisplayStateString(m.getStageDisplayState()));
 	}
 	else // setter
 	{
@@ -371,11 +299,11 @@ stage_displaystate_getset(const fn_call& fn)
 		const std::string& str = fn.arg(0).to_string();
 		if ( noCaseCompare(str, "normal") )
 		{
-		    stage->setDisplayState(Stage::normal);
+		    m.setStageDisplayState(movie_root::normal);
 		}
 		else if ( noCaseCompare(str, "fullScreen") ) 
 		{
-		    stage->setDisplayState(Stage::fullScreen);
+		    m.setStageDisplayState(movie_root::fullScreen);
         }
 
         // If invalid, do nothing.
