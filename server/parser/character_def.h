@@ -30,6 +30,7 @@ class tu_file;
 namespace gnash {
 	class character;
 	class cache_options;
+	class matrix;
 	class rect;
 }
 
@@ -71,7 +72,11 @@ public:
 	//
 	/// Point coordinates are local coords (TWIPS)
 	///
-	virtual bool point_test_local(float /*x*/, float /*y*/)
+	/// @param wm
+	///	Current world matrix of the instance we want to check.
+	///	This is needed to properly scale non-scalable strokes.
+	///
+	virtual bool point_test_local(float /*x*/, float /*y*/, matrix& /*wm*/)
 	{
 		return false;
 	}

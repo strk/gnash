@@ -1356,6 +1356,8 @@ sprite_lineStyle(const fn_call& fn)
   }
 
   thickness = boost::uint16_t(PIXELS_TO_TWIPS(boost::uint16_t(fclamp(fn.arg(0).to_number(), 0, 255))));
+  bool scaleThicknessVertically = true;
+  bool scaleThicknessHorizontally = true;
 
   if ( fn.nargs > 1 )
   {
@@ -1382,11 +1384,41 @@ sprite_lineStyle(const fn_call& fn)
         }
         else
         {
-          log_unimpl(_("pixelHinting arg to MovieClip.lineStyle"));
-          if ( fn.nargs > 4 ) log_unimpl(_("noScale arg to MovieClip.lineStyle"));
-          if ( fn.nargs > 5 ) log_unimpl(_("capsStyle arg to MovieClip.lineStyle"));
-          if ( fn.nargs > 6 ) log_unimpl(_("jointStyle arg to MovieClip.lineStyle"));
-          if ( fn.nargs > 7 ) log_unimpl(_("miterLimit arg to MovieClip.lineStyle"));
+          bool pixelHinting = fn.arg(3).to_bool();
+          if ( pixelHinting) LOG_ONCE( log_unimpl(_("pixelHinting in MovieClip.lineStyle")) );
+          if ( fn.nargs > 4 )
+          {
+            std::string noScaleString = fn.arg(4).to_string();
+            if ( noScaleString == "none" )
+            {
+              scaleThicknessVertically = scaleThicknessHorizontally = false;
+            }
+            else if ( noScaleString == "vertical" )
+            {
+              scaleThicknessVertically = false;
+              scaleThicknessHorizontally = true;
+            }
+            else if ( noScaleString == "horizontal" )
+            {
+              scaleThicknessVertically = true;
+              scaleThicknessHorizontally = false;
+            }
+            else if ( noScaleString == "normal" )
+            {
+              scaleThicknessVertically = true;
+              scaleThicknessHorizontally = true;
+            }
+            else
+            {
+              IF_VERBOSE_ASCODING_ERRORS(
+              std::stringstream ss; fn.dump_args(ss);
+              log_aserror(_("MovieClip.lineStyle(%s): invalid noScale value '%s'"), ss.str(), noScaleString);
+              );
+            }
+          }
+          if ( fn.nargs > 5 ) LOG_ONCE( log_unimpl(_("capsStyle arg to MovieClip.lineStyle")) );
+          if ( fn.nargs > 6 ) LOG_ONCE( log_unimpl(_("jointStyle arg to MovieClip.lineStyle")) );
+          if ( fn.nargs > 7 ) LOG_ONCE( log_unimpl(_("miterLimit arg to MovieClip.lineStyle")) );
           IF_VERBOSE_ASCODING_ERRORS(
           if ( fn.nargs > 8 ) 
           {
@@ -1406,7 +1438,7 @@ sprite_lineStyle(const fn_call& fn)
 #ifdef DEBUG_DRAWING_API
   log_debug("%s.lineStyle(%d,%d,%d,%d);", sprite->getTarget(), thickness, r, g, b);
 #endif
-  sprite->lineStyle(thickness, color);
+  sprite->lineStyle(thickness, color, scaleThicknessVertically, scaleThicknessHorizontally);
 
   return as_value();
 }
@@ -2304,7 +2336,7 @@ sprite_instance::sprite_instance(
   character(parent, id),
   m_root(r),
   m_display_list(),
-  _drawable(new DynamicShape),
+  _drawable(new DynamicShape()),
   _drawable_inst(_drawable->create_character_instance(this, 0)),
   //m_goto_frame_action_list(),
   m_play_state(PLAY),

@@ -1299,11 +1299,20 @@ public:
        
       const line_style& lstyle = line_styles[this_path_gnash.m_line-1];
           
-      int width = lstyle.get_width();
-      if (width==1)
-        this_stroke->width(1);
+      int thickness = lstyle.getThickness();
+      if (!thickness) this_stroke->width(1); // hairline
+      else if ( (!lstyle.scaleThicknessVertically()) && (!lstyle.scaleThicknessHorizontally()) )
+      {
+        this_stroke->width(TWIPS_TO_PIXELS(thickness));
+      }
       else
-        this_stroke->width(width*stroke_scale);
+      {
+        if ( (!lstyle.scaleThicknessVertically()) || (!lstyle.scaleThicknessHorizontally()) )
+        {
+           LOG_ONCE( log_unimpl(_("Unidirectionally scaled strokes in AGG renderer (we'll scale by the scalable one)")) );
+        }
+        this_stroke->width(thickness*stroke_scale);
+      }
        
       this_stroke->attach(curve);
       this_stroke->line_cap(agg::round_cap);
@@ -1752,11 +1761,20 @@ public:
         
         const line_style& lstyle = line_styles[this_path_gnash.m_line-1];
           
-        int width = lstyle.get_width();
-        if (width==1)
-          stroke.width(1);
+        int thickness = lstyle.getThickness();
+        if (!thickness) stroke.width(1); // hairline
+        else if ( (!lstyle.scaleThicknessVertically()) && (!lstyle.scaleThicknessHorizontally()) )
+        {
+          stroke.width(TWIPS_TO_PIXELS(thickness));
+        }
         else
-          stroke.width(std::max(1.0f, width*stroke_scale));
+        {
+          if ( (!lstyle.scaleThicknessVertically()) || (!lstyle.scaleThicknessHorizontally()) )
+          {
+             LOG_ONCE( log_unimpl(_("Unidirectionally scaled strokes in AGG renderer (we'll scale by the scalable one)")) );
+          }
+          stroke.width(std::max(1.0f, thickness*stroke_scale));
+        }
           
         stroke.line_cap(agg::round_cap);        
         stroke.line_join(agg::round_join); 

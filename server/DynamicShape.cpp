@@ -159,9 +159,9 @@ DynamicShape::finalize()
 }
 
 void
-DynamicShape::lineStyle(boost::uint16_t thickness, const rgba& color)
+DynamicShape::lineStyle(boost::uint16_t thickness, const rgba& color, bool vScale, bool hScale)
 {
-	line_style style(thickness, color);
+	line_style style(thickness, color, vScale, hScale);
 	_currline = add_line_style(style);
 	startNewPath(false); // don't make this the start of a new subshape (to verify)
 }
@@ -187,7 +187,7 @@ DynamicShape::moveTo(float x, float y)
 }
 
 void
-DynamicShape::lineTo(float x, float y)
+DynamicShape::lineTo(float x, float y, int swfVersion)
 {
 	if ( ! _currpath ) startNewPath(true); // first shape is always new (I hope this doesn't break anything)
 	assert(_currpath);
@@ -195,11 +195,11 @@ DynamicShape::lineTo(float x, float y)
 	_currpath->drawLineTo(x, y);
 
 	// Update bounds 
-	unsigned thickness = _currline ? m_line_styles[_currline-1].get_width() : 0;
+	unsigned thickness = _currline ? m_line_styles[_currline-1].getThickness() : 0;
 	if ( _currpath->size() == 1 ) {
-		_currpath->expandBounds(m_bound, thickness);
+		_currpath->expandBounds(m_bound, thickness, swfVersion);
 	} else {
-		m_bound.expand_to_circle(x, y, thickness);
+		m_bound.expand_to_circle(x, y, swfVersion < 8 ? thickness : thickness/2.0);
 	}
 
 	// Update current pen position
@@ -211,7 +211,7 @@ DynamicShape::lineTo(float x, float y)
 }
 
 void
-DynamicShape::curveTo(float cx, float cy, float ax, float ay)
+DynamicShape::curveTo(float cx, float cy, float ax, float ay, int swfVersion)
 {
 	if ( ! _currpath ) startNewPath(true); // first shape is always new (I hope this doesn't break anything)
 	assert(_currpath);
@@ -219,12 +219,12 @@ DynamicShape::curveTo(float cx, float cy, float ax, float ay)
 	_currpath->drawCurveTo(cx, cy, ax, ay);
 
 	// Update bounds 
-	unsigned thickness = _currline ? m_line_styles[_currline-1].get_width() : 0;
+	unsigned thickness = _currline ? m_line_styles[_currline-1].getThickness() : 0;
 	if ( _currpath->size() == 1 ) {
-		_currpath->expandBounds(m_bound, thickness);
+		_currpath->expandBounds(m_bound, thickness, swfVersion);
 	} else {
-		m_bound.expand_to_circle(ax, ay, thickness);
-		m_bound.expand_to_circle(cx, cy, thickness);
+		m_bound.expand_to_circle(ax, ay, swfVersion < 8 ? thickness : thickness/2.0);
+		m_bound.expand_to_circle(cx, cy, swfVersion < 8 ? thickness : thickness/2.0);
 	}
 
 	// Update current pen position

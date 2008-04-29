@@ -543,13 +543,21 @@ public:
   
   void apply_line_style(const line_style& style, const cxform& cx)
   {
-    float width = style.get_width();
+    float width = style.getThickness();
 
     if ( width == 0.0 ) {
       // TODO: test this!
       cairo_set_line_width(_cr, 1.0); // expected: 1 pixel
     } else {
-      cairo_set_line_width(_cr, width);
+      // TODO: this is correct for !style.scaleThicknessVertically() 
+      //       and !style.scaleThicknessHorizontally().
+      //       If that's not the case, we should scale the thickness
+      //       togheter with the shapes.
+      if ( style.scaleThicknessVertically() || style.scaleThicknessHorizontally() )
+      {
+        LOG_ONCE( log_unimpl(_("Scaled strokes in Cairo renderer")) );
+      }
+      cairo_set_line_width(_cr, TWIPS_TO_PIXELS(width));
     }
     
     rgba color = cx.transform(style.get_color());

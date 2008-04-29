@@ -682,9 +682,9 @@ public:
 
 	/// @{ Drawing API
 	
-	void lineStyle(boost::uint16_t thickness, const rgba& color)
+	void lineStyle(boost::uint16_t thickness, const rgba& color, bool vScale=true, bool hScale=true)
 	{
-		_drawable->lineStyle(thickness, color);
+		_drawable->lineStyle(thickness, color, vScale, hScale);
 	}
 
 	void resetLineStyle()
@@ -720,13 +720,13 @@ public:
 	void lineTo(float x, float y)
 	{
 		set_invalidated();
-		_drawable->lineTo(x, y);
+		_drawable->lineTo(x, y, getSWFVersion());
 	}
 
 	void curveTo(float cx, float cy, float ax, float ay)
 	{
 		set_invalidated();
-		_drawable->curveTo(cx, cy, ax, ay);
+		_drawable->curveTo(cx, cy, ax, ay, getSWFVersion());
 	}
 
 	void clear()

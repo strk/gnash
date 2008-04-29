@@ -573,13 +573,13 @@ namespace gnash
         {
             // TODO: performance would be improved by computing
             //       the bounds as edges are parsed.
-            compute_bound(&m_bound);
+            compute_bound(&m_bound, m->get_version());
         }
 #ifdef GNASH_DEBUG_SHAPE_BOUNDS
         else
         {
             rect computedBounds;
-            compute_bound(&computedBounds);
+            compute_bound(&computedBounds, m->get_version());
             if ( computedBounds != m_bounds )
             {
                 log_debug("Shape character read for tag %d contained embedded bounds %s, while we computed bounds %s",
@@ -868,9 +868,7 @@ namespace gnash
         return count;
     }
 
-    bool  shape_character_def::point_test_local(float x, float y)
-    // Return true if the specified point is on the interior of our shape.
-    // Incoming coords are local coords.
+    bool  shape_character_def::point_test_local(float x, float y, matrix& wm)
     {
 
         //#define DEBUG_POINT_TEST
@@ -913,7 +911,11 @@ namespace gnash
 
         if (m_bound.point_test(x, y) == false)
         {
-            // Early out.
+            // TODO: not sure it is safe to early-out
+            //       if line strokes are non-scalable !
+#ifdef DEBUG_POINT_TEST
+            log_debug("Point doesn't hit bounds, early out");
+#endif
             return false;
         }
 
@@ -963,21 +965,30 @@ namespace gnash
 
                 line_style& ls = m_line_styles[pth.m_line-1];
 
-                int thickness = ls.get_width();
-                float sqdist;
+                float thickness = ls.getThickness();
 
-                if (thickness == 0)
+                if (! thickness )
                 {
-                    // hairline has always a tolerance of a single twip
-                    sqdist = 1;
+			thickness = 1; 
                 }
-                else
-                {
-                    float dist = thickness/2;
-                    sqdist = dist*dist;
-                }
+		else if ( (!ls.scaleThicknessVertically()) && (!ls.scaleThicknessHorizontally()) )
+		{
+			// TODO: pass the matrix to withinSquareDistance instead ?
+			float xScale = wm.get_x_scale();
+			float yScale = wm.get_y_scale();
+			//log_debug("xScale: %g, yScale: %g", xScale, yScale);
 
-                //cout << "Thickness of line is " << thickness << " squared is " << sqdist << endl;
+			thickness /= std::max(xScale, yScale);
+		}
+		else if ( ls.scaleThicknessVertically() != ls.scaleThicknessHorizontally() )
+		{
+			LOG_ONCE( log_unimpl("Collision detection for unidirectionally scaled strokes") );
+		}
+
+		float dist = thickness/2.0;
+		float sqdist = dist*dist;
+
+                //log_debug("Thickness of line is %g squared is %g", thickness, sqdist);
                 if (pth.withinSquareDistance(pt, sqdist))
                     return true;
             }
@@ -1142,9 +1153,9 @@ namespace gnash
         return m_bound.width();
     }
 
-    void  shape_character_def::compute_bound(rect* r) const
     // Find the bounds of this shape, and store them in
     // the given rectangle.
+    void  shape_character_def::compute_bound(rect* r, int swfVersion) const
     {
         r->set_null();
 
@@ -1166,10 +1177,10 @@ namespace gnash
                 }
                 else
                 {
-                    thickness = m_line_styles[p.m_line-1].get_width();
+                    thickness = m_line_styles[p.m_line-1].getThickness();
                 }
             }
-            p.expandBounds(*r, thickness);
+            p.expandBounds(*r, thickness, swfVersion);
         }
     }
 

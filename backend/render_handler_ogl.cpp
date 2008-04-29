@@ -1215,11 +1215,26 @@ public:
     
     bool rv = true;
     
-    float width = style.get_width();
+    float width = style.getThickness();
+    float pointSize;
     
-    if (width <= 1.0f) {
+    if (!width)
+    {
       glLineWidth(1.0f);
-    } else {
+      rv = false; // Don't draw rounded lines.
+    }
+    else if ( (!style.scaleThicknessVertically()) && (!style.scaleThicknessHorizontally()) )
+    {
+      float pxThickness = TWIPS_TO_PIXELS(width);
+      glLineWidth(pxThickness);
+      glPointSize(pxThickness);
+    }
+    else
+    {
+      if ( (!style.scaleThicknessVertically()) || (!style.scaleThicknessHorizontally()) )
+      {
+         LOG_ONCE( log_unimpl(_("Unidirectionally scaled strokes in OGL renderer")) );
+      }
       
       float stroke_scale = fabsf(mat.get_x_scale()) + fabsf(mat.get_y_scale());
       stroke_scale /= 2.0f;
@@ -1232,20 +1247,22 @@ public:
       glGetFloatv( GL_LINE_WIDTH_RANGE, width_info);          
       
       if (width > width_info[1]) {
-        log_error("Your OpenGL implementation does not support the line width" \
-                  " requested. Lines will be drawn with reduced width.");
+        LOG_ONCE( log_unimpl("Your OpenGL implementation does not support the line width" \
+                  " requested. Lines will be drawn with reduced width.") );
+        width = width_info[1];
       }
       
       
       glLineWidth(width);
-      
+      glPointSize(width);
+#if 0
       if (width >= 1.5) {
-        
         glPointSize(width-1);
       } else {
         // Don't draw rounded lines.
         rv = false;
       }
+#endif
       
       
     }

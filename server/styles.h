@@ -34,10 +34,12 @@ public:
 	/// @param color
 	///	Line color
 	///
-	line_style(boost::uint16_t width, const rgba& color)
+	line_style(boost::uint16_t width, const rgba& color, bool scaleThicknessVertically, bool scaleThicknessHorizontally)
 		:
 		m_width(width),
-		m_color(color)
+		m_color(color),
+		_scaleVertically(scaleThicknessVertically),
+		_scaleHorizontally(scaleThicknessHorizontally)
 	{
 	}
 
@@ -57,7 +59,22 @@ public:
 		line_style *pOther);
 
 	/// Return thickness of the line, in TWIPS
-	boost::uint16_t	get_width() const { return m_width; }
+	boost::uint16_t	getThickness() const
+	{
+		return m_width;
+	}
+
+	/// Return true if line thickness should be scaled vertically
+	bool scaleThicknessVertically() const
+	{
+		return _scaleVertically;
+	}
+
+	/// Return true if line thickness should be scaled horizontally
+	bool scaleThicknessHorizontally() const
+	{
+		return _scaleHorizontally;
+	}
 
 	/// Return line color and alpha
 	const rgba&	get_color() const { return m_color; }
@@ -81,6 +98,8 @@ private:
 	
 	boost::uint16_t	m_width;	// in TWIPS
 	rgba	m_color;
+	bool _scaleVertically;
+	bool _scaleHorizontally;
 };
 
 } // namespace gnash

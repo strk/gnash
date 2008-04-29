@@ -26,7 +26,9 @@ namespace gnash {
 line_style::line_style()
     :
     m_width(0),
-    m_color()
+    m_color(),
+    _scaleVertically(true),
+    _scaleHorizontally(true)
 {
 }
 
@@ -55,13 +57,13 @@ line_style::read_morph(stream* in, int tag_type, movie_definition *md,
 	boost::uint8_t caps = in->read_uint(2);
 	// 0 -- Round join, 1 -- Bevel join, 2 -- Miter join
 	boost::uint8_t joins = in->read_uint(2);
-	bool has_fill = in->read_uint(1);
-	bool no_hscale = in->read_uint(1);
-	bool no_vscale = in->read_uint(1);
-	bool pixel_hinting = in->read_uint(1);
+	bool has_fill = in->read_bit();
+	_scaleHorizontally = ! in->read_bit();
+	_scaleVertically = ! in->read_bit();
+	bool pixel_hinting = in->read_bit();
 
 	static_cast<void> (in->read_uint(5));
-	bool no_close = in->read_uint(1);
+	bool no_close = in->read_bit();
 	bool end_cap_style = in->read_uint(2); // As caps above.
 
 	if (joins == 2)
@@ -107,8 +109,8 @@ line_style::read(stream* in, int tag_type, movie_definition *md)
 	// 0 -- Round join, 1 -- Bevel join, 2 -- Miter join
 	boost::uint8_t joins = in->read_uint(2);
 	bool has_fill = in->read_bit();
-	bool no_hscale = in->read_bit();
-	bool no_vscale = in->read_bit();
+	_scaleHorizontally = ! in->read_bit();
+	_scaleVertically = ! in->read_bit();
 	bool pixel_hinting = in->read_bit();
 	static_cast<void> (in->read_uint(5));
 	bool no_close = in->read_bit();
@@ -137,8 +139,16 @@ line_style::read(stream* in, int tag_type, movie_definition *md)
 void
 line_style::set_lerp(const line_style& ls1, const line_style& ls2, float ratio)
 {
-	m_width = (boost::uint16_t)frnd(flerp(ls1.get_width(), ls2.get_width(), ratio));
+	m_width = (boost::uint16_t)frnd(flerp(ls1.getThickness(), ls2.getThickness(), ratio));
 	m_color.set_lerp(ls1.get_color(), ls2.get_color(), ratio);
+	if ( ls1._scaleVertically != ls2._scaleVertically )
+	{
+		LOG_ONCE( log_error("UNTESTED: Dunno how to interpolate line styles with different vertical thickness scaling") );
+	}
+	if ( ls1._scaleHorizontally != ls2._scaleHorizontally )
+	{
+		LOG_ONCE( log_error("UNTESTED: Dunno how to interpolate line styles with different horizontal thickness scaling") );
+	}
 }
 
 

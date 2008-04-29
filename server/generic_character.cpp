@@ -54,7 +54,7 @@ generic_character::pointInShape(float x, float y) const
   matrix wm = get_world_matrix();
   point lp(x, y);
   wm.transform_by_inverse(lp);
-  return m_def->point_test_local(lp.x, lp.y);
+  return m_def->point_test_local(lp.x, lp.y, wm);
 }
 
 

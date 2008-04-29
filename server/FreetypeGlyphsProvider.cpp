@@ -147,7 +147,8 @@ private:
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
 		log_debug("lineTo: %ld,%ld", to->x, to->y);
 #endif
-		_sh.lineTo(to->x*_scale, -to->y*_scale);
+		static const int swfVersion = 6; // we have no thickness, so 6 is fine
+		_sh.lineTo(to->x*_scale, -to->y*_scale, swfVersion);
 		return 0;
 	}
 
@@ -157,7 +158,8 @@ private:
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
 		log_debug("conicTo: %ld,%ld %ld,%ld", ctrl->x, ctrl->y, to->x, to->y);
 #endif
-		_sh.curveTo(ctrl->x*_scale, -ctrl->y*_scale, to->x*_scale, -to->y*_scale);
+		static const int swfVersion = 6; // we have no thickness, so 6 is fine
+		_sh.curveTo(ctrl->x*_scale, -ctrl->y*_scale, to->x*_scale, -to->y*_scale, swfVersion);
 		return 0;
 	}
 
@@ -171,7 +173,8 @@ private:
 		float x = ctrl1->x + ( (ctrl2->x - ctrl1->x) * 0.5 );
 		float y = ctrl1->y + ( (ctrl2->y - ctrl1->y) * 0.5 );
 
-		_sh.curveTo(x*_scale, -y*_scale, to->x*_scale, -to->y*_scale);
+		static const int swfVersion = 6; // we have no thickness, so 6 is fine
+		_sh.curveTo(x*_scale, -y*_scale, to->x*_scale, -to->y*_scale, swfVersion);
 		return 0;
 	}
 
@@ -457,7 +460,7 @@ FreetypeGlyphsProvider::getGlyph(boost::uint16_t code, float& advance)
 
 	FT_Outline_Decompose(outline, &walk, &walker);
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
-	rect bound; sh->compute_bound(&bound);
+	rect bound; sh->compute_bound(&bound, VM::get().getSWFVersion());
 	log_debug("Decomposed glyph for character '%c' has bounds %s", code, bound.toString().c_str());
 #endif
 

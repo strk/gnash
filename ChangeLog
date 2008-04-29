@@ -1,3 +1,29 @@
+2008-04-29 Sandro Santilli <strk@keybit.net>
+
+	* backend/render_handler_agg.cpp, backend/render_handler_cairo.cpp,
+	  backend/render_handler_ogl.cpp: 
+	  Update calls to fetch line_style strokes, implement noScale="none"
+	  in AGG and log_unimpl in all renderers about unsupported values
+	  of it.
+	* server/parser/character_def.h,
+	  server/parser/shape_character_def.{h,cpp},
+	  server/generic_character.cpp:
+	  Have point_test_local take an additional matrix argument
+	  to deal with non-scaled strokes.
+	* server/DynamicShape.{cpp,h}: have lineTo and curveTo take
+	  an swf version argument, as influence of strokes on boundaries
+	  are version-dependent.
+	* server/FreetypeGlyphProvider.cpp: use SWF6 semantic for the glyph
+	  shapes.
+	* server/shape.{h,cpp} (expandBounds): take an swf version argument, as
+	  influence of strokes on boundaries are version-dependent.
+	* server/styles.{cpp,h}: add vertical and horizontal stroke
+	  scaling flag support.
+	* server/sprite_instance.{cpp,h}: Add support for noScale
+	  parameter of lineStyle in SWF8.
+	* testsuite/actionscript.all/MovieClip.as: success in bounds
+	  checking of strokes in SWF8.
+
 2008-04-29 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/asobj/Global.cpp: tidy up, register ASnative functions,

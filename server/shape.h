@@ -21,9 +21,10 @@
 
 #include "dsodefs.h"
 #include "styles.h"
+#include "rect.h"
+#include "log.h"
 
 #include <vector> // for path composition
-#include "rect.h"
 #include <boost/bind.hpp>  
 #include <algorithm>
 
@@ -323,10 +324,14 @@ namespace gnash {
     ///
     /// @param thickness
     ///  The thickess of our lines, half the thickness will
-    ///  be added in all directions
+    ///  be added in all directions in swf8+, all of it will
+    ///  in swf7-
+    ///
+    /// @param swfVersion
+    ///  SWF version to use.
     ///
     void
-    expandBounds(rect& r, unsigned int thickness) const
+    expandBounds(rect& r, unsigned int thickness, int swfVersion) const
     {
       const Path<T>&  p = *this;
 
@@ -338,7 +343,7 @@ namespace gnash {
         // NOTE: Half of thickness would be enough (and correct) for
         // radius, but that would not match how Flash calculates the
         // bounds using the drawing API.                        
-        unsigned int radius = thickness;
+        unsigned int radius = swfVersion < 8 ? thickness : thickness/2.0;
 
         r.expand_to_circle(ap.x, ap.y, radius);
         for (unsigned int j = 0; j<nedges; j++)
@@ -440,6 +445,8 @@ namespace gnash {
     bool
     withinSquareDistance(const Point2d<float>& p, float dist) const
     {
+//#define GNASH_DEBUG_PATH_DISTANCE 1
+
       size_t nedges = m_edges.size();
 
       if ( ! nedges ) return false;
@@ -453,10 +460,16 @@ namespace gnash {
         if ( e.isStraight() )
         {
           float d = Edge<float>::squareDistancePtSeg(p, px, np);
+#ifdef GNASH_DEBUG_PATH_DISTANCES
+	  log_debug("squaredDistance %s-%s to %s == %g (asked for %g)", px, np, p, d, dist);
+#endif
           if ( d < dist ) return true;
         }
         else
         {
+#ifdef GNASH_DEBUG_PATH_DISTANCES
+	  log_debug("edge %d is a curve", i);
+#endif // DEBUG_MOUSE_ENTITY_FINDING
           // It's a curve !
 
           const int_point& A = px;
@@ -484,6 +497,10 @@ namespace gnash {
             // distance from point and segment being an approximation
             // of the curve 
             float d = Edge<T>::squareDistancePtSeg(p, p0, p1);
+
+#ifdef GNASH_DEBUG_PATH_DISTANCES
+            log_debug("squaredDistance (curve)%s-%s-%s to %s == %g (asked for %g)", A, C, B, p, d, dist);
+#endif // DEBUG_MOUSE_ENTITY_FINDING
 
             //float d = edge::squareDistancePtCurve(A, C, B, p, t);
             //log_debug("Factor %26.26g, distance %g (asked %g)", t, sqrt(d), sqrt(dist));

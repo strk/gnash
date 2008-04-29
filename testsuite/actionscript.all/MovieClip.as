@@ -20,9 +20,9 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.129 2008/04/29 06:10:02 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.130 2008/04/29 11:29:05 strk Exp $";
 
-rcsid="$Id: MovieClip.as,v 1.129 2008/04/29 06:10:02 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.130 2008/04/29 11:29:05 strk Exp $";
 #include "check.as"
 
 // To be called at end of test
@@ -1208,9 +1208,12 @@ with (draw)
  check_equals(draw._height, 40);
 #else
  // SWF8 results are more correct (half-thickness added on each side)
- xcheck_equals(draw._width, 20);
- xcheck_equals(draw._height, 30);
+ check_equals(draw._width, 20);
+ check_equals(draw._height, 30);
 #endif
+
+// TODO: check bounds of non-scaled strokes 
+//       relative to a container which is scaled
 
 #endif // OUTPUT_VERSION >= 6
 

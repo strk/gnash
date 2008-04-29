@@ -42,12 +42,12 @@ public:
 	void moveTo(float x, float y);
 
 	/// Draw a straight line from current position to given one
-	void lineTo(float x, float y);
+	void lineTo(float x, float y, int swfVersion);
 
 	/// \brief
 	/// Draw a curve from current position to given one
 	/// using given control points.
-	void curveTo(float cx, float cy, float ax, float ay);
+	void curveTo(float cx, float cy, float ax, float ay, int swfVersion);
 
 	/// Start drawing with a solid fill
 	void beginFill(const rgba& color);
@@ -62,7 +62,7 @@ public:
 	void endFill();
 
 	/// Set current line style and start a new path.
-	void lineStyle(boost::uint16_t thickness, const rgba& color);
+	void lineStyle(boost::uint16_t thickness, const rgba& color, bool vScale=true, bool hScale=true);
 
 	/// Reset line style to no style and start a new path.
 	void resetLineStyle();
@@ -106,10 +106,10 @@ public:
 	//       would result in a triangle and a stroke, which should fail the last hitTest(2,8).
 	//
 	//
-	bool point_test_local(float x, float y)
+	bool point_test_local(float x, float y, matrix& wm)
 	{
 		finalize();
-		return shape_character_def::point_test_local(x, y);
+		return shape_character_def::point_test_local(x, y, wm);
 	}
 
 	/// Add a path, updating _currpath and recomputing bounds
@@ -127,6 +127,10 @@ public:
 	void finalize();
 
 private:
+
+	/// Movie definition containing the code 
+	/// that created this shape.
+	movie_definition* _mdef;
 
 	/// Initialize a new path
 	//

@@ -40,7 +40,13 @@ namespace gnash {
 		virtual ~shape_character_def();
 
 		virtual void	display(character* inst);
-		virtual bool point_test_local(float x, float y);
+
+		/// Return true if the specified point is on the interior of our shape.
+		//
+		/// Incoming coords are local coords (twips).
+		/// The matrix will be used for lines with non-scalable strokes.
+		///
+		virtual bool point_test_local(float x, float y, matrix& wm);
 
 		float	get_height_local() const;
 		float	get_width_local() const;
@@ -81,7 +87,7 @@ namespace gnash {
 		const rect&	get_bound() const { return m_bound; }
 
 		/// Compute bounds by looking at the component paths
-		void	compute_bound(rect* r) const;
+		void	compute_bound(rect* r, int swfVersion) const;
 
 		const FillStyleVect& get_fill_styles() const { return m_fill_styles; }
 		const LineStyleVect& get_line_styles() const { return m_line_styles; }
