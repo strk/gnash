@@ -155,125 +155,6 @@ swapBytes(void *word, size_t size)
     return word;
 }
 
-#if 0
-bool
-AMF::parseAMF(Network::byte_t * /* in */)
-{
-//    GNASH_REPORT_FUNCTION;
-
-#if 0
-    Network::byte_t *x = in;
-
-    while (*x != Element::OBJECT_END) {
-        x = readElements(x);
-    }
-    return true;
-#endif
-    return false;
-}
-
-vector<AMF::amf_element_t *> *
-AMF::readElements(Network::byte_t *in)
-{
-    GNASH_REPORT_FUNCTION;
-    Network::byte_t *x = in;
-    astype_e type = (astype_e)*x;
-    bool boolshift;
-    const char *mstr = NULL;
-    double *num;
-    double nanosecs;
-    short length;
-
-    vector<AMF::amf_element_t> list;
-    AMF::amf_element_t el;
-    
-    
-    log_debug(_("Type is %s"), astype_str[type]);
-
-//    x++;                        // skip the type byte
-    switch (type) {
-      case Element::NUMBER:
-	  // AMF numbers are 64-bit big-endian integers.
-	  num = extractNumber(x);
-//	  log_debug(_("Number is " AMFNUM_F), num));
-          break;
-      case Element::BOOLEAN:
-          boolshift = *x;
-          log_debug(_("Boolean is %d"), boolshift);
-          break;
-      case Element::STRING:
-          string str = extractString(x);
-//        int length = *(short *)swapBytes(x, 2);
-//           length = *(short *)x;
-//           x+=2;                  // skip the length bytes
-//           mstr = new char[length+1];
-//           memset(mstr, 0, length+1);
-//           memcpy(mstr, x, length);
-          // The function converts the multibyte string beginning at
-          // *src to a sequence of wide characters as if by repeated
-          // calls of the form:
-//          mbsrtowcs
-		  log_debug(_("String is %s"), mstr);
-          break;
-      case Element::OBJECT:
-//          return reinterpret_cast<uint8_t *>(extractObject(x));
-//          readElement();
-          log_unimpl("Object AMF decoder");
-          break;
-      case Element::MOVIECLIP:
-        log_unimpl("MovieClip AMF decoder");
-          break;
-      case Element::UNSUPPORTED:
-        log_unimpl("Unsupported AMF decoder");
-          break;
-      case Element::NULL_VALUE: 
-          log_unimpl("Null AMF decoder");
-          break;
-      case Element::UNDEFINED:
-          log_debug(_("Undefined element"));
-          break;
-      case Element::REFERENCE:
-          log_unimpl("Reference AMF decoder");
-          break;
-      case Element::ECMA_ARRAY:
-          log_unimpl("ECMAArray AMF decoder");
-          break;
-      case Element::OBJECT_END:
-          log_unimpl("ObjectEnd AMF decoder");
-          break;
-      case Element::STRICT_ARRAY:
-          log_unimpl("StrictArray AMF decoder");
-          break;
-      case Element::DATE:
-          nanosecs = *(double *)swapBytes(x+1, 8);
-//          log_debug(_("Date is " AMFNUM_F " nanoseconds"), nanosecs);
-          break;
-      case Element::LONG_STRING:
-//          int length = *(short *)swapBytes(x, 4);
-          x+=4;                  // skip the length bytes
-//        mstr = new char[length+1];
-//          memcpy(mstr, x, length);
-//          log_debug(_("String is %s"), mstr);
-          break;
-      case Element::RECORD_SET:
-          log_unimpl("Recordset AMF decoder");
-          break;
-      case Element::XML_OBJECT:
-          log_unimpl("XMLObject AMF decoder");
-          break;
-      case Element::TYPED_OBJECT:
-          log_unimpl("TypedObject AMF decoder");
-          break;
-      default:
-          log_error("Warning: Unknown AMF element type %d\n", type);
-          break;
-    }
-    
-    return x;
-}
-#endif
-
-
 //
 // Methods for encoding data into big endian formatted raw AMF data.
 //
@@ -289,10 +170,10 @@ AMF::encodeNumber(double indata)
 //    GNASH_REPORT_FUNCTION;
     double num;
     // Encode the data as a 64 bit, big-endian, numeric value
-    Buffer *buf = new Buffer(AMF_NUMBER_SIZE + AMF_HEADER_SIZE);
-    buf->append(Element::NUMBER);
+    Buffer *buf = new Buffer(AMF0_NUMBER_SIZE + AMF_HEADER_SIZE);
+    buf->append(Element::NUMBER_AMF0);
     num = indata;
-    swapBytes(&num, AMF_NUMBER_SIZE);
+    swapBytes(&num, AMF0_NUMBER_SIZE);
     buf->append(num);
     
     return buf;
@@ -311,7 +192,7 @@ AMF::encodeBoolean(bool flag)
 //    GNASH_REPORT_FUNCTION;
     // Encode a boolean value. 0 for false, 1 for true
     Buffer *buf = new Buffer(AMF_HEADER_SIZE);
-    buf->append(Element::BOOLEAN);
+    buf->append(Element::BOOLEAN_AMF0);
     boost::uint16_t x = flag;
     swapBytes(&x, 2);
     buf->append(x);
@@ -327,7 +208,7 @@ AMF::encodeBoolean(bool flag)
 Buffer *
 AMF::encodeObjectEnd()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     Buffer *buf = new Buffer(1);
     buf->append(TERMINATOR);
 
@@ -344,10 +225,10 @@ Buffer *
 AMF::encodeObject(Element *el)
 {
     GNASH_REPORT_FUNCTION;
-    AMF amf_obj;
+//    AMF amf_obj;
     
-    for (size_t i=0; i< el->childrenSize(); i++) {
-//	Buffer *var = amf_obj.encodeVariable();
+    for (size_t i=0; i< el->propertiesSize(); i++) {
+//	Buffer *var = amf_obj.encodeProperty();
 //	Element *child = el[i];
 #if 0
 	Buffer *buf = new Buffer(AMF_HEADER_SIZE + size);
@@ -375,7 +256,7 @@ AMF::encodeUndefined()
 {
 //    GNASH_REPORT_FUNCTION;
     Buffer *buf = new Buffer(AMF_HEADER_SIZE);
-    buf->append(Element::UNDEFINED);
+    buf->append(Element::UNDEFINED_AMF0);
     
     return buf;
 }
@@ -390,7 +271,7 @@ AMF::encodeUnsupported()
 {
 //    GNASH_REPORT_FUNCTION;
     Buffer *buf = new Buffer(AMF_HEADER_SIZE);
-    buf->append(Element::UNSUPPORTED);
+    buf->append(Element::UNSUPPORTED_AMF0);
     
     return buf;
 }
@@ -405,7 +286,7 @@ AMF::encodeDate(Network::byte_t *data)
 {
 //    GNASH_REPORT_FUNCTION;
     Buffer *buf = new Buffer(AMF_HEADER_SIZE);
-    buf->append(Element::DATE);
+    buf->append(Element::DATE_AMF0);
     double num = *reinterpret_cast<const double*>(data);
     swapBytes(&num, 8);
     buf->append(num);
@@ -557,7 +438,7 @@ AMF::encodeString(Network::byte_t *data, size_t size)
     boost::uint16_t length;
     
     Buffer *buf = new Buffer(size + AMF_HEADER_SIZE);
-    buf->append(Element::STRING);
+    buf->append(Element::STRING_AMF0);
     // when a string is stored in an element, we add a NULL terminator so
     // it can be printed by to_string() efficiently. The NULL terminator
     // doesn't get written when encoding a string as it has a byte count
@@ -583,7 +464,7 @@ AMF::encodeNullString()
     boost::uint16_t length;
     
     Buffer *buf = new Buffer(AMF_HEADER_SIZE);
-    buf->append(Element::STRING);
+    buf->append(Element::STRING_AMF0);
     // when a string is stored in an element, we add a NULL terminator so
     // it can be printed by to_string() efficiently. The NULL terminator
     // doesn't get written when encoding a string as it has a byte count
@@ -640,64 +521,64 @@ AMF::encodeElement(Element *el)
       case Element::NOTYPE:
 	  return 0;
 	  break;
-      case Element::NUMBER:
+      case Element::NUMBER_AMF0:
 	  tmp = encodeNumber(el->to_number());
           break;
-      case Element::BOOLEAN:
+      case Element::BOOLEAN_AMF0:
 	  tmp = encodeBoolean(el->to_bool());
           break;
-      case Element::STRING:
+      case Element::STRING_AMF0:
 	  tmp = encodeString(el->getData(), el->getLength()-1);
 	  break;
-      case Element::OBJECT:
+      case Element::OBJECT_AMF0:
 	  tmp = el->encode();
           break;
-      case Element::MOVIECLIP:
+      case Element::MOVIECLIP_AMF0:
 	  tmp = encodeMovieClip(el->getData(), el->getLength());
           break;
-      case Element::NULL_VALUE: 
+      case Element::NULL_AMF0:
 	  tmp = encodeNull();
           break;
-      case Element::UNDEFINED:
+      case Element::UNDEFINED_AMF0:
 	  tmp = encodeUndefined();
 	  break;
-      case Element::REFERENCE:
+      case Element::REFERENCE_AMF0:
 	  tmp = encodeReference(el->getData(), el->getLength());
           break;
-      case Element::ECMA_ARRAY:
+      case Element::ECMA_ARRAY_AMF0:
 	  tmp = encodeECMAArray(el->getData(), el->getLength());
           break;
 	  // The Object End gets added when creating the object, so we can jusy ignore it here.
-      case Element::OBJECT_END:
+      case Element::OBJECT_END_AMF0:
 	  tmp = encodeObjectEnd();
           break;
-      case Element::STRICT_ARRAY:
+      case Element::STRICT_ARRAY_AMF0:
 	  tmp = encodeStrictArray(el->getData(), el->getLength());
           break;
-      case Element::DATE:
+      case Element::DATE_AMF0:
 	  tmp = encodeDate(el->getData());
           break;
-      case Element::LONG_STRING:
+      case Element::LONG_STRING_AMF0:
 	  tmp = encodeLongString(el->getData(), el->getLength());
           break;
-      case Element::UNSUPPORTED:
+      case Element::UNSUPPORTED_AMF0:
 	  tmp = encodeUnsupported();
           break;
-      case Element::RECORD_SET:
+      case Element::RECORD_SET_AMF0:
 	  tmp = encodeRecordSet(el->getData(), el->getLength());
           break;
-      case Element::XML_OBJECT:
+      case Element::XML_OBJECT_AMF0:
 	  tmp = encodeXMLObject(el->getData(), el->getLength());
           // Encode an XML object. The data follows a 4 byte length
           // field. (which must be big-endian)
           break;
-      case Element::TYPED_OBJECT:
+      case Element::TYPED_OBJECT_AMF0:
 //	  tmp = encodeTypedObject(el->getData(), el->getLength());
           break;
-	  // This is a Gnash specific value
-      case Element::VARIABLE:
-      case Element::FUNCTION:
-          break;
+// 	  // This is a Gnash specific value
+//       case Element::VARIABLE:
+//       case Element::FUNCTION:
+//          break;
     };
 
     buf->append(tmp);
@@ -718,7 +599,7 @@ AMF::encodeElement(Element *el)
 vector<Buffer> *
 AMF::encodeElement(vector<amf::Element *> &data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     int size = 0;
     bool pad = false;
@@ -759,7 +640,7 @@ AMF::encodeElement(vector<amf::Element *> &data)
 	// wider variety of sef movies that use LocalConnection to
 	// really tell.
 	if (el->getType() == Element::NUMBER) {
-	    size = AMF_NUMBER_SIZE + 1;
+	    size = AMF0_NUMBER_SIZE + 1;
 	    pad = true;
 	}
 	if (el->getType() == Element::STRING) {
@@ -769,9 +650,9 @@ AMF::encodeElement(vector<amf::Element *> &data)
 	    }
 	    size = el->getLength() + AMF_HEADER_SIZE;
 	}
-	if (el->getType() == Element::FUNCTION) {
-	    // _children
-	}
+// 	if (el->getType() == Element::FUNCTION) {
+// 	    // _properties
+// 	}
 	if (el->getType() == Element::BOOLEAN) {
 	    size = 3;
 	}
@@ -787,253 +668,10 @@ AMF::encodeElement(vector<amf::Element *> &data)
 }
 #endif
 
-// #if 0
-// AMF::astype_e
-// AMF::extractElementHeader(void *in)
-// {
-// //    GNASH_REPORT_FUNCTION;
-
-//     return (AMF::astype_e)*(char *)in;
-// }
-
-// int
-// AMF::extractElementLength(void *in)
-// {
-// //    GNASH_REPORT_FUNCTION;
-
-//     char *x = (char *)in;
-//     Element::astype_e type = (Element::astype_e)*x;
-//     x++;                        // skip the header byte
-    
-//     switch (type) {
-//       case Element::NUMBER:              // a 64 bit numeric value
-//           return AMF_NUMBER_SIZE;
-//           break;
-//       case Element::BOOLEAN:             // a single byte
-//           return sizeof(bool);
-//           break;
-//       case Element::STRING:              // the length is a 2 byte value
-// 		//FIXME, there are all kinds of byte order problems in this code.
-//           return (short)*(short *)x;
-//           break;
-//       case Element::OBJECT:
-//           return x - strchr(x, TERMINATOR);
-//           break;
-//       case Element::MOVIECLIP:
-//           return -1;
-//           log_unimpl("MovieClip AMF extractor");
-//           break;
-//       case Element::NULL_VALUE: 
-//           return -1;
-//           log_unimpl("Null AMF extractor");
-//           break;
-//       case Element::UNDEFINED:
-//           return 0;
-//           break;
-//       case Element::REFERENCE:
-//           return -1;
-//           log_unimpl("Reference AMF extractor");
-//           break;
-//       case Element::ECMA_ARRAY:
-//           return x - strchr(x, TERMINATOR);
-//           break;
-//       case Element::OBJECT_END:
-//           return -1;
-//           log_unimpl("ObjectEnd AMF extractor");
-//           break;
-//       case Element::STRICT_ARRAY:         // the length is a 4 byte value
-// //          return (int *)x;
-//           break;
-//       case Element::DATE:              // a 64 bit numeric value
-//           return 8;
-//           break;
-//       case Element::LONG_STRING:
-//           return -1;
-//           log_unimpl("LongString AMF extractor");
-//           break;
-//       case Element::UNSUPPORTED:
-//           return -1;
-//           log_unimpl("Unsupported AMF extractor");
-//           break;
-//       case Element::RECORD_SET:
-//           return -1;
-//           log_unimpl("Recordset AMF extractor");
-//           break;
-//       case Element::XML_OBJECT:           // the length is a 4 byte value
-// //          return (int)*(int *)x;
-//           break;
-//       case Element::TYPED_OBJECT:
-//           return x - strchr(x, TERMINATOR);
-//           break;
-//     };
-    
-//     return 0;
-// }
-
-// char *
-// AMF::extractString(const Network::byte_t *in)
-// {
-// //    GNASH_REPORT_FUNCTION;
-//     boost::int8_t *buf = NULL;
-//     Network::byte_t *x = const_cast<Network::byte_t *>(in);
-    
-//     if (*x == Element::STRING) {
-//         x++;
-//         short length = *(reinterpret_cast<const short *>(x));
-//         swapBytes(&length, 2);
-// 	log_debug("Encoded length of string: %hd", length);
-//         x += sizeof(short);
-//         buf = new int8_t[length+1];
-//         memset(buf, 0, length+1);
-//         memcpy(buf, x, length); /* x is not long enough */
-//     } else {
-//         log_error("Tried to extract AMF string from non String object!");
-//     }
-    
-//     return reinterpret_cast<char *>(buf);
-// }
-
-// double
-// AMF::extractNumber(const Network::byte_t *in)
-// {
-// //    GNASH_REPORT_FUNCTION;    
-//     Network::byte_t *x = const_cast<uint8_t *>(in);
-// //    double *num = new double;
-//     double num = 0.0;
-// //    memset(num, 0, AMF_NUMBER_SIZE);
-    
-//     if (*x == Element::NUMBER) {
-//         x++;
-//         memcpy(&num, x, AMF_NUMBER_SIZE);
-//         swapBytes(&num, AMF_NUMBER_SIZE);
-//     } else {
-//         log_error("Tried to extract AMF Number from non Number object!");
-//     }
-
-//     return num;
-// }
-
-// Element &
-// AMF::createElement(amf_element_t *el, astype_e type,
-// 		  const std::string &name, Network::byte_t *data, int nbytes)
-// {
-// //    GNASH_REPORT_FUNCTION;
-//     log_debug("Creating element %s", name.c_str());
-    
-//     el->type = type;
-//     el->name = name;
-//     el->length = nbytes;
-//     el->data = data;
-//     return el;
-// }
-
-// // AMF::amf_element_t *
-// // AMF::createElement(amf_element_t *el, const char *name, double data)
-// // {
-// // //    GNASH_REPORT_FUNCTION;
-// //     string str = name;
-// //     return createElement(el, str, data);
-// // }
-
-// // AMF::amf_element_t *
-// // AMF::createElement(amf_element_t *el, const std::string &name, double data)
-// // {
-// // //    GNASH_REPORT_FUNCTION;
-// //     log_debug("Creating element %s", name.c_str());
-
-// //     el->type = AMF::NUMBER;
-// //     el->name = name;
-// //     el->length = AMF_NUMBER_SIZE;
-// // //    char *numptr = (char *)&data;
-// //     el->data = new Network::byte_t[AMF_NUMBER_SIZE + 1];
-// //     memset(el->data, 0, AMF_NUMBER_SIZE + 1);
-// //     memcpy(el->data, &data, AMF_NUMBER_SIZE);
-
-// //     return el;
-// // }
-
-// AMF::amf_element_t *
-// AMF::createElement(amf_element_t *el, const char *name, double data)
-// {
-// //    GNASH_REPORT_FUNCTION;
-//     string str = name;
-//     return createElement(el, str, data);
-// }
-
-// AMF::amf_element_t *
-// AMF::createElement(amf_element_t *el, const std::string &name, double data)
-// {
-// //    GNASH_REPORT_FUNCTION;
-//     log_debug("Creating element %s", name.c_str());
-
-//     el->type = AMF::NUMBER;
-//     el->name = name;
-//     el->length = AMF_NUMBER_SIZE;
-// //    char *numptr = (char *)&data;
-//     el->data = new Network::byte_t[AMF_NUMBER_SIZE + 1];
-//     memset(el->data, 0, AMF_NUMBER_SIZE + 1);
-//     memcpy(el->data, &data, AMF_NUMBER_SIZE);
-
-//     return el;
-// }
-
-// AMF::amf_element_t *
-// AMF::createElement(amf_element_t *el, const char *name, const char *data)
-// {
-// //    GNASH_REPORT_FUNCTION;
-//     log_debug("Creating element %s", name);
-
-//     el->type = AMF::STRING;
-//     el->name = name;
-//     el->length = strlen(data);
-//     char *str = const_cast<char *>(data);
-//     el->data = reinterpret_cast<Network::byte_t *>(str);
-//     return el;
-// }
-
-// AMF::amf_element_t *
-// AMF::createElement(amf_element_t *el, const std::string &name, std::string &data)
-// {
-// //    GNASH_REPORT_FUNCTION;
-//     log_debug("Creating element %s", name.c_str());
-
-//     el->type = AMF::STRING;
-//     el->name = name;
-//     el->length = data.size();
-//     char *str = const_cast<char *>(data.c_str());
-//     el->data = reinterpret_cast<Network::byte_t *>(str);
-//     return el;
-// }
-
-// AMF::amf_element_t *
-// AMF::createElement(amf_element_t *el, const char *name, bool data)
-// {
-// //    GNASH_REPORT_FUNCTION;
-//     string str = name;
-//     return createElement(el, str, data);
-// }
-
-// AMF::amf_element_t *
-// AMF::createElement(AMF::amf_element_t *el, const std::string &name, bool data)
-// {
-// //    GNASH_REPORT_FUNCTION;
-//     log_debug("Creating element %s", name.c_str());
-
-//     el->type = AMF::BOOLEAN;
-//     el->name = name;
-//     el->length = 1;
-//     el->data = new Network::byte_t[sizeof(uint16_t)];
-//     memset(el->data, 0, sizeof(uint16_t));
-//     *el->data = data;
-//     return el;
-// }
-
-// #endif
-
 Buffer *
-AMF::encodeVariable(amf::Element *el)
+AMF::encodeProperty(amf::Element *el)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
     size_t outsize = el->getNameSize() + el->getLength() + AMF_VAR_HEADER_SIZE;
 
@@ -1063,14 +701,14 @@ AMF::encodeVariable(amf::Element *el)
     // Booleans appear to be encoded weird. Just a short after
     // the type byte that's the value.
     switch (el->getType()) {
-      case Element::BOOLEAN:
+      case Element::BOOLEAN_AMF0:
 	  enclength = el->to_bool();
 	  buf->append(enclength);
 	  break;
-      case Element::NUMBER:
+      case Element::NUMBER_AMF0:
 	  if (el->getData()) {
-	      swapBytes(el->getData(), AMF_NUMBER_SIZE);
-	      buf->append(el->getData(), AMF_NUMBER_SIZE);
+	      swapBytes(el->getData(), AMF0_NUMBER_SIZE);
+	      buf->append(el->getData(), AMF0_NUMBER_SIZE);
 	  }
 	  break;
       default:
@@ -1084,137 +722,17 @@ AMF::encodeVariable(amf::Element *el)
     return buf;
 }
 
-// #if 0
-// Network::byte_t *
-// AMF::encodeVariable(const char *name, bool flag)
-// {
-// //    GNASH_REPORT_FUNCTION;
-    
-//     int outsize = strlen(name) + AMF_NUMBER_SIZE + 5;
-//     Network::byte_t *out = new uint8_t[outsize];
-//     Network::byte_t *tmpptr = out;
-
-//     size_t length = strlen(name);
-//     short enclength = length;
-//     swapBytes(&enclength, 2);
-//     memcpy(tmpptr, &enclength, 2);
-//     tmpptr += 2;
-//     memcpy(tmpptr, name, length);
-//     tmpptr += length;
-//     *tmpptr = Element::BOOLEAN;
-//     tmpptr++;
-//     *tmpptr = flag;
-
-//     return out;    
-// }
-
-// Network::byte_t *
-// AMF::encodeVariable(const char *name)
-// {
-// //    GNASH_REPORT_FUNCTION;
-//     size_t outsize = strlen(name) + AMF_NUMBER_SIZE + 5;
-//     Network::byte_t *out = new Network::byte_t[outsize];
-//     Network::byte_t *tmpptr = out;
-
-//     size_t length = strlen(name);
-//     short enclength = length;
-//     swapBytes(&enclength, 2);
-//     memcpy(tmpptr, &enclength, 2);
-//     tmpptr += 2;
-//     memcpy(tmpptr, name, length);
-//     tmpptr += length;
-//     *tmpptr = Element::UNDEFINED;
-//     tmpptr++;
-
-//     return out;    
-// }
-
-// Network::byte_t *
-// AMF::encodeVariable(const char *name, double bignum)
-// {
-// //    GNASH_REPORT_FUNCTION;
-//     int outsize = strlen(name) + AMF_NUMBER_SIZE + 5;
-//     Network::byte_t *out = new Network::byte_t[outsize];
-//     Network::byte_t *tmpptr = out;
-//     double newnum = bignum;
-//     char *numptr = (char *)&newnum;
-
-//     size_t length = strlen(name);
-//     short enclength = length;
-//     swapBytes(&enclength, 2);
-//     memcpy(tmpptr, &enclength, 2);
-//     tmpptr += 2;
-//     memcpy(tmpptr, name, length);
-//     tmpptr += length;
-//     *tmpptr = Element::NUMBER;
-//     tmpptr++;
-// //    swapBytes(numptr, AMF_NUMBER_SIZE);
-//     memcpy(tmpptr, numptr, AMF_NUMBER_SIZE);
-
-//     return out;    
-// }
-
-// uint8_t *
-// AMF::encodeVariable(const char *name, const char *val)
-// {
-// //    GNASH_REPORT_FUNCTION;
-
-//     int outsize = strlen(name) + strlen(val) + 5;
-//     Network::byte_t *out = new Network::byte_t[outsize];
-//     Network::byte_t *tmpptr = out;
-
-//     size_t length = strlen(name);
-//     short enclength = length;
-//     swapBytes(&enclength, 2);
-//     memcpy(tmpptr, &enclength, 2);
-//     tmpptr += 2;
-//     memcpy(tmpptr, name, length);
-//     tmpptr += length;
-//     *tmpptr = Element::STRING;
-//     tmpptr++;
-//     length = strlen(val);
-//     enclength = length;
-//     swapBytes(&enclength, 2);
-//     memcpy(tmpptr, &enclength, 2);
-//     tmpptr += 2;
-//     memcpy(tmpptr, val, length);
-
-//     return out;
-// }
-
-// Network::byte_t *
-// AMF::encodeVariable(std::string &name, std::string &val)
-// {
-// //    GNASH_REPORT_FUNCTION;
-
-//     int outsize = name.size() + val.size() + 5;
-//     Network::byte_t *out = new Network::byte_t[outsize];
-//     Network::byte_t *tmpptr = out;
-//     short length;
-
-//     length = name.size() && 0xffff;
-//     swapBytes(&length, 2);
-//     memcpy(tmpptr, &length, 2);
-//     tmpptr += 2;
-//     memcpy(tmpptr, name.c_str(), name.size());
-//     tmpptr += name.size();
-//     *tmpptr = Element::STRING;
-//     tmpptr++;
-//     length = val.size() && 0xffff;
-//     swapBytes(&length, 2);
-//     memcpy(tmpptr, &length, 2);
-//     tmpptr += 2;
-//     memcpy(tmpptr, val.c_str(), name.size());
-
-//     return out;
-// }
-
-// #endif
+Element *
+AMF::extractAMF(Buffer *buf)
+{
+//    GNASH_REPORT_FUNCTION;
+    return extractAMF(buf->reference());
+}
 
 Element *
 AMF::extractAMF(Network::byte_t *in)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     Element *el = new Element;    
     Network::byte_t *tmpptr;
@@ -1234,21 +752,26 @@ AMF::extractAMF(Network::byte_t *in)
     // 8 bytes are read If it's a String type, then there is a count of
     // characters, then the string value    
     
-    // Check the type of the element data
-    Element::amf_type_e type = *(reinterpret_cast<Element::amf_type_e *>(tmpptr));
+    // Get the type of the element, which is a single byte.
+    // This type casting looks like a stupid mistake, but it's
+    // mostly to make valgrind shut up, as it has a tendency to
+    // complain about legit code when it comes to all this byte
+    // manipulation stuff.
+    char c = *(reinterpret_cast<char *>(tmpptr));
+    Element::amf0_type_e type = static_cast<Element::amf0_type_e>(c);
     tmpptr++;                        // skip the header byte
 
     AMF amf_obj;
     switch (type) {
-      case Element::NUMBER:
+      case Element::NUMBER_AMF0:
 	  el->makeNumber(tmpptr);
-	  tmpptr += AMF_NUMBER_SIZE; // all numbers are 8 bit big endian
+	  tmpptr += AMF0_NUMBER_SIZE; // all numbers are 8 bit big endian
 	  break;
-      case Element::BOOLEAN:
+      case Element::BOOLEAN_AMF0:
 	  el->makeBoolean(tmpptr);
 	  tmpptr += sizeof(boost::uint16_t); // although a bool is one byte, it's stored as a short
 	  break;
-      case Element::STRING:
+      case Element::STRING_AMF0:
 	  // get the length of the name
 	  length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
 	  tmpptr += sizeof(boost::uint16_t);
@@ -1259,91 +782,107 @@ AMF::extractAMF(Network::byte_t *in)
 	      log_debug(_("AMF String is: %s"), el->to_string());
 	      tmpptr += length;
 	  } else {
-	      el->setType(Element::STRING);
+	      el->setType(Element::STRING_AMF0);
 	  };
 	  break;
-      case Element::OBJECT:
+      case Element::OBJECT_AMF0:
+	  el->makeObject();
+	  Element *child;
 	  do {
-	      el = amf_obj.extractVariable(tmpptr);
-	      tmpptr += amf_obj.totalsize();
-	  } while (el->getType() != Element::OBJECT_END);
+	      child = amf_obj.extractProperty(tmpptr);
+	      tmpptr += amf_obj.totalsize() - 1;
+	      el->addProperty(child);
+	  } while (*tmpptr != Element::OBJECT_END_AMF0);
 	  break;
-      case Element::MOVIECLIP:
-      case Element::NULL_VALUE: 
-      case Element::UNDEFINED:
-      case Element::REFERENCE:
-      case Element::ECMA_ARRAY:
-      case Element::OBJECT_END:
-      case Element::STRICT_ARRAY:
-      case Element::DATE:
-      case Element::LONG_STRING:
-      case Element::UNSUPPORTED:
-      case Element::RECORD_SET:
-      case Element::XML_OBJECT:
-      case Element::TYPED_OBJECT:
+      case Element::MOVIECLIP_AMF0:
+      case Element::NULL_AMF0:
+      case Element::UNDEFINED_AMF0:
+      case Element::REFERENCE_AMF0:
+      case Element::ECMA_ARRAY_AMF0:
+      case Element::OBJECT_END_AMF0:
+      case Element::STRICT_ARRAY_AMF0:
+      case Element::DATE_AMF0:
+      case Element::LONG_STRING_AMF0:
+      case Element::UNSUPPORTED_AMF0:
+      case Element::RECORD_SET_AMF0:
+      case Element::XML_OBJECT_AMF0:
+      case Element::TYPED_OBJECT_AMF0:
       default:
 //	  log_unimpl("%s: type %d", __PRETTY_FUNCTION__, (int)type);
 	  return 0;
     }
     
+    // Calculate the offset for the next read
+    _totalsize = (tmpptr - in) + 1;
+
     return el;
 }
 
 Element *
-AMF::extractVariable(Network::byte_t *in)
+AMF::extractProperty(Buffer *buf)
 {
 //    GNASH_REPORT_FUNCTION;
-    Element *el = new Element;
-    boost::uint16_t length;
+    return extractProperty(buf->reference());
+}
 
+Element *
+AMF::extractProperty(Network::byte_t *in)
+{
+//    GNASH_REPORT_FUNCTION;
     Network::byte_t *tmpptr = in;
-//    std::copy(in, in + sizeof(boost::uint16_t), &length);
-    length = *reinterpret_cast<boost::uint16_t *>(in);
-    swapBytes(&length, sizeof(boost::uint16_t));
-    tmpptr += sizeof(boost::uint16_t);    
+    boost::uint16_t length = 0;
+    Network::byte_t len = 0;
+
+//    length = *(reinterpret_cast<boost::uint16_t *>(tmpptr));
+    length = tmpptr[1];
+//    swapBytes(&length, sizeof(boost::uint16_t));
+    tmpptr += sizeof(boost::uint16_t);
+    
     if (length <= 0) {
-	if (*(in+2) == Element::OBJECT_END) {
+//	if (*(in+2) == Element::OBJECT_END) {
 	    log_debug(_("End of Object definition"));
-            el->setType(Element::OBJECT_END);
-            return el;
-        }
-	delete el;
+//            el->setType(Element::OBJECT_END);
+//             return el;
+//         }
+//	delete el;
 	return 0;
     }    
+    
+    Element *el = new Element;
     // get the name of the element, the length of which we just decoded
     if (length > 0) {
-        log_debug(_("AMF element length is: %d"), length);
+//        log_debug(_("AMF element length is: %d"), length);
         el->setName(tmpptr, length);
-	log_debug(_("AMF element name is: %s"), el->getName());
+//	log_debug(_("AMF element name is: %s"), el->getName());
 	tmpptr += length;
     }
     
     // get the type of the element, which is a single byte.
     char c = *(reinterpret_cast<char *>(tmpptr));
-    Element::amf_type_e type = static_cast<Element::amf_type_e>(c);
+    Element::amf0_type_e type = static_cast<Element::amf0_type_e>(c);
     tmpptr++;
-    if (type != Element::TYPED_OBJECT) {
-//        log_debug(_("AMF type is: %s"), amftype_str[(int)type]);
+    if (type != Element::TYPED_OBJECT_AMF0) {
+        log_debug(_("AMF type is: %s"), amftype_str[(int)type]);
 	el->setType(type);
     }
 
     switch (type) {
-      case Element::NUMBER: 
+      case Element::NUMBER_AMF0:
       {
 	  double num = *reinterpret_cast<const double*>(tmpptr);
-          swapBytes(&num, AMF_NUMBER_SIZE);
+          swapBytes(&num, AMF0_NUMBER_SIZE);
 	  el->makeNumber(num);
-          tmpptr += AMF_NUMBER_SIZE;
+          tmpptr += AMF0_NUMBER_SIZE;
 	  break;
       }
-      case Element::BOOLEAN:
+      case Element::BOOLEAN_AMF0:
       {
 	  bool sheet = *(reinterpret_cast<bool *>(tmpptr));
           el->makeBoolean(sheet);
 	  tmpptr += 1;
 	  break;
       }
-      case Element::STRING:
+      case Element::STRING_AMF0:
 	  // extractString returns a printable char *. First 2 bytes for the length,
 	  // and then read the string, which is NOT NULL terminated.
 	  length = *reinterpret_cast<boost::uint16_t *>(tmpptr);
@@ -1354,44 +893,43 @@ AMF::extractVariable(Network::byte_t *in)
 	      tmpptr += length;
 	  }
 	  if (length == 0) {
+//	      log_debug("NullString");
 	      el->makeNullString();
-//	      tmpptr++;
 	  }
-//  	  string v(reinterpret_cast<const char *>(tmpptr) + 3, (int)length);
-  	  log_debug(_("Variable \"%s\" is: %s"), el->getName(), el->to_string());
+//  	  log_debug(_("Property \"%s\" is: %s"), el->getName(), el->to_string());
           break;
-      case Element::OBJECT:
-  	  while (*(tmpptr++) != Element::OBJECT_END) {
-	      log_debug("Look for end of object...");
+      case Element::OBJECT_AMF0:
+  	  while (*(tmpptr++) != Element::OBJECT_END_AMF0) {
+//	      log_debug("Looking for end of object...");
   	  }
 	  break;
-      case Element::MOVIECLIP:
-      case Element::NULL_VALUE:
+      case Element::MOVIECLIP_AMF0:
+      case Element::NULL_AMF0:
 	  el->makeUndefined();
 	  break;
-      case Element::UNDEFINED:
+      case Element::UNDEFINED_AMF0:
 	  el->makeUndefined();
           break;
-      case Element::REFERENCE:
-      case Element::ECMA_ARRAY:
+      case Element::REFERENCE_AMF0:
+      case Element::ECMA_ARRAY_AMF0:
 			// FIXME this shouldn't fall thru
-      case Element::OBJECT_END:
+      case Element::OBJECT_END_AMF0:
 //          log_debug(_("End of Object definition"));
 	  el->makeObjectEnd();
           break;
-      case Element::TYPED_OBJECT:
+      case Element::TYPED_OBJECT_AMF0:
 	  el->makeTypedObject(tmpptr, 0);
           break;
-      case Element::STRICT_ARRAY:
-      case Element::DATE:
+      case Element::STRICT_ARRAY_AMF0:
+      case Element::DATE_AMF0:
 	  el->makeDate(tmpptr);
           break;
-      case Element::LONG_STRING:
-      case Element::UNSUPPORTED:
-      case Element::RECORD_SET:
-      case Element::XML_OBJECT:
+      case Element::LONG_STRING_AMF0:
+      case Element::UNSUPPORTED_AMF0:
+      case Element::RECORD_SET_AMF0:
+      case Element::XML_OBJECT_AMF0:
       default:
-          log_unimpl(_("amf_type_e of value: %x"), (int)type);
+          log_unimpl(_("amf0_type_e of value: %x"), (int)type);
 	  delete el;
 	  return 0;
     }

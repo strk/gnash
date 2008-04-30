@@ -1,3 +1,30 @@
+2008-04-29  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* libamf/amf.h: Use _AMF0* on Element types.
+	* libamf/amf.cpp: Use AMF0_* instead of just AMF_*. Remove junk
+	that's been commented out for awhile. Rename *Variable to
+	*Property, which is the correct name. Adjust to keep valgrind
+	happy.
+	* libamf/element.h: Rename amf_* to amf0_*. Add new
+	amf3_types. Rename *Child methods to *Property.
+	* libamf/element.cpp: Add NOTYPE back in. 
+	* libamf/lcshm.cpp: Use non static methods for extracting AMF
+	objects.
+	* libamf/sol.cpp: Use _AMF0* on Element types. 
+	* testsuite/libamf.all/test_amf.cpp: Don't use Memory profiling
+	if mallinfo() isn't found. Use _AMF0* on Element types.  Delete
+	pointers so there are no memory leaks.
+	* testsuite/libamf.all/test_buffer.cpp: Don't use Memory profiling
+	if mallinfo() isn't found. Use _AMF0* on Element types. Delete
+	pointers so there are no memory leaks.
+	* testsuite/libamf.all/test_el.cpp: Use properties instead of
+	children. Use _AMF0* on Element types. 
+	* testsuite/libamf.all/test_lc.cpp: Don't try to send(), it's
+	unimplemented still. Use _AMF0* on Element types. 
+	* testsuite/libamf.all/test_sol.cpp: Use Memory profiling if
+	mallinfo() exists. Use proper argument processing. Use _AMF0* on
+	Element types.
+
 2008-04-29 Zou Lunkai <zoulunkai@gmail.com>
 	
 	* server/dlist.{h,cpp}: move_display_object() renamed to move_character(),
@@ -6,7 +33,7 @@
 	* server/sprite_instance.{h,cpp}: adop the new names. 	  
 	  
 2008-04-29  Rob Savoye  <rob@ripple.welcomehome.org>
-
+	
 	* libbase/utility.h: Use C ctyle cast for pthread_self() to work
 	around BSD compiler bug.
 	

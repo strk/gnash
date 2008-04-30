@@ -79,8 +79,6 @@ SOL::SOL()
 SOL::~SOL()
 {
 //    GNASH_REPORT_FUNCTION;
-
-#if 0
     vector<amf::Element *>::iterator it;
     for (it = _amfobjs.begin(); it != _amfobjs.end(); it++) {
 	amf::Element *el = (*(it));
@@ -88,7 +86,6 @@ SOL::~SOL()
 	    delete el;
 	}
     }
-#endif
 }
 
 bool
@@ -240,36 +237,36 @@ SOL::writeFile(const string &filespec, const string &name)
 
     for (ita = _amfobjs.begin(); ita != _amfobjs.end(); ita++) {
         amf::Element *el = (*(ita));
-        Buffer *var = amf_obj.encodeVariable(el); 
-        //  Network::byte_t *var = amf_obj.encodeVariable(el, outsize); 
+        Buffer *var = amf_obj.encodeProperty(el); 
+        //  Network::byte_t *var = amf_obj.encodeProperty(el, outsize); 
         if (!var) {
             continue;
         }
         size_t outsize = 0;
         switch (el->getType()) {
-	  case Element::BOOLEAN:
+	  case Element::BOOLEAN_AMF0:
 	      outsize = el->getNameSize() + AMF_VAR_HEADER_SIZE;
 	      memcpy(ptr, var->reference(), outsize); 
 	      ptr += outsize;
 	      break;
-	  case Element::OBJECT:
+	  case Element::OBJECT_AMF0:
 	      outsize = el->getNameSize() + 5;
               assert(ptr+outsize < endPtr);
 	      outsize = el->getNameSize() + 5;
 	      memcpy(ptr, var->reference(), outsize);
 	      ptr += outsize;
-	      *ptr++ = Element::OBJECT_END;
+	      *ptr++ = Element::OBJECT_END_AMF0;
 	      *ptr++ = 0;	// objects are terminated too!
 	      break;
-	  case Element::NUMBER:
-	      outsize = el->getNameSize() + AMF_NUMBER_SIZE + 2;
+	  case Element::NUMBER_AMF0:
+	      outsize = el->getNameSize() + AMF0_NUMBER_SIZE + 2;
               assert(ptr+outsize < endPtr);
 	      memcpy(ptr, var->reference(), outsize);
 	      ptr += outsize;
 	      *ptr++ = 0;	// doubles are terminated too!
 	      *ptr++ = 0;	// doubles are terminated too!
 	      break;
-	  case Element::STRING:
+	  case Element::STRING_AMF0:
 	      if (el->getLength() == 0) {
               	  assert(ptr+outsize+1 < endPtr);
 		  memcpy(ptr, var, outsize+1);
@@ -323,19 +320,19 @@ SOL::readFile(std::string &filespec)
 //    GNASH_REPORT_FUNCTION;
     struct stat st;
     boost::uint16_t size;
-    Network::byte_t *buf;
-    Network::byte_t *ptr;
+    Network::byte_t *buf = 0;
+    Network::byte_t *ptr = 0;
     size_t bodysize;
 
     // Make sure it's an SOL file
     if (stat(filespec.c_str(), &st) == 0) {
         ifstream ifs(filespec.c_str(), ios::binary);
         _filesize = st.st_size;
+	buf = new Network::byte_t[_filesize + sizeof(int)];
+	ptr = buf;
 	bodysize = st.st_size - 6;
         _filespec = filespec;
-	buf = new Network::byte_t[_filesize+1];
-	ptr = buf;
-        ifs.read(reinterpret_cast<char *>(buf), _filesize);
+        ifs.read(reinterpret_cast<char *>(ptr), _filesize);
 
         // skip the magic number (will check later)
         ptr += 2;
@@ -373,17 +370,24 @@ SOL::readFile(std::string &filespec)
 
         AMF amf_obj;
 	int size = 0;
-        while (size <= static_cast<boost::uint16_t>(bodysize)) {
-	    amf::Element *el =  amf_obj.extractVariable(ptr);
-            if (el != 0) {
-		size += amf_obj.totalsize();
-		ptr += amf_obj.totalsize();
-		_amfobjs.push_back(el);
+	amf::Element *el;
+        while (size < static_cast<boost::uint16_t>(bodysize) - 24) {
+	    if (ptr) {
+		el = amf_obj.extractProperty(ptr);
+		if (el != 0) {
+		    size += amf_obj.totalsize();
+		    ptr += amf_obj.totalsize();
+		    _amfobjs.push_back(el);
+		} else {
+		    break;
+		}
+//		log_debug("Bodysize is: %d size is: %d for %s", bodysize, size, el->getName());
 	    } else {
 		break;
 	    }
         }
-        
+	delete[] buf;
+	
         ifs.close();
         return true;
     }
@@ -404,20 +408,20 @@ SOL::dump()
     for (it = _amfobjs.begin(); it != _amfobjs.end(); it++) {
 	amf::Element *el = (*(it));
         cerr << el->getName() << ": ";
-        if (el->getType() == Element::STRING) {
+        if (el->getType() == Element::STRING_AMF0) {
             if (el->getLength() != 0) {
                 cerr << el->getData();
             } else {
                 cerr << "null";
             }
         }
-        if (el->getType() == Element::NUMBER) {
+        if (el->getType() == Element::NUMBER_AMF0) {
             double ddd = *((double *)el->getData());
              cerr << ddd << " ";
 
             cerr << "( " << hexify(el->getData(), 8, false) << ")";
         }
-        if ((*(it))->getType() == Element::BOOLEAN) {
+        if ((*(it))->getType() == Element::BOOLEAN_AMF0) {
             if (el[0] == true) {
                 cerr << "true";
             }
@@ -425,7 +429,7 @@ SOL::dump()
                 cerr << "false";
             }
         }
-        if (el->getType() == Element::OBJECT) {
+        if (el->getType() == Element::OBJECT_AMF0) {
             cerr << "is an object";
         }
         cerr << endl;

@@ -47,7 +47,7 @@ namespace amf
 class Buffer;
 
 // All numbers in AMF format are 8 byte doubles.
-const size_t AMF_NUMBER_SIZE = 0x08;
+const size_t AMF0_NUMBER_SIZE = 0x08;
 
 // The header of an AMF object is a type filed (1 byte), followed by a
 // length field. (short)
@@ -58,9 +58,6 @@ const gnash::Network::byte_t AMF_HEADER_SIZE = 3;
 // object and length is used for the data. So a variable object header is
 // then only 5 bytes instead of the 6 that one assumes would be used.
 const gnash::Network::byte_t AMF_VAR_HEADER_SIZE = 5;
-
-// FIXME: this should go away
-const int  AMF_PACKET_SIZE = 128;
 
 // Use a zero version till now till we know what this should be.
 const gnash::Network::byte_t AMF_VERSION = 0;
@@ -73,15 +70,6 @@ const gnash::Network::byte_t TERMINATOR = 0x09;
 // LocalConnection segment, or over an RTMP connection for streaming.
 class DSOEXPORT AMF {
 public:
-//     typedef enum {
-//         Byte,
-//         Int,
-//         MediumInt,
-//         Long,
-//         Double,
-//         UTF8,
-//         LongUTF8
-//     } amftype_e;
     typedef enum {
         CONNECT = 0x01,
         DISCONNECT = 0x02,
@@ -109,7 +97,6 @@ public:
     AMF();
     AMF(size_t size);
     ~AMF();
-//    size_t size() { return _total_size; };
 
     //
     // Methods for encoding data into big endian formatted raw AMF data.
@@ -244,7 +231,7 @@ public:
     ///         in form of a newly allocated byte array.
     ///         to be deleted by caller using delete [] operator, or NULL
     ///
-    Buffer *encodeVariable(amf::Element *el);
+    Buffer *encodeProperty(amf::Element *el);
     static Buffer *encodeVariableHeader(const std::string &name);
     
     //
@@ -252,14 +239,21 @@ public:
     //
     
     // Extract the object type from the first byte of the header.
-    static amf::Element::amf_type_e extractElementHeader(gnash::Network::byte_t *in)
-                         { return *(reinterpret_cast<amf::Element::amf_type_e *>(in)); };
+    static amf::Element::amf0_type_e extractElementHeader(gnash::Network::byte_t *in)
+                         { return *(reinterpret_cast<amf::Element::amf0_type_e *>(in)); };
 
+    // Unlike when we are encoding, for extracting objects we need
+    // to keep track where we are in the memory buffer so these can't
+    // be static.
+    
     // Extract an AMF object. These have no name like the variables do.
-    static amf::Element *extractAMF(gnash::Network::byte_t *in);
+    amf::Element *extractAMF(gnash::Network::byte_t *in);
+    amf::Element *extractAMF(Buffer *buf);
+    
     // Extract an AMF "variable", which is a standard AMF object preceeded by
     // just a length and a name field.
-    amf::Element *extractVariable(gnash::Network::byte_t *in);
+    amf::Element *extractProperty(gnash::Network::byte_t *in);
+    amf::Element *extractProperty(Buffer *buf);
 
     size_t totalsize() { return _totalsize; }
     

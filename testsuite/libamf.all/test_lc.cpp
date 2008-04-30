@@ -219,6 +219,7 @@ test_data()
     el = new Element(true, 123.456, 987.654, "IAmReplyingNow");
 //    el->dump();
     els.push_back(el);
+    delete el;    
 
 #if 0
     // 
@@ -241,7 +242,9 @@ test_data()
     els.push_back(el);
 
     // Send the AMF objects
-    lc.send(con1, "localhost", els);
+//    lc.send(con1, "localhost", els);
+
+    delete el;
 }
 
 void
@@ -350,11 +353,14 @@ test_read()
         }
     }
 
-    boost::uint8_t *ptr = lc.parseHeader(reinterpret_cast<boost::uint8_t *>(shmaddr));
-    vector<amf::Element *> ellist = lc.parseBody(ptr);
+//    boost::uint8_t *ptr = lc.parseHeader(reinterpret_cast<boost::uint8_t *>(shmaddr));
+//    vector<amf::Element *> ellist = lc.parseBody(ptr);
 //    cout << "# of AMF Elements in file: " << ellist.size() << endl;
 //    lc.dump();
     lc.close();
+
+    // cleanup
+//    delete ptr;
 }
 
 void
@@ -373,9 +379,9 @@ test_write()
     sol.addObj(el);
     if ((el.name == "gain") &&
         (el.type == AMF::NUMBER) &&
-        (memcmp(el.data, &dub, AMF_NUMBER_SIZE) == 0) &&
+        (memcmp(el.data, &dub, AMF0_NUMBER_SIZE) == 0) &&
         (*((double *)el.data) == dub) &&
-        (el.length == AMF_NUMBER_SIZE)) {
+        (el.length == AMF0_NUMBER_SIZE)) {
         runtest.pass("gain set");
     } else {
         runtest.fail("gain set");
@@ -445,9 +451,9 @@ test_write()
     sol.addObj(el);
     if ((el.name == "defaultklimit") &&
         (el.type == AMF::NUMBER) &&
-        (memcmp(el.data, &dub, AMF_NUMBER_SIZE) == 0) &&
+        (memcmp(el.data, &dub, AMF0_NUMBER_SIZE) == 0) &&
         (*((double *)el.data) == dub) &&
-        (el.length == AMF_NUMBER_SIZE)) {
+        (el.length == AMF0_NUMBER_SIZE)) {
         runtest.pass("defaultklimit set");
     } else {
         runtest.fail("defaultklimit set");
@@ -534,9 +540,9 @@ test_write()
     sol.addObj(el);
     if ((el.name == "localSecPathTime") &&
         (el.type == AMF::NUMBER) &&
-        (memcmp(el.data, &dub, AMF_NUMBER_SIZE) == 0) &&
+        (memcmp(el.data, &dub, AMF0_NUMBER_SIZE) == 0) &&
         (*((double *)el.data) == dub) &&
-        (el.length == AMF_NUMBER_SIZE)) {
+        (el.length == AMF0_NUMBER_SIZE)) {
         runtest.pass("localSecPathTime set");
     } else {
         runtest.fail("localSecPathTime set");

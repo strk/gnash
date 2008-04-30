@@ -17,6 +17,7 @@
 //
 
 #include <boost/cstdint.hpp>
+#include <iostream>
 #include "buffer.h"
 #include "amf.h"
 #include "log.h"
@@ -114,8 +115,8 @@ Buffer::copy(double num)
 {
 //    GNASH_REPORT_FUNCTION;
     Network::byte_t *ptr = reinterpret_cast<Network::byte_t *>(&num);
-    std::copy(ptr, ptr + amf::AMF_NUMBER_SIZE, _ptr);    
-    _seekptr = _ptr + amf::AMF_NUMBER_SIZE;
+    std::copy(ptr, ptr + amf::AMF0_NUMBER_SIZE, _ptr);    
+    _seekptr = _ptr + amf::AMF0_NUMBER_SIZE;
 }
 
 void
@@ -167,8 +168,8 @@ Buffer::append(double num)
 //    GNASH_REPORT_FUNCTION;
     if ((_seekptr + sizeof(double)) <= (_ptr + _nbytes)) {
 	Network::byte_t *ptr = reinterpret_cast<Network::byte_t *>(&num);
-	std::copy(ptr, ptr + amf::AMF_NUMBER_SIZE, _seekptr);    
-	_seekptr += amf::AMF_NUMBER_SIZE;
+	std::copy(ptr, ptr + amf::AMF0_NUMBER_SIZE, _seekptr);    
+	_seekptr += amf::AMF0_NUMBER_SIZE;
 	return _seekptr;
     }
     return 0;
@@ -223,7 +224,7 @@ Buffer::append(const std::string &str)
 }
 
 Network::byte_t *
-Buffer::append(amf::Element::amf_type_e type)
+Buffer::append(amf::Element::amf0_type_e type)
 {
     return append(static_cast<Network::byte_t>(type));
 }

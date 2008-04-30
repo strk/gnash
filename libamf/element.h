@@ -34,30 +34,49 @@ class Buffer;
 
 class DSOEXPORT Element {
 public:
-    // The following elements are defined within AMF:
+    // The following elements are defined within AMF0, and are used
+    // up through SWF version 8.
     typedef enum {
 	NOTYPE=-1,
-        NUMBER=0x00,
-        BOOLEAN=0x01,
-        STRING=0x02,
-        OBJECT=0x03,
-        MOVIECLIP=0x04,
-        NULL_VALUE=0x05,
-        UNDEFINED=0x06,
-        REFERENCE=0x07,
-        ECMA_ARRAY=0x08,
-        OBJECT_END=0x09,
-        STRICT_ARRAY=0x0a,
-        DATE=0x0b,
-        LONG_STRING=0x0c,
-        UNSUPPORTED=0x0d,
-        RECORD_SET=0x0e,
-        XML_OBJECT=0x0f,
-        TYPED_OBJECT=0x10,
-	// these aren't part of the AMF spec, they're used internally
-	VARIABLE=0x11,
-	FUNCTION=0x12
-    } amf_type_e;
+        NUMBER_AMF0=0x00,
+        BOOLEAN_AMF0=0x01,
+        STRING_AMF0=0x02,
+        OBJECT_AMF0=0x03,
+        MOVIECLIP_AMF0=0x04,
+        NULL_AMF0=0x05,
+        UNDEFINED_AMF0=0x06,
+        REFERENCE_AMF0=0x07,
+        ECMA_ARRAY_AMF0=0x08,
+        OBJECT_END_AMF0=0x09,
+        STRICT_ARRAY_AMF0=0x0a,
+        DATE_AMF0=0x0b,
+        LONG_STRING_AMF0=0x0c,
+        UNSUPPORTED_AMF0=0x0d,
+        RECORD_SET_AMF0=0x0e,
+        XML_OBJECT_AMF0=0x0f,
+        TYPED_OBJECT_AMF0=0x10,
+// 	// these aren't part of the AMF spec, they're used internally
+// 	VARIABLE=0x11,
+// 	FUNCTION=0x12
+    } amf0_type_e;
+    // AMF3, was introduced with ActionScript 3 in SWF version 9
+    // to reduce duplicate, and allow for a more compact layout of
+    // data to save bandwidth and improve performance.
+    typedef enum {
+        UNDEFINED_AMF3=0x00,
+        NULL_AMF3=0x01,
+        FALSE_AMF3=0x02,
+        TRUE_AMF3=0x03,
+        INTEGER_AMF3=0x04,
+        DOUBLE_AMF3=0x05,
+        STRING_AMF3=0x06,
+        XMLDOC_AMF3=0x07,
+        DATE_AMF3=0x08,
+        ARRAY_AMF3=0x09,
+        OBJECT_AMF3=0x0a,
+        XML_AMF3=0x0b,
+        BYTES_AMF3=0x0c,
+    } amf3_type_e;
     Element();
     Element(gnash::Network::byte_t *data);
     Element(double data);
@@ -147,15 +166,15 @@ public:
     Element &operator=(Element &);
     Element &operator=(Element *);
     
-    Element *operator[](int x);
+    Element *operator[](size_t x);
 
     gnash::Network::byte_t *getData();
     size_t getLength();
     Buffer *getBuffer() { return _buffer; };
     
     // These are all accessors for the various output formats
-    amf_type_e getType() { return _type; };
-    void setType(amf_type_e x) { _type = x; };
+    amf0_type_e getType() { return _type; };
+    void setType(amf0_type_e x) { _type = x; };
 //    void setData(Buffer *buf) { _buffer = buf; };
 
     // These accessors convert the raw data to a standard data type we can use.
@@ -170,12 +189,12 @@ public:
     void setName(gnash::Network::byte_t *name, size_t x);
 
     // Manipulate the children Elements of an object
-    void addChild(Element &el) { _children.push_back(&el); };
-    void addChild(Element *el) { _children.push_back(el); };
-    Element *popChild() { return _children.front(); };
-    size_t childrenSize() { return _children.size(); };
-//    std::vector<Element	*> &getChildren() { return _children; };
-
+    Element *getProperty(size_t x) { return _properties[x]; };
+    
+    void addProperty(Element &el) { _properties.push_back(&el); };
+    void addProperty(Element *el) { _properties.push_back(el); };
+    Element *popProperty()        { return _properties.front(); };
+    size_t propertySize()         { return _properties.size(); };
     amf::Buffer *encode();
     
     void dump();
@@ -183,8 +202,8 @@ private:
     void check_buffer(size_t size);
     char		*_name;
     Buffer		*_buffer;
-    amf_type_e		_type;
-    std::vector<Element	*> _children;
+    amf0_type_e		_type;
+    std::vector<Element	*> _properties;
 };                              // end of class definition
 
 

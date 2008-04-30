@@ -246,7 +246,6 @@ LcShm::parseElement(amf::Element *el, Network::byte_t *data)
           break;
     };
 }
-#endif
 
 vector<amf::Element *> 
 LcShm::parseBody(Network::byte_t *data)
@@ -257,21 +256,26 @@ LcShm::parseBody(Network::byte_t *data)
 
     while (ptr) {
         amf::Element *el = amf.extractAMF(ptr);
-        if (el->getType() == Element::NUMBER) {
-            if (el->to_number() == 0.0) {
+        if (el) {
+            if (el->getType() == Element::NUMBER) {
+                if (el->to_number() == 0.0) {
+                    break;
+                }
+            }
+            if (el->getType() != Element::NOTYPE) {
+                _amfobjs.push_back(el);
+                ptr += el->getLength();
+            } else {
                 break;
             }
-        }
-        if (el->getType() != Element::NOTYPE) {
-            _amfobjs.push_back(el);
-            ptr += el->getLength();
         } else {
-            break;
+
         }
     };
     
     return _amfobjs;
 }
+#endif
 
 // From what I can tell by exaimining the memory segment, after the
 // raw 16 bytes is a LocalConnection object. This appears to have the
@@ -310,7 +314,7 @@ LcShm::parseHeader(Network::byte_t *data)
 
     
     AMF amf;
-    Element *el = AMF::extractAMF(ptr);
+    Element *el = amf.extractAMF(ptr);
     if (el == 0) {
         log_debug("Didn't extract an element from the byte stream!");
         return 0;
@@ -319,7 +323,7 @@ LcShm::parseHeader(Network::byte_t *data)
     _object.connection_name = el->to_string();
     delete el;
     
-    el = AMF::extractAMF(ptr);
+    el = amf.extractAMF(ptr);
     if (ptr != 0) {
         _object.hostname = el->to_string();
     }

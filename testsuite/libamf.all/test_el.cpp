@@ -51,7 +51,7 @@ static void test_construct();
 static void test_destruct();
 static void test_make();
 static void test_operators();
-static void test_children();
+static void test_properties();
 
 // Enable the display of memory allocation and timing data
 static bool memdebug = false;
@@ -113,27 +113,27 @@ main(int argc, char *argv[])
     test_make();
     test_operators();
     test_destruct();
-    test_children();
+    test_properties();
 }
 
 void
-test_children()
+test_properties()
 {
     Element top;
     top.makeObject("app");
 
-    Element *child1 = new Element;
-    child1->makeString("child one");
-    top.addChild(child1);
+    Element *prop1 = new Element;
+    prop1->makeString("property one");
+    top.addProperty(prop1);
     
-    Element *child2 = new Element;
-    child2->makeString("child two");
-    top.addChild(child2);
+    Element *prop2 = new Element;
+    prop2->makeString("property two");
+    top.addProperty(prop2);
 
-    if (top.childrenSize() == 2) {
-        runtest.pass("Adding children");
+    if (top.propertySize() == 2) {
+        runtest.pass("Adding property");
     } else {
-        runtest.fail("Adding children");
+        runtest.fail("Adding property");
     }
     
 //    top.dump();
@@ -145,17 +145,17 @@ test_construct()
     // First test the init method, which is all the constructor does anyway.. First
     // we test just making regular elements instead of named elements, ie...
     // AMF "variables".
-    Element el1;
-    if (el1.getType() == Element::NOTYPE) {
-        runtest.pass("Created empty element");
-    } else {
-        runtest.fail("Created empty element");
-    }
+//     Element el1;
+//     if (el1.getType() == Element::NOTYPE) {
+//         runtest.pass("Created empty element");
+//     } else {
+//         runtest.fail("Created empty element");
+//     }
 
     Element el2;
     double dub = 54.3;
     el2.init(dub);
-    if ((el2.getType() == Element::NUMBER) &&
+    if ((el2.getType() == Element::NUMBER_AMF0) &&
         (el2.to_number() == dub)) {
         runtest.pass("Initialized as double element");
     } else {
@@ -165,7 +165,7 @@ test_construct()
     Element el3;
     bool flag = true;
     el3.init(flag);
-    if ((el3.getType() == Element::BOOLEAN) &&
+    if ((el3.getType() == Element::BOOLEAN_AMF0) &&
         (el3.to_bool() == true)) {
         runtest.pass("Initialized as bool element");
     } else {
@@ -175,7 +175,7 @@ test_construct()
     Element el4;
     string str = "Hello World";
     el4.init(str);
-    if ((el4.getType() == Element::STRING) &&
+    if ((el4.getType() == Element::STRING_AMF0) &&
         (el4.getLength() == str.size())) {
         runtest.pass("Initialized as string element");
     } else {
@@ -186,7 +186,7 @@ test_construct()
     Element el5;
     dub = 2.456;
     el5.init("test1", dub);
-    if ((el5.getType() == Element::NUMBER) &&
+    if ((el5.getType() == Element::NUMBER_AMF0) &&
         (strcmp(el5.getName(), "test1") == 0) &&
         (el5.to_number() == dub)) {
         runtest.pass("Initialized as double element with name");
@@ -197,7 +197,7 @@ test_construct()
     Element el6;
     flag = true;
     el6.init("test2", flag);
-    if ((el6.getType() == Element::BOOLEAN) &&
+    if ((el6.getType() == Element::BOOLEAN_AMF0) &&
         (strcmp(el6.getName(), "test2") == 0) &&
         (el6.to_bool() == true)) {
         runtest.pass("Initialized as bool element with name");
@@ -208,7 +208,7 @@ test_construct()
     Element el7;
     str = "Hello World";
     el7.init("test3", str);
-    if ((el7.getType() == Element::STRING) &&
+    if ((el7.getType() == Element::STRING_AMF0) &&
         (strcmp(el7.getName(), "test3") == 0) &&
         (el7.getLength() == str.size())) {
         runtest.pass("Initialized as string element with name");
@@ -219,7 +219,7 @@ test_construct()
     // Now test the actual constructor
     dub = 23.45;
     Element elnum1(dub);
-    if ((elnum1.getType() == Element::NUMBER) &&
+    if ((elnum1.getType() == Element::NUMBER_AMF0) &&
         (elnum1.to_number() == dub)) {
         runtest.pass("Constructed as double element");
     } else {
@@ -228,7 +228,7 @@ test_construct()
 
     flag = true;
     Element elbool1(flag);
-    if ((elbool1.getType() == Element::BOOLEAN) &&
+    if ((elbool1.getType() == Element::BOOLEAN_AMF0) &&
         (elbool1.to_bool() == true)) {
         runtest.pass("Constructed as bool element");
     } else {
@@ -237,7 +237,7 @@ test_construct()
 
     str = "Guten Tag";
     Element elstr1(str);
-    if ((elstr1.getType() == Element::STRING) &&
+    if ((elstr1.getType() == Element::STRING_AMF0) &&
         (elstr1.getLength() == str.size())) {
         runtest.pass("Constructed as string element");
     } else {
@@ -246,7 +246,7 @@ test_construct()
     // And now test constrcutors with variable names
     dub = 23.45;
     Element elnum2(dub);
-    if ((elnum2.getType() == Element::NUMBER) &&
+    if ((elnum2.getType() == Element::NUMBER_AMF0) &&
         (elnum2.to_number() == dub)) {
         runtest.pass("Constructed as double element with name");
     } else {
@@ -255,7 +255,7 @@ test_construct()
 
     flag = true;
     Element elbool2(flag);
-    if ((elbool2.getType() == Element::BOOLEAN) &&
+    if ((elbool2.getType() == Element::BOOLEAN_AMF0) &&
         (elbool2.to_bool() == true)) {
         runtest.pass("Constructed as bool element with name");
     } else {
@@ -264,7 +264,7 @@ test_construct()
 
     str = "Aloha";
     Element elstr2(str);
-    if ((elstr2.getType() == Element::STRING) &&
+    if ((elstr2.getType() == Element::STRING_AMF0) &&
         (elstr2.getLength() == str.size())) {
         runtest.pass("Constructed as string element with name");
     } else {
@@ -283,7 +283,7 @@ test_make()
     Element el1;
     string str = "Hello World!";
     el1.makeString("Hello World!");
-    if ((el1.getType() == Element::STRING) &&
+    if ((el1.getType() == Element::STRING_AMF0) &&
         (el1.to_string() == str)) {
         runtest.pass("Made string element");
     } else {
@@ -293,7 +293,7 @@ test_make()
     Element el2;
     bool sheet = true;
     el2.makeBoolean(sheet);
-    if ((el2.getType() == Element::BOOLEAN) &&
+    if ((el2.getType() == Element::BOOLEAN_AMF0) &&
         (el2.to_bool() == sheet)) {
         runtest.pass("Made bool element");
     } else {
@@ -303,7 +303,7 @@ test_make()
     Element el3;
     el3.clear();
     el3.makeNull();
-    if (el3.getType() == Element::NULL_VALUE) {
+    if (el3.getType() == Element::NULL_AMF0) {
         runtest.pass("Made NULL Value element");
     } else {
         runtest.fail("Made NULL Value element");
@@ -311,7 +311,7 @@ test_make()
 
     Element el4;
     el4.makeUndefined();
-    if (el4.getType() == Element::UNDEFINED) {
+    if (el4.getType() == Element::UNDEFINED_AMF0) {
         runtest.pass("Made Undefined element");
     } else {
         runtest.fail("Made Undefined element");
@@ -320,7 +320,7 @@ test_make()
     Element el5;
     el5.clear();
     el5.makeObjectEnd();
-    if (el5.getType() == Element::OBJECT_END) {
+    if (el5.getType() == Element::OBJECT_END_AMF0) {
         runtest.pass("Made Object End element");
     } else {
         runtest.fail("Made Object End element");
@@ -329,7 +329,7 @@ test_make()
     Element el6;
     el6.clear();
     el6.makeNullString();
-    if ((el6.getType() == Element::STRING) &&
+    if ((el6.getType() == Element::STRING_AMF0) &&
         (el6.getLength() == 1)) {
         runtest.pass("Made NULL String element");
     } else {
@@ -340,7 +340,7 @@ test_make()
     Element el7;
     el7.clear();
     el7.makeNumber(num);
-    if ((el7.getType() == Element::NUMBER) &&
+    if ((el7.getType() == Element::NUMBER_AMF0) &&
         (el7.to_number() == num)) {
         runtest.pass("Made double element");
     } else {
@@ -350,7 +350,7 @@ test_make()
     Element el8;
     el8.clear();
     el8.makeObject("app");
-    if (el8.getType() == Element::OBJECT) {
+    if (el8.getType() == Element::OBJECT_AMF0) {
         runtest.pass("Made Object element");
     } else {
         runtest.fail("Made Object element");
@@ -359,7 +359,7 @@ test_make()
     Element el9;
     el9.clear();
     el9.makeTypedObject("foobar");
-    if (el9.getType() == Element::TYPED_OBJECT) {
+    if (el9.getType() == Element::TYPED_OBJECT_AMF0) {
         runtest.pass("Made Object element");
     } else {
         runtest.fail("Made Object element");
@@ -368,7 +368,7 @@ test_make()
     Element el10;
     el10.clear();
     el10.makeECMAArray();
-    if (el10.getType() == Element::ECMA_ARRAY) {
+    if (el10.getType() == Element::ECMA_ARRAY_AMF0) {
         runtest.pass("Made ECMA Array Object element");
     } else {
         runtest.fail("Made ECMA Array Object element");
@@ -377,7 +377,7 @@ test_make()
     Element el11;
     el11.clear();
     el11.makeMovieClip();
-    if (el11.getType() == Element::MOVIECLIP) {
+    if (el11.getType() == Element::MOVIECLIP_AMF0) {
         runtest.pass("Made MovieClip Object element");
     } else {
         runtest.fail("Made MovieClip Object element");
@@ -386,7 +386,7 @@ test_make()
     Element el12;
     el12.clear();
     el12.makeRecordSet();
-    if (el12.getType() == Element::RECORD_SET) {
+    if (el12.getType() == Element::RECORD_SET_AMF0) {
         runtest.pass("Made MovieClip Object element");
     } else {
         runtest.fail("Made MovieClip Object element");
@@ -395,7 +395,7 @@ test_make()
     Element el13;
     el13.clear();
     el13.makeReference();
-    if (el13.getType() == Element::REFERENCE) {
+    if (el13.getType() == Element::REFERENCE_AMF0) {
         runtest.pass("Made Reference Object element");
     } else {
         runtest.fail("Made Reference Object element");
@@ -404,7 +404,7 @@ test_make()
     Element el14;
     el14.clear();
     el14.makeLongString();
-    if (el14.getType() == Element::LONG_STRING) {
+    if (el14.getType() == Element::LONG_STRING_AMF0) {
         runtest.pass("Made Long String Object element");
     } else {
         runtest.fail("Made Long String Object element");
@@ -413,7 +413,7 @@ test_make()
     Element el15;
     el15.clear();
     el15.makeUnsupported();
-    if (el15.getType() == Element::UNSUPPORTED) {
+    if (el15.getType() == Element::UNSUPPORTED_AMF0) {
         runtest.pass("Made Unsupported Object element");
     } else {
         runtest.fail("Made Unsupported Object element");
@@ -424,8 +424,8 @@ test_make()
     rel1.clear();
     rel1.makeBoolean(true);
     rel1.makeNumber(num);
-    if ((rel1.getType() == Element::NUMBER) &&
-        (rel1.getLength() == amf::AMF_NUMBER_SIZE) &&
+    if ((rel1.getType() == Element::NUMBER_AMF0) &&
+        (rel1.getLength() == amf::AMF0_NUMBER_SIZE) &&
         (rel1.to_number() == num)) {
         runtest.pass("Remade boolean as a double element");
     } else {

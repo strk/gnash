@@ -65,7 +65,7 @@ public:
     gnash::Network::byte_t *append(boost::uint32_t val);
     gnash::Network::byte_t *append(bool);
     gnash::Network::byte_t *append(double num);
-    gnash::Network::byte_t *append(Element::amf_type_e type);
+    gnash::Network::byte_t *append(Element::amf0_type_e type);
     gnash::Network::byte_t *append(boost::uint16_t length);
     gnash::Network::byte_t *append(gnash::Network::byte_t *data, size_t nbytes);
     gnash::Network::byte_t *append(gnash::Network::byte_t byte);
@@ -102,7 +102,7 @@ public:
     Buffer &operator+=(Buffer &buf);
     gnash::Network::byte_t operator[](int x) { return *(_ptr + x); };
     gnash::Network::byte_t *at(int x) { return _ptr + x; };
-
+    
     // debug stuff, not need for running Cygnal
     void dump();
 protected:

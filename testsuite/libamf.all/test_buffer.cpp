@@ -22,25 +22,22 @@
 
 #ifdef HAVE_DEJAGNU_H
 
+#include <iostream>
 #include <regex.h>
 #include <cstdio>
 #include <cerrno>
-#include <iostream>
 #include <fstream>
 #include <cstring>
 #include <vector>
 #include <boost/cstdint.hpp>
 
-#ifdef HAVE_DEJAGNU_H
 #include "dejagnu.h"
-#else
-#include "check.h"
-#endif
-
 #include "log.h"
 #include "rc.h"
 #include "network.h"
+#ifdef HAVE_MALLINFO
 #include "gmemory.h"
+#endif
 #include "buffer.h"
 #include "arg_parser.h"
 
@@ -63,6 +60,13 @@ static void test_operators();
 // Enable the display of memory allocation and timing data
 static bool memdebug = false;
 
+// We use the Memory profiling class to check the malloc buffers
+// in the kernel to make sure the allocations and frees happen
+// the way we expect them too. There is no real other way to tell.
+#ifdef HAVE_MALLINFO
+Memory *mem = 0;
+#endif
+
 TestState runtest;
 LogFile& dbglogfile = LogFile::getDefaultInstance();
 RcInitFile& rcfile = RcInitFile::getDefaultInstance();
@@ -75,6 +79,11 @@ main (int argc, char** argv)
             { 'h', "help",          Arg_parser::no  },
             { 'v', "verbose",       Arg_parser::no  },
             { 'w', "write",         Arg_parser::no  },
+// Unless you have support for memory debugging turned on, and
+// you have support for the Linux mallinfo() system call,
+// this option is totally useless. This doesn't really matter
+// as the memory testing is primarily used only during
+// debugging or development.
             { 'm', "memstats",      Arg_parser::no  },
             { 'd', "dump",          Arg_parser::no  },
         };
@@ -94,16 +103,14 @@ main (int argc, char** argv)
                   exit(EXIT_SUCCESS);
               case 'v':
                     dbglogfile.setVerbosity();
-                    // This happens once per 'v' flag 
                     log_debug(_("Verbose output turned on"));
                     break;
               case 'm':
-                    // This happens once per 'v' flag 
                     log_debug(_("Enabling memory statistics"));
                     memdebug = true;
                     break;
               case 'w':
-                  rcfile.useWriteLog(true); // dbglogfile.setWriteDisk(true);
+                  rcfile.useWriteLog(true);
                   log_debug(_("Logging to disk enabled"));
                   break;
                   
@@ -116,48 +123,55 @@ main (int argc, char** argv)
         }
     }
     
-    // We use the Memory profiling class to check the malloc buffers
-    // in the kernel to make sure the allocations and frees happen
-    // the way we expect them too. There is no real other way to tell.
-    Memory *mem = 0;
+#ifdef HAVE_MALLINFO
     if (memdebug) {
         mem = new Memory;
         mem->startStats();
     }
+#endif
     
     Buffer buf;
+#ifdef HAVE_MALLINFO
     if (memdebug) {
         mem->addStats(__LINE__);             // take a sample
     }
-    
+#endif    
     if (buf.size() == gnash::NETBUFSIZE) {
          runtest.pass ("Buffer::size()");
      } else {
          runtest.fail ("Buffer::size()");
     }
 
+#ifdef HAVE_MALLINFO
     if (memdebug) {
         mem->addStats(__LINE__);             // take a sample
     }
+#endif
     buf.resize(112);
+#ifdef HAVE_MALLINFO
     if (memdebug) {
         mem->addStats(__LINE__);             // take a sample
     }
-
+#endif
     if (buf.size() == 112) {
          runtest.pass ("Buffer::resize()");
      } else {
          runtest.fail ("Buffer::resize()");
     }
+#ifdef HAVE_MALLINFO
     if (memdebug) {
         mem->addStats(__LINE__);             // take a sample
     }
-
+#endif
+// these tests are bogus unless you have both mallinfo()
+// and also have memory statistics gathering turned on.
+#if defined(HAVE_MALLINFO) && defined(USE_STATS_MEMORY)
     // test creating Buffers
     test_construct();
     // test destroying Buffers
     test_destruct();
-
+#endif
+    
     test_copy();
     test_find();
     test_append();
@@ -166,14 +180,22 @@ main (int argc, char** argv)
 
 // amf::Buffer::resize(unsigned int)
     
+#if defined(HAVE_MALLINFO) && defined(USE_STATS_MEMORY)
     if (memdebug) {
-        mem->analyze();
+        if (mem->analyze()) {
+            runtest.pass("Buffer doesn't leak memory");
+        } else {
+            runtest.fail("Buffer leaks memory!");
+        }
     }
-
+#endif
+    
     // cleanup
+#ifdef HAVE_MALLINFO
     if (mem) {
         delete mem;
     }
+#endif
 }
 
 void
@@ -232,14 +254,15 @@ test_copy()
     Buffer buf4;
     buf4.clear();
     buf4.copy(num);
-    memcpy(data, &num, amf::AMF_NUMBER_SIZE);
+    memcpy(data, &num, amf::AMF0_NUMBER_SIZE);
 
-    if (memcmp(data, buf4.reference(), amf::AMF_NUMBER_SIZE) == 0) {
+    if (memcmp(data, buf4.reference(), amf::AMF0_NUMBER_SIZE) == 0) {
          runtest.pass ("Buffer::copy(double)");
     } else {
          runtest.fail ("Buffer::copy(double)");
     }   
 #endif
+    delete[] data;
 }
 
 void
@@ -256,7 +279,8 @@ test_find()
 
     // populate the buffer
     buf1.copy(data, 10);
-
+    delete[] data;
+    
     // See if we can find a character
     Network::byte_t *fptr = buf1.find('c');
     if (fptr == (ptr1 + 2)) {
@@ -337,6 +361,10 @@ test_append()
     } else {
          runtest.fail ("Buffer::append(double)");
     }
+
+    delete[] data1;
+    delete[] data2;
+    delete[] data3;
     
 // amf::Buffer::append(amf::Element::amf_type_e)
 // amf::Buffer::append(amf::Buffer*)
@@ -400,27 +428,35 @@ test_remove()
          runtest.pass ("Buffer::remove(int, int)");
     } else {
          runtest.fail ("Buffer::remove(int, int)");
-    }    
+    }
+
+    delete[] data1;
+    delete[] data2;
+    delete[] data3;
 }
 
 void
 test_construct()
 {
+// these tests are bogus unless you have both mallinfo()
+// and also have memory statistics gathering turned on.
+#if defined(HAVE_MALLINFO) && defined(USE_STATS_MEMORY)
     bool valgrind = false;
+    
+    size_t fudge = sizeof(long *)*5;
     
     Memory mem(5);
     mem.addStats(__LINE__);             // take a sample
     Buffer buf1;
     mem.addStats(__LINE__);             // take a sample
-    size_t diff = mem.diffStats() - sizeof(buf1);
+    size_t diff = mem.diffStats() - sizeof(buf1);    
     if (diff > NETBUFSIZE) {
         valgrind = true;
         log_debug("Running this test case under valgrind screws up mallinfo(), so the results get skewed");
     }
-
     // Different systems allocate memory slightly differently, so about all we can do to see
     // if it worked is check to make sure it's within a tight range of possible values.
-    if ((buf1.size() == NETBUFSIZE) && (diff >= (NETBUFSIZE - (sizeof(long *) * 4)) && diff <= (NETBUFSIZE + sizeof(long *)*4))) {
+     if ((buf1.size() == NETBUFSIZE) && (diff >= (NETBUFSIZE - fudge)) && diff <= (NETBUFSIZE + fudge)) {
         runtest.pass ("Buffer::Buffer()");
     } else {
         if (valgrind) {
@@ -434,7 +470,7 @@ test_construct()
     Buffer buf2(124);
     mem.addStats(__LINE__);             // take a sample
     diff = mem.diffStats() - sizeof(long *);
-    if ((buf2.size() == 124) && (124 - (sizeof(long *) * 4)) && diff <= (124 + sizeof(long *)*4)) {
+    if ((buf2.size() == 124) && (124 - fudge) && diff <= (124 + fudge)) {
         runtest.pass ("Buffer::Buffer(size_t)");
     } else {
         if (valgrind) {
@@ -443,6 +479,7 @@ test_construct()
             runtest.fail("Buffer::Buffer(size_t)");
         }
     }
+#endif
 }
 
 // make sure when we delete a Buffer, *all* the allocated
@@ -452,6 +489,9 @@ test_construct()
 void
 test_destruct()
 {
+// these tests are bogus unless you have both mallinfo()
+// and also have memory statistics gathering turned on.
+#if defined(HAVE_MALLINFO) && defined(USE_STATS_MEMORY)
     Memory mem(5);
     mem.addStats(__LINE__);             // take a sample
     Buffer *buf1, *buf2;
@@ -475,7 +515,7 @@ test_destruct()
     } else {
         runtest.fail ("Buffer::~Buffer(size_t)");
     }
-    
+#endif
 }
 
 void
@@ -514,16 +554,17 @@ test_operators()
 
     Buffer *buf3, *buf4;
     buf3 = new Buffer;
-    buf4 = new Buffer;
     boost::uint8_t *ptr2 = buf3->reference();
     for (size_t i=1; i< buf3->size(); i++) {
         ptr2[i] = i + 'a';
     }
+    buf4 = new Buffer;
     if (buf3 == buf4) {
          runtest.fail ("Buffer::operator==(Buffer *)");
      } else {
          runtest.pass ("Buffer::operator==(Buffer *)");
     }
+    delete buf4;
 
     // This makes the new buffer be identical to the
     // the source buffer, including copying all the data.
@@ -533,7 +574,8 @@ test_operators()
     } else {
          runtest.fail ("Buffer::operator=(Buffer *)");
     }
-
+    delete buf3;
+    
     Buffer buf5(10);
     buf5.clear();
     boost::uint8_t *ptr3 = buf5.reference();

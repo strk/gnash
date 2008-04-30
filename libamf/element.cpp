@@ -65,7 +65,7 @@ const char *astype_str[] = {
 Element::Element()
     : _name(),
       _buffer(0),
-      _type(Element::NOTYPE)
+      _type(NOTYPE)
 {
 //    GNASH_REPORT_FUNCTION;
 }
@@ -77,8 +77,8 @@ Element::~Element()
     if (_buffer) {
 	delete _buffer;
     }
-    for (size_t i=0; i< _children.size(); i++) {
-	delete _children[i];
+    for (size_t i=0; i< _properties.size(); i++) {
+	delete _properties[i];
     }
     if (_name) {
 	delete[] _name;
@@ -88,18 +88,18 @@ Element::~Element()
 Element::Element(Network::byte_t *indata) 
     : _name(),
       _buffer(0),
-      _type(Element::NOTYPE)
+      _type(NOTYPE)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     init(indata);
 }
 
 Element::Element(double indata)
     : _name(),
       _buffer(0),
-      _type(Element::NOTYPE)
+      _type(NOTYPE)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     init(indata);
 }
 
@@ -112,36 +112,36 @@ Element::Element(double indata)
 Element::Element(const string &indata)
     : _name(),
       _buffer(0),
-    _type(Element::NOTYPE)
+      _type(NOTYPE)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     init(indata);
 }
 
 Element::Element(const string &name, const string &indata)
     : _name(),
       _buffer(0),
-      _type(Element::NOTYPE)
+      _type(NOTYPE)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     init(name, indata);
 }
 
 Element::Element(const string &name, bool indata)
     : _name(),
       _buffer(0),
-      _type(Element::NOTYPE)
+      _type(NOTYPE)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     init(name, indata);
 }
 
 Element::Element(bool indata)
     : _name(),
       _buffer(0),
-      _type(Element::NOTYPE)
+      _type(NOTYPE)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     init(indata);
 }
 
@@ -150,9 +150,9 @@ Element::Element(bool flag, double unknown1, double unknown2,
 		 const string &methodname)
     : _name(),
       _buffer(0),
-      _type(Element::NOTYPE)
+      _type(NOTYPE)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     init(flag, unknown1, unknown2, methodname);
 }
 
@@ -160,27 +160,27 @@ Element &
 Element::init(bool flag, double unknown1, double unknown2,
 	      const string &methodname)
 {
-    GNASH_REPORT_FUNCTION;
-    _type = Element::FUNCTION;
+//    GNASH_REPORT_FUNCTION;
+//    _type = Element::FUNCTION_AMF0;
     if (methodname.size()) {
 	setName(methodname);
     }
 
-    // Build up the children for the function block
+    // Build up the properties for the function block
     Element *el = new Element(flag);
-    _children.push_back(el);
+    _properties.push_back(el);
     
     el = new Element(unknown1);
-    _children.push_back(el);
+    _properties.push_back(el);
     
     el = new Element(unknown2);
-    _children.push_back(el);
+    _properties.push_back(el);
     
     el = new Element(methodname);
-    _children.push_back(el);
+    _properties.push_back(el);
     
     _buffer = new Buffer(3
-	+ ((AMF_HEADER_SIZE + AMF_NUMBER_SIZE) * 2)
+	+ ((AMF_HEADER_SIZE + AMF0_NUMBER_SIZE) * 2)
 	       + methodname.size() + AMF_HEADER_SIZE);
 //     memcpy(_data, &indata, _length);
     return *this;
@@ -197,14 +197,14 @@ Element &
 Element::init(const string &name, double num)
 {
 //    GNASH_REPORT_FUNCTION;
-    _type = Element::NUMBER;
+    _type = Element::NUMBER_AMF0;
     if (name.size()) {
         setName(name);
     }
     if (_buffer == 0) {
-	_buffer = new Buffer(AMF_NUMBER_SIZE);
+	_buffer = new Buffer(AMF0_NUMBER_SIZE);
     } else {
-	_buffer->resize(AMF_NUMBER_SIZE);
+	_buffer->resize(AMF0_NUMBER_SIZE);
     }
     _buffer->copy(num);
     
@@ -221,8 +221,8 @@ Element::init(const string &indata)
 Element &
 Element::init(const string &name, const string &str)
 {
-    GNASH_REPORT_FUNCTION;
-    _type = Element::STRING;
+//    GNASH_REPORT_FUNCTION;
+    _type = Element::STRING_AMF0;
     if (name.size()) {
         setName(name);
     }
@@ -247,7 +247,7 @@ Element &
 Element::init(const string &name, bool flag)
 {
 //    GNASH_REPORT_FUNCTION;
-    _type = Element::BOOLEAN;
+    _type = Element::BOOLEAN_AMF0;
     if (name.size()) {
         setName(name);
     }
@@ -374,7 +374,7 @@ Element::operator==(Element *el)
     }
 
     // FIXME: make this test more exhaustive
-    if (_children.size() == el->childrenSize()) {
+    if (_properties.size() == el->propertySize()) {
 	count++;
     }
 
@@ -397,14 +397,14 @@ Element::operator==(bool x)
 Buffer *
 Element::encode()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     Buffer *buf = 0;
-    if (_type == Element::OBJECT) {
+    if (_type == Element::OBJECT_AMF0) {
 	// FIXME: we probably want a better size, to avoid the other
 	// appends from having to resize and copy the data all the time.
 	buf = new Buffer(128);
 	buf->clear();		// FIXME: temporary, makes buffers cleaner in gdb.
-	buf->append(Element::OBJECT);
+	buf->append(Element::OBJECT_AMF0);
 // 	string name = _name;
 	if (_name > 0) {
 // 	    Buffer *top = AMF::encodeElement(this);
@@ -416,8 +416,8 @@ Element::encode()
 	    buf->append(enclength);
 	}
 
-	for (size_t i=0; i<_children.size(); i++) {
-	    Buffer *partial = AMF::encodeElement(_children[i]);
+	for (size_t i=0; i<_properties.size(); i++) {
+	    Buffer *partial = AMF::encodeElement(_properties[i]);
 //	    log_debug("Encoded partial size is %d", partial->size());
 	    if (partial) {
 		buf->append(partial);
@@ -437,11 +437,11 @@ Element::encode()
 }
 
 Element *
-Element::operator[](int index)
+Element::operator[](size_t index)
 {
-    GNASH_REPORT_FUNCTION;
-    if (index <= _children.size()) {
-	return _children[index];
+//    GNASH_REPORT_FUNCTION;
+    if (index <= _properties.size()) {
+	return _properties[index];
     }
     
     return 0;
@@ -479,7 +479,7 @@ Element &
 Element::makeString(Network::byte_t *data, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
-    _type = Element::STRING;
+    _type = Element::STRING_AMF0;
     // Make room for an additional NULL terminator
     check_buffer(size+1);
     _buffer->copy(data, size);
@@ -499,7 +499,7 @@ Element &
 Element::makeNullString()
 {
 //    GNASH_REPORT_FUNCTION;
-    _type = Element::STRING;
+    _type = Element::STRING_AMF0;
     check_buffer(sizeof(Network::byte_t));
     *(_buffer->reference()) = 0;
     return *this;
@@ -509,7 +509,7 @@ Element &
 Element::makeString(const char *str, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
-    _type = Element::STRING;
+    _type = Element::STRING_AMF0;
     Network::byte_t *ptr = reinterpret_cast<Network::byte_t *>(const_cast<char *>(str));
     return makeString(ptr, size);
 }
@@ -536,8 +536,8 @@ Element::makeNumber(Network::byte_t *data)
 {
 //    GNASH_REPORT_FUNCTION;
     double num = *reinterpret_cast<const double*>(data);
-    _type = Element::NUMBER;
-    check_buffer(AMF_NUMBER_SIZE);
+    _type = Element::NUMBER_AMF0;
+    check_buffer(AMF0_NUMBER_SIZE);
     _buffer->copy(num);
     
     return *this;
@@ -547,8 +547,8 @@ Element &
 Element::makeNumber(double num)
 {
 //    GNASH_REPORT_FUNCTION;
-    _type = Element::NUMBER;
-    check_buffer(AMF_NUMBER_SIZE);
+    _type = Element::NUMBER_AMF0;
+    check_buffer(AMF0_NUMBER_SIZE);
     _buffer->copy(num);
 
     return *this;
@@ -568,7 +568,7 @@ Element &
 Element::makeBoolean(bool flag)
 {
 //    GNASH_REPORT_FUNCTION;
-    _type = Element::BOOLEAN;
+    _type = Element::BOOLEAN_AMF0;
     check_buffer(sizeof(bool));
     _buffer->append(flag);
     return *this;
@@ -597,7 +597,7 @@ Element &
 Element::makeUndefined()
 {
 //    GNASH_REPORT_FUNCTION;
-    _type = Element::UNDEFINED;
+    _type = Element::UNDEFINED_AMF0;
     return *this;
 }
 
@@ -615,7 +615,7 @@ Element &
 Element::makeNull()
 {
 //    GNASH_REPORT_FUNCTION;
-    _type = Element::NULL_VALUE;
+    _type = Element::NULL_AMF0;
     check_buffer(sizeof(Network::byte_t));
     *(_buffer->reference()) = 0;
     return *this;
@@ -635,7 +635,7 @@ Element &
 Element::makeObject()
 {
 //    GNASH_REPORT_FUNCTION;
-    _type = OBJECT;
+    _type = OBJECT_AMF0;
     return *this;
 }
 
@@ -646,7 +646,7 @@ Element::makeObject(const std::string &name)
     if (name.size()) {
         setName(name);
     }
-    _type = OBJECT;
+    _type = OBJECT_AMF0;
     return *this;
 }
 
@@ -654,7 +654,7 @@ Element &
 Element::makeObject(Network::byte_t *indata, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
-    _type = Element::OBJECT;
+    _type = Element::OBJECT_AMF0;
     check_buffer(size);
     _buffer->copy(indata, size);
     return *this;
@@ -664,7 +664,7 @@ Element &
 Element::makeObjectEnd()
 {
 //    GNASH_REPORT_FUNCTION;
-    _type = Element::OBJECT_END;
+    _type = Element::OBJECT_END_AMF0;
     return *this;
 }
 
@@ -672,7 +672,7 @@ Element &
 Element::makeXMLObject(const std::string &name)
 {
 //    GNASH_REPORT_FUNCTION;
-    _type = Element::XML_OBJECT;    
+    _type = Element::XML_OBJECT_AMF0;
     if (name.size()) {
         setName(name);
     }
@@ -683,7 +683,7 @@ Element &
 Element::makeXMLObject(Network::byte_t *indata, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
-    _type = Element::XML_OBJECT;
+    _type = Element::XML_OBJECT_AMF0;
     check_buffer(size);
     _buffer->copy(indata, size);
     
@@ -694,7 +694,7 @@ Element &
 Element::makeTypedObject(const std::string &name)
 {
 //    GNASH_REPORT_FUNCTION;
-    _type = Element::TYPED_OBJECT;    
+    _type = Element::TYPED_OBJECT_AMF0;  
     if (name.size()) {
         setName(name);
     }
@@ -705,7 +705,7 @@ Element &
 Element::makeTypedObject(Network::byte_t *indata, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
-    _type = Element::TYPED_OBJECT;
+    _type = Element::TYPED_OBJECT_AMF0;
     check_buffer(size);
     _buffer->copy(indata, size);
     return *this;
@@ -715,7 +715,7 @@ Element &
 Element::makeReference()
 {
 //    GNASH_REPORT_FUNCTION;
-    _type = Element::REFERENCE;
+    _type = Element::REFERENCE_AMF0;
     return *this;
 }
 
@@ -723,7 +723,7 @@ Element &
 Element::makeReference(Network::byte_t *indata, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
-    _type = Element::REFERENCE;
+    _type = Element::REFERENCE_AMF0;
     check_buffer(size);
     _buffer->copy(indata, size);
     return *this;
@@ -733,15 +733,15 @@ Element &
 Element::makeMovieClip()
 {
 //    GNASH_REPORT_FUNCTION;
-    _type = Element::MOVIECLIP;
+    _type = Element::MOVIECLIP_AMF0;
     return *this;
 }
 
 Element &
 Element::makeMovieClip(Network::byte_t *indata, size_t size)
 {
-    GNASH_REPORT_FUNCTION;
-    _type = Element::MOVIECLIP;
+//    GNASH_REPORT_FUNCTION;
+    _type = Element::MOVIECLIP_AMF0;
     check_buffer(size);
     _buffer->copy(indata, size);
     return *this;    
@@ -751,7 +751,7 @@ Element &
 Element::makeECMAArray()
 {
 //    GNASH_REPORT_FUNCTION;
-    _type = Element::ECMA_ARRAY;
+    _type = Element::ECMA_ARRAY_AMF0;
     return *this;
 }
 
@@ -759,7 +759,7 @@ Element &
 Element::makeECMAArray(Network::byte_t *indata, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
-    _type = Element::ECMA_ARRAY;
+    _type = Element::ECMA_ARRAY_AMF0;
     check_buffer(size);
     _buffer->copy(indata, size);
     return *this;    
@@ -769,7 +769,7 @@ Element &
 Element::makeUnsupported()
 {
 //    GNASH_REPORT_FUNCTION;    
-    _type = Element::UNSUPPORTED;
+    _type = Element::UNSUPPORTED_AMF0;
     return *this;
 }
 
@@ -777,7 +777,7 @@ Element &
 Element::makeUnsupported(Network::byte_t *indata, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;    
-    _type = Element::UNSUPPORTED;
+    _type = Element::UNSUPPORTED_AMF0;
     check_buffer(size);
     _buffer->copy(indata, size);
     return *this;
@@ -787,7 +787,7 @@ Element &
 Element::makeLongString()
 {
 //    GNASH_REPORT_FUNCTION;    
-    _type = Element::LONG_STRING;
+    _type = Element::LONG_STRING_AMF0;
     return *this;
 }
 
@@ -795,7 +795,7 @@ Element &
 Element::makeLongString(Network::byte_t *indata, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;    
-    _type = Element::LONG_STRING;
+    _type = Element::LONG_STRING_AMF0;
     check_buffer(size);
     _buffer->copy(indata, size);
     return *this;
@@ -805,7 +805,7 @@ Element &
 Element::makeRecordSet()
 {
 //    GNASH_REPORT_FUNCTION;
-    _type = Element::RECORD_SET;
+    _type = Element::RECORD_SET_AMF0;
     return *this;
 }
 
@@ -813,7 +813,7 @@ Element &
 Element::makeDate(Network::byte_t *date)
 {
 //    GNASH_REPORT_FUNCTION;
-    _type = Element::DATE;
+    _type = Element::DATE_AMF0;
     size_t size = sizeof(long);
     check_buffer(size);
     _buffer->copy(date, sizeof(long));
@@ -824,7 +824,7 @@ Element &
 Element::makeStrictArray()
 {
 //    GNASH_REPORT_FUNCTION;
-    _type = Element::STRICT_ARRAY;
+    _type = Element::STRICT_ARRAY_AMF0;
     return *this;
 }
 
@@ -832,7 +832,7 @@ Element &
 Element::makeStrictArray(Network::byte_t *indata, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;    
-    _type = Element::STRICT_ARRAY;
+    _type = Element::STRICT_ARRAY_AMF0;
     check_buffer(size);
     _buffer->copy(indata, size);
     return *this;
@@ -898,15 +898,13 @@ Element::dump()
     cerr << astype_str[_type] << ": ";
 
     switch (_type) {
-      case Element::NOTYPE:
-	  break;
-      case Element::NUMBER:
+      case Element::NUMBER_AMF0:
 	  cerr << to_number() << endl;
 	  break;
-      case Element::BOOLEAN:
+      case Element::BOOLEAN_AMF0:
 	  cerr << (to_bool() ? "true" : "false") << endl;
 	  break;
-      case Element::STRING:
+      case Element::STRING_AMF0:
 	  cerr << "(" << getLength() << " bytes): ";
 	  if (getLength() > 0) {
 	      cerr << "\t\"" << to_string() << "\"" << endl;
@@ -914,31 +912,31 @@ Element::dump()
 	      cerr << endl;
 	  }
 	  break;
-      case Element::OBJECT:
+      case Element::OBJECT_AMF0:
 	  break;
-      case Element::MOVIECLIP:
-      case Element::NULL_VALUE: 
-      case Element::UNDEFINED:
-      case Element::REFERENCE:
-      case Element::ECMA_ARRAY:
-      case Element::OBJECT_END:
-      case Element::STRICT_ARRAY:
-      case Element::DATE:
-      case Element::LONG_STRING:
-      case Element::UNSUPPORTED:
-      case Element::RECORD_SET:
-      case Element::XML_OBJECT:
-      case Element::TYPED_OBJECT:
+      case Element::MOVIECLIP_AMF0:
+      case Element::NULL_AMF0: 
+      case Element::UNDEFINED_AMF0:
+      case Element::REFERENCE_AMF0:
+      case Element::ECMA_ARRAY_AMF0:
+      case Element::OBJECT_END_AMF0:
+      case Element::STRICT_ARRAY_AMF0:
+      case Element::DATE_AMF0:
+      case Element::LONG_STRING_AMF0:
+      case Element::UNSUPPORTED_AMF0:
+      case Element::RECORD_SET_AMF0:
+      case Element::XML_OBJECT_AMF0:
+      case Element::TYPED_OBJECT_AMF0:
 //	  cerr << "AMF data is: 0x" << hexify(_data, _length, false) << endl;
 	  log_debug("FIXME: got a typed object!");
 	  break;
-      case Element::VARIABLE:
-      case Element::FUNCTION:
- 	  cerr << "# of children in object: " << _children.size() << endl;
-	  for (size_t i=0; i< _children.size(); i++) {
-	      _children[i]->dump();
-	  }
-	  break;
+//       case Element::VARIABLE:
+//       case Element::FUNCTION:
+//  	  cerr << "# of properties in object: " << properties.size() << endl;
+// 	  for (size_t i=0; i< properties.size(); i++) {
+// 	      properties[i]->dump();
+// 	  }
+// 	  break;
       default:
 //	  log_unimpl("%s: type %d", __PRETTY_FUNCTION__, (int)_type);
 	  break;
