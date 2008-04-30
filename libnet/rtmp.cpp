@@ -127,21 +127,21 @@ RTMP::~RTMP()
 }
 
 void
-RTMP::addVariable(amf::Element *el)
+RTMP::addProperty(amf::Element *el)
 {
 //    GNASH_REPORT_FUNCTION;
     _variables[el->getName()] = el;
 }
 
 void
-RTMP::addVariable(char *name, amf::Element *el)
+RTMP::addProperty(char *name, amf::Element *el)
 { 
 //    GNASH_REPORT_FUNCTION;
     _variables[name] = el;
 }
 
 amf::Element *
-RTMP::getVariable(const std::string &name)
+RTMP::getProperty(const std::string &name)
 {
 //    GNASH_REPORT_FUNCTION;
 //    return _variables[name.c_str()];
@@ -333,8 +333,8 @@ RTMP::packetRead(amf::Buffer *buf)
     log_debug (_("Reading AMF packets till we're done..."));
     buf->dump();
     while (ptr < end) {
-	amf::Element *el = amf.extractVariable(ptr);
-	addVariable(el);
+	amf::Element *el = amf.extractProperty(ptr);
+	addProperty(el);
 	el->dump();
     }
     ptr += 1;
@@ -346,16 +346,16 @@ RTMP::packetRead(amf::Buffer *buf)
 	buf = _handler->merge(buf);
     }
     while ((ptr - buf->begin()) < actual_size) {
-	amf::Element *el = amf.extractVariable(ptr);
-	addVariable(el);
+	amf::Element *el = amf.extractProperty(ptr);
+	addProperty(el);
 	el->dump();		// FIXME: dump the AMF objects as they are read in
     }
 
     dump();
     
-    amf::Element *url = getVariable("tcUrl");
-    amf::Element *file = getVariable("swfUrl");
-    amf::Element *app = getVariable("app");
+    amf::Element *url = getProperty("tcUrl");
+    amf::Element *file = getProperty("swfUrl");
+    amf::Element *app = getProperty("app");
 
     if (file) {
 	log_debug("SWF file %s", file->getData());

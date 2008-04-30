@@ -1277,7 +1277,7 @@ httphandler(Handler::thread_params_t *args)
 			   st.st_size, filefd);
 		do {
 		    amf::Buffer *buf = new amf::Buffer;
-		    ret = ::read(filefd, buf->reference(), buf->size());
+		    ret = read(filefd, buf->reference(), buf->size());
 		    if (ret == 0) { // the file is done
 			delete buf;
 			break;

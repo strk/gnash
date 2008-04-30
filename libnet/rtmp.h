@@ -177,10 +177,10 @@ public:
     bool packetSend(amf::Buffer *buf);
     bool packetRead(amf::Buffer *buf);
 
-    void addVariable(amf::Element *el);
-    void addVariable(char *name, amf::Element *el);
-    void addVariable(std::string &name, amf::Element *el);
-    amf::Element *getVariable(const std::string &name);
+    void addProperty(amf::Element *el);
+    void addProperty(char *name, amf::Element *el);
+    void addProperty(std::string &name, amf::Element *el);
+    amf::Element *getProperty(const std::string &name);
     void setHandler(Handler *hand) { _handler = hand; };
     int headerSize(gnash::Network::byte_t header);
     Network::byte_t *parseHeader(gnash::Network::byte_t *header);

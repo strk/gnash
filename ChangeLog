@@ -1,5 +1,7 @@
 2008-04-29  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* libnet/rtmp.{h,cpp}: Use *Property instead of *Variable.
+	
 	* configure.ac: Don't look for mallinfo() when using jemalloc().
 	
 	* libamf/amf.h: Use _AMF0* on Element types.

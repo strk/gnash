@@ -228,8 +228,8 @@ RTMPServer::packetRead(amf::Buffer *buf)
     buf->dump();
     while (ptr < end) {
 	amf::Element *el = new amf::Element;
-	ptr = amf.extractVariable(el, ptr);
-	addVariable(el);
+	ptr = amf.extractProperty(el, ptr);
+	addProperty(el);
 	el->dump();
     }
     ptr += 1;
@@ -243,8 +243,8 @@ RTMPServer::packetRead(amf::Buffer *buf)
     while ((ptr - buf->begin()) < static_cast<int>(actual_size)) {
 	amf::Element *el = new amf::Element;
 	if (ptr) {
-	    ptr = amf.extractVariable(el, ptr);
-	    addVariable(el);
+	    ptr = amf.extractProperty(el, ptr);
+	    addProperty(el);
 	} else {
 	    return true;
 	}
@@ -271,9 +271,9 @@ RTMPServer::packetRead(amf::Buffer *buf)
           break;
     };
     
-    Element *url = getVariable("tcUrl");
-    Element *file = getVariable("swfUrl");
-    Element *app = getVariable("app");
+    Element *url = getProperty("tcUrl");
+    Element *file = getProperty("swfUrl");
+    Element *app = getProperty("app");
 
     if (file) {
 	log_debug("SWF file %s", file->getData());
