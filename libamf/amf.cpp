@@ -864,7 +864,7 @@ AMF::extractProperty(Network::byte_t *in)
     Element::amf0_type_e type = static_cast<Element::amf0_type_e>(c);
     tmpptr++;
     if (type != Element::TYPED_OBJECT_AMF0) {
-        log_debug(_("AMF type is: %s"), amftype_str[(int)type]);
+//        log_debug(_("AMF type is: %s"), amftype_str[(int)type]);
 	el->setType(type);
     }
 
