@@ -28,9 +28,10 @@ SC_XMLTESTS =			\
 	dict_override.xml	\
 	initaction_in_definesprite.xml \
 	zeroframe_definesprite.xml \
+	background.xml \
 	$(NULL)
 
-EXTRA_DIST = $(SC_XMLTESTS) background.xml
+EXTRA_DIST = $(SC_XMLTESTS) 
 
 if ENABLE_SWFMILL
 

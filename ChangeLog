@@ -1,5 +1,10 @@
 2008-04-30 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-swfmill.all/Makefile.am: don't forget
+	  to clean background.swf (distcheck fix).
+
+2008-04-30 Sandro Santilli <strk@keybit.net>
+
 	* libamf/amf.{cpp,h}, libamf/lcshm.{cpp,h},
 	  libamf/sol.cpp, libnet/rtmp.cpp:
 	  Add boundary checking in AMF parser, will throw
