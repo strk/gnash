@@ -163,14 +163,14 @@ public:
 	///  See character::get_accept_anim_moves()
 	///
 	/// @param color_xform
-	///	The color tranform to assign to the new character.
+	///	The color tranform to assign to the character at the given depth.
 	///	If NULL the default color transform will be kept.
 	//
 	/// @param mat
-	///	The matrix tranform to assign to the new character.
+	///	The matrix tranform to assign to the character at the given depth.
 	///	If NULL the default matrix will be kept.
 	///
-	void	move_display_object(
+	void	move_character(
 		int depth,
 		const cxform* color_xform,
 		const matrix* mat,
@@ -181,7 +181,7 @@ public:
 	//
 	/// Calls unload on the removed character.
 	///
-	void	remove_display_object(int depth);
+	void	remove_character(int depth);
 
 	/// Remove all unloaded character from the list
 	//

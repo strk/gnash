@@ -3346,7 +3346,7 @@ sprite_instance::move_display_object(const SWF::PlaceObject2Tag* tag)
     DisplayList& dlist = const_cast<DisplayList &>( getDisplayList() );
 	
 	int ratio = tag->getRatio();
-    dlist.move_display_object(
+    dlist.move_character(
         tag->getDepth(), 
         tag->hasCxform() ? &tag->getCxform() : NULL,
         tag->hasMatrix() ? &tag->getMatrix() : NULL,

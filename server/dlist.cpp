@@ -344,10 +344,10 @@ DisplayList::replace_character(
 }
   
   
-// Updates the transform properties of the object at
+// Updates the transform properties of the character at
 // the specified depth.
 void
-DisplayList::move_display_object(
+DisplayList::move_character(
   int depth,
   const cxform* color_xform,
   const matrix* mat,
@@ -364,7 +364,7 @@ DisplayList::move_display_object(
   {
     // FIXME, should this be log_aserror?
     IF_VERBOSE_MALFORMED_SWF(
-    log_swferror(_("move_display_object() -- "
+    log_swferror(_("move_character() -- "
       "can't find object at depth %d"),
       depth);
     );
@@ -404,7 +404,7 @@ DisplayList::move_display_object(
   
 // Removes the object at the specified depth.
 void
-DisplayList::remove_display_object(int depth)
+DisplayList::remove_character(int depth)
 {
   //GNASH_REPORT_FUNCTION;
 
@@ -417,7 +417,7 @@ DisplayList::remove_display_object(int depth)
   container_type::size_type size = _charsByDepth.size();
 #endif
 
-  // TODO: would it be legal to call remove_display_object with a depth
+  // TODO: would it be legal to call remove_character with a depth
   //       in the "removed" zone ?
   // TODO: optimize to take by-depth order into account
   container_type::iterator it = std::find_if(

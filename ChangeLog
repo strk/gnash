@@ -1,3 +1,10 @@
+2008-04-29 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* server/dlist.{h,cpp}: move_display_object() renamed to move_character(),
+	  remove_display_object() renamed to remove_character(). maintain name
+	  consistance.
+	* server/sprite_instance.{h,cpp}: adop the new names. 	  
+	  
 2008-04-29  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* libbase/utility.h: Use C ctyle cast for pthread_self() to work

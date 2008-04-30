@@ -390,7 +390,7 @@ public:
 	{
 	    set_invalidated();
 		DisplayList& dlist = const_cast<DisplayList &>( getDisplayList() );
-	    dlist.remove_display_object(depth);
+	    dlist.remove_character(depth);
 	}
 
 	/// Attach the given character instance to current display list
