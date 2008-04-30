@@ -21,6 +21,8 @@
 #include "gnashconfig.h"
 #endif
 
+#include "GnashException.h"
+
 #include <string>
 #include <vector>
 
@@ -43,6 +45,12 @@ using namespace gnash;
 
 namespace amf 
 {
+
+#define ENSUREBYTES(from, toofar, size) { \
+	if ( from+size >= toofar ) \
+		throw ParserException("Premature end of AMF stream"); \
+}
+
 
 // These are used to print more intelligent debug messages
 const char *amftype_str[] = {
@@ -726,11 +734,14 @@ Element *
 AMF::extractAMF(Buffer *buf)
 {
 //    GNASH_REPORT_FUNCTION;
-    return extractAMF(buf->reference());
+    Network::byte_t* start = buf->reference();
+    Network::byte_t* tooFar = start+buf->size();
+    
+    return extractAMF(start, tooFar);
 }
 
 Element *
-AMF::extractAMF(Network::byte_t *in)
+AMF::extractAMF(Network::byte_t *in, Network::byte_t* tooFar)
 {
 //    GNASH_REPORT_FUNCTION;
 
@@ -757,6 +768,9 @@ AMF::extractAMF(Network::byte_t *in)
     // mostly to make valgrind shut up, as it has a tendency to
     // complain about legit code when it comes to all this byte
     // manipulation stuff.
+#ifndef GNASH_TRUST_AMF
+    ENSUREBYTES(tmpptr, tooFar, 1);
+#endif
     char c = *(reinterpret_cast<char *>(tmpptr));
     Element::amf0_type_e type = static_cast<Element::amf0_type_e>(c);
     tmpptr++;                        // skip the header byte
@@ -764,20 +778,32 @@ AMF::extractAMF(Network::byte_t *in)
     AMF amf_obj;
     switch (type) {
       case Element::NUMBER_AMF0:
-	  el->makeNumber(tmpptr);
+#ifndef GNASH_TRUST_AMF
+          ENSUREBYTES(tmpptr, tooFar, AMF0_NUMBER_SIZE);
+#endif
+	  el->makeNumber(tmpptr); 
 	  tmpptr += AMF0_NUMBER_SIZE; // all numbers are 8 bit big endian
 	  break;
       case Element::BOOLEAN_AMF0:
+#ifndef GNASH_TRUST_AMF
+          ENSUREBYTES(tmpptr, tooFar, sizeof(boost::uint16_t));
+#endif
 	  el->makeBoolean(tmpptr);
 	  tmpptr += sizeof(boost::uint16_t); // although a bool is one byte, it's stored as a short
 	  break;
       case Element::STRING_AMF0:
 	  // get the length of the name
+#ifndef GNASH_TRUST_AMF
+          ENSUREBYTES(tmpptr, tooFar, sizeof(boost::uint16_t));
+#endif
 	  length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
 	  tmpptr += sizeof(boost::uint16_t);
 	  log_debug(_("AMF String length is: %d"), length);
 	  if (length > 0) {
 	      // get the name of the element
+#ifndef GNASH_TRUST_AMF
+              ENSUREBYTES(tmpptr, tooFar, length);
+#endif
 	      el->makeString(tmpptr, length);
 	      log_debug(_("AMF String is: %s"), el->to_string());
 	      tmpptr += length;
@@ -789,10 +815,13 @@ AMF::extractAMF(Network::byte_t *in)
 	  el->makeObject();
 	  Element *child;
 	  do {
-	      child = amf_obj.extractProperty(tmpptr);
+	      child = amf_obj.extractProperty(tmpptr, tooFar); 
+#ifndef GNASH_TRUST_AMF
+              ENSUREBYTES(tmpptr, tooFar, amf_obj.totalsize()-1);
+#endif
 	      tmpptr += amf_obj.totalsize() - 1;
 	      el->addProperty(child);
-	  } while (*tmpptr != Element::OBJECT_END_AMF0);
+	  } while (tmpptr < tooFar && *tmpptr != Element::OBJECT_END_AMF0);
 	  break;
       case Element::MOVIECLIP_AMF0:
       case Element::NULL_AMF0:
@@ -822,16 +851,23 @@ Element *
 AMF::extractProperty(Buffer *buf)
 {
 //    GNASH_REPORT_FUNCTION;
-    return extractProperty(buf->reference());
+
+    Network::byte_t* start = buf->reference();
+    Network::byte_t* tooFar = start+buf->size();
+    return extractProperty(start, tooFar);
 }
 
 Element *
-AMF::extractProperty(Network::byte_t *in)
+AMF::extractProperty(Network::byte_t *in, Network::byte_t* tooFar)
 {
 //    GNASH_REPORT_FUNCTION;
     Network::byte_t *tmpptr = in;
     boost::uint16_t length = 0;
     Network::byte_t len = 0;
+
+#ifndef GNASH_TRUST_AMF
+    ENSUREBYTES(tmpptr, tooFar, sizeof(boost::uint16_t));
+#endif
 
     length = *(reinterpret_cast<boost::uint16_t *>(tmpptr));
 //     length = tmpptr[1];		// FIXME: hack. This supports
@@ -854,15 +890,22 @@ AMF::extractProperty(Network::byte_t *in)
     // get the name of the element, the length of which we just decoded
     if (length > 0) {
 //        log_debug(_("AMF element length is: %d"), length);
+#ifndef GNASH_TRUST_AMF
+	ENSUREBYTES(tmpptr, tooFar, length);
+#endif
         el->setName(tmpptr, length);
 //	log_debug(_("AMF element name is: %s"), el->getName());
 	tmpptr += length;
     }
     
     // get the type of the element, which is a single byte.
+#ifndef GNASH_TRUST_AMF
+    ENSUREBYTES(tmpptr, tooFar, 1);
+#endif
     char c = *(reinterpret_cast<char *>(tmpptr));
     Element::amf0_type_e type = static_cast<Element::amf0_type_e>(c);
     tmpptr++;
+
     if (type != Element::TYPED_OBJECT_AMF0) {
 //        log_debug(_("AMF type is: %s"), amftype_str[(int)type]);
 	el->setType(type);
@@ -871,6 +914,9 @@ AMF::extractProperty(Network::byte_t *in)
     switch (type) {
       case Element::NUMBER_AMF0:
       {
+#ifndef GNASH_TRUST_AMF
+          ENSUREBYTES(tmpptr, tooFar, sizeof(double));
+#endif
 	  double num = *reinterpret_cast<const double*>(tmpptr);
           swapBytes(&num, AMF0_NUMBER_SIZE);
 	  el->makeNumber(num);
@@ -879,6 +925,12 @@ AMF::extractProperty(Network::byte_t *in)
       }
       case Element::BOOLEAN_AMF0:
       {
+#ifndef GNASH_TRUST_AMF
+          ENSUREBYTES(tmpptr, tooFar, 1); 
+#endif
+          // 
+          // @@strk@@ :  we read 2 bytes from ::extractAMF, why only 1 here in ::extractProperty ?
+          //
 	  bool sheet = *(reinterpret_cast<bool *>(tmpptr));
           el->makeBoolean(sheet);
 	  tmpptr += 1;
@@ -887,10 +939,16 @@ AMF::extractProperty(Network::byte_t *in)
       case Element::STRING_AMF0:
 	  // extractString returns a printable char *. First 2 bytes for the length,
 	  // and then read the string, which is NOT NULL terminated.
+#ifndef GNASH_TRUST_AMF
+          ENSUREBYTES(tmpptr, tooFar, sizeof(boost::uint16_t)); 
+#endif
 	  length = *reinterpret_cast<boost::uint16_t *>(tmpptr);
 	  swapBytes(&length, sizeof(boost::uint16_t));
 	  tmpptr += sizeof(boost::uint16_t);
 	  if (length > 0) {
+#ifndef GNASH_TRUST_AMF
+              ENSUREBYTES(tmpptr, tooFar, length);
+#endif
 	      el->makeString(tmpptr, length);
 	      tmpptr += length;
 	  }
@@ -901,7 +959,7 @@ AMF::extractProperty(Network::byte_t *in)
 //  	  log_debug(_("Property \"%s\" is: %s"), el->getName(), el->to_string());
           break;
       case Element::OBJECT_AMF0:
-  	  while (*(tmpptr++) != Element::OBJECT_END_AMF0) {
+  	  while ( (tmpptr<tooFar) && ( *(tmpptr++) != Element::OBJECT_END_AMF0) ) {
 //	      log_debug("Looking for end of object...");
   	  }
 	  break;
@@ -920,11 +978,11 @@ AMF::extractProperty(Network::byte_t *in)
 	  el->makeObjectEnd();
           break;
       case Element::TYPED_OBJECT_AMF0:
-	  el->makeTypedObject(tmpptr, 0);
+	  el->makeTypedObject(tmpptr, 0); // TODO: pass tooFar over ?
           break;
       case Element::STRICT_ARRAY_AMF0:
       case Element::DATE_AMF0:
-	  el->makeDate(tmpptr);
+	  el->makeDate(tmpptr); // TODO: pass tooFar over ?
           break;
       case Element::LONG_STRING_AMF0:
       case Element::UNSUPPORTED_AMF0:

@@ -298,6 +298,7 @@ RTMP::packetRead(amf::Buffer *buf)
     int packetsize = 0;
     unsigned int amf_index, headersize;
     Network::byte_t *ptr = buf->reference();
+    Network::byte_t *tooFar = ptr+buf->size();
     AMF amf;
     
 //    \003\000\000\017\000\000%G￿%@\024\000\000\000\000\002\000\aconnect\000?%G￿%@\000\000\000\000\000\000\003\000\003app\002\000#software/gnash/tests/1153948634.flv\000\bflashVer\002\000\fLNX 6,0,82,0\000\006swfUrl\002\000\035file:///file|%2Ftmp%2Fout.swf%G￿%@\000\005tcUrl\002\0004rtmp://localhost/software/gnash/tests/1153948634
@@ -326,14 +327,14 @@ RTMP::packetRead(amf::Buffer *buf)
     ptr = parseHeader(ptr);
 //     ptr += headersize;
     
-    amf::Element *el = amf.extractAMF(ptr);
+    amf::Element *el = amf.extractAMF(ptr, tooFar);
     el->dump();
-    el = amf.extractAMF(ptr) + 1;
+    el = amf.extractAMF(ptr, tooFar) + 1; // @@strk@@ : what's the +1 for ?
     el->dump();
     log_debug (_("Reading AMF packets till we're done..."));
     buf->dump();
     while (ptr < end) {
-	amf::Element *el = amf.extractProperty(ptr);
+	amf::Element *el = amf.extractProperty(ptr, tooFar);
 	addProperty(el);
 	el->dump();
     }
@@ -346,7 +347,7 @@ RTMP::packetRead(amf::Buffer *buf)
 	buf = _handler->merge(buf);
     }
     while ((ptr - buf->begin()) < actual_size) {
-	amf::Element *el = amf.extractProperty(ptr);
+	amf::Element *el = amf.extractProperty(ptr, tooFar);
 	addProperty(el);
 	el->dump();		// FIXME: dump the AMF objects as they are read in
     }

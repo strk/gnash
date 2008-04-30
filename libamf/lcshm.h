@@ -86,7 +86,18 @@ public:
 	      std::vector<amf::Element *> &data);
     void recv(std::string &name, std::string &dataname, amf::Element *data);
     std::vector<amf::Element *> parseBody(gnash::Network::byte_t *data);
-    gnash::Network::byte_t *parseHeader(gnash::Network::byte_t *data);
+
+    /// @param in
+    ///    Pointer to start parsing from
+    //
+    /// @param tooFar
+    ///    A pointer to one-byte-past the last valid memory
+    ///    address within the buffer.
+    ///
+    /// May throw a ParserException 
+    ///
+    gnash::Network::byte_t *parseHeader(gnash::Network::byte_t *data, gnash::Network::byte_t* tooFar);
+
     gnash::Network::byte_t *formatHeader(const std::string &con, const std::string &host, bool domain);
     void addConnectionName(std::string &name);
     void addHostname(std::string &name);

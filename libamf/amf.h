@@ -246,13 +246,40 @@ public:
     // to keep track where we are in the memory buffer so these can't
     // be static.
     
-    // Extract an AMF object. These have no name like the variables do.
-    amf::Element *extractAMF(gnash::Network::byte_t *in);
+    /// Extract an AMF object. These have no name like the variables do.
+    //
+    /// @param in
+    ///    Pointer to start parsing from
+    //
+    /// @param tooFar
+    ///    A pointer to one-byte-past the last valid memory
+    ///    address within the buffer.
+    ///
+    /// May throw a ParserException 
+    ///
+    amf::Element *extractAMF(gnash::Network::byte_t *in, gnash::Network::byte_t* tooFar);
+
+    /// Extract an AMF object. These have no name like the variables do.
     amf::Element *extractAMF(Buffer *buf);
     
-    // Extract an AMF "variable", which is a standard AMF object preceeded by
-    // just a length and a name field.
-    amf::Element *extractProperty(gnash::Network::byte_t *in);
+    /// \brief
+    /// Extract an AMF "variable", which is a standard AMF object preceeded by
+    /// just a length and a name field.
+    ///
+    /// @param in
+    ///    Pointer to start parsing property from
+    //
+    /// @param tooFar
+    ///    A pointer to one-byte-past the last valid memory
+    ///    address within the buffer.
+    ///
+    /// May throw a ParserException 
+    ///
+    amf::Element *extractProperty(gnash::Network::byte_t *in, gnash::Network::byte_t* tooFar);
+
+    /// \brief
+    /// Extract an AMF "variable", which is a standard AMF object preceeded by
+    /// just a length and a name field.
     amf::Element *extractProperty(Buffer *buf);
 
     size_t totalsize() { return _totalsize; }

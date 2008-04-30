@@ -33,6 +33,7 @@
 #include "amf.h"
 #include "shm.h"
 #include "element.h"
+#include "GnashException.h"
 #include "lcshm.h"
 
 using namespace std;
@@ -58,6 +59,11 @@ const int LC_LISTENERS_START  = MAX_LC_HEADER_SIZE +  LC_HEADER_SIZE;
 #ifndef MAXHOSTNAMELEN
 # define MAXHOSTNAMELEN 64
 #endif
+
+#define ENSUREBYTES(from, toofar, size) { \
+	if ( from+size >= toofar ) \
+		throw ParserException("Premature end of AMF stream"); \
+}
 
 // \class LocalConnection
 /// \brief Open a connection between two SWF movies so they can send
@@ -294,7 +300,7 @@ LcShm::parseBody(Network::byte_t *data)
 // other web sites have claimed there is a length field in the initial
 // shared memory segment header, I've never seen one in my tests.
 Network::byte_t *
-LcShm::parseHeader(Network::byte_t *data)
+LcShm::parseHeader(Network::byte_t *data, Network::byte_t* tooFar)
 {
 //    GNASH_REPORT_FUNCTION;
     Network::byte_t *ptr = data;
@@ -303,6 +309,10 @@ LcShm::parseHeader(Network::byte_t *data)
         log_debug("No data pointer to parse!");
         return 0;
     }
+
+#ifndef GNASH_TRUST_AMF
+    ENSUREBYTES(ptr, tooFar, LC_HEADER_SIZE);
+#endif
     
     memcpy(&_header, ptr, LC_HEADER_SIZE);
 //     memcpy(&_object, data + LC_HEADER_SIZE, _header.length);
@@ -314,7 +324,7 @@ LcShm::parseHeader(Network::byte_t *data)
 
     
     AMF amf;
-    Element *el = amf.extractAMF(ptr);
+    Element *el = amf.extractAMF(ptr, tooFar);
     if (el == 0) {
         log_debug("Didn't extract an element from the byte stream!");
         return 0;
@@ -323,7 +333,7 @@ LcShm::parseHeader(Network::byte_t *data)
     _object.connection_name = el->to_string();
     delete el;
     
-    el = amf.extractAMF(ptr);
+    el = amf.extractAMF(ptr, tooFar);
     if (ptr != 0) {
         _object.hostname = el->to_string();
     }
@@ -412,9 +422,11 @@ LcShm::connect(const string &name)
         return false; 
     }
     
-    Listener::setBaseAddress(reinterpret_cast<uint8_t *>(Shm::getAddr()));
-    _baseaddr = reinterpret_cast<uint8_t *>(Shm::getAddr());
-    parseHeader(Listener::getBaseAddress());
+    uint8_t* baseAddress = reinterpret_cast<uint8_t *>(Shm::getAddr());
+    uint8_t* tooFar = baseAddress+Shm::getSize();
+    Listener::setBaseAddress(baseAddress);
+    _baseaddr = baseAddress;
+    parseHeader(baseAddress, tooFar);
 //    vector<amf::Element *> ellist = parseBody(ptr);
 //     log_debug("Base address is: 0x%x, 0x%x",
 //               (unsigned int)Listener::getBaseAddress(), (unsigned int)_baseaddr);
@@ -438,9 +450,11 @@ LcShm::connect(key_t key)
         return false; 
     }
     
-    Listener::setBaseAddress(reinterpret_cast<uint8_t *>(Shm::getAddr()));
-    _baseaddr = reinterpret_cast<uint8_t *>(Shm::getAddr());
-    parseHeader(Listener::getBaseAddress());
+    uint8_t* baseAddress = reinterpret_cast<uint8_t *>(Shm::getAddr());
+    uint8_t* tooFar = baseAddress+Shm::getSize();
+    Listener::setBaseAddress(baseAddress);
+    _baseaddr = baseAddress;
+    parseHeader(baseAddress, tooFar);
 //    vector<amf::Element *> ellist = parseBody(ptr);
 //     log_debug("Base address is: 0x%x, 0x%x",
 //               (unsigned int)Listener::getBaseAddress(), (unsigned int)_baseaddr);

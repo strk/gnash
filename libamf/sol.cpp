@@ -34,6 +34,7 @@
 #include "buffer.h"
 #include "sol.h"
 #include "log.h"
+#include "GnashException.h"
 
 #if defined(HAVE_WINSOCK_H) && !defined(__OS2__)
 # include <winsock2.h>
@@ -66,6 +67,11 @@ const short SOL_MAGIC = 0x00bf;	// is in big-endian format, this is the first
 				// two bytes. of the .sol file.
 //char *SOL_FILETYPE = "TCSO";
 const short SOL_BLOCK_MARK = 0x0004;
+
+#define ENSUREBYTES(from, toofar, size) { \
+	if ( from+size >= toofar ) \
+		throw ParserException("Premature end of AMF stream"); \
+}
 
 namespace amf
 {
@@ -326,13 +332,21 @@ SOL::readFile(std::string &filespec)
 
     // Make sure it's an SOL file
     if (stat(filespec.c_str(), &st) == 0) {
+
+try {
         ifstream ifs(filespec.c_str(), ios::binary);
         _filesize = st.st_size;
 	buf = new Network::byte_t[_filesize + sizeof(int)];
 	ptr = buf;
+	Network::byte_t* tooFar = buf+_filesize+sizeof(int);
+
 	bodysize = st.st_size - 6;
         _filespec = filespec;
         ifs.read(reinterpret_cast<char *>(ptr), _filesize);
+
+#ifndef GNASH_TRUST_AMF
+	ENSUREBYTES(ptr, tooFar, 2+4+10); // magic number, file size, file marker
+#endif
 
         // skip the magic number (will check later)
         ptr += 2;
@@ -357,23 +371,34 @@ SOL::readFile(std::string &filespec)
         } else {
             log_error("%s isn't an SOL file", filespec.c_str());
         }
+
+#ifndef GNASH_TRUST_AMF
+	ENSUREBYTES(ptr, tooFar, 2); 
+#endif
 	
         // 2 bytes for the length of the object name, but it's also null terminated
         size = *(reinterpret_cast<boost::uint16_t *>(ptr));
         size = ntohs(size);
         ptr += 2;
-        _objname = reinterpret_cast<const char *>(ptr);
 
+#ifndef GNASH_TRUST_AMF
+	ENSUREBYTES(ptr, tooFar, size+4);  // 4 is the padding below
+#endif
+
+	// TODO: make sure there's the null-termination, or
+	//       force if if it's there by definition
+        _objname = reinterpret_cast<const char *>(ptr);
         ptr += size;
+
         // Go past the padding
         ptr += 4;
 
         AMF amf_obj;
 	int size = 0;
 	amf::Element *el;
-        while (size < static_cast<boost::uint16_t>(bodysize) - 24) {
+        while ( size < static_cast<boost::uint16_t>(bodysize) - 24 ) {
 	    if (ptr) {
-		el = amf_obj.extractProperty(ptr);
+		el = amf_obj.extractProperty(ptr, tooFar);
 		if (el != 0) {
 		    size += amf_obj.totalsize();
 		    ptr += amf_obj.totalsize();
@@ -390,6 +415,11 @@ SOL::readFile(std::string &filespec)
 	
         ifs.close();
         return true;
+} catch (std::exception& e) {
+	log_error("Reading SharedObject %s: %s", filespec, e.what());
+	return false;
+}
+
     }
     
 //    log_error("Couldn't open file: %s", strerror(errno));

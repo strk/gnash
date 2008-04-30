@@ -1,3 +1,11 @@
+2008-04-30 Sandro Santilli <strk@keybit.net>
+
+	* libamf/amf.{cpp,h}, libamf/lcshm.{cpp,h},
+	  libamf/sol.cpp, libnet/rtmp.cpp:
+	  Add boundary checking in AMF parser, will throw
+	  a ParserException on premature end of buffer,
+	  sol::readFile will interchept and log_error.
+
 2008-04-30  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* configure.ac: Always look for mallinfo(), jemalloc now supports it.
