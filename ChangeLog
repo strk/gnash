@@ -1,5 +1,10 @@
 2008-04-30 Sandro Santilli <strk@keybit.net>
 
+	* libbase/rc.cpp: initialize the _lcshmkey member to 0, add a note
+	  about how I think it should work instead..
+
+2008-04-30 Sandro Santilli <strk@keybit.net>
+
 	* macros/boost.m4: make boost filesystem lib mandatory.
 	  This is still not used, but I tought I'll use this commit
 	  to find out how much discontent it would make :)

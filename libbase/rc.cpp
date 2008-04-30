@@ -96,6 +96,8 @@ RcInitFile::RcInitFile()
     _sollocaldomain(false),
     _lcdisabled(false),
     _lctrace(true),
+    // TODO: give a  default value, and let 0 mean "disabled" -- 0 currently is overridden by libbase/shm.cpp 
+    _lcshmkey(0),
     _ignoreFSCommand(true)
 {
 
