@@ -2563,8 +2563,6 @@ void sprite_instance::call_frame_actions(const as_value& frame_spec)
   const PlayList* playlist = m_def->getPlaylist(frame_number);
   if ( playlist )
   {
-    // std::for_each(playlist->begin(), playlist->end(),
-    //   boost::bind(&ControlTag::execute_action, _1, this)); 
 	PlayList::const_iterator it = playlist->begin();
     PlayList::const_iterator e = playlist->end();
 	for(; it != e; it++)
