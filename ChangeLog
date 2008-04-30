@@ -1,5 +1,8 @@
 2008-04-29  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* server/asobj/SharedObject.cpp: Use AMF0_* instead of just
+	AMF_*.
+	
 	* libamf/amf.cpp: Go back to a proper type cast now that the real
 	problem is fixed.
 	

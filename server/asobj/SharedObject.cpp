@@ -409,18 +409,18 @@ sharedobject_getlocal(const fn_call& fn)
     for (it = els.begin(); it != els.end(); it++) {
         Element *el = (*(it));
 //        log_debug("Adding \"%s\"", el->name.c_str());
-        if (el->getType() == Element::NUMBER) {
+        if (el->getType() == Element::NUMBER_AMF0) {
             double dub =  *((double *)el->getData());
             ptr->set_member(st.string_table::find(el->getName()), as_value(dub));
         } 
-        if (el->getType() == Element::BOOLEAN) {
+        if (el->getType() == Element::BOOLEAN_AMF0) {
             if (el->to_bool() == true) {
                 ptr->set_member(st.string_table::find(el->getName()), as_value(true));
             } else {
                 ptr->set_member(st.string_table::find(el->getName()), as_value(false));
             }       
         } 
-        if (el->getType() == Element::STRING) {
+        if (el->getType() == Element::STRING_AMF0) {
             if (el->getLength() == 0) {
                 ptr->set_member(st.string_table::find(el->getName()), as_value(""));
             } else {
@@ -428,7 +428,7 @@ sharedobject_getlocal(const fn_call& fn)
                 ptr->set_member(st.string_table::find(el->getName()), as_value(str));
             }
         } 
-        if (el->getType() == Element::OBJECT) {
+        if (el->getType() == Element::OBJECT_AMF0) {
 //            data.convert_to_object();
 //            ptr->set_member(st.string_table::find(el->name), data);
         } 
