@@ -1,3 +1,12 @@
+2008-04-30 Sandro Santilli <strk@keybit.net>
+
+	* macros/boost.m4: make boost filesystem lib mandatory.
+	  This is still not used, but I tought I'll use this commit
+	  to find out how much discontent it would make :)
+	  About why we should use it (portability):
+	  http://www.boost.org/doc/libs/1_33_1/libs/filesystem/doc/index.htm
+	  http://www.boost.org/doc/libs/1_35_0/libs/filesystem/doc/index.htm
+
 2008-04-29  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* server/asobj/SharedObject.cpp: Use AMF0_* instead of just
