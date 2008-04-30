@@ -1,5 +1,8 @@
 2008-04-29  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* libamf/amf.cpp: Go back to a proper type cast now that the real
+	problem is fixed.
+	
 	* libnet/rtmp.{h,cpp}: Use *Property instead of *Variable.
 	
 	* configure.ac: Don't look for mallinfo() when using jemalloc().

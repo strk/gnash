@@ -833,9 +833,11 @@ AMF::extractProperty(Network::byte_t *in)
     boost::uint16_t length = 0;
     Network::byte_t len = 0;
 
-//    length = *(reinterpret_cast<boost::uint16_t *>(tmpptr));
-    length = tmpptr[1];
-//    swapBytes(&length, sizeof(boost::uint16_t));
+    length = *(reinterpret_cast<boost::uint16_t *>(tmpptr));
+//     length = tmpptr[1];		// FIXME: hack. This supports
+// 				// strings up to 256 characters
+// 				// but keep svalgrind happy.
+    swapBytes(&length, sizeof(boost::uint16_t));
     tmpptr += sizeof(boost::uint16_t);
     
     if (length <= 0) {
