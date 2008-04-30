@@ -92,6 +92,7 @@ Memory::startStats()
         log_debug("Allocating buffer for %d data samples", _size);
         _info = new struct small_mallinfo[_size];
         reset();
+	addStats();
     }
 }
     
@@ -306,7 +307,7 @@ Memory::analyze()
                  ? "passed" : "failed") << endl;
         }
     }
-    return true; /* The funcion maybe should be declared as void? */
+    return true;
 }
     
 

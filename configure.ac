@@ -288,14 +288,13 @@ if test x"${jemalloc}" = x"yes"; then
   else
     jemalloc=no
   fi
-else
-  AC_TRY_COMPILE([#include <malloc.h>], [
-    struct mallinfo x = mallinfo(); ],
-    mallinfo=yes, mallinfo=no
-  )
-  if test x"${mallinfo}" = x"yes"; then
-    AC_DEFINE(HAVE_MALLINFO, [1], [Has mallinfo()])
-  fi
+fi
+AC_TRY_COMPILE([#include <malloc.h>], [
+  struct mallinfo x = mallinfo(); ],
+  mallinfo=yes, mallinfo=no
+)
+if test x"${mallinfo}" = x"yes"; then
+  AC_DEFINE(HAVE_MALLINFO, [1], [Has mallinfo()])
 fi
 AM_CONDITIONAL(JEMALLOC, test x$jemalloc = xyes)
 AM_CONDITIONAL(HAVE_MALLINFO, [test x$mallinfo = xyes])

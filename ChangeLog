@@ -1,3 +1,9 @@
+2008-04-30  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* configure.ac: Always look for mallinfo(), jemalloc now supports it.
+	* libbase/jemalloc.c: Add support for mallinfo.
+	* libbase/memory.cpp: Take a sample when starting.
+
 2008-04-30 Sandro Santilli <strk@keybit.net>
 
 	* server/character.cpp (alpha_getset): undefined, null and nan

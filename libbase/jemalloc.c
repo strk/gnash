@@ -5840,6 +5840,55 @@ free(void *ptr)
 }
 
 /*
+ * This is a work in progress, which doesn't even get used.
+ */
+#ifdef USE_STATS_MEMORY
+/* Utility to update mallinfo for malloc_stats() and mallinfo() */
+
+static void
+malloc_update_mallinfo(arena_t *arena, struct mallinfo *mi)
+{
+  int i, navail;
+  size_t avail;
+  avail = chunksize * narenas;
+
+#if 0
+  malloc_printf("allocated:   %u %u %u\n",
+                arena->stats.allocated_small + arena->stats.allocated_large,
+                arena->stats.nmalloc_small + arena->stats.nmalloc_large,
+                arena->stats.ndalloc_small + arena->stats.ndalloc_large);
+  
+  malloc_printf("available:   %u\n", avail);
+#endif
+  
+/*   stats_print(arena); */
+  malloc_spin_lock(&arena->lock);
+
+  /* clear unused fields */
+  mi->arena = mi->ordblks = mi->smblks = mi->usmblks = mi->fsmblks = 0;
+  mi->uordblks = arena->stats.allocated_small + arena->stats.allocated_large;
+  mi->fordblks = arena->stats.mapped - mi->uordblks;
+  
+  mi->hblks = mi->hblkhd = 0;
+  mi->keepcost = arena->stats.mapped;
+  malloc_spin_unlock(&arena->lock);
+}
+
+#ifndef DARWIN
+DSOEXPORT
+struct mallinfo
+mallinfo()
+{
+    struct mallinfo mi;
+
+    /* Calculate and print allocated/mapped stats. */
+    malloc_update_mallinfo(choose_arena(), &mi);
+    return mi;
+}
+# endif
+#endif
+
+/*
  * End malloc(3)-compatible functions.
  */
 /******************************************************************************/
