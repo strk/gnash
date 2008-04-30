@@ -85,6 +85,7 @@ libgnashserver_la_SOURCES = \
 	swf/PlaceObject2Tag.cpp \
 	swf/RemoveObjectTag.cpp \
 	swf/StartSoundTag.cpp \
+	swf/StreamSoundBlockTag.cpp \
 	swf_function.cpp \
 	video_stream_instance.cpp \
 	StreamProvider.cpp \
@@ -176,6 +177,7 @@ noinst_HEADERS = \
 	swf/DoInitActionTag.h \
 	swf/SetBackgroundColorTag.h \
 	swf/StartSoundTag.h \
+	swf/StreamSoundBlockTag.h \
 	swf_event.h \
 	swf_function.h \
 	text.h \

@@ -70,39 +70,6 @@ public:
 	sound_sample* cast_to_sound_sample() { return this; }
 };
 
-/// SWF Tag SoundStreamBlock (19) 
-//
-/// TODO: move in it's own SoundStreamBlockTag files...
-///
-class start_stream_sound_tag : public ControlTag
-{
-public:
-	boost::uint16_t	m_handler_id;
-	long		m_start;
-	int		latency;
-
-	start_stream_sound_tag()
-		:
-		m_handler_id(0),
-		m_start(0),
-		latency(0)
-	{
-	}
-
-
-	/// \brief
-	/// Initialize this StartSound tag
-	/// from the stream & given sample.
-	//
-	/// Insert ourself into the movie.
-	void	read(movie_definition* m, int handler_id, long start);
-
-	void	execute(sprite_instance* m) const;
-
-	/// StartStreamSound is not a "state" tag?
-	void execute_state(sprite_instance* m) const;
-};
-
 } // namespace gnash
 
 

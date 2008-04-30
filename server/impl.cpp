@@ -54,6 +54,7 @@
 #include "DoInitActionTag.h"
 #include "SetBackgroundColorTag.h"
 #include "StartSoundTag.h"
+#include "StreamSoundBlockTag.h"
 #include "swf/tag_loaders.h" // for all tag loaders..
 #include "sound_handler.h" // for get_sound_handler
 #ifdef GNASH_USE_GC
@@ -177,7 +178,7 @@ static void ensure_loaders_registered()
   
         register_tag_loader(SWF::DEFINEBUTTONSOUND, button_sound_loader);
   register_tag_loader(SWF::SOUNDSTREAMHEAD, sound_stream_head_loader); // 18
-  register_tag_loader(SWF::SOUNDSTREAMBLOCK, sound_stream_block_loader); // 19
+  register_tag_loader(SWF::SOUNDSTREAMBLOCK, StreamSoundBlockTag::loader); // 19
   register_tag_loader(SWF::DEFINELOSSLESS, define_bits_lossless_2_loader);
   register_tag_loader(SWF::DEFINEBITSJPEG2, define_bits_jpeg2_loader);
   register_tag_loader(SWF::DEFINESHAPE2,  define_shape_loader);
