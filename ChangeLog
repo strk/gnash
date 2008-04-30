@@ -1,3 +1,10 @@
+2008-04-30 Sandro Santilli <strk@keybit.net>
+
+	* server/character.cpp (alpha_getset): undefined, null and nan
+	  values are not valid input to _alpha setter.
+	* testsuite/actionscript.all/MovieClip.as: success for all newly
+	  added _alpha tests.
+
 2008-04-28 Russ Nelson <nelson@crynwr.com>
 
 	* resolve http://savannah.gnu.org/bugs/?22973 by adding a test

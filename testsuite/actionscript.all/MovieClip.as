@@ -20,9 +20,9 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.131 2008/04/30 15:42:00 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.132 2008/04/30 16:16:43 strk Exp $";
 
-rcsid="$Id: MovieClip.as,v 1.131 2008/04/30 15:42:00 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.132 2008/04/30 16:16:43 strk Exp $";
 #include "check.as"
 
 // To be called at end of test
@@ -1223,7 +1223,7 @@ with (draw)
 
 _alpha = "string";
 check_equals(typeof(_alpha), 'number');
-xcheck_equals(_alpha, 100);
+check_equals(_alpha, 100);
 
 _alpha = 25;
 check_equals(_alpha, 25);
@@ -1235,23 +1235,23 @@ check_equals(_alpha, 50);
 
 _alpha = undefined;
 check_equals(typeof(_alpha), 'number');
-xcheck_equals(_alpha, 50);
+check_equals(_alpha, 50);
 
 _alpha = null;
 check_equals(typeof(_alpha), 'number');
-xcheck_equals(_alpha, 50);
+check_equals(_alpha, 50);
 
 _alpha = NaN;
 check_equals(typeof(_alpha), 'number');
-xcheck_equals(_alpha, 50);
+check_equals(_alpha, 50);
 
 _alpha = Infinite;
 check_equals(typeof(_alpha), 'number');
-xcheck_equals(_alpha, 50);
+check_equals(_alpha, 50);
 
 _alpha = 0/0;
 check_equals(typeof(_alpha), 'number');
-xcheck_equals(_alpha, 50);
+check_equals(_alpha, 50);
 
 _alpha = -50;
 check_equals(typeof(_alpha), 'number');
@@ -1262,13 +1262,13 @@ check_equals(typeof(_alpha), 'number');
 #if OUTPUT_VERSION < 7
  check_equals(_alpha, 0);
 #else
- xcheck_equals(_alpha, -50);
+ check_equals(_alpha, -50);
 #endif
 
 _alpha = 100;
 _alpha = -(0/0);
 check_equals(typeof(_alpha), 'number');
-xcheck_equals(_alpha, 100);
+check_equals(_alpha, 100);
 
 
 _alpha = 100;

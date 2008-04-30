@@ -392,9 +392,21 @@ character::alpha_getset(const fn_call& fn)
 	}
 	else // setter
 	{
+		as_value& inval = fn.arg(0);
+		double input = inval.to_number();
+		if ( inval.is_undefined() || inval.is_null() || ! isfinite(input) )
+		{
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror(_("Ignored attempt to set %s.%s=%s"),
+				ptr->getTarget(),
+				_("_alpha"), // trying to reuse translations
+				fn.arg(0).to_debug_string());
+			);
+			return rv;
+		}
 		// Set alpha modulate, in percent.
 		cxform	cx = ptr->get_cxform();
-		cx.m_[3][0] = std::infinite_to_fzero(fn.arg(0).to_number()) / 100.f;
+		cx.m_[3][0] = input / 100.f; // std::infinite_to_fzero(input) / 100.f;
 		ptr->set_cxform(cx);
 		ptr->transformedByScript(); // m_accept_anim_moves = false; 
 	}
