@@ -1,5 +1,11 @@
 2008-04-30 Sandro Santilli <strk@keybit.net>
 
+	* macros/boost.m4: 1.33 didn't have boost/filesystem.hpp,
+	  and we'd need boost/filesystem/convenience.hpp for
+	  create_directories (if we're going to use it).
+
+2008-04-30 Sandro Santilli <strk@keybit.net>
+
 	* macros/boost.m4: correct header is boost/filesystem.hpp
 
 2008-04-30 Zou Lunkai <zoulunkai@gmail.com>
