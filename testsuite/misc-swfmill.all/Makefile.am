@@ -19,6 +19,7 @@
 AUTOMAKE_OPTIONS = dejagnu -Wno-portability
 
 abs_topbuilddir=$(shell cd $(top_builddir); pwd)
+abs_builddir=$(shell cd $(top_builddir)/testsuite/misc-ming.all; pwd)
 
 ## Self-contained XML tests
 SC_XMLTESTS =			\
@@ -29,9 +30,22 @@ SC_XMLTESTS =			\
 	zeroframe_definesprite.xml \
 	$(NULL)
 
-EXTRA_DIST = $(SC_XMLTESTS)
+EXTRA_DIST = $(SC_XMLTESTS) background.xml
 
 if ENABLE_SWFMILL
+
+AM_CPPFLAGS = -I.. \
+	-I$(top_srcdir)		\
+	-I$(top_srcdir)/libbase \
+	-I$(top_srcdir)/libmedia \
+	-I$(top_srcdir)/backend \
+	-I$(top_srcdir)/server  \
+	-I$(top_srcdir)/server/parser  \
+	-I$(top_srcdir)/server/vm \
+	-I$(top_srcdir)/server/asobj \
+	-I$(top_srcdir)/libgeometry \
+	-I$(top_srcdir)/testsuite \
+	$(NULL)
 
 SC_XMLTESTS_OUT = $(SC_XMLTESTS:.xml=.swf)
 
@@ -44,6 +58,9 @@ check_SCRIPTS = \
 	initaction_in_definesprite-runner	\
 	zeroframe_definesprite-runner	\
 	$(NULL)
+
+check_PROGRAMS = \
+	backgroundTestRunner
 
 jump_after_end-runner: $(srcdir)/../generic-testrunner.sh jump_after_end.swf Makefile
 	sh $< -r 50 -c "END OF TEST" $(top_builddir) jump_after_end.swf > $@
@@ -61,6 +78,21 @@ zeroframe_definesprite-runner: $(srcdir)/../generic-testrunner.sh zeroframe_defi
 	sh $< -r 50 -c "END OF TEST" $(top_builddir) zeroframe_definesprite.swf > $@
 	chmod 755 $@
 
+backgroundTestRunner_SOURCES = \
+	backgroundTestRunner.cpp \
+	$(NULL)
+backgroundTestRunner_CXXFLAGS = \
+	-DSRCDIR='"$(srcdir)"' \
+	-DTGTDIR='"$(abs_builddir)"' \
+	$(NULL)
+backgroundTestRunner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
+backgroundTestRunner_DEPENDENCIES = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	background.swf      \
+	$(NULL)
+
 .xml.swf: 
 	$(SWFMILL) -v simple $(@:%.swf=$(srcdir)/%.xml) $@
 
@@ -72,7 +104,7 @@ clean-local:
 
 
 TEST_DRIVERS = ../simple.exp
-TEST_CASES = ${check_SCRIPTS}
+TEST_CASES = ${check_SCRIPTS} ${check_PROGRAMS}
 
 check-DEJAGNU: site-update $(check_PROGRAMS)
 	@runtest=$(RUNTEST); \

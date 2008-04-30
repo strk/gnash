@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+
+<swf version="6" compressed="1">
+
+<!--
+Test for background color
+-->
+
+  <Header width="12800" height="9600" framerate="2" frames="2">
+
+    <size>
+      <Rectangle left="0" right="12800" top="0" bottom="9600"/>
+    </size>
+
+    <tags>
+
+      <SetBackgroundColor>
+        <color>
+          <Color red="244" green="0" blue="0"/>
+        </color>
+      </SetBackgroundColor>
+
+      <SetBackgroundColor>
+        <color>
+          <Color red="0" green="255" blue="0"/>
+        </color>
+      </SetBackgroundColor>
+
+      <ShowFrame/>
+
+      <SetBackgroundColor>
+        <color>
+          <Color red="0" green="0" blue="255"/>
+        </color>
+      </SetBackgroundColor>
+
+      <ShowFrame/>
+
+      <End/>
+
+    </tags>
+
+  </Header>
+</swf>

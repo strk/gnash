@@ -1,5 +1,14 @@
 2008-04-30 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/SetBackgroundColorTag.h: update to match 
+	  change in ::execute signature
+	* testsuite/misc-swfmill.all/: Makefile.am, background.xml,
+	  backgroundTestRunner.cpp: add test for multiple SetBackgroundColor
+	  tags in an SWF. Expected behaviour is we only use the first one,
+	  gnash fails.
+
+2008-04-30 Sandro Santilli <strk@keybit.net>
+
 	* server/Makefile.am, server/impl.cpp,
 	  server/parser/sound_definition.{cpp,h},
 	  server/swf/StreamSoundBlockTag.{cpp,h},
