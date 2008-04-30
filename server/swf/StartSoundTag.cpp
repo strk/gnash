@@ -121,7 +121,7 @@ StartSoundTag::read(stream& in)
 
 
 void
-StartSoundTag::execute(sprite_instance* /* m */) const
+StartSoundTag::execute(sprite_instance* /* m */, DisplayList& /* dlist */) const
 {
 	// Make static ?
 	media::sound_handler* handler = get_sound_handler();
