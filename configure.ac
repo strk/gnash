@@ -2481,6 +2481,7 @@ if test "$media_handler" = "gst"; then
     echo "               Install it from http://www.gstreamer.net" >&3
     echo "               or .deb users: apt-get install libgstreamer0.10-dev" >&3
     echo "               or .rpm users: yum install gstreamer-devel" >&3
+    echo "               or             yast install gstreamer010-devel" >&3
   fi
 fi
 

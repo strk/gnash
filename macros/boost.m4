@@ -75,7 +75,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
   AC_MSG_CHECKING([for boost header])
   for i in $newlist; do
     dirs="`ls -dr $i/boost* 2>/dev/null`"
-    if test -n "${dirs}" -a x"${dirs}" != x"/usr/include/boost"; then
+    if test -n "${dirs}" -a -d "${dirs}" -a x"${dirs}" != x"/usr/include/boost"; then
       gnash_boost_topdir="`(cd ${dirs}; pwd)`"
       gnash_boost_subdir="`dirname ${gnash_boost_topdir}`"
       gnash_boost_version="`echo ${gnash_boost_topdir} | sed -e 's:boost-::'`"
