@@ -1,5 +1,7 @@
 2008-04-29  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* configure.ac: Don't look for mallinfo() when using jemalloc().
+	
 	* libamf/amf.h: Use _AMF0* on Element types.
 	* libamf/amf.cpp: Use AMF0_* instead of just AMF_*. Remove junk
 	that's been commented out for awhile. Rename *Variable to

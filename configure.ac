@@ -288,8 +288,17 @@ if test x"${jemalloc}" = x"yes"; then
   else
     jemalloc=no
   fi
+else
+  AC_TRY_COMPILE([#include <malloc.h>], [
+    struct mallinfo x = mallinfo(); ],
+    mallinfo=yes, mallinfo=no
+  )
+  if test x"${mallinfo}" = x"yes"; then
+    AC_DEFINE(HAVE_MALLINFO, [1], [Has mallinfo()])
+  fi
 fi
 AM_CONDITIONAL(JEMALLOC, test x$jemalloc = xyes)
+AM_CONDITIONAL(HAVE_MALLINFO, [test x$mallinfo = xyes])
 
 AC_ARG_ENABLE(debugger,
   AC_HELP_STRING([--enable-debugger],[Enable the Flash debugger]),
@@ -1170,7 +1179,6 @@ AC_MSG_RESULT($gcc_cv_ld_as_needed)
 dnl GNASH_PKG_FIND(dmalloc, [dmalloc.h], [dmalloc], mallinfo)
 AM_CONDITIONAL(HAVE_DMALLOC, [ test x$has_dmalloc = xyes ])
 
-AC_CHECK_FUNCS(mallinfo)
 AC_PATH_TOOL([AUTOTRACE], [autotrace])
 AC_PATH_TOOL([NETCAT], [netcat])
 AC_HEADER_DIRENT
@@ -1279,13 +1287,6 @@ dnl AC_CHECK_LIB(gmp, _gmp_get_memory_functions)
   AC_CHECK_LIB(X11, XDisableAccessControl)
 dnl fi
 AM_CONDITIONAL(HAVE_X11, [test x$x11 = xyes])
-
-AC_TRY_COMPILE([#include <malloc.h>], [
-  struct mallinfo x = mallinfo(); ],
-  AC_DEFINE(HAVE_MALLINFO, [1], [Has mallinfo()])
-)
-AM_CONDITIONAL(HAVE_MALLINFO, [test x$HAVE_MALLINFO = xyes -a x$jemalloc = xyes])
-
 AC_CHECK_LIB(rt, shm_unlink)
 AC_CHECK_FUNCS(shm_open shm_unlink)
 AC_TRY_COMPILE([#include <strings.h>], [
