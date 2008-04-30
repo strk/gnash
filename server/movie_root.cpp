@@ -75,6 +75,7 @@ movie_root::movie_root()
 	m_viewport_width(1),
 	m_viewport_height(1),
 	m_background_color(255, 255, 255, 255),
+        m_background_color_set(false),
 	m_timer(0.0f),
 	m_mouse_x(0),
 	m_mouse_y(0),
@@ -408,6 +409,11 @@ movie_root::reset()
 void
 movie_root::clear()
 {
+	// reset background color, to allow 
+	// next load to set it again.
+	m_background_color.set(255,255,255,255);
+	m_background_color_set = false;
+
 	// wipe out live chars
 	_liveChars.clear();
 
@@ -1903,6 +1909,9 @@ void
 movie_root::set_background_color(const rgba& color)
 {
 	//GNASH_REPORT_FUNCTION;
+
+	if ( m_background_color_set ) return;
+	m_background_color_set = true;
 
         if ( m_background_color != color )
 	{

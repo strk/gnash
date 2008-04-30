@@ -19,7 +19,7 @@
 AUTOMAKE_OPTIONS = dejagnu -Wno-portability
 
 abs_topbuilddir=$(shell cd $(top_builddir); pwd)
-abs_builddir=$(shell cd $(top_builddir)/testsuite/misc-ming.all; pwd)
+abs_builddir=$(shell cd $(top_builddir)/testsuite/misc-swfmill.all; pwd)
 
 ## Self-contained XML tests
 SC_XMLTESTS =			\

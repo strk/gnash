@@ -37,7 +37,7 @@ using namespace std;
 int
 main(int /*argc*/, char** /*argv*/)
 {
-	string filename = string(SRCDIR) + string("/") + string(INPUT_FILENAME);
+	string filename = string(TGTDIR) + string("/") + string(INPUT_FILENAME);
 	auto_ptr<MovieTester> t;
 
 	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
@@ -64,20 +64,25 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(root->get_frame_count(), 2);
 	check_equals(root->get_current_frame(), 0);
 
-	xcheck_pixel(60, 60, 50, red, 1);
-	xcheck_pixel(60, 400, 50, red, 1);
-	xcheck_pixel(600, 400, 50, red, 1);
-	xcheck_pixel(600, 60, 50, red, 1);
-	xcheck_pixel(320, 240, 50, red, 1);
+	// error tolerance
+	// WARNING ! AGG_RGB555 reports red as 240,0,0 !!!!
+	// it's really annoying ... (UdoG: help ?)
+	int tol = 15;
+
+	check_pixel(60, 60, 50, red, tol);
+	check_pixel(60, 400, 50, red, tol);
+	check_pixel(600, 400, 50, red, tol);
+	check_pixel(600, 60, 50, red, tol);
+	check_pixel(320, 240, 50, red, tol);
 
 	tester.advance();
 
 	check_equals(root->get_current_frame(), 1);
 
-	xcheck_pixel(60, 60, 50, red, 1);
-	xcheck_pixel(60, 400, 50, red, 1);
-	xcheck_pixel(600, 400, 50, red, 1);
-	xcheck_pixel(600, 60, 50, red, 1);
-	xcheck_pixel(320, 240, 50, red, 1);
+	check_pixel(60, 60, 50, red, tol);
+	check_pixel(60, 400, 50, red, tol);
+	check_pixel(600, 400, 50, red, tol);
+	check_pixel(600, 60, 50, red, tol);
+	check_pixel(320, 240, 50, red, tol);
 }
 

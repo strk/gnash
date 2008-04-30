@@ -1,5 +1,17 @@
 2008-04-30 Sandro Santilli <strk@keybit.net>
 
+	* server/movie_root.{cpp,h}: allow setting background color
+	  only once (till the stage is reset by clear).
+	  TODO: check if background can change when loading something
+	  with different background into _level0.
+	* testsuite/misc-swfmill.all/Makefile.am: fix abs_builddir
+	* testsuite/misc-swfmill.all/backgroundTestRunner.cpp: use TGTDIR
+	  (not SRCDIR) to find the swf, use a tolerance of 15 to compare
+	  color (AGG_RGB555 gives 240,0,0 for a red!), success of the
+	  test (related to the change in movie_root).
+
+2008-04-30 Sandro Santilli <strk@keybit.net>
+
 	* server/swf/SetBackgroundColorTag.h: update to match 
 	  change in ::execute signature
 	* testsuite/misc-swfmill.all/: Makefile.am, background.xml,

@@ -851,6 +851,8 @@ private:
     int         m_viewport_width, m_viewport_height;
 
     rgba        m_background_color;
+    bool	m_background_color_set;
+
     float       m_timer;
     int         m_mouse_x, m_mouse_y, m_mouse_buttons;
     void *      m_userdata;
