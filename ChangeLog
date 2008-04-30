@@ -1,3 +1,7 @@
+2008-04-30 Sandro Santilli <strk@keybit.net>
+
+	* macros/boost.m4: correct header is boost/filesystem.hpp
+
 2008-04-30 Zou Lunkai <zoulunkai@gmail.com>
 	
 	* server/sprite_instance.{h,cpp}: drop ugly m_tmp_display_list and

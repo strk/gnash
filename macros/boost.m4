@@ -33,7 +33,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
   libname=""
   dnl this is a list of *required* headers. If any of these are missing, this
   dnl test will return a failure, and Gnash won't build.
-  boost_headers="detail/lightweight_mutex.hpp thread/thread.hpp multi_index_container.hpp multi_index/key_extractors.hpp thread/mutex.hpp filesystem/operations.hpp"
+  boost_headers="detail/lightweight_mutex.hpp thread/thread.hpp multi_index_container.hpp multi_index/key_extractors.hpp thread/mutex.hpp filesystem.hpp"
   dnl this is a list of *required* libraries. If any of these are missing, this
   dnl test will return a failure, and Gnash won't build.
   boost_libs="thread date_time filesystem"
