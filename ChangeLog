@@ -1,3 +1,17 @@
+2008-04-30 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* server/sprite_instance.{h,cpp}: drop ugly m_tmp_display_list and
+	  m_is_jumping back. execute_frame_tags() now take a dislpayList parameter.
+	* server/swf/ControlTag.h
+	  server/swf/DisplayListTag.h
+	  server/swf/DoActionTag.h
+	  server/swf/DoInitActionTag.h
+	  server/swf/PlaceObject2Tag.cpp
+	  server/swf/PlaceObject2Tag.h
+	  server/swf/RemoveObjectTag.cpp
+	  server/swf/RemoveObjectTag.h, 
+	  make all those control tags to take a dlist parameter.
+	  
 2008-04-30 Sandro Santilli <strk@keybit.net>
 
 	* libbase/rc.cpp: initialize the _lcshmkey member to 0, add a note

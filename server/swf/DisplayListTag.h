@@ -54,11 +54,11 @@ public:
 
 	virtual ~DisplayListTag() {}
 
-	virtual void execute(sprite_instance* m) const=0;
+	virtual void execute(sprite_instance* m, DisplayList& dlist) const=0;
 
-	void execute_state(sprite_instance* m) const
+	void execute_state(sprite_instance* m, DisplayList& dlist) const
 	{
-		execute(m);
+		execute(m, dlist);
 	}
 
 	/// Return the depth affected by this DisplayList tag

@@ -421,24 +421,24 @@ PlaceObject2Tag::read(stream& in, tag_type tag)
 
 /// Place/move/whatever our object in the given movie.
 void
-PlaceObject2Tag::execute(sprite_instance* m) const
+PlaceObject2Tag::execute(sprite_instance* m, DisplayList& dlist) const
 {
     switch ( getPlaceType() ) 
     {
       case PLACE:
-          m->add_display_object(this);
+          m->add_display_object(this, dlist);
       break;
 
       case MOVE:
-          m->move_display_object(this);
+          m->move_display_object(this, dlist);
       break;
 
       case REPLACE:
-          m->replace_display_object(this);
+          m->replace_display_object(this, dlist);
       break;
 
       case REMOVE:
-          m->remove_display_object(m_depth, 0); // 0 since it is unused.
+		  m->remove_display_object(this, dlist);
       break;
     }
 }

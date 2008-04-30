@@ -56,7 +56,7 @@ public:
             m_buf.read(*in, in->get_tag_end_position());
 	}
 
-	virtual void execute(sprite_instance* m) const
+	virtual void execute(sprite_instance* m, DisplayList& /* dlist */) const
 	{
 	    	m->add_action_buffer(&m_buf);
 	}

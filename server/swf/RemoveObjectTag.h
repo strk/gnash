@@ -33,6 +33,7 @@ namespace gnash {
 	class sprite_instance;
 	class swf_event;
 	class movie_definition;
+	class DisplayList;
 }
 
 namespace gnash {
@@ -58,7 +59,7 @@ public:
 	void read(stream* in, tag_type tag);
 
 	/// Remove object at specified depth from sprite_instance DisplayList.
-	void	execute(sprite_instance* m) const;
+	void execute(sprite_instance* m, DisplayList& dlist) const;
 
 	static void loader(stream* in, tag_type tag, movie_definition* m);
 

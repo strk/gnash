@@ -2342,7 +2342,6 @@ sprite_instance::sprite_instance(
   m_play_state(PLAY),
   m_current_frame(0),
   m_has_looped(false),
-  is_jumping_back(false),
   _callingFrameActions(false),
   m_as_environment(),
   _text_variables(),
@@ -2564,8 +2563,14 @@ void sprite_instance::call_frame_actions(const as_value& frame_spec)
   const PlayList* playlist = m_def->getPlaylist(frame_number);
   if ( playlist )
   {
-    std::for_each(playlist->begin(), playlist->end(),
-      boost::bind(&ControlTag::execute_action, _1, this)); 
+    // std::for_each(playlist->begin(), playlist->end(),
+    //   boost::bind(&ControlTag::execute_action, _1, this)); 
+	PlayList::const_iterator it = playlist->begin();
+    PlayList::const_iterator e = playlist->end();
+	for(; it != e; it++)
+	{
+		(*it)->execute_action(this, m_display_list);
+	}
   }
   _callingFrameActions=false;
 
@@ -2969,7 +2974,7 @@ void sprite_instance::advance_sprite()
         log_debug("Executing frame%d (0-based) tags of sprite %s", m_current_frame, getTarget());
 #endif
         // Make sure m_current_frame is 0-based during execution of DLIST tags
-        execute_frame_tags(m_current_frame, TAG_DLIST|TAG_ACTION);
+        execute_frame_tags(m_current_frame, m_display_list, TAG_DLIST|TAG_ACTION);
       }
     }
   }
@@ -3056,36 +3061,34 @@ sprite_instance::restoreDisplayList(size_t tgtFrame)
   // and there are some old questions spreading the source files.
   set_invalidated();
 
-  is_jumping_back = true; //remember we are jumping back
-
+  DisplayList m_tmp_display_list;
   for (size_t f = 0; f<tgtFrame; ++f)
   {
     m_current_frame = f;
-    execute_frame_tags(f, TAG_DLIST);
+    execute_frame_tags(f, m_tmp_display_list, TAG_DLIST);
   }
 
   // Execute both action tags and DLIST tags of the target frame
   m_current_frame = tgtFrame;
-  execute_frame_tags(tgtFrame, TAG_DLIST|TAG_ACTION);
-
-  is_jumping_back = false; // finished jumping back
+  execute_frame_tags(tgtFrame, m_tmp_display_list, TAG_DLIST|TAG_ACTION);
 
   m_display_list.mergeDisplayList(m_tmp_display_list);
 }
 
 // 0-based frame number !
 void
-sprite_instance::execute_frame_tags(size_t frame, int typeflags)
+sprite_instance::execute_frame_tags(size_t frame, DisplayList& dlist, int typeflags)
 {
   testInvariant();
-
-  //assert(frame < get_loaded_frames());
 
   assert(typeflags);
 
   const PlayList* playlist = m_def->getPlaylist(frame);
   if ( playlist )
   {
+  	PlayList::const_iterator it = playlist->begin();
+	PlayList::const_iterator e = playlist->end();
+	
     IF_VERBOSE_ACTION(
       // Use 1-based frame numbers
       log_action(_("Executing %d tags in frame %d/%d of sprite %s"),
@@ -3095,17 +3098,25 @@ sprite_instance::execute_frame_tags(size_t frame, int typeflags)
 
     if ( (typeflags&TAG_DLIST) && (typeflags&TAG_ACTION) )
     {
-      std::for_each( playlist->begin(), playlist->end(), boost::bind(&ControlTag::execute, _1, this) );
+        for(; it != e; it++)
+        {
+            (*it)->execute(this, dlist);
+        }
     }
     else if ( typeflags & TAG_DLIST )
     {
-      assert( ! (typeflags & TAG_ACTION) );
-      std::for_each( playlist->begin(), playlist->end(), boost::bind(&ControlTag::execute_state, _1, this) );
+        for(; it != e; it++)
+        {
+            (*it)->execute_state(this, dlist);
+        }
     }
     else
     {
-      assert(typeflags & TAG_ACTION);
-      std::for_each(playlist->begin(), playlist->end(), boost::bind(&ControlTag::execute_action, _1, this));
+        assert(typeflags & TAG_ACTION);
+        for(; it != e; it++)
+        {
+            (*it)->execute_action(this, dlist);
+        }
     }
   }
 
@@ -3207,7 +3218,7 @@ sprite_instance::goto_frame(size_t target_frame_number)
       // Second argument requests that only "DisplayList" tags
       // are executed. This means NO actions will be
       // pushed on m_action_list.
-      execute_frame_tags(m_current_frame, TAG_DLIST);
+      execute_frame_tags(m_current_frame, m_display_list, TAG_DLIST);
     }
     assert(m_current_frame == target_frame_number);
 
@@ -3217,7 +3228,7 @@ sprite_instance::goto_frame(size_t target_frame_number)
     //       we'll backup and resume the _callingFrameActions flag
     bool callingFrameActionsBackup = _callingFrameActions;
     _callingFrameActions = false;
-    execute_frame_tags(target_frame_number, TAG_DLIST|TAG_ACTION);
+    execute_frame_tags(target_frame_number, m_display_list, TAG_DLIST|TAG_ACTION);
     _callingFrameActions = callingFrameActionsBackup;
   }
 
@@ -3269,10 +3280,8 @@ void sprite_instance::display()
   
   // descend the display list
   m_display_list.display();
-    
    
   clear_invalidated();
-    
 }
 
 bool
@@ -3284,7 +3293,7 @@ sprite_instance::attachCharacter(character& newch, int depth)
 }
 
 character*
-sprite_instance::add_display_object(const SWF::PlaceObject2Tag* tag)
+sprite_instance::add_display_object(const SWF::PlaceObject2Tag* tag, DisplayList& dlist)
 {
     assert(m_def != NULL);
     assert(tag != NULL);
@@ -3299,7 +3308,6 @@ sprite_instance::add_display_object(const SWF::PlaceObject2Tag* tag)
         return NULL;
     }
   
-    DisplayList& dlist = const_cast<DisplayList &>( getDisplayList() );
     character* existing_char = dlist.get_character_at_depth(tag->getDepth());
     
     if(existing_char)
@@ -3341,10 +3349,8 @@ sprite_instance::add_display_object(const SWF::PlaceObject2Tag* tag)
 }
 
 void 
-sprite_instance::move_display_object(const SWF::PlaceObject2Tag* tag)
-{
-    DisplayList& dlist = const_cast<DisplayList &>( getDisplayList() );
-	
+sprite_instance::move_display_object(const SWF::PlaceObject2Tag* tag, DisplayList& dlist)
+{	
 	int ratio = tag->getRatio();
     dlist.move_character(
         tag->getDepth(), 
@@ -3354,7 +3360,7 @@ sprite_instance::move_display_object(const SWF::PlaceObject2Tag* tag)
         NULL); // clip_depth is not used in MOVE tag(at least no related tests). 
 }
 
-void sprite_instance::replace_display_object(const SWF::PlaceObject2Tag* tag)
+void sprite_instance::replace_display_object(const SWF::PlaceObject2Tag* tag, DisplayList& dlist)
 {
     assert(m_def != NULL);
     assert(tag != NULL);
@@ -3368,7 +3374,6 @@ void sprite_instance::replace_display_object(const SWF::PlaceObject2Tag* tag)
     }
     assert(cdef);
 
-    DisplayList& dlist = const_cast<DisplayList &>( getDisplayList() );
     character* existing_char = dlist.get_character_at_depth(tag->getDepth());
 
     if (existing_char)
@@ -3376,7 +3381,7 @@ void sprite_instance::replace_display_object(const SWF::PlaceObject2Tag* tag)
         // if the existing character is not a shape, move it instead of replace
         if ( existing_char->isActionScriptReferenceable() )
         {
-            move_display_object(tag);
+            move_display_object(tag, dlist);
             return;
         }
         else
@@ -3406,15 +3411,21 @@ void sprite_instance::replace_display_object(const SWF::PlaceObject2Tag* tag)
             {
                 ch->set_matrix(tag->getMatrix());
             }
-            replace_display_object(ch.get(), tag->getDepth(), 
-                !tag->hasCxform(), // use matrix from the old character if tag doesn't provide one.
-                !tag->hasMatrix());
+			dlist.replace_character(ch.get(), tag->getDepth(), 
+				!tag->hasCxform(), // use matrix from the old character if tag doesn't provide one.
+				!tag->hasMatrix());
         }
     }
     else // non-existing character
     {
         log_error("sprite_instance::replace_display_object: could not find any character at depth %d", tag->getDepth());
     } 
+}
+
+void sprite_instance::remove_display_object(const SWF::PlaceObject2Tag* tag, DisplayList& dlist)
+{
+	set_invalidated();
+	dlist.remove_character(tag->getDepth());
 }
 
 void sprite_instance::replace_display_object(
@@ -3425,9 +3436,7 @@ void sprite_instance::replace_display_object(
 {
     assert(ch != NULL);
 
-    DisplayList& dlist = const_cast<DisplayList &>( getDisplayList() );
-
-    dlist.replace_character(ch, depth, use_old_cxform, use_old_matrix);
+    m_display_list.replace_character(ch, depth, use_old_cxform, use_old_matrix);
 }
 
 int sprite_instance::get_id_at_depth(int depth)
@@ -4135,7 +4144,7 @@ sprite_instance::stagePlacementCallback()
 #ifdef GNASH_DEBUG
       log_debug(_("Executing tags of frame0 in sprite %s"), getTarget());
 #endif
-      execute_frame_tags(0, TAG_DLIST|TAG_ACTION);
+      execute_frame_tags(0, m_display_list, TAG_DLIST|TAG_ACTION);
 
     if ( _vm.getSWFVersion() > 5 )
     {
@@ -4157,7 +4166,7 @@ sprite_instance::stagePlacementCallback()
 #ifdef GNASH_DEBUG
       log_debug(_("Executing tags of frame0 in sprite %s"), getTarget());
 #endif
-      execute_frame_tags(0, TAG_DLIST|TAG_ACTION);
+      execute_frame_tags(0, m_display_list, TAG_DLIST|TAG_ACTION);
   }
 
 }
@@ -4577,8 +4586,6 @@ sprite_instance::markReachableResources() const
   ReachableMarker marker;
 
   m_display_list.visitAll(marker);
-
-  assert(m_tmp_display_list.empty());
 
   _drawable->setReachable();
 

@@ -37,6 +37,7 @@ namespace gnash {
     class swf_event;
     class action_buffer;
     class movie_definition;
+	class DisplayList;
 }
 
 namespace gnash {
@@ -111,7 +112,7 @@ public:
     void read(stream& in, tag_type tag);
 
     /// Place/move/whatever our object in the given movie.
-    void execute(sprite_instance* m) const;
+    void execute(sprite_instance* m, DisplayList& dlist) const;
 
     static void loader(stream* in, tag_type tag, movie_definition* m);
 

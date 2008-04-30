@@ -48,9 +48,10 @@ RemoveObjectTag::read(stream* in, tag_type tag)
 }
 
 void
-RemoveObjectTag::execute(sprite_instance* m) const
+RemoveObjectTag::execute(sprite_instance* m, DisplayList& dlist) const
 {
-	m->remove_display_object(m_depth, m_id);
+    m->set_invalidated();
+	dlist.remove_character(m_depth);
 }
 
 /* public static */

@@ -52,12 +52,12 @@ public:
         read(in);
     }
 
-    virtual void execute_state(sprite_instance* m) const
+    virtual void execute_state(sprite_instance* m, DisplayList& /*dlist*/) const
     {
         m->execute_init_action_buffer(_buf, _cid);
     }
 
-    virtual void execute(sprite_instance* m) const
+    virtual void execute(sprite_instance* m, DisplayList& /*dlist*/) const
     {
         m->execute_init_action_buffer(_buf, _cid);
     }

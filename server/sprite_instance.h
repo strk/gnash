@@ -357,24 +357,14 @@ public:
 	/// Any successful new placement triggers invokation of the newly created
 	/// instance's LOAD event.
 	///
-	/// @param tag
-	/// A swf defined placement tag(PlaceObject, or PlaceObject2, or PlaceObject3)
-	/// No ownership transfer, the tag is still owned by the movie_definition class.
-	///
-	/// @return 
-	///	A pointer to the character being added or NULL
-	///	if this call results in a move of an existing character 
-	///	or in a no-op due to is_jumping_back being false. 
-	/// 
-	character* add_display_object(const SWF::PlaceObject2Tag* tag);
-	
-	/// Proxy of DisplayList::move_display_object()
-	//
-	void move_display_object(const SWF::PlaceObject2Tag* tag);
-
-	void replace_display_object(const SWF::PlaceObject2Tag* tag);
-
+	character* add_display_object(const SWF::PlaceObject2Tag* tag, DisplayList& dlist);
+	// Proxy of DisplayList::move_character()
+	void move_display_object(const SWF::PlaceObject2Tag* tag, DisplayList& dlist);
 	// Proxy of DisplayList::replace_character()
+	void replace_display_object(const SWF::PlaceObject2Tag* tag, DisplayList& dlist);
+	// Proxy of DisplayList::remove_character()
+	void remove_display_object(const SWF::PlaceObject2Tag* tag, DisplayList& dlist);
+
 	void replace_display_object(character* ch,	int depth,
 		bool use_old_cxform,
 		bool use_old_matrix);
@@ -389,8 +379,7 @@ public:
 	void	remove_display_object(int depth, int /* id */)
 	{
 	    set_invalidated();
-		DisplayList& dlist = const_cast<DisplayList &>( getDisplayList() );
-	    dlist.remove_character(depth);
+	    m_display_list.remove_character(depth);
 	}
 
 	/// Attach the given character instance to current display list
@@ -620,11 +609,7 @@ public:
 			
 
 	const DisplayList& getDisplayList() const {
-		if(! is_jumping_back)	{
 			return m_display_list;
-		} else {
-			return m_tmp_display_list;
-		}
 	}
 
 	/// Return the next highest available depth
@@ -874,9 +859,6 @@ private:
 	/// Current Display List contents.
 	DisplayList	m_display_list;
 
-	/// temporary display list used for timeline construction during jump back
-	DisplayList m_tmp_display_list;
-
 	/// The canvas for dynamic drawing
 	//
 	/// WARNING: since DynamicShape is a character_def, which is
@@ -906,9 +888,6 @@ private:
 
 	// true if this sprite reached the last frame and restarted
 	bool		m_has_looped;
-
-	// true is the sprite is jumping back.
-	bool		is_jumping_back;
 
 	// true is we're calling frame actions
 	bool _callingFrameActions;
@@ -971,7 +950,7 @@ protected:
 	///     Which kind of control tags we want to execute. 
 	///	See control_tag_type enum.
 	///
-	void execute_frame_tags(size_t frame, int typeflags=TAG_DLIST|TAG_ACTION); 
+	void execute_frame_tags(size_t frame, DisplayList& dlist, int typeflags=TAG_DLIST|TAG_ACTION);
 
 	/// \brief
 	/// This is either sprite_definition (for sprites defined by
