@@ -1,5 +1,10 @@
 2008-04-30 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/MovieClip.as: add test for setting
+	  _alpha, Gnash fails (potlatch scissors case).
+
+2008-04-30 Sandro Santilli <strk@keybit.net>
+
 	* server/movie_root.{cpp,h}: allow setting background color
 	  only once (till the stage is reset by clear).
 	  TODO: check if background can change when loading something
