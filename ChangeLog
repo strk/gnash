@@ -1,3 +1,7 @@
+2008-04-30 Russ Nelson <nelson@crynwr.com>
+
+	* configure.ac: check for dejagnu and throw a warning if not present.
+
 2008-04-30 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-swfmill.all/Makefile.am: don't forget
@@ -24,7 +28,7 @@
 	* testsuite/actionscript.all/MovieClip.as: success for all newly
 	  added _alpha tests.
 
-2008-04-28 Russ Nelson <nelson@crynwr.com>
+2008-04-30 Russ Nelson <nelson@crynwr.com>
 
 	* resolve http://savannah.gnu.org/bugs/?22973 by adding a test
 	  for a directory, and by removing .. and ../.. which we probably

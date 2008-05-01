@@ -861,6 +861,8 @@ AM_CONDITIONAL(ENABLE_SHARED, [test x"${enable_shared}" = xyes])
 AM_CONDITIONAL(ENABLE_STATIC, [test x"${enable_shared}" = xno])
 dnl -- AM_CONDITIONAL(STATIC_GUI, test x"${dynamic_gui}" = xno -o x"${enable_shared}" = xno)
 
+AC_PATH_PROG(DEJAGNU, runtest)
+
 AM_CONDITIONAL(BUILD_OGL_RENDERER, [ test x$build_ogl = xyes ])
 AM_CONDITIONAL(BUILD_AGG_RENDERER, [ test x$build_agg = xyes ])
 AM_CONDITIONAL(BUILD_CAIRO_RENDERER, [ test x$build_cairo = xyes ])
@@ -2872,8 +2874,18 @@ if test "$GMSGFMT" == ":"; then
   echo "        WARNING: You need the gettext package installed to use translations." >&4
   echo "                 Required for building a package or 'make distcheck'" >&4
   echo "                 Install it from http://www.gnu.org/software/gettext/" >&4
-  echo "                  or deb users: apt-get install gettext" >&4
-  #echo "                 or .rpm users: yum install gettext" >&4
+  echo "                 or .deb users: apt-get install gettext" >&4
+  #echo "                or .rpm users: yum install gettext" >&4
+fi
+
+if test x"${DEJAGNU}" != x""; then
+  echo "        DEJAGNU's runtest is $DEJAGNU"
+else
+  echo "        WARNING: You need the dejagnu package installed to get a summary" >&4
+  echo "                 report after running ``make check''" >&4
+  echo "                 Install it from http://www.gnu.org/software/dejagnu/" >&4
+  echo "                 or .deb users: apt-get install dejagnu" >&4
+  #echo "                or .rpm users: yum install dejagnu" >&4
 fi
 
 
