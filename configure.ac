@@ -487,6 +487,7 @@ build_aqua=no
 build_hildon=no
 build_alp=no
 build_qtopia=no
+build_dump=no
 AC_ARG_ENABLE(gui,
   AC_HELP_STRING([--enable-gui=], [Use the specified GUI toolkit (default=gtk,kde)]),
   if test -n ${enableval}; then
@@ -535,7 +536,11 @@ dnl        AC_DEFINE(USE_GTK, [1], [Use the GTK GUI])
       fb|FB)
         build_fb=yes
         ;;
+      dump|DUMP)
+        build_dump=yes
+        ;;
       all|ALL)
+        build_dump=yes
         build_fb=yes
         build_fltk=yes
         build_kde=yes
@@ -546,7 +551,7 @@ dnl        build_hildon=yes
 dnl        build_alp=yes
 dnl        build_riscos=yes
         ;;
-      *) AC_MSG_ERROR([invalid gui ${enableval} given (accept: gtk|kde|fltk|sdl|riscos|aqua|fb|hildon|alp|qtopia)])
+      *) AC_MSG_ERROR([invalid gui ${enableval} given (accept: gtk|kde|fltk|sdl|riscos|aqua|fb|hildon|alp|qtopia|dump)])
          ;;
       esac]
     enableval=`echo ${enableval} | cut -d ' ' -f 2-6`
@@ -611,6 +616,9 @@ if test x$build_ogl = xyes; then
   fi
   if test x$build_fltk = xyes; then
     AC_MSG_ERROR([OpenGL renderer is not supported by FLTK gui. Use --enable-renderer=AGG]);
+  fi
+  if test x$build_dump = xyes; then
+    AC_MSG_ERROR([OpenGL renderer is not supported by Dump gui. Use --enable-renderer=AGG]);
   fi
    AC_DEFINE([RENDERER_OPENGL], [], [Use OpenGL renderer])
 fi
@@ -1269,6 +1277,9 @@ AC_CHECK_HEADERS(getopt.h)
 AC_CHECK_HEADERS(libgen.h)
 AC_CHECK_HEADERS(pwd.h)
 AC_CHECK_HEADERS(sys/utsname.h)
+AC_CHECK_HEADERS(signal.h)
+AC_CHECK_HEADERS(unistd.h)
+AC_CHECK_HEADERS(sys/time.h)
 AC_CHECK_LIB(lber, der_free)
 AC_CHECK_LIB(m, sqrt)
 AC_CHECK_LIB(c, getpwnam, AC_DEFINE(HAVE_GETPWNAM, 1, [Has getpwnam] ))
@@ -1604,6 +1615,7 @@ AM_CONDITIONAL(BUILD_SDL_GUI, [ test x$build_sdl = xyes ])
 AM_CONDITIONAL(BUILD_FB_GUI, [ test x$build_fb = xyes ])
 AM_CONDITIONAL(BUILD_AQUA_GUI, [ test x$build_aqua = xyes ])
 AM_CONDITIONAL(BUILD_RISCOS_GUI, [ test x$build_riscos = xyes ])
+AM_CONDITIONAL(BUILD_DUMP_GUI, [ test x$build_dump = xyes ])
 
 # plugin building flags
 AM_CONDITIONAL(NSAPI, [test x$nsapi = xyes])
@@ -1754,6 +1766,9 @@ dnl   fi
   fi
   if test x$build_kde = xyes; then
     AC_MSG_ERROR([Cairo renderer is not supported by KDE gui. Use --enable-renderer=AGG]);
+  fi
+  if test x$build_dump = xyes; then
+    AC_MSG_ERROR([Cairo renderer is not supported by Dump gui. Use --enable-renderer=AGG]);
   fi
   AC_DEFINE([RENDERER_CAIRO], [], [Use cairo renderer])
 fi
@@ -2032,6 +2047,9 @@ if test x$build_riscos = xyes; then
 fi
 if test x$build_aqua = xyes; then
   SUPPORTED_GUIS="${SUPPORTED_GUIS},aqua"
+fi
+if test x$build_dump = xyes; then
+  SUPPORTED_GUIS="${SUPPORTED_GUIS},dump"
 fi
 SUPPORTED_GUIS="`echo ${SUPPORTED_GUIS} | sed 's/,//'`" # Strip leading comma
 AC_SUBST(SUPPORTED_GUIS)

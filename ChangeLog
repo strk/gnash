@@ -1,3 +1,7 @@
+2008-05-01 Russ Nelson <nelson@crynwr.com>
+
+	* incorporate Craig Kelley's "dump" gui code.
+
 2008-04-30 Russ Nelson <nelson@crynwr.com>
 
 	* configure.ac: check for dejagnu and throw a warning if not present.

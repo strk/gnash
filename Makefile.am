@@ -278,6 +278,9 @@ endif
 if BUILD_HILDON_GUI
 	@echo "	Supported GUI: HILDON"
 endif
+if BUILD_DUMP_GUI
+	@echo "	Supported GUI: Dump"
+endif
 if BUILD_ALP_GUI
 	@echo "	Supported GUI: ALP/Hiker"
 endif
