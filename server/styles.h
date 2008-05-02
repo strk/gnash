@@ -42,7 +42,13 @@ public:
 		m_width(width),
 		m_color(color),
 		_scaleVertically(scaleThicknessVertically),
-		_scaleHorizontally(scaleThicknessHorizontally)
+		_scaleHorizontally(scaleThicknessHorizontally),
+		_noClose(false),  // TODO: make these constructor arguments?
+		_startCapStyle(CAP_ROUND),
+		_endCapStyle(CAP_ROUND),
+		_joinStyle(JOIN_ROUND),
+		_miterLimitFactor(1.0f)
+		
 	{
 	}
 
