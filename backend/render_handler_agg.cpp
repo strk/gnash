@@ -42,9 +42,9 @@ Status
     patterns          don't exist (they're converted at compile time by Flash!)
     widths            COMPLETE
     colors, alpha     COMPLETE
-    cap styles        TODO / fixed to round caps
-    join styles       TODO / fixed to round joins
-    no-close flag     TODO / currently ignored        
+    cap styles        DONE, but end cap style is ignored
+    join styles       COMPLETE
+    no-close flag     TODO / currently ignored (noClose==1 assumed)        
   
     
   fills:
@@ -1779,9 +1779,25 @@ public:
           }
           stroke.width(std::max(1.0f, thickness*stroke_scale));
         }
-          
-        stroke.line_cap(agg::round_cap);        
-        stroke.line_join(agg::round_join); 
+        
+        // TODO: support endCapStyle
+        
+        // TODO: When lstyle.noClose==0 and the start and end point matches,
+        // then render a real join instead of the caps.
+
+        switch (lstyle.startCapStyle()) {
+          case CAP_NONE   : stroke.line_cap(agg::butt_cap); break; 
+          case CAP_SQUARE : stroke.line_cap(agg::square_cap); break;          
+          default : case CAP_ROUND : stroke.line_cap(agg::round_cap); 
+        }
+        
+        switch (lstyle.joinStyle()) {
+          case JOIN_BEVEL : stroke.line_join(agg::bevel_join); break;
+          case JOIN_MITER : stroke.line_join(agg::miter_join); break;
+          default : case JOIN_ROUND : stroke.line_join(agg::round_join);
+        }
+        
+        stroke.miter_limit(lstyle.miterLimitFactor());
                 
         ras.reset();
         ras.add_path(stroke);

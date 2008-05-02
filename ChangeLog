@@ -1,3 +1,8 @@
+2008-05-02 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* server/style.{cpp,h}: fixed default constructor
+	* backend/render_handler_agg.cpp: implement cap and join styles
+
 2008-05-02 Sandro Santilli <strk@keybit.net>
 
 	* gui/Player.cpp, gui/gui.h: have dump-gnash really use the

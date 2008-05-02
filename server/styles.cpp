@@ -28,7 +28,12 @@ line_style::line_style()
     m_width(0),
     m_color(),
     _scaleVertically(true),
-    _scaleHorizontally(true)
+    _scaleHorizontally(true),
+		_noClose(false),
+		_startCapStyle(CAP_ROUND),
+		_endCapStyle(CAP_ROUND),
+		_joinStyle(JOIN_ROUND),
+		_miterLimitFactor(1.0f)
 {
 }
 
@@ -106,21 +111,21 @@ line_style::read(stream* in, int tag_type, movie_definition *md)
 	m_width = in->read_u16();
 
 	// 0 -- Round caps, 1 -- No caps, 2 -- square caps
-	boost::uint8_t caps = in->read_uint(2);
+	_startCapStyle = (cap_style_e) in->read_uint(2);
 	// 0 -- Round join, 1 -- Bevel join, 2 -- Miter join
-	boost::uint8_t joins = in->read_uint(2);
+	_joinStyle = (join_style_e) in->read_uint(2);
 	bool has_fill = in->read_bit();
 	_scaleHorizontally = ! in->read_bit();
 	_scaleVertically = ! in->read_bit();
 	bool pixel_hinting = in->read_bit();
 	static_cast<void> (in->read_uint(5));
-	bool no_close = in->read_bit();
-	bool end_cap_style = in->read_uint(2); // As caps above.
+	_noClose = in->read_bit();
+	_startCapStyle = (cap_style_e) in->read_uint(2); // As caps above.
 
-	if (joins == 2)
+	if (_joinStyle == JOIN_MITER)  // style 2
 	{
 		in->ensureBytes(2);
-		/*float f_miter =*/static_cast<void>(in->read_short_ufixed());
+		_miterLimitFactor = in->read_short_ufixed();
 	}
 	if (has_fill)
 	{
