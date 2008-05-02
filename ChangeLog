@@ -1,3 +1,11 @@
+2008-05-02 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/Object.cpp (object_registerClass): use symbol table
+	  from the current environment, not _level0. I'm sure failures
+	  are hiding as our concept of "current environment" is pretty
+	  vague. Anyway, makes youtube embedded player beta (bug #23130)
+	  much closer to working.
+
 2008-05-02 Russ Nelson <nelson@crynwr.com>
 
 	* incorporate the rest of Craig Kelley's "dump" gui code.

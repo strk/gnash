@@ -311,7 +311,20 @@ object_registerClass(const fn_call& fn)
 
 	// TODO: check to *which* definition should we ask the export
 	//       this code uses the *relative* root of current environment's target
+#if 0
 	movie_definition* def = VM::get().getRoot().get_movie_definition();
+#else
+	// Using definition of current target fixes the youtube beta case
+	// https://savannah.gnu.org/bugs/index.php?23130
+	character* tgt = fn.env().get_target();
+	if ( ! tgt ) {
+		log_error("current environment has no target, wouldn't know where to look for symbol required for registerClass"); 
+		return as_value(false);
+	}
+	movie_instance* relRoot = tgt->get_root();
+	assert(relRoot);
+	movie_definition* def = relRoot->get_movie_definition();
+#endif
 	boost::intrusive_ptr<resource> exp_res = def->get_exported_resource(symbolid.c_str());
 	if ( ! exp_res )
 	{
