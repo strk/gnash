@@ -37,17 +37,41 @@ public:
 	/// @param color
 	///	Line color
 	///
-	line_style(boost::uint16_t width, const rgba& color, bool scaleThicknessVertically, bool scaleThicknessHorizontally)
+	/// @param scaleThicknessVertically
+	///
+	/// @param scaleThicknessHorizontally
+	///
+	/// @param noClose
+	///
+	/// @param startCapStyle
+	///
+	/// @param endCapStyle
+	///
+	/// @param joinStyle
+	///
+	/// @param miterLimitFactor
+	///
+	line_style(boost::uint16_t width, const rgba& color,
+			bool scaleThicknessVertically=true,
+			bool scaleThicknessHorizontally=true,
+			bool pixelHinting=false,
+			bool noClose=false,
+			cap_style_e startCapStyle=CAP_ROUND,
+			cap_style_e endCapStyle=CAP_ROUND,
+			join_style_e joinStyle=JOIN_ROUND,
+			float miterLimitFactor=1.0f
+		)
 		:
 		m_width(width),
 		m_color(color),
 		_scaleVertically(scaleThicknessVertically),
 		_scaleHorizontally(scaleThicknessHorizontally),
-		_noClose(false),  // TODO: make these constructor arguments?
-		_startCapStyle(CAP_ROUND),
-		_endCapStyle(CAP_ROUND),
-		_joinStyle(JOIN_ROUND),
-		_miterLimitFactor(1.0f)
+		_pixelHinting(pixelHinting),
+		_noClose(noClose),
+		_startCapStyle(startCapStyle),
+		_endCapStyle(endCapStyle),
+		_joinStyle(joinStyle),
+		_miterLimitFactor(miterLimitFactor)
 		
 	{
 	}
@@ -116,6 +140,12 @@ public:
     return _noClose;
   }
 
+	/// Return true if pixel hinting should be activated
+	bool doPixelHinting() const
+	{
+		return _pixelHinting;
+	}
+
 	/// Return line color and alpha
 	const rgba&	get_color() const { return m_color; }
 
@@ -140,6 +170,7 @@ private:
 	rgba	m_color;
 	bool _scaleVertically;
 	bool _scaleHorizontally;
+	bool _pixelHinting;
 	bool _noClose;
 	cap_style_e _startCapStyle;
 	cap_style_e _endCapStyle;

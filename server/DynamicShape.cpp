@@ -159,9 +159,15 @@ DynamicShape::finalize()
 }
 
 void
-DynamicShape::lineStyle(boost::uint16_t thickness, const rgba& color, bool vScale, bool hScale)
+DynamicShape::lineStyle(boost::uint16_t thickness, const rgba& color,
+	bool vScale, bool hScale, bool pixelHinting, bool noClose,
+	cap_style_e startCapStyle, cap_style_e endCapStyle,
+	join_style_e joinStyle, float miterLimitFactor)
 {
-	line_style style(thickness, color, vScale, hScale);
+	line_style style(thickness, color, vScale, hScale, pixelHinting,
+		noClose, startCapStyle, endCapStyle, joinStyle,
+		miterLimitFactor);
+
 	_currline = add_line_style(style);
 	startNewPath(false); // don't make this the start of a new subshape (to verify)
 }

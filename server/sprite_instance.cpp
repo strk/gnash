@@ -54,6 +54,7 @@
 #include "DynamicShape.h" // for composition
 #include "namedStrings.h"
 #include "fill_style.h" // for beginGradientFill
+#include "styles.h" // for cap_style_e and join_style_e enums
 #include "PlaceObject2Tag.h" 
 
 #ifdef USE_SWFTREE
@@ -1358,6 +1359,11 @@ sprite_lineStyle(const fn_call& fn)
   thickness = boost::uint16_t(PIXELS_TO_TWIPS(boost::uint16_t(fclamp(fn.arg(0).to_number(), 0, 255))));
   bool scaleThicknessVertically = true;
   bool scaleThicknessHorizontally = true;
+  bool pixelHinting = false;
+  bool noClose = false;
+  cap_style_e capStyle = CAP_ROUND;
+  join_style_e joinStyle = JOIN_ROUND;
+  float miterLimitFactor = 1.0f;
 
   if ( fn.nargs > 1 )
   {
@@ -1384,8 +1390,7 @@ sprite_lineStyle(const fn_call& fn)
         }
         else
         {
-          bool pixelHinting = fn.arg(3).to_bool();
-          if ( pixelHinting) LOG_ONCE( log_unimpl(_("pixelHinting in MovieClip.lineStyle")) );
+          pixelHinting = fn.arg(3).to_bool();
           if ( fn.nargs > 4 )
           {
             std::string noScaleString = fn.arg(4).to_string();
@@ -1412,13 +1417,64 @@ sprite_lineStyle(const fn_call& fn)
             {
               IF_VERBOSE_ASCODING_ERRORS(
               std::stringstream ss; fn.dump_args(ss);
-              log_aserror(_("MovieClip.lineStyle(%s): invalid noScale value '%s'"), ss.str(), noScaleString);
+              log_aserror(_("MovieClip.lineStyle(%s): invalid noScale value '%s' (valid values: %s|%s|%s|%s"),
+                ss.str(), noScaleString, "none", "vertical", "horizontal", "normal");
               );
             }
           }
-          if ( fn.nargs > 5 ) LOG_ONCE( log_unimpl(_("capsStyle arg to MovieClip.lineStyle")) );
-          if ( fn.nargs > 6 ) LOG_ONCE( log_unimpl(_("jointStyle arg to MovieClip.lineStyle")) );
-          if ( fn.nargs > 7 ) LOG_ONCE( log_unimpl(_("miterLimit arg to MovieClip.lineStyle")) );
+          if ( fn.nargs > 5 )
+          {
+            std::string capStyleStr = fn.arg(5).to_string();
+            if ( capStyleStr == "none" )
+            {
+              capStyle = CAP_NONE;
+            }
+            else if ( capStyleStr == "round" )
+            {
+              capStyle = CAP_ROUND;
+            }
+            else if ( capStyleStr == "square" )
+            {
+              capStyle = CAP_SQUARE;
+            }
+            else
+            {
+              IF_VERBOSE_ASCODING_ERRORS(
+              std::stringstream ss; fn.dump_args(ss);
+              log_aserror(_("MovieClip.lineStyle(%s): invalid calStyle value '%s' (valid values: %s|%s|%s)"), ss.str(),
+                capStyleStr, "none", "round", "square");
+              );
+            }
+          }
+          if ( fn.nargs > 6 )
+          {
+            std::string joinStyleStr = fn.arg(6).to_string();
+            if ( joinStyleStr == "miter" )
+            {
+              joinStyle = JOIN_MITER;
+            }
+            else if ( joinStyleStr == "round" )
+            {
+              joinStyle = JOIN_ROUND;
+            }
+            else if ( joinStyleStr == "bevel" )
+            {
+              joinStyle = JOIN_BEVEL;
+            }
+            else
+            {
+              IF_VERBOSE_ASCODING_ERRORS(
+              std::stringstream ss; fn.dump_args(ss);
+              log_aserror(_("MovieClip.lineStyle(%s): invalid jointStyle value '%s' (valid values: %s|%s|%s)"), ss.str(),
+                joinStyleStr, "miter", "round", "bevel");
+              );
+            }
+          }
+          if ( fn.nargs > 7 )
+          {
+            miterLimitFactor = iclamp(fn.arg(7).to_int(), 1, 255);
+          }
+
           IF_VERBOSE_ASCODING_ERRORS(
           if ( fn.nargs > 8 ) 
           {
@@ -1426,6 +1482,7 @@ sprite_lineStyle(const fn_call& fn)
             log_aserror(_("MovieClip.lineStyle(%s): args after the first eight will be discarded"), ss.str());
           }
           )
+
         }
       }
     }
@@ -1438,7 +1495,9 @@ sprite_lineStyle(const fn_call& fn)
 #ifdef DEBUG_DRAWING_API
   log_debug("%s.lineStyle(%d,%d,%d,%d);", sprite->getTarget(), thickness, r, g, b);
 #endif
-  sprite->lineStyle(thickness, color, scaleThicknessVertically, scaleThicknessHorizontally);
+  sprite->lineStyle(thickness, color,
+	scaleThicknessVertically, scaleThicknessHorizontally,
+	pixelHinting, noClose, capStyle, capStyle, joinStyle, miterLimitFactor);
 
   return as_value();
 }

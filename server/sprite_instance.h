@@ -667,9 +667,19 @@ public:
 
 	/// @{ Drawing API
 	
-	void lineStyle(boost::uint16_t thickness, const rgba& color, bool vScale=true, bool hScale=true)
+	void lineStyle(boost::uint16_t thickness, const rgba& color,
+		bool vScale=true, bool hScale=true,
+		bool pixelHinting=false,
+		bool noClose=false,
+		cap_style_e startCapStyle=CAP_ROUND,
+		cap_style_e endCapStyle=CAP_ROUND,
+		join_style_e joinStyle=JOIN_ROUND,
+		float miterLimitFactor=1.0f)
 	{
-		_drawable->lineStyle(thickness, color, vScale, hScale);
+		_drawable->lineStyle(thickness, color, vScale, hScale,
+			pixelHinting, noClose,
+			startCapStyle, endCapStyle, joinStyle,
+			miterLimitFactor);
 	}
 
 	void resetLineStyle()

@@ -1317,6 +1317,11 @@ public:
         }
         this_stroke->width(thickness*stroke_scale);
       }
+
+      if ( lstyle.doPixelHinting() )
+      {
+           LOG_ONCE( log_unimpl(_("Strokes pixel-hinting in AGG renderer")) );
+      }
        
       this_stroke->attach(curve);
       this_stroke->line_cap(agg::round_cap);
@@ -1780,6 +1785,11 @@ public:
           stroke.width(std::max(1.0f, thickness*stroke_scale));
         }
         
+        if ( lstyle.doPixelHinting() )
+        {
+           LOG_ONCE( log_unimpl(_("Strokes pixel-hinting in AGG renderer")) );
+        }
+
         // TODO: support endCapStyle
         
         // TODO: When lstyle.noClose==0 and the start and end point matches,

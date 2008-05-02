@@ -1,3 +1,11 @@
+2008-05-02 Sandro Santilli <strk@keybit.net>
+
+	* server/DynamicShape.{cpp,h}, server/sprite_instance.{cpp,h},
+	  server/styles.{cpp,h}: Add support for all known parameters
+	  in the lineStyle call for swf8 up.
+	* backend/render_handler_agg.cpp: log_unimpl about pixel
+	  hinting in line styles.
+
 2008-05-02 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* server/style.{cpp,h}: fixed default constructor

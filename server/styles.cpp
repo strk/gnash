@@ -29,6 +29,7 @@ line_style::line_style()
     m_color(),
     _scaleVertically(true),
     _scaleHorizontally(true),
+    _pixelHinting(false),
 		_noClose(false),
 		_startCapStyle(CAP_ROUND),
 		_endCapStyle(CAP_ROUND),

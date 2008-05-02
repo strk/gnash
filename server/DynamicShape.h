@@ -21,6 +21,7 @@
 #define GNASH_DYNAMIC_SHAPE_H
 
 #include "shape_character_def.h"  // for inheritance
+#include "styles.h" // for cap_style_e and join_style_e enums
 
 namespace gnash {
 
@@ -62,7 +63,33 @@ public:
 	void endFill();
 
 	/// Set current line style and start a new path.
-	void lineStyle(boost::uint16_t thickness, const rgba& color, bool vScale=true, bool hScale=true);
+	//
+	/// @param thickness
+	///
+	/// @param color
+	///
+	/// @param vScale
+	///
+	/// @param hScale
+	///
+	/// @param noClose
+	///
+	/// @param startCapStyle
+	///
+	/// @param endCapStyle
+	///
+	/// @param joinStyle
+	///
+	/// @param miterLimitFactor
+	///
+	void lineStyle(boost::uint16_t thickness, const rgba& color,
+		bool vScale=true, bool hScale=true,
+		bool pixelHinting=false,
+		bool noClose=false,
+		cap_style_e startCapStyle=CAP_ROUND,
+		cap_style_e endCapStyle=CAP_ROUND,
+		join_style_e joinStyle=JOIN_ROUND,
+		float miterLimitFactor=1.0f);
 
 	/// Reset line style to no style and start a new path.
 	void resetLineStyle();
