@@ -235,6 +235,11 @@ if BUILD_RISCOS_GUI
 include $(srcdir)/am-frag/riscos.am
 endif
 
+# Build the DUMP gui
+if BUILD_DUMP_GUI
+include $(srcdir)/am-frag/dump.am
+endif
+
 CLEANFILES = klash.moc .configline gnash
 
 bundle: Info.plist

@@ -22,8 +22,8 @@
 #include "gnashconfig.h"
 #endif
 
-#include "gnash.h"
-#include "tu_config.h" // for DSOEXPORT
+#include "dsodefs.h" // for DSOEXPORT
+#include "gui.h" // for inheritance
 
 namespace gnash
 {
