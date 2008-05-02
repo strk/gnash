@@ -1,3 +1,8 @@
+2008-05-02 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/server/ClassSizes.cpp: print sizeof line_style
+	  and fill_style.
+
 2008-05-02 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* server/style.{cpp,h}: added cap style, join style, no-close and
