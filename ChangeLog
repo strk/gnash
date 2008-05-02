@@ -1,3 +1,8 @@
+2008-05-02 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* server/style.{cpp,h}: added cap style, join style, no-close and
+	  miter limit factor properties to line_style class
+
 2008-05-02 Sandro Santilli <strk@keybit.net>
 
 	* gui/Makefile.am: build the DUMP gui when requested.

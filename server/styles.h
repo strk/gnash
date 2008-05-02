@@ -19,6 +19,9 @@ namespace gnash {
 class stream;
 class movie_definition;
 
+  typedef enum { CAP_ROUND=0, CAP_NONE=1, CAP_SQUARE=2 } cap_style_e;
+  typedef enum { JOIN_ROUND=0, JOIN_BEVEL=1, JOIN_MITER=2 } join_style_e;
+  
 /// For the outside of outline shapes, or just bare lines.
 class line_style 
 {
@@ -39,7 +42,12 @@ public:
 		m_width(width),
 		m_color(color),
 		_scaleVertically(scaleThicknessVertically),
-		_scaleHorizontally(scaleThicknessHorizontally)
+		_scaleHorizontally(scaleThicknessHorizontally),
+		_noClose(false),
+		_startCapStyle(CAP_ROUND),
+		_endCapStyle(CAP_ROUND),
+		_joinStyle(JOIN_ROUND),
+		_miterLimitFactor(1.0f)
 	{
 	}
 
@@ -75,6 +83,37 @@ public:
 	{
 		return _scaleHorizontally;
 	}
+	
+	/// Return the start cap style
+	cap_style_e startCapStyle() const
+	{
+	  return _startCapStyle;
+  }
+	
+	/// Return the end cap style
+	cap_style_e endCapStyle() const
+	{
+	  return _endCapStyle;
+  }
+  
+  /// Return the join style
+  join_style_e joinStyle() const
+  {
+    return _joinStyle;
+  }
+  
+  /// Return the miter limit factor
+  float miterLimitFactor() const
+  {
+    return _miterLimitFactor;
+  }
+  
+  /// Return true if stroke should not be closed if the stroke's last point
+  /// matches the first point. Caps should be applied instead of a join
+  bool noClose() const
+  {
+    return _noClose;
+  }
 
 	/// Return line color and alpha
 	const rgba&	get_color() const { return m_color; }
@@ -100,6 +139,11 @@ private:
 	rgba	m_color;
 	bool _scaleVertically;
 	bool _scaleHorizontally;
+	bool _noClose;
+	cap_style_e _startCapStyle;
+	cap_style_e _endCapStyle;
+	join_style_e _joinStyle;
+	float _miterLimitFactor;
 };
 
 } // namespace gnash

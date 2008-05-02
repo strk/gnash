@@ -42,6 +42,10 @@ Status
     patterns          don't exist (they're converted at compile time by Flash!)
     widths            COMPLETE
     colors, alpha     COMPLETE
+    cap styles        TODO / fixed to round caps
+    join styles       TODO / fixed to round joins
+    no-close flag     TODO / currently ignored        
+  
     
   fills:
     solid fills       COMPLETE
