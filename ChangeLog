@@ -1,3 +1,7 @@
+2008-05-02 Russ Nelson <nelson@crynwr.com>
+
+	* incorporate the rest of Craig Kelley's "dump" gui code.
+
 2008-05-02 Sandro Santilli <strk@keybit.net>
 
 	* server/movie_root.cpp (cleanupUnloadedListeners): scan again if

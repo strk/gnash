@@ -133,11 +133,26 @@ public:
 	void setStartFullscreen(bool x) {
 	    _startFullscreen = x;
 	}
+
+        void setAudioDumpfile(const char* filespec) {
+            _audio_dump = filespec;
+        }
 	
 private:
 
 	void init();
 
+	/// This aux streamer returns a silent audio stream
+	///
+	/// @param udata
+	///     Pointer to user-specific data
+	/// @param stream
+	///     Buffer into which method will put data
+	/// @param len
+	///     Requested amount of data to put
+	/// @return success
+	static bool silent_stream(void* udata, boost::uint8_t* stream, int len);
+        
 	void init_sound();
 
 	void init_logfile();
@@ -214,6 +229,8 @@ private:
 	// Whether to start Gnash in fullscreen mode.
 	// (Or what did you think it meant?)
 	bool _startFullscreen;
+
+        const char* _audio_dump;
 
 };
 

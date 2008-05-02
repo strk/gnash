@@ -47,10 +47,10 @@
 namespace gnash {
 namespace media {
 
-SDL_sound_handler::SDL_sound_handler()
+SDL_sound_handler::SDL_sound_handler(char* wave_file)
 	: soundOpened(false),
-		soundsPlaying(0),
-		muted(false)
+	  soundsPlaying(0),
+	  muted(false)
 {
 	// This is our sound settings
 	audioSpec.freq = 44100;
@@ -59,6 +59,29 @@ SDL_sound_handler::SDL_sound_handler()
 	audioSpec.callback = SDL_sound_handler::sdl_audio_callback;
 	audioSpec.userdata = this;
 	audioSpec.samples = 2048;		//512 - not enough for  videostream
+
+        file_output = NULL;
+        file_stream = NULL;
+
+	if (wave_file != NULL) {
+            file_output = wave_file;
+	    file_stream = new std::ofstream();
+	    file_stream->open(file_output);
+	    if (file_stream->fail()) {
+                std::cerr << "Unable to write file '" << file_output << "'\n";
+                exit(1);
+	    } else {
+                write_wave_header(file_stream);
+                std::cout << "# Created 44100 16Mhz stereo wave file:" << std::endl <<
+                    "AUDIOFILE=" << file_output << std::endl;
+	    }
+        }
+
+}
+
+SDL_sound_handler::SDL_sound_handler()
+{
+    SDL_sound_handler(NULL);
 }
 
 void
@@ -84,6 +107,10 @@ SDL_sound_handler::~SDL_sound_handler()
 {
 	delete_all_sounds();
 	if (soundOpened) SDL_CloseAudio();
+	if ((file_stream != NULL) && (file_stream->is_open())) {
+	  file_stream->close();
+	}
+
 }
 
 
@@ -513,6 +540,13 @@ create_sound_handler_sdl()
 	return new SDL_sound_handler;
 }
 
+sound_handler*
+create_sound_handler_sdl(char* wave_file)
+// Factory.
+{
+	return new SDL_sound_handler(wave_file);
+}
+
 // Pointer handling and checking functions
 boost::uint8_t*
 active_sound::get_raw_data_ptr(unsigned long int pos)
@@ -629,6 +663,59 @@ do_mixing(Uint8* stream, active_sound* sound, Uint8* data, unsigned int mix_leng
 }
 
 
+// write a wave header, using the current audioSpec settings
+void SDL_sound_handler::write_wave_header(std::ofstream *outfile)
+{
+
+  int i;
+  char obuff[80];
+ 
+  WAV_HDR *wav;
+  CHUNK_HDR *chk;
+ 
+  // allocate wav header
+  wav = new WAV_HDR;
+  chk = new CHUNK_HDR;
+  
+  // setup wav header
+  sprintf(obuff,"RIFF");
+  for(i=0;i<4;i++) wav->rID[i] = obuff[i];
+ 
+  sprintf(obuff,"WAVE");
+  for(i=0;i<4;i++) wav->wID[i] = obuff[i];
+  
+  sprintf(obuff,"fmt ");
+  for(i=0;i<4;i++) wav->fId[i] = obuff[i];
+ 
+  wav->nBitsPerSample = ((audioSpec.format == AUDIO_S16SYS) ? 16 : 0);
+  wav->nSamplesPerSec = audioSpec.freq;
+  wav->nAvgBytesPerSec = audioSpec.freq;
+  wav->nAvgBytesPerSec *= wav->nBitsPerSample / 8;
+  wav->nAvgBytesPerSec *= audioSpec.channels;
+  wav->nChannels = audioSpec.channels;
+    
+  wav->pcm_header_len = 16;
+  wav->wFormatTag = 1;
+  wav->rLen = sizeof(WAV_HDR) + sizeof(CHUNK_HDR);
+  wav->nBlockAlign = audioSpec.channels * wav->nBitsPerSample / 8;
+
+  // setup chunk header
+  sprintf(obuff,"data");
+  for(i=0;i<4;i++) chk->dId[i] = obuff[i];
+  chk->dLen = 0;
+ 
+  /* write riff/wav header */
+  outfile->write((char *)wav,sizeof(WAV_HDR));
+ 
+  /* write chunk header */
+  outfile->write((char *)chk,sizeof(CHUNK_HDR));
+ 
+  // be polite
+  if(wav!=NULL) delete wav;
+  if(chk!=NULL) delete chk;
+
+}
+
 // Callback invoked by the SDL audio thread.
 void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in)
 {
@@ -652,6 +739,7 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 	// If nothing to play there is no reason to play
 	// Is this a potential deadlock problem?
 	if (handler->soundsPlaying == 0 && handler->m_aux_streamer.size() == 0) {
+            std::cout << "Pausing Audio now...\n";
 		SDL_PauseAudio(1);
 		return;
 	}
@@ -814,7 +902,19 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 		} // active sounds loop
 	} // existing sounds loop
 
+	// 
+	// WRITE CONTENTS OF stream TO FILE
+	//
+	if (handler->file_stream != NULL) {
+            handler->file_stream->write((char*) stream, buffer_length_in);
+            // now, mute all audio
+            memset ((void*) stream, 0, buffer_length_in);
+	}
+
+
+
 }
+
 
 } // gnash.media namespace 
 } // namespace gnash

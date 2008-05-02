@@ -43,6 +43,29 @@ extern "C" {
 #include <boost/bind.hpp>
 #include <boost/thread/mutex.hpp>
 
+// Header of a wave file
+// http://ftp.iptel.org/pub/sems/doc/full/current/wav__hdr_8c-source.html
+typedef struct{
+     char rID[4];            // 'RIFF'
+     long int rLen;        
+     char wID[4];            // 'WAVE'
+     char fId[4];            // 'fmt '
+     long int pcm_header_len;   // varies...
+     short int wFormatTag;
+     short int nChannels;      // 1,2 for stereo data is (l,r) pairs
+     long int nSamplesPerSec;
+     long int nAvgBytesPerSec;
+     short int nBlockAlign;      
+     short int nBitsPerSample;
+} WAV_HDR;
+
+// Chunk of wave file
+// http://ftp.iptel.org/pub/sems/doc/full/current/wav__hdr_8c-source.html
+typedef struct{
+    char dId[4];            // 'data' or 'fact'
+    long int dLen;
+} CHUNK_HDR;
+
 namespace gnash {
 namespace media {
 
@@ -312,9 +335,19 @@ private:
 	// stop and delete all sounds
 	void delete_all_sounds();
 
+	/// File name for dump file
+	char* file_output;
+
+        /// File stream for dump file
+	std::ofstream* file_stream;
+
+	// write a .WAV file header
+	void write_wave_header(std::ofstream *outfile);
+
 public:
 	SDL_sound_handler();
-	virtual ~SDL_sound_handler();
+	SDL_sound_handler(char* wave_file);
+	~SDL_sound_handler();
 
 	/// Called to create a sound.
 	virtual int	create_sound(void* data, unsigned int data_bytes, std::auto_ptr<SoundInfo> sinfo);

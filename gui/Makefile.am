@@ -16,7 +16,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 # 
-# build gtk-gnash, kde-gnash, sdl-gnash, fltk-gnash, aqua-gnash, fb-gnash and riscos-gnash
+# build gtk-gnash, kde-gnash, sdl-gnash, fltk-gnash, aqua-gnash, fb-gnash, riscos-gnash
+# and dump-gnash
 #
 
 AUTOMAKE_OPTIONS = -Wno-portability
@@ -71,6 +72,10 @@ GTK_LIBS =  \
 	$(ATK_LIBS) \
 	$(GLIB_LIBS) \
 	$(EXPAT_LIBS)
+
+DUMP_CFLAGS =
+
+DUMP_LIBS =
 
 # The following will be filled up later
 GUI_CPPFLAGS = 
@@ -225,6 +230,11 @@ if BUILD_HILDON_GUI
 include $(srcdir)/am-frag/hildon.am
 endif
 
+# Build the DUMP gui
+if BUILD_DUMP_GUI
+include $(srcdir)/am-frag/dump.am
+endif
+
 # Build the FB gui
 if BUILD_FB_GUI
 include $(srcdir)/am-frag/fb.am
@@ -233,11 +243,6 @@ endif
 # Build the RISCOS gui
 if BUILD_RISCOS_GUI
 include $(srcdir)/am-frag/riscos.am
-endif
-
-# Build the DUMP gui
-if BUILD_DUMP_GUI
-include $(srcdir)/am-frag/dump.am
 endif
 
 CLEANFILES = klash.moc .configline gnash

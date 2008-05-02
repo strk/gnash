@@ -92,6 +92,7 @@ Player::Player()
     _fpsDebugTime(0.0),
 #endif
     _hostfd(-1),
+    _audio_dump(NULL),
     _startFullscreen(false)
 {
     init();
@@ -159,12 +160,25 @@ Player::init_logfile()
 
 }
 
+bool
+Player::silent_stream(void* /*udata*/, boost::uint8_t* stream, int len)
+{
+    memset((void*)stream, 0, len);
+    return true;
+}
+
 void
 Player::init_sound()
 {
     if (_doSound) {
 #ifdef SOUND_SDL
-        _sound_handler.reset( gnash::media::create_sound_handler_sdl() );
+        _sound_handler.reset( gnash::media::create_sound_handler_sdl(_audio_dump) );
+        if (_audio_dump != NULL) {
+            // add a silent stream to the audio pool so that our output file
+            // is homogenous;  we actually want silent wave data when no sounds
+            // are playing on the stage
+            _sound_handler->attach_aux_streamer(silent_stream, (void*) this);
+        }
 #elif defined(SOUND_GST)
         _sound_handler.reset( gnash::media::create_sound_handler_gst() );
 #else

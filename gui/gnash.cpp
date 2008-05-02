@@ -97,6 +97,8 @@ cout << _("Usage: gnash [options] movie_file.swf") << endl
 #if VERBOSE_PARSE
     << _("  -vp                      Be (very) verbose about parsing") << endl
 #endif
+    << _("  -A <file>                Audio dump file (wave format)") << endl
+    << _("  -D <file>                Video dump file (only valid with dump-gnash)") << endl
     << _("  -x,  --xid <ID>          X11 Window ID for display") << endl
     << _("  -w,  --writelog          Produce the disk based debug log") << endl
     << _("  -j,  --width <width>     Set window width") << endl
@@ -202,6 +204,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
         { 'V', "version",       Arg_parser::no  },        
         { 'f', "debug-fps",     Arg_parser::yes },        
         { 'F', "fd",            Arg_parser::yes },
+        { 'A', "dump",          Arg_parser::yes },
         {   0, 0,               Arg_parser::no  }
     };
 
@@ -374,17 +377,23 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
 	                }
               		player.setParam(name, value);
 	                break;
-	            }
-	            case 0:
-	                infiles.push_back(parser.argument(i));
-	                break;
 	        }
+	        case 0:
+	            infiles.push_back(parser.argument(i));
+	            break;
+                case 'A':
+                {
+                    std::string fn = parser.argument(i);
+                    player.setAudioDumpfile(fn.c_str());
+                    break;
+                }
 	    }
-	    catch (Arg_parser::ArgParserException &e)
-	    {
-	        cerr << _("Error parsing command line options: ") << e.what() << endl;
-	        cerr << _("This is a Gnash bug.") << endl;
-	    }
+        }
+	catch (Arg_parser::ArgParserException &e)
+	{
+	    cerr << _("Error parsing command line options: ") << e.what() << endl;
+	    cerr << _("This is a Gnash bug.") << endl;
+	}
     }
 
     if ( ! renderflag ) {
