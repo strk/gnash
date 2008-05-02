@@ -50,6 +50,24 @@
 //#define GNASH_DEBUG_LOADMOVIE_REQUESTS_PROCESSING 1
 //#define GNASH_DEBUG_TIMERS_EXPIRATION 1
 
+// Defining the macro below prints info about
+// cleanup of live chars (advanceable + key/mouse listeners)
+// Is useful in particular to check for cost of multiple scans
+// when a movie destruction destrois more elements.
+//
+// NOTE: I think the whole confusion here was introduced
+//       by zou making it "optional" to ::unload() childs
+//       when being unloaded. Zou was trying to avoid
+//       queuing an onUnload event, which I suggested we'd
+//       do by having unload() take an additional argument
+//       or similar. Failing to tag childs as unloaded
+//       will result in tagging them later (in ::destroy)
+//       which will require scanning the lists again
+//       (key/mouse + advanceable).
+//       See https://savannah.gnu.org/bugs/index.php?21804
+//
+//#define GNASH_DEBUG_DLIST_CLEANUP 1
+
 namespace gnash
 {
 
@@ -1132,13 +1150,49 @@ char* movie_root::call_method_args(const char* method_name,
 
 void movie_root::cleanupUnloadedListeners(CharacterList& ll)
 {
-    // remove unloaded character listeners from movie_root
-    for (CharacterList::iterator iter = ll.begin(); iter != ll.end(); )
+    bool needScan;
+
+#ifdef GNASH_DEBUG_DLIST_CLEANUP
+    int scansCount = 0;
+#endif
+
+    do
     {
-        character* ch = iter->get();
-        if ( ch->isUnloaded() ) iter = ll.erase(iter);
-        else ++iter;
-    }
+
+#ifdef GNASH_DEBUG_DLIST_CLEANUP
+      scansCount++;
+      int cleaned =0;
+#endif
+
+      needScan=false;
+
+      // remove unloaded character listeners from movie_root
+      for (CharacterList::iterator iter = ll.begin(); iter != ll.end(); )
+      {
+          character* ch = iter->get();
+          if ( ch->isUnloaded() )
+          {
+            if ( ! ch->isDestroyed() )
+            {
+              ch->destroy();
+              needScan=true; // ->destroy() might mark already-scanned chars as unloaded
+            }
+            iter = ll.erase(iter);
+
+#ifdef GNASH_DEBUG_DLIST_CLEANUP
+            cleaned++;
+#endif
+
+          }
+
+          else ++iter;
+      }
+
+#ifdef GNASH_DEBUG_DLIST_CLEANUP
+      cout << " Scan " << scansCount << " cleaned " << cleaned << " instances" << endl;
+#endif
+
+    } while (needScan);
     
 }
 

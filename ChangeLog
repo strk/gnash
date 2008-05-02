@@ -1,5 +1,11 @@
 2008-05-02 Sandro Santilli <strk@keybit.net>
 
+	* server/movie_root.cpp (cleanupUnloadedListeners): scan again if
+	  any unloaded character was found. Fixes an assertion failure
+          with GNASH_PARANOIA_LEVEL > 1 while running MovieClip.as tests.
+
+2008-05-02 Sandro Santilli <strk@keybit.net>
+
 	* server/DynamicShape.{cpp,h}, server/sprite_instance.{cpp,h},
 	  server/styles.{cpp,h}: Add support for all known parameters
 	  in the lineStyle call for swf8 up.
