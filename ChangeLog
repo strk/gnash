@@ -1,5 +1,10 @@
 2008-05-02 Sandro Santilli <strk@keybit.net>
 
+	* gui/Player.cpp, gui/gui.h: have dump-gnash really use the
+	  the DUMP gui.
+
+2008-05-02 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/server/ClassSizes.cpp: print sizeof line_style
 	  and fill_style.
 
