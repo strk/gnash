@@ -596,16 +596,16 @@ Global::Global(VM& vm, ClassHierarchy *ch)
 	// SWF4
 	//-----------------------
 
-    // The Math class was available from SWF4. It
-    // is initialized on demand, and the native
-    // functions *must* be registered before this.
+	// The Math class was available from SWF4. It
+	// is initialized on demand, and the native
+	// functions *must* be registered before this.
 	registerMathNative(*this);
 	
 	// TODO: When should these be registered?
 	registerSystemNative(*this);
 	registerStageNative(*this);
 
-    vm.registerNative(as_global_trace, 100, 4);
+	vm.registerNative(as_global_trace, 100, 4);
 	init_member("trace", vm.getNative(100, 4));
 
 	if ( vm.getSWFVersion() < 5 ) goto extscan;
@@ -613,10 +613,14 @@ Global::Global(VM& vm, ClassHierarchy *ch)
 	// SWF5
 	//-----------------------
 
-    vm.registerNative(as_global_escape, 100, 0);
+	{ // it was reported that gcc 4.2.3 needs a scope for as_value(NAN)
+	  // below, don't ask me why.
+	  // See http://lists.gnu.org/archive/html/gnash/2008-05/msg00016.html
+
+	vm.registerNative(as_global_escape, 100, 0);
 	vm.registerNative(as_global_unescape, 100, 1);
-    vm.registerNative(as_global_parseint, 100, 2);
-    vm.registerNative(as_global_parsefloat, 100, 3);
+	vm.registerNative(as_global_parseint, 100, 2);
+	vm.registerNative(as_global_parsefloat, 100, 3);
 	vm.registerNative(as_global_isnan, 200, 18);
 	vm.registerNative(as_global_isfinite, 200, 19);
 
@@ -635,12 +639,13 @@ Global::Global(VM& vm, ClassHierarchy *ch)
 
 	registerColorNative(*this);
 
-    // The following initializations are necessary
-    // to register ASnative functions
+	// The following initializations are necessary
+	// to register ASnative functions
 	textformat_class_init(*this);
 
-    registerDateNative(*this);
-    registerMouseNative(*this);
+	registerDateNative(*this);
+	registerMouseNative(*this);
+	}
 
 	if ( vm.getSWFVersion() < 6 ) goto extscan;
 	//-----------------------
