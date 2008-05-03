@@ -1417,7 +1417,7 @@ sprite_lineStyle(const fn_call& fn)
             {
               IF_VERBOSE_ASCODING_ERRORS(
               std::stringstream ss; fn.dump_args(ss);
-              log_aserror(_("MovieClip.lineStyle(%s): invalid noScale value '%s' (valid values: %s|%s|%s|%s"),
+              log_aserror(_("MovieClip.lineStyle(%s): invalid noScale value '%s' (valid values: %s|%s|%s|%s)"),
                 ss.str(), noScaleString, "none", "vertical", "horizontal", "normal");
               );
             }
@@ -1441,7 +1441,7 @@ sprite_lineStyle(const fn_call& fn)
             {
               IF_VERBOSE_ASCODING_ERRORS(
               std::stringstream ss; fn.dump_args(ss);
-              log_aserror(_("MovieClip.lineStyle(%s): invalid calStyle value '%s' (valid values: %s|%s|%s)"), ss.str(),
+              log_aserror(_("MovieClip.lineStyle(%s): invalid capStyle value '%s' (valid values: %s|%s|%s)"), ss.str(),
                 capStyleStr, "none", "round", "square");
               );
             }
