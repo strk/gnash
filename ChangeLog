@@ -1,3 +1,9 @@
+2008-05-03 Sandro Santilli <strk@keybit.net>
+
+	* server/URLAccessManager.cpp: include full URL in SECURITY lines
+	  (for allow/deny) - could be done better (using a single line)
+	  but at least we have the full information now.
+
 2008-05-03  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* testsuite/libnet.all/test_rtmp.cpp: Unit tests for the RTMP

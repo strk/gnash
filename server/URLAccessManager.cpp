@@ -349,6 +349,8 @@ allowXMLSocket(const std::string& host, short /* port */)
 bool
 allow(const URL& url)
 {
+	log_security("Checking security of URL '%s'", url);
+
 	// We might reintroduce use of an AccessPolicy cache
 
 	std::string host = url.hostname();
