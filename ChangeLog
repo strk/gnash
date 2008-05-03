@@ -1,5 +1,10 @@
 2008-05-03 Sandro Santilli <strk@keybit.net>
 
+	* server/character.cpp: use namespace std, so isfinite works
+	  when HAVE_ISFINITE is defined.
+
+2008-05-03 Sandro Santilli <strk@keybit.net>
+
 	* server/URLAccessManager.cpp: include full URL in SECURITY lines
 	  (for allow/deny) - could be done better (using a single line)
 	  but at least we have the full information now.

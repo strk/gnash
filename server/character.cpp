@@ -41,6 +41,11 @@
 
 #undef set_invalidated
 
+// This is for std::isfinite
+// FIXME: include the std namespace in the macro, and expose
+//        the macro in a single place !
+using namespace std;
+
 namespace gnash
 {
 
