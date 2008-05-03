@@ -95,7 +95,7 @@ hex2mem(const char *str)
 {
     size_t count = strlen(str);
     Network::byte_t ch = 0;
-    Buffer *buf = new Buffer(count + 12);
+    Buffer *buf = new Buffer((count/3) + 1);
     buf->clear();
 
     Network::byte_t *ptr = const_cast<Network::byte_t *>(reinterpret_cast<const Network::byte_t *>(str));
@@ -228,7 +228,7 @@ test_encoding()
     // Encode a boolean. Although we know a bool is only one character, for AMF,
     // it's actually a two byte short instead.
     bool flag = true;
-    const char *x2 = "00 01";
+    const char *x2 = "01 01";
     Buffer *buf2 = hex2mem(x2);
     boost::uint16_t sht = *(boost::uint16_t *)buf2->reference();
     swapBytes(&sht, sizeof(boost::uint16_t)); // we always encode in big endian format
@@ -245,14 +245,11 @@ test_encoding()
 #endif
     
     // A boolean AMF object has only one header byte, which is the type field.
-    // The data is always encoded as a two byte value, even though *we* know a bool is just
-    // one. Obviously AMF goes back to the days of 16 bit ints, and bool was the same size.
-    // Ya gotta love old K&R C code for binary formats.
-    // AMF changes this to being two different type, FALSE & TRUE
+    // AMF3 changes this to being two different type, FALSE & TRUE
     // which are finally only one byte apiece.
     if ((*encbool->reference() == Element::BOOLEAN_AMF0) &&
-        (encbool->size() == 3) &&
-        (memcmp(buf2->reference(), encbool->reference()+1, sizeof(boost::uint16_t)) == 0)) {
+        (encbool->size() == 2) &&
+        (memcmp(buf2->reference(), encbool->reference(), sizeof(boost::uint16_t)) == 0)) {
         runtest.pass("Encoded AMF Boolean");
     } else {
         runtest.fail("Encoded AMF Boolean");
@@ -366,7 +363,7 @@ test_object()
     const char *x = "03 00 03 61 70 70 02 00 08 6f 66 6c 61 44 65 6d 6f 00 08 66 6c 61 73 68 56 65 72 02 00 0c 4c 4e 58 20 39 2c 30 2c 33 31 2c 30 00 06 73 77 66 55 72 6c 02 00 30 68 74 74 70 3a 2f 2f 77 77 77 2e 72 65 64 35 2e 6e 6c 2f 74 6f 6f 6c 73 2f 70 75 62 6c 69 73 68 65 72 2f 70 75 62 6c 69 73 68 65 72 2e 73 77 66 09";
     Buffer *buf1 = hex2mem(x);
     if ((*encobj->reference() == Element::OBJECT_AMF0) &&
-        (memcmp(buf1->reference(), encobj->reference(), 102) == 0)) {
+        (memcmp(buf1->reference(), encobj->reference(), 101) == 0)) {
         runtest.pass("Encoded Object");
     } else {
         runtest.fail("Encoded Object");
@@ -396,12 +393,6 @@ test_object()
         runtest.fail("Extracted Object");
     }
 
-#if 0
-    newtop->getProperty(0)->dump();
-    newtop->getProperty(1)->dump();
-    newtop->getProperty(2)->dump();
-#endif
-    
     // cleanup
     delete newtop;
     delete buf1;    
