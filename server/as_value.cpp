@@ -438,12 +438,14 @@ as_value::to_number() const
         }
 
         case NULLTYPE:
-        case UNDEFINED:
+        case UNDEFINED: 
+	{
             // Evan: from my tests
             // Martin: FlashPlayer6 gives 0; FP9 gives NaN.
             return ( swfversion >= 7 ? NAN : 0 );
+	}
 
-        case BOOLEAN:
+        case BOOLEAN: 
             // Evan: from my tests
             // Martin: confirmed
             return getBool() ? 1 : 0;
@@ -484,9 +486,11 @@ as_value::to_number() const
         }
 
         case MOVIECLIP:
+	{
             // This is tested, no valueOf is going
             // to be invoked for movieclips.
             return NAN; 
+	}
 
         default:
             // Other object types should return NaN, but if we implement that,

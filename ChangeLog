@@ -1,5 +1,8 @@
 2008-05-03 Sandro Santilli <strk@keybit.net>
 
+	* server/as_value.cpp (to_number): more blocks to protect
+	  NAN (std::numeric_limit<double>::quite_NaN()) from 
+	  initialization-cross paranoia of gcc-4.2.3.
 	* server/asobj/Global.cpp (ctor): use a block-scope
 	  as a woraround to what looks like a bug in gcc-4.2.3
 	  (http://lists.gnu.org/archive/html/gnash/2008-05/msg00016.html)
