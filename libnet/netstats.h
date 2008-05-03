@@ -84,6 +84,30 @@ public:
         AUDIO,
         VIDEO
     } filetypes_e;
+    // This is what the ActionScript 'Client' class returns:
+    typedef struct {
+        int bytes_in;		// Total number of bytes received. 
+        int bytes_out;		// Total number of bytes sent.
+        int msg_in;		// Total number of RTMP messages received.
+        int msg_out;		// Total number of RTMP messages sent.
+        int msg_dropped;	// Total number of dropped RTMP messages.
+        int ping_rtt;		// Length of time the client takes to respond to a ping message.
+        int audio_queue_msgs;	// Current number of audio messages in the queue waiting to be delivered to the client.
+        int video_queue_msgs;	// Current number of video messages in the queue waiting to be delivered to the client.
+        int so_queue_msgs;	// Current number of shared object messages in the queue waiting to be delivered to the client.
+        int data_queue_msgs;	// Current number of data messages in the queue waiting to be delivered to the client.
+        int dropped_audio_msgs;	// Number of audio messages that were dropped.
+        int dropped_video_msgs;	// Number of video messages that were dropped.
+        int audio_queue_bytes;	// Total size of all audio messages (in bytes) in the queue waiting to be delivered to the client.
+        int video_queue_bytes;	// Total size of all video messages (in bytes) in the queue waiting to be delivered to the client.
+        int so_queue_bytes;	// Total size of all shared object messages (in bytes) in the queue waiting to be delivered to the client.
+        int data_queue_bytes;	// Total size of all data messages (in bytes) in the queue waiting to be delivered to the client.
+        int dropped_audio_bytes;// Total size of all audio messages (in bytes) that were dropped.
+        int dropped_video_bytes;// Total size of all video messages (in bytes) that were dropped.
+        int bw_out;		// Current upstream (client to server) bandwidth for this client.
+        int bw_in;		// Current downstream (server to client) bandwidth for this client.
+        int client_id;		// A unique ID issued by the server for this client.
+    } netstats_t;
     // start the clock counting down
     boost::posix_time::ptime startClock();
     // stop the clock from counting down

@@ -178,7 +178,7 @@ AMF::encodeNumber(double indata)
 //    GNASH_REPORT_FUNCTION;
     double num;
     // Encode the data as a 64 bit, big-endian, numeric value
-    Buffer *buf = new Buffer(AMF0_NUMBER_SIZE + AMF_HEADER_SIZE);
+    Buffer *buf = new Buffer(AMF0_NUMBER_SIZE + 1); // only one additional byte for the type
     buf->append(Element::NUMBER_AMF0);
     num = indata;
     swapBytes(&num, AMF0_NUMBER_SIZE);
@@ -192,18 +192,18 @@ AMF::encodeNumber(double indata)
 /// @return a binary AMF packet in big endian format (header,data) which
 /// needs to be deleted[] after being used.
 ///
-/// Although a boolean is one byte in size, swf uses 16bit short integers
-/// heavily, so this value is also a short.
+/// Although a boolean is one byte in size.
 Buffer *
 AMF::encodeBoolean(bool flag)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     // Encode a boolean value. 0 for false, 1 for true
-    Buffer *buf = new Buffer(AMF_HEADER_SIZE);
+    Buffer *buf = new Buffer(2);
     buf->append(Element::BOOLEAN_AMF0);
-    boost::uint16_t x = flag;
-    swapBytes(&x, 2);
-    buf->append(x);
+// Hum, AMF3 ???
+//     boost::uint16_t x = flag;
+//     swapBytes(&x, 2);
+    buf->append(flag);
     
     return buf;
 }
@@ -503,14 +503,19 @@ AMF::encodeNullString()
 Buffer *
 AMF::encodeElement(Element *el)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     Buffer *buf = 0;
     Buffer *tmp;
     
-    size_t outsize = el->getNameSize() + AMF_VAR_HEADER_SIZE;
+    size_t outsize;
+    if (el->getType() == Element::BOOLEAN_AMF0) {
+	outsize = el->getNameSize() + 2;
+    } else {
+	outsize = el->getNameSize() + AMF_VAR_HEADER_SIZE;
+    }
     buf = new Buffer(outsize);
     buf->clear();		// FIXME: temporary, makes buffers cleaner in gdb.
-    // If the name field is set, it's a "variable", followed by the data
+    // If the name field is set, it's a "property", followed by the data
     if (el->getName()) {
 	// Add the length of the string for the name of the variable
 	size_t length = el->getNameSize();
@@ -556,7 +561,7 @@ AMF::encodeElement(Element *el)
       case Element::ECMA_ARRAY_AMF0:
 	  tmp = encodeECMAArray(el->getData(), el->getLength());
           break;
-	  // The Object End gets added when creating the object, so we can jusy ignore it here.
+	  // The Object End gets added when creating the object, so we can just ignore it here.
       case Element::OBJECT_END_AMF0:
 	  tmp = encodeObjectEnd();
           break;
@@ -590,106 +595,20 @@ AMF::encodeElement(Element *el)
     };
 
     buf->append(tmp);
-//    log_debug("Encoded buf size is %d", buf->size());
     delete tmp;
-
     return buf;
 }
-
-#if 0
-/// Encode an array of elements. 
-///
-/// @return a binary AMF packet in big endian format (header,data)
-
-/// @return a newly allocated byte array.
-/// to be deleted by caller using delete [] operator, or NULL
-///
-vector<Buffer> *
-AMF::encodeElement(vector<amf::Element *> &data)
-{
-//    GNASH_REPORT_FUNCTION;
-
-    int size = 0;
-    bool pad = false;
-
-    // Calculate how large the buffer has to be.
-    vector<amf::Element *>::iterator ait;
-    cerr << "# of Elements in file: " << data.size() << endl;
-    for (ait = data.begin(); ait != data.end(); ait++) {
-	amf::Element *el = (*(ait));
-	size += el->getLength() + AMF_HEADER_SIZE;
-//        el->dump();
-    }
-    vector<Network::byte_t> *vec = new vector<Network::byte_t>;
-    Network::byte_t* ptr = new Network::byte_t[size + 1];
-    memset(ptr, 0, size + 1);
-    
-//    Network::byte_t *x = ptr;
-    size = 0;
-    for (ait = data.begin(); ait != data.end(); ait++) {
-	amf::Element *el = (*(ait));
-//	el->dump();
-	Network::byte_t *tmp = encodeElement(el);
-	Network::byte_t *y = tmp;
-#if 0
-	Network::byte_t *hexint;
-	hexint = new Network::byte_t[(el->getLength() + 4) *3];
-	hexify((Network::byte_t *)hexint, (Network::byte_t *)tmp,
-	       el->getLength() + AMF_HEADER_SIZE, true);
-	log_debug(_("The packet head is: 0x%s"), hexint);
-#endif
-	// The 'pad' in this case is a serious hack. I think it
-	// may be an artifact, but one guess is it's a 16bit word
-	// aligned memory segment due to some ancient heritage in
-	// the other player, so after a 3 byte bool, and two 9 byte
-	// numbers, another byte is needed for padding.
-	// My guess is the pattern of boolean->number->number->methodname
-	// is a function block ID. I need to dp more testing with a
-	// wider variety of sef movies that use LocalConnection to
-	// really tell.
-	if (el->getType() == Element::NUMBER) {
-	    size = AMF0_NUMBER_SIZE + 1;
-	    pad = true;
-	}
-	if (el->getType() == Element::STRING) {
-	    if (pad) {
-		vec->push_back('\0');
-		pad = false;
-	    }
-	    size = el->getLength() + AMF_HEADER_SIZE;
-	}
-// 	if (el->getType() == Element::FUNCTION) {
-// 	    // _properties
-// 	}
-	if (el->getType() == Element::BOOLEAN) {
-	    size = 3;
-	}
- 	for (int i=0; i<size; i++) {
-	    Network::byte_t c = *y;
-	    y++;
-//	    printf("0x%x(%c) ", c, (isalpha(c)) ? c : '.');
-	    vec->push_back(c);
-	}
-//	delete[] tmp;
-    }
-    return vec;
-}
-#endif
 
 Buffer *
 AMF::encodeProperty(amf::Element *el)
 {
 //    GNASH_REPORT_FUNCTION;
+    size_t outsize;
     
-    size_t outsize = el->getNameSize() + el->getLength() + AMF_VAR_HEADER_SIZE;
+    outsize = el->getNameSize() + el->getLength() + AMF_VAR_HEADER_SIZE;
 
     Buffer *buf = new Buffer(outsize);
     _totalsize += outsize;
-//     Network::byte_t *out = new Network::byte_t[outsize + 4]; // why +4 here ?
-//     Network::byte_t *end = out + outsize+4; // why +4 ?
-
-//    memset(out, 0, outsize + 2); // why +2 here ?
-//    Network::byte_t *tmpptr = out;
 
     // Add the length of the string for the name of the variable
     size_t length = el->getNameSize();
@@ -710,8 +629,9 @@ AMF::encodeProperty(amf::Element *el)
     // the type byte that's the value.
     switch (el->getType()) {
       case Element::BOOLEAN_AMF0:
-	  enclength = el->to_bool();
-	  buf->append(enclength);
+//  	  enclength = el->to_bool();
+//  	  buf->append(enclength);
+  	  buf->append(el->to_bool());
 	  break;
       case Element::NUMBER_AMF0:
 	  if (el->getData()) {
@@ -789,7 +709,8 @@ AMF::extractAMF(Network::byte_t *in, Network::byte_t* tooFar)
           ENSUREBYTES(tmpptr, tooFar, sizeof(boost::uint16_t));
 #endif
 	  el->makeBoolean(tmpptr);
-	  tmpptr += sizeof(boost::uint16_t); // although a bool is one byte, it's stored as a short
+	  tmpptr += sizeof(bool);
+//	  tmpptr += sizeof(boost::uint16_t); // although a bool is one byte, it's stored as a short
 	  break;
       case Element::STRING_AMF0:
 	  // get the length of the name

@@ -41,18 +41,37 @@ public:
     bool serverFinish();
     bool packetSend(amf::Buffer *buf);
     bool packetRead(amf::Buffer *buf);
-
-    // These process the incoming RTMP message content types from the header
-    gnash::Network::byte_t *decodeChunkSize(gnash::Network::byte_t *buf);
-    gnash::Network::byte_t *decodeBytesRead(gnash::Network::byte_t *buf);
-    gnash::Network::byte_t *decodePing(gnash::Network::byte_t *buf);
-    gnash::Network::byte_t *decodeServer(gnash::Network::byte_t *buf);
-    gnash::Network::byte_t *decodeClient(gnash::Network::byte_t *buf);
-    gnash::Network::byte_t *decodeAudioData(gnash::Network::byte_t *buf);
-    gnash::Network::byte_t *decodeVideoData(gnash::Network::byte_t *buf);
-    gnash::Network::byte_t *decodeNotify(gnash::Network::byte_t *buf);
-    gnash::Network::byte_t *decodeSharedObj(gnash::Network::byte_t *buf);
-    gnash::Network::byte_t *decodeInvoke(gnash::Network::byte_t *buf);
+    
+    // These are handlers for the various types
+#if 0
+    amf::Buffer *encodeChunkSize();
+    void decodeChunkSize();
+    
+    amf::Buffer *encodeBytesRead();
+    void decodeBytesRead();
+    
+    amf::Buffer *encodeServer();
+    void decodeServer();
+    
+    amf::Buffer *encodeClient();
+    void decodeClient();
+    
+    amf::Buffer *encodeAudioData();
+    void decodeAudioData();
+    
+    amf::Buffer *encodeVideoData();
+    void decodeVideoData();
+    
+    amf::Buffer *encodeNotify();
+    void decodeNotify();
+    
+    amf::Buffer *encodeSharedObj();
+    void decodeSharedObj();
+    
+    amf::Buffer *encodeInvoke();
+    void decodeInvoke();
+#endif
+    
     void dump();
   private:
 };

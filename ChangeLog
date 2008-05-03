@@ -1,3 +1,19 @@
+2008-05-03  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* testsuite/libnet.all/test_rtmp.cpp: Unit tests for the RTMP
+	encoding and decoding.
+	* libamf/amf.cpp: Booleans are two bytes after all.
+	* libamf/sol.cpp: Booleans are two bytes after all.
+	* libamf/element.cpp: Copy the name, don't just grab the
+	pointer. Terminate Objects correctly.
+	* libnet/rtmp.cpp: Add methods to encode & decode the RTMP
+	header, and the Ping message.
+	* libnet/rtmp.h: Add methods to encode & decode the RTMP
+	header, and the messages. Add Ping message types and data
+	structure.
+	* libnet/rtmp_server.cpp: Actually handle the message type. Modify
+	how the initial 1536 bytes handshake works.
+
 2008-05-03 Sandro Santilli <strk@keybit.net>
 
 	* server/as_value.cpp (to_number): more blocks to protect

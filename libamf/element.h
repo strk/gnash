@@ -109,6 +109,7 @@ public:
     Element &makeNumber(double num); 
     Element &makeNumber(gnash::Network::byte_t *data); 
     Element &makeNumber(const std::string &name, double num);
+    Element &makeNumber(const std::string &name, gnash::Network::byte_t *data); 
     
     Element &makeBoolean(gnash::Network::byte_t *data); 
     Element &makeBoolean(bool data); 

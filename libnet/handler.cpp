@@ -215,11 +215,13 @@ netin_handler(Handler::thread_params_t *args)
 	size_t ret = hand->readNet(args->netfd, buf->reference(), buf->size(), 1);
 	// the read timed out as there was no data, but the socket is still open.
  	if (ret == 0) {
+	    log_debug("no data yet for fd #%d, continuing...", args->netfd);
  	    continue;
  	}
 	// ret is "no position" when the socket is closed from the other end of the connection,
 	// so we're done.
-	if (ret == string::npos) {
+	if ((ret == string::npos) || (ret == -1)) {
+	    log_debug("socket for fd #%d was closed...", args->netfd);
 	    break;
 	}
 	// We got data. Resize the buffer if necessary.

@@ -80,18 +80,11 @@ RTMPServer::handShakeWait()
 	log_debug("Que empty, net connection dropped for fd #%d", _handler->getFileFd());
 	return false;
     }    
-//     if (readNet(buffer, 1) == 1) {
-    log_debug (_("Read initial Handshake Request"));
-//     } else {
-//         log_error (_("Couldn't read initial Handshake Request"));
-//         return false;
-//     }
-//    _inbytes += 1;
 
-    if (*(buf->reference()) == 0x3) {
-        log_debug (_("Handshake is correct"));
+    if (*buf->reference() == RTMP_HANDSHAKE) {
+        log_debug (_("Handshake request is correct"));
     } else {
-        log_error (_("Handshake isn't correct"));
+        log_error (_("Handshake request isn't correct"));
         return false;
     }
 
@@ -104,11 +97,11 @@ RTMPServer::handShakeWait()
 	_handshake->copy(buf->reference() + 1, RTMP_BODY_SIZE);
 	log_debug (_("Handshake Data matched"));
 	delete buf;			// we're done with the buffer
-	return true;
+//	return true;
     } else {
 	delete buf;			// we're done with the buffer
  	log_error (_("Handshake Data didn't match"));
- 	return false;
+// 	return false;
     }
     
     return true;
@@ -121,13 +114,18 @@ RTMPServer::handShakeResponse()
 {
     GNASH_REPORT_FUNCTION;
 
-    amf::Buffer *buf = new amf::Buffer((RTMP_BODY_SIZE * 2) + 1);
-    Network::byte_t *ptr = buf->reference();
-    *ptr = 0x3;
+    amf::Buffer *buf1 = new amf::Buffer(RTMP_BODY_SIZE + 1);
+    *buf1->begin() = RTMP_HANDSHAKE;
+    buf1->append(_handshake);
+    _handler->pushout(buf1);
 
-    std::copy(_handshake->begin(), _handshake->end(), (ptr + 1));
-    std::copy(_handshake->begin(), _handshake->end(), ptr + _handshake->size() + 1);
-    _handler->pushout(buf);
+    amf::Buffer *buf2 = new amf::Buffer(RTMP_BODY_SIZE);
+    buf2->copy(_handshake->begin(), RTMP_BODY_SIZE);
+    _handler->pushout(buf2);
+    
+//     std::copy(_handshake->begin(), _handshake->end(), (buf1->begin() + 1));    
+//     amf::Buffer *buf = new amf::Buffer(RTMP_BODY_SIZE + 1);
+//     std::copy(_handshake->begin(), _handshake->end(), buf->begin() + 1 + RTMP_BODY_SIZE);
     _handler->notifyout();
 
     log_debug("Sent RTMP Handshake response");
@@ -152,7 +150,7 @@ RTMPServer::serverFinish()
     // So after the handshake block, we strip that part off, and just pass on
     // the remainder for processing.
     if (buf->size() > RTMP_BODY_SIZE) {
-	int size = buf->size() - RTMP_BODY_SIZE;  
+	size_t size = buf->size() - RTMP_BODY_SIZE;  
 	obj = new amf::Buffer[size];
 	obj->copy(buf->begin()+RTMP_BODY_SIZE, size);
     } else {
@@ -170,7 +168,7 @@ RTMPServer::serverFinish()
     }
     
     packetRead(obj);
-    
+        
     return true;
 }
 
@@ -215,10 +213,35 @@ RTMPServer::packetRead(amf::Buffer *buf)
     log_debug("END is %x", (void *)end);
     *end = '*';
 #endif
-    ptr = parseHeader(ptr);
-//     ptr += headersize;
+    rtmp_head_t *head = decodeHeader(ptr);
+    ptr += headersize;
 
-# if 0    
+    Network::byte_t* tooFar = ptr+300+sizeof(int); // FIXME:
+    
+    AMF amf_obj;
+    amf::Element *el1 = amf_obj.extractAMF(ptr, tooFar);
+    ptr += amf_obj.totalsize();
+    amf::Element *el2 = amf_obj.extractAMF(ptr, tooFar);
+
+    int size = 0;
+    amf::Element *el;
+    while ( size < static_cast<boost::uint16_t>(_header.bodysize) - 24 ) {
+	if (ptr) {
+	    el = amf_obj.extractProperty(ptr, tooFar);
+	    if (el != 0) {
+		size += amf_obj.totalsize();
+		ptr += amf_obj.totalsize();
+//		_variables[el->getName()] = el;
+	    } else {
+		break;
+	    }
+//		log_debug("Bodysize is: %d size is: %d for %s", _total_size, size, el->getName());
+	} else {
+	    break;
+	}
+    }
+
+# if 0
     Element el;
     ptr = amf.extractElement(&el, ptr);
     el.dump();
@@ -253,21 +276,58 @@ RTMPServer::packetRead(amf::Buffer *buf)
     
     RTMPproto::dump();
 #endif
-    switch(_type) {
+    switch(_header.type) {
       case CHUNK_SIZE:
+	  decodeChunkSize();
+	  break;
       case BYTES_READ:
+	  decodeBytesRead();
+	  break;
       case PING:
+      {
+	  rtmp_ping_t *ping = decodePing(ptr);
+	  switch (ping->type) {
+	    case PING_CLEAR:
+		break;
+	    case PING_PLAY:
+		break;
+	    case PING_TIME:
+		break;
+	    case PING_RESET:
+		break;
+	    case PING_CLIENT:
+		break;
+	    case PONG_CLIENT:
+		break;
+	    default:
+		return 0;
+		break;
+	  };
+	  break;
+      }
       case SERVER:
+	  decodeServer();
+	  break;
       case CLIENT:
+	  decodeClient();
+	  break;
       case VIDEO_DATA:
+	  decodeVideoData();
+	  break;
       case NOTIFY:
+	  decodeNotify();
+	  break;
       case SHARED_OBJ:
+	  decodeSharedObj();
+	  break;
       case INVOKE:
+	  decodeInvoke();
           break;
-      case AUDIO_DATA:
+      case AUDIO_DATA:	  
+	  decodeAudioData();
           break;
       default:
-          log_error (_("ERROR: Unidentified RTMP message content type 0x%x"), _type);
+          log_error (_("ERROR: Unidentified RTMP message content type 0x%x"), _header.type);
           break;
     };
     
@@ -288,68 +348,107 @@ RTMPServer::packetRead(amf::Buffer *buf)
     return true;
 }
 
+#if 0
 // These process the incoming AMF object types from the data stream
-Network::byte_t *
-RTMPServer::decodeChunkSize(Network::byte_t *buf)
+amf::Buffer *
+RTMPServer::encodeChunkSize()
 {
     GNASH_REPORT_FUNCTION;
 }
-
-Network::byte_t *
-RTMPServer::decodeBytesRead(Network::byte_t *buf)
-{
-    GNASH_REPORT_FUNCTION;
-}
-
-Network::byte_t *
-RTMPServer::decodePing(Network::byte_t *buf)
-{
-    GNASH_REPORT_FUNCTION;
-}
-
-Network::byte_t *
-RTMPServer::decodeServer(Network::byte_t *buf)
-{
-    GNASH_REPORT_FUNCTION;
-}
-
-Network::byte_t *
-RTMPServer::decodeClient(Network::byte_t *buf)
-{
-    GNASH_REPORT_FUNCTION;
-}
-
-Network::byte_t *
-RTMPServer::decodeAudioData(Network::byte_t *buf)
-{
-    GNASH_REPORT_FUNCTION;
-}
-
-Network::byte_t *
-RTMPServer::decodeVideoData(Network::byte_t *buf)
-{
-    GNASH_REPORT_FUNCTION;
-}
-
-Network::byte_t *
-RTMPServer::decodeNotify(Network::byte_t *buf)
+void 
+RTMPServer::decodeChunkSize()
 {
     GNASH_REPORT_FUNCTION;
 }
     
-Network::byte_t *
-RTMPServer::decodeSharedObj(Network::byte_t *buf)
+amf::Buffer *
+RTMPServer::encodeBytesRead()
+{
+    GNASH_REPORT_FUNCTION;
+}
+void 
+RTMPServer::decodeBytesRead()
 {
     GNASH_REPORT_FUNCTION;
 }
 
-// Invoke a remote procedure call for an ActionScript class.
-Network::byte_t *
-RTMPServer::decodeInvoke(Network::byte_t *buf)
+amf::Buffer *
+RTMPServer::encodeServer()
 {
     GNASH_REPORT_FUNCTION;
-    
 }
+void
+RTMPServer::decodeServer()
+{
+    GNASH_REPORT_FUNCTION;
+}
+    
+amf::Buffer *
+RTMPServer::encodeClient()
+{
+    GNASH_REPORT_FUNCTION;
+}
+void 
+RTMPServer::decodeClient()
+{
+    GNASH_REPORT_FUNCTION;
+}
+    
+amf::Buffer *
+RTMPServer::encodeAudioData()
+{
+    GNASH_REPORT_FUNCTION;
+}
+void 
+RTMPServer::decodeAudioData()
+{
+    GNASH_REPORT_FUNCTION;
+}
+    
+amf::Buffer *
+RTMPServer::encodeVideoData()
+{
+    GNASH_REPORT_FUNCTION;
+}
+void 
+RTMPServer::decodeVideoData()
+{
+    GNASH_REPORT_FUNCTION;
+}
+    
+amf::Buffer *
+RTMPServer::encodeNotify()
+{
+    GNASH_REPORT_FUNCTION;
+}
+void
+RTMPServer::decodeNotify()
+{
+    GNASH_REPORT_FUNCTION;
+}
+    
+amf::Buffer *
+RTMPServer::encodeSharedObj()
+{
+    GNASH_REPORT_FUNCTION;
+}
+void 
+RTMPServer::decodeSharedObj()
+{
+    GNASH_REPORT_FUNCTION;
+}
+    
+amf::Buffer *
+RTMPServer::encodeInvoke()
+{
+    GNASH_REPORT_FUNCTION;
+}
+void 
+RTMPServer::decodeInvoke()
+{
+    GNASH_REPORT_FUNCTION;
+}
+#endif
 
 // This is the thread for all incoming RTMP connections
 void

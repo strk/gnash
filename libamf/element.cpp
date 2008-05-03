@@ -402,10 +402,9 @@ Element::encode()
     if (_type == Element::OBJECT_AMF0) {
 	// FIXME: we probably want a better size, to avoid the other
 	// appends from having to resize and copy the data all the time.
-	buf = new Buffer(128);
+	buf = new Buffer(300);
 	buf->clear();		// FIXME: temporary, makes buffers cleaner in gdb.
 	buf->append(Element::OBJECT_AMF0);
-// 	string name = _name;
 	if (_name > 0) {
 // 	    Buffer *top = AMF::encodeElement(this);
 // 	    buf->append(top);
@@ -418,7 +417,8 @@ Element::encode()
 
 	for (size_t i=0; i<_properties.size(); i++) {
 	    Buffer *partial = AMF::encodeElement(_properties[i]);
-//	    log_debug("Encoded partial size is %d", partial->size());
+	    log_debug("Encoded partial size for is %d", partial->size());
+	    partial->dump();
 	    if (partial) {
 		buf->append(partial);
 		delete partial;
@@ -426,8 +426,13 @@ Element::encode()
 		break;
 	    }
 	}
+	log_debug("FIXME: Terminating object");
+	Network::byte_t pad = 0;
+	buf->append(pad);
+	buf->append(pad);
 	buf->append(TERMINATOR);
 	_buffer = buf;
+
 	return buf;
     } else {
 	return AMF::encodeElement(this);
@@ -457,10 +462,10 @@ Element::operator=(Element &el)
 Element &
 Element::operator=(Element *el)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     _type = el->getType();
     if (el->getNameSize()) {
-        _name = el->getName();
+        _name = strdup(el->getName());
     }
     _buffer = new Buffer(el->getLength());
     _buffer->copy(el->getData(), el->getLength());
@@ -562,6 +567,18 @@ Element::makeNumber(const string &name, double num)
         setName(name);
     }
     return makeNumber(num);
+}
+
+Element &
+Element::makeNumber(const std::string &name, gnash::Network::byte_t *data)
+{
+//    GNASH_REPORT_FUNCTION;
+    if (name.size()) {
+        setName(name);
+    }
+    _type = Element::NUMBER_AMF0;
+    check_buffer(AMF0_NUMBER_SIZE);
+    _buffer->copy(data);
 }
 
 Element &

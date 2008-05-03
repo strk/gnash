@@ -251,7 +251,7 @@ SOL::writeFile(const string &filespec, const string &name)
         size_t outsize = 0;
         switch (el->getType()) {
 	  case Element::BOOLEAN_AMF0:
-	      outsize = el->getNameSize() + AMF_VAR_HEADER_SIZE;
+	      outsize = el->getNameSize() + 3;
 	      memcpy(ptr, var->reference(), outsize); 
 	      ptr += outsize;
 	      break;
@@ -333,93 +333,92 @@ SOL::readFile(std::string &filespec)
     // Make sure it's an SOL file
     if (stat(filespec.c_str(), &st) == 0) {
 
-try {
-        ifstream ifs(filespec.c_str(), ios::binary);
-        _filesize = st.st_size;
-	buf = new Network::byte_t[_filesize + sizeof(int)];
-	ptr = buf;
-	Network::byte_t* tooFar = buf+_filesize+sizeof(int);
-
-	bodysize = st.st_size - 6;
-        _filespec = filespec;
-        ifs.read(reinterpret_cast<char *>(ptr), _filesize);
-
+	try {
+	    ifstream ifs(filespec.c_str(), ios::binary);
+	    _filesize = st.st_size;
+	    buf = new Network::byte_t[_filesize + sizeof(int)];
+	    ptr = buf;
+	    Network::byte_t* tooFar = buf+_filesize+sizeof(int);
+	    
+	    bodysize = st.st_size - 6;
+	    _filespec = filespec;
+	    ifs.read(reinterpret_cast<char *>(ptr), _filesize);
+	    
 #ifndef GNASH_TRUST_AMF
-	ENSUREBYTES(ptr, tooFar, 2+4+10); // magic number, file size, file marker
+	    ENSUREBYTES(ptr, tooFar, 2+4+10); // magic number, file size, file marker
 #endif
-
-        // skip the magic number (will check later)
-        ptr += 2;
-
-        // extract the file size
-	boost::uint32_t length = *(reinterpret_cast<boost::uint32_t *>(ptr));
-        length = ntohl(length);
-        ptr += 4;
-
-        // skip the file marker field
-        ptr += 10;
-
-	// consistency check
-        if ((buf[0] == 0) && (buf[1] == 0xbf)) {
-            if (bodysize == length) {
-                log_debug("%s is an SOL file", filespec.c_str());
-            } else {
-                log_error("%s looks like an SOL file, but the length is wrong. Should be %d, got %d",
-                          filespec.c_str(), (_filesize - 6), length);
-            }
-            
+	    
+	    // skip the magic number (will check later)
+	    ptr += 2;
+	    
+	    // extract the file size
+	    boost::uint32_t length = *(reinterpret_cast<boost::uint32_t *>(ptr));
+	    length = ntohl(length);
+	    ptr += 4;
+	    
+	    // skip the file marker field
+	    ptr += 10;
+	    
+	    // consistency check
+	    if ((buf[0] == 0) && (buf[1] == 0xbf)) {
+		if (bodysize == length) {
+		    log_debug("%s is an SOL file", filespec.c_str());
+		} else {
+		    log_error("%s looks like an SOL file, but the length is wrong. Should be %d, got %d",
+			      filespec.c_str(), (_filesize - 6), length);
+		}
+		
         } else {
-            log_error("%s isn't an SOL file", filespec.c_str());
-        }
-
+		log_error("%s isn't an SOL file", filespec.c_str());
+	    }
+	    
 #ifndef GNASH_TRUST_AMF
-	ENSUREBYTES(ptr, tooFar, 2); 
+	    ENSUREBYTES(ptr, tooFar, 2); 
 #endif
-	
-        // 2 bytes for the length of the object name, but it's also null terminated
-        size = *(reinterpret_cast<boost::uint16_t *>(ptr));
-        size = ntohs(size);
-        ptr += 2;
-
+	    
+	    // 2 bytes for the length of the object name, but it's also null terminated
+	    size = *(reinterpret_cast<boost::uint16_t *>(ptr));
+	    size = ntohs(size);
+	    ptr += 2;
+	    
 #ifndef GNASH_TRUST_AMF
-	ENSUREBYTES(ptr, tooFar, size+4);  // 4 is the padding below
+	    ENSUREBYTES(ptr, tooFar, size+4);  // 4 is the padding below
 #endif
-
-	// TODO: make sure there's the null-termination, or
-	//       force if if it's there by definition
-        _objname = reinterpret_cast<const char *>(ptr);
-        ptr += size;
-
-        // Go past the padding
-        ptr += 4;
-
-        AMF amf_obj;
-	int size = 0;
-	amf::Element *el;
-        while ( size < static_cast<boost::uint16_t>(bodysize) - 24 ) {
-	    if (ptr) {
-		el = amf_obj.extractProperty(ptr, tooFar);
-		if (el != 0) {
-		    size += amf_obj.totalsize();
-		    ptr += amf_obj.totalsize();
-		    _amfobjs.push_back(el);
+	    
+	    // TODO: make sure there's the null-termination, or
+	    //       force if if it's there by definition
+	    _objname = reinterpret_cast<const char *>(ptr);
+	    ptr += size;
+	    
+	    // Go past the padding
+	    ptr += 4;
+	    
+	    AMF amf_obj;
+	    int size = 0;
+	    amf::Element *el;
+	    while ( size < static_cast<boost::uint16_t>(bodysize) - 24 ) {
+		if (ptr) {
+		    el = amf_obj.extractProperty(ptr, tooFar);
+		    if (el != 0) {
+			size += amf_obj.totalsize();
+			ptr += amf_obj.totalsize();
+			_amfobjs.push_back(el);
+		    } else {
+			break;
+		    }
+//		log_debug("Bodysize is: %d size is: %d for %s", bodysize, size, el->getName());
 		} else {
 		    break;
 		}
-//		log_debug("Bodysize is: %d size is: %d for %s", bodysize, size, el->getName());
-	    } else {
-		break;
 	    }
-        }
-	delete[] buf;
-	
-        ifs.close();
-        return true;
-} catch (std::exception& e) {
-	log_error("Reading SharedObject %s: %s", filespec, e.what());
-	return false;
-}
-
+	    delete[] buf;
+	    
+	    ifs.close();
+	    return true;
+	} catch (std::exception& e) {
+	    log_error("Reading SharedObject %s: %s", filespec, e.what());
+	    return false;
+	}
     }
     
 //    log_error("Couldn't open file: %s", strerror(errno));

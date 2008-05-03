@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -40,6 +40,7 @@ const int  RTMP_HEADSIZE_MASK = 0xc0;
 const char RTMP_INDEX_MASK = 0x3f;
 const int  RTMP_VIDEO_PACKET_SIZE = 128;
 const int  RTMP_AUDIO_PACKET_SIZE = 64;
+const int  RTMP_MAX_HEADER_SIZE = 12;
 
 // For terminating sequences, a byte with value 0x09 is used.
 const char TERMINATOR = 0x09;
@@ -109,6 +110,20 @@ public:
 //         INITIAL_DATA = 0xb
 //     } sharedobj_types_e;
     typedef enum {
+	PING_CLEAR  = 0x0,	// clear the stream
+	PING_PLAY   = 0x1,	// clear the playing buffer
+	PING_TIME   = 0x3,	// Buffer time in milliseconds
+	PING_RESET  = 0x4,	// Reset stream
+	PING_CLIENT = 0x6,	// Ping the client from the server
+	PONG_CLIENT = 0x7	// pong reply from client to server
+    } rtmp_ping_e;
+    typedef struct {
+	rtmp_ping_e type;	// the type of the ping message
+	boost::uint16_t target;
+	boost::uint16_t param1;
+	boost::uint16_t param2;
+    } rtmp_ping_t;
+    typedef enum {
         RTMP_STATE_HANDSHAKE_SEND,
         RTMP_STATE_HANDSHAKE_RECV,
         RTMP_STATE_HANDSHAKE_ACK,
@@ -132,17 +147,18 @@ public:
     } rtmp_error_t;
 
 // Each header consists of the following:
-//
-// * UTF string (including length bytes) - name
-// * Boolean - specifies if understanding the header is `required'
-// * Long - Length in bytes of header
-// * Variable - Actual data (including a type code)
+// a single byte that is the index of the RTMP channel,
+// then two bits that's a flag to note the size of the header,
+// which can be 1, 4, 8, or 12 bytes long.
+    
+// More info at http://wiki.gnashdev.org/RTMP
     typedef struct {
-        amf::amfutf8_t name;
-	boost::uint8_t required;
-	boost::uint32_t length;
-        void *data;
-    } rtmp_head_t;    
+	int             channel;
+	int             head_size;
+	int             bodysize;
+	rtmp_source_e   src_dest;
+	content_types_e type;
+    } rtmp_head_t;
     typedef enum {
         HEADER_12 = 0x0,
         HEADER_8  = 0x40,
@@ -165,14 +181,15 @@ public:
     
     RTMP();
     ~RTMP();
-    gnash::Network::byte_t *encodeRTMPHeader(int amf_index, rtmp_headersize_e head_size,
-				size_t total_size, content_types_e type, rtmp_source_e routing);
+
+    // Decode
+    rtmp_head_t *decodeHeader(gnash::Network::byte_t *header);
+    rtmp_head_t *decodeHeader(amf::Buffer *data);
+    amf::Buffer *encodeHeader(int amf_index, rtmp_headersize_e head_size,
+			      size_t total_size, content_types_e type, rtmp_source_e routing);
     
-//     bool handShakeWait();
     bool handShakeRequest();
-//    bool handShakeResponse();
     bool clientFinish();
-//  bool serverFinish();
     bool packetRequest();
     bool packetSend(amf::Buffer *buf);
     bool packetRead(amf::Buffer *buf);
@@ -183,38 +200,55 @@ public:
     amf::Element *getProperty(const std::string &name);
     void setHandler(Handler *hand) { _handler = hand; };
     int headerSize(gnash::Network::byte_t header);
-    Network::byte_t *parseHeader(gnash::Network::byte_t *header);
 
-    int getHeaderSize()         { return _header_size; }; 
-    int getTotalSize()          { return _total_size; }; 
+    rtmp_head_t *getHeader()    { return &_header; };
+    int getHeaderSize()         { return _header.head_size; }; 
+    int getTotalSize()          { return _header.bodysize; }; 
+    rtmp_source_e getRouting()  { return _header.src_dest; };
+    int getChannel()            { return _header.channel; };
     int getPacketSize()         { return _packet_size; };
     int getMysteryWord()        { return _mystery_word; };
-    rtmp_source_e getRouting()  { return _src_dest; };
-    int getAMFIndex()           { return _amf_index; };
 
-    // 
-    bool chunk_size();
-    bool bytes_read();
-    bool ping();
-    bool server();
-    bool client();
-    bool audio_data();
-    bool video_data();
-    bool notify();
-    bool shared_obj();
-    bool invoke();
+    // These are handlers for the various types
+    virtual amf::Buffer *encodeChunkSize();
+    virtual void decodeChunkSize();
+    
+    virtual amf::Buffer *encodeBytesRead();
+    virtual void decodeBytesRead();
+    
+    virtual amf::Buffer *encodePing(rtmp_ping_e type, boost::uint16_t milliseconds);
+    virtual rtmp_ping_t *decodePing(Network::byte_t *data);
+    rtmp_ping_t *decodePing(amf::Buffer *buf);
+    
+    virtual amf::Buffer *encodeServer();
+    virtual void decodeServer();
+    
+    virtual amf::Buffer *encodeClient();
+    virtual void decodeClient();
+    
+    virtual amf::Buffer *encodeAudioData();
+    virtual void decodeAudioData();
+    
+    virtual amf::Buffer *encodeVideoData();
+    virtual void decodeVideoData();
+    
+    virtual amf::Buffer *encodeNotify();
+    virtual void decodeNotify();
+    
+    virtual amf::Buffer *encodeSharedObj();
+    virtual void decodeSharedObj();
+    
+    virtual amf::Buffer *encodeInvoke();
+    virtual void decodeInvoke();
+    
     void dump();
   protected:
     std::map<const char *, amf::Element *> _variables;
-    amf::Buffer		*_handshake;
-    Handler		*_handler;
-    int                 _amf_index;
-    int                 _header_size;
-    int                 _total_size;
-    int                 _packet_size;
-    rtmp_source_e       _src_dest;
-    content_types_e     _type;
-    int                 _mystery_word;
+    amf::Buffer	*_handshake;
+    Handler	*_handler;
+    rtmp_head_t	_header;
+    int         _packet_size;
+    int         _mystery_word;
 };
 
 } // end of gnash namespace
