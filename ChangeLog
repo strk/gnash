@@ -1,3 +1,7 @@
+2008-05-04 Zou Lunkai <zoulunkai@gmail.com>
+
+	* server/sprite_instance.h, server/dlist.h: docs.
+
 2008-05-03 Sandro Santilli <strk@keybit.net>
 
 	* server/character.cpp: use namespace std, so isfinite works
@@ -168,6 +172,7 @@
 	  own file and document it, fix the execute
 	  signature to match the one expected by ControlTag.
 
+>>>>>>> 1.6487
 2008-04-30 Sandro Santilli <strk@keybit.net>
 
 	* macros/boost.m4: filesystem/exception.hpp might also

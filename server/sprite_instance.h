@@ -337,34 +337,44 @@ public:
 	boost::intrusive_ptr<character> add_textfield(const std::string& name,
 			int depth, float x, float y, float width, float height);
 
-	/// Place a character or mask to the DisplayList (make a timeline instance) 
+	/// Place a character or mask to the DisplayList.
 	//
-	/// This method instantiates the given character definition (character_id)
-	/// and places it on the stage at the given depth using the specified
-	/// parameters for name, position, color, ratio(?) and clipping depth (if any).
+	/// This method instantiates the given character definition
+	/// and places it on the stage at the given depth.
 	///
-	/// If the specified depth is already occupied by an instance of the same
-	/// character (character_id), the existing instance will be transformed using
-	/// move_display_object() instead.
+	/// If the specified depth is already occupied, it results a no-ops.
+	/// Otherwise, a new character will be created and onload handler will be triggerred.
 	///
-	/// If the specified depth is already occupied by an instance of a different
-	/// character (including any dynamically-created instance), the behaviour is
-	/// controlled by the is_jumping_back flag. If false, this
-	/// call will result in a no-op. If true, the previously existing character
-	/// will be replaced by the new one, with unload() method invoked on the
-	/// removed character. 
+	/// @param tag
+	/// A swf defined placement tag(PlaceObject, or PlaceObject2, or PlaceObject3)
+	/// No ownership transfer, the tag is still owned by the movie_definition class.
 	///
-	/// Any successful new placement triggers invokation of the newly created
-	/// instance's LOAD event.
+	/// @return
+	///     A pointer to the character being added or NULL
 	///
 	character* add_display_object(const SWF::PlaceObject2Tag* tag, DisplayList& dlist);
-	// Proxy of DisplayList::move_character()
+	/// Proxy of DisplayList::move_character()
 	void move_display_object(const SWF::PlaceObject2Tag* tag, DisplayList& dlist);
-	// Proxy of DisplayList::replace_character()
+	/// Proxy of DisplayList::replace_character()
 	void replace_display_object(const SWF::PlaceObject2Tag* tag, DisplayList& dlist);
-	// Proxy of DisplayList::remove_character()
+	/// Proxy of DisplayList::remove_character()
 	void remove_display_object(const SWF::PlaceObject2Tag* tag, DisplayList& dlist);
-
+	/// Proxy of DisplayList::remove_character()
+	///
+	/// @param ch
+	/// new character to be used for replacing.
+	///
+	/// @param depth
+	/// depth at which the old character is to be replaced.
+	///
+	/// @use_old_cxform
+	/// if true, the cxform of the new character will be set to the old one.
+	/// if false, the cxform the new character will be untouched.
+	///
+	/// @use_old_matrix
+	/// if true, the transformation matrix of the old character will be set to the old one.
+	/// if false, the transformation matrix of the old character will be untouched.
+	///
 	void replace_display_object(character* ch,	int depth,
 		bool use_old_cxform,
 		bool use_old_matrix);
@@ -373,8 +383,12 @@ public:
 	/// \brief
 	/// Remove the object at the specified depth.
 	//
-	/// NOTE: the id parameter is unused, but currently
-	/// required to avoid break of inheritance from movie.h
+	/// NOTE: 
+	/// (1)the id parameter is currently unused, but 
+	/// required to avoid breaking of inheritance from movie.h.
+	/// (2)the id might be used for specifying a character
+	/// in the depth(think about multiple characters within the same
+	/// depth, not tested and a rare case)
 	///
 	void	remove_display_object(int depth, int /* id */)
 	{
