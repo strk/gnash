@@ -172,7 +172,6 @@
 	  own file and document it, fix the execute
 	  signature to match the one expected by ControlTag.
 
->>>>>>> 1.6487
 2008-04-30 Sandro Santilli <strk@keybit.net>
 
 	* macros/boost.m4: filesystem/exception.hpp might also

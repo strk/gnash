@@ -369,11 +369,11 @@ public:
 	///
 	/// @use_old_cxform
 	/// if true, the cxform of the new character will be set to the old one.
-	/// if false, the cxform the new character will be untouched.
+	/// if false, the cxform of the new character will be untouched.
 	///
 	/// @use_old_matrix
-	/// if true, the transformation matrix of the old character will be set to the old one.
-	/// if false, the transformation matrix of the old character will be untouched.
+	/// if true, the transformation matrix of the new character will be set to the old one.
+	/// if false, the transformation matrix of the new character will be untouched.
 	///
 	void replace_display_object(character* ch,	int depth,
 		bool use_old_cxform,
