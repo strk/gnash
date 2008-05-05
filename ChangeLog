@@ -1,3 +1,13 @@
+2008-05-05 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/: create a new subtree for the 'flash'
+	  ActionScript package. Stub all known classes there, moving
+	  also there the existing BitmapFilter classes which belongs
+	  in the flash.filters package.
+	  NOTE: the package initialization function is not called
+	  currently, I think we should call them from destructive
+	  native getter-setters.
+
 2008-05-05 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* server/shape.h: Add isClosed() to Path class

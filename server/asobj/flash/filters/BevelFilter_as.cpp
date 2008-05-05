@@ -25,7 +25,7 @@
 // This is enforced by the file itself.
 #define phelp_helper BevelFilter_as
 #include "prophelper.h"
-#include "BitmapFilter_as.h"
+#include "flash/filters/BitmapFilter_as.h"
 
 namespace gnash {
 

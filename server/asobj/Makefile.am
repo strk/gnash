@@ -44,24 +44,15 @@ AM_CPPFLAGS = \
 
 libgnashasobjs_la_SOURCES = \
         AsBroadcaster.cpp \
-        BevelFilter_as.cpp \
-        BitmapFilter_as.cpp \
 	Boolean.cpp \
-        BlurFilter_as.cpp \
 	Camera.cpp \
 	ClassHierarchy.cpp \
 	Color.cpp \
-	ColorMatrixFilter_as.cpp \
 	ContextMenu.cpp	\
-	ConvolutionFilter_as.cpp \
 	CustomActions.cpp\
 	Date.cpp \
-	DropShadowFilter_as.cpp \
 	Error.cpp \
 	Global.cpp \
-	GlowFilter_as.cpp \
-	GradientBevelFilter_as.cpp \
-	GradientGlowFilter_as.cpp \
 	Key.cpp	\
 	LoadVars.cpp \
 	LocalConnection.cpp\
@@ -85,29 +76,47 @@ libgnashasobjs_la_SOURCES = \
 	xmlattrs.cpp \
 	xmlnode.cpp \
 	xmlsocket.cpp \
+	flash/display/BitmapData_as.cpp \
+	flash/display_pkg.cpp \
+	flash/external/ExternalInterface_as.cpp \
+	flash/external_pkg.cpp \
+        flash/filters/BevelFilter_as.cpp \
+        flash/filters/BitmapFilter_as.cpp \
+        flash/filters/DisplacementMapFilter_as.cpp \
+        flash/filters/BlurFilter_as.cpp \
+	flash/filters/ColorMatrixFilter_as.cpp \
+	flash/filters/ConvolutionFilter_as.cpp \
+	flash/filters/DropShadowFilter_as.cpp \
+	flash/filters/GlowFilter_as.cpp \
+	flash/filters/GradientBevelFilter_as.cpp \
+	flash/filters/GradientGlowFilter_as.cpp \
+	flash/filters_pkg.cpp \
+	flash/geom/ColorTransform_as.cpp \
+	flash/geom/Matrix_as.cpp \
+	flash/geom_pkg.cpp \
+	flash/geom/Point_as.cpp \
+	flash/geom/Rectangle_as.cpp \
+	flash/geom/Transform_as.cpp \
+	flash/net/FileReference_as.cpp \
+	flash/net/FileReferenceList_as.cpp \
+	flash/net_pkg.cpp \
+	flash_pkg.cpp \
+	flash/text_pkg.cpp \
+	flash/text/TextRenderer_as.cpp \
 	$(NULL)
 
 noinst_HEADERS = \
         AsBroadcaster.h \
-        BevelFilter_as.h \
-        BitmapFilter_as.h \
 	Boolean.h \
-	BlurFilter_as.h \
 	Camera.h \
 	ClassHierarchy.h \
 	Color.h	\
-	ColorMatrixFilter_as.h \
 	ContextMenu.h \
-	ConvolutionFilter_as.h \
 	CustomActions.h	\
 	Date.h \
-	DropShadowFilter_as.h \
 	Error.h	\
 	GMath.h	\
 	Global.h\
-	GlowFilter_as.h \
-	GradientBevelFilter_as.h \
-	GradientGlowFilter_as.h \
 	Key.h \
 	LoadVars.h \
 	LocalConnection.h\
@@ -136,6 +145,33 @@ noinst_HEADERS = \
 	xmlsocket.h \
 	xmlattrs.h \
 	xmlnode.h \
+	flash/display/BitmapData_as.h \
+	flash/display_pkg.h \
+	flash/external/ExternalInterface_as.h \
+	flash/external_pkg.h \
+        flash/filters/BevelFilter_as.h \
+        flash/filters/BitmapFilter_as.h \
+        flash/filters/DisplacementMapFilter_as.h \
+        flash/filters/BlurFilter_as.h \
+	flash/filters/ColorMatrixFilter_as.h \
+	flash/filters/ConvolutionFilter_as.h \
+	flash/filters/DropShadowFilter_as.h \
+	flash/filters/GlowFilter_as.h \
+	flash/filters/GradientBevelFilter_as.h \
+	flash/filters/GradientGlowFilter_as.h \
+	flash/filters_pkg.h \
+	flash/geom/ColorTransform_as.h \
+	flash/geom/Matrix_as.h \
+	flash/geom_pkg.h \
+	flash/geom/Point_as.h \
+	flash/geom/Rectangle_as.h \
+	flash/geom/Transform_as.h \
+	flash/net/FileReference_as.h \
+	flash/net/FileReferenceList_as.h \
+	flash/net_pkg.h \
+	flash_pkg.h \
+	flash/text_pkg.h \
+	flash/text/TextRenderer_as.h \
 	$(NULL)
 
 libgnashasobjs_la_LIBADD = \
