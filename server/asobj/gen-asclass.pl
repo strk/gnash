@@ -135,6 +135,37 @@ EOF
 
     }
 
+    ## Loop through the list of properties.  Generate code, stored in
+    ## $declarations, $registrations, and $implementations.  $declarations
+    ## contains the declaration code for all methods, etc.  These will
+    ## be printed later, in the section delimited with EOF.  You may
+    ## change the output of these three looped sections.
+    foreach my $p (@{$args{properties}}) {
+
+        ## Where you see 'qq|' and '|', read '"' and '"'.  Using the quote
+        ## operator eliminates the need to escape literal quotes.  Thus,
+        ##   qq|This is an "example".\n|  ==  "This is an \"example\".\n"
+        ## A '.' concatenates a string.
+
+        $declarations .=
+          qq|\nstatic as_value $args{lc}_| .$p. "_getset". qq|(const fn_call& fn);|;
+
+        $registrations .=
+		  qq|\n    o.init_property("$p", $args{lc}_${p}_getset, $args{lc}_${p}_getset);|;
+
+        $implementations .=
+          qq|\nstatic as_value\n$args{lc}_| .$p. "_getset" .
+          qq|(const fn_call& fn)
+{
+	boost::intrusive_ptr<$args{lc}_as> ptr = ensureType<$args{lc}_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+|;
+
+    }
+
     ## The text between the EOFs will be printed in the C++ source file.
     print $fh <<EOF;
 

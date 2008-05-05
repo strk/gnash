@@ -44,6 +44,9 @@ static as_value Point_offset(const fn_call& fn);
 static as_value Point_polar(const fn_call& fn);
 static as_value Point_subtract(const fn_call& fn);
 static as_value Point_toString(const fn_call& fn);
+static as_value Point_length_getset(const fn_call& fn);
+static as_value Point_x_getset(const fn_call& fn);
+static as_value Point_y_getset(const fn_call& fn);
 as_value Point_ctor(const fn_call& fn);
 
 static void
@@ -59,6 +62,9 @@ attachPointInterface(as_object& o)
     o.init_member("polar", new builtin_function(Point_polar));
     o.init_member("subtract", new builtin_function(Point_subtract));
     o.init_member("toString", new builtin_function(Point_toString));
+    o.init_property("length", Point_length_getset, Point_length_getset);
+    o.init_property("x", Point_x_getset, Point_x_getset);
+    o.init_property("y", Point_y_getset, Point_y_getset);
 }
 
 static as_object*
@@ -176,6 +182,33 @@ Point_subtract(const fn_call& fn)
 
 static as_value
 Point_toString(const fn_call& fn)
+{
+	boost::intrusive_ptr<Point_as> ptr = ensureType<Point_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+Point_length_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<Point_as> ptr = ensureType<Point_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+Point_x_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<Point_as> ptr = ensureType<Point_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+Point_y_getset(const fn_call& fn)
 {
 	boost::intrusive_ptr<Point_as> ptr = ensureType<Point_as>(fn.this_ptr);
 	UNUSED(ptr);

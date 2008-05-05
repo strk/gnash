@@ -40,6 +40,12 @@ static as_value FileReference_cancel(const fn_call& fn);
 static as_value FileReference_download(const fn_call& fn);
 static as_value FileReference_removeListener(const fn_call& fn);
 static as_value FileReference_upload(const fn_call& fn);
+static as_value FileReference_creationDate_getset(const fn_call& fn);
+static as_value FileReference_creator_getset(const fn_call& fn);
+static as_value FileReference_modificationDate_getset(const fn_call& fn);
+static as_value FileReference_name_getset(const fn_call& fn);
+static as_value FileReference_size_getset(const fn_call& fn);
+static as_value FileReference_type_getset(const fn_call& fn);
 as_value FileReference_ctor(const fn_call& fn);
 
 static void
@@ -51,6 +57,12 @@ attachFileReferenceInterface(as_object& o)
     o.init_member("download", new builtin_function(FileReference_download));
     o.init_member("removeListener", new builtin_function(FileReference_removeListener));
     o.init_member("upload", new builtin_function(FileReference_upload));
+    o.init_property("creationDate", FileReference_creationDate_getset, FileReference_creationDate_getset);
+    o.init_property("creator", FileReference_creator_getset, FileReference_creator_getset);
+    o.init_property("modificationDate", FileReference_modificationDate_getset, FileReference_modificationDate_getset);
+    o.init_property("name", FileReference_name_getset, FileReference_name_getset);
+    o.init_property("size", FileReference_size_getset, FileReference_size_getset);
+    o.init_property("type", FileReference_type_getset, FileReference_type_getset);
 }
 
 static as_object*
@@ -132,6 +144,60 @@ FileReference_removeListener(const fn_call& fn)
 
 static as_value
 FileReference_upload(const fn_call& fn)
+{
+	boost::intrusive_ptr<FileReference_as> ptr = ensureType<FileReference_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+FileReference_creationDate_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<FileReference_as> ptr = ensureType<FileReference_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+FileReference_creator_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<FileReference_as> ptr = ensureType<FileReference_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+FileReference_modificationDate_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<FileReference_as> ptr = ensureType<FileReference_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+FileReference_name_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<FileReference_as> ptr = ensureType<FileReference_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+FileReference_size_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<FileReference_as> ptr = ensureType<FileReference_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+FileReference_type_getset(const fn_call& fn)
 {
 	boost::intrusive_ptr<FileReference_as> ptr = ensureType<FileReference_as>(fn.this_ptr);
 	UNUSED(ptr);

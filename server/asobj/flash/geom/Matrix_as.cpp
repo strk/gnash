@@ -46,6 +46,12 @@ static as_value Matrix_scale(const fn_call& fn);
 static as_value Matrix_toString(const fn_call& fn);
 static as_value Matrix_transformPoint(const fn_call& fn);
 static as_value Matrix_translate(const fn_call& fn);
+static as_value Matrix_a_getset(const fn_call& fn);
+static as_value Matrix_b_getset(const fn_call& fn);
+static as_value Matrix_c_getset(const fn_call& fn);
+static as_value Matrix_d_getset(const fn_call& fn);
+static as_value Matrix_tx_getset(const fn_call& fn);
+static as_value Matrix_ty_getset(const fn_call& fn);
 as_value Matrix_ctor(const fn_call& fn);
 
 static void
@@ -63,6 +69,12 @@ attachMatrixInterface(as_object& o)
     o.init_member("toString", new builtin_function(Matrix_toString));
     o.init_member("transformPoint", new builtin_function(Matrix_transformPoint));
     o.init_member("translate", new builtin_function(Matrix_translate));
+    o.init_property("a", Matrix_a_getset, Matrix_a_getset);
+    o.init_property("b", Matrix_b_getset, Matrix_b_getset);
+    o.init_property("c", Matrix_c_getset, Matrix_c_getset);
+    o.init_property("d", Matrix_d_getset, Matrix_d_getset);
+    o.init_property("tx", Matrix_tx_getset, Matrix_tx_getset);
+    o.init_property("ty", Matrix_ty_getset, Matrix_ty_getset);
 }
 
 static as_object*
@@ -198,6 +210,60 @@ Matrix_transformPoint(const fn_call& fn)
 
 static as_value
 Matrix_translate(const fn_call& fn)
+{
+	boost::intrusive_ptr<Matrix_as> ptr = ensureType<Matrix_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+Matrix_a_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<Matrix_as> ptr = ensureType<Matrix_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+Matrix_b_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<Matrix_as> ptr = ensureType<Matrix_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+Matrix_c_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<Matrix_as> ptr = ensureType<Matrix_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+Matrix_d_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<Matrix_as> ptr = ensureType<Matrix_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+Matrix_tx_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<Matrix_as> ptr = ensureType<Matrix_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+Matrix_ty_getset(const fn_call& fn)
 {
 	boost::intrusive_ptr<Matrix_as> ptr = ensureType<Matrix_as>(fn.this_ptr);
 	UNUSED(ptr);

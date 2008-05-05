@@ -28,19 +28,37 @@
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
-#include "flash/filters/BitmapFilter_as.h" // for AS inheritance
+#include "Object.h" // for AS inheritance
 
 #include <sstream>
 
 namespace gnash {
 
 static as_value DisplacementMapFilter_clone(const fn_call& fn);
+static as_value DisplacementMapFilter_alpha_getset(const fn_call& fn);
+static as_value DisplacementMapFilter_color_getset(const fn_call& fn);
+static as_value DisplacementMapFilter_componentX_getset(const fn_call& fn);
+static as_value DisplacementMapFilter_componentY_getset(const fn_call& fn);
+static as_value DisplacementMapFilter_mapBitmap_getset(const fn_call& fn);
+static as_value DisplacementMapFilter_mapPoint_getset(const fn_call& fn);
+static as_value DisplacementMapFilter_mode_getset(const fn_call& fn);
+static as_value DisplacementMapFilter_scaleX_getset(const fn_call& fn);
+static as_value DisplacementMapFilter_scaleY_getset(const fn_call& fn);
 as_value DisplacementMapFilter_ctor(const fn_call& fn);
 
 static void
 attachDisplacementMapFilterInterface(as_object& o)
 {
     o.init_member("clone", new builtin_function(DisplacementMapFilter_clone));
+    o.init_property("alpha", DisplacementMapFilter_alpha_getset, DisplacementMapFilter_alpha_getset);
+    o.init_property("color", DisplacementMapFilter_color_getset, DisplacementMapFilter_color_getset);
+    o.init_property("componentX", DisplacementMapFilter_componentX_getset, DisplacementMapFilter_componentX_getset);
+    o.init_property("componentY", DisplacementMapFilter_componentY_getset, DisplacementMapFilter_componentY_getset);
+    o.init_property("mapBitmap", DisplacementMapFilter_mapBitmap_getset, DisplacementMapFilter_mapBitmap_getset);
+    o.init_property("mapPoint", DisplacementMapFilter_mapPoint_getset, DisplacementMapFilter_mapPoint_getset);
+    o.init_property("mode", DisplacementMapFilter_mode_getset, DisplacementMapFilter_mode_getset);
+    o.init_property("scaleX", DisplacementMapFilter_scaleX_getset, DisplacementMapFilter_scaleX_getset);
+    o.init_property("scaleY", DisplacementMapFilter_scaleY_getset, DisplacementMapFilter_scaleY_getset);
 }
 
 static as_object*
@@ -49,7 +67,9 @@ getDisplacementMapFilterInterface()
 	static boost::intrusive_ptr<as_object> o;
 	if ( ! o )
 	{
-		o = new as_object(bitmapFilter_interface());
+		// TODO: check if this class should inherit from Object
+		//       or from a different class
+		o = new as_object(getObjectInterface());
 		attachDisplacementMapFilterInterface(*o);
 	}
 	return o.get();
@@ -75,6 +95,87 @@ public:
 
 static as_value
 DisplacementMapFilter_clone(const fn_call& fn)
+{
+	boost::intrusive_ptr<DisplacementMapFilter_as> ptr = ensureType<DisplacementMapFilter_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+DisplacementMapFilter_alpha_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<DisplacementMapFilter_as> ptr = ensureType<DisplacementMapFilter_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+DisplacementMapFilter_color_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<DisplacementMapFilter_as> ptr = ensureType<DisplacementMapFilter_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+DisplacementMapFilter_componentX_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<DisplacementMapFilter_as> ptr = ensureType<DisplacementMapFilter_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+DisplacementMapFilter_componentY_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<DisplacementMapFilter_as> ptr = ensureType<DisplacementMapFilter_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+DisplacementMapFilter_mapBitmap_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<DisplacementMapFilter_as> ptr = ensureType<DisplacementMapFilter_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+DisplacementMapFilter_mapPoint_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<DisplacementMapFilter_as> ptr = ensureType<DisplacementMapFilter_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+DisplacementMapFilter_mode_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<DisplacementMapFilter_as> ptr = ensureType<DisplacementMapFilter_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+DisplacementMapFilter_scaleX_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<DisplacementMapFilter_as> ptr = ensureType<DisplacementMapFilter_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+DisplacementMapFilter_scaleY_getset(const fn_call& fn)
 {
 	boost::intrusive_ptr<DisplacementMapFilter_as> ptr = ensureType<DisplacementMapFilter_as>(fn.this_ptr);
 	UNUSED(ptr);

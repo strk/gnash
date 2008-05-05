@@ -37,6 +37,7 @@ namespace gnash {
 static as_value FileReferenceList_addListener(const fn_call& fn);
 static as_value FileReferenceList_browse(const fn_call& fn);
 static as_value FileReferenceList_removeListener(const fn_call& fn);
+static as_value FileReferenceList_fileList_getset(const fn_call& fn);
 as_value FileReferenceList_ctor(const fn_call& fn);
 
 static void
@@ -45,6 +46,7 @@ attachFileReferenceListInterface(as_object& o)
     o.init_member("addListener", new builtin_function(FileReferenceList_addListener));
     o.init_member("browse", new builtin_function(FileReferenceList_browse));
     o.init_member("removeListener", new builtin_function(FileReferenceList_removeListener));
+    o.init_property("fileList", FileReferenceList_fileList_getset, FileReferenceList_fileList_getset);
 }
 
 static as_object*
@@ -99,6 +101,15 @@ FileReferenceList_browse(const fn_call& fn)
 
 static as_value
 FileReferenceList_removeListener(const fn_call& fn)
+{
+	boost::intrusive_ptr<FileReferenceList_as> ptr = ensureType<FileReferenceList_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+FileReferenceList_fileList_getset(const fn_call& fn)
 {
 	boost::intrusive_ptr<FileReferenceList_as> ptr = ensureType<FileReferenceList_as>(fn.this_ptr);
 	UNUSED(ptr);

@@ -1,3 +1,16 @@
+2008-05-05 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/gen-asclass.pl: add support for stubbing
+	  properties as native getter-setters.
+	* server/asobj/flash/: display/BitmapData_as.cpp,
+	  external/ExternalInterface_as.cpp,
+	  filters/DisplacementMapFilter_as.cpp,
+	  geom/ColorTransform_as.cpp, geom/Matrix_as.cpp
+	  geom/Point_as.cpp, geom/Rectangle_as.cpp,
+	  geom/Transform_as.cpp, net/FileReferenceList_as.cpp,
+	  net/FileReference_as.cpp, text/TextRenderer_as.cpp:
+	  Re-generated.
+
 2008-05-05 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/asobj/Global.{h,cpp}: drop goto from initialization, use

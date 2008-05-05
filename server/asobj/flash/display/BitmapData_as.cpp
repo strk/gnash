@@ -58,6 +58,10 @@ static as_value BitmapData_scroll(const fn_call& fn);
 static as_value BitmapData_setPixel(const fn_call& fn);
 static as_value BitmapData_setPixel32(const fn_call& fn);
 static as_value BitmapData_threshold(const fn_call& fn);
+static as_value BitmapData_height_getset(const fn_call& fn);
+static as_value BitmapData_rectangle_getset(const fn_call& fn);
+static as_value BitmapData_transparent_getset(const fn_call& fn);
+static as_value BitmapData_width_getset(const fn_call& fn);
 as_value BitmapData_ctor(const fn_call& fn);
 
 static void
@@ -87,6 +91,10 @@ attachBitmapDataInterface(as_object& o)
     o.init_member("setPixel", new builtin_function(BitmapData_setPixel));
     o.init_member("setPixel32", new builtin_function(BitmapData_setPixel32));
     o.init_member("threshold", new builtin_function(BitmapData_threshold));
+    o.init_property("height", BitmapData_height_getset, BitmapData_height_getset);
+    o.init_property("rectangle", BitmapData_rectangle_getset, BitmapData_rectangle_getset);
+    o.init_property("transparent", BitmapData_transparent_getset, BitmapData_transparent_getset);
+    o.init_property("width", BitmapData_width_getset, BitmapData_width_getset);
 }
 
 static as_object*
@@ -330,6 +338,42 @@ BitmapData_setPixel32(const fn_call& fn)
 
 static as_value
 BitmapData_threshold(const fn_call& fn)
+{
+	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+BitmapData_height_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+BitmapData_rectangle_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+BitmapData_transparent_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+BitmapData_width_getset(const fn_call& fn)
 {
 	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
 	UNUSED(ptr);

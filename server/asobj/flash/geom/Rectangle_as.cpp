@@ -49,6 +49,17 @@ static as_value Rectangle_offsetPoint(const fn_call& fn);
 static as_value Rectangle_setEmpty(const fn_call& fn);
 static as_value Rectangle_toString(const fn_call& fn);
 static as_value Rectangle_union(const fn_call& fn);
+static as_value Rectangle_bottom_getset(const fn_call& fn);
+static as_value Rectangle_bottomRight_getset(const fn_call& fn);
+static as_value Rectangle_height_getset(const fn_call& fn);
+static as_value Rectangle_left_getset(const fn_call& fn);
+static as_value Rectangle_right_getset(const fn_call& fn);
+static as_value Rectangle_size_getset(const fn_call& fn);
+static as_value Rectangle_top_getset(const fn_call& fn);
+static as_value Rectangle_topLeft_getset(const fn_call& fn);
+static as_value Rectangle_width_getset(const fn_call& fn);
+static as_value Rectangle_x_getset(const fn_call& fn);
+static as_value Rectangle_y_getset(const fn_call& fn);
 as_value Rectangle_ctor(const fn_call& fn);
 
 static void
@@ -69,6 +80,17 @@ attachRectangleInterface(as_object& o)
     o.init_member("setEmpty", new builtin_function(Rectangle_setEmpty));
     o.init_member("toString", new builtin_function(Rectangle_toString));
     o.init_member("union", new builtin_function(Rectangle_union));
+    o.init_property("bottom", Rectangle_bottom_getset, Rectangle_bottom_getset);
+    o.init_property("bottomRight", Rectangle_bottomRight_getset, Rectangle_bottomRight_getset);
+    o.init_property("height", Rectangle_height_getset, Rectangle_height_getset);
+    o.init_property("left", Rectangle_left_getset, Rectangle_left_getset);
+    o.init_property("right", Rectangle_right_getset, Rectangle_right_getset);
+    o.init_property("size", Rectangle_size_getset, Rectangle_size_getset);
+    o.init_property("top", Rectangle_top_getset, Rectangle_top_getset);
+    o.init_property("topLeft", Rectangle_topLeft_getset, Rectangle_topLeft_getset);
+    o.init_property("width", Rectangle_width_getset, Rectangle_width_getset);
+    o.init_property("x", Rectangle_x_getset, Rectangle_x_getset);
+    o.init_property("y", Rectangle_y_getset, Rectangle_y_getset);
 }
 
 static as_object*
@@ -231,6 +253,105 @@ Rectangle_toString(const fn_call& fn)
 
 static as_value
 Rectangle_union(const fn_call& fn)
+{
+	boost::intrusive_ptr<Rectangle_as> ptr = ensureType<Rectangle_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+Rectangle_bottom_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<Rectangle_as> ptr = ensureType<Rectangle_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+Rectangle_bottomRight_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<Rectangle_as> ptr = ensureType<Rectangle_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+Rectangle_height_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<Rectangle_as> ptr = ensureType<Rectangle_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+Rectangle_left_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<Rectangle_as> ptr = ensureType<Rectangle_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+Rectangle_right_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<Rectangle_as> ptr = ensureType<Rectangle_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+Rectangle_size_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<Rectangle_as> ptr = ensureType<Rectangle_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+Rectangle_top_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<Rectangle_as> ptr = ensureType<Rectangle_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+Rectangle_topLeft_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<Rectangle_as> ptr = ensureType<Rectangle_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+Rectangle_width_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<Rectangle_as> ptr = ensureType<Rectangle_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+Rectangle_x_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<Rectangle_as> ptr = ensureType<Rectangle_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+Rectangle_y_getset(const fn_call& fn)
 {
 	boost::intrusive_ptr<Rectangle_as> ptr = ensureType<Rectangle_as>(fn.this_ptr);
 	UNUSED(ptr);

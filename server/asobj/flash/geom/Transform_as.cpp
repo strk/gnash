@@ -34,11 +34,21 @@
 
 namespace gnash {
 
+static as_value Transform_colorTransform_getset(const fn_call& fn);
+static as_value Transform_concatenatedColorTransform_getset(const fn_call& fn);
+static as_value Transform_concatenatedMatrix_getset(const fn_call& fn);
+static as_value Transform_matrix_getset(const fn_call& fn);
+static as_value Transform_pixelBounds_getset(const fn_call& fn);
 as_value Transform_ctor(const fn_call& fn);
 
 static void
 attachTransformInterface(as_object& o)
 {
+    o.init_property("colorTransform", Transform_colorTransform_getset, Transform_colorTransform_getset);
+    o.init_property("concatenatedColorTransform", Transform_concatenatedColorTransform_getset, Transform_concatenatedColorTransform_getset);
+    o.init_property("concatenatedMatrix", Transform_concatenatedMatrix_getset, Transform_concatenatedMatrix_getset);
+    o.init_property("matrix", Transform_matrix_getset, Transform_matrix_getset);
+    o.init_property("pixelBounds", Transform_pixelBounds_getset, Transform_pixelBounds_getset);
 }
 
 static as_object*
@@ -72,6 +82,51 @@ public:
 	//double get_numeric_value() const { return 0; }
 };
 
+
+static as_value
+Transform_colorTransform_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<Transform_as> ptr = ensureType<Transform_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+Transform_concatenatedColorTransform_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<Transform_as> ptr = ensureType<Transform_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+Transform_concatenatedMatrix_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<Transform_as> ptr = ensureType<Transform_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+Transform_matrix_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<Transform_as> ptr = ensureType<Transform_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+Transform_pixelBounds_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<Transform_as> ptr = ensureType<Transform_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
 
 as_value
 Transform_ctor(const fn_call& fn)

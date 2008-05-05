@@ -36,6 +36,15 @@ namespace gnash {
 
 static as_value ColorTransform_concat(const fn_call& fn);
 static as_value ColorTransform_toString(const fn_call& fn);
+static as_value ColorTransform_alphaMultiplier_getset(const fn_call& fn);
+static as_value ColorTransform_alphaOffset_getset(const fn_call& fn);
+static as_value ColorTransform_blueMultiplier_getset(const fn_call& fn);
+static as_value ColorTransform_blueOffset_getset(const fn_call& fn);
+static as_value ColorTransform_greenMultiplier_getset(const fn_call& fn);
+static as_value ColorTransform_greenOffset_getset(const fn_call& fn);
+static as_value ColorTransform_redMultiplier_getset(const fn_call& fn);
+static as_value ColorTransform_redOffset_getset(const fn_call& fn);
+static as_value ColorTransform_rgb_getset(const fn_call& fn);
 as_value ColorTransform_ctor(const fn_call& fn);
 
 static void
@@ -43,6 +52,15 @@ attachColorTransformInterface(as_object& o)
 {
     o.init_member("concat", new builtin_function(ColorTransform_concat));
     o.init_member("toString", new builtin_function(ColorTransform_toString));
+    o.init_property("alphaMultiplier", ColorTransform_alphaMultiplier_getset, ColorTransform_alphaMultiplier_getset);
+    o.init_property("alphaOffset", ColorTransform_alphaOffset_getset, ColorTransform_alphaOffset_getset);
+    o.init_property("blueMultiplier", ColorTransform_blueMultiplier_getset, ColorTransform_blueMultiplier_getset);
+    o.init_property("blueOffset", ColorTransform_blueOffset_getset, ColorTransform_blueOffset_getset);
+    o.init_property("greenMultiplier", ColorTransform_greenMultiplier_getset, ColorTransform_greenMultiplier_getset);
+    o.init_property("greenOffset", ColorTransform_greenOffset_getset, ColorTransform_greenOffset_getset);
+    o.init_property("redMultiplier", ColorTransform_redMultiplier_getset, ColorTransform_redMultiplier_getset);
+    o.init_property("redOffset", ColorTransform_redOffset_getset, ColorTransform_redOffset_getset);
+    o.init_property("rgb", ColorTransform_rgb_getset, ColorTransform_rgb_getset);
 }
 
 static as_object*
@@ -88,6 +106,87 @@ ColorTransform_concat(const fn_call& fn)
 
 static as_value
 ColorTransform_toString(const fn_call& fn)
+{
+	boost::intrusive_ptr<ColorTransform_as> ptr = ensureType<ColorTransform_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+ColorTransform_alphaMultiplier_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<ColorTransform_as> ptr = ensureType<ColorTransform_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+ColorTransform_alphaOffset_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<ColorTransform_as> ptr = ensureType<ColorTransform_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+ColorTransform_blueMultiplier_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<ColorTransform_as> ptr = ensureType<ColorTransform_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+ColorTransform_blueOffset_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<ColorTransform_as> ptr = ensureType<ColorTransform_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+ColorTransform_greenMultiplier_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<ColorTransform_as> ptr = ensureType<ColorTransform_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+ColorTransform_greenOffset_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<ColorTransform_as> ptr = ensureType<ColorTransform_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+ColorTransform_redMultiplier_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<ColorTransform_as> ptr = ensureType<ColorTransform_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+ColorTransform_redOffset_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<ColorTransform_as> ptr = ensureType<ColorTransform_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+ColorTransform_rgb_getset(const fn_call& fn)
 {
 	boost::intrusive_ptr<ColorTransform_as> ptr = ensureType<ColorTransform_as>(fn.this_ptr);
 	UNUSED(ptr);

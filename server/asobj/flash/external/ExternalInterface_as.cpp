@@ -36,6 +36,7 @@ namespace gnash {
 
 static as_value ExternalInterface_addCallback(const fn_call& fn);
 static as_value ExternalInterface_call(const fn_call& fn);
+static as_value ExternalInterface_available_getset(const fn_call& fn);
 as_value ExternalInterface_ctor(const fn_call& fn);
 
 static void
@@ -43,6 +44,7 @@ attachExternalInterfaceInterface(as_object& o)
 {
     o.init_member("addCallback", new builtin_function(ExternalInterface_addCallback));
     o.init_member("call", new builtin_function(ExternalInterface_call));
+    o.init_property("available", ExternalInterface_available_getset, ExternalInterface_available_getset);
 }
 
 static as_object*
@@ -88,6 +90,15 @@ ExternalInterface_addCallback(const fn_call& fn)
 
 static as_value
 ExternalInterface_call(const fn_call& fn)
+{
+	boost::intrusive_ptr<ExternalInterface_as> ptr = ensureType<ExternalInterface_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+ExternalInterface_available_getset(const fn_call& fn)
 {
 	boost::intrusive_ptr<ExternalInterface_as> ptr = ensureType<ExternalInterface_as>(fn.this_ptr);
 	UNUSED(ptr);
