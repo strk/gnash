@@ -1,5 +1,17 @@
 2008-05-05 Sandro Santilli <strk@keybit.net>
 
+	* server/as_value.{cpp,h}: add convert_to_primitive to
+	  possibly reduce copies of as_value; add newAdd and subtract
+	  methods doing the same as the corresponding opcodes to 
+	  make C++ implementation of AS-like code easier.
+	  (opcodes untoched, would likely be worth delegating).
+	* testsuite/actionscript.all/: Makefile.am, Rectangle.as:
+	  Initial tests for flash.geom.Rectangle class
+	* server/asobj/flash/geom/Rectangle_as.cpp: implement constructor,
+	  left/top/right/bottom getter-setters, isEmpty method.
+
+2008-05-05 Sandro Santilli <strk@keybit.net>
+
 	* server/namedStrings.{cpp,h}: add PROP_WIDTH and PROP_HEIGHT.
 
 2008-05-05 Benjamin Wolsey <bwy@benjaminwolsey.de>

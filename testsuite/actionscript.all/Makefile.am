@@ -120,6 +120,7 @@ ASTESTS =			\
 	case.as			\
 	ops.as			\
 	toString_valueOf.as	\
+	Rectangle.as		\
 	$(NULL)
 
 ASTESTS_OUT = $(ASTESTS:.as=.swf)

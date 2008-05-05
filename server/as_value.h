@@ -385,13 +385,19 @@ public:
 	/// or NULL if it is not an ActionScript function.
 	as_function*	to_as_function() const;
 
-	/// Return value as a primitive type
+	/// Convert this value to a primitive type
 	//
 	/// Primitive types are: undefined, null, boolean, string, number.
 	/// See ECMA-2.6.2 (sections 4.3.2 and 8.6.2.6).
 	///
-	/// @param env
-	/// 	The environment to use for calling the valueOf method.
+	/// @throw ActionTypeError if an object can't be converted to a primitive
+	///
+	as_value& convert_to_primitive();
+
+	/// Return value as a primitive type
+	//
+	/// Primitive types are: undefined, null, boolean, string, number.
+	/// See ECMA-2.6.2 (sections 4.3.2 and 8.6.2.6).
 	///
 	/// @throw ActionTypeError if an object can't be converted to a primitive
 	///
@@ -411,6 +417,18 @@ public:
 	/// @throw ActionTypeError if an object can't be converted to a primitive
 	///
 	as_value to_primitive(type hint) const;
+
+	/// Convert this value to a primitive type, with a preference
+	//
+	/// Primitive types are: undefined, null, boolean, string, number.
+	/// See ECMA-2.6.2 (sections 4.3.2 and 8.6.2.6).
+	///
+	/// @param hint
+	/// 	NUMBER or STRING, the preferred representation we're asking for.
+	///
+	/// @throw ActionTypeError if an object can't be converted to a primitive
+	///
+	as_value& convert_to_primitive(type hint);
 
 	/// Force type to number.
 	//
@@ -549,6 +567,14 @@ public:
 
 	/// Sets this value to this string plus the given string.
 	void	string_concat(const std::string& str);
+
+	/// Equivalent of ActionNewAdd
+	as_value& newAdd(const as_value& v1);
+
+	// Equivalent of ActionSubtract
+	as_value& subtract(const as_value& o);
+
+
 
 	/// Set any object value as reachable (for the GC)
 	//

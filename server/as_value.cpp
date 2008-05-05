@@ -264,6 +264,29 @@ as_value::to_primitive() const
 	return to_primitive(hint);
 }
 
+as_value&
+as_value::convert_to_primitive()
+{
+	VM& vm = VM::get();
+	int swfVersion = vm.getSWFVersion();
+
+	type hint = NUMBER;
+
+	if ( m_type == OBJECT && swfVersion > 5 && getObj()->isDateObject() )
+	{
+		hint = STRING;
+	}
+
+#if 0
+	else if ( m_type == MOVIECLIP && swfVersion > 5 )
+	{
+		throw ActionTypeError();
+	}
+#endif
+
+	return convert_to_primitive(hint);
+}
+
 // Conversion to primitive value.
 as_value
 as_value::to_primitive(type hint) const
@@ -373,6 +396,108 @@ as_value::to_primitive(type hint) const
 
 	return ret;
 
+}
+
+// Conversion to primitive value.
+as_value&
+as_value::convert_to_primitive(type hint) 
+{
+	if ( m_type != OBJECT && m_type != AS_FUNCTION ) return *this; 
+	//if ( ! is_object() ) return *this; // include MOVIECLIP !!
+
+#if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
+	log_debug("to_primitive(%s)", hint==NUMBER ? "NUMBER" : "STRING");
+#endif 
+
+	// TODO: implement as_object::DefaultValue (ECMA-262 - 8.6.2.6)
+
+	as_value method;
+	as_object* obj = NULL;
+
+	if (hint == NUMBER)
+	{
+		if ( m_type == MOVIECLIP )
+		{
+			set_double(NAN);
+			return *this;
+		}
+		if ( m_type == OBJECT ) obj = getObj().get();
+		else obj = getFun().get();
+
+		if ( (!obj->get_member(NSV::PROP_VALUE_OF, &method)) || (!method.is_object()) ) // ECMA says ! is_object()
+		{
+#if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
+			log_debug(" valueOf not found");
+#endif
+			// Returning undefined here instead of throwing
+			// a TypeError passes tests in actionscript.all/Object.as
+			// and many swfdec tests, with no new failures (though
+			// perhaps we aren't testing enough).
+			set_undefined();
+			return *this;
+            
+		}
+	}
+	else
+	{
+		assert(hint==STRING);
+
+		if ( m_type == MOVIECLIP )
+		{
+			set_string(getCharacterProxy().getTarget());
+			return *this;
+		}
+
+		if ( m_type == OBJECT ) obj = getObj().get();
+		else obj = getFun().get();
+
+		// @@ Moock says, "the value that results from
+		// calling toString() on the object".
+		//
+		// When the toString() method doesn't exist, or
+		// doesn't return a valid number, the default
+		// text representation for that object is used
+		// instead.
+		//
+		if ( ! obj->useCustomToString() )
+		{
+#if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
+			log_debug(" not using custom toString");
+#endif
+			set_string(obj->get_text_value());
+			return *this;
+		}
+
+		if ( (!obj->get_member(NSV::PROP_TO_STRING, &method)) || (!method.is_function()) ) // ECMA says ! is_object()
+		{
+#if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
+			log_debug(" toString not found");
+#endif
+			if ( (!obj->get_member(NSV::PROP_VALUE_OF, &method)) || (!method.is_function()) ) // ECMA says ! is_object()
+			{
+#if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
+				log_debug(" valueOf not found");
+#endif
+				throw ActionTypeError();
+			}
+		}
+	}
+
+	assert(obj);
+
+	as_environment env;
+	as_value ret = call_method0(method, &env, obj);
+#if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
+	log_debug("to_primitive: method call returned %s", ret.to_debug_string().c_str());
+#endif
+	if ( ret.m_type == OBJECT || ret.m_type == AS_FUNCTION ) // not a primitive 
+	{
+		throw ActionTypeError();
+	}
+
+	*this = ret;
+
+	return *this;
 }
 
 double
@@ -1573,6 +1698,63 @@ as_value::CharacterProxy::setReachable() const
 {
 	checkDangling();
 	if ( _ptr ) _ptr->setReachable();
+}
+
+as_value&
+as_value::newAdd(const as_value& op2)
+{
+	as_value v2=op2;
+
+	try { convert_to_primitive(); }
+	catch (ActionTypeError& e)
+	{
+		log_debug("%s.to_primitive() threw an error during as_value operator+",
+			to_debug_string().c_str());
+	}
+
+	try { v2 = v2.to_primitive(); }
+	catch (ActionTypeError& e)
+	{
+		log_debug("%s.to_primitive() threw an error during as_value operator+",
+			op2.to_debug_string().c_str());
+	}
+
+#if GNASH_DEBUG
+	log_debug(_("(%s + %s) [primitive conversion done]"),
+			to_debug_string().c_str(),
+			v2.to_debug_string().c_str());
+#endif
+
+	if (is_string() || v2.is_string() )
+	{
+		// use string semantic
+
+		int version = VM::get().getSWFVersion();
+		convert_to_string_versioned(version);
+		string_concat(v2.to_string_versioned(version));
+	}
+	else
+	{
+		// use numeric semantic
+		double v2num = v2.to_number();
+		//log_debug(_("v2 num = %g"), v2num);
+		double v1num = to_number();
+		//log_debug(_("v1 num = %g"), v1num);
+
+		set_double(v2num + v1num); 
+
+	}
+
+	return *this;
+}
+
+as_value&
+as_value::subtract(const as_value& op2)
+{
+	double operand1 = to_number();
+	double operand2 = op2.to_number();
+	set_double(operand1 - operand2);
+	return *this;
 }
 
 } // namespace gnash
