@@ -23,13 +23,12 @@
 #include "gnashconfig.h"
 #endif
 
-#include "gnash.h" // still needed ?
+#include "gnash.h" // needed for interface and fscommand callbacks
 #include "sound_handler.h" // for visibility of sound_handler destructor
 #include "gui.h"
 
 #include <string>
 #include <map>
-#include <iostream> // debugging...
 
 // Forward declarations
 namespace gnash
@@ -134,9 +133,9 @@ public:
 	    _startFullscreen = x;
 	}
 
-        void setAudioDumpfile(const char* filespec) {
-            _audio_dump = filespec;
-        }
+    void setAudioDumpfile(const char* filespec) {
+        _audioDump = filespec;
+    }
 	
 private:
 
@@ -151,7 +150,7 @@ private:
 	/// @param len
 	///     Requested amount of data to put
 	/// @return success
-	static bool silent_stream(void* udata, boost::uint8_t* stream, int len);
+	static bool silentStream(void* udata, boost::uint8_t* stream, int len);
         
 	void init_sound();
 
@@ -201,7 +200,7 @@ private:
 
 	static std::auto_ptr<Gui> _gui;
 
-	std::auto_ptr<media::sound_handler> _sound_handler;
+	std::auto_ptr<media::sound_handler> _soundHandler;
 
 	std::string _url;
 
@@ -211,7 +210,7 @@ private:
 	
 	unsigned long _maxAdvances;
 
-	/// Load the "_infile" movie setting it's url to "_url"
+	/// Load the "_infile" movie setting its url to "_url"
 	// 
 	/// This function takes care of interpreting _infile as
 	/// stdin when it equals "-". May throw a GnashException
@@ -230,7 +229,8 @@ private:
 	// (Or what did you think it meant?)
 	bool _startFullscreen;
 
-        const char* _audio_dump;
+    // The filename to use for dumping audio.
+    const char* _audioDump;
 
 };
 

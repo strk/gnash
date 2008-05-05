@@ -48,8 +48,6 @@
 #include <sstream>
 #include <iomanip>
 
-using std::endl;
-using std::cerr;
 using namespace gnash;
 
 namespace {
@@ -92,8 +90,8 @@ Player::Player()
     _fpsDebugTime(0.0),
 #endif
     _hostfd(-1),
-    _audio_dump(NULL),
-    _startFullscreen(false)
+    _startFullscreen(false),
+    _audioDump(NULL)
 {
     init();
 }
@@ -161,7 +159,7 @@ Player::init_logfile()
 }
 
 bool
-Player::silent_stream(void* /*udata*/, boost::uint8_t* stream, int len)
+Player::silentStream(void* /*udata*/, boost::uint8_t* stream, int len)
 {
     memset((void*)stream, 0, len);
     return true;
@@ -172,21 +170,21 @@ Player::init_sound()
 {
     if (_doSound) {
 #ifdef SOUND_SDL
-        _sound_handler.reset( gnash::media::create_sound_handler_sdl(_audio_dump) );
-        if (_audio_dump != NULL) {
+        _soundHandler.reset( gnash::media::create_sound_handler_sdl(_audio_dump) );
+        if (_audioDump != NULL) {
             // add a silent stream to the audio pool so that our output file
             // is homogenous;  we actually want silent wave data when no sounds
             // are playing on the stage
-            _sound_handler->attach_aux_streamer(silent_stream, (void*) this);
+            _soundHandler->attach_aux_streamer(silentStream, (void*) this);
         }
 #elif defined(SOUND_GST)
-        _sound_handler.reset( gnash::media::create_sound_handler_gst() );
+        _soundHandler.reset( gnash::media::create_sound_handler_gst() );
 #else
         log_error(_("Sound requested but no sound support compiled in"));
         return;
 #endif
         
-        gnash::set_sound_handler(_sound_handler.get());
+        gnash::set_sound_handler(_soundHandler.get());
     }
 }
 
@@ -429,7 +427,7 @@ Player::fs_callback(gnash::sprite_instance* movie, const std::string& command,
     {
         //log_debug("user-provided host requests fd is %d", hostfd);
         std::stringstream request;
-        request << "INVOKE " << command << ":" << args << endl;
+        request << "INVOKE " << command << ":" << args << std::endl;
 
         std::string requestString = request.str();
         const char* cmd = requestString.c_str();

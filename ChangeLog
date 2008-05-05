@@ -1,3 +1,10 @@
+2008-05-05 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* gui/Player.{cpp,h}: fix initialization warning, use camelCase for
+	  new methods and members (and some old ones). Minor doc additions.
+	  Would be nice if the audio-dump-related code could be moved out
+	  of Player.
+
 2008-05-05 Sandro Santilli <strk@keybit.net>
 
 	* doc/C/NOTES: add notes about classes in the 'flash'
