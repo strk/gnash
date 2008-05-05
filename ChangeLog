@@ -1,6 +1,6 @@
 2008-05-05 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
-	* testsuite/actionscript.all/SharedObject.as: add more tests,
+	* testsuite/actionscript.all/LocalConnection.as: add more tests,
 	  mostly failing.
 
 2008-05-05 Sandro Santilli <strk@keybit.net>
