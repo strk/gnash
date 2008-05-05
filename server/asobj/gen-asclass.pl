@@ -149,6 +149,9 @@ EOF
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
+#include "Object.h" // for AS inheritance
+
+#include <sstream>
 
 namespace gnash {
 $declarations
@@ -165,7 +168,9 @@ get$args{class}Interface()
 	static boost::intrusive_ptr<as_object> o;
 	if ( ! o )
 	{
-		o = new as_object();
+		// TODO: check if this class should inherit from Object
+		//       or from a different class
+		o = new as_object(getObjectInterface());
 		attach$args{class}Interface(*o);
 	}
 	return o.get();
@@ -190,9 +195,16 @@ public:
 
 $implementations
 as_value
-$args{lc}_ctor(const fn_call& /*fn*/)
+$args{lc}_ctor(const fn_call& fn)
 {
 	boost::intrusive_ptr<as_object> obj = new $args{lc}_as;
+
+	if ( fn.nargs )
+	{
+		std::stringstream ss;
+		fn.dump_args(ss);
+		LOG_ONCE( log_unimpl("$args{lc}(%s): %s", ss.str(), _("arguments discarded")) );
+	}
 
 	return as_value(obj.get()); // will keep alive
 }

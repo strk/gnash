@@ -876,3 +876,16 @@ BitmapData.scroll()
 BitmapData.setPixel()
 BitmapData.setPixel32()
 BitmapData.threshold()
+
+# flash.filters.DisplacementMapFilter
+DisplacementMapFilter class
+DisplacementMapFilter.alpha
+DisplacementMapFilter.color
+DisplacementMapFilter.componentX
+DisplacementMapFilter.componentY
+DisplacementMapFilter.mapBitmap
+DisplacementMapFilter.mapPoint
+DisplacementMapFilter.mode
+DisplacementMapFilter.scaleX
+DisplacementMapFilter.scaleY
+DisplacementMapFilter.clone()

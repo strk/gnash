@@ -1,5 +1,12 @@
 2008-05-05 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/gen-asclass.pl: log_unimpl if constructor
+	  takes any argument; have prototype inherit from Object class
+	  by default.
+	* doc/C/NOTES: add DisplacementMapFilter notes.
+
+2008-05-05 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/gen-asclass.sh: drop this, better focus on the perl
 	  version (needs improvement).
 
