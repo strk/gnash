@@ -1,3 +1,8 @@
+2008-05-05 Sandro Santilli <strk@keybit.net>
+
+	* doc/C/NOTES: add notes about classes in the 'flash'
+	  package (SWF8)
+
 2008-05-05 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* testsuite/swfdec/PASSING: update for new tests.

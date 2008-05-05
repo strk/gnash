@@ -724,3 +724,155 @@ XMLSocket.onConnect
 XMLSocket.onData
 XMLSocket.onXML
 XMLSocket.send()
+
+# flash.geom.Point
+Point class
+Point.length
+Point.x
+Point.y
+Point.add()
+Point.clone()
+Point.distance()
+Point.equals()
+Point.interpolate()
+Point.normalize()
+Point.offset()
+Point.polar()
+Point.subtract()
+Point.toString()
+
+# flash.geom.Rectangle
+Rectangle class
+Rectangle.bottom
+Rectangle.bottomRight
+Rectangle.height
+Rectangle.left
+Rectangle.right
+Rectangle.size
+Rectangle.top
+Rectangle.topLeft
+Rectangle.width
+Rectangle.x
+Rectangle.y
+Rectangle.clone()
+Rectangle.contains()
+Rectangle.containsPoint()
+Rectangle.containsRectangle()
+Rectangle.equals()
+Rectangle.inflate()
+Rectangle.inflatePoint()
+Rectangle.intersection()
+Rectangle.intersects()
+Rectangle.isEmpty()
+Rectangle.offset()
+Rectangle.offsetPoint()
+Rectangle.setEmpty()
+Rectangle.toString()
+Rectangle.union()
+
+# flash.geom.Matrix
+Matrix class
+Matrix.a
+Matrix.b
+Matrix.c
+Matrix.d
+Matrix.tx
+Matrix.ty
+Matrix.clone()
+Matrix.concat()
+Matrix.createBox()
+Matrix.createGradientBox()
+Matrix.deltaTransformPoint()
+Matrix.identity()
+Matrix.invert()
+Matrix.rotate()
+Matrix.scale()
+Matrix.toString()
+Matrix.transformPoint()
+Matrix.translate()
+
+# flash.geom.ColorTransform
+ColorTransform class
+ColorTransform.alphaMultiplier
+ColorTransform.alphaOffset
+ColorTransform.blueMultiplier
+ColorTransform.blueOffset
+ColorTransform.greenMultiplier
+ColorTransform.greenOffset
+ColorTransform.redMultiplier
+ColorTransform.redOffset
+ColorTransform.rgb
+ColorTransform.concat()
+ColorTransform.toString()
+
+# flash.geom.Transform
+Transform class
+Transform.colorTransform
+Transform.concatenatedColorTransform
+Transform.concatenatedMatrix
+Transform.matrix
+Transform.pixelBounds
+
+# flash.external.ExternalInterface
+ExternalInterface class
+ExternalInterface.available
+ExternalInterface.addCallback()
+ExternalInterface.call()
+
+# flash.text.TextRenderer
+TextRenderer class
+TextRenderer.maxLevel
+TextRenderer.setAdvancedAntialiasingTable()
+
+# flash.net.FileReference
+FileReference class
+FileReference.creationDate
+FileReference.creator
+FileReference.modificationDate
+FileReference.name
+FileReference.size
+FileReference.type
+FileReference.addListener()
+FileReference.browse()
+FileReference.cancel()
+FileReference.download()
+FileReference.removeListener()
+FileReference.upload()
+
+# flash.net.FileReferenceList
+FileReferenceList class
+FileReferenceList.fileList
+FileReferenceList.addListener()
+FileReferenceList.browse()
+FileReferenceList.removeListener()
+
+# flash.display.BitmapData
+BitmapData class
+BitmapData.height
+BitmapData.rectangle
+BitmapData.transparent
+BitmapData.width
+BitmapData.applyFilter()
+BitmapData.clone()
+BitmapData.colorTransform()
+BitmapData.copyChannel()
+BitmapData.copyPixels()
+BitmapData.dispose()
+BitmapData.draw()
+BitmapData.fillRect()
+BitmapData.floodFill()
+BitmapData.generateFilterRect()
+BitmapData.getColorBoundsRect()
+BitmapData.getPixel()
+BitmapData.getPixel32()
+BitmapData.hitTest()
+BitmapData.loadBitmap()
+BitmapData.merge()
+BitmapData.noise()
+BitmapData.paletteMap()
+BitmapData.perlinNoise()
+BitmapData.pixelDissolve()
+BitmapData.scroll()
+BitmapData.setPixel()
+BitmapData.setPixel32()
+BitmapData.threshold()
