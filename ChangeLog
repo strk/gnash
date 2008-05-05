@@ -1,5 +1,10 @@
 2008-05-05 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/gen-asclass.sh: drop this, better focus on the perl
+	  version (needs improvement).
+
+2008-05-05 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/gen-asclass.pl: retain class case, add an _as prefix,
 	  include gnashconfig.h (not config.h), comment-out unused
 	  parameters, fix signature of native methods (must return as_value),
