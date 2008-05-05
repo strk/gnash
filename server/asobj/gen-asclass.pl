@@ -135,6 +135,38 @@ EOF
 
     }
 
+    ## Loop through the list of static methods.  Generate code, stored in
+    ## $declarations, $registrations, and $implementations.  $declarations
+    ## contains the declaration code for all methods, etc.  These will
+    ## be printed later, in the section delimited with EOF.  You may
+    ## change the output of these three looped sections.
+    my ($static_declarations, $static_registrations, $static_implementations);
+    foreach my $m (@{$args{static_methods}}) {
+
+        ## Where you see 'qq|' and '|', read '"' and '"'.  Using the quote
+        ## operator eliminates the need to escape literal quotes.  Thus,
+        ##   qq|This is an "example".\n|  ==  "This is an \"example\".\n"
+        ## A '.' concatenates a string.
+
+        $static_declarations .=
+          qq|\nstatic as_value $args{lc}_| .$m. qq|(const fn_call& fn);|;
+
+        $static_registrations .=
+          qq|\n    o.init_member("$m", new builtin_function($args{lc}_$m));|;
+
+        $static_implementations .=
+          qq|\nstatic as_value\n$args{lc}_| .$m.
+          qq|(const fn_call& fn)
+{
+	boost::intrusive_ptr<$args{lc}_as> ptr = ensureType<$args{lc}_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+|;
+
+    }
+
     ## Loop through the list of properties.  Generate code, stored in
     ## $declarations, $registrations, and $implementations.  $declarations
     ## contains the declaration code for all methods, etc.  These will
@@ -154,6 +186,37 @@ EOF
 		  qq|\n    o.init_property("$p", $args{lc}_${p}_getset, $args{lc}_${p}_getset);|;
 
         $implementations .=
+          qq|\nstatic as_value\n$args{lc}_| .$p. "_getset" .
+          qq|(const fn_call& fn)
+{
+	boost::intrusive_ptr<$args{lc}_as> ptr = ensureType<$args{lc}_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+|;
+
+    }
+
+    ## Loop through the list of static properties.  Generate code, stored in
+    ## $declarations, $registrations, and $implementations.  $declarations
+    ## contains the declaration code for all methods, etc.  These will
+    ## be printed later, in the section delimited with EOF.  You may
+    ## change the output of these three looped sections.
+    foreach my $p (@{$args{static_properties}}) {
+
+        ## Where you see 'qq|' and '|', read '"' and '"'.  Using the quote
+        ## operator eliminates the need to escape literal quotes.  Thus,
+        ##   qq|This is an "example".\n|  ==  "This is an \"example\".\n"
+        ## A '.' concatenates a string.
+
+        $static_declarations .=
+          qq|\nstatic as_value $args{lc}_| .$p. "_getset". qq|(const fn_call& fn);|;
+
+        $static_registrations .=
+		  qq|\n    o.init_property("$p", $args{lc}_${p}_getset, $args{lc}_${p}_getset);|;
+
+        $static_implementations .=
           qq|\nstatic as_value\n$args{lc}_| .$p. "_getset" .
           qq|(const fn_call& fn)
 {
@@ -186,6 +249,8 @@ EOF
 
 namespace gnash {
 $declarations
+$static_declarations
+
 as_value $args{lc}_ctor(const fn_call& fn);
 
 static void
@@ -196,7 +261,7 @@ attach$args{class}Interface(as_object& o)
 static void
 attach$args{class}StaticProperties(as_object& o)
 {
-	// TODO: add static properties here
+   $static_registrations
 }
 
 static as_object*
@@ -228,6 +293,8 @@ public:
 };
 
 $implementations
+$static_implementations
+
 as_value
 $args{lc}_ctor(const fn_call& fn)
 {
@@ -327,7 +394,23 @@ sub get_properties {
     my %args = @_;
     my @want;
     foreach my $row (@{$args{notes}}) {
-        push @want, $1 if ($row =~ /^$args{class}\.(\w+)$/);
+	if ($row =~ /^$args{class}\.(\w+)$/) {
+        	push @want, $1;
+		notify(" Property $1");
+	}
+    }
+    return \@want;
+}
+
+## Take static property names out of notefile data.
+sub get_static_properties {
+    my %args = @_;
+    my @want;
+    foreach my $row (@{$args{notes}}) {
+	if ($row =~ /^$args{class}\.(\w+) static$/) {
+        	push @want, $1;
+		notify(" Static property $1");
+	}
     }
     return \@want;
 }
@@ -339,7 +422,25 @@ sub get_methods {
 
     ## Note that case should not be converted, as SWF7 is case-sensitive
     foreach my $row (@{$args{notes}}) {
-        push @want, $1 if ($row =~ /^$args{class}\.(\w+)\(\)$/);
+	if ($row =~ /^$args{class}\.(\w+)\(\)$/) {
+        	push @want, $1;
+		notify(" Method $1");
+	}
+    }
+    return \@want;
+}
+
+## Take all static method names out of notefile data.
+sub get_static_methods {
+    my %args = @_;
+    my @want;
+
+    ## Note that case should not be converted, as SWF7 is case-sensitive
+    foreach my $row (@{$args{notes}}) {
+	if ($row =~ /^$args{class}\.(\w+)\(\) static$/) {
+        	push @want, $1;
+		notify(" Static Method $1");
+	}
     }
     return \@want;
 }
@@ -360,8 +461,11 @@ sub parse_notefile {
     close $fh;
 
     my $methods = get_methods(%args, notes => \@data);
+    my $static_methods = get_static_methods(%args, notes => \@data);
     my $props   = get_properties(%args, notes => \@data);
-    return { methods => $methods, properties => $props };
+    my $static_props   = get_static_properties(%args, notes => \@data);
+    return { methods => $methods, properties => $props,
+	static_methods => $static_methods, static_properties => $static_props };
 }
 
 ########################### Documentation ############################

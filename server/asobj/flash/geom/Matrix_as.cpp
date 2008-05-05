@@ -52,6 +52,8 @@ static as_value Matrix_c_getset(const fn_call& fn);
 static as_value Matrix_d_getset(const fn_call& fn);
 static as_value Matrix_tx_getset(const fn_call& fn);
 static as_value Matrix_ty_getset(const fn_call& fn);
+
+
 as_value Matrix_ctor(const fn_call& fn);
 
 static void
@@ -80,7 +82,7 @@ attachMatrixInterface(as_object& o)
 static void
 attachMatrixStaticProperties(as_object& o)
 {
-	// TODO: add static properties here
+   
 }
 
 static as_object*
@@ -273,6 +275,8 @@ Matrix_ty_getset(const fn_call& fn)
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
 }
+
+
 
 as_value
 Matrix_ctor(const fn_call& fn)

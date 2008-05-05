@@ -44,6 +44,8 @@ static as_value DisplacementMapFilter_mapPoint_getset(const fn_call& fn);
 static as_value DisplacementMapFilter_mode_getset(const fn_call& fn);
 static as_value DisplacementMapFilter_scaleX_getset(const fn_call& fn);
 static as_value DisplacementMapFilter_scaleY_getset(const fn_call& fn);
+
+
 as_value DisplacementMapFilter_ctor(const fn_call& fn);
 
 static void
@@ -64,7 +66,7 @@ attachDisplacementMapFilterInterface(as_object& o)
 static void
 attachDisplacementMapFilterStaticProperties(as_object& o)
 {
-	// TODO: add static properties here
+   
 }
 
 static as_object*
@@ -185,6 +187,8 @@ DisplacementMapFilter_scaleY_getset(const fn_call& fn)
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
 }
+
+
 
 as_value
 DisplacementMapFilter_ctor(const fn_call& fn)

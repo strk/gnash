@@ -45,6 +45,8 @@ static as_value ColorTransform_greenOffset_getset(const fn_call& fn);
 static as_value ColorTransform_redMultiplier_getset(const fn_call& fn);
 static as_value ColorTransform_redOffset_getset(const fn_call& fn);
 static as_value ColorTransform_rgb_getset(const fn_call& fn);
+
+
 as_value ColorTransform_ctor(const fn_call& fn);
 
 static void
@@ -66,7 +68,7 @@ attachColorTransformInterface(as_object& o)
 static void
 attachColorTransformStaticProperties(as_object& o)
 {
-	// TODO: add static properties here
+   
 }
 
 static as_object*
@@ -196,6 +198,8 @@ ColorTransform_rgb_getset(const fn_call& fn)
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
 }
+
+
 
 as_value
 ColorTransform_ctor(const fn_call& fn)

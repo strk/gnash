@@ -36,17 +36,19 @@ namespace gnash {
 
 static as_value Point_add(const fn_call& fn);
 static as_value Point_clone(const fn_call& fn);
-static as_value Point_distance(const fn_call& fn);
 static as_value Point_equals(const fn_call& fn);
-static as_value Point_interpolate(const fn_call& fn);
 static as_value Point_normalize(const fn_call& fn);
 static as_value Point_offset(const fn_call& fn);
-static as_value Point_polar(const fn_call& fn);
 static as_value Point_subtract(const fn_call& fn);
 static as_value Point_toString(const fn_call& fn);
 static as_value Point_length_getset(const fn_call& fn);
 static as_value Point_x_getset(const fn_call& fn);
 static as_value Point_y_getset(const fn_call& fn);
+
+static as_value Point_distance(const fn_call& fn);
+static as_value Point_interpolate(const fn_call& fn);
+static as_value Point_polar(const fn_call& fn);
+
 as_value Point_ctor(const fn_call& fn);
 
 static void
@@ -54,12 +56,9 @@ attachPointInterface(as_object& o)
 {
     o.init_member("add", new builtin_function(Point_add));
     o.init_member("clone", new builtin_function(Point_clone));
-    o.init_member("distance", new builtin_function(Point_distance));
     o.init_member("equals", new builtin_function(Point_equals));
-    o.init_member("interpolate", new builtin_function(Point_interpolate));
     o.init_member("normalize", new builtin_function(Point_normalize));
     o.init_member("offset", new builtin_function(Point_offset));
-    o.init_member("polar", new builtin_function(Point_polar));
     o.init_member("subtract", new builtin_function(Point_subtract));
     o.init_member("toString", new builtin_function(Point_toString));
     o.init_property("length", Point_length_getset, Point_length_getset);
@@ -70,7 +69,10 @@ attachPointInterface(as_object& o)
 static void
 attachPointStaticProperties(as_object& o)
 {
-	// TODO: add static properties here
+   
+    o.init_member("distance", new builtin_function(Point_distance));
+    o.init_member("interpolate", new builtin_function(Point_interpolate));
+    o.init_member("polar", new builtin_function(Point_polar));
 }
 
 static as_object*
@@ -121,25 +123,7 @@ Point_clone(const fn_call& fn)
 }
 
 static as_value
-Point_distance(const fn_call& fn)
-{
-	boost::intrusive_ptr<Point_as> ptr = ensureType<Point_as>(fn.this_ptr);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
-}
-
-static as_value
 Point_equals(const fn_call& fn)
-{
-	boost::intrusive_ptr<Point_as> ptr = ensureType<Point_as>(fn.this_ptr);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
-}
-
-static as_value
-Point_interpolate(const fn_call& fn)
 {
 	boost::intrusive_ptr<Point_as> ptr = ensureType<Point_as>(fn.this_ptr);
 	UNUSED(ptr);
@@ -158,15 +142,6 @@ Point_normalize(const fn_call& fn)
 
 static as_value
 Point_offset(const fn_call& fn)
-{
-	boost::intrusive_ptr<Point_as> ptr = ensureType<Point_as>(fn.this_ptr);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
-}
-
-static as_value
-Point_polar(const fn_call& fn)
 {
 	boost::intrusive_ptr<Point_as> ptr = ensureType<Point_as>(fn.this_ptr);
 	UNUSED(ptr);
@@ -218,6 +193,35 @@ Point_y_getset(const fn_call& fn)
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
 }
+
+
+static as_value
+Point_distance(const fn_call& fn)
+{
+	boost::intrusive_ptr<Point_as> ptr = ensureType<Point_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+Point_interpolate(const fn_call& fn)
+{
+	boost::intrusive_ptr<Point_as> ptr = ensureType<Point_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+static as_value
+Point_polar(const fn_call& fn)
+{
+	boost::intrusive_ptr<Point_as> ptr = ensureType<Point_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
 
 as_value
 Point_ctor(const fn_call& fn)

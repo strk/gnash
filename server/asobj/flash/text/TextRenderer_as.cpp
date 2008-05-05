@@ -34,21 +34,23 @@
 
 namespace gnash {
 
+
 static as_value TextRenderer_setAdvancedAntialiasingTable(const fn_call& fn);
 static as_value TextRenderer_maxLevel_getset(const fn_call& fn);
+
 as_value TextRenderer_ctor(const fn_call& fn);
 
 static void
 attachTextRendererInterface(as_object& o)
 {
-    o.init_member("setAdvancedAntialiasingTable", new builtin_function(TextRenderer_setAdvancedAntialiasingTable));
-    o.init_property("maxLevel", TextRenderer_maxLevel_getset, TextRenderer_maxLevel_getset);
 }
 
 static void
 attachTextRendererStaticProperties(as_object& o)
 {
-	// TODO: add static properties here
+   
+    o.init_member("setAdvancedAntialiasingTable", new builtin_function(TextRenderer_setAdvancedAntialiasingTable));
+    o.init_property("maxLevel", TextRenderer_maxLevel_getset, TextRenderer_maxLevel_getset);
 }
 
 static as_object*
@@ -80,6 +82,7 @@ public:
 };
 
 
+
 static as_value
 TextRenderer_setAdvancedAntialiasingTable(const fn_call& fn)
 {
@@ -97,6 +100,7 @@ TextRenderer_maxLevel_getset(const fn_call& fn)
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
 }
+
 
 as_value
 TextRenderer_ctor(const fn_call& fn)

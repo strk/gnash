@@ -38,6 +38,8 @@ static as_value FileReferenceList_addListener(const fn_call& fn);
 static as_value FileReferenceList_browse(const fn_call& fn);
 static as_value FileReferenceList_removeListener(const fn_call& fn);
 static as_value FileReferenceList_fileList_getset(const fn_call& fn);
+
+
 as_value FileReferenceList_ctor(const fn_call& fn);
 
 static void
@@ -52,7 +54,7 @@ attachFileReferenceListInterface(as_object& o)
 static void
 attachFileReferenceListStaticProperties(as_object& o)
 {
-	// TODO: add static properties here
+   
 }
 
 static as_object*
@@ -119,6 +121,8 @@ FileReferenceList_fileList_getset(const fn_call& fn)
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
 }
+
+
 
 as_value
 FileReferenceList_ctor(const fn_call& fn)

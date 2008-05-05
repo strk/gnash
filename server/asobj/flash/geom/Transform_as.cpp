@@ -39,6 +39,8 @@ static as_value Transform_concatenatedColorTransform_getset(const fn_call& fn);
 static as_value Transform_concatenatedMatrix_getset(const fn_call& fn);
 static as_value Transform_matrix_getset(const fn_call& fn);
 static as_value Transform_pixelBounds_getset(const fn_call& fn);
+
+
 as_value Transform_ctor(const fn_call& fn);
 
 static void
@@ -54,7 +56,7 @@ attachTransformInterface(as_object& o)
 static void
 attachTransformStaticProperties(as_object& o)
 {
-	// TODO: add static properties here
+   
 }
 
 static as_object*
@@ -130,6 +132,8 @@ Transform_pixelBounds_getset(const fn_call& fn)
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
 }
+
+
 
 as_value
 Transform_ctor(const fn_call& fn)

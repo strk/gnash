@@ -48,7 +48,6 @@ static as_value BitmapData_getColorBoundsRect(const fn_call& fn);
 static as_value BitmapData_getPixel(const fn_call& fn);
 static as_value BitmapData_getPixel32(const fn_call& fn);
 static as_value BitmapData_hitTest(const fn_call& fn);
-static as_value BitmapData_loadBitmap(const fn_call& fn);
 static as_value BitmapData_merge(const fn_call& fn);
 static as_value BitmapData_noise(const fn_call& fn);
 static as_value BitmapData_paletteMap(const fn_call& fn);
@@ -62,6 +61,9 @@ static as_value BitmapData_height_getset(const fn_call& fn);
 static as_value BitmapData_rectangle_getset(const fn_call& fn);
 static as_value BitmapData_transparent_getset(const fn_call& fn);
 static as_value BitmapData_width_getset(const fn_call& fn);
+
+static as_value BitmapData_loadBitmap(const fn_call& fn);
+
 as_value BitmapData_ctor(const fn_call& fn);
 
 static void
@@ -81,7 +83,6 @@ attachBitmapDataInterface(as_object& o)
     o.init_member("getPixel", new builtin_function(BitmapData_getPixel));
     o.init_member("getPixel32", new builtin_function(BitmapData_getPixel32));
     o.init_member("hitTest", new builtin_function(BitmapData_hitTest));
-    o.init_member("loadBitmap", new builtin_function(BitmapData_loadBitmap));
     o.init_member("merge", new builtin_function(BitmapData_merge));
     o.init_member("noise", new builtin_function(BitmapData_noise));
     o.init_member("paletteMap", new builtin_function(BitmapData_paletteMap));
@@ -100,7 +101,8 @@ attachBitmapDataInterface(as_object& o)
 static void
 attachBitmapDataStaticProperties(as_object& o)
 {
-	// TODO: add static properties here
+   
+    o.init_member("loadBitmap", new builtin_function(BitmapData_loadBitmap));
 }
 
 static as_object*
@@ -259,15 +261,6 @@ BitmapData_hitTest(const fn_call& fn)
 }
 
 static as_value
-BitmapData_loadBitmap(const fn_call& fn)
-{
-	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
-}
-
-static as_value
 BitmapData_merge(const fn_call& fn)
 {
 	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
@@ -383,6 +376,17 @@ BitmapData_width_getset(const fn_call& fn)
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
 }
+
+
+static as_value
+BitmapData_loadBitmap(const fn_call& fn)
+{
+	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
 
 as_value
 BitmapData_ctor(const fn_call& fn)

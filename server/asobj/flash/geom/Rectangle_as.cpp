@@ -60,6 +60,8 @@ static as_value Rectangle_topLeft_getset(const fn_call& fn);
 static as_value Rectangle_width_getset(const fn_call& fn);
 static as_value Rectangle_x_getset(const fn_call& fn);
 static as_value Rectangle_y_getset(const fn_call& fn);
+
+
 as_value Rectangle_ctor(const fn_call& fn);
 
 static void
@@ -96,7 +98,7 @@ attachRectangleInterface(as_object& o)
 static void
 attachRectangleStaticProperties(as_object& o)
 {
-	// TODO: add static properties here
+   
 }
 
 static as_object*
@@ -361,6 +363,8 @@ Rectangle_y_getset(const fn_call& fn)
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
 }
+
+
 
 as_value
 Rectangle_ctor(const fn_call& fn)

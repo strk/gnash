@@ -1,5 +1,13 @@
 2008-05-05 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/gen-asclass.pl: add support for static methods and
+	  properties.
+	* doc/C/NOTES: add note about static props and methods in the new
+	  classes in flash package.
+	* server/asobj/flash/: regenerated classes.
+
+2008-05-05 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/Global.cpp: call flash_package_init for SWF8 up.
 	* server/asobj/gen-asclass.pl: don't attach interface to class,
 	  don't use statics for GcResources.

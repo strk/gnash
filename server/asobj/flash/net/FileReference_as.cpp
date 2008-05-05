@@ -46,6 +46,8 @@ static as_value FileReference_modificationDate_getset(const fn_call& fn);
 static as_value FileReference_name_getset(const fn_call& fn);
 static as_value FileReference_size_getset(const fn_call& fn);
 static as_value FileReference_type_getset(const fn_call& fn);
+
+
 as_value FileReference_ctor(const fn_call& fn);
 
 static void
@@ -68,7 +70,7 @@ attachFileReferenceInterface(as_object& o)
 static void
 attachFileReferenceStaticProperties(as_object& o)
 {
-	// TODO: add static properties here
+   
 }
 
 static as_object*
@@ -207,6 +209,8 @@ FileReference_type_getset(const fn_call& fn)
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
 }
+
+
 
 as_value
 FileReference_ctor(const fn_call& fn)

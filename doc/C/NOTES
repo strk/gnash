@@ -732,12 +732,12 @@ Point.x
 Point.y
 Point.add()
 Point.clone()
-Point.distance()
+Point.distance() static
 Point.equals()
-Point.interpolate()
+Point.interpolate() static
 Point.normalize()
 Point.offset()
-Point.polar()
+Point.polar() static
 Point.subtract()
 Point.toString()
 
@@ -815,14 +815,14 @@ Transform.pixelBounds
 
 # flash.external.ExternalInterface
 ExternalInterface class
-ExternalInterface.available
-ExternalInterface.addCallback()
-ExternalInterface.call()
+ExternalInterface.available static 
+ExternalInterface.addCallback() static
+ExternalInterface.call() static
 
 # flash.text.TextRenderer
 TextRenderer class
-TextRenderer.maxLevel
-TextRenderer.setAdvancedAntialiasingTable()
+TextRenderer.maxLevel static
+TextRenderer.setAdvancedAntialiasingTable() static
 
 # flash.net.FileReference
 FileReference class
@@ -866,7 +866,7 @@ BitmapData.getColorBoundsRect()
 BitmapData.getPixel()
 BitmapData.getPixel32()
 BitmapData.hitTest()
-BitmapData.loadBitmap()
+BitmapData.loadBitmap() static
 BitmapData.merge()
 BitmapData.noise()
 BitmapData.paletteMap()
