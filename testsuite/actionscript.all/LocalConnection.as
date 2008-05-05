@@ -21,37 +21,50 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: LocalConnection.as,v 1.20 2008/03/11 19:31:47 strk Exp $";
+// We need more than one frame to test the connection properly.
+
+rcsid="$Id: LocalConnection.as,v 1.21 2008/05/05 15:26:38 bwy Exp $";
 #include "check.as"
 
 #if OUTPUT_VERSION < 6
 
 check_equals(LocalConnection, undefined);
+totals(1);
 
 #else // OUTPUT_VERSION >= 6
 
-var tmp = new LocalConnection;
+xcheck (LocalConnection.prototype.hasOwnProperty("send"));
+xcheck (LocalConnection.prototype.hasOwnProperty("connect"));
+xcheck (LocalConnection.prototype.hasOwnProperty("close"));
+xcheck (LocalConnection.prototype.hasOwnProperty("domain"));
+check (! LocalConnection.prototype.hasOwnProperty("allowDomain"));
+check (! LocalConnection.prototype.hasOwnProperty("onStatus"));
+
+var rec = new LocalConnection();
 
 // test the LocalConnection constuctor
-check_equals (typeof(tmp), 'object');
+check_equals (typeof(rec), 'object');
+
+var snd = new LocalConnection();
+
+// Not sure if this is a sensible test.
+check(rec != snd);
 
 // test the LocalConnection::close method
-check_equals (typeof(tmp.close), 'function');
+check_equals (typeof(rec.close), 'function');
 
 // test the LocalConnection::connect method
-// FIXME: this should not be failing as later we find the function
-// actually works!
-xcheck_equals (typeof(tmp.connnect), 'function');
+check_equals (typeof(rec.connect), 'function');
 
 // test the LocalConnection::domain method
-check_equals (typeof(tmp.domain), 'function');
+check_equals (typeof(rec.domain), 'function');
 
 // test the LocalConnection::send method
-check_equals (typeof(tmp.send), 'function');
+check_equals (typeof(rec.send), 'function');
 
 // Get the domain. By default this should be "localhost" because we
 // haven't made any connections yet,
-var domain = tmp.domain();
+var domain = rec.domain();
 check_equals (domain, "localhost");
 
 // If the listen() times out waiting for a connection, it'll set the
@@ -60,15 +73,42 @@ check_equals (domain, "localhost");
 // could always (in a normal application) check later for incoming
 // connections.
 
-tmp.close();
-var ret = tmp.connect("lc_test");
+rec.close();
+result = rec.connect("lc_test");
+xcheck_equals (rec.domain(), "localhost");
 
 // NOTE: This test will fail if a shared memory segment of the same
 // name exists. So the first time it'll pass, then it'll fail.
-check_equals (ret, true);
+check_equals (result, true);
 
-tmp.close();
+// Checks only for syntactical correctness, not success
+result = snd.send("lc_test", "testfunc", "val");
+xcheck_equals (result, true);
+
+// The function name may not be send or any other LC property.
+result = snd.send("lc_test", "send");
+xcheck_equals (result, false);
+result = snd.send("lc_test", "onStatus");
+xcheck_equals (result, false);
+// Numbers are also bad
+result = snd.send("lc_test", 1);
+xcheck_equals (result, false);
+// undefined
+result = snd.send("lc_test", funcname);
+xcheck_equals (result, false);
+
+
+// But anything else is fine.
+result = snd.send("lc_test", "getSeconds");
+xcheck_equals (result, true);
+funcname = "onFullScreen";
+result = snd.send("lc_test", funcname);
+xcheck_equals (result, true);
+
+rec.close();
+
+totals(22);
 
 #endif // OUTPUT_VERSION >= 6
 
-totals();
+
