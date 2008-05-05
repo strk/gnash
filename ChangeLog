@@ -1,3 +1,7 @@
+2008-05-05 Sandro Santilli <strk@keybit.net>
+
+	* server/namedStrings.{cpp,h}: add PROP_WIDTH and PROP_HEIGHT.
+
 2008-05-05 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* gui/Player.{cpp,h}, gui/gnash.cpp, libmedia/sound_handler.h,
