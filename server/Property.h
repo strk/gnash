@@ -327,8 +327,10 @@ public:
 	{/**/}
 
 	Property(string_table::key name, string_table::key nsId,
-		as_c_function_ptr getter, as_c_function_ptr setter, bool destroy = false) :
-		_flags(), mBound(GetterSetter(getter, setter)), mDestructive(destroy),
+		as_c_function_ptr getter, as_c_function_ptr setter,
+		const as_prop_flags& flags, bool destroy = false)
+		:
+		_flags(flags), mBound(GetterSetter(getter, setter)), mDestructive(destroy),
 		mName(name), mNamespace(nsId),
 		mOrderId(0)
 	{/**/}

@@ -490,9 +490,9 @@ public:
 
 
 	/// \brief
-	/// Initialize a destructive getter/setter property
+	/// Initialize a destructive getter property
 	///
-	/// A destructive getter/setter can be used as a place holder for the real
+	/// A destructive getter can be used as a place holder for the real
 	/// value of a property.  As soon as getValue is invoked on the getter,
 	/// it destroys itself after setting its property to the return value of
 	/// getValue.
@@ -516,6 +516,35 @@ public:
 	bool init_destructive_property(string_table::key key, as_function& getter,
 		int flags=as_prop_flags::dontEnum,
 		string_table::key nsname = 0);
+
+	/// \brief
+	/// Initialize a destructive getter property
+	///
+	/// A destructive getter can be used as a place holder for the real
+	/// value of a property.  As soon as getValue is invoked on the getter,
+	/// it destroys itself after setting its property to the return value of
+	/// getValue.
+	///
+	/// @param key
+	///     Name of the property.
+	///	Will be converted to lowercase if VM is initialized for SWF6 or lower.
+	///
+	/// @param getter
+	///	A function to invoke when this property value is requested.
+	///	add_ref will be called on the function.
+	///
+	/// @param flags
+	///     Flags for the new member. By default dontDelete and dontEnum.
+	///	See as_prop_flags::Flags.
+	///
+	/// @param nsname
+	/// The id of the namespace to which this member belongs. 0 is a wildcard
+	/// and will be matched by anything not asking for a specific namespace.
+	///
+	bool init_destructive_property(string_table::key key, as_c_function_ptr getter,
+		int flags=as_prop_flags::dontEnum,
+		string_table::key nsname = 0);
+
 
 	/// \brief
 	/// Use this method for read-only properties.
@@ -972,29 +1001,6 @@ public:
 	///
 	bool add_property(const std::string& key, as_function& getter,
 		as_function* setter=NULL);
-
-	/// \brief
-	/// Add a getter/setter property, if no member already has
-	/// that name (or should we allow override ? TODO: check this)
-	//
-	/// @param key
-	///     Name of the property.
-	///	Case insensitive up to SWF6,
-	///	case *sensitive* from SWF7 up.
-	///
-	/// @param getter
-	///	A function to invoke when this property value is requested.
-	///	add_ref will be called on the function.
-	///
-	/// @param setter
-	///	A function to invoke when setting this property's value.
-	///	add_ref will be called on the function.
-	///
-	/// @return true if the property was successfully added, false
-	///         otherwise (property already existent?)
-	///
-	bool add_property(const std::string& key, as_c_function_ptr getter,
-		as_c_function_ptr setter);
 
 	/// Return this object '__proto__' member.
 	//

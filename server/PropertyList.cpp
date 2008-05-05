@@ -338,10 +338,10 @@ PropertyList::import(const PropertyList& o)
 
 bool
 PropertyList::addGetterSetter(string_table::key key, as_function& getter,
-	as_function* setter, const as_value& cacheVal, string_table::key nsId)
+	as_function* setter, const as_value& cacheVal,
+	const as_prop_flags& flagsIfMissing, string_table::key nsId)
 {
-	Property a(key, nsId, &getter, setter);
-	a.setCache(cacheVal);
+	Property a(key, nsId, &getter, setter, flagsIfMissing);
 	a.setOrder(- ++mDefaultOrder - 1);
 
 	container::iterator found = iterator_find(_props, key, nsId);
@@ -350,6 +350,7 @@ PropertyList::addGetterSetter(string_table::key key, as_function& getter,
 		// copy flags from previous member (even if it's a normal member ?)
 		as_prop_flags& f = a.getFlags();
 		f = found->getFlags();
+		a.setCache(found->getCache());
 
 		_props.replace(found, a);
 		assert ( iterator_find(_props, key, nsId) != _props.end() );
@@ -357,6 +358,7 @@ PropertyList::addGetterSetter(string_table::key key, as_function& getter,
 	}
 	else
 	{
+		a.setCache(cacheVal);
 		_props.insert(a);
         	assert ( iterator_find(_props, key, nsId) != _props.end() );
 	}
@@ -367,9 +369,10 @@ PropertyList::addGetterSetter(string_table::key key, as_function& getter,
 
 bool
 PropertyList::addGetterSetter(string_table::key key, as_c_function_ptr getter,
-	as_c_function_ptr setter, string_table::key nsId)
+	as_c_function_ptr setter, const as_prop_flags& flagsIfMissing,
+	string_table::key nsId)
 {
-	Property a(key, nsId, getter, setter);
+	Property a(key, nsId, getter, setter, flagsIfMissing);
 	a.setOrder(- ++mDefaultOrder - 1);
 
 	container::iterator found = iterator_find(_props, key, nsId);
@@ -404,6 +407,22 @@ PropertyList::addDestructiveGetter(string_table::key key,
 
 	// destructive getter don't need a setter
 	Property a(key, nsId, &getter, (as_function*)0, flagsIfMissing, true);
+	a.setOrder(- ++mDefaultOrder - 1);
+	_props.insert(a);
+	return true;
+}
+
+bool
+PropertyList::addDestructiveGetter(string_table::key key,
+	as_c_function_ptr getter, string_table::key nsId,
+	const as_prop_flags& flagsIfMissing)
+{
+	container::iterator found = iterator_find(_props, key, nsId);
+	if (found != _props.end())
+		return false; // Already exists.
+
+	// destructive getter don't need a setter
+	Property a(key, nsId, getter, (as_c_function_ptr)0, flagsIfMissing, true);
 	a.setOrder(- ++mDefaultOrder - 1);
 	_props.insert(a);
 	return true;

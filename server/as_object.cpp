@@ -207,14 +207,6 @@ as_object::add_property(const std::string& name, as_function& getter,
 	}
 }
 
-bool
-as_object::add_property(const std::string& name, as_c_function_ptr getter,
-		as_c_function_ptr setter)
-{
-	string_table &st = _vm.getStringTable();
-	return _members.addGetterSetter(st.find(PROPNAME(name)), getter, setter);
-}
-
 /*protected*/
 bool
 as_object::get_member_default(string_table::key name, as_value* val,
@@ -762,8 +754,10 @@ void
 as_object::init_property(string_table::key key, as_function& getter,
 		as_function& setter, int flags, string_table::key nsname)
 {
+	as_value cacheValue;
+
 	bool success;
-	success = _members.addGetterSetter(key, getter, &setter, nsname);
+	success = _members.addGetterSetter(key, getter, &setter, cacheValue, flags, nsname);
 
 	// We shouldn't attempt to initialize a property twice, should we ?
 	assert(success);
@@ -771,7 +765,7 @@ as_object::init_property(string_table::key key, as_function& getter,
 	//log_debug(_("Initialized property '%s'"), name.c_str());
 
 	// TODO: optimize this, don't scan again !
-	_members.setFlags(key, flags, nsname);
+	//_members.setFlags(key, flags, nsname);
 
 }
 
@@ -802,6 +796,17 @@ as_object::init_property(string_table::key key, as_c_function_ptr getter,
 
 bool
 as_object::init_destructive_property(string_table::key key, as_function& getter,
+	int flags, string_table::key nsname)
+{
+	bool success;
+
+	// No case check, since we've already got the key.
+	success = _members.addDestructiveGetter(key, getter, nsname, flags);
+	return success;
+}
+
+bool
+as_object::init_destructive_property(string_table::key key, as_c_function_ptr getter,
 	int flags, string_table::key nsname)
 {
 	bool success;

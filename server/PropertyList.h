@@ -283,11 +283,15 @@ public:
 	///	The value to use as a cache. If null uses any cache
 	///	from pre-existing property with same name.
 	///
+	/// @param flagsIfMissing
+	///	Flags to associate to the property if a new one is created.
+	///
 	/// @return true if the property was successfully added, false
 	///         otherwise (property already existent?)
 	///
 	bool addGetterSetter(string_table::key key, as_function& getter,
-		as_function* setter, const as_value& cacheVal, string_table::key ns=0);
+		as_function* setter, const as_value& cacheVal,
+		const as_prop_flags& flagsIfMissing=0, string_table::key ns=0);
 
 	/// \brief
 	/// Add a getter/setter property, if not already existing
@@ -308,10 +312,11 @@ public:
 	///         otherwise (property already existent?)
 	///
 	bool addGetterSetter(string_table::key key, as_c_function_ptr getter,
-		as_c_function_ptr setter, string_table::key ns = 0);
+		as_c_function_ptr setter, const as_prop_flags& flagsIfMissing,
+		string_table::key ns = 0);
 
 	/// \brief
-	/// Add a destructive getter/setter property, if not already extant.
+	/// Add a destructive getter property, if not already existant.
 	///
 	/// @param key
 	/// Name of the property. Case-sensitive search.
@@ -327,6 +332,25 @@ public:
 	///
 	bool addDestructiveGetter(string_table::key key,
 		as_function& getter, string_table::key ns = 0,
+		const as_prop_flags& flagsIfMissing=0);
+
+	/// \brief
+	/// Add a destructive getter property, if not already existant.
+	///
+	/// @param key
+	/// Name of the property. Case-sensitive search.
+	///
+	/// @param getter
+	/// A function to invoke when this property value is requested.
+	///
+	/// @param flagsIfMissing
+	///	Flags to associate to the property if a new one is created.
+	///
+	/// @return true if the property was successfully added, false
+	/// otherwise.
+	///
+	bool addDestructiveGetter(string_table::key key,
+		as_c_function_ptr getter, string_table::key ns = 0,
 		const as_prop_flags& flagsIfMissing=0);
 
 	/// Set the flags of a property.

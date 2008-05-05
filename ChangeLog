@@ -1,5 +1,13 @@
 2008-05-05 Sandro Santilli <strk@keybit.net>
 
+	* server/Property.h, server/PropertyList.cpp,
+	  server/PropertyList.h, server/as_object.cpp,
+	  server/as_object.h: Allow for native functions
+	  in destructive getter-setters, reduce scans
+	  on initialization.
+
+2008-05-05 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/gen-asclass.pl: add support for stubbing
 	  properties as native getter-setters.
 	* server/asobj/flash/: display/BitmapData_as.cpp,
