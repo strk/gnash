@@ -66,7 +66,7 @@ line_style::read_morph(stream* in, int tag_type, movie_definition *md,
 	bool has_fill = in->read_bit();
 	_scaleHorizontally = ! in->read_bit();
 	_scaleVertically = ! in->read_bit();
-	bool pixel_hinting = in->read_bit();
+	_pixelHinting = in->read_bit();
 
 	static_cast<void> (in->read_uint(5));
 	_noClose = in->read_bit();
@@ -118,7 +118,7 @@ line_style::read(stream* in, int tag_type, movie_definition *md)
 	bool has_fill = in->read_bit();
 	_scaleHorizontally = ! in->read_bit();
 	_scaleVertically = ! in->read_bit();
-	bool pixel_hinting = in->read_bit();
+	_pixelHinting = in->read_bit();
 	static_cast<void> (in->read_uint(5));
 	_noClose = in->read_bit();
 	_startCapStyle = (cap_style_e) in->read_uint(2); // As caps above.

@@ -1,5 +1,10 @@
 2008-05-05 Sandro Santilli <strk@keybit.net>
 
+	* server/styles.cpp: use 'pixelHinting' flag parsed from SWF
+	  tags.
+
+2008-05-05 Sandro Santilli <strk@keybit.net>
+
 	* server/PropertyList.{cpp,h}: rename addDestructiveGetterSetter
 	  to addDestructiveGetter, as we're not using the setter anyway,
 	  add a flagIfMissing to avoid a duplicated scan.
