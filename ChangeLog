@@ -1,3 +1,14 @@
+2008-05-05 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* server/shape.h: Add isClosed() to Path class
+	* backend/render_handler_agg.cpp: Respect doPixelHinting() for
+	  outlines
+	* backend/render_handler_agg.cpp: Remove unused build_agg_strokes()
+	* backend/render_handler_agg.cpp: Remove unimplemented pixel hinting 
+	  warning
+	* backend/render_handler_agg.cpp: implement closed polygons and
+	  check for noClose==0
+
 2008-05-05 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/gen-asclass.pl: log_unimpl if constructor

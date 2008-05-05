@@ -44,7 +44,7 @@ Status
     colors, alpha     COMPLETE
     cap styles        DONE, but end cap style is ignored
     join styles       COMPLETE
-    no-close flag     TODO / currently ignored (noClose==1 assumed)        
+    no-close flag     COMPLETE        
   
     
   fills:
@@ -720,7 +720,7 @@ public:
 
   
   void  draw_line_strip(const void* coords, int vertex_count, const rgba& color,
-	                const matrix& line_mat)
+                  const matrix& line_mat)
   // Draw the line strip formed by the sequence of points.
   {
   
@@ -968,7 +968,7 @@ public:
     // level.
 
     if (have_outline)
-      build_agg_paths_rounded(agg_paths_rounded, paths);
+      build_agg_paths_rounded(agg_paths_rounded, paths, line_styles);
     
     if (have_shape)
       build_agg_paths(agg_paths, paths);
@@ -1065,9 +1065,9 @@ public:
     typedef std::vector<path> PathVect;
     for (PathVect::const_iterator i=paths_in.begin(), e=paths_in.end(); i!=e; ++i)
     {
-	Path<float> floating_path = *i;
-	floating_path.transform(mat);
-	paths_out.push_back(floating_path);
+  Path<float> floating_path = *i;
+  floating_path.transform(mat);
+  paths_out.push_back(floating_path);
     }
 #if 0
     BOOST_FOREACH(const path& in_path, paths_in) {
@@ -1143,7 +1143,8 @@ public:
   } //build_agg_paths
   
   
-  // Version of build_agg_paths that uses rounded coordinates.
+  // Version of build_agg_paths that uses rounded coordinates (pixel hinting)
+  // for line styles that want it.  
   // This is used for outlines which are aligned to the pixel grid to avoid
   // anti-aliasing problems (a perfect horizontal line being drawn over two
   // lines and looking blurry). The proprietary player does this too.  
@@ -1154,11 +1155,15 @@ public:
   // Also, single segments of a path may be aligned or not depending on 
   // the segment properties (this matches MM player behaviour)
   //
+  // This function - in contrast to build_agg_paths() - also checks noClose 
+  // flag and automatically closes polygons.
+  //
   // TODO: Flash never aligns lines that are wider than 1 pixel on *screen*,
   // but we currently don't check the width.  
   void build_agg_paths_rounded(std::vector<agg::path_storage>& dest, 
-    const std::vector< Path<float> >& paths) {
-  
+    const std::vector< Path<float> >& paths, 
+    const std::vector<line_style>& line_styles) {
+
     // Shift all coordinates a half pixel for correct results (the middle of
     // a pixel is at .5 / .5, ie. it's subpixel center) 
     const float subpixel_offset = 0.5f;
@@ -1172,12 +1177,21 @@ public:
       const Path<float>& this_path = paths[pno];
       agg::path_storage& new_path = dest[pno];
       
+      const line_style& lstyle = line_styles[this_path.m_line-1];
+      
+      const bool hinting = lstyle.doPixelHinting();
+      bool closed = this_path.isClosed() && !lstyle.noClose();
+      
       float prev_ax = this_path.ap.x;
       float prev_ay = this_path.ap.y;  
       bool prev_align_x = true;
       bool prev_align_y = true;
       
       size_t ecount = this_path.m_edges.size();
+
+      // avoid extra edge when doing implicit close later
+      if (closed && ecount && 
+        this_path.m_edges.back().is_straight()) ecount--;      
       
       for (size_t eno=0; eno<ecount; eno++) {
         
@@ -1186,7 +1200,7 @@ public:
         float this_ax = this_edge.ap.x;  
         float this_ay = this_edge.ap.y;  
         
-        if (this_edge.is_straight()) {
+        if (hinting && this_edge.is_straight()) {
         
           // candidate for alignment?
           bool align_x = prev_ax == this_ax;
@@ -1267,72 +1281,14 @@ public:
         prev_ay = this_ay;    
         
       } //for
+      
+      if (closed)
+        new_path.close_polygon();
     
     }
-        
   } //build_agg_paths_rounded
   
-  
-  // Builds vector strokes for paths
-  // WARNING 1 : This is not used and will probably be removed soon.
-  // WARNING 2 : Strokes vector returns pointers which are never freed.
-  void build_agg_strokes(std::vector<stroke_type*>& dest, 
-    std::vector<agg::path_storage>& agg_paths,
-    const std::vector< Path<float> > &paths,
-    const std::vector<line_style> &line_styles,
-    const matrix& linestyle_matrix) {
     
-    abort(); // should not be used currently
-    
-    size_t pcount=paths.size(); 
-    dest.resize(pcount);
-    
-    // use avg between x and y scale
-    const float stroke_scale = 
-      (fabsf(linestyle_matrix.get_x_scale()) + 
-       fabsf(linestyle_matrix.get_y_scale()))
-       / 2.0f
-      * get_stroke_scale();   
-    
-    for (size_t pno=0; pno<pcount; pno++) {
-          
-      agg::conv_curve<agg::path_storage> curve(agg_paths[pno]);
-      stroke_type* this_stroke = new stroke_type(curve);
-      
-      const Path<float>& this_path_gnash = paths[pno];
-       
-      const line_style& lstyle = line_styles[this_path_gnash.m_line-1];
-          
-      int thickness = lstyle.getThickness();
-      if (!thickness) this_stroke->width(1); // hairline
-      else if ( (!lstyle.scaleThicknessVertically()) && (!lstyle.scaleThicknessHorizontally()) )
-      {
-        this_stroke->width(TWIPS_TO_PIXELS(thickness));
-      }
-      else
-      {
-        if ( (!lstyle.scaleThicknessVertically()) || (!lstyle.scaleThicknessHorizontally()) )
-        {
-           LOG_ONCE( log_unimpl(_("Unidirectionally scaled strokes in AGG renderer (we'll scale by the scalable one)")) );
-        }
-        this_stroke->width(thickness*stroke_scale);
-      }
-
-      if ( lstyle.doPixelHinting() )
-      {
-           LOG_ONCE( log_unimpl(_("Strokes pixel-hinting in AGG renderer")) );
-      }
-       
-      this_stroke->attach(curve);
-      this_stroke->line_cap(agg::round_cap);
-      this_stroke->line_join(agg::round_join);
-      
-      dest[pno] = this_stroke;
-    
-    }
-    
-  }
-  
   // Initializes the internal styles class for AGG renderer
   void build_agg_styles(agg_style_handler& sh, 
     const std::vector<fill_style>& fill_styles,
@@ -1785,11 +1741,6 @@ public:
           stroke.width(std::max(1.0f, thickness*stroke_scale));
         }
         
-        if ( lstyle.doPixelHinting() )
-        {
-           LOG_ONCE( log_unimpl(_("Strokes pixel-hinting in AGG renderer")) );
-        }
-
         // TODO: support endCapStyle
         
         // TODO: When lstyle.noClose==0 and the start and end point matches,

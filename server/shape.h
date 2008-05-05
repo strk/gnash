@@ -418,6 +418,14 @@ namespace gnash {
     /// @} Primitives for the Drawing API
 
 
+    /// Returns true if the last and the first point of the path match
+    bool
+    isClosed() const 
+    {
+      if ( m_edges.empty() ) return true;  
+      
+      return m_edges.back().ap == ap; 
+    }
 
     /// Close this path with a straight line, if not already closed
     void
