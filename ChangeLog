@@ -1,5 +1,11 @@
 2008-05-05 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
+	* generic_character.cpp, sprite_instance.cpp, character.h, dlist.h, 
+	  dlist.cpp, sprite_instance.h: Implement omit_display(), real fix 
+    for bug #22904   	
+
+2008-05-05 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
 	* backend/render_handler_agg.cpp: Don't try to access line style
 	  for paths that have none  	
 

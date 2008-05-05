@@ -1069,7 +1069,11 @@ public:
   /// the status of the relevant flags. 'prefix' is prepended to each line
   /// to achieve the tree structure.
   ///
-  virtual void dump_character_tree(const std::string prefix) const; 
+  virtual void dump_character_tree(const std::string prefix) const;
+  
+  /// Called instead of display() when the character is not visible on stage.
+  /// Used to clear the invalidated flags.
+  virtual void omit_display() { clear_invalidated(); }; 
   
   /// Callback invoked whenever a character is placed on stage
   //

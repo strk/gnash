@@ -3341,6 +3341,14 @@ void sprite_instance::display()
   clear_invalidated();
 }
 
+void sprite_instance::omit_display()
+{
+  if (m_child_invalidated)
+    m_display_list.omit_display();
+    
+  clear_invalidated();
+}
+
 bool
 sprite_instance::attachCharacter(character& newch, int depth)
 { 

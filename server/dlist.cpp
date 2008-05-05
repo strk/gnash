@@ -624,14 +624,14 @@ DisplayList::display()
             if (mask->boundsInClippingArea())
               mask->display();
             else
-              mask->clear_invalidated();  // avoid stale flag
+              mask->omit_display();
               
             render::end_submit_mask();
             
             if (ch->boundsInClippingArea())
               ch->display();
             else
-              ch->clear_invalidated();  // avoid stale flag
+              ch->omit_display();
               
             render::disable_mask();
             
@@ -661,8 +661,7 @@ DisplayList::display()
         // check for non-mask hiden characters
         if( !renderAsMask && (ch->get_visible() == false))
         {
-            // Avoid stale old_invalidated_rect
-            ch->clear_invalidated(); 
+            ch->omit_display();
             // Don't display non-mask hidden characters
             continue;
         }
@@ -685,8 +684,8 @@ DisplayList::display()
         
         if (ch->boundsInClippingArea())
           ch->display();        
-        else 
-          ch->clear_invalidated();  // avoid stale flag
+        else
+          ch->omit_display();
         
         // Notify the renderer that mask drawing has finished.
         if (ch->isMaskLayer())
@@ -701,6 +700,18 @@ DisplayList::display()
         clipDepthStack.pop();
         render::disable_mask();
     }
+    
+    
+}
+
+void
+DisplayList::omit_display()
+{
+  iterator it = beginNonRemoved(_charsByDepth);
+  for(iterator endIt = _charsByDepth.end(); it != endIt; ++it) {
+    character* ch = it->get();
+    ch->omit_display();
+  }
 }
 
 /*public*/

@@ -316,6 +316,8 @@ public:
 		
 	/// Display (render?) this Sprite/MovieClip, unless invisible
 	void	display();
+	
+	void omit_display();
 
 	/// Swap depth of the given characters in the DisplayList
 	//

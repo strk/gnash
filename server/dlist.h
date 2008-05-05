@@ -238,6 +238,8 @@ public:
 	/// Display the referenced characters.
 	/// Lower depths are obscured by higher depths.
 	void display();
+	
+	void omit_display();
 
 	/// May return NULL.
 	character* get_character_at_depth(int depth);
