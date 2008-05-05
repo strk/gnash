@@ -1177,10 +1177,14 @@ public:
       const Path<float>& this_path = paths[pno];
       agg::path_storage& new_path = dest[pno];
       
-      const line_style& lstyle = line_styles[this_path.m_line-1];
+      bool hinting=false, closed=false;
       
-      const bool hinting = lstyle.doPixelHinting();
-      bool closed = this_path.isClosed() && !lstyle.noClose();
+      if (this_path.m_line) {
+        const line_style& lstyle = line_styles[this_path.m_line-1];
+        
+        hinting = lstyle.doPixelHinting();
+        closed = this_path.isClosed() && !lstyle.noClose();
+      }
       
       float prev_ax = this_path.ap.x;
       float prev_ay = this_path.ap.y;  

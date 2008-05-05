@@ -1,3 +1,8 @@
+2008-05-05 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* backend/render_handler_agg.cpp: Don't try to access line style
+	  for paths that have none  	
+
 2008-05-05 Sandro Santilli <strk@keybit.net>
 
 	* server/as_function.cpp (constructInstance): catch exception
