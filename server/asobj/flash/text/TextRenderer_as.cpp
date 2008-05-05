@@ -29,6 +29,7 @@
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
 #include "Object.h" // for AS inheritance
+#include "VM.h" // for addStatics
 
 #include <sstream>
 
@@ -56,11 +57,19 @@ attachTextRendererStaticProperties(as_object& o)
 static as_object*
 getTextRendererInterface()
 {
-	boost::intrusive_ptr<as_object> o;
-	// TODO: check if this class should inherit from Object
-	//       or from a different class
-	o = new as_object(getObjectInterface());
-	attachTextRendererInterface(*o);
+	static boost::intrusive_ptr<as_object> o;
+
+	if ( ! o )
+	{
+		// TODO: check if this class should inherit from Object
+		//       or from a different class
+		o = new as_object(getObjectInterface());
+		VM::get().addStatic(o.get());
+
+		attachTextRendererInterface(*o);
+
+	}
+
 	return o.get();
 }
 

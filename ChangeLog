@@ -1,8 +1,14 @@
+2008-05-05 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/gen-asclass.pl: getClassInterface MUST return a static
+	  or 'instanceof' will never work correctly!
+	* server/asobj/flash: regenerated classes...
+
 2008-05-05 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* generic_character.cpp, sprite_instance.cpp, character.h, dlist.h, 
 	  dlist.cpp, sprite_instance.h: Implement omit_display(), real fix 
-    for bug #22904   	
+	  for bug #22904   	
 
 2008-05-05 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
