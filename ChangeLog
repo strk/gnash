@@ -1,5 +1,11 @@
 2008-05-05 Sandro Santilli <strk@keybit.net>
 
+	* server/as_function.cpp (constructInstance): catch exception
+	  thrown by native functions. Most will trhow an exception when
+	  'this' is undefined (example: a=new String.prototype.substring).
+
+2008-05-05 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/gen-asclass.pl: add support for static methods and
 	  properties.
 	* doc/C/NOTES: add note about static props and methods in the new

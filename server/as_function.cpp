@@ -386,7 +386,12 @@ as_function::constructInstance( as_environment& env,
 		);
 
 		fn_call fn(NULL, &env, nargs, first_arg_index);
-		newobj = call(fn).to_object();
+		try {
+			newobj = call(fn).to_object();
+		} catch (std::exception& ex) {
+			log_debug("Native function called as constructor returned %s", ex.what());
+			newobj = new as_object();
+		}
 		assert(newobj); // we assume builtin functions do return objects !!
 
 		// Add a __constructor__ member to the new object, but only for SWF6 up
