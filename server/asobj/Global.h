@@ -39,13 +39,17 @@ namespace gnash {
 class Global: public as_object
 {
 public:
+
 	Global(VM& vm, ClassHierarchy *ch);
 	~Global() {}
+
 private:
 
 #ifdef USE_EXTENSIONS
-	Extension et;
+    void loadExtensions();
+	Extension _et;
 #endif
+
 };
 
 } // namespace gnash

@@ -1,3 +1,11 @@
+2008-05-05 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/asobj/Global.{h,cpp}: drop goto from initialization, use
+	  a switch instead (possibly not necessary to distinguish here
+	  based on version anyway). Load extensions in separate method. Use
+	  forward declarations of functions for legibility.
+	* server/asobj/xmlsocket.cpp: fix warning.
+
 2008-05-05 Sandro Santilli <strk@keybit.net>
 
 	* server/styles.cpp: use 'pixelHinting' flag parsed from SWF

@@ -607,7 +607,7 @@ attachXMLSocketInterface(as_object& o)
 }
 
 static void
-attachXMLSocketProperties(as_object& o)
+attachXMLSocketProperties(as_object& /*o*/)
 {
     // this is attached to proto
     //o.init_member("onData", new builtin_function(xmlsocket_onData));
