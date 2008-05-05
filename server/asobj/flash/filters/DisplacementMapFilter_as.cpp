@@ -61,17 +61,20 @@ attachDisplacementMapFilterInterface(as_object& o)
     o.init_property("scaleY", DisplacementMapFilter_scaleY_getset, DisplacementMapFilter_scaleY_getset);
 }
 
+static void
+attachDisplacementMapFilterStaticProperties(as_object& o)
+{
+	// TODO: add static properties here
+}
+
 static as_object*
 getDisplacementMapFilterInterface()
 {
-	static boost::intrusive_ptr<as_object> o;
-	if ( ! o )
-	{
-		// TODO: check if this class should inherit from Object
-		//       or from a different class
-		o = new as_object(getObjectInterface());
-		attachDisplacementMapFilterInterface(*o);
-	}
+	boost::intrusive_ptr<as_object> o;
+	// TODO: check if this class should inherit from Object
+	//       or from a different class
+	o = new as_object(getObjectInterface());
+	attachDisplacementMapFilterInterface(*o);
 	return o.get();
 }
 
@@ -198,22 +201,17 @@ DisplacementMapFilter_ctor(const fn_call& fn)
 	return as_value(obj.get()); // will keep alive
 }
 
-// extern (used by Global.cpp)
-void DisplacementMapFilter_class_init(as_object& global)
+// extern 
+void DisplacementMapFilter_class_init(as_object& where)
 {
-	// This is going to be the global DisplacementMapFilter "class"/"function"
-	static boost::intrusive_ptr<builtin_function> cl;
-
-	if ( cl == NULL )
-	{
-		cl=new builtin_function(&DisplacementMapFilter_ctor, getDisplacementMapFilterInterface());
-		// replicate all interface to class, to be able to access
-		// all methods as static functions
-		attachDisplacementMapFilterInterface(*cl);
-	}
+	// This is going to be the DisplacementMapFilter "class"/"function"
+	// in the 'where' package
+	boost::intrusive_ptr<builtin_function> cl;
+	cl=new builtin_function(&DisplacementMapFilter_ctor, getDisplacementMapFilterInterface());
+	attachDisplacementMapFilterStaticProperties(*cl);
 
 	// Register _global.DisplacementMapFilter
-	global.init_member("DisplacementMapFilter", cl.get());
+	where.init_member("DisplacementMapFilter", cl.get());
 }
 
 } // end of gnash namespace

@@ -20,6 +20,9 @@
 #include "Object.h" // for getObjectInterface
 #include "as_object.h"
 
+#include "string_table.h"
+#include "VM.h"
+
 #include "flash/filters/BevelFilter_as.h"
 #include "flash/filters/BitmapFilter_as.h"
 #include "flash/filters/BlurFilter_as.h"
@@ -33,9 +36,11 @@
 
 namespace gnash {
 
-void
-flash_filters_package_init(as_object& where)
+as_value
+get_flash_filters_package(const fn_call& /*fn*/)
 {
+	log_debug("Loading flash.filters package");
+
 	as_object* pkg = new as_object(getObjectInterface());
 
 	BevelFilter_class_init(*pkg);
@@ -49,7 +54,14 @@ flash_filters_package_init(as_object& where)
 	GradientBevelFilter_class_init(*pkg);
 	GradientGlowFilter_class_init(*pkg);
 
-	where.init_member("filters", pkg);
+	return pkg;
+}
+
+void
+flash_filters_package_init(as_object& where)
+{
+	string_table& st = where.getVM().getStringTable();
+	where.init_destructive_property(st.find("filters"), get_flash_filters_package);
 }
 
 

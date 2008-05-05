@@ -31,10 +31,10 @@
 
 namespace gnash {
 
-void
-flash_package_init(as_object& global)
+static as_value
+get_flash_package(const fn_call& /*fn*/)
 {
-	assert(global.getVM().getSWFVersion() >= 8);
+	log_debug("Loading flash package");
 
 	as_object* pkg = new as_object(getObjectInterface());
 
@@ -47,8 +47,16 @@ flash_package_init(as_object& global)
 	flash_net_package_init(*pkg);
 	flash_text_package_init(*pkg);
 
-	// TODO: use a destructive getter-setter
-	global.init_member("flash", pkg);
+	return pkg;
+}
+
+void
+flash_package_init(as_object& global)
+{
+	assert(global.getVM().getSWFVersion() >= 8);
+
+	string_table& st = global.getVM().getStringTable();
+	global.init_destructive_property(st.find("flash"), get_flash_package);
 }
 
 } // end of gnash namespace

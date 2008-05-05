@@ -65,17 +65,20 @@ attachFileReferenceInterface(as_object& o)
     o.init_property("type", FileReference_type_getset, FileReference_type_getset);
 }
 
+static void
+attachFileReferenceStaticProperties(as_object& o)
+{
+	// TODO: add static properties here
+}
+
 static as_object*
 getFileReferenceInterface()
 {
-	static boost::intrusive_ptr<as_object> o;
-	if ( ! o )
-	{
-		// TODO: check if this class should inherit from Object
-		//       or from a different class
-		o = new as_object(getObjectInterface());
-		attachFileReferenceInterface(*o);
-	}
+	boost::intrusive_ptr<as_object> o;
+	// TODO: check if this class should inherit from Object
+	//       or from a different class
+	o = new as_object(getObjectInterface());
+	attachFileReferenceInterface(*o);
 	return o.get();
 }
 
@@ -220,22 +223,17 @@ FileReference_ctor(const fn_call& fn)
 	return as_value(obj.get()); // will keep alive
 }
 
-// extern (used by Global.cpp)
-void FileReference_class_init(as_object& global)
+// extern 
+void FileReference_class_init(as_object& where)
 {
-	// This is going to be the global FileReference "class"/"function"
-	static boost::intrusive_ptr<builtin_function> cl;
-
-	if ( cl == NULL )
-	{
-		cl=new builtin_function(&FileReference_ctor, getFileReferenceInterface());
-		// replicate all interface to class, to be able to access
-		// all methods as static functions
-		attachFileReferenceInterface(*cl);
-	}
+	// This is going to be the FileReference "class"/"function"
+	// in the 'where' package
+	boost::intrusive_ptr<builtin_function> cl;
+	cl=new builtin_function(&FileReference_ctor, getFileReferenceInterface());
+	attachFileReferenceStaticProperties(*cl);
 
 	// Register _global.FileReference
-	global.init_member("FileReference", cl.get());
+	where.init_member("FileReference", cl.get());
 }
 
 } // end of gnash namespace

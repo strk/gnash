@@ -20,18 +20,30 @@
 #include "Object.h" // for getObjectInterface
 #include "as_object.h"
 
+#include "string_table.h"
+#include "VM.h"
+
 #include "flash/display/BitmapData_as.h"
 
 namespace gnash {
 
-void
-flash_display_package_init(as_object& where)
+static as_value
+get_flash_display_package(const fn_call& /*fn*/)
 {
+	log_debug("Loading flash.display package");
+
 	as_object* pkg = new as_object(getObjectInterface());
 
 	BitmapData_class_init(*pkg);
 
-	where.init_member("display", pkg);
+	return pkg;
+}
+
+void
+flash_display_package_init(as_object& where)
+{
+	string_table& st = where.getVM().getStringTable();
+	where.init_destructive_property(st.find("display"), get_flash_display_package);
 }
 
 

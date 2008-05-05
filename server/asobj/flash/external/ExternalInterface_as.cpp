@@ -47,17 +47,20 @@ attachExternalInterfaceInterface(as_object& o)
     o.init_property("available", ExternalInterface_available_getset, ExternalInterface_available_getset);
 }
 
+static void
+attachExternalInterfaceStaticProperties(as_object& o)
+{
+	// TODO: add static properties here
+}
+
 static as_object*
 getExternalInterfaceInterface()
 {
-	static boost::intrusive_ptr<as_object> o;
-	if ( ! o )
-	{
-		// TODO: check if this class should inherit from Object
-		//       or from a different class
-		o = new as_object(getObjectInterface());
-		attachExternalInterfaceInterface(*o);
-	}
+	boost::intrusive_ptr<as_object> o;
+	// TODO: check if this class should inherit from Object
+	//       or from a different class
+	o = new as_object(getObjectInterface());
+	attachExternalInterfaceInterface(*o);
 	return o.get();
 }
 
@@ -121,22 +124,17 @@ ExternalInterface_ctor(const fn_call& fn)
 	return as_value(obj.get()); // will keep alive
 }
 
-// extern (used by Global.cpp)
-void ExternalInterface_class_init(as_object& global)
+// extern 
+void ExternalInterface_class_init(as_object& where)
 {
-	// This is going to be the global ExternalInterface "class"/"function"
-	static boost::intrusive_ptr<builtin_function> cl;
-
-	if ( cl == NULL )
-	{
-		cl=new builtin_function(&ExternalInterface_ctor, getExternalInterfaceInterface());
-		// replicate all interface to class, to be able to access
-		// all methods as static functions
-		attachExternalInterfaceInterface(*cl);
-	}
+	// This is going to be the ExternalInterface "class"/"function"
+	// in the 'where' package
+	boost::intrusive_ptr<builtin_function> cl;
+	cl=new builtin_function(&ExternalInterface_ctor, getExternalInterfaceInterface());
+	attachExternalInterfaceStaticProperties(*cl);
 
 	// Register _global.ExternalInterface
-	global.init_member("ExternalInterface", cl.get());
+	where.init_member("ExternalInterface", cl.get());
 }
 
 } // end of gnash namespace

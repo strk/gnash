@@ -193,17 +193,20 @@ attach$args{class}Interface(as_object& o)
 {$registrations
 }
 
+static void
+attach$args{class}StaticProperties(as_object& o)
+{
+	// TODO: add static properties here
+}
+
 static as_object*
 get$args{class}Interface()
 {
-	static boost::intrusive_ptr<as_object> o;
-	if ( ! o )
-	{
-		// TODO: check if this class should inherit from Object
-		//       or from a different class
-		o = new as_object(getObjectInterface());
-		attach$args{class}Interface(*o);
-	}
+	boost::intrusive_ptr<as_object> o;
+	// TODO: check if this class should inherit from Object
+	//       or from a different class
+	o = new as_object(getObjectInterface());
+	attach$args{class}Interface(*o);
 	return o.get();
 }
 
@@ -240,22 +243,17 @@ $args{lc}_ctor(const fn_call& fn)
 	return as_value(obj.get()); // will keep alive
 }
 
-// extern (used by Global.cpp)
-void $args{lc}_class_init(as_object& global)
+// extern 
+void $args{lc}_class_init(as_object& where)
 {
-	// This is going to be the global $args{class} "class"/"function"
-	static boost::intrusive_ptr<builtin_function> cl;
-
-	if ( cl == NULL )
-	{
-		cl=new builtin_function(&$args{lc}_ctor, get$args{class}Interface());
-		// replicate all interface to class, to be able to access
-		// all methods as static functions
-		attach$args{class}Interface(*cl);
-	}
+	// This is going to be the $args{class} "class"/"function"
+	// in the 'where' package
+	boost::intrusive_ptr<builtin_function> cl;
+	cl=new builtin_function(&$args{lc}_ctor, get$args{class}Interface());
+	attach$args{class}StaticProperties(*cl);
 
 	// Register _global.$args{class}
-	global.init_member("$args{class}", cl.get());
+	where.init_member("$args{class}", cl.get());
 }
 
 } // end of gnash namespace

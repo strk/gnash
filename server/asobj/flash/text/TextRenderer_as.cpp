@@ -45,17 +45,20 @@ attachTextRendererInterface(as_object& o)
     o.init_property("maxLevel", TextRenderer_maxLevel_getset, TextRenderer_maxLevel_getset);
 }
 
+static void
+attachTextRendererStaticProperties(as_object& o)
+{
+	// TODO: add static properties here
+}
+
 static as_object*
 getTextRendererInterface()
 {
-	static boost::intrusive_ptr<as_object> o;
-	if ( ! o )
-	{
-		// TODO: check if this class should inherit from Object
-		//       or from a different class
-		o = new as_object(getObjectInterface());
-		attachTextRendererInterface(*o);
-	}
+	boost::intrusive_ptr<as_object> o;
+	// TODO: check if this class should inherit from Object
+	//       or from a different class
+	o = new as_object(getObjectInterface());
+	attachTextRendererInterface(*o);
 	return o.get();
 }
 
@@ -110,22 +113,17 @@ TextRenderer_ctor(const fn_call& fn)
 	return as_value(obj.get()); // will keep alive
 }
 
-// extern (used by Global.cpp)
-void TextRenderer_class_init(as_object& global)
+// extern 
+void TextRenderer_class_init(as_object& where)
 {
-	// This is going to be the global TextRenderer "class"/"function"
-	static boost::intrusive_ptr<builtin_function> cl;
-
-	if ( cl == NULL )
-	{
-		cl=new builtin_function(&TextRenderer_ctor, getTextRendererInterface());
-		// replicate all interface to class, to be able to access
-		// all methods as static functions
-		attachTextRendererInterface(*cl);
-	}
+	// This is going to be the TextRenderer "class"/"function"
+	// in the 'where' package
+	boost::intrusive_ptr<builtin_function> cl;
+	cl=new builtin_function(&TextRenderer_ctor, getTextRendererInterface());
+	attachTextRendererStaticProperties(*cl);
 
 	// Register _global.TextRenderer
-	global.init_member("TextRenderer", cl.get());
+	where.init_member("TextRenderer", cl.get());
 }
 
 } // end of gnash namespace

@@ -63,17 +63,20 @@ attachColorTransformInterface(as_object& o)
     o.init_property("rgb", ColorTransform_rgb_getset, ColorTransform_rgb_getset);
 }
 
+static void
+attachColorTransformStaticProperties(as_object& o)
+{
+	// TODO: add static properties here
+}
+
 static as_object*
 getColorTransformInterface()
 {
-	static boost::intrusive_ptr<as_object> o;
-	if ( ! o )
-	{
-		// TODO: check if this class should inherit from Object
-		//       or from a different class
-		o = new as_object(getObjectInterface());
-		attachColorTransformInterface(*o);
-	}
+	boost::intrusive_ptr<as_object> o;
+	// TODO: check if this class should inherit from Object
+	//       or from a different class
+	o = new as_object(getObjectInterface());
+	attachColorTransformInterface(*o);
 	return o.get();
 }
 
@@ -209,22 +212,17 @@ ColorTransform_ctor(const fn_call& fn)
 	return as_value(obj.get()); // will keep alive
 }
 
-// extern (used by Global.cpp)
-void ColorTransform_class_init(as_object& global)
+// extern 
+void ColorTransform_class_init(as_object& where)
 {
-	// This is going to be the global ColorTransform "class"/"function"
-	static boost::intrusive_ptr<builtin_function> cl;
-
-	if ( cl == NULL )
-	{
-		cl=new builtin_function(&ColorTransform_ctor, getColorTransformInterface());
-		// replicate all interface to class, to be able to access
-		// all methods as static functions
-		attachColorTransformInterface(*cl);
-	}
+	// This is going to be the ColorTransform "class"/"function"
+	// in the 'where' package
+	boost::intrusive_ptr<builtin_function> cl;
+	cl=new builtin_function(&ColorTransform_ctor, getColorTransformInterface());
+	attachColorTransformStaticProperties(*cl);
 
 	// Register _global.ColorTransform
-	global.init_member("ColorTransform", cl.get());
+	where.init_member("ColorTransform", cl.get());
 }
 
 } // end of gnash namespace

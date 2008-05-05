@@ -20,18 +20,30 @@
 #include "Object.h" // for getObjectInterface
 #include "as_object.h"
 
+#include "string_table.h"
+#include "VM.h"
+
 #include "flash/text/TextRenderer_as.h"
 
 namespace gnash {
 
-void
-flash_text_package_init(as_object& where)
+as_value
+get_flash_text_package(const fn_call& /*fn*/)
 {
+	log_debug("Loading flash.text package");
+
 	as_object* pkg = new as_object(getObjectInterface());
 
 	TextRenderer_class_init(*pkg);
 
-	where.init_member("geom", pkg);
+	return pkg;
+}
+
+void
+flash_text_package_init(as_object& where)
+{
+	string_table& st = where.getVM().getStringTable();
+	where.init_destructive_property(st.find("text"), get_flash_text_package);
 }
 
 

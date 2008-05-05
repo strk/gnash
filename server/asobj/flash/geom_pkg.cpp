@@ -20,6 +20,9 @@
 #include "Object.h" // for getObjectInterface
 #include "as_object.h"
 
+#include "string_table.h"
+#include "VM.h"
+
 #include "flash/geom/ColorTransform_as.h"
 #include "flash/geom/Matrix_as.h"
 #include "flash/geom/Point_as.h"
@@ -28,9 +31,11 @@
 
 namespace gnash {
 
-void
-flash_geom_package_init(as_object& where)
+as_value
+get_flash_geom_package(const fn_call& /*fn*/)
 {
+	log_debug("Loading flash.geom package");
+
 	as_object* pkg = new as_object(getObjectInterface());
 
 	ColorTransform_class_init(*pkg);
@@ -39,7 +44,14 @@ flash_geom_package_init(as_object& where)
 	Rectangle_class_init(*pkg);
 	Transform_class_init(*pkg);
 
-	where.init_member("geom", pkg);
+	return pkg;
+}
+
+void
+flash_geom_package_init(as_object& where)
+{
+	string_table& st = where.getVM().getStringTable();
+	where.init_destructive_property(st.find("geom"), get_flash_geom_package);
 }
 
 

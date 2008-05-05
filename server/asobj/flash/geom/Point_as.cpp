@@ -67,17 +67,20 @@ attachPointInterface(as_object& o)
     o.init_property("y", Point_y_getset, Point_y_getset);
 }
 
+static void
+attachPointStaticProperties(as_object& o)
+{
+	// TODO: add static properties here
+}
+
 static as_object*
 getPointInterface()
 {
-	static boost::intrusive_ptr<as_object> o;
-	if ( ! o )
-	{
-		// TODO: check if this class should inherit from Object
-		//       or from a different class
-		o = new as_object(getObjectInterface());
-		attachPointInterface(*o);
-	}
+	boost::intrusive_ptr<as_object> o;
+	// TODO: check if this class should inherit from Object
+	//       or from a different class
+	o = new as_object(getObjectInterface());
+	attachPointInterface(*o);
 	return o.get();
 }
 
@@ -231,22 +234,17 @@ Point_ctor(const fn_call& fn)
 	return as_value(obj.get()); // will keep alive
 }
 
-// extern (used by Global.cpp)
-void Point_class_init(as_object& global)
+// extern 
+void Point_class_init(as_object& where)
 {
-	// This is going to be the global Point "class"/"function"
-	static boost::intrusive_ptr<builtin_function> cl;
-
-	if ( cl == NULL )
-	{
-		cl=new builtin_function(&Point_ctor, getPointInterface());
-		// replicate all interface to class, to be able to access
-		// all methods as static functions
-		attachPointInterface(*cl);
-	}
+	// This is going to be the Point "class"/"function"
+	// in the 'where' package
+	boost::intrusive_ptr<builtin_function> cl;
+	cl=new builtin_function(&Point_ctor, getPointInterface());
+	attachPointStaticProperties(*cl);
 
 	// Register _global.Point
-	global.init_member("Point", cl.get());
+	where.init_member("Point", cl.get());
 }
 
 } // end of gnash namespace

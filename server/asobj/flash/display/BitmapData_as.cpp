@@ -97,17 +97,20 @@ attachBitmapDataInterface(as_object& o)
     o.init_property("width", BitmapData_width_getset, BitmapData_width_getset);
 }
 
+static void
+attachBitmapDataStaticProperties(as_object& o)
+{
+	// TODO: add static properties here
+}
+
 static as_object*
 getBitmapDataInterface()
 {
-	static boost::intrusive_ptr<as_object> o;
-	if ( ! o )
-	{
-		// TODO: check if this class should inherit from Object
-		//       or from a different class
-		o = new as_object(getObjectInterface());
-		attachBitmapDataInterface(*o);
-	}
+	boost::intrusive_ptr<as_object> o;
+	// TODO: check if this class should inherit from Object
+	//       or from a different class
+	o = new as_object(getObjectInterface());
+	attachBitmapDataInterface(*o);
 	return o.get();
 }
 
@@ -396,22 +399,17 @@ BitmapData_ctor(const fn_call& fn)
 	return as_value(obj.get()); // will keep alive
 }
 
-// extern (used by Global.cpp)
-void BitmapData_class_init(as_object& global)
+// extern 
+void BitmapData_class_init(as_object& where)
 {
-	// This is going to be the global BitmapData "class"/"function"
-	static boost::intrusive_ptr<builtin_function> cl;
-
-	if ( cl == NULL )
-	{
-		cl=new builtin_function(&BitmapData_ctor, getBitmapDataInterface());
-		// replicate all interface to class, to be able to access
-		// all methods as static functions
-		attachBitmapDataInterface(*cl);
-	}
+	// This is going to be the BitmapData "class"/"function"
+	// in the 'where' package
+	boost::intrusive_ptr<builtin_function> cl;
+	cl=new builtin_function(&BitmapData_ctor, getBitmapDataInterface());
+	attachBitmapDataStaticProperties(*cl);
 
 	// Register _global.BitmapData
-	global.init_member("BitmapData", cl.get());
+	where.init_member("BitmapData", cl.get());
 }
 
 } // end of gnash namespace

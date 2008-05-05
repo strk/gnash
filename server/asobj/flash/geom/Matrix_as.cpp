@@ -77,17 +77,20 @@ attachMatrixInterface(as_object& o)
     o.init_property("ty", Matrix_ty_getset, Matrix_ty_getset);
 }
 
+static void
+attachMatrixStaticProperties(as_object& o)
+{
+	// TODO: add static properties here
+}
+
 static as_object*
 getMatrixInterface()
 {
-	static boost::intrusive_ptr<as_object> o;
-	if ( ! o )
-	{
-		// TODO: check if this class should inherit from Object
-		//       or from a different class
-		o = new as_object(getObjectInterface());
-		attachMatrixInterface(*o);
-	}
+	boost::intrusive_ptr<as_object> o;
+	// TODO: check if this class should inherit from Object
+	//       or from a different class
+	o = new as_object(getObjectInterface());
+	attachMatrixInterface(*o);
 	return o.get();
 }
 
@@ -286,22 +289,17 @@ Matrix_ctor(const fn_call& fn)
 	return as_value(obj.get()); // will keep alive
 }
 
-// extern (used by Global.cpp)
-void Matrix_class_init(as_object& global)
+// extern 
+void Matrix_class_init(as_object& where)
 {
-	// This is going to be the global Matrix "class"/"function"
-	static boost::intrusive_ptr<builtin_function> cl;
-
-	if ( cl == NULL )
-	{
-		cl=new builtin_function(&Matrix_ctor, getMatrixInterface());
-		// replicate all interface to class, to be able to access
-		// all methods as static functions
-		attachMatrixInterface(*cl);
-	}
+	// This is going to be the Matrix "class"/"function"
+	// in the 'where' package
+	boost::intrusive_ptr<builtin_function> cl;
+	cl=new builtin_function(&Matrix_ctor, getMatrixInterface());
+	attachMatrixStaticProperties(*cl);
 
 	// Register _global.Matrix
-	global.init_member("Matrix", cl.get());
+	where.init_member("Matrix", cl.get());
 }
 
 } // end of gnash namespace

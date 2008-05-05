@@ -51,17 +51,20 @@ attachTransformInterface(as_object& o)
     o.init_property("pixelBounds", Transform_pixelBounds_getset, Transform_pixelBounds_getset);
 }
 
+static void
+attachTransformStaticProperties(as_object& o)
+{
+	// TODO: add static properties here
+}
+
 static as_object*
 getTransformInterface()
 {
-	static boost::intrusive_ptr<as_object> o;
-	if ( ! o )
-	{
-		// TODO: check if this class should inherit from Object
-		//       or from a different class
-		o = new as_object(getObjectInterface());
-		attachTransformInterface(*o);
-	}
+	boost::intrusive_ptr<as_object> o;
+	// TODO: check if this class should inherit from Object
+	//       or from a different class
+	o = new as_object(getObjectInterface());
+	attachTransformInterface(*o);
 	return o.get();
 }
 
@@ -143,22 +146,17 @@ Transform_ctor(const fn_call& fn)
 	return as_value(obj.get()); // will keep alive
 }
 
-// extern (used by Global.cpp)
-void Transform_class_init(as_object& global)
+// extern 
+void Transform_class_init(as_object& where)
 {
-	// This is going to be the global Transform "class"/"function"
-	static boost::intrusive_ptr<builtin_function> cl;
-
-	if ( cl == NULL )
-	{
-		cl=new builtin_function(&Transform_ctor, getTransformInterface());
-		// replicate all interface to class, to be able to access
-		// all methods as static functions
-		attachTransformInterface(*cl);
-	}
+	// This is going to be the Transform "class"/"function"
+	// in the 'where' package
+	boost::intrusive_ptr<builtin_function> cl;
+	cl=new builtin_function(&Transform_ctor, getTransformInterface());
+	attachTransformStaticProperties(*cl);
 
 	// Register _global.Transform
-	global.init_member("Transform", cl.get());
+	where.init_member("Transform", cl.get());
 }
 
 } // end of gnash namespace

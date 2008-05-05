@@ -93,17 +93,20 @@ attachRectangleInterface(as_object& o)
     o.init_property("y", Rectangle_y_getset, Rectangle_y_getset);
 }
 
+static void
+attachRectangleStaticProperties(as_object& o)
+{
+	// TODO: add static properties here
+}
+
 static as_object*
 getRectangleInterface()
 {
-	static boost::intrusive_ptr<as_object> o;
-	if ( ! o )
-	{
-		// TODO: check if this class should inherit from Object
-		//       or from a different class
-		o = new as_object(getObjectInterface());
-		attachRectangleInterface(*o);
-	}
+	boost::intrusive_ptr<as_object> o;
+	// TODO: check if this class should inherit from Object
+	//       or from a different class
+	o = new as_object(getObjectInterface());
+	attachRectangleInterface(*o);
 	return o.get();
 }
 
@@ -374,22 +377,17 @@ Rectangle_ctor(const fn_call& fn)
 	return as_value(obj.get()); // will keep alive
 }
 
-// extern (used by Global.cpp)
-void Rectangle_class_init(as_object& global)
+// extern 
+void Rectangle_class_init(as_object& where)
 {
-	// This is going to be the global Rectangle "class"/"function"
-	static boost::intrusive_ptr<builtin_function> cl;
-
-	if ( cl == NULL )
-	{
-		cl=new builtin_function(&Rectangle_ctor, getRectangleInterface());
-		// replicate all interface to class, to be able to access
-		// all methods as static functions
-		attachRectangleInterface(*cl);
-	}
+	// This is going to be the Rectangle "class"/"function"
+	// in the 'where' package
+	boost::intrusive_ptr<builtin_function> cl;
+	cl=new builtin_function(&Rectangle_ctor, getRectangleInterface());
+	attachRectangleStaticProperties(*cl);
 
 	// Register _global.Rectangle
-	global.init_member("Rectangle", cl.get());
+	where.init_member("Rectangle", cl.get());
 }
 
 } // end of gnash namespace
