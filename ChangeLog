@@ -1,3 +1,7 @@
+2008-05-05 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* libbase/URL.h: DSOexport operator<<, fix build with visibility.
+
 2008-05-04 Zou Lunkai <zoulunkai@gmail.com>
 
 	* server/sprite_instance.h, server/dlist.h: docs.

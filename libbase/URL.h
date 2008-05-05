@@ -178,7 +178,7 @@ private:
 	std::string _querystring;
 };
 
-std::ostream& operator<< (std::ostream&o, const URL& u);
+DSOEXPORT std::ostream& operator<< (std::ostream&o, const URL& u);
 
 } // end of gnash namespace
 
