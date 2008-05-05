@@ -170,7 +170,7 @@ Player::init_sound()
 {
     if (_doSound) {
 #ifdef SOUND_SDL
-        _soundHandler.reset( gnash::media::create_sound_handler_sdl(_audio_dump) );
+        _soundHandler.reset( gnash::media::create_sound_handler_sdl(_audioDump) );
         if (_audioDump != NULL) {
             // add a silent stream to the audio pool so that our output file
             // is homogenous;  we actually want silent wave data when no sounds
