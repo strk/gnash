@@ -505,10 +505,6 @@ public:
 	///	A function to invoke when this property value is requested.
 	///	add_ref will be called on the function.
 	///
-	/// @param setter
-	///	A function to invoke when setting this property's value.
-	///	add_ref will be called on the function.
-	///
 	/// @param flags
 	///     Flags for the new member. By default dontDelete and dontEnum.
 	///	See as_prop_flags::Flags.
@@ -518,7 +514,7 @@ public:
 	/// and will be matched by anything not asking for a specific namespace.
 	///
 	bool init_destructive_property(string_table::key key, as_function& getter,
-		as_function& setter, int flags=as_prop_flags::dontEnum,
+		int flags=as_prop_flags::dontEnum,
 		string_table::key nsname = 0);
 
 	/// \brief

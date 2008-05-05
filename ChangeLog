@@ -1,5 +1,15 @@
 2008-05-05 Sandro Santilli <strk@keybit.net>
 
+	* server/PropertyList.{cpp,h}: rename addDestructiveGetterSetter
+	  to addDestructiveGetter, as we're not using the setter anyway,
+	  add a flagIfMissing to avoid a duplicated scan.
+	* server/as_object.{cpp,h}: drop the 'setter' parameter to
+	  init_destructive_property.
+	* server/asobj/ClassHierarchy.cpp: don't create a useless
+	  setter for all declarative properties.
+
+2008-05-05 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/: create a new subtree for the 'flash'
 	  ActionScript package. Stub all known classes there, moving
 	  also there the existing BitmapFilter classes which belongs

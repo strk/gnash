@@ -802,13 +802,12 @@ as_object::init_property(string_table::key key, as_c_function_ptr getter,
 
 bool
 as_object::init_destructive_property(string_table::key key, as_function& getter,
-	as_function& setter, int flags, string_table::key nsname)
+	int flags, string_table::key nsname)
 {
 	bool success;
 
 	// No case check, since we've already got the key.
-	success = _members.addDestructiveGetterSetter(key, getter, setter, nsname);
-	_members.setFlags(key, flags, nsname);
+	success = _members.addDestructiveGetter(key, getter, nsname, flags);
 	return success;
 }
 

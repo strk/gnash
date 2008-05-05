@@ -319,14 +319,15 @@ public:
 	/// @param getter
 	/// A function to invoke when this property value is requested.
 	///
-	/// @param setter
-	/// A function to invoke when setting this property's value.
+	/// @param flagsIfMissing
+	///	Flags to associate to the property if a new one is created.
 	///
 	/// @return true if the property was successfully added, false
 	/// otherwise.
 	///
-	bool addDestructiveGetterSetter(string_table::key key,
-		as_function& getter, as_function& setter, string_table::key ns = 0);
+	bool addDestructiveGetter(string_table::key key,
+		as_function& getter, string_table::key ns = 0,
+		const as_prop_flags& flagsIfMissing=0);
 
 	/// Set the flags of a property.
 	//

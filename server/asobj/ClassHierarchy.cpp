@@ -158,7 +158,6 @@ public:
 	virtual as_value operator()(const fn_call& /*fn*/)
 	{
 		string_table& st = VM::get().getStringTable();
-
 		log_debug("Loading native class %s", st.value(mDeclaration.name));
 
 		mDeclaration.initializer(*mTarget);
@@ -230,11 +229,8 @@ ClassHierarchy::declareClass(extensionClass& c)
 
 	boost::intrusive_ptr<as_function> getter =
 		new declare_extension_function(c, mGlobal, mExtension);
-	boost::intrusive_ptr<as_function> setter =
-		new builtin_function(do_nothing);
 
-	return mGlobal->init_destructive_property(c.name,
-		*getter, *setter);
+	return mGlobal->init_destructive_property(c.name, *getter);
 }
 
 bool
@@ -251,11 +247,9 @@ ClassHierarchy::declareClass(nativeClass& c)
 
 	boost::intrusive_ptr<as_function> getter =
 		new declare_native_function(c, mGlobal, mExtension);
-	boost::intrusive_ptr<as_function> setter =
-		new builtin_function(do_nothing);
 
 	return mGlobal->init_destructive_property(c.name,
-		*getter, *setter);
+		*getter);
 }
 
 static ClassHierarchy::nativeClass knownClasses[] =

@@ -394,14 +394,16 @@ PropertyList::addGetterSetter(string_table::key key, as_c_function_ptr getter,
 }
 
 bool
-PropertyList::addDestructiveGetterSetter(string_table::key key,
-	as_function& getter, as_function& setter, string_table::key nsId)
+PropertyList::addDestructiveGetter(string_table::key key,
+	as_function& getter, string_table::key nsId,
+	const as_prop_flags& flagsIfMissing)
 {
 	container::iterator found = iterator_find(_props, key, nsId);
 	if (found != _props.end())
 		return false; // Already exists.
 
-	Property a(key, nsId, &getter, &setter, 1);
+	// destructive getter don't need a setter
+	Property a(key, nsId, &getter, (as_function*)0, flagsIfMissing, true);
 	a.setOrder(- ++mDefaultOrder - 1);
 	_props.insert(a);
 	return true;
