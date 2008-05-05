@@ -64,10 +64,10 @@ EOF
 #define __GNASH_ASOBJ_$args{up}_H__
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "gnashconfig.h"
 #endif
 
-#include <memory> // for auto_ptr
+//#include <memory> // for auto_ptr
 
 namespace gnash {
 
@@ -117,7 +117,7 @@ EOF
         ## A '.' concatenates a string.
 
         $declarations .=
-          qq|\nstatic void $args{lc}_| .$m. qq|(const fn_call& fn);|;
+          qq|\nstatic as_value $args{lc}_| .$m. qq|(const fn_call& fn);|;
 
         $registrations .=
           qq|\n    o.init_member("$m", new builtin_function($args{lc}_$m));|;
@@ -126,9 +126,9 @@ EOF
           qq|\nstatic as_value\n$args{lc}_| .$m.
           qq|(const fn_call& fn)
 {
-	$args{lc}_as_object* ptr = ensureType<$args{lc}_as_object>(fn.this_ptr);
+	boost::intrusive_ptr<$args{lc}_as> ptr = ensureType<$args{lc}_as>(fn.this_ptr);
 	UNUSED(ptr);
-	log_unimpl (__FUNCTION__);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
 }
 |;
@@ -139,10 +139,10 @@ EOF
     print $fh <<EOF;
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "gnashconfig.h"
 #endif
 
-#include "$args{class}.h"
+#include "$args{class}_as.h"
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
@@ -152,7 +152,7 @@ EOF
 
 namespace gnash {
 $declarations
-void $args{lc}_ctor(const fn_call& fn);
+as_value $args{lc}_ctor(const fn_call& fn);
 
 static void
 attach$args{class}Interface(as_object& o)
@@ -171,12 +171,12 @@ get$args{class}Interface()
 	return o.get();
 }
 
-class $args{lc}_as_object: public as_object
+class $args{lc}_as: public as_object
 {
 
 public:
 
-	$args{lc}_as_object()
+	$args{lc}_as()
 		:
 		as_object(get$args{class}Interface())
 	{}
@@ -190,9 +190,9 @@ public:
 
 $implementations
 as_value
-$args{lc}_ctor(const fn_call& fn)
+$args{lc}_ctor(const fn_call& /*fn*/)
 {
-	boost::intrusive_ptr<as_object> obj = new $args{lc}_as_object;
+	boost::intrusive_ptr<as_object> obj = new $args{lc}_as;
 
 	return as_value(obj.get()); // will keep alive
 }
@@ -242,8 +242,8 @@ sub accept_arguments {
     delete $args{help};
 
     ## Output files should not already exist.
-    $args{headerfile} = "$args{class}.h";
-    $args{cppfile}    = "$args{class}.cpp";
+    $args{headerfile} = "$args{class}_as.h";
+    $args{cppfile}    = "$args{class}_as.cpp";
     unless($args{force}) {
         die "$args{headerfile} exists!  Aborting.\n" if (-e $args{headerfile});
         die "$args{cppfile} exists!  Aborting.\n" if (-e $args{cppfile});
@@ -268,7 +268,7 @@ sub process_arguments {
     %args = (%args, %{parse_notefile(%args)});
 
     ## Add some extra variables we'll use often
-    $args{lc} = lc($args{class});
+    $args{lc} = $args{class};
     $args{up} = uc($args{class});
 
     return \%args;
