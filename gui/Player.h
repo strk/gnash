@@ -133,7 +133,7 @@ public:
 	    _startFullscreen = x;
 	}
 
-    void setAudioDumpfile(const char* filespec) {
+    void setAudioDumpfile(const std::string& filespec) {
         _audioDump = filespec;
     }
 	
@@ -230,7 +230,7 @@ private:
 	bool _startFullscreen;
 
     // The filename to use for dumping audio.
-    const char* _audioDump;
+    std::string _audioDump;
 
 };
 

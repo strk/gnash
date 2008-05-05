@@ -336,17 +336,17 @@ private:
 	void delete_all_sounds();
 
 	/// File name for dump file
-	char* file_output;
+	std::string file_output;
 
         /// File stream for dump file
-	std::ofstream* file_stream;
+	std::ofstream file_stream;
 
 	// write a .WAV file header
-	void write_wave_header(std::ofstream *outfile);
+	void write_wave_header(std::ofstream& outfile);
 
 public:
 	SDL_sound_handler();
-	SDL_sound_handler(char* wave_file);
+	SDL_sound_handler(const std::string& wave_file);
 	~SDL_sound_handler();
 
 	/// Called to create a sound.

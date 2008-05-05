@@ -133,7 +133,7 @@ cout << _("Usage: gnash [options] movie_file.swf") << endl
     << _("  CTRL-] or kp+   Step forward one frame") << endl
 #endif
 
-	<< _("  CTRL-L                   Force immediate redraw") << endl
+    << _("  CTRL-L                   Force immediate redraw") << endl
 
 //    << _("  CTRL-A          Toggle antialiasing (doesn't work)") << endl
 //    << _("  CTRL-T          Debug.  Test the set_variable() function") << endl
@@ -209,7 +209,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
     };
 
     Arg_parser parser(argc, argv, opts);
-    if( ! parser.error().empty() )	
+    if( ! parser.error().empty() )    
     {
         cout << parser.error() << endl;
         exit(EXIT_FAILURE);
@@ -240,7 +240,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                 case 'V':
                     version_and_copyright();
                     build_options();
-                    exit(EXIT_SUCCESS);	      
+                    exit(EXIT_SUCCESS);          
                 case 'w':
                     rcfile.useWriteLog(true); // dbglogfile.setWriteDisk(true);
                     log_debug(_("Logging to disk enabled"));
@@ -277,7 +277,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                     url = parser.argument(i);
                     log_debug (_("Setting root URL to %s"), url.c_str());
                     break;
-                case 'U':	// Set base URL
+                case 'U':    // Set base URL
                     player.setBaseUrl(parser.argument(i));
                     log_debug (_("Setting base URL to %s"), parser.argument(i));
                     break;
@@ -286,8 +286,8 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                     int fd = parser.argument<long>(i);
                     if ( fd < 1 )
                     {
-	                    cerr << boost::format(_("Invalid host communication filedescriptor %d\n")) % fd << endl;
-	                    exit(EXIT_FAILURE);
+                        cerr << boost::format(_("Invalid host communication filedescriptor %d\n")) % fd << endl;
+                        exit(EXIT_FAILURE);
                     }
                     player.setHostFD ( fd );
                     break;
@@ -295,7 +295,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                 case 'j':
                     widthGiven = true;
                     player.setWidth ( parser.argument<long>(i));
-                    log_debug (_("Setting width to " SIZET_FMT), player.getWidth());
+                    log_debug (_("Setting width to %d"), player.getWidth());
                     break;
                 case 'g':
 #ifdef USE_DEBUGGER
@@ -311,7 +311,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                 case 'k':
                     heightGiven = true;
                     player.setHeight ( parser.argument<long>(i));
-                    log_debug (_("Setting height to " SIZET_FMT), player.getHeight());
+                    log_debug (_("Setting height to %d"), player.getHeight());
                     break;
                 case 'x':
                     plugin = true;
@@ -354,46 +354,46 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                     break;
                 case 'f':
 #ifdef GNASH_FPS_DEBUG
-	                player.setFpsPrintTime(parser.argument<float>(i));
+                    player.setFpsPrintTime(parser.argument<float>(i));
 #else
-	                cout << _("FPS debugging disabled at compile time, -f is invalid") << endl;
-	                exit(EXIT_FAILURE);
+                    cout << _("FPS debugging disabled at compile time, -f is invalid") << endl;
+                    exit(EXIT_FAILURE);
 #endif // ndef GNASH_FPS_DEBUG
-	                break;
+                    break;
                 case 'P':
                 {
-	                std::string param = parser.argument(i);
-	                size_t eq = param.find("=");
-	                std::string name, value;
-	                if ( eq == std::string::npos )
-	                {
-		                name = param;
-		                value = "true";
-	                }
-	                else
-	                {
-		                name = param.substr(0, eq);
-		                value = param.substr(eq + 1);
-	                }
-              		player.setParam(name, value);
-	                break;
-	        }
-	        case 0:
-	            infiles.push_back(parser.argument(i));
-	            break;
+                    std::string param = parser.argument(i);
+                    size_t eq = param.find("=");
+                    std::string name, value;
+                    if ( eq == std::string::npos )
+                    {
+                        name = param;
+                        value = "true";
+                    }
+                    else
+                    {
+                        name = param.substr(0, eq);
+                        value = param.substr(eq + 1);
+                    }
+                      player.setParam(name, value);
+                    break;
+                }
                 case 'A':
                 {
                     std::string fn = parser.argument(i);
-                    player.setAudioDumpfile(fn.c_str());
+                    player.setAudioDumpfile(fn);
                     break;
                 }
-	    }
+                case 0:
+                    infiles.push_back(parser.argument(i));
+                    break;
+            }
         }
-	catch (Arg_parser::ArgParserException &e)
-	{
-	    cerr << _("Error parsing command line options: ") << e.what() << endl;
-	    cerr << _("This is a Gnash bug.") << endl;
-	}
+        catch (Arg_parser::ArgParserException &e)
+        {
+            cerr << _("Error parsing command line options: ") << e.what() << endl;
+            cerr << _("This is a Gnash bug.") << endl;
+        }
     }
 
     if ( ! renderflag ) {
@@ -406,7 +406,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
     }
 
     if (plugin && heightGiven && widthGiven
-	&& !player.getHeight() && !player.getWidth()) {
+    && !player.getHeight() && !player.getWidth()) {
             // We were given dimensions of 0x0 to render to (probably the plugin
             // is playing an "invisible" movie. Disable video rendering.
             player.setDoRender(false);
@@ -417,34 +417,34 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
 int
 gnash_main(int argc, char *argv[])
 {
-	gnash::Player player;
+    gnash::Player player;
 
-	// Enable native language support, i.e. internationalization
+    // Enable native language support, i.e. internationalization
 #ifdef ENABLE_NLS
-	setlocale (LC_ALL, "");
-	bindtextdomain (PACKAGE, LOCALEDIR);
-	textdomain (PACKAGE);
+    setlocale (LC_ALL, "");
+    bindtextdomain (PACKAGE, LOCALEDIR);
+    textdomain (PACKAGE);
 #endif
-	//rcfile.loadFiles();
+    //rcfile.loadFiles();
 
-	try { parseCommandLine(argc, argv, player); }
-	catch (const std::exception& ex)
-	{
-		cerr << ex.what() << endl;
-		exit(EXIT_FAILURE);
-	}
-	catch (...)
-	{
-		cerr << _("Exception thrown during parseCommandLine") << endl;
-		exit(EXIT_FAILURE);
-	}
+    try { parseCommandLine(argc, argv, player); }
+    catch (const std::exception& ex)
+    {
+        cerr << ex.what() << endl;
+        exit(EXIT_FAILURE);
+    }
+    catch (...)
+    {
+        cerr << _("Exception thrown during parseCommandLine") << endl;
+        exit(EXIT_FAILURE);
+    }
 
-	// No file name was supplied
-	if (infiles.empty()) {
-	    cerr << _("Error: no input file was specified. Exiting.") << endl;
-	    usage();
-	    return EXIT_FAILURE;
-	}
+    // No file name was supplied
+    if (infiles.empty()) {
+        cerr << _("Error: no input file was specified. Exiting.") << endl;
+        usage();
+        return EXIT_FAILURE;
+    }
 
-	return player.run(argc, argv, infiles.front().c_str(), url.c_str());
+    return player.run(argc, argv, infiles.front().c_str(), url.c_str());
 }

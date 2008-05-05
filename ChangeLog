@@ -1,3 +1,10 @@
+2008-05-05 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* gui/Player.{cpp,h}, gui/gnash.cpp, libmedia/sound_handler.h,
+	  libmedia/sound_handler_sdl.{h,cpp}: don't cast from string
+	  to const char* to char*; pass std::string by const ref, store
+	  as string in SDL_sound_handler. Don't heap-allocate ofstream.
+
 2008-05-05 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/gen-asclass.pl: getClassInterface MUST return a static

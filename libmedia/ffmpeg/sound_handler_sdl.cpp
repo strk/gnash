@@ -47,10 +47,11 @@
 namespace gnash {
 namespace media {
 
-SDL_sound_handler::SDL_sound_handler(char* wave_file)
+SDL_sound_handler::SDL_sound_handler(const std::string& wave_file)
 	: soundOpened(false),
 	  soundsPlaying(0),
-	  muted(false)
+	  muted(false),
+	  file_stream(NULL)
 {
 	// This is our sound settings
 	audioSpec.freq = 44100;
@@ -60,14 +61,10 @@ SDL_sound_handler::SDL_sound_handler(char* wave_file)
 	audioSpec.userdata = this;
 	audioSpec.samples = 2048;		//512 - not enough for  videostream
 
-        file_output = NULL;
-        file_stream = NULL;
-
-	if (wave_file != NULL) {
+	if (!wave_file.empty()) {
             file_output = wave_file;
-	    file_stream = new std::ofstream();
-	    file_stream->open(file_output);
-	    if (file_stream->fail()) {
+	    file_stream.open(file_output.c_str());
+	    if (file_stream.fail()) {
                 std::cerr << "Unable to write file '" << file_output << "'\n";
                 exit(1);
 	    } else {
@@ -107,9 +104,7 @@ SDL_sound_handler::~SDL_sound_handler()
 {
 	delete_all_sounds();
 	if (soundOpened) SDL_CloseAudio();
-	if ((file_stream != NULL) && (file_stream->is_open())) {
-	  file_stream->close();
-	}
+	if (file_stream) file_stream.close();
 
 }
 
@@ -541,7 +536,7 @@ create_sound_handler_sdl()
 }
 
 sound_handler*
-create_sound_handler_sdl(char* wave_file)
+create_sound_handler_sdl(const std::string& wave_file)
 // Factory.
 {
 	return new SDL_sound_handler(wave_file);
@@ -664,7 +659,7 @@ do_mixing(Uint8* stream, active_sound* sound, Uint8* data, unsigned int mix_leng
 
 
 // write a wave header, using the current audioSpec settings
-void SDL_sound_handler::write_wave_header(std::ofstream *outfile)
+void SDL_sound_handler::write_wave_header(std::ofstream& outfile)
 {
 
   int i;
@@ -705,10 +700,10 @@ void SDL_sound_handler::write_wave_header(std::ofstream *outfile)
   chk->dLen = 0;
  
   /* write riff/wav header */
-  outfile->write((char *)wav,sizeof(WAV_HDR));
+  outfile.write((char *)wav,sizeof(WAV_HDR));
  
   /* write chunk header */
-  outfile->write((char *)chk,sizeof(CHUNK_HDR));
+  outfile.write((char *)chk,sizeof(CHUNK_HDR));
  
   // be polite
   if(wav!=NULL) delete wav;
@@ -905,8 +900,8 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 	// 
 	// WRITE CONTENTS OF stream TO FILE
 	//
-	if (handler->file_stream != NULL) {
-            handler->file_stream->write((char*) stream, buffer_length_in);
+	if (handler->file_stream) {
+            handler->file_stream.write((char*) stream, buffer_length_in);
             // now, mute all audio
             memset ((void*) stream, 0, buffer_length_in);
 	}
