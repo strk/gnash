@@ -1177,13 +1177,19 @@ public:
       const Path<float>& this_path = paths[pno];
       agg::path_storage& new_path = dest[pno];
       
-      bool hinting=false, closed=false;
+      bool hinting=false, closed=false, hairline=false;
       
       if (this_path.m_line) {
         const line_style& lstyle = line_styles[this_path.m_line-1];
         
         hinting = lstyle.doPixelHinting();
         closed = this_path.isClosed() && !lstyle.noClose();
+        
+        // check if this line is a hairline ON SCREEN
+        // TODO: we currently only check for hairlines per definiton, not
+        // for thin lines that become hair lines due to scaling
+        if (lstyle.getThickness()<=20)
+          hairline = true;
       }
       
       float prev_ax = this_path.ap.x;
@@ -1204,11 +1210,11 @@ public:
         float this_ax = this_edge.ap.x;  
         float this_ay = this_edge.ap.y;  
         
-        if (hinting && this_edge.is_straight()) {
+        if (hinting || this_edge.is_straight()) {
         
           // candidate for alignment?
-          bool align_x = prev_ax == this_ax;
-          bool align_y = prev_ay == this_ay;
+          bool align_x = hinting || (hairline && (prev_ax == this_ax));
+          bool align_y = hinting || (hairline && (prev_ay == this_ay));
           
           if (align_x) 
             this_ax = round(this_ax);
