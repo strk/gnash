@@ -105,7 +105,8 @@ construct_object(as_function* ctor_as_func,
 
 static void unsupported_action_handler(ActionExec& thread)
 {
-	log_error(_("Unsupported action handler invoked, code at pc is %x"), thread.code[thread.pc]);
+	log_error(_("Unsupported action handler invoked, code at pc is %#x"),
+	        static_cast<int>(thread.code[thread.pc]));
 }
 
 ActionHandler::ActionHandler()

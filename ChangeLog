@@ -1,5 +1,10 @@
 2008-05-06 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* server/vm/ASHandlers.cpp (unsupported_action_handler): fix
+	  the silly debugging message.
+
+2008-05-06 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* server/swf/tag_loaders.cpp: ensureBytes - doesn't fix any known
 	  bug, but is good for robustness.
 	* server/stream.{h,cpp}: move ensureBytes implementation to
