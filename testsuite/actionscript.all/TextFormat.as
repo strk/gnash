@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: TextFormat.as,v 1.3 2008/04/11 12:08:39 strk Exp $";
+rcsid="$Id: TextFormat.as,v 1.4 2008/05/06 11:21:02 bwy Exp $";
 
 #include "check.as"
 
@@ -60,7 +60,7 @@ check(tfObj.hasOwnProperty('getTextExtent'));
 // are all of the 'null' type.
 xcheck_equals(typeof(tfObj.display), 'string');
 xcheck_equals(tfObj.display, 'block');
-xcheck_equals(typeof(tfObj.bullet), 'null');
+check_equals(typeof(tfObj.bullet), 'null');
 xcheck_equals(typeof(tfObj.tabStops), 'null');
 check_equals(typeof(tfObj.blockIndent), 'null');
 check_equals(typeof(tfObj.leading), 'null');
@@ -82,7 +82,7 @@ check_equals(typeof(tfObj.getTextExtent), 'function');
 tfObj = new TextFormat("fname", 2, 30, true, false, true, 'http', 'tgt', 'cEnter', '23', '32', 12, 4);
 xcheck_equals(typeof(tfObj.display), 'string');
 xcheck_equals(tfObj.display, 'block');
-xcheck_equals(typeof(tfObj.bullet), 'null');
+check_equals(typeof(tfObj.bullet), 'null');
 xcheck_equals(typeof(tfObj.tabStops), 'null');
 check_equals(typeof(tfObj.blockIndent), 'null');
 check_equals(tfObj.leading, 4);

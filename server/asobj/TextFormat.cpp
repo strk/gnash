@@ -108,21 +108,49 @@ textformat_new(const fn_call& fn)
 	//GNASH_REPORT_FUNCTION;
 
 	boost::intrusive_ptr<TextFormat> tf = new TextFormat;
-	if ( fn.nargs > 0  ) {	tf->fontSet(fn.arg(0).to_string());
-	if ( fn.nargs > 1  ) {	tf->sizeSet(PIXELS_TO_TWIPS(fn.arg(1).to_int()));
-	if ( fn.nargs > 2  ) {	rgba col; col.parseRGB(fn.arg(2).to_int()); tf->colorSet(col); 
-	if ( fn.nargs > 3  ) {	tf->boldSet(fn.arg(3).to_bool()); 
-	if ( fn.nargs > 4  ) {	tf->italicedSet(fn.arg(4).to_bool()); 
-	if ( fn.nargs > 5  ) {	tf->underlinedSet(fn.arg(5).to_bool()); 
-	if ( fn.nargs > 6  ) {	tf->urlSet(fn.arg(6).to_string()); 
-	if ( fn.nargs > 7  ) {	tf->targetSet(fn.arg(7).to_string()); 
-	if ( fn.nargs > 8  ) {	tf->alignSet(fn.arg(8).to_string());
-	if ( fn.nargs > 9  ) {	tf->leftMarginSet(PIXELS_TO_TWIPS(fn.arg(9).to_int()));
-	if ( fn.nargs > 10 ) {	tf->rightMarginSet(PIXELS_TO_TWIPS(fn.arg(10).to_int()));
-	if ( fn.nargs > 11 ) {	tf->indentSet(PIXELS_TO_TWIPS(fn.arg(11).to_int()));
-	if ( fn.nargs > 12 ) {	tf->leadingSet(PIXELS_TO_TWIPS(fn.arg(12).to_int()));
-	}}}}}}}}}}}}}
-
+	
+	const unsigned int args = fn.nargs;
+	
+	switch (args)
+	{
+	    default:
+	        log_error(_("Too many args (%d) passed to TextFormat"), args);
+	    case 13:
+	        tf->leadingSet(PIXELS_TO_TWIPS(fn.arg(12).to_int()));
+	    case 12:
+	        tf->indentSet(PIXELS_TO_TWIPS(fn.arg(11).to_int()));
+	    case 11:
+	        tf->rightMarginSet(PIXELS_TO_TWIPS(fn.arg(10).to_int()));
+	    case 10:
+	        tf->leftMarginSet(PIXELS_TO_TWIPS(fn.arg(9).to_int()));
+	    case 9:
+	        tf->alignSet(fn.arg(8).to_string());
+	    case 8:
+	        tf->targetSet(fn.arg(7).to_string());
+	    case 7:
+	        tf->urlSet(fn.arg(6).to_string());
+	    case 6:
+	        tf->underlinedSet(fn.arg(5).to_bool());
+	    case 5:
+	        tf->italicedSet(fn.arg(4).to_bool());
+	    case 4:
+	        tf->boldSet(fn.arg(3).to_bool());
+	    case 3:
+	    {
+	        rgba col;
+	        col.parseRGB(fn.arg(2).to_int());
+	        tf->colorSet(col);
+	    }
+	    case 2:
+	        tf->sizeSet(PIXELS_TO_TWIPS(fn.arg(1).to_int()));
+	    case 1:
+	        tf->fontSet(fn.arg(0).to_string());
+	        break;
+	    case 0:
+	        // What happens here?
+	        break;
+	}
+	
 	return as_value(tf.get());
 }
 
@@ -134,10 +162,27 @@ TextFormat::display_getset(const fn_call& /*fn*/)
 }
 
 as_value
-TextFormat::bullet_getset(const fn_call& /*fn*/)
+TextFormat::bullet_getset(const fn_call& fn)
 {
-	LOG_ONCE( log_unimpl("TextField.bullet") );
-	return as_value();
+    // Has the right return values, but not properly implemented
+	LOG_ONCE( log_unimpl("TextFormat.bullet") );
+
+	boost::intrusive_ptr<TextFormat> ptr = ensureType<TextFormat>(fn.this_ptr);
+
+	as_value ret;
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		if ( ptr->bulletDefined() ) ret.set_bool(ptr->bullet());
+		else ret.set_null();
+	}
+	else // setter
+	{
+	    // Boolean
+		ptr->bulletSet(fn.arg(0).to_bool());
+	}
+
+	return ret;
 }
 
 as_value

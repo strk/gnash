@@ -1,5 +1,14 @@
 2008-05-06 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* server/asobj/TextFormat.cpp: use LOG_ONCE more, fix return
+	  values for bullet (not implemented). Use a switch for variable
+	  nargs.
+	* server/edit_text_character.cpp: use LOG_ONCE.
+	* testsuite/actionscript.all/TextFormat.as: bullet returns
+	  correct values.
+
+2008-05-06 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* server/namedStrings{h,cpp}, server/asobj/ClassHierarchy.cpp:
 	  support loading TextFormat on demand.
 	* server/asobj/Global.cpp: load TextFormat on demand, use LOG_ONCE,

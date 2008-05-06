@@ -155,11 +155,7 @@ textfield_getNewTextFormat(const fn_call& fn)
 	boost::intrusive_ptr<edit_text_character> text = ensureType<edit_text_character>(fn.this_ptr);
 	UNUSED(text);
 
-	static bool warned = false;
-	if ( ! warned ) {
-		log_unimpl("TextField.getNewTextFormat()");
-		warned = true;
-	}
+	LOG_ONCE(log_unimpl("TextField.getNewTextFormat()"));
 
 	return as_value();
 }
