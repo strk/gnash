@@ -187,7 +187,7 @@ FBGui::~FBGui()
   
   if (fd>0) {
     enable_terminal();
-    log_debug("Closing framebuffer device\n");
+    log_debug(_("Closing framebuffer device"));
     close(fd);
   }
   
@@ -195,7 +195,7 @@ FBGui::~FBGui()
 
   #ifdef DOUBLE_BUFFER
   if (buffer) {
-    log_debug("Free'ing offscreen buffer\n");
+    log_debug(_("Free'ing offscreen buffer"));
     free(buffer);
   }
   #endif
@@ -209,7 +209,7 @@ bool FBGui::set_grayscale_lut8()
   struct fb_cmap cmap;
   int i;
 
-  log_debug("LUT8: Setting up colormap\n");
+  log_debug(_("LUT8: Setting up colormap"));
 
   cmap.start=0;
   cmap.len=256;
@@ -231,7 +231,7 @@ bool FBGui::set_grayscale_lut8()
   }
 
   if (ioctl(fd, FBIOPUTCMAP, &cmap)) {
-    log_error("LUT8: Error setting colormap: %s\n", strerror(errno));
+    log_error(_("LUT8: Error setting colormap: %s"), strerror(errno));
     return false;
   }
 
@@ -247,12 +247,12 @@ bool FBGui::init(int /*argc*/, char *** /*argv*/)
   // Initialize mouse (don't abort if no mouse found)
   if (!init_mouse()) {
     // just report to the user, keep on going...
-    log_debug("You won't have any pointing input device, sorry.");
+    log_debug(_("You won't have any pointing input device, sorry."));
   }
   
   // Initialize keyboard (still not critical)
   if (!init_keyboard()) {   
-    log_debug("You won't have any keyboard input device, sorry.");
+    log_debug(_("You won't have any keyboard input device, sorry."));
   }
 
   // Open the framebuffer device
@@ -265,9 +265,9 @@ bool FBGui::init(int /*argc*/, char *** /*argv*/)
   // Load framebuffer properties
   ioctl(fd, FBIOGET_VSCREENINFO, &var_screeninfo);
   ioctl(fd, FBIOGET_FSCREENINFO, &fix_screeninfo);
-  log_debug("Framebuffer device uses %d bytes of memory.\n",
+  log_debug(_("Framebuffer device uses %d bytes of memory."),
     fix_screeninfo.smem_len);
-  log_debug("Video mode: %dx%d with %d bits per pixel.\n",
+  log_debug(_("Video mode: %dx%d with %d bits per pixel."),
     var_screeninfo.xres, var_screeninfo.yres, var_screeninfo.bits_per_pixel);
 
   // map framebuffer into memory
@@ -307,10 +307,10 @@ bool FBGui::initialize_renderer() {
     
   
   #ifdef DOUBLE_BUFFER
-  log_debug("Double buffering enabled");
+  log_debug(_("Double buffering enabled"));
   _mem = buffer;
   #else
-  log_debug("Double buffering disabled");
+  log_debug(_("Double buffering disabled"));
   _mem = fbmem;
   #endif
   
@@ -319,13 +319,13 @@ bool FBGui::initialize_renderer() {
   
   // choose apropriate pixel format
   
-  log_debug("red channel: %d / %d", var_screeninfo.red.offset, 
+  log_debug(_("red channel: %d / %d"), var_screeninfo.red.offset, 
     var_screeninfo.red.length);
-  log_debug("green channel: %d / %d", var_screeninfo.green.offset, 
+  log_debug(_("green channel: %d / %d"), var_screeninfo.green.offset, 
     var_screeninfo.green.length);
-  log_debug("blue channel: %d / %d", var_screeninfo.blue.offset, 
+  log_debug(_("blue channel: %d / %d"), var_screeninfo.blue.offset, 
     var_screeninfo.blue.length);
-  log_debug("Total bits per pixel: %d", var_screeninfo.bits_per_pixel);
+  log_debug(_("Total bits per pixel: %d"), var_screeninfo.bits_per_pixel);
   
   const char* pixelformat = agg_detect_pixel_format(
     var_screeninfo.red.offset, var_screeninfo.red.length,
@@ -564,7 +564,7 @@ bool FBGui::disable_terminal()
   int fd;
   
   if (!tty) {
-    log_debug("WARNING: Could not detect controlling TTY");
+    log_debug(_("WARNING: Could not detect controlling TTY"));
     return false;
   }
   
@@ -574,53 +574,53 @@ bool FBGui::disable_terminal()
   
   fd = open(tty, O_RDWR);
   if (fd<0) {
-    log_debug("WARNING: Could not open %s", tty);
+    log_debug(_("WARNING: Could not open %s"), tty);
     return false;
   }
   
   if (ioctl(fd, VT_GETSTATE, &vts) == -1) {
-    log_debug("WARNING: Could not get current VT state");
+    log_debug(_("WARNING: Could not get current VT state"));
     close(fd);
     return false;
   }
     
   original_vt = vts.v_active;
-  log_debug("Original TTY NO = %d", original_vt);   
+  log_debug(_("Original TTY NO = %d"), original_vt);   
   
 #ifdef REQUEST_NEW_VT
 
   // Request a new VT number
   if (ioctl(fd, VT_OPENQRY, &own_vt) == -1) {
-    log_debug("WARNING: Could not request a new VT");
+    log_debug(_("WARNING: Could not request a new VT"));
     close(fd);
     return false;
   }
   
-  log_debug("Own TTY NO = %d", own_vt);
+  log_debug(_("Own TTY NO = %d"), own_vt);
   
   close(fd);
   
   // Activate our new VT
   tty = find_accessible_tty(own_vt);
   if (!tty) {
-    log_debug("WARNING: Could not find device for VT number %d", own_vt);
+    log_debug(_("WARNING: Could not find device for VT number %d"), own_vt);
     return false;
   }
   
   fd = open(tty, O_RDWR);
   if (fd<0) {
-    log_debug("WARNING: Could not open %s", tty);
+    log_debug(_("WARNING: Could not open %s"), tty);
     return false;
   }
   
   if (ioctl(fd, VT_ACTIVATE, own_vt) == -1) {
-    log_debug("WARNING: Could not activate VT number %d", own_vt);
+    log_debug(_("WARNING: Could not activate VT number %d"), own_vt);
     close(fd);
     return false;
   }
   
   if (ioctl(fd, VT_WAITACTIVE, own_vt) == -1) {
-    log_debug("WARNING: Error waiting for VT %d becoming active", own_vt);
+    log_debug(_("WARNING: Error waiting for VT %d becoming active"), own_vt);
     //close(tty);
     //return false;   don't abort
   }
@@ -634,13 +634,13 @@ bool FBGui::disable_terminal()
   // Activate our new VT
   tty = find_accessible_tty(own_vt);
   if (!tty) {
-    log_debug("WARNING: Could not find device for VT number %d", own_vt);
+    log_debug(_("WARNING: Could not find device for VT number %d"), own_vt);
     return false;
   }
   
   fd = open(tty, O_RDWR);
   if (fd<0) {
-    log_debug("WARNING: Could not open %s", tty);
+    log_debug(_("WARNING: Could not open %s"), tty);
     return false;
   }
   
@@ -648,7 +648,7 @@ bool FBGui::disable_terminal()
   // Become session leader and attach to terminal
   setsid();
   if (ioctl(fd, TIOCSCTTY, 0) == -1) {
-    log_debug("WARNING: Could not attach controlling terminal (%s)", tty);
+    log_debug(_("WARNING: Could not attach controlling terminal (%s)"), tty);
   }
   */
   
@@ -658,16 +658,16 @@ bool FBGui::disable_terminal()
   // Disable keyboard cursor
   
   if (ioctl(fd, KDGETMODE, &original_kd) == -1) {
-    log_debug("WARNING: Could not query current keyboard mode on VT");
+    log_debug(_("WARNING: Could not query current keyboard mode on VT"));
   }
 
   if (ioctl(fd, KDSETMODE, KD_GRAPHICS) == -1) {
-    log_debug("WARNING: Could not switch to graphics mode on new VT");
+    log_debug(_("WARNING: Could not switch to graphics mode on new VT"));
   }
    
   close(fd);
   
-  log_debug("VT %d ready", own_vt);
+  log_debug(_("VT %d ready"), own_vt);
   
   
   // NOTE: We could also implement virtual console switching by using 
@@ -680,28 +680,28 @@ bool FBGui::disable_terminal()
 bool FBGui::enable_terminal() 
 {
 
-  log_debug("Restoring terminal...");
+  log_debug(_("Restoring terminal..."));
 
   char* tty = find_accessible_tty(own_vt);
   if (!tty) {
-    log_debug("WARNING: Could not find device for VT number %d", own_vt);
+    log_debug(_("WARNING: Could not find device for VT number %d"), own_vt);
     return false;
   }
 
   int fd = open(tty, O_RDWR);
   if (fd<0) {
-    log_debug("WARNING: Could not open %s", tty);
+    log_debug(_("WARNING: Could not open %s"), tty);
     return false;
   }
 
   if (ioctl(fd, VT_ACTIVATE, original_vt)) {
-    log_debug("WARNING: Could not activate VT number %d", original_vt);
+    log_debug(_("WARNING: Could not activate VT number %d"), original_vt);
     close(fd);
     return false;
   }
 
   if (ioctl(fd, VT_WAITACTIVE, original_vt)) {
-    log_debug("WARNING: Error waiting for VT %d becoming active", original_vt);
+    log_debug(_("WARNING: Error waiting for VT %d becoming active"), original_vt);
     //close(tty);
     //return false;   don't abort
   }
@@ -711,7 +711,7 @@ bool FBGui::enable_terminal()
   // Restore keyboard
   
   if (ioctl(fd, KDSETMODE, original_kd)) {
-    log_debug("WARNING: Could not restore keyboard mode");
+    log_debug(_("WARNING: Could not restore keyboard mode"));
   }  
   
   close(fd);
@@ -755,7 +755,7 @@ bool FBGui::mouse_command(unsigned char cmd, unsigned char *buf, int count) {
   do {
     n = read(input_fd, trash, sizeof trash);
     if (n>0) 
-      log_debug("mouse_command: discarded %d bytes from input buffer", n);
+      log_debug(_("mouse_command: discarded %d bytes from input buffer"), n);
   } while (n>0);
   
   // send command
@@ -788,7 +788,7 @@ bool FBGui::init_mouse()
   input_fd = open(MOUSE_DEVICE, O_RDWR);
   
   if (input_fd<0) {
-    log_debug("Could not open " MOUSE_DEVICE ": %s", strerror(errno));    
+    log_debug(_("Could not open " MOUSE_DEVICE ": %s"), strerror(errno));    
     return false;
   }
   
@@ -806,7 +806,7 @@ bool FBGui::init_mouse()
   
   // Reset mouse
   if ((!mouse_command(0xFF, buf, 3)) || (buf[0]!=0xFA)) {
-    log_debug("Mouse reset failed");
+    log_debug(_("Mouse reset failed"));
     close(input_fd);
     input_fd=-1;
     return false; 
@@ -814,23 +814,23 @@ bool FBGui::init_mouse()
   
   // Get Device ID (not crucial, debug only)
   if ((!mouse_command(0xF2, buf, 2)) || (buf[0]!=0xFA)) {
-    log_debug("WARNING: Could not detect mouse device ID");
+    log_debug(_("WARNING: Could not detect mouse device ID"));
   } else {
     unsigned char devid = buf[1];
     if (devid!=0)
-      log_debug("WARNING: Non-standard mouse device ID %d", devid);
+      log_debug(_("WARNING: Non-standard mouse device ID %d"), devid);
   }
   
   // Enable mouse data reporting
   if ((!mouse_command(0xF4, &byte, 1)) || (byte!=0xFA)) {
-    log_debug("Could not activate Data Reporting mode for mouse");
+    log_debug(_("Could not activate Data Reporting mode for mouse"));
     close(input_fd);
     input_fd=-1;
     return false; 
   }
   
   
-  log_debug("Mouse enabled.");
+  log_debug(_("Mouse enabled."));
       
   mouse_x = 0;
   mouse_y = 0;
@@ -877,7 +877,7 @@ void FBGui::check_mouse()
     
     ymove *= -1; // vertical movement is upside-down
     
-    log_debug("x/y %d/%d btn %d", xmove, ymove, btn);
+    log_debug(_("x/y %d/%d btn %d"), xmove, ymove, btn);
 
     // movement    
     mouse_x += xmove;
@@ -888,7 +888,7 @@ void FBGui::check_mouse()
     if (mouse_x>m_stage_width) mouse_x=m_stage_width;
     if (mouse_y>m_stage_height) mouse_y=m_stage_height;
     
-    //log_debug("mouse @ %d / %d, btn %d", mouse_x, mouse_y, mouse_btn);
+    //log_debug(_("mouse @ %d / %d, btn %d"), mouse_x, mouse_y, mouse_btn);
     
     notify_mouse_moved(mouse_x, mouse_y);
     
@@ -897,7 +897,7 @@ void FBGui::check_mouse()
       mouse_btn = btn;
       
       notify_mouse_clicked(btn, 1);  // mark=??
-      //log_debug("mouse click! %d", btn);
+      //log_debug(_("mouse click! %d"), btn);
     }    
 
     // remove from buffer
@@ -918,7 +918,7 @@ bool FBGui::init_mouse()
   input_fd = open(MOUSE_DEVICE, O_RDWR);
   
   if (input_fd<0) {
-    log_debug("Could not open " MOUSE_DEVICE ": %s", strerror(errno));    
+    log_debug(_("Could not open " MOUSE_DEVICE ": %s"), strerror(errno));    
     return false;
   }
   
@@ -936,7 +936,7 @@ bool FBGui::init_mouse()
   
   mouse_buf_size=0;
   
-  log_debug("Touchpad enabled.");
+  log_debug(_("Touchpad enabled."));
   return true;
 } 
 #endif
@@ -1024,14 +1024,14 @@ bool FBGui::init_mouse()
   input_fd = open(dev.c_str(), O_RDONLY);
   
   if (input_fd<0) {
-    log_debug("Could not open %s: %s", dev.c_str(), strerror(errno));    
+    log_debug(_("Could not open %s: %s"), dev.c_str(), strerror(errno));    
     return false;
   }
   
-  log_debug("Pointing device %s open", dev.c_str());
+  log_debug(_("Pointing device %s open"), dev.c_str());
   
   if (fcntl(input_fd, F_SETFL, fcntl(input_fd, F_GETFL) | O_NONBLOCK)<0) {
-    log_error("Could not set non-blocking mode for pointing device: %s", strerror(errno));
+    log_error(_("Could not set non-blocking mode for pointing device: %s"), strerror(errno));
     close(input_fd);
     input_fd=-1;
     return false; 
@@ -1114,15 +1114,15 @@ void FBGui::apply_ts_calibration(float* cx, float* cy, int rawx, int rawy) {
       } while (0);
       
       if (!ok)
-        log_debug("WARNING: Error parsing calibration data!");
+        log_debug(_("WARNING: Error parsing calibration data!"));
       
-      log_debug("Using touchscreen calibration data: %.0f / %.0f / %.0f / %.0f",
+      log_debug(_("Using touchscreen calibration data: %.0f / %.0f / %.0f / %.0f"),
         cal1x, cal1y, cal2x, cal2y);
     
     } else {
-      log_debug("WARNING: No touchscreen calibration settings found. "
+      log_debug(_("WARNING: No touchscreen calibration settings found. "
         "The mouse pointer most probably won't work precisely. Set "
-        "TSCALIB environment variable with correct values for better results");
+        "TSCALIB environment variable with correct values for better results"));
     }
     
   } //!initialized
@@ -1241,14 +1241,14 @@ bool FBGui::init_keyboard()
   keyb_fd = open(dev.c_str(), O_RDONLY);
   
   if (keyb_fd<0) {
-    log_debug("Could not open %s: %s", dev.c_str(), strerror(errno));    
+    log_debug(_("Could not open %s: %s"), dev.c_str(), strerror(errno));    
     return false;
   }
   
-  log_debug("Keyboard device %s open", dev.c_str());
+  log_debug(_("Keyboard device %s open"), dev.c_str());
   
   if (fcntl(keyb_fd, F_SETFL, fcntl(keyb_fd, F_GETFL) | O_NONBLOCK)<0) {
-    log_error("Could not set non-blocking mode for keyboard device: %s", strerror(errno));
+    log_error(_("Could not set non-blocking mode for keyboard device: %s"), strerror(errno));
     close(keyb_fd);
     keyb_fd=-1;
     return false; 

@@ -1,5 +1,9 @@
 2008-05-06 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* gui/fb.cpp: internationalization.
+
+2008-05-06 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* server/asobj/TextFormat.cpp: use LOG_ONCE more, fix return
 	  values for bullet (not implemented). Use a switch for variable
 	  nargs.
