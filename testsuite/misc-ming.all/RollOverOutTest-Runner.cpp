@@ -45,24 +45,19 @@ main(int /*argc*/, char** /*argv*/)
 	sprite_instance* root = tester.getRootMovie();
 	assert(root);
 
-	check_equals(root->get_frame_count(), 3);
+	check_equals(root->get_frame_count(), 4);
 	check_equals(root->get_play_state(), sprite_instance::PLAY);
 	check_equals(root->get_current_frame(), 0);
+
+	tester.advance();  // advance to the second frame.
 
 	const character* mc1 = tester.findDisplayItemByName(*root, "square1");
 	check(mc1);
 	const character* mc2 = tester.findDisplayItemByName(*root, "square2");
 	check(mc2);
-	check_equals(mc1->get_visible(), false);
-	check_equals(mc2->get_visible(), false);
-
-	tester.advance();
 
 	check_equals(mc1->get_visible(), true);
 	check_equals(mc2->get_visible(), false);
-
-	//check_equals(mc1->get_height(), 40*20);
-	//check_equals(mc1->get_width(), 40*20);
 	check_equals(root->get_play_state(), sprite_instance::STOP);
 	check_equals(root->get_current_frame(), 1);
 
@@ -71,11 +66,9 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(root->get_current_frame(), 1);
 	tester.advance();
 	check_equals(root->get_current_frame(), 1);
-	tester.advance();
-	check_equals(root->get_current_frame(), 1);
 
 	// roll over the middle of the square, this should trigger
-	// the addition of a goto_frame(2) action, which is executed
+	// the addition of a goto_frame(3) action, which is executed
 	// at advance() time.
 	tester.movePointerTo(60, 60);
 	tester.advance();
@@ -93,6 +86,18 @@ main(int /*argc*/, char** /*argv*/)
 	tester.movePointerTo(40, 60);
 	tester.advance();
 	check_equals(root->get_current_frame(), 2);
-
+	
+	// pointer out of the square.
+	tester.movePointerTo(300, 60);
+	//tester.advance();  // mouse event handler should drive the movie
+	check_equals(root->get_current_frame(), 1);
+	
+	// pointer back to the square again.
+	tester.movePointerTo(60, 60);
+	tester.click();
+	//tester.advance(); // mouse event handler should drive the movie
+	check_equals(root->get_current_frame(), 3);
 }
+
+
 
