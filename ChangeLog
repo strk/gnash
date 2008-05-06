@@ -1,4 +1,4 @@
-2008-05-0U Udo Giacomozzi <udo.gnu@nova-sys.net>
+2008-05-06 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* backend/render_handler_agg.cpp: fix doPixelHinting handling
 	  and improve pixel hinting generally
