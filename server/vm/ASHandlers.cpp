@@ -1514,7 +1514,7 @@ SWFHandlers::ActionFscommand2(ActionExec& thread)
 	thread.ensureStack(1); // nargs
 	unsigned int nargs = env.top(off++).to_int();
 
-	thread.ensureStack(nargs); // nargs, cmdname
+	thread.ensureStack(off+nargs+1); // nargs, cmdname, actual args
 	std::string cmd = env.top(off++).to_string();
 
 	std::stringstream ss;
@@ -1523,11 +1523,11 @@ SWFHandlers::ActionFscommand2(ActionExec& thread)
 	{
 		as_value arg = env.top(off++);
 		if ( i>1 ) ss << ", ";
-		ss << arg.to_debug_string();
+		ss << arg;
 	}
 	ss << ")";
 
-	log_unimpl("fscommand2:%s", ss.str().c_str());
+	LOG_ONCE( log_unimpl("fscommand2:%s", ss.str()) );
 
 	// TODO: check wheter or not we should drop anything from
 	//       the stack, some reports and the Canonical tests

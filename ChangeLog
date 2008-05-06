@@ -1,5 +1,10 @@
 2008-05-06 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ASHandlers.cpp (ActionFscommand2): fix ensureStack
+	  calls. Fixes bug #23181.
+
+2008-05-06 Sandro Santilli <strk@keybit.net>
+
 	* server/PropertyList.cpp (setValue): don't let prop flags
 	  prevent setting values of destructive properties.
 	  set_member doesn't use this function, so user-requested
