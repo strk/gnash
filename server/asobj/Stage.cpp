@@ -66,35 +66,16 @@ void registerStageNative(as_object& o)
 static void
 attachStageInterface(as_object& o)
 {
-	VM& vm = o.getVM();
+    const int version = o.getVM().getSWFVersion();
 
-    const int version = vm.getSWFVersion();
+    if ( version < 5 ) return;
 
-	if ( version < 5 ) return;
-
-    as_c_function_ptr getset;
-    
-    getset = stage_scalemode_getset;
-	o.init_property("scaleMode", getset, getset);
-
-	// Stage.align getter-setter
-    getset = stage_align_getset;
-	o.init_property("align", getset, getset);
-
-	// Stage.width getter-setter
-    getset = stage_width_getset;
-	o.init_property("width", getset, getset);
-
-	// Stage.height getter-setter
-    getset = stage_height_getset;
-	o.init_property("height", getset, getset);
-
-	// Stage.showMenu getter-setter
-    getset = stage_showMenu_getset;
-	o.init_property("showMenu", getset, getset);
-
-    getset = stage_displaystate_getset;
-	o.init_property("displayState", getset, getset);
+    o.init_property("scaleMode", &stage_scalemode_getset, &stage_scalemode_getset);
+    o.init_property("align", &stage_align_getset, &stage_align_getset);
+    o.init_property("width", &stage_width_getset, &stage_width_getset);
+    o.init_property("height", &stage_height_getset, &stage_height_getset);
+    o.init_property("showMenu", &stage_showMenu_getset, &stage_showMenu_getset);
+    o.init_property("displayState", &stage_displaystate_getset, &stage_displaystate_getset);
 
 }
 
@@ -193,7 +174,7 @@ stage_width_getset(const fn_call& fn)
 	if ( fn.nargs > 0 ) // setter
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("Stage.width is a read-only property!"));
+		    log_aserror(_("Stage.width is a read-only property!"));
 		);
 		return as_value();
 	}

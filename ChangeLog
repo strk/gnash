@@ -2,6 +2,7 @@
 
 	* server/asobj/TextFormat.{cpp,h}: register ASnative functions
 	  (not yet used).
+	* server/asobj/Stage.cpp: minor cleanups.
 
 2008-05-06 Sandro Santilli <strk@keybit.net>
 
