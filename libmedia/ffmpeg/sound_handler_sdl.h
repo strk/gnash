@@ -335,10 +335,7 @@ private:
 	// stop and delete all sounds
 	void delete_all_sounds();
 
-	/// File name for dump file
-	std::string file_output;
-
-        /// File stream for dump file
+    /// File stream for dump file
 	std::ofstream file_stream;
 
 	// write a .WAV file header

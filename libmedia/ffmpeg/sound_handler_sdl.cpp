@@ -47,11 +47,10 @@
 namespace gnash {
 namespace media {
 
-SDL_sound_handler::SDL_sound_handler(const std::string& wave_file)
+SDL_sound_handler::SDL_sound_handler(const std::string& wavefile)
 	: soundOpened(false),
 	  soundsPlaying(0),
-	  muted(false),
-	  file_stream(NULL)
+	  muted(false)
 {
 	// This is our sound settings
 	audioSpec.freq = 44100;
@@ -61,18 +60,17 @@ SDL_sound_handler::SDL_sound_handler(const std::string& wave_file)
 	audioSpec.userdata = this;
 	audioSpec.samples = 2048;		//512 - not enough for  videostream
 
-	if (!wave_file.empty()) {
-            file_output = wave_file;
-	    file_stream.open(file_output.c_str());
-	    if (file_stream.fail()) {
-                std::cerr << "Unable to write file '" << file_output << "'\n";
-                exit(1);
+	if (! wavefile.empty() ) {
+        file_stream.open(wavefile.c_str());
+        if (file_stream.fail()) {
+            std::cerr << "Unable to write file '" << wavefile << std::endl;
+            exit(1);
 	    } else {
                 write_wave_header(file_stream);
                 std::cout << "# Created 44100 16Mhz stereo wave file:" << std::endl <<
-                    "AUDIOFILE=" << file_output << std::endl;
-	    }
+                    "AUDIOFILE=" << wavefile << std::endl;
         }
+    }
 
 }
 

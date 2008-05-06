@@ -1,5 +1,11 @@
 2008-05-06 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* libmedia/ffmpeg/sound_handler_sdl.{h,cpp}: drop unnecessary
+	  file_output member. Don't initialize ofstream with NULL in the
+	  constructor (or indeed with anything).
+
+2008-05-06 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* gui/fb.cpp: internationalization.
 	* server/sprite_instance.cpp, server/URLAccessManager.cpp: i18n
 
