@@ -1,3 +1,14 @@
+2008-05-06 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/swf/tag_loaders.cpp: ensureBytes - doesn't fix any known
+	  bug, but is good for robustness.
+	* server/stream.{h,cpp}: move ensureBytes implementation to
+	  stream.cpp to make changing it less painful. Throw parser
+	  exception when seeking fails. Stops reading off the end of
+	  the stream, which was happening on certain malformed SWFs.
+	  Clean up logging. Use ensureBytes for open_tag too.
+	* server/parser/action_buffer.cpp: typo.
+
 2008-05-06 Sandro Santilli <strk@keybit.net>
 
 	* server/vm/ASHandlers.cpp (ActionFscommand2): fix ensureStack

@@ -99,7 +99,7 @@ action_buffer::read(stream& in, unsigned long endPos)
 	IF_VERBOSE_MALFORMED_SWF(
 	if ( m_buffer.back() != SWF::ACTION_END )
 	{
-		log_swferror(_("Action buffer starting at offset %lu doesn't end witn an END tag"),
+		log_swferror(_("Action buffer starting at offset %lu doesn't end with an END tag"),
 			startPos);
 	}
 	);

@@ -284,6 +284,7 @@ define_bits_jpeg_loader(stream* in, tag_type tag, movie_definition* m)
     assert(tag == SWF::DEFINEBITS); // 6
     assert(in);
 
+    in->ensureBytes(2);
     boost::uint16_t	character_id = in->read_u16();
 
     //
@@ -456,6 +457,7 @@ define_bits_jpeg3_loader(stream* in, tag_type tag, movie_definition* m)
 {
     assert(tag == SWF::DEFINEBITSJPEG3); // 35
 
+    in->ensureBytes(2);
     boost::uint16_t	character_id = in->read_u16();
 
     IF_VERBOSE_PARSE
@@ -464,6 +466,7 @@ define_bits_jpeg3_loader(stream* in, tag_type tag, movie_definition* m)
 		  character_id, in->get_position());
     );
 
+    in->ensureBytes(4);
     boost::uint32_t	jpeg_size = in->read_u32();
     boost::uint32_t	alpha_position = in->get_position() + jpeg_size;
 
@@ -789,6 +792,7 @@ void define_shape_loader(stream* in, tag_type tag, movie_definition* m)
 	   || tag == SWF::DEFINESHAPE3
 	   || tag == SWF::DEFINESHAPE4 || tag == SWF::DEFINESHAPE4_);
 
+    in->ensureBytes(2);
     boost::uint16_t	character_id = in->read_u16();
     IF_VERBOSE_PARSE
     (
@@ -807,6 +811,7 @@ void define_shape_morph_loader(stream* in, tag_type tag, movie_definition* m)
 		|| tag == SWF::DEFINEMORPHSHAPE2
 		|| tag == SWF::DEFINEMORPHSHAPE2_); 
 
+    in->ensureBytes(2);
     boost::uint16_t character_id = in->read_u16();
 
     IF_VERBOSE_PARSE
@@ -831,6 +836,7 @@ void	define_font_loader(stream* in, tag_type tag, movie_definition* m)
 	   || tag == SWF::DEFINEFONT2
 	   || tag == SWF::DEFINEFONT3 ); // 10 || 48 || 75
 
+    in->ensureBytes(2);
     boost::uint16_t font_id = in->read_u16();
 
     font* f = new font;
@@ -850,6 +856,7 @@ void	define_font_info_loader(stream* in, tag_type tag, movie_definition* m)
 {
     assert(tag == SWF::DEFINEFONTINFO || tag == SWF::DEFINEFONTINFO2);
 
+    in->ensureBytes(2);
     boost::uint16_t font_id = in->read_u16();
 
     font* f = m->get_font(font_id);
@@ -871,6 +878,7 @@ void define_font_name_loader(stream* in, tag_type tag, movie_definition* m)
 {
     assert(tag == SWF::DEFINEFONTNAME);
 
+    in->ensureBytes(2);
     boost::uint16_t font_id = in->read_u16();
 
     font* f = m->get_font(font_id);
@@ -893,6 +901,7 @@ sprite_loader(stream* in, tag_type tag, movie_definition* m)
 {
     assert(tag == SWF::DEFINESPRITE); // 39 - DefineSprite
 
+    in->ensureBytes(2);
     int	character_id = in->read_u16();
 
     IF_VERBOSE_PARSE
@@ -935,6 +944,7 @@ void	button_sound_loader(stream* in, tag_type tag, movie_definition* m)
 {
     assert(tag == SWF::DEFINEBUTTONSOUND); // 17
 
+    in->ensureBytes(2);
     int	button_character_id = in->read_u16();
     character_def* chdef = m->get_character_def(button_character_id);
     if ( ! chdef )
@@ -966,6 +976,7 @@ void	button_character_loader(stream* in, tag_type tag, movie_definition* m)
     // 7 || 34
     assert(tag == SWF::DEFINEBUTTON || tag == SWF::DEFINEBUTTON2);
 
+    in->ensureBytes(2);
     int	character_id = in->read_u16();
 
     IF_VERBOSE_PARSE
@@ -990,6 +1001,7 @@ void	export_loader(stream* in, tag_type tag, movie_definition* m)
 {
     assert(tag == SWF::EXPORTASSETS); // 56
 
+    in->ensureBytes(2);
     int	count = in->read_u16();
 
     IF_VERBOSE_PARSE
@@ -1011,6 +1023,7 @@ void	export_loader(stream* in, tag_type tag, movie_definition* m)
     // Read the exports.
     for (int i = 0; i < count; i++)
     {
+    in->ensureBytes(2);
 	boost::uint16_t	id = in->read_u16();
 	std::string symbolName;
 	in->read_string(symbolName);
@@ -1065,11 +1078,13 @@ void	import_loader(stream* in, tag_type tag, movie_definition* m)
 
     if ( tag == SWF::IMPORTASSETS2 )
     {
+    in->ensureBytes(2);
 	import_version = in->read_uint(8);
 	unsigned char reserved = in->read_uint(8);
 	UNUSED(reserved);
     }
 
+    in->ensureBytes(2);
     int count = in->read_u16();
 
     IF_VERBOSE_PARSE
@@ -1110,6 +1125,7 @@ void	import_loader(stream* in, tag_type tag, movie_definition* m)
     // Get the imports.
     for (int i = 0; i < count; i++)
     {
+    in->ensureBytes(2);
 	boost::uint16_t	id = in->read_u16();
 	std::string symbolName;
 	in->read_string(symbolName);
@@ -1160,6 +1176,7 @@ void	define_edit_text_loader(stream* in, tag_type tag, movie_definition* m)
 {
     assert(tag == SWF::DEFINEEDITTEXT); // 37
 
+    in->ensureBytes(2);
     boost::uint16_t	character_id = in->read_u16();
 
     edit_text_character_def* ch = new edit_text_character_def(m);
@@ -1178,6 +1195,7 @@ define_text_loader(stream* in, tag_type tag, movie_definition* m)
 {
     assert(tag == SWF::DEFINETEXT || tag == SWF::DEFINETEXT2);
 
+    in->ensureBytes(2);
     boost::uint16_t	character_id = in->read_u16();
 
     text_character_def* ch = new text_character_def(m);
@@ -1287,6 +1305,8 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 	    unsigned data_bytes = in->get_tag_end_position() - in->get_position();
 	    unsigned char *data = new unsigned char[data_bytes];
 
+        // data_bytes is already calculated from the end of the tag, which
+        // should be inside the end of the file. TODO: check that this is tha case.
 	    in->read((char*)data, data_bytes);
 
 	    // Store all the data in a SoundInfo object
@@ -1369,36 +1389,30 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
 
     if ( playbackSoundRate != streamSoundRate )
     {
-	static bool warned = false;
-	if ( ! warned )
-	{
-		log_unimpl("Different stream/playback sound rate (%d/%d)."
-			" This seems common in SWF files, so we'll warn only once.",
-			streamSoundRate,playbackSoundRate);
-		warned=true;
-	}
+        LOG_ONCE(
+            log_unimpl(_("Different stream/playback sound rate (%d/%d). "
+			    "This seems common in SWF files, so we'll warn only once."),
+			    streamSoundRate,playbackSoundRate)
+        );
     }
+
     if ( playbackSound16bit != streamSound16bit )
     {
-	static bool warned = false;
-	if ( ! warned )
-	{
-		log_unimpl("Different stream/playback sample size (%d/%d)."
-			" This seems common in SWF files, so we'll warn only once.",
-			streamSound16bit?16:32, playbackSound16bit?16:32 );
-		warned=true;
-	}
+        LOG_ONCE(
+            log_unimpl(_("Different stream/playback sample size (%d/%d). "
+			"This seems common in SWF files, so we'll warn only once."),
+			streamSound16bit ? 16 : 32,
+			playbackSound16bit ? 16 : 32 )
+	    );
     }
     if ( playbackSoundStereo != streamSoundStereo )
     {
-	static bool warned = false;
-	if ( ! warned )
-	{
-		log_unimpl("Different stream/playback channels (%s/%s)."
-			" This seems common in SWF files, so we'll warn only once.",
-			streamSoundStereo?"stereo":"mono", playbackSoundStereo?"stereo":"mono" );
-		warned=true;
-	}
+        LOG_ONCE(
+            log_unimpl(_("Different stream/playback channels (%s/%s). "
+			"This seems common in SWF files, so we'll warn only once."),
+			    streamSoundStereo ? "stereo" : "mono",
+			    playbackSoundStereo ? "stereo":"mono")
+        );
     }
 
     // checks if this is a new streams header or just one in the row
@@ -1455,6 +1469,8 @@ void
 define_video_loader(stream* in, tag_type tag, movie_definition* m)
 {
     assert(tag == SWF::DEFINEVIDEOSTREAM); // 60
+    
+    in->ensureBytes(2);
     boost::uint16_t character_id = in->read_u16();
 
     std::auto_ptr<video_stream_definition> chdef ( new video_stream_definition(character_id) );
@@ -1469,6 +1485,7 @@ video_loader(stream* in, tag_type tag, movie_definition* m)
 {
     assert(tag == SWF::VIDEOFRAME); // 61
 
+    in->ensureBytes(2);
     boost::uint16_t character_id = in->read_u16();
     character_def* chdef = m->get_character_def(character_id);
 
@@ -1508,6 +1525,7 @@ file_attributes_loader(stream* in, tag_type tag, movie_definition* /*m*/)
 
     file_attrs_flags flags;
 
+    in->ensureBytes(1 + 3);
     flags.reserved1 = in->read_uint(3);
     flags.has_metadata = in->read_bit(); 
     flags.reserved2 = in->read_uint(3);
@@ -1618,6 +1636,7 @@ abc_loader(stream* in, tag_type tag, movie_definition* /*m*/)
 	{
 
 		// Skip the 'flags' until they are actually used.
+		in->ensureBytes(4);
 		static_cast<void> (in->read_u32());
 		std::string name;
 		in->read_string(name);

@@ -364,19 +364,7 @@ public:
 	///
 	/// NOTE: if GNASH_TRUST_SWF_INPUT is defined this function is a no-op 
 	///
-	void ensureBytes(unsigned long needed)
-	{
-#ifndef GNASH_TRUST_SWF_INPUT
-		if ( _tagBoundsStack.empty() ) return; // not in a tag (should we check file length ?)
-		unsigned long int left = get_tag_end_position() - get_position();
-		if ( left < needed )
-		{
-			std::stringstream ss;
-			ss << "premature end of tag: need to read " << needed << " bytes, but only " << left << " left in this tag";
-			throw ParserException(ss.str());
-		}
-#endif
-	}
+	void ensureBytes(unsigned long needed);
 
 	/// \brief
 	/// Ensure the requested number of bits are available for a bitwise read

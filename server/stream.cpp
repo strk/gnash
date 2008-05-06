@@ -45,6 +45,23 @@ stream::~stream()
 {
 }
 
+void
+stream::ensureBytes(unsigned long needed)
+{
+#ifndef GNASH_TRUST_SWF_INPUT
+
+    if ( _tagBoundsStack.empty() ) return; // not in a tag (should we check file length ?)
+
+    unsigned long int left = get_tag_end_position() - get_position();
+    if ( left < needed )
+    {
+	    std::stringstream ss;
+	    ss << "premature end of tag: need to read " << needed << " bytes, but only " << left << " left in this tag";
+	    throw ParserException(ss.str());
+    }
+#endif
+}
+
 unsigned stream::read(char *buf, unsigned count)
 {
 	align();
@@ -318,7 +335,9 @@ boost::uint16_t	stream::read_u16()
 #else
 	using boost::uint32_t;
 
-	unsigned char _buf[2]; read((char*)_buf, 2); // would align
+	unsigned char _buf[2];
+	read((char*)_buf, 2); // would align
+	
 	uint32_t result = _buf[0];
 		 result |= (_buf[1] << 8);
 
@@ -399,7 +418,9 @@ void stream::read_string_with_length(unsigned len, std::string& to)
 
 unsigned long stream::get_position()
 {
-	return m_input->get_position();
+	int pos = m_input->get_position();
+	// TODO: check return value? Could be negative.
+	return static_cast<unsigned long>(pos);
 }
 
 
@@ -451,11 +472,14 @@ unsigned long stream::get_tag_end_position()
 }
 
 
-SWF::tag_type stream::open_tag()
+SWF::tag_type
+stream::open_tag()
 {
 	align();
 
 	unsigned long tagStart = get_position();
+
+    ensureBytes(2);
 
 	int	tagHeader = read_u16();
 	int	tagType = tagHeader >> 6;
@@ -464,6 +488,7 @@ SWF::tag_type stream::open_tag()
 		
 	if (tagLength == 0x3F)
 	{
+	    ensureBytes(4);
 		tagLength = read_u32();
 	}
 
@@ -489,7 +514,7 @@ SWF::tag_type stream::open_tag()
 		std::stringstream ss;
 		ss << "Invalid tag end position " << tagEnd << " advertised (tag length "
 			<< tagLength << ").";
-		throw ParserException(ss.str().c_str());
+		throw ParserException(ss.str());
 	}	
 
 	if ( ! _tagBoundsStack.empty() )
@@ -499,14 +524,11 @@ SWF::tag_type stream::open_tag()
 		if ( tagEnd > containerTagEnd )
 		{
 			unsigned long containerTagStart = _tagBoundsStack.back().first;
-			std::stringstream ss;
-			ss << "Tag " << tagType << " starting at offset " << tagStart
-			   << " is advertised to end at offset " << tagEnd
-			   << " which is after end of previously opened tag starting "
-			   << " at offset " << containerTagStart
-			   << " and ending at offset " << containerTagEnd << "."
-			   << " Making it end where container tag ends.";
-			log_swferror("%s", ss.str().c_str());
+			log_swferror(_("Tag %d starting at offset %d is advertised to end "
+			        "at offset %d, which is after end of previously opened "
+			        "tag starting at offset %d and ending at offset %d. "
+			        "Making it end where container tag ends."),
+			        tagType, tagStart, tagEnd, containerTagStart, containerTagEnd);
 
 			// what to do now ?
 			tagEnd = containerTagEnd;
@@ -527,18 +549,21 @@ SWF::tag_type stream::open_tag()
 }
 
 
-void	stream::close_tag()
+void
+stream::close_tag()
 {
-	assert(_tagBoundsStack.size() > 0);
-	unsigned long end_pos = _tagBoundsStack.back().second;
-	_tagBoundsStack.pop_back();
+    assert(_tagBoundsStack.size() > 0);
+    unsigned long end_pos = _tagBoundsStack.back().second;
+    _tagBoundsStack.pop_back();
 
-	if ( m_input->set_position(end_pos) == TU_FILE_SEEK_ERROR )
-	{
-		log_error("Could not seek to end position");
-	}
+    if ( m_input->set_position(end_pos) == TU_FILE_SEEK_ERROR )
+    {
+        // We'll go on reading right past the end of the stream
+        // if we don't throw an exception.
+        throw ParserException(_("Could not seek to end position"));
+    }
 
-	m_unused_bits = 0;
+    m_unused_bits = 0;
 }
 
 } // end namespace gnash
