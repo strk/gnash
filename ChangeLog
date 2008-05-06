@@ -1,5 +1,12 @@
 2008-05-06 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* server/namedStrings{h,cpp}, server/asobj/ClassHierarchy.cpp:
+	  support loading TextFormat on demand.
+	* server/asobj/Global.cpp: load TextFormat on demand, use LOG_ONCE,
+	  indentation.
+
+2008-05-06 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* server/render.h: fix build with visibility.
 
 2008-05-06 Sandro Santilli <strk@keybit.net>

@@ -50,6 +50,7 @@
 #include "Stage.h"
 #include "System.h"
 #include "TextSnapshot.h"
+#include "TextFormat.h"
 #include "video_stream_instance.h"
 #include "extension.h"
 #include "VM.h"
@@ -279,6 +280,7 @@ static ClassHierarchy::nativeClass knownClasses[] =
 	{ xmlnode_class_init, NSV::CLASS_X_M_L_NODE, NSV::CLASS_OBJECT, NSV::NS_FLASH_XML, 5 },
 	{ mouse_class_init, NSV::CLASS_MOUSE, NSV::CLASS_OBJECT, NSV::NS_FLASH_UI, 5 },
 	{ number_class_init, NSV::CLASS_NUMBER, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
+	{ textformat_class_init, NSV::CLASS_TEXT_FORMAT, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
 //	{ string_class_init, NSV::CLASS_STRING, NSV::CLASS_OBJECT, NS_GLOBAL, 5 }, // string is special
 	{ key_class_init, NSV::CLASS_KEY, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
 	{ AsBroadcaster_init, NSV::CLASS_AS_BROADCASTER, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
@@ -302,8 +304,8 @@ ClassHierarchy::massDeclare(int version)
 	// Natives get declared first. It doesn't make any sense for a native
 	// to depend on an extension, but it does make sense the other way
 	// around.
-	unsigned int size = sizeof (knownClasses) / sizeof (nativeClass);
-	for (unsigned int i = 0; i < size; ++i)
+	const size_t size = sizeof (knownClasses) / sizeof (nativeClass);
+	for (size_t i = 0; i < size; ++i)
 	{
 		nativeClass& c = knownClasses[i];
 		if (c.version > version)

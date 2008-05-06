@@ -158,6 +158,7 @@ static string_table::svt preload_names[] =
 	string_table::svt( "AsBroadcaster", NSV::CLASS_AS_BROADCASTER ),
 	string_table::svt( "Function", NSV::CLASS_FUNCTION ),
 	string_table::svt( "TextSnapshot", NSV::CLASS_TEXT_SNAPSHOT ),
+	string_table::svt( "TextFormat", NSV::CLASS_TEXT_FORMAT ),
 	string_table::svt( "Video", NSV::CLASS_VIDEO ),
 	string_table::svt( "Camera", NSV::CLASS_CAMERA ),
 	string_table::svt( "Microphone", NSV::CLASS_MICROPHONE ),

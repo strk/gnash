@@ -80,16 +80,16 @@
 
 // Common code to warn and return if a required single arg is not present
 // and to warn if there are extra args.
-#define ASSERT_FN_ARGS_IS_1						\
-    if (fn.nargs < 1) {							\
-	IF_VERBOSE_ASCODING_ERRORS(					\
-            log_aserror(_("%s needs one argument"), __FUNCTION__);		\
-            )								\
-         return as_value();							\
-    }									\
-    IF_VERBOSE_ASCODING_ERRORS(						\
-	if (fn.nargs > 1)						\
-            log_aserror(_("%s has more than one argument"), __FUNCTION__);	\
+#define ASSERT_FN_ARGS_IS_1                        \
+    if (fn.nargs < 1) {                            \
+    IF_VERBOSE_ASCODING_ERRORS(                    \
+            log_aserror(_("%s needs one argument"), __FUNCTION__);        \
+            )                                \
+         return as_value();                            \
+    }                                    \
+    IF_VERBOSE_ASCODING_ERRORS(                        \
+    if (fn.nargs > 1)                        \
+            log_aserror(_("%s has more than one argument"), __FUNCTION__);    \
     )
 
 namespace gnash {
@@ -111,66 +111,66 @@ static as_value as_global_asconstructor(const fn_call& /*fn*/);
 static as_value as_global_updateAfterEvent(const fn_call& /*fn*/);
 
 Global::Global(VM& vm, ClassHierarchy *ch)
-	:
-	as_object()
+    :
+    as_object()
 {
 
-	//-------------------------------------------------
-	// Unclassified - TODO: move to appropriate section
-	//
-	// WARNING: this approach seems to be bogus, in 
-	//          that the proprietary player seems to 
-	//          always provide all the core classes it
-	//          supports, reguardless of target SWF version.
-	//          The only difference seems to be in actual
-	//          usability of them. For example some will
-	//          be available [ typeof(Name) == 'function' ]
-	//          but not instanciatable.
-	//-------------------------------------------------
+    //-------------------------------------------------
+    // Unclassified - TODO: move to appropriate section
+    //
+    // WARNING: this approach seems to be bogus, in 
+    //          that the proprietary player seems to 
+    //          always provide all the core classes it
+    //          supports, reguardless of target SWF version.
+    //          The only difference seems to be in actual
+    //          usability of them. For example some will
+    //          be available [ typeof(Name) == 'function' ]
+    //          but not instanciatable.
+    //-------------------------------------------------
 
-	// No idea why, but it seems there's a NULL _global.o 
-	// defined at player startup...
-	// Probably due to the AS-based initialization 
-	// Not enumerable but overridable and deletable.
-	//
-	as_value nullVal; nullVal.set_null();
-	init_member("o", nullVal, as_prop_flags::dontEnum);
+    // No idea why, but it seems there's a NULL _global.o 
+    // defined at player startup...
+    // Probably due to the AS-based initialization 
+    // Not enumerable but overridable and deletable.
+    //
+    as_value nullVal; nullVal.set_null();
+    init_member("o", nullVal, as_prop_flags::dontEnum);
 
-	// ASNew was dropped as a builtin function but exists
-	// as ASnative.
-	vm.registerNative(as_global_assetpropflags, 1, 0);
-	vm.registerNative(as_global_asnew, 2, 0);	
-	vm.registerNative(as_global_assetnative, 4, 0);	
-	vm.registerNative(as_global_assetnativeaccessor, 4, 1);
-	vm.registerNative(as_global_updateAfterEvent, 9, 0);	
-	vm.registerNative(timer_setinterval, 250, 0);
-	vm.registerNative(timer_clearinterval, 250, 1);
+    // ASNew was dropped as a builtin function but exists
+    // as ASnative.
+    vm.registerNative(as_global_assetpropflags, 1, 0);
+    vm.registerNative(as_global_asnew, 2, 0);    
+    vm.registerNative(as_global_assetnative, 4, 0);    
+    vm.registerNative(as_global_assetnativeaccessor, 4, 1);
+    vm.registerNative(as_global_updateAfterEvent, 9, 0);    
+    vm.registerNative(timer_setinterval, 250, 0);
+    vm.registerNative(timer_clearinterval, 250, 1);
 
-    // _global functions.    		
-	init_member("ASnative", new builtin_function(as_global_asnative));
-	init_member("ASconstructor", new builtin_function(as_global_asconstructor));
-	
-	init_member("ASSetPropFlags", vm.getNative(1, 0));
-	init_member("ASSetNative", vm.getNative(4, 0));
-	init_member("ASSetNativeAccessor", vm.getNative(4, 1));
-	init_member("updateAfterEvent", vm.getNative(9, 0));
+    // _global functions.            
+    init_member("ASnative", new builtin_function(as_global_asnative));
+    init_member("ASconstructor", new builtin_function(as_global_asconstructor));
+    
+    init_member("ASSetPropFlags", vm.getNative(1, 0));
+    init_member("ASSetNative", vm.getNative(4, 0));
+    init_member("ASSetNativeAccessor", vm.getNative(4, 1));
+    init_member("updateAfterEvent", vm.getNative(9, 0));
 
-	// Defined in timers.h
-	init_member("setInterval", vm.getNative(250, 0));
-	init_member("clearInterval", vm.getNative(250, 1));
-	init_member("setTimeout", new builtin_function(timer_settimeout));
-	init_member("clearTimeout", new builtin_function(timer_clearinterval));
+    // Defined in timers.h
+    init_member("setInterval", vm.getNative(250, 0));
+    init_member("clearInterval", vm.getNative(250, 1));
+    init_member("setTimeout", new builtin_function(timer_settimeout));
+    init_member("clearTimeout", new builtin_function(timer_clearinterval));
 
-	ch->setGlobal(this);
+    ch->setGlobal(this);
 
 // If extensions aren't used, then no extensions will be loaded.
 #ifdef USE_EXTENSIONS
-	ch->setExtension(&_et);
+    ch->setExtension(&_et);
 #endif
 
     const int version = vm.getSWFVersion();
 
-	ch->massDeclare(version);
+    ch->massDeclare(version);
 
     /// Version-based initialization.
     //
@@ -187,73 +187,69 @@ Global::Global(VM& vm, ClassHierarchy *ch)
     {
         case 9:
         case 8:
-		flash_package_init(*this);
+
+            flash_package_init(*this);
 
         case 7:
         case 6:
 
-		function_class_init(*this);
-		ch->getGlobalNs()->stubPrototype(NSV::CLASS_FUNCTION);
-		ch->getGlobalNs()->getClass(NSV::CLASS_FUNCTION)->setDeclared();
-
-	        init_member("LocalConnection", new builtin_function(localconnection_new));
+            function_class_init(*this);
+            ch->getGlobalNs()->stubPrototype(NSV::CLASS_FUNCTION);
+            ch->getGlobalNs()->getClass(NSV::CLASS_FUNCTION)->setDeclared();
+            init_member("LocalConnection", new builtin_function(localconnection_new));
 
         case 5:
         
-		    object_class_init(*this);
-		    ch->getGlobalNs()->stubPrototype(NSV::CLASS_OBJECT);
-		    ch->getGlobalNs()->getClass(NSV::CLASS_OBJECT)->setDeclared();
-		    array_class_init(*this);
-		    ch->getGlobalNs()->stubPrototype(NSV::CLASS_ARRAY);
-		    ch->getGlobalNs()->getClass(NSV::CLASS_ARRAY)->setDeclared();
-		    string_class_init(*this);
-		    ch->getGlobalNs()->stubPrototype(NSV::CLASS_STRING);
-		    ch->getGlobalNs()->getClass(NSV::CLASS_STRING)->setDeclared();        
+            object_class_init(*this);
+            ch->getGlobalNs()->stubPrototype(NSV::CLASS_OBJECT);
+            ch->getGlobalNs()->getClass(NSV::CLASS_OBJECT)->setDeclared();
+            array_class_init(*this);
+            ch->getGlobalNs()->stubPrototype(NSV::CLASS_ARRAY);
+            ch->getGlobalNs()->getClass(NSV::CLASS_ARRAY)->setDeclared();
+            string_class_init(*this);
+            ch->getGlobalNs()->stubPrototype(NSV::CLASS_STRING);
+            ch->getGlobalNs()->getClass(NSV::CLASS_STRING)->setDeclared();        
         
-	        vm.registerNative(as_global_escape, 100, 0);
-	        vm.registerNative(as_global_unescape, 100, 1);
-	        vm.registerNative(as_global_parseint, 100, 2);
-	        vm.registerNative(as_global_parsefloat, 100, 3);
-	        vm.registerNative(as_global_isnan, 200, 18);
-	        vm.registerNative(as_global_isfinite, 200, 19);
+            vm.registerNative(as_global_escape, 100, 0);
+            vm.registerNative(as_global_unescape, 100, 1);
+            vm.registerNative(as_global_parseint, 100, 2);
+            vm.registerNative(as_global_parsefloat, 100, 3);
+            vm.registerNative(as_global_isnan, 200, 18);
+            vm.registerNative(as_global_isfinite, 200, 19);
 
-	        init_member("escape", vm.getNative(100, 0));
-	        init_member("unescape", vm.getNative(100, 1));
-	        init_member("parseInt", vm.getNative(100, 2));
-	        init_member("parseFloat", vm.getNative(100, 3));
-	        init_member("isNaN", vm.getNative(200, 18));
-	        init_member("isFinite", vm.getNative(200, 19));
+            init_member("escape", vm.getNative(100, 0));
+            init_member("unescape", vm.getNative(100, 1));
+            init_member("parseInt", vm.getNative(100, 2));
+            init_member("parseFloat", vm.getNative(100, 3));
+            init_member("isNaN", vm.getNative(200, 18));
+            init_member("isFinite", vm.getNative(200, 19));
 
-	        // NaN and Infinity should only be in _global since SWF6,
-	        // but this is just because SWF5 or lower did not have a "_global"
-	        // reference at all, most likely.
-	        init_member("NaN", as_value(NAN));
-	        init_member("Infinity", as_value(INFINITY));
+            // NaN and Infinity should only be in _global since SWF6,
+            // but this is just because SWF5 or lower did not have a "_global"
+            // reference at all, most likely.
+            init_member("NaN", as_value(NAN));
+            init_member("Infinity", as_value(INFINITY));
 
-	        registerColorNative(*this);
-
-	        // The following initializations are necessary
-	        // to register ASnative functions
-	        textformat_class_init(*this);
-
-	        registerDateNative(*this);
-	        registerMouseNative(*this);
+            registerColorNative(*this);
+            registerTextFormatNative(*this);
+            registerDateNative(*this);
+            registerMouseNative(*this);
 
         case 4:
 
-	        registerMathNative(*this);
-	        registerSystemNative(*this);
-	        registerStageNative(*this);
+            registerMathNative(*this);
+            registerSystemNative(*this);
+            registerStageNative(*this);
 
-	        vm.registerNative(as_global_trace, 100, 4);
-	        init_member("trace", vm.getNative(100, 4));
+            vm.registerNative(as_global_trace, 100, 4);
+            init_member("trace", vm.getNative(100, 4));
 
         default:
             break;
     }
 
 #ifdef USE_EXTENSIONS
-	loadExtensions();
+    loadExtensions();
 #endif
 
 }
@@ -368,14 +364,16 @@ as_global_parseint(const fn_call& fn)
 {
     // assert(fn.nargs == 2 || fn.nargs == 1);
     if (fn.nargs < 1) {
-	IF_VERBOSE_ASCODING_ERRORS(
+        IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("%s needs at least one argument"), __FUNCTION__);
-            )
-         return as_value();
+        )
+        return as_value();
     }
+
     IF_VERBOSE_ASCODING_ERRORS(
-	if (fn.nargs > 2)
+        if (fn.nargs > 2) {
             log_aserror(_("%s has more than two arguments"), __FUNCTION__);
+        }
     )
 
     const std::string digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -431,7 +429,7 @@ as_global_parseint(const fn_call& fn)
         // Check from the current position for non-octal characters;
         // it's decimal in that case.
         else if (expr.find_first_not_of("01234567", it - expr.begin()) !=
-        	std::string::npos)
+            std::string::npos)
         {
             base = 10;
         }
@@ -454,21 +452,21 @@ as_global_parseint(const fn_call& fn)
         else if (*it == '+') it++;
     }    
 
-	// After all that, a second argument specifies the base.
-	// Parsing still starts after any positive/negative 
-	// sign or hex identifier (parseInt("0x123", 8) gives
-	// 83, not 0; parseInt(" 0x123", 8) is 0), which is
-	// why we do this here.
+    // After all that, a second argument specifies the base.
+    // Parsing still starts after any positive/negative 
+    // sign or hex identifier (parseInt("0x123", 8) gives
+    // 83, not 0; parseInt(" 0x123", 8) is 0), which is
+    // why we do this here.
     if (fn.nargs > 1)
     {
-	    base = (fn.arg(1).to_int());
-	
-	    // Bases from 2 to 36 are valid, otherwise return NaN
+        base = (fn.arg(1).to_int());
+    
+        // Bases from 2 to 36 are valid, otherwise return NaN
             if (base < 2 || base > 36)
             {
-	            as_value rv;
-	            rv.set_nan();
-	            return rv;
+                as_value rv;
+                rv.set_nan();
+                return rv;
             }
           
     }
@@ -482,9 +480,9 @@ as_global_parseint(const fn_call& fn)
 
     if (digit >= base || digit < 0)
     {
-	    as_value rv;
-	    rv.set_nan();
-	    return rv;
+        as_value rv;
+        rv.set_nan();
+        return rv;
     }
 
     // The first digit was valid, so continue from the present position
@@ -495,14 +493,14 @@ as_global_parseint(const fn_call& fn)
     ++it;
     
     while (it != expr.end() && (digit = digits.find(toupper(*it))) < base
-    		&& digit >= 0)
+            && digit >= 0)
     {
-	    result = result * base + digit;
-	    ++it;
+        result = result * base + digit;
+        ++it;
     }
 
     if (negative)
-	result = -result;
+    result = -result;
     
     // Now return the parsed string as an integer.
     return as_value(result);
@@ -519,32 +517,32 @@ as_global_assetpropflags(const fn_call& fn)
     // assert((version == 5) ? (fn.nargs == 3) : true);
 
     if (fn.nargs < 3) {
-	IF_VERBOSE_ASCODING_ERRORS(	
+    IF_VERBOSE_ASCODING_ERRORS(    
             log_aserror(_("%s needs at least three arguments"), __FUNCTION__);
             )
          return as_value();
     }
     IF_VERBOSE_ASCODING_ERRORS(
-	if (fn.nargs > 4)
+    if (fn.nargs > 4)
             log_aserror(_("%s has more than four arguments"), __FUNCTION__);
 #if 0 // it is perfectly legal to have 4 args in SWF5 it seems..
-	if (version == 5 && fn.nargs == 4)
+    if (version == 5 && fn.nargs == 4)
             log_aserror(_("%s has four arguments in a SWF version 5 movie"), __FUNCTION__);
 #endif
     )
-		
+    
     // ASSetPropFlags(obj, props, n, allowFalse=false)
 
     // object
     boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
     if ( ! obj )
     {
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("Invalid call to ASSetPropFlags: "
-			"first argument is not an object: %s"),
-			fn.arg(0).to_debug_string());
-		);
-		return as_value();
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("Invalid call to ASSetPropFlags: "
+            "first argument is not an object: %s"),
+            fn.arg(0).to_debug_string());
+        );
+        return as_value();
     }
 
     // list of child names
@@ -552,13 +550,13 @@ as_global_assetpropflags(const fn_call& fn)
     const as_value& props = fn.arg(1);
 
     const int flagsMask = ( as_prop_flags::dontEnum |
-    	  as_prop_flags::dontDelete |
-    	  as_prop_flags::readOnly |
-    	  as_prop_flags::onlySWF6Up |
-    	  as_prop_flags::ignoreSWF6 |
-    	  as_prop_flags::onlySWF7Up |
-    	  as_prop_flags::onlySWF8Up |
-    	  as_prop_flags::onlySWF9Up);
+                            as_prop_flags::dontDelete |
+                            as_prop_flags::readOnly |
+                            as_prop_flags::onlySWF6Up |
+                            as_prop_flags::ignoreSWF6 |
+                            as_prop_flags::onlySWF7Up |
+                            as_prop_flags::onlySWF8Up |
+                            as_prop_flags::onlySWF9Up);
 
     // a number which represents three bitwise flags which
     // are used to determine whether the list of child names should be hidden,
@@ -573,7 +571,7 @@ as_global_assetpropflags(const fn_call& fn)
     // ASSetPropFlags was exposed in Flash 5, however the fourth argument 'set_false'
     // was not required as it always defaulted to the value '~0'. 
     const int setFalse = (fn.nargs < 4 ? 0 : int(fn.arg(3).to_number())) &
-    	flagsMask;
+        flagsMask;
 
     obj->setPropFlags(props, setFalse, setTrue);
 
@@ -585,54 +583,54 @@ as_global_assetpropflags(const fn_call& fn)
 as_value
 as_global_asnative(const fn_call& fn)
 {
-	as_value ret;
+    as_value ret;
 
-	if (fn.nargs < 2)
-	{
-		IF_VERBOSE_ASCODING_ERRORS(	
-		log_aserror(_("ASNative(%s): needs at least two arguments"), fn.dump_args());
-		)
-		return ret;
-	}
+    if (fn.nargs < 2)
+    {
+        IF_VERBOSE_ASCODING_ERRORS(    
+        log_aserror(_("ASNative(%s): needs at least two arguments"), fn.dump_args());
+        )
+        return ret;
+    }
 
-	const int sx = fn.arg(0).to_int();
-	const int sy = fn.arg(1).to_int();
+    const int sx = fn.arg(0).to_int();
+    const int sy = fn.arg(1).to_int();
 
-	if ( sx < 0 )
-	{
-		IF_VERBOSE_ASCODING_ERRORS(	
-		log_aserror(_("ASNative(%s): first arg must be >= 0"), fn.dump_args());
-		)
-		return ret;
-	}
-	if ( sy < 0 )
-	{
-		IF_VERBOSE_ASCODING_ERRORS(	
-		log_aserror(_("ASNative(%s): second arg must be >= 0"), fn.dump_args());
-		)
-		return ret;
-	}
+    if ( sx < 0 )
+    {
+        IF_VERBOSE_ASCODING_ERRORS(    
+        log_aserror(_("ASNative(%s): first arg must be >= 0"), fn.dump_args());
+        )
+        return ret;
+    }
+    if ( sy < 0 )
+    {
+        IF_VERBOSE_ASCODING_ERRORS(    
+        log_aserror(_("ASNative(%s): second arg must be >= 0"), fn.dump_args());
+        )
+        return ret;
+    }
 
-	const unsigned int x = static_cast<unsigned int>(sx);
-	const unsigned int y = static_cast<unsigned int>(sy);
+    const unsigned int x = static_cast<unsigned int>(sx);
+    const unsigned int y = static_cast<unsigned int>(sy);
 
-	VM& vm = VM::get();
-	as_function* fun = vm.getNative(x, y);
-	if ( ! fun ) {
-	    log_debug(_("No ASnative(%d, %d) registered with the VM"), x, y);
-	    return ret;
-	}
-	ret.set_as_function(fun);
-	return ret;
-		
+    VM& vm = VM::get();
+    as_function* fun = vm.getNative(x, y);
+    if ( ! fun ) {
+        log_debug(_("No ASnative(%d, %d) registered with the VM"), x, y);
+        return ret;
+    }
+    ret.set_as_function(fun);
+    return ret;
+        
 }
 
 // Obsolete ASnew function (exists only as ASnative(2, 0))
 as_value
 as_global_asnew(const fn_call& /*fn*/)
 {
-	LOG_ONCE(log_unimpl("ASNative (2, 0) - old ASnew"));
-	return as_value();
+    LOG_ONCE(log_unimpl("ASNative (2, 0) - old ASnew"));
+    return as_value();
 }
 
 // ASSetNative function
@@ -640,8 +638,8 @@ as_global_asnew(const fn_call& /*fn*/)
 as_value
 as_global_assetnative(const fn_call& /*fn*/)
 {
-	LOG_ONCE(log_unimpl("ASSetNative"));
-	return as_value();
+    LOG_ONCE(log_unimpl("ASSetNative"));
+    return as_value();
 }
 
 // ASSetNativeAccessor function
@@ -649,8 +647,8 @@ as_global_assetnative(const fn_call& /*fn*/)
 as_value
 as_global_assetnativeaccessor(const fn_call& /*fn*/)
 {
-	LOG_ONCE(log_unimpl("ASSetNativeAccessor"));
-	return as_value();
+    LOG_ONCE(log_unimpl("ASSetNativeAccessor"));
+    return as_value();
 }
 
 // ASconstructor function
@@ -658,8 +656,8 @@ as_global_assetnativeaccessor(const fn_call& /*fn*/)
 as_value
 as_global_asconstructor(const fn_call& /*fn*/)
 {
-	LOG_ONCE(log_unimpl("ASconstructor"));
-	return as_value();
+    LOG_ONCE(log_unimpl("ASconstructor"));
+    return as_value();
 }
 
 
@@ -667,8 +665,8 @@ as_global_asconstructor(const fn_call& /*fn*/)
 as_value
 as_global_updateAfterEvent(const fn_call& /*fn*/)
 {
-	LOG_ONCE(log_unimpl("updateAfterEvent()"));
-	return as_value();
+    LOG_ONCE(log_unimpl("updateAfterEvent()"));
+    return as_value();
 }
 
 
@@ -685,16 +683,15 @@ void
 Global::loadExtensions()
 {
 
-
-	if ( RcInitFile::getDefaultInstance().enableExtensions() )
-	{
-		log_security(_("Extensions enabled, scanning plugin dir for load"));
-		_et.scanAndLoad(*this);
-	}
-	else
-	{
-		log_security(_("Extensions disabled"));
-	}
+    if ( RcInitFile::getDefaultInstance().enableExtensions() )
+    {
+        log_security(_("Extensions enabled, scanning plugin dir for load"));
+        _et.scanAndLoad(*this);
+    }
+    else
+    {
+        log_security(_("Extensions disabled"));
+    }
 
 }
 
