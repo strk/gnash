@@ -1,6 +1,7 @@
 2008-05-06 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* gui/fb.cpp: internationalization.
+	* server/sprite_instance.cpp, server/URLAccessManager.cpp: i18n
 
 2008-05-06 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
