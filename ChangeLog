@@ -1,3 +1,8 @@
+2008-05-06 Sandro Santilli <strk@keybit.net>
+
+	* server/PropertyList.cpp: add compile-time macro to enable
+	  debugging of properties insertions and flags setting.
+
 2008-05-06 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* backend/render_handler_agg.cpp: fix doPixelHinting handling
