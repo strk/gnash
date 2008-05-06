@@ -308,7 +308,10 @@ ClassHierarchy::massDeclare(int version)
 		nativeClass& c = knownClasses[i];
 		if (c.version > version)
 			continue;
-		declareClass(c);
+		if ( ! declareClass(c) )
+		{
+			log_error("Could not declare class %s", c);
+		}
 	}
 
 	if (mExtension != NULL)
@@ -326,6 +329,34 @@ ClassHierarchy::markReachableResources() const
 void
 ClassHierarchy::dump()
 {
+}
+std::ostream& operator << (std::ostream& os, const ClassHierarchy::nativeClass& c)
+{
+	string_table& st = VM::get().getStringTable();
+
+	os << "("
+		<< " name:" << st.value(c.name)
+		<< " super:" << st.value(c.super_name)
+		<< " namespace:" << st.value(c.namespace_name)
+		<< " version:" << c.version
+		<< ")";
+
+	return os;
+}
+
+std::ostream& operator << (std::ostream& os, const ClassHierarchy::extensionClass& c)
+{
+	string_table& st = VM::get().getStringTable();
+
+	os << "(file:" << c.file_name
+		<< " init:" << c.init_name
+		<< " name:" << st.value(c.name)
+		<< " super:" << st.value(c.super_name)
+		<< " namespace:" << st.value(c.namespace_name)
+		<< " version:" << c.version
+		<< ")";
+
+	return os;
 }
 
 } /* namespace gnash */

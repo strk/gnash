@@ -1,5 +1,8 @@
 2008-05-06 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/ClassHierarchy.{cpp,h}: add output operator
+	  for nativeClass and extentionClass, handle declareClass
+	  failures in massDeclare (log_error).
 	* server/as_prop_flags.h: add output operator (useful
 	  for log_debug).
 

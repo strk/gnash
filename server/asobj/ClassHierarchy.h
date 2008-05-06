@@ -21,6 +21,7 @@
 
 #include <list>
 #include <vector>
+#include <ostream>
 
 #include "as_object.h"
 #include "asClass.h"
@@ -238,6 +239,9 @@ private:
 	SafeStack<asBoundValue> mBoundValueMemory;
 	SafeStack<asBoundAccessor> mBoundAccessorMemory;
 };
+
+std::ostream& operator << (std::ostream& os, const ClassHierarchy::nativeClass& c);
+std::ostream& operator << (std::ostream& os, const ClassHierarchy::extensionClass& c);
 
 } /* namespace gnash */
 #endif /* GNASH_CLASS_HIERARCHY_H */
