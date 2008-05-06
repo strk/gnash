@@ -30,10 +30,53 @@
 
 namespace gnash {
 
+// Forward declarations
 static as_value textformat_new(const fn_call& fn);
 static as_object* getTextFormatInterface();
 static void attachTextFormatInterface(as_object& o);
 
+
+void
+registerTextFormatNative(as_object& o)
+{
+    VM& vm = o.getVM();
+    
+    //vm.registerNative(110, 0) // [_global] TextFormat
+    vm.registerNative(&TextFormat::font_getset, 110, 1);
+    vm.registerNative(&TextFormat::font_getset, 110, 2);
+    vm.registerNative(&TextFormat::size_getset, 110, 3);
+    vm.registerNative(&TextFormat::size_getset, 110, 4);
+    vm.registerNative(&TextFormat::color_getset, 110, 5);
+    vm.registerNative(&TextFormat::color_getset, 110, 6);
+    vm.registerNative(&TextFormat::url_getset, 110, 7);
+    vm.registerNative(&TextFormat::url_getset, 110, 8);
+    vm.registerNative(&TextFormat::target_getset, 110, 9);
+    vm.registerNative(&TextFormat::target_getset, 110, 10);
+    vm.registerNative(&TextFormat::bold_getset, 110, 11);
+    vm.registerNative(&TextFormat::bold_getset, 110, 12);
+    vm.registerNative(&TextFormat::italic_getset, 110, 13);
+    vm.registerNative(&TextFormat::italic_getset, 110, 14);
+    vm.registerNative(&TextFormat::underline_getset, 110, 15);
+    vm.registerNative(&TextFormat::underline_getset, 110, 16);
+    vm.registerNative(&TextFormat::align_getset, 110, 17);
+    vm.registerNative(&TextFormat::align_getset, 110, 18);
+    vm.registerNative(&TextFormat::leftMargin_getset, 110, 19);
+    vm.registerNative(&TextFormat::leftMargin_getset, 110, 20);
+    vm.registerNative(&TextFormat::rightMargin_getset, 110, 21);
+    vm.registerNative(&TextFormat::rightMargin_getset, 110, 22);
+    vm.registerNative(&TextFormat::indent_getset, 110, 23);
+    vm.registerNative(&TextFormat::indent_getset, 110, 24);
+    vm.registerNative(&TextFormat::leading_getset, 110, 25);
+    vm.registerNative(&TextFormat::leading_getset, 110, 26);
+    vm.registerNative(&TextFormat::blockIndent_getset, 110, 27);
+    vm.registerNative(&TextFormat::blockIndent_getset, 110, 28);
+    vm.registerNative(&TextFormat::tabStops_getset, 110, 29);
+    vm.registerNative(&TextFormat::tabStops_getset, 110, 30);
+    vm.registerNative(&TextFormat::bullet_getset, 110, 31);
+    vm.registerNative(&TextFormat::bullet_getset, 110, 32);
+    vm.registerNative(&TextFormat::getTextExtent_method, 110, 33);
+
+}
 
 TextFormat::TextFormat()
 	:
@@ -371,9 +414,6 @@ static void
 attachTextFormatInterface(as_object& o)
 {
 	int flags = 0; // for sure we want to enum, dunno about deleting yet
-
-	// TODO: register natives, see
-	// http://osflash.org/flashcoders/undocumented/asnative
 
 	o.init_property("display", &TextFormat::display_getset, &TextFormat::display_getset, flags);
 	o.init_property("bullet", &TextFormat::bullet_getset, &TextFormat::bullet_getset, flags);

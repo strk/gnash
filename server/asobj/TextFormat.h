@@ -241,6 +241,7 @@ private:
 	std::string	 _url;	
 };
  
+void registerTextFormatNative(as_object& global);
 
 /// Initialize the global Color class
 void textformat_class_init(as_object& global);
