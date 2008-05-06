@@ -18,6 +18,8 @@
 #ifndef GNASH_AS_PROP_FLAGS_H
 #define GNASH_AS_PROP_FLAGS_H
 
+#include <ostream>
+
 namespace gnash {
 
 /// Flags defining the level of protection of a member
@@ -28,7 +30,7 @@ class as_prop_flags
 	int _flags;
 
 	/// if true, this value is protected (internal to gnash)
-	bool _protected;
+	//bool _protected;
 
 public:
 
@@ -210,6 +212,20 @@ public:
 		return true;
 	}
 };
+
+inline std::ostream&
+operator << (std::ostream& os, const as_prop_flags& fl)
+{
+	os << "(";
+	if ( fl.get_static() ) os << " static";
+	if ( fl.get_read_only() ) os << " readonly";
+	if ( fl.get_dont_delete() ) os << " nodelete";
+	if ( fl.get_dont_enum() ) os << " noenum";
+	if ( fl.get_is_protected() ) os << " protected";
+	os << " )";
+	// TODO: visibility flags
+	return os;
+}
 
 
 
