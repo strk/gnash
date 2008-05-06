@@ -181,15 +181,21 @@ PropertyList::setValue(string_table::key key, as_value val,
 #endif
 		return true;
 	}
-	if (found->isReadOnly())
+
+	const Property& prop = *found;
+	if (prop.isReadOnly() && ! prop.isDestructive())
 	{
 		string_table& st = VM::get().getStringTable();
 		log_error(_("Property %s (key %d) in namespace %s (key %d) is read-only %s, not setting it to %s"), 
-			st.value(key), key, st.value(nsId), nsId, found->getFlags(), val);
+			st.value(key), key, st.value(nsId), nsId, prop.getFlags(), val);
 		return false;
 	}
 
-	const_cast<Property*>(&(*found))->setValue(this_ptr, val);
+	// Property is const because the container uses its members
+	// for indexing. We don't use value (only name and namespace)
+	// so this const_cast is safe
+	const_cast<Property&>(prop).setValue(this_ptr, val);
+
 	return true;
 }
 

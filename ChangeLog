@@ -1,3 +1,14 @@
+2008-05-06 Sandro Santilli <strk@keybit.net>
+
+	* server/PropertyList.cpp (setValue): don't let prop flags
+	  prevent setting values of destructive properties.
+	  set_member doesn't use this function, so user-requested
+	  override is still handled correctly. init_member instead
+	  which is only used by internal code, will use it.
+	  NOTE: in a cleaner design, we'd use native destructive
+	  getter returning an as_value directly instead !
+	  Fixes abort reported on bug #23139.
+
 2008-05-06 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* libmedia/ffmpeg/sound_handler_sdl.{h,cpp}: drop unnecessary
