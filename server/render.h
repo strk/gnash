@@ -14,6 +14,7 @@
 #include "gnash.h"
 #include "image.h"
 #include "render_handler.h"
+#include "dsodefs.h"
 
 
 namespace gnash {
@@ -89,7 +90,7 @@ namespace gnash {
 				int vertex_count, const rgba& color, const matrix& mat);
 
 		/// See render_handler::draw_poly (in backend/render_handler.h)
-		void  draw_poly(const point* corners, int corner_count,
+		DSOEXPORT void  draw_poly(const point* corners, int corner_count,
 				const rgba& fill, const rgba& outline, const matrix& mat,
 				bool masked);
       
