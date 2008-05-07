@@ -22,6 +22,7 @@
 #endif
 
 #include "Rectangle_as.h"
+#include "Point_as.h"
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
@@ -136,9 +137,22 @@ static as_value
 Rectangle_clone(const fn_call& fn)
 {
 	boost::intrusive_ptr<Rectangle_as> ptr = ensureType<Rectangle_as>(fn.this_ptr);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+
+	as_value x, y, w, h;
+
+	ptr->get_member(NSV::PROP_X, &x);
+	ptr->get_member(NSV::PROP_Y, &y);
+	ptr->get_member(NSV::PROP_WIDTH, &w);
+	ptr->get_member(NSV::PROP_HEIGHT, &h);
+
+	boost::intrusive_ptr<as_object> obj = new Rectangle_as;
+
+	obj->set_member(NSV::PROP_X, x);
+	obj->set_member(NSV::PROP_Y, y);
+	obj->set_member(NSV::PROP_WIDTH, w);
+	obj->set_member(NSV::PROP_HEIGHT, h);
+
+	return as_value(obj.get()); // will keep alive
 }
 
 static as_value
@@ -326,9 +340,38 @@ static as_value
 Rectangle_bottomRight_getset(const fn_call& fn)
 {
 	boost::intrusive_ptr<Rectangle_as> ptr = ensureType<Rectangle_as>(fn.this_ptr);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+
+	as_value ret;
+
+	if ( ! fn.nargs ) // getter
+	{
+		as_value x,y,w,h;
+		ptr->get_member(NSV::PROP_X, &x);
+		ptr->get_member(NSV::PROP_Y, &y);
+		ptr->get_member(NSV::PROP_WIDTH, &w);
+		ptr->get_member(NSV::PROP_HEIGHT, &h);
+
+		as_value right = x.newAdd(w);
+		as_value bottom = y.newAdd(h);
+
+		as_function* pointCtor = getFlashGeomPointConstructor();
+
+		as_environment& env = fn.env();
+		env.push(bottom);
+		env.push(right);
+
+		ret = pointCtor->constructInstance(env, 2, env.stack_size()-1);
+
+		env.drop(2);
+	}
+	else // setter
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("Attempt to set read-only property %s"), "Rectangle.bottomRight");
+		);
+	}
+
+	return ret;
 }
 
 static as_value
@@ -391,9 +434,33 @@ static as_value
 Rectangle_size_getset(const fn_call& fn)
 {
 	boost::intrusive_ptr<Rectangle_as> ptr = ensureType<Rectangle_as>(fn.this_ptr);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+
+	as_value ret;
+
+	if ( ! fn.nargs ) // getter
+	{
+		as_value w,h;
+		ptr->get_member(NSV::PROP_WIDTH, &w);
+		ptr->get_member(NSV::PROP_HEIGHT, &h);
+
+		as_function* pointCtor = getFlashGeomPointConstructor();
+
+		as_environment& env = fn.env();
+		env.push(h);
+		env.push(w);
+
+		ret = pointCtor->constructInstance(env, 2, env.stack_size()-1);
+
+		env.drop(2);
+	}
+	else // setter
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("Attempt to set read-only property %s"), "Rectangle.size");
+		);
+	}
+
+	return ret;
 }
 
 static as_value
@@ -429,9 +496,33 @@ static as_value
 Rectangle_topLeft_getset(const fn_call& fn)
 {
 	boost::intrusive_ptr<Rectangle_as> ptr = ensureType<Rectangle_as>(fn.this_ptr);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+
+	as_value ret;
+
+	if ( ! fn.nargs ) // getter
+	{
+		as_value x,y;
+		ptr->get_member(NSV::PROP_X, &x);
+		ptr->get_member(NSV::PROP_Y, &y);
+
+		as_function* pointCtor = getFlashGeomPointConstructor();
+
+		as_environment& env = fn.env();
+		env.push(y);
+		env.push(x);
+
+		ret = pointCtor->constructInstance(env, 2, env.stack_size()-1);
+
+		env.drop(2);
+	}
+	else // setter
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("Attempt to set read-only property %s"), "Rectangle.topLeft");
+		);
+	}
+
+	return ret;
 }
 
 
@@ -480,17 +571,21 @@ Rectangle_ctor(const fn_call& fn)
 	return as_value(obj.get()); // will keep alive
 }
 
+static as_value get_flash_geom_rectangle_constructor(const fn_call& /*fn*/)
+{
+	log_debug("Loading flash.geom.Rectangle class");
+
+	builtin_function* cl=new builtin_function(&Rectangle_ctor, getRectangleInterface());
+	attachRectangleStaticProperties(*cl);
+	return cl;
+}
+
 // extern 
 void Rectangle_class_init(as_object& where)
 {
-	// This is going to be the Rectangle "class"/"function"
-	// in the 'where' package
-	boost::intrusive_ptr<builtin_function> cl;
-	cl=new builtin_function(&Rectangle_ctor, getRectangleInterface());
-	attachRectangleStaticProperties(*cl);
-
 	// Register _global.Rectangle
-	where.init_member("Rectangle", cl.get());
+	string_table& st = where.getVM().getStringTable();
+	where.init_destructive_property(st.find("Rectangle"), get_flash_geom_rectangle_constructor);
 }
 
 } // end of gnash namespace

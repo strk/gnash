@@ -121,6 +121,7 @@ ASTESTS =			\
 	ops.as			\
 	toString_valueOf.as	\
 	Rectangle.as		\
+	Point.as		\
 	$(NULL)
 
 ASTESTS_OUT = $(ASTESTS:.as=.swf)

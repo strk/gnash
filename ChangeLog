@@ -1,3 +1,14 @@
+2008-05-07 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/flash/geom/Point_as.{cpp,h}: implement constructor,
+	  toString and length; load on demand; expose constructor for internal
+	  use.
+	* server/asobj/flash/geom/Rectangle_as.cpp: implement topLeft,
+	  bottomRight, size and clone; load on demand.
+	* testsuite/actionscript.all/: Makefile.am, Point.as: new stub
+	  for testing flash.geom.Point (only tests ctor, length and toString).
+	* testsuite/actionscript.all/Rectangle.as: more tests, all successes.
+
 2008-05-07 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/media/empty_swf.swf: add a new binary empty swf file for testing

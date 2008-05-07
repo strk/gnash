@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Rectangle.as,v 1.1 2008/05/05 21:02:02 strk Exp $";
+rcsid="$Id: Rectangle.as,v 1.2 2008/05/07 08:03:40 strk Exp $";
 
 #include "check.as"
 
@@ -166,26 +166,39 @@ check_equals(r0.width, 15); // old width (20) + ( old left (10) - new left (15) 
 //-------------------------------------------------------------
 
 r0 = new Rectangle('x', 'y', 'w', 'h');
-xcheck(r0.bottomRight instanceof flash.geom.Point);
-xcheck(r0.topLeft instanceof flash.geom.Point);
-xcheck_equals(''+r0.bottomRight, '(x=xw, y=yh)');
-xcheck_equals(''+r0.topLeft, '(x=x, y=y)');
+check(r0.bottomRight instanceof flash.geom.Point);
+check(r0.topLeft instanceof flash.geom.Point);
+check_equals(''+r0.bottomRight, '(x=xw, y=yh)');
+check_equals(''+r0.topLeft, '(x=x, y=y)');
+
+ASSetPropFlags(r0, "bottomRight", 0, 4); // clear read-only (if any)
+r0.bottomRight = 4;
+check_equals(typeof(r0.bottomRight), 'object');
+
+ASSetPropFlags(r0, "topLeft", 0, 4); // clear read-only (if any)
+r0.topLeft = 4;
+check_equals(typeof(r0.topLeft), 'object');
 
 //-------------------------------------------------------------
 // Test size
 //-------------------------------------------------------------
 
 r0 = new Rectangle('x', 'y', 'w', 'h');
-xcheck(r0.size instanceof flash.geom.Point);
-xcheck_equals(''+r0.size, '(x=w, y=h)');
+check(r0.size instanceof flash.geom.Point);
+check_equals(''+r0.size, '(x=w, y=h)');
+ASSetPropFlags(r0, "size", 0, 4); // clear read-only (if any)
+r0.size = 4;
+check_equals(typeof(r0.topLeft), 'object');
 
 //-------------------------------------------------------------
 // Test clone
 //-------------------------------------------------------------
 
 r0 = new Rectangle('x', 'y', 'w', 'h');
+r0.custom = 4;
 r2 = r0.clone();
-xcheck_equals(r2.toString(), '(x=x, y=y, w=w, h=h)');
+check_equals(r2.toString(), '(x=x, y=y, w=w, h=h)');
+check_equals(r2.custom, undefined);
 
 //-------------------------------------------------------------
 // Test contains
@@ -263,6 +276,6 @@ xcheck_equals(r2.toString(), '(x=x, y=y, w=w, h=h)');
 // END OF TEST
 //-------------------------------------------------------------
 
-check_totals(92);
+check_totals(96);
 
 #endif // OUTPUT_VERSION >= 8

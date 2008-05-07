@@ -29,12 +29,16 @@
 namespace gnash {
 
 class as_object;
+class as_function;
 
 /// Initialize the global Point class
 void Point_class_init(as_object& global);
 
 /// Return a Point instance (in case the core lib needs it)
 //std::auto_ptr<as_object> init_Point_instance();
+
+/// Return the Point constructor, for use by Rectangle 
+as_function* getFlashGeomPointConstructor();
 
 } // end of gnash namespace
 
