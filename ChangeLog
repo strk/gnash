@@ -1,5 +1,11 @@
 2008-05-07 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/: intervalTest.as, intervalTestRunner.cpp:
+	  Add test for 'super' in setInterval-set method call (comment #3
+	  in bug #23130).
+
+2008-05-07 Sandro Santilli <strk@keybit.net>
+
 	* libbase/log.cpp: add pid in timestamp
 	* server/asobj/flash/: external/ExternalInterface_as.cpp,
 	  filters/DisplacementMapFilter_as.cpp,

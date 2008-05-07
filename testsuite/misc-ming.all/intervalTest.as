@@ -27,16 +27,30 @@ do_this = function() {
 	var int = now-this_timer;
 	this_timer = now;
 	check(int >= this_ms, this_ms+" interval (this) called after " + int + " milliseconds [" + __FILE__ + ":" + __LINE__ + "]");
-	//note("Doing this "+this_counter+" after " + int + " milliseconds");
+	note("Doing this "+this_counter+" after " + int + " milliseconds");
 	if ( this_counter > 3 )
 	{
 		clearInterval(this_interval);
 		note("This interval cleared ");
 		if ( this_counter > 4 )
 		{
-			totals(16, __FILE__ + ":" + __LINE__ );
-			test_completed = 1;
-			loadMovie("fscommand:quit", _level0);
+			note('Setting another interval');
+			A = function() {};
+			A.prototype.name = 'A';
+			A.prototype.test = function() { return 'Atest'; };
+			B = function() {}; B.prototype = new A;
+			B.prototype.test = function() {
+				xcheck_equals(super.test(), 'Atest');
+				xcheck_equals(super.name, 'A');
+				totals(18, __FILE__ + ":" + __LINE__ );
+				test_completed = 1;
+				clearInterval(method_interval);
+				loadMovie("fscommand:quit", _level0);
+
+			};
+
+			o = new B;
+			method_interval = setInterval(o, 'test', 1); 
 		}
 	}
 };
@@ -85,5 +99,6 @@ check_equals(that_interval, 2);
 pushed_args = new Array;
 push_interval  = setInterval(push_args, 200, 8, 9, 10);
 check_equals(push_interval, 3);
+
 
 stop();

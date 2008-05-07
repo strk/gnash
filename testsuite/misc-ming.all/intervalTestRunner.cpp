@@ -127,6 +127,9 @@ main(int /*argc*/, char** /*argv*/)
 	as_environment env; // needed for proper to_string()
 	check_equals(tmp.to_string(), std::string("8,9,10"));
 
+	tester.advanceClock(100); // "sleep" another 100 milliseconds
+	tester.advance(); // run expired timers
+
 	root->get_member(st.find("test_completed"), &tmp);
 	check_equals(tmp.to_number(), 1);
 
