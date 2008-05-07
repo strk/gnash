@@ -1,5 +1,11 @@
 2008-05-07 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/Makefile.am: fix DrawingApiTest.swf build
+	  out of source tree (we should use the source btw, or older Ming
+	  won't build it).
+
+2008-05-07 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/flash/geom/Point_as.{cpp,h}: implement constructor,
 	  toString and length; load on demand; expose constructor for internal
 	  use.
