@@ -40,8 +40,8 @@ do_this = function() {
 			A.prototype.test = function() { return 'Atest'; };
 			B = function() {}; B.prototype = new A;
 			B.prototype.test = function() {
-				xcheck_equals(super.test(), 'Atest');
-				xcheck_equals(super.name, 'A');
+				check_equals(super.test(), 'Atest');
+				check_equals(super.name, 'A');
 				totals(18, __FILE__ + ":" + __LINE__ );
 				test_completed = 1;
 				clearInterval(method_interval);

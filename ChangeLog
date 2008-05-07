@@ -1,5 +1,10 @@
 2008-05-07 Sandro Santilli <strk@keybit.net>
 
+	* server/timers.cpp (execute): compute super.
+	* testsuite/misc-ming.all/intervalTest.as: successes.
+
+2008-05-07 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/: intervalTest.as, intervalTestRunner.cpp:
 	  Add test for 'super' in setInterval-set method call (comment #3
 	  in bug #23130).

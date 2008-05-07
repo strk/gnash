@@ -128,18 +128,31 @@ Timer::execute()
 
     as_value timer_method;
 
+    as_object* super = NULL;
+
     if ( _function.get() )
     {
         timer_method.set_as_function(_function.get());
     }
     else
     {
-        as_value tmp;
-        if (!_object->get_member(VM::get().getStringTable().find(_methodName), &tmp) )
-        {
-            //log_debug("Can't find interval method %s on object %p (%s)", _methodName.c_str(), (void*)_object.get(), _object->get_text_value().c_str());
+	VM& vm = VM::get();
+	string_table::key k = vm.getStringTable().find(_methodName);
+	as_object* owner = NULL;
+	Property* p = _object->findProperty(k, 0, &owner);
+	if ( ! p )
+	{
+            //log_debug("member %s of object %p (interval method) can't be found",
+            //   _methodName, (void*)_object.get());
             return;
-        }
+	}
+	if ( _object->isSuper() )
+	{
+		log_unimpl("Getting super from a super in inteval timers");
+	}
+	super = owner->get_super();
+
+        as_value tmp = p->getValue(*_object); // TODO: check visibility flags ?
         as_function* f = tmp.to_as_function();
         if ( ! f )
         {
@@ -163,7 +176,7 @@ Timer::execute()
     size_t firstArgBottomIndex = env.stack_size()-1; 
 
     as_value val = call_method(timer_method, &env, _object.get(),
-		    _args.size(), firstArgBottomIndex);
+		    _args.size(), firstArgBottomIndex, super);
 
 }
 
@@ -216,7 +229,7 @@ timer_setinterval(const fn_call& fn)
 		return as_value();
 	}
 
-    std::string methodName;
+	std::string methodName;
 
 	// Get interval function
 	boost::intrusive_ptr<as_function> as_func = obj->to_function(); 
