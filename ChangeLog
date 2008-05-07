@@ -1,5 +1,10 @@
 2008-05-07 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* server/parser/sprite_definition.cpp: drop loaded frame assertion.
+	  It's fine for this to exceed total frames. Fixes bug #23186.
+
+2008-05-07 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* libbase/GnashException.h: make ActionException ctor protected
 	  so that it can't be used directly. Add ActionParserException
 	  subclass for bad action_buffer accesses. Make ActionTypeError

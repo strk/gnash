@@ -169,7 +169,11 @@ void
 sprite_definition::add_frame_name(const std::string& name)
 {
 	//log_debug(_("labelframe: frame %d, name %s"), m_loading_frame, name);
-	assert(m_loading_frame < m_frame_count);
+
+    // It's fine for loaded frames to exceed frame count. Should be
+    // adjusted at the end of parsing.
+    //
+	//assert(m_loading_frame < m_frame_count);
     m_named_frames[name] = m_loading_frame;
 }
 
