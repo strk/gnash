@@ -59,6 +59,8 @@ main(int argc, char** argv)
     return EXIT_FAILURE;
   }
 
+  printf("Using sound file %s\n", sound_filename);
+
   if ( -1 == fstat(fileno(sound_f), &statbuf) )
   {
     perror("fstat");
