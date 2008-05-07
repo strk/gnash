@@ -1,3 +1,26 @@
+2008-05-07 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* libbase/GnashException.h: make ActionException ctor protected
+	  so that it can't be used directly. Add ActionParserException
+	  subclass for bad action_buffer accesses. Make ActionTypeError
+	  a subclass of ActionException. GnashException should perhaps
+	  get the same treatment, but is used directly in a number
+	  of places.
+	* server/sprite_instance.cpp: catch ActionTypeError.
+	* server/as_object.h (ensureType): throw ActionTypeError.
+	* server/as_object.cpp: catch ActionTypeError.
+	* server/action.cpp: throw/catch ActionTypeError.
+	* server/parser/action_buffer.h: the actual point of these
+	  changes: check for out-of-buffer access and throw an 
+	  ActionParserException. Drop unused method get_length(). Add
+	  assertions to other methods. Use direct vector access instead
+	  of .at() now that boundaries are checked. Fixes bug #23185
+	* server/parser/action_buffer.cpp: Add a NULL terminator to buffer
+	  if no END tag found, to prevent string reads going past the end of
+	  the buffer.
+	* server/vm/AShandlers.cpp (SWFHandlers::execute()): catch
+	  ActionParserException and stop parsing on error.
+
 2008-05-07 Sandro Santilli <strk@keybit.net>
 
 	* server/swf/tag_loaders.cpp (sound_stream_head_loader): log no

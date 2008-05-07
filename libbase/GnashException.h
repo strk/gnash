@@ -73,7 +73,7 @@ public:
 class ActionException: public GnashException
 {
 
-public:
+protected:
 
 	ActionException(const std::string& s)
 		:
@@ -85,6 +85,8 @@ public:
 		GnashException("ActionScript error")
 	{}
 
+public:
+
 	virtual ~ActionException() throw() {}
 
 };
@@ -94,19 +96,19 @@ public:
 /// When this exception is thrown, current execution should
 /// be aborted, stacks and registers cleaning included.
 ///
-class ActionLimitException: public GnashException
+class ActionLimitException: public ActionException
 {
 
 public:
 
 	ActionLimitException(const std::string& s)
 		:
-		GnashException(s)
+		ActionException(s)
 	{}
 
 	ActionLimitException()
 		:
-		GnashException("ActionScript limit hit")
+		ActionException("ActionScript limit hit")
 	{}
 
 	virtual ~ActionLimitException() throw() {}
@@ -137,6 +139,28 @@ public:
 	virtual ~ActionTypeError() throw() {}
 
 };
+
+/// An action parsing error, thrown on illegal
+/// action buffer access.
+class ActionParserException: public ActionException
+{
+
+public:
+
+	ActionParserException(const std::string& s)
+		:
+		ActionException(s)
+	{}
+
+	ActionParserException()
+		:
+		ActionException("Action parser exception")
+	{}
+
+	virtual ~ActionParserException() throw() {}
+
+};
+
 
 } // namespace gnash
 

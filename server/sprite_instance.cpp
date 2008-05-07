@@ -2502,7 +2502,7 @@ bool sprite_instance::get_member(string_table::key name_key, as_value* val,
   {
     try { *val = prop->getValue(*this); }
     catch (ActionLimitException&) { throw; }
-    catch (ActionException& ex) { log_error(_("Caught exception: %s"), ex.what()); return false; }
+    catch (ActionTypeError& ex) { log_error(_("Caught exception: %s"), ex.what()); return false; }
     return true;
   }
 
@@ -2549,7 +2549,11 @@ bool sprite_instance::get_member(string_table::key name_key, as_value* val,
     assert(owner != this);
     try { *val = prop->getValue(*this); }
     catch (ActionLimitException&) { throw; }
-    catch (ActionException& ex) { log_error(_("Caught exception: %s"), ex.what()); return false; }
+    catch (ActionTypeError& ex)
+    {
+        log_error(_("Caught exception: %s"), ex.what());
+        return false;
+    }
     return true;
   }
 

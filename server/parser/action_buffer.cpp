@@ -96,13 +96,19 @@ action_buffer::read(stream& in, unsigned long endPos)
 	// NOTE: it is common to find such movies, swfmill is known to write
 	//       DoAction w/out the terminating END tag
 	//
-	IF_VERBOSE_MALFORMED_SWF(
-	if ( m_buffer.back() != SWF::ACTION_END )
-	{
-		log_swferror(_("Action buffer starting at offset %lu doesn't end with an END tag"),
-			startPos);
-	}
-	);
+    if ( m_buffer.back() != SWF::ACTION_END )
+    {
+        // Add a null terminator so read_string won't read off
+        // the end of the buffer.
+        m_buffer.resize(size + 1);
+        m_buffer[size] = 0;
+
+	    IF_VERBOSE_MALFORMED_SWF(
+		    log_swferror(_("Action buffer starting at offset %lu doesn't end with an END tag"),
+			    startPos);
+        );
+    }
+    
 }
 
 /*public*/

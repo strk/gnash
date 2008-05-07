@@ -97,14 +97,14 @@ call_method(
 				method.to_debug_string().c_str());
 			buf[255] = '\0';
 		
-			throw ActionException(buf);
+			throw ActionTypeError(buf);
 		}
 	}
-	catch (ActionException& ex)
+	catch (ActionTypeError& e)
 	{
 		assert(val.is_undefined());
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("%s", ex.what());
+		log_aserror("%s", e.what());
 		);
 	}
 

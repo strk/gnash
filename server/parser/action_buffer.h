@@ -26,11 +26,12 @@
 #include "gnash.h"
 #include "types.h"
 
-//#include <cwchar>
 #include <boost/cstdint.hpp> // for boost::uint8_t
 #include <vector> // for composition
 
+#include "GnashException.h"
 #include "smart_ptr.h"
+#include "log.h" // For gettext macro
 
 // Forward declarations
 namespace gnash {
@@ -66,22 +67,20 @@ public:
 	///	<= in.get_tag_end_position() or an assertion will
 	///	fail.
 	///
-	void	read(stream& in, unsigned long endPos);
+	void read(stream& in, unsigned long endPos);
 
 	bool is_null() const
 	{
-		return (m_buffer.size() < 1 || m_buffer.at(0) == 0);
+		return (m_buffer.size() < 1 || m_buffer[0] == 0);
 	}
-
-	// kept for backward compatibility, should drop and see
-	// what breaks.
-	size_t get_length() const { return size(); }
 
 	size_t size() const { return m_buffer.size(); }
 
 	boost::uint8_t operator[] (size_t off) const
 	{
-		assert(off < m_buffer.size() );
+		if (off >= m_buffer.size()) {
+		    throw ActionParserException (_("Attempt to read outside action buffer"));
+		}
 		return m_buffer[off];
 	}
 
@@ -94,39 +93,52 @@ public:
 	///
 	const char* read_string(size_t pc) const
 	{
-		//assert(pc < m_buffer.size() );
-		return (const char*)(&m_buffer[pc]);
+		assert(pc < m_buffer.size() );
+		return reinterpret_cast<const char*>(&m_buffer[pc]);
 	}
 
 	/// Get a variable length 32-bit integer from the stream.
 	/// Store its length in the passed boost::uint8_t.
 	boost::uint32_t read_V32(size_t pc, boost::uint8_t& length) const
 	{
-		boost::uint32_t res = m_buffer.at(pc);
+	    const size_t buflen = m_buffer.size();
+	    const std::string err = _("Attempt to read outside action buffer");
+	    
+	    if (pc >= buflen) throw ActionParserException(err);
+
+		boost::uint32_t res = m_buffer[pc];
 		if (!(res & 0x00000080))
 		{
 			length = 1;
 			return res;
 		}
-		res = (res & 0x0000007F) | (m_buffer.at(pc + 1) << 7);
+
+	    if (pc + 1 >= buflen) throw ActionParserException(err);
+		res = (res & 0x0000007F) | (m_buffer[pc + 1] << 7);
 		if (!(res & 0x00004000))
 		{
 			length = 2;
 			return res;
 		}
-		res = (res & 0x00003FFF) | (m_buffer.at(pc + 2) << 14);
+
+	    if (pc + 2 >= buflen) throw ActionParserException(err);
+		res = (res & 0x00003FFF) | (m_buffer[pc + 2] << 14);
 		if (!(res & 0x00200000))
 		{
 			length = 3;
 			return res;
 		}
-		res = (res & 0x001FFFFF) | (m_buffer.at(pc + 3) << 21);
+
+	    if (pc + 3 >= buflen) throw ActionParserException(err);
+		res = (res & 0x001FFFFF) | (m_buffer[pc + 3] << 21);
 		if (!(res & 0x10000000))
 		{
 			length = 4;
 			return res;
 		}
-		res = (res & 0x0FFFFFFF) | (m_buffer.at(pc + 4) << 28);
+
+	    if (pc + 4 >= buflen) throw ActionParserException(err);
+		res = (res & 0x0FFFFFFF) | (m_buffer[pc + 4] << 28);
 		length = 5;
 		return res;
 	}
@@ -134,19 +146,20 @@ public:
     /// Get a pointer to the current instruction within the code
 	const unsigned char* getFramePointer(size_t pc) const
 	{
+	    assert (pc < m_buffer.size());
 		return reinterpret_cast<const unsigned char*>(&m_buffer.at(pc));
 	}
 
-        /// Get the base pointer of the code buffer.
-        const unsigned char* getCodeStart()
+    /// Get the base pointer of the code buffer.
+    const unsigned char* getCodeStart()
 	{
 		return reinterpret_cast<const unsigned char*>(&m_buffer);
 	}
 
 	const unsigned char* get_buffer(size_t pc) const
 	{
-		//assert(pc < m_buffer.size() );
-		return (const unsigned char*)(&m_buffer.at(pc));
+		assert(pc < m_buffer.size() );
+		return reinterpret_cast<const unsigned char*>(&m_buffer[pc]);
 	}
 
 	/// Get a signed integer value from given offset
@@ -155,14 +168,15 @@ public:
 	///
 	boost::int16_t read_int16(size_t pc) const
 	{
-		boost::int16_t ret = (m_buffer.at(pc) | (m_buffer.at(pc + 1) << 8));
+	    if (pc + 1 >= m_buffer.size()) {
+	        throw ActionParserException(_("Attempt to read outside action buffer limits"));
+	    }
+		boost::int16_t ret = (m_buffer[pc] | (m_buffer[pc + 1] << 8));
 		return ret;
 	}
 
 	/// Get an unsigned short integer value from given offset
-	//
-	/// Useful to hide complexity of underlying buffer access.
-	///
+    /// read_int16 should check buffer boundaries.
 	boost::uint16_t read_uint16(size_t pc) const
 	{
 		return static_cast<boost::uint16_t>(read_int16(pc));
@@ -174,10 +188,14 @@ public:
 	///
 	boost::int32_t read_int32(size_t pc) const
 	{
+		if (pc + 3 >= m_buffer.size()) {
+	        throw ActionParserException(_("Attempt to read outside action buffer limits"));
+	    }
+	    
 		boost::int32_t	val = m_buffer[pc]
-		      | (m_buffer.at(pc + 1) << 8)
-		      | (m_buffer.at(pc + 2) << 16)
-		      | (m_buffer.at(pc + 3) << 24);
+		      | (m_buffer[pc + 1] << 8)
+		      | (m_buffer[pc + 2] << 16)
+		      | (m_buffer[pc + 3] << 24);
 		return val;
 	}
 
@@ -203,7 +221,8 @@ public:
 	/// Return a value from the constant pool
 	const char* dictionary_get(size_t n) const
 	{
-		return m_dictionary.at(n);
+	    assert (n < m_dictionary.size());
+		return m_dictionary[n];
 	}
 
 	/// Interpret the SWF::ACTION_CONSTANTPOOL opcode. 

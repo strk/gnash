@@ -228,7 +228,7 @@ as_object::get_member_default(string_table::key name, as_value* val,
 		// will be logged by outer catcher
 		throw;
 	}
-	catch (ActionException& exc)
+	catch (ActionTypeError& exc)
 	{
 		// TODO: check if this should be an 'as' error.. (log_aserror)
 		log_error(_("Caught exception: %s"), exc.what());
@@ -595,7 +595,7 @@ as_object::set_member_default(string_table::key key, const as_value& val,
 
 			prop->clearVisible(_vm.getSWFVersion());
 		}
-		catch (ActionException& exc)
+		catch (ActionTypeError& exc)
 		{
 			log_aserror(_("%s: Exception %s. Will create a new member"),
 				_vm.getStringTable().value(key).c_str(), exc.what());
@@ -697,7 +697,7 @@ as_object::update_member(string_table::key key, const as_value& val,
 			prop->setValue(*this, newVal);
 			return std::make_pair(true, true);
 		}
-		catch (ActionException& exc)
+		catch (ActionTypeError& exc)
 		{
 			log_debug(_("%s: Exception %s. Will create a new member"),
 				_vm.getStringTable().value(key).c_str(), exc.what());

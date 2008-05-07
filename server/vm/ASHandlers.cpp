@@ -451,7 +451,12 @@ SWFHandlers::execute(action_type type, ActionExec& thread) const
 //    GNASH_REPORT_FUNCTION;
 //	It is very heavy operation
 //	if ( _handlers[type].getName() == "unsupported" ) return false;
-	get_handlers()[type].execute(thread);
+    try {
+	    get_handlers()[type].execute(thread);
+	}
+	catch (ActionParserException& e) {
+	    log_swferror(_("Malformed action code: %s"), e.what());
+	}
 }
 
 void

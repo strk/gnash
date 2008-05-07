@@ -1175,7 +1175,7 @@ ensureType (boost::intrusive_ptr<as_object> obj)
 		std::string msg = "builtin method or gettersetter for " +
 			target + " called from " + source + " instance.";
 
-		throw ActionException(msg);
+		throw ActionTypeError(msg);
 	}
 	return ret;
 }
