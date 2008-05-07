@@ -99,7 +99,8 @@ VideoDecoderGst::VideoDecoderGst(videoCodecType codec_type, int width, int heigh
   _appsink = gst_element_factory_make ("appsink", NULL);
 
 
-  caps = gst_caps_new_simple ("video/x-raw-rgb", NULL);
+  caps = gst_caps_new_simple ("video/x-raw-rgb", "bpp", G_TYPE_INT, 24,
+                                                 "depth", G_TYPE_INT, 24, NULL);
 
   gst_app_sink_set_caps(GST_APP_SINK(_appsink), caps);
 

@@ -91,7 +91,10 @@ NetStreamGst::NetStreamGst()
   GstElement* videocaps = gst_element_factory_make ("capsfilter", NULL);
 
   // Make sure we receive RGB
-  GstCaps* videooutcaps = gst_caps_new_simple ("video/x-raw-rgb", NULL);
+  GstCaps* videooutcaps = gst_caps_new_simple ("video/x-raw-rgb",
+                                               "bpp", G_TYPE_INT, 24,
+                                               "depth", G_TYPE_INT, 24,
+                                               NULL);
   g_object_set (G_OBJECT (videocaps), "caps", videooutcaps, NULL);
   gst_caps_unref (videooutcaps);
 
