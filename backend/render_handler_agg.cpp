@@ -625,7 +625,7 @@ public:
     // by default allow drawing everywhere
     set_invalidated_region_world();
     
-    log_debug("initialized AGG buffer <%p>, %d bytes, %dx%d, rowsize is %d bytes", 
+    log_debug(_("Initialized AGG buffer <%p>, %d bytes, %dx%d, rowsize is %d bytes"), 
       (void*)mem, size, x, y, rowstride);
   }
   
@@ -695,10 +695,10 @@ public:
   {
   
     if (m_drawing_mask) 
-      log_debug("warning: rendering ended while drawing a mask");
+      log_debug(_("Warning: rendering ended while drawing a mask"));
       
     while (! m_alpha_mask.empty()) {
-      log_debug("warning: rendering ended while masks were still active");
+      log_debug(_("Warning: rendering ended while masks were still active"));
       disable_mask();      
     }
   
@@ -895,8 +895,8 @@ public:
     rect ch_bounds = def->get_bound();
 
     if (ch_bounds.is_null()) {
-      log_debug("warning: select_clipbounds encountered a character definition "
-        "with null bounds");
+      log_debug(_("Warning: select_clipbounds encountered a character definition "
+        "with null bounds"));
       return;
     }   
 
@@ -985,7 +985,7 @@ public:
       select_clipbounds(def, mat);
       
       if (_clipbounds_selected.empty()) {
-        log_debug("warning: AGG renderer skipping a whole character");
+        log_debug(_("Warning: AGG renderer skipping a whole character"));
         return; // nothing to draw!?
       }
     
@@ -2025,7 +2025,6 @@ public:
   void set_scale(float new_xscale, float new_yscale) {
     
     scale_set=true;
-    
     stage_matrix.set_identity();
     stage_matrix.set_scale(new_xscale/20.0f, new_yscale/20.0f);
   }
@@ -2097,9 +2096,9 @@ DSOEXPORT render_handler_agg_base*  create_render_handler_agg(const char *pixelf
   if (!pixelformat) return NULL;
 
   if (is_little_endian_host())
-    log_debug("framebuffer pixel format is %s (little-endian host)", pixelformat);
+    log_debug(_("Framebuffer pixel format is %s (little-endian host)"), pixelformat);
   else
-    log_debug("framebuffer pixel format is %s (big-endian host)", pixelformat);
+    log_debug(_("Framebuffer pixel format is %s (big-endian host)"), pixelformat);
   
 #ifdef PIXELFORMAT_RGB555  
   if (!strcmp(pixelformat, "RGB555"))

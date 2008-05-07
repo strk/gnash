@@ -1,3 +1,10 @@
+2008-05-07 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* backend/render_handler_agg.cpp: i18n.
+	* gui/gui.cpp: don't divide by zero; it annoys the matrices.
+	  Fixes bug #23184.
+	* gui/gtk.cpp: nothing much, was just left over from debugging.
+
 2008-05-07 Sandro Santilli <strk@keybit.net>
 
 	* server/timers.cpp (execute): be more verbose about as coding

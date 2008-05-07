@@ -246,9 +246,12 @@ Gui::updateStageMatrix()
 
 		case movie_root::showAll:
 		{
-			// set new scale value ( user-pixel / pseudo-pixel )
-			_xscale = _width / swfwidth;
-			_yscale = _height / swfheight;
+		
+			// set new scale value ( user-pixel / pseudo-pixel ). Do
+			// not divide by zero, or we end up with an invalid
+			// stage matrix that returns nan values.			
+			_xscale = (swfwidth == 0.0f) ? 1.0f : _width / swfwidth;
+			_yscale = (swfheight == 0.0f) ? 1.0f : _height / swfheight;
 			
 			// Scale proportionally, using smallest scale
 			if (_xscale < _yscale) _yscale = _xscale;
@@ -261,8 +264,8 @@ Gui::updateStageMatrix()
 		{
 
 			// set new scale value ( user-pixel / pseudo-pixel )
-			_xscale = _width / swfwidth;
-			_yscale = _height / swfheight;
+			_xscale = (swfwidth == 0.0f) ? 1.0f : _width / swfwidth;
+			_yscale = (swfheight == 0.0f) ? 1.0f : _height / swfheight;
 			
 			// Scale proportionally, using biggest scale
 			if (_xscale > _yscale) _yscale = _xscale;
@@ -274,8 +277,8 @@ Gui::updateStageMatrix()
 		case movie_root::exactFit:
 		{
 			// NOTE: changing aspect ratio is valid!
-			_xscale = _width / swfwidth;
-			_yscale = _height / swfheight;
+			_xscale = (swfwidth == 0.0f) ? 1.0f : _width / swfwidth;
+			_yscale = (swfheight == 0.0f) ? 1.0f : _height / swfheight;
 			//LOG_ONCE( log_unimpl("Stage.scaleMode=exactFit") );
 			break;
 		}

@@ -1733,9 +1733,11 @@ GtkGui::expose_event(GtkWidget *const /*widget*/,
 
     GtkGui* gui = static_cast<GtkGui*>(data);
 
-    int xmin = event->area.x, xmax = event->area.x + event->area.width,
-    ymin = event->area.y, ymax = event->area.y + event->area.height;
-          
+    const int xmin = event->area.x;
+    const int xmax = event->area.x + event->area.width;
+    const int ymin = event->area.y;
+    const int ymax = event->area.y + event->area.height;
+
     gui->rerenderPixels(xmin, ymin, xmax, ymax);
 
     return TRUE;
