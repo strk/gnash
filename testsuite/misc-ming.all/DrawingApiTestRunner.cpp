@@ -80,10 +80,11 @@ main(int /*argc*/, char** /*argv*/)
 	sprite_instance* root = tester.getRootMovie();
 	assert(root);
 
-	check_equals(root->get_frame_count(), 1);
+	check_equals(root->get_frame_count(), 2);
 	check_equals(root->get_current_frame(), 0);
-
-	//tester.advance();
+	
+	// advance to the second frame, first frame is Dejagnu.swf 
+	tester.advance();
 
 	rgba white(255, 255, 255, 255);
 	rgba blue(0, 0, 255, 255);

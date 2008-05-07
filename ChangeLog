@@ -1,3 +1,11 @@
+2008-05-07 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/media/empty_swf.swf: add a new binary empty swf file for testing
+	  convenience(produced by "makeswf empty_source_file.as")
+	* testsuite/misc-ming.all/makefile.am, testsuite/misc-ming.all/DrawingApiTest.as,
+	  testsuite/misc-ming.all/DrawingApiTestRunner.cpp: put the tests to the second
+	  frame. hitTest(*, *, true) is not reliable when in the first frame(don't know why).
+	
 2008-05-06 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/asobj/NetStreamGst.cpp, libmedia/gst/VideoDecoderGst.cpp:

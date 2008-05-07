@@ -749,3 +749,7 @@ onKeyDown = function()
 
 };
 Key.addListener(this);
+
+stop();
+
+
