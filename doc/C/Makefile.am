@@ -39,7 +39,6 @@ COMMON = \
 	introduction.xml \
 	security.xml \
 	legal.xml \
-	gpl-appendix.xml \
 	app_authors.xml \
 	doc_authors.xml \
 	fdl-appendix.xml \
