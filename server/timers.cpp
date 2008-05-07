@@ -142,8 +142,10 @@ Timer::execute()
 	Property* p = _object->findProperty(k, 0, &owner);
 	if ( ! p )
 	{
-            //log_debug("member %s of object %p (interval method) can't be found",
-            //   _methodName, (void*)_object.get());
+            IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror("member %s of object %p (interval method) can't be found",
+                 _methodName, (void*)_object.get());
+            );
             return;
 	}
 	if ( _object->isSuper() )
@@ -156,8 +158,10 @@ Timer::execute()
         as_function* f = tmp.to_as_function();
         if ( ! f )
         {
-            //log_debug("member %s of object %p (interval method) is not a function (%s)",
-            //   _methodName.c_str(), (void*)_object.get(), tmp.to_debug_string().c_str());
+            IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror("member %s of object %p (interval method) is not a function (%s)",
+                 _methodName, (void*)_object.get(), tmp);
+            );
             return;
         }
         timer_method.set_as_function(f);

@@ -1,5 +1,10 @@
 2008-05-07 Sandro Santilli <strk@keybit.net>
 
+	* server/timers.cpp (execute): be more verbose about as coding
+	  errors.
+
+2008-05-07 Sandro Santilli <strk@keybit.net>
+
 	* server/timers.cpp (execute): compute super.
 	* testsuite/misc-ming.all/intervalTest.as: successes.
 
