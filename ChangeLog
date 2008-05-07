@@ -1,5 +1,9 @@
 2008-05-07 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* po/*.po, po/gnash.pot: updated for distribution.
+
+2008-05-07 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* backend/render_handler_agg.cpp: i18n.
 	* gui/gui.cpp: don't divide by zero; it annoys the matrices.
 	  Fixes bug #23184.

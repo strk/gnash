@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Gnash\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-03-19 10:00+0100\n"
+"POT-Creation-Date: 2008-05-07 17:34+0200\n"
 "PO-Revision-Date: 2008-03-19 09:54+0100\n"
 "Last-Translator: Alwin Meschede <ameschede@gmx.de>\n"
 "Language-Team: German <gnome-de@gnome.org>\n"
@@ -15,6 +15,10 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+
+#: ../libbase/ClockTime.cpp:269
+msgid "Cannot get requested timezone information"
+msgstr ""
 
 #: ../libbase/curl_adapter.cpp:374
 #, c-format
@@ -65,33 +69,33 @@ msgstr "Kann Verzeichnis %s nicht öffnen"
 msgid "Gnash Plugin name: %s"
 msgstr "Gnash-Plugin-Name: %s"
 
-#: ../libbase/GC.cpp:62
+#: ../libbase/GC.cpp:68
 #, c-format
 msgid "GC %p deleted, deleting all managed resources - collector run "
 msgstr ""
 
-#: ../libbase/GC.cpp:79
+#: ../libbase/GC.cpp:85
 #, c-format
 msgid "GC %p: SWEEP SCAN"
 msgstr ""
 
-#: ../libbase/GC.cpp:89
+#: ../libbase/GC.cpp:95
 #, c-format
 msgid "GC %p: cleanUnreachable deleting object %p (%s)"
 msgstr ""
 
-#: ../libbase/GC.cpp:104
+#: ../libbase/GC.cpp:110
 #, c-format
 msgid "GC %p: cleanUnreachable deleted "
 msgstr ""
 
-#: ../libbase/GC.cpp:119
+#: ../libbase/GC.cpp:125
 msgid ""
 "Garbage collection skipped since number of collectables added since last run "
 "is too low ("
 msgstr ""
 
-#: ../libbase/GC.cpp:130
+#: ../libbase/GC.cpp:136
 #, c-format
 msgid "GC %p Starting collector: "
 msgstr ""
@@ -101,243 +105,47 @@ msgstr ""
 msgid "Internal jpeg error: %s"
 msgstr "Interner JPEG-Fehler: %s"
 
-#: ../libbase/log.cpp:158
-msgid "TRACE"
-msgstr "TRACE"
+#: ../libbase/rc.cpp:344 ../libbase/rc.cpp:351
+#, fuzzy
+msgid "RcInitFile: couldn't open file: "
+msgstr "Konnte Datei %s nicht öffnen"
 
-#: ../libbase/log.cpp:229
-msgid "ERROR"
-msgstr "FEHLER"
-
-#: ../libbase/log.cpp:244
-msgid "UNIMPLEMENTED"
-msgstr "NICHT IMPLEMENTIERT"
-
-#: ../libbase/log.cpp:259
-msgid "SECURITY"
-msgstr "SICHERHEIT"
-
-#: ../libbase/log.cpp:274
-msgid "MALFORMED SWF"
-msgstr "FEHLERHAFTES SWF"
-
-#: ../libbase/log.cpp:289
-msgid "ACTIONSCRIPT ERROR"
-msgstr "ACTIONSCRIPT-FEHLER"
-
-#: ../libbase/network.cpp:82
-msgid "Could not find a usable WinSock DLL"
-msgstr "Konnte keine verwendbare WinSock-DLL finden"
-
-#: ../libbase/network.cpp:124
-#, c-format
-msgid "Can't connect to privileged port #%d"
-msgstr "Kann mit privilegiertem Port %d nicht verbinden"
-
-#: ../libbase/network.cpp:146
-#, c-format
-msgid "unable to get protocol entry for %s"
-msgstr "Erfassen des Protokolleintrags für %s nicht möglich!"
-
-#: ../libbase/network.cpp:163 ../libbase/network.cpp:323
-#: ../libbase/network.cpp:471
-#, c-format
-msgid "unable to create socket: %s"
-msgstr "konnte Sockel nicht erstellen: %s"
-
-#: ../libbase/network.cpp:170
-msgid "setsockopt SO_REUSEADDR failed"
-msgstr "setsockopt SO_REUSEADDR fehlgeschlagen"
-
-#: ../libbase/network.cpp:180
-#, c-format
-msgid "unable to bind to port %hd: %s"
-msgstr "Binden an Port %hd unmöglich: %s"
-
-#: ../libbase/network.cpp:190
-#, c-format
-msgid "Server bound to service on %s, port %hd, using fd %d"
+#: ../libbase/rc.cpp:355
+msgid "RcInitFile: parsing "
 msgstr ""
 
-#: ../libbase/network.cpp:196
+#: ../libbase/rc.cpp:393
 #, c-format
-msgid "unable to listen on port: %hd: %s "
+msgid "Warning: missing value for variable \"%s\" in rcfile %s, line %d"
 msgstr ""
 
-#: ../libbase/network.cpp:233
+#: ../libbase/rc.cpp:519
 #, c-format
-msgid "Trying to accept net traffic on fd %d"
+msgid "Warning: unrecognized directive \"%s\" in rcfile %s line %d"
 msgstr ""
 
-#: ../libbase/network.cpp:263
-msgid "There is data at the console for stdin"
+#: ../libbase/rc.cpp:533
+#, c-format
+msgid "Warning: empty include specification in rcfile %s, line %d"
 msgstr ""
 
-#: ../libbase/network.cpp:270
-#, c-format
-msgid "The accept() socket for fd %d was interupted by a system call"
-msgstr ""
-
-#: ../libbase/network.cpp:274
-#, c-format
-msgid "The accept() socket for fd %d never was available for writing"
-msgstr ""
-
-#: ../libbase/network.cpp:281
-#, c-format
-msgid "The accept() socket for fd %d timed out waiting to write"
-msgstr ""
-
-#: ../libbase/network.cpp:293
-#, c-format
-msgid "unable to accept: %s"
-msgstr "nicht annehmbar: %s"
-
-#: ../libbase/network.cpp:298
-#, c-format
-msgid "Accepting tcp/ip connection on fd %d"
-msgstr "Nehme TCP/IP-Verbindung an fd %d an"
-
-#: ../libbase/network.cpp:345 ../libbase/network.cpp:493
-#, c-format
-msgid "The connect() socket for fd %d was interupted by a system call"
-msgstr ""
-"Der connect()-Sockel für fd %d wurde durch einen Systemaufruf unterbrochen"
-
-#: ../libbase/network.cpp:352 ../libbase/network.cpp:377
-#: ../libbase/network.cpp:500 ../libbase/network.cpp:529
-#, c-format
-msgid "The connect() socket for fd %d never was available for writing"
-msgstr ""
-
-#: ../libbase/network.cpp:363 ../libbase/network.cpp:511
-#, c-format
-msgid "The connect() socket for fd %d timed out waiting to write"
-msgstr ""
-
-#: ../libbase/network.cpp:371
-#, c-format
-msgid "\tsocket name %s for fd %d"
-msgstr ""
-
-#: ../libbase/network.cpp:436
-#, c-format
-msgid "Can't connect to privileged port %hd"
-msgstr "Verbindung mit privilegiertem Port %hd unmöglich"
-
-#: ../libbase/network.cpp:441
-#, c-format
-msgid "%s: to host %s at port %d"
-msgstr ""
-
-#: ../libbase/network.cpp:447
-#, c-format
-msgid "The hostname for this machine is %s"
-msgstr "Der Hostname für diesen Rechner ist %s"
-
-#: ../libbase/network.cpp:449
-msgid "Couldn't get the hostname for this machine"
-msgstr "Konnte Hostnamen für diesen Rechner nicht ermitteln"
-
-#: ../libbase/network.cpp:463
-#, c-format
-msgid "The IP address for this client socket is %s"
-msgstr "Die IP-Adresse für diesen Client-Sockel ist %s"
-
-#: ../libbase/network.cpp:522
-#, c-format
-msgid "\tport %d at IP %s for fd %d"
-msgstr ""
-
-#: ../libbase/network.cpp:598
-#, c-format
-msgid "Unable to close the socket for fd %d: %s"
-msgstr "Kann Sockel für fd %d nicht schließen: %s"
-
-#: ../libbase/network.cpp:605
-#, c-format
-msgid "Closed the socket on fd %d"
-msgstr "Sockel auf fd %d geschlossen"
-
-#: ../libbase/network.cpp:688 ../libbase/network.cpp:779
-#, c-format
-msgid "The socket for fd %d was interupted by a system call"
-msgstr ""
-"Der connect()-Sockel für fd %d wurde durch einen Systemaufruf unterbrochen"
-
-#: ../libbase/network.cpp:692
-#, c-format
-msgid "The socket for fd %d was never available for reading"
-msgstr ""
-
-#: ../libbase/network.cpp:697
-#, c-format
-msgid "The socket for fd %d timed out waiting to read"
-msgstr ""
-
-#: ../libbase/network.cpp:703
-#, c-format
-msgid "read %d bytes from fd %d"
-msgstr "%d bytes from fd %d gelesen"
-
-#: ../libbase/network.cpp:707
+#: ../libbase/rc.cpp:540
 #, c-format
 msgid ""
-"%s: Read packet data from fd %d (%d bytes): \n"
-"%s"
+"Warning: include specification must be an absolute pathin rcfile %s, line %d"
 msgstr ""
 
-#: ../libbase/network.cpp:783
+#: ../libbase/rc.cpp:551
 #, c-format
-msgid "The socket for fd %d was never available for writing"
+msgid "Warning: unrecognized action \"%s\" in rcfile %s, line %d"
 msgstr ""
 
-#: ../libbase/network.cpp:787
+#: ../libbase/rc.cpp:628
 #, c-format
-msgid "The socket for fd %d timed out waiting to write"
-msgstr ""
+msgid "Couldn't open file %s for writing"
+msgstr "Konnte Datei %s für Dekodierung nicht öffnen"
 
-#: ../libbase/network.cpp:793
-#, c-format
-msgid "Wrote zero out of %d bytes to fd %d: %s"
-msgstr ""
-
-#: ../libbase/network.cpp:798
-#, c-format
-msgid "Couldn't write %d bytes to fd %d: %s"
-msgstr ""
-
-#: ../libbase/network.cpp:806
-#, c-format
-msgid "wrote %d bytes to fd %d, expected %d"
-msgstr ""
-
-#: ../libbase/network.cpp:811
-#, c-format
-msgid "wrote %d bytes to fd %d"
-msgstr ""
-
-#: ../libbase/network.cpp:819
-#, c-format
-msgid ""
-"%s: Wrote packet data to fd %d: \n"
-"%s"
-msgstr ""
-
-#: ../libbase/network.cpp:833
-#, c-format
-msgid "took %d usec to write (%d bytes)"
-msgstr ""
-
-#: ../libbase/rc.cpp:491
-msgid "Warning: unrecognized directive \""
-msgstr ""
-
-#: ../libbase/rc.cpp:492
-msgid "\" in rcfile."
-msgstr ""
-
-#: ../libbase/rc.cpp:559
+#: ../libbase/rc.cpp:637
 msgid "# Generated by Gnash. Manual changes to this file may be overridden."
 msgstr ""
 "# Von Gnash generiert. Manuelle Änderungen in dieser Datei könnten "
@@ -348,212 +156,99 @@ msgstr ""
 msgid "Couldn't initialize ltdl: %s"
 msgstr "Konnte ltdl nicht initialisieren: %s"
 
-#: ../libbase/sharedlib.cpp:179
+#: ../libbase/sharedlib.cpp:177
 #, c-format
 msgid "Opened dynamic library \"%s\""
 msgstr "Dynamische Bibliothek \"%s\" geöffnet"
 
-#: ../libbase/sharedlib.cpp:214 ../libbase/sharedlib.cpp:239
+#: ../libbase/sharedlib.cpp:212 ../libbase/sharedlib.cpp:237
 #, c-format
 msgid "Couldn't find symbol: %s"
 msgstr "Konnte Symbol %s nicht finden"
 
-#: ../libbase/sharedlib.cpp:217 ../libbase/sharedlib.cpp:242
+#: ../libbase/sharedlib.cpp:215 ../libbase/sharedlib.cpp:240
 #, c-format
 msgid "Found symbol %s @ %p"
 msgstr "Symbol %s @ %p gefunden"
 
-#: ../libamf/amf.cpp:177
+#: ../backend/render_handler_agg.cpp:628
 #, c-format
-msgid "Type is %s"
-msgstr "Typ ist %s"
-
-#: ../libamf/amf.cpp:188
-#, c-format
-msgid "Boolean is %d"
-msgstr "Boolean ist %d"
-
-#: ../libamf/amf.cpp:202
-#, c-format
-msgid "String is %s"
-msgstr "String ist %s"
-
-#: ../libamf/amf.cpp:219
-msgid "Undefined element"
-msgstr "Undefiniertes Element"
-
-#: ../libamf/amf.cpp:683 ../libamf/amf.cpp:1391
-#, c-format
-msgid "The packet head is: 0x%s"
-msgstr "Der Paket-Header ist: 0x%s"
-
-#: ../libamf/amf.cpp:1363
-#, c-format
-msgid "AMF Header size bits (0x%X) out of range"
-msgstr "AMF Header-Längen-Bits (0x%X) außerhalb des erlaubten Bereichs"
-
-#: ../libamf/amf.cpp:1379
-#, c-format
-msgid "AMF header byte is: 0x%X"
-msgstr "AMF Header Byte ist: 0x%X"
-
-#: ../libamf/amf.cpp:1382
-#, c-format
-msgid "The AMF channel index is %d"
-msgstr "Der AMF Channel-Index ist %d"
-
-#: ../libamf/amf.cpp:1385
-#, c-format
-msgid "The header size is %d"
-msgstr "Die Header-Länge ist %d"
-
-#: ../libamf/amf.cpp:1398
-#, c-format
-msgid "The mystery word is: %d or 0x%s"
+msgid "Initialized AGG buffer <%p>, %d bytes, %dx%d, rowsize is %d bytes"
 msgstr ""
 
-#: ../libamf/amf.cpp:1407
-#, c-format
-msgid "The body size is: %d, or 0x%s"
+#: ../backend/render_handler_agg.cpp:698
+msgid "Warning: rendering ended while drawing a mask"
 msgstr ""
 
-#: ../libamf/amf.cpp:1417
-#, c-format
-msgid "The type is: %d, or 0x%s"
+#: ../backend/render_handler_agg.cpp:701
+msgid "Warning: rendering ended while masks were still active"
 msgstr ""
 
-#: ../libamf/amf.cpp:1436
-#, c-format
-msgid "ERROR: Unidentified AMF header data type %d"
-msgstr "FEHLER: Unbekannter AMF-Header-Datentyp %d"
-
-#: ../libamf/amf.cpp:1444
-#, c-format
-msgid "The source/destination is: %d, or 0x%s"
+#: ../backend/render_handler_agg.cpp:898
+msgid ""
+"Warning: select_clipbounds encountered a character definition with null "
+"bounds"
 msgstr ""
 
-#: ../libamf/amf.cpp:1479
+#: ../backend/render_handler_agg.cpp:988
+msgid "Warning: AGG renderer skipping a whole character"
+msgstr ""
+
+#: ../backend/render_handler_agg.cpp:1749
+msgid ""
+"Unidirectionally scaled strokes in AGG renderer (we'll scale by the scalable "
+"one)"
+msgstr ""
+
+#: ../backend/render_handler_agg.cpp:2099
+#, c-format
+msgid "Framebuffer pixel format is %s (little-endian host)"
+msgstr ""
+
+#: ../backend/render_handler_agg.cpp:2101
+#, c-format
+msgid "Framebuffer pixel format is %s (big-endian host)"
+msgstr ""
+
+#: ../backend/render_handler_cairo.cpp:558
+msgid "Scaled strokes in Cairo renderer"
+msgstr ""
+
+#: ../backend/render_handler_ogl.cpp:1236
+msgid "Unidirectionally scaled strokes in OGL renderer"
+msgstr ""
+
+#: ../libamf/amf.cpp:673
 msgid "AMF body input data is NULL"
 msgstr ""
 
-#: ../libamf/amf.cpp:1491
+#: ../libamf/amf.cpp:722
+#, fuzzy, c-format
+msgid "AMF String length is: %d"
+msgstr "String ist %s"
+
+#: ../libamf/amf.cpp:729
+#, fuzzy, c-format
+msgid "AMF String is: %s"
+msgstr "String ist %s"
+
+#: ../libamf/amf.cpp:802
+msgid "End of Object definition"
+msgstr ""
+
+#: ../libamf/amf.cpp:913
 #, c-format
-msgid "The packet body is: 0x%s"
+msgid "amf0_type_e of value: %x"
 msgstr ""
 
-#: ../libamf/amf.cpp:1593
-#, c-format
-msgid "The element is: 0x%s"
-msgstr ""
-
-#: ../libamf/amf.cpp:1630
-#, c-format
-msgid "Number \"%s\" is: 0x%s"
-msgstr ""
-
-#: ../libamf/amf.cpp:1690
-#, c-format
-msgid "astype_e of value: %x"
-msgstr ""
-
-#: ../libamf/rtmp.cpp:87
-msgid "Read initial Handshake Request"
-msgstr "Initialer Handshake-Request gelesen"
-
-#: ../libamf/rtmp.cpp:89
-msgid "Couldn't read initial Handshake Request"
-msgstr "Konnte initialen Handshake-Request nicht lesen"
-
-#: ../libamf/rtmp.cpp:95
-msgid "Handshake is correct"
-msgstr "Handshake ist korrekt"
-
-#: ../libamf/rtmp.cpp:97
-#, c-format
-msgid "Handshake isn't correct; Data read is: 0x%x"
-msgstr "Handshake ist nicht korrekt; Die gelesenen Daten sind: 0x%x"
-
-#: ../libamf/rtmp.cpp:104
-msgid "Read Handshake Data"
-msgstr "Handshake-Daten gelesen"
-
-#: ../libamf/rtmp.cpp:108
-#, c-format
-msgid "Couldn't read Handshake DataData read is: %s"
-msgstr ""
-
-#: ../libamf/rtmp.cpp:176
-msgid "Read first data block in handshake"
-msgstr ""
-
-#: ../libamf/rtmp.cpp:178
-msgid "Couldn't read first data block in handshake"
-msgstr ""
-
-#: ../libamf/rtmp.cpp:183
-msgid "Read second data block in handshake"
-msgstr ""
-
-#: ../libamf/rtmp.cpp:187
-msgid "Couldn't read second data block in handshake"
-msgstr ""
-
-#: ../libamf/rtmp.cpp:208
-msgid "Read Handshake Finish Data"
-msgstr ""
-
-#: ../libamf/rtmp.cpp:210
-msgid "Couldn't read Handshake Finish Data"
-msgstr ""
-
-#: ../libamf/rtmp.cpp:267
-msgid "Read first RTMP header byte"
-msgstr ""
-
-#: ../libamf/rtmp.cpp:269
-msgid "Couldn't read first RTMP header byte"
-msgstr "Konnte das erste Byte im RTMP-Header nicht lesen"
-
-#: ../libamf/rtmp.cpp:275
-#, c-format
-msgid "The Header size is: %d"
-msgstr "Die Header-Größe ist: %d"
-
-#: ../libamf/rtmp.cpp:276
-#, c-format
-msgid "The AMF index is: 0x%x"
-msgstr "Der AMF-Index ist: 0x%x"
-
-#: ../libamf/rtmp.cpp:280
-#, c-format
-msgid "Read first RTMP packet header of header size %d"
-msgstr ""
-
-#: ../libamf/rtmp.cpp:284
-msgid "Couldn't read first RTMP packet header"
-msgstr ""
-
-#: ../libamf/rtmp.cpp:297
-msgid "Reading AMF packets till we're done..."
-msgstr ""
-
-#: ../libamf/rtmp.cpp:303 ../libamf/rtmp.cpp:305
-#, c-format
-msgid "The packet data is: 0x%s"
-msgstr ""
-
-#: ../libamf/rtmp.cpp:309
-msgid "Done reading packet"
-msgstr "Lesen des Pakets abgeschlossen"
-
-#: ../libamf/sol.cpp:193
+#: ../libamf/sol.cpp:204
 #, c-format
 msgid ""
 "%s: SOL file header is: \n"
 "%s"
 msgstr ""
 
-#: ../libmedia/AudioDecoderNellymoser.cpp:832
+#: ../libmedia/AudioDecoderNellymoser.cpp:836
 #: ../libmedia/AudioDecoderSimple.cpp:415
 msgid "Error in sound sample conversion"
 msgstr "Fehler bei Audio-Sample-Umwandlung"
@@ -618,36 +313,36 @@ msgstr ""
 msgid "Error while decoding audio data."
 msgstr "Fehler beim Dekodieren von Audio-Daten"
 
-#: ../libmedia/ffmpeg/sound_handler_sdl.cpp:112
+#: ../libmedia/ffmpeg/sound_handler_sdl.cpp:132
 msgid "gnash has not been compiled to handle mp3 audio"
 msgstr "Gnash ist nicht kompiliert worden, um MP3-Audio zu verarbeiten!"
 
-#: ../libmedia/ffmpeg/sound_handler_sdl.cpp:128
+#: ../libmedia/ffmpeg/sound_handler_sdl.cpp:148
 #, c-format
 msgid "unknown sound format %d requested; gnash does not handle it"
 msgstr ""
 "Unbekanntes Audioformat %d angefordert. Gnash kann es nicht verarbeiten"
 
-#: ../libmedia/ffmpeg/sound_handler_sdl.cpp:190
+#: ../libmedia/ffmpeg/sound_handler_sdl.cpp:210
 msgid "Trying to play sound with size 0"
 msgstr ""
 
-#: ../libmedia/ffmpeg/sound_handler_sdl.cpp:265
+#: ../libmedia/ffmpeg/sound_handler_sdl.cpp:285
 #, c-format
 msgid "Unable to start SDL sound: %s"
 msgstr "Kann SDL-Audioausgabe nicht starten: %s"
 
-#: ../libmedia/ffmpeg/sound_handler_sdl.cpp:434
+#: ../libmedia/ffmpeg/sound_handler_sdl.cpp:454
 #, c-format
 msgid "Unable to start aux SDL sound: %s"
 msgstr "Kann Aux-SDL-Audioausgabe nicht starten: %s"
 
-#: ../libmedia/ffmpeg/sound_handler_sdl.cpp:637
+#: ../libmedia/ffmpeg/sound_handler_sdl.cpp:717
 #, c-format
 msgid "Negative buffer length in sdl_audio_callback (%d)"
 msgstr "Negative Pufferlänge in sdl_audio_callback (%d)"
 
-#: ../libmedia/ffmpeg/sound_handler_sdl.cpp:643
+#: ../libmedia/ffmpeg/sound_handler_sdl.cpp:723
 msgid "Zero buffer length in sdl_audio_callback"
 msgstr "Pufferlänge in sdl_audio_callback (%d) ist Null"
 
@@ -719,7 +414,7 @@ msgstr ""
 "Gnash konnte keinen passenden Gstreamer-Audio-Decoder finden. Bitte "
 "installieren Sie gstreamer-ffmpeg und/oder gstreamer-plugins-bad"
 
-#: ../libmedia/gst/SoundGst.cpp:444 ../server/asobj/NetStreamGst.cpp:136
+#: ../libmedia/gst/SoundGst.cpp:444 ../server/asobj/NetStreamGst.cpp:139
 msgid "Failed to make a valid audio sink."
 msgstr "Konnte keinen Audiosink setzen."
 
@@ -738,207 +433,202 @@ msgid ""
 "available; consider installing gstreamer-ffmpeg."
 msgstr ""
 
-#: ../libmedia/gst/VideoDecoderGst.cpp:224
+#: ../libmedia/gst/VideoDecoderGst.cpp:225
 #, c-format
 msgid "Embedded video playback halted; module %s reported: %s\n"
 msgstr "Eingebettetes Video-Playback angehalten; Modul %s meldete: %s\n"
 
-#: ../libmedia/gst/VideoDecoderGst.cpp:236
-#: ../server/asobj/NetStreamGst.cpp:542
+#: ../libmedia/gst/VideoDecoderGst.cpp:237
+#: ../server/asobj/NetStreamGst.cpp:545
 msgid "NetStream has reached the end of the stream."
 msgstr "NetStream hat das Ende des Streams erreicht."
 
-#: ../server/array.cpp:302
+#: ../server/array.cpp:309
 #, c-format
 msgid "Unhandled sort flags: %d (0x%X)"
 msgstr ""
 
-#: ../server/array.cpp:625
+#: ../server/array.cpp:630
 msgid "tried to pop element from back of empty array, returning undef"
 msgstr ""
 
-#: ../server/array.cpp:646
+#: ../server/array.cpp:651
 msgid "tried to shift element from front of empty array, returning undef"
 msgstr ""
 
-#: ../server/array.cpp:749
+#: ../server/array.cpp:750
 #, c-format
 msgid "Array.slice(%u, %u) called"
 msgstr ""
 
-#: ../server/array.cpp:779
-#, c-format
-msgid "Current array is %s"
-msgstr ""
-
-#: ../server/array.cpp:910
+#: ../server/array.cpp:908
 #, c-format
 msgid "Array(%s).splice(%s) called"
 msgstr ""
 
-#: ../server/array.cpp:916
+#: ../server/array.cpp:914
 msgid "Array.splice() needs at least 1 argument, call ignored"
 msgstr ""
 
-#: ../server/array.cpp:932
+#: ../server/array.cpp:930
 #, c-format
 msgid "Array.splice: start:%d became %u"
 msgstr ""
 
-#: ../server/array.cpp:945
+#: ../server/array.cpp:943
 #, c-format
 msgid "Array.splice(%d,%d): negative length given, call ignored"
 msgstr ""
 
-#: ../server/array.cpp:1014
+#: ../server/array.cpp:1011
 msgid "Sort called with invalid arguments."
 msgstr "Sort mit ungültigen Argumenten aufgerufen."
 
-#: ../server/array.cpp:1171
+#: ../server/array.cpp:1164
 msgid "SortOn called with invalid arguments."
 msgstr "SortOn mit ungültigen Argumenten aufgerufen."
 
-#: ../server/array.cpp:1186
+#: ../server/array.cpp:1179
 #, c-format
 msgid "calling array push, pushing %d values onto back of array"
 msgstr ""
 
-#: ../server/array.cpp:1202
+#: ../server/array.cpp:1195
 #, c-format
 msgid "calling array unshift, pushing %d values onto front of array"
 msgstr ""
 
-#: ../server/array.cpp:1221
+#: ../server/array.cpp:1214
 #, c-format
 msgid "calling array pop, result:%s, new array size:%d"
 msgstr ""
 
-#: ../server/array.cpp:1237
+#: ../server/array.cpp:1230
 #, c-format
 msgid "calling array shift, result:%s, new array size:%d"
 msgstr ""
 
-#: ../server/array.cpp:1254
+#: ../server/array.cpp:1247
 #, c-format
 msgid "called array reverse, result:%s, new array size:%d"
 msgstr ""
 
-#: ../server/array.cpp:1289
+#: ../server/array.cpp:1282
 #, c-format
 msgid "array_to_string called, nargs = %d, this_ptr = %p"
 msgstr ""
 
-#: ../server/array.cpp:1292
+#: ../server/array.cpp:1285
 #, c-format
 msgid "to_string result is: %s"
 msgstr ""
 
-#: ../server/array.cpp:1342
+#: ../server/array.cpp:1338
 msgid ""
 "More than 2 arguments to Array.slice, and I don't know what to do with "
 "them.  Ignoring them"
 msgstr ""
 
-#: ../server/array.cpp:1420
+#: ../server/array.cpp:1416
 #, c-format
 msgid "array_new called, nargs = %d"
 msgstr ""
 
-#: ../server/array.cpp:1447
+#: ../server/array.cpp:1443
 #, c-format
 msgid "array_new setting object %p in result"
 msgstr ""
 
-#: ../server/as_environment.cpp:62
+#: ../server/as_environment.cpp:57
 #, c-format
 msgid "get_variable(%s)"
 msgstr ""
 
-#: ../server/as_environment.cpp:83
+#: ../server/as_environment.cpp:78
 #, c-format
 msgid "find_object(\"%s\") [ varname = '%s' - current target = '%s' ] failed"
 msgstr ""
 
-#: ../server/as_environment.cpp:89
+#: ../server/as_environment.cpp:84
 #, c-format
 msgid "...but get_variable_raw(%s, <scopeStack>) succeeded (%s)!"
 msgstr ""
 
-#: ../server/as_environment.cpp:153
+#: ../server/as_environment.cpp:148
 #, c-format
 msgid "Won't get invalid raw variable name: %s"
 msgstr ""
 
-#: ../server/as_environment.cpp:220
+#: ../server/as_environment.cpp:215
 #, c-format
 msgid "reference to unexisting variable '%s'"
 msgstr ""
 
-#: ../server/as_environment.cpp:310
+#: ../server/as_environment.cpp:305
 #, c-format
 msgid "Path target '%s' not found while setting %s=%s"
 msgstr ""
 
-#: ../server/as_environment.cpp:339
+#: ../server/as_environment.cpp:334
 #, c-format
 msgid "Won't set invalid raw variable name: %s"
 msgstr ""
 
-#: ../server/as_environment.cpp:536
+#: ../server/as_environment.cpp:531
 #, c-format
 msgid "find_object(%s) called"
 msgstr ""
 
-#: ../server/as_environment.cpp:542
+#: ../server/as_environment.cpp:537
 msgid "Returning m_target (empty path)"
 msgstr ""
 
-#: ../server/as_environment.cpp:566
+#: ../server/as_environment.cpp:561
 #, c-format
 msgid "Path is '/', return the root (%p)"
 msgstr ""
 
-#: ../server/as_environment.cpp:576
+#: ../server/as_environment.cpp:571
 #, c-format
 msgid "Absolute path, start at the root (%p)"
 msgstr ""
 
-#: ../server/as_environment.cpp:583
+#: ../server/as_environment.cpp:578
 #, c-format
 msgid "Relative path, start at (%s)"
 msgstr ""
 
-#: ../server/as_environment.cpp:598
+#: ../server/as_environment.cpp:593
 #, c-format
 msgid "Path is %s, returning the root"
 msgstr ""
 
-#: ../server/as_environment.cpp:609
+#: ../server/as_environment.cpp:604
 #, c-format
 msgid "invalid path '%s' (p=next_slash=%s)"
 msgstr ""
 
-#: ../server/as_environment.cpp:620
+#: ../server/as_environment.cpp:615
 #, c-format
 msgid "invalid path '%s' (dot not allowed after having seen a slash)"
 msgstr ""
 
-#: ../server/as_environment.cpp:640
+#: ../server/as_environment.cpp:635
 #, c-format
 msgid "No more subparts, env is %p"
 msgstr ""
 
-#: ../server/as_environment.cpp:700
+#: ../server/as_environment.cpp:695
 #, c-format
 msgid "Invoking get_path_element(%s) on object %p (%s)"
 msgstr ""
 
-#: ../server/as_environment.cpp:707
+#: ../server/as_environment.cpp:702
 #, c-format
 msgid "Path element %s not found in object %p"
 msgstr ""
 
-#: ../server/as_environment.cpp:887
+#: ../server/as_environment.cpp:882
 #, c-format
 msgid "Max stack count reached (%u)"
 msgstr ""
@@ -984,228 +674,298 @@ msgstr ""
 msgid "it's a built-in class"
 msgstr ""
 
-#: ../server/as_function.cpp:418
+#: ../server/as_function.cpp:425
 #, c-format
 msgid "constructor prototype is %s"
 msgstr ""
 
-#: ../server/as_object.cpp:197
+#: ../server/as_object.cpp:234 ../server/sprite_instance.cpp:2505
+#: ../server/sprite_instance.cpp:2554
 #, c-format
 msgid "Caught exception: %s"
 msgstr ""
 
-#: ../server/as_object.cpp:509 ../server/as_object.cpp:554
+#: ../server/as_object.cpp:554 ../server/as_object.cpp:665
 #, c-format
 msgid "Attempt to set read-only property '%s'"
 msgstr ""
 
-#: ../server/as_object.cpp:523 ../server/as_object.cpp:567
+#: ../server/as_object.cpp:600 ../server/as_object.cpp:702
 #, c-format
 msgid "%s: Exception %s. Will create a new member"
 msgstr ""
 
-#: ../server/as_object.cpp:536
+#: ../server/as_object.cpp:614
 #, c-format
 msgid "Unknown failure in setting property '%s' on object '%p'"
 msgstr ""
 
-#: ../server/as_object.cpp:594
+#: ../server/as_object.cpp:729
 msgid ""
 "Attempt to set a slot for either a slot or a property which already exists."
 msgstr ""
 
-#: ../server/as_object.cpp:602
+#: ../server/as_object.cpp:737
 #, c-format
 msgid "Attempt to initialize read-only property ``%s'' on object ``%p'' twice"
 msgstr ""
 
-#: ../server/as_object.cpp:756
+#: ../server/as_object.cpp:962
 msgid "Circular inheritance chain detected during isPrototypeOf call"
 msgstr ""
 
-#: ../server/as_object.cpp:765
+#: ../server/as_object.cpp:971
 #, c-format
-msgid " members of object %p follow"
+msgid "%d members of object %p follow"
 msgstr ""
 
-#: ../server/as_object.cpp:822
+#: ../server/as_object.cpp:1028
 #, c-format
 msgid ""
 "Can't set propflags on object property %s (either not found or protected)"
 msgstr ""
 
-#: ../server/as_object.cpp:870
+#: ../server/as_object.cpp:1076
 #, c-format
 msgid ""
 "Invalid call to AsSetPropFlags: invalid second argument %s (expected string, "
 "null or an array)"
 msgstr ""
 
-#: ../server/as_value.cpp:183
+#: ../server/as_value.cpp:178
 #, c-format
 msgid "to_primitive(%s, STRING) threw an ActionTypeError %s"
 msgstr ""
 
-#: ../server/as_value.cpp:454
+#: ../server/as_value.cpp:599
 #, c-format
 msgid "to_primitive(%s, NUMBER) threw an ActionTypeError %s"
 msgstr ""
 
-#: ../server/button_character_instance.cpp:465
+#: ../server/as_value.cpp:1723
+#, c-format
+msgid "(%s + %s) [primitive conversion done]"
+msgstr ""
+
+#: ../server/button_character_instance.cpp:503
 #, c-format
 msgid "Unhandled button event %s"
 msgstr ""
 
-#: ../server/button_character_instance.cpp:551
-#, c-format
-msgid "Executing actions for button condition %d"
-msgstr ""
-
-#: ../server/button_character_instance.cpp:911
+#: ../server/button_character_instance.cpp:1081
 #, c-format
 msgid ""
 "A button member (%s) clashes with the name of an existing character in its "
 "display list.  The member will hide the character"
 msgstr ""
 
-#: ../server/character.cpp:117
+#: ../server/button_character_instance.cpp:1174
+msgid "Button state"
+msgstr ""
+
+#: ../server/character.cpp:128
 msgid ""
 "ActionScript code trying to reference a nonexistent parent with '..'  (a "
 "nonexistent parent probably only occurs in the root MovieClip). Returning "
 "NULL. "
 msgstr ""
 
-#: ../server/character.cpp:282
+#: ../server/character.cpp:300
 #, c-format
 msgid "Attempt to set _xscale to %g, refused"
 msgstr ""
 
-#: ../server/character.cpp:318
+#: ../server/character.cpp:336
 #, c-format
 msgid "Attempt to set _yscale to %g, refused"
 msgstr ""
 
-#: ../server/character.cpp:436
-msgid "FIXME: can't set _width on character with null or world bounds"
-msgstr ""
-
-#: ../server/character.cpp:443
+#: ../server/character.cpp:405
 #, c-format
-msgid "FIXME: can't set _height on character with width %d"
+msgid "Ignored attempt to set %s.%s=%s"
 msgstr ""
 
-#: ../server/character.cpp:451
+#: ../server/character.cpp:407
+msgid "_alpha"
+msgstr ""
+
+#: ../server/character.cpp:466
+#, c-format
+msgid "FIXME: can't set _width on character %s (%s) with null or world bounds"
+msgstr ""
+
+#: ../server/character.cpp:474
+#, c-format
+msgid "FIXME: can't set _width on character %s (%s) with width %d"
+msgstr ""
+
+#: ../server/character.cpp:483
 #, c-format
 msgid "Setting _width=%g of character %s (%s)"
 msgstr ""
 
-#: ../server/character.cpp:485
-msgid "FIXME: can't set _height on character with null or world bounds"
-msgstr ""
-
-#: ../server/character.cpp:492
+#: ../server/character.cpp:518
 #, c-format
-msgid "FIXME: can't set _height on character with height %d"
+msgid "FIXME: can't set _height on character %s (%s) with null or world bounds"
 msgstr ""
 
-#: ../server/character.cpp:500
+#: ../server/character.cpp:526
+#, c-format
+msgid "FIXME: can't set _height on character %s (%s) with height %d"
+msgstr ""
+
+#: ../server/character.cpp:535
 #, c-format
 msgid "Setting _height=%g of character %s (%s)"
 msgstr ""
 
-#: ../server/debugger.cpp:142
+#: ../server/character.cpp:1031 ../server/movie_root.cpp:2110
+msgid "yes"
+msgstr ""
+
+#: ../server/character.cpp:1032 ../server/movie_root.cpp:2111
+msgid "no"
+msgstr ""
+
+#: ../server/character.cpp:1038
+msgid "Depth"
+msgstr "Tiefe"
+
+#: ../server/character.cpp:1045
+msgid "Ratio"
+msgstr ""
+
+#: ../server/character.cpp:1055
+msgid "Clipping depth"
+msgstr ""
+
+#: ../server/character.cpp:1060
+msgid "Dimensions"
+msgstr ""
+
+#: ../server/character.cpp:1062
+msgid "Dynamic"
+msgstr ""
+
+#: ../server/character.cpp:1063
+msgid "Mask"
+msgstr ""
+
+#: ../server/character.cpp:1064
+msgid "Destroyed"
+msgstr ""
+
+#: ../server/character.cpp:1065
+msgid "Unloaded"
+msgstr ""
+
+#: ../server/debugger.cpp:143
 msgid "Debugger enabled >> "
 msgstr "Debugger eingeschaltet >>"
 
-#: ../server/debugger.cpp:357 ../server/debugger.cpp:398
+#: ../server/debugger.cpp:358 ../server/debugger.cpp:399
 msgid "No format flag"
 msgstr "Kein Format-Flag"
 
-#: ../server/debugger.cpp:467
+#: ../server/debugger.cpp:468
 #, c-format
 msgid "Setting watchpoint for variable: \"%s\""
 msgstr ""
 
-#: ../server/debugger.cpp:514
+#: ../server/debugger.cpp:515
 #, c-format
 msgid "Matched for variable \"%s\": \"%s\""
 msgstr ""
 
-#: ../server/debugger.cpp:529 ../server/debugger.cpp:548
-#: ../server/debugger.cpp:561 ../server/debugger.cpp:623
+#: ../server/debugger.cpp:530 ../server/debugger.cpp:549
+#: ../server/debugger.cpp:562 ../server/debugger.cpp:624
 #, c-format
 msgid "WARNING: environment not set in %s"
 msgstr ""
 
-#: ../server/debugger.cpp:565
+#: ../server/debugger.cpp:566
 #, c-format
 msgid "Stack Dump of: %p"
 msgstr ""
 
-#: ../server/debugger.cpp:593
+#: ../server/debugger.cpp:594
 #, c-format
 msgid "Stack Dump of 0x%p: empty"
 msgstr ""
 
-#: ../server/debugger.cpp:628
+#: ../server/debugger.cpp:629
 msgid "Global Registers Dump:"
 msgstr ""
 
-#: ../server/dlist.cpp:401
+#: ../server/dlist.cpp:367
 #, c-format
-msgid "move_display_object() -- can't find object at depth %d"
+msgid "move_character() -- can't find object at depth %d"
 msgstr ""
 
-#: ../server/dlist.cpp:746
+#: ../server/dlist.cpp:729
 #, c-format
 msgid "Item %d at depth %d (char id %d, name %s, type %s)"
 msgstr ""
 
-#: ../server/edit_text_character.cpp:448
+#: ../server/edit_text_character.cpp:205
+msgid "missing arg"
+msgstr ""
+
+#: ../server/edit_text_character.cpp:220
+#, fuzzy
+msgid "first argument is not an object"
+msgstr "MovieClipLoader.getProgress(%s): Erstes Argument ist kein Objekt"
+
+#: ../server/edit_text_character.cpp:230
+#, fuzzy
+msgid "first argument is not a TextFormat"
+msgstr "%s.setMask(%s) : Erstes Argument ist kein Zeichen"
+
+#: ../server/edit_text_character.cpp:550
 #, c-format
 msgid ""
 "CHECKME: removeTextField(%s): TextField depth (%d) out of the 'dynamic' zone "
 "[0..1048575], won't remove"
 msgstr ""
 
-#: ../server/edit_text_character.cpp:847
+#: ../server/edit_text_character.cpp:952
 #, c-format
 msgid "Attempt to set TextField._width to %g"
 msgstr ""
 
-#: ../server/edit_text_character.cpp:855
+#: ../server/edit_text_character.cpp:960
 #, c-format
 msgid "Attempt to set TextField._width to a negative number: %g, toggling sign"
 msgstr ""
 
-#: ../server/edit_text_character.cpp:909
+#: ../server/edit_text_character.cpp:1013
 #, c-format
 msgid "Attempt to set TextField._height to %g"
 msgstr ""
 
-#: ../server/edit_text_character.cpp:917
+#: ../server/edit_text_character.cpp:1021
 #, c-format
 msgid ""
 "Attempt to set TextField._height to a negative number: %g, toggling sign"
 msgstr ""
 
-#: ../server/edit_text_character.cpp:1086
+#: ../server/edit_text_character.cpp:1190
 #, c-format
 msgid ""
 "TextField text doesn't fit in its boundaries: width %g, margin %g - nothing "
 "to align"
 msgstr ""
 
-#: ../server/edit_text_character.cpp:1145
+#: ../server/edit_text_character.cpp:1253
 msgid "TextField.autoSize != 'none' TESTING"
 msgstr ""
 
-#: ../server/edit_text_character.cpp:1165
+#: ../server/edit_text_character.cpp:1271
 #, c-format
 msgid "No font for edit_text_character! [%s:%d]"
 msgstr "Keine Schriftart für edit_text_character! [%s:%d]"
 
-#: ../server/edit_text_character.cpp:1289
+#: ../server/edit_text_character.cpp:1397
 msgid ""
 "HTML in a text field is unsupported, gnash will just forget the tags and "
 "print their content"
@@ -1213,38 +973,38 @@ msgstr ""
 "HTML in einem Textfeld wird nicht unterstützt, gnash wird einfach die Tags "
 "vergessen und ihren Inhalt ausgeben"
 
-#: ../server/edit_text_character.cpp:1313
+#: ../server/edit_text_character.cpp:1418
 #, c-format
 msgid ""
 "%s -- missing glyph for space char (needed for TAB).  Make sure character "
 "shapes for font %s are being exported into your SWF file."
 msgstr ""
 
-#: ../server/edit_text_character.cpp:1364
+#: ../server/edit_text_character.cpp:1469
 #, c-format
 msgid ""
 "%s -- missing embedded glyph for char %d.  Make sure character shapes for "
 "font %s are being exported into your SWF file"
 msgstr ""
 
-#: ../server/edit_text_character.cpp:1373
+#: ../server/edit_text_character.cpp:1478
 #, c-format
 msgid ""
 "%s -- missing device glyph for char %d.  Maybe you don't have font '%s' "
 "installed in your system?"
 msgstr ""
 
-#: ../server/edit_text_character.cpp:1538
+#: ../server/edit_text_character.cpp:1661
 #, c-format
 msgid "VariableName: %s"
 msgstr ""
 
-#: ../server/edit_text_character.cpp:1554
+#: ../server/edit_text_character.cpp:1677
 #, c-format
 msgid "Variable text Path: %s, Var: %s"
 msgstr ""
 
-#: ../server/edit_text_character.cpp:1567
+#: ../server/edit_text_character.cpp:1690
 #, c-format
 msgid ""
 "VariableName associated to text field refer to an unknown target (%s). It is "
@@ -1252,19 +1012,19 @@ msgid ""
 "Gnash will try to register again on next access."
 msgstr ""
 
-#: ../server/edit_text_character.cpp:1584
+#: ../server/edit_text_character.cpp:1707
 msgid "registerTextVariable() called"
 msgstr ""
 
-#: ../server/edit_text_character.cpp:1590
+#: ../server/edit_text_character.cpp:1713
 msgid "registerTextVariable() no-op call (already registered)"
 msgstr ""
 
-#: ../server/edit_text_character.cpp:1598
+#: ../server/edit_text_character.cpp:1721
 msgid "string is empty, consider as registered"
 msgstr ""
 
-#: ../server/edit_text_character.cpp:1608
+#: ../server/edit_text_character.cpp:1731
 #, c-format
 msgid ""
 "VariableName associated to text field (%s) refer to an unknown target. It is "
@@ -1272,33 +1032,45 @@ msgid ""
 "Gnash will try to register again on next access."
 msgstr ""
 
-#: ../server/edit_text_character.cpp:1625
+#: ../server/edit_text_character.cpp:1748
 #, c-format
 msgid "target object (%s @ %p) does have a member named %s"
 msgstr ""
 
-#: ../server/edit_text_character.cpp:1636
+#: ../server/edit_text_character.cpp:1759
 #, c-format
 msgid ""
 "target sprite (%s @ %p) does NOT have a member named %s (no problem, we'll "
 "add it with value %s)"
 msgstr ""
 
-#: ../server/edit_text_character.cpp:2067
+#: ../server/edit_text_character.cpp:1768
+#, c-format
+msgid ""
+"target sprite (%s @ %p) does NOT have a member named %s, and we don't have "
+"text defined"
+msgstr ""
+
+#: ../server/edit_text_character.cpp:2275
+#, c-format
+msgid "Attempt to set length property of TextField %s"
+msgstr ""
+
+#: ../server/edit_text_character.cpp:2335
 #, c-format
 msgid "Invalid value given to TextField.type: %s"
 msgstr ""
 
-#: ../server/fill_style.cpp:150
+#: ../server/fill_style.cpp:151
 msgid "num gradients 0"
 msgstr ""
 
-#: ../server/fill_style.cpp:160
+#: ../server/fill_style.cpp:161
 #, c-format
 msgid "Unexpected num gradients (%d), expected 1 to 8"
 msgstr ""
 
-#: ../server/fill_style.cpp:235
+#: ../server/fill_style.cpp:236
 #, c-format
 msgid ""
 "Bitmap fill specifies '%d' as associated bitmap character id, but that "
@@ -1306,107 +1078,107 @@ msgid ""
 "such  malformed SWF, so we'll only warn once about this."
 msgstr ""
 
-#: ../server/fill_style.cpp:299
+#: ../server/fill_style.cpp:300
 #, c-format
 msgid "Unknown fill style %d"
 msgstr ""
 
-#: ../server/fill_style.cpp:340
+#: ../server/fill_style.cpp:341
 #, c-format
 msgid ""
 "First gradient in a fill_style have position==%d (expected 0). This seems to "
 "be common, so will warn only once."
 msgstr ""
 
-#: ../server/fill_style.cpp:376
+#: ../server/fill_style.cpp:377
 #, c-format
 msgid "two gradients in a fill_style have the same position/ratio: %d"
 msgstr ""
 
-#: ../server/font.cpp:102 ../server/font.cpp:424
+#: ../server/font.cpp:103 ../server/font.cpp:431
 #, c-format
 msgid "Could not initialize device font face '%s'"
 msgstr ""
 
-#: ../server/font.cpp:156
+#: ../server/font.cpp:163
 msgid "reading DefineFont"
 msgstr ""
 
-#: ../server/font.cpp:200
+#: ../server/font.cpp:207
 msgid "Glyphs offset table corrupted in DefineFont tag"
 msgstr ""
 
-#: ../server/font.cpp:215
+#: ../server/font.cpp:222
 msgid "reading DefineFont2 or DefineFont3"
 msgstr ""
 
-#: ../server/font.cpp:265 ../server/font.cpp:281
+#: ../server/font.cpp:272 ../server/font.cpp:288
 #, c-format
 msgid "Glyph %d at offset %u"
 msgstr ""
 
-#: ../server/font.cpp:303
+#: ../server/font.cpp:310
 msgid "Glyphs offset table corrupted in DefineFont2/3 tag"
 msgstr ""
 
-#: ../server/font.cpp:318
+#: ../server/font.cpp:325
 msgid "Bad offset in DefineFont2"
 msgstr ""
 
-#: ../server/font.cpp:384
+#: ../server/font.cpp:391
 msgid "Repeated kerning pair found - ignoring"
 msgstr ""
 
-#: ../server/font.cpp:415
+#: ../server/font.cpp:422
 msgid "DefineFontInfo2 partially implemented"
 msgstr ""
 
-#: ../server/font.cpp:448
+#: ../server/font.cpp:455
 #, c-format
 msgid "reading code table at offset %lu"
 msgstr ""
 
-#: ../server/font.cpp:486
+#: ../server/font.cpp:493
 #, c-format
 msgid "get_glyph_index(%u) returning %d"
 msgstr ""
 
-#: ../server/font.cpp:498
+#: ../server/font.cpp:505
 #, c-format
 msgid "get_glyph_index(%u) returning -1"
 msgstr ""
 
-#: ../server/FreetypeGlyphsProvider.cpp:360
+#: ../server/FreetypeGlyphsProvider.cpp:366
 #, c-format
 msgid "Can't find font file for font '%s'"
 msgstr "Kann für Schriftart '%s' keine Schriftartendatei finden"
 
-#: ../server/FreetypeGlyphsProvider.cpp:372
+#: ../server/FreetypeGlyphsProvider.cpp:378
 #, c-format
 msgid "Font file '%s' has bad format"
 msgstr "Schriftartendatei '%s' hat ein ungültiges Format"
 
-#: ../server/FreetypeGlyphsProvider.cpp:379
+#: ../server/FreetypeGlyphsProvider.cpp:385
 #, c-format
 msgid "Some error opening font '%s'"
 msgstr "Beim Öffnen der Schrift '%s' ist ein Fehler aufgetreten"
 
-#: ../server/impl.cpp:98
+#: ../server/impl.cpp:100
 #, c-format
 msgid "Base url set to: %s"
 msgstr "Basis-URL gesetzt auf: %s"
 
-#: ../server/impl.cpp:295
+#: ../server/impl.cpp:297
 #, c-format
 msgid "get_movie_info(): can't open '%s'"
 msgstr "get_movie_info(): kann '%s' nicht öffnen"
 
-#: ../server/impl.cpp:310
+#: ../server/impl.cpp:312
 #, c-format
 msgid "get_movie_info(): file '%s' does not start with a SWF header"
 msgstr "get_movie_info(): Datei '%s' beginnt nicht mit einem SWF-Header"
 
-#: ../server/impl.cpp:320
+#: ../server/impl.cpp:322
 msgid ""
 "get_movie_info(): can't read zipped SWF data; gnash was compiled without "
 "zlib support"
@@ -1414,186 +1186,148 @@ msgstr ""
 "get_movie_info(): Kann gezippte SWF-Daten nicht lesen; gnash wurde ohne zlib-"
 "Unterstützung kompiliert"
 
-#: ../server/impl.cpp:381
+#: ../server/impl.cpp:383
 #, c-format
 msgid "Can't read jpeg from %s"
 msgstr "Kann jpeg von %s nicht lesen"
 
-#: ../server/impl.cpp:396
+#: ../server/impl.cpp:398
 msgid "Loading of png"
 msgstr "Laden von png"
 
-#: ../server/impl.cpp:404
+#: ../server/impl.cpp:406
 #, c-format
 msgid "Can't read png from %s"
 msgstr "Kann png von %s nicht lesen"
 
-#: ../server/impl.cpp:427
+#: ../server/impl.cpp:429
 msgid "Can't read file header"
 msgstr "Kann Kopfteil der Datei nicht lesen"
 
-#: ../server/impl.cpp:519
+#: ../server/impl.cpp:521
 msgid ""
 "Requested to keep from completely loading a movie, but the movie in question "
 "is a jpeg, for which we don't yet have the concept of a 'loading thread'"
 msgstr ""
 
-#: ../server/impl.cpp:527
+#: ../server/impl.cpp:529
 msgid ""
 "Requested to keep from completely loading a movie, but the movie in question "
 "is a png, for which we don't yet have the concept of a 'loading thread'"
 msgstr ""
 
-#: ../server/impl.cpp:536
+#: ../server/impl.cpp:538
 #, c-format
 msgid "unknown file type (%s)"
 msgstr "unbekannter Dateityp (%s)"
 
-#: ../server/impl.cpp:554
+#: ../server/impl.cpp:556
 #, c-format
 msgid "failed to open '%s'; can't create movie"
 msgstr "Konnte '%s' nicht öffnen. Kann Film nicht erstellen"
 
-#: ../server/impl.cpp:559
+#: ../server/impl.cpp:561
 #, c-format
 msgid "streamProvider opener can't open '%s'"
 msgstr "streamProvider opener kann '%s' nicht öffnen"
 
-#: ../server/impl.cpp:802
+#: ../server/impl.cpp:804
 #, c-format
 msgid "Movie %s already in library"
 msgstr "Film %s bereits in der Bibliothek"
 
-#: ../server/impl.cpp:816
+#: ../server/impl.cpp:818
 #, c-format
 msgid "Couldn't load library movie '%s'"
 msgstr "Konnte die Film-Bibliothek '%s' nicht laden"
 
-#: ../server/impl.cpp:825
+#: ../server/impl.cpp:827
 #, c-format
 msgid "Movie %s (SWF%d) added to library"
 msgstr ""
 
-#: ../server/impl.cpp:829
+#: ../server/impl.cpp:831
 #, c-format
 msgid "Movie %s (SWF%d) NOT added to library (resulted from a POST)"
 msgstr ""
 
-#: ../server/movie_root.cpp:181
+#: ../server/movie_root.cpp:194
 #, c-format
 msgid "ActionLimits hit during setRootMovie: %s.Disabling scripts"
 msgstr ""
 
-#: ../server/movie_root.cpp:275 ../server/movie_root.cpp:284
+#: ../server/movie_root.cpp:289 ../server/movie_root.cpp:298
 #, c-format
 msgid ""
 "%s.swapDepth(%d): movie has a depth (%d) below static depth zone (%d), won't "
 "swap it's depth"
 msgstr ""
 
-#: ../server/movie_root.cpp:346
+#: ../server/movie_root.cpp:360
 msgid "Original root movie can't be removed"
 msgstr ""
 
-#: ../server/movie_root.cpp:365 ../server/sprite_instance.cpp:4183
+#: ../server/movie_root.cpp:379 ../server/sprite_instance.cpp:4376
 #, c-format
 msgid "can't create movie_definition for %s"
 msgstr ""
 
-#: ../server/movie_root.cpp:374 ../server/sprite_instance.cpp:4192
+#: ../server/movie_root.cpp:388 ../server/sprite_instance.cpp:4385
 #, c-format
 msgid "can't create extern movie_instance for %s"
 msgstr ""
 
-#: ../server/movie_root.cpp:857
+#: ../server/movie_root.cpp:873
 #, c-format
 msgid "ActionLimits hit during mouse event processing: %s. Disabling scripts"
 msgstr ""
 
-#: ../server/movie_root.cpp:1048
+#: ../server/movie_root.cpp:1065
 #, c-format
 msgid "ActionLimits hit during advance: %s. Disabling scripts"
 msgstr ""
 
-#: ../server/movie_root.cpp:1846
+#: ../server/movie_root.cpp:2043
 #, c-format
 msgid "processLoadMovieRequest: Testing _level loading (level %u)"
 msgstr ""
 
-#: ../server/movie_root.cpp:1913
-msgid "yes"
-msgstr ""
-
-#: ../server/movie_root.cpp:1914
-msgid "no"
-msgstr ""
-
-#: ../server/movie_root.cpp:1959
+#: ../server/movie_root.cpp:2160
 msgid "Live characters"
 msgstr ""
 
-#: ../server/movie_root.cpp:1970
-msgid "Depth"
-msgstr "Tiefe"
-
-#: ../server/movie_root.cpp:1977
-msgid "Ratio"
-msgstr ""
-
-#: ../server/movie_root.cpp:1987
-msgid "Clipping depth"
-msgstr ""
-
-#: ../server/movie_root.cpp:1992
-msgid "Dimensions"
-msgstr ""
-
-#: ../server/movie_root.cpp:1994
-msgid "Dynamic"
-msgstr ""
-
-#: ../server/movie_root.cpp:1995
-msgid "Mask"
-msgstr ""
-
-#: ../server/movie_root.cpp:1996
-msgid "Destroyed"
-msgstr ""
-
-#: ../server/movie_root.cpp:1997
-msgid "Unloaded"
-msgstr ""
-
-#: ../server/PropertyList.cpp:172
+#: ../server/PropertyList.cpp:189
 #, c-format
-msgid "Property %s is read-only, not setting it to %s"
+msgid ""
+"Property %s (key %d) in namespace %s (key %d) is read-only %s, not setting "
+"it to %s"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:214
+#: ../server/sprite_instance.cpp:211
 #, c-format
 msgid ""
 "attachMovie called with wrong number of arguments expected 3 to 4, got (%d) "
 "- returning undefined"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:228
+#: ../server/sprite_instance.cpp:225
 #, c-format
 msgid "attachMovie: '%s': no such exported resource - returning undefined"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:239
+#: ../server/sprite_instance.cpp:235
 #, c-format
 msgid ""
 "attachMovie: exported resource '%s' is not a character definition (%s) -- "
 "returning undefined"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:265
+#: ../server/sprite_instance.cpp:260
 #, c-format
 msgid "Could not attach character at depth %d"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:282
+#: ../server/sprite_instance.cpp:277
 #, c-format
 msgid ""
 "Fourth argument of attachMovie doesn't cast to an object (%s), we'll act as "
@@ -1610,36 +1344,36 @@ msgstr ""
 msgid "createEmptyMovieClip takes 2 args, but %d given, discarding the excess"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:363
+#: ../server/sprite_instance.cpp:365
 #, c-format
 msgid "%s.swapDepths() needs one arg"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:373
+#: ../server/sprite_instance.cpp:375
 #, c-format
 msgid "%s.swapDepths(%s): won't swap a clip below depth %d (%d)"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:391
+#: ../server/sprite_instance.cpp:393
 #, c-format
 msgid "%s.swapDepths(%s): invalid call, swapping to self?"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:401
+#: ../server/sprite_instance.cpp:403
 #, c-format
 msgid ""
 "%s.swapDepths(%s): invalid call, the two characters don't have the same "
 "parent"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:417
+#: ../server/sprite_instance.cpp:419
 #, c-format
 msgid ""
 "%s.swapDepths(%s): ignored, source and target characters have the same depth "
 "%d"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:435
+#: ../server/sprite_instance.cpp:436
 #, c-format
 msgid ""
 "%s.swapDepths(%s): first argument invalid (neither a sprite nor a number)"
@@ -1650,337 +1384,650 @@ msgstr ""
 msgid "%s.swapDepths(%s): ignored, character already at depth %d"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:492
+#: ../server/sprite_instance.cpp:491
 msgid "MovieClip.duplicateMovieClip() needs 2 or 3 args"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:523
+#: ../server/sprite_instance.cpp:522
 msgid "sprite_goto_and_play needs one arg"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:533
+#: ../server/sprite_instance.cpp:532
 #, c-format
 msgid "sprite_goto_and_play('%s') -- invalid frame"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:552
+#: ../server/sprite_instance.cpp:551
 msgid "sprite_goto_and_stop needs one arg"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:562
+#: ../server/sprite_instance.cpp:561
 #, c-format
 msgid "sprite_goto_and_stop('%s') -- invalid frame"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:625
+#: ../server/sprite_instance.cpp:624
 #, c-format
 msgid ""
 "MovieClip.loadMovie() expected 1 or 2 args, got %d - returning undefined"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:637
+#: ../server/sprite_instance.cpp:636
 #, c-format
 msgid ""
 "First argument of MovieClip.loadMovie(%s) evaluates to an empty string - "
 "returning undefined"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:674
+#: ../server/sprite_instance.cpp:673
 #, c-format
 msgid ""
 "MovieClip.loadMovie(%s): second argument (if any) must be 'post' or "
 "'get' [got %s]"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:718
+#: ../server/sprite_instance.cpp:691
+#, c-format
+msgid "POSTING: %s"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:700
+#, c-format
+msgid "GETTING: %s"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:717
 #, c-format
 msgid ""
 "MovieClip.loadVariables() expected 1 or 2 args, got %d - returning undefined"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:730
+#: ../server/sprite_instance.cpp:729
 #, c-format
 msgid ""
 "First argument passed to MovieClip.loadVariables(%s) evaluates to an empty "
 "string - returning undefined"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:796
+#: ../server/sprite_instance.cpp:790
 #, c-format
 msgid "Can't find hitTest target %s"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:836
+#: ../server/sprite_instance.cpp:830
 #, c-format
 msgid "hitTest() called with %u args"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:855
+#: ../server/sprite_instance.cpp:849
 #, c-format
 msgid "createTextField called with %d args, expected 6 - returning undefined"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:873
+#: ../server/sprite_instance.cpp:867
 #, c-format
 msgid "createTextField: negative width (%d) - reverting sign"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:883
+#: ../server/sprite_instance.cpp:877
 #, c-format
 msgid "createTextField: negative height (%d) - reverting sign"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:1014
+#: ../server/sprite_instance.cpp:956
+#, fuzzy, c-format
+msgid "meth(%s): first argument doesn't cast to object"
+msgstr "%s.setMask(%s) : Erstes Argument ist kein Zeichen"
+
+#: ../server/sprite_instance.cpp:963
+#, c-format
+msgid "after call to toLowerCase with arg %s we got %s"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:998
 #, c-format
 msgid "MovieClip.getBounds(%s): invalid call, first arg must be a sprite"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:1065
+#: ../server/sprite_instance.cpp:1049
 msgid "MovieClip.globalToLocal() takes one arg"
 msgstr "MovieClip.globalToLocal() nimmt ein Argument"
 
-#: ../server/sprite_instance.cpp:1074
+#: ../server/sprite_instance.cpp:1058
 #, c-format
 msgid "MovieClip.globalToLocal(%s): first argument doesn't cast to an object"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:1088
+#: ../server/sprite_instance.cpp:1072
 #, c-format
 msgid ""
 "MovieClip.globalToLocal(%s): object parameter doesn't have an 'x' member"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:1099
+#: ../server/sprite_instance.cpp:1083
 #, c-format
 msgid ""
 "MovieClip.globalToLocal(%s): object parameter doesn't have an 'y' member"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:1127
+#: ../server/sprite_instance.cpp:1111
 msgid "MovieClip.localToGlobal() takes one arg"
 msgstr "MovieClip.localToGlobal() nimmt ein Argument"
 
-#: ../server/sprite_instance.cpp:1136
+#: ../server/sprite_instance.cpp:1120
 #, c-format
 msgid "MovieClip.localToGlobal(%s): first argument doesn't cast to an object"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:1150
+#: ../server/sprite_instance.cpp:1134
 #, c-format
 msgid ""
 "MovieClip.localToGlobal(%s): object parameter doesn't have an 'x' member"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:1161
+#: ../server/sprite_instance.cpp:1145
 #, c-format
 msgid ""
 "MovieClip.localToGlobal(%s): object parameter doesn't have an 'y' member"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:1191
+#: ../server/sprite_instance.cpp:1175
 #, c-format
 msgid "%s.setMask() : needs an argument"
 msgstr "%s.setMask() : benötigt ein Argument"
 
-#: ../server/sprite_instance.cpp:1210
+#: ../server/sprite_instance.cpp:1194
 #, c-format
 msgid "%s.setMask(%s) : first argument is not a character"
 msgstr "%s.setMask(%s) : Erstes Argument ist kein Zeichen"
 
-#: ../server/sprite_instance.cpp:1244
-msgid "MovieClip.lineTo() takes two args"
+#: ../server/sprite_instance.cpp:1217
+#, c-format
+msgid "MovieClip.endFill(%s): args will be discarded"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:1235
+#, fuzzy
+msgid "MovieClip.lineTo() needs at least two"
 msgstr "MovieClip.lineTo() benötigt zwei Argumente"
 
-#: ../server/sprite_instance.cpp:1290
+#: ../server/sprite_instance.cpp:1244
+#, c-format
+msgid "MovieClip.lineTo(%s): args after the first two will be discarded"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:1255
+#, c-format
+msgid "%s.lineTo(%s) : non-finite first argument (%s), converted to zero"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:1266
+#, c-format
+msgid "%s.lineTo(%s) : non-finite second argument (%s), converted to zero"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:1289
 msgid "MovieClip.moveTo() takes two args"
 msgstr "MovieClip.moveTo() benötigt zwei Argumente"
 
-#: ../server/sprite_instance.cpp:1383
+#: ../server/sprite_instance.cpp:1298
+#, c-format
+msgid "MovieClip.moveTo(%s): args after the first two will be discarded"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:1309
+#, c-format
+msgid "%s.moveTo(%s) : non-finite first argument (%s), converted to zero"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:1320
+#, c-format
+msgid "%s.moveTo(%s) : non-finite second argument (%s), converted to zero"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:1328
+#, c-format
+msgid "%s.moveTo(%g,%g);"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:1388
+#, c-format
+msgid "MovieClip.lineStyle(%s): args after the first three will be discarded"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:1420
+#, c-format
+msgid ""
+"MovieClip.lineStyle(%s): invalid noScale value '%s' (valid values: %s|%s|%s|%"
+"s)"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:1444
+#, c-format
+msgid ""
+"MovieClip.lineStyle(%s): invalid capStyle value '%s' (valid values: %s|%s|%s)"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:1468
+#, c-format
+msgid ""
+"MovieClip.lineStyle(%s): invalid jointStyle value '%s' (valid values: %s|%s|%"
+"s)"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:1482
+#, c-format
+msgid "MovieClip.lineStyle(%s): args after the first eight will be discarded"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:1513
 msgid "MovieClip.curveTo() takes four args"
 msgstr "MovieClip.curveTo() benötigt vier Argumente"
 
-#: ../server/sprite_instance.cpp:1502
+#: ../server/sprite_instance.cpp:1522
+#, fuzzy, c-format
+msgid "MovieClip.curveTo(%s): args after the first four will be discarded"
+msgstr "MovieClip.curveTo() benötigt vier Argumente"
+
+#: ../server/sprite_instance.cpp:1535
+#, c-format
+msgid "%s.curveTo(%s) : non-finite first argument (%s), converted to zero"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:1546
+#, c-format
+msgid "%s.curveTo(%s) : non-finite second argument (%s), converted to zero"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:1557
+#, c-format
+msgid "%s.curveTo(%s) : non-finite third argument (%s), converted to zero"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:1568
+#, c-format
+msgid "%s.curveTo(%s) : non-finite fourth argument (%s), converted to zero"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:1576
+#, c-format
+msgid "%s.curveTo(%g,%g,%g,%g);"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:1592
+#, c-format
+msgid "MovieClip.clear(%s): args will be discarded"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:1597
+#, c-format
+msgid "%s.clear();"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:1629
+#, c-format
+msgid "MovieClip.beginFill(%s): args after the first will be discarded"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:1639
+#, c-format
+msgid "%s.beginFill(%d,%d,%d);"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:1655
 #, c-format
 msgid "%s.beginGradientFill(%s): invalid call: 5 arguments needed"
 msgstr "%s.beginGradientFill(%s): ungültiger Aufruf: 5 Argumente benötigt"
 
-#: ../server/sprite_instance.cpp:1517
+#: ../server/sprite_instance.cpp:1665
+#, c-format
+msgid ""
+"MovieClip.beginGradientFill(%s): args after the first five will be discarded"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:1678
 #, c-format
 msgid "%s.beginGradientFill(%s): first arg must be 'radial' or 'linear'"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:1535
+#: ../server/sprite_instance.cpp:1696
 #, c-format
 msgid ""
 "%s.beginGradientFill(%s): one or more of the  args from 2nd to 5th don't "
 "cast to objects"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:1694
+#: ../server/sprite_instance.cpp:1855
 #, c-format
 msgid ""
 "%s.beginGradientFill(%s): colors, alphas and ratios args don't have same "
 "length"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:1802
+#: ../server/sprite_instance.cpp:1866
+#, c-format
+msgid ""
+"%s.beginGradientFill(%s) : too many array elements for colors and ratios (%"
+"d), will trim to 8"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:1958
 #, c-format
 msgid "min/max bbox values in MovieClip.startDrag(%s) swapped, fixing"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:1804
+#: ../server/sprite_instance.cpp:1960
 #, c-format
 msgid "non-finite bbox values in MovieClip.startDrag(%s), took as zero"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:2324
-#, c-format
-msgid ""
-"A sprite member (%s) clashes with the name of an existing character in its "
-"display list.  The member will hide the character"
-msgstr ""
-
-#: ../server/sprite_instance.cpp:2416
+#: ../server/sprite_instance.cpp:2605
 #, c-format
 msgid "call_frame('%s') -- invalid frame"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:2519
+#: ../server/sprite_instance.cpp:2700
 msgid "Can't clone root of the movie"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:2525
+#: ../server/sprite_instance.cpp:2706
 #, c-format
 msgid "%s parent is not a sprite, can't clone"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:2767
-msgid "it's a Text Variable, associated with "
+#: ../server/sprite_instance.cpp:2762
+#, c-format
+msgid "Event %s invoked for sprite %s"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:2778
+#: ../server/sprite_instance.cpp:2769
+#, c-format
+msgid "Sprite %s ignored ENTER_FRAME event (is unloaded)"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:2777
+#, c-format
+msgid "Sprite %s ignored button-like event %s as not 'enabled'"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:2838
+#, c-format
+msgid ""
+"Sprite %s (depth %d) won't check for user-defined LOAD event (is not "
+"dynamic, has a parent, no registered class and no clip events defined)"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:2950
+#, c-format
+msgid "it's a Text Variable, associated with %d TextFields"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:2962
 msgid "it's NOT a Text Variable"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:2800
+#: ../server/sprite_instance.cpp:2983
 #, c-format
 msgid "advance_sprite: no frames loaded for sprite/movie %s"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:2814
+#: ../server/sprite_instance.cpp:2995
 #, c-format
 msgid "Advance_sprite for sprite '%s' - frame %u/%u "
 msgstr ""
 
-#: ../server/sprite_instance.cpp:2827
+#: ../server/sprite_instance.cpp:3008
 msgid "sprite_instance::advance_sprite we're in PLAY mode"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:2833
+#: ../server/sprite_instance.cpp:3014
 msgid "on_event_load called, incrementing"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:2837
+#: ../server/sprite_instance.cpp:3018
 #, c-format
 msgid "after increment we are at frame %u/%u"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:2864
+#: ../server/sprite_instance.cpp:3028
+#, c-format
+msgid "Jumping back to frame 0 of sprite %s"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:3035
+#, c-format
+msgid "Executing frame%d (0-based) tags of sprite %s"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:3045
 msgid "sprite_instance::advance_sprite we're in STOP mode"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:2877
+#: ../server/sprite_instance.cpp:3058
 #, c-format
 msgid "Advance sprite '%s' at frame %u/%u"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:2976
-msgid "Executing "
-msgstr "Führe aus"
-
-#: ../server/sprite_instance.cpp:3005
+#: ../server/sprite_instance.cpp:3077
 #, c-format
-msgid "sprite %s ::goto_frame("
+msgid "Queuing init actions in frame %d of sprite %s"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:3056
-msgid "GotoFrame("
-msgstr "GotoFrame("
+#: ../server/sprite_instance.cpp:3097
+#, c-format
+msgid "Init actions for character %d already executed"
+msgstr ""
 
-#: ../server/sprite_instance.cpp:3127
+#: ../server/sprite_instance.cpp:3155
+#, c-format
+msgid "Executing %d tags in frame %d/%d of sprite %s"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:3191
+#, c-format
+msgid "sprite %s ::goto_frame(%d) - current frame is %d"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:3206
+#, c-format
+msgid ""
+"Target frame of a gotoFrame(%d) was never loaded,although frame count in "
+"header (%d) said we should have found it"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:3239
+#, c-format
+msgid ""
+"GotoFrame(%d) targets a yet to be loaded frame (%d) loaded). We'll wait for "
+"it but a more correct form is explicitly using WaitForFrame instead"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:3249
+#, c-format
+msgid ""
+"Target frame of a gotoFrame(%d) was never loaded, although frame count in "
+"header (%d) said we should have found it"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:3311
 #, c-format
 msgid "sprite_instance::goto_labeled_frame('%s') unknown label"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:3200
+#: ../server/sprite_instance.cpp:3376
 #, c-format
 msgid "sprite_instance::add_display_object(): unknown cid = %d"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:3261
+#: ../server/sprite_instance.cpp:3442
 #, c-format
 msgid "sprite::replace_display_object(): unknown cid = %d"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:3358
+#: ../server/sprite_instance.cpp:3492
+#, c-format
+msgid ""
+"sprite_instance::replace_display_object: could not find any character at "
+"depth %d"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:3539
 #, c-format
 msgid "Frame %u/%u, bytes %u/%u"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:3825
+#: ../server/sprite_instance.cpp:3599
+#, c-format
+msgid ""
+"CHECKME: nested mask in MouseEntityFinder. This mask is %s at depth %d outer "
+"mask masked up to depth %d."
+msgstr ""
+
+#: ../server/sprite_instance.cpp:3613 ../server/sprite_instance.cpp:3879
+#, c-format
+msgid ""
+"Character %s at depth %d is a mask not hitting the query point %g,%g and "
+"masking up to depth %d"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:3622 ../server/sprite_instance.cpp:3888
+#, c-format
+msgid "Character %s at depth %d is a mask hitting the query point %g,%g"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:3659
+#, c-format
+msgid "MouseEntityFinder found character %s (depth %d) hitting point %g,%g"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:3751
+#, c-format
+msgid ""
+"%s is a dynamic mask and can't handle mouse events, no point will hit it"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:3760
+#, c-format
+msgid "%s is dynamically masked by %s, which doesn't hit point %g,%g"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:3862
+#, c-format
+msgid ""
+"CHECKME: nested mask in DropTargetFinder. This mask is %s at depth %d outer "
+"mask masked up to depth %d."
+msgstr ""
+
+#: ../server/sprite_instance.cpp:3874
+msgid "FIXME: invisible mask in MouseEntityFinder."
+msgstr ""
+
+#: ../server/sprite_instance.cpp:4013
 #, c-format
 msgid "%s doesn't even check for a char"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:3971
-#, c-format
-msgid "stagePlacementCallback: no frames loaded for sprite/movie %s"
-msgstr ""
-
-#: ../server/sprite_instance.cpp:3979
+#: ../server/sprite_instance.cpp:4156
 #, c-format
 msgid "Sprite '%s' placed on stage"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:4034 ../server/sprite_instance.cpp:4056
+#: ../server/sprite_instance.cpp:4175
+#, c-format
+msgid "stagePlacementCallback: no frames loaded for sprite/movie %s"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:4193
+#, c-format
+msgid ""
+"Sprite %s is dynamic, sending INITIALIZE and CONSTRUCT events immediately"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:4202
+#, c-format
+msgid "Queuing INITIALIZE event for sprite %s"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:4207
+#, c-format
+msgid "Queuing CONSTRUCT event for sprite %s"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:4224 ../server/sprite_instance.cpp:4246
 #, c-format
 msgid "Executing tags of frame0 in sprite %s"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:4041 ../server/sprite_instance.cpp:4051
+#: ../server/sprite_instance.cpp:4231 ../server/sprite_instance.cpp:4241
 #, c-format
 msgid "Queuing ONLOAD event for sprite %s"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:4091
+#: ../server/sprite_instance.cpp:4258
+#, c-format
+msgid "constructAsScriptObject called for sprite %s"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:4281
 #, c-format
 msgid "Attached sprites %s registered class is %p"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:4152
+#: ../server/sprite_instance.cpp:4342
 #, c-format
 msgid "Unloading sprite '%s'"
 msgstr ""
 
-#: ../server/sprite_instance.cpp:4290
+#: ../server/sprite_instance.cpp:4372
+#, c-format
+msgid "Posting data '%s' to url '%s'"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:4479
 #, c-format
 msgid "Could not load variables from %s"
 msgstr "Konnte Variablen von %s nicht laden"
 
-#: ../server/sprite_instance.cpp:4365
+#: ../server/sprite_instance.cpp:4504
+#, fuzzy, c-format
+msgid "Setting variable '%s' to value '%s'"
+msgstr "Lade Variablen-Datei von URL: '%s'"
+
+#: ../server/sprite_instance.cpp:4556
 #, c-format
 msgid ""
 "removeMovieClip(%s): sprite depth (%d) out of the 'dynamic' zone "
 "[0..1048575], won't remove"
 msgstr ""
 
-#: ../server/stream.cpp:263 ../server/parser/action_buffer.cpp:502
+#: ../server/sprite_instance.cpp:4784
+#, c-format
+msgid "Stream sound id from %d to %d, stopping old"
+msgstr ""
+
+#: ../server/sprite_instance.cpp:4839
+msgid "Childs"
+msgstr ""
+
+#: ../server/stream.cpp:280 ../server/parser/action_buffer.cpp:508
 msgid "Native floating point format not recognised"
 msgstr ""
 
-#: ../server/stream.cpp:438
+#: ../server/stream.cpp:459
 msgid "Unexpected end of stream"
 msgstr "Unerwartetes Ende des Streams"
+
+#: ../server/stream.cpp:527
+#, c-format
+msgid ""
+"Tag %d starting at offset %d is advertised to end at offset %d, which is "
+"after end of previously opened tag starting at offset %d and ending at "
+"offset %d. Making it end where container tag ends."
+msgstr ""
+
+#: ../server/stream.cpp:563
+msgid "Could not seek to end position"
+msgstr ""
 
 #: ../server/StreamProvider.cpp:100 ../server/StreamProvider.cpp:142
 #, c-format
@@ -1991,12 +2038,12 @@ msgstr "Nicht unterstützte Netzwerkverbindung %s"
 msgid "POST data discarded while getting a stream from file: uri"
 msgstr ""
 
-#: ../server/text.cpp:60
+#: ../server/text.cpp:59
 #, c-format
 msgid "text style references unknown font (id = %d)"
 msgstr "Text-Style verweist auf unbekannte Schriftart (id = %d)"
 
-#: ../server/text.cpp:159
+#: ../server/text.cpp:154
 msgid "invalid glyph (-1)"
 msgstr ""
 
@@ -2004,19 +2051,59 @@ msgstr ""
 msgid "render shape glyph using filled outline (render::draw_glyph)"
 msgstr ""
 
-#: ../server/textformat.cpp:155
-msgid "TextFormat.setFormat() needs at least 3 arguments - ...me thinks"
-msgstr ""
-
-#: ../server/textformat.cpp:164
-msgid ""
-"Argument 3 given to TextFormat.setFormat() is not a TextFormat object - ... "
-"should it be?"
-msgstr ""
-
-#: ../server/textformat.cpp:245
+#: ../server/URLAccessManager.cpp:106
 #, c-format
-msgid "%s: args=%d unfinished implementation"
+msgid "Load from host %s granted (whitelisted)"
+msgstr ""
+
+#: ../server/URLAccessManager.cpp:112
+#, c-format
+msgid "Load from host %s forbidden (not in non-empty whitelist)"
+msgstr ""
+
+#: ../server/URLAccessManager.cpp:124
+#, c-format
+msgid "Load from host %s forbidden (blacklisted)"
+msgstr ""
+
+#: ../server/URLAccessManager.cpp:129
+#, c-format
+msgid "Load from host %s granted (default)"
+msgstr ""
+
+#: ../server/URLAccessManager.cpp:166
+#, c-format
+msgid "Load of file %s forbidden (starting url %s is not a local resource)"
+msgstr ""
+
+#: ../server/URLAccessManager.cpp:184
+#, c-format
+msgid "Load of file %s granted (under local sandbox %s)"
+msgstr ""
+
+#: ../server/URLAccessManager.cpp:192
+#, c-format
+msgid "Load of file %s forbidden (not under local sandboxes)"
+msgstr ""
+
+#: ../server/URLAccessManager.cpp:232
+#, c-format
+msgid "gethostname failed: %s"
+msgstr ""
+
+#: ../server/URLAccessManager.cpp:254
+#, c-format
+msgid "Load from host %s forbidden (not in the local domain)"
+msgstr ""
+
+#: ../server/URLAccessManager.cpp:260
+#, c-format
+msgid "Load from host %s forbidden (not on the local host)"
+msgstr ""
+
+#: ../server/URLAccessManager.cpp:288
+#, c-format
+msgid "Checking security of URL '%s'"
 msgstr ""
 
 #: ../server/video_stream_instance.cpp:116
@@ -2028,58 +2115,52 @@ msgstr "attachVideo benötigt ein Argument"
 msgid "attachVideo(%s) first arg is not a NetStream instance"
 msgstr "attachVideo(%s) erstes Argument ist keine NetStream-Instanz"
 
-#: ../server/video_stream_instance.cpp:214
+#: ../server/video_stream_instance.cpp:216
 #, c-format
 msgid "Video frame data is missing in frame %d"
 msgstr ""
 
-#: ../server/vm/action.cpp:162
+#: ../server/vm/action.cpp:96
 #, c-format
 msgid ""
 "Attempt to call a value which is neither a C nor an ActionScript function (%"
 "s)"
 msgstr ""
 
-#: ../server/vm/action.cpp:198
+#: ../server/vm/action.cpp:132
 #, c-format
 msgid "FIXME(%d): %s"
 msgstr ""
 
-#: ../server/vm/action.cpp:242
+#: ../server/vm/action.cpp:176
 #, c-format
 msgid "call_method_parsed('%s','%s') -- invalid fmt '%%l%c'"
 msgstr ""
 
-#: ../server/vm/action.cpp:251
+#: ../server/vm/action.cpp:185
 #, c-format
 msgid "call_method_parsed('%s','%s') -- invalid fmt '%%%c'"
 msgstr ""
 
-#: ../server/vm/action.cpp:267
+#: ../server/vm/action.cpp:201
 #, c-format
 msgid "call_method_parsed('%s','%s') -- invalid char '%c'"
 msgstr ""
 
-#: ../server/vm/action.cpp:303
-msgid "-- start movie"
-msgstr ""
-
-#: ../server/vm/action.cpp:314
+#: ../server/vm/ActionExec.cpp:175
 #, c-format
-msgid "FIXME: %s"
-msgstr ""
-
-#: ../server/vm/ActionExec.cpp:174
-msgid "at ActionExec operator() start, pc="
+msgid "at ActionExec operator() start, pc=%d, stop_pc=%d, code.size=%d."
 msgstr ""
 
 #: ../server/vm/ActionExec.cpp:329
 #, c-format
-msgid "Length %u (%d) of action tag id %u at pc "
+msgid ""
+"Length %u (%d) of action tag id %u at pc %d overflows actions buffer size %d"
 msgstr ""
 
 #: ../server/vm/ActionExec.cpp:391
-msgid "After execution: PC "
+#, c-format
+msgid "After execution: PC %d, next PC %d, stack follows"
 msgstr ""
 
 #: ../server/vm/ActionExec.cpp:413
@@ -2087,9 +2168,10 @@ msgstr ""
 msgid "Script exceeded time limit of %u milliseconds."
 msgstr "Skript hat das Zeitlimit von %u Millisekunden überschritten"
 
-#: ../server/vm/ActionExec.cpp:422
+#: ../server/vm/ActionExec.cpp:421
 #, c-format
-msgid "Loop iterations count exceeded limit of "
+msgid ""
+"Loop iterations count exceeded limit of %d. Last branch was from pc %d to %d."
 msgstr ""
 
 #: ../server/vm/ActionExec.cpp:457
@@ -2099,66 +2181,82 @@ msgid ""
 msgstr ""
 
 #: ../server/vm/ActionExec.cpp:469
-msgid " elements left on the stack after block execution.  Cleaning up"
+#, c-format
+msgid "%d elements left on the stack after block execution.  Cleaning up"
 msgstr ""
 
 #: ../server/vm/ActionExec.cpp:493
-msgid "End of DoAction block hit while skipping "
+#, c-format
+msgid ""
+"End of DoAction block hit while skipping %d action tags (pc:%d, stop_pc:%d) "
+"(WaitForFrame, probably)"
 msgstr ""
 
 #: ../server/vm/ActionExec.cpp:530
-msgid "'With' stack depth ("
+#, c-format
+msgid ""
+"'With' stack depth (%d) exceeds the allowed limit for current SWF target "
+"version (%d for version %d). Don't expect this movie to work with all "
+"players."
 msgstr ""
 
 #: ../server/vm/ActionExec.cpp:613
-msgid "Stack underrun: "
+#, c-format
+msgid ""
+"Stack underrun: %d elements required, %d/%d available. Fixing by inserting %"
+"d undefined values on the missing slots."
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:107
-#, c-format
-msgid "Unsupported action handler invoked, code at pc is %x"
+#: ../server/vm/ASHandlers.cpp:108
+#, fuzzy, c-format
+msgid "Unsupported action handler invoked, code at pc is %#x"
 msgstr "Nicht unterstützter Aktions-Handler aufgerufen, Code bei pc ist %x"
 
-#: ../server/vm/ASHandlers.cpp:187
+#: ../server/vm/ASHandlers.cpp:184
 msgid ""
 "FIXME: VM not initialized at SWFHandlers construction time, can't set action "
 "handlers based on SWF version"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:471
+#: ../server/vm/ASHandlers.cpp:458
+#, c-format
+msgid "Malformed action code: %s"
+msgstr ""
+
+#: ../server/vm/ASHandlers.cpp:473
 #, c-format
 msgid "%s: CHECKME: was broken"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:627
+#: ../server/vm/ASHandlers.cpp:621
 #, c-format
 msgid "GetUrl: target=%s url=%s"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:648
+#: ../server/vm/ASHandlers.cpp:642
 #, c-format
-msgid "ActionWaitForFrame (0x%X) tag length == "
+msgid "ActionWaitForFrame (0x%X) tag length == %d (expected 3)"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:663 ../server/vm/ASHandlers.cpp:715
-#: ../server/vm/ASHandlers.cpp:1894
+#: ../server/vm/ASHandlers.cpp:657 ../server/vm/ASHandlers.cpp:709
+#: ../server/vm/ASHandlers.cpp:1930
 #, c-format
 msgid "%s: environment target is not a sprite_instance"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:896
+#: ../server/vm/ASHandlers.cpp:894
 msgid "Undefined or null string passed to ActionSubString, returning undefined"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:915 ../server/vm/ASHandlers.cpp:1768
+#: ../server/vm/ASHandlers.cpp:914 ../server/vm/ASHandlers.cpp:1803
 msgid "Negative size passed to ActionSubString, taking as whole length"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:927
+#: ../server/vm/ASHandlers.cpp:934
 msgid "Start is less then 1 in ActionSubString, setting to 1."
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:938
+#: ../server/vm/ASHandlers.cpp:945
 msgid ""
 "Start goes beyond input string in ActionSubString, returning the empty "
 "string."
@@ -2169,84 +2267,84 @@ msgid ""
 "start + size goes beyond input string in ActionSubString, adjusting size"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:1014
+#: ../server/vm/ASHandlers.cpp:1013
 #, c-format
 msgid "-- get var: %s=%s"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:1037
+#: ../server/vm/ASHandlers.cpp:1036
 #, c-format
 msgid "-- set var: %s = %s"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:1102
+#: ../server/vm/ASHandlers.cpp:1101
 msgid ""
 "ActionGetProperty(<empty>) called, but current target is not a character"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:1125
+#: ../server/vm/ASHandlers.cpp:1124
 #, c-format
 msgid "invalid property query, property number %d"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:1134
+#: ../server/vm/ASHandlers.cpp:1133
 #, c-format
 msgid "Could not find GetProperty target (%s)"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:1166
+#: ../server/vm/ASHandlers.cpp:1165
 #, c-format
 msgid "invalid set_property, property number %d"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:1174
+#: ../server/vm/ASHandlers.cpp:1173
 #, c-format
 msgid "ActionSetProperty: can't find target %s for setting property %s"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:1198
+#: ../server/vm/ASHandlers.cpp:1197
 #, c-format
 msgid "Path given to duplicateMovieClip(%s) doesn't point to a character"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:1209
+#: ../server/vm/ASHandlers.cpp:1208
 #, c-format
 msgid "Path given to duplicateMovieClip(%s) is not a sprite"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:1234
+#: ../server/vm/ASHandlers.cpp:1233
 #, c-format
 msgid "Path given to removeMovieClip(%s) doesn't point to a character"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:1244
+#: ../server/vm/ASHandlers.cpp:1243
 #, c-format
 msgid "Path given to removeMovieClip(%s) is not a sprite"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:1289
+#: ../server/vm/ASHandlers.cpp:1288
 #, c-format
 msgid "startDrag: unknown target '%s'"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:1314
+#: ../server/vm/ASHandlers.cpp:1313
 msgid "Y values in ActionStartDrag swapped, fixing"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:1322
+#: ../server/vm/ASHandlers.cpp:1321
 msgid "X values in ActionStartDrag swapped, fixing"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:1395
+#: ../server/vm/ASHandlers.cpp:1394
 #, c-format
 msgid "-- %s cast_to %s (invalid args?)"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:1417
+#: ../server/vm/ASHandlers.cpp:1416
 msgid "ActionCastOp TESTING"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:1439
+#: ../server/vm/ASHandlers.cpp:1438
 #, c-format
 msgid "Stack value on IMPLEMENTSOP is not an object: %s."
 msgstr ""
@@ -2257,277 +2355,303 @@ msgstr ""
 
 #: ../server/vm/ASHandlers.cpp:1456
 #, c-format
+msgid "IMPLEMENTSOP target object's prototype is not an object (%s)"
+msgstr ""
+
+#: ../server/vm/ASHandlers.cpp:1465
+#, c-format
 msgid "Invalid interfaces count (%d) on IMPLEMENTSOP"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:1469
+#: ../server/vm/ASHandlers.cpp:1479
 #, c-format
-msgid "class found on stack on IMPLEMENTSOP is not a function: %s"
+msgid "class found on stack on IMPLEMENTSOP is not an object: %s"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:1749
+#: ../server/vm/ASHandlers.cpp:1486
+msgid "Interface object for IMPLEMENTSOP has no prototype."
+msgstr ""
+
+#: ../server/vm/ASHandlers.cpp:1494
+#, c-format
+msgid "Prototype of interface object for IMPLEMENTSOP is not an object (%s)."
+msgstr ""
+
+#: ../server/vm/ASHandlers.cpp:1785
 msgid ""
 "Undefined or null string passed to ActionMBSubString, returning undefined"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:1777
+#: ../server/vm/ASHandlers.cpp:1812
 msgid "Base is less then 1 in ActionMbSubString, setting to 1."
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:1786
+#: ../server/vm/ASHandlers.cpp:1821
 msgid ""
 "base goes beyond input string in ActionMbSubString, returning the empty "
 "string."
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:1799
+#: ../server/vm/ASHandlers.cpp:1834
 #, c-format
 msgid ""
 "base+size goes beyond input string in ActionMbSubString, adjusting size "
 "based on length:%d and start:%d"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:1903
+#: ../server/vm/ASHandlers.cpp:1939
 #, c-format
 msgid ""
 "Frame spec found on stack at ActionWaitForFrame doesn't evaluate to a valid "
 "frame: %s"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:1968
+#: ../server/vm/ASHandlers.cpp:2004
 #, c-format
 msgid "[push length=%d]"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:1987
+#: ../server/vm/ASHandlers.cpp:2023
 #, c-format
 msgid ""
 "Unknown push type %d. Execution will continue but it is likely to fail due "
 "to lost sync."
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:2039
+#: ../server/vm/ASHandlers.cpp:2075
 #, c-format
-msgid "register %d out of local registers bounds (0.."
+msgid "register %d out of local registers bounds (0..%d)!"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:2048
+#: ../server/vm/ASHandlers.cpp:2084
 #, c-format
 msgid "register %d out of global registers bounds"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:2094 ../server/vm/ASHandlers.cpp:2113
+#: ../server/vm/ASHandlers.cpp:2130 ../server/vm/ASHandlers.cpp:2149
 #, c-format
 msgid "dict_lookup %d is out of bounds"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:2125 ../server/vm/ASHandlers.cpp:2129
-msgid "\t"
+#: ../server/vm/ASHandlers.cpp:2161
+#, c-format
+msgid "\t%d) type=%s (%d), value=%s"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:2183
+#: ../server/vm/ASHandlers.cpp:2165
+#, c-format
+msgid "\t%d) type=%s, value=%s"
+msgstr ""
+
+#: ../server/vm/ASHandlers.cpp:2219
 msgid "Bogus empty GetUrl url in SWF file, skipping"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:2198
+#: ../server/vm/ASHandlers.cpp:2234
 msgid ""
 "Bogus GetUrl2 send vars method  in SWF file (both GET and POST requested), "
 "use GET"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:2251
+#: ../server/vm/ASHandlers.cpp:2287
 #, c-format
 msgid ""
 "get url: target=%s, url=%s (%s), method=%x (sendVars:%X, loadTarget:%d, "
 "loadVariable:%d)"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:2291
+#: ../server/vm/ASHandlers.cpp:2327
 msgid "getURL2 loadVariable"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:2295
+#: ../server/vm/ASHandlers.cpp:2331
 #, c-format
 msgid "get url: target %s not found"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:2303 ../server/vm/ASHandlers.cpp:2358
+#: ../server/vm/ASHandlers.cpp:2339 ../server/vm/ASHandlers.cpp:2394
 #, c-format
 msgid "get url: target %s is not a sprite"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:2311
+#: ../server/vm/ASHandlers.cpp:2347
 msgid "POST with loadVariables ignored"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:2323
+#: ../server/vm/ASHandlers.cpp:2359
 msgid "getURL2 target load"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:2330 ../server/vm/ASHandlers.cpp:2385
+#: ../server/vm/ASHandlers.cpp:2366 ../server/vm/ASHandlers.cpp:2421
 #, c-format
 msgid "Testing _level loading (level %u)"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:2343
+#: ../server/vm/ASHandlers.cpp:2379
 #, c-format
 msgid "Unknown loadMovie target: %s"
 msgstr "unbekannter loadMovie-Ziel (%s)"
 
-#: ../server/vm/ASHandlers.cpp:2399
+#: ../server/vm/ASHandlers.cpp:2435
 msgid "POST with host-provided uri grabber"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:2444
+#: ../server/vm/ASHandlers.cpp:2480
 #, c-format
 msgid "Launching URL... %s"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:2498
+#: ../server/vm/ASHandlers.cpp:2510
+#, c-format
+msgid "Sent request '%s' to host fd %d"
+msgstr ""
+
+#: ../server/vm/ASHandlers.cpp:2536
 #, c-format
 msgid ""
 "Couldn't find movie \"%s\" to set target to! Resetting to original target..."
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:2527
+#: ../server/vm/ASHandlers.cpp:2565
 msgid "Undefined GetUrl2 url on stack, skipping"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:2564
-msgid "branch to offset "
+#: ../server/vm/ASHandlers.cpp:2602
+#, c-format
+msgid "branch to offset %d  --  this section only runs to %d"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:2604
+#: ../server/vm/ASHandlers.cpp:2642
 #, c-format
 msgid ""
 "Couldn't find target_sprite \"%s\" in ActionCallFrame! target frame actions "
 "will not be called..."
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:2666
+#: ../server/vm/ASHandlers.cpp:2704
 #, c-format
 msgid ""
 "Frame spec found on stack at ActionGotoExpression doesn't evaluate to a "
 "valid frame: %s"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:2680
+#: ../server/vm/ASHandlers.cpp:2718
 #, c-format
 msgid ""
 "Couldn't find target sprite \"%s\" in ActionGotoExpression.  Will not go to "
 "target frame..."
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:2747
+#: ../server/vm/ASHandlers.cpp:2785
 #, c-format
 msgid "-- set local var: %s = %s"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:2779
+#: ../server/vm/ASHandlers.cpp:2817
 #, c-format
 msgid "ActionCallFunction: %s is not an object"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:2791
+#: ../server/vm/ASHandlers.cpp:2829
 msgid "Object doensn't have a constructor"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:2811
+#: ../server/vm/ASHandlers.cpp:2849
 #, c-format
 msgid ""
 "Attempt to call a function with %u arguments while only %u are available on "
 "the stack."
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:2906
+#: ../server/vm/ASHandlers.cpp:2944
 #, c-format
 msgid "---new object: %s"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:2919
+#: ../server/vm/ASHandlers.cpp:2957
 #, c-format
 msgid "ActionNew: '%s' is not a constructor"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:2961
+#: ../server/vm/ASHandlers.cpp:2999
 msgid "The 'var whatever' syntax in timeline context is a no-op."
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:3077
+#: ../server/vm/ASHandlers.cpp:3115
 #, c-format
 msgid "Argument to TargetPath(%s) doesn't cast to a MovieClip"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:3115
+#: ../server/vm/ASHandlers.cpp:3153
 #, c-format
 msgid ""
 "Top of stack doesn't evaluate to an object (%s) at ActionEnumerate execution"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:3159
+#: ../server/vm/ASHandlers.cpp:3197
 #, c-format
 msgid "ActionNewAdd(%s, %s) [primitive conversion done]"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:3253 ../server/vm/ASHandlers.cpp:3261
+#: ../server/vm/ASHandlers.cpp:3291 ../server/vm/ASHandlers.cpp:3299
 #, c-format
 msgid "to_primitive(%s) threw an ActionTypeError %s"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:3332
+#: ../server/vm/ASHandlers.cpp:3370
 #, c-format
 msgid "getMember called against a value that does not cast to an as_object: %s"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:3342
+#: ../server/vm/ASHandlers.cpp:3380
 #, c-format
 msgid " ActionGetMember: target: %s (object %p)"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:3357
+#: ../server/vm/ASHandlers.cpp:3395
 #, c-format
 msgid "-- get_member %s.%s=%s"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:3384
+#: ../server/vm/ASHandlers.cpp:3422
 #, c-format
 msgid "-- set_member %s.%s=%s"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:3396
+#: ../server/vm/ASHandlers.cpp:3434
 #, c-format
 msgid "-- set_member %s.%s=%s on invalid object!"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:3451
+#: ../server/vm/ASHandlers.cpp:3489
 #, c-format
 msgid ""
 "Attempt to call a method with %u arguments while only %u are available on "
 "the stack."
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:3460
+#: ../server/vm/ASHandlers.cpp:3498
 #, c-format
 msgid " method name: %s"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:3461
+#: ../server/vm/ASHandlers.cpp:3499
 #, c-format
 msgid " method object/func: %s"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:3462
+#: ../server/vm/ASHandlers.cpp:3500
 #, c-format
 msgid " method nargs: %d"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:3539
+#: ../server/vm/ASHandlers.cpp:3577
 msgid ""
 "ActionCallMethod invoked with undefined method_name and non-object object/"
 "func"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:3548
+#: ../server/vm/ASHandlers.cpp:3586
 #, c-format
 msgid ""
 "Function object given to ActionCallMethod is not a function (%s), will try "
@@ -2535,117 +2659,119 @@ msgid ""
 "method"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:3559
+#: ../server/vm/ASHandlers.cpp:3597
 msgid "ActionCallMethod: object has no constructor"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:3568
+#: ../server/vm/ASHandlers.cpp:3606
 msgid "ActionCallMethod: object constructor is not a function"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:3583
+#: ../server/vm/ASHandlers.cpp:3621
 #, c-format
 msgid "ActionCallMethod: Tried to invoke method '%s' on non-object value %s."
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:3596
+#: ../server/vm/ASHandlers.cpp:3634
 #, c-format
 msgid "ActionCallMethod: Can't find method %s of object %s"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:3619
+#: ../server/vm/ASHandlers.cpp:3657
 msgid "FIXME: debugger doesn't deal with anonymous function calls"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:3661
+#: ../server/vm/ASHandlers.cpp:3699
 #, c-format
 msgid ""
 "Attempt to call a constructor with %u arguments while only %u are available "
 "on the stack."
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:3673
+#: ../server/vm/ASHandlers.cpp:3711
 msgid "On ActionNewMethod: no object found on stack on ActionMethod"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:3691
+#: ../server/vm/ASHandlers.cpp:3729
 #, c-format
 msgid "ActionNewMethod: can't find method %s of object %s"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:3705
+#: ../server/vm/ASHandlers.cpp:3743
 msgid "ActionNewMethod: method name is undefined, and object is not a function"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:3744
+#: ../server/vm/ASHandlers.cpp:3782
 #, c-format
 msgid "-- %s instanceof %s (invalid args?)"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:3778
+#: ../server/vm/ASHandlers.cpp:3816
 #, c-format
 msgid "Top of stack not an object %s at ActionEnum2  execution"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:3956
+#: ../server/vm/ASHandlers.cpp:3994
 #, c-format
 msgid "ActionExtends: Super is not an as_function (%s)"
 msgstr "ActionExtends: Super ist keine as_function (%s)"
 
-#: ../server/vm/ASHandlers.cpp:3961
+#: ../server/vm/ASHandlers.cpp:3999
 #, c-format
 msgid "ActionExtends: Sub is not an as_function (%s)"
 msgstr "ActionExtends: Super ist keine as_function (%s)"
 
-#: ../server/vm/ASHandlers.cpp:4050
+#: ../server/vm/ASHandlers.cpp:4088
 #, c-format
 msgid ""
-"function2 code len (%u) overflows DOACTION tag boundaries (DOACTION tag len="
+"function2 code len (%u) overflows DOACTION tag boundaries (DOACTION tag len=%"
+"d, function2 code offset=%d). Forcing code len to eat the whole buffer "
+"(would this work?)."
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:4157
+#: ../server/vm/ASHandlers.cpp:4195
 #, c-format
 msgid ""
 "ActionTry: reserved:%x doFinally:%d doCatch:%d trySize:%u catchSize:%u "
 "finallySize:%u catchName:%s catchRegister:%u"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:4184
+#: ../server/vm/ASHandlers.cpp:4222
 msgid "ActionWith tag length != 2; skipping"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:4194
+#: ../server/vm/ASHandlers.cpp:4232
 msgid "Empty with() block..."
 msgstr "Leerer with()-Block..."
 
-#: ../server/vm/ASHandlers.cpp:4206
+#: ../server/vm/ASHandlers.cpp:4244
 #, c-format
 msgid "with(%s) : first argument doesn't cast to an object!"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:4347
+#: ../server/vm/ASHandlers.cpp:4385
 #, c-format
 msgid "-------------- local register[%d] = '%s'"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:4354
+#: ../server/vm/ASHandlers.cpp:4392
 #, c-format
-msgid "store_register[%d] -- register out of local registers bounds (0.."
+msgid "store_register[%d] -- register out of local registers bounds (0..%d)!"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:4363
+#: ../server/vm/ASHandlers.cpp:4401
 #, c-format
 msgid "-------------- global register[%d] = '%s'"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:4371
+#: ../server/vm/ASHandlers.cpp:4409
 #, c-format
 msgid "store_register[%d] -- register out of global registers bounds!"
 msgstr ""
 
-#: ../server/vm/ASHandlers.cpp:4382
+#: ../server/vm/ASHandlers.cpp:4420
 #, c-format
-msgid "at SWFHandlers::action_name(%d) call time, _handlers size is "
+msgid "at SWFHandlers::action_name(%d) call time, _handlers size is %d"
 msgstr ""
 
 #: ../server/swf/DefineFontAlignZonesTag.cpp:51
@@ -2667,8 +2793,8 @@ msgstr ""
 msgid "  PLACEOBJECT: depth=%d(%d) char=%d"
 msgstr ""
 
-#: ../server/swf/PlaceObject2Tag.cpp:59 ../server/swf/PlaceObject2Tag.cpp:283
-#: ../server/swf/PlaceObject2Tag.cpp:460
+#: ../server/swf/PlaceObject2Tag.cpp:59 ../server/swf/PlaceObject2Tag.cpp:251
+#: ../server/swf/PlaceObject2Tag.cpp:389
 msgid "  cxform:"
 msgstr ""
 
@@ -2695,51 +2821,51 @@ msgid ""
 "swf_event::read() -- unknown / unhandled event type received, flags = 0x%x"
 msgstr ""
 
-#: ../server/swf/PlaceObject2Tag.cpp:274
+#: ../server/swf/PlaceObject2Tag.cpp:242
 #, c-format
 msgid "  PLACEOBJECT2: depth = %d (%d)"
 msgstr ""
 
-#: ../server/swf/PlaceObject2Tag.cpp:275 ../server/swf/PlaceObject2Tag.cpp:452
+#: ../server/swf/PlaceObject2Tag.cpp:243 ../server/swf/PlaceObject2Tag.cpp:381
 #, c-format
 msgid "  char id = %d"
 msgstr ""
 
-#: ../server/swf/PlaceObject2Tag.cpp:278 ../server/swf/PlaceObject2Tag.cpp:455
+#: ../server/swf/PlaceObject2Tag.cpp:246 ../server/swf/PlaceObject2Tag.cpp:384
 msgid "  mat:"
 msgstr ""
 
-#: ../server/swf/PlaceObject2Tag.cpp:286 ../server/swf/PlaceObject2Tag.cpp:463
+#: ../server/swf/PlaceObject2Tag.cpp:254 ../server/swf/PlaceObject2Tag.cpp:392
 #, c-format
 msgid "  ratio: %d"
 msgstr ""
 
-#: ../server/swf/PlaceObject2Tag.cpp:287 ../server/swf/PlaceObject2Tag.cpp:464
+#: ../server/swf/PlaceObject2Tag.cpp:255 ../server/swf/PlaceObject2Tag.cpp:393
 #, c-format
 msgid "  name = %s"
 msgstr ""
 
-#: ../server/swf/PlaceObject2Tag.cpp:288 ../server/swf/PlaceObject2Tag.cpp:466
+#: ../server/swf/PlaceObject2Tag.cpp:256 ../server/swf/PlaceObject2Tag.cpp:395
 #, c-format
 msgid "  clip_depth = %d (%d)"
 msgstr ""
 
-#: ../server/swf/PlaceObject2Tag.cpp:289 ../server/swf/PlaceObject2Tag.cpp:467
+#: ../server/swf/PlaceObject2Tag.cpp:257 ../server/swf/PlaceObject2Tag.cpp:396
 #, c-format
 msgid " m_place_type: %d"
 msgstr ""
 
-#: ../server/swf/PlaceObject2Tag.cpp:331 ../server/swf/PlaceObject2Tag.cpp:451
+#: ../server/swf/PlaceObject2Tag.cpp:284 ../server/swf/PlaceObject2Tag.cpp:380
 #, c-format
 msgid "  PLACEOBJECT3: depth = %d (%d)"
 msgstr ""
 
-#: ../server/swf/PlaceObject2Tag.cpp:465
+#: ../server/swf/PlaceObject2Tag.cpp:394
 #, c-format
 msgid "  class name = %s"
 msgstr ""
 
-#: ../server/swf/RemoveObjectTag.cpp:69
+#: ../server/swf/RemoveObjectTag.cpp:70
 #, c-format
 msgid "  remove_object_2(%d)"
 msgstr ""
@@ -2752,6 +2878,10 @@ msgstr ""
 #: ../server/swf/StartSoundTag.cpp:69
 #, c-format
 msgid "StartSound: id=%d, stop = %d, loop ct = %d"
+msgstr ""
+
+#: ../server/swf/StreamSoundBlockTag.cpp:76
+msgid "Found SOUNDSTREAMBLOCK tag w/out preceeding SOUNDSTREAMHEAD"
 msgstr ""
 
 #: ../server/swf/tag_loaders.cpp:212
@@ -2771,250 +2901,281 @@ msgstr ""
 msgid "No bytes to read in JPEGTABLES tag at offset %lu"
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:297
+#: ../server/swf/tag_loaders.cpp:298
 #, c-format
 msgid ""
 "DEFINEBITS: No jpeg loader registered in movie definition - discarding "
 "bitmap character %d"
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:324
+#: ../server/swf/tag_loaders.cpp:325
 #, c-format
 msgid "DEFINEBITS: Duplicate id (%d) for bitmap character - discarding it"
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:344
+#: ../server/swf/tag_loaders.cpp:345
 #, c-format
 msgid "  define_bits_jpeg2_loader: charid = %d pos = %ld"
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:358
+#: ../server/swf/tag_loaders.cpp:359
 #, c-format
 msgid "DEFINEBITSJPEG2: Duplicate id (%d) for bitmap character - discarding it"
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:393
+#: ../server/swf/tag_loaders.cpp:394
 #, c-format
 msgid "inflate_wrapper() inflateInit() returned %d (%s)"
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:414
+#: ../server/swf/tag_loaders.cpp:415
 msgid "inflate_wrapper(): no end of zstream found within swf tag boundaries"
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:437
+#: ../server/swf/tag_loaders.cpp:438
 #, c-format
 msgid "inflate_wrapper() inflate() returned %d (%s)"
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:446
+#: ../server/swf/tag_loaders.cpp:447
 #, c-format
 msgid "inflate_wrapper() inflateEnd() return %d (%s)"
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:463
+#: ../server/swf/tag_loaders.cpp:465
 #, c-format
 msgid "  define_bits_jpeg3_loader: charid = %d pos = %lx"
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:471
+#: ../server/swf/tag_loaders.cpp:474
 msgid "gnash is not linked to zlib -- can't load jpeg3 image data"
 msgstr "gnash ist nicht mit zlib gelinkt -- kann jpeg3-Bilddaten nicht laden"
 
-#: ../server/swf/tag_loaders.cpp:527
+#: ../server/swf/tag_loaders.cpp:530
 #, c-format
 msgid "  defbitslossless2: tag = %d, id = %d, fmt = %d, w = %d, h = %d"
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:535
+#: ../server/swf/tag_loaders.cpp:538
 #, c-format
 msgid "Bitmap character %d has a height or width of 0."
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:544
+#: ../server/swf/tag_loaders.cpp:547
 msgid "gnash is not linked to zlib -- can't load zipped image data"
 msgstr ""
 "Gnash ist nicht mit zlib gelinkt -- kann gezippte Bilddaten nicht laden"
 
-#: ../server/swf/tag_loaders.cpp:650
+#: ../server/swf/tag_loaders.cpp:653
 #, c-format
 msgid ""
 "DEFINEBITSLOSSLESS: Duplicate id (%d) for bitmap character - discarding it"
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:780
+#: ../server/swf/tag_loaders.cpp:783
 #, c-format
 msgid "  FIXME: tagtype = %d"
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:795
+#: ../server/swf/tag_loaders.cpp:799
 #, c-format
 msgid "  shape_loader: id = %d"
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:814
+#: ../server/swf/tag_loaders.cpp:819
 #, c-format
 msgid "  shape_morph_loader: id = %d"
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:863
+#: ../server/swf/tag_loaders.cpp:870
 #, c-format
 msgid "define_font_info_loader: can't find font w/ id %d"
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:884
+#: ../server/swf/tag_loaders.cpp:892
 #, c-format
 msgid "define_font_name_loader: can't find font w/ id %d"
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:900
+#: ../server/swf/tag_loaders.cpp:909
 #, c-format
 msgid "  sprite:  char id = %d"
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:909
+#: ../server/swf/tag_loaders.cpp:918
 msgid "Nested DEFINESPRITE tags. Will add to top-level characters dictionary."
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:937
+#: ../server/swf/tag_loaders.cpp:928
+#, c-format
+msgid "Sprite %d advertise no frames"
+msgstr ""
+
+#: ../server/swf/tag_loaders.cpp:953
 #, c-format
 msgid "DEFINEBUTTONSOUND refers to an unknown character def %d"
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:946
+#: ../server/swf/tag_loaders.cpp:962
 #, c-format
 msgid ""
 "DEFINEBUTTONSOUND refers to character id %d, being a %s (expected a button "
 "definition)"
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:967
+#: ../server/swf/tag_loaders.cpp:984
 #, c-format
 msgid "  button character loader: char_id = %d"
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:991
+#: ../server/swf/tag_loaders.cpp:1009
 #, c-format
 msgid "  export: count = %d"
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:1000
+#: ../server/swf/tag_loaders.cpp:1018
 msgid "EXPORT tag inside DEFINESPRITE. Will export in top-level symbol table."
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:1013
+#: ../server/swf/tag_loaders.cpp:1032
 #, c-format
 msgid "  export: id = %d, name = %s"
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:1033
+#: ../server/swf/tag_loaders.cpp:1052
 #, c-format
 msgid "don't know how to export resource '%s' with id %d (can't find that id)"
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:1071
+#: ../server/swf/tag_loaders.cpp:1092
 #, c-format
 msgid "  import: version = %u, source_url = %s (%s), count = %d"
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:1083
+#: ../server/swf/tag_loaders.cpp:1104
 #, c-format
 msgid "Exception: %s"
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:1089
+#: ../server/swf/tag_loaders.cpp:1110
 #, c-format
 msgid "can't import movie from url %s"
 msgstr "Kann Film von URL %s nicht importieren"
 
-#: ../server/swf/tag_loaders.cpp:1098
+#: ../server/swf/tag_loaders.cpp:1119
 msgid "Movie attempts to import symbols from itself."
 msgstr "Der Film versucht, Symbole von sich selbst zu importieren"
 
-#: ../server/swf/tag_loaders.cpp:1112
+#: ../server/swf/tag_loaders.cpp:1134
 #, c-format
 msgid "  import: id = %d, name = %s"
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:1128
+#: ../server/swf/tag_loaders.cpp:1150
 #, c-format
 msgid "import error: could not find resource '%s' in movie '%s'"
 msgstr "Import-Fehler: Konnte Resource '%s' in Film '%s' nicht finden!"
 
-#: ../server/swf/tag_loaders.cpp:1143 ../server/parser/movie_def_impl.cpp:295
+#: ../server/swf/tag_loaders.cpp:1165 ../server/parser/movie_def_impl.cpp:307
 #, c-format
 msgid "import error: resource '%s' from movie '%s' has unknown type"
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:1162
+#: ../server/swf/tag_loaders.cpp:1185
 #, c-format
 msgid "edit_text_char, id = %d"
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:1180
+#: ../server/swf/tag_loaders.cpp:1204
 #, c-format
 msgid "text_character, id = %d"
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:1232
+#: ../server/swf/tag_loaders.cpp:1256
 #, c-format
 msgid "DEFINESOUNDLOADER: sound sample rate %d (expected 0 to %u"
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:1267
+#: ../server/swf/tag_loaders.cpp:1293
 #, c-format
 msgid "define sound: ch=%d, format=%d, rate=%d, 16=%d, stereo=%d, ct=%d"
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:1303
+#: ../server/swf/tag_loaders.cpp:1331
 #, c-format
 msgid ""
 "There is no sound handler currently active, so character with id %d will NOT "
 "be added to the dictionary"
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:1353
+#: ../server/swf/tag_loaders.cpp:1381
 #, c-format
 msgid "SOUNDSTREAMHEAD: stream sample rate %d (expected 0 to %u)"
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:1428
+#: ../server/swf/tag_loaders.cpp:1393
+#, c-format
+msgid ""
+"Different stream/playback sound rate (%d/%d). This seems common in SWF "
+"files, so we'll warn only once."
+msgstr ""
+
+#: ../server/swf/tag_loaders.cpp:1402
+#, c-format
+msgid ""
+"Different stream/playback sample size (%d/%d). This seems common in SWF "
+"files, so we'll warn only once."
+msgstr ""
+
+#: ../server/swf/tag_loaders.cpp:1411
+#, c-format
+msgid ""
+"Different stream/playback channels (%s/%s). This seems common in SWF files, "
+"so we'll warn only once."
+msgstr ""
+
+#: ../server/swf/tag_loaders.cpp:1429
+msgid ""
+"No samples advertised for sound stream, pretty common so will warn only once"
+msgstr ""
+
+#: ../server/swf/tag_loaders.cpp:1455
 #, c-format
 msgid ""
 "sound stream head: format=%d, rate=%d, 16=%d, stereo=%d, ct=%d, latency=%d"
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:1527
+#: ../server/swf/tag_loaders.cpp:1499
 #, c-format
 msgid "VideoFrame tag refers to unknown video stream id %d"
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:1537
+#: ../server/swf/tag_loaders.cpp:1509
 #, c-format
 msgid "VideoFrame tag refers to a non-video character %d (%s)"
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:1568
+#: ../server/swf/tag_loaders.cpp:1541
 #, c-format
 msgid "  file attributes: has_metadata=%s use_network=%s"
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:1569 ../server/swf/tag_loaders.cpp:1570
+#: ../server/swf/tag_loaders.cpp:1542 ../server/swf/tag_loaders.cpp:1543
 msgid "true"
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:1569 ../server/swf/tag_loaders.cpp:1570
+#: ../server/swf/tag_loaders.cpp:1542 ../server/swf/tag_loaders.cpp:1543
 msgid "false"
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:1575
+#: ../server/swf/tag_loaders.cpp:1548
 msgid ""
 "FileAttributes tag in the SWF requests that network access is not granted to "
 "this movie (or application?) when loaded from the filesystem. Anyway Gnash "
 "won't care; use white/black listing in your .gnashrc instead"
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:1599
+#: ../server/swf/tag_loaders.cpp:1572
 #, c-format
 msgid ""
 "  metadata = [[\n"
@@ -3022,22 +3183,22 @@ msgid ""
 "]]"
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:1602
+#: ../server/swf/tag_loaders.cpp:1575
 #, c-format
 msgid "METADATA tag unused: %s"
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:1651
+#: ../server/swf/tag_loaders.cpp:1624
 #, c-format
 msgid "  reflex = \"%c%c%c\""
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:1654
+#: ../server/swf/tag_loaders.cpp:1627
 #, c-format
 msgid "REFLEX tag parsed (\"%c%c%c\") but unused"
 msgstr ""
 
-#: ../server/swf/tag_loaders.cpp:1678
+#: ../server/swf/tag_loaders.cpp:1652
 #, c-format
 msgid "%s tag parsed but not yet used"
 msgstr ""
@@ -3222,96 +3383,97 @@ msgstr ""
 msgid "Empty action buffer starting at offset %lu"
 msgstr ""
 
-#: ../server/parser/action_buffer.cpp:102
+#: ../server/parser/action_buffer.cpp:107
 #, c-format
-msgid "Action buffer starting at offset %lu doesn't end witn an END tag"
+msgid "Action buffer starting at offset %lu doesn't end with an END tag"
 msgstr ""
 
-#: ../server/parser/action_buffer.cpp:125
+#: ../server/parser/action_buffer.cpp:131
 msgid "process_decl_dict("
 msgstr ""
 
-#: ../server/parser/action_buffer.cpp:154
+#: ../server/parser/action_buffer.cpp:160
 msgid "action buffer dict length exceeded"
 msgstr ""
 
-#: ../server/parser/action_buffer.cpp:578
+#: ../server/parser/action_buffer.cpp:584
 msgid "Native double floating point format not recognised"
 msgstr ""
 
-#: ../server/parser/BitmapMovieDefinition.cpp:67
+#: ../server/parser/BitmapMovieDefinition.cpp:63
 #, c-format
 msgid "Creating a shape_definition wrapping a %g x %g bitmap"
 msgstr ""
 
-#: ../server/parser/button_character_def.cpp:55
+#: ../server/parser/button_character_def.cpp:56
 msgid "Premature end of button action input: can't read conditions"
 msgstr ""
 
-#: ../server/parser/button_character_def.cpp:64
-msgid "-- actions in button"
+#: ../server/parser/button_character_def.cpp:65
+#, c-format
+msgid "   button actions for conditions 0x%x"
 msgstr ""
 
-#: ../server/parser/button_character_def.cpp:100
+#: ../server/parser/button_character_def.cpp:123
 msgid "   premature end of button record input stream, can't read flags"
 msgstr ""
 
-#: ../server/parser/button_character_def.cpp:125
+#: ../server/parser/button_character_def.cpp:148
 msgid "   premature end of button record input stream, can't read character id"
 msgstr ""
 
-#: ../server/parser/button_character_def.cpp:140
+#: ../server/parser/button_character_def.cpp:163
 #, c-format
 msgid ""
 "   button record for states [%s] refer to character with id %d, which is not "
 "found in the chars dictionary"
 msgstr ""
 
-#: ../server/parser/button_character_def.cpp:148
+#: ../server/parser/button_character_def.cpp:171
 #, c-format
 msgid "   button record for states [%s] contain character %d (%s)"
 msgstr ""
 
-#: ../server/parser/button_character_def.cpp:157
+#: ../server/parser/button_character_def.cpp:180
 msgid ""
 "   premature end of button record input stream, can't read button layer "
 "(depth?)"
 msgstr ""
 
-#: ../server/parser/button_character_def.cpp:316
+#: ../server/parser/button_character_def.cpp:337
 msgid "Premature end of DEFINEBUTTON tag, won't read actions"
 msgstr ""
 
-#: ../server/parser/button_character_def.cpp:354
+#: ../server/parser/button_character_def.cpp:368
 #, c-format
 msgid "Next Button2 actionOffset (%u) points past the end of tag (%lu)"
 msgstr ""
 
-#: ../server/parser/button_character_def.cpp:409
+#: ../server/parser/button_character_def.cpp:413
 #, c-format
 msgid ""
 "Next action offset (%u) in Button2ActionConditions points past the end of tag"
 msgstr ""
 
-#: ../server/parser/button_character_def.cpp:440
+#: ../server/parser/button_character_def.cpp:444
 msgid "Attempt to redefine button sound ignored"
 msgstr ""
 
-#: ../server/parser/button_character_def.cpp:448
+#: ../server/parser/button_character_def.cpp:452
 msgid "button sound options: "
 msgstr ""
 
-#: ../server/parser/button_character_def.cpp:462
+#: ../server/parser/button_character_def.cpp:466
 #, c-format
 msgid "sound tag not found, sound_id=%d, button state #=%i"
 msgstr ""
 
-#: ../server/parser/filter_factory.cpp:97
+#: ../server/parser/filter_factory.cpp:99
 #, c-format
 msgid "Invalid filter type %d."
 msgstr ""
 
-#: ../server/parser/filter_factory.cpp:107
+#: ../server/parser/filter_factory.cpp:109
 #, c-format
 msgid "Filter %d could not read."
 msgstr ""
@@ -3321,290 +3483,297 @@ msgstr ""
 msgid "Different number of edges in start (%u) and end (%u) shapes of a morph"
 msgstr ""
 
-#: ../server/parser/movie_def_impl.cpp:278
+#: ../server/parser/movie_def_impl.cpp:290
 #, c-format
 msgid "import error: resource '%s' is not exported from movie '%s'"
 msgstr ""
 
-#: ../server/parser/movie_def_impl.cpp:325
+#: ../server/parser/movie_def_impl.cpp:337
 #, c-format
 msgid "get_character_def(): character_id %d is still waiting to be imported"
 msgstr ""
 
-#: ../server/parser/movie_def_impl.cpp:351
+#: ../server/parser/movie_def_impl.cpp:363
 #, c-format
 msgid "get_font(): font_id %d is still waiting to be imported"
 msgstr ""
 
-#: ../server/parser/movie_def_impl.cpp:401
+#: ../server/parser/movie_def_impl.cpp:413
 #, c-format
 msgid "Add sound sample %d assigning id %d"
 msgstr ""
 
-#: ../server/parser/movie_def_impl.cpp:431
+#: ../server/parser/movie_def_impl.cpp:443
 msgid "gnash::movie_def_impl::read() -- file does not start with a SWF header"
 msgstr ""
 
-#: ../server/parser/movie_def_impl.cpp:438
+#: ../server/parser/movie_def_impl.cpp:450
 #, c-format
 msgid "version = %d, file_length = %d"
 msgstr ""
 
-#: ../server/parser/movie_def_impl.cpp:444
+#: ../server/parser/movie_def_impl.cpp:456
 #, c-format
 msgid "SWF%d is not fully supported, trying anyway but don't expect it to work"
 msgstr ""
 
-#: ../server/parser/movie_def_impl.cpp:451
+#: ../server/parser/movie_def_impl.cpp:463
 msgid ""
 "movie_def_impl::read(): unable to read zipped SWF data; gnash was compiled "
 "without zlib support"
 msgstr ""
 
-#: ../server/parser/movie_def_impl.cpp:456
+#: ../server/parser/movie_def_impl.cpp:468
 msgid "file is compressed"
 msgstr ""
 
-#: ../server/parser/movie_def_impl.cpp:490
+#: ../server/parser/movie_def_impl.cpp:502
 #, c-format
 msgid "frame rate = %f, frames = "
 msgstr ""
 
-#: ../server/parser/movie_def_impl.cpp:518
+#: ../server/parser/movie_def_impl.cpp:530
 msgid "Could not start loading thread"
-msgstr ""
-
-#: ../server/parser/movie_def_impl.cpp:626
-#, c-format
-msgid "Character %d @ %p"
 msgstr ""
 
 #: ../server/parser/movie_def_impl.cpp:638
 #, c-format
+msgid "Character %d @ %p"
+msgstr ""
+
+#: ../server/parser/movie_def_impl.cpp:650
+#, c-format
 msgid "Could not find char %d, dump is:"
 msgstr ""
 
-#: ../server/parser/movie_def_impl.cpp:676
+#: ../server/parser/movie_def_impl.cpp:688
 #, c-format
 msgid "Ensure load of frame %u/%u (last loaded is: %u)"
 msgstr ""
 
-#: ../server/parser/movie_def_impl.cpp:681
+#: ../server/parser/movie_def_impl.cpp:693
 msgid "Could not advance to frame "
 msgstr ""
 
-#: ../server/parser/movie_def_impl.cpp:690
+#: ../server/parser/movie_def_impl.cpp:702
 #, c-format
 msgid ""
 "No more frames to load. Framecount: %u, Lastloaded: %u, next to load: %u"
 msgstr ""
 
-#: ../server/parser/movie_def_impl.cpp:740
+#: ../server/parser/movie_def_impl.cpp:752
 msgid ""
 "Hit stream-end tag, but not at the advertised SWF end; stopping for safety."
 msgstr ""
 
-#: ../server/parser/movie_def_impl.cpp:766
+#: ../server/parser/movie_def_impl.cpp:778
 #, c-format
 msgid ""
 "last expected SHOWFRAME in SWF stream '%s' isn't followed by an END (%d)."
 msgstr ""
 
-#: ../server/parser/movie_def_impl.cpp:785
+#: ../server/parser/movie_def_impl.cpp:797
 #, c-format
 msgid "*** no tag loader for type %d (movie)"
 msgstr ""
 
-#: ../server/parser/movie_def_impl.cpp:806
+#: ../server/parser/movie_def_impl.cpp:818
 #, c-format
 msgid "Parsing exception: %s"
 msgstr ""
 
-#: ../server/parser/movie_def_impl.cpp:813
+#: ../server/parser/movie_def_impl.cpp:825
 msgid " control tags are NOT followed by a SHOWFRAME tag"
 msgstr ""
 
-#: ../server/parser/movie_def_impl.cpp:822
+#: ../server/parser/movie_def_impl.cpp:834
 msgid " frames advertised in header, but only "
 msgstr ""
 
-#: ../server/parser/movie_def_impl.cpp:851
+#: ../server/parser/movie_def_impl.cpp:861
 #, c-format
 msgid "number of SHOWFRAME tags in SWF stream '%s' ("
 msgstr ""
 
-#: ../server/parser/movie_def_impl.cpp:863
+#: ../server/parser/movie_def_impl.cpp:873
 #, c-format
 msgid "Loaded frame %u/%u"
 msgstr ""
 
-#: ../server/parser/movie_def_impl.cpp:896
+#: ../server/parser/movie_def_impl.cpp:906
 #, c-format
 msgid "get_exported_resource called, frame count=%u"
 msgstr ""
 
-#: ../server/parser/movie_def_impl.cpp:936
+#: ../server/parser/movie_def_impl.cpp:946
 msgid "looking for exported resource: frame load advancement (from "
 msgstr ""
 
-#: ../server/parser/movie_def_impl.cpp:947
+#: ../server/parser/movie_def_impl.cpp:957
 #, c-format
 msgid ""
 "No frame progress in movie %s after %lu milliseconds (%lu microseconds = %lu "
 "iterations), giving up on get_exported_resource(%s): circular IMPORTS?"
 msgstr ""
 
-#: ../server/parser/movie_def_impl.cpp:962
+#: ../server/parser/movie_def_impl.cpp:972
 #, c-format
 msgid "No frame progress at iteration %lu of get_exported_resource(%s)"
 msgstr ""
 
-#: ../server/parser/movie_def_impl.cpp:973
+#: ../server/parser/movie_def_impl.cpp:983
 #, c-format
 msgid "At end of stream, still no '%s' symbol found in _exportedResources ("
 msgstr ""
 
-#: ../server/parser/movie_def_impl.cpp:985
+#: ../server/parser/movie_def_impl.cpp:995
 #, c-format
 msgid ""
 "We haven't finished loading (loading frame %u), and _exportedResources.get "
 "returned no entries, sleeping a bit and trying again"
 msgstr ""
 
-#: ../server/parser/shape_character_def.cpp:91
+#: ../server/parser/shape_character_def.cpp:92
 #, c-format
 msgid "  read_fill_styles: count = %u"
 msgstr ""
 
-#: ../server/parser/shape_character_def.cpp:120
+#: ../server/parser/shape_character_def.cpp:121
 #, c-format
 msgid "  read_line_styles: count = %d"
 msgstr ""
 
-#: ../server/parser/shape_character_def.cpp:132
+#: ../server/parser/shape_character_def.cpp:133
 #, c-format
 msgid "  read_line_styles: count2 = %d"
 msgstr ""
 
-#: ../server/parser/shape_character_def.cpp:184
+#: ../server/parser/shape_character_def.cpp:185
 #, c-format
 msgid "  bound rect: %s"
 msgstr ""
 
-#: ../server/parser/shape_character_def.cpp:227
+#: ../server/parser/shape_character_def.cpp:228
 #, c-format
 msgid "  shape_character_def read: nfillbits = %d, nlinebits = %d"
 msgstr ""
 
-#: ../server/parser/shape_character_def.cpp:318
+#: ../server/parser/shape_character_def.cpp:319
 #, c-format
 msgid "  shape_character read: moveto %d %d"
 msgstr ""
 
-#: ../server/parser/shape_character_def.cpp:344
+#: ../server/parser/shape_character_def.cpp:345
 #, c-format
 msgid ""
 "Invalid fill style %d in fillStyle0Change record for font tag (0 or 1 "
 "valid). Set to 0."
 msgstr ""
 
-#: ../server/parser/shape_character_def.cpp:355
+#: ../server/parser/shape_character_def.cpp:356
 #, c-format
 msgid "Invalid fill style %d in fillStyle0Change record - "
 msgstr ""
 
-#: ../server/parser/shape_character_def.cpp:364
+#: ../server/parser/shape_character_def.cpp:365
 #, c-format
 msgid "  shape_character read: fill0 (left) = %d"
 msgstr ""
 
-#: ../server/parser/shape_character_def.cpp:391
+#: ../server/parser/shape_character_def.cpp:392
 #, c-format
 msgid ""
 "Invalid fill style %d in fillStyle1Change record for font tag (0 or 1 "
 "valid). Set to 0."
 msgstr ""
 
-#: ../server/parser/shape_character_def.cpp:402
+#: ../server/parser/shape_character_def.cpp:403
 #, c-format
 msgid "Invalid fill style %d in fillStyle1Change record - "
 msgstr ""
 
-#: ../server/parser/shape_character_def.cpp:411
+#: ../server/parser/shape_character_def.cpp:412
 #, c-format
 msgid "  shape_character read: fill1 (right) = %d"
 msgstr ""
 
-#: ../server/parser/shape_character_def.cpp:436
+#: ../server/parser/shape_character_def.cpp:437
 #, c-format
 msgid ""
 "Invalid line style %d in lineStyleChange record for font tag (0 or 1 valid). "
 "Set to 0."
 msgstr ""
 
-#: ../server/parser/shape_character_def.cpp:447
+#: ../server/parser/shape_character_def.cpp:448
 #, c-format
 msgid "Invalid fill style %d in lineStyleChange record - "
 msgstr ""
 
-#: ../server/parser/shape_character_def.cpp:455
+#: ../server/parser/shape_character_def.cpp:456
 #, c-format
 msgid "  shape_character_read: line = %d"
 msgstr ""
 
-#: ../server/parser/shape_character_def.cpp:472
+#: ../server/parser/shape_character_def.cpp:473
 msgid "  shape_character read: more fill styles"
 msgstr ""
 
-#: ../server/parser/shape_character_def.cpp:516
+#: ../server/parser/shape_character_def.cpp:517
 #, c-format
 msgid "  shape_character read: curved edge   = %d %d - %d %d - %d %d"
 msgstr ""
 
-#: ../server/parser/shape_character_def.cpp:559
+#: ../server/parser/shape_character_def.cpp:560
 #, c-format
 msgid "  shape_character_read: straight edge = %d %d - %d %d"
 msgstr ""
 
-#: ../server/parser/sprite_definition.cpp:45
+#: ../server/parser/sprite_definition.cpp:46
 #, c-format
 msgid "Instantiating sprite_def %p"
 msgstr ""
 
-#: ../server/parser/sprite_definition.cpp:76
+#: ../server/parser/sprite_definition.cpp:77
 msgid "  frames = "
 msgstr ""
 
-#: ../server/parser/sprite_definition.cpp:94
+#: ../server/parser/sprite_definition.cpp:95
 msgid ""
 "Hit end tag, before the advertised DEFINESPRITE end; stopping for safety."
 msgstr ""
 
-#: ../server/parser/sprite_definition.cpp:112
+#: ../server/parser/sprite_definition.cpp:109
 msgid "  show_frame "
 msgstr ""
 
-#: ../server/parser/sprite_definition.cpp:127
+#: ../server/parser/sprite_definition.cpp:124
 msgid ""
 "last SHOWFRAME of a DEFINESPRITE tag isn't followed by an END. Stopping for "
 "safety."
 msgstr ""
 
-#: ../server/parser/sprite_definition.cpp:147
+#: ../server/parser/sprite_definition.cpp:144
 #, c-format
 msgid "*** no tag loader for type %d (sprite)"
 msgstr ""
 
-#: ../server/parser/sprite_definition.cpp:155
+#: ../server/parser/sprite_definition.cpp:154
+#, c-format
+msgid ""
+"%d frames advertised in header, but only %d SHOWFRAME tags found in define "
+"sprite."
+msgstr ""
+
+#: ../server/parser/sprite_definition.cpp:163
 msgid "  -- sprite END --"
 msgstr ""
 
-#: ../server/parser/sprite_definition.cpp:210
+#: ../server/parser/sprite_definition.cpp:222
 #, c-format
 msgid "Registered class %p for sprite_def %p"
 msgstr ""
 
-#: ../server/parser/sprite_definition.cpp:212
+#: ../server/parser/sprite_definition.cpp:224
 msgid " Exported interface: "
 msgstr ""
 
@@ -3626,7 +3795,7 @@ msgstr ""
 msgid "  has_font: font id = %d (%p)"
 msgstr ""
 
-#: ../server/parser/text_character_def.cpp:93
+#: ../server/parser/text_character_def.cpp:94
 msgid "  has_color"
 msgstr ""
 
@@ -3635,22 +3804,22 @@ msgstr ""
 msgid "  has_x_offset = %g"
 msgstr ""
 
-#: ../server/parser/text_character_def.cpp:118
+#: ../server/parser/text_character_def.cpp:117
 #, c-format
 msgid "  has_y_offset = %g"
 msgstr ""
 
-#: ../server/parser/text_character_def.cpp:131
+#: ../server/parser/text_character_def.cpp:130
 #, c-format
 msgid "  text_height = %g"
 msgstr ""
 
-#: ../server/parser/text_character_def.cpp:155
+#: ../server/parser/text_character_def.cpp:154
 #, c-format
 msgid "  glyph_records: count = %d"
 msgstr ""
 
-#: ../server/parser/text_character_def.cpp:159
+#: ../server/parser/text_character_def.cpp:158
 #, c-format
 msgid "   glyph%d: index=%d, advance=%g"
 msgstr ""
@@ -3688,280 +3857,277 @@ msgstr ""
 msgid "%p.addListener(%s): this object's _listener isn't an array: %s"
 msgstr ""
 
-#: ../server/asobj/Color.cpp:205
+#: ../server/asobj/Color.cpp:198
 #, c-format
 msgid ""
 "Color.getTransform(%s) : no or unloaded sprite associated with the Color "
 "object"
 msgstr ""
 
-#: ../server/asobj/Color.cpp:237
+#: ../server/asobj/Color.cpp:230
 msgid "Color.setRGB() : missing argument"
 msgstr ""
 
-#: ../server/asobj/Color.cpp:281
+#: ../server/asobj/Color.cpp:274
 msgid "Color.setTransform() : missing argument"
 msgstr ""
 
-#: ../server/asobj/Color.cpp:291
+#: ../server/asobj/Color.cpp:284
 #, c-format
 msgid "Color.setTransform(%s) : first argument doesn't cast to an object"
 msgstr ""
 
-#: ../server/asobj/Color.cpp:301
+#: ../server/asobj/Color.cpp:294
 #, c-format
 msgid ""
 "Color.setTransform(%s) : no or unloaded sprite associated with the Color "
 "object"
 msgstr ""
 
-#: ../server/asobj/Color.cpp:365
+#: ../server/asobj/Color.cpp:358
 #, c-format
 msgid "new Color(%s) : first argument doesn't evaluate or point to a MovieClip"
 msgstr ""
 
-#: ../server/asobj/Date.cpp:466
+#: ../server/asobj/Date.cpp:444
 msgid "Date constructor called with more than 7 arguments"
 msgstr ""
 
-#: ../server/asobj/Date.cpp:493
-msgid "Date() failed to initialise from arguments"
-msgstr ""
-
-#: ../server/asobj/Date.cpp:700
+#: ../server/asobj/Date.cpp:596
 msgid "Date.setTime needs one argument"
 msgstr "Date.setTime benötigt ein Argument"
 
-#: ../server/asobj/Date.cpp:707
+#: ../server/asobj/Date.cpp:606
 msgid "Date.setTime was called with more than one argument"
 msgstr "Date.setTime wurde mit mehr als einem Argument aufgerufen"
 
-#: ../server/asobj/Date.cpp:757
-msgid "Failed to set a date."
-msgstr "Konnte kein Datum setzen."
-
-#: ../server/asobj/Date.cpp:794
-msgid "utc_tm_msec_to_date failed to convert a date"
-msgstr ""
-
-#: ../server/asobj/Date.cpp:868
+#: ../server/asobj/Date.cpp:693
 msgid "Date.setFullYear needs one argument"
 msgstr "Date.setFullYear benötigt ein Argument"
 
-#: ../server/asobj/Date.cpp:884
+#: ../server/asobj/Date.cpp:709
 msgid "Date.setFullYear was called with more than three arguments"
 msgstr "Date.setFullYear wurde mit mehr als drei Argumenten aufgerufen"
 
-#: ../server/asobj/Date.cpp:913
+#: ../server/asobj/Date.cpp:739
 msgid "Date.setYear needs one argument"
 msgstr "Date.setYear benötigt ein Argument"
 
-#: ../server/asobj/Date.cpp:933
+#: ../server/asobj/Date.cpp:756
 msgid "Date.setYear was called with more than three arguments"
 msgstr "Date.setYear wurde mit mehr als drei Argumenten aufgerufen"
 
-#: ../server/asobj/Date.cpp:961
+#: ../server/asobj/Date.cpp:785
 msgid "Date.setMonth needs one argument"
 msgstr "Date.setMonth benötigt ein Argument"
 
-#: ../server/asobj/Date.cpp:990
+#: ../server/asobj/Date.cpp:817
 msgid "Date.setMonth was called with more than three arguments"
 msgstr "Date.setMonth wurde mit mehr als drei Argumenten aufgerufen"
 
-#: ../server/asobj/Date.cpp:1009
+#: ../server/asobj/Date.cpp:836
 msgid "Date.setDate needs one argument"
 msgstr "Date.setDate benötigt ein Argument"
 
-#: ../server/asobj/Date.cpp:1023
+#: ../server/asobj/Date.cpp:850
 msgid "Date.setDate was called with more than one argument"
 msgstr "Date.setDate wurde mit mehr als einem Argument aufgerufen"
 
-#: ../server/asobj/Date.cpp:1047
+#: ../server/asobj/Date.cpp:875
 msgid "Date.setHours needs one argument"
 msgstr "Date.setHours benötigt ein Argument"
 
-#: ../server/asobj/Date.cpp:1065
+#: ../server/asobj/Date.cpp:893
 msgid "Date.setHours was called with more than four arguments"
 msgstr "Date.setHours was called with more than four arguments"
 
-#: ../server/asobj/Date.cpp:1087
+#: ../server/asobj/Date.cpp:918
 msgid "Date.setMinutes needs one argument"
 msgstr "Date.setMinutes benötigt ein Argument"
 
-#: ../server/asobj/Date.cpp:1104 ../server/asobj/Date.cpp:1142
+#: ../server/asobj/Date.cpp:935 ../server/asobj/Date.cpp:975
 msgid "Date.setMinutes was called with more than three arguments"
 msgstr "Date.setMinutes wurde mit mehr als drei Argumenten aufgerufen"
 
-#: ../server/asobj/Date.cpp:1124
+#: ../server/asobj/Date.cpp:956
 msgid "Date.setSeconds needs one argument"
 msgstr "Date.setSeconds benötigt ein Argument"
 
-#: ../server/asobj/Date.cpp:1158
+#: ../server/asobj/Date.cpp:994
 msgid "Date.setMilliseconds needs one argument"
 msgstr "Date.setMilliseconds benötigt ein Argument"
 
-#: ../server/asobj/Date.cpp:1168
+#: ../server/asobj/Date.cpp:1010
 msgid "Date.setMilliseconds was called with more than one argument"
 msgstr "Date.setMilliseconds wurde mit mehr als einem Argument aufgerufen"
 
-#: ../server/asobj/Date.cpp:1257
+#: ../server/asobj/Date.cpp:1103
 msgid "Date.UTC needs one argument"
 msgstr "Date.UTC benötigt ein Argument"
 
-#: ../server/asobj/Date.cpp:1277
+#: ../server/asobj/Date.cpp:1127
 msgid "Date.UTC was called with more than 7 arguments"
 msgstr "Date.UTC wurde mit mehr als sieben Argumenten aufgerufen"
 
-#: ../server/asobj/Global.cpp:84 ../server/asobj/string.cpp:44
+#: ../server/asobj/Global.cpp:86 ../server/asobj/string.cpp:43
 #, c-format
 msgid "%s needs one argument"
 msgstr "%s benötigt ein Argument"
 
-#: ../server/asobj/Global.cpp:90 ../server/asobj/string.cpp:50
+#: ../server/asobj/Global.cpp:92 ../server/asobj/string.cpp:49
 #, c-format
 msgid "%s has more than one argument"
 msgstr "%s hat mehr als ein Argument"
 
-#: ../server/asobj/Global.cpp:207
+#: ../server/asobj/Global.cpp:368
 #, c-format
 msgid "%s needs at least one argument"
 msgstr "%s benötigt mindestens ein Argument"
 
-#: ../server/asobj/Global.cpp:213
+#: ../server/asobj/Global.cpp:375
 #, c-format
 msgid "%s has more than two arguments"
 msgstr "%s hat mehr als zwei Argumente"
 
-#: ../server/asobj/Global.cpp:358
+#: ../server/asobj/Global.cpp:521
 #, c-format
 msgid "%s needs at least three arguments"
 msgstr "%s benötigt mindestens drei Argumente"
 
-#: ../server/asobj/Global.cpp:364
+#: ../server/asobj/Global.cpp:527
 #, c-format
 msgid "%s has more than four arguments"
 msgstr "%s hat mehr als vier Argumente"
 
-#: ../server/asobj/Global.cpp:366
+#: ../server/asobj/Global.cpp:530
 #, c-format
 msgid "%s has four arguments in a SWF version 5 movie"
 msgstr "%s hat vier Argumente in einem Film der SWF-Version 5"
 
-#: ../server/asobj/Global.cpp:375
-#, c-format
-msgid "Invalid call to ASSetPropFlags: object argument is not an object: %s"
-msgstr ""
+#: ../server/asobj/Global.cpp:541
+#, fuzzy, c-format
+msgid "Invalid call to ASSetPropFlags: first argument is not an object: %s"
+msgstr "MovieClipLoader.getProgress(%s): Erstes Argument ist kein Objekt"
 
-#: ../server/asobj/Global.cpp:416
+#: ../server/asobj/Global.cpp:591
 #, c-format
 msgid "ASNative(%s): needs at least two arguments"
 msgstr "ASNative(%s): Benötigt mindestens zwei Argumente"
 
-#: ../server/asobj/Global.cpp:427
+#: ../server/asobj/Global.cpp:602
 #, c-format
 msgid "ASNative(%s): first arg must be >= 0"
 msgstr "ASNative(%s): Erstes Argument muss >= 0 sein"
 
-#: ../server/asobj/Global.cpp:434
+#: ../server/asobj/Global.cpp:609
 #, c-format
 msgid "ASNative(%s): second arg must be >= 0"
 msgstr "ASNative(%s): Zweites Argument muss >= 0 sein"
 
-#: ../server/asobj/Global.cpp:612
+#: ../server/asobj/Global.cpp:620
+#, c-format
+msgid "No ASnative(%d, %d) registered with the VM"
+msgstr ""
+
+#: ../server/asobj/Global.cpp:688
 msgid "Extensions enabled, scanning plugin dir for load"
 msgstr ""
 
-#: ../server/asobj/Global.cpp:618
+#: ../server/asobj/Global.cpp:693
 msgid "Extensions disabled"
 msgstr ""
 
-#: ../server/asobj/Key.cpp:153
+#: ../server/asobj/Key.cpp:150
 msgid "Key.isDown needs one argument (the key code)"
 msgstr ""
 
-#: ../server/asobj/LoadVars.cpp:329
+#: ../server/asobj/LoadVars.cpp:339
 #, c-format
 msgid "Can't load variables from %s (security?)"
 msgstr "Kann Variablen von %s nicht laden (Sicherheit?)"
 
-#: ../server/asobj/LoadVars.cpp:336
+#: ../server/asobj/LoadVars.cpp:346
 #, c-format
 msgid "Loading variables file from url: '%s'"
 msgstr "Lade Variablen-Datei von URL: '%s'"
 
-#: ../server/asobj/LoadVars.cpp:522
+#: ../server/asobj/LoadVars.cpp:532
 msgid "LoadVars.load() requires at least one argument"
 msgstr "LoadVars.load() benötigt mindestens ein Argument"
 
-#: ../server/asobj/LoadVars.cpp:531
+#: ../server/asobj/LoadVars.cpp:541
 msgid "LoadVars.load(): invalid empty url"
 msgstr "LoadVars.load(): Ungültige leere URL"
 
-#: ../server/asobj/LoadVars.cpp:558
+#: ../server/asobj/LoadVars.cpp:568
 msgid "LoadVars.sendAndLoad() requires at least two arguments"
 msgstr "LoadVars.sendAndLoad() benötigt mindestens zwei Argumente"
 
-#: ../server/asobj/LoadVars.cpp:567
+#: ../server/asobj/LoadVars.cpp:577
 msgid "LoadVars.sendAndLoad(): invalid empty url"
 msgstr "LoadVars.sendAndLoad(): Ungültige leere URL"
 
-#: ../server/asobj/LoadVars.cpp:576
+#: ../server/asobj/LoadVars.cpp:586
 msgid "LoadVars.sendAndLoad(): invalid target (must be a LoadVars object)"
 msgstr ""
 "LoadVars.sendAndLoad(): Ungültiges Ziel (muss ein LoadVars-Objekt sein)"
 
-#: ../server/asobj/LocalConnection.cpp:235
+#: ../server/asobj/LocalConnection.cpp:236
 msgid "No connection name specified to LocalConnection.connect()"
 msgstr ""
 
-#: ../server/asobj/Mouse.cpp:103
+#: ../server/asobj/LocalConnection.cpp:263
+msgid "LocalConnection.send unimplemented"
+msgstr ""
+
+#: ../server/asobj/Mouse.cpp:75
 msgid "No callback to handle Mouse.hide"
 msgstr ""
 
-#: ../server/asobj/Mouse.cpp:121
+#: ../server/asobj/Mouse.cpp:97
 msgid "No callback to handle Mouse.show"
 msgstr ""
 
-#: ../server/asobj/MovieClipLoader.cpp:199
+#: ../server/asobj/MovieClipLoader.cpp:198
 #, c-format
 msgid " resolved url: %s"
 msgstr "Aufgelöste URL: %s"
 
-#: ../server/asobj/MovieClipLoader.cpp:271
+#: ../server/asobj/MovieClipLoader.cpp:270
 #, c-format
 msgid "MovieClipLoader.loadClip(%s): missing arguments"
 msgstr "MovieClipLoader.loadClip(%s): Fehlende Argumente"
 
-#: ../server/asobj/MovieClipLoader.cpp:285
+#: ../server/asobj/MovieClipLoader.cpp:284
 #, c-format
 msgid "Could not find target %s (evaluated from %s)"
 msgstr ""
 
-#: ../server/asobj/MovieClipLoader.cpp:295
+#: ../server/asobj/MovieClipLoader.cpp:294
 #, c-format
 msgid "Target %s is not a sprite instance (%s)"
 msgstr ""
 
-#: ../server/asobj/MovieClipLoader.cpp:302
+#: ../server/asobj/MovieClipLoader.cpp:301
 #, c-format
 msgid "load clip: %s, target is: %p\n"
 msgstr ""
 
-#: ../server/asobj/MovieClipLoader.cpp:317
+#: ../server/asobj/MovieClipLoader.cpp:316
 #, c-format
 msgid "%s: %s"
 msgstr "%s: %s"
 
-#: ../server/asobj/MovieClipLoader.cpp:343
+#: ../server/asobj/MovieClipLoader.cpp:342
 msgid "MovieClipLoader.getProgress(): missing argument"
 msgstr "MovieClipLoader.getProgress(): Fehlendes Argument"
 
-#: ../server/asobj/MovieClipLoader.cpp:353
+#: ../server/asobj/MovieClipLoader.cpp:352
 #, c-format
 msgid "MovieClipLoader.getProgress(%s): first argument is not an object"
 msgstr "MovieClipLoader.getProgress(%s): Erstes Argument ist kein Objekt"
 
-#: ../server/asobj/MovieClipLoader.cpp:363
+#: ../server/asobj/MovieClipLoader.cpp:362
 #, c-format
 msgid "MovieClipLoader.getProgress(%s): first argument is not an sprite"
 msgstr "MovieClipLoader.getProgress(%s): Erstes Argument ist kein Sprite"
@@ -3999,17 +4165,17 @@ msgstr ""
 msgid "NetConnection.connect(): first argument shouldn't be undefined"
 msgstr ""
 
-#: ../server/asobj/NetStream.cpp:109
+#: ../server/asobj/NetStream.cpp:112
 #, c-format
 msgid ""
 "First argument to NetStream constructor doesn't cast to a NetConnection (%s)"
 msgstr ""
 
-#: ../server/asobj/NetStream.cpp:149
+#: ../server/asobj/NetStream.cpp:152
 msgid "NetStream play needs args"
 msgstr ""
 
-#: ../server/asobj/NetStream.cpp:157
+#: ../server/asobj/NetStream.cpp:160
 #, c-format
 msgid "NetStream.play(%s): stream is not connected"
 msgstr ""
@@ -4112,7 +4278,7 @@ msgid ""
 "playback halted."
 msgstr ""
 
-#: ../server/asobj/NetStreamGst.cpp:115
+#: ../server/asobj/NetStreamGst.cpp:118
 msgid ""
 "Couldn't create the Gstreamer video conversion elements. Please make sure "
 "Gstreamer and gstreamer-plugins-base are correctly installed. Video playback "
@@ -4122,17 +4288,17 @@ msgstr ""
 "Sie dafür, dass Gstreamer und gstreamer-plugins-base korrekt installiert "
 "sind. Video-Wiedergabe wird nicht möglich sein."
 
-#: ../server/asobj/NetStreamGst.cpp:122
+#: ../server/asobj/NetStreamGst.cpp:125
 msgid ""
 "Failed to link video conversion elements. Video playback will not be possible"
 msgstr ""
 
-#: ../server/asobj/NetStreamGst.cpp:240
+#: ../server/asobj/NetStreamGst.cpp:243
 #, c-format
 msgid "%s: The provided URL could not be resolved (url: %s)"
 msgstr "%s: Die angegebene URL konnte nicht aufgelöst werden (URL: %s)"
 
-#: ../server/asobj/NetStreamGst.cpp:257
+#: ../server/asobj/NetStreamGst.cpp:260
 #, c-format
 msgid ""
 "%s: No URI handler was found for the provided URL. NetStream playback will "
@@ -4140,205 +4306,223 @@ msgid ""
 "gstreamer plugin, such as gnomevfssrc, neonhttpsrc or souphttpsrc."
 msgstr ""
 
-#: ../server/asobj/NetStreamGst.cpp:268
+#: ../server/asobj/NetStreamGst.cpp:271
 #, c-format
 msgid "URI handler \"%s\" found for URI %s"
 msgstr ""
 
-#: ../server/asobj/NetStreamGst.cpp:274
+#: ../server/asobj/NetStreamGst.cpp:277
 msgid "gst_bin_add failed. Aborting NetStream.play()."
 msgstr ""
 
-#: ../server/asobj/NetStreamGst.cpp:282
+#: ../server/asobj/NetStreamGst.cpp:285
 msgid "gst_element_link failed. Aborting NetStream.play()."
 msgstr ""
 
-#: ../server/asobj/NetStreamGst.cpp:312
+#: ../server/asobj/NetStreamGst.cpp:315
 msgid "Seek failed. This is expected, but we tried it anyway."
 msgstr ""
 
-#: ../server/asobj/NetStreamGst.cpp:527
+#: ../server/asobj/NetStreamGst.cpp:530
 #, c-format
 msgid "NetStream playback halted; module %s reported: %s\n"
 msgstr ""
 
-#: ../server/asobj/NetStreamGst.cpp:619
+#: ../server/asobj/NetStreamGst.cpp:633
 #, c-format
 msgid "Missing Gstreamer plugin: %s. Please consider installing it."
 msgstr ""
 
-#: ../server/asobj/NetStreamGst.cpp:630
+#: ../server/asobj/NetStreamGst.cpp:644
 #, c-format
 msgid "Missing plugin: %s. Will attempt to start system installer"
 msgstr ""
 
-#: ../server/asobj/NetStreamGst.cpp:644
+#: ../server/asobj/NetStreamGst.cpp:658
 msgid ""
 "Gstreamer plugin installation was at least partially successful. Will try to "
 "restart the pipeline."
 msgstr ""
 
-#: ../server/asobj/NetStreamGst.cpp:648
+#: ../server/asobj/NetStreamGst.cpp:662
 msgid ""
 "The request for system installation of missing plugins has failed. Full "
 "playback will not be possible."
 msgstr ""
 
-#: ../server/asobj/NetStreamGst.cpp:681
+#: ../server/asobj/NetStreamGst.cpp:695
 msgid ""
 "Failed to start the system Gstreamer plugin installer.Media playback will "
 "not work (fully)."
 msgstr ""
 
-#: ../server/asobj/NetStreamGst.cpp:743
+#: ../server/asobj/NetStreamGst.cpp:757
 #, c-format
 msgid "Streams of type %s are not supported!"
 msgstr ""
 
-#: ../server/asobj/NetStreamGst.cpp:775
+#: ../server/asobj/NetStreamGst.cpp:789
 #, c-format
 msgid "Couldn't find a decoder for stream type %s!"
 msgstr "Konnte keinen Decoder für Stream-Typ %s finden!"
 
-#: ../server/asobj/Number.cpp:203
+#: ../server/asobj/Number.cpp:216
 #, c-format
 msgid "Number.toString(%s): radix must be in the 2..36 range (%d is invalid)"
 msgstr ""
 
-#: ../server/asobj/Object.cpp:140
+#: ../server/asobj/Object.cpp:150
 msgid "Too many args to Object constructor"
 msgstr ""
 
-#: ../server/asobj/Object.cpp:193
+#: ../server/asobj/Object.cpp:203
 #, c-format
 msgid ""
 "Invalid call to Object.addProperty(%s) - expected 3 arguments (<name>, "
 "<getter>, <setter>)"
 msgstr ""
 
-#: ../server/asobj/Object.cpp:210
+#: ../server/asobj/Object.cpp:220
 msgid "Invalid call to Object.addProperty() - empty property name"
 msgstr ""
 
-#: ../server/asobj/Object.cpp:220
+#: ../server/asobj/Object.cpp:230
 msgid "Invalid call to Object.addProperty() - getter is not an AS function"
 msgstr ""
 
-#: ../server/asobj/Object.cpp:230
-msgid "Invalid call to Object.addProperty() - setter is not an AS function"
+#: ../server/asobj/Object.cpp:244
+#, c-format
+msgid ""
+"Invalid call to Object.addProperty() - setter is not null and not an AS "
+"function (%s)"
 msgstr ""
 
-#: ../server/asobj/Object.cpp:257
+#: ../server/asobj/Object.cpp:273
 #, c-format
 msgid ""
 "Invalid call to Object.registerClass(%s) - expected 2 arguments (<symbol>, "
 "<constructor>)"
 msgstr ""
 
-#: ../server/asobj/Object.cpp:276
+#: ../server/asobj/Object.cpp:292
 #, c-format
 msgid ""
 "Invalid call to Object.registerClass(%s) - first argument (symbol id) "
 "evaluates to empty string"
 msgstr ""
 
-#: ../server/asobj/Object.cpp:288
+#: ../server/asobj/Object.cpp:304
 #, c-format
 msgid ""
 "Invalid call to Object.registerClass(%s) - second argument (class) is not a "
 "function)"
 msgstr ""
 
-#: ../server/asobj/Object.cpp:303
+#: ../server/asobj/Object.cpp:332
 #, c-format
 msgid "Object.registerClass(%s, %s): can't find exported symbol"
 msgstr ""
 
-#: ../server/asobj/Object.cpp:321
+#: ../server/asobj/Object.cpp:350
 #, c-format
 msgid ""
 "Object.registerClass(%s, %s): exported symbol is not a MovieClip symbol "
 "(sprite_definition), but a %s"
 msgstr ""
 
-#: ../server/asobj/Object.cpp:342
+#: ../server/asobj/Object.cpp:371
 msgid "Object.hasOwnProperty() requires one arg"
 msgstr ""
 
-#: ../server/asobj/Object.cpp:351
+#: ../server/asobj/Object.cpp:380
 #, c-format
 msgid "Invalid call to Object.hasOwnProperty('%s')"
 msgstr ""
 
-#: ../server/asobj/Object.cpp:366
+#: ../server/asobj/Object.cpp:395
 msgid "Object.isPropertyEnumerable() requires one arg"
 msgstr ""
 
-#: ../server/asobj/Object.cpp:375
+#: ../server/asobj/Object.cpp:404
 #, c-format
 msgid "Invalid call to Object.isPropertyEnumerable('%s')"
 msgstr ""
 
-#: ../server/asobj/Object.cpp:396
+#: ../server/asobj/Object.cpp:425
 msgid "Object.isPrototypeOf() requires one arg"
 msgstr ""
 
-#: ../server/asobj/Object.cpp:405
+#: ../server/asobj/Object.cpp:434
 #, c-format
 msgid "First arg to Object.isPrototypeOf(%s) is not an object"
 msgstr ""
 
-#: ../server/asobj/Sound.cpp:143
+#: ../server/asobj/Object.cpp:452
+#, fuzzy, c-format
+msgid "Object.watch(%s): missing arguments"
+msgstr "XML.sendAndLoad (%s): Fehlende Argumente"
+
+#: ../server/asobj/Object.cpp:464
+#, fuzzy, c-format
+msgid "Object.watch(%s): second argument is not a function"
+msgstr "XML.sendAndLoad(%s): Zweites Argument ist kein XML-Objekt"
+
+#: ../server/asobj/Object.cpp:489
+#, fuzzy, c-format
+msgid "Object.unwatch(%s): missing argument"
+msgstr "XML.sendAndLoad (%s): Fehlende Argumente"
+
+#: ../server/asobj/Sound.cpp:146
 #, c-format
 msgid "%s is still testing!"
 msgstr "%s testet noch!"
 
-#: ../server/asobj/Sound.cpp:146
+#: ../server/asobj/Sound.cpp:149
 #, c-format
 msgid ""
 "%s: This sound already has a connection?  (We try to handle this by "
 "overriding the old one...)"
 msgstr ""
 
-#: ../server/asobj/Sound.cpp:220 ../server/asobj/Sound.cpp:232
+#: ../server/asobj/Sound.cpp:223 ../server/asobj/Sound.cpp:235
 #, c-format
 msgid "%s: only works when ffmpeg, gstreamer or libmad is enabled"
 msgstr "%s: funktioniert nur wenn ffmpeg, gstreamer oder libmad aktiviert ist"
 
-#: ../server/asobj/Sound.cpp:260
+#: ../server/asobj/Sound.cpp:263
 msgid "-- start sound"
 msgstr ""
 
-#: ../server/asobj/Sound.cpp:285
+#: ../server/asobj/Sound.cpp:288
 msgid "-- stop sound "
 msgstr ""
 
-#: ../server/asobj/Sound.cpp:301 ../server/asobj/Sound.cpp:355
+#: ../server/asobj/Sound.cpp:304 ../server/asobj/Sound.cpp:358
 #, c-format
 msgid "import error: resource '%s' is not exported"
 msgstr ""
 
-#: ../server/asobj/Sound.cpp:315 ../server/asobj/Sound.cpp:369
+#: ../server/asobj/Sound.cpp:318 ../server/asobj/Sound.cpp:372
 msgid "sound sample is NULL (doesn't cast to sound_sample)"
 msgstr ""
 
-#: ../server/asobj/Sound.cpp:328
+#: ../server/asobj/Sound.cpp:331
 msgid "-- attach sound"
 msgstr ""
 
-#: ../server/asobj/Sound.cpp:333
+#: ../server/asobj/Sound.cpp:336
 msgid "attach sound needs one argument"
 msgstr ""
 
-#: ../server/asobj/Sound.cpp:343
+#: ../server/asobj/Sound.cpp:346
 msgid "attachSound needs a non-empty string"
 msgstr ""
 
-#: ../server/asobj/Sound.cpp:444
+#: ../server/asobj/Sound.cpp:455
 msgid "loadSound needs 2 arguments"
 msgstr ""
 
-#: ../server/asobj/Sound.cpp:485
+#: ../server/asobj/Sound.cpp:486
 msgid "set volume of sound needs one argument"
 msgstr ""
 
@@ -4440,287 +4624,311 @@ msgid ""
 "the old one...)"
 msgstr ""
 
-#: ../server/asobj/Stage.cpp:264
+#: ../server/asobj/Stage.cpp:177
 msgid "Stage.width is a read-only property!"
 msgstr ""
 
-#: ../server/asobj/Stage.cpp:282
+#: ../server/asobj/Stage.cpp:194
 msgid "Stage.height is a read-only property!"
 msgstr ""
 
-#: ../server/asobj/Stage.cpp:293
-msgid ""
-"Stage.alignMode goes through the motions but is not properly implemented."
-msgstr ""
-
-#: ../server/asobj/string.cpp:464
+#: ../server/asobj/string.cpp:449
 msgid "string.slice() called with end < start"
 msgstr ""
 
-#: ../server/asobj/string.cpp:578
+#: ../server/asobj/string.cpp:563
 msgid "string.charCodeAt needs one argument"
 msgstr ""
 
-#: ../server/asobj/string.cpp:587
+#: ../server/asobj/string.cpp:572
 msgid "string.charCodeAt has more than one argument"
 msgstr ""
 
-#: ../server/asobj/xml.cpp:98 ../server/asobj/xml.cpp:120
+#: ../server/asobj/TextFormat.cpp:117
+#, c-format
+msgid "Too many args (%d) passed to TextFormat"
+msgstr ""
+
+#: ../server/asobj/xml.cpp:101 ../server/asobj/xml.cpp:123
 #, c-format
 msgid "Creating XML data at %p"
 msgstr ""
 
-#: ../server/asobj/xml.cpp:188
+#: ../server/asobj/xml.cpp:193
 #, c-format
 msgid "\tDeleting XML top level node at %p"
 msgstr ""
 
-#: ../server/asobj/xml.cpp:327
-msgid "Can't load XML file"
-msgstr "Kann XML-Datei nicht laden"
+#: ../server/asobj/xml.cpp:246
+#, c-format
+msgid "%s: extracting node %s"
+msgstr ""
 
-#: ../server/asobj/xml.cpp:356
+#: ../server/asobj/xml.cpp:254
+#, c-format
+msgid "extractNode %s has property %s, value is %s"
+msgstr ""
+
+#: ../server/asobj/xml.cpp:266
+#, c-format
+msgid ""
+"\tPushing attribute %s for element %s has value %s, next attribute is %p"
+msgstr ""
+
+#: ../server/asobj/xml.cpp:366
 msgid "XML data is empty"
 msgstr ""
 
-#: ../server/asobj/xml.cpp:374
-msgid "Can't parse XML data"
+#: ../server/asobj/xml.cpp:390
+msgid "malformed XML, trying to recover"
 msgstr ""
 
-#: ../server/asobj/xml.cpp:544 ../server/asobj/xml.cpp:618
+#: ../server/asobj/xml.cpp:395
+#, c-format
+msgid ""
+"unrecoverable malformed XML (xmlParseBalancedChunkMemoryRecover returned %d)."
+msgstr ""
+
+#: ../server/asobj/xml.cpp:400
+msgid "recovered malformed XML."
+msgstr ""
+
+#: ../server/asobj/xml.cpp:583 ../server/asobj/xml.cpp:657
 #, c-format
 msgid "Can't load XML file: %s (security?)"
 msgstr ""
 
-#: ../server/asobj/xml.cpp:551 ../server/asobj/xml.cpp:625
+#: ../server/asobj/xml.cpp:590 ../server/asobj/xml.cpp:664
 #, c-format
 msgid "Loading XML file from url: '%s'"
 msgstr "Lade XML-Datei von URL: '%s'"
 
-#: ../server/asobj/xml.cpp:561
+#: ../server/asobj/xml.cpp:600
 #, c-format
 msgid "%s: FIXME: onLoad Default event handler"
 msgstr ""
 
-#: ../server/asobj/xml.cpp:651
+#: ../server/asobj/xml.cpp:690
 msgid "XML.load(): missing argument"
 msgstr ""
 
-#: ../server/asobj/xml.cpp:726
+#: ../server/asobj/xml.cpp:765
 #, c-format
 msgid "\tCloned the XML object at %p"
 msgstr ""
 
-#: ../server/asobj/xml.cpp:735
+#: ../server/asobj/xml.cpp:774
 #, c-format
 msgid "First arg given to XML constructor (%s) evaluates to the empty string"
 msgstr ""
 
-#: ../server/asobj/xml.cpp:760
+#: ../server/asobj/xml.cpp:799
 #, c-format
 msgid "%s: %d args"
 msgstr ""
 
-#: ../server/asobj/xml.cpp:791
+#: ../server/asobj/xml.cpp:830
 msgid "no text for element creation"
 msgstr ""
 
-#: ../server/asobj/xml.cpp:820
+#: ../server/asobj/xml.cpp:859
 msgid "no text for text node creation"
 msgstr ""
 
-#: ../server/asobj/xml.cpp:886
+#: ../server/asobj/xml.cpp:925
 #, c-format
 msgid "XML.sendAndLoad(%s): missing arguments"
 msgstr "XML.sendAndLoad (%s): Fehlende Argumente"
 
-#: ../server/asobj/xml.cpp:900
+#: ../server/asobj/xml.cpp:939
 #, c-format
 msgid "XML.sendAndLoad(%s): second argument doesn't cast to an object"
 msgstr ""
 
-#: ../server/asobj/xml.cpp:911
+#: ../server/asobj/xml.cpp:950
 #, c-format
 msgid "XML.sendAndLoad(%s): second argument is not an XML object"
 msgstr "XML.sendAndLoad(%s): Zweites Argument ist kein XML-Objekt"
 
-#: ../server/asobj/xml.cpp:994
+#: ../server/asobj/xml.cpp:1033
 #, c-format
 msgid "XML parser: %s"
 msgstr "XML-Parser: %s"
 
-#: ../server/asobj/xmlnode.cpp:86 ../server/asobj/xmlnode.cpp:98
+#: ../server/asobj/xmlnode.cpp:81 ../server/asobj/xmlnode.cpp:93
 #, c-format
 msgid "\tCreating XMLNode data at %p"
 msgstr ""
 
-#: ../server/asobj/xmlnode.cpp:126
+#: ../server/asobj/xmlnode.cpp:121
 #, c-format
 msgid "\tDeleting XMLNode data %s with value %s at %p"
 msgstr ""
 
-#: ../server/asobj/xmlnode.cpp:154
+#: ../server/asobj/xmlnode.cpp:149
 #, c-format
 msgid "XMLNode %p has no children"
 msgstr ""
 
-#: ../server/asobj/xmlnode.cpp:195
+#: ../server/asobj/xmlnode.cpp:190
 msgid ""
 "XMLNode.insertBefore(): positional parameter is not a child of this node"
 msgstr ""
 
-#: ../server/asobj/xmlnode.cpp:302
+#: ../server/asobj/xmlnode.cpp:297
 #, c-format
 msgid ""
 "Stringifying node %p with name %s, value %s, %u attributes and %u children"
 msgstr ""
 
-#: ../server/asobj/xmlnode.cpp:440
+#: ../server/asobj/xmlnode.cpp:435
 msgid "XMLNode::appendChild() needs at least one argument"
 msgstr ""
 
-#: ../server/asobj/xmlnode.cpp:449
+#: ../server/asobj/xmlnode.cpp:444
 msgid "First argument to XMLNode::appendChild() is not an XMLNode"
 msgstr ""
 
-#: ../server/asobj/xmlnode.cpp:483
+#: ../server/asobj/xmlnode.cpp:478
 #, c-format
 msgid "XMLNode.insertBefore(%s) needs at least two argument"
 msgstr ""
 
-#: ../server/asobj/xmlnode.cpp:493
+#: ../server/asobj/xmlnode.cpp:488
 #, c-format
 msgid "First argument to XMLNode.insertBefore(%s) is not an XMLNode"
 msgstr ""
 
-#: ../server/asobj/xmlnode.cpp:504
+#: ../server/asobj/xmlnode.cpp:499
 #, c-format
 msgid "Second argument to XMLNode.insertBefore(%s) is not an XMLNode"
 msgstr ""
 
-#: ../server/asobj/xmlsocket.cpp:210
+#: ../server/asobj/xmlsocket.cpp:211
 #, c-format
 msgid ""
 "%s: fd <= 0, returning false (timer not unregistered while socket "
 "disconnected?"
 msgstr ""
 
-#: ../server/asobj/xmlsocket.cpp:225
+#: ../server/asobj/xmlsocket.cpp:226
 #, c-format
 msgid "The socket for fd #%d was interupted by a system call"
 msgstr ""
 
-#: ../server/asobj/xmlsocket.cpp:230 ../server/asobj/xmlsocket.cpp:405
+#: ../server/asobj/xmlsocket.cpp:231 ../server/asobj/xmlsocket.cpp:406
 #, c-format
 msgid "%s: The socket for fd #%d never was available"
 msgstr ""
 
-#: ../server/asobj/xmlsocket.cpp:246
+#: ../server/asobj/xmlsocket.cpp:247
 #, c-format
 msgid "%s: read %d bytes, first msg terminates at %d"
 msgstr ""
 
-#: ../server/asobj/xmlsocket.cpp:254
+#: ../server/asobj/xmlsocket.cpp:255
 #, c-format
 msgid "Packet size is %d at %p"
 msgstr ""
 
-#: ../server/asobj/xmlsocket.cpp:262
+#: ../server/asobj/xmlsocket.cpp:263
 #, c-format
-msgid "%d: Pushing Packet of size "
+msgid "%d: Pushing Packet of size %d at %p"
 msgstr ""
 
-#: ../server/asobj/xmlsocket.cpp:304
+#: ../server/asobj/xmlsocket.cpp:305
 #, c-format
 msgid "Throwing out partial packet %s"
 msgstr ""
 
-#: ../server/asobj/xmlsocket.cpp:319
+#: ../server/asobj/xmlsocket.cpp:320
 #, c-format
 msgid "%s: Returning %d messages"
 msgstr ""
 
-#: ../server/asobj/xmlsocket.cpp:334
+#: ../server/asobj/xmlsocket.cpp:335
 #, c-format
 msgid "%s: socket not initialized"
 msgstr ""
 
-#: ../server/asobj/xmlsocket.cpp:341
+#: ../server/asobj/xmlsocket.cpp:342
 #, c-format
 msgid "%s: sent %d bytes, data was %s"
 msgstr ""
 
-#: ../server/asobj/xmlsocket.cpp:401
+#: ../server/asobj/xmlsocket.cpp:402
 #, c-format
 msgid ""
 "%s: The socket for fd #%d was interupted by a system call in this thread"
 msgstr ""
 
-#: ../server/asobj/xmlsocket.cpp:409
+#: ../server/asobj/xmlsocket.cpp:410
 #, c-format
 msgid "%s: There is no data in the socket for fd #%d"
 msgstr ""
 
-#: ../server/asobj/xmlsocket.cpp:413
+#: ../server/asobj/xmlsocket.cpp:414
 #, c-format
 msgid "%s: There is data in the socket for fd #%d"
 msgstr ""
 
-#: ../server/asobj/xmlsocket.cpp:431
+#: ../server/asobj/xmlsocket.cpp:432
 #, c-format
 msgid "XMLSocket.connect(%s) called"
 msgstr ""
 
-#: ../server/asobj/xmlsocket.cpp:438
+#: ../server/asobj/xmlsocket.cpp:439
 msgid "XMLSocket.connect() called while already connected, ignored"
 msgstr ""
 
-#: ../server/asobj/xmlsocket.cpp:457
+#: ../server/asobj/xmlsocket.cpp:458
 msgid "XMLSocket.connect(): tring to call onConnect"
 msgstr ""
 
-#: ../server/asobj/xmlsocket.cpp:462
+#: ../server/asobj/xmlsocket.cpp:463
 msgid "Setting up timer for calling XMLSocket.onData()"
 msgstr ""
 
-#: ../server/asobj/xmlsocket.cpp:470
+#: ../server/asobj/xmlsocket.cpp:471
 msgid "Timer set"
 msgstr ""
 
-#: ../server/asobj/xmlsocket.cpp:511
+#: ../server/asobj/xmlsocket.cpp:512
 #, c-format
 msgid "new XMLSocket(%s) called - created object at %p"
 msgstr ""
 
-#: ../server/asobj/xmlsocket.cpp:531
+#: ../server/asobj/xmlsocket.cpp:532
 #, c-format
 msgid "%s: not connected"
 msgstr "%s: Nicht verbunden"
 
-#: ../server/asobj/xmlsocket.cpp:553
+#: ../server/asobj/xmlsocket.cpp:554
 msgid "Builtin XMLSocket.onData() needs an argument"
 msgstr ""
 
-#: ../server/asobj/xmlsocket.cpp:562
+#: ../server/asobj/xmlsocket.cpp:563
 #, c-format
 msgid ""
 "Builtin XMLSocket.onData() called with an argument that resolves to the "
 "empty string: %s"
 msgstr ""
 
-#: ../server/asobj/xmlsocket.cpp:644
+#: ../server/asobj/xmlsocket.cpp:653
 msgid "Still processing data"
 msgstr ""
 
-#: ../server/asobj/xmlsocket.cpp:654
-msgid "Got "
+#: ../server/asobj/xmlsocket.cpp:663
+#, c-format
+msgid "Got %d messages: "
 msgstr ""
 
-#: ../server/asobj/xmlsocket.cpp:657
-msgid " Message "
+#: ../server/asobj/xmlsocket.cpp:666
+#, c-format
+msgid " Message %d: %s "
 msgstr ""
 
-#: ../server/asobj/xmlsocket.cpp:688
+#: ../server/asobj/xmlsocket.cpp:697
 #, c-format
 msgid "%s: Couldn't find onData"
 msgstr ""
@@ -4779,44 +4987,49 @@ msgstr ""
 msgid "\tTotal # of bytes: "
 msgstr ""
 
-#: ../utilities/processor.cpp:133 ../gui/Player.cpp:407
+#: ../utilities/processor.cpp:136 ../gui/Player.cpp:419
 #, c-format
 msgid "fs_callback(%p): %s %s"
 msgstr ""
 
-#: ../utilities/processor.cpp:161
+#: ../utilities/processor.cpp:146
+#, c-format
+msgid "eventCallback: %s %s"
+msgstr ""
+
+#: ../utilities/processor.cpp:211
 #, c-format
 msgid "Gnash gprocessor version: %s, Gnash version: %s\n"
 msgstr "Gnash gprocessor Version: %s, Gnash Version: %s\n"
 
-#: ../utilities/processor.cpp:203 ../utilities/soldumper.cpp:96
-#: ../gui/gnash.cpp:233
+#: ../utilities/processor.cpp:253 ../utilities/soldumper.cpp:96
+#: ../gui/gnash.cpp:238
 msgid "Verbose output turned on"
 msgstr "Ausführliche Ausgabe eingeschaltet"
 
-#: ../utilities/processor.cpp:209 ../gui/gnash.cpp:297
+#: ../utilities/processor.cpp:259 ../gui/gnash.cpp:302
 msgid "Setting debugger ON"
 msgstr "Schalte Debugger EIN"
 
-#: ../utilities/processor.cpp:211
+#: ../utilities/processor.cpp:261
 msgid "The debugger has been disabled at configuration time"
 msgstr "Der Debugger wurde bei der Kompilierung deaktiviert"
 
-#: ../utilities/processor.cpp:217
+#: ../utilities/processor.cpp:267
 msgid "Verbose actions disabled at compile time"
 msgstr "Ausführlicher Modus für Aktionen bei der Kompilierung deaktiviert"
 
-#: ../utilities/processor.cpp:224
+#: ../utilities/processor.cpp:274
 msgid "Verbose parsing disabled at compile time"
 msgstr "Ausführlicher Modus beim Parsen bei der Kompilierung deaktiviert"
 
-#: ../utilities/processor.cpp:334 ../utilities/processor.cpp:337
-#: ../gui/Player.cpp:222 ../gui/Player.cpp:245
+#: ../utilities/processor.cpp:385 ../utilities/processor.cpp:388
+#: ../gui/Player.cpp:235 ../gui/Player.cpp:258
 #, c-format
 msgid "%s appended to local sandboxes"
 msgstr ""
 
-#: ../utilities/processor.cpp:489
+#: ../utilities/processor.cpp:540
 #, c-format
 msgid ""
 "gprocessor -- an SWF preprocessor for Gnash.\n"
@@ -4831,7 +5044,7 @@ msgid ""
 "%s%s%s%s"
 msgstr ""
 
-#: ../utilities/processor.cpp:498
+#: ../utilities/processor.cpp:549
 msgid ""
 "options:\n"
 "\n"
@@ -4849,15 +5062,15 @@ msgstr ""
 "Informationen schreiben.\n"
 "  -v          Ausführlicher Modus; d.h. Log-Meldungen nach stdout senden\n"
 
-#: ../utilities/processor.cpp:506
+#: ../utilities/processor.cpp:557
 msgid "  -vp         Be verbose about movie parsing\n"
 msgstr "  -va         Ausführlicher Modus für Film-Parsing\n"
 
-#: ../utilities/processor.cpp:511
+#: ../utilities/processor.cpp:562
 msgid "  -va         Be verbose about ActionScript\n"
 msgstr "  -va         Ausführlicher Modus für ActionScript\n"
 
-#: ../utilities/processor.cpp:516
+#: ../utilities/processor.cpp:567
 msgid ""
 "  -d [<ms>]\n"
 "              Milliseconds delay between advances (0 by default).\n"
@@ -4900,472 +5113,739 @@ msgstr ""
 msgid "-l\tList all .sol files in default dir"
 msgstr "-l\tAlle .sol-Dateien im Standardordner auflisten"
 
-#: ../gui/gnash.cpp:81
+#: ../gui/dump.cpp:124
+msgid "Ignoring request to display in X11 window"
+msgstr ""
+
+#: ../gui/dump.cpp:138
+msgid "# FATAL:  No filename given with -D argument."
+msgstr ""
+
+#: ../gui/dump.cpp:174 ../gui/dump.cpp:201
+msgid "Unable to call gettimeofday."
+msgstr ""
+
+#: ../gui/dump.cpp:258
+msgid "# FATAL:  Unable to write to closed output file."
+msgstr ""
+
+#: ../gui/dump.cpp:259
+msgid "Unable to write to closed output file."
+msgstr ""
+
+#: ../gui/dump.cpp:268
+msgid "Please supply a dump filename for gnash-dump."
+msgstr ""
+
+#: ../gui/dump.cpp:274
+#, fuzzy, c-format
+msgid "Unable to write file '%s'."
+msgstr "konnte Sockel nicht erstellen: %s"
+
+#: ../gui/fb.cpp:190
+msgid "Closing framebuffer device"
+msgstr ""
+
+#: ../gui/fb.cpp:198
+msgid "Free'ing offscreen buffer"
+msgstr ""
+
+#: ../gui/fb.cpp:212
+msgid "LUT8: Setting up colormap"
+msgstr ""
+
+#: ../gui/fb.cpp:234
+#, c-format
+msgid "LUT8: Error setting colormap: %s"
+msgstr ""
+
+#: ../gui/fb.cpp:250
+msgid "You won't have any pointing input device, sorry."
+msgstr ""
+
+#: ../gui/fb.cpp:255
+msgid "You won't have any keyboard input device, sorry."
+msgstr ""
+
+#: ../gui/fb.cpp:268
+#, c-format
+msgid "Framebuffer device uses %d bytes of memory."
+msgstr ""
+
+#: ../gui/fb.cpp:270
+#, c-format
+msgid "Video mode: %dx%d with %d bits per pixel."
+msgstr ""
+
+#: ../gui/fb.cpp:310
+#, fuzzy
+msgid "Double buffering enabled"
+msgstr "Debugger eingeschaltet >>"
+
+#: ../gui/fb.cpp:313
+msgid "Double buffering disabled"
+msgstr ""
+
+#: ../gui/fb.cpp:322
+#, fuzzy, c-format
+msgid "red channel: %d / %d"
+msgstr "Der AMF Channel-Index ist %d"
+
+#: ../gui/fb.cpp:324
+#, fuzzy, c-format
+msgid "green channel: %d / %d"
+msgstr "Der AMF Channel-Index ist %d"
+
+#: ../gui/fb.cpp:326
+#, fuzzy, c-format
+msgid "blue channel: %d / %d"
+msgstr "Der AMF Channel-Index ist %d"
+
+#: ../gui/fb.cpp:328
+#, c-format
+msgid "Total bits per pixel: %d"
+msgstr ""
+
+#: ../gui/fb.cpp:476
+msgid "This GUI does not yet support menus"
+msgstr ""
+
+#: ../gui/fb.cpp:481
+msgid "This GUI does not yet support a mouse pointer"
+msgstr ""
+
+#: ../gui/fb.cpp:567
+msgid "WARNING: Could not detect controlling TTY"
+msgstr ""
+
+#: ../gui/fb.cpp:577 ../gui/fb.cpp:612 ../gui/fb.cpp:643 ../gui/fb.cpp:693
+#, fuzzy, c-format
+msgid "WARNING: Could not open %s"
+msgstr "Konnte Codec %d nicht öffnen"
+
+#: ../gui/fb.cpp:582
+msgid "WARNING: Could not get current VT state"
+msgstr ""
+
+#: ../gui/fb.cpp:588
+#, c-format
+msgid "Original TTY NO = %d"
+msgstr ""
+
+#: ../gui/fb.cpp:594
+msgid "WARNING: Could not request a new VT"
+msgstr ""
+
+#: ../gui/fb.cpp:599
+#, c-format
+msgid "Own TTY NO = %d"
+msgstr ""
+
+#: ../gui/fb.cpp:606 ../gui/fb.cpp:637 ../gui/fb.cpp:687
+#, c-format
+msgid "WARNING: Could not find device for VT number %d"
+msgstr ""
+
+#: ../gui/fb.cpp:617 ../gui/fb.cpp:698
+#, c-format
+msgid "WARNING: Could not activate VT number %d"
+msgstr ""
+
+#: ../gui/fb.cpp:623 ../gui/fb.cpp:704
+#, c-format
+msgid "WARNING: Error waiting for VT %d becoming active"
+msgstr ""
+
+#: ../gui/fb.cpp:661
+msgid "WARNING: Could not query current keyboard mode on VT"
+msgstr ""
+
+#: ../gui/fb.cpp:665
+msgid "WARNING: Could not switch to graphics mode on new VT"
+msgstr ""
+
+#: ../gui/fb.cpp:670
+#, c-format
+msgid "VT %d ready"
+msgstr ""
+
+#: ../gui/fb.cpp:683
+msgid "Restoring terminal..."
+msgstr ""
+
+#: ../gui/fb.cpp:714
+msgid "WARNING: Could not restore keyboard mode"
+msgstr ""
+
+#: ../gui/fb.cpp:758
+#, c-format
+msgid "mouse_command: discarded %d bytes from input buffer"
+msgstr ""
+
+#: ../gui/fb.cpp:791 ../gui/fb.cpp:921
+#, fuzzy
+msgid "Could not open "
+msgstr "Konnte Codec %d nicht öffnen"
+
+#: ../gui/fb.cpp:809
+msgid "Mouse reset failed"
+msgstr ""
+
+#: ../gui/fb.cpp:817
+msgid "WARNING: Could not detect mouse device ID"
+msgstr ""
+
+#: ../gui/fb.cpp:821
+#, c-format
+msgid "WARNING: Non-standard mouse device ID %d"
+msgstr ""
+
+#: ../gui/fb.cpp:826
+msgid "Could not activate Data Reporting mode for mouse"
+msgstr ""
+
+#: ../gui/fb.cpp:833
+msgid "Mouse enabled."
+msgstr ""
+
+#: ../gui/fb.cpp:880
+#, c-format
+msgid "x/y %d/%d btn %d"
+msgstr ""
+
+#: ../gui/fb.cpp:939
+msgid "Touchpad enabled."
+msgstr ""
+
+#: ../gui/fb.cpp:1027 ../gui/fb.cpp:1244
+#, fuzzy, c-format
+msgid "Could not open %s: %s"
+msgstr "Konnte Datei %s nicht öffnen"
+
+#: ../gui/fb.cpp:1031
+#, c-format
+msgid "Pointing device %s open"
+msgstr ""
+
+#: ../gui/fb.cpp:1034
+#, c-format
+msgid "Could not set non-blocking mode for pointing device: %s"
+msgstr ""
+
+#: ../gui/fb.cpp:1117
+msgid "WARNING: Error parsing calibration data!"
+msgstr ""
+
+#: ../gui/fb.cpp:1119
+#, c-format
+msgid "Using touchscreen calibration data: %.0f / %.0f / %.0f / %.0f"
+msgstr ""
+
+#: ../gui/fb.cpp:1123
+msgid ""
+"WARNING: No touchscreen calibration settings found. The mouse pointer most "
+"probably won't work precisely. Set TSCALIB environment variable with correct "
+"values for better results"
+msgstr ""
+
+#: ../gui/fb.cpp:1248
+#, c-format
+msgid "Keyboard device %s open"
+msgstr ""
+
+#: ../gui/fb.cpp:1251
+#, c-format
+msgid "Could not set non-blocking mode for keyboard device: %s"
+msgstr ""
+
+#: ../gui/gnash.cpp:83
 msgid "Usage: gnash [options] movie_file.swf"
 msgstr "Verwendung: gnash [Optionen] datei.swf"
 
-#: ../gui/gnash.cpp:83
+#: ../gui/gnash.cpp:85
 msgid "Plays a SWF (Shockwave Flash) movie"
 msgstr "Wiedergabe einer SWF-Datei"
 
-#: ../gui/gnash.cpp:84
+#: ../gui/gnash.cpp:86
 msgid "Options:"
 msgstr "Optionen:"
 
-#: ../gui/gnash.cpp:86
+#: ../gui/gnash.cpp:88
 msgid "  -h,  --help              Print this help and exit"
 msgstr "  -h,  --help              Diese Hilfe anzeigen und beenden"
 
-#: ../gui/gnash.cpp:87
+#: ../gui/gnash.cpp:89
 msgid "  -V,  --version           Print version information and exit"
 msgstr "  -V,  --version           Versionsnummern anzeigen und beenden"
 
-#: ../gui/gnash.cpp:88
+#: ../gui/gnash.cpp:90
 msgid "  -s,  --scale <factor>    Scale the movie by the specified factor"
 msgstr "  -s,  --scale <Faktor>    Film um den angegebenen Faktor skalieren"
 
-#: ../gui/gnash.cpp:89
+#: ../gui/gnash.cpp:91
 msgid ""
 "  -c                       Produce a core file instead of letting SDL trap it"
 msgstr ""
 
-#: ../gui/gnash.cpp:90
+#: ../gui/gnash.cpp:92
 msgid "  -d,  --delay num         Number of milliseconds to delay in main loop"
 msgstr ""
 "  -d,  --delay num         Wartezeit in der Hauptschleife in Millisekunden"
 
-#: ../gui/gnash.cpp:91
+#: ../gui/gnash.cpp:93
 msgid "  -v,  --verbose           Produce verbose output"
 msgstr "  -v,  --verbose           Ausführlicher Modus"
 
-#: ../gui/gnash.cpp:93
+#: ../gui/gnash.cpp:95
 msgid "  -va                      Be (very) verbose about action execution"
 msgstr ""
 "  -va                      (Sehr) ausführlicher Modus für Film-Aktionen"
 
-#: ../gui/gnash.cpp:96
+#: ../gui/gnash.cpp:98
 msgid "  -vp                      Be (very) verbose about parsing"
 msgstr "  -vp                      (Sehr) ausführlicher Modus für Film-Parsing"
 
-#: ../gui/gnash.cpp:98
+#: ../gui/gnash.cpp:100
+msgid "  -A <file>                Audio dump file (wave format)"
+msgstr ""
+
+#: ../gui/gnash.cpp:101
+msgid "  -D <file>                Video dump file (only valid with dump-gnash)"
+msgstr ""
+
+#: ../gui/gnash.cpp:102
 msgid "  -x,  --xid <ID>          X11 Window ID for display"
 msgstr ""
 
-#: ../gui/gnash.cpp:99
+#: ../gui/gnash.cpp:103
 msgid "  -w,  --writelog          Produce the disk based debug log"
 msgstr ""
 
-#: ../gui/gnash.cpp:100
+#: ../gui/gnash.cpp:104
 msgid "  -j,  --width <width>     Set window width"
 msgstr "  -j,  --width <Breite>    Fensterbreite setzen"
 
-#: ../gui/gnash.cpp:101
+#: ../gui/gnash.cpp:105
 msgid "  -k,  --height <height>   Set window height"
 msgstr "  -k,  --height <Höhe>     Fensterhöhe setzen"
 
-#: ../gui/gnash.cpp:102
+#: ../gui/gnash.cpp:106
 msgid "  -1,  --once              Exit when/if movie reaches the last frame"
 msgstr ""
 
-#: ../gui/gnash.cpp:103
+#: ../gui/gnash.cpp:107
 msgid "  -g,  --debugger          Turn on the Flash debugger"
 msgstr "  -g,  --debugger          Flash-Debugger einschalten"
 
-#: ../gui/gnash.cpp:104
+#: ../gui/gnash.cpp:108
 msgid "  -r,  --render-mode <0|1|2|3>"
 msgstr ""
 
-#: ../gui/gnash.cpp:105
+#: ../gui/gnash.cpp:109
 msgid "                           0 disable rendering and sound"
 msgstr "                           0 Rendering und Audio deaktiviert"
 
-#: ../gui/gnash.cpp:106
+#: ../gui/gnash.cpp:110
 msgid "                           1 enable rendering, disable sound"
 msgstr "                           1 Rendering aktiviert, Audio deaktiviert"
 
-#: ../gui/gnash.cpp:107
+#: ../gui/gnash.cpp:111
 msgid "                           2 enable sound, disable rendering"
 msgstr "                           2 Audio aktiviert, Rendering deaktiviert"
 
-#: ../gui/gnash.cpp:108
+#: ../gui/gnash.cpp:112
 msgid "                           3 enable rendering and sound (default)"
 msgstr "                           3 Rendering und Audio aktiviert (Standard)"
 
-#: ../gui/gnash.cpp:109
+#: ../gui/gnash.cpp:113
 msgid "  -t,  --timeout <sec>     Exit after the specified number of seconds"
 msgstr ""
 
-#: ../gui/gnash.cpp:110
+#: ../gui/gnash.cpp:114
 msgid "  -u,  --real-url <url>    Set \"real\" URL of the movie"
 msgstr ""
 
-#: ../gui/gnash.cpp:111
+#: ../gui/gnash.cpp:115
 msgid "  -U,  --base-url <url>    Set \"base\" URL for resolving relative URLs"
 msgstr ""
 
-#: ../gui/gnash.cpp:112
+#: ../gui/gnash.cpp:116
 msgid "  -P,  --param <param>     Set parameter (e.g. \"FlashVars=A=1&b=2\")"
 msgstr ""
 
-#: ../gui/gnash.cpp:113
+#: ../gui/gnash.cpp:117
 msgid ""
 "  -F,  --fd <fd>           Filedescriptor to use for external communications"
 msgstr ""
 
-#: ../gui/gnash.cpp:115
+#: ../gui/gnash.cpp:119
 msgid "  -f,  --debug-fps num     Print FPS every num seconds (float)."
 msgstr ""
 
-#: ../gui/gnash.cpp:118
+#: ../gui/gnash.cpp:122
 msgid "  --max-advances num       Exit after specified number of advances"
 msgstr ""
 
-#: ../gui/gnash.cpp:119
+#: ../gui/gnash.cpp:123
 msgid "  --fullscreen             Start in fullscreen mode"
 msgstr ""
 
-#: ../gui/gnash.cpp:121
+#: ../gui/gnash.cpp:125
 msgid "Keys:"
 msgstr ""
 
-#: ../gui/gnash.cpp:123
+#: ../gui/gnash.cpp:127
 msgid "  CTRL-Q, CTRL-W           Quit/Exit"
 msgstr ""
 
-#: ../gui/gnash.cpp:124
+#: ../gui/gnash.cpp:128
 msgid "  CTRL-P                   Toggle Pause"
 msgstr ""
 
-#: ../gui/gnash.cpp:125
+#: ../gui/gnash.cpp:129
 msgid "  CTRL-R                   Restart the movie"
 msgstr "  CTRL-R                   Film neu starten"
 
-#: ../gui/gnash.cpp:128
+#: ../gui/gnash.cpp:132
 msgid "  CTRL-[ or kp-   Step back one frame"
 msgstr ""
 
-#: ../gui/gnash.cpp:129
+#: ../gui/gnash.cpp:133
 msgid "  CTRL-] or kp+   Step forward one frame"
 msgstr ""
 
-#: ../gui/gnash.cpp:132
+#: ../gui/gnash.cpp:136
 msgid "  CTRL-L                   Force immediate redraw"
 msgstr "  CTRL-L                   Sofortige Neuzeichnung erzwingen"
 
-#: ../gui/gnash.cpp:145
-msgid "Gnash "
-msgstr "Gnash "
+#: ../gui/gnash.cpp:150
+msgid ""
+"Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.\n"
+"Gnash comes with NO WARRANTY, to the extent permitted by law.\n"
+"You may redistribute copies of Gnash under the terms of the GNU General\n"
+"Public License.  For more information, see the file named COPYING.\n"
+msgstr ""
 
-#: ../gui/gnash.cpp:155
+#: ../gui/gnash.cpp:159
 msgid "Build options "
 msgstr "Build-Optionen "
 
-#: ../gui/gnash.cpp:156
+#: ../gui/gnash.cpp:160
 msgid "   Target: "
 msgstr "   Ziel: "
 
-#: ../gui/gnash.cpp:158
+#: ../gui/gnash.cpp:162
 msgid "   Renderer: "
 msgstr "   Renderer: "
 
-#: ../gui/gnash.cpp:159
+#: ../gui/gnash.cpp:163
 msgid " - GUI: "
 msgstr " - GUI: "
 
-#: ../gui/gnash.cpp:160
+#: ../gui/gnash.cpp:164
 msgid " - Media handler: "
 msgstr " - Medienhandler: "
 
-#: ../gui/gnash.cpp:162
+#: ../gui/gnash.cpp:166
 msgid "   Configured with: "
 msgstr "   Konfiguriert mit: "
 
-#: ../gui/gnash.cpp:163
+#: ../gui/gnash.cpp:167
 msgid "   CXXFLAGS: "
 msgstr "   CXXFLAGS: "
 
-#: ../gui/gnash.cpp:166
+#: ../gui/gnash.cpp:170
 msgid "Built against ffmpeg version: "
 msgstr ""
 
-#: ../gui/gnash.cpp:169
+#: ../gui/gnash.cpp:173
 msgid "Built against gstreamer version: "
 msgstr ""
 
-#: ../gui/gnash.cpp:241
+#: ../gui/gnash.cpp:246
 msgid "Logging to disk enabled"
 msgstr "Logging auf Festplatte aktiviert"
 
-#: ../gui/gnash.cpp:247
+#: ../gui/gnash.cpp:252
 msgid "No verbose actions; disabled at compile time"
 msgstr ""
 "Kein ausführlicher Modus für Aktionen. Bei der Kompilierung deaktiviert"
 
-#: ../gui/gnash.cpp:254
+#: ../gui/gnash.cpp:259
 msgid "No verbose parsing; disabled at compile time"
 msgstr "Kein ausführlicher Modus beim Parsen. Bei der Kompilierung deaktiviert"
 
-#: ../gui/gnash.cpp:273
+#: ../gui/gnash.cpp:278
 #, c-format
 msgid "Setting root URL to %s"
 msgstr "Setze Root-URL auf %s"
 
-#: ../gui/gnash.cpp:277
+#: ../gui/gnash.cpp:282
 #, c-format
 msgid "Setting base URL to %s"
 msgstr "Setze Basis-URL auf %s"
 
-#: ../gui/gnash.cpp:284
+#: ../gui/gnash.cpp:289
 #, c-format
 msgid "Invalid host communication filedescriptor %d\n"
 msgstr ""
 
-#: ../gui/gnash.cpp:293
-msgid "Setting width to "
+#: ../gui/gnash.cpp:298
+#, fuzzy, c-format
+msgid "Setting width to %d"
 msgstr "Setze Breite auf "
 
-#: ../gui/gnash.cpp:302
+#: ../gui/gnash.cpp:307
 msgid "No debugger; disabled at compile time, -g is invalid"
 msgstr "Kein Debugger; bei der Kompilierung deaktiviert, -g ist ungültig"
 
-#: ../gui/gnash.cpp:309
-msgid "Setting height to "
+#: ../gui/gnash.cpp:314
+#, fuzzy, c-format
+msgid "Setting height to %d"
 msgstr "Setze Höhe auf"
 
-#: ../gui/gnash.cpp:343
+#: ../gui/gnash.cpp:348
 msgid "ERROR: -r must be followed by 0, 1, 2 or 3 "
 msgstr "ERROR: Auf -r muss 0, 1, 2, oder 3 folgen"
 
-#: ../gui/gnash.cpp:354
+#: ../gui/gnash.cpp:359
 msgid "FPS debugging disabled at compile time, -f is invalid"
 msgstr "FPS-Debugging bei der Kompilierung deaktiviert, -f ist ungültig"
 
-#: ../gui/gnash.cpp:383
+#: ../gui/gnash.cpp:394
 msgid "Error parsing command line options: "
 msgstr ""
 
-#: ../gui/gnash.cpp:384
+#: ../gui/gnash.cpp:395
 msgid "This is a Gnash bug."
 msgstr ""
 
-#: ../gui/gnash.cpp:389
+#: ../gui/gnash.cpp:400
 msgid "No rendering flags specified, using rcfile"
 msgstr ""
 
-#: ../gui/gnash.cpp:433
+#: ../gui/gnash.cpp:438
+msgid "Exception thrown during parseCommandLine"
+msgstr ""
+
+#: ../gui/gnash.cpp:444
 msgid "Error: no input file was specified. Exiting."
 msgstr ""
 
-#: ../gui/gtk.cpp:118
+#: ../gui/gtk.cpp:136
 msgid "Created XEmbedded window"
 msgstr ""
 
-#: ../gui/gtk.cpp:126
+#: ../gui/gtk.cpp:144
 msgid "Created top level window"
 msgstr ""
 
-#: ../gui/gtk.cpp:188
+#: ../gui/gtk.cpp:156
+msgid "Click to play"
+msgstr ""
+
+#: ../gui/gtk.cpp:216
 msgid "LIRC daemon not running"
 msgstr "Der LIRC-Dämon läuft nicht"
 
-#: ../gui/gtk.cpp:526
+#: ../gui/gtk.cpp:599
 msgid "Sound"
 msgstr "Audio"
 
-#: ../gui/gtk.cpp:542 ../gui/kde.cpp:445
+#: ../gui/gtk.cpp:615 ../gui/kde.cpp:442
 msgid "Quit Gnash"
 msgstr "Gnash beenden"
 
-#: ../gui/gtk.cpp:622 ../gui/gtk.cpp:623
+#: ../gui/gtk.cpp:695 ../gui/gtk.cpp:696
 #, c-format
 msgid "Couldn't find pixmap file: %s"
 msgstr "Konnte Bilddatei '%s' nicht finden"
 
-#: ../gui/gtk.cpp:629
+#: ../gui/gtk.cpp:702
 #, c-format
 msgid "Failed to load pixbuf file: %s: %s"
 msgstr ""
 
-#: ../gui/gtk.cpp:835
+#: ../gui/gtk.cpp:920
 #, c-format
 msgid ""
 "Attempting to open file %s.\n"
 "NOTE: the file open functionality is not yet implemented!"
 msgstr ""
 
-#: ../gui/gtk.cpp:959
+#: ../gui/gtk.cpp:1045
 msgid "Gnash preferences"
 msgstr "Einstellungen"
 
-#: ../gui/gtk.cpp:985
+#: ../gui/gtk.cpp:1071
 msgid "_Logging"
 msgstr "_Logging"
 
-#: ../gui/gtk.cpp:989
+#: ../gui/gtk.cpp:1075
 msgid "<b>Logging options</b>"
 msgstr "<b>Logging-Optionen</b>"
 
-#: ../gui/gtk.cpp:993
+#: ../gui/gtk.cpp:1079
 msgid "Verbosity level:"
 msgstr "Ausführlichkeit:"
 
-#: ../gui/gtk.cpp:1002
+#: ../gui/gtk.cpp:1088
 msgid "Log to _file"
 msgstr "Log in _Datei schreiben"
 
-#: ../gui/gtk.cpp:1006
+#: ../gui/gtk.cpp:1092
 msgid "Logfile name:"
 msgstr "Logdatei:"
 
-#: ../gui/gtk.cpp:1015
+#: ../gui/gtk.cpp:1101
 msgid "Log _parser output"
 msgstr "Ausgabe des _Parsers loggen"
 
-#: ../gui/gtk.cpp:1022
+#: ../gui/gtk.cpp:1108
 msgid "Log SWF _actions"
 msgstr "SWF-A_ktionen loggen"
 
-#: ../gui/gtk.cpp:1029
+#: ../gui/gtk.cpp:1115
 msgid "Log malformed SWF _errors"
 msgstr "SWF-_Fehler loggen"
 
-#: ../gui/gtk.cpp:1035
+#: ../gui/gtk.cpp:1121
 msgid "Log ActionScript _coding errors"
 msgstr "_ActionScript-Fehler loggen"
 
-#: ../gui/gtk.cpp:1042
+#: ../gui/gtk.cpp:1128
 msgid "Log _Local Connection activity"
 msgstr "Local-_Connection loggen"
 
-#: ../gui/gtk.cpp:1049
+#: ../gui/gtk.cpp:1135
 msgid "Enable _debugger"
 msgstr "_Debugger einschalten"
 
-#: ../gui/gtk.cpp:1062
+#: ../gui/gtk.cpp:1148
 msgid "_Security"
 msgstr "_Sicherheit"
 
-#: ../gui/gtk.cpp:1067
+#: ../gui/gtk.cpp:1153
 msgid "<b>Network connections</b>"
 msgstr "<b>Netzwerkverbindungen</b>"
 
-#: ../gui/gtk.cpp:1071
+#: ../gui/gtk.cpp:1157
 msgid "Connect only to local _host"
 msgstr "Nur mit Localhost verbinden"
 
-#: ../gui/gtk.cpp:1075
+#: ../gui/gtk.cpp:1161
 msgid "Connect only to local _domain"
 msgstr "Nur mit lokaler Domain verbinden"
 
-#: ../gui/gtk.cpp:1079
+#: ../gui/gtk.cpp:1165
 msgid "Disable SSL _verification"
 msgstr "SSL-Verbindungen nicht validieren"
 
-#: ../gui/gtk.cpp:1083
+#: ../gui/gtk.cpp:1169
 msgid "_Whitelist"
 msgstr ""
 
-#: ../gui/gtk.cpp:1089
+#: ../gui/gtk.cpp:1175
 msgid "_Blacklist"
 msgstr ""
 
-#: ../gui/gtk.cpp:1096
+#: ../gui/gtk.cpp:1182
 msgid "<b>Privacy</b>"
 msgstr "<b>Privatsphäre</b>"
 
-#: ../gui/gtk.cpp:1100
+#: ../gui/gtk.cpp:1186
 msgid "Shared objects directory:"
 msgstr "SharedObject-Ordner"
 
-#: ../gui/gtk.cpp:1109
+#: ../gui/gtk.cpp:1195
 msgid "Do _not write Shared Object files"
 msgstr "SharedObject-Dateien nicht schreiben"
 
-#: ../gui/gtk.cpp:1115
+#: ../gui/gtk.cpp:1201
 msgid "Only _access local Shared Object files"
 msgstr "Nur lokale SharedObject-Dateien öffnen"
 
-#: ../gui/gtk.cpp:1121
+#: ../gui/gtk.cpp:1207
 msgid "Disable Local _Connection object"
 msgstr "Local-_Connection-Object deaktivieren"
 
-#: ../gui/gtk.cpp:1132
+#: ../gui/gtk.cpp:1218
 msgid "_Media"
 msgstr "_Media"
 
-#: ../gui/gtk.cpp:1137
+#: ../gui/gtk.cpp:1223
 msgid "<b>Sound</b>"
 msgstr "<b>Audio</b>"
 
-#: ../gui/gtk.cpp:1141
+#: ../gui/gtk.cpp:1227
 msgid "Use sound _handler"
 msgstr "Soundhandler verwenden"
 
-#: ../gui/gtk.cpp:1150
+#: ../gui/gtk.cpp:1236
 msgid "_Player"
 msgstr "_Player"
 
-#: ../gui/gtk.cpp:1155
+#: ../gui/gtk.cpp:1241
 msgid "<b>Player description</b>"
 msgstr "<b>Player-Beschreibung</b>"
 
-#: ../gui/gtk.cpp:1163
+#: ../gui/gtk.cpp:1249
 msgid "Player version:"
 msgstr "Player-Version:"
 
-#: ../gui/gtk.cpp:1176
+#: ../gui/gtk.cpp:1262
 msgid "Operating system:"
 msgstr "Betriebssystem:"
 
-#: ../gui/gtk.cpp:1185
+#: ../gui/gtk.cpp:1271
 msgid "<i>If blank, Gnash will detect your OS</i>"
 msgstr "<i>Wenn leer, ermittelt Gnash das Betriebssystem</i>"
 
-#: ../gui/gtk.cpp:1195
+#: ../gui/gtk.cpp:1281
 msgid "URL opener:"
 msgstr "Befehl zum Öffnen von URLs:"
 
-#: ../gui/gtk.cpp:1205
+#: ../gui/gtk.cpp:1291
 msgid "<b>Performance</b>"
 msgstr "<b>Leistung</b>"
 
-#: ../gui/gtk.cpp:1213
+#: ../gui/gtk.cpp:1299
 msgid "Max size of movie library:"
 msgstr "Größe der Filmbibliothek:"
 
-#: ../gui/gtk.cpp:1223
+#: ../gui/gtk.cpp:1309
 msgid "Start _Gnash in pause mode"
 msgstr "_Gnash in Pausemodus starten"
 
-#: ../gui/gtk.cpp:1236
+#: ../gui/gtk.cpp:1322
 msgid "Movie properties"
 msgstr "Film-Eigenschaften"
 
-#: ../gui/gtk.cpp:1309
+#: ../gui/gtk.cpp:1397
 msgid "Variable"
 msgstr "Variable"
 
-#: ../gui/gtk.cpp:1321
+#: ../gui/gtk.cpp:1409
 msgid "Value"
 msgstr "Wert"
 
-#: ../gui/gtk.cpp:1365
+#: ../gui/gtk.cpp:1455
 msgid "Gnash is the GNU Flash movie player based on GameSWF."
 msgstr "Gnash ist der Flash-Player von GNU, der auf GameSWF basiert."
 
-#: ../gui/gtk.cpp:1367
+#: ../gui/gtk.cpp:1457
 msgid ""
 "\n"
 "Renderer: "
 msgstr ""
 
-#: ../gui/gtk.cpp:1369
+#: ../gui/gtk.cpp:1459
 msgid ""
 "\n"
 "GUI: "
 msgstr ""
 
-#: ../gui/gtk.cpp:1371
+#: ../gui/gtk.cpp:1461
 msgid ""
 "\n"
 "Media: "
@@ -5373,84 +5853,88 @@ msgstr ""
 "\n"
 "Media: "
 
-#: ../gui/gtk.cpp:1374
+#: ../gui/gtk.cpp:1464
 msgid ""
 "\n"
 "Built against gstreamer version: "
 msgstr ""
 
-#: ../gui/gtk.cpp:1380
+#: ../gui/gtk.cpp:1470
 msgid ""
 "\n"
 "Built against ffmpeg version: "
 msgstr ""
 
-#: ../gui/gtk.cpp:1389
+#: ../gui/gtk.cpp:1479
 msgid "GNASH flash movie player"
 msgstr "Gnash Flash-Player"
 
-#: ../gui/gtk.cpp:1421 ../gui/gtk.cpp:1434
+#: ../gui/gtk.cpp:1511 ../gui/gtk.cpp:1524
 msgid "Open file"
 msgstr "Datei öffnen"
 
-#: ../gui/gtk.cpp:1775
+#: ../gui/gtk.cpp:1878
 msgid "_File"
 msgstr "_Datei"
 
-#: ../gui/gtk.cpp:1839
+#: ../gui/gtk.cpp:1942
 msgid "_Edit"
 msgstr "_Bearbeiten"
 
-#: ../gui/gtk.cpp:1861
+#: ../gui/gtk.cpp:1964
 msgid "_Help"
 msgstr "_Hilfe"
 
-#: ../gui/gtk.cpp:1882
+#: ../gui/gtk.cpp:1986
 msgid "_View"
 msgstr "_Ansicht"
 
-#: ../gui/gtk.cpp:1892
+#: ../gui/gtk.cpp:1996
 msgid "Redraw"
 msgstr "Aktualisieren"
 
-#: ../gui/gtk.cpp:1904 ../gui/gtk.cpp:1910
+#: ../gui/gtk.cpp:2008 ../gui/gtk.cpp:2014
 msgid "Toggle fullscreen"
 msgstr "Vollbild"
 
+#: ../gui/gtk.cpp:2024
+msgid "Show updated ranges"
+msgstr ""
+
 # (Taken from Totem translation)
-#: ../gui/gtk.cpp:1926
+#: ../gui/gtk.cpp:2045
 msgid "Movie _Control"
 msgstr "_Gehe zu"
 
-#: ../gui/gtk.cpp:1939
+#: ../gui/gtk.cpp:2058
 msgid "Play"
 msgstr "Wiedergabe"
 
-#: ../gui/gtk.cpp:1952
+#: ../gui/gtk.cpp:2071
 msgid "Pause"
 msgstr "Pause"
 
-#: ../gui/gtk.cpp:1965
+#: ../gui/gtk.cpp:2084
 msgid "Stop"
 msgstr "Stopp"
 
-#: ../gui/gtk.cpp:1980 ../gui/kde.cpp:437
+#: ../gui/gtk.cpp:2099 ../gui/kde.cpp:434
 msgid "Restart Movie"
 msgstr "Neu starten"
 
-#: ../gui/gtk.cpp:1996
+#: ../gui/gtk.cpp:2115
 msgid "Step Forward Frame"
 msgstr "1 Frame nach vorne gehen"
 
-#: ../gui/gtk.cpp:2008
+#: ../gui/gtk.cpp:2127
 msgid "Step Backward Frame"
 msgstr "1 Frame zurück gehen"
 
-#: ../gui/gtk.cpp:2021
+#: ../gui/gtk.cpp:2140
 msgid "Jump Forward 10 Frames"
 msgstr "10 Frames nach vorne springen"
 
-#: ../gui/gtk.cpp:2031
+#: ../gui/gtk.cpp:2150
 msgid "Jump Backward 10 Frames"
 msgstr "10 Frames zurück springen"
 
@@ -5477,57 +5961,57 @@ msgstr ""
 msgid "Got double-buffered visual."
 msgstr ""
 
-#: ../gui/gui.cpp:169 ../gui/gui.cpp:175
+#: ../gui/gui.cpp:166 ../gui/gui.cpp:172
 msgid "Fullscreen not yet supported in this GUI"
 msgstr ""
 
-#: ../gui/gui.cpp:184
+#: ../gui/gui.cpp:181
 msgid "Mouse show/hide not yet supported in this GUI"
 msgstr ""
 
-#: ../gui/gui.cpp:195
+#: ../gui/gui.cpp:194
 msgid "menushow not yet supported in this GUI"
 msgstr ""
 
-#: ../gui/gui.cpp:375
+#: ../gui/gui.cpp:518
 #, c-format
 msgid "mouse @ %d,%d"
 msgstr ""
 
-#: ../gui/gui.cpp:763
+#: ../gui/gui.cpp:934
 #, c-format
 msgid "Frame %d"
 msgstr "Bild %d"
 
-#: ../gui/kde.cpp:434
+#: ../gui/kde.cpp:431
 msgid "Play Movie"
 msgstr "Wiedergabe"
 
-#: ../gui/kde.cpp:435
+#: ../gui/kde.cpp:432
 msgid "Pause Movie"
 msgstr "Pause"
 
-#: ../gui/kde.cpp:436
+#: ../gui/kde.cpp:433
 msgid "Stop Movie"
 msgstr "Stopp"
 
-#: ../gui/kde.cpp:439
+#: ../gui/kde.cpp:436
 msgid "Step Forward"
 msgstr "Vorspulen"
 
-#: ../gui/kde.cpp:440
+#: ../gui/kde.cpp:437
 msgid "Step Backward"
 msgstr "Zurückspulen"
 
-#: ../gui/kde.cpp:441
+#: ../gui/kde.cpp:438
 msgid "Jump Forward"
 msgstr "Vorwärts springen"
 
-#: ../gui/kde.cpp:442
+#: ../gui/kde.cpp:439
 msgid "Jump Backward"
 msgstr "Zurück springen"
 
-#: ../gui/kde.cpp:444
+#: ../gui/kde.cpp:441
 msgid "Refresh"
 msgstr ""
 
@@ -5536,47 +6020,54 @@ msgstr ""
 msgid "Timer delay set to %d milliseconds"
 msgstr "Timer-Verzögerung auf %d Millisekunden gesetzt"
 
-#: ../gui/Player.cpp:169
+#: ../gui/Player.cpp:182
 msgid "Sound requested but no sound support compiled in"
 msgstr ""
 "Audio erfordert, jedoch wurde keine Audiounterstützung bei der Kompilierung "
 "aktiviert"
 
-#: ../gui/Player.cpp:202
+#: ../gui/Player.cpp:215
 #, c-format
 msgid "Activating FPS debugging every %g seconds"
 msgstr ""
 
-#: ../gui/Player.cpp:357
-msgid "Input movie has collapsed dimensions "
-msgstr ""
-
-#: ../gui/Player.cpp:415
+#: ../gui/Player.cpp:366
 #, c-format
-msgid "Running as plugin: ignoring fscommand %s."
+msgid ""
+"Input movie has collapsed dimensions %d/%d. Setting to 1/1 and going on."
 msgstr ""
 
 #: ../gui/Player.cpp:452
 #, c-format
-msgid "FScommand exec called with argument %s"
-msgstr "FScommand exec mit Argument %s aufgerufen"
-
-#: ../gui/Player.cpp:459
-#, c-format
-msgid "FScommand allowscale called with argument %s"
-msgstr "FScommand allowscale mit Argument %s aufgerufen"
-
-#: ../gui/Player.cpp:466
-#, c-format
-msgid "FScommand trapallkeys called with argument %s"
-msgstr "FScommand trapallkeys mit Argument %s aufgerufen"
-
-#: ../gui/Player.cpp:470
-#, c-format
-msgid "Unhandled FSCommand %s (%s)"
+msgid "Sent FsCommand '%s' to host fd %d"
 msgstr ""
 
-#: ../gui/Player.cpp:496
+#: ../gui/Player.cpp:461
+#, c-format
+msgid "Running as plugin: skipping internal handling of FsCommand %s%s."
+msgstr ""
+
+#: ../gui/Player.cpp:506
+#, fuzzy, c-format
+msgid "FsCommand exec called with argument %s"
+msgstr "FScommand exec mit Argument %s aufgerufen"
+
+#: ../gui/Player.cpp:513
+#, fuzzy, c-format
+msgid "FsCommand allowscale called with argument %s"
+msgstr "FScommand allowscale mit Argument %s aufgerufen"
+
+#: ../gui/Player.cpp:520
+#, fuzzy, c-format
+msgid "FsCommand trapallkeys called with argument %s"
+msgstr "FScommand trapallkeys mit Argument %s aufgerufen"
+
+#: ../gui/Player.cpp:526
+#, c-format
+msgid "FsCommand '%s(%s)' not handled internally"
+msgstr ""
+
+#: ../gui/Player.cpp:597
 #, c-format
 msgid "Unhandled callback %s with arguments %s"
 msgstr ""
@@ -5623,6 +6114,140 @@ msgstr ""
 #, c-format
 msgid "Field name is: %s: "
 msgstr "Feldname ist: %s: "
+
+#~ msgid "TRACE"
+#~ msgstr "TRACE"
+
+#~ msgid "ERROR"
+#~ msgstr "FEHLER"
+
+#~ msgid "UNIMPLEMENTED"
+#~ msgstr "NICHT IMPLEMENTIERT"
+
+#~ msgid "SECURITY"
+#~ msgstr "SICHERHEIT"
+
+#~ msgid "MALFORMED SWF"
+#~ msgstr "FEHLERHAFTES SWF"
+
+#~ msgid "ACTIONSCRIPT ERROR"
+#~ msgstr "ACTIONSCRIPT-FEHLER"
+
+#~ msgid "Could not find a usable WinSock DLL"
+#~ msgstr "Konnte keine verwendbare WinSock-DLL finden"
+
+#~ msgid "Can't connect to privileged port #%d"
+#~ msgstr "Kann mit privilegiertem Port %d nicht verbinden"
+
+#~ msgid "unable to get protocol entry for %s"
+#~ msgstr "Erfassen des Protokolleintrags für %s nicht möglich!"
+
+#~ msgid "setsockopt SO_REUSEADDR failed"
+#~ msgstr "setsockopt SO_REUSEADDR fehlgeschlagen"
+
+#~ msgid "unable to bind to port %hd: %s"
+#~ msgstr "Binden an Port %hd unmöglich: %s"
+
+#~ msgid "unable to accept: %s"
+#~ msgstr "nicht annehmbar: %s"
+
+#~ msgid "Accepting tcp/ip connection on fd %d"
+#~ msgstr "Nehme TCP/IP-Verbindung an fd %d an"
+
+#~ msgid "The connect() socket for fd %d was interupted by a system call"
+#~ msgstr ""
+#~ "Der connect()-Sockel für fd %d wurde durch einen Systemaufruf unterbrochen"
+
+#~ msgid "Can't connect to privileged port %hd"
+#~ msgstr "Verbindung mit privilegiertem Port %hd unmöglich"
+
+#~ msgid "The hostname for this machine is %s"
+#~ msgstr "Der Hostname für diesen Rechner ist %s"
+
+#~ msgid "Couldn't get the hostname for this machine"
+#~ msgstr "Konnte Hostnamen für diesen Rechner nicht ermitteln"
+
+#~ msgid "The IP address for this client socket is %s"
+#~ msgstr "Die IP-Adresse für diesen Client-Sockel ist %s"
+
+#~ msgid "Unable to close the socket for fd %d: %s"
+#~ msgstr "Kann Sockel für fd %d nicht schließen: %s"
+
+#~ msgid "Closed the socket on fd %d"
+#~ msgstr "Sockel auf fd %d geschlossen"
+
+#~ msgid "The socket for fd %d was interupted by a system call"
+#~ msgstr ""
+#~ "Der connect()-Sockel für fd %d wurde durch einen Systemaufruf unterbrochen"
+
+#~ msgid "read %d bytes from fd %d"
+#~ msgstr "%d bytes from fd %d gelesen"
+
+#~ msgid "Type is %s"
+#~ msgstr "Typ ist %s"
+
+#~ msgid "Boolean is %d"
+#~ msgstr "Boolean ist %d"
+
+#~ msgid "Undefined element"
+#~ msgstr "Undefiniertes Element"
+
+#~ msgid "The packet head is: 0x%s"
+#~ msgstr "Der Paket-Header ist: 0x%s"
+
+#~ msgid "AMF Header size bits (0x%X) out of range"
+#~ msgstr "AMF Header-Längen-Bits (0x%X) außerhalb des erlaubten Bereichs"
+
+#~ msgid "AMF header byte is: 0x%X"
+#~ msgstr "AMF Header Byte ist: 0x%X"
+
+#~ msgid "The header size is %d"
+#~ msgstr "Die Header-Länge ist %d"
+
+#~ msgid "ERROR: Unidentified AMF header data type %d"
+#~ msgstr "FEHLER: Unbekannter AMF-Header-Datentyp %d"
+
+#~ msgid "Read initial Handshake Request"
+#~ msgstr "Initialer Handshake-Request gelesen"
+
+#~ msgid "Couldn't read initial Handshake Request"
+#~ msgstr "Konnte initialen Handshake-Request nicht lesen"
+
+#~ msgid "Handshake is correct"
+#~ msgstr "Handshake ist korrekt"
+
+#~ msgid "Handshake isn't correct; Data read is: 0x%x"
+#~ msgstr "Handshake ist nicht korrekt; Die gelesenen Daten sind: 0x%x"
+
+#~ msgid "Read Handshake Data"
+#~ msgstr "Handshake-Daten gelesen"
+
+#~ msgid "Couldn't read first RTMP header byte"
+#~ msgstr "Konnte das erste Byte im RTMP-Header nicht lesen"
+
+#~ msgid "The Header size is: %d"
+#~ msgstr "Die Header-Größe ist: %d"
+
+#~ msgid "The AMF index is: 0x%x"
+#~ msgstr "Der AMF-Index ist: 0x%x"
+
+#~ msgid "Done reading packet"
+#~ msgstr "Lesen des Pakets abgeschlossen"
+
+#~ msgid "Executing "
+#~ msgstr "Führe aus"
+
+#~ msgid "GotoFrame("
+#~ msgstr "GotoFrame("
+
+#~ msgid "Failed to set a date."
+#~ msgstr "Konnte kein Datum setzen."
+
+#~ msgid "Can't load XML file"
+#~ msgstr "Kann XML-Datei nicht laden"
+
+#~ msgid "Gnash "
+#~ msgstr "Gnash "
 
 #~ msgid ""
 #~ "usage: gnash [options] movie_file.swf\n"
@@ -5713,12 +6338,6 @@ msgstr "Feldname ist: %s: "
 #~ "Die Liste '%s' in einer rc-Datei enthält einen Doppelpunkt. Dies wird "
 #~ "nicht mehr unterstützt und könnte zu unerwartetem Verhalten führen. Bitte "
 #~ "benutzen Sie ausschließlich Leerzeichen als Trennzeichen."
-
-#~ msgid "Couldn't open file: %s"
-#~ msgstr "Konnte Datei %s nicht öffnen"
-
-#~ msgid "Couldn't open file %s for writing"
-#~ msgstr "Konnte Datei %s für Dekodierung nicht öffnen"
 
 #~ msgid "Recoverable error while decoding MP3-stream, MAD error: %s"
 #~ msgstr "Behebbarer Fehler beim Dekodieren des MP3-Streams, MAD-Fehler: %s"
