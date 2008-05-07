@@ -1,5 +1,11 @@
 2008-05-07 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/tag_loaders.cpp (sound_stream_head_loader): log no
+	  samples as an swf error and only once [annoying otherwise],
+	  other log-related small changes.
+
+2008-05-07 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/Makefile.am: fix DrawingApiTest.swf build
 	  out of source tree (we should use the source btw, or older Ming
 	  won't build it).

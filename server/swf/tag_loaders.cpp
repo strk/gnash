@@ -1425,7 +1425,9 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
     {
 	// this seems common too, we'd need to reproduce with a custom
 	// testcase to really tell if it's a problem or not...
-        log_error("No samples advertised for sound stream");
+	IF_VERBOSE_MALFORMED_SWF(
+        LOG_ONCE( log_swferror(_("No samples advertised for sound stream, pretty common so will warn only once")) );
+	);
     }
 
     int latency = 0;
@@ -1441,7 +1443,9 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
 	{
 		// See https://savannah.gnu.org/bugs/?21729 for an example 
 		// triggering this.
+		IF_VERBOSE_MALFORMED_SWF(
 		log_swferror("MP3 sound stream lacks a 'latency' field");
+		);
         }
         //garbage = in->read_uint(16);
     }
