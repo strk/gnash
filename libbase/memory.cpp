@@ -225,7 +225,7 @@ Memory::analyze()
             struct small_mallinfo *ptr = _info + i;
 
 //	    // Get the time stamp
-            int diff_stamp_sec = (ptr->stamp.tv_sec) - (ptr - 1)->stamp.tv_sec;
+//            int diff_stamp_sec = (ptr->stamp.tv_sec) - (ptr - 1)->stamp.tv_sec;
             int diff_stamp_nsec = (ptr->stamp.tv_nsec) - (ptr - 1)->stamp.tv_nsec;
 //             if ((diff_stamp_sec > 0) || (diff_stamp_nsec > 0)) {
 // 		if (ptr->line && (ptr - 1)->line) {

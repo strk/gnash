@@ -84,7 +84,7 @@ Shm::attach()
 }
 
 bool
-Shm::attach(key_t key, bool nuke)
+Shm::attach(key_t key, bool /* nuke */)
 {
 //    GNASH_REPORT_FUNCTION;
     

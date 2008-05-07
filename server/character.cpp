@@ -186,6 +186,9 @@ character::set_invalidated(const char* debug_file, int debug_line)
 		#ifdef DEBUG_SET_INVALIDATED
 		printf("%p set_invalidated() of %s in %s:%d\n",
 			this, get_name(), debug_file, debug_line);
+		#else
+		UNUSED(debug_file);
+		UNUSED(debug_line);
 		#endif
 		
 		// NOTE: the SnappingRanges instance used here is not initialized by the

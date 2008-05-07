@@ -587,15 +587,21 @@ AMF::encodeElement(Element *el)
           break;
       case Element::TYPED_OBJECT_AMF0:
 //	  tmp = encodeTypedObject(el->getData(), el->getLength());
+	  tmp = 0;
           break;
 // 	  // This is a Gnash specific value
 //       case Element::VARIABLE:
 //       case Element::FUNCTION:
 //          break;
+      default:
+	  tmp = 0;
+          break;
     };
 
-    buf->append(tmp);
-    delete tmp;
+    if (tmp) {
+        buf->append(tmp);
+        delete tmp;
+    }
     return buf;
 }
 
@@ -784,7 +790,6 @@ AMF::extractProperty(Network::byte_t *in, Network::byte_t* tooFar)
 //    GNASH_REPORT_FUNCTION;
     Network::byte_t *tmpptr = in;
     boost::uint16_t length = 0;
-    Network::byte_t len = 0;
 
 #ifndef GNASH_TRUST_AMF
     ENSUREBYTES(tmpptr, tooFar, sizeof(boost::uint16_t));

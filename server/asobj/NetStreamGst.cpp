@@ -645,6 +645,8 @@ NetStreamGst::missingPluginMsg(GstMessage* message)
     plugin_name);
 
   g_free(plugin_name);
+#else
+UNUSED(message);
 #endif
 }
 
@@ -780,8 +782,8 @@ NetStreamGst::decodebin_newpad_cb(GstElement* /*decodebin*/, GstPad* pad,
 }
 
 void
-NetStreamGst::decodebin_unknown_cb(GstElement* /*decodebin*/, GstPad* pad,
-                                  GstCaps *caps, gpointer user_data)
+NetStreamGst::decodebin_unknown_cb(GstElement* /*decodebin*/, GstPad* /*pad*/,
+                                  GstCaps *caps, gpointer /*user_data*/)
 {
   GstStructure* str = gst_caps_get_structure (caps, 0);
   const gchar* structure_name = gst_structure_get_name (str);

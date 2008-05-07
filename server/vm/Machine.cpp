@@ -2312,6 +2312,9 @@ Machine::getMember(asClass* pDefinition, asName& name,
 	// And push the instance ('this')
 	mStack.push(instance);
 	pushCall(1, &mStack.top(0), pBinding); //TODO: pBinding->getGetter());
+#else
+UNUSED(pDefinition);
+UNUSED(name);
 #endif
 }
 
@@ -2340,6 +2343,10 @@ Machine::setMember(asClass *pDefinition, asName& name, as_value& instance,
 	mStack.push(instance);
 	mStack.push(newvalue);
 	pushCall(2, &mStack.top(1), pBinding); //TODO: pBinding->getSetter());
+#else
+UNUSED(pDefinition);
+UNUSED(name);
+UNUSED(newvalue);
 #endif
 }
 

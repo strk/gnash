@@ -205,7 +205,7 @@ Extension::scanDir(const char *dirlist)
     struct dirent *entry;
     //string::size_type pos;
     char *dirlistcopy;
-    char *dir, libsdir;
+    char *dir;
     char *suffix = 0;
 
 //    scoped_lock lock(lib_mutex);

@@ -1,3 +1,16 @@
+2008-05-07 Russ Nelson <nelson@crynwr.com>
+
+	* libamf/amf.cpp: eliminate "tmp used before initialization"
+	* libamf/amf.cpp: eliminate "variable not used" warning.
+	* libbase/extension.cpp: remove unused variable.
+	* libbase/memory.cpp: comment out unused variable.
+	* libbase/shm.cpp: nuke nuke.
+	* server/character.cpp: mark unused variables as such.
+	* server/asobj/ClassHierarchy.cpp: remove unused function.
+	* server/asobj/NetStreamGst.cpp: mark unused variables as such.
+	* server/vm/ActionExec.cpp: #if 0 out an unused variable.
+	* server/vm/Machine.cpp: mark unused variables as such.
+	
 2008-05-07 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* testsuite/swfdec/PASSING: update for new tests.

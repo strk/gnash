@@ -212,12 +212,6 @@ public:
 
 } // end anonymous namespace
 
-static
-as_value do_nothing(const fn_call&)
-{
-	return as_value();
-}
-
 bool
 ClassHierarchy::declareClass(extensionClass& c)
 {

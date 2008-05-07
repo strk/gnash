@@ -187,7 +187,9 @@ ActionExec::operator() ()
 	// TODO: specify in the .gnashrc !!
 	static const size_t maxBranchCount = 65536; // what's enough ?
 
+#if 0
 	boost::uint32_t timeLimit = getScriptTimeout();
+#endif
 	WallClockTimer timer;
 
 	size_t branchCount = 0;
