@@ -579,6 +579,7 @@ Element::makeNumber(const std::string &name, gnash::Network::byte_t *data)
     _type = Element::NUMBER_AMF0;
     check_buffer(AMF0_NUMBER_SIZE);
     _buffer->copy(data);
+    return *this;
 }
 
 Element &
