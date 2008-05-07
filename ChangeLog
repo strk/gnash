@@ -1,3 +1,7 @@
+2008-05-07 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* testsuite/swfdec/PASSING: update for new tests.
+
 2008-05-07 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* gui/fb.cpp: don't read from closed file descriptors
