@@ -1136,6 +1136,8 @@ void FBGui::apply_ts_calibration(float* cx, float* cy, int rawx, int rawy) {
 void FBGui::check_mouse()
 {
 
+  if (input_fd < 0) return;
+
   struct input_event ev;  // time,type,code,value
   
   static int new_mouse_x = 0; // all uncalibrated!
@@ -1382,6 +1384,8 @@ gnash::key::code FBGui::scancode_to_gnash_key(int code, bool shift) {
 
 void FBGui::check_keyboard()
 {
+
+  if (keyb_fd < 0) return;
 
   struct input_event ev;  // time,type,code,value
 
