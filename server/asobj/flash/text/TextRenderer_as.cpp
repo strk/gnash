@@ -42,7 +42,7 @@ static as_value TextRenderer_maxLevel_getset(const fn_call& fn);
 as_value TextRenderer_ctor(const fn_call& fn);
 
 static void
-attachTextRendererInterface(as_object& o)
+attachTextRendererInterface(as_object& /*o*/)
 {
 }
 

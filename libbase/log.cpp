@@ -87,7 +87,7 @@ timestamp() {
 	strftime (buf, sizeof(buf), "%H:%M:%S", localtime (&t));
 
 	std::stringstream ss;
-	ss << get_thread_id() << "] " << buf;
+	ss << getpid() << ":" << get_thread_id() << "] " << buf;
 	return ss.str();
 
 }

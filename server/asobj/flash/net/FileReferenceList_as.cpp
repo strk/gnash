@@ -53,7 +53,7 @@ attachFileReferenceListInterface(as_object& o)
 }
 
 static void
-attachFileReferenceListStaticProperties(as_object& o)
+attachFileReferenceListStaticProperties(as_object& /*o*/)
 {
    
 }

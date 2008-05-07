@@ -65,9 +65,8 @@ attachDisplacementMapFilterInterface(as_object& o)
 }
 
 static void
-attachDisplacementMapFilterStaticProperties(as_object& o)
+attachDisplacementMapFilterStaticProperties(as_object& /*o*/)
 {
-   
 }
 
 static as_object*

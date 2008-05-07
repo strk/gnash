@@ -55,7 +55,7 @@ attachTransformInterface(as_object& o)
 }
 
 static void
-attachTransformStaticProperties(as_object& o)
+attachTransformStaticProperties(as_object& /*o*/)
 {
    
 }

@@ -42,7 +42,7 @@ static as_value ExternalInterface_call(const fn_call& fn);
 as_value ExternalInterface_ctor(const fn_call& fn);
 
 static void
-attachExternalInterfaceInterface(as_object& o)
+attachExternalInterfaceInterface(as_object& /*o*/)
 {
 }
 

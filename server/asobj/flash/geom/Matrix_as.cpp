@@ -81,7 +81,7 @@ attachMatrixInterface(as_object& o)
 }
 
 static void
-attachMatrixStaticProperties(as_object& o)
+attachMatrixStaticProperties(as_object& /*o*/)
 {
    
 }

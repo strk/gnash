@@ -67,7 +67,7 @@ attachColorTransformInterface(as_object& o)
 }
 
 static void
-attachColorTransformStaticProperties(as_object& o)
+attachColorTransformStaticProperties(as_object& /*o*/)
 {
    
 }

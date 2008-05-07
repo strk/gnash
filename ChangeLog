@@ -1,3 +1,13 @@
+2008-05-07 Sandro Santilli <strk@keybit.net>
+
+	* libbase/log.cpp: add pid in timestamp
+	* server/asobj/flash/: external/ExternalInterface_as.cpp,
+	  filters/DisplacementMapFilter_as.cpp,
+	  geom/ColorTransform_as.cpp, geom/Matrix_as.cpp,
+	  geom/Transform_as.cpp, net/FileReferenceList_as.cpp,
+	  net/FileReference_as.cpp, text/TextRenderer_as.cpp:
+	  Fix unused parameter warning.
+
 2008-05-07 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/parser/sprite_definition.cpp: drop loaded frame assertion.
