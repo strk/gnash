@@ -83,7 +83,11 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(root->get_frame_count(), 2);
 	check_equals(root->get_current_frame(), 0);
 	
-	// advance to the second frame, first frame is Dejagnu.swf 
+	// advance to the second frame, first frame is an empty frame.
+	//
+	// Don't use the Dejagnuclip for this test, the EditText box in it
+	// would violates many checks(invalidatedBound...) here.
+	//
 	tester.advance();
 
 	rgba white(255, 255, 255, 255);
