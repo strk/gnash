@@ -1,3 +1,7 @@
+2008-05-08 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* docs: update logging info in refmanual.
+
 2008-05-08 Sandro Santilli <strk@keybit.net>
 
 	* doc/DESIGN: draf a design diagram
@@ -12,11 +16,7 @@
 	  testsuite/misc-ming.all/empty.as: add a empty as file for making an empty frame.
 	  testsuite/misc-ming.all/Makefile.am: use empty.as instead of empty_swf.swf
 	  testsuite/misc-ming.all/RollOverOutTest.c: pass.	
-	  should fix bug #22889. 
-	
-2008-05-08 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* docs: update logging info in refmanual.
+	  should fix bug #22889.
 
 2008-05-08 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
