@@ -1,6 +1,6 @@
 Draft design diagram for Gnash
 ------------------------------
-$Id: DESIGN,v 1.3 2008/05/08 10:56:27 strk Exp $
+$Id: DESIGN,v 1.4 2008/05/08 10:57:43 strk Exp $
 
 
     (speakers,file)
@@ -22,7 +22,7 @@ $Id: DESIGN,v 1.3 2008/05/08 10:56:27 strk Exp $
      [gnash_core] -- Gnash core lib (swf parser, VM, builtin objects)
   [sound_handler] -- Sound handler, can be modular (gst/ffmpeg/mad/whatever)
  [render_handler] -- Renderer, can be modular (agg/ogl/cairo/whatever)
-  [media_handler] -- Media decoders, can be modular (gst/ffmpeg/whatever)
+  [media_handler] -- Media parser and decoder, can be modular (gst/ffmpeg/whatever)
 
  {A} --- [gnash_core] to [sound_handler] connector 
          Is setup with gnash::set_sound_handler()
