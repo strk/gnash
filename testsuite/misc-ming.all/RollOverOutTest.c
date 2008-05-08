@@ -242,7 +242,7 @@ main(int argc, char **argv)
     // hitTest works for visible sprites.
     check(mo, "visible_mc.hitTest(80, 120, true)");
     // hitTest works for invisible sprites.
-    xcheck(mo, "invisible_mc.hitTest(80, 180, true)");
+    check(mo, "invisible_mc.hitTest(80, 180, true)");
     // hitTest works for static placed maskes.
     check(mo, "static_mask.hitTest(80, 240, true)");
     // hitTest does not work for dynamic masks created by drawing API.

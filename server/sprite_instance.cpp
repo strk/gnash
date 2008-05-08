@@ -821,7 +821,7 @@ static as_value sprite_hit_test(const fn_call& fn)
       bool shapeFlag = fn.arg(2).to_bool();
 
       if ( ! shapeFlag ) return sprite->pointInBounds(x, y);
-      else return sprite->pointInVisibleShape(x, y);
+      else return sprite->pointInHitableShape(x, y);
     }
 
     default:
@@ -3731,41 +3731,105 @@ public:
     
 };
 
+/// Find the first hitable character whose shape contain the point 
+// 
+/// Point coordinates in world TWIPS 
+/// 
+class HitableShapeContainerFinder { 
+    bool _found; 
+    float _x; 
+    float _y; 
+    
+public: 
+    HitableShapeContainerFinder(float x, float y) 
+        : 
+    _found(false), 
+    _x(x), 
+    _y(y) 
+    {} 
+
+    bool operator() (character* ch) 
+    { 
+        if( ch->isDynamicMask() ) 
+        { 
+            return true; 
+        } 
+        else if ( ch->pointInShape(_x, _y) ) 
+        {
+            _found = true; 
+            return false; 
+        } 
+        else 
+        { 
+            return true; 
+        }
+    } 
+
+    bool hitFound() { return _found; } 
+}; 
+
 bool
 sprite_instance::pointInShape(float x, float y) const
 {
-  ShapeContainerFinder finder(x, y);
-  const_cast<DisplayList&>(m_display_list).visitBackward(finder);
-  if ( finder.hitFound() ) return true;
-  return _drawable_inst->pointInShape(x, y); 
+    ShapeContainerFinder finder(x, y);
+    const_cast<DisplayList&>(m_display_list).visitBackward(finder);
+    if ( finder.hitFound() ) return true;
+    return _drawable_inst->pointInShape(x, y); 
 }
 
 bool
 sprite_instance::pointInVisibleShape(float x, float y) const
 {
-  if ( ! get_visible() ) return false;
-  if ( isDynamicMask() && ! can_handle_mouse_event() )
-  {
-      // see testsuite/misc-ming.all/masks_test.swf
+    if ( ! get_visible() ) return false;
+    if ( isDynamicMask() && ! can_handle_mouse_event() )
+    {
+        // see testsuite/misc-ming.all/masks_test.swf
 #ifdef GNASH_DEBUG_HITTEST
-      log_debug(_("%s is a dynamic mask and can't handle mouse "
-              "events, no point will hit it"), getTarget());
+        log_debug(_("%s is a dynamic mask and can't handle mouse "
+                    "events, no point will hit it"), getTarget());
 #endif
-      return false;
-  }
-  character* mask = getMask(); // dynamic one
-  if ( mask && mask->get_visible() && ! mask->pointInShape(x, y) )
-  {
+        return false;
+    }
+    character* mask = getMask(); // dynamic one
+    if ( mask && mask->get_visible() && ! mask->pointInShape(x, y) )
+    {
 #ifdef GNASH_DEBUG_HITTEST
-    log_debug(_("%s is dynamically masked by %s, which "
-        "doesn't hit point %g,%g"), getTarget(), mask->getTarget(), x, y);
+        log_debug(_("%s is dynamically masked by %s, which "
+                    "doesn't hit point %g,%g"), getTarget(), mask->getTarget(), x, y);
 #endif
-    return false;
-  }
-  VisibleShapeContainerFinder finder(x, y);
-  const_cast<DisplayList&>(m_display_list).visitBackward(finder);
-  if ( finder.hitFound() ) return true;
-  return _drawable_inst->pointInVisibleShape(x, y); 
+        return false;
+    }
+    VisibleShapeContainerFinder finder(x, y);
+    const_cast<DisplayList&>(m_display_list).visitBackward(finder);
+    if ( finder.hitFound() ) return true;
+    return _drawable_inst->pointInVisibleShape(x, y); 
+}
+
+bool
+sprite_instance::pointInHitableShape(float x, float y) const
+{
+    if ( isDynamicMask() && !can_handle_mouse_event() )
+    {
+        return false;
+    }
+
+    character* mask = getMask(); 
+    if ( mask && ! mask->pointInShape(x, y) )
+    {
+        return false;
+    }
+        
+    HitableShapeContainerFinder finder(x, y);
+    m_display_list.visitBackward(finder);
+
+    if ( finder.hitFound() )
+    {
+        return true;
+    } 
+    else
+    {
+        return _drawable_inst->pointInShape(x, y); 
+    }
 }
 
 character*

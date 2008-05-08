@@ -1573,7 +1573,7 @@ gotoFrame2Test-Runner: $(srcdir)/../generic-testrunner.sh gotoFrame2Test.swf
 
 
 DrawingApiTest.swf: $(srcdir)/DrawingApiTest.as 
-	$(MAKESWF) -r 1 -o $@  $(abs_mediadir)/empty_swf.swf $(srcdir)/DrawingApiTest.as
+	$(MAKESWF) -r 1 -o $@  $(srcdir)/empty.as $(srcdir)/DrawingApiTest.as
 
 DrawingApiTestRunner_SOURCES = \
 	DrawingApiTestRunner.cpp \
