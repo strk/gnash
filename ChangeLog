@@ -1,6 +1,6 @@
 2008-05-08 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
-	* server/stream.cpp: it's a vector, use push_back.
+	* server/parser/action_buffer.cpp: it's a vector, use push_back.
 	* server/swf/PlaceObject2Tag.cpp: use ensureBytes, drop
 	  assertion, with comment: rely on action_buffer's safety.
 
