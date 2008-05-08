@@ -1,3 +1,8 @@
+2008-05-08 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* server/asobj/NetStreamFfmpeg.cpp: Sleep 1 millisecond instead of 1
+	microsecond to reduce CPU hogging.
+
 2008-05-08 Sandro Santilli <strk@keybit.net>
 
 	* libmedia/sound_handler.h: expose create_sound_handler_sdl(), fixing

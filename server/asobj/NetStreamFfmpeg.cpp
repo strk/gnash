@@ -706,7 +706,7 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 
 		}
 
-		usleep(1); // task switch, to avoid 100% CPU
+		usleep(1000); // Sleep 1ms to avoid busying the processor.
 
 	}
 
