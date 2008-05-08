@@ -1,0 +1,25 @@
+Draft design diagram for Gnash
+------------------------------
+$Id: DESIGN,v 1.1 2008/05/08 10:45:26 strk Exp $
+
+
+    (speakers,file)
+          ^
+          |
+    [sound_handler] <---------.
+                              |
+                              |
+           (inputs) --> [gnash_core] <----> [media_handler]
+                              |
+                              |
+      [render_handler] <------'
+            |
+            v
+       (screen,file) 
+
+
+
+     [gnash_core] -- Gnash core lib
+  [sound_handler] -- Sound handler, can be modular (gst/ffmpeg/mad/whatever)
+ [render_handler] -- Renderer, can be modular (agg/ogl/cairo/whatever)
+  [media_handler] -- Media decoders, can be modular (gst/ffmpeg/whatever)

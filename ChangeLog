@@ -1,5 +1,6 @@
 2008-05-08 Sandro Santilli <strk@keybit.net>
 
+	* doc/DESIGN: draf a design diagram
 	* gui/gnash.cpp: print gstreamer linked version in addition to
 	  built-against version.
 
