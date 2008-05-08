@@ -9,6 +9,10 @@
   |  - _framesloaded is never less then _totalframes
   |  - _totalframes reflects what's advertised, no matter number of SHOWFRAME
   |
+  | NOTE: the SWF resulting from this source will be malformed, having
+  |       a short tag size count for PlaceObject tags. We'll keep as is
+  |       so it tests robustness in addition to the rest..
+  |
 -->
   <Header framerate="12" frames="2">
     <size>
