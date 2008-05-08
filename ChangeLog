@@ -1,3 +1,11 @@
+2008-05-08 Sandro Santilli <strk@keybit.net>
+
+	* libmedia/ffmpeg/sound_handler_sdl.cpp: fix default constructor
+	  to actually construct the object instead of corrupting memory;
+	  don't heap-allocate WAV and CHK stuff.
+	* libmedia/ffmpeg/sound_handler_sdl.h: hide wave-specific code, not
+	  needed in header.
+
 2008-05-08 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/asobj/NetStreamFfmpeg.cpp: Sleep 1 millisecond instead of 1

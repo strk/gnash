@@ -43,28 +43,6 @@ extern "C" {
 #include <boost/bind.hpp>
 #include <boost/thread/mutex.hpp>
 
-// Header of a wave file
-// http://ftp.iptel.org/pub/sems/doc/full/current/wav__hdr_8c-source.html
-typedef struct{
-     char rID[4];            // 'RIFF'
-     long int rLen;        
-     char wID[4];            // 'WAVE'
-     char fId[4];            // 'fmt '
-     long int pcm_header_len;   // varies...
-     short int wFormatTag;
-     short int nChannels;      // 1,2 for stereo data is (l,r) pairs
-     long int nSamplesPerSec;
-     long int nAvgBytesPerSec;
-     short int nBlockAlign;      
-     short int nBitsPerSample;
-} WAV_HDR;
-
-// Chunk of wave file
-// http://ftp.iptel.org/pub/sems/doc/full/current/wav__hdr_8c-source.html
-typedef struct{
-    char dId[4];            // 'data' or 'fact'
-    long int dLen;
-} CHUNK_HDR;
 
 namespace gnash {
 namespace media {

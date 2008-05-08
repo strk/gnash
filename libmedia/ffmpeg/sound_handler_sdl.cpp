@@ -44,6 +44,33 @@
 #include <boost/scoped_array.hpp>
 #include <SDL.h>
 
+namespace { // anonymous
+
+// Header of a wave file
+// http://ftp.iptel.org/pub/sems/doc/full/current/wav__hdr_8c-source.html
+typedef struct{
+     char rID[4];            // 'RIFF'
+     long int rLen;        
+     char wID[4];            // 'WAVE'
+     char fId[4];            // 'fmt '
+     long int pcm_header_len;   // varies...
+     short int wFormatTag;
+     short int nChannels;      // 1,2 for stereo data is (l,r) pairs
+     long int nSamplesPerSec;
+     long int nAvgBytesPerSec;
+     short int nBlockAlign;      
+     short int nBitsPerSample;
+} WAV_HDR;
+
+// Chunk of wave file
+// http://ftp.iptel.org/pub/sems/doc/full/current/wav__hdr_8c-source.html
+typedef struct{
+    char dId[4];            // 'data' or 'fact'
+    long int dLen;
+} CHUNK_HDR;
+
+} // end of anonymous namespace
+
 namespace gnash {
 namespace media {
 
@@ -75,8 +102,11 @@ SDL_sound_handler::SDL_sound_handler(const std::string& wavefile)
 }
 
 SDL_sound_handler::SDL_sound_handler()
+	:
+	soundOpened(false),
+	soundsPlaying(0),
+	muted(false)
 {
-    SDL_sound_handler(NULL);
 }
 
 void
@@ -663,50 +693,43 @@ void SDL_sound_handler::write_wave_header(std::ofstream& outfile)
   int i;
   char obuff[80];
  
-  WAV_HDR *wav;
-  CHUNK_HDR *chk;
- 
   // allocate wav header
-  wav = new WAV_HDR;
-  chk = new CHUNK_HDR;
-  
+  WAV_HDR wav;
+  CHUNK_HDR chk;
+ 
   // setup wav header
   sprintf(obuff,"RIFF");
-  for(i=0;i<4;i++) wav->rID[i] = obuff[i];
+  for(i=0;i<4;i++) wav.rID[i] = obuff[i];
  
   sprintf(obuff,"WAVE");
-  for(i=0;i<4;i++) wav->wID[i] = obuff[i];
+  for(i=0;i<4;i++) wav.wID[i] = obuff[i];
   
   sprintf(obuff,"fmt ");
-  for(i=0;i<4;i++) wav->fId[i] = obuff[i];
+  for(i=0;i<4;i++) wav.fId[i] = obuff[i];
  
-  wav->nBitsPerSample = ((audioSpec.format == AUDIO_S16SYS) ? 16 : 0);
-  wav->nSamplesPerSec = audioSpec.freq;
-  wav->nAvgBytesPerSec = audioSpec.freq;
-  wav->nAvgBytesPerSec *= wav->nBitsPerSample / 8;
-  wav->nAvgBytesPerSec *= audioSpec.channels;
-  wav->nChannels = audioSpec.channels;
+  wav.nBitsPerSample = ((audioSpec.format == AUDIO_S16SYS) ? 16 : 0);
+  wav.nSamplesPerSec = audioSpec.freq;
+  wav.nAvgBytesPerSec = audioSpec.freq;
+  wav.nAvgBytesPerSec *= wav.nBitsPerSample / 8;
+  wav.nAvgBytesPerSec *= audioSpec.channels;
+  wav.nChannels = audioSpec.channels;
     
-  wav->pcm_header_len = 16;
-  wav->wFormatTag = 1;
-  wav->rLen = sizeof(WAV_HDR) + sizeof(CHUNK_HDR);
-  wav->nBlockAlign = audioSpec.channels * wav->nBitsPerSample / 8;
+  wav.pcm_header_len = 16;
+  wav.wFormatTag = 1;
+  wav.rLen = sizeof(WAV_HDR) + sizeof(CHUNK_HDR);
+  wav.nBlockAlign = audioSpec.channels * wav.nBitsPerSample / 8;
 
   // setup chunk header
   sprintf(obuff,"data");
-  for(i=0;i<4;i++) chk->dId[i] = obuff[i];
-  chk->dLen = 0;
+  for(i=0;i<4;i++) chk.dId[i] = obuff[i];
+  chk.dLen = 0;
  
   /* write riff/wav header */
-  outfile.write((char *)wav,sizeof(WAV_HDR));
+  outfile.write((char *)&wav, sizeof(WAV_HDR));
  
   /* write chunk header */
-  outfile.write((char *)chk,sizeof(CHUNK_HDR));
+  outfile.write((char *)&chk, sizeof(CHUNK_HDR));
  
-  // be polite
-  if(wav!=NULL) delete wav;
-  if(chk!=NULL) delete chk;
-
 }
 
 // Callback invoked by the SDL audio thread.
