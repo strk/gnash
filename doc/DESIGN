@@ -1,18 +1,18 @@
 Draft design diagram for Gnash
 ------------------------------
-$Id: DESIGN,v 1.2 2008/05/08 10:49:10 strk Exp $
+$Id: DESIGN,v 1.3 2008/05/08 10:56:27 strk Exp $
 
 
     (speakers,file)
           ^
           |
-    [sound_handler] <---------.
+    [sound_handler] <--------{A}
                               |
                               |
-           (inputs) --> [gnash_core] <----> [media_handler]
+           (inputs) --> [gnash_core] <---{C}---> [media_handler]
                               |
                               |
-      [render_handler] <------'
+      [render_handler] <-----{B}
             |
             v
        (screen,file) 
@@ -23,3 +23,19 @@ $Id: DESIGN,v 1.2 2008/05/08 10:49:10 strk Exp $
   [sound_handler] -- Sound handler, can be modular (gst/ffmpeg/mad/whatever)
  [render_handler] -- Renderer, can be modular (agg/ogl/cairo/whatever)
   [media_handler] -- Media decoders, can be modular (gst/ffmpeg/whatever)
+
+ {A} --- [gnash_core] to [sound_handler] connector 
+         Is setup with gnash::set_sound_handler()
+         and retrived with gnash::get_sound_handler().
+         Both currently exposed in server/gnash.h.
+
+ {B} --- [gnash_core] to [render_handler] connector 
+         Is setup with gnash::set_render_handler()
+         exposed in gnash.h.
+         Can be retrived with gnash::get_render_handler()
+         exposed in server/render.h, or used trough
+         wrappers in the gnash::render namespace
+         (still in server/render.h)
+
+ {C} --- [gnash_core] to [media_handler] connector 
+         ???
