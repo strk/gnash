@@ -69,6 +69,7 @@ PlaceObject2Tag::readPlaceActions(stream& in)
 {
     int movie_version = _movie_def.get_version();
 
+    in.ensureBytes(2);
     boost::uint16_t reserved = in.read_u16();
     IF_VERBOSE_MALFORMED_SWF (
         if ( reserved != 0 ) // must be 0
@@ -78,7 +79,16 @@ PlaceObject2Tag::readPlaceActions(stream& in)
     );
     
     // The logical 'or' of all the following handlers.
-    all_event_flags = (movie_version >= 6) ? in.read_u32() : in.read_u16();
+    if (movie_version >= 6)
+    {
+        in.ensureBytes(4);
+        all_event_flags = in.read_u32();
+    }
+    else
+    {
+        in.ensureBytes(2);
+        all_event_flags = in.read_u16();        
+    }
 
     IF_VERBOSE_PARSE (
         log_parse(_("  actions: flags = 0x%X"), all_event_flags);
@@ -90,13 +100,24 @@ PlaceObject2Tag::readPlaceActions(stream& in)
         // Read event.
         in.align();
 
-        boost::uint32_t flags = (movie_version >= 6) ? in.read_u32() : in.read_u16();
+        boost::uint32_t flags;
+        if (movie_version >= 6)
+        {
+            in.ensureBytes(4);
+            flags = in.read_u32();
+        }
+        else
+        {
+            in.ensureBytes(2);
+            flags = in.read_u16();        
+        }
 
         if (flags == 0) // no other events
         {
             break;
         }
 
+        in.ensureBytes(4);
         boost::uint32_t event_length = in.read_u32();
         if ( in.get_tag_end_position() - in.get_position() <  event_length )
         {
@@ -114,6 +135,7 @@ PlaceObject2Tag::readPlaceActions(stream& in)
 
         if (flags & (1 << 17))  // has KeyPress event
         {
+            in.ensureBytes(1);
             ch = in.read_u8();
             event_length--;
         }
@@ -123,7 +145,10 @@ PlaceObject2Tag::readPlaceActions(stream& in)
         _actionBuffers.push_back(action); // take ownership
         action->read(in, in.get_position()+event_length);
 
-        assert(action->size() == event_length); 
+        // If there is no end tag, action_buffer appends a null-terminator,
+        // and fails this check. As action_buffer should check bounds, we
+        // can just continue here.
+        //assert (action->size() == event_length);
 
         // 13 bits reserved, 19 bits used
         const int total_known_events = 19;

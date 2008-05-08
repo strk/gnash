@@ -100,8 +100,7 @@ action_buffer::read(stream& in, unsigned long endPos)
     {
         // Add a null terminator so read_string won't read off
         // the end of the buffer.
-        m_buffer.resize(size + 1);
-        m_buffer[size] = 0;
+        m_buffer.push_back(0x00);
 
 	    IF_VERBOSE_MALFORMED_SWF(
 		    log_swferror(_("Action buffer starting at offset %lu doesn't end with an END tag"),
