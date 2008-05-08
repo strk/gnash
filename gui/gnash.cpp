@@ -172,6 +172,10 @@ static void build_options()
 #ifdef HAVE_GST_GST_H
     cout << _("Built against gstreamer version: ") << GST_VERSION_MAJOR << "."
         << GST_VERSION_MINOR << "." << GST_VERSION_MICRO << endl;
+    guint major, minor, micro, nano;
+    gst_version(&major, &minor, &micro, &nano);
+    cout << _("Linked against gstreamer version: ") << major << "."
+        << minor << "." << micro << endl;
 #endif
 }
 
