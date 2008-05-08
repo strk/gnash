@@ -1,5 +1,9 @@
 2008-05-08 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/Makefile.am: distribute empty.as
+
+2008-05-08 Sandro Santilli <strk@keybit.net>
+
 	* server/swf/PlaceObject2Tag.cpp (readPlaceActions): handle malformed
 	  swf during events parsing by keeping what was read so far.
 	  Fixes misc-swfmill.all/zeroframe_definesprite.swf run.

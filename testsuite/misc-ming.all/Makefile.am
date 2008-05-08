@@ -29,7 +29,9 @@ CLEANFILES =  \
 	testrun.sum \
 	testrun.log
 
-EXTRA_DIST = VarAndCharClashTest.as \
+EXTRA_DIST = \
+	empty.as \
+	VarAndCharClashTest.as \
 	PrototypeEventListeners.as \
 	DragDropTest.as \
 	gotoFrame2Test.as \
