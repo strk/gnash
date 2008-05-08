@@ -1,5 +1,11 @@
 2008-05-08 Sandro Santilli <strk@keybit.net>
 
+	* libbase/curl_adapter.cpp (CurlStreamFile::seek): remove
+	  a warning on seek(too_far). Return code cleanly handles
+	  it (keep warnings for unexpected internal errors).
+
+2008-05-08 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/NetStreamFfmpeg.cpp: use multithread_queue::clear
 	  rather then looping and using .pop/.size (clear would lock
 	  the mutex once).

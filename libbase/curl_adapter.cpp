@@ -661,7 +661,7 @@ CurlStreamFile::seek(size_t pos)
 
 	if ( _cached < pos )
 	{
-		fprintf(stderr, "Warning: could not cache anough bytes on seek\n");
+		//fprintf(stderr, "Warning: could not cache anough bytes on seek\n");
 		return false; // couldn't cache so many bytes
 	}
 
