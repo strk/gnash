@@ -1,5 +1,11 @@
 2008-05-08 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/PlaceObject2Tag.cpp (readPlaceActions): handle malformed
+	  swf during events parsing by keeping what was read so far.
+	  Fixes misc-swfmill.all/zeroframe_definesprite.swf run.
+
+2008-05-08 Sandro Santilli <strk@keybit.net>
+
 	* libmedia/ffmpeg/sound_handler_sdl.cpp: fix default constructor
 	  to actually construct the object instead of corrupting memory;
 	  don't heap-allocate WAV and CHK stuff.

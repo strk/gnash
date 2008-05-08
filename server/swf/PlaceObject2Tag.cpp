@@ -97,113 +97,135 @@ PlaceObject2Tag::readPlaceActions(stream& in)
     // Read swf_events.
     for (;;)
     {
-        // Read event.
-        in.align();
-
-        boost::uint32_t flags;
-        if (movie_version >= 6)
+        // Handle SWF malformations locally, by just prematurely interrupting
+        // parsing of action events.
+        // TODO: a possibly improvement would be using local code for the
+        //       equivalent of ensureBytes which has the cost of a function
+        //       call for itself plus a repeated useless function call for
+        //       get_end_tag_position (which could be cached).
+        //       
+        try
         {
-            in.ensureBytes(4);
-            flags = in.read_u32();
-        }
-        else
-        {
-            in.ensureBytes(2);
-            flags = in.read_u16();        
-        }
-
-        if (flags == 0) // no other events
-        {
-            break;
-        }
-
-        in.ensureBytes(4);
-        boost::uint32_t event_length = in.read_u32();
-        if ( in.get_tag_end_position() - in.get_position() <  event_length )
-        {
-            IF_VERBOSE_MALFORMED_SWF(
-            log_swferror(_("swf_event::read(), "
-                "even_length = %u, but only %lu bytes left "
-                "to the end of current tag."
-                " Breaking for safety."),
-                event_length, in.get_tag_end_position() - in.get_position());
-            );
-            break;
-        }
-
-        boost::uint8_t ch = key::INVALID;
-
-        if (flags & (1 << 17))  // has KeyPress event
-        {
-            in.ensureBytes(1);
-            ch = in.read_u8();
-            event_length--;
-        }
-
-        // Read the actions for event(s)
-        action_buffer* action = new action_buffer(_movie_def); // ownership will be xferred to _actionBuffers
-        _actionBuffers.push_back(action); // take ownership
-        action->read(in, in.get_position()+event_length);
-
-        // If there is no end tag, action_buffer appends a null-terminator,
-        // and fails this check. As action_buffer should check bounds, we
-        // can just continue here.
-        //assert (action->size() == event_length);
-
-        // 13 bits reserved, 19 bits used
-        const int total_known_events = 19;
-        static const event_id s_code_bits[total_known_events] =
-        {
-            event_id::LOAD,
-            event_id::ENTER_FRAME,
-            event_id::UNLOAD,
-            event_id::MOUSE_MOVE,
-            event_id::MOUSE_DOWN,
-            event_id::MOUSE_UP,
-            event_id::KEY_DOWN,
-            event_id::KEY_UP,
-
-            event_id::DATA,
-            event_id::INITIALIZE,
-            event_id::PRESS,
-            event_id::RELEASE,
-            event_id::RELEASE_OUTSIDE,
-            event_id::ROLL_OVER,
-            event_id::ROLL_OUT,
-            event_id::DRAG_OVER,
-
-            event_id::DRAG_OUT,
-            event_id(event_id::KEY_PRESS, key::CONTROL),
-            event_id::CONSTRUCT
-        };
-
-        // Let's see if the event flag we received is for an event that we know of
-
-        // Integrity check: all reserved bits should be zero
-        if( flags >> total_known_events ) 
-        {
-            IF_VERBOSE_MALFORMED_SWF(
-            log_swferror(_("swf_event::read() -- unknown / unhandled event type received, flags = 0x%x"), flags);
-            );
-        }
-
-        // Aah! same action for multiple events !
-        for (int i = 0, mask = 1; i < total_known_events; i++, mask <<= 1)
-        {
-            if (flags & mask)
+            // Read event.
+            in.align();
+    
+            boost::uint32_t flags;
+            if (movie_version >= 6)
             {
-                std::auto_ptr<swf_event> ev ( new swf_event(s_code_bits[i], *action) );
-                IF_VERBOSE_PARSE (
-                log_parse("---- actions for event %s", ev->event().get_function_name().c_str());
-                );
-
-                if (i == 17)    // has KeyPress event
-                {
-                    ev->event().setKeyCode(ch);
-                }
-
-                m_event_handlers.push_back(ev.release());
+                in.ensureBytes(4);
+                flags = in.read_u32();
             }
+            else
+            {
+                in.ensureBytes(2);
+                flags = in.read_u16();        
+            }
+    
+            if (flags == 0) // no other events
+            {
+                break;
+            }
+    
+            in.ensureBytes(4);
+            boost::uint32_t event_length = in.read_u32();
+            if ( in.get_tag_end_position() - in.get_position() <  event_length )
+            {
+                IF_VERBOSE_MALFORMED_SWF(
+                log_swferror(_("swf_event::read(), "
+                    "even_length = %u, but only %lu bytes left "
+                    "to the end of current tag."
+                    " Breaking for safety."),
+                    event_length, in.get_tag_end_position() - in.get_position());
+                );
+                break;
+            }
+    
+            boost::uint8_t ch = key::INVALID;
+    
+            if (flags & (1 << 17))  // has KeyPress event
+            {
+                in.ensureBytes(1);
+                ch = in.read_u8();
+                event_length--;
+            }
+    
+            // Read the actions for event(s)
+            // auto_ptr here prevents leaks on malformed swf
+            std::auto_ptr<action_buffer> action ( new action_buffer(_movie_def) );
+            action->read(in, in.get_position()+event_length);
+            _actionBuffers.push_back(action.release()); // take ownership
+    
+            // If there is no end tag, action_buffer appends a null-terminator,
+            // and fails this check. As action_buffer should check bounds, we
+            // can just continue here.
+            //assert (action->size() == event_length);
+    
+            // 13 bits reserved, 19 bits used
+            const int total_known_events = 19;
+            static const event_id s_code_bits[total_known_events] =
+            {
+                event_id::LOAD,
+                event_id::ENTER_FRAME,
+                event_id::UNLOAD,
+                event_id::MOUSE_MOVE,
+                event_id::MOUSE_DOWN,
+                event_id::MOUSE_UP,
+                event_id::KEY_DOWN,
+                event_id::KEY_UP,
+    
+                event_id::DATA,
+                event_id::INITIALIZE,
+                event_id::PRESS,
+                event_id::RELEASE,
+                event_id::RELEASE_OUTSIDE,
+                event_id::ROLL_OVER,
+                event_id::ROLL_OUT,
+                event_id::DRAG_OVER,
+    
+                event_id::DRAG_OUT,
+                event_id(event_id::KEY_PRESS, key::CONTROL),
+                event_id::CONSTRUCT
+            };
+    
+            // Let's see if the event flag we received is for an event that we know of
+    
+            // Integrity check: all reserved bits should be zero
+            if( flags >> total_known_events ) 
+            {
+                IF_VERBOSE_MALFORMED_SWF(
+                log_swferror(_("swf_event::read() -- unknown / unhandled event type received, flags = 0x%x"), flags);
+                );
+            }
+    
+            // Aah! same action for multiple events !
+            for (int i = 0, mask = 1; i < total_known_events; i++, mask <<= 1)
+            {
+                if (flags & mask)
+                {
+                    /// Yes, swf_event stores a reference to an element in _actionBuffers.
+                    /// A case of remote ownership, but both swf_event and the actions
+                    /// are owned by this class, so shouldn't be a problem.
+                    action_buffer* thisAction = _actionBuffers.back();
+                    std::auto_ptr<swf_event> ev ( new swf_event(s_code_bits[i], *thisAction) );
+                    IF_VERBOSE_PARSE (
+                    log_parse("---- actions for event %s", ev->event().get_function_name().c_str());
+                    );
+    
+                    if (i == 17)    // has KeyPress event
+                    {
+                        ev->event().setKeyCode(ch);
+                    }
+    
+                    m_event_handlers.push_back(ev.release());
+                }
+            }
+        }
+        catch (ParserException& what)
+        {
+            IF_VERBOSE_MALFORMED_SWF(
+            log_swferror(_("Unexpected end of tag while parsing PlaceObject tag events"));
+            );
+            break;
         }
     } //end of for(;;)
 }
