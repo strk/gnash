@@ -1,5 +1,11 @@
 2008-05-08 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/NetStreamFfmpeg.cpp: use multithread_queue::clear
+	  rather then looping and using .pop/.size (clear would lock
+	  the mutex once).
+
+2008-05-08 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/Makefile.am: distribute empty.as
 
 2008-05-08 Sandro Santilli <strk@keybit.net>

@@ -163,17 +163,8 @@ void NetStreamFfmpeg::close()
 	delete m_unqueued_data;
 	m_unqueued_data = NULL;
 
-	while (m_qvideo.size() > 0)
-	{
-		delete m_qvideo.front();
-		m_qvideo.pop();
-	}
-
-	while (m_qaudio.size() > 0)
-	{
-		delete m_qaudio.front();
-		m_qaudio.pop();
-	}
+	m_qvideo.clear();
+	m_qaudio.clear();
 
 	delete [] ByteIOCxt.buffer;
 
@@ -693,6 +684,16 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 					break;
 				}
 			}
+			else
+			{
+				// TODO: sleep till any of the two queues
+				//       falls under the given number
+				//       (20 currently, but should be a class member really)
+				//
+				// NOTE: audio_streamer pops from m_qaudio and
+				//       refreshVideoFrame pops from m_qvideo
+				//
+			}
 
 		}
 		else
@@ -1175,16 +1176,8 @@ NetStreamFfmpeg::seek(boost::uint32_t pos)
 	}
 	
 	// Flush the queues
-  	while ( m_qvideo.size() > 0 ) 
-	{
-    		delete m_qvideo.front();
-    		m_qvideo.pop();
-  	}
-  	while ( m_qaudio.size() > 0 ) 
-	{
-    		delete m_qaudio.front();
-    		m_qaudio.pop();
-  	}
+	m_qvideo.clear();
+	m_qaudio.clear();
 
 }
 
