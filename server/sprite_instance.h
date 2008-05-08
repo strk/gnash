@@ -147,10 +147,11 @@ public:
 	// See dox in character.h
 	bool pointInVisibleShape(float x, float y) const;
 
-    /// return true if the given point is located in this sprite.
+    /// return true if the given point is located in a(this) hitable sprite.
     ///
     /// all sprites except mouse-insensitive dynamic masks are hitable.
     /// _visible property is ignored for hitable characters.
+    ///
     bool pointInHitableShape(float x, float y) const;
 
 	/// Return 0-based index to current frame
