@@ -3,9 +3,8 @@
   
   <para>
     &app;'s common message logging system uses a <emphasis>printf()</emphasis>
-    style format. C++ iostream logging functions were introduced alongside, but this has since
-    largely been abandoned. Despite the C-like appearance, however, &app;'s LogFile class
-    by default does not use <emphasis>printf()</emphasis> for formatting at all the
+    style format. Despite the C-like appearance, however, &app;'s LogFile class
+    by default does not use <emphasis>printf()</emphasis> for formatting the
     messages at all.
   </para>
   
@@ -17,23 +16,13 @@
     the logging API remains exactly the same, regardless of which method is
     used to format the log output.
   </para>  
-  
-  <sect3 id="status">
-  <title>Status</title>  
-  <para>
-    Currently, &app; is preserving the option of returning to the previous
-    <emphasis>printf()</emphasis> implementation. While it is possible to use
-    std::strings and even custom types
-    in substitutions, and <emphasis>boost::format</emphasis> style positional
-    identifiers (%1%, %2%, %1%)
-    in the format string, this is inadvisable as it would break any move back to
-    <emphasis>printf()</emphasis>.
-  </para>   
 
   <para>
-    It is possible to switch between the different logging format functions simply by
-    changing <emphasis>#define USE_BOOST_FORMAT_TEMPLATES</emphasis> in log.h. 
-  </para>   
+    The templates for conversion are generated using Boost.Preprocessor. Currently,
+    they allow for a maximum of 16 arguments (more than enough for all current 
+    usage), but that can be expanded or reduced by changing 
+    <emphasis>#define ARG_NUMBER</emphasis> in <emphasis>libbase/log.h</emphasis>.
+  </para>  
 
   <para>
     If a filename is not specified before the log file is needed, a
@@ -45,7 +34,7 @@
     can be specified using either <emphasis>gnashrc</emphasis> or a 
     call to the LogFile instance itself.
   </para>
-    </sect3>
+
   <sect3 id="api">
     <title>Logging System API</title>
 
@@ -193,7 +182,7 @@
 	</listitem>
       </varlistentry>
       <varlistentry>
-	<term>setLogFilename(const std::string&amp; fname)</term>
+	<term>setLogFilename(const std::string&amp; filename)</term>
 	<listitem>
 	  <para>
 	    Use this to set a different name for the disk-based log file.
@@ -205,7 +194,7 @@
       </varlistentry>
 
       <varlistentry>
-	<term>closeLog(void)</term>
+	<term>closeLog()</term>
 	<listitem>
 	  <para>
 	    Close a debug log. The disk file remains.
@@ -213,7 +202,7 @@
 	</listitem>
       </varlistentry>
       <varlistentry>
-	<term>removeLog(void)</term>
+	<term>removeLog()</term>
 	<listitem>
 	  <para>
 	    Delete the debug log file from disk.
@@ -221,7 +210,7 @@
 	</listitem>
       </varlistentry>
       <varlistentry>
-	<term>setVerbosity(void)</term>
+	<term>setVerbosity()</term>
 	<listitem>
 	  <para>
 	    Increment the verbosity level.
@@ -229,7 +218,7 @@
 	</listitem>
       </varlistentry>
       <varlistentry>
-	<term>setVerbosity(int)</term>
+	<term>setVerbosity(int level)</term>
 	<listitem>
 	  <para>
 	    Set the verbosity level to a specified level.
