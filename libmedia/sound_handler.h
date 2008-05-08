@@ -435,6 +435,7 @@ protected:
 };
 
 // TODO: move to appropriate specific sound handlers
+DSOEXPORT sound_handler*	create_sound_handler_sdl();
 DSOEXPORT sound_handler*	create_sound_handler_sdl(const std::string& wave_file);
 DSOEXPORT sound_handler*	create_sound_handler_gst();
 	

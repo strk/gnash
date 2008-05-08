@@ -1,3 +1,8 @@
+2008-05-08 Sandro Santilli <strk@keybit.net>
+
+	* libmedia/sound_handler.h: expose create_sound_handler_sdl(), fixing
+	  make check (and any use not willing to save a wave file... ).
+
 2008-05-08 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* docs: update logging info in refmanual.
