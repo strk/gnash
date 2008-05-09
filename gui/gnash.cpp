@@ -193,7 +193,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
         { 256, "max-advances",  Arg_parser::yes },
         { 257, "fullscreen",    Arg_parser::no  },        
         { 'c', 0,               Arg_parser::no  },
-        { 'm', 0,               Arg_parser::yes },
+        { 'm', 0,               Arg_parser::yes }, // What is this for?
         { 'd', "delay",         Arg_parser::yes },
         { 'x', "xid",           Arg_parser::yes },
         { 'r', "render-mode",   Arg_parser::yes },
@@ -210,7 +210,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
         { 'f', "debug-fps",     Arg_parser::yes },        
         { 'F', "fd",            Arg_parser::yes },
         { 'A', "dump",          Arg_parser::yes },
-        { 'D', 0,               Arg_parser::yes },
+        { 'D', 0,               Arg_parser::yes }, // Handled in dump gui
         {   0, 0,               Arg_parser::no  }
     };
 
