@@ -1,5 +1,10 @@
 2008-05-09 Sandro Santilli <strk@keybit.net>
 
+	* libmedia/: Makefile.cm, FLVParser.{cpp,h}: drop unused FLVParser
+	  (we use the one from libbase).
+
+2008-05-09 Sandro Santilli <strk@keybit.net>
+
 	* libbase/FLVParser.{cpp,h}: take a tu_file rather then a LoadThread.
 	* server/asobj/NetConnection.{cpp,h}: don't construct a LoadThread,
 	  let users create a thread for download/parser/decode.
