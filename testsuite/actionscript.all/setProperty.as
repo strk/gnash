@@ -33,9 +33,9 @@ mc1.func = function () {
     check_equals(_root.mc1._xscale, 100);
     check_equals(_root._xscale, 100);
     
-    // setProperty("", _xscale, 10);
-    // for SWF6 and above, it's _root._xscale = 10.
-    // for SWF5, it's mc1._xscale = 10;
+    // setProperty("", _xscale, 30);
+    // for SWF6 and above, it's _root._xscale = 30.
+    // for SWF5, it's mc1._xscale = 30;
     asm{
         push "", 2, 30
         setproperty
