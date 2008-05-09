@@ -78,7 +78,7 @@ ASTESTS =			\
 	delete.as		\
 	getvariable.as		\
 	swap.as			\
-	setProperty.as \
+	setProperty.as 		\
 	targetPath.as		\
 	Boolean.as		\
 	Camera.as		\
