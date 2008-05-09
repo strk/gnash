@@ -34,6 +34,8 @@
 #include "VideoDecoderFfmpeg.h"
 #include "ClockTime.h" // TODO: use the VirtualClock instead ?
 
+#include "FLVParser.h" 
+
 #include <boost/scoped_array.hpp>
 
 

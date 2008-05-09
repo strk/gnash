@@ -21,9 +21,9 @@ EXTRA_DIST =
 # this is where Gnash plugins get installed
 pluginsdir = $(prefix)/lib/gnash/plugins
 
-if INSTALL_LTDL
-LIBLTDLHEAD =  $(top_srcdir)/libltdl/ltdl.h
-endif
+#if INSTALL_LTDL
+#LIBLTDLHEAD =  $(top_srcdir)/libltdl/ltdl.h
+#endif
 
 # If we are using an installable libltdl, then it needs to be built
 # before libgnash, as libgnash depends on it for extensions.
@@ -169,7 +169,7 @@ endif
 
 libgnashmedia_la_LDFLAGS = -release $(VERSION)
 
-libltdlc_la_CPPFLAGS = $(LTDLINCL)
+#libltdlc_la_CPPFLAGS = $(LTDLINCL)
 #if CONVENIENCE_LTDL
 #noinst_LTLIBRARIES = libltdlc.la
 #libltdlc_la_SOURCES = $(top_srcdir)/libltdl/ltdl.c

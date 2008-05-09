@@ -45,10 +45,7 @@ extern "C" {
 #include "StreamProvider.h"	
 #include "NetStream.h" // for inheritance
 
-#include "FLVParser.h"
-
 #include "ffmpegNetStreamUtil.h"
-
 
 namespace gnash {
   
