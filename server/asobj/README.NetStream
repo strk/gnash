@@ -56,10 +56,6 @@ Notation: process, [dataStore], <externalEvent>
   thread2 (load/parse/decode) : parser, decoder
   thread3 (playsound)         : soundPlayer
 
-  NOTE: thread2 actually includes a loading thread hidden in this diagram for simplicity.
-        it is likely that we can safely drop that additional thread as a whole.
-
-
 ===============================================================================
  Data flow diagram for Gnash implementation of NetStream playback using GST
 ===============================================================================
