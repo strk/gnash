@@ -1,3 +1,7 @@
+2008-05-09 Russ Nelson <nelson@crynwr.com>
+
+	* Fix dump-gnash's -D switch.
+
 2008-05-09 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/setProperty.as: round _xscale so gnash
