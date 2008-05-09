@@ -1,3 +1,8 @@
+2008-05-09 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* testsuite/actionscript.all/setProperty.as, Makefile.am: 
+	  new tests for set/getProperty. Fixing this will fix some swf5 files.
+	  
 2008-05-09 Sandro Santilli <strk@keybit.net>
 
 	* libmedia/Makefile.am: remove other references to libltdl.
