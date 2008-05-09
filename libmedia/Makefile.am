@@ -22,14 +22,12 @@ EXTRA_DIST =
 pluginsdir = $(prefix)/lib/gnash/plugins
 
 if INSTALL_LTDL
-include_HEADERS =  $(top_srcdir)/libltdl/ltdl.h
-LIBLTDLLIB = libltdl.la
 LIBLTDLHEAD =  $(top_srcdir)/libltdl/ltdl.h
 endif
 
 # If we are using an installable libltdl, then it needs to be built
 # before libgnash, as libgnash depends on it for extensions.
-pkglib_LTLIBRARIES =  $(LIBLTDLLIB) libgnashmedia.la
+pkglib_LTLIBRARIES =  libgnashmedia.la
 
 libgnashmedia_la_CPPFLAGS = \
 	-I.. -I$(srcdir) \
@@ -172,15 +170,15 @@ endif
 libgnashmedia_la_LDFLAGS = -release $(VERSION)
 
 libltdlc_la_CPPFLAGS = $(LTDLINCL)
-if CONVENIENCE_LTDL
-noinst_LTLIBRARIES = libltdlc.la
-libltdlc_la_SOURCES = $(top_srcdir)/libltdl/ltdl.c
-endif
-CLEANFILES = libltdl.la libltdlc.la
+#if CONVENIENCE_LTDL
+#noinst_LTLIBRARIES = libltdlc.la
+#libltdlc_la_SOURCES = $(top_srcdir)/libltdl/ltdl.c
+#endif
+#CLEANFILES = libltdl.la libltdlc.la
 
-libltdl_la_SOURCES = $(top_srcdir)/libltdl/ltdl.c
-libltdl_la_LDFLAGS = -no-undefined -version-info 4:4:1
-libltdl_la_LIBADD = $(LIBADD_DL)
+#libltdl_la_SOURCES = $(top_srcdir)/libltdl/ltdl.c
+#libltdl_la_LDFLAGS = -no-undefined -version-info 4:4:1
+#libltdl_la_LIBADD = $(LIBADD_DL)
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:

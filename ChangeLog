@@ -1,3 +1,8 @@
+2008-05-08 Russ Nelson <nelson@crynwr.com>
+
+	* libmedia/Makefile.am: don't build libltdl here, as it's already
+	  being built by libbase.
+
 2008-05-08 Sandro Santilli <strk@keybit.net>
 
 	* libbase/curl_adapter.cpp (CurlStreamFile::seek): remove
