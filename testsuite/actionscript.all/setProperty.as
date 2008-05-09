@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: setProperty.as,v 1.3 2008/05/09 13:21:08 strk Exp $";
+rcsid="$Id: setProperty.as,v 1.4 2008/05/09 13:27:06 strk Exp $";
 #include "check.as"
 
 #ifdef MING_SUPPORTS_ASM
@@ -31,6 +31,11 @@ createSprite = ASnative(901, 0); // MovieClip.prototype.createEmptyMovieClip
 createSprite("mc1", 10);
 
 mc1.func = function () {
+	pass_check = _root.pass_check;
+	xpass_check = _root.xpass_check;
+	fail_check = _root.fail_check;
+	xfail_check = _root.xfail_check;
+
     check_equals(this, _root.mc1);
     check_equals(_root.mc1._xscale, 100);
     check_equals(_root._xscale, 100);

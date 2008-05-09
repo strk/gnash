@@ -1,5 +1,10 @@
 2008-05-09 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/setProperty.as: copy dejagnu
+	  stuff to function scope so swf5 still works...
+
+2008-05-09 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/Makefile.am: indent
 	* testsuite/actionscript.all/MovieClip.as: drop duplicated rcsid.
 	* testsuite/actionscript.all/setProperty.as: add rcsid, don't stop,
