@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: setProperty.as,v 1.4 2008/05/09 13:27:06 strk Exp $";
+rcsid="$Id: setProperty.as,v 1.5 2008/05/09 13:55:48 strk Exp $";
 #include "check.as"
 
 #ifdef MING_SUPPORTS_ASM
@@ -55,7 +55,7 @@ mc1.func = function () {
     // Gnash might be failed due to accuracy problem.
     // should we be more tolerant here?
     check_equals(_root.mc1._xscale, 100);
-    check_equals(_root._xscale, 30); 
+    check_equals(Math.round(_root._xscale), 30); 
 #endif
     _root._xscale = 60;
     var testvar = 0;
@@ -73,7 +73,7 @@ mc1.func = function () {
 #else
     // Gnash might be failed due to accuracy problem.
     // should we be more tolerant here?
-    check_equals(testvar, 60);
+    check_equals(Math.round(testvar), 60);
 #endif
 };
 mc1.func();

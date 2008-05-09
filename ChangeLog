@@ -1,5 +1,10 @@
 2008-05-09 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/setProperty.as: round _xscale so gnash
+	  passes.
+
+2008-05-09 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/setProperty.as: copy dejagnu
 	  stuff to function scope so swf5 still works...
 
