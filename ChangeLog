@@ -1,3 +1,10 @@
+2008-05-09 Sandro Santilli <strk@keybit.net>
+
+	* libbase/FLVParser.cpp: use 64 (rather then 8) padding bytes.
+	  I've no idea what that padding means and why is needed, anyway
+	  it fixes an illegal read of 33 bytes past the allocated set
+	  watching http://www.youtube.com/watch?v=P48VFXltFyM.
+
 2008-05-09 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* fonts: drop unused fonts directory.

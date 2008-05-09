@@ -26,7 +26,7 @@
 
 using namespace std;
 
-#define PADDING_BYTES 8
+#define PADDING_BYTES 64
 
 // Define the following macro the have seek() operations printed
 //#define GNASH_DEBUG_SEEK 1
