@@ -1,5 +1,10 @@
 2008-05-09 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/NetStreamFfmpeg.cpp (decodeVideo): make somewhat more
+	  readable.
+
+2008-05-09 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/NetStreamFfmpeg.{cpp,h}: maintain a decoder
 	  buffer so to reuse it in case resampling is needed;
 	  allocate for it AVCODEC_MAX_AUDIO_FRAME_SIZE rather then 3/2

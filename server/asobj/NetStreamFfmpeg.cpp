@@ -936,146 +936,143 @@ bool NetStreamFfmpeg::decodeVideo(AVPacket* packet)
 
 	int got = 0;
 	avcodec_decode_video(m_VCodecCtx, m_Frame, &got, packet->data, packet->size);
-	if (got)
+	if (!got) return false;
+
+	if (m_imageframe == NULL)
 	{
-		if (m_imageframe == NULL)
-		{
-			if (m_videoFrameFormat == render::YUV)
-			{
-				m_imageframe = new image::yuv(m_VCodecCtx->width, m_VCodecCtx->height);
-			}
-			else if (m_videoFrameFormat == render::RGB)
-			{
-				m_imageframe = new image::rgb(m_VCodecCtx->width, m_VCodecCtx->height);
-			}
-		}
-
-		AVPicture rgbpicture;
-
-		if (m_videoFrameFormat == render::NONE)
-		{
-			// NullGui?
-			return false;
-
-		}
-		else if (m_videoFrameFormat == render::YUV && m_VCodecCtx->pix_fmt != PIX_FMT_YUV420P)
-		{
-      			assert( 0 );	// TODO
-			//img_convert((AVPicture*) pFrameYUV, PIX_FMT_YUV420P, (AVPicture*) pFrame, pCodecCtx->pix_fmt, pCodecCtx->width, pCodecCtx->height);
-			// Don't use depreceted img_convert, use sws_scale
-
-		}
-		else if (m_videoFrameFormat == render::RGB && m_VCodecCtx->pix_fmt != PIX_FMT_RGB24)
-		{
-			rgbpicture = media::VideoDecoderFfmpeg::convertRGB24(m_VCodecCtx, *m_Frame);
-			if (!rgbpicture.data[0]) {
-				return false;
-			}
-		}
-
-    		media::raw_mediadata_t* video = new media::raw_mediadata_t();
-
 		if (m_videoFrameFormat == render::YUV)
 		{
-			video->m_data = new boost::uint8_t[static_cast<image::yuv*>(m_imageframe)->size()];
+			m_imageframe = new image::yuv(m_VCodecCtx->width, m_VCodecCtx->height);
 		}
 		else if (m_videoFrameFormat == render::RGB)
 		{
-			image::rgb* tmp = static_cast<image::rgb*>(m_imageframe);
-      			video->m_data = new boost::uint8_t[tmp->pitch() * tmp->height()];
+			m_imageframe = new image::rgb(m_VCodecCtx->width, m_VCodecCtx->height);
 		}
-
-		video->m_ptr = video->m_data;
-		video->m_stream_index = m_video_index;
-		video->m_pts = 0;
-
-		// set presentation timestamp
-		if (packet->dts != static_cast<signed long>(AV_NOPTS_VALUE))
-		{
-			if (!m_isFLV)	video->m_pts = static_cast<boost::uint32_t>((as_double(m_video_stream->time_base) * packet->dts) * 1000.0);
-			else video->m_pts = static_cast<boost::uint32_t>((as_double(m_VCodecCtx->time_base) * packet->dts) * 1000.0);
-		}
-
-		if (video->m_pts != 0)
-		{	
-			// update video clock with pts, if present
-			m_last_video_timestamp = video->m_pts;
-		}
-		else
-		{
-			video->m_pts = m_last_video_timestamp;
-		}
-
-		// update video clock for next frame
-		boost::uint32_t frame_delay;
-		if (!m_isFLV) frame_delay = static_cast<boost::uint32_t>(as_double(m_video_stream->codec->time_base) * 1000.0);
-		else frame_delay = m_parser->videoFrameDelay();
-
-		// for MPEG2, the frame can be repeated, so we update the clock accordingly
-		frame_delay += static_cast<boost::uint32_t>(m_Frame->repeat_pict * (frame_delay * 0.5) * 1000.0);
-
-		m_last_video_timestamp += frame_delay;
-
-		if (m_videoFrameFormat == render::YUV)
-		{
-			image::yuv* yuvframe = static_cast<image::yuv*>(m_imageframe);
-			unsigned int copied = 0;
-			boost::uint8_t* ptr = video->m_data;
-			for (int i = 0; i < 3 ; i++)
-			{
-				int shift = (i == 0 ? 0 : 1);
-				boost::uint8_t* yuv_factor = m_Frame->data[i];
-				int h = m_VCodecCtx->height >> shift;
-				int w = m_VCodecCtx->width >> shift;
-				for (int j = 0; j < h; j++)
-				{
-					copied += w;
-					assert(copied <= yuvframe->size());
-					memcpy(ptr, yuv_factor, w);
-					yuv_factor += m_Frame->linesize[i];
-					ptr += w;
-				}
-			}
-			video->m_size = copied;
-		}
-		else if (m_videoFrameFormat == render::RGB)
-		{
-			AVPicture* src;
-			if (m_VCodecCtx->pix_fmt != PIX_FMT_RGB24)
-			{
-				src = &rgbpicture;
-			} else
-			{
-				src = (AVPicture*) m_Frame;
-			}
-		
-			boost::uint8_t* srcptr = src->data[0];		  
-			boost::uint8_t* srcend = srcptr + rgbpicture.linesize[0] * m_VCodecCtx->height;
-			boost::uint8_t* dstptr = video->m_data;
-			unsigned int srcwidth = m_VCodecCtx->width * 3;
-
-			video->m_size = 0;
-
-			while (srcptr < srcend) {
-				memcpy(dstptr, srcptr, srcwidth);
-				srcptr += src->linesize[0];
-				dstptr += srcwidth;
-				video->m_size += srcwidth;
-			}
-			
-			if (m_VCodecCtx->pix_fmt != PIX_FMT_RGB24) {
-				delete [] rgbpicture.data[0];
-			}
-
-		}
-
-		if (m_isFLV) m_qvideo.push(video);
-		else m_unqueued_data = m_qvideo.push(video) ? NULL : video;
-
-		return true;
 	}
 
-	return false;
+	AVPicture rgbpicture;
+
+	if (m_videoFrameFormat == render::NONE)
+	{
+		// NullGui?
+		return false;
+
+	}
+	else if (m_videoFrameFormat == render::YUV && m_VCodecCtx->pix_fmt != PIX_FMT_YUV420P)
+	{
+		assert( 0 );	// TODO
+		//img_convert((AVPicture*) pFrameYUV, PIX_FMT_YUV420P, (AVPicture*) pFrame, pCodecCtx->pix_fmt, pCodecCtx->width, pCodecCtx->height);
+		// Don't use depreceted img_convert, use sws_scale
+
+	}
+	else if (m_videoFrameFormat == render::RGB && m_VCodecCtx->pix_fmt != PIX_FMT_RGB24)
+	{
+		rgbpicture = media::VideoDecoderFfmpeg::convertRGB24(m_VCodecCtx, *m_Frame);
+		if (!rgbpicture.data[0]) {
+			return false;
+		}
+	}
+
+	media::raw_mediadata_t* video = new media::raw_mediadata_t();
+
+	if (m_videoFrameFormat == render::YUV)
+	{
+		video->m_data = new boost::uint8_t[static_cast<image::yuv*>(m_imageframe)->size()];
+	}
+	else if (m_videoFrameFormat == render::RGB)
+	{
+		image::rgb* tmp = static_cast<image::rgb*>(m_imageframe);
+		video->m_data = new boost::uint8_t[tmp->pitch() * tmp->height()];
+	}
+
+	video->m_ptr = video->m_data;
+	video->m_stream_index = m_video_index;
+	video->m_pts = 0;
+
+	// set presentation timestamp
+	if (packet->dts != static_cast<signed long>(AV_NOPTS_VALUE))
+	{
+		if (!m_isFLV)	video->m_pts = static_cast<boost::uint32_t>((as_double(m_video_stream->time_base) * packet->dts) * 1000.0);
+		else video->m_pts = static_cast<boost::uint32_t>((as_double(m_VCodecCtx->time_base) * packet->dts) * 1000.0);
+	}
+
+	if (video->m_pts != 0)
+	{	
+		// update video clock with pts, if present
+		m_last_video_timestamp = video->m_pts;
+	}
+	else
+	{
+		video->m_pts = m_last_video_timestamp;
+	}
+
+	// update video clock for next frame
+	boost::uint32_t frame_delay;
+	if (!m_isFLV) frame_delay = static_cast<boost::uint32_t>(as_double(m_video_stream->codec->time_base) * 1000.0);
+	else frame_delay = m_parser->videoFrameDelay();
+
+	// for MPEG2, the frame can be repeated, so we update the clock accordingly
+	frame_delay += static_cast<boost::uint32_t>(m_Frame->repeat_pict * (frame_delay * 0.5) * 1000.0);
+
+	m_last_video_timestamp += frame_delay;
+
+	if (m_videoFrameFormat == render::YUV)
+	{
+		image::yuv* yuvframe = static_cast<image::yuv*>(m_imageframe);
+		unsigned int copied = 0;
+		boost::uint8_t* ptr = video->m_data;
+		for (int i = 0; i < 3 ; i++)
+		{
+			int shift = (i == 0 ? 0 : 1);
+			boost::uint8_t* yuv_factor = m_Frame->data[i];
+			int h = m_VCodecCtx->height >> shift;
+			int w = m_VCodecCtx->width >> shift;
+			for (int j = 0; j < h; j++)
+			{
+				copied += w;
+				assert(copied <= yuvframe->size());
+				memcpy(ptr, yuv_factor, w);
+				yuv_factor += m_Frame->linesize[i];
+				ptr += w;
+			}
+		}
+		video->m_size = copied;
+	}
+	else if (m_videoFrameFormat == render::RGB)
+	{
+		AVPicture* src;
+		if (m_VCodecCtx->pix_fmt != PIX_FMT_RGB24)
+		{
+			src = &rgbpicture;
+		} else
+		{
+			src = (AVPicture*) m_Frame;
+		}
+	
+		boost::uint8_t* srcptr = src->data[0];		  
+		boost::uint8_t* srcend = srcptr + rgbpicture.linesize[0] * m_VCodecCtx->height;
+		boost::uint8_t* dstptr = video->m_data;
+		unsigned int srcwidth = m_VCodecCtx->width * 3;
+
+		video->m_size = 0;
+
+		while (srcptr < srcend) {
+			memcpy(dstptr, srcptr, srcwidth);
+			srcptr += src->linesize[0];
+			dstptr += srcwidth;
+			video->m_size += srcwidth;
+		}
+		
+		if (m_VCodecCtx->pix_fmt != PIX_FMT_RGB24) {
+			delete [] rgbpicture.data[0];
+		}
+
+	}
+
+	if (m_isFLV) m_qvideo.push(video);
+	else m_unqueued_data = m_qvideo.push(video) ? NULL : video;
+
+	return true;
 }
 
 bool NetStreamFfmpeg::decodeMediaFrame()
