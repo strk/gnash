@@ -20,8 +20,8 @@
 #define __NETCONNECTION_H__
 
 #include "tu_file.h"
-#include "LoadThread.h"
-#include "FLVParser.h"
+//#include "LoadThread.h"
+//#include "FLVParser.h"
 
 #include <stdexcept>
 #include <cstdio>
@@ -39,6 +39,7 @@
 // Forward declarations
 namespace gnash {
 	//class NetStream;
+	class FLVParser;
 }
 
 namespace gnash {
@@ -164,7 +165,7 @@ private:
 	std::string _completeUrl;
 
 	/// The file/stream loader thread and interface
-	std::auto_ptr<LoadThread> _loader;
+	std::auto_ptr<tu_file> _loader;
 
 	/// Attach ActionScript instance properties
 	void attachProperties();

@@ -33,7 +33,7 @@ using namespace std;
 
 namespace gnash {
 
-FLVParser::FLVParser(LoadThread& lt)
+FLVParser::FLVParser(tu_file& lt)
 	:
 	_lt(lt),
 	_lastParsedPosition(0),
@@ -166,9 +166,9 @@ FLVFrame* FLVParser::nextMediaFrame()
 		frame->dataSize = _audioFrames[_nextAudioFrame]->dataSize;
 		frame->timestamp = _audioFrames[_nextAudioFrame]->timestamp;
 
-		_lt.seek(_audioFrames[_nextAudioFrame]->dataPosition);
+		_lt.set_position(_audioFrames[_nextAudioFrame]->dataPosition); // TODO: check return code...
 		frame->data = new boost::uint8_t[frame->dataSize + PADDING_BYTES];
-		size_t bytesread = _lt.read(frame->data, frame->dataSize);
+		size_t bytesread = _lt.read_bytes(frame->data, frame->dataSize);
 		memset(frame->data + bytesread, 0, PADDING_BYTES);
 
 		frame->tag = 8;
@@ -180,9 +180,9 @@ FLVFrame* FLVParser::nextMediaFrame()
 		frame->dataSize = _videoFrames[_nextVideoFrame]->dataSize;
 		frame->timestamp = _videoFrames[_nextVideoFrame]->timestamp;
 
-		_lt.seek(_videoFrames[_nextVideoFrame]->dataPosition);
+		_lt.set_position(_videoFrames[_nextVideoFrame]->dataPosition); // TODO: check return code
 		frame->data = new boost::uint8_t[frame->dataSize + PADDING_BYTES];
-		size_t bytesread  = _lt.read(frame->data, frame->dataSize);
+		size_t bytesread  = _lt.read_bytes(frame->data, frame->dataSize);
 		memset(frame->data + bytesread, 0, PADDING_BYTES);
 
 		frame->tag = 9;
@@ -213,10 +213,10 @@ FLVFrame* FLVParser::nextAudioFrame()
 	frame->timestamp = _audioFrames[_nextAudioFrame]->timestamp;
 	frame->tag = 8;
 
-	_lt.seek(_audioFrames[_nextAudioFrame]->dataPosition);
+	_lt.set_position(_audioFrames[_nextAudioFrame]->dataPosition); // TODO: check return code
 	frame->data = new boost::uint8_t[_audioFrames[_nextAudioFrame]->dataSize +
 				  PADDING_BYTES];
-	size_t bytesread = _lt.read(frame->data, 
+	size_t bytesread = _lt.read_bytes(frame->data, 
 				_audioFrames[_nextAudioFrame]->dataSize);
 	memset(frame->data + bytesread, 0, PADDING_BYTES);
 
@@ -255,10 +255,10 @@ FLVFrame* FLVParser::nextVideoFrame()
 	frame->timestamp = _videoFrames[_nextVideoFrame]->timestamp;
 	frame->tag = 9;
 
-	_lt.seek(_videoFrames[_nextVideoFrame]->dataPosition);
+	_lt.set_position(_videoFrames[_nextVideoFrame]->dataPosition); // TODO: check return code
 	frame->data = new boost::uint8_t[_videoFrames[_nextVideoFrame]->dataSize + 
 				  PADDING_BYTES];
-	size_t bytesread = _lt.read(frame->data, 
+	size_t bytesread = _lt.read_bytes(frame->data, 
 				_videoFrames[_nextVideoFrame]->dataSize);
 	memset(frame->data + bytesread, 0, PADDING_BYTES);
 
@@ -517,21 +517,25 @@ bool FLVParser::parseNextFrame()
 	if (_lastParsedPosition == 0 && !parseHeader()) return false;
 
 	// Check if there is enough data to parse the header of the frame
-	if (!_lt.isPositionConfirmed(_lastParsedPosition+14)) return false;
+	//if (!_lt.isPositionConfirmed(_lastParsedPosition+14)) return false;
 
 	// Seek to next frame and skip the size of the last tag
-	_lt.seek(_lastParsedPosition+4);
+	if ( _lt.set_position(_lastParsedPosition+4) )
+	{
+		log_error("FLVParser::parseNextFrame: can't seek to %d", _lastParsedPosition+4);
+		return false;
+	}
 
 	// Read the tag info
 	boost::uint8_t tag[12];
-	_lt.read(tag, 12);
+	_lt.read_bytes(tag, 12);
 
 	// Extract length and timestamp
 	boost::uint32_t bodyLength = getUInt24(&tag[1]);
 	boost::uint32_t timestamp = getUInt24(&tag[4]);
 
 	// Check if there is enough data to parse the body of the frame
-	if (!_lt.isPositionConfirmed(_lastParsedPosition+15+bodyLength)) return false;
+	//if (!_lt.isPositionConfirmed(_lastParsedPosition+15+bodyLength)) return false;
 
 	_lastParsedPosition += 15 + bodyLength;
 
@@ -542,7 +546,7 @@ bool FLVParser::parseNextFrame()
 		FLVAudioFrame* frame = new FLVAudioFrame;
 		frame->dataSize = bodyLength - 1;
 		frame->timestamp = timestamp;
-		frame->dataPosition = _lt.tell();
+		frame->dataPosition = _lt.get_position();
 		_audioFrames.push_back(frame);
 
 		// If this is the first audioframe no info about the
@@ -566,7 +570,7 @@ bool FLVParser::parseNextFrame()
 		FLVVideoFrame* frame = new FLVVideoFrame;
 		frame->dataSize = bodyLength - 1;
 		frame->timestamp = timestamp;
-		frame->dataPosition = _lt.tell();
+		frame->dataPosition = _lt.get_position();
 		frame->frameType = (tag[11] & 0xf0) >> 4;
 		_videoFrames.push_back(frame);
 
@@ -580,9 +584,13 @@ bool FLVParser::parseNextFrame()
 
 			// Extract the video size from the videodata header
 			if (codec == VIDEO_CODEC_H263) {
-				_lt.seek(frame->dataPosition);
+				if ( _lt.set_position(frame->dataPosition) )
+				{
+					log_error(" Couldn't seek to VideoTag data position");
+					return false;
+				}
 				boost::uint8_t videohead[12];
-				_lt.read(videohead, 12);
+				_lt.read_bytes(videohead, 12); // TODO: use return code
 
 				bool sizebit1 = (videohead[3] & 0x02);
 				bool sizebit2 = (videohead[3] & 0x01);
@@ -643,11 +651,15 @@ bool FLVParser::parseNextFrame()
 bool FLVParser::parseHeader()
 {
 	// seek to the begining of the file
-	_lt.seek(0);
+	_lt.set_position(0); // seek back ? really ?
 
 	// Read the header
 	boost::uint8_t header[9];
-	_lt.read(header, 9);
+	if ( _lt.read_bytes(header, 9) != 9 )
+	{
+		log_error("FLVParser::parseHeader: couldn't read 9 bytes of header");
+		return false;
+	}
 
 	// Check if this is really a FLV file
 	if (header[0] != 'F' || header[1] != 'L' || header[2] != 'V') return false;

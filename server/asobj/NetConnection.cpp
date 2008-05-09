@@ -36,6 +36,8 @@
 #include "URLAccessManager.h"
 #include "URL.h"
 
+#include "FLVParser.h"
+
 namespace gnash {
 
 static as_value netconnection_new(const fn_call& fn);
@@ -92,23 +94,26 @@ bool NetConnection::openConnection(const std::string& url)
   assert( uriStr.find( "://" ) != std::string::npos );
 
   // Check if we're allowed to open url
+#if 1 // done by getStream I guess...
   if ( ! URLAccessManager::allow( uri ) ) {
     log_security( _("Gnash is not allowed to open this url: %s"), uriStr.c_str() );
     return false;
   }
+#endif
 
-  log_security( _("Connecting to movie: %s"), uriStr.c_str() );
+  log_security( _("Connecting to movie: %s"), uriStr );
 
-  _loader.reset( new LoadThread() );
+  StreamProvider& streamProvider = StreamProvider::getDefaultInstance();
+  _loader.reset( streamProvider.getStream( uri ) );
 
-  if ( ! _loader->setStream( std::auto_ptr<tu_file>(StreamProvider::getDefaultInstance().getStream( uri ) ) ) ) {
-    log_error( _("Gnash could not open this url: %s"), uriStr.c_str() );
+  if ( ! _loader.get() ) {
+    log_error( _("Gnash could not open this url: %s"), uriStr );
     _loader.reset();
 
     return false;
   }
 
-  log_debug( _("Connection established to movie: %s"), uriStr.c_str() );
+  log_debug( _("Connection established to movie: %s"), uriStr );
 
   return true;
 }
@@ -119,7 +124,7 @@ bool
 NetConnection::eof()
 {
 	if (!_loader.get()) return true; // @@ correct ?
-	return _loader->eof();
+	return _loader->get_eof();
 }
 
 
@@ -172,7 +177,7 @@ NetConnection::read( void *dst, size_t bytes )
     return 0;
   }
 
-  return _loader->read( dst, bytes );
+  return _loader->read_bytes( dst, bytes );
 }
 
 
@@ -184,7 +189,7 @@ NetConnection::seek( size_t pos )
     return false;
   }
 
-  return _loader->seek( pos );
+  return ! _loader->set_position( pos );
 }
 
 
@@ -193,7 +198,7 @@ size_t
 NetConnection::tell()
 {
 	if (!_loader.get()) return 0; // @@ correct ?
-	return _loader->tell();
+	return _loader->get_position();
 }
 
 
@@ -202,7 +207,7 @@ long
 NetConnection::getBytesLoaded()
 {
 	if (!_loader.get()) return 0; // @@ correct ?
-	return _loader->getBytesLoaded();
+	return _loader->get_position(); // getBytesLoaded();
 }
 
 
@@ -211,7 +216,7 @@ long
 NetConnection::getBytesTotal()
 {
 	if (!_loader.get()) return 0; // @@ correct ?
-	return _loader->getBytesTotal();
+	return _loader->get_size(); // getBytesTotal();
 }
 
 
@@ -223,7 +228,8 @@ NetConnection::loadCompleted()
     return false;
   }
 
-  return _loader->completed();
+  // is the below correct ?
+  return _loader->get_eof(); // completed();
 }
 
 

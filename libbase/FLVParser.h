@@ -130,8 +130,6 @@ public:
 ///
 /// Input is received from a LoadThread object.
 ///
-/// TODO: have the LoadThread passed at construction time
-///
 class DSOEXPORT FLVParser
 {
 
@@ -179,7 +177,7 @@ public:
 	/// 	LoadThread to use for input.
 	/// 	Ownership left to the caller.
 	///
-	FLVParser(LoadThread& lt);
+	FLVParser(tu_file& lt);
 
 	/// Kills the parser...
 	~FLVParser();
@@ -307,7 +305,7 @@ private:
 	inline boost::uint32_t getUInt24(boost::uint8_t* in);
 
 	/// The interface to the file, externally owned
-	LoadThread& _lt;
+	tu_file& _lt;
 
 	typedef std::vector<FLVVideoFrame*> VideoFrames;
 
