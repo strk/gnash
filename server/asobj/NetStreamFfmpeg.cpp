@@ -77,7 +77,9 @@ NetStreamFfmpeg::NetStreamFfmpeg():
 	m_last_audio_timestamp(0),
 	m_current_timestamp(0),
 	m_unqueued_data(NULL),
-	m_time_of_pause(0)
+	m_time_of_pause(0),
+
+	_decoderBuffer(0)
 {
 
 	ByteIOCxt.buffer = NULL;
@@ -85,6 +87,7 @@ NetStreamFfmpeg::NetStreamFfmpeg():
 
 NetStreamFfmpeg::~NetStreamFfmpeg()
 {
+	if ( _decoderBuffer ) delete [] _decoderBuffer;
 	close();
 }
 
@@ -815,11 +818,15 @@ bool NetStreamFfmpeg::decodeAudio( AVPacket* packet )
 	if (!m_ACodecCtx) return false;
 
 	int frame_size;
-	unsigned int bufsize = (AVCODEC_MAX_AUDIO_FRAME_SIZE * 3) / 2;
+	//static const unsigned int bufsize = (AVCODEC_MAX_AUDIO_FRAME_SIZE * 3) / 2;
+	static const unsigned int bufsize = AVCODEC_MAX_AUDIO_FRAME_SIZE;
 
-	boost::uint8_t* ptr = new boost::uint8_t[bufsize];
+	if ( ! _decoderBuffer ) _decoderBuffer = new boost::uint8_t[bufsize];
+
+	boost::uint8_t* ptr = _decoderBuffer;
+
 #ifdef FFMPEG_AUDIO2
-	frame_size = bufsize;
+	frame_size = bufsize; // TODO: is it safe not initializing this ifndef FFMPEG_AUDIO2 ?
 	if (avcodec_decode_audio2(m_ACodecCtx, (boost::int16_t*) ptr, &frame_size, packet->data, packet->size) >= 0)
 #else
 	if (avcodec_decode_audio(m_ACodecCtx, (boost::int16_t*) ptr, &frame_size, packet->data, packet->size) >= 0)
@@ -833,20 +840,57 @@ bool NetStreamFfmpeg::decodeAudio( AVPacket* packet )
 		{
 			// Resampling is needed.
 			
-			boost::uint8_t* output = new boost::uint8_t[bufsize];
+			// Compute new size based on frame_size and
+			// resampling configuration
+			double resampleFactor = (44100.0/m_ACodecCtx->sample_rate) * (2.0/m_ACodecCtx->channels);
+			int resampledFrameSize = int(ceil(frame_size*resampleFactor));
+
+			// Allocate just the required amount of bytes
+			boost::uint8_t* output = new boost::uint8_t[resampledFrameSize];
 			
 			samples = _resampler.resample(reinterpret_cast<boost::int16_t*>(ptr), 
 							 reinterpret_cast<boost::int16_t*>(output), 
 							 samples);
-			delete [] ptr;
+
+			if (resampledFrameSize < samples*2*2)
+			{
+				log_error(" --- Computation of resampled frame size (%d) < then the one based on samples (%d)",
+					resampledFrameSize, samples*2*2);
+
+				log_debug(" input frame size: %d", frame_size);
+				log_debug(" input sample rate: %d", m_ACodecCtx->sample_rate);
+				log_debug(" input channels: %d", m_ACodecCtx->channels);
+				log_debug(" input samples: %d", samples);
+
+				log_debug(" output sample rate (assuming): %d", 44100);
+				log_debug(" output channels (assuming): %d", 2);
+				log_debug(" output samples: %d", samples);
+
+				abort(); // the call to resample() likely corrupted memory...
+			}
+
+			frame_size = samples*2*2;
+
+			// ownership of memory pointed-to by 'ptr' will be
+			// transferred below
 			ptr = reinterpret_cast<boost::uint8_t*>(output);
+
+			// we'll reuse _decoderBuffer 
+		}
+		else
+		{
+			// ownership of memory pointed-to by 'ptr' will be
+			// transferred below, so we reset _decoderBuffer here.
+			// Doing so, next time we'll need to decode we'll create
+			// a new buffer
+			_decoderBuffer=0;
 		}
 		
     		media::raw_mediadata_t* raw = new media::raw_mediadata_t();
 		
-		raw->m_data = ptr;
+		raw->m_data = ptr; // ownership of memory pointed by 'ptr' transferred here
 		raw->m_ptr = raw->m_data;
-		raw->m_size = samples * 2 * 2; // 2 for stereo and 2 for samplesize = 2 bytes
+		raw->m_size = frame_size;
 		raw->m_stream_index = m_audio_index;
 
 		// set presentation timestamp
