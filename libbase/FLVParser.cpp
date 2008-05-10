@@ -23,15 +23,75 @@
 #include "FLVParser.h"
 #include "amf.h"
 #include "log.h"
+#include "utility.h"
 
 using namespace std;
 
 #define PADDING_BYTES 64
+#define READ_CHUNKS 64
 
 // Define the following macro the have seek() operations printed
 //#define GNASH_DEBUG_SEEK 1
 
 namespace gnash {
+
+static std::auto_ptr<FLVFrame>
+makeVideoFrame(tu_file& in, const FLVVideoFrame& frameInfo)
+{
+	std::auto_ptr<FLVFrame> frame ( new FLVFrame );
+
+	frame->dataSize = frameInfo.dataSize;
+	frame->timestamp = frameInfo.timestamp;
+	frame->tag = 9;
+
+	if ( in.set_position(frameInfo.dataPosition) )
+	{
+		log_error(_("Failed seeking to videoframe in FLV input"));
+		frame.reset();
+		return frame;
+	}
+
+	unsigned long int dataSize = frameInfo.dataSize;
+	unsigned long int chunkSize = smallestMultipleContaining(READ_CHUNKS, dataSize+PADDING_BYTES);
+
+	frame->data = new boost::uint8_t[chunkSize];
+	size_t bytesread = in.read_bytes(frame->data, dataSize);
+
+	unsigned long int padding = chunkSize-dataSize;
+	assert(padding);
+	memset(frame->data + bytesread, 0, padding);
+
+	return frame;
+}
+
+static std::auto_ptr<FLVFrame>
+makeAudioFrame(tu_file& in, const FLVAudioFrame& frameInfo)
+{
+	std::auto_ptr<FLVFrame> frame ( new FLVFrame );
+	frame->dataSize = frameInfo.dataSize; 
+	frame->timestamp = frameInfo.timestamp;
+
+	if ( in.set_position(frameInfo.dataPosition) )
+	{
+		log_error(_("Failed seeking to audioframe in FLV input"));
+		frame.reset();
+		return frame;
+	}
+
+	unsigned long int dataSize = frameInfo.dataSize;
+	unsigned long int chunkSize = smallestMultipleContaining(READ_CHUNKS, dataSize+PADDING_BYTES);
+
+	frame->data = new boost::uint8_t[chunkSize];
+	size_t bytesread = in.read_bytes(frame->data, dataSize);
+
+	unsigned long int padding = chunkSize-dataSize;
+	assert(padding);
+	memset(frame->data + bytesread, 0, padding);
+
+	frame->tag = 8;
+
+	return frame;
+}
 
 FLVParser::FLVParser(tu_file& lt)
 	:
@@ -162,32 +222,30 @@ FLVFrame* FLVParser::nextMediaFrame()
 
 	if (useAudio) {
 
-		FLVFrame* frame = new FLVFrame;
-		frame->dataSize = _audioFrames[_nextAudioFrame]->dataSize;
-		frame->timestamp = _audioFrames[_nextAudioFrame]->timestamp;
+		FLVAudioFrame* frameInfo = _audioFrames[_nextAudioFrame];
 
-		_lt.set_position(_audioFrames[_nextAudioFrame]->dataPosition); // TODO: check return code...
-		frame->data = new boost::uint8_t[frame->dataSize + PADDING_BYTES];
-		size_t bytesread = _lt.read_bytes(frame->data, frame->dataSize);
-		memset(frame->data + bytesread, 0, PADDING_BYTES);
+		std::auto_ptr<FLVFrame> frame = makeAudioFrame(_lt, *frameInfo);
+		if ( ! frame.get() )
+		{
+			log_error("Could not make audio frame %d", _nextAudioFrame);
+			return 0;
+		}
 
-		frame->tag = 8;
 		_nextAudioFrame++;
-		return frame;
+		return frame.release(); // TODO: return by auto_ptr
 
 	} else {
-		FLVFrame* frame = new FLVFrame;
-		frame->dataSize = _videoFrames[_nextVideoFrame]->dataSize;
-		frame->timestamp = _videoFrames[_nextVideoFrame]->timestamp;
 
-		_lt.set_position(_videoFrames[_nextVideoFrame]->dataPosition); // TODO: check return code
-		frame->data = new boost::uint8_t[frame->dataSize + PADDING_BYTES];
-		size_t bytesread  = _lt.read_bytes(frame->data, frame->dataSize);
-		memset(frame->data + bytesread, 0, PADDING_BYTES);
+		FLVVideoFrame* frameInfo = _videoFrames[_nextVideoFrame];
+		std::auto_ptr<FLVFrame> frame = makeVideoFrame(_lt, *frameInfo);
+		if ( ! frame.get() )
+		{
+			log_error("Could not make video frame %d", _nextVideoFrame);
+			return 0;
+		}
 
-		frame->tag = 9;
 		_nextVideoFrame++;
-		return frame;
+		return frame.release(); // TODO: return by auto_ptr
 	}
 
 
@@ -208,20 +266,16 @@ FLVFrame* FLVParser::nextAudioFrame()
 	// If the needed frame can't be parsed (EOF reached) return NULL
 	if (_audioFrames.size() <= _nextAudioFrame || _audioFrames.size() == 0) return NULL;
 
-	FLVFrame* frame = new FLVFrame;
-	frame->dataSize = _audioFrames[_nextAudioFrame]->dataSize;
-	frame->timestamp = _audioFrames[_nextAudioFrame]->timestamp;
-	frame->tag = 8;
-
-	_lt.set_position(_audioFrames[_nextAudioFrame]->dataPosition); // TODO: check return code
-	frame->data = new boost::uint8_t[_audioFrames[_nextAudioFrame]->dataSize +
-				  PADDING_BYTES];
-	size_t bytesread = _lt.read_bytes(frame->data, 
-				_audioFrames[_nextAudioFrame]->dataSize);
-	memset(frame->data + bytesread, 0, PADDING_BYTES);
+	FLVAudioFrame* frameInfo = _audioFrames[_nextAudioFrame];
+	std::auto_ptr<FLVFrame> frame = makeAudioFrame(_lt, *frameInfo);
+	if ( ! frame.get() )
+	{
+		log_error("Could not make audio frame %d", _nextAudioFrame);
+		return 0;
+	}
 
 	_nextAudioFrame++;
-	return frame;
+	return frame.release(); // TODO: return by auto_ptr
 
 }
 
@@ -249,21 +303,17 @@ FLVFrame* FLVParser::nextVideoFrame()
 		return NULL;
 	}
 
-
-	FLVFrame* frame = new FLVFrame;
-	frame->dataSize = _videoFrames[_nextVideoFrame]->dataSize;
-	frame->timestamp = _videoFrames[_nextVideoFrame]->timestamp;
-	frame->tag = 9;
-
-	_lt.set_position(_videoFrames[_nextVideoFrame]->dataPosition); // TODO: check return code
-	frame->data = new boost::uint8_t[_videoFrames[_nextVideoFrame]->dataSize + 
-				  PADDING_BYTES];
-	size_t bytesread = _lt.read_bytes(frame->data, 
-				_videoFrames[_nextVideoFrame]->dataSize);
-	memset(frame->data + bytesread, 0, PADDING_BYTES);
+	// TODO: let a function do this
+	FLVVideoFrame* frameInfo = _videoFrames[_nextVideoFrame];
+	std::auto_ptr<FLVFrame> frame = makeVideoFrame(_lt, *frameInfo);
+	if ( ! frame.get() )
+	{
+		log_error("Could not make video frame %d", _nextVideoFrame);
+		return 0;
+	}
 
 	_nextVideoFrame++;
-	return frame;
+	return frame.release(); // TODO: return by auto_ptr
 }
 
 
@@ -528,7 +578,12 @@ bool FLVParser::parseNextFrame()
 
 	// Read the tag info
 	boost::uint8_t tag[12];
-	_lt.read_bytes(tag, 12);
+	int actuallyRead = _lt.read_bytes(tag, 12);
+	if ( actuallyRead < 12 )
+	{
+		log_error("FLVParser::parseNextFrame: can't read tag info (needed 12 bytes, only got %d)", actuallyRead);
+		return false;
+	}
 
 	// Extract length and timestamp
 	boost::uint32_t bodyLength = getUInt24(&tag[1]);
@@ -590,7 +645,12 @@ bool FLVParser::parseNextFrame()
 					return false;
 				}
 				boost::uint8_t videohead[12];
-				_lt.read_bytes(videohead, 12); // TODO: use return code
+				int actuallyRead = _lt.read_bytes(videohead, 12);
+				if ( actuallyRead < 12 )
+				{
+		log_error("FLVParser::parseNextFrame: can't read H263 video header (needed 12 bytes, only got %d)", actuallyRead);
+		return false;
+				}
 
 				bool sizebit1 = (videohead[3] & 0x02);
 				bool sizebit2 = (videohead[3] & 0x01);
@@ -633,6 +693,7 @@ bool FLVParser::parseNextFrame()
 		}
 
 	} else if (tag[0] == META_TAG) {
+		LOG_ONCE( log_unimpl("FLV MetaTag parser") );
 		// Extract information from the meta tag
 		/*_lt.seek(_lastParsedPosition+16);
 		char* metaTag = new char[bodyLength];
@@ -691,3 +752,4 @@ inline boost::uint32_t FLVParser::getUInt24(boost::uint8_t* in)
 } // end of gnash namespace
 
 #undef PADDING_BYTES
+#undef READ_CHUNKS 

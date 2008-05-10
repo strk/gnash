@@ -91,14 +91,21 @@ public:
 };
 
 
+/// Information about an FLV Audio Frame
 class FLVVideoFrame
 {
 public:
+
+	/// Type of this frame (should likely be videoFrameType)
 	boost::uint16_t frameType;
+
+	/// Size of the frame in bytes
 	boost::uint32_t dataSize;
+
+	/// Start of frame data in stream
 	boost::uint64_t dataPosition;
 
-	/// in milliseconds 
+	/// Timestamp in milliseconds 
 	boost::uint32_t timestamp;
 
 	/// Return true if this video frame is a key frame
@@ -109,13 +116,17 @@ public:
 
 };
 
+/// Information about an FLV Audio Frame
 class FLVAudioFrame
 {
 public:
+	/// Size of the frame in bytes
 	boost::uint32_t dataSize;
+
+	/// Start of frame data in stream
 	boost::uint64_t dataPosition;
 
-	/// in milliseconds 
+	/// Timestamp in milliseconds 
 	boost::uint32_t timestamp;
 
 };
@@ -307,11 +318,17 @@ private:
 	/// The interface to the file, externally owned
 	tu_file& _lt;
 
+	// NOTE: FLVVideoFrame is a relatively small structure,
+	//       chances are keeping by value here would reduce
+	//       memory fragmentation with no big cost
 	typedef std::vector<FLVVideoFrame*> VideoFrames;
 
 	/// list of videoframes, does no contain the frame data.
 	VideoFrames _videoFrames;
 
+	// NOTE: FLVAudioFrame is a relatively small structure,
+	//       chances are keeping by value here would reduce
+	//       memory fragmentation with no big cost
 	typedef std::vector<FLVAudioFrame*> AudioFrames;
 
 	/// list of audioframes, does no contain the frame data.

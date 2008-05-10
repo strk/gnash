@@ -132,6 +132,18 @@ inline int	frnd(float f) { return (int)(f + 0.5f); }	// replace with inline asm 
 inline double trunc(double x) { return (x < 0 ?  -(std::floor(-x)) : std::floor(x)); }
 #endif
 
+
+/// \brief
+/// Return the smallest multiple of given base greater or equal
+/// given limit
+inline unsigned int
+smallestMultipleContaining(unsigned int base, unsigned int x)
+{
+        int f=x/base;
+        if ( x%base ) f++;
+        return base*f;
+}
+
 // Handy macro to quiet compiler warnings about unused parameters/variables.
 #define UNUSED(x) (x) = (x)
 

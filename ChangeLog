@@ -1,3 +1,16 @@
+2008-05-10 Sandro Santilli <strk@keybit.net>
+
+	* libbase/utility.h: add smallestMultipleContaining
+	  utility function.
+	* libbase/FLVParser.{cpp,h}: always allocate a multiple
+	  of 64 (READ_CHUNK) greater or equal the actual frame
+	  size augmented by 64 bytes (PADDING_BYTES): the multiple
+	  thing was suggested by bjacques, the PADDING_BYTES I found
+	  by myself (for h264 parser in ffmpeg...). Always check
+	  return from tu_file::read_bytes to catch premature end
+	  of input. Merge duplicated code into makeAudioFrame and
+	  makeVideoFrame static functions.
+
 2008-05-09 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* gui/gnash.cpp: add comments for options handled elsewhere. What is
