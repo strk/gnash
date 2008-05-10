@@ -1,5 +1,10 @@
 2008-05-10 Sandro Santilli <strk@keybit.net>
 
+	* libbase/FLVParser.cpp (parseNextTag): don't log_error 
+	  if we just reached EOF outside any tag...
+
+2008-05-10 Sandro Santilli <strk@keybit.net>
+
 	* libbase/FLVParser.{cpp,h}: rename parseNextFrame to
 	  parseNextTag, as that's really what the function does;
 	  fix parsing of audio/video flag, add parsing of FLV version.

@@ -581,7 +581,9 @@ bool FLVParser::parseNextTag()
 	int actuallyRead = _lt.read_bytes(tag, 12);
 	if ( actuallyRead < 12 )
 	{
-		log_error("FLVParser::parseNextTag: can't read tag info (needed 12 bytes, only got %d)", actuallyRead);
+		if ( actuallyRead )
+			log_error("FLVParser::parseNextTag: can't read tag info (needed 12 bytes, only got %d)", actuallyRead);
+		// else { assert(_lt.get_eof(); } ?
 		_parsingComplete=true;
 		return false;
 	}
