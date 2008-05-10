@@ -247,9 +247,13 @@ main(int argc, char** argv)
 		"		' currentFps:'+stream.currentFps+' time:'+stream.time);"
 		"	var ascii = Key.getAscii();"
 		"	trace('Key down: '+ascii);"
-		"	if ( ascii == 32 ) {" // ' ' - start/stop playback 
+		"	if ( ascii == 32 ) {" // ' ' - pause(toggle)
 		"		stream.paused = !stream.paused;"
-		"		stream.pause(stream.paused);"
+		"		stream.pause();" // stream.paused);"
+		"	}"
+		"	else if ( ascii == 112 ) {" // 'p' - play()
+		"		stream.play();"
+		"               _root.note(\"2. Verify video hasn't started, then press space to continue.\");"
 		"	}"
 		"};"
 		"Key.addListener(_root);"
@@ -431,7 +435,7 @@ main(int argc, char** argv)
 		" delete info.duration;"
 		" check(!info.hasOwnProperty('duration'), 'metadata duration can be deleted');"
 
-		" _root.note('- Press space to continue, or any key to just see info about playhed -');"
+		" _root.note('1. Press \"p\" key');"
 
 		"};"
 		));
