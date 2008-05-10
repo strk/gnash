@@ -1,5 +1,5 @@
 /* 
- *   Copyright (C) 2007 Free Software Foundation, Inc.
+ *   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -96,6 +96,11 @@ main(int argc, char** argv)
   	sprintf(buffer_b,
   	// bytesTotal (read-only)
 	"stream.play('%s');"
+	"stream.pause(true);" 
+	"stream.paused=true;"
+	"_root.metadataNotified=0;"
+	"_root.startNotified=0;"
+	"_root.stopNotified=0;"
 	"stop();",
 	filename);
 
@@ -236,6 +241,19 @@ main(int argc, char** argv)
 
   SWFMovie_add(mo, (SWFBlock)newSWFAction(
 
+		"_root.onKeyDown = function() {"
+		" 	_root.note(' bufferLength:'+stream.bufferLength+"
+		" 		' bytesLoaded:'+stream.bytesLoaded+"
+		"		' currentFps:'+stream.currentFps+' time:'+stream.time);"
+		"	var ascii = Key.getAscii();"
+		"	trace('Key down: '+ascii);"
+		"	if ( ascii == 32 ) {" // ' ' - start/stop playback 
+		"		stream.paused = !stream.paused;"
+		"		stream.pause(stream.paused);"
+		"	}"
+		"};"
+		"Key.addListener(_root);"
+
 		"stream.onStatus = function(info) {"
 
 		"  if ( ! _root.enumerableStatusInfoChecked ) {"
@@ -265,17 +283,26 @@ main(int argc, char** argv)
 
 		// Print some info
 		" _root.note('onStatus('+info.code+') called'); "
-		" _root.note(' bufferLength:'+stream.bufferLength+"
-		" 	' bytesLoaded:'+stream.bytesLoaded+"
-		"	' currentFps:'+stream.currentFps+' time:'+stream.time);"
 
-		" if ( info.code == 'NetStream.Play.Stop' )"
+		" if ( info.code == 'NetStream.Play.Start' )"
 		" {"
-		" 	_root.check(this instanceOf NetStream); "
-		" 	_root.check_equals(this.bufferTime, 2); "
-		" 	_root.check_equals(this.bytesTotal, 21482); "
-		"	this.stopNotified = true;"
-		"	_root.nextFrame();"
+		"	check(!_root.startNotified, 'No duplicated Play.Start notification');"
+		"	_root.startNotified++;"
+		" }"
+
+		" else if ( info.code == 'NetStream.Play.Stop' )"
+		" {"
+		" 	if ( ! _root.stopNotified )"
+		" 	{"
+		" 		_root.stopNotified++;"
+		" 		stream.seek(0);"
+		" 	} else {"
+		"		_root.stopNotified++;"
+		" 		_root.check(this instanceOf NetStream); "
+		" 		_root.check_equals(this.bufferTime, 2); "
+		" 		_root.check_equals(this.bytesTotal, 21482); "
+		"		_root.nextFrame();"
+		"	}"
 		" }"
 #if 0
 		" else if ( info.code == 'NetStream.Buffer.Empty' && this.stopNotified ) "
@@ -302,8 +329,15 @@ main(int argc, char** argv)
 		" }"
 		" _root.note('onMetaData: '+s);"
 
+		// don't run other tests if already done
+		// BTW: should be called once, gnash (gst) calls this twice
+		//      and would succeed in composition checking in second call.
+		" if ( _root.metadataNotified ) return;"
+
+		" _root.metadataNotified++;"
+		" xcheck(_root.startNotified, 'onMetaData should be notified after Play.Start');"
 		" check_equals(arguments.length, 1, 'single argument');"
-		" check(info instanceof Object);"
+		" check(info instanceof Object, 'onMetaData argument should be instanceof Object');"
 
 		// Test enumeration
 		" var enu = new Array;"
@@ -397,12 +431,17 @@ main(int argc, char** argv)
 		" delete info.duration;"
 		" check(!info.hasOwnProperty('duration'), 'metadata duration can be deleted');"
 
+		" _root.note('- Press space to continue, or any key to just see info about playhed -');"
+
 		"};"
 		));
 
   SWFMovie_nextFrame(mo);
 
-  SWFMovie_add(mo, (SWFBlock)newSWFAction("totals(112); stop();"));
+  check_equals(mo, "metadataNotified", "1");
+  check_equals(mo, "stopNotified", "2");
+  check_equals(mo, "startNotified", "1");
+  SWFMovie_add(mo, (SWFBlock)newSWFAction("totals(117); stop();"));
 
   SWFMovie_nextFrame(mo);
 

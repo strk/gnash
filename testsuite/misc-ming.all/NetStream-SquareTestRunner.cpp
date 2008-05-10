@@ -21,6 +21,8 @@
 #define INPUT_FILENAME "NetStream-SquareTest.swf"
 
 #include "MovieTester.h"
+#include "VM.h"
+#include "string_table.h"
 #include "sprite_instance.h"
 #include "character.h"
 #include "dlist.h"
@@ -62,7 +64,10 @@ main(int /*argc*/, char** /*argv*/)
 	// When all possible tests are implemented as self-contained, we'll
 	// add tests that can't be self-contained.
 	//
-	while (root->get_current_frame() < 2)
+	string_table& st = VM::get().getStringTable();
+	string_table::key k = st.find("startNotified");
+	as_value tmp;
+	while (! root->get_member(k, &tmp) )
 	{
 		tester.advance();
 
@@ -71,6 +76,18 @@ main(int /*argc*/, char** /*argv*/)
 		sleep(1);
 	}
 
+	cout << "Pressing space" << endl;
+	tester.pressKey(key::SPACE);
+	tester.releaseKey(key::SPACE);
+
+        while (root->get_current_frame() < 2)
+	{
+		tester.advance();
+
+		// sleep to give the NetStream a chance to load data and trigger notifications
+		// needs more analisys to find a good way for doing this..
+		sleep(1);
+	}
 
 }
 

@@ -1,5 +1,11 @@
 2008-05-10 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/: NetStream-SquareTest.c,
+	  NetStream-SquareTestRunner.cpp: add test for pause/play
+	  using user-interaction + some events-related tests.
+
+2008-05-10 Sandro Santilli <strk@keybit.net>
+
 	* libbase/utility.h: add smallestMultipleContaining
 	  utility function.
 	* libbase/FLVParser.{cpp,h}: always allocate a multiple
