@@ -1,5 +1,11 @@
 2008-05-10 Sandro Santilli <strk@keybit.net>
 
+	* libbase/FLVParser.{cpp,h}: rename parseNextFrame to
+	  parseNextTag, as that's really what the function does;
+	  fix parsing of audio/video flag, add parsing of FLV version.
+
+2008-05-10 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/: NetStream-SquareTest.c,
 	  NetStream-SquareTestRunner.cpp: add test for pause/play
 	  using user-interaction + some events-related tests.

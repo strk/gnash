@@ -139,7 +139,7 @@ boost::uint16_t FLVParser::videoFrameRate()
 
 	// Make sure that there are parsed some frames
 	while(_videoFrames.size() < 2 && !_parsingComplete) {
-		parseNextFrame();
+		parseNextTag();
 	}
 
 	if (_videoFrames.size() < 2) return 0;
@@ -159,7 +159,7 @@ boost::uint32_t FLVParser::videoFrameDelay()
 
 	// Make sure that there are parsed some frames
 	while(_videoFrames.size() < 2 && !_parsingComplete) {
-		parseNextFrame();
+		parseNextTag();
 	}
 
 	// If there is no video data return 0
@@ -177,7 +177,7 @@ boost::uint32_t FLVParser::audioFrameDelay()
 
 	// Make sure that there are parsed some frames
 	while(_audioFrames.size() < 2 && !_parsingComplete) {
-		parseNextFrame();
+		parseNextTag();
 	}
 
 	// If there is no video data return 0
@@ -198,7 +198,7 @@ FLVFrame* FLVParser::nextMediaFrame()
 
 		// Parse a media frame if any left or if needed
 		while(_videoFrames.size() <= _nextVideoFrame && _audioFrames.size() <= _nextAudioFrame && !_parsingComplete) {
-			if (!parseNextFrame()) break;
+			if (!parseNextTag()) break;
 		}
 	}
 
@@ -260,7 +260,7 @@ FLVFrame* FLVParser::nextAudioFrame()
 
 	// Make sure that there are parsed enough frames to return the need frame
 	while(_audioFrames.size() <= _nextAudioFrame && !_parsingComplete) {
-		if (!parseNextFrame()) break;
+		if (!parseNextTag()) break;
 	}
 
 	// If the needed frame can't be parsed (EOF reached) return NULL
@@ -293,7 +293,7 @@ FLVFrame* FLVParser::nextVideoFrame()
 	// Make sure that there are parsed enough frames to return the need frame
 	while(_videoFrames.size() <= static_cast<boost::uint32_t>(_nextVideoFrame) && !_parsingComplete)
 	{
-		if (!parseNextFrame()) break;
+		if (!parseNextTag()) break;
 	}
 
 	// If the needed frame can't be parsed (EOF reached) return NULL
@@ -322,7 +322,7 @@ boost::uint32_t FLVParser::seekAudio(boost::uint32_t time)
 
 	// Make sure that there are parsed some frames
 	while(_audioFrames.size() < 1 && !_parsingComplete) {
-		parseNextFrame();
+		parseNextTag();
 	}
 
 	// If there is no audio data return NULL
@@ -331,7 +331,7 @@ boost::uint32_t FLVParser::seekAudio(boost::uint32_t time)
 	// Make sure that there are parsed some enough frames
 	// to get the right frame.
 	while(_audioFrames.back()->timestamp < time && !_parsingComplete) {
-		parseNextFrame();
+		parseNextTag();
 	}
 
 	// If there are no audio greater than the given time
@@ -375,7 +375,7 @@ boost::uint32_t FLVParser::seekVideo(boost::uint32_t time)
 {
 	// Make sure that there are parsed some frames
 	while(_videoFrames.size() < 1 && !_parsingComplete) {
-		parseNextFrame();
+		parseNextTag();
 	}
 
 	// If there is no video data return NULL
@@ -384,7 +384,7 @@ boost::uint32_t FLVParser::seekVideo(boost::uint32_t time)
 	// Make sure that there are parsed some enough frames
 	// to get the right frame.
 	while(_videoFrames.back()->timestamp < time && !_parsingComplete) {
-		parseNextFrame();
+		parseNextTag();
 	}
 
 	// If there are no videoframe greater than the given time
@@ -490,7 +490,7 @@ FLVVideoInfo* FLVParser::getVideoInfo()
 
 	// Make sure that there are parsed some video frames
 	while(_videoInfo == NULL && !_parsingComplete) {
-		parseNextFrame();
+		parseNextTag();
 	}
 
 	// If there are no video data return NULL
@@ -511,7 +511,7 @@ FLVAudioInfo* FLVParser::getAudioInfo()
 
 	// Make sure that there are parsed some audio frames
 	while(_audioInfo == NULL && !_parsingComplete) {
-		parseNextFrame();
+		parseNextTag();
 	}
 
 	// If there are no audio data return NULL
@@ -528,7 +528,7 @@ bool FLVParser::isTimeLoaded(boost::uint32_t time)
 
 	// Parse frames until the need time is found, or EOF
 	while (!_parsingComplete) {
-		if (!parseNextFrame()) break;
+		if (!parseNextTag()) break;
 		if ((_videoFrames.size() > 0 && _videoFrames.back()->timestamp >= time)
 			|| (_audioFrames.size() > 0 && _audioFrames.back()->timestamp >= time)) {
 			return true;
@@ -561,18 +561,18 @@ boost::uint32_t FLVParser::seek(boost::uint32_t time)
 	return time;
 }
 
-bool FLVParser::parseNextFrame()
+bool FLVParser::parseNextTag()
 {
+	if ( _parsingComplete ) return false;
+
 	// Parse the header if not done already. If unsuccesfull return false.
 	if (_lastParsedPosition == 0 && !parseHeader()) return false;
-
-	// Check if there is enough data to parse the header of the frame
-	//if (!_lt.isPositionConfirmed(_lastParsedPosition+14)) return false;
 
 	// Seek to next frame and skip the size of the last tag
 	if ( _lt.set_position(_lastParsedPosition+4) )
 	{
-		log_error("FLVParser::parseNextFrame: can't seek to %d", _lastParsedPosition+4);
+		log_error("FLVParser::parseNextTag: can't seek to %d", _lastParsedPosition+4);
+		_parsingComplete=true;
 		return false;
 	}
 
@@ -581,16 +581,14 @@ bool FLVParser::parseNextFrame()
 	int actuallyRead = _lt.read_bytes(tag, 12);
 	if ( actuallyRead < 12 )
 	{
-		log_error("FLVParser::parseNextFrame: can't read tag info (needed 12 bytes, only got %d)", actuallyRead);
+		log_error("FLVParser::parseNextTag: can't read tag info (needed 12 bytes, only got %d)", actuallyRead);
+		_parsingComplete=true;
 		return false;
 	}
 
 	// Extract length and timestamp
 	boost::uint32_t bodyLength = getUInt24(&tag[1]);
 	boost::uint32_t timestamp = getUInt24(&tag[4]);
-
-	// Check if there is enough data to parse the body of the frame
-	//if (!_lt.isPositionConfirmed(_lastParsedPosition+15+bodyLength)) return false;
 
 	_lastParsedPosition += 15 + bodyLength;
 
@@ -642,13 +640,15 @@ bool FLVParser::parseNextFrame()
 				if ( _lt.set_position(frame->dataPosition) )
 				{
 					log_error(" Couldn't seek to VideoTag data position");
+					_parsingComplete=true;
 					return false;
 				}
 				boost::uint8_t videohead[12];
 				int actuallyRead = _lt.read_bytes(videohead, 12);
 				if ( actuallyRead < 12 )
 				{
-		log_error("FLVParser::parseNextFrame: can't read H263 video header (needed 12 bytes, only got %d)", actuallyRead);
+		log_error("FLVParser::parseNextTag: can't read H263 video header (needed 12 bytes, only got %d)", actuallyRead);
+		_parsingComplete=true;
 		return false;
 				}
 
@@ -702,8 +702,9 @@ bool FLVParser::parseNextFrame()
 		amfParser->parseAMF(metaTag);*/
 
 	} else {
-		_parsingComplete = true;
-		return false;
+		log_error("Unknown FLV tag type %d", tag[0]);
+		//_parsingComplete = true;
+		//return false;
 	}
 
 	return true;
@@ -725,19 +726,13 @@ bool FLVParser::parseHeader()
 	// Check if this is really a FLV file
 	if (header[0] != 'F' || header[1] != 'L' || header[2] != 'V') return false;
 
+	int version = header[3];
+
 	// Parse the audio+video bitmask
-	if (header[4] == 5) {
-		_audio = true;
-		_video = true;
-	} else if (header[4] == 4) {
-		_audio = true;
-		_video = false;
-	} else if (header[4] == 4) {
-		_audio = false;
-		_video = true;
-	} else {
-		gnash::log_debug("Weird FLV bit mask\n");
-	}
+	_audio = header[4]&(1<<2);
+	_video = header[4]&(1<<0);
+
+	log_debug("Parsing FLV version %d, audio:%d, video:%d", version, _audio, _video);
 
 	_lastParsedPosition = 9;
 	return true;

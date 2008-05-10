@@ -305,9 +305,12 @@ private:
 	boost::uint32_t seekVideo(boost::uint32_t time);
 
 
-	/// Parses next frame from the file, returns true is a frame
-	/// was succesfully parsed, or false if not enough data was present.
-	bool parseNextFrame();
+	/// Parses next tag from the file
+	//
+	/// Returns true if something was parsed, false otherwise.
+	/// Sets _parsingComplete=true on end of file.
+	///
+	bool parseNextTag();
 
 	/// Parses the header of the file
 	bool parseHeader();
