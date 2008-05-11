@@ -1,5 +1,11 @@
 2008-05-11 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/NetStream-SquareTest.c: add a second
+	  video character, will be attached a second NetStream using
+	  the same NetConnection as the first.
+
+2008-05-11 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/NetStream-SquareTest.c: test that
 	  NetConnection.isConnected returns true after .connect(null).
 

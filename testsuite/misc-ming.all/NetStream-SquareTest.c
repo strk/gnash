@@ -92,19 +92,21 @@ main(int argc, char** argv)
 	"stream = new NetStream(nc);"
 	"check_equals ( typeof(stream.bytesTotal), 'number' );"
 	"stream.bytesTotal = 'string';"
-	"check_equals ( typeof(stream.bytesTotal), 'number' );",	
-	OUTPUT_VERSION);
+	"check_equals ( typeof(stream.bytesTotal), 'number' );"
+	"stream2 = new NetStream(nc);"
+	, OUTPUT_VERSION);
 
   	sprintf(buffer_b,
   	// bytesTotal (read-only)
 	"stream.play('%s');"
+	"stream2.play('%s');"
 	"stream.pause(true);" 
 	"stream.paused=true;"
 	"_root.metadataNotified=0;"
 	"_root.startNotified=0;"
 	"_root.stopNotified=0;"
 	"stop();",
-	filename);
+	filename, filename);
 
   Ming_init();
   Ming_useSWFVersion (OUTPUT_VERSION);
@@ -130,6 +132,12 @@ main(int argc, char** argv)
   /* SWFDisplayItem_moveTo(item, 0, 200); */
   SWFDisplayItem_setName(item, "video");
 
+  stream = newSWFVideoStream();
+  SWFVideoStream_setDimension(stream, video_width, video_height);
+  item = SWFMovie_add(mo, (SWFBlock)stream);
+  SWFDisplayItem_moveTo(item, 200, 0);
+  SWFDisplayItem_setName(item, "video2");
+
   a = newSWFAction(buffer_a);
   if(a == NULL) return -1;
   SWFMovie_add(mo, (SWFBlock)a);
@@ -147,6 +155,7 @@ main(int argc, char** argv)
   check(mo, "NetStream.prototype.hasOwnProperty('bytesTotal')"); // check bytesTotal
   
   add_actions(mo, "video.attachVideo(stream);"); 
+  add_actions(mo, "video2.attachVideo(stream2);"); 
   
   // currentFps (read-only)
   check_equals (mo, "typeof(stream.currentFps)", "'number'" );
@@ -256,6 +265,12 @@ main(int argc, char** argv)
 		"	else if ( ascii == 112 ) {" // 'p' - play()
 		"		stream.play();"
 		"               _root.note(\"2. Verify video hasn't started, then press space to continue.\");"
+		"	}"
+		"	else if ( ascii == 99 ) {" // 'c' - play()
+		"		_root.check(nc.isConnected, 'NetConnection is connected');"
+		"		_root.nc.close();"
+		"               _root.note(\"Closed netconnection\");"
+		"		_root.check(!nc.isConnected, 'NetConnection is not connected');"
 		"	}"
 		"};"
 		"Key.addListener(_root);"
