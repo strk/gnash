@@ -163,8 +163,11 @@ void NetStreamFfmpeg::close()
 		m_FormatCtx = NULL;
 	}
 
-	delete m_imageframe;
-	m_imageframe = NULL;
+	{
+		boost::mutex::scoped_lock lock(image_mutex);
+		delete m_imageframe;
+		m_imageframe = NULL;
+	}
 	delete m_unqueued_data;
 	m_unqueued_data = NULL;
 
@@ -565,15 +568,20 @@ NetStreamFfmpeg::startPlayback()
 
 	// Allocate a frame to store the decoded frame in
 	m_Frame = avcodec_alloc_frame();
-	
-	// Determine required buffer size and allocate buffer
-	if (m_videoFrameFormat == render::YUV)
+
 	{
-		m_imageframe = new image::yuv(m_VCodecCtx->width,	m_VCodecCtx->height);
-	}
-	else if (m_videoFrameFormat == render::RGB)
-	{
-		m_imageframe = new image::rgb(m_VCodecCtx->width,	m_VCodecCtx->height);
+		boost::mutex::scoped_lock lock(image_mutex);
+
+		// Determine required buffer size and allocate buffer
+		if (m_videoFrameFormat == render::YUV)
+		{
+			m_imageframe = new image::yuv(m_VCodecCtx->width,	m_VCodecCtx->height);
+		}
+		else if (m_videoFrameFormat == render::RGB)
+		{
+			m_imageframe = new image::rgb(m_VCodecCtx->width,	m_VCodecCtx->height);
+		}
+
 	}
 
 	media::sound_handler* s = get_sound_handler();
@@ -937,6 +945,8 @@ bool NetStreamFfmpeg::decodeVideo(AVPacket* packet)
 	int got = 0;
 	avcodec_decode_video(m_VCodecCtx, m_Frame, &got, packet->data, packet->size);
 	if (!got) return false;
+
+	boost::mutex::scoped_lock lock(image_mutex);
 
 	if (m_imageframe == NULL)
 	{

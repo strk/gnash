@@ -1,3 +1,8 @@
+2008-05-10 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* server/asobj/NetStreamFfmpeg.cpp: Mutex-protect m_imageframe,
+	which is used across threads.
+
 2008-05-10 Sandro Santilli <strk@keybit.net>
 
 	* libbase/FLVParser.cpp (parseNextTag): don't log_error 
