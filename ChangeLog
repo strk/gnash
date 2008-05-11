@@ -1,3 +1,8 @@
+2008-05-11 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/NetStream-SquareTest.c: test that
+	  NetConnection.isConnected returns true after .connect(null).
+
 2008-05-10 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/asobj/NetStreamFfmpeg.cpp: Mutex-protect m_imageframe,

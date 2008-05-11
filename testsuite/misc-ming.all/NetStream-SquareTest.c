@@ -81,7 +81,9 @@ main(int argc, char** argv)
   	"note('SWF version %d');"
   	
   	"nc=new NetConnection();"
+	"check(!nc.isConnected, 'newly created NetConnection is not connected');"
 	"nc.connect(null);"
+	"xcheck(nc.isConnected, 'NetConnection is connected after .connect(null)');"
 	"check(!NetStream.prototype.hasOwnProperty('currentFPS'));" // version 7 here
 	"xcheck(!NetStream.prototype.hasOwnProperty('currentFps'));"
 	"stream = new NetStream();"
@@ -445,7 +447,7 @@ main(int argc, char** argv)
   check_equals(mo, "metadataNotified", "1");
   check_equals(mo, "stopNotified", "2");
   check_equals(mo, "startNotified", "1");
-  SWFMovie_add(mo, (SWFBlock)newSWFAction("totals(117); stop();"));
+  SWFMovie_add(mo, (SWFBlock)newSWFAction("totals(119); stop();"));
 
   SWFMovie_nextFrame(mo);
 
