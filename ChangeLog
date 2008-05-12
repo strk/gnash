@@ -1,5 +1,10 @@
 2008-05-12 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/NetStreamFfmpeg.{cpp,h}: cache sound_handler pointer
+	  as class member (to reduce function calls).
+
+2008-05-12 Sandro Santilli <strk@keybit.net>
+
 	* libbase/FLVParser.{cpp,h}: keep audio/video stream info object
 	  by auto_ptr, fixing a memory leak. Have getVideoInfo/getAudioInfo
 	  NOT transfer ownership, avoiding useless memory copies. Document

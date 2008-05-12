@@ -214,6 +214,9 @@ private:
 
 	// Decoder buffer
 	boost::uint8_t* _decoderBuffer;
+
+	// Current sound handler
+	media::sound_handler* _soundHandler;
 };
 
 

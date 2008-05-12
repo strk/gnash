@@ -79,7 +79,8 @@ NetStreamFfmpeg::NetStreamFfmpeg():
 	m_unqueued_data(NULL),
 	m_time_of_pause(0),
 
-	_decoderBuffer(0)
+	_decoderBuffer(0),
+	_soundHandler(get_sound_handler())
 {
 
 	ByteIOCxt.buffer = NULL;
@@ -137,10 +138,9 @@ void NetStreamFfmpeg::close()
 
 	// When closing gnash before playback is finished, the soundhandler 
 	// seems to be removed before netstream is destroyed.
-	media::sound_handler* s = get_sound_handler();
-	if (s != NULL)
+	if (_soundHandler)
 	{
-		s->detach_aux_streamer(this);
+		_soundHandler->detach_aux_streamer(this);
 	}
 
 	if (m_Frame) av_free(m_Frame);
@@ -584,15 +584,14 @@ NetStreamFfmpeg::startPlayback()
 
 	}
 
-	media::sound_handler* s = get_sound_handler();
-	if (m_audio_index >= 0 && s != NULL)
+	if ( m_audio_index >= 0 && _soundHandler )
 	{
 		// Get a pointer to the audio codec context for the video stream
 		m_ACodecCtx = m_FormatCtx->streams[m_audio_index]->codec;
 
 		// Find the decoder for the audio stream
 		AVCodec* pACodec = avcodec_find_decoder(m_ACodecCtx->codec_id);
-	    if (pACodec == NULL)
+		if (pACodec == NULL)
 		{
 			log_error(_("No available audio decoder %d to process MPEG file: '%s'"), 
 				m_ACodecCtx->codec_id, url.c_str());
@@ -660,10 +659,9 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 	else
 	{
 		// We need to restart the audio
-		media::sound_handler* s = get_sound_handler();
-		if (s)
+		if (_soundHandler)
 		{
-			s->attach_aux_streamer(audio_streamer, ns);
+			_soundHandler->attach_aux_streamer(audio_streamer, ns);
 		}
 	}
 
@@ -1093,8 +1091,7 @@ bool NetStreamFfmpeg::decodeMediaFrame()
 	{
 		if (m_unqueued_data->m_stream_index == m_audio_index)
 		{
-			media::sound_handler* s = get_sound_handler();
-			if (s)
+			if (_soundHandler)
 			{
 				m_unqueued_data = m_qaudio.push(m_unqueued_data) ? NULL : m_unqueued_data;
 			}
@@ -1390,8 +1387,7 @@ void NetStreamFfmpeg::unpausePlayback()
 
 	// Re-connect to the soundhandler.
 	// It was disconnected to avoid to keep playing sound while paused
-	media::sound_handler* s = get_sound_handler();
-	if ( s )     s->attach_aux_streamer(audio_streamer, (void*) this);
+	if ( _soundHandler ) _soundHandler->attach_aux_streamer(audio_streamer, (void*) this);
 }
 
 
