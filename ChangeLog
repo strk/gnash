@@ -1,5 +1,10 @@
 2008-05-12 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/NetStreamFfmpeg.cpp (pausePlayback): detach aux
+	  streamer so sound doesn't come out while in pause mode.
+
+2008-05-12 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/NetStreamFfmpeg.cpp: stop touching m_imageframe from
 	  decoder thread. No more need to lock mutexes, should fix a deadlock.
 
