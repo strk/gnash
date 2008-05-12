@@ -129,6 +129,9 @@ void NetStreamFfmpeg::close()
 		// request decoder thread termination
 		m_go = false;
 
+		// resume the decoder, if waiting
+		_qFillerResume.notify_all();
+
 		// wait till thread is complete before main continues
 		_decodeThread->join();
 
@@ -164,9 +167,18 @@ void NetStreamFfmpeg::close()
 	}
 
 	{
+#ifdef GNASH_DEBUG_THREADS
+		log_debug("image_mutex: waiting for lock in close");
+#endif
 		boost::mutex::scoped_lock lock(image_mutex);
+#ifdef GNASH_DEBUG_THREADS
+		log_debug("image_mutex: lock obtained in close");
+#endif
 		delete m_imageframe;
 		m_imageframe = NULL;
+#ifdef GNASH_DEBUG_THREADS
+		log_debug("image_mutex: releasing lock in close");
+#endif
 	}
 	delete m_unqueued_data;
 	m_unqueued_data = NULL;
@@ -708,16 +720,9 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 			// If both queues are full then don't bother filling it
       			if ( ns->m_qvideo.full() && ns->m_qaudio.full() )
 			{
-				// TODO: sleep till any of the two queues
-				//       falls under the given number
-				//       (20 currently, but should be a class member really)
-				//
-				// NOTE: audio_streamer pops from m_qaudio and
-				//       refreshVideoFrame pops from m_qvideo, wouldn't know
-				//       where to notify the condition from (both?)
-				//
-				//log_debug("Queues full, sleeping more");
-				sleepTime *= 4;
+				// Instead wait till waked up by short-queues event
+				//log_debug("Queues full, waiting on qNeedRefill condition");
+				ns->_qFillerResume.wait(lock);
 			}
 			else
 			{
@@ -784,7 +789,7 @@ bool NetStreamFfmpeg::audio_streamer(void *owner, boost::uint8_t *stream, int le
 		return false;
 	}
 
-	while (len > 0 && ns->m_qaudio.size() > 0)
+	while (ns->m_go && len > 0 && ! ns->m_qaudio.empty())
 	{
 #ifdef GNASH_DEBUG_THREADS
 		log_debug("qMutex: waiting for lock in audio_streamer");
@@ -809,6 +814,9 @@ bool NetStreamFfmpeg::audio_streamer(void *owner, boost::uint8_t *stream, int le
 		{
 			ns->m_qaudio.pop();
 			delete samples;
+
+			// wake up filler (TODO: do only if decoder is running)
+			ns->_qFillerResume.notify_all();
 		}
 
 #ifdef GNASH_DEBUG_THREADS
@@ -1036,8 +1044,6 @@ bool NetStreamFfmpeg::decodeVideo(AVPacket* packet)
 	}
 
 	media::raw_mediadata_t* video = new media::raw_mediadata_t();
-
-	image::image_base* tmpImage = NULL;
 
 	if (m_videoFrameFormat == render::YUV)
 	{
@@ -1313,7 +1319,7 @@ NetStreamFfmpeg::refreshVideoFrame()
 	}
 
 	// Loop until a good frame is found
-	while(1)
+	while(!m_qvideo.empty())
 	{
 		// Get video frame from queue, will have the lowest timestamp
 		// will return NULL if empty(). See multithread_queue::front
@@ -1370,6 +1376,10 @@ NetStreamFfmpeg::refreshVideoFrame()
 			m_qvideo.pop();
 			delete video;
 
+			// wake up filler (TODO: do only if decoder is running)
+			// TODO2: resume only at end of loop ?
+			_qFillerResume.notify_all();
+
 			// A frame is ready for pickup
 			m_newFrameReady = true;
 
@@ -1395,6 +1405,7 @@ NetStreamFfmpeg::refreshVideoFrame()
 void
 NetStreamFfmpeg::advance()
 {
+	//log_debug("advance");
 
 	// Make sure al decoding has stopped
 	// This can happen in 2 cases: 

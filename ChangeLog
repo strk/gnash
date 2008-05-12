@@ -1,5 +1,12 @@
 2008-05-12 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/NetStreamFfmpeg.{cpp,h}: use a conditional in
+	  av_streamer to wait till more frames are needed, signal
+	  the condition from refreshVideoFrame and audio_streamer
+	  everytime a new frame is popped from the queue.
+
+2008-05-12 Sandro Santilli <strk@keybit.net>
+
 	* libmedia/ffmpeg/ffmpegNetStreamUtil.h: drop multithread_queue,
 	  substitute with ElementsOwningQueue.
 	* server/asobj/NetStreamFfmpeg.{cpp,h}: use a simple

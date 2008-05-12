@@ -243,6 +243,9 @@ private:
 	/// Mutex protecting access to queues
 	boost::mutex _qMutex;
 
+	/// Queues filler will wait on this condition when queues are full
+	boost::condition _qFillerResume;
+
 	// The time we started playing in seconds (since VM start ?)
 	volatile boost::uint64_t m_start_clock;
 
