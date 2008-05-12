@@ -89,7 +89,9 @@ NetStreamFfmpeg::NetStreamFfmpeg():
 NetStreamFfmpeg::~NetStreamFfmpeg()
 {
 	if ( _decoderBuffer ) delete [] _decoderBuffer;
-	close();
+
+	close(); // close will also detach from sound handler
+
 	delete m_imageframe;
 }
 
@@ -1401,6 +1403,9 @@ void NetStreamFfmpeg::pausePlayback()
 
 	// Save the current time so we later can tell how long the pause lasted
 	m_time_of_pause = clocktime::getTicks();
+
+	// Disconnect the soundhandler so we don't play while paused
+	if ( _soundHandler ) _soundHandler->detach_aux_streamer((void*)this);
 }
 
 void NetStreamFfmpeg::unpausePlayback()
@@ -1424,7 +1429,7 @@ void NetStreamFfmpeg::unpausePlayback()
 	}
 
 	// Re-connect to the soundhandler.
-	// It was disconnected to avoid to keep playing sound while paused
+	// It was disconnected in ::pausePlayback to avoid to keep playing sound while paused
 	if ( _soundHandler ) _soundHandler->attach_aux_streamer(audio_streamer, (void*) this);
 }
 
