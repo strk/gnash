@@ -489,16 +489,9 @@ FLVVideoInfo* FLVParser::getVideoInfo()
 	if (!_video && _lastParsedPosition > 0) return NULL;
 
 	// Make sure that there are parsed some video frames
-	while(_videoInfo == NULL && !_parsingComplete) {
-		parseNextTag();
-	}
+	while( ! _parsingComplete && !_videoInfo.get() ) parseNextTag();
 
-	// If there are no video data return NULL
-	if (_videoInfo == NULL) return NULL;
-
-	FLVVideoInfo* info = new FLVVideoInfo(_videoInfo->codec, _videoInfo->width, _videoInfo->height, _videoInfo->frameRate, _videoInfo->duration);
-	return info;
-
+	return _videoInfo.get(); // may be null
 }
 
 FLVAudioInfo* FLVParser::getAudioInfo()
@@ -510,16 +503,12 @@ FLVAudioInfo* FLVParser::getAudioInfo()
 	if (!_audio && _lastParsedPosition > 0) return NULL;
 
 	// Make sure that there are parsed some audio frames
-	while(_audioInfo == NULL && !_parsingComplete) {
+	while (!_parsingComplete && ! _audioInfo.get() )
+	{
 		parseNextTag();
 	}
 
-	// If there are no audio data return NULL
-	if (_audioInfo == NULL) return NULL;
-
-	FLVAudioInfo* info = new FLVAudioInfo(_audioInfo->codec, _audioInfo->sampleRate, _audioInfo->sampleSize, _audioInfo->stereo, _audioInfo->duration);
-	return info;
-
+	return _audioInfo.get(); // may be null
 }
 
 bool FLVParser::isTimeLoaded(boost::uint32_t time)
@@ -597,7 +586,8 @@ bool FLVParser::parseNextTag()
 	// check for empty tag
 	if (bodyLength == 0) return true;
 
-	if (tag[0] == AUDIO_TAG) {
+	if (tag[0] == AUDIO_TAG)
+	{
 		FLVAudioFrameInfo* frame = new FLVAudioFrameInfo;
 		frame->dataSize = bodyLength - 1;
 		frame->timestamp = timestamp;
@@ -606,7 +596,8 @@ bool FLVParser::parseNextTag()
 
 		// If this is the first audioframe no info about the
 		// audio format has been noted, so we do that now
-		if (_audioInfo == NULL) {
+		if ( !_audioInfo.get() )
+		{
 			int samplerate = (tag[11] & 0x0C) >> 2;
 			if (samplerate == 0) samplerate = 5500;
 			else if (samplerate == 1) samplerate = 11000;
@@ -617,11 +608,13 @@ bool FLVParser::parseNextTag()
 			if (samplesize == 0) samplesize = 1;
 			else samplesize = 2;
 
-			_audioInfo = new FLVAudioInfo((tag[11] & 0xf0) >> 4, samplerate, samplesize, (tag[11] & 0x01) >> 0, 0);
+			_audioInfo.reset( new FLVAudioInfo((tag[11] & 0xf0) >> 4, samplerate, samplesize, (tag[11] & 0x01) >> 0, 0) );
 		}
 
 
-	} else if (tag[0] == VIDEO_TAG) {
+	}
+	else if (tag[0] == VIDEO_TAG)
+	{
 		FLVVideoFrameInfo* frame = new FLVVideoFrameInfo;
 		frame->dataSize = bodyLength - 1;
 		frame->timestamp = timestamp;
@@ -631,7 +624,8 @@ bool FLVParser::parseNextTag()
 
 		// If this is the first videoframe no info about the
 		// video format has been noted, so we do that now
-		if (_videoInfo == NULL) {
+		if ( ! _videoInfo.get() )
+		{
 			boost::uint16_t codec = (tag[11] & 0x0f) >> 0;
 			// Set standard guessed size...
 			boost::uint16_t width = 320;
@@ -691,7 +685,7 @@ bool FLVParser::parseNextTag()
 			}
 
 			// Create the videoinfo
-			_videoInfo = new FLVVideoInfo(codec, width, height, 0 /*frameRate*/, 0 /*duration*/);
+			_videoInfo.reset( new FLVVideoInfo(codec, width, height, 0 /*frameRate*/, 0 /*duration*/) );
 		}
 
 	} else if (tag[0] == META_TAG) {

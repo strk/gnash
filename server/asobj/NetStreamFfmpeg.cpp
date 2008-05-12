@@ -304,11 +304,11 @@ initContext(enum CodecID codec_id)
 /// @return the initialized context, or NULL on failure. The caller
 ///         is responsible for deallocating this pointer.
 static AVCodecContext* 
-initFlvVideo(FLVParser* parser)
+initFlvVideo(FLVParser& parser)
 {
 	// Get video info from the parser
-	std::auto_ptr<FLVVideoInfo> videoInfo( parser->getVideoInfo() );
-	if (!videoInfo.get())
+	FLVVideoInfo* videoInfo = parser.getVideoInfo();
+	if (!videoInfo)
 	{
 		return NULL;
 	}
@@ -340,11 +340,11 @@ initFlvVideo(FLVParser* parser)
 
 /// Like initFlvVideo, but for audio.
 static AVCodecContext*
-initFlvAudio(FLVParser* parser)
+initFlvAudio(FLVParser& parser)
 {
 	// Get audio info from the parser
-	std::auto_ptr<FLVAudioInfo> audioInfo( parser->getAudioInfo() );
-	if (!audioInfo.get())
+	FLVAudioInfo* audioInfo =  parser.getAudioInfo();
+	if (!audioInfo)
 	{
 		return NULL;
 	}
@@ -441,14 +441,14 @@ NetStreamFfmpeg::startPlayback()
 		avcodec_init();
 		avcodec_register_all();
 
-		m_VCodecCtx = initFlvVideo(m_parser.get());
+		m_VCodecCtx = initFlvVideo(*m_parser);
 		if (!m_VCodecCtx)
 		{
 			log_error(_("Failed to initialize FLV video codec"));
 			return false;
 		}
 
-		m_ACodecCtx = initFlvAudio(m_parser.get());
+		m_ACodecCtx = initFlvAudio(*m_parser);
 		if (!m_ACodecCtx)
 		{
 			log_error(_("Failed to initialize FLV audio codec"));

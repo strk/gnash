@@ -27,6 +27,7 @@
 #include "dsodefs.h"
 #include <vector>
 #include <boost/thread/mutex.hpp>
+#include <memory>
 
 namespace gnash {
 
@@ -246,9 +247,13 @@ public:
 	///
 	bool parsingCompleted() const { return _parsingComplete; }
 
-	/// Returns a FLVVideoInfo class about the videostream
+	/// Returns information about video in the stream.
 	//
 	/// Locks the _mutex
+	///
+	/// The returned object is owned by the FLVParser object.
+	/// Can return NULL if video contains NO video frames.
+	/// Will block till either parsing finished or a video frame is found.
 	///
 	FLVVideoInfo* getVideoInfo();
 
@@ -326,6 +331,8 @@ private:
 	/// Returns true if something was parsed, false otherwise.
 	/// Sets _parsingComplete=true on end of file.
 	///
+	/// TODO: make public (seems useful for an external parsing driver)
+	///
 	bool parseNextTag();
 
 	/// Parses the header of the file
@@ -359,11 +366,11 @@ private:
 	/// Whether the parsing is complete or not
 	bool _parsingComplete;
 
-	/// Info about the video stream
-	FLVVideoInfo* _videoInfo;
+	/// Info about the video stream (if any)
+	std::auto_ptr<FLVVideoInfo> _videoInfo;
 
-	/// Info about the audio stream
-	FLVAudioInfo* _audioInfo;
+	/// Info about the audio stream (if any)
+	std::auto_ptr<FLVAudioInfo> _audioInfo;
 
 	/// Last audio frame returned
 	size_t _nextAudioFrame;
