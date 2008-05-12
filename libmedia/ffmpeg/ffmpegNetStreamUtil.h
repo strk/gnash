@@ -34,7 +34,7 @@ extern "C" {
 }
 #endif
 
-#include <queue>
+#include <deque>
 
 #include <iconv.h>
 #include <SDL_audio.h>
@@ -62,78 +62,89 @@ public:
 };
 
 
-/// Threadsafe elements-owning queue
+/// Elements-owning queue
 //
-/// This class is a threadsafe queue, using std:queue and locking.
-/// It is used to store decoded audio and video data which are waiting to be "played"
-/// Elements of the queue are owned by instances of this class.
+/// This class is a queue owning its elements and optionally
+/// limited in size.
 ///
 template<class T>
-class multithread_queue
+class ElementsOwningQueue
 {
 public:
 
-	multithread_queue() 
+	/// Construct a queue, limited by given amount of elements (20 by default)
+	ElementsOwningQueue(size_t limit=20) 
+		:
+		_limit(limit)
 	{
 	}
 
-	// Destroy all elements of the queue. Locks.
-	~multithread_queue()
+	// Destroy all elements of the queue. 
+	~ElementsOwningQueue()
 	{
-	  clear();
+		clear();
 	}
 
-	// Destroy all elements of the queue. Locks.
+	// Destroy all elements of the queue.
 	void clear()
 	{
-	  boost::mutex::scoped_lock lock( _mutex );
-
-	  while ( ! m_queue.empty() ) {
-	    T x = m_queue.front();
-	    m_queue.pop();
-	    delete x;
-	  }
+		for (typename container::iterator i=_queue.begin(),
+				e=_queue.end();
+			i!=e;
+			++i)
+		{
+			delete *i;
+		}
+		_queue.clear();
 	}
 
-	/// Returns the size if the queue. Locks.
+	/// Returns the size if the queue. 
 	//
 	/// @return the size of the queue
 	///
 	size_t size()
 	{
-	  boost::mutex::scoped_lock lock( _mutex );
-
-	  size_t n = m_queue.size();
-
-	  return n;
+		return _queue.size();
 	}
 
-	/// Pushes an element to the queue. Locks.
+	/// Return true if the queue is empty
+	bool empty()
+	{
+		return _queue.empty();
+	}
+
+	/// Return true if the queue is full
+	//
+	/// The function would never return true
+	/// if the queue has no limit..
+	///
+	bool full()
+	{
+		if ( ! _limit ) return false;
+		return _queue.size() >= _limit;
+	}
+
+	/// Set queue limit
+	void setLimit(unsigned int limit)
+	{
+		_limit = limit;
+	}
+
+	/// Pushes an element to the queue. 
 	//
 	/// @param member
 	/// The element to be pushed unto the queue.
 	///
-	/// @return true if queue isn't full and the element was pushed to the queue,
-	/// or false if the queue was full, and the element wasn't push unto it.
+	/// @return false if the queue has reached its limit, true otherwise.
 	///
 	bool push(T member)
 	{
-	  bool rc = false;
-	  boost::mutex::scoped_lock lock( _mutex );
-
-	  // We only keep max 20 items in the queue.
-	  // If it's "full" the item must wait, see calls to 
-	  // this function in read_frame() to see how it is 
-	  // done.
-	  if ( m_queue.size() < 20 ) {
-	    m_queue.push( member );
-	    rc = true;
-	  }
-
-	  return rc;
+		if ( _limit && _queue.size() >= _limit ) return false;
+		_queue.push_back( member );
+		return true;
 	}
 
-	/// Returns a pointer to the first element on the queue. Locks.
+	/// Returns a pointer to the first element on the queue. 
 	//
 	/// If no elements are available this function returns NULL.
 	///
@@ -141,38 +152,32 @@ public:
 	///
 	T front()
 	{
-	  boost::mutex::scoped_lock lock( _mutex );
-	
-	  T member = NULL;
-
-	  if ( ! m_queue.empty() ) {
-	    member = m_queue.front();
-	  }
-  
-	  return member;
+		if ( _queue.empty() ) return 0;
+		return _queue.front();
 	}
 
-	/// Pops the first element from the queue. Locks.
+	/// Pops the first element from the queue. 
 	//
 	/// If no elements are available this function is
 	/// a noop. 
 	///
 	void pop()
 	{
-	  boost::mutex::scoped_lock lock( _mutex );
-
-	  if ( ! m_queue.empty() ) {
-	    m_queue.pop();
-	  }
+		if ( ! _queue.empty() ) _queue.pop_front();
 	}
 
 private:
+
+	typedef std::deque<T> container;
+
+	/// Limit queue to this number of elements
+	unsigned int _limit;
 
 	// Mutex used for locking
 	boost::mutex _mutex;
 
 	// The actual queue.
-	std::queue<T> m_queue;
+	container _queue;
 };
 
 

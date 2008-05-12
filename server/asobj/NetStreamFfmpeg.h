@@ -138,24 +138,62 @@ private:
 	// Used to decode and push the next available (non-FLV) frame to the audio or video queue
 	bool decodeMediaFrame();
 
-	/// Used to decode push the next available FLV frame to the audio or video queue
+	/// Used to push decoded version of next available FLV frame to the audio or video queue
 	//
 	/// Called by ::av_streamer to buffer more a/v frames when possible.
 	///
-	/// This is a non-blocking call, if data isn't available in the parser no
-	/// new frame is decoded and this method returns false. Note that this doesn't
-	/// necessarely means the FLV stream is ended, rather it is possible the loader
-	/// thread is starving. 
+	/// Will call decodeVideo or decodeAudio depending on frame type, and return
+	/// what they return.
+	/// Will set m_go to false on EOF from input.
 	///
-	/// TODO: return a more informative value to distinguish between EOF and starving
-	///       conditions ?
+	/// This is a blocking call.
+	//
+	/// @returns :
+	/// 	If next frame is video and:
+	///		- we have no video decoding context
+	///		- or there is a decoding error
+	///		- or there is a conversion error
+	///		- or renderer requested format is NONE
+	/// 	... false will be returned.
+	/// 	If next frame is an audio frame and we have no audio decoding context, false is returned.
+	/// 	In any other case, true is returned.
+	///
+	/// NOTE: (FIXME) if we succeeded decoding but the relative queue was full,
+	///       true will be returned but nothing would be pushed on the queues.
+	/// 
+	/// TODO: return a more informative value to tell what happened.
+	/// TODO: make it simpler !
 	///
 	bool decodeFLVFrame();
 
-	// Used to decode a video frame and push it on the videoqueue
+	/// Used to decode a video frame and push it on the videoqueue
+	//
+	/// Also updates m_imageframe (why !??)
+	///
+	/// This is a blocking call.
+	/// If no Video decoding context exists (m_VCodecCtx), false is returned.
+	/// On decoding (or converting) error, false is returned.
+	/// If renderer requested video format is render::NONE, false is returned.
+	/// In any other case, true is returned.
+	///
+	/// NOTE: (FIXME) if video queue is full, 
+	///       we'd still return true w/out pushing anything new there
+	/// 
+	/// TODO: return a more informative value to tell what happened.
+	///
 	bool decodeVideo( AVPacket* packet );
 
-	// Used to decode a audio frame and push it on the audioqueue
+	/// Used to decode a audio frame and push it on the audioqueue
+	//
+	/// This is a blocking call.
+	/// If no Video decoding context exists (m_ACodecCtx), false is returned.
+	/// In any other case, true is returned.
+	///
+	/// NOTE: (FIXME) if audio queue is full,
+	///       we'd still return true w/out pushing anything new there
+	/// 
+	/// TODO: return a more informative value to tell what happened.
+	///
 	bool decodeAudio( AVPacket* packet );
 
 	// Used to calculate a decimal value from a ffmpeg fraction
@@ -197,8 +235,10 @@ private:
 	boost::uint32_t m_current_timestamp;
 
 	/// The queues of audio and video data.
-	media::multithread_queue <media::raw_mediadata_t*> m_qaudio;
-	media::multithread_queue <media::raw_mediadata_t*> m_qvideo;
+	typedef media::ElementsOwningQueue<media::raw_mediadata_t*> MediaQueue;
+
+	MediaQueue m_qaudio;
+	MediaQueue m_qvideo;
 
 	/// Mutex protecting access to queues
 	boost::mutex _qMutex;

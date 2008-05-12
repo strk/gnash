@@ -1,5 +1,14 @@
 2008-05-12 Sandro Santilli <strk@keybit.net>
 
+	* libmedia/ffmpeg/ffmpegNetStreamUtil.h: drop multithread_queue,
+	  substitute with ElementsOwningQueue.
+	* server/asobj/NetStreamFfmpeg.{cpp,h}: use a simple
+	  ElementsOwningQueue for audio/video queues, document more
+	  the overlycomplex methods, sleep more in av_streamer when
+	  queues are full.
+
+2008-05-12 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/NetStreamFfmpeg.{cpp,h}: complete use of cached
 	  sound_handler; add a mutex protecting generic access to the
 	  audio/video queues. The mutex will be locked by

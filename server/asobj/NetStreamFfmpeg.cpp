@@ -572,7 +572,13 @@ NetStreamFfmpeg::startPlayback()
 	m_Frame = avcodec_alloc_frame();
 
 	{
+#ifdef GNASH_DEBUG_THREADS
+		log_debug("image_mutex: waiting for lock in startPlayback");
+#endif
 		boost::mutex::scoped_lock lock(image_mutex);
+#ifdef GNASH_DEBUG_THREADS
+		log_debug("image_mutex: lock obtained in startPlayback");
+#endif
 
 		// Determine required buffer size and allocate buffer
 		if (m_videoFrameFormat == render::YUV)
@@ -584,6 +590,9 @@ NetStreamFfmpeg::startPlayback()
 			m_imageframe = new image::rgb(m_VCodecCtx->width,	m_VCodecCtx->height);
 		}
 
+#ifdef GNASH_DEBUG_THREADS
+		log_debug("image_mutex: releasing lock in startPlayback");
+#endif
 	}
 
 	if ( m_audio_index >= 0 && _soundHandler )
@@ -680,34 +689,54 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 	// Loop while we're playing
 	while (ns->m_go)
 	{
+		unsigned long int sleepTime = 1000;
+
 #ifdef GNASH_DEBUG_THREADS
 		log_debug("Decoding iteration. bufferTime=%lu, bufferLen=%lu", ns->bufferTime(), ns->bufferLength());
 #endif
 
 		{
+#ifdef GNASH_DEBUG_THREADS
+		log_debug("qMutex: waiting for lock in av_streamer");
+#endif
 		boost::mutex::scoped_lock lock(ns->_qMutex);
+#ifdef GNASH_DEBUG_THREADS
+		log_debug("qMutex: lock obtained in av_streamer");
+#endif
 		if (ns->m_isFLV)
 		{
-			// If queues are full then don't bother filling it
-      			if ( ns->m_qvideo.size() < 20 || ns->m_qaudio.size() < 20 ) 
-			{
-
-				// If we have problems with decoding - break
-				if (!ns->decodeFLVFrame() && ns->m_start_onbuffer == false && ns->m_qvideo.size() == 0 && ns->m_qaudio.size() == 0)
-				{
-					// TODO: do we really want to break here !?
-					break;
-				}
-			}
-			else
+			// If both queues are full then don't bother filling it
+      			if ( ns->m_qvideo.full() && ns->m_qaudio.full() )
 			{
 				// TODO: sleep till any of the two queues
 				//       falls under the given number
 				//       (20 currently, but should be a class member really)
 				//
 				// NOTE: audio_streamer pops from m_qaudio and
-				//       refreshVideoFrame pops from m_qvideo
+				//       refreshVideoFrame pops from m_qvideo, wouldn't know
+				//       where to notify the condition from (both?)
 				//
+				//log_debug("Queues full, sleeping more");
+				sleepTime *= 4;
+			}
+			else
+			{
+				//log_debug("Calling decodeFLVFrame");
+				bool successDecoding = ns->decodeFLVFrame();
+				//log_debug("decodeFLVFrame returned %d", successDecoding);
+				if ( ! successDecoding )
+				{
+					// Possible failures:
+					// 1. could not decode frame... lot's of possible
+					//    reasons...
+					if ( ns->m_videoFrameFormat != render::NONE )
+					{
+						log_error("Could not decode FLV frame");
+						break;
+					}
+					// else it's expected, we'll keep going anyway
+				}
+
 			}
 
 		}
@@ -721,9 +750,14 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 			}
 
 		}
+
+#ifdef GNASH_DEBUG_THREADS
+		log_debug("qMutex: releasing lock in av_streamer");
+#endif
 		}
 
-		usleep(1000); // Sleep 1ms to avoid busying the processor.
+		//log_debug("Sleeping %d microseconds", sleepTime);
+		usleep(sleepTime); // Sleep 1ms to avoid busying the processor.
 
 	}
 
@@ -752,7 +786,13 @@ bool NetStreamFfmpeg::audio_streamer(void *owner, boost::uint8_t *stream, int le
 
 	while (len > 0 && ns->m_qaudio.size() > 0)
 	{
+#ifdef GNASH_DEBUG_THREADS
+		log_debug("qMutex: waiting for lock in audio_streamer");
+#endif
 		boost::mutex::scoped_lock lock(ns->_qMutex);
+#ifdef GNASH_DEBUG_THREADS
+		log_debug("qMutex: lock obtained in audio_streamer");
+#endif
 
     		media::raw_mediadata_t* samples = ns->m_qaudio.front();
 
@@ -771,6 +811,9 @@ bool NetStreamFfmpeg::audio_streamer(void *owner, boost::uint8_t *stream, int le
 			delete samples;
 		}
 
+#ifdef GNASH_DEBUG_THREADS
+		log_debug("qMutex: releasing lock in audio_streamer");
+#endif
 	}
 	return true;
 }
@@ -952,7 +995,6 @@ bool NetStreamFfmpeg::decodeVideo(AVPacket* packet)
 	avcodec_decode_video(m_VCodecCtx, m_Frame, &got, packet->data, packet->size);
 	if (!got) return false;
 
-	boost::mutex::scoped_lock lock(image_mutex);
 
 	if (m_imageframe == NULL)
 	{
@@ -984,12 +1026,18 @@ bool NetStreamFfmpeg::decodeVideo(AVPacket* packet)
 	else if (m_videoFrameFormat == render::RGB && m_VCodecCtx->pix_fmt != PIX_FMT_RGB24)
 	{
 		rgbpicture = media::VideoDecoderFfmpeg::convertRGB24(m_VCodecCtx, *m_Frame);
-		if (!rgbpicture.data[0]) {
+		if (!rgbpicture.data[0])
+		{
+#ifdef GNASH_DEBUG_THREADS
+			log_debug("image_mutex: releasing lock in decodeVideo");
+#endif
 			return false;
 		}
 	}
 
 	media::raw_mediadata_t* video = new media::raw_mediadata_t();
+
+	image::image_base* tmpImage = NULL;
 
 	if (m_videoFrameFormat == render::YUV)
 	{
@@ -1088,6 +1136,10 @@ bool NetStreamFfmpeg::decodeVideo(AVPacket* packet)
 	// NOTE: Caller is assumed to have locked _qMutex already
 	if (m_isFLV) m_qvideo.push(video);
 	else m_unqueued_data = m_qvideo.push(video) ? NULL : video;
+
+#ifdef GNASH_DEBUG_THREADS
+	log_debug("image_mutex: releasing lock in decodeVideo");
+#endif
 
 	return true;
 }
@@ -1243,10 +1295,22 @@ NetStreamFfmpeg::seek(boost::uint32_t pos)
 void
 NetStreamFfmpeg::refreshVideoFrame()
 {
+#ifdef GNASH_DEBUG_THREADS
+	log_debug("qMutex: waiting for lock in refreshVideoFrame");
+#endif
 	boost::mutex::scoped_lock lock(_qMutex);
+#ifdef GNASH_DEBUG_THREADS
+	log_debug("qMutex: lock obtained in refreshVideoFrame");
+#endif
 
 	// If we're paused or not running, there is no need to do this
-	if (!m_go || m_pause) return;
+	if (!m_go || m_pause)
+	{
+#ifdef GNASH_DEBUG_THREADS
+		log_debug("qMutex: releasing lock in refreshVideoFrame");
+#endif
+		return;
+	}
 
 	// Loop until a good frame is found
 	while(1)
@@ -1258,7 +1322,7 @@ NetStreamFfmpeg::refreshVideoFrame()
 		// If the queue is empty we have nothing to do
 		if (!video)
 		{
-			return;
+			break;
 		}
 
 		// Caclulate the current time
@@ -1279,7 +1343,17 @@ NetStreamFfmpeg::refreshVideoFrame()
 		// current time, we put it in the output image.
 		if (current_clock >= video_clock)
 		{
+
+#ifdef GNASH_DEBUG_THREADS
+			log_debug("image_mutex: waiting for lock in refreshVideoFrame");
+#endif
+
 			boost::mutex::scoped_lock lock(image_mutex);
+
+#ifdef GNASH_DEBUG_THREADS
+			log_debug("image_mutex: lock obtained in refreshVideoFrame");
+#endif
+
 			if (m_videoFrameFormat == render::YUV)
 			{
 				// XXX m_imageframe might be a byte aligned buffer, while video is not!
@@ -1299,15 +1373,22 @@ NetStreamFfmpeg::refreshVideoFrame()
 			// A frame is ready for pickup
 			m_newFrameReady = true;
 
+#ifdef GNASH_DEBUG_THREADS
+			log_debug("image_mutex: releasing lock in refreshVideoFrame");
+#endif
 		}
 		else
 		{
 			// The timestamp on the first frame in the queue is greater
 			// than the current time, so no need to do anything.
-			return;
+			break;
 		}
 
 	}
+
+#ifdef GNASH_DEBUG_THREADS
+	log_debug("qMutex: releasing lock in refreshVideoFrame");
+#endif
 }
 
 
