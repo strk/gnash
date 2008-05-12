@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: setProperty.as,v 1.5 2008/05/09 13:55:48 strk Exp $";
+rcsid="$Id: setProperty.as,v 1.6 2008/05/12 03:36:08 zoulunkai Exp $";
 #include "check.as"
 
 #ifdef MING_SUPPORTS_ASM
@@ -31,10 +31,11 @@ createSprite = ASnative(901, 0); // MovieClip.prototype.createEmptyMovieClip
 createSprite("mc1", 10);
 
 mc1.func = function () {
-	pass_check = _root.pass_check;
-	xpass_check = _root.xpass_check;
-	fail_check = _root.fail_check;
-	xfail_check = _root.xfail_check;
+
+    pass_check = _root.pass_check;
+    xpass_check = _root.xpass_check;
+    fail_check = _root.fail_check;
+    xfail_check = _root.xfail_check;
 
     check_equals(this, _root.mc1);
     check_equals(_root.mc1._xscale, 100);
@@ -77,9 +78,55 @@ mc1.func = function () {
 #endif
 };
 mc1.func();
-
-check_totals(6); 
+// restore the _xscale of _root after test.
 _root._xscale = 100;
 
-#endif //MING_SUPPORTS_ASM
 
+//
+//  test removeMovieClip(""), opcode 37
+//
+createSprite("mc2", 20);
+mc2.remove = function () {
+    // in SWF6 and obove, it's no effect(probably results _root.removeMovieClip()).
+    // in SWF5, mc2.removeMovieClip().
+    removeMovieClip("");
+};
+mc2.remove();
+#if OUTPUT_VERSION == 5
+    xcheck_equals(typeof(mc2), 'undefined');
+#else
+    check_equals(typeof(mc2), 'movieclip');
+#endif
+
+
+//
+//  test setTarget(""), opcode 139 
+//
+createSprite("mc3", 30);
+_root.checkpoint = 0;
+_root.mc3thisPtr = 0;
+
+mc3.set_target = function() {
+    // for SWF6 and above, it's setTarget("_root");
+    // for SWF5, it's setTarget("mc3");
+    setTarget("");
+    _root.mc3thisPtr = this;
+    asm{
+        push '_root.checkpoint', '', 11         
+        getproperty  //_target         
+        setvariable             
+    };
+};
+mc3.set_target();
+
+check_equals(mc3thisPtr, mc3);
+
+#if OUTPUT_VERSION == 5
+    xcheck_equals(_root.checkpoint, "/mc3");
+#else
+    check_equals(_root.checkpoint, "/");
+#endif
+
+check_totals(9); 
+
+#endif //MING_SUPPORTS_ASM
