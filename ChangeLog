@@ -1,5 +1,10 @@
 2008-05-12 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/NetStreamFfmpeg.cpp: stop touching m_imageframe from
+	  decoder thread. No more need to lock mutexes, should fix a deadlock.
+
+2008-05-12 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/NetStreamFfmpeg.{cpp,h}: use a conditional in
 	  av_streamer to wait till more frames are needed, signal
 	  the condition from refreshVideoFrame and audio_streamer

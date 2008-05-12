@@ -90,6 +90,7 @@ NetStreamFfmpeg::~NetStreamFfmpeg()
 {
 	if ( _decoderBuffer ) delete [] _decoderBuffer;
 	close();
+	delete m_imageframe;
 }
 
 
@@ -166,20 +167,8 @@ void NetStreamFfmpeg::close()
 		m_FormatCtx = NULL;
 	}
 
-	{
-#ifdef GNASH_DEBUG_THREADS
-		log_debug("image_mutex: waiting for lock in close");
-#endif
-		boost::mutex::scoped_lock lock(image_mutex);
-#ifdef GNASH_DEBUG_THREADS
-		log_debug("image_mutex: lock obtained in close");
-#endif
-		delete m_imageframe;
-		m_imageframe = NULL;
-#ifdef GNASH_DEBUG_THREADS
-		log_debug("image_mutex: releasing lock in close");
-#endif
-	}
+	delete m_imageframe;
+	m_imageframe = NULL;
 	delete m_unqueued_data;
 	m_unqueued_data = NULL;
 
@@ -583,30 +572,6 @@ NetStreamFfmpeg::startPlayback()
 	// Allocate a frame to store the decoded frame in
 	m_Frame = avcodec_alloc_frame();
 
-	{
-#ifdef GNASH_DEBUG_THREADS
-		log_debug("image_mutex: waiting for lock in startPlayback");
-#endif
-		boost::mutex::scoped_lock lock(image_mutex);
-#ifdef GNASH_DEBUG_THREADS
-		log_debug("image_mutex: lock obtained in startPlayback");
-#endif
-
-		// Determine required buffer size and allocate buffer
-		if (m_videoFrameFormat == render::YUV)
-		{
-			m_imageframe = new image::yuv(m_VCodecCtx->width,	m_VCodecCtx->height);
-		}
-		else if (m_videoFrameFormat == render::RGB)
-		{
-			m_imageframe = new image::rgb(m_VCodecCtx->width,	m_VCodecCtx->height);
-		}
-
-#ifdef GNASH_DEBUG_THREADS
-		log_debug("image_mutex: releasing lock in startPlayback");
-#endif
-	}
-
 	if ( m_audio_index >= 0 && _soundHandler )
 	{
 		// Get a pointer to the audio codec context for the video stream
@@ -1003,17 +968,16 @@ bool NetStreamFfmpeg::decodeVideo(AVPacket* packet)
 	avcodec_decode_video(m_VCodecCtx, m_Frame, &got, packet->data, packet->size);
 	if (!got) return false;
 
-
-	if (m_imageframe == NULL)
+	// This tmpImage is really only used to compute proper size of the video data...
+	// stupid isn't it ?
+	std::auto_ptr<image::image_base> tmpImage;
+	if (m_videoFrameFormat == render::YUV)
 	{
-		if (m_videoFrameFormat == render::YUV)
-		{
-			m_imageframe = new image::yuv(m_VCodecCtx->width, m_VCodecCtx->height);
-		}
-		else if (m_videoFrameFormat == render::RGB)
-		{
-			m_imageframe = new image::rgb(m_VCodecCtx->width, m_VCodecCtx->height);
-		}
+		tmpImage.reset( new image::yuv(m_VCodecCtx->width, m_VCodecCtx->height) );
+	}
+	else if (m_videoFrameFormat == render::RGB)
+	{
+		tmpImage.reset( new image::rgb(m_VCodecCtx->width, m_VCodecCtx->height) );
 	}
 
 	AVPicture rgbpicture;
@@ -1036,25 +1000,13 @@ bool NetStreamFfmpeg::decodeVideo(AVPacket* packet)
 		rgbpicture = media::VideoDecoderFfmpeg::convertRGB24(m_VCodecCtx, *m_Frame);
 		if (!rgbpicture.data[0])
 		{
-#ifdef GNASH_DEBUG_THREADS
-			log_debug("image_mutex: releasing lock in decodeVideo");
-#endif
 			return false;
 		}
 	}
 
 	media::raw_mediadata_t* video = new media::raw_mediadata_t();
 
-	if (m_videoFrameFormat == render::YUV)
-	{
-		video->m_data = new boost::uint8_t[static_cast<image::yuv*>(m_imageframe)->size()];
-	}
-	else if (m_videoFrameFormat == render::RGB)
-	{
-		image::rgb* tmp = static_cast<image::rgb*>(m_imageframe);
-		video->m_data = new boost::uint8_t[tmp->pitch() * tmp->height()];
-	}
-
+	video->m_data = new boost::uint8_t[tmpImage->size()];
 	video->m_ptr = video->m_data;
 	video->m_stream_index = m_video_index;
 	video->m_pts = 0;
@@ -1088,7 +1040,7 @@ bool NetStreamFfmpeg::decodeVideo(AVPacket* packet)
 
 	if (m_videoFrameFormat == render::YUV)
 	{
-		image::yuv* yuvframe = static_cast<image::yuv*>(m_imageframe);
+		image::yuv* yuvframe = static_cast<image::yuv*>(tmpImage.get());
 		unsigned int copied = 0;
 		boost::uint8_t* ptr = video->m_data;
 		for (int i = 0; i < 3 ; i++)
@@ -1142,10 +1094,6 @@ bool NetStreamFfmpeg::decodeVideo(AVPacket* packet)
 	// NOTE: Caller is assumed to have locked _qMutex already
 	if (m_isFLV) m_qvideo.push(video);
 	else m_unqueued_data = m_qvideo.push(video) ? NULL : video;
-
-#ifdef GNASH_DEBUG_THREADS
-	log_debug("image_mutex: releasing lock in decodeVideo");
-#endif
 
 	return true;
 }
@@ -1350,24 +1298,15 @@ NetStreamFfmpeg::refreshVideoFrame()
 		if (current_clock >= video_clock)
 		{
 
-#ifdef GNASH_DEBUG_THREADS
-			log_debug("image_mutex: waiting for lock in refreshVideoFrame");
-#endif
-
-			boost::mutex::scoped_lock lock(image_mutex);
-
-#ifdef GNASH_DEBUG_THREADS
-			log_debug("image_mutex: lock obtained in refreshVideoFrame");
-#endif
-
 			if (m_videoFrameFormat == render::YUV)
 			{
+				if ( ! m_imageframe ) m_imageframe  = new image::yuv(m_VCodecCtx->width, m_VCodecCtx->height);
 				// XXX m_imageframe might be a byte aligned buffer, while video is not!
 				static_cast<image::yuv*>(m_imageframe)->update(video->m_data);
 			}
 			else if (m_videoFrameFormat == render::RGB)
 			{
-
+				if ( ! m_imageframe ) m_imageframe  = new image::rgb(m_VCodecCtx->width, m_VCodecCtx->height);
 				image::rgb* imgframe = static_cast<image::rgb*>(m_imageframe);
 				rgbcopy(imgframe, video, m_VCodecCtx->width * 3);
 			}
@@ -1383,9 +1322,6 @@ NetStreamFfmpeg::refreshVideoFrame()
 			// A frame is ready for pickup
 			m_newFrameReady = true;
 
-#ifdef GNASH_DEBUG_THREADS
-			log_debug("image_mutex: releasing lock in refreshVideoFrame");
-#endif
 		}
 		else
 		{
