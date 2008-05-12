@@ -36,13 +36,13 @@ using namespace std;
 namespace gnash {
 
 static std::auto_ptr<FLVFrame>
-makeVideoFrame(tu_file& in, const FLVVideoFrame& frameInfo)
+makeVideoFrame(tu_file& in, const FLVVideoFrameInfo& frameInfo)
 {
 	std::auto_ptr<FLVFrame> frame ( new FLVFrame );
 
 	frame->dataSize = frameInfo.dataSize;
 	frame->timestamp = frameInfo.timestamp;
-	frame->tag = 9;
+	frame->type = videoFrame;
 
 	if ( in.set_position(frameInfo.dataPosition) )
 	{
@@ -65,11 +65,13 @@ makeVideoFrame(tu_file& in, const FLVVideoFrame& frameInfo)
 }
 
 static std::auto_ptr<FLVFrame>
-makeAudioFrame(tu_file& in, const FLVAudioFrame& frameInfo)
+makeAudioFrame(tu_file& in, const FLVAudioFrameInfo& frameInfo)
 {
 	std::auto_ptr<FLVFrame> frame ( new FLVFrame );
 	frame->dataSize = frameInfo.dataSize; 
 	frame->timestamp = frameInfo.timestamp;
+	frame->type = audioFrame;
+
 
 	if ( in.set_position(frameInfo.dataPosition) )
 	{
@@ -87,8 +89,6 @@ makeAudioFrame(tu_file& in, const FLVAudioFrame& frameInfo)
 	unsigned long int padding = chunkSize-dataSize;
 	assert(padding);
 	memset(frame->data + bytesread, 0, padding);
-
-	frame->tag = 8;
 
 	return frame;
 }
@@ -222,7 +222,7 @@ FLVFrame* FLVParser::nextMediaFrame()
 
 	if (useAudio) {
 
-		FLVAudioFrame* frameInfo = _audioFrames[_nextAudioFrame];
+		FLVAudioFrameInfo* frameInfo = _audioFrames[_nextAudioFrame];
 
 		std::auto_ptr<FLVFrame> frame = makeAudioFrame(_lt, *frameInfo);
 		if ( ! frame.get() )
@@ -236,7 +236,7 @@ FLVFrame* FLVParser::nextMediaFrame()
 
 	} else {
 
-		FLVVideoFrame* frameInfo = _videoFrames[_nextVideoFrame];
+		FLVVideoFrameInfo* frameInfo = _videoFrames[_nextVideoFrame];
 		std::auto_ptr<FLVFrame> frame = makeVideoFrame(_lt, *frameInfo);
 		if ( ! frame.get() )
 		{
@@ -266,7 +266,7 @@ FLVFrame* FLVParser::nextAudioFrame()
 	// If the needed frame can't be parsed (EOF reached) return NULL
 	if (_audioFrames.size() <= _nextAudioFrame || _audioFrames.size() == 0) return NULL;
 
-	FLVAudioFrame* frameInfo = _audioFrames[_nextAudioFrame];
+	FLVAudioFrameInfo* frameInfo = _audioFrames[_nextAudioFrame];
 	std::auto_ptr<FLVFrame> frame = makeAudioFrame(_lt, *frameInfo);
 	if ( ! frame.get() )
 	{
@@ -304,7 +304,7 @@ FLVFrame* FLVParser::nextVideoFrame()
 	}
 
 	// TODO: let a function do this
-	FLVVideoFrame* frameInfo = _videoFrames[_nextVideoFrame];
+	FLVVideoFrameInfo* frameInfo = _videoFrames[_nextVideoFrame];
 	std::auto_ptr<FLVFrame> frame = makeVideoFrame(_lt, *frameInfo);
 	if ( ! frame.get() )
 	{
@@ -336,7 +336,7 @@ boost::uint32_t FLVParser::seekAudio(boost::uint32_t time)
 
 	// If there are no audio greater than the given time
 	// the last audioframe is returned
-	FLVAudioFrame* lastFrame = _audioFrames.back();
+	FLVAudioFrameInfo* lastFrame = _audioFrames.back();
 	if (lastFrame->timestamp < time) {
 		_nextAudioFrame = _audioFrames.size() - 1;
 		return lastFrame->timestamp;
@@ -389,7 +389,7 @@ boost::uint32_t FLVParser::seekVideo(boost::uint32_t time)
 
 	// If there are no videoframe greater than the given time
 	// the last key videoframe is returned
-	FLVVideoFrame* lastFrame = _videoFrames.back();
+	FLVVideoFrameInfo* lastFrame = _videoFrames.back();
 	size_t numFrames = _videoFrames.size();
 	if (lastFrame->timestamp < time)
 	{
@@ -598,7 +598,7 @@ bool FLVParser::parseNextTag()
 	if (bodyLength == 0) return true;
 
 	if (tag[0] == AUDIO_TAG) {
-		FLVAudioFrame* frame = new FLVAudioFrame;
+		FLVAudioFrameInfo* frame = new FLVAudioFrameInfo;
 		frame->dataSize = bodyLength - 1;
 		frame->timestamp = timestamp;
 		frame->dataPosition = _lt.get_position();
@@ -622,7 +622,7 @@ bool FLVParser::parseNextTag()
 
 
 	} else if (tag[0] == VIDEO_TAG) {
-		FLVVideoFrame* frame = new FLVVideoFrame;
+		FLVVideoFrameInfo* frame = new FLVVideoFrameInfo;
 		frame->dataSize = bodyLength - 1;
 		frame->timestamp = timestamp;
 		frame->dataPosition = _lt.get_position();

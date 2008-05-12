@@ -30,23 +30,40 @@
 
 namespace gnash {
 
+/// Frame type
+enum FrameType {
+
+	/// Video frame
+	videoFrame,
+
+	/// Audio frame
+	audioFrame
+};
+
 /// \brief
-/// The FLVFrame class contains a video or audio frame, its size, its
+/// The FLVFrame class contains an encoded
+/// video or audio frame, its size, its
 /// timestamp,
 class FLVFrame
 {
 public:
+	/// Size of the encoded frame
 	boost::uint32_t dataSize;
+
+	/// Encoded data
 	boost::uint8_t* data;
+
+	/// Frame timestamp, in milliseconds
 	boost::uint64_t timestamp;
-	boost::uint8_t tag;
+
+	/// Frame type (audio/video)
+	FrameType type;
 };
 
 /// \brief
 /// The FLVAudioInfo class contains information about the audiostream
 /// in the FLV being parsed. The information stored is codec-type,
-/// samplerate, samplesize, stereo and duration.
-/// timestamp,
+/// samplerate, samplesize, stereo flag and duration.
 class FLVAudioInfo
 {
 public:
@@ -70,7 +87,6 @@ public:
 /// The FLVVideoInfo class contains information about the videostream
 /// in the FLV being parsed. The information stored is codec-type,
 /// width, height, framerate and duration.
-/// timestamp,
 class FLVVideoInfo
 {
 public:
@@ -92,7 +108,7 @@ public:
 
 
 /// Information about an FLV Audio Frame
-class FLVVideoFrame
+class FLVVideoFrameInfo
 {
 public:
 
@@ -117,7 +133,7 @@ public:
 };
 
 /// Information about an FLV Audio Frame
-class FLVAudioFrame
+class FLVAudioFrameInfo
 {
 public:
 	/// Size of the frame in bytes
@@ -321,18 +337,18 @@ private:
 	/// The interface to the file, externally owned
 	tu_file& _lt;
 
-	// NOTE: FLVVideoFrame is a relatively small structure,
+	// NOTE: FLVVideoFrameInfo is a relatively small structure,
 	//       chances are keeping by value here would reduce
 	//       memory fragmentation with no big cost
-	typedef std::vector<FLVVideoFrame*> VideoFrames;
+	typedef std::vector<FLVVideoFrameInfo*> VideoFrames;
 
 	/// list of videoframes, does no contain the frame data.
 	VideoFrames _videoFrames;
 
-	// NOTE: FLVAudioFrame is a relatively small structure,
+	// NOTE: FLVAudioFrameInfo is a relatively small structure,
 	//       chances are keeping by value here would reduce
 	//       memory fragmentation with no big cost
-	typedef std::vector<FLVAudioFrame*> AudioFrames;
+	typedef std::vector<FLVAudioFrameInfo*> AudioFrames;
 
 	/// list of audioframes, does no contain the frame data.
 	AudioFrames _audioFrames;

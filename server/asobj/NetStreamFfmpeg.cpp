@@ -807,13 +807,14 @@ bool NetStreamFfmpeg::decodeFLVFrame()
   	// FIXME: is this the right value for packet.dts?
   	packet.pts = packet.dts = static_cast<boost::int64_t>(frame->timestamp);
 
-	if (frame->tag == 9)
+	if (frame->type == videoFrame)
 	{
     		packet.stream_index = 0;
     		return decodeVideo(&packet);
 	}
 	else
 	{
+		assert(frame->type == audioFrame);
     		packet.stream_index = 1;
     		return decodeAudio(&packet);
 	}

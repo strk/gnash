@@ -1,3 +1,12 @@
+2008-05-12 Sandro Santilli <strk@keybit.net>
+
+	* libbase/FLVParser.{cpp,h}: more dox about utility classes,
+	  rename FLVVideoFrame and FLVAudioFrame to FLVVideoFrameInfo
+	  and FLVAudioFrameInfo as they don't contain the actual data,
+	  just offsets in the input.
+	* server/asobj/NetStreamFfmpeg.cpp: update use of FLVVideoFrame
+	  and FLVAudioFrame.
+
 2008-05-12 Robert Millan <rmh@aybabtu.com>
 
 	* libbase/: Makefile.am, gnashpluginrc.in, gnashrc.in,
