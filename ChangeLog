@@ -1,5 +1,12 @@
 2008-05-12 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/NetStream-SquareTest.c: have the second
+	  NetStream play an ogg. This is to help testing both access methods
+	  from ffmpeg handler, and to keep an eye on ogg support (gstreamer
+	  works pretty nicely here).
+
+2008-05-12 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/NetStreamFfmpeg.{cpp,h}: cache sound_handler pointer
 	  as class member (to reduce function calls).
 

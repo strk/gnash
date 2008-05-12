@@ -37,6 +37,7 @@
 
 const char* mediadir=".";
 char filename[256];
+char filename2[256];
 
 
 int
@@ -62,6 +63,7 @@ main(int argc, char** argv)
   }
 	
   sprintf(filename, "%s/square.flv", mediadir);
+  sprintf(filename2, "%s/square.ogg", mediadir);
 
   // Some online examples...
   //
@@ -106,7 +108,7 @@ main(int argc, char** argv)
 	"_root.startNotified=0;"
 	"_root.stopNotified=0;"
 	"stop();",
-	filename, filename);
+	filename, filename2);
 
   Ming_init();
   Ming_useSWFVersion (OUTPUT_VERSION);
@@ -135,7 +137,7 @@ main(int argc, char** argv)
   stream = newSWFVideoStream();
   SWFVideoStream_setDimension(stream, video_width, video_height);
   item = SWFMovie_add(mo, (SWFBlock)stream);
-  SWFDisplayItem_moveTo(item, 200, 0);
+  SWFDisplayItem_moveTo(item, 400, 0);
   SWFDisplayItem_setName(item, "video2");
 
   a = newSWFAction(buffer_a);
