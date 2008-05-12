@@ -1,3 +1,10 @@
+2008-05-12 Robert Millan <rmh@aybabtu.com>
+
+	* libbase/: Makefile.am, gnashpluginrc.in, gnashrc.in,
+	  sysgnashpluginrc.in, sysgnashrc.in:
+	  Use 'gnashrc' and 'gnashpluginrc', w/out 'sys' prefix.
+	  Patch #6509.
+
 2008-05-11 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/NetStream-SquareTest.c: add a second

@@ -15,7 +15,7 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-EXTRA_DIST = sysgnashrc.in sysgnashpluginrc.in
+EXTRA_DIST = gnashrc.in gnashpluginrc.in
 
 # this is where Gnash plugins get installed
 pluginsdir = $(prefix)/lib/gnash/plugins
@@ -26,7 +26,7 @@ LIBLTDLLIB = libltdl.la
 LIBLTDLHEAD =  $(top_srcdir)/libltdl/ltdl.h
 endif
 
-sysconf_DATA = sysgnashrc sysgnashpluginrc
+sysconf_DATA = gnashrc gnashpluginrc
 
 edit = sed \
 	-e 's|@DEFAULT_FLASH_PLATFORM_ID[@]|$(DEFAULT_FLASH_PLATFORM_ID)|g' \
@@ -35,10 +35,10 @@ edit = sed \
 	-e 's|@DEFAULT_FLASH_REV_NUMBER[@]|$(DEFAULT_FLASH_REV_NUMBER)|g' \
 	-e 's|@DEFAULT_STREAMS_TIMEOUT[@]|$(DEFAULT_STREAMS_TIMEOUT)|g' 
 
-sysgnashrc: sysgnashrc.in
+gnashrc: gnashrc.in
 	$(edit) '$(srcdir)/$@.in' >$@
 
-sysgnashpluginrc: sysgnashpluginrc.in
+gnashpluginrc: gnashpluginrc.in
 	$(edit) '$(srcdir)/$@.in' >$@
 
 # If we are using an installable libltdl, then it needs to be built
@@ -179,7 +179,7 @@ if CONVENIENCE_LTDL
 noinst_LTLIBRARIES = libltdlc.la
 libltdlc_la_SOURCES = $(top_srcdir)/libltdl/ltdl.c
 endif
-CLEANFILES = libltdl.la libltdlc.la sysgnashrc sysgnashpluginrc
+CLEANFILES = libltdl.la libltdlc.la gnashrc gnashpluginrc
 
 libltdl_la_SOURCES = $(top_srcdir)/libltdl/ltdl.c
 libltdl_la_LDFLAGS = -no-undefined -version-info 4:4:1
