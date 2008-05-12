@@ -196,9 +196,12 @@ private:
 	// Misured in seconds.
 	boost::uint32_t m_current_timestamp;
 
-	// The queues of audio and video data.
+	/// The queues of audio and video data.
 	media::multithread_queue <media::raw_mediadata_t*> m_qaudio;
 	media::multithread_queue <media::raw_mediadata_t*> m_qvideo;
+
+	/// Mutex protecting access to queues
+	boost::mutex _qMutex;
 
 	// The time we started playing in seconds (since VM start ?)
 	volatile boost::uint64_t m_start_clock;

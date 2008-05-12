@@ -171,6 +171,8 @@ void NetStreamFfmpeg::close()
 	delete m_unqueued_data;
 	m_unqueued_data = NULL;
 
+	boost::mutex::scoped_lock lock(_qMutex);
+
 	m_qvideo.clear();
 	m_qaudio.clear();
 
@@ -659,9 +661,9 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 	else
 	{
 		// We need to restart the audio
-		if (_soundHandler)
+		if (ns->_soundHandler)
 		{
-			_soundHandler->attach_aux_streamer(audio_streamer, ns);
+			ns->_soundHandler->attach_aux_streamer(audio_streamer, ns);
 		}
 	}
 
@@ -682,6 +684,8 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 		log_debug("Decoding iteration. bufferTime=%lu, bufferLen=%lu", ns->bufferTime(), ns->bufferLength());
 #endif
 
+		{
+		boost::mutex::scoped_lock lock(ns->_qMutex);
 		if (ns->m_isFLV)
 		{
 			// If queues are full then don't bother filling it
@@ -717,6 +721,7 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 			}
 
 		}
+		}
 
 		usleep(1000); // Sleep 1ms to avoid busying the processor.
 
@@ -747,6 +752,8 @@ bool NetStreamFfmpeg::audio_streamer(void *owner, boost::uint8_t *stream, int le
 
 	while (len > 0 && ns->m_qaudio.size() > 0)
 	{
+		boost::mutex::scoped_lock lock(ns->_qMutex);
+
     		media::raw_mediadata_t* samples = ns->m_qaudio.front();
 
 		int n = imin(samples->m_size, len);
@@ -1078,6 +1085,7 @@ bool NetStreamFfmpeg::decodeVideo(AVPacket* packet)
 
 	}
 
+	// NOTE: Caller is assumed to have locked _qMutex already
 	if (m_isFLV) m_qvideo.push(video);
 	else m_unqueued_data = m_qvideo.push(video) ? NULL : video;
 
@@ -1113,7 +1121,7 @@ bool NetStreamFfmpeg::decodeMediaFrame()
 
 	if (rc >= 0)
 	{
-		if (packet.stream_index == m_audio_index && get_sound_handler())
+		if (packet.stream_index == m_audio_index && _soundHandler)
 		{
       			if (!decodeAudio(&packet)) 
 			{
@@ -1235,6 +1243,8 @@ NetStreamFfmpeg::seek(boost::uint32_t pos)
 void
 NetStreamFfmpeg::refreshVideoFrame()
 {
+	boost::mutex::scoped_lock lock(_qMutex);
+
 	// If we're paused or not running, there is no need to do this
 	if (!m_go || m_pause) return;
 
@@ -1253,7 +1263,7 @@ NetStreamFfmpeg::refreshVideoFrame()
 
 		// Caclulate the current time
 		boost::uint32_t current_clock;
-		if (m_ACodecCtx && get_sound_handler())
+		if (m_ACodecCtx && _soundHandler)
 		{
 			current_clock = m_current_timestamp;
 		}

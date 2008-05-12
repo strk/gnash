@@ -1,5 +1,20 @@
 2008-05-12 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/NetStreamFfmpeg.{cpp,h}: complete use of cached
+	  sound_handler; add a mutex protecting generic access to the
+	  audio/video queues. The mutex will be locked by
+	  loader/parser/decoder thread, main thread (refreshVideoFrame)
+	  and audio streamer (audio_streamer).
+	  The rationale here is that locking on each inspector or modifier
+	  on the single queue is pretty useless, as code relies on cached
+	  informations about them, like their size, their composition and
+	  so on. Should be pretty safe to remove any locking on the 
+	  multiqueue_threads now (should also change name...) but better
+	  postpone this.
+
+
+2008-05-12 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/NetStream-SquareTest.c: have the second
 	  NetStream play an ogg. This is to help testing both access methods
 	  from ffmpeg handler, and to keep an eye on ogg support (gstreamer
