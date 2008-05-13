@@ -17,10 +17,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifdef HAVE_CONFIG_H
-# include "gnashconfig.h"
-#endif
-
 #include "GnashException.h"
 #include "URL.h"
 #include "noseek_fd_adapter.h"
@@ -35,12 +31,14 @@
 #include "render_handler_agg.h"
 #include "SystemClock.h"
 #include "log.h"
+#include "rc.h"
 
-#include <cstdio>
 #include <string>
 #include <memory>
 
 #include "gnashpython.h"
+
+#define LOG_QUEUE_MAX 200
 
 #define REQUIRE_MOVIE_LOADED if (!_movieDef) throw GnashException("No Movie Loaded!")
 #define REQUIRE_VM_STARTED if (!_movieRoot) throw GnashException("VM not started!")
@@ -49,6 +47,7 @@ namespace gnash {
 
 namespace pythonwrapper {
 
+std::deque<std::string> GnashPlayer::_logMessages;
 
 GnashPlayer::GnashPlayer()
 	:
@@ -58,10 +57,8 @@ GnashPlayer::GnashPlayer()
     _logFile(gnash::LogFile::getDefaultInstance()),
     _xpos(0),
     _ypos(0),
-    _url(""),
-    _fp(NULL)
+    _url("")
 {
-    init();
 }
 
 GnashPlayer::~GnashPlayer()
@@ -80,6 +77,36 @@ void
 GnashPlayer::init()
 {
     gnash::gnashInit();
+    _logFile.registerLogCallback(&receiveLogMessages);
+}
+
+void 
+GnashPlayer::receiveLogMessages(const std::string& s)
+{
+    /// Make sure the _logMessage queue doesn't grow out of control.
+    if (_logMessages.size() > LOG_QUEUE_MAX)
+    {
+        _logMessages.pop_front();
+    }
+    _logMessages.push_back(s);
+}
+
+std::string
+GnashPlayer::getLogMessage()
+{
+    if (! _logMessages.empty() )
+    {
+        std::string ret = _logMessages.front();
+        _logMessages.pop_front();
+        return ret;
+    }
+    return "";
+}
+
+size_t
+GnashPlayer::logSize()
+{
+    return _logMessages.size();
 }
 
 void
@@ -104,42 +131,50 @@ GnashPlayer::setBaseURL(std::string url)
     gnash::set_base_url( (gnash::URL)_url );
 }
 
-// TODO: Read in movies from a python file object.
+
 bool
-GnashPlayer::loadMovie(std::string url)
+GnashPlayer::loadMovie(PyObject& pf)
 {
 
     if (_movieDef) return false;
-    
-    setBaseURL(url);
+
+    init();
+        
+    FILE* file = PyFile_AsFile(&pf);
+
+    std::string filename(PyString_AsString(PyFile_Name(&pf)));
+
+    URL baseurl = URL(filename);
+
+    setBaseURL(baseurl.str());
+
+    // Add URL to sandbox
+	RcInitFile& rcfile = RcInitFile::getDefaultInstance();
+	const std::string& path = baseurl.path();
+	size_t lastSlash = path.find_last_of('/');
+	std::string dir = path.substr(0, lastSlash+1);
+	rcfile.addLocalSandboxPath(dir);
 
     // Fail if base URL not set
     if (_url == "") return false;
 
-    _fp = fopen(_url.c_str(), "rb");
-    
-    if (!_fp) return false;
-
-    std::auto_ptr<tu_file> in(noseek_fd_adapter::make_stream(fileno(_fp)));
+    std::auto_ptr<tu_file> in(noseek_fd_adapter::make_stream(fileno(file)));
       
     _movieDef = gnash::create_movie(in, _url, false);
     
     if (!_movieDef) {
-        // Something didn't work
-        fclose(_fp);
-	return false;
+        return false;
     }
     
     return true;
 }
 
+
 bool
 GnashPlayer::initVM()
 {
 
-    // If movie definition hasn't already been created, try to create it,
-    // fail if that doesn't work either.
-    if (!_movieDef  && !loadMovie(_url)) return false;
+    if (!_movieDef || _movieRoot ) return false;
 
     // Initialize the VM with a manual clock
     _movieRoot = &(gnash::VM::init(*_movieDef, _manualClock).getRoot());
@@ -151,10 +186,6 @@ GnashPlayer::initVM()
     
     _movieDef->completeLoad();
     _movieDef->ensure_frame_loaded(getSWFFrameCount());
-    
-    if (_fp) {
-        fclose (_fp);
-    }
 
     // I don't know why it's done like this.
     std::auto_ptr<movie_instance> mi (_movieDef->create_movie_instance());
@@ -165,20 +196,12 @@ GnashPlayer::initVM()
     return true; 
 }
 
-// Whether the movie can be resized or not
-void
-GnashPlayer::allowRescale(bool allow)
-{
-    REQUIRE_VM_STARTED;
-    _movieRoot->allowRescaling(allow);
-}
 
 // Whether debug messages are sent to stdout
 void
-GnashPlayer::setVerbose(bool verbose)
+GnashPlayer::setVerbosity(unsigned verbosity)
 {
-    // Can't turn this off yet...
-    if (verbose) _logFile.setVerbosity();
+    _logFile.setVerbosity(verbosity);
 }
 
 // Move Gnash's sense of time along manually

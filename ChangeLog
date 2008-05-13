@@ -1,5 +1,12 @@
 2008-05-13 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* pythonmodule/pyGnash.cpp, pythonmodule/gnashpython.{cpp,h}: make
+	  it build again; allow fetching log messages; let Python handle the
+	  file object, not Gnash; clean up a bit. There's no option to build
+	  this code, so it's irrelevant for the release.
+
+2008-05-13 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* server/swf/tag_loaders.cpp: minor cleanups, typo corrections,
 	  include used headers.
 	* server/parser/movie_def_impl.h: log malformed SWF and return

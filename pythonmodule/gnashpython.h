@@ -33,7 +33,10 @@
 #include "character.h"
 #include "log.h"
 
-#include <string> 
+#include <string>
+#include <memory>
+#include <deque>
+#include <boost/python.hpp>
 
 // Because the Python bindings are there to allow flexible access
 // to Gnash in an interpreted language, there need to be many
@@ -66,8 +69,10 @@ public:
     // For exiting
     void close();
 
-    // Movie creation
-    bool loadMovie(std::string url);
+    /// Movie creation
+    
+    /// Takes a python file object
+    bool loadMovie(PyObject& pf);
     bool initVM();
 
     // Renderer
@@ -93,10 +98,9 @@ public:
     // Interaction
     void advanceClock(unsigned long ms);
     void advance();
-    void allowRescale(bool allow);
     void render(bool forceRedraw);
     void restart();
-    void setVerbose(bool verbose);
+    void setVerbosity(unsigned verbosity);
     
     geometry::SnappingRanges2d<int> getInvalidatedRanges() const;
     
@@ -113,6 +117,9 @@ public:
     // @ return whether the keypress triggered an event needing a redraw. Use this
     // to decide whether to rerender.
     bool pressKey(int code);
+
+    static std::string getLogMessage();
+    static size_t logSize();
     
 private:
     void init();
@@ -126,7 +133,7 @@ private:
 
     gnash::InvalidatedRanges _invalidatedBounds;
  
-    gnash::LogFile& _logFile ;
+    gnash::LogFile& _logFile;
     
     // The position of our pointer
     int _xpos, _ypos;
@@ -134,8 +141,10 @@ private:
     // The base URL of the movie;
     std::string _url;
 
-    // File to open (a bit primitive...)    
-    FILE* _fp;
+    static std::deque<std::string> _logMessages;
+
+    static void receiveLogMessages(const std::string& s);
+
 };
 
 class GnashCharacter
