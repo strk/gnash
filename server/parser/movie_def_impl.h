@@ -476,7 +476,17 @@ public:
 	/// images (JPEG images without the table info).
 	void	set_jpeg_loader(std::auto_ptr<jpeg::input> j_in)
 	{
-	    assert(m_jpeg_in.get() == NULL);
+	    if (m_jpeg_in.get())
+	    {
+	        /// There should be only one JPEGTABLES tag in an SWF (see: 
+	        /// http://www.m2osw.com/en/swf_alexref.html#tag_jpegtables)
+	        /// Discard any subsequent attempts to set the jpeg loader
+	        /// to avoid crashing on very malformed SWFs. (No conclusive tests
+	        /// for pp behaviour, though one version also crashes out on the
+	        /// malformed SWF that triggers this assert in Gnash).
+	        log_swferror(_("More than one JPEGTABLES tag found: not resetting JPEG loader"));
+	        return;
+	    }
 	    m_jpeg_in = j_in;
 	}
 

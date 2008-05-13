@@ -1,3 +1,10 @@
+2008-05-13 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/swf/tag_loaders.cpp: minor cleanups, typo corrections,
+	  include used headers.
+	* server/parser/movie_def_impl.h: log malformed SWF and return
+	  when more than one JPEGTABLES tag present. Fixes bug #23201.
+
 2008-05-12 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/NetStreamFfmpeg.cpp (pausePlayback): detach aux

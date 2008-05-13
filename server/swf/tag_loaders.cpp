@@ -59,6 +59,8 @@
 #include <zlib.h>
 #endif
 #include <map>
+#include <limits>
+#include <cassert>
 
 namespace gnash {
 
@@ -214,8 +216,8 @@ frame_label_loader(stream* in, tag_type tag, movie_definition* m)
 	else
 	{
 	    IF_VERBOSE_MALFORMED_SWF(
-		log_swferror(_("frame_label_loader end position " SIZET_FMT ", "
-			       "read up to " SIZET_FMT),
+		log_swferror(_("frame_label_loader end position %d, "
+			       "read up to %d"),
 			     end_tag, curr_pos);
 	    );
 	}
@@ -235,16 +237,16 @@ jpeg_tables_loader(stream* in, tag_type tag, movie_definition* m)
         log_parse(_("  jpeg_tables_loader"));
     );
 
-    unsigned long currPos = in->get_position();
-    unsigned long endPos = in->get_tag_end_position();
+    const unsigned long currPos = in->get_position();
+    const unsigned long endPos = in->get_tag_end_position();
 
     assert(endPos >= currPos);
 
-    unsigned int jpegHeaderSize = endPos-currPos;
+    const unsigned long jpegHeaderSize = endPos - currPos;
 
     if ( ! jpegHeaderSize )
     {
-        log_debug(_("No bytes to read in JPEGTABLES tag at offset %lu"), currPos);
+        log_debug(_("No bytes to read in JPEGTABLES tag at offset %d"), currPos);
     }
 
     std::auto_ptr<jpeg::input> j_in;
@@ -259,7 +261,7 @@ jpeg_tables_loader(stream* in, tag_type tag, movie_definition* m)
 	// of gnash::stream::read(), so this is not a problem.
 	//
         std::auto_ptr<tu_file> ad( StreamAdapter::getFile(*in, std::numeric_limits<unsigned long>::max()) );
-        //  transfer ownerhip to the jpeg::input
+        //  transfer ownership to the jpeg::input
         j_in.reset(jpeg::input::create_swf_jpeg2_header_only(ad.release(), jpegHeaderSize, true));
 
     }
