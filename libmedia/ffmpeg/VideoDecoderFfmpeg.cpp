@@ -193,12 +193,10 @@ VideoDecoderFfmpeg::pop()
 {
   std::auto_ptr<image::rgb> ret;
 
-  std::for_each(_video_frames.begin(), _video_frames.end(), boost::bind(&gnash::media::VideoDecoderFfmpeg::decode, this, _1));
-#if 0
-  BOOST_FOREACH(const EncodedVideoFrame* frame, _video_frames) {
-    ret = decode(frame->data(), frame->dataSize());
+  for (std::vector<const EncodedVideoFrame*>::iterator it =
+       _video_frames.begin(), end = _video_frames.end(); it != end; ++it) {
+     ret = decode((*it)->data(), (*it)->dataSize());
   }
-#endif
 
   _video_frames.clear();
 

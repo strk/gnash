@@ -1,3 +1,8 @@
+2008-05-13 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* libmedia/ffmpeg/VideoDecoderFfmpeg.cpp: Don't neglect to return the
+	decoded frame.
+
 2008-05-13 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* pythonmodule/pyGnash.cpp, pythonmodule/gnashpython.{cpp,h}: make
