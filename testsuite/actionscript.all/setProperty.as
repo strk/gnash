@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: setProperty.as,v 1.7 2008/05/14 08:14:25 zoulunkai Exp $";
+rcsid="$Id: setProperty.as,v 1.8 2008/05/14 08:28:45 zoulunkai Exp $";
 #include "check.as"
 
 #ifdef MING_SUPPORTS_ASM
@@ -139,29 +139,34 @@ _root.checkpoint = "var_in_root";
 createSprite("mc4", 40);
 mc4.checkpoint = "var_in_mc4";
 mc4.func = function () {
-	check_equals(this, _root.mc4);
+    check_equals(this, _root.mc4);
 #if OUTPUT_VERSION == 5
-	// for swf5, mc4 is the top of the scope chain.
-	xcheck_equals(checkpoint, var_in_mc4);
-	xcheck_equals(_target, "/mc4");
+    // for swf5, mc4 is the top of the scope chain.
+    xcheck_equals(checkpoint, var_in_mc4);
+    xcheck_equals(_target, "/mc4");
+    checkpoint = 0;
+    xcheck_equals(this.checkpoint, 0);
 #else
-	// for swf6 and above, current target is the top of the scope chain.
-	check_equals(checkpoint, "var_in_root");
-	check_equals(_target, "/");
+    // for swf6 and above, current target is the top of the scope chain.
+    check_equals(checkpoint, "var_in_root");
+    check_equals(_target, "/");
+    checkpoint = 0;
+    check_equals(_root.checkpoint, 0);
 #endif
 };
 mc4.func();
 
+_root.checkpoint = "var_in_root";
 obj.checkpoint = "var_in_obj";
 obj = new Object();
 obj.func = function () {
-	check_equals(this, obj);
-	// "this" object is not part of the scope chain for all swf versions.
-	// But if "this" is a sprite(tests right above), the situation is different...
-	check_equals(checkpoint, "var_in_root");
+    check_equals(this, obj);
+    // "this" object is not part of the scope chain for all swf versions.
+    // But if "this" is a sprite(tests right above), the situation is different...
+    check_equals(checkpoint, "var_in_root");
 };
 obj.func();
 
-check_totals(14); 
+check_totals(15); 
 
 #endif //MING_SUPPORTS_ASM
