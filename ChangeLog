@@ -1,5 +1,11 @@
 2008-05-14 Sandro Santilli <strk@keybit.net>
 
+	* server/dlist.cpp (mergeDisplayList): add assertion checking
+	  when GNASH_PARANOIA_LEVEL > 1. The assertion fails running
+	  movie attached to bug #23248.
+
+2008-05-14 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/NetStreamGst.cpp (time,bytesLoaded,bytesTotal): check
 	  existance of the elements before querying them. Fixes some
 	  gst-CRITICAL errors.

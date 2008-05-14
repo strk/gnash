@@ -1040,6 +1040,29 @@ DisplayList::mergeDisplayList(DisplayList & newList)
     }
 
     // clear the new display list after merge
+    // ASSERT:
+    // 	- Any element in newList._charsByDepth is either marked as unloaded
+    //    or found in this list
+#if GNASH_PARANOIA_LEVEL > 1
+    for (iterator i=newList._charsByDepth.begin(), e=newList._charsByDepth.end(); i!=e; ++i)
+    {
+        character* ch = (*i).get();
+        if ( ! ch->isUnloaded() )
+	{
+		iterator found = std::find(_charsByDepth.begin(), _charsByDepth.end(), ch);
+		if ( found == _charsByDepth.end() )
+		{
+			log_error("mergeDisplayList: character %s (%s at depth %d [%d]) "
+				"about to be discarded in given display list"
+				" is not marked as unloaded and not found in the"
+				" merged current displaylist",
+				ch->getTarget(), typeName(*ch), ch->get_depth(),
+				ch->get_depth()-character::staticDepthOffset);
+			abort();
+		}
+	}
+    }
+#endif
     newList._charsByDepth.clear();
 
     testInvariant();
