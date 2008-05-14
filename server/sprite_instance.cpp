@@ -1021,10 +1021,10 @@ sprite_getBounds(const fn_call& fn)
   if ( bounds.isFinite() )
   {
     // Round to the twip
-    xMin = int(rint(bounds.getMinX())) / 20.0f;
-    yMin = int(rint(bounds.getMinY())) / 20.0f;
-    xMax = int(rint(bounds.getMaxX())) / 20.0f;
-    yMax = int(rint(bounds.getMaxY())) / 20.0f;
+    xMin = std::floor(bounds.getMinX() + 0.5) / 20.0;
+    yMin = std::floor(bounds.getMinY() + 0.5) / 20.0;
+    xMax = std::floor(bounds.getMaxX() + 0.5) / 20.0;
+    yMax = std::floor(bounds.getMaxY() + 0.5) / 20.0;
   }
 
   boost::intrusive_ptr<as_object> bounds_obj(new as_object());

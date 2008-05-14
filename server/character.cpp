@@ -184,8 +184,8 @@ character::set_invalidated(const char* debug_file, int debug_line)
 		m_invalidated = true;
 		
 		#ifdef DEBUG_SET_INVALIDATED
-		printf("%p set_invalidated() of %s in %s:%d\n",
-			this, get_name(), debug_file, debug_line);
+		log_debug("%p set_invalidated() of %s in %s:%d",
+			(void*)this, get_name(), debug_file, debug_line);
 		#else
 		UNUSED(debug_file);
 		UNUSED(debug_line);
@@ -215,7 +215,7 @@ character::set_child_invalidated()
 void 
 character::dump_character_tree(const std::string prefix) const
 {
-  log_debug("%s%s<%p> I=%d,CI=%d", prefix, typeName(*this).c_str(), this,
+  log_debug("%s%s<%p> I=%d,CI=%d", prefix, typeName(*this), this,
     m_invalidated, m_child_invalidated);  
 }
 
@@ -245,7 +245,7 @@ character::x_getset(const fn_call& fn)
 	}
 	else // setter
 	{
-		double newx = fn.arg(0).to_number();
+		const double newx = fn.arg(0).to_number();
 		matrix m = ptr->get_matrix();
 		m.set_x_translation(std::floor(std::infinite_to_fzero(PIXELS_TO_TWIPS(newx))));
 		ptr->set_matrix(m);
@@ -268,7 +268,7 @@ character::y_getset(const fn_call& fn)
 	}
 	else // setter
 	{
-		double newy = fn.arg(0).to_number();
+		const double newy = fn.arg(0).to_number();
 		matrix m = ptr->get_matrix();
 		m.set_y_translation(std::floor(std::infinite_to_fzero(PIXELS_TO_TWIPS(newy))));
 		ptr->set_matrix(m);
@@ -287,14 +287,14 @@ character::xscale_getset(const fn_call& fn)
 	if ( fn.nargs == 0 ) // getter
 	{
 		matrix m = ptr->get_matrix();
-		float xscale = m.get_x_scale();
+		const float xscale = m.get_x_scale();
 		rv = as_value(xscale * 100); // result in percent
 	}
 	else // setter
 	{
 		matrix m = ptr->get_matrix();
 
-		double scale_percent = fn.arg(0).to_number();
+		const double scale_percent = fn.arg(0).to_number();
 
 		// Handle bogus values
 		if (isnan(scale_percent))
@@ -307,7 +307,7 @@ character::xscale_getset(const fn_call& fn)
 		}
 
 		// input is in percent
-		float scale = (float)scale_percent/100.f;
+		float scale = static_cast<float>(scale_percent) / 100.f;
 		ptr->set_x_scale(scale);
 	}
 	return rv;
@@ -323,14 +323,14 @@ character::yscale_getset(const fn_call& fn)
 	if ( fn.nargs == 0 ) // getter
 	{
 		matrix m = ptr->get_matrix();
-		float yscale = m.get_y_scale();
+		const float yscale = m.get_y_scale();
 		rv = as_value(yscale * 100); // result in percent
 	}
 	else // setter
 	{
 		matrix m = ptr->get_matrix();
 
-		double scale_percent = fn.arg(0).to_number();
+		const double scale_percent = fn.arg(0).to_number();
 
 		// Handle bogus values
 		if (isnan(scale_percent))
@@ -343,7 +343,7 @@ character::yscale_getset(const fn_call& fn)
 		}
 
 		// input is in percent
-		float scale = (float)scale_percent/100.f;
+		float scale = static_cast<float>(scale_percent) / 100.f;
 		ptr->set_y_scale(scale);
 	}
 	return rv;
@@ -361,7 +361,7 @@ character::xmouse_get(const fn_call& fn)
 
 	matrix m = ptr->get_world_matrix();
 
-	point a(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
+	const point a(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
 	point b;
 		
 	m.transform_by_inverse(&b, a);
@@ -380,7 +380,7 @@ character::ymouse_get(const fn_call& fn)
 
 	matrix m = ptr->get_world_matrix();
 
-	point a(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
+	const point a(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
 	point b;
 		
 	m.transform_by_inverse(&b, a);
@@ -400,8 +400,8 @@ character::alpha_getset(const fn_call& fn)
 	}
 	else // setter
 	{
-		as_value& inval = fn.arg(0);
-		double input = inval.to_number();
+		const as_value& inval = fn.arg(0);
+		const double input = inval.to_number();
 		if ( inval.is_undefined() || inval.is_null() || ! isfinite(input) )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
@@ -458,7 +458,7 @@ character::width_getset(const fn_call& fn)
 			matrix m = ptr->get_matrix();
 			m.transform(bounds);
 			assert(bounds.isFinite());
-			w = TWIPS_TO_PIXELS(rint(bounds.width()));
+			w = TWIPS_TO_PIXELS(std::floor(bounds.width() + 0.5));
 		}
 		rv = as_value(w);
 	}
@@ -471,7 +471,7 @@ character::width_getset(const fn_call& fn)
 			return rv;
 		}
 
-		double oldwidth = bounds.width();
+		const double oldwidth = bounds.width();
 		if ( oldwidth <= 0 )
 		{
 			log_unimpl(_("FIXME: can't set _width on character %s (%s) with width %d"),
@@ -479,7 +479,7 @@ character::width_getset(const fn_call& fn)
 			return rv;
 		}
 
-		double newwidth = PIXELS_TO_TWIPS(fn.arg(0).to_number());
+		const double newwidth = PIXELS_TO_TWIPS(fn.arg(0).to_number());
 		if ( newwidth <= 0 )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
@@ -510,7 +510,7 @@ character::height_getset(const fn_call& fn)
 			matrix m = ptr->get_matrix();
 			m.transform(bounds);
 			assert(bounds.isFinite());
-			h = TWIPS_TO_PIXELS(rint(bounds.height()));
+			h = TWIPS_TO_PIXELS(std::floor(bounds.height() + 0.5));
 		}
 		rv = as_value(h);
 	}
@@ -523,7 +523,7 @@ character::height_getset(const fn_call& fn)
 			return rv;
 		}
 
-		double oldheight = bounds.height();
+		const double oldheight = bounds.height();
 		if ( oldheight <= 0 )
 		{
 			log_unimpl(_("FIXME: can't set _height on character %s (%s) with height %d"),
@@ -531,11 +531,12 @@ character::height_getset(const fn_call& fn)
 			return rv;
 		}
 
-		double newheight = PIXELS_TO_TWIPS(fn.arg(0).to_number());
+		const double newheight = PIXELS_TO_TWIPS(fn.arg(0).to_number());
 		if ( newheight <= 0 )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror(_("Setting _height=%g of character %s (%s)"), newheight/20, ptr->getTarget().c_str(), typeName(*ptr).c_str());
+			log_aserror(_("Setting _height=%g of character %s (%s)"),
+			                newheight / 20,ptr->getTarget(), typeName(*ptr));
 			);
 		}
 
@@ -567,7 +568,7 @@ character::rotation_getset(const fn_call& fn)
 		matrix m = ptr->get_matrix();
 
 		// input is in degrees
-		float rotation = (float) fn.arg(0).to_number() * float(M_PI) / 180.f;
+		const float rotation = (float) fn.arg(0).to_number() * float(M_PI) / 180.f;
 		m.set_rotation(rotation);
 
 		ptr->set_matrix(m);
@@ -605,7 +606,7 @@ character::name_getset(const fn_call& fn)
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		VM& vm = VM::get(); // TODO: fetch VM from ptr 
+		const VM& vm = VM::get(); // TODO: fetch VM from ptr 
 		const std::string& name = ptr->get_name();
 		if ( vm.getSWFVersion() < 6 && name.empty() )
 		{
@@ -613,7 +614,7 @@ character::name_getset(const fn_call& fn)
 		} 
 		else
 		{
-			return as_value(name.c_str());
+			return as_value(name);
 		}
 	}
 	else // setter
@@ -632,7 +633,7 @@ character::set_event_handlers(const Events& copyfrom)
 	{
 		const event_id& ev = it->first;
 		const BufferList& bufs = it->second;
-		for (size_t i=0; i<bufs.size(); ++i)
+		for (size_t i = 0, e = bufs.size(); i < e; ++i)
 		{
 			const action_buffer* buf = bufs[i];
 			assert(buf);
@@ -881,7 +882,7 @@ character::getTarget() const
 
 	// Build the target string from the parents stack
 	std::string target;
-	for ( Path::reverse_iterator
+	for ( Path::const_reverse_iterator
 			it=path.rbegin(), itEnd=path.rend();
 			it != itEnd;
 			++it )
@@ -978,9 +979,9 @@ character::setMask(character* mask)
 	if ( _mask )
 	{
 		log_debug(" %s.setMask(%s): registering with new mask %s",
-			getTarget().c_str(),
-			mask ? mask->getTarget().c_str() : "null",
-			_mask->getTarget().c_str());
+			getTarget(),
+			mask ? mask->getTarget() : "null",
+			_mask->getTarget());
 		/// Register as as masked by the mask
 		_mask->setMaskee(this);
 	}
@@ -999,7 +1000,7 @@ character::setMaskee(character* maskee)
 		// We don't want the maskee to call setMaskee(null)
 		// on us again
 		log_debug(" %s.setMaskee(%s) : previously masked char %s being set as non-masked",
-			getTarget().c_str(), maskee ? maskee->getTarget().c_str() : "null", _maskee->getTarget().c_str());
+			getTarget(), maskee ? maskee->getTarget() : "null", _maskee->getTarget());
 		_maskee->_mask = NULL;
 	}
 

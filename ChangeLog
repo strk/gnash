@@ -1,3 +1,12 @@
+2008-05-14 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/character.cpp: rint isn't a standard function, and isn't
+	  defined on some platforms, but is equivalent to std::floor(x + 0.5).
+	  Minor const correctness changes, drop c_str() usage where
+	  appropriate. 
+	* server/sprite_instance.cpp: replace rint. Don't construct an int
+	  from a double, only to divide by a float to get a double again.
+
 2008-05-14 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/loop_test.c: place the subject of the test
