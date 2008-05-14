@@ -118,6 +118,7 @@ main(int argc, char** argv)
 
   SWFDisplayItem it1, it2;
   it1 = SWFMovie_add(mo, (SWFBlock)mc1);  //add movieClip1 to the _root
+  SWFDisplayItem_setDepth(it1, 64000);
   SWFDisplayItem_setName(it1, "movieClip1"); //name movieClip1
   SWFDisplayItem_addAction(it1, newSWFAction("_root.mc1Constructed++;"),
 		  SWFACTION_CONSTRUCT);

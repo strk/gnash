@@ -1,5 +1,11 @@
 2008-05-14 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/loop_test.c: place the subject of the test
+	  at depth 64000, triggering a failure in the mergeDisplayList
+	  assertion checking (when GNASH_PARANOIA_LEVEL>1).
+
+2008-05-14 Sandro Santilli <strk@keybit.net>
+
 	* server/dlist.cpp (mergeDisplayList): add assertion checking
 	  when GNASH_PARANOIA_LEVEL > 1. The assertion fails running
 	  movie attached to bug #23248.
