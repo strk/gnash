@@ -320,6 +320,8 @@ NetStreamGst::seek(boost::uint32_t pos)
 boost::int32_t
 NetStreamGst::time()
 {  
+  if ( ! _pipeline ) return 0;
+
   GstFormat fmt = GST_FORMAT_TIME;
   
   gint64 pos = 0;
@@ -390,6 +392,8 @@ long
 NetStreamGst::bytesLoaded()
 {
 
+  if ( ! _downloader ) return 0;
+
   gint64 pos = 0;
   GstFormat format = GST_FORMAT_BYTES;
   gst_element_query_position(_downloader, &format, &pos);
@@ -412,7 +416,10 @@ NetStreamGst::bytesLoaded()
 long
 NetStreamGst::bytesTotal()
 {  
+  if ( ! _downloader ) return _duration;
+
   gint64 duration = 0;
+
   GstFormat format = GST_FORMAT_BYTES;
   
   gst_element_query_duration (_downloader, &format, &duration);

@@ -1,3 +1,9 @@
+2008-05-14 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/NetStreamGst.cpp (time,bytesLoaded,bytesTotal): check
+	  existance of the elements before querying them. Fixes some
+	  gst-CRITICAL errors.
+
 2008-05-13 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* libmedia/ffmpeg/VideoDecoderFfmpeg.cpp: Don't neglect to return the
