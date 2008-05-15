@@ -68,6 +68,10 @@ SWFAction  action_in_root()
       "if ( ++runs > 5 )  {"
       "  _root.check_equals(mc1Constructed, 1);"
       "  _root.check_equals(mc2Constructed, 1);"
+      "  _root.check_equals(mc1Unloaded, undefined);"
+      "  _root.check_equals(mc2Unloaded, undefined);"
+      "  _root.check_equals(mc1Executed, 1);"
+      "  _root.check_equals(mc2Executed, 1);"
       "  totals();"
       "  stop();"
       "}"
@@ -109,11 +113,13 @@ main(int argc, char** argv)
   sh1 = make_fill_square (300, 300, 60, 60, 255, 0, 0, 255, 0, 0);
   mc1 = newSWFMovieClip();
   SWFMovieClip_add(mc1, (SWFBlock)sh1); 
+  SWFMovieClip_add(mc1, newSWFAction("_root.mc1Executed++;"));
   SWFMovieClip_nextFrame(mc1);
   
   sh2 = make_fill_square (330, 270, 120, 120, 0, 0, 0, 0, 0, 0);
   mc2 = newSWFMovieClip();
   SWFMovieClip_add(mc2, (SWFBlock)sh2);  
+  SWFMovieClip_add(mc2, newSWFAction("_root.mc2Executed++;"));
   SWFMovieClip_nextFrame(mc2); 
 
   SWFDisplayItem it1, it2;
@@ -122,11 +128,15 @@ main(int argc, char** argv)
   SWFDisplayItem_setName(it1, "movieClip1"); //name movieClip1
   SWFDisplayItem_addAction(it1, newSWFAction("_root.mc1Constructed++;"),
 		  SWFACTION_CONSTRUCT);
+  SWFDisplayItem_addAction(it1, newSWFAction("_root.mc1Unloaded++;"),
+		  SWFACTION_UNLOAD);
 
   it2 = SWFMovie_add(mo, (SWFBlock)mc2);  //add movieClip2 to the _root
   SWFDisplayItem_setName(it2, "movieClip2"); //name movieClip2
   SWFDisplayItem_addAction(it2, newSWFAction("_root.mc2Constructed++;"),
 		  SWFACTION_CONSTRUCT);
+  SWFDisplayItem_addAction(it2, newSWFAction("_root.mc2Unloaded++;"),
+		  SWFACTION_UNLOAD);
   
   SWFMovie_nextFrame(mo); 
   SWFMovie_nextFrame(mo); 
