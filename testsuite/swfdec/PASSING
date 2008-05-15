@@ -79,6 +79,10 @@ atan2-8.swf:d780802cf9d18559de95d517248cf027
 attachmovie-object-5.swf:a1fa0db4e7ac649e5451ff5e96a71436
 attachmovie-object-6.swf:52c0c8d46a3535c7db79d3d827b31b41
 attachmovie-object-7.swf:9a18445affc4ae1dc0e0fe085b13f1e1
+beginFill-values-5.swf:8bce6af5505b7ba23ffc26095008a977
+beginFill-values-6.swf:431ddb714956dd170060f95df230425d
+beginFill-values-7.swf:d02c60a25c48eedefe9b6a44654741ef
+beginFill-values-8.swf:6413d81730e062f9ded5052440cb3144
 bevel-filter-properties-5.swf:019bb55478951055973b5f953b2e82ef
 bevel-filter-properties-5.swf:0ec31af3035594a9cbcb1ba8a645ad4c
 bitmap-filter-properties-5.swf:62973bfcdf9f1fd383440fabcbfebca9
@@ -710,6 +714,7 @@ removesprite-depths-5.swf:03c73fab9efd3909214def0f6b233486
 removesprite-depths-6.swf:039c217ab8233668d64bffd2e7a6ef79
 removesprite-depths-7.swf:b792dc92c63978c09f9c937a2d5a24cf
 remove-with-onUnload-5.swf:5d41fcdce5757cff3e4c9678c9c3e72b
+replaceText-newline-5.swf:1add6bd68a2b79b0b794e0d6aed2ccbb
 rewind-remove-5.swf:70780bb0428e3795f6866a1c47bb46b0
 root-onload-5.swf:4f41e2bffb53d75ce665c54312f66190
 root-onload-6.swf:0d09109c7f942e8268aa0b9661071f1d
@@ -927,6 +932,7 @@ targetpath-6.swf:a359790235e622d7d7c3d30376dcee2c
 targetpath-7.swf:4e4f761384cb7fc41954c04f009ca55f
 targetpath-7.swf:b280daedd3a8f4e3d0defd38ff2c2b2a
 text-field-get-text-format-5.swf:1e3a1b39de01a627e3d9cf327b6fcefa
+text-field-hscroll-5.swf:f0b6b2bdc087164334da9fad1ca0140a
 text-field-init-5.swf:f9c095838e41c5b00de362cef6c20167
 text-field-init-native-5.swf:881f1f6314617bd2d789fa99f9765e60
 text-field-replace-text-5.swf:571ec2f1d311c65f98e5e7f76392cb9e

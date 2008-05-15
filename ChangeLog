@@ -1,12 +1,16 @@
+2008-05-15 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* testsuite/swfdec/PASSING: new tests.
+
+2008-05-15 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/tools.cpp: drop unused file.
+
 2008-05-15 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/loop_test.c: test no unload event occurs,
 	  and actions in first frame of the characters being swapped
 	  are executed only once.
-
-2008-05-15 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/tools.cpp: drop unused file.
 
 2008-05-15 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
