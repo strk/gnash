@@ -1,3 +1,10 @@
+2008-05-15 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/asobj/Math.cpp: drop the hack, drop using namespace std,
+	  qualify all cmath functions with std::, and see if that causes
+	  problems on any platforms. As all the functions are from C89 and
+	  in the C++ standard, the hackery ought to be unnecessary.
+
 2008-05-15 Zou Lunkai <zoulunkai@gmail.com>
 	
 	* server/dlist.{h,cpp}: mergeDisplayList(), don't forget to merge characters

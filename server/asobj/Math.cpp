@@ -28,10 +28,6 @@
 //
 
 
-#ifdef HAVE_CONFIG_H
-# include "gnashconfig.h"
-#endif
-
 #include <cmath>
 #include <string>
 #include <boost/random.hpp>
@@ -42,8 +38,6 @@
 #include "log.h"
 #include "builtin_function.h" 
 #include "Object.h" // for getObjectInterface
-
-using namespace std;
 
 namespace gnash {
 
@@ -95,15 +89,18 @@ math_class_init(as_object& global)
 		if (fn.nargs < 1) result = NAN;			\
 		else {						\
 			double	arg = fn.arg(0).to_number();	\
-			result = funcname(arg);			\
+			result = std::funcname(arg);			\
 		}						\
 		return as_value(result);			\
 	}
 
-#ifndef __GNUC__  //Some hacks are ugly and dirty, we call them 'fulhack'.
-#	undef TU_MATH_H
-#	include "tu_math.h"
-#endif
+// Dirty it is, but what's it for? All the functions used here are
+// in the standard cmath header, so there *ought* to be no need for
+// a hack.
+//#ifndef __GNUC__  //Some hacks are ugly and dirty, we call them 'fulhack'.
+//#	undef TU_MATH_H
+//#	include "tu_math.h"
+//#endif
 
 MATH_WRAP_FUNC1(fabs)
 MATH_WRAP_FUNC1(acos)
@@ -142,10 +139,10 @@ MATH_WRAP_FUNC1(tan)
 		return as_value(result);			\
 	}
 
-MATH_WRAP_FUNC2_EXP(atan2, (atan2(arg0, arg1)))
+MATH_WRAP_FUNC2_EXP(atan2, (std::atan2(arg0, arg1)))
 MATH_WRAP_FUNC2_EXP(max, (arg0 > arg1 ? arg0 : arg1))
 MATH_WRAP_FUNC2_EXP(min, (arg0 < arg1 ? arg0 : arg1))
-MATH_WRAP_FUNC2_EXP(pow, (pow(arg0, arg1)))
+MATH_WRAP_FUNC2_EXP(pow, (std::pow(arg0, arg1)))
 
 
 // A couple of oddballs.
@@ -173,7 +170,7 @@ math_round(const fn_call& fn)
 	if (fn.nargs < 1) result = NAN;
 	else {
 		double arg0 = fn.arg(0).to_number();
-		result = floor(arg0 + 0.5);
+		result = std::floor(arg0 + 0.5);
 	}
 	return as_value(result);
 }
