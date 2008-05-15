@@ -380,11 +380,11 @@ private:
 	/// Return an constant iterator to the first element of the container NOT in the "removed" depth zone
 	static const_iterator beginNonRemoved(const container_type& c);
 
-	/// Return an iterator succeeding the last element in the static zone
-	static iterator staticZoneEnd(container_type& c);
+	/// Return an iterator succeeding the last element in zone (-16384, 0xffff-16384)
+	static iterator dlistTagsEffectivZoneEnd(container_type& c);
 	
-	/// Return an constant iterator succeeding the last element in the static zone
-	static const_iterator staticZoneEnd(const container_type& c);
+	/// Return an constant iterator succeeding the last element in (-16384, 0xffff-16384)
+	static const_iterator dlistTagsEffectivZoneEnd(const container_type& c);
 
 
 	/// Re-insert a removed-from-stage character after appropriately

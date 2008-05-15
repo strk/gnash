@@ -75,7 +75,7 @@ main(int /*argc*/, char** /*argv*/)
 	rgba white(255,255,255,255);
 
 	// Advance till the movie is stopped (or 10 loops are performed)
-	bool blackOverRed=true;
+	bool blackOverRed=false;
 	for (size_t i=0; i<=framecount*10; ++i)
 	{
 		check_equals(root->get_current_frame(), i%framecount);

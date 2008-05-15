@@ -1,3 +1,10 @@
+2008-05-15 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* server/dlist.{h,cpp}: mergeDisplayList(), don't forget to merge characters
+	  placed in dynamic zone. fix bug #23248.
+	* testsuite/misc-ming.all/loop_test-Runner.cpp: minor fix, the test swf was
+	  updated yestoday.
+	
 2008-05-14 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/character.cpp: rint isn't a standard function, and isn't

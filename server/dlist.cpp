@@ -910,9 +910,12 @@ DisplayList::mergeDisplayList(DisplayList & newList)
     iterator itOld = beginNonRemoved(_charsByDepth);
     iterator itNew = beginNonRemoved(newList._charsByDepth);
 
-    iterator itOldEnd = staticZoneEnd(_charsByDepth);
-    iterator itNewEnd = staticZoneEnd(newList._charsByDepth); 
+    iterator itOldEnd = dlistTagsEffectivZoneEnd(_charsByDepth);
+    iterator itNewEnd = newList._charsByDepth.end(); 
+    assert(itNewEnd == dlistTagsEffectivZoneEnd(newList._charsByDepth) );
 
+    // step1. 
+    // starting scanning both lists.
     while( itOld != itOldEnd )
     {
         iterator itOldBackup = itOld;
@@ -927,25 +930,28 @@ DisplayList::mergeDisplayList(DisplayList & newList)
             boost::intrusive_ptr<character> chNew = itNewBackup->get();
             int depthNew = chNew->get_depth();
             
-            // unload the old character if it is not in the new list
+            // depth in old list is occupied, and empty in new list.
             if( depthOld < depthNew )
             {
                 itOld++;
-
-                _charsByDepth.erase(itOldBackup);
-
-                if ( chOld->unload() )
+                // unload the character if it's in static zone(-16384,0)
+                if( depthOld < 0)
                 {
-                    reinsertRemovedCharacter(chOld);
-                }
-                else 
-                {
-                    chOld->destroy();
+                    _charsByDepth.erase(itOldBackup);
+
+                     if ( chOld->unload() )
+                    {
+                        reinsertRemovedCharacter(chOld);
+                    }
+                    else 
+                    {
+                        chOld->destroy();
+                    }
                 }
 
                 break;
             }
-            // if depth is occupied in both lists
+            // depth is occupied in both lists
             else if( depthOld == depthNew )
             {
                 itOld++;
@@ -985,23 +991,26 @@ DisplayList::mergeDisplayList(DisplayList & newList)
 
                 break;
             }
-            // add the character in new list if it is not in the old list
+            // depth in old list is empty, but occupied in new list.
             else 
             {
                 itNew++;
-
+                // add the new character to the old list.
                 _charsByDepth.insert(itOldBackup, *itNewBackup );
             }
         }// end of while
 
+        // break if finish scanning the new list
         if( itNew == itNewEnd )
         {
             break;
         }
     }// end of while
-    
-    // unload remaining characters in old list
-    while( itOld != itOldEnd )
+
+    // step2(only required if scanning of new list finished earlier in step1).
+    // continue to scan the static zone of the old list.
+    // unload remaining characters directly.
+    while( (itOld != itOldEnd) && ((*itOld)->get_depth() < 0) )
     {
         boost::intrusive_ptr<character> chOld = itOld->get();
 
@@ -1017,12 +1026,15 @@ DisplayList::mergeDisplayList(DisplayList & newList)
         }
     }
 
-    // add remaining characters in new list to the old list
+    // step3(only required if scanning of old list finished earlier in step1).
+    // continue to scan the new list.
+    // add remaining characters directly.
     if( itNew != itNewEnd )
     {
         _charsByDepth.insert(itOld, itNew, itNewEnd);
     }
 
+    // step4.
     // Copy all unloaded characters from the new display list to the old display list, 
     // and clear the new display list
     for (itNew = newList._charsByDepth.begin(); itNew != itNewEnd; ++itNew)
@@ -1127,16 +1139,18 @@ DisplayList::beginNonRemoved(const container_type& c)
 
 /*private static*/
 DisplayList::iterator
-DisplayList::staticZoneEnd(container_type& c)
+DisplayList::dlistTagsEffectivZoneEnd(container_type& c)
 {
-    return std::find_if(c.begin(), c.end(), DepthGreaterOrEqual(0));
+    return std::find_if(c.begin(), c.end(), 
+               DepthGreaterOrEqual(0xffff + character::staticDepthOffset));
 }
 
 /*private static*/
 DisplayList::const_iterator
-DisplayList::staticZoneEnd(const container_type& c)
+DisplayList::dlistTagsEffectivZoneEnd(const container_type& c)
 {
-    return std::find_if(c.begin(), c.end(), DepthGreaterOrEqual(0));
+    return std::find_if(c.begin(), c.end(), 
+               DepthGreaterOrEqual(0xffff + character::staticDepthOffset));
 }
 
 void
