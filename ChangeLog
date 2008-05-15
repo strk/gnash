@@ -6,6 +6,10 @@
 
 2008-05-15 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* server/tools.cpp: drop unused file.
+
+2008-05-15 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* server/asobj/GMath.h: drop all the undefs.
 
 2008-05-15 Sandro Santilli <strk@keybit.net>
