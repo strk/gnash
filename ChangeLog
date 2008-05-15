@@ -1,5 +1,14 @@
 2008-05-15 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* libbase/image_filters.cpp: drop (hasn't been used or built since
+	  before 0.8.2).
+	* libbase/tu_math.cpp: drop (was only included in a couple of cpp files
+	  for isfinite, which is also defined in utility.h).
+	* libbase/Makefile.am: remove tu_math.h
+	* server/asobj/Global.cpp: replace tu_math.h include with utility.h.
+
+2008-05-15 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* server/asobj/Math.cpp: drop the hack, drop using namespace std,
 	  qualify all cmath functions with std::, and see if that causes
 	  problems on any platforms. As all the functions are from C89 and

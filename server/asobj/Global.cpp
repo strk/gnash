@@ -66,7 +66,7 @@
 #include "rc.h"
 #include "ClassHierarchy.h"
 #include "namedStrings.h"
-#include "tu_math.h" // for isfinite replacement
+#include "utility.h" // for isfinite replacement
 #include "flash_pkg.h"
 
 #include "fn_call.h"

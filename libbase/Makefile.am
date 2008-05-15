@@ -154,7 +154,6 @@ noinst_HEADERS = \
 	tree.hh \
 	dsodefs.h \
 	tu_file.h \
-	tu_math.h \
 	tu_opengl_includes.h \
 	ClockTime.h \
 	WallClockTimer.h \
