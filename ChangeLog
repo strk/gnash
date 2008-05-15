@@ -1,3 +1,7 @@
+2008-05-15 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/asobj/GMath.h: drop all the undefs.
+
 2008-05-15 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/NetStream.{cpp,h}: drop unused as_environment member.

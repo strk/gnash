@@ -19,37 +19,8 @@
 #ifndef __GMATH_H__
 #define __GMATH_H__
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "impl.h"
 #include "as_object.h"
-#ifdef WIN32
-# undef min
-# undef max
-#endif
-
-#ifndef __GNUC__
-	#undef abs
-	#undef acos
-	#undef asin
-	#undef atan
-	#undef atan2
-	#undef ceil
-	#undef cos
-	#undef exp
-	#undef floor
-	#undef log
-	#undef max
-	#undef min
-	#undef pow
-	#undef random
-	#undef round
-	#undef sin
-	#undef sqrt
-	#undef tan
-#endif
 
 namespace gnash {
 
