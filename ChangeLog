@@ -1,5 +1,11 @@
 2008-05-15 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/movie_def_impl.cpp (readHeader): limit FPS to a max of
+	  84 (limit found by trial and error). Can be turned into a
+	  compile-time define. Use this upper bound when FPS 0 is requested.
+
+2008-05-15 Sandro Santilli <strk@keybit.net>
+
 	* configure.ac: bail out if sdl gui is selected in conjuntion
 	  with cairo renderer (unsupported).
 
