@@ -68,7 +68,6 @@ NetStream::NetStream()
 	:
 	as_object(getNetStreamInterface()),
 	_netCon(NULL),
-	m_env(NULL),
 	m_bufferTime(100), // The default size needed to begin playback of media is 100 miliseconds
 	m_videoFrameFormat(gnash::render::videoFrameFormat()),
 	m_newFrameReady(false),
@@ -104,7 +103,6 @@ netstream_new(const fn_call& fn)
 		if ( ns )
 		{
 			netstream_obj->setNetCon(ns);
-			netstream_obj->setEnvironment(&fn.env());			
 		}
 		else
 		{
@@ -639,8 +637,6 @@ NetStream::markReachableResources() const
 	if ( _netCon ) _netCon->setReachable();
 
 	if ( m_statusHandler ) m_statusHandler->setReachable();
-
-	if ( m_env ) m_env->markReachableResources();
 
 	// Invoke generic as_object marker
 	markAsObjectReachable();

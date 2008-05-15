@@ -122,15 +122,6 @@ protected:
 	
 	void processNotify(const std::string& funcname, as_object* metadata_obj);
 
-	/// The actionscript enviroment for the AS callbacks
-	//
-	/// TODO: research on safety of this: who's the owner of the as_environment ?
-	///       can we be sure that the environment won't be prematurely deleted ?
-	///       We'd need an as_environment::testInvariant() to call in our own
-	///       testInvariant() method (also TODO).
-	///
-	as_environment* m_env;
-
 	// The size of the buffer in milliseconds
 	boost::uint32_t m_bufferTime;
 
@@ -179,7 +170,6 @@ protected:
 	/// Reachable resources are:
 	///	- associated NetConnection object (_netCon)
 	///	- onStatus event handler (m_statusHandler)
-	///	- The associated as_environment (m_env)
 	///
 	virtual void markReachableResources() const;
 
@@ -248,17 +238,6 @@ public:
 
 	/// Return true if the NetStream has an associated NetConnection
 	bool isConnected() const { return _netCon != 0; }
-
-	/// Sets the AS Enviroment needed for eventhandlers
-	//
-	/// @param enviroment
-	///	TODO: document ownership !!
-	///
-	void setEnvironment(as_environment* env)
-	{
-		assert(env);
-		m_env = env;
-	}
 
 	/// Specifies the number of milliseconds to buffer before starting to display the stream.
 	//
