@@ -1,3 +1,8 @@
+2008-05-15 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: bail out if sdl gui is selected in conjuntion
+	  with cairo renderer (unsupported).
+
 2008-05-15 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* testsuite/swfdec/PASSING: new tests.
