@@ -1,12 +1,17 @@
-This directory contains "media" files, that is files for use
-by either Ming to embed in SWFs or to test gnash loading capabilities.
+	This directory contains "media" files, that is files for use
+	by either Ming to embed in SWFs or to test gnash loading capabilities.
+	Any filename beginning at the left margin goes into the source
+	distribution
 
+README
 
-Bitstream Vera Sans.fdb
+	This file.
+
+Bitstream-Vera-Sans.fdb
+Bitstream-Vera-Sans.COPYRIGHT
 
 	Font Definition Block (fdb) for embedding in SWF.
-	Taken from http://ming.sf.net. Copyright is in
-	Bitstream.COPYRIGHT
+	Taken from http://ming.sf.net.
 
 sound1.wav
 
