@@ -3,7 +3,7 @@
   
   <para>
     &app; tries to run as many tests as possible, but will
-    simply skip tests if the tools to run them are unavailable.
+    silentl skip tests if the tools to run them are unavailable.
   </para>
   
   <table frame='all' id="testdeps">

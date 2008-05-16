@@ -95,7 +95,7 @@
 		   url="http://ftp.gnu.org/gnu/texinfo/">http://ftp.gnu.org/gnu/texinfo/</ulink>.
 	  </entry>
 	  <entry>
-	    Texinfo is required if you wish to product GNU info
+	    Texinfo is required if you wish to produce GNU info
 	    pages.
 	  </entry>
 	  <entry><filename>texinfo</filename></entry>

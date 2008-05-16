@@ -4,7 +4,7 @@
       <para>
 	Gnash is a capable of reading up to SWF v9 files and opcodes,
 	but primarily supports SWF v7, with better SWF v8 and v9
-	support under heavy developement. With the 0.8.2 release,
+	support under heavy developement. Since the 0.8.2 release,
 	Gnash includes initial parser support for SWF v8 and v9.
 	Not all ActionScript 2 classes are implemented yet, but all of the
 	most heavily used ones are. Many ActionScript 2 classes are
@@ -48,7 +48,7 @@
 
       <para>
 	This is a quick list of what is currently implemented in Gnash
-	as of March, 2008.
+	as of May, 2008.
 
 	<informaltable frame="all">
 	  <?dbhtml table-width="75%" ?>
@@ -257,6 +257,21 @@
 		</entry>
 	      </row>
 
+	      <row>
+		<entry valign="top" align="left">
+ 		  <para><link linkend="askey">Implements</link></para>
+		</entry>
+		<entry valign="top" align="center">
+		  <para>
+		    swf v6
+		  </para>
+		</entry>
+		<entry valign="top"  align="center">
+		  <para>
+		    Fully implemented.
+		  </para>
+		</entry>
+	      </row>
 	      <row>
 		<entry valign="top" align="left">
  		  <para><link linkend="askey">Key</link></para>

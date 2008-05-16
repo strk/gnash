@@ -1,5 +1,5 @@
 <html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Gnash User Manual</title><meta name="generator" content="DocBook XSL Stylesheets V1.73.2"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="book" lang="en"><div class="titlepage"><div><div><h1 class="title"><a name="index"></a>Gnash User Manual</h1></div><div><p class="releaseinfo">
-        This manual describes version 0.8.2 of Gnash.
+        This manual describes version 0.8.3 of Gnash.
     </p></div><div><p class="copyright">Copyright © 2005, 2006, 2007, 2008 Free Software Foundation</p></div><div><div class="legalnotice"><a name="legalnotice"></a><p>
     Permission is granted to copy, distribute and/or modify this document
     under the terms of the <a class="link" href="#fdl" title="Appendix A. GNU Free Documentation License"><em class="citetitle">GNU
@@ -13,64 +13,64 @@
       <p class="author">Rob Savoye
       <code class="email">&lt;<a class="email" href="mailto:rob@openmedianow.org">rob@openmedianow.org</a>&gt;</code>
       The end user parts of the manual have been pulled out of
-      the original version of the manual, and rewritten.
+      the original version of the manual and rewritten.
       </p>
       
       <p class="publisher">Open Media Now! Foundation</p>
-    </td></tr></table></div></div></div><hr></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="chapter"><a href="#intro">1. Introduction</a></span></dt><dd><dl><dt><span class="sect1"><a href="#audience">Audience</a></span></dt><dt><span class="sect1"><a href="#runs-on">What Is Supported ?</a></span></dt></dl></dd><dt><span class="chapter"><a href="#usage">2. Using <span class="application">Gnash</span></a></span></dt><dd><dl><dt><span class="sect1"><a href="#options"><span class="application">Gnash</span> Command Line Options</a></span></dt><dt><span class="sect1"><a href="#keys"><span class="application">Gnash</span> Interactive Control Keys</a></span></dt><dt><span class="sect1"><a href="#gnashrc">User Configuration File</a></span></dt></dl></dd><dt><span class="chapter"><a href="#build">3. Installing and Configuring Gnash</a></span></dt><dd><dl><dt><span class="sect1"><a href="#requirements">Requirements</a></span></dt><dd><dl><dt><span class="sect2"><a href="#hardware">Hardware Requirements</a></span></dt><dt><span class="sect2"><a href="#software">Software Requirements</a></span></dt></dl></dd><dt><span class="sect1"><a href="#downloading">Downloading Gnash</a></span></dt><dd><dl><dt><span class="sect2"><a href="#gettingsource">Getting the Source</a></span></dt><dt><span class="sect2"><a href="#getcodecs">Getting Codec Support</a></span></dt></dl></dd></dl></dd><dt><span class="chapter"><a href="#bugreport">4. Reporting Bugs</a></span></dt><dd><dl><dt><span class="sect1"><a href="#bugstep_package">Get a Fresh Binary Package</a></span></dt><dt><span class="sect1"><a href="#bugstep_search">Determine if the bug was previously reported</a></span></dt><dt><span class="sect1"><a href="#bugstep_guidelines">Review the bug writing guidelines</a></span></dt><dt><span class="sect1"><a href="#bugstep_file">Filing a bug report</a></span></dt></dl></dd><dt><span class="glossary"><a href="#glossary">Glossary</a></span></dt><dt><span class="chapter"><a href="#authors">5. Authors</a></span></dt><dt><span class="appendix"><a href="#fdl">A. GNU Free Documentation License</a></span></dt><dd><dl><dt><span class="sect1"><a href="#fdl-preamble">0. PREAMBLE</a></span></dt><dt><span class="sect1"><a href="#fdl-section1">1. APPLICABILITY AND DEFINITIONS</a></span></dt><dt><span class="sect1"><a href="#fdl-section2">2. VERBATIM COPYING</a></span></dt><dt><span class="sect1"><a href="#fdl-section3">3. COPYING IN QUANTITY</a></span></dt><dt><span class="sect1"><a href="#fdl-section4">4. MODIFICATIONS</a></span></dt><dt><span class="sect1"><a href="#fdl-section5">5. COMBINING DOCUMENTS</a></span></dt><dt><span class="sect1"><a href="#fdl-section6">6. COLLECTIONS OF DOCUMENTS</a></span></dt><dt><span class="sect1"><a href="#fdl-section7">7. AGGREGATION WITH INDEPENDENT WORKS</a></span></dt><dt><span class="sect1"><a href="#fdl-section8">8. TRANSLATION</a></span></dt><dt><span class="sect1"><a href="#fdl-section9">9. TERMINATION</a></span></dt><dt><span class="sect1"><a href="#fdl-section10">10. FUTURE REVISIONS OF THIS LICENSE</a></span></dt><dt><span class="sect1"><a href="#fdl-using">Addendum</a></span></dt></dl></dd></dl></div><div class="list-of-tables"><p><b>List of Tables</b></p><dl><dt>2.1. <a href="#tb-command-line-options">Gnash Command Line Options</a></dt><dt>2.2. <a href="#tb-control-keys">Gnash Interactive Control Keys</a></dt><dt>2.3. <a href="#tb-config-variables">User Configuration Variables</a></dt><dt>3.1. <a href="#tb-os-cpu">Build Matrix</a></dt></dl></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="intro"></a>Chapter 1. Introduction</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="sect1"><a href="#audience">Audience</a></span></dt><dt><span class="sect1"><a href="#runs-on">What Is Supported ?</a></span></dt></dl></div><p>
+    </td></tr></table></div></div></div><hr></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="chapter"><a href="#intro">1. Introduction</a></span></dt><dd><dl><dt><span class="sect1"><a href="#audience">Audience</a></span></dt><dt><span class="sect1"><a href="#runs-on">What Is Supported?</a></span></dt></dl></dd><dt><span class="chapter"><a href="#usage">2. Using <span class="application">Gnash</span></a></span></dt><dd><dl><dt><span class="sect1"><a href="#options"><span class="application">Gnash</span> Command Line Options</a></span></dt><dt><span class="sect1"><a href="#keys"><span class="application">Gnash</span> Interactive Control Keys</a></span></dt><dt><span class="sect1"><a href="#gnashrc">User Configuration File</a></span></dt></dl></dd><dt><span class="chapter"><a href="#build">3. Installing and Configuring Gnash</a></span></dt><dd><dl><dt><span class="sect1"><a href="#requirements">Requirements</a></span></dt><dd><dl><dt><span class="sect2"><a href="#hardware">Hardware Requirements</a></span></dt><dt><span class="sect2"><a href="#software">Software Requirements</a></span></dt></dl></dd><dt><span class="sect1"><a href="#downloading">Downloading Gnash</a></span></dt><dd><dl><dt><span class="sect2"><a href="#gettingsource">Getting the Source</a></span></dt><dt><span class="sect2"><a href="#getcodecs">Getting Codec Support</a></span></dt></dl></dd></dl></dd><dt><span class="chapter"><a href="#bugreport">4. Reporting Bugs</a></span></dt><dd><dl><dt><span class="sect1"><a href="#bugstep_package">Get a Fresh Binary Package</a></span></dt><dt><span class="sect1"><a href="#bugstep_search">Determine if the bug was previously reported</a></span></dt><dt><span class="sect1"><a href="#bugstep_guidelines">Review the bug writing guidelines</a></span></dt><dt><span class="sect1"><a href="#bugstep_file">Filing a bug report</a></span></dt></dl></dd><dt><span class="glossary"><a href="#glossary">Glossary</a></span></dt><dt><span class="chapter"><a href="#authors">5. Authors</a></span></dt><dt><span class="appendix"><a href="#fdl">A. GNU Free Documentation License</a></span></dt><dd><dl><dt><span class="sect1"><a href="#fdl-preamble">0. PREAMBLE</a></span></dt><dt><span class="sect1"><a href="#fdl-section1">1. APPLICABILITY AND DEFINITIONS</a></span></dt><dt><span class="sect1"><a href="#fdl-section2">2. VERBATIM COPYING</a></span></dt><dt><span class="sect1"><a href="#fdl-section3">3. COPYING IN QUANTITY</a></span></dt><dt><span class="sect1"><a href="#fdl-section4">4. MODIFICATIONS</a></span></dt><dt><span class="sect1"><a href="#fdl-section5">5. COMBINING DOCUMENTS</a></span></dt><dt><span class="sect1"><a href="#fdl-section6">6. COLLECTIONS OF DOCUMENTS</a></span></dt><dt><span class="sect1"><a href="#fdl-section7">7. AGGREGATION WITH INDEPENDENT WORKS</a></span></dt><dt><span class="sect1"><a href="#fdl-section8">8. TRANSLATION</a></span></dt><dt><span class="sect1"><a href="#fdl-section9">9. TERMINATION</a></span></dt><dt><span class="sect1"><a href="#fdl-section10">10. FUTURE REVISIONS OF THIS LICENSE</a></span></dt><dt><span class="sect1"><a href="#fdl-using">Addendum</a></span></dt></dl></dd></dl></div><div class="list-of-tables"><p><b>List of Tables</b></p><dl><dt>2.1. <a href="#tb-command-line-options">Gnash Command Line Options</a></dt><dt>2.2. <a href="#tb-control-keys">Gnash Interactive Control Keys</a></dt><dt>2.3. <a href="#tb-config-variables">User Configuration Variables</a></dt><dt>3.1. <a href="#tb-os-cpu">Build Matrix</a></dt></dl></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="intro"></a>Chapter 1. Introduction</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="sect1"><a href="#audience">Audience</a></span></dt><dt><span class="sect1"><a href="#runs-on">What Is Supported?</a></span></dt></dl></div><p>
     <span class="application">Gnash</span> is a free SWF movie player.  It is available as a
     stand-alone application or as a plugin for several popular
     web browsers. It supports playing media from a disk or streaming
     over a network connection. Some popular video sharing sites like
-    YouTube are supported from a wide vaariety of devices from
+    YouTube are supported on a wide variety of devices from
     embedded ones to modern desktops.
   </p><p>
     <span class="application">Gnash</span> has a better focus on security, allowing the user tight
     control of all network or disk based I/O. Gnash also supports
-    extending ActionScript by creating your own. You can write
+    extending ActionScript by creating your own classes. You can write
     wrappers for any development library, and import them into the
-    player much like perl or python does.
+    player much like Perl or Python does.
   </p><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="audience"></a>Audience</h2></div></div></div><p>
       This manual is primarily focused on users interested in how to
       get Gnash installed from a package, and basic usage as a web
       browser plugin. For more technical details, please refer to the
       Gnash Reference manual.
-    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="runs-on"></a>What Is Supported ?</h2></div></div></div><p>
+    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="runs-on"></a>What Is Supported?</h2></div></div></div><p>
       Gnash is known to compile for most any POSIX and ANSI C++
       conforming system if you have all the dependent libraries
-      installed. Systems we test on, and which Gnash is know to
-      run on are Ubuntu, Fedora, Debian, OpenBSD, NetBSD, FreeBSD,
+      installed. Systems we test on, and which Gnash is known to
+      run on are Ubuntu, Fedora, Debian, Mandriva, OpenBSD, NetBSD, FreeBSD,
       Win32, and Darwin (OSX) primarily. Occasionally other platforms
       are built, primarily by those distribution maintainers. This
       includes BeOS, Haiku, Syllable, OS/2, Solaris, Slackware, and
       Gentoo.
     </p><p>
-      Gnash is a capable of reading up to SWF v9 files and opcodes,
+      Gnash is capable of reading up to SWF v9 files and opcodes,
       but primarily supports SWF v7, with better SWF v8 and v9
-      support under heavy developement. With the 0.8.2 release,
+      support under heavy development. With the 0.8.2 release,
       Gnash includes initial parser support for SWF v8 and v9.
       Not all ActionScript 2 classes are implemented yet, but all of the
       most heavily used ones are. Many ActionScript 2 classes are
       partially implemented; there is support for all of the
       commonly used methods of each class.
     </p><p>
-      Gnash has implemented about 80% of ActionScript v. 2.0, and has
-      begun implementing ActionScript v. 3.0. Gnash supports the
-      majority of Flash opcodes up to SWF version 9, and a wide
-      sampling of ActionScript classes for SWF version 8.
+      Gnash has implemented about 80% of ActionScript v2.0, and has
+      begun implementing ActionScript v3.0. Gnash supports the
+      majority of Flash opcodes up to SWF v9, and a wide
+      sampling of ActionScript classes for SWF v8.
     </p><p>
-      As ActionsScript 3 is a more developed version of
+      As ActionScript 3 is a more developed version of
       ActionScript 2, many of the same classes work for
       both. Support has been added to Gnash's ActionScript library
       to support the new ActionScript 3 filters, which get applied
-      to every class. Implementing ActionScript clases is often the
+      to every class. Implementing ActionScript classes is often the
       easiest way for new Gnash developers to make a contribution
-      without a deep internal knpowledge of Gnash.
+      without a deep internal knowledge of Gnash.
     </p><p>
       Gnash has included video support since early 2007, but this is
-      an every changing field of reverse engineering. Many of the
+      an ever changing field of reverse engineering. Many of the
       popular video sharing sites use SWF v8 or v9, which Gnash
-      still has imperfect support for. This is improving all the
+      supports imperfectly. This is improving all the
       time, so often builds from a development snapshot will work
       when using the older release packaged in your distribution
       doesn't. You can find daily snapshots of the latest CVS tree
@@ -84,26 +84,26 @@
       in a SWF file. Ffmpeg contains the codecs used by the current
       SWF defintion, FLV, VP6 (ON2), H.263, H.264, and MP3.
     </p></div></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="usage"></a>Chapter 2. Using <span class="application">Gnash</span></h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="sect1"><a href="#options"><span class="application">Gnash</span> Command Line Options</a></span></dt><dt><span class="sect1"><a href="#keys"><span class="application">Gnash</span> Interactive Control Keys</a></span></dt><dt><span class="sect1"><a href="#gnashrc">User Configuration File</a></span></dt></dl></div><p>
-    When used as a standalone player, you can play any Flash file from
+    When used as a standalone player, you can play any SWF file from
     the command line by entering a command of the format: 
     </p><pre class="programlisting">
       gnash <em class="replaceable"><code>&lt;option&gt; &lt;flashfile.swf&gt;</code></em>
     </pre><p>
-    The only required argument is the name (and location)of the file
+    The only required argument is the name (and location) of the file
     to be played. 
   </p><p>
     The available options are listed in the following section, or you
     may view them in the terminal window by executing the following at
     the command line: 
     </p><pre class="programlisting">
-      gnash --help |less
+      gnash --help | less
     </pre><p>
   </p><p>
-    The source code download of <span class="application">Gnash</span> includes several example .SWF
+    The source code download of <span class="application">Gnash</span> includes several example SWF
     files.  They are located in the
     <code class="filename">testsuite/samples/</code> directory of the <span class="application">Gnash</span>
     source directory.  If you have installed <span class="application">Gnash</span> correctly, issuing
-    the a command similar to the following plays a short animation of
+    a command similar to the following plays a short animation of
     a car swerving and crashing: 
     </p><pre class="programlisting">
       gnash
@@ -122,16 +122,16 @@
     Flash files are difficult to play. 
   </p><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="options"></a><span class="application">Gnash</span> Command Line Options</h2></div></div></div><p>
       No options are required for  <span class="application">Gnash</span>'s default behavior.  However,
-      there are many options that can be used to that behavior. 
+      there are many options that can be used to change that behavior. 
     </p><p>
       </p><pre class="programlisting">
 	gnash <em class="replaceable"><code>&lt;options&gt;</code></em>
 	<code class="filename">filename.swf</code> 
       </pre><p>
-    </p><div class="table"><a name="tb-command-line-options"></a><p class="title"><b>Table 2.1. Gnash Command Line Options</b></p><div class="table-contents"><table summary="Gnash Command Line Options" border="1"><colgroup><col><col></colgroup><thead><tr><th align="left">Option</th><th align="left">Function</th></tr></thead><tbody><tr><td align="left"><code class="option">-h</code></td><td align="left">
+    </p><div class="table"><a name="tb-command-line-options"></a><p class="title"><b>Table 2.1. Gnash Command Line Options</b></p><div class="table-contents"><table summary="Gnash Command Line Options" border="1"><colgroup><col><col></colgroup><thead><tr><th align="left">Option</th><th align="left">Function</th></tr></thead><tbody><tr><td align="left"><code class="option">-h, --help</code></td><td align="left">
 	      Print usage information.
 	    </td></tr><tr><td align="left">
-	      <code class="option">-s factor</code>
+	      <code class="option">-s, --scale</code> <em class="replaceable"><code>&lt;factor&gt;</code></em>
 	    </td><td align="left">
 	      Scale the movie up/down by the specified factor.
 	    </td></tr><tr><td align="left">
@@ -141,7 +141,7 @@
 	      default, SDL traps all signals, but sometimes a core file
 	      is desired to assist with debugging.
 	    </td></tr><tr><td align="left">
-	      <code class="option">-d num</code>
+	      <code class="option">-d, --delay</code> <em class="replaceable"><code>&lt;num&gt;</code></em>
 	    </td><td align="left">
 	      Number of milliseconds to delay in main loop. The main
 	      loop polls continuously with a delay to adjust how long
@@ -150,116 +150,117 @@
 	      gets, and of course, the more iterations of the main
 	      command loop.
 	    </td></tr><tr><td align="left">
-	      <code class="option">-p</code>
+	      <code class="option">-v, --verbose</code>
 	    </td><td align="left">
-	      Run full speed (no sleep) and log frame rate.
+	      Be verbose; i.e. print important messages to stdout.
 	    </td></tr><tr><td align="left">
-	      <code class="option">-a</code>
+	      <code class="option">-vv</code>
 	    </td><td align="left">
-	      Enable Actionscript debugging.
-	    </td></tr><tr><td align="left">
-	      <code class="option">-v</code>
-	    </td><td align="left">
-	      Be verbose; i.e. print debug messages to stdout.
+	      Be very verbose; i.e. also print debug messages to stdout.
 	    </td></tr><tr><td align="left">
 	      <code class="option">-va</code>
 	    </td><td align="left">
-	      Be verbose about movie Actions. 
+	      Be verbose about movie actions (for ActionScript debugging). This usually
+	      generates very large amounts of text and will affect <span class="application">Gnash</span>'s performance.
 	    </td></tr><tr><td align="left">
 	      <code class="option">-vp</code>
 	    </td><td align="left">
-	      Be verbose about parsing the movie. Warning: this can
-	      generate a lot of text, and can affect the performance of
-	      the movie you are playing.
+	      Be verbose about parsing the movie. This generates a fairly large
+	      amount of text, and is likely to affect <span class="application">Gnash</span>'s performance.
 	    </td></tr><tr><td align="left">
-	      <code class="option">-ml bias</code>
+	      <code class="option">-A</code> <em class="replaceable"><code>&lt;file&gt;</code></em>
 	    </td><td align="left">
-	      Specify the texture LOD bias (float, default is -1) This
-	      affects the fuzziness of small objects, especially small
-	      text.
+              Write the audio output to a wave format file.
 	    </td></tr><tr><td align="left">
-	      <code class="option">-w</code>
+	      <code class="option">-D</code> <em class="replaceable"><code>&lt;file&gt;</code></em>
 	    </td><td align="left">
-	      Write a debug log called gnash-dbg.log. This will 
-	      record of all the debug messages whether they are printed
-	      to the screen or not.
+              Write the video output to a raw video file.  This option
+              is only valid with dump-gnash.
 	    </td></tr><tr><td align="left">
-	      <code class="option">-j</code>
+	      <code class="option">-w, --writelog</code>
 	    </td><td align="left">
-	      Specify the width of the window. This is mostly used
+	      Write the log messages to disk using the file specified in the gnashrc file.
+	      The default is gnash-dbg.log.
+	    </td></tr><tr><td align="left">
+	      <code class="option">-j, --width</code> <em class="replaceable"><code>&lt;num&gt;</code></em>
+	    </td><td align="left">
+	      Specify the starting width of the window. This is mostly used
 	      only by the plugin.
 	    </td></tr><tr><td align="left">
-	      <code class="option">-k</code>
+	      <code class="option">-k, --height</code> <em class="replaceable"><code>&lt;num&gt;</code></em>
 	    </td><td align="left">
-	      Specify the height of the window. This is mostly used
+	      Specify the starting height of the window. This is mostly used
 	      only by the plugin.
 	    </td></tr><tr><td align="left">
-	      <code class="option">-1</code>
+	      <code class="option">-1, --once</code>
 	    </td><td align="left">
-	      Play once; exit when/if movie reaches the last
-	      frame. This is the default.
+	      Play once; exit if or when the movie reaches the last
+	      frame.
 	    </td></tr><tr><td align="left">
-	      <code class="option">-r [0|1|2|3]</code>
+	      <code class="option">-r, --render-mode</code> <em class="replaceable"><code>&lt;0|1|2|3&gt;</code></em>
 	    </td><td align="left">
 	      <div class="itemizedlist"><ul type="disc"><li><p>
 		    0 disables rendering and sound (good for batch tests).
 		  </p></li><li><p>
-		    1 enables rendering and disables sound (default setting).
+		    1 enables rendering and disables sound.
 		  </p></li><li><p>
 		    2 enables sound and disables rendering.
 		  </p></li><li><p>
-		    3 enables rendering and sound.
+		    3 enables rendering and sound (default).
 		  </p></li></ul></div>
 	    </td></tr><tr><td align="left">
-	      <code class="option">-t sec</code>
+	      <code class="option">-t, --timeout</code> <em class="replaceable"><code>&lt;sec&gt;</code></em>
 	    </td><td align="left">
 	      Timeout and exit after the specified number of
 	      seconds. This is useful for movies which repeat
 	      themselves.
 	    </td></tr><tr><td align="left">
-	      <code class="option">-g</code>
+	      <code class="option">-g, --debugger</code>
 	    </td><td align="left">
 	      Start <span class="application">Gnash</span> with a Flash debugger console so one can set
 	      break points or watchpoints.
 	    </td></tr><tr><td align="left">
-	      <code class="option">-x id</code>
+	      <code class="option">-x, --xid</code> <em class="replaceable"><code>&lt;ID&gt;</code></em>
 	    </td><td align="left">
 	      This specifies the X11 window ID to display
 	      in; this is mainly used by plugins.
 	    </td></tr><tr><td align="left">
-	      <code class="option">-b bits</code>
-	    </td><td align="left">
-	      Bit depth of output window (for example, 16 or 32). Appropriate
-	      bit depths depend on the renderer and GUI library used.
-	      
-	    </td></tr><tr><td align="left">
-	      <code class="option">-u url</code>
+	      <code class="option">-u, --real-url</code> <em class="replaceable"><code>&lt;URL&gt;</code></em>
 	    </td><td align="left">
 	      Set the _url member of the root movie. This is useful 
 	      when you download a movie and play it from a different 
 	      location. See also the -U switch.
 	    </td></tr><tr><td align="left">
-	      <code class="option">-U baseurl</code>
+	      <code class="option">-U, --base-url</code> <em class="replaceable"><code>&lt;URL&gt;</code></em>
 	    </td><td align="left">
 	      Set base URL for this run. URLs are resolved relative to 
-	      this base. If omitted defaults to the _url member of the 
+	      this base. If omitted or empty, it defaults to the _url member of the 
 	      top-level movie (see the -u switch).
 	    </td></tr><tr><td align="left">
-	      <code class="option">-P entrymeter</code>
+	      <code class="option">-P, --param</code> <em class="replaceable"><code>&lt;parameter&gt;</code></em>
 	    </td><td align="left">
-	      Parameters are given in ParamName=Value syntax and are mostly 
-	      useful to the plugin to honour EMBED tags attributes 
+	      Parameters are given in the syntax "ParamName=Value" and are mostly 
+	      useful for the plugin to honour EMBED tags attributes 
 	      or explicit OBJECT PARAM tags. A common use for -P 
 	      is to provide FlashVars 
 	      (ie: -P "FlashVars=home=http://www.gnu.org").
 	    </td></tr><tr><td align="left">
-	      <code class="option">-F filedescriptor</code>
+	      <code class="option">-F, --fd</code> <em class="replaceable"><code>&lt;filedescriptor&gt;</code></em>
 	    </td><td align="left">
 	      Use the given filedescriptor to send requests to the host
 	      application. This is currently only used for GETURL requests.
 	      The protocol is not documented yet, and also needs improvement.
 	      Primary use for this switch is for the NPAPI plugin to properly
 	      support javascript and target windows in geturl requests.
+	    </td></tr><tr><td align="left">
+	      <code class="option">--max-advances</code> <em class="replaceable"><code>&lt;num&gt;</code></em>
+	    </td><td align="left">
+          Exit after the specified number of frame advances.
+	    </td></tr><tr><td align="left">
+	      <code class="option">--fullscreen</code>
+	    </td><td align="left">
+          Start <span class="application">Gnash</span> in fullscreen mode as long as the GUI and window
+          manager support this. 
 	    </td></tr></tbody></table></div></div><br class="table-break"></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="keys"></a><span class="application">Gnash</span> Interactive Control Keys</h2></div></div></div><p>
       While a movie is playing, there are several control
       keys. These can be used to step through frames, pause the
@@ -285,14 +286,6 @@
 	    </td><td align="left">
 	      Restart the movie.
 	    </td></tr><tr><td align="left">
-	      <code class="option">CTRL-[ or kp-</code>
-	    </td><td align="left">
-	      Step back one frame.
-	    </td></tr><tr><td align="left">
-	      <code class="option">CTRL-] or kp+</code>
-	    </td><td align="left">
-	      Step forward one frame.
-	    </td></tr><tr><td align="left">
 		<code class="option">CTRL-L</code>
 	      </td><td align="left">
 		Force immediate redraw.
@@ -308,10 +301,6 @@
 	      <code class="option">CTRL-M</code>
 	    </td><td align="left">
 	      Debug.  Test the call_method() function.
-	    </td></tr><tr><td align="left">
-	      <code class="option">CTRL-B</code>
-	    </td><td align="left">
-	      Toggle the background color.
 	    </td></tr></tbody></table></div></div><br class="table-break"></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="gnashrc"></a>User Configuration File</h2></div></div></div><p>
     Individual user preferences may be set by editing variables with
     the <code class="filename">.gnashrc</code> file: 
@@ -362,7 +351,7 @@
 	  Because several files can be parsed in succession, each file can override
 	  or add to lists in other files. Use <span class="emphasis"><em>set</em></span> to override
 	  all other lists or <span class="emphasis"><em>append</em></span> to add new sandboxes.
-	  Note that there's currently no way to *drop* the directory of base dir
+	  Note that there's currently no way to <span class="emphasis"><em>drop</em></span> the directory of base dir
 	  from the list of allowed local sandboxes.
 	  </td></tr><tr><td align="left">delay</td><td align="left">Number</td><td align="left"><span class="application">Gnash</span> uses a timer-based event mechanism to advance frames
 	  at a steady rate. This option overrides the default
@@ -391,14 +380,19 @@
 	  Note that the version advertised by the plugin is NOT affected by this setting,
 	  instead you need to set the GNASH_FLASH_VERSION environment variable for
 	  the latter (which doesn't affect $version and System.capabilities.version).</td></tr><tr><td align="left">flashSystemOS</td><td align="left">string</td><td align="left">The string that Gnash should return for System.capabilities.OS</td></tr><tr><td align="left">flashSystemManufacturer</td><td align="left">string</td><td align="left">The string that Gnash should return for System.capabilities.manufacturer</td></tr><tr><td align="left">StreamsTimeout</td><td align="left">double</td><td align="left">
-	    Set the number of seconds after which streams download time out. Note that timeouts only occurs after the given number of seconds
-	    passed w/out anything was received.
+	    Set the number of seconds after which streams download time
+            out. Timeouts only occur after the given number
+            of seconds have passed without anything being received.
 	  </td></tr><tr><td align="left">insecureSSL</td><td align="left">on/off</td><td align="left">If set to <span class="emphasis"><em>on</em></span>, no verification of SSL connections
 	  is performed. This means that, although the connection is encrypted, the server
 	  certificate could be invalid, may not belong to the host, or both. Equivalent
 	  to curl --insecure. By default, this option is <span class="emphasis"><em>off</em></span> and
 	  connections will fail when a host cannot be verified.</td></tr><tr><td align="left">SOLsafedir</td><td align="left">Absolute path</td><td align="left">The full path to a directory where <span class="application">Gnash</span> should store Shared Object files ("flash cookies") if
-	  they are enabled.</td></tr><tr><td align="left">SOLreadonly</td><td align="left">on/off</td><td align="left">If set to <span class="emphasis"><em>on</em></span>, <span class="application">Gnash</span> will not write Shared Object files.</td></tr><tr><td align="left">URLOpenerFormat</td><td align="left">string</td><td align="left">
+	  they are enabled.</td></tr><tr><td align="left">SOLreadonly</td><td align="left">on/off</td><td align="left">If set to <span class="emphasis"><em>on</em></span>, <span class="application">Gnash</span> will not write Shared Object files.</td></tr><tr><td align="left">ignoreFSCommand</td><td align="left">on/off</td><td align="left">If set to on (default), <span class="application">Gnash</span> will ignore fscommands in standalone mode.
+	  Fscommands are requests from the playing movie to the operating system or 
+	  user interface: the most common are quit, fullscreen, showmenu and exec. <span class="application">Gnash</span>
+	  always ignores fscommands when running as a plugin.
+	  </td></tr><tr><td align="left">URLOpenerFormat</td><td align="left">string</td><td align="left">
 	    Set the format of an url opener command. The %u label would be substituted by the actual url to be opened.
 	    Examples:
 	    <pre class="programlisting">
@@ -494,7 +488,7 @@
 	      </td></tr><tr><td align="left">Gentoo</td><td align="left">AMD64, PowerPC, SPARC, x86 
 	      </td></tr><tr><td align="left">Maemo 2.1</td><td align="left">i385, ARMv5t</td></tr><tr><td align="left">Scratchbox</td><td align="left">i386, ARMv5t</td></tr><tr><td align="left">Access Linux Platform
 	      </td><td align="left">i386, ARMv5t</td></tr><tr><td align="left">Mandriva
-	      </td><td align="left">i386, MIPS</td></tr><tr><td align="left">Open Embedded, OpenMoko, Poky
+	      </td><td align="left">i386, x86-64, MIPS</td></tr><tr><td align="left">Open Embedded, OpenMoko
 	      </td><td align="left">ARM
 	      </td></tr><tr><td align="left">YellowDog Linux 6
 	      </td><td align="left">PowerPC, PS3
@@ -509,7 +503,7 @@
 	      </td></tr><tr><td align="left">Darwin (MacOS X)
 	      </td><td align="left">PowerPC and x86-32 
 	      </td></tr><tr><td align="left">Windows XP, Windows Vista</td><td align="left">x86-32</td></tr></tbody></table></div></div><br class="table-break"></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="software"></a>Software Requirements</h3></div></div></div><p>
-	The 0.8.2 release of Gnash has been designed to run on
+	The 0.8.3 release of Gnash has been designed to run on
 	UNIX/Linux variants, and has been run on most of the free ones.
 	However, Gnash has successfully run on Windows, Darwin (Mac OS X),
 	Irix, Solaris, BeOs, OS/2, and Haiku.  Gnash has also run on the
@@ -583,7 +577,7 @@
 	  from your distributions repository.
 	</p></div></div></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="bugreport"></a>Chapter 4. Reporting Bugs</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="sect1"><a href="#bugstep_package">Get a Fresh Binary Package</a></span></dt><dt><span class="sect1"><a href="#bugstep_search">Determine if the bug was previously reported</a></span></dt><dt><span class="sect1"><a href="#bugstep_guidelines">Review the bug writing guidelines</a></span></dt><dt><span class="sect1"><a href="#bugstep_file">Filing a bug report</a></span></dt></dl></div><p>
     The Gnash project relies on the community of Gnash users to test
-    the player, feedback is critical to any successful project.  Not
+    the player.  Feedback is critical to any successful project.  Not
     only does it let us know that people use Gnash, but it helps us  
     understand the community's needs. Gnash uses a bug tracker on
     <a class="ulink" href="http://savannah.gnu.org" target="_top">http://savannah.gnu.org</a> to manage these reports.
@@ -591,8 +585,8 @@
     When filing a report, please follow the guidelines below. The better
     your bug report is, the easier it will be for the developers to
     address the issue. Bug reports without enough information will
-    initially be asked to provide this information anyway. Adding
-    critical details, like the Operating System you are on, it's
+    be asked to provide this information anyway. Adding
+    critical details, like the Operating System you are on, its
     version, and any relevant error messages from Gnash that you get.
   </p><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="bugstep_package"></a>Get a Fresh Binary Package</h2></div></div></div><p>
       For starters, it's a good idea to obtain a copy of the latest
@@ -600,8 +594,8 @@
       Gnash build infrastructure allows the automated building of
       binary packages. Often the version of Gnash as packaged by a
       GNU/Linux or BSD distribution is based on the last official
-      release, which could be months out of date. It is helpful if
-      this is the case to try a newer packaged build of Gnash. 
+      release, which could be months out of date. It helps us, if
+      this is the case, for you to try a newer packaged build of Gnash. 
     </p><p>
       You can get a fresh binary package of Gnash, as well as recent 
       source packages from
@@ -660,7 +654,7 @@
 	  AGG is the AntiGrain 2D graphics library, which can be used
 	  as a renderer in Gnash. It is faster than OpenGL on systems
 	  without hardware graphics acceleration. As of Gnash version
-	  0.8.1 it is the more feature complete renderer. 
+	  0.8.2 it is the more feature complete renderer. 
 	</p></dd><dt>
 	AMF
       </dt><dd><p>
@@ -722,9 +716,11 @@
       </dt><dd><p>
 	  The term <span class="emphasis"><em>Flash</em></span> is used to describe both the 
 	  Adobe IDE for creating <span class="emphasis"><em>SWF</em></span>
-	  files, and the technology itself. Flash is a trademarked
-	  term of Adobe's, we prfer to use SWF to refer to the files
-	  themselves, as well as the format, instead of flash(tm).
+	  files, and the technology itself. Flash is a registered trademark
+	  belonging to Adobe.   Unfortunately, neither Macromedia nor
+          Adobe have done a good job creating a generic name for all
+          things having to do with Flash.  They risk
+          loss of their trademark.
 	</p></dd><dt>
 	FLV
       </dt><dd><p>
@@ -776,17 +772,16 @@
 	You must choose a GUI library during the
 	configuration stage of building Gnash.
       </p></dd></dl></div><div class="glossdiv"><h3 class="title">K</h3><dl><dt>
-	Klash
+	kde-gnash
       </dt><dd><p>
-	  <span class="emphasis"><em>Klash</em></span> was the name given to the stand-alone 
+	  <span class="emphasis"><em>kde-gnash</em></span> is the name given to the stand-alone 
 	  instance of <span class="application">Gnash</span> which used the KDE GUI.  It has been replaced with 
-	  an implementation using Qt.  Some documentation may incorrectly
-	  refer to the Konqueror plugin as <span class="emphasis"><em>Klash</em></span>.
-	  The plugin was renamed <span class="emphasis"><em>Kpart</em></span>.
+	  an implementation using Qt.  The Konqueror plugin runs kde-gnash
+          and is called <span class="emphasis"><em>Kparts</em></span>.
 	</p></dd><dt>
-	Kpart
+	Kparts
       </dt><dd><p>
-	  <span class="emphasis"><em>Kpart</em></span> is a plugin for Konqueror which is
+	  <span class="emphasis"><em>Kparts</em></span> is a plugin for Konqueror which is
 	  enabled with the configuration option --enable-kparts.
 	</p></dd></dl></div><div class="glossdiv"><h3 class="title">L</h3><dl><dt>
 	libmad
@@ -882,16 +877,15 @@
 	  platforms' graphics, sound, and input APIs. Gnash can use it
 	  as a GUI and/or as a sound handler. Note that the two usages
 	  are independent of each other: you can use it for a task and
-	  not for the other if you wish. At time or writing (2007-01-11)
-	  the SDL GUI lacks menus and a performant input event
-	  architecture; the SDL sound handler is the most feature rich,
-	  supporting Video through ffmpeg. 
+	  not for the other if you wish.  This version of Gnash does not
+          implement menus in the SDL GUI; the SDL sound handler is the
+          most feature rich, supporting video through ffmpeg. 
 	</p></dd><dt>
 	sound handler
       </dt><dd><p>
 	  The <span class="emphasis"><em>sound handler</em></span> is the part of <span class="application">Gnash</span>
 	  which handles both event sounds and streaming sound.  Audio
-	  from external sources are also handled through the sound handler
+	  from external sources is sent through the sound handler
 	  when SDL is used.  The sound handler must be selected during
 	  configuration of Gnash when compiling.
 	</p><p>
@@ -910,7 +904,8 @@
 	</p></dd><dt>
 	Stage
       </dt><dd><p>
-	  The visible area of a Flash movie. The name derives from a	  theater analogy. Graphical elements are referred to as
+	  The visible area of a Flash movie. The name derives from a
+	  theater analogy. Graphical elements are referred to as
 	  characters.  
 	</p></dd><dt>
 	SWF
@@ -942,10 +937,10 @@
 	</p></dd></dl></div></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="authors"></a>Chapter 5. Authors</h2></div></div></div><p>
         <span class="application">Gnash</span> is maintained by Rob Savoye. Other active developers
 	are: Sandro Santilli, Bastiaan Jacques, Udo Giacomozzi, Chad
-	Musick, Benjamin Wolsey, and Zou Lunkai. Please send all
-	comments and suggestions to <code class="email">&lt;<a class="email" href="mailto:gnash-dev@gnu.org%0A%09">gnash-dev@gnu.org
-	</a>&gt;</code>. Past and sometimes current developers are Tomas
-	Groth and Markus Gothe.
+	Musick, Benjamin Wolsey, Zou Lunkai, and Russ Nelson. Please
+        send all comments and suggestions to
+        <code class="email">&lt;<a class="email" href="mailto:gnash-dev@gnu.org">gnash-dev@gnu.org</a>&gt;</code>. Past and sometimes current
+        developers are Tomas Groth and Markus Gothe.
     </p><p>
         <span class="application">Gnash</span> was initially derived from <span class="application">GameSWF</span>.
         <span class="application">GameSWF</span> is maintained by

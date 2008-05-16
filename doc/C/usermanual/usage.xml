@@ -25,7 +25,7 @@
     files.  They are located in the
     <filename>testsuite/samples/</filename> directory of the &app;
     source directory.  If you have installed &app; correctly, issuing
-    the a command similar to the following plays a short animation of
+    a command similar to the following plays a short animation of
     a car swerving and crashing: 
     <programlisting>
       gnash
@@ -148,6 +148,23 @@
 	  </row>
 	  <row>
 	    <entry>
+	      <option>-A</option> <replaceable>&lt;file&gt;</replaceable>
+	    </entry>
+	    <entry>
+              Write the audio output to a wave format file.
+	    </entry>
+	  </row>
+	  <row>
+	    <entry>
+	      <option>-D</option> <replaceable>&lt;file&gt;</replaceable>
+	    </entry>
+	    <entry>
+              Write the video output to a raw video file.  This option
+              is only valid with dump-gnash.
+	    </entry>
+	  </row>
+	  <row>
+	    <entry>
 	      <option>-w, --writelog</option>
 	    </entry>
 	    <entry>
@@ -173,8 +190,8 @@
 	      only by the plugin.
 	    </entry>
 	  </row>
-	  <row>
 	    <!--	
+	      <row>
 		<entry>
 		<option>-e</option>
 		</entry>
@@ -184,8 +201,8 @@
 		improve performance for some types of movies.
 		</entry>
 		</row>
-		<row>
 	    -->
+	  <row>
 	    <entry>
 	      <option>-1, --once</option>
 	    </entry>

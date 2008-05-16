@@ -1,3 +1,26 @@
+2008-05-16 Russ Nelson <nelson@crynwr.com>
+
+	* NEWS: add notes about this release, make formatting consistent
+          across all the release notes.
+	* README: remove first person, update to 0.8.3
+	* doc/C/actionscript.xml: update version number
+	* doc/C/app_authors.xml: add myself as author
+	* doc/C/conformance.xml: add Implements 
+	* doc/C/gnashref.xml: update version number
+	* doc/C/gnashuser.xml: update version number
+	* doc/C/introduction.xml: change the tense
+	* doc/C/preformatted/gnash.1.in: regenerate
+	* doc/C/preformatted/gnash_ref.info.in: regenerate
+	* doc/C/preformatted/gnash_user.info.in: regenerate
+	* doc/C/preformatted/gnashref.html.in: regenerate
+	* doc/C/preformatted/gnashuser.html.in: regenerate
+	* doc/C/refmanual/documentation_dependencies.xml: spelling
+	* doc/C/refmanual/feature_configuration.xml: spelling/grammar and note
+          that AGG is the default.
+	* doc/C/refmanual/testing_dependencies.xml: spelling
+	* doc/C/usermanual/usage.xml: spelling and add options for dump-gnash.
+	* macros/docbook.m4: improve FOP and jre location code
+
 2008-05-16 Sandro Santilli <strk@keybit.net>
 
 	* libmedia/ffmpeg/sound_handler_sdl.h: add an

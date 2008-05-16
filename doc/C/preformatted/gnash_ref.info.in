@@ -1,7 +1,7 @@
-START-INFO-DIR-ENTRY
-This is gnash_ref.info, produced by makeinfo version 4.11 from gnash_ref.texi.
+This is gnash_ref.info, produced by makeinfo version 4.11 from stdin.
 
-* Gnash Reference Manual: (gnash_ref).   Gnash
+START-INFO-DIR-ENTRY
+* Gnash Reference Manual: (gnash_ref).   [MISSING TEXT]
 END-INFO-DIR-ENTRY
 
 
@@ -28,7 +28,7 @@ Gnash Reference Manual
 Introduction
 
 * Audience::
-* What Is Supported ?::
+* What Is Supported?::
 
 Building from Source
 
@@ -102,21 +102,21 @@ Gnash is a free SWF movie player.  It is available as a stand-alone
 application or as a plugin for several popular web browsers. It
 supports playing media from a disk or streaming over a network
 connection. Some popular video sharing sites like YouTube are supported
-from a wide vaariety of devices from embedded ones to modern desktops.
+on a wide variety of devices from embedded ones to modern desktops.
 
    Gnash has a better focus on security, allowing the user tight
 control of all network or disk based I/O. Gnash also supports extending
-ActionScript by creating your own. You can write wrappers for any
-development library, and import them into the player much like perl or
-python does.
+ActionScript by creating your own classes. You can write wrappers for
+any development library, and import them into the player much like Perl
+or Python does.
 
 * Menu:
 
 * Audience::
-* What Is Supported ?::
+* What Is Supported?::
 
 
-File: gnash_ref.info,  Node: Audience,  Next: What Is Supported ?,  Up: Introduction
+File: gnash_ref.info,  Node: Audience,  Next: What Is Supported?,  Up: Introduction
 
 1.1 Audience
 ============
@@ -127,46 +127,46 @@ plugin. For more technical details, please refer to the Gnash Reference
 manual.
 
 
-File: gnash_ref.info,  Node: What Is Supported ?,  Prev: Audience,  Up: Introduction
+File: gnash_ref.info,  Node: What Is Supported?,  Prev: Audience,  Up: Introduction
 
-1.2 What Is Supported ?
-=======================
+1.2 What Is Supported?
+======================
 
 Gnash is known to compile for most any POSIX and ANSI C++ conforming
 system if you have all the dependent libraries installed. Systems we
-test on, and which Gnash is know to run on are Ubuntu, Fedora, Debian,
-OpenBSD, NetBSD, FreeBSD, Win32, and Darwin (OSX) primarily.
+test on, and which Gnash is known to run on are Ubuntu, Fedora, Debian,
+Mandriva, OpenBSD, NetBSD, FreeBSD, Win32, and Darwin (OSX) primarily.
 Occasionally other platforms are built, primarily by those distribution
 maintainers. This includes BeOS, Haiku, Syllable, OS/2, Solaris,
 Slackware, and Gentoo.
 
-   Gnash is a capable of reading up to SWF v9 files and opcodes, but
+   Gnash is capable of reading up to SWF v9 files and opcodes, but
 primarily supports SWF v7, with better SWF v8 and v9 support under
-heavy developement. With the 0.8.2 release, Gnash includes initial
+heavy development. With the 0.8.2 release, Gnash includes initial
 parser support for SWF v8 and v9.  Not all ActionScript 2 classes are
 implemented yet, but all of the most heavily used ones are. Many
 ActionScript 2 classes are partially implemented; there is support for
 all of the commonly used methods of each class.
 
-   Gnash has implemented about 80% of ActionScript v. 2.0, and has
-begun implementing ActionScript v. 3.0. Gnash supports the majority of
-Flash opcodes up to SWF version 9, and a wide sampling of ActionScript
-classes for SWF version 8.
+   Gnash has implemented about 80% of ActionScript v2.0, and has begun
+implementing ActionScript v3.0. Gnash supports the majority of Flash
+opcodes up to SWF v9, and a wide sampling of ActionScript classes for
+SWF v8.
 
-   As ActionsScript 3 is a more developed version of ActionScript 2,
+   As ActionScript 3 is a more developed version of ActionScript 2,
 many of the same classes work for both. Support has been added to
 Gnash's ActionScript library to support the new ActionScript 3 filters,
-which get applied to every class. Implementing ActionScript clases is
+which get applied to every class. Implementing ActionScript classes is
 often the easiest way for new Gnash developers to make a contribution
-without a deep internal knpowledge of Gnash.
+without a deep internal knowledge of Gnash.
 
    Gnash has included video support since early 2007, but this is an
-every changing field of reverse engineering. Many of the popular video
-sharing sites use SWF v8 or v9, which Gnash still has imperfect support
-for. This is improving all the time, so often builds from a development
-snapshot will work when using the older release packaged in your
-distribution doesn't. You can find daily snapshots of the latest CVS
-tree at: http://www.gnashdev.org/dev_snapshots
+ever changing field of reverse engineering. Many of the popular video
+sharing sites use SWF v8 or v9, which Gnash supports imperfectly. This
+is improving all the time, so often builds from a development snapshot
+will work when using the older release packaged in your distribution
+doesn't. You can find daily snapshots of the latest CVS tree at:
+http://www.gnashdev.org/dev_snapshots
 (http://www.gnashdev.org/dev_snapshots/).
 
    Gnash uses ffmpeg for codecs, so any file supported by Mplayer
@@ -663,7 +663,7 @@ File: gnash_ref.info,  Node: Testing Dependencies,  Next: Documentation Dependen
 2.4 Testing Dependencies
 ========================
 
-Gnash tries to run as many tests as possible, but will simply skip
+Gnash tries to run as many tests as possible, but will silentl skip
 tests if the tools to run them are unavailable.
 
 *Testing Dependency Table*
@@ -689,9 +689,9 @@ Mtasc      Optional   1.12 or     Mtasc is  Mtasc is   `mtasc'    No
                                                                   packages
                                                                   are
                                                                   available.
-swfc       Optional   part of     Swfc a    Swfc is    No         No
-                      swftools   swf        used in    distributiondistribution
-                      0.8.1      decompiler.some       packages   packages
+swfc       Optional   part of     Swfc is   Swfc is    No         No
+                      swftools   an swf     used in    distributiondistribution
+                      0.8.1      compiler.  some       packages   packages
                                             testcases. are        are
                                                        available. available.No
                                                                   distribution
@@ -793,7 +793,7 @@ Texinfo    Possibly               Texinfo   Texinfo    `texinfo'  `texinfo'`texi
                                  used to    required              
                                  convert    if you                
                                  DocBook2X  wish to               
-                                 output     product               
+                                 output     produce               
                                  into GNU   GNU info              
                                  info       pages.                
                                  pages.                           
@@ -1000,19 +1000,20 @@ Option                               Function
                                      dir is extracted from kde-config.
 `--disable-plugins'                  Disable build of both kparts and
                                      npapi plugins
-`--enable-renderer=opengl|cairo|agg' Enable support for the a graphics
+`--enable-renderer=opengl|cairo|agg' Enable support for a graphics
                                      backend. Currently only `opengl' and
-                                     `agg' work sufficiently. OpenGL is
-                                     used when you have hardware
-                                     accelerated graphics. AGG i used
-                                     when you do not have hardware
-                                     accelerated graphics. Typically
-                                     most desktop machines have OpenGL
-                                     support, and most embedded systems
-                                     do not. OpenGl is the default when
-                                     building Gnash, although the
-                                     quality of AGG's rendering is
-                                     currently superior to OpenGL.
+                                     `agg' work sufficiently. Use OpenGL
+                                     when you have hardware accelerated
+                                     graphics. Use AGG when you do not
+                                     have hardware accelerated graphics
+                                     or when you are building for a wide
+                                     audience.  Typically most desktop
+                                     machines have OpenGL support, and
+                                     most embedded systems do not. AGG
+                                     is the default when building Gnash,
+                                     although the speed of OpenGL's
+                                     rendering is currently superior to
+                                     AGG.
 `--enable-sdk-install'               Enable installing the libraries and
                                      headers as an SDK.
 `--disable-shared'                   Enable installing the shared
@@ -1591,18 +1592,17 @@ File: gnash_ref.info,  Node: A Tour of Gnash,  Next: Sound handling in Gnash,  U
 ===================
 
 The top level of Gnash has several libraries, _libgnashbase_,
-_libgnashgeo_, _libgnashserver_, _libgnashasobjs_ and
-_libgnashbackend_. There are several utility programs included for
-debug parsing and processing of Flash movie files, and other useful
-utilitis for examining local Shared Objects and sniffingh
-LocalConnections.
+_libgnashserver_, _libgnashmedia_, _libgnashamf_ and _libgnashbackend_.
+There are several utility programs included for debug parsing and
+processing of Flash movie files, and other useful utilities for
+examining local Shared Objects and sniffing LocalConnections.
 
 * Menu:
 
 * The Libraries::
 * The Applications::
 * The Plugin::
-* The Debug Logging System::
+* The Message Logging System::
 
 
 File: gnash_ref.info,  Node: The Libraries,  Next: The Applications,  Up: A Tour of Gnash
@@ -1613,17 +1613,15 @@ File: gnash_ref.info,  Node: The Libraries,  Next: The Applications,  Up: A Tour
 * Menu:
 
 * libgnashbase::
-* libgnashgeo::
-* libgnashgui::
 * libgnashserver::
-* libgnashasobjs::
+* libgnashmedia::
 * libgnashamf::
 * libgnashbackend::
 * libgnashplugin::
 * libklashpart::
 
 
-File: gnash_ref.info,  Node: libgnashbase,  Next: libgnashgeo,  Up: The Libraries
+File: gnash_ref.info,  Node: libgnashbase,  Next: libgnashserver,  Up: The Libraries
 
 3.1.1.1 libgnashbase
 ....................
@@ -1636,26 +1634,9 @@ freed up automatically by the interpreter. Both STL and Boost smart
 pointers are used.
 
 
-File: gnash_ref.info,  Node: libgnashgeo,  Next: libgnashgui,  Prev: libgnashbase,  Up: The Libraries
+File: gnash_ref.info,  Node: libgnashserver,  Next: libgnashmedia,  Prev: libgnashbase,  Up: The Libraries
 
-3.1.1.2 libgnashgeo
-...................
-
-Libgnashgeo contains code for device independent graphics routines.
-
-
-File: gnash_ref.info,  Node: libgnashgui,  Next: libgnashserver,  Prev: libgnashgeo,  Up: The Libraries
-
-3.1.1.3 libgnashgui
-...................
-
-Libgnashgui contains code for a portable GUI class that supports using
-GTK2, a framebuffer, SDL, or KDE, FLTK, or Aqua.
-
-
-File: gnash_ref.info,  Node: libgnashserver,  Next: libgnashasobjs,  Prev: libgnashgui,  Up: The Libraries
-
-3.1.1.4 libgnashserver
+3.1.1.2 libgnashserver
 ......................
 
 Libgnashserver is the guts of the interpreter itself. This is where the
@@ -1663,18 +1644,21 @@ main code for the interpreter lives. Includes in libserver are the two
 support libraries for the parser and the core of the virtual machine.
 
 
-File: gnash_ref.info,  Node: libgnashasobjs,  Next: libgnashamf,  Prev: libgnashserver,  Up: The Libraries
+File: gnash_ref.info,  Node: libgnashmedia,  Next: libgnashamf,  Prev: libgnashserver,  Up: The Libraries
 
-3.1.1.5 libgnashasobjs
-......................
+3.1.1.3 libgnashmedia
+.....................
 
-Libgnashasobjs contains all the ActionScript classes used by the
-interpreter.
+Libgnashmedia handles Gnash's audio and video capabilities, dealing
+with streamed video and sound as well as decoding embedded media
+frames. Besides the standard Flash formats FLV, MPEG4, Nellymoser,
+ADPCM, MP3 and RAW, Gnash can decode other formats supports by
+gstreamer or ffmpeg, including the free OGG container and free codecs.
 
 
-File: gnash_ref.info,  Node: libgnashamf,  Next: libgnashbackend,  Prev: libgnashasobjs,  Up: The Libraries
+File: gnash_ref.info,  Node: libgnashamf,  Next: libgnashbackend,  Prev: libgnashmedia,  Up: The Libraries
 
-3.1.1.6 libgnashamf
+3.1.1.4 libgnashamf
 ...................
 
 AMF is the data format used internally by SWF files. This is Gnash's
@@ -1685,7 +1669,7 @@ NetStream class when using thre RTMP streaming network protocol.
 
 File: gnash_ref.info,  Node: libgnashbackend,  Next: libgnashplugin,  Prev: libgnashamf,  Up: The Libraries
 
-3.1.1.7 libgnashbackend
+3.1.1.5 libgnashbackend
 .......................
 
 Libgnashbackend is a library containing the rendering code that glues
@@ -1695,7 +1679,7 @@ Cairo, and AGG.
 
 File: gnash_ref.info,  Node: libgnashplugin,  Next: libklashpart,  Prev: libgnashbackend,  Up: The Libraries
 
-3.1.1.8 libgnashplugin
+3.1.1.6 libgnashplugin
 ......................
 
 Libgnashplugin is the Mozilla/Firefox plugin.
@@ -1703,7 +1687,7 @@ Libgnashplugin is the Mozilla/Firefox plugin.
 
 File: gnash_ref.info,  Node: libklashpart,  Prev: libgnashplugin,  Up: The Libraries
 
-3.1.1.9 libklashpart
+3.1.1.7 libklashpart
 ....................
 
 Libklashpart is the Konqueror plugin.
@@ -1714,8 +1698,8 @@ File: gnash_ref.info,  Node: The Applications,  Next: The Plugin,  Prev: The Lib
 3.1.2 The Applications
 ----------------------
 
-There are currently a few standalone programs in Gnash, which serve to
-either assist with Gnash development or play flash movies.
+There are currently a few standalone programs in Gnash, which serve
+either to assist with Gnash development or to play flash movies.
 
 * Menu:
 
@@ -1730,8 +1714,8 @@ File: gnash_ref.info,  Node: The Standalone Player,  Next: Gprocessor,  Up: The 
 3.1.2.1 The Standalone Player
 .............................
 
-This is the standalone OpenGL back-end used to play movies. There are
-several command-line options and keyboard control keys used by Gnash.
+This is the standalone OpenGL backend used to play movies. There are
+several command line options and keyboard control keys used by Gnash.
 
 
 File: gnash_ref.info,  Node: Gprocessor,  Next: SOLdumper,  Prev: The Standalone Player,  Up: The Applications
@@ -1763,40 +1747,40 @@ Dumpshm is a program used to find and dump the contents of the
 _LocalConnection_ shared memory segment.
 
 
-File: gnash_ref.info,  Node: The Plugin,  Next: The Debug Logging System,  Prev: The Applications,  Up: A Tour of Gnash
+File: gnash_ref.info,  Node: The Plugin,  Next: The Message Logging System,  Prev: The Applications,  Up: A Tour of Gnash
 
 3.1.3 The Plugin
 ----------------
 
 The plugin is designed to work within Mozilla or Firefox, although
-there is Konqueror support as well. The plugin uses the Mozilla NSAPI
-plugin API to be cross platform, and is portable, as well as being well
-integrated into Mozilla based browsers.
+there is Konqueror support as well. The plugin uses the Mozilla plugin
+API (NPAPI) to be cross platform, and is portable, as well as being
+well integrated into Mozilla based browsers.
 
 * Menu:
 
-* Current Status::
+* Current Implementation::
 * GUI Support::
 * Mozplugger::
 * Klash::
 
 
-File: gnash_ref.info,  Node: Current Status,  Next: GUI Support,  Up: The Plugin
+File: gnash_ref.info,  Node: Current Implementation,  Next: GUI Support,  Up: The Plugin
 
-3.1.3.1 Current Status
-......................
+3.1.3.1 Current Implementation
+..............................
 
-As of March 30, 2006, the plugin works! This works in a fashion similar
-to MozPlugger in that the standalone player is used instead of using a
-thread. This gets around the issue of having to maintain a separate
-player to support the plugin. It also gets around the other issues that
-Gnash itself is not thread safe at this time.
+The plugin works in a fashion similar to MozPlugger: the standalone
+player is used instead of using a thread. This gets around the issue of
+having to maintain a separate player to support the plugin. It also
+gets around the other issues that Gnash itself is not thread safe at
+this time.
 
    As of Jan, 2007, streaming video, ala "YouTube" works, along with
 other video sharing sites.
 
 
-File: gnash_ref.info,  Node: GUI Support,  Next: Mozplugger,  Prev: Current Status,  Up: The Plugin
+File: gnash_ref.info,  Node: GUI Support,  Next: Mozplugger,  Prev: Current Implementation,  Up: The Plugin
 
 3.1.3.2 GUI Support
 ...................
@@ -1888,143 +1872,143 @@ _-enable-klash_ option when configuring. Other than installing, there
 is nothing else that needs to be done to install Klash.
 
 
-File: gnash_ref.info,  Node: The Debug Logging System,  Prev: The Plugin,  Up: A Tour of Gnash
+File: gnash_ref.info,  Node: The Message Logging System,  Prev: The Plugin,  Up: A Tour of Gnash
 
-3.1.4 The Debug Logging System
-------------------------------
+3.1.4 The Message Logging System
+--------------------------------
 
-Gnash supports a debug logging system which supports both C and C++
-natively. This means you can use both _printf()_ style debug messages
-and C++ _iostreams_ style, where you can print C++ objects directly as
-you would when using _cout_.
+Gnash's common message logging system uses a _printf()_ style format.
+Despite the C-like appearance, however, Gnash's LogFile class by
+default does not use _printf()_ for formatting the messages at all.
 
-   In the beginning, Gnash only supported the C API for debug logging,
-so it is the most heavily used in Gnash. This API was used in the
-_log_msg()_ and _log_error()_ functions, and used a callback to set
-them up.
+   All logging calls are converted using templated functions to use
+boost::format.  This uses a similar syntax to printf(), but
+additionally guarantees type-safety and allows more advanced substition
+using positional identifiers besides the traditional printf() type
+identifiers. The conversion templates mean that the logging API remains
+exactly the same, regardless of which method is used to format the log
+output.
 
-   If a filename is not specified at object construction time, a
+   The templates for conversion are generated using Boost.Preprocessor.
+Currently, they allow for a maximum of 16 arguments (more than enough
+for all current usage), but that can be expanded or reduced by changing
+_#define ARG_NUMBER_ in _libbase/log.h_.
+
+   If a filename is not specified before the log file is needed, a
 default name of _gnash-dbg.log_ is used. If Gnash is started from the
 command line, the debug log will be created in the current directory.
 When executing Gnash from a launcher under _GNOME_ or _KDE_ the debug
 file goes in your home directory, since that's considered the current
-directory.
-
-   There is common functionality between using the C or C++ API.
-Optional output is based on flags that can be set or unset. Multiple
-levels of verbosity are supported, so you can get more output by
-supplying multiple _-v_ options on the command line. You can also
-disable the creation of the debug log.
-
-   Currently the use of the C++ API for logging is discouraged, do to
-performance issues.and the generic log_msg() has been replaced by more
-spcific function calls to allow more control of what gets displayed and
-logged.
+directory. A file name can be specified using either _gnashrc_ or a
+call to the LogFile instance itself.
 
 * Menu:
 
-* Logging System C API::
-* Logging System C++ API::
+* Logging System API::
+* The LogFile Instance::
 
 
-File: gnash_ref.info,  Node: Logging System C API,  Next: Logging System C++ API,  Up: The Debug Logging System
+File: gnash_ref.info,  Node: Logging System API,  Next: The LogFile Instance,  Up: The Message Logging System
 
-3.1.4.1 Logging System C API
-............................
+3.1.4.1 Logging System API
+..........................
 
-These functions are clones of the originals as they were used for
-Gnash. These function the same as always except output can be logged to
-disk now as well. These currently print no timestamp with the output,
-which is the older functionality. As these functions are implemented on
-top of the C++ API now, they can be used without corrupting the output
-buffers.
+Gnash provides 9 specialized logging calls, each using the
+_printf()_-style call similar to this:
 
-log_error(const char* fmt, ...)
-     Display an error message if verbose output is enabled. By default
-     the error messages are always written to the disk file, but
-     optionally displayed in the terminal.
+     log_error(const char* fmt, ...)
 
-void log_unimpl
+The different calls and their purposes are described below. The output
+to stdout and to disk are always identical, although writing the log to
+disk can be separately disabled.
+
+log_error
+     Display an error message if verbose output is enabled. This is
+     always printed at a verbosity level of 1 or more.
+
+log_unimpl
      Displays a warning to the user about missing Gnash features.  We
      expect all calls to this function to disappear over time, as we
-     implement those features of Flash.
+     implement those features of Flash. This is always printed at a
+     verbosity level of 1 or more.
 
-void log_trace
-     Used only for explicit user traces
+log_trace
+     Used only for the output of the ActionScript _trace()_ function.
+     This is always printed at a verbosity level of 1 or more.
 
-void log_debug
-     Logs debug information.
+log_debug
+     Logs debug information. This is printed at a verbosity level of 2
+     or more.
 
-void log_action
+log_action
      Log action execution information. Wrap all calls to this function
      (and other related statements) into an IF_VERBOSE_ACTION macro, so
      to allow completely removing all the overhead at compile time and
-     reduce it at runtime.
+     reduce it at runtime. This is printed at a verbosity level of 1 or
+     more only if action logging is enabled.
 
-void log_parse
+log_parse
      Log SWF parsing  Wrap all calls to this function (and other
      related statements) into an IF_VERBOSE_PARSE macro, so to allow
      completely removing all the overhead at compile time and reduce it
-     at runtime.
+     at runtime. This is printed at a verbosity level of 1 or more only
+     if parser logging is enabled.
 
-void log_security
-     Display a message with security related information.
+log_security
+     Display a message with security related information. This is always
+     printed at a verbosity level of 1 or more.
 
-void log_swferror
+log_swferror
      This indicates an error in how the binary SWF file was
      constructed, i.e.probably a bug in the tools used to build the SWF
      file. Wrap all calls to this function (and other related
      statements) into an IF_VERBOSE_MALFORMED_SWF macro, so to allow
      completely removing all the overhead at compile time and reduce it
-     at runtime.
+     at runtime. This is printed at a verbosity level of 1 or more only
+     if malformed SWF logging is enabled.
 
-log_warning(const char* fmt, ...)
-     Display a warning message if verbose output is enabled. By default
-     the error messages are always written to the disk file, but
-     optionally displayed in the terminal.
+void log_aserror
+     This indicates an erroneous actionscript request such as an
+     incorrect number of arguments or an invalid argument.  Wrap all
+     calls to this function (and other related statements) into an
+     IF_VERBOSE_ASCODING_ERRORS macro, so to allow completely removing
+     all the overhead at compile time and reduce it at runtime.  This
+     is printed at a verbosity level of 1 or more only if AS coding
+     error logging is enabled.
 
 
-File: gnash_ref.info,  Node: Logging System C++ API,  Prev: Logging System C API,  Up: The Debug Logging System
+File: gnash_ref.info,  Node: The LogFile Instance,  Prev: Logging System API,  Up: The Message Logging System
 
-3.1.4.2 Logging System C++ API
-..............................
+3.1.4.2 The LogFile Instance
+............................
 
-This is the new C++ streams based API that can be used to print C++
-objects natively. All output lines are timestamped.
+This is the main API for initializing and manipulating the logging
+output.  By default, the log will be written to _gnash-dbg.log_ file
+whenever a verbose option is supplied.
 
-   There are two macros used for program tracing. these can be used in
-both C or C++ code with one little difference. Since C doesn't have
-destructors, you must call _GNASH_REPORT_RETURN_ at the end of a
-function to display the function returning message.
+getDefaultInstance()
+     This allows the construction of a LogFile on the first call, so
+     ensuring that it the logfile is always initialised before use.  It
+     is the only way to access a LogFile instance. The logfile itself
+     is never opened until it is needed.
 
-GNASH_REPORT_FUNCTION;
-     When this is included in a C++ method, a message is printed when
-     entering and exiting this method by hooking into the constructor
-     and destructor. These are always written to the disk file, but
-     optionally written to the screen only at the highest levels of
-     verbosity.
+setLogFilename(const std::string& filename)
+     Use this to set a different name for the disk-based log file.
+     This setting can be overridden by a directive in gnashrc. If the
+     log file is already open, a call to setLogFilename() will close it;
+     a file with the new name will be opened when it is next needed.
 
-GNASH_REPORT_RETURN;
-     This is used by C functions to print the returning from function
-     debug message. For C++, this macro is executed automatically by
-     the destructor.
-
-   This is the main API for the logging system. By default everything
-is setup to write to the default _gnash-dbg.log_ file whenever a
-verbose option is supplied. Optionally it is possible to open a log
-file with a specified name, allowing multiple output files.
-
-closeLog(void)
+closeLog()
      Close a debug log. The disk file remains.
 
-removeLog(void)
+removeLog()
      Delete the debug log file from disk.
 
-setVerbosity(void)
+setVerbosity()
      Increment the verbosity level.
 
-setVerbosity(int)
-     Set the verbosity level.
+setVerbosity(int level)
+     Set the verbosity level to a specified level.
 
 setStamp(bool flag)
      If _flag_ is _true_, then print a timestamp prefixed to every
@@ -2976,16 +2960,16 @@ File: gnash_ref.info,  Node: Reporting Bugs,  Next: Gnash Extensions,  Prev: Sof
 ****************
 
 The Gnash project relies on the community of Gnash users to test the
-player, feedback is critical to any successful project.  Not only does
+player.  Feedback is critical to any successful project.  Not only does
 it let us know that people use Gnash, but it helps us understand the
 community's needs. Gnash uses a bug tracker on
 `http://savannah.gnu.org' to manage these reports.
 
    When filing a report, please follow the guidelines below. The better
 your bug report is, the easier it will be for the developers to address
-the issue. Bug reports without enough information will initially be
-asked to provide this information anyway. Adding critical details, like
-the Operating System you are on, it's version, and any relevant error
+the issue. Bug reports without enough information will be asked to
+provide this information anyway. Adding critical details, like the
+Operating System you are on, its version, and any relevant error
 messages from Gnash that you get.
 
 * Menu:
@@ -3006,8 +2990,8 @@ Although Gnash is primarily released as source, the Gnash build
 infrastructure allows the automated building of binary packages. Often
 the version of Gnash as packaged by a GNU/Linux or BSD distribution is
 based on the last official release, which could be months out of date.
-It is helpful if this is the case to try a newer packaged build of
-Gnash.
+It helps us, if this is the case, for you to try a newer packaged build
+of Gnash.
 
    You can get a fresh binary package of Gnash, as well as recent
 source packages from http://www.getgnash.org/packages
@@ -4089,9 +4073,9 @@ File: gnash_ref.info,  Node: Authors,  Next: GNU Free Documentation License,  Pr
 
 Gnash is maintained by Rob Savoye. Other active developers are: Sandro
 Santilli, Bastiaan Jacques, Udo Giacomozzi, Chad Musick, Benjamin
-Wolsey, and Zou Lunkai. Please send all comments and suggestions to
-<gnash-dev@gnu.org>. Past and sometimes current developers are Tomas
-Groth and Markus Gothe.
+Wolsey, Zou Lunkai, and Russ Nelson. Please send all comments and
+suggestions to <gnash-dev@gnu.org>. Past and sometimes current
+developers are Tomas Groth and Markus Gothe.
 
    Gnash was initially derived from GameSWF.  GameSWF is maintained by
 Thatcher Ulrich <tu@tulrich.com>.  The following people contributed to
@@ -4549,144 +4533,142 @@ software.
 
 Tag Table:
 Node: Top168
-Node: Introduction1999
-Node: Audience2800
-Node: What Is Supported ?3128
-Node: Building from Source5660
-Node: Overview6040
-Node: Getting The Source7082
-Node: Releases7288
-Node: CVS Access7656
-Node: Code Dependencies8368
-Ref: Code Dependency Table9065
-Node: Testing Dependencies34580
-Ref: Testing Dependency Table34888
-Node: Documentation Dependencies38812
-Ref: Documentation Dependency Table39081
-Node: Configuring Gnash48149
-Node: Features50443
-Ref: Configuration Options - Features51043
-Node: Specifying Custom Paths57373
-Ref: Custom Path Options57843
-Node: Compiling the Code67466
-Node: Creating the Documentation68407
-Node: Running the Tests69753
-Node: Using DejaGnu70207
-Node: Increasing Verbosity70570
-Node: Running Some Tests71106
-Node: Running The Tests Manually71926
-Node: Movie tests72588
-Node: ActionScript Unit Tests72942
-Node: Installation73259
-Node: Libraries74572
-Node: Executables75428
-Node: Documentation76298
-Node: Cross Configuring77053
-Node: Software Internals80133
-Node: A Tour of Gnash80402
-Node: The Libraries80969
-Node: libgnashbase81272
-Node: libgnashgeo81696
-Node: libgnashgui81911
-Node: libgnashserver82180
-Node: libgnashasobjs82551
-Node: libgnashamf82787
-Node: libgnashbackend83210
-Node: libgnashplugin83525
-Node: libklashpart83731
-Node: The Applications83901
-Node: The Standalone Player84268
-Node: Gprocessor84566
-Node: SOLdumper84960
-Node: Dumpshm85227
-Node: The Plugin85446
-Node: Current Status85924
-Node: GUI Support86482
-Node: Mozplugger88163
-Node: Klash90054
-Node: The Debug Logging System90604
-Node: Logging System C API92165
-Node: Logging System C++ API94369
-Node: Sound handling in Gnash96210
-Node: Sound types96953
-Node: Sound parsing97490
-Node: Sound playback98058
-Node: The SDL sound backend98588
-Node: The Gstreamer backend99907
-Node: Future audio backends100923
-Node: Detailed description of the Gstreamer backend101413
-Node: Testing103664
-Node: Testing Tools104135
-Node: Test Cases104967
-Node: Writing ActionScript Tests105546
-Node: Writing Ming-based self-contained SWF tests108049
-Node: Using Ming-based test generators facilities109206
-Node: Writing self-contained SWF tests with other compilers111566
-Node: Writing Test Runners114691
-Node: Using the generic test runner for self-contained SWF tests116440
-Node: Writing Movie testers118530
-Node: Adding New ActionScript Class120270
-Node: Prototype121450
-Node: Declaration122867
-Node: Instantiation123132
-Node: Methods123759
-Node: Accessing Arguments124150
-Node: Returning a Value to ActionScript124546
-Node: Additional fn_call Members124925
-Node: Dynamic Properties125779
-Node: The as_value Object Type127284
-Node: Data Types127722
-Node: Determining the Type128043
-Node: Fetching the Value128575
-Node: Setting the Value and Type129065
-Node: Further Reading129659
-Node: Object ActionScript Class130074
-Node: The Methods of the Class130414
-Node: The Properties of the Object Class130753
-Node: Object Class Conformance131068
-Node: Reporting Bugs132607
-Node: Get a Fresh Binary Package133600
-Node: Determine if the bug was previously reported134378
-Node: Review the bug writing guidelines135196
-Node: Filing a bug report136247
-Node: Gnash Extensions136530
-Node: Creating A New Extension138800
-Node: Crafting an Extension140218
-Node: Debugging An Extension144522
-Node: Included Extensions146214
-Node: Gtk Extension146658
-Node: File I/O Extension147645
-Node: MySQL Extension148831
-Node: RTMP Protocol149682
-Node: AMF Format159478
-Node: Mozilla/Firefox NPAPI Plugin160454
-Node: Plugin C API161472
-Node: Plugin C++ API163331
-Node: OpenGL and Threads166595
-Node: Plugin Event Handling167923
-Node: Appendix168892
-Node: Code Style169044
-Node: Authors172874
-Node: GNU Free Documentation License173570
-Node: 0_ PREAMBLE174333
-Node: 1_ APPLICABILITY AND DEFINITIONS175639
-Ref: fdl-document175864
-Ref: fdl-modified176155
-Ref: fdl-secondary176342
-Ref: fdl-invariant176987
-Ref: fdl-cover-texts177236
-Ref: fdl-transparent177449
-Ref: fdl-title-page178739
-Node: 2_ VERBATIM COPYING179128
-Node: 3_ COPYING IN QUANTITY180108
-Node: 4_ MODIFICATIONS182465
-Node: 5_ COMBINING DOCUMENTS188525
-Node: 6_ COLLECTIONS OF DOCUMENTS190022
-Node: 7_ AGGREGATION WITH INDEPENDENT WORKS190913
-Node: 8_ TRANSLATION192141
-Node: 9_ TERMINATION193044
-Node: 10_ FUTURE REVISIONS OF THIS LICENSE193699
-Node: Addendum194839
+Node: Introduction1998
+Node: Audience2803
+Node: What Is Supported?3130
+Node: Building from Source5636
+Node: Overview6016
+Node: Getting The Source7058
+Node: Releases7264
+Node: CVS Access7632
+Node: Code Dependencies8344
+Ref: Code Dependency Table9041
+Node: Testing Dependencies34556
+Ref: Testing Dependency Table34865
+Node: Documentation Dependencies38789
+Ref: Documentation Dependency Table39058
+Node: Configuring Gnash48126
+Node: Features50420
+Ref: Configuration Options - Features51020
+Node: Specifying Custom Paths57417
+Ref: Custom Path Options57887
+Node: Compiling the Code67510
+Node: Creating the Documentation68451
+Node: Running the Tests69797
+Node: Using DejaGnu70251
+Node: Increasing Verbosity70614
+Node: Running Some Tests71150
+Node: Running The Tests Manually71970
+Node: Movie tests72632
+Node: ActionScript Unit Tests72986
+Node: Installation73303
+Node: Libraries74616
+Node: Executables75472
+Node: Documentation76342
+Node: Cross Configuring77097
+Node: Software Internals80177
+Node: A Tour of Gnash80446
+Node: The Libraries81014
+Node: libgnashbase81284
+Node: libgnashserver81711
+Node: libgnashmedia82082
+Node: libgnashamf82571
+Node: libgnashbackend82993
+Node: libgnashplugin83308
+Node: libklashpart83514
+Node: The Applications83684
+Node: The Standalone Player84054
+Node: Gprocessor84351
+Node: SOLdumper84745
+Node: Dumpshm85012
+Node: The Plugin85231
+Node: Current Implementation85721
+Node: GUI Support86262
+Node: Mozplugger87951
+Node: Klash89842
+Node: The Message Logging System90392
+Node: Logging System API91949
+Node: The LogFile Instance94783
+Node: Sound handling in Gnash96267
+Node: Sound types97010
+Node: Sound parsing97547
+Node: Sound playback98115
+Node: The SDL sound backend98645
+Node: The Gstreamer backend99964
+Node: Future audio backends100980
+Node: Detailed description of the Gstreamer backend101470
+Node: Testing103721
+Node: Testing Tools104192
+Node: Test Cases105024
+Node: Writing ActionScript Tests105603
+Node: Writing Ming-based self-contained SWF tests108106
+Node: Using Ming-based test generators facilities109263
+Node: Writing self-contained SWF tests with other compilers111623
+Node: Writing Test Runners114748
+Node: Using the generic test runner for self-contained SWF tests116497
+Node: Writing Movie testers118587
+Node: Adding New ActionScript Class120327
+Node: Prototype121507
+Node: Declaration122924
+Node: Instantiation123189
+Node: Methods123816
+Node: Accessing Arguments124207
+Node: Returning a Value to ActionScript124603
+Node: Additional fn_call Members124982
+Node: Dynamic Properties125836
+Node: The as_value Object Type127341
+Node: Data Types127779
+Node: Determining the Type128100
+Node: Fetching the Value128632
+Node: Setting the Value and Type129122
+Node: Further Reading129716
+Node: Object ActionScript Class130131
+Node: The Methods of the Class130471
+Node: The Properties of the Object Class130810
+Node: Object Class Conformance131125
+Node: Reporting Bugs132664
+Node: Get a Fresh Binary Package133647
+Node: Determine if the bug was previously reported134433
+Node: Review the bug writing guidelines135251
+Node: Filing a bug report136302
+Node: Gnash Extensions136585
+Node: Creating A New Extension138855
+Node: Crafting an Extension140273
+Node: Debugging An Extension144577
+Node: Included Extensions146269
+Node: Gtk Extension146713
+Node: File I/O Extension147700
+Node: MySQL Extension148886
+Node: RTMP Protocol149737
+Node: AMF Format159533
+Node: Mozilla/Firefox NPAPI Plugin160509
+Node: Plugin C API161527
+Node: Plugin C++ API163386
+Node: OpenGL and Threads166650
+Node: Plugin Event Handling167978
+Node: Appendix168947
+Node: Code Style169099
+Node: Authors172929
+Node: GNU Free Documentation License173638
+Node: 0_ PREAMBLE174401
+Node: 1_ APPLICABILITY AND DEFINITIONS175707
+Ref: fdl-document175932
+Ref: fdl-modified176223
+Ref: fdl-secondary176410
+Ref: fdl-invariant177055
+Ref: fdl-cover-texts177304
+Ref: fdl-transparent177517
+Ref: fdl-title-page178807
+Node: 2_ VERBATIM COPYING179196
+Node: 3_ COPYING IN QUANTITY180176
+Node: 4_ MODIFICATIONS182533
+Node: 5_ COMBINING DOCUMENTS188593
+Node: 6_ COLLECTIONS OF DOCUMENTS190090
+Node: 7_ AGGREGATION WITH INDEPENDENT WORKS190981
+Node: 8_ TRANSLATION192209
+Node: 9_ TERMINATION193112
+Node: 10_ FUTURE REVISIONS OF THIS LICENSE193767
+Node: Addendum194907
 
 End Tag Table
 

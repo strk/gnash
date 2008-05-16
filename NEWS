@@ -86,6 +86,22 @@ Improvements since 0.8.1 release are:
 Fourth alpha release of Gnash (0.8.1).
 Improvements since 0.8.0 release are:
 
+<<<<<<< NEWS
+    * Garbage Collector
+    * Support for device fonts
+    * Support for dynamic text fields
+    * Better key handling
+    * Support for FFMPEG SVN
+    * Support for on-demand install of needed Gstreamer codec plugins.
+    * Debugger off by default (improves performance and memory use)
+    * AGG renderer by default 
+    * Support for KDE/AGG combination
+    * Layout change : we'll now build <gui>-gnash and 'gnash' is a shell
+	  script with gui selection capabilities (-G)
+    * More robust parser 
+    * Better support for flash player detection
+    * Fix for 'debugLog' directive in gnashrc
+=======
     * Garbage Collector
     * Support for device fonts
     * Support for dynamic text fields
@@ -100,12 +116,33 @@ Improvements since 0.8.0 release are:
     * More robust parser 
     * Better support for flash player detection
     * Fix for 'debugLog' directive in gnashrc
+>>>>>>> 1.7
 
 2007-06-01  Rob Savoye  <rob@welcomehome.org>
 
 The third alpha release of Gnash. Improvements since the 0.7.2 release
 are: 
 
+<<<<<<< NEWS
+    * Streaming video works with YouTube and Lulu.tv! This has been the
+      focus for the majority of the time since the last release.
+    * Many core improvments in the VM as our understanding of Flash
+      improves. These all improve both the correctness of a movie that is
+      being played, but enables more movies to play that used to not work.
+    * New FLTK2 gui.
+    * Simple Flash debugger added.
+    * Improved Darwin support that can use the system OpenGL.
+    * Flash extensions, direct support for file handling, MySQL access,
+      etc.. through plugins to the Gnash VM. Wrappers for any C/C++ API
+      libraries can be exported into ActionScript, and used as native
+      commands in a Flash movie.
+    * Updated manuals.
+    * Many new testcases! Support for testing with ming, swfmill, amd
+      mtasc compilers.
+    * New drawing API for MovieClips..
+
+2006-09-10  Rob Savoye  <rob@welcomehome.org>
+=======
     * Streaming video works with YouTube and Lulu.tv! This has been the
       focus for the majority of the time since the last release.
     * Many core improvments in the VM as our understanding of Flash
@@ -124,6 +161,7 @@ are:
     * New drawing API for MovieClips..
     
 2006-09-10  Rob Savoye  <rob@welcomehome.org>
+>>>>>>> 1.7
 
 The second alpha release of Gnash is coming soon. Improvements since
 the 0.7.1 alpha release are:

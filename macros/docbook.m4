@@ -58,8 +58,12 @@ AC_DEFUN([GNASH_DOCBOOK], [
     AC_MSG_NOTICE([checking for other programs needed to process the DocBook files])
     AC_PATH_PROG(FOP, fop.sh, [],
     	[$PATH:/usr/local/fop-0.20.5/:/usr/fop-0.20.5/:/usr/local/fop:/usr/lib/java/fop])
+    if test x"$FOP" == x; then
+        AC_PATH_PROG(FOP, fop, [],
+            [$PATH:/usr/local/fop-0.20.5/:/usr/fop-0.20.5/:/usr/local/fop:/usr/lib/java/fop])
+    fi
     if test x"$FOP" != x; then
-      dirlist="/usr/lib/jre /usr/jre /opt/local/Java/JavaSDK ~/ReQuest/jre $J2REDIR"
+      dirlist="/usr /usr/lib/jre /usr/jre /opt/local/Java/JavaSDK ~/ReQuest/jre $J2REDIR"
       JAVA=
       for i in $dirlist; do
         if test -f $i/bin/java; then

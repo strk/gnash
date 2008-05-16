@@ -37,6 +37,22 @@ their methods.  All unimplemented opcodes and ActionScript classes and
 methods print a warning when using -v with gnash or gprocessor.  Using
 gprocessor -v is a quick way to see why a movie isn't playing correctly.
 
+<<<<<<< README
+Currently implemented ActionScript classes are: Array, Boolean, Button,
+Date, Implements, Key, Math, Mouse, NetConnection, NetStream, Number,
+Object, Sound, Stage, String, XML, XMLNode, XMLSocket.
+
+Partially implemented classes are: MovieClipLoader, LocalConnection,
+MovieClip, TextField, TextFormat, System, Function, LoadVars, Video.
+
+Unimplemented classes are: Accessibility, Error, Microphone,
+Selection, SharedObject, Camera, Color, ContextMenu,
+CustomActions.
+
+Unimplemented Opcodes are: MDLength, MDSubstring, MDChr, Throw, Try.
+
+=======
+>>>>>>> 1.32
 Currently streaming video for some video sharing sites like Lulu.tv,
 or YouTube.com, does work. Your mileage with other sites may vary, but
 work continues on improving Gnash.

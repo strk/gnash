@@ -134,7 +134,7 @@
 	      <listitem>
 		<para>
 		  Fast Light ToolKit, low on resource usage.
-		  Since all build using fltk are now broken, we declare it
+		  Since all builds using fltk are now broken, we declare it
 		  "for developers".
 		</para>
 	      </listitem>
@@ -207,15 +207,16 @@
 	<row>
 	  <entry><option>--enable-renderer=opengl|cairo|agg</option>
 	  </entry>
-	  <entry>Enable support for the a graphics backend. Currently
+	  <entry>Enable support for a graphics backend. Currently
 	  only <option>opengl</option> and
-	  <option>agg</option> work sufficiently. OpenGL is
-	  used when you have hardware accelerated graphics. AGG i
-	  used when you do not have hardware accelerated
-	  graphics. Typically most desktop machines have OpenGL
-	  support, and most embedded systems do not. OpenGl is the
-	  default when building Gnash, although the quality of AGG's
-	  rendering is currently superior to OpenGL.</entry>
+	  <option>agg</option> work sufficiently. Use OpenGL
+	  when you have hardware accelerated graphics. Use AGG
+	  when you do not have hardware accelerated
+	  graphics or when you are building for a wide audience.
+          Typically most desktop machines have OpenGL
+	  support, and most embedded systems do not. AGG is the
+	  default when building Gnash, although the speed of OpenGL's
+	  rendering is currently superior to AGG.</entry>
 	</row>
 	<row>
 	  <entry><option>--enable-sdk-install</option>

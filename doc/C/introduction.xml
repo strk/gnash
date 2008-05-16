@@ -47,7 +47,7 @@
     <para>
       Gnash is capable of reading up to SWF v9 files and opcodes,
       but primarily supports SWF v7, with better SWF v8 and v9
-      support under heavy development. With the 0.8.2 release,
+      support under heavy development. Since the 0.8.2 release,
       Gnash includes initial parser support for SWF v8 and v9.
       Not all ActionScript 2 classes are implemented yet, but all of the
       most heavily used ones are. Many ActionScript 2 classes are
