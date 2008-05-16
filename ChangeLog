@@ -1,5 +1,9 @@
 2008-05-16 Russ Nelson <nelson@crynwr.com>
 
+	* NEWS, README: removing conflicts
+
+2008-05-16 Russ Nelson <nelson@crynwr.com>
+
 	* NEWS: add notes about this release, make formatting consistent
           across all the release notes.
 	* README: remove first person, update to 0.8.3
