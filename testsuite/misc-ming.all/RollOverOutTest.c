@@ -130,7 +130,7 @@ main(int argc, char **argv)
     dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
     SWFMovie_add(mo, (SWFBlock)dejagnuclip);
 
-    sprintf(fdbfont, "%s/Bitstream Vera Sans.fdb", srcdir);
+    sprintf(fdbfont, "%s/Bitstream-Vera-Sans.fdb", srcdir);
     FILE *font_file = fopen(fdbfont, "r");
     if ( font_file == NULL )
     {

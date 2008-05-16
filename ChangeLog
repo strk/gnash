@@ -1,5 +1,15 @@
 2008-05-16 Russ Nelson <nelson@crynwr.com>
 
+	Fix references to Bitstream-Vera-Sans:
+	* testsuite/misc-ming.all/DefineTextTest.c
+	* testsuite/misc-ming.all/ming_utils.c
+	* testsuite/misc-ming.all/DefineEditTextTest.c
+	* testsuite/misc-ming.all/RollOverOutTest.c
+	* testsuite/misc-ming.all/SpriteButtonEventsTest.c
+	* testsuite/misc-ming.all/DefineEditTextVariableNameTest2.c
+
+2008-05-16 Russ Nelson <nelson@crynwr.com>
+
 	* testsuite/media/Bitstream Vera Sans.COPYRIGHT rename to:
 	* testsuite/media/Bitstream-Vera-Sans.COPYRIGHT
 	* testsuite/media/Bitstream Vera Sans.fdb rename to:

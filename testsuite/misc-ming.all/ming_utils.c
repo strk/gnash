@@ -364,7 +364,7 @@ get_default_font(const char* mediadir)
 	FILE *font_file;
 	char fdbfont[256];
 
-	sprintf(fdbfont, "%s/Bitstream Vera Sans.fdb", mediadir);
+	sprintf(fdbfont, "%s/Bitstream-Vera-Sans.fdb", mediadir);
 
 	font_file = fopen(fdbfont, "r");
 	if ( font_file == NULL )

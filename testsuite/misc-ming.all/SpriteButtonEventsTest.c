@@ -227,7 +227,7 @@ main(int argc, char **argv)
 		return 1;
 	}
 
-	sprintf(fdbfont, "%s/Bitstream Vera Sans.fdb", srcdir);
+	sprintf(fdbfont, "%s/Bitstream-Vera-Sans.fdb", srcdir);
 	FILE *font_file = fopen(fdbfont, "r");
 	if ( font_file == NULL )
 	{

@@ -116,7 +116,7 @@ main(int argc, char** argv)
     return 1;
   }
 
-  sprintf(fdbfont, "%s/Bitstream Vera Sans.fdb", srcdir);
+  sprintf(fdbfont, "%s/Bitstream-Vera-Sans.fdb", srcdir);
 
   puts("Setting things up");
 
