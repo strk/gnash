@@ -293,7 +293,8 @@ private:
 	//
 	/// Elemenst of the vector are owned by this class
 	///
-	std::vector<sound_data*>	m_sound_data;
+	typedef std::vector<sound_data*> Sounds;
+	Sounds	m_sound_data;
 
 	/// Is sound device opened?
 	bool soundOpened;

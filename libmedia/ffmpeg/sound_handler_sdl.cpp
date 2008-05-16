@@ -374,21 +374,15 @@ void	SDL_sound_handler::stop_all_sounds()
 {
 	boost::mutex::scoped_lock lock(_mutex);
 
-	boost::int32_t num_sounds = (boost::int32_t) m_sound_data.size()-1;
-	for (boost::int32_t j = num_sounds; j > -1; j--) {//Optimized
-		sound_data* sounddata = m_sound_data[j];
-		boost::int32_t num_active_sounds = (boost::int32_t) sounddata->m_active_sounds.size()-1;
-		for (boost::int32_t i = num_active_sounds; i > -1; i--) {
+	for (Sounds::iterator i=m_sound_data.begin(), e=m_sound_data.end(); i!=e; ++i)
+	{
+		sound_data* sounddata = *i;
+		size_t nActiveSounds = sounddata->m_active_sounds.size();
 
-			//active_sound* sound = sounddata->m_active_sounds[i];
+		soundsPlaying -= nActiveSounds;
+		_soundsStopped += nActiveSounds;
 
-			// Stop sound, remove it from the active list
-			//delete sound->decoder;
-			sounddata->m_active_sounds.erase(sounddata->m_active_sounds.begin() + i);
-			
-			--soundsPlaying;
-			++_soundsStopped;
-		}
+		sounddata->clearActiveSounds();
 	}
 }
 

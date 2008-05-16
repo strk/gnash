@@ -1,3 +1,8 @@
+2008-05-16 Sandro Santilli <strk@keybit.net>
+
+	* libmedia/ffmpeg/sound_handler_sdl.{cpp,h}: fix memory leak in
+	  stop_all_sounds too..
+
 2008-05-16 Russ Nelson <nelson@crynwr.com>
 
 	* NEWS, README: removing conflicts
