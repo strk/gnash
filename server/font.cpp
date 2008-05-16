@@ -222,31 +222,29 @@ GlyphInfo::markReachableResources() const
 		log_parse(_("reading DefineFont2 or DefineFont3"));
 		);
 
-		// TODO: should this be aligned ?
-		in->ensureBytes(2); // 1 for the flags, 1 reserved
-		bool	has_layout = in->read_bit();
-		m_shift_jis_chars = in->read_bit();
-		m_unicode_chars = in->read_bit();
-		m_ansi_chars = in->read_bit();
-		bool	wide_offsets = in->read_bit();
-		m_wide_codes = in->read_bit();
-		m_is_italic = in->read_bit();
-		m_is_bold = in->read_bit();
-		boost::uint8_t	reserved = in->read_u8();
+		in->ensureBytes(2); // 1 for the flags, 1 unknown
+        int flags = in->read_u8();
+		bool  has_layout   = flags & (1 << 7);
+		m_shift_jis_chars  = flags & (1 << 6);
+		m_unicode_chars    = flags & (1 << 5);
+		m_ansi_chars       = flags & (1 << 4);
+		bool  wide_offsets = flags & (1 << 3);
+		m_wide_codes       = flags & (1 << 2);
+		m_is_italic        = flags & (1 << 1);
+		m_is_bold          = flags & (1 << 0);
+        // don't know the usage, so we discard it.
+		int	discarded = in->read_u8();
 
 		IF_VERBOSE_PARSE (
-		log_parse(" has_layout = %d", has_layout);
-		log_parse(" shift_jis_chars = %d", m_shift_jis_chars);
-		log_parse(" m_unicode_chars = %d", m_unicode_chars);
-		log_parse(" m_ansi_chars = %d", m_ansi_chars);
-		log_parse(" wide_offsets = %d", wide_offsets);
-		log_parse(" wide_codes = %d", m_wide_codes);
-		log_parse(" is_italic = %d", m_is_italic);
-		log_parse(" is_bold = %d", m_is_bold);
+            log_parse(" has_layout = %d", has_layout);
+		    log_parse(" shift_jis_chars = %d", m_shift_jis_chars);
+            log_parse(" m_unicode_chars = %d", m_unicode_chars);
+            log_parse(" m_ansi_chars = %d", m_ansi_chars);
+            log_parse(" wide_offsets = %d", wide_offsets);
+            log_parse(" wide_codes = %d", m_wide_codes);
+            log_parse(" is_italic = %d", m_is_italic);
+            log_parse(" is_bold = %d", m_is_bold);
 		);
-
-		// Inhibit compiler warning.
-		reserved = reserved;
 
 		in->read_string_with_length(m_name);
 
@@ -413,7 +411,6 @@ GlyphInfo::markReachableResources() const
 	{
 		assert(tag == SWF::DEFINEFONTINFO || tag == SWF::DEFINEFONTINFO2); 
 
-
 		if ( tag == SWF::DEFINEFONTINFO2 )
 		{
 			// See: SWFalexref/SWFalexref.html#tag_definefont2
@@ -432,19 +429,14 @@ GlyphInfo::markReachableResources() const
 		}
 
 		in->ensureBytes(1);
-		unsigned char	flags = in->read_u8();
-
-		// The following 3 flags are reserved
-		// for SWF6+
-
-		// this is font_info_small for SWF6 or up
-		m_unicode_chars = (flags & 0x20) != 0;
-		m_shift_jis_chars = (flags & 0x10) != 0;
-		m_ansi_chars = (flags & 0x08) != 0;
-
-		m_is_italic = (flags & 0x04) != 0;
-		m_is_bold = (flags & 0x02) != 0;
-		m_wide_codes = (flags & 0x01) != 0;
+		int	flags = in->read_u8();
+        // highest two bits are reserved.
+		m_unicode_chars   = flags & (1 << 5); //???
+		m_shift_jis_chars = flags & (1 << 4);
+		m_ansi_chars      = flags & (1 << 3);
+		m_is_italic       = flags & (1 << 2);
+		m_is_bold         = flags & (1 << 1);
+		m_wide_codes      = flags & (1 << 0);
 
 		read_code_table(in);
 	}
