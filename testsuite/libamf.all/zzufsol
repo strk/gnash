@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# Usage: zzufsol <indir> <outdir> <min> <max>
+# Will create corrupted SOL files from all the .sol files in <indir>
+# using zzuf seeds from <min> to <max> and write them to <outdir>
+
+for r in `ls $1/*.sol`
+do
+    count=$3
+    while [ $count -le $4 ]
+    do
+        f=`md5sum $r | sed 's/  .*$//;'`.sol
+        echo "$count-$f"
+        zzuf -s$count < $r > "$2/$count-$f"
+        count=$[$count+1]
+    done
+done

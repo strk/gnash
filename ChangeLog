@@ -1,3 +1,10 @@
+2008-05-16 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* testsuite/libamf.all/zzufsol: script to corrupt all your .sol files.
+	* testsuite/libamf.all/gen_malformed_sol_tests.pl: script to generate
+	  an AS file to open all the corrupted .sol files in turn (test
+	  robustness).
+
 2008-05-16 Sandro Santilli <strk@keybit.net>
 
 	* NEWS, README: forward-port nelson changes here (docbook changes
