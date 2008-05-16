@@ -1,3 +1,11 @@
+2008-05-16 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* testsuite/tmpSharedObjects/malformed: add 10 sol files that cause
+	  an abort in Gnash - std::logic_error exceptions (construction of
+	  std::string from NULL), so they result from earlier memory errors.
+	  This were the only aborts in 3400 malformed files, so still
+	  seems fairly good performance.
+
 2008-05-16 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/libamf.all/zzufsol: print usage on stderr when
