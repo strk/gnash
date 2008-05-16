@@ -185,6 +185,8 @@ Global::Global(VM& vm, ClassHierarchy *ch)
 
     switch (version)
     {
+        default:
+            // Version 10 or above reported
         case 9:
         case 8:
 
@@ -244,7 +246,9 @@ Global::Global(VM& vm, ClassHierarchy *ch)
             vm.registerNative(as_global_trace, 100, 4);
             init_member("trace", vm.getNative(100, 4));
 
-        default:
+        case 3:
+        case 2:
+        case 1:
             break;
     }
 

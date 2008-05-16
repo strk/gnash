@@ -1,3 +1,7 @@
+2008-05-16 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/asobj/Global.cpp: handle versions higher than SWF9.
+
 2008-05-15  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* libamf/amf.cpp: Trap the new AMF3 type. Decode objects
