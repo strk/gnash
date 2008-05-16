@@ -248,13 +248,16 @@ void button_character_definition::sound_info::read(stream* in)
 {
 	in->ensureBytes(1);
 	m_in_point = m_out_point = m_loop_count = 0;
-	in->read_uint(2);	// skip reserved bits.
-	m_stop_playback = in->read_bit(); 
-	m_no_multiple = in->read_bit(); 
-	m_has_envelope = in->read_bit();
-	m_has_loops = in->read_bit(); 
-	m_has_out_point = in->read_bit();
-	m_has_in_point = in->read_bit(); 
+    
+    // highest 2 bits are reserved(unused).
+    int flags = in->read_u8();
+	m_stop_playback = flags & (1 << 5); 
+	m_no_multiple   = flags & (1 << 4); 
+	m_has_envelope  = flags & (1 << 3); 
+	m_has_loops     = flags & (1 << 2);  
+	m_has_out_point = flags & (1 << 1); 
+	m_has_in_point  = flags & (1 << 0);  
+    
 	if (m_has_in_point)
 	{
 		in->ensureBytes(4);

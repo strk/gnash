@@ -44,25 +44,27 @@ edit_text_character_def::read(stream* in, int tag_type,
 	m_rect.read(in);
 
 	in->align();
-	in->ensureBytes(1);
-	m_has_text = in->read_bit();
-	m_word_wrap = in->read_bit();
-	m_multiline = in->read_bit();
-	m_password = in->read_bit();
-	m_readonly = in->read_bit(); 
-	bool	has_color = in->read_bit(); 
-	bool	has_max_length = in->read_bit(); 
-	bool	has_font = in->read_bit(); 
+	in->ensureBytes(2);
+    
+    int flags = in->read_u8();
+	m_has_text  = flags & (1 << 7);
+	m_word_wrap = flags & (1 << 6);
+	m_multiline = flags & (1 << 5);
+	m_password  = flags & (1 << 4);
+	m_readonly  = flags & (1 << 3); 
+	bool  has_color      = flags & (1 << 2); 
+	bool  has_max_length = flags & (1 << 1); 
+	bool  has_font       = flags & (1 << 0); 
 
-	in->ensureBytes(1);
-	in->read_bit();	// reserved
-	m_auto_size = in->read_bit(); 
-	bool	has_layout = in->read_bit(); 
-	m_no_select = in->read_bit(); 
-	m_border = in->read_bit(); 
-	in->read_bit(); // reserved
-	m_html = in->read_bit(); 
-	m_use_outlines = in->read_bit(); 
+    flags = in->read_u8();
+    // reserved_bit  = flags & (1 << 7);
+	m_auto_size      = flags & (1 << 6); 
+	bool  has_layout = flags & (1 << 5); 
+	m_no_select      = flags & (1 << 4); 
+	m_border         = flags & (1 << 3); 
+	// reserved_bit  = flags & (1 << 2);
+	m_html           = flags & (1 << 1); 
+	m_use_outlines   = flags & (1 << 0); 
 
 	if (has_font)
 	{
