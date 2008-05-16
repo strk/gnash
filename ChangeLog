@@ -1,3 +1,10 @@
+2008-05-16 Sandro Santilli <strk@keybit.net>
+
+	* Makefile.am: isn't clear to me which of INTLLIB and LIBINTL we 
+	  should be using (macro/gettext.m4 sets both), so we print them
+	  in 'make dumpconfig' now to tell (I get both empty, if anyone
+	  gets values there please let me know - see bug #21536).
+
 2008-05-16 Zou Lunkai <zoulunkai@gmail.com>
 	
 	* server/cxform.cpp: use read_u8() instead of read_bit(), parser optimize.
