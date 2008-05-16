@@ -1,5 +1,10 @@
 2008-05-16 Sandro Santilli <strk@keybit.net>
 
+	* NEWS, README: forward-port nelson changes here (docbook changes
+	  will need to be ported too).
+
+2008-05-16 Sandro Santilli <strk@keybit.net>
+
 	* Makefile.am: isn't clear to me which of INTLLIB and LIBINTL we 
 	  should be using (macro/gettext.m4 sets both), so we print them
 	  in 'make dumpconfig' now to tell (I get both empty, if anyone

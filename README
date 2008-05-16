@@ -6,7 +6,7 @@ Gnash is a player for animated "movies" in the Macromedia Shockwave Flash
 plugin, or as a library used by other programs.  It is not yet complete;
 it does not correctly handle every .swf file.
 
-This is the README file for the Gnash-0.8XXXXXX release (or CVS snapshot).
+This is the README file for the Gnash-0.8.3 release (or CVS snapshot).
 
 Gnash is originally based on the code of GameSWF, by Thatcher Ulrich.
 GameSWF was the most advanced among free flash movie players; it
@@ -25,31 +25,17 @@ and the Gnash volunteers for making Gnash what it is today.
 Flash Support:
 --------------
 
-Many of the Flash movies that I come across play fine in Gnash.  Many
-others do not.  In particular, Flash movies that are used for browser
-navigation may still have a few issues with some URLs left.  Most
-Flash based navigation of a web site should work.
+Many Flash movies play fine in Gnash.  Many others do not.  In particular,
+Flash movies that are used for browser navigation may still have a few
+issues with some URLs left.  Most Flash based navigation of a web site
+should work.
 
-Gnash supports the majority of Flash opcodes up to SWF version 7, and
-a wide sampling of ActionScript classes for SWF version 7.  All the core
-ones are implemented, and many of the newer ones work, but may be missing
-some of their methods.  All unimplemented opcodes and ActionScript classes
-and methods print a warning when using -v with gnash or gprocessor.  Using
+Gnash supports most Flash opcodes up to SWF version 7, and a wide sampling
+of ActionScript classes for SWF version 7.  All the core ones are
+implemented, and many of the newer ones work, but may be missing some of
+their methods.  All unimplemented opcodes and ActionScript classes and
+methods print a warning when using -v with gnash or gprocessor.  Using
 gprocessor -v is a quick way to see why a movie isn't playing correctly.
-
-Currently implemented ActionScript classes are: Array, Boolean, Date,
-Key, Math, Mouse, Number, Object, Sound, String, XML, XMLNode,
-XMLSocket, NetStream, NetConnection, Stage, Button.
-
-Partially implemented classes are: MovieClipLoader, LocalConnection,
-MovieClip, TextField, TextFormat, System, Function, LoadVars, Video.
-
-Unimplemented classes are: Accessibility, Error, Microphone,
-Selection, SharedObject, Camera, Color, ContextMenu,
-CustomActions.
-
-Unimplemented Opcodes are: Throw, Implements, Try,
-MDLength, MDSubstring, MDChr.
 
 Currently streaming video for some video sharing sites like Lulu.tv,
 or YouTube.com, does work. Your mileage with other sites may vary, but
@@ -67,7 +53,7 @@ gtk1 due to the NSAPI used), Firefox 1.0.x, Firefox 1.5.x, and Firefox 2.x.
 
 Some web pages have Internet Explorer-specific Javascript that fail
 in Firefox, which prevents the plugin from being loaded. In these cases
-I "view source" and then use wget to grab the movie for testing.
+"view source" and then use wget to grab the movie for testing.
 
 By default, the configure script looks for the GtkGl extension, and
 if that can't be found, it defaults to using SDL. The plugin works by
@@ -106,12 +92,12 @@ Gnash has also been ported to a variety of embedded devices, most
 running variations of OpenEmbedded. These include several custom
 hardware platforms aimed at educational software for children. Better
 known devices are the Sharp Zaurus family of PDAs (reflashed to run Open
-Zaurus), the Nokia 770/800, the OLPC and the Pepper Pad 3, that both
-run a trimmed down Fedora.
+Zaurus), the Nokia Internet Tablets (770 / 800 / 810), the OLPC and the
+Pepper Pad 3, the latter two running a trimmed down Fedora.
 
-64bit systems Gnash has been known to run on are the Itanium,
-UltraSparc, PowerPC, AMD64, MIPS. Embedded systems include several ARM
-variants, MIPS, and the Geode GX.
+Gnash has been known to run on these 64-bit systems: the Itanium,
+UltraSparc, PowerPC, AMD64, MIPS. Embedded processors include several
+ARM variants, MIPS, and the Geode GX.
 
 Building Gnash:
 ---------------
@@ -126,14 +112,13 @@ flash files.  The three variants are configured with the options:
 
    --enable-renderer=opengl
    --enable-renderer=cairo
-or --enable-renderer=agg
+or --enable-renderer=agg (default)
 
 Only one can be specified.  In addition, Gnash can use different multimedia
 back-ends for sound and/or video:
 
-   --enable-media=GST			Gstreamer
-   --enable-media=ffmpeg		Ffmpeg
-or --enable-media=mad			libmad (MP3 audio decoding only)
+   --enable-media=GST			Gstreamer (default)
+or --enable-media=ffmpeg		Ffmpeg/SDL
 
 The "media" setting is independent of the "renderer" setting.
 
@@ -145,10 +130,12 @@ You can build the player without GTK support, and these are the
 dependent packages: OpenGL(libMesa), SDL.
 
 The GTK support is more developed and featureful, while the SDL
-support has fewer dependancies on other packages. The AGG backend
+support has fewer dependencies on other packages. The AGG backend
 gives better quality results, and works on devices with only a
-framebuffer, but the performance isn't as good as the OpenGL backend
-if you have a binary blob acelerated graphics driver installed.
+framebuffer.  Performance is better with the OpenGL backend, but
+it depends on having an accelerated graphics driver installed.
+This may require the use of a binary-only driver, so it's not
+for everyone.
 
 Other required packages are libxml2, libpng, and libjpeg.
 If gettext support is installed, or is present in the standard C library,
@@ -219,3 +206,4 @@ system name and version, and which gnash version you are using, in your
 bug reports. Please try to reproduce your bug reports with the most
 recent version of Gnash in CVS, as bugs are fixed there that may be
 broken in a standard release.
+

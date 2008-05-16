@@ -1,103 +1,151 @@
+2008-05-10 Russ Nelson <nelson@crynwr.com>
+
+Sixth alpha release of Gnash (0.8.3).
+Improvements since 0.8.2 release are:
+
+More visible to users:
+    * Native fullscreen support (from AS) implemented.
+    * Long command-line options properly supported.
+    * View detailed movie information from GTK gui.
+    * Added an option in Preferences to initially display a movie
+      as a blank ("Click here to start") screen.
+    * Added "dump" GUI to dump a movie to disk.
+    * Improved Cairo rendering performance.
+    * Fix support for OpenOffice Impress SWF exporter (malformed..)
+
+Less visible to users:
+    * Garbage Collector usage reduced where appropriate.
+    * Mouse.hide and Mouse.show implemented in GTK.
+    * ActionScript inheritance fixes:
+        o super implemented correctly (still not 100% compatible for SWF7)
+        o implements / instanceof works correctly now 
+    * FsCommands quit, fullscreen and showMenu implemented.
+    * FsCommand-to-javascript implemented (plugin).
+    * Minor ActionScript compatibility fixes: String, XML, toLocaleString,
+      int, parseInt. fromCharCode, toString (SWF4) etc.
+    * Fixes to arguments class (tests: Function.as, line404~456).
+    * Stage.scaleMode implemented (fixes resizing of various movies).
+    * Stage.align implemented.
+    * Fixes to Date class (platform consistent).
+    * Logging uses boost::format.
+    * Improved Win32 support: builds using MinGW/MSYS (cross-compile
+      not tested yet), and initial implementation of npgnash.dll exists.
+    * Sprite handling improved, fixing FlowPlayer and other video SWFs.
+    * TextField handling:
+          o Fix in device font handling (DefineFontInfo tag)
+          o Fix support for DefineFont2 tag (sizes)
+          o Improve TextField support for TextFormat use. 
+    * Fix parsing of malformed XML files
+    * Fix loading of text / XML with Byte Order Marks.
+    * Minor fix to _x and _y translation.
+    * More functions correctly registered as ASnative.
+    * System.capabilities information expanded.
+    * Jemalloc memory allocator from Mozilla added as an option.
+    * Redesigned and implemented AMF0 support, with the beginning of
+      AMF3 support.
+    * SWF8 line styles support (both from tag and drawing api) 
+
+
 2008-02-21  Sandro Santilli <strk@keybit.net>
 
 Fifth alpha release of Gnash (0.8.2).
 Improvements since 0.8.1 release are:
 
-    - Improved timeline redesign.
-    - Action execution order fixes.
-    - Keyboard handling improved [1].
-    - New classes implemented: System.capabilities (partial),
+    * Improved timeline redesign.
+    * Action execution order fixes.
+    * Keyboard handling improved [1].
+    * New classes implemented: System.capabilities (partial),
       SharedObject, LocalConnection.
-    - New opcodes implemented: ActionImplements, Try/Throw.
-    - Movieclip.beginGradientFill completes drawing API support.
-    - MovieClip._lockroot support added.
-    - Implement GET/POST for MovieClip.loadVariables and
+    * New opcodes implemented: ActionImplements, Try/Throw.
+    * Movieclip.beginGradientFill completes drawing API support.
+    * MovieClip._lockroot support added.
+    * Implement GET/POST for MovieClip.loadVariables and
       MovieClip.loadMovie
-    - Textfield support improved.
-    - Security: configurable sandbox restricts filesystem access by movies.
-    - Better support for SWF8.
-    - Streaming OGG-contained multimedia (e.g. vorbis/theora or vorbis/dirac),
+    * Textfield support improved.
+    * Security: configurable sandbox restricts filesystem access by movies.
+    * Better support for SWF8.
+    * Streaming OGG-contained multimedia (e.g. vorbis/theora or vorbis/dirac),
       and other free formats.
-    - OGL and Cairo renderers much improved.
-    - Improvements of the Framebuffer GUI (hide text messages, support Linux
+    * OGL and Cairo renderers much improved.
+    * Improvements of the Framebuffer GUI (hide text messages, support Linux
       events system, built-in touchscreen calibration, simple keyboard support,
       better architecture support).
-    - SOLdumper utility for reading SOL files ('flash cookies').
-    - DumpShm utility finds and dumps Local Connection memory segments.
-    - Fullscreen display possible.
-    - Extensions for LIRC and DBus.
-    - High quality, cross-platform psuedo-randomness using boost random.
-    - NPAPI (Mozilla) plugin: keyboard events work, navigation and javascript
+    * SOLdumper utility for reading SOL files ('flash cookies').
+    * DumpShm utility finds and dumps Local Connection memory segments.
+    * Fullscreen display possible.
+    * Extensions for LIRC and DBus.
+    * High quality, cross-platform psuedo-randomness using boost random.
+    * NPAPI (Mozilla) plugin: keyboard events work, navigation and javascript
       from within movies.
-    - Set and save preferences from the GUI (GTK).
-    - Improved stability and robustness with malformed SWFs.
-    - Many other bugfixes. 
+    * Set and save preferences from the GUI (GTK).
+    * Improved stability and robustness with malformed SWFs.
+    * Many other bugfixes. 
 
 2007-08-29  Sandro Santilli <strk@keybit.net>
 
 Fourth alpha release of Gnash (0.8.1).
 Improvements since 0.8.0 release are:
 
-	- Garbage Collector
-	- Support for device fonts
-	- Support for dynamic text fields
-	- Better key handling
-	- Support for FFMPEG SVN
-	- Support for on-demand install of needed Gstreamer codec plugins.
-	- Debugger off by default (improves performance and memory use)
-	- AGG renderer by default 
-	- Support for KDE/AGG combination
-	- Layout change : we'll now build <gui>-gnash and 'gnash' is a shell
-	  script with gui selection capabilities (-G)
-	- More robust parser 
-	- Better support for flash player detection
-	- Fix for 'debugLog' directive in gnashrc
+    * Garbage Collector
+    * Support for device fonts
+    * Support for dynamic text fields
+    * Better key handling
+    * Support for FFMPEG SVN
+    * Support for on-demand install of needed Gstreamer codec plugins.
+    * Debugger off by default (improves performance and memory use)
+    * AGG renderer by default 
+    * Support for KDE/AGG combination
+    * Layout change : we'll now build <gui>-gnash and 'gnash' is a shell
+      script with gui selection capabilities (-G)
+    * More robust parser 
+    * Better support for flash player detection
+    * Fix for 'debugLog' directive in gnashrc
 
-07-06-XX  Rob Savoye  <rob@darkstar.welcomehome.org>
+2007-06-01  Rob Savoye  <rob@welcomehome.org>
 
 The third alpha release of Gnash. Improvements since the 0.7.2 release
 are: 
 
-* Streaming video works with YouTube and Lulu.tv! This has been the
-focus for the majority of the time since the last release.
-* Many core improvments in the VM as our understanding of Flash
-improves. These all improve both the correctness of a movie that is
-being played, but enebles more movies to play that used to not work.
-* New FLTK2 gui.
-* Simple Flash debugger added.
-* Improved Darwin support that can use the system OpenGL.
-* Flash extensions, direct support for file handling, MySQL access,
-etc.. through plugins to the Gnash VM. Wrappers for any C/C++ API
-libraries can be exported into ActionScript, and used as native
-commands in a Flash movie.
-* Updated manuals.
-* Many new testcases! Support for testing with ming, swfmill, amd
-mtasc compilers.
-* New drawing API for MovieClips..
-
-2006-09-10  Rob Savoye  <rob@bertha.welcomehome.org>
+    * Streaming video works with YouTube and Lulu.tv! This has been the
+      focus for the majority of the time since the last release.
+    * Many core improvments in the VM as our understanding of Flash
+      improves. These all improve both the correctness of a movie that is
+      being played, but enables more movies to play that used to not work.
+    * New FLTK2 gui.
+    * Simple Flash debugger added.
+    * Improved Darwin support that can use the system OpenGL.
+    * Flash extensions, direct support for file handling, MySQL access,
+      etc.. through plugins to the Gnash VM. Wrappers for any C/C++ API
+      libraries can be exported into ActionScript, and used as native
+      commands in a Flash movie.
+    * Updated manuals.
+    * Many new testcases! Support for testing with ming, swfmill, amd
+      mtasc compilers.
+    * New drawing API for MovieClips..
+    
+2006-09-10  Rob Savoye  <rob@welcomehome.org>
 
 The second alpha release of Gnash is coming soon. Improvements since
 the 0.7.1 alpha release are:
 
-* Polling main loop replaced with event driven framework.
-* New GUI abstraction layer supporting GTK2, KDE, SDL, and just a
-framebuffer. 
-* Movies are parsed by a background thread, so they start playing
-while still loading.
-* Plugin supports web navigation and starts playing while the stream
-is loading.
-* New AntiGrain (AGG) 2D backend added for framebuffer devices.
-* Sound now works.
-* Supports cross configuration and cross compiling for embedded targets.
-* A whole slew of minor bugs that kept various movies from playing.
+    * Polling main loop replaced with event driven framework.
+    * New GUI abstraction layer supporting GTK2, KDE, SDL, and just a
+      framebuffer. 
+    * Movies are parsed by a background thread, so they start playing
+      while still loading.
+    * Plugin supports web navigation and starts playing while the stream
+      is loading.
+    * New AntiGrain (AGG) 2D backend added for framebuffer devices.
+    * Sound now works.
+    * Supports cross configuration and cross compiling for embedded targets.
+    * A whole slew of minor bugs that kept various movies from playing.
 
-2006-04-20  Rob Savoye  <rob@bertha.welcomehome.org>
+2006-04-20  Rob Savoye  <rob@welcomehome.org>
 
-The first alpha release of Gnash! Version 0.7.1 is released with a
-working browser plugin.
+    * The first alpha release of Gnash! Version 0.7.1 is released with a
+      working browser plugin.
 
 2005-12-10  Rob Savoye  <rob@bertha.welcomehome.org>
 
-GameSWF has been turned into Gnash! Gnash's goals are to turn this
-into a free flash movie player plugin for Firefox.
+    * GameSWF has been turned into Gnash! Gnash's goals are to turn this
+      into a free flash movie player plugin for Firefox.
