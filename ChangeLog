@@ -1,3 +1,12 @@
+2008-05-16 Sandro Santilli <strk@keybit.net>
+
+	* libmedia/ffmpeg/sound_handler_sdl.h: add an
+	  sound_data::clearActiveSounds() method to properly
+	  drop active sounds w/out memory leaks.
+	* libmedia/ffmpeg/sound_handler_sdl.cpp (stop_sound):
+	  use sound_data::clearActiveSounds() fixing leak of
+	  actual active sounds..
+
 2008-05-16 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* testsuite/libamf.all/gen_malformed_sol_tests.pl: skip directories

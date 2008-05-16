@@ -126,6 +126,8 @@ public:
 
 	ActiveSounds m_active_sounds;
 
+	/// Drop all active sounds
+	void clearActiveSounds();
 };
 
 /// Used to hold the info about active sounds
@@ -141,6 +143,7 @@ class active_sound
 public:
 	active_sound()
 		:
+		decoder(0),
 		position(0),
 		raw_position(0),
 		loop_count(0),
@@ -275,10 +278,7 @@ private:
 // This is here as it needs definition of active_sound
 sound_data::~sound_data()
 {
-	for (ActiveSounds::iterator i=m_active_sounds.begin(), e=m_active_sounds.end(); i!=e; ++i)
-	{
-		delete *i;
-	}
+	clearActiveSounds();
 }
 
 // Use SDL and ffmpeg/mad/nothing to handle sounds.

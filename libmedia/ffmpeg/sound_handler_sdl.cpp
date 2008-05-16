@@ -338,23 +338,18 @@ void	SDL_sound_handler::stop_sound(int sound_handle)
 	if (sound_handle < 0 || (unsigned int) sound_handle >= m_sound_data.size())
 	{
 		// Invalid handle.
-	} else {
-	
-		sound_data* sounddata = m_sound_data[sound_handle];
-	
-		for (boost::int32_t i = (boost::int32_t) sounddata->m_active_sounds.size()-1; i >-1; i--) {
-
-			//active_sound* sound = sounddata->m_active_sounds[i];
-
-			// Stop sound, remove it from the active list
-			//sound->delete_raw_data();
-			//delete sound->decoder;
-			sounddata->m_active_sounds.erase(sounddata->m_active_sounds.begin() + i);
-			
-			--soundsPlaying;
-			++_soundsStopped;
-		}
+		return;
 	}
+
+	
+	sound_data* sounddata = m_sound_data[sound_handle];
+
+	size_t nActiveSounds = sounddata->m_active_sounds.size();
+
+	soundsPlaying -= nActiveSounds;
+	_soundsStopped += nActiveSounds;
+
+	sounddata->clearActiveSounds();
 
 }
 
@@ -929,6 +924,16 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 
 
 
+}
+
+void
+sound_data::clearActiveSounds()
+{
+	for (ActiveSounds::iterator i=m_active_sounds.begin(), e=m_active_sounds.end(); i!=e; ++i)
+	{
+		delete *i;
+	}
+	m_active_sounds.clear();
 }
 
 
