@@ -1,5 +1,10 @@
 2008-05-16 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* testsuite/libamf.all/gen_malformed_sol_tests.pl: skip directories
+	  and other not ending in .sol.
+
+2008-05-16 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* testsuite/tmpSharedObjects/malformed: add 10 sol files that cause
 	  an abort in Gnash - std::logic_error exceptions (construction of
 	  std::string from NULL), so they result from earlier memory errors.
