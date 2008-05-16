@@ -66,8 +66,8 @@ main (int /*argc*/, char** /*argv*/) {
     Handler que;
 
     Buffer buf;
-    boost::uint8_t *test = new uint8_t[6];
-    memcpy(test, "hell", 4);
+//     boost::uint8_t *test = new uint8_t[6];
+//     memcpy(test, "hell", 4);
 
     // Push one buffer on the fifo. The default is the incoming fifo,
     // which is the one where data flows from the network to the queue.

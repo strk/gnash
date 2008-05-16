@@ -77,10 +77,7 @@ public:
     void addObj(amf::Element *x);
 
     /// Return a reference to the elements in this object
-    std::vector<amf::Element *>& getElements()
-    {
-        return _amfobjs;
-    }
+    std::vector<amf::Element *>& getElements() { return _amfobjs; }
 
     /// Get an element by index
     //

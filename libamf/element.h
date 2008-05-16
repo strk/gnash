@@ -55,8 +55,9 @@ public:
         RECORD_SET_AMF0=0x0e,
         XML_OBJECT_AMF0=0x0f,
         TYPED_OBJECT_AMF0=0x10,
+	AMF3_DATA=0x11,
 // 	// these aren't part of the AMF spec, they're used internally
-// 	VARIABLE=0x11,
+ 	RTMP_HEADER=0x20,
 // 	FUNCTION=0x12
     } amf0_type_e;
     // AMF3, was introduced with ActionScript 3 in SWF version 9
@@ -107,6 +108,7 @@ public:
     Element &makeString(const std::string &name, const std::string &data);
     
     Element &makeNumber(double num); 
+    Element &makeNumber(amf::Buffer *buf); 
     Element &makeNumber(gnash::Network::byte_t *data); 
     Element &makeNumber(const std::string &name, double num);
     Element &makeNumber(const std::string &name, gnash::Network::byte_t *data); 
@@ -158,6 +160,8 @@ public:
     Element &makeStrictArray(gnash::Network::byte_t *data, size_t size);
 //    Element &makeArray();
 
+//    Element &makeConnect();
+    
     // Test to see if Elements are the same
     bool operator==(Element &);
     bool operator==(Element *);
@@ -188,6 +192,7 @@ public:
     size_t getNameSize();
     void setName(const std::string &name);
     void setName(gnash::Network::byte_t *name, size_t x);
+    void setName(const char *name, size_t x);
 
     // Manipulate the children Elements of an object
     Element *getProperty(size_t x) { return _properties[x]; };
@@ -197,7 +202,7 @@ public:
     Element *popProperty()        { return _properties.front(); };
     size_t propertySize()         { return _properties.size(); };
     amf::Buffer *encode();
-    
+    std::vector<Element *> getProperties() { return _properties; };
     void dump();
 private:
     void check_buffer(size_t size);

@@ -65,6 +65,12 @@ const gnash::Network::byte_t AMF_VERSION = 0;
 // For terminating sequences, a byte with value 0x09 is used.
 const gnash::Network::byte_t TERMINATOR = 0x09;
 
+// As if there is a parsing error, we'll often see the symptom of the length
+// for the following value is bogus. Although the length field is a short, it
+// seems silly to assume we'll ever see a string 65,000 characters long. Still,
+// it makes sense to make this an adjustable thing.
+const int SANE_STR_SIZE = 1024;
+
 // An AMF object is the binary representation of an ActionScript object. AMF
 // is used to send objects, wheather to a SharedObject .sol file, a memory based
 // LocalConnection segment, or over an RTMP connection for streaming.

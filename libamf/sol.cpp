@@ -394,14 +394,15 @@ SOL::readFile(std::string &filespec)
 	    ptr += 4;
 	    
 	    AMF amf_obj;
-	    int size = 0;
 	    amf::Element *el;
-	    while ( size < static_cast<boost::uint16_t>(bodysize) - 24 ) {
+	    while ( ptr < tooFar) {
 		if (ptr) {
 		    el = amf_obj.extractProperty(ptr, tooFar);
 		    if (el != 0) {
-			size += amf_obj.totalsize();
-			ptr += amf_obj.totalsize();
+			// Unlike RTMP, SOL files tack an extra
+			// zero byte after every property, so we
+			// want to skip past this one too.
+			ptr += amf_obj.totalsize() + 1;
 			_amfobjs.push_back(el);
 		    } else {
 			break;
@@ -446,15 +447,16 @@ SOL::dump()
         }
         if (el->getType() == Element::NUMBER_AMF0) {
             double ddd = *((double *)el->getData());
-             cerr << ddd << " ";
+	    swapBytes(&ddd, sizeof(double));
+	    cerr << ddd << " ";
 
             cerr << "( " << hexify(el->getData(), 8, false) << ")";
         }
-        if ((*(it))->getType() == Element::BOOLEAN_AMF0) {
-            if (el[0] == true) {
+        if (el->getType() == Element::BOOLEAN_AMF0) {
+            if (el->to_bool() == true) {
                 cerr << "true";
             }
-            if (el[0] == false) {
+            if (el->to_bool() == false) {
                 cerr << "false";
             }
         }

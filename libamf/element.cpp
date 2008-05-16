@@ -58,8 +58,7 @@ const char *astype_str[] = {
     "Recordset",
     "XMLObject",
     "TypedObject",
-    "Varible (gnash)",
-    "Function (gnash)"
+    "AMF3 Data"
 };
 
 Element::Element()
@@ -397,28 +396,29 @@ Element::operator==(bool x)
 Buffer *
 Element::encode()
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     Buffer *buf = 0;
     if (_type == Element::OBJECT_AMF0) {
 	// FIXME: we probably want a better size, to avoid the other
 	// appends from having to resize and copy the data all the time.
-	buf = new Buffer(300);
+	buf = new Buffer(300);	// FIXME: calculate a sensible size
 	buf->clear();		// FIXME: temporary, makes buffers cleaner in gdb.
 	buf->append(Element::OBJECT_AMF0);
 	if (_name > 0) {
-// 	    Buffer *top = AMF::encodeElement(this);
-// 	    buf->append(top);
-	    buf->append(reinterpret_cast<Network::byte_t *>(_name), getNameSize());
 	    size_t length = getNameSize();
 	    boost::uint16_t enclength = length;
 	    swapBytes(&enclength, 2);
 	    buf->append(enclength);
+	    string str = _name;
+	    buf->append(str);
+	    Network::byte_t byte = static_cast<Network::byte_t>(0x5);
+	    buf->append(byte);
 	}
 
 	for (size_t i=0; i<_properties.size(); i++) {
 	    Buffer *partial = AMF::encodeElement(_properties[i]);
-	    log_debug("Encoded partial size for is %d", partial->size());
-	    partial->dump();
+//	    log_debug("Encoded partial size for is %d", partial->size());
+//	    partial->dump();
 	    if (partial) {
 		buf->append(partial);
 		delete partial;
@@ -426,7 +426,7 @@ Element::encode()
 		break;
 	    }
 	}
-	log_debug("FIXME: Terminating object");
+//	log_debug("FIXME: Terminating object");
 	Network::byte_t pad = 0;
 	buf->append(pad);
 	buf->append(pad);
@@ -485,16 +485,18 @@ Element::makeString(Network::byte_t *data, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::STRING_AMF0;
+
     // Make room for an additional NULL terminator
     check_buffer(size+1);
+    _buffer->clear();		// FIXME: this could be a performance issue
     _buffer->copy(data, size);
     
     // Unlike other buffers, people like to print strings, so we must add
     // a NULL terminator to the string. When encoding, we are careful to
     // to adjust the byte count down by one, as the NULL terminator doesn't
     // get written.
-    *(_buffer->end() - 1) = 0;
-
+//     *(_buffer->end() - 1) = 0;
+    _buffer->setSize(size);
     return *this;
 }
 
@@ -534,6 +536,13 @@ Element::makeString(const string &name, const string &str)
         setName(name);
     }    
     return makeString(str.c_str(), str.size());
+}
+
+Element &
+Element::makeNumber(Buffer *buf)
+{
+//    GNASH_REPORT_FUNCTION;
+    return makeNumber(buf->reference());
 }
 
 Element &
@@ -876,6 +885,14 @@ Element::setName(const string &str)
 }
 
 void
+Element::setName(const char *name, size_t size)
+{
+//    GNASH_REPORT_FUNCTION;
+    Network::byte_t *ptr = reinterpret_cast<Network::byte_t *>(const_cast<char *>(name));
+    return setName(ptr, size);
+}
+
+void
 Element::setName(Network::byte_t *name, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -945,8 +962,11 @@ Element::dump()
       case Element::RECORD_SET_AMF0:
       case Element::XML_OBJECT_AMF0:
       case Element::TYPED_OBJECT_AMF0:
-//	  cerr << "AMF data is: 0x" << hexify(_data, _length, false) << endl;
-	  log_debug("FIXME: got a typed object!");
+      case Element::AMF3_DATA:
+	  if (getLength() != 0) {
+	      log_debug("FIXME: got AMF3 data!");
+	  }
+//	  cerr << "AMF3 data is: 0x" << hexify(_data, _length, false) << endl;
 	  break;
 //       case Element::VARIABLE:
 //       case Element::FUNCTION:
@@ -958,6 +978,19 @@ Element::dump()
       default:
 //	  log_unimpl("%s: type %d", __PRETTY_FUNCTION__, (int)_type);
 	  break;
+    }
+
+    if (_buffer) {
+	_buffer->dump();
+    }
+
+    if (_properties.size() > 0) {
+	vector<amf::Element *>::iterator ait;
+	cerr << "# of Properties in object" << _properties.size() << endl;
+	for (ait = _properties.begin(); ait != _properties.end(); ait++) {
+	    amf::Element *el = (*(ait));
+	    el->dump();
+	}
     }
 }
 

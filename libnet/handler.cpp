@@ -220,7 +220,7 @@ netin_handler(Handler::thread_params_t *args)
  	}
 	// ret is "no position" when the socket is closed from the other end of the connection,
 	// so we're done.
-	if ((ret == string::npos) || (ret == -1)) {
+	if ((ret == string::npos) || (ret == 0xffffffff)) {
 	    log_debug("socket for fd #%d was closed...", args->netfd);
 	    break;
 	}

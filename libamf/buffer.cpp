@@ -29,6 +29,51 @@ using namespace gnash;
 namespace amf
 {
 
+#if 0
+// convert an ascii hex digit to a number.
+//      param is hex digit.
+//      returns a decimal digit.
+Network::byte_t
+hex2digit (Network::byte_t digit)
+{  
+    if (digit == 0)
+        return 0;
+    
+    if (digit >= '0' && digit <= '9')
+        return digit - '0';
+    if (digit >= 'a' && digit <= 'f')
+        return digit - 'a' + 10;
+    if (digit >= 'A' && digit <= 'F')
+        return digit - 'A' + 10;
+    
+    // shouldn't ever get this far
+    return -1;
+}
+
+// Convert the hex array pointed to by buf into binary to be placed in mem
+Buffer *
+Buffer::hex2mem(const char *str)
+{
+    size_t count = strlen(str);
+    Network::byte_t ch = 0;
+    _ptr = new Buffer((count/3)+1);
+//    buf->clear();
+
+    Network::byte_t *strdata = const_cast<Network::byte_t *>(reinterpret_cast<const Network::byte_t *>(str));
+    
+    for (size_t i=0; i<count; i++) {
+        if (*strdata == ' ') {      // skip spaces.
+            strdata++;
+            continue;
+        }
+        ch = hex2digit(*strdata++) << 4;
+        ch |= hex2digit(*strdata++);
+        append(ch);
+    }
+    return _ptr;
+}
+#endif
+
 void *
 Buffer::init(size_t nbytes)
 {
@@ -191,12 +236,8 @@ Network::byte_t *
 Buffer::append(boost::uint32_t num)
 {
 //    GNASH_REPORT_FUNCTION;
-    if ((_seekptr + sizeof(boost::uint32_t)) <= (_ptr + _nbytes)) {
-	std::copy(&num, &num + sizeof(boost::uint32_t), _seekptr);    
-	_seekptr += sizeof(boost::uint32_t);
-	return _seekptr;
-    }
-    return 0;
+    Network::byte_t *ptr = reinterpret_cast< Network::byte_t *>(&num);    
+    return append(ptr, sizeof(boost::uint32_t));
 }
 
 Network::byte_t *
@@ -432,6 +473,14 @@ Buffer::clear()
 }
 
 // Resize the buffer that holds the data.
+// Resize the buffer that holds the data.
+void *
+Buffer::resize()
+{
+//    GNASH_REPORT_FUNCTION;
+    return resize(_seekptr - _ptr);
+}
+
 void *
 Buffer::resize(size_t size)
 {

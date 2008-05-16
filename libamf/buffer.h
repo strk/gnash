@@ -45,6 +45,7 @@ public:
     bool empty() { return (_seekptr)?true:false; };
 
     // Resize the buffer that holds the data
+    void *resize();
     void *resize(size_t nbytes);
 
     // Put data into the buffer. This overwrites all data, and resets the seek ptr.
@@ -102,6 +103,7 @@ public:
     Buffer &operator+=(Buffer &buf);
     gnash::Network::byte_t operator[](int x) { return *(_ptr + x); };
     gnash::Network::byte_t *at(int x) { return _ptr + x; };
+//    Buffer *hex2mem(const char *str);
     
     // debug stuff, not need for running Cygnal
     void dump();

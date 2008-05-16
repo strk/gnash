@@ -154,91 +154,15 @@ RTMP::getProperty(const std::string &name)
 	    return el;
 	}
     }
+    return 0;
 }
 
-// A request for a handshake is initiated by sending a byte with a
-// value of 0x3, followed by a message body of unknown format.
-bool
-RTMP::handShakeRequest()
+RTMP::rtmp_head_t *
+RTMP::decodeHeader(Buffer *buf)
 {
     GNASH_REPORT_FUNCTION;
-
-#if 0
-    char buffer[RTMP_BODY_SIZE+1];
-    char c = 0x3;
-    int  i, ret;
-    
-    ret = writeNet(&c, 1);
-    _outbytes += 1;
-    // something went wrong, chances are the other end of the network
-    // connection is down, or never initialized.
-    if (ret <= 0) {
-        return false;
-    }
-
-    // Since we don't know what the format is, create a pattern we can
-    // recognize if we stumble across it later on.
-    for (i=0; i<RTMP_BODY_SIZE; i++) {
-        buffer[i] = i^256;
-    }
-    
-    _outbytes += RTMP_BODY_SIZE;
-    ret = writeNet(buffer, RTMP_BODY_SIZE);
-#endif
-    
-    return true;
+    return decodeHeader(buf->reference());
 }
-
-// The client finished the handshake process by sending the second
-// data block we get from the server as the response
-bool
-RTMP::clientFinish()
-{
-    GNASH_REPORT_FUNCTION;
-
-#if 0
-    char buffer[RTMP_BODY_SIZE+1];
-    memset(buffer, 0, RTMP_BODY_SIZE+1);
-
-    if (readNet(buffer, RTMP_BODY_SIZE) == RTMP_BODY_SIZE) {        
-        log_debug (_("Read first data block in handshake"));
-    } else {
-        log_error (_("Couldn't read first data block in handshake"));
-        return false;
-    }
-    _inbytes += RTMP_BODY_SIZE;
-    if (readNet(buffer, RTMP_BODY_SIZE) == RTMP_BODY_SIZE) {        
-        log_debug (_("Read second data block in handshake"));
-//         _body = new char(RTMP_BODY_SIZE+1);
-//         memcpy(_body, buffer, RTMP_BODY_SIZE);
-    } else {
-        log_error (_("Couldn't read second data block in handshake"));
-        return false;
-    }
-    _inbytes += RTMP_BODY_SIZE;
-
-    writeNet(buffer, RTMP_BODY_SIZE);
-    _outbytes += RTMP_BODY_SIZE;
-#endif
-    
-    return true;
-}
-
-bool
-RTMP::packetRequest()
-{
-    GNASH_REPORT_FUNCTION;
-    return false;
-}
-
-#if 0
-bool
-RTMP::packetSend(amf::Buffer * /* buf */)
-{
-    GNASH_REPORT_FUNCTION;
-    return false;
-}
-#endif
 
 RTMP::rtmp_head_t *
 RTMP::decodeHeader(Network::byte_t *in)
@@ -251,12 +175,13 @@ RTMP::decodeHeader(Network::byte_t *in)
     log_debug (_("The AMF channel index is %d"), _header.channel);
     
     _header.head_size = headerSize(*tmpptr++);
-    printf (_("The header size is %d"), _header.head_size);
+    log_debug (_("The header size is %d"), _header.head_size);
 
     if (_header.head_size >= 4) {
         _mystery_word = *tmpptr++;
         _mystery_word = (_mystery_word << 12) + *tmpptr++;
         _mystery_word = (_mystery_word << 8) + *tmpptr++;
+
         log_debug(_("The mystery word is: %d"), _mystery_word);
     }
 
@@ -295,7 +220,7 @@ RTMP::decodeHeader(Network::byte_t *in)
 //     };
     
     if (_header.head_size == 12) {
-        _header.src_dest = *(reinterpret_cast<rtmp_source_e *>(tmpptr));
+        _header.src_dest = *(reinterpret_cast<RTMPMsg::rtmp_source_e *>(tmpptr));
         tmpptr += sizeof(unsigned int);
         log_debug(_("The source/destination is: %x"), _header.src_dest);
     }
@@ -310,11 +235,26 @@ RTMP::decodeHeader(Network::byte_t *in)
 /// * Type - The type of the message
 /// * Routing - The source/destination of the message
 //
+
+amf::Buffer *
+RTMP::encodeHeader(int amf_index, rtmp_headersize_e head_size)
+{
+    GNASH_REPORT_FUNCTION;
+    amf::Buffer *buf = new Buffer(1);
+    Network::byte_t *ptr = buf->reference();
+    
+    // Make the channel index & header size byte
+    *ptr = head_size & RTMP_HEADSIZE_MASK;  
+    *ptr += amf_index  & RTMP_INDEX_MASK;
+
+    return buf;
+}
+
 // There are 3 size of RTMP headers, 1, 4, 8, and 12.
 amf::Buffer *
 RTMP::encodeHeader(int amf_index, rtmp_headersize_e head_size,
 		       size_t total_size, content_types_e type,
-		       rtmp_source_e routing)
+		       RTMPMsg::rtmp_source_e routing)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -342,7 +282,7 @@ RTMP::encodeHeader(int amf_index, rtmp_headersize_e head_size,
     *ptr = head_size & RTMP_HEADSIZE_MASK;  
     *ptr += amf_index  & RTMP_INDEX_MASK;
     ptr++;
-    
+
     // Add the unknown bytes. These seem to be used by video and
     // audio, and only when the header size is 4 or more.
     if ((head_size == HEADER_4) || (head_size == HEADER_8) || (head_size == HEADER_12)) {
@@ -390,7 +330,7 @@ RTMP::packetRead(amf::Buffer *buf)
     GNASH_REPORT_FUNCTION;
 
 //    int packetsize = 0;
-    unsigned int amf_index, headersize;
+    size_t amf_index, headersize;
     Network::byte_t *ptr = buf->reference();
     Network::byte_t *tooFar = ptr+buf->size();
     AMF amf;
@@ -423,15 +363,15 @@ RTMP::packetRead(amf::Buffer *buf)
 //    ptr += headersize;
     
     amf::Element *el = amf.extractAMF(ptr, tooFar);
-    el->dump();
+//    el->dump();
     el = amf.extractAMF(ptr, tooFar) + 1; // @@strk@@ : what's the +1 for ?
-    el->dump();
+//    el->dump();
     log_debug (_("Reading AMF packets till we're done..."));
-    buf->dump();
+//    buf->dump();
     while (ptr < end) {
 	amf::Element *el = amf.extractProperty(ptr, tooFar);
 	addProperty(el);
-	el->dump();
+//	el->dump();
     }
     ptr += 1;
     size_t actual_size = static_cast<size_t>(_header.bodysize - AMF_HEADER_SIZE);
@@ -441,13 +381,13 @@ RTMP::packetRead(amf::Buffer *buf)
 	log_debug("FIXME: MERGING");
 	buf = _handler->merge(buf);
     }
-    while ((ptr - buf->begin()) < actual_size) {
+    while ((ptr - buf->begin()) < static_cast<int>(actual_size)) {
 	amf::Element *el = amf.extractProperty(ptr, tooFar);
 	addProperty(el);
-	el->dump();		// FIXME: dump the AMF objects as they are read in
+//	el->dump();		// FIXME: dump the AMF objects as they are read in
     }
 
-    dump();
+//    dump();
     
     amf::Element *url = getProperty("tcUrl");
     amf::Element *file = getProperty("swfUrl");
@@ -494,75 +434,12 @@ RTMP::dump()
 // type 6: Ping the client from server. The second parameter is the current time.
 // type 7: Pong reply from client. The second parameter is the time the server sent with his
 //         ping request.
-amf::Buffer *
-RTMP::encodeChunkSize()
-{
-    GNASH_REPORT_FUNCTION;
-}
-void
-RTMP::decodeChunkSize()
-{
-    GNASH_REPORT_FUNCTION;
-}
-    
-amf::Buffer *
-RTMP::encodeBytesRead()
-{
-    GNASH_REPORT_FUNCTION;
-}
-void
-RTMP::decodeBytesRead()
-{
-    GNASH_REPORT_FUNCTION;
-}
 
-// A RTMP Ping packet looks like this: "03 00 00 00 00 00 00 0B B8", which is the
-// Ping type byte, followed by two shorts that are the parameters. Only the first
+// A RTMP Ping packet looks like this: "02 00 00 00 00 00 06 04 00 00 00 00 00 00 00 00 00 0",
+// which is the Ping type byte, followed by two shorts that are the parameters. Only the first
 // two paramters are required.
-amf::Buffer *
-RTMP::encodePing(rtmp_ping_e type, boost::uint16_t milliseconds)
-{
-    GNASH_REPORT_FUNCTION;
-    Buffer *buf = new Buffer(sizeof(boost::uint16_t) * 4);
-    Network::byte_t *ptr = buf->reference();
-    buf->clear();		// default everything to zeros, real data gets optionally added.
-    boost::uint16_t typefield = *reinterpret_cast<boost::uint16_t *>(&type);
-    ptr += sizeof(boost::uint16_t); // go past the first short
-
-    boost::uint16_t swapped = 0;
-    buf->copy(typefield);
-    switch (type) {
-        // These two don't appear to have any paramaters
-      case PING_CLEAR:
-      case PING_PLAY:
-	  break;
-	  // the third parameter is the buffer time in milliseconds
-      case PING_TIME:
-      {
-	  ptr += sizeof(boost::uint16_t); // go past the second short
-	  swapped = htons(milliseconds);
-	  buf->append(swapped);
-	  break;
-      }
-      // reset doesn't have any parameters
-      case PING_RESET:
-	  break;
-	  // For Ping and Pong, the second parameter is always the milliseconds
-      case PING_CLIENT:
-      case PONG_CLIENT:
-      {
-	  swapped = htons(milliseconds);
-//	  std::copy(&swapped, &swapped + sizeof(boost::uint16_t), ptr);
-	  buf->append(swapped);
-	  break;
-      }
-      default:
-	  return 0;
-	  break;
-    };
-    
-    return buf;
-}
+// This seems to be a ping message, 12 byte header, system channel 2
+// 02 00 00 00 00 00 06 04 00 00 00 00 00 00 00 00 00 00
 RTMP::rtmp_ping_t *
 RTMP::decodePing(Network::byte_t *data)
 {
@@ -571,18 +448,23 @@ RTMP::decodePing(Network::byte_t *data)
     Network::byte_t *ptr = reinterpret_cast<Network::byte_t *>(data);
     rtmp_ping_t *ping = new rtmp_ping_t;
     memset(ping, 0, sizeof(rtmp_ping_t));
-    
-    boost::uint16_t type = *reinterpret_cast<rtmp_ping_e *>(ptr);
+
+    // All the data fields in a ping message are 2 bytes long.
+    boost::uint16_t type = ntohs(*reinterpret_cast<rtmp_ping_e *>(ptr));
     ping->type = static_cast<rtmp_ping_e>(type);
     ptr += sizeof(boost::uint16_t);
 
-    ping->target = *reinterpret_cast<boost::uint16_t *>(ptr);
+    ping->target = ntohs(*reinterpret_cast<boost::uint16_t *>(ptr));
     ptr += sizeof(boost::uint16_t);
     
     ping->param1 = ntohs(*reinterpret_cast<boost::uint16_t *>(ptr));
     ptr += sizeof(boost::uint16_t);
     
-    ping->param1 = ntohs(*reinterpret_cast<boost::uint16_t *>(ptr));
+//     ping->param2 = ntohs(*reinterpret_cast<boost::uint16_t *>(ptr));
+//     ptr += sizeof(boost::uint16_t);
+
+//    ping->param3 = ntohs(*reinterpret_cast<boost::uint16_t *>(ptr));
+    ping->param3 = 0;
 
     return ping;    
 }
@@ -593,81 +475,246 @@ RTMP::decodePing(amf::Buffer *buf)
     return decodePing(buf->reference());
 }
 
+// Decode the result we get from the server after we've made a request.
+//
+// 03 00 00 00 00 00 81 14 00 00 00 00 02 00 07 5f  ..............._
+// 72 65 73 75 6c 74 00 3f f0 00 00 00 00 00 00 05  result.?........
+// 03 00 0b 61 70 70 6c 69 63 61 74 69 6f 6e 05 00  ...application..
+// 05 6c 65 76 65 6c 02 00 06 73 74 61 74 75 73 00  .level...status.
+// 0b 64 65 73 63 72 69 70 74 69 6f 6e 02 00 15 43  .description...C
+// 6f 6e 6e 65 63 74 69 6f 6e 20 73 75 63 63 65 65  onnection succee
+// 64 65 64 2e 00 04 63 6f 64 65 02 00 1d 4e 65 74  ded...code...Net
+// 43 6f 6e 6e 65 63 74 69 6f 6e 2e 43 6f 6e 6e 65  Connection.Conne
+// 63 74 2e 53 75 63 63 65 73 73 00 00 c3 09        ct.Success....
+//
+// 43 00 00 00 00 00 48 14 02 00 06 5f 65 72 72 6f  C.....H...._erro
+// 72 00 40 00 00 00 00 00 00 00 05 03 00 04 63 6f  r.@...........co
+// 64 65 02 00 19 4e 65 74 43 6f 6e 6e 65 63 74 69  de...NetConnecti
+// 6f 6e 2e 43 61 6c 6c 2e 46 61 69 6c 65 64 00 05  on.Call.Failed..
+// 6c 65 76 65 6c 02 00 05 65 72 72 6f 72 00 00 09  level...error...
+//
+// T 127.0.0.1:1935 -> 127.0.0.1:38167 [AP]
+// 44 00 00 00 00 00 b2 14 02 00 08 6f 6e 53 74 61  D..........onSta
+// 74 75 73 00 3f f0 00 00 00 00 00 00 05 03 00 08  tus.?...........
+// 63 6c 69 65 6e 74 69 64 00 3f f0 00 00 00 00 00  clientid.?......
+// 00 00 05 6c 65 76 65 6c 02 00 06 73 74 61 74 75  ...level...statu
+// 73 00 07 64 65 74 61 69 6c 73 02 00 16 6f 6e 32  s..details...on2
+// 5f 66 6c 61 73 68 38 5f 77 5f 61 75 64 69 6f 2e  _flash8_w_audio.
+// 66 6c 76 00 0b 64 65 73 63 72 69 70 74 69 6f 6e  flv..description
+// 02 00 27 53 74 61 72 74 65 64 20 70 6c 61 79 69  ..'Started playi
+// 6e 67 20 6f 6e 32 5f 66 c4 6c 61 73 68 38 5f 77  ng on2_f.lash8_w
+// 5f 61 75 64 69 6f 2e 66 6c 76 2e 00 04 63 6f 64  _audio.flv...cod
+// 65 02 00 14 4e 65 74 53 74 72 65 61 6d 2e 50 6c  e...NetStream.Pl
+// 61 79 2e 53 74 61 72 74 00 00 09                 ay.Start...
+//
+// ^^^_result^?^^^^^^^^^^^application^^^level^^^status^^description^^^Connection succeeded.^^code^^^NetConnection.Connect.Success^^^^
+// 02 00 07 5f 72 65 73 75 6c 74 00 3f f0 00 00 00 00 00 00 05 03 00 0b 61 70 70 6c 69 63 61 74 69 6f 6e 05 00 05 6c 65 76 65 6c 02 00 06 73 74 61 74 75 73 00 0b 64 65 73 63 72 69 70 74 69 6f 6e 02 00 15 43 6f 6e 6e 65 63 74 69 6f 6e 20 73 75 63 63 65 65 64 65 64 2e 00 04 63 6f 64 65 02 00 1d 4e 65 74 43 6f 6e 6e 65 63 74 69 6f 6e 2e 43 6f 6e 6e 65 63 74 2e 53 75 63 63 65 73 73 00 00 c3 09 
+// 10629:3086592224] 20:01:20 DEBUG: read 29 bytes from fd 3 from port 0
+// C^^^^^^^^^^onBWDone^@^^^^^^^^
+// 43 00 00 00 00 00 15 14 02 00 08 6f 6e 42 57 44 6f 6e 65 00 40 00 00 00 00 00 00 00 05
+RTMPMsg *
+RTMP::decodeMsgBody(Network::byte_t *data, size_t size)
+{
+    GNASH_REPORT_FUNCTION;
+    AMF amf_obj;
+    Network::byte_t *ptr = data;
+    Network::byte_t* tooFar = ptr + size;
+    bool status = false;
+
+    // The first data object is the method name of this object.
+    Element *name = amf_obj.extractAMF(ptr, tooFar);
+    if (name) {
+	ptr += name->getLength() + 3; // skip the length bytes too
+    } else {
+	log_error("Name field of RTMP Message corrupted!");
+	return 0;
+    }
+
+    // The stream ID is the second data object. All messages have these two objects
+    // at the minimum.
+    Element *streamid = amf_obj.extractAMF(ptr, tooFar);
+    if (streamid) {
+	ptr += streamid->getLength() + 2;
+    } else {
+	log_error("Stream ID field of RTMP Message corrupted!");
+	return 0;
+    }
+
+    // This will need to be deleted manually later after usage, it is not
+    // automatically deallocated.
+    RTMPMsg *msg = new RTMPMsg;
+
+    msg->setMethodName(name->to_string());
+    double swapped = streamid->to_number();
+    swapBytes(&swapped, amf::AMF0_NUMBER_SIZE);
+    msg->setStreamID(swapped);
+
+    if ((msg->getMethodName() == "_result") || (msg->getMethodName() == "error")) {
+ 	status = true;
+    }
+    
+    // Then there are a series of AMF objects, often a higher level ActionScript object with
+    // properties attached.
+    while (ptr < tooFar) {
+	// These pointers get deleted automatically when the msg object is deleted
+        amf::Element *el = amf_obj.extractAMF(ptr, tooFar);
+        if (el == 0) {
+	    break;
+	}
+//	el->dump();
+	msg->addObject(el);
+ 	if (status) {
+	    msg->checkStatus(el);
+	}
+	ptr += amf_obj.totalsize();
+    };
+    
+    // cleanup after ourselves
+    delete name;
+    delete streamid;
+    
+    return msg;
+}
+
+RTMPMsg *
+RTMP::decodeMsgBody(amf::Buffer *buf)
+{
+//    GNASH_REPORT_FUNCTION;
+    return decodeMsgBody(buf->reference(), buf->size());
+}
+
+amf::Buffer *
+RTMP::encodeChunkSize()
+{
+    GNASH_REPORT_FUNCTION;
+    log_unimpl(__PRETTY_FUNCTION__);
+    return 0;
+}
+
+void
+RTMP::decodeChunkSize()
+{
+    GNASH_REPORT_FUNCTION;
+    log_unimpl(__PRETTY_FUNCTION__);
+}
+    
+amf::Buffer *
+RTMP::encodeBytesRead()
+{
+    GNASH_REPORT_FUNCTION;
+    log_unimpl(__PRETTY_FUNCTION__);
+    return 0;
+}
+
+void
+RTMP::decodeBytesRead()
+{
+    GNASH_REPORT_FUNCTION;
+    log_unimpl(__PRETTY_FUNCTION__);
+}
+
 amf::Buffer *
 RTMP::encodeServer()
 {
     GNASH_REPORT_FUNCTION;
+    log_unimpl(__PRETTY_FUNCTION__);
+    return 0;
 }
+
 void 
 RTMP::decodeServer()
 {
     GNASH_REPORT_FUNCTION;
+    log_unimpl(__PRETTY_FUNCTION__);
 }
     
 amf::Buffer *
 RTMP::encodeClient()
 {
     GNASH_REPORT_FUNCTION;
+    log_unimpl(__PRETTY_FUNCTION__);
+    return 0;
 }
+
 void 
 RTMP::decodeClient()
 {
     GNASH_REPORT_FUNCTION;
+    log_unimpl(__PRETTY_FUNCTION__);
 }
     
 amf::Buffer *
 RTMP::encodeAudioData()
 {
     GNASH_REPORT_FUNCTION;
+    log_unimpl(__PRETTY_FUNCTION__);
+    return 0;
 }
+
 void 
 RTMP::decodeAudioData()
 {
     GNASH_REPORT_FUNCTION;
+    log_unimpl(__PRETTY_FUNCTION__);
 }
     
 amf::Buffer *
 RTMP::encodeVideoData()
 {
     GNASH_REPORT_FUNCTION;
+    log_unimpl(__PRETTY_FUNCTION__);
+    return 0;
 }
+
 void 
 RTMP::decodeVideoData()
 {
     GNASH_REPORT_FUNCTION;
+    log_unimpl(__PRETTY_FUNCTION__);
 }
     
 amf::Buffer *
 RTMP::encodeNotify()
 {
     GNASH_REPORT_FUNCTION;
+    log_unimpl(__PRETTY_FUNCTION__);
+    return 0;
 }
+
 void 
 RTMP::decodeNotify()
 {
     GNASH_REPORT_FUNCTION;
+    log_unimpl(__PRETTY_FUNCTION__);
 }
     
 amf::Buffer *
 RTMP::encodeSharedObj()
 {
     GNASH_REPORT_FUNCTION;
+    log_unimpl(__PRETTY_FUNCTION__);
+    return 0;
 }
+
 void 
 RTMP::decodeSharedObj()
 {
     GNASH_REPORT_FUNCTION;
+    log_unimpl(__PRETTY_FUNCTION__);
 }
     
 amf::Buffer *
 RTMP::encodeInvoke()
 {
     GNASH_REPORT_FUNCTION;
+    log_unimpl(__PRETTY_FUNCTION__);
+    return 0;
 }
 void 
 RTMP::decodeInvoke()
 {
     GNASH_REPORT_FUNCTION;
+    log_unimpl(__PRETTY_FUNCTION__);
 }
 
 } // end of gnash namespace

@@ -54,6 +54,8 @@ noinst_HEADERS = \
 	network.h \
 	netstats.h \
 	rtmp.h \
+	rtmp_msg.h \
+	rtmp_client.h \
 	rtmp_server.h \
 	statistics.h
 
@@ -65,6 +67,8 @@ libgnashnet_la_SOURCES = \
 	network.cpp \
 	netstats.cpp \
 	rtmp.cpp \
+	rtmp_msg.cpp \
+	rtmp_client.cpp \
 	rtmp_server.cpp \
 	statistics.cpp
 

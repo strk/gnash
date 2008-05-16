@@ -36,8 +36,9 @@
 #include "dejagnu.h"
 #include "log.h"
 #include "amf.h"
-#include "rtmp_server.h"
 #include "rtmp.h"
+#include "rtmp_client.h"
+#include "rtmp_server.h"
 #include "buffer.h"
 #include "network.h"
 #include "element.h"
@@ -65,6 +66,8 @@ static TestState runtest;
 
 static void test_header();
 static void test_types();
+static void test_results();
+static void test_system();
 
 LogFile& dbglogfile = LogFile::getDefaultInstance();
 
@@ -96,7 +99,7 @@ hex2mem(const char *str)
 {
     size_t count = strlen(str);
     Network::byte_t ch = 0;
-    Buffer *buf = new Buffer(count + 12);
+    Buffer *buf = new Buffer((count/3)+1);
     buf->clear();
 
     Network::byte_t *ptr = const_cast<Network::byte_t *>(reinterpret_cast<const Network::byte_t *>(str));
@@ -168,41 +171,284 @@ main(int argc, char *argv[])
 #endif
     
     test_header();
-    test_types();
+    test_system();
+    test_results();
+//    test_types();
 }
+
+void
+test_system()
+{
+    GNASH_REPORT_FUNCTION;
+    
+    RTMPClient client;
+    RTMPServer server;
+
+    
+//    const char *x1 = "00 00 00 00 00 00";
+    Buffer *buf1 = hex2mem("00 00 00 00 00 00");  // clear buffer message
+//    const char *x2 = "00 06 cf 03 04 c3";
+    Buffer *buf2 = hex2mem("00 06 cf 03 04 c3"); // ping client from server
+//    const char *x3 = "00 07 cf 03 04 c3";
+    Buffer *buf3 = hex2mem("00 07 cf 03 04 c3"); // Pong, reply from client
+//    const char *x4 = "00 00 00 00 00 01";
+    Buffer *buf4 = hex2mem("00 00 00 00 00 01"); // clear buffer message
+    
+    RTMP::rtmp_ping_t *ping1 = client.decodePing(buf1);
+    if (ping1->type == RTMP::PING_CLEAR) {
+        runtest.pass("Decoded RTMP Ping message");
+    } else {
+        runtest.fail("Decoded RTMP Ping message");
+    }
+    
+    Buffer *enc1 = server.encodePing(RTMP::PING_CLEAR);
+    if ((memcmp(buf1->reference(), enc1->reference(), 6) == 0)) {
+        runtest.pass("Encoded RTMP Ping Clear message");
+    } else {
+        runtest.fail("Encoded RTMP Ping Clear message");
+    }
+
+    boost::uint32_t time = *(reinterpret_cast<boost::uint32_t *>(buf2->reference() + 2));
+    Buffer *enc2 = server.encodePing(RTMP::PING_CLIENT, htonl(time));
+//    cerr << hexify(enc2->begin(), enc2->size(), false) << endl;
+    if ((memcmp(buf2->reference(), enc2->reference(), 6) == 0)) {
+        runtest.pass("Encoded RTMP Ping Client message");
+    } else {
+        runtest.fail("Encoded RTMP Ping Client message");
+    }
+
+    RTMP::rtmp_ping_t *ping2 = client.decodePing(buf2);
+    if ((ping2->type == RTMP::PING_CLIENT)
+        && (ping2->target == 0xcf03)
+        && (ping2->param1 == 0x4c3)) {
+        runtest.pass("Decoded RTMP Ping Client message");
+    } else {
+        runtest.fail("Decoded RTMP Ping Client message");
+    }    
+
+#if 0
+    for (double dub=0; dub<=200; dub ++) {
+        Element el11;
+        el11.makeNumber(dub);
+        Buffer *buf11 = el11.getBuffer();
+        cerr << "FIXME: " << el11.to_number() << ":     ";
+        swapBytes(buf11->begin(), 8);
+        cerr << hexify(buf11->begin(), buf11->size(), false) << endl;
+    }
+#endif
+    
+    // cleanup
+    delete ping1;
+    delete ping2;
+    delete buf1;
+    delete buf2;
+    delete buf3;
+    delete buf4;
+    
+    delete enc1;
+    delete enc2;
+}    
 
 void
 test_header()
 {
     GNASH_REPORT_FUNCTION;
-    RTMP rtmp;
+    RTMPClient client;
+    RTMPServer server;
     
     // this is a sample 12 bytes RTMP header
-    const char *x = "03 00 00 00 00 01 1f 14 00 00 00 00";
-    Buffer *buf1 = hex2mem(x);
-    Buffer *head = rtmp.encodeHeader(0x3, RTMP::HEADER_12, 287,
-                                     RTMP::INVOKE, RTMP::FROM_CLIENT);
-//     cerr << hexify(head->begin(), 12, false) << endl;
+//    const char *x1 = "03 00 00 00 00 01 1f 14 00 00 00 00";
+    Buffer *buf1 = hex2mem("03 00 00 00 00 01 1f 14 00 00 00 00");
+    Buffer *head1 = server.encodeHeader(0x3, RTMP::HEADER_12, 287,
+                                        RTMP::INVOKE, RTMPMsg::FROM_SERVER);
+//    cerr << hexify(head1->begin(), RTMP_MAX_HEADER_SIZE, false) << endl;
     
-     if ((memcmp(buf1->reference(), head->reference(), 12) == 0)) {
-         runtest.pass("Encoded RTMP header");
+     if ((memcmp(buf1->reference(), head1->reference(), RTMP_MAX_HEADER_SIZE) == 0)) {
+         runtest.pass("Encoded RTMP header(Invoke)");
      } else {
-         runtest.fail("Encoded RTMP header");
+         runtest.fail("Encoded RTMP header(Invoke)");
      }
 
-     RTMP::rtmp_head_t *header = rtmp.decodeHeader(buf1->reference());
-     if ((header->channel == 0x3) && (header->head_size == 12)
-         && (header->bodysize == 287) && (header->type ==  RTMP::INVOKE)) {
-         runtest.pass("Decoded RTMP header");
+     RTMP::rtmp_head_t *header1 = server.decodeHeader(buf1->reference());
+     if ((header1->channel == 0x3) && (header1->head_size == RTMP_MAX_HEADER_SIZE)
+         && (header1->bodysize == 287) && (header1->type ==  RTMP::INVOKE)) {
+         runtest.pass("Decoded RTMP header(Invoke)");
      } else {
-         runtest.fail("Decoded RTMP header");
+         runtest.fail("Decoded RTMP header(Invoke)");
+     }
+
+     Buffer *buf2 = hex2mem("02 00 00 00 00 00 06 04 00 00 00 00");
+     Buffer *head2 = server.encodeHeader(0x2, RTMP::HEADER_12, PING_MSG_SIZE,
+                                     RTMP::PING, RTMPMsg::FROM_SERVER);
+//     cerr << hexify(head2->begin(), RTMP_MAX_HEADER_SIZE, false) << endl;
+     if ((memcmp(buf2->reference(), head2->reference(), 8) == 0)) {
+         runtest.pass("Encoded RTMP header(Ping 0)");
+     } else {
+         runtest.fail("Encoded RTMP header(Ping 0)");
+     }
+
+     Buffer *buf3 = hex2mem("02 ff e3 6c 00 00 06 04 00 00 00 00");
+     Buffer *head3 = server.encodeHeader(0x2, RTMP::HEADER_12, PING_MSG_SIZE,
+                                     RTMP::PING, RTMPMsg::FROM_SERVER);
+//     cerr << hexify(head3->begin(), RTMP_MAX_HEADER_SIZE, false) << endl;
+     if ((memcmp(buf2->reference(), head3->reference(), 8) == 0)) {
+         runtest.pass("Encoded RTMP header(Ping 1)");
+     } else {
+         runtest.fail("Encoded RTMP header(Ping 1)");
+     }
+
+     RTMP::rtmp_head_t *header2 = client.decodeHeader(buf3);
+     if ((header2->channel == 0x2) && (header2->head_size == RTMP_MAX_HEADER_SIZE)
+         && (header2->bodysize == 6) && (header2->type ==  RTMP::PING)) {
+         runtest.pass("Decoded RTMP header(Ping)");
+     } else {
+         runtest.fail("Decoded RTMP header(Ping)");
+     }
+
+     Buffer *buf4 = hex2mem("c2");
+     Buffer *head4 = server.encodeHeader(0x2, RTMP::HEADER_1);
+//     cerr << hexify(head4->begin(), RTMP_MAX_HEADER_SIZE, false) << endl;
+     if ((memcmp(buf4->reference(), head4->reference(), 1) == 0)) {
+         runtest.pass("Encoded RTMP header(size 1)");
+     } else {
+         runtest.fail("Encoded RTMP header(size 1)");
      }
      
      // cleanup after ourselves
      delete buf1;
-     delete head;
+     delete buf2;
+     delete buf3;
+     delete buf4;
+     delete head1;
+     delete head2;
+     delete head3;
+     delete head4;
+//     delete header1;
+//      delete header2;
 }
 
+void
+test_results()
+{
+    GNASH_REPORT_FUNCTION;
+    RTMPServer rtmpserv;
+//   03 00 00 00 00 00 81 14    00 00 00 00 02 00 07 5f    ..............._
+//   72 65 73 75 6c 74 00 3f    f0 00 00 00 00 00 00 05    result.?........
+//   03 00 0b 61 70 70 6c 69    63 61 74 69 6f 6e 05 00    ...application..
+//   05 6c 65 76 65 6c 02 00    06 73 74 61 74 75 73 00    .level...status.
+//   0b 64 65 73 63 72 69 70    74 69 6f 6e 02 00 15 43    .description...C
+//   6f 6e 6e 65 63 74 69 6f    6e 20 73 75 63 63 65 65    onnection succee
+//   64 65 64 2e 00 04 63 6f    64 65 02 00 1d 4e 65 74    ded...code...Net
+//   43 6f 6e 6e 65 63 74 69    6f 6e 2e 43 6f 6e 6e 65    Connection.Conne
+//   63 74 2e 53 75 63 63 65    73 73 00 00 c3 09          ct.Success....
+    Buffer *hex2 = hex2mem("02 00 07 5f 72 65 73 75 6c 74 00 3f f0 00 00 00 00 00 00 05 03 00 0b 61 70 70 6c 69 63 61 74 69 6f 6e 05 00 05 6c 65 76 65 6c 02 00 06 73 74 61 74 75 73 00 0b 64 65 73 63 72 69 70 74 69 6f 6e 02 00 15 43 6f 6e 6e 65 63 74 69 6f 6e 20 73 75 63 63 65 65 64 65 64 2e 00 04 63 6f 64 65 02 00 1d 4e 65 74 43 6f 6e 6e 65 63 74 69 6f 6e 2e 43 6f 6e 6e 65 63 74 2e 53 75 63 63 65 73 73 00 00 09");
+
+    RTMPMsg *msg1 = rtmpserv.decodeMsgBody(hex2);
+    if (msg1) {
+        std::vector<amf::Element *> hell = msg1->getElements();
+        std::vector<amf::Element *> props = hell[0]->getProperties();        
+//         printf("FIXME: %d, %d, %s:%s\n", props.size(), msg1->getStatus(),
+//                props[3]->getName(), props[3]->to_string());
+//         msg1->dump();
+        if ((msg1->getStatus() ==  RTMPMsg::NC_CONNECT_SUCCESS)
+            && (msg1->getMethodName() == "_result")
+            && (msg1->getStreamID() == 1)
+            && (msg1->size() == 1)) { // the msg has one element, which has 4 properties
+            runtest.pass("Decoded RTMP Result(NC_CONNECT_SUCCESS) message");
+        } else {
+            runtest.fail("Decoded RTMP Result(NC_CONNECT_SUCCESS) message");
+        }
+    } else {
+        runtest.untested("Decoded RTMP Result(NC_CONNECT_SUCCESS) message");
+    }
+    delete msg1;
+
+    Buffer *buf2 = rtmpserv.encodeResult(RTMPMsg::NC_CONNECT_SUCCESS);
+//    cerr << hexify(buf2->begin(), 122, true) << endl;
+    if ((memcmp(hex2->reference(), buf2->reference(), 122) == 0)) {
+        runtest.pass("Encoded RTMP result(NC_CONNECT_SUCCESS)");
+    } else {
+        runtest.fail("Encoded RTMP result(NC_CONNECT_SUCCESS)");
+    }
+    delete buf2;
+    delete hex2;
+    
+    Buffer *hex3 = hex2mem("02 00 07 5f 72 65 73 75 6c 74 00 3f f0 00 00 00 00 00 00 05 03 00 0b 61 70 70 6c 69 63 61 74 69 6f 6e 05 00 05 6c 65 76 65 6c 02 00 05 65 72 72 6f 72 00 0b 64 65 73 63 72 69 70 74 69 6f 6e 02 00 00 00 04 63 6f 64 65 02 00 1c 4e 65 74 43 6f 6e 6e 65 63 74 69 6f 6e 2e 43 6f 6e 6e 65 63 74 2e 46 61 69 6c 65 64 00 00 09");
+    RTMPMsg *msg2 = rtmpserv.decodeMsgBody(hex3);
+    std::vector<amf::Element *> hell = msg2->getElements();
+    std::vector<amf::Element *> props = hell[0]->getProperties();        
+//     printf("FIXME: %d, %d, %s:%s\n", props.size(), msg1->getStatus(),
+//            props[3]->getName(), props[3]->to_string());
+    if (msg2) {
+//        msg2->dump();
+        if ((msg2->getStatus() ==  RTMPMsg::NC_CONNECT_FAILED)
+            && (msg2->getMethodName() == "_result")
+            && (msg2->getStreamID() == 1)
+            && (msg2->size() == 1)) {
+            runtest.pass("Decoded RTMP result(NC_CONNECT_FAILED(as result)");
+        } else {
+            runtest.fail("Decoded RTMP result(NC_CONNECT_FAILED(as result)");
+        }
+    } else {
+        runtest.untested("Decoded RTMP result(NC_CONNECT_FAILED(as result)");
+    }
+
+    delete msg2;
+
+    delete hex3;
+    
+//     Buffer hex4 = "43 00 00 00 00 00 48 14 02 00 06 5f 65 72 72 6f 72 00 40 00 00 00 00 00 00 00 05 03 00 04 63 6f 64 65 02 00 19 4e 65 74 43 6f 6e 6e 65 63 74 69 6f 6e 2e 43 61 6c 6c 2e 46 61 69 6c 65 64 00 05 6c 65 76 65 6c 02 00 05 65 72 72 6f 72 00 00 09";
+//     if ((memcmp(hex4->reference(), buf4->reference(), hex4->size()) == 0)) {
+//         runtest.pass("Encoded RTMP result(NC_CONNECT_FAILED(as result)");
+//     } else {
+//         runtest.fail("Encoded RTMP result(NC_CONNECT_FAILED(as result)");
+//     }
+//     delete buf4;
+
+    
+#if 0
+//    const char *x4 = "";
+    Buffer *hex4 = hex2mem("");
+    Buffer *buf4 = rtmpserv.encodeResult(RTMPMsg::NC_CONNECT_REJECTED);
+    if ((memcmp(hex4->reference(), buf4->reference(), buf4->size()) == 0)) {
+        runtest.pass("Encoded RTMP result(NC_CONNECT_REJECTED");
+    } else {
+        runtest.fail("Encoded RTMP result(NC_CONNECT_REJECTED)");
+    }
+    delete buf4;
+    
+//    const char *x5 = "";
+    Buffer *hex5 = hex2mem("");
+    Buffer *buf5 = rtmpserv.encodeResult(RTMPMsg::NC_CONNECT_APPSHUTDOWN);
+    if ((memcmp(hex5->reference(), buf5->reference(), buf5->size()) == 0)) {
+        runtest.pass("Encoded RTMP result(NC_CONNECT_APPSHUTDOWN)");
+    } else {
+        runtest.fail("Encoded RTMP result(NC_CONNECT_APPSHUTDOWN)");
+    }
+    delete buf5;
+    
+//    const char *x6 = "";
+    Buffer *hex6 = hex2mem("");
+    Buffer *buf6 = rtmpserv.encodeResult(RTMPMsg::NC_CONNECT_INVALID_APPLICATION);
+    if ((memcmp(hex6->reference(), buf6->reference(), buf6->size()) == 0)) {
+        runtest.pass("Encoded RTMP result(NC_CONNECT_INVALID_APPLICATION)");
+    } else {
+        runtest.fail("Encoded RTMP result(NC_CONNECT_INVALID_APPLICATION)");
+    }
+    delete buf6;
+    
+//    const char *x7 = "";
+    Buffer *hex7 = hex2mem("");
+    Buffer *buf7 = rtmpserv.encodeResult(RTMPMsg::NC_CONNECT_CLOSED);
+    if ((memcmp(hex7->reference(), buf7->reference(), buf7->size()) == 0)) {
+        runtest.pass("Encoded RTMP result(NC_CONNECT_INVALID_CLOSED)");
+    } else {
+        runtest.fail("Encoded RTMP result(NC_CONNECT_INVALID_CLOSED)");
+    }
+    delete buf7;
+#endif
+
+}
 
 void
 test_types()
@@ -213,23 +459,6 @@ test_types()
     const char *x = "06 00 d2 04 00 00 00 00";
     Buffer *buf1 = hex2mem(x);
     
-    RTMP::rtmp_ping_t *ping = rtmp.decodePing(buf1);
-    if (ping->type == RTMP::PING_CLIENT) {
-         runtest.pass("Decoded RTMP Ping message");
-     } else {
-         runtest.fail("Decoded RTMP Ping message");
-     }
-    
-    Buffer *buf2 = rtmp.encodePing(RTMP::PING_CLIENT, 53764);
-    cerr << hexify(buf2->begin(), 8, false) << endl;
-     if ((memcmp(buf1->reference(), buf2->reference(), 8) == 0)) {
-         runtest.pass("Encoded RTMP Ping message");
-     } else {
-         runtest.fail("Encoded RTMP Ping message");
-     }
-     delete ping;
-     delete buf1;
-     delete buf2;
 }
 
 static void

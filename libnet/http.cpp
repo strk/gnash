@@ -173,7 +173,7 @@ HTTP::formatHeader(http_status_e type)
 
 
 bool
-HTTP::formatHeader(int filesize, http_status_e type)
+HTTP::formatHeader(int filesize, http_status_e /* type */)
 {
 //    GNASH_REPORT_FUNCTION;
 
@@ -389,6 +389,7 @@ bool
 HTTP::formatLastModified(const string &date)
 {
     _header << "Last-Modified: " << date << "\r\n";
+    return true;
 }
 
 bool
@@ -473,7 +474,7 @@ HTTP::sendGetReply(http_status_e code)
 }
 
 bool
-HTTP::sendPostReply(rtmpt_cmd_e code)
+HTTP::sendPostReply(rtmpt_cmd_e /* code */)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -660,7 +661,7 @@ HTTP::extractCommand(gnash::Network::byte_t *data)
     // force the case to make comparisons easier
 //     std::transform(body.begin(), body.end(), body.begin(), 
 //                (int(*)(int)) toupper);
-    string::size_type start, end;
+    string::size_type start; 
 
     // Extract the command
     start = body.find("GET", 0);
@@ -705,7 +706,7 @@ HTTP::extractAcceptRanges(Network::byte_t *data) {
 //    GNASH_REPORT_FUNCTION;
     
     string body = reinterpret_cast<const char *>(data);
-    string::size_type start, end, length, pos;
+    string::size_type start, end;
     string pattern = "Accept-Ranges: ";
     start = body.find(pattern, 0);
     if (start == string::npos) {
@@ -1190,7 +1191,6 @@ void
 httphandler(Handler::thread_params_t *args)
 {
     GNASH_REPORT_FUNCTION;
-    int retries = 10;
 //    struct thread_params thread_data;
     string url, filespec, parameters;
     string::size_type pos;
@@ -1216,7 +1216,8 @@ httphandler(Handler::thread_params_t *args)
 	    log_debug("Not waiting no more, no more for more HTTP data for fd #%d...", args->netfd);
 	    map<int, Handler *>::iterator hit = handlers.find(args->netfd);
 	    if ((*hit).second) {
-		log_debug("Removing handle %x for HTTP on fd #%d", (void *)hand), args->netfd;
+		log_debug("Removing handle %x for HTTP on fd #%d",
+			  (void *)hand, args->netfd);
 		handlers.erase(args->netfd);
 		delete (*hit).second;
 	    }
@@ -1266,7 +1267,8 @@ httphandler(Handler::thread_params_t *args)
 	    log_debug (_("File to load is: %s"), filespec.c_str());
 	    log_debug (_("Parameters are: %s"), parameters.c_str());
 	    struct stat st;
-	    int filefd, ret;
+	    int filefd;
+	    size_t ret;
 #ifdef USE_STATISTICS
 	    struct timespec start;
 	    clock_gettime (CLOCK_REALTIME, &start);

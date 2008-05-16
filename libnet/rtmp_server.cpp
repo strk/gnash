@@ -24,6 +24,7 @@
 #include <iostream>
 #include <string>
 #include <map>
+#include <boost/cstdint.hpp>
 
 #if ! (defined(_WIN32) || defined(WIN32))
 #	include <netinet/in.h>
@@ -92,7 +93,7 @@ RTMPServer::handShakeWait()
 // 	secret = _handler->merge(buf->reference());
 //     }
 
-    if (buf->size() >= RTMP_BODY_SIZE) {
+    if (buf->size() >= static_cast<size_t>(RTMP_BODY_SIZE)) {
 	_handshake = new amf::Buffer(RTMP_BODY_SIZE);
 	_handshake->copy(buf->reference() + 1, RTMP_BODY_SIZE);
 	log_debug (_("Handshake Data matched"));
@@ -149,7 +150,7 @@ RTMPServer::serverFinish()
     // The first data packet is often buried in with the end of the handshake.
     // So after the handshake block, we strip that part off, and just pass on
     // the remainder for processing.
-    if (buf->size() > RTMP_BODY_SIZE) {
+    if (buf->size() >= static_cast<size_t>(RTMP_BODY_SIZE)) {
 	size_t size = buf->size() - RTMP_BODY_SIZE;  
 	obj = new amf::Buffer[size];
 	obj->copy(buf->begin()+RTMP_BODY_SIZE, size);
@@ -184,8 +185,6 @@ RTMPServer::packetRead(amf::Buffer *buf)
 {
     GNASH_REPORT_FUNCTION;
 
-    int ret;
-    int packetsize = 0;
     unsigned int amf_index, headersize;
     Network::byte_t *ptr = buf->reference();
     AMF amf;
@@ -206,14 +205,14 @@ RTMPServer::packetRead(amf::Buffer *buf)
 //         }
 //     }
 
-#if 1
-    Network::byte_t *end = buf->remove(0xc3);
-#else
-    Network::byte_t *end = buf->find(0xc3);
-    log_debug("END is %x", (void *)end);
-    *end = '*';
-#endif
-    rtmp_head_t *head = decodeHeader(ptr);
+// #if 1
+//     Network::byte_t *end = buf->remove(0xc3);
+// #else
+//     Network::byte_t *end = buf->find(0xc3);
+//     log_debug("END is %x", (void *)end);
+//     *end = '*';
+// #endif
+    decodeHeader(ptr);
     ptr += headersize;
 
     Network::byte_t* tooFar = ptr+300+sizeof(int); // FIXME:
@@ -241,6 +240,9 @@ RTMPServer::packetRead(amf::Buffer *buf)
 	}
     }
 
+    delete el1;
+    delete el2;
+    
 # if 0
     Element el;
     ptr = amf.extractElement(&el, ptr);
@@ -348,107 +350,160 @@ RTMPServer::packetRead(amf::Buffer *buf)
     return true;
 }
 
-#if 0
-// These process the incoming AMF object types from the data stream
+// A result packet looks like this:
+// 
+// 03 00 00 00 00 00 81 14 00 00 00 00 02 00 07 5f   ..............._
+// 72 65 73 75 6c 74 00 3f f0 00 00 00 00 00 00 05   result.?........
+// 03 00 0b 61 70 70 6c 69 63 61 74 69 6f 6e 05 00   ...application..
+// 05 6c 65 76 65 6c 02 00 06 73 74 61 74 75 73 00   .level...status.
+// 0b 64 65 73 63 72 69 70 74 69 6f 6e 02 00 15 43   .description...C
+// 6f 6e 6e 65 63 74 69 6f 6e 20 73 75 63 63 65 65   onnection succee
+// 64 65 64 2e 00 04 63 6f 64 65 02 00 1d 4e 65 74   ded...code...Net
+// 43 6f 6e 6e 65 63 74 69 6f 6e 2e 43 6f 6e 6e 65   Connection.Conne
+// 63 74 2e 53 75 63 63 65 73 73 00 00 c3 09         ct.Success....
+//
+// _result(double ClientStream, NULL, double ServerStream)
+// These are handlers for the various types
 amf::Buffer *
-RTMPServer::encodeChunkSize()
+RTMPServer::encodeResult(RTMPMsg::rtmp_status_e status)
 {
     GNASH_REPORT_FUNCTION;
-}
-void 
-RTMPServer::decodeChunkSize()
-{
-    GNASH_REPORT_FUNCTION;
-}
     
-amf::Buffer *
-RTMPServer::encodeBytesRead()
-{
-    GNASH_REPORT_FUNCTION;
-}
-void 
-RTMPServer::decodeBytesRead()
-{
-    GNASH_REPORT_FUNCTION;
-}
+//    Buffer *buf = new Buffer;
+//     Network::byte_t *ptr = buf->reference();
+//     buf->clear();		// default everything to zeros, real data gets optionally added.
+//    ptr += sizeof(boost::uint16_t); // go past the first short
+//     const char *capabilities = 0;
+//     const char *description = 0;
+//     const char *code = 0;
+//     const char *status = 0;
 
-amf::Buffer *
-RTMPServer::encodeServer()
-{
-    GNASH_REPORT_FUNCTION;
-}
-void
-RTMPServer::decodeServer()
-{
-    GNASH_REPORT_FUNCTION;
-}
+    Element *str = new Element;
+    str->makeString("_result");
+
+    Element *number = new Element;
+    // add The server ID
+    number->makeNumber(1);	// FIXME: needs a real value, which should increment
+
+    Element top;
+    top.makeObject("application");
     
-amf::Buffer *
-RTMPServer::encodeClient()
-{
-    GNASH_REPORT_FUNCTION;
-}
-void 
-RTMPServer::decodeClient()
-{
-    GNASH_REPORT_FUNCTION;
-}
+    switch (status) {
+      case RTMPMsg::APP_GC:
+      case RTMPMsg::APP_RESOURCE_LOWMEMORY:
+      case RTMPMsg::APP_SCRIPT_ERROR:
+      case RTMPMsg::APP_SCRIPT_WARNING:
+      case RTMPMsg::APP_SHUTDOWN:
+      case RTMPMsg::NC_CALL_BADVERSION:
+      case RTMPMsg::NC_CALL_FAILED:
+//	  status = 0;
+//	  code = "NetConnection.Call.Failed";
+      case RTMPMsg::NC_CONNECT_APPSHUTDOWN:
+      case RTMPMsg::NC_CONNECT_CLOSED:
+      case RTMPMsg::NC_CONNECT_FAILED:
+      {
+// 	  errstr = new Element;
+// 	  errstr->makeString("error");
+	  Element *level = new Element;
+	  level->makeString("level", "error");
+	  top.addProperty(level);
+
+	  Element *description = new Element;
+	  description->makeString("description", "Connection Failed.");
+	  top.addProperty(description);
+	  
+	  Element *code = new Element;
+	  code->makeString("code", "Connection.Connect.Failed");
+	  top.addProperty(code);
+      }
+      case RTMPMsg::NC_CONNECT_INVALID_APPLICATION:
+      case RTMPMsg::NC_CONNECT_REJECTED:
+      {
+// 	  delete str;
+// 	  str = new Element;
+// 	  str->makeString("error");
+	  Element *level = new Element;
+	  level->makeString("level", "error");
+	  top.addProperty(level);
+
+	  Element *description = new Element;
+	  description->makeString("description", "Connection Rejected.");
+	  top.addProperty(description);
+	  
+	  Element *code = new Element;
+	  code->makeString("code", "NetConnection.Connect.Rejected");
+	  top.addProperty(code);
+      }
+      case RTMPMsg::NC_CONNECT_SUCCESS:
+      {
+	  Element *level = new Element;
+	  level->makeString("level", "status");
+	  top.addProperty(level);
+
+	  Element *description = new Element;
+	  description->makeString("description", "Connection succeeded.");
+	  top.addProperty(description);
+	  
+	  Element *code = new Element;
+	  code->makeString("code", "NetConnection.Connect.Success");
+	  top.addProperty(code);
+      }
+      break;
+      case RTMPMsg::NS_CLEAR_FAILED:
+      case RTMPMsg::NS_CLEAR_SUCCESS:
+      case RTMPMsg::NS_DATA_START:
+      case RTMPMsg::NS_FAILED:
+      case RTMPMsg::NS_INVALID_ARGUMENT:
+      case RTMPMsg::NS_PAUSE_NOTIFY:
+      case RTMPMsg::NS_PLAY_COMPLETE:
+      case RTMPMsg::NS_PLAY_FAILED:
+      case RTMPMsg::NS_PLAY_FILE_STRUCTURE_INVALID:
+      case RTMPMsg::NS_PLAY_INSUFFICIENT_BW:
+      case RTMPMsg::NS_PLAY_NO_SUPPORTED_TRACK_FOUND:
+      case RTMPMsg::NS_PLAY_PUBLISHNOTIFY:
+      case RTMPMsg::NS_PLAY_RESET:
+      case RTMPMsg::NS_PLAY_START:
+      case RTMPMsg::NS_PLAY_STOP:
+      case RTMPMsg::NS_PLAY_STREAMNOTFOUND:
+      case RTMPMsg::NS_PLAY_SWITCH:
+      case RTMPMsg::NS_PLAY_UNPUBLISHNOTIFY:
+      case RTMPMsg::NS_PUBLISH_BADNAME:
+      case RTMPMsg::NS_PUBLISH_START:
+      case RTMPMsg::NS_RECORD_FAILED:
+      case RTMPMsg::NS_RECORD_NOACCESS:
+      case RTMPMsg::NS_RECORD_START:
+      case RTMPMsg::NS_RECORD_STOP:
+      case RTMPMsg::NS_SEEK_FAILED:
+      case RTMPMsg::NS_SEEK_NOTIFY:
+      case RTMPMsg::NS_UNPAUSE_NOTIFY:
+      case RTMPMsg::NS_UNPUBLISHED_SUCCESS:
+      case RTMPMsg::SO_CREATION_FAILED:
+      case RTMPMsg::SO_NO_READ_ACCESS:
+      case RTMPMsg::SO_NO_WRITE_ACCESS:
+      case RTMPMsg::SO_PERSISTENCE_MISMATCH:
+      default:
+	  break;
+    };
     
-amf::Buffer *
-RTMPServer::encodeAudioData()
-{
-    GNASH_REPORT_FUNCTION;
-}
-void 
-RTMPServer::decodeAudioData()
-{
-    GNASH_REPORT_FUNCTION;
-}
+    Buffer *strbuf = str->encode();
+    Buffer *numbuf = number->encode();
+    Buffer *topbuf = top.encode();
+
+    Buffer *buf = new Buffer(strbuf->size() + numbuf->size() + topbuf->size());
+    buf->append(strbuf);
+    buf->append(numbuf);
+    Network::byte_t byte = static_cast<Network::byte_t>(RTMP::SERVER & 0x000000ff);
+    buf->append(byte);
+    buf->append(topbuf);
+
+    delete str;
+    delete number;
+    delete strbuf;
+    delete numbuf;
+//    delete topbuf;//   FIXME: deleting this shouldn't core dump.
     
-amf::Buffer *
-RTMPServer::encodeVideoData()
-{
-    GNASH_REPORT_FUNCTION;
+    return buf;
 }
-void 
-RTMPServer::decodeVideoData()
-{
-    GNASH_REPORT_FUNCTION;
-}
-    
-amf::Buffer *
-RTMPServer::encodeNotify()
-{
-    GNASH_REPORT_FUNCTION;
-}
-void
-RTMPServer::decodeNotify()
-{
-    GNASH_REPORT_FUNCTION;
-}
-    
-amf::Buffer *
-RTMPServer::encodeSharedObj()
-{
-    GNASH_REPORT_FUNCTION;
-}
-void 
-RTMPServer::decodeSharedObj()
-{
-    GNASH_REPORT_FUNCTION;
-}
-    
-amf::Buffer *
-RTMPServer::encodeInvoke()
-{
-    GNASH_REPORT_FUNCTION;
-}
-void 
-RTMPServer::decodeInvoke()
-{
-    GNASH_REPORT_FUNCTION;
-}
-#endif
 
 // This is the thread for all incoming RTMP connections
 void
@@ -532,7 +587,79 @@ rtmp_handler(Handler::thread_params_t *args)
 
 //	st.dump(); 
     }
-}    
+}
+
+// A Ping packet has two parameters that ae always specified, and 2 that are optional.
+// The first two bytes are the ping type, as in rtmp_ping_e, the second is the ping
+// target, which is always zero as far as we can tell.
+//
+// More notes from: http://jira.red5.org/confluence/display/docs/Ping
+// type 0: Clear the stream. No third and fourth parameters. The second parameter could be 0.
+// After the connection is established, a Ping 0,0 will be sent from server to client. The
+// message will also be sent to client on the start of Play and in response of a Seek or
+// Pause/Resume request. This Ping tells client to re-calibrate the clock with the timestamp
+// of the next packet server sends.
+// type 1: Tell the stream to clear the playing buffer.
+// type 3: Buffer time of the client. The third parameter is the buffer time in millisecond.
+// type 4: Reset a stream. Used together with type 0 in the case of VOD. Often sent before type 0.
+// type 6: Ping the client from server. The second parameter is the current time.
+// type 7: Pong reply from client. The second parameter is the time the server sent with his
+//         ping request.
+
+// A RTMP Ping packet looks like this: "02 00 00 00 00 00 06 04 00 00 00 00 00 00 00 00 00 0",
+// which is the Ping type byte, followed by two shorts that are the parameters. Only the first
+// two paramters are required.
+amf::Buffer *
+RTMPServer::encodePing(rtmp_ping_e type)
+{
+    GNASH_REPORT_FUNCTION;
+    return encodePing(type, 0);
+}
+
+amf::Buffer *
+RTMPServer::encodePing(rtmp_ping_e type, boost::uint32_t milliseconds)
+{
+    GNASH_REPORT_FUNCTION;
+    Buffer *buf = new Buffer(sizeof(boost::uint16_t) * 4);
+    Network::byte_t *ptr = buf->reference();
+    buf->clear();		// default everything to zeros, real data gets optionally added.
+    boost::uint16_t typefield = *reinterpret_cast<boost::uint16_t *>(&type);
+    ptr += sizeof(boost::uint16_t); // go past the first short
+
+//    boost::uint32_t swapped = 0;
+    swapBytes(&typefield, sizeof(boost::uint16_t));
+    buf->copy(typefield);
+    switch (type) {
+        // These two don't appear to have any paramaters
+      case PING_CLEAR:
+      case PING_PLAY:
+	  break;
+	  // the third parameter is the buffer time in milliseconds
+      case PING_TIME:
+      {
+	  ptr += sizeof(boost::uint16_t); // go past the second short
+//	  swapped = htonl(milliseconds);
+	  buf->append(htonl(milliseconds));
+	  break;
+      }
+      // reset doesn't have any parameters
+      case PING_RESET:
+	  break;
+	  // For Ping and Pong, the second parameter is always the milliseconds
+      case PING_CLIENT:
+      case PONG_CLIENT:
+      {
+//	  swapped = htonl(milliseconds);
+	  buf->append(htonl(milliseconds));
+	  break;
+      }
+      default:
+	  return 0;
+	  break;
+    };
+    
+    return buf;
+}
 
 } // end of gnash namespace
 

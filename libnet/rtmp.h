@@ -20,14 +20,14 @@
 
 #include <boost/cstdint.hpp>
 #include <string>
-#include <map>
+#include <vector>
 
 #include "amf.h"
 #include "element.h"
 #include "handler.h"
 #include "network.h"
 #include "buffer.h"
-#include "amfutf8.h"
+#include "rtmp_msg.h"
 
 namespace gnash
 {
@@ -41,6 +41,7 @@ const char RTMP_INDEX_MASK = 0x3f;
 const int  RTMP_VIDEO_PACKET_SIZE = 128;
 const int  RTMP_AUDIO_PACKET_SIZE = 64;
 const int  RTMP_MAX_HEADER_SIZE = 12;
+const int  PING_MSG_SIZE = 6;
 
 // For terminating sequences, a byte with value 0x09 is used.
 const char TERMINATOR = 0x09;
@@ -73,13 +74,21 @@ typedef enum {
 class DSOEXPORT RTMP
 {
 public:
+    typedef enum {
+	RAW=0x0,
+	ADPCM=0x01,
+	MP3=0x02,
+	NELLYMOSER_8khz=0x05,
+	NEYYNOSER=0x6
+    } audiocodecs_e;
+    typedef enum {
+	H263=0x2,
+	SCREEN0x3,
+	VP6=0x4
+    } videocodecs_e;
     // The second byte of the AMF file/stream is appears to be 0x00 if the
     // client is the Flash Player and 0x01 if the client is the FlashCom
     // server.
-    typedef enum {
-	FROM_CLIENT,                     // Flash player
-	FROM_SERVER                      // Flash com server
-    } rtmp_source_e;
     typedef enum {
         NONE = 0x0,
         CHUNK_SIZE = 0x1,
@@ -119,9 +128,10 @@ public:
     } rtmp_ping_e;
     typedef struct {
 	rtmp_ping_e type;	// the type of the ping message
-	boost::uint16_t target;
-	boost::uint16_t param1;
+	boost::uint16_t target; // all Ping message data fields
+	boost::uint16_t param1; // are 2 bytes long
 	boost::uint16_t param2;
+	boost::uint16_t param3;
     } rtmp_ping_t;
     typedef enum {
         RTMP_STATE_HANDSHAKE_SEND,
@@ -133,6 +143,12 @@ public:
         RTMP_STATE_HEADER,
         RTMP_STATE_DONE
     } rtmp_state_t;
+//     typedef struct {
+// 	rtmp_status_e status;
+// 	std::string   method;
+// 	double        streamid;
+// 	std::vector<amf::Element *> objs;
+//     } rtmp_msg_t;
     typedef enum {
         RTMP_ERR_UNDEF=0,
         RTMP_ERR_NOTFOUND,
@@ -156,7 +172,7 @@ public:
 	int             channel;
 	int             head_size;
 	int             bodysize;
-	rtmp_source_e   src_dest;
+	RTMPMsg::rtmp_source_e   src_dest;
 	content_types_e type;
     } rtmp_head_t;
     typedef enum {
@@ -172,25 +188,23 @@ public:
 // * UTF String - Response
 // * Long - Body length in bytes
 // * Variable - Actual data (including a type code)
-    typedef struct {
-        amf::amfutf8_t target;
-        amf::amfutf8_t response;
-	boost::uint32_t length;
-        void *data;
-    } rtmp_body_t;
+//     typedef struct {
+//         amf::amfutf8_t target;
+//         amf::amfutf8_t response;
+// 	boost::uint32_t length;
+//         void *data;
+//     } rtmp_body_t;
     
     RTMP();
-    ~RTMP();
+    virtual ~RTMP();
 
     // Decode
     rtmp_head_t *decodeHeader(gnash::Network::byte_t *header);
     rtmp_head_t *decodeHeader(amf::Buffer *data);
     amf::Buffer *encodeHeader(int amf_index, rtmp_headersize_e head_size,
-			      size_t total_size, content_types_e type, rtmp_source_e routing);
+			      size_t total_size, content_types_e type, RTMPMsg::rtmp_source_e routing);
+    amf::Buffer *encodeHeader(int amf_index, rtmp_headersize_e head_size);
     
-    bool handShakeRequest();
-    bool clientFinish();
-    bool packetRequest();
     bool packetSend(amf::Buffer *buf);
     bool packetRead(amf::Buffer *buf);
 
@@ -204,22 +218,24 @@ public:
     rtmp_head_t *getHeader()    { return &_header; };
     int getHeaderSize()         { return _header.head_size; }; 
     int getTotalSize()          { return _header.bodysize; }; 
-    rtmp_source_e getRouting()  { return _header.src_dest; };
+    RTMPMsg::rtmp_source_e getRouting()  { return _header.src_dest; };
     int getChannel()            { return _header.channel; };
     int getPacketSize()         { return _packet_size; };
     int getMysteryWord()        { return _mystery_word; };
 
+    // Decode the an RTMP message
+    RTMPMsg *decodeMsgBody(Network::byte_t *data, size_t size);
+    RTMPMsg *decodeMsgBody(amf::Buffer *buf);
+    
+    virtual rtmp_ping_t *decodePing(Network::byte_t *data);
+    rtmp_ping_t *decodePing(amf::Buffer *buf);
+    
     // These are handlers for the various types
     virtual amf::Buffer *encodeChunkSize();
     virtual void decodeChunkSize();
     
     virtual amf::Buffer *encodeBytesRead();
     virtual void decodeBytesRead();
-    
-    virtual amf::Buffer *encodePing(rtmp_ping_e type, boost::uint16_t milliseconds);
-    virtual rtmp_ping_t *decodePing(Network::byte_t *data);
-    rtmp_ping_t *decodePing(amf::Buffer *buf);
-    
     virtual amf::Buffer *encodeServer();
     virtual void decodeServer();
     

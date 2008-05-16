@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,15 +15,17 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef _RTMP_SERVER_H_
-#define _RTMP_SERVER_H_ 1
+#ifndef _RTMP_CLIENT_H_
+#define _RTMP_CLIENT_H_ 1
 
 #include <boost/cstdint.hpp>
 #include <string>
 #include <map>
+#include <time.h>
 
 #include "rtmp.h"
 #include "amf.h"
+#include "element.h"
 #include "handler.h"
 #include "network.h"
 #include "buffer.h"
@@ -31,31 +33,37 @@
 namespace gnash
 {
 
-class DSOEXPORT RTMPServer : public RTMP
+class DSOEXPORT RTMPClient : public RTMP
 {
 public:
-    RTMPServer();
-    ~RTMPServer();
+    RTMPClient();
+    ~RTMPClient();
+
     bool handShakeWait();
     bool handShakeResponse();
-    bool serverFinish();
-    bool packetSend(amf::Buffer *buf);
-    bool packetRead(amf::Buffer *buf);
+    bool clientFinish();
+    bool handShakeRequest();
     
-    // These are handlers for the various types
-    amf::Buffer *encodeResult(RTMPMsg::rtmp_status_e status);
-    amf::Buffer *encodePing(rtmp_ping_e type, boost::uint32_t milliseconds);
-    amf::Buffer *encodePing(rtmp_ping_e type);
+    // These are used for creating the primary objects
+    // Create the initial object sent to the server, which is NetConnection::connect()
+    amf::Buffer *encodeConnect(const char *app, const char *swfUrl, const char *tcUrl,
+			       double audioCodecs, double videoCodecs, double videoFunction,
+			       const char *pageUrl);
+    // Create the second object sent to the server, which is NetStream():;NetStream()
+    amf::Buffer *encodeStream(double id);
+
+    amf::Buffer *encodePublish();
     
     void dump();
   private:
+    double _connections;
 };
 
 // This is the thread for all incoming RTMP connections
 void rtmp_handler(Handler::thread_params_t *args);
 
 } // end of gnash namespace
-// end of _RTMP_SERVER_H_
+// end of _RTMP_CLIENT_H_
 #endif
 
 // local Variables:

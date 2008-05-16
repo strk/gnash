@@ -1,3 +1,23 @@
+2008-05-15  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* libamf/amf.cpp: Trap the new AMF3 type. Decode objects
+	correctly. 
+	* libamf.buffer.{h,cpp}: Resize to hold the data up to the current
+	seek pointer if no argument.
+	* libamf/element.cpp: Trap the switch from AMF0 to AMF3. Dump
+	properties too.
+	* libamf/sol.cpp: Properties in a SOL file have a zero byte
+	terminator after each one.
+	* libnet/Makefile.am: Add new files, rtmp_msg.* and rtmp_client.*.
+	* libnet/rtmp_client.{g,cpp}: Client side support for RTMP.
+	* libnet/rtmp_msg.{g,cpp}: Represent an RTMP packet, inckuding the
+	header. 
+	* libnet/http.cpp: Cleanup warnings.
+	* libnet/rtmp.cpp: Move client side methods to new RTMPClient
+	class and other to RTMPMsg. Decode result messages from media
+	server. Cleanup warnings.
+	* libnet/rtmp_server.cpp: Build result messages for client.
+
 2008-05-15 Sandro Santilli <strk@keybit.net>
 
 	* server/parser/movie_def_impl.cpp (readHeader): limit FPS to a max of
