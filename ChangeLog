@@ -1,3 +1,7 @@
+2008-05-16 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* server/cxform.cpp: use read_u8() instead of read_bit(), parser optimize.
+	
 2008-05-16 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/asobj/Global.cpp: handle versions higher than SWF9.

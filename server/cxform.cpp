@@ -88,12 +88,18 @@ void	cxform::read_rgb(stream& in)
 	in.align();
 
 	in.ensureBits(6);
-	bool	has_add = in.read_bit();
-	bool	has_mult = in.read_bit();
-	int	nbits = in.read_uint(4);
+    int  field =  in.read_uint(6);
+	bool has_add  =  field & (1 << 5);
+	bool has_mult =  field & (1 << 4);
+	int	 nbits = field & 0x0f;
 
 	int reads = has_mult + has_add; // 0, 1 or 2
-	if ( reads ) in.ensureBits(nbits*reads*3);
+	if ( reads ) {
+        in.ensureBits(nbits*reads*3);
+    }
+    else {
+        return;
+    }
 
 	if (has_mult) {
 		m_[0][0] = in.read_sint(nbits) / 255.0f;
