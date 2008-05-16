@@ -4107,6 +4107,32 @@ sprite_instance::set_background_color(const rgba& color)
   _vm.getRoot().set_background_color(color);
 }
 
+static bool isTextFieldUnloaded(boost::intrusive_ptr< edit_text_character >& p)
+{
+	return p->isUnloaded();
+}
+
+/*private*/
+void
+sprite_instance::cleanup_textfield_variables()
+{
+  // nothing to do
+  if ( ! _text_variables.get() ) return;
+
+  TextFieldMap& m = *_text_variables;
+
+  for (TextFieldMap::iterator i=m.begin(), ie=m.end(); i!=ie; ++i)
+  {
+    TextFieldPtrVect& v=i->second;
+    TextFieldPtrVect::iterator lastValid = std::remove_if(v.begin(), v.end(), boost::bind(isTextFieldUnloaded, _1));
+    v.erase(lastValid, v.end());
+    // TODO: remove the map element if vector is empty
+    //if ( v.empty() )
+    //{
+    //}
+  }
+}
+
 
 /* public */
 void
@@ -4713,7 +4739,9 @@ void
 sprite_instance::cleanupDisplayList()
 {
         //log_debug("%s.cleanDisplayList() called, current dlist is %p", getTarget(), (void*)&m_display_list);
-  m_display_list.removeUnloaded();
+	m_display_list.removeUnloaded();
+
+        cleanup_textfield_variables();
 }
 
 #ifdef GNASH_USE_GC
@@ -4749,6 +4777,19 @@ sprite_instance::markReachableResources() const
       const TextFieldPtrVect& tfs=i->second;
       for (TextFieldPtrVect::const_iterator j=tfs.begin(), je=tfs.end(); j!=je; ++j)
       {
+        if ( (*j)->isUnloaded() )
+	{
+          // NOTE: cleanup_display_list should have cleared these up on ::cleanupDisplayList.
+          //       I guess if we get more might be due to ::destroy calls happening after
+          //       our own ::cleanupDisplayList call. Should be ok to postpone cleanup
+          //       on next ::advance, or we should cleanup here (locally) altought we're
+          //       a 'const' method...
+          //       Yet another approach would be for TextField::unload to unregister
+          //       self from our map, but TextField (edit_text_character) doesn't really
+          //       store a pointer to the sprite it's registered against.
+          //
+          log_debug("Unloaded TextField in registered textfield variables container on ::markReachableResources");
+	}
         (*j)->setReachable();
       }
     }

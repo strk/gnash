@@ -958,6 +958,9 @@ private:
 	///
 	TextFieldPtrVect* get_textfield_variable(const std::string& name);
 
+	/// Unregister textfield variables bound to unloaded TextFields
+	void cleanup_textfield_variables();
+
 	/// soundid for current playing stream. If no stream set to -1
 	int m_sound_stream_id;
 
