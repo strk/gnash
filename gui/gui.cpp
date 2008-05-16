@@ -888,7 +888,7 @@ Gui::start()
     mr->setVariables(_flashVars);
 
     _stage->setRootMovie( mr.release() ); // will construct the instance
-    _stage->set_display_viewport(0, 0, _width, _height);
+    resize_view(_width, _height); // to properly update stageMatrix if scaling is given 
 
     bool background = true; // ??
     _stage->set_background_alpha(background ? 1.0f : 0.05f);

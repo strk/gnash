@@ -1,5 +1,11 @@
 2008-05-16 Sandro Santilli <strk@keybit.net>
 
+	* gui/gui.cpp (start): call resize_view rather then setting display
+	  viewport directly. This should ensure stage matrix is properly
+	  updated when -s or -j/-k are given.
+
+2008-05-16 Sandro Santilli <strk@keybit.net>
+
 	* libmedia/ffmpeg/sound_handler_sdl.{cpp,h}: fix memory leak in
 	  stop_all_sounds too..
 
