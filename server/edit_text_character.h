@@ -392,6 +392,11 @@ public:
 
 	void setUnderlined(bool v);
 
+	const geometry::Range2d<float>& getTextBoundingBox() const
+	{
+		return m_text_bounding_box;
+	}
+
 private:
 
 	/// Set our text to the given string.

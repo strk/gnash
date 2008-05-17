@@ -94,6 +94,8 @@ static as_value textfield_wordWrap_getset(const fn_call& fn);
 static as_value textfield_html_getset(const fn_call& fn);
 static as_value textfield_selectable_getset(const fn_call& fn);
 static as_value textfield_length_getset(const fn_call& fn);
+static as_value textfield_textWidth_getset(const fn_call& fn);
+static as_value textfield_textHeight_getset(const fn_call& fn);
 
 
 //
@@ -365,6 +367,8 @@ attachTextFieldInterface(as_object& o)
 	o.init_property(NSV::PROP_uYMOUSE, character::ymouse_get, character::ymouse_get, propFlags);
 	o.init_property(NSV::PROP_uXSCALE, character::xscale_getset, character::xscale_getset);
 	o.init_property(NSV::PROP_uYSCALE, character::yscale_getset, character::yscale_getset);
+	o.init_property(NSV::PROP_TEXT_WIDTH, textfield_textWidth_getset, textfield_textWidth_getset);
+	o.init_property(NSV::PROP_TEXT_HEIGHT, textfield_textHeight_getset, textfield_textHeight_getset);
 
 
 	// SWF5 or higher (TODO: check textfields in SWF5 !!! we miss tests here !)
@@ -1149,18 +1153,6 @@ edit_text_character::get_member(string_table::key name, as_value* val,
 #ifdef GNASH_DEBUG_TEXTFIELDS
 		log_debug("Got TextField height == %s", val->to_debug_string());
 #endif // GNASH_DEBUG_TEXTFIELDS
-		return true;
-	}
-	case NSV::PROP_TEXT_WIDTH:
-		//else if (name == "textWidth")
-	{
-		// Return the width, in pixels, of the text as laid out.
-		// (I.e. the actual text content, not our defined
-		// bounding box.)
-		//
-		// In local coords.  Verified against Macromedia Flash.
-		val->set_double(TWIPS_TO_PIXELS(m_text_bounding_box.width()));
-
 		return true;
 	}
 	}	// end switch
@@ -2273,6 +2265,56 @@ textfield_length_getset(const fn_call& fn)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("Attempt to set length property of TextField %s"), ptr->getTarget());
+		);
+	}
+
+	return as_value();
+}
+
+static as_value
+textfield_textHeight_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<edit_text_character> ptr = ensureType<edit_text_character>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		// Return the height, in pixels, of the text as laid out.
+		// (I.e. the actual text content, not our defined
+		// bounding box.)
+		//
+		// In local coords.  Verified against Macromedia Flash.
+		return as_value(TWIPS_TO_PIXELS(ptr->getTextBoundingBox().height()));
+
+	}
+	else // setter
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("Attempt to set read-only %s property of TextField %s"), "textHeight", ptr->getTarget());
+		);
+	}
+
+	return as_value();
+}
+
+static as_value
+textfield_textWidth_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<edit_text_character> ptr = ensureType<edit_text_character>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		// Return the width, in pixels, of the text as laid out.
+		// (I.e. the actual text content, not our defined
+		// bounding box.)
+		//
+		// In local coords.  Verified against Macromedia Flash.
+		return as_value(TWIPS_TO_PIXELS(ptr->getTextBoundingBox().width()));
+
+	}
+	else // setter
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("Attempt to set read-only %s property of TextField %s"), "textWidth", ptr->getTarget());
 		);
 	}
 

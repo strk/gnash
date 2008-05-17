@@ -119,6 +119,7 @@ static string_table::svt preload_names[] =
 	string_table::svt( "text", NSV::PROP_TEXT ),
 	string_table::svt( "textColor", NSV::PROP_TEXT_COLOR ),
 	string_table::svt( "textWidth", NSV::PROP_TEXT_WIDTH ),
+	string_table::svt( "textHeight", NSV::PROP_TEXT_HEIGHT ),
 	string_table::svt( "toString", NSV::PROP_TO_STRING ),
 	string_table::svt( "_totalframes", NSV::PROP_uTOTALFRAMES ),
 	string_table::svt( "underline", NSV::PROP_UNDERLINE ),

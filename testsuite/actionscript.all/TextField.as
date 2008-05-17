@@ -20,7 +20,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: TextField.as,v 1.54 2008/04/29 17:22:43 strk Exp $";
+rcsid="$Id: TextField.as,v 1.55 2008/05/17 15:48:13 strk Exp $";
 #include "check.as"
 
 #if OUTPUT_VERSION > 5
@@ -69,8 +69,8 @@ check( !TextField.prototype.hasOwnProperty('scroll') );
 xcheck( !TextField.prototype.hasOwnProperty('selectable') );
 check( !TextField.prototype.hasOwnProperty('text') );
 xcheck( !TextField.prototype.hasOwnProperty('textColor') );
-check( !TextField.prototype.hasOwnProperty('textHeight') );
-check( !TextField.prototype.hasOwnProperty('textWidth') );
+xcheck( !TextField.prototype.hasOwnProperty('textHeight') ); // should be available on first instantiation
+xcheck( !TextField.prototype.hasOwnProperty('textWidth') ); // should be available on first instantiation
 xcheck( !TextField.prototype.hasOwnProperty('type') ); // should be available on first instantiation
 xcheck( !TextField.prototype.hasOwnProperty('variable') );
 xcheck( !TextField.prototype.hasOwnProperty('wordWrap') );
@@ -144,8 +144,8 @@ xcheck( TextField.prototype.hasOwnProperty('scroll') );
 check( TextField.prototype.hasOwnProperty('selectable') );
 xcheck( TextField.prototype.hasOwnProperty('text') );
 check( TextField.prototype.hasOwnProperty('textColor') );
-xcheck( TextField.prototype.hasOwnProperty('textHeight') );
-xcheck( TextField.prototype.hasOwnProperty('textWidth') );
+check( TextField.prototype.hasOwnProperty('textHeight') );
+check( TextField.prototype.hasOwnProperty('textWidth') );
 check( TextField.prototype.hasOwnProperty('type') );
 check( TextField.prototype.hasOwnProperty('variable') );
 check( TextField.prototype.hasOwnProperty('wordWrap') );
@@ -531,11 +531,11 @@ check_equals(tf.textColor, 0xFF0000);
 
 // Check TextField.textHeight (height of the bounding box)
 
-xcheck_equals(typeof(tf.textHeight), 'number');
+check_equals(typeof(tf.textHeight), 'number');
 check( ! tf.hasOwnProperty('textHeight') ); 
 currentHeight = tf.textHeight; // WARNING: this might depend on the default font height
 tf.textHeight = 1000;
-xcheck_equals(tf.textHeight, currentHeight); // was read-only (I think)
+check_equals(tf.textHeight, currentHeight); // was read-only (I think)
 
 // Check TextField.textWidth (width of the bounding box)
 

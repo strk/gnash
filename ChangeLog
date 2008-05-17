@@ -1,3 +1,10 @@
+2008-05-17 Sandro Santilli <strk@keybit.net>
+
+	* server/namedStrings.{cpp,h}: add PROP_TEXT_HEIGHT.
+	* server/edit_text_character.{cpp,h}: implement missing textHeight,
+	  turn textWidth into a proper property.
+	* testsuite/actionscript.all/TextField.as: updated expected results.
+
 2008-05-17 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/asobj/NetStreamGst.cpp: replace rint with std::floor.
