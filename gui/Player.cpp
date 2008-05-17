@@ -317,8 +317,14 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
         return EXIT_FAILURE;
     }
 
-        // Parse querystring (before FlashVars, see testsuite/misc-ming.all/FlashVarsTest*)
+    // Parse querystring (before FlashVars, see testsuite/misc-ming.all/FlashVarsTest*)
     setFlashVars(URL(_url).querystring());
+
+    // These flags are here so we can construct
+    // the correct URL for base url later.
+    // If the URL class was not immutable we could do something smarter...
+    bool hasOverriddenBaseUrl;
+    std::string overriddenBaseUrl;
 
     // Parse parameters
     StringNoCaseEqual noCaseCompare;
@@ -331,15 +337,17 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
             continue;
         }
 
-            if ( noCaseCompare(it->first, "base") )
+        if ( noCaseCompare(it->first, "base") )
         {
-            setBaseUrl(it->second);
+            hasOverriddenBaseUrl=true;
+            overriddenBaseUrl=it->second;
             continue;
         }
     }
 
     // Set base url for this movie (needed before parsing)
-    gnash::set_base_url(URL(_baseurl));
+    if ( hasOverriddenBaseUrl ) gnash::set_base_url(URL(overriddenBaseUrl, URL(_baseurl)));
+    else gnash::set_base_url(URL(_baseurl));
 
     // Load the actual movie.
     _movieDef = load_movie();
