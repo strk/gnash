@@ -44,7 +44,7 @@
 #include <cstdio>
 #include <string>
 #include <memory> // for auto_ptr
-#include <cmath> // for ceil and exp2
+#include <cmath> // for ceil and (possibly) exp2
 #include <iostream>
 
 #define SHOW_INVALIDATED_BOUNDS_ON_ADVANCE 1

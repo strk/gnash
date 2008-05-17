@@ -21,6 +21,10 @@
 #ifndef _GNASH_MOVIETESTER_H
 #define _GNASH_MOVIETESTER_H
 
+#ifdef HAVE_CONFIG_H
+# include "gnashconfig.h" // For exp2 test
+#endif
+
 #include "Range2d.h"
 #include "gnash.h" // for namespace key
 #include "sound_handler.h" // for creating the "test" sound handlers
@@ -32,6 +36,7 @@
 #include <memory> // for auto_ptr
 #include <string> 
 #include <boost/shared_ptr.hpp>
+#include <cmath>
 
 #define check_pixel(x, y, radius, color, tolerance) \
 	{\
@@ -342,6 +347,12 @@ private:
 	ManualClock _clock;
 	//std::auto_ptr<VirtualClock> _clock;
 };
+
+// exp2 isn't part of standard C++, so is defined here in case the compiler
+// doesn't supply it (e.g. in BSD)
+#ifndef HAVE_EXP2
+inline double	exp2(double x) { return std::pow((double)2, double(x)); }
+#endif
 
 } // namespace gnash
 

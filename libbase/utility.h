@@ -117,21 +117,7 @@ inline float	fclamp(float f, float xmin, float xmax) {
 
 inline float flerp(float a, float b, float f) { return (b - a) * f + a; }
 
-//This is from C99.
-const float LN_2 = 0.693147180559945f;
-// the overridden log(f) will use logf IFF f is a float
-#ifndef HAVE_LOG2
-inline double	log2(double f) { return std::log(f) / LN_2; }
-#endif
-//exp2 might be missing on Net-/OpenBSD.
-#ifndef HAVE_EXP2
-inline double	exp2(double x) { return std::pow((double)2, double(x)); }
-#endif
 inline int	frnd(float f) { return (int)(f + 0.5f); }	// replace with inline asm if desired
-#ifndef HAVE_TRUNC
-inline double trunc(double x) { return (x < 0 ?  -(std::floor(-x)) : std::floor(x)); }
-#endif
-
 
 /// \brief
 /// Return the smallest multiple of given base greater or equal
