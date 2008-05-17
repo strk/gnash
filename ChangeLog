@@ -1,5 +1,11 @@
 2008-05-17 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* server/asobj/NetStreamGst.cpp: replace rint with std::floor.
+	* server/asobj/flash/geom/Point_as.cpp: drop code after return,
+	  fix compile warning.
+
+2008-05-17 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* libbase/utility.h: add inline bool utility::isFinite() to replace
 	  use of non-portable and non-standard isfinite in the code. Drop
 	  define of isfinite. Moved infinite_to_fzero under gnash::utility

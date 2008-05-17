@@ -24,6 +24,7 @@
 #include "VM.h" 
 #include "string_table.h"
 #include <boost/algorithm/string/case_conv.hpp> // for PROPNAME (shouldn't this include be in the header actualy defining PROPNAME, btw?)
+#include <cmath> // std::floor
 
 #include "Object.h"
 #include "gstflvdemux.h"
@@ -495,7 +496,7 @@ metadata(const GstTagList *list, const gchar *tag, gpointer user_data)
       {
          // duration is given in nanoseconds, we want that in seconds,
          // and rounded to the millisecond 
-         val.set_double(rint(value/1000000.0)/1000.0);
+         val.set_double(std::floor(value/1000000.0)/1000.0 + 0.5);
       }
       else
       {

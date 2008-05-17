@@ -17,10 +17,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "Point_as.h"
 #include "as_object.h" // for inheritance
 #include "log.h"
@@ -207,12 +203,6 @@ Point_length_getset(const fn_call& fn)
 		log_aserror(_("Attempt to set read-only property %s"), "Point.length");
 		);
 		return as_value();
-		as_value y;
-		ptr->get_member(NSV::PROP_Y, &y);
-
-		as_value bottom = fn.arg(0);
-		as_value newh = bottom.subtract(y);
-		ptr->set_member(NSV::PROP_HEIGHT, newh);
 	}
 }
 
