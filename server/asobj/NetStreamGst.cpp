@@ -496,7 +496,7 @@ metadata(const GstTagList *list, const gchar *tag, gpointer user_data)
       {
          // duration is given in nanoseconds, we want that in seconds,
          // and rounded to the millisecond 
-         val.set_double(std::floor(value/1000000.0)/1000.0 + 0.5);
+         val.set_double(std::floor( (value / 1000000.0) + 0.5) / 1000.0);
       }
       else
       {

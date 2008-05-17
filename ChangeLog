@@ -1,3 +1,8 @@
+2008-05-17 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/asobj/NetStreamGst.cpp: replace rint with std::floor
+	  properly.
+
 2008-05-17 Sandro Santilli <strk@keybit.net>
 
 	* server/namedStrings.{cpp,h}: add PROP_TEXT_HEIGHT.
