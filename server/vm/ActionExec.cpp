@@ -585,7 +585,7 @@ ActionExec::setLocalVariable(const std::string& name, const as_value& val)
 	} else {
 	    // TODO: set target member  ?
 	    //       what about 'with' stack ?
-	    env.set_variable(PROPNAME(name), val);
+	    env.set_variable(PROPNAME(name), val, getScopeStack());
 	}
 }
 

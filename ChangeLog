@@ -1,3 +1,9 @@
+2008-05-17 Sandro Santilli <strk@keybit.net>
+
+	* server/vm/ActionExec.cpp (setLocalVariable): use scope stack
+	  when out of a function context (as comment suggested).
+	* testsuite/swfdec/PASSING: definelocal-scope.as in all versions.
+
 2008-05-17 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/asobj/NetStreamGst.cpp: replace rint with std::floor

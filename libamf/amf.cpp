@@ -814,7 +814,7 @@ AMF::extractProperty(Network::byte_t *in, Network::byte_t* tooFar)
     
     // name is just debugging help to print cleaner, and should be removed later
     log_debug(_("AMF property name length is: %d"), length);
-    const char *name = strndup(reinterpret_cast<const char *>(tmpptr), length);
+    std::string name(reinterpret_cast<const char *>(tmpptr), length);
     log_debug(_("AMF property name is: %s"), name);
 
     Element *el = 0;
@@ -823,7 +823,7 @@ AMF::extractProperty(Network::byte_t *in, Network::byte_t* tooFar)
     if (*(tmpptr+length) == Element::NULL_AMF0) {
 	log_debug("No data associated with Property \"%s\"", name);
 	el = new Element;
-	el->setName(name, length);
+	el->setName(name.c_str(), length);
 	tmpptr += length + 1;
 	// Calculate the offset for the next read
     } else {
@@ -833,12 +833,12 @@ AMF::extractProperty(Network::byte_t *in, Network::byte_t* tooFar)
 	tmpptr += length;
 	el = extractAMF(tmpptr, tooFar);
 	if (el) {
-	    el->setName(name, length);
+	    el->setName(name.c_str(), length);
 	    tmpptr += totalsize();
 	}
     }
 
-    delete name;
+    //delete name;
     
     // Calculate the offset for the next read
     _totalsize = (tmpptr - in);
