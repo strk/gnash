@@ -29,11 +29,9 @@
 
 #include "check.h"
 
-using namespace gnash;
+#include "utility.h"
 
-#ifndef isfinite
-# define isfinite std::isfinite
-#endif
+using namespace gnash;
 
 int
 main(int /*argc*/, char** /*argv*/)
@@ -47,21 +45,21 @@ main(int /*argc*/, char** /*argv*/)
 	num /= 9999999;
 
 	check(!isnan(num));
-        check(isfinite(num));
+        check(utility::isFinite(num));
 
 	num = std::numeric_limits<float>::quiet_NaN();
 
 	check(isnan(num));
-	check(!isfinite(num));
+	check(!utility::isFinite(num));
 
 	num = std::numeric_limits<float>::infinity();
 	
 	check(!isnan(num));
-	check(!isfinite(num));
+	check(!utility::isFinite(num));
 
 	num = 1.0 / 0.0;
 
-	check(!isfinite(num));
+	check(!utility::isFinite(num));
 	check(!isnan(num));
 
 	int intgr = num;
@@ -69,7 +67,7 @@ main(int /*argc*/, char** /*argv*/)
 	num = intgr;
 
 	check(!isnan(num));
-	check(isfinite(num));
+	check(utility::isFinite(num));
 
 }
 

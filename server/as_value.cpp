@@ -30,7 +30,7 @@
 #include "Number.h" // for automatic as_value::NUMBER => Number as object
 #include "Boolean.h" // for automatic as_value::BOOLEAN => Boolean as object
 #include "action.h" // for call_method0
-#include "utility.h" // for typeName()
+#include "utility.h" // for typeName() and utility::isFinite
 #include "namedStrings.h"
 
 #include <cmath>
@@ -633,7 +633,7 @@ as_value::to_int() const
 {
 	double d = to_number();
 
-	if ( ! isfinite(d) ) return 0;
+	if ( ! utility::isFinite(d) ) return 0;
 
 	boost::int32_t i = 0;
 
@@ -724,7 +724,7 @@ as_value::to_bool_v6() const
 		case NUMBER:
 		{
 			double d = getNum();
-			return isfinite(d) && d;
+			return utility::isFinite(d) && d;
 		}
 		case BOOLEAN:
 			return getBool();
@@ -983,7 +983,7 @@ as_value::equals(const as_value& v) const
     if (m_type == NUMBER && v.m_type == STRING)
     {
 	double n = v.to_number();
-	if ( ! isfinite(n) ) return false;
+	if ( ! utility::isFinite(n) ) return false;
         return equalsSameType(n);
     }
 
@@ -992,7 +992,7 @@ as_value::equals(const as_value& v) const
     if (v.m_type == NUMBER && m_type == STRING)
     {
 	double n = to_number();
-	if ( ! isfinite(n) ) return false;
+	if ( ! utility::isFinite(n) ) return false;
         return v.equalsSameType(n); 
     }
 

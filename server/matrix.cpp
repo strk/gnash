@@ -30,15 +30,7 @@
 #include "types.h" // for TWIPS_TO_PIXEL define
                    // (should probably not use it though)
 #include "log.h"
-#include "utility.h" // for infinite_to_fzero
-
-#ifndef HAVE_ISFINITE
-# ifndef isfinite 
-#  define isfinite finite
-# endif 
-#endif 
-
-using namespace std;
+#include "utility.h" // for utility::infinite_to_fzero, utility::isFinite
 
 namespace gnash {
 
@@ -54,12 +46,12 @@ matrix::matrix()
 bool
 matrix::is_valid() const
 {
-	return isfinite(m_[0][0])
-		&& isfinite(m_[0][1])
-		&& isfinite(m_[0][2])
-		&& isfinite(m_[1][0])
-		&& isfinite(m_[1][1])
-		&& isfinite(m_[1][2]);
+	return utility::isFinite(m_[0][0])
+		&& utility::isFinite(m_[0][1])
+		&& utility::isFinite(m_[0][2])
+		&& utility::isFinite(m_[1][0])
+		&& utility::isFinite(m_[1][1])
+		&& utility::isFinite(m_[1][2]);
 }
 
 
@@ -111,8 +103,8 @@ matrix::concatenate_translation(float tx, float ty)
 // matrix.  When transforming points, the translation
 // happens first, then our original xform.
 {
-	m_[0][2] += infinite_to_fzero(m_[0][0] * tx + m_[0][1] * ty);
-	m_[1][2] += infinite_to_fzero(m_[1][0] * tx + m_[1][1] * ty);
+	m_[0][2] += utility::infinite_to_fzero(m_[0][0] * tx + m_[0][1] * ty);
+	m_[1][2] += utility::infinite_to_fzero(m_[1][0] * tx + m_[1][1] * ty);
 }
 
 
@@ -122,10 +114,10 @@ matrix::concatenate_scale(float scale)
 // matrix.  When transforming points, the scale
 // happens first, then our original xform.
 {
-	m_[0][0] *= infinite_to_fzero(scale);
-	m_[0][1] *= infinite_to_fzero(scale);
-	m_[1][0] *= infinite_to_fzero(scale);
-	m_[1][1] *= infinite_to_fzero(scale);
+	m_[0][0] *= utility::infinite_to_fzero(scale);
+	m_[0][1] *= utility::infinite_to_fzero(scale);
+	m_[1][0] *= utility::infinite_to_fzero(scale);
+	m_[1][1] *= utility::infinite_to_fzero(scale);
 }
 
 void	
@@ -137,10 +129,10 @@ matrix::concatenate_scales(float x, float y)
 
 #if 0 // the code below only works when x and y scales are equal,
       // see testsuite/server/MatrixTest.cpp
-	m_[0][0] *= infinite_to_fzero(x);
-	m_[0][1] *= infinite_to_fzero(x);
-	m_[1][0] *= infinite_to_fzero(y);
-	m_[1][1] *= infinite_to_fzero(y);
+	m_[0][0] *= utility::infinite_to_fzero(x);
+	m_[0][1] *= utility::infinite_to_fzero(x);
+	m_[1][0] *= utility::infinite_to_fzero(y);
+	m_[1][1] *= utility::infinite_to_fzero(y);
 #endif
 }
 
@@ -164,10 +156,10 @@ matrix::set_scale_rotation(float x_scale, float y_scale, float angle)
 {
 	float	cos_angle = cosf(angle);
 	float	sin_angle = sinf(angle);
-	m_[0][0] = infinite_to_fzero(x_scale * cos_angle);
-	m_[0][1] = infinite_to_fzero(y_scale * -sin_angle);
-	m_[1][0] = infinite_to_fzero(x_scale * sin_angle);
-	m_[1][1] = infinite_to_fzero(y_scale * cos_angle);
+	m_[0][0] = utility::infinite_to_fzero(x_scale * cos_angle);
+	m_[0][1] = utility::infinite_to_fzero(y_scale * -sin_angle);
+	m_[1][0] = utility::infinite_to_fzero(x_scale * sin_angle);
+	m_[1][1] = utility::infinite_to_fzero(y_scale * cos_angle);
 }
 
 void

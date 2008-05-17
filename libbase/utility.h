@@ -86,17 +86,31 @@ void	operator delete[](void* ptr);
 #define M_PI 3.141592654
 #endif // M_PI
 
-#ifndef HAVE_ISFINITE
-# ifndef isfinite 
-#  define isfinite finite
-# endif 
-#endif 
+namespace gnash {
+namespace utility {
 
+inline bool isFinite(double d)
+{
+#ifndef isfinite
+    return (finite(d));
+#else
+    // Put using namespace std; here if you have to
+    // put it anywhere.
+    return (isfinite(d));
+#endif
+}
+
+inline float infinite_to_fzero(float x)
+{
+    return utility::isFinite(x) ? x : 0.0f;
+}
+
+}
+}
 //
 // some misc handy math functions
 //
 namespace std {
-inline float	infinite_to_fzero(float x) { return isfinite(x) ? x : 0.0f; }
 }
 inline int	iabs(int i) { if (i < 0) return -i; else return i; }
 /* fmax()/fmin() is C99 */

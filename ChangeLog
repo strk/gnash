@@ -1,3 +1,26 @@
+2008-05-17 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* libbase/utility.h: add inline bool utility::isFinite() to replace
+	  use of non-portable and non-standard isfinite in the code. Drop
+	  define of isfinite. Moved infinite_to_fzero under gnash::utility
+	  namespace. Please make any portability fixes here and *not*
+	  anywhere else.
+	* libbase/utility.cpp: drop dead include.
+	* server/array.cpp: replace isfinite.
+	* server/as_value.cpp: replace isfinite.
+	* server/as_value.h: drop second define of isfinite.
+	* server/character.cpp: drop using namespace std; (was for isfinite),
+	  replace isfinite.
+	* server/edit_text_character.cpp: update infinite_to_fzero namespace.
+	* server/matrix.cpp: drop another define of isfinite, drop using
+	  namespace std;, replace isfinite.
+	* server/resource.h: drop yet another define of isfinite.
+	* server/sprite_instance.cpp: replace isfinite.
+	* server/types.cpp: another define of isfinite...
+	* server/asobj/Global.cpp: replace isfinite
+	* server/asobj/flash/geom/{Point,Rectangle}_as.cpp: replace isfinite.
+	* testsuite/server/AsValueTest.cpp: replace isfinite.	
+
 2008-05-17 Sandro Santilli <strk@keybit.net>
 
 	* gui/Player.cpp (run): support relative urls in 'base' parameter,

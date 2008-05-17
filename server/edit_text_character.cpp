@@ -924,7 +924,7 @@ edit_text_character::set_member(string_table::key name,
 		//else if (name == "_x")
 	{
 		matrix	m = get_matrix();
-		m.m_[0][2] = std::infinite_to_fzero(PIXELS_TO_TWIPS(val.to_number()));	
+		m.m_[0][2] = utility::infinite_to_fzero(PIXELS_TO_TWIPS(val.to_number()));	
 		set_matrix(m);
 
 		// m_accept_anim_moves = false;
@@ -935,7 +935,7 @@ edit_text_character::set_member(string_table::key name,
 		//else if (name == "_y")
 	{
 		matrix	m = get_matrix();
-		m.m_[1][2] = std::infinite_to_fzero(PIXELS_TO_TWIPS(val.to_number()));
+		m.m_[1][2] = utility::infinite_to_fzero(PIXELS_TO_TWIPS(val.to_number()));
 		set_matrix(m);
 
 		// m_accept_anim_moves = false;
@@ -1071,7 +1071,7 @@ edit_text_character::set_member(string_table::key name,
 		// @@ TODO this should be generic to class character!
 		// Arg is in percent.
 		cxform	cx = get_cxform();
-		cx.m_[3][0] = fclamp(std::infinite_to_fzero(val.to_number()) / 100.f, 0, 1);
+		cx.m_[3][0] = fclamp(utility::infinite_to_fzero(val.to_number()) / 100.f, 0, 1);
 		set_cxform(cx);
 		return true;
 	}

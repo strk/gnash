@@ -598,7 +598,7 @@ as_array_object::index_requested(string_table::key name)
 	double value = temp.to_number();
 
 	// if we were sent a string that can't convert like "asdf", it returns as NaN. -1 means invalid index
-	if (!isfinite(value)) return -1;
+	if (!utility::isFinite(value)) return -1;
 
 	return int(value);
 }

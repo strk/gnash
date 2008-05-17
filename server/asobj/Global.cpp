@@ -289,7 +289,7 @@ as_global_isfinite(const fn_call& fn)
 {
     ASSERT_FN_ARGS_IS_1
 
-    return as_value( static_cast<bool>(isfinite(fn.arg(0).to_number())) );
+    return as_value( static_cast<bool>(utility::isFinite(fn.arg(0).to_number())) );
 }
 
 /// \brief Encode a string to URL-encoded format

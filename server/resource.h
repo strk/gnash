@@ -35,12 +35,6 @@ class font;
 class character_def;
 class sound_sample;
 
-#ifndef HAVE_ISFINITE
-# ifndef isfinite 
-#  define isfinite finite
-# endif 
-#endif 
- 
 
 /// An interface for casting to different types of resources.
 class resource : public ref_counted

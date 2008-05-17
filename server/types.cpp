@@ -15,13 +15,6 @@
 #include <cstring>
 #include <sstream> // for ::print and ::toString
 
-
-#ifndef HAVE_ISFINITE
-# ifndef isfinite 
-#  define isfinite finite
-# endif 
-#endif 
-
 namespace gnash {
 
 	//

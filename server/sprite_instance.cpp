@@ -1248,7 +1248,7 @@ sprite_lineTo(const fn_call& fn)
   float x = PIXELS_TO_TWIPS(fn.arg(0).to_number());
   float y = PIXELS_TO_TWIPS(fn.arg(1).to_number());
 
-  if ( ! isfinite(x) )
+  if ( ! utility::isFinite(x) )
   {
     IF_VERBOSE_ASCODING_ERRORS(
     std::stringstream ss; fn.dump_args(ss);
@@ -1259,7 +1259,7 @@ sprite_lineTo(const fn_call& fn)
     x = 0;
   }
    
-  if ( ! isfinite(y) )
+  if ( ! utility::isFinite(y) )
   {
     IF_VERBOSE_ASCODING_ERRORS(
     std::stringstream ss; fn.dump_args(ss);
@@ -1302,7 +1302,7 @@ sprite_moveTo(const fn_call& fn)
   float x = PIXELS_TO_TWIPS(fn.arg(0).to_number());
   float y = PIXELS_TO_TWIPS(fn.arg(1).to_number());
 
-  if ( ! isfinite(x) )
+  if ( ! utility::isFinite(x) )
   {
     IF_VERBOSE_ASCODING_ERRORS(
     std::stringstream ss; fn.dump_args(ss);
@@ -1313,7 +1313,7 @@ sprite_moveTo(const fn_call& fn)
     x = 0;
   }
    
-  if ( ! isfinite(y) )
+  if ( ! utility::isFinite(y) )
   {
     IF_VERBOSE_ASCODING_ERRORS(
     std::stringstream ss; fn.dump_args(ss);
@@ -1528,7 +1528,7 @@ sprite_curveTo(const fn_call& fn)
   float ax = PIXELS_TO_TWIPS(fn.arg(2).to_number());
   float ay = PIXELS_TO_TWIPS(fn.arg(3).to_number());
 
-  if ( ! isfinite(cx) )
+  if ( ! utility::isFinite(cx) )
   {
     IF_VERBOSE_ASCODING_ERRORS(
     std::stringstream ss; fn.dump_args(ss);
@@ -1539,7 +1539,7 @@ sprite_curveTo(const fn_call& fn)
     cx = 0;
   }
    
-  if ( ! isfinite(cy) )
+  if ( ! utility::isFinite(cy) )
   {
     IF_VERBOSE_ASCODING_ERRORS(
     std::stringstream ss; fn.dump_args(ss);
@@ -1550,7 +1550,7 @@ sprite_curveTo(const fn_call& fn)
     cy = 0;
   }
 
-  if ( ! isfinite(ax) )
+  if ( ! utility::isFinite(ax) )
   {
     IF_VERBOSE_ASCODING_ERRORS(
     std::stringstream ss; fn.dump_args(ss);
@@ -1561,7 +1561,7 @@ sprite_curveTo(const fn_call& fn)
     ax = 0;
   }
    
-  if ( ! isfinite(ay) )
+  if ( ! utility::isFinite(ay) )
   {
     IF_VERBOSE_ASCODING_ERRORS(
     std::stringstream ss; fn.dump_args(ss);
@@ -1932,10 +1932,10 @@ sprite_startDrag(const fn_call& fn)
 
             // check for infinite values
             bool gotinf = false;
-            if ( ! isfinite(x0) ) { x0=0; gotinf=true; }
-            if ( ! isfinite(y0) ) { y0=0; gotinf=true; }
-            if ( ! isfinite(x1) ) { x1=0; gotinf=true; }
-            if ( ! isfinite(y1) ) { y1=0; gotinf=true; }
+            if ( ! utility::isFinite(x0) ) { x0=0; gotinf=true; }
+            if ( ! utility::isFinite(y0) ) { y0=0; gotinf=true; }
+            if ( ! utility::isFinite(x1) ) { x1=0; gotinf=true; }
+            if ( ! utility::isFinite(y1) ) { y1=0; gotinf=true; }
 
             // check for swapped values
             bool swapped = false;
@@ -2575,7 +2575,7 @@ sprite_instance::get_frame_number(const as_value& frame_spec, size_t& frameno) c
 
   //log_debug("get_frame_number(%s), num: %g", frame_spec.to_debug_string(), num);
 
-  if ( ! isfinite(num) || int(num) != num || num == 0)
+  if ( ! utility::isFinite(num) || int(num) != num || num == 0)
   {
     bool ret = m_def->get_labeled_frame(fspecStr, frameno);
     //log_debug("get_labeled_frame(%s) returned %d, frameno is %d", fspecStr, ret, frameno);
@@ -2680,8 +2680,8 @@ sprite_instance::add_textfield(const std::string& name, int depth, float x, floa
 
   // Set _x and _y
   txt_matrix.set_translation(
-      infinite_to_fzero(PIXELS_TO_TWIPS(x)),
-      infinite_to_fzero(PIXELS_TO_TWIPS(y)));
+      utility::infinite_to_fzero(PIXELS_TO_TWIPS(x)),
+      utility::infinite_to_fzero(PIXELS_TO_TWIPS(y)));
 
   txt_char->set_matrix(txt_matrix);  
   // Here we add the character to the displayList.  

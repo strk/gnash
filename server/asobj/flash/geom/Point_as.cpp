@@ -30,6 +30,7 @@
 #include "GnashException.h" // for ActionException
 #include "Object.h" // for AS inheritance
 #include "VM.h" // for addStatics
+#include "utility.h" // isFinite
 
 #include <sstream>
 
@@ -193,9 +194,9 @@ Point_length_getset(const fn_call& fn)
 		ptr->get_member(NSV::PROP_X, &xval);
 		ptr->get_member(NSV::PROP_Y, &yval);
 		double x = xval.to_number();
-		if ( ! isfinite(x) ) return as_value(NAN);
+		if ( ! utility::isFinite(x) ) return as_value(NAN);
 		double y = yval.to_number();
-		if ( ! isfinite(y) ) return as_value(NAN);
+		if ( ! utility::isFinite(y) ) return as_value(NAN);
 
 		double l = sqrt(x*x+y*y);
 		return as_value(l);

@@ -33,6 +33,7 @@
 #include "VM.h" // for addStatics
 #include "as_value.h"
 #include "namedStrings.h"
+#include "utility.h" // isFinite
 
 #include <sstream>
 
@@ -241,10 +242,10 @@ Rectangle_isEmpty(const fn_call& fn)
 	if ( h.is_undefined() || h.is_null() ) return as_value(true);
 
 	double wn = w.to_number();
-	if ( ! isfinite(wn) || wn == 0 ) return as_value(true);
+	if ( ! utility::isFinite(wn) || wn == 0 ) return as_value(true);
 
 	double hn = h.to_number();
-	if ( ! isfinite(hn) || hn == 0 ) return as_value(true);
+	if ( ! utility::isFinite(hn) || hn == 0 ) return as_value(true);
 
 	log_debug("Width: %g, Height: %g", wn, hn);
 

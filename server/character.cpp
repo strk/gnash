@@ -41,11 +41,6 @@
 
 #undef set_invalidated
 
-// This is for std::isfinite
-// FIXME: include the std namespace in the macro, and expose
-//        the macro in a single place !
-using namespace std;
-
 namespace gnash
 {
 
@@ -247,7 +242,7 @@ character::x_getset(const fn_call& fn)
 	{
 		const double newx = fn.arg(0).to_number();
 		matrix m = ptr->get_matrix();
-		m.set_x_translation(std::floor(std::infinite_to_fzero(PIXELS_TO_TWIPS(newx))));
+		m.set_x_translation(std::floor(utility::infinite_to_fzero(PIXELS_TO_TWIPS(newx))));
 		ptr->set_matrix(m);
 		ptr->transformedByScript(); // m_accept_anim_moves = false; 
 	}
@@ -270,7 +265,7 @@ character::y_getset(const fn_call& fn)
 	{
 		const double newy = fn.arg(0).to_number();
 		matrix m = ptr->get_matrix();
-		m.set_y_translation(std::floor(std::infinite_to_fzero(PIXELS_TO_TWIPS(newy))));
+		m.set_y_translation(std::floor(utility::infinite_to_fzero(PIXELS_TO_TWIPS(newy))));
 		ptr->set_matrix(m);
 		ptr->transformedByScript(); // m_accept_anim_moves = false; 
 	}
@@ -402,7 +397,7 @@ character::alpha_getset(const fn_call& fn)
 	{
 		const as_value& inval = fn.arg(0);
 		const double input = inval.to_number();
-		if ( inval.is_undefined() || inval.is_null() || ! isfinite(input) )
+		if ( inval.is_undefined() || inval.is_null() || ! utility::isFinite(input) )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
 			log_aserror(_("Ignored attempt to set %s.%s=%s"),
@@ -414,7 +409,7 @@ character::alpha_getset(const fn_call& fn)
 		}
 		// Set alpha modulate, in percent.
 		cxform	cx = ptr->get_cxform();
-		cx.m_[3][0] = input / 100.f; // std::infinite_to_fzero(input) / 100.f;
+		cx.m_[3][0] = input / 100.f; // utility::infinite_to_fzero(input) / 100.f;
 		ptr->set_cxform(cx);
 		ptr->transformedByScript(); // m_accept_anim_moves = false; 
 	}

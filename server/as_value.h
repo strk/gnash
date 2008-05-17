@@ -47,12 +47,6 @@ class character;
 class asNamespace;
 class asName;
 
-#ifndef HAVE_ISFINITE
-# ifndef isfinite 
-#  define isfinite finite
-# endif 
-#endif 
-
 #ifndef NAN
 #       define NAN (std::numeric_limits<double>::quiet_NaN())
 #endif
