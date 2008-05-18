@@ -1,3 +1,8 @@
+2008-05-18 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: have KPARTS install dir summary use 'KPARTS' label,
+	  to conform with that given by 'make dumpconfig'.
+
 2008-05-17 Sandro Santilli <strk@keybit.net>
 
 	* server/vm/ActionExec.cpp (setLocalVariable): use scope stack

@@ -2164,10 +2164,10 @@ fi
 
 if test x"$kparts" = x"yes"; then
   echo "        KPARTS plugin enabled (default). Use --disable-kparts to disable"
-  echo "            KDE plugin will be installed in ${KDE_PLUGINDIR}"
-  echo "            KDE service will be installed in ${KDE_SERVICESDIR}"
-  echo "            KDE config dir will be in ${KDE_CONFIGDIR}"
-  echo "            KDE appsdata will be installed in ${KDE_APPSDATADIR}"
+  echo "            KPARTS plugin will be installed in ${KDE_PLUGINDIR}"
+  echo "            KPARTS service will be installed in ${KDE_SERVICESDIR}"
+  echo "            KPARTS config dir will be in ${KDE_CONFIGDIR}"
+  echo "            KPARTS appsdata will be installed in ${KDE_APPSDATADIR}"
 else
   echo "        KPARTS plugin disabled."
 fi
