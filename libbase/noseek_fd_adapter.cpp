@@ -47,6 +47,7 @@
 #endif
 
 #include <string>
+#include <boost/format.hpp>
 
 namespace noseek_fd_adapter
 {
@@ -223,9 +224,7 @@ NoSeekFile::fill_cache(size_t size)
 		ssize_t bytesRead = read(_fd, (void*)_buf, bytesNeeded);
 		if ( bytesRead < 0 )
 		{
-			fprintf(stderr,
-				"Error reading " SIZET_FMT " bytes from input stream",
-				bytesNeeded);
+			std::cerr << boost::format(_("Error reading %d bytes from input stream")) % bytesNeeded;
 			_running = false;
 			// this looks like a CRITICAL error (since we don't handle it..)
 			throw gnash::GnashException("Error reading from input stream");

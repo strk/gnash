@@ -924,7 +924,7 @@ array_splice(const fn_call& fn)
 	unsigned startoffset;
 	int start = fn.arg(0).to_number<int>();
 	if ( start < 0 ) start = array->size()+start; // start is negative, so + means -abs()
-	startoffset = iclamp(start, 0, origlen);
+	startoffset = utility::iclamp(start, 0, origlen);
 #ifdef GNASH_DEBUG
 	if ( startoffset != start )
 		log_debug(_("Array.splice: start:%d became %u"), start, startoffset);
@@ -945,7 +945,7 @@ array_splice(const fn_call& fn)
 			);
 			return as_value();
 		}
-		len = iclamp(lenval, 0, origlen-startoffset);
+		len = utility::iclamp(lenval, 0, origlen-startoffset);
 	}
 
 	//----------------

@@ -272,7 +272,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                     player.setStartFullscreen(true);
                     break;                    
                 case 's':
-                    player.setScale( fclamp(
+                    player.setScale( utility::fclamp(
                                     parser.argument<float>(i),
                                     0.01f, 100.f) );
                     break;

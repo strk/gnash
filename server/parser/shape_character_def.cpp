@@ -36,10 +36,10 @@
 #include <cfloat>
 #include <algorithm>
 
-#ifdef __sgi
-extern double round(double);
-#pragma optional round
-#endif
+//#ifdef __sgi
+//extern double round(double);
+//#pragma optional round
+//#endif
 
 // Define the macro below to always compute bounds for shape characters
 // and compare them with the bounds encoded in the SWF
@@ -62,7 +62,7 @@ namespace gnash
 
     void  set_curve_max_pixel_error(float pixel_error)
     {
-        s_curve_max_pixel_error = fclamp(pixel_error, 1e-6f, 1e6f);
+        s_curve_max_pixel_error = utility::fclamp(pixel_error, 1e-6f, 1e6f);
     }
 
     float get_curve_max_pixel_error()
@@ -902,8 +902,12 @@ namespace gnash
         // any visible inaccuracy before the shape is scaled more an 2000x). The
         // resulting coordinate is *very* close to the original one and still in the
         // same coordinate system.
-        x = (round(x * 2000.0f) + 0.5f) / 2000.0f;
-        y = (round(y * 2000.0f) + 0.5f) / 2000.0f;
+        
+        // These used to use round(x), now use std::floor(x + 0.5f), which
+        // means that negative half-values are rounded in a different
+        // direction. The testsuite notices no differences.
+        x = (std::floor(x * 2000.0f + 0.5f) + 0.5f) / 2000.0f;
+        y = (std::floor(y * 2000.0f + 0.5f) + 0.5f) / 2000.0f;
 
         point pt(x, y);
 

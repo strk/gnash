@@ -140,6 +140,7 @@ void
 matrix::set_lerp(const matrix& m1, const matrix& m2, float t)
 // Set this matrix to a blend of m1 and m2, parameterized by t.
 {
+    using utility::flerp;
 	m_[0][0] = flerp(m1.m_[0][0], m2.m_[0][0], t);
 	m_[1][0] = flerp(m1.m_[1][0], m2.m_[1][0], t);
 	m_[0][1] = flerp(m1.m_[0][1], m2.m_[0][1], t);

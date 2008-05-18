@@ -144,6 +144,7 @@ void	rect::set_lerp(const rect& a, const rect& b, float t)
 	
 	// TODO: remove double calls to get_{x,y}_{min,max}
 	//       to remove double equivalent assertions
+	using utility::flerp;
 	float xmin = flerp(a.get_x_min(), b.get_x_min(), t);
 	float ymin = flerp(a.get_y_min(), b.get_y_min(), t);
 	float xmax = flerp(a.get_x_max(), b.get_x_max(), t);
@@ -163,8 +164,8 @@ rect::clamp(point& p) const
 	// nothing to do, point is surely inside
 	if ( _range.isWorld() ) return;
 
-	p.x = fclamp(p.x, _range.getMinX(), _range.getMaxX());
-	p.y = fclamp(p.y, _range.getMinY(), _range.getMaxY());
+	p.x = utility::fclamp(p.x, _range.getMinX(), _range.getMaxX());
+	p.y = utility::fclamp(p.y, _range.getMinY(), _range.getMaxY());
 }
 
 std::string

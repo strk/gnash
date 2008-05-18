@@ -210,7 +210,7 @@ validIndex(const std::wstring& subject, int index)
         index = subject.size() + index;
     }
 
-    index = iclamp(index, 0, subject.size());
+    index = utility::iclamp(index, 0, subject.size());
 
     return index;
 }
@@ -295,7 +295,7 @@ string_split(const fn_call& fn)
 	{
 		return as_value(array.get());
 	}
-        max = iclamp((size_t)max_in, 0, wstr.size());
+        max = utility::iclamp((size_t)max_in, 0, wstr.size());
     }
 
     if ( wstr.empty() )

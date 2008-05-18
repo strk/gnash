@@ -234,6 +234,7 @@ GlyphInfo::markReachableResources() const
 		m_is_bold          = flags & (1 << 0);
         // don't know the usage, so we discard it.
 		int	discarded = in->read_u8();
+		UNUSED(discarded);
 
 		IF_VERBOSE_PARSE (
             log_parse(" has_layout = %d", has_layout);

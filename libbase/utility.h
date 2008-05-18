@@ -86,6 +86,10 @@ void	operator delete[](void* ptr);
 #define M_PI 3.141592654
 #endif // M_PI
 
+// Commonly-used inlined mathematical functions are defined in
+// namespace gnash::utility so that it's clear where they
+// come from.
+
 namespace gnash {
 namespace utility {
 
@@ -105,33 +109,62 @@ inline float infinite_to_fzero(float x)
     return utility::isFinite(x) ? x : 0.0f;
 }
 
+inline int iabs(int i)
+{
+    if (i < 0) return -i;
+    else return i;
 }
-}
-//
-// some misc handy math functions
-//
-namespace std {
-}
-inline int	iabs(int i) { if (i < 0) return -i; else return i; }
-/* fmax()/fmin() is C99 */
-inline float	fmax(float a, float b) { if (a < b) return b; else return a; }
-inline float	fmin(float a, float b) { if (a < b) return a; else return b; }
-inline int	imax(int a, int b) { if (a < b) return b; else return a; }
-inline int	imin(int a, int b) { if (a < b) return a; else return b; }
 
-inline int	iclamp(int i, int min, int max) {
+/* fmax()/fmin() is C99 */
+inline float fmax(float a, float b)
+{
+    if (a < b) return b;
+    else return a;
+}
+
+inline float fmin(float a, float b)
+{
+    if (a < b) return a;
+    else return b;
+}
+
+inline int imax(int a, int b)
+{
+    if (a < b) return b;
+    else return a;
+}
+
+inline int imin(int a, int b)
+{
+    if (a < b) return a;
+    else return b;
+}
+
+inline int iclamp(int i, int min, int max)
+{
 	assert( min <= max );
 	return imax(min, imin(i, max));
 }
 
-inline float	fclamp(float f, float xmin, float xmax) {
+inline float fclamp(float f, float xmin, float xmax)
+{
 	assert( xmin <= xmax );
 	return fmax(xmin, fmin(f, xmax));
 }
 
-inline float flerp(float a, float b, float f) { return (b - a) * f + a; }
+inline float flerp(float a, float b, float f)
+{
+    return (b - a) * f + a;
+}
 
-inline int	frnd(float f) { return (int)(f + 0.5f); }	// replace with inline asm if desired
+inline int frnd(float f) 
+{
+    return static_cast<int>(f + 0.5f);
+}
+
+}
+}
+
 
 /// \brief
 /// Return the smallest multiple of given base greater or equal
@@ -146,7 +179,6 @@ smallestMultipleContaining(unsigned int base, unsigned int x)
 
 // Handy macro to quiet compiler warnings about unused parameters/variables.
 #define UNUSED(x) (x) = (x)
-
 
 // Compile-time constant size of array.
 #define ARRAYSIZE(x) (sizeof(x)/sizeof(x[0]))

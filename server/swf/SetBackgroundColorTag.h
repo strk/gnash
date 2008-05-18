@@ -86,7 +86,7 @@ public:
 	{
 		float	current_alpha = m->get_background_alpha();
 		rgba newcolor = m_color; // to avoid making m_color mutable
-		newcolor.m_a = frnd(current_alpha * 255.0f);
+		newcolor.m_a = utility::frnd(current_alpha * 255.0f);
 		m->set_background_color(newcolor);
 	}
 

@@ -1,3 +1,19 @@
+2008-05-18 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* libbase/utility.h: move general mathematical functions under
+	  gnash::utility namespace so that their origin is clearer in
+	  the code.
+	* server/sprite_instance.cpp: replace C99 round function with
+	  std::floor(x + 0.5). This is different for negative half-values
+	  but the testsuite passes and the original use of round doesn't
+	  seem to have any particular reasoning. Comments explaining why
+	  in case it causes problems.
+	* server/parser/shape_character_def.cpp: ditto.
+	* libbase/noseek_fd_adapter.cpp: fix some sizet_fmt warnings (there
+	  are plenty more, but are ifdeffed out at the moment).
+	* server/font.cpp: silence unused variable warning.
+	* many files: add gnash::utility namespace for flerp, frnd etc.
+
 2008-05-18 Sandro Santilli <strk@keybit.net>
 
 	* macros/kde.m4: add --with-kparts-install=user|system|prefix,

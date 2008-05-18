@@ -718,7 +718,7 @@ edit_text_character::on_event(const event_id& id)
 			gnash::key::code c = id.keyCode;
 
 			// maybe _text is changed in ActionScript
-			m_cursor = imin(m_cursor, _text.size());
+			m_cursor = utility::imin(m_cursor, _text.size());
 
 			switch (c)
 			{
@@ -1075,7 +1075,7 @@ edit_text_character::set_member(string_table::key name,
 		// @@ TODO this should be generic to class character!
 		// Arg is in percent.
 		cxform	cx = get_cxform();
-		cx.m_[3][0] = fclamp(utility::infinite_to_fzero(val.to_number()) / 100.f, 0, 1);
+		cx.m_[3][0] = utility::fclamp(utility::infinite_to_fzero(val.to_number()) / 100.f, 0, 1);
 		set_cxform(cx);
 		return true;
 	}
