@@ -1,5 +1,15 @@
 2008-05-18 Sandro Santilli <strk@keybit.net>
 
+	* macros/kde.m4: add --with-kparts-install=user|system|prefix,
+	  default to prefix, overridable with --with-kde-pluginprefix
+	  and further overridable by specific kparts components
+	  switches.
+	* Makefile.am: use --with-kparts-install=prefix on 'distcheck'.
+	* doc/C/refmanual/custompath_configuration.xml: document
+	  --with-kparts-install.
+
+2008-05-18 Sandro Santilli <strk@keybit.net>
+
 	* configure.ac: have KPARTS install dir summary use 'KPARTS' label,
 	  to conform with that given by 'make dumpconfig'.
 

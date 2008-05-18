@@ -29,26 +29,17 @@ AC_DEFUN([GNASH_PATH_KDE],
     fi
   ])
 
+  AC_PATH_PROG(KDE_CONFIG, kde-config, ,[${pathlist}])
 
-  AC_ARG_WITH(kde-plugindir,
-    AC_HELP_STRING([--with-kde-plugindir=DIR], [Directory to install KDE plugin in]),
-    [KDE_PLUGINDIR=${withval}
-  ])
-
-  AC_ARG_WITH(kde-servicesdir, AC_HELP_STRING([--with-kde-servicesdir=DIR],
-      [Directory to install KDE service in]),
-    [KDE_SERVICESDIR=${withval}
-  ])
-
-  AC_ARG_WITH(kde-configdir, AC_HELP_STRING([--with-kde-configdir=DIR],
-      [Directory to install KDE configfile in]),
-    [KDE_CONFIGDIR=${withval}
-  ])
-
-  AC_ARG_WITH(kde-appsdatadir, AC_HELP_STRING([--with-kde-appsdatadir=DIR],
-      [Directory to install KDE data in]),
-    [KDE_APPSDATADIR=${withval}
-  ])
+  AC_ARG_WITH(kparts-install,
+    AC_HELP_STRING([--with-kparts-install=system|user|prefix], [Policy for KPARTS plugin install. Default: user.]),
+	[case "${withval}" in
+	  user) KPARTS_INSTALL_POLICY=user ;;
+	  system) KPARTS_INSTALL_POLICY=system ;;
+	  prefix) KPARTS_INSTALL_POLICY=prefix ;;
+	  *)  AC_MSG_ERROR([bad value ${withval} for --with-kparts-install]) ;;
+	 esac 
+	], KPARTS_INSTALL_POLICY=user) dnl TODO: inherit a generic PLUGINS_INSTALL_POLICY when available
 
   AC_ARG_WITH(kde-pluginprefix, AC_HELP_STRING([--with-kde-pluginprefix=DIR],
       [Prefix for KDE plugin, like /usr]),
@@ -58,7 +49,6 @@ AC_DEFUN([GNASH_PATH_KDE],
   kde_prefix="/usr"
   has_kde=no
   if test x"${ac_cv_path_kde_incl}" = x; then
-    AC_PATH_PROG(KDE_CONFIG, kde-config, ,[${pathlist}])
     if test "x$KDE_CONFIG" != "x" ; then
       if test "x$KDE_CFLAGS" = "x" ; then
         kde_prefix=`$KDE_CONFIG --prefix`
@@ -178,13 +168,44 @@ AC_DEFUN([GNASH_PATH_KDE],
   dnl If building the kparts plugin, get the install paths correct.  
   if test x$kparts = xyes; then
     if test x$KDE_PLUGINPREFIX = x; then
-      KDE_PLUGINPREFIX=${HOME}/.kde
+      if test "x$KPARTS_INSTALL_POLICY" = "xuser"; then
+      	KDE_PLUGINPREFIX=${HOME}/.kde
+      elif test "x$KPARTS_INSTALL_POLICY" = "xsystem"; then
+        if test "x$KDE_CONFIG" != "x" ; then
+          KDE_PLUGINPREFIX=`$KDE_CONFIG --prefix`
+        else
+          AC_MSG_ERROR([Dunno how to make a 'system' kde plugin install not having found kde-config]);
+        fi
+      elif test "x$KPARTS_INSTALL_POLICY" = "xprefix"; then
+      	KDE_PLUGINPREFIX="\${prefix}/kparts"
+      fi
     fi
-    KDE_PLUGINDIR=$KDE_PLUGINPREFIX'/lib/kde3'
-    KDE_SERVICESDIR=$KDE_PLUGINPREFIX'/share/services'
-    KDE_CONFIGDIR=$KDE_PLUGINPREFIX'/share/config'
-    KDE_APPSDATADIR=$KDE_PLUGINPREFIX'/share/apps/klash'
+    KDE_PLUGINDIR="${KDE_PLUGINPREFIX}/lib/kde3"
+    KDE_SERVICESDIR="${KDE_PLUGINPREFIX}/share/services"
+    KDE_CONFIGDIR="${KDE_PLUGINPREFIX}/share/config"
+    KDE_APPSDATADIR="${KDE_PLUGINPREFIX}/share/apps/klash"
   fi
+
+  AC_ARG_WITH(kde-plugindir,
+    AC_HELP_STRING([--with-kde-plugindir=DIR], [Directory to install KDE plugin in]),
+    [KDE_PLUGINDIR=${withval}
+  ])
+
+  AC_ARG_WITH(kde-servicesdir, AC_HELP_STRING([--with-kde-servicesdir=DIR],
+      [Directory to install KDE service in]),
+    [KDE_SERVICESDIR=${withval}
+  ])
+
+  AC_ARG_WITH(kde-configdir, AC_HELP_STRING([--with-kde-configdir=DIR],
+      [Directory to install KDE configfile in]),
+    [KDE_CONFIGDIR=${withval}
+  ])
+
+  AC_ARG_WITH(kde-appsdatadir, AC_HELP_STRING([--with-kde-appsdatadir=DIR],
+      [Directory to install KDE data in]),
+    [KDE_APPSDATADIR=${withval}
+  ])
+
 
   AC_SUBST(KDE_PLUGINDIR)
   AC_SUBST(KDE_SERVICESDIR)

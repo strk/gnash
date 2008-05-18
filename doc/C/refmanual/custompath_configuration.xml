@@ -166,6 +166,21 @@
 	</row>
 	<row>
 	  <entry>
+	    <option>--with-kparts-install=user|system|prefix</option>
+	  </entry>
+	  <entry>
+	    This option sets the install policy for all KPARTS (kde) files.
+	    Policy 'user' means plugin will be installed in ~/.kde;
+            'system' will find out using kde-config (or bail out if not found);
+            'prefix' will install under ${prefix}/kparts.
+            The actual prefix can be overridden using
+            <option>--with-kde-pluginprefix</option>
+            or the fine-tuned options.
+            The default at time of writing (2008-05-18) is 'user'.
+	  </entry>
+	</row>
+	<row>
+	  <entry>
 	    <option>--with-kde-pluginprefix</option>
 	  </entry>
 	  <entry>
