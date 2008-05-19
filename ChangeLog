@@ -1,5 +1,11 @@
 2008-05-19 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* win32: drop old win32 files in head too. Anyone wanting to update
+	  them (if they're at all useful) can easily resurrect them from
+	  CVS.
+
+2008-05-19 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* libbase/utility.h: use std::min / std::max, drop custom fmin/fmax,
 	  imin/imax functions, replace iclamp/fclamp with templated clamp<> 
 	  using std::min/max.
