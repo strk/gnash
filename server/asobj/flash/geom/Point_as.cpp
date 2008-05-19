@@ -317,6 +317,14 @@ Point_distance(const fn_call& fn)
 		return as_value();
 	}
 
+	IF_VERBOSE_ASCODING_ERRORS(
+	if ( fn.nargs > 2 )
+	{
+		std::stringstream ss; fn.dump_args(ss);
+		log_aserror("Point.distance(%s): %s", ss.str(), _("arguments after first two discarded"));
+	}
+	);
+
 	as_value& arg1 = fn.arg(0);
 	if ( ! arg1.is_object() )
 	{
@@ -374,10 +382,87 @@ Point_distance(const fn_call& fn)
 static as_value
 Point_interpolate(const fn_call& fn)
 {
-	boost::intrusive_ptr<Point_as> ptr = ensureType<Point_as>(fn.this_ptr);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+	as_value x0val;
+	as_value y0val;
+	as_value x1val;
+	as_value y1val;
+	as_value muval;
+
+	if ( fn.nargs < 3 )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		std::stringstream ss; fn.dump_args(ss);
+		log_aserror("Point.interpolate(%s): %s", ss.str(), _("missing arguments"));
+		);
+	}
+	else
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		if ( fn.nargs > 3 )
+		{
+		std::stringstream ss; fn.dump_args(ss);
+		log_aserror("Point.interpolate(%s): %s", ss.str(), _("arguments after first three discarded"));
+		}
+		);
+
+		as_value& p0val = fn.arg(0);
+		as_object* p0 = p0val.to_object().get();
+		if ( ! p0 )
+		{
+			IF_VERBOSE_ASCODING_ERRORS(
+			std::stringstream ss; fn.dump_args(ss);
+			log_aserror("Point.interpolate(%s): %s", ss.str(), _("first argument doesn't cast to object"));
+			);
+		}
+		else
+		{
+			p0->get_member(NSV::PROP_X, &x0val);
+			p0->get_member(NSV::PROP_Y, &y0val);
+		}
+
+		as_value& p1val = fn.arg(1);
+		as_object* p1 = p1val.to_object().get();
+		if ( ! p1 )
+		{
+			IF_VERBOSE_ASCODING_ERRORS(
+			std::stringstream ss; fn.dump_args(ss);
+			log_aserror("Point.interpolate(%s): %s", ss.str(), _("second argument doesn't cast to object"));
+			);
+		}
+		else
+		{
+			p1->get_member(NSV::PROP_X, &x1val);
+			p1->get_member(NSV::PROP_Y, &y1val);
+		}
+
+		muval = fn.arg(2);
+	}
+
+
+	double x0 = x0val.to_number();
+	double y0 = y0val.to_number();
+	double x1 = x1val.to_number();
+	double y1 = y1val.to_number();
+	double mu = muval.to_number();
+
+	// newX = b.x + ( muval * (a.x - b.x) );
+	// newY = b.y + ( muval * (a.y - b.y) );
+
+	as_value xoff = mu * (x0 - x1);
+	as_value yoff = mu * (y0 - y1);
+
+	//log_debug("xoff:%s, yoff:%s, x1val:%s, y1val:%s", xoff, yoff, x1val, y1val);
+
+	as_value x = x1val; // copy to avoid changing stack value
+	x.newAdd(xoff);
+	as_value y = y1val; // copy to avoid changing stack value
+	y.newAdd(yoff);
+
+	boost::intrusive_ptr<as_object> ret = new Point_as;
+	ret->set_member(NSV::PROP_X, as_value(x));
+	ret->set_member(NSV::PROP_Y, as_value(y));
+
+	return as_value(ret.get());
 }
 
 static as_value

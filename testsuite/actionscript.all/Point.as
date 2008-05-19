@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Point.as,v 1.3 2008/05/19 11:51:41 strk Exp $";
+rcsid="$Id: Point.as,v 1.4 2008/05/19 14:12:16 strk Exp $";
 
 #include "check.as"
 
@@ -253,6 +253,71 @@ check(!p1.equals('string'));
 // Test Point.interpolate (static)
 //-------------------------------------------------------------
 
+ret = Point.interpolate();
+check(ret instanceof Point);
+check_equals(ret.toString(), '(x=NaN, y=NaN)');
+
+ret = Point.interpolate(1, 2, 3);
+check(ret instanceof Point);
+check_equals(ret.toString(), '(x=NaN, y=NaN)');
+
+p0 = new Point('x0', 'y0');
+p1 = new Point('x1', 'y1');
+ret = Point.interpolate(p0, p1, 3);
+check(ret instanceof Point);
+check_equals(ret.toString(), '(x=x1NaN, y=y1NaN)');
+
+p0 = new Point('0', '0');
+p1 = new Point('10', '0');
+ret = Point.interpolate(p0, p1, 3);
+check(ret instanceof Point);
+check_equals(ret.toString(), '(x=10-30, y=00)');
+ret = Point.interpolate(p0, p1, 0);
+check(ret instanceof Point);
+check_equals(ret.toString(), '(x=100, y=00)');
+ret = Point.interpolate(p0, p1, 0.5);
+check(ret instanceof Point);
+check_equals(ret.toString(), '(x=10-5, y=00)');
+
+// second arg drives newAdd
+p0 = new Point(0, 0);
+p1 = new Point('10', '0');
+ret = Point.interpolate(p0, p1, 3);
+check(ret instanceof Point);
+check_equals(ret.toString(), '(x=10-30, y=00)');
+
+// second arg drives newAdd
+p0 = new Point('0', '0');
+p1 = new Point(10, 0);
+ret = Point.interpolate(p0, p1, 3);
+check(ret instanceof Point);
+check_equals(ret.toString(), '(x=-20, y=0)');
+
+p0 = new Point(0, 0);
+p1 = new Point(10, 0);
+ret = Point.interpolate(p0, p1, 0.5);
+check(ret instanceof Point);
+check_equals(ret.toString(), '(x=5, y=0)');
+
+p0 = new Point(0, 0);
+p1 = new Point(10, 0);
+ret = Point.interpolate(p0, p1, 1, 'discarder arg');
+check(ret.equals(p0));
+ret = Point.interpolate(p0, p1, 0);
+check(ret.equals(p1));
+ret = Point.interpolate(p0, p1);
+check_equals(ret.toString(), '(x=NaN, y=NaN)');
+
+o0 = {x:0, y:10};
+o1 = {x:10, y:0};
+ret = Point.interpolate(o0, o1, 1);
+check_equals(ret.toString(), '(x=0, y=10)');
+ret = Point.interpolate(o0, o1, 0);
+check_equals(ret.toString(), '(x=10, y=0)');
+ret = Point.interpolate(o0, o1, 0.5);
+check_equals(ret.toString(), '(x=5, y=5)');
+
+
 // TODO
 
 //-------------------------------------------------------------
@@ -283,6 +348,6 @@ check(!p1.equals('string'));
 // END OF TEST
 //-------------------------------------------------------------
 
-check_totals(92);
+check_totals(116);
 
 #endif // OUTPUT_VERSION >= 8

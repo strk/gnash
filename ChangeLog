@@ -1,3 +1,8 @@
+2008-05-19 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/flash/geom/Point_as.cpp: implement Point.interpolate().
+	* testsuite/actionscript.all/Point.as: test Point.interpolate().
+
 2008-05-19 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* win32: drop old win32 files in head too. Anyone wanting to update
