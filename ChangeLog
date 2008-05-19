@@ -1,3 +1,21 @@
+2008-05-19 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* libbase/utility.h: use std::min / std::max, drop custom fmin/fmax,
+	  imin/imax functions, replace iclamp/fclamp with templated clamp<> 
+	  using std::min/max.
+	* server/array.cpp, server/as_value.h, server/character.h,
+	  server/cxform.cpp, server/edit_text_character.cpp, server/impl.h,
+	  server/movie_instance.cpp, server/movie_root.cpp, server/rect.cpp,
+	  server/sprite_instance.cpp, server/asobj/ContextMenu.cpp,
+	  server/asobj/NetStreamFfmpeg.cpp, server/asobj/string.cpp,
+	  server/parser/bitmap_character_def.h, gui/gnash.cpp,
+	  gui/gui.cpp, libbase/FLVParser.cpp, libbase/container.h, 
+	  libbase/smart_ptr.h, libbase/tu_file.cpp, libbase/zlib_adapter.cpp,
+	  libgeometry/snappingrange.h, libmedia/AudioDecoderSimple.cpp,
+	  server/parser/shape_character_def.cpp: replace iclamp with
+	  clamp<T> as appropriate, replace custom min/max methods with
+	  std methods. Add / remove utility.h include as necessary.
+
 2008-05-19 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/swfdec/REALTIME: movieclip-version-*.swf must run in

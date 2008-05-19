@@ -62,7 +62,7 @@ namespace gnash
 
     void  set_curve_max_pixel_error(float pixel_error)
     {
-        s_curve_max_pixel_error = utility::fclamp(pixel_error, 1e-6f, 1e6f);
+        s_curve_max_pixel_error = utility::clamp<float>(pixel_error, 1e-6f, 1e6f);
     }
 
     float get_curve_max_pixel_error()

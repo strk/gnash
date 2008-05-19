@@ -26,7 +26,7 @@
 #include "types.h" // for rgba type :(
 #include "stream.h" // for reading from SWF
 #include "log.h"
-#include "utility.h" // for fclamp
+#include "utility.h" // for utility::clamp
 
 namespace gnash {
 
@@ -75,10 +75,11 @@ rgba    cxform::transform(const rgba& in) const
 void    cxform::transform(boost::uint8_t& r, boost::uint8_t& g, boost::uint8_t& b, boost::uint8_t& a) const
 // Faster transform() method for loops (avoids creation of rgba object)
 {
-    r = (boost::uint8_t) utility::fclamp(r * m_[0][0] + m_[0][1], 0, 255);
-    g = (boost::uint8_t) utility::fclamp(g * m_[1][0] + m_[1][1], 0, 255);
-    b = (boost::uint8_t) utility::fclamp(b * m_[2][0] + m_[2][1], 0, 255);
-    a = (boost::uint8_t) utility::fclamp(a * m_[3][0] + m_[3][1], 0, 255);
+    using utility::clamp;
+    r = static_cast<boost::uint8_t>(clamp<float>(r * m_[0][0] + m_[0][1], 0, 255));
+    g = static_cast<boost::uint8_t>(clamp<float>(g * m_[1][0] + m_[1][1], 0, 255));
+    b = static_cast<boost::uint8_t>(clamp<float>(b * m_[2][0] + m_[2][1], 0, 255));
+    a = static_cast<boost::uint8_t>(clamp<float>(a * m_[3][0] + m_[3][1], 0, 255));
 }
 
 void    cxform::read_rgb(stream& in)
@@ -162,15 +163,16 @@ void    cxform::read_rgba(stream& in)
 /// Force component values to be in legal range.
 void cxform::clamp()
 {
-    m_[0][0] = utility::fclamp(m_[0][0], 0, 1);
-    m_[1][0] = utility::fclamp(m_[1][0], 0, 1);
-    m_[2][0] = utility::fclamp(m_[2][0], 0, 1);
-    m_[3][0] = utility::fclamp(m_[3][0], 0, 1);
+    using utility::clamp;
+    m_[0][0] = clamp<float>(m_[0][0], 0, 1);
+    m_[1][0] = clamp<float>(m_[1][0], 0, 1);
+    m_[2][0] = clamp<float>(m_[2][0], 0, 1);
+    m_[3][0] = clamp<float>(m_[3][0], 0, 1);
 
-    m_[0][1] = utility::fclamp(m_[0][1], -255.0f, 255.0f);
-    m_[1][1] = utility::fclamp(m_[1][1], -255.0f, 255.0f);
-    m_[2][1] = utility::fclamp(m_[2][1], -255.0f, 255.0f);
-    m_[3][1] = utility::fclamp(m_[3][1], -255.0f, 255.0f);
+    m_[0][1] = clamp<float>(m_[0][1], -255.0f, 255.0f);
+    m_[1][1] = clamp<float>(m_[1][1], -255.0f, 255.0f);
+    m_[2][1] = clamp<float>(m_[2][1], -255.0f, 255.0f);
+    m_[3][1] = clamp<float>(m_[3][1], -255.0f, 255.0f);
 }
 
 void    cxform::print() const

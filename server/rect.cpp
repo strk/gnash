@@ -15,15 +15,12 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// 
-//
-
 #include "rect.h"
 #include "log.h"
 #include "stream.h"
 #include "matrix.h"
 #include "types.h" // for TWIPS_TO_PIXELS
-#include "utility.h" // for flerp, fclamp...
+#include "utility.h" // for flerp, clamp...
 
 #include <sstream> // for ::print and ::toString
 
@@ -164,8 +161,8 @@ rect::clamp(point& p) const
 	// nothing to do, point is surely inside
 	if ( _range.isWorld() ) return;
 
-	p.x = utility::fclamp(p.x, _range.getMinX(), _range.getMaxX());
-	p.y = utility::fclamp(p.y, _range.getMinY(), _range.getMaxY());
+	p.x = utility::clamp<float>(p.x, _range.getMinX(), _range.getMaxX());
+	p.y = utility::clamp<float>(p.y, _range.getMinY(), _range.getMaxY());
 }
 
 std::string

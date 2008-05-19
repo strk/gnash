@@ -1364,7 +1364,7 @@ sprite_lineStyle(const fn_call& fn)
     return as_value();
   }
 
-  thickness = boost::uint16_t(PIXELS_TO_TWIPS(boost::uint16_t(utility::fclamp(fn.arg(0).to_number(), 0, 255))));
+  thickness = boost::uint16_t(PIXELS_TO_TWIPS(boost::uint16_t(utility::clamp<float>(fn.arg(0).to_number(), 0, 255))));
   bool scaleThicknessVertically = true;
   bool scaleThicknessHorizontally = true;
   bool pixelHinting = false;
@@ -1376,14 +1376,14 @@ sprite_lineStyle(const fn_call& fn)
   if ( fn.nargs > 1 )
   {
     // 2^24 is the max here
-    boost::uint32_t rgbval = boost::uint32_t(utility::fclamp(fn.arg(1).to_number(), 0, 16777216));
+    boost::uint32_t rgbval = boost::uint32_t(utility::clamp<float>(fn.arg(1).to_number(), 0, 16777216));
     r = boost::uint8_t( (rgbval&0xFF0000) >> 16);
     g = boost::uint8_t( (rgbval&0x00FF00) >> 8);
     b = boost::uint8_t( (rgbval&0x0000FF) );
 
     if ( fn.nargs > 2 )
     {
-      float alphaval = utility::fclamp(fn.arg(2).to_number(), 0, 100);
+      float alphaval = utility::clamp<float>(fn.arg(2).to_number(), 0, 100);
       a = boost::uint8_t( 255 * (alphaval/100) );
 
       if ( fn.nargs > 3 )
@@ -1480,7 +1480,7 @@ sprite_lineStyle(const fn_call& fn)
           }
           if ( fn.nargs > 7 )
           {
-            miterLimitFactor = utility::iclamp(fn.arg(7).to_int(), 1, 255);
+            miterLimitFactor = utility::clamp<int>(fn.arg(7).to_int(), 1, 255);
           }
 
           IF_VERBOSE_ASCODING_ERRORS(
@@ -1622,14 +1622,14 @@ sprite_beginFill(const fn_call& fn)
   if ( fn.nargs > 0 )
   {
     // 2^24 is the max here
-    boost::uint32_t rgbval = boost::uint32_t(utility::fclamp(fn.arg(0).to_number(), 0, 16777216));
+    boost::uint32_t rgbval = boost::uint32_t(utility::clamp<float>(fn.arg(0).to_number(), 0, 16777216));
     r = boost::uint8_t( (rgbval&0xFF0000) >> 16);
     g = boost::uint8_t( (rgbval&0x00FF00) >> 8);
     b = boost::uint8_t( (rgbval&0x0000FF) );
 
     if ( fn.nargs > 1 )
     {
-      a = 255 * utility::iclamp(fn.arg(1).to_int(), 0, 100) / 100;
+      a = 255 * utility::clamp<int>(fn.arg(1).to_int(), 0, 100) / 100;
       IF_VERBOSE_ASCODING_ERRORS(
       if ( fn.nargs > 2 )
       {
@@ -1889,10 +1889,10 @@ sprite_beginGradientFill(const fn_call& fn)
     boost::uint32_t col = colVal.is_number() ? colVal.to_int() : 0;
 
     as_value alpVal = alphas->getMember(key);
-    boost::uint8_t alp = alpVal.is_number() ? utility::iclamp(alpVal.to_int(), 0, 255) : 0;
+    boost::uint8_t alp = alpVal.is_number() ? utility::clamp<int>(alpVal.to_int(), 0, 255) : 0;
 
     as_value ratVal = ratios->getMember(key);
-    boost::uint8_t rat = ratVal.is_number() ? utility::iclamp(ratVal.to_int(), 0, 255) : 0;
+    boost::uint8_t rat = ratVal.is_number() ? utility::clamp<int>(ratVal.to_int(), 0, 255) : 0;
 
     rgba color;
     color.parseRGB(col);

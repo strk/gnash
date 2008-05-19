@@ -9,9 +9,9 @@
 
 #include "zlib_adapter.h"
 #include "tu_file.h"
-#include "utility.h"
 #include "log.h"
 #include "GnashException.h"
+#include <algorithm> // std::min
 
 #include <memory>
 
@@ -280,7 +280,7 @@ namespace zlib_adapter
 		{
 			int	to_read = pos - inf->m_logical_stream_pos;
 			assert(to_read > 0);
-			int	to_read_this_time = utility::imin(to_read, ZBUF_SIZE);
+			int	to_read_this_time = std::min<int>(to_read, ZBUF_SIZE);
 			assert(to_read_this_time > 0);
 
 			int	bytes_read = inf->inflate_from_stream(temp, to_read_this_time);

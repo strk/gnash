@@ -263,7 +263,7 @@ tu_file::copy_bytes(tu_file* src, int byte_count)
     
     int	bytes_left = byte_count;
     while (bytes_left) {
-	int	to_copy = utility::imin(bytes_left, BUFSIZE);
+	int	to_copy = std::min<int>(bytes_left, BUFSIZE);
 	
 	int	read_count = src->read_bytes(buffer, to_copy);
 	int	write_count = write_bytes(buffer, read_count);

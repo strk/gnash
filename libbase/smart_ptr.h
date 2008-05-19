@@ -25,8 +25,6 @@
 #ifndef SMART_PTR_H
 #define SMART_PTR_H
 
-#include "utility.h"
-
 // Define the following macro to use garbage collecting rather
 // then ref-counting. Currenlty this would make ref_counted
 // derive from GcResource and intrusive_ptr never really messing

@@ -30,6 +30,7 @@
 #include "GnashException.h"
 #include "Object.h" // for getObjectInterface
 #include "namedStrings.h"
+#include "utility.h" // UNUSED
 
 namespace gnash {
 

@@ -55,7 +55,6 @@ size_t strftime __P((char *, size_t, const char *, const struct tm *));
 
 #endif // ! HAVE_WINSOCK_H
 
-#include "utility.h"
 #include <cstddef>
 #include <cstring>	// for strcmp and friends
 //#include <new>	// for placement new

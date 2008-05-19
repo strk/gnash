@@ -596,9 +596,10 @@ public:
   
 private:
 
+  // Unused...
   inline T absmin(T a, T b) {
     if (b<0) b*=-1;
-    return min(a,b);
+    return std::min<T>(a,b);
   }
   
   void finalize() const {

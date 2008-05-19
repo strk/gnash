@@ -36,6 +36,7 @@
 
 #include <cstdio>
 #include <cstring>
+#include <algorithm> // std::max, std::min
 
 #ifdef SKIP_RENDERING_IF_LATE
 #include "WallClockTimer.h"
@@ -1185,8 +1186,8 @@ Gui::fpsCounterTick()
       fps_rate_min = rate;
       fps_rate_max = rate; 
     } else {
-      fps_rate_min = fmin(fps_rate_min, rate);
-      fps_rate_max = fmax(fps_rate_max, rate);
+      fps_rate_min = std::max<float>(fps_rate_min, rate);
+      fps_rate_max = std::max<float>(fps_rate_max, rate);
     }
     
     float avg = fps_counter_total / secs_total; 

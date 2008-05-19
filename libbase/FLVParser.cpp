@@ -349,7 +349,7 @@ boost::uint32_t FLVParser::seekAudio(boost::uint32_t time)
 	size_t guess = size_t(time / tpf);
 
 	// Here we test if the guess was ok, and adjust if needed.
-	size_t bestFrame = utility::iclamp(guess, 0, _audioFrames.size()-1);
+	size_t bestFrame = utility::clamp<size_t>(guess, 0, _audioFrames.size()-1);
 
 	// Here we test if the guess was ok, and adjust if needed.
 	long diff = _audioFrames[bestFrame]->timestamp - time;
@@ -410,7 +410,7 @@ boost::uint32_t FLVParser::seekVideo(boost::uint32_t time)
 	double tpf = lastFrame->timestamp / numFrames; // time per frame
 	size_t guess = size_t(time / tpf);
 
-	size_t bestFrame = utility::iclamp(guess, 0, _videoFrames.size()-1);
+	size_t bestFrame = utility::clamp<size_t>(guess, 0, _videoFrames.size()-1);
 
 	// Here we test if the guess was ok, and adjust if needed.
 	long diff = _videoFrames[bestFrame]->timestamp - time;

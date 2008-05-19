@@ -23,7 +23,6 @@
 
 #include "gnash.h"
 #include "types.h"
-#include "utility.h"
 #include "smart_ptr.h"
 #include "swf/TagLoadersTable.h"
 

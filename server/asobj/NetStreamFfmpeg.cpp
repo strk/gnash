@@ -37,6 +37,7 @@
 #include "FLVParser.h" 
 
 #include <boost/scoped_array.hpp>
+#include <algorithm> // std::min
 
 
 #if defined(_WIN32) || defined(WIN32)
@@ -768,7 +769,7 @@ bool NetStreamFfmpeg::audio_streamer(void *owner, boost::uint8_t *stream, int le
 
     		media::raw_mediadata_t* samples = ns->m_qaudio.front();
 
-		int n = imin(samples->m_size, len);
+		int n = std::min<int>(samples->m_size, len);
 		memcpy(stream, samples->m_ptr, n);
 		stream += n;
 		samples->m_ptr += n;

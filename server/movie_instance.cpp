@@ -28,7 +28,7 @@
 #include <cmath>
 
 #include <functional> // for mem_fun, bind1st
-#include <algorithm> // for for_each
+#include <algorithm> // for for_each, std::min
 
 using namespace std;
 
@@ -77,7 +77,7 @@ movie_instance::advance()
 	// We do this inside advance_root to make sure
 	// it's only for a root sprite (not a sprite defined
 	// by DefineSprite!)
-	size_t nextframe = min(get_current_frame()+2, get_frame_count());
+	size_t nextframe = std::min<size_t>(get_current_frame()+2, get_frame_count());
 	if ( !_def->ensure_frame_loaded(nextframe) )
 	{
 		IF_VERBOSE_MALFORMED_SWF(

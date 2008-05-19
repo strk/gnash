@@ -29,6 +29,7 @@
 #include <typeinfo>
 #include <cmath>
 #include <boost/cstdint.hpp>
+#include <algorithm> // std::min, std::max
 
 #if defined(__GNUC__) && __GNUC__ > 2
 #  include <cxxabi.h>
@@ -115,41 +116,10 @@ inline int iabs(int i)
     else return i;
 }
 
-/* fmax()/fmin() is C99 */
-inline float fmax(float a, float b)
-{
-    if (a < b) return b;
-    else return a;
-}
-
-inline float fmin(float a, float b)
-{
-    if (a < b) return a;
-    else return b;
-}
-
-inline int imax(int a, int b)
-{
-    if (a < b) return b;
-    else return a;
-}
-
-inline int imin(int a, int b)
-{
-    if (a < b) return a;
-    else return b;
-}
-
-inline int iclamp(int i, int min, int max)
+template <typename T> inline T clamp(T i, T min, T max)
 {
 	assert( min <= max );
-	return imax(min, imin(i, max));
-}
-
-inline float fclamp(float f, float xmin, float xmax)
-{
-	assert( xmin <= xmax );
-	return fmax(xmin, fmin(f, xmax));
+	return std::max<T>(min, std::min<T>(i, max));
 }
 
 inline float flerp(float a, float b, float f)

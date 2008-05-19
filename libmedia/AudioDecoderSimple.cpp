@@ -82,11 +82,11 @@ private:
 		if (code_sign_bit) delta = -delta;
 
 		sample += delta;
-		sample = utility::iclamp(sample, -32768, 32767);
+		sample = utility::clamp<int>(sample, -32768, 32767);
 
 		/* Update our stepsize index.  Use a lookup table. */
 		stepsize_index += index_update_table[code_mag];
-		stepsize_index = utility::iclamp(stepsize_index, 0, STEPSIZE_CT - 1);
+		stepsize_index = utility::clamp<int>(stepsize_index, 0, STEPSIZE_CT - 1);
 	}
 
 	/* Uncompress 4096 mono samples of ADPCM. */
