@@ -65,10 +65,9 @@ attachPointInterface(as_object& o)
 static void
 attachPointStaticProperties(as_object& o)
 {
-   
-    o.init_member("distance", new builtin_function(Point_distance));
-    o.init_member("interpolate", new builtin_function(Point_interpolate));
-    o.init_member("polar", new builtin_function(Point_polar));
+    o.init_member("distance", new builtin_function(Point_distance), 0);
+    o.init_member("interpolate", new builtin_function(Point_interpolate), 0);
+    o.init_member("polar", new builtin_function(Point_polar), 0);
 }
 
 static as_object*

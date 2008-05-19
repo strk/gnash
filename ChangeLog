@@ -1,5 +1,13 @@
 2008-05-19 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/flash/geom/Point_as.cpp (attachPointStaticProperties):
+	  Don't protect static properties. Gets closer to succeed swfdec's
+	  point-properties-*.swf. Won't get any further at would require
+	  either an ugly hack (providing an empty useless-looking prototype)
+	  or some longer support (prototype by destructive setter).
+
+2008-05-19 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/Global.cpp, server/asobj/flash_pkg.cpp:
 	  Register the 'flash' package starting at swf6, just 
 	  hide by prop flags (so to get more successes in swfdec testsuite).
