@@ -53,10 +53,9 @@ get_flash_package(const fn_call& /*fn*/)
 void
 flash_package_init(as_object& global)
 {
-	assert(global.getVM().getSWFVersion() >= 8);
-
 	string_table& st = global.getVM().getStringTable();
-	global.init_destructive_property(st.find("flash"), get_flash_package);
+	global.init_destructive_property(st.find("flash"), get_flash_package,
+		as_prop_flags::dontEnum|as_prop_flags::onlySWF8Up);
 }
 
 } // end of gnash namespace

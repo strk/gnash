@@ -1,5 +1,13 @@
 2008-05-19 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/Global.cpp, server/asobj/flash_pkg.cpp:
+	  Register the 'flash' package starting at swf6, just 
+	  hide by prop flags (so to get more successes in swfdec testsuite).
+	* testsuite/swfdec/PASSING: point-{6,7}.swf succeed, completing
+	  the set.
+
+2008-05-19 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/flash/geom/Point_as.cpp: sqrtf->std::sqrt,
 	  drop some early outs with wrong assumption (non-finite is not
 	  necessarely NaN)

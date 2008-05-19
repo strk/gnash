@@ -190,12 +190,11 @@ Global::Global(VM& vm, ClassHierarchy *ch)
         case 9:
         case 8:
 
-            flash_package_init(*this);
-
         case 7:
         case 6:
 
             function_class_init(*this);
+            flash_package_init(*this); // will hide unless swf8 (by prop flags)
             ch->getGlobalNs()->stubPrototype(NSV::CLASS_FUNCTION);
             ch->getGlobalNs()->getClass(NSV::CLASS_FUNCTION)->setDeclared();
             init_member("LocalConnection", new builtin_function(localconnection_new));
