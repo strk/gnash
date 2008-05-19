@@ -35,8 +35,7 @@ noinst_SCRIPT = autogen.sh
 ## We also want to build everything possible, since we're
 ## testing builds.
 DISTCHECK_CONFIGURE_FLAGS = \
-	--with-kparts-install=prefix \
-	--with-npapi-plugindir=/tmp/gnash-distcheck-$$/npapi \
+	--with-plugins-install=prefix \
 	--enable-extensions=all \
 	--enable-gui=all 
 #--enable-cygnal

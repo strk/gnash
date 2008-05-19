@@ -157,6 +157,19 @@
 	</row>
 	<row>
 	  <entry>
+	    <option>--with-plugins-install=user|system|prefix</option>
+	  </entry>
+	  <entry>
+	    This option sets the install policy for NPAPI (mozilla) and KPARTS (kde) plugins.
+	    Policy 'user' means plugin will be installed only for the configuring user.
+            Policy 'system' will try to find a systemwide place for plugins (to enable for all).
+            Policy 'prefix' will install under ${prefix} (npapi/kparts subdirs);
+            WARNING: if 'prefix' policy is given, plugins won't be found w/out further enabling procudures.
+            The default policy is 'user', can be overridden for specific plugins.
+	  </entry>
+	</row>
+	<row>
+	  <entry>
 	    <option>--with-npapi-install=user|system|prefix</option>
 	  </entry>
 	  <entry>

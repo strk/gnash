@@ -1244,6 +1244,20 @@ if test x$plugins = xno; then
   kparts=no
 fi
 
+dnl
+dnl Set the general plugins install policy here
+dnl
+AC_ARG_WITH(plugins-install,
+  AC_HELP_STRING([--with-plugins-install=system|user|prefix], [Policy for plugins install. Default: user.]),
+	[case "${withval}" in
+	  user) PLUGINS_INSTALL_POLICY=user ;;
+	  system) PLUGINS_INSTALL_POLICY=system ;;
+	  prefix) PLUGINS_INSTALL_POLICY=prefix ;;
+	  *)  AC_MSG_ERROR([bad value ${withval} for --with-plugins-install]) ;;
+	 esac 
+	], PLUGINS_INSTALL_POLICY=user) 
+
+
 GNASH_PATH_FIREFOX
 
 dnl -----------------------------------------------------------------

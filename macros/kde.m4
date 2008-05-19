@@ -39,7 +39,7 @@ AC_DEFUN([GNASH_PATH_KDE],
 	  prefix) KPARTS_INSTALL_POLICY=prefix ;;
 	  *)  AC_MSG_ERROR([bad value ${withval} for --with-kparts-install]) ;;
 	 esac 
-	], KPARTS_INSTALL_POLICY=user) dnl TODO: inherit a generic PLUGINS_INSTALL_POLICY when available
+	], KPARTS_INSTALL_POLICY=${PLUGINS_INSTALL_POLICY}) dnl Inherit a generic PLUGINS_INSTALL_POLICY when available
 
   AC_ARG_WITH(kde-pluginprefix, AC_HELP_STRING([--with-kde-pluginprefix=DIR],
       [Prefix for KDE plugin, like /usr]),

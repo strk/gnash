@@ -34,7 +34,7 @@ AC_DEFUN([GNASH_PATH_FIREFOX],
   	  prefix) NPAPI_INSTALL_POLICY=prefix ;;
   	  *)  AC_MSG_ERROR([bad value ${withval} for --with-npapi-install]) ;;
   	 esac 
-      ], NPAPI_INSTALL_POLICY=user) dnl TODO: inherit a generic PLUGINS_INSTALL_POLICY when available
+      ], NPAPI_INSTALL_POLICY=${PLUGINS_INSTALL_POLICY}) dnl Inherit a generic PLUGINS_INSTALL_POLICY when available
 
 
   dnl For backward compatibility, won't be advertised
