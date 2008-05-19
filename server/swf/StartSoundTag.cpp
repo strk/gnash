@@ -19,7 +19,7 @@
 
 
 #ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
+    #include "gnashconfig.h"
 #endif
 
 #include "StartSoundTag.h"
@@ -35,113 +35,121 @@ namespace SWF {
 void
 StartSoundTag::loader(stream* in, tag_type tag, movie_definition* m)
 {
-	assert(tag == SWF::STARTSOUND); // 15 
+    assert(tag == SWF::STARTSOUND); // 15 
 
-	// Make static ?
-	media::sound_handler* handler = get_sound_handler();
+    // Make static ?
+    media::sound_handler* handler = get_sound_handler();
 
-	in->ensureBytes(2); // sound_id
+    in->ensureBytes(2); // sound_id
 
-	int sound_id = in->read_u16();
+    int sound_id = in->read_u16();
 
-	sound_sample* sam = m->get_sound_sample(sound_id);
-	if ( ! sam ) // invalid id... nothing to do
-	{
-		IF_VERBOSE_MALFORMED_SWF(
-		// if there's no sound_handler we might have simply skipped
-		// the definition of sound sample...
-		if (handler)
-		{
-			log_swferror(_("start_sound_loader: sound_id %d is not defined"), sound_id);
-		}
-		);
+    sound_sample* sam = m->get_sound_sample(sound_id);
+    if ( ! sam ) // invalid id... nothing to do
+    {
+        IF_VERBOSE_MALFORMED_SWF(
+            // if there's no sound_handler we might have simply skipped
+            // the definition of sound sample...
+            if (handler) {
+              log_swferror(_("start_sound_loader: sound_id %d is not defined"), sound_id);
+            }
+        );
+        return;
+    }
 
-		return;
-	}
+    // NOTE: sound_id is the SWF-defined id,
+    //       sam->m_sound_handler_id is the sound_handler-provided id
+    //
+    StartSoundTag*  sst = new StartSoundTag(sam->m_sound_handler_id);
+    sst->read(*in);
 
-	// NOTE: sound_id is the SWF-defined id,
-	//       sam->m_sound_handler_id is the sound_handler-provided id
-	//
-	StartSoundTag*	sst = new StartSoundTag(sam->m_sound_handler_id);
-	sst->read(*in);
+    IF_VERBOSE_PARSE (
+         log_parse(_("StartSound: id=%d, stop = %d, loop ct = %d"),
+              sound_id, int(sst->m_stop_playback), sst->m_loop_count);
+    );
 
-	IF_VERBOSE_PARSE (
-	log_parse(_("StartSound: id=%d, stop = %d, loop ct = %d"),
-		sound_id, int(sst->m_stop_playback), sst->m_loop_count);
-	);
-
-	m->addControlTag(sst); // takes ownership
+    m->addControlTag(sst); // takes ownership
 }
 
 /* private */
 void
 StartSoundTag::read(stream& in)
 {
-	in.align();
-	in.ensureBytes(1); // header
+    in.align();
+    in.ensureBytes(1); // header
 
-	in.read_uint(2);	// skip reserved bits.
-	m_stop_playback = in.read_bit(); 
-	bool	no_multiple = in.read_bit(); 
-	bool	has_envelope = in.read_bit();
-	bool	has_loops = in.read_bit(); 
-	bool	has_out_point = in.read_bit(); 
-	bool	has_in_point = in.read_bit(); 
+    int flags = in.read_u8();
+    // first two bits are reserved.
+    m_stop_playback     = flags & (1 << 5); 
+    bool  no_multiple   = flags & (1 << 4); 
+    bool  has_envelope  = flags & (1 << 3); 
+    bool  has_loops     = flags & (1 << 2); 
+    bool  has_out_point = flags & (1 << 1); 
+    bool  has_in_point  = flags & (1 << 0); 
 
-	if (no_multiple)
-	{
-		LOG_ONCE( log_unimpl("syncNoMultiple flag in StartSoundTag") );
-	}
+    if (no_multiple)
+    {
+        LOG_ONCE( log_unimpl("syncNoMultiple flag in StartSoundTag") );
+    }
 
-	boost::uint32_t	in_point = 0;
-	boost::uint32_t	out_point = 0;
+    boost::uint32_t in_point = 0;
+    boost::uint32_t out_point = 0;
 
-	in.ensureBytes(has_in_point*4 + has_out_point*4 + has_loops*2);
+    in.ensureBytes(has_in_point*4 + has_out_point*4 + has_loops*2);
 
-	if (has_in_point) { in_point = in.read_u32(); }
-	if (has_out_point) { out_point = in.read_u32(); }
-	if (has_loops) { m_loop_count = in.read_u16(); }
+    if (has_in_point)
+    {
+        in_point = in.read_u32();
+    }
+    if (has_out_point)
+    {
+        out_point = in.read_u32();
+    }
+    if (has_loops)
+    {
+        m_loop_count = in.read_u16();
+    }
 
-	if (has_envelope)
-	{
-		in.ensureBytes(1);
-		int nPoints = in.read_u8();
+    if (has_envelope)
+    {
+        in.ensureBytes(1);
+        int nPoints = in.read_u8();
 
-		m_envelopes.resize(nPoints);
-		in.ensureBytes(8*nPoints);
-		for (int i=0; i < nPoints; i++)
-		{
-			m_envelopes[i].m_mark44 = in.read_u32();
-			m_envelopes[i].m_level0 = in.read_u16();
-			m_envelopes[i].m_level1 = in.read_u16();
-		}
-	}
+        m_envelopes.resize(nPoints);
+        in.ensureBytes(8*nPoints);
+        for (int i=0; i < nPoints; i++)
+        {
+            m_envelopes[i].m_mark44 = in.read_u32();
+            m_envelopes[i].m_level0 = in.read_u16();
+            m_envelopes[i].m_level1 = in.read_u16();
+        }
+    }
 
 }
-
 
 void
 StartSoundTag::execute(sprite_instance* /* m */, DisplayList& /* dlist */) const
 {
-	// Make static ?
-	media::sound_handler* handler = get_sound_handler();
+    //GNASH_REPORT_FUNCTION;
 
-	//GNASH_REPORT_FUNCTION;
+    // Make static ?
+    media::sound_handler* handler = get_sound_handler();   
 
-	if (handler)
-	{
-		if (m_stop_playback)
-		{
-			//log_debug("Execute StartSoundTag with 'stop playback' flag on");
-			handler->stop_sound(m_handler_id);
-		}
-		else
-		{
-			//log_debug("Execute StartSoundTag with 'stop playback' flag OFF");
-			handler->play_sound(m_handler_id, m_loop_count, 0, 0, (m_envelopes.empty() ? NULL : &m_envelopes));
-		}
-	}
+    if (handler)
+    {
+        if (m_stop_playback)
+        {
+            //log_debug("Execute StartSoundTag with 'stop playback' flag on");
+            handler->stop_sound(m_handler_id);
+        }
+        else
+        {
+            //log_debug("Execute StartSoundTag with 'stop playback' flag OFF");
+            handler->play_sound(m_handler_id, m_loop_count, 0, 0, (m_envelopes.empty() ? NULL : &m_envelopes));
+        }
+    }
 }
+
 
 } // namespace gnash::SWF
 } // namespace gnash

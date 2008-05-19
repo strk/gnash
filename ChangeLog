@@ -1,3 +1,7 @@
+2008-05-18 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* server/cxform.cpp, server/swf/StartSoundTag.cpp: more read_bit() reduction.
+	
 2008-05-18 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* libbase/utility.h: move general mathematical functions under
