@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Point.as,v 1.2 2008/05/19 11:05:27 strk Exp $";
+rcsid="$Id: Point.as,v 1.3 2008/05/19 11:51:41 strk Exp $";
 
 #include "check.as"
 
@@ -92,7 +92,6 @@ check_equals(p0.length, 5);
 // Test Point.add
 //-------------------------------------------------------------
 
-// TODO
 p0 = new Point('x', 'y');
 ret = p0.add();
 check(ret instanceof Point);
@@ -143,7 +142,66 @@ check_equals(p2.toString(), "(x=3, y=4)");
 // Test Point.distance (static)
 //-------------------------------------------------------------
 
-// TODO
+dist = Point.distance();
+check_equals(typeof(dist), 'undefined');
+
+dist = Point.distance(undefined);
+check_equals(typeof(dist), 'undefined');
+
+o0 = {x:10, y:1};
+o1 = {x:21, y:1};
+dist = Point.distance(o0, o1);
+check_equals(typeof(dist), 'undefined');
+
+p0 = new Point('x', 'y');
+p1 = new Point('a', 'b');
+dist = Point.distance(p0, p1);
+check_equals(typeof(dist), 'number');
+check(isNaN(dist));
+dist = p0.distance(p1);
+check_equals(typeof(dist), 'undefined');
+
+p0 = new Point('10', '20');
+p1 = new Point('10', 'y');
+dist = Point.distance(p0, p1);
+check_equals(typeof(dist), 'number');
+check(isNaN(dist));
+dist = p0.distance(p1);
+check_equals(typeof(dist), 'undefined');
+
+p0 = new Point('10', 'y');
+p1 = new Point('10', '20');
+dist = Point.distance(p0, p1);
+check_equals(typeof(dist), 'number');
+check(isNaN(dist));
+dist = p0.distance(p1);
+check_equals(typeof(dist), 'undefined');
+
+p0 = new Point('5', '4');
+p1 = new Point('4', '7');
+dist = Point.distance(p0, p1);
+check_equals(typeof(dist), 'number');
+check_equals(Math.round(dist*100), 316);
+dist = p0.distance(p1);
+check_equals(typeof(dist), 'undefined');
+
+p0 = new Point('1', '1');
+p1 = new Point('10', '1');
+dist = Point.distance(p0, p1);
+check_equals(typeof(dist), 'number');
+check_equals(dist, 9);
+
+// Doesn't matter if second arg is an instanceof Point
+dist = Point.distance(p0, o1);
+check_equals(typeof(dist), 'number');
+check_equals(dist, 20);
+
+// But first arg *must* be instanceof point !
+dist = Point.distance(o1, p0);
+check_equals(typeof(dist), 'undefined');
+o1.__proto__ = Point.prototype;
+dist = Point.distance(o1, p0);
+check_equals(dist, 20);
 
 //-------------------------------------------------------------
 // Test Point.equals
@@ -225,6 +283,6 @@ check(!p1.equals('string'));
 // END OF TEST
 //-------------------------------------------------------------
 
-check_totals(71);
+check_totals(92);
 
 #endif // OUTPUT_VERSION >= 8

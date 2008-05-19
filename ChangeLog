@@ -1,5 +1,10 @@
 2008-05-19 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/flash/geom/Point_as.cpp: implement Point.distance().
+	* testsuite/actionscript.all/Point.as: test Point.distance().
+
+2008-05-19 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/flash/geom/Point_as.cpp: implement Point.add(),
 	  Point.equals() and Point.clone()
 	* testsuite/actionscript.all/Point.as: test Point.add(),

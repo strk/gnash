@@ -308,10 +308,67 @@ Point_length_getset(const fn_call& fn)
 static as_value
 Point_distance(const fn_call& fn)
 {
-	boost::intrusive_ptr<Point_as> ptr = ensureType<Point_as>(fn.this_ptr);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+	if ( fn.nargs < 2 )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		std::stringstream ss; fn.dump_args(ss);
+		log_aserror("Point.distance(%s): %s", ss.str(), _("missing arguments"));
+		);
+		return as_value();
+	}
+
+	as_value& arg1 = fn.arg(0);
+	if ( ! arg1.is_object() )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		std::stringstream ss; fn.dump_args(ss);
+		log_aserror("Point.distance(%s): %s", ss.str(), _("First arg must be an object"));
+		);
+		return as_value();
+	}
+	as_object* o1 = arg1.to_object().get();
+	assert(o1);
+	if ( ! o1->instanceOf(getFlashGeomPointConstructor()) )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		std::stringstream ss; fn.dump_args(ss);
+		log_aserror("Point.equals(%s): %s %s", ss.str(), _("First arg must be an instance of"), "flash.geom.Point");
+		);
+		return as_value();
+	}
+
+	as_value& arg2 = fn.arg(1);
+	as_object* o2 = arg2.to_object().get();
+	assert(o2);
+	// it seems there's no need to check arg2 (see actionscript.all/Point.as)
+
+	as_value x1val;
+	o1->get_member(NSV::PROP_X, &x1val);
+	double x1 = x1val.to_number();
+	if ( ! utility::isFinite(x1) ) return as_value(NAN);
+
+	as_value y1val;
+	o1->get_member(NSV::PROP_Y, &y1val);
+	double y1 = y1val.to_number();
+	if ( ! utility::isFinite(y1) ) return as_value(NAN);
+
+	as_value x2val;
+	o2->get_member(NSV::PROP_X, &x2val);
+	double x2 = x2val.to_number();
+	if ( ! utility::isFinite(x2) ) return as_value(NAN);
+
+	as_value y2val;
+	o2->get_member(NSV::PROP_Y, &y2val);
+	double y2 = y2val.to_number();
+	if ( ! utility::isFinite(y2) ) return as_value(NAN);
+
+	double hside = x2 - x1; // p1.x - p0.x;
+	double vside = y2 - y1; // p1.y - p0.y;
+
+	double sqdist = hside*hside + vside*vside;
+	double dist = sqrtf(sqdist);
+
+	return as_value(dist);
 }
 
 static as_value
