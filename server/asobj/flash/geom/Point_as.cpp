@@ -127,13 +127,13 @@ Point_add(const fn_call& fn)
 	}
 	else
 	{
+		IF_VERBOSE_ASCODING_ERRORS(
 		if ( fn.nargs > 1 )
 		{
-			IF_VERBOSE_ASCODING_ERRORS(
 			std::stringstream ss; fn.dump_args(ss);
 			log_aserror("Point.add(%s): %s", ss.str(), _("arguments after first discarded"));
-			);
 		}
+		);
 		as_value& arg1 = fn.arg(0);
 		as_object* o = arg1.to_object().get();
 		if ( ! o )
@@ -238,8 +238,53 @@ static as_value
 Point_normalize(const fn_call& fn)
 {
 	boost::intrusive_ptr<Point_as> ptr = ensureType<Point_as>(fn.this_ptr);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
+
+	as_value argval;
+
+	if ( ! fn.nargs )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("%s: missing arguments"), "Point.normalize()");
+		);
+		return as_value();
+	}
+	else
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		if ( fn.nargs > 1 )
+		{
+			std::stringstream ss; fn.dump_args(ss);
+			log_aserror("Point.normalize(%s): %s", ss.str(), _("arguments after first discarded"));
+		}
+		);
+
+		argval = fn.arg(0);
+	}
+
+	// newlen may be NaN, and we'd still be updating x/y
+	// see actionscript.all/Point.as
+	double newlen = argval.to_number();
+
+	as_value xval, yval;
+	ptr->get_member(NSV::PROP_X, &xval);
+	ptr->get_member(NSV::PROP_Y, &yval);
+
+	double x = xval.to_number();
+	if ( ! utility::isFinite(x) ) return as_value();
+	double y = yval.to_number();
+	if ( ! utility::isFinite(y) ) return as_value();
+
+	if ( x == 0 && y == 0 ) return as_value();
+
+	double curlen = sqrt(x*x+y*y);
+	double fact = newlen/curlen;
+
+
+	xval.set_double( xval.to_number() * fact );
+	yval.set_double( yval.to_number() * fact );
+	ptr->set_member(NSV::PROP_X, xval);
+	ptr->set_member(NSV::PROP_Y, yval);
+
 	return as_value();
 }
 
@@ -247,8 +292,24 @@ static as_value
 Point_offset(const fn_call& fn)
 {
 	boost::intrusive_ptr<Point_as> ptr = ensureType<Point_as>(fn.this_ptr);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
+
+	as_value x, y;
+	ptr->get_member(NSV::PROP_X, &x);
+	ptr->get_member(NSV::PROP_Y, &y);
+
+	as_value xoff, yoff;
+
+	if ( fn.nargs ) {
+		xoff = fn.arg(0);
+		if ( fn.nargs > 1 ) yoff = fn.arg(1);
+	}
+
+	x.newAdd(xoff);
+	y.newAdd(yoff);
+
+	ptr->set_member(NSV::PROP_X, x);
+	ptr->set_member(NSV::PROP_Y, y);
+
 	return as_value();
 }
 
@@ -256,9 +317,66 @@ static as_value
 Point_subtract(const fn_call& fn)
 {
 	boost::intrusive_ptr<Point_as> ptr = ensureType<Point_as>(fn.this_ptr);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+
+	as_value x, y;
+	ptr->get_member(NSV::PROP_X, &x);
+	ptr->get_member(NSV::PROP_Y, &y);
+
+	as_value x1, y1;
+
+	if ( ! fn.nargs )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("%s: missing arguments"), "Point.add()");
+		);
+	}
+	else
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		if ( fn.nargs > 1 )
+		{
+			std::stringstream ss; fn.dump_args(ss);
+			log_aserror("Point.add(%s): %s", ss.str(), _("arguments after first discarded"));
+		}
+		);
+		as_value& arg1 = fn.arg(0);
+		as_object* o = arg1.to_object().get();
+		if ( ! o )
+		{
+			IF_VERBOSE_ASCODING_ERRORS(
+			std::stringstream ss; fn.dump_args(ss);
+			log_aserror("Point.add(%s): %s", ss.str(), _("first argument doesn't cast to object"));
+			);
+		}
+		else
+		{
+			if ( ! o->get_member(NSV::PROP_X, &x1) )
+			{
+				IF_VERBOSE_ASCODING_ERRORS(
+				std::stringstream ss; fn.dump_args(ss);
+				log_aserror("Point.add(%s): %s", ss.str(),
+					_("first argument casted to object doesn't contain an 'x' member"));
+				);
+			}
+			if ( ! o->get_member(NSV::PROP_Y, &y1) )
+			{
+				IF_VERBOSE_ASCODING_ERRORS(
+				std::stringstream ss; fn.dump_args(ss);
+				log_aserror("Point.add(%s): %s", ss.str(),
+					_("first argument casted to object doesn't contain an 'y' member"));
+				);
+			}
+		}
+	}
+
+	x.set_double(x.to_number() - x1.to_number());
+	y.set_double(y.to_number() - y1.to_number());
+
+	boost::intrusive_ptr<as_object> ret = new Point_as;
+	ret->set_member(NSV::PROP_X, x);
+	ret->set_member(NSV::PROP_Y, y);
+
+	return as_value(ret.get());
 }
 
 static as_value
@@ -468,10 +586,43 @@ Point_interpolate(const fn_call& fn)
 static as_value
 Point_polar(const fn_call& fn)
 {
-	boost::intrusive_ptr<Point_as> ptr = ensureType<Point_as>(fn.this_ptr);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+	as_value lval; // length
+	as_value aval; // angle (radians)
+
+	if ( fn.nargs )
+	{
+		lval=fn.arg(0);
+		if ( fn.nargs > 1 ) aval=fn.arg(1);
+		else
+		{
+			IF_VERBOSE_ASCODING_ERRORS(
+			std::stringstream ss; fn.dump_args(ss);
+			log_aserror("Point.polar(%s): %s", ss.str(), _("missing arguments"));
+			);
+		}
+	}
+	else
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		std::stringstream ss; fn.dump_args(ss);
+		log_aserror("Point.polar(%s): %s", ss.str(), _("missing arguments"));
+		);
+	}
+	
+	double len = lval.to_number();
+	double angle = aval.to_number();
+
+	double x = len * std::cos(angle);
+	double y = len * std::sin(angle);
+
+	as_value xval(x);
+	as_value yval(y);
+	boost::intrusive_ptr<as_object> obj = new Point_as;
+
+	obj->set_member(NSV::PROP_X, x);
+	obj->set_member(NSV::PROP_Y, y);
+	
+	return as_value(obj.get());
 }
 
 

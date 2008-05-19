@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Point.as,v 1.4 2008/05/19 14:12:16 strk Exp $";
+rcsid="$Id: Point.as,v 1.5 2008/05/19 15:59:25 strk Exp $";
 
 #include "check.as"
 
@@ -318,36 +318,164 @@ ret = Point.interpolate(o0, o1, 0.5);
 check_equals(ret.toString(), '(x=5, y=5)');
 
 
-// TODO
-
 //-------------------------------------------------------------
 // Test Point.normalize
 //-------------------------------------------------------------
 
-// TODO
+p0 = new Point(0, 0);
+p1 = p0.clone();
+ret = p1.normalize();
+check_equals(typeof(ret), 'undefined');
+check(p1.equals(p0));
+
+p0 = new Point(0, 0);
+p1 = p0.clone();
+ret = p1.normalize(10);
+check_equals(typeof(ret), 'undefined');
+check(p1.equals(p0));
+
+p0 = new Point(10, 0);
+p1 = p0.clone();
+ret = p1.normalize(5);
+check_equals(typeof(ret), 'undefined');
+check_equals(p1.toString(), '(x=5, y=0)');
+
+p0 = new Point(0, 10);
+p1 = p0.clone();
+ret = p1.normalize(-5);
+check_equals(typeof(ret), 'undefined');
+check_equals(p1.toString(), '(x=0, y=-5)');
+
+p0 = new Point(3, -4);
+p1 = p0.clone();
+ret = p1.normalize(-10);
+check_equals(typeof(ret), 'undefined');
+check_equals(p1.toString(), '(x=-6, y=8)');
+
+p0 = new Point(-10, 0);
+p1 = p0.clone();
+ret = p1.normalize(5);
+check_equals(typeof(ret), 'undefined');
+check_equals(p1.toString(), '(x=-5, y=0)');
+
+p0 = new Point(-10, 0);
+p1 = p0.clone();
+ret = p1.normalize('r');
+check_equals(typeof(ret), 'undefined');
+check_equals(p1.toString(), '(x=NaN, y=NaN)');
+
+p0 = new Point('x', 'y');
+p1 = p0.clone();
+ret = p1.normalize(5);
+check_equals(typeof(ret), 'undefined');
+check_equals(p1.toString(), '(x=x, y=y)');
 
 //-------------------------------------------------------------
 // Test Point.offset
 //-------------------------------------------------------------
 
-// TODO
+p0 = new Point('x', 'y');
+ret = p0.offset();
+check_equals(typeof(ret), 'undefined');
+check_equals(p0.toString(), '(x=xundefined, y=yundefined)');
+
+p0 = new Point('x', 'y');
+ret = p0.offset('a');
+check_equals(typeof(ret), 'undefined');
+check_equals(p0.toString(), '(x=xa, y=yundefined)');
+
+p0 = new Point('x', 'y');
+ret = p0.offset('a', 'b', 3);
+check_equals(typeof(ret), 'undefined');
+check_equals(p0.toString(), '(x=xa, y=yb)');
+
+p0 = new Point(4, 5);
+ret = p0.offset('-6', -8);
+check_equals(typeof(ret), 'undefined');
+check_equals(p0.toString(), '(x=4-6, y=-3)');
 
 //-------------------------------------------------------------
 // Test Point.polar (static)
 //-------------------------------------------------------------
 
-// TODO
+p0 = Point.polar();
+check(p0 instanceof Point);
+check_equals(p0.toString(), '(x=NaN, y=NaN)');
+
+p0 = Point.polar(1);
+check(p0 instanceof Point);
+check_equals(p0.toString(), '(x=NaN, y=NaN)');
+
+p0 = Point.polar(1, 0);
+check(p0 instanceof Point);
+check_equals(p0.toString(), '(x=1, y=0)');
+
+p0 = Point.polar(1, Math.PI);
+check(p0 instanceof Point);
+check_equals(p0.x, -1);
+check_equals(Math.round(p0.y*100), 0);
+
+p0 = Point.polar(1, Math.PI/2);
+check(p0 instanceof Point);
+check_equals(Math.round(p0.x*100), 0);
+check_equals(p0.y, 1);
+
+p0 = Point.polar(1, Math.PI*2);
+check(p0 instanceof Point);
+check_equals(p0.x, 1);
+check_equals(Math.round(p0.y*100), 0);
+
+p0 = Point.polar(1, Math.PI*1.5);
+check(p0 instanceof Point);
+check_equals(Math.round(p0.x*100), 0);
+check_equals(p0.y, -1);
+
+p0 = Point.polar('5', '0');
+check(p0 instanceof Point);
+check_equals(p0.x, 5);
+check_equals(p0.y, 0);
+
 
 //-------------------------------------------------------------
 // Test Point.subtract
 //-------------------------------------------------------------
 
-// TODO
+p0 = new Point('x', 'y');
+ret = p0.subtract();
+check(ret instanceof Point);
+check_equals(p0.toString(), '(x=x, y=y)');
+check_equals(ret.toString(), '(x=NaN, y=NaN)');
+String.prototype.x = 3; // to test it's used
+ret = p0.subtract('1');
+delete String.prototype.x;
+check(ret instanceof Point);
+check_equals(ret.toString(), '(x=NaN, y=NaN)');
+check_equals(p0.toString(), '(x=x, y=y)');
+ret = p0.subtract(1, '2');
+check(ret instanceof Point);
+check_equals(ret.toString(), '(x=NaN, y=NaN)');
+check_equals(p0.toString(), '(x=x, y=y)');
+
+p0 = new Point('x', 'y');
+p1 = new Point('x1', 'y1');
+ret = p0.subtract(p1);
+check(ret instanceof Point);
+check_equals(ret.toString(), '(x=NaN, y=NaN)');
+check_equals(p0.toString(), '(x=x, y=y)');
+check_equals(p1.toString(), '(x=x1, y=y1)');
+
+p0 = new Point(2, 3);
+p1 = { x:1, y:1 };
+ret = p0.subtract(p1);
+check_equals(ret.toString(), '(x=1, y=2)');
+
+ret = p0.subtract(p1, 4, 5, 6);
+check_equals(ret.toString(), '(x=1, y=2)');
 
 //-------------------------------------------------------------
 // END OF TEST
 //-------------------------------------------------------------
 
-check_totals(116);
+check_totals(176);
 
 #endif // OUTPUT_VERSION >= 8
