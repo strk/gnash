@@ -52,7 +52,7 @@ msgstr ""
 #: ../libbase/curl_adapter.cpp:374
 #, c-format
 msgid "Timeout (%u milliseconds) while loading from url %s"
-msgstr "url %s のロードがタイムアウト (%u ミリ秒) しました"
+msgstr "url %2$s のロードがタイムアウト (%1$u ミリ秒) しました"
 
 #: ../libbase/curl_adapter.cpp:481
 msgid "Allowing connections to SSL sites with invalid or absent certificates"
