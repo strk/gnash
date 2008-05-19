@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Point.as,v 1.1 2008/05/07 08:03:40 strk Exp $";
+rcsid="$Id: Point.as,v 1.2 2008/05/19 11:05:27 strk Exp $";
 
 #include "check.as"
 
@@ -93,12 +93,51 @@ check_equals(p0.length, 5);
 //-------------------------------------------------------------
 
 // TODO
+p0 = new Point('x', 'y');
+ret = p0.add();
+check(ret instanceof Point);
+check_equals(p0.toString(), '(x=x, y=y)');
+check_equals(ret.toString(), '(x=xundefined, y=yundefined)');
+String.prototype.x = 3; // to test it's used
+ret = p0.add('1');
+delete String.prototype.x;
+check(ret instanceof Point);
+check_equals(ret.toString(), '(x=x3, y=yundefined)');
+check_equals(p0.toString(), '(x=x, y=y)');
+ret = p0.add(1, '2');
+check(ret instanceof Point);
+check_equals(ret.toString(), '(x=xundefined, y=yundefined)');
+check_equals(p0.toString(), '(x=x, y=y)');
+
+p0 = new Point('x', 'y');
+p1 = new Point('x1', 'y1');
+ret = p0.add(p1);
+check(ret instanceof Point);
+check_equals(ret.toString(), '(x=xx1, y=yy1)');
+check_equals(p0.toString(), '(x=x, y=y)');
+check_equals(p1.toString(), '(x=x1, y=y1)');
+
+p0 = new Point(2, 3);
+p1 = { x:1, y:1 };
+ret = p0.add(p1);
+check_equals(ret.toString(), '(x=3, y=4)');
+
+ret = p0.add(p1, 4, 5, 6);
+check_equals(ret.toString(), '(x=3, y=4)');
 
 //-------------------------------------------------------------
 // Test Point.clone
 //-------------------------------------------------------------
 
-// TODO
+p0 = new Point(3, 4);
+p0.z = 5;
+p2 = p0.clone();
+check(p2 instanceof Point);
+check_equals(p2.toString(), "(x=3, y=4)");
+check_equals(typeof(p2.z), 'undefined');
+p2 = p0.clone(1, 2, 3);
+check(p2 instanceof Point);
+check_equals(p2.toString(), "(x=3, y=4)");
 
 //-------------------------------------------------------------
 // Test Point.distance (static)
@@ -110,7 +149,47 @@ check_equals(p0.length, 5);
 // Test Point.equals
 //-------------------------------------------------------------
 
-// TODO
+o0 = {};
+o0.valueOf = function() { return 4; };
+o1 = {};
+o1.valueOf = function() { return 4; };
+
+p0 = new Point(3, o0);
+check(p0.equals(p0));
+
+p1 = new Point(3, o1);
+check(p1.equals(p1));
+
+check(p0 != p1);
+check_equals(p0.toString(), p1.toString());
+
+check(!p0.equals(p1));
+check(!p1.equals(p0));
+
+ret = p0.equals();
+check_equals(typeof(ret), 'boolean');
+check(!ret);
+
+p2 = new Point(3, o1);
+check(p1.equals(p2));
+// Equals doesn't return true if p2 isn't an point
+p2 = {x:3, y:o1};
+ret = p1.equals(p2);
+check_equals(typeof(ret), 'boolean');
+check(!ret);
+// But we can cheat ...
+p2.__proto__ = Point.prototype;
+check(p1.equals(p2));
+// ... even with double jump to get there ...
+o3 = {}; o3.prototype = {}; o3.prototype.__proto__ = Point.prototype;
+p2.__proto__ = o3.prototype;
+check(p1.equals(p2));
+// ... but not with syntetized objects ?
+String.prototype.x = 3;
+String.prototype.y = o1;
+String.prototype.__proto__ = Point.prototype;
+check(!p1.equals('string'));
+
 
 //-------------------------------------------------------------
 // Test Point.interpolate (static)
@@ -146,6 +225,6 @@ check_equals(p0.length, 5);
 // END OF TEST
 //-------------------------------------------------------------
 
-check_totals(37);
+check_totals(71);
 
 #endif // OUTPUT_VERSION >= 8

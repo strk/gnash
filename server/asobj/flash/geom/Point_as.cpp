@@ -112,27 +112,126 @@ static as_value
 Point_add(const fn_call& fn)
 {
 	boost::intrusive_ptr<Point_as> ptr = ensureType<Point_as>(fn.this_ptr);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+
+	as_value x, y;
+	ptr->get_member(NSV::PROP_X, &x);
+	ptr->get_member(NSV::PROP_Y, &y);
+
+	as_value x1, y1;
+
+	if ( ! fn.nargs )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("%s: missing arguments"), "Point.add()");
+		);
+	}
+	else
+	{
+		if ( fn.nargs > 1 )
+		{
+			IF_VERBOSE_ASCODING_ERRORS(
+			std::stringstream ss; fn.dump_args(ss);
+			log_aserror("Point.add(%s): %s", ss.str(), _("arguments after first discarded"));
+			);
+		}
+		as_value& arg1 = fn.arg(0);
+		as_object* o = arg1.to_object().get();
+		if ( ! o )
+		{
+			IF_VERBOSE_ASCODING_ERRORS(
+			std::stringstream ss; fn.dump_args(ss);
+			log_aserror("Point.add(%s): %s", ss.str(), _("first argument doesn't cast to object"));
+			);
+		}
+		else
+		{
+			if ( ! o->get_member(NSV::PROP_X, &x1) )
+			{
+				IF_VERBOSE_ASCODING_ERRORS(
+				std::stringstream ss; fn.dump_args(ss);
+				log_aserror("Point.add(%s): %s", ss.str(),
+					_("first argument casted to object doesn't contain an 'x' member"));
+				);
+			}
+			if ( ! o->get_member(NSV::PROP_Y, &y1) )
+			{
+				IF_VERBOSE_ASCODING_ERRORS(
+				std::stringstream ss; fn.dump_args(ss);
+				log_aserror("Point.add(%s): %s", ss.str(),
+					_("first argument casted to object doesn't contain an 'y' member"));
+				);
+			}
+		}
+	}
+
+	x.newAdd(x1);
+	y.newAdd(y1);
+
+	boost::intrusive_ptr<as_object> ret = new Point_as;
+	ret->set_member(NSV::PROP_X, x);
+	ret->set_member(NSV::PROP_Y, y);
+
+	return as_value(ret.get());
 }
 
 static as_value
 Point_clone(const fn_call& fn)
 {
 	boost::intrusive_ptr<Point_as> ptr = ensureType<Point_as>(fn.this_ptr);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+
+	as_value x, y;
+	ptr->get_member(NSV::PROP_X, &x);
+	ptr->get_member(NSV::PROP_Y, &y);
+
+	boost::intrusive_ptr<as_object> ret = new Point_as;
+	ret->set_member(NSV::PROP_X, x);
+	ret->set_member(NSV::PROP_Y, y);
+
+	return as_value(ret.get());
 }
 
 static as_value
 Point_equals(const fn_call& fn)
 {
 	boost::intrusive_ptr<Point_as> ptr = ensureType<Point_as>(fn.this_ptr);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+
+	if ( ! fn.nargs )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("%s: missing arguments"), "Point.equals()");
+		);
+		return as_value(false);
+	}
+
+	as_value& arg1 = fn.arg(0);
+	if ( ! arg1.is_object() )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		std::stringstream ss; fn.dump_args(ss);
+		log_aserror("Point.equals(%s): %s", ss.str(), _("First arg must be an object"));
+		);
+		return as_value(false);
+	}
+	as_object* o = arg1.to_object().get();
+	assert(o);
+	if ( ! o->instanceOf(getFlashGeomPointConstructor()) )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		std::stringstream ss; fn.dump_args(ss);
+		log_aserror("Point.equals(%s): %s %s", ss.str(), _("First arg must be an instance of"), "flash.geom.Point");
+		);
+		return as_value(false);
+	}
+
+	as_value x, y;
+	ptr->get_member(NSV::PROP_X, &x);
+	ptr->get_member(NSV::PROP_Y, &y);
+
+	as_value x1, y1;
+	o->get_member(NSV::PROP_X, &x1);
+	o->get_member(NSV::PROP_Y, &y1);
+
+	return as_value(x.equals(x1) && y.equals(y1));
 }
 
 static as_value
