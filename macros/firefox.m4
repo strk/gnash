@@ -26,40 +26,53 @@ AC_DEFUN([GNASH_PATH_FIREFOX],
   FIREFOX_PLUGINS=""
   if test x"${nsapi}" = x"yes"; then
 
-dnl    AC_ARG_WITH(plugindir, AC_HELP_STRING([--with-plugindir=DIR], [Directory to install NPAPI plugin in]),
-dnl      [FIREFOX_PLUGINS=$withval]
-dnl   )
+  AC_ARG_WITH(npapi-install,
+    AC_HELP_STRING([--with-npapi-install=system|user|prefix], [Policy for NPAPI plugin install. Default: user.]),
+      [case "${withval}" in
+  	  user) NPAPI_INSTALL_POLICY=user ;;
+  	  system) NPAPI_INSTALL_POLICY=system ;;
+  	  prefix) NPAPI_INSTALL_POLICY=prefix ;;
+  	  *)  AC_MSG_ERROR([bad value ${withval} for --with-npapi-install]) ;;
+  	 esac 
+      ], NPAPI_INSTALL_POLICY=user) dnl TODO: inherit a generic PLUGINS_INSTALL_POLICY when available
 
-    dnl For backward compatibility, won't be advertised
-    AC_ARG_WITH(plugindir, [],
-	[ AC_MSG_WARN([--with-plugindir is obsoleted, use --with-npapi-plugindir instead]); FIREFOX_PLUGINS=$withval])
 
-    AC_ARG_WITH(npapi-plugindir,
-	AC_HELP_STRING([--with-npapi-plugindir=DIR], [Directory to install NPAPI plugin in]),
-	[FIREFOX_PLUGINS=$withval]
-    )
+  dnl For backward compatibility, won't be advertised
+  AC_ARG_WITH(plugindir, [],
+    [ AC_MSG_WARN([--with-plugindir is obsoleted, use --with-npapi-plugindir instead]); FIREFOX_PLUGINS=$withval])
 
-dnl  GNASHEXE=""
-dnl     dnl Allow setting a path for the Gnash executable to be different from the prefix. This
-dnl     dnl is mostly only used for cross compiling.
-dnl     AC_ARG_WITH(gnashexe, AC_HELP_STRING([--with-gnashexe=DIR], [Directory to where the gnash executable is]),
-dnl       [gnashbindir=$withval]
-dnl     )
-dnl 
-dnl     dnl default to the prefix if no path is specified. As $prefix isn't set at this time by
-dnl     dnl configure, we set this to the variable itself so it gets resolved at make time.
-dnl     if test x"${gnashbindir}" = "x" ; then
-dnl       GNASHEXE="\${prefix}/bin"
-dnl     else
-dnl       GNASHEXE=${gnashbindir}
-dnl     fi
-dnl  AC_SUBST(GNASHEXE)
+  AC_ARG_WITH(npapi-plugindir,
+    AC_HELP_STRING([--with-npapi-plugindir=DIR], [Directory to install NPAPI plugin in]),
+    [FIREFOX_PLUGINS=$withval]
+  )
 
-    dnl Always install the plugin in the users home directory. We
-    dnl always use .mozilla instead of .firefox, as this directoryis
-    dnl used by all mozilla derived browsers.
-    if test x"${FIREFOX_PLUGINS}" = "x" ; then
-       FIREFOX_PLUGINS=$HOME/.mozilla/plugins
+  dnl
+  dnl If not explicitly specified, figure install dir
+  dnl from policy
+  dnl
+  if test x"${FIREFOX_PLUGINS}" = "x" ; then
+
+       if test "x${NPAPI_INSTALL_POLICY}" = "xuser"; then
+
+          dnl We always use .mozilla instead of .firefox, as this directoryis
+          dnl used by all mozilla derived browsers.
+          FIREFOX_PLUGINS=$HOME/.mozilla/plugins
+
+       elif test "x${NPAPI_INSTALL_POLICY}" = "xsystem"; then
+
+          for dir in /usr/lib/mozilla/plugins /usr/lib/firefox/plugins; do
+             if test -d $dir; then
+                FIREFOX_PLUGINS=$dir
+                break
+             fi
+          done
+          if test "x${FIREFOX_PLUGINS}" = x; then
+             AC_MSG_ERROR([Could not find system mozilla plugin dir, use --with-npapi-plugindir.]);
+          fi
+
+       elif test "x${NPAPI_INSTALL_POLICY}" = "xprefix"; then
+          FIREFOX_PLUGINS="\${prefix}/npapi"
+       fi
     fi
   fi
 

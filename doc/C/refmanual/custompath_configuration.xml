@@ -157,6 +157,17 @@
 	</row>
 	<row>
 	  <entry>
+	    <option>--with-npapi-install=user|system|prefix</option>
+	  </entry>
+	  <entry>
+	    This option sets the install policy for NPAPI plugin.
+	    Policy 'user' means plugin will be installed in ~/.mozilla/plugins;
+            'system' will try to find an existing system-wide mozilla plugin dir (or bail out if not found);
+            'prefix' will install under ${prefix}/npapi.
+	  </entry>
+	</row>
+	<row>
+	  <entry>
 	    <option>--with-npapi-plugindir</option>
 	  </entry>
 	  <entry>

@@ -1,3 +1,10 @@
+2008-05-19 Sandro Santilli <strk@keybit.net>
+
+	* macros/firefox.m4: add --with-npapi-install=user|system|prefix,
+	  default to user.
+	* doc/C/refmanual/custompath_configuration.xml: document
+	  --with-npapi-install.
+
 2008-05-18 Zou Lunkai <zoulunkai@gmail.com>
 	
 	* server/cxform.cpp, server/swf/StartSoundTag.cpp: more read_bit() reduction.
@@ -21,7 +28,7 @@
 2008-05-18 Sandro Santilli <strk@keybit.net>
 
 	* macros/kde.m4: add --with-kparts-install=user|system|prefix,
-	  default to prefix, overridable with --with-kde-pluginprefix
+	  default to user, overridable with --with-kde-pluginprefix
 	  and further overridable by specific kparts components
 	  switches.
 	* Makefile.am: use --with-kparts-install=prefix on 'distcheck'.
