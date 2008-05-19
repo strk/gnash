@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Point.as,v 1.5 2008/05/19 15:59:25 strk Exp $";
+rcsid="$Id: Point.as,v 1.6 2008/05/19 16:32:24 strk Exp $";
 
 #include "check.as"
 
@@ -87,6 +87,12 @@ check_equals(p0.length, 5);
 ASSetPropFlags(p0, "length", 0, 4); // clear read-only (if any)
 p0.length = 10;
 check_equals(p0.length, 5);
+
+p0 = new Point(50, -Infinity);
+check_equals(p0.length, Infinity);
+
+p0 = new Point(0, 0);
+check_equals(p0.length, 0);
 
 //-------------------------------------------------------------
 // Test Point.add
@@ -476,6 +482,6 @@ check_equals(ret.toString(), '(x=1, y=2)');
 // END OF TEST
 //-------------------------------------------------------------
 
-check_totals(176);
+check_totals(178);
 
 #endif // OUTPUT_VERSION >= 8

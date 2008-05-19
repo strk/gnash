@@ -276,7 +276,7 @@ Point_normalize(const fn_call& fn)
 
 	if ( x == 0 && y == 0 ) return as_value();
 
-	double curlen = sqrt(x*x+y*y);
+	double curlen = std::sqrt(x*x+y*y);
 	double fact = newlen/curlen;
 
 
@@ -407,11 +407,9 @@ Point_length_getset(const fn_call& fn)
 		ptr->get_member(NSV::PROP_X, &xval);
 		ptr->get_member(NSV::PROP_Y, &yval);
 		double x = xval.to_number();
-		if ( ! utility::isFinite(x) ) return as_value(NAN);
 		double y = yval.to_number();
-		if ( ! utility::isFinite(y) ) return as_value(NAN);
 
-		double l = sqrt(x*x+y*y);
+		double l = std::sqrt(x*x+y*y);
 		return as_value(l);
 	}
 	else // setter
@@ -471,28 +469,28 @@ Point_distance(const fn_call& fn)
 	as_value x1val;
 	o1->get_member(NSV::PROP_X, &x1val);
 	double x1 = x1val.to_number();
-	if ( ! utility::isFinite(x1) ) return as_value(NAN);
+	//if ( ! utility::isFinite(x1) ) return as_value(NAN);
 
 	as_value y1val;
 	o1->get_member(NSV::PROP_Y, &y1val);
 	double y1 = y1val.to_number();
-	if ( ! utility::isFinite(y1) ) return as_value(NAN);
+	//if ( ! utility::isFinite(y1) ) return as_value(NAN);
 
 	as_value x2val;
 	o2->get_member(NSV::PROP_X, &x2val);
 	double x2 = x2val.to_number();
-	if ( ! utility::isFinite(x2) ) return as_value(NAN);
+	//if ( ! utility::isFinite(x2) ) return as_value(NAN);
 
 	as_value y2val;
 	o2->get_member(NSV::PROP_Y, &y2val);
 	double y2 = y2val.to_number();
-	if ( ! utility::isFinite(y2) ) return as_value(NAN);
+	//if ( ! utility::isFinite(y2) ) return as_value(NAN);
 
 	double hside = x2 - x1; // p1.x - p0.x;
 	double vside = y2 - y1; // p1.y - p0.y;
 
 	double sqdist = hside*hside + vside*vside;
-	double dist = sqrtf(sqdist);
+	double dist = std::sqrt(sqdist);
 
 	return as_value(dist);
 }

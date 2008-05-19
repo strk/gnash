@@ -1,5 +1,14 @@
 2008-05-19 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/flash/geom/Point_as.cpp: sqrtf->std::sqrt,
+	  drop some early outs with wrong assumption (non-finite is not
+	  necessarely NaN)
+	* testsuite/actionscript.all/Point.as: test that length of a Point
+	  with Infinite ordinate is Infinite.
+	* testsuite/swfdec/PASSING: point-8.swf succeeds now.
+
+2008-05-19 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/flash/geom/Point_as.cpp: 
 	  Implement Point.normalize(), Point.offset(), Point.subtract()
 	  and Point.polar().
