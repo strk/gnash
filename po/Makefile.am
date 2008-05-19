@@ -26,7 +26,7 @@ CLEANFILES = \
 	POTFILES \
 	update-po
 
-translations = cs de es fi fr it sv
+translations = cs de es fi fr it ja sv
 
 # This is GNU make specific, so if you are building Gnash on a BSD
 # machine, you probably want to install GNU make in additional to

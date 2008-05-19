@@ -1,3 +1,8 @@
+2008-05-19 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* po/Makefile.am, po/ja.po: add Japanese translation by 
+	  Makoto Kato.
+
 2008-05-19 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/flash/geom/Point_as.cpp: implement Point.interpolate().
