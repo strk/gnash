@@ -1075,7 +1075,7 @@ edit_text_character::set_member(string_table::key name,
 		// @@ TODO this should be generic to class character!
 		// Arg is in percent.
 		cxform	cx = get_cxform();
-		cx.m_[3][0] = utility::clamp<float>(utility::infinite_to_fzero(val.to_number()) / 100.f, 0, 1);
+		cx.aa = (boost::int16_t)(val.to_number() * 2.56);
 		set_cxform(cx);
 		return true;
 	}
@@ -1122,7 +1122,7 @@ edit_text_character::get_member(string_table::key name, as_value* val,
 	{
 		// @@ TODO this should be generic to class character!
 		const cxform&	cx = get_cxform();
-		val->set_double(cx.m_[3][0] * 100.f);
+		val->set_double(cx.aa / 2.56);
 		return true;
 	}
 	case NSV::PROP_uX:

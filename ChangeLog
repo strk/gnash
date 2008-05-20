@@ -1,3 +1,11 @@
+2008-05-20 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* server/cxform.{h,cpp}: code refactory, using integral alrithmatic for cxform.
+	* server/character.cpp, server/edit_text_character.cpp, 
+	  server/asobj/Color.cpp: update to synchronize the new cxform.
+	* testsuite/actionscript.all/Color.as: passing.
+	  More compatible, much faster, 50% less memory per cxform... 
+	
 2008-05-19 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* po/ja.po: correct variable order (only one instance).

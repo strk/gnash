@@ -30,35 +30,32 @@
 
 namespace gnash {
 
-cxform  cxform::identity;
+using boost::uint8_t;
+using boost::int16_t;
+using utility::clamp;
 
 cxform::cxform()
 // Initialize to identity transform.    
 {
-    m_[0][0] = 1;
-    m_[1][0] = 1;
-    m_[2][0] = 1;
-    m_[3][0] = 1;
-    m_[0][1] = 0;
-    m_[1][1] = 0;
-    m_[2][1] = 0;
-    m_[3][1] = 0;
+    ra = ga = ba = aa = 256;
+    rb = gb = bb = ab = 0;
 }
 
-void    cxform::concatenate(const cxform& c)
 // Concatenate c's transform onto ours.  When
 // transforming colors, c's transform is applied
-// first, then ours.    
+// first, then ours.  
+void    cxform::concatenate(const cxform& c)  
 {
-    m_[0][1] += m_[0][0] * c.m_[0][1];
-    m_[1][1] += m_[1][0] * c.m_[1][1];
-    m_[2][1] += m_[2][0] * c.m_[2][1];
-    m_[3][1] += m_[3][0] * c.m_[3][1];
+// enbrace all the overflows intentionally.
+    rb += (ra * c.rb >> 8);
+    gb += (ga * c.gb >> 8);
+    bb += (ba * c.bb >> 8);
+    ab += (aa * c.ab >> 8);
 
-    m_[0][0] *= c.m_[0][0];
-    m_[1][0] *= c.m_[1][0];
-    m_[2][0] *= c.m_[2][0];
-    m_[3][0] *= c.m_[3][0];
+    ra = ra * c.ra >> 8;
+    ga = ga * c.ga >> 8;
+    ba = ba * c.ba >> 8;
+    aa = aa * c.aa >> 8;
 }
 
 
@@ -66,20 +63,29 @@ rgba    cxform::transform(const rgba& in) const
 // Apply our transform to the given color; return the result.
 {
     rgba    result(in.m_r, in.m_g, in.m_b, in.m_a);
-
+    
     transform(result.m_r, result.m_g, result.m_b, result.m_a);
-
     return result;
 }
 
+// transform the given color with our cxform.
 void    cxform::transform(boost::uint8_t& r, boost::uint8_t& g, boost::uint8_t& b, boost::uint8_t& a) const
-// Faster transform() method for loops (avoids creation of rgba object)
 {
-    using utility::clamp;
-    r = static_cast<boost::uint8_t>(clamp<float>(r * m_[0][0] + m_[0][1], 0, 255));
-    g = static_cast<boost::uint8_t>(clamp<float>(g * m_[1][0] + m_[1][1], 0, 255));
-    b = static_cast<boost::uint8_t>(clamp<float>(b * m_[2][0] + m_[2][1], 0, 255));
-    a = static_cast<boost::uint8_t>(clamp<float>(a * m_[3][0] + m_[3][1], 0, 255));
+    // force conversion to int16 first, kind of optimization.
+    int16_t rt = (int16_t)r;
+    int16_t gt = (int16_t)g;
+    int16_t bt = (int16_t)b;
+    int16_t at = (int16_t)a;
+    
+    rt = (rt * ra >> 8) + rb;
+    gt = (gt * ga >> 8) + gb;
+    bt = (bt * ba >> 8) + bb;
+    at = (at * aa >> 8) + ab;
+    
+    r = (uint8_t)(clamp<int16_t>(rt, 0, 255));
+    g = (uint8_t)(clamp<int16_t>(gt, 0, 255));
+    b = (uint8_t)(clamp<int16_t>(bt, 0, 255));
+    a = (uint8_t)(clamp<int16_t>(at, 0, 255));
 }
 
 void    cxform::read_rgb(stream& in)
@@ -102,22 +108,22 @@ void    cxform::read_rgb(stream& in)
     }
 
     if (has_mult) {
-        m_[0][0] = in.read_sint(nbits) / 255.0f;
-        m_[1][0] = in.read_sint(nbits) / 255.0f;
-        m_[2][0] = in.read_sint(nbits) / 255.0f;
-        m_[3][0] = 1;
+        ra = in.read_sint(nbits);
+        ga = in.read_sint(nbits);
+        ba = in.read_sint(nbits);
+        aa = 256;
     }
     else {
-        for (int i = 0; i < 4; i++) { m_[i][0] = 1; }
+        ra = ga = ba = aa = 256; 
     }
     if (has_add) {
-        m_[0][1] = (float) in.read_sint(nbits);
-        m_[1][1] = (float) in.read_sint(nbits);
-        m_[2][1] = (float) in.read_sint(nbits);
-        m_[3][1] = 1;
+        rb = in.read_sint(nbits);
+        gb = in.read_sint(nbits);
+        bb = in.read_sint(nbits);
+        ab = 0;
     }
     else {
-        for (int i = 0; i < 4; i++) { m_[i][1] = 0; }
+        rb = gb = bb = ab = 0; 
     }
 }
 
@@ -141,48 +147,33 @@ void    cxform::read_rgba(stream& in)
     }
 
     if (has_mult) {
-        m_[0][0] = in.read_sint(nbits) / 256.0f;
-        m_[1][0] = in.read_sint(nbits) / 256.0f;
-        m_[2][0] = in.read_sint(nbits) / 256.0f;
-        m_[3][0] = in.read_sint(nbits) / 256.0f;
+        ra = in.read_sint(nbits);
+        ga = in.read_sint(nbits);
+        ba = in.read_sint(nbits);
+        aa = in.read_sint(nbits);
     }
     else {
-        for (int i = 0; i < 4; i++) { m_[i][0] = 1; }
+        ra = ga = ba = aa = 256; 
     }
     if (has_add) {
-        m_[0][1] = (float) in.read_sint(nbits);
-        m_[1][1] = (float) in.read_sint(nbits);
-        m_[2][1] = (float) in.read_sint(nbits);
-        m_[3][1] = (float) in.read_sint(nbits);
+        rb = in.read_sint(nbits);
+        gb = in.read_sint(nbits);
+        bb = in.read_sint(nbits);
+        ab = in.read_sint(nbits);
     }
     else {
-        for (int i = 0; i < 4; i++) { m_[i][1] = 0; }
+        rb = gb = bb = ab = 0; 
     }
-}
-
-/// Force component values to be in legal range.
-void cxform::clamp()
-{
-    using utility::clamp;
-    m_[0][0] = clamp<float>(m_[0][0], 0, 1);
-    m_[1][0] = clamp<float>(m_[1][0], 0, 1);
-    m_[2][0] = clamp<float>(m_[2][0], 0, 1);
-    m_[3][0] = clamp<float>(m_[3][0], 0, 1);
-
-    m_[0][1] = clamp<float>(m_[0][1], -255.0f, 255.0f);
-    m_[1][1] = clamp<float>(m_[1][1], -255.0f, 255.0f);
-    m_[2][1] = clamp<float>(m_[2][1], -255.0f, 255.0f);
-    m_[3][1] = clamp<float>(m_[3][1], -255.0f, 255.0f);
 }
 
 void    cxform::print() const
 // Debug log.
 {
     log_parse("    *         +");
-    log_parse("| %4.4f %4.4f|", m_[0][0], m_[0][1]);
-    log_parse("| %4.4f %4.4f|", m_[1][0], m_[1][1]);
-    log_parse("| %4.4f %4.4f|", m_[2][0], m_[2][1]);
-    log_parse("| %4.4f %4.4f|", m_[3][0], m_[3][1]);
+    log_parse("| %4.4f %4.4f|", ra/256.0f, rb);
+    log_parse("| %4.4f %4.4f|", ga/256.0f, gb);
+    log_parse("| %4.4f %4.4f|", ba/256.0f, bb);
+    log_parse("| %4.4f %4.4f|", aa/256.0f, ab);
 }
 
 std::string
@@ -196,30 +187,31 @@ cxform::toString() const
 std::ostream&
 operator<< (std::ostream& os, const cxform& cx) 
 {
-    os << "r: *" << cx.m_[0][0] << " +" << cx.m_[0][1] << ", ";
-    os << "|g: *" << cx.m_[1][0] << " +" << cx.m_[1][1] << ", ";
-    os << "|b: *" << cx.m_[2][0] << " +" << cx.m_[2][1] << ", ";
-    os << "|a: *" << cx.m_[3][0] << " +" << cx.m_[3][1];
+    os << "r: *"  << cx.ra  << " +" << cx.rb << ", ";
+    os << "|g: *" << cx.ga << " +" << cx.gb << ", ";
+    os << "|b: *" << cx.ba << " +" << cx.bb << ", ";
+    os << "|a: *" << cx.aa << " +" << cx.ab;
     return os;
 }
 
 bool    cxform::is_identity() const
 // Returns true when the cxform equals identity (no transform)
 {      
-    for (int a=0; a<4; a++)
-        for (int b=0; b<2; b++)
-        {
-            if (m_[a][b] != identity.m_[a][b])
-                return false;
-        }
-
-    return true;
+    return 
+        ra == 256 &&
+        rb == 0   &&
+        ga == 256 &&
+        gb == 0   &&
+        ba == 256 &&
+        bb == 0   &&
+        aa == 256 &&
+        ab == 0;
 }
 
 bool    cxform::is_invisible() const
 // Returns true when the cxform leads to alpha == 0
 {
-    return(255.0 * m_[3][0] + m_[3][1]) <= 0.0;    
+    return (255 * aa >> 8) + ab == 0;    
 }
 
 

@@ -22,7 +22,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Color.as,v 1.16 2008/05/20 01:59:28 zoulunkai Exp $";
+rcsid="$Id: Color.as,v 1.17 2008/05/20 09:54:25 zoulunkai Exp $";
 #include "check.as"
 
 //--------------------------------
@@ -219,7 +219,7 @@ check_equals ( trans2.rb, 0 );
 check_equals ( trans2.ga, -50 );
 check_equals ( trans2.gb, 255 );
 // pp uses 1/256 accuracy, 31.640625 == int(0.32*256)*100/256.0f
-xcheck( trans2.ba - 31.640625 < 0.000001 ); // Don't use check_equals or Math.round here.
+check( trans2.ba - 31.640625 < 0.000001 ); // Don't use check_equals or Math.round here.
 check_equals ( trans2.bb, 2 );
 check_equals ( trans2.aa, 100 );
 check_equals ( trans2.ab, 0 );
@@ -249,7 +249,7 @@ trans.rb = 99.9;
 colorObj.setTransform(trans);
 trans2 = colorObj.getTransform();
 // 99.609375 == int(0.999*256)*100/256.0
-xcheck(trans2.ra - 99.609375 < 0.0000001); // Don't use check_equals or Math.round here.
+check(trans2.ra - 99.609375 < 0.0000001); // Don't use check_equals or Math.round here.
 check_equals(trans2.rb, 99);
 
 //

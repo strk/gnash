@@ -31,7 +31,7 @@ namespace gnash {
 
 namespace gnash {
 
-/// Color transform type, used by render handler
+/// Color Transformation Record
 class DSOEXPORT cxform
 {
 public:
@@ -39,8 +39,14 @@ public:
     friend bool operator== (const cxform&, const cxform&);
     friend std::ostream& operator<< (std::ostream& os, const cxform& cx);
 
-    /// [RGBA][multiply, add]
-    float	m_[4][2];
+    boost::int16_t ra; // RedMultTerm,   8.8 fixed point
+    boost::int16_t rb; // RedAddTerm,   16.0 fixed point
+    boost::int16_t ga; // GreenMultTerm  8.8 fixed point
+    boost::int16_t gb; // GreenAddTerm  16.0 fixed point
+    boost::int16_t ba; // BlueMultTerm   8.8 fixed point
+    boost::int16_t bb; // BlueAddTerm   16.0 fixed point
+    boost::int16_t aa; // AlphaMultTerm  8.8 fixed point
+    boost::int16_t ab; // AlphaAddTerm  16.0 fixed point
     
     /// Initialize to the identity color transform (no transform)
     cxform();
@@ -52,27 +58,46 @@ public:
     ///
     void concatenate(const cxform& c);
     
-    /// Apply our transform to the given color; return the result.
+    /// Transform the given color, return the result.
     rgba transform(const rgba& in) const;
     
-    /// Faster transform() method for loops (avoids creation of rgba object)
+    /// Transform the given color.
     void transform(boost::uint8_t& r, boost::uint8_t& g, boost::uint8_t& b, boost::uint8_t& a) const;    
+
+    void  store_to(boost::int16_t * dst) const
+    {
+        *dst++ = ra; *dst++ = rb; 
+        *dst++ = ga; *dst++ = gb; 
+        *dst++ = ba; *dst++ = bb; 
+        *dst++ = aa; *dst++ = ab; 
+    }
+    
+    cxform & load_from(float * src)
+    {
+    // enbrace the overflows intentionally.
+        ra = (boost::int16_t)((*src++) * 2.56f);
+        rb = (boost::int16_t)(*src++);
+        ga = (boost::int16_t)((*src++) * 2.56f);
+        gb = (boost::int16_t)(*src++);
+        ba = (boost::int16_t)((*src++) * 2.56f);
+        bb = (boost::int16_t)(*src++);
+        aa = (boost::int16_t)((*src++) * 2.56f);
+        ab = (boost::int16_t)(*src++);
+        return *this;
+    }
     
     /// Read RGB from the SWF input stream.
     void read_rgb(stream& in);
 
-    // temp hack, should drop..
+    // TODO: temp hack, should drop!
     void read_rgb(stream* in) { read_rgb(*in); }
     
     /// Read RGBA from the SWF input stream.
     void read_rgba(stream& in);
 
-    // temp hack, should drop..
+    // TODO: temp hack, should drop!
     void read_rgba(stream* in) { read_rgba(*in); }
-    
-    /// Force component values to be in range.
-    void clamp();
-    
+        
     /// Debug log.
     void print() const;
     
@@ -82,9 +107,6 @@ public:
     /// Returns true when the cxform leads to alpha == 0
     bool is_invisible() const;
     
-    /// The identity color transform (no transform)
-    static cxform	identity;
-
     std::string toString() const;
 };
 
@@ -92,17 +114,15 @@ public:
 inline bool operator== (const cxform& a, const cxform& b)
 {
 	return	
-		a.m_[0][0] == b.m_[0][0] &&
-		a.m_[0][1] == b.m_[0][1] &&
-		a.m_[1][0] == b.m_[1][0] &&
-		a.m_[1][1] == b.m_[1][1] &&
-		a.m_[2][0] == b.m_[2][0] &&
-		a.m_[2][1] == b.m_[2][1] &&
-		a.m_[3][0] == b.m_[3][0] &&
-		a.m_[3][1] == b.m_[3][1];
+		a.ra == b.ra &&
+		a.rb == b.rb &&
+		a.ga == b.ga &&
+		a.gb == b.gb &&
+		a.ba == b.ba &&
+		a.bb == b.bb &&
+		a.aa == b.aa &&
+		a.ab == b.ab;
 }
-
-
 
 }	// namespace gnash
 

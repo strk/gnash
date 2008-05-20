@@ -129,16 +129,8 @@ public:
 
 	void setTransform(const cxform& newTrans) 
 	{
-		if ( ! checkSprite() ) return; // nothing to do
-
-#ifdef GNASH_DEBUG_COLOR
-		stringstream ss; ss << newTrans;
-		int r = (int)newTrans.m_[0][1];
-		int g = (int)newTrans.m_[1][1];
-		int b = (int)newTrans.m_[2][1];
-		log_debug ("Color.setnewTransform set newTrans to = %d/%d/%d (%s)", r, g, b, ss.str().c_str());
-#endif
-
+		if ( ! checkSprite() ) return;
+        
 		_sprite->set_user_cxform(newTrans);
 	}
 
@@ -173,12 +165,9 @@ color_getrgb(const fn_call& fn)
 
 	const cxform& trans = obj->getTransform();
 
-	int r = (int)trans.m_[0][1];
-	int g = (int)trans.m_[1][1];
-	int b = (int)trans.m_[2][1];
-#ifdef GNASH_DEBUG_COLOR
-	log_debug ("Color.getRGB found Color transform with rgb = %d/%d/%d (%f,%f,%f)", r, g, b, trans.m_[0][1], trans.m_[1][1], trans.m_[2][1]);
-#endif
+	int r = (int)trans.rb;
+	int g = (int)trans.gb;
+	int b = (int)trans.bb;
 
 	boost::int32_t rgb = (r<<16) | (g<<8) | b;
 
@@ -206,15 +195,15 @@ color_gettransform(const fn_call& fn)
 
 	as_object* ret = new as_object(getObjectInterface());
 
-	ret->init_member("ra", int(cx.m_[0][0]*100));
-	ret->init_member("ga", int(cx.m_[1][0]*100));
-	ret->init_member("ba", int(cx.m_[2][0]*100));
-	ret->init_member("aa", int(cx.m_[3][0]*100));
+	ret->init_member("ra", double(cx.ra / 2.56));
+	ret->init_member("ga", double(cx.ga / 2.56));
+	ret->init_member("ba", double(cx.ba / 2.56));
+	ret->init_member("aa", double(cx.aa / 2.56));
 
-	ret->init_member("rb", int(cx.m_[0][1]));
-	ret->init_member("gb", int(cx.m_[1][1]));
-	ret->init_member("bb", int(cx.m_[2][1]));
-	ret->init_member("ab", int(cx.m_[3][1]));
+	ret->init_member("rb", int(cx.rb));
+	ret->init_member("gb", int(cx.gb));
+	ret->init_member("bb", int(cx.bb));
+	ret->init_member("ab", int(cx.ab));
 
 	return ret;
 }
@@ -239,12 +228,12 @@ color_setrgb(const fn_call& fn)
 	int b = (color&0x0000FF);
 
 	cxform newTrans = obj->getTransform();
-	newTrans.m_[0][1] = r;
-	newTrans.m_[1][1] = g;
-	newTrans.m_[2][1] = b;
-	newTrans.m_[0][0] = 0;
-	newTrans.m_[1][0] = 0;
-	newTrans.m_[2][0] = 0;
+	newTrans.rb = (boost::int16_t)r;
+	newTrans.gb = (boost::int16_t)g;
+	newTrans.bb = (boost::int16_t)b;
+	newTrans.ra = 0;
+	newTrans.ga = 0;
+	newTrans.ba = 0;
 
 	obj->setTransform(newTrans);
 
@@ -252,15 +241,22 @@ color_setrgb(const fn_call& fn)
 }
 
 static inline void
-parseColorTransProp (as_object& obj, string_table::key key, float *target, bool scale)
+parseColorTransProp (as_object& obj, string_table::key key, boost::int16_t *target, bool scale)
 {
 	as_value tmp;
 	double d;
 
-	if ( ! obj.get_member(key, &tmp) ) return;
+	if ( ! obj.get_member(key, &tmp) ) {
+        return;
+    }
+    
 	d = tmp.to_number();
-	if ( scale ) *target = d/100.0;
-	else *target = d;
+	if ( scale ) {   
+        *target = (boost::int16_t)(d * 2.56);
+    }
+	else {
+        *target = (boost::int16_t)d;
+    }
 }
 
 static as_value
@@ -301,16 +297,16 @@ color_settransform(const fn_call& fn)
 	cxform newTrans = obj->getTransform();
 
 	// multipliers
-	parseColorTransProp(*trans, st.find("ra"), &newTrans.m_[0][0], true);
-	parseColorTransProp(*trans, st.find("ga"), &newTrans.m_[1][0], true);
-	parseColorTransProp(*trans, st.find("ba"), &newTrans.m_[2][0], true);
-	parseColorTransProp(*trans, st.find("aa"), &newTrans.m_[3][0], true);
+	parseColorTransProp(*trans, st.find("ra"), &newTrans.ra, true);
+	parseColorTransProp(*trans, st.find("ga"), &newTrans.ga, true);
+	parseColorTransProp(*trans, st.find("ba"), &newTrans.ba, true);
+	parseColorTransProp(*trans, st.find("aa"), &newTrans.aa, true);
 
 	// offsets
-	parseColorTransProp(*trans, st.find("rb"), &newTrans.m_[0][1], false);
-	parseColorTransProp(*trans, st.find("gb"), &newTrans.m_[1][1], false);
-	parseColorTransProp(*trans, st.find("bb"), &newTrans.m_[2][1], false);
-	parseColorTransProp(*trans, st.find("ab"), &newTrans.m_[3][1], false);
+	parseColorTransProp(*trans, st.find("rb"), &newTrans.rb, false);
+	parseColorTransProp(*trans, st.find("gb"), &newTrans.gb, false);
+	parseColorTransProp(*trans, st.find("bb"), &newTrans.bb, false);
+	parseColorTransProp(*trans, st.find("ab"), &newTrans.ab, false);
 
 	obj->setTransform(newTrans);
 

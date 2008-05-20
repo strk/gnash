@@ -391,7 +391,7 @@ character::alpha_getset(const fn_call& fn)
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
 	{
-		rv = as_value(ptr->get_cxform().m_[3][0] * 100.f);
+		rv = as_value(ptr->get_cxform().aa / 2.56f);
 	}
 	else // setter
 	{
@@ -407,10 +407,10 @@ character::alpha_getset(const fn_call& fn)
 			);
 			return rv;
 		}
-		// Set alpha modulate, in percent.
+		// set alpha = input / 100.0 * 256 = input * 2.56;
 		cxform	cx = ptr->get_cxform();
-		cx.m_[3][0] = input / 100.f; // utility::infinite_to_fzero(input) / 100.f;
-		ptr->set_cxform(cx);
+		cx.aa = (boost::int16_t)(input * 2.56); 
+        ptr->set_cxform(cx);
 		ptr->transformedByScript(); // m_accept_anim_moves = false; 
 	}
 	return rv;
