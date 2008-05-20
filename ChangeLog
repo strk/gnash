@@ -1,3 +1,16 @@
+2008-05-20 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/fill_style.cpp: squash more non-standard functions (the
+	  operations are on doubles anyway, so it doesn't involve any more
+	  casts than before). Clean up logging.
+	* server/parser/{BitmapMovieDefinition,movie_def_impl}.h: ditto.
+	* server/as_value.cpp: use std::fmod, drop using namespace std;, 
+	  drop c_str() for logging, replace snprintf with boost::format
+	  (will be slightly slower for those cases), drop snprintf ifdef.
+	  A slightly faster alternative to boost::format that also avoids
+	  using non-standard functions would be stringstreams, but it is
+	  not as clear.	
+
 2008-05-20 Zou Lunkai <zoulunkai@gmail.com>
 	
 	* server/cxform.{h,cpp}: code refactory, using integral alrithmatic for cxform.

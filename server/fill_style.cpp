@@ -28,6 +28,7 @@
 #include "movie_definition.h"
 #include "swf.h"
 #include "GnashException.h"
+#include <cmath> // sqrt, floor
 
 namespace gnash {
 
@@ -96,7 +97,7 @@ fill_style::read(stream* in, int tag_type, movie_definition* md,
 
 		IF_VERBOSE_PARSE
 		(
-        log_parse("  color: %s", m_color.toString().c_str());
+        log_parse("  color: %s", m_color.toString());
 		);
     }
     else if (m_type == SWF::FILL_LINEAR_GRADIENT
@@ -419,7 +420,7 @@ fill_style::create_gradient_bitmap() const
                 float	radius = (im->height() - 1) / 2.0f;
                 float	y = (j - radius) / radius;
                 float	x = (i - radius) / radius;
-                int	ratio = (int) floorf(255.5f * sqrt(x * x + y * y));
+                int	ratio = static_cast<int>(std::floor(255.5f * std::sqrt(x * x + y * y)));
                 if (ratio > 255) {
                     ratio = 255;
                 }
@@ -441,7 +442,7 @@ fill_style::create_gradient_bitmap() const
 				float radiusx = radiusy + std::abs(radiusy * m_focal_point);
 				float y = (j - radiusy) / radiusy;
 				float x = (i - radiusx) / radiusx;
-				int ratio = (int) floorf(255.5f * sqrt(x*x + y*y));
+				int ratio = static_cast<int>(std::floor(255.5f * std::sqrt(x*x + y*y)));
 				if (ratio > 255)
 				{
 					ratio = 255;

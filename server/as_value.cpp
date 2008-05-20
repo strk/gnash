@@ -33,18 +33,13 @@
 #include "utility.h" // for typeName() and utility::isFinite
 #include "namedStrings.h"
 
-#include <cmath>
+#include <cmath> // std::fmod
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/format.hpp>
 #include <locale>
 #include <sstream>
 #include <iomanip>
-
-#ifdef WIN32
-#	define snprintf _snprintf
-#endif
-
-using namespace std;
 
 // Define the macro below to make abstract equality operator verbose
 //#define GNASH_DEBUG_EQUALITY 1
@@ -167,8 +162,8 @@ as_value::to_string() const
 				// reference player.
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
 				log_debug(" %s.to_primitive(STRING) returned %s", 
-						to_debug_string().c_str(),
-						ret.to_debug_string().c_str());
+						to_debug_string(),
+						ret.to_debug_string());
 #endif
 				if ( ret.is_string() ) return ret.to_string();
 			}
@@ -176,7 +171,7 @@ as_value::to_string() const
 			{
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
 				log_debug(_("to_primitive(%s, STRING) threw an ActionTypeError %s"),
-						to_debug_string().c_str(), e.what());
+						to_debug_string(), e.what());
 #endif
 			}
 
@@ -386,7 +381,7 @@ as_value::to_primitive(type hint) const
 	as_environment env;
 	as_value ret = call_method0(method, &env, obj);
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
-	log_debug("to_primitive: method call returned %s", ret.to_debug_string().c_str());
+	log_debug("to_primitive: method call returned %s", ret.to_debug_string());
 #endif
 	if ( ret.m_type == OBJECT || ret.m_type == AS_FUNCTION ) // not a primitive 
 	{
@@ -488,7 +483,7 @@ as_value::convert_to_primitive(type hint)
 	as_environment env;
 	as_value ret = call_method0(method, &env, obj);
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
-	log_debug("to_primitive: method call returned %s", ret.to_debug_string().c_str());
+	log_debug("to_primitive: method call returned %s", ret.to_debug_string());
 #endif
 	if ( ret.m_type == OBJECT || ret.m_type == AS_FUNCTION ) // not a primitive 
 	{
@@ -558,7 +553,7 @@ as_value::to_number() const
             // just like for any other non-numerical text. This is correct
             // behaviour.
             {
-            	return (double)NAN;
+            	return static_cast<double>(NAN);
             }
         }
 
@@ -597,7 +592,7 @@ as_value::to_number() const
             {
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
                 log_debug(_("to_primitive(%s, NUMBER) threw an ActionTypeError %s"),
-                        to_debug_string().c_str(), e.what());
+                        to_debug_string(), e.what());
 #endif
                 if ( m_type == AS_FUNCTION && swfversion < 6 )
                 {
@@ -639,11 +634,11 @@ as_value::to_int() const
 
     if (d < 0)
     {   
-	    i = - static_cast<boost::uint32_t>(fmod (-d, 4294967296.0));
+	    i = - static_cast<boost::uint32_t>(std::fmod (-d, 4294967296.0));
     }
     else
     {
-	    i = static_cast<boost::uint32_t>(fmod (d, 4294967296.0));
+	    i = static_cast<boost::uint32_t>(std::fmod (d, 4294967296.0));
     }
     
     return i;
@@ -942,7 +937,7 @@ as_value::equals(const as_value& v) const
 
 #ifdef GNASH_DEBUG_EQUALITY
     static int count=0;
-    log_debug("equals(%s, %s) called [%d]", to_debug_string().c_str(), v.to_debug_string().c_str(), count++);
+    log_debug("equals(%s, %s) called [%d]", to_debug_string(), v.to_debug_string(), count++);
 #endif
 
     int SWFVersion = VM::get().getSWFVersion();
@@ -1019,7 +1014,7 @@ as_value::equals(const as_value& v) const
 		if ( v.strictly_equals(v2) ) return false;
 
 #ifdef GNASH_DEBUG_EQUALITY
-		log_debug(" 20: convertion to primitive : %s -> %s", v.to_debug_string().c_str(), v2.to_debug_string().c_str());
+		log_debug(" 20: convertion to primitive : %s -> %s", v.to_debug_string(), v2.to_debug_string());
 #endif
 
 		return equals(v2);
@@ -1027,7 +1022,7 @@ as_value::equals(const as_value& v) const
 	catch (ActionTypeError& e)
 	{
 #ifdef GNASH_DEBUG_EQUALITY
-		log_debug(" %s.to_primitive() threw an ActionTypeError %s", v.to_debug_string().c_str(), e.what());
+		log_debug(" %s.to_primitive() threw an ActionTypeError %s", v.to_debug_string(), e.what());
 #endif
 		return false; // no valid conversion
 	}
@@ -1045,7 +1040,7 @@ as_value::equals(const as_value& v) const
 		if ( strictly_equals(v2) ) return false;
 
 #ifdef GNASH_DEBUG_EQUALITY
-		log_debug(" 21: convertion to primitive : %s -> %s", to_debug_string().c_str(), v2.to_debug_string().c_str());
+		log_debug(" 21: convertion to primitive : %s -> %s", to_debug_string(), v2.to_debug_string());
 #endif
 
 		return v2.equals(v);
@@ -1054,7 +1049,7 @@ as_value::equals(const as_value& v) const
 	{
 
 #ifdef GNASH_DEBUG_EQUALITY
-		log_debug(" %s.to_primitive() threw an ActionTypeError %s", to_debug_string().c_str(), e.what());
+		log_debug(" %s.to_primitive() threw an ActionTypeError %s", to_debug_string(), e.what());
 #endif
 
 		return false; // no valid conversion
@@ -1067,7 +1062,7 @@ as_value::equals(const as_value& v) const
 	// Both operands are objects (OBJECT,AS_FUNCTION,MOVIECLIP)
 	if ( ! is_object() || ! v.is_object() )
 	{
-		log_debug("Equals(%s,%s)", to_debug_string().c_str(), v.to_debug_string().c_str());
+		log_debug("Equals(%s,%s)", to_debug_string(), v.to_debug_string());
 	}
 #endif
 
@@ -1082,14 +1077,14 @@ as_value::equals(const as_value& v) const
 		p = to_primitive(); 
 		if ( ! strictly_equals(p) ) ++converted;
 #ifdef GNASH_DEBUG_EQUALITY
-		log_debug(" convertion to primitive (this): %s -> %s", to_debug_string().c_str(), p.to_debug_string().c_str());
+		log_debug(" convertion to primitive (this): %s -> %s", to_debug_string(), p.to_debug_string());
 #endif
 	}
 	catch (ActionTypeError& e)
 	{
 #ifdef GNASH_DEBUG_CONVERSION_TO_PRIMITIVE 
 		log_debug(" %s.to_primitive() threw an ActionTypeError %s",
-			to_debug_string().c_str(), e.what());
+			to_debug_string(), e.what());
 #endif
 	}
 
@@ -1098,14 +1093,14 @@ as_value::equals(const as_value& v) const
 		vp = v.to_primitive(); 
 		if ( ! v.strictly_equals(vp) ) ++converted;
 #ifdef GNASH_DEBUG_EQUALITY
-		log_debug(" convertion to primitive (that): %s -> %s", v.to_debug_string().c_str(), vp.to_debug_string().c_str());
+		log_debug(" convertion to primitive (that): %s -> %s", v.to_debug_string(), vp.to_debug_string());
 #endif
 	}
 	catch (ActionTypeError& e)
 	{
 #ifdef GNASH_DEBUG_CONVERSION_TO_PRIMITIVE 
 		log_debug(" %s.to_primitive() threw an ActionTypeError %s",
-			v.to_debug_string().c_str(), e.what());
+			v.to_debug_string(), e.what());
 #endif
 	}
 
@@ -1185,7 +1180,7 @@ as_value::equalsSameType(const as_value& v) const
 {
 #ifdef GNASH_DEBUG_EQUALITY
     static int count=0;
-    log_debug("equalsSameType(%s, %s) called [%d]", to_debug_string().c_str(), v.to_debug_string().c_str(), count++);
+    log_debug("equalsSameType(%s, %s) called [%d]", to_debug_string(), v.to_debug_string(), count++);
 #endif
 	assert(m_type == v.m_type);
 	switch (m_type)
@@ -1237,7 +1232,7 @@ as_value::strictly_equals(const as_value& v) const
 std::string
 as_value::to_debug_string() const
 {
-	char buf[512];
+    boost::format ret;
 
 	switch (m_type)
 	{
@@ -1246,19 +1241,19 @@ as_value::to_debug_string() const
 		case NULLTYPE:
 			return "[null]";
 		case BOOLEAN:
-			sprintf(buf, "[bool:%s]", getBool() ? "true" : "false");
-			return buf;
+		    ret = boost::format("[bool:%s]") % (getBool() ? "true" : "false");
+            return ret.str();
 		case OBJECT:
 		{
 			as_object* obj = getObj().get();
-			sprintf(buf, "[object(%s):%p]", typeName(*obj).c_str(), (void *)obj);
-			return buf;
+			ret = boost::format("[object(%s):%p]") % typeName(*obj) % static_cast<void*>(obj);
+			return ret.str();
 		}
 		case AS_FUNCTION:
 		{
 			as_function* obj = getFun().get();
-			sprintf(buf, "[function(%s):%p]", typeName(*obj).c_str(), (void *)obj);
-			return buf;
+			ret = boost::format("[function(%s):%p]") % typeName(*obj) % static_cast<void*>(obj);
+			return ret.str();
 		}
 		case STRING:
 			return "[string:" + getStr() + "]";
@@ -1276,24 +1271,23 @@ as_value::to_debug_string() const
 				character* rebound = sp.get();
 				if ( rebound )
 				{
-					snprintf(buf, 511, "[rebound %s(%s):%p]",
-						typeName(*rebound).c_str(),
-						sp.getTarget().c_str(),
-						(void*)rebound);
+				    ret = boost::format("[rebound %s(%s):%p]") % 
+						typeName(*rebound) % sp.getTarget() %
+						static_cast<void*>(rebound);
 				}
 				else
 				{
-					snprintf(buf, 511, "[dangling character:%s]",
-						sp.getTarget().c_str());
+				    ret = boost::format("[dangling character:%s]") % 
+					    sp.getTarget();
 				}
 			}
 			else
 			{
 				character* ch = sp.get();
-				snprintf(buf, 511, "[%s(%s):%p]", typeName(*ch).c_str(), sp.getTarget().c_str(), (void *)ch);
+				ret = boost::format("[%s(%s):%p]") % typeName(*ch) %
+				                sp.getTarget() % static_cast<void*>(ch);
 			}
-			buf[511] = '\0';
-			return buf;
+			return ret.str();
 		}
 		default:
 			if (is_exception())
@@ -1678,8 +1672,8 @@ as_value::CharacterProxy::checkDangling() const
 	{
 		_tgt = _ptr->getOrigTarget();
 #ifdef GNASH_DEBUG_SOFT_REFERENCES
-		log_debug("char %s (%s) was destroyed, stored it's orig target (%s) for later rebinding", _ptr->getTarget().c_str(),
-			typeName(*_ptr).c_str(), _tgt.c_str());
+		log_debug("char %s (%s) was destroyed, stored it's orig target (%s) for later rebinding", _ptr->getTarget(),
+			typeName(*_ptr), _tgt);
 #endif
 		_ptr = 0;
 	}
@@ -1709,20 +1703,20 @@ as_value::newAdd(const as_value& op2)
 	catch (ActionTypeError& e)
 	{
 		log_debug("%s.to_primitive() threw an error during as_value operator+",
-			to_debug_string().c_str());
+			to_debug_string());
 	}
 
 	try { v2 = v2.to_primitive(); }
 	catch (ActionTypeError& e)
 	{
 		log_debug("%s.to_primitive() threw an error during as_value operator+",
-			op2.to_debug_string().c_str());
+			op2.to_debug_string());
 	}
 
 #if GNASH_DEBUG
 	log_debug(_("(%s + %s) [primitive conversion done]"),
-			to_debug_string().c_str(),
-			v2.to_debug_string().c_str());
+			to_debug_string(),
+			v2.to_debug_string());
 #endif
 
 	if (is_string() || v2.is_string() )

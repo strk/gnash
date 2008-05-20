@@ -339,14 +339,14 @@ public:
 	float	get_frame_rate() const { return m_frame_rate; }
 	const rect& get_frame_size() const { return m_frame_size; }
 
-	float	get_width_pixels() const
+	float get_width_pixels() const
 	{
-		return ceilf(TWIPS_TO_PIXELS(m_frame_size.width()));
+		return std::ceil(TWIPS_TO_PIXELS(m_frame_size.width()));
 	}
 
 	float	get_height_pixels() const
 	{
-		return ceilf(TWIPS_TO_PIXELS(m_frame_size.height()));
+		return std::ceil(TWIPS_TO_PIXELS(m_frame_size.height()));
 	}
 
 	virtual int	get_version() const { return m_version; }
