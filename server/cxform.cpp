@@ -41,12 +41,12 @@ cxform::cxform()
     rb = gb = bb = ab = 0;
 }
 
-// Concatenate c's transform onto ours.  When
+// Concatenate cxform c onto ours.  When
 // transforming colors, c's transform is applied
 // first, then ours.  
 void    cxform::concatenate(const cxform& c)  
 {
-// enbrace all the overflows intentionally.
+	// enbrace all the overflows intentionally.
     rb += (ra * c.rb >> 8);
     gb += (ga * c.gb >> 8);
     bb += (ba * c.bb >> 8);
@@ -170,10 +170,10 @@ void    cxform::print() const
 // Debug log.
 {
     log_parse("    *         +");
-    log_parse("| %4.4f %4.4f|", ra/256.0f, rb);
-    log_parse("| %4.4f %4.4f|", ga/256.0f, gb);
-    log_parse("| %4.4f %4.4f|", ba/256.0f, bb);
-    log_parse("| %4.4f %4.4f|", aa/256.0f, ab);
+    log_parse("| %4.4f %4.4f|", ra/256.0, rb);
+    log_parse("| %4.4f %4.4f|", ga/256.0, gb);
+    log_parse("| %4.4f %4.4f|", ba/256.0, bb);
+    log_parse("| %4.4f %4.4f|", aa/256.0, ab);
 }
 
 std::string
@@ -187,7 +187,7 @@ cxform::toString() const
 std::ostream&
 operator<< (std::ostream& os, const cxform& cx) 
 {
-    os << "r: *"  << cx.ra  << " +" << cx.rb << ", ";
+    os << "r: *"  << cx.ra << " +" << cx.rb << ", ";
     os << "|g: *" << cx.ga << " +" << cx.gb << ", ";
     os << "|b: *" << cx.ba << " +" << cx.bb << ", ";
     os << "|a: *" << cx.aa << " +" << cx.ab;

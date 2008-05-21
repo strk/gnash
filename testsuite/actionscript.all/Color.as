@@ -22,7 +22,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Color.as,v 1.17 2008/05/20 09:54:25 zoulunkai Exp $";
+rcsid="$Id: Color.as,v 1.18 2008/05/21 07:26:09 zoulunkai Exp $";
 #include "check.as"
 
 //--------------------------------
@@ -251,6 +251,24 @@ trans2 = colorObj.getTransform();
 // 99.609375 == int(0.999*256)*100/256.0
 check(trans2.ra - 99.609375 < 0.0000001); // Don't use check_equals or Math.round here.
 check_equals(trans2.rb, 99);
+
+#if OUTPUT_VERSION >= 6
+trans.aa = 12800; // 0x80 * 100
+trans.ab = 0;
+_root.createEmptyMovieClip("mc1", 10);
+check_equals(mc1._alpha, 100);
+colorObj = new Color(mc1);
+colorObj.setTransform(trans);
+trans2 = colorObj.getTransform();
+// (int16)(12800 / 100.0 * 256) == -12800
+// Gnash failed, but not due to accuracy problem,
+// _alpha is not calculated correctly.
+xcheck_equals(mc1._alpha, -12800);
+
+trans.ab = 10;
+// _alpha is not calculated correctly. Not sure about the algorithm at the moment. 
+xcheck_equals(mc1._alpha, -12800);
+#endif
 
 //
 // Some tests for same-named (case-insensitive) variables in SWF6

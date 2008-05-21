@@ -36,22 +36,19 @@ class DSOEXPORT cxform
 {
 public:
 
-    friend bool operator== (const cxform&, const cxform&);
-    friend std::ostream& operator<< (std::ostream& os, const cxform& cx);
-
     boost::int16_t ra; // RedMultTerm,   8.8 fixed point
-    boost::int16_t rb; // RedAddTerm,   16.0 fixed point
+    boost::int16_t rb; // RedAddTerm,    16 bit integer(no fraction)
     boost::int16_t ga; // GreenMultTerm  8.8 fixed point
-    boost::int16_t gb; // GreenAddTerm  16.0 fixed point
+    boost::int16_t gb; // GreenAddTerm   16 bit integer(no fraction)
     boost::int16_t ba; // BlueMultTerm   8.8 fixed point
-    boost::int16_t bb; // BlueAddTerm   16.0 fixed point
+    boost::int16_t bb; // BlueAddTerm    16 bit integer(no fraction)
     boost::int16_t aa; // AlphaMultTerm  8.8 fixed point
-    boost::int16_t ab; // AlphaAddTerm  16.0 fixed point
+    boost::int16_t ab; // AlphaAddTerm   16 bit integer(no fraction)
     
     /// Initialize to the identity color transform (no transform)
     cxform();
     
-    /// Concatenate c's transform onto ours. 
+    /// Concatenate cxform c onto ours. 
     //
     /// When transforming colors, c's transform is applied
     /// first, then ours.
@@ -64,6 +61,7 @@ public:
     /// Transform the given color.
     void transform(boost::uint8_t& r, boost::uint8_t& g, boost::uint8_t& b, boost::uint8_t& a) const;    
 
+	/// Store the cxform record to an external array.
     void  store_to(boost::int16_t * dst) const
     {
         *dst++ = ra; *dst++ = rb; 
@@ -71,10 +69,11 @@ public:
         *dst++ = ba; *dst++ = bb; 
         *dst++ = aa; *dst++ = ab; 
     }
-    
+
+	/// Load an cxform record from an external array.
     cxform & load_from(float * src)
     {
-    // enbrace the overflows intentionally.
+    	// enbrace the overflows intentionally.
         ra = (boost::int16_t)((*src++) * 2.56f);
         rb = (boost::int16_t)(*src++);
         ga = (boost::int16_t)((*src++) * 2.56f);
@@ -86,28 +85,37 @@ public:
         return *this;
     }
     
+    /// Returns true when the cxform equals identity (no transform).
+    bool is_identity() const;
+    
+    /// Returns true when the cxform leads to alpha == 0
+    //
+    /// Not the _alpha property, but the visible alpha related to dislpay. 
+    /// The two might be completely diffrent. eg. mc._alpha ranges in [-32768, 32767]
+    /// But the alpha on screen ranges in [0, 255]
+    bool is_invisible() const;
+    
     /// Read RGB from the SWF input stream.
     void read_rgb(stream& in);
 
-    // TODO: temp hack, should drop!
+    // TODO: temp hack, should drop! 
+    // why read_xxx(stream *) and read_xxx(stream &) are mixed together?
     void read_rgb(stream* in) { read_rgb(*in); }
     
     /// Read RGBA from the SWF input stream.
     void read_rgba(stream& in);
 
     // TODO: temp hack, should drop!
+    // why read_xxx(stream *) and read_xxx(stream &) are mixed together?
     void read_rgba(stream* in) { read_rgba(*in); }
-        
-    /// Debug log.
-    void print() const;
-    
-    /// Returns true when the cxform equals identity (no transform)
-    bool is_identity() const;
-    
-    /// Returns true when the cxform leads to alpha == 0
-    bool is_invisible() const;
-    
-    std::string toString() const;
+
+    friend bool operator== (const cxform&, const cxform&);
+	
+    friend std::ostream& operator<< (std::ostream& os, const cxform& cx);
+
+	std::string toString() const;
+
+	void print() const;
 };
 
 

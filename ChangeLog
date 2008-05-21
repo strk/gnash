@@ -1,3 +1,8 @@
+2008-05-21 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* server/cxform.{h,cpp}: docs, minor cleanup.
+	* testsuite/actionscript.all/color.as: more accuracy tests.  
+	
 2008-05-21 Sandro Santilli <strk@keybit.net>
 
 	* cygnal/Makefile.am, utilities/Makefile.am: add LIBINTL
