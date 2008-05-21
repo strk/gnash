@@ -64,6 +64,10 @@ namespace gnash {
 
 
 NetStreamFfmpeg::NetStreamFfmpeg():
+
+	_playback_state(PLAY_NONE),
+	_decoding_state(DEC_NONE),
+
 	m_video_index(-1),
 	m_audio_index(-1),
 
@@ -100,9 +104,10 @@ NetStreamFfmpeg::~NetStreamFfmpeg()
 
 void NetStreamFfmpeg::pause( PauseMode mode )
 {
+	log_debug("::pause(%d) called ", mode);
   switch ( mode ) {
     case pauseModeToggle:
-			if ( m_pause ) {
+			if ( playbackStatus() == PLAY_PAUSED ) {
 			  unpausePlayback();
 			} else {
 			  pausePlayback();
@@ -118,23 +123,15 @@ void NetStreamFfmpeg::pause( PauseMode mode )
 			break;
   }
 
-#if 0 // we don't want to start _decodeThread so naively...
-  if ( !m_pause && !m_go ) {
-    setStatus( playStart );
-    m_go = true;
-
-    _decodeThread = new boost::thread( boost::bind(NetStreamFfmpeg::av_streamer, this) );
-  }
-#endif
 }
 
 void NetStreamFfmpeg::close()
 {
 
-	if (m_go)
+	if (decodingStatus() != DEC_STOPPED && decodingStatus() != DEC_NONE)
 	{
 		// request decoder thread termination
-		m_go = false;
+		decodingStatus(DEC_STOPPED);
 
 		// resume the decoder, if waiting
 		_qFillerResume.notify_all();
@@ -242,9 +239,10 @@ NetStreamFfmpeg::play(const std::string& c_url)
 {
 
 	// Is it already playing ?
-	if (m_go)
+	if (playbackStatus() != PLAY_NONE && playbackStatus() != PLAY_STOPPED)
 	{
-		unpausePlayback(); // will check for m_pause itself..
+		log_error("NetStream.play() called already playing ?"); // TODO: fix this case
+		unpausePlayback(); // will check for playbackStatus itself..
 		return;
 	}
 
@@ -264,8 +262,8 @@ NetStreamFfmpeg::play(const std::string& c_url)
 		url = url.substr(4);
 	}
 
-	m_go = true;
-	pausePlayback();
+	decodingStatus(DEC_BUFFERING);
+	unpausePlayback();
 
 	// This starts the decoding thread
 	_decodeThread = new boost::thread(boost::bind(NetStreamFfmpeg::av_streamer, this)); 
@@ -665,14 +663,10 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 
 	ns->m_unqueued_data = NULL;
 
-	// Loop while we're playing
-	while (ns->m_go)
+	// Loop while we're playing or buffering
+	while (ns->decodingStatus() != DEC_STOPPED)
 	{
 		unsigned long int sleepTime = 1000;
-
-#ifdef GNASH_DEBUG_THREADS
-		log_debug("Decoding iteration. bufferTime=%lu, bufferLen=%lu", ns->bufferTime(), ns->bufferLength());
-#endif
 
 		{
 #ifdef GNASH_DEBUG_THREADS
@@ -682,18 +676,26 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 #ifdef GNASH_DEBUG_THREADS
 		log_debug("qMutex: lock obtained in av_streamer");
 #endif
+
+#ifdef GNASH_DEBUG_THREADS
+		log_debug("Decoding iteration. bufferTime=%lu, bufferLen=%lu, videoFrames=%lu, audioFrames=%lu",
+			ns->bufferTime(), ns->bufferLength(), ns->m_qvideo.size(), ns->m_qaudio.size());
+#endif
+
 		if (ns->m_isFLV)
 		{
 			// If both queues are full then don't bother filling it
       			if ( ns->m_qvideo.full() && ns->m_qaudio.full() )
 			{
+				ns->decodingStatus(DEC_DECODING); // that's to say: not buffering anymore
+
 				// Instead wait till waked up by short-queues event
-				//log_debug("Queues full, waiting on qNeedRefill condition");
+				log_debug("Queues full, waiting on qNeedRefill condition");
 				ns->_qFillerResume.wait(lock);
 			}
 			else
 			{
-				//log_debug("Calling decodeFLVFrame");
+				log_debug("Calling decodeFLVFrame");
 				bool successDecoding = ns->decodeFLVFrame();
 				//log_debug("decodeFLVFrame returned %d", successDecoding);
 				if ( ! successDecoding )
@@ -701,10 +703,10 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 					// Possible failures:
 					// 1. could not decode frame... lot's of possible
 					//    reasons...
+					// 2. EOF reached
 					if ( ns->m_videoFrameFormat != render::NONE )
 					{
 						log_error("Could not decode FLV frame");
-						break;
 					}
 					// else it's expected, we'll keep going anyway
 				}
@@ -733,15 +735,11 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 
 	}
 
-#ifdef GNASH_DEBUG_THREADS
-	log_debug("Out of decoding loop");
-#endif
-	ns->m_go = false;
+//#ifdef GNASH_DEBUG_THREADS
+	log_debug("Out of decoding loop. playbackStatus:%d, decodingStatus:%d", ns->playbackStatus(), ns->decodingStatus());
+//#endif
+	ns->decodingStatus(DEC_STOPPED);
 
-#ifdef GNASH_DEBUG_STATUS
-	log_debug("Setting playStop status");
-#endif
-	ns->setStatus(playStop);
 }
 
 // audio callback is running in sound handler thread
@@ -751,12 +749,13 @@ bool NetStreamFfmpeg::audio_streamer(void *owner, boost::uint8_t *stream, int le
 
 	NetStreamFfmpeg* ns = static_cast<NetStreamFfmpeg*>(owner);
 
-	if (!ns->m_go || ns->m_pause)
+	if (ns->playbackStatus() == PLAY_PAUSED)
 	{
+		log_debug("playback status is paused, won't consume audio frames");
 		return false;
 	}
 
-	while (ns->m_go && len > 0 && ! ns->m_qaudio.empty())
+	while (len > 0 && ! ns->m_qaudio.empty())
 	{
 #ifdef GNASH_DEBUG_THREADS
 		log_debug("qMutex: waiting for lock in audio_streamer");
@@ -795,31 +794,13 @@ bool NetStreamFfmpeg::audio_streamer(void *owner, boost::uint8_t *stream, int le
 
 bool NetStreamFfmpeg::decodeFLVFrame()
 {
-	FLVFrame* frame = NULL;
-  	if ( m_qvideo.size() < m_qaudio.size() ) 
-	{
-    		frame = m_parser->nextVideoFrame();
-  	} else {
-    		frame = m_parser->nextAudioFrame();
-  	}
+	FLVFrame* frame = m_parser->nextMediaFrame(); // we don't care which one, do we ?
 
 	if (frame == NULL)
 	{
-		if (_netCon->loadCompleted())
-		{
-#ifdef GNASH_DEBUG_THREADS
-			log_debug("decodeFLVFrame: load completed, stopping");
-#endif
-			// Stop!
-			this->m_go = false;
-		}
-		else
-		{
-			pausePlayback();
-			setStatus(bufferEmpty);
-			m_start_onbuffer = true;
-		}
-		return false;
+		assert ( _netCon->loadCompleted() );
+		decodingStatus(DEC_STOPPED);
+		return true;
 	}
 
   	AVPacket packet;
@@ -955,7 +936,13 @@ bool NetStreamFfmpeg::decodeAudio( AVPacket* packet )
 
 		m_last_audio_timestamp += frame_delay;
 
-		if (m_isFLV) m_qaudio.push(raw);
+		if (m_isFLV)
+		{
+			if ( ! m_qaudio.push(raw) )
+			{
+				log_error("Audio queue full!");
+			}
+		}
 		else m_unqueued_data = m_qaudio.push(raw) ? NULL : raw;
 	}
 	return true;
@@ -1094,7 +1081,13 @@ bool NetStreamFfmpeg::decodeVideo(AVPacket* packet)
 	}
 
 	// NOTE: Caller is assumed to have locked _qMutex already
-	if (m_isFLV) m_qvideo.push(video);
+	if (m_isFLV)
+	{
+		if ( ! m_qvideo.push(video) )
+		{
+			log_error("Video queue full !");
+		}
+	}
 	else m_unqueued_data = m_qvideo.push(video) ? NULL : video;
 
 	return true;
@@ -1259,9 +1252,10 @@ NetStreamFfmpeg::refreshVideoFrame()
 	log_debug("qMutex: lock obtained in refreshVideoFrame");
 #endif
 
-	// If we're paused or not running, there is no need to do this
-	if (!m_go || m_pause)
+	// If we're paused (and we got the first imageframe), there is no need to do this
+	if (playbackStatus() == PLAY_PAUSED && m_imageframe)
 	{
+		log_debug("refreshVideoFrame doing nothing as playback is paused and we have an image frame already");
 #ifdef GNASH_DEBUG_THREADS
 		log_debug("qMutex: releasing lock in refreshVideoFrame");
 #endif
@@ -1269,15 +1263,36 @@ NetStreamFfmpeg::refreshVideoFrame()
 	}
 
 	// Loop until a good frame is found
-	while(!m_qvideo.empty())
+	do
 	{
 		// Get video frame from queue, will have the lowest timestamp
 		// will return NULL if empty(). See multithread_queue::front
     		media::raw_mediadata_t* video = m_qvideo.front();
 
-		// If the queue is empty we have nothing to do
+		// If the queue is empty either we're waiting for more data
+		// to be decoded or we're out of data
 		if (!video)
 		{
+			log_debug("refreshVideoFrame:: No more video frames in queue");
+
+			if ( decodingStatus() == DEC_STOPPED )
+			{
+				if ( playbackStatus() != PLAY_STOPPED )
+				{
+					playbackStatus(PLAY_STOPPED);
+//#ifdef GNASH_DEBUG_STATUS
+					log_debug("Setting playStop status");
+//#endif
+					setStatus(playStop);
+				}
+			}
+			else
+			{
+				// There no video but decoder is still running
+				// not much to do here except wait for next call
+				//assert(decodingStatus() == DEC_BUFFERING);
+			}
+
 			break;
 		}
 
@@ -1332,7 +1347,7 @@ NetStreamFfmpeg::refreshVideoFrame()
 			break;
 		}
 
-	}
+	} while(!m_qvideo.empty());
 
 #ifdef GNASH_DEBUG_THREADS
 	log_debug("qMutex: releasing lock in refreshVideoFrame");
@@ -1344,25 +1359,6 @@ void
 NetStreamFfmpeg::advance()
 {
 	//log_debug("advance");
-
-	// Make sure al decoding has stopped
-	// This can happen in 2 cases: 
-	// 1) When playback has just started and we've been waiting for the buffer 
-	//    to be filled (buffersize set by setBufferTime() and default is 100
-	//    miliseconds).
-	// 2) The buffer has be "starved" (not being filled as quickly as needed),
-	//    and we then wait until the buffer contains some data (1 sec) again.
-	if (m_go && m_pause && m_start_onbuffer && m_parser.get() && m_parser->isTimeLoaded(m_current_timestamp+m_bufferTime))
-	{
-#ifdef GNASH_DEBUG_STATUS
-		log_debug("(advance): setting buffer full");
-#endif
-		setStatus(bufferFull);
-		unpausePlayback();
-		m_start_onbuffer = false;
-	}
-
-	//log_debug("(advance): processing status notification, refreshing video frame");
 
 	// Check if there are any new status messages, and if we should
 	// pass them to a event handler
@@ -1395,11 +1391,11 @@ NetStreamFfmpeg::time()
 
 void NetStreamFfmpeg::pausePlayback()
 {
-	//GNASH_REPORT_FUNCTION
+	GNASH_REPORT_FUNCTION;
 
-	if (m_pause) return;
+	if (playbackStatus() == PLAY_PAUSED) return;
 
-	m_pause = true;
+	playbackStatus(PLAY_PAUSED);
 
 	// Save the current time so we later can tell how long the pause lasted
 	m_time_of_pause = clocktime::getTicks();
@@ -1410,12 +1406,15 @@ void NetStreamFfmpeg::pausePlayback()
 
 void NetStreamFfmpeg::unpausePlayback()
 {
-	if (!m_pause) // already not paused
+	GNASH_REPORT_FUNCTION;
+
+	if (playbackStatus() == PLAY_PLAYING) // already playing
 	{
+		log_debug("unpausePlayback: already playing");
 		return;
 	}
 
-	m_pause = false;	
+	playbackStatus(PLAY_PLAYING);
 
 	if (m_current_timestamp == 0)
 	{
@@ -1428,7 +1427,7 @@ void NetStreamFfmpeg::unpausePlayback()
 		m_start_clock += clocktime::getTicks() - m_time_of_pause;
 	}
 
-	// Re-connect to the soundhandler.
+	// (re)-connect to the soundhandler.
 	// It was disconnected in ::pausePlayback to avoid to keep playing sound while paused
 	if ( _soundHandler ) _soundHandler->attach_aux_streamer(audio_streamer, (void*) this);
 }
@@ -1459,6 +1458,30 @@ NetStreamFfmpeg::bytesTotal ()
   	}
 
   	return ret_val;
+}
+
+NetStreamFfmpeg::PlaybackState
+NetStreamFfmpeg::playbackStatus(PlaybackState newstate)
+{
+	boost::mutex::scoped_lock lock(_state_mutex);
+
+	if (newstate != PLAY_NONE) {
+		_playback_state = newstate;
+	}
+
+	return _playback_state;
+}
+
+NetStreamFfmpeg::DecodingState
+NetStreamFfmpeg::decodingStatus(DecodingState newstate)
+{
+	boost::mutex::scoped_lock lock(_state_mutex);
+
+	if (newstate != DEC_NONE) {
+		_decoding_state = newstate;
+	}
+
+	return _decoding_state;
 }
 
 

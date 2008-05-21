@@ -103,6 +103,27 @@ public:
 
 private:
 
+	enum PlaybackState {
+		PLAY_NONE,
+		PLAY_STOPPED,
+		PLAY_PLAYING,
+		PLAY_PAUSED
+	};
+
+	enum DecodingState {
+		DEC_NONE,
+		DEC_STOPPED,
+		DEC_DECODING,
+		DEC_BUFFERING,
+	};
+
+	PlaybackState _playback_state;
+	DecodingState _decoding_state;
+
+	// Mutex protecting _playback_state and _decoding_state
+	// (not sure a single one is appropriate)
+	boost::mutex _state_mutex;
+
 	// Setups the playback
 	bool startPlayback();
 
@@ -145,7 +166,7 @@ private:
 	///
 	/// Will call decodeVideo or decodeAudio depending on frame type, and return
 	/// what they return.
-	/// Will set m_go to false on EOF from input.
+	/// Will set decodingStatus to DEC_BUFFERING when starving on input
 	///
 	/// This is a blocking call.
 	//
@@ -156,8 +177,9 @@ private:
 	///		- or there is a conversion error
 	///		- or renderer requested format is NONE
 	/// 	... false will be returned.
-	/// 	If next frame is an audio frame and we have no audio decoding context, false is returned.
 	/// 	In any other case, true is returned.
+	///
+	/// NOTE: if EOF is reached, true is returned by decodingStatus is set to DEC_STOPPED
 	///
 	/// NOTE: (FIXME) if we succeeded decoding but the relative queue was full,
 	///       true will be returned but nothing would be pushed on the queues.
@@ -202,6 +224,9 @@ private:
 	{
 		return time.num / (double) time.den;
 	}
+
+	PlaybackState playbackStatus(PlaybackState newstate = PLAY_NONE);
+	DecodingState decodingStatus(DecodingState newstate = DEC_NONE);
 
 	int m_video_index;
 	int m_audio_index;

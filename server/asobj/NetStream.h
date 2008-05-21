@@ -134,14 +134,8 @@ protected:
 	// Mutex to insure we don't corrupt the image
 	boost::mutex image_mutex;
 
-	// Are the playing loop running or not
-	volatile bool m_go;
-
 	// The image/videoframe which is given to the renderer
 	image::image_base* m_imageframe;
-
-	// paused or not
-	volatile bool m_pause;
 
 	// The video URL
 	std::string url;

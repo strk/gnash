@@ -1,3 +1,11 @@
+2008-05-21 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/NetStream.{cpp,h}: drop m_pause and m_go.
+	* server/asobj/NetStreamFfmpeg.{cpp,h}: drop m_pause and m_go,
+	  use separate variables for playback and decoding status.
+	  Add a lot more debugging (not really meant for final user, but
+	  helpful for later progress on this).
+
 2008-05-21 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/array.cpp, server/as_function.cpp,

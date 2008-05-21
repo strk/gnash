@@ -71,9 +71,7 @@ NetStream::NetStream()
 	m_bufferTime(100), // The default size needed to begin playback of media is 100 miliseconds
 	m_videoFrameFormat(gnash::render::videoFrameFormat()),
 	m_newFrameReady(false),
-	m_go(false),
 	m_imageframe(NULL),
-	m_pause(false),
 	m_parser(NULL),
 	m_isFLV(false),
 	m_start_onbuffer(false),
