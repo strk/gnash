@@ -47,7 +47,7 @@
 #include <iostream>
 #include <sstream>
 #include <iomanip>
-#include <unistd.h>
+#include <unistd.h> // for write() on BSD
 
 using namespace gnash;
 
