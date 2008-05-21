@@ -1,3 +1,9 @@
+2008-05-20 Brad Smith <brad@comstyle.com>
+
+	* libnet/network.h: Ensure data types are defined before including
+	netinet.h (for OpenBSD).
+	* gui/Player.cpp: Make sure write() is defined (for OpenBSD).
+
 2008-05-21 Zou Lunkai <zoulunkai@gmail.com>
 	
 	* server/cxform.{h,cpp}: docs, minor cleanup.

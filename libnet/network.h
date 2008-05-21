@@ -23,6 +23,7 @@
 #endif
 
 #if !defined(HAVE_WINSOCK_H) || defined(__OS2__)
+# include <sys/types.h>
 # include <netinet/in.h>
 # include <arpa/inet.h>
 #else

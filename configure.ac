@@ -1775,12 +1775,18 @@ dnl   fi
   if test x$build_fb = xyes; then
     AC_MSG_ERROR([Cairo renderer is not supported by FB gui. Use --enable-renderer=AGG]);
   fi
+<<<<<<< configure.ac
+dnl  if test x$build_fltk = xyes; then
+dnl    AC_MSG_ERROR([Cairo renderer is not supported by FLTK gui. Use --enable-renderer=AGG]);
+dnl  fi
+=======
   if test x$build_sdl = xyes; then
     AC_MSG_ERROR([Cairo renderer is not supported by SDL gui. Use --enable-renderer=AGG]);
   fi
   if test x$build_fltk = xyes; then
     AC_MSG_ERROR([Cairo renderer is not supported by FLTK gui. Use --enable-renderer=AGG]);
   fi
+>>>>>>> 1.533
   if test x$build_kde = xyes; then
     AC_MSG_ERROR([Cairo renderer is not supported by KDE gui. Use --enable-renderer=AGG]);
   fi

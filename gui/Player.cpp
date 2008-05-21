@@ -47,6 +47,7 @@
 #include <iostream>
 #include <sstream>
 #include <iomanip>
+#include <unistd.h>
 
 using namespace gnash;
 
