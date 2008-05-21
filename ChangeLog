@@ -1,3 +1,9 @@
+2008-05-21 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* testsuite/tmpSharedObject/: remove malformed sol files - they can
+	  wait for git (where renaming and moving directories is hopefully
+	  not such a pain).
+
 2008-05-20 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/fill_style.cpp: squash more non-standard functions (the
