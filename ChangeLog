@@ -12,7 +12,9 @@
 	* server/gnash.h: drop declaration of callback-registering
 	  functions (done in movie_root now).
 	* server/character.h, server/impl.h, server/swf/ControlTag.h,
-	  server/parser/bitmap_character_def.h	  
+	  server/parser/bitmap_character_def.h
+	* server/asobj/{Mouse,System}.cpp: get interfaceHandle from
+	  movie_root.
 
 2008-05-21 Sandro Santilli <strk@keybit.net>
 
