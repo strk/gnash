@@ -384,6 +384,9 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
     // Register Player to receive events from the core (Mouse, Stage,
     // System etc)
     root.registerEventCallback(&interfaceEventCallback);
+    
+    // Register Player to receive FsCommand events from the core.
+    root.registerFSCommandCallback(&fs_callback);
 
     // Set host requests fd (if any)
     if ( _hostfd != -1 ) root.setHostFD(_hostfd);

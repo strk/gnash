@@ -1,5 +1,9 @@
 2008-05-21 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* gui/Player.cpp: register FScommand callback again.
+
+2008-05-21 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* server/movie_root.{cpp,h}: make AS callback handlers and
 	  registering functions into non-static members of movie_root
 	  (FScommand and interfaceEvent).
