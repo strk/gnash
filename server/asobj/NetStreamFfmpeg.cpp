@@ -765,7 +765,7 @@ bool NetStreamFfmpeg::audio_streamer(void *owner, boost::uint8_t *stream, int le
 		log_debug("qMutex: lock obtained in audio_streamer");
 #endif
 
-    		media::raw_mediadata_t* samples = ns->m_qaudio.front();
+    		std::auto_ptr<media::raw_mediadata_t> samples ( ns->m_qaudio.pop() );
 
 		int n = std::min<int>(samples->m_size, len);
 		memcpy(stream, samples->m_ptr, n);
@@ -778,9 +778,6 @@ bool NetStreamFfmpeg::audio_streamer(void *owner, boost::uint8_t *stream, int le
 
 		if (samples->m_size == 0)
 		{
-			ns->m_qaudio.pop();
-			delete samples;
-
 			// wake up filler (TODO: do only if decoder is running)
 			ns->_qFillerResume.notify_all();
 		}
@@ -1267,11 +1264,11 @@ NetStreamFfmpeg::refreshVideoFrame()
 	{
 		// Get video frame from queue, will have the lowest timestamp
 		// will return NULL if empty(). See multithread_queue::front
-    		media::raw_mediadata_t* video = m_qvideo.front();
+    		std::auto_ptr<media::raw_mediadata_t> video ( m_qvideo.pop() );
 
 		// If the queue is empty either we're waiting for more data
 		// to be decoded or we're out of data
-		if (!video)
+		if (!video.get())
 		{
 			log_debug("refreshVideoFrame:: No more video frames in queue");
 
@@ -1325,12 +1322,8 @@ NetStreamFfmpeg::refreshVideoFrame()
 			{
 				if ( ! m_imageframe ) m_imageframe  = new image::rgb(m_VCodecCtx->width, m_VCodecCtx->height);
 				image::rgb* imgframe = static_cast<image::rgb*>(m_imageframe);
-				rgbcopy(imgframe, video, m_VCodecCtx->width * 3);
+				rgbcopy(imgframe, video.get(), m_VCodecCtx->width * 3);
 			}
-
-			// Delete the frame from the queue
-			m_qvideo.pop();
-			delete video;
 
 			// wake up filler (TODO: do only if decoder is running)
 			// TODO2: resume only at end of loop ?

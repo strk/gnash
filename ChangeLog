@@ -1,5 +1,13 @@
 2008-05-21 Sandro Santilli <strk@keybit.net>
 
+	* libmedia/ffmpeg/ffmpegNetStreamUtil.h,
+	  server/asobj/NetStreamFfmpeg.cpp:
+	  Change ElementsOwningQueue::pop to return 
+	  the element and transfer ownership. Make 
+	  things clearer to me.
+
+2008-05-21 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/NetStream.{cpp,h}: drop m_pause and m_go.
 	* server/asobj/NetStreamFfmpeg.{cpp,h}: drop m_pause and m_go,
 	  use separate variables for playback and decoding status.
