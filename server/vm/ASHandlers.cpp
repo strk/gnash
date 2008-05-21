@@ -78,11 +78,6 @@ static gnash::Debugger& debugger = gnash::Debugger::getDefaultInstance();
 //
 #undef REALLY_WAIT_ON_WAIT_FOR_FRAME
 
-// Forward declarations
-namespace gnash {
-	extern fscommand_callback s_fscommand_handler;
-}
-
 namespace gnash {
 
 namespace SWF { // gnash::SWF
@@ -2242,14 +2237,16 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 		target_string = target.to_string();
 	}
 
+
+    movie_root& m = VM::get().getRoot();
 	// If the url starts with "FSCommand:", then this is
 	// a message for the host app.
 	if (strncasecmp(url_c, "FSCommand:", 10) == 0)
 	{
-		if (s_fscommand_handler)
+		if (m.fsCommandHandle)
 		{
 			// Call into the app.
-			(*s_fscommand_handler)(env.get_target()->get_root(), url_c + 10, target_string.c_str());
+			(*m.fsCommandHandle)(env.get_target()->get_root(), url_c + 10, target_string.c_str());
 		}
 
 		return;

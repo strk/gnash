@@ -70,13 +70,6 @@ namespace gnash {
 static Debugger& debugger = Debugger::getDefaultInstance();
 #endif
 
-// External interface (to be moved under swf/ASHandlers)
-fscommand_callback s_fscommand_handler = NULL;
-void	registerFSCommandCallback(fscommand_callback handler)
-{
-    s_fscommand_handler = handler;
-}
-
 ActionExec::ActionExec(const swf_function& func, as_environment& newEnv, as_value* nRetVal, as_object* this_ptr)
 	:
 	with_stack(),

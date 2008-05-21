@@ -26,7 +26,6 @@
 #include "bitmap_info.h" // for dtor visibility by intrusive_ptr
 #include "GC.h" // for GcResource (markReachableResources)
 
-#include <cstdarg>
 #include <cassert>
 #include <memory> // for auto_ptr
 

@@ -91,7 +91,9 @@ getSystemCapabilitiesInterface()
     // "Windows XP", "Windows 2000", "Windows NT", "Windows 98/ME",
     // "Windows 95", "Windows CE", "Linux", "MacOS"
     // Override in gnashrc
-    const std::string os = VM::get().getOSName();
+    VM& vm = VM::get();
+    
+    const std::string os = vm.getOSName();
 
     const std::string language = systemLanguage();
 
@@ -130,21 +132,23 @@ getSystemCapabilitiesInterface()
 
     std::istringstream ss;
 
-    if (movie_root::interfaceHandle) {
-        ss.str((*movie_root::interfaceHandle)("System.capabilities.screenResolutionX", ""));
+    const movie_root& m = vm.getRoot();
+
+    if (m.interfaceHandle) {
+        ss.str((*m.interfaceHandle)("System.capabilities.screenResolutionX", ""));
         ss >> screenResolutionX;
         
         ss.clear();
-        ss.str((*movie_root::interfaceHandle)("System.capabilities.screenResolutionY", ""));
+        ss.str((*m.interfaceHandle)("System.capabilities.screenResolutionY", ""));
         ss >> screenResolutionY;
 
         ss.clear();
-        ss.str((*movie_root::interfaceHandle)("System.capabilities.screenDPI", ""));
+        ss.str((*m.interfaceHandle)("System.capabilities.screenDPI", ""));
         ss >> screenDPI;
         
-        pixelAspectRatio = (*movie_root::interfaceHandle)("System.capabilities.pixelAspectRatio", "");
-        playerType = (*movie_root::interfaceHandle)("System.capabilities.playerType", "");
-        screenColor = (*movie_root::interfaceHandle)("System.capabilities.screenColor", "");
+        pixelAspectRatio = (*m.interfaceHandle)("System.capabilities.pixelAspectRatio", "");
+        playerType = (*m.interfaceHandle)("System.capabilities.playerType", "");
+        screenColor = (*m.interfaceHandle)("System.capabilities.screenColor", "");
     }
 
     //

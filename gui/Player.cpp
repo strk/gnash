@@ -112,10 +112,6 @@ Player::init()
 
     set_use_cache_files(false);
 
-    gnash::registerFSCommandCallback(fs_callback);
-    
-    gnash::movie_root::registerEventCallback(&interfaceEventCallback);
-
 }
 
 void
@@ -384,6 +380,10 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
 
     SystemClock clock; // use system clock here...
     movie_root& root = VM::init(*_movieDef, clock).getRoot();
+    
+    // Register Player to receive events from the core (Mouse, Stage,
+    // System etc)
+    root.registerEventCallback(&interfaceEventCallback);
 
     // Set host requests fd (if any)
     if ( _hostfd != -1 ) root.setHostFD(_hostfd);

@@ -71,7 +71,6 @@
 namespace gnash
 {
 
-gnash::interfaceEventCallback movie_root::interfaceHandle = NULL;
 
 inline bool
 movie_root::testInvariant() const
@@ -88,6 +87,8 @@ movie_root::testInvariant() const
 
 movie_root::movie_root()
 	:
+	interfaceHandle(0),
+	fsCommandHandle(0),
 	m_viewport_x0(0),
 	m_viewport_y0(0),
 	m_viewport_width(1),

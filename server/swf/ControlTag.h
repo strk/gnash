@@ -18,11 +18,6 @@
 #ifndef GNASH_EXECUTE_TAG_H
 #define GNASH_EXECUTE_TAG_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
-#include <cstdarg>
 #include <cassert>
 
 namespace gnash {

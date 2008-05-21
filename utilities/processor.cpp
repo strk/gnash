@@ -323,9 +323,6 @@ main(int argc, char *argv[])
 	exit(1);
     }
 
-    registerFSCommandCallback(execFsCommand);
-    gnash::movie_root::registerEventCallback(&eventCallback);
-
     // Play through all the movies.
     for (int i = 0, n = infiles.size(); i < n; i++) {
 
@@ -406,11 +403,17 @@ play_movie(const char* filename)
     long clockAdvance = fpsDelay/1000;
     long localDelay = delay == -1 ? fpsDelay : delay; // microseconds
 
-    log_debug("Will sleep %ld microseconds between iterations - fps is %g, clockAdvance is %lu\n", localDelay, fps, clockAdvance);
+    log_debug("Will sleep %ld microseconds between iterations - fps is %g, clockAdvance is %lu", 
+                        localDelay, fps, clockAdvance);
 
     // Use a clock advanced at every iteration to match exact FPS speed.
     ManualClock cl;
     gnash::movie_root& m = VM::init(*md, cl).getRoot();
+    
+    // Register processor to receive ActionScript events (Mouse, Stage
+    // System etc).
+    m.registerEventCallback(&eventCallback);
+    m.registerFSCommandCallback(&execFsCommand);
 
     md->completeLoad();
 

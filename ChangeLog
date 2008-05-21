@@ -1,3 +1,19 @@
+2008-05-21 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/movie_root.{cpp,h}: make AS callback handlers and
+	  registering functions into non-static members of movie_root
+	  (FScommand and interfaceEvent).
+	* server/vm/ActionExec.cpp: registerFSCommandCallback moved to
+	  movie_root.
+	* server/ASHandlers.cpp: get FScommand callback from movie_root,
+	  reduces use of globals and 'extern'.
+	* gui/Player.cpp, utilities/processor.cpp: update registering
+	  callback handlers (after VM is initialized).
+	* server/gnash.h: drop declaration of callback-registering
+	  functions (done in movie_root now).
+	* server/character.h, server/impl.h, server/swf/ControlTag.h,
+	  server/parser/bitmap_character_def.h	  
+
 2008-05-21 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/NetStream-SquareTest.c: fix the test

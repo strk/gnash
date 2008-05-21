@@ -710,14 +710,34 @@ public:
         return _hostfd;
     }
 
-	/// A callback to the GUI for sending events and receiving
-	/// replies.
-	static gnash::interfaceEventCallback interfaceHandle;
+	/// A callback to the GUI (or whatever is listening) for sending
+	/// events and receiving replies. Used for ActionScript interface
+	/// with the gui (Mouse visibility, Stage alignment etc and System
+	/// information, for instance).
+	gnash::interfaceEventCallback interfaceHandle;
 
-	static void registerEventCallback(interfaceEventCallback handler)
+	DSOEXPORT void registerEventCallback(interfaceEventCallback handler)
 	{
 	   	interfaceHandle = handler;
 	}
+
+    // Callback to send FsCommands somewhere.
+    gnash::fscommand_callback fsCommandHandle;
+
+
+    /// ActionScript embedded in a movie can use the built-in
+    /// fscommand() function to send data back to the host
+    /// application.  If you are interested in this data, register
+    /// a handler, which will be called when the embedded scripts
+    /// call fscommand().
+    ///
+    /// The handler gets the sprite_instance* that the script is
+    /// embedded in, and the two string arguments passed by the
+    /// script to fscommand().
+    DSOEXPORT void registerFSCommandCallback(fscommand_callback handler)
+    {
+        fsCommandHandle = handler;
+    }
 
 #ifdef USE_SWFTREE
     typedef std::pair<std::string, std::string> StringPair;

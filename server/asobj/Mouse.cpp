@@ -66,9 +66,11 @@ mouse_hide(const fn_call& fn)
 
     int success = 0;
 
-	if (movie_root::interfaceHandle)
+    movie_root& m = VM::get().getRoot();
+
+	if (m.interfaceHandle)
 	{
-		success = ((*movie_root::interfaceHandle)("Mouse.hide", "") == "true") ? 1 : 0;
+		success = ((*m.interfaceHandle)("Mouse.hide", "") == "true") ? 1 : 0;
 	}
 	else
 	{
@@ -88,9 +90,11 @@ mouse_show(const fn_call& fn)
 
     int success = 0;
 
-	if (movie_root::interfaceHandle)
+    movie_root& m = VM::get().getRoot();
+
+	if (m.interfaceHandle)
 	{
-		success = ((*movie_root::interfaceHandle)("Mouse.show", "") == "true") ? 1 : 0;
+		success = ((*m.interfaceHandle)("Mouse.show", "") == "true") ? 1 : 0;
 	}
 	else
 	{

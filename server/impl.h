@@ -26,7 +26,6 @@
 #include "smart_ptr.h"
 #include "swf/TagLoadersTable.h"
 
-#include <cstdarg>
 #include <cassert>
 
 namespace gnash {

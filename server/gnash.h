@@ -109,24 +109,9 @@ void    register_progress_callback(progress_callback progress_handle);
 typedef void (*fscommand_callback)(sprite_instance* movie,
 						const std::string& command, const std::string& arg);
 
-/// ActionScripts embedded in a movie can use the built-in
-/// fscommand() function to send data back to the host
-/// application.  If you are interested in this data, register
-/// a handler, which will be called when the embedded scripts
-/// call fscommand().
-///
-/// The handler gets the sprite_instance* that the script is
-/// embedded in, and the two string arguments passed by the
-/// script to fscommand().
-DSOEXPORT void registerFSCommandCallback(fscommand_callback handler);
-
 /// Signature of interface event callback.
-typedef std::string (*interfaceEventCallback)(const std::string& event, const std::string& arg);
-
-/// Use this to register listeners for core events that should
-/// trigger an event in the user interface (GUI or any other
-/// user of the gnash core libs).
-DSOEXPORT void registerEventCallback(interfaceEventCallback handler);
+typedef std::string (*interfaceEventCallback)(const std::string& event,
+                                              const std::string& arg);
 
 /// Use this to register gnash extension
 //

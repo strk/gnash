@@ -39,7 +39,6 @@
 #endif
 
 #include <map>
-#include <cstdarg>
 #include <string>
 #include <cassert>
 #include <typeinfo>
