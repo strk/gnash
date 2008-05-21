@@ -34,6 +34,7 @@
 #include <boost/bind.hpp> 
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition.hpp>
+#include <boost/thread/barrier.hpp>
 
 #include "impl.h"
 
@@ -223,6 +224,9 @@ private:
 
 	// The decoding thread
 	boost::thread* _decodeThread;
+
+	// Barrier to synchronize thread and thread starter
+	boost::barrier _decodeThreadBarrier;
 
 	// The timestamp of the last decoded video frame, in seconds.
 	volatile boost::uint32_t m_last_video_timestamp;

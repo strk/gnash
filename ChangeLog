@@ -1,3 +1,8 @@
+2008-05-21 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/NetStreamFfmpeg.{cpp,h}: use a barrier
+	  to wait for start of decoder thread.
+
 2008-05-21 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* gui/Player.cpp: register FScommand callback again.

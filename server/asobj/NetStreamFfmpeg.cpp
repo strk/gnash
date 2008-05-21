@@ -73,6 +73,7 @@ NetStreamFfmpeg::NetStreamFfmpeg():
 	m_Frame(NULL),
 
 	_decodeThread(NULL),
+	_decodeThreadBarrier(2), // main and decoder threads
 
 	m_last_video_timestamp(0),
 	m_last_audio_timestamp(0),
@@ -117,12 +118,14 @@ void NetStreamFfmpeg::pause( PauseMode mode )
 			break;
   }
 
+#if 0 // we don't want to start _decodeThread so naively...
   if ( !m_pause && !m_go ) {
     setStatus( playStart );
     m_go = true;
 
     _decodeThread = new boost::thread( boost::bind(NetStreamFfmpeg::av_streamer, this) );
   }
+#endif
 }
 
 void NetStreamFfmpeg::close()
@@ -266,6 +269,7 @@ NetStreamFfmpeg::play(const std::string& c_url)
 
 	// This starts the decoding thread
 	_decodeThread = new boost::thread(boost::bind(NetStreamFfmpeg::av_streamer, this)); 
+	_decodeThreadBarrier.wait();
 
 	return;
 }
@@ -632,12 +636,7 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 {
 	//GNASH_REPORT_FUNCTION;
 
-	// This should only happen if close() is called before this thread is ready
-	if (!ns->m_go)
-	{
-		log_debug("av_streamer: !ns->m_go, returning");
-		return;
-	}
+	ns->_decodeThreadBarrier.wait();
 
 	if (!ns->m_ACodecCtx && !ns->m_VCodecCtx && !ns->m_FormatCtx)
 	{
