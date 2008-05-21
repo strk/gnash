@@ -693,7 +693,14 @@ bool FLVParser::parseNextTag()
 		// Extract information from the meta tag
 		/*_lt.seek(_lastParsedPosition+16);
 		char* metaTag = new char[bodyLength];
-		_lt.read(metaTag, bodyLength);
+		size_t actuallyRead = _lt.read(metaTag, bodyLength);
+		if ( actuallyRead < bodyLength )
+		{
+			log_error("FLVParser::parseNextTag: can't read metaTag (%d) body (needed %d bytes, only got %d)",
+				META_TAG, bodyLength, actuallyRead);
+			_parsingComplete=true;
+			return false;
+		}
 		amf::AMF* amfParser = new amf::AMF();
 		amfParser->parseAMF(metaTag);*/
 

@@ -1,4 +1,9 @@
-2008-05-20 Brad Smith <brad@comstyle.com>
+2008-05-21 Sandro Santilli <strk@keybit.net>
+
+	* libbase/FLVParser.cpp (parseNextFrame): handle premature EOF while
+	  parsing meta tags.
+
+2008-05-21 Brad Smith <brad@comstyle.com>
 
 	* libnet/network.h: Ensure data types are defined before including
 	netinet.h (for OpenBSD).
