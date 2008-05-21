@@ -2,6 +2,14 @@
 
 	* libmedia/ffmpeg/ffmpegNetStreamUtil.h,
 	  server/asobj/NetStreamFfmpeg.cpp:
+	  Sorry, reverted previous patch, it consumed
+	  more frames from "the buffer" then required
+	  (really consumes only based timestamp)
+
+2008-05-21 Sandro Santilli <strk@keybit.net>
+
+	* libmedia/ffmpeg/ffmpegNetStreamUtil.h,
+	  server/asobj/NetStreamFfmpeg.cpp:
 	  Change ElementsOwningQueue::pop to return 
 	  the element and transfer ownership. Make 
 	  things clearer to me.

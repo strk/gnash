@@ -149,7 +149,6 @@ public:
 	/// If no elements are available this function returns NULL.
 	///
 	/// @return a pointer to the first element on the queue, NULL if queue is empty.
-	///         Ownership is retained by this class. See pop()
 	///
 	T front()
 	{
@@ -157,17 +156,14 @@ public:
 		return _queue.front();
 	}
 
-	/// Pops the first element from the queue, transferring ownership to caller
+	/// Pops the first element from the queue. 
 	//
 	/// If no elements are available this function is
 	/// a noop. 
 	///
-	T pop()
+	void pop()
 	{
-		if ( _queue.empty() ) return 0;
-		T ret = _queue.front();
-		_queue.pop_front();
-		return ret;
+		if ( ! _queue.empty() ) _queue.pop_front();
 	}
 
 private:
