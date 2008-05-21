@@ -43,6 +43,7 @@ AM_LDFLAGS = \
 	$(LIBXML_LIBS) \
 	$(CURL_LIBS) \
 	$(BOOST_LIBS) \
+	$(LIBINTL) \
 	$(PTHREAD_LIBS)
 
 localedir = $(datadir)/locale

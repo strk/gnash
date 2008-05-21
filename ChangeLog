@@ -1,3 +1,9 @@
+2008-05-21 Sandro Santilli <strk@keybit.net>
+
+	* cygnal/Makefile.am, utilities/Makefile.am: add LIBINTL
+	  to AM_LDFLAGS. Patch in bug #21536, modified to use LIBINT
+	  consistently (also used in libbase/Makefile.am).
+
 2008-05-21 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* testsuite/tmpSharedObject/: remove malformed sol files - they can
