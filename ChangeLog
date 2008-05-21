@@ -1,5 +1,13 @@
 2008-05-21 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/NetStreamFfmpeg.cpp (av_streamer):
+	  Wait to be waked up when *any* (not both) 
+	  media frame buffer is full, or the actual
+	  decoder would just do discard the product of work
+	  done for an already full queue...
+
+2008-05-21 Sandro Santilli <strk@keybit.net>
+
 	* libmedia/ffmpeg/ffmpegNetStreamUtil.h,
 	  server/asobj/NetStreamFfmpeg.cpp:
 	  Sorry, reverted previous patch, it consumed

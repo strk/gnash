@@ -684,8 +684,10 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 
 		if (ns->m_isFLV)
 		{
-			// If both queues are full then don't bother filling it
-      			if ( ns->m_qvideo.full() && ns->m_qaudio.full() )
+			// If any of the two queues are full don't bother fetching more
+			// (next consumer will wake us up)
+			//
+      			if ( ns->m_qvideo.full() || ns->m_qaudio.full() )
 			{
 				ns->decodingStatus(DEC_DECODING); // that's to say: not buffering anymore
 
