@@ -1,3 +1,10 @@
+2008-05-21 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/vm/ASHandlers.cpp: clean up logging a lot (dropping
+	  to_debug_string() and c_str()), drop using namespace std;,
+	  const correct. Use references more often (using existing
+	  code as a guide).
+
 2008-05-21 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/NetStreamFfmpeg.cpp (av_streamer):
