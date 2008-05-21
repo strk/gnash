@@ -352,12 +352,14 @@ main(int argc, char** argv)
 		" }"
 		" _root.note('onMetaData: '+s);"
 
+
+		" _root.metadataNotified++;"
+
 		// don't run other tests if already done
 		// BTW: should be called once, gnash (gst) calls this twice
 		//      and would succeed in composition checking in second call.
-		" if ( _root.metadataNotified ) return;"
+		" if ( _root.metadataNotified > 1 ) return;"
 
-		" _root.metadataNotified++;"
 		" xcheck(_root.startNotified, 'onMetaData should be notified after Play.Start');"
 		" check_equals(arguments.length, 1, 'single argument');"
 		" check(info instanceof Object, 'onMetaData argument should be instanceof Object');"
@@ -461,7 +463,7 @@ main(int argc, char** argv)
 
   SWFMovie_nextFrame(mo);
 
-  check_equals(mo, "metadataNotified", "1");
+  xcheck_equals(mo, "metadataNotified", "1");
   check_equals(mo, "stopNotified", "2");
   check_equals(mo, "startNotified", "1");
   SWFMovie_add(mo, (SWFBlock)newSWFAction("totals(119); stop();"));
