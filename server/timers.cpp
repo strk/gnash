@@ -32,8 +32,6 @@
 
 #include <limits> // for numeric_limits
 
-using namespace std;
-
 namespace gnash {
 
   Timer::Timer() :

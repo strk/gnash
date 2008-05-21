@@ -1,3 +1,10 @@
+2008-05-21 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/array.cpp, server/as_function.cpp,
+	  server/BitmapMovieInstance.cpp, server/movie_instance.cpp,
+	  server/swf_function.cpp: don't use namespace std, drop
+	  some gnashconfig.h includes.
+
 2008-05-21 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/NetStreamFfmpeg.{cpp,h}: use a barrier

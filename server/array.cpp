@@ -41,8 +41,6 @@
 
 //#define GNASH_DEBUG 
 
-using namespace std;
-
 namespace gnash {
 
 typedef boost::function2<bool, const as_value&, const as_value&> as_cmp_fn;

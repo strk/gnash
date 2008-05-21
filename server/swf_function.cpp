@@ -36,8 +36,6 @@
 #include <iostream>
 #include <string>
 
-using namespace std;
-
 namespace gnash {
 
 swf_function::~swf_function()

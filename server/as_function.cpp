@@ -33,8 +33,6 @@
 #include <typeinfo>
 #include <iostream>
 
-using namespace std;
-
 namespace gnash {
 
 // should be static, probably

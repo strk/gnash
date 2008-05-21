@@ -30,8 +30,6 @@
 #include <functional> // for mem_fun, bind1st
 #include <algorithm> // for for_each, std::min
 
-using namespace std;
-
 namespace gnash {
 
 movie_instance::movie_instance(movie_definition* def, character* parent)

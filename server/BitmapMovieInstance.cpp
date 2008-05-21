@@ -15,18 +15,11 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
-
 #include "BitmapMovieInstance.h"
 #include "BitmapMovieDefinition.h"
 #include "fill_style.h"
 #include "shape.h" // for class path and class edge
 #include "render.h" // for ::display
-
-using namespace std;
 
 namespace gnash {
 
@@ -40,7 +33,7 @@ BitmapMovieInstance::BitmapMovieInstance(BitmapMovieDefinition* def, character* 
 	assert(chdef);
 	boost::intrusive_ptr<character> ch = chdef->create_character_instance(this, 1);
 	
-	int depth = 1+character::staticDepthOffset;
+	const int depth = 1 + character::staticDepthOffset;
 	place_character(ch.get(), depth);
 }
 
