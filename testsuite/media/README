@@ -13,6 +13,27 @@ Bitstream-Vera-Sans.COPYRIGHT
 	Font Definition Block (fdb) for embedding in SWF.
 	Taken from http://ming.sf.net.
 
+default.orc
+
+	Csound default orchestra file
+
+gnash.xml
+
+	An example XML file.
+
+majorscale.sco
+
+	Csound score file for a major scale execution
+
+offspring.swf
+offspring.jpg
+green.jpg
+green.swf
+lynch.swf
+lynch.jpg
+
+	The swfs display the associated jpgs.
+
 sound1.wav
 
 	(tick, tick)
@@ -29,14 +50,6 @@ sound1.mp3
 	Channels       : 1
 	Sample Rate    : 22050
 
-default.orc
-
-	Csound default orchestra file
-
-majorscale.sco
-
-	Csound score file for a major scale execution
-
 square.flv
 
 	H263 video in an FLV
@@ -46,3 +59,9 @@ square.flv
 square.ogg
 
 	Theora video version of square.flv.
+
+vars.txt
+vars2.txt
+
+	Text files containing variable assignments.
+

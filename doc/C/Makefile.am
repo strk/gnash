@@ -70,12 +70,12 @@ REFMAN = \
 
 
 EXTRA_DIST = \
-	preformatted \
 	$(USERMAN) \
 	$(REFMAN) \
 	$(COMMON) \
 	$(XML_MAIN) \
-	$(MANSRC) 
+	$(MANSRC)  \
+	preformatted/gnashuser.html.in preformatted/gprocessor.1.in preformatted/cygnal.1.in preformatted/gnash.1.in preformatted/gnash_ref.info.in preformatted/soldumper.1.in preformatted/dumpshm.1.in preformatted/gnashref.html.in preformatted/gnash_user.info.in
 
 #noinst_SCRIPT = gen-doc.sh
 # We list the texi and info pages twice, as differing versions of the 

@@ -1,3 +1,9 @@
+2008-05-22 Russ Nelson <nelson@crynwr.com>
+
+	* doc/C/Makefile.am: list the files one by one, not the subdir.
+	* testsuite/Makefile.am: list the files one by one, not the subdir.
+	* testsuite/media/README: list and describe the files to include
+
 2008-05-22 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/vm/ASHandlers.cpp: partial revert of last commit, restricted
@@ -300,6 +306,7 @@
 	* configure.ac: have KPARTS install dir summary use 'KPARTS' label,
 	  to conform with that given by 'make dumpconfig'.
 
+>>>>>>> 1.6678
 2008-05-17 Sandro Santilli <strk@keybit.net>
 
 	* server/vm/ActionExec.cpp (setLocalVariable): use scope stack

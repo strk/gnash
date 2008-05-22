@@ -142,7 +142,7 @@ Slackware, and Gentoo.
 
    Gnash is capable of reading up to SWF v9 files and opcodes, but
 primarily supports SWF v7, with better SWF v8 and v9 support under
-heavy development. With the 0.8.2 release, Gnash includes initial
+heavy development. Since the 0.8.2 release, Gnash includes initial
 parser support for SWF v8 and v9.  Not all ActionScript 2 classes are
 implemented yet, but all of the most heavily used ones are. Many
 ActionScript 2 classes are partially implemented; there is support for
@@ -4536,139 +4536,139 @@ Node: Top168
 Node: Introduction1998
 Node: Audience2803
 Node: What Is Supported?3130
-Node: Building from Source5636
-Node: Overview6016
-Node: Getting The Source7058
-Node: Releases7264
-Node: CVS Access7632
-Node: Code Dependencies8344
-Ref: Code Dependency Table9041
-Node: Testing Dependencies34556
-Ref: Testing Dependency Table34865
-Node: Documentation Dependencies38789
-Ref: Documentation Dependency Table39058
-Node: Configuring Gnash48126
-Node: Features50420
-Ref: Configuration Options - Features51020
-Node: Specifying Custom Paths57417
-Ref: Custom Path Options57887
-Node: Compiling the Code67510
-Node: Creating the Documentation68451
-Node: Running the Tests69797
-Node: Using DejaGnu70251
-Node: Increasing Verbosity70614
-Node: Running Some Tests71150
-Node: Running The Tests Manually71970
-Node: Movie tests72632
-Node: ActionScript Unit Tests72986
-Node: Installation73303
-Node: Libraries74616
-Node: Executables75472
-Node: Documentation76342
-Node: Cross Configuring77097
-Node: Software Internals80177
-Node: A Tour of Gnash80446
-Node: The Libraries81014
-Node: libgnashbase81284
-Node: libgnashserver81711
-Node: libgnashmedia82082
-Node: libgnashamf82571
-Node: libgnashbackend82993
-Node: libgnashplugin83308
-Node: libklashpart83514
-Node: The Applications83684
-Node: The Standalone Player84054
-Node: Gprocessor84351
-Node: SOLdumper84745
-Node: Dumpshm85012
-Node: The Plugin85231
-Node: Current Implementation85721
-Node: GUI Support86262
-Node: Mozplugger87951
-Node: Klash89842
-Node: The Message Logging System90392
-Node: Logging System API91949
-Node: The LogFile Instance94783
-Node: Sound handling in Gnash96267
-Node: Sound types97010
-Node: Sound parsing97547
-Node: Sound playback98115
-Node: The SDL sound backend98645
-Node: The Gstreamer backend99964
-Node: Future audio backends100980
-Node: Detailed description of the Gstreamer backend101470
-Node: Testing103721
-Node: Testing Tools104192
-Node: Test Cases105024
-Node: Writing ActionScript Tests105603
-Node: Writing Ming-based self-contained SWF tests108106
-Node: Using Ming-based test generators facilities109263
-Node: Writing self-contained SWF tests with other compilers111623
-Node: Writing Test Runners114748
-Node: Using the generic test runner for self-contained SWF tests116497
-Node: Writing Movie testers118587
-Node: Adding New ActionScript Class120327
-Node: Prototype121507
-Node: Declaration122924
-Node: Instantiation123189
-Node: Methods123816
-Node: Accessing Arguments124207
-Node: Returning a Value to ActionScript124603
-Node: Additional fn_call Members124982
-Node: Dynamic Properties125836
-Node: The as_value Object Type127341
-Node: Data Types127779
-Node: Determining the Type128100
-Node: Fetching the Value128632
-Node: Setting the Value and Type129122
-Node: Further Reading129716
-Node: Object ActionScript Class130131
-Node: The Methods of the Class130471
-Node: The Properties of the Object Class130810
-Node: Object Class Conformance131125
-Node: Reporting Bugs132664
-Node: Get a Fresh Binary Package133647
-Node: Determine if the bug was previously reported134433
-Node: Review the bug writing guidelines135251
-Node: Filing a bug report136302
-Node: Gnash Extensions136585
-Node: Creating A New Extension138855
-Node: Crafting an Extension140273
-Node: Debugging An Extension144577
-Node: Included Extensions146269
-Node: Gtk Extension146713
-Node: File I/O Extension147700
-Node: MySQL Extension148886
-Node: RTMP Protocol149737
-Node: AMF Format159533
-Node: Mozilla/Firefox NPAPI Plugin160509
-Node: Plugin C API161527
-Node: Plugin C++ API163386
-Node: OpenGL and Threads166650
-Node: Plugin Event Handling167978
-Node: Appendix168947
-Node: Code Style169099
-Node: Authors172929
-Node: GNU Free Documentation License173638
-Node: 0_ PREAMBLE174401
-Node: 1_ APPLICABILITY AND DEFINITIONS175707
-Ref: fdl-document175932
-Ref: fdl-modified176223
-Ref: fdl-secondary176410
-Ref: fdl-invariant177055
-Ref: fdl-cover-texts177304
-Ref: fdl-transparent177517
-Ref: fdl-title-page178807
-Node: 2_ VERBATIM COPYING179196
-Node: 3_ COPYING IN QUANTITY180176
-Node: 4_ MODIFICATIONS182533
-Node: 5_ COMBINING DOCUMENTS188593
-Node: 6_ COLLECTIONS OF DOCUMENTS190090
-Node: 7_ AGGREGATION WITH INDEPENDENT WORKS190981
-Node: 8_ TRANSLATION192209
-Node: 9_ TERMINATION193112
-Node: 10_ FUTURE REVISIONS OF THIS LICENSE193767
-Node: Addendum194907
+Node: Building from Source5637
+Node: Overview6017
+Node: Getting The Source7059
+Node: Releases7265
+Node: CVS Access7633
+Node: Code Dependencies8345
+Ref: Code Dependency Table9042
+Node: Testing Dependencies34557
+Ref: Testing Dependency Table34866
+Node: Documentation Dependencies38790
+Ref: Documentation Dependency Table39059
+Node: Configuring Gnash48127
+Node: Features50421
+Ref: Configuration Options - Features51021
+Node: Specifying Custom Paths57418
+Ref: Custom Path Options57888
+Node: Compiling the Code67511
+Node: Creating the Documentation68452
+Node: Running the Tests69798
+Node: Using DejaGnu70252
+Node: Increasing Verbosity70615
+Node: Running Some Tests71151
+Node: Running The Tests Manually71971
+Node: Movie tests72633
+Node: ActionScript Unit Tests72987
+Node: Installation73304
+Node: Libraries74617
+Node: Executables75473
+Node: Documentation76343
+Node: Cross Configuring77098
+Node: Software Internals80178
+Node: A Tour of Gnash80447
+Node: The Libraries81015
+Node: libgnashbase81285
+Node: libgnashserver81712
+Node: libgnashmedia82083
+Node: libgnashamf82572
+Node: libgnashbackend82994
+Node: libgnashplugin83309
+Node: libklashpart83515
+Node: The Applications83685
+Node: The Standalone Player84055
+Node: Gprocessor84352
+Node: SOLdumper84746
+Node: Dumpshm85013
+Node: The Plugin85232
+Node: Current Implementation85722
+Node: GUI Support86263
+Node: Mozplugger87952
+Node: Klash89843
+Node: The Message Logging System90393
+Node: Logging System API91950
+Node: The LogFile Instance94784
+Node: Sound handling in Gnash96268
+Node: Sound types97011
+Node: Sound parsing97548
+Node: Sound playback98116
+Node: The SDL sound backend98646
+Node: The Gstreamer backend99965
+Node: Future audio backends100981
+Node: Detailed description of the Gstreamer backend101471
+Node: Testing103722
+Node: Testing Tools104193
+Node: Test Cases105025
+Node: Writing ActionScript Tests105604
+Node: Writing Ming-based self-contained SWF tests108107
+Node: Using Ming-based test generators facilities109264
+Node: Writing self-contained SWF tests with other compilers111624
+Node: Writing Test Runners114749
+Node: Using the generic test runner for self-contained SWF tests116498
+Node: Writing Movie testers118588
+Node: Adding New ActionScript Class120328
+Node: Prototype121508
+Node: Declaration122925
+Node: Instantiation123190
+Node: Methods123817
+Node: Accessing Arguments124208
+Node: Returning a Value to ActionScript124604
+Node: Additional fn_call Members124983
+Node: Dynamic Properties125837
+Node: The as_value Object Type127342
+Node: Data Types127780
+Node: Determining the Type128101
+Node: Fetching the Value128633
+Node: Setting the Value and Type129123
+Node: Further Reading129717
+Node: Object ActionScript Class130132
+Node: The Methods of the Class130472
+Node: The Properties of the Object Class130811
+Node: Object Class Conformance131126
+Node: Reporting Bugs132665
+Node: Get a Fresh Binary Package133648
+Node: Determine if the bug was previously reported134434
+Node: Review the bug writing guidelines135252
+Node: Filing a bug report136303
+Node: Gnash Extensions136586
+Node: Creating A New Extension138856
+Node: Crafting an Extension140274
+Node: Debugging An Extension144578
+Node: Included Extensions146270
+Node: Gtk Extension146714
+Node: File I/O Extension147701
+Node: MySQL Extension148887
+Node: RTMP Protocol149738
+Node: AMF Format159534
+Node: Mozilla/Firefox NPAPI Plugin160510
+Node: Plugin C API161528
+Node: Plugin C++ API163387
+Node: OpenGL and Threads166651
+Node: Plugin Event Handling167979
+Node: Appendix168948
+Node: Code Style169100
+Node: Authors172930
+Node: GNU Free Documentation License173639
+Node: 0_ PREAMBLE174402
+Node: 1_ APPLICABILITY AND DEFINITIONS175708
+Ref: fdl-document175933
+Ref: fdl-modified176224
+Ref: fdl-secondary176411
+Ref: fdl-invariant177056
+Ref: fdl-cover-texts177305
+Ref: fdl-transparent177518
+Ref: fdl-title-page178808
+Node: 2_ VERBATIM COPYING179197
+Node: 3_ COPYING IN QUANTITY180177
+Node: 4_ MODIFICATIONS182534
+Node: 5_ COMBINING DOCUMENTS188594
+Node: 6_ COLLECTIONS OF DOCUMENTS190091
+Node: 7_ AGGREGATION WITH INDEPENDENT WORKS190982
+Node: 8_ TRANSLATION192210
+Node: 9_ TERMINATION193113
+Node: 10_ FUTURE REVISIONS OF THIS LICENSE193768
+Node: Addendum194908
 
 End Tag Table
 

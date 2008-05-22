@@ -35,7 +35,7 @@ SUBDIRS = \
 	actionscript.all \
 	$(NULL)
 
-EXTRA_DIST = check.h DummyMovieDefinition.h DummyCharacter.h media gnashrc.in simple.exp
+EXTRA_DIST = check.h DummyMovieDefinition.h DummyCharacter.h gnashrc.in simple.exp media/README media/Bitstream-Vera-Sans.fdb media/Bitstream-Vera-Sans.COPYRIGHT media/default.orc media/gnash.xml media/majorscale.sco media/offspring.swf media/offspring.jpg media/green.jpg media/green.swf media/lynch.swf media/lynch.jpg media/sound1.wav media/sound1.mp3 media/square.flv media/square.ogg media/vars.txt media/vars2.txt
 
 dist_noinst_SCRIPTS = anaylse-results.sh generic-testrunner.sh
 
