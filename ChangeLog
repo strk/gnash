@@ -1,5 +1,10 @@
 2008-05-22 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/swfdec/PASSING: color-setTransform-full.swf passes
+	  (I guess since zou touched the relative code).
+
+2008-05-22 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/NetStreamFfmpeg.{cpp,h}: have the decoder thread
 	  only exit if explicitly requested; on EOF just wait on the 
 	  condition, will be waked up on destruction or seek.
