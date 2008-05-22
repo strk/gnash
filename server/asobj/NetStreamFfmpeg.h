@@ -253,6 +253,25 @@ private:
 	// Barrier to synchronize thread and thread starter
 	boost::barrier _decodeThreadBarrier;
 
+	/// Kill decoder thread, if any
+	//
+	/// POSTCONDITIONS:
+	/// 	_decodeThread is NULL
+	/// 	decoder thread is not running
+	///
+	/// Uses the _qMutex
+	///
+	void killDecodeThread();
+
+	/// Return true if kill of decoder thread
+	/// was requested
+	//
+	bool decodeThreadKillRequested();
+
+	/// Protected by _qMutex 
+	bool _qFillerKillRequest;
+
+
 	// The timestamp of the last decoded video frame, in seconds.
 	volatile boost::uint32_t m_last_video_timestamp;
 

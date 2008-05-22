@@ -48,7 +48,7 @@
 #endif
 
 /// Define this to add debugging prints for locking
-//#define GNASH_DEBUG_THREADS
+#define GNASH_DEBUG_THREADS
 
 // Define the following macro to have status notification handling debugged
 //#define GNASH_DEBUG_STATUS
@@ -78,6 +78,7 @@ NetStreamFfmpeg::NetStreamFfmpeg():
 
 	_decodeThread(NULL),
 	_decodeThreadBarrier(2), // main and decoder threads
+	_qFillerKillRequest(false),
 
 	m_last_video_timestamp(0),
 	m_last_audio_timestamp(0),
@@ -127,22 +128,9 @@ void NetStreamFfmpeg::pause( PauseMode mode )
 
 void NetStreamFfmpeg::close()
 {
+	GNASH_REPORT_FUNCTION;
 
-	if (decodingStatus() != DEC_STOPPED && decodingStatus() != DEC_NONE)
-	{
-		// request decoder thread termination
-		decodingStatus(DEC_STOPPED);
-
-		// resume the decoder, if waiting
-		_qFillerResume.notify_all();
-
-		// wait till thread is complete before main continues
-		if ( _decodeThread ) _decodeThread->join();
-		// else could be decoder didn't start yet...
-
-		delete _decodeThread;
-
-	}
+	killDecodeThread();
 
 	// When closing gnash before playback is finished, the soundhandler 
 	// seems to be removed before netstream is destroyed.
@@ -664,8 +652,8 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 
 	ns->m_unqueued_data = NULL;
 
-	// Loop while we're playing or buffering
-	while (ns->decodingStatus() != DEC_STOPPED)
+	// Loop until killed
+	while ( ! ns->decodeThreadKillRequested() ) // locks _qMutex
 	{
 		unsigned long int sleepTime = 1000;
 
@@ -677,6 +665,13 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 #ifdef GNASH_DEBUG_THREADS
 		log_debug("qMutex: lock obtained in av_streamer");
 #endif
+
+		if ( ns->decodingStatus() == DEC_STOPPED )
+		{
+			log_debug("Dec stopped (eof), waiting on qNeedRefill condition");
+			ns->_qFillerResume.wait(lock);
+			continue; // will release the lock for a moment
+		}
 
 #ifdef GNASH_DEBUG_THREADS
 		log_debug("Decoding iteration. bufferTime=%lu, bufferLen=%lu, videoFrames=%lu, audioFrames=%lu",
@@ -752,13 +747,14 @@ bool NetStreamFfmpeg::audio_streamer(void *owner, boost::uint8_t *stream, int le
 
 	NetStreamFfmpeg* ns = static_cast<NetStreamFfmpeg*>(owner);
 
-	if (ns->playbackStatus() == PLAY_PAUSED)
+	PlaybackState pbStatus = ns->playbackStatus();
+	if (pbStatus != PLAY_PLAYING)
 	{
 		log_debug("playback status is paused, won't consume audio frames");
 		return false;
 	}
 
-	while (len > 0 && ! ns->m_qaudio.empty())
+	while (len > 0)
 	{
 #ifdef GNASH_DEBUG_THREADS
 		log_debug("qMutex: waiting for lock in audio_streamer");
@@ -767,6 +763,14 @@ bool NetStreamFfmpeg::audio_streamer(void *owner, boost::uint8_t *stream, int le
 #ifdef GNASH_DEBUG_THREADS
 		log_debug("qMutex: lock obtained in audio_streamer");
 #endif
+
+		if ( ns->m_qaudio.empty() )
+		{
+#ifdef GNASH_DEBUG_THREADS
+			log_debug("qMutex: releasing lock in audio_streamer");
+#endif
+			break;
+		}
 
     		media::raw_mediadata_t* samples = ns->m_qaudio.front();
 
@@ -801,7 +805,8 @@ bool NetStreamFfmpeg::decodeFLVFrame()
 
 	if (frame == NULL)
 	{
-		assert ( _netCon->loadCompleted() );
+		//assert ( _netCon->loadCompleted() );
+		//assert ( m_parser->parsingCompleted() );
 		decodingStatus(DEC_STOPPED);
 		return true;
 	}
@@ -1156,6 +1161,11 @@ bool NetStreamFfmpeg::decodeMediaFrame()
 void
 NetStreamFfmpeg::seek(boost::uint32_t pos)
 {
+	GNASH_REPORT_FUNCTION;
+
+	// We'll mess with the queues here
+	boost::mutex::scoped_lock lock(_qMutex);
+
 	long newpos = 0;
 	double timebase = 0;
 
@@ -1242,6 +1252,14 @@ NetStreamFfmpeg::seek(boost::uint32_t pos)
 	m_qvideo.clear();
 	m_qaudio.clear();
 
+	decodingStatus(DEC_DECODING); // or ::refreshVideoFrame will send a STOPPED again
+	if ( playbackStatus() == PLAY_STOPPED )
+	{
+		// restart playback (if not paused)
+		playbackStatus(PLAY_PLAYING);
+	}
+	_qFillerResume.notify_all(); // wake it decoder is sleeping
+	
 }
 
 void
@@ -1487,6 +1505,40 @@ NetStreamFfmpeg::decodingStatus(DecodingState newstate)
 	return _decoding_state;
 }
 
+void
+NetStreamFfmpeg::killDecodeThread()
+{
+	GNASH_REPORT_FUNCTION;
+
+	{
+#ifdef GNASH_DEBUG_THREADS
+		log_debug("qMutex: waiting for lock in killDecodeThread");
+#endif
+		boost::mutex::scoped_lock lock(_qMutex);
+#ifdef GNASH_DEBUG_THREADS
+		log_debug("qMutex: lock obtained in killDecodeThread");
+#endif
+
+		_qFillerKillRequest = true;
+		_qFillerResume.notify_all(); // wake it up if waiting..
+	}
+
+	// might as well be never started
+	if ( _decodeThread )
+	{
+		_decodeThread->join();
+	}
+
+	delete _decodeThread;
+	_decodeThread = NULL;
+}
+
+bool
+NetStreamFfmpeg::decodeThreadKillRequested()
+{
+	boost::mutex::scoped_lock lock(_qMutex);
+	return _qFillerKillRequest;
+}
 
 } // gnash namespcae
 
