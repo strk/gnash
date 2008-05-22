@@ -100,14 +100,6 @@
 
 namespace gnash {
 
-struct video_frame
-{
-  std::auto_ptr<image::image_base> _frame;
-  matrix _mat;
-  rect _bounds;
-};
-
-
 #ifdef OSMESA_TESTING
 
 class OSRenderMesa : public boost::noncopyable
@@ -648,26 +640,41 @@ public:
     return RGB;
   }
   
-  // UGLY HACK ALERT
-  // All OpenGL calls currently go into a display list, so they can be
-  // anti-aliased using the accumulation buffer in end_display. If we were
-  // to draw the video frame *now*, it would end up in the display list as
-  // well, and would likewise be anti-aliased. We want to avoid doing this
-  // for video, though, because not only does video not require anti-aliasing,
-  // doing so anyway will produce blurry video.
-  //
-  // So, instead, we duplicate the frame and safe it until after the
-  // anti-aliasing stage.
-  //
-  // This has the side effect of allowing only one video to be displayed at a
-  // time. And horribly inefficient code, of course.  
+  // Since we store drawing operations in display lists, we take special care
+  // to store video frame operations in their own display list, lest they be
+  // anti-aliased with the rest of the drawing. Since display lists cannot be
+  // concatenated this means we'll add up with several display lists for normal
+  // drawing operations.
   virtual void drawVideoFrame(image::image_base* baseframe, const matrix* m, const rect* bounds)
-  { 
-    _video_frame._frame = baseframe->clone();
-    _video_frame._mat = *m;
-    _video_frame._bounds = *bounds;
+  {
+    GLint index;
+
+    glGetIntegerv(GL_LIST_INDEX, &index);
+
+    if (index >= 255) {
+      log_error("An insane number of video frames have been requested to be "
+                "drawn. Further video frames will be ignored.");
+      return;
+    }
+
+    glEndList();
+
+    glGenLists(2);
+
+    ++index;
+
+    glNewList(index, GL_COMPILE);
+    _video_indices.push_back(index);
+
+    reallyDrawVideoFrame(baseframe, m, bounds);
+
+    glEndList();
+
+    ++index;
+
+    glNewList(index, GL_COMPILE);
+    _render_indices.push_back(index);
   }
-  // END UGLY HACK ALERT
   
   virtual void reallyDrawVideoFrame(image::image_base* baseframe, const matrix* m, const rect* bounds)
   {
@@ -752,10 +759,13 @@ public:
                    bg_color.m_a / 255.0);
     } else {
       glClearColor(1.0, 1.0, 1.0, 1.0);
-    }    
+    }
+
+    glGenLists(1);
     
     // Start a new display list which will contain almost everything we draw.
     glNewList(1, GL_COMPILE);
+    _render_indices.push_back(1);
     
   }
   
@@ -817,7 +827,8 @@ public:
       glTranslatef (points[i].x * _width / viewport_width,
                     points[i].y * _height / viewport_height, 0.0);
 
-      glCallList(1); // Draws the scene
+      glCallLists(_render_indices.size(), GL_UNSIGNED_BYTE,
+                  &_render_indices.front());
       
       glPopMatrix ();
       
@@ -826,10 +837,10 @@ public:
     
     glAccum (GL_RETURN, 1.0);
     
-    if (_video_frame._frame.get()) {
-      // there's a video frame to draw, without anti-aliasing.
-      reallyDrawVideoFrame(_video_frame._frame.get(), &_video_frame._mat,
-                           &_video_frame._bounds);
+    if (!_video_indices.empty()) {
+      // there's a video frame (or several) to draw, without anti-aliasing.
+      glCallLists(_video_indices.size(), GL_UNSIGNED_BYTE,
+                  &_video_indices.front());
     }  
   
   #if 0
@@ -843,6 +854,10 @@ public:
 
     glRectd(x, y - h, x + w, y + h);
   #endif
+
+    glDeleteLists(1, _render_indices.size() + _video_indices.size());
+    _render_indices.clear();
+    _video_indices.clear();
   
     check_error();
 
@@ -1672,7 +1687,8 @@ private:
   std::vector<PathVec> _masks;
   bool _drawing_mask;
   
-  video_frame _video_frame;
+  std::vector<boost::uint8_t> _render_indices;
+  std::vector<boost::uint8_t> _video_indices;
   
 #ifdef OSMESA_TESTING
   std::auto_ptr<OSRenderMesa> _offscreen;

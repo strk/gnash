@@ -1,3 +1,8 @@
+2008-05-21 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* backend/render_handler_ogl.cpp: Allow multiple videos to be shown
+	simultaneously.
+
 2008-05-21 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/vm/ASHandlers.cpp: clean up logging a lot (dropping
