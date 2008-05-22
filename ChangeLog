@@ -1,3 +1,7 @@
+2008-05-22 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/NetStreamFfmpeg.cpp: reduce code complexity.
+
 2008-05-21 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* backend/render_handler_ogl.cpp: Allow multiple videos to be shown
