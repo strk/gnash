@@ -1,3 +1,11 @@
+2008-05-22 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/vm/ASHandlers.cpp: partial revert of last commit, restricted
+	  to dropping using namespace std, const correcting some variables,
+	  and as an extra using boost::lexical_cast not as_value for
+	  converting ints to strings. The changes to take some variables
+	  by reference and to logging have been reverted for now. 
+
 2008-05-22 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/swfdec/PASSING: color-setTransform-full.swf passes
