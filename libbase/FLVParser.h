@@ -26,7 +26,6 @@
 #include "LoadThread.h"
 #include "dsodefs.h"
 #include <vector>
-#include <boost/thread/mutex.hpp>
 #include <memory>
 
 namespace gnash {
@@ -156,7 +155,7 @@ public:
 /// and fetching frames from there on, sequentially.
 /// See seek(), nextVideoFrame(), nextAudioFrame() and nextMediaFrame().
 ///
-/// Input is received from a LoadThread object.
+/// Input is received from a tu_file object.
 ///
 class DSOEXPORT FLVParser
 {
@@ -204,39 +203,56 @@ public:
 	/// @param lt
 	/// 	LoadThread to use for input.
 	/// 	Ownership left to the caller.
+	///	TODO: take ownership
 	///
 	FLVParser(tu_file& lt);
 
 	/// Kills the parser...
 	~FLVParser();
 
-	/// Return next media frame
-	//
-	/// Locks the _mutex
-	///
-	FLVFrame* nextMediaFrame();
-
 	/// \brief
-	/// Returns the next audio frame in the parsed buffer.
+	/// Return the next audio frame info in the parsed buffer.
 	//
 	/// If no frame has been played before the first frame is returned.
 	/// If there is no more frames in the parsed buffer NULL is returned,
 	/// you can check with parsingCompleted() to know wheter this is due to 
 	/// EOF reached.
 	///
-	/// Locks the _mutex
+	/// TODO: return a more abstract EncodedAudioFrameInfo
+	///
+	FLVAudioFrameInfo* peekNextAudioFrameInfo();
+
+	/// \brief
+	/// Returns the next audio frame in the parsed buffer, advancing audio cursor.
+	//
+	/// If no frame has been played before the first frame is returned.
+	/// If there is no more frames in the parsed buffer NULL is returned,
+	/// you can check with parsingCompleted() to know wheter this is due to 
+	/// EOF reached.
+	///
+	/// TODO: return a more abstract EncodedAudioFrame
 	///
 	FLVFrame* nextAudioFrame();
 
-	/// \brief
-	/// Returns the next video frame in the parsed buffer.
+	/// Returns the next video frame info in the parsed buffer.
 	//
 	/// If no frame has been played before the first frame is returned.
 	/// If there is no more frames in the parsed buffer NULL is returned.
 	/// you can check with parsingCompleted() to know wheter this is due to 
 	/// EOF reached.
 	///
-	/// Locks the _mutex
+	/// TODO: return a more abstract EncodedVideoFrameInfo
+	///
+	FLVVideoFrameInfo* peekNextVideoFrameInfo();
+
+	/// Returns the next video frame in the parsed buffer, advancing video cursor.
+	//
+	/// If no frame has been played before the first frame is returned.
+	/// If there is no more frames in the parsed buffer NULL is returned.
+	/// you can check with parsingCompleted() to know wheter this is due to 
+	/// EOF reached.
+	///
+	/// TODO: return a more abstract EncodedVideoFrame
 	///
 	FLVFrame* nextVideoFrame();
 
@@ -249,17 +265,17 @@ public:
 
 	/// Returns information about video in the stream.
 	//
-	/// Locks the _mutex
-	///
 	/// The returned object is owned by the FLVParser object.
 	/// Can return NULL if video contains NO video frames.
 	/// Will block till either parsing finished or a video frame is found.
+	///
+	/// TODO: return a more abstract VideoInfo
 	///
 	FLVVideoInfo* getVideoInfo();
 
 	/// Returns a FLVAudioInfo class about the audiostream
 	//
-	/// Locks the _mutex
+	/// TODO: return a more abstract AudioInfo
 	///
 	FLVAudioInfo* getAudioInfo();
 
@@ -271,8 +287,6 @@ public:
 	/// available in list of already the parsed frames, we
 	/// parse some more. This is used to check how much is buffered.
 	///
-	/// Locks the _mutex
-	///
 	/// @param time
 	///	Timestamp, in milliseconds.
 	///
@@ -282,38 +296,46 @@ public:
 	/// Seeks to the closest possible position the given position,
 	/// and returns the new position.
 	//
-	/// Locks the _mutex
+	///
+	/// TODO: throw something for sending Seek.InvalidTime ?
+	///       (triggered by seeks beyond the end of video or beyond what's
+	///        downloaded so far)
 	///
 	boost::uint32_t seek(boost::uint32_t);
 
 	/// Returns the framedelay from the last to the current
 	/// audioframe in milliseconds. This is used for framerate.
 	//
-	/// Locks the _mutex
-	///
 	boost::uint32_t audioFrameDelay();
 
 	/// \brief
 	/// Returns the framedelay from the last to the current
 	/// videoframe in milliseconds. 
 	//
-	/// Locks the _mutex
-	///
 	boost::uint32_t videoFrameDelay();
 
 	/// Returns the framerate of the video
 	//
-	/// Locks the _mutex
-	///
 	boost::uint16_t videoFrameRate();
 
 	/// Returns the "bufferlength", meaning the differens between the
 	/// current frames timestamp and the timestamp of the last parseable
 	/// frame. Returns the difference in milliseconds.
 	//
-	/// Locks the _mutex
-	///
 	boost::uint32_t getBufferLength();
+
+	/// Parses next tag from the file
+	//
+	/// Returns true if something was parsed, false otherwise.
+	/// Sets _parsingComplete=true on end of file.
+	///
+	bool parseNextTag();
+
+	/// Return number of bytes parsed so far
+	boost::uint64_t getBytesLoaded() const;
+
+	/// Return total number of bytes in input
+	boost::uint64_t getBytesTotal() const;
 
 private:
 
@@ -324,16 +346,6 @@ private:
 	/// seeks to the closest possible position the given position,
 	/// and returns the new position.
 	boost::uint32_t seekVideo(boost::uint32_t time);
-
-
-	/// Parses next tag from the file
-	//
-	/// Returns true if something was parsed, false otherwise.
-	/// Sets _parsingComplete=true on end of file.
-	///
-	/// TODO: make public (seems useful for an external parsing driver)
-	///
-	bool parseNextTag();
 
 	/// Parses the header of the file
 	bool parseHeader();
@@ -383,9 +395,6 @@ private:
 
 	/// Audio stream is present
 	bool _video;
-
-	/// Mutex to avoid problems with threads using the parser
-	boost::mutex _mutex;
 };
 
 } // end of gnash namespace

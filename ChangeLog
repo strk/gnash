@@ -1,5 +1,13 @@
 2008-05-23 Sandro Santilli <strk@keybit.net>
 
+	* libbase/FLVParser.{cpp,h}: add peekNextVideoFrameInfo
+	  and peekNextAudioFrameInfo to check timestamp of next frame
+	  w/out advancing cursor; make parseNextTag public to be
+	  eventually used from a parser thread; drop embedded
+	  mutex locking as we'll want to control mutexes from outside.
+
+2008-05-23 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/NetStream.{cpp,h}: Add PlayHead class implementation.
 
 2008-05-23 Benjamin Wolsey <bwy@benjaminwolsey.de>

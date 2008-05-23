@@ -115,28 +115,26 @@ FLVParser::~FLVParser()
 }
 
 
-boost::uint32_t FLVParser::getBufferLength()
+boost::uint32_t
+FLVParser::getBufferLength()
 {
-	boost::mutex::scoped_lock lock(_mutex);
-
 	if (_video) {
 		size_t size = _videoFrames.size();
 		if (size > 1 && size > _nextVideoFrame) {
-			return _videoFrames.back()->timestamp - _videoFrames[_nextVideoFrame]->timestamp;
+			return _videoFrames.back()->timestamp; //  - _videoFrames[_nextVideoFrame]->timestamp;
 		}
 	}
 	if (_audio) {
 		size_t size = _audioFrames.size();
 		if (size > 1 && size > _nextAudioFrame) {
-			return _audioFrames.back()->timestamp - _audioFrames[_nextAudioFrame]->timestamp;
+			return _audioFrames.back()->timestamp; //  - _audioFrames[_nextAudioFrame]->timestamp;
 		}
 	}
 	return 0;
 }
-boost::uint16_t FLVParser::videoFrameRate()
+boost::uint16_t
+FLVParser::videoFrameRate()
 {
-	boost::mutex::scoped_lock lock(_mutex);
-
 	// Make sure that there are parsed some frames
 	while(_videoFrames.size() < 2 && !_parsingComplete) {
 		parseNextTag();
@@ -150,10 +148,9 @@ boost::uint16_t FLVParser::videoFrameRate()
 }
 
 
-boost::uint32_t FLVParser::videoFrameDelay()
+boost::uint32_t
+FLVParser::videoFrameDelay()
 {
-	boost::mutex::scoped_lock lock(_mutex);
-
 	// If there are no video in this FLV return 0
 	if (!_video && _lastParsedPosition > 0) return 0;
 
@@ -168,10 +165,9 @@ boost::uint32_t FLVParser::videoFrameDelay()
 	return _videoFrames[_nextVideoFrame-1]->timestamp - _videoFrames[_nextVideoFrame-2]->timestamp;
 }
 
-boost::uint32_t FLVParser::audioFrameDelay()
+boost::uint32_t
+FLVParser::audioFrameDelay()
 {
-	boost::mutex::scoped_lock lock(_mutex);
-
 	// If there are no audio in this FLV return 0
 	if (!_audio && _lastParsedPosition > 0) return 0;
 
@@ -186,77 +182,11 @@ boost::uint32_t FLVParser::audioFrameDelay()
 	return _audioFrames[_nextAudioFrame-1]->timestamp - _audioFrames[_nextAudioFrame-2]->timestamp;
 }
 
-FLVFrame* FLVParser::nextMediaFrame()
+FLVAudioFrameInfo*
+FLVParser::peekNextAudioFrameInfo()
 {
-	boost::mutex::scoped_lock lock(_mutex);
-
-	boost::uint32_t video_size = _videoFrames.size();
-	boost::uint32_t audio_size = _audioFrames.size();
-
-	if (audio_size <= _nextAudioFrame && video_size <= _nextVideoFrame)
-	{
-
-		// Parse a media frame if any left or if needed
-		while(_videoFrames.size() <= _nextVideoFrame && _audioFrames.size() <= _nextAudioFrame && !_parsingComplete) {
-			if (!parseNextTag()) break;
-		}
-	}
-
-	// Find the next frame in the file
-	bool audioReady = _audioFrames.size() > _nextAudioFrame;
-	bool videoReady = _videoFrames.size() > _nextVideoFrame;
-	bool useAudio = false;
-
-	if (audioReady && videoReady) {
-		useAudio = _audioFrames[_nextAudioFrame]->dataPosition < _videoFrames[_nextVideoFrame]->dataPosition;
-	} else if (!audioReady && videoReady) {
-		useAudio = false;
-	} else if (audioReady && !videoReady) {
-		useAudio = true;
-	} else {
-		// If no frames are next we have reached EOF
-		return NULL;
-	}
-
-	// Find the next frame in the file a return it
-
-	if (useAudio) {
-
-		FLVAudioFrameInfo* frameInfo = _audioFrames[_nextAudioFrame];
-
-		std::auto_ptr<FLVFrame> frame = makeAudioFrame(_lt, *frameInfo);
-		if ( ! frame.get() )
-		{
-			log_error("Could not make audio frame %d", _nextAudioFrame);
-			return 0;
-		}
-
-		_nextAudioFrame++;
-		return frame.release(); // TODO: return by auto_ptr
-
-	} else {
-
-		FLVVideoFrameInfo* frameInfo = _videoFrames[_nextVideoFrame];
-		std::auto_ptr<FLVFrame> frame = makeVideoFrame(_lt, *frameInfo);
-		if ( ! frame.get() )
-		{
-			log_error("Could not make video frame %d", _nextVideoFrame);
-			return 0;
-		}
-
-		_nextVideoFrame++;
-		return frame.release(); // TODO: return by auto_ptr
-	}
-
-
-}
-
-FLVFrame* FLVParser::nextAudioFrame()
-{
-	boost::mutex::scoped_lock lock(_mutex);
-
 	// If there are no audio in this FLV return NULL
-	if (!_audio && _lastParsedPosition > 0) return NULL;
+	if (!_audio && _lastParsedPosition > 0) return 0;
 
 	// Make sure that there are parsed enough frames to return the need frame
 	while(_audioFrames.size() <= _nextAudioFrame && !_parsingComplete) {
@@ -264,9 +194,20 @@ FLVFrame* FLVParser::nextAudioFrame()
 	}
 
 	// If the needed frame can't be parsed (EOF reached) return NULL
-	if (_audioFrames.size() <= _nextAudioFrame || _audioFrames.size() == 0) return NULL;
+	if (_audioFrames.empty() || _audioFrames.size() <= _nextAudioFrame)
+	{
+		return 0;	
+	}
 
-	FLVAudioFrameInfo* frameInfo = _audioFrames[_nextAudioFrame];
+	return _audioFrames[_nextAudioFrame];
+}
+
+FLVFrame*
+FLVParser::nextAudioFrame()
+{
+	FLVAudioFrameInfo* frameInfo = peekNextAudioFrameInfo();
+	if ( ! frameInfo ) return 0;
+
 	std::auto_ptr<FLVFrame> frame = makeAudioFrame(_lt, *frameInfo);
 	if ( ! frame.get() )
 	{
@@ -279,15 +220,14 @@ FLVFrame* FLVParser::nextAudioFrame()
 
 }
 
-FLVFrame* FLVParser::nextVideoFrame()
+FLVVideoFrameInfo*
+ FLVParser::peekNextVideoFrameInfo()
 {
-	boost::mutex::scoped_lock lock(_mutex);
-
 	// If there are no video in this FLV return NULL
 	if (!_video && _lastParsedPosition > 0)
 	{
 		//gnash::log_debug("no video, or lastParserPosition > 0");
-		return NULL;
+		return 0;
 	}
 
 	// Make sure that there are parsed enough frames to return the need frame
@@ -297,14 +237,18 @@ FLVFrame* FLVParser::nextVideoFrame()
 	}
 
 	// If the needed frame can't be parsed (EOF reached) return NULL
-	if (_videoFrames.size() <= _nextVideoFrame || _videoFrames.size() == 0)
+	if (_videoFrames.empty() || _videoFrames.size() <= _nextVideoFrame)
 	{
 		//gnash::log_debug("The needed frame (%d) can't be parsed (EOF reached)", _lastVideoFrame);
-		return NULL;
+		return 0;
 	}
 
-	// TODO: let a function do this
-	FLVVideoFrameInfo* frameInfo = _videoFrames[_nextVideoFrame];
+	return _videoFrames[_nextVideoFrame];
+}
+
+FLVFrame* FLVParser::nextVideoFrame()
+{
+	FLVVideoFrameInfo* frameInfo = peekNextVideoFrameInfo();
 	std::auto_ptr<FLVFrame> frame = makeVideoFrame(_lt, *frameInfo);
 	if ( ! frame.get() )
 	{
@@ -483,8 +427,6 @@ boost::uint32_t FLVParser::seekVideo(boost::uint32_t time)
 
 FLVVideoInfo* FLVParser::getVideoInfo()
 {
-	boost::mutex::scoped_lock lock(_mutex);
-
 	// If there are no video in this FLV return NULL
 	if (!_video && _lastParsedPosition > 0) return NULL;
 
@@ -496,9 +438,6 @@ FLVVideoInfo* FLVParser::getVideoInfo()
 
 FLVAudioInfo* FLVParser::getAudioInfo()
 {
-
-	boost::mutex::scoped_lock lock(_mutex);
-
 	// If there are no audio in this FLV return NULL
 	if (!_audio && _lastParsedPosition > 0) return NULL;
 
@@ -511,10 +450,9 @@ FLVAudioInfo* FLVParser::getAudioInfo()
 	return _audioInfo.get(); // may be null
 }
 
-bool FLVParser::isTimeLoaded(boost::uint32_t time)
+bool
+FLVParser::isTimeLoaded(boost::uint32_t time)
 {
-	boost::mutex::scoped_lock lock(_mutex);
-
 	// Parse frames until the need time is found, or EOF
 	while (!_parsingComplete) {
 		if (!parseNextTag()) break;
@@ -536,10 +474,9 @@ bool FLVParser::isTimeLoaded(boost::uint32_t time)
 
 }
 
-boost::uint32_t FLVParser::seek(boost::uint32_t time)
+boost::uint32_t
+FLVParser::seek(boost::uint32_t time)
 {
-	boost::mutex::scoped_lock lock(_mutex);
-
 	if (time == 0) {
 		if (_video) _nextVideoFrame = 0;
 		if (_audio) _nextAudioFrame = 0;
@@ -745,6 +682,18 @@ inline boost::uint32_t FLVParser::getUInt24(boost::uint8_t* in)
 {
 	// The bits are in big endian order
 	return (in[0] << 16) | (in[1] << 8) | in[2];
+}
+
+boost::uint64_t
+FLVParser::getBytesLoaded() const
+{
+	return _lastParsedPosition;
+}
+
+boost::uint64_t
+FLVParser::getBytesTotal() const
+{
+	return _lt.get_size();
 }
 
 } // end of gnash namespace
