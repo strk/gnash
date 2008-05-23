@@ -1,3 +1,9 @@
+2008-05-23 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/vm/ASHandlers.cpp: drop many dead, old debugging messages,
+	  drop all to_debug_string() and c_str() in logging (except log_trace,
+	  comment added). Use to_int() instead of to_number() more.
+
 2008-05-23 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* backend/render_handler_cairo.cpp: Unlike AGG, the Cairo renderer
