@@ -105,7 +105,22 @@ main(int argc, char** argv)
   add_clip_actions(mc1, "_root.x8 = 'mc1_frame8'; stop(); ");
   SWFMovieClip_labelFrame(mc1, "frame8");
   SWFMovieClip_nextFrame(mc1); 
-  
+  add_clip_actions(mc1, "_root.x9 = 'small_first'; stop(); ");
+  SWFMovieClip_labelFrame(mc1, "small_first");
+  SWFMovieClip_nextFrame(mc1); 
+  add_clip_actions(mc1, "_root.x9 = 'Small_first'; stop(); ");
+  SWFMovieClip_labelFrame(mc1, "Small_first");
+  SWFMovieClip_nextFrame(mc1);   
+  add_clip_actions(mc1, "_root.x10 = 'mc1_frame10'; stop(); ");
+  SWFMovieClip_labelFrame(mc1, "frame10");
+  SWFMovieClip_nextFrame(mc1);  
+  add_clip_actions(mc1, "_root.x11 = 'Big_first'; stop(); ");
+  SWFMovieClip_labelFrame(mc1, "Big_first");
+  SWFMovieClip_nextFrame(mc1); 
+  add_clip_actions(mc1, "_root.x11 = 'big_first'; stop(); ");
+  SWFMovieClip_labelFrame(mc1, "big_first");
+  SWFMovieClip_nextFrame(mc1); 
+
     
   /* place _root.mc1 */
   it1 = SWFMovie_add(mo, (SWFBlock)mc1); 
@@ -123,7 +138,10 @@ main(int argc, char** argv)
                   " gotoAndPlay(lable); "           //GotoExpression
                   " "CALLFRAME"('/mc1/mc11/:frame6'); "
                   " "CALLFRAME"('mc1:7'); "
-                  " "CALLFRAME"('mc1/:frame8'); ");      
+                  " "CALLFRAME"('mc1/:frame8'); "
+                  " "CALLFRAME"('mc1/:Small_first'); "
+                  " "CALLFRAME"('mc1/:Frame10'); "
+                  " "CALLFRAME"('mc1/:big_first'); ");      
                   
   SWFMovie_nextFrame(mo); /* 3rd frame of _root */
    
@@ -135,6 +153,9 @@ main(int argc, char** argv)
   check_equals(mo, "_root.x3", "'mc11_frame6'");
   check_equals(mo, "_root.x7", "'mc1_frame7'");
   check_equals(mo, "_root.x8", "'mc1_frame8'");
+  xcheck_equals(mo, "_root.x9", "'small_first'");
+  xcheck_equals(mo, "_root.x10", "'mc1_frame10'");
+  xcheck_equals(mo, "_root.x11", "'Big_first'");
   /* seems that GotoLabel does not support target_path */
   check_equals(mo, "_root.x4", "0");
   check_equals(mo, "_root.x5", "0");

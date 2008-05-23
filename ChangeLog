@@ -1,5 +1,10 @@
 2008-05-23 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* testsuite/misc-ming.all/frame_label_test.c: test for
+	  case sensitivity.
+
+2008-05-23 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* server/vm/ASHandlers.cpp: bitwise left shift of more than the size of
 	  the left operand is bad (undefined behaviour).
 
