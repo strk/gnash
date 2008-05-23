@@ -1,4 +1,4 @@
-// styles.cpp	-- Thatcher Ulrich <tu@tulrich.com> 2003
+// styles.cpp   -- Thatcher Ulrich <tu@tulrich.com> 2003
 
 // This source code has been donated to the Public Domain.  Do
 // whatever you want with it.
@@ -22,7 +22,7 @@ namespace gnash {
 // line_style
 //
 
-	
+    
 line_style::line_style()
     :
     m_width(0),
@@ -40,23 +40,23 @@ line_style::line_style()
 
 void
 line_style::read_morph(stream* in, int tag_type, movie_definition *md,
-	line_style *pOther)
+    line_style *pOther)
 {
-	if (tag_type == SWF::DEFINEMORPHSHAPE)
-	{
-		in->ensureBytes(2 + 2);
-		m_width = in->read_u16();
-		pOther->m_width = in->read_u16();
-		m_color.read(in, tag_type);
-		pOther->m_color.read(in, tag_type);
-		return;
-	}
+    if (tag_type == SWF::DEFINEMORPHSHAPE)
+    {
+        in->ensureBytes(2 + 2);
+        m_width = in->read_u16();
+        pOther->m_width = in->read_u16();
+        m_color.read(in, tag_type);
+        pOther->m_color.read(in, tag_type);
+        return;
+    }
 
-	// MorphShape 2 from here down.
-	in->ensureBytes(4 + 2);
+    // MorphShape 2 from here down.
+    in->ensureBytes(4 + 2);
 
-	m_width = in->read_u16();
-	pOther->m_width = in->read_u16();
+    m_width = in->read_u16();
+    pOther->m_width = in->read_u16();
 
     int flags1 = in->read_u8();
     int flags2 = in->read_u8();
@@ -66,45 +66,45 @@ line_style::read_morph(stream* in, int tag_type, movie_definition *md,
     _scaleHorizontally = !(flags1 & (1 << 2));
     _scaleVertically   = !(flags1 & (1 << 1));
     _pixelHinting      =   flags1 & (1 << 0);
-	_noClose = flags2 & (1 << 2);
-	_endCapStyle = (cap_style_e) (flags2 & 0x03); 
+    _noClose = flags2 & (1 << 2);
+    _endCapStyle = (cap_style_e) (flags2 & 0x03); 
 
-	if (_joinStyle == JOIN_MITER)  
-	{
-		in->ensureBytes(2);
-		_miterLimitFactor = in->read_short_ufixed();
-	}
-	if (has_fill)
-	{
+    if (_joinStyle == JOIN_MITER)  
+    {
+        in->ensureBytes(2);
+        _miterLimitFactor = in->read_short_ufixed();
+    }
+    if (has_fill)
+    {
         // read fill styles for strokes.
         // TODO: don't throw away this information, should be passed to renderer.
         fill_style f, g;
-		f.read(in, tag_type, md, &g);
-		m_color = f.get_color();
-		pOther->m_color = g.get_color();
-	}
-	else
-	{
-		m_color.read(in, tag_type);
-		pOther->m_color.read(in, tag_type);
-	}
+        f.read(in, tag_type, md, &g);
+        m_color = f.get_color();
+        pOther->m_color = g.get_color();
+    }
+    else
+    {
+        m_color.read(in, tag_type);
+        pOther->m_color.read(in, tag_type);
+    }
 }
 
 void
 line_style::read(stream* in, int tag_type, movie_definition *md)
 {
     if (!(tag_type == SWF::DEFINESHAPE4 || tag_type == SWF::DEFINESHAPE4_))
-	{
-		in->ensureBytes(2);
-		m_width = in->read_u16();
-		m_color.read(in, tag_type);
-		return;
-	}
+    {
+        in->ensureBytes(2);
+        m_width = in->read_u16();
+        m_color.read(in, tag_type);
+        return;
+    }
 
-	// TODO: Unfinished. Temporary to allow DefineShape4 to work in many
-	// cases, but does not work correctly in all cases.
-	in->ensureBytes(2+2);
-	m_width = in->read_u16();
+    // TODO: Unfinished. Temporary to allow DefineShape4 to work in many
+    // cases, but does not work correctly in all cases.
+    in->ensureBytes(2+2);
+    m_width = in->read_u16();
 
     int flags1 = in->read_u8();
     int flags2 = in->read_u8();
@@ -114,42 +114,42 @@ line_style::read(stream* in, int tag_type, movie_definition *md)
     _scaleHorizontally = !(flags1 & (1 << 2));
     _scaleVertically   = !(flags1 & (1 << 1));
     _pixelHinting      =   flags1 & (1 << 0);
-	_noClose = flags2 & (1 << 2);
-	_endCapStyle = (cap_style_e) (flags2 & 0x03); 
+    _noClose = flags2 & (1 << 2);
+    _endCapStyle = (cap_style_e) (flags2 & 0x03); 
 
-	if (_joinStyle == JOIN_MITER) 
-	{
-		in->ensureBytes(2);
-		_miterLimitFactor = in->read_short_ufixed();
-	}
-	if (has_fill)
-	{
+    if (_joinStyle == JOIN_MITER) 
+    {
+        in->ensureBytes(2);
+        _miterLimitFactor = in->read_short_ufixed();
+    }
+    if (has_fill)
+    {
         // read fill styles for strokes.
         // TODO: don't throw away this information, should be passed to renderer.
-		fill_style f;
-		f.read(in, tag_type, md);
-		m_color = f.get_color();
-	}
-	else
-	{
-		m_color.read(in, tag_type);
-	}
+        fill_style f;
+        f.read(in, tag_type, md);
+        m_color = f.get_color();
+    }
+    else
+    {
+        m_color.read(in, tag_type);
+    }
 }
 
 void
 line_style::set_lerp(const line_style& ls1, const line_style& ls2, float ratio)
 {
-	m_width = static_cast<boost::uint16_t>(
-	    utility::frnd(utility::flerp(ls1.getThickness(), ls2.getThickness(), ratio)));
-	m_color.set_lerp(ls1.get_color(), ls2.get_color(), ratio);
-	if ( ls1._scaleVertically != ls2._scaleVertically )
-	{
-		LOG_ONCE( log_error("UNTESTED: Dunno how to interpolate line styles with different vertical thickness scaling") );
-	}
-	if ( ls1._scaleHorizontally != ls2._scaleHorizontally )
-	{
-		LOG_ONCE( log_error("UNTESTED: Dunno how to interpolate line styles with different horizontal thickness scaling") );
-	}
+    m_width = static_cast<boost::uint16_t>(
+        utility::frnd(utility::flerp(ls1.getThickness(), ls2.getThickness(), ratio)));
+    m_color.set_lerp(ls1.get_color(), ls2.get_color(), ratio);
+    if ( ls1._scaleVertically != ls2._scaleVertically )
+    {
+        LOG_ONCE( log_error("UNTESTED: Dunno how to interpolate line styles with different vertical thickness scaling") );
+    }
+    if ( ls1._scaleHorizontally != ls2._scaleHorizontally )
+    {
+        LOG_ONCE( log_error("UNTESTED: Dunno how to interpolate line styles with different horizontal thickness scaling") );
+    }
 }
 
 // end of namespace
