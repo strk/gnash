@@ -1,5 +1,13 @@
 2008-05-23 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* server/asobj/SharedObject.cpp: restrict using directives, use
+	  a const iterator for vector of Elements, as they shouldn't be
+	  changed while reading. Clean up logging (c_str(),
+	  to_debug_string()).
+	* server/vm/ASHandlers.cpp: drop to_debug_string().c_str().
+
+2008-05-23 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* gui/aqua_ogl_glue.h gui/fltk_glue_agg.h gui/fltk_glue_cairo.h
 	  gui/gtk_glue_gtkglext.h, gui/kde_glue_opengl.h,
 	  gui/sdl_cairo_glue.h, gui/sdl_ogl_glue.h: Do not put

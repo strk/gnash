@@ -18,7 +18,7 @@
 //
 
 #ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
+#include "gnashconfig.h" // USE_SOL_READ_ONLY
 #endif
 
 #include <unistd.h>
@@ -45,7 +45,7 @@
 #include "URL.h"
 #include "rc.h" // for use of rcfile
 
-using namespace std;
+using std::string;
 
 namespace {
 gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
@@ -53,7 +53,6 @@ gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
 }
 
 using namespace amf;
-using namespace boost;
 
 namespace gnash {
 
@@ -87,7 +86,7 @@ public:
 
             const string& name = _st.string_table::value(key);
 
-//          cerr << "FIXME: yes!!!!! " << name << ": "<< val.to_debug_string() << endl;
+//          cerr << "FIXME: yes!!!!! " << name << ": "<< val << std::endl;
 
             if (val.is_string()) {
                 string str;
@@ -133,7 +132,7 @@ attachSharedObjectInterface(as_object& o)
 //    GNASH_REPORT_FUNCTION;
 
     VM& vm = o.getVM();
-    int swfVersion = vm.getSWFVersion();
+    const int swfVersion = vm.getSWFVersion();
 
     // clear, flush and getSize not in SWF<6 , it seems
     if ( swfVersion < 6 ) return; 
@@ -184,11 +183,8 @@ sharedobject_clear(const fn_call& fn)
     boost::intrusive_ptr<SharedObject> obj = ensureType<SharedObject>(fn.this_ptr);
     UNUSED(obj);
     
-    static bool warned=false;
-    if ( ! warned ) {
-        log_unimpl (__FUNCTION__);
-        warned=true;
-    }
+    LOG_ONCE(log_unimpl (__FUNCTION__));
+
     return as_value();
 }
 
@@ -199,13 +195,13 @@ sharedobject_flush(const fn_call& fn)
     
     boost::intrusive_ptr<SharedObject> obj = ensureType<SharedObject>(fn.this_ptr);
 
-//    log_debug("Flushing to file %s", obj->getFilespec().c_str());        
+//    log_debug("Flushing to file %s", obj->getFilespec());        
     VM& vm = obj->getVM();
 
 #ifndef USE_SOL_READONLY
     if (rcfile.getSOLReadOnly() ) {
         log_security("Attempting to write object %s when it's SOL Read Only is set! Refusing...",
-                     obj->getFilespec().c_str());
+                     obj->getFilespec());
         return as_value(false);
     }
     
@@ -217,7 +213,7 @@ sharedobject_flush(const fn_call& fn)
     boost::intrusive_ptr<as_object> ptr = as.to_object();
     if ( ! ptr ) {
         log_error("'data' member of SharedObject is not an object (%s)",
-                  as.to_debug_string().c_str());
+                  as);
         return as_value();
     }
     
@@ -230,10 +226,10 @@ sharedobject_flush(const fn_call& fn)
     bool ret = sol.writeFile(newspec, obj->getObjectName().c_str());
     if ( ! ret )
     {
-        log_error("writing SharedObject file to %s", newspec.c_str());
+        log_error("writing SharedObject file to %s", newspec);
         return as_value(false);
     }
-    log_security("SharedObject '%s' written to filesystem.", newspec.c_str());
+    log_security("SharedObject '%s' written to filesystem.", newspec);
     return as_value(true); // TODO: check expected return type from SharedObject.flush
 #else
     return as_value(false);
@@ -292,7 +288,7 @@ sharedobject_getlocal(const fn_call& fn)
     struct stat statbuf;
     if ( -1 == stat(newspec.c_str(), &statbuf) )
     {
-       log_error("Invalid SOL safe dir %s: %s", newspec.c_str(), strerror(errno));
+       log_error("Invalid SOL safe dir %s: %s", newspec, std::strerror(errno));
         return as_value(false);
     }
     
@@ -317,7 +313,7 @@ sharedobject_getlocal(const fn_call& fn)
     const string& origURL = obj->getVM().getSWFUrl(); 
     
     URL url(origURL);
-//  log_debug(_("BASE URL=%s (%s)"), url.str().c_str(), url.hostname().c_str());
+//  log_debug(_("BASE URL=%s (%s)"), url.str(), url.hostname());
 
     // Get the domain part, or take as 'localhost' if none
     // (loaded from filesystem)
@@ -333,7 +329,7 @@ sharedobject_getlocal(const fn_call& fn)
     if ( rcfile.getSOLLocalDomain() && domain != "localhost") 
     {
         log_security("Attempting to open non localhost created SOL file!! %s",
-                     obj->getFilespec().c_str());
+                     obj->getFilespec());
         return as_value(false);
     }
 
@@ -344,7 +340,7 @@ sharedobject_getlocal(const fn_call& fn)
     //
     if (fn.nargs > 1) {
         rootdir = fn.arg(1).to_string();
-        log_debug("The rootdir is: %s", rootdir.c_str());
+        log_debug("The rootdir is: %s", rootdir);
         newspec += rootdir;
     } else {
         newspec += "/";    
@@ -354,13 +350,13 @@ sharedobject_getlocal(const fn_call& fn)
         newspec += "/";
     }
     
-    //log_debug("newspec before adding obj's filespec: %s", newspec.c_str());
+    //log_debug("newspec before adding obj's filespec: %s", newspec);
     newspec += obj->getFilespec();
     obj->setFilespec(newspec);
         
     if (newspec.find("/", 0) != string::npos) {
-        typedef tokenizer<char_separator<char> > Tok;
-        char_separator<char> sep("/");
+        typedef boost::tokenizer<boost::char_separator<char> > Tok;
+        boost::char_separator<char> sep("/");
         Tok t(newspec, sep);
         Tok::iterator tit;
         string newdir = "/";
@@ -368,7 +364,7 @@ sharedobject_getlocal(const fn_call& fn)
             //cout << *tit << "\n";
             newdir += *tit;
             if (newdir.find("..", 0) != string::npos) {
-		log_error("Invalid SharedObject path (contains '..'): %s", newspec.c_str());
+		log_error("Invalid SharedObject path (contains '..'): %s", newspec);
                 return as_value(false);
             }
             // Don't try to create a directory of the .sol file name!
@@ -382,33 +378,33 @@ sharedobject_getlocal(const fn_call& fn)
 #endif
                 if ((errno != EEXIST) && (ret != 0)) {
                     log_error("Couldn't create directory for .sol files: %s\n\t%s",
-                              newdir.c_str(), strerror(errno));
+                              newdir, std::strerror(errno));
                     return as_value(false);
                 }
-            } // else log_debug("newdir %s ends with .sol", newdir.c_str());
+            } // else log_debug("newdir %s ends with .sol", newdir);
             newdir += "/";
         }
-    } // else log_debug("no slash in filespec %s", obj->getFilespec().c_str());
+    } // else log_debug("no slash in filespec %s", obj->getFilespec());
 
     SOL sol;
-    log_security("Opening SharedObject file: %s", newspec.c_str());
+    log_security("Opening SharedObject file: %s", newspec);
     if (sol.readFile(newspec) == false) {
-        log_security("empty or non-existing SOL file \"%s\", will be created on flush/exit", newspec.c_str());
+        log_security("empty or non-existing SOL file \"%s\", will be created on flush/exit", newspec);
         return as_value(obj.get());
     }
     
-    vector<Element *>::iterator it;
-    vector<Element *> els = sol.getElements();
-    log_debug("Read %d AMF objects from %s", els.size(), newspec.c_str());
+    std::vector<Element *>::const_iterator it, e;
+    std::vector<Element *> els = sol.getElements();
+    log_debug("Read %d AMF objects from %s", els.size(), newspec);
 
     string_table& st = obj->getVM().getStringTable();
     string_table::key dataKey =  obj->getVM().getStringTable().find("data");
     as_value as = obj->getMember(dataKey);
     boost::intrusive_ptr<as_object> ptr = as.to_object();
     
-    for (it = els.begin(); it != els.end(); it++) {
+    for (it = els.begin(), e = els.end(); it != e; it++) {
         Element *el = (*(it));
-//        log_debug("Adding \"%s\"", el->name.c_str());
+//        log_debug("Adding \"%s\"", el->name);
         if (el->getType() == Element::NUMBER_AMF0) {
             double dub =  *((double *)el->getData());
             ptr->set_member(st.string_table::find(el->getName()), as_value(dub));
