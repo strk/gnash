@@ -1,3 +1,9 @@
+2008-05-23 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* server/styles.cpp: read_bit() reduction, cleanups. 
+	* testsuite/actionscript.all/color.as: one xcheck to check, probably
+	  already passed before. 
+	
 2008-05-22 Russ Nelson <nelson@crynwr.com>
 
 	* doc/C/Makefile.am: list the files one by one, not the subdir.

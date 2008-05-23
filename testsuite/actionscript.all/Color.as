@@ -22,7 +22,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Color.as,v 1.19 2008/05/21 07:56:45 zoulunkai Exp $";
+rcsid="$Id: Color.as,v 1.20 2008/05/23 02:30:21 zoulunkai Exp $";
 #include "check.as"
 
 //--------------------------------
@@ -274,7 +274,7 @@ trans2 = colorObj.getTransform();
 // 59.765625: value retrieved from AS
 // int(60 / 100.0 * 256): value stored in cxform. 
 // 59.765625 == int(60 / 100.0 * 256) / 2.56
-xcheck(trans2.aa - 59.765625 < 0.0000001);
+check(trans2.aa - 59.765625 < 0.0000001);
 check_equals(trans.ab, 10);
 #endif
 

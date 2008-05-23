@@ -30,11 +30,11 @@ line_style::line_style()
     _scaleVertically(true),
     _scaleHorizontally(true),
     _pixelHinting(false),
-		_noClose(false),
-		_startCapStyle(CAP_ROUND),
-		_endCapStyle(CAP_ROUND),
-		_joinStyle(JOIN_ROUND),
-		_miterLimitFactor(1.0f)
+    _noClose(false),
+    _startCapStyle(CAP_ROUND),
+    _endCapStyle(CAP_ROUND),
+    _joinStyle(JOIN_ROUND),
+    _miterLimitFactor(1.0f)
 {
 }
 
@@ -58,32 +58,27 @@ line_style::read_morph(stream* in, int tag_type, movie_definition *md,
 	m_width = in->read_u16();
 	pOther->m_width = in->read_u16();
 
-	// TODO: Same as in read(...), use these.
-	// 0 -- Round caps, 1 -- No caps, 2 -- square caps
-	_startCapStyle = (cap_style_e) in->read_uint(2);
-	// 0 -- Round join, 1 -- Bevel join, 2 -- Miter join
-	_joinStyle = (join_style_e) in->read_uint(2);
-	bool has_fill = in->read_bit();
-	_scaleHorizontally = ! in->read_bit();
-	_scaleVertically = ! in->read_bit();
-	_pixelHinting = in->read_bit();
+    int flags1 = in->read_u8();
+    int flags2 = in->read_u8();
+    _startCapStyle =  (cap_style_e)((flags1 & 0xC0) >> 6);
+    _joinStyle     = (join_style_e)((flags1 & 0x30) >> 4);
+    bool has_fill      =   flags1 & (1 << 3);
+    _scaleHorizontally = !(flags1 & (1 << 2));
+    _scaleVertically   = !(flags1 & (1 << 1));
+    _pixelHinting      =   flags1 & (1 << 0);
+	_noClose = flags2 & (1 << 2);
+	_endCapStyle = (cap_style_e) (flags2 & 0x03); 
 
-	static_cast<void> (in->read_uint(5));
-	_noClose = in->read_bit();
-	_endCapStyle = (cap_style_e) in->read_uint(2); // As caps above.
-
-	if (_joinStyle == JOIN_MITER)  // style 2
+	if (_joinStyle == JOIN_MITER)  
 	{
 		in->ensureBytes(2);
 		_miterLimitFactor = in->read_short_ufixed();
 	}
 	if (has_fill)
 	{
-		// TODO: Throwing this away is not the right thing.
-		// What is?
-		// A fill style is here.
-		// Answer (Udo): Should be passed to renderer somehow.
-		fill_style f, g;
+        // read fill styles for strokes.
+        // TODO: don't throw away this information, should be passed to renderer.
+        fill_style f, g;
 		f.read(in, tag_type, md, &g);
 		m_color = f.get_color();
 		pOther->m_color = g.get_color();
@@ -106,33 +101,31 @@ line_style::read(stream* in, int tag_type, movie_definition *md)
 		return;
 	}
 
-	// TODO: Unfinished. Temporary to allow define shape 4 to work in many
+	// TODO: Unfinished. Temporary to allow DefineShape4 to work in many
 	// cases, but does not work correctly in all cases.
 	in->ensureBytes(2+2);
 	m_width = in->read_u16();
 
-	// 0 -- Round caps, 1 -- No caps, 2 -- square caps
-	_startCapStyle = (cap_style_e) in->read_uint(2);
-	// 0 -- Round join, 1 -- Bevel join, 2 -- Miter join
-	_joinStyle = (join_style_e) in->read_uint(2);
-	bool has_fill = in->read_bit();
-	_scaleHorizontally = ! in->read_bit();
-	_scaleVertically = ! in->read_bit();
-	_pixelHinting = in->read_bit();
-	static_cast<void> (in->read_uint(5));
-	_noClose = in->read_bit();
-	_startCapStyle = (cap_style_e) in->read_uint(2); // As caps above.
+    int flags1 = in->read_u8();
+    int flags2 = in->read_u8();
+    _startCapStyle =  (cap_style_e)((flags1 & 0xC0) >> 6);
+    _joinStyle     = (join_style_e)((flags1 & 0x30) >> 4);
+    bool has_fill      =   flags1 & (1 << 3);
+    _scaleHorizontally = !(flags1 & (1 << 2));
+    _scaleVertically   = !(flags1 & (1 << 1));
+    _pixelHinting      =   flags1 & (1 << 0);
+	_noClose = flags2 & (1 << 2);
+	_endCapStyle = (cap_style_e) (flags2 & 0x03); 
 
-	if (_joinStyle == JOIN_MITER)  // style 2
+	if (_joinStyle == JOIN_MITER) 
 	{
 		in->ensureBytes(2);
 		_miterLimitFactor = in->read_short_ufixed();
 	}
 	if (has_fill)
 	{
-		// TODO: Throwing this away is not the right thing.
-		// What is?
-		// A fill style is here.
+        // read fill styles for strokes.
+        // TODO: don't throw away this information, should be passed to renderer.
 		fill_style f;
 		f.read(in, tag_type, md);
 		m_color = f.get_color();
@@ -158,7 +151,6 @@ line_style::set_lerp(const line_style& ls1, const line_style& ls2, float ratio)
 		LOG_ONCE( log_error("UNTESTED: Dunno how to interpolate line styles with different horizontal thickness scaling") );
 	}
 }
-
 
 // end of namespace
 }
