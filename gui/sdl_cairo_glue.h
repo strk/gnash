@@ -20,10 +20,6 @@
 #include <SDL.h>
 
 
-
-using namespace std;
-
-
 namespace gnash
 {
 

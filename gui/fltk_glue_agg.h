@@ -31,7 +31,6 @@
 #include "render_handler.h"
 #include "render_handler_agg.h"
 
-using namespace std;
 using namespace fltk;
 
 namespace gnash {

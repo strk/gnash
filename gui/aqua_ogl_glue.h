@@ -22,7 +22,6 @@
 #include "aqua_glue.h"
 #include <AGL/agl.h>
 
-using namespace std;
 
 namespace gnash
 {

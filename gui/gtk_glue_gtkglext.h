@@ -28,8 +28,6 @@
 
 #include "tu_opengl_includes.h"
 
-using namespace std;
-
 
 namespace gnash
 {

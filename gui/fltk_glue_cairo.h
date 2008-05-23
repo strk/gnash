@@ -43,7 +43,6 @@
 #include "fltksup.h"
 #include <cairo.h>
 
-using namespace std;
 using namespace fltk;
 
 namespace gnash {

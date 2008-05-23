@@ -18,8 +18,6 @@
 #include "sdl_glue.h"
 
 
-using namespace std;
-
 
 namespace gnash
 {

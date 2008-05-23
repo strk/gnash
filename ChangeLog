@@ -1,5 +1,12 @@
 2008-05-23 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* gui/aqua_ogl_glue.h gui/fltk_glue_agg.h gui/fltk_glue_cairo.h
+	  gui/gtk_glue_gtkglext.h, gui/kde_glue_opengl.h,
+	  gui/sdl_cairo_glue.h, gui/sdl_ogl_glue.h: Do not put
+	  "using namespace std;" in header files. It's wrong.
+
+2008-05-23 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* parser/BitmapMovieDefinition.cpp, parser/bitmap_character_def.cpp,
 	  parser/sprite_definition.cpp, server/sprite_instance.cpp: minor
 	  cleanups, drop (already unnecessary) "using namespace std;", wrap

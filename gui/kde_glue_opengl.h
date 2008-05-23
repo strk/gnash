@@ -19,7 +19,6 @@
 #include "kde_glue.h"
 #include <qgl.h>
 
-using namespace std;
 
 namespace gnash
 {
