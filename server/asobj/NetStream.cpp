@@ -674,6 +674,7 @@ PlayHead::setState(PlaybackStatus newState)
 
 	if ( _state == PLAY_PAUSED )
 	{
+		assert(newState == PLAY_PLAYING);
 		_state = PLAY_PLAYING;
 
 		// if we go from PAUSED to PLAYING, reset
@@ -688,7 +689,10 @@ PlayHead::setState(PlaybackStatus newState)
 	else
 	{
 		assert(_state == PLAY_PLAYING);
+
+		assert(newState == PLAY_PAUSED);
 		_state = PLAY_PAUSED;
+
 		// When going from PLAYING to PAUSED
 		// we do nothing with _clockOffset
 		// as we'll update it when getting back to PLAYING
