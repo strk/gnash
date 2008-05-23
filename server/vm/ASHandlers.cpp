@@ -3094,7 +3094,8 @@ SWFHandlers::ActionEnumerate(ActionExec& thread)
 
     env.top(0).set_null();
 
-    if ( ! variable.is_object() )
+    const boost::intrusive_ptr<as_object> obj = variable.to_object();
+    if ( !obj || !variable.is_object() )
     {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Top of stack doesn't evaluate to an object (%s) at "
@@ -3103,8 +3104,6 @@ SWFHandlers::ActionEnumerate(ActionExec& thread)
         );
         return;
     }
-
-    const boost::intrusive_ptr<as_object> obj = variable.to_object();
 
     enumerateObject(env, *obj);
 }
@@ -3757,17 +3756,15 @@ SWFHandlers::ActionEnum2(ActionExec& thread)
     // as we copied that as_value.
     env.top(0).set_null();
 
-    if ( ! obj_val.is_object() )
+    const boost::intrusive_ptr<as_object> obj = obj_val.to_object();
+    if ( !obj || !obj_val.is_object() )
     {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Top of stack not an object %s at ActionEnum2 "
-            " execution"),
-            obj_val);
+            " execution"), obj_val);
         );
         return;
     }
-
-    boost::intrusive_ptr<as_object> obj = obj_val.to_object();
 
     enumerateObject(env, *obj);
 

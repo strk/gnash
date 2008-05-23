@@ -49,18 +49,12 @@
 // too much information for my tastes. I really want just
 // to see how stack changes while executing actions...
 // --strk Fri Jun 30 02:28:46 CEST 2006
-#define DEBUG_STACK 1
+# define DEBUG_STACK 1
 
 // Max number of stack item to dump. 0 for unlimited.
-#define STACK_DUMP_LIMIT 32
+# define STACK_DUMP_LIMIT 32
 
 #endif
-
-using namespace gnash;
-using namespace SWF;
-using std::string;
-using std::endl;
-using std::stringstream;
 
 
 namespace gnash {
@@ -155,7 +149,7 @@ ActionExec::operator() ()
     // Do not execute if scripts are disabled
     if ( VM::get().getRoot().scriptsDisabled() ) return;
 
-    static const SWFHandlers& ash = SWFHandlers::instance();
+    static const SWF::SWFHandlers& ash = SWF::SWFHandlers::instance();
 		
     _original_target = env.get_target();
 
@@ -168,12 +162,12 @@ ActionExec::operator() ()
         	log_action(_("at ActionExec operator() start, pc=%d"
 		           ", stop_pc=%d, code.size=%d."),
 			    pc, stop_pc, code.size());
-		stringstream ss;
+		std::stringstream ss;
 		env.dump_stack(ss, STACK_DUMP_LIMIT);
 		env.dump_global_registers(ss);
 		env.dump_local_registers(ss);
 		env.dump_local_variables(ss);
-		log_action("%s", ss.str().c_str());
+		log_action("%s", ss.str());
 	);
 #endif
 
@@ -305,8 +299,7 @@ ActionExec::operator() ()
 	size_t oldPc = pc;
 
 	IF_VERBOSE_ACTION (
-		// FIXME, avoid direct dbglogfile access, use log_action
-		log_action("PC:%d - EX: %s", pc, code.disasm(pc).c_str());
+		log_action("PC:%d - EX: %s", pc, code.disasm(pc));
 	);
 
 	// Set default next_pc offset, control flow action handlers
@@ -343,7 +336,7 @@ ActionExec::operator() ()
 		break;
 	}
 
-	ash.execute((action_type)action_id, *this);
+	ash.execute(static_cast<SWF::action_type>(action_id), *this);
 
 #if 1 // See bugs: #20974, #21069, #20996.
 
@@ -367,7 +360,7 @@ ActionExec::operator() ()
 		ss << "Discarding " << stop_pc-next_pc
 			<< " bytes of remaining opcodes: " << std::endl;
 		dumpActions(next_pc, stop_pc, ss);
-		log_debug("%s", ss.str().c_str());
+		log_debug("%s", ss.str());
 		break;
 	}
 #endif
@@ -384,12 +377,12 @@ ActionExec::operator() ()
 #if DEBUG_STACK
 	IF_VERBOSE_ACTION (
 		log_action(_("After execution: PC %d, next PC %d, stack follows"), pc, next_pc);
-		stringstream ss;
+		std::stringstream ss;
 		env.dump_stack(ss, STACK_DUMP_LIMIT);
 		env.dump_global_registers(ss);
 		env.dump_local_registers(ss);
 		env.dump_local_variables(ss);
-		log_action("%s", ss.str().c_str());
+		log_action("%s", ss.str());
 	);
 #endif
 

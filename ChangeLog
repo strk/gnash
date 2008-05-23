@@ -1,3 +1,9 @@
+2008-05-23 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/vm/ActionExec.cpp: clean up using directives.
+	* server/vm/ASHandlers.cpp: check that an object exists and that it's
+	  a proper object before enumerating it. Fixes bug #23331.
+
 2008-05-23 Russ Nelson <nelson@crynwr.com>
 
 	* configure.ac: make the user's life a little easier by telling them
