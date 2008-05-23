@@ -64,15 +64,12 @@
 #include <vector>
 #include <string>
 #include <cmath>
+#include <cstdio> // std::sprintf
 
 #include <functional> // for mem_fun, bind1st
 #include <algorithm> // for for_each
 #include <boost/algorithm/string/case_conv.hpp>
 
-//#ifdef __sgi
-//extern double round(double);
-//#pragma optional round
-//#endif
 
 namespace gnash {
 
@@ -1882,7 +1879,7 @@ sprite_beginGradientFill(const fn_call& fn)
   for (size_t i=0; i<ngradients; ++i)
   {
     char buf[32];
-    sprintf(buf, SIZET_FMT, i);
+    std::sprintf(buf, SIZET_FMT, i);
     string_table::key key = st.find(buf);
 
     as_value colVal = colors->getMember(key);
@@ -4905,7 +4902,7 @@ sprite_instance::stopStreamSound()
 {
 	if ( m_sound_stream_id == -1 ) return; // nothing to do
 
-	media::sound_handler* handler = get_sound_handler(); // TODO: chache ?
+	media::sound_handler* handler = get_sound_handler(); // TODO: cache ?
 	if (handler)
 	{
 		handler->stop_sound(m_sound_stream_id);

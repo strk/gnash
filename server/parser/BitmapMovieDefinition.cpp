@@ -24,7 +24,6 @@
 #include "shape.h" // for class path and class edge
 #include "render.h" // for ::display
 
-using namespace std;
 
 namespace gnash {
 
@@ -50,17 +49,19 @@ BitmapMovieDefinition::getShapeDef()
 	//mat.concatenate_scale(1.0/20.0);
 	mat.set_scale(1.0/20.0, 1.0/20.0); // bitmap fills get matrix reversed
 	fill_style bmFill(_bitmap.get(), mat);
-	size_t fillLeft = _shapedef->add_fill_style(bmFill);
+	const size_t fillLeft = _shapedef->add_fill_style(bmFill);
 
 	// Define a rectangle filled with the bitmap style
 
 	// We use one twip for each pixel in the image
 	// The character will be scaled * 20
 	// when placed in BitmapMovieInstance's DisplayList
-	float w = _framesize.width(); // /20;
-	float h = _framesize.height(); // /20;
+	const float w = _framesize.width(); // /20;
+	const float h = _framesize.height(); // /20;
 
-	log_parse(_("Creating a shape_definition wrapping a %g x %g bitmap"), w, h);
+	IF_VERBOSE_PARSE(
+	    log_parse(_("Creating a shape_definition wrapping a %g x %g bitmap"), w, h);
+	);
 
 	path bmPath(w, h, fillLeft, 0, 0, false);
 	bmPath.drawLineTo(w, 0);

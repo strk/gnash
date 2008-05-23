@@ -1,3 +1,10 @@
+2008-05-23 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* parser/BitmapMovieDefinition.cpp, parser/bitmap_character_def.cpp,
+	  parser/sprite_definition.cpp, server/sprite_instance.cpp: minor
+	  cleanups, drop (already unnecessary) "using namespace std;", wrap
+	  log_parse in verbose parsing macro.
+
 2008-05-23 Russ Nelson <nelson@crynwr.com>
 
 	* README.dump-gnash: I don't know where to put this information

@@ -30,7 +30,6 @@
 #include <string>
 #include <cassert>
 
-using namespace std;
 
 // Define the following macro to get a dump the prototype 
 // members of classes registered to definitions.
@@ -69,13 +68,13 @@ sprite_definition::~sprite_definition()
 void
 sprite_definition::read(stream* in)
 {
-	unsigned long tag_end = in->get_tag_end_position();
+    unsigned long tag_end = in->get_tag_end_position();
 
-	m_frame_count = in->read_u16();
+    m_frame_count = in->read_u16();
 
-	IF_VERBOSE_PARSE (
-	log_parse(_("  frames = " SIZET_FMT), m_frame_count);
-	);
+    IF_VERBOSE_PARSE (
+        log_parse(_("  frames = %d"), m_frame_count);
+    );
 
 	m_loading_frame = 0;
 
@@ -106,8 +105,7 @@ sprite_definition::read(stream* in)
 		    	++m_loading_frame;
 
 			IF_VERBOSE_PARSE (
-				log_parse(_("  show_frame "
-					SIZET_FMT "/" SIZET_FMT
+				log_parse(_("  show_frame %d/%d"
 					" (sprite)"),
 					m_loading_frame,
 					m_frame_count);

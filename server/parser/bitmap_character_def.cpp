@@ -28,7 +28,6 @@
 #include <cassert>
 #include <memory> // for auto_ptr
 
-using namespace std;
 
 namespace gnash {
 
