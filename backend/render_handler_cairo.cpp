@@ -547,7 +547,7 @@ public:
 
     if ( width == 0.0 ) {
       // TODO: test this!
-      cairo_set_line_width(_cr, 1.0); // expected: 1 pixel
+      cairo_set_line_width(_cr, 20.0); // expected: 1 pixel
     } else {
       // TODO: this is correct for !style.scaleThicknessVertically() 
       //       and !style.scaleThicknessHorizontally().
@@ -557,7 +557,7 @@ public:
       {
         LOG_ONCE( log_unimpl(_("Scaled strokes in Cairo renderer")) );
       }
-      cairo_set_line_width(_cr, TWIPS_TO_PIXELS(width));
+      cairo_set_line_width(_cr, width);
     }
     
     rgba color = cx.transform(style.get_color());

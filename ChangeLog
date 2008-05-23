@@ -1,3 +1,8 @@
+2008-05-23 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* backend/render_handler_cairo.cpp: Unlike AGG, the Cairo renderer
+	accepts measurements in TWIPS.
+
 2008-05-23 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/asobj/SharedObject.cpp: restrict using directives, use
