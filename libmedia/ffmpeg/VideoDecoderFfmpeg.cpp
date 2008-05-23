@@ -20,11 +20,20 @@
 
 #include "VideoDecoderFfmpeg.h"
 
-#ifdef HAVE_SWSCALE_H
+#ifdef HAVE_FFMPEG_SWSCALE_H
+#define HAVE_SWSCALE_H 1
 extern "C" {
 #include <ffmpeg/swscale.h>
 }
 #endif
+
+#ifdef HAVE_LIBSWSCALE_SWSCALE_H
+#define HAVE_SWSCALE_H 1
+extern "C" {
+#include <libswscale/swscale.h>
+}
+#endif
+
 #include <boost/scoped_array.hpp>
 //#include <boost/foreach.hpp>
 #include <boost/bind.hpp>

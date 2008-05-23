@@ -2547,11 +2547,11 @@ fi
         echo "               This version of ffmpeg may not work!" >&3
         echo "               Version 51.27.0 or newer is highly recommended." >&3
       else
-	avformat_h=`echo $avcodec_h | sed 's/avcodec/avformat/g'`
-	if test ! -f "$avformat_h"; then
+	if test x"${avformat_h}" == x; then
           echo "        ERROR: FFMPEG's libavcodec header is installed but not libavformat." >&3
           echo "               You can install FFMPEG from http://ffmpeg.mplayerhq.hu" >&3
           echo "               or .deb users: apt-get install libavformat-dev" >&3
+          echo "               or explicitly set the path using --with-ffmpeg-incl=" >&5
           echo "               or reconfigure with --enable-media=gst" >&3
 	else
           if test x"$FFMPEG_CFLAGS" != x; then

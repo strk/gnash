@@ -38,9 +38,17 @@
 
 #include "impl.h"
 
+#ifdef HAVE_FFMPEG_AVFORMAT_H
 extern "C" {
 #include <ffmpeg/avformat.h>
 }
+#endif
+
+#ifdef HAVE_LIBAVFORMAT_AVFORMAT_H
+extern "C" {
+#include <libavformat/avformat.h>
+}
+#endif
 
 #include "image.h"
 #include "StreamProvider.h"	

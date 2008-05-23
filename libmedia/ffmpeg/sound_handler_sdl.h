@@ -27,9 +27,17 @@
 #include "log.h"
 
 #ifdef USE_FFMPEG
+#ifdef HAVE_FFMPEG_AVCODEC_H
 extern "C" {
-#include <ffmpeg/avcodec.h>
+# include "ffmpeg/avcodec.h"
 }
+#endif
+
+#ifdef HAVE_LIBAVCODEC_AVCODEC_H
+extern "C" {
+# include "libavcodec/avcodec.h"
+}
+#endif
 #elif defined(USE_MAD)
 #include <mad.h>
 #endif

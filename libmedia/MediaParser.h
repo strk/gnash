@@ -28,10 +28,17 @@
 #include "tu_file.h"
 
 #ifdef USE_FFMPEG
-extern "C" 
-{
-	#include <ffmpeg/avcodec.h>
+#ifdef HAVE_FFMPEG_AVCODEC_H
+extern "C" {
+# include "ffmpeg/avcodec.h"
 }
+#endif
+
+#ifdef HAVE_LIBAVCODEC_AVCODEC_H
+extern "C" {
+# include "libavcodec/avcodec.h"
+}
+#endif
 #endif // USE_FFMPEG
 
 #include <memory>

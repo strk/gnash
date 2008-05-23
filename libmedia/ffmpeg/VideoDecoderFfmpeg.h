@@ -28,10 +28,17 @@
 #include "log.h"
 #include "VideoDecoder.h"
 
+#ifdef HAVE_FFMPEG_AVCODEC_H
 extern "C" {
-#include <ffmpeg/avcodec.h>
+# include "ffmpeg/avcodec.h"
 }
+#endif
 
+#ifdef HAVE_LIBAVCODEC_AVCODEC_H
+extern "C" {
+# include "libavcodec/avcodec.h"
+}
+#endif
 
 namespace gnash {
 namespace media {

@@ -24,9 +24,17 @@
 #define __STDC_CONSTANT_MACROS
 #endif
 
+#ifdef HAVE_FFMPEG_AVCODEC_H
 extern "C" {
-#include <ffmpeg/avcodec.h>
+# include "ffmpeg/avcodec.h"
 }
+#endif
+
+#ifdef HAVE_LIBAVCODEC_AVCODEC_H
+extern "C" {
+# include "libavcodec/avcodec.h"
+}
+#endif
 
 #include "log.h"
 #include "AudioDecoder.h"

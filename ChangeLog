@@ -1,3 +1,11 @@
+ 2008-05-23 Russ Nelson <nelson@crynwr.com>
+ 
+ 	* All files were changed to support the new method for location
+ 	  of ffmpeg include files.  They were moved from .../ffmpeg/* into
+ 	  .../lib*/*.  Also, they changed the way they express the version
+ 	  number in avcodec.h, which we are parsing to avoid compiling
+ 	  because we support cross-compilation.  We now support that also.
+
 2008-05-23 Zou Lunkai <zoulunkai@gmail.com>
 	
 	* server/styles.cpp: read_bit() reduction, cleanups. 

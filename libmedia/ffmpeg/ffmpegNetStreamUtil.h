@@ -29,10 +29,22 @@
 #include "dsodefs.h" //For DSOEXPORT
 
 #ifdef USE_FFMPEG
+#ifdef HAVE_FFMPEG_AVCODEC_H
 extern "C" {
 #include <ffmpeg/avcodec.h>
 }
 #endif
+  
+#ifdef HAVE_LIBAVCODEC_AVCODEC_H
+extern "C" {
+#include <libavcodec/avcodec.h>
+}
+#endif
+#endif
+
+#include <queue>
+  
+#include <iconv.h>
 
 #include <deque>
 

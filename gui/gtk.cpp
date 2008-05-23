@@ -53,6 +53,12 @@ extern "C" {
 }
 #endif
 
+#ifdef HAVE_LIBAVCODEC_AVCODEC_H
+extern "C" {
+# include "libavcodec/avcodec.h" // Only for the version number
+}
+#endif
+
 #ifdef HAVE_GST_GST_H
 # include "gst/gstversion.h" // Only for the version number
 #endif

@@ -32,9 +32,17 @@
 // TODO: use a global define for disabling all threads at once
 #define LOADS_IN_SEPARATE_THREAD
 
+#ifdef HAVE_FFMPEG_AVFORMAT_H
 extern "C" {
 #include <ffmpeg/avformat.h>
 }
+#endif
+
+#ifdef HAVE_LIBAVFORMAT_AVFORMAT_H
+extern "C" {
+#include <libavformat/avformat.h>
+}
+#endif
 
 namespace gnash {
 
