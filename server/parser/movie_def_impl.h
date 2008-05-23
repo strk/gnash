@@ -220,7 +220,7 @@ private:
 	PlayListMap m_playlist;
 
 	/// 0-based frame #'s
-	typedef std::map<std::string, size_t> NamedFrameMap;
+	typedef std::map<std::string, size_t, StringNoCaseLessThen> NamedFrameMap;
 	NamedFrameMap _namedFrames;
 
 	// Mutex protecting access to _namedFrames

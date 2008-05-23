@@ -1,5 +1,15 @@
 2008-05-23 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* server/sprite_instance.{h,cpp},
+	  server/parser/movie_def_impl.{h,cpp}: use StringNoCaseLessThen
+	  as a comparator for the frame name map (_namedFrames), use insert
+	  instead of operator[] so that the first inserted named frame is not
+	  replaced by a subsequent one with the same name (case insensitive).
+	  3 passes in misc-ming.all, fixes bug #23327. Const-correct some
+	  iterators.
+
+2008-05-23 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* testsuite/misc-ming.all/frame_label_test.c: test for
 	  case sensitivity.
 

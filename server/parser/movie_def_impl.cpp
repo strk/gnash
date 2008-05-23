@@ -47,6 +47,7 @@
 #include <iomanip>
 #include <memory>
 #include <string>
+#include <algorithm> // std::make_pair
 #include <unistd.h>
 
 
@@ -1027,15 +1028,15 @@ movie_def_impl::add_frame_name(const std::string& n)
 {
 	boost::mutex::scoped_lock lock1(_namedFramesMutex);
 	boost::mutex::scoped_lock lock2(_frames_loaded_mutex);
-	//log_debug(_("labelframe: frame %d, name %s"), _frames_loaded, n.c_str());
-	_namedFrames[n] = _frames_loaded;
+
+	_namedFrames.insert(std::make_pair(n, _frames_loaded));
 }
 
 bool
 movie_def_impl::get_labeled_frame(const std::string& label, size_t& frame_number)
 {
     boost::mutex::scoped_lock lock(_namedFramesMutex);
-    NamedFrameMap::iterator it = _namedFrames.find(label);
+    NamedFrameMap::const_iterator it = _namedFrames.find(label);
     if ( it == _namedFrames.end() ) return false;
     frame_number = it->second;
     return true;

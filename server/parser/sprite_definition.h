@@ -22,11 +22,13 @@
 
 
 #include <vector>
+#include <map>
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "movie_definition.h"
 #include "stream.h"
 #include "log.h"
 #include "rect.h"
+#include "StringPredicates.h" // StringNoCaseLessThen
 
 namespace gnash
 {
@@ -239,8 +241,8 @@ private:
 	PlayListMap m_playlist;
 
 	// stores 0-based frame #'s
-	typedef std::map<std::string, size_t> NamedFrameMap;
-	NamedFrameMap m_named_frames;
+	typedef std::map<std::string, size_t, StringNoCaseLessThen> NamedFrameMap;
+	NamedFrameMap _namedFrames;
 
 	size_t m_frame_count;
 
@@ -255,7 +257,7 @@ private:
 	}
 
 	// See dox in movie_definition.h
-	virtual void	add_frame_name(const std::string& name);
+	virtual void add_frame_name(const std::string& name);
 
 	// See dox in movie_definition
 	bool get_labeled_frame(const std::string& label, size_t& frame_number);

@@ -172,14 +172,14 @@ sprite_definition::add_frame_name(const std::string& name)
     // adjusted at the end of parsing.
     //
 	//assert(m_loading_frame < m_frame_count);
-    m_named_frames[name] = m_loading_frame;
+    _namedFrames.insert(std::make_pair(name, m_loading_frame));
 }
 
 bool
 sprite_definition::get_labeled_frame(const std::string& label, size_t& frame_number)
 {
-    NamedFrameMap::iterator it = m_named_frames.find(label);
-    if ( it == m_named_frames.end() ) return false;
+    NamedFrameMap::const_iterator it = _namedFrames.find(label);
+    if ( it == _namedFrames.end() ) return false;
     frame_number = it->second;
     return true;
 }
