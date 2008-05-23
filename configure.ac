@@ -612,13 +612,13 @@ dnl fi
 
 if test x$build_ogl = xyes; then
   if test x$build_fb = xyes; then
-    AC_MSG_ERROR([OpenGL renderer is not supported by FB gui. Use --enable-renderer=AGG]);
+    AC_MSG_ERROR([OpenGL renderer is not supported by FB gui. Use --enable-renderer=AGG or --enable-gui=kde,gtk,sdl]);
   fi
   if test x$build_fltk = xyes; then
-    AC_MSG_ERROR([OpenGL renderer is not supported by FLTK gui. Use --enable-renderer=AGG]);
+    AC_MSG_ERROR([OpenGL renderer is not supported by FLTK gui. Use --enable-renderer=AGG or --enable-gui=kde,gtk,sdl]);
   fi
   if test x$build_dump = xyes; then
-    AC_MSG_ERROR([OpenGL renderer is not supported by Dump gui. Use --enable-renderer=AGG]);
+    AC_MSG_ERROR([OpenGL renderer is not supported by Dump gui. Use --enable-renderer=AGG or --enable-gui=kde,gtk,sdl]);
   fi
    AC_DEFINE([RENDERER_OPENGL], [], [Use OpenGL renderer])
 fi
@@ -1773,19 +1773,19 @@ dnl      CAIRO_CFLAGS=`echo ${CAIRO_CFLAGS} | sed -e 's/ *//'`
 dnl      CAIRO_CFLAGS="${CAIRO_CFLAGS} ${CAIRO_CFLAGS}/cairo"
 dnl   fi
   if test x$build_fb = xyes; then
-    AC_MSG_ERROR([Cairo renderer is not supported by FB gui. Use --enable-renderer=AGG]);
+    AC_MSG_ERROR([Cairo renderer is not supported by FB gui. Use --enable-renderer=AGG or --enable-gui=gtk,sdl]);
   fi
   if test x$build_sdl = xyes; then
-    AC_MSG_ERROR([Cairo renderer is not supported by SDL gui. Use --enable-renderer=AGG]);
+    AC_MSG_ERROR([Cairo renderer is not supported by SDL gui. Use --enable-renderer=AGG or --enable-gui=gtk,sdl]);
   fi
   if test x$build_fltk = xyes; then
-    AC_MSG_ERROR([Cairo renderer is not supported by FLTK gui. Use --enable-renderer=AGG]);
+    AC_MSG_ERROR([Cairo renderer is not supported by FLTK gui. Use --enable-renderer=AGG or --enable-gui=gtk,sdl]);
   fi
   if test x$build_kde = xyes; then
-    AC_MSG_ERROR([Cairo renderer is not supported by KDE gui. Use --enable-renderer=AGG]);
+    AC_MSG_ERROR([Cairo renderer is not supported by KDE gui. Use --enable-renderer=AGG or --enable-gui=gtk,sdl]);
   fi
   if test x$build_dump = xyes; then
-    AC_MSG_ERROR([Cairo renderer is not supported by Dump gui. Use --enable-renderer=AGG]);
+    AC_MSG_ERROR([Cairo renderer is not supported by Dump gui. Use --enable-renderer=AGG or --enable-gui=gtk,sdl]);
   fi
   AC_DEFINE([RENDERER_CAIRO], [], [Use cairo renderer])
 fi

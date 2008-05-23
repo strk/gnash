@@ -1,3 +1,8 @@
+2008-05-23 Russ Nelson <nelson@crynwr.com>
+
+	* configure.ac: make the user's life a little easier by telling them
+	  explicitly what guis each renderer supports.
+
 2008-05-23 Sandro Santilli <strk@keybit.net>
 
 	* libbase/FLVParser.{cpp,h}: add peekNextVideoFrameInfo
