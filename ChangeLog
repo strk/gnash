@@ -7,6 +7,7 @@
 	  replaced by a subsequent one with the same name (case insensitive).
 	  3 passes in misc-ming.all, fixes bug #23327. Const-correct some
 	  iterators.
+	* testsuite/misc-ming.all/frame_label_test.c: 3 passes.
 
 2008-05-23 Benjamin Wolsey <bwy@benjaminwolsey.de>
 

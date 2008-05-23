@@ -153,9 +153,9 @@ main(int argc, char** argv)
   check_equals(mo, "_root.x3", "'mc11_frame6'");
   check_equals(mo, "_root.x7", "'mc1_frame7'");
   check_equals(mo, "_root.x8", "'mc1_frame8'");
-  xcheck_equals(mo, "_root.x9", "'small_first'");
-  xcheck_equals(mo, "_root.x10", "'mc1_frame10'");
-  xcheck_equals(mo, "_root.x11", "'Big_first'");
+  check_equals(mo, "_root.x9", "'small_first'");
+  check_equals(mo, "_root.x10", "'mc1_frame10'");
+  check_equals(mo, "_root.x11", "'Big_first'");
   /* seems that GotoLabel does not support target_path */
   check_equals(mo, "_root.x4", "0");
   check_equals(mo, "_root.x5", "0");
