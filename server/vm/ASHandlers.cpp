@@ -3824,7 +3824,12 @@ SWFHandlers::ActionShiftLeft(ActionExec& thread)
     as_environment& env = thread.env;
     thread.ensureStack(2);
 
-    boost::uint32_t amount = env.top(0).to_int();
+    /// A left shift of more than or equal to the size in
+    /// bits of the left operand, or a negative shift, results
+    /// in undefined behaviour in C++.
+    boost::int32_t amount = env.top(0).to_int() % 32;
+    if (amount < 0) amount += 32;
+    
     boost::int32_t value = env.top(1).to_int();
 
     value = value << amount;
