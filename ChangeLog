@@ -333,7 +333,6 @@
 	* configure.ac: have KPARTS install dir summary use 'KPARTS' label,
 	  to conform with that given by 'make dumpconfig'.
 
->>>>>>> 1.6678
 2008-05-17 Sandro Santilli <strk@keybit.net>
 
 	* server/vm/ActionExec.cpp (setLocalVariable): use scope stack
