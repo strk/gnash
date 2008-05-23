@@ -42,6 +42,8 @@
 #include "namedStrings.h"
 #include "movie_root.h"
 
+#include "VirtualClock.h" // for PlayHead
+
 // Define the following macro to have status notification handling debugged
 //#define GNASH_DEBUG_STATUS
 
@@ -74,7 +76,6 @@ NetStream::NetStream()
 	m_imageframe(NULL),
 	m_parser(NULL),
 	m_isFLV(false),
-	m_start_onbuffer(false),
 	inputPos(0),
 	_lastStatus(invalidStatus)
 {
@@ -640,5 +641,101 @@ NetStream::markReachableResources() const
 	markAsObjectReachable();
 }
 #endif // GNASH_USE_GC
+
+// ------- PlayHead class --------
+PlayHead::PlayHead(VirtualClock* clockSource)
+	:
+	_position(0),
+	_state(PLAY_PLAYING),
+	_availableConsumers(0),
+	_positionConsumers(0),
+	_clockSource(clockSource)
+{
+	_clockOffset = _clockSource->elapsed();
+}
+
+void
+PlayHead::init(bool hasVideo, bool hasAudio)
+{
+	boost::uint64_t now = _clockSource->elapsed();
+	if ( hasVideo ) _availableConsumers |= CONSUMER_VIDEO;
+	if ( hasAudio ) _availableConsumers |= CONSUMER_AUDIO;
+	_positionConsumers = 0;
+
+	_position = 0;
+	_clockOffset = now;
+	assert(now-_clockOffset == _position);
+}
+
+PlayHead::PlaybackStatus
+PlayHead::setState(PlaybackStatus newState)
+{
+	if ( _state == newState ) return _state; // nothing to do
+
+	if ( _state == PLAY_PAUSED )
+	{
+		_state = PLAY_PLAYING;
+
+		// if we go from PAUSED to PLAYING, reset
+		// _clockOffset to yank current position
+		// when querying clock source *now*
+		boost::uint64_t now = _clockSource->elapsed();
+		_clockOffset = ( now - _position );
+		assert( now-_clockOffset == _position ); // check if we did the right thing
+
+		return PLAY_PAUSED;
+	}
+	else
+	{
+		assert(_state == PLAY_PLAYING);
+		_state = PLAY_PAUSED;
+		// When going from PLAYING to PAUSED
+		// we do nothing with _clockOffset
+		// as we'll update it when getting back to PLAYING
+		return PLAY_PLAYING;
+	}
+}
+
+PlayHead::PlaybackStatus
+PlayHead::toggleState()
+{
+	if ( _state == PLAY_PAUSED ) return setState(PLAY_PLAYING);
+	else return setState(PLAY_PAUSED);
+}
+
+void
+PlayHead::advanceIfConsumed()
+{
+	if ( (_positionConsumers & _availableConsumers) != _availableConsumers)
+	{
+		// not all available consumers consumed current position,
+		// won't advance
+		log_debug("PlayHead::advance(): "
+			"not all consumers consumed current position, "
+			"won't advance");
+		return;
+	}
+
+	// Advance position
+	boost::uint64_t now = _clockSource->elapsed();
+	_position = now-_clockOffset;
+
+	// Reset consumers state
+	_positionConsumers = 0;
+}
+
+void
+PlayHead::seekTo(boost::uint64_t position)
+{
+	boost::uint64_t now = _clockSource->elapsed();
+	_position = position;
+
+	_clockOffset = ( now - _position );
+	assert( now-_clockOffset == _position ); // check if we did the right thing
+
+	// Reset consumers state
+	_positionConsumers = 0;
+}
+
 
 } // end of gnash namespace

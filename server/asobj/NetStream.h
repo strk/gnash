@@ -39,9 +39,146 @@
 // Forward declarations
 namespace gnash {
 	//class NetConnection;
+	class VirtualClock;
 }
 
 namespace gnash {
+
+/// The playback controller
+class PlayHead {
+
+public:
+
+	/// Flags for playback state
+	enum PlaybackStatus {
+		PLAY_PLAYING = 1,
+		PLAY_PAUSED = 2
+	};
+	
+
+	/// Initialize playhead given a VirtualCock to use
+	/// as clock source.
+	//
+	/// The PlayHead will have initial state set to PLAYING
+	///
+	/// @param clockSource
+	///	The VirtualClock to use as time source.
+	///	Ownership left to caller (not necessarely a good thing).
+	///
+	PlayHead(VirtualClock* clockSource);
+
+	/// Initialize playhead 
+	//
+	/// @param hasVideo
+	/// 	Whether video consumer is available
+	///
+	/// @param hasAudio
+	/// 	Whether video consumer is available
+	///
+	void init(bool hasVideo, bool hasAudio);
+
+	/// Get current playhead position (milliseconds)
+	boost::uint64_t getPosition() { return _position; }
+
+	/// Get current playback state
+	PlaybackStatus getState() { return _state; }
+
+	/// Set playback state, returning old state
+	PlaybackStatus setState(PlaybackStatus newState);
+
+	/// Toggle playback state, returning old state
+	PlaybackStatus toggleState();
+
+	/// Return true if video of current position have been consumed
+	bool isVideoConsumed() const
+	{
+		return (_positionConsumers & CONSUMER_VIDEO);
+	}
+
+	/// \brief
+	/// Mark current position as being consumed by video consumer,
+	/// advancing if needed
+	void setVideoConsumed()
+	{
+		_positionConsumers |= CONSUMER_VIDEO;
+		advanceIfConsumed();
+	}
+
+	/// Return true if audio of current position have been consumed
+	bool isAudioConsumed() const
+	{
+		return (_positionConsumers & CONSUMER_AUDIO);
+	}
+
+	/// \brief
+	/// Mark current position as being consumed by audio consumer,
+	/// advancing if needed.
+	void setAudioConsumed()
+	{
+		_positionConsumers |= CONSUMER_AUDIO;
+		advanceIfConsumed();
+	}
+
+	/// Change current position to the given time.
+	//
+	/// Consume flag will be reset.
+	///
+	/// @param position
+	///	Position timestamp (milliseconds)
+	///
+	/// POSTCONDITIONS:
+	///	- isVideoConsumed() == false
+	///	- isAudioConsumed() == false
+	///	- getPosition() == position
+	///
+	void seekTo(boost::uint64_t position);
+
+private:
+
+	/// Advance position if all consumers consumed the current one
+	//
+	/// Clock source will be used to determine the amount
+	/// of milliseconds to advance position to.
+	///
+	/// Consumer flags will be reset.
+	///
+	/// POSTCONDITIONS:
+	///	- isVideoConsumed() == false
+	///	- isAudioConsumed() == false
+	///
+	void advanceIfConsumed();
+		
+	/// Flags for consumers state
+	enum ConsumerFlag {
+		CONSUMER_VIDEO = 1,
+		CONSUMER_AUDIO = 2
+	};
+
+	/// Current playhead position
+	boost::uint64_t _position;
+
+	/// Current playback state
+	PlaybackStatus _state;
+
+	/// Binary OR of consumers representing
+	/// which consumers are active
+	int _availableConsumers;
+
+	/// Binary OR of consumers representing
+	/// which consumers consumed current position
+	int _positionConsumers;
+
+	/// The clock source, externally owned
+	VirtualClock* _clockSource;
+
+	/// Offset to subtract from current clock source
+	/// to get current position
+	//
+	/// The offset will be 
+	boost::uint64_t _clockOffset; 
+
+};
+
   
 
 /// NetStream ActionScript class
@@ -149,12 +286,6 @@ protected:
 	// The handler which is invoked on status change
 	boost::intrusive_ptr<as_function> m_statusHandler;
 
-	// should we start when the FLVParser has buffered/parsed enough frames,
-	// so that the differens between the current frames timestamp (0 at the 
-	// beginning) and the last parseable frames timestamp i bigger than 
-	// m_bufferTime.
-	bool m_start_onbuffer;
-
 	// The position in the inputfile, only used when not playing a FLV
 	long inputPos;
 
@@ -203,6 +334,7 @@ public:
 	//
 	/// @param position
 	///	Defines in seconds where to seek to
+	///	TODO: take milliseconds !!
 	///
 	virtual void seek(boost::uint32_t /*pos*/){}
 

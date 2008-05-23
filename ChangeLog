@@ -1,3 +1,7 @@
+2008-05-23 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/NetStream.{cpp,h}: Add PlayHead class implementation.
+
 2008-05-23 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/sprite_instance.{h,cpp},
