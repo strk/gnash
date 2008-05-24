@@ -1,3 +1,7 @@
+2008-05-24 Sandro Santilli <strk@keybit.net>
+
+	* server/VirtualClock.h: add interruptable wrapper for VirtualClocks.
+
 2008-05-23 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/vm/ActionExec.cpp: clean up using directives.

@@ -24,6 +24,8 @@
 #include "gnashconfig.h"
 #endif
 
+#include <memory> // for InterruptableVirtualClock
+#include <cassert> // for InterruptableVirtualClock
 
 namespace gnash
 {
@@ -52,6 +54,70 @@ public:
 
     virtual ~VirtualClock() {}
 };
+
+/// A VirtualClock wrapper adding pause/resume capabilities 
+class InterruptableVirtualClock : public VirtualClock
+{
+
+public:
+
+	/// Construct an InterruptableVirtualClock from a VirtualClock source
+	//
+	/// The interruptable virtual clock starts in 'stop' mode
+	///
+	/// @param src
+	///	A VirtualClock to use as source, ownership transferred
+	///
+	InterruptableVirtualClock(VirtualClock* src)
+		:
+		_src(src),
+		_elapsed(0),
+		_offset(_src->elapsed()),
+		_paused(true)
+	{
+	}
+
+	/// Return elapsed time, taking interruptions in consideration
+	unsigned long int elapsed() const
+	{
+		if ( ! _paused ) // query source if not stopped
+			_elapsed = _src->elapsed()-_offset;
+		return _elapsed;
+	}
+
+	void restart()
+	{
+		_elapsed = 0;
+		_offset = _src->elapsed();
+	}
+
+	void pause()
+	{
+		if ( _paused ) return; // nothing to do
+		_paused = true;
+	}
+
+	void resume()
+	{
+		if ( ! _paused ) return; // nothing to do
+		_paused = false;
+
+		unsigned long now = _src->elapsed();
+		_offset = ( now - _elapsed );
+		assert( now-_offset == _elapsed ); // check if we did the right thing
+	}
+
+private:
+
+	std::auto_ptr<VirtualClock> _src;
+
+	mutable unsigned long int _elapsed;
+
+	unsigned long int _offset;
+
+	bool _paused;
+};
+
 
 } // namespace gnash
 
