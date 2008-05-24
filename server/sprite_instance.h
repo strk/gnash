@@ -608,10 +608,6 @@ public:
 	    on_event(event_id::LOAD_PROGRESS);
 	}
 
-	/// Call a method with a list of arguments
-	virtual const char* call_method_args(const char* method_name,
-		const char* method_arg_fmt, va_list args);
-
 	// inherited from character class, see dox in character.h
 	as_environment& get_environment() {
 		return m_as_environment;

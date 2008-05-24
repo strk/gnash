@@ -17,9 +17,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
 
 #include "action.h"
 #include "as_object.h"
@@ -34,17 +31,10 @@
 #include "StringPredicates.h"
 #include "namedStrings.h"
 
-
 #include <typeinfo>
 #include <string>
 #include <algorithm>
-
-using namespace gnash;
-using namespace SWF;
-
-#if defined(_WIN32) || defined(WIN32)
-#define snprintf _snprintf
-#endif // _WIN32
+#include <boost/format.hpp>
 
 
 namespace gnash {
@@ -53,8 +43,6 @@ namespace gnash {
 // action stuff
 //
 
-// Statics.
-bool	s_inited = false;
 
 void register_component(const std::string& name, as_c_function_ptr handler)
 {
@@ -92,12 +80,10 @@ call_method(
 		}
 		else
 		{
-			char buf[256];
-			snprintf(buf, 256, _("Attempt to call a value which is neither a C nor an ActionScript function (%s)"),
-				method.to_debug_string().c_str());
-			buf[255] = '\0';
-		
-			throw ActionTypeError(buf);
+			boost::format fmt =
+			            boost::format(_("Attempt to call a value which is neither a "
+			                            "C nor an ActionScript function (%s)")) % method;
+			throw ActionTypeError(fmt.str());
 		}
 	}
 	catch (ActionTypeError& e)
@@ -118,117 +104,6 @@ as_value	call_method0(
     as_object* this_ptr)
 {
     return call_method(method, env, this_ptr, 0, env->get_top_index() + 1);
-}
-
-// Printf-like vararg interface for calling ActionScript.
-// Handy for external binding.
-const char*	call_method_parsed(
-    as_environment* env,
-    as_object* this_ptr,
-    const char* method_name,
-    const char* method_arg_fmt,
-    va_list args)
-{
-    log_debug(_("FIXME(%d): %s"), __LINE__, __FUNCTION__);
-
-    // Parse va_list args
-    int	starting_index = env->get_top_index();
-    const char* p = method_arg_fmt;
-    for (;; p++)
-	{
-	    char	c = *p;
-	    if (c == 0)
-		{
-		    // End of args.
-		    break;
-		}
-	    else if (c == '%')
-		{
-		    p++;
-		    c = *p;
-		    // Here's an arg.
-		    if (c == 'd')
-			{
-			    // Integer.
-			    env->push(va_arg(args, int));
-			}
-		    else if (c == 'f')
-			{
-			    // Double
-			    env->push(va_arg(args, double));
-			}
-		    else if (c == 's')
-			{
-			    // String
-			    env->push(va_arg(args, const char *));
-			}
-		    else if (c == 'l')
-			{
-			    p++;
-			    c = *p;
-			    if (c == 's')
-				{
-				    // Wide string.
-				    env->push(va_arg(args, const wchar_t *));
-				}
-			    else
-				{
-				    log_error(_("call_method_parsed('%s','%s') -- invalid fmt '%%l%c'"),
-					      method_name,
-					      method_arg_fmt,
-					      c);
-				}
-			}
-		    else
-			{
-			    // Invalid fmt, warn.
-			    log_error(_("call_method_parsed('%s','%s') -- invalid fmt '%%%c'"),
-				      method_name,
-				      method_arg_fmt,
-				      c);
-			}
-		}
-	    else
-		{
-		    // Ignore whitespace and commas.
-		    if (c == ' ' || c == '\t' || c == ',')
-			{
-			    // OK
-			}
-		    else
-			{
-			    // Invalid arg; warn.
-			    log_error(_("call_method_parsed('%s','%s') -- invalid char '%c'"),
-				      method_name,
-				      method_arg_fmt,
-				      c);
-			}
-		}
-	}
-
-    as_value	method = env->get_variable(method_name);
-
-    // check method
-
-    // Reverse the order of pushed args
-    int	nargs = env->get_top_index() - starting_index;
-    for (int i = 0; i < (nargs >> 1); i++)
-	{
-	    int	i0 = starting_index + 1 + i;
-	    int	i1 = starting_index + nargs - i;
-	    assert(i0 < i1);
-
-	    std::swap(env->bottom(i0), env->bottom(i1));
-	}
-
-    // Do the call.
-    as_value	result = call_method(method, env, this_ptr, nargs, env->get_top_index());
-    env->drop(nargs);
-
-    // Return pointer to static string for return value.
-    static std::string	s_retval;
-    s_retval = result.to_string();
-    return s_retval.c_str();
 }
 
 

@@ -27,7 +27,6 @@
 
 #include <memory> // for auto_ptr
 #include <cctype>   // for poxy wchar_t
-#include <cstdarg>  // for va_list arg to sprite_instance::call_method_args()
 #include <string>   // for movie_definition* create_movie(std::auto_ptr<tu_file>
 				 	// in, const std::string& url);
 

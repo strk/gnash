@@ -30,9 +30,6 @@
 
 #include <cwchar>
 
-#ifdef __sgi
-	__SGI_LIBC_USING_FROM_STD(va_list) 
-#endif
 
 namespace gnash {
 	class sprite_instance;
@@ -42,13 +39,11 @@ namespace gnash {
 	class swf_function;
 
 
-	extern DSOEXPORT boost::intrusive_ptr<as_object> s_global;
-
 	class DSOLOCAL as_property_interface
 	{
 	public:
 		virtual ~as_property_interface() {}
-		virtual bool	set_property(int index, const as_value& val) = 0;
+		virtual bool set_property(int index, const as_value& val) = 0;
 	};
 
 	//
@@ -57,15 +52,6 @@ namespace gnash {
 
 	// Dispatching methods from C++.
 	as_value	call_method0(const as_value& method, as_environment* env, as_object* this_ptr);
-	as_value	call_method1(
-		const as_value& method, as_environment* env, as_object* this_ptr,
-		const as_value& arg0);
-	as_value	call_method2(
-		const as_value& method, as_environment* env, as_object* this_ptr,
-		const as_value& arg0, const as_value& arg1);
-	as_value	call_method3(
-		const as_value& method, as_environment* env, as_object* this_ptr,
-		const as_value& arg0, const as_value& arg1, const as_value& arg2);
 
 	/// Call a method, be it an as_function or a c_function. 
 	//
@@ -81,22 +67,6 @@ namespace gnash {
 		as_object* this_ptr, // this is ourself
 		int nargs, int first_arg_bottom_index, as_object* super=NULL);
 
-	const char*	call_method_parsed(
-		as_environment* env,
-		as_object* this_ptr,
-		const char* method_name,
-		const char* method_arg_fmt,
-		va_list args);
-
-	// tulrich: don't use this!  To register a class constructor,
-	// just assign the classname to the constructor function.  E.g.:
-	//
-	// my_movie->set_member("MyClass", as_value(MyClassConstructorFunction));
-	// 
-	//void register_as_object(const char* object_name, as_c_function_ptr handler);
-
-	// deprecated, use sprite_instance::loadMovie
-	//void attach_extern_movie(const char* c_url, const sprite_instance* target, const sprite_instance* root_movie);
 
 }	// end namespace gnash
 

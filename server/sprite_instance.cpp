@@ -4214,16 +4214,6 @@ sprite_instance::dump_character_tree(const std::string prefix) const
   m_display_list.dump_character_tree(prefix+" ");
 }
 
-const char*
-sprite_instance::call_method_args(const char* method_name,
-    const char* method_arg_fmt, va_list args)
-{
-    // Keep m_as_environment alive during any method calls!
-    boost::intrusive_ptr<as_object> this_ptr(this);
-
-    return call_method_parsed(&m_as_environment, this,
-    method_name, method_arg_fmt, args);
-}
 
 /// register characters as key listeners if they have clip key events defined.
 /// Don't call twice for the same chracter.

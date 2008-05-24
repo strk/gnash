@@ -280,7 +280,7 @@ movie_root::swapLevels(boost::intrusive_ptr<sprite_instance> movie, int depth)
 	log_debug("Before swapLevels (source depth %d, target depth %d) levels are: ", oldDepth, depth);
 	for (Levels::const_iterator i=_movies.begin(), e=_movies.end(); i!=e; ++i)
 	{
-		log_debug(" %d: %p (%s @ depth %d)", i->first, (void*)(i->second.get()), i->second->getTarget().c_str(), i->second->get_depth());
+		log_debug(" %d: %p (%s @ depth %d)", i->first, (void*)(i->second.get()), i->second->getTarget(), i->second->get_depth());
 	}
 #endif
 
@@ -288,7 +288,7 @@ movie_root::swapLevels(boost::intrusive_ptr<sprite_instance> movie, int depth)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("%s.swapDepth(%d): movie has a depth (%d) below static depth zone (%d), won't swap it's depth"),
-			movie->getTarget().c_str(), depth, oldDepth, character::staticDepthOffset);
+			movie->getTarget(), depth, oldDepth, character::staticDepthOffset);
 		);
 		return;
 	}
@@ -297,7 +297,7 @@ movie_root::swapLevels(boost::intrusive_ptr<sprite_instance> movie, int depth)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("%s.swapDepth(%d): movie has a depth (%d) below static depth zone (%d), won't swap it's depth"),
-			movie->getTarget().c_str(), depth, oldDepth, character::staticDepthOffset);
+			movie->getTarget(), depth, oldDepth, character::staticDepthOffset);
 		);
 		return;
 	}
@@ -307,7 +307,7 @@ movie_root::swapLevels(boost::intrusive_ptr<sprite_instance> movie, int depth)
 	if ( oldIt == _movies.end() )
 	{
 		log_debug("%s.swapDepth(%d): target depth (%d) contains no movie",
-			movie->getTarget().c_str(), depth, oldNum);
+			movie->getTarget(), depth, oldNum);
 		return;
 	}
 
@@ -331,7 +331,7 @@ movie_root::swapLevels(boost::intrusive_ptr<sprite_instance> movie, int depth)
 	log_debug("After swapLevels levels are: ");
 	for (Levels::const_iterator i=_movies.begin(), e=_movies.end(); i!=e; ++i)
 	{
-		log_debug(" %d: %p (%s @ depth %d)", i->first, (void*)(i->second.get()), i->second->getTarget().c_str(), i->second->get_depth());
+		log_debug(" %d: %p (%s @ depth %d)", i->first, (void*)(i->second.get()), i->second->getTarget(), i->second->get_depth());
 	}
 #endif
 	
@@ -378,7 +378,7 @@ movie_root::loadLevel(unsigned int num, const URL& url)
 	if (md == NULL)
 	{
 		log_error(_("can't create movie_definition for %s"),
-			url.str().c_str());
+			url.str());
 		return false;
 	}
 
@@ -387,7 +387,7 @@ movie_root::loadLevel(unsigned int num, const URL& url)
 	if (extern_movie == NULL)
 	{
 		log_error(_("can't create extern movie_instance "
-			"for %s"), url.str().c_str());
+			"for %s"), url.str());
 		return false;
 	}
 
@@ -546,7 +546,7 @@ movie_root::getMouseObject()
 		std::string objName = PROPNAME("Mouse");
 		if (global->get_member(vm.getStringTable().find(objName), &val) )
 		{
-			//log_debug("Found member 'Mouse' in _global: %s", val.to_debug_string().c_str());
+			//log_debug("Found member 'Mouse' in _global: %s", val.to_debug_string());
 			_mouseobject = val.to_object();
 		}
 	}
@@ -1126,28 +1126,6 @@ movie_root::display()
 }
 
 
-const char*
-movie_root::call_method(const char* method_name,
-		const char* method_arg_fmt, ...)
-{
-	assert(testInvariant());
-
-	va_list	args;
-	va_start(args, method_arg_fmt);
-	const char* result = getRootMovie()->call_method_args(method_name,
-		method_arg_fmt, args);
-	va_end(args);
-
-	return result;
-}
-
-const
-char* movie_root::call_method_args(const char* method_name,
-		const char* method_arg_fmt, va_list args)
-{
-	assert(testInvariant());
-	return getRootMovie()->call_method_args(method_name, method_arg_fmt, args);
-}
 
 void movie_root::cleanupUnloadedListeners(CharacterList& ll)
 {
@@ -1262,7 +1240,7 @@ void
 movie_root::notify_mouse_listeners(const event_id& event)
 {
 	//log_debug("Notifying %d listeners about %s",
-	//		m_mouse_listeners.size(), event.get_function_name().c_str());
+	//		m_mouse_listeners.size(), event.get_function_name());
 
 	CharacterList copy = m_mouse_listeners;
 	for (CharacterList::iterator iter = copy.begin(), itEnd=copy.end();
@@ -1620,7 +1598,7 @@ movie_root::pushAction(const action_buffer& buf, boost::intrusive_ptr<character>
 {
 	assert(lvl >= 0 && lvl < apSIZE);
 #ifdef GNASH_DEBUG
-	log_debug("Pushed action buffer for target %s", target->getTargetPath().c_str());
+	log_debug("Pushed action buffer for target %s", target->getTargetPath());
 #endif
 
 	std::auto_ptr<ExecutableCode> code ( new GlobalCode(buf, target) );
@@ -1644,7 +1622,7 @@ movie_root::pushAction(boost::intrusive_ptr<as_function> func, boost::intrusive_
 {
 	assert(lvl >= 0 && lvl < apSIZE);
 #ifdef GNASH_DEBUG
-	log_debug("Pushed function (event hanlder?) with target %s", target->getTargetPath().c_str());
+	log_debug("Pushed function (event hanlder?) with target %s", target->getTargetPath());
 #endif
 
 	std::auto_ptr<ExecutableCode> code ( new FunctionCode(func, target) );
@@ -1938,13 +1916,13 @@ movie_root::advanceLiveChar(boost::intrusive_ptr<character> ch)
 	if ( ! ch->isUnloaded() )
 	{
 #ifdef GNASH_DEBUG
-		log_debug("    advancing character %s", ch->getTarget().c_str());
+		log_debug("    advancing character %s", ch->getTarget());
 #endif
 		ch->advance();
 	}
 #ifdef GNASH_DEBUG
 	else {
-		log_debug("    character %s is unloaded, not advancing it", ch->getTarget().c_str());
+		log_debug("    character %s is unloaded, not advancing it", ch->getTarget());
 	}
 #endif
 }
@@ -2013,7 +1991,7 @@ movie_root::findCharacterByTarget(const std::string& tgtstr_orig) const
 		if ( ! o ) {
 #ifdef GNASH_DEBUG_TARGET_RESOLUTION
 			log_debug("Evaluating character target path: element '%s' of path '%s' not found",
-				part.c_str(), tgtstr.c_str());
+				part, tgtstr);
 #endif
 			return NULL;
 		}
@@ -2026,7 +2004,7 @@ movie_root::findCharacterByTarget(const std::string& tgtstr_orig) const
 void
 movie_root::loadMovie(const URL& url, const std::string& target, const std::string* postdata)
 {
-    log_debug("movie_root::loadMovie(%s, %s)", url.str().c_str(), target.c_str());
+    log_debug("movie_root::loadMovie(%s, %s)", url.str(), target);
     _loadMovieRequests.push_front(LoadMovieRequest(url, target, postdata));
 }
 
@@ -2049,14 +2027,14 @@ movie_root::processLoadMovieRequest(const LoadMovieRequest& r)
     character* ch = findCharacterByTarget(target);
     if ( ! ch )
     {
-        log_debug("Target %s of a loadMovie request doesn't exist at processing time", target.c_str());
+        log_debug("Target %s of a loadMovie request doesn't exist at processing time", target);
         return;
     }
 
     sprite_instance* sp = ch->to_movie();
     if ( ! sp )
     {
-        log_unimpl("loadMovie against a %s character", typeName(*ch).c_str());
+        log_unimpl("loadMovie against a %s character", typeName(*ch));
         return;
     }
 

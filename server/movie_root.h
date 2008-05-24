@@ -69,6 +69,7 @@
 #include "gnashconfig.h" //USE_SWFTREE
 #endif
 
+
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "dsodefs.h" // DSOEXPORT
 #include "mouse_button_state.h" // for composition
@@ -395,23 +396,6 @@ public:
 	getRootMovie()->set_play_state(s);
     }
 
-    /// For ActionScript interfacing convenience.
-    //
-    /// TODO: check if we really  need this. I guess we might
-    ///       need for fscommand:, but we lack documentation
-    ///       about where to find the method (which level?)
-    ///
-    const char* call_method(const char* method_name,
-            const char* method_arg_fmt, ...);
-
-    /// For ActionScript interfacing convenience.
-    //
-    /// TODO: check if we really  need this. I guess we might
-    ///       need for fscommand:, but we lack documentation
-    ///       about where to find the method (which level?)
-    ///
-    const char* call_method_args(const char* method_name,
-            const char* method_arg_fmt, va_list args);
 
     void * get_userdata() { return m_userdata; }
     void set_userdata(void * ud ) { m_userdata = ud;  }

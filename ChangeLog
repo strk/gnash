@@ -1,3 +1,15 @@
+2008-05-24 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/vm/action.{cpp,h}: drop unused call_method{1,2,3,4} and
+	  va_list call_method_parsed. Drop unused variables. Replace snprintf
+	  (error message) with boost::format (speed shouldn't be an issue
+	  here).
+	* server/sprite_instance.{cpp,h}: drop virtual call_method_args
+	  (va_list method).
+	* server/movie_instance.{h,cpp}: drop call_method_args and unused
+	  call_method (the only caller of call_method_args).
+	* server/gnash.h: drop <cstdarg> include.
+
 2008-05-24  Rob Savoye  <rob@ute.welcomehome.org>
 
 	* libnet/rtmp_server.cpp: Use swapBytes() instead of ntohl(), so
