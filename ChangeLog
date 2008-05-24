@@ -1,3 +1,8 @@
+2008-05-24  Rob Savoye  <rob@ute.welcomehome.org>
+
+	* libnet/rtmp_server.cpp: Use swapBytes() instead of ntohl(), so
+	mingw32 is happy.
+
 2008-05-24 Sandro Santilli <strk@keybit.net>
 
 	* server/VirtualClock.h: add interruptable wrapper for VirtualClocks.

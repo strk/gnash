@@ -626,7 +626,7 @@ RTMPServer::encodePing(rtmp_ping_e type, boost::uint32_t milliseconds)
     boost::uint16_t typefield = *reinterpret_cast<boost::uint16_t *>(&type);
     ptr += sizeof(boost::uint16_t); // go past the first short
 
-//    boost::uint32_t swapped = 0;
+    boost::uint32_t swapped = 0;
     swapBytes(&typefield, sizeof(boost::uint16_t));
     buf->copy(typefield);
     switch (type) {
@@ -638,8 +638,9 @@ RTMPServer::encodePing(rtmp_ping_e type, boost::uint32_t milliseconds)
       case PING_TIME:
       {
 	  ptr += sizeof(boost::uint16_t); // go past the second short
-//	  swapped = htonl(milliseconds);
-	  buf->append(htonl(milliseconds));
+	  swapped = milliseconds;
+	  swapBytes(&swapped, sizeof(boost::uint32_t));
+	  buf->append(swapped);
 	  break;
       }
       // reset doesn't have any parameters
@@ -650,7 +651,9 @@ RTMPServer::encodePing(rtmp_ping_e type, boost::uint32_t milliseconds)
       case PONG_CLIENT:
       {
 //	  swapped = htonl(milliseconds);
-	  buf->append(htonl(milliseconds));
+	  swapped = milliseconds;
+	  swapBytes(&swapped, sizeof(boost::uint32_t));
+	  buf->append(swapped);
 	  break;
       }
       default:
