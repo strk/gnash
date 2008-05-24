@@ -314,6 +314,8 @@ private:
 	// Time of when pause started, in seconds since VM started
 	volatile boost::uint64_t m_time_of_pause;
 
+	bool m_start_onbuffer;
+
 	// Decoder buffer
 	boost::uint8_t* _decoderBuffer;
 

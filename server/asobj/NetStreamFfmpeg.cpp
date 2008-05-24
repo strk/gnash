@@ -85,6 +85,7 @@ NetStreamFfmpeg::NetStreamFfmpeg():
 	m_current_timestamp(0),
 	m_unqueued_data(NULL),
 	m_time_of_pause(0),
+	m_start_onbuffer(false),
 
 	_decoderBuffer(0),
 	_soundHandler(get_sound_handler())

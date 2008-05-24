@@ -1,3 +1,11 @@
+2008-05-24 Sandro Santilli <strk@keybit.net>
+
+	* libbase/FLVParser.{cpp,h}: re-add nextMediaFrame as it's still
+	  used by current NetStreamFfmpeg.
+	* server/asobj/NetStreamFfmpeg.{cpp,h}: re-add m_start_onbuffer, still
+	  used by current NetStreamFfmpeg.
+	  Fixes bug #23346.
+
 2008-05-24 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/matrix.cpp: Use std::max instead of fmax to fix build on BSD

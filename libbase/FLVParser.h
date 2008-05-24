@@ -210,6 +210,12 @@ public:
 	/// Kills the parser...
 	~FLVParser();
 
+	/// Return next media frame
+	//
+	/// Locks the _mutex
+	///
+	FLVFrame* nextMediaFrame();
+
 	/// \brief
 	/// Return the next audio frame info in the parsed buffer.
 	//

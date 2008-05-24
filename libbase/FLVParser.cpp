@@ -696,6 +696,69 @@ FLVParser::getBytesTotal() const
 	return _lt.get_size();
 }
 
+FLVFrame* FLVParser::nextMediaFrame()
+{
+	boost::uint32_t video_size = _videoFrames.size();
+	boost::uint32_t audio_size = _audioFrames.size();
+
+	if (audio_size <= _nextAudioFrame && video_size <= _nextVideoFrame)
+	{
+
+		// Parse a media frame if any left or if needed
+		while(_videoFrames.size() <= _nextVideoFrame && _audioFrames.size() <= _nextAudioFrame && !_parsingComplete) {
+			if (!parseNextTag()) break;
+		}
+	}
+
+	// Find the next frame in the file
+	bool audioReady = _audioFrames.size() > _nextAudioFrame;
+	bool videoReady = _videoFrames.size() > _nextVideoFrame;
+	bool useAudio = false;
+
+	if (audioReady && videoReady) {
+		useAudio = _audioFrames[_nextAudioFrame]->dataPosition < _videoFrames[_nextVideoFrame]->dataPosition;
+	} else if (!audioReady && videoReady) {
+		useAudio = false;
+	} else if (audioReady && !videoReady) {
+		useAudio = true;
+	} else {
+		// If no frames are next we have reached EOF
+		return NULL;
+	}
+
+	// Find the next frame in the file a return it
+
+	if (useAudio) {
+
+		FLVAudioFrameInfo* frameInfo = _audioFrames[_nextAudioFrame];
+
+		std::auto_ptr<FLVFrame> frame = makeAudioFrame(_lt, *frameInfo);
+		if ( ! frame.get() )
+		{
+			log_error("Could not make audio frame %d", _nextAudioFrame);
+			return 0;
+		}
+
+		_nextAudioFrame++;
+		return frame.release(); // TODO: return by auto_ptr
+
+	} else {
+
+		FLVVideoFrameInfo* frameInfo = _videoFrames[_nextVideoFrame];
+		std::auto_ptr<FLVFrame> frame = makeVideoFrame(_lt, *frameInfo);
+		if ( ! frame.get() )
+		{
+			log_error("Could not make video frame %d", _nextVideoFrame);
+			return 0;
+		}
+
+		_nextVideoFrame++;
+		return frame.release(); // TODO: return by auto_ptr
+	}
+
+
+}
+
 } // end of gnash namespace
 
 #undef PADDING_BYTES
