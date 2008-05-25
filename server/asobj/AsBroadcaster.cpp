@@ -159,7 +159,7 @@ AsBroadcaster::initialize_method(const fn_call& fn)
 	if ( ! tgtval.is_object() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("AsBroadcaster.initialize(%s): first arg is not an object"), tgtval.to_debug_string().c_str()); 
+		log_aserror(_("AsBroadcaster.initialize(%s): first arg is not an object"), tgtval); 
 		);
 		return as_value();
 	}
@@ -168,7 +168,7 @@ AsBroadcaster::initialize_method(const fn_call& fn)
 
 	AsBroadcaster::initialize(*tgt);
 
-	//log_debug("AsBroadcaster.initialize(%s): TESTING", tgtval.to_debug_string().c_str());
+	//log_debug("AsBroadcaster.initialize(%s): TESTING", tgtval);
 
 	return as_value();
 }
@@ -194,7 +194,7 @@ AsBroadcaster::addListener_method(const fn_call& fn)
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("%p.addListener(%s): this object has no _listeners member"),
 			(void*)fn.this_ptr.get(),
-			fn.dump_args().c_str());
+			fn.dump_args());
 		);
 		return as_value(true); // odd, but seems the case..
 	}
@@ -205,7 +205,7 @@ AsBroadcaster::addListener_method(const fn_call& fn)
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("%p.addListener(%s): this object's _listener isn't an object: %s"),
 			(void*)fn.this_ptr.get(),
-			fn.dump_args().c_str(), listenersValue.to_debug_string().c_str());
+			fn.dump_args(), listenersValue);
 		);
 		return as_value(false); // TODO: check this
 	}
@@ -219,7 +219,7 @@ AsBroadcaster::addListener_method(const fn_call& fn)
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("%p.addListener(%s): this object's _listener isn't an array: %s -- will call 'push' on it anyway"),
 			(void*)fn.this_ptr.get(),
-			fn.dump_args().c_str(), listenersValue.to_debug_string().c_str());
+			fn.dump_args(), listenersValue);
 		);
 
 		listenersObj->callMethod(NSV::PROP_PUSH, newListener);
@@ -230,7 +230,7 @@ AsBroadcaster::addListener_method(const fn_call& fn)
 		listeners->push(newListener);
 	}
 
-	//log_debug("%p.addListener(%s) TESTING", (void*)fn.this_ptr.get(), fn.dump_args().c_str());
+	//log_debug("%p.addListener(%s) TESTING", (void*)fn.this_ptr.get(), fn.dump_args());
 	return as_value(true);
 
 }
@@ -251,7 +251,7 @@ AsBroadcaster::removeListener_method(const fn_call& fn)
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("%p.addListener(%s): this object has no _listeners member"),
 			(void*)fn.this_ptr.get(),
-			fn.dump_args().c_str());
+			fn.dump_args());
 		);
 		return as_value(false); // TODO: check this
 	}
@@ -262,7 +262,7 @@ AsBroadcaster::removeListener_method(const fn_call& fn)
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("%p.addListener(%s): this object's _listener isn't an object: %s"),
 			(void*)fn.this_ptr.get(),
-			fn.dump_args().c_str(), listenersValue.to_debug_string().c_str());
+			fn.dump_args(), listenersValue);
 		);
 		return as_value(false); // TODO: check this
 	}
@@ -279,7 +279,7 @@ AsBroadcaster::removeListener_method(const fn_call& fn)
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("%p.addListener(%s): this object's _listener isn't an array: %s"),
 			(void*)fn.this_ptr.get(),
-			fn.dump_args().c_str(), listenersValue.to_debug_string().c_str());
+			fn.dump_args(), listenersValue);
 		);
 
 		// TODO: implement brute force scan of pseudo-array
@@ -325,7 +325,7 @@ AsBroadcaster::broadcastMessage_method(const fn_call& fn)
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("%p.addListener(%s): this object has no _listeners member"),
 			(void*)fn.this_ptr.get(),
-			fn.dump_args().c_str());
+			fn.dump_args());
 		);
 		return as_value(); // TODO: check this
 	}
@@ -336,7 +336,7 @@ AsBroadcaster::broadcastMessage_method(const fn_call& fn)
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("%p.addListener(%s): this object's _listener isn't an object: %s"),
 			(void*)fn.this_ptr.get(),
-			fn.dump_args().c_str(), listenersValue.to_debug_string().c_str());
+			fn.dump_args(), listenersValue);
 		);
 		return as_value(); // TODO: check this
 	}
@@ -347,7 +347,7 @@ AsBroadcaster::broadcastMessage_method(const fn_call& fn)
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("%p.addListener(%s): this object's _listener isn't an array: %s"),
 			(void*)fn.this_ptr.get(),
-			fn.dump_args().c_str(), listenersValue.to_debug_string().c_str());
+			fn.dump_args(), listenersValue);
 		);
 		return as_value(); // TODO: check this
 	}

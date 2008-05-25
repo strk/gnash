@@ -489,8 +489,7 @@ string_index_of(const fn_call& fn)
 		if ( start_arg < 0 )
 		{
 			log_aserror("String.indexOf(%s, %s): second argument casts to invalid offset (%d)",
-				tfarg.to_debug_string().c_str(),
-				saval.to_debug_string().c_str(), start_arg);
+				tfarg, saval, start_arg);
 		}
 		);
 	}
@@ -726,7 +725,7 @@ init_string_instance(const char* val)
 		else if ( ! clval.is_function() )
 		{
 			log_debug("UNTESTED: String instantiation requested but _global.String is not a function (%s). Returning the NULL object.",
-				clval.to_debug_string().c_str());
+				clval);
 			return cl;
 			//cl = getStringConstructor();
 		}

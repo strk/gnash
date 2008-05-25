@@ -127,7 +127,7 @@ video_attach(const fn_call& fn)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("attachVideo(%s) first arg is not a NetStream instance"),
-			fn.arg(0).to_debug_string().c_str());
+			fn.arg(0));
 		);
 	}
 	return as_value();

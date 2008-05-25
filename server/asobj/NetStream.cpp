@@ -109,7 +109,7 @@ netstream_new(const fn_call& fn)
 				log_aserror(_("First argument "
 					"to NetStream constructor "
 					"doesn't cast to a NetConnection (%s)"),
-					fn.arg(0).to_debug_string().c_str());
+					fn.arg(0));
 			);
 		}
 	}
@@ -154,7 +154,7 @@ static as_value netstream_play(const fn_call& fn)
 	if ( ! ns->isConnected() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("NetStream.play(%s): stream is not connected"), fn.arg(0).to_debug_string().c_str());
+		log_aserror(_("NetStream.play(%s): stream is not connected"), fn.arg(0));
 		);
 		return as_value();
 	}

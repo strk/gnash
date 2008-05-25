@@ -259,7 +259,9 @@ public:
 	///
 	std::string to_string() const;
 
-	std::string to_debug_string() const;
+    // Used for operator<< to give useful information about an
+    // as_value object.
+	std::string toDebugString() const;
 
 	/// Get a string representation for this value.
 	//
@@ -767,7 +769,7 @@ private:
 typedef as_value (*as_c_function_ptr)(const fn_call& fn);
 
 inline std::ostream& operator<< (std::ostream& os, const as_value& v) {
-	return os << v.to_debug_string();
+	return os << v.toDebugString();
 }
 
 } // namespace gnash

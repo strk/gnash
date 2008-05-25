@@ -403,7 +403,7 @@ character::alpha_getset(const fn_call& fn)
 			log_aserror(_("Ignored attempt to set %s.%s=%s"),
 				ptr->getTarget(),
 				_("_alpha"), // trying to reuse translations
-				fn.arg(0).to_debug_string());
+				fn.arg(0));
 			);
 			return rv;
 		}

@@ -1143,7 +1143,7 @@ edit_text_character::get_member(string_table::key name, as_value* val,
 	{
 		val->set_double(TWIPS_TO_PIXELS(get_width()));
 #ifdef GNASH_DEBUG_TEXTFIELDS
-		log_debug("Got TextField width == %s", val->to_debug_string());
+		log_debug("Got TextField width == %s", *val);
 #endif // GNASH_DEBUG_TEXTFIELDS
 		return true;
 	}
@@ -1151,7 +1151,7 @@ edit_text_character::get_member(string_table::key name, as_value* val,
 	{
 		val->set_double(TWIPS_TO_PIXELS(get_height()));
 #ifdef GNASH_DEBUG_TEXTFIELDS
-		log_debug("Got TextField height == %s", val->to_debug_string());
+		log_debug("Got TextField height == %s", *val);
 #endif // GNASH_DEBUG_TEXTFIELDS
 		return true;
 	}
@@ -1750,7 +1750,7 @@ edit_text_character::registerTextVariable()
 #ifdef DEBUG_DYNTEXT_VARIABLES
 		log_debug(_("target sprite (%s @ %p) does NOT have a member named %s (no problem, we'll add it with value %s)"),
 			typeName(*target), (void*)target, _vm.getStringTable().value(key),
-			newVal.to_debug_string());
+			newVal);
 #endif
 		target->set_member(key, newVal);
 	}
@@ -2370,7 +2370,7 @@ textfield_type_getset(const fn_call& fn)
 	as_value& arg = fn.arg(0);
 	std::string strval = arg.to_string();
 	edit_text_character::TypeValue val = ptr->parseTypeValue(strval);
-	//log_debug("setting %s.type : %s (toString->%s) => %d", ptr->getTarget(), arg.to_debug_string(), strval, val);
+	//log_debug("setting %s.type : %s (toString->%s) => %d", ptr->getTarget(), arg, strval, val);
 	IF_VERBOSE_ASCODING_ERRORS(
 	if ( val == edit_text_character::typeInvalid )
 	{

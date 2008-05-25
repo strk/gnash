@@ -82,7 +82,7 @@ as_environment::get_variable(const std::string& varname,
             if ( ! tmp.is_undefined() )
             {
                 log_aserror(_("...but get_variable_raw(%s, <scopeStack>) succeeded (%s)!"),
-                    path.c_str(), tmp.to_debug_string().c_str());
+                    path.c_str(), tmp);
             }
             );
             return as_value(); // TODO: should we check get_variable_raw ?
@@ -282,14 +282,14 @@ as_environment::set_variable(
 {
 	IF_VERBOSE_ACTION (
     log_action("-------------- %s = %s",
-	       varname.c_str(), val.to_debug_string().c_str());
+	       varname.c_str(), val);
 	);
 
     // Path lookup rigamarole.
     as_object* target = m_target;
     std::string	path;
     std::string	var;
-    //log_debug(_("set_variable(%s, %s)"), varname.c_str(), val.to_debug_string().c_str());
+    //log_debug(_("set_variable(%s, %s)"), varname.c_str(), val);
     if ( parse_path(varname, path, var) )
     {
     	//log_debug(_("Variable '%s' parsed into path='%s', var='%s'"), varname.c_str(), path.c_str(), var.c_str());
@@ -303,7 +303,7 @@ as_environment::set_variable(
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("Path target '%s' not found while setting %s=%s"),
-			path.c_str(), varname.c_str(), val.to_debug_string().c_str());
+			path.c_str(), varname.c_str(), val);
 		);
 	}
     } else {
@@ -764,7 +764,7 @@ dump(const as_environment::LocalVars& locals, std::ostream& out)
 	{
 		if (count++) out << ", ";
 		// TODO: define output operator for as_value !
-		out << i->first << "==" << i->second.to_debug_string();
+		out << i->first << "==" << i->second;
 	}
 	out << std::endl;
 }
@@ -803,7 +803,7 @@ as_environment::dump_global_registers(std::ostream& out) const
 
 		if ( defined++ ) ss <<  ", ";
 
-		ss << i << ":" << m_global_register[i].to_debug_string();
+		ss << i << ":" << m_global_register[i];
 
 	}
 	if ( defined ) out << ss.str() << std::endl;

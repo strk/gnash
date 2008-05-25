@@ -81,7 +81,7 @@ public:
 	virtual bool get_member(string_table::key name, as_value* val,
 		string_table::key nsname = 0)
 	{
-		//log_debug("as_super::get_member %s called - _proto is %p", getVM().getStringTable().value(name).c_str(), _proto);
+		//log_debug("as_super::get_member %s called - _proto is %p", getVM().getStringTable().value(name), _proto);
 		if ( _proto ) return _proto->get_member(name, val, nsname);
 		log_debug("Super has no associated prototype");
 		return false;
@@ -145,7 +145,7 @@ public:
 	void operator() (string_table::key name, const as_value& val)
 	{
 		if (name == NSV::PROP_uuPROTOuu) return;
-		//log_debug(_("Setting member '%s' to value '%s'"), name.c_str(), val.to_debug_string().c_str());
+		//log_debug(_("Setting member '%s' to value '%s'"), name, val);
 		_tgt.set_member(name, val);
 	}
 };
@@ -186,7 +186,7 @@ as_object::add_property(const std::string& name, as_function& getter,
 		{
 			Trigger& trig = trigIter->second;
 
-			log_debug("add_property: property %s is being watched, current val: %s", name, cacheVal.to_debug_string());
+			log_debug("add_property: property %s is being watched, current val: %s", name, cacheVal);
 			cacheVal = trig.call(cacheVal, as_value(), *this);
 
 			// The trigger call could have deleted the property,
@@ -309,7 +309,7 @@ as_object::get_super()
 	as_object *proto = protoval.to_object().get();
 	if (!proto)
 	{
-		log_debug("This object's (%s @ %p) 'prototype' member is not an object (%s) - get_super returns NULL", typeName(*this), (void*)this, protoval.to_debug_string());
+		log_debug("This object's (%s @ %p) 'prototype' member is not an object (%s) - get_super returns NULL", typeName(*this), (void*)this, protoval);
 		getting = false;
 		return NULL;
 	}
@@ -395,7 +395,7 @@ as_object::get_constructor()
 		//log_debug("Object %p has no __constructor__ member");
 		return NULL;
 	}
-	//log_debug("%p.__constructor__ is %s", ctorVal.to_debug_string().c_str());
+	//log_debug("%p.__constructor__ is %s", ctorVal);
 	return ctorVal.to_as_function();
 }
 
@@ -545,7 +545,7 @@ bool
 as_object::set_member_default(string_table::key key, const as_value& val,
 	string_table::key nsname, bool ifFound)
 {
-	//log_debug(_("set_member_default(%s)"), key.c_str());
+	//log_debug(_("set_member_default(%s)"), key);
 	Property* prop = findUpdatableProperty(key, nsname);
 	if (prop)
 	{
@@ -553,7 +553,7 @@ as_object::set_member_default(string_table::key key, const as_value& val,
 		{
 			IF_VERBOSE_ASCODING_ERRORS(log_aserror(_(""
 				"Attempt to set read-only property '%s'"),
-				_vm.getStringTable().value(key).c_str()););
+				_vm.getStringTable().value(key)););
 			return true;
 		}
 
@@ -572,7 +572,7 @@ as_object::set_member_default(string_table::key key, const as_value& val,
 				as_value curVal = prop->getCache(); // getValue(*this); 
 
 				log_debug("Existing property %s is being watched: firing trigger on update (current val:%s, new val:%s)",
-					_vm.getStringTable().value(key), curVal.to_debug_string(), val.to_debug_string());
+					_vm.getStringTable().value(key), curVal, val);
 				as_value newVal = trig.call(curVal, val, *this);
 				// The trigger call could have deleted the property,
 				// so we check for its existance again, and do NOT put
@@ -598,7 +598,7 @@ as_object::set_member_default(string_table::key key, const as_value& val,
 		catch (ActionTypeError& exc)
 		{
 			log_aserror(_("%s: Exception %s. Will create a new member"),
-				_vm.getStringTable().value(key).c_str(), exc.what());
+				_vm.getStringTable().value(key), exc.what());
 		}
 
 		return true;
@@ -612,8 +612,8 @@ as_object::set_member_default(string_table::key key, const as_value& val,
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 			log_aserror(_("Unknown failure in setting property '%s' on "
-			"object '%p'"), _vm.getStringTable().value(key).c_str(),
-			(void*) this););
+			"object '%p'"), _vm.getStringTable().value(key), (void*) this);
+	    );
 		return false;
 	}
 
@@ -656,7 +656,7 @@ as_object::update_member(string_table::key key, const as_value& val,
 {
 	std::pair<bool,bool> ret; // first is found, second is updated
 
-	//log_debug(_("set_member_default(%s)"), key.c_str());
+	//log_debug(_("set_member_default(%s)"), key);
 	Property* prop = findUpdatableProperty(key, nsname);
 	if (prop)
 	{
@@ -664,7 +664,7 @@ as_object::update_member(string_table::key key, const as_value& val,
 		{
 			IF_VERBOSE_ASCODING_ERRORS(log_aserror(_(""
 				"Attempt to set read-only property '%s'"),
-				_vm.getStringTable().value(key).c_str()););
+				_vm.getStringTable().value(key)););
 			return std::make_pair(true, false);
 		}
 
@@ -682,7 +682,7 @@ as_object::update_member(string_table::key key, const as_value& val,
 				as_value curVal = prop->getCache(); // Value(*this); 
 				log_debug("Property %s is being watched: firing trigger on update (current val:%s, new val:%s",
 					_vm.getStringTable().value(key),
-					curVal.to_debug_string(), val.to_debug_string());
+					curVal, val);
 				newVal = trig.call(curVal, val, *this);
 				// The trigger call could have deleted the property,
 				// so we check for its existance again, and do NOT put
@@ -700,7 +700,7 @@ as_object::update_member(string_table::key key, const as_value& val,
 		catch (ActionTypeError& exc)
 		{
 			log_debug(_("%s: Exception %s. Will create a new member"),
-				_vm.getStringTable().value(key).c_str(), exc.what());
+				_vm.getStringTable().value(key), exc.what());
 		}
 
 		return std::make_pair(true, false);
@@ -721,7 +721,7 @@ void
 as_object::init_member(string_table::key key, const as_value& val, int flags,
 	string_table::key nsname, int order)
 {
-	//log_debug(_("Initializing member %s for object %p"), _vm.getStringTable().value(key).c_str(), (void*) this);
+	//log_debug(_("Initializing member %s for object %p"), _vm.getStringTable().value(key), (void*) this);
 
 	if (order >= 0 && !_members.
 		reserveSlot(static_cast<unsigned short>(order), key, nsname))
@@ -736,7 +736,7 @@ as_object::init_member(string_table::key key, const as_value& val, int flags,
 	{
 		log_error(_("Attempt to initialize read-only property ``%s''"
 			" on object ``%p'' twice"),
-			_vm.getStringTable().value(key).c_str(), (void*)this);
+			_vm.getStringTable().value(key), (void*)this);
 		// We shouldn't attempt to initialize a member twice, should we ?
 		abort();
 	}
@@ -762,7 +762,7 @@ as_object::init_property(string_table::key key, as_function& getter,
 	// We shouldn't attempt to initialize a property twice, should we ?
 	assert(success);
 
-	//log_debug(_("Initialized property '%s'"), name.c_str());
+	//log_debug(_("Initialized property '%s'"), name);
 
 	// TODO: optimize this, don't scan again !
 	//_members.setFlags(key, flags, nsname);
@@ -787,7 +787,7 @@ as_object::init_property(string_table::key key, as_c_function_ptr getter,
 	// We shouldn't attempt to initialize a property twice, should we ?
 	assert(success);
 
-	//log_debug(_("Initialized property '%s'"), name.c_str());
+	//log_debug(_("Initialized property '%s'"), name);
 
 	// TODO: optimize this, don't scan again !
 	_members.setFlags(key, flags, nsname);
@@ -900,7 +900,7 @@ as_object::instanceOf(as_object* ctor)
 	{
 #ifdef GNASH_DEBUG_INSTANCE_OF
 		log_debug("Object %p can't be an instance of an object (%p) with non-object 'prototype' (%s)",
-			(void*)this, (void*)ctor, protoVal.to_debug_string());
+			(void*)this, (void*)ctor, protoVal);
 #endif
 		return false;
 	}
@@ -1027,8 +1027,7 @@ as_object::setPropFlags(const as_value& props_val, int set_false, int set_true)
 				IF_VERBOSE_ASCODING_ERRORS(
 				log_aserror(_("Can't set propflags on object "
 					"property %s "
-					"(either not found or protected)"),
-					prop.c_str());
+					"(either not found or protected)"),	prop);
 				);
 			}
 
@@ -1076,7 +1075,7 @@ as_object::setPropFlags(const as_value& props_val, int set_false, int set_true)
 		log_aserror(_("Invalid call to AsSetPropFlags: "
 			"invalid second argument %s "
 			"(expected string, null or an array)"),
-			props_val.to_debug_string().c_str());
+			props_val);
 		);
 		return;
 	}
@@ -1224,7 +1223,7 @@ as_object::get_prototype()
 		//log_debug("Object %p has no __proto__ member");
 		return NULL;
 	}
-	//log_debug("%p.__proto__ is %s", val.to_debug_string().c_str());
+	//log_debug("%p.__proto__ is %s", val);
 	return val.to_object().get();
 #else
 	static string_table::key key = NSV::PROP_uuPROTOuu;
@@ -1413,8 +1412,7 @@ as_object::get_path_element(string_table::key key)
 	{
 #ifdef DEBUG_TARGET_FINDING 
 		log_debug("Member %s not found in object %p",
-			_vm.getStringTable().value(key).c_str(),
-			(void*)this);
+			_vm.getStringTable().value(key), (void*)this);
 #endif
 		return NULL;
 	}
@@ -1422,8 +1420,7 @@ as_object::get_path_element(string_table::key key)
 	{
 #ifdef DEBUG_TARGET_FINDING 
 		log_debug("Member %s of object %p is not an object (%s)",
-			_vm.getStringTable().value(key).c_str(), (void*)this,
-			tmp.to_debug_string().c_str());
+			_vm.getStringTable().value(key), (void*)this, tmp);
 #endif
 		return NULL;
 	}

@@ -215,7 +215,7 @@ number_as_object::toString_method(const fn_call& fn)
 			IF_VERBOSE_ASCODING_ERRORS(
 			log_aserror(_("Number.toString(%s): "
 				"radix must be in the 2..36 range (%d is invalid)"),
-				fn.arg(0).to_debug_string().c_str(), userRadix)
+				fn.arg(0), userRadix)
 			)
 		}
 

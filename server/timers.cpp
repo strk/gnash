@@ -171,7 +171,7 @@ Timer::execute()
     for ( ArgsContainer::reverse_iterator it=_args.rbegin(), itEnd=_args.rend();
 		    it != itEnd; ++it )
     {
-	    //log_debug("Env-pushing %s", it->to_debug_string().c_str());
+	    //log_debug("Env-pushing %s", *it);
 	    env.push(*it);
     }
 

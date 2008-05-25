@@ -139,7 +139,7 @@ public:
 		for (unsigned int i=0; i<nargs; ++i)
 		{
 			if ( i ) os << ", ";
-			os << arg(i).to_debug_string();
+			os << arg(i).toDebugString();
 		}
 	}
 

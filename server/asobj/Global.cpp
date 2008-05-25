@@ -543,7 +543,7 @@ as_global_assetpropflags(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Invalid call to ASSetPropFlags: "
             "first argument is not an object: %s"),
-            fn.arg(0).to_debug_string());
+            fn.arg(0));
         );
         return as_value();
     }

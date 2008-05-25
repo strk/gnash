@@ -576,7 +576,7 @@ Debugger::dumpStackFrame(as_environment &env)
 // 		    cerr << name << " ";
 // 		}
 // 	    }
-            cerr << env.m_stack[i].to_debug_string();
+            cerr << env.m_stack[i];
 	    if (val.is_object()) {
 		boost::intrusive_ptr<as_object> o = val.to_object();
 		string name = lookupSymbol(o.get());
@@ -629,7 +629,7 @@ Debugger::dumpGlobalRegisters(as_environment &env)
     log_debug (_("Global Registers Dump:"));
     for (unsigned int i=0; i<4; ++i) {
 	ss << "\treg #" << i << ": \"";
-	ss << env.global_register(i).to_debug_string() << "\"" << endl;
+	ss << env.global_register(i) << "\"" << endl;
     }
     cerr << ss.str().c_str() << endl;
 }

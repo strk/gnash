@@ -241,7 +241,7 @@ function_apply(const fn_call& fn)
 					log_aserror(_("Second arg of Function.apply"
 						" is %s (expected array)"
 						" - considering as call with no args"),
-						fn.arg(1).to_debug_string().c_str());
+						fn.arg(1));
 				);
 				goto call_it;
 			}
@@ -322,7 +322,7 @@ function_call(const fn_call& fn)
 			log_aserror(_("First argument to Function.call(%s) doesn't cast to object. "
 				"Gnash will keep the current 'this' pointer as it is, "
 				"but this is known to not be the correct way to handle "
-				"such a malformed call."), this_val.to_debug_string().c_str());
+				"such a malformed call."), this_val);
 			);
 		}
 		else
@@ -420,7 +420,7 @@ as_function::constructInstance( as_environment& env,
 		//assert(func_has_prototype);
 
 		IF_VERBOSE_ACTION (
-		log_action(_("constructor prototype is %s"), proto.to_debug_string().c_str());
+		log_action(_("constructor prototype is %s"), proto);
 		);
 
 		// Create an empty object, with a ref to the constructor's prototype.

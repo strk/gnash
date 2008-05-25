@@ -195,11 +195,11 @@ MovieClipLoader::loadClip(const std::string& url_str, sprite_instance& target)
 	URL url(url_str.c_str(), get_base_url());
 	
 #if GNASH_DEBUG
-	log_debug(_(" resolved url: %s"), url.str().c_str());
+	log_debug(_(" resolved url: %s"), url.str());
 #endif
 			 
 	as_value targetVal(&target);
-	log_debug("Target is %s", targetVal.to_debug_string().c_str());
+	log_debug("Target is %s", targetVal);
 
 	bool ret = target.loadMovie(url);
 	if ( ! ret ) 
@@ -267,7 +267,7 @@ moviecliploader_loadclip(const fn_call& fn)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		std::stringstream ss; fn.dump_args(ss);
-		log_aserror(_("MovieClipLoader.loadClip(%s): missing arguments"), ss.str().c_str());
+		log_aserror(_("MovieClipLoader.loadClip(%s): missing arguments"), ss.str());
 		);
 		return as_value(false);
 	}
@@ -282,7 +282,7 @@ moviecliploader_loadclip(const fn_call& fn)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("Could not find target %s (evaluated from %s)"),
-			tgt_str.c_str(), tgt_arg.to_debug_string().c_str());
+			tgt_str, tgt_arg);
 		);
 		return as_value(false);
 	}
@@ -292,14 +292,14 @@ moviecliploader_loadclip(const fn_call& fn)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("Target %s is not a sprite instance (%s)"),
-			target->getTarget().c_str(), typeName(*target).c_str());
+			target->getTarget(), typeName(*target));
 		);
 		return as_value(false);
 	}
 
 #if GNASH_DEBUG
 	log_debug(_("load clip: %s, target is: %p\n"),
-		str_url.c_str(), (void*)sprite);
+		str_url, (void*)sprite);
 #endif
 
 	ptr->loadClip(str_url, *sprite);
@@ -313,7 +313,7 @@ static as_value
 moviecliploader_unloadclip(const fn_call& fn)
 {
   const std::string filespec = fn.arg(0).to_string();
-  log_unimpl (_("%s: %s"), __PRETTY_FUNCTION__, filespec.c_str());
+  log_unimpl (_("%s: %s"), __PRETTY_FUNCTION__, filespec);
   return as_value();
 }
 
@@ -350,7 +350,7 @@ moviecliploader_getprogress(const fn_call& fn)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("MovieClipLoader.getProgress(%s): first argument is not an object"),
-			fn.arg(0).to_debug_string().c_str());
+			fn.arg(0));
 		);
 		return as_value();
 	}
@@ -360,7 +360,7 @@ moviecliploader_getprogress(const fn_call& fn)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("MovieClipLoader.getProgress(%s): first argument is not an sprite"),
-			fn.arg(0).to_debug_string().c_str());
+			fn.arg(0));
 		);
 		return as_value();
 	}

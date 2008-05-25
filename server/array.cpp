@@ -903,7 +903,7 @@ array_splice(const fn_call& fn)
 #ifdef GNASH_DEBUG
 	std::stringstream ss;
 	fn.dump_args(ss);
-	log_debug(_("Array(%s).splice(%s) called"), array->toString().c_str(), ss.str().c_str());
+	log_debug(_("Array(%s).splice(%s) called"), array->toString(), ss.str());
 #endif
 
 	if (fn.nargs < 1)
@@ -1210,7 +1210,7 @@ array_pop(const fn_call& fn)
 
 	IF_VERBOSE_ACTION (
 	log_action(_("calling array pop, result:%s, new array size:%d"),
-		rv.to_debug_string().c_str(), array->size());
+		rv, array->size());
 	);
         return rv;
 }
@@ -1226,7 +1226,7 @@ array_shift(const fn_call& fn)
 
 	IF_VERBOSE_ACTION (
 	log_action(_("calling array shift, result:%s, new array size:%d"),
-		rv.to_debug_string().c_str(), array->size());
+		rv, array->size());
 	);
 	return rv;
 }
@@ -1243,7 +1243,7 @@ array_reverse(const fn_call& fn)
 
 	IF_VERBOSE_ACTION (
 	log_action(_("called array reverse, result:%s, new array size:%d"),
-		rv.to_debug_string().c_str(), array->size());
+		rv, array->size());
 	);
 	return rv;
 }
@@ -1263,7 +1263,7 @@ array_join(const fn_call& fn)
 
 	std::string ret = array->join(separator, env);
 
-	return as_value(ret.c_str());
+	return as_value(ret);
 }
 
 // Callback to convert array to a string
@@ -1280,10 +1280,10 @@ array_to_string(const fn_call& fn)
 	log_action(_("array_to_string called, nargs = %d, "
 			"this_ptr = %p"),
 			fn.nargs, (void*)fn.this_ptr.get());
-	log_action(_("to_string result is: %s"), ret.c_str());
+	log_action(_("to_string result is: %s"), ret);
 		);
 
-	return as_value(ret.c_str());
+	return as_value(ret);
 }
 
 /// concatenates the elements specified in the parameters with

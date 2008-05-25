@@ -1,3 +1,19 @@
+2008-05-25 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/array.cpp, server/as_environment.cpp,
+	  server/as_function.cpp, server/as_object.cpp server/as_value.cpp,
+	  server/as_value.h, server/character.cpp, server/debugger.cpp,
+	  server/edit_text_character.cpp, server/movie_root.cpp,
+	  server/sprite_instance.cpp, server/timers.cpp,
+	  server/video_stream_instance.cpp, server/asobj/AsBroadcaster.cpp,
+	  server/asobj/ClassHierarchy.cpp, server/asobj/Global.cpp,
+	  server/asobj/Key.cpp, server/asobj/MovieClipLoader.cpp,
+	  server/asobj/NetStream.cpp, server/asobj/Number.cpp,
+	  server/asobj/Object.cpp, server/asobj/string.cpp,
+	  server/asobj/xml.cpp, server/asobj/xmlsocket.cpp,
+	  server/vm/fn_call.h: logging cleanups, dropping c_str() and
+	  to_debug_string(). Should slim down the source a bit.
+
 2008-05-24 Sandro Santilli <strk@keybit.net>
 
 	* libbase/FLVParser.{cpp,h}: re-add nextMediaFrame as it's still

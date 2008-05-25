@@ -165,7 +165,7 @@ XML::set_member(string_table::key name, const as_value& val,
         {
 		// TODO: this should really be a proper property
                 bool b = val.to_bool();
-		//log_debug(_("set_member 'loaded' (%s) became boolean %d"), val.to_debug_string().c_str(), b);
+		//log_debug(_("set_member 'loaded' (%s) became boolean %d"), val, b);
                 if ( b ) _loaded = 1;
                 else _loaded = 0;
                 return true;
@@ -646,7 +646,7 @@ XML::sendAndLoad(const URL& url, XML& target)
     as_value ctypeVal;
     if ( get_member(ctypeKey, &ctypeVal) )
     {
-       log_unimpl ("Custom ContentType (%s) in XML.sendAndLoad", ctypeVal.to_debug_string().c_str());
+       log_unimpl ("Custom ContentType (%s) in XML.sendAndLoad", ctypeVal);
     }
   
     //log_debug(_("%s: mem is %d"), __FUNCTION__, mem);
@@ -772,7 +772,7 @@ xml_new(const fn_call& fn)
         {
             IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("First arg given to XML constructor (%s) evaluates to the empty string"),
-                    fn.arg(0).to_debug_string().c_str());
+                    fn.arg(0));
             );
         }
         else

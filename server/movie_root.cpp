@@ -546,7 +546,7 @@ movie_root::getMouseObject()
 		std::string objName = PROPNAME("Mouse");
 		if (global->get_member(vm.getStringTable().find(objName), &val) )
 		{
-			//log_debug("Found member 'Mouse' in _global: %s", val.to_debug_string());
+			//log_debug("Found member 'Mouse' in _global: %s", val);
 			_mouseobject = val.to_object();
 		}
 	}

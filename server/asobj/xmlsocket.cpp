@@ -561,8 +561,7 @@ xmlsocket_onData(const fn_call& fn)
     if ( xmlin.empty() )
     {
             log_error(_("Builtin XMLSocket.onData() called with an argument "
-                            "that resolves to the empty string: %s"),
-                            fn.arg(0).to_debug_string().c_str());
+                        "that resolves to the empty string: %s"), fn.arg(0));
             return as_value();
     }
 

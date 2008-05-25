@@ -271,7 +271,7 @@ static as_value sprite_attach_movie(const fn_call& fn)
       IF_VERBOSE_ASCODING_ERRORS(
       log_aserror(_("Fourth argument of attachMovie "
         "doesn't cast to an object (%s), we'll act as if it wasn't given"),
-        fn.arg(3).to_debug_string());
+        fn.arg(3));
       );
     }
   }
@@ -525,7 +525,7 @@ static as_value sprite_goto_and_play(const fn_call& fn)
     // No dice.
     IF_VERBOSE_ASCODING_ERRORS(
     log_aserror(_("sprite_goto_and_play('%s') -- invalid frame"),
-          fn.arg(0).to_debug_string());
+          fn.arg(0));
     );
     return as_value();
   }
@@ -554,7 +554,7 @@ static as_value sprite_goto_and_stop(const fn_call& fn)
     // No dice.
     IF_VERBOSE_ASCODING_ERRORS(
     log_aserror(_("sprite_goto_and_stop('%s') -- invalid frame"),
-          fn.arg(0).to_debug_string());
+          fn.arg(0));
     );
     return as_value();
   }
@@ -783,7 +783,7 @@ static as_value sprite_hit_test(const fn_call& fn)
       {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Can't find hitTest target %s"),
-          tgt_val.to_debug_string());
+          tgt_val);
         );
         return as_value();
       }
@@ -948,14 +948,14 @@ sprite_meth(const fn_call& fn)
   boost::intrusive_ptr<as_object> o = v.to_object();
   if ( ! o )
   {
-    log_debug(_("meth(%s): first argument doesn't cast to object"), v.to_debug_string());
+    log_debug(_("meth(%s): first argument doesn't cast to object"), v);
     return as_value(0);
   }
 
   string_table& st = sprite->getVM().getStringTable();
   as_value lc = o->callMethod(st.find(PROPNAME("toLowerCase")));
 
-  log_debug(_("after call to toLowerCase with arg %s we got %s"), v.to_debug_string(), lc.to_debug_string());
+  log_debug(_("after call to toLowerCase with arg %s we got %s"), v, lc);
 
   //if ( ! v.is_string() ) return as_value(0);
   std::string s = lc.to_string();
@@ -991,7 +991,7 @@ sprite_getBounds(const fn_call& fn)
     {
       IF_VERBOSE_ASCODING_ERRORS(
       log_aserror(_("MovieClip.getBounds(%s): invalid call, first arg must be a sprite"),
-        fn.arg(0).to_debug_string());
+        fn.arg(0));
       );
       return as_value();
     }
@@ -1052,7 +1052,7 @@ sprite_globalToLocal(const fn_call& fn)
     IF_VERBOSE_ASCODING_ERRORS(
     log_aserror(_("MovieClip.globalToLocal(%s): "
         "first argument doesn't cast to an object"),
-      fn.arg(0).to_debug_string());
+      fn.arg(0));
     );
     return ret;
   }
@@ -1066,7 +1066,7 @@ sprite_globalToLocal(const fn_call& fn)
     IF_VERBOSE_ASCODING_ERRORS(
     log_aserror(_("MovieClip.globalToLocal(%s): "
         "object parameter doesn't have an 'x' member"),
-      fn.arg(0).to_debug_string());
+      fn.arg(0));
     );
     return ret;
   }
@@ -1077,7 +1077,7 @@ sprite_globalToLocal(const fn_call& fn)
     IF_VERBOSE_ASCODING_ERRORS(
     log_aserror(_("MovieClip.globalToLocal(%s): "
         "object parameter doesn't have an 'y' member"),
-      fn.arg(0).to_debug_string());
+      fn.arg(0));
     );
     return ret;
   }
@@ -1119,7 +1119,7 @@ sprite_localToGlobal(const fn_call& fn)
     IF_VERBOSE_ASCODING_ERRORS(
     log_aserror(_("MovieClip.localToGlobal(%s): "
         "first argument doesn't cast to an object"),
-      fn.arg(0).to_debug_string());
+      fn.arg(0));
     );
     return ret;
   }
@@ -1133,7 +1133,7 @@ sprite_localToGlobal(const fn_call& fn)
     IF_VERBOSE_ASCODING_ERRORS(
     log_aserror(_("MovieClip.localToGlobal(%s): "
         "object parameter doesn't have an 'x' member"),
-      fn.arg(0).to_debug_string());
+      fn.arg(0));
     );
     return ret;
   }
@@ -1144,7 +1144,7 @@ sprite_localToGlobal(const fn_call& fn)
     IF_VERBOSE_ASCODING_ERRORS(
     log_aserror(_("MovieClip.localToGlobal(%s): "
         "object parameter doesn't have an 'y' member"),
-      fn.arg(0).to_debug_string());
+      fn.arg(0));
     );
     return ret;
   }
@@ -1197,7 +1197,7 @@ sprite_setMask(const fn_call& fn)
     {
       IF_VERBOSE_ASCODING_ERRORS(
       log_aserror(_("%s.setMask(%s) : first argument is not a character"),
-        maskee->getTarget(), arg.to_debug_string());
+        maskee->getTarget(), arg);
       );
       return as_value();
     }
@@ -1259,7 +1259,7 @@ sprite_lineTo(const fn_call& fn)
     std::stringstream ss; fn.dump_args(ss);
     log_aserror(_("%s.lineTo(%s) : non-finite first argument (%s), "
       "converted to zero"), sprite->getTarget(),
-      ss.str(), fn.arg(0).to_debug_string());
+      ss.str(), fn.arg(0));
     );
     x = 0;
   }
@@ -1270,7 +1270,7 @@ sprite_lineTo(const fn_call& fn)
     std::stringstream ss; fn.dump_args(ss);
     log_aserror(_("%s.lineTo(%s) : non-finite second argument (%s), "
       "converted to zero"), sprite->getTarget(),
-      ss.str(), fn.arg(1).to_debug_string());
+      ss.str(), fn.arg(1));
     );
     y = 0;
   }
@@ -1313,7 +1313,7 @@ sprite_moveTo(const fn_call& fn)
     std::stringstream ss; fn.dump_args(ss);
     log_aserror(_("%s.moveTo(%s) : non-finite first argument (%s), "
       "converted to zero"), sprite->getTarget(),
-      ss.str(), fn.arg(0).to_debug_string());
+      ss.str(), fn.arg(0));
     );
     x = 0;
   }
@@ -1324,7 +1324,7 @@ sprite_moveTo(const fn_call& fn)
     std::stringstream ss; fn.dump_args(ss);
     log_aserror(_("%s.moveTo(%s) : non-finite second argument (%s), "
       "converted to zero"), sprite->getTarget(),
-      ss.str(), fn.arg(1).to_debug_string());
+      ss.str(), fn.arg(1));
     );
     y = 0;
   }
@@ -1539,7 +1539,7 @@ sprite_curveTo(const fn_call& fn)
     std::stringstream ss; fn.dump_args(ss);
     log_aserror(_("%s.curveTo(%s) : non-finite first argument (%s), "
       "converted to zero"), sprite->getTarget(),
-      ss.str(), fn.arg(0).to_debug_string());
+      ss.str(), fn.arg(0));
     );
     cx = 0;
   }
@@ -1550,7 +1550,7 @@ sprite_curveTo(const fn_call& fn)
     std::stringstream ss; fn.dump_args(ss);
     log_aserror(_("%s.curveTo(%s) : non-finite second argument (%s), "
       "converted to zero"), sprite->getTarget(),
-      ss.str(), fn.arg(1).to_debug_string());
+      ss.str(), fn.arg(1));
     );
     cy = 0;
   }
@@ -1561,7 +1561,7 @@ sprite_curveTo(const fn_call& fn)
     std::stringstream ss; fn.dump_args(ss);
     log_aserror(_("%s.curveTo(%s) : non-finite third argument (%s), "
       "converted to zero"), sprite->getTarget(),
-      ss.str(), fn.arg(0).to_debug_string());
+      ss.str(), fn.arg(0));
     );
     ax = 0;
   }
@@ -1572,7 +1572,7 @@ sprite_curveTo(const fn_call& fn)
     std::stringstream ss; fn.dump_args(ss);
     log_aserror(_("%s.curveTo(%s) : non-finite fourth argument (%s), "
       "converted to zero"), sprite->getTarget(),
-      ss.str(), fn.arg(1).to_debug_string());
+      ss.str(), fn.arg(1));
     );
     ay = 0;
   }
@@ -2578,7 +2578,7 @@ sprite_instance::get_frame_number(const as_value& frame_spec, size_t& frameno) c
 
   double num =  str.to_number();
 
-  //log_debug("get_frame_number(%s), num: %g", frame_spec.to_debug_string(), num);
+  //log_debug("get_frame_number(%s), num: %g", frame_spec, num);
 
   if ( ! utility::isFinite(num) || int(num) != num || num == 0)
   {
@@ -2608,7 +2608,7 @@ void sprite_instance::call_frame_actions(const as_value& frame_spec)
     // No dice.
     IF_VERBOSE_ASCODING_ERRORS(
     log_aserror(_("call_frame('%s') -- invalid frame"),
-          frame_spec.to_debug_string());
+          frame_spec);
     );
     return;
   }
@@ -2929,7 +2929,7 @@ sprite_instance::set_member(string_table::key name,
     const as_value& val, string_table::key nsname, bool ifFound)
 {
 #ifdef DEBUG_DYNTEXT_VARIABLES
-  //log_debug(_("sprite[%p]::set_member(%s, %s)"), (void*)this, VM::get().getStringTable().value(name), val.to_debug_string());
+  //log_debug(_("sprite[%p]::set_member(%s, %s)"), (void*)this, VM::get().getStringTable().value(name), val);
 #endif
 
   //if ( val.is_function() )

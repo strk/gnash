@@ -112,7 +112,7 @@ public:
 				// Error here -- not an object.
 				log_error("%s (Superclass of %s) is not a function (%s)",
 					st.value(mDeclaration.super_name),
-					st.value(mDeclaration.name), super.to_debug_string());
+					st.value(mDeclaration.name), super);
 				super.set_undefined();
 				return super;
 			}
@@ -185,7 +185,7 @@ public:
 					// Error here -- not an object.
 					log_error("%s (Superclass of %s) is not a function (%s)",
 						st.value(mDeclaration.super_name),
-						st.value(mDeclaration.name), super.to_debug_string());
+						st.value(mDeclaration.name), super);
 					super.set_undefined();
 					return super;
 				}
@@ -194,7 +194,7 @@ public:
 			if ( ! us.to_object() )
 			{
 				log_error("Native class %s is not an object after initialization (%s)",
-					st.value(mDeclaration.name), us.to_debug_string());
+					st.value(mDeclaration.name), us);
 			}
 			if (mDeclaration.super_name && !us.to_object()->hasOwnProperty(NSV::PROP_uuPROTOuu))
 			{

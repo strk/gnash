@@ -105,7 +105,7 @@ key_as_object::notify_listeners(const event_id& key_event)
 
     as_value ev(key_event.get_function_name());
 
-    //log_debug("notify_listeners calling broadcastMessage with arg %s", ev.to_debug_string().c_str());
+    //log_debug("notify_listeners calling broadcastMessage with arg %s", ev);
     callMethod(NSV::PROP_BROADCAST_MESSAGE, ev);
 }
 

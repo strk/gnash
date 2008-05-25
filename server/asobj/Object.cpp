@@ -202,7 +202,7 @@ object_addproperty(const fn_call& fn)
 		fn.dump_args(ss);
 		log_aserror(_("Invalid call to Object.addProperty(%s) - "
 			"expected 3 arguments (<name>, <getter>, <setter>)"),
-		       	ss.str().c_str());
+		       	ss.str());
 		);
 
 		// if we've been given more args then needed there's
@@ -243,7 +243,7 @@ object_addproperty(const fn_call& fn)
 			IF_VERBOSE_ASCODING_ERRORS(
 			log_aserror(_("Invalid call to Object.addProperty() - "
 				"setter is not null and not an AS function (%s)"),
-				setterval.to_debug_string());
+				setterval);
 			);
 			return as_value(false);
 		}
@@ -272,7 +272,7 @@ object_registerClass(const fn_call& fn)
 		fn.dump_args(ss);
 		log_aserror(_("Invalid call to Object.registerClass(%s) - "
 			"expected 2 arguments (<symbol>, <constructor>)"),
-			ss.str().c_str());
+			ss.str());
 		);
 
 		// if we've been given more args then needed there's
@@ -290,7 +290,7 @@ object_registerClass(const fn_call& fn)
 		std::stringstream ss;
 		fn.dump_args(ss);
 		log_aserror(_("Invalid call to Object.registerClass(%s) - "
-			"first argument (symbol id) evaluates to empty string"), ss.str().c_str());
+			"first argument (symbol id) evaluates to empty string"), ss.str());
 		);
 		return as_value(false);
 	}
@@ -302,7 +302,7 @@ object_registerClass(const fn_call& fn)
 		std::stringstream ss;
 		fn.dump_args(ss);
 		log_aserror(_("Invalid call to Object.registerClass(%s) - "
-			"second argument (class) is not a function)"), ss.str().c_str());
+			"second argument (class) is not a function)"), ss.str());
 		);
 		return as_value(false);
 	}
@@ -331,7 +331,7 @@ object_registerClass(const fn_call& fn)
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("Object.registerClass(%s, %s): "
 			"can't find exported symbol"),
-			symbolid.c_str(), 
+			symbolid, 
 			typeid(theclass).name());
 		);
 		return as_value(false);
@@ -350,7 +350,7 @@ object_registerClass(const fn_call& fn)
 		log_aserror(_("Object.registerClass(%s, %s): "
 			"exported symbol is not a MovieClip symbol "
 			"(sprite_definition), but a %s"),
-			symbolid.c_str(), 
+			symbolid, 
 			typeid(theclass).name(),
 			typeid(*exp_res).name());
 		);
@@ -377,7 +377,7 @@ object_hasOwnProperty(const fn_call& fn)
 	if ( arg.is_undefined() || propname.empty() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("Invalid call to Object.hasOwnProperty('%s')"), arg.to_debug_string().c_str());
+		log_aserror(_("Invalid call to Object.hasOwnProperty('%s')"), arg);
 		);
 		return as_value(false);
 	}
@@ -401,7 +401,7 @@ object_isPropertyEnumerable(const fn_call& fn)
 	if ( arg.is_undefined() || propname.empty() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("Invalid call to Object.isPropertyEnumerable('%s')"), arg.to_debug_string().c_str());
+		log_aserror(_("Invalid call to Object.isPropertyEnumerable('%s')"), arg);
 		);
 		return as_value();
 	}
@@ -431,7 +431,7 @@ object_isPrototypeOf(const fn_call& fn)
 	if ( ! obj )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("First arg to Object.isPrototypeOf(%s) is not an object"), fn.arg(0).to_debug_string().c_str());
+		log_aserror(_("First arg to Object.isPrototypeOf(%s) is not an object"), fn.arg(0));
 		);
 		return as_value(false);
 	}
