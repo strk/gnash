@@ -320,7 +320,7 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
     // These flags are here so we can construct
     // the correct URL for base url later.
     // If the URL class was not immutable we could do something smarter...
-    bool hasOverriddenBaseUrl;
+    bool hasOverriddenBaseUrl=false;
     std::string overriddenBaseUrl;
 
     // Parse parameters
