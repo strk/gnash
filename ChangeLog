@@ -1,5 +1,10 @@
 2008-05-25 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* testsuite/actionscript.all/Microphone.as: more tests for Microphone
+	  class.
+
+2008-05-25 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* server/array.cpp, server/as_environment.cpp,
 	  server/as_function.cpp, server/as_object.cpp server/as_value.cpp,
 	  server/as_value.h, server/character.cpp, server/debugger.cpp,

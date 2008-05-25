@@ -22,7 +22,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Microphone.as,v 1.16 2008/03/13 17:25:39 bwy Exp $";
+rcsid="$Id: Microphone.as,v 1.17 2008/05/25 16:27:46 bwy Exp $";
 #include "check.as"
 
 // There was no Microphone class in SWF5 or lower
@@ -35,6 +35,47 @@ check_equals ( typeof(Microphone.prototype.setRate), 'function' );
 check_equals ( typeof(Microphone.prototype.setSilenceLevel), 'function' );
 check_equals ( typeof(Microphone.prototype.setUseEchoSuppression), 'function' );
 
+
+check(Microphone.prototype.hasOwnProperty("setGain"));
+check(Microphone.prototype.hasOwnProperty("setRate"));
+check(Microphone.prototype.hasOwnProperty("setSilenceLevel"));
+check(Microphone.prototype.hasOwnProperty("setUseEchoSuppression"));
+
+// These aren't present yet.
+xcheck(!Microphone.prototype.hasOwnProperty("get"));
+check(!Microphone.prototype.hasOwnProperty("activityLevel"));
+check(!Microphone.prototype.hasOwnProperty("gain"));
+check(!Microphone.prototype.hasOwnProperty("index"));
+check(!Microphone.prototype.hasOwnProperty("muted"));
+check(!Microphone.prototype.hasOwnProperty("name"));
+check(!Microphone.prototype.hasOwnProperty("names"));
+check(!Microphone.prototype.hasOwnProperty("onActivity"));
+check(!Microphone.prototype.hasOwnProperty("onStatus"));
+check(!Microphone.prototype.hasOwnProperty("rate"));
+check(!Microphone.prototype.hasOwnProperty("silenceLevel"));
+check(!Microphone.prototype.hasOwnProperty("silenceTimeOut"));
+check(!Microphone.prototype.hasOwnProperty("useEchoSuppression"));
+
+f = new Microphone;
+check_equals(typeof(f), 'object');
+check_equals(typeof(f.setGain), 'function')
+
+
+// Still not present
+xcheck(!Microphone.prototype.hasOwnProperty("get"));
+check(!Microphone.prototype.hasOwnProperty("activityLevel"));
+check(!Microphone.prototype.hasOwnProperty("gain"));
+check(!Microphone.prototype.hasOwnProperty("index"));
+check(!Microphone.prototype.hasOwnProperty("muted"));
+check(!Microphone.prototype.hasOwnProperty("name"));
+check(!Microphone.prototype.hasOwnProperty("names"));
+check(!Microphone.prototype.hasOwnProperty("onActivity"));
+check(!Microphone.prototype.hasOwnProperty("onStatus"));
+check(!Microphone.prototype.hasOwnProperty("rate"));
+check(!Microphone.prototype.hasOwnProperty("silenceLevel"));
+check(!Microphone.prototype.hasOwnProperty("silenceTimeOut"));
+check(!Microphone.prototype.hasOwnProperty("useEchoSuppression"));
+
 // Documented to be an array.
 xcheck ( Microphone.hasOwnProperty("names"));
 xcheck_equals (typeof (Microphone.names), 'object');
@@ -42,6 +83,19 @@ xcheck_equals (typeof (Microphone.names), 'object');
 // test the Microphone constuctor
 var microphoneObj = Microphone.get();
 xcheck_equals (typeof(microphoneObj), 'object');
+
+// Microphone.get() adds these properties.
+// Other properties are probably dependent on whether a microphone
+// is present or not.
+xcheck(!Microphone.prototype.hasOwnProperty("get"));
+xcheck(Microphone.prototype.hasOwnProperty("activityLevel"));
+xcheck(Microphone.prototype.hasOwnProperty("gain"));
+xcheck(Microphone.prototype.hasOwnProperty("index"));
+xcheck(Microphone.prototype.hasOwnProperty("muted"));
+xcheck(Microphone.prototype.hasOwnProperty("name"));
+xcheck(Microphone.prototype.hasOwnProperty("rate"));
+xcheck(Microphone.prototype.hasOwnProperty("silenceLevel"));
+xcheck(Microphone.prototype.hasOwnProperty("useEchoSuppression"));
 
 // test that Microphone.get() returns a singleton
 check_equals(microphoneObj, Microphone.get());
