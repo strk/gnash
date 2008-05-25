@@ -64,12 +64,9 @@
 #include <vector>
 #include <string>
 #include <cmath>
-#include <cstdio> // std::sprintf
-
-#include <functional> // for mem_fun, bind1st
-#include <algorithm> // for for_each
+#include <algorithm> // for std::swap
 #include <boost/algorithm/string/case_conv.hpp>
-
+#include <boost/lexical_cast.hpp>
 
 namespace gnash {
 
@@ -327,7 +324,6 @@ static as_value sprite_create_empty_movieclip(const fn_call& fn)
     }
   }
 
-  // TODO: Why not use to_int()?
   character* ch = sprite->add_empty_movieclip(fn.arg(0).to_string().c_str(),
                                               fn.arg(1).to_int());
   return as_value(ch);
@@ -338,7 +334,7 @@ static as_value sprite_get_depth(const fn_call& fn)
   // TODO: make this a character::getDepth_method function...
   boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 
-  int n = sprite->get_depth();
+  const int n = sprite->get_depth();
 
   return as_value(n);
 }
@@ -350,7 +346,7 @@ static as_value sprite_swap_depths(const fn_call& fn)
   typedef boost::intrusive_ptr<character> CharPtr;
 
   SpritePtr sprite = ensureType<sprite_instance>(fn.this_ptr);
-  int this_depth = sprite->get_depth();
+  const int this_depth = sprite->get_depth();
 
   as_value rv;
 
@@ -569,8 +565,8 @@ static as_value sprite_next_frame(const fn_call& fn)
 {
   boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 
-  size_t frame_count = sprite->get_frame_count();
-  size_t current_frame = sprite->get_current_frame();
+  const size_t frame_count = sprite->get_frame_count();
+  const size_t current_frame = sprite->get_current_frame();
   if (current_frame < frame_count)
   {
       sprite->goto_frame(current_frame + 1);
@@ -583,7 +579,7 @@ static as_value sprite_prev_frame(const fn_call& fn)
 {
   boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 
-  size_t current_frame = sprite->get_current_frame();
+  const size_t current_frame = sprite->get_current_frame();
   if (current_frame > 0)
   {
       sprite->goto_frame(current_frame - 1);
@@ -1878,9 +1874,8 @@ sprite_beginGradientFill(const fn_call& fn)
   gradients.reserve(ngradients);
   for (size_t i=0; i<ngradients; ++i)
   {
-    char buf[32];
-    std::sprintf(buf, SIZET_FMT, i);
-    string_table::key key = st.find(buf);
+
+    string_table::key key = st.find(boost::lexical_cast<std::string>(i));
 
     as_value colVal = colors->getMember(key);
     boost::uint32_t col = colVal.is_number() ? colVal.to_int() : 0;
