@@ -264,19 +264,8 @@ FLVFrame* FLVParser::nextVideoFrame()
 boost::uint32_t FLVParser::seekAudio(boost::uint32_t time)
 {
 
-	// Make sure that there are parsed some frames
-	while(_audioFrames.size() < 1 && !_parsingComplete) {
-		parseNextTag();
-	}
-
 	// If there is no audio data return NULL
-	if (_audioFrames.size() == 0) return 0;
-
-	// Make sure that there are parsed some enough frames
-	// to get the right frame.
-	while(_audioFrames.back()->timestamp < time && !_parsingComplete) {
-		parseNextTag();
-	}
+	if (_audioFrames.empty()) return 0;
 
 	// If there are no audio greater than the given time
 	// the last audioframe is returned
@@ -315,21 +304,10 @@ boost::uint32_t FLVParser::seekAudio(boost::uint32_t time)
 }
 
 
-boost::uint32_t FLVParser::seekVideo(boost::uint32_t time)
+boost::uint32_t
+FLVParser::seekVideo(boost::uint32_t time)
 {
-	// Make sure that there are parsed some frames
-	while(_videoFrames.size() < 1 && !_parsingComplete) {
-		parseNextTag();
-	}
-
-	// If there is no video data return NULL
-	if (_videoFrames.size() == 0) return 0;
-
-	// Make sure that there are parsed some enough frames
-	// to get the right frame.
-	while(_videoFrames.back()->timestamp < time && !_parsingComplete) {
-		parseNextTag();
-	}
+	if ( _videoFrames.empty() ) return 0;
 
 	// If there are no videoframe greater than the given time
 	// the last key videoframe is returned
@@ -366,23 +344,6 @@ boost::uint32_t FLVParser::seekVideo(boost::uint32_t time)
 	{
 		while ( bestFrame < _videoFrames.size()-1 && _videoFrames[bestFrame+1]->timestamp < time ) ++bestFrame;
 	}
-
-#if 0
-	boost::uint32_t diff = abs(_videoFrames[bestFrame]->timestamp - time);
-	while (true)
-	{
-		if (bestFrame+1 < numFrames && static_cast<boost::uint32_t>(abs(_videoFrames[bestFrame+1]->timestamp - time)) < diff) {
-			diff = abs(_videoFrames[bestFrame+1]->timestamp - time);
-			bestFrame = bestFrame + 1;
-		} else if (bestFrame > 0 && static_cast<boost::uint32_t>(abs(_videoFrames[bestFrame-1]->timestamp - time)) < diff) {
-			diff = abs(_videoFrames[bestFrame-1]->timestamp - time);
-			bestFrame = bestFrame - 1;
-		} else {
-			break;
-		}
-	}
-#endif
-
 
 	// Find closest backward keyframe  
 	size_t rewindKeyframe = bestFrame;
@@ -482,8 +443,8 @@ FLVParser::seek(boost::uint32_t time)
 		if (_audio) _nextAudioFrame = 0;
 	}
 
-	if (_video)	time = seekVideo(time);
 	if (_audio)	time = seekAudio(time);
+	if (_video)	time = seekVideo(time);
 	return time;
 }
 
