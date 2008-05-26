@@ -120,6 +120,9 @@ void
 SDL_sound_handler::delete_all_sounds()
 {
 	stop_all_sounds();
+
+	boost::mutex::scoped_lock lock(_mutex);
+
 	for (size_t i=0, e=m_sound_data.size(); i < e; ++i)
 	{
 		stop_sound(i);
@@ -741,15 +744,15 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 	// Get the soundhandler
 	SDL_sound_handler* handler = static_cast<SDL_sound_handler*>(udata);
 
+	boost::mutex::scoped_lock lock(handler->_mutex);
+
 	// If nothing to play there is no reason to play
 	// Is this a potential deadlock problem?
-	if (handler->soundsPlaying == 0 && handler->m_aux_streamer.size() == 0) {
+	if (handler->soundsPlaying == 0 && handler->m_aux_streamer.empty()) {
             std::cout << "Pausing Audio now...\n";
 		SDL_PauseAudio(1);
 		return;
 	}
-
-	boost::mutex::scoped_lock lock(handler->_mutex);
 
 	// Mixed sounddata buffer
 	Uint8* buffer = stream;
