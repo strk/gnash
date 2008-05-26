@@ -1,3 +1,8 @@
+2008-05-26 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* plugin/win32/plugin.cpp: fscommand is now registered with the
+	  movie_root.
+
 2008-05-25 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/sprite_instance.cpp: replace sprintf with boost::lexical_cast.

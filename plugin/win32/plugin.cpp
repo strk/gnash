@@ -64,8 +64,8 @@
 #include <windowsx.h>
 #include <wingdi.h>
 
-#include <stdarg.h>
-#include <stdint.h>
+#include <cstdarg>
+#include <cstdint>
 #include <fstream>
 
 #include "plugin.h"
@@ -393,7 +393,6 @@ nsPluginInstance::threadMain(void)
     // Initialize Gnash core library.
     gnash::gnashInit();
     gnash::set_use_cache_files(false);
-    gnash::registerFSCommandCallback(FSCommand_callback);
     DBG("Gnash core initialized.\n");
  
     // Init logfile.
@@ -463,8 +462,16 @@ nsPluginInstance::threadMain(void)
             movie_width, movie_height, movie_fps);
 
     gnash::SystemClock clock; // use system clock here...
-    gnash::movie_root& root = gnash::VM::init(*md, clock).getRoot(); 
+    gnash::movie_root& root = gnash::VM::init(*md, clock).getRoot();
     DBG("Gnash VM initialized.\n");
+    
+    // Register this plugin as listener for FsCommands from the core
+    // (movie_root)
+    root.registerFSCommandCallback(FSCommand_callback);
+    
+    // Register a static function to handle ActionScript events such
+    // as Mouse.hide, Stage.align etc.
+    // root.registerEventCallback(&staticEventHandlingFunction);
 
     md->completeLoad();
     DBG("Movie loaded.\n");
