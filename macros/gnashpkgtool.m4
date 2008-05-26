@@ -131,7 +131,7 @@ dnl     esac], $1=yes)
       dnl do this automatically. AC_CHECK_HEADERS (not the final S) would do it.
       AC_DEFINE([HAVE_]UPHEADER, 1, [Define if you have the $2 header])
 
-      if test x"${ac_cv_path_$1_incl}" != x ; then
+      if test x"${ac_cv_path_$1_incl}" != x -a x"${ac_cv_path_$1_incl}" != x"-I/usr/include"; then
         UP[]_CFLAGS="${ac_cv_path_$1_incl}"
       else
         UP[]_CFLAGS=""
