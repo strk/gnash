@@ -65,7 +65,7 @@
 #include <wingdi.h>
 
 #include <cstdarg>
-#include <cstdint>
+#include <boost/cstdint.hpp>
 #include <fstream>
 
 #include "plugin.h"
@@ -332,7 +332,7 @@ nsPluginInstance::shut(void)
 
 NPError
 nsPluginInstance::NewStream(NPMIMEType type, NPStream *stream,
-        NPBool seekable, uint16_t *stype)
+        NPBool seekable, boost::uint16_t *stype)
 {
     DBG("nsPluginInstance::NewStream\n");
     DBG("stream->url: %s\n", stream->url);
