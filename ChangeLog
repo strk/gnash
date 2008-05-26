@@ -1,5 +1,7 @@
 2008-05-26 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/NetStreamFfmpeg.cpp (seek): seek time is given in
+	  second, not milliseconds...
 	* libbase/FLVParser.cpp (seek): don't parse on seek, just don't
 	  allow seeking past the currently parsed range.
 

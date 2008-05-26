@@ -1160,7 +1160,7 @@ bool NetStreamFfmpeg::decodeMediaFrame()
 }
 
 void
-NetStreamFfmpeg::seek(boost::uint32_t pos)
+NetStreamFfmpeg::seek(boost::uint32_t posSeconds)
 {
 	GNASH_REPORT_FUNCTION;
 
@@ -1169,6 +1169,9 @@ NetStreamFfmpeg::seek(boost::uint32_t pos)
 
 	long newpos = 0;
 	double timebase = 0;
+
+        // Don't ask me why, but NetStream::seek() takes seconds...
+	boost::uint32_t pos = posSeconds*1000;
 
 	// Seek to new position
 	if (m_isFLV)
