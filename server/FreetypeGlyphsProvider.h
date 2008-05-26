@@ -24,6 +24,7 @@
 
 #include <string>
 #include <memory> // for auto_ptr
+#include <boost/thread/mutex.hpp>
 
 #ifdef USE_FREETYPE 
 # include <ft2build.h>
@@ -151,6 +152,7 @@ private:
 	bool getFontFilename(const std::string& name, bool bold, bool italic,
 			std::string& filename);
 
+	/// Initialize the FreeType library if not done so yet
 	static void init();
 
 	static void close();
@@ -162,7 +164,12 @@ private:
 	std::auto_ptr<image::alpha> draw_bitmap(const FT_Bitmap& bitmap);
 
 
+	/// Mutex protecting FreeType library (for initialization basically)
+	static boost::mutex	m_lib_mutex;
+
+	/// FreeType library
 	static FT_Library	m_lib;
+
 	FT_Face	m_face;
 
 #endif // USE_FREETYPE

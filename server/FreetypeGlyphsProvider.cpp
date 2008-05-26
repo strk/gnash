@@ -181,12 +181,17 @@ private:
 
 };
 
-// static
-FT_Library FreetypeGlyphsProvider::m_lib;
+// statics
+FT_Library FreetypeGlyphsProvider::m_lib = 0;
+boost::mutex FreetypeGlyphsProvider::m_lib_mutex;
 
 // static private
 void FreetypeGlyphsProvider::init()
 {
+	boost::mutex::scoped_lock lock(m_lib_mutex);
+
+	if ( m_lib ) return; // nothing to do
+
 	int	error = FT_Init_FreeType(&m_lib);
 	if (error)
 	{

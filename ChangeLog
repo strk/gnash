@@ -1,5 +1,10 @@
 2008-05-26 Sandro Santilli <strk@keybit.net>
 
+	* server/FreetypeGlyphsProvider.{cpp,h}: mutex-protect access to
+	  static Freetype lib.
+
+2008-05-26 Sandro Santilli <strk@keybit.net>
+
 	* libmedia/ffmpeg/sound_handler_sdl.cpp: add some missing lockings.
 	* server/asobj/NetStreamFfmpeg.cpp (seek): seek time is given in
 	  second, not milliseconds...
