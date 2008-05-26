@@ -1,5 +1,4 @@
-// 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//    Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -62,7 +61,11 @@ AquaOglGlue::init(int, char***)
 #endif
 
     const GLint glattribs[] = { AGL_RGBA, AGL_ACCELERATED,
-                                AGL_DEPTH_SIZE, 24,
+                                AGL_DEPTH_SIZE, 32,
+                                AGL_ACCUM_RED_SIZE, 8,
+                                AGL_ACCUM_GREEN_SIZE, 8,
+                                AGL_ACCUM_RED_SIZE, 8,
+                                AGL_ACCUM_ALPHA_SIZE, 8,
                                 AGL_DOUBLEBUFFER, AGL_NONE };
                               
     AGLPixelFormat pixfmt = aglChoosePixelFormat ( NULL, 0, glattribs);
@@ -95,15 +98,6 @@ bool AquaOglGlue::prepDrawingArea(int width, int height, AGLDrawable drawable)
 	GNASH_REPORT_FUNCTION;
     bool ret = aglSetDrawable(_context, drawable);
     
-    glMatrixMode(GL_PROJECTION);
-
-    float oversize = 1.0;
-
-    // Flip the image, since (0,0) by default in OpenGL is the bottom left.
-    gluOrtho2D(-oversize, oversize, oversize, -oversize);
-    // Restore the matrix mode to the default.
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity(); 
     return ret;
 }
 

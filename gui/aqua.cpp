@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: aqua.cpp,v 1.32 2008/03/21 04:59:51 nihilus Exp $ */
+/* $Id: aqua.cpp,v 1.33 2008/05/26 22:13:33 ann Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -54,7 +54,6 @@ pascal OSStatus DoWindowClose (EventHandlerCallRef  nextHandler,
 
 void DoAdvanceMovie ( EventLoopTimerRef inTimer, void* data)
 {
-   GNASH_REPORT_FUNCTION;
    AquaGui* gui = static_cast<AquaGui*>(data);
    Gui::advance_movie(gui);
 }
@@ -76,7 +75,6 @@ AquaGui::~AquaGui()
 
 bool AquaGui::run()
 {
-  GNASH_REPORT_FUNCTION;
     double interval = _interval / 1000.0;
 
 
@@ -96,7 +94,6 @@ bool AquaGui::run()
 
 void AquaGui::renderBuffer()
 {
-    GNASH_REPORT_FUNCTION;
     _glue.render();
 
       Rect rectPort;
@@ -111,8 +108,6 @@ bool AquaGui::init(int argc, char **argv[]) /* Self-explainatory */
 	long response;
 	Str255 text = " OS X version lower than 10.4 is not supported!", tmp = "";
   
-	GNASH_REPORT_FUNCTION;
-	
 	/* Version check */
 	err = Gestalt(gestaltSystemVersion, &response);
 	Boolean ok = ((err == noErr) && (response >= 0x00001040));
@@ -144,7 +139,6 @@ void AquaGui::key_event(int key, bool down)
 
 void AquaGui::setCursor(gnash_cursor_type newcursor)
 {
-	  GNASH_REPORT_FUNCTION;
 
 	  switch(newcursor) {
 	  	case gnash::CURSOR_HAND:	  		
@@ -168,7 +162,8 @@ bool AquaGui::createWindow(const char* title, int width, int height)
 	EventTypeSpec     eventType;                 // Specifier for event type
 	EventHandlerUPP   handlerUPP;                // Pointer to event handler routine
  
-	GNASH_REPORT_FUNCTION;
+        _width = width;
+        _height = height;
 
 	SetRect(&theBounds, 0, 0, width, height);
 	OSStatus status = CreateNewWindow ( kDocumentWindowClass,
@@ -199,7 +194,6 @@ bool AquaGui::createMenu()
 	MenuRef rApplicationMenu;
 	MenuItemIndex outIndex[1];	  
 	
-	GNASH_REPORT_FUNCTION;
 	
 	/* Enable 'Prefereces...' */
 	EnableMenuCommand(NULL, kHICommandPreferences);
@@ -214,7 +208,6 @@ bool AquaGui::createMenu()
 
 bool AquaGui::setupEvents()
 {	
-	GNASH_REPORT_FUNCTION;
 
 	return true;
 }

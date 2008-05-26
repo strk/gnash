@@ -1,3 +1,11 @@
+2008-05-26 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* gui/aqua.cpp: Remove function reports and define _width and
+	_height.
+	* gui/aqua_ogl_glue.cpp: Enable the accumulation buffer. Don't
+	flip the OpenGL screen, because this now happens inside the
+	renderer.
+
 2008-05-26 Sandro Santilli <strk@keybit.net>
 
 	* server/FreetypeGlyphsProvider.{cpp,h}: mutex-protect access to
