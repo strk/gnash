@@ -221,12 +221,15 @@ public:
 
 	// If stereo is true, samples are interleaved w/ left sample first.
 	
-	/// gnash's parser calls this to create sounds to be played later.
+	/// Create a sound buffer slot, for playing on-demand.
 	//
 	/// @param data
 	/// 	The data to be stored. For soundstream this is NULL.
 	/// 	If not NULL, ownership of the data is transferred.
 	///	The data is assumed to have been allocated using new[].
+	///	The data is in encoded format, with format specified
+	///	with the sinfo parameter, this is to allow on-demand
+	///	decoding (if the sound is never played, it's never decoded).
 	///
 	/// @param data_bytes
 	///	The size of the data to be stored. For soundstream this is 0.
@@ -243,8 +246,14 @@ public:
 		std::auto_ptr<SoundInfo> sinfo
 		) = 0;
 
-	/// gnash's parser calls this to fill up soundstreams data
+	/// Append data to an existing sound buffer slot.
 	//
+	///
+	/// Gnash's parser calls this to fill up soundstreams data.
+	/// TODO: the current code uses memory reallocation to grow the sound,
+	/// which is suboptimal; instead, we should maintain sound sources as a 
+	/// list of buffers, to avoid reallocations.
+	///
 	/// @param data
 	/// 	The sound data to be saved, allocated by new[]. Ownership is transferred.
 	///	TODO: define a class for containing both data and data_bytes ? or use vector ?
@@ -272,8 +281,10 @@ public:
 	///
 	virtual SoundInfo* get_sound_info(int sound_handle) = 0;
 
-	/// gnash calls this when it wants you to play the defined sound.
+	/// Schedule playing of a sound source
 	//
+	/// All scheduled sounds will be played on next output flush.
+	///
 	/// @param sound_handle
 	///	The sound_handlers id for the sound to start playing
 	///
@@ -294,8 +305,7 @@ public:
 	///
 	virtual void	play_sound(int sound_handle, int loop_count, int secondOffset, long start, const std::vector<sound_envelope>* envelopes) = 0;
 
-	/// stops all sounds currently playing in a SWF file without stopping the playhead.
-	/// Sounds set to stream will resume playing as the playhead moves over the frames they are in.
+	/// Remove any scheduled request to play sound 
 	virtual void	stop_all_sounds() = 0;
 
 	/// Gets the volume for a given sound. Only used by the AS Sound class
@@ -305,6 +315,7 @@ public:
 	///
 	/// @return the sound volume level as an integer from 0 to 100,
 	/// where 0 is off and 100 is full volume. The default setting is 100.
+	///
 	virtual int	get_volume(int sound_handle) = 0;
 	
 	/// Sets the volume for a given sound. Only used by the AS Sound class
@@ -318,6 +329,8 @@ public:
 	///
 	virtual void	set_volume(int sound_handle, int volume) = 0;
 		
+	/// Remove any scheduled request to play the specified sound 
+	//
 	/// Stop the specified sound if it's playing.
 	/// (Normally a full-featured sound API would take a
 	/// handle specifying the *instance* of a playing
@@ -328,15 +341,17 @@ public:
 	///
 	virtual void	stop_sound(int sound_handle) = 0;
 		
-	/// gnash calls this when it's done with a particular sound.
+	/// Discard a sound buffer slot
 	//
 	/// @param sound_handle
 	///	The sound_handlers id for the sound to be deleted
 	///
 	virtual void	delete_sound(int sound_handle) = 0;
 
-	/// gnash calls this when restarting playback from scratch
+	/// Discard any sound input and clear scheduling
 	//
+	/// Gnash calls this on movie restart.
+	///
 	/// The function should stop all sounds and get ready
 	/// for a "parse from scratch" operation.
 	///
