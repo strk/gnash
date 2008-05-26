@@ -281,55 +281,60 @@ public:
 	///
 	virtual SoundInfo* get_sound_info(int sound_handle) = 0;
 
-	/// Schedule playing of a sound source
+	/// Schedule playing of a sound buffer slot
 	//
 	/// All scheduled sounds will be played on next output flush.
 	///
 	/// @param sound_handle
-	///	The sound_handlers id for the sound to start playing
+	///	Id of the sound buffer slot schedule playback of.
 	///
 	/// @param loop_count
-	/// loop_count == 0 means play the sound once (1 means play it twice, etc)
+	/// 	loop_count == 0 means play the sound once (1 means play it twice, etc)
 	///
 	/// @param secondOffset
-	/// When starting soundstreams there sometimes is a offset to make the sound
-	/// start at the exact right moment.
+	/// 	When starting soundstreams there sometimes is a offset to make the sound
+	/// 	start at the exact right moment.
 	///
 	/// @param start
-	/// When starting a soundstream from a random frame, this tells where in the
-	/// data the decoding should start, in samples.
+	/// 	When starting a soundstream from a random frame, this tells where in the
+	/// 	data the decoding should start, in samples.
 	///
 	/// @param envelopes
-	/// Some eventsounds have some volume control mechanism called envelopes.
-	/// They basically tells that from sample X the volume should be Y.
+	/// 	Some eventsounds have some volume control mechanism called envelopes.
+	/// 	They basically tells that from sample X the volume should be Y.
 	///
 	virtual void	play_sound(int sound_handle, int loop_count, int secondOffset, long start, const std::vector<sound_envelope>* envelopes) = 0;
 
-	/// Remove any scheduled request to play sound 
+	/// Remove all scheduled request for playback of sound buffer slots
 	virtual void	stop_all_sounds() = 0;
 
-	/// Gets the volume for a given sound. Only used by the AS Sound class
+	/// Gets the volume for a given sound buffer slot.
 	//
+	/// Only used by the AS Sound class
+	///
 	/// @param sound_handle
 	///	The sound_handlers id for the sound to be deleted
 	///
 	/// @return the sound volume level as an integer from 0 to 100,
-	/// where 0 is off and 100 is full volume. The default setting is 100.
+	/// 	where 0 is off and 100 is full volume. The default setting is 100.
 	///
 	virtual int	get_volume(int sound_handle) = 0;
 	
-	/// Sets the volume for a given sound. Only used by the AS Sound class
+	/// Sets the volume for a given sound buffer slot.
 	//
+	/// Only used by the AS Sound class
+	///
 	/// @param sound_handle
 	///	The sound_handlers id for the sound to be deleted
 	///
 	/// @param volume
-	/// A number from 0 to 100 representing a volume level. 
-	/// 100 is full volume and 0 is no volume. The default setting is 100.
+	/// 	A number from 0 to 100 representing a volume level. 
+	/// 	100 is full volume and 0 is no volume.
+	///	The default setting is 100.
 	///
 	virtual void	set_volume(int sound_handle, int volume) = 0;
 		
-	/// Remove any scheduled request to play the specified sound 
+	/// Remove scheduled requests to play the specified sound buffer slot
 	//
 	/// Stop the specified sound if it's playing.
 	/// (Normally a full-featured sound API would take a
@@ -348,7 +353,9 @@ public:
 	///
 	virtual void	delete_sound(int sound_handle) = 0;
 
-	/// Discard any sound input and clear scheduling
+	/// \brief
+	/// Discard all sound inputs (slots and aux streamers)
+	/// and clear scheduling
 	//
 	/// Gnash calls this on movie restart.
 	///
