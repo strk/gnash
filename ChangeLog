@@ -1,5 +1,9 @@
 2008-05-27 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* testsuite/swfdec/PASSING: update swfdec passes.
+
+2008-05-27 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* server/impl.cpp: clean up logging, drop the global bool
 	  s_no_recurse_while_loading, which has been used to disable parts
 	  of the code since before Gnash existed.
