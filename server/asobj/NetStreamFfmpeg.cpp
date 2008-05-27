@@ -32,7 +32,7 @@
 #include "movie_root.h"
 #include "sound_handler.h"
 #include "VideoDecoderFfmpeg.h"
-#include "ClockTime.h" // TODO: use the VirtualClock instead ?
+#include "SystemClock.h"
 
 #include "FLVParser.h" 
 
@@ -48,24 +48,31 @@
 #endif
 
 /// Define this to add debugging prints for locking
-#define GNASH_DEBUG_THREADS
+//#define GNASH_DEBUG_THREADS
 
 // Define the following macro to have status notification handling debugged
 //#define GNASH_DEBUG_STATUS
 
+// Define the following macro to have decoding activity  debugged
+//#define GNASH_DEBUG_DECODING
+
+namespace {
+
 // Used to free data in the AVPackets we create our self
-static void avpacket_destruct(AVPacket* av)
+void avpacket_destruct(AVPacket* av)
 {
 	delete [] av->data;
 }
+
+} // anonymous namespace
 
 
 namespace gnash {
 
 
-NetStreamFfmpeg::NetStreamFfmpeg():
+NetStreamFfmpeg::NetStreamFfmpeg()
+	:
 
-	_playback_state(PLAY_NONE),
 	_decoding_state(DEC_NONE),
 
 	m_video_index(-1),
@@ -76,16 +83,19 @@ NetStreamFfmpeg::NetStreamFfmpeg():
 	m_FormatCtx(NULL),
 	m_Frame(NULL),
 
-	_decodeThread(NULL),
-	_decodeThreadBarrier(2), // main and decoder threads
-	_qFillerKillRequest(false),
+#ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
+	_parserThread(NULL),
+	_parserThreadBarrier(2), // main and decoder threads
+	_parserKillRequest(false),
+#endif
 
 	m_last_video_timestamp(0),
 	m_last_audio_timestamp(0),
-	m_current_timestamp(0),
+
+	_playbackClock(new InterruptableVirtualClock(new SystemClock)),
+	_playHead(_playbackClock.get()), 
+
 	m_unqueued_data(NULL),
-	m_time_of_pause(0),
-	m_start_onbuffer(false),
 
 	_decoderBuffer(0),
 	_soundHandler(get_sound_handler())
@@ -107,23 +117,21 @@ NetStreamFfmpeg::~NetStreamFfmpeg()
 void NetStreamFfmpeg::pause( PauseMode mode )
 {
 	log_debug("::pause(%d) called ", mode);
-  switch ( mode ) {
-    case pauseModeToggle:
-			if ( playbackStatus() == PLAY_PAUSED ) {
-			  unpausePlayback();
-			} else {
-			  pausePlayback();
-			}
+	switch ( mode )
+	{
+		case pauseModeToggle:
+			if ( _playHead.getState() == PlayHead::PLAY_PAUSED) unpausePlayback();
+			else pausePlayback();
 			break;
-    case pauseModePause:
+		case pauseModePause:
 			pausePlayback();
 			break;
-    case pauseModeUnPause:
+		case pauseModeUnPause:
 			unpausePlayback();
 			break;
-    default:
+		default:
 			break;
-  }
+	}
 
 }
 
@@ -131,7 +139,9 @@ void NetStreamFfmpeg::close()
 {
 	GNASH_REPORT_FUNCTION;
 
-	killDecodeThread();
+#ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
+	killParserThread();
+#endif
 
 	// When closing gnash before playback is finished, the soundhandler 
 	// seems to be removed before netstream is destroyed.
@@ -165,11 +175,6 @@ void NetStreamFfmpeg::close()
 	delete m_unqueued_data;
 	m_unqueued_data = NULL;
 
-	boost::mutex::scoped_lock lock(_qMutex);
-
-	m_qvideo.clear();
-	m_qaudio.clear();
-
 	delete [] ByteIOCxt.buffer;
 
 }
@@ -180,10 +185,12 @@ NetStreamFfmpeg::readPacket(void* opaque, boost::uint8_t* buf, int buf_size)
 {
 
 	NetStreamFfmpeg* ns = static_cast<NetStreamFfmpeg*>(opaque);
-	boost::intrusive_ptr<NetConnection> nc = ns->_netCon;
 
-	size_t ret = nc->read(static_cast<void*>(buf), buf_size);
-	ns->inputPos += ret;
+	assert( ns->_inputStream.get() );
+	tu_file& in = *(ns->_inputStream);
+
+	size_t ret = in.read_bytes(static_cast<void*>(buf), buf_size);
+	ns->inputPos += ret; // what for ??
 	return ret;
 
 }
@@ -194,21 +201,21 @@ NetStreamFfmpeg::seekMedia(void *opaque, offset_t offset, int whence)
 {
 
 	NetStreamFfmpeg* ns = static_cast<NetStreamFfmpeg*>(opaque);
-	boost::intrusive_ptr<NetConnection> nc = ns->_netCon;
 
+	tu_file& in = *(ns->_inputStream);
 
 	// Offset is absolute new position in the file
 	if (whence == SEEK_SET)
 	{	
-		nc->seek(offset);
-		ns->inputPos = offset;
+		in.set_position(offset);
+		ns->inputPos = offset; // what for ?!
 
 	// New position is offset + old position
 	}
 	else if (whence == SEEK_CUR)
 	{
-		nc->seek(ns->inputPos + offset);
-		ns->inputPos = ns->inputPos + offset;
+		in.set_position(ns->inputPos + offset);
+		ns->inputPos = ns->inputPos + offset; // what for ?!
 
 	// New position is offset + end of file
 	}
@@ -216,23 +223,22 @@ NetStreamFfmpeg::seekMedia(void *opaque, offset_t offset, int whence)
 	{
 		// This is (most likely) a streamed file, so we can't seek to the end!
 		// Instead we seek to 50.000 bytes... seems to work fine...
-		nc->seek(50000);
-		ns->inputPos = 50000;
+		in.set_position(50000);
+		ns->inputPos = 50000; // what for ?!
 
 	}
 
-	return ns->inputPos;
+	return ns->inputPos; // ah, thats why ! :/
 }
 
 void
 NetStreamFfmpeg::play(const std::string& c_url)
 {
-
 	// Is it already playing ?
-	if (playbackStatus() != PLAY_NONE && playbackStatus() != PLAY_STOPPED)
+	if ( m_parser.get() )
 	{
-		log_error("NetStream.play() called already playing ?"); // TODO: fix this case
-		//unpausePlayback(); // will check for playbackStatus itself..
+		// TODO: check what to do in these cases
+		log_error("FIXME: NetStream.play() called while already streaming");
 		return;
 	}
 
@@ -245,11 +251,32 @@ NetStreamFfmpeg::play(const std::string& c_url)
 		return;
 	}
 
-	if (url.size() == 0) url += c_url;
+	url = c_url;
+
 	// Remove any "mp3:" prefix. Maybe should use this to mark as audio-only
 	if (url.compare(0, 4, std::string("mp3:")) == 0)
 	{
 		url = url.substr(4);
+	}
+
+	// TODO: check what is this needed for, I'm not sure it would be needed..
+	url = _netCon->validateURL(url);
+	if (url.empty())
+	{
+		log_error("Couldn't load URL %s", c_url);
+		return;
+	}
+
+	log_security( _("Connecting to movie: %s"), url );
+
+	StreamProvider& streamProvider = StreamProvider::getDefaultInstance();
+	_inputStream.reset( streamProvider.getStream( url ) );
+
+	if ( ! _inputStream.get() )
+	{
+		log_error( _("Gnash could not open this url: %s"), url );
+		setStatus(streamNotFound);
+		return;
 	}
 
 	// We need to start playback
@@ -259,15 +286,15 @@ NetStreamFfmpeg::play(const std::string& c_url)
 		return;
 	}
 
-	//decodingStatus(DEC_BUFFERING);
-
 	// We need to restart the audio
 	if (_soundHandler)
 		_soundHandler->attach_aux_streamer(audio_streamer, this);
 
-	// This starts the decoding thread
-	_decodeThread = new boost::thread(boost::bind(NetStreamFfmpeg::av_streamer, this)); 
-	_decodeThreadBarrier.wait();
+#ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
+	// This starts the parser thread
+	_parserThread = new boost::thread(boost::bind(NetStreamFfmpeg::parseAllInput, this)); 
+	_parserThreadBarrier.wait();
+#endif // LOAD_MEDIA_IN_A_SEPARATE_THREAD
 
 	return;
 }
@@ -354,6 +381,7 @@ initFlvAudio(FLVParser& parser)
 	FLVAudioInfo* audioInfo =  parser.getAudioInfo();
 	if (!audioInfo)
 	{
+		log_debug("No audio in FLV stream");
 		return NULL;
 	}
 
@@ -407,42 +435,37 @@ probeStream(NetStreamFfmpeg* ns)
 bool
 NetStreamFfmpeg::startPlayback()
 {
+	assert(_inputStream.get());
+	assert(_inputStream->get_position() == 0);
 
-	boost::intrusive_ptr<NetConnection> nc = _netCon;
-	assert(nc);
-
-	// Pass stuff from/to the NetConnection object.
-	if ( !nc->openConnection(url) )
-	{
-		log_error(_("Gnash could not open movie: %s"), url.c_str());
-		setStatus(streamNotFound);
-		return false;
-	}
-
-	nc->seek(0);
 	inputPos = 0;
 
 	// Check if the file is a FLV, in which case we use our own parser
 	char head[4] = {0, 0, 0, 0};
-	if (nc->read(head, 3) < 3)
+	if (_inputStream->read_bytes(head, 3) < 3)
 	{
+		log_error(_("Could not read 3 bytes from NetStream input"));
+		// not really correct, the stream was found, just wasn't what we expected..
 		setStatus(streamNotFound);
 		return false;
 	}
 
-	nc->seek(0);
+
+	_inputStream->set_position(0);
 	if (std::string(head) == "FLV")
 	{
 		m_isFLV = true;
-		if (!m_parser.get())
+		assert ( !m_parser.get() );
+
+		m_parser.reset( new FLVParser(_inputStream) ); 
+		assert(! _inputStream.get() ); // TODO: when ownership will be transferred...
+
+		if (! m_parser.get() )
 		{
-			m_parser = nc->getConnectedParser();
-			if (! m_parser.get() )
-			{
-				setStatus(streamNotFound);
-				log_error(_("Gnash could not open FLV movie: %s"), url.c_str());
-				return false;
-			}
+			log_error(_("Gnash could not open FLV movie: %s"), url.c_str());
+			// not really correct, the stream was found, just wasn't what we expected..
+			setStatus(streamNotFound);
+			return false;
 		}
 
 		// Init the avdecoder-decoder
@@ -459,16 +482,15 @@ NetStreamFfmpeg::startPlayback()
 		m_ACodecCtx = initFlvAudio(*m_parser);
 		if (!m_ACodecCtx)
 		{
-			log_error(_("Failed to initialize FLV audio codec"));
-			return false;
+			// There might simply be no audio, no problem...
+			//log_error(_("Failed to initialize FLV audio codec"));
+			//return false;
 		}
 
 		// We just define the indexes here, they're not really used when
 		// the file format is FLV
 		m_video_index = 0;
 		m_audio_index = 1;
-
-		m_start_onbuffer = true;
 
 		// Allocate a frame to store the decoded frame in
 		m_Frame = avcodec_alloc_frame();
@@ -490,7 +512,9 @@ NetStreamFfmpeg::startPlayback()
 		}
 
 		// After the format probe, reset to the beginning of the file.
-		nc->seek(0);
+		// TODO: have this done by probeStream !
+		//       (actually, have the whole thing done by MediaParser)
+		_inputStream->set_position(0);
 
 		// Setup the filereader/seeker mechanism. 7th argument (NULL) is the writer function,
 		// which isn't needed.
@@ -603,8 +627,17 @@ NetStreamFfmpeg::startPlayback()
 		}
 	}
 
-	playbackStatus(PLAY_PLAYING);
-	m_start_clock = clocktime::getTicks();
+	//_playHead.init(m_VCodecCtx!=0, false); // second arg should be m_ACodecCtx!=0, but we're testing video only for now
+	_playHead.init(m_VCodecCtx!=0, m_ACodecCtx!=0);
+	_playHead.setState(PlayHead::PLAY_PLAYING);
+
+	decodingStatus(DEC_BUFFERING);
+
+#ifdef GNASH_DEBUG_STATUS
+	log_debug("Setting playStart status");
+#endif // GNASH_DEBUG_STATUS
+	setStatus(playStart);
+
 	return true;
 }
 
@@ -632,114 +665,58 @@ rgbcopy(image::rgb* dst, media::raw_mediadata_t* src, int width)
   }
 }
 
-// decoder thread
-void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
+#ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
+// to be run in parser thread
+void NetStreamFfmpeg::parseAllInput(NetStreamFfmpeg* ns)
 {
 	//GNASH_REPORT_FUNCTION;
 
-	ns->_decodeThreadBarrier.wait();
+	ns->_parserThreadBarrier.wait();
 
-	//assert (ns->m_ACodecCtx); // is only set if audio decoder could be initialized 
-	//assert (ns->m_VCodecCtx); // is only set if video decder could be initialized 
-	//assert (ns->m_FormatCtx); // is only set for non-flv
-
-	ns->setStatus(playStart);
-
-	ns->m_last_video_timestamp = 0;
-	ns->m_last_audio_timestamp = 0;
-	ns->m_current_timestamp = 0;
-
-	ns->m_start_clock = clocktime::getTicks();
-
-	ns->m_unqueued_data = NULL;
-
-	// Loop until killed
-	while ( ! ns->decodeThreadKillRequested() ) // locks _qMutex
+	// Parse in a thread...
+	while ( 1 )
 	{
-		unsigned long int sleepTime = 1000;
+		// this one will lock _parserKillRequestMutex
+		if ( ns->parserThreadKillRequested() ) break;
 
 		{
-#ifdef GNASH_DEBUG_THREADS
-		log_debug("qMutex: waiting for lock in av_streamer");
-#endif
-		boost::mutex::scoped_lock lock(ns->_qMutex);
-#ifdef GNASH_DEBUG_THREADS
-		log_debug("qMutex: lock obtained in av_streamer");
-#endif
-
-		if ( ns->decodingStatus() == DEC_STOPPED )
-		{
-			log_debug("Dec stopped (eof), waiting on qNeedRefill condition");
-			ns->_qFillerResume.wait(lock);
-			continue; // will release the lock for a moment
+			boost::mutex::scoped_lock lock(ns->_parserMutex);
+			if ( ns->m_parser->parsingCompleted() ) break;
+			ns->m_parser->parseNextTag();
 		}
 
-#ifdef GNASH_DEBUG_THREADS
-		log_debug("Decoding iteration. bufferTime=%lu, bufferLen=%lu, videoFrames=%lu, audioFrames=%lu",
-			ns->bufferTime(), ns->bufferLength(), ns->m_qvideo.size(), ns->m_qaudio.size());
-#endif
+		usleep(10); // task switch (after lock was released!)
+	}
+}
 
-		if (ns->m_isFLV)
-		{
-			// If any of the two queues are full don't bother fetching more
-			// (next consumer will wake us up)
-			//
-      			if ( ns->m_qvideo.full() || ns->m_qaudio.full() )
-			{
-				ns->decodingStatus(DEC_DECODING); // that's to say: not buffering anymore
+void
+NetStreamFfmpeg::killParserThread()
+{
+	GNASH_REPORT_FUNCTION;
 
-				// Instead wait till waked up by short-queues event
-				log_debug("Queues full, waiting on qNeedRefill condition");
-				ns->_qFillerResume.wait(lock);
-			}
-			else
-			{
-				log_debug("Calling decodeFLVFrame");
-				bool successDecoding = ns->decodeFLVFrame();
-				//log_debug("decodeFLVFrame returned %d", successDecoding);
-				if ( ! successDecoding )
-				{
-					// Possible failures:
-					// 1. could not decode frame... lot's of possible
-					//    reasons...
-					// 2. EOF reached
-					if ( ns->m_videoFrameFormat != render::NONE )
-					{
-						log_error("Could not decode FLV frame");
-					}
-					// else it's expected, we'll keep going anyway
-				}
-
-			}
-
-		}
-		else
-		{
-
-			// If we have problems with decoding - break
-			if (ns->decodeMediaFrame() == false && ns->m_start_onbuffer == false && ns->m_qvideo.size() == 0 && ns->m_qaudio.size() == 0)
-			{
-				break;
-			}
-
-		}
-
-#ifdef GNASH_DEBUG_THREADS
-		log_debug("qMutex: releasing lock in av_streamer");
-#endif
-		}
-
-		//log_debug("Sleeping %d microseconds", sleepTime);
-		usleep(sleepTime); // Sleep 1ms to avoid busying the processor.
-
+	{
+		boost::mutex::scoped_lock lock(_parserKillRequestMutex);
+		_parserKillRequest = true;
 	}
 
-//#ifdef GNASH_DEBUG_THREADS
-	log_debug("Out of decoding loop. playbackStatus:%d, decodingStatus:%d", ns->playbackStatus(), ns->decodingStatus());
-//#endif
-	ns->decodingStatus(DEC_STOPPED);
+	// might as well be never started
+	if ( _parserThread )
+	{
+		_parserThread->join();
+	}
 
+	delete _parserThread;
+	_parserThread = NULL;
 }
+
+bool
+NetStreamFfmpeg::parserThreadKillRequested()
+{
+	boost::mutex::scoped_lock lock(_parserKillRequestMutex);
+	return _parserKillRequest;
+}
+
+#endif // LOAD_MEDIA_IN_A_SEPARATE_THREAD
 
 // audio callback is running in sound handler thread
 bool NetStreamFfmpeg::audio_streamer(void *owner, boost::uint8_t *stream, int len)
@@ -748,32 +725,24 @@ bool NetStreamFfmpeg::audio_streamer(void *owner, boost::uint8_t *stream, int le
 
 	NetStreamFfmpeg* ns = static_cast<NetStreamFfmpeg*>(owner);
 
-	PlaybackState pbStatus = ns->playbackStatus();
-	if (pbStatus != PLAY_PLAYING)
-	{
-		log_debug("playback status is paused, won't consume audio frames");
-		return false;
-	}
+	boost::mutex::scoped_lock lock(ns->_audioQueueMutex);
+
+#if 0
+	log_debug("audio_streamer called, audioQueue size: %d, "
+		"requested %d bytes of fill-up",
+		ns->_audioQueue.size(), len);
+#endif
+
 
 	while (len > 0)
 	{
-#ifdef GNASH_DEBUG_THREADS
-		log_debug("qMutex: waiting for lock in audio_streamer");
-#endif
-		boost::mutex::scoped_lock lock(ns->_qMutex);
-#ifdef GNASH_DEBUG_THREADS
-		log_debug("qMutex: lock obtained in audio_streamer");
-#endif
 
-		if ( ns->m_qaudio.empty() )
+		if ( ns->_audioQueue.empty() )
 		{
-#ifdef GNASH_DEBUG_THREADS
-			log_debug("qMutex: releasing lock in audio_streamer");
-#endif
 			break;
 		}
 
-    		media::raw_mediadata_t* samples = ns->m_qaudio.front();
+    		media::raw_mediadata_t* samples = ns->_audioQueue.front();
 
 		int n = std::min<int>(samples->m_size, len);
 		memcpy(stream, samples->m_ptr, n);
@@ -782,26 +751,156 @@ bool NetStreamFfmpeg::audio_streamer(void *owner, boost::uint8_t *stream, int le
 		samples->m_size -= n;
 		len -= n;
 
-		ns->m_current_timestamp = samples->m_pts;
-
 		if (samples->m_size == 0)
 		{
-			ns->m_qaudio.pop();
 			delete samples;
-
-			// wake up filler (TODO: do only if decoder is running)
-			ns->_qFillerResume.notify_all();
+			ns->_audioQueue.pop_front();
 		}
 
-#ifdef GNASH_DEBUG_THREADS
-		log_debug("qMutex: releasing lock in audio_streamer");
-#endif
 	}
+
 	return true;
 }
 
-bool NetStreamFfmpeg::decodeFLVFrame()
+media::raw_mediadata_t*
+NetStreamFfmpeg::getDecodedVideoFrame(boost::uint32_t ts)
 {
+	assert(m_parser.get());
+	if ( ! m_parser.get() )
+	{
+		log_error("getDecodedVideoFrame: no parser available");
+		return 0; // no parser, no party
+	}
+
+	FLVVideoFrameInfo* info = m_parser->peekNextVideoFrameInfo();
+	if ( ! info )
+	{
+#ifdef GNASH_DEBUG_DECODING
+		log_debug("getDecodedVideoFrame(%d): no more video frames in input (peekNextVideoFrameInfo returned false)");
+#endif // GNASH_DEBUG_DECODING
+		decodingStatus(DEC_STOPPED);
+		return 0;
+	}
+
+	if ( info->timestamp > ts )
+	{
+#ifdef GNASH_DEBUG_DECODING
+		log_debug("%p.getDecodedVideoFrame(%d): next video frame is in the future (%d)",
+			this, ts, info->timestamp);
+#endif // GNASH_DEBUG_DECODING
+		return 0; // next frame is in the future
+	}
+
+	// Loop until a good frame is found
+    	media::raw_mediadata_t* video = 0;
+	while ( 1 )
+	{
+    		video = decodeNextVideoFrame();
+		if ( ! video )
+		{
+			log_error("peekNextVideoFrameInfo returned some info, "
+				"but decodeNextVideoFrame returned null, "
+				"I don't think this should ever happen");
+			break;
+		}
+
+		FLVVideoFrameInfo* info = m_parser->peekNextVideoFrameInfo();
+		if ( ! info )
+		{
+			// the one we decoded was the last one
+#ifdef GNASH_DEBUG_DECODING
+			log_debug("%p.getDecodedVideoFrame(%d): last video frame decoded "
+				"(should set playback status to STOP?)", this, ts);
+#endif // GNASH_DEBUG_DECODING
+			break;
+		}
+		if ( info->timestamp > ts )
+		{
+			// the next one is in the future, we'll return this one.
+#ifdef GNASH_DEBUG_DECODING
+			log_debug("%p.getDecodedVideoFrame(%d): "
+				"next video frame is in the future, "
+				"we'll return this one",
+				this, ts);
+#endif // GNASH_DEBUG_DECODING
+			break; // the one we decoded
+		}
+	}
+
+	return video;
+}
+
+media::raw_mediadata_t*
+NetStreamFfmpeg::decodeNextVideoFrame()
+{
+	if ( ! m_parser.get() )
+	{
+		log_error("decodeNextVideoFrame: no parser available");
+		return 0; // no parser, no party
+	}
+
+	FLVFrame* frame = m_parser->nextVideoFrame(); 
+	if (frame == NULL)
+	{
+#ifdef GNASH_DEBUG_DECODING
+		log_debug("%p.decodeNextVideoFrame(): "
+			"no more video frames in input",
+			this);
+#endif // GNASH_DEBUG_DECODING
+		return 0;
+	}
+	assert (frame->type == videoFrame);
+
+  	AVPacket packet;
+
+  	packet.destruct = avpacket_destruct; // needed ?
+  	packet.size = frame->dataSize;
+  	packet.data = frame->data;
+  	// FIXME: is this the right value for packet.dts?
+  	packet.pts = packet.dts = static_cast<boost::int64_t>(frame->timestamp);
+	assert (frame->type == videoFrame);
+	packet.stream_index = 0;
+
+	return decodeVideo(&packet);
+}
+
+media::raw_mediadata_t*
+NetStreamFfmpeg::decodeNextAudioFrame()
+{
+	assert ( m_parser.get() );
+
+	FLVFrame* frame = m_parser->nextAudioFrame(); 
+	if (frame == NULL)
+	{
+#ifdef GNASH_DEBUG_DECODING
+		log_debug("%p.decodeNextAudioFrame: "
+			"no more video frames in input",
+			this);
+#endif // GNASH_DEBUG_DECODING
+		return 0;
+	}
+	assert (frame->type == audioFrame);
+
+  	AVPacket packet;
+
+  	packet.destruct = avpacket_destruct;
+  	packet.size = frame->dataSize;
+  	packet.data = frame->data;
+  	// FIXME: is this the right value for packet.dts?
+  	packet.pts = packet.dts = static_cast<boost::int64_t>(frame->timestamp);
+	assert(frame->type == audioFrame);
+	packet.stream_index = 1;
+
+	return decodeAudio(&packet);
+}
+
+bool
+NetStreamFfmpeg::decodeFLVFrame()
+{
+#if 1
+	abort();
+	return false;
+#else
 	FLVFrame* frame = m_parser->nextMediaFrame(); // we don't care which one, do we ?
 
 	if (frame == NULL)
@@ -823,21 +922,40 @@ bool NetStreamFfmpeg::decodeFLVFrame()
 	if (frame->type == videoFrame)
 	{
     		packet.stream_index = 0;
-    		return decodeVideo(&packet);
+		media::raw_mediadata_t* video = decodeVideo(&packet);
+		assert (m_isFLV);
+		if (video)
+		{
+			// NOTE: Caller is assumed to have locked _qMutex already
+			if ( ! m_qvideo.push(video) )
+			{
+				log_error("Video queue full !");
+			}
+		}
 	}
 	else
 	{
 		assert(frame->type == audioFrame);
     		packet.stream_index = 1;
-    		return decodeAudio(&packet);
+		media::raw_mediadata_t* audio = decodeAudio(&packet);
+		if ( audio )
+		{
+			if ( ! m_qaudio.push(audio) )
+			{
+				log_error("Audio queue full!");
+			}
+		}
 	}
 
+	return true;
+#endif
 }
 
 
-bool NetStreamFfmpeg::decodeAudio( AVPacket* packet )
+media::raw_mediadata_t* 
+NetStreamFfmpeg::decodeAudio( AVPacket* packet )
 {
-	if (!m_ACodecCtx) return false;
+	if (!m_ACodecCtx) return 0;
 
 	int frame_size;
 	//static const unsigned int bufsize = (AVCODEC_MAX_AUDIO_FRAME_SIZE * 3) / 2;
@@ -945,26 +1063,21 @@ bool NetStreamFfmpeg::decodeAudio( AVPacket* packet )
 
 		m_last_audio_timestamp += frame_delay;
 
-		if (m_isFLV)
-		{
-			if ( ! m_qaudio.push(raw) )
-			{
-				log_error("Audio queue full!");
-			}
-		}
-		else m_unqueued_data = m_qaudio.push(raw) ? NULL : raw;
+		return raw;
 	}
-	return true;
+	return 0;
 }
 
 
-bool NetStreamFfmpeg::decodeVideo(AVPacket* packet)
+media::raw_mediadata_t* 
+NetStreamFfmpeg::decodeVideo(AVPacket* packet)
 {
-	if (!m_VCodecCtx) return false;
+	if (!m_VCodecCtx) return NULL;
+	if (!m_Frame) return NULL;
 
 	int got = 0;
 	avcodec_decode_video(m_VCodecCtx, m_Frame, &got, packet->data, packet->size);
-	if (!got) return false;
+	if (!got) return NULL;
 
 	// This tmpImage is really only used to compute proper size of the video data...
 	// stupid isn't it ?
@@ -983,7 +1096,7 @@ bool NetStreamFfmpeg::decodeVideo(AVPacket* packet)
 	if (m_videoFrameFormat == render::NONE)
 	{
 		// NullGui?
-		return false;
+		return NULL;
 
 	}
 	else if (m_videoFrameFormat == render::YUV && m_VCodecCtx->pix_fmt != PIX_FMT_YUV420P)
@@ -998,7 +1111,7 @@ bool NetStreamFfmpeg::decodeVideo(AVPacket* packet)
 		rgbpicture = media::VideoDecoderFfmpeg::convertRGB24(m_VCodecCtx, *m_Frame);
 		if (!rgbpicture.data[0])
 		{
-			return false;
+			return NULL;
 		}
 	}
 
@@ -1089,21 +1202,14 @@ bool NetStreamFfmpeg::decodeVideo(AVPacket* packet)
 
 	}
 
-	// NOTE: Caller is assumed to have locked _qMutex already
-	if (m_isFLV)
-	{
-		if ( ! m_qvideo.push(video) )
-		{
-			log_error("Video queue full !");
-		}
-	}
-	else m_unqueued_data = m_qvideo.push(video) ? NULL : video;
-
-	return true;
+	return video;
 }
 
 bool NetStreamFfmpeg::decodeMediaFrame()
 {
+	return false;
+
+#if 0 // Only FLV for now (non-FLV should be threated the same as FLV, using a MediaParser in place of the FLVParser)
 
 	if (m_unqueued_data)
 	{
@@ -1133,20 +1239,24 @@ bool NetStreamFfmpeg::decodeMediaFrame()
 	{
 		if (packet.stream_index == m_audio_index && _soundHandler)
 		{
-      			if (!decodeAudio(&packet)) 
+			media::raw_mediadata_t* audio = decodeAudio(&packet);
+      			if (!audio)
 			{
 				log_error(_("Problems decoding audio frame"));
 				return false;
 			}
+			m_unqueued_data = m_qaudio.push(audio) ? NULL : audio;
 		}
 		else
 		if (packet.stream_index == m_video_index)
 		{
-      			if (!decodeVideo(&packet)) 
+			media::raw_mediadata_t* video = decodeVideo(&packet);
+      			if (!video)
 			{
 				log_error(_("Problems decoding video frame"));
 				return false;
 			}
+			m_unqueued_data = m_qvideo.push(video) ? NULL : video;
 		}
 		av_free_packet(&packet);
 	}
@@ -1157,6 +1267,7 @@ bool NetStreamFfmpeg::decodeMediaFrame()
 	}
 
 	return true;
+#endif
 }
 
 void
@@ -1164,30 +1275,31 @@ NetStreamFfmpeg::seek(boost::uint32_t posSeconds)
 {
 	GNASH_REPORT_FUNCTION;
 
-	// We'll mess with the queues here
-	boost::mutex::scoped_lock lock(_qMutex);
+#ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
+	boost::mutex::scoped_lock lock(_parserMutex);
+#endif // LOAD_MEDIA_IN_A_SEPARATE_THREAD
+
+	// We'll mess with the input here
+	if ( ! m_parser.get() )
+	{
+		log_debug("NetStreamFfmpeg::seek(%d): no parser, no party", posSeconds);
+		return;
+	}
+
+	// Don't ask me why, but NetStream::seek() takes seconds...
+	boost::uint32_t pos = posSeconds*1000;
 
 	long newpos = 0;
 	double timebase = 0;
 
-        // Don't ask me why, but NetStream::seek() takes seconds...
-	boost::uint32_t pos = posSeconds*1000;
-
 	// Seek to new position
 	if (m_isFLV)
 	{
-		if (m_parser.get())
-		{
-			newpos = m_parser->seek(pos);
-		}
-		else
-		{
-			newpos = 0;
-		}
+		newpos = m_parser->seek(pos);
+		log_debug("m_parser->seek(%d) returned %d", pos, newpos);
 	}
 	else if (m_FormatCtx)
 	{
-
 		AVStream* videostream = m_FormatCtx->streams[m_video_index];
     		timebase = static_cast<double>(videostream->time_base.num / videostream->time_base.den);
 		newpos = static_cast<long>(pos / timebase);
@@ -1209,20 +1321,11 @@ NetStreamFfmpeg::seek(boost::uint32_t posSeconds)
 	{
 		m_last_video_timestamp = 0;
 		m_last_audio_timestamp = 0;
-		m_current_timestamp = 0;
-
-		m_start_clock = clocktime::getTicks();
-
 	}
 	else if (m_isFLV)
 	{
-
-		if (m_VCodecCtx) m_start_clock += m_last_video_timestamp - newpos;
-		else m_start_clock += m_last_audio_timestamp - newpos;
-
 		if (m_ACodecCtx) m_last_audio_timestamp = newpos;
 		if (m_VCodecCtx) m_last_video_timestamp = newpos;
-		m_current_timestamp = newpos;
 	}
 	else
 	{
@@ -1244,257 +1347,436 @@ NetStreamFfmpeg::seek(boost::uint32_t posSeconds)
     		av_free_packet( &Packet );
 
 		av_seek_frame(m_FormatCtx, m_video_index, newpos, 0);
-		boost::uint32_t newtime_ms = static_cast<boost::int32_t>(newtime / 1000.0);
-		m_start_clock += m_last_audio_timestamp - newtime_ms;
+		newpos = static_cast<boost::int32_t>(newtime / 1000.0);
 
-		m_last_audio_timestamp = newtime_ms;
-		m_last_video_timestamp = newtime_ms;
-		m_current_timestamp = newtime_ms;
+		m_last_audio_timestamp = newpos;
+		m_last_video_timestamp = newpos;
+	}
+
+	{ // cleanup audio queue, so won't be consumed while seeking
+		boost::mutex::scoped_lock lock(_audioQueueMutex);
+		for (AudioQueue::iterator i=_audioQueue.begin(), e=_audioQueue.end();
+				i!=e; ++i)
+		{
+			delete (*i);
+		}
+		_audioQueue.clear();
 	}
 	
-	// Flush the queues
-	m_qvideo.clear();
-	m_qaudio.clear();
+	// 'newpos' will always be on a keyframe (supposedly)
+	_playHead.seekTo(newpos);
 
-	decodingStatus(DEC_DECODING); // or ::refreshVideoFrame will send a STOPPED again
-	if ( playbackStatus() == PLAY_STOPPED )
-	{
-		// restart playback (if not paused)
-		playbackStatus(PLAY_PLAYING);
-	}
+	decodingStatus(DEC_BUFFERING); // make sure we have enough things in buffer
 	_qFillerResume.notify_all(); // wake it decoder is sleeping
 	
+	refreshVideoFrame(true);
 }
 
 void
-NetStreamFfmpeg::refreshVideoFrame()
+NetStreamFfmpeg::parseNextChunk()
 {
-#ifdef GNASH_DEBUG_THREADS
-	log_debug("qMutex: waiting for lock in refreshVideoFrame");
-#endif
-	boost::mutex::scoped_lock lock(_qMutex);
-#ifdef GNASH_DEBUG_THREADS
-	log_debug("qMutex: lock obtained in refreshVideoFrame");
+	// TODO: parse as much as possible w/out blocking
+	//       (will always block currently..)
+	const int tagsPerChunk = 2;
+	for (int i=0; i<tagsPerChunk; ++i)
+		m_parser->parseNextTag();
+}
+
+void
+NetStreamFfmpeg::refreshAudioBuffer()
+{
+	assert ( m_parser.get() );
+
+#ifdef GNASH_DEBUG_DECODING
+	// bufferLength() would lock the mutex (which we already hold),
+	// so this is to avoid that.
+	boost::uint32_t parserTime = m_parser->getBufferLength();
+	boost::uint32_t playHeadTime = time();
+	boost::uint32_t bufferLen = parserTime > playHeadTime ? parserTime-playHeadTime : 0;
 #endif
 
-	// If we're paused (and we got the first imageframe), there is no need to do this
-	if (playbackStatus() == PLAY_PAUSED && m_imageframe)
+	if ( _playHead.getState() == PlayHead::PLAY_PAUSED )
 	{
-		log_debug("refreshVideoFrame doing nothing as playback is paused and we have an image frame already");
-#ifdef GNASH_DEBUG_THREADS
-		log_debug("qMutex: releasing lock in refreshVideoFrame");
-#endif
+#ifdef GNASH_DEBUG_DECODING
+		log_debug("%p.refreshAudioBuffer: doing nothing as playhead is paused - "
+			"bufferLength=%d, bufferTime=%d",
+			this, bufferLen, m_bufferTime);
+#endif // GNASH_DEBUG_DECODING
 		return;
 	}
 
-	// Loop until a good frame is found
-	do
+	if ( _playHead.isAudioConsumed() ) 
 	{
-		// Get video frame from queue, will have the lowest timestamp
-		// will return NULL if empty(). See multithread_queue::front
-    		media::raw_mediadata_t* video = m_qvideo.front();
+#ifdef GNASH_DEBUG_DECODING
+		log_debug("%p.refreshAudioBuffer: doing nothing "
+			"as current position was already decoded - "
+			"bufferLength=%d, bufferTime=%d",
+			this, bufferLen, m_bufferTime);
+#endif // GNASH_DEBUG_DECODING
+		return;
+	}
 
-		// If the queue is empty either we're waiting for more data
-		// to be decoded or we're out of data
-		if (!video)
+	// Calculate the current time
+	boost::uint64_t curPos = _playHead.getPosition();
+
+#ifdef GNASH_DEBUG_DECODING
+	log_debug("%p.refreshAudioBuffer: currentPosition=%d, playHeadState=%d, bufferLength=%d, bufferTime=%d",
+		this, curPos, _playHead.getState(), bufferLen, m_bufferTime);
+#endif // GNASH_DEBUG_DECODING
+
+	// TODO: here we should fetch all frames up to the one with timestamp >= curPos
+	//       and push them into the buffer to be consumed by audio_streamer
+	pushDecodedAudioFrames(curPos);
+}
+
+void
+NetStreamFfmpeg::pushDecodedAudioFrames(boost::uint32_t ts)
+{
+	assert(m_parser.get());
+
+	bool consumed = false;
+
+	while ( 1 )
+	{
+		FLVAudioFrameInfo* info = m_parser->peekNextAudioFrameInfo();
+		if ( ! info )
 		{
-			log_debug("refreshVideoFrame:: No more video frames in queue");
-
-			if ( decodingStatus() == DEC_STOPPED )
-			{
-				if ( playbackStatus() != PLAY_STOPPED )
-				{
-					playbackStatus(PLAY_STOPPED);
-//#ifdef GNASH_DEBUG_STATUS
-					log_debug("Setting playStop status");
-//#endif
-					setStatus(playStop);
-				}
-			}
-			else
-			{
-				// There no video but decoder is still running
-				// not much to do here except wait for next call
-				//assert(decodingStatus() == DEC_BUFFERING);
-			}
-
-			break;
-		}
-
-		// Caclulate the current time
-		boost::uint32_t current_clock;
-		if (m_ACodecCtx && _soundHandler)
-		{
-			current_clock = m_current_timestamp;
-		}
-		else
-		{
-			current_clock = clocktime::getTicks() - m_start_clock;
-			m_current_timestamp = current_clock;
-		}
-
-		boost::uint32_t video_clock = video->m_pts;
-
-		// If the timestamp on the videoframe is smaller than the
-		// current time, we put it in the output image.
-		if (current_clock >= video_clock)
-		{
-
-			if (m_videoFrameFormat == render::YUV)
-			{
-				if ( ! m_imageframe ) m_imageframe  = new image::yuv(m_VCodecCtx->width, m_VCodecCtx->height);
-				// XXX m_imageframe might be a byte aligned buffer, while video is not!
-				static_cast<image::yuv*>(m_imageframe)->update(video->m_data);
-			}
-			else if (m_videoFrameFormat == render::RGB)
-			{
-				if ( ! m_imageframe ) m_imageframe  = new image::rgb(m_VCodecCtx->width, m_VCodecCtx->height);
-				image::rgb* imgframe = static_cast<image::rgb*>(m_imageframe);
-				rgbcopy(imgframe, video, m_VCodecCtx->width * 3);
-			}
-
-			// Delete the frame from the queue
-			m_qvideo.pop();
-			delete video;
-
-			// wake up filler (TODO: do only if decoder is running)
-			// TODO2: resume only at end of loop ?
-			_qFillerResume.notify_all();
-
-			// A frame is ready for pickup
-			m_newFrameReady = true;
-
-		}
-		else
-		{
-			// The timestamp on the first frame in the queue is greater
-			// than the current time, so no need to do anything.
-			break;
-		}
-
-	} while(!m_qvideo.empty());
-
-#ifdef GNASH_DEBUG_THREADS
-	log_debug("qMutex: releasing lock in refreshVideoFrame");
+#ifdef GNASH_DEBUG_DECODING
+			log_debug("%p.pushDecodedAudioFrames(%d): "
+				"no more audio frames in input "
+				"(peekNextAudioFrameInfo returned false)",
+				this, ts);
+#endif // GNASH_DEBUG_DECODING
+			consumed = true;
+			decodingStatus(DEC_STOPPED);
+#ifdef GNASH_DEBUG_STATUS
+			log_debug("Setting playStop status");
 #endif
+			setStatus(playStop);
+			break;
+		}
+
+		if ( info->timestamp > ts )
+		{
+#ifdef GNASH_DEBUG_DECODING
+			log_debug("%p.pushDecodedAudioFrames(%d): "
+				"next audio frame is in the future (%d)",
+				this, ts, info->timestamp);
+#endif // GNASH_DEBUG_DECODING
+			consumed = true;
+			break; // next frame is in the future
+		}
+
+		boost::mutex::scoped_lock lock(_audioQueueMutex);
+
+		static const int bufferLimit = 20;
+		if ( _audioQueue.size() > bufferLimit )
+		{
+			// we won't buffer more then 'bufferLimit' frames in the queue
+			// to avoid ending up with a huge queue which will take some
+			// time before being consumed by audio mixer, but still marked
+			// as "consumed". Keeping decoded frames buffer low would also
+			// reduce memory use.
+			//
+			// The alternative would be always decode on demand from the
+			// audio consumer thread, but would introduce a lot of thread-safety
+			// issues: playhead would need protection, input would need protection.
+			//
+#ifdef GNASH_DEBUG_DECODING
+			log_debug("%p.pushDecodedAudioFrames(%d) : queue size over limit (%d), "
+				"audio won't be consumed (buffer overrun?)",
+				this, ts, bufferLimit);
+#endif // GNASH_DEBUG_DECODING
+			return;
+		}
+
+		media::raw_mediadata_t* audio = decodeNextAudioFrame();
+		if ( ! audio )
+		{
+			log_error("peekNextAudioFrameInfo returned some info, "
+				"but decodeNextAudioFrame returned null, "
+				"I don't think this should ever happen");
+			break;
+		}
+
+		_audioQueue.push_back(audio);
+	}
+
+	// If we consumed audio of current position, feel free to advance if needed
+	if ( consumed ) _playHead.setAudioConsumed();
+}
+
+
+void
+NetStreamFfmpeg::refreshVideoFrame(bool alsoIfPaused)
+{
+	assert ( m_parser.get() );
+
+#ifdef GNASH_DEBUG_DECODING
+	// bufferLength() would lock the mutex (which we already hold),
+	// so this is to avoid that.
+	boost::uint32_t parserTime = m_parser->getBufferLength();
+	boost::uint32_t playHeadTime = time();
+	boost::uint32_t bufferLen = parserTime > playHeadTime ? parserTime-playHeadTime : 0;
+#endif
+
+	if ( ! alsoIfPaused && _playHead.getState() == PlayHead::PLAY_PAUSED )
+	{
+#ifdef GNASH_DEBUG_DECODING
+		log_debug("%p.refreshVideoFrame: doing nothing as playhead is paused - "
+			"bufferLength=%d, bufferTime=%d",
+			this, bufferLen, m_bufferTime);
+#endif // GNASH_DEBUG_DECODING
+		return;
+	}
+
+	if ( _playHead.isVideoConsumed() ) 
+	{
+#ifdef GNASH_DEBUG_DECODING
+		log_debug("%p.refreshVideoFrame: doing nothing "
+			"as current position was already decoded - "
+			"bufferLength=%d, bufferTime=%d",
+			this, bufferLen, m_bufferTime);
+#endif // GNASH_DEBUG_DECODING
+		return;
+	}
+
+	// Calculate the current time
+	boost::uint64_t curPos = _playHead.getPosition();
+
+#ifdef GNASH_DEBUG_DECODING
+	log_debug("%p.refreshVideoFrame: currentPosition=%d, playHeadState=%d, bufferLength=%d, bufferTime=%d",
+		this, curPos, _playHead.getState(), bufferLen, m_bufferTime);
+#endif // GNASH_DEBUG_DECODING
+
+	// Get next decoded video frame from parser, will have the lowest timestamp
+    	media::raw_mediadata_t* video = getDecodedVideoFrame(curPos);
+
+	// to be decoded or we're out of data
+	if (!video)
+	{
+		if ( decodingStatus() == DEC_STOPPED )
+		{
+#ifdef GNASH_DEBUG_DECODING
+			log_debug("%p.refreshVideoFrame(): "
+				"no more video frames to decode, "
+				"sending STOP event",
+				this);
+#endif // GNASH_DEBUG_DECODING
+#ifdef GNASH_DEBUG_STATUS
+			log_debug("Setting playStop status");
+#endif
+			setStatus(playStop);
+		}
+		else
+		{
+#ifdef GNASH_DEBUG_DECODING
+			log_debug("%p.refreshVideoFrame(): "
+				"last video frame was good enough "
+				"for current position",
+				this);
+#endif // GNASH_DEBUG_DECODING
+			// There no video but decoder is still running
+			// not much to do here except wait for next call
+			//assert(decodingStatus() == DEC_BUFFERING);
+		}
+
+	}
+	else
+	{
+
+		if (m_videoFrameFormat == render::YUV)
+		{
+			if ( ! m_imageframe ) m_imageframe  = new image::yuv(m_VCodecCtx->width, m_VCodecCtx->height);
+			// XXX m_imageframe might be a byte aligned buffer, while video is not!
+			static_cast<image::yuv*>(m_imageframe)->update(video->m_data);
+		}
+		else if (m_videoFrameFormat == render::RGB)
+		{
+			if ( ! m_imageframe ) m_imageframe  = new image::rgb(m_VCodecCtx->width, m_VCodecCtx->height);
+			image::rgb* imgframe = static_cast<image::rgb*>(m_imageframe);
+			rgbcopy(imgframe, video, m_VCodecCtx->width * 3);
+		}
+
+		// Delete the frame from the queue
+		delete video;
+
+		// A frame is ready for pickup
+		m_newFrameReady = true;
+	}
+
+	// We consumed video of current position, feel free to advance if needed
+	_playHead.setVideoConsumed();
+
+
 }
 
 
 void
 NetStreamFfmpeg::advance()
 {
-	//log_debug("advance");
-
 	// Check if there are any new status messages, and if we should
 	// pass them to a event handler
 	processStatusNotifications();
 
+#ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
+	// stop parser thread while advancing
+	boost::mutex::scoped_lock lock(_parserMutex);
+#endif // LOAD_MEDIA_IN_A_SEPARATE_THREAD
+
+	// Nothing to do if we don't have a parser
+	if ( ! m_parser.get() ) return;
+
+#ifndef LOAD_MEDIA_IN_A_SEPARATE_THREAD
+	// Parse some input no matter what
+	parseNextChunk(); 
+#endif // LOAD_MEDIA_IN_A_SEPARATE_THREAD
+
+	// bufferLength() would lock the mutex (which we already hold),
+	// so this is to avoid that.
+	boost::uint32_t parserTime = m_parser->getBufferLength();
+	boost::uint32_t playHeadTime = time();
+	boost::uint32_t bufferLen = parserTime > playHeadTime ? parserTime-playHeadTime : 0;
+
+
+	// Check decoding status 
+	if ( decodingStatus() == DEC_DECODING && bufferLen == 0 )
+	{
+		if ( ! m_parser->parsingCompleted() )
+		{
+#ifdef GNASH_DEBUG_DECODING
+			log_debug("%p.advance: buffer empty while decoding,"
+				" setting buffer to buffering and pausing playback clock",
+				this);
+#endif // GNASH_DEBUG_DECODING
+#ifdef GNASH_DEBUG_STATUS
+			log_debug("Setting bufferEmpty status");
+#endif
+			setStatus(bufferEmpty);
+			decodingStatus(DEC_BUFFERING);
+			_playbackClock->pause();
+		}
+		else
+		{
+#ifdef GNASH_DEBUG_DECODING
+			log_debug("%p.advance : bufferLength=%d, parsing completed",
+ 				this, bufferLen);
+#endif // GNASH_DEBUG_DECODING
+			// set playStop ? (will be done later for now)
+		}
+	}
+
+	if ( decodingStatus() == DEC_BUFFERING )
+	{
+		if ( bufferLen < m_bufferTime && ! m_parser->parsingCompleted() )
+		{
+#ifdef GNASH_DEBUG_DECODING
+			log_debug("%p.advance: buffering"
+				" - position=%d, buffer=%d/%d",
+				this, _playHead.getPosition(), bufferLen, m_bufferTime);
+#endif // GNASH_DEBUG_DECODING
+			return;
+		}
+
+#ifdef GNASH_DEBUG_DECODING
+		log_debug("%p.advance: buffer full (or parsing completed), resuming playback clock"
+			" - position=%d, buffer=%d/%d",
+			this, _playHead.getPosition(), bufferLen, m_bufferTime);
+#endif // GNASH_DEBUG_DECODING
+
+		setStatus(bufferFull);
+		decodingStatus(DEC_DECODING);
+		_playbackClock->resume();
+	}
+
 	// Find video frame with the most suited timestamp in the video queue,
 	// and put it in the output image frame.
 	refreshVideoFrame();
+
+	// Refill audio buffer to consume all samples
+	// up to current playhead
+	refreshAudioBuffer();
 }
 
 boost::int32_t
 NetStreamFfmpeg::time()
 {
-
-	if (m_FormatCtx && m_FormatCtx->nb_streams > 0)
-	{
-    		double time = (double)m_FormatCtx->streams[0]->time_base.num / (double)m_FormatCtx->streams[0]->time_base.den * (double)m_FormatCtx->streams[0]->cur_dts;
-		return static_cast<boost::int32_t>(time);
-	}
-	else if
-	(m_isFLV)
-	{
-		return m_current_timestamp;
-	}
-	else
-	{
-		return 0;
-	}
+	return _playHead.getPosition();
 }
 
 void NetStreamFfmpeg::pausePlayback()
 {
 	GNASH_REPORT_FUNCTION;
 
-	if (playbackStatus() == PLAY_PAUSED) return;
+	PlayHead::PlaybackStatus oldStatus = _playHead.setState(PlayHead::PLAY_PAUSED);
 
-	playbackStatus(PLAY_PAUSED);
-
-	// Save the current time so we later can tell how long the pause lasted
-	m_time_of_pause = clocktime::getTicks();
-
-	// Disconnect the soundhandler so we don't play while paused
-	if ( _soundHandler ) _soundHandler->detach_aux_streamer((void*)this);
+	// Disconnect the soundhandler if we were playing before
+	if ( oldStatus == PlayHead::PLAY_PLAYING && _soundHandler )
+	{
+		_soundHandler->detach_aux_streamer((void*)this);
+	}
 }
 
 void NetStreamFfmpeg::unpausePlayback()
 {
 	GNASH_REPORT_FUNCTION;
 
-	if (playbackStatus() == PLAY_PLAYING) // already playing
-	{
-		log_debug("unpausePlayback: already playing");
-		return;
-	}
+	PlayHead::PlaybackStatus oldStatus = _playHead.setState(PlayHead::PLAY_PLAYING);
 
-	playbackStatus(PLAY_PLAYING);
-
-	if (m_current_timestamp == 0)
+	// Re-connect to the soundhandler if we were paused before
+	if ( oldStatus == PlayHead::PLAY_PAUSED && _soundHandler )
 	{
-		m_start_clock = clocktime::getTicks();
+		_soundHandler->attach_aux_streamer(audio_streamer, (void*) this);
 	}
-	else
-	{
-		// Add the paused time to the start time so that the playhead doesn't
-		// noticed that we have been paused
-		m_start_clock += clocktime::getTicks() - m_time_of_pause;
-	}
-
-	// (re)-connect to the soundhandler.
-	// It was disconnected in ::pausePlayback to avoid to keep playing sound while paused
-	if ( _soundHandler ) _soundHandler->attach_aux_streamer(audio_streamer, (void*) this);
 }
 
 
 long
 NetStreamFfmpeg::bytesLoaded ()
 {
-  	long ret_val = 0;
-
-  	if ( _netCon ) 
+  	if ( ! m_parser.get() )
 	{
-    		ret_val = _netCon->getBytesLoaded();
+		log_debug("bytesLoaded: no parser, no party");
+		return 0;
   	}
 
-  	return ret_val;
+	return m_parser->getBytesLoaded();
 }
 
+long
+NetStreamFfmpeg::bufferLength ()
+{
+#ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
+	boost::mutex::scoped_lock lock(_parserMutex);
+#endif // LOAD_MEDIA_IN_A_SEPARATE_THREAD
+
+  	if ( ! m_parser.get() )
+	{
+		log_debug("bytesTotal: no parser, no party");
+		return 0;
+  	}
+
+	boost::uint32_t maxTimeInBuffer = m_parser->getBufferLength();
+	boost::uint64_t curPos = _playHead.getPosition();
+
+	if ( maxTimeInBuffer < curPos ) return 0;
+	return maxTimeInBuffer-curPos;
+}
 
 long
 NetStreamFfmpeg::bytesTotal ()
 {
-  	long ret_val = 0;
+#ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
+	boost::mutex::scoped_lock lock(_parserMutex);
+#endif // LOAD_MEDIA_IN_A_SEPARATE_THREAD
 
-  	if ( _netCon ) 
+  	if ( ! m_parser.get() )
 	{
-    		ret_val = _netCon->getBytesTotal();
+		log_debug("bytesTotal: no parser, no party");
+		return 0;
   	}
 
-  	return ret_val;
-}
-
-NetStreamFfmpeg::PlaybackState
-NetStreamFfmpeg::playbackStatus(PlaybackState newstate)
-{
-	boost::mutex::scoped_lock lock(_state_mutex);
-
-	if (newstate != PLAY_NONE) {
-		_playback_state = newstate;
-	}
-
-	return _playback_state;
+	return m_parser->getBytesTotal();
 }
 
 NetStreamFfmpeg::DecodingState
@@ -1507,41 +1789,6 @@ NetStreamFfmpeg::decodingStatus(DecodingState newstate)
 	}
 
 	return _decoding_state;
-}
-
-void
-NetStreamFfmpeg::killDecodeThread()
-{
-	GNASH_REPORT_FUNCTION;
-
-	{
-#ifdef GNASH_DEBUG_THREADS
-		log_debug("qMutex: waiting for lock in killDecodeThread");
-#endif
-		boost::mutex::scoped_lock lock(_qMutex);
-#ifdef GNASH_DEBUG_THREADS
-		log_debug("qMutex: lock obtained in killDecodeThread");
-#endif
-
-		_qFillerKillRequest = true;
-		_qFillerResume.notify_all(); // wake it up if waiting..
-	}
-
-	// might as well be never started
-	if ( _decodeThread )
-	{
-		_decodeThread->join();
-	}
-
-	delete _decodeThread;
-	_decodeThread = NULL;
-}
-
-bool
-NetStreamFfmpeg::decodeThreadKillRequested()
-{
-	boost::mutex::scoped_lock lock(_qMutex);
-	return _qFillerKillRequest;
 }
 
 } // gnash namespcae

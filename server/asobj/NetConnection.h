@@ -145,7 +145,7 @@ public:
 	//
 	/// If not connected, a NULL auto_ptr is returned.
 	///
-	std::auto_ptr<FLVParser> getConnectedParser() const;
+	std::auto_ptr<FLVParser> getConnectedParser();
 
 	/// Returns whether the load is complete
 	//

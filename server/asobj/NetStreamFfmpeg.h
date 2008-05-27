@@ -36,6 +36,9 @@
 #include <boost/thread/condition.hpp>
 #include <boost/thread/barrier.hpp>
 
+#include <memory>
+#include <cassert>
+
 #include "impl.h"
 
 #ifdef HAVE_FFMPEG_AVFORMAT_H
@@ -53,8 +56,12 @@ extern "C" {
 #include "image.h"
 #include "StreamProvider.h"	
 #include "NetStream.h" // for inheritance
+#include "VirtualClock.h"
 
 #include "ffmpegNetStreamUtil.h"
+
+/// Uncomment the following to load media in a separate thread
+//#define LOAD_MEDIA_IN_A_SEPARATE_THREAD
 
 namespace gnash {
   
@@ -94,8 +101,10 @@ public:
 	// Used for ffmpeg data read and seek callbacks with non-FLV
 	static offset_t seekMedia(void *opaque, offset_t offset, int whence);
 
-	/// The decoding thread. Sets up the decoder, and decodes.
-	static void av_streamer(NetStreamFfmpeg* ns);
+#ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
+	/// The parsing thread. Sets up the decoder, and decodes.
+	static void parseAllInput(NetStreamFfmpeg* ns);
+#endif
 
 	/// Callback used by sound_handler to get audio data
 	//
@@ -109,6 +118,7 @@ public:
 
 	long bytesTotal();
 
+	long bufferLength();
 private:
 
 	enum PlaybackState {
@@ -125,7 +135,6 @@ private:
 		DEC_BUFFERING,
 	};
 
-	PlaybackState _playback_state;
 	DecodingState _decoding_state;
 
 	// Mutex protecting _playback_state and _decoding_state
@@ -163,7 +172,15 @@ private:
 	/// is that  refreshVideoFrame() is called right before get_video(). This is important
 	/// to ensure timing is correct..
 	///
-	void refreshVideoFrame();
+	/// @param alsoIfPaused
+	///	If true, video is consumed/refreshed even if playhead is paused.
+	///	By default this is false, but will be used on ::seek (user-reguested)
+	///
+	void refreshVideoFrame(bool alsoIfPaused=false);
+
+	/// Refill audio buffers, so to contain new frames since last run
+	/// and up to current timestamp
+	void refreshAudioBuffer();
 
 	// Used to decode and push the next available (non-FLV) frame to the audio or video queue
 	bool decodeMediaFrame();
@@ -197,35 +214,56 @@ private:
 	///
 	bool decodeFLVFrame();
 
-	/// Used to decode a video frame and push it on the videoqueue
+	/// Decode next video frame fetching it MediaParser cursor
 	//
-	/// Also updates m_imageframe (why !??)
+	/// @return 0 on EOF or error, a decoded video otherwise
 	///
-	/// This is a blocking call.
-	/// If no Video decoding context exists (m_VCodecCtx), false is returned.
-	/// On decoding (or converting) error, false is returned.
-	/// If renderer requested video format is render::NONE, false is returned.
-	/// In any other case, true is returned.
-	///
-	/// NOTE: (FIXME) if video queue is full, 
-	///       we'd still return true w/out pushing anything new there
-	/// 
-	/// TODO: return a more informative value to tell what happened.
-	///
-	bool decodeVideo( AVPacket* packet );
+	media::raw_mediadata_t* decodeNextVideoFrame();
 
-	/// Used to decode a audio frame and push it on the audioqueue
+	/// Decode next audio frame fetching it MediaParser cursor
+	//
+	/// @return 0 on EOF or error, a decoded audio frame otherwise
+	///
+	media::raw_mediadata_t* decodeNextAudioFrame();
+
+	/// \brief
+	/// Decode input audio frames with timestamp <= ts
+	/// and push them to the output audio queue
+	void pushDecodedAudioFrames(boost::uint32_t ts);
+
+	/// Decode input frames up to the one with timestamp <= ts.
+	//
+	/// Decoding starts from "next" element in the parser cursor.
+	///
+	/// Return 0 if:
+	///	1. there's no parser active.
+	///	2. parser cursor is already on last frame.
+	///	3. next element in cursor has timestamp > tx
+	///	4. there was an error decoding
+	///
+	media::raw_mediadata_t* getDecodedVideoFrame(boost::uint32_t ts);
+
+	/// Used to decode a video frame 
 	//
 	/// This is a blocking call.
-	/// If no Video decoding context exists (m_ACodecCtx), false is returned.
-	/// In any other case, true is returned.
+	/// If no Video decoding context exists (m_VCodecCtx), 0 is returned.
+	/// On decoding (or converting) error, 0 is returned.
+	/// If renderer requested video format is render::NONE, 0 is returned.
+	/// In any other case, a decoded video frame is returned.
 	///
-	/// NOTE: (FIXME) if audio queue is full,
-	///       we'd still return true w/out pushing anything new there
-	/// 
 	/// TODO: return a more informative value to tell what happened.
 	///
-	bool decodeAudio( AVPacket* packet );
+	media::raw_mediadata_t* decodeVideo( AVPacket* packet );
+
+	/// Used to decode an audio frame 
+	//
+	/// This is a blocking call.
+	/// If no Video decoding context exists (m_ACodecCtx), 0 is returned.
+	/// In any other case, a decoded audio frame is returned.
+	///
+	/// TODO: return a more informative value to tell what happened.
+	///
+	media::raw_mediadata_t* decodeAudio( AVPacket* packet );
 
 	// Used to calculate a decimal value from a ffmpeg fraction
 	inline double as_double(AVRational time)
@@ -233,7 +271,6 @@ private:
 		return time.num / (double) time.den;
 	}
 
-	PlaybackState playbackStatus(PlaybackState newstate = PLAY_NONE);
 	DecodingState decodingStatus(DecodingState newstate = DEC_NONE);
 
 	int m_video_index;
@@ -255,11 +292,16 @@ private:
 	// Use for resampling audio
 	media::AudioResampler _resampler;
 
-	// The decoding thread
-	boost::thread* _decodeThread;
+#ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
+	/// The parser thread
+	boost::thread* _parserThread;
 
-	// Barrier to synchronize thread and thread starter
-	boost::barrier _decodeThreadBarrier;
+	/// Barrier to synchronize thread and thread starter
+	boost::barrier _parserThreadBarrier;
+
+	/// Mutex serializing access to parser,
+	/// when reading from a separate thread
+	boost::mutex _parserMutex;
 
 	/// Kill decoder thread, if any
 	//
@@ -269,15 +311,18 @@ private:
 	///
 	/// Uses the _qMutex
 	///
-	void killDecodeThread();
+	void killParserThread();
 
-	/// Return true if kill of decoder thread
-	/// was requested
-	//
-	bool decodeThreadKillRequested();
+	/// Return true if kill of parser thread was requested
+	bool parserThreadKillRequested();
 
-	/// Protected by _qMutex 
-	bool _qFillerKillRequest;
+	/// Protected by _parserKillRequestMutex
+	bool _parserKillRequest;
+
+	/// Mutex protecting _parserKillRequest
+	boost::mutex _parserKillRequestMutex;
+
+#endif // LOAD_MEDIA_IN_A_SEPARATE_THREAD
 
 
 	// The timestamp of the last decoded video frame, in seconds.
@@ -286,24 +331,14 @@ private:
 	// The timestamp of the last decoded audio frame, in seconds.
 	volatile boost::uint32_t m_last_audio_timestamp;
 
-	// The timestamp of the last played audio (default) or video (if no audio) frame.
-	// Misured in seconds.
-	boost::uint32_t m_current_timestamp;
-
-	/// The queues of audio and video data.
-	typedef media::ElementsOwningQueue<media::raw_mediadata_t*> MediaQueue;
-
-	MediaQueue m_qaudio;
-	MediaQueue m_qvideo;
-
-	/// Mutex protecting access to queues
-	boost::mutex _qMutex;
-
 	/// Queues filler will wait on this condition when queues are full
 	boost::condition _qFillerResume;
 
-	// The time we started playing in seconds (since VM start ?)
-	volatile boost::uint64_t m_start_clock;
+	/// Virtual clock used as playback clock source
+	std::auto_ptr<InterruptableVirtualClock> _playbackClock;
+
+	/// Playback control device 
+	PlayHead _playHead;
 
 	// When the queues are full, this is where we keep the audio/video frame
 	// there wasn't room for on its queue
@@ -311,16 +346,34 @@ private:
 
 	ByteIOContext ByteIOCxt;
 
-	// Time of when pause started, in seconds since VM started
-	volatile boost::uint64_t m_time_of_pause;
-
-	bool m_start_onbuffer;
-
 	// Decoder buffer
 	boost::uint8_t* _decoderBuffer;
 
 	// Current sound handler
 	media::sound_handler* _soundHandler;
+
+	/// Parse a chunk of input
+	/// Currently blocks, ideally should parse as much
+	/// as possible w/out blocking
+	void parseNextChunk();
+
+	/// Input stream
+	//
+	/// This should just be a temporary variable, transferred
+	/// to MediaParser constructor.
+	///
+	std::auto_ptr<tu_file> _inputStream;
+
+        typedef std::deque<media::raw_mediadata_t*> AudioQueue;
+
+	/// This is where audio frames are pushed by ::advance
+	/// and consumed by sound_handler callback (audio_streamer)
+        AudioQueue _audioQueue;
+
+	/// The queue needs to be protected as sound_handler callback
+	/// is invoked by a separate thread (dunno if it makes sense actually)
+	boost::mutex _audioQueueMutex;
+
 };
 
 

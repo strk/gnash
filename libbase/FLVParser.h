@@ -202,10 +202,9 @@ public:
 	//
 	/// @param lt
 	/// 	LoadThread to use for input.
-	/// 	Ownership left to the caller.
-	///	TODO: take ownership
+	/// 	Ownership transferred.
 	///
-	FLVParser(tu_file& lt);
+	FLVParser(std::auto_ptr<tu_file> lt);
 
 	/// Kills the parser...
 	~FLVParser();
@@ -360,7 +359,7 @@ private:
 	inline boost::uint32_t getUInt24(boost::uint8_t* in);
 
 	/// The interface to the file, externally owned
-	tu_file& _lt;
+	std::auto_ptr<tu_file> _lt;
 
 	// NOTE: FLVVideoFrameInfo is a relatively small structure,
 	//       chances are keeping by value here would reduce

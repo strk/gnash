@@ -1,3 +1,12 @@
+2008-05-27 Sandro Santilli <strk@keybit.net>
+
+	* libbase/FLVParser.{cpp,h}: take ownership of the input stream.
+	* server/asobj/NetConnection.{cpp,h}: drop getConnectedParser().
+	* server/asobj/NetStreamFfmpeg.{cpp,h}: load, parse and decode
+	  in main thread, consume audio in audio buffers in sdl thread.
+	  Have a compile-time macro to enable load&parsing in a separate
+	  thread
+
 2008-05-27 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* libbase/log.{cpp,h}: header cleanup, rename DEBUGLEVEL to

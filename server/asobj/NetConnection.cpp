@@ -234,12 +234,13 @@ NetConnection::loadCompleted()
 
 
 std::auto_ptr<FLVParser>
-NetConnection::getConnectedParser() const
+NetConnection::getConnectedParser()
 {
   std::auto_ptr<FLVParser> ret;
 
   if ( _loader.get() ) {
-    ret.reset( new FLVParser(*_loader) );
+    ret.reset( new FLVParser(_loader) ); // transfer loader ownership
+    assert(!_loader.get());
   }
 
   return ret;
