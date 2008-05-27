@@ -1,5 +1,12 @@
 2008-05-26 Bastiaan Jacques <bastiaan@bjacques.org>
 
+	* backend/render_handler_cairo.cpp: Don't apply the shape matrix to
+	patterns, because that's already taken care of in
+	draw_shape_character. Implement focal gradients. Shift all pixel
+	positions by one half, so that single width lines will show up.
+
+2008-05-26 Bastiaan Jacques <bastiaan@bjacques.org>
+
 	* gui/aqua.cpp: Remove function reports and define _width and
 	_height.
 	* gui/aqua_ogl_glue.cpp: Enable the accumulation buffer. Don't

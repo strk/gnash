@@ -21,7 +21,6 @@
 // - The current coordinate system 
 //
 // TODOs:
-// - Implement focal gradients.
 // - Implement unimplemented methods.
 // - Would be nice to have a header/implementation separation.
 // - Document workings of Cairo and this renderer.
@@ -33,7 +32,7 @@
 //
 // Already implemented:
 // - outlines
-// - fills: solid, linear, radial and bitmap
+// - fills: solid, linear, radial, focal and bitmap
 // - bitmaps
 // - fonts
 // - masks
@@ -342,6 +341,17 @@ public:
     cairo_device_to_user(cr, &x, &y);
   }
 
+  static void
+  snap_to_half_pixel(cairo_t* cr, double& x, double& y)
+  {
+    cairo_user_to_device(cr, &x, &y);
+
+    x = std::floor(x + 0.5) + 0.5;
+    y = std::floor(y + 0.5) + 0.5;
+   
+    cairo_device_to_user(cr, &x, &y);
+  }
+
   virtual void  begin_display(
     const rgba& bg_color,
     int viewport_x0, int viewport_y0,
@@ -479,19 +489,23 @@ public:
     _masks.pop_back();
   }
 
-  void add_path(cairo_t* cr, const path& cur_path)
+  void add_path(cairo_t* cr, const path& cur_path, bool round_to_half = false)
   {  
-    cairo_move_to(cr, cur_path.ap.x, cur_path.ap.y);
+    double x = cur_path.ap.x;
+    double y = cur_path.ap.y;
     
-    int prev_x = cur_path.ap.x,
-        prev_y = cur_path.ap.y;
+    snap_to_half_pixel(cr, x, y);
+    cairo_move_to(cr, x, y);
     
     for (std::vector<edge>::const_iterator it = cur_path.m_edges.begin(),
          end = cur_path.m_edges.end(); it != end; ++it) {
       const edge& cur_edge = *it;
       
       if (cur_edge.is_straight()) {
-        cairo_line_to(cr, cur_edge.ap.x, cur_edge.ap.y);
+        x = cur_edge.ap.x;
+        y = cur_edge.ap.y;
+        snap_to_half_pixel(cr, x, y);
+        cairo_line_to(cr, x, y);
       } else {
       
         // Cairo expects a cubic Bezier curve, while Flash gives us a
@@ -500,24 +514,22 @@ public:
         const float two_thirds = 2.0/3.0;
         const float one_third = 1 - two_thirds;
         
-        float x1 = prev_x + two_thirds * (cur_edge.cp.x - prev_x);
-        float y1 = prev_y + two_thirds * (cur_edge.cp.y - prev_y);
+        double x1 = x + two_thirds * (cur_edge.cp.x - x);
+        double y1 = y + two_thirds * (cur_edge.cp.y - y);
         
-        float x2 = cur_edge.cp.x + one_third * (cur_edge.ap.x - cur_edge.cp.x);
-        float y2 = cur_edge.cp.y + one_third * (cur_edge.ap.y - cur_edge.cp.y);
+        double x2 = cur_edge.cp.x + one_third * (cur_edge.ap.x - cur_edge.cp.x);
+        double y2 = cur_edge.cp.y + one_third * (cur_edge.ap.y - cur_edge.cp.y);
         
-        const int& x3 = cur_edge.ap.x;
-        const int& y3 = cur_edge.ap.y;
+        x = cur_edge.ap.x;
+        y = cur_edge.ap.y;
     
+        snap_to_half_pixel(cr, x1, y1);
+        snap_to_half_pixel(cr, x2, y2);
+        snap_to_half_pixel(cr, x, y);    
     
-        cairo_curve_to(cr, x1, y1, x2, y2, x3, y3);
+        cairo_curve_to(cr, x1, y1, x2, y2, x, y);
       }
-      
-      prev_x = cur_edge.ap.x;
-      prev_y = cur_edge.ap.y;
-      
     }
-  
   }
   
   
@@ -546,8 +558,10 @@ public:
     float width = style.getThickness();
 
     if ( width == 0.0 ) {
-      // TODO: test this!
-      cairo_set_line_width(_cr, 20.0); // expected: 1 pixel
+      double hwidth = 1.0;
+
+      cairo_device_to_user_distance(_cr, &hwidth, &hwidth);
+      cairo_set_line_width(_cr, hwidth);
     } else {
       // TODO: this is correct for !style.scaleThicknessVertically() 
       //       and !style.scaleThicknessHorizontally().
@@ -609,9 +623,6 @@ public:
       case SWF::FILL_LINEAR_GRADIENT:
       {
         matrix m = style.get_gradient_matrix();
-        matrix cm;
-        cm.set_inverse(mat);
-        m.concatenate(cm);         
       
         cairo_matrix_t mat;
         init_cairo_matrix(&mat, m);
@@ -624,13 +635,11 @@ public:
         break;
       }
       case SWF::FILL_RADIAL_GRADIENT:
+      case SWF::FILL_FOCAL_GRADIENT:
       {        
         matrix m = style.get_gradient_matrix();
-        matrix cm;
-        cm.set_inverse(mat);
-        m.concatenate(cm);
         
-        // move the center of the radial fill to where it should be, according to Udo
+        // Undo the translation our parser applied.
         gnash::matrix transl;
         transl.concatenate_translation(-32.0f, -32.0f);
         transl.concatenate(m);  
@@ -638,19 +647,19 @@ public:
         cairo_matrix_t mat;
         init_cairo_matrix(&mat, transl);
         
-        pattern = cairo_pattern_create_radial(0.0, 0.0, 0.0, 0.0, 0.0, 32.0);
+        double focal_pos = 0;
+        
+        if (fill_type == SWF::FILL_FOCAL_GRADIENT) {
+          focal_pos = 32.0f * style.get_focal_point();
+        }
+
+        pattern = cairo_pattern_create_radial(focal_pos, 0.0, 0.0, 0.0, 0.0, 32.0);
 
         cairo_pattern_set_matrix (pattern, &mat);          
         
         pattern_add_color_stops(style, pattern, cx);
         break;
       }
-      case SWF::FILL_FOCAL_GRADIENT:
-      {
-        log_unimpl("focal gradient fill");
-        
-        break;
-      }              
       case SWF::FILL_TILED_BITMAP_HARD:
       case SWF::FILL_TILED_BITMAP:
       case SWF::FILL_CLIPPED_BITMAP:
