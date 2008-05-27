@@ -1295,12 +1295,12 @@ AC_CHECK_HEADERS(signal.h)
 AC_CHECK_HEADERS(unistd.h)
 AC_CHECK_HEADERS(sys/time.h)
 AC_CHECK_LIB(lber, ber_free)
-AC_CHECK_LIB(m, sqrt)
+dnl AC_CHECK_LIB(m, sqrt)
 AC_CHECK_LIB(c, getpwnam, AC_DEFINE(HAVE_GETPWNAM, 1, [Has getpwnam] ))
 
-AC_CHECK_LIB(m, exp2, AC_DEFINE(HAVE_EXP2, 1, [Has exp2()]))
-AC_CHECK_LIB(m, log2, AC_DEFINE(HAVE_LOG2, 1, [Has log2()]))
-AC_CHECK_LIB(m, trunc, AC_DEFINE(HAVE_TRUNC, 1, [Has trunc()]))
+dnl AC_CHECK_LIB(m, exp2, AC_DEFINE(HAVE_EXP2, 1, [Has exp2()]))
+dnl AC_CHECK_LIB(m, log2, AC_DEFINE(HAVE_LOG2, 1, [Has log2()]))
+dnl AC_CHECK_LIB(m, trunc, AC_DEFINE(HAVE_TRUNC, 1, [Has trunc()]))
 
 dnl X11 is needed for fltk (at least),
 dnl and probably for many other guis too ...
@@ -1346,7 +1346,7 @@ if test x$ipc_key = xno; then
 fi
 
 dnl AC_CHECK_FUNCS(strcasecmp stricmp)
-AC_CHECK_FUNCS(vsnprintf)
+dnl AC_CHECK_FUNCS(vsnprintf)
 dnl AC_CHECK_FUNCS(finite isfinite)
 
 AC_CACHE_CHECK([for finite], ac_cv_finite,
