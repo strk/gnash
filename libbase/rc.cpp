@@ -40,6 +40,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 
 #include <boost/format.hpp>
 

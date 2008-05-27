@@ -13,6 +13,7 @@
 #include "GnashException.h"
 #include <algorithm> // std::min
 
+#include <sstream>
 #include <memory>
 
 using namespace gnash;
@@ -86,7 +87,7 @@ namespace zlib_adapter
 
 			int	err = inflateInit(&m_zstream);
 			if (err != Z_OK) {
-				gnash::log_error("inflater_impl::ctor() inflateInit() returned %d\n", err);
+				gnash::log_error("inflater_impl::ctor() inflateInit() returned %d", err);
 				m_error = 1;
 				return;
 			}
@@ -107,7 +108,7 @@ namespace zlib_adapter
 			m_at_eof = 0;
 			int	err = inflateReset(&m_zstream);
 			if (err != Z_OK) {
-				gnash::log_error("inflater_impl::reset() inflateReset() returned %d\n", err);
+				gnash::log_error("inflater_impl::reset() inflateReset() returned %d", err);
 				m_error = 1;
 				return;
 			}
@@ -167,22 +168,22 @@ namespace zlib_adapter
 				}
 				if (err == Z_BUF_ERROR)
 				{
-					std::stringstream ss;
+					std::ostringstream ss;
 					ss << __FILE__ << ":" << __LINE__ << ": " << m_zstream.msg;
 					// we should call inflate again... giving more input or output space !
-					gnash::log_error("%s", ss.str().c_str());
+					gnash::log_error("%s", ss.str());
 					break;
 				}
 				if (err == Z_DATA_ERROR)
 				{
-					std::stringstream ss;
+					std::ostringstream ss;
 					ss << __FILE__ << ":" << __LINE__ << ": " << m_zstream.msg;
 					throw ParserException(ss.str());
 					break;
 				}
 				if (err == Z_MEM_ERROR)
 				{
-					std::stringstream ss;
+					std::ostringstream ss;
 					ss << __FILE__ << ":" << __LINE__ << ": " << m_zstream.msg;
 					throw ParserException(ss.str());
 					break;
@@ -190,7 +191,7 @@ namespace zlib_adapter
 				if (err != Z_OK)
 				{
 					// something's wrong.
-					std::stringstream ss;
+					std::ostringstream ss;
 					ss << __FILE__ << ":" << __LINE__ << ": " << m_zstream.msg;
 					throw ParserException(ss.str());
 					//m_error = 1;

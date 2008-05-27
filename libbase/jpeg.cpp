@@ -13,12 +13,11 @@
 #include "log.h"
 #include "GnashException.h"
 
-#include <cstdio>
+#include <sstream>
 
 extern "C" {
 
 // do we reall want to undefine HAVE_STDLIB_H here ??
-#undef HAVE_STDLIB_H
 #include <jpeglib.h>
 }
 
