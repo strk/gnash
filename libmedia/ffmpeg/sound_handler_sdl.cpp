@@ -125,8 +125,12 @@ SDL_sound_handler::delete_all_sounds()
 
 	for (size_t i=0, e=m_sound_data.size(); i < e; ++i)
 	{
-		stop_sound(i);
-		delete_sound(i);
+		sound_data* sounddata = m_sound_data[i];
+
+		size_t nActiveSounds = sounddata->m_active_sounds.size();
+		soundsPlaying -= nActiveSounds;
+		_soundsStopped += nActiveSounds;
+		delete sounddata;
 	}
 	m_sound_data.clear();
 }
