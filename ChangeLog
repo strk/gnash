@@ -1,5 +1,12 @@
 2008-05-27 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* libbase/log.{cpp,h}: header cleanup, rename DEBUGLEVEL to
+	  GNASH_DEBUG_LEVEL to avoid conflict with OS X system headers.
+	  Should fix bug #23369. Drop unused defines. Use C functions
+	  in the std namespace.
+
+2008-05-27 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* libbase/jpeg.cpp, libbase/rc.cpp, libbase/zlib_adapter.cpp:
 	  header cleanup - include sstream where it's used (It'll be
 	  dropped from log.h shortly). Drop c_str() for logging, use

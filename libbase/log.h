@@ -22,23 +22,16 @@
 #include "gnashconfig.h"
 #endif
 
-#ifdef HAVE_WINSOCK2_H
-# include <io.h>
-#endif
-
 #include "rc.h" // for IF_VERBOSE_* implementation
 #include "dsodefs.h" // for DSOEXPORT
 
 #include <fstream>
-#include <sstream>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/format.hpp>
 
 // the default name for the debug log
 #define DEFAULT_LOGFILE "gnash-dbg.log"
-#define TIMESTAMP_LENGTH 24             // timestamp length
-#define TIMESTAMP_FORMAT "%Y-%m-%d %H:%M:%S     " // timestamp format
 
 // Support compilation with (or without) native language support
 #include "gettext.h"
@@ -59,7 +52,7 @@
 
 namespace gnash {
 
-#define DEBUGLEVEL 2
+#define GNASH_DEBUG_LEVEL 2
 
 // This is a basic file logging class
 class DSOEXPORT LogFile {
@@ -380,7 +373,7 @@ public:
     }
 
     ~__Host_Function_Report__(void) {
-	if (LogFile::getDefaultInstance().getVerbosity() >= DEBUGLEVEL + 1) {
+	if (LogFile::getDefaultInstance().getVerbosity() >= GNASH_DEBUG_LEVEL + 1) {
 	    log_debug("returning");
 	}
     }

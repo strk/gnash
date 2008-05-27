@@ -21,10 +21,12 @@
 #include "gnashconfig.h"
 #endif
 
-#include <ctime>
-#include <cctype> // for isprint
+#include <ctime> // std::strftime, std::time etc
+#include <cctype> // for std::isprint
+#include <cstring> // std::memset
 
-#include <iosfwd> // ostream, fstream, sstream
+#include <sstream>
+#include <fstream>
 #include <iomanip> // for std::setfill
 #include <string>
 #include <boost/format.hpp>
@@ -77,14 +79,15 @@ hexify (const unsigned char *p, size_t length, bool ascii)
 }
 
 std::string
-timestamp() {
+timestamp()
+{
 
 	time_t t;
 	char buf[10];
 
-	memset (buf, '0', 10);		// this terminates the string
-	time (&t);					// get the current time
-	strftime (buf, sizeof(buf), "%H:%M:%S", localtime (&t));
+	std::memset (buf, '0', 10); // this terminates the string
+	std::time (&t); // get the current time
+	std::strftime (buf, sizeof(buf), "%H:%M:%S", std::localtime (&t));
 
 	std::stringstream ss;
 	ss << getpid() << ":" << get_thread_id() << "] " << buf;
@@ -121,7 +124,7 @@ processLog_trace(const boost::format& fmt)
 void
 processLog_debug(const boost::format& fmt)
 {
-	if (dbglogfile.getVerbosity() < DEBUGLEVEL) return;
+	if (dbglogfile.getVerbosity() < GNASH_DEBUG_LEVEL) return;
 	dbglogfile.log(N_("DEBUG"), fmt.str());
 }
 
@@ -178,8 +181,8 @@ LogFile::log(const std::string& msg)
 
 	if (_stamp == true )
 	{
-        	std::string ts = timestamp();
-        	if (_verbose) cout << ts << " " << msg << endl;
+    	std::string ts = timestamp();
+    	if (_verbose) cout << ts << " " << msg << endl;
 		if (openLogIfNeeded()) {
 			_outstream << ts << ": " << msg << endl;
 		}
