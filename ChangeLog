@@ -9,6 +9,7 @@
 	* configure.ac: drop tests for unused C library functions.
 	* libmedia/GstUtil.cpp, libnet/http.h: include sstream, don't
 	  rely on other headers to include it.
+	* server/as_environment.cpp: drop c_str() in logging.
 
 2008-05-26 Bastiaan Jacques <bastiaan@bjacques.org>
 

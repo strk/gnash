@@ -54,7 +54,7 @@ as_environment::get_variable(const std::string& varname,
     std::string	var;
 
 #ifdef GNASH_DEBUG_GET_VARIABLE
-    log_debug(_("get_variable(%s)"), varname.c_str());
+    log_debug(_("get_variable(%s)"), varname);
 #endif
 
     if ( parse_path(varname, path, var) )
@@ -75,14 +75,14 @@ as_environment::get_variable(const std::string& varname,
         {
 
             IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("find_object(\"%s\") [ varname = '%s' - current target = '%s' ] failed"),
-                path.c_str(), varname.c_str(),
-                m_target->get_text_value().c_str());
+            log_aserror(_("find_object(\"%s\") [ varname = '%s' - "
+                        "current target = '%s' ] failed"),
+                        path, varname, m_target->get_text_value());
             as_value tmp = get_variable_raw(path, scopeStack, retTarget);
             if ( ! tmp.is_undefined() )
             {
-                log_aserror(_("...but get_variable_raw(%s, <scopeStack>) succeeded (%s)!"),
-                    path.c_str(), tmp);
+                log_aserror(_("...but get_variable_raw(%s, <scopeStack>) "
+                            "succeeded (%s)!"), path, tmp);
             }
             );
             return as_value(); // TODO: should we check get_variable_raw ?
@@ -145,7 +145,7 @@ as_environment::get_variable_raw(
 	if ( ! validRawVariableName(varname) )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("Won't get invalid raw variable name: %s"), varname.c_str());
+		log_aserror(_("Won't get invalid raw variable name: %s"), varname);
 		);
 		return as_value();
 	}
@@ -165,7 +165,7 @@ as_environment::get_variable_raw(
         if (obj && obj->get_member(key, &val))
         {
             // Found the var in with context.
-            //log_debug("Found %s in object %d/%d of scope stack (%p)", varname.c_str(), i, scopeStack.size(), obj);
+            //log_debug("Found %s in object %d/%d of scope stack (%p)", varname, i, scopeStack.size(), obj);
             if ( retTarget ) *retTarget = obj;
             return val;
         }
@@ -213,7 +213,7 @@ as_environment::get_variable_raw(
     // FIXME, should this be log_error?  or log_swferror?
     IF_VERBOSE_ASCODING_ERRORS (
     log_aserror(_("reference to unexisting variable '%s'"),
-           varname.c_str());
+           varname);
     );
 
     return as_value();
@@ -282,17 +282,17 @@ as_environment::set_variable(
 {
 	IF_VERBOSE_ACTION (
     log_action("-------------- %s = %s",
-	       varname.c_str(), val);
+	       varname, val);
 	);
 
     // Path lookup rigamarole.
     as_object* target = m_target;
     std::string	path;
     std::string	var;
-    //log_debug(_("set_variable(%s, %s)"), varname.c_str(), val);
+    //log_debug(_("set_variable(%s, %s)"), varname, val);
     if ( parse_path(varname, path, var) )
     {
-    	//log_debug(_("Variable '%s' parsed into path='%s', var='%s'"), varname.c_str(), path.c_str(), var.c_str());
+    	//log_debug(_("Variable '%s' parsed into path='%s', var='%s'"), varname, path, var);
 	//target = find_target(path);
         target = find_object(path, &scopeStack); 
 	if (target)
@@ -303,7 +303,7 @@ as_environment::set_variable(
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("Path target '%s' not found while setting %s=%s"),
-			path.c_str(), varname.c_str(), val);
+			path, varname, val);
 		);
 	}
     } else {
@@ -331,7 +331,7 @@ as_environment::set_variable_raw(
 	if ( ! validRawVariableName(varname) )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("Won't set invalid raw variable name: %s"), varname.c_str());
+		log_aserror(_("Won't set invalid raw variable name: %s"), varname);
 		);
 		return;
 	}
@@ -437,7 +437,7 @@ as_environment::parse_path(const std::string& var_path_in,
 		std::string& path, std::string& var)
 {
 #ifdef DEBUG_TARGET_FINDING 
-	log_debug("parse_path(%s)", var_path_in.c_str());
+	log_debug("parse_path(%s)", var_path_in);
 #endif
 
 	size_t lastDotOrColon = var_path_in.find_last_of(":.");
@@ -449,7 +449,7 @@ as_environment::parse_path(const std::string& var_path_in,
 	theVar.assign(var_path_in, lastDotOrColon+1, var_path_in.length());
 
 #ifdef DEBUG_TARGET_FINDING 
-	log_debug("path: %s, var: %s", thePath.c_str(), theVar.c_str());
+	log_debug("path: %s, var: %s", thePath, theVar);
 #endif
 
 	if ( thePath.empty() ) return false;
@@ -463,7 +463,7 @@ as_environment::parse_path(const std::string& var_path_in,
 		if ( ++contiguoscommas > 1 )
 		{
 #ifdef DEBUG_TARGET_FINDING 
-			log_debug("path '%s' ends with too many colon chars, not considering a path", thePath.c_str());
+			log_debug("path '%s' ends with too many colon chars, not considering a path", thePath);
 #endif
 			return false;
 		}
@@ -528,7 +528,7 @@ as_object*
 as_environment::find_object(const std::string& path_in, const ScopeStack* scopeStack) const
 {
 #ifdef DEBUG_TARGET_FINDING 
-	log_debug(_("find_object(%s) called"), path_in.c_str());
+	log_debug(_("find_object(%s) called"), path_in);
 #endif
 
     if (path_in.empty())
@@ -575,7 +575,7 @@ as_environment::find_object(const std::string& path_in, const ScopeStack* scopeS
 #ifdef DEBUG_TARGET_FINDING 
     else
     {
-	log_debug(_("Relative path, start at (%s)"), m_target->getTarget().c_str());
+	log_debug(_("Relative path, start at (%s)"), m_target->getTarget());
     }
 #endif
     
@@ -590,7 +590,7 @@ as_environment::find_object(const std::string& path_in, const ScopeStack* scopeS
 	if ( ! *p )
 	{
 #ifdef DEBUG_TARGET_FINDING 
-		log_debug(_("Path is %s, returning the root"), path.c_str());
+		log_debug(_("Path is %s, returning the root"), path);
 #endif
 		return env;
 	}
@@ -601,7 +601,7 @@ as_environment::find_object(const std::string& path_in, const ScopeStack* scopeS
 	if (next_slash == p)
 	{
             IF_VERBOSE_ASCODING_ERRORS(
-	    log_aserror(_("invalid path '%s' (p=next_slash=%s)"), path.c_str(), next_slash);
+	    log_aserror(_("invalid path '%s' (p=next_slash=%s)"), path, next_slash);
 	    );
 	    return NULL;
 	}
@@ -612,7 +612,7 @@ as_environment::find_object(const std::string& path_in, const ScopeStack* scopeS
 			if ( ! dot_allowed )
 			{
 				IF_VERBOSE_ASCODING_ERRORS(
-				log_aserror(_("invalid path '%s' (dot not allowed after having seen a slash)"), path.c_str());
+				log_aserror(_("invalid path '%s' (dot not allowed after having seen a slash)"), path);
 				);
 				return NULL;
 			}
@@ -680,7 +680,8 @@ as_environment::find_object(const std::string& path_in, const ScopeStack* scopeS
 		if ( ! element ) 
 		{
 #ifdef DEBUG_TARGET_FINDING 
-			log_debug("subpart %s of path %s not found in any scope stack element", subpart.c_str(), path.c_str());
+			log_debug("subpart %s of path %s not found in any "
+			"scope stack element", subpart, path);
 #endif
 			return NULL;
 		}
@@ -692,14 +693,16 @@ as_environment::find_object(const std::string& path_in, const ScopeStack* scopeS
 	{
 
 #ifdef DEBUG_TARGET_FINDING 
-		log_debug(_("Invoking get_path_element(%s) on object %p (%s)"), subpart.c_str(), (void *)env, env->get_text_value().c_str());
+		log_debug(_("Invoking get_path_element(%s) on object "
+				"%p (%s)"), subpart, (void *)env, env->get_text_value());
 #endif
 
 		as_object* element = env->get_path_element(subpartKey);
 		if ( ! element )
 		{
 #ifdef DEBUG_TARGET_FINDING 
-			log_debug(_("Path element %s not found in object %p"), subpart.c_str(), (void *)env);
+			log_debug(_("Path element %s not found in "
+						"object %p"), subpart, (void *)env);
 #endif
 			return NULL;
 		}
