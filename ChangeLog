@@ -1,5 +1,16 @@
 2008-05-27 Sandro Santilli <strk@keybit.net>
 
+	* libbase/FLVParser.cpp (seek): have video stream drive
+	  the actual time, having more constraints over which
+	  frame will be legal to pick.
+	* server/asobj/NetStream.cpp: if-0 out PlayHead advancement
+	  debugging lines.
+	* server/asobj/NetStreamFfmpeg.cpp (seek): close the playback
+	  clockpipe tap while seeking, or time will keep flowing
+	  while buffering, with consequent audio buffer overruns.
+
+2008-05-27 Sandro Santilli <strk@keybit.net>
+
 	* libbase/FLVParser.{cpp,h}: take ownership of the input stream.
 	* server/asobj/NetConnection.{cpp,h}: drop getConnectedParser().
 	* server/asobj/NetStreamFfmpeg.{cpp,h}: load, parse and decode

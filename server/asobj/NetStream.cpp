@@ -714,9 +714,11 @@ PlayHead::advanceIfConsumed()
 	{
 		// not all available consumers consumed current position,
 		// won't advance
+#if 0
 		log_debug("PlayHead::advance(): "
 			"not all consumers consumed current position, "
 			"won't advance");
+#endif
 		return;
 	}
 

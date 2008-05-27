@@ -261,7 +261,8 @@ FLVFrame* FLVParser::nextVideoFrame()
 }
 
 
-boost::uint32_t FLVParser::seekAudio(boost::uint32_t time)
+boost::uint32_t
+FLVParser::seekAudio(boost::uint32_t time)
 {
 
 	// If there is no audio data return NULL
@@ -438,13 +439,38 @@ FLVParser::isTimeLoaded(boost::uint32_t time)
 boost::uint32_t
 FLVParser::seek(boost::uint32_t time)
 {
+	GNASH_REPORT_FUNCTION;
+
+	log_debug("FLVParser::seek(%d) ", time);
+
 	if (time == 0) {
 		if (_video) _nextVideoFrame = 0;
 		if (_audio) _nextAudioFrame = 0;
 	}
 
-	if (_audio)	time = seekAudio(time);
-	if (_video)	time = seekVideo(time);
+	// Video, if present, has more constraints
+	// as to where we allow seeking (we only
+	// allow seek to closest *key* frame).
+	// So we first have video seeking tell us
+	// what time is best for that, and next
+	// we seek audio on that time
+
+	if (_video)
+	{
+		time = seekVideo(time);
+#ifdef GNASH_DEBUG_SEEK
+		log_debug("  seekVideo -> %d", time);
+#endif
+	}
+
+	if (_audio)
+	{
+		time = seekAudio(time);
+#ifdef GNASH_DEBUG_SEEK
+		log_debug("  seekAudio -> %d", time);
+#endif
+	}
+
 	return time;
 }
 

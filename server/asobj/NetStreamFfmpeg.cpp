@@ -1292,6 +1292,15 @@ NetStreamFfmpeg::seek(boost::uint32_t posSeconds)
 	long newpos = 0;
 	double timebase = 0;
 
+	// We'll pause the clock source and mark decoders as buffering.
+	// In this way, next advance won't find the source time to 
+	// be a lot of time behind and chances to get audio buffer
+	// overruns will reduce.
+	// ::advance will resume the playbackClock if DEC_BUFFERING...
+	//
+	_playbackClock->pause();
+	decodingStatus(DEC_BUFFERING); 
+
 	// Seek to new position
 	if (m_isFLV)
 	{
@@ -1365,8 +1374,6 @@ NetStreamFfmpeg::seek(boost::uint32_t posSeconds)
 	
 	// 'newpos' will always be on a keyframe (supposedly)
 	_playHead.seekTo(newpos);
-
-	decodingStatus(DEC_BUFFERING); // make sure we have enough things in buffer
 	_qFillerResume.notify_all(); // wake it decoder is sleeping
 	
 	refreshVideoFrame(true);
@@ -1482,11 +1489,11 @@ NetStreamFfmpeg::pushDecodedAudioFrames(boost::uint32_t ts)
 			// audio consumer thread, but would introduce a lot of thread-safety
 			// issues: playhead would need protection, input would need protection.
 			//
-#ifdef GNASH_DEBUG_DECODING
+//#ifdef GNASH_DEBUG_DECODING
 			log_debug("%p.pushDecodedAudioFrames(%d) : queue size over limit (%d), "
 				"audio won't be consumed (buffer overrun?)",
 				this, ts, bufferLimit);
-#endif // GNASH_DEBUG_DECODING
+//#endif // GNASH_DEBUG_DECODING
 			return;
 		}
 
@@ -1499,6 +1506,11 @@ NetStreamFfmpeg::pushDecodedAudioFrames(boost::uint32_t ts)
 			break;
 		}
 
+#ifdef GNASH_DEBUG_DECODING
+		// this one we might avoid :) -- a less intrusive logging could
+		// be take note about how many things we're pushing over
+		log_debug("pushDecodedAudioFrames(%d) pushing frame with timestamp %d", ts, info->timestamp); 
+#endif
 		_audioQueue.push_back(audio);
 	}
 
