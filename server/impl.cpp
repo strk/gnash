@@ -97,7 +97,7 @@ set_base_url(const URL& url)
   // can call this only once during a single run
   assert(!globals::baseurl.get());
   globals::baseurl.reset(new URL(url));
-  log_debug(_("Base url set to: %s"), globals::baseurl->str().c_str());
+  log_debug(_("Base url set to: %s"), globals::baseurl->str());
 }
 
 const URL&
@@ -290,11 +290,11 @@ void  get_movie_info(
     // Put extracted info in the given vars.
     // Sets *version to 0 if info can't be extracted.
 {
-    //log_debug(_("%s: url is %s"),  __PRETTY_FUNCTION__, url.str().c_str());
+    //log_debug(_("%s: url is %s"),  __PRETTY_FUNCTION__, url.str());
 
     tu_file*  in = globals::streamProvider.getStream(url);
     if (in == NULL || in->get_error() != TU_FILE_NO_ERROR) {
-  log_error(_("get_movie_info(): can't open '%s'"), url.str().c_str());
+  log_error(_("get_movie_info(): can't open '%s'"), url.str());
   if (version) *version = 0;
   //delete in;
   return;
@@ -309,7 +309,7 @@ void  get_movie_info(
     if ((header & 0x0FFFFFF) != 0x00535746
   && (header & 0x0FFFFFF) != 0x00535743) {
   // ERROR
-  log_error(_("get_movie_info(): file '%s' does not start with a SWF header"), url.str().c_str());
+  log_error(_("get_movie_info(): file '%s' does not start with a SWF header"), url.str());
   if (version) *version = 0;
   //delete in;
   return;
@@ -380,7 +380,7 @@ create_jpeg_movie(std::auto_ptr<tu_file> in, const std::string& url)
 
   if ( ! im.get() )
   {
-    log_error(_("Can't read jpeg from %s"), url.c_str());
+    log_error(_("Can't read jpeg from %s"), url);
     return NULL;
   } 
 
@@ -403,7 +403,7 @@ create_png_movie(std::auto_ptr<tu_file> /*in*/, const std::string& /*url*/)
 
   if ( ! im.get() )
   {
-    log_error(_("Can't read png from %s"), url.c_str());
+    log_error(_("Can't read png from %s"), url);
     return NULL;
   } 
 
@@ -535,34 +535,29 @@ create_movie(std::auto_ptr<tu_file> in, const std::string& url, bool startLoader
     return create_swf_movie(in, url, startLoaderThread);
   }
 
-  log_error(_("unknown file type (%s)"), type.c_str());
+  log_error(_("unknown file type (%s)"), type);
   return NULL;
 }
 
 movie_definition*
 create_movie(const URL& url, const char* reset_url, bool startLoaderThread, const std::string* postdata)
 {
-  // URL::str() returns by value, save it to a local string
-  std::string url_str = url.str();
-  const char* c_url = url_str.c_str();
-
-//  log_debug(_("%s: url is %s"),  __PRETTY_FUNCTION__, c_url);
 
   std::auto_ptr<tu_file> in;
   if ( postdata ) in.reset( globals::streamProvider.getStream(url, *postdata) );
   else in.reset( globals::streamProvider.getStream(url) );
   if ( ! in.get() )
   {
-      log_error(_("failed to open '%s'; can't create movie"), c_url);
+      log_error(_("failed to open '%s'; can't create movie"), url.str());
       return NULL;
   }
   else if ( in->get_error() )
   {
-      log_error(_("streamProvider opener can't open '%s'"), c_url);
+      log_error(_("streamProvider opener can't open '%s'"), url.str());
       return NULL;
   }
 
-  const char* movie_url = reset_url ? reset_url : c_url;
+  const char* movie_url = reset_url ? reset_url : url.str().c_str();
   movie_definition* ret = create_movie(in, movie_url, startLoaderThread);
 
   return ret;
@@ -570,14 +565,9 @@ create_movie(const URL& url, const char* reset_url, bool startLoaderThread, cons
 
 }
 
-
-bool  s_no_recurse_while_loading = false; // @@ TODO get rid of this; make it the normal mode.
-
-
 //
 // global gnash management
 //
-
 
 
 void  clear()
@@ -790,7 +780,7 @@ static void clear_library()
 //
 movie_definition* create_library_movie(const URL& url, const char* real_url, bool startLoaderThread, const std::string* postdata)
 {
-//    log_debug(_("%s: url is %s"), __PRETTY_FUNCTION__, url.str().c_str());
+//    log_debug(_("%s: url is %s"), __PRETTY_FUNCTION__, url.str());
 
     // Use real_url as label for cache if available 
     std::string cache_label = real_url ? URL(real_url).str() : url.str();
@@ -801,7 +791,7 @@ movie_definition* create_library_movie(const URL& url, const char* real_url, boo
   boost::intrusive_ptr<movie_definition>  m;
   if ( s_movie_library.get(cache_label, &m) )
       {
-        log_debug(_("Movie %s already in library"), cache_label.c_str());
+        log_debug(_("Movie %s already in library"), cache_label);
     return m.get();
       }
     }
@@ -811,12 +801,12 @@ movie_definition* create_library_movie(const URL& url, const char* real_url, boo
   // calling create_library_movie() again and NOT finding
   // the just-created movie.
   movie_definition* mov = create_movie(url, real_url, false, postdata);
-  //log_debug(_("create_movie(%s, %s, false) returned %p"), url.str().c_str(), real_url, mov);
+  //log_debug(_("create_movie(%s, %s, false) returned %p"), url.str(), real_url, mov);
 
   if (mov == NULL)
   {
     log_error(_("Couldn't load library movie '%s'"),
-      url.str().c_str());
+      url.str());
     return NULL;
   }
 
@@ -824,11 +814,11 @@ movie_definition* create_library_movie(const URL& url, const char* real_url, boo
   if ( ! postdata ) // don't add if we POSTed
   {
   	s_movie_library.add(cache_label, mov);
-        log_debug(_("Movie %s (SWF%d) added to library"), cache_label.c_str(), mov->get_version());
+        log_debug(_("Movie %s (SWF%d) added to library"), cache_label, mov->get_version());
   }
   else
   {
-        log_debug(_("Movie %s (SWF%d) NOT added to library (resulted from a POST)"), cache_label.c_str(), mov->get_version());
+        log_debug(_("Movie %s (SWF%d) NOT added to library (resulted from a POST)"), cache_label, mov->get_version());
   }
 
   // Now complete the load if the movie is an SWF movie
@@ -845,7 +835,7 @@ movie_definition* create_library_movie(const URL& url, const char* real_url, boo
     }
   }
 
-  //log_debug(_("create_library_movie(%s, %s, startLoaderThread=%d) about to return %p"), url.str().c_str(), real_url, startLoaderThread, mov);
+  //log_debug(_("create_library_movie(%s, %s, startLoaderThread=%d) about to return %p"), url.str(), real_url, startLoaderThread, mov);
   return mov;
 }
 

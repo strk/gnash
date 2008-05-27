@@ -245,82 +245,6 @@ movie_def_impl::~movie_def_impl()
 	//assert(m_jpeg_in.get() == NULL);
 }
 
-bool movie_def_impl::in_import_table(int character_id) const
-{
-    for (size_t i = 0, n = m_imports.size(); i < n; i++)
-        {
-            if (m_imports[i].m_character_id == character_id)
-                {
-                    return true;
-                }
-        }
-    return false;
-}
-
-void movie_def_impl::visit_imported_movies(import_visitor& visitor)
-{
-    // don't call the visitor twice for a single URL
-    std::set<std::string> visited;
-
-    for (size_t i = 0, n = m_imports.size(); i < n; i++)
-    {
-        const import_info& inf = m_imports[i];
-        if (visited.insert(inf.m_source_url).second)
-        {
-            // Call back the visitor.
-            visitor.visit(inf.m_source_url);
-        }
-    }
-}
-
-void movie_def_impl::resolve_import(const std::string& source_url, movie_definition* source_movie)
-{
-
-    // Iterate in reverse, since we remove stuff along the way.
-    for (size_t i = m_imports.size(); i > 0; i--)
-        {
-            const import_info&	inf = m_imports[i-1];
-            if (inf.m_source_url == source_url)
-                {
-                    // Do the import.
-                    boost::intrusive_ptr<resource> res = source_movie->get_exported_resource(inf.m_symbol);
-                    bool	 imported = false;
-
-                    if (res == NULL)
-                        {
-                            log_error(_("import error: resource '%s' is not exported from movie '%s'"),
-                                      inf.m_symbol.c_str(), source_url.c_str());
-                        }
-                    else if (font* f = res->cast_to_font())
-                        {
-                            // Add this shared font to our fonts.
-                            add_font(inf.m_character_id, f);
-                            imported = true;
-                        }
-                    else if (character_def* ch = res->cast_to_character_def())
-                        {
-                            // Add this character to our characters.
-                            add_character(inf.m_character_id, ch);
-                            imported = true;
-                        }
-                    else
-                        {
-                            log_error(_("import error: resource '%s' from movie '%s' has unknown type"),
-                                      inf.m_symbol.c_str(), source_url.c_str());
-                        }
-
-                    if (imported)
-                        {
-				// TODO: a std::list would be faster here
-                            m_imports.erase(m_imports.begin() + i);
-
-                            // Hold a ref, to keep this source movie_definition alive.
-                            m_import_source_movies.push_back(source_movie);
-                        }
-                }
-        }
-}
-
 void movie_def_impl::add_character(int character_id, character_def* c)
 {
 	assert(c);
@@ -331,14 +255,6 @@ void movie_def_impl::add_character(int character_id, character_def* c)
 character_def*
 movie_def_impl::get_character_def(int character_id)
 {
-#ifndef NDEBUG
-    // make sure character_id is resolved
-    if (in_import_table(character_id))
-        {
-            log_error(_("get_character_def(): character_id %d is still waiting to be imported"),
-                      character_id);
-        }
-#endif // not NDEBUG
 
 	boost::mutex::scoped_lock lock(_dictionaryMutex);
 
@@ -357,14 +273,6 @@ void movie_def_impl::add_font(int font_id, font* f)
 
 font* movie_def_impl::get_font(int font_id) const
 {
-#ifndef NDEBUG
-    // make sure font_id is resolved
-    if (in_import_table(font_id))
-        {
-            log_error(_("get_font(): font_id %d is still waiting to be imported"),
-                      font_id);
-        }
-#endif // not NDEBUG
 
     FontMap::const_iterator it = m_fonts.find(font_id);
     if ( it == m_fonts.end() ) return NULL;
@@ -518,7 +426,7 @@ movie_def_impl::readHeader(std::auto_ptr<tu_file> in, const std::string& url)
 
 	IF_VERBOSE_PARSE(
 		m_frame_size.print();
-		log_parse(_("frame rate = %f, frames = " SIZET_FMT),
+		log_parse(_("frame rate = %f, frames = %d"),
 			m_frame_rate, m_frame_count);
 	);
 
@@ -709,7 +617,7 @@ movie_def_impl::load_next_frame_chunk()
 #endif
 		if ( ! ensure_frame_loaded(nextframe) )
 		{
-			log_error(_("Could not advance to frame " SIZET_FMT),
+			log_error(_("Could not advance to frame %d"),
 				nextframe);
 			// these kind of errors should be handled by callers
 			abort();
@@ -797,7 +705,7 @@ parse_tag:
 					log_swferror(_("last expected SHOWFRAME "
 						"in SWF stream '%s' isn't "
 						"followed by an END (%d)."),
-						get_url().c_str(), tag_type);
+						get_url(), tag_type);
 					);
 				}
 				goto parse_tag;
@@ -818,7 +726,7 @@ parse_tag:
 			IF_VERBOSE_PARSE(
 				std::stringstream ss;
 				dump_tag_bytes(&str, ss);
-				log_error("tag dump follows: %s", ss.str().c_str());
+				log_error("tag dump follows: %s", ss.str());
 			);
 		}
 
@@ -841,7 +749,7 @@ parse_tag:
 	if ( ! m_playlist[floaded].empty() )
 	{
 		IF_VERBOSE_MALFORMED_SWF(
-		log_swferror(_(SIZET_FMT " control tags are NOT followed by"
+		log_swferror(_("%d control tags are NOT followed by"
 			" a SHOWFRAME tag"),
 			m_playlist[floaded].size());
 		);
@@ -850,7 +758,7 @@ parse_tag:
 	if ( m_frame_count > floaded )
 	{
 		IF_VERBOSE_MALFORMED_SWF(
-		log_swferror(_(SIZET_FMT " frames advertised in header, but only " SIZET_FMT " SHOWFRAME tags "
+		log_swferror(_("%d frames advertised in header, but only %d SHOWFRAME tags "
 			"found in stream. Pretending we loaded all advertised frames"), m_frame_count, floaded);
 		);
 		boost::mutex::scoped_lock lock(_frames_loaded_mutex);
@@ -878,11 +786,9 @@ movie_def_impl::incrementLoadedFrames()
 	{
 		IF_VERBOSE_MALFORMED_SWF(
 			log_swferror(_("number of SHOWFRAME tags "
-				"in SWF stream '%s' (" SIZET_FMT
-				") exceeds "
-				"the advertised number in header ("
-			        SIZET_FMT ")."),
-				get_url().c_str(), _frames_loaded,
+				"in SWF stream '%s' (%d) exceeds "
+				"the advertised number in header (%d)."),
+				get_url(), _frames_loaded,
 				m_frame_count);
 		);
 		//m_playlist.resize(_frames_loaded+1);
@@ -962,8 +868,8 @@ movie_def_impl::get_exported_resource(const std::string& symbol)
 		if ( new_loading_frame != loading_frame )
 		{
 #ifdef DEBUG_EXPORTS
-			log_debug(_("looking for exported resource: frame load advancement (from "
-				SIZET_FMT " to " SIZET_FMT ")"),
+			log_debug(_("looking for exported resource: frame load "
+						"advancement (from %d to %d)"),
 				loading_frame, new_loading_frame);
 #endif
 			loading_frame = new_loading_frame;
@@ -979,17 +885,17 @@ movie_def_impl::get_exported_resource(const std::string& symbol)
 					"giving up on "
 					"get_exported_resource(%s): "
 					"circular IMPORTS?"),
-					get_url().c_str(),
+					get_url(),
 					(def_timeout*naptime)/1000,
 					def_timeout*naptime,
 					def_timeout,
-					symbol.c_str());
+					symbol);
 				return res;
 			}
 
 #ifdef DEBUG_EXPORTS
 			log_debug(_("No frame progress at iteration %lu of get_exported_resource(%s)"),
-				timeout, symbol.c_str());
+				timeout, symbol);
 #endif
 
 			continue; // not worth checking
@@ -1000,11 +906,11 @@ movie_def_impl::get_exported_resource(const std::string& symbol)
 #ifdef DEBUG_EXPORTS
 			boost::mutex::scoped_lock lock(_exportedResourcesMutex);
 			log_debug(_("At end of stream, still no '%s' symbol found "
-				"in _exportedResources (" SIZET_FMT " entries in it, "
-				"follow)"), symbol.c_str(), _exportedResources.size());
+				"in _exportedResources (%d entries in it, "
+				"follow)"), symbol, _exportedResources.size());
 			for (ExportMap::const_iterator it=_exportedResources.begin(); it!=_exportedResources.end(); ++it)
 			{
-				log_debug(" symbol %s (%s)", it->first.c_str(), typeName(*(it->second)).c_str());
+				log_debug(" symbol %s (%s)", it->first, typeName(*(it->second)));
 			}
 #endif
 			return res;

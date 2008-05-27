@@ -40,7 +40,6 @@
 //
 // Forward declarations
 namespace gnash {
-	class import_info;
 	class movie_def_impl;
 	class movie_root;
 	class sprite_instance;
@@ -52,34 +51,6 @@ namespace gnash {
 
 namespace gnash
 {
-
-//
-// Helper for movie_def_impl
-//
-
-class import_info
-{
-private:
-    friend class movie_def_impl;
-
-    std::string	m_source_url;
-    int	        m_character_id;
-    std::string	m_symbol;
-
-    import_info()
-	:
-	m_character_id(-1)
-	{
-	}
-
-    import_info(const std::string& source, int id, const std::string& symbol)
-	:
-	m_source_url(source),
-	m_character_id(id),
-	m_symbol(symbol)
-	{
-	}
-};
 
 /// \brief
 /// movie_def_impl helper class handling start and execution of
@@ -232,9 +203,6 @@ private:
 	// Mutex protecting access to _exportedResources
 	mutable boost::mutex _exportedResourcesMutex;
 
-	/// Items we import.
-	std::vector<import_info> m_imports;
-
 	/// Movies we import from; hold a ref on these,
 	/// to keep them alive
 	typedef std::vector<boost::intrusive_ptr<movie_definition> > ImportVect;
@@ -324,10 +292,6 @@ private:
 	/// A flag set to true when load cancelation is requested
 	bool _loadingCanceled;
 
-	/// Debug helper; returns true if the given
-	/// character_id is listed in the import table.
-	bool in_import_table(int character_id) const;
-
 public:
 
 	movie_def_impl();
@@ -404,22 +368,6 @@ public:
 	///         resource, or if a timeout occurs while scanning the movie.
 	///
 	virtual boost::intrusive_ptr<resource> get_exported_resource(const std::string& symbol);
-
-	// see docs in movie_definition.h
-	virtual void add_import(const std::string& source_url, int id, const std::string& symbol)
-	{
-	    assert(in_import_table(id) == false);
-	    m_imports.push_back(import_info(source_url, id, symbol));
-	}
-
-	/// \brief
-	/// Calls back the visitor for each movie that we
-	/// import symbols from.
-	virtual void visit_imported_movies(import_visitor& visitor);
-
-	// See docs in movie_definition.h
-	virtual void resolve_import(const std::string& source_url,
-		movie_definition* source_movie);
 
 	void add_character(int character_id, character_def* c);
 

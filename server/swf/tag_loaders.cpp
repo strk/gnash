@@ -64,13 +64,6 @@
 
 namespace gnash {
 
-	// @@ TODO get rid of this; make it the normal mode.
-	extern bool s_no_recurse_while_loading;
-
-}
-
-namespace gnash {
-
 namespace SWF {
 namespace tag_loaders {
 
@@ -97,13 +90,6 @@ class StreamAdapter
 		currPos(startPos)
 	{
 		assert(endPos > startPos);
-#if 0
-		if (endPos <= startPos)
-		{
-			log_error("startPos: %lu, endPos: %lu", startPos, endPos);
-			abort();
-		}
-#endif
 	}
 
 	static int readFunc(void* dst, int bytes, void* appdata) 
@@ -964,7 +950,7 @@ void	button_sound_loader(stream* in, tag_type tag, movie_definition* m)
         log_swferror(_("DEFINEBUTTONSOUND refers to character id %d, "
             "being a %s (expected a button definition)"),
             button_character_id,
-            typeName(*chdef).c_str());
+            typeName(*chdef));
         );
         return;
     }
@@ -1031,7 +1017,7 @@ void	export_loader(stream* in, tag_type tag, movie_definition* m)
 	in->read_string(symbolName);
 
 	IF_VERBOSE_PARSE (
-	    log_parse(_("  export: id = %d, name = %s"), id, symbolName.c_str());
+	    log_parse(_("  export: id = %d, name = %s"), id, symbolName);
 	);
 
 	if (font* f = m->get_font(id))
@@ -1053,7 +1039,7 @@ void	export_loader(stream* in, tag_type tag, movie_definition* m)
 	    IF_VERBOSE_MALFORMED_SWF(
 	    log_swferror(_("don't know how to export resource '%s' "
 			"with id %d (can't find that id)"),
-		      symbolName.c_str(), id);
+		      symbolName, id);
             );
 	}
 
@@ -1091,25 +1077,25 @@ void	import_loader(stream* in, tag_type tag, movie_definition* m)
 
     IF_VERBOSE_PARSE
     (
-	log_parse(_("  import: version = %u, source_url = %s (%s), count = %d"), import_version, abs_url.str().c_str(), source_url.c_str(), count);
+	    log_parse(_("  import: version = %u, source_url = %s (%s), count = %d"),
+	    import_version, abs_url.str(), source_url, count);
     );
 
 
     // Try to load the source movie into the movie library.
     movie_definition*	source_movie = NULL;
 
-    if (s_no_recurse_while_loading == false)
-    {
 	try {
 	    source_movie = create_library_movie(abs_url);
 	} catch (gnash::GnashException& e) {
 	    log_error(_("Exception: %s"), e.what());
 	    source_movie = NULL;
 	}
+
 	if (source_movie == NULL)
 	{
 	    // Give up on imports.
-	    log_error(_("can't import movie from url %s"), abs_url.str().c_str());
+	    log_error(_("can't import movie from url %s"), abs_url.str());
 	    return;
 	}
 
@@ -1122,52 +1108,40 @@ void	import_loader(stream* in, tag_type tag, movie_definition* m)
 	    );
 	    return;
 	}
-    }
 
     // Get the imports.
     for (int i = 0; i < count; i++)
     {
-    in->ensureBytes(2);
-	boost::uint16_t	id = in->read_u16();
-	std::string symbolName;
-	in->read_string(symbolName);
-	IF_VERBOSE_PARSE
-	(
-	    log_parse(_("  import: id = %d, name = %s"), id, symbolName.c_str());
-	);
+        in->ensureBytes(2);
+	    boost::uint16_t	id = in->read_u16();
+	    std::string symbolName;
+	    in->read_string(symbolName);
+	    IF_VERBOSE_PARSE
+	    (
+	        log_parse(_("  import: id = %d, name = %s"), id, symbolName);
+	    );
 
-	if (s_no_recurse_while_loading)
-	{
-	    m->add_import(source_url, id, symbolName.c_str()); // TODO: pass the const ref of string instead
-	}
-	else
-	{
-	    // @@ TODO get rid of this, always use
-	    // s_no_recurse_while_loading, change
-	    // create_movie().
-
-	    boost::intrusive_ptr<resource> res = source_movie->get_exported_resource(symbolName);
-	    if (res == NULL)
-	    {
-		log_error(_("import error: could not find resource '%s' in movie '%s'"),
-			  symbolName.c_str(), source_url.c_str());
-	    }
-	    else if (font* f = res->cast_to_font())
-	    {
-		// Add this shared font to the currently-loading movie.
-		    m->add_font(id, f);
-	    }
-	    else if (character_def* ch = res->cast_to_character_def())
-	    {
-		// Add this character to the loading movie.
-		m->add_character(id, ch);
-	    }
-	    else
-	    {
-		log_error(_("import error: resource '%s' from movie '%s' has unknown type"),
-			  symbolName.c_str(), source_url.c_str());
-	    }
-	}
+        boost::intrusive_ptr<resource> res = source_movie->get_exported_resource(symbolName);
+        if (res == NULL)
+        {
+        log_error(_("import error: could not find resource '%s' in movie '%s'"),
+	          symbolName, source_url);
+        }
+        else if (font* f = res->cast_to_font())
+        {
+            // Add this shared font to the currently-loading movie.
+            m->add_font(id, f);
+        }
+        else if (character_def* ch = res->cast_to_character_def())
+        {
+            // Add this character to the loading movie.
+            m->add_character(id, ch);
+        }
+        else
+        {
+        log_error(_("import error: resource '%s' from movie '%s' has unknown type"),
+	          symbolName, source_url);
+        }
 
     }
 
@@ -1508,7 +1482,7 @@ video_loader(stream* in, tag_type tag, movie_definition* m)
     if ( ! vdef )
     {
         IF_VERBOSE_MALFORMED_SWF(
-        log_swferror(_("VideoFrame tag refers to a non-video character %d (%s)"), character_id, typeName(*chdef).c_str());
+        log_swferror(_("VideoFrame tag refers to a non-video character %d (%s)"), character_id, typeName(*chdef));
         );
         return;
     }
@@ -1571,10 +1545,10 @@ metadata_loader(stream* in, tag_type tag, movie_definition* /*m*/)
     in->read_string(metadata);
 
     IF_VERBOSE_PARSE (
-	log_parse(_("  metadata = [[\n%s\n]]"), metadata.c_str());
+	log_parse(_("  metadata = [[\n%s\n]]"), metadata);
     );
 
-    log_unimpl(_("METADATA tag unused: %s"), metadata.c_str());
+    log_unimpl(_("METADATA tag unused: %s"), metadata);
 
     // TODO: attach to movie_definition instead
     //       (should we parse the XML maybe?)
@@ -1607,7 +1581,7 @@ serialnumber_loader(stream* in, tag_type tag, movie_definition* /*m*/)
     ss << " - Build " << build;
     ss << " - Timestamp " << timestamp;
 
-    log_debug("%s", ss.str().c_str());
+    log_debug("%s", ss.str());
 
     // attach to movie_definition ?
 }
@@ -1664,10 +1638,8 @@ abc_loader(stream* in, tag_type tag, movie_definition* /*m*/)
 
 
 
-// @@ lots of macros here!  It seems that VC6 can't correctly
-// handle integer template args, although it's happy to
-// compile them?!
-
+// VC6 is a recognized pile of crap and no one should
+// worry about trying to support it.
 
 class in_stream
 {

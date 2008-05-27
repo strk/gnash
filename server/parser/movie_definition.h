@@ -136,37 +136,7 @@ public:
 		return NULL;
 	}
 	
-	//
-	// (optional) API to support gnash::create_movie_no_recurse().
-	//
-	
-	/// \brief
-	/// Call visit_imported_movies() to retrieve a list of
-	/// names of movies imported into this movie.
-	//
-	/// visitor.visit() will be called back with the name
-	/// of each imported movie.
-	///
-	class import_visitor
-	{
-	public:
-	    virtual ~import_visitor() {}
-	    virtual void visit(const std::string& imported_movie_filename) = 0;
-	};
-	virtual void visit_imported_movies(import_visitor& /*visitor*/) {}
-	
-	/// Call this to resolve an import of the given movie.
-	//
-	/// Replaces the dummy placeholder with the real
-	/// movie_definition* given.
-	///
-	/// The default implementation is a no-op.
-	///
-	/// @see add_import
-	///
-	virtual void resolve_import(const std::string& /*name*/,
-			movie_definition* /*def*/) {}
-	
+
 	//
 	// (optional) API to support host-driven creation of textures.
 	//
@@ -449,25 +419,6 @@ public:
 	{
 	}
 
-	/// \brief
-	/// Adds an entry to a table of resources that need to
-	/// be imported from other movies. 
-	//
-	/// Client code must call resolve_import() later, when the
-	/// source movie has been loaded, so that the actual resource
-	/// can be used.
-	///
-	/// This mechanism (add_import/resolve_import) is only used
-	/// by the IMPORT tag loader if s_no_recurse_while_loading is
-	/// true, which currently NEVER happens using the standard
-	/// executables.
-	///
-	/// The default implementation is a no-op.
-	///
-	virtual void add_import(const std::string& /*source_url*/,
-			int /*id*/, const std::string& /*symbol_name*/)
-	{
-	}
 
 	/// \brief
 	/// All bitmap_info's used by this movie should be
