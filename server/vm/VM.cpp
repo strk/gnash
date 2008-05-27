@@ -39,6 +39,7 @@
 
 #include <memory>
 #include <boost/random.hpp> // for random generator
+#include <cstdlib> // std::getenv
 
 namespace {
 gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
@@ -182,9 +183,9 @@ VM::getSystemLanguage()
 	// This should work on most UNIX-like systems.
 	// Callers should work out what to do with it.
 	// TODO: Other OSs.
-	if ((loc = getenv("LANG")) ||
-		(loc = getenv("LANGUAGE")) ||
-		(loc = getenv("LC_MESSAGES"))
+	if ((loc = std::getenv("LANG")) ||
+		(loc = std::getenv("LANGUAGE")) ||
+		(loc = std::getenv("LC_MESSAGES"))
 		)
 	{
 		std::string lang = loc;

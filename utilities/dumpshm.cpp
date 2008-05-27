@@ -60,7 +60,7 @@ extern char *optarg;
 #include <cerrno>
 
 #ifdef ENABLE_NLS
-#include <locale>
+# include <locale>
 #endif
 
 #include "log.h"
@@ -111,7 +111,7 @@ main(int argc, char *argv[])
     
     // Enable native language support, i.e. internationalization
 #ifdef ENABLE_NLS
-    setlocale (LC_ALL, "");
+    std::setlocale (LC_ALL, "");
     bindtextdomain (PACKAGE, LOCALEDIR);
     textdomain (PACKAGE);
 #endif

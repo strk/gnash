@@ -35,7 +35,7 @@
 #include <unistd.h> // for getuid()
 #include <sys/stat.h>
 #include <limits>
-
+#include <cstdlib> // getenv
 #include <string>
 #include <vector>
 #include <iostream>
@@ -133,7 +133,7 @@ RcInitFile::loadFiles()
     parseFile(loadfile);
     
     // Check the users home directory
-    char *home = getenv("HOME");
+    char *home = std::getenv("HOME");
     if (home) {
         loadfile = home;
         loadfile.append("/.gnashrc");
@@ -144,7 +144,7 @@ RcInitFile::loadFiles()
     // TODO: keep note of the already-parsed files
     //       to avoid parsign multiple times ?
     //       (would mess up user-reguested order)
-    char *gnashrc = getenv("GNASHRC");
+    char *gnashrc = std::getenv("GNASHRC");
     if (gnashrc)
     {
         std::string paths(gnashrc);
@@ -264,7 +264,7 @@ RcInitFile::expandPath (std::string& path)
         // Initial "~" followed by "/"
         if (path.substr(1,1) == "/") {
             
-            const char *home = getenv("HOME");
+            const char *home = std::getenv("HOME");
             if (home) {
                 // if HOME set in env, replace ~ with HOME
                 path.replace(0, 1, home);
@@ -577,7 +577,7 @@ RcInitFile::updateFile()
     // should be written first.
     // If you name an important file in GNASHRC and 'save' the
     // preferences, you'll obviously overwrite that file.
-    char *gnashrc = getenv("GNASHRC");
+    char *gnashrc = std::getenv("GNASHRC");
     if (gnashrc) {
         std::string filelist(gnashrc);
         
@@ -598,7 +598,7 @@ RcInitFile::updateFile()
     else
     {
         // Check the users home directory    
-        char *home = getenv("HOME");
+        char *home = std::getenv("HOME");
         if (home) {
             writefile = home;
             writefile.append("/.gnashrc");

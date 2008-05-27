@@ -24,6 +24,7 @@
 #include <cerrno>
 #include <cstring>
 #include <cassert>
+#include <cstdlib>
 #include <sys/types.h>
 #include <sys/stat.h>
 
@@ -61,7 +62,7 @@ main(int argc, char *argv[])
     string procname;
     pid_t childpid;
     
-    char *gnash_env = getenv("GNASH_PLAYER");
+    char *gnash_env = std::getenv("GNASH_PLAYER");
     if (!gnash_env) {
       procname = GNASHBINDIR;
       procname += "/hildon-gnash";

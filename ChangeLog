@@ -1,3 +1,12 @@
+2008-05-27 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* extensions/launcher/launcher.cpp, gui/fb.cpp, gui/gnash.cpp
+	  libbase/GC.cpp, libbase/rc.cpp, libbase/sharedlib.cpp,
+	  plugin/plugin.cpp, plugin/win32/plugin.cpp, server/vm/VM.cpp,
+	  utilities/dumpshm.cpp, utilities/processor.cpp,
+	  utilities/soldumper.cpp: use std::setlocale, and from cstdlib
+	  std::getenv; only set locale if ENABLE_NLS is defined. 
+
 2008-05-27 Sandro Santilli <strk@keybit.net>
 
 	* libbase/curl_adapter.cpp (CurlStreamFile::init): add support

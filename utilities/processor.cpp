@@ -195,7 +195,7 @@ main(int argc, char *argv[])
 
     // Enable native language support, i.e. internationalization
 #ifdef ENABLE_NLS
-    setlocale (LC_ALL, "");
+    std::setlocale (LC_ALL, "");
     bindtextdomain (PACKAGE, LOCALEDIR);
     textdomain (PACKAGE);
 #endif

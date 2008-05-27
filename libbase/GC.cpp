@@ -28,6 +28,8 @@
 #include "log.h"
 #endif
 
+#include <cstdlib>
+
 namespace gnash {
 
 GC* GC::_singleton = NULL;
@@ -38,7 +40,7 @@ GC::init(GcRoot& root)
 {
 	assert(!_singleton);
 	_singleton = new GC(root);
-	char *gcgap = getenv("GNASH_GC_TRIGGER_THRESHOLD");
+	char *gcgap = std::getenv("GNASH_GC_TRIGGER_THRESHOLD");
 	if ( gcgap )
 	{
 		unsigned int gap = atoi(gcgap);

@@ -27,9 +27,12 @@
 
 #include <sys/stat.h>
 #include <unistd.h>
+
 #include <string>
-#include <ltdl.h>
 #include <iostream>
+#include <cstdlib>
+
+#include <ltdl.h>
 #ifdef HAVE_DLFCN_H
 	#include <dlfcn.h>
 #endif
@@ -108,7 +111,7 @@ SharedLib::SharedLib(const char *filespec)
 //         log_debug ("Initialized ltdl");
     }
     const char *pluginsdir = PLUGINSDIR;
-    char *env = getenv ("GNASH_PLUGINS");
+    char *env = std::getenv ("GNASH_PLUGINS");
     if (env != NULL)
         pluginsdir = env;
    

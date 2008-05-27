@@ -80,7 +80,7 @@
 #include <linux/vt.h>
 #include <unistd.h>
 #include <csignal>
-
+#include <cstdlib> // getenv
 
 #include "gnash.h"
 #include "gui.h"
@@ -1016,7 +1016,7 @@ bool FBGui::init_mouse()
 {
   std::string dev;
 
-  char* devname = getenv("POINTING_DEVICE");
+  char* devname = std::getenv("POINTING_DEVICE");
   if (devname) dev = devname;
   else dev = "/dev/input/event0";
 
@@ -1069,7 +1069,7 @@ void FBGui::apply_ts_calibration(float* cx, float* cy, int rawx, int rawy) {
   if (!initialized) {
     initialized=true;
     
-    char* settings = getenv("TSCALIB");
+    char* settings = std::getenv("TSCALIB");
     
     if (settings) {
     
@@ -1149,7 +1149,7 @@ void FBGui::check_mouse()
   bool move_pending = false;  // true: notify_mouse_moved() should be called
   
   // this is necessary for our quick'n'dirty touchscreen calibration: 
-  static int coordinatedebug = getenv("DUMP_RAW")!=NULL;
+  static int coordinatedebug = std::getenv("DUMP_RAW")!=NULL;
   
   // The while loop is limited because the kernel tends to send us hundreds
   // of events while the touchscreen is touched. We don't loose any 
@@ -1170,7 +1170,7 @@ void FBGui::check_mouse()
         
         float cx, cy;
         
-        if (getenv("TSCALIB"))  // ONLY convert when requested
+        if (std::getenv("TSCALIB"))  // ONLY convert when requested
           apply_ts_calibration(&cx, &cy, mouse_x, mouse_y);
         else
           { cx=mouse_x; cy=mouse_y; }
@@ -1235,7 +1235,7 @@ bool FBGui::init_keyboard()
 {
   std::string dev;
 
-  char* devname = getenv("KEYBOARD_DEVICE");
+  char* devname = std::getenv("KEYBOARD_DEVICE");
   if (devname) dev = devname;
   else dev = "/dev/input/event0";
 

@@ -21,6 +21,8 @@
 #include "gnashconfig.h"
 #endif
 
+#include <cstdlib>
+
 #define FLASH_MAJOR_VERSION "9"
 #define FLASH_MINOR_VERSION "0"
 #define FLASH_REV_NUMBER "82"
@@ -397,7 +399,7 @@ nsPluginInstance::threadMain(void)
  
     // Init logfile.
     gnash::RcInitFile& rcinit = gnash::RcInitFile::getDefaultInstance();
-    std::string logfilename = std::string(getenv("TEMP")) +
+    std::string logfilename = std::string(std::getenv("TEMP")) +
         std::string("\\npgnash.log");
     rcinit.setDebugLog(logfilename);
     gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();

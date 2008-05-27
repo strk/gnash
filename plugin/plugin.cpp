@@ -20,6 +20,8 @@
 #include "gnashconfig.h"
 #endif
 
+#include <cstdlib> // getenv
+
 #define MIME_TYPES_HANDLED  "application/x-shockwave-flash"
 // The name must be this value to get flash movies that check the
 // plugin version to load.
@@ -173,7 +175,7 @@ NS_PluginInitialize()
 	/*
 	Check for environment variables.
 	*/
-	char* opts = getenv("GNASH_OPTIONS");
+	char* opts = std::getenv("GNASH_OPTIONS");
 	if (opts != NULL)
 	{
 		cout << "GNASH_OPTIONS : " << opts << endl;
@@ -192,7 +194,7 @@ NS_PluginInitialize()
 		//       and serialize back (to avoid duplicates)
 
 		std::string newGnashRc;
-		char *gnashrc = getenv("GNASHRC");
+		char *gnashrc = std::getenv("GNASHRC");
 		if ( gnashrc )
 		{
 			newGnashRc.assign(gnashrc);
@@ -202,7 +204,7 @@ NS_PluginInitialize()
 		newGnashRc.append(SYSCONFDIR);
 		newGnashRc.append("/gnashpluginrc");
 
-		char *home = getenv("HOME");
+		char *home = std::getenv("HOME");
 		if ( home )
 		{
 			newGnashRc.append(":");
@@ -744,7 +746,7 @@ void
 nsPluginInstance::startProc(Window win)
 {
 	string procname;
-	char *gnash_env = getenv("GNASH_PLAYER");
+	char *gnash_env = std::getenv("GNASH_PLAYER");
 	if (gnash_env == NULL) {
 		procname = GNASHBINDIR;
 		procname += "/gtk-gnash";
@@ -1052,7 +1054,7 @@ static const char* getPluginDescription()
 	static const char* desc = NULL;
 	if (!desc)
 	{
-		desc = getenv("GNASH_PLUGIN_DESCRIPTION");
+		desc = std::getenv("GNASH_PLUGIN_DESCRIPTION");
 		if (desc == NULL) desc = PLUGIN_DESCRIPTION;
 	}
 	return desc;
