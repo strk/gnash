@@ -37,6 +37,7 @@
 #include "ExecutableCode.h"
 #include "namedStrings.h"
 #include "Object.h" // for getObjectInterface
+#include "StringPredicates.h"
 
 /** \page buttons Buttons and mouse behaviour
 
@@ -825,7 +826,7 @@ button_character_instance::get_path_element(string_table::key key)
 	as_object* ch = get_path_element_character(key);
 	if ( ch ) return ch;
 
-	std::string name = _vm.getStringTable().value(key);
+	const std::string& name = _vm.getStringTable().value(key);
 	return getChildByName(name); // possibly NULL
 }
 
@@ -842,18 +843,19 @@ button_character_instance::getChildByName(const std::string& name) const
 
 	for (CharsVect::iterator i=actChars.begin(), e=actChars.end(); i!=e; ++i)
 	{
-		character* child = *i;
-		const char* pat_c = child->get_name().c_str();
-		const char* nam_c = name.c_str();
 
-  		if ( _vm.getSWFVersion() >= 7 )
-		{
-			if (! strcmp(pat_c, nam_c) ) return child;
-		}
-		else
-		{
-			if ( ! strcasecmp(pat_c, nam_c) ) return child;
-		}
+		character* const child = *i;
+		const std::string& childname = child->get_name();
+ 
+   		if ( _vm.getSWFVersion() >= 7 )
+ 		{
+			if ( childname == name ) return child;
+ 		}
+ 		else
+ 		{
+		    StringNoCaseEqual noCaseCompare;
+			if ( noCaseCompare(childname, name) ) return child;
+ 		}
 	}
 
 	return NULL;
@@ -875,8 +877,8 @@ button_character_instance::stagePlacementCallback()
 	{
 		button_record& bdef = m_def->m_button_records[*i];
 
-		const matrix&	mat = bdef.m_button_matrix;
-		const cxform&	cx = bdef.m_button_cxform;
+		const matrix& mat = bdef.m_button_matrix;
+		const cxform& cx = bdef.m_button_cxform;
 		int ch_depth = bdef.m_button_layer+character::staticDepthOffset+1;
 		int ch_id = bdef.m_character_id;
 
