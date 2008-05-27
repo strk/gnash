@@ -492,6 +492,28 @@ CurlStreamFile::init(const std::string& url)
 		}
 	}
 
+	// Read cookies from file if requested.
+	// TODO: only read the file once, not at every request !
+	const char *cookiein = getenv("GNASH_COOKIES_IN");
+	// Or just enable cookie engine.
+	if ( ! cookiein ) cookiein = "";
+	ccode = curl_easy_setopt(_handle, CURLOPT_COOKIEFILE , cookiein);
+	if ( ccode != CURLE_OK ) {
+		throw gnash::GnashException(curl_easy_strerror(ccode));
+	}
+
+	// Write gathered cookies from file if requested.
+	// TODO: only write the file once, not at every cleanup !
+	const char *cookieout = getenv("GNASH_COOKIES_OUT");
+	if ( cookieout )
+	{
+		// Dump cookies to a file
+		ccode = curl_easy_setopt(_handle, CURLOPT_COOKIEJAR , cookieout);
+		if ( ccode != CURLE_OK ) {
+			throw gnash::GnashException(curl_easy_strerror(ccode));
+		}
+	}
+
 	ccode = curl_easy_setopt(_handle, CURLOPT_USERAGENT, "Gnash-" VERSION);
 	if ( ccode != CURLE_OK ) {
 		throw gnash::GnashException(curl_easy_strerror(ccode));

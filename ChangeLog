@@ -1,3 +1,9 @@
+2008-05-27 Sandro Santilli <strk@keybit.net>
+
+	* libbase/curl_adapter.cpp (CurlStreamFile::init): add support
+	  for GNASH_COOKIES_IN and GNASH_COOKIES_OUT environment variable;
+	  always enable the libcurl cookie engine.
+
 2008-05-27 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* libbase/container.h, libbase/grid_index.h: drop more dead files.
