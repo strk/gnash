@@ -28,8 +28,8 @@
 #include "log.h"
 
 #include <gst/gst.h>
+#include <sstream>
 
-using namespace boost;
 
 namespace gnash {
 namespace media {

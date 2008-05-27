@@ -7,6 +7,8 @@
 	  HAVE_STDLIB_H in jpeg.cpp (as queried in comment) to see
 	  who squeals.
 	* configure.ac: drop tests for unused C library functions.
+	* libmedia/GstUtil.cpp, libnet/http.h: include sstream, don't
+	  rely on other headers to include it.
 
 2008-05-26 Bastiaan Jacques <bastiaan@bjacques.org>
 
