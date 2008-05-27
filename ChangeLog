@@ -1,5 +1,10 @@
 2008-05-27 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* libbase/container.h, libbase/grid_index.h: drop more dead files.
+	  I think Gnash works by magic.
+
+2008-05-27 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* server/button_character_instance.cpp: compare std::strings for
 	  portability (no strcasecmp).
 

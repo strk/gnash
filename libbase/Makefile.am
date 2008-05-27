@@ -133,12 +133,10 @@ libgnashbase_la_SOURCES = \
 
 noinst_HEADERS = \
 	$(LIBLTDLHEAD) \
-	container.h \
 	dlmalloc.h \
 	extension.h \
 	GnashException.h \
 	gettext.h \
-	grid_index.h \
 	image.h	\
 	jemtree.h \
 	jpeg.h \
