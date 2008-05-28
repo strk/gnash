@@ -1,5 +1,9 @@
 2008-05-28 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* plugin/win32/plugin.cpp: fix build.
+
+2008-05-28 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* server/asobj/TextFormat.cpp: correct some typos (should fix
 	  the silly debug message: "Invalid align string left, take
 	  as left").

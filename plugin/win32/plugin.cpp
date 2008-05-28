@@ -394,7 +394,6 @@ nsPluginInstance::threadMain(void)
 
     // Initialize Gnash core library.
     gnash::gnashInit();
-    gnash::set_use_cache_files(false);
     DBG("Gnash core initialized.\n");
  
     // Init logfile.
@@ -404,7 +403,7 @@ nsPluginInstance::threadMain(void)
     rcinit.setDebugLog(logfilename);
     gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
     dbglogfile.setWriteDisk(true);
-    dbglogfile.setVerbosity(DEBUGLEVEL);
+    dbglogfile.setVerbosity(GNASH_DEBUG_LEVEL);
     DBG("Gnash logging initialized: %s\n", logfilename.c_str());
 
     // Init sound.
