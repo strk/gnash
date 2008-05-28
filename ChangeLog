@@ -1,5 +1,10 @@
 2008-05-28 Sandro Santilli <strk@keybit.net>
 
+	* server/button_character_instance.cpp (on_event): if-0 out
+	  debugging line.
+
+2008-05-28 Sandro Santilli <strk@keybit.net>
+
 	* libbase/curl_adapter.cpp: keep select() timeout low (1/100 of
 	  second), to allow thread switching while waiting for input.
 	  Re-intruduce the WallClock to implement user-requested

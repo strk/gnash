@@ -355,8 +355,10 @@ button_character_instance::on_event(const event_id& id)
 	{
 		// We dont' respond to events while unloaded
 		// See bug #22982
+#if 0 // debugging..
 		log_debug("Button %s received %s event while unloaded: ignored",
 			getTarget(), id.get_function_name());
+#endif
 		return false; 
 	}
 
