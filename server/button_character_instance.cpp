@@ -902,7 +902,7 @@ button_character_instance::stagePlacementCallback()
 	// Instantiate the default state characters 
 	RecSet upChars;
 	get_active_records(upChars, UP);
-	log_debug("At StagePlacementCallback, button %s got %d active chars for state UP", getTarget(), upChars.size());
+	//log_debug("At StagePlacementCallback, button %s got %d active chars for state UP", getTarget(), upChars.size());
 	for (RecSet::iterator i=upChars.begin(),e=upChars.end(); i!=e; ++i)
 	{
 		int rno = *i;

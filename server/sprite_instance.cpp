@@ -4778,7 +4778,7 @@ sprite_instance::markReachableResources() const
           //       self from our map, but TextField (edit_text_character) doesn't really
           //       store a pointer to the sprite it's registered against.
           //
-          log_debug("Unloaded TextField in registered textfield variables container on ::markReachableResources");
+          //log_debug("Unloaded TextField in registered textfield variables container on ::markReachableResources");
 	}
         (*j)->setReachable();
       }
