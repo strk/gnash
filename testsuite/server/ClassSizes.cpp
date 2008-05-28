@@ -25,6 +25,7 @@
 #include "PropertyList.h"
 #include "sprite_instance.h"
 #include "character.h"
+#include "types.h"
 
 #include <iostream>
 #include <sstream>
@@ -62,6 +63,7 @@ main(int /*argc*/, char** /*argv*/)
 	std::cout << "sizeof(character): " << (sizeof(character)) << std::endl;
 	std::cout << "sizeof(sprite_instance): " << (sizeof(sprite_instance)) << std::endl;
 
+	std::cout << "sizeof(rgba): " << (sizeof(rgba)) << std::endl;
 	std::cout << "sizeof(line_style): " << (sizeof(line_style)) << std::endl;
 	std::cout << "sizeof(fill_style): " << (sizeof(fill_style)) << std::endl;
 }
