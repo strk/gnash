@@ -207,7 +207,8 @@ public:
     m_span_interpolator(m_tr),
     m_gradient_func(),
     m_gradient_adaptor(m_gradient_func),
-    m_sg(m_span_interpolator, m_gradient_adaptor, m_gradient_lut, 0, norm_size) 
+    m_sg(m_span_interpolator, m_gradient_adaptor, m_gradient_lut, 0, norm_size),
+    m_need_premultiply(false)
   {
   
     m_is_solid = false;
@@ -229,9 +230,12 @@ public:
       
 #ifdef DEBUG_LIMIT_COLOR_ALPHA
       trans_color.m_a = trans_color.m_a>127 ? 127 : trans_color.m_a;
-#endif    
+#endif
+
+      if (trans_color.m_a < 255) 
+        m_need_premultiply=true;    
       
-      m_gradient_lut.add_color(gr.m_ratio/255.0, agg::rgba8_pre(trans_color.m_r, 
+      m_gradient_lut.add_color(gr.m_ratio/255.0, agg::rgba8(trans_color.m_r, 
         trans_color.m_g, trans_color.m_b, trans_color.m_a));
         
     } // for
@@ -249,6 +253,10 @@ public:
   void generate_span(color_type* span, int x, int y, unsigned len) 
   {
     m_sg.generate(span, x, y, len);
+    
+    if (m_need_premultiply)
+      while (len--)
+        (span++)->premultiply();
   }
   
   // Provide access to our gradient adaptor to allow re-initialization of
@@ -285,6 +293,9 @@ protected:
   // Span generator
   sg_type m_sg;  
 
+  // premultiplication necessary?
+  bool m_need_premultiply;
+  
 }; // agg_style_gradient
 
 
