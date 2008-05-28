@@ -320,7 +320,9 @@ CurlStreamFile::fillCache(long unsigned size)
 
         // A value of -1 means no file descriptors were added.
         if (maxfd < 0) {
+#if GNASH_CURL_VERBOSE
             gnash::log_debug("No filedescriptors; breaking");
+#endif
             break;
         }
 
