@@ -69,40 +69,6 @@ tu_file* make_stream(const char * /*url */)
 // define this if you want seeks back to be reported
 //#define GNASH_CURL_WARN_SEEKSBACK 1
 
-// Adapt to older versions of libcurl.
-//
-// In 7.10.7 and before, CURLINFO_RESPONSE_CODE was called CURLINFO_HTTP_CODE
-//
-#if LIBCURL_VERSION_NUM <= 0x070a07
-# define CURLINFO_RESPONSE_CODE CURLINFO_HTTP_CODE
-#endif
-//
-// curl_multi_strerror() and curl_easy_strerror() came in at 7.12.0
-// Just print the number and tell the user how to decode it.
-//
-#if LIBCURL_VERSION_NUM < 0x070c00
-static const char *
-curl_easy_strerror(int code)
-{
-    static std::string ret;
-	std::ostringstream ss << "CurlE error code " <<
-	                   code << " (man libcurl-errors)";
-	
-	ret = ss.str();
-	return ret.c_str();
-}
-
-static const char *
-curl_multi_strerror(int code)
-{
-    static std::string ret;
-	std::ostringstream ss << "CurlM error code " <<
-	                   code << " (man libcurl-errors)";
-
-	ret = ss.str();
-	return ret.c_str();
-}
-#endif
 
 namespace curl_adapter
 {

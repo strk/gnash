@@ -1,5 +1,10 @@
 2008-05-28 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* libbase/curl_adapter.cpp: drop support for curl pre-7.12
+	  (was released in 2004).
+
+2008-05-28 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* libbase/curl_adapter.cpp: use select() to wait for data instead
 	  of sleeping. Correct includes, logging and cstdio.
 
