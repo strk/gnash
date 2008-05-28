@@ -1,5 +1,10 @@
 2008-05-28 Sandro Santilli <strk@keybit.net>
 
+	* libbase/curl_adapter.cpp (fillCache): spaces to tabs, comments
+	  about timeout constraints.
+
+2008-05-28 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/swfdec/REALTIME: run the sec-0.6.2-local-access.as
 	  tests in realtime (they load an xml file).
 

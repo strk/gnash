@@ -272,16 +272,16 @@ CurlStreamFile::fillCache(long unsigned size)
 	    return;
 	}
 
-    fd_set readfd, writefd, exceptfd;
-    int maxfd;
-    CURLMcode mcode;
-    timeval tv;
+	fd_set readfd, writefd, exceptfd;
+	int maxfd;
+	CURLMcode mcode;
+	timeval tv;
 
-    const unsigned int timeout = static_cast<unsigned int>(
-                        gnash::RcInitFile::getDefaultInstance().getStreamsTimeout());
+	const unsigned int timeout = static_cast<unsigned int>(
+			gnash::RcInitFile::getDefaultInstance().getStreamsTimeout());
 
-    while (_running)
-    {
+	while (_running)
+	{
 
 		do
 		{
@@ -293,42 +293,47 @@ CurlStreamFile::fillCache(long unsigned size)
 			throw gnash::GnashException(curl_multi_strerror(mcode));
 		}
 
-        // Do this here to avoid calling select() when we have enough
-        // bytes anyway.
-        if (_cached >= size) break;
+		// Do this here to avoid calling select() when we have enough
+		// bytes anyway.
+		if (_cached >= size) break;
 
 #if GNASH_CURL_VERBOSE
-        //gnash::log_debug("cached: %d, size: %d", _cached, size);
+		//gnash::log_debug("cached: %d, size: %d", _cached, size);
 #endif
 
-        FD_ZERO(&readfd);
-        FD_ZERO(&writefd);
-        FD_ZERO(&exceptfd);
-        tv.tv_sec = timeout;
-        tv.tv_usec = 0;
-
-        mcode = curl_multi_fdset(_mhandle, &readfd, &writefd, &exceptfd, &maxfd);
-        if (mcode != CURLM_OK) {
-            // This is a serious error, not just a failure to add any
-            // fds.
-            throw gnash::GnashException(curl_multi_strerror(mcode));
-        }
+		mcode = curl_multi_fdset(_mhandle, &readfd, &writefd, &exceptfd, &maxfd);
+		if (mcode != CURLM_OK) {
+			// This is a serious error, not just a failure to add any
+			// fds.
+			throw gnash::GnashException(curl_multi_strerror(mcode));
+		}
 
 #ifdef GNASH_CURL_VERBOSE
-        gnash::log_debug("Max fd: %d", maxfd);
+		gnash::log_debug("Max fd: %d", maxfd);
 #endif
 
-        // A value of -1 means no file descriptors were added.
-        if (maxfd < 0) {
+		// A value of -1 means no file descriptors were added.
+		if (maxfd < 0) {
 #if GNASH_CURL_VERBOSE
-            gnash::log_debug("No filedescriptors; breaking");
+			gnash::log_debug("No filedescriptors; breaking");
 #endif
-            break;
-        }
+			break;
+		}
 
-        // Wait for data on the filedescriptors until a timeout set
-        // in gnashrc.
-        select(maxfd + 1, &readfd, &writefd, &exceptfd, &tv);
+		FD_ZERO(&readfd);
+		FD_ZERO(&writefd);
+		FD_ZERO(&exceptfd);
+
+		// TODO: don't wait more then curl_multi_timeout()
+		//       [ or an fixed max is that's not supported
+		//         by current curl version ]
+		tv.tv_sec = timeout;
+		tv.tv_usec = 0;
+
+
+		// Wait for data on the filedescriptors until a timeout set
+		// in gnashrc.
+		select(maxfd + 1, &readfd, &writefd, &exceptfd, &tv);
 
 	}
 
