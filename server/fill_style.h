@@ -22,9 +22,9 @@
 #define GNASH_FILL_STYLE_H
 
 #include "smart_ptr.h" // GNASH_USE_GC
-#include "types.h"
 #include "matrix.h"
 #include "bitmap_character_def.h"
+#include "swf.h"
 
 #include <vector> // for composition
 
@@ -150,6 +150,12 @@ public:
 
 	/// Get fill type, see SWF::fill_style_type
 	int	get_type() const { return m_type; }
+
+	SWF::gradient_spread_mode get_gradient_spread_mode()
+	{ return m_spread_mode; }
+
+	SWF::gradient_interpolation_mode get_gradient_interpolation_mode()
+	{ return m_interpolation; }
 	
 	/// Sets this style to a blend of a and b.  t = [0,1] (for shape morphing)
 	void	set_lerp(const fill_style& a, const fill_style& b, float t);
@@ -216,6 +222,9 @@ private:
 	boost::intrusive_ptr<gnash::bitmap_info>	m_gradient_bitmap_info;
 	boost::intrusive_ptr<bitmap_character_def>	m_bitmap_character;
 	matrix	m_bitmap_matrix;
+
+	SWF::gradient_spread_mode m_spread_mode;
+	SWF::gradient_interpolation_mode m_interpolation;
 };
 
 

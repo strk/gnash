@@ -55,9 +55,10 @@ fill_style::fill_style()
     m_type(SWF::FILL_SOLID),
     m_color(), // FF.FF.FF.FF
     m_gradient_bitmap_info(0),
-    m_bitmap_character(0)
+    m_bitmap_character(0),
+    m_spread_mode(SWF::GRADIENT_SPREAD_PAD),
+    m_interpolation(SWF::GRADIENT_INTERPOL_NORMAL)
 {
-    assert(m_gradients.size() == 0);
 }
 
 
@@ -142,10 +143,42 @@ fill_style::read(stream* in, int tag_type, movie_definition* md,
 		
         // GRADIENT
         in->ensureBytes(1);
-		// num_gradients is not 8 bits, it is only the last 4.
-		// at the moment, the first four are unused, so we may
-		// mask, but this needs to be changed.
-        unsigned int num_gradients = in->read_u8() & 15;
+
+	uint8_t grad_props = in->read_u8();
+
+	if (tag_type == SWF::DEFINESHAPE4 ||
+	    tag_type == SWF::DEFINESHAPE4_) {
+		uint8_t spread_mode = grad_props >> 6;
+		switch(spread_mode) {
+        		case 0:
+			m_spread_mode = SWF::GRADIENT_SPREAD_PAD;
+        		break;
+	        	case 1:
+        		m_spread_mode = SWF::GRADIENT_SPREAD_REFLECT;
+			break;
+			case 2:
+			m_spread_mode = SWF::GRADIENT_SPREAD_REPEAT;
+			break;
+			default: 
+			IF_VERBOSE_MALFORMED_SWF(
+				log_swferror("Illegal spread mode in gradient definition.");
+			);
+	        }
+
+		uint8_t interpolation = (grad_props >> 4) & 3;
+		switch(interpolation) {
+			case 0: 
+			m_interpolation = SWF::GRADIENT_INTERPOL_NORMAL;
+			case 1:
+        		m_interpolation = SWF::GRADIENT_INTERPOL_LINEAR;
+			default:
+			IF_VERBOSE_MALFORMED_SWF(
+				log_swferror("Illegal interpolation mode in gradient definition.");
+			);
+		}
+	}
+
+	uint8_t num_gradients = grad_props & 0xF;
         if ( ! num_gradients )
 	{
 		IF_VERBOSE_MALFORMED_SWF(
