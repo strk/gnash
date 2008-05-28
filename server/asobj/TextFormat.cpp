@@ -511,14 +511,14 @@ edit_text_character_def::alignment
 TextFormat::parseAlignString(const std::string& align)
 {
 	StringNoCaseEqual cmp;
-	if ( cmp(align, "right") ) return edit_text_character_def::ALIGN_RIGHT;
+	if ( cmp(align, "left") ) return edit_text_character_def::ALIGN_LEFT;
 	else if ( cmp(align, "center") ) return edit_text_character_def::ALIGN_CENTER;
 	else if ( cmp(align, "right") ) return edit_text_character_def::ALIGN_RIGHT;
 	else if ( cmp(align, "justify") ) return edit_text_character_def::ALIGN_JUSTIFY;
 	else
 	{
 		log_debug("Invalid align string %s, take as left", align);
-		return edit_text_character_def::ALIGN_JUSTIFY;
+		return edit_text_character_def::ALIGN_LEFT;
 	}
 }
 
