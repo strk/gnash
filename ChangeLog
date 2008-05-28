@@ -1,8 +1,13 @@
-2008-05-27 Bastiaan Jacques <bastiaan@bjacques.org>
+2008-05-28 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* libbase/curl_adapter.cpp: use select() to wait for data instead
+	  of sleeping. Correct includes, logging and cstdio.
+
+2008-05-28 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/fill_style.cpp: Add missing breaks in switch statement.
 
-2008-05-27 Benjamin Wolsey <bwy@benjaminwolsey.de>
+2008-05-28 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/parser/shape_character_def.cpp: drop unused global
 	  functions and flags.
@@ -14,11 +19,11 @@
 	* gui/Player.cpp, utilities/processor.cpp: setting cache flag
 	  didn't do anything.
 
-2008-05-27 Sandro Santilli <strk@keybit.net>
+2008-05-28 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/server/ClassSizes.cpp: print sizeof(rgba).
 
-2008-05-27 Bastiaan Jacques <bastiaan@bjacques.org>
+2008-05-28 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/style.{h,cpp}: Parse gradient spread and interpolation modes
 	(available in DEFINESHAPE4).

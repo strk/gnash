@@ -22,60 +22,52 @@
 #include "gnashconfig.h"
 #endif
 
-#include "curl_adapter.h"
+#include <iostream> // std::cerr
 #include "tu_file.h"
-#include "utility.h"
-#include "GnashException.h"
+#include "curl_adapter.h"
 #include "log.h"
-#include "rc.h"
-//#include "tu_timer.h"
-#include "WallClockTimer.h"
-
-#include <map>
-#include <iostream>
-#include <string>
-#include <cstring>
-#if defined(_WIN32) || defined(WIN32)
-# include <windows.h>	// for sleep()
-# define usleep(x) Sleep(x/1000)
-#else
-# include "unistd.h" // for usleep()
-#endif
-
-using namespace std;
-
-//#define GNASH_CURL_VERBOSE 1
-
-// define this if you want seeks back to be reported (on stderr)
-//#define GNASH_CURL_WARN_SEEKSBACK 1
 
 #ifndef USE_CURL
+// Stub for warning about access when no libcurl is defined.
 
-// Stubs, in case client doesn't want to link to zlib.
 namespace curl_adapter
 {
 tu_file* make_stream(const char * /*url */)
 	{
-		fprintf(stderr, "libcurl is not available, but curl_adapter has been attempted to use\n");
-		return NULL; // should abort() instead ?
+		log_error(_("ERROR: libcurl is not available, but "
+		            "Gnash has attempted to use the curl adapter"));
+		// Should abort instead?
+		return NULL;
 	}
 }
 
-
 #else // def USE_CURL
 
+#include <curl/curl.h>
+#include "utility.h"
+#include "GnashException.h"
+#include "rc.h"
 
-#include <stdexcept>
-#include <cstdio>
+#include <map>
+#include <string>
+#include <sstream>
 #include <cerrno>
-#include <sys/types.h>
-#include <sys/stat.h>
+#include <cstdio> // cached data uses a *FILE
+#include <cstdlib> // std::getenv
 
-#if !defined(_WIN32) && !defined(WIN32)
+// For select()
+#ifdef HAVE_WINSOCK2_H
+# include <winsock2.h>
+#else
+# include <sys/types.h>
+# include <sys/stat.h>
 # include <unistd.h>
 #endif
 
-#include <curl/curl.h>
+//#define GNASH_CURL_VERBOSE 1
+
+// define this if you want seeks back to be reported
+//#define GNASH_CURL_WARN_SEEKSBACK 1
 
 // Adapt to older versions of libcurl.
 //
@@ -89,21 +81,26 @@ tu_file* make_stream(const char * /*url */)
 // Just print the number and tell the user how to decode it.
 //
 #if LIBCURL_VERSION_NUM < 0x070c00
-static char curl_strerror_buf[64];
 static const char *
 curl_easy_strerror(int code)
 {
-	sprintf(curl_strerror_buf,
-		"CurlE error code %d (man libcurl-errors)", code);
-	return curl_strerror_buf;
+    static std::string ret;
+	std::ostringstream ss << "CurlE error code " <<
+	                   code << " (man libcurl-errors)";
+	
+	ret = ss.str();
+	return ret.c_str();
 }
 
 static const char *
 curl_multi_strerror(int code)
 {
-	sprintf(curl_strerror_buf,
-		"CurlM error code %d (man libcurl-errors)", code);
-	return curl_strerror_buf;
+    static std::string ret;
+	std::ostringstream ss << "CurlM error code " <<
+	                   code << " (man libcurl-errors)";
+
+	ret = ss.str();
+	return ret.c_str();
 }
 #endif
 
@@ -218,15 +215,13 @@ private:
 
 	// Attempt at filling the cache up to the given size.
 	// Will call libcurl routines to fetch data.
-	void fill_cache(long unsigned size);
+	void fillCache(long unsigned size);
 
 	// Append sz bytes to the cache
 	size_t cache(void *from, size_t sz);
 
-	void printInfo();
-
 	// Callback for libcurl, will be called
-	// by fill_cache() and will call cache()
+	// by fillCache() and will call cache()
 	static size_t recv(void *buf, size_t  size,
 		size_t  nmemb, void *userp);
 
@@ -242,11 +237,11 @@ private:
 // Ensure libcurl is initialized
 static void ensure_libcurl_initialized()
 {
-	static bool initialized=0;
+	static bool initialized = 0;
 	if ( ! initialized ) {
 		// TODO: handle an error here
 		curl_global_init(CURL_GLOBAL_ALL);
-		initialized=1;
+		initialized = 1;
 	}
 }
 
@@ -256,41 +251,39 @@ CurlStreamFile::recv(void *buf, size_t  size,  size_t  nmemb,
 	void *userp)
 {
 #ifdef GNASH_CURL_VERBOSE
-	fprintf(stderr, "curl write callback called for (%d) bytes\n",
-		size*nmemb);
+	gnash::log_debug("curl write callback called for (%d) bytes",
+		size * nmemb);
 #endif
-	CurlStreamFile* stream = (CurlStreamFile*)userp;
-	return stream->cache(buf, size*nmemb);
+	CurlStreamFile* stream = static_cast<CurlStreamFile*>(userp);
+	return stream->cache(buf, size * nmemb);
 }
 
 
 /*private*/
 size_t
-CurlStreamFile::cache(void *from, size_t sz)
+CurlStreamFile::cache(void *from, size_t size)
 {
 	// take note of current position
-	long curr_pos = ftell(_cache);
+	long curr_pos = std::ftell(_cache);
 
 	// seek to the end
-	fseek(_cache, 0, SEEK_END);
+	std::fseek(_cache, 0, SEEK_END);
 
-	size_t wrote = fwrite(from, 1, sz, _cache);
+	size_t wrote = std::fwrite(from, 1, size, _cache);
 	if ( wrote < 1 )
 	{
-		char errmsg[256];
 
-		snprintf(errmsg, 255,
-			"writing to cache file: requested " SIZET_FMT ", wrote " SIZET_FMT " (%s)",
-			sz, wrote, strerror(errno));
-		fprintf(stderr, "%s\n", errmsg);
-		throw gnash::GnashException(errmsg);
+        boost::format fmt = boost::format("writing to cache file: requested "
+                                          "%d, wrote %d (%s)") %
+                                          size % wrote % std::strerror(errno);
+		throw gnash::GnashException(fmt.str());
 	}
 
 	// Set the size of cached data
-	_cached = ftell(_cache);
+	_cached = std::ftell(_cache);
 
 	// reset position for next read
-	fseek(_cache, curr_pos, SEEK_SET);
+	std::fseek(_cache, curr_pos, SEEK_SET);
 
 	return wrote;
 }
@@ -298,108 +291,60 @@ CurlStreamFile::cache(void *from, size_t sz)
 
 /*private*/
 void
-CurlStreamFile::fill_cache(long unsigned size)
+CurlStreamFile::fillCache(long unsigned size)
 {
-#ifdef GNASH_CURL_VERBOSE
-	fprintf(stderr, "fill_cache(%lu) called\n", size);
-#endif
 
-	// early out
 	if ( ! _running || _cached >= size ) return;
 
-	// I don't think we can rely on this, unless we
-	// can trust the result (the interface isn't documented
-	// about trust of it)
-	//
-	// if ( size > get_stream_size() ) return;
+    fd_set readfd, writefd, exceptfd;
+    int maxfd;
+    CURLMcode mcode;
+    timeval tv;
 
-// Disable this when you're convinced the sleeping mechanism is satisfactory
-//#define VERBOSE_POLLING_LOOP 1
+    const unsigned int timeout = static_cast<unsigned int>(
+                        gnash::RcInitFile::getDefaultInstance().getStreamsTimeout());
 
-#if VERBOSE_POLLING_LOOP
-	long unsigned fetchRequested = size-_cached;
-#endif
+    while (_running)
+    {
 
-	// These are the minimum and maximum times in microseconds
-	// to nap between curl_multi_perform calls if the amount
-	// of data requested haven't arrived yet.
-	// 
-	const long unsigned minSleep =  10000; // 1/100 second
-	const long unsigned maxSleep =  1000000; // 1/10 second
-
-	CURLMcode mcode;
-	long unsigned lastCached = _cached;
-	long unsigned sleepTime = minSleep;
-
-	// Timeout in milliseconds (TODO: have getStreamsTimeout return milliseconds)
-	static const unsigned int timeout = int(gnash::RcInitFile::getDefaultInstance().getStreamsTimeout()*1000.0);
-#if VERBOSE_POLLING_LOOP
-	printf("Timeout is %u\n", timeout);
-#endif
-
-	gnash::WallClockTimer lastProgress; // timer since last progress
-	while (_cached < size && _running)
-	{
 		do
 		{
-			mcode=curl_multi_perform(_mhandle, &_running);
-		} while ( mcode == CURLM_CALL_MULTI_PERFORM );
+		    //gnash::log_debug("perform!");
+			mcode = curl_multi_perform(_mhandle, &_running);
+		} while (mcode == CURLM_CALL_MULTI_PERFORM);
 
-		if ( mcode != CURLM_OK )
+		if (mcode != CURLM_OK)
 		{
 			throw gnash::GnashException(curl_multi_strerror(mcode));
 		}
 
-		// done...
-		if ( _cached >= size || ! _running ) break;
+        FD_ZERO(&readfd);
+        FD_ZERO(&writefd);
+        FD_ZERO(&exceptfd);
+        tv.tv_sec = timeout;
+        tv.tv_usec = 0;
 
-		// In order to avoid overusing the CPU we take a nap if we didn't
-		// reach the requested position.
+        mcode = curl_multi_fdset(_mhandle, &readfd, &writefd, &exceptfd, &maxfd);
+        if (mcode != CURLM_OK) {
+            // This is a serious error, not just a failure to add any
+            // fds.
+            throw gnash::GnashException(curl_multi_strerror(mcode));
+        }
 
-		long unsigned fetched = _cached - lastCached;
-		if ( fetched )
-		{
-#if VERBOSE_POLLING_LOOP
-			fprintf(stderr, "Fetched %lu bytes, resetting progress timer\n", fetched);
-#endif
-			lastProgress.restart();
-		}
-		else
-		{
-#if VERBOSE_POLLING_LOOP
-			fprintf(stderr, "Nothing fetched, elapsed is %u\n", lastProgress.elapsed() );
-#endif
-			if ( timeout && lastProgress.elapsed() > timeout )
-			{
-				gnash::log_error(_("Timeout (%u milliseconds) while loading from url %s"), timeout, _url.c_str());
-				return;
-			}
-		}
+        // A value of -1 means no file descriptors were added.
+        if (maxfd < 0) break;
 
-#if VERBOSE_POLLING_LOOP
-		fprintf(stderr, "CurlStreamFile %p: Fetched: %lu (%lu/%lu total) from url %s"
-				" - requested %lu (%lu total) - sleeping %lu milliseconds "
-				" - %u millisecond since last progress (timeout is %u)\n",
-				this, fetched, _cached, get_stream_size(), _url.c_str(),
-				fetchRequested, size, sleepTime/1000, lastProgress.elapsed(),
-				timeout);
-#endif
-		lastCached = _cached;
-
-		usleep(sleepTime);
-
-		// If we'll need to sleep again we'll sleep more next time...
-		// Up to a max (maxSleep)
-		sleepTime = std::min(sleepTime*2, maxSleep);
+        // Wait for data on the filedescriptors until a timeout set
+        // in gnashrc.
+        select(maxfd + 1, &readfd, &writefd, &exceptfd, &tv);
 
 	}
 
 	CURLMsg *curl_msg;
-	int _active = _running; // Is _running a suitable var for the number
-				// of active easy_handles? (Which seems 
-				// to be a maximum of 1 anyway).
-
-	while ((curl_msg = curl_multi_info_read(_mhandle, &_active))) {
+	
+	// Does this also decrement the number of active handles (_running)?
+	// Should however be no more than one.
+	while ((curl_msg = curl_multi_info_read(_mhandle, &_running))) {
 
 		// Only for completed transactions
 		if (curl_msg->msg == CURLMSG_DONE) {
@@ -415,23 +360,22 @@ CurlStreamFile::fill_cache(long unsigned size)
 
 				if ( code >= 400 ) {
 					gnash::log_error ("HTTP response %ld from url %s",
-							code, _url.c_str());
+							            code, _url);
 					_error = TU_FILE_OPEN_ERROR;
 					_running = false;
-				} else {
+				}
+				else {
 					gnash::log_debug ("HTTP response %ld from url %s",
-							code, _url.c_str());
+							            code, _url);
 				}
 
-			} else {
+			}
+			else {
 
 				// Transaction failed, pass on curl error.
-				gnash::log_error("CURL: %s",
-					         curl_easy_strerror(
-						 curl_msg->data.result));
+				gnash::log_error("CURL: %s", curl_easy_strerror(
+						            curl_msg->data.result));
 				_error = TU_FILE_OPEN_ERROR;
-				_running = false;
-
 			}
 
 		}
@@ -440,12 +384,6 @@ CurlStreamFile::fill_cache(long unsigned size)
 
 }
 
-/*private*/
-void
-CurlStreamFile::printInfo()
-{
-	fprintf(stderr, "_cache.tell = " SIZET_FMT "\n", tell());
-}
 
 /*private*/
 void
@@ -465,7 +403,7 @@ CurlStreamFile::init(const std::string& url)
 
 	/// later on we might want to accept a filename
 	/// in the constructor
-	_cache = tmpfile();
+	_cache = std::tmpfile();
 	if ( ! _cache ) {
 		throw gnash::GnashException("Could not create temporary cache file");
 	}
@@ -478,8 +416,8 @@ CurlStreamFile::init(const std::string& url)
 	// Equivalent to curl -k or curl --insecure.
 	if (gnash::RcInitFile::getDefaultInstance().insecureSSL())
 	{
-                gnash::log_security(_("Allowing connections to SSL sites with invalid"
-				 " or absent certificates"));		
+                gnash::log_security(_("Allowing connections to SSL sites with invalid "
+				 "certificates"));		
 
 		ccode = curl_easy_setopt(_handle, CURLOPT_SSL_VERIFYPEER, 0);
 		if ( ccode != CURLE_OK ) {
@@ -494,7 +432,7 @@ CurlStreamFile::init(const std::string& url)
 
 	// Read cookies from file if requested.
 	// TODO: only read the file once, not at every request !
-	const char *cookiein = getenv("GNASH_COOKIES_IN");
+	const char *cookiein = std::getenv("GNASH_COOKIES_IN");
 	// Or just enable cookie engine.
 	if ( ! cookiein ) cookiein = "";
 	ccode = curl_easy_setopt(_handle, CURLOPT_COOKIEFILE , cookiein);
@@ -504,7 +442,7 @@ CurlStreamFile::init(const std::string& url)
 
 	// Write gathered cookies from file if requested.
 	// TODO: only write the file once, not at every cleanup !
-	const char *cookieout = getenv("GNASH_COOKIES_OUT");
+	const char *cookieout = std::getenv("GNASH_COOKIES_OUT");
 	if ( cookieout )
 	{
 		// Dump cookies to a file
@@ -563,7 +501,7 @@ are not honored during the DNS lookup - which you can  work  around  by
 		throw gnash::GnashException(curl_easy_strerror(ccode));
 	}
 
-	//fill_cache(32); // pre-cache 32 bytes
+	//fillCache(32); // pre-cache 32 bytes
 	//curl_multi_perform(_mhandle, &_running);
 }
 
@@ -615,7 +553,7 @@ CurlStreamFile::~CurlStreamFile()
 	curl_multi_remove_handle(_mhandle, _handle);
 	curl_easy_cleanup(_handle);
 	curl_multi_cleanup(_mhandle);
-	fclose(_cache);
+	std::fclose(_cache);
 }
 
 /*public*/
@@ -625,17 +563,17 @@ CurlStreamFile::read(void *dst, size_t bytes)
 	if ( eof() || _error ) return 0;
 
 #ifdef GNASH_CURL_VERBOSE
-	fprintf(stderr, "read(%d) called\n", bytes);
+	gnash::log_debug ("read(%d) called", bytes);
 #endif
 
-	fill_cache(tell()+bytes);
-	if ( _error ) return 0; // error can be set by fill_cache
+	fillCache(tell() + bytes);
+	if ( _error ) return 0; // error can be set by fillCache
 
 #ifdef GNASH_CURL_VERBOSE
-	printInfo();
+	gnash::log_debug("_cache.tell = %d", tell());
 #endif
 
-	return fread(dst, 1, bytes, _cache);
+	return std::fread(dst, 1, bytes, _cache);
 
 }
 
@@ -646,7 +584,7 @@ CurlStreamFile::eof()
 	bool ret = ( ! _running && feof(_cache) );
 
 #ifdef GNASH_CURL_VERBOSE
-	fprintf(stderr, "eof() returning %d\n", ret);
+	gnash::log_debug("eof() returning %d", ret);
 #endif
 	return ret;
 
@@ -656,10 +594,10 @@ CurlStreamFile::eof()
 size_t
 CurlStreamFile::tell()
 {
-	long ret =  ftell(_cache);
+	long ret =  std::ftell(_cache);
 
 #ifdef GNASH_CURL_VERBOSE
-	fprintf(stderr, "tell() returning %ld\n", ret);
+	gnash::log_debug("tell() returning %ld", ret);
 #endif
 
 	return ret;
@@ -672,14 +610,13 @@ CurlStreamFile::seek(size_t pos)
 {
 #ifdef GNASH_CURL_WARN_SEEKSBACK
 	if ( pos < tell() ) {
-		fprintf(stderr,
-			"Warning: seek backward requested (%ld from %ld)\n",
+		gnash::log_debug("Warning: seek backward requested (%ld from %ld)",
 			pos, tell());
 	}
 #endif
 
-	fill_cache(pos);
-	if ( _error ) return false; // error can be set by fill_cache
+	fillCache(pos);
+	if ( _error ) return false; // error can be set by fillCache
 
 	if ( _cached < pos )
 	{
@@ -687,8 +624,8 @@ CurlStreamFile::seek(size_t pos)
 		return false; // couldn't cache so many bytes
 	}
 
-	if ( fseek(_cache, pos, SEEK_SET) == -1 ) {
-		fprintf(stderr, "Warning: fseek failed\n");
+	if (std::fseek(_cache, pos, SEEK_SET) == -1) {
+		gnash::log_error("Warning: fseek failed");
 		return false;
 	} else {
 		return true;
@@ -701,7 +638,7 @@ bool
 CurlStreamFile::seek_to_end()
 {
 	CURLMcode mcode;
-	while (_running)
+	while (_running > 0)
 	{
 		do
 		{
@@ -717,16 +654,15 @@ CurlStreamFile::seek_to_end()
                 curl_easy_getinfo(_handle, CURLINFO_RESPONSE_CODE, &code);
                 if ( code == 404 ) // file not found!
                 {
-                        gnash::log_error(_("404 response from url %s"), _url.c_str());
+                        gnash::log_error(_("404 response from url %s"), _url);
                         _error = TU_FILE_OPEN_ERROR;
-			_running = false;
                         return false;
                 }
 
 	}
 
-	if ( fseek(_cache, 0, SEEK_END) == -1 ) {
-		fprintf(stderr, "Warning: fseek to end failed\n");
+	if (std::fseek(_cache, 0, SEEK_END) == -1) {
+		gnash::log_error("Warning: fseek to end failed");
 		return false;
 	} else {
 		return true;
@@ -746,7 +682,7 @@ CurlStreamFile::get_stream_size()
 	}
 
 #ifdef GNASH_CURL_VERBOSE
-	fprintf(stderr, "get_stream_size() returning %lu\n", _size);
+	gnash::log_debug("get_stream_size() returning %lu", _size);
 #endif
 
 	return _size;
@@ -841,15 +777,16 @@ make_stream(const char* url)
 	ensure_libcurl_initialized();
 
 #ifdef GNASH_CURL_VERBOSE
-	fprintf(stderr, "making curl stream for %s\n", url);
+	gnash::log_debug("making curl stream for %s", url);
 #endif
 
 	CurlStreamFile* stream = NULL;
 
 	try {
 		stream = new CurlStreamFile(url);
-	} catch (const std::exception& ex) {
-		fprintf(stderr, "curl stream: %s\n", ex.what());
+	}
+	catch (const std::exception& ex) {
+		gnash::log_error("curl stream: %s", ex.what());
 		delete stream;
 		return NULL;
 	}
@@ -873,15 +810,16 @@ make_stream(const char* url, const std::string& postdata)
 	ensure_libcurl_initialized();
 
 #ifdef GNASH_CURL_VERBOSE
-	fprintf(stderr, "making curl stream for %s\n", url);
+	gnash::log_debug("making curl stream for %s", url);
 #endif
 
 	CurlStreamFile* stream = NULL;
 
 	try {
 		stream = new CurlStreamFile(url, postdata);
-	} catch (const std::exception& ex) {
-		fprintf(stderr, "curl stream: %s\n", ex.what());
+	}
+	catch (const std::exception& ex) {
+		gnash::log_error("curl stream: %s", ex.what());
 		delete stream;
 		return NULL;
 	}
