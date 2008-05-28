@@ -1,3 +1,9 @@
+2008-05-27 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* server/style.{h,cpp}: Parse gradient spread and interpolation modes
+	(available in DEFINESHAPE4).
+	* server/swf.h: Add gradient spread and interpolation modes.
+
 2008-05-27 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* extensions/launcher/launcher.cpp, gui/fb.cpp, gui/gnash.cpp

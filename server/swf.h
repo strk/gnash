@@ -1730,6 +1730,19 @@ typedef enum {
 
 } fill_style_type;
 
+typedef enum {
+        GRADIENT_SPREAD_PAD,
+        GRADIENT_SPREAD_REFLECT,
+        GRADIENT_SPREAD_REPEAT
+} gradient_spread_mode;
+
+typedef enum {
+        GRADIENT_INTERPOL_NORMAL,
+        GRADIENT_INTERPOL_LINEAR
+} gradient_interpolation_mode;
+
+
+
 
 } // namespace gnash::SWF
 
