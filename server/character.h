@@ -24,7 +24,6 @@
 #endif
 
 #include "smart_ptr.h" // GNASH_USE_GC
-#include "gnash.h"
 #include "types.h"
 #include "event_id.h" // for inlines
 #include "as_object.h" // for inheritance

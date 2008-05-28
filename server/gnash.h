@@ -26,7 +26,6 @@
 #include "dsodefs.h"
 
 #include <memory> // for auto_ptr
-#include <cctype>   // for poxy wchar_t
 #include <string>   // for movie_definition* create_movie(std::auto_ptr<tu_file>
 				 	// in, const std::string& url);
 
@@ -70,24 +69,10 @@ DSOEXPORT void  set_sound_handler(media::sound_handler* s);
 /// Get currently registered sound handler
 DSOEXPORT media::sound_handler* get_sound_handler();
 
-
-///
-/// Log & error reporting control.
-///
-
-/// Supply a function pointer to receive log & error messages.
-void    register_log_callback(void (*callback)(bool error, const char* message));
-
-/// Control verbosity of action processing
-void    set_verbose_action(bool verbose);
-
-/// Control verbosity of SWF parsing
-void    set_verbose_parse(bool verbose);
-
 /// Set the render handler.  This is one of the first
 /// things you should do to initialise the player (assuming you
 /// want to display anything).
-DSOEXPORT void    set_render_handler(render_handler* s);
+DSOEXPORT void set_render_handler(render_handler* s);
 
 /// Set the base url against which to resolve relative urls
 DSOEXPORT void set_base_url(const URL& url);
@@ -124,11 +109,6 @@ class fn_call; // for the following typedef
 typedef as_value (*as_c_function_ptr)(const fn_call& fn); // original typedef is in as_value.h ...
 void register_component(const std::string& name, as_c_function_ptr handler);
 
-/// Use this to control how finely curves are subdivided.  1.0
-/// is the default; it's a pretty good value.  Larger values
-/// result in coarser, more angular curves with fewer vertices.
-void    set_curve_max_pixel_error(float pixel_error);
-float   get_curve_max_pixel_error();
 
 // Some helpers that may or may not be compiled into your
 // version of the library, depending on platform etc.
@@ -151,18 +131,9 @@ public:
 };
 
 
-/// Enable/disable attempts to read cache files (.gsc) when loading movies.
-DSOEXPORT void  set_use_cache_files(bool use_cache);
-    
 /// Create a gnash::movie_definition from the given URL.
 //
 /// The URL can correspond to either a JPEG or SWF file.
-///
-/// Normally, will also try to load any cached data file
-/// (".gsc") that corresponds to the given movie file.  This
-/// will still work even if there is no cache file.  You can
-/// disable the attempts to load cache files by calling
-/// gnash::use_cache_files(false).
 ///
 /// Uses the global StreamProvider 'streamProvider' 
 /// to read the files themselves.
@@ -177,7 +148,7 @@ DSOEXPORT void  set_use_cache_files(bool use_cache);
 /// global-ish flags, libraries, callback pointers, font
 /// library, etc.
 ///
-/// IFF real_url is given, the movie's url will be set to that value.
+/// If real_url is given, the movie's url will be set to that value.
 ///
 /// @param url
 /// The URL to load the movie from.
@@ -226,34 +197,6 @@ movie_definition* create_movie(const URL& url, const char* real_url=NULL, bool s
 ///
 DSOEXPORT movie_definition* create_movie(std::auto_ptr<tu_file> in, const std::string& url, bool startLoaderThread=true);
 
-/// Creates the movie from the given input stream. 
-//
-/// Only reads from the given stream; does not open files. 
-/// If the movie imports resources from other movies, the created movie
-/// inserts proxy stubs in place of those resources.  The list
-/// of imported movie filenames can be retrieved with
-/// movie_definition::visit_imported_movies().  The proxies can
-/// be replaced with actual movie_definition's via
-/// movie_definition::resolve_proxy(name,def).
-///
-/// Use DO_NOT_LOAD_BITMAPS if you have pre-processed bitmaps
-/// stored externally somewhere, and you plan to install them
-/// via get_bitmap_info()->...
-enum create_bitmaps_flag
-{
-    DO_LOAD_BITMAPS,
-    DO_NOT_LOAD_BITMAPS
-};
-
-/// Use DO_NOT_LOAD_FONT_SHAPES if you know you have
-/// precomputed texture glyphs (in cached data) and you know
-/// you always want to render text using texture glyphs.
-enum create_font_shapes_flag
-{
-    DO_LOAD_FONT_SHAPES,
-    DO_NOT_LOAD_FONT_SHAPES
-};
-
 /// \brief
 /// Create a gnash::movie_definition from the given URL
 //
@@ -275,7 +218,7 @@ enum create_font_shapes_flag
 /// drop_ref() when you're done with it.
 /// Or use boost::intrusive_ptr<T> from base/smart_ptr.h if you want.
 ///
-/// IFF real_url is given, the movie's url will be set to that value.
+/// If real_url is given, the movie's url will be set to that value.
 ///
 /// @param url
 /// The URL to load the movie from.
@@ -302,20 +245,6 @@ DSOEXPORT movie_definition* create_library_movie(const URL& url,
 	const std::string* postdata=NULL);
     
 
-/// Helper to pregenerate cached data (basically, shape tesselations). 
-//
-/// Does this by running through each frame of
-/// the movie and displaying the shapes with a null renderer.
-/// The pregenerated data is stored in the movie_definition
-/// object itself, and is included with the cached data written
-/// by movie_definition::output_cached_data().
-///
-/// Note that this tesselates shapes to the resolution they
-/// explicitly appear in the linear frames of the movie.  Does
-/// not try very hard to run your ActionScript to account for
-/// dynamic scaling (that's more or less futile anyway due to
-/// the halting problem).
-void    precompute_cached_data(movie_definition* movie_def);
 
 /// Initialize gnash core library
 //
@@ -331,7 +260,7 @@ DSOEXPORT void  gnashInit();
 /// referenced by the host program and haven't had drop_ref()
 /// called on them.
 ///
-DSOEXPORT void  clear();
+DSOEXPORT void clear();
     
 //
 // texture and render callback handler.
@@ -919,40 +848,6 @@ const unsigned char codeMap[KEYCOUNT][TYPES] = {
 };
 
 }   // end namespace key
-
-/// Some optional helpers.
-namespace tools
-{
-
-class DSOLOCAL process_options
-{
-public:
-    /// @@ not implemented yet (low priority?)
-    bool    m_zip_whole_file;
-
-    /// removes existing image data; leaves minimal placeholder tags
-    bool    m_remove_image_data;
-
-    bool    m_remove_font_glyph_shapes;
-
-    process_options()
-        :
-        m_zip_whole_file(false),
-        m_remove_image_data(false),
-        m_remove_font_glyph_shapes(false)
-        {
-        }
-};
-
-/// Copy tags from *in to *out, applying the given
-/// options.  *in should be a SWF-format stream.  The
-/// output will be a SWF-format stream.
-///
-/// Returns 0 on success, or a non-zero error-code on
-/// failure.
-int process_swf(tu_file* swf_out, tu_file* swf_in, const process_options& options);
-}
-
 
 }   // namespace gnash
 

@@ -4,6 +4,11 @@
 	  functions and flags.
 	* server/parser/movie_definition.h: drop gnash.h include.
 	* server/swf/StartSoundTag.cpp: include gnash.h for sound handler.
+	* server/impl.{cpp,h}: drop gnash.h include, old verbosity functions.
+	* server/gnash.h: remove long-dead global functions.
+	* server/character.h: drop gnash.h include.
+	* gui/Player.cpp, utilities/processor.cpp: setting cache flag
+	  didn't do anything.
 
 2008-05-27 Sandro Santilli <strk@keybit.net>
 

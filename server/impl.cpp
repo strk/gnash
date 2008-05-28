@@ -109,26 +109,6 @@ get_base_url()
 }
 
 
-bool  s_verbose_action = false;
-bool  s_verbose_parse = false;
-
-#ifndef NDEBUG
-bool  s_verbose_debug = true;
-#else
-bool  s_verbose_debug = false;
-#endif
-
-static bool
-s_use_cache_files = false;
-
-// Enable/disable attempts to read cache files when loading
-// movies.
-void
-set_use_cache_files(bool use_cache)
-{
-    s_use_cache_files = use_cache;
-}
-
 // Associate the specified tag type with the given tag loader
 // function.
 void

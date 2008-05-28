@@ -309,8 +309,6 @@ main(int argc, char *argv[])
         dbglogfile.removeLog();
 	exit(1);
     }
-
-    gnash::set_use_cache_files(false);	// don't load old cache files!
         
     std::vector<movie_data>	data;
 

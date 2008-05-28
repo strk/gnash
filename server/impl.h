@@ -21,7 +21,6 @@
 
 #include "dsodefs.h"
 
-#include "gnash.h"
 #include "types.h"
 #include "smart_ptr.h"
 #include "swf/TagLoadersTable.h"

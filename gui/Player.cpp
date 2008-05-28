@@ -110,8 +110,6 @@ Player::init()
     /// Initialize gnash core library
     gnashInit();
 
-    set_use_cache_files(false);
-
 }
 
 void
