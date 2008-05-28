@@ -523,21 +523,23 @@ movie_definition*
 create_movie(const URL& url, const char* reset_url, bool startLoaderThread, const std::string* postdata)
 {
 
+  const std::string swfurl = url.str();
+
   std::auto_ptr<tu_file> in;
   if ( postdata ) in.reset( globals::streamProvider.getStream(url, *postdata) );
   else in.reset( globals::streamProvider.getStream(url) );
   if ( ! in.get() )
   {
-      log_error(_("failed to open '%s'; can't create movie"), url.str());
+      log_error(_("failed to open '%s'; can't create movie"), swfurl);
       return NULL;
   }
   else if ( in->get_error() )
   {
-      log_error(_("streamProvider opener can't open '%s'"), url.str());
+      log_error(_("streamProvider opener can't open '%s'"), swfurl);
       return NULL;
   }
 
-  const char* movie_url = reset_url ? reset_url : url.str().c_str();
+  const char* movie_url = reset_url ? reset_url : swfurl.c_str();
   movie_definition* ret = create_movie(in, movie_url, startLoaderThread);
 
   return ret;
