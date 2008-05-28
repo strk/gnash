@@ -1,5 +1,10 @@
 2008-05-29 Sandro Santilli <strk@keybit.net>
 
+	* libbase/curl_adapter.cpp: include boost/version.hpp
+	  for the scoped_lock second arg...
+
+2008-05-29 Sandro Santilli <strk@keybit.net>
+
 	* libbase/curl_adapter.cpp: have the CurlSession created
 	  on first get (singleton) so we have proper logging support
 	  by that time; have CurlSession constructor import cookies

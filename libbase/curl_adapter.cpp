@@ -29,6 +29,7 @@
 
 #include <iostream> // std::cerr
 #include <boost/thread/mutex.hpp>
+#include <boost/version.hpp>
 
 using gnash::log_debug;
 using gnash::log_error;
