@@ -1,3 +1,7 @@
+2008-05-27 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* server/fill_style.cpp: Add missing breaks in switch statement.
+
 2008-05-27 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/parser/shape_character_def.cpp: drop unused global

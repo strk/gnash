@@ -169,8 +169,10 @@ fill_style::read(stream* in, int tag_type, movie_definition* md,
 		switch(interpolation) {
 			case 0: 
 			m_interpolation = SWF::GRADIENT_INTERPOL_NORMAL;
+			break;
 			case 1:
         		m_interpolation = SWF::GRADIENT_INTERPOL_LINEAR;
+			break;
 			default:
 			IF_VERBOSE_MALFORMED_SWF(
 				log_swferror("Illegal interpolation mode in gradient definition.");
