@@ -1,3 +1,9 @@
+2008-05-27 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/parser/shape_character_def.cpp: drop unused global
+	  functions and flags.
+	* server/parser/movie_definition.h: drop gnash.h include.
+
 2008-05-27 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/server/ClassSizes.cpp: print sizeof(rgba).

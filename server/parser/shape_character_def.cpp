@@ -54,22 +54,6 @@ bool  gnash_debug_show_paths = false;
 namespace gnash
 {
 
-    static float  s_curve_max_pixel_error = 1.0f;
-
-    //
-    // helper functions.
-    //
-
-    void  set_curve_max_pixel_error(float pixel_error)
-    {
-        s_curve_max_pixel_error = utility::clamp<float>(pixel_error, 1e-6f, 1e6f);
-    }
-
-    float get_curve_max_pixel_error()
-    {
-        return s_curve_max_pixel_error;
-    }
-
     // Read fill styles, and push them onto the given style array.
     static void
         read_fill_styles(std::vector<fill_style>& styles, stream* in,

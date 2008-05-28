@@ -51,9 +51,6 @@
 #include "fontlib.h"
 #include "jpeg.h"
 #include "tu_file.h"
-#include "gnash.h" // For create_bitmaps_flag and create_font_shapes_flag.
-                   // Would be much better to have those two enums defined
-		   // inside movie_definition instead, btw...
 
 #include <string>
 #include <memory> // for auto_ptr
