@@ -22,18 +22,28 @@
 #include "gnashconfig.h"
 #endif
 
-#include <iostream> // std::cerr
 #include "tu_file.h"
 #include "curl_adapter.h"
 #include "log.h"
 #include "WallClockTimer.h"
+
+#include <iostream> // std::cerr
+#include <boost/thread/mutex.hpp>
+
+using gnash::log_debug;
+using gnash::log_error;
+
+#ifndef UNUSED
+# define UNUSED(x) x=x
+#endif
+
 
 #ifndef USE_CURL
 // Stub for warning about access when no libcurl is defined.
 
 namespace curl_adapter
 {
-tu_file* make_stream(const char * /*url */)
+	tu_file* make_stream(const char * /*url */)
 	{
 		log_error(_("ERROR: libcurl is not available, but "
 		            "Gnash has attempted to use the curl adapter"));
@@ -73,6 +83,223 @@ tu_file* make_stream(const char * /*url */)
 
 namespace curl_adapter
 {
+
+/***********************************************************************
+ *
+ *  CurlSession definition and implementation
+ *
+ **********************************************************************/
+
+/// A libcurl session consists in a shared handle
+/// sharing DNS cache and COOKIES.
+///
+class CurlSession {
+
+public:
+
+	/// Get the shared handle
+	CURLSH* getSharedHandle() { return _shandle; }
+
+	/// Initialize a libcurl session
+	//
+	/// A libcurl session consists in a shared handle
+	/// sharing DNS cache and COOKIES.
+	///
+	/// Also, global libcurl initialization function will
+	/// be invoked, so MAKE SURE NOT TO CONSTRUCT multiple
+	/// CurlSession instances in a multithreaded environment!
+	///
+	/// AGAIN: this is NOT thread-safe !
+	///
+	CurlSession();
+
+	/// Cleanup curl session stuff (including global lib init)
+	~CurlSession();
+
+private:
+
+	// the libcurl share handle, for sharing cookies
+	CURLSH* _shandle;
+
+	// mutex protecting share state
+	boost::mutex _shareMutex;
+	boost::mutex::scoped_lock _shareMutexLock;
+
+	// mutex protecting shared cookies
+	boost::mutex _cookieMutex;
+	boost::mutex::scoped_lock _cookieMutexLock;
+
+	// mutex protecting shared dns cache
+	boost::mutex _dnscacheMutex;
+	boost::mutex::scoped_lock _dnscacheMutexLock;
+
+
+	/// Shared handle data locking function
+	void lockSharedHandle(CURL* handle, curl_lock_data data, curl_lock_access access);
+
+	/// Shared handle data unlocking function
+	void unlockSharedHandle(CURL* handle, curl_lock_data data);
+
+	/// Shared handle locking function
+	static void lockSharedHandleWrapper(CURL* handle, curl_lock_data data, curl_lock_access access, void* userptr)
+	{
+		CurlSession* ci = static_cast<CurlSession*>(userptr);
+		ci->lockSharedHandle(handle, data, access);
+	}
+
+	/// Shared handle unlocking function
+	static void unlockSharedHandleWrapper(CURL* handle, curl_lock_data data, void* userptr)
+	{
+		//data defines what data libcurl wants to unlock, and you must make sure that only one lick is given at any time for each kind of data.
+		//userptr is the pointer you set with CURLSHOPT_USERDATA. 
+		CurlSession* ci = static_cast<CurlSession*>(userptr);
+		ci->unlockSharedHandle(handle, data);
+	}
+
+};
+
+CurlSession::~CurlSession()
+{
+	CURLSHcode err = curl_share_cleanup(_shandle);
+	if ( err != CURLSHE_OK )
+	{
+		std::cerr << "Failure cleaning up curl share handle" << std::endl;
+	}
+	_shandle = 0;
+
+	curl_global_cleanup();
+}
+
+CurlSession::CurlSession()
+	:
+	_shandle(0),
+	_shareMutex(),
+	_shareMutexLock(_shareMutex, false), // start unlocked
+	_cookieMutex(),
+	_cookieMutexLock(_cookieMutex, false), // start unlocked
+	_dnscacheMutex(),
+	_dnscacheMutexLock(_dnscacheMutex, false) // start unlocked
+{
+
+	// TODO: handle an error here (throw an exception)
+	curl_global_init(CURL_GLOBAL_ALL);
+
+	_shandle = curl_share_init();
+	if ( ! _shandle )
+		throw gnash::GnashException("Failure initializing curl share handle");
+
+	CURLSHcode ccode;
+
+	// Register share locking function
+	ccode = curl_share_setopt(_shandle, CURLSHOPT_LOCKFUNC, lockSharedHandleWrapper);
+	if ( ccode != CURLSHE_OK ) {
+		throw gnash::GnashException(curl_share_strerror(ccode));
+	}
+
+	// Register share unlocking function
+	ccode = curl_share_setopt(_shandle, CURLSHOPT_UNLOCKFUNC, unlockSharedHandleWrapper);
+	if ( ccode != CURLSHE_OK ) {
+		throw gnash::GnashException(curl_share_strerror(ccode));
+	}
+
+	// Activate sharing of cookies
+	ccode = curl_share_setopt(_shandle, CURLSHOPT_SHARE, CURL_LOCK_DATA_COOKIE);
+	if ( ccode != CURLSHE_OK ) {
+		throw gnash::GnashException(curl_share_strerror(ccode));
+	}
+
+	// Activate sharing of DNS cache (since we're there..)
+	ccode = curl_share_setopt(_shandle, CURLSHOPT_SHARE, CURL_LOCK_DATA_DNS);
+	if ( ccode != CURLSHE_OK ) {
+		throw gnash::GnashException(curl_share_strerror(ccode));
+	}
+
+	// Pass ourselves as the userdata
+	ccode = curl_share_setopt(_shandle, CURLSHOPT_USERDATA, this);
+	if ( ccode != CURLSHE_OK ) {
+		throw gnash::GnashException(curl_share_strerror(ccode));
+	}
+
+}
+
+void
+CurlSession::lockSharedHandle(CURL* handle, curl_lock_data data, curl_lock_access access)
+{
+	UNUSED(handle); // possibly being the 'easy' handle triggering the request ?
+
+	// data defines what data libcurl wants to lock, and you must make sure that only one lock is given at any time for each kind of data.
+	// access defines what access type libcurl wants, shared or single.
+
+	// TODO: see if we may make use of the 'access' parameter
+	UNUSED(access);
+
+	switch (data)
+	{
+		case CURL_LOCK_DATA_DNS:
+			//log_debug("Locking DNS cache mutex");
+			_dnscacheMutexLock.lock();
+			//log_debug("DNS cache mutex locked");
+			break;
+		case CURL_LOCK_DATA_COOKIE:
+			//log_debug("Locking cookies mutex");
+			_cookieMutexLock.lock(); 
+			//log_debug("Cookies mutex locked");
+			break;
+		case CURL_LOCK_DATA_SHARE:
+			//log_debug("Locking share mutex");
+			_shareMutexLock.lock(); 
+			//log_debug("Share mutex locked");
+			break;
+		case CURL_LOCK_DATA_SSL_SESSION:
+			gnash::log_error("lockSharedHandle: SSL session locking unsupported");
+			break;
+		case CURL_LOCK_DATA_CONNECT:
+			gnash::log_error("lockSharedHandle: connect locking unsupported");
+			break;
+		case CURL_LOCK_DATA_LAST:
+			gnash::log_error("lockSharedHandle: last locking unsupported ?!");
+			break;
+		default:
+			gnash::log_error("lockSharedHandle: unknown shared data %d", data);
+			break;
+	}
+}
+
+void
+CurlSession::unlockSharedHandle(CURL* handle, curl_lock_data data)
+{
+	UNUSED(handle); // possibly being the 'easy' handle triggering the request ?
+
+	// data defines what data libcurl wants to lock, and you must make sure that only one lock is given at any time for each kind of data.
+	switch (data)
+	{
+		case CURL_LOCK_DATA_DNS:
+			//log_debug("Unlocking DNS cache mutex");
+			_dnscacheMutexLock.unlock();
+			break;
+		case CURL_LOCK_DATA_COOKIE:
+			//log_debug("Unlocking cookies mutex");
+			_cookieMutexLock.unlock();
+			break;
+		case CURL_LOCK_DATA_SHARE:
+			//log_debug("Unlocking share mutex");
+			_shareMutexLock.unlock();
+			break;
+		case CURL_LOCK_DATA_SSL_SESSION:
+			gnash::log_error("unlockSharedHandle: SSL session locking unsupported");
+			break;
+		case CURL_LOCK_DATA_CONNECT:
+			gnash::log_error("unlockSharedHandle: connect locking unsupported");
+			break;
+		case CURL_LOCK_DATA_LAST:
+			gnash::log_error("unlockSharedHandle: last locking unsupported ?!");
+			break;
+		default:
+			std::cerr << "unlockSharedHandle: unknown shared data " << data << std::endl;
+			break;
+	}
+}
+
 
 
 /***********************************************************************
@@ -195,22 +422,17 @@ private:
 
 };
 
+
 /***********************************************************************
  *
- *  CurlStreamFile implementation
+ *  Statics and CurlStreamFile implementation
  *
  **********************************************************************/
 
-// Ensure libcurl is initialized
-static void ensure_libcurl_initialized()
-{
-	static bool initialized = 0;
-	if ( ! initialized ) {
-		// TODO: handle an error here
-		curl_global_init(CURL_GLOBAL_ALL);
-		initialized = 1;
-	}
-}
+// This is the "singleton" libcurl initialization
+// wrapper.
+CurlSession curlSession;
+
 
 /*static private*/
 size_t
@@ -437,8 +659,6 @@ CurlStreamFile::fillCache(long unsigned size)
 void
 CurlStreamFile::init(const std::string& url)
 {
-	ensure_libcurl_initialized();
-
 	_url = url;
 	_running = 1;
 	_error = 0;
@@ -478,12 +698,31 @@ CurlStreamFile::init(const std::string& url)
 		}
 	}
 
+	// Get shared data
+	ccode = curl_easy_setopt(_handle, CURLOPT_SHARE, curlSession.getSharedHandle());
+	if ( ccode != CURLE_OK ) {
+		throw gnash::GnashException(curl_easy_strerror(ccode));
+	}
+
+	// Set expiration time for DNS cache entries, in seconds
+	// 0 disables caching
+	// -1 makes cache entries never expire
+	// default is 60
+	//
+	// NOTE: this snippet is here just as a placeholder for whoever
+	//       will feel a need to make this parametrizable
+	//
+	ccode = curl_easy_setopt(_handle, CURLOPT_DNS_CACHE_TIMEOUT, 60);
+	if ( ccode != CURLE_OK ) {
+		throw gnash::GnashException(curl_easy_strerror(ccode));
+	}
+
 	// Read cookies from file if requested.
 	// TODO: only read the file once, not at every request !
 	const char *cookiein = std::getenv("GNASH_COOKIES_IN");
 	// Or just enable cookie engine.
 	if ( ! cookiein ) cookiein = "";
-	ccode = curl_easy_setopt(_handle, CURLOPT_COOKIEFILE , cookiein);
+	ccode = curl_easy_setopt(_handle, CURLOPT_COOKIEFILE, cookiein);
 	if ( ccode != CURLE_OK ) {
 		throw gnash::GnashException(curl_easy_strerror(ccode));
 	}
@@ -822,8 +1061,6 @@ close(void* appdata)
 tu_file*
 make_stream(const char* url)
 {
-	ensure_libcurl_initialized();
-
 #ifdef GNASH_CURL_VERBOSE
 	gnash::log_debug("making curl stream for %s", url);
 #endif
@@ -855,8 +1092,6 @@ make_stream(const char* url)
 tu_file*
 make_stream(const char* url, const std::string& postdata)
 {
-	ensure_libcurl_initialized();
-
 #ifdef GNASH_CURL_VERBOSE
 	gnash::log_debug("making curl stream for %s", url);
 #endif
