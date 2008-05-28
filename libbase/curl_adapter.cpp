@@ -260,7 +260,17 @@ void
 CurlStreamFile::fillCache(long unsigned size)
 {
 
-	if ( ! _running || _cached >= size ) return;
+#if GNASH_CURL_VERBOSE
+    gnash::log_debug("fillCache(%d), called, currently cached: %d", size, _cached);
+#endif 
+
+	if ( ! _running || _cached >= size ) {
+#if GNASH_CURL_VERBOSE
+        if (!_running) gnash::log_debug("Not running: returning");
+        else gnash::log_debug("Already enough bytes cached: returning");
+#endif
+	    return;
+	}
 
     fd_set readfd, writefd, exceptfd;
     int maxfd;
@@ -275,7 +285,6 @@ CurlStreamFile::fillCache(long unsigned size)
 
 		do
 		{
-		    //gnash::log_debug("perform!");
 			mcode = curl_multi_perform(_mhandle, &_running);
 		} while (mcode == CURLM_CALL_MULTI_PERFORM);
 
@@ -283,6 +292,14 @@ CurlStreamFile::fillCache(long unsigned size)
 		{
 			throw gnash::GnashException(curl_multi_strerror(mcode));
 		}
+
+        // Do this here to avoid calling select() when we have enough
+        // bytes anyway.
+        if (_cached >= size) break;
+
+#if GNASH_CURL_VERBOSE
+        //gnash::log_debug("cached: %d, size: %d", _cached, size);
+#endif
 
         FD_ZERO(&readfd);
         FD_ZERO(&writefd);
@@ -297,8 +314,15 @@ CurlStreamFile::fillCache(long unsigned size)
             throw gnash::GnashException(curl_multi_strerror(mcode));
         }
 
+#ifdef GNASH_CURL_VERBOSE
+        gnash::log_debug("Max fd: %d", maxfd);
+#endif
+
         // A value of -1 means no file descriptors were added.
-        if (maxfd < 0) break;
+        if (maxfd < 0) {
+            gnash::log_debug("No filedescriptors; breaking");
+            break;
+        }
 
         // Wait for data on the filedescriptors until a timeout set
         // in gnashrc.
@@ -310,7 +334,11 @@ CurlStreamFile::fillCache(long unsigned size)
 	
 	// Does this also decrement the number of active handles (_running)?
 	// Should however be no more than one.
-	while ((curl_msg = curl_multi_info_read(_mhandle, &_running))) {
+	
+	// The number of messages left in the queue (not used by us).
+	int msgs;
+	
+	while ((curl_msg = curl_multi_info_read(_mhandle, &msgs))) {
 
 		// Only for completed transactions
 		if (curl_msg->msg == CURLMSG_DONE) {
@@ -586,7 +614,7 @@ CurlStreamFile::seek(size_t pos)
 
 	if ( _cached < pos )
 	{
-		//fprintf(stderr, "Warning: could not cache anough bytes on seek\n");
+		gnash::log_error ("Warning: could not cache anough bytes on seek: %d requested, %d cached", pos, _cached);
 		return false; // couldn't cache so many bytes
 	}
 
