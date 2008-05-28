@@ -1,5 +1,12 @@
 2008-05-28 Sandro Santilli <strk@keybit.net>
 
+	* libbase/curl_adapter.cpp: keep select() timeout low (1/100 of
+	  second), to allow thread switching while waiting for input.
+	  Re-intruduce the WallClock to implement user-requested
+	  streams timeout.
+
+2008-05-28 Sandro Santilli <strk@keybit.net>
+
 	* libbase/curl_adapter.cpp (fillCache): spaces to tabs, comments
 	  about timeout constraints.
 

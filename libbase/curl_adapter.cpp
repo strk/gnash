@@ -26,6 +26,7 @@
 #include "tu_file.h"
 #include "curl_adapter.h"
 #include "log.h"
+#include "WallClockTimer.h"
 
 #ifndef USE_CURL
 // Stub for warning about access when no libcurl is defined.
@@ -277,9 +278,19 @@ CurlStreamFile::fillCache(long unsigned size)
 	CURLMcode mcode;
 	timeval tv;
 
-	const unsigned int timeout = static_cast<unsigned int>(
-			gnash::RcInitFile::getDefaultInstance().getStreamsTimeout());
+	// Hard-coded slect timeout.
+	// This number is kept low to give more thread switch
+	// opportunities while waiting for a load.
+	const long maxSleepUsec = 10000;  // 1/100 of a second
 
+	const unsigned int userTimeout = static_cast<unsigned int>(
+			gnash::RcInitFile::getDefaultInstance().getStreamsTimeout()*1000);
+
+#ifdef GNASH_CURL_VERBOSE
+        gnash::log_debug("User timeout is %u milliseconds", userTimeout);
+#endif
+
+	gnash::WallClockTimer lastProgress; // timer since last progress
 	while (_running)
 	{
 
@@ -293,9 +304,10 @@ CurlStreamFile::fillCache(long unsigned size)
 			throw gnash::GnashException(curl_multi_strerror(mcode));
 		}
 
-		// Do this here to avoid calling select() when we have enough
-		// bytes anyway.
-		if (_cached >= size) break;
+		// Do this here to avoid calling select()
+		// when we have enough bytes anyway, or
+		// we reached EOF
+		if (_cached >= size || !_running) break;
 
 #if GNASH_CURL_VERBOSE
 		//gnash::log_debug("cached: %d, size: %d", _cached, size);
@@ -324,16 +336,51 @@ CurlStreamFile::fillCache(long unsigned size)
 		FD_ZERO(&writefd);
 		FD_ZERO(&exceptfd);
 
-		// TODO: don't wait more then curl_multi_timeout()
-		//       [ or an fixed max is that's not supported
-		//         by current curl version ]
-		tv.tv_sec = timeout;
-		tv.tv_usec = 0;
+		tv.tv_sec = 0;
+		tv.tv_usec = maxSleepUsec;
 
+#ifdef GNASH_CURL_VERBOSE
+		gnash::log_debug("select() with %d milliseconds timeout", maxSleepUsec*1000);
+#endif
 
 		// Wait for data on the filedescriptors until a timeout set
 		// in gnashrc.
-		select(maxfd + 1, &readfd, &writefd, &exceptfd, &tv);
+		int ret = select(maxfd + 1, &readfd, &writefd, &exceptfd, &tv);
+		if ( ret == -1 )
+		{
+			// something unexpected happened
+			boost::format fmt = boost::format(
+				"error polling data from connection to %s: %s ")
+				% _url % strerror(errno);
+			throw gnash::GnashException(fmt.str());
+		}
+		if ( ! ret )
+		{
+			// timeout
+#ifdef GNASH_CURL_VERBOSE
+                        gnash::log_debug("select() timed out, elapsed is %u", lastProgress.elapsed() );
+#endif
+                        if ( userTimeout && lastProgress.elapsed() > userTimeout )
+                        {
+                                gnash::log_error(_("Timeout (%u milliseconds) while loading from url %s"),
+					userTimeout, _url);
+				// TODO: should we set _error here ?
+                                return;
+                        }
+		}
+		else
+		{
+#ifdef GNASH_CURL_VERBOSE
+                        gnash::log_debug("FD activity, resetting progress timer");
+#endif
+                        lastProgress.restart();
+		}
+
+
+		// TODO: check if we timedout or got some data
+		//       if we did timeout, check the clock to see
+		//       if we expired the user Timeout, otherwise
+		//       reset the timer...
 
 	}
 
