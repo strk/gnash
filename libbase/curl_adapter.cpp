@@ -97,8 +97,13 @@ class CurlSession {
 
 public:
 
+	/// Get CurlSession singleton
+	static CurlSession& get();
+
 	/// Get the shared handle
 	CURLSH* getSharedHandle() { return _shandle; }
+
+private:
 
 	/// Initialize a libcurl session
 	//
@@ -116,7 +121,6 @@ public:
 	/// Cleanup curl session stuff (including global lib init)
 	~CurlSession();
 
-private:
 
 	// the libcurl share handle, for sharing cookies
 	CURLSH* _shandle;
@@ -133,6 +137,23 @@ private:
 	boost::mutex _dnscacheMutex;
 	boost::mutex::scoped_lock _dnscacheMutexLock;
 
+	/// Import cookies, if requested
+	//
+	/// This method will lookup GNASH_COOKIES_IN
+	/// in the environment, and if existing, will
+	/// parse the file sending each line to a fake
+	/// easy handle created ad-hoc
+	///
+	void importCookies();
+
+	/// Export cookies, if requested
+	//
+	/// This method will lookup GNASH_COOKIES_OUT
+	/// in the environment, and if existing, will
+	/// create the file writing any cookie currently
+	/// in the jar
+	///
+	void exportCookies();
 
 	/// Shared handle data locking function
 	void lockSharedHandle(CURL* handle, curl_lock_data data, curl_lock_access access);
@@ -158,29 +179,43 @@ private:
 
 };
 
+CurlSession&
+CurlSession::get()
+{
+	static CurlSession cs;
+	return cs;
+}
+
 CurlSession::~CurlSession()
 {
-	CURLSHcode err = curl_share_cleanup(_shandle);
-	if ( err != CURLSHE_OK )
+	exportCookies();
+
+	CURLSHcode code = curl_share_cleanup(_shandle);
+	if ( code != CURLSHE_OK )
 	{
-		std::cerr << "Failure cleaning up curl share handle" << std::endl;
+		log_error("Failed cleaning up share handle: %s", curl_share_strerror(code));
 	}
 	_shandle = 0;
 
 	curl_global_cleanup();
 }
 
+#if BOOST_VERSION < 103500
+# define GNASH_DEFER_LOCK false
+#else
+# define GNASH_DEFER_LOCK boost::defer_lock
+#endif
+
 CurlSession::CurlSession()
 	:
 	_shandle(0),
 	_shareMutex(),
-	_shareMutexLock(_shareMutex, false), // start unlocked
+	_shareMutexLock(_shareMutex, GNASH_DEFER_LOCK), // start unlocked
 	_cookieMutex(),
-	_cookieMutexLock(_cookieMutex, false), // start unlocked
+	_cookieMutexLock(_cookieMutex, GNASH_DEFER_LOCK), // start unlocked
 	_dnscacheMutex(),
-	_dnscacheMutexLock(_dnscacheMutex, false) // start unlocked
+	_dnscacheMutexLock(_dnscacheMutex, GNASH_DEFER_LOCK) // start unlocked
 {
-
 	// TODO: handle an error here (throw an exception)
 	curl_global_init(CURL_GLOBAL_ALL);
 
@@ -202,7 +237,7 @@ CurlSession::CurlSession()
 		throw gnash::GnashException(curl_share_strerror(ccode));
 	}
 
-	// Activate sharing of cookies
+	// Activate sharing of cookies and DNS cache
 	ccode = curl_share_setopt(_shandle, CURLSHOPT_SHARE, CURL_LOCK_DATA_COOKIE);
 	if ( ccode != CURLSHE_OK ) {
 		throw gnash::GnashException(curl_share_strerror(ccode));
@@ -220,6 +255,7 @@ CurlSession::CurlSession()
 		throw gnash::GnashException(curl_share_strerror(ccode));
 	}
 
+	importCookies();
 }
 
 void
@@ -299,7 +335,6 @@ CurlSession::unlockSharedHandle(CURL* handle, curl_lock_data data)
 			break;
 	}
 }
-
 
 
 /***********************************************************************
@@ -428,11 +463,6 @@ private:
  *  Statics and CurlStreamFile implementation
  *
  **********************************************************************/
-
-// This is the "singleton" libcurl initialization
-// wrapper.
-CurlSession curlSession;
-
 
 /*static private*/
 size_t
@@ -699,7 +729,7 @@ CurlStreamFile::init(const std::string& url)
 	}
 
 	// Get shared data
-	ccode = curl_easy_setopt(_handle, CURLOPT_SHARE, curlSession.getSharedHandle());
+	ccode = curl_easy_setopt(_handle, CURLOPT_SHARE, CurlSession::get().getSharedHandle());
 	if ( ccode != CURLE_OK ) {
 		throw gnash::GnashException(curl_easy_strerror(ccode));
 	}
@@ -715,28 +745,6 @@ CurlStreamFile::init(const std::string& url)
 	ccode = curl_easy_setopt(_handle, CURLOPT_DNS_CACHE_TIMEOUT, 60);
 	if ( ccode != CURLE_OK ) {
 		throw gnash::GnashException(curl_easy_strerror(ccode));
-	}
-
-	// Read cookies from file if requested.
-	// TODO: only read the file once, not at every request !
-	const char *cookiein = std::getenv("GNASH_COOKIES_IN");
-	// Or just enable cookie engine.
-	if ( ! cookiein ) cookiein = "";
-	ccode = curl_easy_setopt(_handle, CURLOPT_COOKIEFILE, cookiein);
-	if ( ccode != CURLE_OK ) {
-		throw gnash::GnashException(curl_easy_strerror(ccode));
-	}
-
-	// Write gathered cookies from file if requested.
-	// TODO: only write the file once, not at every cleanup !
-	const char *cookieout = std::getenv("GNASH_COOKIES_OUT");
-	if ( cookieout )
-	{
-		// Dump cookies to a file
-		ccode = curl_easy_setopt(_handle, CURLOPT_COOKIEJAR , cookieout);
-		if ( ccode != CURLE_OK ) {
-			throw gnash::GnashException(curl_easy_strerror(ccode));
-		}
 	}
 
 	ccode = curl_easy_setopt(_handle, CURLOPT_USERAGENT, "Gnash-" VERSION);
@@ -974,6 +982,106 @@ CurlStreamFile::get_stream_size()
 
 	return _size;
 
+}
+
+void
+CurlSession::importCookies()
+{
+	const char* cookiesIn = std::getenv("GNASH_COOKIES_IN");
+	if ( ! cookiesIn ) return; // nothing to do
+
+	////////////////////////////////////////////////////////////////
+	//
+	// WARNING: what we're doing here is an ugly hack
+	//
+	// We'll be creating a fake easy handle for the sole purpos
+	// of importing cookies. Tests conducted against 7.15.5-CVS
+	// resulted in this working if a CURLOPT_URL is given, even
+	// if invalid (but non-0!), while wouldn't if NO CURLOPT_URL
+	// is given, with both cases returning the same CURLcode on
+	// _perform (URL using bad/illegal format or missing URL)
+	//
+	// TODO: instead, we should be reading the input file
+	//       ourselves and use CURLOPT_COOKIELIST to send
+	//       each line. Doing so should not require a
+	//       _perform call.
+	//
+	////////////////////////////////////////////////////////////////
+
+	// Create a fake handle for purpose of importing data
+	CURL* fakeHandle = curl_easy_init(); // errors to handle here ?
+	CURLcode ccode;
+
+	// Configure the fake handle to use the share (shared cookies in particular..)
+	ccode = curl_easy_setopt(fakeHandle, CURLOPT_SHARE, getSharedHandle());
+	if ( ccode != CURLE_OK ) {
+		throw gnash::GnashException(curl_easy_strerror(ccode));
+	}
+
+	// Configure the fake handle to read cookies from the specified file
+	ccode = curl_easy_setopt(fakeHandle, CURLOPT_COOKIEFILE, cookiesIn);
+	if ( ccode != CURLE_OK ) {
+		throw gnash::GnashException(curl_easy_strerror(ccode));
+	}
+
+	// need to pass a non-zero URL string for COOKIEFILE to
+	// be really parsed
+	ccode = curl_easy_setopt(fakeHandle, CURLOPT_URL, "");
+	if ( ccode != CURLE_OK ) {
+		throw gnash::GnashException(curl_easy_strerror(ccode));
+	}
+
+	// perform, to activate actual cookie file parsing
+	log_debug("Performing on the fake handle to import cookies");
+	ccode = curl_easy_perform(fakeHandle);
+	log_debug("Fake performance returned %s", curl_easy_strerror(ccode));
+
+	curl_easy_cleanup(fakeHandle);
+
+}
+
+void
+CurlSession::exportCookies()
+{
+	const char* cookiesOut = std::getenv("GNASH_COOKIES_OUT");
+	if ( ! cookiesOut ) return; // nothing to do
+
+	////////////////////////////////////////////////////////////////
+	//
+	// WARNING: what we're doing here is an ugly hack
+	//
+	// We'll be creating a fake easy handle for the sole purpose
+	// of exporting cookies. Tests conducted against 7.15.5-CVS
+	// resulted in this working w/out a CURLOPT_URL.
+	// 
+	// NOTE: the "correct" way would be to use CURLOPT_COOKIELIST
+	//       with the "FLUSH" special string as value, but that'd
+	//       be only supported by version 7.17.1
+	//
+	////////////////////////////////////////////////////////////////
+
+	CURL* fakeHandle = curl_easy_init(); // errors to handle here ?
+	CURLcode ccode;
+
+	// Configure the fake handle to use the share (shared cookies in particular..)
+	ccode = curl_easy_setopt(fakeHandle, CURLOPT_SHARE, getSharedHandle());
+	if ( ccode != CURLE_OK ) {
+		throw gnash::GnashException(curl_easy_strerror(ccode));
+	}
+	// Configure the fake handle to write cookies to the specified file
+	ccode = curl_easy_setopt(fakeHandle, CURLOPT_COOKIEJAR , cookiesOut);
+	if ( ccode != CURLE_OK ) {
+		throw gnash::GnashException(curl_easy_strerror(ccode));
+	}
+
+	// perform, to activate actual cookie file parsing
+	log_debug("Performing on the fake handle to export cookies");
+	ccode = curl_easy_perform(fakeHandle);
+	log_debug("Fake performance returned %s", curl_easy_strerror(ccode));
+
+	curl_easy_cleanup(fakeHandle);
+
+	//log_error("Cookies export unimplemented yet");
 }
 
 /***********************************************************************

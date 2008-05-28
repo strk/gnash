@@ -1,3 +1,13 @@
+2008-05-29 Sandro Santilli <strk@keybit.net>
+
+	* libbase/curl_adapter.cpp: have the CurlSession created
+	  on first get (singleton) so we have proper logging support
+	  by that time; have CurlSession constructor import cookies
+	  (if requested) and destructor export cookies (if requested)
+	  - if neither input nor output are requested, cookies are
+	  simply disabled; change second argument to scoped_lock
+	  based on boost version, fixing bug #23419.
+
 2008-05-28 Sandro Santilli <strk@keybit.net>
 
 	* libbase/curl_adapter.cpp: move all one-time initialization
