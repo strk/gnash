@@ -3,6 +3,7 @@
 	* server/parser/shape_character_def.cpp: drop unused global
 	  functions and flags.
 	* server/parser/movie_definition.h: drop gnash.h include.
+	* server/swf/StartSoundTag.cpp: include gnash.h for sound handler.
 
 2008-05-27 Sandro Santilli <strk@keybit.net>
 
