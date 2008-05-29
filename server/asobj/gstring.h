@@ -38,7 +38,7 @@ void string_class_init(as_object& global);
 /// In the second case, not finding a proper constructor might result in
 /// returning the NULL object.
 ///
-boost::intrusive_ptr<as_object> init_string_instance(const char* val);
+boost::intrusive_ptr<as_object> init_string_instance(const std::string& val);
 
 }
 

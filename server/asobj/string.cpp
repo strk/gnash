@@ -141,7 +141,7 @@ getStringInterface()
     if ( o == NULL )
     {
         o = new as_object(getObjectInterface());
-	VM::get().addStatic(o.get());
+	    VM::get().addStatic(o.get());
 
         attachStringInterface(*o);
     }
@@ -510,8 +510,9 @@ string_index_of(const fn_call& fn)
 static as_value
 string_from_char_code(const fn_call& fn)
 {
+    boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
 
-    int version = VM::get().getSWFVersion();
+    const int version = obj->getVM().getSWFVersion();
 
     if (version == 5)
     {
@@ -553,7 +554,7 @@ string_char_code_at(const fn_call& fn)
 {
     boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
 
-    int version = VM::get().getSWFVersion();
+    int version = obj->getVM().getSWFVersion();
 
     const std::wstring& wstr = utf8::decodeCanonicalString(obj->str(), version);
 
@@ -588,7 +589,7 @@ string_char_at(const fn_call& fn)
 {
     boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
 
-    int version = VM::get().getSWFVersion();
+    const int version = obj->getVM().getSWFVersion();
 
     const std::wstring& wstr = utf8::decodeCanonicalString(obj->str(), version);
 
@@ -613,7 +614,7 @@ string_to_upper_case(const fn_call& fn)
     boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
     std::string subject = obj->str();
 
-    VM& vm = VM::get();
+    VM& vm = obj->getVM();
 
     boost::to_upper(subject, vm.getLocale());
 
@@ -626,7 +627,7 @@ string_to_lower_case(const fn_call& fn)
     boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
     std::string subject = obj->str();
 
-    VM& vm = VM::get();
+    VM& vm = obj->getVM();
 
     boost::to_lower(subject, vm.getLocale());
 
@@ -697,7 +698,7 @@ void string_class_init(as_object& global)
 }
 
 boost::intrusive_ptr<as_object>
-init_string_instance(const char* val)
+init_string_instance(const std::string& val)
 {
 	// TODO: get the environment passed in !!
 	as_environment env;

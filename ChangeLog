@@ -1,3 +1,13 @@
+2008-05-29 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/asobj/{string.cpp,gstring.h}: get VM from object. Make
+	  init_string_instance take const std::string&, as that's what
+	  is usually passed to it.
+	* server/asobj/Mouse.cpp, server/asobj/System.cpp,
+	  server/asobj/Stage.cpp, server/asobj/Sound.cpp,
+	  server/asobj/Object.cpp, server/asobj/Global.cpp: get VM from
+	  object.
+
 2008-05-29 Sandro Santilli <strk@keybit.net>
 
 	* libbase/curl_adapter.cpp: avoid the _perform on cookies

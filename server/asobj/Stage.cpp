@@ -139,7 +139,10 @@ getScaleModeString(movie_root::ScaleMode sm)
 as_value
 stage_scalemode_getset(const fn_call& fn)
 {
-    const movie_root& m = VM::get().getRoot();
+
+    boost::intrusive_ptr<as_object> obj=ensureType<as_object>(fn.this_ptr);
+
+    movie_root& m = obj->getVM().getRoot();
 
 	if ( fn.nargs == 0 ) // getter
 	{
@@ -158,8 +161,6 @@ stage_scalemode_getset(const fn_call& fn)
 		else if ( noCaseCompare(str, "exactFit") ) mode = movie_root::exactFit;
 		else if ( noCaseCompare(str, "noBorder") ) mode = movie_root::noBorder;
 
-        movie_root& m = VM::get().getRoot();
-
         if ( m.getStageScaleMode() == mode ) return as_value(); // nothing to do
 
 	    m.setStageScaleMode(mode);
@@ -170,6 +171,7 @@ stage_scalemode_getset(const fn_call& fn)
 as_value
 stage_width_getset(const fn_call& fn)
 {
+    boost::intrusive_ptr<as_object> obj=ensureType<as_object>(fn.this_ptr);
 
 	if ( fn.nargs > 0 ) // setter
 	{
@@ -180,13 +182,14 @@ stage_width_getset(const fn_call& fn)
 	}
 
     // getter
-    movie_root& m = VM::get().getRoot();
+    movie_root& m = obj->getVM().getRoot();
     return as_value(m.getStageWidth());
 }
 
 as_value
 stage_height_getset(const fn_call& fn)
 {
+    boost::intrusive_ptr<as_object> obj=ensureType<as_object>(fn.this_ptr);
 
 	if ( fn.nargs > 0 ) // setter
 	{
@@ -197,7 +200,7 @@ stage_height_getset(const fn_call& fn)
 	}
 
     // getter
-    movie_root& m = VM::get().getRoot();
+    movie_root& m = obj->getVM().getRoot();
     return as_value(m.getStageHeight());
 }
 
@@ -205,7 +208,9 @@ stage_height_getset(const fn_call& fn)
 as_value
 stage_align_getset(const fn_call& fn)
 {
-    movie_root& m = VM::get().getRoot();
+    boost::intrusive_ptr<as_object> obj=ensureType<as_object>(fn.this_ptr); 
+ 
+    movie_root& m = obj->getVM().getRoot();
     
 	if ( fn.nargs == 0 ) // getter
 	{
@@ -264,8 +269,9 @@ stage_showMenu_getset(const fn_call& fn)
 as_value
 stage_displaystate_getset(const fn_call& fn)
 {
+    boost::intrusive_ptr<as_object> obj=ensureType<as_object>(fn.this_ptr);
 
-    movie_root& m = VM::get().getRoot();
+    movie_root& m = obj->getVM().getRoot();
 
 	if ( fn.nargs == 0 ) // getter
 	{

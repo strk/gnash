@@ -62,11 +62,10 @@ as_value
 mouse_hide(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
-    UNUSED(obj);
 
     int success = 0;
 
-    movie_root& m = VM::get().getRoot();
+    movie_root& m = obj->getVM().getRoot();
 
 	if (m.interfaceHandle)
 	{
@@ -86,11 +85,10 @@ as_value
 mouse_show(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> obj=ensureType<as_object>(fn.this_ptr);
-    UNUSED(obj);
 
     int success = 0;
 
-    movie_root& m = VM::get().getRoot();
+    movie_root& m = obj->getVM().getRoot();
 
 	if (m.interfaceHandle)
 	{

@@ -586,6 +586,8 @@ as_global_assetpropflags(const fn_call& fn)
 as_value
 as_global_asnative(const fn_call& fn)
 {
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+
     as_value ret;
 
     if (fn.nargs < 2)
@@ -617,7 +619,7 @@ as_global_asnative(const fn_call& fn)
     const unsigned int x = static_cast<unsigned int>(sx);
     const unsigned int y = static_cast<unsigned int>(sy);
 
-    VM& vm = VM::get();
+    VM& vm = ptr->getVM();
     as_function* fun = vm.getNative(x, y);
     if ( ! fun ) {
         log_debug(_("No ASnative(%d, %d) registered with the VM"), x, y);

@@ -445,7 +445,7 @@ xmlsocket_connect(const fn_call& fn)
     
     bool success = ptr->obj.connect(host.c_str(), port);
 
-    VM& vm = VM::get();
+    VM& vm = ptr->getVM();
     string_table& st = vm.getStringTable();
     
     // Actually, if first-stage connection was successful, we

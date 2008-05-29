@@ -168,7 +168,7 @@ void object_class_init(as_object& global)
 	// This is going to be the global Object "class"/"function"
 	static boost::intrusive_ptr<builtin_function> cl=NULL;
 
-	VM& vm = VM::get();
+	VM& vm = global.getVM();
 
 	if ( cl == NULL )
 	{
@@ -263,7 +263,6 @@ static as_value
 object_registerClass(const fn_call& fn)
 {
 	assert(fn.this_ptr);
-	//as_object* obj = fn.this_ptr;
 
 	if ( fn.nargs != 2 )
 	{
@@ -311,6 +310,7 @@ object_registerClass(const fn_call& fn)
 
 	// TODO: check to *which* definition should we ask the export
 	//       this code uses the *relative* root of current environment's target
+	//       and don't use VM::get() if this code is ever reactivated.
 #if 0
 	movie_definition* def = VM::get().getRoot().get_movie_definition();
 #else
@@ -325,7 +325,7 @@ object_registerClass(const fn_call& fn)
 	assert(relRoot);
 	movie_definition* def = relRoot->get_movie_definition();
 #endif
-	boost::intrusive_ptr<resource> exp_res = def->get_exported_resource(symbolid.c_str());
+	boost::intrusive_ptr<resource> exp_res = def->get_exported_resource(symbolid);
 	if ( ! exp_res )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -364,6 +364,8 @@ object_registerClass(const fn_call& fn)
 as_value
 object_hasOwnProperty(const fn_call& fn)
 {
+    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+
 	//assert(fn.result->is_undefined());
 	if ( fn.nargs < 1 )
 	{
@@ -382,12 +384,14 @@ object_hasOwnProperty(const fn_call& fn)
 		return as_value(false);
 	}
 	//log_debug("%p.hasOwnProperty", fn.this_ptr);
-	return as_value(fn.this_ptr->hasOwnProperty(VM::get().getStringTable().find(propname)));
+	return as_value(fn.this_ptr->hasOwnProperty(obj->getVM().getStringTable().find(propname)));
 }
 
 as_value
 object_isPropertyEnumerable(const fn_call& fn)
 {
+    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+
 	//assert(fn.result->is_undefined());
 	if ( fn.nargs < 1 )
 	{
@@ -406,7 +410,7 @@ object_isPropertyEnumerable(const fn_call& fn)
 		return as_value();
 	}
 
-	Property* prop = fn.this_ptr->getOwnProperty(VM::get().getStringTable().find(propname));
+	Property* prop = fn.this_ptr->getOwnProperty(obj->getVM().getStringTable().find(propname));
 	if ( ! prop )
 	{
 		return as_value(false);
