@@ -83,8 +83,7 @@ namespace gnash {
 		const matrix& this_mat,
 		character* inst,
 		const std::vector<text_glyph_record>& records,
-		// root_def was used to resove fonts, now done at parse time
-		movie_definition* /*root_def*/, bool useEmbeddedGlyphs)
+		bool useEmbeddedGlyphs)
 	{
 		//GNASH_REPORT_FUNCTION;
 		

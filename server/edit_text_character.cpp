@@ -652,8 +652,7 @@ edit_text_character::display()
 	
 	
 	//log_debug("Displaying glyph records for textfield %s", getTarget());
-	display_glyph_records(m, this, m_text_glyph_records,
-			      m_def->get_root_def(), _embedFonts);
+	display_glyph_records(m, this, m_text_glyph_records, _embedFonts);
 
 	if (m_has_focus)
 	{

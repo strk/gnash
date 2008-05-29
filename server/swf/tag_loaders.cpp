@@ -1155,7 +1155,7 @@ void	define_edit_text_loader(stream* in, tag_type tag, movie_definition* m)
     in->ensureBytes(2);
     boost::uint16_t	character_id = in->read_u16();
 
-    edit_text_character_def* ch = new edit_text_character_def(m);
+    edit_text_character_def* ch = new edit_text_character_def();
     IF_VERBOSE_PARSE
     (
 	log_parse(_("edit_text_char, id = %d"), character_id);
@@ -1174,7 +1174,7 @@ define_text_loader(stream* in, tag_type tag, movie_definition* m)
     in->ensureBytes(2);
     boost::uint16_t	character_id = in->read_u16();
 
-    text_character_def* ch = new text_character_def(m);
+    text_character_def* ch = new text_character_def();
     IF_VERBOSE_PARSE
     (
 	log_parse(_("text_character, id = %d"), character_id);

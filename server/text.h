@@ -220,7 +220,7 @@ namespace gnash {
 		const matrix& this_mat,
 		character* inst,
 		const std::vector<text_glyph_record>& records,
-		movie_definition* root_def, bool useEmbeddedGlyphs);
+		bool useEmbeddedGlyphs);
 
 } // namespace gnash
 

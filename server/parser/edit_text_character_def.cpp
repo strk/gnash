@@ -27,7 +27,7 @@
 
 #include "edit_text_character_def.h"
 #include "edit_text_character.h"
-#include "font.h" // for setReachable call
+#include "font.h" // for setReachable call, ctor and dtor
 
 namespace gnash {
 
@@ -36,7 +36,7 @@ class movie_definition;
 
 void
 edit_text_character_def::read(stream* in, int tag_type,
-		movie_definition* /*m*/)
+		movie_definition* m)
 {
 	//assert(m != NULL);
 	assert(tag_type == SWF::DEFINEEDITTEXT); // 37
@@ -69,7 +69,14 @@ edit_text_character_def::read(stream* in, int tag_type,
 	if (has_font)
 	{
 		in->ensureBytes(4);
-		m_font_id = in->read_u16();
+		int fontID = in->read_u16();
+		m_font = m->get_font(fontID);
+		if (m_font == NULL)
+		{
+			// this is fine, the textfield would use a default device font
+			//log_debug(_("text style with undefined font; font_id = %d; using a default font"), m_font_id);
+			m_font = fontlib::get_default_font().get();
+		}
 		m_text_height = in->read_u16();
 	}
 
@@ -117,19 +124,7 @@ edit_text_character_def::read(stream* in, int tag_type,
 const font*
 edit_text_character_def::get_font()
 {
-	if (m_font == NULL)
-	{
-		// Resolve the font, if possible.
-		m_font = m_root_def->get_font(m_font_id);
-		if (m_font == NULL)
-		{
-			// this is fine, the textfield would use a default device font
-			//log_debug(_("text style with undefined font; font_id = %d; using a default font"), m_font_id);
-			m_font = fontlib::get_default_font().get();
-		}
-	}
-
-	return m_font;
+	return m_font.get();
 }
 
 character*
@@ -168,10 +163,43 @@ edit_text_character_def::create_character_instance(character* parent,
 void
 edit_text_character_def::markReachableResources() const
 {
-	if ( m_root_def ) m_root_def->setReachable();
+	//if ( m_root_def ) m_root_def->setReachable();
 	if ( m_font ) m_font->setReachable();
 }
 #endif // GNASH_USE_GC
+
+edit_text_character_def::edit_text_character_def()
+	:
+	m_has_text(true), // For an SWF-defined textfield we'll read
+			  // this from the tag. Dynamic textfields should
+			  // behave as always having text by default (not tested).
+
+	m_word_wrap(false),
+	m_multiline(false),
+	m_password(false),
+	m_readonly(true),
+	m_auto_size(false),
+	m_no_select(false),
+	m_border(false),
+	m_html(false),
+	m_use_outlines(false), // For an SWF-defined textfield we'll read
+			       // this from the tag. Dynamic textfields should
+			       // use device fonts by default (so not use outline ones)
+	m_font_id(-1),
+	m_font(),
+	m_text_height(1), // TODO: initialize to a meaningful value (see sprite_instance::add_textfield)
+			  //       and make sure get_font_height is not called for rendering purposes
+			  //       (instead call a method of edit_text_character_def)
+	m_max_length(0),
+	m_alignment(ALIGN_LEFT),
+	m_left_margin(0),
+	m_right_margin(0),
+	m_indent(0),
+	m_leading(0)
+{
+	m_color.set(0, 0, 0, 255);
+}
+
 
 } // namespace gnash
 

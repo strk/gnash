@@ -2661,7 +2661,7 @@ sprite_instance::add_textfield(const std::string& name, int depth, float x, floa
   matrix txt_matrix;
 
   // Create a definition (TODO: cleanup this thing, definitions should be immutable!)
-  boost::intrusive_ptr<edit_text_character_def> txt = new edit_text_character_def(get_movie_definition());
+  boost::intrusive_ptr<edit_text_character_def> txt = new edit_text_character_def();
 
   // Set textfield bounds
   txt->set_bounds(rect(0, 0, PIXELS_TO_TWIPS(width), PIXELS_TO_TWIPS(height)));

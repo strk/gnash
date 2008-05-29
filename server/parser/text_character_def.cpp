@@ -169,7 +169,7 @@ void text_character_def::display(character* inst)
 	bool useEmbeddedGlyphs = true;
 
 	display_glyph_records(m_matrix, inst,
-		m_text_glyph_records, m_root_def, useEmbeddedGlyphs); 
+		m_text_glyph_records, useEmbeddedGlyphs); 
 }
 
 }	// end namespace gnash

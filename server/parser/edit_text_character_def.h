@@ -27,6 +27,7 @@ namespace gnash {
 
 // Forward declarations
 class movie_definition;
+class font;
 
 /// \brief
 /// A definition for a text display character, whose text can
@@ -47,45 +48,7 @@ public:
 		ALIGN_JUSTIFY
 	};
 
-	edit_text_character_def(movie_definition* root_def)
-		:
-		m_root_def(root_def),
-
-		m_has_text(true), // For an SWF-defined textfield we'll read
-		                  // this from the tag. Dynamic textfields should
-		                  // behave as always having text by default (not tested).
-
-		m_word_wrap(false),
-		m_multiline(false),
-		m_password(false),
-		m_readonly(true),
-		m_auto_size(false),
-		m_no_select(false),
-		m_border(false),
-		m_html(false),
-		m_use_outlines(false), // For an SWF-defined textfield we'll read
-		                       // this from the tag. Dynamic textfields should
-		                       // use device fonts by default (so not use outline ones)
-		m_font_id(-1),
-		m_font(NULL),
-		m_text_height(1), // TODO: initialize to a meaningful value (see sprite_instance::add_textfield)
-		                  //       and make sure get_font_height is not called for rendering purposes
-		                  //       (instead call a method of edit_text_character_def)
-		m_max_length(0),
-		m_alignment(ALIGN_LEFT),
-		m_left_margin(0),
-		m_right_margin(0),
-		m_indent(0),
-		m_leading(0)
-	{
-		assert(m_root_def);
-
-		m_color.set(0, 0, 0, 255);
-	}
-
-	~edit_text_character_def()
-	{
-	}
+	edit_text_character_def();
 
 	/// Get width of this definition in twips (by definition)
 	float width() const { return m_rect.width(); }
@@ -216,11 +179,6 @@ public:
 		return m_has_text;
 	}
 
-	/// Get root movie definition
-	movie_definition* get_root_def() {
-		return m_root_def;
-	}
-
 	bool get_readonly() const
 	{
 		return m_readonly;
@@ -257,16 +215,12 @@ protected:
 	/// Mark all reachable resources (for GC)
 	//
 	/// Reachable resources are:
-	///  - The root movie definition (m_root_def) @@ what do we use this for ?
 	///  - The font being used (m_font) 
 	///
 	void markReachableResources() const;
 #endif // GNASH_USE_GC
 
 private:
-
-	/// Root movie_definition
-	movie_definition*	m_root_def;
 
 	rect			m_rect;
 	std::string		m_variable_name;
@@ -321,7 +275,7 @@ private:
 	bool	m_use_outlines;
 
 	int	m_font_id;
-	font*	m_font;
+	boost::intrusive_ptr<font> m_font;
 
 	/// height of font text, in twips
 	boost::uint16_t m_text_height;

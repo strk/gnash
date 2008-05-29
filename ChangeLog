@@ -1,3 +1,13 @@
+2008-05-29 Sandro Santilli <strk@keybit.net>
+
+	* server/edit_text_character.cpp, server/sprite_instance.cpp,
+	  server/text.{cpp,h}, server/parser/edit_text_character_def.{cpp,h},
+	  server/parser/text_character_def.{cpp,h},
+	  server/swf/tag_loaders.{cpp,h}:
+	  Drop references from font, edit_text_character_def and
+	  text_character_def to defining movie (unused).
+	  
+
 2008-05-29 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/generic_character.cpp: header cleanup.

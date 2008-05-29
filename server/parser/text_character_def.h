@@ -42,17 +42,11 @@ class movie_definition;
 class text_character_def : public character_def
 {
 public:
-	movie_definition*	m_root_def;
 	rect	m_rect;
 	matrix	m_matrix;
 	std::vector<text_glyph_record>	m_text_glyph_records;
 
-	text_character_def(movie_definition* root_def)
-		:
-		m_root_def(root_def)
-	{
-		assert(m_root_def);
-	}
+	text_character_def() {}
 
 	void read(stream* in, int tag_type, movie_definition* m);
 
