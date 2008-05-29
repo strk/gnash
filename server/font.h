@@ -166,7 +166,7 @@ public:
 	/// @param in is the SWF stream
 	/// @param tag is the tag type either DefineFont or DefineFont2
 	/// @param m is the movie_definition containing this definition
-	///          (or "owning" this font)
+	///          (used to resolve dictionary simbols referred to by glyphs, if any)
 	///
 	void	read(stream* in, SWF::tag_type tag, movie_definition* m);
 
@@ -191,9 +191,6 @@ public:
 
 	/// Get name of this font. Warning: can be NULL.
 	const std::string& get_name() const { return m_name; }
-
-	/// Return the movie_definition "owning" this font
-	movie_definition* get_owning_movie() const { return m_owning_movie; }
 
 	/// Return the glyph index for a given character code
 	//
@@ -290,8 +287,6 @@ private:
 	std::string	m_name;
         std::string     m_display_name;
         std::string     m_copyright_name;
-
-	movie_definition*	m_owning_movie;
 
 	bool	m_has_layout;
 	bool	m_unicode_chars;

@@ -1,3 +1,9 @@
+2008-05-29 Sandro Santilli <strk@keybit.net>
+
+	* server/font.{cpp,h}: drop reference to "owning movie"
+	* server/parser/movie_def_impl.{cpp,h}: drop unused
+	  get_owned_fonts.
+
 2008-05-29 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* backend/render_handler{.h,_agg.cpp,_ogl.cpp,_cairo.cpp}: Replace the

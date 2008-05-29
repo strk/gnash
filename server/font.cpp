@@ -65,7 +65,6 @@ GlyphInfo::markReachableResources() const
 		m_name(),
                 m_display_name(),
                 m_copyright_name(),
-		m_owning_movie(NULL),
 		m_unicode_chars(false),
 		m_shift_jis_chars(false),
 		m_ansi_chars(true),
@@ -84,7 +83,6 @@ GlyphInfo::markReachableResources() const
 		m_name(name),
                 m_display_name(),
                 m_copyright_name(),
-		m_owning_movie(NULL),
 		m_unicode_chars(false),
 		m_shift_jis_chars(false),
 		m_ansi_chars(true),
@@ -131,10 +129,6 @@ GlyphInfo::markReachableResources() const
 
 	void	font::read(stream* in, SWF::tag_type tag, movie_definition* m)
 	{
-		// No add_ref() here, to avoid cycle. 
-		// m_owning_movie is our owner, so it has a ref to us.
-		m_owning_movie = m;
-
 		if (tag == SWF::DEFINEFONT)
 		{
 			readDefineFont(in, m);

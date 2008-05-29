@@ -508,43 +508,6 @@ movie_def_impl::ensure_frame_loaded(size_t framenum)
 	return ( framenum <= _frames_loaded );
 }
 
-
-/* movie_def_impl */
-void movie_def_impl::get_owned_fonts(std::vector<font*>* fonts)
-    // Fill up *fonts with fonts that we own.
-{
-    assert(fonts);
-    fonts->resize(0);
-
-    std::vector<int>	font_ids;
-
-    for (FontMap::iterator it = m_fonts.begin(), itEnd=m_fonts.end();
-         it != itEnd; ++it)
-        {
-            font*	f = it->second.get();
-            if (f->get_owning_movie() == this)
-                {
-                    // Sort by character id, so the ordering is
-                    // consistent for cache read/write.
-                    int	id = it->first;
-
-                    // Insert in correct place.
-                    unsigned int insert;
-                    for (insert = 0; insert < font_ids.size(); insert++)
-                        {
-                            if (font_ids[insert] > id)
-                                {
-                                    // We want to insert here.
-                                    break;
-                                }
-                        }
-                    fonts->insert(fonts->begin() + insert, f);
-                    font_ids.insert(font_ids.begin() + insert, id);
-                }
-        }
-}
-
-
 movie_instance*
 movie_def_impl::create_movie_instance(character* parent)
 {
