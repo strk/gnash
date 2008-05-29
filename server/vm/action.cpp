@@ -43,13 +43,6 @@ namespace gnash {
 // action stuff
 //
 
-
-void register_component(const std::string& name, as_c_function_ptr handler)
-{
-	as_object* global = VM::get().getGlobal();
-	global->set_member(VM::get().getStringTable().find(name), handler);
-}
-
 //
 // Function/method dispatch.
 //

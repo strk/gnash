@@ -1,5 +1,17 @@
 2008-05-29 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* server/vm/action.cpp: register_component is not the way to
+	  register extensions.
+	* server/parser/character_def.cpp: drop unused forward declaration.
+	* server/parser/movie_def_impl.cpp: drop progress_callback related
+	  stuff.
+	* server/parser/bitmap_character_def.cpp: add forward declaration
+	  dropped from gnash.h
+	* server/gnash.h: drop unused global callback functions, unnecessary
+	  forward declarations and some other useless code.
+
+2008-05-29 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* server/asobj/string.cpp: last commit was the wrong version of
 	  string.cpp.
 

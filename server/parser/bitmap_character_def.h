@@ -30,6 +30,7 @@
 #include <memory> // for auto_ptr
 
 namespace image {
+	class rgba;
 	class rgb;
 }
 

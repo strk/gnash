@@ -29,7 +29,6 @@ class tu_file;
 
 namespace gnash {
 	class character;
-	class cache_options;
 	class matrix;
 	class rect;
 }

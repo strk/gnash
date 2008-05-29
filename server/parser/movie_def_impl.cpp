@@ -189,19 +189,6 @@ static void	dump_tag_bytes(stream* in, std::ostream& os)
 
 
 //
-// progress callback stuff
-//
-progress_callback	s_progress_function = NULL;
-
-// Host calls this to register a function for progress bar handling
-// during loading movies.
-void
-register_progress_callback(progress_callback progress_handle)
-{
-    s_progress_function = progress_handle;
-}
-
-//
 // movie_def_impl
 //
 
@@ -625,12 +612,6 @@ movie_def_impl::read_all_swf()
 		SWF::tag_type tag_type = str.open_tag();
 
 parse_tag:
-
-		if (s_progress_function != NULL)
-                {
-			s_progress_function((boost::uint32_t)str.get_position(),
-				_swf_end_pos);
-                }
 
 		if (tag_type == SWF::END)
                 {

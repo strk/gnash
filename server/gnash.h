@@ -26,8 +26,7 @@
 #include "dsodefs.h"
 
 #include <memory> // for auto_ptr
-#include <string>   // for movie_definition* create_movie(std::auto_ptr<tu_file>
-				 	// in, const std::string& url);
+#include <string>
 
 // FIXME: The local usage of these constants should probably be renamed in this
 // file because they conflict with definitions in the system header files. Luckily
@@ -36,7 +35,7 @@
 #undef INVALID
 #undef ESCAPE
 
-class tu_file; // for file_opener_callback typedef
+class tu_file;
 
 namespace gnash {
 	class sprite_instance; // for fscommand_callback typedef
@@ -47,10 +46,7 @@ namespace gnash {
  		class sound_handler; // for set_sound_handler
  	}
 }
-// @@ forward decl to avoid including base/image.h; TODO change the
-// render_handler interface to not depend on these classes at all.
-namespace image { class image_base; class rgb; class rgba; }
-namespace jpeg { class input; }
+
 
 namespace gnash {
 
@@ -80,15 +76,6 @@ DSOEXPORT void set_base_url(const URL& url);
 /// Return base url
 DSOEXPORT const gnash::URL& get_base_url();
 
-/// Signature of file opener callback function
-typedef tu_file* (*file_opener_callback)(const URL& url);
-
-/// Signature of progress callback function
-typedef void (*progress_callback)(unsigned int loaded_bytes, unsigned int total_bytes);
-
-/// Register a callback for displaying SWF load progress.
-void    register_progress_callback(progress_callback progress_handle);
-
 /// Signature of fscommand callback function
 typedef void (*fscommand_callback)(sprite_instance* movie,
 						const std::string& command, const std::string& arg);
@@ -97,39 +84,11 @@ typedef void (*fscommand_callback)(sprite_instance* movie,
 typedef std::string (*interfaceEventCallback)(const std::string& event,
                                               const std::string& arg);
 
-/// Use this to register gnash extension
-//
-/// WARNING: does not convert name, make sure to pass a lowercase
-///          name if SWF version is < 7 ! It seems currently no code
-///          calls this function..
-///
-///
-class as_value; // for the following typedef
-class fn_call; // for the following typedef
-typedef as_value (*as_c_function_ptr)(const fn_call& fn); // original typedef is in as_value.h ...
-void register_component(const std::string& name, as_c_function_ptr handler);
-
-
 // Some helpers that may or may not be compiled into your
 // version of the library, depending on platform etc.
 DSOEXPORT render_handler*   create_render_handler_xbox();
 DSOEXPORT render_handler*   create_render_handler_ogl(bool init = true);
 //DSOEXPORT render_handler* create_render_handler_cairo(void* cairohandle);
-
-/// For caching precomputed stuff.  Generally of
-/// interest to gnash_processor and programs like it.
-class cache_options
-{
-public:
-    bool    m_include_font_bitmaps;
-    
-    cache_options()
-        :
-        m_include_font_bitmaps(true)
-        {
-        }
-};
-
 
 /// Create a gnash::movie_definition from the given URL.
 //
