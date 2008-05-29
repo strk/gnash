@@ -26,7 +26,6 @@
 // - Document workings of Cairo and this renderer.
 // - Test bitmap implementation correctness.
 // - Figure out what extend types should be used and when.
-// - Figure out what the deal with subpixel offsets is.
 // - Cleanups.
 // - Optimizations.
 //
@@ -408,8 +407,39 @@ public:
     
   virtual void  draw_line_strip(const void* coords, int vertex_count,
       const rgba& color, const matrix& mat)
+  // In this day and age, do we still need void* pointers?
   {
-    log_unimpl("draw_line_strip");
+    const boost::int16_t* vertices = static_cast<const boost::int16_t*>(coords);
+    CairoScopeMatrix mat_transformer(_cr, mat);
+
+    if (vertex_count < 2) {
+      return;
+    }
+
+    double x, y;
+    x = vertices[0];
+    y = vertices[1];
+    snap_to_half_pixel(_cr, x, y);
+
+    cairo_move_to(_cr, x, y);
+
+    for (int i = 2; i < vertex_count * 2; i += 2) {
+      x = vertices[i];
+      y = vertices[i+1];
+      snap_to_half_pixel(_cr, x, y);
+      cairo_line_to(_cr, x, y);
+    }
+
+    set_color(color);
+    cairo_set_line_cap(_cr, CAIRO_LINE_CAP_ROUND);
+    cairo_set_line_join(_cr, CAIRO_LINE_JOIN_ROUND);
+
+    double hwidth = 1.0;
+
+    cairo_device_to_user_distance(_cr, &hwidth, &hwidth);
+    cairo_set_line_width(_cr, hwidth);
+
+    cairo_stroke(_cr);
   }
   
   virtual void  draw_poly(const point* corners, size_t corner_count, 

@@ -202,6 +202,17 @@ public:
 class DSOEXPORT render_handler
 {
 public:
+  enum antialias_method
+  {
+    ANTIALIAS_DEFAULT, // Whatever the renderer prefers
+    ANTIALIAS_NONE,    // Disabled
+
+    ANTIALIAS_MULTISAMPLE, // OpenGL ARB_multisample extension
+    ANTIALIAS_ACCUM,       // OpenGL accumulation buffer
+
+    ANTIALIAS_GRAY        // Cairo single-color antialiasing
+  };
+ 
   virtual ~render_handler() {}
 
   // Your handler should return these with a ref-count of 0.  (@@ is that the right policy?)
@@ -327,9 +338,18 @@ public:
 
   virtual void  end_display() = 0;
     
-  /// Draw a line-strip directly, using a thin, solid line. 
+  /// Draw a line-strip directly, using a thin, solid line.
   //
   /// Can be used to draw empty boxes and cursors.
+  ///
+  /// @coords an array of 16-bit signed integer coordinates. Even indices
+  ///         (and 0) are x coordinates, while uneven ones are y coordinates.
+  ///
+  /// @vertex_count the number of x-y coordinates (vertices).
+  ///
+  /// @color the color to be used to draw the line strip.
+  ///
+  /// @mat the matrix to be used to transform the vertices.
   virtual void  draw_line_strip(const void* coords, int vertex_count,
       const rgba& color, const matrix& mat) = 0;
     

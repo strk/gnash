@@ -1,3 +1,9 @@
+2008-05-29 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* backend/render_handler.h: Add anti-alias types for future
+	use. Document draw_line_strip.
+	* backend/render_handler_cairo.cpp: Implement draw_line_strip.
+
 2008-05-29 Sandro Santilli <strk@keybit.net>
 
 	* libbase/curl_adapter.cpp: include boost/version.hpp
