@@ -33,7 +33,6 @@
 #include "as_prop_flags.h" // for enum
 #include "GnashException.h"
 #include "event_id.h" // for event_id
-#include <sstream>
 
 #if defined(__GNUC__) && __GNUC__ > 2
 #  include <cxxabi.h>

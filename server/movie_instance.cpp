@@ -15,13 +15,10 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "movie_instance.h"
 #include "movie_definition.h"
 #include "movie_root.h"
+#include "log.h"
 
 #include <vector>
 #include <string>

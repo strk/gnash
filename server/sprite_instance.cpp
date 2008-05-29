@@ -2627,7 +2627,7 @@ void sprite_instance::call_frame_actions(const as_value& frame_spec)
   if ( playlist )
   {
 	PlayList::const_iterator it = playlist->begin();
-    PlayList::const_iterator e = playlist->end();
+    const PlayList::const_iterator e = playlist->end();
 	for(; it != e; it++)
 	{
 		(*it)->execute_action(this, m_display_list);

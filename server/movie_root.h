@@ -396,10 +396,6 @@ public:
 	getRootMovie()->set_play_state(s);
     }
 
-
-    void * get_userdata() { return m_userdata; }
-    void set_userdata(void * ud ) { m_userdata = ud;  }
-
 	/// Notify still loaded character listeners for key events
 	DSOEXPORT void notify_key_listeners(key::code k, bool down);
 
@@ -859,7 +855,6 @@ private:
 
     float       m_timer;
     int         m_mouse_x, m_mouse_y, m_mouse_buttons;
-    void *      m_userdata;
 
     mouse_button_state  m_mouse_button_state;
 

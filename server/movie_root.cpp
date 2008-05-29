@@ -99,7 +99,6 @@ movie_root::movie_root()
 	m_mouse_x(0),
 	m_mouse_y(0),
 	m_mouse_buttons(0),
-	m_userdata(NULL),
 	m_on_event_xmlsocket_ondata_called(false),
 	m_on_event_xmlsocket_onxml_called(false),
 	m_on_event_load_progress_called(false),

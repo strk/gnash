@@ -766,7 +766,7 @@ as_value::to_object() const
 			return ptr(to_character());
 
 		case STRING:
-			return init_string_instance(getStr().c_str());
+			return init_string_instance(getStr());
 
 		case NUMBER:
 			return init_number_instance(getNum());
