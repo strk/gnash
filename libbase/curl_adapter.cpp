@@ -639,12 +639,8 @@ CurlStreamFile::fillCache(long unsigned size)
 
 	CURLMsg *curl_msg;
 	
-	// Does this also decrement the number of active handles (_running)?
-	// Should however be no more than one.
-	
 	// The number of messages left in the queue (not used by us).
 	int msgs;
-	
 	while ((curl_msg = curl_multi_info_read(_mhandle, &msgs))) {
 
 		// Only for completed transactions

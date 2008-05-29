@@ -1,5 +1,10 @@
 2008-05-29 Sandro Santilli <strk@keybit.net>
 
+	* libbase/curl_adapter.cpp: remove confusing comment about 
+	  _runnign and curl_multi_info_read.
+
+2008-05-29 Sandro Santilli <strk@keybit.net>
+
 	* server/edit_text_character.cpp, server/sprite_instance.cpp,
 	  server/text.{cpp,h}, server/parser/edit_text_character_def.{cpp,h},
 	  server/parser/text_character_def.{cpp,h},
