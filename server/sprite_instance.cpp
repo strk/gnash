@@ -903,7 +903,7 @@ sprite_getInstanceAtDepth(const fn_call& fn)
     return as_value();
   }
 
-  int depth = fn.arg(0).to_number<int>();
+  int depth = fn.arg(0).to_int();
   boost::intrusive_ptr<character> ch = sprite->get_character_at_depth(depth);
   if ( ! ch ) return as_value(); // we want 'undefined', not 'null'
   return as_value(ch.get());

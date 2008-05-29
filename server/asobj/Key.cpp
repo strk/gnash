@@ -152,7 +152,7 @@ key_is_down(const fn_call& fn)
         return as_value();
     }
 
-    int keycode = fn.arg(0).to_number<int>();
+    int keycode = fn.arg(0).to_int();
 
     return as_value(ko->is_key_down(keycode));
 }

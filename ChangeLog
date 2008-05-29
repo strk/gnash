@@ -1,3 +1,12 @@
+2008-05-29 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/generic_character.cpp: header cleanup.
+	* server/sprite_instance.cpp, server/edit_text_character.cpp: replace
+	  deprecated to_number<>().
+	* server/asobj/Key.cpp, server/asobj/NetStream.cpp: ditto.
+	* server/vm/Machine.cpp: ditto.
+	* server/array.cpp: use to_int() instead of casting to_number().
+
 2008-05-29 Sandro Santilli <strk@keybit.net>
 
 	* server/font.{cpp,h}: drop reference to "owning movie"

@@ -381,7 +381,7 @@ public:
 		assert(prevStackSize == _env.stack_size());
 #endif
 
-		return (*_zeroCmp)((int)ret.to_number());
+		return (*_zeroCmp)(ret.to_int());
 	}
 };
 
@@ -476,7 +476,7 @@ public:
 	{
 		if ( _cmps.empty() ) return false;
 
-		Comps::iterator cmp = _cmps.begin();
+		Comps::const_iterator cmp = _cmps.begin();
 		Props::iterator pit;
 
 		// why do we cast ao/bo to objects here ?
@@ -920,7 +920,7 @@ array_splice(const fn_call& fn)
 	// Get start offset
 	//----------------
 	unsigned startoffset;
-	int start = fn.arg(0).to_number<int>();
+	int start = fn.arg(0).to_int();
 	if ( start < 0 ) start = array->size()+start; // start is negative, so + means -abs()
 	startoffset = utility::clamp<int>(start, 0, origlen);
 #ifdef GNASH_DEBUG
@@ -934,7 +934,7 @@ array_splice(const fn_call& fn)
 	unsigned len = origlen - start;
 	if (fn.nargs > 1)
 	{
-		int lenval = fn.arg(1).to_number<int>();
+		int lenval = fn.arg(1).to_int();
 		if ( lenval < 0 )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
@@ -1348,7 +1348,7 @@ array_slice(const fn_call& fn)
 	}
 
 
-	startindex = int(fn.arg(0).to_number());
+	startindex = fn.arg(0).to_int();
 
 	// if the index is negative, it means "places from the end"
 	// where -1 is the last element
@@ -1357,7 +1357,7 @@ array_slice(const fn_call& fn)
 	// if we sent at least two arguments, setup endindex
 	if (fn.nargs >= 2)
 	{
-		endindex = int(fn.arg(1).to_number());
+		endindex = fn.arg(1).to_int();
 
 		// if the index is negative, it means
 		// "places from the end" where -1 is the last element

@@ -170,7 +170,7 @@ static as_value netstream_seek(const fn_call& fn) {
 	boost::uint32_t time = 0;
 	if (fn.nargs > 0)
 	{
-		time = fn.arg(0).to_number<boost::uint32_t>();
+		time = static_cast<boost::uint32_t>(fn.arg(0).to_number());
 	}
 	ns->seek(time);
 
