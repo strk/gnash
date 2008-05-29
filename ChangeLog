@@ -5,8 +5,9 @@
 	  is usually passed to it.
 	* server/asobj/Mouse.cpp, server/asobj/System.cpp,
 	  server/asobj/Stage.cpp, server/asobj/Sound.cpp,
-	  server/asobj/Object.cpp, server/asobj/Global.cpp: get VM from
+	  server/asobj/Object.cpp, server/asobj/Global.cpp get VM from
 	  object.
+	* server/asobj/xml.cpp: ditto.
 
 2008-05-29 Sandro Santilli <strk@keybit.net>
 
