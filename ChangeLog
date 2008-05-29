@@ -1,5 +1,10 @@
 2008-05-29 Bastiaan Jacques <bastiaan@bjacques.org>
 
+	* backend/render_handler{.h,_agg.cpp,_ogl.cpp,_cairo.cpp}: Replace the
+	void pointer to draw_line_strip with the actual type.
+
+2008-05-29 Bastiaan Jacques <bastiaan@bjacques.org>
+
 	* backend/render_handler.h: Add anti-alias types for future
 	use. Document draw_line_strip.
 	* backend/render_handler_cairo.cpp: Implement draw_line_strip.

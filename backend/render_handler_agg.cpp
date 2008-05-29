@@ -719,7 +719,7 @@ public:
 
 
   
-  void  draw_line_strip(const void* coords, int vertex_count, const rgba& color,
+  void  draw_line_strip(const boost::int16_t* coords, int vertex_count, const rgba& color,
                   const matrix& line_mat)
   // Draw the line strip formed by the sequence of points.
   {
@@ -749,7 +749,7 @@ public:
     stroke.line_join(agg::round_join);
     path.remove_all(); // Not obligatory in this case
 
-    const boost::int16_t *vertex = static_cast<const boost::int16_t*>(coords);
+    const boost::int16_t *vertex = coords;
     
     mat.transform(&pnt, point(vertex[0], vertex[1]));
     path.move_to(pnt.x, pnt.y);

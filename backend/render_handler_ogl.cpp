@@ -868,7 +868,7 @@ public:
   //
   /// Can be used to draw empty boxes and cursors.
   virtual void
-  draw_line_strip(const void* coords, int vertex_count, const rgba& color,
+  draw_line_strip(const boost::int16_t* coords, int vertex_count, const rgba& color,
                   const matrix& mat)
   {
     glPushMatrix();

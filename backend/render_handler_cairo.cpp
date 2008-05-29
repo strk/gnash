@@ -405,11 +405,9 @@ public:
     cairo_restore(_cr);
   }
     
-  virtual void  draw_line_strip(const void* coords, int vertex_count,
+  virtual void  draw_line_strip(const boost::int16_t coords[], int vertex_count,
       const rgba& color, const matrix& mat)
-  // In this day and age, do we still need void* pointers?
   {
-    const boost::int16_t* vertices = static_cast<const boost::int16_t*>(coords);
     CairoScopeMatrix mat_transformer(_cr, mat);
 
     if (vertex_count < 2) {
@@ -417,15 +415,15 @@ public:
     }
 
     double x, y;
-    x = vertices[0];
-    y = vertices[1];
+    x = coords[0];
+    y = coords[1];
     snap_to_half_pixel(_cr, x, y);
 
     cairo_move_to(_cr, x, y);
 
     for (int i = 2; i < vertex_count * 2; i += 2) {
-      x = vertices[i];
-      y = vertices[i+1];
+      x = coords[i];
+      y = coords[i+1];
       snap_to_half_pixel(_cr, x, y);
       cairo_line_to(_cr, x, y);
     }
