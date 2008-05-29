@@ -510,7 +510,7 @@ string_index_of(const fn_call& fn)
 static as_value
 string_from_char_code(const fn_call& fn)
 {
-    boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
 
     const int version = obj->getVM().getSWFVersion();
 

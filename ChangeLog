@@ -1,3 +1,8 @@
+2008-05-29 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/asobj/string.cpp: last commit was the wrong version of
+	  string.cpp.
+
 2008-05-29 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* backend/render_handler_ogl.cpp: Apply the requested matrix
