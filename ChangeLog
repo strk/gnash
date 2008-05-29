@@ -1,5 +1,10 @@
 2008-05-29 Sandro Santilli <strk@keybit.net>
 
+	* libbase/curl_adapter.cpp: avoid the _perform on cookies
+	  export (we need _cleanup only); add note about this.
+
+2008-05-29 Sandro Santilli <strk@keybit.net>
+
 	* libbase/curl_adapter.cpp: remove confusing comment about 
 	  _runnign and curl_multi_info_read.
 

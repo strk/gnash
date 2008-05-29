@@ -1029,9 +1029,14 @@ CurlSession::importCookies()
 	}
 
 	// perform, to activate actual cookie file parsing
-	log_debug("Performing on the fake handle to import cookies");
-	ccode = curl_easy_perform(fakeHandle);
-	log_debug("Fake performance returned %s", curl_easy_strerror(ccode));
+	//
+	// NOTE: curl_easy_perform is expected to return an
+	//       "URL using bad/illegal format or missing URL" error,
+	//       there's no way to detect actual cookies import errors
+	//       other then using curl debugging output routines
+	//
+	log_debug("Importing cookies from file '%s'", cookiesIn);
+	curl_easy_perform(fakeHandle);
 
 	curl_easy_cleanup(fakeHandle);
 
@@ -1049,7 +1054,8 @@ CurlSession::exportCookies()
 	//
 	// We'll be creating a fake easy handle for the sole purpose
 	// of exporting cookies. Tests conducted against 7.15.5-CVS
-	// resulted in this working w/out a CURLOPT_URL.
+	// resulted in this working w/out a CURLOPT_URL and w/out a
+	// curl_easy_perform.
 	// 
 	// NOTE: the "correct" way would be to use CURLOPT_COOKIELIST
 	//       with the "FLUSH" special string as value, but that'd
@@ -1065,20 +1071,17 @@ CurlSession::exportCookies()
 	if ( ccode != CURLE_OK ) {
 		throw gnash::GnashException(curl_easy_strerror(ccode));
 	}
+
 	// Configure the fake handle to write cookies to the specified file
 	ccode = curl_easy_setopt(fakeHandle, CURLOPT_COOKIEJAR , cookiesOut);
 	if ( ccode != CURLE_OK ) {
 		throw gnash::GnashException(curl_easy_strerror(ccode));
 	}
 
-	// perform, to activate actual cookie file parsing
-	log_debug("Performing on the fake handle to export cookies");
-	ccode = curl_easy_perform(fakeHandle);
-	log_debug("Fake performance returned %s", curl_easy_strerror(ccode));
-
+	// Cleanup, to trigger actual cookie file flushing
+	log_debug("Exporting cookies file '%s'", cookiesOut);
 	curl_easy_cleanup(fakeHandle);
 
-	//log_error("Cookies export unimplemented yet");
 }
 
 /***********************************************************************
