@@ -872,7 +872,8 @@ public:
                   const matrix& mat)
   {
     glPushMatrix();
-    
+    apply_matrix(mat);
+
     glColor3ub(color.m_r, color.m_g, color.m_b);
 
     // Send the line-strip to OpenGL
@@ -892,10 +893,35 @@ public:
     glPopMatrix();
   }
 
+  // NOTE: this implementation can't handle complex polygons (such as concave
+  // polygons.
   virtual void  draw_poly(const point* corners, size_t corner_count, 
     const rgba& fill, const rgba& outline, const matrix& mat, bool masked)
   {
-    log_unimpl("draw_poly");
+    if (corner_count < 1) {
+      return;
+    }
+
+    glPushMatrix();
+    apply_matrix(mat);
+
+    glColor4ub(fill.m_r, fill.m_g, fill.m_b, fill.m_a);
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+
+    // Draw simple polygon
+    glVertexPointer(2, GL_FLOAT, 0 /* tight packing */, corners);
+    glDrawArrays(GL_POLYGON, 0, corner_count);
+
+    // Draw outline
+    glLineWidth(1.0);
+    glColor4ub(outline.m_r, outline.m_g, outline.m_b, outline.m_a);
+    glVertexPointer(2, GL_FLOAT, 0 /* tight packing */, corners);
+    glDrawArrays(GL_LINE_LOOP, 0, corner_count);
+
+    glDisableClientState(GL_VERTEX_ARRAY);
+
+    glPopMatrix();
   }
 
   virtual void  set_antialiased(bool enable)
