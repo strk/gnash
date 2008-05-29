@@ -1,5 +1,9 @@
 2008-05-29 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* server/asobj/Global.cpp: add note on undefined 'this'.
+
+2008-05-29 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* server/vm/action.cpp: register_component is not the way to
 	  register extensions.
 	* server/parser/character_def.cpp: drop unused forward declaration.
