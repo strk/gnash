@@ -2138,7 +2138,7 @@ textfield_backgroundColor_getset(const fn_call& fn)
 	else // setter
 	{
 		rgba newColor;
-		newColor.parseRGB( fn.arg(0).to_number<boost::uint32_t>() );
+		newColor.parseRGB( static_cast<boost::uint32_t>(fn.arg(0).to_number()) );
 		ptr->setBackgroundColor(newColor);
 	}
 
@@ -2157,7 +2157,7 @@ textfield_borderColor_getset(const fn_call& fn)
 	else // setter
 	{
 		rgba newColor;
-		newColor.parseRGB( fn.arg(0).to_number<boost::uint32_t>() );
+		newColor.parseRGB( static_cast<boost::uint32_t>(fn.arg(0).to_number()) );
 		ptr->setBorderColor(newColor);
 	}
 
@@ -2176,7 +2176,7 @@ textfield_textColor_getset(const fn_call& fn)
 	else // setter
 	{
 		rgba newColor;
-		newColor.parseRGB( fn.arg(0).to_number<boost::uint32_t>() );
+		newColor.parseRGB( static_cast<boost::uint32_t>(fn.arg(0).to_number()) );
 		ptr->setTextColor(newColor);
 	}
 
