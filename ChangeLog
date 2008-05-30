@@ -1,5 +1,10 @@
 2008-05-30 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/gnashrc.in: limit MovieLibrary to 1 element.
+	  Exposes the segfault in bug #23364 on make check.
+
+2008-05-30 Sandro Santilli <strk@keybit.net>
+
 	* server/parser/movie_def_impl.cpp (get_exported_resource):
 	  Rework the check/timeout loop to really sleep between
 	  checks (old code wasn't...). Avoid valgrind runs timing-out

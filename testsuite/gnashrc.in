@@ -25,4 +25,7 @@ set sound true
 # actual output
 set GstAudioSink fakesink
 
+# Open a can of worms by raising likelyhood of movie definition destruction
+set movieLibraryLimit 1
+
 # TODO: enable extensions ?
