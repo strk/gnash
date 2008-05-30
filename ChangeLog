@@ -7,7 +7,7 @@
 	  movie_def_impl.{cpp,h}:
 	  Add new importResources() method taking care of IMPORT
 	  details; have movie_def_impl maintain a list of movies
-	  from which it imports from: fixes bug #
+	  from which it imports from: fixes bug #23364.
 	* server/swf/tag_loaders.cpp (import_loader): just parse
 	  and load the source movie, let the rest be done
 	  by the new importResources() method.
