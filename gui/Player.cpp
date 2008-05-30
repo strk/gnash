@@ -213,10 +213,10 @@ Player::init_gui()
 #endif // def GNASH_FPS_DEBUG
 }
 
-movie_definition* 
+boost::intrusive_ptr<movie_definition>
 Player::load_movie()
 {
-    gnash::movie_definition* md = NULL;
+    boost::intrusive_ptr<gnash::movie_definition> md;
 
     RcInitFile& rcfile = RcInitFile::getDefaultInstance();
     URL vurl(_url);
@@ -392,9 +392,16 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
     _gui->setStage(&root);
 
     // Start loader thread
+    // NOTE: the loader thread might (in IMPORT tag parsing)
+    //       create new movies and register them to the MovieLibrary.
+    //       If MovieLibrary size exceeded, _movieDef might be
+    //       destroyed prematurely. movie_root might actually be
+    //       keeping it alive, as Gui might as well, but why relying
+    //       on luck ? So we made sure to keep _movieDef by 
+    //       intrusive_ptr...
     _movieDef->completeLoad();
 
-    _gui->setMovieDefinition(_movieDef);
+    _gui->setMovieDefinition(_movieDef.get());
 
     if (! _delay) {
       _delay = static_cast<unsigned int>(1000 / movie_fps) ; // milliseconds per frame

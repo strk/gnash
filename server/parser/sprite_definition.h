@@ -198,6 +198,14 @@ public:
 		return m_movie_def->get_exported_resource(sym);
 	}
 
+	/// Overridden just for complaining  about malformed SWF
+	virtual void importResources(boost::intrusive_ptr<movie_definition> /*source*/, Imports& /*imports*/)
+	{
+		IF_VERBOSE_MALFORMED_SWF (
+		log_swferror(_("IMPORT tag appears in DEFINESPRITE tag"));
+		);
+	}
+
 	/// \brief
 	/// Get a character_def from this Sprite's root movie
 	/// CharacterDictionary.

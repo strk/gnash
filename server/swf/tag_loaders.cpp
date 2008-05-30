@@ -61,6 +61,7 @@
 #include <map>
 #include <limits>
 #include <cassert>
+#include <utility> // for std::make_pair
 
 namespace gnash {
 
@@ -1054,45 +1055,44 @@ void	export_loader(stream* in, tag_type tag, movie_definition* m)
 
 void	import_loader(stream* in, tag_type tag, movie_definition* m)
 {
-    assert(tag == SWF::IMPORTASSETS || tag == SWF::IMPORTASSETS2);
+	assert(tag == SWF::IMPORTASSETS || tag == SWF::IMPORTASSETS2);
 
-    std::string source_url;
-    in->read_string(source_url);
+	std::string source_url;
+	in->read_string(source_url);
 
-    // Resolve relative urls against baseurl
-    URL abs_url(source_url, get_base_url());
+	// Resolve relative urls against baseurl
+	URL abs_url(source_url, get_base_url());
 
-    unsigned char import_version = 0;
+	unsigned char import_version = 0;
 
-    if ( tag == SWF::IMPORTASSETS2 )
-    {
-    in->ensureBytes(2);
-	import_version = in->read_uint(8);
-	unsigned char reserved = in->read_uint(8);
-	UNUSED(reserved);
-    }
+	if ( tag == SWF::IMPORTASSETS2 )
+	{
+		in->ensureBytes(2);
+		import_version = in->read_uint(8);
+		unsigned char reserved = in->read_uint(8);
+		UNUSED(reserved);
+	}
 
-    in->ensureBytes(2);
-    int count = in->read_u16();
+	in->ensureBytes(2);
+	int count = in->read_u16();
 
-    IF_VERBOSE_PARSE
-    (
-	    log_parse(_("  import: version = %u, source_url = %s (%s), count = %d"),
-	    import_version, abs_url.str(), source_url, count);
-    );
+	IF_VERBOSE_PARSE
+	(
+		log_parse(_("  import: version = %u, source_url = %s (%s), count = %d"),
+			import_version, abs_url.str(), source_url, count);
+	);
 
 
-    // Try to load the source movie into the movie library.
-    movie_definition*	source_movie = NULL;
+	// Try to load the source movie into the movie library.
+	boost::intrusive_ptr<movie_definition> source_movie;
 
 	try {
 	    source_movie = create_library_movie(abs_url);
 	} catch (gnash::GnashException& e) {
 	    log_error(_("Exception: %s"), e.what());
-	    source_movie = NULL;
 	}
 
-	if (source_movie == NULL)
+	if (!source_movie)
 	{
 	    // Give up on imports.
 	    log_error(_("can't import movie from url %s"), abs_url.str());
@@ -1109,42 +1109,22 @@ void	import_loader(stream* in, tag_type tag, movie_definition* m)
 	    return;
 	}
 
-    // Get the imports.
-    for (int i = 0; i < count; i++)
-    {
-        in->ensureBytes(2);
-	    boost::uint16_t	id = in->read_u16();
-	    std::string symbolName;
-	    in->read_string(symbolName);
-	    IF_VERBOSE_PARSE
-	    (
-	        log_parse(_("  import: id = %d, name = %s"), id, symbolName);
-	    );
+	movie_definition::Imports imports;
 
-        boost::intrusive_ptr<resource> res = source_movie->get_exported_resource(symbolName);
-        if (res == NULL)
-        {
-        log_error(_("import error: could not find resource '%s' in movie '%s'"),
-	          symbolName, source_url);
-        }
-        else if (font* f = res->cast_to_font())
-        {
-            // Add this shared font to the currently-loading movie.
-            m->add_font(id, f);
-        }
-        else if (character_def* ch = res->cast_to_character_def())
-        {
-            // Add this character to the loading movie.
-            m->add_character(id, ch);
-        }
-        else
-        {
-        log_error(_("import error: resource '%s' from movie '%s' has unknown type"),
-	          symbolName, source_url);
-        }
+	// Get the imports.
+	for (int i = 0; i < count; i++)
+	{
+		in->ensureBytes(2);
+		boost::uint16_t	id = in->read_u16();
+		std::string symbolName;
+		in->read_string(symbolName);
+		IF_VERBOSE_PARSE (
+			log_parse(_("  import: id = %d, name = %s"), id, symbolName);
+		);
+		imports.push_back( std::make_pair(id, symbolName) );
+	}
 
-    }
-
+	m->importResources(source_movie, imports);
 }
 
 // Read a DefineText tag.

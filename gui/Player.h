@@ -26,6 +26,8 @@
 #include "gnash.h" // needed for interface and fscommand callbacks
 #include "sound_handler.h" // for visibility of sound_handler destructor
 #include "gui.h"
+#include "movie_definition.h" // for visibility of movie_definition destructor
+#include "smart_ptr.h" // for intrusive_ptr holding of top-level movie
 
 #include <string>
 #include <map>
@@ -206,7 +208,7 @@ private:
 
 	std::string _infile;
 
-	movie_definition* _movieDef;
+	boost::intrusive_ptr<movie_definition> _movieDef;
 	
 	unsigned long _maxAdvances;
 
@@ -216,7 +218,7 @@ private:
 	/// stdin when it equals "-". May throw a GnashException
 	/// on failure.
 	///
-	movie_definition* load_movie();
+	boost::intrusive_ptr<movie_definition> load_movie();
 
 #ifdef GNASH_FPS_DEBUG
 	float _fpsDebugTime;

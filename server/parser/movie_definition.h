@@ -202,6 +202,22 @@ public:
 	}
 
 
+	typedef std::pair<int, std::string> ImportSpec;
+	typedef std::vector< ImportSpec > Imports;
+
+	/// Import resources 
+	//
+	/// @param source
+	///	Movie containing the resources being imported
+	///
+	/// @param imports
+	///	Resources to import, each with the id to use in our dictionary
+	///
+	virtual void importResources(boost::intrusive_ptr<movie_definition> /*source*/, Imports& /*imports*/)
+	{
+	}
+
+
 	/// \brief
 	/// Get a character from the dictionary.
 	//

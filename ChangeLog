@@ -1,5 +1,19 @@
 2008-05-30 Sandro Santilli <strk@keybit.net>
 
+	* gui/Player.{cpp,h}: keep the toplevel movie in an intrusive_ptr
+	  just in case someone else will get it in and out of one while
+	  we're still using it (would prematurely destroy it).
+	* server/parser/: movie_definition.h, sprite_definition.h,
+	  movie_def_impl.{cpp,h}:
+	  Add new importResources() method taking care of IMPORT
+	  details; have movie_def_impl maintain a list of movies
+	  from which it imports from: fixes bug #
+	* server/swf/tag_loaders.cpp (import_loader): just parse
+	  and load the source movie, let the rest be done
+	  by the new importResources() method.
+
+2008-05-30 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/gnashrc.in: limit MovieLibrary to 1 element.
 	  Exposes the segfault in bug #23364 on make check.
 

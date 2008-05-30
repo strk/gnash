@@ -910,4 +910,45 @@ movie_def_impl::markReachableResources() const
 }
 #endif // GNASH_USE_GC
 
+void
+movie_def_impl::importResources(boost::intrusive_ptr<movie_definition> source, Imports& imports)
+{
+	size_t importedSyms=0;
+	for (Imports::iterator i=imports.begin(), e=imports.end(); i!=e; ++i)
+	{
+		int id = i->first;
+		const std::string& symbolName = i->second;
+
+	        boost::intrusive_ptr<resource> res = source->get_exported_resource(symbolName);
+	        if (!res)
+	        {
+			log_error(_("import error: could not find resource '%s' in movie '%s'"),
+				symbolName, source->get_url());
+			continue;
+	        }
+	        else if (font* f = res->cast_to_font())
+		{
+			// Add this shared font to the currently-loading movie.
+			add_font(id, f);
+			++importedSyms;
+	        }
+	        else if (character_def* ch = res->cast_to_character_def())
+	        {
+			// Add this character to the loading movie.
+			add_character(id, ch);
+			++importedSyms;
+	        }
+	        else
+	        {
+			log_error(_("importResources error: unsupported import of '%s' from movie '%s' has unknown type"),
+				symbolName, source->get_url());
+	        }
+	}
+
+	if ( importedSyms )
+	{
+		_importSources.insert(source);
+	}
+}
+
 } // namespace gnash

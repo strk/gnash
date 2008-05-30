@@ -31,6 +31,7 @@
 #include "StringPredicates.h" // for case-insensitive string comparision (ExportMap)
 
 #include <map> // for CharacterDictionary
+#include <set> // for _importSources
 #include <string>
 #include <memory> // for auto_ptr
 #include <boost/thread/thread.hpp>
@@ -292,6 +293,9 @@ private:
 	/// A flag set to true when load cancelation is requested
 	bool _loadingCanceled;
 
+	/// Movies we import resources from
+	std::set< boost::intrusive_ptr<movie_definition> > _importSources;
+
 public:
 
 	movie_def_impl();
@@ -368,6 +372,8 @@ public:
 	///         resource, or if a timeout occurs while scanning the movie.
 	///
 	virtual boost::intrusive_ptr<resource> get_exported_resource(const std::string& symbol);
+
+	virtual void importResources(boost::intrusive_ptr<movie_definition> source, Imports& imports);
 
 	void add_character(int character_id, character_def* c);
 
