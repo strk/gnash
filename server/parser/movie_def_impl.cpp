@@ -769,8 +769,6 @@ movie_def_impl::export_resource(const std::string& symbol, resource* res)
 boost::intrusive_ptr<resource>
 movie_def_impl::get_exported_resource(const std::string& symbol)
 {
-	boost::intrusive_ptr<resource> res;
-
 #ifdef DEBUG_EXPORTS
 	log_debug(_("get_exported_resource called, frame count=%u"), m_frame_count);
 #endif
@@ -794,20 +792,22 @@ movie_def_impl::get_exported_resource(const std::string& symbol)
 	const unsigned long naptime=500000;
 
 	// Timeout after two seconds of NO frames progress
-	const unsigned long def_timeout=2000000/naptime;
+	const unsigned long timeout_ms=2000000;
+	const unsigned long def_timeout=timeout_ms/naptime; 
 
 	unsigned long timeout=def_timeout;
 	size_t loading_frame = (size_t)-1; // used to keep track of advancements
-	for (;;)
+
+	for(;;)
 	{
+		size_t new_loading_frame = get_loading_frame();
+
 		// _exportedResources access is thread-safe
 		{
 			boost::mutex::scoped_lock lock(_exportedResourcesMutex);
 			ExportMap::iterator it = _exportedResources.find(symbol);
 			if ( it != _exportedResources.end() ) return it->second;
 		}
-
-		size_t new_loading_frame = get_loading_frame();
 
 		if ( new_loading_frame != loading_frame )
 		{
@@ -817,60 +817,34 @@ movie_def_impl::get_exported_resource(const std::string& symbol)
 				loading_frame, new_loading_frame);
 #endif
 			loading_frame = new_loading_frame;
-			timeout = def_timeout;
+			timeout = def_timeout+1;
 		}
-		else
+		else if ( ! --timeout || loading_frame >= m_frame_count )
 		{
-			if ( ! timeout-- )
-			{
-				log_error(_("No frame progress in movie %s "
-					"after %lu milliseconds "
-					"(%lu microseconds = %lu iterations), "
-					"giving up on "
-					"get_exported_resource(%s): "
-					"circular IMPORTS?"),
-					get_url(),
-					(def_timeout*naptime)/1000,
-					def_timeout*naptime,
-					def_timeout,
-					symbol);
-				return res;
-			}
-
-#ifdef DEBUG_EXPORTS
-			log_debug(_("No frame progress at iteration %lu of get_exported_resource(%s)"),
-				timeout, symbol);
-#endif
-
-			continue; // not worth checking
+			break;
 		}
 
-		if ( loading_frame >= m_frame_count )
-		{
-#ifdef DEBUG_EXPORTS
-			boost::mutex::scoped_lock lock(_exportedResourcesMutex);
-			log_debug(_("At end of stream, still no '%s' symbol found "
-				"in _exportedResources (%d entries in it, "
-				"follow)"), symbol, _exportedResources.size());
-			for (ExportMap::const_iterator it=_exportedResources.begin(); it!=_exportedResources.end(); ++it)
-			{
-				log_debug(" symbol %s (%s)", it->first, typeName(*(it->second)));
-			}
-#endif
-			return res;
-		}
+		// take a breath to give other threads more time to advance
+		usleep(naptime);
 
-#ifdef DEBUG_EXPORTS
-		log_debug(_("We haven't finished loading (loading frame %u), "
-			"and _exportedResources.get returned no entries, "
-			"sleeping a bit and trying again"),
-			get_loading_frame());
-#endif
-
-		usleep(naptime); // take a breath
 	}
 
-	return res;
+	if ( ! timeout ) // timed out
+	{
+		log_error("Timeout (%d milliseconds) seeking export symbol %s in movie %s. "
+			"Frames loaded %d/%d",
+			timeout_ms/1000, symbol, _url, loading_frame, m_frame_count);
+	}
+	else // eof 
+	{
+		assert(loading_frame >= m_frame_count);
+		log_error("No export symbol %s found in movie %s. "
+			"Frames loaded %d/%d",
+			symbol, _url, loading_frame, m_frame_count);
+	}
+
+	return boost::intrusive_ptr<resource>(0); // 0
+
 }
 
 void

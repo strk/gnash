@@ -1,3 +1,10 @@
+2008-05-30 Sandro Santilli <strk@keybit.net>
+
+	* server/parser/movie_def_impl.cpp (get_exported_resource):
+	  Rework the check/timeout loop to really sleep between
+	  checks (old code wasn't...). Avoid valgrind runs timing-out
+	  on Dejagnu.swf import.
+
 2008-05-29 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/asobj/Global.cpp: add note on undefined 'this'.
