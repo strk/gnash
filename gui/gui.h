@@ -15,8 +15,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef _GUI_H_
-#define _GUI_H_
+#ifndef HAVE_GUI_H
+#define HAVE_GUI_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -33,6 +33,10 @@
 
 #include <string>
 #include <map>
+
+// Define this to enable fps debugging without touching
+// gnashconfig.h
+//#define GNASH_FPS_DEBUG
 
 // Define the following macro if you want to skip rendering
 // when late on FPS time.

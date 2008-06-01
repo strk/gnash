@@ -18,7 +18,7 @@
 //
 
 #ifdef HAVE_CONFIG_H
-#include "gnashconfig.h" // USE_SWFTREE, SIZET_FMT
+#include "gnashconfig.h" // USE_SWFTREE 
 #endif
 
 #include "log.h" 

@@ -32,6 +32,7 @@
 
 #ifdef GNASH_FPS_DEBUG
 #include "ClockTime.h"
+#include <boost/format.hpp>
 #endif
 
 #include <cstdio>
@@ -109,7 +110,7 @@ Gui::Gui() :
     ,_keyboardMouseMovementsStep(1)
 #endif
 {
-//    GNASH_REPORT_FUNCTION;
+
 }
 
 Gui::Gui(unsigned long xid, float scale, bool loop, unsigned int depth)
@@ -154,10 +155,10 @@ Gui::Gui(unsigned long xid, float scale, bool loop, unsigned int depth)
 
 Gui::~Gui()
 {
-//    GNASH_REPORT_FUNCTION;
+
     delete _renderer;
 #ifdef GNASH_FPS_DEBUG
-    printf("Total frame advances: %u\n", fps_counter_total);
+    std::cerr << "Total frame advances: " << fps_counter_total << std::endl;
 #endif
 }
 
@@ -176,25 +177,14 @@ Gui::unsetFullscreen()
 bool
 Gui::showMouse(bool /* show */)
 {
-	static bool warned = false;
-	if (!warned)
-	{
-    	log_unimpl(_("Mouse show/hide not yet supported in this GUI"));
-    	warned = true;
-   	}
-   	
+	LOG_ONCE(log_unimpl(_("Mouse show/hide not yet supported in this GUI")));
    	return true;
 }
 
 void
 Gui::showMenu(bool /* show */)
 {
-	static bool warned = false;
-	if (!warned)
-	{
-    	log_unimpl(_("menushow not yet supported in this GUI"));
-    	warned = true;
-   	}
+	LOG_ONCE(log_unimpl(_("menushow not yet supported in this GUI")));
 }
 
 void
@@ -211,14 +201,9 @@ Gui::toggleFullscreen()
 void
 Gui::menu_restart()
 {
-//    GNASH_REPORT_FUNCTION;
-
 	_stage->reset();
 	_started = false;
 	start();
-
-	//_stage->restart();
-
 }
 
 void
@@ -413,45 +398,30 @@ Gui::resize_view(int width, int height)
 void
 Gui::menu_quit()
 {
-//    GNASH_REPORT_FUNCTION;
     quit();
 }
 
 void
 Gui::menu_play()
 {
-//    GNASH_REPORT_FUNCTION;
-    //get_current_root()->set_play_state(gnash::sprite_instance::PLAY);
     play();
 }
 
 void
 Gui::menu_pause()
 {
-//    GNASH_REPORT_FUNCTION;
-
     pause();
-//    movie_root* m = get_current_root();
-//    if (m->get_play_state() == gnash::sprite_instance::STOP) {
-//      m->set_play_state(gnash::sprite_instance::PLAY);
-//    } else {
-//      m->set_play_state(gnash::sprite_instance::STOP);
-//    }
-
 }
 
 void
 Gui::menu_stop()
 {
-//    GNASH_REPORT_FUNCTION;
-    //get_current_root()->set_play_state(gnash::sprite_instance::STOP);
     stop();
 }
 
 void
 Gui::menu_step_forward()
 {
-//    GNASH_REPORT_FUNCTION;
 	movie_root* m = get_current_root();
 	m->goto_frame(m->get_current_frame()+1);
 }
@@ -459,8 +429,6 @@ Gui::menu_step_forward()
 void
 Gui::menu_step_backward()
 {
-//    GNASH_REPORT_FUNCTION;
-
 	movie_root* m = get_current_root();
 	m->goto_frame(m->get_current_frame()-1);
 }
@@ -468,8 +436,6 @@ Gui::menu_step_backward()
 void
 Gui::menu_jump_forward()
 {
-//    GNASH_REPORT_FUNCTION;
-
 	movie_root* m = get_current_root();
 	m->goto_frame(m->get_current_frame()+10);
 }
@@ -477,8 +443,6 @@ Gui::menu_jump_forward()
 void
 Gui::menu_jump_backward()
 {
-//    GNASH_REPORT_FUNCTION;
-
 	movie_root* m = get_current_root();
 	m->goto_frame(m->get_current_frame()-10);
 }
@@ -486,7 +450,7 @@ Gui::menu_jump_backward()
 void
 Gui::menu_toggle_sound()
 {
-//    GNASH_REPORT_FUNCTION;
+
     media::sound_handler* s = get_sound_handler();
 
     if (!s)
@@ -906,7 +870,7 @@ Gui::advanceMovie()
 
     if ( ! _started ) start();
   
-//	GNASH_REPORT_FUNCTION;
+
 
 #ifdef SKIP_RENDERING_IF_LATE
 	WallClockTimer advanceTimer;
@@ -1137,7 +1101,6 @@ Gui::getMovieInfo() const
 void 
 Gui::fpsCounterTick()
 {
-  // GNASH_REPORT_FUNCTION;
 
   // increment this *before* the early return so that
   // frame count on exit is still valid
@@ -1172,7 +1135,7 @@ Gui::fpsCounterTick()
       // the timers are unsigned, so when the clock runs "backwards" it leads
       // to a very high difference value. In theory, this should never happen
       // with ticks, but it does on my machine (which may have a hw problem?).
-      printf("Time glich detected, need to restart FPS counters, sorry...\n");
+      std::cerr << "Time glitch detected, need to restart FPS counters, sorry..." << std::endl;
       
       fps_timer = current_timer;
       fps_start_timer = current_timer;
@@ -1193,9 +1156,11 @@ Gui::fpsCounterTick()
     float avg = fps_counter_total / secs_total; 
   
     //log_debug("Effective frame rate: %0.2f fps", (float)(fps_counter/secs));
-    printf("Effective frame rate: %0.2f fps (min %0.2f, avg %0.2f, max %0.2f, "
-      "%u frames in %0.1f secs total)\n", rate, fps_rate_min, avg, fps_rate_max,
-      fps_counter_total, secs_total);
+    std::cerr << boost::format("Effective frame rate: %0.2f fps "
+                               "(min %0.2f, avg %0.2f, max %0.2f, "
+                               "%u frames in %0.1f secs total)") % rate %
+                               fps_rate_min % avg % fps_rate_max %
+                               fps_counter_total % secs_total << std::endl;
       
     fps_counter = 0;
     fps_timer = current_timer;

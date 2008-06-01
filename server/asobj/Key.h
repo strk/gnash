@@ -17,8 +17,8 @@
 // 
 
 
-#ifndef __KEY_H__
-#define __KEY_H__
+#ifndef HAVE_KEY_H
+#define HAVE_KEY_H
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "as_object.h" // for inheritance
@@ -90,6 +90,6 @@ void key_class_init(as_object& global);
 
 } // end of gnash namespace
 
-// __KEY_H__
+// HAVE_KEY_H
 #endif
 

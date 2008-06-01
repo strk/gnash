@@ -73,8 +73,6 @@ key_as_object::set_key_down(key::code code)
     // we lookup keycode to add to _unreleasedKeys.   
     size_t keycode = key::codeMap[code][key::KEY];
 
-    assert(keycode < _unreleasedKeys.size());
-
     _unreleasedKeys.set(keycode, 1);
 }
 
@@ -90,8 +88,6 @@ key_as_object::set_key_up(key::code code)
     // Key.isDown() only cares about flash keycode, not character, so
     // we lookup keycode to add to _unreleasedKeys.
     size_t keycode = key::codeMap[code][key::KEY];
-
-    assert(keycode < _unreleasedKeys.size());
 
     _unreleasedKeys.set(keycode, 0);
 }

@@ -1,3 +1,16 @@
+2008-06-01 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/asobj/Key.{cpp,h}: small change, lots of rebuilding:
+	  any name containing a double underscore is reserved to the
+	  implementation, so don't use them even as header guards. Drop
+	  bounds assertion before std::bitset, which has its own checks.
+	* gui/gui.{cpp,h}: an initial underscore followed by a capital
+	  letter is also a reserved identifier. Boost-formatize FPS
+	  debugging and use iostreams, not printf. Drop GNASH_REPORT_FUNCTION
+	  where it's commented out. Use LOG_ONCE.
+	* server/sprite_instance.cpp: very minor comment cleanup.
+	
+
 2008-05-30 Sandro Santilli <strk@keybit.net>
 
 	* gui/Player.{cpp,h}: keep the toplevel movie in an intrusive_ptr
