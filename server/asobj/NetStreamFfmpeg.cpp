@@ -33,6 +33,7 @@
 #include "sound_handler.h"
 #include "VideoDecoderFfmpeg.h"
 #include "SystemClock.h"
+#include "gnash.h" // get_sound_handler()
 
 #include "FLVParser.h" 
 

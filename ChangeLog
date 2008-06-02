@@ -1,5 +1,9 @@
 2008-06-02 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* server/asobj/NetStreamFfmpeg.cpp: gnash.h for get_sound_handler().
+
+2008-06-02 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* server/dlist.cpp, server/fontlib.cpp, server/sprite_instance.cpp,
 	  server/types.cpp, testsuite/FuzzyPixel.h, testsuite/MovieTester.h,
 	  testsuite/misc-ming.all/DrawingApiTestRunner.cpp,
