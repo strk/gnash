@@ -17,11 +17,11 @@
  *
  */ 
 
-#ifndef _GNASH_FUZZYPIXEL_H
-#define _GNASH_FUZZYPIXEL_H
+#ifndef GNASH_FUZZYPIXEL_H
+#define GNASH_FUZZYPIXEL_H
 
 #include "Range2d.h"
-#include "gnash.h" // for namespace key
+#include "GnashKey.h" // for namespace key
 #include "types.h" // for rgba class
 
 #include <iostream> 

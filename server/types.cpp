@@ -10,9 +10,7 @@
 #include "log.h"
 #include "stream.h"
 #include "render.h"
-#include "gnash.h"
 
-#include <cstring>
 #include <sstream> // for ::print and ::toString
 
 namespace gnash {

@@ -49,7 +49,7 @@
 #include "URLAccessManager.h" // for loadVariables
 #include "LoadVariablesThread.h" 
 #include "ExecutableCode.h" // for inheritance of ConstructEvent
-#include "gnash.h" // for point class !
+#include "gnash.h" // for get_sound_handler
 #include "Object.h" // for getObjectInterface
 #include "DynamicShape.h" // for composition
 #include "namedStrings.h"

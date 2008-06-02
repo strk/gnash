@@ -25,7 +25,7 @@
 #include "character.h"
 #include "dlist.h"
 #include "log.h"
-#include "gnash.h" // for gnash::key::code
+#include "GnashKey.h" // for gnash::key::code
 
 #include "check.h"
 #include <string>

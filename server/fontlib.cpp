@@ -7,7 +7,6 @@
 
 
 #include "tu_file.h"
-#include "gnash.h"
 #include "font.h"
 #include "impl.h"
 #include "log.h"

@@ -18,15 +18,15 @@
  *
  */ 
 
-#ifndef _GNASH_MOVIETESTER_H
-#define _GNASH_MOVIETESTER_H
+#ifndef GNASH_MOVIETESTER_H
+#define GNASH_MOVIETESTER_H
 
 #ifdef HAVE_CONFIG_H
 # include "gnashconfig.h" // For exp2 test
 #endif
 
 #include "Range2d.h"
-#include "gnash.h" // for namespace key
+#include "GnashKey.h"
 #include "sound_handler.h" // for creating the "test" sound handlers
 #include "types.h" // for rgba class
 #include "render_handler.h" // for dtor visibility by auto_ptr

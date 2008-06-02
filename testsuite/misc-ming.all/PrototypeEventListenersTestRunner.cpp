@@ -27,7 +27,7 @@
 #include "log.h"
 #include "VM.h"
 #include "string_table.h"
-#include "gnash.h" // gnash::key::code
+#include "GnashKey.h" // gnash::key::code
 
 #include "check.h"
 #include <string>

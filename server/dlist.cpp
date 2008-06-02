@@ -21,7 +21,6 @@
 #include "dlist.h"
 #include "log.h"
 #include "render.h"
-#include "gnash.h" 
 #include "StringPredicates.h"
 #include "sprite_instance.h"
 
