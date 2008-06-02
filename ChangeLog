@@ -1,5 +1,9 @@
 2008-06-02 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* testsuite/swfdec/PASSING: new tests.
+
+2008-06-02 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* server/GnashKey.h, server/gnash.h: move key::code enums
 	  into a separate file, stop undefining some names to see
 	  if it still causes problems.
