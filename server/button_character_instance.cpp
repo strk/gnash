@@ -38,6 +38,7 @@
 #include "namedStrings.h"
 #include "Object.h" // for getObjectInterface
 #include "StringPredicates.h"
+#include "GnashKey.h" // key::code
 
 /** \page buttons Buttons and mouse behaviour
 

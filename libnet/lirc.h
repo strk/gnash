@@ -15,10 +15,10 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef __LIRC_H__
-#define __LIRC_H__
+#ifndef GNASH_LIRC_H
+#define GNASH_LIRC_H
 
-#include "gnash.h"
+#include "GnashKey.h"
 #include "network.h"
 
 namespace gnash {
@@ -42,7 +42,7 @@ public:
 
 } // end of gnash namespace
 
-// __LIRC_H__
+// GNASH_LIRC_H
 #endif
 
 // Local Variables:

@@ -28,6 +28,7 @@
 #include "Object.h" // for getObjectInterface()
 #include "AsBroadcaster.h" // for initializing self as a broadcaster
 #include "namedStrings.h"
+#include "GnashKey.h" // key::code
 
 namespace gnash {
 

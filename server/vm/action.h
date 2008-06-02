@@ -23,13 +23,9 @@
 
 #include "dsodefs.h" // for DSOEXPORT
 
-#include "gnash.h"
 #include "as_object.h"
 #include "types.h"
 #include "smart_ptr.h"
-
-#include <cwchar>
-
 
 namespace gnash {
 	class sprite_instance;

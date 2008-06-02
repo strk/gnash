@@ -28,7 +28,7 @@
 #include "movie_definition.h"
 #include "action_buffer.h"
 #include "filter_factory.h"
-#include "gnash.h" // for gnash::key::codeMap
+#include "GnashKey.h" // for gnash::key::codeMap
 
 namespace gnash {
 

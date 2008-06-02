@@ -69,7 +69,6 @@
 #include "gnashconfig.h" //USE_SWFTREE
 #endif
 
-
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "dsodefs.h" // DSOEXPORT
 #include "mouse_button_state.h" // for composition
@@ -78,6 +77,7 @@
 #include "asobj/Key.h"
 #include "smart_ptr.h" // for memory management
 #include "URL.h" // for loadMovie
+#include "GnashKey.h" // key::code
 
 #ifdef USE_SWFTREE
 # include "tree.hh"

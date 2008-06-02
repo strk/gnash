@@ -23,7 +23,7 @@
 #include "string_table.h"
 #include "dsodefs.h"
 
-#include "gnash.h" // for gnash::key namespace
+#include "GnashKey.h" // for gnash::key::code
 
 namespace gnash {
 

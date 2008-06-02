@@ -23,7 +23,6 @@
 #include "builtin_function.h" // for _global.Function
 #include "as_value.h"
 #include "array.h"
-#include "gnash.h"
 #include "fn_call.h"
 #include "GnashException.h"
 #include "VM.h"

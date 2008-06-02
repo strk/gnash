@@ -151,6 +151,7 @@ noinst_HEADERS = \
 	fontlib.h \
 	generic_character.h \
 	gnash.h	\
+	GnashKey.h \
 	impl.h \
 	LoadVariablesThread.h \
 	matrix.h \

@@ -21,9 +21,9 @@
 #endif
 
 #include <string>
-
 #include <iostream>
-#include "gnash.h"
+
+#include "GnashKey.h" // key::code
 #include "network.h"
 #include "log.h"
 #include "lirc.h"
@@ -80,7 +80,7 @@ gnash::key::code
 Lirc::getKey()
 {
 //    GNASH_REPORT_FUNCTION;
-    key::code key;
+    key::code key = gnash::key::INVALID;
     
     byte_t buf[LIRC_PACKET_SIZE];
     memset(buf, 0, LIRC_PACKET_SIZE);

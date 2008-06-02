@@ -18,12 +18,6 @@
 #ifndef GNASH_ACTION_BUFFER_H
 #define GNASH_ACTION_BUFFER_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
-
-#include "gnash.h"
 #include "types.h"
 
 #include <boost/cstdint.hpp> // for boost::uint8_t

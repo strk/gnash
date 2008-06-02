@@ -50,6 +50,7 @@ namespace gnash {
   class movie_instance;
   class ExecutableCode;
   class action_buffer;
+  class movie_definition;
 }
 
 namespace gnash {

@@ -49,7 +49,7 @@ namespace gnash {
 
   void
   Timer::setInterval(as_function& method, unsigned long ms, boost::intrusive_ptr<as_object> this_ptr, 
-		  std::vector<as_value>& args, bool runOnce)
+		  ArgsContainer& args, bool runOnce)
   {
     _function = &method;
     _interval = ms; // keep as milliseconds
@@ -202,7 +202,7 @@ as_value
 timer_setinterval(const fn_call& fn)
 {
 	//std::stringstream ss; fn.dump_args(ss);
-	//log_debug("setInterval(%s)", ss.str().c_str());
+	//log_debug("setInterval(%s)", ss.str());
 
 	//log_debug("%s: args=%d", __FUNCTION__, fn.nargs);
     
@@ -212,7 +212,7 @@ timer_setinterval(const fn_call& fn)
 			std::stringstream ss; fn.dump_args(ss);
 			log_aserror("Invalid call to setInterval(%s) "
 				"- need at least 2 arguments",
-				ss.str().c_str());
+				ss.str());
 		);
 		return as_value();
 	}
@@ -226,7 +226,7 @@ timer_setinterval(const fn_call& fn)
 			std::stringstream ss; fn.dump_args(ss);
 			log_aserror("Invalid call to setInterval(%s) "
 				"- first argument is not an object or function",
-				ss.str().c_str());
+				ss.str());
 		);
 		return as_value();
 	}
@@ -248,7 +248,7 @@ timer_setinterval(const fn_call& fn)
 			std::stringstream ss; fn.dump_args(ss);
 			log_aserror("Invalid call to setInterval(%s) "
 				"- missing timeout argument",
-				ss.str().c_str());
+				ss.str());
 		);
 		return as_value();
 	}
@@ -286,7 +286,7 @@ as_value
 timer_settimeout(const fn_call& fn)
 {
 	//std::stringstream ss; fn.dump_args(ss);
-	//log_debug("setTimeout(%s)", ss.str().c_str());
+	//log_debug("setTimeout(%s)", ss.str());
 
 	//log_debug("%s: args=%d", __FUNCTION__, fn.nargs);
     
@@ -296,7 +296,7 @@ timer_settimeout(const fn_call& fn)
 			std::stringstream ss; fn.dump_args(ss);
 			log_aserror("Invalid call to setTimeout(%s) "
 				"- need at least 2 arguments",
-				ss.str().c_str());
+				ss.str());
 		);
 		return as_value();
 	}
@@ -310,7 +310,7 @@ timer_settimeout(const fn_call& fn)
 			std::stringstream ss; fn.dump_args(ss);
 			log_aserror("Invalid call to setInterval(%s) "
 				"- first argument is not an object or function",
-				ss.str().c_str());
+				ss.str());
 		);
 		return as_value();
 	}
@@ -332,7 +332,7 @@ timer_settimeout(const fn_call& fn)
 			std::stringstream ss; fn.dump_args(ss);
 			log_aserror("Invalid call to setTimeout(%s) "
 				"- missing timeout argument",
-				ss.str().c_str());
+				ss.str());
 		);
 		return as_value();
 	}

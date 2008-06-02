@@ -15,14 +15,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "log.h"
 #include "swf_function.h"
 #include "array.h"
-#include "gnash.h"
 #include "fn_call.h"
 #include "sprite_instance.h"
 #include "action_buffer.h"

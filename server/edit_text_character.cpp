@@ -41,6 +41,7 @@
 #include "AsBroadcaster.h" // for initializing self as a broadcaster
 #include "StringPredicates.h"
 #include "TextFormat.h" // for getTextFormat/setTextFormat
+#include "GnashKey.h" // key::code
 
 #include <algorithm> // std::min
 #include <string>

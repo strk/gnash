@@ -25,7 +25,6 @@
 #include <string>
 #include <boost/scoped_array.hpp>
 
-#include "gnash.h"
 #include "stream.h"
 #include "string_table.h"
 #include "asClass.h"

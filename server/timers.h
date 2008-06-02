@@ -15,21 +15,15 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef __TIMERS_H__
-#define __TIMERS_H__
-
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
+#ifndef HAVE_TIMERS_H
+#define HAVE_TIMERS_H
 
 #include "dsodefs.h"
 
 #include "as_value.h" // for struct variable composition
 #include "as_object.h" // for inheritance
 #include "as_function.h" // for visibility of destructor by intrusive_ptr
-#include "smart_ptr.h"
-
-//#include "tu_timer.h"
+#include "smart_ptr.h" // GNASH_USE_GC
 
 #include <string>
 #include <vector> 
@@ -247,5 +241,5 @@ private:
   
 } // end of namespace gnash
 
-  // __TIMERS_H_
+  // HAVE_TIMERS_H
 #endif

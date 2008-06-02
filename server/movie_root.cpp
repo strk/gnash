@@ -32,6 +32,7 @@
 #include "GnashException.h"
 #include "sound_handler.h"
 #include "timers.h" // for Timer use
+#include "GnashKey.h" // key::code
 
 #include <utility>
 #include <iostream>

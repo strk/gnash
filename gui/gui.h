@@ -24,7 +24,7 @@
 
 #include "rect.h"  // for composition
 #include "snappingrange.h"  // for InvalidatedRanges
-#include "gnash.h" // for gnash::key::code type
+#include "GnashKey.h" // for gnash::key::code type
 #include "smart_ptr.h"
 
 #ifdef USE_SWFTREE
@@ -65,6 +65,7 @@ namespace gnash
 {
     class render_handler;
     class movie_root;
+    class movie_definition;
 }
 
 namespace gnash

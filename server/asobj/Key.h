@@ -24,15 +24,9 @@
 #include "as_object.h" // for inheritance
 #include "fn_call.h"
 #include "event_id.h"
-#include "gnash.h" // for gnash::key namespace
+#include "GnashKey.h" // for key::code
 #include "dsodefs.h"
 #include <bitset>
-
-#ifdef WIN32
-#   undef _CONTROL
-#   undef _SPACE
-#   undef _UP
-#endif
 
 namespace gnash {
 

@@ -1,3 +1,21 @@
+2008-06-02 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/GnashKey.h, server/gnash.h: move key::code enums
+	  into a separate file, stop undefining some names to see
+	  if it still causes problems.
+	* server/as_function.cpp, server/button_character_instance.cpp
+	  server/character.h, server/edit_text_character.cpp,
+	  server/event_id.h, server/movie_root.cpp server/movie_root.h,
+	  server/swf_function.cpp, server/asobj/Key.{h,cpp},
+	  server/parser/abc_block.h, server/parser/action_buffer.h,
+	  server/vm/action.h, server/parser/button_character_def.cpp,
+	  server/swf/PlaceObject2Tag.cpp, gui/gui.h, libnet/lirc{h,cpp}:
+	  replace gnash.h with GnashKey.h where only key::code is required,
+	  drop gnash.h where it's not needed. General header and header
+	  guard cleanups.
+	* server/timers.{cpp,h}: drop c_str() for logging, clean up, 
+	  use legal header guard define. 
+
 2008-06-01 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/asobj/Key.{cpp,h}: small change, lots of rebuilding:
