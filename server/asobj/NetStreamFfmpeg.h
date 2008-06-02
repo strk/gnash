@@ -63,6 +63,13 @@ extern "C" {
 /// Uncomment the following to load media in a separate thread
 //#define LOAD_MEDIA_IN_A_SEPARATE_THREAD
 
+// Forward declarations
+namespace gnash {
+	namespace media {
+		class sound_handler;
+	}
+}
+
 namespace gnash {
   
 
