@@ -155,36 +155,30 @@ MovieLoader::start()
 //
 
 /// Log the contents of the current tag, in hex to the output strream
-static void	dump_tag_bytes(stream* in, std::ostream& os)
+static void	dumpTagBytes(stream* in, std::ostream& os)
 {
-    static const int	ROW_BYTES = 16;
-    char	row_buf[ROW_BYTES];
-    int	row_count = 0;
-
-    row_buf[ROW_BYTES-1] = '\0';
-
+    const unsigned int rowlength = 16;
     os << std::endl;
-    while(in->get_position() < in->get_tag_end_position())
+    
+    // This decremented until we reach the end of the stream.
+    unsigned int toread = in->get_tag_end_position() - in->get_position();
+    in->ensureBytes(toread);
+
+    unsigned char buf[rowlength];    
+    while (toread)
     {
-            int	c = in->read_u8();
-            os << std::hex << std::setw(2) << std::setfill('0') << c << " ";
+        // Read in max row length or remainder of stream.
+        unsigned int got = in->read(reinterpret_cast<char*>(&buf),
+                                    std::min<unsigned>(toread, rowlength));
+        
+        // Stream once as hex
+        os << std::left << std::setw(3 * rowlength) << hexify(buf, got, false);
+        
+        // and once as ASCII
+        os << "| " << hexify(buf, got, true) << std::endl;
 
-            if (c < 32 || c > 127 ) c = '.';
-            row_buf[row_count] = c;
-
-            row_count++;
-            if (row_count >= ROW_BYTES)
-            {
-                    os << row_buf << std::endl;
-                    row_count = 0;
-            }
-   }
-   if ( row_count )
-   {
-            row_buf[row_count] = '\0';
-            while (row_count++ < ROW_BYTES ) os << "   ";
-            os << row_buf << std::endl;
-   }
+        toread -= got;
+    }
 }
 
 
@@ -211,7 +205,6 @@ movie_def_impl::movie_def_impl()
 
 movie_def_impl::~movie_def_impl()
 {
-	//cout << "movie_def_impl dtor called" << endl;
 
 	// Request cancelation of the loading thread
 	_loadingCanceled = true;
@@ -669,7 +662,7 @@ parse_tag:
 				tag_type);
 			IF_VERBOSE_PARSE(
 				std::stringstream ss;
-				dump_tag_bytes(&str, ss);
+				dumpTagBytes(&str, ss);
 				log_error("tag dump follows: %s", ss.str());
 			);
 		}

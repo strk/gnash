@@ -1,5 +1,15 @@
 2008-06-02 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* server/movie_def_impl.cpp: use hexify() to format tag dumps - it
+	  takes a useful length parameter that avoids writing uninitialized
+	  values. Read more than a single byte at a time from the stream and
+	  check return of read().
+	* libbase/log.cpp: adapt hexify so it can be used in movie_def_impl
+	  (not printing newlines, using '.' instead of '^' for non-print
+	  characters).
+
+2008-06-02 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* server/asobj/NetStreamFfmpeg.cpp: gnash.h for get_sound_handler().
 
 2008-06-02 Benjamin Wolsey <bwy@benjaminwolsey.de>

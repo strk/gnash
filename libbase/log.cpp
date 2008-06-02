@@ -63,10 +63,10 @@ hexify (const unsigned char *p, size_t length, bool ascii)
 	     i != e; ++i)
 	    {
 		if (ascii) {
-		    if (std::isprint(*i) || *i == 0xd || *i == 0xa) {
-			ss << *i;
+		    if (std::isprint(*i) || *i == 0xd) {
+				ss << *i;
 		    }
-		    else ss << "^";
+		    else ss << ".";
 		}
 		else  {
 		    // Not ascii
