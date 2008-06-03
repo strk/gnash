@@ -1170,12 +1170,6 @@ define_text_loader(stream* in, tag_type tag, movie_definition* m)
 // Sound
 //
 
-// Forward declaration
-/*static void sound_expand(stream *in, media::sound_handler::format_type &format,
-	bool sample_16bit, bool stereo, unsigned int &sample_count,
-	unsigned char* &data, unsigned &data_bytes);
-*/
-
 // Common data
 
 /// Sample rate table for DEFINESOUNDHEAD tags
@@ -1258,12 +1252,17 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 	{
 	    // First it is the amount of data from file,
 	    // then the amount allocated at *data (it may grow)
-	    unsigned data_bytes = in->get_tag_end_position() - in->get_position();
-	    unsigned char *data = new unsigned char[data_bytes];
+	    const unsigned dataLength = in->get_tag_end_position() - in->get_position();
+	    unsigned char *data = new unsigned char[dataLength];
 
-        // data_bytes is already calculated from the end of the tag, which
+        // dataLength is already calculated from the end of the tag, which
         // should be inside the end of the file. TODO: check that this is tha case.
-	    in->read((char*)data, data_bytes);
+	    const unsigned int bytesRead = in->read(reinterpret_cast<char*>(data), dataLength);
+
+        if (bytesRead < dataLength)
+        {
+            throw ParserException(_("Tag boundary reported past end of stream!"));
+        }
 
 	    // Store all the data in a SoundInfo object
 	    std::auto_ptr<media::SoundInfo> sinfo;
@@ -1272,7 +1271,7 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 	    // Stores the sounddata in the soundhandler, and the ID returned
 	    // can be used to starting, stopping and deleting that sound
 	    // NOTE: ownership of 'data' is transferred to the sound hanlder 
-	    int	handler_id = handler->create_sound(data, data_bytes, sinfo);
+	    int	handler_id = handler->create_sound(data, dataLength, sinfo);
 
 	    if (handler_id >= 0)
 	    {

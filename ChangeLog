@@ -7,6 +7,10 @@
 	* server/swf/DoInitActionTag.h, server/swf/RemoveObjectTag.cpp,
 	  server/swf/DefineFontAlignZonesTag.cpp: missing ensureBytes,
 	  drop gnashconfig.h include.
+	* server/swf/tag_loaders.cpp, server/swf/StreamSoundBlockTag.cpp,
+	  server/parser/video_stream_def.cpp: check return of stream::read()
+	  and throw parser exception if it's shorter than expected (means
+	  the reported tag end position was outside the stream).
 
 2008-06-03 Benjamin Wolsey <bwy@benjaminwolsey.de>
 

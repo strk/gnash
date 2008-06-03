@@ -18,10 +18,6 @@
 //
 
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "StreamSoundBlockTag.h"
 #include "sound_handler.h" 
 #include "movie_definition.h" // for addControlTag
@@ -91,8 +87,8 @@ StreamSoundBlockTag::loader(stream* in, tag_type tag, movie_definition* m)
 	LOG_ONCE ( if ( seekSamples ) log_unimpl("MP3 soundblock seek samples") );
     }
 
-    unsigned int data_bytes = in->get_tag_end_position() - in->get_position();
-    if ( ! data_bytes )
+    const unsigned int dataLength = in->get_tag_end_position() - in->get_position();
+    if ( ! dataLength )
     {
         IF_VERBOSE_MALFORMED_SWF(
         LOG_ONCE( log_swferror("Empty SOUNDSTREAMBLOCK tag, seems common waste of space") );
@@ -100,15 +96,20 @@ StreamSoundBlockTag::loader(stream* in, tag_type tag, movie_definition* m)
         return;
     }
 
-    unsigned char *data = new unsigned char[data_bytes];
-    in->read((char*)data, data_bytes);
+    unsigned char *data = new unsigned char[dataLength];
+    const unsigned int bytesRead = in->read(reinterpret_cast<char*>(data), dataLength);
+    
+    if (bytesRead < dataLength)
+    {
+        throw ParserException(_("Tag boundary reported past end of stream!"));
+    }
 
     // Fill the data on the apropiate sound, and receives the starting point
     // for later "start playing from this frame" events.
     //
     // ownership of 'data' is transferred here
     //
-    long start = handler->fill_stream_data(data, data_bytes, sample_count, handle_id);
+    long start = handler->fill_stream_data(data, dataLength, sample_count, handle_id);
 
     // TODO: log_parse ?
 

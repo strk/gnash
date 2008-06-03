@@ -107,21 +107,27 @@ video_stream_definition::readDefineVideoFrame(stream* in, SWF::tag_type tag, mov
 	unsigned int frameNum = in->read_u16(); // in->skip_bytes(2); 
 	if ( m->get_loading_frame() != frameNum )
 	{
-		log_debug("frameNum field in tag is %d, currently loading frame is "SIZET_FMT", we'll use the latter.",
+		log_debug("frameNum field in tag is %d, currently loading frame is %d, we'll use the latter.",
 			frameNum, m->get_loading_frame());
 		frameNum = m->get_loading_frame();
 	}
 
-	unsigned int dataSize = in->get_tag_end_position() - in->get_position();
+	const unsigned int dataLength = in->get_tag_end_position() - in->get_position();
 	
-	boost::uint8_t* buffer = new uint8_t[dataSize + 8]; // FIXME: catch bad_alloc
+	boost::uint8_t* buffer = new uint8_t[dataLength + 8]; // FIXME: catch bad_alloc
 
-	size_t bytesread = in->read((char*)buffer, dataSize);
-	memset(buffer+bytesread, 0, 8);
+	const size_t bytesRead = in->read(reinterpret_cast<char*>(buffer), dataLength);
+
+    if (bytesRead < dataLength)
+    {
+        throw ParserException(_("Tag boundary reported past end of stream!"));
+    }	
+	
+	memset(buffer + bytesRead, 0, 8);
 
 	using namespace media;
 
-	EncodedVideoFrame* frame = new EncodedVideoFrame(buffer, dataSize, frameNum);
+	EncodedVideoFrame* frame = new EncodedVideoFrame(buffer, dataLength, frameNum);
 
 	boost::mutex::scoped_lock lock(_video_mutex);
 
