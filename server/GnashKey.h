@@ -23,6 +23,12 @@ namespace gnash {
 
 namespace key {
 
+/// Conflicts with mingw header with gcc3.x (or whatever
+/// antiquated version mingw has).
+#ifdef _WIN32
+# undef REGISTERED
+#endif
+
 enum modifier
 {
     GNASH_MOD_NONE = 0,
