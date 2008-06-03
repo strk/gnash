@@ -1,5 +1,11 @@
 2008-06-03 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/NetStreamFfmpeg.{cpp,h}: drop ffmpeg includes, as this
+	  class is finally media-handler agnostic (except for expecting
+	  the sound_handler to implement the aux streamers).
+
+2008-06-03 Sandro Santilli <strk@keybit.net>
+
 	* libmedia/MediaHandler.h: add createAudioDecoder, taking AudioInfo
 	  as input, change createVideoDecoder to take VideoInfo for
 	  consistency.

@@ -61,17 +61,6 @@
 // Define the following macro to have decoding activity  debugged
 //#define GNASH_DEBUG_DECODING
 
-namespace {
-
-// Used to free data in the AVPackets we create our self
-void avpacket_destruct(AVPacket* av)
-{
-	delete [] av->data;
-}
-
-} // anonymous namespace
-
-
 namespace gnash {
 
 
@@ -94,17 +83,13 @@ NetStreamFfmpeg::NetStreamFfmpeg()
 
 	m_unqueued_data(NULL),
 
-	_decoderBuffer(0),
-	_soundHandler(get_sound_handler())
+	_soundHandler(get_sound_handler()),
+	_mediaHandler(media::MediaHandler::get())
 {
-
-	ByteIOCxt.buffer = NULL;
 }
 
 NetStreamFfmpeg::~NetStreamFfmpeg()
 {
-	if ( _decoderBuffer ) delete [] _decoderBuffer;
-
 	close(); // close will also detach from sound handler
 
 	delete m_imageframe;
@@ -153,60 +138,6 @@ void NetStreamFfmpeg::close()
 	delete m_unqueued_data;
 	m_unqueued_data = NULL;
 
-	delete [] ByteIOCxt.buffer;
-
-}
-
-// ffmpeg callback function
-int 
-NetStreamFfmpeg::readPacket(void* opaque, boost::uint8_t* buf, int buf_size)
-{
-
-	NetStreamFfmpeg* ns = static_cast<NetStreamFfmpeg*>(opaque);
-
-	assert( ns->_inputStream.get() );
-	tu_file& in = *(ns->_inputStream);
-
-	size_t ret = in.read_bytes(static_cast<void*>(buf), buf_size);
-	ns->inputPos += ret; // what for ??
-	return ret;
-
-}
-
-// ffmpeg callback function
-offset_t 
-NetStreamFfmpeg::seekMedia(void *opaque, offset_t offset, int whence)
-{
-
-	NetStreamFfmpeg* ns = static_cast<NetStreamFfmpeg*>(opaque);
-
-	tu_file& in = *(ns->_inputStream);
-
-	// Offset is absolute new position in the file
-	if (whence == SEEK_SET)
-	{	
-		in.set_position(offset);
-		ns->inputPos = offset; // what for ?!
-
-	// New position is offset + old position
-	}
-	else if (whence == SEEK_CUR)
-	{
-		in.set_position(ns->inputPos + offset);
-		ns->inputPos = ns->inputPos + offset; // what for ?!
-
-	// New position is offset + end of file
-	}
-	else if (whence == SEEK_END)
-	{
-		// This is (most likely) a streamed file, so we can't seek to the end!
-		// Instead we seek to 50.000 bytes... seems to work fine...
-		in.set_position(50000);
-		ns->inputPos = 50000; // what for ?!
-
-	}
-
-	return ns->inputPos; // ah, thats why ! :/
 }
 
 void
@@ -287,10 +218,9 @@ NetStreamFfmpeg::initVideoDecoder(media::MediaParser& parser)
 		return;
 	}
 
-	media::MediaHandler* mh = media::MediaHandler::get();
-	assert ( mh ); // caller should check this
+	assert ( _mediaHandler ); // caller should check this
 
-	_videoDecoder = mh->createVideoDecoder(*videoInfo);
+	_videoDecoder = _mediaHandler->createVideoDecoder(*videoInfo);
 	if ( ! _videoDecoder.get() )
 		log_error(_("Could not create video decoder for codec %d"), videoInfo->codec);
 }
@@ -307,39 +237,13 @@ NetStreamFfmpeg::initAudioDecoder(media::MediaParser& parser)
 		return;
 	}
 
-	media::MediaHandler* mh = media::MediaHandler::get();
-	assert ( mh ); // caller should check this
+	assert ( _mediaHandler ); // caller should check this
 
-	_audioDecoder = mh->createAudioDecoder(*audioInfo);
+	_audioDecoder = _mediaHandler->createAudioDecoder(*audioInfo);
 	if ( ! _audioDecoder.get() )
 		log_error(_("Could not create audio decoder for codec %d"), audioInfo->codec);
 }
 
-
-/// Probe the stream and try to figure out what the format is.
-//
-/// @param ns the netstream to use for reading
-/// @return a pointer to the AVInputFormat structure containing
-///         information about the input format, or NULL.
-static AVInputFormat*
-probeStream(NetStreamFfmpeg* ns)
-{
-	boost::scoped_array<boost::uint8_t> buffer(new boost::uint8_t[2048]);
-
-	// Probe the file to detect the format
-	AVProbeData probe_data;
-	probe_data.filename = "";
-	probe_data.buf = buffer.get();
-	probe_data.buf_size = 2048;
-
-	if (ns->readPacket(ns, probe_data.buf, probe_data.buf_size) < 1)
-	{
- 		log_error(_("Gnash could not read from movie url"));
- 		return NULL;
-	}
-
-	return av_probe_input_format(&probe_data, 1);
-}
 
 bool
 NetStreamFfmpeg::startPlayback()
@@ -349,14 +253,13 @@ NetStreamFfmpeg::startPlayback()
 
 	inputPos = 0;
 
-	media::MediaHandler* mh = media::MediaHandler::get();
-	if ( ! mh )
+	if ( ! _mediaHandler )
 	{
 		LOG_ONCE( log_error(_("No Media handler registered, can't "
 			"parse NetStream input")) );
 		return false;
 	}
-	m_parser = mh->createMediaParser(_inputStream);
+	m_parser = _mediaHandler->createMediaParser(_inputStream);
 	assert(!_inputStream.get());
 
 	if ( ! m_parser.get() )
@@ -383,29 +286,6 @@ NetStreamFfmpeg::startPlayback()
 	return true;
 }
 
-
-/// Copy RGB data from a source raw_mediadata_t to a destination image::rgb.
-/// @param dst the destination image::rgb, which must already be initialized
-///            with a buffer of size of at least src.m_size.
-/// @param src the source raw_mediadata_t to copy data from. The m_size member
-///            of this structure must be initialized.
-/// @param width the width, in bytes, of a row of video data.
-static void
-rgbcopy(image::rgb* dst, media::raw_mediadata_t* src, int width)
-{
-  assert( src->m_size <= static_cast<boost::uint32_t>(dst->width() * dst->height() * 3) ); 
-
-  boost::uint8_t* dstptr = dst->data();
-
-  boost::uint8_t* srcptr = src->m_data;
-  boost::uint8_t* srcend = src->m_data + src->m_size;
-
-  while (srcptr < srcend) {
-    memcpy(dstptr, srcptr, width);
-    dstptr += dst->pitch();
-    srcptr += width;
-  }
-}
 
 #ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
 // to be run in parser thread
@@ -669,7 +549,6 @@ NetStreamFfmpeg::seek(boost::uint32_t posSeconds)
 	boost::uint32_t pos = posSeconds*1000;
 
 	long newpos = 0;
-	double timebase = 0;
 
 	// We'll pause the clock source and mark decoders as buffering.
 	// In this way, next advance won't find the source time to 
@@ -798,7 +677,7 @@ NetStreamFfmpeg::pushDecodedAudioFrames(boost::uint32_t ts)
 
 		boost::mutex::scoped_lock lock(_audioQueueMutex);
 
-		static const int bufferLimit = 20;
+		static const unsigned int bufferLimit = 20;
 		if ( _audioQueue.size() > bufferLimit )
 		{
 			// we won't buffer more then 'bufferLimit' frames in the queue

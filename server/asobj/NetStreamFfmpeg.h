@@ -53,19 +53,6 @@
 #include <cassert>
 
 
-// TODO: drop ffmpeg-specific stuff here ?
-#ifdef HAVE_FFMPEG_AVFORMAT_H
-extern "C" {
-#include <ffmpeg/avformat.h>
-}
-#endif
-
-#ifdef HAVE_LIBAVFORMAT_AVFORMAT_H
-extern "C" {
-#include <libavformat/avformat.h>
-}
-#endif
-
 /// Uncomment the following to load media in a separate thread
 //#define LOAD_MEDIA_IN_A_SEPARATE_THREAD
 
@@ -73,6 +60,7 @@ extern "C" {
 namespace gnash {
 	namespace media {
 		class sound_handler;
+		class MediaHandler;
 	}
 }
 
@@ -98,7 +86,6 @@ public:
 	// Users:
 	//	- ::advance (VM), itself locking
 	//	- ::startPlayback() non locking but called by av_streamer which locks
-	//	- ::seekMedia() set as a callback with init_put_byte (??)
 	//
 	void seek(boost::uint32_t pos);
 
@@ -107,12 +94,6 @@ public:
 
 	// See dox in NetStream.h
 	void advance();
-
-	// Used for ffmpeg data read and seek callbacks with non-FLV
-	static int readPacket(void* opaque, boost::uint8_t* buf, int buf_size);
-
-	// Used for ffmpeg data read and seek callbacks with non-FLV
-	static offset_t seekMedia(void *opaque, offset_t offset, int whence);
 
 #ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
 	/// The parsing thread. Sets up the decoder, and decodes.
@@ -305,13 +286,11 @@ private:
 	// there wasn't room for on its queue
 	media::raw_mediadata_t* m_unqueued_data;
 
-	ByteIOContext ByteIOCxt;
-
-	// Decoder buffer
-	boost::uint8_t* _decoderBuffer;
-
 	// Current sound handler
 	media::sound_handler* _soundHandler;
+
+	// Current media handler
+	media::MediaHandler* _mediaHandler;
 
 	/// Parse a chunk of input
 	/// Currently blocks, ideally should parse as much
