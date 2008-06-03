@@ -1,3 +1,7 @@
+2008-06-03 Sandro Santilli <strk@keybit.net>
+
+	* server/video_stream_instance.h: drop unneeded include.
+
 2008-06-03 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* utilities/processor.cpp: use an intrusive_ptr so that gprocessor

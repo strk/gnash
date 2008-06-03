@@ -22,7 +22,6 @@
 
 #include "character.h" // for inheritance
 #include "video_stream_def.h"
-#include "VideoDecoder.h"
 #include "snappingrange.h"
 
 // Forward declarations
