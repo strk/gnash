@@ -1,6 +1,8 @@
 2008-06-03 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/impl.cpp: indentation.
+	* server/stream.cpp: always check return of read() to avoid reading
+	  past the end of the stream; throw parser exception on failure.
 
 2008-06-03 Sandro Santilli <strk@keybit.net>
 
