@@ -18,10 +18,6 @@
 //
 
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "font.h"
 #include "log.h"
 #include "shape.h"
@@ -43,6 +39,7 @@ DefineFontAlignZonesTag::loader(stream* in, tag_type tag, movie_definition* m)
 {
 	assert(tag == SWF::DEFINEALIGNZONES); // 73
 
+    in->ensureBytes(1);
 	unsigned short ref = in->read_u8(); // must reference a valid DEFINEFONT3 tag
 	font* referencedFont = m->get_font(ref);
 	if ( ! referencedFont )
@@ -54,6 +51,7 @@ DefineFontAlignZonesTag::loader(stream* in, tag_type tag, movie_definition* m)
 		return;
 	}
 
+    in->ensureBytes(1);
 	unsigned flags = in->read_u8(); // 2bits are cms table, 6bits are reserved
 
 	// TODO:
@@ -66,12 +64,7 @@ DefineFontAlignZonesTag::loader(stream* in, tag_type tag, movie_definition* m)
 	);
 
 	in->skip_to_tag_end();
-	static bool warned=false;
-	if ( ! warned ) {
-		log_unimpl(_("DefineFontAlignZoneTag"));
-		warned = true;
-	}
-
+	LOG_ONCE(log_unimpl(_("DefineFontAlignZoneTag")));
 
 }
 

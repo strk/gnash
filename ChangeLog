@@ -4,6 +4,9 @@
 	* server/parser/morph_character2_def.cpp: missing ensureBytes, const
 	  correct function, drop SIZET_FMT.
 	* server/sprite_definition.cpp: missing ensureBytes.
+	* server/swf/DoInitActionTag.h, server/swf/RemoveObjectTag.cpp,
+	  server/swf/DefineFontAlignZonesTag.cpp: missing ensureBytes,
+	  drop gnashconfig.h include.
 
 2008-06-03 Benjamin Wolsey <bwy@benjaminwolsey.de>
 

@@ -18,10 +18,6 @@
 #ifndef GNASH_SWF_DOINITACTIONTAG_H
 #define GNASH_SWF_DOINITACTIONTAG_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "ControlTag.h" // for inheritance
 #include "swf.h" // for tag_type definition
 #include "action_buffer.h" // for composition
@@ -70,6 +66,7 @@ public:
 
     static void doInitActionLoader(stream* in, tag_type tag, movie_definition* m)
     {
+        in->ensureBytes(2);
         int cid = in->read_u16();
         DoInitActionTag* da = new DoInitActionTag(*in, *m, cid);
 

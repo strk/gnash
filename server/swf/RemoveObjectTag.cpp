@@ -18,10 +18,6 @@
 //
 
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "RemoveObjectTag.h"
 #include "sprite_instance.h"
 #include "swf.h" // for tag_type definition
@@ -41,10 +37,12 @@ RemoveObjectTag::read(stream* in, tag_type tag)
 		// Older SWF's allow multiple objects at the same depth;
 		// this m_id disambiguates.  Later SWF's just use one
 		// object per depth.
+		in->ensureBytes(2);
 		m_id = in->read_u16();
 	}
 
-	m_depth = in->read_u16()+character::staticDepthOffset;
+    in->ensureBytes(2);
+	m_depth = in->read_u16() + character::staticDepthOffset;
 }
 
 void
