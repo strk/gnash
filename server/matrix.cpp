@@ -64,21 +64,6 @@ matrix::set_identity()
 	m_[1][1] = 1;
 }
 
-std::ostream& operator<< (std::ostream& os, const matrix& m)
-{
-	os << "| " << m.m_[0][0] << " "
-		<< m.m_[0][1] << " "
-		<< TWIPS_TO_PIXELS(m.m_[0][2]) << " |";
-
-	os << "| " << m.m_[1][0] << " "
-		<< m.m_[1][1] << " "
-		<< TWIPS_TO_PIXELS(m.m_[1][2])
-		<< " |";
-
-	return os;
-}
-
-
 void
 matrix::concatenate(const matrix& m)
 // Concatenate m's transform onto ours.  When
@@ -237,15 +222,6 @@ matrix::read(stream& in)
 	}
 
 	//IF_VERBOSE_PARSE(log_parse("  mat: has_scale = %d, has_rotate = %d\n", has_scale, has_rotate));
-}
-
-
-void
-matrix::print() const
-// Debug log.
-{
-	log_parse("| %4.4f %4.4f %4.4f |", m_[0][0], m_[0][1], TWIPS_TO_PIXELS(m_[0][2]));
-	log_parse("| %4.4f %4.4f %4.4f |", m_[1][0], m_[1][1], TWIPS_TO_PIXELS(m_[1][2]));
 }
 
 
@@ -440,6 +416,24 @@ matrix::get_rotation() const
 	}
 }
 
+std::ostream& operator<< (std::ostream& o, const matrix& m)
+{
+    // 8 digits and a decimal point.
+    const short fieldWidth = 9;
+
+    o << std::endl << "| "
+      << std::setw(fieldWidth) << std::fixed << std::setprecision(4) << m.m_[0][0] << " "
+      << std::setw(fieldWidth) << std::fixed << std::setprecision(4) << m.m_[0][1] << " "
+      << std::setw(fieldWidth) << std::fixed << std::setprecision(4) << TWIPS_TO_PIXELS(m.m_[0][2])
+      << " |" 
+      << std::endl << "| "
+      << std::setw(fieldWidth) << std::fixed << std::setprecision(4) << m.m_[1][0] << " "
+      << std::setw(fieldWidth) << std::fixed << std::setprecision(4) << m.m_[1][1] << " "
+      << std::setw(fieldWidth) << std::fixed << std::setprecision(4) << TWIPS_TO_PIXELS(m.m_[1][2])
+      << " |";
+      
+      return o;
+}
 
 }	// end namespace gnash
 

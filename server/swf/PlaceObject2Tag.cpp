@@ -42,7 +42,7 @@ PlaceObject2Tag::readPlaceObject(stream& in)
             log_parse(_("  PLACEOBJECT: depth=%d(%d) char=%d"),
             m_depth, m_depth-character::staticDepthOffset,
             m_character_id);
-        m_matrix.print();
+            log_parse("%s", m_matrix);
     );
 
     if (in.get_position() < in.get_tag_end_position())
@@ -285,8 +285,7 @@ PlaceObject2Tag::readPlaceObject2(stream& in)
         if ( hasCharacter() ) log_parse(_("  char id = %d"), m_character_id);
         if ( hasMatrix() )
         {
-            log_parse(_("  mat:"));
-            m_matrix.print();
+            log_parse(_("  matrix: %s"), m_matrix);
         }
         if ( hasCxform() )
         {
@@ -379,18 +378,19 @@ PlaceObject2Tag::readPlaceObject3(stream& in)
     IF_VERBOSE_PARSE
     (
         if ( hasMatrix() ) {
-            log_parse("   matrix:");
-        m_matrix.print();
+            log_parse("   matrix: %s", m_matrix);
     }
         if ( hasCxform() ) {
             log_parse("   cxform:");
             m_color_transform.print();
     }
         if ( hasRatio() )  log_parse("   ratio:%d", m_ratio);
-        if ( hasName() ) log_parse("   name:%s", m_name.c_str());
+        if ( hasName() ) log_parse("   name:%s", m_name);
 
-        if ( hasClipDepth() )
-        log_parse("   clip_depth:%d(%d)", m_clip_depth, m_clip_depth-character::staticDepthOffset);
+        if ( hasClipDepth() ) {
+            log_parse("   clip_depth:%d(%d)", m_clip_depth,
+                      m_clip_depth-character::staticDepthOffset);
+        }
     );
 
     if ( hasFilters() )
@@ -423,8 +423,7 @@ PlaceObject2Tag::readPlaceObject3(stream& in)
         if ( hasCharacter() ) log_parse(_("  char id = %d"), m_character_id);
         if ( hasMatrix() )
         {
-            log_parse(_("  mat:"));
-            m_matrix.print();
+            log_parse(_("  matrix: %s"), m_matrix);
         }
         if ( hasCxform() )
         {
@@ -432,9 +431,10 @@ PlaceObject2Tag::readPlaceObject3(stream& in)
             m_color_transform.print();
         }
         if ( hasRatio() ) log_parse(_("  ratio: %d"), m_ratio);
-        if ( hasName() ) log_parse(_("  name = %s"), m_name.c_str());
-        if ( hasClassName() ) log_parse(_("  class name = %s"), className.c_str());
-        if ( hasClipDepth() ) log_parse(_("  clip_depth = %d (%d)"), m_clip_depth, m_clip_depth-character::staticDepthOffset);
+        if ( hasName() ) log_parse(_("  name = %s"), m_name);
+        if ( hasClassName() ) log_parse(_("  class name = %s"), className);
+        if ( hasClipDepth() ) log_parse(_("  clip_depth = %d (%d)"),
+                                m_clip_depth, m_clip_depth-character::staticDepthOffset);
         log_parse(_(" m_place_type: %d"), getPlaceType());
     );
 

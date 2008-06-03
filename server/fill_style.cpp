@@ -297,7 +297,7 @@ fill_style::read(stream* in, int tag_type, movie_definition* md,
 			pOther->m_bitmap_matrix.set_inverse(m);
 		}
         IF_VERBOSE_PARSE(
-            m_bitmap_matrix.print();
+            log_parse("matrix: %s", m_bitmap_matrix);
         );
     }
     else

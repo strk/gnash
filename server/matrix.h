@@ -29,6 +29,7 @@
 #include "Point2d.h" // for transforming Point2d<float> (typedefe'd to point)
 
 #include <iosfwd>
+#include <iomanip>
 
 // Forward declarations
 namespace gnash {
@@ -144,9 +145,6 @@ public:
 	// temp hack, should drop..
 	void	read(stream* in) { read(*in); }
 
-	/// Debug log.
-	void	print() const;
-
 	/// Transform point 'p' by our matrix. 
 	//
 	/// Put the result in *result.
@@ -253,6 +251,7 @@ public: // must be switched to private
 	///
 	float	m_[2][3];
 };
+
 
 inline bool operator== (const matrix& a, const matrix& b)
 {
