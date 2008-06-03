@@ -58,7 +58,6 @@
 #endif
 
 #include <string>
-#include <cstring> // memset
 #include <map>
 #include <memory> // for auto_ptr
 
@@ -310,7 +309,6 @@ get_file_type(tu_file* in)
   in->set_position(0);
 
   unsigned char buf[3];
-  std::memset(buf, 0, 3);
   
   if ( 3 < in->read_bytes(buf, 3) )
   {

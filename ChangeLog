@@ -1,5 +1,9 @@
 2008-06-03 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* server/impl.cpp: the memset is unnecessary anyway.
+
+2008-06-03 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* server/fill_style.cpp: missing ensureBytes.
 	* server/parser/morph_character2_def.cpp: missing ensureBytes, const
 	  correct function, drop SIZET_FMT.
