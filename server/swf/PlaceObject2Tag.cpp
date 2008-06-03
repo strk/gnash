@@ -51,8 +51,7 @@ PlaceObject2Tag::readPlaceObject(stream& in)
 
         IF_VERBOSE_PARSE
         (
-            log_parse(_("  cxform:"));
-            m_color_transform.print();
+            log_parse(_("  cxform: %s"), m_color_transform);
         );
 
     }
@@ -289,8 +288,7 @@ PlaceObject2Tag::readPlaceObject2(stream& in)
         }
         if ( hasCxform() )
         {
-            log_parse(_("  cxform:"));
-            m_color_transform.print();
+            log_parse(_("  cxform: %s"), m_color_transform);
         }
         if ( hasRatio() ) log_parse(_("  ratio: %d"), m_ratio);
         if ( hasName() ) log_parse(_("  name = %s"), m_name.c_str());
@@ -381,8 +379,7 @@ PlaceObject2Tag::readPlaceObject3(stream& in)
             log_parse("   matrix: %s", m_matrix);
     }
         if ( hasCxform() ) {
-            log_parse("   cxform:");
-            m_color_transform.print();
+            log_parse("   cxform: %s", m_color_transform);
     }
         if ( hasRatio() )  log_parse("   ratio:%d", m_ratio);
         if ( hasName() ) log_parse("   name:%s", m_name);
@@ -427,8 +424,7 @@ PlaceObject2Tag::readPlaceObject3(stream& in)
         }
         if ( hasCxform() )
         {
-            log_parse(_("  cxform:"));
-            m_color_transform.print();
+            log_parse(_("  cxform: %d"), m_color_transform);
         }
         if ( hasRatio() ) log_parse(_("  ratio: %d"), m_ratio);
         if ( hasName() ) log_parse(_("  name = %s"), m_name);

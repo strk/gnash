@@ -115,7 +115,6 @@ public:
 
 	std::string toString() const;
 
-	void print() const;
 };
 
 

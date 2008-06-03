@@ -1,5 +1,10 @@
 2008-06-03 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* server/cxform.{cpp,h}: drop cxform::print().
+	* server/swf/PlaceObject2Tag.cpp: use cxform ostream operator.
+
+2008-06-03 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* server/parser/movie_def_impl.cpp: add ensureBytes.
 	* server/matrix.{h,cpp}: drop matrix::print() method in favour
 	  of the ostream operator. Make output prettier.

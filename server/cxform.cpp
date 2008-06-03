@@ -18,21 +18,17 @@
 // 
 //
 
-#ifdef HAVE_CONFIG_H
-    #include "gnashconfig.h"
-#endif
-
 #include "cxform.h"
 #include "types.h" // for rgba type :(
 #include "stream.h" // for reading from SWF
 #include "log.h"
 #include "utility.h" // for utility::clamp
+#include <iomanip>
 
 namespace gnash {
 
 using boost::uint8_t;
 using boost::int16_t;
-using utility::clamp;
 
 cxform::cxform()
 // Initialize to identity transform.    
@@ -81,6 +77,8 @@ void    cxform::transform(boost::uint8_t& r, boost::uint8_t& g, boost::uint8_t& 
     gt = (gt * ga >> 8) + gb;
     bt = (bt * ba >> 8) + bb;
     at = (at * aa >> 8) + ab;
+
+    using utility::clamp;
     
     r = (uint8_t)(clamp<int16_t>(rt, 0, 255));
     g = (uint8_t)(clamp<int16_t>(gt, 0, 255));
@@ -166,16 +164,6 @@ void    cxform::read_rgba(stream& in)
     }
 }
 
-void    cxform::print() const
-// Debug log.
-{
-    log_parse("    *         +");
-    log_parse("| %4.4f %4.4f|", ra/256.0, rb);
-    log_parse("| %4.4f %4.4f|", ga/256.0, gb);
-    log_parse("| %4.4f %4.4f|", ba/256.0, bb);
-    log_parse("| %4.4f %4.4f|", aa/256.0, ab);
-}
-
 std::string
 cxform::toString() const
 {
@@ -187,10 +175,23 @@ cxform::toString() const
 std::ostream&
 operator<< (std::ostream& os, const cxform& cx) 
 {
-    os << "r: *"  << cx.ra << " +" << cx.rb << ", ";
-    os << "|g: *" << cx.ga << " +" << cx.gb << ", ";
-    os << "|b: *" << cx.ba << " +" << cx.bb << ", ";
-    os << "|a: *" << cx.aa << " +" << cx.ab;
+    // For integers up to 256
+    const short fieldWidth = 3;
+
+    os
+    << std::endl
+    << "| r: * " <<  std::setw(fieldWidth) << cx.ra 
+    << " + " << std::setw(fieldWidth) << cx.rb << " |"
+    << std::endl
+    << "| g: * " << std::setw(fieldWidth) << cx.ga 
+    << " + "  << std::setw(fieldWidth) << cx.gb << " |"
+    << std::endl
+    << "| b: * " << std::setw(fieldWidth) << cx.ba 
+    << " + " << std::setw(fieldWidth) << cx.bb << " |"
+    << std::endl
+    << "| a: * " << std::setw(fieldWidth) << cx.aa 
+    << " + " << std::setw(fieldWidth) << cx.ab << " |";  
+
     return os;
 }
 
