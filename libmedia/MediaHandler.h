@@ -33,6 +33,9 @@ class tu_file;
 namespace gnash {
 	namespace media {
 		class VideoDecoder;
+		class AudioDecoder;
+		class AudioInfo;
+		class VideoInfo;
 	}
 }
 
@@ -83,8 +86,15 @@ public:
 	///
 	/// @return 0 if no decoder could be created for the specified encoding
 	///
-	virtual std::auto_ptr<VideoDecoder> createVideoDecoder(
-			videoCodecType format, int width, int height)=0;
+	virtual std::auto_ptr<VideoDecoder> createVideoDecoder(VideoInfo& info)=0;
+
+	/// Create an AudioDecoder for decoding what's specified in the AudioInfo
+	//
+	/// @param info
+	///     AudioInfo class with all the info needed to decode
+	///     the sound correctly.
+	///
+	virtual std::auto_ptr<AudioDecoder> createAudioDecoder(AudioInfo& info)=0;
 
 protected:
 

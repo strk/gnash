@@ -50,6 +50,8 @@ public:
 	///
 	/// @return true if succesfull else false
 	///
+	/// TODO: take AudioInfo by ref, not pointer
+	///
 	virtual bool setup(AudioInfo* /*info*/) { return false; }
 
 	/// Sets up the decoder.

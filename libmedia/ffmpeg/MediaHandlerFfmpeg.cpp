@@ -20,6 +20,7 @@
 
 #include "MediaHandlerFfmpeg.h"
 #include "VideoDecoderFfmpeg.h"
+#include "AudioDecoderFfmpeg.h"
 
 #include "tu_file.h" // for visibility of destructor
 #include "MediaParser.h" // for visibility of destructor
@@ -35,9 +36,25 @@ MediaHandlerFfmpeg::createMediaParser(std::auto_ptr<tu_file> stream)
 }
 
 std::auto_ptr<VideoDecoder>
-MediaHandlerFfmpeg::createVideoDecoder(videoCodecType format, int width, int height)
+MediaHandlerFfmpeg::createVideoDecoder(VideoInfo& info)
 {
+	if ( info.type != FLASH )
+	{
+		log_error("Non-flash video encoding not supported yet by FFMPEG VideoDecoder");
+		return std::auto_ptr<VideoDecoder>(0);
+	}
+	videoCodecType format = static_cast<videoCodecType>(info.codec);
+	int width = info.width;
+	int height = info.height;
 	std::auto_ptr<VideoDecoder> ret( new VideoDecoderFfmpeg(format, width, height) );
+	return ret;
+}
+
+std::auto_ptr<AudioDecoder>
+MediaHandlerFfmpeg::createAudioDecoder(AudioInfo& info)
+{
+	std::auto_ptr<AudioDecoder> ret( new AudioDecoderFfmpeg() );
+	ret->setup(&info);
 	return ret;
 }
 

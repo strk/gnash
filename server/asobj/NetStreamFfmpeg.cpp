@@ -31,11 +31,15 @@
 #include "render.h"	
 #include "movie_root.h"
 #include "sound_handler.h"
-#include "VideoDecoderFfmpeg.h"
+
+#include "MediaParser.h" 
+#include "VideoDecoder.h"
+#include "AudioDecoder.h"
+#include "MediaHandler.h"
+
 #include "SystemClock.h"
 #include "gnash.h" // get_sound_handler()
 
-#include "FLVParser.h" 
 
 #include <boost/scoped_array.hpp>
 #include <algorithm> // std::min
@@ -75,14 +79,6 @@ NetStreamFfmpeg::NetStreamFfmpeg()
 	:
 
 	_decoding_state(DEC_NONE),
-
-	m_video_index(-1),
-	m_audio_index(-1),
-
-	m_VCodecCtx(NULL),
-	m_ACodecCtx(NULL),
-	m_FormatCtx(NULL),
-	m_Frame(NULL),
 
 #ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
 	_parserThread(NULL),
@@ -151,28 +147,9 @@ void NetStreamFfmpeg::close()
 		_soundHandler->detach_aux_streamer(this);
 	}
 
-	if (m_Frame) av_free(m_Frame);
-	m_Frame = NULL;
-
-  if ( m_VCodecCtx ) {
-    avcodec_close( m_VCodecCtx );
-  }
-  m_VCodecCtx = NULL;
-
-  if ( m_ACodecCtx ) {
-    avcodec_close( m_ACodecCtx );
-  }
-  m_ACodecCtx = NULL;
-
-	if (m_FormatCtx)
-	{
-		m_FormatCtx->iformat->flags = AVFMT_NOFILE;
-		av_close_input_file(m_FormatCtx);
-		m_FormatCtx = NULL;
-	}
-
 	delete m_imageframe;
 	m_imageframe = NULL;
+
 	delete m_unqueued_data;
 	m_unqueued_data = NULL;
 
@@ -300,114 +277,42 @@ NetStreamFfmpeg::play(const std::string& c_url)
 	return;
 }
 
-/// Finds a decoder, allocates a context and initializes it.
-//
-/// @param codec_id the codec ID to find
-/// @return the initialized context, or NULL on failure. The caller is 
-///         responsible for deallocating!
-///
-/// TODO: drop, let VideoDecoder/AudioDecoder do this !
-///
-static AVCodecContext*
-initContext(enum CodecID codec_id)
-{
-
-	AVCodec* codec = avcodec_find_decoder(codec_id);
-	if (!codec)
-	{
-		log_error(_("libavcodec couldn't find decoder"));
-		return NULL;
-	}
-
-	AVCodecContext * context = avcodec_alloc_context();
-	if (!context)
-	{
-		log_error(_("libavcodec couldn't allocate context"));
-		return NULL;
-	}
-
-	int rv = avcodec_open(context, codec);
-	if (rv < 0) 
-	{
-		avcodec_close(context);
-		log_error(_("libavcodec failed to initialize codec"));
-		return NULL;
-	}
-
-	return context;
-}
-
-/// Gets video info from the parser and initializes the codec.
-//
-/// @param parser the parser to use to get video information.
-/// @return the initialized context, or NULL on failure. The caller
-///         is responsible for deallocating this pointer.
-static AVCodecContext* 
-initVideoDecoder(media::MediaParser& parser)
+void
+NetStreamFfmpeg::initVideoDecoder(media::MediaParser& parser)
 {
 	// Get video info from the parser
 	media::VideoInfo* videoInfo = parser.getVideoInfo();
-	if (!videoInfo)
-	{
-		return NULL;
+	if (!videoInfo) {
+		log_debug("No video in NetStream stream");
+		return;
 	}
 
-	enum CodecID codec_id;
+	media::MediaHandler* mh = media::MediaHandler::get();
+	assert ( mh ); // caller should check this
 
-	// Find the decoder and init the parser
-	switch(videoInfo->codec)
-	{
-		case media::VIDEO_CODEC_H263:
-			codec_id = CODEC_ID_FLV1;
-			break;
-#ifdef FFMPEG_VP6
-		case media::VIDEO_CODEC_VP6:
-			codec_id = CODEC_ID_VP6F;
-			break;
-#endif
-		case media::VIDEO_CODEC_SCREENVIDEO:
-			codec_id = CODEC_ID_FLASHSV;
-			break;
-		default:
-			log_error(_("Unsupported video codec %d"), (int) videoInfo->codec);
-			return NULL;
-	}
-
-	return initContext(codec_id);
+	_videoDecoder = mh->createVideoDecoder(*videoInfo);
+	if ( ! _videoDecoder.get() )
+		log_error(_("Could not create video decoder for codec %d"), videoInfo->codec);
 }
 
 
-/// Like initVideoDecoder, but for audio.
-static AVCodecContext*
-initAudioDecoder(media::MediaParser& parser)
+/* private */
+void
+NetStreamFfmpeg::initAudioDecoder(media::MediaParser& parser)
 {
 	// Get audio info from the parser
 	media::AudioInfo* audioInfo =  parser.getAudioInfo();
-	if (!audioInfo)
-	{
-		log_debug("No audio in FLV stream");
-		return NULL;
+	if (!audioInfo) {
+		log_debug("No audio in NetStream input");
+		return;
 	}
 
-	enum CodecID codec_id;
+	media::MediaHandler* mh = media::MediaHandler::get();
+	assert ( mh ); // caller should check this
 
-	switch(audioInfo->codec)
-	{
-		case media::AUDIO_CODEC_RAW:
-			codec_id = CODEC_ID_PCM_U16LE;
-			break;
-		case media::AUDIO_CODEC_ADPCM:
-			codec_id = CODEC_ID_ADPCM_SWF;
-			break;
-		case media::AUDIO_CODEC_MP3:
-			codec_id = CODEC_ID_MP3;
-			break;
-		default:
-			log_error(_("Unsupported audio codec %d"), (int)audioInfo->codec);
-			return NULL;
-	}
-
-	return initContext(codec_id);
+	_audioDecoder = mh->createAudioDecoder(*audioInfo);
+	if ( ! _audioDecoder.get() )
+		log_error(_("Could not create audio decoder for codec %d"), audioInfo->codec);
 }
 
 
@@ -444,199 +349,28 @@ NetStreamFfmpeg::startPlayback()
 
 	inputPos = 0;
 
-	// Check if the file is a FLV, in which case we use our own parser
-	char head[4] = {0, 0, 0, 0};
-	if (_inputStream->read_bytes(head, 3) < 3)
+	media::MediaHandler* mh = media::MediaHandler::get();
+	if ( ! mh )
 	{
-		log_error(_("Could not read 3 bytes from NetStream input"));
-		// not really correct, the stream was found, just wasn't what we expected..
+		LOG_ONCE( log_error(_("No Media handler registered, can't "
+			"parse NetStream input")) );
+		return false;
+	}
+	m_parser = mh->createMediaParser(_inputStream);
+	assert(!_inputStream.get());
+
+	if ( ! m_parser.get() )
+	{
+		log_error(_("Unable to create parser for NetStream input"));
+		// not necessarely correct, the stream might have been found...
 		setStatus(streamNotFound);
 		return false;
 	}
 
-	//
-	// TODO: let all of this be handled by a MediaParserFactory
-	// (ie: inspecting type of input)
-	// 
+	initVideoDecoder(*m_parser); 
+	initAudioDecoder(*m_parser); 
 
-	_inputStream->set_position(0);
-	if (std::string(head) == "FLV")
-	{
-		m_isFLV = true;
-		assert ( !m_parser.get() );
-
-		m_parser.reset( new media::FLVParser(_inputStream) );
-		assert(! _inputStream.get() ); // TODO: when ownership will be transferred...
-
-		if (! m_parser.get() )
-		{
-			log_error(_("Gnash could not open FLV movie: %s"), url.c_str());
-			// not really correct, the stream was found, just wasn't what we expected..
-			setStatus(streamNotFound);
-			return false;
-		}
-
-		// Init the avdecoder-decoder
-		avcodec_init();
-		avcodec_register_all();
-
-		m_VCodecCtx = initVideoDecoder(*m_parser); // TODO: let VideoDecoder do this !
-		if (!m_VCodecCtx)
-		{
-			log_error(_("Failed to initialize FLV video codec"));
-			return false;
-		}
-
-		m_ACodecCtx = initAudioDecoder(*m_parser); // TODO: let AudioDecoder do this !
-		if (!m_ACodecCtx)
-		{
-			// There might simply be no audio, no problem...
-			//log_error(_("Failed to initialize FLV audio codec"));
-			//return false;
-		}
-
-		// We just define the indexes here, they're not really used when
-		// the file format is FLV
-		m_video_index = 0;
-		m_audio_index = 1;
-
-		// Allocate a frame to store the decoded frame in
-		m_Frame = avcodec_alloc_frame();
-	}
-	else
-	{
-
-		// This registers all available file formats and codecs 
-		// with the library so they will be used automatically when
-		// a file with the corresponding format/codec is opened
-		// XXX should we call avcodec_init() first?
-		av_register_all();
-
-		AVInputFormat* inputFmt = probeStream(this);
-		if (!inputFmt)
-		{
-			log_error(_("Couldn't determine stream input format from URL %s"), url.c_str());
-			return false;
-		}
-
-		// After the format probe, reset to the beginning of the file.
-		// TODO: have this done by probeStream !
-		//       (actually, have the whole thing done by MediaParser)
-		_inputStream->set_position(0);
-
-		// Setup the filereader/seeker mechanism. 7th argument (NULL) is the writer function,
-		// which isn't needed.
-		init_put_byte(&ByteIOCxt, new boost::uint8_t[500000], 500000, 0, this, NetStreamFfmpeg::readPacket, NULL, NetStreamFfmpeg::seekMedia);
-		ByteIOCxt.is_streamed = 1;
-
-		m_FormatCtx = av_alloc_format_context();
-
-		// Open the stream. the 4th argument is the filename, which we ignore.
-		if(av_open_input_stream(&m_FormatCtx, &ByteIOCxt, "", inputFmt, NULL) < 0)
-		{
-			log_error(_("Couldn't open file '%s' for decoding"), url.c_str());
-			setStatus(streamNotFound);
-			return false;
-		}
-
-		// Next, we need to retrieve information about the streams contained in the file
-		// This fills the streams field of the AVFormatContext with valid information
-		int ret = av_find_stream_info(m_FormatCtx);
-		if (ret < 0)
-		{
-			log_error(_("Couldn't find stream information from '%s', error code: %d"), url.c_str(), ret);
-			return false;
-		}
-
-	//	m_FormatCtx->pb.eof_reached = 0;
-	//	av_read_play(m_FormatCtx);
-
-		// Find the first video & audio stream
-		m_video_index = -1;
-		m_audio_index = -1;
-		//assert(m_FormatCtx->nb_streams >= 0); useless assert. 
-		for (unsigned int i = 0; i < (unsigned)m_FormatCtx->nb_streams; i++)
-		{
-			AVCodecContext* enc = m_FormatCtx->streams[i]->codec; 
-
-			switch (enc->codec_type)
-			{
-				case CODEC_TYPE_AUDIO:
-					if (m_audio_index < 0)
-					{
-						m_audio_index = i;
-						m_audio_stream = m_FormatCtx->streams[i];
-					}
-					break;
-
-				case CODEC_TYPE_VIDEO:
-					if (m_video_index < 0)
-					{
-						m_video_index = i;
-						m_video_stream = m_FormatCtx->streams[i];
-					}
-					break;
-				default:
-					break;
-			}
-		}
-
-		if (m_video_index < 0)
-		{
-			log_error(_("Didn't find a video stream from '%s'"), url.c_str());
-			return false;
-		}
-
-		// Get a pointer to the codec context for the video stream
-		m_VCodecCtx = m_FormatCtx->streams[m_video_index]->codec;
-
-		// Find the decoder for the video stream
-		AVCodec* pCodec = avcodec_find_decoder(m_VCodecCtx->codec_id);
-		if (pCodec == NULL)
-		{
-			m_VCodecCtx = NULL;
-			log_error(_("Video decoder %d not found"), 
-				m_VCodecCtx->codec_id);
-			return false;
-		}
-
-		// Open codec
-		if (avcodec_open(m_VCodecCtx, pCodec) < 0)
-		{
-			log_error(_("Could not open codec %d"),
-				m_VCodecCtx->codec_id);
-		}
-
-		// Allocate a frame to store the decoded frame in
-		m_Frame = avcodec_alloc_frame();
-
-		if ( m_audio_index >= 0 && _soundHandler )
-		{
-			// Get a pointer to the audio codec context for the video stream
-			m_ACodecCtx = m_FormatCtx->streams[m_audio_index]->codec;
-
-			// Find the decoder for the audio stream
-			AVCodec* pACodec = avcodec_find_decoder(m_ACodecCtx->codec_id);
-			if (pACodec == NULL)
-			{
-				log_error(_("No available audio decoder %d to process MPEG file: '%s'"), 
-					m_ACodecCtx->codec_id, url.c_str());
-				return false;
-			}
-		
-			// Open codec
-			if (avcodec_open(m_ACodecCtx, pACodec) < 0)
-			{
-				log_error(_("Could not open audio codec %d for %s"),
-					m_ACodecCtx->codec_id, url.c_str());
-				return false;
-			}
-
-		}
-	}
-
-	//_playHead.init(m_VCodecCtx!=0, false); // second arg should be m_ACodecCtx!=0, but we're testing video only for now
-	_playHead.init(m_VCodecCtx!=0, m_ACodecCtx!=0);
+	_playHead.init(_videoDecoder.get(), _audioDecoder.get());
 	_playHead.setState(PlayHead::PLAY_PLAYING);
 
 	decodingStatus(DEC_BUFFERING);
@@ -770,14 +504,18 @@ bool NetStreamFfmpeg::audio_streamer(void *owner, boost::uint8_t *stream, int le
 	return true;
 }
 
-media::raw_mediadata_t*
+std::auto_ptr<image::rgb> 
 NetStreamFfmpeg::getDecodedVideoFrame(boost::uint32_t ts)
 {
+	assert(_videoDecoder.get()); // caller should check this
+
+	std::auto_ptr<image::rgb> video;
+
 	assert(m_parser.get());
 	if ( ! m_parser.get() )
 	{
 		log_error("getDecodedVideoFrame: no parser available");
-		return 0; // no parser, no party
+		return video; // no parser, no party
 	}
 
 	boost::uint64_t nextTimestamp;
@@ -787,7 +525,7 @@ NetStreamFfmpeg::getDecodedVideoFrame(boost::uint32_t ts)
 		log_debug("getDecodedVideoFrame(%d): no more video frames in input (nextVideoFrameTimestamp returned false)");
 #endif // GNASH_DEBUG_DECODING
 		decodingStatus(DEC_STOPPED);
-		return 0;
+		return video;
 	}
 
 	if ( nextTimestamp > ts )
@@ -796,15 +534,14 @@ NetStreamFfmpeg::getDecodedVideoFrame(boost::uint32_t ts)
 		log_debug("%p.getDecodedVideoFrame(%d): next video frame is in the future (%d)",
 			this, ts, nextTimestamp);
 #endif // GNASH_DEBUG_DECODING
-		return 0; // next frame is in the future
+		return video; // next frame is in the future
 	}
 
 	// Loop until a good frame is found
-    	media::raw_mediadata_t* video = 0;
 	while ( 1 )
 	{
     		video = decodeNextVideoFrame();
-		if ( ! video )
+		if ( ! video.get() )
 		{
 			log_error("nextVideoFrameTimestamp returned true, "
 				"but decodeNextVideoFrame returned null, "
@@ -837,13 +574,15 @@ NetStreamFfmpeg::getDecodedVideoFrame(boost::uint32_t ts)
 	return video;
 }
 
-media::raw_mediadata_t*
+std::auto_ptr<image::rgb> 
 NetStreamFfmpeg::decodeNextVideoFrame()
 {
+	std::auto_ptr<image::rgb> video;
+
 	if ( ! m_parser.get() )
 	{
 		log_error("decodeNextVideoFrame: no parser available");
-		return 0; // no parser, no party
+		return video; // no parser, no party
 	}
 
 	std::auto_ptr<media::EncodedVideoFrame> frame = m_parser->nextVideoFrame(); 
@@ -854,20 +593,21 @@ NetStreamFfmpeg::decodeNextVideoFrame()
 			"no more video frames in input",
 			this);
 #endif // GNASH_DEBUG_DECODING
-		return 0;
+		return video;
 	}
 
-  	AVPacket packet;
+	assert( _videoDecoder.get() ); // caller should check this
+	assert( ! _videoDecoder->peek() ); // everything we push, we'll pop too..
 
-  	packet.destruct = avpacket_destruct; // needed ?
-  	packet.size = frame->dataSize();
-	// ffmpeg insist in requiring non-const AVPacket.data ...
-  	packet.data = const_cast<boost::uint8_t*>(frame->data());
-  	// FIXME: is this the right value for packet.dts?
-  	packet.pts = packet.dts = frame->timestamp();
-	packet.stream_index = 0;
+	_videoDecoder->push(*frame);
+	video = _videoDecoder->pop();
+	if ( ! video.get() )
+	{
+		// TODO: tell more about the failure
+		log_error("Error decoding encoded video frame in NetSTream input");
+	}
 
-	return decodeVideo(&packet);
+	return video;
 }
 
 media::raw_mediadata_t*
@@ -886,392 +626,27 @@ NetStreamFfmpeg::decodeNextAudioFrame()
 		return 0;
 	}
 
-  	AVPacket packet;
+    	media::raw_mediadata_t* raw = new media::raw_mediadata_t();
+	boost::uint32_t decodedData=0;
+	bool parseAudio = true; // I don't get this...
+	raw->m_data = _audioDecoder->decode(frame->data.get(), frame->dataSize, raw->m_size, decodedData, parseAudio);
 
-  	packet.destruct = avpacket_destruct;
-  	packet.size = frame->dataSize;
-  	packet.data = frame->data.get();
-  	// FIXME: is this the right value for packet.dts?
-  	packet.pts = packet.dts = frame->timestamp;
-	packet.stream_index = 1;
-
-	return decodeAudio(&packet);
-}
-
-bool
-NetStreamFfmpeg::decodeFLVFrame()
-{
-#if 1
-	abort();
-	return false;
-#else
-	FLVFrame* frame = m_parser->nextMediaFrame(); // we don't care which one, do we ?
-
-	if (frame == NULL)
+	if ( decodedData != frame->dataSize )
 	{
-		//assert ( _netCon->loadCompleted() );
-		//assert ( m_parser->parsingCompleted() );
-		decodingStatus(DEC_STOPPED);
-		return true;
+		log_error("FIXME: not all data in EncodedAudioFrame was decoded, just %d/%d",
+			frame->dataSize, decodedData);
 	}
 
-  	AVPacket packet;
+	//raw->m_stream_index = m_audio_index; // no idea what this is needed for
+	raw->m_ptr = raw->m_data; // no idea what this is needed for
+	raw->m_pts = frame->timestamp;
 
-  	packet.destruct = avpacket_destruct;
-  	packet.size = frame->dataSize;
-  	packet.data = frame->data;
-  	// FIXME: is this the right value for packet.dts?
-  	packet.pts = packet.dts = static_cast<boost::int64_t>(frame->timestamp);
-
-	if (frame->type == videoFrame)
-	{
-    		packet.stream_index = 0;
-		media::raw_mediadata_t* video = decodeVideo(&packet);
-		assert (m_isFLV);
-		if (video)
-		{
-			// NOTE: Caller is assumed to have locked _qMutex already
-			if ( ! m_qvideo.push(video) )
-			{
-				log_error("Video queue full !");
-			}
-		}
-	}
-	else
-	{
-		assert(frame->type == audioFrame);
-    		packet.stream_index = 1;
-		media::raw_mediadata_t* audio = decodeAudio(&packet);
-		if ( audio )
-		{
-			if ( ! m_qaudio.push(audio) )
-			{
-				log_error("Audio queue full!");
-			}
-		}
-	}
-
-	return true;
-#endif
-}
-
-
-media::raw_mediadata_t* 
-NetStreamFfmpeg::decodeAudio( AVPacket* packet )
-{
-	if (!m_ACodecCtx) return 0;
-
-	int frame_size;
-	//static const unsigned int bufsize = (AVCODEC_MAX_AUDIO_FRAME_SIZE * 3) / 2;
-	static const unsigned int bufsize = AVCODEC_MAX_AUDIO_FRAME_SIZE;
-
-	if ( ! _decoderBuffer ) _decoderBuffer = new boost::uint8_t[bufsize];
-
-	boost::uint8_t* ptr = _decoderBuffer;
-
-#ifdef FFMPEG_AUDIO2
-	frame_size = bufsize; // TODO: is it safe not initializing this ifndef FFMPEG_AUDIO2 ?
-	if (avcodec_decode_audio2(m_ACodecCtx, (boost::int16_t*) ptr, &frame_size, packet->data, packet->size) >= 0)
-#else
-	if (avcodec_decode_audio(m_ACodecCtx, (boost::int16_t*) ptr, &frame_size, packet->data, packet->size) >= 0)
-#endif
-	{
-
-		bool stereo = m_ACodecCtx->channels > 1 ? true : false;
-		int samples = stereo ? frame_size >> 2 : frame_size >> 1;
-		
-		if (_resampler.init(m_ACodecCtx))
-		{
-			// Resampling is needed.
-			
-			// Compute new size based on frame_size and
-			// resampling configuration
-			double resampleFactor = (44100.0/m_ACodecCtx->sample_rate) * (2.0/m_ACodecCtx->channels);
-			int resampledFrameSize = int(ceil(frame_size*resampleFactor));
-
-			// Allocate just the required amount of bytes
-			boost::uint8_t* output = new boost::uint8_t[resampledFrameSize];
-			
-			samples = _resampler.resample(reinterpret_cast<boost::int16_t*>(ptr), 
-							 reinterpret_cast<boost::int16_t*>(output), 
-							 samples);
-
-			if (resampledFrameSize < samples*2*2)
-			{
-				log_error(" --- Computation of resampled frame size (%d) < then the one based on samples (%d)",
-					resampledFrameSize, samples*2*2);
-
-				log_debug(" input frame size: %d", frame_size);
-				log_debug(" input sample rate: %d", m_ACodecCtx->sample_rate);
-				log_debug(" input channels: %d", m_ACodecCtx->channels);
-				log_debug(" input samples: %d", samples);
-
-				log_debug(" output sample rate (assuming): %d", 44100);
-				log_debug(" output channels (assuming): %d", 2);
-				log_debug(" output samples: %d", samples);
-
-				abort(); // the call to resample() likely corrupted memory...
-			}
-
-			frame_size = samples*2*2;
-
-			// ownership of memory pointed-to by 'ptr' will be
-			// transferred below
-			ptr = reinterpret_cast<boost::uint8_t*>(output);
-
-			// we'll reuse _decoderBuffer 
-		}
-		else
-		{
-			// ownership of memory pointed-to by 'ptr' will be
-			// transferred below, so we reset _decoderBuffer here.
-			// Doing so, next time we'll need to decode we'll create
-			// a new buffer
-			_decoderBuffer=0;
-		}
-		
-    		media::raw_mediadata_t* raw = new media::raw_mediadata_t();
-		
-		raw->m_data = ptr; // ownership of memory pointed by 'ptr' transferred here
-		raw->m_ptr = raw->m_data;
-		raw->m_size = frame_size;
-		raw->m_stream_index = m_audio_index;
-
-		// set presentation timestamp
-		if (packet->dts != static_cast<signed long>(AV_NOPTS_VALUE))
-		{
-			if (!m_isFLV) raw->m_pts = static_cast<boost::uint32_t>(as_double(m_audio_stream->time_base) * packet->dts * 1000.0);
-			else raw->m_pts = static_cast<boost::uint32_t>((as_double(m_ACodecCtx->time_base) * packet->dts) * 1000.0);
-		}
-
-		if (raw->m_pts != 0)
-		{	
-			// update audio clock with pts, if present
-			m_last_audio_timestamp = raw->m_pts;
-		}
-		else
-		{
-			raw->m_pts = m_last_audio_timestamp;
-		}
-
-		// update video clock for next frame
-		boost::uint32_t frame_delay;
-		if (!m_isFLV)
-		{
-			frame_delay = static_cast<boost::uint32_t>((as_double(m_audio_stream->time_base) * packet->dts) * 1000.0);
-		}
-		else
-		{
-			frame_delay = m_parser->audioFrameDelay();
-		}
-
-		m_last_audio_timestamp += frame_delay;
-
-		return raw;
-	}
-	return 0;
-}
-
-
-media::raw_mediadata_t* 
-NetStreamFfmpeg::decodeVideo(AVPacket* packet)
-{
-	if (!m_VCodecCtx) return NULL;
-	if (!m_Frame) return NULL;
-
-	int got = 0;
-	avcodec_decode_video(m_VCodecCtx, m_Frame, &got, packet->data, packet->size);
-	if (!got) return NULL;
-
-	// This tmpImage is really only used to compute proper size of the video data...
-	// stupid isn't it ?
-	std::auto_ptr<image::image_base> tmpImage;
-	if (m_videoFrameFormat == render::YUV)
-	{
-		tmpImage.reset( new image::yuv(m_VCodecCtx->width, m_VCodecCtx->height) );
-	}
-	else if (m_videoFrameFormat == render::RGB)
-	{
-		tmpImage.reset( new image::rgb(m_VCodecCtx->width, m_VCodecCtx->height) );
-	}
-
-	AVPicture rgbpicture;
-
-	if (m_videoFrameFormat == render::NONE)
-	{
-		// NullGui?
-		return NULL;
-
-	}
-	else if (m_videoFrameFormat == render::YUV && m_VCodecCtx->pix_fmt != PIX_FMT_YUV420P)
-	{
-		assert( 0 );	// TODO
-		//img_convert((AVPicture*) pFrameYUV, PIX_FMT_YUV420P, (AVPicture*) pFrame, pCodecCtx->pix_fmt, pCodecCtx->width, pCodecCtx->height);
-		// Don't use depreceted img_convert, use sws_scale
-
-	}
-	else if (m_videoFrameFormat == render::RGB && m_VCodecCtx->pix_fmt != PIX_FMT_RGB24)
-	{
-		rgbpicture = media::VideoDecoderFfmpeg::convertRGB24(m_VCodecCtx, *m_Frame);
-		if (!rgbpicture.data[0])
-		{
-			return NULL;
-		}
-	}
-
-	media::raw_mediadata_t* video = new media::raw_mediadata_t();
-
-	video->m_data = new boost::uint8_t[tmpImage->size()];
-	video->m_ptr = video->m_data;
-	video->m_stream_index = m_video_index;
-	video->m_pts = 0;
-
-	// set presentation timestamp
-	if (packet->dts != static_cast<signed long>(AV_NOPTS_VALUE))
-	{
-		if (!m_isFLV)	video->m_pts = static_cast<boost::uint32_t>((as_double(m_video_stream->time_base) * packet->dts) * 1000.0);
-		else video->m_pts = static_cast<boost::uint32_t>((as_double(m_VCodecCtx->time_base) * packet->dts) * 1000.0);
-	}
-
-	if (video->m_pts != 0)
-	{	
-		// update video clock with pts, if present
-		m_last_video_timestamp = video->m_pts;
-	}
-	else
-	{
-		video->m_pts = m_last_video_timestamp;
-	}
-
-	// update video clock for next frame
-	boost::uint32_t frame_delay;
-	if (!m_isFLV) frame_delay = static_cast<boost::uint32_t>(as_double(m_video_stream->codec->time_base) * 1000.0);
-	else frame_delay = m_parser->videoFrameDelay();
-
-	// for MPEG2, the frame can be repeated, so we update the clock accordingly
-	frame_delay += static_cast<boost::uint32_t>(m_Frame->repeat_pict * (frame_delay * 0.5) * 1000.0);
-
-	m_last_video_timestamp += frame_delay;
-
-	if (m_videoFrameFormat == render::YUV)
-	{
-		image::yuv* yuvframe = static_cast<image::yuv*>(tmpImage.get());
-		unsigned int copied = 0;
-		boost::uint8_t* ptr = video->m_data;
-		for (int i = 0; i < 3 ; i++)
-		{
-			int shift = (i == 0 ? 0 : 1);
-			boost::uint8_t* yuv_factor = m_Frame->data[i];
-			int h = m_VCodecCtx->height >> shift;
-			int w = m_VCodecCtx->width >> shift;
-			for (int j = 0; j < h; j++)
-			{
-				copied += w;
-				assert(copied <= yuvframe->size());
-				memcpy(ptr, yuv_factor, w);
-				yuv_factor += m_Frame->linesize[i];
-				ptr += w;
-			}
-		}
-		video->m_size = copied;
-	}
-	else if (m_videoFrameFormat == render::RGB)
-	{
-		AVPicture* src;
-		if (m_VCodecCtx->pix_fmt != PIX_FMT_RGB24)
-		{
-			src = &rgbpicture;
-		} else
-		{
-			src = (AVPicture*) m_Frame;
-		}
-	
-		boost::uint8_t* srcptr = src->data[0];		  
-		boost::uint8_t* srcend = srcptr + rgbpicture.linesize[0] * m_VCodecCtx->height;
-		boost::uint8_t* dstptr = video->m_data;
-		unsigned int srcwidth = m_VCodecCtx->width * 3;
-
-		video->m_size = 0;
-
-		while (srcptr < srcend) {
-			memcpy(dstptr, srcptr, srcwidth);
-			srcptr += src->linesize[0];
-			dstptr += srcwidth;
-			video->m_size += srcwidth;
-		}
-		
-		if (m_VCodecCtx->pix_fmt != PIX_FMT_RGB24) {
-			delete [] rgbpicture.data[0];
-		}
-
-	}
-
-	return video;
+	return raw;
 }
 
 bool NetStreamFfmpeg::decodeMediaFrame()
 {
 	return false;
-
-#if 0 // Only FLV for now (non-FLV should be threated the same as FLV, using a MediaParser in place of the FLVParser)
-
-	if (m_unqueued_data)
-	{
-		if (m_unqueued_data->m_stream_index == m_audio_index)
-		{
-			if (_soundHandler)
-			{
-				m_unqueued_data = m_qaudio.push(m_unqueued_data) ? NULL : m_unqueued_data;
-			}
-		}
-		else if (m_unqueued_data->m_stream_index == m_video_index)
-		{
-			m_unqueued_data = m_qvideo.push(m_unqueued_data) ? NULL : m_unqueued_data;
-		}
-		else
-		{
-			log_error(_("read_frame: not audio & video stream"));
-		}
-		return true;
-	}
-
-  	AVPacket packet;
-	
-  	int rc = av_read_frame(m_FormatCtx, &packet);
-
-	if (rc >= 0)
-	{
-		if (packet.stream_index == m_audio_index && _soundHandler)
-		{
-			media::raw_mediadata_t* audio = decodeAudio(&packet);
-      			if (!audio)
-			{
-				log_error(_("Problems decoding audio frame"));
-				return false;
-			}
-			m_unqueued_data = m_qaudio.push(audio) ? NULL : audio;
-		}
-		else
-		if (packet.stream_index == m_video_index)
-		{
-			media::raw_mediadata_t* video = decodeVideo(&packet);
-      			if (!video)
-			{
-				log_error(_("Problems decoding video frame"));
-				return false;
-			}
-			m_unqueued_data = m_qvideo.push(video) ? NULL : video;
-		}
-		av_free_packet(&packet);
-	}
-	else
-	{
-		log_error(_("Problems decoding frame"));
-		return false;
-	}
-
-	return true;
-#endif
 }
 
 void
@@ -1306,65 +681,10 @@ NetStreamFfmpeg::seek(boost::uint32_t posSeconds)
 	decodingStatus(DEC_BUFFERING); 
 
 	// Seek to new position
-	if (m_isFLV)
-	{
-		newpos = m_parser->seek(pos);
-		log_debug("m_parser->seek(%d) returned %d", pos, newpos);
-	}
-	else if (m_FormatCtx)
-	{
-		AVStream* videostream = m_FormatCtx->streams[m_video_index];
-    		timebase = static_cast<double>(videostream->time_base.num / videostream->time_base.den);
-		newpos = static_cast<long>(pos / timebase);
-		
-		if (av_seek_frame(m_FormatCtx, m_video_index, newpos, 0) < 0)
-		{
-			log_error(_("%s: seeking failed"), __FUNCTION__);
-			return;
-		}
-	}
-	else
-	{
-		// TODO: should we log_debug ??
-		return;
-	}
+	newpos = m_parser->seek(pos);
+	log_debug("m_parser->seek(%d) returned %d", pos, newpos);
 
-	// This is kindof hackish and ugly :-(
-	if (newpos == 0)
-	{
-		m_last_video_timestamp = 0;
-		m_last_audio_timestamp = 0;
-	}
-	else if (m_isFLV)
-	{
-		if (m_ACodecCtx) m_last_audio_timestamp = newpos;
-		if (m_VCodecCtx) m_last_video_timestamp = newpos;
-	}
-	else
-	{
-    		AVPacket Packet;
-    		av_init_packet(&Packet);
-		double newtime = 0;
-		while (newtime == 0)
-		{
-      			if (av_read_frame(m_FormatCtx, &Packet) < 0) 
-			{
-				av_seek_frame(m_FormatCtx, -1, 0, AVSEEK_FLAG_BACKWARD);
-				av_free_packet( &Packet );
-				return;
-			}
-
-			newtime = timebase * (double)m_FormatCtx->streams[m_video_index]->cur_dts;
-		}
-
-    		av_free_packet( &Packet );
-
-		av_seek_frame(m_FormatCtx, m_video_index, newpos, 0);
-		newpos = static_cast<boost::int32_t>(newtime / 1000.0);
-
-		m_last_audio_timestamp = newpos;
-		m_last_video_timestamp = newpos;
-	}
+	m_last_audio_timestamp = m_last_video_timestamp = newpos;
 
 	{ // cleanup audio queue, so won't be consumed while seeking
 		boost::mutex::scoped_lock lock(_audioQueueMutex);
@@ -1564,10 +884,10 @@ NetStreamFfmpeg::refreshVideoFrame(bool alsoIfPaused)
 #endif // GNASH_DEBUG_DECODING
 
 	// Get next decoded video frame from parser, will have the lowest timestamp
-    	media::raw_mediadata_t* video = getDecodedVideoFrame(curPos);
+	std::auto_ptr<image::rgb> video = getDecodedVideoFrame(curPos);
 
 	// to be decoded or we're out of data
-	if (!video)
+	if (!video.get())
 	{
 		if ( decodingStatus() == DEC_STOPPED )
 		{
@@ -1598,23 +918,7 @@ NetStreamFfmpeg::refreshVideoFrame(bool alsoIfPaused)
 	}
 	else
 	{
-
-		if (m_videoFrameFormat == render::YUV)
-		{
-			if ( ! m_imageframe ) m_imageframe  = new image::yuv(m_VCodecCtx->width, m_VCodecCtx->height);
-			// XXX m_imageframe might be a byte aligned buffer, while video is not!
-			static_cast<image::yuv*>(m_imageframe)->update(video->m_data);
-		}
-		else if (m_videoFrameFormat == render::RGB)
-		{
-			if ( ! m_imageframe ) m_imageframe  = new image::rgb(m_VCodecCtx->width, m_VCodecCtx->height);
-			image::rgb* imgframe = static_cast<image::rgb*>(m_imageframe);
-			rgbcopy(imgframe, video, m_VCodecCtx->width * 3);
-		}
-
-		// Delete the frame from the queue
-		delete video;
-
+		m_imageframe = video.release(); // ownership transferred
 		// A frame is ready for pickup
 		m_newFrameReady = true;
 	}

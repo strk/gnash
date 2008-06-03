@@ -20,6 +20,7 @@
 
 #include "MediaHandlerGst.h"
 #include "VideoDecoderGst.h"
+#include "AudioDecoderGst.h"
 
 #include "tu_file.h" // for visibility of destructor
 #include "MediaParser.h" // for visibility of destructor
@@ -35,9 +36,26 @@ MediaHandlerGst::createMediaParser(std::auto_ptr<tu_file> stream)
 }
 
 std::auto_ptr<VideoDecoder>
-MediaHandlerGst::createVideoDecoder(videoCodecType format, int width, int height)
+MediaHandlerGst::createVideoDecoder(VideoInfo& info)
 {
+	if ( info.type != FLASH )
+	{
+		log_error("Non-flash video encoding not supported yet by GST VideoDecoder");
+		return std::auto_ptr<VideoDecoder>(0);
+	}
+	videoCodecType format = static_cast<videoCodecType>(info.codec);
+	int width = info.width;
+	int height = info.height;
+
 	std::auto_ptr<VideoDecoder> ret( new VideoDecoderGst(format, width, height) );
+	return ret;
+}
+
+std::auto_ptr<AudioDecoder>
+MediaHandlerGst::createAudioDecoder(AudioInfo& info)
+{
+	std::auto_ptr<AudioDecoder> ret( new AudioDecoderGst() );
+	ret->setup(&info);
 	return ret;
 }
 

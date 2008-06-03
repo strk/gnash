@@ -22,6 +22,8 @@
 #include "render.h"
 #include "BitsReader.h"
 #include "MediaHandler.h"
+#include "MediaParser.h" // for VideoInfo
+#include "VideoDecoder.h"
 
 #include <boost/bind.hpp>
 
@@ -90,7 +92,8 @@ video_stream_definition::readDefineVideoStream(stream* in, SWF::tag_type tag, mo
 		return;
 	}
 
-	_decoder = mh->createVideoDecoder(m_codec_id, _width, _height);
+	media::VideoInfo info(m_codec_id, _width, _height, 0 /*framerate*/, 0 /*duration*/, media::FLASH /*typei*/);
+	_decoder = mh->createVideoDecoder(info); 
 	if ( ! _decoder.get() )
 	{
 		log_error(_("Could not create video decoder for codec id %d"),

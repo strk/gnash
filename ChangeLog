@@ -1,5 +1,20 @@
 2008-06-03 Sandro Santilli <strk@keybit.net>
 
+	* libmedia/MediaHandler.h: add createAudioDecoder, taking AudioInfo
+	  as input, change createVideoDecoder to take VideoInfo for
+	  consistency.
+	* libmedia/AudioDecoder.h: minor comment for interface cleanup
+	* libmedia/ffmpeg/MediaHandlerFfmpeg.{cpp,h}: implement
+	  createAudioDecoder, fix createVideoDecoder.
+	* libmedia/gst/MediaHandlerGst.{cpp,h}: implement createAudioDecoder,
+	  fix createVideoDecoder.
+	* server/asobj/NetStreamFfmpeg.{cpp,h}: drop all decoding code,
+	  rely solely on the MediaHandler for that.
+	* server/parser/video_stream_def.cpp: update calls to
+	  createVideoDecoder now that a VideoInfo is required.
+
+2008-06-03 Sandro Santilli <strk@keybit.net>
+
 	* libmedia/MediaHandler.{cpp,h},
 	  libmedia/gst/MediaHandlerGst.{cpp,h},
 	  libmedia/ffmpeg/MediaHandlerFfmpeg.{cpp,h}

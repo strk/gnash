@@ -29,6 +29,19 @@
 #define __STDC_CONSTANT_MACROS
 #endif
 
+#include "impl.h" // what for ? drop ?
+#include "VideoDecoder.h" // for visibility of dtor
+#include "AudioDecoder.h" // for visibility of dtor
+
+#include "image.h"
+#include "StreamProvider.h"	
+#include "NetStream.h" // for inheritance
+#include "VirtualClock.h"
+
+// TODO: drop ffmpeg-specific stuff
+#include "ffmpegNetStreamUtil.h"
+
+
 #include <queue>
 #include <boost/thread/thread.hpp>
 #include <boost/bind.hpp> 
@@ -39,8 +52,8 @@
 #include <memory>
 #include <cassert>
 
-#include "impl.h"
 
+// TODO: drop ffmpeg-specific stuff here ?
 #ifdef HAVE_FFMPEG_AVFORMAT_H
 extern "C" {
 #include <ffmpeg/avformat.h>
@@ -52,13 +65,6 @@ extern "C" {
 #include <libavformat/avformat.h>
 }
 #endif
-
-#include "image.h"
-#include "StreamProvider.h"	
-#include "NetStream.h" // for inheritance
-#include "VirtualClock.h"
-
-#include "ffmpegNetStreamUtil.h"
 
 /// Uncomment the following to load media in a separate thread
 //#define LOAD_MEDIA_IN_A_SEPARATE_THREAD
@@ -142,6 +148,18 @@ private:
 		DEC_BUFFERING,
 	};
 
+	/// Gets video info from the parser and initializes _videoDecoder
+	//
+	/// @param parser the parser to use to get video information.
+	///
+	void initVideoDecoder(media::MediaParser& parser);
+
+	/// Gets audio info from the parser and initializes _audioDecoder
+	//
+	/// @param parser the parser to use to get audio information.
+	///
+	void initAudioDecoder(media::MediaParser& parser);
+
 	DecodingState _decoding_state;
 
 	// Mutex protecting _playback_state and _decoding_state
@@ -192,40 +210,11 @@ private:
 	// Used to decode and push the next available (non-FLV) frame to the audio or video queue
 	bool decodeMediaFrame();
 
-	/// Used to push decoded version of next available FLV frame to the audio or video queue
-	//
-	/// Called by ::av_streamer to buffer more a/v frames when possible.
-	///
-	/// Will call decodeVideo or decodeAudio depending on frame type, and return
-	/// what they return.
-	/// Will set decodingStatus to DEC_BUFFERING when starving on input
-	///
-	/// This is a blocking call.
-	//
-	/// @returns :
-	/// 	If next frame is video and:
-	///		- we have no video decoding context
-	///		- or there is a decoding error
-	///		- or there is a conversion error
-	///		- or renderer requested format is NONE
-	/// 	... false will be returned.
-	/// 	In any other case, true is returned.
-	///
-	/// NOTE: if EOF is reached, true is returned by decodingStatus is set to DEC_STOPPED
-	///
-	/// NOTE: (FIXME) if we succeeded decoding but the relative queue was full,
-	///       true will be returned but nothing would be pushed on the queues.
-	/// 
-	/// TODO: return a more informative value to tell what happened.
-	/// TODO: make it simpler !
-	///
-	bool decodeFLVFrame();
-
 	/// Decode next video frame fetching it MediaParser cursor
 	//
 	/// @return 0 on EOF or error, a decoded video otherwise
 	///
-	media::raw_mediadata_t* decodeNextVideoFrame();
+	std::auto_ptr<image::rgb> decodeNextVideoFrame();
 
 	/// Decode next audio frame fetching it MediaParser cursor
 	//
@@ -248,29 +237,7 @@ private:
 	///	3. next element in cursor has timestamp > tx
 	///	4. there was an error decoding
 	///
-	media::raw_mediadata_t* getDecodedVideoFrame(boost::uint32_t ts);
-
-	/// Used to decode a video frame 
-	//
-	/// This is a blocking call.
-	/// If no Video decoding context exists (m_VCodecCtx), 0 is returned.
-	/// On decoding (or converting) error, 0 is returned.
-	/// If renderer requested video format is render::NONE, 0 is returned.
-	/// In any other case, a decoded video frame is returned.
-	///
-	/// TODO: return a more informative value to tell what happened.
-	///
-	media::raw_mediadata_t* decodeVideo( AVPacket* packet );
-
-	/// Used to decode an audio frame 
-	//
-	/// This is a blocking call.
-	/// If no Video decoding context exists (m_ACodecCtx), 0 is returned.
-	/// In any other case, a decoded audio frame is returned.
-	///
-	/// TODO: return a more informative value to tell what happened.
-	///
-	media::raw_mediadata_t* decodeAudio( AVPacket* packet );
+	std::auto_ptr<image::rgb> getDecodedVideoFrame(boost::uint32_t ts);
 
 	// Used to calculate a decimal value from a ffmpeg fraction
 	inline double as_double(AVRational time)
@@ -280,24 +247,11 @@ private:
 
 	DecodingState decodingStatus(DecodingState newstate = DEC_NONE);
 
-	int m_video_index;
-	int m_audio_index;
-	
-	// video
-	AVCodecContext* m_VCodecCtx;
-	AVStream* m_video_stream;
+	/// Video decoder
+	std::auto_ptr<media::VideoDecoder> _videoDecoder;
 
-	// audio
-	AVCodecContext *m_ACodecCtx;
-	AVStream* m_audio_stream;
-
-	// the format (mp3, avi, etc.)
-	AVFormatContext *m_FormatCtx;
-
-	AVFrame* m_Frame;
-
-	// Use for resampling audio
-	media::AudioResampler _resampler;
+	/// Audio decoder
+	std::auto_ptr<media::AudioDecoder> _audioDecoder;
 
 #ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
 	/// The parser thread

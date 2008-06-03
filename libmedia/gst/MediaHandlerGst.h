@@ -37,7 +37,9 @@ public:
 
 	virtual std::auto_ptr<MediaParser> createMediaParser(std::auto_ptr<tu_file> stream);
 
-	virtual std::auto_ptr<VideoDecoder> createVideoDecoder(videoCodecType format, int width, int height);
+	virtual std::auto_ptr<VideoDecoder> createVideoDecoder(VideoInfo& info);
+
+	virtual std::auto_ptr<AudioDecoder> createAudioDecoder(AudioInfo& info);
 };
 
 
