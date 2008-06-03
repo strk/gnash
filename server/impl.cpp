@@ -18,10 +18,6 @@
 //
 
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "tu_file.h"
 #include "utility.h"
@@ -62,6 +58,7 @@
 #endif
 
 #include <string>
+#include <cstring> // memset
 #include <map>
 #include <memory> // for auto_ptr
 
@@ -256,96 +253,6 @@ static void ensure_loaders_registered()
 }
 
 
-#if 0 // deprecated
-void  get_movie_info(
-    const URL& url,
-    int* version,
-    int* width,
-    int* height,
-    float* frames_per_second,
-    int* frame_count,
-    int* tag_count
-    )
-    // Attempt to read the header of the given .swf movie file.
-    // Put extracted info in the given vars.
-    // Sets *version to 0 if info can't be extracted.
-{
-    //log_debug(_("%s: url is %s"),  __PRETTY_FUNCTION__, url.str());
-
-    tu_file*  in = globals::streamProvider.getStream(url);
-    if (in == NULL || in->get_error() != TU_FILE_NO_ERROR) {
-  log_error(_("get_movie_info(): can't open '%s'"), url.str());
-  if (version) *version = 0;
-  //delete in;
-  return;
-    }
-    
-    boost::uint32_t file_start_pos = in->get_position();
-    boost::uint32_t header = in->read_le32();
-    boost::uint32_t file_length = in->read_le32();
-    boost::uint32_t file_end_pos = file_start_pos + file_length;
-    
-    int local_version = (header >> 24) & 255;
-    if ((header & 0x0FFFFFF) != 0x00535746
-  && (header & 0x0FFFFFF) != 0x00535743) {
-  // ERROR
-  log_error(_("get_movie_info(): file '%s' does not start with a SWF header"), url.str());
-  if (version) *version = 0;
-  //delete in;
-  return;
-    }
-    bool  compressed = (header & 255) == 'C';
-    
-    tu_file*  original_in = NULL;
-    if (compressed) {
-#ifndef HAVE_ZLIB_H
-  log_error(_("get_movie_info(): can't read zipped SWF data; gnash was compiled without zlib support"));
-  return;
-#else
-  original_in = in;
-  
-  // Uncompress the input as we read it.
-  in = zlib_adapter::make_inflater(original_in);
-  
-  // Subtract the size of the 8-byte header, since
-  // it's not included in the compressed
-  // stream length.
-  file_length -= 8;
-#endif
-    }
-    
-    stream  str(in);
-    
-    rect  frame_size;
-    frame_size.read(&str);
-    
-    float local_frame_rate = str.read_u16() / 256.0f;
-    int local_frame_count = str.read_u16();
-
-    if (version) *version = local_version;
-    if (width) *width = int(frame_size.width() / 20.0f + 0.5f);
-    if (height) *height = int(frame_size.height() / 20.0f + 0.5f);
-    if (frames_per_second) *frames_per_second = local_frame_rate;
-    if (frame_count) *frame_count = local_frame_count;
-    
-    if (tag_count)
-  {
-      // Count tags.
-      int local_tag_count = 0;
-      while ((boost::uint32_t) str.get_position() < file_end_pos)
-    {
-        str.open_tag();
-        str.close_tag();
-        local_tag_count++;
-    }
-      *tag_count = local_tag_count;
-  }
-
-    //delete in;
-    //delete original_in;
-}
-#endif
-
 // Create a movie_definition from a jpeg stream
 // NOTE: this method assumes this *is* a jpeg stream
 static movie_definition*
@@ -403,7 +310,8 @@ get_file_type(tu_file* in)
   in->set_position(0);
 
   unsigned char buf[3];
-  memset(buf, 0, 3);
+  std::memset(buf, 0, 3);
+  
   if ( 3 < in->read_bytes(buf, 3) )
   {
     log_error(_("Can't read file header"));

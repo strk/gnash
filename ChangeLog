@@ -11,6 +11,9 @@
 	  server/parser/video_stream_def.cpp: check return of stream::read()
 	  and throw parser exception if it's shorter than expected (means
 	  the reported tag end position was outside the stream).
+	* server/impl.cpp: drop deprecated (and commented-out) code, include
+	  cstring for std::memset, drop gnashconfig.h include.
+	* server/parser/bitmap_character_def.cpp: drop gnashconfig.h include.
 
 2008-06-03 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
