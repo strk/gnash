@@ -380,6 +380,8 @@ movie_def_impl::readHeader(std::auto_ptr<tu_file> in, const std::string& url)
 	// It seems frame rate is limited to a max 
 	// 84 was found by testing the pp, might be turned into a compile-time define
 	static const int maxfps = 84;
+	
+	_str->ensureBytes(2 + 2); // frame rate, frame count.
 	m_frame_rate = _str->read_u16();
 	if ( ! m_frame_rate )
 	{
