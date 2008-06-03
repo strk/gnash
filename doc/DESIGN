@@ -1,6 +1,6 @@
 Draft design diagram for Gnash
 ------------------------------
-$Id: DESIGN,v 1.5 2008/05/08 10:59:01 strk Exp $
+$Id: DESIGN,v 1.6 2008/06/03 16:30:33 strk Exp $
 
 
     (speakers,file)
@@ -9,7 +9,7 @@ $Id: DESIGN,v 1.5 2008/05/08 10:59:01 strk Exp $
     [sound_handler] <--------{A}
                               |
                               |
-           (inputs) --> [gnash_core] <---{C}---> [media_handler]
+           (inputs) --> [gnash_core] <---{C}---> [MediaHandler]
                               |
                               |
       [render_handler] <-----{B}
@@ -24,7 +24,7 @@ Components
      [gnash_core] -- Gnash core lib (swf parser, VM, builtin objects)
   [sound_handler] -- Sound handler, can be modular (gst/ffmpeg/mad/whatever)
  [render_handler] -- Renderer, can be modular (agg/ogl/cairo/whatever)
-  [media_handler] -- Media parser and decoder, can be modular (gst/ffmpeg/whatever)
+   [MediaHandler] -- Factory for media parsers and decoders, can be modular (gst/ffmpeg/whatever)
 
 Component connectors 
 --------------------
@@ -42,5 +42,7 @@ Component connectors
          wrappers in the gnash::render namespace
          (still in server/render.h)
 
- {C} --- [gnash_core] to [media_handler] connector 
-         ???
+ {C} --- [gnash_core] to [MediaHandler] connector 
+         Is setup with gnash::media::MediaHandler::set
+         and retrived with gnash::media::MediaHandler::get,
+         both currently exposed in libmedia/MediaHandler.h
