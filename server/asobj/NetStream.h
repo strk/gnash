@@ -31,7 +31,7 @@
 #include "impl.h"
 #include "video_stream_instance.h"
 #include "NetConnection.h"
-#include "FLVParser.h"
+#include "MediaParser.h"
 #include "as_function.h" // for visibility of destructor by intrusive_ptr
 
 #include <deque>
@@ -277,8 +277,8 @@ protected:
 	// The video URL
 	std::string url;
 
-	// The homegrown parser we use for FLV
-	std::auto_ptr<FLVParser> m_parser;
+	// The input media parser
+	std::auto_ptr<media::MediaParser> m_parser;
 
 	// Are we playing a FLV?
 	bool m_isFLV;

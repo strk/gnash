@@ -31,6 +31,7 @@
 #include "rect.h" // for composition
 #include "ControlTag.h"
 #include "VideoDecoder.h"
+#include "MediaParser.h" // for videoFrameType and videoCodecType enums
 
 #include "image.h"
 

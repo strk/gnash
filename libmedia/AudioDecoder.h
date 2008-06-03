@@ -20,9 +20,15 @@
 #ifndef __AUDIODECODER_H__
 #define __AUDIODECODER_H__
 
-#include "MediaParser.h"
 #include "SoundInfo.h"
 #include "Util.h"
+
+// Forward declarations
+namespace gnash {
+	namespace media {
+		class AudioInfo;
+	}
+}
 
 namespace gnash {
 namespace media {

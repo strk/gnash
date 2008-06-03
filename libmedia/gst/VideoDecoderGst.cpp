@@ -133,11 +133,12 @@ VideoDecoderGst::push(const EncodedVideoFrame& frame)
   
   GstBuffer* buffer = gst_buffer_new();
   
-  GST_BUFFER_DATA(buffer) = frame.data();
-	GST_BUFFER_SIZE(buffer) = frame.dataSize();	
-	GST_BUFFER_OFFSET(buffer) = frame.frameNum();
-	GST_BUFFER_TIMESTAMP(buffer) = GST_CLOCK_TIME_NONE;
-	GST_BUFFER_DURATION(buffer) = GST_CLOCK_TIME_NONE;
+  // dunno why gst needs non-const here
+  GST_BUFFER_DATA(buffer) = const_cast<uint8_t*>(frame.data());
+  GST_BUFFER_SIZE(buffer) = frame.dataSize();	
+  GST_BUFFER_OFFSET(buffer) = frame.frameNum();
+  GST_BUFFER_TIMESTAMP(buffer) = GST_CLOCK_TIME_NONE;
+  GST_BUFFER_DURATION(buffer) = GST_CLOCK_TIME_NONE;
   
   gst_app_src_push_buffer (GST_APP_SRC(_appsrc), buffer);
   

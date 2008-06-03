@@ -125,7 +125,6 @@ libgnashbase_la_SOURCES = \
 	zlib_adapter.cpp \
 	URL.cpp \
 	LoadThread.cpp \
-	FLVParser.cpp \
 	GC.cpp \
 	BitsReader.cpp \
 	arg_parser.cpp \
@@ -162,7 +161,6 @@ noinst_HEADERS = \
 	zlib_adapter.h \
 	URL.h \
 	LoadThread.h \
-	FLVParser.h \
 	GC.h \
 	BitsReader.h \
 	arg_parser.h \

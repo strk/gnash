@@ -20,15 +20,19 @@
 #ifndef __VIDEODECODER_H__
 #define __VIDEODECODER_H__
 
-#include "MediaParser.h"
 #include "image.h"
 
 #include <boost/noncopyable.hpp>
 
+// Forward declarations
+namespace gnash {
+	namespace media {
+		class EncodedVideoFrame;
+	}
+}
+
 namespace gnash {
 namespace media {
-
-class EncodedVideoFrame;
 
 /// Abstract base class for embedded video decoders.
 //
@@ -66,44 +70,6 @@ public:
   ///
   virtual bool peek() = 0;
 };
-
-
-/// This class represents a video frame that has not yet been decoded.
-class EncodedVideoFrame : public boost::noncopyable
-{
-public:
-  /// @param buffer Pointer to the video data corresponding to this frame. This
-  ///               class takes ownership of the pointer.
-  /// @param buf_size The size, in bytes, of the data pointed to in the buffer
-  ///                 argument
-  /// @param frame_number The number of the frame in the video stream.
-  EncodedVideoFrame(boost::uint8_t* buffer, size_t buf_size, size_t frame_num)
-    : _buffer(buffer),
-      _buffer_size(buf_size),
-      _frame_number(frame_num)
-  {}
-  
-  uint8_t* data() const
-  {
-    return _buffer.get();
-  }
-  
-  size_t dataSize() const
-  {
-    return _buffer_size;
-  }
-  
-  size_t frameNum() const
-  {
-    return _frame_number;
-  }
-
-private:
-  boost::scoped_array<uint8_t> _buffer;
-  size_t _buffer_size;
-  size_t _frame_number;
-};
-
 
 	
 } // gnash.media namespace 

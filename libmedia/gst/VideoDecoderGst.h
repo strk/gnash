@@ -26,11 +26,12 @@
 #endif
 
 #include "image.h"
-#include <gst/gst.h>
 #include "log.h"
-#include "MediaParser.h"
 #include "VideoDecoder.h"
 #include "dsodefs.h"
+#include "MediaParser.h" // for videoCodecType enum
+
+#include <gst/gst.h>
 
 
 namespace gnash {

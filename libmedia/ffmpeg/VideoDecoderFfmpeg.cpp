@@ -160,7 +160,7 @@ VideoDecoderFfmpeg::convertRGB24(AVCodecContext* srcCtx,
 }
 
 std::auto_ptr<image::rgb>
-VideoDecoderFfmpeg::decode(boost::uint8_t* input, boost::uint32_t input_size)
+VideoDecoderFfmpeg::decode(const boost::uint8_t* input, boost::uint32_t input_size)
 {
   std::auto_ptr<image::rgb> ret;
 
@@ -171,7 +171,8 @@ VideoDecoderFfmpeg::decode(boost::uint8_t* input, boost::uint32_t input_size)
   }
 
   int bytes = 0;  
-  avcodec_decode_video(_videoCodecCtx, frame, &bytes, input, input_size);
+  // no idea why avcodec_decode_video wants a non-const input...
+  avcodec_decode_video(_videoCodecCtx, frame, &bytes, const_cast<boost::uint8_t*>(input), input_size);
   
   if (!bytes) {
     log_error("Decoding of a video frame failed");

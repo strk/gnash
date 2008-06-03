@@ -59,6 +59,12 @@
 #define NELLY_BASE_OFF 4228
 #define NELLY_BASE_SHIFT 19
 
+// Forward declarations
+namespace gnash {
+	namespace media {
+		class AudioInfo;
+	}
+}
 
 
 typedef struct nelly_handle_struct {

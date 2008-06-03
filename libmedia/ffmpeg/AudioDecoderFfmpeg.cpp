@@ -143,16 +143,8 @@ bool AudioDecoderFfmpeg::setup(AudioInfo* info)
 		return false;
 	}
 
-	// Reuse the audioCodecCtx from the ffmpeg parser if exists/possible
-	if (info->audioCodecCtx)
-	{
-		log_debug("re-using the parser's audioCodecCtx");
-		_audioCodecCtx = info->audioCodecCtx;
-	} 
-	else
-	{
-		_audioCodecCtx = avcodec_alloc_context();
-	}
+	// Create an audioCodecCtx from the ffmpeg parser if exists/possible
+	_audioCodecCtx = avcodec_alloc_context();
 
 	if (!_audioCodecCtx) {
 		log_error(_("libavcodec couldn't allocate context"));

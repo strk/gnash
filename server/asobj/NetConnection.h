@@ -20,8 +20,6 @@
 #define __NETCONNECTION_H__
 
 #include "tu_file.h"
-//#include "LoadThread.h"
-//#include "FLVParser.h"
 
 #include <stdexcept>
 #include <cstdio>
@@ -39,7 +37,6 @@
 // Forward declarations
 namespace gnash {
 	//class NetStream;
-	class FLVParser;
 }
 
 namespace gnash {
@@ -111,6 +108,8 @@ public:
 	///
 	/// Return number of actually read bytes
 	///
+	/// TODO: drop
+	///
 	size_t read(void *dst, size_t bytes);
 
 	/// Return true if EOF has been reached
@@ -125,12 +124,16 @@ public:
 	/// This call never blocks.
 	/// If not connected, 0 is returned (is this correct behaviour?)
 	///
+	/// TODO: drop
+	///
 	size_t tell();
 
 	/// Returns the number of bytes cached
 	//
 	/// This call never blocks.
 	/// If not connected, 0 is returned (is this correct behaviour?)
+	///
+	/// TODO: drop
 	///
 	long getBytesLoaded();
 
@@ -139,17 +142,15 @@ public:
 	/// This call never blocks.
 	/// If not connected, 0 is returned (is this correct behaviour?)
 	///
-	long getBytesTotal();
-
-	/// Return an FLVParser using our LoadThread for input
-	//
-	/// If not connected, a NULL auto_ptr is returned.
+	/// TODO: drop
 	///
-	std::auto_ptr<FLVParser> getConnectedParser();
+	long getBytesTotal();
 
 	/// Returns whether the load is complete
 	//
 	/// This call never blocks.
+	///
+	/// TODO: drop
 	///
 	bool loadCompleted();
 
@@ -165,6 +166,9 @@ private:
 	std::string _completeUrl;
 
 	/// The file/stream loader thread and interface
+	//
+	/// TODO: drop
+	///
 	std::auto_ptr<tu_file> _loader;
 
 	/// Attach ActionScript instance properties

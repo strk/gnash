@@ -1,3 +1,25 @@
+2008-06-03 Sandro Santilli <strk@keybit.net>
+
+	* libbase/FLVParser.{cpp,h} => libmedia/FLVParser.{cpp,h},
+	  libbase/Makefile.am, libmedia/Makefile.am:
+	  Moved FLVParser under libmedia and make it a MediaParser.
+	* libmedia/AudioDecoder.h, libmedia/AudioDecoderNellymoser.h,
+	  libmedia/SoundInfo.h
+	  Streamline headers inclusion.
+	* libmedia/VideoDecoder.h: drop EncodedVideoFrame, moved to
+	   MediaParser
+	* libmedia/MediaDecoder.{cpp,h}, libmedia/gst/MediaDecoderGst.{cpp,h}:
+	  drop unused files.
+	* libmedia/MediaParser.h: extend MediaParser interface to expose all
+	  needed stuff.
+	* libmedia/ffmpeg/AudioDecoderFfmpeg.cpp,
+	  libmedia/ffmpeg/VideoDecoderFfmpeg.{cpp,h},
+	  libmedia/gst/VideoDecoderGst.{cpp,h}: minor cleanups
+	* server/asobj/NetConnection.{cpp,h}: cleanups
+	* server/asobj/NetStream.h: m_parser is a MediaParser now.
+	* server/asobj/NetStreamFfmpeg.cpp: update use of the parser
+	* server/parser/video_stream_def.h: include MediaParser for enums.
+
 2008-06-03 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/cxform.{cpp,h}: drop cxform::print().

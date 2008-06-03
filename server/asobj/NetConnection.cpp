@@ -194,6 +194,7 @@ NetConnection::seek( size_t pos )
 
 
 /*public*/
+/// TODO: drop
 size_t
 NetConnection::tell()
 {
@@ -203,6 +204,7 @@ NetConnection::tell()
 
 
 /*public*/
+/// TODO: drop
 long
 NetConnection::getBytesLoaded()
 {
@@ -212,6 +214,7 @@ NetConnection::getBytesLoaded()
 
 
 /*public*/
+/// TODO: drop
 long
 NetConnection::getBytesTotal()
 {
@@ -221,6 +224,7 @@ NetConnection::getBytesTotal()
 
 
 /*public*/
+/// TODO: drop
 bool
 NetConnection::loadCompleted()
 {
@@ -230,20 +234,6 @@ NetConnection::loadCompleted()
 
   // is the below correct ?
   return _loader->get_eof(); // completed();
-}
-
-
-std::auto_ptr<FLVParser>
-NetConnection::getConnectedParser()
-{
-  std::auto_ptr<FLVParser> ret;
-
-  if ( _loader.get() ) {
-    ret.reset( new FLVParser(_loader) ); // transfer loader ownership
-    assert(!_loader.get());
-  }
-
-  return ret;
 }
 
 

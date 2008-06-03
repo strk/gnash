@@ -305,6 +305,9 @@ NetStreamFfmpeg::play(const std::string& c_url)
 /// @param codec_id the codec ID to find
 /// @return the initialized context, or NULL on failure. The caller is 
 ///         responsible for deallocating!
+///
+/// TODO: drop, let VideoDecoder/AudioDecoder do this !
+///
 static AVCodecContext*
 initContext(enum CodecID codec_id)
 {
@@ -340,10 +343,10 @@ initContext(enum CodecID codec_id)
 /// @return the initialized context, or NULL on failure. The caller
 ///         is responsible for deallocating this pointer.
 static AVCodecContext* 
-initFlvVideo(FLVParser& parser)
+initVideoDecoder(media::MediaParser& parser)
 {
 	// Get video info from the parser
-	FLVVideoInfo* videoInfo = parser.getVideoInfo();
+	media::VideoInfo* videoInfo = parser.getVideoInfo();
 	if (!videoInfo)
 	{
 		return NULL;
@@ -374,12 +377,12 @@ initFlvVideo(FLVParser& parser)
 }
 
 
-/// Like initFlvVideo, but for audio.
+/// Like initVideoDecoder, but for audio.
 static AVCodecContext*
-initFlvAudio(FLVParser& parser)
+initAudioDecoder(media::MediaParser& parser)
 {
 	// Get audio info from the parser
-	FLVAudioInfo* audioInfo =  parser.getAudioInfo();
+	media::AudioInfo* audioInfo =  parser.getAudioInfo();
 	if (!audioInfo)
 	{
 		log_debug("No audio in FLV stream");
@@ -451,6 +454,10 @@ NetStreamFfmpeg::startPlayback()
 		return false;
 	}
 
+	//
+	// TODO: let all of this be handled by a MediaParserFactory
+	// (ie: inspecting type of input)
+	// 
 
 	_inputStream->set_position(0);
 	if (std::string(head) == "FLV")
@@ -458,7 +465,7 @@ NetStreamFfmpeg::startPlayback()
 		m_isFLV = true;
 		assert ( !m_parser.get() );
 
-		m_parser.reset( new FLVParser(_inputStream) ); 
+		m_parser.reset( new media::FLVParser(_inputStream) );
 		assert(! _inputStream.get() ); // TODO: when ownership will be transferred...
 
 		if (! m_parser.get() )
@@ -473,14 +480,14 @@ NetStreamFfmpeg::startPlayback()
 		avcodec_init();
 		avcodec_register_all();
 
-		m_VCodecCtx = initFlvVideo(*m_parser);
+		m_VCodecCtx = initVideoDecoder(*m_parser); // TODO: let VideoDecoder do this !
 		if (!m_VCodecCtx)
 		{
 			log_error(_("Failed to initialize FLV video codec"));
 			return false;
 		}
 
-		m_ACodecCtx = initFlvAudio(*m_parser);
+		m_ACodecCtx = initAudioDecoder(*m_parser); // TODO: let AudioDecoder do this !
 		if (!m_ACodecCtx)
 		{
 			// There might simply be no audio, no problem...
@@ -773,21 +780,21 @@ NetStreamFfmpeg::getDecodedVideoFrame(boost::uint32_t ts)
 		return 0; // no parser, no party
 	}
 
-	FLVVideoFrameInfo* info = m_parser->peekNextVideoFrameInfo();
-	if ( ! info )
+	boost::uint64_t nextTimestamp;
+	if ( ! m_parser->nextVideoFrameTimestamp(nextTimestamp) )
 	{
 #ifdef GNASH_DEBUG_DECODING
-		log_debug("getDecodedVideoFrame(%d): no more video frames in input (peekNextVideoFrameInfo returned false)");
+		log_debug("getDecodedVideoFrame(%d): no more video frames in input (nextVideoFrameTimestamp returned false)");
 #endif // GNASH_DEBUG_DECODING
 		decodingStatus(DEC_STOPPED);
 		return 0;
 	}
 
-	if ( info->timestamp > ts )
+	if ( nextTimestamp > ts )
 	{
 #ifdef GNASH_DEBUG_DECODING
 		log_debug("%p.getDecodedVideoFrame(%d): next video frame is in the future (%d)",
-			this, ts, info->timestamp);
+			this, ts, nextTimestamp);
 #endif // GNASH_DEBUG_DECODING
 		return 0; // next frame is in the future
 	}
@@ -799,14 +806,13 @@ NetStreamFfmpeg::getDecodedVideoFrame(boost::uint32_t ts)
     		video = decodeNextVideoFrame();
 		if ( ! video )
 		{
-			log_error("peekNextVideoFrameInfo returned some info, "
+			log_error("nextVideoFrameTimestamp returned true, "
 				"but decodeNextVideoFrame returned null, "
 				"I don't think this should ever happen");
 			break;
 		}
 
-		FLVVideoFrameInfo* info = m_parser->peekNextVideoFrameInfo();
-		if ( ! info )
+		if ( ! m_parser->nextVideoFrameTimestamp(nextTimestamp) )
 		{
 			// the one we decoded was the last one
 #ifdef GNASH_DEBUG_DECODING
@@ -815,7 +821,7 @@ NetStreamFfmpeg::getDecodedVideoFrame(boost::uint32_t ts)
 #endif // GNASH_DEBUG_DECODING
 			break;
 		}
-		if ( info->timestamp > ts )
+		if ( nextTimestamp > ts )
 		{
 			// the next one is in the future, we'll return this one.
 #ifdef GNASH_DEBUG_DECODING
@@ -840,8 +846,8 @@ NetStreamFfmpeg::decodeNextVideoFrame()
 		return 0; // no parser, no party
 	}
 
-	FLVFrame* frame = m_parser->nextVideoFrame(); 
-	if (frame == NULL)
+	std::auto_ptr<media::EncodedVideoFrame> frame = m_parser->nextVideoFrame(); 
+	if ( ! frame.get() )
 	{
 #ifdef GNASH_DEBUG_DECODING
 		log_debug("%p.decodeNextVideoFrame(): "
@@ -850,16 +856,15 @@ NetStreamFfmpeg::decodeNextVideoFrame()
 #endif // GNASH_DEBUG_DECODING
 		return 0;
 	}
-	assert (frame->type == videoFrame);
 
   	AVPacket packet;
 
   	packet.destruct = avpacket_destruct; // needed ?
-  	packet.size = frame->dataSize;
-  	packet.data = frame->data;
+  	packet.size = frame->dataSize();
+	// ffmpeg insist in requiring non-const AVPacket.data ...
+  	packet.data = const_cast<boost::uint8_t*>(frame->data());
   	// FIXME: is this the right value for packet.dts?
-  	packet.pts = packet.dts = static_cast<boost::int64_t>(frame->timestamp);
-	assert (frame->type == videoFrame);
+  	packet.pts = packet.dts = frame->timestamp();
 	packet.stream_index = 0;
 
 	return decodeVideo(&packet);
@@ -870,8 +875,8 @@ NetStreamFfmpeg::decodeNextAudioFrame()
 {
 	assert ( m_parser.get() );
 
-	FLVFrame* frame = m_parser->nextAudioFrame(); 
-	if (frame == NULL)
+	std::auto_ptr<media::EncodedAudioFrame> frame = m_parser->nextAudioFrame(); 
+	if ( ! frame.get() )
 	{
 #ifdef GNASH_DEBUG_DECODING
 		log_debug("%p.decodeNextAudioFrame: "
@@ -880,16 +885,14 @@ NetStreamFfmpeg::decodeNextAudioFrame()
 #endif // GNASH_DEBUG_DECODING
 		return 0;
 	}
-	assert (frame->type == audioFrame);
 
   	AVPacket packet;
 
   	packet.destruct = avpacket_destruct;
   	packet.size = frame->dataSize;
-  	packet.data = frame->data;
+  	packet.data = frame->data.get();
   	// FIXME: is this the right value for packet.dts?
-  	packet.pts = packet.dts = static_cast<boost::int64_t>(frame->timestamp);
-	assert(frame->type == audioFrame);
+  	packet.pts = packet.dts = frame->timestamp;
 	packet.stream_index = 1;
 
 	return decodeAudio(&packet);
@@ -1385,9 +1388,7 @@ NetStreamFfmpeg::parseNextChunk()
 {
 	// TODO: parse as much as possible w/out blocking
 	//       (will always block currently..)
-	const int tagsPerChunk = 2;
-	for (int i=0; i<tagsPerChunk; ++i)
-		m_parser->parseNextTag();
+	m_parser->parseNextChunk();
 }
 
 void
@@ -1444,15 +1445,15 @@ NetStreamFfmpeg::pushDecodedAudioFrames(boost::uint32_t ts)
 
 	bool consumed = false;
 
+	boost::uint64_t nextTimestamp;
 	while ( 1 )
 	{
-		FLVAudioFrameInfo* info = m_parser->peekNextAudioFrameInfo();
-		if ( ! info )
+		if ( ! m_parser->nextAudioFrameTimestamp(nextTimestamp) )
 		{
 #ifdef GNASH_DEBUG_DECODING
 			log_debug("%p.pushDecodedAudioFrames(%d): "
 				"no more audio frames in input "
-				"(peekNextAudioFrameInfo returned false)",
+				"(nextAudioFrameTimestamp returned false)",
 				this, ts);
 #endif // GNASH_DEBUG_DECODING
 			consumed = true;
@@ -1464,12 +1465,12 @@ NetStreamFfmpeg::pushDecodedAudioFrames(boost::uint32_t ts)
 			break;
 		}
 
-		if ( info->timestamp > ts )
+		if ( nextTimestamp > ts )
 		{
 #ifdef GNASH_DEBUG_DECODING
 			log_debug("%p.pushDecodedAudioFrames(%d): "
 				"next audio frame is in the future (%d)",
-				this, ts, info->timestamp);
+				this, ts, nextTimestamp);
 #endif // GNASH_DEBUG_DECODING
 			consumed = true;
 			break; // next frame is in the future
@@ -1501,7 +1502,7 @@ NetStreamFfmpeg::pushDecodedAudioFrames(boost::uint32_t ts)
 		media::raw_mediadata_t* audio = decodeNextAudioFrame();
 		if ( ! audio )
 		{
-			log_error("peekNextAudioFrameInfo returned some info, "
+			log_error("nextAudioFrameTimestamp returned true, "
 				"but decodeNextAudioFrame returned null, "
 				"I don't think this should ever happen");
 			break;
@@ -1510,7 +1511,7 @@ NetStreamFfmpeg::pushDecodedAudioFrames(boost::uint32_t ts)
 #ifdef GNASH_DEBUG_DECODING
 		// this one we might avoid :) -- a less intrusive logging could
 		// be take note about how many things we're pushing over
-		log_debug("pushDecodedAudioFrames(%d) pushing frame with timestamp %d", ts, info->timestamp); 
+		log_debug("pushDecodedAudioFrames(%d) pushing frame with timestamp %d", ts, nextTimestamp); 
 #endif
 		_audioQueue.push_back(audio);
 	}

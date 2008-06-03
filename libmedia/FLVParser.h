@@ -23,12 +23,14 @@
 #ifndef __FLVPARSER_H__
 #define __FLVPARSER_H__
 
-#include "LoadThread.h"
 #include "dsodefs.h"
+#include "MediaParser.h" // for inheritance
+
 #include <vector>
 #include <memory>
 
 namespace gnash {
+namespace media {
 
 /// Frame type
 enum FrameType {
@@ -64,6 +66,9 @@ public:
 /// The FLVAudioInfo class contains information about the audiostream
 /// in the FLV being parsed. The information stored is codec-type,
 /// samplerate, samplesize, stereo flag and duration.
+//
+/// TODO: drop
+///
 class FLVAudioInfo
 {
 public:
@@ -87,11 +92,15 @@ public:
 /// The FLVVideoInfo class contains information about the videostream
 /// in the FLV being parsed. The information stored is codec-type,
 /// width, height, framerate and duration.
+//
+/// TODO: drop
+///
 class FLVVideoInfo
 {
 public:
 	FLVVideoInfo(boost::uint16_t codeci, boost::uint16_t widthi, boost::uint16_t heighti, boost::uint16_t frameRatei, boost::uint64_t durationi)
-		: codec(codeci),
+		:
+		codec(codeci),
 		width(widthi),
 		height(heighti),
 		frameRate(frameRatei),
@@ -147,61 +156,18 @@ public:
 
 };
 
-/// \brief
-/// The FLVParser class parses an FLV stream, buffers audio/video frames
-/// and provides cursor-based access to them.
-//
-/// Cursor-based access allow seeking as close as possible to a specified time
-/// and fetching frames from there on, sequentially.
-/// See seek(), nextVideoFrame(), nextAudioFrame() and nextMediaFrame().
-///
-/// Input is received from a tu_file object.
-///
-class DSOEXPORT FLVParser
+/// The FLVParser class parses FLV streams
+class DSOEXPORT FLVParser : public MediaParser
 {
 
 public:
 
-	enum videoCodecType
-	{
-		VIDEO_CODEC_H263 = 2,	// H263/SVQ3 video codec
-		VIDEO_CODEC_SCREENVIDEO = 3,	// Screenvideo codec
-		VIDEO_CODEC_VP6 = 4,		// On2 VP6 video codec
-		VIDEO_CODEC_VP6A = 5,		// On2 VP6 Alpha video codec
-		VIDEO_CODEC_SCREENVIDEO2 = 6	// Screenvideo2 codec
-	};
-
-	enum audioCodecType
-	{
-		AUDIO_CODEC_RAW = 0,		// unspecified format.  Useful for 8-bit sounds???
-		AUDIO_CODEC_ADPCM = 1,	// gnash doesn't pass this through; it uncompresses and sends FORMAT_NATIVE16
-		AUDIO_CODEC_MP3 = 2,
-		AUDIO_CODEC_UNCOMPRESSED = 3,	// 16 bits/sample, little-endian
-		AUDIO_CODEC_NELLYMOSER_8HZ_MONO = 5,	// According to ffmpeg
-		AUDIO_CODEC_NELLYMOSER = 6	// Mystery proprietary format; see nellymoser.com
-	};
-
-	enum tagType
-	{
-		AUDIO_TAG = 0x08,
-		VIDEO_TAG = 0x09,
-		META_TAG = 0x12
-	};
-
-	enum videoFrameType
-	{
-		KEY_FRAME = 1,
-		INTER_FRAME = 2,
-		DIS_INTER_FRAME = 3
-	};
-
-
 	/// \brief
 	/// Create an FLV parser reading input from
-	/// the given LoadThread
+	/// the given tu_file
 	//
 	/// @param lt
-	/// 	LoadThread to use for input.
+	/// 	tu_file to use for input.
 	/// 	Ownership transferred.
 	///
 	FLVParser(std::auto_ptr<tu_file> lt);
@@ -209,64 +175,17 @@ public:
 	/// Kills the parser...
 	~FLVParser();
 
-	/// Return next media frame
-	//
-	/// Locks the _mutex
-	///
-	FLVFrame* nextMediaFrame();
+	// see dox in MediaParser.h
+	bool nextAudioFrameTimestamp(boost::uint64_t& ts);
 
-	/// \brief
-	/// Return the next audio frame info in the parsed buffer.
-	//
-	/// If no frame has been played before the first frame is returned.
-	/// If there is no more frames in the parsed buffer NULL is returned,
-	/// you can check with parsingCompleted() to know wheter this is due to 
-	/// EOF reached.
-	///
-	/// TODO: return a more abstract EncodedAudioFrameInfo
-	///
-	FLVAudioFrameInfo* peekNextAudioFrameInfo();
+	// see dox in MediaParser.h
+	bool nextVideoFrameTimestamp(boost::uint64_t& ts);
 
-	/// \brief
-	/// Returns the next audio frame in the parsed buffer, advancing audio cursor.
-	//
-	/// If no frame has been played before the first frame is returned.
-	/// If there is no more frames in the parsed buffer NULL is returned,
-	/// you can check with parsingCompleted() to know wheter this is due to 
-	/// EOF reached.
-	///
-	/// TODO: return a more abstract EncodedAudioFrame
-	///
-	FLVFrame* nextAudioFrame();
+	// see dox in MediaParser.h
+	std::auto_ptr<EncodedAudioFrame> nextAudioFrame();
 
-	/// Returns the next video frame info in the parsed buffer.
-	//
-	/// If no frame has been played before the first frame is returned.
-	/// If there is no more frames in the parsed buffer NULL is returned.
-	/// you can check with parsingCompleted() to know wheter this is due to 
-	/// EOF reached.
-	///
-	/// TODO: return a more abstract EncodedVideoFrameInfo
-	///
-	FLVVideoFrameInfo* peekNextVideoFrameInfo();
-
-	/// Returns the next video frame in the parsed buffer, advancing video cursor.
-	//
-	/// If no frame has been played before the first frame is returned.
-	/// If there is no more frames in the parsed buffer NULL is returned.
-	/// you can check with parsingCompleted() to know wheter this is due to 
-	/// EOF reached.
-	///
-	/// TODO: return a more abstract EncodedVideoFrame
-	///
-	FLVFrame* nextVideoFrame();
-
-	/// Return true of parsing is completed
-	//
-	/// If this function returns true, any call to nextVideoFrame() or nextAudioFrame
-	/// will always return NULL
-	///
-	bool parsingCompleted() const { return _parsingComplete; }
+	// see dox in MediaParser.h
+	std::auto_ptr<EncodedVideoFrame> nextVideoFrame();
 
 	/// Returns information about video in the stream.
 	//
@@ -274,15 +193,13 @@ public:
 	/// Can return NULL if video contains NO video frames.
 	/// Will block till either parsing finished or a video frame is found.
 	///
-	/// TODO: return a more abstract VideoInfo
-	///
-	FLVVideoInfo* getVideoInfo();
+	VideoInfo* getVideoInfo();
 
 	/// Returns a FLVAudioInfo class about the audiostream
 	//
 	/// TODO: return a more abstract AudioInfo
 	///
-	FLVAudioInfo* getAudioInfo();
+	AudioInfo* getAudioInfo();
 
 	/// \brief
 	/// Asks if a frame with with a timestamp larger than
@@ -329,6 +246,10 @@ public:
 	//
 	boost::uint32_t getBufferLength();
 
+	virtual bool parseNextChunk() {
+		return parseNextTag();
+	}
+
 	/// Parses next tag from the file
 	//
 	/// Returns true if something was parsed, false otherwise.
@@ -339,10 +260,11 @@ public:
 	/// Return number of bytes parsed so far
 	boost::uint64_t getBytesLoaded() const;
 
-	/// Return total number of bytes in input
-	boost::uint64_t getBytesTotal() const;
-
 private:
+
+	FLVAudioFrameInfo* peekNextAudioFrameInfo();
+
+	FLVVideoFrameInfo* peekNextVideoFrameInfo();
 
 	/// seeks to the closest possible position the given position,
 	/// and returns the new position.
@@ -357,9 +279,6 @@ private:
 
 	// Functions used to extract numbers from the file
 	inline boost::uint32_t getUInt24(boost::uint8_t* in);
-
-	/// The interface to the file, externally owned
-	std::auto_ptr<tu_file> _lt;
 
 	// NOTE: FLVVideoFrameInfo is a relatively small structure,
 	//       chances are keeping by value here would reduce
@@ -380,14 +299,11 @@ private:
 	/// The position where the parsing should continue from.
 	boost::uint64_t _lastParsedPosition;
 
-	/// Whether the parsing is complete or not
-	bool _parsingComplete;
-
 	/// Info about the video stream (if any)
-	std::auto_ptr<FLVVideoInfo> _videoInfo;
+	std::auto_ptr<VideoInfo> _videoInfo;
 
 	/// Info about the audio stream (if any)
-	std::auto_ptr<FLVAudioInfo> _audioInfo;
+	std::auto_ptr<AudioInfo> _audioInfo;
 
 	/// Last audio frame returned
 	size_t _nextAudioFrame;
@@ -402,6 +318,7 @@ private:
 	bool _video;
 };
 
+} // end of gnash::media namespace
 } // end of gnash namespace
 
 #endif // __FLVPARSER_H__

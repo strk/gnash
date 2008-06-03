@@ -34,43 +34,44 @@ using namespace std;
 //#define GNASH_DEBUG_SEEK 1
 
 namespace gnash {
+namespace media {
 
-static std::auto_ptr<FLVFrame>
+static std::auto_ptr<EncodedVideoFrame>
 makeVideoFrame(tu_file& in, const FLVVideoFrameInfo& frameInfo)
 {
-	std::auto_ptr<FLVFrame> frame ( new FLVFrame );
+	std::auto_ptr<EncodedVideoFrame> frame;
 
-	frame->dataSize = frameInfo.dataSize;
-	frame->timestamp = frameInfo.timestamp;
-	frame->type = videoFrame;
+	boost::uint32_t dataSize = frameInfo.dataSize;
+	boost::uint64_t timestamp = frameInfo.timestamp;
 
 	if ( in.set_position(frameInfo.dataPosition) )
 	{
 		log_error(_("Failed seeking to videoframe in FLV input"));
-		frame.reset();
 		return frame;
 	}
 
-	unsigned long int dataSize = frameInfo.dataSize;
 	unsigned long int chunkSize = smallestMultipleContaining(READ_CHUNKS, dataSize+PADDING_BYTES);
 
-	frame->data = new boost::uint8_t[chunkSize];
-	size_t bytesread = in.read_bytes(frame->data, dataSize);
+	boost::uint8_t* data = new boost::uint8_t[chunkSize];
+	size_t bytesread = in.read_bytes(data, dataSize);
 
 	unsigned long int padding = chunkSize-dataSize;
 	assert(padding);
-	memset(frame->data + bytesread, 0, padding);
+	memset(data + bytesread, 0, padding);
 
+	// We won't need frameNum, so will set to zero...
+	// TODO: fix this ?
+	// NOTE: ownership of 'data' is transferred here
+	frame.reset( new EncodedVideoFrame(data, dataSize, 0, timestamp) );
 	return frame;
 }
 
-static std::auto_ptr<FLVFrame>
+static std::auto_ptr<EncodedAudioFrame>
 makeAudioFrame(tu_file& in, const FLVAudioFrameInfo& frameInfo)
 {
-	std::auto_ptr<FLVFrame> frame ( new FLVFrame );
+	std::auto_ptr<EncodedAudioFrame> frame ( new EncodedAudioFrame );
 	frame->dataSize = frameInfo.dataSize; 
 	frame->timestamp = frameInfo.timestamp;
-	frame->type = audioFrame;
 
 
 	if ( in.set_position(frameInfo.dataPosition) )
@@ -83,21 +84,20 @@ makeAudioFrame(tu_file& in, const FLVAudioFrameInfo& frameInfo)
 	unsigned long int dataSize = frameInfo.dataSize;
 	unsigned long int chunkSize = smallestMultipleContaining(READ_CHUNKS, dataSize+PADDING_BYTES);
 
-	frame->data = new boost::uint8_t[chunkSize];
-	size_t bytesread = in.read_bytes(frame->data, dataSize);
+	frame->data.reset( new boost::uint8_t[chunkSize] );
+	size_t bytesread = in.read_bytes(frame->data.get(), dataSize);
 
 	unsigned long int padding = chunkSize-dataSize;
 	assert(padding);
-	memset(frame->data + bytesread, 0, padding);
+	memset(frame->data.get() + bytesread, 0, padding);
 
 	return frame;
 }
 
 FLVParser::FLVParser(std::auto_ptr<tu_file> lt)
 	:
-	_lt(lt),
+	MediaParser(lt),
 	_lastParsedPosition(0),
-	_parsingComplete(false),
 	_videoInfo(NULL),
 	_audioInfo(NULL),
 	_nextAudioFrame(0),
@@ -182,11 +182,11 @@ FLVParser::audioFrameDelay()
 	return _audioFrames[_nextAudioFrame-1]->timestamp - _audioFrames[_nextAudioFrame-2]->timestamp;
 }
 
-FLVAudioFrameInfo*
-FLVParser::peekNextAudioFrameInfo()
+bool
+FLVParser::nextAudioFrameTimestamp(boost::uint64_t& ts)
 {
 	// If there are no audio in this FLV return NULL
-	if (!_audio && _lastParsedPosition > 0) return 0;
+	if (!_audio && _lastParsedPosition > 0) return false;
 
 	// Make sure that there are parsed enough frames to return the need frame
 	while(_audioFrames.size() <= _nextAudioFrame && !_parsingComplete) {
@@ -196,38 +196,41 @@ FLVParser::peekNextAudioFrameInfo()
 	// If the needed frame can't be parsed (EOF reached) return NULL
 	if (_audioFrames.empty() || _audioFrames.size() <= _nextAudioFrame)
 	{
-		return 0;	
+		return false;
 	}
 
-	return _audioFrames[_nextAudioFrame];
+	FLVAudioFrameInfo* info = _audioFrames[_nextAudioFrame];
+	ts = info->timestamp; 
+	return true;
 }
 
-FLVFrame*
+std::auto_ptr<EncodedAudioFrame> 
 FLVParser::nextAudioFrame()
 {
-	FLVAudioFrameInfo* frameInfo = peekNextAudioFrameInfo();
-	if ( ! frameInfo ) return 0;
+	std::auto_ptr<EncodedAudioFrame> frame;
 
-	std::auto_ptr<FLVFrame> frame = makeAudioFrame(*_lt, *frameInfo);
+	FLVAudioFrameInfo* frameInfo = peekNextAudioFrameInfo();
+	if ( ! frameInfo ) return frame;
+
+	frame = makeAudioFrame(*_stream, *frameInfo);
 	if ( ! frame.get() )
 	{
 		log_error("Could not make audio frame %d", _nextAudioFrame);
-		return 0;
+		return frame;
 	}
 
 	_nextAudioFrame++;
-	return frame.release(); // TODO: return by auto_ptr
-
+	return frame;
 }
 
-FLVVideoFrameInfo*
- FLVParser::peekNextVideoFrameInfo()
+bool
+FLVParser::nextVideoFrameTimestamp(boost::uint64_t& ts)
 {
 	// If there are no video in this FLV return NULL
 	if (!_video && _lastParsedPosition > 0)
 	{
 		//gnash::log_debug("no video, or lastParserPosition > 0");
-		return 0;
+		return false;
 	}
 
 	// Make sure that there are parsed enough frames to return the need frame
@@ -240,24 +243,27 @@ FLVVideoFrameInfo*
 	if (_videoFrames.empty() || _videoFrames.size() <= _nextVideoFrame)
 	{
 		//gnash::log_debug("The needed frame (%d) can't be parsed (EOF reached)", _lastVideoFrame);
-		return 0;
+		return false;
 	}
 
-	return _videoFrames[_nextVideoFrame];
+	FLVVideoFrameInfo* info = _videoFrames[_nextVideoFrame];
+	ts = info->timestamp;
+	return true;
 }
 
-FLVFrame* FLVParser::nextVideoFrame()
+std::auto_ptr<EncodedVideoFrame> 
+FLVParser::nextVideoFrame()
 {
 	FLVVideoFrameInfo* frameInfo = peekNextVideoFrameInfo();
-	std::auto_ptr<FLVFrame> frame = makeVideoFrame(*_lt, *frameInfo);
+	std::auto_ptr<EncodedVideoFrame> frame = makeVideoFrame(*_stream, *frameInfo);
 	if ( ! frame.get() )
 	{
 		log_error("Could not make video frame %d", _nextVideoFrame);
-		return 0;
+		return frame;
 	}
 
 	_nextVideoFrame++;
-	return frame.release(); // TODO: return by auto_ptr
+	return frame;
 }
 
 
@@ -387,7 +393,8 @@ FLVParser::seekVideo(boost::uint32_t time)
 
 
 
-FLVVideoInfo* FLVParser::getVideoInfo()
+VideoInfo*
+FLVParser::getVideoInfo()
 {
 	// If there are no video in this FLV return NULL
 	if (!_video && _lastParsedPosition > 0) return NULL;
@@ -398,7 +405,8 @@ FLVVideoInfo* FLVParser::getVideoInfo()
 	return _videoInfo.get(); // may be null
 }
 
-FLVAudioInfo* FLVParser::getAudioInfo()
+AudioInfo*
+FLVParser::getAudioInfo()
 {
 	// If there are no audio in this FLV return NULL
 	if (!_audio && _lastParsedPosition > 0) return NULL;
@@ -482,7 +490,7 @@ bool FLVParser::parseNextTag()
 	if (_lastParsedPosition == 0 && !parseHeader()) return false;
 
 	// Seek to next frame and skip the size of the last tag
-	if ( _lt->set_position(_lastParsedPosition+4) )
+	if ( _stream->set_position(_lastParsedPosition+4) )
 	{
 		log_error("FLVParser::parseNextTag: can't seek to %d", _lastParsedPosition+4);
 		_parsingComplete=true;
@@ -491,12 +499,12 @@ bool FLVParser::parseNextTag()
 
 	// Read the tag info
 	boost::uint8_t tag[12];
-	int actuallyRead = _lt->read_bytes(tag, 12);
+	int actuallyRead = _stream->read_bytes(tag, 12);
 	if ( actuallyRead < 12 )
 	{
 		if ( actuallyRead )
 			log_error("FLVParser::parseNextTag: can't read tag info (needed 12 bytes, only got %d)", actuallyRead);
-		// else { assert(_lt->get_eof(); } ?
+		// else { assert(_stream->get_eof(); } ?
 		_parsingComplete=true;
 		return false;
 	}
@@ -510,12 +518,19 @@ bool FLVParser::parseNextTag()
 	// check for empty tag
 	if (bodyLength == 0) return true;
 
+	enum tagType
+	{
+		AUDIO_TAG = 0x08,
+		VIDEO_TAG = 0x09,
+		META_TAG = 0x12
+	};
+
 	if (tag[0] == AUDIO_TAG)
 	{
 		FLVAudioFrameInfo* frame = new FLVAudioFrameInfo;
 		frame->dataSize = bodyLength - 1;
 		frame->timestamp = timestamp;
-		frame->dataPosition = _lt->get_position();
+		frame->dataPosition = _stream->get_position();
 		_audioFrames.push_back(frame);
 
 		// If this is the first audioframe no info about the
@@ -532,7 +547,7 @@ bool FLVParser::parseNextTag()
 			if (samplesize == 0) samplesize = 1;
 			else samplesize = 2;
 
-			_audioInfo.reset( new FLVAudioInfo((tag[11] & 0xf0) >> 4, samplerate, samplesize, (tag[11] & 0x01) >> 0, 0) );
+			_audioInfo.reset( new AudioInfo((tag[11] & 0xf0) >> 4, samplerate, samplesize, (tag[11] & 0x01) >> 0, 0, FLASH) );
 		}
 
 
@@ -542,7 +557,7 @@ bool FLVParser::parseNextTag()
 		FLVVideoFrameInfo* frame = new FLVVideoFrameInfo;
 		frame->dataSize = bodyLength - 1;
 		frame->timestamp = timestamp;
-		frame->dataPosition = _lt->get_position();
+		frame->dataPosition = _stream->get_position();
 		frame->frameType = (tag[11] & 0xf0) >> 4;
 		_videoFrames.push_back(frame);
 
@@ -557,14 +572,14 @@ bool FLVParser::parseNextTag()
 
 			// Extract the video size from the videodata header
 			if (codec == VIDEO_CODEC_H263) {
-				if ( _lt->set_position(frame->dataPosition) )
+				if ( _stream->set_position(frame->dataPosition) )
 				{
 					log_error(" Couldn't seek to VideoTag data position");
 					_parsingComplete=true;
 					return false;
 				}
 				boost::uint8_t videohead[12];
-				int actuallyRead = _lt->read_bytes(videohead, 12);
+				int actuallyRead = _stream->read_bytes(videohead, 12);
 				if ( actuallyRead < 12 )
 				{
 		log_error("FLVParser::parseNextTag: can't read H263 video header (needed 12 bytes, only got %d)", actuallyRead);
@@ -609,15 +624,15 @@ bool FLVParser::parseNextTag()
 			}
 
 			// Create the videoinfo
-			_videoInfo.reset( new FLVVideoInfo(codec, width, height, 0 /*frameRate*/, 0 /*duration*/) );
+			_videoInfo.reset( new VideoInfo(codec, width, height, 0 /*frameRate*/, 0 /*duration*/, FLASH /*codec type*/) );
 		}
 
 	} else if (tag[0] == META_TAG) {
 		LOG_ONCE( log_unimpl("FLV MetaTag parser") );
 		// Extract information from the meta tag
-		/*_lt->seek(_lastParsedPosition+16);
+		/*_stream->seek(_lastParsedPosition+16);
 		char* metaTag = new char[bodyLength];
-		size_t actuallyRead = _lt->read(metaTag, bodyLength);
+		size_t actuallyRead = _stream->read(metaTag, bodyLength);
 		if ( actuallyRead < bodyLength )
 		{
 			log_error("FLVParser::parseNextTag: can't read metaTag (%d) body (needed %d bytes, only got %d)",
@@ -640,11 +655,11 @@ bool FLVParser::parseNextTag()
 bool FLVParser::parseHeader()
 {
 	// seek to the begining of the file
-	_lt->set_position(0); // seek back ? really ?
+	_stream->set_position(0); // seek back ? really ?
 
 	// Read the header
 	boost::uint8_t header[9];
-	if ( _lt->read_bytes(header, 9) != 9 )
+	if ( _stream->read_bytes(header, 9) != 9 )
 	{
 		log_error("FLVParser::parseHeader: couldn't read 9 bytes of header");
 		return false;
@@ -677,75 +692,55 @@ FLVParser::getBytesLoaded() const
 	return _lastParsedPosition;
 }
 
-boost::uint64_t
-FLVParser::getBytesTotal() const
+/* private */
+FLVAudioFrameInfo*
+FLVParser::peekNextAudioFrameInfo()
 {
-	return _lt->get_size();
-}
+	// If there are no audio in this FLV return NULL
+	if (!_audio && _lastParsedPosition > 0) return 0;
 
-FLVFrame* FLVParser::nextMediaFrame()
-{
-	boost::uint32_t video_size = _videoFrames.size();
-	boost::uint32_t audio_size = _audioFrames.size();
+	// Make sure that there are parsed enough frames to return the need frame
+	while(_audioFrames.size() <= _nextAudioFrame && !_parsingComplete) {
+		if (!parseNextTag()) break;
+	}
 
-	if (audio_size <= _nextAudioFrame && video_size <= _nextVideoFrame)
+	// If the needed frame can't be parsed (EOF reached) return NULL
+	if (_audioFrames.empty() || _audioFrames.size() <= _nextAudioFrame)
 	{
-
-		// Parse a media frame if any left or if needed
-		while(_videoFrames.size() <= _nextVideoFrame && _audioFrames.size() <= _nextAudioFrame && !_parsingComplete) {
-			if (!parseNextTag()) break;
-		}
+		return 0;	
 	}
 
-	// Find the next frame in the file
-	bool audioReady = _audioFrames.size() > _nextAudioFrame;
-	bool videoReady = _videoFrames.size() > _nextVideoFrame;
-	bool useAudio = false;
-
-	if (audioReady && videoReady) {
-		useAudio = _audioFrames[_nextAudioFrame]->dataPosition < _videoFrames[_nextVideoFrame]->dataPosition;
-	} else if (!audioReady && videoReady) {
-		useAudio = false;
-	} else if (audioReady && !videoReady) {
-		useAudio = true;
-	} else {
-		// If no frames are next we have reached EOF
-		return NULL;
-	}
-
-	// Find the next frame in the file a return it
-
-	if (useAudio) {
-
-		FLVAudioFrameInfo* frameInfo = _audioFrames[_nextAudioFrame];
-
-		std::auto_ptr<FLVFrame> frame = makeAudioFrame(*_lt, *frameInfo);
-		if ( ! frame.get() )
-		{
-			log_error("Could not make audio frame %d", _nextAudioFrame);
-			return 0;
-		}
-
-		_nextAudioFrame++;
-		return frame.release(); // TODO: return by auto_ptr
-
-	} else {
-
-		FLVVideoFrameInfo* frameInfo = _videoFrames[_nextVideoFrame];
-		std::auto_ptr<FLVFrame> frame = makeVideoFrame(*_lt, *frameInfo);
-		if ( ! frame.get() )
-		{
-			log_error("Could not make video frame %d", _nextVideoFrame);
-			return 0;
-		}
-
-		_nextVideoFrame++;
-		return frame.release(); // TODO: return by auto_ptr
-	}
-
-
+	return _audioFrames[_nextAudioFrame];
 }
 
+/*private*/
+FLVVideoFrameInfo*
+FLVParser::peekNextVideoFrameInfo()
+{
+	// If there are no video in this FLV return NULL
+	if (!_video && _lastParsedPosition > 0)
+	{
+		//gnash::log_debug("no video, or lastParserPosition > 0");
+		return 0;
+	}
+
+	// Make sure that there are parsed enough frames to return the need frame
+	while(_videoFrames.size() <= static_cast<boost::uint32_t>(_nextVideoFrame) && !_parsingComplete)
+	{
+		if (!parseNextTag()) break;
+	}
+
+	// If the needed frame can't be parsed (EOF reached) return NULL
+	if (_videoFrames.empty() || _videoFrames.size() <= _nextVideoFrame)
+	{
+		//gnash::log_debug("The needed frame (%d) can't be parsed (EOF reached)", _lastVideoFrame);
+		return 0;
+	}
+
+	return _videoFrames[_nextVideoFrame];
+}
+
+} // end of gnash::media namespace
 } // end of gnash namespace
 
 #undef PADDING_BYTES

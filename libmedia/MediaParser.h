@@ -24,24 +24,10 @@
 #include "gnashconfig.h"
 #endif
 
-#include <boost/shared_ptr.hpp>
-#include "tu_file.h"
-
-#ifdef USE_FFMPEG
-#ifdef HAVE_FFMPEG_AVCODEC_H
-extern "C" {
-# include "ffmpeg/avcodec.h"
-}
-#endif
-
-#ifdef HAVE_LIBAVCODEC_AVCODEC_H
-extern "C" {
-# include "libavcodec/avcodec.h"
-}
-#endif
-#endif // USE_FFMPEG
-
+#include <boost/scoped_array.hpp>
 #include <memory>
+
+#include "tu_file.h"
 
 namespace gnash {
 namespace media {
@@ -66,6 +52,9 @@ enum codecType
 	FLASH,
 
 	/// Ffmpegs codecs ids
+	//
+	/// TODO: make this media-handler agnostic
+	///
 	FFMPEG
 };
 
@@ -110,19 +99,6 @@ enum audioCodecType
 	AUDIO_CODEC_NELLYMOSER = 6
 };
 
-/// Type of frame in FLVs. Also type of the frame contained in the MediaFrame class.
-enum tagType
-{
-	/// Audio frame
-	AUDIO_TAG = 0x08,
-
-	/// Video frame
-	VIDEO_TAG = 0x09,
-
-	/// Meta frame
-	META_TAG = 0x12
-};
-
 /// \brief
 /// The AudioInfo class contains information about the audiostream
 /// in the file being parsed. The information stored is codec-id,
@@ -137,9 +113,6 @@ public:
 		sampleSize(sampleSizei),
 		stereo(stereoi),
 		duration(durationi),
-#ifdef USE_FFMPEG
-		audioCodecCtx(NULL),
-#endif
 		type(typei)
 		{
 		}
@@ -149,9 +122,6 @@ public:
 	boost::uint16_t sampleSize;
 	bool stereo;
 	boost::uint64_t duration;
-#ifdef USE_FFMPEG
-	AVCodecContext* audioCodecCtx; // If videoCodecCtx is ugly, so is this.
-#endif
 	codecType type;
 };
 
@@ -169,47 +139,97 @@ public:
 		height(heighti),
 		frameRate(frameRatei),
 		duration(durationi),
-#ifdef USE_FFMPEG
-		videoCodecCtx(NULL),
-#endif
 		type(typei)
-		{
-		}
+	{
+	}
 
 	int codec;
 	boost::uint16_t width;
 	boost::uint16_t height;
 	boost::uint16_t frameRate;
 	boost::uint64_t duration;
-#ifdef USE_FFMPEG
-	AVCodecContext* videoCodecCtx; // UGLY!!
-#endif
 	codecType type;
 };
 
-/// \brief
-/// The MediaFrame class contains a video or audio frame, its size, its
-/// timestamp. Ownership of the data is in the parser.
-class MediaFrame
+/// An encoded video frame
+class EncodedVideoFrame
+{
+public:
+
+	/// Create an encoded video frame
+	//
+	/// @param data
+	///	Data buffer, ownership transferred
+	///
+	/// @param size
+	///	Size of the data buffer
+	///
+	/// @param frameNum
+	///	Frame number.
+	///
+	/// @param type
+	/// 	Video frame type
+	///
+	/// @param timestamp
+	///	Presentation timestamp, in milliseconds.
+	///
+	EncodedVideoFrame(boost::uint8_t* data, boost::uint32_t size,
+			unsigned int frameNum,
+			boost::uint64_t timestamp=0)
+		:
+		_size(size),
+		_data(data),
+		_frameNum(frameNum),
+		_timestamp(timestamp)
+	{}
+
+	/// Return pointer to actual data. Ownership retained by this class.
+	const boost::uint8_t* data() const { return _data.get(); }
+
+	/// Return size of data buffer.
+	boost::uint32_t dataSize() const { return _size; }
+
+	/// Return video frame presentation timestamp
+	boost::uint64_t timestamp() const { return _timestamp; }
+
+	/// Return video frame number
+	unsigned frameNum() const { return _frameNum; }
+
+private:
+
+	boost::uint32_t _size;
+	boost::scoped_array<boost::uint8_t> _data;
+	unsigned int _frameNum;
+	boost::uint64_t _timestamp;
+};
+
+/// An encoded audio frame
+class EncodedAudioFrame
 {
 public:
 	boost::uint32_t dataSize;
-	boost::uint8_t* data;
+	boost::scoped_array<boost::uint8_t> data;
 	boost::uint64_t timestamp;
-	boost::uint8_t tag;
 };
 
-/// \brief
-/// The MediaParser class detects the format of the input file, and parses it on demand.
+/// The MediaParser class provides cursor-based access to encoded media frames 
+//
+/// Cursor-based access allow seeking as close as possible to a specified time
+/// and fetching frames from there on, sequentially.
+/// See seek(), nextVideoFrame(), nextAudioFrame() 
+///
+/// Input is received from a tu_file object.
 ///
 class MediaParser
 {
 public:
-	MediaParser(boost::shared_ptr<tu_file> stream)
-	:
-	_isAudioMp3(false),
-	_isAudioNellymoser(false),
-	_stream(stream)
+
+	MediaParser(std::auto_ptr<tu_file> stream)
+		:
+		_isAudioMp3(false),
+		_isAudioNellymoser(false),
+		_stream(stream),
+		_parsingComplete(false)
 	{}
 
 	// Classes with virtual methods (virtual classes)
@@ -219,61 +239,131 @@ public:
 	//
 	virtual ~MediaParser() {};
 
-	/// Used to parse the next media frame in the stream and return it
+	/// Returns the "bufferlength", meaning the difference between the
+	/// current frames timestamp and the timestamp of the last parseable
+	/// frame. Returns the difference in milliseconds.
 	//
-	/// @return a pointer to a MediaFrame in which the undecoded frame data is.
-	virtual MediaFrame* parseMediaFrame() { return NULL; }
+	virtual boost::uint32_t getBufferLength()=0;
+
+	/// Get timestamp of the video frame which would be returned on nextVideoFrame
+	//
+	/// @return false if there no video frame left
+	///         (either none or no more)
+	///
+	virtual bool nextVideoFrameTimestamp(boost::uint64_t& ts)=0;
+
+	/// Returns the next video frame in the parsed buffer, advancing video cursor.
+	//
+	/// If no frame has been played before the first frame is returned.
+	/// If there is no more frames in the parsed buffer NULL is returned.
+	/// you can check with parsingCompleted() to know wheter this is due to 
+	/// EOF reached.
+	///
+	virtual std::auto_ptr<EncodedVideoFrame> nextVideoFrame()=0;
+
+	/// Get timestamp of the audio frame which would be returned on nextAudioFrame
+	//
+	/// @return false if there no video frame left
+	///         (either none or no more)
+	///
+	virtual bool nextAudioFrameTimestamp(boost::uint64_t& ts)=0;
+
+	/// Returns the next audio frame in the parsed buffer, advancing audio cursor.
+	//
+	/// If no frame has been played before the first frame is returned.
+	/// If there is no more frames in the parsed buffer NULL is returned.
+	/// you can check with parsingCompleted() to know wheter this is due to 
+	/// EOF reached.
+	///
+	virtual std::auto_ptr<EncodedAudioFrame> nextAudioFrame()=0;
 
 	/// Is the input MP3?
 	//
 	/// @return if the input audio is MP3
+	///
 	bool isAudioMp3() { return _isAudioMp3; }
 
 	/// Is the input Nellymoser?
 	//
 	/// @return if the input audio is Nellymoser
+	///
 	bool isAudioNellymoser() { return _isAudioNellymoser; }
 
 	/// Setup the parser
 	//
 	/// @return whether we'll be able to parse the file.
+	///
 	virtual bool setupParser() { return false; }
 
 	/// Returns a VideoInfo class about the videostream
 	//
-	/// @return a VideoInfo class about the videostream
-	virtual std::auto_ptr<VideoInfo> getVideoInfo() { return std::auto_ptr<VideoInfo>(NULL); }
+	/// @return a VideoInfo class about the videostream,
+	///         or zero if stream contains no video
+	///
+	virtual VideoInfo* getVideoInfo() { return 0; }
 
 	/// Returns a AudioInfo class about the audiostream
 	//
-	/// @return a AudioInfo class about the audiostream
-	virtual std::auto_ptr<AudioInfo> getAudioInfo() { return std::auto_ptr<AudioInfo>(NULL); }
+	/// @return a AudioInfo class about the audiostream,
+	///         or zero if stream contains no audio
+	///
+	virtual AudioInfo* getAudioInfo() { return 0; }
 
-	/// Seeks to the closest possible position the given position,
-	/// and returns the new position.
+	/// Seeks to the closest possible position the given position.
 	//
+	/// Valid seekable position are constrained by key-frames when
+	/// video data is available. Actual seek position should be always
+	/// less of equal the requested one.
+	///
 	/// @return the position the seek reached
+	///
 	virtual boost::uint32_t seek(boost::uint32_t) { return 0; }
 
 	/// Returns the framedelay from the last to the current
 	/// audioframe in milliseconds. This is used for framerate.
 	//
 	/// @return the diff between the current and last frame
+	///
 	virtual boost::uint32_t audioFrameDelay() { return 0; }
 
 	/// Returns the framedelay from the last to the current
 	/// videoframe in milliseconds. 
 	//
 	/// @return the diff between the current and last frame
+	///
 	virtual boost::uint32_t videoFrameDelay() { return 0; }
 
 	/// Returns the framerate of the video
 	//
 	/// @return the framerate of the video
+	///
 	virtual boost::uint16_t videoFrameRate() { return 0; }
 
 	/// Returns the last parsed position in the file in bytes
 	virtual boost::uint32_t getLastParsedPos() { return 0; }
+
+	/// Parse next input chunk
+	//
+	/// Returns true if something was parsed, false otherwise.
+	/// See parsingCompleted().
+	///
+	virtual bool parseNextChunk() { return false; }
+
+	/// Return true of parsing is completed
+	//
+	/// If this function returns true, any call to nextVideoFrame()
+	/// or nextAudioFrame() will always return NULL
+	///
+	bool parsingCompleted() const { return _parsingComplete; }
+
+	/// Return number of bytes parsed so far
+	virtual boost::uint64_t getBytesLoaded() const { return 0; }
+
+	/// Return total number of bytes in input
+	boost::uint64_t getBytesTotal() const
+	{
+		return _stream->get_size();
+	}
 
 protected:
 
@@ -284,7 +374,10 @@ protected:
 	bool _isAudioNellymoser;
 
 	/// The stream used to access the file
-	boost::shared_ptr<tu_file> _stream;
+	std::auto_ptr<tu_file> _stream;
+
+	/// Whether the parsing is complete or not
+	bool _parsingComplete;
 };
 
 

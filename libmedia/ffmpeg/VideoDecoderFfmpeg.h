@@ -27,6 +27,7 @@
 #include "dsodefs.h" //For DSOEXPORT
 #include "log.h"
 #include "VideoDecoder.h"
+#include "MediaParser.h" // for videoCodecType enum
 
 #ifdef HAVE_FFMPEG_AVCODEC_H
 extern "C" {
@@ -70,7 +71,7 @@ public:
 
 private:
 
-  std::auto_ptr<image::rgb> decode(boost::uint8_t* input, boost::uint32_t input_size);
+  std::auto_ptr<image::rgb> decode(const boost::uint8_t* input, boost::uint32_t input_size);
 
   std::auto_ptr<image::rgb> decode(const EncodedVideoFrame* vf)
   {
