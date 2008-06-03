@@ -46,7 +46,7 @@ public:
 	{}
 
 	/// Return number of edges in the path list
-	size_t size()
+	size_t size() const
 	{
 		return _nedges;
 	}
@@ -215,6 +215,8 @@ private:
 		inner_bound2.read(in);
 		// This should be used -- first 6 bits reserved, then 'non-scaling' stroke,
 		// then 'scaling' stroke -- these can be used to optimize morphing.
+		
+		in->ensureBytes(1);
 		static_cast<void>(in->read_u8());
 	}
 
@@ -272,8 +274,8 @@ private:
 
 		IF_VERBOSE_PARSE(
 		  log_parse("morph: "
-			  "startShape(paths:" SIZET_FMT ", edges:%u), "
-			  "endShape(paths:" SIZET_FMT ", edges:%u)",
+			  "startShape(paths:%d, edges:%u), "
+			  "endShape(paths:%d, edges:%u)",
 			  m_shape1->m_paths.size(), edges_count1,
 			  m_shape2->m_paths.size(), edges_count2);
 		);
