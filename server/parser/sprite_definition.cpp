@@ -70,6 +70,7 @@ sprite_definition::read(stream* in)
 {
     unsigned long tag_end = in->get_tag_end_position();
 
+    in->ensureBytes(2);
     m_frame_count = in->read_u16();
 
     IF_VERBOSE_PARSE (
