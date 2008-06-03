@@ -161,15 +161,21 @@ static void	dumpTagBytes(stream* in, std::ostream& os)
     os << std::endl;
     
     // This decremented until we reach the end of the stream.
-    unsigned int toread = in->get_tag_end_position() - in->get_position();
-    in->ensureBytes(toread);
+    unsigned int toRead = in->get_tag_end_position() - in->get_position();
+    in->ensureBytes(toRead);
 
     unsigned char buf[rowlength];    
-    while (toread)
+    while (toRead)
     {
         // Read in max row length or remainder of stream.
-        unsigned int got = in->read(reinterpret_cast<char*>(&buf),
-                                    std::min<unsigned>(toread, rowlength));
+        const unsigned int thisRow = std::min<unsigned int>(toRead, rowlength);
+        const unsigned int got = in->read(reinterpret_cast<char*>(&buf), thisRow);
+        
+        // Check that we read all the bytes we expected.
+        if (got < thisRow)
+        {
+            throw ParserException(_("Unexpected end of stream while reading"));
+        }
         
         // Stream once as hex
         os << std::left << std::setw(3 * rowlength) << hexify(buf, got, false);
@@ -177,7 +183,7 @@ static void	dumpTagBytes(stream* in, std::ostream& os)
         // and once as ASCII
         os << "| " << hexify(buf, got, true) << std::endl;
 
-        toread -= got;
+        toRead -= got;
     }
 }
 
@@ -501,26 +507,29 @@ movie_def_impl::create_movie_instance(character* parent)
 // CharacterDictionary
 //
 
-void
-CharacterDictionary::dump_chars() const
+std::ostream&
+operator<<(std::ostream& o, const CharacterDictionary& cd)
 {
-	for ( const_iterator it=begin(), endIt=end();
-		it != endIt; ++it )
-	{
-		log_debug(_("Character %d @ %p"), it->first, static_cast<void*>(it->second.get()));
-		//character_def* cdef = it->second;
-	}
+
+   	for (CharacterDictionary::CharacterConstIterator it = cd.begin(), endIt = cd.end();
+   	        it != endIt; it++)
+   	{
+   	    o << std::endl
+   	      << "Character: " << it->first
+   	      << " at address: " << static_cast<void*>(it->second.get());
+   	}
+   	
+   	return o;
 }
 
 boost::intrusive_ptr<character_def>
 CharacterDictionary::get_character(int id)
 {
-	container::iterator it = _map.find(id);
+	CharacterIterator it = _map.find(id);
 	if ( it == _map.end() )
 	{
 		IF_VERBOSE_PARSE(
-		log_parse(_("Could not find char %d, dump is:"), id);
-		dump_chars();
+		log_parse(_("Could not find char %d, dump is: %s"), id, *this);
 		);
 		return boost::intrusive_ptr<character_def>();
 	}
@@ -532,7 +541,6 @@ CharacterDictionary::add_character(int id, boost::intrusive_ptr<character_def> c
 {
 	//log_debug(_("CharacterDictionary: add char %d"), id);
 	_map[id] = c;
-	//dump_chars();
 }
 
 // Load next chunk of this sprite frames.
@@ -624,7 +632,7 @@ parse_tag:
 		}
 
 		SWF::TagLoadersTable::loader_function lf = NULL;
-		//log_parse("tag_type = %d\n", tag_type);
+
 		if (tag_type == SWF::SHOWFRAME)
 		{
 			// show frame tag -- advance to the next frame.
@@ -660,13 +668,12 @@ parse_tag:
 		else
 		{
 			// no tag loader for this tag type.
-			log_error(_("*** no tag loader for type %d (movie)"),
-				tag_type);
-			IF_VERBOSE_PARSE(
-				std::stringstream ss;
-				dumpTagBytes(&str, ss);
-				log_error("tag dump follows: %s", ss.str());
-			);
+            log_error(_("*** no tag loader for type %d (movie)"), tag_type);
+            IF_VERBOSE_PARSE(
+                std::ostringstream ss;
+                dumpTagBytes(&str, ss);
+                log_error("tag dump follows: %s", ss.str());
+            );
 		}
 
 		str.close_tag();
@@ -689,8 +696,7 @@ parse_tag:
 	{
 		IF_VERBOSE_MALFORMED_SWF(
 		log_swferror(_("%d control tags are NOT followed by"
-			" a SHOWFRAME tag"),
-			m_playlist[floaded].size());
+			" a SHOWFRAME tag"), m_playlist[floaded].size());
 		);
 	}
 

@@ -3,6 +3,11 @@
 	* server/impl.cpp: indentation.
 	* server/stream.cpp: always check return of read() to avoid reading
 	  past the end of the stream; throw parser exception on failure.
+	* server/movie_def_impl.{h,cpp}: rename confusing typedefs. Add
+	  ostream operator<< for CharacterDictionary, drop dump_chars().
+	  Check return of read, throw parser exception on failure: fixes
+	  a few hangs with -vp for truncated unhandled tags (all my
+	  malformed movies also succeed with -vp now).
 
 2008-06-03 Sandro Santilli <strk@keybit.net>
 

@@ -108,11 +108,11 @@ public:
 	//
 	/// It contains pairs of 'int' and 'boost::intrusive_ptr<character_def>'
 	///
-	typedef std::map< int, boost::intrusive_ptr<character_def> > container;
+	typedef std::map< int, boost::intrusive_ptr<character_def> > CharacterContainer;
 
-	typedef container::iterator iterator;
+	typedef CharacterContainer::iterator CharacterIterator;
 
-	typedef container::const_iterator const_iterator;
+	typedef CharacterContainer::const_iterator CharacterConstIterator;
 
 	/// Get the Character with the given id
 	//
@@ -127,25 +127,24 @@ public:
 	void add_character(int id, boost::intrusive_ptr<character_def> c);
 
 	/// Return an iterator to the first dictionary element
-	iterator begin() { return _map.begin(); }
+	CharacterIterator begin() { return _map.begin(); }
 
 	/// Return a const_iterator to the first dictionary element
-	const_iterator begin() const { return _map.begin(); }
+	CharacterConstIterator begin() const { return _map.begin(); }
 
 	/// Return an iterator to one-past last dictionary element
-	iterator end() { return _map.end(); }
+	CharacterIterator end() { return _map.end(); }
 
 	/// Return a const_iterator to one-past last dictionary element
-	const_iterator end() const { return _map.end(); }
+	CharacterConstIterator end() const { return _map.end(); }
 
-	/// Dump content of the dictionary (debugging only)
-	void dump_chars(void) const;
+    friend std::ostream& operator<<(std::ostream& o, const CharacterDictionary& cd);
 
 #ifdef GNASH_USE_GC
 	/// Mark all dictionary items to be reachable (for GC)
 	void markReachableResources() const
 	{
-		for(const_iterator i=_map.begin(), e=_map.end(); i!=e; ++i)
+		for(CharacterConstIterator i=_map.begin(), e=_map.end(); i!=e; ++i)
 		{
 			i->second->setReachable();
 		}
@@ -154,7 +153,7 @@ public:
 
 private:
 
-	container _map;
+	CharacterContainer _map;
 
 };
 
