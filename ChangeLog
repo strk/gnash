@@ -1,3 +1,8 @@
+2008-06-03 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* utilities/processor.cpp: use an intrusive_ptr so that gprocessor
+	  doesn't segfault with movie library limit of 1.
+
 2008-06-02 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/NetStreamFfmpeg.h: forward declare sound_handler.

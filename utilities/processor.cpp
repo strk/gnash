@@ -45,6 +45,7 @@
 #include "noseek_fd_adapter.h"
 #include "ManualClock.h"
 #include "StringPredicates.h"
+#include "smart_ptr.h"
 
 extern "C"{
 	#include <unistd.h>
@@ -97,11 +98,11 @@ gnash::Debugger& debugger = gnash::Debugger::getDefaultInstance();
 
 struct movie_data
 {
-    gnash::movie_definition*	m_movie;
+    gnash::movie_definition* m_movie;
     std::string	m_filename;
 };
 
-static gnash::movie_definition*	play_movie(const char* filename);
+static boost::intrusive_ptr<gnash::movie_definition>	play_movie(const char* filename);
 
 static bool s_do_output = false;
 static bool s_stop_on_errors = true;
@@ -326,7 +327,7 @@ main(int argc, char *argv[])
 
         set_base_url(URL(infiles[i]));
 
-	gnash::movie_definition*	m = play_movie(infiles[i]);
+	boost::intrusive_ptr<gnash::movie_definition> m = play_movie(infiles[i]);
 	if (m == NULL) {
 	    if (s_stop_on_errors) {
 		// Fail.
@@ -336,7 +337,7 @@ main(int argc, char *argv[])
 	}
 	
 	movie_data	md;
-	md.m_movie = m;
+	md.m_movie = m.get();
 	md.m_filename = std::string(infiles[i]);
 	data.push_back(md);
     }
@@ -356,10 +357,10 @@ main(int argc, char *argv[])
 // or build font textures again.
 //
 // Return the movie definition.
-gnash::movie_definition*
+boost::intrusive_ptr<gnash::movie_definition>
 play_movie(const char* filename)
 {
-    gnash::movie_definition* md;
+    boost::intrusive_ptr<gnash::movie_definition> md;
     try
     {
       if ( ! strcmp(filename, "-") )
