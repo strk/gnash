@@ -27,7 +27,7 @@
 #include <boost/scoped_array.hpp>
 #include <memory>
 
-#include "tu_file.h"
+#include "tu_file.h" // for inlines
 
 namespace gnash {
 namespace media {

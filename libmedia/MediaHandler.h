@@ -1,0 +1,102 @@
+// MediaHandler.h: Base class for media handlers
+// 
+//   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
+// 
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+
+#ifndef __MEDIAHANDLER_H__
+#define __MEDIAHANDLER_H__
+
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h"
+#endif
+
+#include "MediaParser.h" // for videoCodecType and audioCodecType enums
+
+#include <memory>
+
+// Forward declarations
+class tu_file;
+namespace gnash {
+	namespace media {
+		class VideoDecoder;
+	}
+}
+
+namespace gnash {
+namespace media {
+
+/// The MediaHandler class acts as a factory to provide parser and decoders
+class MediaHandler
+{
+public:
+
+	virtual ~MediaHandler() {}
+
+	/// Return currently registered MediaHandler, possibly null.
+	static MediaHandler* get()
+	{
+		return _handler.get();
+	}
+
+	/// Register a MediaHandler to use
+	static void set(std::auto_ptr<MediaHandler> mh)
+	{
+		_handler = mh;
+	}
+
+	/// Return an appropriate MediaParser for given input
+	//
+	/// @param stream
+	///	Input stream, ownership transferred
+	///
+	/// @return 0 if no parser could be created for the input
+	///
+	/// NOTE: the default implementation returns an FLVParser for FLV input
+	///       or 0 for others.
+	///
+	virtual std::auto_ptr<MediaParser> createMediaParser(std::auto_ptr<tu_file> stream);
+
+	/// Create a VideoDecoder for the specified codec_type
+	//
+	/// @param format
+	///	Video encoding.
+	///
+	/// @param width
+	///	Video frame width
+	///
+	/// @param height
+	///	Video frame height
+	///
+	/// @return 0 if no decoder could be created for the specified encoding
+	///
+	virtual std::auto_ptr<VideoDecoder> createVideoDecoder(
+			videoCodecType format, int width, int height)=0;
+
+protected:
+
+	MediaHandler() {}
+
+private:
+
+	static std::auto_ptr<MediaHandler> _handler;
+};
+
+
+} // gnash.media namespace 
+} // namespace gnash
+
+#endif // __MEDIAHANDLER_H__

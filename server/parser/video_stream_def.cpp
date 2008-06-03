@@ -21,12 +21,7 @@
 #include "video_stream_instance.h"
 #include "render.h"
 #include "BitsReader.h"
-
-#ifdef SOUND_GST
-# include "VideoDecoderGst.h"
-#elif defined(USE_FFMPEG)
-# include "VideoDecoderFfmpeg.h"
-#endif
+#include "MediaHandler.h"
 
 #include <boost/bind.hpp>
 
@@ -87,11 +82,20 @@ video_stream_definition::readDefineVideoStream(stream* in, SWF::tag_type tag, mo
 		return;
 	}
 
-#ifdef SOUND_GST
-	_decoder.reset( new media::VideoDecoderGst(m_codec_id, _width, _height) );
-#elif defined(USE_FFMPEG)
-	_decoder.reset( new media::VideoDecoderFfmpeg(m_codec_id, _width, _height) );
-#endif
+	media::MediaHandler* mh = media::MediaHandler::get();
+	if ( ! mh )
+	{
+		LOG_ONCE( log_error(_("No Media handler registered, "
+			"won't be able to decode embedded video")) );
+		return;
+	}
+
+	_decoder = mh->createVideoDecoder(m_codec_id, _width, _height);
+	if ( ! _decoder.get() )
+	{
+		log_error(_("Could not create video decoder for codec id %d"),
+			m_codec_id);
+	}
 }
 
 void

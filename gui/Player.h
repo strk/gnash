@@ -25,6 +25,7 @@
 
 #include "gnash.h" // needed for interface and fscommand callbacks
 #include "sound_handler.h" // for visibility of sound_handler destructor
+#include "MediaHandler.h" // for visibility of MediaHandler destructor
 #include "gui.h"
 #include "movie_definition.h" // for visibility of movie_definition destructor
 #include "smart_ptr.h" // for intrusive_ptr holding of top-level movie
@@ -156,6 +157,8 @@ private:
         
 	void init_sound();
 
+	void init_media();
+
 	void init_logfile();
 
 	void init_gui();
@@ -203,6 +206,8 @@ private:
 	static std::auto_ptr<Gui> _gui;
 
 	std::auto_ptr<media::sound_handler> _soundHandler;
+
+	std::auto_ptr<media::MediaHandler> _mediaHandler;
 
 	std::string _url;
 

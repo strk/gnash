@@ -37,9 +37,9 @@
 
 #include <boost/shared_array.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/scoped_ptr.hpp>
- 
 #include <boost/thread/mutex.hpp>
+
+#include <memory> // for auto_ptr
 
 namespace gnash {
 
@@ -176,7 +176,7 @@ private:
 	boost::uint32_t _height;
 
 	/// The decoder used to decode the video frames
-	boost::scoped_ptr<media::VideoDecoder> _decoder;
+	std::auto_ptr<media::VideoDecoder> _decoder;
 };
 
 }	// end namespace gnash

@@ -1,5 +1,19 @@
 2008-06-03 Sandro Santilli <strk@keybit.net>
 
+	* libmedia/MediaHandler.{cpp,h},
+	  libmedia/gst/MediaHandlerGst.{cpp,h},
+	  libmedia/ffmpeg/MediaHandlerFfmpeg.{cpp,h}
+	  libmedia/Makefile.am:
+	  First stub at a MediaHandler/factory class.
+	* gui/Player.{cpp,h}: register a MediaHandler
+	  based on compile-time define.
+	* libmedia/MediaParser.h: comment header inclusion
+	* server/parser/video_stream_def.{cpp,h}: drop
+	  compile time defines for media handler to use,
+	  fetch whatever is currently registered instead.
+
+2008-06-03 Sandro Santilli <strk@keybit.net>
+
 	* libbase/FLVParser.{cpp,h} => libmedia/FLVParser.{cpp,h},
 	  libbase/Makefile.am, libmedia/Makefile.am:
 	  Moved FLVParser under libmedia and make it a MediaParser.

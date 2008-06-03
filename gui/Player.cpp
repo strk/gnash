@@ -43,6 +43,13 @@
 #include "VM.h"
 #include "SystemClock.h"
 
+#ifdef SOUND_SDL
+# include "MediaHandlerFfmpeg.h"
+#elif defined(SOUND_GST)
+# include "MediaHandlerGst.h"
+#endif
+
+
 #include "log.h"
 #include <iostream>
 #include <sstream>
@@ -182,6 +189,21 @@ Player::init_sound()
     }
 }
 
+void
+Player::init_media()
+{
+#ifdef SOUND_SDL
+	_mediaHandler.reset( new gnash::media::MediaHandlerFfmpeg() );
+#elif defined(SOUND_GST)
+        _mediaHandler.reset( new gnash::media::MediaHandlerGst() );
+#else
+        log_error(_("No media support compiled in"));
+        return;
+#endif
+        
+        gnash::media::MediaHandler::set(_mediaHandler);
+}
+
 
 void
 Player::init_gui()
@@ -280,6 +302,7 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
     // (example: setDoSound(), setWindowId() etc.. ) 
     init_logfile();
     init_sound();
+    init_media();
     init_gui();
    
     // gnash.cpp should check that a filename is supplied.

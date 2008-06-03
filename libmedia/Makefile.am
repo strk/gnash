@@ -73,6 +73,7 @@ libgnashmedia_la_LIBADD = \
 	$(NULL)
 
 libgnashmedia_la_SOURCES = \
+	MediaHandler.cpp \
 	AudioDecoderNellymoser.cpp \
 	AudioDecoderSimple.cpp \
 	FLVParser.cpp \
@@ -84,6 +85,7 @@ noinst_HEADERS = \
 	AudioDecoder.h \
 	VideoDecoder.h \
 	MediaParser.h \
+	MediaHandler.h \
 	FLVParser.h \
 	AudioDecoderNellymoser.h \
 	AudioDecoderSimple.h \
@@ -95,6 +97,7 @@ noinst_HEADERS = \
 
 if USE_SOUND_GST
    libgnashmedia_la_SOURCES += \
+		gst/MediaHandlerGst.cpp \
 		gst/VideoDecoderGst.cpp \
 		gst/AudioDecoderGst.cpp \
 		gst/gstappsink.c \
@@ -107,6 +110,7 @@ if USE_SOUND_GST
 		gst/gstbuffersrc.c
 	
    noinst_HEADERS += \
+		gst/MediaHandlerGst.h \
 		gst/AudioDecoderGst.h \
 		gst/VideoDecoderGst.h \
 		gst/gstappsink.h \
@@ -129,12 +133,14 @@ endif
 
 if USE_FFMPEG_ENGINE
    libgnashmedia_la_SOURCES += \
+		ffmpeg/MediaHandlerFfmpeg.cpp \
 		ffmpeg/AudioDecoderFfmpeg.cpp \
 		ffmpeg/VideoDecoderFfmpeg.cpp \
 		ffmpeg/sound_handler_sdl.cpp \
 		ffmpeg/ffmpegNetStreamUtil.cpp 
 
    noinst_HEADERS += \
+		ffmpeg/MediaHandlerFfmpeg.h \
 		ffmpeg/AudioDecoderFfmpeg.h \
 		ffmpeg/VideoDecoderFfmpeg.h \
 		ffmpeg/sound_handler_sdl.h \
