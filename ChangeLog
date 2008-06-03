@@ -1,5 +1,9 @@
 2008-06-03 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* server/fill_style.cpp: missing ensureBytes.
+
+2008-06-03 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* server/GnashKey.h: yes, REGISTERED does cause problems on mingw.
 
 2008-06-03 Sandro Santilli <strk@keybit.net>

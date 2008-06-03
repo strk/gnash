@@ -212,6 +212,7 @@ fill_style::read(stream* in, int tag_type, movie_definition* md,
 		// A focal gradient also has a focal point.
 		if (m_type == SWF::FILL_FOCAL_GRADIENT)
 		{
+		    in->ensureBytes(2);
 			m_focal_point = in->read_short_sfixed();
 			if (m_focal_point < -1.0f)
 				m_focal_point = -1.0f;
