@@ -179,6 +179,7 @@ noinst_HEADERS = \
 	swf/SetBackgroundColorTag.h \
 	swf/StartSoundTag.h \
 	swf/StreamSoundBlockTag.h \
+	swf/ScriptLimitsTag.h \
 	swf_event.h \
 	swf_function.h \
 	text.h \

@@ -1,5 +1,13 @@
 2008-06-04 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* server/swf/ScriptLimitsTag.h: parse the ScriptLimits tag (not
+	  a lot to do). Not yet used, but will be passed to movie_root.
+	* server/impl.cpp: register the ScriptLimits tag loader. Use an
+	  enum for file types rather than a std::string.
+	* server/Makefile.am: add ScriptLimits header.
+
+2008-06-04 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* server/swf/DefineFontAlignZonesTag.cpp: typo.
 
 2008-06-04 Sandro Santilli <strk@keybit.net>

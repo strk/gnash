@@ -42,6 +42,7 @@
 #include "StreamProvider.h"
 #include "sprite_instance.h"
 #include "VM.h"
+#include "ScriptLimitsTag.h"
 #include "BitmapMovieDefinition.h"
 #include "DefineFontAlignZonesTag.h"
 #include "PlaceObject2Tag.h"
@@ -218,9 +219,7 @@ static void ensure_loaders_registered()
     //  We're not an authoring tool so we don't care.
     // (might be nice to dump the password instead..)
     register_tag_loader(SWF::ENABLEDEBUGGER2, null_loader);    // 64
-
-    // TODO: Fix this to load the limits, or decide we will ignore them.  
-    register_tag_loader(SWF::SCRIPTLIMITS, fixme_loader); //65
+    register_tag_loader(SWF::SCRIPTLIMITS, ScriptLimitsTag::loader); //65
 
     // TODO: Fix this, but probably not critical.
     register_tag_loader(SWF::SETTABINDEX, fixme_loader); //66 
@@ -303,8 +302,16 @@ create_png_movie(std::auto_ptr<tu_file> /*in*/, const std::string& /*url*/)
 // Get type of file looking at first bytes
 // return "jpeg", "png", "swf" or "unknown"
 //
-static std::string
-get_file_type(tu_file* in)
+
+enum FileType {
+    GNASH_FILETYPE_JPEG,
+    GNASH_FILETYPE_PNG,
+    GNASH_FILETYPE_SWF,
+    GNASH_FILETYPE_UNKNOWN
+};
+
+FileType
+getFileType(tu_file* in)
 {
   in->set_position(0);
 
@@ -314,21 +321,21 @@ get_file_type(tu_file* in)
   {
     log_error(_("Can't read file header"));
     in->set_position(0);
-    return "unknown";
+    return GNASH_FILETYPE_UNKNOWN;
   }
   
   // This is the magic number for any JPEG format file
   if ((buf[0] == 0xff) && (buf[1] == 0xd8) && (buf[2] == 0xff))
   {
     in->set_position(0);
-    return "jpeg";
+    return GNASH_FILETYPE_JPEG;
   }
 
   // This is the magic number for any JPEG format file
   if ((buf[0] == 137) && (buf[1] == 'P') && (buf[2] == 'N')) // buf[3] == 'G' (we didn't read so far)
   {
     in->set_position(0);
-    return "png";
+    return GNASH_FILETYPE_PNG;
   }
 
   // This is for SWF (FWS or CWS)
@@ -337,7 +344,7 @@ get_file_type(tu_file* in)
     (buf[2] == 'S') )
   {
     in->set_position(0);
-    return "swf";
+    return GNASH_FILETYPE_SWF;
   }
   
   // Check if it is an swf embedded in a player (.exe-file)
@@ -346,10 +353,10 @@ get_file_type(tu_file* in)
     if ( 3 < in->read_bytes(buf, 3) )
     {
       in->set_position(0);
-      return "unknown";
+      return GNASH_FILETYPE_UNKNOWN;
     }
 
-    while (buf[0]!='F' && buf[0]!='C' || buf[1]!='W' || buf[2]!='S')
+    while ((buf[0]!='F' && buf[0]!='C') || buf[1]!='W' || buf[2]!='S')
     {
       buf[0] = buf[1];
       buf[1] = buf[2];
@@ -357,13 +364,13 @@ get_file_type(tu_file* in)
       if (in->get_eof())
       {
         in->set_position(0);
-        return "unknown";
+        return GNASH_FILETYPE_UNKNOWN;
       }
     }
     in->set_position(in->get_position()-3); // position to start of the swf itself
-    return "swf";
+    return GNASH_FILETYPE_SWF;
   }
-  return "unknown";
+  return GNASH_FILETYPE_UNKNOWN;
 }
 
 // Create a SWFMovieDefinition from an SWF stream
@@ -398,9 +405,9 @@ create_movie(std::auto_ptr<tu_file> in, const std::string& url, bool startLoader
 
   // see if it's a jpeg or an swf
   // TODO: use an integer code rather then a string !
-  std::string type = get_file_type(in.get());
+  FileType type = getFileType(in.get());
 
-  if ( type == "jpeg" )
+  if ( type == GNASH_FILETYPE_JPEG )
   {
     if ( startLoaderThread == false )
     {
@@ -408,15 +415,17 @@ create_movie(std::auto_ptr<tu_file> in, const std::string& url, bool startLoader
     }
     return create_jpeg_movie(in, url);
   }
-  else if ( type == "png" )
+  else if ( type == GNASH_FILETYPE_PNG )
   {
     if ( startLoaderThread == false )
     {
-      log_unimpl(_("Requested to keep from completely loading a movie, but the movie in question is a png, for which we don't yet have the concept of a 'loading thread'"));
+      log_unimpl(_("Requested to keep from completely loading a movie, but the"
+              " movie in question is a png, for which we don't yet have the "
+              "concept of a 'loading thread'"));
     }
     return create_png_movie(in, url);
   }
-  else if ( type == "swf" )
+  else if ( type == GNASH_FILETYPE_SWF )
   {
     return create_swf_movie(in, url, startLoaderThread);
   }
