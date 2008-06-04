@@ -1,5 +1,19 @@
 2008-06-04 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* server/parser/movie_def_impl.{cpp,h}: rename movie_def_impl class to
+	  SWFMovieDefinition. Add {store,get}DescriptiveMetadata() for dealing
+	  with the METADATA tag, disabled if Movie Properties isn't used.
+	  (--disable-swftree). Rearrange class so public methods are first, like
+	  in almost all other classes. 
+	* server/parser/movie_definition.h: add virtual
+	  {store,get}DescriptiveMetadata() with no-op as default
+	  implementation. (Not used for sprite_instance).
+	* server/swf/tag_loaders.cpp: copy metadata to SWFMovieDefinition, add
+	  comments.
+	* server/impl.cpp: renamed movie_def_impl.
+
+2008-06-04 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* server/actionscript.all/Microphone.as: a couple of tests.
 	* server/fontlib.h: clean up forward declarations.
 	* server/parser/character_def.h: header cleanups.

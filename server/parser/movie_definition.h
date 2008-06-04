@@ -30,12 +30,12 @@
 /// thus it can manage gnash::as_value members.
 ///
 /// The implementation of SWF parsing for a Movie definition
-/// is found in gnash::movie_def_impl::read.
+/// is found in gnash::SWFMovieDefinition::read.
 ///
 /// Note that movie_definition is also used as a base class
 /// for gnash::sprite_definition, which is a sub-movie defined in an SWF
 /// file. This seems to be the only reason to have a
-/// movie_def_impl class, being the top-level definition of
+/// SWFMovieDefinition class, being the top-level definition of
 /// a movie (the one with a CharacterDictionary in it).
 ///
 /// Also note that gnash::movie_instance is a subclass of gnash::sprite_instance,
@@ -46,6 +46,10 @@
 
 #ifndef GNASH_MOVIE_DEFINITION_H
 #define GNASH_MOVIE_DEFINITION_H
+
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h" // for USE_SWFTREE
+#endif
 
 #include "character_def.h" // for inheritance
 #include "fontlib.h"
@@ -79,7 +83,7 @@ namespace gnash
 /// unneeded for top-level movies, because they don't need
 /// to be put in any CharacterDictionary... anyway the
 /// current design requires both sprite_definition (a sprite)
-/// and movie_def_impl (a top-level movie) to derive from
+/// and SWFMovieDefinition (a top-level movie) to derive from
 /// a common class to allow tag_loaders to take a pointer
 /// to the base class to act on (consider PLACEOBJECT tags...).
 ///
@@ -125,7 +129,7 @@ public:
 	///
 	/// Override this method for any definition that is
 	/// able to be instanciated as a movie_instance.
-	/// movie_def_impl is one such example, future examples
+	/// SWFMovieDefinition is one such example, future examples
 	/// should include jpeg_movie_def and similar..
 	///
 	virtual movie_instance* create_movie_instance(character* /*parent*/=0)
@@ -223,8 +227,8 @@ public:
 	//
 	/// Note that only top-level movies (those belonging to a single
 	/// SWF stream) have a characters dictionary, thus our
-	/// movie_def_impl. The other derived class, sprite_definition
-	/// will seek for characters in it's base movie_def_impl.
+	/// SWFMovieDefinition. The other derived class, sprite_definition
+	/// will seek for characters in it's base SWFMovieDefinition.
 	///
 	/// @return NULL if no character with the given ID is found
 	///         (this is the default)
@@ -298,7 +302,7 @@ public:
 	/// @param tag
 	/// 	The tag to add in the list of executable tags for
 	/// 	the frame currently being loaded. Ownership is transferred
-	/// 	to the movie_def_impl.
+	/// 	to the SWFMovieDefinition.
 	///
 	/// TODO: take an auto_ptr.
 	/// NOTE: the default implementation just let the ControlTag leak.
@@ -351,8 +355,8 @@ public:
 	//
 	/// Note that only top-level movies (those belonging to a single
 	/// SWF stream) have a characters dictionary, thus our
-	/// movie_def_impl. The other derived class, sprite_definition
-	/// will seek for characters in it's base movie_def_impl.
+	/// SWFMovieDefinition. The other derived class, sprite_definition
+	/// will seek for characters in it's base SWFMovieDefinition.
 	///
 	/// @return NULL if no character with the given ID is found, or
 	///	    if the corresponding character is not a bitmap.
@@ -484,7 +488,26 @@ public:
 	virtual void load_next_frame_chunk() 
 	{
 	}
-    
+
+#ifdef USE_SWFTREE
+
+	// These methods attach the contents of the METADATA tag
+	// to a movie_definition. They are not used by the player
+	// at all, but are stored for display in Movie Properties.
+	// To save memory and parsing time, this won't happen
+	// when the swf tree view is disabled.
+	virtual void storeDescriptiveMetadata(const std::string& /*data*/)
+	{
+	}
+
+	virtual const std::string& getDescriptiveMetadata() const
+	{
+	    static const std::string s("");
+	    return s;
+	}	
+
+#endif
+
 };
 
 } // namespace gnash

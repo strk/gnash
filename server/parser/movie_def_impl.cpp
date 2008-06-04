@@ -1,4 +1,4 @@
-// movie_def_impl.cpp:  Load in Movie definitions, for Gnash.
+// movie_def_impl.cpp: load a SWF definition
 //
 //   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 //
@@ -18,7 +18,7 @@
 //
 
 #ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
+#include "gnashconfig.h" // USE_SWFTREE
 #endif
 
 #include "smart_ptr.h" // GNASH_USE_GC
@@ -76,7 +76,7 @@
 namespace gnash
 {
 
-MovieLoader::MovieLoader(movie_def_impl& md)
+MovieLoader::MovieLoader(SWFMovieDefinition& md)
 	:
 	_movie_def(md),
 	_thread(NULL),
@@ -124,7 +124,7 @@ MovieLoader::isSelfThread() const
 
 // static..
 void
-MovieLoader::execute(MovieLoader& ml, movie_def_impl* md)
+MovieLoader::execute(MovieLoader& ml, SWFMovieDefinition* md)
 {
 	ml._barrier.wait(); // let _thread assignment happen before going on
 	md->read_all_swf();
@@ -189,12 +189,15 @@ static void	dumpTagBytes(stream* in, std::ostream& os)
 
 
 //
-// movie_def_impl
+// SWFMovieDefinition
 //
 
-movie_def_impl::movie_def_impl()
+SWFMovieDefinition::SWFMovieDefinition()
 	:
-	// FIXME: use a class-static TagLoadersTable for movie_def_impl
+	// FIXME: use a class-static TagLoadersTable for SWFMovieDefinition
+#ifdef USE_SWFTREE
+    _metadata(),
+#endif
 	_tag_loaders(SWF::TagLoadersTable::getInstance()),
 	m_frame_rate(30.0f),
 	m_frame_count(0u),
@@ -209,7 +212,7 @@ movie_def_impl::movie_def_impl()
 {
 }
 
-movie_def_impl::~movie_def_impl()
+SWFMovieDefinition::~SWFMovieDefinition()
 {
 
 	// Request cancelation of the loading thread
@@ -231,7 +234,7 @@ movie_def_impl::~movie_def_impl()
 	//assert(m_jpeg_in.get() == NULL);
 }
 
-void movie_def_impl::add_character(int character_id, character_def* c)
+void SWFMovieDefinition::add_character(int character_id, character_def* c)
 {
 	assert(c);
 	boost::mutex::scoped_lock lock(_dictionaryMutex);
@@ -239,7 +242,7 @@ void movie_def_impl::add_character(int character_id, character_def* c)
 }
 
 character_def*
-movie_def_impl::get_character_def(int character_id)
+SWFMovieDefinition::get_character_def(int character_id)
 {
 
 	boost::mutex::scoped_lock lock(_dictionaryMutex);
@@ -251,13 +254,13 @@ movie_def_impl::get_character_def(int character_id)
 	return ch.get(); // mm... why don't we return the boost::intrusive_ptr?
 }
 
-void movie_def_impl::add_font(int font_id, font* f)
+void SWFMovieDefinition::add_font(int font_id, font* f)
 {
     assert(f);
     m_fonts.insert(std::make_pair(font_id, boost::intrusive_ptr<font>(f)));
 }
 
-font* movie_def_impl::get_font(int font_id) const
+font* SWFMovieDefinition::get_font(int font_id) const
 {
 
     FontMap::const_iterator it = m_fonts.find(font_id);
@@ -267,7 +270,7 @@ font* movie_def_impl::get_font(int font_id) const
     return f.get();
 }
 
-bitmap_character_def* movie_def_impl::get_bitmap_character_def(int character_id)
+bitmap_character_def* SWFMovieDefinition::get_bitmap_character_def(int character_id)
 {
     BitmapMap::iterator it = m_bitmap_characters.find(character_id);
     if ( it == m_bitmap_characters.end() ) return NULL;
@@ -275,7 +278,7 @@ bitmap_character_def* movie_def_impl::get_bitmap_character_def(int character_id)
 }
 
 void
-movie_def_impl::add_bitmap_character_def(int character_id,
+SWFMovieDefinition::add_bitmap_character_def(int character_id,
 		bitmap_character_def* ch)
 {
     assert(ch);
@@ -288,7 +291,7 @@ movie_def_impl::add_bitmap_character_def(int character_id,
     add_bitmap_info(ch->get_bitmap_info());
 }
 
-sound_sample* movie_def_impl::get_sound_sample(int character_id)
+sound_sample* SWFMovieDefinition::get_sound_sample(int character_id)
 {
     SoundSampleMap::iterator it = m_sound_samples.find(character_id);
     if ( it == m_sound_samples.end() ) return NULL;
@@ -301,7 +304,7 @@ sound_sample* movie_def_impl::get_sound_sample(int character_id)
     return ch.get();
 }
 
-void movie_def_impl::add_sound_sample(int character_id, sound_sample* sam)
+void SWFMovieDefinition::add_sound_sample(int character_id, sound_sample* sam)
 {
     assert(sam);
     IF_VERBOSE_PARSE(
@@ -314,7 +317,7 @@ void movie_def_impl::add_sound_sample(int character_id, sound_sample* sam)
 
 // Read header and assign url
 bool
-movie_def_impl::readHeader(std::auto_ptr<tu_file> in, const std::string& url)
+SWFMovieDefinition::readHeader(std::auto_ptr<tu_file> in, const std::string& url)
 {
 
 	_in = in;
@@ -335,7 +338,7 @@ movie_def_impl::readHeader(std::auto_ptr<tu_file> in, const std::string& url)
 		&& (header & 0x0FFFFFF) != 0x00535743)
         {
 		// ERROR
-		log_error(_("gnash::movie_def_impl::read() -- "
+		log_error(_("gnash::SWFMovieDefinition::read() -- "
 			"file does not start with a SWF header"));
 		return false;
         }
@@ -355,7 +358,7 @@ movie_def_impl::readHeader(std::auto_ptr<tu_file> in, const std::string& url)
 	if (compressed)
         {
 #ifndef HAVE_ZLIB_H
-		log_error(_("movie_def_impl::read(): unable to read "
+		log_error(_("SWFMovieDefinition::read(): unable to read "
 			"zipped SWF data; gnash was compiled without zlib support"));
 		return false;
 #else
@@ -424,7 +427,7 @@ movie_def_impl::readHeader(std::auto_ptr<tu_file> in, const std::string& url)
 
 // Fire up the loading thread
 bool
-movie_def_impl::completeLoad()
+SWFMovieDefinition::completeLoad()
 {
 
 	// should call this only once
@@ -464,7 +467,7 @@ movie_def_impl::completeLoad()
 
 // Read a .SWF movie.
 bool
-movie_def_impl::read(std::auto_ptr<tu_file> in, const std::string& url)
+SWFMovieDefinition::read(std::auto_ptr<tu_file> in, const std::string& url)
 {
 
 	if ( ! readHeader(in, url) ) return false;
@@ -475,7 +478,7 @@ movie_def_impl::read(std::auto_ptr<tu_file> in, const std::string& url)
 
 // 1-based frame number
 bool
-movie_def_impl::ensure_frame_loaded(size_t framenum)
+SWFMovieDefinition::ensure_frame_loaded(size_t framenum)
 {
 	boost::mutex::scoped_lock lock(_frames_loaded_mutex);
 
@@ -497,7 +500,7 @@ movie_def_impl::ensure_frame_loaded(size_t framenum)
 }
 
 movie_instance*
-movie_def_impl::create_movie_instance(character* parent)
+SWFMovieDefinition::create_movie_instance(character* parent)
 {
 	return new movie_instance(this, parent);
 }
@@ -546,7 +549,7 @@ CharacterDictionary::add_character(int id, boost::intrusive_ptr<character_def> c
 // Load next chunk of this sprite frames.
 // This is possibly better defined in movie_definition
 void
-movie_def_impl::load_next_frame_chunk()
+SWFMovieDefinition::load_next_frame_chunk()
 {
 
 	size_t framecount = get_frame_count();
@@ -585,7 +588,7 @@ movie_def_impl::load_next_frame_chunk()
 }
 
 void
-movie_def_impl::read_all_swf()
+SWFMovieDefinition::read_all_swf()
 {
 	assert(_str.get() != NULL);
 
@@ -714,14 +717,14 @@ parse_tag:
 }
 
 size_t
-movie_def_impl::get_loading_frame() const
+SWFMovieDefinition::get_loading_frame() const
 {
 	boost::mutex::scoped_lock lock(_frames_loaded_mutex);
 	return _frames_loaded;
 }
 
 size_t
-movie_def_impl::incrementLoadedFrames()
+SWFMovieDefinition::incrementLoadedFrames()
 {
 	boost::mutex::scoped_lock lock(_frames_loaded_mutex);
 
@@ -757,7 +760,7 @@ movie_def_impl::incrementLoadedFrames()
 }
 
 void
-movie_def_impl::export_resource(const std::string& symbol, resource* res)
+SWFMovieDefinition::export_resource(const std::string& symbol, resource* res)
 {
 	// _exportedResources access should be protected by a mutex
 	boost::mutex::scoped_lock lock(_exportedResourcesMutex);
@@ -768,7 +771,7 @@ movie_def_impl::export_resource(const std::string& symbol, resource* res)
 
 
 boost::intrusive_ptr<resource>
-movie_def_impl::get_exported_resource(const std::string& symbol)
+SWFMovieDefinition::get_exported_resource(const std::string& symbol)
 {
 #ifdef DEBUG_EXPORTS
 	log_debug(_("get_exported_resource called, frame count=%u"), m_frame_count);
@@ -849,7 +852,7 @@ movie_def_impl::get_exported_resource(const std::string& symbol)
 }
 
 void
-movie_def_impl::add_frame_name(const std::string& n)
+SWFMovieDefinition::add_frame_name(const std::string& n)
 {
 	boost::mutex::scoped_lock lock1(_namedFramesMutex);
 	boost::mutex::scoped_lock lock2(_frames_loaded_mutex);
@@ -858,7 +861,7 @@ movie_def_impl::add_frame_name(const std::string& n)
 }
 
 bool
-movie_def_impl::get_labeled_frame(const std::string& label, size_t& frame_number)
+SWFMovieDefinition::get_labeled_frame(const std::string& label, size_t& frame_number)
 {
     boost::mutex::scoped_lock lock(_namedFramesMutex);
     NamedFrameMap::const_iterator it = _namedFrames.find(label);
@@ -869,7 +872,7 @@ movie_def_impl::get_labeled_frame(const std::string& label, size_t& frame_number
 
 #ifdef GNASH_USE_GC
 void
-movie_def_impl::markReachableResources() const
+SWFMovieDefinition::markReachableResources() const
 {
 	for (FontMap::const_iterator i=m_fonts.begin(), e=m_fonts.end(); i!=e; ++i)
 	{
@@ -912,7 +915,7 @@ movie_def_impl::markReachableResources() const
 #endif // GNASH_USE_GC
 
 void
-movie_def_impl::importResources(boost::intrusive_ptr<movie_definition> source, Imports& imports)
+SWFMovieDefinition::importResources(boost::intrusive_ptr<movie_definition> source, Imports& imports)
 {
 	size_t importedSyms=0;
 	for (Imports::iterator i=imports.begin(), e=imports.end(); i!=e; ++i)

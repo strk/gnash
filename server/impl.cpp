@@ -366,15 +366,15 @@ get_file_type(tu_file* in)
   return "unknown";
 }
 
-// Create a movie_def_impl from an SWF stream
+// Create a SWFMovieDefinition from an SWF stream
 // NOTE: this method assumes this *is* an SWF stream
 //
-static movie_def_impl*
+static SWFMovieDefinition*
 create_swf_movie(std::auto_ptr<tu_file> in, const std::string& url, bool startLoaderThread)
 {
 
   // Avoid leaks on error 
-  std::auto_ptr<movie_def_impl> m ( new movie_def_impl() );
+  std::auto_ptr<SWFMovieDefinition> m ( new SWFMovieDefinition() );
 
   if ( ! m->readHeader(in, url) )
   {
@@ -510,7 +510,7 @@ void  clear()
 
 /// Library of SWF movies indexed by URL strings
 //
-/// Elements are actually movie_def_impl, the ones
+/// Elements are actually SWFMovieDefinition, the ones
 /// associated with URLS. Dunno why, but we were using
 /// movie_definition here before so this didn't change
 /// when the new class was introduced.
@@ -717,7 +717,7 @@ movie_definition* create_library_movie(const URL& url, const char* real_url, boo
   //
   if ( startLoaderThread )
   {
-    movie_def_impl* mdi = dynamic_cast<movie_def_impl*>(mov);
+    SWFMovieDefinition* mdi = dynamic_cast<SWFMovieDefinition*>(mov);
     if ( mdi ) {
       mdi->completeLoad();
     }

@@ -19,7 +19,7 @@
 
 
 #ifdef HAVE_CONFIG_H
-#include "gnashconfig.h" // HAVE_ZLIB_H
+#include "gnashconfig.h" // HAVE_ZLIB_H, USE_SWFTREE
 #endif
 
 #include "tu_file.h"
@@ -902,7 +902,7 @@ sprite_loader(stream* in, tag_type tag, movie_definition* m)
     // would be a malformed SWF, anyway to be compatible
     // we should still allow that. See bug #22468.
     IF_VERBOSE_MALFORMED_SWF(
-    if ( ! dynamic_cast<movie_def_impl*>(m) )
+    if ( ! dynamic_cast<SWFMovieDefinition*>(m) )
     {
 	    log_swferror(_("Nested DEFINESPRITE tags. Will add to top-level characters dictionary."));
     }
@@ -1002,7 +1002,7 @@ void	export_loader(stream* in, tag_type tag, movie_definition* m)
     // would be a malformed SWF, anyway to be compatible
     // we should still allow that. See bug #22468.
     IF_VERBOSE_MALFORMED_SWF(
-    if ( ! dynamic_cast<movie_def_impl*>(m) )
+    if ( ! dynamic_cast<SWFMovieDefinition*>(m) )
     {
 	log_swferror(_("EXPORT tag inside DEFINESPRITE. Will export in top-level symbol table."));
     }
@@ -1306,7 +1306,7 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
     // no character id for soundstreams... so we make one up...
     // This only works if there is only one stream in the movie...
     // The right way to do it is to make seperate structures for streams
-    // in movie_def_impl.
+    // in SWFMovieDefinition.
 
     // 1 byte for playback info, 1 for stream info, 2 for sample count
     in->ensureBytes(4);
@@ -1516,7 +1516,7 @@ file_attributes_loader(stream* in, tag_type tag, movie_definition* /*m*/)
 
 
 void
-metadata_loader(stream* in, tag_type tag, movie_definition* /*m*/)
+metadata_loader(stream* in, tag_type tag, movie_definition* m)
 {
     assert(tag == SWF::METADATA); // 77
 
@@ -1528,10 +1528,30 @@ metadata_loader(stream* in, tag_type tag, movie_definition* /*m*/)
 	log_parse(_("  RDF metadata (information only): [[\n%s\n]]"), metadata);
     );
 
-    // TODO: add to Movie Properties?
     // The metadata tag exists exclusively for external
     // description of the SWF file and should be ignored
     // by the SWF player.
+    //
+    // Note: the presence of metadata should correspond to the
+    // file attributes flag hasMetadata; otherwise the SWF
+    // is malformed.
+    //
+    // This should be in RDF format, so should be easy to parse
+    // (knowing how well Adobe conform to XML standards...) if
+    // it's worth it.
+    // See http://www.w3.org/TR/rdf-syntax-grammar/
+    log_debug(_("Descriptive metadata from movie %s: %s"),
+		    m->get_url(), metadata);
+
+#ifdef USE_SWFTREE
+    // If the Movie Properties tree is disabled, the metadata
+    // is discarded to save parsing time and memory. There seems
+    // to be no limit on its length, although you'd have to be
+    // malicious or stupid to put really enormous amounts of
+    // descriptive metadata in a SWF. There can be one tag for each
+    // loaded SWF, however, so it could mount up. 
+    m->storeDescriptiveMetadata(metadata);
+#endif
 
 }
 

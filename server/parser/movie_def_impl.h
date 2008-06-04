@@ -15,8 +15,16 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef GNASH_MOVIE_DEF_IMPL_H
-#define GNASH_MOVIE_DEF_IMPL_H
+// The SWFMovieDefinition is the 'root' definition of a SWF movie, including
+// movies loaded into another SWF file. Each self-contained SWF file has exactly
+// one SWFMovieDefinition.
+
+#ifndef GNASH_SWF_MOVIE_DEFINITION_H
+#define GNASH_SWF_MOVIE_DEFINITION_H
+
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h" // for USE_SWFTREE
+#endif
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "fontlib.h"
@@ -41,7 +49,7 @@
 //
 // Forward declarations
 namespace gnash {
-	class movie_def_impl;
+	class SWFMovieDefinition;
 	class movie_root;
 	class sprite_instance;
 	class movie_instance;
@@ -54,20 +62,20 @@ namespace gnash
 {
 
 /// \brief
-/// movie_def_impl helper class handling start and execution of
+/// SWFMovieDefinition helper class handling start and execution of
 /// an SWF loading thread
 ///
 class MovieLoader
 {
 public:
 
-	MovieLoader(movie_def_impl& md);
+	MovieLoader(SWFMovieDefinition& md);
 
 	~MovieLoader();
 
 	/// Start loading thread.
 	//
-	/// The associated movie_def_impl instance
+	/// The associated SWFMovieDefinition instance
 	/// is expected to have already read the SWF
 	/// header and applied a zlib adapter if needed.
 	///
@@ -81,7 +89,7 @@ public:
 
 private:
 
-	movie_def_impl& _movie_def;
+	SWFMovieDefinition& _movie_def;
 
 	mutable boost::mutex _mutex;
 	std::auto_ptr<boost::thread> _thread;
@@ -92,7 +100,7 @@ private:
 	boost::barrier _barrier;
 
 	/// Entry point for the actual thread
-	static void execute(MovieLoader& ml, movie_def_impl* md);
+	static void execute(MovieLoader& ml, SWFMovieDefinition* md);
 };
 
 /// The Characters dictionary associated with each SWF file.
@@ -164,142 +172,13 @@ private:
 /// current state; for that you need to call create_movie_instance()
 /// to get a movie instance 
 ///
-class movie_def_impl : public movie_definition
+class SWFMovieDefinition : public movie_definition
 {
-private:
-	/// Characters Dictionary
-	CharacterDictionary	_dictionary;
-
-	/// Mutex protecting _dictionary
-	mutable boost::mutex _dictionaryMutex;
-
-	/// Tags loader table
-	SWF::TagLoadersTable& _tag_loaders;
-
-	typedef std::map<int, boost::intrusive_ptr<font> > FontMap;
-	FontMap m_fonts;
-
-	typedef std::map<int, boost::intrusive_ptr<bitmap_character_def> > BitmapMap;
-	BitmapMap m_bitmap_characters;
-
-	typedef std::map<int, boost::intrusive_ptr<sound_sample> > SoundSampleMap;
-	SoundSampleMap m_sound_samples;
-
-	typedef std::map<size_t, PlayList> PlayListMap;
-
-	/// Movie control events for each frame.
-	PlayListMap m_playlist;
-
-	/// 0-based frame #'s
-	typedef std::map<std::string, size_t, StringNoCaseLessThen> NamedFrameMap;
-	NamedFrameMap _namedFrames;
-
-	// Mutex protecting access to _namedFrames
-	mutable boost::mutex _namedFramesMutex;
-
-	typedef std::map<std::string, boost::intrusive_ptr<resource>, StringNoCaseLessThen > ExportMap;
-	ExportMap _exportedResources;
-
-	// Mutex protecting access to _exportedResources
-	mutable boost::mutex _exportedResourcesMutex;
-
-	/// Movies we import from; hold a ref on these,
-	/// to keep them alive
-	typedef std::vector<boost::intrusive_ptr<movie_definition> > ImportVect;
-	ImportVect m_import_source_movies;
-
-	/// Bitmaps used in this movie; collected in one place to make
-	/// it possible for the host to manage them as textures.
-	typedef std::vector<boost::intrusive_ptr<bitmap_info> >	BitmapVect;
-	BitmapVect m_bitmap_list;
-
-	rect	m_frame_size;
-	float	m_frame_rate;
-	size_t	m_frame_count;
-	int	m_version;
-
-	/// Number of fully loaded frames
-	size_t	_frames_loaded;
-
-	/// A mutex protecting access to _frames_loaded
-	//
-	/// This is needed because the loader thread will
-	/// increment this number, while the virtual machine
-	/// thread will read it.
-	///
-	mutable boost::mutex _frames_loaded_mutex;
-
-	/// A semaphore to signal load of a specific frame
-	boost::condition _frame_reached_condition;
-
-	/// Set this to trigger signaling of loaded frame
-	//
-	/// Make sure you _frames_loaded_mutex is locked
-	/// when accessing this member !
-	///
-	size_t _waiting_for_frame;
-
-	/// Number bytes loaded / parsed
-	unsigned long _bytes_loaded;
-
-	/// A mutex protecting access to _bytes_loaded
-	//
-	/// This is needed because the loader thread will
-	/// increment this number, while the virtual machine
-	/// thread will read it.
-	///
-	mutable boost::mutex _bytes_loaded_mutex;
-
-
-
-	int	m_loading_sound_stream;
-	boost::uint32_t	m_file_length;
-
-	std::auto_ptr<jpeg::input> m_jpeg_in;
-
-	std::string _url;
-
-	std::auto_ptr<stream> _str;
-
-	std::auto_ptr<tu_file> _in;
-
-	/// swf end position (as read from header)
-	unsigned int _swf_end_pos;
-
-	/// asyncronous SWF loader and parser
-	MovieLoader _loader;
-
-	/// \brief
-	/// Increment loaded frames count, signaling frame reached condition if
-	/// any thread is waiting for that. See ensure_frame_loaded().
-	///
-	/// NOTE: this method locks _frames_loaded_mutex
-	///
-	/// @return the new value of _frames_loaded
-	///
-	size_t incrementLoadedFrames();
-
-	/// Set number of bytes loaded from input stream
-	//
-	/// NOTE: this method locks _bytes_loaded_mutex
-	///
-	void setBytesLoaded(unsigned long bytes)
-	{
-		boost::mutex::scoped_lock lock(_bytes_loaded_mutex);
-		_bytes_loaded=bytes;
-	}
-
-	/// A flag set to true when load cancelation is requested
-	bool _loadingCanceled;
-
-	/// Movies we import resources from
-	std::set< boost::intrusive_ptr<movie_definition> > _importSources;
-
 public:
 
-	movie_def_impl();
+	SWFMovieDefinition();
 
-	~movie_def_impl();
+	~SWFMovieDefinition();
 
 	// ...
 	size_t get_frame_count() const { return m_frame_count; }
@@ -534,10 +413,162 @@ public:
 		return unused;
 	}
 
+#ifdef USE_SWFTREE
+
+	// These methods attach the contents of the METADATA tag
+	// to a movie_definition.
+	virtual void storeDescriptiveMetadata(const std::string& data)
+	{
+	    _metadata = data;
+	}
+
+	virtual const std::string& getDescriptiveMetadata() const
+	{
+	    return _metadata;
+	}	
+
+#endif
+
+private:
+
+#ifdef USE_SWFTREE
+    // For storing descriptive metadata (information only)
+    std::string _metadata;
+#endif
+
+	/// Characters Dictionary
+	CharacterDictionary	_dictionary;
+
+	/// Mutex protecting _dictionary
+	mutable boost::mutex _dictionaryMutex;
+
+	/// Tags loader table
+	SWF::TagLoadersTable& _tag_loaders;
+
+	typedef std::map<int, boost::intrusive_ptr<font> > FontMap;
+	FontMap m_fonts;
+
+	typedef std::map<int, boost::intrusive_ptr<bitmap_character_def> > BitmapMap;
+	BitmapMap m_bitmap_characters;
+
+	typedef std::map<int, boost::intrusive_ptr<sound_sample> > SoundSampleMap;
+	SoundSampleMap m_sound_samples;
+
+	typedef std::map<size_t, PlayList> PlayListMap;
+
+	/// Movie control events for each frame.
+	PlayListMap m_playlist;
+
+	/// 0-based frame #'s
+	typedef std::map<std::string, size_t, StringNoCaseLessThen> NamedFrameMap;
+	NamedFrameMap _namedFrames;
+
+	// Mutex protecting access to _namedFrames
+	mutable boost::mutex _namedFramesMutex;
+
+	typedef std::map<std::string, boost::intrusive_ptr<resource>, StringNoCaseLessThen > ExportMap;
+	ExportMap _exportedResources;
+
+	// Mutex protecting access to _exportedResources
+	mutable boost::mutex _exportedResourcesMutex;
+
+	/// Movies we import from; hold a ref on these,
+	/// to keep them alive
+	typedef std::vector<boost::intrusive_ptr<movie_definition> > ImportVect;
+	ImportVect m_import_source_movies;
+
+	/// Bitmaps used in this movie; collected in one place to make
+	/// it possible for the host to manage them as textures.
+	typedef std::vector<boost::intrusive_ptr<bitmap_info> >	BitmapVect;
+	BitmapVect m_bitmap_list;
+
+	rect	m_frame_size;
+	float	m_frame_rate;
+	size_t	m_frame_count;
+	int	m_version;
+
+	/// Number of fully loaded frames
+	size_t	_frames_loaded;
+
+	/// A mutex protecting access to _frames_loaded
+	//
+	/// This is needed because the loader thread will
+	/// increment this number, while the virtual machine
+	/// thread will read it.
+	///
+	mutable boost::mutex _frames_loaded_mutex;
+
+	/// A semaphore to signal load of a specific frame
+	boost::condition _frame_reached_condition;
+
+	/// Set this to trigger signaling of loaded frame
+	//
+	/// Make sure you _frames_loaded_mutex is locked
+	/// when accessing this member !
+	///
+	size_t _waiting_for_frame;
+
+	/// Number bytes loaded / parsed
+	unsigned long _bytes_loaded;
+
+	/// A mutex protecting access to _bytes_loaded
+	//
+	/// This is needed because the loader thread will
+	/// increment this number, while the virtual machine
+	/// thread will read it.
+	///
+	mutable boost::mutex _bytes_loaded_mutex;
+
+
+
+	int	m_loading_sound_stream;
+	boost::uint32_t	m_file_length;
+
+	std::auto_ptr<jpeg::input> m_jpeg_in;
+
+	std::string _url;
+
+	std::auto_ptr<stream> _str;
+
+	std::auto_ptr<tu_file> _in;
+
+	/// swf end position (as read from header)
+	unsigned int _swf_end_pos;
+
+	/// asyncronous SWF loader and parser
+	MovieLoader _loader;
+
+	/// \brief
+	/// Increment loaded frames count, signaling frame reached condition if
+	/// any thread is waiting for that. See ensure_frame_loaded().
+	///
+	/// NOTE: this method locks _frames_loaded_mutex
+	///
+	/// @return the new value of _frames_loaded
+	///
+	size_t incrementLoadedFrames();
+
+	/// Set number of bytes loaded from input stream
+	//
+	/// NOTE: this method locks _bytes_loaded_mutex
+	///
+	void setBytesLoaded(unsigned long bytes)
+	{
+		boost::mutex::scoped_lock lock(_bytes_loaded_mutex);
+		_bytes_loaded=bytes;
+	}
+
+	/// A flag set to true when load cancelation is requested
+	bool _loadingCanceled;
+
+	/// Movies we import resources from
+	std::set< boost::intrusive_ptr<movie_definition> > _importSources;
+
+
 protected:
 
 #ifdef GNASH_USE_GC
-	/// Mark reachable resources of a movie_def_impl
+	/// Mark reachable resources of a SWFMovieDefinition
 	//
 	/// Reachable resources are:
 	///	- fonts (m_fonts)
