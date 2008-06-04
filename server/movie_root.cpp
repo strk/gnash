@@ -2094,21 +2094,24 @@ movie_root::getMovieInfo(tree<StringPair>& tr, tree<StringPair>::iterator it)
     //
     /// Stage
     //
-    movie_definition* def0 = get_movie_definition();
-    assert(def0);
+    movie_definition* def = get_movie_definition();
+    assert(def);
 
     it = tr.insert(it, StringPair("Stage Properties", ""));
 
     std::ostringstream os;
-    os << "SWF " << def0->get_version();
+    os << "SWF " << def->get_version();
     localIter = tr.append_child(it, StringPair("SWF version", os.str()));
-    localIter = tr.append_child(it, StringPair("URL", def0->get_url()));
-    
+    localIter = tr.append_child(it, StringPair("URL", def->get_url()));
+
+    // TODO: format this better?
+    localIter = tr.append_child(it, StringPair("Descriptive metadata",
+                                        def->getDescriptiveMetadata()));
  
     /// Stage: real dimensions.
     os.str("");
-    os << def0->get_width_pixels() <<
-        "x" << def0->get_height_pixels();
+    os << def->get_width_pixels() <<
+        "x" << def->get_height_pixels();
     localIter = tr.append_child(it, StringPair("Real dimensions", os.str()));
 
     /// Stage: rendered dimensions.

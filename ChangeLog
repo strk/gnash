@@ -1,5 +1,9 @@
 2008-06-04 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* server/movie_root.cpp: add metadata to Movie Properties tree.
+
+2008-06-04 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* server/fill_style.cpp, server/sprite_instance.cpp: update
 	  comments.
 
