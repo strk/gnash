@@ -60,7 +60,7 @@ DefineFontAlignZonesTag::loader(stream* in, tag_type tag, movie_definition* m)
 	// 	- register the tag with the referencedFont
 
 	IF_VERBOSE_PARSE (
-	log_parse(_("  DefinFontAlignZones: font=%d, flags=%d"), ref, flags);
+	log_parse(_("  DefineFontAlignZones: font=%d, flags=%d"), ref, flags);
 	);
 
 	in->skip_to_tag_end();
