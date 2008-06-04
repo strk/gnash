@@ -198,7 +198,14 @@ bool
 FLVParser::nextAudioFrameTimestamp(boost::uint64_t& ts)
 {
 	// If there are no audio in this FLV return NULL
-	if (!_audio && _lastParsedPosition > 0) return false;
+	// 
+	// TODO: FIXME: the condition assumes that if _lastParsedPosition > 0
+	//       we had a chance to figure if video was present !
+	//
+	if (!_audio && _lastParsedPosition > 0)
+	{
+		return false;
+	}
 
 	// Make sure that there are parsed enough frames to return the need frame
 	while(_audioFrames.size() <= _nextAudioFrame && !_parsingComplete) {
@@ -239,9 +246,12 @@ bool
 FLVParser::nextVideoFrameTimestamp(boost::uint64_t& ts)
 {
 	// If there are no video in this FLV return NULL
+	// 
+	// TODO: FIXME: the condition assumes that if _lastParsedPosition > 0
+	//       we had a chance to figure if video was present !
+	//
 	if (!_video && _lastParsedPosition > 0)
 	{
-		//gnash::log_debug("no video, or lastParserPosition > 0");
 		return false;
 	}
 
