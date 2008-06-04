@@ -1,5 +1,12 @@
 2008-06-04 Sandro Santilli <strk@keybit.net>
 
+	* libmedia/FLVParser.cpp (getBufferLength): don't rely
+	  on cursor to tell how much time the buffer contains;
+	  add notes about need to sort out a rationale for
+	  what to return when both audio/video buffers exist..
+
+2008-06-04 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/NetStream-SquareTest.c: don't let
 	  the buffer loaded bar become > 100%, but keep it at alpha
 	  50 while not saturated, and bring to 100 when saturated.

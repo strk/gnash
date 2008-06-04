@@ -126,18 +126,22 @@ FLVParser::~FLVParser()
 boost::uint32_t
 FLVParser::getBufferLength()
 {
-	if (_video) {
-		size_t size = _videoFrames.size();
-		if (size > 1 && size > _nextVideoFrame) {
-			return _videoFrames.back()->timestamp; //  - _videoFrames[_nextVideoFrame]->timestamp;
-		}
+	// TODO: figure wheter and why we should privilege
+	//       video frames over audio frames when both
+	//       are available
+	//	 I belive the corrent behaviour here would
+	//	 be using the smallest max-timestamp..
+
+	if (_video && !_videoFrames.empty())
+	{
+		return _videoFrames.back()->timestamp; 
 	}
-	if (_audio) {
-		size_t size = _audioFrames.size();
-		if (size > 1 && size > _nextAudioFrame) {
-			return _audioFrames.back()->timestamp; //  - _audioFrames[_nextAudioFrame]->timestamp;
-		}
+
+	if (_audio && ! _audioFrames.empty())
+	{
+		return _audioFrames.back()->timestamp; 
 	}
+
 	return 0;
 }
 boost::uint16_t
