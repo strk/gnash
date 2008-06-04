@@ -3019,7 +3019,7 @@ void sprite_instance::advance_sprite()
 #endif
 
     // Execute the current frame's tags.
-    // First time execute_frame_tags(0) executed in dlist.cpp(child) or movie_def_impl(root)
+    // First time execute_frame_tags(0) executed in dlist.cpp(child) or SWFMovieDefinition(root)
     if (m_current_frame != (size_t)prev_frame)
     {
       if ( m_current_frame == 0 && has_looped() )

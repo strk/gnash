@@ -242,7 +242,7 @@ fill_style::read(stream* in, int tag_type, movie_definition* md,
 			pOther->need_gradient_bitmap();
 		md->add_bitmap_info(pOther->m_gradient_bitmap_info.get());
 	}
-        // Make sure our movie_def_impl knows about this bitmap.
+        // Make sure our SWFMovieDefinition knows about this bitmap.
         md->add_bitmap_info(m_gradient_bitmap_info.get());
     }
     else if (m_type == SWF::FILL_TILED_BITMAP
