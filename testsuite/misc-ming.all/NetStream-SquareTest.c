@@ -81,7 +81,6 @@ main(int argc, char** argv)
   sprintf(buffer_a,
   	"note(System.capabilities.version);"
   	"note('SWF version %d');"
-  	
   	"nc=new NetConnection();"
 	"check(!nc.isConnected, 'newly created NetConnection is not connected');"
 	"nc.connect(null);"
@@ -98,8 +97,34 @@ main(int argc, char** argv)
 	"stream2 = new NetStream(nc);"
 	, OUTPUT_VERSION);
 
-  	sprintf(buffer_b,
+  sprintf(buffer_b,
   	// bytesTotal (read-only)
+	"MovieClip.prototype.addBytesLoadedProgress = function(v, s) {"
+	"	var nam = 'blprogress_'+v;"
+	"	var dep = this.getNextHighestDepth();"
+	"	var pc = this.createEmptyMovieClip(nam, dep);"
+	"	pc.stream = s;"
+	"	pc.video = v;"
+	"	var pcp = pc.createEmptyMovieClip('bar', pc.getNextHighestDepth());"
+	"	var x = v._x;"
+	"	var y = v._y+v._height+10;"
+	"	var w = v._width;"
+	"	var h = 10;"
+	"	with(pcp) {"
+	"		_x = x;"
+	"		_y = y;"
+	"		moveTo(0,0);"
+	"		beginFill(0xFF0000,50);"
+	"		lineTo(0, h);"
+	"		lineTo(w, h);"
+	"		lineTo(w, 0);"
+	"		lineTo(0, 0);"
+	"		endFill();"
+	"	};"
+	"	pc.onEnterFrame = function() {"
+	"		pcp._xscale = 100*(this.stream.bytesLoaded/this.stream.bytesTotal);"
+	"	};"
+	"};"
 	"stream.play('%s');"
 	"stream2.play('%s');"
 	"stream.pause(true);" 
@@ -240,7 +265,10 @@ main(int argc, char** argv)
 		"video._x = 100;"
 		"video._xscale = 120;"
 		"video._yscale = 120;"
-		"video._rotation = 45;");
+		"video._rotation = 45;"
+		"_root.addBytesLoadedProgress(video, stream);"
+		"_root.addBytesLoadedProgress(video2, stream2);"
+	);
 
   check_equals(mo, "video._x", "100")	;
   check_equals(mo, "Math.round(video._xscale*100)/100", "120");

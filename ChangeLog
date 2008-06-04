@@ -1,5 +1,10 @@
 2008-06-04 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/NetStream-SquareTest.c: add progress bars
+	  for bytesLoaded/bytesTotal.
+
+2008-06-04 Sandro Santilli <strk@keybit.net>
+
 	* libmedia/ffmpeg/MediaParserFfmpeg.{cpp,h}: implement frame parsing.
 	* server/asobj/NetStreamFfmpeg.cpp (refreshVideoFrame): don't do
 	  anything if video decoder wasn't initialized.
