@@ -50,7 +50,7 @@ main(int argc, char** argv)
   SWFAction a;
   SWFAction b;
   char buffer_a[1028];
-  char buffer_b[1028];
+  char buffer_b[2048];
 
   int video_width = 128;
   int video_height = 96;
@@ -123,6 +123,32 @@ main(int argc, char** argv)
 	"	};"
 	"	pc.onEnterFrame = function() {"
 	"		pcp._xscale = 100*(this.stream.bytesLoaded/this.stream.bytesTotal);"
+	"	};"
+	"};"
+	"MovieClip.prototype.addBufferLoadedProgress = function(v, s) {"
+	"	var nam = 'blprogress_'+v;"
+	"	var dep = this.getNextHighestDepth();"
+	"	var pc = this.createEmptyMovieClip(nam, dep);"
+	"	pc.stream = s;"
+	"	pc.video = v;"
+	"	var pcp = pc.createEmptyMovieClip('bar', pc.getNextHighestDepth());"
+	"	var x = v._x;"
+	"	var y = v._y+v._height+22;"
+	"	var w = v._width;"
+	"	var h = 10;"
+	"	with(pcp) {"
+	"		_x = x;"
+	"		_y = y;"
+	"		moveTo(0,0);"
+	"		beginFill(0x00FF00,50);"
+	"		lineTo(0, h);"
+	"		lineTo(w, h);"
+	"		lineTo(w, 0);"
+	"		lineTo(0, 0);"
+	"		endFill();"
+	"	};"
+	"	pc.onEnterFrame = function() {"
+	"		pcp._xscale = 100*(this.stream.bufferLength/this.stream.bufferTime);"
 	"	};"
 	"};"
 	"stream.play('%s');"
@@ -268,6 +294,8 @@ main(int argc, char** argv)
 		"video._rotation = 45;"
 		"_root.addBytesLoadedProgress(video, stream);"
 		"_root.addBytesLoadedProgress(video2, stream2);"
+		"_root.addBufferLoadedProgress(video, stream);"
+		"_root.addBufferLoadedProgress(video2, stream2);"
 	);
 
   check_equals(mo, "video._x", "100")	;

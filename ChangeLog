@@ -1,5 +1,10 @@
 2008-06-04 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/NetStream-SquareTest.c: add progress bar
+	  for bufferLength/bufferTime.
+
+2008-06-04 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/NetStream-SquareTest.c: add progress bars
 	  for bytesLoaded/bytesTotal.
 
