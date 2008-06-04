@@ -5,15 +5,14 @@
 
 // Some basic types.
 
-#ifndef __TYPES_H__
-#define __TYPES_H__
+#ifndef GNASH_TYPES_H
+#define GNASH_TYPES_H
 
 #include <string>
 #include <boost/cstdint.hpp> // for boost::?int??_t 
 
-#define TWIPS_TO_PIXELS(x)	((x) / 20.0)
-#define PIXELS_TO_TWIPS(x)	((x) * 20)
-
+inline double TWIPS_TO_PIXELS(int i) { return i / 20.0; }
+inline int PIXELS_TO_TWIPS(double d) { return d * 20; }
 
 namespace gnash {
 	class stream;	// forward declaration
@@ -137,7 +136,7 @@ namespace gnash {
 }	// end namespace gnash
 
 
-#endif // __TYPES_H__
+#endif // GNASH_TYPES_H
 
 
 // Local Variables:

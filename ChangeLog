@@ -1,3 +1,13 @@
+2008-06-04 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* libbase/test_ogl.cpp: make your own if you want to test OGL
+	  (dropped).
+	* server/types.h: __TYPES_H__ is a likely candidate for a name
+	  conflict (using a double underscore in an identifier is undefined
+	  behaviour). Make macros into inlines for better compile time
+	  checking, and so that the compiler (which knows best) can
+	  decide what to do with them.
+
 2008-06-04 Sandro Santilli <strk@keybit.net>
 
 	* libmedia/ffmpeg/MediaParserFfmpeg.{cpp,h}:
