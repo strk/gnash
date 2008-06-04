@@ -22,7 +22,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Microphone.as,v 1.17 2008/05/25 16:27:46 bwy Exp $";
+rcsid="$Id: Microphone.as,v 1.18 2008/06/04 13:43:24 bwy Exp $";
 #include "check.as"
 
 // There was no Microphone class in SWF5 or lower
@@ -57,9 +57,13 @@ check(!Microphone.prototype.hasOwnProperty("silenceTimeOut"));
 check(!Microphone.prototype.hasOwnProperty("useEchoSuppression"));
 
 f = new Microphone;
+
+// Called with new, Microphone returns an object with static
+// properties.
 check_equals(typeof(f), 'object');
 check_equals(typeof(f.setGain), 'function')
-
+check_equals(typeof(f.gain), 'undefined')
+check_equals(typeof(f.rate), 'undefined')
 
 // Still not present
 xcheck(!Microphone.prototype.hasOwnProperty("get"));

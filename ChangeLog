@@ -1,5 +1,9 @@
 2008-06-04 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* server/actionscript.all/Microphone.as: a couple of tests.
+
+2008-06-04 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* server/swf/tag_loaders.h: header cleanup.
 
 2008-06-04 Sandro Santilli <strk@keybit.net>
