@@ -60,6 +60,9 @@ MediaParserFfmpeg::probeStream()
 	size_t actuallyRead = _stream->read_bytes(probe_data.buf, probe_data.buf_size);
 	_stream->set_position(0);
 
+	if ( actuallyRead > _lastParsedPosition ) // could probably be an assertion here (always true)
+		_lastParsedPosition = actuallyRead;
+
 	if (actuallyRead < 1)
 	{
  		log_error(_("Gnash could not read from movie url"));
@@ -73,14 +76,14 @@ MediaParserFfmpeg::probeStream()
 boost::uint32_t
 MediaParserFfmpeg::getBufferLength()
 {
-	log_unimpl("%s", __PRETTY_FUNCTION__);
+	LOG_ONCE( log_unimpl("%s", __PRETTY_FUNCTION__) );
 	return 0;
 }
 
 bool
 MediaParserFfmpeg::nextVideoFrameTimestamp(boost::uint64_t& ts)
 {
-	log_unimpl("%s", __PRETTY_FUNCTION__);
+	LOG_ONCE( log_unimpl("%s", __PRETTY_FUNCTION__) );
 	return false;
 }
 
@@ -88,14 +91,14 @@ std::auto_ptr<EncodedVideoFrame>
 MediaParserFfmpeg::nextVideoFrame()
 {
 	std::auto_ptr<EncodedVideoFrame> ret;
-	log_unimpl("%s", __PRETTY_FUNCTION__);
+	LOG_ONCE( log_unimpl("%s", __PRETTY_FUNCTION__) );
 	return ret;
 }
 
 bool
 MediaParserFfmpeg::nextAudioFrameTimestamp(boost::uint64_t& ts)
 {
-	log_unimpl("%s", __PRETTY_FUNCTION__);
+	LOG_ONCE( log_unimpl("%s", __PRETTY_FUNCTION__) );
 	return false;
 }
 
@@ -104,21 +107,21 @@ MediaParserFfmpeg::nextAudioFrame()
 {
 	std::auto_ptr<EncodedAudioFrame> ret;
 
-	log_unimpl("%s", __PRETTY_FUNCTION__);
+	LOG_ONCE( log_unimpl("%s", __PRETTY_FUNCTION__) );
 	return ret;
 }
 
 VideoInfo*
 MediaParserFfmpeg::getVideoInfo()
 {
-	log_unimpl("%s", __PRETTY_FUNCTION__);
+	LOG_ONCE( log_unimpl("%s", __PRETTY_FUNCTION__) );
 	return 0;
 }
 
 AudioInfo*
 MediaParserFfmpeg::getAudioInfo()
 {
-	log_unimpl("%s", __PRETTY_FUNCTION__);
+	LOG_ONCE( log_unimpl("%s", __PRETTY_FUNCTION__) );
 	return 0;
 }
 
@@ -146,14 +149,14 @@ MediaParserFfmpeg::seek(boost::uint32_t pos)
 		{
 			log_error("Error in av_read_frame (while seeking)");
 			av_seek_frame(_formatCtx, -1, 0, AVSEEK_FLAG_BACKWARD);
-			av_free_packet( &Packet );
+			//av_free_packet( &Packet );
 			return 0; // ??
 		}
 
 		newtime = timebase * (double)_formatCtx->streams[_videoIndex]->cur_dts;
 	}
 
-	av_free_packet( &Packet );
+	//av_free_packet( &Packet );
 	av_seek_frame(_formatCtx, _videoIndex, newpos, 0);
 
 	newtime = static_cast<boost::int32_t>(newtime / 1000.0);
@@ -163,7 +166,7 @@ MediaParserFfmpeg::seek(boost::uint32_t pos)
 bool
 MediaParserFfmpeg::parseNextChunk()
 {
-	log_unimpl("%s", __PRETTY_FUNCTION__);
+	LOG_ONCE( log_unimpl("%s", __PRETTY_FUNCTION__) );
 	return false;
 }
 
@@ -182,8 +185,11 @@ MediaParserFfmpeg::MediaParserFfmpeg(std::auto_ptr<tu_file> stream)
 	_videoIndex(-1),
 	_videoStream(0),
 	_audioIndex(-1),
-	_audioStream(0)
+	_audioStream(0),
+	_lastParsedPosition(0)
 {
+	av_register_all(); // TODO: needs to be invoked only once ?
+
 	ByteIOCxt.buffer = NULL;
 
 	_inputFmt = probeStream();
@@ -196,9 +202,10 @@ MediaParserFfmpeg::MediaParserFfmpeg(std::auto_ptr<tu_file> stream)
 
 	// Setup the filereader/seeker mechanism. 7th argument (NULL) is the writer function,
 	// which isn't needed.
+	_byteIOBuffer.reset( new unsigned char[byteIOBufferSize] );
 	init_put_byte(&ByteIOCxt,
-		new boost::uint8_t[500000], // FIXME: happy leakage !
-		500000, // ?
+		_byteIOBuffer.get(),
+		byteIOBufferSize, // ?
 		0, // ?
 		this, // opaque pointer to pass to the callbacks
 		MediaParserFfmpeg::readPacketWrapper, // packet reader callback
@@ -241,20 +248,22 @@ MediaParserFfmpeg::MediaParserFfmpeg(std::auto_ptr<tu_file> stream)
 		}
 	}
 
-	log_unimpl("MediaParserFfmpeg");
+	LOG_ONCE( log_unimpl("MediaParserFfmpeg") );
 }
 
 MediaParserFfmpeg::~MediaParserFfmpeg()
 {
 	if ( _inputFmt )
 	{
-		// TODO: how to release an AVInputFormat ?
+		// TODO: check if this is correct (should we create RIIA classes for ffmpeg stuff?)
+		av_free(_inputFmt);
 	}
 
 	if ( _formatCtx )
 	{
-		// TODO: how to release a AVFormatContext 
-		av_close_input_file(_formatCtx);
+		// TODO: check if this is correct (should we create RIIA classes for ffmpeg stuff?)
+		//av_close_input_file(_formatCtx); // NOTE: this one triggers a mismatched free/delete on _byteIOBuffer !
+		av_free(_formatCtx);
 	}
 }
 
@@ -296,8 +305,8 @@ MediaParserFfmpeg::seekMedia(offset_t offset, int whence)
 	else if (whence == SEEK_END)
 	{
 		// This is (most likely) a streamed file, so we can't seek to the end!
-		// Instead we seek to 50.000 bytes... seems to work fine...
-		in.set_position(50000);
+		// Instead we seek to byteIOBufferSize bytes... seems to work fine...
+		in.set_position(byteIOBufferSize);
 
 	}
 

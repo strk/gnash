@@ -35,13 +35,6 @@ extern "C" {
 }
 #endif
 
-#ifdef HAVE_LIBAVFORMAT_AVFORMAT_H
-extern "C" {
-#include <libavformat/avformat.h>
-}
-#endif
-
-
 // Forward declaration
 class tu_file;
 
@@ -129,8 +122,14 @@ private:
 	/// ?
 	ByteIOContext ByteIOCxt;
 
+	/// Size of the ByteIO context buffer
+	static const size_t byteIOBufferSize = 500000;
+
+	boost::scoped_array<unsigned char> _byteIOBuffer;
+
 	/// The last parsed position, for getBytesLoaded
 	boost::uint64_t _lastParsedPosition;
+
 
 };
 

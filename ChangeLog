@@ -1,5 +1,12 @@
 2008-06-04 Sandro Santilli <strk@keybit.net>
 
+	* libmedia/ffmpeg/MediaParserFfmpeg.{cpp,h}: don't
+	  miss to call av_register_all, so probing works (thanks bjacques);
+	  LOG_ONCE for log_unimpl; don't leak ByteIO buffer;
+	  don't leak _inputFmt and _formatCtx.
+
+2008-06-04 Sandro Santilli <strk@keybit.net>
+
 	* libmedia/MediaHandler.{cpp,h}: add protected isFLV
 	  method, for use by subclasses to figure if FLVParser
 	  would be enough for input.
