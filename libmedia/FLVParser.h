@@ -262,8 +262,20 @@ public:
 
 private:
 
+	/// \brief
+	/// Get info about the audio frame to return
+	/// on nextAudioFrame() call
+	//
+	/// Returned object is owned by this class.
+	///
 	FLVAudioFrameInfo* peekNextAudioFrameInfo();
 
+	/// \brief
+	/// Get info about the video frame to return
+	/// on nextAudioFrame() call
+	//
+	/// Returned object is owned by this class.
+	///
 	FLVVideoFrameInfo* peekNextVideoFrameInfo();
 
 	/// seeks to the closest possible position the given position,
@@ -286,6 +298,8 @@ private:
 	typedef std::vector<FLVVideoFrameInfo*> VideoFrames;
 
 	/// list of videoframes, does no contain the frame data.
+	//
+	/// Elements owned by this class.
 	VideoFrames _videoFrames;
 
 	// NOTE: FLVAudioFrameInfo is a relatively small structure,
@@ -294,6 +308,8 @@ private:
 	typedef std::vector<FLVAudioFrameInfo*> AudioFrames;
 
 	/// list of audioframes, does no contain the frame data.
+	//
+	/// Elements owned by this class.
 	AudioFrames _audioFrames;
 
 	/// The position where the parsing should continue from.

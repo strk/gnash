@@ -109,9 +109,17 @@ FLVParser::FLVParser(std::auto_ptr<tu_file> lt)
 
 FLVParser::~FLVParser()
 {
-	_videoFrames.clear();
+	for (VideoFrames::iterator i=_videoFrames.begin(),
+		e=_videoFrames.end(); i!=e; ++i)
+	{
+		delete (*i);
+	}
 
-	_audioFrames.clear();
+	for (AudioFrames::iterator i=_audioFrames.begin(),
+		e=_audioFrames.end(); i!=e; ++i)
+	{
+		delete (*i);
+	}
 }
 
 
