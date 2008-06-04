@@ -1,3 +1,9 @@
+2008-06-04 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/NetStream-SquareTest.c: don't let
+	  the buffer loaded bar become > 100%, but keep it at alpha
+	  50 while not saturated, and bring to 100 when saturated.
+
 2008-06-04 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/swf/ScriptLimitsTag.h: parse the ScriptLimits tag (not
