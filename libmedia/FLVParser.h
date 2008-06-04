@@ -321,10 +321,18 @@ private:
 	/// Info about the audio stream (if any)
 	std::auto_ptr<AudioInfo> _audioInfo;
 
-	/// Last audio frame returned
+	/// Audio frame cursor position 
+	//
+	/// This is the video frame number that will
+	/// be referenced by nextVideoFrame and nextVideoFrameTimestamp
+	///
 	size_t _nextAudioFrame;
 
-	/// Last video frame returned
+	/// Video frame cursor position 
+	//
+	/// This is the video frame number that will
+	/// be referenced by nextVideoFrame and nextVideoFrameTimestamp
+	///
 	size_t _nextVideoFrame;
 
 	/// Audio stream is present
