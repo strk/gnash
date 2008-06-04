@@ -18,14 +18,9 @@
 #ifndef GNASH_CHARACTER_DEF_H
 #define GNASH_CHARACTER_DEF_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "resource.h" // for inheritance from resource class
 
 // Forward declarations
-class tu_file;
 
 namespace gnash {
 	class character;

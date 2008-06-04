@@ -2,6 +2,7 @@
 
 	* server/actionscript.all/Microphone.as: a couple of tests.
 	* server/fontlib.h: clean up forward declarations.
+	* server/parser/character_def.h: header cleanups.
 
 2008-06-04 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
