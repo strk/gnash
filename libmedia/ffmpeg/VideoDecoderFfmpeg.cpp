@@ -88,6 +88,8 @@ VideoDecoderFfmpeg::VideoDecoderFfmpeg(videoCodecType format, int width,int heig
   int ret = avcodec_open(_videoCodecCtx, _videoCodec);
   if (ret < 0) {
     log_error(_("libavcodec failed to initialize codec"));
+    av_free(_videoCodecCtx);
+    _videoCodecCtx=0;
     return;
   }
   _videoCodecCtx->width = width;

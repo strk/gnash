@@ -84,7 +84,9 @@ bool AudioDecoderFfmpeg::setup(SoundInfo* info)
 
 	int ret = avcodec_open(_audioCodecCtx, _audioCodec);
 	if (ret < 0) {
-		avcodec_close(_audioCodecCtx);
+		//avcodec_close(_audioCodecCtx);
+		av_free(_audioCodecCtx);
+		_audioCodecCtx=0;
 		log_error(_("libavcodec failed to initialize codec"));
 		return false;
 	}
@@ -153,7 +155,9 @@ bool AudioDecoderFfmpeg::setup(AudioInfo* info)
 
 	int ret = avcodec_open(_audioCodecCtx, _audioCodec);
 	if (ret < 0) {
-		avcodec_close(_audioCodecCtx);
+		//avcodec_close(_audioCodecCtx);
+		av_free(_audioCodecCtx);
+		_audioCodecCtx = 0;
 		log_error(_("libavcodec failed to initialize codec"));
 		return false;
 	}

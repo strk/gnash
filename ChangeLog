@@ -1,3 +1,10 @@
+2008-06-04 Sandro Santilli <strk@keybit.net>
+
+	* libmedia/ffmpeg/AudioDecoderFfmpeg.cpp: don't close audio codec
+	  context if it wasn't opened.
+	* libmedia/ffmpeg/VideoDecoderFfmpeg.cpp: don't close video codec
+	  context if it wasn't opened.
+
 2008-06-04 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/movie_root.{cpp,h}: add methods to set and retrieve
