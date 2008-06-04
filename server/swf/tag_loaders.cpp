@@ -1514,6 +1514,7 @@ file_attributes_loader(stream* in, tag_type tag, movie_definition* /*m*/)
     // 	- only use if it is the *first* tag in the stream.
 }
 
+
 void
 metadata_loader(stream* in, tag_type tag, movie_definition* /*m*/)
 {
@@ -1524,13 +1525,13 @@ metadata_loader(stream* in, tag_type tag, movie_definition* /*m*/)
     in->read_string(metadata);
 
     IF_VERBOSE_PARSE (
-	log_parse(_("  metadata = [[\n%s\n]]"), metadata);
+	log_parse(_("  RDF metadata (information only): [[\n%s\n]]"), metadata);
     );
 
-    log_unimpl(_("METADATA tag unused: %s"), metadata);
-
-    // TODO: attach to movie_definition instead
-    //       (should we parse the XML maybe?)
+    // TODO: add to Movie Properties?
+    // The metadata tag exists exclusively for external
+    // description of the SWF file and should be ignored
+    // by the SWF player.
 
 }
 
@@ -1599,7 +1600,6 @@ abc_loader(stream* in, tag_type tag, movie_definition* /*m*/)
 		static_cast<void> (in->read_u32());
 		std::string name;
 		in->read_string(name);
-		name.c_str();
 	}
 
 	//TODO: Move this to execution time so that as_object can be used. bool success = a.read(in);

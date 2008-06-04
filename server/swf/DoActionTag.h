@@ -18,10 +18,6 @@
 #ifndef GNASH_SWF_DOACTIONTAG_H
 #define GNASH_SWF_DOACTIONTAG_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "ControlTag.h" // for inheritance
 #include "swf.h" // for tag_type definition
 #include "action_buffer.h" // for composition
@@ -74,7 +70,7 @@ public:
 
 		IF_VERBOSE_PARSE (
 		log_parse(_("tag %d: do_action_loader"), tag);
-		log_parse(_("-- actions in frame " SIZET_FMT), m->get_loading_frame());
+		log_parse(_("-- actions in frame %d"), m->get_loading_frame());
 		);
 
 		m->addControlTag(da); // ownership transferred

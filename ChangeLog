@@ -1,3 +1,10 @@
+2008-06-04 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/swf/tag_loaders.cpp: no need to log_unimpl with metadata
+	  tag as it should be ignored by the player.
+	* server/swf/DoActionTag.h: replace SIZET_FMT, drop gnashconfig.h
+	  include.
+
 2008-06-03 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/impl.cpp: indentation.
