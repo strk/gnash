@@ -404,7 +404,6 @@ create_movie(std::auto_ptr<tu_file> in, const std::string& url, bool startLoader
   ensure_loaders_registered();
 
   // see if it's a jpeg or an swf
-  // TODO: use an integer code rather then a string !
   FileType type = getFileType(in.get());
 
   if ( type == GNASH_FILETYPE_JPEG )
