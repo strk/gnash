@@ -19,10 +19,6 @@
 #ifndef GNASH_SWF_TAG_LOADERS_H
 #define GNASH_SWF_TAG_LOADERS_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "swf.h" // for SWF::tag_type
 
 #include <cassert>

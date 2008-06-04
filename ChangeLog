@@ -1,3 +1,7 @@
+2008-06-04 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/swf/tag_loaders.h: header cleanup.
+
 2008-06-04 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/MovieTester.{cpp,h}: register media handler.
