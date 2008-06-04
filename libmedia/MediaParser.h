@@ -289,12 +289,6 @@ public:
 	///
 	bool isAudioNellymoser() { return _isAudioNellymoser; }
 
-	/// Setup the parser
-	//
-	/// @return whether we'll be able to parse the file.
-	///
-	virtual bool setupParser() { return false; }
-
 	/// Returns a VideoInfo class about the videostream
 	//
 	/// @return a VideoInfo class about the videostream,
@@ -324,23 +318,23 @@ public:
 	//
 	/// @return the diff between the current and last frame
 	///
-	virtual boost::uint32_t audioFrameDelay() { return 0; }
+	//virtual boost::uint32_t audioFrameDelay() { return 0; }
 
 	/// Returns the framedelay from the last to the current
 	/// videoframe in milliseconds. 
 	//
 	/// @return the diff between the current and last frame
 	///
-	virtual boost::uint32_t videoFrameDelay() { return 0; }
+	//virtual boost::uint32_t videoFrameDelay() { return 0; }
 
 	/// Returns the framerate of the video
 	//
 	/// @return the framerate of the video
 	///
-	virtual boost::uint16_t videoFrameRate() { return 0; }
+	//virtual boost::uint16_t videoFrameRate() { return 0; }
 
 	/// Returns the last parsed position in the file in bytes
-	virtual boost::uint32_t getLastParsedPos() { return 0; }
+	//virtual boost::uint32_t getLastParsedPos() { return 0; }
 
 	/// Parse next input chunk
 	//

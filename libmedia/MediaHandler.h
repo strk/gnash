@@ -98,6 +98,9 @@ public:
 
 protected:
 
+	/// Return true if input stream is an FLV
+	bool isFLV(tu_file& stream);
+
 	MediaHandler() {}
 
 private:

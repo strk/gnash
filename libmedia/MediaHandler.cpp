@@ -28,27 +28,35 @@ namespace media {
 
 std::auto_ptr<MediaHandler> MediaHandler::_handler;
 
+/* public static */
+bool
+MediaHandler::isFLV(tu_file& stream)
+{
+	char head[4] = {0, 0, 0, 0};
+	stream.set_position(0);
+	size_t actuallyRead = stream.read_bytes(head, 3);
+	stream.set_position(0);
+
+	if (actuallyRead < 3)
+	{
+		log_error(_("MediaHandler::isFLV: Could not read 3 bytes from input stream"));
+		return false;
+	}
+
+	if (std::string(head) != "FLV") return false;
+	return true;
+}
+
 std::auto_ptr<MediaParser>
 MediaHandler::createMediaParser(std::auto_ptr<tu_file> stream)
 {
 	std::auto_ptr<MediaParser> parser;
 
-	char head[4] = {0, 0, 0, 0};
-	size_t actuallyRead = stream->read_bytes(head, 3);
-	stream->set_position(0);
-
-	if (actuallyRead < 3)
-	{
-		log_error(_("MediaHandler::createMediaParser: Could not read 3 bytes from input stream"));
-		return parser;
-	}
-
-	if (std::string(head) != "FLV")
+	if ( ! isFLV(*stream) )
 	{
 		log_error(_("MediaHandler::createMediaParser: only FLV input is supported by this MediaHandler"));
 		return parser;
 	}
-	
 
 	parser.reset( new FLVParser(stream) );
 	assert(! stream.get() ); // TODO: when ownership will be transferred...

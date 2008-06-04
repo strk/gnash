@@ -134,6 +134,7 @@ endif
 if USE_FFMPEG_ENGINE
    libgnashmedia_la_SOURCES += \
 		ffmpeg/MediaHandlerFfmpeg.cpp \
+		ffmpeg/MediaParserFfmpeg.cpp \
 		ffmpeg/AudioDecoderFfmpeg.cpp \
 		ffmpeg/VideoDecoderFfmpeg.cpp \
 		ffmpeg/sound_handler_sdl.cpp \
@@ -141,6 +142,7 @@ if USE_FFMPEG_ENGINE
 
    noinst_HEADERS += \
 		ffmpeg/MediaHandlerFfmpeg.h \
+		ffmpeg/MediaParserFfmpeg.h \
 		ffmpeg/AudioDecoderFfmpeg.h \
 		ffmpeg/VideoDecoderFfmpeg.h \
 		ffmpeg/sound_handler_sdl.h \

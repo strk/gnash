@@ -19,8 +19,11 @@
 
 
 #include "MediaHandlerFfmpeg.h"
+#include "MediaParserFfmpeg.h"
 #include "VideoDecoderFfmpeg.h"
 #include "AudioDecoderFfmpeg.h"
+#include "GnashException.h"
+#include "FLVParser.h"
 
 #include "tu_file.h" // for visibility of destructor
 #include "MediaParser.h" // for visibility of destructor
@@ -31,8 +34,26 @@ namespace media {
 std::auto_ptr<MediaParser>
 MediaHandlerFfmpeg::createMediaParser(std::auto_ptr<tu_file> stream)
 {
-	// TODO: support more then just FLV...
-	return MediaHandler::createMediaParser(stream);
+	std::auto_ptr<MediaParser> parser;
+
+	if ( isFLV(*stream) )
+	{
+		parser.reset( new FLVParser(stream) );
+	}
+	else
+	{
+		try
+		{
+			parser.reset(new MediaParserFfmpeg(stream));
+		}
+		catch (GnashException& ex)
+		{
+			log_error("Could not create FFMPEG based media parser for input stream: %s", ex.what());
+			assert(!parser.get());
+		}
+	}
+
+	return parser;
 }
 
 std::auto_ptr<VideoDecoder>
