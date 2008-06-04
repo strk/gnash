@@ -591,7 +591,7 @@ stream::close_tag()
     unsigned long endPos = _tagBoundsStack.back().second;
     _tagBoundsStack.pop_back();
 
-    log_debug("Close tag called at %d, stream size: %d", endPos);
+    //log_debug("Close tag called at %d, stream size: %d", endPos);
 
     if ( m_input->set_position(endPos) == TU_FILE_SEEK_ERROR )
     {

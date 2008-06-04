@@ -1,3 +1,7 @@
+2008-06-04 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/stream.cpp: silence debug logging.
+
 2008-06-04 Sandro Santilli <strk@keybit.net>
 
 	* libmedia/FLVParser.{cpp,h}: don't leak encoded frame info.
