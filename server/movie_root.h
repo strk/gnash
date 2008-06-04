@@ -719,6 +719,37 @@ public:
         fsCommandHandle = handler;
     }
 
+    /// Called from the ScriptLimits tag parser to set the
+    /// global script limits. It is expected behaviour that
+    /// each new loaded movie should override this.
+    /// Can be overridden from gnashrc.
+    //
+    /// @param recursion the maximum number of recursions when
+    ///             finding 'super'.
+    ///             The default value for this (i.e. when no
+    ///             ScriptLimits tag is present) is documented to be
+    ///             256, but this may change and appears not to be
+    ///             crucial for (backward) compatibility.
+    /// @param timeout the timeout in seconds for script execution.
+    ///             The default value for this (i.e. when no
+    ///             ScriptLimits tag is present) is documented to be
+    ///             15 to 20 seconds, depending on platform.
+    void setScriptLimits(boost::uint16_t recursion, boost::uint16_t timeout);
+    
+    /// Get the current global recursion limit for this movie: it can
+    /// be changed by loaded movies.
+    boost::uint16_t getRecursionLimit() const
+    {
+        return _recursionLimit;
+    }
+
+    /// Get the current global script timeout limit for this movie: it
+    /// can be changed by loaded movies.
+    boost::uint16_t getTimeoutLimit() const
+    {
+        return _timeoutLimit;
+    }
+
 #ifdef USE_SWFTREE
     typedef std::pair<std::string, std::string> StringPair;
     void getMovieInfo(tree<StringPair>& tr, tree<StringPair>::iterator it);
@@ -1020,6 +1051,14 @@ private:
     ScaleMode _scaleMode;
     
     DisplayState _displayState;
+    
+    // The maximum number of recursions e.g. when finding
+    // 'super', set in the ScriptLimits tag.
+    boost::uint16_t _recursionLimit;
+
+    // The timeout in seconds for script execution, in the
+    // ScriptLimits tag.    
+    boost::uint16_t _timeoutLimit;
 };
 
 

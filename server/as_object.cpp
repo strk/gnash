@@ -464,6 +464,10 @@ as_object::findProperty(string_table::key key, string_table::key nsname,
 	int i = 0;
 
 	boost::intrusive_ptr<as_object> obj = this;
+		
+    // This recursion prevention seems not to exist in the PP.
+    // Instead, it stops when its general timeout for the
+    // execution of scripts is reached.
 	while (obj && visited.insert(obj.get()).second)
 	{
 		++i;
@@ -506,6 +510,8 @@ as_object::findUpdatableProperty(string_table::key key, string_table::key nsname
 	int i = 0;
 
 	boost::intrusive_ptr<as_object> obj = get_prototype();
+
+    // TODO: does this recursion protection exist in the PP?
 	while (obj && visited.insert(obj.get()).second)
 	{
 		++i;

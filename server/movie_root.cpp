@@ -115,7 +115,9 @@ movie_root::movie_root()
 	_hostfd(-1),
 	_alignMode(0),
 	_scaleMode(showAll),
-	_displayState(normal)
+	_displayState(normal),
+	_recursionLimit(256),
+	_timeoutLimit(15)
 {
 }
 
@@ -192,7 +194,7 @@ movie_root::setRootMovie(movie_instance* movie)
 	}
 	catch (ActionLimitException& al)
 	{
-		log_error(_("ActionLimits hit during setRootMovie: %s."
+		log_error(_("ActionLimits hit during setRootMovie: %s. "
 		        		"Disabling scripts"), al.what());
 		disableScripts();
 		clearActionQueue();
@@ -2080,6 +2082,21 @@ movie_root::isLevelTarget(const std::string& name, unsigned int& levelno)
   return true;
 
 }
+
+void
+movie_root::setScriptLimits(boost::uint16_t recursion, boost::uint16_t timeout)
+{
+
+    // This tag reported in some sources to be ignored for movies
+    // below SWF7. However, on Linux with PP version 9, the tag
+    // takes effect on SWFs of any version.
+    log_debug(_("Setting script limits: max recursion %d, "
+            "timeout %d seconds"), recursion, timeout);
+
+    _recursionLimit = recursion;
+    _timeoutLimit = timeout;
+}
+
 
 #ifdef USE_SWFTREE
 void

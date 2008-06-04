@@ -52,8 +52,7 @@ namespace ScriptLimitsTag
                     tag, recursionLimit, timeoutLimit);
 	    );
 
-//        r.setRecursionLimit(recursionLimit);
-//        r.setTimeoutLimit(timeoutLimit);
+        r.setScriptLimits(recursionLimit, timeoutLimit);
     }
 }
 

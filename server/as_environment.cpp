@@ -33,6 +33,7 @@
 #include <string>
 #include <utility> // for std::pair
 #include <boost/algorithm/string/case_conv.hpp>
+#include <boost/format.hpp>
 
 // Define this to have find_target() calls trigger debugging output
 //#define DEBUG_TARGET_FINDING 1
@@ -877,18 +878,26 @@ as_environment::padStack(size_t offset, size_t count)
 void
 as_environment::pushCallFrame(as_function* func)
 {
-	const unsigned maxstacksize = 255;
 
-	if ( _localFrames.size() == maxstacksize )
+    // The stack size can be changed by the ScriptLimits
+    // tag. There is *no* difference between SWF versions.
+    // TODO: override from gnashrc.
+	const boost::uint16_t maxstacksize = VM::get().getRoot().getRecursionLimit();
+
+    // Doesn't proceed if the stack size would reach the limit; should
+    // this check be done somewhere after adding to the stack? Would
+    // it make any difference?
+	if ( _localFrames.size() == maxstacksize - 1 )
 	{
-		char buf[256];
-		snprintf(buf, 255, _("Max stack count reached (%u)"),
-				maxstacksize);
+		std::ostringstream ss;
+		ss << boost::format(_("Max stack count reached (%u)")) % _localFrames.size();
 
 		// throw something
-		throw ActionLimitException(buf); 
+		throw ActionLimitException(ss.str()); 
 	}
+
 	_localFrames.push_back(CallFrame(func));
+
 }
 
 void 
