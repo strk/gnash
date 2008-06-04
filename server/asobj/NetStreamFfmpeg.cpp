@@ -642,6 +642,9 @@ NetStreamFfmpeg::pushDecodedAudioFrames(boost::uint32_t ts)
 {
 	assert(m_parser.get());
 
+	// nothing to do if we don't have an audio decoder
+	if ( ! _audioDecoder.get() ) return;
+
 	bool consumed = false;
 
 	boost::uint64_t nextTimestamp;

@@ -149,6 +149,16 @@ private:
 	///
 	VideoFrames _videoFrames;
 
+	/// Video frame cursor position 
+	//
+	/// This is the video frame number that will
+	/// be referenced by nextVideoFrame and nextVideoFrameTimestamp
+	///
+	size_t _nextVideoFrame;
+
+	/// Info about the video stream (if any)
+	std::auto_ptr<VideoInfo> _videoInfo;
+
 	// NOTE: AudioFrameInfo is a relatively small structure,
 	//       chances are keeping by value here would reduce
 	//       memory fragmentation with no big cost
@@ -158,6 +168,16 @@ private:
 	//
 	/// Elements owned by this class.
 	AudioFrames _audioFrames;
+
+	/// Audio frame cursor position 
+	//
+	/// This is the video frame number that will
+	/// be referenced by nextVideoFrame and nextVideoFrameTimestamp
+	///
+	size_t _nextAudioFrame;
+
+	/// Info about the audio stream (if any)
+	std::auto_ptr<AudioInfo> _audioInfo;
 
 	/// Parse next media frame
 	//

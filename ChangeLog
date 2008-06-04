@@ -1,5 +1,12 @@
 2008-06-04 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/NetStreamFfmpeg.cpp (pushDecodedAudioFrames):
+	  do nothing if no audio decoder is available.
+	* libmedia/ffmpeg/MediaParserFfmpeg.{cpp,h}:
+	  Implement nextAudioFrameTimestamp and nextVideoFrameTimestamp.
+
+2008-06-04 Sandro Santilli <strk@keybit.net>
+
 	* libmedia/ffmpeg/MediaParserFfmpeg.{cpp,h}: implement
 	  getBufferLength; reduce chunk size for reads; modify
 	  getBytesLoaded to be immune to seek backs; don't check

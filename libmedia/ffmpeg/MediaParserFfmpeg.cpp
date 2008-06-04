@@ -104,10 +104,27 @@ MediaParserFfmpeg::getBufferLength()
 }
 
 bool
-MediaParserFfmpeg::nextVideoFrameTimestamp(boost::uint64_t& /*ts*/)
+MediaParserFfmpeg::nextVideoFrameTimestamp(boost::uint64_t& ts)
 {
-	LOG_ONCE( log_unimpl("%s", __PRETTY_FUNCTION__) );
-	return false;
+	// If there is no video in this stream return NULL
+	if (!_videoStream) return false;
+
+	// Make sure that there are parsed enough frames to return the need frame
+	while(_videoFrames.size() <= _nextVideoFrame && !_parsingComplete)
+	{
+		if (!parseNextFrame()) break;
+	}
+
+	// If the needed frame can't be parsed (EOF reached) return NULL
+	if (_videoFrames.empty() || _videoFrames.size() <= _nextVideoFrame)
+	{
+		//gnash::log_debug("The needed frame (%d) can't be parsed (EOF reached)", _lastVideoFrame);
+		return false;
+	}
+
+	VideoFrameInfo* info = _videoFrames[_nextVideoFrame];
+	ts = info->timestamp;
+	return true;
 }
 
 std::auto_ptr<EncodedVideoFrame>
@@ -119,10 +136,27 @@ MediaParserFfmpeg::nextVideoFrame()
 }
 
 bool
-MediaParserFfmpeg::nextAudioFrameTimestamp(boost::uint64_t& /*ts*/)
+MediaParserFfmpeg::nextAudioFrameTimestamp(boost::uint64_t& ts)
 {
-	LOG_ONCE( log_unimpl("%s", __PRETTY_FUNCTION__) );
-	return false;
+	// If there is no audio in this stream return NULL
+	if (!_audioStream) return false;
+
+	// Make sure that there are parsed enough frames to return the need frame
+	while(_audioFrames.size() <= _nextAudioFrame && !_parsingComplete)
+	{
+		if (!parseNextFrame()) break;
+	}
+
+	// If the needed frame can't be parsed (EOF reached) return NULL
+	if (_audioFrames.empty() || _audioFrames.size() <= _nextAudioFrame)
+	{
+		//gnash::log_debug("The needed frame (%d) can't be parsed (EOF reached)", _lastAudioFrame);
+		return false;
+	}
+
+	AudioFrameInfo* info = _audioFrames[_nextAudioFrame];
+	ts = info->timestamp;
+	return true;
 }
 
 std::auto_ptr<EncodedAudioFrame>
@@ -137,16 +171,13 @@ MediaParserFfmpeg::nextAudioFrame()
 VideoInfo*
 MediaParserFfmpeg::getVideoInfo()
 {
-        //VideoInfo(int codeci, boost::uint16_t widthi, boost::uint16_t heighti, boost::uint16_t frameRatei, boost::uint64_t durationi, codecType typei)
-	LOG_ONCE( log_unimpl("%s", __PRETTY_FUNCTION__) );
-	return 0;
+	return _videoInfo.get();
 }
 
 AudioInfo*
 MediaParserFfmpeg::getAudioInfo()
 {
-	LOG_ONCE( log_unimpl("%s", __PRETTY_FUNCTION__) );
-	return 0;
+	return _audioInfo.get();
 }
 
 boost::uint32_t
@@ -210,8 +241,8 @@ MediaParserFfmpeg::parseVideoFrame(AVPacket& packet)
 	boost::int64_t offset = packet.pos;
 	if ( offset < 0 )
 	{
-		log_error("Unknown offset of video frame, what to use here ?");
-		return false;
+		LOG_ONCE(log_debug("Unknown offset of video frame, should we pretend we know ? or rely on ffmpeg seeking ? I guess the latter will do for a start."));
+		//return false;
 	}
 
 	VideoFrameInfo* info = new VideoFrameInfo;
@@ -245,7 +276,7 @@ MediaParserFfmpeg::parseAudioFrame(AVPacket& packet)
 	boost::int64_t offset = packet.pos;
 	if ( offset < 0 )
 	{
-		log_error("Unknown offset of audio frame, should we pretend we know ? or rely on ffmpeg seeking ? I guess the latter will do for a start.");
+		LOG_ONCE(log_debug("Unknown offset of audio frame, should we pretend we know ? or rely on ffmpeg seeking ? I guess the latter will do for a start."));
 		//return false;
 	}
 
@@ -264,7 +295,7 @@ MediaParserFfmpeg::parseNextFrame()
 {
 	if ( _parsingComplete )
 	{
-		log_debug("MediaParserFfmpeg::parseNextFrame: parsing complete, nothing to do");
+		//log_debug("MediaParserFfmpeg::parseNextFrame: parsing complete, nothing to do");
 		return false;
 	}
 
@@ -272,9 +303,9 @@ MediaParserFfmpeg::parseNextFrame()
 
   	AVPacket packet;
 
-	log_debug("av_read_frame call");
+	//log_debug("av_read_frame call");
   	int rc = av_read_frame(_formatCtx, &packet);
-	log_debug("av_read_frame returned %d", rc);
+	//log_debug("av_read_frame returned %d", rc);
 	if ( rc < 0 )
 	{
 		log_error(_("MediaParserFfmpeg::parseNextChunk: Problems parsing next frame"));
@@ -330,6 +361,10 @@ MediaParserFfmpeg::getBytesLoaded() const
 MediaParserFfmpeg::MediaParserFfmpeg(std::auto_ptr<tu_file> stream)
 	:
 	MediaParser(stream),
+	_videoFrames(),
+	_nextVideoFrame(0),
+	_audioFrames(),
+	_nextAudioFrame(0),
 	_inputFmt(0),
 	_formatCtx(0),
 	_videoStreamIndex(-1),
@@ -397,6 +432,12 @@ MediaParserFfmpeg::MediaParserFfmpeg(std::auto_ptr<tu_file> stream)
 				break;
 		}
 	}
+
+	// TODO: create _videoInfo and _audioInfo here ...
+        //VideoInfo(int codeci, boost::uint16_t widthi, boost::uint16_t heighti, boost::uint16_t frameRatei, boost::uint64_t durationi, codecType typei)
+	if ( _videoStream) LOG_ONCE( log_unimpl("VideoInfo from _videoStream") );
+	if ( _audioStream) LOG_ONCE( log_unimpl("AudioInfo from _audioStream") );
+
 }
 
 MediaParserFfmpeg::~MediaParserFfmpeg()
