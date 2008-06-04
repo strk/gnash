@@ -250,6 +250,11 @@ private:
 	/// The last parsed position, for getBytesLoaded
 	boost::uint64_t _lastParsedPosition;
 
+	/// Return sample size from SampleFormat
+	//
+	/// TODO: move somewhere in ffmpeg utils..
+	///
+	boost::uint16_t SampleFormatToSampleSize(SampleFormat fmt);
 
 };
 

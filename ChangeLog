@@ -1,5 +1,10 @@
 2008-06-04 Sandro Santilli <strk@keybit.net>
 
+	* libmedia/ffmpeg/MediaParserFfmpeg.{cpp,h}:
+	  Impement getVideoInfo/getAudioInfo.
+
+2008-06-04 Sandro Santilli <strk@keybit.net>
+
 	* libmedia/ffmpeg/AudioDecoderFfmpeg.cpp: don't close audio codec
 	  context if it wasn't opened.
 	* libmedia/ffmpeg/VideoDecoderFfmpeg.cpp: don't close video codec

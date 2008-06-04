@@ -433,10 +433,29 @@ MediaParserFfmpeg::MediaParserFfmpeg(std::auto_ptr<tu_file> stream)
 		}
 	}
 
-	// TODO: create _videoInfo and _audioInfo here ...
-        //VideoInfo(int codeci, boost::uint16_t widthi, boost::uint16_t heighti, boost::uint16_t frameRatei, boost::uint64_t durationi, codecType typei)
-	if ( _videoStream) LOG_ONCE( log_unimpl("VideoInfo from _videoStream") );
-	if ( _audioStream) LOG_ONCE( log_unimpl("AudioInfo from _audioStream") );
+	// Create VideoInfo
+	if ( _videoStream)
+	{
+		int codec = static_cast<int>(_videoStream->codec->codec_id); // originally an enum CodecID 
+		boost::uint16_t width = _videoStream->codec->width;
+		boost::uint16_t height = _videoStream->codec->height;
+		boost::uint16_t frameRate = static_cast<boost::uint16_t>(as_double(_videoStream->r_frame_rate));
+		boost::uint64_t duration = _videoStream->codec_info_duration;
+
+		_videoInfo.reset( new VideoInfo(codec, width, height, frameRate, duration, FFMPEG /*codec type*/) );
+	}
+
+	// Create AudioInfo
+	if ( _audioStream)
+	{
+		int codec = static_cast<int>(_audioStream->codec->codec_id); // originally an enum CodecID 
+		boost::uint16_t sampleRate = _audioStream->codec->sample_rate;
+		boost::uint16_t sampleSize = SampleFormatToSampleSize(_audioStream->codec->sample_fmt);
+		bool stereo = (_audioStream->codec->channels == 2);
+		boost::uint64_t duration = _videoStream->codec_info_duration;
+
+		_audioInfo.reset( new AudioInfo(codec, sampleRate, sampleSize, stereo, duration, FFMPEG /*codec type*/) );
+	}
 
 }
 
@@ -515,6 +534,30 @@ MediaParserFfmpeg::seekMedia(offset_t offset, int whence)
 	}
 
 	return in.get_position(); 
+}
+
+boost::uint16_t
+MediaParserFfmpeg::SampleFormatToSampleSize(SampleFormat fmt)
+{
+	switch (fmt)
+	{
+		case SAMPLE_FMT_U8: // unsigned 8 bits
+			return 1;
+
+		case SAMPLE_FMT_S16: // signed 16 bits
+		case SAMPLE_FMT_FLT: // float
+			return 2;
+
+		case SAMPLE_FMT_S24: // signed 24 bits
+			return 3;
+
+		case SAMPLE_FMT_S32: // signed 32 bits
+			return 4;
+
+		case SAMPLE_FMT_NONE:
+		default:
+			return 8; // arbitrary value
+	}
 }
 
 
