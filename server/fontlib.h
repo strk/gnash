@@ -20,13 +20,8 @@
 #ifndef GNASH_FONTLIB_H
 #define GNASH_FONTLIB_H
 
-#include "types.h"
-
 // Forward declarations
-class tu_file;
 namespace gnash {
-	class movie_def_impl;
-	class matrix;
 	class font;
 }
 
@@ -46,16 +41,16 @@ namespace gnash {
 namespace fontlib {
 
 	// For adding fonts.
-	void	add_font(font* f);
+	void add_font(font* f);
 
 	/// Clean up the font library
-	void	clear();
+	void clear();
 
 	int	get_font_count();
 
-	font*	get_font(int index);
+	font* get_font(int index);
 
-	font*	get_font(const std::string& name, bool bold, bool italic);
+	font* get_font(const std::string& name, bool bold, bool italic);
 
 	/// Return a default device font.
 	boost::intrusive_ptr<font> get_default_font();
