@@ -1,5 +1,13 @@
 2008-06-04 Sandro Santilli <strk@keybit.net>
 
+	* libmedia/ffmpeg/MediaParserFfmpeg.{cpp,h}: implement
+	  getBufferLength; reduce chunk size for reads; modify
+	  getBytesLoaded to be immune to seek backs; don't check
+	  eof in the ffmpeg callback routine but just at the
+	  end of each frame parsing.
+
+2008-06-04 Sandro Santilli <strk@keybit.net>
+
 	* libmedia/FLVParser.cpp (getBufferLength): don't rely
 	  on cursor to tell how much time the buffer contains;
 	  add notes about need to sort out a rationale for

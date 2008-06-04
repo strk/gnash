@@ -70,9 +70,6 @@ MediaParserFfmpeg::probeStream()
 	size_t actuallyRead = _stream->read_bytes(probe_data.buf, probe_data.buf_size);
 	_stream->set_position(0);
 
-	if ( actuallyRead > _lastParsedPosition ) // could probably be an assertion here (always true)
-		_lastParsedPosition = actuallyRead;
-
 	if (actuallyRead < 1)
 	{
  		log_error(_("Gnash could not read from movie url"));
@@ -80,18 +77,34 @@ MediaParserFfmpeg::probeStream()
 	}
 
 	probe_data.buf_size = actuallyRead; // right ?
-	return av_probe_input_format(&probe_data, 1);
+	AVInputFormat* ret = av_probe_input_format(&probe_data, 1);
+	return ret;
 }
 
 boost::uint32_t
 MediaParserFfmpeg::getBufferLength()
 {
-	LOG_ONCE( log_unimpl("%s", __PRETTY_FUNCTION__) );
+	// TODO: figure wheter and why we should privilege
+	//       video frames over audio frames when both
+	//       are available
+	//	 I belive the corrent behaviour here would
+	//	 be using the smallest max-timestamp..
+
+	if (_videoStream && ! _videoFrames.empty())
+	{
+		return _videoFrames.back()->timestamp; 
+	}
+
+	if (_audioStream && ! _audioFrames.empty())
+	{
+		return _audioFrames.back()->timestamp; 
+	}
+
 	return 0;
 }
 
 bool
-MediaParserFfmpeg::nextVideoFrameTimestamp(boost::uint64_t& ts)
+MediaParserFfmpeg::nextVideoFrameTimestamp(boost::uint64_t& /*ts*/)
 {
 	LOG_ONCE( log_unimpl("%s", __PRETTY_FUNCTION__) );
 	return false;
@@ -106,7 +119,7 @@ MediaParserFfmpeg::nextVideoFrame()
 }
 
 bool
-MediaParserFfmpeg::nextAudioFrameTimestamp(boost::uint64_t& ts)
+MediaParserFfmpeg::nextAudioFrameTimestamp(boost::uint64_t& /*ts*/)
 {
 	LOG_ONCE( log_unimpl("%s", __PRETTY_FUNCTION__) );
 	return false;
@@ -183,6 +196,11 @@ MediaParserFfmpeg::parseVideoFrame(AVPacket& packet)
 	// packet.dts is "decompression" timestamp
 	// packet.pts is "presentation" timestamp
 	// Dunno why we use dts, and don't understand the magic formula either...
+	//
+	// From ffmpeg dox:
+	//    pkt->pts can be AV_NOPTS_VALUE if the video format has B frames,
+	//    so it is better to rely on pkt->dts if you do not decompress the payload.
+	//
 	boost::uint64_t timestamp = static_cast<boost::uint64_t>(packet.dts * as_double(_videoStream->time_base) * 1000.0); 
 
 	// flags, for keyframe
@@ -216,19 +234,24 @@ MediaParserFfmpeg::parseAudioFrame(AVPacket& packet)
 	// packet.dts is "decompression" timestamp
 	// packet.pts is "presentation" timestamp
 	// Dunno why we use dts, and don't understand the magic formula either...
+	//
+	// From ffmpeg dox:
+	//    pkt->pts can be AV_NOPTS_VALUE if the video format has B frames,
+	//    so it is better to rely on pkt->dts if you do not decompress the payload.
+	//
 	boost::uint64_t timestamp = static_cast<boost::uint64_t>(packet.dts * as_double(_audioStream->time_base) * 1000.0); 
 
 	// Frame offset in input
 	boost::int64_t offset = packet.pos;
 	if ( offset < 0 )
 	{
-		log_error("Unknown offset of audio frame, what to use here ?");
-		return false;
+		log_error("Unknown offset of audio frame, should we pretend we know ? or rely on ffmpeg seeking ? I guess the latter will do for a start.");
+		//return false;
 	}
 
 	AudioFrameInfo* info = new AudioFrameInfo;
 	info->dataSize = packet.size;
-	info->dataPosition = offset;
+	info->dataPosition = offset > 0 ? (boost::uint64_t)offset : 0;
 	info->timestamp = timestamp;
 
 	_audioFrames.push_back(info); // takes ownership
@@ -239,13 +262,19 @@ MediaParserFfmpeg::parseAudioFrame(AVPacket& packet)
 bool
 MediaParserFfmpeg::parseNextFrame()
 {
-	if ( _parsingComplete ) return false;
+	if ( _parsingComplete )
+	{
+		log_debug("MediaParserFfmpeg::parseNextFrame: parsing complete, nothing to do");
+		return false;
+	}
 
 	assert(_formatCtx);
 
   	AVPacket packet;
 
+	log_debug("av_read_frame call");
   	int rc = av_read_frame(_formatCtx, &packet);
+	log_debug("av_read_frame returned %d", rc);
 	if ( rc < 0 )
 	{
 		log_error(_("MediaParserFfmpeg::parseNextChunk: Problems parsing next frame"));
@@ -270,6 +299,14 @@ MediaParserFfmpeg::parseNextFrame()
 
 	av_free_packet(&packet);
 
+	// Check if EOF was reached
+	if ( _stream->get_eof() )
+	{
+		log_debug("MediaParserFfmpeg::parseNextFrame: at eof after av_read_frame");
+		_parsingComplete=true;
+	}
+
+
 	return ret;
 
 }
@@ -287,7 +324,7 @@ boost::uint64_t
 MediaParserFfmpeg::getBytesLoaded() const
 {
 	//log_unimpl("%s", __PRETTY_FUNCTION__);
-	return _stream->get_position();
+	return _lastParsedPosition;
 }
 
 MediaParserFfmpeg::MediaParserFfmpeg(std::auto_ptr<tu_file> stream)
@@ -394,6 +431,7 @@ MediaParserFfmpeg::~MediaParserFfmpeg()
 int 
 MediaParserFfmpeg::readPacket(boost::uint8_t* buf, int buf_size)
 {
+	//GNASH_REPORT_FUNCTION;
 
 	assert( _stream.get() );
 	tu_file& in = *_stream;
@@ -404,9 +442,6 @@ MediaParserFfmpeg::readPacket(boost::uint8_t* buf, int buf_size)
 	boost::uint64_t curPos = in.get_position();
 	if ( curPos > _lastParsedPosition ) _lastParsedPosition = curPos;
 
-	// Check if EOF was reached
-	if ( in.get_eof() ) _parsingComplete=true;
-
 	return ret;
 
 }
@@ -414,6 +449,7 @@ MediaParserFfmpeg::readPacket(boost::uint8_t* buf, int buf_size)
 offset_t 
 MediaParserFfmpeg::seekMedia(offset_t offset, int whence)
 {
+	//GNASH_REPORT_FUNCTION;
 
 	assert(_stream.get());
 	tu_file& in = *(_stream);

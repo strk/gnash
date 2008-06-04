@@ -219,7 +219,11 @@ private:
 	ByteIOContext ByteIOCxt;
 
 	/// Size of the ByteIO context buffer
-	static const size_t byteIOBufferSize = 500000;
+	//
+	/// This seems to be the size of chunks read
+	/// by av_read_frame.
+	///
+	static const size_t byteIOBufferSize = 1024; // 500000;
 
 	boost::scoped_array<unsigned char> _byteIOBuffer;
 
