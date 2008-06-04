@@ -725,6 +725,9 @@ NetStreamFfmpeg::refreshVideoFrame(bool alsoIfPaused)
 {
 	assert ( m_parser.get() );
 
+	// nothing to do if we don't have a video decoder
+	if ( ! _videoDecoder.get() ) return;
+
 #ifdef GNASH_DEBUG_DECODING
 	// bufferLength() would lock the mutex (which we already hold),
 	// so this is to avoid that.

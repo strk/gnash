@@ -30,6 +30,16 @@ using namespace std;
 namespace gnash {
 namespace media {
 
+namespace { // anonymous namespace
+
+	// Used to calculate a decimal value from a ffmpeg fraction
+	inline double as_double(AVRational time)
+	{
+		return time.num / (double) time.den;
+	}
+
+} // anonymous namespace
+
 
 int
 MediaParserFfmpeg::readPacketWrapper(void* opaque, boost::uint8_t* buf, int buf_size)
@@ -114,6 +124,7 @@ MediaParserFfmpeg::nextAudioFrame()
 VideoInfo*
 MediaParserFfmpeg::getVideoInfo()
 {
+        //VideoInfo(int codeci, boost::uint16_t widthi, boost::uint16_t heighti, boost::uint16_t frameRatei, boost::uint64_t durationi, codecType typei)
 	LOG_ONCE( log_unimpl("%s", __PRETTY_FUNCTION__) );
 	return 0;
 }
@@ -130,11 +141,11 @@ MediaParserFfmpeg::seek(boost::uint32_t pos)
 {
 	log_debug("MediaParserFfmpeg::seek(%d) TESTING", pos);
 
-	AVStream* videostream = _formatCtx->streams[_videoIndex];
+	AVStream* videostream = _formatCtx->streams[_videoStreamIndex];
     	double timebase = static_cast<double>(videostream->time_base.num / videostream->time_base.den);
 	long newpos = static_cast<long>(pos / timebase);
 		
-	if (av_seek_frame(_formatCtx, _videoIndex, newpos, 0) < 0)
+	if (av_seek_frame(_formatCtx, _videoStreamIndex, newpos, 0) < 0)
 	{
 		log_error(_("%s: seeking failed"), __FUNCTION__);
 		return 0;
@@ -153,21 +164,123 @@ MediaParserFfmpeg::seek(boost::uint32_t pos)
 			return 0; // ??
 		}
 
-		newtime = timebase * (double)_formatCtx->streams[_videoIndex]->cur_dts;
+		newtime = timebase * (double)_formatCtx->streams[_videoStreamIndex]->cur_dts;
 	}
 
 	//av_free_packet( &Packet );
-	av_seek_frame(_formatCtx, _videoIndex, newpos, 0);
+	av_seek_frame(_formatCtx, _videoStreamIndex, newpos, 0);
 
 	newtime = static_cast<boost::int32_t>(newtime / 1000.0);
 	return newtime;
 }
 
 bool
+MediaParserFfmpeg::parseVideoFrame(AVPacket& packet)
+{
+	assert(packet.stream_index == _videoStreamIndex);
+	assert(_videoStream);
+
+	// packet.dts is "decompression" timestamp
+	// packet.pts is "presentation" timestamp
+	// Dunno why we use dts, and don't understand the magic formula either...
+	boost::uint64_t timestamp = static_cast<boost::uint64_t>(packet.dts * as_double(_videoStream->time_base) * 1000.0); 
+
+	// flags, for keyframe
+	bool isKeyFrame = packet.flags&PKT_FLAG_KEY;
+
+	// Frame offset in input
+	boost::int64_t offset = packet.pos;
+	if ( offset < 0 )
+	{
+		log_error("Unknown offset of video frame, what to use here ?");
+		return false;
+	}
+
+	VideoFrameInfo* info = new VideoFrameInfo;
+	info->dataSize = packet.size;
+	info->isKeyFrame = isKeyFrame;
+	info->dataPosition = offset;
+	info->timestamp = timestamp;
+
+	_videoFrames.push_back(info); // takes ownership
+
+	return true;
+}
+
+bool
+MediaParserFfmpeg::parseAudioFrame(AVPacket& packet)
+{
+	assert(packet.stream_index == _audioStreamIndex);
+	assert(_audioStream);
+
+	// packet.dts is "decompression" timestamp
+	// packet.pts is "presentation" timestamp
+	// Dunno why we use dts, and don't understand the magic formula either...
+	boost::uint64_t timestamp = static_cast<boost::uint64_t>(packet.dts * as_double(_audioStream->time_base) * 1000.0); 
+
+	// Frame offset in input
+	boost::int64_t offset = packet.pos;
+	if ( offset < 0 )
+	{
+		log_error("Unknown offset of audio frame, what to use here ?");
+		return false;
+	}
+
+	AudioFrameInfo* info = new AudioFrameInfo;
+	info->dataSize = packet.size;
+	info->dataPosition = offset;
+	info->timestamp = timestamp;
+
+	_audioFrames.push_back(info); // takes ownership
+
+	return true;
+}
+
+bool
+MediaParserFfmpeg::parseNextFrame()
+{
+	if ( _parsingComplete ) return false;
+
+	assert(_formatCtx);
+
+  	AVPacket packet;
+
+  	int rc = av_read_frame(_formatCtx, &packet);
+	if ( rc < 0 )
+	{
+		log_error(_("MediaParserFfmpeg::parseNextChunk: Problems parsing next frame"));
+		return false;
+	}
+
+	bool ret=false;
+
+	if ( packet.stream_index == _videoStreamIndex )
+	{
+		ret = parseVideoFrame(packet);
+	}
+	else if ( packet.stream_index == _audioStreamIndex )
+	{
+		ret = parseAudioFrame(packet);
+	}
+	else
+	{
+		ret = false; // redundant..
+		log_debug("MediaParserFfmpeg::parseNextFrame: unknown stream index %d", packet.stream_index);
+	}
+
+	av_free_packet(&packet);
+
+	return ret;
+
+}
+
+bool
 MediaParserFfmpeg::parseNextChunk()
 {
-	LOG_ONCE( log_unimpl("%s", __PRETTY_FUNCTION__) );
-	return false;
+	// parse 2 frames...
+	if ( ! parseNextFrame() ) return false;
+	if ( ! parseNextFrame() ) return false;
+	return true;
 }
 
 boost::uint64_t
@@ -182,9 +295,9 @@ MediaParserFfmpeg::MediaParserFfmpeg(std::auto_ptr<tu_file> stream)
 	MediaParser(stream),
 	_inputFmt(0),
 	_formatCtx(0),
-	_videoIndex(-1),
+	_videoStreamIndex(-1),
 	_videoStream(0),
-	_audioIndex(-1),
+	_audioStreamIndex(-1),
 	_audioStream(0),
 	_lastParsedPosition(0)
 {
@@ -229,17 +342,17 @@ MediaParserFfmpeg::MediaParserFfmpeg(std::auto_ptr<tu_file> stream)
 		switch (enc->codec_type)
 		{
 			case CODEC_TYPE_AUDIO:
-				if (_audioIndex < 0)
+				if (_audioStreamIndex < 0)
 				{
-					_audioIndex = i;
+					_audioStreamIndex = i;
 					_audioStream = _formatCtx->streams[i];
 				}
 				break;
 
 			case CODEC_TYPE_VIDEO:
-				if (_videoIndex < 0)
+				if (_videoStreamIndex < 0)
 				{
-					_videoIndex = i;
+					_videoStreamIndex = i;
 					_videoStream = _formatCtx->streams[i];
 				}
 				break;
@@ -247,23 +360,34 @@ MediaParserFfmpeg::MediaParserFfmpeg(std::auto_ptr<tu_file> stream)
 				break;
 		}
 	}
-
-	LOG_ONCE( log_unimpl("MediaParserFfmpeg") );
 }
 
 MediaParserFfmpeg::~MediaParserFfmpeg()
 {
-	if ( _inputFmt )
-	{
-		// TODO: check if this is correct (should we create RIIA classes for ffmpeg stuff?)
-		av_free(_inputFmt);
-	}
 
 	if ( _formatCtx )
 	{
 		// TODO: check if this is correct (should we create RIIA classes for ffmpeg stuff?)
 		//av_close_input_file(_formatCtx); // NOTE: this one triggers a mismatched free/delete on _byteIOBuffer !
 		av_free(_formatCtx);
+	}
+
+	if ( _inputFmt )
+	{
+		// TODO: check if this is correct (should we create RIIA classes for ffmpeg stuff?)
+		//av_free(_inputFmt); // it seems this one blows up, could be due to av_free(_formatCtx) above
+	}
+
+	for (VideoFrames::iterator i=_videoFrames.begin(),
+		e=_videoFrames.end(); i!=e; ++i)
+	{
+		delete (*i);
+	}
+
+	for (AudioFrames::iterator i=_audioFrames.begin(),
+		e=_audioFrames.end(); i!=e; ++i)
+	{
+		delete (*i);
 	}
 }
 
@@ -279,6 +403,9 @@ MediaParserFfmpeg::readPacket(boost::uint8_t* buf, int buf_size)
 	// Update _lastParsedPosition
 	boost::uint64_t curPos = in.get_position();
 	if ( curPos > _lastParsedPosition ) _lastParsedPosition = curPos;
+
+	// Check if EOF was reached
+	if ( in.get_eof() ) _parsingComplete=true;
 
 	return ret;
 
