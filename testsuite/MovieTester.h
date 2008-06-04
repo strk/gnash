@@ -284,6 +284,14 @@ private:
 	///
 	void initTestingSoundHandlers();
 
+	/// Initialize media handlers
+	//
+	/// For now this function initializes a single media handler,
+	/// the one enabled at configure time.
+	/// In the future it might initialize multiple ones (maybe)
+	///
+	void initTestingMediaHandlers();
+
 	/// Render the current movie to all testing renderers
 	//
 	/// This function calls movie_root::display internally

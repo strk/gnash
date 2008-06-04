@@ -41,6 +41,13 @@
 #include "render_handler_cairo.h"
 #endif
 
+#include "MediaHandler.h"
+#ifdef SOUND_SDL
+# include "ffmpeg/MediaHandlerFfmpeg.h"
+#elif defined(SOUND_GST)
+# include "gst/MediaHandlerGst.h"
+#endif
+
 #include <cstdio>
 #include <string>
 #include <memory> // for auto_ptr
@@ -106,6 +113,9 @@ MovieTester::MovieTester(const std::string& url)
 
 	// Initialize the sound handler(s)
 	initTestingSoundHandlers();
+
+	// Initialize the testing media handlers
+	initTestingMediaHandlers();
 
 	_movie_root = &(VM::init(*_movie_def, _clock).getRoot());
 
@@ -554,6 +564,24 @@ MovieTester::initTestingSoundHandlers()
 #endif
 
 	gnash::set_sound_handler(_sound_handler.get());
+}
+
+void
+MovieTester::initTestingMediaHandlers()
+{
+
+	std::auto_ptr<media::MediaHandler> handler;
+
+#ifdef SOUND_SDL
+	handler.reset( new gnash::media::MediaHandlerFfmpeg() );
+#elif defined(SOUND_GST)
+        handler.reset( new gnash::media::MediaHandlerGst() );
+#else
+	std::cerr << "Neigher SOUND_SDL nor SOUND_GST defined" << std::endl;
+	return;
+#endif
+
+	gnash::media::MediaHandler::set(handler);
 }
 
 void
