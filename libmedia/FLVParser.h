@@ -116,7 +116,7 @@ public:
 };
 
 
-/// Information about an FLV Audio Frame
+/// Information about an FLV Video Frame
 class FLVVideoFrameInfo
 {
 public:
