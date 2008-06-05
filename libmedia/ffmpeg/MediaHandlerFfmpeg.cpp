@@ -59,15 +59,7 @@ MediaHandlerFfmpeg::createMediaParser(std::auto_ptr<tu_file> stream)
 std::auto_ptr<VideoDecoder>
 MediaHandlerFfmpeg::createVideoDecoder(VideoInfo& info)
 {
-	if ( info.type != FLASH )
-	{
-		log_error("Non-flash video encoding not supported yet by FFMPEG VideoDecoder");
-		return std::auto_ptr<VideoDecoder>(0);
-	}
-	videoCodecType format = static_cast<videoCodecType>(info.codec);
-	int width = info.width;
-	int height = info.height;
-	std::auto_ptr<VideoDecoder> ret( new VideoDecoderFfmpeg(format, width, height) );
+	std::auto_ptr<VideoDecoder> ret( new VideoDecoderFfmpeg(info) );
 	return ret;
 }
 

@@ -48,7 +48,11 @@ namespace media {
 class VideoDecoderFfmpeg : public VideoDecoder {
   
 public:
+
   DSOEXPORT VideoDecoderFfmpeg(videoCodecType format, int width, int height);
+
+  DSOEXPORT VideoDecoderFfmpeg(VideoInfo& info);
+
   DSOEXPORT ~VideoDecoderFfmpeg();
   
   void push(const EncodedVideoFrame& buffer);
@@ -67,9 +71,17 @@ public:
   ///         caller owns that pointer, which must be freed with delete [].
   ///         It is advised to wrap the pointer in a boost::scoped_array.
   ///         If conversion fails, AVPicture::data[0] will be NULL.
-    DSOEXPORT static AVPicture convertRGB24(AVCodecContext* srcCtx, const AVFrame& srcFrame);
+  DSOEXPORT static AVPicture convertRGB24(AVCodecContext* srcCtx, const AVFrame& srcFrame);
+
+  /// Convert FLASH codec id to FFMPEG codec id
+  //
+  /// @return CODEC_ID_NONE for unsupported flash codecs
+  ///
+  DSOEXPORT static enum CodecID FlashToFfmpegCodec(videoCodecType format);
 
 private:
+
+  void init(enum CodecID format, int width, int height);
 
   std::auto_ptr<image::rgb> decode(const boost::uint8_t* input, boost::uint32_t input_size);
 
@@ -77,7 +89,6 @@ private:
   {
   	return decode(vf->data(), vf->dataSize());
   }
-private:
 
   AVCodec* _videoCodec;
   AVCodecContext* _videoCodecCtx;

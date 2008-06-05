@@ -42,37 +42,36 @@ extern "C" {
 namespace gnash {
 namespace media {
   
-VideoDecoderFfmpeg::VideoDecoderFfmpeg(videoCodecType format, int width,int height)
+VideoDecoderFfmpeg::VideoDecoderFfmpeg(videoCodecType format, int width, int height)
   :
   _videoCodec(NULL),
   _videoCodecCtx(NULL)
+{
+  enum CodecID codec_id = FlashToFfmpegCodec(format);
+
+  init(codec_id, width, height);
+}
+
+VideoDecoderFfmpeg::VideoDecoderFfmpeg(VideoInfo& info)
+  :
+  _videoCodec(NULL),
+  _videoCodecCtx(NULL)
+{
+  enum CodecID codec_id = CODEC_ID_NONE;
+  if ( info.type == FLASH ) codec_id = FlashToFfmpegCodec(static_cast<videoCodecType>(info.codec));
+  else codec_id = static_cast<enum CodecID>(info.codec);
+
+  init(codec_id, info.width, info.height);
+}
+
+void
+VideoDecoderFfmpeg::init(enum CodecID codecId, int width, int height)
 {
   // Init the avdecoder-decoder
   avcodec_init();
   avcodec_register_all();// change this to only register need codec?
 
-  enum CodecID codec_id;
-
-  // Find the decoder and init the parser
-  switch(format) {
-    case VIDEO_CODEC_H263:
-      codec_id = CODEC_ID_FLV1;
-      break;
-#ifdef FFMPEG_VP6
-    case VIDEO_CODEC_VP6:
-      codec_id = CODEC_ID_VP6F;
-      break;
-#endif
-    case VIDEO_CODEC_SCREENVIDEO:
-      codec_id = CODEC_ID_FLASHSV;
-      break;
-    default:
-      log_error(_("Unsupported video codec %d"),
-            static_cast<int>(format));
-      return;
-  }
-
-  _videoCodec = avcodec_find_decoder(static_cast<CodecID>(codec_id)); // WTF?
+  _videoCodec = avcodec_find_decoder(codecId); 
 
   if (!_videoCodec) {
     log_error(_("libavcodec can't decode the current video format"));
@@ -97,7 +96,6 @@ VideoDecoderFfmpeg::VideoDecoderFfmpeg(videoCodecType format, int width,int heig
 
   assert(_videoCodecCtx->width > 0);
   assert(_videoCodecCtx->height > 0);
-  return;
 }
 
 VideoDecoderFfmpeg::~VideoDecoderFfmpeg()
@@ -220,6 +218,28 @@ VideoDecoderFfmpeg::peek()
 {
   return (!_video_frames.empty());
 }
+
+/* public static */
+enum CodecID
+VideoDecoderFfmpeg::FlashToFfmpegCodec(videoCodecType format)
+{
+  // Find the decoder and init the parser
+  switch(format) {
+    case VIDEO_CODEC_H263:
+      return CODEC_ID_FLV1;
+#ifdef FFMPEG_VP6
+    case VIDEO_CODEC_VP6:
+      return CODEC_ID_VP6F;
+#endif
+    case VIDEO_CODEC_SCREENVIDEO:
+      return CODEC_ID_FLASHSV;
+    default:
+      log_error(_("Unsupported video codec %d"),
+            static_cast<int>(format));
+      return CODEC_ID_NONE;
+  }
+}
+
 
 } // gnash.media namespace 
 } // gnash namespace

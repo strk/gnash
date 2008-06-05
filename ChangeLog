@@ -1,3 +1,10 @@
+2008-06-05 Sandro Santilli <strk@keybit.net>
+
+	* libmedia/ffmpeg/MediaHandlerFfmpeg.cpp: construct VideoDecoder
+	  by VideoInfo (to support non-FLASH codecs).
+	* libmedia/ffmpeg/VideoDecoderFfmpeg.{cpp,h}: add constructor
+	  taking a VideoInfo&.
+
 2008-06-05 Zou Lunkai <zoulunkai@gmail.com>
 
 	* server/matrix.{h,cpp}: code refactory, use integer math for swf matrix, 
