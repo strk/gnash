@@ -194,9 +194,13 @@ movie_root::setRootMovie(movie_instance* movie)
 	}
 	catch (ActionLimitException& al)
 	{
-		log_error(_("ActionLimits hit during setRootMovie: %s. "
-		        		"Disabling scripts"), al.what());
-		disableScripts();
+		//log_error(_("ActionLimits hit during setRootMovie: %s. "
+		//        		"Disabling scripts"), al.what());
+		//disableScripts();
+
+        // The PP doesn't disable scripts here, but rather abandons processing
+        // carries on.
+		log_error(_("ActionLimits hit during setRootMovie: %s."), al.what());
 		clearActionQueue();
 	}
 
@@ -596,13 +600,27 @@ movie_root::notify_key_event(key::code k, bool down)
 	//	for user defined handerlers.
 	if(global_key)
 	{
-		if(down)
-		{
-			global_key->notify_listeners(event_id::KEY_DOWN);
-			global_key->notify_listeners(event_id::KEY_PRESS);
-		}
-		else
-			global_key->notify_listeners(event_id::KEY_UP);
+	    try
+	    {
+	        // Can throw an action limit exception if the stack limit is 0 or 1,
+	        // i.e. if the stack is at the limit before it contains anything.
+            // A stack limit like that is hardly of any use, but could be used
+            // maliciously to crash Gnash.
+		    if(down)
+		    {
+			    global_key->notify_listeners(event_id::KEY_DOWN);
+			    global_key->notify_listeners(event_id::KEY_PRESS);
+		    }
+		    else
+		    {
+			    global_key->notify_listeners(event_id::KEY_UP);
+	        }
+	    }
+	    catch (ActionLimitException &e)
+	    {
+            log_error(_("ActionLimits hit notifying key listeners: %s."), e.what());
+            clearActionQueue();
+	    }
 	}
 
 	processActionQueue();
@@ -1065,8 +1083,12 @@ movie_root::advance()
 	}
 	catch (ActionLimitException& al)
 	{
-		log_error(_("ActionLimits hit during advance: %s. Disabling scripts"), al.what());
-		disableScripts();
+		//log_error(_("ActionLimits hit during advance: %s. Disabling scripts"), al.what());
+		//disableScripts();
+
+	    // The PP does not disable scripts when the stack limit is reached,
+	    // but rather struggles on. 
+		log_error(_("Action limit hit during advance: %s."), al.what());
 		clearActionQueue();
 	}
 
@@ -1260,7 +1282,20 @@ movie_root::notify_mouse_listeners(const event_id& event)
 	ObjPtr mouseObj = getMouseObject();
 	if ( mouseObj )
 	{
-		mouseObj->callMethod(NSV::PROP_BROADCAST_MESSAGE, as_value(PROPNAME(event.get_function_name())));
+
+        try
+        {
+            // Can throw an action limit exception if the stack limit is 0 or 1.
+            // A stack limit like that is hardly of any use, but could be used
+            // maliciously to crash Gnash.
+		    mouseObj->callMethod(NSV::PROP_BROADCAST_MESSAGE, as_value(PROPNAME(event.get_function_name())));
+		}
+	    catch (ActionLimitException &e)
+	    {
+            log_error(_("ActionLimits hit notifying mouse events: %s."), e.what());
+            clearActionQueue();
+	    }
+	    
 	}
 
 	assert(testInvariant());
@@ -2095,6 +2130,7 @@ movie_root::setScriptLimits(boost::uint16_t recursion, boost::uint16_t timeout)
 
     _recursionLimit = recursion;
     _timeoutLimit = timeout;
+    
 }
 
 

@@ -1,3 +1,13 @@
+2008-06-05 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/as_environment.cpp: fix warning, minor changes.
+	* server/movie_root.cpp: don't disable scripts when we hit
+	  the recursion limit. A recursion limit can be 0 or 1, so
+	  mouse and key notifiers need to catch the ActionLimits exception.
+	  It may be better not to call them. This makes Gnash behaviour more
+	  or less compatible, though in some cases we may be pushing less on
+	  the stack than we should, which of course changes behaviour.
+
 2008-06-05 Sandro Santilli <strk@keybit.net>
 
 	* libmedia/ffmpeg/: AudioDecoderFfmpeg.cpp, VideoDecoderFfmpeg.cpp:
