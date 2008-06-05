@@ -513,8 +513,8 @@ NetStreamFfmpeg::decodeNextAudioFrame()
 
 	if ( decodedData != frame->dataSize )
 	{
-		log_error("FIXME: not all data in EncodedAudioFrame was decoded, just %d/%d",
-			frame->dataSize, decodedData);
+		log_error("FIXME: NetStreamFfmpeg::decodeNextAudioFrame: not all data in EncodedAudioFrame was decoded, just %d/%d bytes.",
+			decodedData,frame->dataSize);
 	}
 
 	//raw->m_stream_index = m_audio_index; // no idea what this is needed for
