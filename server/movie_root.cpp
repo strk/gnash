@@ -195,13 +195,9 @@ movie_root::setRootMovie(movie_instance* movie)
 	}
 	catch (ActionLimitException& al)
 	{
-		//log_error(_("ActionLimits hit during setRootMovie: %s. "
-		//        		"Disabling scripts"), al.what());
-		//disableScripts();
-
-        // The PP doesn't disable scripts here, but rather abandons processing
-        // carries on.
-		log_error(_("ActionLimits hit during setRootMovie: %s."), al.what());
+		log_error(_("ActionLimits hit during setRootMovie: %s. "
+		        		"Disabling scripts"), al.what());
+		disableScripts();
 		clearActionQueue();
 	}
 

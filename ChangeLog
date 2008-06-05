@@ -1,5 +1,11 @@
 2008-06-05 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* server/movie_root.cpp: not disabling scripts in setMovieRoot is
+	  wrong (tested in swfdec testsuite) and wasn't supposed to be
+	  committed.
+
+2008-06-05 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* server/dlist.cpp: use list::remove_if() instead of std::remove_if()
 	  on a list.
 	* server/movie_root.cpp: use list::remove_if() rather than iterating
