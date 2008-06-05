@@ -928,7 +928,7 @@ edit_text_character::set_member(string_table::key name,
 		//else if (name == "_x")
 	{
 		matrix	m = get_matrix();
-		m.m_[0][2] = utility::infinite_to_fzero(PIXELS_TO_TWIPS(val.to_number()));	
+		m.tx = utility::infinite_to_fzero(PIXELS_TO_TWIPS(val.to_number()));	
 		set_matrix(m);
 
 		// m_accept_anim_moves = false;
@@ -939,7 +939,7 @@ edit_text_character::set_member(string_table::key name,
 		//else if (name == "_y")
 	{
 		matrix	m = get_matrix();
-		m.m_[1][2] = utility::infinite_to_fzero(PIXELS_TO_TWIPS(val.to_number()));
+		m.ty = utility::infinite_to_fzero(PIXELS_TO_TWIPS(val.to_number()));
 		set_matrix(m);
 
 		// m_accept_anim_moves = false;
@@ -1129,14 +1129,14 @@ edit_text_character::get_member(string_table::key name, as_value* val,
 		//else if (name == "_x")
 	{
 		matrix	m = get_matrix();	// @@ get_world_matrix()???
-		val->set_double(TWIPS_TO_PIXELS(m.m_[0][2]));
+		val->set_double(TWIPS_TO_PIXELS(m.tx));
 		return true;
 	}
 	case NSV::PROP_uY:
 		//else if (name == "_y")
 	{
 		matrix	m = get_matrix();	// @@ get_world_matrix()???
-		val->set_double(TWIPS_TO_PIXELS(m.m_[1][2]));
+		val->set_double(TWIPS_TO_PIXELS(m.ty));
 		return true;
 	}
 	case NSV::PROP_uWIDTH:

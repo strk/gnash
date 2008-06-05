@@ -1792,12 +1792,12 @@ sprite_beginGradientFill(const fn_call& fn)
     float valG = PIXELS_TO_TWIPS(matrixArg->getMember(keyG).to_number()); // x0
     float valH = PIXELS_TO_TWIPS(matrixArg->getMember(keyH).to_number()); // y0
 
-    input_matrix.m_[0][0] = valA; // xx
-    input_matrix.m_[1][0] = valB; // yx
-    input_matrix.m_[0][1] = valD; // xy
-    input_matrix.m_[1][1] = valE; // yy
-    input_matrix.m_[0][2] = valG; // x0
-    input_matrix.m_[1][2] = valH; // y0
+    input_matrix.sx = valA * 65536; // xx
+    input_matrix.shx = valB * 65536; // yx
+    input_matrix.shy = valD * 65536; // xy
+    input_matrix.sy = valE * 65536; // yy
+    input_matrix.tx = valG; // x0
+    input_matrix.ty = valH; // y0
 
     // This is the matrix that would transform the gnash
     // gradient to the expected flash gradient.

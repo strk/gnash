@@ -39,36 +39,27 @@ namespace gnash {
 
 namespace gnash {
 
-
-/// Matrix type, used by render handler.
-//
-/// This type stores the top two rows of a 3x3 matrix whose
-/// bottom row is (0 0 1). This matrix lets you define any combination of
-/// scaling, motion and rotation (including flipping) in just 6 numbers.
-/// Better yet, the same distortion is always represented by the same set
-/// of 6 numbers.
-///
-/// The matrix looks like this (last line implicit):
-///
-///   | scale_x  x_dep_y  translate_x |
-///   | y_dep_x  scale_y  translate_y |
-///   |   0         0          1      |
-///
+/// The SWF matrix record.
+/// 
+/// Conceptuall, it represents a 3*3 linear transformation matrix like this:
+/// 
+///   | scale_x       rotateSkew_y  translate_x |
+///   | rotateSkey_x  scale_y       traslate_y  |
+///   | 0             0             1           |
+/// 
 class DSOEXPORT matrix
 {
 public:
-	
+
+	int sx;  // Xscale, 16.16 fixed point.
+    int shx; // Xshear, 16.16 fixed point. 
+    int tx;  // Xtranslation, TWIPS.
+    int sy;  // Yscale, 16.16 fixed point.
+    int shy; // Yshear, 16.16 fixed point.
+    int ty;  // Ytranslation, TWIPS.
+             
 	friend bool operator== (const matrix&, const matrix&);
 	friend std::ostream& operator<< (std::ostream&, const matrix&);
-
-	/// The identity matrix (no transforms)
-	//
-	/// Identity matrix is:
-	///
-	///	| 1 0 0 |
-	///	| 0 1 0 |
-	///
-	static matrix	identity;
 	
 	/// Defaults to identity
 	matrix();
@@ -124,19 +115,19 @@ public:
 	/// Set x translation
 	void set_x_translation(float x)
 	{
-		m_[0][2] = x;
+		tx = x;
 	}
 
 	/// Set y translation
 	void set_y_translation(float y)
 	{
-		m_[1][2] = y;
+		ty = y;
 	}
 
 	void set_translation(float x, float y)
 	{
-		m_[0][2] = x;
-		m_[1][2] = y;
+		tx = x;
+		ty = y;
 	}
 
 	/// Initialize from the SWF input stream.
@@ -167,8 +158,8 @@ public:
 	transform(T& x, T& y) const
 	// Transform point 'x,y' by our matrix.
 	{
-		float nx = m_[0][0] * x + m_[0][1] * y + m_[0][2];
-		float ny = m_[1][0] * x + m_[1][1] * y + m_[1][2];
+		float nx = (sx / 65536.0f) * x + (shy / 65536.0f) * y + tx;
+		float ny = (shx / 65536.0f) * x + (sy / 65536.0 ) * y + ty;
 		x = nx;
 		y = ny;
 	}
@@ -207,13 +198,6 @@ public:
 	/// Return the determinant of the 2x2 rotation/scale part only.
 	float	get_determinant() const;
 
-	/// Return the maximum scale factor that this transform applies.
-	//
-	/// For assessing scale, when determining acceptable
-	/// errors in tesselation.
-	///
-	float	get_max_scale() const;	
-
 	/// return the magnitude scale of our x coord output
 	float	get_x_scale() const;
 
@@ -226,43 +210,26 @@ public:
 	/// return the canonical x translation
 	float	get_x_translation() const
 	{
-		return m_[0][2];
+		return tx;
 	}
 
 	/// return the canonical y translation
 	float	get_y_translation() const
 	{
-		return m_[1][2];
+		return ty;
 	}
-
-public: // must be switched to private
-
-	/// \brief
-	/// Top two rows of a 3x3 matrix whose bottom row is 
-	/// assumed to be | 0 0 1 |
-	///
-	///	| scale_x  x_dep_y  translate_x |
-	///	| y_dep_x  scale_y  translate_y |
-	///
-	/// In cairo dialect, these are:
-	///
-	///	|      xx       xy           x0 |
-	///	|      yx       yy           y0 |
-	///
-	float	m_[2][3];
 };
-
 
 inline bool operator== (const matrix& a, const matrix& b)
 {
-	return	a.m_[0][0] == b.m_[0][0] &&
-		a.m_[0][1] == b.m_[0][1] &&
-		a.m_[0][2] == b.m_[0][2] &&
-		a.m_[1][0] == b.m_[1][0] &&
-		a.m_[1][1] == b.m_[1][1] &&
-		a.m_[1][2] == b.m_[1][2];
+	return	
+        a.sx  == b.sx  &&
+		a.shx == b.shx &&
+		a.tx  == b.tx  &&
+		a.sy  == b.sy  &&
+		a.shy == b.shy &&
+		a.ty  == b.ty;
 }
-
 
 }	// namespace gnash
 

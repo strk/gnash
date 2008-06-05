@@ -34,24 +34,18 @@
 
 namespace gnash {
 
-matrix	matrix::identity;
-
 matrix::matrix()
 {
-	// Default to identity.
-	set_identity();
+    // Default to identity.
+    sx = sy = 65536;
+    shx = shy = tx = ty = 0;
 }
 
 
 bool
 matrix::is_valid() const
 {
-	return utility::isFinite(m_[0][0])
-		&& utility::isFinite(m_[0][1])
-		&& utility::isFinite(m_[0][2])
-		&& utility::isFinite(m_[1][0])
-		&& utility::isFinite(m_[1][1])
-		&& utility::isFinite(m_[1][2]);
+	return true;
 }
 
 
@@ -59,9 +53,8 @@ void
 matrix::set_identity()
 // Set the matrix to identity.
 {
-	memset(&m_[0], 0, sizeof(m_));
-	m_[0][0] = 1;
-	m_[1][1] = 1;
+    sx = sy = 65536;
+    shx = shy = tx = ty = 0;
 }
 
 void
@@ -71,25 +64,25 @@ matrix::concatenate(const matrix& m)
 // original xform.
 {
 	matrix	t;
-	t.m_[0][0] = m_[0][0] * m.m_[0][0] + m_[0][1] * m.m_[1][0];
-	t.m_[1][0] = m_[1][0] * m.m_[0][0] + m_[1][1] * m.m_[1][0];
-	t.m_[0][1] = m_[0][0] * m.m_[0][1] + m_[0][1] * m.m_[1][1];
-	t.m_[1][1] = m_[1][0] * m.m_[0][1] + m_[1][1] * m.m_[1][1];
-	t.m_[0][2] = m_[0][0] * m.m_[0][2] + m_[0][1] * m.m_[1][2] + m_[0][2];
-	t.m_[1][2] = m_[1][0] * m.m_[0][2] + m_[1][1] * m.m_[1][2] + m_[1][2];
+	t.sx =  Fixed16Mul(sx, m.sx)  + Fixed16Mul(shy, m.shx);
+	t.shx = Fixed16Mul(shx, m.sx) + Fixed16Mul(sy, m.shx);
+	t.shy = Fixed16Mul(sx, m.shy) + Fixed16Mul(shy, m.sy);
+	t.sy =  Fixed16Mul(shx, m.shy)+ Fixed16Mul(sy, m.sy);
+	t.tx =  Fixed16Mul(sx, m.tx)  + Fixed16Mul(shy, m.ty) + tx;
+	t.ty =  Fixed16Mul(shx, m.tx) + Fixed16Mul(sy, m.ty)  + ty;
 
 	*this = t;
 }
 
 
 void
-matrix::concatenate_translation(float tx, float ty)
+matrix::concatenate_translation(float xoffset, float yoffset)
 // Concatenate a translation onto the front of our
 // matrix.  When transforming points, the translation
 // happens first, then our original xform.
 {
-	m_[0][2] += utility::infinite_to_fzero(m_[0][0] * tx + m_[0][1] * ty);
-	m_[1][2] += utility::infinite_to_fzero(m_[1][0] * tx + m_[1][1] * ty);
+	tx += Fixed16Mul(sx,  xoffset) + Fixed16Mul(shy, yoffset);
+	ty += Fixed16Mul(shx, xoffset) + Fixed16Mul(sy, yoffset);
 }
 
 
@@ -99,26 +92,19 @@ matrix::concatenate_scale(float scale)
 // matrix.  When transforming points, the scale
 // happens first, then our original xform.
 {
-	m_[0][0] *= utility::infinite_to_fzero(scale);
-	m_[0][1] *= utility::infinite_to_fzero(scale);
-	m_[1][0] *= utility::infinite_to_fzero(scale);
-	m_[1][1] *= utility::infinite_to_fzero(scale);
+	sx *= utility::infinite_to_fzero(scale);
+	shy *= utility::infinite_to_fzero(scale);
+	shx *= utility::infinite_to_fzero(scale);
+	sy *= utility::infinite_to_fzero(scale);
 }
 
 void	
 matrix::concatenate_scales(float x, float y)
 // Just like concatenate_scale() but with different scales for x/y
 {
-	matrix m2; m2.set_scale_rotation(x, y, 0);
+	matrix m2; 
+    m2.set_scale_rotation(x, y, 0);
 	concatenate(m2);
-
-#if 0 // the code below only works when x and y scales are equal,
-      // see testsuite/server/MatrixTest.cpp
-	m_[0][0] *= utility::infinite_to_fzero(x);
-	m_[0][1] *= utility::infinite_to_fzero(x);
-	m_[1][0] *= utility::infinite_to_fzero(y);
-	m_[1][1] *= utility::infinite_to_fzero(y);
-#endif
 }
 
 void
@@ -126,12 +112,12 @@ matrix::set_lerp(const matrix& m1, const matrix& m2, float t)
 // Set this matrix to a blend of m1 and m2, parameterized by t.
 {
     using utility::flerp;
-	m_[0][0] = flerp(m1.m_[0][0], m2.m_[0][0], t);
-	m_[1][0] = flerp(m1.m_[1][0], m2.m_[1][0], t);
-	m_[0][1] = flerp(m1.m_[0][1], m2.m_[0][1], t);
-	m_[1][1] = flerp(m1.m_[1][1], m2.m_[1][1], t);
-	m_[0][2] = flerp(m1.m_[0][2], m2.m_[0][2], t);
-	m_[1][2] = flerp(m1.m_[1][2], m2.m_[1][2], t);
+	sx = flerp(m1.sx, m2.sx, t);
+	shx = flerp(m1.shx, m2.shx, t);
+	shy = flerp(m1.shy, m2.shy, t);
+	sy = flerp(m1.sy, m2.sy, t);
+	tx = flerp(m1.tx, m2.tx, t);
+	ty = flerp(m1.ty, m2.ty, t);
 }
 
 
@@ -142,10 +128,10 @@ matrix::set_scale_rotation(float x_scale, float y_scale, float angle)
 {
 	float	cos_angle = cosf(angle);
 	float	sin_angle = sinf(angle);
-	m_[0][0] = utility::infinite_to_fzero(x_scale * cos_angle);
-	m_[0][1] = utility::infinite_to_fzero(y_scale * -sin_angle);
-	m_[1][0] = utility::infinite_to_fzero(x_scale * sin_angle);
-	m_[1][1] = utility::infinite_to_fzero(y_scale * cos_angle);
+	sx  = 65536 * x_scale * cos_angle;
+	shy = 65536 * y_scale * -sin_angle;
+	shx = 65536 * x_scale * sin_angle;
+	sy  = 65536 * y_scale * cos_angle;
 }
 
 void
@@ -196,8 +182,8 @@ matrix::read(stream& in)
 		int	scale_nbits = in.read_uint(5);
 
 		in.ensureBits(scale_nbits*2);
-		m_[0][0] = in.read_sint(scale_nbits) / 65536.0f;
-		m_[1][1] = in.read_sint(scale_nbits) / 65536.0f;
+		sx = in.read_sint(scale_nbits);
+		sy = in.read_sint(scale_nbits);
 	}
 
 	in.ensureBits(1);
@@ -208,8 +194,8 @@ matrix::read(stream& in)
 		int	rotate_nbits = in.read_uint(5);
 
 		in.ensureBits(rotate_nbits*2);
-		m_[1][0] = in.read_sint(rotate_nbits) / 65536.0f;
-		m_[0][1] = in.read_sint(rotate_nbits) / 65536.0f;
+		shx = in.read_sint(rotate_nbits);
+		shy = in.read_sint(rotate_nbits);
 	}
 
 	in.ensureBits(5);
@@ -217,13 +203,12 @@ matrix::read(stream& in)
 	if (translate_nbits > 0)
 	{
 		in.ensureBits(translate_nbits*2);
-		m_[0][2] = (float) in.read_sint(translate_nbits);
-		m_[1][2] = (float) in.read_sint(translate_nbits);
+		tx = (float) in.read_sint(translate_nbits);
+		ty = (float) in.read_sint(translate_nbits);
 	}
 
 	//IF_VERBOSE_PARSE(log_parse("  mat: has_scale = %d, has_rotate = %d\n", has_scale, has_rotate));
 }
-
 
 void
 matrix::transform(point* result, const point& p) const
@@ -232,8 +217,8 @@ matrix::transform(point* result, const point& p) const
 {
 	assert(result);
 
-	result->x = m_[0][0] * p.x + m_[0][1] * p.y + m_[0][2];
-	result->y = m_[1][0] * p.x + m_[1][1] * p.y + m_[1][2];
+	result->x = sx  / 65536.0 * p.x  + shy / 65536.0f * p.y + tx;
+	result->y = shx / 65536.0 * p.x  + sy  / 65536.0f * p.y + ty;
 }
 
 void
@@ -246,20 +231,20 @@ matrix::transform(geometry::Range2d<float>& r) const
 	float ymin = r.getMinY();
 	float ymax = r.getMaxY();
 
-        point p0(xmin, ymin);
-        point p1(xmin, ymax);
-        point p2(xmax, ymax);
-        point p3(xmax, ymin);
+    point p0(xmin, ymin);
+    point p1(xmin, ymax);
+    point p2(xmax, ymax);
+    point p3(xmax, ymin);
 
-        transform(p0);
-        transform(p1);
-        transform(p2);
-        transform(p3);
+    transform(p0);
+    transform(p1);
+    transform(p2);
+    transform(p3);
 
-        r.setTo(p0.x, p0.y);
-        r.expandTo(p1.x, p1.y);
-        r.expandTo(p2.x, p2.y);
-        r.expandTo(p3.x, p3.y);
+    r.setTo(p0.x, p0.y);
+    r.expandTo(p1.x, p1.y);
+    r.expandTo(p2.x, p2.y);
+    r.expandTo(p3.x, p3.y);
 }
 
 void
@@ -269,8 +254,8 @@ matrix::transform_vector(point* result, const point& v) const
 {
 	assert(result);
 
-	result->x = m_[0][0] * v.x + m_[0][1] * v.y;
-	result->y = m_[1][0] * v.x + m_[1][1] * v.y;
+	result->x = sx / 65536.0f * v.x + shy / 65536.0f * v.y;
+	result->y = sy / 65536.0f * v.x + shx / 65536.0f * v.y;
 }
 
 void
@@ -310,7 +295,7 @@ matrix::set_inverse(const matrix& m)
 	assert(this != &m);
 
 	// Invert the rotation part.
-	float	det = m.m_[0][0] * m.m_[1][1] - m.m_[0][1] * m.m_[1][0];
+	float	det = m.get_determinant();
 	if (det == 0.0f)
 	{
 		// Not invertible.
@@ -318,19 +303,19 @@ matrix::set_inverse(const matrix& m)
 
 		// Arbitrary fallback.
 		set_identity();
-		m_[0][2] = -m.m_[0][2];
-		m_[1][2] = -m.m_[1][2];
+		tx = -m.tx;
+		ty = -m.ty;
 	}
 	else
 	{
 		float	inv_det = 1.0f / det;
-		m_[0][0] = m.m_[1][1] * inv_det;
-		m_[1][1] = m.m_[0][0] * inv_det;
-		m_[0][1] = -m.m_[0][1] * inv_det;
-		m_[1][0] = -m.m_[1][0] * inv_det;
+		sx = m.sy * inv_det;
+		sy = m.sx * inv_det;
+		shy = -m.shy * inv_det;
+		shx = -m.shx * inv_det;
 
-		m_[0][2] = -(m_[0][0] * m.m_[0][2] + m_[0][1] * m.m_[1][2]);
-		m_[1][2] = -(m_[1][0] * m.m_[0][2] + m_[1][1] * m.m_[1][2]);
+		tx = -( sx / 65536.0f * m.tx + shy / 65536.0f * m.ty);
+		ty = -(shx / 65536.0f * m.tx +  sy / 65536.0f * m.ty);
 	}
 }
 
@@ -339,9 +324,9 @@ bool
 matrix::does_flip() const
 // Return true if this matrix reverses handedness.
 {
-	float	det = m_[0][0] * m_[1][1] - m_[0][1] * m_[1][0];
+	float	det = (float)sx * sy - (float)shx * shy;
 
-	return det < 0.f;
+	return det < 0.0f;
 }
 
 
@@ -349,28 +334,7 @@ float
 matrix::get_determinant() const
 // Return the determinant of the 2x2 rotation/scale part only.
 {
-	return m_[0][0] * m_[1][1] - m_[1][0] * m_[0][1];
-}
-
-
-float
-matrix::get_max_scale() const
-// Return the maximum scale factor that this transform
-// applies.  For assessing scale, when determining acceptable
-// errors in tesselation.
-{
-	// @@ not 100% sure what the heck I'm doing here.  I
-	// think this is roughly what I want; take the max
-	// length of the two basis vectors.
-
-	//float	basis0_length2 = m_[0][0] * m_[0][0] + m_[0][1] * m_[0][1];
-	float	basis0_length2 = m_[0][0] * m_[0][0] + m_[1][0] * m_[1][0];
-
-	//float	basis1_length2 = m_[1][0] * m_[1][0] + m_[1][1] * m_[1][1];
-	float	basis1_length2 = m_[0][1] * m_[0][1] + m_[1][1] * m_[1][1];
-
-	float	max_length2 = std::max(basis0_length2, basis1_length2);
-	return sqrtf(max_length2);
+	return ((float)sx * sy - (float)shx * shy) / (65536.0 * 65536.0);
 }
 
 float
@@ -378,7 +342,7 @@ matrix::get_x_scale() const
 {
 	// Scale is applied before rotation, must match implementation
 	// in set_scale_rotation
-	float	scale = sqrtf(m_[0][0] * m_[0][0] + m_[1][0] * m_[1][0]);
+	float  scale = sqrtf(((float)sx * sx + (float)shx * shx)) / 65536.0f;
 
 	// Are we turned inside out?
 	if (get_determinant() < 0.f)
@@ -394,7 +358,7 @@ matrix::get_y_scale() const
 {
 	// Scale is applied before rotation, must match implementation
 	// in set_scale_rotation
-	return sqrtf(m_[1][1] * m_[1][1] + m_[0][1] * m_[0][1]);
+	return sqrtf(((float)sy * sy + (float)shy * shy)) / 65536.0f;
 }
 
 float
@@ -408,11 +372,11 @@ matrix::get_rotation() const
 		// Matches get_x_scale().
 		//
 		// @@ this may not be how Macromedia does it!  Test this!
-		return atan2f(m_[1][0], -m_[0][0]);
+		return atan2f(shx, -sx);
 	}
 	else
 	{
-		return atan2f(m_[1][0], m_[0][0]);
+		return atan2f(shx, sx);
 	}
 }
 
@@ -422,14 +386,20 @@ std::ostream& operator<< (std::ostream& o, const matrix& m)
     const short fieldWidth = 9;
 
     o << std::endl << "| "
-      << std::setw(fieldWidth) << std::fixed << std::setprecision(4) << m.m_[0][0] << " "
-      << std::setw(fieldWidth) << std::fixed << std::setprecision(4) << m.m_[0][1] << " "
-      << std::setw(fieldWidth) << std::fixed << std::setprecision(4) << TWIPS_TO_PIXELS(m.m_[0][2])
+      << std::setw(fieldWidth) << std::fixed << std::setprecision(4) 
+      << m.sx/65536.0 << " "
+      << std::setw(fieldWidth) << std::fixed << std::setprecision(4) 
+      << m.shy/65536.0 << " "
+      << std::setw(fieldWidth) << std::fixed << std::setprecision(4) 
+      << TWIPS_TO_PIXELS(m.tx)
       << " |" 
       << std::endl << "| "
-      << std::setw(fieldWidth) << std::fixed << std::setprecision(4) << m.m_[1][0] << " "
-      << std::setw(fieldWidth) << std::fixed << std::setprecision(4) << m.m_[1][1] << " "
-      << std::setw(fieldWidth) << std::fixed << std::setprecision(4) << TWIPS_TO_PIXELS(m.m_[1][2])
+      << std::setw(fieldWidth) << std::fixed << std::setprecision(4) 
+      << m.shx/65536.0 << " "
+      << std::setw(fieldWidth) << std::fixed << std::setprecision(4) 
+      << m.sy/65536.0 << " "
+      << std::setw(fieldWidth) << std::fixed << std::setprecision(4) 
+      << TWIPS_TO_PIXELS(m.ty)
       << " |";
       
       return o;

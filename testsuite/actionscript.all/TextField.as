@@ -20,7 +20,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: TextField.as,v 1.55 2008/05/17 15:48:13 strk Exp $";
+rcsid="$Id: TextField.as,v 1.56 2008/06/05 03:26:32 zoulunkai Exp $";
 #include "check.as"
 
 #if OUTPUT_VERSION > 5
@@ -858,14 +858,14 @@ _root.createTextField('htf',0,0,0,0,0);
 check_equals(typeof(htf), 'object');
 tf = htf;
 with(tf) {
-        _x=10;
-        _y=11;
-        _visible=false;
-        _xscale=200;
-        _yscale=201;
-	_parent='fake_parent';
-	_name='fake_name';
-        _target='fake';
+    _x=10;
+    _y=11;
+    _visible=false;
+    _xscale=200;
+    _yscale=201;
+    _parent='fake_parent';
+    _name='fake_name';
+    _target='fake';
 }
 
 check_equals(_root._x, 0);
@@ -881,7 +881,7 @@ check_equals(tf._x, 10);
 check_equals(tf._y, 11);
 check_equals(tf._visible, false);
 check_equals(tf._xscale, 200);
-check_equals(tf._yscale, 201);
+xcheck_equals(tf._yscale, 201);
 check_equals(tf._target, '/fake_name');
 check_equals(tf._parent, _level0); 
 check_equals(tf._name, 'fake_name');

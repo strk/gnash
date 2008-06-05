@@ -471,9 +471,9 @@ public:
     // convert Gnash matrix to AGG matrix and scale down to pixel coordinates
     // while we're at it
     agg::trans_affine img_mtx(
-      mat.m_[0][0], mat.m_[1][0], 
-      mat.m_[0][1], mat.m_[1][1], 
-      mat.m_[0][2], mat.m_[1][2]
+      mat.sx  / 65536.0, mat.shx / 65536.0, 
+      mat.shy / 65536.0, mat.sy / 65536.0, 
+      mat.tx, mat.ty
     );    
     
     // invert matrix since this is used for the image source

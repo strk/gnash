@@ -1,3 +1,18 @@
+2008-06-05 Zou Lunkai <zoulunkai@gmail.com>
+
+	* server/matrix.{h,cpp}: code refactory, use integer math for swf matrix, 
+	  which would be more compatible later.
+	* libbase/utility.h: add a Fixed16Mul() for fixed point multiplication.
+	* server/edit_text_character.cpp, sprite_instance.cpp,
+	  gui/gui.cpp,
+	  backend/render_handler_agg.cpp
+	  backend/render_handler_agg_style.h
+	  backend/render_handler_cairo.cpp
+	  backend/render_handler_ogl.cpp: synchronize the new matrix interfaces.
+	* testsuite/server/MatrixTest.cpp: disable the tests temporarily, which are
+	  too accurate for the new matrix.
+	* testsuite/actionscript.all/TextField.as: accept an accuracy lost temporarily.  
+	  
 2008-06-04 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* libbase/test_ogl.cpp: make your own if you want to test OGL

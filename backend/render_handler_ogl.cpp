@@ -514,15 +514,15 @@ bitmap_info_ogl::apply(const gnash::matrix& bitmap_matrix,
   const gnash::matrix& m = bitmap_matrix;
   glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
   float p[4] = { 0, 0, 0, 0 };
-  p[0] = m.m_[0][0] * inv_width;
-  p[1] = m.m_[0][1] * inv_width;
-  p[3] = m.m_[0][2] * inv_width;
+  p[0] = m.sx / 65536.0f * inv_width;
+  p[1] = m.shy / 65536.0f * inv_width;
+  p[3] = m.tx * inv_width;
   glTexGenfv(GL_S, GL_OBJECT_PLANE, p);
 
   glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
-  p[0] = m.m_[1][0] * inv_height;
-  p[1] = m.m_[1][1] * inv_height;
-  p[3] = m.m_[1][2] * inv_height;
+  p[0] = m.shx / 65536.0f * inv_height;
+  p[1] = m.shy / 65536.0f * inv_height;
+  p[3] = m.ty * inv_height;
   glTexGenfv(GL_T, GL_OBJECT_PLANE, p);
   
 }
@@ -777,13 +777,13 @@ public:
   
     float mat[16];
     memset(&mat[0], 0, sizeof(mat));
-    mat[0] = m.m_[0][0];
-    mat[1] = m.m_[1][0];
-    mat[4] = m.m_[0][1];
-    mat[5] = m.m_[1][1];
+    mat[0] = m.sx / 65536.0f;
+    mat[1] = m.shx / 65536.0f;
+    mat[4] = m.shy / 65536.0f;
+    mat[5] = m.sy / 65536.0f;
     mat[10] = 1;
-    mat[12] = m.m_[0][2];
-    mat[13] = m.m_[1][2];
+    mat[12] = m.tx;
+    mat[13] = m.ty;
     mat[15] = 1;
     glMultMatrixf(mat);
   }

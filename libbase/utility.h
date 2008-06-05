@@ -132,7 +132,13 @@ inline int frnd(float f)
     return static_cast<int>(f + 0.5f);
 }
 
+} // end of namespace utility
+
+inline boost::int32_t Fixed16Mul(boost::int32_t a, boost::int32_t b)
+{
+    return (boost::int32_t)((boost::int64_t)a * (boost::int64_t)b >> 16);
 }
+
 }
 
 

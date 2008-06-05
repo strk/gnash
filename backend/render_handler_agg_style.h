@@ -132,9 +132,9 @@ public:
     // a real AGG descendant (templates!). However, it's better to use AGG's
     // class as this should be faster (avoid type conversion).
     m_tr=agg::trans_affine(
-      mat.m_[0][0], mat.m_[1][0], 
-      mat.m_[0][1], mat.m_[1][1], 
-      mat.m_[0][2], mat.m_[1][2]);
+      mat.sx/65536.0, mat.shx/65536.0, 
+      mat.shy/65536.0, mat.sy/65536.0, 
+      mat.tx, mat.ty);
             
     m_cx = cx;
       
@@ -214,9 +214,9 @@ public:
     m_is_solid = false;
     
     m_tr=agg::trans_affine(
-      mat.m_[0][0], mat.m_[1][0], 
-      mat.m_[0][1], mat.m_[1][1], 
-      mat.m_[0][2], mat.m_[1][2]);
+      mat.sx / 65536.0, mat.shx/65536.0, 
+      mat.shy / 65536.0, mat.sy / 65536.0, 
+      mat.tx, mat.ty);
       
     m_cx = cx;
             
