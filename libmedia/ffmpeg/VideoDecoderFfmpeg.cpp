@@ -86,13 +86,17 @@ VideoDecoderFfmpeg::init(enum CodecID codecId, int width, int height)
 
   int ret = avcodec_open(_videoCodecCtx, _videoCodec);
   if (ret < 0) {
-    log_error(_("VideoDecoderFfmpeg::init: avcodec_open: failed to initialize FFMPEG codec %d"), (int)codecId);
+    log_error(_("VideoDecoderFfmpeg::init: avcodec_open: failed to initialize FFMPEG codec %s (%d)"),
+		_videoCodec->name, (int)codecId);
     av_free(_videoCodecCtx);
     _videoCodecCtx=0;
     return;
   }
   _videoCodecCtx->width = width;
   _videoCodecCtx->height = height;
+
+  log_debug(_("VideoDecoderFfmpeg::init: initialized FFMPEG codec %s (%d)"), 
+		_videoCodec->name, (int)codecId);
 
   assert(_videoCodecCtx->width > 0);
   assert(_videoCodecCtx->height > 0);
@@ -226,7 +230,7 @@ VideoDecoderFfmpeg::FlashToFfmpegCodec(videoCodecType format)
   // Find the decoder and init the parser
   switch(format) {
     case VIDEO_CODEC_H263:
-      return CODEC_ID_FLV1;
+      return CODEC_ID_FLV1; // why not CODEC_ID_H263I ?
 #ifdef FFMPEG_VP6
     case VIDEO_CODEC_VP6:
       return CODEC_ID_VP6F;

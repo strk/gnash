@@ -1,5 +1,7 @@
 2008-06-05 Sandro Santilli <strk@keybit.net>
 
+	* libmedia/ffmpeg/VideoDecoderFfmpeg.cpp (init): print codec
+	  name in error and debug.
 	* libmedia/ffmpeg/AudioDecoderFfmpeg.cpp (setup): print codec
 	  name in error and debug.
 
