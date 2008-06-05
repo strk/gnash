@@ -87,7 +87,7 @@ bool AudioDecoderFfmpeg::setup(SoundInfo* info)
 		//avcodec_close(_audioCodecCtx);
 		av_free(_audioCodecCtx);
 		_audioCodecCtx=0;
-		log_error(_("libavcodec failed to initialize codec"));
+    		log_error(_("AudioDecoderFfmpeg::setup: avcodec_open: failed to initialize FFMPEG codec %d"), (int)codec_id);
 		return false;
 	}
 
@@ -106,8 +106,9 @@ bool AudioDecoderFfmpeg::setup(AudioInfo* info)
 	avcodec_init();
 	avcodec_register_all();// change this to only register need codec?
 
+	enum CodecID codec_id = CODEC_ID_NONE;
+
 	if (info->type == FLASH) {
-		enum CodecID codec_id;
 
 		switch(info->codec)
 		{
@@ -158,7 +159,7 @@ bool AudioDecoderFfmpeg::setup(AudioInfo* info)
 		//avcodec_close(_audioCodecCtx);
 		av_free(_audioCodecCtx);
 		_audioCodecCtx = 0;
-		log_error(_("libavcodec failed to initialize codec"));
+    		log_error(_("AudioDecoderFfmpeg::setup: avcodec_open: failed to initialize FFMPEG codec %d"), (int)codec_id);
 		return false;
 	}
 

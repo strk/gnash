@@ -86,7 +86,7 @@ VideoDecoderFfmpeg::init(enum CodecID codecId, int width, int height)
 
   int ret = avcodec_open(_videoCodecCtx, _videoCodec);
   if (ret < 0) {
-    log_error(_("libavcodec failed to initialize codec"));
+    log_error(_("VideoDecoderFfmpeg::init: avcodec_open: failed to initialize FFMPEG codec %d"), (int)codecId);
     av_free(_videoCodecCtx);
     _videoCodecCtx=0;
     return;
