@@ -40,6 +40,7 @@
 #include <map>
 #include <typeinfo>
 #include <cassert>
+#include <functional> // std::bind2nd, std::equal_to
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/bind.hpp>
 
@@ -1249,15 +1250,22 @@ void movie_root::add_listener(CharacterList& ll, character* listener)
 	ll.push_front(listener);
 }
 
+
 /* static private */
 void movie_root::remove_listener(CharacterList& ll, character* listener)
 {
 	assert(listener);
+
+#if 0
 	for(CharacterList::iterator iter = ll.begin(); iter != ll.end(); )
 	{
 		if(*iter == listener) iter = ll.erase(iter);
 		else ++iter;
 	}
+#else
+    // This should be faster.	
+	ll.remove_if(std::bind2nd(std::equal_to<boost::intrusive_ptr<character> >(), listener));
+#endif	
 }
 
 void

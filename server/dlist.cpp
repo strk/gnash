@@ -1157,9 +1157,13 @@ DisplayList::removeUnloaded()
 {
   testInvariant();
 
-  // TODO: erase from begin() to beginNonRemoved()-1 ?
+#if 1
+  // This is a list, so list::remove_if is quicker and cleaner than std::remove_if
+  _charsByDepth.remove_if(boost::bind(&character::isUnloaded, _1));
+#else
   iterator last = std::remove_if(_charsByDepth.begin(), _charsByDepth.end(), boost::bind(&character::isUnloaded, _1));
   _charsByDepth.erase(last, _charsByDepth.end());
+#endif
 
   testInvariant();
 }
