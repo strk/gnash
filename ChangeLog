@@ -1,3 +1,8 @@
+2008-06-05 Sandro Santilli <strk@keybit.net>
+
+	* libmedia/ffmpeg/AudioDecoderFfmpeg.cpp (setup): print codec
+	  name in error and debug.
+
 2008-06-05 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/as_environment.cpp: fix warning, minor changes.

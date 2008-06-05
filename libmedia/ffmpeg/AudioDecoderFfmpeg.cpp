@@ -108,7 +108,12 @@ bool AudioDecoderFfmpeg::setup(AudioInfo* info)
 
 	enum CodecID codec_id = CODEC_ID_NONE;
 
-	if (info->type == FLASH) {
+	if (info->type == FFMPEG)
+	{
+		codec_id = static_cast<CodecID>(info->codec);
+	}
+	else if (info->type == FLASH)
+	{
 
 		switch(info->codec)
 		{
@@ -125,30 +130,25 @@ bool AudioDecoderFfmpeg::setup(AudioInfo* info)
 				log_error(_("Unsupported audio codec %d"), static_cast<int>(info->codec));
 				return false;
 		}
-		_audioCodec = avcodec_find_decoder(codec_id);
-		// Init the parser
-		_parser = av_parser_init(codec_id);
-	}
-	else if (info->type == FFMPEG)
-	{
-		_audioCodec = avcodec_find_decoder(static_cast<CodecID>(info->codec));
-		// Init the parser
-		_parser = av_parser_init(static_cast<CodecID>(info->codec));
 	}
 	else
 	{
+		log_error("AudioDecoderFfmpeg::setup: unknown codec type %d ( should never happen )", info->type);
 		return false;
 	}
 
+	_audioCodec = avcodec_find_decoder(codec_id);
 	if (!_audioCodec)
 	{
 		log_error(_("libavcodec can't decode the current audio format"));
 		return false;
 	}
 
+	// Init the parser
+	_parser = av_parser_init(static_cast<CodecID>(info->codec));
+
 	// Create an audioCodecCtx from the ffmpeg parser if exists/possible
 	_audioCodecCtx = avcodec_alloc_context();
-
 	if (!_audioCodecCtx) {
 		log_error(_("libavcodec couldn't allocate context"));
 		return false;
@@ -159,7 +159,8 @@ bool AudioDecoderFfmpeg::setup(AudioInfo* info)
 		//avcodec_close(_audioCodecCtx);
 		av_free(_audioCodecCtx);
 		_audioCodecCtx = 0;
-    		log_error(_("AudioDecoderFfmpeg::setup: avcodec_open: failed to initialize FFMPEG codec %d"), (int)codec_id);
+    		log_error(_("AudioDecoderFfmpeg::setup: avcodec_open: failed to initialize FFMPEG codec %s (%d)"),
+			_audioCodec->name, (int)codec_id);
 		return false;
 	}
 
@@ -168,6 +169,9 @@ bool AudioDecoderFfmpeg::setup(AudioInfo* info)
 		_audioCodecCtx->sample_rate = info->sampleRate;
 		//_audioCodecCtx->sample_fmt = SAMPLE_FMT_S16;
 	}
+
+  	log_debug(_("AudioDecoderFfmpeg::setup: initialized FFMPEG codec %s (%d)"),
+		_audioCodec->name, (int)codec_id);
 
 	return true;
 }
