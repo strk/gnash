@@ -5,6 +5,8 @@
 	  gcc supports it.
 	* utility.h: Fixed a quirk on Leopard/BSD for isfinite();
 	* libmedia/ffmpeg/MediaParserFfmpeg.cpp: Fixed #ifndef.
+	* server/edit_text_character.cpp: Use isFinite(), instead of 
+	  finite().
 
 2008-06-06 Russ Nelson <nelson@crynwr.com>
 

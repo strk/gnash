@@ -949,7 +949,7 @@ edit_text_character::set_member(string_table::key name,
 	case NSV::PROP_uWIDTH:
 	{
 		float nw = PIXELS_TO_TWIPS(val.to_number()); // TODO: pass an as_environment !
-		if ( ! finite(nw) )
+		if ( ! utility::isFinite(nw) )
 		{
 			// might be our fault, see the TODO above (missing to pass as_environment out..)
 			IF_VERBOSE_ASCODING_ERRORS(
@@ -1010,7 +1010,7 @@ edit_text_character::set_member(string_table::key name,
 	case NSV::PROP_uHEIGHT:
 	{
 		float nh = PIXELS_TO_TWIPS(val.to_number()); // TODO: pass an as_environment !
-		if ( ! finite(nh) )
+		if ( ! utility::isFinite(nh) )
 		{
 			// might be our fault, see the TODO above (missing to pass as_environment out..)
 			IF_VERBOSE_ASCODING_ERRORS(
