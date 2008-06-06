@@ -27,6 +27,7 @@
 #include <vector> // for path composition
 #include <boost/bind.hpp>  
 #include <algorithm>
+#include <cmath> // sqrt
 
 
 // Forward declarations
@@ -144,7 +145,7 @@ namespace gnash {
     distancePtSeg(const Point2d<U>& pt, const Point2d<U>& A, const Point2d<U>& B)
     {
       float square = squareDistancePtSeg(pt, A, B);
-      return sqrt(square);
+      return std::sqrt(square);
     }
 
     /// Find point of the quadratic curve defined by points A,C,B
@@ -175,7 +176,7 @@ namespace gnash {
         << " T:" << t
         << " Q1:" << Q1 << " Q2:" << Q2
         << " R:" << R;
-      log_debug("%s", ss.str().c_str());
+      log_debug("%s", ss.str());
 #endif
 
       return R;
@@ -499,7 +500,7 @@ namespace gnash {
           float_point p0(A.x, A.y);
           for (int i=1; i<=segCount; ++i)
           {
-            float t1 = (float)i/segCount;
+            float t1 = i / static_cast<float>(segCount);
             float_point p1 = Edge<T>::pointOnCurve(A, C, B, t1);
 
             // distance from point and segment being an approximation

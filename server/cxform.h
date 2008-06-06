@@ -74,14 +74,14 @@ public:
     cxform & load_from(float * src)
     {
     	// enbrace the overflows intentionally.
-        ra = (boost::int16_t)((*src++) * 2.56f);
-        rb = (boost::int16_t)(*src++);
-        ga = (boost::int16_t)((*src++) * 2.56f);
-        gb = (boost::int16_t)(*src++);
-        ba = (boost::int16_t)((*src++) * 2.56f);
-        bb = (boost::int16_t)(*src++);
-        aa = (boost::int16_t)((*src++) * 2.56f);
-        ab = (boost::int16_t)(*src++);
+        ra = static_cast<boost::int16_t>((*src++) * 2.56f);
+        rb = static_cast<boost::int16_t>(*src++);
+        ga = static_cast<boost::int16_t>((*src++) * 2.56f);
+        gb = static_cast<boost::int16_t>(*src++);
+        ba = static_cast<boost::int16_t>((*src++) * 2.56f);
+        bb = static_cast<boost::int16_t>(*src++);
+        aa = static_cast<boost::int16_t>((*src++) * 2.56f);
+        ab = static_cast<boost::int16_t>(*src++);
         return *this;
     }
     

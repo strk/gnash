@@ -1,3 +1,22 @@
+2008-06-06 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* libbase/utility.h: include gnashconfig.h, fix some old-style casts,
+	  use Dossy's 0.8.3 branch solution for isfinite on win32 in HEAD
+	  too.
+	* libbase/tu_file.{cpp,h}: fix old-style casts, add some indentation.
+	* libgeometry/Point2d.h: old-style casts, std:: mathematic functions.
+	* libgeometry/Range2d.h: ditto.
+	* server/cxform.h, server/types.h, server/shape.h, server/event_id.h,
+	  server/as_value.h: old-style casts.
+	* configure.ac: drop tests for hash map extensions, add -ansi to
+	  standard CXXFLAGS (this simply disables gcc extensions, so there
+	  should be (and are) no problems building). Add extra warnings to
+	  standard CXXFLAGS. Replace NSAPI with NPAPI.
+	* macros/firefox.m4: replace $nsapi with $npapi.
+	* plugins/Makefile.am, plugins/win32/Makefile.am, Makefile.am:
+	  NSAPI->NPAPI.
+	* GnashException.h: header guard used reserved identifier.
+
 2008-06-06 Sandro Santilli <strk@keybit.net>
 
 	* libmedia/AudioDecoder.h: add a decode(EncodedAudioFrame&) method.
@@ -9,7 +28,8 @@
 
 2008-06-06 Zou Lunkai <zoulunkai@gmail.com>
 	
-	YOUR ADV HERE
+	* server/matrix.{h,cpp}: more floats to integers migration, cleanups.
+	* testsuite/misc-ming.all/DrawingApiTest.as: make the tests saner.
 
 2008-06-06 Sandro Santilli <strk@keybit.net>
 

@@ -15,8 +15,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef _GNASH_GNASHEXCEPTION__H
-#define _GNASH_GNASHEXCEPTION__H 1
+#ifndef GNASH_GNASHEXCEPTION_H
+#define GNASH_GNASHEXCEPTION_H 1
 
 #include <exception>
 #include <string>
@@ -164,7 +164,7 @@ public:
 
 } // namespace gnash
 
-#endif // def _GNASH_GNASHEXCEPTION__H
+#endif // def GNASH_GNASHEXCEPTION_H
 
 
 // Local Variables:

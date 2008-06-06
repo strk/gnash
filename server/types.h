@@ -54,9 +54,9 @@ namespace gnash {
 		///
 		void parseRGB(boost::uint32_t rgbCol)
 		{
-			m_r = (boost::uint8_t)(rgbCol>>16);
-			m_g = (boost::uint8_t)(rgbCol>>8);
-			m_b = (boost::uint8_t)(rgbCol);
+			m_r = static_cast<boost::uint8_t>(rgbCol>>16);
+			m_g = static_cast<boost::uint8_t>(rgbCol>>8);
+			m_b = static_cast<boost::uint8_t>(rgbCol);
 		}
 
 		/// \brief

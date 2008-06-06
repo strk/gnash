@@ -17,7 +17,7 @@
 
 AUTOMAKE_OPTIONS = 
 
-if NSAPI
+if NPAPI
 if WIN32
 
 AM_CPPFLAGS = \
@@ -87,7 +87,7 @@ uninstall-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
 	$(RM) -f $(bindir)/npgnash.dll
 
 endif # WIN32
-endif # NSAPI
+endif # NPAPI
 
 force:
 

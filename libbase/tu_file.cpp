@@ -10,6 +10,7 @@
 #include "utility.h"
 #include "log.h"
 
+#include <cstdio>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -40,7 +41,7 @@ std_read_func(void* dst, int bytes, void* appdata)
     
     assert(appdata);
     assert(dst);
-    return fread( dst, 1, bytes, (FILE *)appdata );
+    return fread( dst, 1, bytes, static_cast<FILE*>(appdata) );
 }
 
 static int
@@ -49,7 +50,7 @@ std_write_func(const void* src, int bytes, void* appdata)
 {
     assert(appdata);
     assert(src);
-    return fwrite( src, 1, bytes, (FILE *)appdata );
+    return std::fwrite( src, 1, bytes, static_cast<FILE*>(appdata));
 }
 
 static int
@@ -82,7 +83,7 @@ std_seek_to_end_func(void *appdata)
 // Return 0 on success, TU_FILE_SEEK_ERROR on failure.
 {
     assert(appdata);
-    int	result = fseek((FILE*)appdata, 0, SEEK_END);
+    int	result = fseek(static_cast<FILE*>(appdata), 0, SEEK_END);
     if (result == EOF) {
 	// @@ TODO should set m_error to something relevant based on errno.
 	return TU_FILE_SEEK_ERROR;
@@ -148,7 +149,7 @@ std_close_func(void *appdata)
 // Return 0 on success, or TU_FILE_CLOSE_ERROR on failure.
 {
     assert(appdata);
-    int	result = fclose((FILE*)appdata);
+    int	result = std::fclose(static_cast<FILE*>(appdata));
     if (result == EOF) {
 	// @@ TODO should set m_error to something relevant based on errno.
 	return TU_FILE_CLOSE_ERROR;
@@ -185,7 +186,7 @@ tu_file::tu_file(FILE* fp, bool autoclose=false)
 {
     //GNASH_REPORT_FUNCTION;
 
-    m_data = (void *)fp;
+    m_data = static_cast<void*>(fp);
     m_read = std_read_func;
     m_write = std_write_func;
     m_seek = std_seek_func;

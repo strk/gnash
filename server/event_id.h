@@ -126,10 +126,13 @@ public:
 		while (key::codeMap[i][key::SWF] != SWFkey && i < key::KEYCOUNT) i++;
 
 		if (i == key::KEYCOUNT) keyCode = key::INVALID;
-		else keyCode = (key::code)i;
+		else keyCode = static_cast<key::code>(i);
 	}
 
-	bool	operator==(const event_id& id) const { return m_id == id.m_id && keyCode == id.keyCode; }
+	bool	operator==(const event_id& id) const
+	{
+	    return m_id == id.m_id && keyCode == id.keyCode;
+	}
 
 	bool operator< (const event_id& id) const
 	{

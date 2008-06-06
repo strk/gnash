@@ -140,7 +140,7 @@ public:
 	template <typename U>
 	bool operator== (const Point2d<U>& p) const
 	{
-		return x == (T)p.x && y == (T)p.y;
+		return x == static_cast<T>(p.x) && y == static_cast<T>(p.y);
 	}
 
 	bool operator!=(const Point2d<T>& p) const

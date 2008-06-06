@@ -21,7 +21,8 @@
 #ifndef UTILITY_H
 #define UTILITY_H
 
-//#include "tu_config.h"
+// HAVE_FINITE, HAVE_PTHREADS, WIN32, NDEBUG etc.
+#include "gnashconfig.h"
 
 #include <cassert>
 #include <cctype>
@@ -96,7 +97,7 @@ namespace utility {
 
 inline bool isFinite(double d)
 {
-#ifndef isfinite
+#if defined(HAVE_FINITE) && !defined(isfinite)
     return (finite(d));
 #else
     // Put using namespace std; here if you have to
@@ -136,7 +137,8 @@ inline int frnd(float f)
 
 inline boost::int32_t Fixed16Mul(boost::int32_t a, boost::int32_t b)
 {
-    return (boost::int32_t)((boost::int64_t)a * (boost::int64_t)b >> 16);
+    return static_cast<boost::int32_t>(
+            static_cast<boost::int64_t>(a) * static_cast<boost::int64_t>(b) >> 16);
 }
 
 }
@@ -170,11 +172,11 @@ inline size_t	bernstein_hash(const void* data_in, int size, unsigned int seed = 
 // concentrated toward zero, instead of randomly distributed in
 // [0,2^32-1], because of shifting up only 5 bits per byte.
 {
-	const unsigned char*	data = (const unsigned char*) data_in;
+	const unsigned char*	data = static_cast<const unsigned char*>(data_in);
 	unsigned int	h = seed;
 	while (size > 0) {
 		size--;
-		h = ((h << 5) + h) ^ (unsigned) data[size];
+		h = ((h << 5) + h) ^ static_cast<unsigned>(data[size]);
 	}
 
 	return h;
@@ -188,11 +190,11 @@ inline size_t	sdbm_hash(const void* data_in, int size, unsigned int seed = 5381)
 // This is somewhat slower, but it works way better than the above
 // hash function for hashing large numbers of 32-bit ints.
 {
-	const unsigned char*	data = (const unsigned char*) data_in;
-	unsigned int	h = seed;
+	const unsigned char* data = static_cast<const unsigned char*>(data_in);
+	unsigned int h = seed;
 	while (size > 0) {
 		size--;
-		h = (h << 16) + (h << 6) - h + (unsigned) data[size];
+		h = (h << 16) + (h << 6) - h + static_cast<unsigned>(data[size]);
 	}
 
 	return h;
@@ -204,11 +206,11 @@ inline size_t	bernstein_hash_case_insensitive(const void* data_in, int size, uns
 // http://www.cs.yorku.ca/~oz/hash.html Due to Dan Bernstein.
 // Allegedly very good on strings.
 {
-	const unsigned char*	data = (const unsigned char*) data_in;
-	unsigned int	h = seed;
+	const unsigned char* data = static_cast<const unsigned char*>(data_in);
+	unsigned int h = seed;
 	while (size > 0) {
 		size--;
-		h = ((h << 5) + h) ^ (unsigned) std::tolower(data[size]);		
+		h = ((h << 5) + h) ^ static_cast<unsigned>(std::tolower(data[size]));		
 	}
 
 	// Alternative: "sdbm" hash function, suggested at same web page above.

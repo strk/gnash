@@ -535,9 +535,9 @@ public:
 	// Flag or unflag an as_value as an exception -- this gets flagged
 	// when an as_value is 'thrown'.
 	void	flag_exception() 
-	{ if (!is_exception()) m_type = (type) ((int) m_type + 1); }
+	{ if (!is_exception()) m_type = static_cast<type>(static_cast<int>(m_type) + 1); }
 	void	unflag_exception()
-	{ if (is_exception()) m_type = (type) ((int) m_type - 1); }
+	{ if (is_exception()) m_type = static_cast<type>(static_cast<int>(m_type) - 1); }
 
 	/// Return true if this value is strictly equal to the given one
 	//
@@ -701,9 +701,9 @@ private:
 	//       primitive value types will require modifications in all callers.
 	//       This happened when adding MOVIECLIP.
 	//
-	type	get_type() const { return m_type; }
+	type get_type() const { return m_type; }
 
-	type	m_type;
+	type m_type;
 
 	typedef sprite_instance* SpritePtr;
 	typedef character* CharacterPtr;

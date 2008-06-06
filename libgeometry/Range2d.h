@@ -76,22 +76,22 @@ private:
 
 	T scaleMin(T min, float scale)
 	{
-		return roundMin((float)min*scale);
+		return roundMin(static_cast<float>(min) * scale);
 	}
 
 	T scaleMax(T max, float scale)
 	{
-		return roundMax((float)max*scale);
+		return roundMax(static_cast<float>(max) * scale);
 	}
 
 	T roundMin(float v)
 	{
-		return (T)v;
+		return static_cast<T>(v);
 	}
 
 	T roundMax(float v)
 	{
-		return (T)v;
+		return static_cast<T>(v);
 	}
 
 public:
@@ -787,7 +787,7 @@ Intersection(const Range2d<T>& r1, const Range2d<T>& r2)
 template <> inline int
 Range2d<int>::roundMin(float min)
 {
-	return static_cast<int>(floor(min));
+	return static_cast<int>(std::floor(min));
 }
 
 /// Specialization of minimum value rounding for unsigned int type.
@@ -797,7 +797,7 @@ Range2d<int>::roundMin(float min)
 template <> inline unsigned int
 Range2d<unsigned int>::roundMin(float min)
 {
-	return static_cast<unsigned int>(floor(min));
+	return static_cast<unsigned int>(std::floor(min));
 }
 
 /// Specialization of maximum value rounding for int type.
@@ -807,7 +807,7 @@ Range2d<unsigned int>::roundMin(float min)
 template <> inline int
 Range2d<int>::roundMax(float max)
 {
-	return static_cast<int>(ceil(max));
+	return static_cast<int>(std::ceil(max));
 }
 
 /// Specialization of maximum value rounding for unsigned int type.
@@ -817,7 +817,7 @@ Range2d<int>::roundMax(float max)
 template <> inline unsigned int
 Range2d<unsigned int>::roundMax(float max)
 {
-	return static_cast<unsigned int>(ceil((float)max));
+	return static_cast<unsigned int>(std::ceil(static_cast<float>(max)));
 }
 
 /// Specialization of area value for int type.

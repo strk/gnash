@@ -24,13 +24,13 @@ if KPARTS
 SUBDIRS += klash
 endif
 
-if NSAPI
+if NPAPI
 SUBDIRS += mozilla-sdk
 
 if WIN32
 SUBDIRS += win32
 endif
-endif # NSAPI
+endif # NPAPI
 
 # if DMALLOC
 # MALL_CFLAGS = $(DMALLOC_CFLAGS)
@@ -90,7 +90,7 @@ noinst_HEADERS = plugin.h \
          mozilla-sdk/include/obsolete/protypes.h 
 
 if !WIN32
-if NSAPI
+if NPAPI
 
 plugin_LTLIBRARIES = libgnashplugin.la
 
@@ -107,7 +107,7 @@ libgnashplugin_la_LDFLAGS = -avoid-version -L$(plugindir)
 else
 libgnashplugin_la_LDFLAGS = -module -avoid-version -L$(plugindir)
 endif
-endif # NSAPI
+endif # NPAPI
 endif # WIN32
 
 test_perms:

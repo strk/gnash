@@ -24,7 +24,7 @@ AC_DEFUN([GNASH_PATH_FIREFOX],
 [dnl 
 
   FIREFOX_PLUGINS=""
-  if test x"${nsapi}" = x"yes"; then
+  if test x"${npapi}" = x"yes"; then
 
   AC_ARG_WITH(npapi-install,
     AC_HELP_STRING([--with-npapi-install=system|user|prefix], [Policy for NPAPI plugin install. Default: user.]),

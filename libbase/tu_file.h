@@ -89,13 +89,14 @@ public:
     /// TODO: define what happens when the stream
     ///       is in error condition, see get_error().
     ///
-    boost::uint32_t 	read_le32() {
-	// read8() is boost::uint8_t, so no masks with 0xff are required.
-	boost::uint32_t result = (boost::uint32_t)read8();
-	result |= (boost::uint32_t)read8() << 8;
-	result |= (boost::uint32_t)read8() << 16;
-	result |= (boost::uint32_t)read8() << 24;
-	return(result);
+    boost::uint32_t read_le32() 
+    {
+	    // read8() is boost::uint8_t, so no masks with 0xff are required.
+	    boost::uint32_t result = static_cast<boost::uint32_t>(read8());
+	    result |= static_cast<boost::uint32_t>(read8()) << 8;
+	    result |= static_cast<boost::uint32_t>(read8()) << 16;
+	    result |= static_cast<boost::uint32_t>(read8()) << 24;
+	    return(result);
     }
 	
 	/// \brief Read a 64-bit word from a little-ending stream,
@@ -104,7 +105,8 @@ public:
 	/// TODO: define what happens when the stream is in
 	///       error condition, see get_error().
 	/// TODO: define a platform-neutral type for 64 bits.
-	long double read_le_double64() {
+	long double read_le_double64()
+	{
 		return static_cast<long double> (
 			static_cast<boost::int64_t> (read_le32()) |
 			static_cast<boost::int64_t> (read_le32()) << 32
@@ -116,10 +118,11 @@ public:
     /// TODO: define what happens when the stream
     ///       is in error condition, see get_error().
     ///
-    boost::uint16_t 	read_le16() {
-	boost::uint16_t result = (boost::uint16_t)read8();
-	result |= (boost::uint16_t)read8() << 8;
-	return(result);
+    boost::uint16_t read_le16()
+    {
+	    boost::uint16_t result = static_cast<boost::uint16_t>(read8());
+	    result |= static_cast<boost::uint16_t>(read8()) << 8;
+	    return(result);
     }
 
     /// \brief Write a 32-bit word to a little-endian stream.
@@ -127,11 +130,12 @@ public:
     /// TODO: define what happens when the stream
     ///       is in error condition, see get_error().
     ///
-    void 	write_le32(boost::uint32_t u) {
-	write8((boost::uint8_t)u);
-	write8((boost::uint8_t)(u>>8));
-	write8((boost::uint8_t)(u>>16));
-	write8((boost::uint8_t)(u>>24));
+    void 	write_le32(boost::uint32_t u)
+    {
+        write8(static_cast<boost::int8_t>(u));
+        write8(static_cast<boost::int8_t>(u>>8));
+        write8(static_cast<boost::int8_t>(u>>16));
+        write8(static_cast<boost::int8_t>(u>>24));
     }
 
     /// \brief Write a 16-bit word to a little-endian stream.
@@ -139,9 +143,10 @@ public:
     /// TODO: define what happens when the stream
     ///       is in error condition, see get_error().
     ///
-    void 	write_le16(boost::uint16_t u) {
-	write8((boost::uint8_t)u);
-	write8((boost::uint8_t)(u>>8));
+    void write_le16(boost::uint16_t u)
+    {
+        write8(static_cast<boost::int8_t>(u));
+        write8(static_cast<boost::int8_t>(u>>8));
     }
     
     /// \brief Read a single byte from the stream
@@ -149,28 +154,34 @@ public:
     /// TODO: define what happens when the stream
     ///       is in error condition, see get_error().
     ///
-    boost::uint8_t 	read_byte() { return read8(); }
+    boost::uint8_t read_byte() { return read8(); }
 
     /// \brief write a single byte to the stream
     //
     /// TODO: define what happens when the stream
     ///       is in error condition, see get_error().
     ///
-    void	write_byte(boost::uint8_t u) { write8(u); }
+    void write_byte(boost::uint8_t u) { write8(u); }
     
     /// \brief Read the given number of bytes from the stream
     //
     /// TODO: define what happens when the stream
     ///       is in error condition, see get_error().
     ///
-    int 	read_bytes(void* dst, int num) { return m_read(dst, num, m_data); }
+    int read_bytes(void* dst, int num)
+    {
+        return m_read(dst, num, m_data);
+    }
 
     /// \brief Write the given number of bytes to the stream
     //
     /// TODO: define what happens when the stream
     ///       is in error condition, see get_error().
     ///
-    int 	write_bytes(const void* src, int num) { return m_write(src, num, m_data); }
+    int write_bytes(const void* src, int num)
+    {
+        return m_write(src, num, m_data);
+    }
     
     /// \brief Write a 0-terminated string to a stream.
     //
@@ -233,7 +244,7 @@ public:
     /// TODO: define what to return when in error condition
     /// see get_error().
     ///
-    bool	get_eof() { return m_get_eof(m_data); }
+    bool get_eof() { return m_get_eof(m_data); }
     
     /// \brief Return non-zero if the stream is in an error state
     //
@@ -250,45 +261,60 @@ public:
     int get_size() { return m_get_stream_size(m_data); }
     
     // \brief UNSAFE back door, for testing only.
-    void*	get_app_data_DEBUG() { return m_data; }
+    void* get_app_data_DEBUG() { return m_data; }
     
     
 private:
-    boost::uint64_t	read64() {
-	boost::uint64_t u;
-	m_read(&u, 8, m_data);
-	return u;
+
+    boost::uint64_t	read64()
+    {
+        boost::uint64_t u;
+        m_read(&u, 8, m_data);
+        return u;
     }
-    boost::uint32_t	read32() {
-	boost::uint32_t u;
-	m_read(&u, 4, m_data);
-	return u;
+
+    boost::uint32_t	read32()
+    {
+        boost::uint32_t u;
+        m_read(&u, 4, m_data);
+        return u;
     }
-    boost::uint16_t	read16() {
-	boost::uint16_t u;
-	m_read(&u, 2, m_data);
-	return u;
-    }
-    boost::uint8_t	read8() {
-	boost::uint8_t u;
-	m_read(&u, 1, m_data);
-	return u;
-    }
-    
-    void	write64(boost::uint64_t u) {
-	m_write(&u, 8, m_data);
-    }
-    void	write32(boost::uint32_t u) {
-	m_write(&u, 4, m_data);
-    }
-    void	write16(boost::uint16_t u) {
-	m_write(&u, 2, m_data);
-    }
-    void	write8(boost::uint8_t u) {
-	m_write(&u, 1, m_data);
+
+    boost::uint16_t read16()
+    {
+        boost::uint16_t u;
+        m_read(&u, 2, m_data);
+        return u;
     }
     
-    void	close();
+    boost::uint8_t	read8()
+    {
+        boost::uint8_t u;
+        m_read(&u, 1, m_data);
+        return u;
+    }
+    
+    void write64(boost::uint64_t u)
+    {
+        m_write(&u, 8, m_data);
+    }
+
+    void write32(boost::uint32_t u)
+    {
+        m_write(&u, 4, m_data);
+    }
+
+    void write16(boost::uint16_t u)
+    {
+        m_write(&u, 2, m_data);
+    }
+
+    void write8(boost::uint8_t u)
+    {
+        m_write(&u, 1, m_data);
+    }
+    
+    void close();
     
     void *		m_data;
     read_func		m_read;
@@ -314,9 +340,10 @@ private:
 inline void	tu_file::write_float32(float value)
 {
     union alias {
-	float	f;
-	boost::uint32_t	i;
+        float	f;
+        boost::uint32_t	i;
     } u;
+
     compiler_assert(sizeof(alias) == sizeof(boost::uint32_t));
     
     u.f = value;
@@ -331,9 +358,10 @@ inline float	tu_file::read_float32()
 // Read a 32-bit little-endian float from this file.
 {
     union {
-	float	f;
-	boost::uint32_t	i;
+        float	f;
+        boost::uint32_t	i;
     } u;
+
     compiler_assert(sizeof(u) == sizeof(u.i));
     
     u.i = read_le32();
