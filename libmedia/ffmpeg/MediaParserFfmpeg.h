@@ -57,27 +57,6 @@ public:
 	~MediaParserFfmpeg();
 
 	// See dox in MediaParser.h
-	virtual boost::uint32_t getBufferLength();
-
-	// See dox in MediaParser.h
-	virtual bool nextVideoFrameTimestamp(boost::uint64_t& ts);
-
-	// See dox in MediaParser.h
-	virtual std::auto_ptr<EncodedVideoFrame> nextVideoFrame();
-
-	// See dox in MediaParser.h
-	virtual bool nextAudioFrameTimestamp(boost::uint64_t& ts);
-
-	// See dox in MediaParser.h
-	virtual std::auto_ptr<EncodedAudioFrame> nextAudioFrame();
-
-	// See dox in MediaParser.h
-	virtual VideoInfo* getVideoInfo();
-
-	// See dox in MediaParser.h
-	virtual AudioInfo* getAudioInfo();
-
-	// See dox in MediaParser.h
 	virtual boost::uint32_t seek(boost::uint32_t);
 
 	// See dox in MediaParser.h
@@ -88,86 +67,12 @@ public:
 
 private:
 
-	/// Information about an FFMPEG Video Frame
-	class VideoFrameInfo
-	{
-	public:
-
-		VideoFrameInfo()
-			:
-			isKeyFrame(false),
-			dataSize(0),
-			dataPosition(0),
-			timestamp(0)
-		{}
-
-		/// Type of this frame 
-		bool isKeyFrame;
-
-		/// Size of the frame in bytes (needed?)
-		boost::uint32_t dataSize;
-
-		/// Start of frame data in stream
-		boost::uint64_t dataPosition;
-
-		/// Timestamp in milliseconds 
-		boost::uint32_t timestamp;
-
-	};
-
-	/// Information about an FFMPEG Audio Frame
-	class AudioFrameInfo
-	{
-	public:
-
-		AudioFrameInfo()
-			:
-			dataSize(0),
-			dataPosition(0),
-			timestamp(0)
-		{}
-
-		/// Size of the frame in bytes (needed?)
-		boost::uint32_t dataSize;
-
-		/// Start of frame data in stream
-		boost::uint64_t dataPosition;
-
-		/// Timestamp in milliseconds 
-		boost::uint32_t timestamp;
-
-	};
-
-	// NOTE: VideoFrameInfo is a relatively small structure,
-	//       chances are keeping by value here would reduce
-	//       memory fragmentation with no big cost
-	typedef std::vector<VideoFrameInfo*> VideoFrames;
-
-	/// list of videoframes, does no contain the frame data.
-	//
-	/// Elements owned by this class.
-	///
-	VideoFrames _videoFrames;
-
 	/// Video frame cursor position 
 	//
 	/// This is the video frame number that will
 	/// be referenced by nextVideoFrame and nextVideoFrameTimestamp
 	///
 	size_t _nextVideoFrame;
-
-	/// Info about the video stream (if any)
-	std::auto_ptr<VideoInfo> _videoInfo;
-
-	// NOTE: AudioFrameInfo is a relatively small structure,
-	//       chances are keeping by value here would reduce
-	//       memory fragmentation with no big cost
-	typedef std::vector<AudioFrameInfo*> AudioFrames;
-
-	/// list of audioframes, does no contain the frame data.
-	//
-	/// Elements owned by this class.
-	AudioFrames _audioFrames;
 
 	/// Audio frame cursor position 
 	//
@@ -176,32 +81,11 @@ private:
 	///
 	size_t _nextAudioFrame;
 
-	/// Info about the audio stream (if any)
-	std::auto_ptr<AudioInfo> _audioInfo;
-
 	/// Parse next media frame
 	//
 	/// @return false on error or eof, true otherwise
 	///
 	bool parseNextFrame();
-
-	/// Parse a video frame
-	//
-	/// Basically create a VideoFrameInfo out of the AVPacket and push
-	/// it on the container.
-	///
-	/// @return false on error 
-	///
-	bool parseVideoFrame(AVPacket& packet);
-
-	/// Parse an audio frame
-	//
-	/// Basically create a AudioFrameInfo out of the AVPacket and push
-	/// it on the container.
-	///
-	/// @return false on error 
-	///
-	bool parseAudioFrame(AVPacket& packet);
 
 	/// Input chunk reader, to be called by ffmpeg parser
 	int readPacket(boost::uint8_t* buf, int buf_size);
@@ -236,14 +120,14 @@ private:
 	AVStream* _audioStream;
 
 	/// ?
-	ByteIOContext ByteIOCxt;
+	ByteIOContext _byteIOCxt;
 
 	/// Size of the ByteIO context buffer
 	//
 	/// This seems to be the size of chunks read
 	/// by av_read_frame.
 	///
-	static const size_t byteIOBufferSize = 1024; // 500000;
+	static const size_t byteIOBufferSize = 1024;
 
 	boost::scoped_array<unsigned char> _byteIOBuffer;
 
@@ -256,6 +140,12 @@ private:
 	///
 	boost::uint16_t SampleFormatToSampleSize(SampleFormat fmt);
 
+	/// Make an EncodedVideoFrame from an AVPacket and push to buffer
+	//
+	bool parseVideoFrame(AVPacket& packet);
+
+	/// Make an EncodedAudioFrame from an AVPacket and push to buffer
+	bool parseAudioFrame(AVPacket& packet);
 };
 
 

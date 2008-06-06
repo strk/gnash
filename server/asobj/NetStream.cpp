@@ -529,9 +529,6 @@ long
 NetStream::bufferLength()
 {
 	if (m_parser.get() == NULL) return 0;
-
-	// m_parser will lock a mutex
-	// FLVParser::getBufferLength returns milliseconds already
 	return m_parser->getBufferLength();
 }
 

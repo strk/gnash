@@ -175,45 +175,6 @@ public:
 	/// Kills the parser...
 	~FLVParser();
 
-	// see dox in MediaParser.h
-	bool nextAudioFrameTimestamp(boost::uint64_t& ts);
-
-	// see dox in MediaParser.h
-	bool nextVideoFrameTimestamp(boost::uint64_t& ts);
-
-	// see dox in MediaParser.h
-	std::auto_ptr<EncodedAudioFrame> nextAudioFrame();
-
-	// see dox in MediaParser.h
-	std::auto_ptr<EncodedVideoFrame> nextVideoFrame();
-
-	/// Returns information about video in the stream.
-	//
-	/// The returned object is owned by the FLVParser object.
-	/// Can return NULL if video contains NO video frames.
-	/// Will block till either parsing finished or a video frame is found.
-	///
-	VideoInfo* getVideoInfo();
-
-	/// Returns a FLVAudioInfo class about the audiostream
-	//
-	/// TODO: return a more abstract AudioInfo
-	///
-	AudioInfo* getAudioInfo();
-
-	/// \brief
-	/// Asks if a frame with with a timestamp larger than
-	/// the given time is available.
-	//
-	/// If such a frame is not
-	/// available in list of already the parsed frames, we
-	/// parse some more. This is used to check how much is buffered.
-	///
-	/// @param time
-	///	Timestamp, in milliseconds.
-	///
-	bool isTimeLoaded(boost::uint32_t time);
-
 	/// \brief
 	/// Seeks to the closest possible position the given position,
 	/// and returns the new position.
@@ -225,30 +186,7 @@ public:
 	///
 	boost::uint32_t seek(boost::uint32_t);
 
-	/// Returns the framedelay from the last to the current
-	/// audioframe in milliseconds. This is used for framerate.
-	//
-	boost::uint32_t audioFrameDelay();
-
-	/// \brief
-	/// Returns the framedelay from the last to the current
-	/// videoframe in milliseconds. 
-	//
-	boost::uint32_t videoFrameDelay();
-
-	/// Returns the framerate of the video
-	//
-	boost::uint16_t videoFrameRate();
-
-	/// Returns the "bufferlength", meaning the differens between the
-	/// current frames timestamp and the timestamp of the last parseable
-	/// frame. Returns the difference in milliseconds.
-	//
-	boost::uint32_t getBufferLength();
-
-	virtual bool parseNextChunk() {
-		return parseNextTag();
-	}
+	virtual bool parseNextChunk();
 
 	/// Parses next tag from the file
 	//
@@ -262,64 +200,14 @@ public:
 
 private:
 
-	/// \brief
-	/// Get info about the audio frame to return
-	/// on nextAudioFrame() call
-	//
-	/// Returned object is owned by this class.
-	///
-	FLVAudioFrameInfo* peekNextAudioFrameInfo();
-
-	/// \brief
-	/// Get info about the video frame to return
-	/// on nextAudioFrame() call
-	//
-	/// Returned object is owned by this class.
-	///
-	FLVVideoFrameInfo* peekNextVideoFrameInfo();
-
-	/// seeks to the closest possible position the given position,
-	/// and returns the new position.
-	boost::uint32_t seekAudio(boost::uint32_t time);
-
-	/// seeks to the closest possible position the given position,
-	/// and returns the new position.
-	boost::uint32_t seekVideo(boost::uint32_t time);
-
 	/// Parses the header of the file
 	bool parseHeader();
 
 	// Functions used to extract numbers from the file
 	inline boost::uint32_t getUInt24(boost::uint8_t* in);
 
-	// NOTE: FLVVideoFrameInfo is a relatively small structure,
-	//       chances are keeping by value here would reduce
-	//       memory fragmentation with no big cost
-	typedef std::vector<FLVVideoFrameInfo*> VideoFrames;
-
-	/// list of videoframes, does no contain the frame data.
-	//
-	/// Elements owned by this class.
-	VideoFrames _videoFrames;
-
-	// NOTE: FLVAudioFrameInfo is a relatively small structure,
-	//       chances are keeping by value here would reduce
-	//       memory fragmentation with no big cost
-	typedef std::vector<FLVAudioFrameInfo*> AudioFrames;
-
-	/// list of audioframes, does no contain the frame data.
-	//
-	/// Elements owned by this class.
-	AudioFrames _audioFrames;
-
 	/// The position where the parsing should continue from.
 	boost::uint64_t _lastParsedPosition;
-
-	/// Info about the video stream (if any)
-	std::auto_ptr<VideoInfo> _videoInfo;
-
-	/// Info about the audio stream (if any)
-	std::auto_ptr<AudioInfo> _audioInfo;
 
 	/// Audio frame cursor position 
 	//
@@ -340,6 +228,10 @@ private:
 
 	/// Audio stream is present
 	bool _video;
+
+	std::auto_ptr<EncodedAudioFrame> readAudioFrame(boost::uint32_t dataSize, boost::uint32_t timestamp);
+
+	std::auto_ptr<EncodedVideoFrame> readVideoFrame(boost::uint32_t dataSize, boost::uint32_t timestamp);
 };
 
 } // end of gnash::media namespace

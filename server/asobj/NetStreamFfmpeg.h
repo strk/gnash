@@ -112,7 +112,6 @@ public:
 
 	long bytesTotal();
 
-	long bufferLength();
 private:
 
 	enum PlaybackState {

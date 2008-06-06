@@ -76,6 +76,7 @@ libgnashmedia_la_SOURCES = \
 	MediaHandler.cpp \
 	AudioDecoderNellymoser.cpp \
 	AudioDecoderSimple.cpp \
+	MediaParser.cpp \
 	FLVParser.cpp \
 	Util.cpp \
 	$(NULL)

@@ -24,10 +24,11 @@
 #include "gnashconfig.h"
 #endif
 
+#include "tu_file.h" // for inlines
+
 #include <boost/scoped_array.hpp>
 #include <memory>
-
-#include "tu_file.h" // for inlines
+#include <deque>
 
 namespace gnash {
 namespace media {
@@ -237,20 +238,25 @@ public:
 	// of subclasses will never be invoked, tipically resulting
 	// in memory leaks..
 	//
-	virtual ~MediaParser() {};
+	virtual ~MediaParser();
 
-	/// Returns the "bufferlength", meaning the difference between the
-	/// current frames timestamp and the timestamp of the last parseable
-	/// frame. Returns the difference in milliseconds.
+	/// Returns mininum length of available buffers in milliseconds
 	//
-	virtual boost::uint32_t getBufferLength()=0;
+	/// TODO: FIXME: NOTE: this is currently used by NetStream.bufferLength
+	/// but is bogus as it doesn't take the *current* playhead cursor time
+	/// into account. A proper way would be having a  getLastBufferTime ()
+	/// interface here, returning minimun timestamp of last available 
+	/// frames and let NetSTream::bufferLength() use that with playhead
+	/// time to find out...
+	///
+	boost::uint64_t getBufferLength() const;
 
 	/// Get timestamp of the video frame which would be returned on nextVideoFrame
 	//
 	/// @return false if there no video frame left
 	///         (either none or no more)
 	///
-	virtual bool nextVideoFrameTimestamp(boost::uint64_t& ts)=0;
+	bool nextVideoFrameTimestamp(boost::uint64_t& ts) const;
 
 	/// Returns the next video frame in the parsed buffer, advancing video cursor.
 	//
@@ -259,14 +265,14 @@ public:
 	/// you can check with parsingCompleted() to know wheter this is due to 
 	/// EOF reached.
 	///
-	virtual std::auto_ptr<EncodedVideoFrame> nextVideoFrame()=0;
+	std::auto_ptr<EncodedVideoFrame> nextVideoFrame();
 
 	/// Get timestamp of the audio frame which would be returned on nextAudioFrame
 	//
 	/// @return false if there no video frame left
 	///         (either none or no more)
 	///
-	virtual bool nextAudioFrameTimestamp(boost::uint64_t& ts)=0;
+	bool nextAudioFrameTimestamp(boost::uint64_t& ts) const;
 
 	/// Returns the next audio frame in the parsed buffer, advancing audio cursor.
 	//
@@ -275,17 +281,21 @@ public:
 	/// you can check with parsingCompleted() to know wheter this is due to 
 	/// EOF reached.
 	///
-	virtual std::auto_ptr<EncodedAudioFrame> nextAudioFrame()=0;
+	std::auto_ptr<EncodedAudioFrame> nextAudioFrame();
 
 	/// Is the input MP3?
 	//
 	/// @return if the input audio is MP3
+	///
+	/// TODO: drop ?
 	///
 	bool isAudioMp3() { return _isAudioMp3; }
 
 	/// Is the input Nellymoser?
 	//
 	/// @return if the input audio is Nellymoser
+	///
+	/// TODO: drop ?
 	///
 	bool isAudioNellymoser() { return _isAudioNellymoser; }
 
@@ -294,14 +304,14 @@ public:
 	/// @return a VideoInfo class about the videostream,
 	///         or zero if stream contains no video
 	///
-	virtual VideoInfo* getVideoInfo() { return 0; }
+	VideoInfo* getVideoInfo() { return _videoInfo.get(); }
 
 	/// Returns a AudioInfo class about the audiostream
 	//
 	/// @return a AudioInfo class about the audiostream,
 	///         or zero if stream contains no audio
 	///
-	virtual AudioInfo* getAudioInfo() { return 0; }
+	AudioInfo* getAudioInfo() { return _audioInfo.get(); }
 
 	/// Seeks to the closest possible position the given position.
 	//
@@ -361,10 +371,49 @@ public:
 
 protected:
 
+	typedef std::deque<EncodedVideoFrame*> VideoFrames;
+	typedef std::deque<EncodedAudioFrame*> AudioFrames;
+
+	/// Queue of video frames (the video buffer)
+	//
+	/// Elements owned by this class.
+	///
+	VideoFrames _videoFrames;
+
+	/// Queue of audio frames (the audio buffer)
+	//
+	/// Elements owned by this class.
+	///
+	AudioFrames _audioFrames;
+
+	/// Return pointer to next encoded video frame in buffer
+	//
+	/// If no video is present, or queue is empty, 0 is returned
+	///
+	const EncodedVideoFrame* peekNextVideoFrame() const;
+
+	/// Return pointer to next encoded audio frame in buffer
+	//
+	/// If no video is present, or queue is empty, 0 is returned
+	///
+	const EncodedAudioFrame* peekNextAudioFrame() const;
+
+	/// Info about the video stream (if any)
+	std::auto_ptr<VideoInfo> _videoInfo;
+
+	/// Info about the audio stream (if any)
+	std::auto_ptr<AudioInfo> _audioInfo;
+
 	/// Is the input audio MP3?
+	//
+	/// TODO: drop ?
+	///
 	bool _isAudioMp3;
 
 	/// Is the input audio Nellymoser?
+	//
+	/// TODO: drop ?
+	///
 	bool _isAudioNellymoser;
 
 	/// The stream used to access the file
@@ -372,6 +421,14 @@ protected:
 
 	/// Whether the parsing is complete or not
 	bool _parsingComplete;
+
+private:
+
+	/// Return diff between timestamp of last and first audio frame
+	boost::uint64_t audioBufferLength() const;
+
+	/// Return diff between timestamp of last and first video frame
+	boost::uint64_t videoBufferLength() const;
 };
 
 

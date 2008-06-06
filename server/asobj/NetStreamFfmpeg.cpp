@@ -507,17 +507,16 @@ NetStreamFfmpeg::decodeNextAudioFrame()
 	}
 
     	media::raw_mediadata_t* raw = new media::raw_mediadata_t();
-	raw->m_data = _audioDecoder->decode(*frame, raw->m_size);
+	raw->m_data = _audioDecoder->decode(*frame, raw->m_size); 
 
 #ifdef GNASH_DEBUG_DECODING
-        log_debug("NetStreamFfmpeg::decodeNextAudioFrame: "
-                "%d bytes of encoded audio "
-                "decoded to %d bytes",
-                frame->dataSize,
-                raw->m_size);
+	log_debug("NetStreamFfmpeg::decodeNextAudioFrame: "
+		"%d bytes of encoded audio "
+		"decoded to %d bytes",
+		frame->dataSize,
+		raw->m_size);
 #endif // GNASH_DEBUG_DECODING
 
-	//raw->m_stream_index = m_audio_index; // no idea what this is needed for
 	raw->m_ptr = raw->m_data; // no idea what this is needed for
 	raw->m_pts = frame->timestamp;
 
@@ -713,7 +712,7 @@ NetStreamFfmpeg::pushDecodedAudioFrames(boost::uint32_t ts)
 #ifdef GNASH_DEBUG_DECODING
 		// this one we might avoid :) -- a less intrusive logging could
 		// be take note about how many things we're pushing over
-		log_debug("pushDecodedAudioFrames(%d) pushing frame with timestamp %d", ts, nextTimestamp); 
+		log_debug("pushDecodedAudioFrames(%d) pushing %dth frame with timestamp %d", ts, _audioQueue.size()+1, nextTimestamp); 
 #endif
 		_audioQueue.push_back(audio);
 	}
@@ -729,7 +728,11 @@ NetStreamFfmpeg::refreshVideoFrame(bool alsoIfPaused)
 	assert ( m_parser.get() );
 
 	// nothing to do if we don't have a video decoder
-	if ( ! _videoDecoder.get() ) return;
+	if ( ! _videoDecoder.get() )
+	{
+		log_debug("refreshVideoFrame: no video decoder, nothing to do");
+		return;
+	}
 
 #ifdef GNASH_DEBUG_DECODING
 	// bufferLength() would lock the mutex (which we already hold),
@@ -944,26 +947,6 @@ NetStreamFfmpeg::bytesLoaded ()
   	}
 
 	return m_parser->getBytesLoaded();
-}
-
-long
-NetStreamFfmpeg::bufferLength ()
-{
-#ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
-	boost::mutex::scoped_lock lock(_parserMutex);
-#endif // LOAD_MEDIA_IN_A_SEPARATE_THREAD
-
-  	if ( ! m_parser.get() )
-	{
-		log_debug("bytesTotal: no parser, no party");
-		return 0;
-  	}
-
-	boost::uint32_t maxTimeInBuffer = m_parser->getBufferLength();
-	boost::uint64_t curPos = _playHead.getPosition();
-
-	if ( maxTimeInBuffer < curPos ) return 0;
-	return maxTimeInBuffer-curPos;
 }
 
 long

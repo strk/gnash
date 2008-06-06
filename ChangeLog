@@ -1,3 +1,22 @@
+2008-06-06 Sandro Santilli <strk@keybit.net>
+
+	* libmedia/: Makefile.am, MediaParser.{cpp,h}:
+	  Change MediaParser so that "The Buffer" is queues
+	  of encoded frames, move all buffer inspectors
+	  in the base class.
+	* libmedia/FLVParser.{cpp,h}: drop all buffer inspectors
+	  (now in base class), reimplemnet fillers to push encoded
+	  frames.
+	* libmedia/ffmpeg/MediaParserFfmpeg.{cpp,h}: drop all
+	  buffer inspectors (now in base class), reimplement
+	  fillers to push encoded frames.
+	* server/asobj/NetStream.cpp: minor comment cleanup
+	* server/asobj/NetStreamFfmpeg.h: don't override bufferLength,
+	  the one in NetStream is kind of fine for now (not 100%,
+	  but could be when PlayHead will be in the base class).
+	* server/asobj/NetStreamFfmpeg.cpp: drop bufferLength override,
+	  cleanup some debugging calls.
+
 2008-06-06  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* libamf/amf.cpp: Add support for NULL objects.

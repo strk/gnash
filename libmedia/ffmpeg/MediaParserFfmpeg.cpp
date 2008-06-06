@@ -82,105 +82,6 @@ MediaParserFfmpeg::probeStream()
 }
 
 boost::uint32_t
-MediaParserFfmpeg::getBufferLength()
-{
-	// TODO: figure wheter and why we should privilege
-	//       video frames over audio frames when both
-	//       are available
-	//	 I belive the corrent behaviour here would
-	//	 be using the smallest max-timestamp..
-
-	if (_videoStream && ! _videoFrames.empty())
-	{
-		return _videoFrames.back()->timestamp; 
-	}
-
-	if (_audioStream && ! _audioFrames.empty())
-	{
-		return _audioFrames.back()->timestamp; 
-	}
-
-	return 0;
-}
-
-bool
-MediaParserFfmpeg::nextVideoFrameTimestamp(boost::uint64_t& ts)
-{
-	// If there is no video in this stream return NULL
-	if (!_videoStream) return false;
-
-	// Make sure that there are parsed enough frames to return the need frame
-	while(_videoFrames.size() <= _nextVideoFrame && !_parsingComplete)
-	{
-		if (!parseNextFrame()) break;
-	}
-
-	// If the needed frame can't be parsed (EOF reached) return NULL
-	if (_videoFrames.empty() || _videoFrames.size() <= _nextVideoFrame)
-	{
-		//gnash::log_debug("The needed frame (%d) can't be parsed (EOF reached)", _lastVideoFrame);
-		return false;
-	}
-
-	VideoFrameInfo* info = _videoFrames[_nextVideoFrame];
-	ts = info->timestamp;
-	return true;
-}
-
-std::auto_ptr<EncodedVideoFrame>
-MediaParserFfmpeg::nextVideoFrame()
-{
-	std::auto_ptr<EncodedVideoFrame> ret;
-	LOG_ONCE( log_unimpl("%s", __PRETTY_FUNCTION__) );
-	return ret;
-}
-
-bool
-MediaParserFfmpeg::nextAudioFrameTimestamp(boost::uint64_t& ts)
-{
-	// If there is no audio in this stream return NULL
-	if (!_audioStream) return false;
-
-	// Make sure that there are parsed enough frames to return the need frame
-	while(_audioFrames.size() <= _nextAudioFrame && !_parsingComplete)
-	{
-		if (!parseNextFrame()) break;
-	}
-
-	// If the needed frame can't be parsed (EOF reached) return NULL
-	if (_audioFrames.empty() || _audioFrames.size() <= _nextAudioFrame)
-	{
-		//gnash::log_debug("The needed frame (%d) can't be parsed (EOF reached)", _lastAudioFrame);
-		return false;
-	}
-
-	AudioFrameInfo* info = _audioFrames[_nextAudioFrame];
-	ts = info->timestamp;
-	return true;
-}
-
-std::auto_ptr<EncodedAudioFrame>
-MediaParserFfmpeg::nextAudioFrame()
-{
-	std::auto_ptr<EncodedAudioFrame> ret;
-
-	LOG_ONCE( log_unimpl("%s", __PRETTY_FUNCTION__) );
-	return ret;
-}
-
-VideoInfo*
-MediaParserFfmpeg::getVideoInfo()
-{
-	return _videoInfo.get();
-}
-
-AudioInfo*
-MediaParserFfmpeg::getAudioInfo()
-{
-	return _audioInfo.get();
-}
-
-boost::uint32_t
 MediaParserFfmpeg::seek(boost::uint32_t pos)
 {
 	log_debug("MediaParserFfmpeg::seek(%d) TESTING", pos);
@@ -234,26 +135,24 @@ MediaParserFfmpeg::parseVideoFrame(AVPacket& packet)
 	//
 	boost::uint64_t timestamp = static_cast<boost::uint64_t>(packet.dts * as_double(_videoStream->time_base) * 1000.0); 
 
+	LOG_ONCE( log_unimpl("%s", __PRETTY_FUNCTION__) );
+	return false;
+
+#if 0
+
 	// flags, for keyframe
 	bool isKeyFrame = packet.flags&PKT_FLAG_KEY;
-
-	// Frame offset in input
-	boost::int64_t offset = packet.pos;
-	if ( offset < 0 )
-	{
-		LOG_ONCE(log_debug("Unknown offset of video frame, should we pretend we know ? or rely on ffmpeg seeking ? I guess the latter will do for a start."));
-		//return false;
-	}
 
 	VideoFrameInfo* info = new VideoFrameInfo;
 	info->dataSize = packet.size;
 	info->isKeyFrame = isKeyFrame;
-	info->dataPosition = offset;
+	info->dataPosition = pos;
 	info->timestamp = timestamp;
 
 	_videoFrames.push_back(info); // takes ownership
 
 	return true;
+#endif
 }
 
 bool
@@ -272,22 +171,18 @@ MediaParserFfmpeg::parseAudioFrame(AVPacket& packet)
 	//
 	boost::uint64_t timestamp = static_cast<boost::uint64_t>(packet.dts * as_double(_audioStream->time_base) * 1000.0); 
 
-	// Frame offset in input
-	boost::int64_t offset = packet.pos;
-	if ( offset < 0 )
-	{
-		LOG_ONCE(log_debug("Unknown offset of audio frame, should we pretend we know ? or rely on ffmpeg seeking ? I guess the latter will do for a start."));
-		//return false;
-	}
+	LOG_ONCE( log_unimpl("%s", __PRETTY_FUNCTION__) );
+	return false;
+#if 0
+	std::auto_ptr<EncodedAudioFrame> frame ( new EncodedAudioFrame );
 
-	AudioFrameInfo* info = new AudioFrameInfo;
-	info->dataSize = packet.size;
-	info->dataPosition = offset > 0 ? (boost::uint64_t)offset : 0;
-	info->timestamp = timestamp;
+	frame->dataSize = packet.size
+	frame->timestamp = timestamp;
 
-	_audioFrames.push_back(info); // takes ownership
+	_audioFrames.push_back(frame.release()); // takes ownership
 
 	return true;
+#endif
 }
 
 bool
@@ -295,17 +190,22 @@ MediaParserFfmpeg::parseNextFrame()
 {
 	if ( _parsingComplete )
 	{
-		//log_debug("MediaParserFfmpeg::parseNextFrame: parsing complete, nothing to do");
+		log_debug("MediaParserFfmpeg::parseNextFrame: parsing complete, nothing to do");
 		return false;
 	}
+
+	// position the stream where we left parsing as
+	// it could be somewhere else for reading a specific
+	// or seeking.
+	_stream->set_position(_lastParsedPosition);
 
 	assert(_formatCtx);
 
   	AVPacket packet;
 
-	//log_debug("av_read_frame call");
+	log_debug("av_read_frame call");
   	int rc = av_read_frame(_formatCtx, &packet);
-	//log_debug("av_read_frame returned %d", rc);
+	log_debug("av_read_frame returned %d", rc);
 	if ( rc < 0 )
 	{
 		log_error(_("MediaParserFfmpeg::parseNextChunk: Problems parsing next frame"));
@@ -337,9 +237,21 @@ MediaParserFfmpeg::parseNextFrame()
 		_parsingComplete=true;
 	}
 
+	// Update _lastParsedPosition
+	boost::uint64_t curPos = _stream->get_position();
+	if ( curPos > _lastParsedPosition )
+	{
+		_lastParsedPosition = curPos;
+	}
+	log_debug("parseNextFrame: parsed %d+%d/%d bytes (byteIOCxt: pos:%d, buf_ptr:%p, buf_end:%p); "
+		" AVFormatContext: data_offset:%d, cur_ptr:%p,; "
+		"%d video frames, %d audio frames",
+		curPos, _formatCtx->cur_ptr-_formatCtx->cur_pkt.data, _stream->get_size(),
+		_byteIOCxt.pos, (void*)_byteIOCxt.buf_ptr, (void*)_byteIOCxt.buf_end,
+		_formatCtx->data_offset, (void*)_formatCtx->cur_ptr,
+		_videoFrames.size(), _audioFrames.size());
 
 	return ret;
-
 }
 
 bool
@@ -361,9 +273,7 @@ MediaParserFfmpeg::getBytesLoaded() const
 MediaParserFfmpeg::MediaParserFfmpeg(std::auto_ptr<tu_file> stream)
 	:
 	MediaParser(stream),
-	_videoFrames(),
 	_nextVideoFrame(0),
-	_audioFrames(),
 	_nextAudioFrame(0),
 	_inputFmt(0),
 	_formatCtx(0),
@@ -375,7 +285,7 @@ MediaParserFfmpeg::MediaParserFfmpeg(std::auto_ptr<tu_file> stream)
 {
 	av_register_all(); // TODO: needs to be invoked only once ?
 
-	ByteIOCxt.buffer = NULL;
+	_byteIOCxt.buffer = NULL;
 
 	_inputFmt = probeStream();
 	if ( ! _inputFmt )
@@ -388,20 +298,20 @@ MediaParserFfmpeg::MediaParserFfmpeg(std::auto_ptr<tu_file> stream)
 	// Setup the filereader/seeker mechanism. 7th argument (NULL) is the writer function,
 	// which isn't needed.
 	_byteIOBuffer.reset( new unsigned char[byteIOBufferSize] );
-	init_put_byte(&ByteIOCxt,
-		_byteIOBuffer.get(),
-		byteIOBufferSize, // ?
-		0, // ?
+	init_put_byte(&_byteIOCxt,
+		_byteIOBuffer.get(), // buffer
+		byteIOBufferSize, // buffer size
+		0, // write flags
 		this, // opaque pointer to pass to the callbacks
 		MediaParserFfmpeg::readPacketWrapper, // packet reader callback
-		NULL, // writer callback
+		NULL, // packet writer callback
 		MediaParserFfmpeg::seekMediaWrapper // seeker callback
 		);
 
-	ByteIOCxt.is_streamed = 1;
+	_byteIOCxt.is_streamed = 1;
 
 	// Open the stream. the 4th argument is the filename, which we ignore.
-	if(av_open_input_stream(&_formatCtx, &ByteIOCxt, "", _inputFmt, NULL) < 0)
+	if(av_open_input_stream(&_formatCtx, &_byteIOCxt, "", _inputFmt, NULL) < 0)
 	{
 		throw GnashException("MediaParserFfmpeg couldn't open input stream");
 	}
@@ -475,32 +385,18 @@ MediaParserFfmpeg::~MediaParserFfmpeg()
 		//av_free(_inputFmt); // it seems this one blows up, could be due to av_free(_formatCtx) above
 	}
 
-	for (VideoFrames::iterator i=_videoFrames.begin(),
-		e=_videoFrames.end(); i!=e; ++i)
-	{
-		delete (*i);
-	}
-
-	for (AudioFrames::iterator i=_audioFrames.begin(),
-		e=_audioFrames.end(); i!=e; ++i)
-	{
-		delete (*i);
-	}
 }
 
 int 
 MediaParserFfmpeg::readPacket(boost::uint8_t* buf, int buf_size)
 {
 	//GNASH_REPORT_FUNCTION;
+	log_debug("readPacket(%d)", buf_size);
 
 	assert( _stream.get() );
 	tu_file& in = *_stream;
 
 	size_t ret = in.read_bytes(static_cast<void*>(buf), buf_size);
-
-	// Update _lastParsedPosition
-	boost::uint64_t curPos = in.get_position();
-	if ( curPos > _lastParsedPosition ) _lastParsedPosition = curPos;
 
 	return ret;
 
@@ -509,7 +405,7 @@ MediaParserFfmpeg::readPacket(boost::uint8_t* buf, int buf_size)
 offset_t 
 MediaParserFfmpeg::seekMedia(offset_t offset, int whence)
 {
-	//GNASH_REPORT_FUNCTION;
+	GNASH_REPORT_FUNCTION;
 
 	assert(_stream.get());
 	tu_file& in = *(_stream);
