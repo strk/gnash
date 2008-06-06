@@ -1,3 +1,9 @@
+2008-06-07 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* configure.ac: #define HAVE_(IS)FINITE to 1 and removed
+	  -Wunsafe-loop-optimizations since not all versions of
+	  gcc supports it.
+
 2008-06-06 Russ Nelson <nelson@crynwr.com>
 
 	* configure.ac: Added warning about missing makeswf.
