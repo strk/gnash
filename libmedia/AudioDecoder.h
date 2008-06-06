@@ -87,6 +87,23 @@ public:
 	///
 	virtual boost::uint8_t* decode(boost::uint8_t* /*input*/, boost::uint32_t /*inputSize*/, boost::uint32_t& /*outputSize*/, boost::uint32_t& /*decodedData*/, bool /*parse*/) { return NULL; }
 
+	/// Decodes an EncodedAudioFrame and returns a pointer to the decoded data
+	//
+	/// @param input
+	/// 	The audio data
+	///
+	/// @param outputSize
+	/// 	The output size of the video data, is passed by reference.
+	///
+	/// @return a pointer to the decoded data, or NULL if decoding fails.
+	///     The caller owns the decoded data.
+	///
+	virtual boost::uint8_t* decode(const EncodedAudioFrame& /*input*/,
+	                               boost::uint32_t& /*outputSize*/)
+	{
+		return NULL;
+	}
+
 };
 	
 } // gnash.media namespace 

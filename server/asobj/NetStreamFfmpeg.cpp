@@ -507,15 +507,15 @@ NetStreamFfmpeg::decodeNextAudioFrame()
 	}
 
     	media::raw_mediadata_t* raw = new media::raw_mediadata_t();
-	boost::uint32_t decodedData=0;
-	bool parseAudio = true; // I don't get this...
-	raw->m_data = _audioDecoder->decode(frame->data.get(), frame->dataSize, raw->m_size, decodedData, parseAudio);
+	raw->m_data = _audioDecoder->decode(*frame, raw->m_size);
 
-	if ( decodedData != frame->dataSize )
-	{
-		log_error("FIXME: NetStreamFfmpeg::decodeNextAudioFrame: not all data in EncodedAudioFrame was decoded, just %d/%d bytes.",
-			decodedData,frame->dataSize);
-	}
+#ifdef GNASH_DEBUG_DECODING
+        log_debug("NetStreamFfmpeg::decodeNextAudioFrame: "
+                "%d bytes of encoded audio "
+                "decoded to %d bytes",
+                frame->dataSize,
+                raw->m_size);
+#endif // GNASH_DEBUG_DECODING
 
 	//raw->m_stream_index = m_audio_index; // no idea what this is needed for
 	raw->m_ptr = raw->m_data; // no idea what this is needed for

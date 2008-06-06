@@ -20,6 +20,8 @@
 
 #include "AudioDecoderFfmpeg.h"
 
+//#define GNASH_DEBUG_AUDIO_DECODING
+
 namespace gnash {
 namespace media {
 	
@@ -167,7 +169,7 @@ bool AudioDecoderFfmpeg::setup(AudioInfo* info)
 	if (_audioCodecCtx->codec->id != CODEC_ID_MP3) {
 		_audioCodecCtx->channels = (info->stereo ? 2 : 1);
 		_audioCodecCtx->sample_rate = info->sampleRate;
-		//_audioCodecCtx->sample_fmt = SAMPLE_FMT_S16;
+		_audioCodecCtx->sample_fmt = SAMPLE_FMT_S16; // was commented out, why ?
 	}
 
   	log_debug(_("AudioDecoderFfmpeg::setup: initialized FFMPEG codec %s (%d)"),
@@ -176,107 +178,135 @@ bool AudioDecoderFfmpeg::setup(AudioInfo* info)
 	return true;
 }
 
-boost::uint8_t* AudioDecoderFfmpeg::decode(boost::uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize, boost::uint32_t& decodedBytes, bool parse)
+boost::uint8_t*
+AudioDecoderFfmpeg::decode(boost::uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize, boost::uint32_t& decodedBytes, bool parse)
 {
+	//GNASH_REPORT_FUNCTION;
 
-	long bytes_decoded = 0;
-	int bufsize = (AVCODEC_MAX_AUDIO_FRAME_SIZE * 3) / 2;
-	boost::uint8_t* output = new boost::uint8_t[bufsize];
-	boost::uint32_t orgbufsize = bufsize;
-	decodedBytes = 0;
-
-	if (parse) {
-	
-		if (!_parser)
-		{	
-			log_error(_("libavcodec can't parse the current audio format"));
-			return NULL;
-		}
-	
-	
-		bufsize = 0;
-		while (bufsize == 0 && decodedBytes < inputSize) {
-			boost::uint8_t* frame;
-			int framesize;
-
-			bytes_decoded = av_parser_parse(_parser, _audioCodecCtx, &frame, &framesize, input+decodedBytes, inputSize-decodedBytes, 0, 0); //the last 2 is pts & dts
-
-			int tmp = 0;
-#ifdef FFMPEG_AUDIO2
-			bufsize = AVCODEC_MAX_AUDIO_FRAME_SIZE;
-			tmp = avcodec_decode_audio2(_audioCodecCtx, reinterpret_cast<boost::int16_t*>(output), &bufsize, frame, framesize);
-#else
-			tmp = avcodec_decode_audio(_audioCodecCtx, reinterpret_cast<boost::int16_t*>(output), &bufsize, frame, framesize);
-#endif
-
-			if (bytes_decoded < 0 || tmp < 0 || bufsize < 0) {
-				log_error(_("Error while decoding audio data. Upgrading ffmpeg/libavcodec might fix this issue."));
-				// Setting data position to data size will get the sound removed
-				// from the active sound list later on.
-				decodedBytes = inputSize;
-				break;
-			}
-
-			decodedBytes += bytes_decoded;
-		}
-
-	} else {
-
-		int tmp = 0;
-
-#ifdef FFMPEG_AUDIO2
-		tmp = avcodec_decode_audio2(_audioCodecCtx, reinterpret_cast<boost::int16_t*>(output), &bufsize, input, inputSize);
-#else
-		tmp = avcodec_decode_audio(_audioCodecCtx, reinterpret_cast<boost::int16_t*>(output), &bufsize, input, inputSize);
-#endif
-
-
-
-		if (bytes_decoded < 0 || tmp < 0 || bufsize < 0) {
-			log_error(_("Error while decoding audio data. Upgrading ffmpeg/libavcodec might fix this issue."));
-			// Setting data position to data size will get the sound removed
-			// from the active sound list later on.
-			decodedBytes = 0;
-			outputSize = 0;
-			delete [] output;
-			return NULL;
-		}
-
-		decodedBytes = inputSize;
+	if ( ! parse )
+	{
+		boost::uint8_t* ret = decodeFrame(input, inputSize, outputSize);
+		if ( ret ) decodedBytes=inputSize;
+		else decodedBytes=0;
+		return ret;
 	}
 
-	// Error handling
-	if (bufsize < 1) {
-		log_error(_("Error while decoding audio data."));
-		delete [] output;
-		decodedBytes = 0;
+	LOG_ONCE( log_unimpl("Parsing inside FFMPEG AudioDecoder (shouldn't be needed, core lib should be fixed to not even try)") );
+	// TODO: for each parsed frame, call decodeFrame and
+	//       grow the buffer to return...
+	//assert(!parse);
+	decodedBytes=inputSize; // pretend we decoded everything
+	outputSize=0;		// and that resulting output is empty
+	return 0;
+}
+
+boost::uint8_t*
+AudioDecoderFfmpeg::decode(const EncodedAudioFrame& ef, boost::uint32_t& outputSize)
+{
+	return decodeFrame(ef.data.get(), ef.dataSize, outputSize);
+}
+
+boost::uint8_t*
+AudioDecoderFfmpeg::decodeFrame(boost::uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize)
+{
+	//GNASH_REPORT_FUNCTION;
+
+        //static const unsigned int bufsize = (AVCODEC_MAX_AUDIO_FRAME_SIZE * 3) / 2;
+        static const unsigned int bufsize = AVCODEC_MAX_AUDIO_FRAME_SIZE;
+
+	// TODO: make this a private member, to reuse (see NetStreamFfmpeg in 0.8.3)
+	boost::uint8_t* output = new boost::uint8_t[bufsize];
+        boost::int16_t* outPtr = reinterpret_cast<boost::int16_t*>(output);
+
+	// We initialize output size to the full size
+	// then decoding will eventually reduce it
+	int outSize = bufsize; 
+
+	int tmp = 
+#ifdef FFMPEG_AUDIO2
+		avcodec_decode_audio2(_audioCodecCtx, outPtr, &outSize, input, inputSize);
+#else
+		avcodec_decode_audio (_audioCodecCtx, outPtr, &outSize, input, inputSize);
+#endif
+
+#ifdef GNASH_DEBUG_AUDIO_DECODING
+	log_debug(" avcodec_decode_audio[2](ctx, bufptr, %d, input, %d) returned %d and set frame_size to %d",
+		bufsize, inputSize, tmp, outSize);
+#endif
+
+	if (tmp < 0)
+	{
+		log_error(_("avcodec_decode_audio returned %d. Upgrading ffmpeg/libavcodec might fix this issue."), tmp);
 		outputSize = 0;
+		delete [] output;
+		return NULL;
+	}
+
+	if (outSize < 1)
+	{
+		log_error(_("outputSize:%d after decoding audio data. Upgrading ffmpeg/libavcodec might fix this issue."),
+			outputSize);
+		outputSize = 0;
+		delete [] output;
 		return NULL;
 	}
 
 	// Resampling is needed.
-	if (_resampler.init(_audioCodecCtx)) {
-		bool stereo = _audioCodecCtx->channels > 1 ? true : false;
-		int samples = stereo ? bufsize >> 2 : bufsize >> 1;
+	if (_resampler.init(_audioCodecCtx))
+	{
+		// Resampling is needed.
 
-		boost::uint8_t* tmp = new boost::uint8_t[orgbufsize];
-			
-		samples = _resampler.resample(reinterpret_cast<boost::int16_t*>(output),
-						 reinterpret_cast<boost::int16_t*>(tmp),
-						 samples);
-		outputSize = samples *2 *2; // the resampled audio has samplesize 2, and is stereo
-		boost::uint8_t* ret = new boost::uint8_t[outputSize];
-		memcpy(ret, tmp, outputSize);
-		delete [] tmp;
+		// Compute new size based on frame_size and
+		// resampling configuration
+		double resampleFactor = (44100.0/_audioCodecCtx->sample_rate) * (2.0/_audioCodecCtx->channels);
+		bool stereo = _audioCodecCtx->channels > 1 ? true : false;
+		int samples = stereo ? outSize >> 2 : outSize >> 1;
+
+		int resampledFrameSize = int(ceil(outSize*resampleFactor));
+
+		// Allocate just the required amount of bytes
+		boost::uint8_t* resampledOutput = new boost::uint8_t[bufsize]; // be safe for now, but should be resampledFrameSize;
+
+#ifdef GNASH_DEBUG_AUDIO_DECODING
+		log_debug("Calling the resampler; "
+			"ouput to 44100hz, 2channels; "
+			"input is %dhz, %dchannels",
+			_audioCodecCtx->sample_rate, _audioCodecCtx->channels);
+#endif
+
+		samples = _resampler.resample(outPtr, // input
+			reinterpret_cast<boost::int16_t*>(resampledOutput), // output
+			samples); // input..
+
+		// make sure to set outPtr *after* we use it as input to the resampler
+        	outPtr = reinterpret_cast<boost::int16_t*>(resampledOutput);
 		delete [] output;
-		return ret;
-	} else {
-		outputSize = bufsize;
-		boost::uint8_t* ret = new boost::uint8_t[outputSize];
-		memcpy(ret, output, outputSize);
-		delete [] output;
-		return ret;		
+
+		if (resampledFrameSize < samples*2*2)
+		{
+			log_error(" --- Computation of resampled frame size (%d) < then the one based on samples (%d)",
+				resampledFrameSize, samples*2*2);
+
+			log_debug(" input frame size: %d", outSize);
+			log_debug(" input sample rate: %d", _audioCodecCtx->sample_rate);
+			log_debug(" input channels: %d", _audioCodecCtx->channels);
+			log_debug(" input samples: %d", samples);
+
+			log_debug(" output sample rate (assuming): %d", 44100);
+			log_debug(" output channels (assuming): %d", 2);
+			log_debug(" output samples: %d", samples);
+
+			abort(); // the call to resample() likely corrupted memory...
+		}
+
+		// we let the consistency check run before we override outSize
+		// to make debugging values correct
+		outSize = resampledFrameSize;
+
 	}
+
+	outputSize = outSize;
+	return reinterpret_cast<uint8_t*>(outPtr);
 }
 
 

@@ -1,5 +1,15 @@
+2008-06-06 Sandro Santilli <strk@keybit.net>
+
+	* libmedia/AudioDecoder.h: add a decode(EncodedAudioFrame&) method.
+	* libmedia/ffmpeg/AudioDecoderFfmpeg.{cpp,h}: Implement
+	  decode(EncodeAudioFrame), fix resampling code, disable (log_unimp)
+	  the "parsing" feature (should be dropped)
+	* server/asobj/NetStreamFfmpeg.cpp: use
+	  AudioDecoder::decode(EncodedAudioFrame) interface, cleaner.
+
 2008-06-06 Zou Lunkai <zoulunkai@gmail.com>
 	
+	YOUR ADV HERE
 
 2008-06-06 Sandro Santilli <strk@keybit.net>
 
