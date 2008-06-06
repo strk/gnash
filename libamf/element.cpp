@@ -597,7 +597,8 @@ Element::makeBoolean(bool flag)
 //    GNASH_REPORT_FUNCTION;
     _type = Element::BOOLEAN_AMF0;
     check_buffer(sizeof(bool));
-    _buffer->append(flag);
+    *(_buffer->reference()) = flag;
+
     return *this;
 }
 
@@ -638,13 +639,12 @@ Element::makeUndefined(const std::string &name)
     return makeUndefined();
 }
 
+// a NULL amf Object consists of a single byte, which is the type
 Element &
 Element::makeNull()
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::NULL_AMF0;
-    check_buffer(sizeof(Network::byte_t));
-    *(_buffer->reference()) = 0;
     return *this;
 }
 

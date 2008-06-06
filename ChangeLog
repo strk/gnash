@@ -1,3 +1,14 @@
+2008-06-06  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* libamf/amf.cpp: Add support for NULL objects.
+	* libamf/element.cpp: Set the boolean data correctly, it was
+	offset by one byte. Make a NULL object.
+	* libnet/rtmp.h: Add Stream operations, play, stop, pause, seek,
+	publish.
+	* libnet/rtmp_client.{h,cpp}: Build NetStream operation packets.
+	* testsuite/libnet.all/test_rtmp.cpp: Test NetStream operations
+	packets for the client side.
+
 2008-06-06 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* libbase/utility.h: include gnashconfig.h, fix some old-style casts,

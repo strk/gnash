@@ -79,16 +79,16 @@ RTMPClient::encodeConnect(const char *app, const char *swfUrl, const char *tcUrl
     
     AMF amf_obj;
 
-    Element *connect = new Element;
-    connect->makeString("connect");
+    Element connect;
+    connect.makeString("connect");
 
-    Element *connum = new Element;
+    Element connum;
 //     const char *connumStr = "00 00 00 00 00 00 f0 3f";
 //     Buffer *connumBuf = hex2mem(connumStr);
     // update the counter for the number of connections. This number is used heavily
     // in RTMP to help keep communications clear when there are multiple streams.
     _connections++;
-    connum->makeNumber(_connections);
+    connum.makeNumber(_connections);
     
     // Make the top level object
     Element obj;
@@ -148,8 +148,8 @@ RTMPClient::encodeConnect(const char *app, const char *swfUrl, const char *tcUrl
 //                                      RTMP::INVOKE, RTMP::FROM_CLIENT);
 //     const char *rtmpStr = "03 00 00 04 00 01 1f 14 00 00 00 00";
 //     Buffer *rtmpBuf = hex2mem(rtmpStr);
-    Buffer *conobj = connect->encode();
-    Buffer *numobj = connum->encode();
+    Buffer *conobj = connect.encode();
+    Buffer *numobj = connum.encode();
     Buffer *encobj = obj.encode();
 
     Buffer *buf = new Buffer(conobj->size() + numobj->size() + encobj->size());
@@ -158,6 +158,8 @@ RTMPClient::encodeConnect(const char *app, const char *swfUrl, const char *tcUrl
     buf->append(numobj);
     buf->append(encobj);
 
+    // Now that we have an encoded buffer, nuke the Element
+    
     return buf;
 }
 
@@ -165,19 +167,37 @@ RTMPClient::encodeConnect(const char *app, const char *swfUrl, const char *tcUrl
 // 65 53 74 72 65 61 6d 00 40 08 00 00 00 00 00 00  eStream.@.......
 // 05                                                    .               
 amf::Buffer *
-RTMPClient::encodeStream(double /* id */)
+RTMPClient::encodeStream(double id)
 {
     GNASH_REPORT_FUNCTION;
     
     struct timespec now;
     clock_gettime (CLOCK_REALTIME, &now);
-    
-//     log_debug("Buffer %x (%d) stayed in queue for %f seconds",
-// 	      (void *)_ptr, _nbytes,
-// 	      (float)((now.tv_sec - _stamp.tv_sec) + ((now.tv_nsec - _stamp.tv_nsec)/1e9)));
 
-    log_unimpl(__PRETTY_FUNCTION__);
-    return 0;
+    Element str = new Element;
+    str.makeString("createStream");
+    Buffer *strobj = str.encode();
+    if (!strobj) {
+	return 0;
+    }
+  
+    Element num = new Element;
+    num.makeNumber(id);
+    Buffer *numobj = num.encode();
+    if (!numobj) {
+	return 0;
+    }
+
+    Buffer *buf = new Buffer(strobj->size() + numobj->size());
+    if (!buf) {
+	return 0;
+    }
+    buf->append(strobj);
+    buf->append(numobj);
+
+    delete strobj;
+    delete numobj;
+    return buf;
 }
 
 // 127.0.0.1:38167 -> 127.0.0.1:1935 [AP]
@@ -187,12 +207,134 @@ RTMPClient::encodeStream(double /* id */)
 // 69 6f 2e 66 6c 76 c2 00 03 00 00 00 01 00 00 27  io.flv.........'
 // 10
 amf::Buffer *
-RTMPClient::encodePublish()
+RTMPClient::encodeStreamOp(double id, rtmp_op_e op, bool flag)
+{
+//    GNASH_REPORT_FUNCTION;
+    return encodeStreamOp(id, op, flag, "", 0);
+}    
+
+amf::Buffer *
+RTMPClient::encodeStreamOp(double id, rtmp_op_e op, bool flag, double pos)
+{
+//    GNASH_REPORT_FUNCTION;
+    return encodeStreamOp(id, op, flag, "", pos);
+}    
+
+amf::Buffer *
+RTMPClient::encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string &name)
+{
+//    GNASH_REPORT_FUNCTION;
+    return encodeStreamOp(id, op, flag, name, 0);
+}
+
+// A seek packet is the operation name "seek", followed by the
+// stream ID, then a NULL object, followed by the location to seek to.
+//
+// A pause packet is the operation name "pause", followed by the stream ID,
+// then a NULL object, a boolean (always true from what I can tell), and then
+// a location, which appears to always be 0.
+amf::Buffer *
+RTMPClient::encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string &name, double pos)
 {
     GNASH_REPORT_FUNCTION;
-    log_unimpl(__PRETTY_FUNCTION__);
-    return 0;
-}    
+
+    // Set the operations command name
+    Element str;
+    switch (op) {
+      case STREAM_PLAY:		// play the existing stream
+	  str.makeString("play");
+	  break;
+      case STREAM_PAUSE:	// pause the existing stream
+	  str.makeString("pause");
+	  break;
+      case STREAM_PUBLISH:	// publish the existing stream
+	  str.makeString("publish");
+	  break;
+      case STREAM_STOP:		// stop the existing stream
+	  str.makeString("stop");
+	  break;
+      case STREAM_SEEK:		// seek in the existing stream
+	  str.makeString("seek");
+	  break;
+      default:
+	  return 0;
+    };
+
+    Buffer *strobj = str.encode();
+    if (!strobj) {
+	return 0;
+    }
+
+    // Set the stream ID, which follows the command
+    Element strid;
+    strid.makeNumber(id);
+    Buffer *stridobj = strid.encode();
+    if (!stridobj) {
+	return 0;
+    }
+
+    // Set the NULL object element that follows the stream ID
+    Element null;
+    null.makeNull();
+    Buffer *nullobj = null.encode();    
+    if (!nullobj) {
+	return 0;
+    }
+
+    // Set the BOOLEAN object element that is the last field in the packet
+    Element boolean;
+    boolean.makeBoolean(flag);
+    Buffer *boolobj = boolean.encode();    
+    if (!boolobj) {
+	return 0;
+    }
+    
+    // Calculate the packet size, rather than use the default as we want to
+    // to be concious of the memory usage. The command name and the optional
+    // file name are the only two dynamically sized fields.
+    size_t pktsize = strobj->size() + name.size();
+    // Add 2 bytes for the Boolean, and 16 bytes for the two doubles, which are
+    // 8 bytes apiece.
+    pktsize += (sizeof(double) * 2) + 2;
+//    Buffer *buf = new Buffer(pktsize);
+    Buffer *buf = new Buffer;
+    
+    if (!buf) {
+	return 0;
+    }
+    buf->append(strobj);
+    delete strobj;
+    buf->append(stridobj);
+    delete stridobj;    
+    buf->append(nullobj);
+    delete nullobj;
+    // Seek doesn't use the boolean flag
+    if (op != STREAM_SEEK) {
+	buf->append(boolobj);
+    }
+    delete boolobj;
+
+    // The play command has an optional field, which is the name of the file
+    // used for the stream. A Play command without this name set play an
+    // existing stream that is already open.
+    if (!name.empty()) {
+	buf->append(name);
+    }
+    
+    // The seek command also may have an optional location to seek to
+    if ((op == STREAM_PAUSE) || (op == STREAM_SEEK)) {
+	Element seek;
+	seek.makeNumber(pos);
+	Buffer *posobj = seek.encode();
+	if (!posobj) {
+	    return 0;
+	}
+	buf->append(posobj);
+	delete posobj;
+    }
+
+    return buf;
+}
 
 // A request for a handshake is initiated by sending a byte with a
 // value of 0x3, followed by a message body of unknown format.

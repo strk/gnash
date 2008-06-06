@@ -51,8 +51,10 @@ public:
 			       const char *pageUrl);
     // Create the second object sent to the server, which is NetStream():;NetStream()
     amf::Buffer *encodeStream(double id);
-
-    amf::Buffer *encodePublish();
+    amf::Buffer *encodeStreamOp(double id, rtmp_op_e op, bool flag);
+    amf::Buffer *encodeStreamOp(double id, rtmp_op_e op, bool flag, double pos);
+    amf::Buffer *encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string &name);
+    amf::Buffer *encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string &name, double pos);
     
     void dump();
   private:

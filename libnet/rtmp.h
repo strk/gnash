@@ -126,6 +126,13 @@ public:
 	PING_CLIENT = 0x6,	// Ping the client from the server
 	PONG_CLIENT = 0x7	// pong reply from client to server
     } rtmp_ping_e;
+    typedef enum {
+	STREAM_PLAY,		// play the existing stream
+	STREAM_PAUSE,		// pause the existing stream
+	STREAM_PUBLISH,		// publish the existing stream
+	STREAM_STOP,		// stop the existing stream
+	STREAM_SEEK		// seek in the existing stream
+    } rtmp_op_e;
     typedef struct {
 	rtmp_ping_e type;	// the type of the ping message
 	boost::uint16_t target; // all Ping message data fields

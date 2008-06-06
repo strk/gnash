@@ -193,7 +193,6 @@ AMF::encodeNumber(double indata)
 /// @return a binary AMF packet in big endian format (header,data) which
 /// needs to be deleted[] after being used.
 ///
-/// Although a boolean is one byte in size.
 Buffer *
 AMF::encodeBoolean(bool flag)
 {
@@ -201,9 +200,6 @@ AMF::encodeBoolean(bool flag)
     // Encode a boolean value. 0 for false, 1 for true
     Buffer *buf = new Buffer(2);
     buf->append(Element::BOOLEAN_AMF0);
-// Hum, AMF3 ???
-//     boost::uint16_t x = flag;
-//     swapBytes(&x, 2);
     buf->append(flag);
     
     return buf;
@@ -312,8 +308,10 @@ AMF::encodeNull()
 {
 //    GNASH_REPORT_FUNCTION;
 
-    log_unimpl("NULL AMF object not supported yet");
-    return 0;
+    Buffer *buf = new Buffer(1);
+    buf->append(Element::NULL_AMF0);
+    
+    return buf;
 }
 
 /// Encode an XML object
@@ -513,6 +511,10 @@ AMF::encodeElement(Element *el)
 	outsize = el->getNameSize() + 2;
     } else {
 	outsize = el->getNameSize() + AMF_VAR_HEADER_SIZE;
+    }
+    // A NULL object is a single byte
+    if (el->getType() == Element::NULL_AMF0) {
+	outsize = 1;
     }
     buf = new Buffer(outsize);
     buf->clear();		// FIXME: temporary, makes buffers cleaner in gdb.

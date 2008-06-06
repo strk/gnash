@@ -68,6 +68,7 @@ static void test_header();
 static void test_types();
 static void test_results();
 static void test_system();
+static void test_client();
 
 LogFile& dbglogfile = LogFile::getDefaultInstance();
 
@@ -113,6 +114,7 @@ hex2mem(const char *str)
         ch |= hex2digit(*ptr++);
         buf->append(ch);
     }
+
     return buf;
 }
 
@@ -173,6 +175,7 @@ main(int argc, char *argv[])
     test_header();
     test_system();
     test_results();
+    test_client();
 //    test_types();
 }
 
@@ -183,15 +186,10 @@ test_system()
     
     RTMPClient client;
     RTMPServer server;
-
     
-//    const char *x1 = "00 00 00 00 00 00";
     Buffer *buf1 = hex2mem("00 00 00 00 00 00");  // clear buffer message
-//    const char *x2 = "00 06 cf 03 04 c3";
     Buffer *buf2 = hex2mem("00 06 cf 03 04 c3"); // ping client from server
-//    const char *x3 = "00 07 cf 03 04 c3";
     Buffer *buf3 = hex2mem("00 07 cf 03 04 c3"); // Pong, reply from client
-//    const char *x4 = "00 00 00 00 00 01";
     Buffer *buf4 = hex2mem("00 00 00 00 00 01"); // clear buffer message
     
     RTMP::rtmp_ping_t *ping1 = client.decodePing(buf1);
@@ -458,7 +456,80 @@ test_types()
 
     const char *x = "06 00 d2 04 00 00 00 00";
     Buffer *buf1 = hex2mem(x);
+
+    delete buf1;
+}
+
+void
+test_client()
+{
+    GNASH_REPORT_FUNCTION;
+    RTMPClient rtmp;
+
+    Buffer *buf1 = hex2mem("02 00 04 70 6c 61 79 00 00 00 00 00 00 00 00 00 05 01 00");
+    Buffer *buf2 = rtmp.encodeStreamOp(0, RTMP::STREAM_PLAY, false);
+    if ((memcmp(buf1->reference(), buf2->reference(), buf1->size()) == 0)) {
+        runtest.pass("Encoded RTMPClient::encodeStreamOp(RTMP::STREAM_PLAY)");
+    } else {
+        runtest.fail("Encoded RTMPClient::encodeStreamOp(RTMP::STREAM_PLAY)");
+    }
+    delete buf1;
+    delete buf2;
+
+    buf1 = hex2mem("02 00 05 70 61 75 73 65 00 00 00 00 00 00 00 00 00 05 01 01 00 00 00 00 00 00 00 00 00");
+    buf2 = rtmp.encodeStreamOp(0, RTMP::STREAM_PAUSE, true, 0);
+    if ((memcmp(buf1->reference(), buf2->reference(), buf1->size()) == 0)) {
+        runtest.pass("Encoded RTMPClient::encodeStreamOp(RTMP::STREAM_PAUSE)");
+    } else {
+        runtest.fail("Encoded RTMPClient::encodeStreamOp(RTMP::STREAM_PAUSE)");
+    }
+    delete buf1;
+    delete buf2;
+
+    buf1 = hex2mem("02 00 04 73 74 6f 70 00 00 00 00 00 00 00 00 00 05 01 00");
+    buf2 = rtmp.encodeStreamOp(0, RTMP::STREAM_STOP, false);
+    if ((memcmp(buf1->reference(), buf2->reference(), buf1->size()) == 0)) {
+        runtest.pass("Encoded RTMPClient::encodeStreamOp(RTMP::STREAM_STOP)");
+    } else {
+        runtest.fail("Encoded RTMPClient::encodeStreamOp(RTMP::STREAM_STOP)");
+    }
+    delete buf1;
+    delete buf2;
+
+#if 0
+    buf1 = hex2mem("02 00 07 70 75 62 6c 69 73 68 00 00 00 00 00 00 00 00 00 05 02 00 06 73 74 72 65 61 6d 02 00 04 6c 69 76 65 0d 00 02 ba 00 00 1a 14 02 00 00 00 02 00");
+    buf2 = rtmp.encodeStreamOp(0, RTMP::STREAM_PUBLISH, false);
+    cerr << hexify(buf1->begin(), buf1->size(), false) << endl;
+    cerr << hexify(buf2->begin(), buf1->size(), false) << endl;
+    if ((memcmp(buf1->reference(), buf2->reference(), buf1->size()) == 0)) {
+        runtest.pass("Encoded RTMPClient::encodeStreamOp(RTMP::STREAM_PUBLISH)");
+    } else {
+        runtest.fail("Encoded RTMPClient::encodeStreamOp(RTMP::STREAM_PUBLISH)");
+    }
+    delete buf1;
+    delete buf2;
+#endif
     
+    buf1 = hex2mem("02 00 04 73 65 65 6b 00 00 00 00 00 00 00 00 00 05 00 00 00 00 00 00 00 00 00");
+    buf2 = rtmp.encodeStreamOp(0, RTMP::STREAM_SEEK, false);
+    if ((memcmp(buf1->reference(), buf2->reference(), buf1->size()) == 0)) {
+        runtest.pass("Encoded RTMPClient::encodeStream(RTMP::SEEK)");
+    } else {
+        runtest.fail("Encoded RTMPClient::encodeStream(RTMP::SEEK)");
+    }
+    delete buf1;
+    delete buf2;
+
+    buf1 = hex2mem("02 00 04 73 65 65 6b 00 00 00 00 00 00 00 00 00 05 00 40 c7 70 00 00 00 00 00");
+    buf2 = rtmp.encodeStreamOp(0, RTMP::STREAM_SEEK, false, 12000);
+    if ((memcmp(buf1->reference(), buf2->reference(), buf1->size()) == 0)) {
+        runtest.pass("Encoded RTMPClient::encodeStream(RTMP::SEEK, double)");
+    } else {
+        runtest.fail("Encoded RTMPClient::encodeStream(RTMP::SEEK, double)");
+    }
+    delete buf1;
+    delete buf2;
+
 }
 
 static void
