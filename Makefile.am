@@ -323,7 +323,7 @@ else
 	@echo "	KPARTS (KDE) plugin disabled"
 endif
 
-if NSAPI
+if NPAPI
 	@echo "	NPAPI (Mozilla) plugin enabled"
 	@echo "	  NPAPI plugin install dir: $(FIREFOX_PLUGINS)"
 else

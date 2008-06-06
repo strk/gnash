@@ -1094,7 +1094,7 @@ if test x$cross_compiling = xyes; then
   export incllist="`eval echo ${with_top_level}/include ${pkgroot}/${host_alias}/include ${pkgroot}/include`"
   export libslist="`eval echo ${with_top_level}/lib ${pkgroot}/${host_alias}/lib ${pkgroot}/lib64 ${pkgroot}/lib32 ${pkgroot}/lib`"
   export pathlist="`eval echo ${pkgroot}/${host_alias}/bin:${pkgroot}/bin`"
-  nsapi=no
+  npapi=no
 else
   AC_MSG_NOTICE([Configuring Gnash for native compilation])
   export incllist="`eval cat ${srcdir}/macros/incllist`"
@@ -1196,7 +1196,7 @@ dnl -----------------------------------------------------------------
 dnl PLUGIN RELATED STUFF
 dnl -----------------------------------------------------------------
 
-dnl !! This has been moved here to make --enable-nsapi work
+dnl !! This has been moved here to make --enable-npapi work
 dnl !! All of plugin-related macro calls could be moved into
 dnl !! a specialized macros/plugin.m4
 
@@ -1213,17 +1213,17 @@ AC_ARG_ENABLE(kparts,
 esac],kparts=$build_kde)
 
 dnl ----------------------------------------------------
-dnl Add NSAPI support, if specified or GTK gui is built
+dnl Add NPAPI support, if specified or GTK gui is built
 dnl ----------------------------------------------------
 
-AC_ARG_ENABLE(nsapi,
-  AC_HELP_STRING([--disable-nsapi], [Disable NSAPI plugin build (default: enabled if gtk gui is)]),
+AC_ARG_ENABLE(npapi,
+  AC_HELP_STRING([--disable-npapi], [Disable NPAPI plugin build (default: enabled if gtk gui is)]),
   [case "${enableval}" in
-    yes) nsapi=yes ;;
-    no)  nsapi=no ;;
-    *)   AC_MSG_ERROR([bad value ${enableval} for disable-nsapi option]) ;;
+    yes) npapi=yes ;;
+    no)  npapi=no ;;
+    *)   AC_MSG_ERROR([bad value ${enableval} for disable-npapi option]) ;;
   esac],
-  nsapi=$build_gtk
+  npapi=$build_gtk
 )
 
 dnl -----------------------------------------------------------------
@@ -1240,7 +1240,7 @@ AC_ARG_ENABLE(plugins,
   plugins=yes
 )
 if test x$plugins = xno; then
-  nsapi=no
+  npapi=no
   kparts=no
 fi
 
@@ -1347,7 +1347,6 @@ fi
 
 dnl AC_CHECK_FUNCS(strcasecmp stricmp)
 dnl AC_CHECK_FUNCS(vsnprintf)
-dnl AC_CHECK_FUNCS(finite isfinite)
 
 AC_CACHE_CHECK([for finite], ac_cv_finite,
  [AC_TRY_LINK([#include <math.h>],
@@ -1470,17 +1469,17 @@ AC_CHECK_FUNCS(CreateFileMappingA)
 dnl GNASH_HASHMAP
 dnl Let's get rid of this small file and inline the function.
 
-AC_LANG_PUSH(C++)
-	AC_CHECK_HEADER(ext/hash_map, [
-		AC_DEFINE([GNU_HASH_MAP], [1], [Using GNU ext/hash_map.h])
-		AC_DEFINE([HASH_MAP_NS], [__gnu_cxx], [Using GNU __gnu_cxx::])
-	], [
-		AC_CHECK_HEADER(hash_map, [
-			AC_DEFINE([WIN32_HASH_MAP], [1], [Using Win32 hash_map.h])
-			AC_DEFINE([HASH_MAP_NS], [stdext], [Using win32 stdext::])
-		])
-	])
-AC_LANG_POP(C++)
+dnl AC_LANG_PUSH(C++)
+dnl 	AC_CHECK_HEADER(ext/hash_map, [
+dnl 		AC_DEFINE([GNU_HASH_MAP], [1], [Using GNU ext/hash_map.h])
+dnl 		AC_DEFINE([HASH_MAP_NS], [__gnu_cxx], [Using GNU __gnu_cxx::])
+dnl 	], [
+dnl 		AC_CHECK_HEADER(hash_map, [
+dnl 			AC_DEFINE([WIN32_HASH_MAP], [1], [Using Win32 hash_map.h])
+dnl 			AC_DEFINE([HASH_MAP_NS], [stdext], [Using win32 stdext::])
+dnl 		])
+dnl 	])
+dnl AC_LANG_POP(C++)
 
 dnl Shm::resize() uses this if it exists
 AC_CHECK_LIB(c, mremap)
@@ -1593,11 +1592,11 @@ fi
 
 AM_CONDITIONAL(HAVE_GLIB, [ test x$has_glib = xyes ])
 
-if test x$build_gtk = xno -a x$nsapi = xyes; then
-  AC_MSG_WARN(["Enabled NSAPI plugin, but you aren't building a GTK based GUI!"])
+if test x$build_gtk = xno -a x$npapi = xyes; then
+  AC_MSG_WARN(["Enabled NPAPI plugin, but you aren't building a GTK based GUI!"])
 fi
 
-if test x$windows = xyes -a x$nsapi = xyes; then
+if test x$windows = xyes -a x$npapi = xyes; then
   if test "x$NSPR_CFLAGS" = x -a "x$NSPR_LIBS" = x; then
     AC_MSG_ERROR(["On Win32, NPAPI plugin requires NSPR."])
   fi
@@ -1632,7 +1631,7 @@ AM_CONDITIONAL(BUILD_RISCOS_GUI, [ test x$build_riscos = xyes ])
 AM_CONDITIONAL(BUILD_DUMP_GUI, [ test x$build_dump = xyes ])
 
 # plugin building flags
-AM_CONDITIONAL(NSAPI, [test x$nsapi = xyes])
+AM_CONDITIONAL(NPAPI, [test x$npapi = xyes])
 AM_CONDITIONAL(KPARTS, [test x$kparts = xyes])
 
 AC_SUBST(KDE_CFLAGS)
@@ -1689,7 +1688,7 @@ if test x$glext = xno -a x$build_ogl = xyes; then
     AC_ERROR([You have GTK installed, but not GtkGLExt. You need GtkGLExt to use the OpenGL renderer. Attempting to build SDL version])
   fi
   gui=sdl
-  nsapi=no
+  npapi=no
   AC_MSG_WARN([GTK2 specified for the GUI, but GtkGlExt is not present. Trying SDL instead.])
 fi
 
@@ -1906,10 +1905,12 @@ AC_ARG_ENABLE([strict],
 )
 
 if test x"$strict" = x"yes" -a x$build_agg = xyes; then
-  AC_MSG_ERROR([agg renderer will fail with --enable-strict.]);	
+   AC_MSG_ERROR([agg renderer will fail with --enable-strict.]);	
 fi
 
 # We want warnings, lots of warnings  :-)
+# It should be possible to build with -ansi, not with
+# -pedantic because of agg.
 if test x"$GCC" = x"yes"; then
   CXXFLAGS="$CXXFLAGS \
     -W \
@@ -1918,6 +1919,11 @@ if test x"$GCC" = x"yes"; then
     -Wcast-qual \
     -Wpointer-arith \
     -Wreturn-type \
+    -Wnon-virtual-dtor \
+    -Wunused \
+    -Wextra \
+    -Wunsafe-loop-optimizations \    
+    -ansi \
     "
   CFLAGS="$CFLAGS \
     -W \
@@ -1932,15 +1938,14 @@ if test x"$GCC" = x"yes"; then
     "
   if test x"$strict" = x"yes"; then
     CXXFLAGS="$CXXFLAGS \
-      -ansi \
       -pedantic \
       -Wno-long-long \
       "
 
     CFLAGS="$CFLAGS \
-      -ansi \
       -pedantic \
       -Wno-long-long \
+      -ansi \
       "
   fi
 fi
@@ -2169,8 +2174,8 @@ else
   echo "        DMalloc support disabled (default). Use --enable-dmalloc to enable."
 fi
 
-if test x"$nsapi" = x"yes"; then
-  echo "        NPAPI plugin enabled (default). Use --disable-nsapi to disable."
+if test x"$npapi" = x"yes"; then
+  echo "        NPAPI plugin enabled (default). Use --disable-npapi to disable."
   echo "            NPAPI plugin will be installed in ${FIREFOX_PLUGINS}"
 else
   echo "        NPAPI plugin disabled."
@@ -2646,7 +2651,7 @@ if $need_sdl; then
 fi
 unset need_sdl
 
-if test x"$nsapi" = x"yes"; then
+if test x"$npapi" = x"yes"; then
 dnl  if test x"$FIREFOX_CFLAGS" != x; then
 dnl    echo "        Firefox flags are: $FIREFOX_CFLAGS"
 dnl    echo "        Firefox libs are: $FIREFOX_LIBS"
