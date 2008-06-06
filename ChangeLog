@@ -1,3 +1,11 @@
+2008-06-06 Russ Nelson <nelson@crynwr.com>
+
+        * macros/ffmpeg.m4: Previous method for location of ffmpeg
+          libraries didn't work on Mandriva.  Current method should be
+          more supportable.
+        * ..: throw up our hands and give up if we can't autolocate
+          avcodec.h; suggest that they use --with-ffmpeg-incl.
+
 2008-06-06 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* libmedia/MediaHandler.h, libmedia/MediaParser.h,

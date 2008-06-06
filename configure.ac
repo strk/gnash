@@ -2556,6 +2556,8 @@ fi
           echo "        ERROR: FFMPEG's libavcodec header is installed but not libavformat." >&3
           echo "               You can install FFMPEG from http://ffmpeg.mplayerhq.hu" >&3
           echo "               or .deb users: apt-get install libavformat-dev" >&3
+          echo "               or YaST users: yast -i libavformat-api (but currently installs into /usr/lib64)" >&3
+
           echo "               or explicitly set the path using --with-ffmpeg-incl=" >&5
           echo "               or reconfigure with --enable-media=gst" >&3
 	else

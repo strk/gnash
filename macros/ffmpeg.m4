@@ -22,7 +22,7 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
   backupLIBS="$LIBS"
   backupCFLAGS="$CFLAGS"
 
-  dnl Look for the header
+  dnl Did they tell us where the header is?
   AC_ARG_WITH(ffmpeg_incl, AC_HELP_STRING([--with-ffmpeg-incl], [directory where ffmpeg headers are]), with_ffmpeg_incl=${withval})
   AC_CACHE_VAL(ac_cv_path_ffmpeg_incl,[
     if test x"${with_ffmpeg_incl}" != x ; then
@@ -43,6 +43,7 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
       else
         AC_MSG_ERROR([${with_ffmpeg_incl} directory contains neither the ffmpeg/avcodec.h nor libavcodec/avcodec.h header])
       fi
+      topdir=${with_ffmpeg_incl}
     fi
   ])
 
@@ -82,7 +83,7 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
       # Gets "" if not installed
       if test x"$topdir" != x; then
         if test -e "$topdir/ffmpeg/avcodec.h"; then
-	      avcodec_h="$topdir/ffmpeg/avcodec.h"
+          avcodec_h="$topdir/ffmpeg/avcodec.h"
         else
           avcodec_h="$topdir/libavcodec/avcodec.h"
         fi
@@ -99,7 +100,7 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
         ac_cv_path_ffmpeg_incl="-I$i"
         CFLAGS="$ac_cv_path_ffmpeg_incl $CFLAGS"
         topdir=$i
-	        avcodec_h="$i/ffmpeg/avcodec.h"
+        avcodec_h="$i/ffmpeg/avcodec.h"
         break
       fi
       if test -f $i/libavcodec/avcodec.h; then
@@ -114,9 +115,7 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
   fi
 
   if test x"${ac_cv_path_ffmpeg_incl}" = x; then
-    if test x${cross_compiling} = xno; then
-      AC_CHECK_HEADERS(ffmpeg/avcodec.h, [ac_cv_path_ffmpeg_incl=""])
-    fi
+     AC_MSG_ERROR([Cannot find ffmpeg/avcodec.h.  Use --with-ffmpeg-incl= to specify the location of the *directory* holding avcodec.h])
   else
     if echo $avcodec_h | grep -q ffmpeg; then
       AC_DEFINE(HAVE_FFMPEG_AVCODEC_H, 1, [Define if you have avcodec.h installed.])
@@ -208,8 +207,8 @@ dnl version numbering fail gracefully.
       ffmpeg_version=`$EGREP "define LIBAVCODEC_VERSION " ${avcodec_h} | sed -e "s%[[^0-9]]%%g"`
       ffmpeg_num_version=$ffmpeg_version
 
-    if test x"${ffmpeg_version}" = x ; then
-      ffmpeg_version=`$EGREP "define LIBAVCODEC_BUILD " ${avcodec_h} | sed -e "s%[[^0-9.]]%%g"`
+      if test x"${ffmpeg_version}" = x ; then
+        ffmpeg_version=`$EGREP "define LIBAVCODEC_BUILD " ${avcodec_h} | sed -e "s%[[^0-9.]]%%g"`
         ffmpeg_num_version=$ffmpeg_version
       fi
     fi
@@ -247,14 +246,13 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
   fi
 
   AC_MSG_CHECKING([for avformat.h])
-  avformat_h=`echo ${ac_cv_path_ffmpeg_incl} | sed 's/-I//'`
-  if test -f "${avformat_h}/ffmpeg/avformat.h"; then
+  if test -f "${topdir}/ffmpeg/avformat.h"; then
     AC_DEFINE(HAVE_FFMPEG_AVFORMAT_H, 1, [Define if avformat.h is found])
-    avformat_h="${avformat_h}/ffmpeg/avformat.h"
+    avformat_h="${topdir}/ffmpeg/avformat.h"
   else
-    if test -f "${avformat_h}/libavformat/avformat.h"; then
+    if test -f "${topdir}/libavformat/avformat.h"; then
       AC_DEFINE(HAVE_LIBAVFORMAT_AVFORMAT_H, 1, [Define if avformat.h is found])
-      avformat_h="${avformat_h}/libavformat/avformat.h"
+      avformat_h="${topdir}/libavformat/avformat.h"
     else
       avformat_h=""
     fi
@@ -263,11 +261,10 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
 
   dnl look for swscale.h, but ignore versions older than 51.40.3
   if test $ffmpeg_num_version -gt 51403; then
-    swscale_h=`echo ${ac_cv_path_ffmpeg_incl} | sed 's/-I//'`
-    if test -f "${swscale_h}/ffmpeg/swscale.h"; then
+    if test -f "${topdir}/ffmpeg/swscale.h"; then
       AC_DEFINE(HAVE_FFMPEG_SWSCALE_H, 1, [Define if swscale.h is found])
     fi
-    if test -f "${swscale_h}/libswscale/swscale.h"; then
+    if test -f "${topdir}/libswscale/swscale.h"; then
       AC_DEFINE(HAVE_LIBSWSCALE_SWSCALE_H, 1, [Define if swscale.h is found])
     fi
   fi
