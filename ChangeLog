@@ -1,3 +1,8 @@
+2008-06-06 Sandro Santilli <strk@keybit.net>
+
+	* libmedia/ffmpeg/MediaParserFfmpeg.{cpp,h}: fix build with more
+	  recent ffmpeg (bug #23502).
+
 2008-06-06 Russ Nelson <nelson@crynwr.com>
 
         * macros/ffmpeg.m4: Previous method for location of ffmpeg

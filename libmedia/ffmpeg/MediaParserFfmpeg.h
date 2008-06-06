@@ -36,6 +36,12 @@ extern "C" {
 }
 #endif
 
+#ifdef HAVE_LIBAVFORMAT_AVFORMAT_H
+extern "C" {
+#include <libavformat/avformat.h>
+}
+#endif
+
 // Forward declaration
 class tu_file;
 

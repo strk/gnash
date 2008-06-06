@@ -350,8 +350,11 @@ MediaParserFfmpeg::MediaParserFfmpeg(std::auto_ptr<tu_file> stream)
 		boost::uint16_t width = _videoStream->codec->width;
 		boost::uint16_t height = _videoStream->codec->height;
 		boost::uint16_t frameRate = static_cast<boost::uint16_t>(as_double(_videoStream->r_frame_rate));
+#ifndef HAVE_LIBAVFORMAT_AVFORMAT_H
 		boost::uint64_t duration = _videoStream->codec_info_duration;
-
+#else
+		boost::uint64_t duration = _videoStream->duration;
+#endif
 		_videoInfo.reset( new VideoInfo(codec, width, height, frameRate, duration, FFMPEG /*codec type*/) );
 	}
 
@@ -362,8 +365,11 @@ MediaParserFfmpeg::MediaParserFfmpeg(std::auto_ptr<tu_file> stream)
 		boost::uint16_t sampleRate = _audioStream->codec->sample_rate;
 		boost::uint16_t sampleSize = SampleFormatToSampleSize(_audioStream->codec->sample_fmt);
 		bool stereo = (_audioStream->codec->channels == 2);
+#ifndef HAVE_LIBAVFORMAT_AVFORMAT_H
 		boost::uint64_t duration = _videoStream->codec_info_duration;
-
+#else
+		boost::uint64_t duration = _videoStream->duration;
+#endif
 		_audioInfo.reset( new AudioInfo(codec, sampleRate, sampleSize, stereo, duration, FFMPEG /*codec type*/) );
 	}
 
