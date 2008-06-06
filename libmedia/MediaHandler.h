@@ -17,8 +17,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-#ifndef MEDIAHANDLER_H
-#define MEDIAHANDLER_H
+#ifndef GNASH_MEDIAHANDLER_H
+#define GNASH_MEDIAHANDLER_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
