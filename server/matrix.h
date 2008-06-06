@@ -28,6 +28,7 @@
 #include "Range2d.h" // for transforming Range2d<float>
 #include "Point2d.h" // for transforming Point2d<float> (typedefe'd to point)
 
+#include <boost/cstdint.hpp>
 #include <iosfwd>
 #include <iomanip>
 
@@ -195,9 +196,6 @@ public:
 	/// Return true if this matrix reverses handedness.
 	bool	does_flip() const;	
 
-	/// Return the determinant of the 2x2 rotation/scale part only.
-	float	get_determinant() const;
-
 	/// return the magnitude scale of our x coord output
 	float	get_x_scale() const;
 
@@ -218,6 +216,9 @@ public:
 	{
 		return ty;
 	}
+
+	/// Return the determinant of this matrix in 32.32 fixed point format.
+	boost::int64_t	get_determinant() const;
 };
 
 inline bool operator== (const matrix& a, const matrix& b)

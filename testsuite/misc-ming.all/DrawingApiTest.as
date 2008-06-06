@@ -233,10 +233,14 @@ with (a)
 		lineStyle(6, 0xFF8800);
 		beginFill(0x888800, 100);
 		moveTo(100, 100);
-		lineTo("string", NaN); // equivalent to 0, 0
-		curveTo(100, "string", Object, 100); // equivalent to 100, 0, 0, 100
-		moteTo(undefined, 0); // equivalent to 0, 0
-		lineTo(100, null);
+		//lineTo("string", NaN); // equivalent to 0, 0
+		lineTo(0, 0);
+		//curveTo(100, "string", Object, 100); // equivalent to 100, 0, 0, 100
+		curveTo(100, 0, 0 ,100);
+		//moteTo(undefined, 0); // equivalent to 0, 0
+		//moveTo(0,0); ???
+		//lineTo(100, null); // equivalent to 100, 0
+		lineTo(100, 0);
 		endFill();
 	}
 	x._x = 100;

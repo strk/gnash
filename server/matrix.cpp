@@ -41,6 +41,47 @@ matrix::matrix()
     shx = shy = tx = ty = 0;
 }
 
+void
+matrix::read(stream& in)
+// Initialize from the stream.
+{
+	in.align();
+
+	set_identity();
+
+	in.ensureBits(1);
+	bool	has_scale = in.read_bit(); 
+	if (has_scale)
+	{
+		in.ensureBits(5);
+		int	scale_nbits = in.read_uint(5);
+
+		in.ensureBits(scale_nbits*2);
+		sx = in.read_sint(scale_nbits);
+		sy = in.read_sint(scale_nbits);
+	}
+
+	in.ensureBits(1);
+	bool	has_rotate = in.read_bit();
+	if (has_rotate)
+	{
+		in.ensureBits(5);
+		int	rotate_nbits = in.read_uint(5);
+
+		in.ensureBits(rotate_nbits*2);
+		shx = in.read_sint(rotate_nbits);
+		shy = in.read_sint(rotate_nbits);
+	}
+
+	in.ensureBits(5);
+	int	translate_nbits = in.read_uint(5);
+	if (translate_nbits > 0)
+	{
+		in.ensureBits(translate_nbits*2);
+		tx = (float) in.read_sint(translate_nbits);
+		ty = (float) in.read_sint(translate_nbits);
+	}
+}
 
 bool
 matrix::is_valid() const
@@ -128,10 +169,10 @@ matrix::set_scale_rotation(float x_scale, float y_scale, float angle)
 {
 	float	cos_angle = cosf(angle);
 	float	sin_angle = sinf(angle);
-	sx  = 65536 * x_scale * cos_angle;
-	shy = 65536 * y_scale * -sin_angle;
-	shx = 65536 * x_scale * sin_angle;
-	sy  = 65536 * y_scale * cos_angle;
+	sx  = 65536.0f * x_scale * cos_angle;
+	shy = 65536.0f * y_scale * -sin_angle;
+	shx = 65536.0f * x_scale * sin_angle;
+	sy  = 65536.0f * y_scale * cos_angle;
 }
 
 void
@@ -165,60 +206,14 @@ matrix::set_rotation(float rotation)
 	set_scale_rotation(xscale, yscale, rotation);
 }
 
-
-void
-matrix::read(stream& in)
-// Initialize from the stream.
-{
-	in.align();
-
-	set_identity();
-
-	in.ensureBits(1);
-	bool	has_scale = in.read_bit(); 
-	if (has_scale)
-	{
-		in.ensureBits(5);
-		int	scale_nbits = in.read_uint(5);
-
-		in.ensureBits(scale_nbits*2);
-		sx = in.read_sint(scale_nbits);
-		sy = in.read_sint(scale_nbits);
-	}
-
-	in.ensureBits(1);
-	bool	has_rotate = in.read_bit();
-	if (has_rotate)
-	{
-		in.ensureBits(5);
-		int	rotate_nbits = in.read_uint(5);
-
-		in.ensureBits(rotate_nbits*2);
-		shx = in.read_sint(rotate_nbits);
-		shy = in.read_sint(rotate_nbits);
-	}
-
-	in.ensureBits(5);
-	int	translate_nbits = in.read_uint(5);
-	if (translate_nbits > 0)
-	{
-		in.ensureBits(translate_nbits*2);
-		tx = (float) in.read_sint(translate_nbits);
-		ty = (float) in.read_sint(translate_nbits);
-	}
-
-	//IF_VERBOSE_PARSE(log_parse("  mat: has_scale = %d, has_rotate = %d\n", has_scale, has_rotate));
-}
-
 void
 matrix::transform(point* result, const point& p) const
-// Transform point 'p' by our matrix.  Put the result in
-// *result.
+// Transform point 'p' by our matrix.  Put the result in *result.
 {
 	assert(result);
 
-	result->x = sx  / 65536.0 * p.x  + shy / 65536.0f * p.y + tx;
-	result->y = shx / 65536.0 * p.x  + sy  / 65536.0f * p.y + ty;
+	result->x = Fixed16Mul(sx,  p.x) + Fixed16Mul(shy, p.y) + tx;
+	result->y = Fixed16Mul(shx, p.x) + Fixed16Mul(sy,  p.y) + ty;
 }
 
 void
@@ -254,8 +249,8 @@ matrix::transform_vector(point* result, const point& v) const
 {
 	assert(result);
 
-	result->x = sx / 65536.0f * v.x + shy / 65536.0f * v.y;
-	result->y = sy / 65536.0f * v.x + shx / 65536.0f * v.y;
+	result->x = Fixed16Mul(sx, v.x) + Fixed16Mul(shy, v.y);
+	result->y = Fixed16Mul(sy, v.x) + Fixed16Mul(shx, v.y);
 }
 
 void
@@ -294,28 +289,23 @@ matrix::set_inverse(const matrix& m)
 {
 	assert(this != &m);
 
-	// Invert the rotation part.
-	float	det = m.get_determinant();
-	if (det == 0.0f)
+	boost::int64_t  det = m.get_determinant();
+	if (det == 0)
 	{
-		// Not invertible.
-		//abort();	// castano: this happens sometimes! (ie. sample6.swf)
-
-		// Arbitrary fallback.
+        // cann't invert this matrix, set it to identity.
+        // this might happen when xscale == yscale == 0
 		set_identity();
-		tx = -m.tx;
-		ty = -m.ty;
 	}
 	else
 	{
-		float	inv_det = 1.0f / det;
-		sx = m.sy * inv_det;
-		sy = m.sx * inv_det;
-		shy = -m.shy * inv_det;
-		shx = -m.shx * inv_det;
-
-		tx = -( sx / 65536.0f * m.tx + shy / 65536.0f * m.ty);
-		ty = -(shx / 65536.0f * m.tx +  sy / 65536.0f * m.ty);
+		double  inv_det = 65536.0 * 65536.0 / det;
+		sx  = (boost::int32_t)(m.sy * inv_det);
+		sy  = (boost::int32_t)(m.sx * inv_det);
+		shy = -(boost::int32_t)(m.shy * inv_det);
+		shx = -(boost::int32_t)(m.shx * inv_det);
+        
+        tx = -( Fixed16Mul(sx,  m.tx) + Fixed16Mul(shy, m.ty) );
+        ty = -( Fixed16Mul(shx, m.tx) + Fixed16Mul(sy,  m.ty) );
 	}
 }
 
@@ -324,54 +314,35 @@ bool
 matrix::does_flip() const
 // Return true if this matrix reverses handedness.
 {
-	float	det = (float)sx * sy - (float)shx * shy;
-
-	return det < 0.0f;
+    return ((boost::int64_t)sx * sy) < ((boost::int64_t)shx * shy);
 }
 
 
-float
+boost::int64_t
 matrix::get_determinant() const
-// Return the determinant of the 2x2 rotation/scale part only.
+// Return the 32.32 fixed point determinant of this matrix.
 {
-	return ((float)sx * sy - (float)shx * shy) / (65536.0 * 65536.0);
+	return (boost::int64_t)sx * sy - (boost::int64_t)shx * shy;
 }
 
 float
 matrix::get_x_scale() const
 {
-	// Scale is applied before rotation, must match implementation
-	// in set_scale_rotation
-	float  scale = sqrtf(((float)sx * sx + (float)shx * shx)) / 65536.0f;
-
-	// Are we turned inside out?
-	if (get_determinant() < 0.f)
-	{
-		scale = -scale;
-	}
-
-	return scale;
+	return sqrtf(((float)sx * sx + (float)shx * shx)) / 65536.0f;
 }
 
 float
 matrix::get_y_scale() const
 {
-	// Scale is applied before rotation, must match implementation
-	// in set_scale_rotation
 	return sqrtf(((float)sy * sy + (float)shy * shy)) / 65536.0f;
 }
 
 float
 matrix::get_rotation() const
 {
-	if (get_determinant() < 0.f)
+	if (get_determinant() < 0)
 	{
-		// We're turned inside out; negate the
-		// x-component used to compute rotation.
-		//
-		// Matches get_x_scale().
-		//
-		// @@ this may not be how Macromedia does it!  Test this!
+        // TODO: check this.
 		return atan2f(shx, -sx);
 	}
 	else
@@ -385,22 +356,20 @@ std::ostream& operator<< (std::ostream& o, const matrix& m)
     // 8 digits and a decimal point.
     const short fieldWidth = 9;
 
-    o << std::endl << "| "
+    o << std::endl << "|"
       << std::setw(fieldWidth) << std::fixed << std::setprecision(4) 
       << m.sx/65536.0 << " "
       << std::setw(fieldWidth) << std::fixed << std::setprecision(4) 
       << m.shy/65536.0 << " "
       << std::setw(fieldWidth) << std::fixed << std::setprecision(4) 
-      << TWIPS_TO_PIXELS(m.tx)
-      << " |" 
-      << std::endl << "| "
+      << TWIPS_TO_PIXELS(m.tx) << " |" 
+      << std::endl << "|"
       << std::setw(fieldWidth) << std::fixed << std::setprecision(4) 
       << m.shx/65536.0 << " "
       << std::setw(fieldWidth) << std::fixed << std::setprecision(4) 
       << m.sy/65536.0 << " "
       << std::setw(fieldWidth) << std::fixed << std::setprecision(4) 
-      << TWIPS_TO_PIXELS(m.ty)
-      << " |";
+      << TWIPS_TO_PIXELS(m.ty) << " |";
       
       return o;
 }
