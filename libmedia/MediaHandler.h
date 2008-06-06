@@ -17,14 +17,15 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-#ifndef __MEDIAHANDLER_H__
-#define __MEDIAHANDLER_H__
+#ifndef MEDIAHANDLER_H
+#define MEDIAHANDLER_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
 #endif
 
 #include "MediaParser.h" // for videoCodecType and audioCodecType enums
+#include "dsodefs.h" // DSOEXPORT
 
 #include <memory>
 
@@ -43,7 +44,7 @@ namespace gnash {
 namespace media {
 
 /// The MediaHandler class acts as a factory to provide parser and decoders
-class MediaHandler
+class DSOEXPORT MediaHandler
 {
 public:
 

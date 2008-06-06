@@ -17,14 +17,15 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-#ifndef __MEDIAPARSER_H__
-#define __MEDIAPARSER_H__
+#ifndef GNASH_MEDIAPARSER_H
+#define GNASH_MEDIAPARSER_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
 #endif
 
 #include "tu_file.h" // for inlines
+#include "dsodefs.h" // DSOEXPORT
 
 #include <boost/scoped_array.hpp>
 #include <memory>
@@ -249,7 +250,7 @@ public:
 	/// frames and let NetSTream::bufferLength() use that with playhead
 	/// time to find out...
 	///
-	boost::uint64_t getBufferLength() const;
+	DSOEXPORT boost::uint64_t getBufferLength() const;
 
 	/// Get timestamp of the video frame which would be returned on nextVideoFrame
 	//

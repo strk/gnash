@@ -1,3 +1,9 @@
+2008-06-06 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* libmedia/MediaHandler.h, libmedia/MediaParser.h,
+	  libmedia/gst/MediaHandlerGst.h: fix visibility build, use legal
+	  header guards.
+
 2008-06-06 Sandro Santilli <strk@keybit.net>
 
 	* libmedia/: Makefile.am, MediaParser.{cpp,h}:

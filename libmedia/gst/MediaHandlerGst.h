@@ -17,13 +17,14 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-#ifndef __MEDIAHANDLERGST_H__
-#define __MEDIAHANDLERGST_H__
+#ifndef GNASH_MEDIAHANDLERGST_H
+#define GNASH_MEDIAHANDLERGST_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
 #endif
 
+#include "dsodefs.h" // DSOEXPORT
 #include "MediaHandler.h" // for inheritance
 
 #include <memory>
@@ -31,7 +32,7 @@
 namespace gnash {
 namespace media {
 
-class MediaHandlerGst : public MediaHandler
+class DSOEXPORT MediaHandlerGst : public MediaHandler
 {
 public:
 
