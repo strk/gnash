@@ -73,7 +73,7 @@ NetStream::NetStream()
 	m_bufferTime(100), // The default size needed to begin playback of media is 100 miliseconds
 	m_videoFrameFormat(gnash::render::videoFrameFormat()),
 	m_newFrameReady(false),
-	m_imageframe(NULL),
+	m_imageframe(),
 	m_parser(NULL),
 	m_isFLV(false),
 	inputPos(0),
@@ -548,7 +548,7 @@ NetStream::get_video()
 {
 	boost::mutex::scoped_lock lock(image_mutex);
 
-	if (!m_imageframe) return std::auto_ptr<image::image_base>(0);
+	if (!m_imageframe.get()) return std::auto_ptr<image::image_base>(0);
 
 	// TODO: inspect if we could return m_imageframe directly...
 	return m_imageframe->clone();	

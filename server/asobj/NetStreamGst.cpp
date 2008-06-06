@@ -191,8 +191,7 @@ NetStreamGst::close()
 
   boost::mutex::scoped_lock lock(image_mutex);
 
-  delete m_imageframe;
-  m_imageframe = NULL;
+  m_imageframe.reset();
 }
 
 void 
@@ -732,10 +731,9 @@ NetStreamGst::video_data_cb(GstElement* /*c*/, GstBuffer *buffer,
   
   boost::mutex::scoped_lock lock(ns->image_mutex);
   
-  if (!ns->m_imageframe || unsigned(width) != ns->m_imageframe->width() ||
+  if (!ns->m_imageframe.get() || unsigned(width) != ns->m_imageframe->width() ||
       unsigned(height) != ns->m_imageframe->height()) {
-    delete ns->m_imageframe;
-    ns->m_imageframe = new image::rgb(width, height);
+    ns->m_imageframe.reset( new image::rgb(width, height) );
   }    
   
   ns->m_imageframe->update(GST_BUFFER_DATA(buffer));

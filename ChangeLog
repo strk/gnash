@@ -1,5 +1,14 @@
 2008-06-06 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/NetStream.{cpp,h}: keep m_imageframe
+	  by auto_ptr, fixes memory leaks with NetStreamFfmpeg by
+	  making memory management automatic.
+	* server/asobj/NetStreamFfmpeg.cpp: update use of m_imageframe.
+	* server/asobj/NetStreamGst.cpp: update use of m_imageframe
+	  (drop manual memory management).
+
+2008-06-06 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/NetStreamFfmpeg.cpp (advance): don't feed the
 	  buffer if it's already full.
 

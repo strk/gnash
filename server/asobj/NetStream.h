@@ -272,7 +272,7 @@ protected:
 	boost::mutex image_mutex;
 
 	// The image/videoframe which is given to the renderer
-	image::image_base* m_imageframe;
+	std::auto_ptr<image::image_base> m_imageframe;
 
 	// The video URL
 	std::string url;

@@ -91,8 +91,6 @@ NetStreamFfmpeg::NetStreamFfmpeg()
 NetStreamFfmpeg::~NetStreamFfmpeg()
 {
 	close(); // close will also detach from sound handler
-
-	delete m_imageframe;
 }
 
 
@@ -132,8 +130,7 @@ void NetStreamFfmpeg::close()
 		_soundHandler->detach_aux_streamer(this);
 	}
 
-	delete m_imageframe;
-	m_imageframe = NULL;
+	m_imageframe.reset();
 
 	delete m_unqueued_data;
 	m_unqueued_data = NULL;
@@ -806,7 +803,8 @@ NetStreamFfmpeg::refreshVideoFrame(bool alsoIfPaused)
 	}
 	else
 	{
-		m_imageframe = video.release(); // ownership transferred
+		m_imageframe = video; // ownership transferred
+		assert(!video.get());
 		// A frame is ready for pickup
 		m_newFrameReady = true;
 	}
@@ -888,7 +886,7 @@ NetStreamFfmpeg::advance()
 			// The very first video frame we want to provide
 			// as soon as possible (if not paused),
 			// reguardless bufferLength...
-			if ( ! m_imageframe && _playHead.getState() != PlayHead::PLAY_PAUSED )
+			if ( ! m_imageframe.get() && _playHead.getState() != PlayHead::PLAY_PAUSED )
 			{
 				refreshVideoFrame(true);
 			}
