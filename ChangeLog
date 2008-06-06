@@ -1,5 +1,10 @@
 2008-06-06 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/NetStreamFfmpeg.cpp (advance): don't feed the
+	  buffer if it's already full.
+
+2008-06-06 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/NetStreamFfmpeg.cpp (advance): if not paused
 	  and haven't yet decoded any video frame, do so, reguardless
 	  of buffer length (tested as being the expected behaviour).

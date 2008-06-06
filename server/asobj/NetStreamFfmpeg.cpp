@@ -833,16 +833,19 @@ NetStreamFfmpeg::advance()
 	// Nothing to do if we don't have a parser
 	if ( ! m_parser.get() ) return;
 
-#ifndef LOAD_MEDIA_IN_A_SEPARATE_THREAD
-	// Parse some input no matter what
-	parseNextChunk(); 
-#endif // LOAD_MEDIA_IN_A_SEPARATE_THREAD
-
 	// bufferLength() would lock the mutex (which we already hold),
 	// so this is to avoid that.
 	boost::uint32_t parserTime = m_parser->getBufferLength();
 	boost::uint32_t playHeadTime = time();
 	boost::uint32_t bufferLen = parserTime > playHeadTime ? parserTime-playHeadTime : 0;
+
+#ifndef LOAD_MEDIA_IN_A_SEPARATE_THREAD
+	// Fill the buffer some more if not full ...
+	if ( bufferLen < m_bufferTime && ! m_parser->parsingCompleted() )
+	{
+		parseNextChunk(); 
+	}
+#endif // LOAD_MEDIA_IN_A_SEPARATE_THREAD
 
 
 	// Check decoding status 
