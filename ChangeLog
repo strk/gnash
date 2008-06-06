@@ -1,3 +1,7 @@
+2008-06-06 Russ Nelson <nelson@crynwr.com>
+
+	* configure.ac: Added warning about missing makeswf.
+
 2008-06-06 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/NetStream.{cpp,h}: keep m_imageframe

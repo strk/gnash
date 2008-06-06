@@ -2557,7 +2557,6 @@ fi
           echo "               You can install FFMPEG from http://ffmpeg.mplayerhq.hu" >&3
           echo "               or .deb users: apt-get install libavformat-dev" >&3
           echo "               or YaST users: yast -i libavformat-api (but currently installs into /usr/lib64)" >&3
-
           echo "               or explicitly set the path using --with-ffmpeg-incl=" >&5
           echo "               or reconfigure with --enable-media=gst" >&3
 	else
@@ -2653,7 +2652,7 @@ if $need_sdl; then
 fi
 unset need_sdl
 
-if test x"$npapi" = x"yes"; then
+if test x"$nsapi" = x"yes"; then
 dnl  if test x"$FIREFOX_CFLAGS" != x; then
 dnl    echo "        Firefox flags are: $FIREFOX_CFLAGS"
 dnl    echo "        Firefox libs are: $FIREFOX_LIBS"
@@ -2798,15 +2797,23 @@ fi
 dnl don't look for the flash compilers when cross compiling.
 if test x$cross_compiling = xno; then
   if test x"$MING_LIBS" != x; then
-    echo "        MING version code is $MING_VERSION_CODE"
     echo "        MING flags are $MING_CFLAGS"
     echo "        MING libs are $MING_LIBS"
-    echo "        MAKESWF is $MAKESWF"
   else
-    echo "        WARNING: You need to have the Ming development and utilities packages" >&4
+    echo "        WARNING: You need to have the Ming development package" >&4
     echo "                 installed to run most of the tests in Gnash testsuite." >&4
     echo "                 Install it from http://ming.sourceforge.net" >&4
     echo "                 or .deb users: apt-get install libming-dev" >&4
+  fi
+
+  if test x"$MAKESWF" != x; then
+    echo "        MING version code is $MING_VERSION_CODE"
+    echo "        MAKESWF is $MAKESWF"
+  else
+    echo "        WARNING: You need to have the Ming utilities package" >&4
+    echo "                 installed to run most of the tests in Gnash testsuite." >&4
+    echo "                 Install it from http://ming.sourceforge.net" >&4
+    echo "                 or .deb users: apt-get install libming-utils" >&4
   fi
 
   if test x"$SWFDEC_TESTSUITE" != x; then
