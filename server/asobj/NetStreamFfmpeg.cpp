@@ -881,6 +881,15 @@ NetStreamFfmpeg::advance()
 				" - position=%d, buffer=%d/%d",
 				this, _playHead.getPosition(), bufferLen, m_bufferTime);
 #endif // GNASH_DEBUG_DECODING
+
+			// The very first video frame we want to provide
+			// as soon as possible (if not paused),
+			// reguardless bufferLength...
+			if ( ! m_imageframe && _playHead.getState() != PlayHead::PLAY_PAUSED )
+			{
+				refreshVideoFrame(true);
+			}
+
 			return;
 		}
 

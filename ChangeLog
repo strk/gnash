@@ -1,3 +1,9 @@
+2008-06-06 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/NetStreamFfmpeg.cpp (advance): if not paused
+	  and haven't yet decoded any video frame, do so, reguardless
+	  of buffer length (tested as being the expected behaviour).
+
 2008-06-06 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* libmedia/MediaHandler.h: add GNASH to header guard.
