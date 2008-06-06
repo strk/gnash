@@ -1355,7 +1355,7 @@ AC_CACHE_CHECK([for finite], ac_cv_finite,
  ac_cv_finite=no
 )])
 if test x"$ac_cv_finite" = x"yes"; then
-  AC_DEFINE(HAVE_FINITE, [], [Has finite])
+  AC_DEFINE(HAVE_FINITE, [1], [Has finite])
 fi
 
 AC_CACHE_CHECK([for isfinite], ac_cv_isfinite,
@@ -1365,7 +1365,7 @@ AC_CACHE_CHECK([for isfinite], ac_cv_isfinite,
  ac_cv_isfinite=no
 )])
 if test x"$ac_cv_isfinite" = x"yes"; then
-  AC_DEFINE(HAVE_ISFINITE, [], [Has isfinite])
+  AC_DEFINE(HAVE_ISFINITE, [1], [Has isfinite])
 fi
 
 AC_LANG_PUSH(C++)
@@ -1921,8 +1921,7 @@ if test x"$GCC" = x"yes"; then
     -Wreturn-type \
     -Wnon-virtual-dtor \
     -Wunused \
-    -Wextra \
-    -Wunsafe-loop-optimizations \    
+    -Wextra \   
     -ansi \
     "
   CFLAGS="$CFLAGS \
