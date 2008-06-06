@@ -3,6 +3,7 @@
 	* configure.ac: #define HAVE_(IS)FINITE to 1 and removed
 	  -Wunsafe-loop-optimizations since not all versions of
 	  gcc supports it.
+	* utility.h: Fixed a quirk on Leopard/BSD for isfinite();
 
 2008-06-06 Russ Nelson <nelson@crynwr.com>
 

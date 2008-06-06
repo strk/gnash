@@ -97,11 +97,12 @@ namespace utility {
 
 inline bool isFinite(double d)
 {
-#if defined(HAVE_FINITE) && !defined(isfinite)
+#if defined(HAVE_FINITE) && !defined(HAVE_ISFINITE)
     return (finite(d));
 #else
     // Put using namespace std; here if you have to
     // put it anywhere.
+    using namespace std;
     return (isfinite(d));
 #endif
 }
