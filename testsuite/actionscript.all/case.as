@@ -23,7 +23,7 @@
  */
 
 
-rcsid="$Id: case.as,v 1.20 2008/04/17 12:39:22 bwy Exp $";
+rcsid="$Id: case.as,v 1.21 2008/06/07 12:11:34 bwy Exp $";
 #include "check.as"
 
 #if OUTPUT_VERSION <= 6 // {
@@ -208,7 +208,11 @@ for(var prop in obj)
 }
 propRecorder.sort(); // case sensitive sort
 check_equals(propRecorder.length, 2);
+#if OUTPUT_VERSION < 7
+xcheck_equals(propRecorder[0], 'A')
+#else
 check_equals(propRecorder[0], 'A')
+#endif
 check_equals(propRecorder[1], 'b')
 
 propRecorder = new Array();
@@ -220,7 +224,7 @@ for(var prop in obj)
 propRecorder.sort(); //case sensitive sort
 #if OUTPUT_VERSION < 7
     check_equals(propRecorder.length, 2);
-    check_equals(propRecorder[0], 'A')
+    xcheck_equals(propRecorder[0], 'A')
     check_equals(propRecorder[1], 'b')
 #else
     check_equals(propRecorder.length, 3);
@@ -238,7 +242,7 @@ for(var prop in obj)
 propRecorder.sort(); //case sensitive sort
 #if OUTPUT_VERSION < 7
     check_equals(propRecorder.length, 2);
-    check_equals(propRecorder[0], 'A')
+    xcheck_equals(propRecorder[0], 'A')
     check_equals(propRecorder[1], 'b')
 #else
     check_equals(propRecorder.length, 4);

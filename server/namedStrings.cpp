@@ -31,18 +31,22 @@ namespace NSV { // Named String Values
 // Load up our pre-known names
 static string_table::svt preload_names[] =
 {
+	string_table::svt( "a", NSV::PROP_A ),
 	string_table::svt( "addListener", NSV::PROP_ADD_LISTENER ),
 	string_table::svt( "align", NSV::PROP_ALIGN ),
 	string_table::svt( "_alpha", NSV::PROP_uALPHA ),
+	string_table::svt( "b", NSV::PROP_B ),
 	string_table::svt( "blockIndent", NSV::PROP_BLOCK_INDENT ),
 	string_table::svt( "bold", NSV::PROP_BOLD ),
 	string_table::svt( "broadcastMessage", NSV::PROP_BROADCAST_MESSAGE ),
 	string_table::svt( "bullet", NSV::PROP_BULLET ),
+	string_table::svt( "c", NSV::PROP_C ),
 	string_table::svt( "callee", NSV::PROP_CALLEE ),
 	//string_table::svt( "color", NSV::PROP_COLOR ), // clashes with CLASS_COLOR in case-insensitive mode
 	string_table::svt( "constructor", NSV::PROP_CONSTRUCTOR ),
 	string_table::svt( "__constructor__", NSV::PROP_uuCONSTRUCTORuu ),
 	string_table::svt( "_currentframe", NSV::PROP_uCURRENTFRAME ),
+	string_table::svt( "d", NSV::PROP_D ),
 	string_table::svt( "_droptarget", NSV::PROP_uDROPTARGET ),
 	string_table::svt( "enabled", NSV::PROP_ENABLED ),
 	string_table::svt( "useHandCursor", NSV::PROP_USEHANDCURSOR ),
@@ -122,6 +126,8 @@ static string_table::svt preload_names[] =
 	string_table::svt( "textHeight", NSV::PROP_TEXT_HEIGHT ),
 	string_table::svt( "toString", NSV::PROP_TO_STRING ),
 	string_table::svt( "_totalframes", NSV::PROP_uTOTALFRAMES ),
+	string_table::svt( "tx", NSV::PROP_TX ),
+	string_table::svt( "ty", NSV::PROP_TY ),
 	string_table::svt( "underline", NSV::PROP_UNDERLINE ),
 	string_table::svt( "_url", NSV::PROP_uURL ),
 	string_table::svt( "valueOf", NSV::PROP_VALUE_OF ),

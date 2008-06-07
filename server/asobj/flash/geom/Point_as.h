@@ -17,8 +17,10 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef __GNASH_ASOBJ_POINT_H__
-#define __GNASH_ASOBJ_POINT_H__
+#ifndef GNASH_ASOBJ_POINT_H
+#define GNASH_ASOBJ_POINT_H
+
+#include "as_object.h" // For inheritance
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -28,8 +30,14 @@
 
 namespace gnash {
 
-class as_object;
 class as_function;
+
+// The Point class is needed by Matrix
+class Point_as: public as_object
+{
+public:
+	Point_as();
+};
 
 /// Initialize the global Point class
 void Point_class_init(as_object& global);

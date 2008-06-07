@@ -17,8 +17,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef __GNASH_ASOBJ_MATRIX_H__
-#define __GNASH_ASOBJ_MATRIX_H__
+#ifndef GNASH_ASOBJ_MATRIX_H
+#define GNASH_ASOBJ_MATRIX_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"

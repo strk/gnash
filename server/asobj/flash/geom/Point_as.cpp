@@ -89,22 +89,12 @@ getPointInterface()
 	return o.get();
 }
 
-class Point_as: public as_object
-{
-
-public:
-
-	Point_as()
+Point_as::Point_as()
 		:
-		as_object(getPointInterface())
-	{}
+	as_object(getPointInterface())
+{
+}
 
-	// override from as_object ?
-	//std::string get_text_value() const { return "Point"; }
-
-	// override from as_object ?
-	//double get_numeric_value() const { return 0; }
-};
 
 
 static as_value

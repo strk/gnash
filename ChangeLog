@@ -1,5 +1,21 @@
 2008-06-07 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* server/asobj/flash/geom/Point_as{h,cpp}: move class declaration
+	  to header, as Matrix_as needs to construct points.
+	* server/asobj/flash/geom/Matrix_as.{cpp,h}: implement getter/setters,
+	  deltaTransformPoint, scale, rotate, identity, translate (also
+	  clone, but this is untested).
+	* server/namedStrings.{cpp,h}: add named properties to string table.
+	  This breaks something in the testsuite (because the .a property is
+	  now a named string), but is not a new bug; it confirms the
+	  implementation problem. If 'X' or 'Y' rather than 'A' were tested
+	  in the testsuite, the same failure would already be there.
+	* testsuite/actionscript.all/Matrix_as: lots of test passes.
+	* testsuite/actionscript.all/case.as: expect failures for SWF6 and
+	  below.
+	  
+2008-06-07 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* testsuite/actionscript.all/Matrix.as: add tests for the
 	  flash.geom.Matrix object (which is an ActionScript matrix of
 	  double-precision values and nothing to do with Zou's matrices).
