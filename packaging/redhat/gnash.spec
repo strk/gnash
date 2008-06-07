@@ -1,6 +1,6 @@
-%define version 20080216
+%define version 0.8.3
 Name:           gnash
-Version:        %{version}cvs
+Version:        %{version}
 Release:        1%{?dist}
 Summary:        GNU flash movie player
 
@@ -40,7 +40,7 @@ Requires(postun): /sbin/ldconfig
 #Requires(preun): /sbin/install-info
 
 %description
-Gnash is a GNU Flash movie player that supports many SWF v7 features.
+Gnash is a GNU Flash movie player that supports many SWF v7 features, with growing support for swf v8 and v9.
 
 %package plugin
 Summary:   Web-client flash movie player plugin 
@@ -154,11 +154,15 @@ make %{?_smp_mflags} dumpconfig all
         --prefix=/usr \
 	--mandir=/usr/share/man \
 	--infodir=/usr/share/info \
-	--with-plugindir=/usr/lib/mozilla/plugins \
  	--disable-static \
 	--enable-shared \
-	--disable-testsuite
-#	--enable-docbook
+	--disable-testsuite \
+	--with-plugindir=%{_libdir}/mozilla/plugins \
+        --with-kde-plugindir=%{_libdir}/kde3 \
+        --with-kde-servicesdir=${datadir}/services \
+        --with-kde-configdir=${datadir}/config \
+        --with-kde-appsdatadir=${datadir}/apps \
+        --with-kde-pluginprefix=/usr
 
 make dumpconfig all
 %endif
@@ -213,9 +217,11 @@ scrollkeeper-update -q || :
 %{_datadir}/man/man1/*.1*
 %{_datadir}/locale/*/LC_MESSAGES/gnash.mo
 %if !%{cross_compile}
-%{_prefix}/share/info/*.info*
+#%{_prefix}/share/info/*.info*
 %{_prefix}/share/doc/gnash/*.html
 %{_prefix}/share/doc/gnash/images/*.png
+%{_prefix}/etc/gnashrc
+%{_prefix}/etc/gnashpluginrc
 # %{_infodir}/*.info*
 #%doc doc/C/gnash*.html 
 #%doc doc/C/images/*.png
@@ -233,7 +239,8 @@ scrollkeeper-update -q || :
 %if !%{cross_compile}
 %{_bindir}/kde-gnash
 %{_libdir}/kde3/libklashpart.*
-%{_datadir}/apps/klash/
+%{_datadir}/apps/klash/klashpartui.rc
+%{_datadir}/apps/klash/pluginsinfo
 %{_datadir}/services/klash_part.desktop
 %endif
 
