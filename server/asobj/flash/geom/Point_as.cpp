@@ -89,12 +89,16 @@ getPointInterface()
 	return o.get();
 }
 
-Point_as::Point_as()
-		:
-	as_object(getPointInterface())
-{
-}
 
+class Point_as: public as_object
+{
+public:
+	Point_as()
+	    :
+	    as_object(getPointInterface())
+	{}
+	    
+};
 
 
 static as_value
@@ -665,6 +669,11 @@ static as_value get_flash_geom_point_constructor(const fn_call& /*fn*/)
 	log_debug("Loading flash.geom.Point class");
 
 	return getFlashGeomPointConstructor();
+}
+
+std::auto_ptr<as_object> init_Point_instance()
+{
+    return std::auto_ptr<as_object>(new Point_as);
 }
 
 // extern 

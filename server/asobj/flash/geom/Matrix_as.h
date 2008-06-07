@@ -29,12 +29,16 @@
 namespace gnash {
 
 class as_object;
+class as_function;
 
 /// Initialize the global Matrix class
 void Matrix_class_init(as_object& global);
 
 /// Return a Matrix instance (in case the core lib needs it)
 //std::auto_ptr<as_object> init_Matrix_instance();
+
+// This will probably be needed by other geom classes.
+as_function* getFlashGeomMatrixConstructor();
 
 } // end of gnash namespace
 

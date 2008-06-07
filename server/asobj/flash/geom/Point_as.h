@@ -20,30 +20,22 @@
 #ifndef GNASH_ASOBJ_POINT_H
 #define GNASH_ASOBJ_POINT_H
 
-#include "as_object.h" // For inheritance
-
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
 #endif
 
-//#include <memory> // for auto_ptr
+#include "as_object.h" // For visibility to auto_ptr
+#include <memory> // for auto_ptr
 
 namespace gnash {
 
 class as_function;
 
-// The Point class is needed by Matrix
-class Point_as: public as_object
-{
-public:
-	Point_as();
-};
-
 /// Initialize the global Point class
 void Point_class_init(as_object& global);
 
 /// Return a Point instance (in case the core lib needs it)
-//std::auto_ptr<as_object> init_Point_instance();
+std::auto_ptr<as_object> init_Point_instance();
 
 /// Return the Point constructor, for use by Rectangle 
 as_function* getFlashGeomPointConstructor();

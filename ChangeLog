@@ -1,3 +1,12 @@
+2008-06-07 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/asobj/flash/geom/Point_as{h,cpp}: move class declaration
+	  back into the implementation file and implement the handy auto_ptr
+	  function that was lying about (thanks strk).
+	* server/asobj/flash/geom/Matrix_as.{cpp,h}: add
+	  getFlashGeomMatrixConstructor() in header (will probably be
+	  needed).
+
 2008-06-07  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* Makefile.am: Include xpi.am for XPI packages.
