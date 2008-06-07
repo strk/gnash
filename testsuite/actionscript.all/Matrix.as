@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Matrix.as,v 1.2 2008/06/07 12:11:34 bwy Exp $";
+rcsid="$Id: Matrix.as,v 1.3 2008/06/07 12:44:26 bwy Exp $";
 
 
 // There are lots of floating point calculations here. Comparing them
@@ -42,8 +42,18 @@ Matrix = flash.geom.Matrix;
 check_equals(typeof(Matrix), 'function');
 check_equals(typeof(Matrix.prototype), 'object');
 // TODO: check prototypes properties
-//check(Point.prototype.hasOwnProperty('length'));
-
+check(Matrix.prototype.hasOwnProperty('identity'));
+check(Matrix.prototype.hasOwnProperty('rotate'));
+check(Matrix.prototype.hasOwnProperty('concat'));
+check(Matrix.prototype.hasOwnProperty('translate'));
+check(Matrix.prototype.hasOwnProperty('scale'));
+check(Matrix.prototype.hasOwnProperty('transformPoint'));
+check(Matrix.prototype.hasOwnProperty('deltaTransformPoint'));
+check(Matrix.prototype.hasOwnProperty('createBox'));
+check(Matrix.prototype.hasOwnProperty('clone'));
+check(Matrix.prototype.hasOwnProperty('createGradientBox'));
+check(Matrix.prototype.hasOwnProperty('invert'));
+check(Matrix.prototype.hasOwnProperty('toString'));
 
 //-------------------------------------------------------------
 // Test constructor
@@ -162,6 +172,11 @@ m3 = new Matrix(2, 0, 0, 2, 100, 100);
 m3.scale(3, 4);
 check_equals(m3.toString(), "(a=6, b=0, c=0, d=8, tx=300, ty=400)");
 
+// Test clone
+m4 = m3.clone();
+check_equals(m4.toString(), "(a=6, b=0, c=0, d=8, tx=300, ty=400)");
+
+// Test invert
 m3.invert();
 xcheck_equals(m3.toString(), "(a=0.166666666666667, b=0, c=0, d=0.125, tx=-50, ty=-50)");
 
@@ -183,6 +198,8 @@ check_equals(m3.c.toString(), "0");
 check_equals(m3.d.toString(), "1");
 check_equals(m3.tx.toString(), "0");
 check_equals(m3.ty.toString(), "0");
+
+
 
 //-------------------------------------------------------------
 // END OF TEST

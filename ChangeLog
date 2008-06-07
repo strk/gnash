@@ -1,5 +1,10 @@
 2008-06-07 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* testsuite/actionscript.all/Matrix_as: tests for clone() and
+	  properties.
+
+2008-06-07 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* server/asobj/flash/geom/Point_as{h,cpp}: move class declaration
 	  to header, as Matrix_as needs to construct points.
 	* server/asobj/flash/geom/Matrix_as.{cpp,h}: implement getter/setters,
