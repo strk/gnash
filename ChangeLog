@@ -1,3 +1,9 @@
+2008-06-07  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* Makefile.am: Include xpi.am for XPI packages.
+	* packaging/xpi.am: XPI packaging support.
+	* packaging/xpi/install.rdf: Install data file for XPI.
+
 2008-06-07 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* testsuite/actionscript.all/Matrix_as: tests for clone() and

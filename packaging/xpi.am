@@ -1,0 +1,76 @@
+# 
+#   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+# 
+
+#
+# Build a Debian Familiar .ipk GNU/Linux package. These are always
+# cross compiled, typically for the ARM or XScale.
+#
+
+# this is where the output of "make install" goes, which is what
+# we use to build the package.
+XPI_TMP=/tmp/$(host_alias)-gnash
+
+# this is where we build the bundle that goes in the xpi file
+XPI_BUNDLE=$(XPI_TMP)/bundle
+
+# this is where the gnash gets compiled
+XPI_BUILD=gnash-${VERSION}
+
+xpi-unpack: $(top_builddir)/config.status
+	-@rm -f xpi-*		# nuke everything, we're starting over
+	-@rm -f xpi-unpack
+	rm -rf $(XPI_BUILD)
+	tar jxf $(XPI_BUILD).tar.bz2
+	@touch xpi-unpack
+
+xpi-configure: xpi-unpack $(XPI_BUILD)
+	-@rm -f ipkg-configure
+	cd $(XPI_BUILD); ./configure \
+	  --disable-kparts --enable-gui=gtk \
+	--with-plugins-install=system
+	@touch xpi-configure 
+
+xpi-build: xpi-configure
+	-@rm -f xpi-build
+	$(MAKE) -C $(XPI_BUILD) all
+	@touch xpi-build
+
+xpi-install: xpi-build Makefile
+	-@rm -f xpi-install
+	$(MAKE) -C $(XPI_BUILD) install install-plugin DESTDIR=$(XPI_TMP)
+	@touch xpi-install
+
+xpi-depend: 
+	-@rm -f xpi-depend
+	@touch xpi-depend
+
+xpi xpi-bundle: xpi-install # xpi-depend
+	if ! test -d $(XPI_TMP)/plugins ; then \
+	  mkdir $(XPI_TMP)/plugins; \
+	fi
+	topdir=`cd ${top_srcdir}; pwd`; \
+	for i in install.rdf; do \
+	  cp -f $${topdir}/packaging/xpi/$$i $(XPI_BUNDLE)/; \
+	done; \
+	xpi-build $(XPI_TMP)
+
+xpi-clean:
+	rm -fr xpi-* $(XPI_BUILD) $(XPI_TMP) gnash*$(VERSION)*.ipk
+
+.PHONY : xpi xpi-bundle
+
+

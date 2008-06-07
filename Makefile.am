@@ -116,6 +116,11 @@ include $(srcdir)/packaging/alp.am
 include $(srcdir)/packaging/bsd.am
 
 #
+# Mozille/Firefox XPI support
+#
+include $(srcdir)/packaging/xpi.am
+
+#
 # Binary tarball packaging
 #
 include $(srcdir)/packaging/snapshot.am
