@@ -31,7 +31,7 @@
 namespace gnash {
 namespace media {
 
-class MediaHandlerFfmpeg : public MediaHandler
+class DSOEXPORT MediaHandlerFfmpeg : public MediaHandler
 {
 public:
 
