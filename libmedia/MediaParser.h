@@ -257,7 +257,7 @@ public:
 	/// @return false if there no video frame left
 	///         (either none or no more)
 	///
-	bool nextVideoFrameTimestamp(boost::uint64_t& ts) const;
+	DSOEXPORT bool nextVideoFrameTimestamp(boost::uint64_t& ts) const;
 
 	/// Returns the next video frame in the parsed buffer, advancing video cursor.
 	//
@@ -266,14 +266,14 @@ public:
 	/// you can check with parsingCompleted() to know wheter this is due to 
 	/// EOF reached.
 	///
-	std::auto_ptr<EncodedVideoFrame> nextVideoFrame();
+	DSOEXPORT std::auto_ptr<EncodedVideoFrame> nextVideoFrame();
 
 	/// Get timestamp of the audio frame which would be returned on nextAudioFrame
 	//
 	/// @return false if there no video frame left
 	///         (either none or no more)
 	///
-	bool nextAudioFrameTimestamp(boost::uint64_t& ts) const;
+	DSOEXPORT bool nextAudioFrameTimestamp(boost::uint64_t& ts) const;
 
 	/// Returns the next audio frame in the parsed buffer, advancing audio cursor.
 	//
@@ -282,7 +282,7 @@ public:
 	/// you can check with parsingCompleted() to know wheter this is due to 
 	/// EOF reached.
 	///
-	std::auto_ptr<EncodedAudioFrame> nextAudioFrame();
+	DSOEXPORT std::auto_ptr<EncodedAudioFrame> nextAudioFrame();
 
 	/// Is the input MP3?
 	//
