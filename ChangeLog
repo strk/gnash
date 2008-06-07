@@ -1,3 +1,9 @@
+2008-06-07 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* testsuite/actionscript.all/Matrix.as: add tests for the
+	  flash.geom.Matrix object (which is an ActionScript matrix of
+	  double-precision values and nothing to do with Zou's matrices).
+
 2008-06-07 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* configure.ac: #define HAVE_(IS)FINITE to 1 and removed

@@ -123,6 +123,7 @@ ASTESTS =			\
 	toString_valueOf.as	\
 	Rectangle.as		\
 	Point.as		\
+	Matrix.as \
 	$(NULL)
 
 ASTESTS_OUT = $(ASTESTS:.as=.swf)
