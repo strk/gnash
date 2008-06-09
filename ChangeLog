@@ -1,5 +1,10 @@
 2008-06-09 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/libbase/: CurlStreamTest.cpp, NoSeekFileTest.cpp:
+	  fix build...
+
+2008-06-09 Sandro Santilli <strk@keybit.net>
+
 	* server/parser/button_character_def.h: don't redefine UNUSED
 
 2008-06-09 Sandro Santilli <strk@keybit.net>

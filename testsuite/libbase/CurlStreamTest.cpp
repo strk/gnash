@@ -36,14 +36,14 @@ const char* post = NULL;
 static void
 dump_curl(const char* url, ostream& os)
 {
-	std::auto_ptr<tu_file> reader;
+	std::auto_ptr<gnash::IOChannel> reader;
 	if ( post )
 	{
-		reader.reset( curl_adapter::make_stream(url, post) );
+		reader.reset( gnash::curl_adapter::make_stream(url, post) );
 	}
 	else
 	{
-		reader.reset( curl_adapter::make_stream(url) );
+		reader.reset( gnash::curl_adapter::make_stream(url) );
 	}
 
 	assert(reader.get());

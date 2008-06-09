@@ -46,7 +46,7 @@ using namespace std;
 TestState runtest;
 
 static void
-dump_buffer(char* label, char* buf, size_t size, ostream& os)
+dump_buffer(const char* label, char* buf, size_t size, ostream& os)
 {
 	os << label << ":" << endl;
 	for (size_t i=0; i<size; i++) {
@@ -57,7 +57,7 @@ dump_buffer(char* label, char* buf, size_t size, ostream& os)
 
 
 bool 
-compare_reads(tu_file* reader, int fd, char* first, char* second)
+compare_reads(gnash::IOChannel* reader, int fd, char* first, char* second)
 {
 	char buf[CHUNK_SIZE];
 	char buf2[CHUNK_SIZE];
@@ -135,7 +135,7 @@ main(int /*argc*/, char** /*argv*/)
 
 	dup2(fd, 0);
 
-	tu_file* reader = noseek_fd_adapter::make_stream(0, cachename);
+	gnash::IOChannel* reader = gnash::noseek_fd_adapter::make_stream(0, cachename);
 	assert(reader);
 
 	compare_reads(reader, raw, "wrapped", "raw");
