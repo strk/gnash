@@ -124,5 +124,22 @@ IOChannel::read_float32()
     return u.f;
 }
 
+boost::uint8_t
+IOChannel::read_byte()
+{
+	boost::uint8_t u;
+	if ( read_bytes(&u, 1) == -1 )
+	{
+		throw IOException("Could not read a single byte from input");
+	}
+	return u;
+}
+
+void
+IOChannel::write_byte(boost::uint8_t u)
+{
+	write_bytes(&u, 1); // will trhow on error it seems
+}
+
 
 } // namespace gnash

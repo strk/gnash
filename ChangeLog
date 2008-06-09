@@ -1,5 +1,12 @@
 2008-06-09 Sandro Santilli <strk@keybit.net>
 
+	* libbase/IOChannel.{cpp,h}: read_byte and write_byte don't
+	  need to be virtual, implement in terms of read_bytes and
+	  write_bytes, with exception throwing on error. Fix IOException
+	  to be actually instantiatable..
+
+2008-06-09 Sandro Santilli <strk@keybit.net>
+
 	* lots of files: use IOChannel instead of tu_file for input.
 
 2008-06-09 Benjamin Wolsey <bwy@benjaminwolsey.de>

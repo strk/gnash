@@ -42,7 +42,7 @@ namespace gnash {
 
 /// Exception signalling an IO error
 class IOException : public GnashException {
-
+public:
 	IOException(const std::string& s) : GnashException(s) {}
 	IOException() : GnashException("IO error") {}
 };
@@ -92,13 +92,13 @@ public:
 	//
 	/// Throw IOException on error
 	///
-	virtual boost::uint8_t read_byte() =0;
+	boost::uint8_t read_byte();
 
 	/// write a single byte to the stream
 	//
 	/// Throw IOException on error
 	///
-	virtual void write_byte(boost::uint8_t u)=0;
+	void write_byte(boost::uint8_t u);
 
 	/// Read the given number of bytes from the stream
 	//
