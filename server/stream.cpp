@@ -442,7 +442,7 @@ void SWFStream::read_string_with_length(unsigned len, std::string& to)
     ensureBytes(len);
     for (unsigned int i = 0; i < len; ++i)
     {
-        to.push_back(read_u8());
+        to[i] = read_u8();
     }
 
 }

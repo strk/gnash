@@ -226,25 +226,29 @@ GlyphInfo::markReachableResources() const
 		m_wide_codes       = flags & (1 << 2);
 		m_is_italic        = flags & (1 << 1);
 		m_is_bold          = flags & (1 << 0);
-        // don't know the usage, so we discard it.
-		int	discarded = in.read_u8();
-		UNUSED(discarded);
+
+		// Next is language code, always 0 for SWF5 or previous
+		int languageCode = in.read_u8();
+		LOG_ONCE( if (languageCode) { log_unimpl("LanguageCode in DefineFont (2 or 3)"); } );
+
+		in.read_string_with_length(m_name);
+
+		in.ensureBytes(2); 
+		boost::uint16_t glyph_count = in.read_u16();
 
 		IF_VERBOSE_PARSE (
             log_parse(" has_layout = %d", has_layout);
-		    log_parse(" shift_jis_chars = %d", m_shift_jis_chars);
+	    log_parse(" shift_jis_chars = %d", m_shift_jis_chars);
             log_parse(" m_unicode_chars = %d", m_unicode_chars);
             log_parse(" m_ansi_chars = %d", m_ansi_chars);
             log_parse(" wide_offsets = %d", wide_offsets);
             log_parse(" wide_codes = %d", m_wide_codes);
             log_parse(" is_italic = %d", m_is_italic);
             log_parse(" is_bold = %d", m_is_bold);
+            log_parse(" name = %s", m_name);
+            log_parse(" glyphs count = %d", glyph_count);
 		);
 
-		in.read_string_with_length(m_name);
-
-		in.ensureBytes(2); 
-		boost::uint16_t glyph_count = in.read_u16();
 		
 		unsigned long table_base = in.get_position();
 
