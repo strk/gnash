@@ -1,5 +1,9 @@
 2008-06-09 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/button_character_def.h: don't redefine UNUSED
+
+2008-06-09 Sandro Santilli <strk@keybit.net>
+
 	* libbase/IOChannel.{cpp,h}: read_byte and write_byte don't
 	  need to be virtual, implement in terms of read_bytes and
 	  write_bytes, with exception throwing on error. Fix IOException

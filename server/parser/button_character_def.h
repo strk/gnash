@@ -34,10 +34,6 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/cstdint.hpp> // for boost::uint64_t typedef
 
-#ifndef UNUSED
-#define UNUSED(x) ((x) = (x))
-#endif
-
 // Forward declarations
 namespace gnash {
 	class sprite_instance;
