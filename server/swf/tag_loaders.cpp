@@ -22,7 +22,7 @@
 #include "gnashconfig.h" // HAVE_ZLIB_H, USE_SWFTREE
 #endif
 
-#include "tu_file.h"
+#include "tu_file.h" // for StreamAdapter (bitmap tag loaders)
 #include "utility.h"
 #include "action.h"
 #include "action_buffer.h"

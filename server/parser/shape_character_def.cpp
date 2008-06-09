@@ -31,8 +31,6 @@
 #include "stream.h"
 #include "sprite_instance.h"
 
-#include "tu_file.h"
-
 #include <cfloat>
 #include <algorithm>
 
