@@ -378,7 +378,7 @@ public:
 	virtual unsigned int get_duration(int sound_handle);
 
 	/// Gets the playhead position in milliseconds of an event sound connected to an AS Soound obejct.
-	virtual unsigned int get_position(int sound_handle);
+	virtual unsigned int tell(int sound_handle);
 	
 	virtual void	attach_aux_streamer(aux_streamer_ptr ptr, void* owner);	//vv
 	virtual void	detach_aux_streamer(void* owner);	//vv

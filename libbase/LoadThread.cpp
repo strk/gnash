@@ -152,7 +152,7 @@ size_t LoadThread::read(void *dst, size_t bytes)
 		// If the actual position is different from the position
 		// last used by the user/owner, seek to the position
 		if (_actualPosition != _userPosition) {
-			_stream->set_position(_userPosition);
+			_stream->seek(_userPosition);
 			_actualPosition = _userPosition;
 		}
 		
@@ -181,7 +181,7 @@ size_t LoadThread::read(void *dst, size_t bytes)
 		// If the actual position is different from the position
 		// last used by the user/owner, seek to the position
 		if (_actualPosition != _userPosition) {
-			_stream->set_position(_userPosition);
+			_stream->seek(_userPosition);
 			_actualPosition = _userPosition;
 		}
 
@@ -222,7 +222,7 @@ size_t LoadThread::read(void *dst, size_t bytes)
 	// If the actual position is different from the position
 	// last used by the user/owner, seek to the position
 	if (_actualPosition != _userPosition) {
-		_stream->set_position(newcachestart);
+		_stream->seek(newcachestart);
 		_actualPosition = newcachestart;
 	}
 
@@ -296,7 +296,7 @@ void LoadThread::setupCache()
 	_cacheStart = 0;
 	_cachedData = ret;
 	_loadPosition = ret;
-	_streamSize = _stream->get_size();
+	_streamSize = _stream->size();
 
 	if ( ret < setupSize )
 	{
@@ -336,7 +336,7 @@ void LoadThread::fillCache()
 	assert(!_completed);
 
 	// If we're not at the reading head, move to it
-	if (_loadPosition != _actualPosition) _stream->set_position(_loadPosition);
+	if (_loadPosition != _actualPosition) _stream->seek(_loadPosition);
 
 	// If loading the next chunk will overflow the cache, only fill the cache
 	// the "the edge", and "warm up" the remaining data.
@@ -352,8 +352,8 @@ void LoadThread::fillCache()
 #endif
 			_completed = true;
 		} else {
-			_stream->set_position(_loadPosition + _chunkSize);
-			long pos = _stream->get_position();
+			_stream->seek(_loadPosition + _chunkSize);
+			long pos = _stream->tell();
 			if (pos != _loadPosition + _chunkSize) {
 #ifdef GNASH_DEBUG_LOAD_THREAD
 				log_debug("LoadThread completed during fillCache (attempted to go to position %d, but only got to %d",
@@ -397,17 +397,17 @@ void LoadThread::download()
 	// Can't rely on _streamSize right ?
 	//if ( nextpos > _streamSize ) nextpos = _streamSize;
 
-	_stream->set_position(nextpos);
-	long pos = _stream->get_position();
+	_stream->seek(nextpos);
+	long pos = _stream->tell();
 	if ( pos == -1 )
 	{
-		log_error("Error in get_position");
+		log_error("Error in tell");
 		abort();
 	}
 
 	if (pos < nextpos) {
 #ifdef GNASH_DEBUG_LOAD_THREAD
-		log_debug("LoadThread completed during download (get_position was %d after set_position(%d))",
+		log_debug("LoadThread completed during download (tell was %d after seek(%d))",
 			pos, nextpos);
 #endif
 		_completed = true;

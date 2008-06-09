@@ -69,7 +69,7 @@ public:
 
   unsigned int get_duration(int sound_handle);
 
-  unsigned int get_position(int sound_handle);
+  unsigned int tell(int sound_handle);
   
   void start_timer();  
   

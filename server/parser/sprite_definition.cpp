@@ -80,7 +80,7 @@ sprite_definition::read(SWFStream* in)
 
 	m_loading_frame = 0;
 
-	while ( in->get_position() < tag_end )
+	while ( in->tell() < tag_end )
 	{
 		SWF::tag_type tag_type = in->open_tag();
 
@@ -88,7 +88,7 @@ sprite_definition::read(SWFStream* in)
 
 		if (tag_type == SWF::END)
                 {
-			if (in->get_position() != tag_end)
+			if (in->tell() != tag_end)
                         {
 		    		IF_VERBOSE_MALFORMED_SWF(
 				// Safety break, so we don't read past

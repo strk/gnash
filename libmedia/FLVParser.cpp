@@ -84,7 +84,7 @@ bool FLVParser::parseNextTag()
 	if ( _parsingComplete ) return false;
 
 	// Seek to next frame and skip the size of the last tag
-	if ( _stream->set_position(_lastParsedPosition+4) )
+	if ( _stream->seek(_lastParsedPosition+4) )
 	{
 		log_error("FLVParser::parseNextTag: can't seek to %d", _lastParsedPosition+4);
 		_parsingComplete=true;
@@ -98,7 +98,7 @@ bool FLVParser::parseNextTag()
 	{
 		if ( actuallyRead )
 			log_error("FLVParser::parseNextTag: can't read tag info (needed 12 bytes, only got %d)", actuallyRead);
-		// else { assert(_stream->get_eof(); } ?
+		// else { assert(_stream->eof(); } ?
 		_parsingComplete=true;
 		return false;
 	}
@@ -149,7 +149,7 @@ bool FLVParser::parseNextTag()
 		bool isKeyFrame = (tag[11] & 0xf0) >> 4;
 		UNUSED(isKeyFrame); // may be used for building seekable indexes...
 
-		size_t dataPosition = _stream->get_position();
+		size_t dataPosition = _stream->tell();
 
 		std::auto_ptr<EncodedVideoFrame> frame = readVideoFrame(bodyLength-1, timestamp);
 		if ( ! frame.get() ) { log_error("could not read video frame?"); }
@@ -170,8 +170,8 @@ bool FLVParser::parseNextTag()
 				// We're going to re-read some data here
 				// (can likely avoid with a better cleanup)
 
-				size_t bkpos = _stream->get_position();
-				if ( _stream->set_position(dataPosition) ) {
+				size_t bkpos = _stream->tell();
+				if ( _stream->seek(dataPosition) ) {
 					log_error(" Couldn't seek to VideoTag data position");
 					_parsingComplete=true;
 					return false;
@@ -179,7 +179,7 @@ bool FLVParser::parseNextTag()
 				boost::uint8_t videohead[12];
 
 				int actuallyRead = _stream->read_bytes(videohead, 12);
-				_stream->set_position(bkpos); // rewind
+				_stream->seek(bkpos); // rewind
 
 				if ( actuallyRead < 12 )
 				{
@@ -256,7 +256,7 @@ bool FLVParser::parseNextTag()
 bool FLVParser::parseHeader()
 {
 	// seek to the begining of the file
-	_stream->set_position(0); // seek back ? really ?
+	_stream->seek(0); // seek back ? really ?
 
 	// Read the header
 	boost::uint8_t header[9];
@@ -311,7 +311,7 @@ FLVParser::readAudioFrame(boost::uint32_t dataSize, boost::uint32_t timestamp)
 {
 	IOChannel& in = *_stream;
 
-	//log_debug("Reading the %dth audio frame, with data size %d, from position %d", _audioFrames.size()+1, dataSize, in.get_position());
+	//log_debug("Reading the %dth audio frame, with data size %d, from position %d", _audioFrames.size()+1, dataSize, in.tell());
 
 	std::auto_ptr<EncodedAudioFrame> frame ( new EncodedAudioFrame );
 	frame->dataSize = dataSize;

@@ -243,7 +243,7 @@ tu_file::copy_from(tu_file* src)
 // Copy remaining contents of *src into *this.
 {
     // @@ bah, should buffer this!
-    while (src->get_eof() == false) {
+    while (src->eof() == false) {
 	boost::uint8_t	b = src->read8();
 	if (src->get_error()) {
 	    break;

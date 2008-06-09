@@ -157,7 +157,7 @@ GlyphInfo::markReachableResources() const
 		log_parse(_("reading DefineFont"));
 		);
 
-		unsigned long table_base = in.get_position();
+		unsigned long table_base = in.tell();
 
 		// Read the glyph offsets.  Offsets
 		// are measured from the start of the
@@ -196,7 +196,7 @@ GlyphInfo::markReachableResources() const
 			// Seek to the start of the shape data.
 			unsigned long new_pos = table_base + offsets[i];
 
-			if ( ! in.set_position(new_pos) )
+			if ( ! in.seek(new_pos) )
 			{
 				throw ParserException(_("Glyphs offset table corrupted in DefineFont tag"));
 			}
@@ -250,7 +250,7 @@ GlyphInfo::markReachableResources() const
 		);
 
 		
-		unsigned long table_base = in.get_position();
+		unsigned long table_base = in.tell();
 
 		// Read the glyph offsets.  Offsets
 		// are measured from the start of the
@@ -300,9 +300,9 @@ GlyphInfo::markReachableResources() const
 
 			// It seems completely possible to
 			// have such seeks-back, see bug #16311
-			//assert(new_pos >= in.get_position());
+			//assert(new_pos >= in.tell());
 
-			if ( ! in.set_position(new_pos) )
+			if ( ! in.seek(new_pos) )
 			{
 				throw ParserException(_("Glyphs offset table corrupted in DefineFont2/3 tag"));
 			}
@@ -314,7 +314,7 @@ GlyphInfo::markReachableResources() const
 			_embedGlyphTable[i].glyph = s;
 		}
 
-		unsigned long current_position = in.get_position();
+		unsigned long current_position = in.tell();
 		if (font_code_offset + table_base != current_position)
 		{
 			// Bad offset!  Don't try to read any more.
@@ -443,7 +443,7 @@ GlyphInfo::markReachableResources() const
 	void	font::read_code_table(SWFStream& in)
 	{
 		IF_VERBOSE_PARSE (
-		log_parse(_("reading code table at offset %lu"), in.get_position());
+		log_parse(_("reading code table at offset %lu"), in.tell());
 		);
 
 		assert(_embedded_code_table.empty());

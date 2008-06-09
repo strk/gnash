@@ -161,7 +161,7 @@ static void	dumpTagBytes(SWFStream* in, std::ostream& os)
     os << std::endl;
     
     // This decremented until we reach the end of the stream.
-    unsigned int toRead = in->get_tag_end_position() - in->get_position();
+    unsigned int toRead = in->get_tag_end_position() - in->tell();
     in->ensureBytes(toRead);
 
     unsigned char buf[rowlength];    
@@ -328,7 +328,7 @@ SWFMovieDefinition::readHeader(std::auto_ptr<IOChannel> in, const std::string& u
 	if ( url == "" ) _url = "<anonymous>";
 	else _url = url;
 
-	boost::uint32_t file_start_pos = _in->get_position();
+	boost::uint32_t file_start_pos = _in->tell();
 	boost::uint32_t header = _in->read_le32();
 	m_file_length = _in->read_le32();
 	_swf_end_pos = file_start_pos + m_file_length;
@@ -421,7 +421,7 @@ SWFMovieDefinition::readHeader(std::auto_ptr<IOChannel> in, const std::string& u
 			m_frame_rate, m_frame_count);
 	);
 
-	setBytesLoaded(_str->get_position());
+	setBytesLoaded(_str->tell());
 	return true;
 }
 
@@ -605,7 +605,7 @@ SWFMovieDefinition::read_all_swf()
 	try {
 
 	//size_t it=0;
-	while ( (boost::uint32_t) str.get_position() < _swf_end_pos )
+	while ( (boost::uint32_t) str.tell() < _swf_end_pos )
 	{
 		if ( _loadingCanceled )
 		{
@@ -621,7 +621,7 @@ parse_tag:
 
 		if (tag_type == SWF::END)
                 {
-			if ((unsigned int) str.get_position() != _swf_end_pos)
+			if ((unsigned int) str.tell() != _swf_end_pos)
                         {
 		    		IF_VERBOSE_MALFORMED_SWF(
 				// Safety break, so we don't read past
@@ -681,7 +681,7 @@ parse_tag:
 
 		str.close_tag();
 
-		setBytesLoaded(str.get_position());
+		setBytesLoaded(str.tell());
 	}
 
 	} catch (const std::exception& e) {

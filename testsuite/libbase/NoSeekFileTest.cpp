@@ -106,7 +106,7 @@ compare_reads(gnash::IOChannel* reader, int fd, char* first, char* second)
 		return false;
 	}
 
-	if ( ! reader->get_eof() )
+	if ( ! reader->eof() )
 	{
 		ss << "tu_file not at EOF at end of read";
 		runtest.fail(ss.str());
@@ -141,7 +141,7 @@ main(int /*argc*/, char** /*argv*/)
 	compare_reads(reader, raw, "wrapped", "raw");
 
 	lseek(raw, 0, SEEK_SET);
-	reader->set_position(0);
+	reader->seek(0);
 	compare_reads(reader, raw, "wrapped-rewind", "raw-rewind");
 
 	tu_file orig(cachename, "r");

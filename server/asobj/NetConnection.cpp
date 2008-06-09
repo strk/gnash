@@ -123,7 +123,7 @@ bool
 NetConnection::eof()
 {
 	if (!_loader.get()) return true; // @@ correct ?
-	return _loader->get_eof();
+	return _loader->eof();
 }
 
 
@@ -188,7 +188,7 @@ NetConnection::seek( size_t pos )
     return false;
   }
 
-  return ! _loader->set_position( pos );
+  return ! _loader->seek( pos );
 }
 
 
@@ -198,7 +198,7 @@ size_t
 NetConnection::tell()
 {
 	if (!_loader.get()) return 0; // @@ correct ?
-	return _loader->get_position();
+	return _loader->tell();
 }
 
 
@@ -208,7 +208,7 @@ long
 NetConnection::getBytesLoaded()
 {
 	if (!_loader.get()) return 0; // @@ correct ?
-	return _loader->get_position(); // getBytesLoaded();
+	return _loader->tell(); // getBytesLoaded();
 }
 
 
@@ -218,7 +218,7 @@ long
 NetConnection::getBytesTotal()
 {
 	if (!_loader.get()) return 0; // @@ correct ?
-	return _loader->get_size(); // getBytesTotal();
+	return _loader->size(); // getBytesTotal();
 }
 
 
@@ -232,7 +232,7 @@ NetConnection::loadCompleted()
   }
 
   // is the below correct ?
-  return _loader->get_eof(); // completed();
+  return _loader->eof(); // completed();
 }
 
 

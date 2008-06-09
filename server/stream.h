@@ -133,9 +133,9 @@ public:
 	/// This method is implicitly called by all 'aligned' reads.
 	///
 	/// NOTE:
-	/// The position returned by get_position() won't be changed
+	/// The position returned by tell() won't be changed
 	/// by calls to this function, altought any subsequent reads
-	/// will start on next byte. See get_position() for more info.
+	/// will start on next byte. See tell() for more info.
 	///
 	void	align()
 	{
@@ -300,7 +300,7 @@ public:
 	/// - For aligned reads the current byte will not be used
 	///   (already used)
 	///
-	unsigned long get_position();
+	unsigned long tell();
 
 	/// Set the file position to the given value (byte aligned)
 	//
@@ -313,7 +313,7 @@ public:
 	///	- given position is after end of current tag, if any.
 	///	- given position is before start of current tag, if any.
 	///
-	bool set_position(unsigned long pos);
+	bool seek(unsigned long pos);
 
 	/// Return the file position of the end of the current tag.
 	unsigned long get_tag_end_position();
@@ -337,7 +337,7 @@ public:
 	///	  current tag, if any.
 	///
 	/// WARNING: alignment is not specified here, the method uses
-	///          get_position() which is known NOT to consider
+	///          tell() which is known NOT to consider
 	///          a fully-read byte as already "skipped"
 	///	     TODO: force alignment and see what happens !!
 	///
@@ -345,15 +345,15 @@ public:
 	{
 		// there's probably a better way, but
 		// it's the interface that counts atm
-		size_t curpos = get_position();
-		return set_position(curpos+num);
+		size_t curpos = tell();
+		return seek(curpos+num);
 	}
 
 	/// Discard all bytes up to end of tag
 	void skip_to_tag_end()
 	{
-		// set_position will call align...
-		set_position(get_tag_end_position());
+		// seek will call align...
+		seek(get_tag_end_position());
 	}
 
 	/// \brief
@@ -382,7 +382,7 @@ public:
 	{
 #ifndef GNASH_TRUST_SWF_INPUT
 		if ( _tagBoundsStack.empty() ) return; // not in a tag (should we check file length ?)
-		unsigned long int bytesLeft = get_tag_end_position() - get_position();
+		unsigned long int bytesLeft = get_tag_end_position() - tell();
 		unsigned long int bitsLeft = (bytesLeft*8)+m_unused_bits;
 		if ( bitsLeft < needed )
 		{

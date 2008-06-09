@@ -367,7 +367,7 @@ public:
 	/// Return total number of bytes in input
 	boost::uint64_t getBytesTotal() const
 	{
-		return _stream->get_size();
+		return _stream->size();
 	}
 
 protected:

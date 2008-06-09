@@ -86,7 +86,7 @@ class StreamAdapter
 	StreamAdapter(SWFStream& str, unsigned long maxPos)
 		:
 		s(str),
-		startPos(s.get_position()),
+		startPos(s.tell()),
 		endPos(maxPos),
 		currPos(startPos)
 	{
@@ -186,14 +186,14 @@ frame_label_loader(SWFStream* in, tag_type tag, movie_definition* m)
     // if it is 1 this label can be accessed by #name and it's
     // entrance sets the browser URL with anchor appended
     //
-    // To avoid relaying on SWFStream::get_position (see task #5838)
+    // To avoid relaying on SWFStream::tell (see task #5838)
     // we should add a new method to that class
     // (ie: SWFStream::current_tag_length)
     //
     // See server/sample/test_clipping_layer.swf for a testcase.
     //
     size_t end_tag = in->get_tag_end_position();
-    size_t curr_pos = in->get_position();
+    size_t curr_pos = in->tell();
     if ( end_tag != curr_pos )
     {
 	if ( end_tag == curr_pos + 1 )
@@ -224,7 +224,7 @@ jpeg_tables_loader(SWFStream* in, tag_type tag, movie_definition* m)
         log_parse(_("  jpeg_tables_loader"));
     );
 
-    const unsigned long currPos = in->get_position();
+    const unsigned long currPos = in->tell();
     const unsigned long endPos = in->get_tag_end_position();
 
     assert(endPos >= currPos);
@@ -332,7 +332,7 @@ define_bits_jpeg2_loader(SWFStream* in, tag_type tag, movie_definition* m)
     IF_VERBOSE_PARSE
     (
 	log_parse(_("  define_bits_jpeg2_loader: charid = %d pos = %ld"),
-		  character_id, in->get_position());
+		  character_id, in->tell());
     );
 
     //
@@ -393,8 +393,8 @@ void inflate_wrapper(SWFStream& in, void* buffer, int buffer_bytes)
     for (;;)
     {
 	unsigned int chunkSize = CHUNKSIZE;
-	assert(in.get_position() <= endTagPos);
-        unsigned int availableBytes =  endTagPos - in.get_position();
+	assert(in.tell() <= endTagPos);
+        unsigned int availableBytes =  endTagPos - in.tell();
 	if ( availableBytes < chunkSize )
 	{
 		if ( ! availableBytes )
@@ -452,12 +452,12 @@ define_bits_jpeg3_loader(SWFStream* in, tag_type tag, movie_definition* m)
     IF_VERBOSE_PARSE
     (
 	log_parse(_("  define_bits_jpeg3_loader: charid = %d pos = %lx"),
-		  character_id, in->get_position());
+		  character_id, in->tell());
     );
 
     in->ensureBytes(4);
     boost::uint32_t	jpeg_size = in->read_u32();
-    boost::uint32_t	alpha_position = in->get_position() + jpeg_size;
+    boost::uint32_t	alpha_position = in->tell() + jpeg_size;
 
 #ifndef HAVE_ZLIB_H
     log_error(_("gnash is not linked to zlib -- can't load jpeg3 image data"));
@@ -472,7 +472,7 @@ define_bits_jpeg3_loader(SWFStream* in, tag_type tag, movie_definition* m)
     std::auto_ptr<image::rgba> im( image::read_swf_jpeg3(ad.get()) );
 
     // Read alpha channel.
-    in->set_position(alpha_position);
+    in->seek(alpha_position);
 
     size_t imWidth = im->width();
     size_t imHeight = im->height();
@@ -558,7 +558,7 @@ define_bits_lossless_2_loader(SWFStream* in, tag_type tag, movie_definition* m)
     	boost::scoped_array<boost::uint8_t> buffer ( new boost::uint8_t[buffer_bytes] );
 
     	inflate_wrapper(*in, buffer.get(), buffer_bytes);
-    	assert(in->get_position() <= in->get_tag_end_position());
+    	assert(in->tell() <= in->get_tag_end_position());
 
     	boost::uint8_t* color_table = buffer.get();
 
@@ -586,7 +586,7 @@ define_bits_lossless_2_loader(SWFStream* in, tag_type tag, movie_definition* m)
     	boost::scoped_array<boost::uint8_t> buffer ( new boost::uint8_t[buffer_bytes] );
 
     	inflate_wrapper(*in, buffer.get(), buffer_bytes);
-    	assert(in->get_position() <= in->get_tag_end_position());
+    	assert(in->tell() <= in->get_tag_end_position());
 
     	for (int j = 0; j < height; j++)
     	{
@@ -614,7 +614,7 @@ define_bits_lossless_2_loader(SWFStream* in, tag_type tag, movie_definition* m)
     	boost::scoped_array<boost::uint8_t> buffer ( new boost::uint8_t[buffer_bytes] );
 
     	inflate_wrapper(*in, buffer.get(), buffer_bytes);
-    	assert(in->get_position() <= in->get_tag_end_position());
+    	assert(in->tell() <= in->get_tag_end_position());
 
     	// Need to re-arrange ARGB into RGB.
     	for (int j = 0; j < height; j++)
@@ -672,7 +672,7 @@ define_bits_lossless_2_loader(SWFStream* in, tag_type tag, movie_definition* m)
     	boost::scoped_array<boost::uint8_t> buffer ( new boost::uint8_t[buffer_bytes] );
 
     	inflate_wrapper(*in, buffer.get(), buffer_bytes);
-    	assert(in->get_position() <= in->get_tag_end_position());
+    	assert(in->tell() <= in->get_tag_end_position());
 
     	boost::uint8_t* color_table = buffer.get();
 
@@ -701,7 +701,7 @@ define_bits_lossless_2_loader(SWFStream* in, tag_type tag, movie_definition* m)
     	boost::scoped_array<boost::uint8_t> buffer ( new boost::uint8_t[buffer_bytes] );
 
     	inflate_wrapper(*in, buffer.get(), buffer_bytes);
-    	assert(in->get_position() <= in->get_tag_end_position());
+    	assert(in->tell() <= in->get_tag_end_position());
 
     	for (int j = 0; j < height; j++)
     	{
@@ -725,7 +725,7 @@ define_bits_lossless_2_loader(SWFStream* in, tag_type tag, movie_definition* m)
     	// 32 bits / pixel, input is ARGB format
 
     	inflate_wrapper(*in, image->data(), width * height * 4);
-    	assert(in->get_position() <= in->get_tag_end_position());
+    	assert(in->tell() <= in->get_tag_end_position());
 
     	// Need to re-arrange ARGB into RGBA.
     	for (int j = 0; j < height; j++)
@@ -1252,7 +1252,7 @@ define_sound_loader(SWFStream* in, tag_type tag, movie_definition* m)
 	{
 	    // First it is the amount of data from file,
 	    // then the amount allocated at *data (it may grow)
-	    const unsigned dataLength = in->get_tag_end_position() - in->get_position();
+	    const unsigned dataLength = in->get_tag_end_position() - in->tell();
 	    unsigned char *data = new unsigned char[dataLength];
 
         // dataLength is already calculated from the end of the tag, which

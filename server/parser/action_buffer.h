@@ -58,7 +58,7 @@ public:
 	//
 	/// @param endPos
 	///	One past last valid-to-read byte position.
-	///	Make sure it's > then in.get_position() and
+	///	Make sure it's > then in.tell() and
 	///	<= in.get_tag_end_position() or an assertion will
 	///	fail.
 	///

@@ -87,7 +87,7 @@ StreamSoundBlockTag::loader(SWFStream* in, tag_type tag, movie_definition* m)
 	LOG_ONCE ( if ( seekSamples ) log_unimpl("MP3 soundblock seek samples") );
     }
 
-    const unsigned int dataLength = in->get_tag_end_position() - in->get_position();
+    const unsigned int dataLength = in->get_tag_end_position() - in->tell();
     if ( ! dataLength )
     {
         IF_VERBOSE_MALFORMED_SWF(

@@ -374,9 +374,7 @@ public:
 	virtual int read_bytes(void *dst, int bytes);
 
 	/// Return true if EOF has been reached
-	virtual bool get_eof() const;
-
-	bool eof() const { return get_eof(); }
+	virtual bool eof() const;
 
 	/// Return the error condition of current stream
 	virtual int get_error() const {
@@ -384,12 +382,10 @@ public:
 	}
 
 	/// Report global position within the file
-	virtual int get_position() const;
-
-	int tell() const { return get_position(); }
+	virtual int tell() const;
 
 	/// Put read pointer at given position
-	virtual int set_position(int pos);
+	virtual int seek(int pos);
 
 	/// Put read pointer at eof
 	virtual void go_to_end();
@@ -403,7 +399,7 @@ public:
 	/// Another approach might be filling the cache ourselves
 	/// aiming at obtaining a useful value.
 	///
-	virtual int get_size() const;
+	virtual int size() const;
 
 private:
 
@@ -857,7 +853,7 @@ CurlStreamFile::~CurlStreamFile()
 int
 CurlStreamFile::read_bytes(void *dst, int bytes)
 {
-	if ( get_eof() || _error ) return 0;
+	if ( eof() || _error ) return 0;
 
 #ifdef GNASH_CURL_VERBOSE
 	gnash::log_debug ("read(%d) called", bytes);
@@ -876,7 +872,7 @@ CurlStreamFile::read_bytes(void *dst, int bytes)
 
 /*public*/
 bool
-CurlStreamFile::get_eof() const
+CurlStreamFile::eof() const
 {
 	bool ret = ( ! _running && feof(_cache) );
 
@@ -889,7 +885,7 @@ CurlStreamFile::get_eof() const
 
 /*public*/
 int
-CurlStreamFile::get_position() const
+CurlStreamFile::tell() const
 {
 	int ret =  std::ftell(_cache);
 
@@ -903,7 +899,7 @@ CurlStreamFile::get_position() const
 
 /*public*/
 int
-CurlStreamFile::set_position(int pos)
+CurlStreamFile::seek(int pos)
 {
 #ifdef GNASH_CURL_WARN_SEEKSBACK
 	if ( pos < tell() ) {
@@ -968,7 +964,7 @@ CurlStreamFile::go_to_end()
 
 /*public*/
 int
-CurlStreamFile::get_size() const
+CurlStreamFile::size() const
 {
 	if ( ! _size )
 	{

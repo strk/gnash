@@ -176,7 +176,7 @@ public:
     /// TODO: define what to return when the stream
     ///       is in error condition, see get_error().
     ///
-    int	get_position() const { return m_tell(m_data); }
+    int	tell() const { return m_tell(m_data); }
 
     /// \brief Seek to the specified position
     //
@@ -186,7 +186,7 @@ public:
     ///
     /// @return 0 on success, or TU_FILE_SEEK_ERROR on failure.
     ///
-    int	set_position(int p) { return m_seek(p, m_data); }
+    int	seek(int p) { return m_seek(p, m_data); }
 
     /// \brief Seek to the end of the stream
     //
@@ -199,7 +199,7 @@ public:
     /// TODO: define what to return when in error condition
     /// see get_error().
     ///
-    bool get_eof() const { return m_get_eof(m_data); }
+    bool eof() const { return m_get_eof(m_data); }
     
     /// \brief Return non-zero if the stream is in an error state
     //
@@ -213,7 +213,7 @@ public:
     
 
     /// \brief Get the size of the stream
-    int get_size() const { return m_get_stream_size(m_data); }
+    int size() const { return m_get_stream_size(m_data); }
     
     // \brief UNSAFE back door, for testing only.
     void* get_app_data_DEBUG() { return m_data; }

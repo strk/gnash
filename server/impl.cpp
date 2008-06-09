@@ -313,28 +313,28 @@ enum FileType {
 FileType
 getFileType(IOChannel* in)
 {
-  in->set_position(0);
+  in->seek(0);
 
   unsigned char buf[3];
   
   if ( 3 < in->read_bytes(buf, 3) )
   {
     log_error(_("Can't read file header"));
-    in->set_position(0);
+    in->seek(0);
     return GNASH_FILETYPE_UNKNOWN;
   }
   
   // This is the magic number for any JPEG format file
   if ((buf[0] == 0xff) && (buf[1] == 0xd8) && (buf[2] == 0xff))
   {
-    in->set_position(0);
+    in->seek(0);
     return GNASH_FILETYPE_JPEG;
   }
 
   // This is the magic number for any JPEG format file
   if ((buf[0] == 137) && (buf[1] == 'P') && (buf[2] == 'N')) // buf[3] == 'G' (we didn't read so far)
   {
-    in->set_position(0);
+    in->seek(0);
     return GNASH_FILETYPE_PNG;
   }
 
@@ -343,7 +343,7 @@ getFileType(IOChannel* in)
     (buf[1] == 'W') &&
     (buf[2] == 'S') )
   {
-    in->set_position(0);
+    in->seek(0);
     return GNASH_FILETYPE_SWF;
   }
   
@@ -352,7 +352,7 @@ getFileType(IOChannel* in)
 
     if ( 3 < in->read_bytes(buf, 3) )
     {
-      in->set_position(0);
+      in->seek(0);
       return GNASH_FILETYPE_UNKNOWN;
     }
 
@@ -361,13 +361,13 @@ getFileType(IOChannel* in)
       buf[0] = buf[1];
       buf[1] = buf[2];
       buf[2] = in->read_byte();
-      if (in->get_eof())
+      if (in->eof())
       {
-        in->set_position(0);
+        in->seek(0);
         return GNASH_FILETYPE_UNKNOWN;
       }
     }
-    in->set_position(in->get_position()-3); // position to start of the swf itself
+    in->seek(in->tell()-3); // position to start of the swf itself
     return GNASH_FILETYPE_SWF;
   }
   return GNASH_FILETYPE_UNKNOWN;

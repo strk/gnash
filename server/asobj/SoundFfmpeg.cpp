@@ -491,7 +491,7 @@ SoundFfmpeg::getPosition()
 	if (!externalSound) {
 		media::sound_handler* s = get_sound_handler();
 		if (s) {
-			return s->get_position(soundId);
+			return s->tell(soundId);
 	    } else {
 	    	return 0; // just in case
 		}

@@ -120,7 +120,7 @@ video_stream_definition::readDefineVideoFrame(SWFStream* in, SWF::tag_type tag, 
 		frameNum = m->get_loading_frame();
 	}
 
-	const unsigned int dataLength = in->get_tag_end_position() - in->get_position();
+	const unsigned int dataLength = in->get_tag_end_position() - in->tell();
 	
 	boost::uint8_t* buffer = new uint8_t[dataLength + 8]; // FIXME: catch bad_alloc
 

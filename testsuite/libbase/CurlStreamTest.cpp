@@ -75,7 +75,7 @@ dump_tu_file(const char* url, ostream& os)
 		}
 	}
 
-	if ( reader->get_eof() )
+	if ( reader->eof() )
 		printf("-EOF-\n");
 
 }

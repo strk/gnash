@@ -246,7 +246,7 @@ bool
 NetStreamFfmpeg::startPlayback()
 {
 	assert(_inputStream.get());
-	assert(_inputStream->get_position() == 0);
+	assert(_inputStream->tell() == 0);
 
 	inputPos = 0;
 

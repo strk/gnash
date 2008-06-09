@@ -431,7 +431,7 @@ public:
 	/// The id of the event sound
 	///
 	/// @return the duration of the sound in milliseconds
-	virtual unsigned int get_position(int sound_handle) = 0;
+	virtual unsigned int tell(int sound_handle) = 0;
 
 	/// Special test-fuction. Reports how many times a sound has been started
 	size_t numSoundsStarted() const { return _soundsStarted; }

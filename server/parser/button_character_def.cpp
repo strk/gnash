@@ -50,7 +50,7 @@ button_action::button_action(SWFStream& in, int tag_type, unsigned long endPos, 
 	{
 		assert(tag_type == SWF::DEFINEBUTTON2); // 34
 
-		if ( in.get_position()+2 > endPos ) 
+		if ( in.tell()+2 > endPos ) 
 		{
 			IF_VERBOSE_MALFORMED_SWF(
 			log_swferror(_("Premature end of button action input: can't read conditions"));
@@ -117,7 +117,7 @@ button_record::read(SWFStream* in, int tag_type,
 		movie_definition* m, unsigned long endPos)
 {
 	// caller should check this
-	if (in->get_position()+1 > endPos)
+	if (in->tell()+1 > endPos)
 	{
 		IF_VERBOSE_MALFORMED_SWF(
 		log_swferror(_("   premature end of button record input stream, can't read flags"));
@@ -142,7 +142,7 @@ button_record::read(SWFStream* in, int tag_type,
 	m_over     = flags & (1<<1); // 2 ? true : false;
 	m_up       = flags & (1<<0); // 1 ? true : false;
 
-	if (in->get_position()+2 > endPos)
+	if (in->tell()+2 > endPos)
 	{
 		IF_VERBOSE_MALFORMED_SWF(
 		log_swferror(_("   premature end of button record input stream, can't read character id"));
@@ -174,7 +174,7 @@ button_record::read(SWFStream* in, int tag_type,
 		);
 	}
 
-	if (in->get_position()+2 > endPos)
+	if (in->tell()+2 > endPos)
 	{
 		IF_VERBOSE_MALFORMED_SWF(
 		log_swferror(_("   premature end of button record input stream, can't read button layer (depth?)"));
@@ -334,7 +334,7 @@ button_character_definition::readDefineButton(SWFStream* in, movie_definition* m
 		}
 	}
 
-	if ( in->get_position() >= endTagPos )
+	if ( in->tell() >= endTagPos )
 	{
 		IF_VERBOSE_MALFORMED_SWF(
 		log_swferror(_("Premature end of DEFINEBUTTON tag, won't read actions"));
@@ -363,7 +363,7 @@ button_character_definition::readDefineButton2(SWFStream* in, movie_definition* 
 	unsigned button_2_action_offset = in->read_u16();
 
 	unsigned long tagEndPosition = in->get_tag_end_position();
-	unsigned next_action_pos = in->get_position() + button_2_action_offset - 2;
+	unsigned next_action_pos = in->tell() + button_2_action_offset - 2;
 
 	if ( next_action_pos > tagEndPosition )
 	{
@@ -380,7 +380,7 @@ button_character_definition::readDefineButton2(SWFStream* in, movie_definition* 
 	// Read button records.
 	// takes at least 1 byte for the end mark button record, so 
 	// we don't attempt to parse at all unless we have at least 1 byte left
-	while ( in->get_position() < endOfButtonRecords )
+	while ( in->tell() < endOfButtonRecords )
 	{
 		button_record	r;
 		if (r.read(in, SWF::DEFINEBUTTON2, m, endOfButtonRecords) == false)
@@ -399,17 +399,17 @@ button_character_definition::readDefineButton2(SWFStream* in, movie_definition* 
 
 	if ( button_2_action_offset )
 	{
-		in->set_position(next_action_pos);
+		in->seek(next_action_pos);
 
 		// Read Button2ActionConditions
 		// Don't read past tag end
-		while ( in->get_position() < tagEndPosition ) 
+		while ( in->tell() < tagEndPosition ) 
 		{
 			in->ensureBytes(2);
 			unsigned next_action_offset = in->read_u16();
 			if ( next_action_offset )
 			{
-				next_action_pos = in->get_position() + next_action_offset - 2;
+				next_action_pos = in->tell() + next_action_offset - 2;
 				if ( next_action_pos > tagEndPosition )
 				{
 					IF_VERBOSE_MALFORMED_SWF(
@@ -431,7 +431,7 @@ button_character_definition::readDefineButton2(SWFStream* in, movie_definition* 
 			}
 
 			// seek to next action.
-			in->set_position(next_action_pos);
+			in->seek(next_action_pos);
 		}
 	}
 }

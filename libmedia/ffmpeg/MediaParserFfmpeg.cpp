@@ -67,9 +67,9 @@ MediaParserFfmpeg::probeStream()
 	probe_data.buf = buffer.get();
 	probe_data.buf_size = 2048;
 
-	assert(_stream->get_position() == 0);
+	assert(_stream->tell() == 0);
 	size_t actuallyRead = _stream->read_bytes(probe_data.buf, probe_data.buf_size);
-	_stream->set_position(0);
+	_stream->seek(0);
 
 	if (actuallyRead < 1)
 	{
@@ -198,7 +198,7 @@ MediaParserFfmpeg::parseNextFrame()
 	// position the stream where we left parsing as
 	// it could be somewhere else for reading a specific
 	// or seeking.
-	_stream->set_position(_lastParsedPosition);
+	_stream->seek(_lastParsedPosition);
 
 	assert(_formatCtx);
 
@@ -232,14 +232,14 @@ MediaParserFfmpeg::parseNextFrame()
 	av_free_packet(&packet);
 
 	// Check if EOF was reached
-	if ( _stream->get_eof() )
+	if ( _stream->eof() )
 	{
 		log_debug("MediaParserFfmpeg::parseNextFrame: at eof after av_read_frame");
 		_parsingComplete=true;
 	}
 
 	// Update _lastParsedPosition
-	boost::uint64_t curPos = _stream->get_position();
+	boost::uint64_t curPos = _stream->tell();
 	if ( curPos > _lastParsedPosition )
 	{
 		_lastParsedPosition = curPos;
@@ -247,7 +247,7 @@ MediaParserFfmpeg::parseNextFrame()
 	log_debug("parseNextFrame: parsed %d+%d/%d bytes (byteIOCxt: pos:%d, buf_ptr:%p, buf_end:%p); "
 		" AVFormatContext: data_offset:%d, cur_ptr:%p,; "
 		"%d video frames, %d audio frames",
-		curPos, _formatCtx->cur_ptr-_formatCtx->cur_pkt.data, _stream->get_size(),
+		curPos, _formatCtx->cur_ptr-_formatCtx->cur_pkt.data, _stream->size(),
 		_byteIOCxt.pos, (void*)_byteIOCxt.buf_ptr, (void*)_byteIOCxt.buf_end,
 		_formatCtx->data_offset, (void*)_formatCtx->cur_ptr,
 		_videoFrames.size(), _audioFrames.size());
@@ -420,23 +420,23 @@ MediaParserFfmpeg::seekMedia(offset_t offset, int whence)
 	// Offset is absolute new position in the file
 	if (whence == SEEK_SET)
 	{	
-		in.set_position(offset);
+		in.seek(offset);
 		// New position is offset + old position
 	}
 	else if (whence == SEEK_CUR)
 	{
-		in.set_position(in.get_position() + offset);
+		in.seek(in.tell() + offset);
 		// New position is offset + end of file
 	}
 	else if (whence == SEEK_END)
 	{
 		// This is (most likely) a streamed file, so we can't seek to the end!
 		// Instead we seek to byteIOBufferSize bytes... seems to work fine...
-		in.set_position(byteIOBufferSize);
+		in.seek(byteIOBufferSize);
 
 	}
 
-	return in.get_position(); 
+	return in.tell(); 
 }
 
 boost::uint16_t

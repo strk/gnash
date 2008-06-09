@@ -1,5 +1,13 @@
 2008-06-09 Sandro Santilli <strk@keybit.net>
 
+	* lots of files: methods rename:
+		get_position -> tell
+		set_position -> seek
+		get_eof      -> eof
+		get_size     -> size
+
+2008-06-09 Sandro Santilli <strk@keybit.net>
+
 	* server/font.cpp: more parse logging, log unimplemented when
 	  a language code is specified.
 	* server/stream.cpp (read_string_with_length): fix regression

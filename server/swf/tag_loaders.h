@@ -105,7 +105,7 @@ void	sprite_loader(SWFStream*, tag_type, movie_definition*);
 void	end_loader(SWFStream* in, tag_type tag, movie_definition*)
 {
 	assert(tag == SWF::END); // 0
-	assert(in->get_position() == in->get_tag_end_position());
+	assert(in->tell() == in->get_tag_end_position());
 }
 
 void	remove_object_2_loader(SWFStream*, tag_type, movie_definition*);

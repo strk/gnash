@@ -45,7 +45,7 @@ PlaceObject2Tag::readPlaceObject(SWFStream& in)
             log_parse("%s", m_matrix);
     );
 
-    if (in.get_position() < in.get_tag_end_position())
+    if (in.tell() < in.get_tag_end_position())
     {
         m_color_transform.read_rgb(in);
 
@@ -122,14 +122,14 @@ PlaceObject2Tag::readPlaceActions(SWFStream& in)
     
             in.ensureBytes(4);
             boost::uint32_t event_length = in.read_u32();
-            if ( in.get_tag_end_position() - in.get_position() <  event_length )
+            if ( in.get_tag_end_position() - in.tell() <  event_length )
             {
                 IF_VERBOSE_MALFORMED_SWF(
                 log_swferror(_("swf_event::read(), "
                     "even_length = %u, but only %lu bytes left "
                     "to the end of current tag."
                     " Breaking for safety."),
-                    event_length, in.get_tag_end_position() - in.get_position());
+                    event_length, in.get_tag_end_position() - in.tell());
                 );
                 break;
             }
@@ -146,7 +146,7 @@ PlaceObject2Tag::readPlaceActions(SWFStream& in)
             // Read the actions for event(s)
             // auto_ptr here prevents leaks on malformed swf
             std::auto_ptr<action_buffer> action ( new action_buffer(_movie_def) );
-            action->read(in, in.get_position()+event_length);
+            action->read(in, in.tell()+event_length);
             _actionBuffers.push_back(action.release()); // take ownership
     
             // If there is no end tag, action_buffer appends a null-terminator,

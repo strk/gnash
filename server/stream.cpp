@@ -53,7 +53,7 @@ SWFStream::ensureBytes(unsigned long needed)
 
     if ( _tagBoundsStack.empty() ) return; // not in a tag (should we check file length ?)
 
-    unsigned long int left = get_tag_end_position() - get_position();
+    unsigned long int left = get_tag_end_position() - tell();
     if ( left < needed )
     {
         std::stringstream ss;
@@ -72,7 +72,7 @@ unsigned SWFStream::read(char *buf, unsigned count)
     {
         TagBoundaries& tb = _tagBoundsStack.back();
         unsigned long endPos = tb.second;
-        unsigned long cur_pos = get_position();
+        unsigned long cur_pos = tell();
         assert(endPos >= cur_pos);
         unsigned long left = endPos - cur_pos;
         if ( left < count ) count = left;
@@ -449,16 +449,16 @@ void SWFStream::read_string_with_length(unsigned len, std::string& to)
 
 
 unsigned long
-SWFStream::get_position()
+SWFStream::tell()
 {
-    int pos = m_input->get_position();
+    int pos = m_input->tell();
     // TODO: check return value? Could be negative.
     return static_cast<unsigned long>(pos);
 }
 
 
 bool
-SWFStream::set_position(unsigned long pos)
+SWFStream::seek(unsigned long pos)
 {
     align();
 
@@ -485,7 +485,7 @@ SWFStream::set_position(unsigned long pos)
     }
 
     // Do the seek.
-    if ( m_input->set_position(pos) == -1 )
+    if ( m_input->seek(pos) == -1 )
     {
         // TODO: should we throw an exception ?
         //       we might be called from an exception handler
@@ -512,7 +512,7 @@ SWFStream::open_tag()
 {
     align();
 
-    unsigned long tagStart = get_position();
+    unsigned long tagStart = tell();
 
     ensureBytes(2);
 
@@ -537,7 +537,7 @@ SWFStream::open_tag()
         log_debug("Tag %d has a size of %d bytes !!", tagType, tagLength);
     }
 
-    unsigned long tagEnd = get_position() + tagLength;
+    unsigned long tagEnd = tell() + tagLength;
     
     // Check end position doesn't overflow a signed int - that makes
     // zlib adapter's inflate_seek(int pos, void* appdata) unhappy.
@@ -594,7 +594,7 @@ SWFStream::close_tag()
 
     //log_debug("Close tag called at %d, stream size: %d", endPos);
 
-    if ( m_input->set_position(endPos) == -1 )
+    if ( m_input->seek(endPos) == -1 )
     {
         // We'll go on reading right past the end of the stream
         // if we don't throw an exception.

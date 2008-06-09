@@ -155,7 +155,7 @@ public:
 	//
 	/// Throw IOException on error
 	///
-	virtual int get_position() const=0;
+	virtual int tell() const=0;
 
 	/// Seek to the specified position
 	//
@@ -164,7 +164,7 @@ public:
 	///
 	/// @return 0 on success, or -1 on failure.
 	///
-	virtual int set_position(int p)=0;
+	virtual int seek(int p)=0;
 
 	/// Seek to the end of the stream
 	//
@@ -176,7 +176,7 @@ public:
 	//
 	/// Throw IOException on error
 	///
-	virtual bool get_eof() const=0;
+	virtual bool eof() const=0;
     
 	/// Return non-zero if the stream is in an error state
 	//
@@ -197,7 +197,7 @@ public:
 	///
 	/// @return unreliable input size. 
 	///
-	virtual int get_size() const=0;
+	virtual int size() const=0;
    
 };
 

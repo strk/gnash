@@ -526,7 +526,7 @@ unsigned int SDL_sound_handler::get_duration(int sound_handle)
 	}
 }
 
-unsigned int SDL_sound_handler::get_position(int sound_handle)
+unsigned int SDL_sound_handler::tell(int sound_handle)
 {
 	boost::mutex::scoped_lock lock(_mutex);
 

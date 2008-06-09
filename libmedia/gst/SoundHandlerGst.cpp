@@ -163,7 +163,7 @@ SoundHandlerGst::get_duration(int handle)
 }
 
 unsigned int
-SoundHandlerGst::get_position(int handle)
+SoundHandlerGst::tell(int handle)
 {
   return ts_call(handle, bind(&SoundGst::position, _1), 0);
 }

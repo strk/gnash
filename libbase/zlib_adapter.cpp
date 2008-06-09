@@ -71,7 +71,7 @@ namespace zlib_adapter
 		// Constructor.
 			:
 			m_in(in),
-			m_initial_stream_pos(m_in->get_position()),
+			m_initial_stream_pos(m_in->tell()),
 			m_logical_stream_pos(m_initial_stream_pos),
 			m_at_eof(false),
 			m_error(0)
@@ -123,7 +123,7 @@ namespace zlib_adapter
 			m_zstream.avail_out = 0;
 
 			// Rewind the underlying stream.
-			if ( m_in->set_position(m_initial_stream_pos) == TU_FILE_SEEK_ERROR )
+			if ( m_in->seek(m_initial_stream_pos) == TU_FILE_SEEK_ERROR )
 			{
 				std::stringstream ss;
 				ss << "inflater_impl::reset: unable to seek underlying stream to position " <<  m_initial_stream_pos;
@@ -224,14 +224,14 @@ namespace zlib_adapter
 		{
 			if (m_zstream.avail_in > 0)
 			{
-				int	pos = m_in->get_position();
+				int	pos = m_in->tell();
 				int	rewound_pos = pos - m_zstream.avail_in;
 				assert(pos >= 0);
 				assert(pos >= m_initial_stream_pos);
 				assert(rewound_pos >= 0);
 				assert(rewound_pos >= m_initial_stream_pos);
 
-				m_in->set_position(rewound_pos);
+				m_in->seek(rewound_pos);
 			}
 		}
 	};
