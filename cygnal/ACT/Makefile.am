@@ -32,7 +32,7 @@ AM_LDFLAGS = \
 
 localedir = $(datadir)/locale
 
-INCLUDES = -I.. \
+INCLUDES = \
         -I$(top_srcdir)/cygnal	\
         -DLOCALEDIR=\"$(localedir)\" \
 	$(BOOST_CFLAGS)

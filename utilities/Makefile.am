@@ -46,8 +46,7 @@ AM_LDFLAGS = \
 localedir = $(datadir)/locale
 
 #AM_CPPFLAGS = # -Wall
-AM_CPPFLAGS = -I.. \
-        -I$(top_srcdir)	\
+AM_CPPFLAGS = \
         -I$(top_srcdir)/libgeometry \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/libnet \

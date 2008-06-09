@@ -22,11 +22,12 @@ pluginsdir = $(libdir)/gnash/plugins
 
 plugins_LTLIBRARIES = lirc.la
 
-INCLUDES = -I$(srcdir)  \
+INCLUDES = \
             -I$(top_srcdir)/libbase \
             -I$(top_srcdir)/server \
             -I$(top_srcdir)/server/vm \
 	    -I$(top_srcdir)/asobjs \
+	    -I$(top_srcdir)/libnet \
 	    $(BOOST_CFLAGS) \
 	    $(INCLTDL)
 

@@ -24,8 +24,7 @@ CLEANFILES =  \
       testrun.* \
       GotoAndPlayTestRunner
 
-AM_CPPFLAGS = -I.. \
-        -I$(top_srcdir)		\
+AM_CPPFLAGS = \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/libmedia \
         -I$(top_srcdir)/backend \

@@ -47,8 +47,6 @@ AUXMOVIES = \
 
 EXTRA_DIST = $(ASTESTS) $(AUXMOVIES) TestClass.as ../check.h Dejagnu.as check.as Derived1.as Base1.as  implementsOp/BExtendingImplementation.as  implementsOp/ImplementationA.as  implementsOp/ImplementationB.as implementsOp/SimpleInterface.as
 
-if ENABLE_MTASC
-
 MTASC_FLAGS = -version 6 -cp $(MTASC_CLASSPATH) -cp $(srcdir) -v -header 800:600:20
 MTASC_CPP = $(CPP) -x c -P -I$(srcdir)
 
@@ -108,4 +106,3 @@ site-update: site.exp
 	@echo "# This is a list of the pre-compiled testcases" >> site.exp
 	@echo "set testcases \"$(TEST_CASES)\"" >> site.exp
 
-endif

@@ -21,7 +21,6 @@ if NPAPI
 if WIN32
 
 AM_CPPFLAGS = \
-	-I$(top_srcdir) \
 	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/libgeometry \
 	-I$(top_srcdir)/libmedia \

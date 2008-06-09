@@ -21,8 +21,7 @@
 
 AUTOMAKE_OPTIONS = dejagnu
 
-AM_CPPFLAGS = -I.. \
-	-I$(srcdir) \
+AM_CPPFLAGS = \
         -I$(top_srcdir)/testsuite  \
         -I$(top_srcdir)/libbase  \
         -I$(top_srcdir)/libgeometry  \

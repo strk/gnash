@@ -23,7 +23,7 @@ pluginsdir = $(libdir)/gnash/plugins
 plugins_LTLIBRARIES = gtkext.la
 DEF_MAKESWF_FLAGS = -I $(top_srcdir)/testsuite/actionscript.all
 
-INCLUDES = -I$(srcdir)  \
+INCLUDES = \
 	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/libgeometry \
 	-I$(top_srcdir)/gui \

@@ -21,6 +21,7 @@
 #include "dsodefs.h"
 #include "gnash.h"
 #include "network.h"
+#include "GnashKey.h"
 
 namespace gnash {
 

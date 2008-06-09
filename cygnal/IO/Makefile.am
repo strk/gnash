@@ -36,8 +36,7 @@ AM_LDFLAGS = \
 
 localedir = $(datadir)/locale
 
-INCLUDES = -I.. \
-        -I$(top_srcdir)	\
+INCLUDES = \
         -I$(top_srcdir)/cygnal	\
         -I$(top_srcdir)/libamf \
         -I$(top_srcdir)/libbase \

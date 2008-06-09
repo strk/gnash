@@ -166,7 +166,7 @@ do
 #       fi
       echo "Running aclocal $aclocalinclude ..."
       ${ACLOCAL:-aclocal} $aclocalinclude
-      if grep "^AM_CONFIG_HEADER" configure.ac >/dev/null; then
+      if grep "^A[CM]_CONFIG_HEADER" configure.ac >/dev/null; then
 	echo "Running autoheader..."
 	${AUTOHEADER:-autoheader}
       fi

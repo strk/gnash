@@ -27,7 +27,6 @@ AM_CPPFLAGS += -DXP_UNIX
 endif
 
 AM_CPPFLAGS += \
-	-I$(srcdir) \
 	-I$(srcdir)/include \
 	-I$(top_srcdir)/libbase
 

@@ -17,7 +17,7 @@
 #include "SoundHandlerGst.h"
 
 #include "log.h"
-#include "vm/VM.h"
+#include "VM.h"
 #include "builtin_function.h"
 #include "timers.h"
 #include "as_value.h"

@@ -20,8 +20,6 @@ AUTOMAKE_OPTIONS = dejagnu -Wno-portability
 
 abs_topbuilddir=$(shell cd $(top_builddir); pwd)
 
-if ENABLE_SWFDEC_TESTSUITE
-
 check_SCRIPTS = \
 	run_swfdec_testsuite_a \
 	run_swfdec_testsuite_b \
@@ -184,4 +182,3 @@ site-update: site.exp
 	@echo "# This is a list of the pre-compiled testcases" >> site.exp
 	@echo "set testcases \"$(TEST_CASES)\"" >> site.exp
 
-endif

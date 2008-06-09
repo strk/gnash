@@ -24,7 +24,7 @@ plugins_LTLIBRARIES = fileio.la
 
 DEF_MAKESWF_FLAGS = -I $(top_srcdir)/testsuite/actionscript.all
 
-INCLUDES = -I$(srcdir)  \
+INCLUDES =  \
             -I$(top_srcdir)/libbase \
 	    -I$(top_srcdir)/libgeometry \
             -I$(top_srcdir)/server \
@@ -57,7 +57,10 @@ CLEANFILES = \
 	test.swf.frame0.pp \
 	test.swf \
 	test \
-	logfile
+	logfile \
+	testrun.log \
+	testrun.sum \
+	site.exp.bak
 
 install-pluginsLTLIBRARIES: $(plugins_LTLIBRARIES)
 	test -d "$(DESTDIR)$(pluginsdir)" || $(mkinstalldirs) "$(DESTDIR)$(pluginsdir)"

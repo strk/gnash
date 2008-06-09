@@ -38,7 +38,6 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/libgeometry \
 	-I$(top_srcdir)/libmedia \
-	-I$(top_srcdir)	\
 	$(PTHREAD_CFLAGS) \
 	$(DMALLOC_CFLAGS) \
 	$(GLIB_CFLAGS) \

@@ -21,8 +21,6 @@ AUTOMAKE_OPTIONS = dejagnu -Wno-portability
 abs_builddir=$(shell cd $(top_builddir)/testsuite/misc-ming.all; pwd)
 abs_mediadir = $(shell cd $(srcdir)/../media; pwd)
 
-if ENABLE_MING
-
 CLEANFILES =  \
 	gnash-dbg.log \
 	site.exp.bak \
@@ -42,8 +40,7 @@ EXTRA_DIST = \
 	StageConfigTest.as
 
 
-AM_CPPFLAGS = -I.. \
-	-I$(top_srcdir)		\
+AM_CPPFLAGS = \
 	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/libmedia \
 	-I$(top_srcdir)/backend \
@@ -1886,6 +1883,4 @@ site-update: site.exp
 	@sed -e '/testcases/d' site.exp.bak > site.exp
 	@echo "# This is a list of the pre-compiled testcases" >> site.exp
 	@echo "set testcases \"$(TEST_CASES)\"" >> site.exp
-
-endif
 

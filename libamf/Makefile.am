@@ -33,7 +33,7 @@ libgnashamf_la_LIBADD = \
 libgnashamf_la_LDFLAGS =  -release $(VERSION) ${AM_LDFLAGS} 
 # noinst_HEADERS = amf.h amfutf8.h
 
-AM_CPPFLAGS = -I.. -I$(srcdir) \
+AM_CPPFLAGS = \
 	-I$(top_srcdir)/libnet \
 	-I$(top_srcdir)/server \
 	-I$(top_srcdir)/libbase \

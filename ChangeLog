@@ -1,3 +1,24 @@
+2008-06-09 Patrice Dumas  <pertusus at free.fr>
+
+	(patch #6525)
+	* autogen.sh: work with AC_CONFIG_HEADER and not only AM_CONFIG_HEADER
+	* configure.ac: use --enable-extensions instead of --with-extensions
+	* remove unneeded -I in INCLUDES in Makefile.am, namely:
+	  $(srcdir), ../, $(top_srcdir)
+	* add some includes
+	* extensions/lirc/Makefile.am: add libnet include.
+	* extensions/mysql/Makefile.am: add libltdl include.
+	* server/vm/Makefile.am: add libltdl include.
+	* extensions/dbus/dbus_ext.h: use gnashconfig instead of config 
+	* libbase/lirc.h: add an #include "GnashKey.h" 
+	* fixes in po when gettext only installed by the maintainer
+	* minor changes to have make distcheck work better
+	* testsuite/Makefile.am: select the directories in based on ming...
+	  being there or not, and don't disable portions of Makefile.am
+	* automatically generated changes in po and pot files
+	* libmedia/gst/SoundHandlerGst.cpp:  include "VM.h" instead of "vm/VM.h"
+	* server/asobj/TextFormat.cpp: include "types.h" instead of "server/types.h" 
+
 2008-06-09 Sandro Santilli <strk@keybit.net>
 
 	* libbase/LoadThread.{cpp,h}: const correctness, 'size' alias

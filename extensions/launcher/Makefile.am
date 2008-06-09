@@ -24,7 +24,7 @@ plugins_LTLIBRARIES = launcher_ext.la
 bin_PROGRAMS = launcher-gnash
 
 AM_CPPFLAGS = -DGNASHBINDIR=\"${bindir}\" 
-INCLUDES = -I$(srcdir)  \
+INCLUDES =  \
             -I$(top_srcdir)/libbase \
             -I$(top_srcdir)/server \
             -I$(top_srcdir)/server/vm \

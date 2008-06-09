@@ -23,7 +23,6 @@ AUTOMAKE_OPTIONS = dejagnu
 # of the generated SWF should work, but it's currently
 # broken and needs to be used in misc-ming.all too
 # so I take responsibility of dropping that for the moment...
-if ENABLE_MING
 
 abs_mediadir = `cd $(srcdir)/../media; pwd`
 DEF_MAKESWF_FLAGS=-DMING_VERSION_CODE=$(MING_VERSION_CODE) -DMEDIADIR='\"$(abs_mediadir)\"'
@@ -52,8 +51,7 @@ TEST_CASES = \
 
 dist_noinst_SCRIPTS = gen-test.sh gen-index.sh
 
-AM_CPPFLAGS = -I.. \
-        -I$(top_srcdir)		\
+AM_CPPFLAGS = \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/libamf  \
         -I$(top_srcdir)/server  \
@@ -384,4 +382,3 @@ site-update: site.exp
 	@echo "# This is a list of the pre-compiled testcases" >> site.exp
 	@echo "set testcases \"$(TEST_CASES)\"" >> site.exp
 
-endif

@@ -25,8 +25,7 @@ LDADD = $(top_builddir)/libbase/libgnashbase.la
 
 # AM_CPPFLAGS isn't right here since per-program *_CPPFLAGS override global
 # AM_CPPFLAGS
-INCLUDES = -I.. \
-        -I$(top_srcdir)	 \
+INCLUDES = \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/server  \
         -I$(top_srcdir)/libgeometry \

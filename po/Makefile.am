@@ -20,7 +20,7 @@ AUTOMAKE_OPTIONS = -Wno-portability
 POFILES = AUTO
 
 
-CLEANFILES = \
+MAINTAINERCLEANFILES = \
 	*.gmo \
 	gnash.pot \
 	POTFILES \
@@ -60,7 +60,7 @@ dirs =  $(top_srcdir)/libbase \
 	
 srcfiles := $(foreach dir,$(dirs),$(wildcard $(dir)/*.cpp))
 
-EXTRA_DIST = $(gmofiles)
+EXTRA_DIST = $(gmofiles) $(pofiles) gnash.pot POTFILES update-po
 
 all: $(gmofiles)
 
@@ -96,8 +96,16 @@ else # not HAS_GETTEXT
 
 $(gmofiles): force
 	@for i in $(gmofiles); do \
-	  ln -fs $(srcdir)/$$i.in $$i; \
+	  ln -fs $(srcdir)/$$i $$i; \
 	done
+
+$(pofiles): force
+	@for i in $(pofiles); do \
+	  ln -fs $(srcdir)/$$i $$i; \
+	done
+
+POTFILES gnash.pot update-po: force
+	ln -fs $(srcdir)/$@ $@
 
 endif # not HAS_GETTEXT
 
@@ -111,3 +119,9 @@ install-data-hook: $(gmofiles)
 	    $(INSTALL_DATA) $$i.gmo $(DESTDIR)$(datadir)/locale/$$i/LC_MESSAGES/gnash.mo; \
 	  fi; \
 	done
+
+uninstall-hook:
+	for i in $(translations); do \
+	  rm -f "$(DESTDIR)$(datadir)/locale/$$i/LC_MESSAGES/gnash.mo"; \
+	done
+

@@ -32,8 +32,7 @@ AM_LDFLAGS = \
 
 localedir = $(datadir)/locale
 
-INCLUDES = -I.. \
-        -I$(top_srcdir)	\
+INCLUDES = \
         -I$(top_srcdir)/testsuite \
         -I$(top_srcdir)/libnet \
         -I$(top_srcdir)/libamf \

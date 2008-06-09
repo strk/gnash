@@ -30,8 +30,6 @@ pluginsdir = $(prefix)/lib/gnash/plugins
 pkglib_LTLIBRARIES =  libgnashmedia.la
 
 libgnashmedia_la_CPPFLAGS = \
-	-I.. -I$(srcdir) \
-	-I$(top_srcdir)	\
 	-I$(top_srcdir)/libamf	\
 	-I$(top_srcdir)/libnet \
 	-I$(top_srcdir)/backend	\

@@ -77,8 +77,6 @@ AUXMOVIES = \
 
 EXTRA_DIST = $(SANE_SCTESTS) $(BOGO_SCTESTS) $(AUXMOVIES) $(INTERACTIVE_SCTESTS) check.sc Dejagnu.sc hello.sc
 
-if ENABLE_SWFC
-
 check_PROGRAMS = \
 	button_test1runner \
 	$(NULL)
@@ -160,4 +158,3 @@ site-update: site.exp
 	@echo "# This is a list of the pre-compiled testcases" >> site.exp
 	@echo "set testcases \"$(TEST_CASES)\"" >> site.exp
 
-endif # ENABLE_SWFC

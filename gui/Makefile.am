@@ -33,8 +33,7 @@ BUILT_SOURCES = .configline
 EXTRA_DIST = gnash.in klash.moc.in
 
 noinst_LTLIBRARIES = 
-AM_CPPFLAGS = -I.. \
-        -I$(top_srcdir) \
+AM_CPPFLAGS = \
         -I$(top_srcdir)/libamf \
         -I$(top_srcdir)/libnet \
         -I$(top_srcdir)/server \

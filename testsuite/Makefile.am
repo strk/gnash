@@ -17,22 +17,41 @@
 
 AUTOMAKE_OPTIONS = 
 
+if ENABLE_MING
+DIR_MING = misc-ming.all actionscript.all
+endif
+
+if ENABLE_MTASC
+DIR_MTASC = misc-mtasc.all
+endif
+
+if ENABLE_SWFMILL
+DIR_SWFMILL = misc-swfmill.all
+endif
+
+if ENABLE_SWFC
+DIR_SWFC = misc-swfc.all
+endif
+
+if ENABLE_SWFDEC_TESTSUITE
+DIR_SWFDEC_TESTSUITE = swfdec
+endif
+
 # movies.all
 SUBDIRS = \
 	.	\
-	swfdec \
+	$(DIR_SWFDEC_TESTSUITE) \
 	libnet.all \
 	libbase	\
 	libamf.all \
 	libgeometry \
 	server \
 	samples	\
-	misc-ming.all \
-	misc-mtasc.all \
-	misc-swfmill.all \
-	misc-swfc.all \
+	$(DIR_MING) \
+	$(DIR_MTASC) \
+	$(DIR_SWFMILL) \
+	$(DIR_SWFC) \
 	movies.all \
-	actionscript.all \
 	$(NULL)
 
 EXTRA_DIST = check.h DummyMovieDefinition.h DummyCharacter.h gnashrc.in simple.exp media/README media/Bitstream-Vera-Sans.fdb media/Bitstream-Vera-Sans.COPYRIGHT media/default.orc media/gnash.xml media/majorscale.sco media/offspring.swf media/offspring.jpg media/green.jpg media/green.swf media/lynch.swf media/lynch.jpg media/sound1.wav media/sound1.mp3 media/square.flv media/square.ogg media/vars.txt media/vars2.txt

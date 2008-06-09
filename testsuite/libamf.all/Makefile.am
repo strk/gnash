@@ -31,8 +31,7 @@ AM_LDFLAGS = \
 
 AM_CPPFLAGS = -DSRCDIR=\"$(srcdir)\"
 
-INCLUDES = -I.. \
-        -I$(top_srcdir)	\
+INCLUDES = \
         -I$(top_srcdir)/libamf \
         -I$(top_srcdir)/libnet \
         -I$(top_srcdir)/libbase \

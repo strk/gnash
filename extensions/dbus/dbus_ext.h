@@ -19,7 +19,7 @@
 #define __DBUS_PLUGIN_H__
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "gnashconfig.h"
 #endif
 
 #include <memory> // for auto_ptr

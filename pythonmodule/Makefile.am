@@ -42,8 +42,7 @@ libgnashpython_la_LDFLAGS = \
 	$(PTHREAD_LIBS) \
 	$(NULL)
 		
-libgnashpython_la_CPPFLAGS = -I.. \
-        -I$(top_srcdir) \
+libgnashpython_la_CPPFLAGS = \
         -I$(top_srcdir)/server \
         -I$(top_srcdir)/server/parser \
         -I$(top_srcdir)/server/vm \

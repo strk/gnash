@@ -33,10 +33,7 @@ SC_XMLTESTS =			\
 
 EXTRA_DIST = $(SC_XMLTESTS) 
 
-if ENABLE_SWFMILL
-
-AM_CPPFLAGS = -I.. \
-	-I$(top_srcdir)		\
+AM_CPPFLAGS = \
 	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/libmedia \
 	-I$(top_srcdir)/backend \
@@ -125,4 +122,3 @@ site-update: site.exp
 	@echo "# This is a list of the pre-compiled testcases" >> site.exp
 	@echo "set testcases \"$(TEST_CASES)\"" >> site.exp
 
-endif

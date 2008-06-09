@@ -759,20 +759,20 @@ ext_dbus=no
 ext_metome=no
 ext_all=no
 ext_launcher=no
-AC_ARG_WITH(extensions,
-  AC_HELP_STRING([--with-extensions=], [Specify which extensions to build]),
-  if test -n ${withval}; then
-    if test "x${withval}" != "xno"; then
-      extlist="${withval}"
-      withval=`echo ${withval} | tr '\054' ' ' `
+AC_ARG_ENABLE(extensions,
+  AC_HELP_STRING([--enable-extensions=], [Specify which extensions to build]),
+  if test -n ${enableval}; then
+    if test "x${enableval}" != "xno"; then
+      extlist="${enableval}"
+      enableval=`echo ${enableval} | tr '\054' ' ' `
     else
       extlist=""
-      withval=""
+      enableval=""
     fi
   fi
   nextensions=0
-  while test -n "${withval}" ; do
-    val=`echo ${withval} | cut -d ' ' -f 1`
+  while test -n "${enableval}" ; do
+    val=`echo ${enableval} | cut -d ' ' -f 1`
     extensions_list="${extensions_list} ${val}"
     [case "${val}" in
       dejagnu|DEJAGNU|dj|DJ)
@@ -831,11 +831,11 @@ AC_ARG_WITH(extensions,
         ext_all=yes
         nextensions=9
         ;;
-      *) AC_MSG_ERROR([invalid extension specified: ${withval} given (accept: MYSQL|DEJAGNU|FILEIO|GTK|LIRC|DBUS|METOME|ALL)])
+      *) AC_MSG_ERROR([invalid extension specified: ${enableval} given (accept: MYSQL|DEJAGNU|FILEIO|GTK|LIRC|DBUS|METOME|ALL)])
          ;;
       esac]
-    withval=`echo ${withval} | cut -d ' ' -f 2-6`
-    if test "x$val" = "x$withval"; then
+    enableval=`echo ${enableval} | cut -d ' ' -f 2-6`
+    if test "x$val" = "x$enableval"; then
       break;
     fi
   done

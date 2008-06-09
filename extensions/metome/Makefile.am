@@ -22,7 +22,7 @@ pluginsdir = $(libdir)/gnash/plugins
 
 plugins_LTLIBRARIES = metome_ext.la
 
-INCLUDES = -I$(srcdir)  \
+INCLUDES =  \
             -I$(top_srcdir)/libbase \
             -I$(top_srcdir)/server \
             -I$(top_srcdir)/server/vm \

@@ -23,8 +23,7 @@ AM_LDFLAGS =  \
 
 # AM_CPPFLAGS isn't right here since per-program *_CPPFLAGS override global
 # AM_CPPFLAGS
-INCLUDES = -I.. \
-        -I$(top_srcdir)	 \
+INCLUDES = \
         -I$(top_srcdir)/libgeometry \
         -I$(top_srcdir)/testsuite \
 	$(NULL)

@@ -24,7 +24,7 @@
 #include "builtin_function.h" // for getter/setter properties
 #include "namedStrings.h"
 #include "VM.h"
-#include "server/types.h" // for PIXELS_TO_TWIPS
+#include "types.h" // for PIXELS_TO_TWIPS
 #include "StringPredicates.h" // for parseAlignString
 #include "smart_ptr.h" // intrusive_ptr
 
