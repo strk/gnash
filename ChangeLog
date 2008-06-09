@@ -1,3 +1,7 @@
+2008-06-09 Sandro Santilli <strk@keybit.net>
+
+	* server/font.{cpp,h}: drop tu_file include and forward decl.
+
 2008-06-07 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/asobj/flash/geom/Point_as{h,cpp}: move class declaration

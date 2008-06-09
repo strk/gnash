@@ -37,8 +37,6 @@
 
 #include <map>
 
-// Forward declarations
-class tu_file;
 
 namespace gnash {
 

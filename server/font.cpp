@@ -24,7 +24,6 @@
 #include "font.h"
 #include "stream.h"
 #include "log.h"
-#include "tu_file.h"
 #include "movie_definition.h"
 #include "shape_character_def.h"
 #include "swf.h"
