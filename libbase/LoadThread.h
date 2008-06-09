@@ -81,13 +81,13 @@ public:
 	size_t read(void *dst, size_t bytes);
 
 	/// Return true if EOF has been reached
-	bool eof();
+	bool eof() const;
 
 	/// Report global position within the file
-	size_t tell();
+	size_t tell() const;
 
 	///	Returns the number of bytes known to be accessable
-	long getBytesLoaded();
+	long getBytesLoaded() const;
 
 	///	Returns the total size of the file
 	//
@@ -103,10 +103,13 @@ public:
 	/// or short of it... Reading the code is
 	/// discouraging for me (--strk)
 	///
-	long getBytesTotal();
+	long getBytesTotal() const;
+
+	// alias for getBytesTotal()
+	long size() const { return getBytesTotal(); }
 
 	/// Check if the load is completed
-	bool completed();
+	bool completed() const;
 
 	/// Check if given position is confirmed to be accessable
 	bool isPositionConfirmed(size_t pos) const

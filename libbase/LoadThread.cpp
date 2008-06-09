@@ -252,31 +252,31 @@ size_t LoadThread::read(void *dst, size_t bytes)
 	return newret;
 }
 
-bool LoadThread::eof()
+bool LoadThread::eof() const
 {
 	// Check if we're at the EOF
 	if (_completed && _userPosition >= _loadPosition) return true;
 	else return false;
 }
 
-size_t LoadThread::tell()
+size_t LoadThread::tell() const
 {
 	return _userPosition;
 }
 
-long LoadThread::getBytesLoaded()
+long LoadThread::getBytesLoaded() const
 {
 	// The load position is equal to the bytesloaded
 	return _loadPosition;
 }
 
-long LoadThread::getBytesTotal()
+long LoadThread::getBytesTotal() const
 {
 	// TODO: proxy to underlying stream instead ?
 	return _streamSize;
 }
 
-bool LoadThread::completed()
+bool LoadThread::completed() const
 {
 	return _completed;
 }
