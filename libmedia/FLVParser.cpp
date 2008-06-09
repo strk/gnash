@@ -93,7 +93,7 @@ bool FLVParser::parseNextTag()
 
 	// Read the tag info
 	boost::uint8_t tag[12];
-	int actuallyRead = _stream->read_bytes(tag, 12);
+	int actuallyRead = _stream->read(tag, 12);
 	if ( actuallyRead < 12 )
 	{
 		if ( actuallyRead )
@@ -178,7 +178,7 @@ bool FLVParser::parseNextTag()
 				}
 				boost::uint8_t videohead[12];
 
-				int actuallyRead = _stream->read_bytes(videohead, 12);
+				int actuallyRead = _stream->read(videohead, 12);
 				_stream->seek(bkpos); // rewind
 
 				if ( actuallyRead < 12 )
@@ -260,7 +260,7 @@ bool FLVParser::parseHeader()
 
 	// Read the header
 	boost::uint8_t header[9];
-	if ( _stream->read_bytes(header, 9) != 9 )
+	if ( _stream->read(header, 9) != 9 )
 	{
 		log_error("FLVParser::parseHeader: couldn't read 9 bytes of header");
 		return false;
@@ -320,7 +320,7 @@ FLVParser::readAudioFrame(boost::uint32_t dataSize, boost::uint32_t timestamp)
 	unsigned long int chunkSize = smallestMultipleContaining(READ_CHUNKS, dataSize+PADDING_BYTES);
 
 	frame->data.reset( new boost::uint8_t[chunkSize] );
-	size_t bytesread = in.read_bytes(frame->data.get(), dataSize);
+	size_t bytesread = in.read(frame->data.get(), dataSize);
 	if ( bytesread < dataSize )
 	{
 		log_error("FLVParser::readAudioFrame: could only read %d/%d bytes", bytesread, dataSize);
@@ -344,7 +344,7 @@ FLVParser::readVideoFrame(boost::uint32_t dataSize, boost::uint32_t timestamp)
 	unsigned long int chunkSize = smallestMultipleContaining(READ_CHUNKS, dataSize+PADDING_BYTES);
 
 	boost::uint8_t* data = new boost::uint8_t[chunkSize];
-	size_t bytesread = in.read_bytes(data, dataSize);
+	size_t bytesread = in.read(data, dataSize);
 
 	unsigned long int padding = chunkSize-dataSize;
 	assert(padding);

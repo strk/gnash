@@ -104,13 +104,13 @@ public:
 	//
 	/// Throw IOException on error
 	///
-	virtual int read_bytes(void* dst, int num)=0;
+	virtual int read(void* dst, int num)=0;
 
 	/// Write the given number of bytes to the stream
 	//
 	/// Throw IOException on error/unsupported op.
 	///
-	virtual int write_bytes(const void* src, int num);
+	virtual int write(const void* src, int num);
 
 	/// \brief Write a 0-terminated string to a stream.
 	//

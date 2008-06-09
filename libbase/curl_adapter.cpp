@@ -371,7 +371,7 @@ public:
 	//
 	/// Return number of actually read bytes
 	///
-	virtual int read_bytes(void *dst, int bytes);
+	virtual int read(void *dst, int bytes);
 
 	/// Return true if EOF has been reached
 	virtual bool eof() const;
@@ -851,7 +851,7 @@ CurlStreamFile::~CurlStreamFile()
 
 /*public*/
 int
-CurlStreamFile::read_bytes(void *dst, int bytes)
+CurlStreamFile::read(void *dst, int bytes)
 {
 	if ( eof() || _error ) return 0;
 

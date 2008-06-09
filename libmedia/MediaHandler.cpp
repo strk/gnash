@@ -34,7 +34,7 @@ MediaHandler::isFLV(IOChannel& stream)
 {
 	char head[4] = {0, 0, 0, 0};
 	stream.seek(0);
-	size_t actuallyRead = stream.read_bytes(head, 3);
+	size_t actuallyRead = stream.read(head, 3);
 	stream.seek(0);
 
 	if (actuallyRead < 3)

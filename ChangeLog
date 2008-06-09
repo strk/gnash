@@ -1,5 +1,11 @@
 2008-06-09 Sandro Santilli <strk@keybit.net>
 
+	* still on IOChannel-related, rename:
+		read_bytes  -> read
+		write_bytes -> write
+
+2008-06-09 Sandro Santilli <strk@keybit.net>
+
 	* lots of files: methods rename:
 		get_position -> tell
 		set_position -> seek

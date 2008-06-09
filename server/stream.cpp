@@ -80,7 +80,7 @@ unsigned SWFStream::read(char *buf, unsigned count)
 
     if ( ! count ) return 0;
 
-    return m_input->read_bytes(buf, count);
+    return m_input->read(buf, count);
 }
 
 bool SWFStream::read_bit()
@@ -132,8 +132,8 @@ unsigned SWFStream::read_uint(unsigned short bitcount)
         assert (bytesToRead <= 4);
         byte cache[4]; // at most 4 bytes in the cache
 
-        if ( spareBits ) m_input->read_bytes(&cache, bytesToRead+1);
-        else m_input->read_bytes(&cache, bytesToRead);
+        if ( spareBits ) m_input->read(&cache, bytesToRead+1);
+        else m_input->read(&cache, bytesToRead);
 
         for (int i=0; i<bytesToRead; ++i)
         {

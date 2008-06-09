@@ -317,7 +317,7 @@ getFileType(IOChannel* in)
 
   unsigned char buf[3];
   
-  if ( 3 < in->read_bytes(buf, 3) )
+  if ( 3 < in->read(buf, 3) )
   {
     log_error(_("Can't read file header"));
     in->seek(0);
@@ -350,7 +350,7 @@ getFileType(IOChannel* in)
   // Check if it is an swf embedded in a player (.exe-file)
   if ((buf[0] == 'M') && (buf[1] == 'Z')) {
 
-    if ( 3 < in->read_bytes(buf, 3) )
+    if ( 3 < in->read(buf, 3) )
     {
       in->seek(0);
       return GNASH_FILETYPE_UNKNOWN;

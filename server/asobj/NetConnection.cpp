@@ -176,7 +176,7 @@ NetConnection::read( void *dst, size_t bytes )
     return 0;
   }
 
-  return _loader->read_bytes( dst, bytes );
+  return _loader->read( dst, bytes );
 }
 
 

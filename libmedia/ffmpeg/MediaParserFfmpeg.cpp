@@ -68,7 +68,7 @@ MediaParserFfmpeg::probeStream()
 	probe_data.buf_size = 2048;
 
 	assert(_stream->tell() == 0);
-	size_t actuallyRead = _stream->read_bytes(probe_data.buf, probe_data.buf_size);
+	size_t actuallyRead = _stream->read(probe_data.buf, probe_data.buf_size);
 	_stream->seek(0);
 
 	if (actuallyRead < 1)
@@ -403,7 +403,7 @@ MediaParserFfmpeg::readPacket(boost::uint8_t* buf, int buf_size)
 	assert( _stream.get() );
 	IOChannel& in = *_stream;
 
-	size_t ret = in.read_bytes(static_cast<void*>(buf), buf_size);
+	size_t ret = in.read(static_cast<void*>(buf), buf_size);
 
 	return ret;
 

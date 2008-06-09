@@ -156,7 +156,7 @@ public:
     /// TODO: define what happens when the stream
     ///       is in error condition, see get_error().
     ///
-    int read_bytes(void* dst, int num)
+    int read(void* dst, int num)
     {
         return m_read(dst, num, m_data);
     }
@@ -166,7 +166,7 @@ public:
     /// TODO: define what happens when the stream
     ///       is in error condition, see get_error().
     ///
-    int write_bytes(const void* src, int num)
+    int write(const void* src, int num)
     {
         return m_write(src, num, m_data);
     }

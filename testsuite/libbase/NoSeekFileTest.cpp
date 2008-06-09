@@ -65,11 +65,11 @@ compare_reads(gnash::IOChannel* reader, int fd, char* first, char* second)
 	stringstream ss;
 
 
-	size_t read_bytes = 0;
+	size_t read = 0;
 
 	for(;;)
 	{
-		size_t sz1 = reader->read_bytes(buf, CHUNK_SIZE);
+		size_t sz1 = reader->read(buf, CHUNK_SIZE);
 		size_t sz2 = read(fd, buf2, CHUNK_SIZE);
 
 		if ( sz1 != sz2 )
@@ -97,10 +97,10 @@ compare_reads(gnash::IOChannel* reader, int fd, char* first, char* second)
 			return false;
 		}
 
-		read_bytes+=sz1;
+		read+=sz1;
 	}
 
-	if ( read_bytes == 0 ) 
+	if ( read == 0 ) 
 	{
 		runtest.fail("No bytes read from either " + string(first) + " or " + string(second) + " file");
 		return false;
@@ -113,7 +113,7 @@ compare_reads(gnash::IOChannel* reader, int fd, char* first, char* second)
 		return false;
 	}
 
-	ss << "compared " << read_bytes << " bytes from "
+	ss << "compared " << read << " bytes from "
 		<< first << " and " << second;
 
 	runtest.pass(ss.str());

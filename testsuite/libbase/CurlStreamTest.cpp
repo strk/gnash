@@ -50,7 +50,7 @@ dump_curl(const char* url, ostream& os)
 
 	char buf[CHUNK_SIZE];
 
-	while (size_t read = reader->read_bytes(buf, CHUNK_SIZE) )
+	while (size_t read = reader->read(buf, CHUNK_SIZE) )
 	{
 		for (size_t i=0; i<read; i++) {
 			os << buf[i];
@@ -68,7 +68,7 @@ dump_tu_file(const char* url, ostream& os)
 
 	char buf[CHUNK_SIZE];
 
-	while ( size_t read = reader->read_bytes(buf, CHUNK_SIZE) )
+	while ( size_t read = reader->read(buf, CHUNK_SIZE) )
 	{
 		for (size_t i=0; i<read; i++) {
 			os << buf[i];

@@ -85,7 +85,7 @@ namespace IOChannel_wrappers
 			rw_source_IOChannel*	src = (rw_source_IOChannel*) cinfo->src;
 
 			// TODO: limit read as requested by caller
-			size_t	bytes_read = src->m_in_stream->read_bytes(src->m_buffer, IO_BUF_SIZE);
+			size_t	bytes_read = src->m_in_stream->read(src->m_buffer, IO_BUF_SIZE);
 
 			if (bytes_read <= 0) {
 				// Is the file completely empty?
@@ -263,7 +263,7 @@ namespace IOChannel_wrappers
 			rw_dest_IOChannel*	dest = (rw_dest_IOChannel*) cinfo->dest;
 			assert(dest);
 
-			if (dest->m_out_stream->write_bytes(dest->m_buffer, IO_BUF_SIZE) != IO_BUF_SIZE)
+			if (dest->m_out_stream->write(dest->m_buffer, IO_BUF_SIZE) != IO_BUF_SIZE)
 			{
 				// Error.
 				// @@ bah, exceptions suck.  TODO consider alternatives.
@@ -289,7 +289,7 @@ namespace IOChannel_wrappers
 			// Write any remaining data.
 			int	datacount = IO_BUF_SIZE - dest->m_pub.free_in_buffer;
 			if (datacount > 0) {
-				if (dest->m_out_stream->write_bytes(dest->m_buffer, datacount) != datacount)
+				if (dest->m_out_stream->write(dest->m_buffer, datacount) != datacount)
 				{
 					// Error.
 					gnash::log_error("jpeg::rw_dest_IOChannel::term_destination couldn't write data.");

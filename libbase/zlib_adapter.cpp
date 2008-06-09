@@ -150,7 +150,7 @@ namespace zlib_adapter
 				if (m_zstream.avail_in == 0)
 				{
 					// Get more raw data.
-					int	new_bytes = m_in->read_bytes(m_rawdata, ZBUF_SIZE);
+					int	new_bytes = m_in->read(m_rawdata, ZBUF_SIZE);
 					if (new_bytes == 0)
 					{
 						// The cupboard is bare!  We have nothing to feed to inflate().

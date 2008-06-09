@@ -54,7 +54,7 @@ LoadVariablesThread::completeLoad()
 	char* buf = new char[CHUNK_SIZE];
 	unsigned int parsedLines = 0;
 	// TODO: use read_string ?
-	while ( size_t read = _stream->read_bytes(buf, CHUNK_SIZE) )
+	while ( size_t read = _stream->read(buf, CHUNK_SIZE) )
 	{
 #ifdef DEBUG_LOAD_VARIABLES
 		log_debug("Read %u bytes", read);

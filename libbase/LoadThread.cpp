@@ -158,7 +158,7 @@ size_t LoadThread::read(void *dst, size_t bytes)
 		
 		// Try to read a wanted amount of bytes into the given 
 		// buffer, note the new position and return the actual amount read
-		int ret = _stream->read_bytes(dst, bytes);
+		int ret = _stream->read(dst, bytes);
 		_userPosition += ret;
 		_actualPosition = _userPosition;
 		return ret;
@@ -187,7 +187,7 @@ size_t LoadThread::read(void *dst, size_t bytes)
 
 		// Try to read a wanted amount of bytes into the given 
 		// buffer, note the new position and return the actual amount read
-		int ret = _stream->read_bytes(dst, bytes);
+		int ret = _stream->read(dst, bytes);
 
 		memcpy(_cache.get() +(_userPosition - _cacheStart), dst, ret);
 		_cachedData = _userPosition - _cacheStart + ret;
@@ -229,7 +229,7 @@ size_t LoadThread::read(void *dst, size_t bytes)
 
 	// Try to read a wanted amount of bytes into the given 
 	// buffer, note the new position and return the actual amount read
-	int ret = _stream->read_bytes(_cache.get(), readdata);
+	int ret = _stream->read(_cache.get(), readdata);
 
 	_cachedData = ret;
 	_cacheStart = newcachestart;
@@ -292,7 +292,7 @@ void LoadThread::setupCache()
 
 	size_t setupSize = 1024;
 
-	size_t ret = _stream->read_bytes(_cache.get(), setupSize);
+	size_t ret = _stream->read(_cache.get(), setupSize);
 	_cacheStart = 0;
 	_cachedData = ret;
 	_loadPosition = ret;
@@ -342,7 +342,7 @@ void LoadThread::fillCache()
 	// the "the edge", and "warm up" the remaining data.
 	int ret;
 	if (_cachedData + _chunkSize > _cacheSize) {
-		ret = _stream->read_bytes(_cache.get() + _cachedData, _cacheSize - _cachedData);
+		ret = _stream->read(_cache.get() + _cachedData, _cacheSize - _cachedData);
 
 		_cachedData += ret;
 		if (ret != _cacheSize - _cachedData) {
@@ -365,7 +365,7 @@ void LoadThread::fillCache()
 		}
 		
 	} else {
-		ret = _stream->read_bytes(_cache.get() + _cachedData, _chunkSize);
+		ret = _stream->read(_cache.get() + _cachedData, _chunkSize);
 		if (ret != _chunkSize) {
 #ifdef GNASH_DEBUG_LOAD_THREAD
 			log_debug("LoadThread completed during fillCache (tried to read %d bytes, but read %d)",
