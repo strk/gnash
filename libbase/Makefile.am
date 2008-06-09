@@ -107,6 +107,7 @@ libgnashbase_la_SOURCES = \
 	sharedlib.cpp \
 	string_table.cpp \
 	tu_file.cpp \
+	IOChannel.cpp \
 	ClockTime.cpp \
 	WallClockTimer.cpp \
 	utf8.cpp \
@@ -142,6 +143,7 @@ noinst_HEADERS = \
 	tree.hh \
 	dsodefs.h \
 	tu_file.h \
+	IOChannel.h \
 	tu_opengl_includes.h \
 	ClockTime.h \
 	WallClockTimer.h \

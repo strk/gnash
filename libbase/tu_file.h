@@ -11,27 +11,15 @@
 
 #include "dsodefs.h" // DSOEXPORT
 #include "utility.h"
+#include "IOChannel.h" // for inheritance
 
 #include <cstdio>
-
-//class membuf;
-
-enum
-{
-    TU_FILE_NO_ERROR = 0,
-    TU_FILE_OPEN_ERROR,
-    TU_FILE_READ_ERROR,
-    TU_FILE_WRITE_ERROR,
-    TU_FILE_SEEK_ERROR,
-    TU_FILE_CLOSE_ERROR
-};
-
 
 // a file abstraction that can be customized with callbacks.
 // Designed to be easy to hook up to FILE*, SDL_RWops*, or
 // whatever stream type(s) you might use in your game or
 // libraries.
-class DSOEXPORT tu_file
+class DSOEXPORT tu_file : public gnash::IOChannel
 {
 public:
     typedef int (* read_func)(void* dst, int bytes, void* appdata);
@@ -182,39 +170,6 @@ public:
     {
         return m_write(src, num, m_data);
     }
-    
-    /// \brief Write a 0-terminated string to a stream.
-    //
-    /// TODO: define what happens when the stream
-    ///       is in error condition, see get_error().
-    ///
-    void write_string(const char* src);
-    
-    /// \brief
-    /// Read up to max_length characters, returns the number of characters 
-    /// read, or -1 if the string length is longer than max_length.
-    //
-    /// Stops at the first \0 character if it comes before max_length.
-    ///
-    /// Guarantees termination of the string.
-    ///
-    /// @return ??
-    ///
-    /// TODO: define what to return when the stream
-    ///       is in error condition, see get_error().
-    ///
-    int	read_string(char* dst, int max_length);
-    
-    /// \brief Write a 32-bit float to a stream.
-    //
-    /// TODO: define what to return when the stream
-    ///       is in error condition, see get_error().
-    void	write_float32(float value);
-
-    /// \brief Read a 32-bit float from a stream.
-    /// TODO: define what to return when the stream
-    ///       is in error condition, see get_error().
-    float	read_float32();
 
     /// \brief Return current stream position
     //
@@ -244,7 +199,7 @@ public:
     /// TODO: define what to return when in error condition
     /// see get_error().
     ///
-    bool get_eof() { return m_get_eof(m_data); }
+    bool get_eof() const { return m_get_eof(m_data); }
     
     /// \brief Return non-zero if the stream is in an error state
     //
@@ -254,11 +209,11 @@ public:
     /// There are some rough meaning for possible returned values
     /// but I don't think they make much sense currently.
     ///
-    int	get_error() { return m_get_err(m_data); }
+    int	get_error() const { return m_get_err(m_data); }
     
 
     /// \brief Get the size of the stream
-    int get_size() { return m_get_stream_size(m_data); }
+    int get_size() const { return m_get_stream_size(m_data); }
     
     // \brief UNSAFE back door, for testing only.
     void* get_app_data_DEBUG() { return m_data; }
@@ -327,46 +282,6 @@ private:
     get_stream_size_func	m_get_stream_size;
     close_func		m_close;
 };
-
-
-//
-// Some inline stuff.
-//
-
-
-/// \brief Write a 32-bit float to a stream in little-endian order.
-/// @@ This currently relies on host FP format being the same as the Flash one
-/// (presumably IEEE 754).
-inline void	tu_file::write_float32(float value)
-{
-    union alias {
-        float	f;
-        boost::uint32_t	i;
-    } u;
-
-    compiler_assert(sizeof(alias) == sizeof(boost::uint32_t));
-    
-    u.f = value;
-    write_le32(u.i);
-}
-
-
-/// \brief Read a 32-bit float from a little-endian stream.
-/// @@ This currently relies on host FP format being the same as the Flash one
-/// (presumably IEEE 754).
-inline float	tu_file::read_float32()
-// Read a 32-bit little-endian float from this file.
-{
-    union {
-        float	f;
-        boost::uint32_t	i;
-    } u;
-
-    compiler_assert(sizeof(u) == sizeof(u.i));
-    
-    u.i = read_le32();
-    return u.f;
-}
 
 #endif // TU_FILE_H
 

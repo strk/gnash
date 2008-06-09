@@ -285,35 +285,6 @@ tu_file::copy_bytes(tu_file* src, int byte_count)
     return byte_count;
 }
 
-void
-tu_file::write_string(const char* src)
-{
-    for (;;) {
-	write8(*src);
-	if (*src == 0) {
-	    break;
-	}
-	src++;
-    }
-}
-
-int
-tu_file::read_string(char* dst, int max_length) 
-{
-    int i=0;
-    while (i<max_length) {
-	dst[i] = read8();
-	if (dst[i]=='\0') {
-	    return i;
-	}
-	i++;
-    }
-    
-    dst[max_length - 1] = '\0';	// force termination.
-    
-    return -1;
-}
-
 // Local Variables:
 // mode: C++
 // indent-tabs-mode: t

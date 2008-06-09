@@ -1,5 +1,11 @@
 2008-06-09 Sandro Santilli <strk@keybit.net>
 
+	* libbase/: Makefile.am, IOChannel.{cpp,h}: initial draft for a virtual
+	  IO class (to replace tu_file).
+	* libbase/tu_file.{cpp,h}: make tu_file derive from IOChannel.
+
+2008-06-09 Sandro Santilli <strk@keybit.net>
+
 	* lots of files: renames gnash::stream to gnash::SWFStream.
 
 2008-06-09 Sandro Santilli <strk@keybit.net>
