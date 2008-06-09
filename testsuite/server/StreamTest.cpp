@@ -119,7 +119,7 @@ main(int /*argc*/, char** /*argv*/)
 	{
 	/// bits: 10101010 (0xAA)
 	br.setByte(0xAA);
-	stream s(&fakeIn);
+	SWFStream s(&fakeIn);
 
 
 	check_equals(s.get_position(), 0);
@@ -349,7 +349,7 @@ main(int /*argc*/, char** /*argv*/)
 	{
 	/// bits: 10011001 (0x99)
 	br.setByte(0x99);
-	stream s(&fakeIn);
+	SWFStream s(&fakeIn);
 	s.set_position(27);
 
 	s.align();
