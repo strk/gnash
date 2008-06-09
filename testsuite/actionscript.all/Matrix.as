@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Matrix.as,v 1.4 2008/06/09 11:55:38 bwy Exp $";
+rcsid="$Id: Matrix.as,v 1.5 2008/06/09 12:37:01 bwy Exp $";
 
 
 // There are lots of floating point calculations here. Comparing them
@@ -222,6 +222,12 @@ check_equals(m4.toString(), "(a=192, b=-40.8, c=768, d=-108.8, tx=48160, ty=-750
 m4.concat(m2);
 // Works for me.
 check_equals(m4.toString(), "(a=90.6729490609422, b=174.089219392218, c=310.274230957074, d=710.908813846049, tx=20109.8154004632, ty=44398.6139954762)");
+
+m7 = new Matrix ("A string", undefined, new Object, true, NaN, new Point);
+check_equals("" + m7, "(a=A string, b=undefined, c=[object Object], d=true, tx=NaN, ty=(x=0, y=0))");
+
+m7.rotate(2);
+check_equals(m7.toString(), "(a=NaN, b=NaN, c=NaN, d=NaN, tx=NaN, ty=NaN)");
 
 //-------------------------------------------------------------
 // END OF TEST
