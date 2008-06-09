@@ -1,5 +1,9 @@
 2008-06-09 Sandro Santilli <strk@keybit.net>
 
+	* libbase/: Makefile.am, tu_file_SDL.cpp: drop unused file.
+
+2008-06-09 Sandro Santilli <strk@keybit.net>
+
 	* server/swf/tag_loaders.cpp: document need for tu_file.h include.
 	* server/parser/shape_character_def.cpp: drop tu_file.h include.
 

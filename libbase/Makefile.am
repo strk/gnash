@@ -56,7 +56,6 @@ libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\" \
 	$(PTHREAD_CFLAGS) \
 	$(LIBXML_CFLAGS) \
 	$(PNG_CFLAGS) \
-	$(SDL_CFLAGS) \
 	$(GLIB_CFLAGS) \
 	$(GSTREAMER_CFLAGS) \
 	$(CURL_CFLAGS) \
@@ -85,13 +84,6 @@ libgnashbase_la_LIBADD = \
 	$(PTHREAD_LIBS) \
 	$(NULL)
 
-if HAVE_SDL
-SDL_FILE = tu_file_SDL.cpp
-libgnashbase_la_LIBADD += $(SDL_LIBS)
-else
-EXTRA_DIST += tu_file_SDL.cpp 
-endif
-
 # Maybe use jemalloc, which handles memory fragmentation for
 # ECAMscript languages better than the regular system malloc.
 # This is controlled by the --enable-jemalloc (disabled by default)
@@ -115,7 +107,6 @@ libgnashbase_la_SOURCES = \
 	sharedlib.cpp \
 	string_table.cpp \
 	tu_file.cpp \
-	$(SDL_FILE) \
 	ClockTime.cpp \
 	WallClockTimer.cpp \
 	utf8.cpp \
