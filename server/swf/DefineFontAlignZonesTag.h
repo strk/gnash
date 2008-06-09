@@ -26,7 +26,7 @@
 // Forward declarations
 namespace gnash {
 	class movie_definition;
-	class stream;
+	class SWFStream;
 }
 
 namespace gnash {
@@ -41,9 +41,9 @@ public:
 		THICK = 2
 	};
 
-	DefineFontAlignZonesTag(movie_definition& m, stream& in);
+	DefineFontAlignZonesTag(movie_definition& m, SWFStream& in);
 
-	static void loader(stream* in, tag_type tag, movie_definition* m);
+	static void loader(SWFStream* in, tag_type tag, movie_definition* m);
 
 private:
 

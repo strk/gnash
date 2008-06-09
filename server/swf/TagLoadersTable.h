@@ -28,7 +28,7 @@
 
 // Forward declarations
 namespace gnash {
-	class stream;
+	class SWFStream;
 	class movie_definition;
 }
 
@@ -47,7 +47,7 @@ public:
 	/// 'm' a pointer to the movie (or sprite) being read
 	///
 	typedef void (*loader_function)(
-		stream* input, tag_type type, movie_definition* m);
+		SWFStream* input, tag_type type, movie_definition* m);
 
 	/// \brief
 	/// Get a pointer to the loader_function for the

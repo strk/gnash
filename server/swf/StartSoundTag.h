@@ -32,7 +32,7 @@
 
 // Forward declarations
 namespace gnash {
-	class stream;
+	class SWFStream;
 	class movie_definition;
 	class sound_sample;
 }
@@ -84,12 +84,12 @@ class StartSoundTag : public ControlTag
 	///
 	std::vector<media::sound_handler::sound_envelope> m_envelopes;
 
-	/// Initialize this StartSoundTag from the stream  
+	/// Initialize this StartSoundTag from the SWFStream  
 	//
 	/// The stream is assumed to be positioned right after the
 	/// sound_id field of the tag structure.
 	///
-	void read(stream& in);
+	void read(SWFStream& in);
 
 
 	/// Create a StartSoundTag for starting the given sound sample
@@ -110,7 +110,7 @@ public:
 	void	execute(sprite_instance* /* m */, DisplayList& /* dlist */) const;
 
 	/// Load a SWF::STARTSOUND tag.
-	static void loader(stream* in, tag_type tag, movie_definition* m);
+	static void loader(SWFStream* in, tag_type tag, movie_definition* m);
 
 };
 

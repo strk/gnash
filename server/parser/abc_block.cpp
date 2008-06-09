@@ -19,7 +19,7 @@
 //
 
 #include "abc_block.h"
-#include "stream.h"
+#include "stream.h" // for use
 #include "VM.h"
 #include "log.h"
 #include "ClassHierarchy.h"
@@ -159,7 +159,7 @@ abc_Trait::finalize_mbody(abc_block *pBlock, asMethod *pMethod)
 
 /// Read an AS3 'trait'
 bool
-abc_Trait::read(stream* in, abc_block *pBlock)
+abc_Trait::read(SWFStream* in, abc_block *pBlock)
 {
 	boost::uint32_t name = in->read_V32();
 	if (name >= pBlock->mMultinamePool.size())
@@ -1111,7 +1111,7 @@ abc_block::read_method_bodies()
 
 // Load up all of the data.
 bool
-abc_block::read(stream* in)
+abc_block::read(SWFStream* in)
 {
 	mS = in;
 	if (!read_version()) return false;

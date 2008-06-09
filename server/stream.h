@@ -52,11 +52,11 @@ namespace gnash {
 /// - aligned reads always start on a byte boundary
 /// - bitwise reads can cross byte boundaries
 /// 
-class DSOEXPORT stream
+class DSOEXPORT SWFStream
 {
 public:
-	stream(tu_file* input);
-	~stream();
+	SWFStream(tu_file* input);
+	~SWFStream();
 
 	/// \brief
 	/// Reads a bit-packed unsigned integer from the stream

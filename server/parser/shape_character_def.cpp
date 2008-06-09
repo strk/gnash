@@ -54,7 +54,7 @@ namespace gnash
 
     // Read fill styles, and push them onto the given style array.
     static void
-        read_fill_styles(std::vector<fill_style>& styles, stream* in,
+        read_fill_styles(std::vector<fill_style>& styles, SWFStream* in,
         int tag_type, movie_definition* m)
     {
 
@@ -90,7 +90,7 @@ namespace gnash
     }
 
     static void
-        read_line_styles(std::vector<line_style>& styles, stream* in, int tag_type,
+        read_line_styles(std::vector<line_style>& styles, SWFStream* in, int tag_type,
         movie_definition *md)
     // Read line styles and push them onto the back of the given array.
     {
@@ -154,7 +154,7 @@ namespace gnash
     }
 
     void
-        shape_character_def::read(stream* in, int tag_type, bool with_style,
+        shape_character_def::read(SWFStream* in, int tag_type, bool with_style,
         movie_definition* m)
     {
         if (with_style)

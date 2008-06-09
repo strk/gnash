@@ -14,7 +14,7 @@
 
 namespace gnash {
 
-void text_character_def::read(stream* in, int tag_type,
+void text_character_def::read(SWFStream* in, int tag_type,
 		movie_definition* m)
 {
 	assert(m != NULL);

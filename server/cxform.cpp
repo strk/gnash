@@ -86,7 +86,7 @@ void    cxform::transform(boost::uint8_t& r, boost::uint8_t& g, boost::uint8_t& 
     a = (uint8_t)(clamp<int16_t>(at, 0, 255));
 }
 
-void    cxform::read_rgb(stream& in)
+void    cxform::read_rgb(SWFStream& in)
 {
     in.align();
 
@@ -125,7 +125,7 @@ void    cxform::read_rgb(stream& in)
     }
 }
 
-void    cxform::read_rgba(stream& in)
+void    cxform::read_rgba(SWFStream& in)
 {
     in.align();
 

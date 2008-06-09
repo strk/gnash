@@ -40,7 +40,7 @@ class DoInitActionTag : public ControlTag
 {
 public:
 
-    DoInitActionTag(stream& in, movie_definition& md, int cid)
+    DoInitActionTag(SWFStream& in, movie_definition& md, int cid)
 	:
 	_buf(md),
 	_cid(cid)
@@ -64,7 +64,7 @@ public:
         return true;
     }
 
-    static void doInitActionLoader(stream* in, tag_type tag, movie_definition* m)
+    static void doInitActionLoader(SWFStream* in, tag_type tag, movie_definition* m)
     {
         in->ensureBytes(2);
         int cid = in->read_u16();
@@ -81,9 +81,9 @@ public:
 
 private:
 
-    /// Read a DoInitAction block from the stream
+    /// Read a DoInitAction block from the SWFStream
     //
-    void read(stream& in)
+    void read(SWFStream& in)
     {
         _buf.read(in, in.get_tag_end_position());
     }

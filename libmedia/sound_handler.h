@@ -37,7 +37,6 @@
 #include <cstring>
 
 namespace gnash {
-	class stream;
 //	class SoundInfo;
 }
 

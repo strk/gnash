@@ -25,10 +25,13 @@
 #include <string>
 #include <boost/scoped_array.hpp>
 
-#include "stream.h"
 #include "string_table.h"
 #include "asClass.h"
 #include "asName.h"
+
+namespace gnash {
+	class SWFStream; // for read signature
+}
 
 namespace gnash {
 
@@ -75,7 +78,7 @@ public:
 		mNamespace(NULL), mMethod(NULL), mValueSet(false)
 	{/**/}
 
-	bool read(stream* in, abc_block *pBlock);
+	bool read(SWFStream* in, abc_block *pBlock);
 	bool finalize(abc_block *pBlock, asClass *pClass, bool do_static);
 	bool finalize_mbody(abc_block *pBlock, asMethod *pMethod);
 
@@ -140,7 +143,7 @@ public:
 	std::vector<abc_parsing::abc_Trait*> mTraits;
 
 	string_table* mStringTable;
-	stream *mS; // Not stored beyond one read.
+	SWFStream *mS; // Not stored beyond one read.
 
 	asClass *mTheObject;
 	ClassHierarchy *mCH;
@@ -172,7 +175,7 @@ public:
 	bool read_scripts();
 	bool read_method_bodies();
 
-	bool read(stream* in);
+	bool read(SWFStream* in);
 
 	bool pool_value(boost::uint32_t index, boost::uint8_t type, as_value &v);
 

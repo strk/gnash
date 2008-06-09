@@ -37,7 +37,7 @@ namespace gnash {
 //
 
 void
-gradient_record::read(stream* in, int tag_type)
+gradient_record::read(SWFStream* in, int tag_type)
 {
     in->ensureBytes(1);
     m_ratio = in->read_u8();
@@ -63,7 +63,7 @@ fill_style::fill_style()
 
 
 void
-fill_style::read(stream* in, int tag_type, movie_definition* md,
+fill_style::read(SWFStream* in, int tag_type, movie_definition* md,
 	fill_style *pOther)
 {
 	const bool is_morph = pOther != NULL;

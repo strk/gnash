@@ -29,7 +29,7 @@ namespace SWF {
 
 /* public static */
 void
-StartSoundTag::loader(stream* in, tag_type tag, movie_definition* m)
+StartSoundTag::loader(SWFStream* in, tag_type tag, movie_definition* m)
 {
     assert(tag == SWF::STARTSOUND); // 15 
 
@@ -69,7 +69,7 @@ StartSoundTag::loader(stream* in, tag_type tag, movie_definition* m)
 
 /* private */
 void
-StartSoundTag::read(stream& in)
+StartSoundTag::read(SWFStream& in)
 {
     in.align();
     in.ensureBytes(1); // header

@@ -32,6 +32,7 @@ namespace gnash {
 	class as_environment;
 	class as_value;
 	class movie_definition;
+	class SWFStream; // for read signature
 }
 
 
@@ -61,7 +62,7 @@ public:
 	///	<= in.get_tag_end_position() or an assertion will
 	///	fail.
 	///
-	void read(stream& in, unsigned long endPos);
+	void read(SWFStream& in, unsigned long endPos);
 
 	bool is_null() const
 	{

@@ -20,7 +20,7 @@ namespace gnash {
 	//
 
 	/// Can throw ParserException on premature end of input stream
-	void	rgba::read(stream* in, int tag_type)
+	void	rgba::read(SWFStream* in, int tag_type)
 	{
 		switch (tag_type)
 		{
@@ -36,7 +36,7 @@ namespace gnash {
 	}
 
 	/// Can throw ParserException on premature end of input stream
-	void	rgba::read_rgba(stream* in)
+	void	rgba::read_rgba(SWFStream* in)
 	{
 		read_rgb(in);
     		in->ensureBytes(1);
@@ -44,7 +44,7 @@ namespace gnash {
 	}
 
 	/// Can throw ParserException on premature end of input stream
-	void	rgba::read_rgb(stream* in)
+	void	rgba::read_rgb(SWFStream* in)
 	{
     		in->ensureBytes(3);
 		m_r = in->read_u8();

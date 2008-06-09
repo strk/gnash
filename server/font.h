@@ -42,7 +42,7 @@ namespace gnash {
 
 class movie_definition;
 class shape_character_def;
-class stream;
+class SWFStream;
 
 
 // @@ replace this with a flat hash, or else a sorted array
@@ -166,7 +166,7 @@ public:
 	/// @param m is the movie_definition containing this definition
 	///          (used to resolve dictionary simbols referred to by glyphs, if any)
 	///
-	void	read(stream* in, SWF::tag_type tag, movie_definition* m);
+	void	read(SWFStream* in, SWF::tag_type tag, movie_definition* m);
 
 	/// \brief
 	/// Read additional information about this font, from a
@@ -176,7 +176,7 @@ public:
 	///
 	/// @see SWF::define_font_info_loader
 	///
-	void	read_font_info(stream* in, SWF::tag_type tag, movie_definition* m);
+	void	read_font_info(SWFStream* in, SWF::tag_type tag, movie_definition* m);
 
         /// \brief
         /// Read the name of this font, from a DEFINEFONTNAME tag.
@@ -185,7 +185,7 @@ public:
         //
         /// @see SWF::define_font_name_loader
         ///
-        void read_font_name(stream* in, SWF::tag_type tag, movie_definition* m);
+        void read_font_name(SWFStream* in, SWF::tag_type tag, movie_definition* m);
 
 	/// Get name of this font. Warning: can be NULL.
 	const std::string& get_name() const { return m_name; }
@@ -251,13 +251,13 @@ public:
 private:
 
 	/// Read the table that maps from glyph indices to character codes.
-	void	read_code_table(stream* in);
+	void	read_code_table(SWFStream& in);
 
 	/// Read a DefineFont2 or DefineFont3 tag
-	void readDefineFont2_or_3(stream* in, movie_definition* m);
+	void readDefineFont2_or_3(SWFStream& in, movie_definition* m);
 
 	/// Read a DefineFont tag
-	void readDefineFont(stream* in, movie_definition* m);
+	void readDefineFont(SWFStream& in, movie_definition* m);
 
 	/// Add a glyph from the os font into the device glyphs table
 	//

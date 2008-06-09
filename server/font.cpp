@@ -126,16 +126,16 @@ GlyphInfo::markReachableResources() const
 	}
 
 
-	void	font::read(stream* in, SWF::tag_type tag, movie_definition* m)
+	void	font::read(SWFStream* in, SWF::tag_type tag, movie_definition* m)
 	{
 		if (tag == SWF::DEFINEFONT)
 		{
-			readDefineFont(in, m);
+			readDefineFont(*in, m);
 		}
 		else
 		{
 			assert (tag == SWF::DEFINEFONT2 || tag == SWF::DEFINEFONT3);
-			readDefineFont2_or_3(in, m);
+			readDefineFont2_or_3(*in, m);
 			if (tag == SWF::DEFINEFONT3)
 			{
 				m_subpixel_font = true;
@@ -150,20 +150,20 @@ GlyphInfo::markReachableResources() const
 	}
 
 	// Read a DefineFont tag
-	void font::readDefineFont(stream* in, movie_definition* m)
+	void font::readDefineFont(SWFStream& in, movie_definition* m)
 	{
 		IF_VERBOSE_PARSE (
 		log_parse(_("reading DefineFont"));
 		);
 
-		unsigned long table_base = in->get_position();
+		unsigned long table_base = in.get_position();
 
 		// Read the glyph offsets.  Offsets
 		// are measured from the start of the
 		// offset table.
 		std::vector<unsigned>	offsets;
-		in->ensureBytes(2);
-		offsets.push_back(in->read_u16());
+		in.ensureBytes(2);
+		offsets.push_back(in.read_u16());
 
 		IF_VERBOSE_PARSE (
 		log_parse("offset[0] = %d", offsets[0]);
@@ -172,10 +172,10 @@ GlyphInfo::markReachableResources() const
 		int	count = offsets[0] >> 1;
 		if ( count > 0 )
 		{
-			in->ensureBytes(count*2);
+			in.ensureBytes(count*2);
 			for (int i = 1; i < count; i++)
 			{
-				offsets.push_back(in->read_u16());
+				offsets.push_back(in.read_u16());
 
 				IF_VERBOSE_PARSE (
 				log_parse("offset[%d] = %d", i, offsets[i]);
@@ -195,28 +195,28 @@ GlyphInfo::markReachableResources() const
 			// Seek to the start of the shape data.
 			unsigned long new_pos = table_base + offsets[i];
 
-			if ( ! in->set_position(new_pos) )
+			if ( ! in.set_position(new_pos) )
 			{
 				throw ParserException(_("Glyphs offset table corrupted in DefineFont tag"));
 			}
 
 			// Create & read the shape.
 			shape_character_def* s = new shape_character_def;
-			s->read(in, SWF::DEFINEFONT, false, m); 
+			s->read(&in, SWF::DEFINEFONT, false, m); 
 
 			_embedGlyphTable[i].glyph = s;
 		}
 	}
 
 	// Read a DefineFont2 or DefineFont3 tag
-	void font::readDefineFont2_or_3(stream* in, movie_definition* m)
+	void font::readDefineFont2_or_3(SWFStream& in, movie_definition* m)
 	{
 		IF_VERBOSE_PARSE (
 		log_parse(_("reading DefineFont2 or DefineFont3"));
 		);
 
-		in->ensureBytes(2); // 1 for the flags, 1 unknown
-        int flags = in->read_u8();
+		in.ensureBytes(2); // 1 for the flags, 1 unknown
+		int flags = in.read_u8();
 		bool  has_layout   = flags & (1 << 7);
 		m_shift_jis_chars  = flags & (1 << 6);
 		m_unicode_chars    = flags & (1 << 5);
@@ -226,7 +226,7 @@ GlyphInfo::markReachableResources() const
 		m_is_italic        = flags & (1 << 1);
 		m_is_bold          = flags & (1 << 0);
         // don't know the usage, so we discard it.
-		int	discarded = in->read_u8();
+		int	discarded = in.read_u8();
 		UNUSED(discarded);
 
 		IF_VERBOSE_PARSE (
@@ -240,12 +240,12 @@ GlyphInfo::markReachableResources() const
             log_parse(" is_bold = %d", m_is_bold);
 		);
 
-		in->read_string_with_length(m_name);
+		in.read_string_with_length(m_name);
 
-		in->ensureBytes(2); 
-		boost::uint16_t glyph_count = in->read_u16();
+		in.ensureBytes(2); 
+		boost::uint16_t glyph_count = in.read_u16();
 		
-		unsigned long table_base = in->get_position();
+		unsigned long table_base = in.get_position();
 
 		// Read the glyph offsets.  Offsets
 		// are measured from the start of the
@@ -255,10 +255,10 @@ GlyphInfo::markReachableResources() const
 		if (wide_offsets)
 		{
 			// 32-bit offsets.
-			in->ensureBytes(4*glyph_count + 4); 
+			in.ensureBytes(4*glyph_count + 4); 
 			for (unsigned int i = 0; i < glyph_count; i++)
 			{
-				boost::uint32_t off = in->read_u32();	
+				boost::uint32_t off = in.read_u32();	
 
 				IF_VERBOSE_PARSE (
 				log_parse(_("Glyph %d at offset %u"), i, off);
@@ -266,15 +266,15 @@ GlyphInfo::markReachableResources() const
 
 				offsets.push_back(off);
 			}
-			font_code_offset = in->read_u32();
+			font_code_offset = in.read_u32();
 		}
 		else
 		{
 			// 16-bit offsets.
-			in->ensureBytes(2*glyph_count + 2); 
+			in.ensureBytes(2*glyph_count + 2); 
 			for (unsigned int i = 0; i < glyph_count; i++)
 			{
-				boost::uint16_t off = in->read_u16();	
+				boost::uint16_t off = in.read_u16();	
 
 				IF_VERBOSE_PARSE (
 				log_parse(_("Glyph %d at offset %u"), i, off);
@@ -282,7 +282,7 @@ GlyphInfo::markReachableResources() const
 
 				offsets.push_back(off);
 			}
-			font_code_offset = in->read_u16();
+			font_code_offset = in.read_u16();
 		}
 
 		_embedGlyphTable.resize(glyph_count);
@@ -295,21 +295,21 @@ GlyphInfo::markReachableResources() const
 
 			// It seems completely possible to
 			// have such seeks-back, see bug #16311
-			//assert(new_pos >= in->get_position());
+			//assert(new_pos >= in.get_position());
 
-			if ( ! in->set_position(new_pos) )
+			if ( ! in.set_position(new_pos) )
 			{
 				throw ParserException(_("Glyphs offset table corrupted in DefineFont2/3 tag"));
 			}
 
 			// Create & read the shape.
 			shape_character_def* s = new shape_character_def;
-			s->read(in, SWF::DEFINEFONT2, false, m); // .. or DEFINEFONT3 actually..
+			s->read(&in, SWF::DEFINEFONT2, false, m); // .. or DEFINEFONT3 actually..
 
 			_embedGlyphTable[i].glyph = s;
 		}
 
-		unsigned long current_position = in->get_position();
+		unsigned long current_position = in.get_position();
 		if (font_code_offset + table_base != current_position)
 		{
 			// Bad offset!  Don't try to read any more.
@@ -324,17 +324,17 @@ GlyphInfo::markReachableResources() const
 		// Read layout info for the glyphs.
 		if (has_layout)
 		{
-			in->ensureBytes(6);
-			m_ascent = (float) in->read_s16();
-			m_descent = (float) in->read_s16();
-			m_leading = (float) in->read_s16();
+			in.ensureBytes(6);
+			m_ascent = (float) in.read_s16();
+			m_descent = (float) in.read_s16();
+			m_leading = (float) in.read_s16();
 			
 			// Advance table; i.e. how wide each character is.
 			size_t nGlyphs = _embedGlyphTable.size();
-			in->ensureBytes(nGlyphs*2);
+			in.ensureBytes(nGlyphs*2);
 			for (size_t i = 0; i < nGlyphs; i++)
 			{
-				_embedGlyphTable[i].advance = (float) in->read_s16();
+				_embedGlyphTable[i].advance = (float) in.read_s16();
 			}
 
 			// Bounds table.
@@ -345,15 +345,15 @@ GlyphInfo::markReachableResources() const
 			}
 
 			// Kerning pairs.
-			in->ensureBytes(2);
-			int	kerning_count = in->read_u16();
+			in.ensureBytes(2);
+			int	kerning_count = in.read_u16();
 			if ( m_wide_codes )
 			{
-				in->ensureBytes(6*kerning_count); // includes the adjustment 
+				in.ensureBytes(6*kerning_count); // includes the adjustment 
 			}
 			else
 			{
-				in->ensureBytes(4*kerning_count); // includes the adjustment 
+				in.ensureBytes(4*kerning_count); // includes the adjustment 
 			}
 
 			for (int i = 0; i < kerning_count; i++)
@@ -361,15 +361,15 @@ GlyphInfo::markReachableResources() const
 				boost::uint16_t	char0, char1;
 				if (m_wide_codes)
 				{
-					char0 = in->read_u16();
-					char1 = in->read_u16();
+					char0 = in.read_u16();
+					char1 = in.read_u16();
 				}
 				else
 				{
-					char0 = in->read_u8();
-					char1 = in->read_u8();
+					char0 = in.read_u8();
+					char1 = in.read_u8();
 				}
-				float	adjustment = (float) in->read_s16();
+				float	adjustment = (float) in.read_s16();
 
 				kerning_pair	k;
 				k.m_char0 = char0;
@@ -389,7 +389,7 @@ GlyphInfo::markReachableResources() const
 	}
 
         // Read the font name, display and legal, from a DefineFontName tag.
-        void font::read_font_name(stream* in, SWF::tag_type tag,
+        void font::read_font_name(SWFStream* in, SWF::tag_type tag,
             movie_definition* /*m*/) 
         {
             assert(tag == SWF::DEFINEFONTNAME);
@@ -400,7 +400,7 @@ GlyphInfo::markReachableResources() const
 	// Read additional information about this font, from a
 	// DefineFontInfo tag.  The caller has already read the tag
 	// type and font id.
-	void	font::read_font_info(stream* in, SWF::tag_type tag,
+	void	font::read_font_info(SWFStream* in, SWF::tag_type tag,
 			movie_definition* /*m*/)
 	{
 		assert(tag == SWF::DEFINEFONTINFO || tag == SWF::DEFINEFONTINFO2); 
@@ -432,13 +432,13 @@ GlyphInfo::markReachableResources() const
 		m_is_bold         = flags & (1 << 1);
 		m_wide_codes      = flags & (1 << 0);
 
-		read_code_table(in);
+		read_code_table(*in);
 	}
 
-	void	font::read_code_table(stream* in)
+	void	font::read_code_table(SWFStream& in)
 	{
 		IF_VERBOSE_PARSE (
-		log_parse(_("reading code table at offset %lu"), in->get_position());
+		log_parse(_("reading code table at offset %lu"), in.get_position());
 		);
 
 		assert(_embedded_code_table.empty());
@@ -446,21 +446,21 @@ GlyphInfo::markReachableResources() const
 		size_t nGlyphs = _embedGlyphTable.size();
 		if (m_wide_codes)
 		{
-			in->ensureBytes(2*nGlyphs);
+			in.ensureBytes(2*nGlyphs);
 			// Code table is made of boost::uint16_t's.
 			for (size_t i=0; i<nGlyphs; ++i)
 			{
-				boost::uint16_t code = in->read_u16();
+				boost::uint16_t code = in.read_u16();
 				_embedded_code_table.insert(std::make_pair(code, i));
 			}
 		}
 		else
 		{
 			// Code table is made of bytes.
-			in->ensureBytes(1*nGlyphs);
+			in.ensureBytes(1*nGlyphs);
 			for (size_t i=0; i<nGlyphs; ++i)
 			{
-				boost::uint8_t code = in->read_u8();
+				boost::uint8_t code = in.read_u8();
 				_embedded_code_table.insert(std::make_pair(code, i));
 			}
 		}

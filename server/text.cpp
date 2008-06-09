@@ -65,7 +65,7 @@ namespace gnash {
 		return true;
 	}
 
-	void text_glyph_record::read(stream* in, int glyph_count,
+	void text_glyph_record::read(SWFStream* in, int glyph_count,
 			int glyph_bits, int advance_bits)
 	{
 		// TODO: shouldn't we take unsigned for *_bits ?

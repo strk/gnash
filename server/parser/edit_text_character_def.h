@@ -19,7 +19,7 @@
 #define _GNASH_EDIT_TEXT_CHARACTER_DEF_H_
 
 #include "smart_ptr.h" // GNASH_USE_GC
-#include "types.h"
+#include "types.h" // what for ?
 #include "character_def.h" // for inheritance
 #include "rect.h" // for composition
 
@@ -27,6 +27,7 @@ namespace gnash {
 
 // Forward declarations
 class movie_definition;
+class SWFStream; // for read signature
 class font;
 
 /// \brief
@@ -60,7 +61,7 @@ public:
 	character* create_character_instance(character* parent, int id);
 
 	/// Initialize from SWF input stream (tag 37)
-	void read(stream* in, int tag_type, movie_definition* m);
+	void read(SWFStream* in, int tag_type, movie_definition* m);
 
 	/// Return a reference to the default text associated
 	/// with this EditText definition.

@@ -32,7 +32,7 @@
 
 namespace gnash {
     
-stream::stream(tu_file* input)
+SWFStream::SWFStream(tu_file* input)
     :
     m_input(input),
     m_current_byte(0),
@@ -41,12 +41,12 @@ stream::stream(tu_file* input)
 }
 
 
-stream::~stream()
+SWFStream::~SWFStream()
 {
 }
 
 void
-stream::ensureBytes(unsigned long needed)
+SWFStream::ensureBytes(unsigned long needed)
 {
 #ifndef GNASH_TRUST_SWF_INPUT
 
@@ -62,7 +62,7 @@ stream::ensureBytes(unsigned long needed)
 #endif
 }
 
-unsigned stream::read(char *buf, unsigned count)
+unsigned SWFStream::read(char *buf, unsigned count)
 {
     align();
 
@@ -82,7 +82,7 @@ unsigned stream::read(char *buf, unsigned count)
     return m_input->read_bytes(buf, count);
 }
 
-bool stream::read_bit()
+bool SWFStream::read_bit()
 {
     if (!m_unused_bits)
     {
@@ -96,7 +96,7 @@ bool stream::read_bit()
     }
 }
 
-unsigned stream::read_uint(unsigned short bitcount)
+unsigned SWFStream::read_uint(unsigned short bitcount)
 {
     // htf_sweet.swf fails when this is set to 24. There seems to
     // be no reason why this should be limited to 32 other than
@@ -185,7 +185,7 @@ unsigned stream::read_uint(unsigned short bitcount)
 
 
 int
-stream::read_sint(unsigned short bitcount)
+SWFStream::read_sint(unsigned short bitcount)
 {
     //assert(bitcount <= 32); // already asserted in read_uint
 
@@ -196,13 +196,13 @@ stream::read_sint(unsigned short bitcount)
         value |= -1 << bitcount;
     }
 
-//        IF_DEBUG(log_debug("stream::read_sint(%d) == %d\n", bitcount, value));
+//        IF_DEBUG(log_debug("SWFStream::read_sint(%d) == %d\n", bitcount, value));
 
     return value;
 }
 
 
-float    stream::read_fixed()
+float    SWFStream::read_fixed()
 {
     // align(); // read_u32 will align 
     return static_cast<float> (
@@ -213,7 +213,7 @@ float    stream::read_fixed()
 
 // float is not large enough to hold a 32 bit value without doing the wrong thing with the sign.
 // So we upgrade to double for the calculation and then resize when we know it's small enough.
-float    stream::read_ufixed()
+float    SWFStream::read_ufixed()
 {
     // align(); // read_u32 will align 
     return static_cast<float> (
@@ -222,21 +222,21 @@ float    stream::read_ufixed()
 }
 
 // Read a short fixed value, unsigned.
-float   stream::read_short_ufixed()
+float   SWFStream::read_short_ufixed()
 {
     // align(); // read_u16 will align 
     return static_cast<float> ( read_u16() / 256.0f );
 }
 
 // Read a short fixed value, signed.
-float    stream::read_short_sfixed()
+float    SWFStream::read_short_sfixed()
 {
     // align(); // read_s16 will align 
     return static_cast<float> ( read_s16() / 256.0f );
 }
 
 /// Read a 16bit (1:sign 5:exp 10:mantissa) floating point value
-float    stream::read_short_float()
+float    SWFStream::read_short_float()
 {
     // read_s16 will align
     return static_cast<float> ( read_s16() );
@@ -286,7 +286,7 @@ convert_float_little(const void *p)
 }
 
 /// Read a 32bit (1:sign 8:exp 23:mantissa) floating point value
-float    stream::read_long_float()
+float    SWFStream::read_long_float()
 {
     const unsigned short dataLength = 4;
 
@@ -301,7 +301,7 @@ float    stream::read_long_float()
 }
 
 // Read a 64-bit double value
-long double stream::read_d64()
+long double SWFStream::read_d64()
 {
 #ifdef USE_TU_FILE_BYTESWAPPING 
     align();
@@ -332,19 +332,19 @@ long double stream::read_d64()
 #endif
 }
 
-boost::uint8_t    stream::read_u8()
+boost::uint8_t    SWFStream::read_u8()
 {
     align();
     return m_input->read_byte();
 }
 
-int8_t    stream::read_s8()
+int8_t    SWFStream::read_s8()
 {
     // read_u8 will align
     return read_u8();
 }
 
-boost::uint16_t stream::read_u16()
+boost::uint16_t SWFStream::read_u16()
 {
 #ifdef USE_TU_FILE_BYTESWAPPING 
     align();
@@ -367,13 +367,13 @@ boost::uint16_t stream::read_u16()
 #endif
 }
 
-boost::int16_t stream::read_s16()
+boost::int16_t SWFStream::read_s16()
 {
     // read_u16 will align
     return read_u16();
 }
 
-boost::uint32_t    stream::read_u32()
+boost::uint32_t    SWFStream::read_u32()
 {
 #ifdef USE_TU_FILE_BYTESWAPPING 
     align();
@@ -400,14 +400,14 @@ boost::uint32_t    stream::read_u32()
 #endif
 }
 
-boost::int32_t    stream::read_s32()
+boost::int32_t    SWFStream::read_s32()
 {
     // read_u32 will align
     return read_u32();
 }
 
 void
-stream::read_string(std::string& to)
+SWFStream::read_string(std::string& to)
 {
     align();
 
@@ -423,7 +423,7 @@ stream::read_string(std::string& to)
 
 }
 
-void stream::read_string_with_length(std::string& to)
+void SWFStream::read_string_with_length(std::string& to)
 {
     align();
 
@@ -432,7 +432,7 @@ void stream::read_string_with_length(std::string& to)
     read_string_with_length(len, to); // will check 'len'
 }
 
-void stream::read_string_with_length(unsigned len, std::string& to)
+void SWFStream::read_string_with_length(unsigned len, std::string& to)
 {
     align();
 
@@ -448,7 +448,7 @@ void stream::read_string_with_length(unsigned len, std::string& to)
 
 
 unsigned long
-stream::get_position()
+SWFStream::get_position()
 {
     int pos = m_input->get_position();
     // TODO: check return value? Could be negative.
@@ -457,7 +457,7 @@ stream::get_position()
 
 
 bool
-stream::set_position(unsigned long pos)
+SWFStream::set_position(unsigned long pos)
 {
     align();
 
@@ -498,7 +498,7 @@ stream::set_position(unsigned long pos)
 
 
 unsigned long
-stream::get_tag_end_position()
+SWFStream::get_tag_end_position()
 {
     assert(_tagBoundsStack.size() > 0);
 
@@ -507,7 +507,7 @@ stream::get_tag_end_position()
 
 
 SWF::tag_type
-stream::open_tag()
+SWFStream::open_tag()
 {
     align();
 
@@ -584,7 +584,7 @@ stream::open_tag()
 
 
 void
-stream::close_tag()
+SWFStream::close_tag()
 {
 
     assert(_tagBoundsStack.size() > 0);

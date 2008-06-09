@@ -37,7 +37,7 @@ namespace gnash {
 //
 
 
-button_action::button_action(stream& in, int tag_type, unsigned long endPos, movie_definition& mdef)
+button_action::button_action(SWFStream& in, int tag_type, unsigned long endPos, movie_definition& mdef)
 	:
 	m_actions(mdef)
 {
@@ -113,7 +113,7 @@ computeButtonStatesString(int flags)
 }
 
 bool
-button_record::read(stream* in, int tag_type,
+button_record::read(SWFStream* in, int tag_type,
 		movie_definition* m, unsigned long endPos)
 {
 	// caller should check this
@@ -244,7 +244,7 @@ button_character_definition::~button_character_definition()
 }
 
 
-void button_character_definition::sound_info::read(stream* in)
+void button_character_definition::sound_info::read(SWFStream* in)
 {
 	in->ensureBytes(1);
 	m_in_point = m_out_point = m_loop_count = 0;
@@ -305,7 +305,7 @@ void button_character_definition::sound_info::read(stream* in)
 }
 
 void
-button_character_definition::readDefineButton(stream* in, movie_definition* m)
+button_character_definition::readDefineButton(SWFStream* in, movie_definition* m)
 {
 	assert(m);
 	assert(in);
@@ -348,7 +348,7 @@ button_character_definition::readDefineButton(stream* in, movie_definition* m)
 }
 
 void
-button_character_definition::readDefineButton2(stream* in, movie_definition* m)
+button_character_definition::readDefineButton2(SWFStream* in, movie_definition* m)
 {
 	// Character ID has been read already
 
@@ -437,7 +437,7 @@ button_character_definition::readDefineButton2(stream* in, movie_definition* m)
 }
 
 void
-button_character_definition::readDefineButtonSound(stream* in, movie_definition* m)
+button_character_definition::readDefineButtonSound(SWFStream* in, movie_definition* m)
 {
 	// Character ID has been read already
 
@@ -479,8 +479,7 @@ button_character_definition::readDefineButtonSound(stream* in, movie_definition*
 
 
 void
-button_character_definition::read(stream* in, int tag_type, movie_definition* m)
-// Initialize from the given stream.
+button_character_definition::read(SWFStream* in, int tag_type, movie_definition* m)
 {
 	// Character ID has been read already
 

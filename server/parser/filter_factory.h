@@ -28,7 +28,7 @@
 
 namespace gnash {
 
-class stream;
+class SWFStream;
 
 typedef std::vector<Filter> Filters;
 
@@ -39,7 +39,7 @@ public:
     /// and push them into the vector store. Returns the number read.
     /// If read_multiple is true, the first byte of the stream is
     /// expected to contain the number of filters to be read.
-    static int read(stream& in, bool read_multiple,
+    static int read(SWFStream& in, bool read_multiple,
         Filters* store);
 };
 

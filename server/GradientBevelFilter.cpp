@@ -21,7 +21,7 @@
 namespace gnash {
 
 // See parser/filter_factory.cpp for the implementation. Purposefully not here.
-//bool GradientBevelFilter::read(stream* in);
+//bool GradientBevelFilter::read(SWFStream* in);
 
 } // Namespace gnash
 

@@ -25,7 +25,6 @@
 #endif
 
 #include "character_def.h"
-#include "stream.h" // for read()
 #include "movie_definition.h"
 #include "swf.h"
 #include "rect.h" // for composition
@@ -42,6 +41,9 @@
 #include <memory> // for auto_ptr
 
 namespace gnash {
+
+// Forward declarations
+class SWFStream;
 
 
 /// Class used to store data for the undecoded embedded video frames.
@@ -89,7 +91,7 @@ public:
 	/// This function is allowed to be called only *once* for each
 	/// instance of this class.
 	///
-	void readDefineVideoStream(stream* in, SWF::tag_type tag, movie_definition* m);
+	void readDefineVideoStream(SWFStream* in, SWF::tag_type tag, movie_definition* m);
 
 	/// Read tag SWF::VIDEOFRAME
 	//
@@ -99,7 +101,7 @@ public:
 	/// This function is allowed to be called zero or more times, as long
 	/// as readDefineVideoStream was read before.
 	///
-	void readDefineVideoFrame(stream* in, SWF::tag_type tag, movie_definition* m);
+	void readDefineVideoFrame(SWFStream* in, SWF::tag_type tag, movie_definition* m);
 
 	/// Return local video bounds in twips
 	const rect&	get_bound() const

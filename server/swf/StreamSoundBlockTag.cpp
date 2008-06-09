@@ -45,7 +45,7 @@ StreamSoundBlockTag::execute(sprite_instance* m, DisplayList& /*dlist*/) const
 
 /* public static */
 void
-StreamSoundBlockTag::loader(stream* in, tag_type tag, movie_definition* m)
+StreamSoundBlockTag::loader(SWFStream* in, tag_type tag, movie_definition* m)
 {
     assert(tag == SWF::SOUNDSTREAMBLOCK); // 19
 

@@ -29,8 +29,8 @@ namespace gnash {
 class GlowFilter : public BitmapFilter
 {
 public:
-    // Fill from a stream. See parser/filter_factory.cpp for the implementations.
-    virtual bool read(stream& in);
+    // Fill from a SWFStream. See parser/filter_factory.cpp for the implementations.
+    virtual bool read(SWFStream& in);
 
     virtual ~GlowFilter() { return; }
 

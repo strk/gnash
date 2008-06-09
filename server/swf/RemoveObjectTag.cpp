@@ -28,7 +28,7 @@ namespace gnash {
 namespace SWF {
 
 void
-RemoveObjectTag::read(stream* in, tag_type tag)
+RemoveObjectTag::read(SWFStream* in, tag_type tag)
 {
 	assert(tag == SWF::REMOVEOBJECT || tag == SWF::REMOVEOBJECT2);
 
@@ -54,7 +54,7 @@ RemoveObjectTag::execute(sprite_instance* m, DisplayList& dlist) const
 
 /* public static */
 void
-RemoveObjectTag::loader(stream* in, tag_type tag, movie_definition* m)
+RemoveObjectTag::loader(SWFStream* in, tag_type tag, movie_definition* m)
 {
     assert(tag == SWF::REMOVEOBJECT || tag == SWF::REMOVEOBJECT2);
 

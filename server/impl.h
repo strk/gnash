@@ -37,7 +37,6 @@ class character;
 class character_def;
 class font;
 class movie_root;
-class stream;
 class sprite_instance;
 
 DSOEXPORT void save_extern_movie(sprite_instance* m);

@@ -32,7 +32,8 @@
 
 namespace gnash {
 
-class movie_definition;
+class movie_definition; // for read signature
+class SWFStream; // for read signature
 
 /// Text character 
 //
@@ -48,7 +49,7 @@ public:
 
 	text_character_def() {}
 
-	void read(stream* in, int tag_type, movie_definition* m);
+	void read(SWFStream* in, int tag_type, movie_definition* m);
 
 	/// Draw the string.
 	void display(character* inst);

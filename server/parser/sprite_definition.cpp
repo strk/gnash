@@ -25,6 +25,7 @@
 #include "sprite_definition.h"
 #include "ControlTag.h" // for dtor visibility
 #include "as_function.h" // for dtor visibility
+#include "stream.h" // for use
 
 #include <vector>
 #include <string>
@@ -66,7 +67,7 @@ sprite_definition::~sprite_definition()
 /*private*/
 // only called from constructors
 void
-sprite_definition::read(stream* in)
+sprite_definition::read(SWFStream* in)
 {
     unsigned long tag_end = in->get_tag_end_position();
 
@@ -185,7 +186,7 @@ sprite_definition::get_labeled_frame(const std::string& label, size_t& frame_num
     return true;
 }
 
-sprite_definition::sprite_definition(movie_definition* m, stream* in)
+sprite_definition::sprite_definition(movie_definition* m, SWFStream* in)
 	:
 	// FIXME: use a class-static TagLoadersTable for sprite_definition
 	_tag_loaders(SWF::TagLoadersTable::getInstance()),

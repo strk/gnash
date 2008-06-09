@@ -23,7 +23,7 @@
 
 namespace gnash {
 
-class stream;
+class SWFStream;
 class BitmapFilter;
 typedef boost::shared_ptr<BitmapFilter> Filter;
 
@@ -32,7 +32,7 @@ class BitmapFilter
 {
 public:
     // Fill from a stream. See parser/filter_factory.cpp for the implementations.
-    virtual bool read(stream& /*in*/) { return true; }
+    virtual bool read(SWFStream& /*in*/) { return true; }
 
     BitmapFilter() { return; }
     virtual ~BitmapFilter() { return; }

@@ -32,7 +32,7 @@
 
 // Forward declarations
 namespace gnash {
-    class stream;
+    class SWFStream;
     class sprite_instance;
     class swf_event;
     class action_buffer;
@@ -109,12 +109,12 @@ public:
     ~PlaceObject2Tag();
 
     /// Read SWF::PLACEOBJECT or SWF::PLACEOBJECT2
-    void read(stream& in, tag_type tag);
+    void read(SWFStream& in, tag_type tag);
 
     /// Place/move/whatever our object in the given movie.
     void execute(sprite_instance* m, DisplayList& dlist) const;
 
-    static void loader(stream* in, tag_type tag, movie_definition* m);
+    static void loader(SWFStream* in, tag_type tag, movie_definition* m);
 
     int getPlaceType() const { return m_has_flags2 & (HAS_CHARACTER_MASK | MOVE_MASK); } 
     int getRatio()     const { return m_ratio; }
@@ -188,16 +188,16 @@ private:
     EventHandlers m_event_handlers;
 
     // read SWF::PLACEOBJECT 
-    void readPlaceObject(stream& in);
+    void readPlaceObject(SWFStream& in);
 
     // read placeObject2 actions
-    void readPlaceActions(stream& in);
+    void readPlaceActions(SWFStream& in);
 
     // read SWF::PLACEOBJECT2 
-    void readPlaceObject2(stream& in);
+    void readPlaceObject2(SWFStream& in);
 
     // read SWF::PLACEOBJECT3
-    void readPlaceObject3(stream& in);
+    void readPlaceObject3(SWFStream& in);
 
 };
 

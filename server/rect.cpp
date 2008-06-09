@@ -26,18 +26,18 @@
 
 namespace gnash {
 
-void	rect::read(stream* in)
+void	rect::read(SWFStream& in)
 {
-	in->align();
+	in.align();
 
-	in->ensureBits(5);
-	unsigned int nbits = in->read_uint(5);
+	in.ensureBits(5);
+	unsigned int nbits = in.read_uint(5);
 
-	in->ensureBits(nbits*4);
-	float xmin = (float) in->read_sint(nbits);
-	float xmax = (float) in->read_sint(nbits);
-	float ymin = (float) in->read_sint(nbits);
-	float ymax = (float) in->read_sint(nbits);
+	in.ensureBits(nbits*4);
+	float xmin = (float) in.read_sint(nbits);
+	float xmax = (float) in.read_sint(nbits);
+	float ymin = (float) in.read_sint(nbits);
+	float ymax = (float) in.read_sint(nbits);
 
 	// Check for swapped X or Y values
 	if (xmax < xmin || ymax < ymin)

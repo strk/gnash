@@ -35,7 +35,7 @@ namespace gnash {
 class movie_definition;
 
 void
-edit_text_character_def::read(stream* in, int tag_type,
+edit_text_character_def::read(SWFStream* in, int tag_type,
 		movie_definition* m)
 {
 	//assert(m != NULL);

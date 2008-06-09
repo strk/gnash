@@ -155,7 +155,7 @@ MovieLoader::start()
 //
 
 /// Log the contents of the current tag, in hex to the output strream
-static void	dumpTagBytes(stream* in, std::ostream& os)
+static void	dumpTagBytes(SWFStream* in, std::ostream& os)
 {
     const unsigned int rowlength = 16;
     os << std::endl;
@@ -373,7 +373,7 @@ SWFMovieDefinition::readHeader(std::auto_ptr<tu_file> in, const std::string& url
 
 	assert(_in.get());
 
-	_str.reset(new stream(_in.get()));
+	_str.reset(new SWFStream(_in.get()));
 
 	m_frame_size.read(_str.get());
 	// If the rect is malformed, rect::read would already 
@@ -600,7 +600,7 @@ SWFMovieDefinition::read_all_swf()
 	assert( ! _loader.isSelfThread() );
 #endif
 
-	stream &str = *_str;
+	SWFStream &str = *_str;
 
 	try {
 

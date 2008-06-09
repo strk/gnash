@@ -34,7 +34,7 @@
 
 // Forward declarations
 namespace gnash {
-	class stream;
+	class SWFStream;
 }
 
 
@@ -132,10 +132,10 @@ public:
 	}
 
 	/// Initialize from the SWF input stream.
-	void	read(stream& in);
+	void	read(SWFStream& in);
 
 	// temp hack, should drop..
-	void	read(stream* in) { read(*in); }
+	void	read(SWFStream* in) { read(*in); }
 
 	/// Transform point 'p' by our matrix. 
 	//

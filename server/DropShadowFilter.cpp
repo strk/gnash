@@ -21,7 +21,7 @@
 namespace gnash {
 
 // See parser/filter_factory.cpp for the implementation. Purposefully not here.
-//bool DropShadowFilter::read(stream* in);
+//bool DropShadowFilter::read(SWFStream* in);
 
 } // Namespace gnash
 

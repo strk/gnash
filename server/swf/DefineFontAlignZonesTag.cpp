@@ -29,13 +29,13 @@ namespace gnash {
 namespace SWF {
 
 DefineFontAlignZonesTag::DefineFontAlignZonesTag(movie_definition& /* m */,
-	stream& /* in */)
+	SWFStream& /* in */)
 {
 }
 
 /* public static */
 void
-DefineFontAlignZonesTag::loader(stream* in, tag_type tag, movie_definition* m)
+DefineFontAlignZonesTag::loader(SWFStream* in, tag_type tag, movie_definition* m)
 {
 	assert(tag == SWF::DEFINEALIGNZONES); // 73
 

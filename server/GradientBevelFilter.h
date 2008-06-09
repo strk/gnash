@@ -37,8 +37,8 @@ public:
         FULL_BEVEL = 3
     } glow_types;
 
-    // Fill from a stream. See parser/filter_factory.cpp for the implementations.
-    virtual bool read(stream& in);
+    // Fill from a SWFStream. See parser/filter_factory.cpp for the implementations.
+    virtual bool read(SWFStream& in);
 
     virtual ~GradientBevelFilter() { return; }
 

@@ -35,7 +35,7 @@
 #include "character_def.h" // for boost::intrusive_ptr visibility of dtor
 #include "bitmap_character_def.h" // for boost::intrusive_ptr visibility of dtor
 #include "resource.h" // for boost::intrusive_ptr visibility of dtor
-#include "stream.h" // for get_bytes_loaded
+#include "stream.h" // for get_bytes_loaded and visitbility of dtor (composition)
 #include "StringPredicates.h" // for case-insensitive string comparision (ExportMap)
 
 #include <map> // for CharacterDictionary
@@ -528,7 +528,7 @@ private:
 
 	std::string _url;
 
-	std::auto_ptr<stream> _str;
+	std::auto_ptr<SWFStream> _str;
 
 	std::auto_ptr<tu_file> _in;
 

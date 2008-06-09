@@ -32,7 +32,7 @@
 
 // Forward declarations
 namespace gnash {
-	class stream;
+	class SWFStream;
 	class movie_definition;
 }
 
@@ -56,7 +56,7 @@ private:
 	///
 	/// Can throw ParserException on premature end of input stream
 	///
-	void read(stream& in)
+	void read(SWFStream& in)
 	{
 		// may throw ParserException
 		m_color.read_rgb(&in);
@@ -77,7 +77,7 @@ public:
 	///
 	/// Can throw ParserException on premature end of input stream
 	///
-	SetBackgroundColorTag(stream& in)
+	SetBackgroundColorTag(SWFStream& in)
 	{
 		read(in);
 	}
@@ -96,7 +96,7 @@ public:
 	}
 
 	/// Set background color tag loader (SWF::SETBACKGROUNDCOLOR)
-	static void loader(stream* in, tag_type tag, movie_definition* m)
+	static void loader(SWFStream* in, tag_type tag, movie_definition* m)
 	{
 		assert(tag == SWF::SETBACKGROUNDCOLOR); // 9
 		assert(m);

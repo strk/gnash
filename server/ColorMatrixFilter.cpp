@@ -21,7 +21,7 @@
 namespace gnash {
 
 // See parser/filter_factory.cpp for the implementation. Purposefully not here.
-//bool ConvolutionFilter::read(stream* in);
+//bool ConvolutionFilter::read(SWFStream* in);
 
 } // Namespace gnash
 

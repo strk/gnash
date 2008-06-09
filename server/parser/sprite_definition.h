@@ -24,11 +24,15 @@
 #include <vector>
 #include <map>
 #include "smart_ptr.h" // GNASH_USE_GC
-#include "movie_definition.h"
-#include "stream.h"
+#include "movie_definition.h" // for inheritance
 #include "log.h"
 #include "rect.h"
 #include "StringPredicates.h" // StringNoCaseLessThen
+
+// Forward declarations
+namespace gnash {
+	class SWFStream; // for read signature
+}
 
 namespace gnash
 {
@@ -57,7 +61,7 @@ public:
 	///	The stream associated with the sprite. It is assumed
 	///	to be already positioned right before the frame count
 	///
-	sprite_definition(movie_definition* m, stream* in);
+	sprite_definition(movie_definition* m, SWFStream* in);
 
 	/// Destructor, releases playlist data
 	~sprite_definition();
@@ -232,7 +236,7 @@ public:
 
 private:
 
-	void read(stream* in);
+	void read(SWFStream* in);
 
 	/// Tags loader table.
 	//

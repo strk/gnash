@@ -57,7 +57,7 @@ action_buffer::action_buffer(const movie_definition& md)
 }
 
 void
-action_buffer::read(stream& in, unsigned long endPos)
+action_buffer::read(SWFStream& in, unsigned long endPos)
 {
 	unsigned long startPos = in.get_position();
 	assert(endPos <= in.get_tag_end_position());

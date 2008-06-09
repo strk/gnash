@@ -29,7 +29,7 @@ namespace gnash {
 namespace SWF {
 
 void
-PlaceObject2Tag::readPlaceObject(stream& in)
+PlaceObject2Tag::readPlaceObject(SWFStream& in)
 {
     // Original place_object tag; very simple.
     in.ensureBytes(2 + 2);
@@ -59,7 +59,7 @@ PlaceObject2Tag::readPlaceObject(stream& in)
 
 // read placeObject2 actions
 void
-PlaceObject2Tag::readPlaceActions(stream& in)
+PlaceObject2Tag::readPlaceActions(SWFStream& in)
 {
     int movie_version = _movie_def.get_version();
 
@@ -226,7 +226,7 @@ PlaceObject2Tag::readPlaceActions(stream& in)
 
 // read SWF::PLACEOBJECT2
 void
-PlaceObject2Tag::readPlaceObject2(stream& in)
+PlaceObject2Tag::readPlaceObject2(SWFStream& in)
 {
     in.align();
 
@@ -301,7 +301,7 @@ PlaceObject2Tag::readPlaceObject2(stream& in)
 
 // read SWF::PLACEOBJECT3
 void
-PlaceObject2Tag::readPlaceObject3(stream& in)
+PlaceObject2Tag::readPlaceObject3(SWFStream& in)
 {
     in.align();
 
@@ -438,7 +438,7 @@ PlaceObject2Tag::readPlaceObject3(stream& in)
 }
 
 void
-PlaceObject2Tag::read(stream& in, tag_type tag)
+PlaceObject2Tag::read(SWFStream& in, tag_type tag)
 {
 
     m_tag_type = tag;
@@ -497,7 +497,7 @@ PlaceObject2Tag::~PlaceObject2Tag()
 
 /* public static */
 void
-PlaceObject2Tag::loader(stream* in, tag_type tag, movie_definition* m)
+PlaceObject2Tag::loader(SWFStream* in, tag_type tag, movie_definition* m)
 {
     assert(tag == SWF::PLACEOBJECT || tag == SWF::PLACEOBJECT2 || tag == SWF::PLACEOBJECT3);
 

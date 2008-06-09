@@ -45,7 +45,7 @@ typedef enum
 } filter_types;
 
 int
-filter_factory::read(stream& in, bool read_multiple, Filters* store)
+filter_factory::read(SWFStream& in, bool read_multiple, Filters* store)
 {
     //GNASH_REPORT_FUNCTION;
 
@@ -116,7 +116,7 @@ filter_factory::read(stream& in, bool read_multiple, Filters* store)
     return count;
 }
 
-bool DropShadowFilter::read(stream& in)
+bool DropShadowFilter::read(SWFStream& in)
 {
     in.ensureBytes(4 + 8 + 8 + 2 + 1);
 
@@ -145,7 +145,7 @@ bool DropShadowFilter::read(stream& in)
     return true;
 }
 
-bool BlurFilter::read(stream& in)
+bool BlurFilter::read(SWFStream& in)
 {
     in.ensureBytes(4 + 4 + 1);
 
@@ -164,7 +164,7 @@ bool BlurFilter::read(stream& in)
     return true;
 }
 
-bool GlowFilter::read(stream& in)
+bool GlowFilter::read(SWFStream& in)
 {
     //GNASH_REPORT_FUNCTION;
 
@@ -190,7 +190,7 @@ bool GlowFilter::read(stream& in)
     return true;
 }
 
-bool BevelFilter::read(stream& in)
+bool BevelFilter::read(SWFStream& in)
 {
     in.ensureBytes(4 + 4 + 8 + 8 + 2 + 1);
 
@@ -228,7 +228,7 @@ bool BevelFilter::read(stream& in)
     return true;
 }
 
-bool GradientGlowFilter::read(stream& in)
+bool GradientGlowFilter::read(SWFStream& in)
 {
     in.ensureBytes(1);
 
@@ -275,7 +275,7 @@ bool GradientGlowFilter::read(stream& in)
     return true;
 }
 
-bool ConvolutionFilter::read(stream& in)
+bool ConvolutionFilter::read(SWFStream& in)
 {
     in.ensureBytes(2 + 8);
 
@@ -310,7 +310,7 @@ bool ConvolutionFilter::read(stream& in)
     return true;
 }
 
-bool ColorMatrixFilter::read(stream& in)
+bool ColorMatrixFilter::read(SWFStream& in)
 {
     in.ensureBytes(20 * 4); 
 
@@ -335,7 +335,7 @@ bool ColorMatrixFilter::read(stream& in)
     return true;
 }
 
-bool GradientBevelFilter::read(stream& in)
+bool GradientBevelFilter::read(SWFStream& in)
 {
     in.ensureBytes(1);
     boost::uint8_t count = in.read_u8(); // How many colorings.

@@ -18,6 +18,7 @@
 
 
 namespace gnash {
+	class SWFStream;
 	class cxform;
 	class matrix;
 }
@@ -74,7 +75,7 @@ namespace gnash {
 		///	This is used to resolve bitmap characters for fill styles, never
 		///	used if with_style is false.
 		///
-		void	read(stream* in, int tag_type, bool with_style, movie_definition* m);
+		void	read(SWFStream* in, int tag_type, bool with_style, movie_definition* m);
 
 		void	display(
 			const matrix& mat,

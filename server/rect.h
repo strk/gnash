@@ -30,7 +30,7 @@
 // Forward decl
 namespace gnash {
 	class matrix;
-	class stream;
+	class SWFStream;
 }
 
 namespace gnash {
@@ -39,7 +39,7 @@ namespace gnash {
 /// Rectangle class, basically a wrapper around a
 /// gnash::geometry::Range2d<float> with a few
 /// additional methods for reading it from the
-/// stream ..
+/// SWFStream ..
 //
 /// used by render handler (?)
 ///
@@ -108,7 +108,10 @@ public:
 	/// rectangle to the NULL rectangle. See is_null().
 	///	
 	///
-	void	read(stream* in);
+	void	read(SWFStream& in);
+
+	// TODO: drop this, currently here to avoid touching all callers
+	void	read(SWFStream* in) { read(*in); }
 
 	void	print() const;
 

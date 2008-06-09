@@ -42,7 +42,7 @@ matrix::matrix()
 }
 
 void
-matrix::read(stream& in)
+matrix::read(SWFStream& in)
 // Initialize from the stream.
 {
 	in.align();

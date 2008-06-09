@@ -26,7 +26,6 @@
 // Forward declarations
 namespace gnash {
 	class movie_definition;
-	class stream;
 }
 
 
