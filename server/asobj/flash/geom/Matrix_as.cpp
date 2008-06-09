@@ -384,12 +384,12 @@ Matrix_invert(const fn_call& fn)
 
  	ublas::permutation_matrix<double> pm(currentMatrix.size1());
 
- 	int valid = ublas::lu_factorize(currentMatrix, pm);
+ 	int valid = ublas::lu_factorize<ublas::c_matrix<double, 3, 3> >(currentMatrix, pm);
  	
  	if( valid == 0 )
  	{
  	    // We can invert.
- 	    boost::numeric::ublas::lu_substitute(currentMatrix, pm, inverseMatrix);
+ 	    ublas::lu_substitute<ublas::c_matrix<double, 3, 3> >(currentMatrix, pm, inverseMatrix);
  	}
 
     // Returns the identity matrix if unsuccessful.

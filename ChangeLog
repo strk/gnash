@@ -1,3 +1,9 @@
+2008-06-09 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/asobj/flash/geom/Matrix_as.cpp: specify template arguments
+	  for matrix factorization, see if it fixes strk's problem. Round
+	  two will be catching the exception.
+	
 2008-06-09 Sandro Santilli <strk@keybit.net>
 
 	* still on IOChannel-related, rename:
