@@ -26,6 +26,7 @@
 #include "rc.h" // for use of rcfile
 #include "debugger.h"
 #include "arg_parser.h"
+#include "utility.h" // for clamp
 
 #ifdef HAVE_FFMPEG_AVCODEC_H
 extern "C" {

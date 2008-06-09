@@ -30,8 +30,8 @@
 #include <memory>
 
 // Forward declarations
-class tu_file;
 namespace gnash {
+	class IOChannel;
 	namespace media {
 		class VideoDecoder;
 		class AudioDecoder;
@@ -72,7 +72,7 @@ public:
 	/// NOTE: the default implementation returns an FLVParser for FLV input
 	///       or 0 for others.
 	///
-	virtual std::auto_ptr<MediaParser> createMediaParser(std::auto_ptr<tu_file> stream);
+	virtual std::auto_ptr<MediaParser> createMediaParser(std::auto_ptr<IOChannel> stream);
 
 	/// Create a VideoDecoder for the specified codec_type
 	//
@@ -100,7 +100,7 @@ public:
 protected:
 
 	/// Return true if input stream is an FLV
-	bool isFLV(tu_file& stream);
+	bool isFLV(IOChannel& stream);
 
 	MediaHandler() {}
 

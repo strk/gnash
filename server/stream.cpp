@@ -21,9 +21,10 @@
 
 #include "log.h"
 #include "types.h"
-#include "tu_file.h"
+#include "IOChannel.h"
 #include "swf.h"
 #include "Property.h"
+
 #include <cstring>
 #include <climits>
 //#include <iostream> // debugging only
@@ -32,7 +33,7 @@
 
 namespace gnash {
     
-SWFStream::SWFStream(tu_file* input)
+SWFStream::SWFStream(IOChannel* input)
     :
     m_input(input),
     m_current_byte(0),
@@ -484,7 +485,7 @@ SWFStream::set_position(unsigned long pos)
     }
 
     // Do the seek.
-    if ( m_input->set_position(pos) == TU_FILE_SEEK_ERROR )
+    if ( m_input->set_position(pos) == -1 )
     {
         // TODO: should we throw an exception ?
         //       we might be called from an exception handler
@@ -541,7 +542,7 @@ SWFStream::open_tag()
     // Check end position doesn't overflow a signed int - that makes
     // zlib adapter's inflate_seek(int pos, void* appdata) unhappy.
     // The cast stops compiler warnings. We know it's a positive number.
-    // TODO: make tu_file take a long instead of an int.
+    // TODO: make IOChannel take a long instead of an int.
     // TODO: check against stream length.
     if (tagEnd > static_cast<unsigned int>(std::numeric_limits<signed int>::max()))
     {
@@ -593,7 +594,7 @@ SWFStream::close_tag()
 
     //log_debug("Close tag called at %d, stream size: %d", endPos);
 
-    if ( m_input->set_position(endPos) == TU_FILE_SEEK_ERROR )
+    if ( m_input->set_position(endPos) == -1 )
     {
         // We'll go on reading right past the end of the stream
         // if we don't throw an exception.

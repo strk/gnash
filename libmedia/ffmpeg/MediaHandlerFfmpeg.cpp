@@ -25,14 +25,14 @@
 #include "GnashException.h"
 #include "FLVParser.h"
 
-#include "tu_file.h" // for visibility of destructor
+#include "IOChannel.h" // for visibility of destructor
 #include "MediaParser.h" // for visibility of destructor
 
 namespace gnash { 
 namespace media {
 
 std::auto_ptr<MediaParser>
-MediaHandlerFfmpeg::createMediaParser(std::auto_ptr<tu_file> stream)
+MediaHandlerFfmpeg::createMediaParser(std::auto_ptr<IOChannel> stream)
 {
 	std::auto_ptr<MediaParser> parser;
 

@@ -35,7 +35,7 @@ class DSOEXPORT MediaHandlerFfmpeg : public MediaHandler
 {
 public:
 
-	virtual std::auto_ptr<MediaParser> createMediaParser(std::auto_ptr<tu_file> stream);
+	virtual std::auto_ptr<MediaParser> createMediaParser(std::auto_ptr<IOChannel> stream);
 
 	virtual std::auto_ptr<VideoDecoder> createVideoDecoder(VideoInfo& info);
 

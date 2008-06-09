@@ -3,12 +3,13 @@
 // This source code has been donated to the Public Domain.  Do
 // whatever you want with it.
 
-// Code to wrap zlib compression/decompression around a tu_file
+// Code to wrap zlib compression/decompression around a IOChannel
 // stream.
 
 
 #include "zlib_adapter.h"
 #include "tu_file.h"
+#include "IOChannel.h"
 #include "log.h"
 #include "GnashException.h"
 #include <algorithm> // std::min
@@ -16,7 +17,8 @@
 #include <sstream>
 #include <memory>
 
-using namespace gnash;
+namespace gnash {
+
 
 #ifndef HAVE_ZLIB_H
 
@@ -24,12 +26,13 @@ using namespace gnash;
 // Stubs, in case client doesn't want to link to zlib.
 namespace zlib_adapter
 {
-	std::auto_ptr<tu_file> make_inflater(std::auto_ptr<tu_file> /*in*/)
+	std::auto_ptr<IOChannel> make_inflater(std::auto_ptr<IOChannel> /*in*/)
 	{
 		abort(); // callers should check this themselves
-		return std::auto_ptr<tu_file>(NULL);
+		return std::auto_ptr<IOChannel>(NULL);
 	}
-	tu_file* make_deflater(tu_file* /*out*/)
+
+	IOChannel* make_deflater(IOChannel* /*out*/)
 	{
 		abort(); // callers should check this themselves
 		return NULL;
@@ -50,7 +53,7 @@ namespace zlib_adapter
 	class inflater_impl
 	{
 	private:
-		std::auto_ptr<tu_file>	m_in;
+		std::auto_ptr<IOChannel>	m_in;
 		int		m_initial_stream_pos;	// position of the input stream where we started inflating.
 		unsigned char	m_rawdata[ZBUF_SIZE];
 
@@ -64,7 +67,7 @@ namespace zlib_adapter
 		bool		m_at_eof;
 		int		m_error;
 		
-		inflater_impl(std::auto_ptr<tu_file> in)
+		inflater_impl(std::auto_ptr<IOChannel> in)
 		// Constructor.
 			:
 			m_in(in),
@@ -367,12 +370,12 @@ namespace zlib_adapter
 	}
 
 
-	std::auto_ptr<tu_file> make_inflater(std::auto_ptr<tu_file> in)
+	std::auto_ptr<IOChannel> make_inflater(std::auto_ptr<IOChannel> in)
 	{
 		assert(in.get());
 
 		inflater_impl*	inflater = new inflater_impl(in);
-		return std::auto_ptr<tu_file> (
+		return std::auto_ptr<IOChannel> (
 			new tu_file(
 				inflater,
 				inflate_read,
@@ -389,11 +392,12 @@ namespace zlib_adapter
 
 
 	// @@ TODO
-	// tu_file*	make_deflater(tu_file* out) { ... }
+	// IOChannel*	make_deflater(IOChannel* out) { ... }
 }
 
 #endif // HAVE_ZLIB_H
 
+} // namespace gnash 
 
 // Local Variables:
 // mode: C++

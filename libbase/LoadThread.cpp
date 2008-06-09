@@ -102,7 +102,7 @@ LoadThread::cancelRequested() const
     return _cancelRequested;
 }
 
-bool LoadThread::setStream(std::auto_ptr<tu_file> stream)
+bool LoadThread::setStream(std::auto_ptr<gnash::IOChannel> stream)
 {
 	_stream = stream;
 	if (_stream.get() != NULL) {

@@ -28,9 +28,8 @@
 #include <memory> // for auto_ptr
 #include <string>
 
-class tu_file;
-
 namespace gnash {
+	class IOChannel;
 	class sprite_instance; // for fscommand_callback typedef
 	class movie_definition; // for create_movie
 	class render_handler; // for set_render_handler 
@@ -138,7 +137,7 @@ movie_definition* create_movie(const URL& url, const char* real_url=NULL, bool s
 /// @param url
 /// The url to use as the _url member of the resulting
 /// movie definition. This is required as it can not be
-/// derived from the tu_file.
+/// derived from the IOChannel.
 ///
 /// @param startLoaderThread
 /// If false only the header will be read, and you'll need to call completeLoad
@@ -147,7 +146,7 @@ movie_definition* create_movie(const URL& url, const char* real_url=NULL, bool s
 /// Initializing the VirtualMachine requires a target SWF version, which can
 /// be found in the SWF header.
 ///
-DSOEXPORT movie_definition* create_movie(std::auto_ptr<tu_file> in, const std::string& url, bool startLoaderThread=true);
+DSOEXPORT movie_definition* create_movie(std::auto_ptr<IOChannel> in, const std::string& url, bool startLoaderThread=true);
 
 /// \brief
 /// Create a gnash::movie_definition from the given URL

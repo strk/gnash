@@ -54,7 +54,6 @@
 #include "character_def.h" // for inheritance
 #include "fontlib.h"
 #include "jpeg.h"
-#include "tu_file.h"
 
 #include <string>
 #include <memory> // for auto_ptr

@@ -80,7 +80,7 @@ MovieTester::MovieTester(const std::string& url)
 
 	if ( url == "-" )
 	{
-		std::auto_ptr<tu_file> in (
+		std::auto_ptr<IOChannel> in (
 				noseek_fd_adapter::make_stream(fileno(stdin))
 				);
 		_movie_def = gnash::create_movie(in, url, false);

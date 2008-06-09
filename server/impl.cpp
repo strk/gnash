@@ -19,7 +19,7 @@
 
 
 #include "smart_ptr.h" // GNASH_USE_GC
-#include "tu_file.h"
+#include "IOChannel.h"
 #include "utility.h"
 #include "action.h"
 #include "impl.h"
@@ -254,7 +254,7 @@ static void ensure_loaders_registered()
 // Create a movie_definition from a jpeg stream
 // NOTE: this method assumes this *is* a jpeg stream
 static movie_definition*
-create_jpeg_movie(std::auto_ptr<tu_file> in, const std::string& url)
+create_jpeg_movie(std::auto_ptr<IOChannel> in, const std::string& url)
 {
   // FIXME: temporarly disabled
   //log_unimpl(_("Loading of jpegs"));
@@ -278,7 +278,7 @@ create_jpeg_movie(std::auto_ptr<tu_file> in, const std::string& url)
 // Create a movie_definition from a png stream
 // NOTE: this method assumes this *is* a png stream
 static movie_definition*
-create_png_movie(std::auto_ptr<tu_file> /*in*/, const std::string& /*url*/)
+create_png_movie(std::auto_ptr<IOChannel> /*in*/, const std::string& /*url*/)
 {
   log_unimpl(_("Loading of png"));
   return NULL;
@@ -311,7 +311,7 @@ enum FileType {
 };
 
 FileType
-getFileType(tu_file* in)
+getFileType(IOChannel* in)
 {
   in->set_position(0);
 
@@ -377,7 +377,7 @@ getFileType(tu_file* in)
 // NOTE: this method assumes this *is* an SWF stream
 //
 static SWFMovieDefinition*
-create_swf_movie(std::auto_ptr<tu_file> in, const std::string& url, bool startLoaderThread)
+create_swf_movie(std::auto_ptr<IOChannel> in, const std::string& url, bool startLoaderThread)
 {
 
   // Avoid leaks on error 
@@ -397,7 +397,7 @@ create_swf_movie(std::auto_ptr<tu_file> in, const std::string& url, bool startLo
 }
 
 movie_definition*
-create_movie(std::auto_ptr<tu_file> in, const std::string& url, bool startLoaderThread)
+create_movie(std::auto_ptr<IOChannel> in, const std::string& url, bool startLoaderThread)
 {
   assert(in.get());
 
@@ -439,7 +439,7 @@ create_movie(const URL& url, const char* reset_url, bool startLoaderThread, cons
 
   const std::string swfurl = url.str();
 
-  std::auto_ptr<tu_file> in;
+  std::auto_ptr<IOChannel> in;
   if ( postdata ) in.reset( globals::streamProvider.getStream(url, *postdata) );
   else in.reset( globals::streamProvider.getStream(url) );
   if ( ! in.get() )

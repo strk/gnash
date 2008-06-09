@@ -51,8 +51,7 @@ static as_value netconnection_new(const fn_call& fn);
 
 NetConnection::NetConnection()
 	:
-	as_object(getNetConnectionInterface()),
-	_loader()
+	as_object(getNetConnectionInterface())
 {
 	attachProperties();
 }

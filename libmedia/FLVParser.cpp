@@ -23,6 +23,7 @@
 #include "log.h"
 #include "utility.h"
 #include "GnashException.h"
+#include "IOChannel.h"
 
 #include <string>
 #include <iosfwd>
@@ -38,7 +39,7 @@ using namespace std;
 namespace gnash {
 namespace media {
 
-FLVParser::FLVParser(std::auto_ptr<tu_file> lt)
+FLVParser::FLVParser(std::auto_ptr<IOChannel> lt)
 	:
 	MediaParser(lt),
 	_lastParsedPosition(0),
@@ -308,7 +309,7 @@ FLVParser::getBytesLoaded() const
 std::auto_ptr<EncodedAudioFrame>
 FLVParser::readAudioFrame(boost::uint32_t dataSize, boost::uint32_t timestamp)
 {
-	tu_file& in = *_stream;
+	IOChannel& in = *_stream;
 
 	//log_debug("Reading the %dth audio frame, with data size %d, from position %d", _audioFrames.size()+1, dataSize, in.get_position());
 
@@ -336,7 +337,7 @@ FLVParser::readAudioFrame(boost::uint32_t dataSize, boost::uint32_t timestamp)
 std::auto_ptr<EncodedVideoFrame>
 FLVParser::readVideoFrame(boost::uint32_t dataSize, boost::uint32_t timestamp)
 {
-	tu_file& in = *_stream;
+	IOChannel& in = *_stream;
 
 	std::auto_ptr<EncodedVideoFrame> frame;
 

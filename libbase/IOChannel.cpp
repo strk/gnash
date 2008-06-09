@@ -20,6 +20,8 @@
 
 #include "IOChannel.h"
 
+#include <boost/static_assert.hpp>
+
 namespace gnash
 {
 
@@ -102,7 +104,7 @@ IOChannel::write_float32(float value)
         boost::uint32_t	i;
     } u;
 
-    compiler_assert(sizeof(alias) == sizeof(boost::uint32_t));
+    BOOST_STATIC_ASSERT(sizeof(alias) == sizeof(boost::uint32_t));
     
     u.f = value;
     write_le32(u.i);
@@ -116,7 +118,7 @@ IOChannel::read_float32()
         boost::uint32_t	i;
     } u;
 
-    compiler_assert(sizeof(u) == sizeof(u.i));
+    BOOST_STATIC_ASSERT(sizeof(u) == sizeof(u.i));
     
     u.i = read_le32();
     return u.f;

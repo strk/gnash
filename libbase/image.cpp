@@ -9,7 +9,9 @@
 
 #include "utility.h"
 #include "jpeg.h"
-#include "tu_file.h"
+#include "IOChannel.h"
+#include "tu_file.h" // some functions take a filename, tu_file is created in that case..
+
 #include <cstring>
 #include <memory>		// for auto_ptr
 #include <boost/scoped_array.hpp>
@@ -456,7 +458,7 @@ namespace image
 
 
 	// Write the given image to the given out stream, in jpeg format.
-	void	write_jpeg(tu_file* out, rgb* image, int quality)
+	void	write_jpeg(gnash::IOChannel* out, rgb* image, int quality)
 	{
 		size_t height = image->height();
 
@@ -489,7 +491,7 @@ namespace image
 	//
 	// TODO: return by auto_ptr !
 	//
-	rgb*	read_jpeg(tu_file* in)
+	rgb*	read_jpeg(gnash::IOChannel* in)
 	{
 		std::auto_ptr<jpeg::input> j_in ( jpeg::input::create(in) );
 		if (!j_in.get()) return 0;
@@ -531,7 +533,7 @@ namespace image
 	//
 	// TODO: return by auto_ptr !
 	//
-	rgba*	read_swf_jpeg3(tu_file* in)
+	rgba*	read_swf_jpeg3(gnash::IOChannel* in)
 	{
 		std::auto_ptr<jpeg::input> j_in ( jpeg::input::create_swf_jpeg2_header_only(in, false) );
 		if ( ! j_in.get() ) return 0;
@@ -563,7 +565,7 @@ namespace image
 
 
 	// Write a 32-bit Targa format bitmap.  Dead simple, no compression.
-	void	write_tga(tu_file* out, rgba* im)
+	void	write_tga(gnash::IOChannel* out, rgba* im)
 	{
 		size_t imWidth = im->width();
 		size_t imHeight = im->height();

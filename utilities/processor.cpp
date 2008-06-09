@@ -46,6 +46,7 @@
 #include "ManualClock.h"
 #include "StringPredicates.h"
 #include "smart_ptr.h"
+#include "IOChannel.h" // for proper dtor call
 
 extern "C"{
 	#include <unistd.h>
@@ -365,7 +366,7 @@ play_movie(const char* filename)
     {
       if ( ! strcmp(filename, "-") )
       {
-         std::auto_ptr<tu_file> in ( noseek_fd_adapter::make_stream(fileno(stdin)) );
+         std::auto_ptr<IOChannel> in ( noseek_fd_adapter::make_stream(fileno(stdin)) );
          md = gnash::create_movie(in, filename, false);
       }
       else

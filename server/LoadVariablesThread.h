@@ -23,13 +23,15 @@
 #include "StreamProvider.h" // for inlines
 #include "URL.h" // for inlines
 
+#include "log.h"
+#include "IOChannel.h"
+
 #include <string>
 #include <map>
 #include <memory>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/bind.hpp> 
-#include "log.h"
 
 // Forward declarations
 namespace gnash {
@@ -195,7 +197,7 @@ private:
 
 	size_t _bytesTotal;
 
-	std::auto_ptr<tu_file> _stream;
+	std::auto_ptr<IOChannel> _stream;
 
 	std::auto_ptr<boost::thread> _thread;
 

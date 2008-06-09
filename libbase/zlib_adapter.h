@@ -12,31 +12,35 @@
 
 #include <memory>
 
-class tu_file;
+namespace gnash {
+
+class IOChannel;
 
 
-/// Code to wrap zlib compression/decompression around a tu_file stream.
+/// Code to wrap zlib compression/decompression around an IOChannel stream.
 namespace zlib_adapter
 {
 	// NOTE: these functions will return NULL if
 	// HAVE_ZLIB_H is not defined
 
 	/// \brief
-	/// Returns a read-only tu_file stream that inflates the remaining
+	/// Returns a read-only IOChannel stream that inflates the remaining
 	/// content of the given input stream, as you read data from the
 	/// new stream.
 	//
 	///
-	DSOEXPORT std::auto_ptr<tu_file> make_inflater(std::auto_ptr<tu_file> in);
+	DSOEXPORT std::auto_ptr<IOChannel> make_inflater(std::auto_ptr<IOChannel> in);
 
 	/// \brief
-	/// Returns a write-only tu_file stream that deflates the remaining
+	/// Returns a write-only IOChannel stream that deflates the remaining
 	/// content of the given input stream.
 	//
 	/// TODO: take and return by auto_ptr
 	///
-	DSOEXPORT tu_file*	make_deflater(tu_file* out);
-}
+	DSOEXPORT IOChannel*	make_deflater(IOChannel* out);
+
+} // namespace gnash.zlib_adapter
+} // namespace gnash
 
 
 #endif // ZLIB_ADAPTER_H

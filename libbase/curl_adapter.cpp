@@ -82,8 +82,8 @@ namespace curl_adapter
 //#define GNASH_CURL_WARN_SEEKSBACK 1
 
 
-namespace curl_adapter
-{
+namespace gnash {
+namespace curl_adapter {
 
 /***********************************************************************
  *
@@ -1166,7 +1166,7 @@ close(void* appdata)
 // Exported interfaces
 //-------------------------------------------
 
-tu_file*
+IOChannel*
 make_stream(const char* url)
 {
 #ifdef GNASH_CURL_VERBOSE
@@ -1197,7 +1197,7 @@ make_stream(const char* url)
 		close);
 }
 
-tu_file*
+IOChannel*
 make_stream(const char* url, const std::string& postdata)
 {
 #ifdef GNASH_CURL_VERBOSE
@@ -1229,6 +1229,7 @@ make_stream(const char* url, const std::string& postdata)
 }
 
 } // namespace curl_adapter
+} // namespace gnash
 
 #endif // def USE_CURL
 

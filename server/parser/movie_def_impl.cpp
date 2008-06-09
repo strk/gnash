@@ -25,8 +25,8 @@
 #include "movie_def_impl.h"
 #include "movie_definition.h" // for inheritance
 #include "sprite_instance.h" // for ??
-#include "tu_file.h"
 #include "zlib_adapter.h"
+#include "IOChannel.h" // for use
 #include "stream.h"
 #include "jpeg.h"
 #include "fontlib.h"
@@ -317,7 +317,7 @@ void SWFMovieDefinition::add_sound_sample(int character_id, sound_sample* sam)
 
 // Read header and assign url
 bool
-SWFMovieDefinition::readHeader(std::auto_ptr<tu_file> in, const std::string& url)
+SWFMovieDefinition::readHeader(std::auto_ptr<IOChannel> in, const std::string& url)
 {
 
 	_in = in;
@@ -467,7 +467,7 @@ SWFMovieDefinition::completeLoad()
 
 // Read a .SWF movie.
 bool
-SWFMovieDefinition::read(std::auto_ptr<tu_file> in, const std::string& url)
+SWFMovieDefinition::read(std::auto_ptr<IOChannel> in, const std::string& url)
 {
 
 	if ( ! readHeader(in, url) ) return false;

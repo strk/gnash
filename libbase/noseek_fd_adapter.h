@@ -24,7 +24,8 @@
 #include <string>
 
 
-class tu_file;
+namespace gnash {
+class IOChannel;
 
 
 /// Code to use volatile (non-back-seekable) streams as tu_files
@@ -41,9 +42,11 @@ namespace noseek_fd_adapter
 /// Specify a cachefilename if you want to be able to access
 /// the full cache after deletion of the returned tu_file.
 ///
-DSOEXPORT tu_file* make_stream(int fd, const char* cachefilename=NULL);
+DSOEXPORT IOChannel* make_stream(int fd, const char* cachefilename=NULL);
 
-}
+} // namespace gnash::noseek_fd_adapter
+} // namespace gnash
+ 
 
 #endif // STDIN_ADAPTER_H
 

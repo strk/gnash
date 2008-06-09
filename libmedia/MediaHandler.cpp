@@ -20,7 +20,7 @@
 
 #include "MediaHandler.h"
 #include "FLVParser.h"
-#include "tu_file.h"
+#include "IOChannel.h"
 #include "log.h"
 
 namespace gnash {
@@ -30,7 +30,7 @@ std::auto_ptr<MediaHandler> MediaHandler::_handler;
 
 /* public static */
 bool
-MediaHandler::isFLV(tu_file& stream)
+MediaHandler::isFLV(IOChannel& stream)
 {
 	char head[4] = {0, 0, 0, 0};
 	stream.set_position(0);
@@ -48,7 +48,7 @@ MediaHandler::isFLV(tu_file& stream)
 }
 
 std::auto_ptr<MediaParser>
-MediaHandler::createMediaParser(std::auto_ptr<tu_file> stream)
+MediaHandler::createMediaParser(std::auto_ptr<IOChannel> stream)
 {
 	std::auto_ptr<MediaParser> parser;
 

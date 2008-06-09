@@ -55,7 +55,7 @@ StreamProvider::getDefaultInstance()
 	return inst;
 }
 
-tu_file*
+IOChannel*
 StreamProvider::getStream(const URL& url)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -104,7 +104,7 @@ StreamProvider::getStream(const URL& url)
 	}
 }
 
-tu_file*
+IOChannel*
 StreamProvider::getStream(const URL& url, const std::string& postdata)
 {
 //    GNASH_REPORT_FUNCTION;

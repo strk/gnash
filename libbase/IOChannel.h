@@ -21,11 +21,10 @@
 #define GNASH_IOCHANNEL_H
 
 #include "dsodefs.h" // DSOEXPORT
-#include "utility.h"
 
-#include <cstdio>
+#include "GnashException.h" // for IOException inheritance
 
-//class membuf;
+#include <boost/cstdint.hpp> // for boost int types
 
 // temp hack to avoid changing all callers
 // TODO: update all callers ...
@@ -41,6 +40,13 @@ enum
 
 namespace gnash {
 
+/// Exception signalling an IO error
+class IOException : public GnashException {
+
+	IOException(const std::string& s) : GnashException(s) {}
+	IOException() : GnashException("IO error") {}
+};
+
 /// A virtual IO channel
 class DSOEXPORT IOChannel
 {
@@ -51,73 +57,64 @@ public:
 	/// \brief Read a 32-bit word from a little-endian stream.
 	///	returning it as a native-endian word.
 	//
-	/// TODO: define what happens when the stream
-	///       is in error condition, see get_error().
+	/// Throw IOException on error
 	///
 	boost::uint32_t read_le32();
 
 	/// \brief Read a 64-bit word from a little-ending stream,
 	/// returning it as a native-endian word.
 	//
-	/// TODO: define what happens when the stream is in
-	///       error condition, see get_error().
+	/// Throw IOException on premature EOF
+	///
 	/// TODO: define a platform-neutral type for 64 bits.
 	///
 	long double read_le_double64();
 
 	/// Read a 16-bit word from a little-endian stream.
 	//
-	/// TODO: define what happens when the stream
-	///       is in error condition, see get_error().
+	/// Throw IOException on error
 	///
 	boost::uint16_t read_le16();
 
 	/// Write a 32-bit word to a little-endian stream.
 	//
-	/// TODO: define what happens when the stream
-	///       is in error condition, see get_error().
+	/// Throw IOException on error
 	///
 	void write_le32(boost::uint32_t u);
 
 	/// \brief Write a 16-bit word to a little-endian stream.
 	//
-	/// TODO: define what happens when the stream
-	///       is in error condition, see get_error().
+	/// Throw IOException on error
 	///
 	void write_le16(boost::uint16_t u);
 
 	/// Read a single byte from the stream
 	//
-	/// TODO: define what happens when the stream
-	///       is in error condition, see get_error().
+	/// Throw IOException on error
 	///
 	virtual boost::uint8_t read_byte() =0;
 
 	/// write a single byte to the stream
 	//
-	/// TODO: define what happens when the stream
-	///       is in error condition, see get_error().
+	/// Throw IOException on error
 	///
 	virtual void write_byte(boost::uint8_t u)=0;
 
 	/// Read the given number of bytes from the stream
 	//
-	/// TODO: define what happens when the stream
-	///       is in error condition, see get_error().
+	/// Throw IOException on error
 	///
 	virtual int read_bytes(void* dst, int num)=0;
 
 	/// \brief Write the given number of bytes to the stream
 	//
-	/// TODO: define what happens when the stream
-	///       is in error condition, see get_error().
+	/// Throw IOException on error
 	///
 	virtual int write_bytes(const void* src, int num)=0;
 
 	/// \brief Write a 0-terminated string to a stream.
 	//
-	/// TODO: define what happens when the stream
-	///       is in error condition, see get_error().
+	/// Throw IOException on error
 	///
 	void write_string(const char* src);
 
@@ -132,8 +129,7 @@ public:
 	/// @return the number of characters read, or -1 no null-termination
 	///         was found within max_length
 	///
-	/// TODO: define what to return when the stream
-	///       is in error condition, see get_error().
+	/// Throw IOException on error
 	///
 	int	read_string(char* dst, int max_length);
 
@@ -142,8 +138,7 @@ public:
 	/// NOTE: this currently relies on host FP format being the same as the Flash one
 	///       (presumably IEEE 754).
 	///
-	/// TODO: define what to return when the stream
-	///       is in error condition, see get_error().
+	/// Throw IOException on error
 	///
 	void	write_float32(float value);
 
@@ -152,23 +147,20 @@ public:
 	/// NOTE: this currently relies on host FP format being the same as the Flash one
 	/// (presumably IEEE 754).
 	///
-	/// TODO: define what to return when the stream
-	///       is in error condition, see get_error().
+	/// Throw IOException on error
 	///
 	float	read_float32();
 
 	/// Return current stream position
 	//
-	/// TODO: define what to return when the stream
-	///       is in error condition, see get_error().
+	/// Throw IOException on error
 	///
 	virtual int get_position() const=0;
 
 	/// Seek to the specified position
 	//
 	/// 
-	/// TODO: define what happens when an error occurs, or
-	///       when we're already in an error condition
+	/// Throw IOException on error
 	///
 	/// @return 0 on success, or -1 on failure.
 	///
@@ -176,14 +168,13 @@ public:
 
 	/// Seek to the end of the stream
 	//
-	/// TODO: define what happens when an error occurs
+	/// Throw IOException on error
 	///
 	virtual void go_to_end()=0;
 
 	/// Return true if the end of the stream has been reached.
 	//
-	/// TODO: define what to return when in error condition
-	/// see get_error().
+	/// Throw IOException on error
 	///
 	virtual bool get_eof() const=0;
     

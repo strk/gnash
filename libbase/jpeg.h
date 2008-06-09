@@ -12,9 +12,8 @@
 #include "dsodefs.h"
 #include <csetjmp> // for jmp_buf
 
-struct jpeg_decompress_struct;
-struct jpeg_compress_struct;
-class tu_file;
+// Forward declarations
+namespace gnash { class IOChannel; }
 
 /// Wrapper for jpeg file operations. 
 //
@@ -54,7 +53,7 @@ namespace jpeg
 		///
 		/// @return NULL on error
 		///
-		DSOEXPORT static input*	create(tu_file* in, bool takeOwnership=false);
+		DSOEXPORT static input*	create(gnash::IOChannel* in, bool takeOwnership=false);
 
 		/// Read SWF JPEG2-style header. 
 		//
@@ -63,7 +62,7 @@ namespace jpeg
 		/// bracketing within start_image()/finish_image() pairs.
 		///
 		/// @param in
-		///	The tu_file to use for input. Ownership specified
+		///	The gnash::IOChannel to use for input. Ownership specified
 		///	by last arg.
 		///
 		/// @param maxHeaderBytes
@@ -78,7 +77,7 @@ namespace jpeg
 		///
 		/// @return NULL on error
 		///
-		DSOEXPORT static input*	create_swf_jpeg2_header_only(tu_file* in,
+		DSOEXPORT static input*	create_swf_jpeg2_header_only(gnash::IOChannel* in,
 				unsigned int maxHeaderBytes, bool takeOwnership=false);
 
 		/// Discard existing bytes in our buffer.
@@ -109,12 +108,12 @@ namespace jpeg
 	class output
 	{
 	public:
-		/// Create an output object bount to a tu_file
+		/// Create an output object bount to a gnash::IOChannel
 		//
 		/// @param quality
 		///	Quality goes from 1-100.
 		///
-		DSOEXPORT static output*	create(tu_file* out, int width, int height, int quality);
+		DSOEXPORT static output*	create(gnash::IOChannel* out, int width, int height, int quality);
 
 		virtual ~output() {}
 

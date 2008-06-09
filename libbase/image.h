@@ -14,8 +14,9 @@
 #include <boost/scoped_array.hpp>
 #include <memory> // for auto_ptr
 
-class tu_file;
+// Forward declarations
 namespace jpeg { class input; }
+namespace gnash { class IOChannel; }
 
 
 /// Handy image utilities for RGB surfaces.
@@ -304,10 +305,10 @@ public:
 			 rgba* in, float in_x0, float in_y0, float in_x1, float in_y1);
 
 	/// Write the given image to the given out stream, in jpeg format.
-	DSOEXPORT void	write_jpeg(tu_file* out, rgb* image, int quality);
+	DSOEXPORT void	write_jpeg(gnash::IOChannel* out, rgb* image, int quality);
 
 	/// Write a 32-bit Targa format bitmap.  Dead simple, no compression.
-	DSOEXPORT void	write_tga(tu_file* out, rgba* image);
+	DSOEXPORT void	write_tga(gnash::IOChannel* out, rgba* image);
 
 	/// Create and read a new image from the given filename, if possible.
 	DSOEXPORT rgb*	read_jpeg(const char* filename);
@@ -318,12 +319,12 @@ public:
 	/// 	Stream to read from. Ownership to the caller,
 	///	not needed after return.
 	///
-	DSOEXPORT rgb*	read_jpeg(tu_file* in);
+	DSOEXPORT rgb*	read_jpeg(gnash::IOChannel* in);
 
 	/// \brief
 	/// For reading SWF JPEG2-style image data (slight variation on
 	/// ordinary JPEG).
-	DSOEXPORT rgb*	read_swf_jpeg2(tu_file* in);
+	DSOEXPORT rgb*	read_swf_jpeg2(gnash::IOChannel* in);
 
 	/// \brief
 	/// For reading SWF JPEG2-style image data, using pre-loaded
@@ -333,7 +334,7 @@ public:
 	/// \brief
 	/// For reading SWF JPEG3-style image data, like ordinary JPEG, 
 	/// but stores the data in rgba format.
-	DSOEXPORT rgba*	read_swf_jpeg3(tu_file* in);
+	DSOEXPORT rgba*	read_swf_jpeg3(gnash::IOChannel* in);
 }
 
 

@@ -255,7 +255,7 @@ Player::load_movie()
     try {
         if ( _infile == "-" )
         {
-            std::auto_ptr<tu_file> in ( noseek_fd_adapter::make_stream(fileno(stdin)) );
+            std::auto_ptr<IOChannel> in ( noseek_fd_adapter::make_stream(fileno(stdin)) );
             md = gnash::create_movie(in, _url, false);
         }
         else

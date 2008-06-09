@@ -22,14 +22,14 @@
 #include "VideoDecoderGst.h"
 #include "AudioDecoderGst.h"
 
-#include "tu_file.h" // for visibility of destructor
+#include "IOChannel.h" // for visibility of destructor
 #include "MediaParser.h" // for visibility of destructor
 
 namespace gnash { 
 namespace media {
 
 std::auto_ptr<MediaParser>
-MediaHandlerGst::createMediaParser(std::auto_ptr<tu_file> stream)
+MediaHandlerGst::createMediaParser(std::auto_ptr<IOChannel> stream)
 {
 	// TODO: support more then just FLV...
 	return MediaHandler::createMediaParser(stream);

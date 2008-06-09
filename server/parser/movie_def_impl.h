@@ -30,7 +30,7 @@
 #include "fontlib.h"
 #include "font.h"
 #include "jpeg.h"
-#include "tu_file.h"
+#include "IOChannel.h"
 #include "movie_definition.h" // for inheritance
 #include "character_def.h" // for boost::intrusive_ptr visibility of dtor
 #include "bitmap_character_def.h" // for boost::intrusive_ptr visibility of dtor
@@ -346,7 +346,7 @@ public:
 	/// 	see description of readHeader() and completeLoad()
 	///	for possible reasons of failures
 	///
-	bool read(std::auto_ptr<tu_file> in, const std::string& url);
+	bool read(std::auto_ptr<IOChannel> in, const std::string& url);
 
 	/// Read the header of the SWF file
 	//
@@ -354,12 +354,12 @@ public:
 	/// stream and assigns the movie an URL.
 	/// Call completeLoad() to fire up the loader thread.
 	///
-	/// @param in the tu_file from which to read SWF
+	/// @param in the IOChannel from which to read SWF
 	/// @param url the url associated with the input
 	///
 	/// @return false if SWF header could not be parsed
 	///
-	bool readHeader(std::auto_ptr<tu_file> in, const std::string& url);
+	bool readHeader(std::auto_ptr<IOChannel> in, const std::string& url);
 
 	/// Complete load of the SWF file
 	//
@@ -530,7 +530,7 @@ private:
 
 	std::auto_ptr<SWFStream> _str;
 
-	std::auto_ptr<tu_file> _in;
+	std::auto_ptr<IOChannel> _in;
 
 	/// swf end position (as read from header)
 	unsigned int _swf_end_pos;

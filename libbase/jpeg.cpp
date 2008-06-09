@@ -33,16 +33,16 @@ static void	jpeg_error_exit(j_common_ptr cinfo);
 static void	setup_jpeg_err(jpeg_error_mgr* jerr);
 
 
-/// input/output wrappers for tu_file
-namespace tu_file_wrappers
+/// input/output wrappers for IOChannel
+namespace IOChannel_wrappers
 {
 
 	// Helper object for reading jpeg image data.  Basically a thin
 	static const int	IO_BUF_SIZE = 4096;
 
-	// A jpeglib source manager that reads from a tu_file.  Paraphrased
+	// A jpeglib source manager that reads from a IOChannel.  Paraphrased
 	// from IJG jpeglib jdatasrc.c.
-	class rw_source_tu_file
+	class rw_source_IOChannel
 	{
 	public:
 		struct jpeg_source_mgr	m_pub;		/* public fields */
@@ -50,7 +50,7 @@ namespace tu_file_wrappers
 		// Constructor.  The caller is responsible for closing the input stream
 		// after it's done using us.
 		//
-		rw_source_tu_file(tu_file* in)
+		rw_source_IOChannel(gnash::IOChannel* in)
 			:
 			_ownSourceStream(false),
 			m_in_stream(in),
@@ -64,7 +64,7 @@ namespace tu_file_wrappers
 			_ownSourceStream=true;
 		}
 
-		~rw_source_tu_file()
+		~rw_source_IOChannel()
 		{
 			if ( _ownSourceStream )
 			{
@@ -74,7 +74,7 @@ namespace tu_file_wrappers
 
 		static void init_source(j_decompress_ptr cinfo)
 		{
-			rw_source_tu_file*	src = (rw_source_tu_file*) cinfo->src;
+			rw_source_IOChannel*	src = (rw_source_IOChannel*) cinfo->src;
 			src->m_start_of_file = true;
 		}
 
@@ -82,7 +82,7 @@ namespace tu_file_wrappers
 		// when it needs more data from the file.
 		static boolean fill_input_buffer(j_decompress_ptr cinfo)
 		{
-			rw_source_tu_file*	src = (rw_source_tu_file*) cinfo->src;
+			rw_source_IOChannel*	src = (rw_source_IOChannel*) cinfo->src;
 
 			// TODO: limit read as requested by caller
 			size_t	bytes_read = src->m_in_stream->read_bytes(src->m_buffer, IO_BUF_SIZE);
@@ -129,7 +129,7 @@ namespace tu_file_wrappers
 		// uninteresting data.
 		static void	skip_input_data(j_decompress_ptr cinfo, long num_bytes)
 		{
-			rw_source_tu_file*	src = (rw_source_tu_file*) cinfo->src;
+			rw_source_IOChannel*	src = (rw_source_IOChannel*) cinfo->src;
 
 			// According to jpeg docs, large skips are
 			// infrequent.  So let's just do it the simple
@@ -148,7 +148,7 @@ namespace tu_file_wrappers
 		static void term_source(j_decompress_ptr /* cinfo */)
 		// Terminate the source.  Make sure we get deleted.
 		{
-			/*rw_source_tu_file*	src = (rw_source_tu_file*) cinfo->src;
+			/*rw_source_IOChannel*	src = (rw_source_IOChannel*) cinfo->src;
 			assert(src);
 
 			// @@ it's kind of bogus to be deleting here
@@ -179,11 +179,11 @@ namespace tu_file_wrappers
 		///	If false, ownership of the stream 
 		///	is left to caller, otherwise we take it.
 		//
-		static void setup(jpeg_decompress_struct* cinfo, tu_file* instream,
+		static void setup(jpeg_decompress_struct* cinfo, gnash::IOChannel* instream,
 			bool takeOwnership=false)
 		{
 			// assert(cinfo->src == NULL);
-			rw_source_tu_file* source = new rw_source_tu_file(instream);
+			rw_source_IOChannel* source = new rw_source_IOChannel(instream);
 			if ( takeOwnership ) source->takeStreamOwnership();
 			cinfo->src = (jpeg_source_mgr*)source;
 		}
@@ -203,7 +203,7 @@ namespace tu_file_wrappers
 		}
 
 		bool _ownSourceStream;
-		tu_file*	m_in_stream;		/* source stream */
+		gnash::IOChannel*	m_in_stream;		/* source stream */
 		bool	m_start_of_file;		/* have we gotten any data yet? */
 		JOCTET	m_buffer[IO_BUF_SIZE];		/* start of buffer */
 
@@ -213,9 +213,9 @@ namespace tu_file_wrappers
 	
 
 
-	// A jpeglib destination manager that writes to a tu_file.
+	// A jpeglib destination manager that writes to a gnash::IOChannel.
 	// Paraphrased from IJG jpeglib jdatadst.c.
-	class rw_dest_tu_file
+	class rw_dest_IOChannel
 	{
 	public:
 		struct jpeg_destination_mgr	m_pub;	/* public fields */
@@ -228,7 +228,7 @@ namespace tu_file_wrappers
 		/// @param out
 		///	The output stream, externally owned.
 		///
-		rw_dest_tu_file(tu_file* out)
+		rw_dest_IOChannel(gnash::IOChannel* out)
 			:
 			m_out_stream(out)
 		{
@@ -243,7 +243,7 @@ namespace tu_file_wrappers
 
 		static void init_destination(j_compress_ptr cinfo)
 		{
-			rw_dest_tu_file*	dest = (rw_dest_tu_file*) cinfo->dest;
+			rw_dest_IOChannel*	dest = (rw_dest_IOChannel*) cinfo->dest;
 			assert(dest);
 
 			dest->m_pub.next_output_byte = dest->m_buffer;
@@ -252,22 +252,22 @@ namespace tu_file_wrappers
 
 		// Set up the given compress object to write to the given
 		// output stream.
-		static void setup(j_compress_ptr cinfo, tu_file* outstream)
+		static void setup(j_compress_ptr cinfo, gnash::IOChannel* outstream)
 		{
-			cinfo->dest = (jpeg_destination_mgr*) (new rw_dest_tu_file(outstream));
+			cinfo->dest = (jpeg_destination_mgr*) (new rw_dest_IOChannel(outstream));
 		}
 
 		/// Write the output buffer into the stream.
 		static boolean	empty_output_buffer(j_compress_ptr cinfo)
 		{
-			rw_dest_tu_file*	dest = (rw_dest_tu_file*) cinfo->dest;
+			rw_dest_IOChannel*	dest = (rw_dest_IOChannel*) cinfo->dest;
 			assert(dest);
 
 			if (dest->m_out_stream->write_bytes(dest->m_buffer, IO_BUF_SIZE) != IO_BUF_SIZE)
 			{
 				// Error.
 				// @@ bah, exceptions suck.  TODO consider alternatives.
-				gnash::log_error("jpeg::rw_dest_tu_file couldn't write data.");
+				gnash::log_error("jpeg::rw_dest_IOChannel couldn't write data.");
 				return false;
 			}
 
@@ -283,7 +283,7 @@ namespace tu_file_wrappers
 		///
 		static void term_destination(j_compress_ptr cinfo)
 		{
-			rw_dest_tu_file*	dest = (rw_dest_tu_file*) cinfo->dest;
+			rw_dest_IOChannel*	dest = (rw_dest_IOChannel*) cinfo->dest;
 			assert(dest);
 
 			// Write any remaining data.
@@ -292,7 +292,7 @@ namespace tu_file_wrappers
 				if (dest->m_out_stream->write_bytes(dest->m_buffer, datacount) != datacount)
 				{
 					// Error.
-					gnash::log_error("jpeg::rw_dest_tu_file::term_destination couldn't write data.");
+					gnash::log_error("jpeg::rw_dest_IOChannel::term_destination couldn't write data.");
 				}
 			}
 
@@ -304,14 +304,14 @@ namespace tu_file_wrappers
 	private:	
 
 		// source stream, externally owned
-		tu_file*	m_out_stream;	
+		gnash::IOChannel*	m_out_stream;	
 
 		JOCTET	m_buffer[IO_BUF_SIZE];		/* start of buffer */
 
 	};
 
 	/// Bascially this is a thin wrapper around jpeg_decompress object.
-	class input_tu_file : public input
+	class input_IOChannel : public input
 	{
 	public:
 		// State needed for input.
@@ -333,7 +333,7 @@ namespace tu_file_wrappers
 		/// @param takeOwnership
 		///	If true, we take ownership of the input stream. 
 		///
-		input_tu_file(tu_file* in, bool takeOwnership=false)
+		input_IOChannel(gnash::IOChannel* in, bool takeOwnership=false)
 			:
 			m_compressor_opened(false)
 		{
@@ -344,7 +344,7 @@ namespace tu_file_wrappers
 			// Initialize decompression object.
 			jpeg_create_decompress(&m_cinfo);
 
-			rw_source_tu_file::setup(&m_cinfo, in, takeOwnership);
+			rw_source_IOChannel::setup(&m_cinfo, in, takeOwnership);
 
 		}
 
@@ -393,11 +393,11 @@ namespace tu_file_wrappers
 		}
 
 		// Destructor.  Clean up our jpeg reader state.
-		~input_tu_file()
+		~input_IOChannel()
 		{
 			finish_image();
 
-			rw_source_tu_file* src = (rw_source_tu_file*) m_cinfo.src;
+			rw_source_IOChannel* src = (rw_source_IOChannel*) m_cinfo.src;
 			delete src;
 			m_cinfo.src = NULL;
 
@@ -410,7 +410,7 @@ namespace tu_file_wrappers
 		// data, to avoid screwing up future reads.
 		void	discard_partial_buffer()
 		{
-			rw_source_tu_file* src = (rw_source_tu_file*) m_cinfo.src;
+			rw_source_IOChannel* src = (rw_source_IOChannel*) m_cinfo.src;
 
 			// We only have to discard the input buffer after reading the tables.
 			if (src)
@@ -543,7 +543,7 @@ namespace tu_file_wrappers
 
 	// Basically this is a thin wrapper around jpeg_compress
 	// object.
-	class output_tu_file : public output
+	class output_IOChannel : public output
 	{
 	public:
 		// State needed for output.
@@ -554,14 +554,14 @@ namespace tu_file_wrappers
 		//
 		/// Read the header data from in, and
 		///  prepare to read data.
-		output_tu_file(tu_file* out, int width, int height, int quality)
+		output_IOChannel(gnash::IOChannel* out, int width, int height, int quality)
 		{
 			m_cinfo.err = jpeg_std_error(&m_jerr);
 
 			// Initialize decompression object.
 			jpeg_create_compress(&m_cinfo);
 
-			rw_dest_tu_file::setup(&m_cinfo, out);
+			rw_dest_IOChannel::setup(&m_cinfo, out);
 			m_cinfo.image_width = width;
 			m_cinfo.image_height = height;
 			m_cinfo.input_components = 3;
@@ -573,12 +573,12 @@ namespace tu_file_wrappers
 		}
 
 
-		~output_tu_file()
+		~output_IOChannel()
 		// Destructor.  Clean up our jpeg reader state.
 		{
 			jpeg_finish_compress(&m_cinfo);
 /*
-			rw_dest_tu_file* src = (rw_source_tu_file*) m_cinfo.dest;
+			rw_dest_IOChannel* src = (rw_source_IOChannel*) m_cinfo.dest;
 			delete dest;
 			m_cinfo.dest = NULL;
 */
@@ -595,7 +595,7 @@ namespace tu_file_wrappers
 
 
 
-} // namespace tu_file_wrappers
+} // namespace IOChannel_wrappers
 
 
 // Set up some error handlers for the jpeg lib.
@@ -636,20 +636,20 @@ input::errorOccurred(const char* msg)
 
 /*static*/
 input*
-input::create(tu_file* in, bool takeOwnership)
+input::create(gnash::IOChannel* in, bool takeOwnership)
 {
-	using tu_file_wrappers::input_tu_file;
-	std::auto_ptr<input_tu_file> ret ( new input_tu_file(in, takeOwnership) );
+	using IOChannel_wrappers::input_IOChannel;
+	std::auto_ptr<input_IOChannel> ret ( new input_IOChannel(in, takeOwnership) );
 	if ( ret.get() ) ret->start_image(); // might throw an exception (I guess)
 	return ret.release();
 }
 
 /*static*/
 input*
-input::create_swf_jpeg2_header_only(tu_file* in, unsigned int maxHeaderBytes, bool takeOwnership)
+input::create_swf_jpeg2_header_only(gnash::IOChannel* in, unsigned int maxHeaderBytes, bool takeOwnership)
 {
-	using tu_file_wrappers::input_tu_file;
-	std::auto_ptr<input_tu_file> ret ( new input_tu_file(in, takeOwnership) );
+	using IOChannel_wrappers::input_IOChannel;
+	std::auto_ptr<input_IOChannel> ret ( new input_IOChannel(in, takeOwnership) );
 	if ( ret.get() ) ret->readHeader(maxHeaderBytes); // might throw an exception
 	return ret.release();
 }
@@ -657,9 +657,9 @@ input::create_swf_jpeg2_header_only(tu_file* in, unsigned int maxHeaderBytes, bo
 
 /*static*/
 output*
-output::create(tu_file* in, int width, int height, int quality)
+output::create(gnash::IOChannel* in, int width, int height, int quality)
 {
-	return new tu_file_wrappers::output_tu_file(in, width, height, quality);
+	return new IOChannel_wrappers::output_IOChannel(in, width, height, quality);
 }
 
 } // namespace jpeg

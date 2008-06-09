@@ -206,7 +206,7 @@ private:
     void initParser();
 
     /// Queue a load request from the given stream
-    void queueLoad(std::auto_ptr<tu_file> str);
+    void queueLoad(std::auto_ptr<IOChannel> str);
 
     //static void _xmlErrorHandler(void *ctx, const char* fmt, ...);
 

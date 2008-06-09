@@ -28,7 +28,7 @@
 #include "StreamProvider.h"
 #include "URL.h"
 #include "gnash.h" // for get_base_url
-#include "tu_file.h"
+#include "IOChannel.h"
 #include "timers.h"
 #include "VM.h"
 #include "Object.h" // for getObjectInterface
@@ -330,7 +330,7 @@ LoadVars::addLoadVariablesThread(const std::string& urlstr, const char* postdata
 
 	URL url(urlstr, get_base_url());
 
-	std::auto_ptr<tu_file> str;
+	std::auto_ptr<IOChannel> str;
 	if ( postdata ) str.reset ( StreamProvider::getDefaultInstance().getStream(url, std::string(postdata)) );
 	else str.reset ( StreamProvider::getDefaultInstance().getStream(url) );
 

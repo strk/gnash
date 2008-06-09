@@ -35,7 +35,7 @@
 #include "debugger.h"
 #include "StreamProvider.h"
 #include "URLAccessManager.h"
-#include "tu_file.h"
+#include "IOChannel.h"
 #include "URL.h"
 #include "VM.h"
 #include "namedStrings.h"
@@ -418,7 +418,7 @@ XML::parseXML(const std::string& xml_in)
 }
 
 void
-XML::queueLoad(std::auto_ptr<tu_file> str)
+XML::queueLoad(std::auto_ptr<IOChannel> str)
 {
     //GNASH_REPORT_FUNCTION;
 
@@ -577,7 +577,7 @@ XML::load(const URL& url)
   
     //log_debug(_("%s: mem is %d"), __FUNCTION__, mem);
 
-    std::auto_ptr<tu_file> str ( StreamProvider::getDefaultInstance().getStream(url) );
+    std::auto_ptr<IOChannel> str ( StreamProvider::getDefaultInstance().getStream(url) );
     if ( ! str.get() ) 
     {
         log_error(_("Can't load XML file: %s (security?)"), url.str().c_str());
@@ -651,7 +651,7 @@ XML::sendAndLoad(const URL& url, XML& target)
   
     //log_debug(_("%s: mem is %d"), __FUNCTION__, mem);
 
-    std::auto_ptr<tu_file> str ( StreamProvider::getDefaultInstance().getStream(url, data) );
+    std::auto_ptr<IOChannel> str ( StreamProvider::getDefaultInstance().getStream(url, data) );
     if ( ! str.get() ) 
     {
         log_error(_("Can't load XML file: %s (security?)"), url.str().c_str());

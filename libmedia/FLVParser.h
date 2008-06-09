@@ -164,13 +164,13 @@ public:
 
 	/// \brief
 	/// Create an FLV parser reading input from
-	/// the given tu_file
+	/// the given IOChannel
 	//
 	/// @param lt
-	/// 	tu_file to use for input.
+	/// 	IOChannel to use for input.
 	/// 	Ownership transferred.
 	///
-	FLVParser(std::auto_ptr<tu_file> lt);
+	FLVParser(std::auto_ptr<IOChannel> lt);
 
 	/// Kills the parser...
 	~FLVParser();

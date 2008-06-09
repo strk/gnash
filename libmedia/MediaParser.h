@@ -24,7 +24,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include "tu_file.h" // for inlines
+#include "IOChannel.h" // for inlines
 #include "dsodefs.h" // DSOEXPORT
 
 #include <boost/scoped_array.hpp>
@@ -220,13 +220,13 @@ public:
 /// and fetching frames from there on, sequentially.
 /// See seek(), nextVideoFrame(), nextAudioFrame() 
 ///
-/// Input is received from a tu_file object.
+/// Input is received from a IOChannel object.
 ///
 class MediaParser
 {
 public:
 
-	MediaParser(std::auto_ptr<tu_file> stream)
+	MediaParser(std::auto_ptr<IOChannel> stream)
 		:
 		_isAudioMp3(false),
 		_isAudioNellymoser(false),
@@ -418,7 +418,7 @@ protected:
 	bool _isAudioNellymoser;
 
 	/// The stream used to access the file
-	std::auto_ptr<tu_file> _stream;
+	std::auto_ptr<IOChannel> _stream;
 
 	/// Whether the parsing is complete or not
 	bool _parsingComplete;

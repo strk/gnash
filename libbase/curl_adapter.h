@@ -24,12 +24,12 @@
 #include <string>
 
 
-class tu_file;
+namespace gnash {
+class IOChannel;
 
 
 /// Code to wrap libcurl around a tu_file stream.
-namespace curl_adapter
-{
+namespace curl_adapter {
 
 /// \brief
 /// Returns a read-only tu_file stream that fetches data
@@ -37,7 +37,7 @@ namespace curl_adapter
 //
 /// The caller owns the returned tu_file*.  
 ///
-DSOEXPORT tu_file* make_stream(const char* url);
+DSOEXPORT IOChannel* make_stream(const char* url);
 
 /// \brief
 /// Returns a read-only tu_file stream that fetches data
@@ -51,9 +51,10 @@ DSOEXPORT tu_file* make_stream(const char* url);
 /// @param postdata
 ///	The url-encoded post data
 ///
-DSOEXPORT tu_file* make_stream(const char* url, const std::string& postdata);
+DSOEXPORT IOChannel* make_stream(const char* url, const std::string& postdata);
 
-}
+} // namespace gnash::curl_adaptar
+} // namespace gnash
 
 #endif // CURL_ADAPTER_H
 

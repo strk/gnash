@@ -19,7 +19,7 @@
 #ifndef __NETCONNECTION_H__
 #define __NETCONNECTION_H__
 
-#include "tu_file.h"
+#include "IOChannel.h"
 
 #include <stdexcept>
 #include <cstdio>
@@ -169,7 +169,7 @@ private:
 	//
 	/// TODO: drop
 	///
-	std::auto_ptr<tu_file> _loader;
+	std::auto_ptr<IOChannel> _loader;
 
 	/// Attach ActionScript instance properties
 	void attachProperties();

@@ -21,6 +21,7 @@
 #include "MediaParserFfmpeg.h"
 #include "GnashException.h"
 #include "log.h"
+#include "IOChannel.h" // for use
 
 using namespace std;
 
@@ -270,7 +271,7 @@ MediaParserFfmpeg::getBytesLoaded() const
 	return _lastParsedPosition;
 }
 
-MediaParserFfmpeg::MediaParserFfmpeg(std::auto_ptr<tu_file> stream)
+MediaParserFfmpeg::MediaParserFfmpeg(std::auto_ptr<IOChannel> stream)
 	:
 	MediaParser(stream),
 	_nextVideoFrame(0),
@@ -400,7 +401,7 @@ MediaParserFfmpeg::readPacket(boost::uint8_t* buf, int buf_size)
 	log_debug("readPacket(%d)", buf_size);
 
 	assert( _stream.get() );
-	tu_file& in = *_stream;
+	IOChannel& in = *_stream;
 
 	size_t ret = in.read_bytes(static_cast<void*>(buf), buf_size);
 
@@ -414,7 +415,7 @@ MediaParserFfmpeg::seekMedia(offset_t offset, int whence)
 	GNASH_REPORT_FUNCTION;
 
 	assert(_stream.get());
-	tu_file& in = *(_stream);
+	IOChannel& in = *(_stream);
 
 	// Offset is absolute new position in the file
 	if (whence == SEEK_SET)

@@ -58,6 +58,7 @@
 
 // Forward declarations
 namespace gnash {
+	class IOChannel;
 	namespace media {
 		class sound_handler;
 		class MediaHandler;
@@ -301,7 +302,7 @@ private:
 	/// This should just be a temporary variable, transferred
 	/// to MediaParser constructor.
 	///
-	std::auto_ptr<tu_file> _inputStream;
+	std::auto_ptr<IOChannel> _inputStream;
 
         typedef std::deque<media::raw_mediadata_t*> AudioQueue;
 

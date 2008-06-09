@@ -19,6 +19,7 @@
 
 
 #include "AudioDecoderFfmpeg.h"
+#include <cmath> // for std::ceil
 
 //#define GNASH_DEBUG_AUDIO_DECODING
 
@@ -262,7 +263,7 @@ AudioDecoderFfmpeg::decodeFrame(boost::uint8_t* input, boost::uint32_t inputSize
 		bool stereo = _audioCodecCtx->channels > 1 ? true : false;
 		int samples = stereo ? outSize >> 2 : outSize >> 1;
 
-		int resampledFrameSize = int(ceil(outSize*resampleFactor));
+		int resampledFrameSize = int(std::ceil(outSize*resampleFactor));
 
 		// Allocate just the required amount of bytes
 		boost::uint8_t* resampledOutput = new boost::uint8_t[bufsize]; // be safe for now, but should be resampledFrameSize;

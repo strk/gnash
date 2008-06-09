@@ -21,7 +21,7 @@
 #endif
 
 #include "LoadVariablesThread.h"
-#include "tu_file.h"
+#include "IOChannel.h"
 #include "log.h"
 #include "GnashException.h"
 #include "utf8.h"

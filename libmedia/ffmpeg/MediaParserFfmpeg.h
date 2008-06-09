@@ -43,7 +43,9 @@ extern "C" {
 #endif
 
 // Forward declaration
-class tu_file;
+namespace gnash {
+	class IOChannel;
+}
 
 namespace gnash {
 namespace media {
@@ -58,7 +60,7 @@ public:
 	//
 	/// Can throw a GnashException if input format couldn't be detected
 	///
-	MediaParserFfmpeg(std::auto_ptr<tu_file> stream);
+	MediaParserFfmpeg(std::auto_ptr<IOChannel> stream);
 
 	~MediaParserFfmpeg();
 

@@ -49,8 +49,8 @@
 #include <string>
 #include <boost/format.hpp>
 
-namespace noseek_fd_adapter
-{
+namespace gnash {
+namespace noseek_fd_adapter {
 
 
 /***********************************************************************
@@ -464,7 +464,7 @@ close(void* appdata)
 }
 
 // this is the only exported interface
-tu_file*
+IOChannel*
 make_stream(int fd, const char* cachefilename)
 {
 #ifdef GNASH_NOSEEK_FD_VERBOSE
@@ -494,7 +494,8 @@ make_stream(int fd, const char* cachefilename)
 		close);
 }
 
-} // namespace noseek_fd_adapter
+} // namespace gnash::noseek_fd_adapter
+} // namespace gnash
 
 
 

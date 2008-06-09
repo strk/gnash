@@ -21,15 +21,15 @@
 #include <string>
 
 // Forward declarations
-class tu_file;
 namespace gnash {
 	class URL;
+	class IOChannel;
 }
 
 
 namespace gnash {
 
-/// Provide tu_file streams for network or filesystem resources
+/// Provide IOChannel streams for network or filesystem resources
 class StreamProvider
 {
 
@@ -46,7 +46,7 @@ public:
 	/// On error NULL is returned
 	/// Derive from this for a CachingStreamProvider
 	///
-	virtual tu_file* getStream(const URL& url);
+	virtual IOChannel* getStream(const URL& url);
 
 	/// Get a stream from the response of a POST operation
 	//
@@ -62,7 +62,7 @@ public:
 	///	Post data in url-encoded form.
 	///
 	///
-	virtual tu_file* getStream(const URL& url, const std::string& postdata);
+	virtual IOChannel* getStream(const URL& url, const std::string& postdata);
 	
 };
 

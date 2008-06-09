@@ -28,6 +28,7 @@
 #include "shape_character_def.h"
 #include "swf.h"
 #include "GnashException.h"
+#include "utility.h" // for UNUSED
 
 #include <utility> // for std::make_pair
 

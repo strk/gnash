@@ -39,7 +39,9 @@
 //
 //#define GNASH_TRUST_SWF_INPUT
 
-class tu_file;
+namespace gnash {
+	class IOChannel;
+}
 
 namespace gnash {
 
@@ -55,7 +57,7 @@ namespace gnash {
 class DSOEXPORT SWFStream
 {
 public:
-	SWFStream(tu_file* input);
+	SWFStream(IOChannel* input);
 	~SWFStream();
 
 	/// \brief
@@ -393,7 +395,7 @@ public:
 
 private:
 
-	tu_file*	m_input;
+	IOChannel*	m_input;
 	boost::uint8_t	m_current_byte;
 	boost::uint8_t	m_unused_bits;
 
