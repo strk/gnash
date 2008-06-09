@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Matrix.as,v 1.3 2008/06/07 12:44:26 bwy Exp $";
+rcsid="$Id: Matrix.as,v 1.4 2008/06/09 11:55:38 bwy Exp $";
 
 
 // There are lots of floating point calculations here. Comparing them
@@ -41,7 +41,6 @@ check_totals(1);
 Matrix = flash.geom.Matrix;
 check_equals(typeof(Matrix), 'function');
 check_equals(typeof(Matrix.prototype), 'object');
-// TODO: check prototypes properties
 check(Matrix.prototype.hasOwnProperty('identity'));
 check(Matrix.prototype.hasOwnProperty('rotate'));
 check(Matrix.prototype.hasOwnProperty('concat'));
@@ -54,6 +53,12 @@ check(Matrix.prototype.hasOwnProperty('clone'));
 check(Matrix.prototype.hasOwnProperty('createGradientBox'));
 check(Matrix.prototype.hasOwnProperty('invert'));
 check(Matrix.prototype.hasOwnProperty('toString'));
+check(!Matrix.prototype.hasOwnProperty('a'));
+check(!Matrix.prototype.hasOwnProperty('b'));
+check(!Matrix.prototype.hasOwnProperty('c'));
+check(!Matrix.prototype.hasOwnProperty('d'));
+check(!Matrix.prototype.hasOwnProperty('tx'));
+check(!Matrix.prototype.hasOwnProperty('ty'));
 
 //-------------------------------------------------------------
 // Test constructor
@@ -130,22 +135,18 @@ check_equals(m1.toString(), "(a=1, b=2, c=3, d=4, tx=5, ty=6)");
 
 m1.scale(32, -3.4);
 check_equals(m1.toString(), "(a=32, b=-6.8, c=96, d=-13.6, tx=160, ty=-20.4)");
-
+// Do not change m1; it's used later to test concat!
 
 m2 = new Matrix();
 m2.rotate(Math.PI);
 
 // PP: "(a=-1, b=1.22460635382238e-16, c=-1.22460635382238e-16, d=-1, tx=0, ty=0) ");
-// Can we risk it?
 check_equals (m2.a, -1);
 check (m2.b < 0.00000000001 && m2.b > -0.000000000001);
 check (m2.c < 0.00000000001 && m2.c > -0.000000000001);
 check (m2.d == -1);
-// Probably okay:
 check (m2.tx == 0);
 check (m2.ty == 0);
-
-m2.rotate();
 
 m2 = new Matrix();
 m2.rotate(1.3);
@@ -156,7 +157,7 @@ check (m2.c < -0.96355818 && m2.c > -0.96355819);
 check (m2.d < 0.26749883 && m2.d > 0.26749881);
 check (m2.tx == 0);
 check (m2.ty == 0);
-
+// Do not change m2 after this; it's used later to test concat!
 
 ///
 /// Test deltaTransform of Point
@@ -167,18 +168,34 @@ newP = m2.deltaTransformPoint(p);
 check_equals(typeof(newP), "object");
 check_equals(newP.toString(), "(x=31.2567984378314, y=26.6085052458191)");
 
-
+// Scale
 m3 = new Matrix(2, 0, 0, 2, 100, 100);
 m3.scale(3, 4);
 check_equals(m3.toString(), "(a=6, b=0, c=0, d=8, tx=300, ty=400)");
+// Do not change m3; it is used to test invert!
 
 // Test clone
 m4 = m3.clone();
 check_equals(m4.toString(), "(a=6, b=0, c=0, d=8, tx=300, ty=400)");
+// Do not change m4; it's used later to test concat!
+
 
 // Test invert
 m3.invert();
-xcheck_equals(m3.toString(), "(a=0.166666666666667, b=0, c=0, d=0.125, tx=-50, ty=-50)");
+check_equals(m3.toString(), "(a=0.166666666666667, b=0, c=0, d=0.125, tx=-50, ty=-50)");
+
+// Invalid inverse
+m6 = new Matrix(4, 5, 44, 55, 2, 4);
+check_equals(m6.toString(), "(a=4, b=5, c=44, d=55, tx=2, ty=4)");
+m6.invert();
+check_equals(m6.toString(), "(a=1, b=0, c=0, d=1, tx=0, ty=0)");
+
+// Valid inverse.
+m6 = new Matrix(4, 5, 0, 5, 2, 3);
+check_equals(m6.toString(), "(a=4, b=5, c=0, d=5, tx=2, ty=3)");
+m6.invert();
+check_equals(m6.toString(), "(a=0.25, b=-0.25, c=0, d=0.2, tx=-0.5, ty=-0.1)");
+
 
 // Rotation applies to translation
 m3 = new Matrix(1, 0, 0, 1, 2, 2);
@@ -199,7 +216,12 @@ check_equals(m3.d.toString(), "1");
 check_equals(m3.tx.toString(), "0");
 check_equals(m3.ty.toString(), "0");
 
-
+// m4 is still interesting
+m4.concat(m1);
+check_equals(m4.toString(), "(a=192, b=-40.8, c=768, d=-108.8, tx=48160, ty=-7500.4)");
+m4.concat(m2);
+// Works for me.
+check_equals(m4.toString(), "(a=90.6729490609422, b=174.089219392218, c=310.274230957074, d=710.908813846049, tx=20109.8154004632, ty=44398.6139954762)");
 
 //-------------------------------------------------------------
 // END OF TEST

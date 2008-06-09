@@ -33,9 +33,9 @@
 #include "Point_as.h" // Matrix needs to operate on Points.
 
 #include <cmath>
-#include <limits>
 #include <boost/numeric/ublas/matrix.hpp> // boost matrix
 #include <boost/numeric/ublas/io.hpp>
+#include <boost/numeric/ublas/lu.hpp> // permutation matrix etc.
 #include <sstream>
 #include <memory> // std::auto_ptr
 
@@ -52,6 +52,8 @@
 
 namespace gnash {
 
+class Matrix_as;
+
 // Forward declarations
 static as_value Matrix_clone(const fn_call& fn);
 static as_value Matrix_concat(const fn_call& fn);
@@ -65,13 +67,8 @@ static as_value Matrix_scale(const fn_call& fn);
 static as_value Matrix_toString(const fn_call& fn);
 static as_value Matrix_transformPoint(const fn_call& fn);
 static as_value Matrix_translate(const fn_call& fn);
-static as_value Matrix_a_getset(const fn_call& fn);
-static as_value Matrix_b_getset(const fn_call& fn);
-static as_value Matrix_c_getset(const fn_call& fn);
-static as_value Matrix_d_getset(const fn_call& fn);
-static as_value Matrix_tx_getset(const fn_call& fn);
-static as_value Matrix_ty_getset(const fn_call& fn);
-
+static void fillMatrix(boost::numeric::ublas::c_matrix<double, 3, 3>& matrix,
+                         as_object* const matrixObject);
 
 as_value Matrix_ctor(const fn_call& fn);
 
@@ -174,12 +171,67 @@ Matrix_clone(const fn_call& fn)
     return as_value(ret.get());
 }
 
+// A full, normal concatenation, so use full 3x3 matrices.
 static as_value
 Matrix_concat(const fn_call& fn)
 {
     boost::intrusive_ptr<Matrix_as> ptr = ensureType<Matrix_as>(fn.this_ptr);
-    UNUSED(ptr);
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
+
+    if (fn.nargs != 1)
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::ostringstream ss;
+            fn.dump_args(ss);
+            log_aserror("Matrix.concat(%s) needs exactly one argument; "
+                        "%d were passed", ss.str(), fn.nargs);
+        );
+        return as_value();
+    }
+
+    // Matrix passed as argument:    
+    const as_value& arg = fn.arg(0);
+    
+    if ( ! arg.is_object() )
+    {
+        /// Isn't an object...
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::ostringstream ss;
+            fn.dump_args(ss);
+            log_aserror("Matrix.concat(%s): needs a Matrix object", ss.str());
+        );
+        return as_value();
+    }
+    
+    as_object* obj = arg.to_object().get();
+    assert(obj);
+    if ( ! obj->instanceOf(getFlashGeomMatrixConstructor()) )
+    {
+        /// Isn't a point.
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::ostringstream ss;
+            fn.dump_args(ss);
+            log_aserror("Matrix.concat(%s): object must be a Matrix", ss.str());
+        );
+        return as_value();
+    }
+
+    boost::numeric::ublas::c_matrix<double, 3, 3> concatMatrix;
+    fillMatrix(concatMatrix, obj);
+
+    // Current ('this') Matrix
+    boost::numeric::ublas::c_matrix<double, 3, 3> currentMatrix;
+    fillMatrix(currentMatrix, ptr.get());
+    
+    currentMatrix = boost::numeric::ublas::prod(concatMatrix, currentMatrix);
+    
+    // Set values of current matrix
+    ptr->set_member(NSV::PROP_A, as_value(currentMatrix(0, 0)));
+    ptr->set_member(NSV::PROP_B, as_value(currentMatrix(1, 0)));
+    ptr->set_member(NSV::PROP_C, as_value(currentMatrix(0, 1)));
+    ptr->set_member(NSV::PROP_D, as_value(currentMatrix(1, 1)));
+    ptr->set_member(NSV::PROP_TX, as_value(currentMatrix(0, 2)));
+    ptr->set_member(NSV::PROP_TY, as_value(currentMatrix(1, 2)));
+
     return as_value();
 }
 
@@ -265,14 +317,14 @@ Matrix_deltaTransformPoint(const fn_call& fn)
     transformMatrix(1, 1) = d.to_number();
 
     // Construct the point
-    boost::numeric::ublas::vector<double> point(2);
+    boost::numeric::ublas::c_vector<double, 2> point;
     point(0) = x.to_number();
     point(1) = y.to_number();
 
     // Transform
     point = boost::numeric::ublas::prod(point, transformMatrix);
 
-    // Get an auto_ptr to a Point and keep alive.
+    // Get an auto_ptr to a Point and pretend to keep alive.
     boost::intrusive_ptr<as_object> ret = init_Point_instance().release();
     ret->set_member(NSV::PROP_X, point(0));
     ret->set_member(NSV::PROP_Y, point(1));
@@ -285,7 +337,7 @@ Matrix_deltaTransformPoint(const fn_call& fn)
 ///
 /// | 1   0   0 |
 /// | 0   1   0 |
-///
+///(| 0   0   1 |)
 /// Returns void.
 static as_value
 Matrix_identity(const fn_call& fn)
@@ -306,8 +358,48 @@ static as_value
 Matrix_invert(const fn_call& fn)
 {
     boost::intrusive_ptr<Matrix_as> ptr = ensureType<Matrix_as>(fn.this_ptr);
-    UNUSED(ptr);
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
+
+    using namespace boost::numeric;
+
+    const double u = 0.0;
+    const double v = 0.0;
+    const double w = 1.0;
+
+    // This starts off as the identity matrix. If it's impossible to invert the
+    // matrix, this is returned.
+    ublas::c_matrix<double, 3, 3> inverseMatrix;
+    inverseMatrix(0, 0) = 1.0;
+    inverseMatrix(0, 1) = 0.0;
+    inverseMatrix(0, 2) = 0.0;
+    inverseMatrix(1, 0) = 0.0;
+    inverseMatrix(1, 1) = 1.0;
+    inverseMatrix(1, 2) = 0.0;
+    inverseMatrix(2, 0) = u;
+    inverseMatrix(2, 1) = v;
+    inverseMatrix(2, 2) = w;
+
+    // Get current matrix
+    ublas::c_matrix<double, 3, 3> currentMatrix;
+    fillMatrix(currentMatrix, ptr.get());
+
+ 	ublas::permutation_matrix<double> pm(currentMatrix.size1());
+
+ 	int valid = ublas::lu_factorize(currentMatrix, pm);
+ 	
+ 	if( valid == 0 )
+ 	{
+ 	    // We can invert.
+ 	    boost::numeric::ublas::lu_substitute(currentMatrix, pm, inverseMatrix);
+ 	}
+
+    // Returns the identity matrix if unsuccessful.
+    ptr->set_member(NSV::PROP_A, as_value(inverseMatrix(0, 0)));
+    ptr->set_member(NSV::PROP_B, as_value(inverseMatrix(1, 0)));
+    ptr->set_member(NSV::PROP_C, as_value(inverseMatrix(0, 1)));
+    ptr->set_member(NSV::PROP_D, as_value(inverseMatrix(1, 1)));
+    ptr->set_member(NSV::PROP_TX, as_value(inverseMatrix(0, 2)));
+    ptr->set_member(NSV::PROP_TY, as_value(inverseMatrix(1, 2)));
+
     return as_value();
 }
 
@@ -357,7 +449,7 @@ Matrix_rotate(const fn_call& fn)
         ptr->set_member(NSV::PROP_D, as_value(currentMatrix(1, 1)));
 
         // Do rotation separately.
-        boost::numeric::ublas::vector<double> translation(2);
+        boost::numeric::ublas::c_vector<double, 2> translation;
         translation(0) = tx.to_number();
         translation(1) = ty.to_number();
         
@@ -478,127 +570,36 @@ Matrix_translate(const fn_call& fn)
     return as_value();
 }
 
-static as_value
-Matrix_a_getset(const fn_call& fn)
+
+// A helper function to create a boost matrix from a Matrix object
+static void fillMatrix(boost::numeric::ublas::c_matrix<double, 3, 3>& matrix,
+                         as_object* const matrixObject)
 {
-    boost::intrusive_ptr<Matrix_as> ptr = ensureType<Matrix_as>(fn.this_ptr);
 
-    if ( ! fn.nargs ) // getter
-    {
-        as_value a;
-        ptr->get_member(NSV::PROP_A, &a);
-        return a;
-    }
-    else // setter
-    {
-        as_value a = fn.arg(0);
-        ptr->set_member(NSV::PROP_A, a);
-    }
+    const double u = 0.0;
+    const double v = 0.0;
+    const double w = 1.0;
 
-    return as_value();
+    as_value a, b, c, d, tx, ty;
+
+    matrixObject->get_member(NSV::PROP_A, &a);
+    matrixObject->get_member(NSV::PROP_B, &b);
+    matrixObject->get_member(NSV::PROP_C, &c);
+    matrixObject->get_member(NSV::PROP_D, &d);
+    matrixObject->get_member(NSV::PROP_TX, &tx);
+    matrixObject->get_member(NSV::PROP_TY, &ty);
+
+    matrix(0, 0) = a.to_number();
+    matrix(0, 1) = c.to_number();
+    matrix(0, 2) = tx.to_number();
+    matrix(1, 0) = b.to_number();
+    matrix(1, 1) = d.to_number();
+    matrix(1, 2) = ty.to_number();
+    matrix(2, 0) = u;
+    matrix(2, 1) = v;
+    matrix(2, 2) = w;
+
 }
-
-static as_value
-Matrix_b_getset(const fn_call& fn)
-{
-    boost::intrusive_ptr<Matrix_as> ptr = ensureType<Matrix_as>(fn.this_ptr);
-
-    if ( ! fn.nargs ) // getter
-    {
-        as_value b;
-        ptr->get_member(NSV::PROP_B, &b);
-        return b;
-    }
-    else // setter
-    {
-        as_value b = fn.arg(0);
-        ptr->set_member(NSV::PROP_B, b);
-    }
-
-    return as_value();
-}
-
-static as_value
-Matrix_c_getset(const fn_call& fn)
-{
-    boost::intrusive_ptr<Matrix_as> ptr = ensureType<Matrix_as>(fn.this_ptr);
-
-    if ( ! fn.nargs ) // getter
-    {
-        as_value c;
-        ptr->get_member(NSV::PROP_C, &c);
-        return c;
-    }
-    else // setter
-    {
-        as_value c = fn.arg(0);
-        ptr->set_member(NSV::PROP_C, c);
-    }
-
-    return as_value();
-}
-
-static as_value
-Matrix_d_getset(const fn_call& fn)
-{
-    boost::intrusive_ptr<Matrix_as> ptr = ensureType<Matrix_as>(fn.this_ptr);
-
-    if ( ! fn.nargs ) // getter
-    {
-        as_value d;
-        ptr->get_member(NSV::PROP_D, &d);
-        return d;
-    }
-    else // setter
-    {
-        as_value d = fn.arg(0);
-        ptr->set_member(NSV::PROP_D, d);
-    }
-
-    return as_value();
-}
-
-static as_value
-Matrix_tx_getset(const fn_call& fn)
-{
-    boost::intrusive_ptr<Matrix_as> ptr = ensureType<Matrix_as>(fn.this_ptr);
-
-    if ( ! fn.nargs ) // getter
-    {
-        as_value tx;
-        ptr->get_member(NSV::PROP_TX, &tx);
-        return tx;
-    }
-    else // setter
-    {
-        as_value tx = fn.arg(0);
-        ptr->set_member(NSV::PROP_TX, tx);
-    }
-
-    return as_value();
-}
-
-static as_value
-Matrix_ty_getset(const fn_call& fn)
-{
-    boost::intrusive_ptr<Matrix_as> ptr = ensureType<Matrix_as>(fn.this_ptr);
-
-    if ( ! fn.nargs ) // getter
-    {
-        as_value ty;
-        ptr->get_member(NSV::PROP_TY, &ty);
-        return ty;
-    }
-    else // setter
-    {
-        as_value ty = fn.arg(0);
-        ptr->set_member(NSV::PROP_TY, ty);
-    }
-
-    return as_value();
-}
-
-
 
 as_value
 Matrix_ctor(const fn_call& fn)

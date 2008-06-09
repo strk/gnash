@@ -1,3 +1,10 @@
+2008-06-09 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/asobj/flash/geom/Matrix_as.{cpp,h}: implement concat and
+	  invert. Clean up and provide a helper function for filling
+	  boost matrices with AS matrix properties.
+	* testsuite/actionscript.all: test Matrix more.
+
 2008-06-09 Sandro Santilli <strk@keybit.net>
 
 	* libbase/: Makefile.am, IOChannel.{cpp,h}: initial draft for a virtual
