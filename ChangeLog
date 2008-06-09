@@ -1,5 +1,12 @@
 2008-06-09 Sandro Santilli <strk@keybit.net>
 
+	* libbase/IOChannel.{cpp,h}: docs cleanup, have write_bytes
+	  throw IOException by default (unsupported op).
+	* libbase/curl_adapter.cpp: implement the Curl adapter by
+	  subclassing IOChannel (get rid of tu_file use in it).
+
+2008-06-09 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/server/StreamTest.cpp: fix build.
 
 2008-06-09 Sandro Santilli <strk@keybit.net>

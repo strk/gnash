@@ -141,5 +141,10 @@ IOChannel::write_byte(boost::uint8_t u)
 	write_bytes(&u, 1); // will trhow on error it seems
 }
 
+int
+IOChannel::write_bytes(const void* src, int num)
+{
+	throw IOException("This IOChannel implementation doesn't support output");
+}
 
 } // namespace gnash

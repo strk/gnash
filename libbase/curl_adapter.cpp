@@ -23,6 +23,7 @@
 #endif
 
 #include "tu_file.h"
+#include "IOChannel.h"
 #include "curl_adapter.h"
 #include "log.h"
 #include "WallClockTimer.h"
@@ -344,7 +345,7 @@ CurlSession::unlockSharedHandle(CURL* handle, curl_lock_data data)
  *
  **********************************************************************/
 
-class CurlStreamFile
+class CurlStreamFile : public IOChannel
 {
 
 public:
@@ -370,24 +371,28 @@ public:
 	//
 	/// Return number of actually read bytes
 	///
-	size_t read(void *dst, size_t bytes);
+	virtual int read_bytes(void *dst, int bytes);
 
 	/// Return true if EOF has been reached
-	bool eof();
+	virtual bool get_eof() const;
+
+	bool eof() const { return get_eof(); }
 
 	/// Return the error condition of current stream
-	int err() const {
+	virtual int get_error() const {
 		return _error;
 	}
 
 	/// Report global position within the file
-	size_t tell();
+	virtual int get_position() const;
+
+	int tell() const { return get_position(); }
 
 	/// Put read pointer at given position
-	bool seek(size_t pos);
+	virtual int set_position(int pos);
 
 	/// Put read pointer at eof
-	bool seek_to_end();
+	virtual void go_to_end();
 
 	/// Returns the size of the stream
 	//
@@ -398,7 +403,7 @@ public:
 	/// Another approach might be filling the cache ourselves
 	/// aiming at obtaining a useful value.
 	///
-	long get_stream_size();
+	virtual int get_size() const;
 
 private:
 
@@ -441,7 +446,7 @@ private:
 	//
 	/// This will be 0 until known
 	///
-	long unsigned _size;
+	mutable int _size;
 
 	// Attempt at filling the cache up to the given size.
 	// Will call libcurl routines to fetch data.
@@ -849,10 +854,10 @@ CurlStreamFile::~CurlStreamFile()
 }
 
 /*public*/
-size_t
-CurlStreamFile::read(void *dst, size_t bytes)
+int
+CurlStreamFile::read_bytes(void *dst, int bytes)
 {
-	if ( eof() || _error ) return 0;
+	if ( get_eof() || _error ) return 0;
 
 #ifdef GNASH_CURL_VERBOSE
 	gnash::log_debug ("read(%d) called", bytes);
@@ -871,7 +876,7 @@ CurlStreamFile::read(void *dst, size_t bytes)
 
 /*public*/
 bool
-CurlStreamFile::eof()
+CurlStreamFile::get_eof() const
 {
 	bool ret = ( ! _running && feof(_cache) );
 
@@ -883,10 +888,10 @@ CurlStreamFile::eof()
 }
 
 /*public*/
-size_t
-CurlStreamFile::tell()
+int
+CurlStreamFile::get_position() const
 {
-	long ret =  std::ftell(_cache);
+	int ret =  std::ftell(_cache);
 
 #ifdef GNASH_CURL_VERBOSE
 	gnash::log_debug("tell() returning %ld", ret);
@@ -897,8 +902,8 @@ CurlStreamFile::tell()
 }
 
 /*public*/
-bool
-CurlStreamFile::seek(size_t pos)
+int
+CurlStreamFile::set_position(int pos)
 {
 #ifdef GNASH_CURL_WARN_SEEKSBACK
 	if ( pos < tell() ) {
@@ -908,26 +913,26 @@ CurlStreamFile::seek(size_t pos)
 #endif
 
 	fillCache(pos);
-	if ( _error ) return false; // error can be set by fillCache
+	if ( _error ) return -1; // error can be set by fillCache
 
-	if ( _cached < pos )
+	if ( _cached < (unsigned int)pos )
 	{
 		gnash::log_error ("Warning: could not cache anough bytes on seek: %d requested, %d cached", pos, _cached);
-		return false; // couldn't cache so many bytes
+		return -1; // couldn't cache so many bytes
 	}
 
 	if (std::fseek(_cache, pos, SEEK_SET) == -1) {
 		gnash::log_error("Warning: fseek failed");
-		return false;
+		return -1;
 	} else {
-		return true;
+		return 0;
 	}
 
 }
 
 /*public*/
-bool
-CurlStreamFile::seek_to_end()
+void
+CurlStreamFile::go_to_end()
 {
 	CURLMcode mcode;
 	while (_running > 0)
@@ -939,32 +944,31 @@ CurlStreamFile::seek_to_end()
 
 		if ( mcode != CURLM_OK )
 		{
-			throw gnash::GnashException(curl_multi_strerror(mcode));
+			throw gnash::IOException(curl_multi_strerror(mcode));
 		}
 
                 long code;
                 curl_easy_getinfo(_handle, CURLINFO_RESPONSE_CODE, &code);
                 if ( code == 404 ) // file not found!
                 {
-                        gnash::log_error(_("404 response from url %s"), _url);
-                        _error = TU_FILE_OPEN_ERROR;
-                        return false;
+			throw gnash::IOException("File not found");
+                        //gnash::log_error(_("404 response from url %s"), _url);
+                        //_error = TU_FILE_OPEN_ERROR;
+                        //return;
                 }
 
 	}
 
 	if (std::fseek(_cache, 0, SEEK_END) == -1) {
-		gnash::log_error("Warning: fseek to end failed");
-		return false;
-	} else {
-		return true;
-	}
-
+		throw gnash::IOException("curl_adapter: fseek to end failed");
+		//gnash::log_error("Warning: fseek to end failed");
+		//return -1;
+	} 
 }
 
 /*public*/
-long
-CurlStreamFile::get_stream_size()
+int
+CurlStreamFile::get_size() const
 {
 	if ( ! _size )
 	{
@@ -1084,84 +1088,6 @@ CurlSession::exportCookies()
 
 }
 
-/***********************************************************************
- *
- * Adapter calls
- *
- **********************************************************************/
-
-
-// Return number of bytes actually read.
-static int
-read(void* dst, int bytes, void* appdata)
-{
-	CurlStreamFile* stream = (CurlStreamFile*) appdata;
-	return stream->read(dst, bytes);
-}
-
-static int
-err(void* appdata)
-{
-	CurlStreamFile* stream = (CurlStreamFile*) appdata;
-	return stream->err();
-}
-
-static bool
-eof(void* appdata)
-{
-	CurlStreamFile* stream = (CurlStreamFile*) appdata;
-	return stream->eof();
-}
-
-static int
-write(const void* /*src*/, int /*bytes*/, void* /*appdata*/)
-{
-	abort(); // not supported
-	return 0;
-}
-
-static int
-seek(int pos, void* appdata)
-{
-	CurlStreamFile* stream = (CurlStreamFile*) appdata;
-	if ( stream->seek(pos) ) return 0;
-	else return TU_FILE_SEEK_ERROR;
-}
-
-static int
-seek_to_end(void* appdata)
-{
-	CurlStreamFile* stream = (CurlStreamFile*) appdata;
-	if ( stream->seek_to_end() ) return 0;
-	else return TU_FILE_SEEK_ERROR;
-}
-
-static int
-tell(void* appdata)
-{
-	CurlStreamFile* stream = (CurlStreamFile*) appdata;
-	return stream->tell();
-}
-
-static long
-get_stream_size(void* appdata)
-{
-	CurlStreamFile* stream = (CurlStreamFile*) appdata;
-	return stream->get_stream_size();
-
-}
-
-static int
-close(void* appdata)
-{
-	CurlStreamFile* stream = (CurlStreamFile*) appdata;
-
-	delete stream;
-
-	//return TU_FILE_CLOSE_ERROR;
-	return 0;
-}
-
 //-------------------------------------------
 // Exported interfaces
 //-------------------------------------------
@@ -1184,17 +1110,7 @@ make_stream(const char* url)
 		return NULL;
 	}
 
-	return new tu_file(
-		(void*)stream, // opaque user pointer
-		read, // read
-		write, // write
-		seek, // seek
-		seek_to_end, // seek_to_end
-		tell, // tell
-		eof, // get eof
-		err, // get error
-		get_stream_size, // size of stream
-		close);
+	return stream;
 }
 
 IOChannel*
@@ -1215,17 +1131,7 @@ make_stream(const char* url, const std::string& postdata)
 		return NULL;
 	}
 
-	return new tu_file(
-		(void*)stream, // opaque user pointer
-		read, // read
-		write, // write
-		seek, // seek
-		seek_to_end, // seek_to_end
-		tell, // tell
-		eof, // get eof
-		err, // get error
-		get_stream_size, // size of stream
-		close);
+	return stream;
 }
 
 } // namespace curl_adapter
