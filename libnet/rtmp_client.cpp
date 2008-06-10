@@ -143,6 +143,10 @@ RTMPClient::encodeConnect(const char *app, const char *swfUrl, const char *tcUrl
     pageUrlnode->makeString("pageUrl", pageUrl);
     obj.addProperty(pageUrlnode);
 
+    Element *objencodingnode = new Element;
+    objencodingnode->makeNumber("objectEncoding", 0.0);
+    obj.addProperty(objencodingnode);
+    
 //    size_t total_size = 227;
 //     Buffer *out = encodeHeader(0x3, RTMP::HEADER_12, total_size,
 //                                      RTMP::INVOKE, RTMP::FROM_CLIENT);
@@ -158,8 +162,6 @@ RTMPClient::encodeConnect(const char *app, const char *swfUrl, const char *tcUrl
     buf->append(numobj);
     buf->append(encobj);
 
-    // Now that we have an encoded buffer, nuke the Element
-    
     return buf;
 }
 

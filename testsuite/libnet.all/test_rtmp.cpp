@@ -174,8 +174,8 @@ main(int argc, char *argv[])
     
     test_header();
     test_system();
-    test_results();
     test_client();
+    test_results();
 //    test_types();
 }
 
@@ -466,8 +466,20 @@ test_client()
     GNASH_REPORT_FUNCTION;
     RTMPClient rtmp;
 
-    Buffer *buf1 = hex2mem("02 00 04 70 6c 61 79 00 00 00 00 00 00 00 00 00 05 01 00");
-    Buffer *buf2 = rtmp.encodeStreamOp(0, RTMP::STREAM_PLAY, false);
+    Buffer *buf1 = hex2mem("02 00 07 63 6f 6e 6e 65 63 74 00 3f f0 00 00 00 00 00 00 03 00 03 61 70 70 02 00 0f 6d 70 33 5f 61 70 70 2f 69 64 33 74 65 73 74 00 08 66 6c 61 73 68 56 65 72 02 00 0c 4c 4e 58 20 39 2c 30 2c 33 31 2c 30 00 06 73 77 66 55 72 6c 02 00 29 68 74 74 70 3a 2f 2f 72 65 6e 61 75 6e 2e 63 6f 6d 2f 66 6c 65 78 32 2f 70 6f 73 74 73 2f 4d 50 33 54 65 73 74 2e 73 77 66 00 05 74 63 55 72 6c 02 00 21 72 74 6d 70 3a 2f 2f 72 65 6e 61 75 6e 2e 63 6f 6d 2f 6d 70 33 5f 61 70 70 2f 69 64 33 74 65 73 74 00 04 66 70 61 64 01 00 00 0b 61 75 64 69 6f 43 6f 64 65 63 73 00 40 83 38 00 00 00 00 00 00 0b 76 69 64 65 6f 43 6f 64 65 63 73 00 40 5f 00 00 00 00 00 00 00 0d 76 69 64 65 6f 46 75 6e 63 74 69 6f 6e 00 3f f0 00 00 00 00 00 00 00 07 70 61 67 65 55 72 6c 02 00 2a 68 74 74 70 3a 2f 2f 72 65 6e 61 75 6e 2e 63 6f 6d 2f 66 6c 65 78 32 2f 70 6f 73 74 73 2f 4d 50 33 54 65 73 74 2e 68 74 6d 6c 00 0e 6f 62 6a 65 63 74 45 6e 63 6f 64 69 6e 67 00 00 00 00 00 00 00 00 00 00 00 09");
+    Buffer *buf2 = rtmp.encodeConnect("mp3_app/id3test", "http://renaun.com/flex2/posts/MP3Test.swf", "rtmp://renaun.com/mp3_app/id3test", 615, 124, 1, "http://renaun.com/flex2/posts/MP3Test.html");
+//     cerr << hexify(buf1->begin(), buf1->size(), false) << endl;
+//     cerr << hexify(buf2->begin(), buf1->size(), false) << endl;
+    if ((memcmp(buf1->reference(), buf2->reference(), buf1->size()) == 0)) {
+        runtest.pass("Encoded RTMPClient::encodeConnect()");
+    } else {
+        runtest.fail("Encoded RTMPClient::encodeConnect()");
+    }
+    delete buf1;
+    delete buf2;
+    
+    buf1 = hex2mem("02 00 04 70 6c 61 79 00 00 00 00 00 00 00 00 00 05 01 00");
+    buf2 = rtmp.encodeStreamOp(0, RTMP::STREAM_PLAY, false);
     if ((memcmp(buf1->reference(), buf2->reference(), buf1->size()) == 0)) {
         runtest.pass("Encoded RTMPClient::encodeStreamOp(RTMP::STREAM_PLAY)");
     } else {

@@ -398,10 +398,14 @@ Element::encode()
 {
     GNASH_REPORT_FUNCTION;
     Buffer *buf = 0;
+    size_t size = 0;
     if (_type == Element::OBJECT_AMF0) {
 	// FIXME: we probably want a better size, to avoid the other
 	// appends from having to resize and copy the data all the time.
-	buf = new Buffer(300);	// FIXME: calculate a sensible size
+	for (size_t i=0; i<_properties.size(); i++) {
+	    size += _properties[i]->getLength() + _properties[i]->getNameSize() + AMF_VAR_HEADER_SIZE;
+	}
+	buf = new Buffer(size);
 	buf->clear();		// FIXME: temporary, makes buffers cleaner in gdb.
 	buf->append(Element::OBJECT_AMF0);
 	if (_name > 0) {
@@ -426,7 +430,7 @@ Element::encode()
 		break;
 	    }
 	}
-//	log_debug("FIXME: Terminating object");
+	log_debug("FIXME: Terminating object");
 	Network::byte_t pad = 0;
 	buf->append(pad);
 	buf->append(pad);

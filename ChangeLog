@@ -1,3 +1,12 @@
+2008-06-09  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* libamf/element.cpp: Actually calculate the size of the output
+	buffer when encoding AMF0 Objects.
+	* libnet/rtmp_client.cpp: Add the "ObjectEncoding" property when
+	creating a NetConnection object.
+	* testsuite/libnet.all/test_rtmp.cpp: Add a test for creating a
+	NetConnection object.
+
 2008-06-09 Patrice Dumas  <pertusus at free.fr>
 
 	(patch #6525)

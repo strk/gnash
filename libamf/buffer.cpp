@@ -142,7 +142,7 @@ Buffer::copy(Network::byte_t *data, size_t nbytes)
 void
 Buffer::copy(const string &str)
 {    
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     std::copy(str.begin(), str.end(), _ptr);
     _seekptr = _ptr + str.size();
 }
