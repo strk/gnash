@@ -121,7 +121,8 @@ bool LoadThread::setStream(std::auto_ptr<gnash::IOChannel> stream)
 	}
 }
 
-bool LoadThread::seek(size_t pos)
+int
+LoadThread::seek(size_t pos)
 {
 	// Try to seek to the wanted position, and return
 	// true is the new position is equal the wanted,
@@ -129,10 +130,10 @@ bool LoadThread::seek(size_t pos)
 
 	if (_loadPosition >= static_cast<long>(pos)) {
 		_userPosition = pos;
-		return true;
+		return 0;
 	} else {
 		_userPosition = _loadPosition;
-		return false;
+		return -1;
 	}
 }
 

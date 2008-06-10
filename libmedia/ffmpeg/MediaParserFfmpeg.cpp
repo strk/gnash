@@ -400,10 +400,7 @@ MediaParserFfmpeg::readPacket(boost::uint8_t* buf, int buf_size)
 	//GNASH_REPORT_FUNCTION;
 	log_debug("readPacket(%d)", buf_size);
 
-	assert( _stream.get() );
-	IOChannel& in = *_stream;
-
-	size_t ret = in.read(static_cast<void*>(buf), buf_size);
+	size_t ret = _stream->read(static_cast<void*>(buf), buf_size);
 
 	return ret;
 
@@ -415,28 +412,27 @@ MediaParserFfmpeg::seekMedia(offset_t offset, int whence)
 	GNASH_REPORT_FUNCTION;
 
 	assert(_stream.get());
-	IOChannel& in = *(_stream);
 
 	// Offset is absolute new position in the file
 	if (whence == SEEK_SET)
 	{	
-		in.seek(offset);
+		_stream->seek(offset);
 		// New position is offset + old position
 	}
 	else if (whence == SEEK_CUR)
 	{
-		in.seek(in.tell() + offset);
+		_stream->seek(_stream->tell() + offset);
 		// New position is offset + end of file
 	}
 	else if (whence == SEEK_END)
 	{
 		// This is (most likely) a streamed file, so we can't seek to the end!
 		// Instead we seek to byteIOBufferSize bytes... seems to work fine...
-		in.seek(byteIOBufferSize);
+		_stream->seek(byteIOBufferSize);
 
 	}
 
-	return in.tell(); 
+	return _stream->tell(); 
 }
 
 boost::uint16_t

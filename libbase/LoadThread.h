@@ -70,9 +70,13 @@ public:
 	bool setStream(std::auto_ptr<gnash::IOChannel> str);
 
 	/// Put read pointer at given position
+	//
 	/// Will block if there is not enough data buffered,
 	/// and wait until enough data is present.
-	bool seek(size_t pos);
+	///
+	/// @return 0 on success, -1 on error (EOF).
+	///
+	int seek(size_t pos);
 
 	/// Read 'bytes' bytes into the given buffer.
 	/// Return number of actually read bytes.

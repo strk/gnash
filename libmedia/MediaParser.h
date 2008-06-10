@@ -226,13 +226,7 @@ class MediaParser
 {
 public:
 
-	MediaParser(std::auto_ptr<IOChannel> stream)
-		:
-		_isAudioMp3(false),
-		_isAudioNellymoser(false),
-		_stream(stream),
-		_parsingComplete(false)
-	{}
+	MediaParser(std::auto_ptr<IOChannel> stream);
 
 	// Classes with virtual methods (virtual classes)
 	// must have a virtual destructor, or the destructors

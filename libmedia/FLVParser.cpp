@@ -59,12 +59,19 @@ FLVParser::~FLVParser()
 
 
 boost::uint32_t
-FLVParser::seek(boost::uint32_t /*time*/)
+FLVParser::seek(boost::uint32_t time)
 {
-	LOG_ONCE( log_unimpl("%s", __PRETTY_FUNCTION__) );
+	if ( time ) // seek to 0 should be fine..
+	{
+		LOG_ONCE( log_unimpl("%s", __PRETTY_FUNCTION__) );
+	}
 
 	// In particular, what to do if there's no frames in queue ?
 	// just seek to the the later available first timestamp
+	_audioFrames.clear();
+	_videoFrames.clear();
+	_stream->seek(0);
+	_parsingComplete=false;
 	return 0;
 }
 
@@ -303,15 +310,14 @@ boost::uint64_t
 FLVParser::getBytesLoaded() const
 {
 	return _lastParsedPosition;
+	//return _stream->getBytesLoaded();
 }
 
 /*private*/
 std::auto_ptr<EncodedAudioFrame>
 FLVParser::readAudioFrame(boost::uint32_t dataSize, boost::uint32_t timestamp)
 {
-	IOChannel& in = *_stream;
-
-	//log_debug("Reading the %dth audio frame, with data size %d, from position %d", _audioFrames.size()+1, dataSize, in.tell());
+	//log_debug("Reading the %dth audio frame, with data size %d, from position %d", _audioFrames.size()+1, dataSize, _stream->tell());
 
 	std::auto_ptr<EncodedAudioFrame> frame ( new EncodedAudioFrame );
 	frame->dataSize = dataSize;
@@ -320,7 +326,7 @@ FLVParser::readAudioFrame(boost::uint32_t dataSize, boost::uint32_t timestamp)
 	unsigned long int chunkSize = smallestMultipleContaining(READ_CHUNKS, dataSize+PADDING_BYTES);
 
 	frame->data.reset( new boost::uint8_t[chunkSize] );
-	size_t bytesread = in.read(frame->data.get(), dataSize);
+	size_t bytesread = _stream->read(frame->data.get(), dataSize);
 	if ( bytesread < dataSize )
 	{
 		log_error("FLVParser::readAudioFrame: could only read %d/%d bytes", bytesread, dataSize);
@@ -337,14 +343,12 @@ FLVParser::readAudioFrame(boost::uint32_t dataSize, boost::uint32_t timestamp)
 std::auto_ptr<EncodedVideoFrame>
 FLVParser::readVideoFrame(boost::uint32_t dataSize, boost::uint32_t timestamp)
 {
-	IOChannel& in = *_stream;
-
 	std::auto_ptr<EncodedVideoFrame> frame;
 
 	unsigned long int chunkSize = smallestMultipleContaining(READ_CHUNKS, dataSize+PADDING_BYTES);
 
 	boost::uint8_t* data = new boost::uint8_t[chunkSize];
-	size_t bytesread = in.read(data, dataSize);
+	size_t bytesread = _stream->read(data, dataSize);
 
 	unsigned long int padding = chunkSize-dataSize;
 	assert(padding);

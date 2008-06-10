@@ -24,6 +24,17 @@
 namespace gnash {
 namespace media {
 
+MediaParser::MediaParser(std::auto_ptr<IOChannel> stream)
+	:
+	_isAudioMp3(false),
+	_isAudioNellymoser(false),
+	_stream(stream),
+	//_stream(new LoadThread),
+	_parsingComplete(false)
+{
+	//_stream->setStream(stream);
+}
+
 boost::uint64_t
 MediaParser::getBufferLength() const
 {
