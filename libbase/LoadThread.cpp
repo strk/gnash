@@ -119,11 +119,28 @@ LoadThread::seek(size_t pos)
 	// true is the new position is equal the wanted,
 	// or else return false
 
-	if (_loadPosition >= static_cast<long>(pos)) {
+	while ( (!_completed) && (!cancelRequested()) && _loadPosition < static_cast<long>(pos) )
+	{
+		usleep(100000); // 1/10 second WATCH FOR TIMEOUTS !
+	}
+
+	if (_loadPosition >= static_cast<long>(pos))
+	{
 		_userPosition = pos;
 		return 0;
-	} else {
-		_userPosition = _loadPosition;
+	}
+	else
+	{
+		// Completed (eof) or canceled 
+		if ( _completed )
+		{
+			log_error("LoadThread::seek(%d) : can't seek there, only %d bytes available", pos, _loadPosition);
+		}
+		else
+		{
+			assert( _cancelRequested );
+			log_error("LoadThread::seek(%d) : load cancellation requested while seeking", pos);
+		}
 		return -1;
 	}
 }
