@@ -14,12 +14,12 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef __SOUND_HANDLER_GST_H
-#define __SOUND_HANDLER_GST_H
+#ifndef SOUND_HANDLER_GST_H
+#define SOUND_HANDLER_GST_H
 
 #include "SoundGst.h"
 #include <boost/thread/mutex.hpp>
-
+#include <algorithm>
 
 // Forward declarations
 namespace gnash {
