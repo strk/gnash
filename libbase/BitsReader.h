@@ -47,9 +47,26 @@ public:
 	BitsReader(byte* input, size_t len)
 		:
 		start(input),
-		ptr(input),
-		end(ptr+len),
+		ptr(start),
+		end(start+len),
 		usedBits(0)
+	{
+	}
+
+	/// Create a BitsReader reading a subset of another
+	//
+	/// The starting pointer will be taken from the parent
+	/// reader cursor, including used bits, use align() if
+	/// need to discard the left over ones.
+	///
+	/// length will be given explicitly.
+	///
+	BitsReader(const BitsReader& from, size_t len)
+		:
+		start(from.ptr),
+		ptr(start),
+		end(start+len),
+		usedBits(from.usedBits) 
 	{
 	}
 
