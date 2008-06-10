@@ -1,6 +1,10 @@
 2008-06-10 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/asobj/gen-asclass.pl: stop generating bad header guard names.
+	* server/asobj/flash/geom/Matrix_as.cpp: using boost ublas for
+	  inverting was massively over-complicated; do a simpler implementation
+	  (as in server/matrix.h, but without the oddities needed for the SWF
+	  matrix). Add notes and a typedef.
 
 2008-06-10 Sandro Santilli <strk@keybit.net>
 

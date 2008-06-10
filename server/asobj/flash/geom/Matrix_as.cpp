@@ -31,14 +31,10 @@
 #include <cmath>
 #include <boost/numeric/ublas/matrix.hpp> // boost matrix
 #include <boost/numeric/ublas/io.hpp>
-#include <boost/numeric/ublas/lu.hpp> // permutation matrix etc.
 #include <sstream>
 #include <memory> // std::auto_ptr
 
 /// According to senocular, Flash docs get this wrong (b and c swapped).
-/// However, most of the transformations only apply to a
-/// subset of the elements, so it's unnecessary to use a full 3x3 matrix for
-/// every operation.
 ///
 // A transformation matrix for affine transformations:
 //    a  c  tx
@@ -46,13 +42,19 @@
 //    u  v  w
 // The matrix can only operate in 2d space. The bottom row is immutable
 // as 0  0  1.
+/// Most transformations only apply to a subset of the elements
+/// (partly because the bottom line is immutable), so it's unnecessary to
+/// use a full 3x3 matrix for every operation: particularly for invert(),
+/// where boost::ublas is overcomplicated and can easily fail its own
+/// consistency checks. For simpler multiplication, boost::ublas is very
+/// helpful for keep the code clear and tidy.
 
 // Define this to get verbose debugging messages for matrix calculations
 //#define GNASH_DEBUG_GEOM_MATRIX 1
 
 namespace gnash {
 
-class Matrix_as;
+typedef boost::numeric::ublas::c_matrix<double, 3, 3> MatrixType;
 
 // Forward declarations
 static as_value Matrix_clone(const fn_call& fn);
@@ -67,7 +69,7 @@ static as_value Matrix_scale(const fn_call& fn);
 static as_value Matrix_toString(const fn_call& fn);
 static as_value Matrix_transformPoint(const fn_call& fn);
 static as_value Matrix_translate(const fn_call& fn);
-static void fillMatrix(boost::numeric::ublas::c_matrix<double, 3, 3>& matrix,
+static void fillMatrix(MatrixType& matrix,
                          as_object* const matrixObject);
 
 as_value Matrix_ctor(const fn_call& fn);
@@ -215,12 +217,11 @@ Matrix_concat(const fn_call& fn)
         return as_value();
     }
 
-    boost::numeric::ublas::c_matrix<double, 3, 3> concatMatrix;
+    MatrixType concatMatrix;
     fillMatrix(concatMatrix, obj);
 
-
     // Current ('this') Matrix
-    boost::numeric::ublas::c_matrix<double, 3, 3> currentMatrix;
+    MatrixType currentMatrix;
     fillMatrix(currentMatrix, ptr.get());
 
 #ifdef GNASH_DEBUG_GEOM_MATRIX
@@ -373,79 +374,59 @@ Matrix_identity(const fn_call& fn)
     return as_value();
 }
 
+
+static inline double
+getMinorDeterminant(const MatrixType& m)
+{
+    return m(0, 0) * m(1, 1) - m(0, 1) * m(1, 0);
+}
+
 static as_value
 Matrix_invert(const fn_call& fn)
 {
+
     boost::intrusive_ptr<Matrix_as> ptr = ensureType<Matrix_as>(fn.this_ptr);
 
-    using namespace boost::numeric;
-
-    const double u = 0.0;
-    const double v = 0.0;
-    const double w = 1.0;
-
-    // This starts off as the identity matrix. If it's impossible to invert the
-    // matrix, this is returned.
-    ublas::c_matrix<double, 3, 3> inverseMatrix;
-    inverseMatrix(0, 0) = 1.0;
-    inverseMatrix(0, 1) = 0.0;
-    inverseMatrix(0, 2) = 0.0;
-    inverseMatrix(1, 0) = 0.0;
-    inverseMatrix(1, 1) = 1.0;
-    inverseMatrix(1, 2) = 0.0;
-    inverseMatrix(2, 0) = u;
-    inverseMatrix(2, 1) = v;
-    inverseMatrix(2, 2) = w;
-
-    // Get current matrix
-    ublas::c_matrix<double, 3, 3> currentMatrix;
+    MatrixType currentMatrix;
+    
+    // This just saves repeating code to get doubles for each
+    // value.
     fillMatrix(currentMatrix, ptr.get());
 
-#ifdef GNASH_DEBUG_GEOM_MATRIX
-    log_debug("(Matrix.invert) This matrix (pre-transform): %s", currentMatrix);
-#endif
-
- 	ublas::permutation_matrix<double> pm(currentMatrix.size1());
-
-#ifdef GNASH_DEBUG_GEOM_MATRIX
-    log_debug("(Matrix.invert) Permutation matrix: %s", pm);
-#endif
-
- 	int valid = ublas::lu_factorize<ublas::c_matrix<double, 3, 3> >(currentMatrix, pm);
-
-#ifdef GNASH_DEBUG_GEOM_MATRIX
-    log_debug("(Matrix.invert) Factorized matrix (return %f): %s", valid, pm);
-#endif
- 	
- 	if( valid == 0 )
- 	{
- 	    try
- 	    {
-     	    // We can probably invert, but the validity check above fails on
-     	    // some machines. We can get an exception from boost::ublas
-     	    ublas::lu_substitute<ublas::c_matrix<double, 3, 3> >(currentMatrix, pm, inverseMatrix);
-     	}
-     	catch (ublas::internal_logic &e)
-     	{
-     	
-     	}
-     	
- 	}
-
-#ifdef GNASH_DEBUG_GEOM_MATRIX
-        log_debug("(Matrix.invert) Inverse matrix: %s", inverseMatrix);
-#endif
+    const double determinant = getMinorDeterminant(currentMatrix);
+    
+    // This is a double, so it could be worth checking for the epsilon.
+    if (determinant == 0)
+    {
+        // Return the identity matrix
+        ptr->set_member(NSV::PROP_A, as_value(1.0));
+        ptr->set_member(NSV::PROP_B, as_value(0.0));
+        ptr->set_member(NSV::PROP_C, as_value(0.0));
+        ptr->set_member(NSV::PROP_D, as_value(1.0));
+        ptr->set_member(NSV::PROP_TX, as_value(0.0));
+        ptr->set_member(NSV::PROP_TY, as_value(0.0)); 
+        return as_value();  
+    }
+    
+    const double a = currentMatrix(1, 1) / determinant;
+    const double c = - currentMatrix(0, 1) / determinant;
+    const double b = - currentMatrix(1, 0) / determinant;
+    const double d = currentMatrix(0, 0) / determinant;
+    
+    const double tx = - (a * currentMatrix(0, 2) + c * currentMatrix(1, 2));
+    const double ty = - (b * currentMatrix(0, 2) + d * currentMatrix(1, 2));
 
     // Returns the identity matrix if unsuccessful.
-    ptr->set_member(NSV::PROP_A, as_value(inverseMatrix(0, 0)));
-    ptr->set_member(NSV::PROP_B, as_value(inverseMatrix(1, 0)));
-    ptr->set_member(NSV::PROP_C, as_value(inverseMatrix(0, 1)));
-    ptr->set_member(NSV::PROP_D, as_value(inverseMatrix(1, 1)));
-    ptr->set_member(NSV::PROP_TX, as_value(inverseMatrix(0, 2)));
-    ptr->set_member(NSV::PROP_TY, as_value(inverseMatrix(1, 2)));
+    ptr->set_member(NSV::PROP_A, as_value(as_value(a)));
+    ptr->set_member(NSV::PROP_B, as_value(as_value(b)));
+    ptr->set_member(NSV::PROP_C, as_value(as_value(c)));
+    ptr->set_member(NSV::PROP_D, as_value(as_value(d)));
+    ptr->set_member(NSV::PROP_TX, as_value(as_value(tx)));
+    ptr->set_member(NSV::PROP_TY, as_value(as_value(ty)));
 
     return as_value();
 }
+
 
 static as_value
 Matrix_rotate(const fn_call& fn)
@@ -629,7 +610,7 @@ Matrix_translate(const fn_call& fn)
 
 
 // A helper function to create a boost matrix from a Matrix object
-static void fillMatrix(boost::numeric::ublas::c_matrix<double, 3, 3>& matrix,
+static void fillMatrix(MatrixType& matrix,
                          as_object* const matrixObject)
 {
 
