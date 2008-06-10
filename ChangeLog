@@ -2,6 +2,7 @@
 
 	* server/asobj/flash/geom/Point_as{.cpp.h},Matrix_as.cpp: drop auto_ptr
 	  for intrusive_ptr to pass a Point object.
+	* server/testsuite/actionscript.all/Matrix_as.cpp: uncommitted tests.
 
 2008-06-10 Sandro Santilli <strk@keybit.net>
 

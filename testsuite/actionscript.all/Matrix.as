@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Matrix.as,v 1.5 2008/06/09 12:37:01 bwy Exp $";
+rcsid="$Id: Matrix.as,v 1.6 2008/06/10 14:25:33 bwy Exp $";
 
 
 // There are lots of floating point calculations here. Comparing them
@@ -190,11 +190,15 @@ check_equals(m6.toString(), "(a=4, b=5, c=44, d=55, tx=2, ty=4)");
 m6.invert();
 check_equals(m6.toString(), "(a=1, b=0, c=0, d=1, tx=0, ty=0)");
 
-// Valid inverse.
+// Valid inverse2.
 m6 = new Matrix(4, 5, 0, 5, 2, 3);
 check_equals(m6.toString(), "(a=4, b=5, c=0, d=5, tx=2, ty=3)");
 m6.invert();
 check_equals(m6.toString(), "(a=0.25, b=-0.25, c=0, d=0.2, tx=-0.5, ty=-0.1)");
+m6.rotate(-0.5);
+check_equals(m6.toString(), "(a=0.0995392558215424, b=-0.339252025123644, c=0.0958851077208406, d=0.175516512378075, tx=-0.486733834805607, ty=0.151954513113064)");
+m6.invert();
+check_equals(m6.toString(), "(a=3.51033024756149, b=6.78504050247288, c=-1.91770215441681, d=1.99078511643085, tx=2, ty=3)");
 
 
 // Rotation applies to translation
