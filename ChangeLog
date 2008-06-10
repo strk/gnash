@@ -1,5 +1,10 @@
 2008-06-10 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/libbase/NoSeekFileTest.cpp: fix build (don't use
+	  'read' as a variable name, being already a library function).
+
+2008-06-10 Sandro Santilli <strk@keybit.net>
+
 	* libbase/LoadThread.{cpp,h}: change seek to return 0 on success
 	  and -1 on error (to be closer to IOChannel iface). There were no
 	  users of it, I tested. Note that seek() doesn't do what dox say
