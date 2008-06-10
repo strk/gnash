@@ -1,3 +1,7 @@
+2008-06-10 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/asobj/gen-asclass.pl: stop generating bad header guard names.
+
 2008-06-10 Sandro Santilli <strk@keybit.net>
 
 	* server/parser/edit_text_character.cpp (read): handle hasFontClass

@@ -60,8 +60,8 @@ EOF
     ## The text between the EOFs will be printed in the header file.
     print $fh <<EOF;
 
-#ifndef __GNASH_ASOBJ_$args{up}_H__
-#define __GNASH_ASOBJ_$args{up}_H__
+#ifndef GNASH_ASOBJ_$args{up}_H
+#define GNASH_ASOBJ_$args{up}_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -81,7 +81,7 @@ void $args{lc}_class_init(as_object& global);
 
 } // end of gnash namespace
 
-// __GNASH_ASOBJ_$args{up}_H__
+// GNASH_ASOBJ_$args{up}_H
 #endif
 EOF
 
