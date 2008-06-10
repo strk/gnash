@@ -117,12 +117,12 @@ fill_style::read(SWFStream* in, int tag_type, movie_definition* md,
         if (m_type == SWF::FILL_LINEAR_GRADIENT)
         {
             m_gradient_matrix.concatenate_translation(128.f, 0.f);
-            m_gradient_matrix.concatenate_scale(1.0f / 128.0f);
+            m_gradient_matrix.concatenate_scale(1.0f/128, 1.0f/128);
         }
         else // FILL_RADIAL_GRADIENT or FILL_FOCAL_GRADIENT
         {
             m_gradient_matrix.concatenate_translation(32.f, 32.f);
-            m_gradient_matrix.concatenate_scale(1.0f / 512.0f);
+            m_gradient_matrix.concatenate_scale(1.0f/512, 1.0f/512);
         }
 
         matrix	m;

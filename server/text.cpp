@@ -145,7 +145,7 @@ namespace gnash {
 					
 				mat = base_matrix;
 				mat.concatenate_translation(x, y);
-				mat.concatenate_scale(scale);
+				mat.concatenate_scale(scale, scale);
 
 				if (index == -1)
 				{

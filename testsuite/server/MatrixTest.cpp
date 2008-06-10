@@ -59,7 +59,7 @@ int
 main(int /*argc*/, char** /*argv*/)
 {
 #if 0
-	std::string label;
+    std::string label;
 
 	// Check attributes of the identity
 	matrix identity; 
@@ -70,7 +70,6 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(identity.get_rotation(), 0);
 	check_equals(identity.get_x_translation(), 0);
 	check_equals(identity.get_y_translation(), 0);
-	check( ! identity.does_flip() );
 
 	// The inverse of identity is still the identity
 	matrix invert;
@@ -88,9 +87,8 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(m1.get_rotation(), 0);
 	check_equals(m1.get_x_translation(), 0);
 	check_equals(m1.get_y_translation(), 0);
-	check(!m1.does_flip());
 
-	m1.set_scale(1.5, 2.5);
+    m1.set_scale(1.5, 2.5);
 	check_equals(D(m1.get_x_scale()), 1.5);
 	check_equals(D(m1.get_y_scale()), 2.5);
 	check_equals(D(m1.get_rotation()), 0);
@@ -150,21 +148,21 @@ main(int /*argc*/, char** /*argv*/)
 	// Test concatenation
 	//---------------------------------------------
 
-	m1.concatenate_scale(2);
+	m1.concatenate_scale(2, 2);
 	check_equals(D(m1.get_x_scale()), 2);
 	check_equals(D(m1.get_y_scale()), 4);
 	check_equals(D(m1.get_rotation()), 2);
 	check_equals(m1.get_x_translation(), 5);
 	check_equals(m1.get_y_translation(), 6);
 
-	m1.concatenate_scales(3, 3);
+	m1.concatenate_scale(3, 3);
 	check_equals(D(m1.get_x_scale()), 6);
 	check_equals(D(m1.get_y_scale()), 12);
 	check_equals(D(m1.get_rotation()), 2);
 	check_equals(m1.get_x_translation(), 5);
 	check_equals(m1.get_y_translation(), 6);
 
-	m1.concatenate_scales(2, 1);
+	m1.concatenate_scale(2, 1);
 	check_equals(D(m1.get_x_scale()), 12);
 	check_equals(D(m1.get_y_scale()), 12);
 	check_equals(D(m1.get_rotation()), 2);
@@ -182,23 +180,18 @@ main(int /*argc*/, char** /*argv*/)
 	m1.set_identity();
 
 	// Make a distance of 64 become a distance of 20 .. 
-
 	m1.set_scale(20.0/64, 20.0/64);
-    std::cout << m1 << std::endl;
 
 	m1.transform(&r, p1);
 	check_equals(r.x, 0);
 	check_equals(r.y, 0);
-
-    std::cout << m1 << std::endl;
-    
+   
 	m1.transform(&r, p2);
 	check_equals(r.x, 20);
 	check_equals(r.y, 20);
 
 	// Translate points to have the origin at 32,32
 	// (coordinates expressed in prior-to-scaling matrix)
-    std::cout << m1 << std::endl;
 	m1.concatenate_translation(-32, -32);
 
 	m1.transform(&r, p1);

@@ -93,7 +93,7 @@ public:
 	void	concatenate_scale(float s);
 
 	/// Just like concatenate_scale() but with different scales for x/y 
-	void	concatenate_scales(float x, float y);
+	void	concatenate_scale(float x, float y);
 
 	/// Set this matrix to a blend of m1 and m2, parameterized by t.
 	void	set_lerp(const matrix& m1, const matrix& m2, float t);
@@ -137,6 +137,9 @@ public:
 	// temp hack, should drop..
 	void	read(SWFStream* in) { read(*in); }
 
+    /// Transform a given point by our matrix
+    void    transform(point &p) const;
+    
 	/// Transform point 'p' by our matrix. 
 	//
 	/// Put the result in *result.
@@ -193,9 +196,6 @@ public:
 	/// Set this matrix to the inverse of the given matrix.
 	void	set_inverse(const matrix& m);
 
-	/// Return true if this matrix reverses handedness.
-	bool	does_flip() const;	
-
 	/// return the magnitude scale of our x coord output
 	float	get_x_scale() const;
 
@@ -241,3 +241,4 @@ inline bool operator== (const matrix& a, const matrix& b)
 // mode: C++
 // indent-tabs-mode: t
 // End:
+// 

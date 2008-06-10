@@ -138,8 +138,14 @@ inline int frnd(float f)
 
 inline boost::int32_t Fixed16Mul(boost::int32_t a, boost::int32_t b)
 {
-    return static_cast<boost::int32_t>(
-            static_cast<boost::int64_t>(a) * static_cast<boost::int64_t>(b) >> 16);
+    // There might be overflows, but we don't care in our specific case.
+    return (boost::int32_t)((boost::int64_t)a * (boost::int64_t)b >> 16);
+}
+
+inline boost::int32_t FloatToFixed16(float a)
+{
+    // There might be overflows, but we don't care in our specific case.
+    return (boost::int32_t)(a * 65536.0f);
 }
 
 }

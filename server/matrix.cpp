@@ -45,48 +45,48 @@ void
 matrix::read(SWFStream& in)
 // Initialize from the stream.
 {
-	in.align();
+    in.align();
 
-	set_identity();
+    set_identity();
 
-	in.ensureBits(1);
-	bool	has_scale = in.read_bit(); 
-	if (has_scale)
-	{
-		in.ensureBits(5);
-		int	scale_nbits = in.read_uint(5);
+    in.ensureBits(1);
+    bool    has_scale = in.read_bit(); 
+    if (has_scale)
+    {
+        in.ensureBits(5);
+        int scale_nbits = in.read_uint(5);
 
-		in.ensureBits(scale_nbits*2);
-		sx = in.read_sint(scale_nbits);
-		sy = in.read_sint(scale_nbits);
-	}
+        in.ensureBits(scale_nbits*2);
+        sx = in.read_sint(scale_nbits);
+        sy = in.read_sint(scale_nbits);
+    }
 
-	in.ensureBits(1);
-	bool	has_rotate = in.read_bit();
-	if (has_rotate)
-	{
-		in.ensureBits(5);
-		int	rotate_nbits = in.read_uint(5);
+    in.ensureBits(1);
+    bool    has_rotate = in.read_bit();
+    if (has_rotate)
+    {
+        in.ensureBits(5);
+        int rotate_nbits = in.read_uint(5);
 
-		in.ensureBits(rotate_nbits*2);
-		shx = in.read_sint(rotate_nbits);
-		shy = in.read_sint(rotate_nbits);
-	}
+        in.ensureBits(rotate_nbits*2);
+        shx = in.read_sint(rotate_nbits);
+        shy = in.read_sint(rotate_nbits);
+    }
 
-	in.ensureBits(5);
-	int	translate_nbits = in.read_uint(5);
-	if (translate_nbits > 0)
-	{
-		in.ensureBits(translate_nbits*2);
-		tx = (float) in.read_sint(translate_nbits);
-		ty = (float) in.read_sint(translate_nbits);
-	}
+    in.ensureBits(5);
+    int translate_nbits = in.read_uint(5);
+    if (translate_nbits > 0)
+    {
+        in.ensureBits(translate_nbits*2);
+        tx = in.read_sint(translate_nbits);
+        ty = in.read_sint(translate_nbits);
+    }
 }
 
 bool
 matrix::is_valid() const
 {
-	return true;
+    return true;
 }
 
 
@@ -102,17 +102,17 @@ void
 matrix::concatenate(const matrix& m)
 // Concatenate m's transform onto ours.  When
 // transforming points, m happens first, then our
-// original xform.
+// original matrix.
 {
-	matrix	t;
-	t.sx =  Fixed16Mul(sx, m.sx)  + Fixed16Mul(shy, m.shx);
-	t.shx = Fixed16Mul(shx, m.sx) + Fixed16Mul(sy, m.shx);
-	t.shy = Fixed16Mul(sx, m.shy) + Fixed16Mul(shy, m.sy);
-	t.sy =  Fixed16Mul(shx, m.shy)+ Fixed16Mul(sy, m.sy);
-	t.tx =  Fixed16Mul(sx, m.tx)  + Fixed16Mul(shy, m.ty) + tx;
-	t.ty =  Fixed16Mul(shx, m.tx) + Fixed16Mul(sy, m.ty)  + ty;
+    matrix  t;
+    t.sx =  Fixed16Mul(sx, m.sx)  + Fixed16Mul(shy, m.shx);
+    t.shx = Fixed16Mul(shx, m.sx) + Fixed16Mul(sy, m.shx);
+    t.shy = Fixed16Mul(sx, m.shy) + Fixed16Mul(shy, m.sy);
+    t.sy =  Fixed16Mul(shx, m.shy)+ Fixed16Mul(sy, m.sy);
+    t.tx =  Fixed16Mul(sx, m.tx)  + Fixed16Mul(shy, m.ty) + tx;
+    t.ty =  Fixed16Mul(shx, m.tx) + Fixed16Mul(sy, m.ty)  + ty;
 
-	*this = t;
+    *this = t;
 }
 
 
@@ -122,30 +122,20 @@ matrix::concatenate_translation(float xoffset, float yoffset)
 // matrix.  When transforming points, the translation
 // happens first, then our original xform.
 {
-	tx += Fixed16Mul(sx,  xoffset) + Fixed16Mul(shy, yoffset);
-	ty += Fixed16Mul(shx, xoffset) + Fixed16Mul(sy, yoffset);
+    tx += Fixed16Mul(sx,  xoffset) + Fixed16Mul(shy, yoffset);
+    ty += Fixed16Mul(shx, xoffset) + Fixed16Mul(sy, yoffset);
 }
 
 
 void
-matrix::concatenate_scale(float scale)
-// Concatenate a uniform scale onto the front of our
-// matrix.  When transforming points, the scale
-// happens first, then our original xform.
+matrix::concatenate_scale(float xscale, float yscale)
+// Concatenate scales to our matrix. When transforming points, these 
+// scales happen first, then our matirx.
 {
-	sx *= utility::infinite_to_fzero(scale);
-	shy *= utility::infinite_to_fzero(scale);
-	shx *= utility::infinite_to_fzero(scale);
-	sy *= utility::infinite_to_fzero(scale);
-}
-
-void	
-matrix::concatenate_scales(float x, float y)
-// Just like concatenate_scale() but with different scales for x/y
-{
-	matrix m2; 
-    m2.set_scale_rotation(x, y, 0);
-	concatenate(m2);
+    sx  = Fixed16Mul(sx, FloatToFixed16(xscale));
+    shy = Fixed16Mul(shy,FloatToFixed16(yscale));
+    shx = Fixed16Mul(shx,FloatToFixed16(xscale));
+    sy  = Fixed16Mul(sy, FloatToFixed16(yscale));
 }
 
 void
@@ -153,12 +143,12 @@ matrix::set_lerp(const matrix& m1, const matrix& m2, float t)
 // Set this matrix to a blend of m1 and m2, parameterized by t.
 {
     using utility::flerp;
-	sx = flerp(m1.sx, m2.sx, t);
-	shx = flerp(m1.shx, m2.shx, t);
-	shy = flerp(m1.shy, m2.shy, t);
-	sy = flerp(m1.sy, m2.sy, t);
-	tx = flerp(m1.tx, m2.tx, t);
-	ty = flerp(m1.ty, m2.ty, t);
+    sx = flerp(m1.sx, m2.sx, t);
+    shx = flerp(m1.shx, m2.shx, t);
+    shy = flerp(m1.shy, m2.shy, t);
+    sy = flerp(m1.sy, m2.sy, t);
+    tx = flerp(m1.tx, m2.tx, t);
+    ty = flerp(m1.ty, m2.ty, t);
 }
 
 
@@ -167,64 +157,79 @@ matrix::set_scale_rotation(float x_scale, float y_scale, float angle)
 // Set the scale & rotation part of the matrix.
 // angle in radians.
 {
-	float	cos_angle = cosf(angle);
-	float	sin_angle = sinf(angle);
-	sx  = 65536.0f * x_scale * cos_angle;
-	shy = 65536.0f * y_scale * -sin_angle;
-	shx = 65536.0f * x_scale * sin_angle;
-	sy  = 65536.0f * y_scale * cos_angle;
+    float   cos_angle = cosf(angle);
+    float   sin_angle = sinf(angle);
+    sx  = FloatToFixed16(x_scale * cos_angle);
+    shy = FloatToFixed16(y_scale * -sin_angle);
+    shx = FloatToFixed16(x_scale * sin_angle);
+    sy  = FloatToFixed16(y_scale * cos_angle);
 }
 
 void
 matrix::set_x_scale(float xscale)
 {
-	float rotation = get_rotation();
-	float yscale = get_y_scale();
-	set_scale_rotation(xscale, yscale, rotation);
+    float angle = get_rotation();
+    float cos_v = cosf(angle);
+    float sin_v = sinf(angle);
+    sx  =  FloatToFixed16(xscale * cos_v);
+    shx =  FloatToFixed16(xscale * sin_v);
 }
 
 void
 matrix::set_y_scale(float yscale)
 {
-	float rotation = get_rotation();
-	float xscale = get_x_scale();
-	set_scale_rotation(xscale, yscale, rotation);
+    float angle = get_rotation();
+    float cos_v = cosf(angle);
+    float sin_v = sinf(angle);
+    shy =  - FloatToFixed16(yscale * sin_v);
+    sy  =  FloatToFixed16(yscale * cos_v);
 }
 
 void
 matrix::set_scale(float xscale, float yscale)
 {
-	float rotation = get_rotation();
-	set_scale_rotation(xscale, yscale, rotation);
+    float rotation = get_rotation();
+    set_scale_rotation(xscale, yscale, rotation);
 }
 
 void
 matrix::set_rotation(float rotation)
+{   
+    float xscale = get_x_scale();
+    float yscale = get_y_scale();
+    set_scale_rotation(xscale, yscale, rotation);
+}
+
+void
+matrix::transform(point &p) const
 {
-	float xscale = get_x_scale();
-	float yscale = get_y_scale();
-	set_scale_rotation(xscale, yscale, rotation);
+    //boost::int32_t x = Fixed16Mul(sx,  p.x) + Fixed16Mul(shy, p.y) + tx;
+    //boost::int32_t y = Fixed16Mul(shx, p.x) + Fixed16Mul(sy,  p.y) + ty;
+    float x = sx / 65536.0f * p.x + shy/ 65536.0f * p.y + tx;
+    float y = shx/ 65536.0f * p.x + sy / 65536.0f * p.y + ty;
+    p.x = x;
+    p.y = y;
 }
 
 void
 matrix::transform(point* result, const point& p) const
 // Transform point 'p' by our matrix.  Put the result in *result.
 {
-	assert(result);
+    assert(result);
 
-	result->x = Fixed16Mul(sx,  p.x) + Fixed16Mul(shy, p.y) + tx;
-	result->y = Fixed16Mul(shx, p.x) + Fixed16Mul(sy,  p.y) + ty;
+    result->x = Fixed16Mul(sx,  p.x) + Fixed16Mul(shy, p.y) + tx;
+    result->y = Fixed16Mul(shx, p.x) + Fixed16Mul(sy,  p.y) + ty;
 }
 
 void
 matrix::transform(geometry::Range2d<float>& r) const
 {
-	if ( ! r.isFinite() ) return;
+    if ( ! r.isFinite() ) return;
 
-	float xmin = r.getMinX();
-	float xmax = r.getMaxX();
-	float ymin = r.getMinY();
-	float ymax = r.getMaxY();
+    float xmin = r.getMinX();
+    float xmax = r.getMaxX();
+    float ymin = r.getMinY();
+    float ymax = r.getMaxY();
 
     point p0(xmin, ymin);
     point p1(xmin, ymax);
@@ -242,44 +247,34 @@ matrix::transform(geometry::Range2d<float>& r) const
     r.expandTo(p3.x, p3.y);
 }
 
-void
-matrix::transform_vector(point* result, const point& v) const
-// Transform vector 'v' by our matrix. Doesn't apply translation.
-// Put the result in *result.
-{
-	assert(result);
-
-	result->x = Fixed16Mul(sx, v.x) + Fixed16Mul(shy, v.y);
-	result->y = Fixed16Mul(sy, v.x) + Fixed16Mul(shx, v.y);
-}
 
 void
 matrix::transform_by_inverse(point* result, const point& p) const
 // Transform point 'p' by the inverse of our matrix.  Put result in *result.
 {
-	// @@ TODO optimize this!
-	matrix	m;
-	m.set_inverse(*this);
-	m.transform(result, p);
+    // @@ TODO optimize this!
+    matrix  m;
+    m.set_inverse(*this);
+    m.transform(result, p);
 }
 
 void
 matrix::transform_by_inverse(point& p) const
 // Transform point 'p' by the inverse of our matrix.  
 {
-	// @@ TODO optimize this!
-	matrix	m;
-	m.set_inverse(*this);
-	m.transform(p);
+    // @@ TODO optimize this!
+    matrix  m;
+    m.set_inverse(*this);
+    m.transform(p);
 }
 
 void
 matrix::transform_by_inverse(geometry::Range2d<float>& r) const
 {
-	// @@ TODO optimize this!
-	matrix	m;
-	m.set_inverse(*this);
-	m.transform(r);
+    // @@ TODO optimize this!
+    matrix  m;
+    m.set_inverse(*this);
+    m.transform(r);
 }
 
 
@@ -287,34 +282,26 @@ void
 matrix::set_inverse(const matrix& m)
 // Set this matrix to the inverse of the given matrix.
 {
-	assert(this != &m);
+    assert(this != &m);
 
-	boost::int64_t  det = m.get_determinant();
-	if (det == 0)
-	{
+    boost::int64_t  det = m.get_determinant();
+    if (det == 0)
+    {
         // cann't invert this matrix, set it to identity.
         // this might happen when xscale == yscale == 0
-		set_identity();
-	}
-	else
-	{
-		double  inv_det = 65536.0 * 65536.0 / det;
-		sx  = (boost::int32_t)(m.sy * inv_det);
-		sy  = (boost::int32_t)(m.sx * inv_det);
-		shy = -(boost::int32_t)(m.shy * inv_det);
-		shx = -(boost::int32_t)(m.shx * inv_det);
+        set_identity();
+    }
+    else
+    {
+        double  inv_det = 65536.0 * 65536.0 / det;
+        sx  = (boost::int32_t)(m.sy * inv_det);
+        sy  = (boost::int32_t)(m.sx * inv_det);
+        shy = -(boost::int32_t)(m.shy * inv_det);
+        shx = -(boost::int32_t)(m.shx * inv_det);
         
         tx = -( Fixed16Mul(sx,  m.tx) + Fixed16Mul(shy, m.ty) );
         ty = -( Fixed16Mul(shx, m.tx) + Fixed16Mul(sy,  m.ty) );
-	}
-}
-
-
-bool
-matrix::does_flip() const
-// Return true if this matrix reverses handedness.
-{
-    return ((boost::int64_t)sx * sy) < ((boost::int64_t)shx * shy);
+    }
 }
 
 
@@ -322,33 +309,33 @@ boost::int64_t
 matrix::get_determinant() const
 // Return the 32.32 fixed point determinant of this matrix.
 {
-	return (boost::int64_t)sx * sy - (boost::int64_t)shx * shy;
+    return (boost::int64_t)sx * sy - (boost::int64_t)shx * shy;
 }
 
 float
 matrix::get_x_scale() const
 {
-	return sqrtf(((float)sx * sx + (float)shx * shx)) / 65536.0f;
+    return sqrtf(((float)sx * sx + (float)shx * shx)) / 65536.0f;
 }
 
 float
 matrix::get_y_scale() const
 {
-	return sqrtf(((float)sy * sy + (float)shy * shy)) / 65536.0f;
+    return sqrtf(((float)sy * sy + (float)shy * shy)) / 65536.0f;
 }
 
 float
 matrix::get_rotation() const
 {
-	if (get_determinant() < 0)
-	{
+    if (get_determinant() < 0)
+    {
         // TODO: check this.
-		return atan2f(shx, -sx);
-	}
-	else
-	{
-		return atan2f(shx, sx);
-	}
+        return atan2f(shx, -sx);
+    }
+    else
+    {
+        return atan2f(shx, sx);
+    }
 }
 
 std::ostream& operator<< (std::ostream& o, const matrix& m)
@@ -374,7 +361,7 @@ std::ostream& operator<< (std::ostream& o, const matrix& m)
       return o;
 }
 
-}	// end namespace gnash
+}   // end namespace gnash
 
 
 // Local Variables:
