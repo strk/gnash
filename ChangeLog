@@ -1,3 +1,13 @@
+2008-06-10 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/asobj/flash/geom/Matrix_as.cpp: add optional debugging output;
+	  lu_factorize's failure to notice that some matrices aren't invertible
+	  is a known problem with that solving method. Add a try/catch to handle
+	  the exception. As the exception is only thrown when NDEBUG is defined,
+	  I'll find a more reliable solver. Gnash is about 60-70% faster than
+	  the PP for flash.geom.Matrix operations in a loop, despite being
+	  almost 50% slower executing the loop itself...
+
 2008-06-09  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* libamf/element.cpp: Actually calculate the size of the output

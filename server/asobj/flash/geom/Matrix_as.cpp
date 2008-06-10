@@ -17,10 +17,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "Matrix_as.h"
 #include "as_object.h" // for inheritance
 #include "log.h"
@@ -47,8 +43,12 @@
 // A transformation matrix for affine transformations:
 //    a  c  tx
 //    b  d  ty
-//    0  0  1
-// The matrix can only operate in 2d space.
+//    u  v  w
+// The matrix can only operate in 2d space. The bottom row is immutable
+// as 0  0  1.
+
+// Define this to get verbose debugging messages for matrix calculations
+//#define GNASH_DEBUG_GEOM_MATRIX 1
 
 namespace gnash {
 
@@ -218,11 +218,21 @@ Matrix_concat(const fn_call& fn)
     boost::numeric::ublas::c_matrix<double, 3, 3> concatMatrix;
     fillMatrix(concatMatrix, obj);
 
+
     // Current ('this') Matrix
     boost::numeric::ublas::c_matrix<double, 3, 3> currentMatrix;
     fillMatrix(currentMatrix, ptr.get());
+
+#ifdef GNASH_DEBUG_GEOM_MATRIX
+    log_debug("(Matrix.concat) This matrix (pre-transform): %s", currentMatrix);
+    log_debug("(Matrix.concat) Transform matrix: %s", concatMatrix);
+#endif
     
     currentMatrix = boost::numeric::ublas::prod(concatMatrix, currentMatrix);
+ 
+#ifdef GNASH_DEBUG_GEOM_MATRIX
+    log_debug("(Matrix.concat) This matrix (post-transform): %s", currentMatrix);
+#endif 
     
     // Set values of current matrix
     ptr->set_member(NSV::PROP_A, as_value(currentMatrix(0, 0)));
@@ -321,8 +331,17 @@ Matrix_deltaTransformPoint(const fn_call& fn)
     point(0) = x.to_number();
     point(1) = y.to_number();
 
+#ifdef GNASH_DEBUG_GEOM_MATRIX
+    log_debug("(Matrix.deltaTransformPoint) This matrix: %s", transformMatrix);
+    log_debug("(Matrix.deltaTransformPoint) Point vector (pre-transform): %s", point);
+#endif
+
     // Transform
     point = boost::numeric::ublas::prod(point, transformMatrix);
+
+#ifdef GNASH_DEBUG_GEOM_MATRIX
+    log_debug("(Matrix.deltaTransformPoint) Point vector (post-transform): %s", point);
+#endif
 
     // Get an auto_ptr to a Point and pretend to keep alive.
     boost::intrusive_ptr<as_object> ret = init_Point_instance().release();
@@ -382,15 +401,40 @@ Matrix_invert(const fn_call& fn)
     ublas::c_matrix<double, 3, 3> currentMatrix;
     fillMatrix(currentMatrix, ptr.get());
 
+#ifdef GNASH_DEBUG_GEOM_MATRIX
+    log_debug("(Matrix.invert) This matrix (pre-transform): %s", currentMatrix);
+#endif
+
  	ublas::permutation_matrix<double> pm(currentMatrix.size1());
 
+#ifdef GNASH_DEBUG_GEOM_MATRIX
+    log_debug("(Matrix.invert) Permutation matrix: %s", pm);
+#endif
+
  	int valid = ublas::lu_factorize<ublas::c_matrix<double, 3, 3> >(currentMatrix, pm);
+
+#ifdef GNASH_DEBUG_GEOM_MATRIX
+    log_debug("(Matrix.invert) Factorized matrix (return %f): %s", valid, pm);
+#endif
  	
  	if( valid == 0 )
  	{
- 	    // We can invert.
- 	    ublas::lu_substitute<ublas::c_matrix<double, 3, 3> >(currentMatrix, pm, inverseMatrix);
+ 	    try
+ 	    {
+     	    // We can probably invert, but the validity check above fails on
+     	    // some machines. We can get an exception from boost::ublas
+     	    ublas::lu_substitute<ublas::c_matrix<double, 3, 3> >(currentMatrix, pm, inverseMatrix);
+     	}
+     	catch (ublas::internal_logic &e)
+     	{
+     	
+     	}
+     	
  	}
+
+#ifdef GNASH_DEBUG_GEOM_MATRIX
+        log_debug("(Matrix.invert) Inverse matrix: %s", inverseMatrix);
+#endif
 
     // Returns the identity matrix if unsuccessful.
     ptr->set_member(NSV::PROP_A, as_value(inverseMatrix(0, 0)));
@@ -436,12 +480,18 @@ Matrix_rotate(const fn_call& fn)
         currentMatrix(0, 1) = b.to_number();
         currentMatrix(1, 0) = c.to_number();
         currentMatrix(1, 1) = d.to_number();
-        
+
+#ifdef GNASH_DEBUG_GEOM_MATRIX
+        log_debug("(Matrix.rotate) This matrix (pre-transform): %s", currentMatrix);
+#endif
+
         // Apply rotation to current matrix.
         currentMatrix = boost::numeric::ublas::prod(currentMatrix, transformMatrix);
 
-        log_debug("Modified matrix: %s", currentMatrix);
-        log_debug("Transformation matrix%s", transformMatrix);
+#ifdef GNASH_DEBUG_GEOM_MATRIX
+        log_debug("(Matrix.rotate) Transformation matrix: %s", transformMatrix);
+        log_debug("(Matrix.rotate) This matrix (post-transform): %s", currentMatrix);
+#endif
  
         ptr->set_member(NSV::PROP_A, as_value(currentMatrix(0, 0)));
         ptr->set_member(NSV::PROP_B, as_value(currentMatrix(0, 1)));
@@ -496,10 +546,17 @@ Matrix_scale(const fn_call& fn)
         currentMatrix(1, 0) = c.to_number();
         currentMatrix(1, 1) = d.to_number();
         
-        log_debug("%s - %s", currentMatrix, transformMatrix);
+#ifdef GNASH_DEBUG_GEOM_MATRIX
+        log_debug("(Matrix.scale) This matrix (pre-transform): %s", currentMatrix);
+#endif
         
         // Apply scale to current matrix.
         currentMatrix = boost::numeric::ublas::prod(currentMatrix, transformMatrix);
+
+#ifdef GNASH_DEBUG_GEOM_MATRIX
+        log_debug("(Matrix.scale) Transformation matrix: %s", transformMatrix);
+        log_debug("(Matrix.scale) This matrix (post-transform): %s", currentMatrix);
+#endif
 
         ptr->set_member(NSV::PROP_A, as_value(currentMatrix(0, 0)));
         ptr->set_member(NSV::PROP_B, as_value(currentMatrix(0, 1)));
