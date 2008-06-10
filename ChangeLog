@@ -1,3 +1,7 @@
+2008-06-10 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/FreetypeGlyphsProvider.h: boost/cstdint.h include.
+
 2008-06-10 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/gen-asclass.pl: since we're at it, stop generating
@@ -10,6 +14,7 @@
 	  inverting was massively over-complicated; do a simpler implementation
 	  (as in server/matrix.h, but without the oddities needed for the SWF
 	  matrix). Add notes and a typedef.
+	* server/FreetypeGlyphsProvider.h: boost/cstdint.h include.
 
 2008-06-10 Sandro Santilli <strk@keybit.net>
 

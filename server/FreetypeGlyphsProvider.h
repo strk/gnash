@@ -25,6 +25,7 @@
 #include <string>
 #include <memory> // for auto_ptr
 #include <boost/thread/mutex.hpp>
+#include <boost/cstdint.hpp>
 
 #ifdef USE_FREETYPE 
 # include <ft2build.h>
