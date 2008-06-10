@@ -34,7 +34,7 @@
 
 // Forward declarations
 namespace gnash {
-	class SWFStream;
+    class SWFStream;
 }
 
 
@@ -52,187 +52,184 @@ class DSOEXPORT matrix
 {
 public:
 
-	int sx;  // Xscale, 16.16 fixed point.
+    int sx;  // Xscale, 16.16 fixed point.
     int shx; // Xshear, 16.16 fixed point. 
     int tx;  // Xtranslation, TWIPS.
     int sy;  // Yscale, 16.16 fixed point.
     int shy; // Yshear, 16.16 fixed point.
     int ty;  // Ytranslation, TWIPS.
              
-	friend bool operator== (const matrix&, const matrix&);
-	friend std::ostream& operator<< (std::ostream&, const matrix&);
-	
-	/// Defaults to identity
-	matrix();
+    friend bool operator== (const matrix&, const matrix&);
+    friend std::ostream& operator<< (std::ostream&, const matrix&);
+    
+    /// Defaults to identity
+    matrix();
 
-	/// Check validity of the matrix values
-	bool	is_valid() const;
+    /// Check validity of the matrix values
+    bool    is_valid() const;
 
-	/// Set the matrix to identity.
-	void	set_identity();
+    /// Set the matrix to identity.
+    void    set_identity();
 
-	/// Concatenate m's transform onto ours. 
-	//
-	/// When transforming points, m happens first,
-	/// then our original xform.
-	///
-	void	concatenate(const matrix& m);
+    /// Concatenate m's transform onto ours. 
+    //
+    /// When transforming points, m happens first,
+    /// then our original xform.
+    ///
+    void    concatenate(const matrix& m);
 
-	/// Concatenate a translation onto the front of our matrix.
-	//
-	/// When transforming points, the translation
-	/// happens first, then our original xform.
-	///
-	void	concatenate_translation(float tx, float ty);
+    /// Concatenate a translation onto the front of our matrix.
+    //
+    /// When transforming points, the translation
+    /// happens first, then our original xform.
+    ///
+    void    concatenate_translation(float tx, float ty);
 
-	/// Concatenate a uniform scale onto the front of our matrix.
-	//
-	/// When transforming points, the scale
-	/// happens first, then our original xform.
-	///
-	void	concatenate_scale(float s);
+    /// Concatenate scale x and y to the front of our matrix 
+    //
+    /// When transforming points, these scales happen first, then
+    /// our original matrix. 
+    /// 
+    void    concatenate_scale(float x, float y);
 
-	/// Just like concatenate_scale() but with different scales for x/y 
-	void	concatenate_scale(float x, float y);
+    /// Set this matrix to a blend of m1 and m2, parameterized by t.
+    void    set_lerp(const matrix& m1, const matrix& m2, float t);
 
-	/// Set this matrix to a blend of m1 and m2, parameterized by t.
-	void	set_lerp(const matrix& m1, const matrix& m2, float t);
+    /// Set the scale & rotation part of the matrix. angle in radians.
+    void    set_scale_rotation(float x_scale, float y_scale, float rotation);
 
-	/// Set the scale & rotation part of the matrix. angle in radians.
-	void	set_scale_rotation(float x_scale, float y_scale, float rotation);
+    /// Set the scale part of the matrix, will keep current rotation
+    void    set_scale(float x_scale, float y_scale);
 
-	/// Set the scale part of the matrix, will keep current rotation
-	void	set_scale(float x_scale, float y_scale);
+    /// Set the X scale part of the matrix, will keep current rotation and Y scale
+    void    set_x_scale(float scale);
 
-	/// Set the X scale part of the matrix, will keep current rotation and Y scale
-	void	set_x_scale(float scale);
+    /// Set the Y scale part of the matrix, will keep current rotation and X scale
+    void    set_y_scale(float scale);
 
-	/// Set the Y scale part of the matrix, will keep current rotation and X scale
-	void	set_y_scale(float scale);
+    /// Set the rotation part of the matrix, will keep current scale. Angle in radians.
+    void    set_rotation(float rotation);
 
-	/// Set the rotation part of the matrix, will keep current scale. Angle in radians.
-	void	set_rotation(float rotation);
+    /// Set x translation
+    void set_x_translation(float x)
+    {
+        tx = x;
+    }
 
-	/// Set x translation
-	void set_x_translation(float x)
-	{
-		tx = x;
-	}
+    /// Set y translation
+    void set_y_translation(float y)
+    {
+        ty = y;
+    }
 
-	/// Set y translation
-	void set_y_translation(float y)
-	{
-		ty = y;
-	}
+    void set_translation(float x, float y)
+    {
+        tx = x;
+        ty = y;
+    }
 
-	void set_translation(float x, float y)
-	{
-		tx = x;
-		ty = y;
-	}
+    /// Initialize from the SWF input stream.
+    void    read(SWFStream& in);
 
-	/// Initialize from the SWF input stream.
-	void	read(SWFStream& in);
-
-	// temp hack, should drop..
-	void	read(SWFStream* in) { read(*in); }
+    // temp hack, should drop..
+    void    read(SWFStream* in) { read(*in); }
 
     /// Transform a given point by our matrix
     void    transform(point &p) const;
     
-	/// Transform point 'p' by our matrix. 
-	//
-	/// Put the result in *result.
-	///
-	void	transform(point* result, const point& p) const;
+    /// Transform point 'p' by our matrix. 
+    //
+    /// Put the result in *result.
+    ///
+    void    transform(point* result, const point& p) const;
 
-	// Transform point 'p' by our matrix.
-	template <typename T>
-	void transform(geometry::Point2d<T>& p) const
-	{
-		transform(p.x, p.y);
-	}
+    // Transform point 'p' by our matrix.
+    template <typename T>
+    void transform(geometry::Point2d<T>& p) const
+    {
+        transform(p.x, p.y);
+    }
 
-	/// Transform point 'p' by the inverse of our matrix. 
-	void	transform_by_inverse(point& p) const;
+    /// Transform point 'p' by the inverse of our matrix. 
+    void    transform_by_inverse(point& p) const;
 
-	/// Transform point 'x,y' by our matrix. 
-	template <typename T>
-	void
-	transform(T& x, T& y) const
-	// Transform point 'x,y' by our matrix.
-	{
-		float nx = (sx / 65536.0f) * x + (shy / 65536.0f) * y + tx;
-		float ny = (shx / 65536.0f) * x + (sy / 65536.0 ) * y + ty;
-		x = nx;
-		y = ny;
-	}
+    /// Transform point 'x,y' by our matrix. 
+    template <typename T>
+    void
+    transform(T& x, T& y) const
+    // Transform point 'x,y' by our matrix.
+    {
+        float nx = (sx / 65536.0f) * x + (shy / 65536.0f) * y + tx;
+        float ny = (shx / 65536.0f) * x + (sy / 65536.0 ) * y + ty;
+        x = nx;
+        y = ny;
+    }
 
-	/// Transform vector 'v' by our matrix. Doesn't apply translation.
-	//
-	/// Put the result in *result.
-	///
-	void	transform_vector(point* result, const point& p) const;
+    /// Transform vector 'v' by our matrix. Doesn't apply translation.
+    //
+    /// Put the result in *result.
+    ///
+    void    transform_vector(point* result, const point& p) const;
 
-	/// Transform point 'p' by the inverse of our matrix. 
-	//
-	/// Put result in *result.
-	///
-	void	transform_by_inverse(point* result, const point& p) const;
+    /// Transform point 'p' by the inverse of our matrix. 
+    //
+    /// Put result in *result.
+    ///
+    void    transform_by_inverse(point* result, const point& p) const;
 
-	/// Transform Range2d<float> 'r' by our matrix. 
-	//
-	/// NULL and WORLD ranges are untouched.
-	///
-	void	transform(geometry::Range2d<float>& r) const;
+    /// Transform Range2d<float> 'r' by our matrix. 
+    //
+    /// NULL and WORLD ranges are untouched.
+    ///
+    void    transform(geometry::Range2d<float>& r) const;
 
-	/// Transform Range2d<float> 'r' by the inverse our matrix. 
-	//
-	/// NULL and WORLD ranges are untouched.
-	///
-	void	transform_by_inverse(geometry::Range2d<float>& r) const;
+    /// Transform Range2d<float> 'r' by the inverse our matrix. 
+    //
+    /// NULL and WORLD ranges are untouched.
+    ///
+    void    transform_by_inverse(geometry::Range2d<float>& r) const;
 
 
-	/// Set this matrix to the inverse of the given matrix.
-	void	set_inverse(const matrix& m);
+    /// Set this matrix to the inverse of the given matrix.
+    void    set_inverse(const matrix& m);
 
-	/// return the magnitude scale of our x coord output
-	float	get_x_scale() const;
+    /// return the magnitude scale of our x coord output
+    float   get_x_scale() const;
 
-	/// return the magnitude scale of our y coord output
-	float	get_y_scale() const;
+    /// return the magnitude scale of our y coord output
+    float   get_y_scale() const;
 
-	/// return our rotation component (in radians)
-	float	get_rotation() const;
+    /// return our rotation component (in radians)
+    float   get_rotation() const;
 
-	/// return the canonical x translation
-	float	get_x_translation() const
-	{
-		return tx;
-	}
+    /// return the canonical x translation
+    float   get_x_translation() const
+    {
+        return tx;
+    }
 
-	/// return the canonical y translation
-	float	get_y_translation() const
-	{
-		return ty;
-	}
+    /// return the canonical y translation
+    float   get_y_translation() const
+    {
+        return ty;
+    }
 
-	/// Return the determinant of this matrix in 32.32 fixed point format.
-	boost::int64_t	get_determinant() const;
+    /// Return the determinant of this matrix in 32.32 fixed point format.
+    boost::int64_t  get_determinant() const;
 };
 
 inline bool operator== (const matrix& a, const matrix& b)
 {
-	return	
+    return  
         a.sx  == b.sx  &&
-		a.shx == b.shx &&
-		a.tx  == b.tx  &&
-		a.sy  == b.sy  &&
-		a.shy == b.shy &&
-		a.ty  == b.ty;
+        a.shx == b.shx &&
+        a.tx  == b.tx  &&
+        a.sy  == b.sy  &&
+        a.shy == b.shy &&
+        a.ty  == b.ty;
 }
 
-}	// namespace gnash
+}   // namespace gnash
 
 #endif // GNASH_MATRIX_H
 

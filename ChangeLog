@@ -1,3 +1,7 @@
+2008-06-10 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* server/matrix.h: drop matrix::concatenate_scale(float s), not used any more.
+	
 2008-06-10 Sandro Santilli <strk@keybit.net>
 
 	* libbase/LoadThread.cpp: make seek() blocking, as advertised
