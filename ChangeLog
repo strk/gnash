@@ -1,3 +1,8 @@
+2008-06-10 Sandro Santilli <strk@keybit.net>
+
+	* server/parser/edit_text_character.cpp (read): handle hasFontClass
+	  (log_unimpl, and some log_swferror).
+
 2008-06-10 Zou Lunkai <zoulunkai@gmail.com>
 	
 	* server/matrix.h: drop matrix::concatenate_scale(float s), not used any more.

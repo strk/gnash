@@ -57,12 +57,21 @@ edit_text_character_def::read(SWFStream* in, int tag_type,
 	bool  has_font       = flags & (1 << 0); 
 
     flags = in->read_u8();
-    // reserved_bit  = flags & (1 << 7);
+	// 0: no font class, 1 font class and height, can't be true if has_font was true
+	bool hasFontClass = flags & (1 << 7);
+	if ( hasFontClass && has_font )
+	{
+		IF_VERBOSE_MALFORMED_SWF(
+		log_swferror("DefineEditText: hasFontClass can't be true if hasFont is true, ignoring");
+		);
+		hasFontClass=false;
+	}
 	m_auto_size      = flags & (1 << 6); 
 	bool  has_layout = flags & (1 << 5); 
 	m_no_select      = flags & (1 << 4); 
 	m_border         = flags & (1 << 3); 
-	// reserved_bit  = flags & (1 << 2);
+	bool wasStatic   = flags & (1 << 2); // authored as static text (not dynamic text)
+	UNUSED(wasStatic);
 	m_html           = flags & (1 << 1); 
 	m_use_outlines   = flags & (1 << 0); 
 
@@ -79,6 +88,13 @@ edit_text_character_def::read(SWFStream* in, int tag_type,
 		}
 		m_text_height = in->read_u16();
 	}
+	else if ( hasFontClass )
+	{
+		std::string fontClassName;
+		in->read_string(fontClassName);
+		log_unimpl("Font class support for DefineEditText (%d)", fontClassName);
+	}
+	
 
 	if (has_color)
 	{
