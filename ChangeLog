@@ -1,3 +1,10 @@
+2008-06-10 Sandro Santilli <strk@keybit.net>
+
+	* libbase/IOChannel.h: give a default implementation for get_size()
+	  and a meaning to -1 (unknown).
+	* libbase/zlib_adapter.cpp: implement zlib adapter as a proper
+	  IOChannel subclass.
+
 2008-06-10 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/FreetypeGlyphsProvider.h: boost/cstdint.h include.

@@ -195,9 +195,9 @@ public:
 	/// and some have one but isn't necessarely truthful
 	/// (a few HTTP severs are bogus in this reguard).
 	///
-	/// @return unreliable input size. 
+	/// @return unreliable input size, -1 if not known. 
 	///
-	virtual int size() const=0;
+	virtual int size() const { return -1; }
    
 };
 
