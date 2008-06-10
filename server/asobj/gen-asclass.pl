@@ -67,7 +67,7 @@ EOF
 #include "gnashconfig.h"
 #endif
 
-//#include <memory> // for auto_ptr
+//#include <smart_ptr.h> // for intrusive_ptr and GC stuff
 
 namespace gnash {
 
@@ -77,7 +77,7 @@ class as_object;
 void $args{lc}_class_init(as_object& global);
 
 /// Return a $args{class} instance (in case the core lib needs it)
-//std::auto_ptr<as_object> init_$args{lc}_instance();
+//boost::intrusive_ptr<as_object> init_$args{lc}_instance();
 
 } // end of gnash namespace
 
