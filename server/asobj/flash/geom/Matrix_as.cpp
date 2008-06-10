@@ -32,7 +32,6 @@
 #include <boost/numeric/ublas/matrix.hpp> // boost matrix
 #include <boost/numeric/ublas/io.hpp>
 #include <sstream>
-#include <memory> // std::auto_ptr
 
 /// According to senocular, Flash docs get this wrong (b and c swapped).
 ///
@@ -345,7 +344,7 @@ Matrix_deltaTransformPoint(const fn_call& fn)
 #endif
 
     // Get an auto_ptr to a Point and pretend to keep alive.
-    boost::intrusive_ptr<as_object> ret = init_Point_instance().release();
+    boost::intrusive_ptr<as_object> ret = init_Point_instance();
     ret->set_member(NSV::PROP_X, point(0));
     ret->set_member(NSV::PROP_Y, point(1));
 

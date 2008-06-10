@@ -1,3 +1,8 @@
+2008-06-10 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/asobj/flash/geom/Point_as{.cpp.h},Matrix_as.cpp: drop auto_ptr
+	  for intrusive_ptr to pass a Point object.
+
 2008-06-10 Sandro Santilli <strk@keybit.net>
 
 	* libbase/IOChannel.h: give a default implementation for get_size()

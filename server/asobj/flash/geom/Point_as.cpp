@@ -671,9 +671,9 @@ static as_value get_flash_geom_point_constructor(const fn_call& /*fn*/)
 	return getFlashGeomPointConstructor();
 }
 
-std::auto_ptr<as_object> init_Point_instance()
+boost::intrusive_ptr<as_object> init_Point_instance()
 {
-    return std::auto_ptr<as_object>(new Point_as);
+    return boost::intrusive_ptr<as_object>(new Point_as);
 }
 
 // extern 
