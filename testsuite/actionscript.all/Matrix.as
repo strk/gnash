@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Matrix.as,v 1.6 2008/06/10 14:25:33 bwy Exp $";
+rcsid="$Id: Matrix.as,v 1.7 2008/06/10 16:52:00 bwy Exp $";
 
 
 // There are lots of floating point calculations here. Comparing them
@@ -201,6 +201,15 @@ m6.invert();
 check_equals(m6.toString(), "(a=3.51033024756149, b=6.78504050247288, c=-1.91770215441681, d=1.99078511643085, tx=2, ty=3)");
 
 
+// Matrix.transformPoint (and deltaTransformPoint again)
+p = new Point(23, 95);
+p2 = m6.transformPoint(p);
+check_equals(p2.toString(), "(x=-99.4441089756828, y=348.180517617807)");
+p3 = m6.deltaTransformPoint(p);
+check_equals(p3.toString(), "(x=-101.444108975683, y=345.180517617807)");
+p2 = m6.transformPoint(p2);
+check_equals(p2.toString(), "(x=-1014.78819244077, y=21.420285172384)");
+
 // Rotation applies to translation
 m3 = new Matrix(1, 0, 0, 1, 2, 2);
 m3.rotate (Math.PI / 2);
@@ -233,10 +242,39 @@ check_equals("" + m7, "(a=A string, b=undefined, c=[object Object], d=true, tx=N
 m7.rotate(2);
 check_equals(m7.toString(), "(a=NaN, b=NaN, c=NaN, d=NaN, tx=NaN, ty=NaN)");
 
+m8 = new Matrix(5, 4, 5, 3, 2, 1);
+check_equals(m8.toString(), "(a=5, b=4, c=5, d=3, tx=2, ty=1)");
+m8.createBox(4, 3, 4, 2, 3);
+check_equals(m8.toString(), "(a=-2.61457448345445, b=-2.27040748592378, c=3.02720998123171, d=-1.96093086259084, tx=2, ty=3)");
+m8.createBox(45, 444, -1.3874987, -47, -2999398);
+check_equals(m8.toString(), "(a=8.2022824555003, b=-436.562099487155, c=44.2461587318062, d=80.9291868942697, tx=-47, ty=-2999398)");
+m8.createBox(4, 3, new Object(), "a string");
+check_equals(m8.toString(), "(a=NaN, b=NaN, c=NaN, d=NaN, tx=a string, ty=0)");
+m8.createBox("a", "b");
+check_equals(m8.toString(), "(a=NaN, b=NaN, c=NaN, d=NaN, tx=0, ty=0)");
+
+m8.createGradientBox(20, 30, 2 * Math.PI, 10, 25);
+
+// The very small numbers aren't very 'accurate', of course.
+check_equals(m8.a.toString(), "0.01220703125");
+check_equals(m8.d.toString(), "0.018310546875");
+check_equals(m8.tx.toString(), "20");
+check_equals(m8.ty.toString(), "40");
+check(Math.abs(m8.b) < 0.0000000000001);
+check(Math.abs(m8.c) < 0.0000000000001);
+
+m8.createGradientBox(40, 49, 0, "string", undefined);
+// Half of the width is added to the translation - they take that quite literally...
+check_equals(m8.toString(), "(a=0.0244140625, b=0, c=0, d=0.0299072265625, tx=string20, ty=NaN)");
+m8.createGradientBox(5, 6, 0, 1, 1);
+check_equals(m8.toString(), "(a=0.0030517578125, b=0, c=0, d=0.003662109375, tx=3.5, ty=4)");
+m8.createGradientBox(5, 6, 2, 1, 1);
+check_equals(m8.toString(), "(a=-0.0012699793595799, b=0.00332994663144171, c=-0.00277495552620142, d=-0.00152397523149588, tx=3.5, ty=4)");
+
 //-------------------------------------------------------------
 // END OF TEST
 //-------------------------------------------------------------
 
-totals();
+totals(115);
 
 #endif // OUTPUT_VERSION >= 8

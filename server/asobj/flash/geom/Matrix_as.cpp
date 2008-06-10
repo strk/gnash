@@ -54,6 +54,7 @@
 namespace gnash {
 
 typedef boost::numeric::ublas::c_matrix<double, 3, 3> MatrixType;
+typedef boost::numeric::ublas::c_vector<double, 2> PointType;
 
 // Forward declarations
 static as_value Matrix_clone(const fn_call& fn);
@@ -68,8 +69,8 @@ static as_value Matrix_scale(const fn_call& fn);
 static as_value Matrix_toString(const fn_call& fn);
 static as_value Matrix_transformPoint(const fn_call& fn);
 static as_value Matrix_translate(const fn_call& fn);
-static void fillMatrix(MatrixType& matrix,
-                         as_object* const matrixObject);
+static void fillMatrix(MatrixType& matrix, as_object* const matrixObject);
+static PointType transformPoint(as_object* const pointObject, as_object* const matrixObject);
 
 as_value Matrix_ctor(const fn_call& fn);
 
@@ -178,13 +179,12 @@ Matrix_concat(const fn_call& fn)
 {
     boost::intrusive_ptr<Matrix_as> ptr = ensureType<Matrix_as>(fn.this_ptr);
 
-    if (fn.nargs != 1)
+    if (fn.nargs < 1)
     {
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror("Matrix.concat(%s) needs exactly one argument; "
-                        "%d were passed", ss.str(), fn.nargs);
+            log_aserror("Matrix.concat(%s): needs one argument", ss.str());
         );
         return as_value();
     }
@@ -235,31 +235,144 @@ Matrix_concat(const fn_call& fn)
 #endif 
     
     // Set values of current matrix
-    ptr->set_member(NSV::PROP_A, as_value(currentMatrix(0, 0)));
-    ptr->set_member(NSV::PROP_B, as_value(currentMatrix(1, 0)));
-    ptr->set_member(NSV::PROP_C, as_value(currentMatrix(0, 1)));
-    ptr->set_member(NSV::PROP_D, as_value(currentMatrix(1, 1)));
-    ptr->set_member(NSV::PROP_TX, as_value(currentMatrix(0, 2)));
-    ptr->set_member(NSV::PROP_TY, as_value(currentMatrix(1, 2)));
+    ptr->set_member(NSV::PROP_A, currentMatrix(0, 0));
+    ptr->set_member(NSV::PROP_B, currentMatrix(1, 0));
+    ptr->set_member(NSV::PROP_C, currentMatrix(0, 1));
+    ptr->set_member(NSV::PROP_D, currentMatrix(1, 1));
+    ptr->set_member(NSV::PROP_TX, currentMatrix(0, 2));
+    ptr->set_member(NSV::PROP_TY, currentMatrix(1, 2));
 
     return as_value();
 }
 
+
+/// Creates a matrix from (X scale, Y scale, rotation, X translation, Y translation)
+/// The translation values can be any as_value; the others (because mathematical
+/// operations are applied to them), result in NaN if anything other than a number
+/// is passed, so we treat them as doubles from the beginning.
 static as_value
 Matrix_createBox(const fn_call& fn)
 {
     boost::intrusive_ptr<Matrix_as> ptr = ensureType<Matrix_as>(fn.this_ptr);
-    UNUSED(ptr);
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
+
+    if (fn.nargs < 2)
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::ostringstream ss;
+            fn.dump_args(ss);
+            log_aserror("Matrix.createBox(%s): needs at least two arguments", ss.str());
+        );
+        return as_value();
+    }
+
+    double scaleX, scaleY;
+
+    // Default values for optional arguments    
+    double rotation = 0;
+    as_value tx, ty;
+    tx.set_double(0);
+    ty.set_double(0);
+    
+    switch (fn.nargs)
+    {
+        default:
+            // Log as coding error
+        case 5:
+            ty = fn.arg(4);
+        case 4:
+            tx = fn.arg(3);
+        case 3:
+            rotation = fn.arg(2).to_number();
+        case 2:
+            // There must be a minimum of 2 arguments.
+            scaleY = fn.arg(1).to_number();
+            scaleX = fn.arg(0).to_number();
+            break;
+    }
+    
+    
+    const double a = std::cos(rotation) * scaleX;
+    const double b = std::sin(rotation) * scaleY;
+    const double c = -std::sin(rotation) * scaleX;
+    const double d = std::cos(rotation) * scaleY;
+    
+    ptr->set_member(NSV::PROP_A, as_value(a));
+    ptr->set_member(NSV::PROP_B, as_value(b));
+    ptr->set_member(NSV::PROP_C, as_value(c));
+    ptr->set_member(NSV::PROP_D, as_value(d));
+    ptr->set_member(NSV::PROP_TX, tx);
+    ptr->set_member(NSV::PROP_TY, ty);
+    
     return as_value();
 }
 
+
+// Like createBox, but with strange offsets applied.
 static as_value
 Matrix_createGradientBox(const fn_call& fn)
 {
     boost::intrusive_ptr<Matrix_as> ptr = ensureType<Matrix_as>(fn.this_ptr);
-    UNUSED(ptr);
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
+
+    if (fn.nargs < 2)
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::ostringstream ss;
+            fn.dump_args(ss);
+            log_aserror("Matrix.createGradientBox(%s): needs at least two arguments", ss.str());
+        );
+        return as_value();
+    }
+
+    double widthX, widthY;
+
+    // Default values for optional arguments    
+    double rotation = 0;
+    as_value tx, ty;
+    tx.set_double(0);
+    ty.set_double(0);
+    
+    switch (fn.nargs)
+    {
+        default:
+            // Log as coding error
+        case 5:
+            ty = fn.arg(4);
+        case 4:
+            tx = fn.arg(3);
+        case 3:
+            rotation = fn.arg(2).to_number();
+        case 2:
+            // There must be a minimum of 2 arguments.
+            widthY = fn.arg(1).to_number();
+            widthX = fn.arg(0).to_number();
+            break;
+    }
+    
+    // A bit of a magic number: the maximum positive co-ordinate of
+    // a gradient square.
+    const double gradientSquareMax = 16384.0;
+    
+    const double a = std::cos(rotation) * widthX * 10 / gradientSquareMax;
+    const double b = std::sin(rotation) * widthY * 10 / gradientSquareMax;
+    const double c = -std::sin(rotation) * widthX * 10 / gradientSquareMax;
+    const double d = std::cos(rotation) * widthY * 10 / gradientSquareMax;
+    
+    ptr->set_member(NSV::PROP_A, as_value(a));
+    ptr->set_member(NSV::PROP_B, as_value(b));
+    ptr->set_member(NSV::PROP_C, as_value(c));
+    ptr->set_member(NSV::PROP_D, as_value(d));
+    
+    // The translation is offset by half the size of the corresponding
+    // dimension. Or rather, half the dimension is added to the translation,
+    // whether it's a number or not.
+    tx.newAdd(widthX / 2.0);
+    ty.newAdd(widthY / 2.0);
+
+    ptr->set_member(NSV::PROP_TX, tx);
+    ptr->set_member(NSV::PROP_TY, ty);
+    
+    return as_value();
+
     return as_value();
 }
 
@@ -273,9 +386,13 @@ Matrix_deltaTransformPoint(const fn_call& fn)
 {
     boost::intrusive_ptr<Matrix_as> ptr = ensureType<Matrix_as>(fn.this_ptr);
 
-    if (fn.nargs != 1)
+    if (fn.nargs < 1)
     {
-        //log error
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::ostringstream ss;
+            fn.dump_args(ss);
+            log_aserror("Matrix.deltaTransformPoint(%s): needs one argument", ss.str());
+        );
         return as_value();
     }
 
@@ -305,45 +422,9 @@ Matrix_deltaTransformPoint(const fn_call& fn)
         return as_value();
     }
 
-    // Get the point co-ordinates.
-    as_value x, y;
-    
-    obj->get_member(NSV::PROP_X, &x);
-    obj->get_member(NSV::PROP_Y, &y);
+    const PointType& point = transformPoint(obj, ptr.get());
 
-    // Get the matrix elements to use as a transformation matrix.
-    as_value a, b, c, d;
-
-    ptr->get_member(NSV::PROP_A, &a);
-    ptr->get_member(NSV::PROP_B, &b);
-    ptr->get_member(NSV::PROP_C, &c);
-    ptr->get_member(NSV::PROP_D, &d);
-
-    // Construct the matrix
-    boost::numeric::ublas::c_matrix<double, 2, 2> transformMatrix;
-    transformMatrix(0, 0) = a.to_number();
-    transformMatrix(0, 1) = b.to_number();
-    transformMatrix(1, 0) = c.to_number();
-    transformMatrix(1, 1) = d.to_number();
-
-    // Construct the point
-    boost::numeric::ublas::c_vector<double, 2> point;
-    point(0) = x.to_number();
-    point(1) = y.to_number();
-
-#ifdef GNASH_DEBUG_GEOM_MATRIX
-    log_debug("(Matrix.deltaTransformPoint) This matrix: %s", transformMatrix);
-    log_debug("(Matrix.deltaTransformPoint) Point vector (pre-transform): %s", point);
-#endif
-
-    // Transform
-    point = boost::numeric::ublas::prod(point, transformMatrix);
-
-#ifdef GNASH_DEBUG_GEOM_MATRIX
-    log_debug("(Matrix.deltaTransformPoint) Point vector (post-transform): %s", point);
-#endif
-
-    // Get an auto_ptr to a Point and pretend to keep alive.
+    // Construct a Point and set its properties.
     boost::intrusive_ptr<as_object> ret = init_Point_instance();
     ret->set_member(NSV::PROP_X, point(0));
     ret->set_member(NSV::PROP_Y, point(1));
@@ -363,12 +444,12 @@ Matrix_identity(const fn_call& fn)
 {
     boost::intrusive_ptr<Matrix_as> ptr = ensureType<Matrix_as>(fn.this_ptr);
 
-    ptr->set_member(NSV::PROP_A, as_value(1.0));
-    ptr->set_member(NSV::PROP_B, as_value(0.0));
-    ptr->set_member(NSV::PROP_C, as_value(0.0));
-    ptr->set_member(NSV::PROP_D, as_value(1.0));
-    ptr->set_member(NSV::PROP_TX, as_value(0.0));
-    ptr->set_member(NSV::PROP_TY, as_value(0.0));
+    ptr->set_member(NSV::PROP_A, 1.0);
+    ptr->set_member(NSV::PROP_B, 0.0);
+    ptr->set_member(NSV::PROP_C, 0.0);
+    ptr->set_member(NSV::PROP_D, 1.0);
+    ptr->set_member(NSV::PROP_TX, 0.0);
+    ptr->set_member(NSV::PROP_TY, 0.0);
 
     return as_value();
 }
@@ -398,12 +479,12 @@ Matrix_invert(const fn_call& fn)
     if (determinant == 0)
     {
         // Return the identity matrix
-        ptr->set_member(NSV::PROP_A, as_value(1.0));
-        ptr->set_member(NSV::PROP_B, as_value(0.0));
-        ptr->set_member(NSV::PROP_C, as_value(0.0));
-        ptr->set_member(NSV::PROP_D, as_value(1.0));
-        ptr->set_member(NSV::PROP_TX, as_value(0.0));
-        ptr->set_member(NSV::PROP_TY, as_value(0.0)); 
+        ptr->set_member(NSV::PROP_A, 1.0);
+        ptr->set_member(NSV::PROP_B, 0.0);
+        ptr->set_member(NSV::PROP_C, 0.0);
+        ptr->set_member(NSV::PROP_D, 1.0);
+        ptr->set_member(NSV::PROP_TX, 0.0);
+        ptr->set_member(NSV::PROP_TY, 0.0); 
         return as_value();  
     }
     
@@ -432,62 +513,69 @@ Matrix_rotate(const fn_call& fn)
 {
     boost::intrusive_ptr<Matrix_as> ptr = ensureType<Matrix_as>(fn.this_ptr);
 
-    if (fn.nargs == 1)
+    if (fn.nargs < 1)
     {
-        // Make rotation matrix
-        boost::numeric::ublas::c_matrix<double, 2, 2> transformMatrix;
-        
-        const double rot = fn.arg(0).to_number();
-        
-        transformMatrix(0, 0) = std::cos(rot);
-        transformMatrix(0, 1) = std::sin(rot);
-        transformMatrix(1, 0) = -std::sin(rot);
-        transformMatrix(1, 1) = std::cos(rot);
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::ostringstream ss;
+            fn.dump_args(ss);
+            log_aserror("Matrix.rotate(%s): needs one argument", ss.str());
+        );
+        return as_value();
+    }
 
-        // Get current matrix
-        boost::numeric::ublas::c_matrix<double, 2, 2> currentMatrix;
+    // Make rotation matrix
+    boost::numeric::ublas::c_matrix<double, 2, 2> transformMatrix;
+    
+    const double rot = fn.arg(0).to_number();
+    
+    transformMatrix(0, 0) = std::cos(rot);
+    transformMatrix(0, 1) = std::sin(rot);
+    transformMatrix(1, 0) = -std::sin(rot);
+    transformMatrix(1, 1) = std::cos(rot);
 
-        as_value a, b, c, d, tx, ty;
+    // Get current matrix
+    boost::numeric::ublas::c_matrix<double, 2, 2> currentMatrix;
 
-        ptr->get_member(NSV::PROP_A, &a);
-        ptr->get_member(NSV::PROP_B, &b);
-        ptr->get_member(NSV::PROP_C, &c);
-        ptr->get_member(NSV::PROP_D, &d);
-        ptr->get_member(NSV::PROP_TX, &tx);
-        ptr->get_member(NSV::PROP_TY, &ty);
-                
-        currentMatrix(0, 0) = a.to_number();
-        currentMatrix(0, 1) = b.to_number();
-        currentMatrix(1, 0) = c.to_number();
-        currentMatrix(1, 1) = d.to_number();
+    as_value a, b, c, d, tx, ty;
+
+    ptr->get_member(NSV::PROP_A, &a);
+    ptr->get_member(NSV::PROP_B, &b);
+    ptr->get_member(NSV::PROP_C, &c);
+    ptr->get_member(NSV::PROP_D, &d);
+    ptr->get_member(NSV::PROP_TX, &tx);
+    ptr->get_member(NSV::PROP_TY, &ty);
+            
+    currentMatrix(0, 0) = a.to_number();
+    currentMatrix(0, 1) = b.to_number();
+    currentMatrix(1, 0) = c.to_number();
+    currentMatrix(1, 1) = d.to_number();
 
 #ifdef GNASH_DEBUG_GEOM_MATRIX
-        log_debug("(Matrix.rotate) This matrix (pre-transform): %s", currentMatrix);
+    log_debug("(Matrix.rotate) This matrix (pre-transform): %s", currentMatrix);
 #endif
 
-        // Apply rotation to current matrix.
-        currentMatrix = boost::numeric::ublas::prod(currentMatrix, transformMatrix);
+    // Apply rotation to current matrix.
+    currentMatrix = boost::numeric::ublas::prod(currentMatrix, transformMatrix);
 
 #ifdef GNASH_DEBUG_GEOM_MATRIX
-        log_debug("(Matrix.rotate) Transformation matrix: %s", transformMatrix);
-        log_debug("(Matrix.rotate) This matrix (post-transform): %s", currentMatrix);
+    log_debug("(Matrix.rotate) Transformation matrix: %s", transformMatrix);
+    log_debug("(Matrix.rotate) This matrix (post-transform): %s", currentMatrix);
 #endif
- 
-        ptr->set_member(NSV::PROP_A, as_value(currentMatrix(0, 0)));
-        ptr->set_member(NSV::PROP_B, as_value(currentMatrix(0, 1)));
-        ptr->set_member(NSV::PROP_C, as_value(currentMatrix(1, 0)));
-        ptr->set_member(NSV::PROP_D, as_value(currentMatrix(1, 1)));
 
-        // Do rotation separately.
-        boost::numeric::ublas::c_vector<double, 2> translation;
-        translation(0) = tx.to_number();
-        translation(1) = ty.to_number();
-        
-        translation = boost::numeric::ublas::prod(translation, transformMatrix);
+    ptr->set_member(NSV::PROP_A, as_value(currentMatrix(0, 0)));
+    ptr->set_member(NSV::PROP_B, as_value(currentMatrix(0, 1)));
+    ptr->set_member(NSV::PROP_C, as_value(currentMatrix(1, 0)));
+    ptr->set_member(NSV::PROP_D, as_value(currentMatrix(1, 1)));
 
-        ptr->set_member(NSV::PROP_TX, as_value(translation(0)));
-        ptr->set_member(NSV::PROP_TY, as_value(translation(1)));  
-    }      
+    // Do rotation separately.
+    PointType translation;
+    translation(0) = tx.to_number();
+    translation(1) = ty.to_number();
+    
+    translation = boost::numeric::ublas::prod(translation, transformMatrix);
+
+    ptr->set_member(NSV::PROP_TX, translation(0));
+    ptr->set_member(NSV::PROP_TY, translation(1));  
 
     return as_value();
 }
@@ -496,57 +584,65 @@ static as_value
 Matrix_scale(const fn_call& fn)
 {
     boost::intrusive_ptr<Matrix_as> ptr = ensureType<Matrix_as>(fn.this_ptr);
-    if (fn.nargs == 2)
+
+    if (fn.nargs < 2)
     {
-        // Make scale matrix
-        boost::numeric::ublas::c_matrix<double, 2, 2> transformMatrix;
-        
-        const double scaleX = fn.arg(0).to_number();
-        const double scaleY = fn.arg(1).to_number();
-        
-        transformMatrix(0, 0) = scaleX;
-        transformMatrix(0, 1) = 0.0;
-        transformMatrix(1, 0) = 0.0;
-        transformMatrix(1, 1) = scaleY;
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::ostringstream ss;
+            fn.dump_args(ss);
+            log_aserror("Matrix.translate(%s): needs two arguments", ss.str());
+        );
+        return as_value();
+    }
 
-        // Get current matrix
-        boost::numeric::ublas::c_matrix<double, 2, 2> currentMatrix;
-        
-        as_value a, b, c, d, tx, ty;
+    // Make scale matrix
+    boost::numeric::ublas::c_matrix<double, 2, 2> transformMatrix;
+    
+    const double scaleX = fn.arg(0).to_number();
+    const double scaleY = fn.arg(1).to_number();
+    
+    transformMatrix(0, 0) = scaleX;
+    transformMatrix(0, 1) = 0.0;
+    transformMatrix(1, 0) = 0.0;
+    transformMatrix(1, 1) = scaleY;
 
-        ptr->get_member(NSV::PROP_A, &a);
-        ptr->get_member(NSV::PROP_B, &b);
-        ptr->get_member(NSV::PROP_C, &c);
-        ptr->get_member(NSV::PROP_D, &d);
-        ptr->get_member(NSV::PROP_TX, &tx);
-        ptr->get_member(NSV::PROP_TY, &ty);
-                
-        currentMatrix(0, 0) = a.to_number();
-        currentMatrix(0, 1) = b.to_number();
-        currentMatrix(1, 0) = c.to_number();
-        currentMatrix(1, 1) = d.to_number();
-        
+    // Get current matrix
+    boost::numeric::ublas::c_matrix<double, 2, 2> currentMatrix;
+    
+    as_value a, b, c, d, tx, ty;
+
+    ptr->get_member(NSV::PROP_A, &a);
+    ptr->get_member(NSV::PROP_B, &b);
+    ptr->get_member(NSV::PROP_C, &c);
+    ptr->get_member(NSV::PROP_D, &d);
+    ptr->get_member(NSV::PROP_TX, &tx);
+    ptr->get_member(NSV::PROP_TY, &ty);
+            
+    currentMatrix(0, 0) = a.to_number();
+    currentMatrix(0, 1) = b.to_number();
+    currentMatrix(1, 0) = c.to_number();
+    currentMatrix(1, 1) = d.to_number();
+    
 #ifdef GNASH_DEBUG_GEOM_MATRIX
-        log_debug("(Matrix.scale) This matrix (pre-transform): %s", currentMatrix);
+    log_debug("(Matrix.scale) This matrix (pre-transform): %s", currentMatrix);
 #endif
-        
-        // Apply scale to current matrix.
-        currentMatrix = boost::numeric::ublas::prod(currentMatrix, transformMatrix);
+    
+    // Apply scale to current matrix.
+    currentMatrix = boost::numeric::ublas::prod(currentMatrix, transformMatrix);
 
 #ifdef GNASH_DEBUG_GEOM_MATRIX
-        log_debug("(Matrix.scale) Transformation matrix: %s", transformMatrix);
-        log_debug("(Matrix.scale) This matrix (post-transform): %s", currentMatrix);
+    log_debug("(Matrix.scale) Transformation matrix: %s", transformMatrix);
+    log_debug("(Matrix.scale) This matrix (post-transform): %s", currentMatrix);
 #endif
 
-        ptr->set_member(NSV::PROP_A, as_value(currentMatrix(0, 0)));
-        ptr->set_member(NSV::PROP_B, as_value(currentMatrix(0, 1)));
-        ptr->set_member(NSV::PROP_C, as_value(currentMatrix(1, 0)));
-        ptr->set_member(NSV::PROP_D, as_value(currentMatrix(1, 1)));
+    ptr->set_member(NSV::PROP_A, currentMatrix(0, 0));
+    ptr->set_member(NSV::PROP_B, currentMatrix(0, 1));
+    ptr->set_member(NSV::PROP_C, currentMatrix(1, 0));
+    ptr->set_member(NSV::PROP_D, currentMatrix(1, 1));
 
-        // This is just a simple multiplication, so do it separately.
-        ptr->set_member(NSV::PROP_TX, as_value(tx.to_number() * scaleX));
-        ptr->set_member(NSV::PROP_TY, as_value(ty.to_number() * scaleY));  
-    }      
+    // This is just a simple multiplication, so do it separately.
+    ptr->set_member(NSV::PROP_TX, as_value(tx.to_number() * scaleX));
+    ptr->set_member(NSV::PROP_TY, as_value(ty.to_number() * scaleY));  
 
     return as_value();
 }
@@ -581,15 +677,71 @@ static as_value
 Matrix_transformPoint(const fn_call& fn)
 {
     boost::intrusive_ptr<Matrix_as> ptr = ensureType<Matrix_as>(fn.this_ptr);
-    UNUSED(ptr);
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
-    return as_value();
+
+    if (fn.nargs < 1)
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::ostringstream ss;
+            fn.dump_args(ss);
+            log_aserror("Matrix.translate(%s): needs one argument", ss.str());
+        );
+        return as_value();
+    }
+
+    const as_value& arg = fn.arg(0);
+    
+    if ( ! arg.is_object() )
+    {
+        /// Isn't an object...
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::ostringstream ss;
+            fn.dump_args(ss);
+            log_aserror("Matrix.transformPoint(%s): needs an object", ss.str());
+        );
+        return as_value();
+    }
+    
+    as_object* obj = arg.to_object().get();
+    assert(obj);
+    if ( ! obj->instanceOf(getFlashGeomPointConstructor()) )
+    {
+        /// Isn't a point.
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::ostringstream ss;
+            fn.dump_args(ss);
+            log_aserror("Matrix.transformPoint(%s): object must be a Point", ss.str());
+        );
+        return as_value();
+    }
+
+    as_value tx, ty;
+    ptr->get_member(NSV::PROP_TX, &tx);
+    ptr->get_member(NSV::PROP_TY, &ty);
+    
+    const PointType& point = transformPoint(obj, ptr.get());
+
+    boost::intrusive_ptr<as_object> ret = init_Point_instance();
+    ret->set_member(NSV::PROP_X, point(0) + tx.to_number());
+    ret->set_member(NSV::PROP_Y, point(1) + ty.to_number());
+
+    return as_value(ret.get());
 }
 
 static as_value
 Matrix_translate(const fn_call& fn)
 {
     boost::intrusive_ptr<Matrix_as> ptr = ensureType<Matrix_as>(fn.this_ptr);
+    
+    if (fn.nargs < 2)
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::ostringstream ss;
+            fn.dump_args(ss);
+            log_aserror("Matrix.translate(%s): needs two arguments", ss.str());
+        );
+        return as_value();    
+    }
+    
     if (fn.nargs == 2)
     {
 
@@ -607,6 +759,54 @@ Matrix_translate(const fn_call& fn)
     return as_value();
 }
 
+// A helper function to transform a point using a matrix object,
+// after which the translation can be applied if necessary
+// (transformPoint) or not if not (deltaTransformPoint). Just
+// make sure the objects are what they're supposed to be.
+static PointType
+transformPoint(as_object* const pointObject, as_object* const matrixObject)
+{
+    // Get the point co-ordinates.
+    as_value x, y;
+    
+    pointObject->get_member(NSV::PROP_X, &x);
+    pointObject->get_member(NSV::PROP_Y, &y);
+
+    // Get the matrix elements to use as a transformation matrix.
+    as_value a, b, c, d;
+
+    matrixObject->get_member(NSV::PROP_A, &a);
+    matrixObject->get_member(NSV::PROP_B, &b);
+    matrixObject->get_member(NSV::PROP_C, &c);
+    matrixObject->get_member(NSV::PROP_D, &d);
+
+    // Construct the matrix
+    boost::numeric::ublas::c_matrix<double, 2, 2> transformMatrix;
+    transformMatrix(0, 0) = a.to_number();
+    transformMatrix(0, 1) = b.to_number();
+    transformMatrix(1, 0) = c.to_number();
+    transformMatrix(1, 1) = d.to_number();
+
+    // Construct the point
+    PointType point;
+    point(0) = x.to_number();
+    point(1) = y.to_number();
+
+#ifdef GNASH_DEBUG_GEOM_MATRIX
+    log_debug("(Matrix.{delta}TransformPoint) This matrix: %s", transformMatrix);
+    log_debug("(Matrix.{delta}TransformPoint) Point vector (pre-transform): %s", point);
+#endif
+
+    // Transform
+    point = boost::numeric::ublas::prod(point, transformMatrix);
+
+#ifdef GNASH_DEBUG_GEOM_MATRIX
+    log_debug("(Matrix.{delta}TransformPoint) Point vector (post-transform): %s", point);
+#endif
+
+    return point;
+
+}
 
 // A helper function to create a boost matrix from a Matrix object
 static void fillMatrix(MatrixType& matrix,
@@ -645,7 +845,7 @@ Matrix_ctor(const fn_call& fn)
     
     as_value a, b, c, d, tx, ty;
 
-    if ( ! fn.nargs )
+    if (fn.nargs  == 0)
     {
         a.set_double(1);
         b.set_double(0);
@@ -659,7 +859,7 @@ Matrix_ctor(const fn_call& fn)
         switch (fn.nargs)
         {
             default:
-                // Log as coding error
+                // Log as coding error?
             case 6:
                 ty = fn.arg(5);
             case 5:
