@@ -1,5 +1,12 @@
 2008-06-10 Sandro Santilli <strk@keybit.net>
 
+	* libbase/LoadThread.{cpp,h}: take the IOChannel input at construction
+	  time
+	* server/asobj/LoadVars.cpp: update calls to LoadThread.
+	* server/asobj/xml.cpp: update calls to LoadThread.
+
+2008-06-10 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/libbase/NoSeekFileTest.cpp: fix build (don't use
 	  'read' as a variable name, being already a library function).
 

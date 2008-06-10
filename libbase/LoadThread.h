@@ -16,8 +16,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef __LOADTHREAD_H__
-#define __LOADTHREAD_H__
+#ifndef GNASH_LOADTHREAD_H
+#define GNASH_LOADTHREAD_H
 
 
 #include "IOChannel.h"
@@ -34,11 +34,12 @@
 // This is useful for debugging.
 #define THREADED_LOADS 1
 
+namespace gnash {
 
 /// \brief
 /// The LoadThread class can be used to download from a file
 /// or stream using a thread, without having to block.
-///
+//
 /// When the object is created it starts a thread which seeks forward
 /// in the IOCHannel given as an argument to the constructor, which will
 /// make cause the IOChannel backend to download the amount of data needed
@@ -49,25 +50,18 @@
 /// not been downloaded enough data to accomendate a request (seek/read)
 /// it will block until the data is present (curl_adaptor behavoir).
 ///
-/// When using the LoadThread, all access to the gnash::IOChannel should be
+/// When using the LoadThread, all access to the IOChannel should be
 /// done through LoadThread, or it will likely break.
 ///
-/// @todo When we read from a real movie stream (rtmp) we might
-/// want to use a cirkular-buffer.
-
 class DSOEXPORT LoadThread : private boost::noncopyable
 {
 
 public:
-	/// Just sets up the object
-	LoadThread();
+	/// Create a LoadThread using to the given IOChannel as input
+	LoadThread(std::auto_ptr<IOChannel> str);
 
 	/// Stops the download if still running
 	~LoadThread();
-
-	/// Sets the stream used for the connection, and starts the download
-	/// is the stream is valid. Returns true is the stream is valid, and else false.
-	bool setStream(std::auto_ptr<gnash::IOChannel> str);
 
 	/// Put read pointer at given position
 	//
@@ -142,7 +136,7 @@ private:
 	void fillCache();
 
 	/// The stream/file we want to access
-	std::auto_ptr<gnash::IOChannel> _stream;
+	std::auto_ptr<IOChannel> _stream;
 
 	volatile bool _completed;
 
@@ -188,4 +182,6 @@ private:
 	void reset();
 };
 
-#endif // __LOADTHREAD_H__
+} // namespace gnash
+
+#endif // GNASH_LOADTHREAD_H

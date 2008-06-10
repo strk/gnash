@@ -347,8 +347,7 @@ LoadVars::addLoadVariablesThread(const std::string& urlstr, const char* postdata
 
 	bool startTimer = _loadThreads.empty();
 
-	std::auto_ptr<LoadThread> lt ( new LoadThread );
-	lt->setStream(str);
+	std::auto_ptr<LoadThread> lt ( new LoadThread(str) );
 
 	// we push on the front to avoid invalidating
 	// iterators when queueLoad is called as effect

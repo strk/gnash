@@ -27,10 +27,11 @@
 # include "unistd.h" // for usleep()
 #endif
 
-using namespace gnash;
+namespace gnash {
 
-LoadThread::LoadThread()
+LoadThread::LoadThread(std::auto_ptr<IOChannel> stream)
 	:
+	_stream(stream),
 	_completed(false),
 	_loadPosition(0),
 	_userPosition(0),
@@ -44,6 +45,15 @@ LoadThread::LoadThread()
 	_streamSize(0),
 	_needAccess(false)
 {
+	assert(_stream.get());
+
+	// Start the downloading.
+	setupCache(); // what for ??
+#ifdef THREADED_LOADS
+	_thread.reset( new boost::thread(boost::bind(LoadThread::downloadThread, this)) );
+#else
+	downloadThread(this);
+#endif
 }
 
 void
@@ -100,25 +110,6 @@ LoadThread::cancelRequested() const
 {
     boost::mutex::scoped_lock lock(_mutex);
     return _cancelRequested;
-}
-
-bool LoadThread::setStream(std::auto_ptr<gnash::IOChannel> stream)
-{
-	_stream = stream;
-	if (_stream.get() != NULL) {
-		// Start the downloading.
-		setupCache();
-		_cancelRequested = false;
-#ifdef THREADED_LOADS
-		_thread.reset( new boost::thread(boost::bind(LoadThread::downloadThread, this)) );
-#else
-		downloadThread(this);
-#endif
-
-		return true;
-	} else {
-		return false;
-	}
 }
 
 int
@@ -421,3 +412,4 @@ void LoadThread::download()
 
 }
 
+} // namespace gnash
