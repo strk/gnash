@@ -887,10 +887,11 @@ SDL_sound_handler::mixActiveSound(active_sound& sound, sound_data& sounddata, Ui
 			}
 
 			tmp_raw_buffer = sound.decoder->decode(sound.get_data_ptr(sound.position), 
-						inputSize, tmp_raw_buffer_size, decodedBytes, parse);
+					inputSize, tmp_raw_buffer_size, decodedBytes, parse);
 
 			sound.position += decodedBytes;
 
+			// tmp_raw_buffer ownership transferred here
 			sound.appendDecodedData(tmp_raw_buffer, tmp_raw_buffer_size);
 
 			decoded_size += tmp_raw_buffer_size;
