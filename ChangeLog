@@ -1,5 +1,12 @@
 2008-06-11 Sandro Santilli <strk@keybit.net>
 
+	* libmedia/ffmpeg/AudioDecoderFfmpeg.cpp (decode): reintroduce
+	  support for the 'parse' parameter. Still not sure if that's
+	  a clean way to decode *sets* of frames, but at least it works
+	  for the time being.
+
+2008-06-11 Sandro Santilli <strk@keybit.net>
+
 	* libbase/Buffer.h: add copy ctor and assignment op.
 
 2008-06-11 Benjamin Wolsey <bwy@benjaminwolsey.de>

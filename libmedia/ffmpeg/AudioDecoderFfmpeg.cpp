@@ -20,8 +20,15 @@
 
 #include "AudioDecoderFfmpeg.h"
 #include <cmath> // for std::ceil
+#include <algorithm> // for std::copy
 
 //#define GNASH_DEBUG_AUDIO_DECODING
+
+#ifdef FFMPEG_AUDIO2
+# define AVCODEC_DECODE_AUDIO avcodec_decode_audio2
+#else
+# define AVCODEC_DECODE_AUDIO avcodec_decode_audio
+#endif
 
 namespace gnash {
 namespace media {
@@ -200,51 +207,98 @@ AudioDecoderFfmpeg::decode(boost::uint8_t* input, boost::uint32_t inputSize, boo
 		return 0;
 	}
 
-#if 0
-	LOG_ONCE( log_unimpl("Parsing inside FFMPEG AudioDecoder (shouldn't be needed, core lib should be fixed to not even try)") );
-	// TODO: for each parsed frame, call decodeFrame and
-	//       grow the buffer to return...
-	//assert(!parse);
-	decodedBytes=inputSize; // pretend we decoded everything
-	outputSize=0;		// and that resulting output is empty
-	return 0;
+	size_t retCapacity = AVCODEC_MAX_AUDIO_FRAME_SIZE;
+	boost::uint8_t* retBuf = new boost::uint8_t[retCapacity];
+	int retBufSize = 0;
 
-#else
-
-	long bytes_decoded = 0;
-	int bufsize = (AVCODEC_MAX_AUDIO_FRAME_SIZE * 3) / 2;
-	boost::uint8_t* output = new boost::uint8_t[bufsize];
-	boost::uint32_t orgbufsize = bufsize;
-	decodedBytes = 0;
-
-	bufsize = 0;
-	while (bufsize == 0 && decodedBytes < inputSize)
+#ifdef GNASH_DEBUG_AUDIO_DECODING
+	log_debug("  Parsing loop starts, input is %d bytes, retCapacity is %d bytes", inputSize, retCapacity);
+#endif // GNASH_DEBUG_AUDIO_DECODING
+	decodedBytes = 0; // nothing decoded yet
+	while (decodedBytes < inputSize)
 	{
-		boost::uint8_t* frame;
-		int framesize;
+		boost::uint8_t* frame=0; // parsed frame (pointer into input)
+		int framesize; // parsed frame size
 
-		bytes_decoded = av_parser_parse(_parser, _audioCodecCtx, &frame, &framesize, input+decodedBytes, inputSize-decodedBytes, 0, 0); //the last 2 is pts & dts
-
-		int tmp = 0;
-#ifdef FFMPEG_AUDIO2
-		bufsize = AVCODEC_MAX_AUDIO_FRAME_SIZE;
-		tmp = avcodec_decode_audio2(_audioCodecCtx, reinterpret_cast<boost::int16_t*>(output), &bufsize, frame, framesize);
-#else
-		tmp = avcodec_decode_audio(_audioCodecCtx, reinterpret_cast<boost::int16_t*>(output), &bufsize, frame, framesize);
-#endif
-
-		if (bytes_decoded < 0 || tmp < 0 || bufsize < 0) {
-			log_error(_("Error while decoding audio data. Upgrading ffmpeg/libavcodec might fix this issue."));
+		int consumed = av_parser_parse(_parser, _audioCodecCtx,
+			&frame, &framesize,
+			input+decodedBytes, inputSize-decodedBytes,
+			0, 0); // pts & dts
+		if (consumed < 0)
+		{
+			log_error(_("av_parser_parse returned %d. Upgrading ffmpeg/libavcodec might fix this issue."), consumed);
 			// Setting data position to data size will get the sound removed
 			// from the active sound list later on.
 			decodedBytes = inputSize;
 			break;
 		}
 
-		decodedBytes += bytes_decoded;
+#if GNASH_PARANOIA_LEVEL > 1
+		// the returned frame pointer is inside the input buffer
+		assert(frame >= input+decodedBytes && frame < input+inputSize);
+		// the returned frame size is within the input size
+		assert(framesize <= inputSize);
+		assert(frame+framesize <= input+inputSize);
+		// the number of bytes skipped to get to the frame
+		// is the offset to the parsed frame
+		assert(consumed == framesize);
+		assert(input+decodedBytes == frame);
+#endif
+
+		// all good so far, keep going..
+		// (we might do this immediately, as we'll override decodedBytes on error anyway)
+		decodedBytes += consumed;
+
+#ifdef GNASH_DEBUG_AUDIO_DECODING
+		log_debug("   parsed frame is %d bytes (consumed %d/%d)", framesize, decodedBytes, inputSize);
+#endif // GNASH_DEBUG_AUDIO_DECODING
+
+
+		// Now, decode the frame. We use the ::decodeFrame specialized function
+		// here so resampling is done appropriately
+		boost::uint32_t outSize = 0;
+		boost::uint8_t* outBuf = decodeFrame(frame, framesize, outSize);
+
+		if (!outBuf)
+		{
+			// Setting data position to data size will get the sound removed
+			// from the active sound list later on.
+			decodedBytes = inputSize;
+			break;
+		}
+
+#ifdef GNASH_DEBUG_AUDIO_DECODING
+		log_debug("   decoded frame is %d bytes, would grow return buffer size to %d bytes", outSize, retBufSize+(unsigned)outSize);
+#endif // GNASH_DEBUG_AUDIO_DECODING
+
+		//
+		// Now append this data to the buffer we're going to return
+		//
+
+		// if the new data doesn't fit, reallocate the output
+		// TODO: can use the Buffer class here.. if we return it too...
+		if ( retBufSize+(unsigned)outSize > retCapacity )
+		{
+#ifdef GNASH_DEBUG_AUDIO_DECODING
+			log_debug("    output buffer won't be able to hold %d bytes, capacity is only %d bytes",
+				retBufSize+(unsigned)outSize, retCapacity);
+#endif // GNASH_DEBUG_AUDIO_DECODING
+			boost::uint8_t* tmp = retBuf;
+			retCapacity = std::max(retBufSize+(unsigned)outSize, retCapacity*2);
+#ifdef GNASH_DEBUG_AUDIO_DECODING
+			log_debug("    reallocating it to hold up to %d bytes", retCapacity);
+#endif // GNASH_DEBUG_AUDIO_DECODING
+			retBuf = new boost::uint8_t[retCapacity];
+			if ( retBufSize ) std::copy(tmp, tmp+retBufSize, retBuf);
+			delete [] tmp;
+		}
+		std::copy(outBuf, outBuf+outSize, retBuf+retBufSize);
+		retBufSize+=(unsigned)outSize;
 	}
 
-#endif
+	
+	outputSize = retBufSize;
+	return retBuf;
 
 }
 
@@ -270,12 +324,7 @@ AudioDecoderFfmpeg::decodeFrame(boost::uint8_t* input, boost::uint32_t inputSize
 	// then decoding will eventually reduce it
 	int outSize = bufsize; 
 
-	int tmp = 
-#ifdef FFMPEG_AUDIO2
-		avcodec_decode_audio2(_audioCodecCtx, outPtr, &outSize, input, inputSize);
-#else
-		avcodec_decode_audio (_audioCodecCtx, outPtr, &outSize, input, inputSize);
-#endif
+	int tmp = AVCODEC_DECODE_AUDIO(_audioCodecCtx, outPtr, &outSize, input, inputSize);
 
 #ifdef GNASH_DEBUG_AUDIO_DECODING
 	log_debug(" avcodec_decode_audio[2](ctx, bufptr, %d, input, %d) returned %d and set frame_size to %d",
