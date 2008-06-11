@@ -98,30 +98,31 @@ public:
     /// Set the scale & rotation part of the matrix. angle in radians.
     void    set_scale_rotation(float x_scale, float y_scale, float rotation);
 
-    /// Set the scale part of the matrix, will keep current rotation
+    /// Set x and y scales, rotation is unchanged.
     void    set_scale(float x_scale, float y_scale);
 
-    /// Set the X scale part of the matrix, will keep current rotation and Y scale
+    /// Set x scale, rotation any y scale are unchanged.
     void    set_x_scale(float scale);
 
-    /// Set the Y scale part of the matrix, will keep current rotation and X scale
+    /// Set y scale, rotation and x scale are unchanged.
     void    set_y_scale(float scale);
 
-    /// Set the rotation part of the matrix, will keep current scale. Angle in radians.
+    /// Set rotation in radians, scales component are unchanged.
     void    set_rotation(float rotation);
 
-    /// Set x translation
+    /// Set x translation in TWIPS
     void set_x_translation(float x)
     {
         tx = x;
     }
 
-    /// Set y translation
+    /// Set y translation in TWIPS.
     void set_y_translation(float y)
     {
         ty = y;
     }
 
+    /// Set x and y translation in TWIPS.
     void set_translation(float x, float y)
     {
         tx = x;
@@ -143,33 +144,14 @@ public:
     ///
     void    transform(point* result, const point& p) const;
 
-    // Transform point 'p' by our matrix.
-    template <typename T>
-    void transform(geometry::Point2d<T>& p) const
-    {
-        transform(p.x, p.y);
-    }
-
+    /// Transform Range2d<float> 'r' by our matrix. 
+    //
+    /// NULL and WORLD ranges are untouched.
+    ///
+    void    transform(geometry::Range2d<float>& r) const;
+    
     /// Transform point 'p' by the inverse of our matrix. 
     void    transform_by_inverse(point& p) const;
-
-    /// Transform point 'x,y' by our matrix. 
-    template <typename T>
-    void
-    transform(T& x, T& y) const
-    // Transform point 'x,y' by our matrix.
-    {
-        float nx = (sx / 65536.0f) * x + (shy / 65536.0f) * y + tx;
-        float ny = (shx / 65536.0f) * x + (sy / 65536.0 ) * y + ty;
-        x = nx;
-        y = ny;
-    }
-
-    /// Transform vector 'v' by our matrix. Doesn't apply translation.
-    //
-    /// Put the result in *result.
-    ///
-    void    transform_vector(point* result, const point& p) const;
 
     /// Transform point 'p' by the inverse of our matrix. 
     //
@@ -177,18 +159,11 @@ public:
     ///
     void    transform_by_inverse(point* result, const point& p) const;
 
-    /// Transform Range2d<float> 'r' by our matrix. 
-    //
-    /// NULL and WORLD ranges are untouched.
-    ///
-    void    transform(geometry::Range2d<float>& r) const;
-
     /// Transform Range2d<float> 'r' by the inverse our matrix. 
     //
     /// NULL and WORLD ranges are untouched.
     ///
     void    transform_by_inverse(geometry::Range2d<float>& r) const;
-
 
     /// Set this matrix to the inverse of the given matrix.
     void    set_inverse(const matrix& m);
@@ -199,16 +174,16 @@ public:
     /// return the magnitude scale of our y coord output
     float   get_y_scale() const;
 
-    /// return our rotation component (in radians)
+    /// return rotation component in radians.
     float   get_rotation() const;
 
-    /// return the canonical x translation
+    /// return x translation n TWIPS unit.
     float   get_x_translation() const
     {
         return tx;
     }
 
-    /// return the canonical y translation
+    /// return y translation in TWIPS unit.
     float   get_y_translation() const
     {
         return ty;

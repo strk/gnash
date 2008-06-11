@@ -1,3 +1,7 @@
+2008-06-11 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* server/matrix.h: drop helpless templates, docs, cleanups. 
+	
 2008-06-10 Sandro Santilli <strk@keybit.net>
 
 	* libbase/BitsReader.h: add constructor taking a "parent" BitsReader
