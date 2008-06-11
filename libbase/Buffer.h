@@ -63,6 +63,39 @@ public:
 		delete _data;
 	}
 
+	/// Copy constructor
+	//
+	/// The copy ctor will set capacity to be
+	/// as small as required to hold the size of the
+	/// model buffer.
+	///
+	Buffer(const Buffer& b)
+		:
+		_data(0),
+		_size(b._size),
+		_capacity(b._size)
+	{
+		if ( _size )
+		{
+			_data = new boost::uint8_t[_size];
+			std::copy(b._data, b._data+b._size, _data);
+		}
+	}
+
+	/// Assignment operator
+	//
+	/// The assignment op will not reset capacity
+	///
+	Buffer& operator= (const Buffer& b)
+	{
+		if ( this != &b )  // don't waste time on self-assignment
+		{
+			resize(0); // shouldn't deallocate memory
+			append(b);
+		}
+		return *this;
+	}
+
 	/// Return true if buffer is empty
 	bool empty() const { return _size==0; }
 

@@ -1,3 +1,7 @@
+2008-06-11 Sandro Santilli <strk@keybit.net>
+
+	* libbase/Buffer.h: add copy ctor and assignment op.
+
 2008-06-11 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* testsuite/actionscript.all/Try.as: more tests, only build with
