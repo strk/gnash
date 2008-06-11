@@ -90,7 +90,7 @@ bin_PROGRAMS = gprocessor soldumper dumpshm
 gprocessor_SOURCES = processor.cpp
 gprocessor_CPPFLAGS = $(AM_CPPFLAGS)
 # export our symbols so they can be used by Gnash plugins
-gprocessor_LDFLAGS = -export-dynamic $(LIBLTDL)
+gprocessor_LDFLAGS = -export-dynamic $(AM_LDFLAGS)
 gprocessor_LDADD = $(GNASH_LIBS) 
 #gprocessor_DEPENDENCIES = 
 

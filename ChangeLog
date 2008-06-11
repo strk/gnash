@@ -1,3 +1,10 @@
+2008-06-11 Sandro Santilli <strk@keybit.net>
+
+	* utilities/Makefile.am: add full AM_LDFLAGS to gprocessor, otherwise
+	  only using the LDFLAGS explicitly put in overridden _LDFLAGS
+	  automake variable (at least on some systems, reported on bug
+	  #21536). Might need back-port to 0.8.3.
+
 2008-06-11 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* testsuite/actionscript.all/Try.as: initial tests for try / catch
