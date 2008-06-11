@@ -1,5 +1,15 @@
 2008-06-11 Sandro Santilli <strk@keybit.net>
 
+	* libmedia/sound_handler.h: drop the Buffer here, use the one in
+	  libbase.
+	* libmedia/ffmpeg/sound_handler_sdl.{cpp,h}: updated to use the
+	  Buffer in libbase, split body of the SDL callbacks in subfunction
+	  (still too big the lower one).
+	* libmedia/ffmpeg/AudioDecoderFfmpeg.cpp: try at reintroducing the
+	  parsing feature (isn't really working).
+
+2008-06-11 Sandro Santilli <strk@keybit.net>
+
 	* libbase/: Buffer.h, Makefile.am: add a generic Buffer class aimed
 	  at unifying buffer types among the whole gnash lib.
 

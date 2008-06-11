@@ -192,6 +192,15 @@ AudioDecoderFfmpeg::decode(boost::uint8_t* input, boost::uint32_t inputSize, boo
 		return ret;
 	}
 
+	if (!_parser)
+	{	
+		log_error(_("AudioDecoderFfmpeg: libavcodec can't parse the current audio format"));
+		decodedBytes=inputSize;
+		outputSize=0;
+		return 0;
+	}
+
+#if 0
 	LOG_ONCE( log_unimpl("Parsing inside FFMPEG AudioDecoder (shouldn't be needed, core lib should be fixed to not even try)") );
 	// TODO: for each parsed frame, call decodeFrame and
 	//       grow the buffer to return...
@@ -199,6 +208,44 @@ AudioDecoderFfmpeg::decode(boost::uint8_t* input, boost::uint32_t inputSize, boo
 	decodedBytes=inputSize; // pretend we decoded everything
 	outputSize=0;		// and that resulting output is empty
 	return 0;
+
+#else
+
+	long bytes_decoded = 0;
+	int bufsize = (AVCODEC_MAX_AUDIO_FRAME_SIZE * 3) / 2;
+	boost::uint8_t* output = new boost::uint8_t[bufsize];
+	boost::uint32_t orgbufsize = bufsize;
+	decodedBytes = 0;
+
+	bufsize = 0;
+	while (bufsize == 0 && decodedBytes < inputSize)
+	{
+		boost::uint8_t* frame;
+		int framesize;
+
+		bytes_decoded = av_parser_parse(_parser, _audioCodecCtx, &frame, &framesize, input+decodedBytes, inputSize-decodedBytes, 0, 0); //the last 2 is pts & dts
+
+		int tmp = 0;
+#ifdef FFMPEG_AUDIO2
+		bufsize = AVCODEC_MAX_AUDIO_FRAME_SIZE;
+		tmp = avcodec_decode_audio2(_audioCodecCtx, reinterpret_cast<boost::int16_t*>(output), &bufsize, frame, framesize);
+#else
+		tmp = avcodec_decode_audio(_audioCodecCtx, reinterpret_cast<boost::int16_t*>(output), &bufsize, frame, framesize);
+#endif
+
+		if (bytes_decoded < 0 || tmp < 0 || bufsize < 0) {
+			log_error(_("Error while decoding audio data. Upgrading ffmpeg/libavcodec might fix this issue."));
+			// Setting data position to data size will get the sound removed
+			// from the active sound list later on.
+			decodedBytes = inputSize;
+			break;
+		}
+
+		decodedBytes += bytes_decoded;
+	}
+
+#endif
+
 }
 
 boost::uint8_t*

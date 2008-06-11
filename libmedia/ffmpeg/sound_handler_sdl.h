@@ -23,6 +23,7 @@
 
 #include "sound_handler.h" // for inheritance
 #include "AudioDecoder.h"
+#include "Buffer.h"
 
 #include "log.h"
 
@@ -86,6 +87,7 @@ public:
 	void append(boost::uint8_t* data, unsigned int size)
 	{
 		_buf.append(data, size);
+		delete [] data; // since ownership was transferred...
 	}
 
 	/// Return size of the data buffer
@@ -110,7 +112,8 @@ public:
 	/// 	An assertion will fail if pos > size()
 	///
 	const boost::uint8_t* data(size_t pos) const {
-		return _buf.data(pos);
+		assert(pos < _buf.size());
+		return _buf.data()+pos;
 	}
 
 	/// Return a pointer to an offset in the underlying buffer
@@ -119,7 +122,8 @@ public:
 	/// 	An assertion will fail if pos > size()
 	///
 	boost::uint8_t* data(size_t pos) {
-		return _buf.data(pos);
+		assert(pos < _buf.size());
+		return _buf.data()+pos;
 	}
 
 	/// Volume for AS-sounds, range: 0-100.
@@ -136,6 +140,12 @@ public:
 
 	/// Drop all active sounds
 	void clearActiveSounds();
+
+	/// Drop an active sound
+	void eraseActiveSound(size_t i)
+	{
+		m_active_sounds.erase(m_active_sounds.begin() + i);
+	}
 };
 
 /// Used to hold the info about active sounds
@@ -247,12 +257,12 @@ public:
 	{
 		if ( ! _decodedData.get() )
 		{
-			_decodedData.reset( new Buffer(data, size) );
+			_decodedData.reset( new Buffer() );
 		}
-		else
-		{
-			_decodedData->assign(data, size);
-		}
+
+		_decodedData->resize(0); // shouldn't release memory
+		_decodedData->append(data, size);
+		delete [] data; // ownership transferred...
 	}
 
 	size_t rawDataSize() const
@@ -327,6 +337,10 @@ private:
 
 	// write a .WAV file header
 	void write_wave_header(std::ofstream& outfile);
+
+	void mixSoundData(sound_data& sounddata, Uint8* stream, unsigned int buffer_length);
+
+	void mixActiveSound(active_sound& sound, sound_data& sounddata, Uint8* stream, unsigned int buffer_length);
 
 public:
 	SDL_sound_handler();
