@@ -83,7 +83,9 @@ public:
 	/// 	Should we parse the audio? Needed for embedded MP3 sounds.
 	///
 	/// @return a pointer to the decoded data, or NULL if decoding fails.
-	///     The caller owns the decoded data.
+	///     The caller owns the decoded data, which was allocated with new [].
+	///
+	/// TODO: return a gnash::Buffer
 	///
 	virtual boost::uint8_t* decode(boost::uint8_t* /*input*/, boost::uint32_t /*inputSize*/, boost::uint32_t& /*outputSize*/, boost::uint32_t& /*decodedData*/, bool /*parse*/) { return NULL; }
 
@@ -96,7 +98,9 @@ public:
 	/// 	The output size of the video data, is passed by reference.
 	///
 	/// @return a pointer to the decoded data, or NULL if decoding fails.
-	///     The caller owns the decoded data.
+	///     The caller owns the decoded data, which was allocated with new [].
+	///
+	/// TODO: return a gnash::Buffer
 	///
 	virtual boost::uint8_t* decode(const EncodedAudioFrame& /*input*/,
 	                               boost::uint32_t& /*outputSize*/)
