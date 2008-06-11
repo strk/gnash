@@ -1345,7 +1345,7 @@ sound_stream_head_loader(SWFStream* in, tag_type tag, movie_definition* m)
     if ( playbackSoundRate != streamSoundRate )
     {
         LOG_ONCE(
-            log_unimpl(_("Different SWFStream/playback sound rate (%d/%d). "
+            log_unimpl(_("Different stream/playback sound rate (%d/%d). "
 			    "This seems common in SWF files, so we'll warn only once."),
 			    streamSoundRate,playbackSoundRate)
         );
@@ -1354,7 +1354,7 @@ sound_stream_head_loader(SWFStream* in, tag_type tag, movie_definition* m)
     if ( playbackSound16bit != streamSound16bit )
     {
         LOG_ONCE(
-            log_unimpl(_("Different SWFStream/playback sample size (%d/%d). "
+            log_unimpl(_("Different stream/playback sample size (%d/%d). "
 			"This seems common in SWF files, so we'll warn only once."),
 			streamSound16bit ? 16 : 32,
 			playbackSound16bit ? 16 : 32 )
@@ -1363,7 +1363,7 @@ sound_stream_head_loader(SWFStream* in, tag_type tag, movie_definition* m)
     if ( playbackSoundStereo != streamSoundStereo )
     {
         LOG_ONCE(
-            log_unimpl(_("Different SWFStream/playback channels (%s/%s). "
+            log_unimpl(_("Different stream/playback channels (%s/%s). "
 			"This seems common in SWF files, so we'll warn only once."),
 			    streamSoundStereo ? "stereo" : "mono",
 			    playbackSoundStereo ? "stereo":"mono")
