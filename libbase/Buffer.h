@@ -42,14 +42,20 @@ class Buffer {
 
 public:
 
-	/// Construct a Buffer with an optional initial size
-	Buffer(size_t size=0)
+	/// Construct a Buffer with an optional initial capacity
+	//
+	/// @param capacity
+	///	The initial buffer capacity. This is the amount of
+	///	bytes you can append to the buffer before a new reallocation
+	///	will occur.
+	///
+	Buffer(size_t capacity=0)
 		:
 		_data(0),
-		_size(size),
-		_capacity(size)
+		_size(0),
+		_capacity(capacity)
 	{
-		if ( _size ) _data = new boost::uint8_t[size];
+		if ( _capacity ) _data = new boost::uint8_t[_capacity];
 	}
 
 	~Buffer()
