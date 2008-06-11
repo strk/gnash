@@ -85,7 +85,9 @@ ASTESTS =			\
 	CustomActions.as	\
 	Date.as			\
 	Error.as		\
+	Function.as		\
 	Global.as		\
+	Inheritance.as		\
 	Key.as			\
 	LoadVars.as		\
 	Math.as			\
@@ -93,6 +95,7 @@ ASTESTS =			\
 	Mouse.as		\
 	MovieClip.as		\
 	MovieClipLoader.as	\
+	NetConnection.as	\
 	NetStream.as		\
 	Number.as		\
 	Random.as		\
@@ -104,11 +107,11 @@ ASTESTS =			\
 	TextField.as		\
 	TextFormat.as		\
 	TextSnapshot.as		\
+	Try.as \
 	Video.as		\
+	Matrix.as \
 	Object.as		\
-	Inheritance.as		\
-	NetConnection.as	\
-	Function.as		\
+	Point.as		\
 	with.as			\
 	XML.as			\
 	XMLSocket.as	\
@@ -120,8 +123,6 @@ ASTESTS =			\
 	ops.as			\
 	toString_valueOf.as	\
 	Rectangle.as		\
-	Point.as		\
-	Matrix.as \
 	$(NULL)
 
 ASTESTS_OUT = $(ASTESTS:.as=.swf)
