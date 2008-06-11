@@ -61,7 +61,7 @@ public:
 	bool empty() const { return _size==0; }
 
 	/// Get a pointer to start of data. May be NULL if size==0.
-	boost::uint8_t* data() { return _data.get(); }
+	boost::uint8_t* data() { return _data; }
 
 	/// Get a pointer to start of data. May be NULL if size==0.
 	const boost::uint8_t* data() const { return _data; }
