@@ -25,9 +25,9 @@
 
 //#include "dsodefs.h" // for DSOEXPORT (not used)
 
-#include <cassert>
-#include <cstring> // for memcpy, should be changed to use std::copy
-#include <boost/scoped_array.hpp>
+#include <cassert> // for assert
+#include <boost/cstdint.hpp> // for boost::uint8_t
+#include <algorithm> // for std::copy
 
 namespace gnash {
 
@@ -60,6 +60,12 @@ public:
 	/// Return true if buffer is empty
 	bool empty() const { return _size==0; }
 
+	/// Return size of the buffer
+	size_t size() const { return _size; }
+
+	/// Return capacity of the buffer
+	size_t capacity() const { return _capacity; }
+
 	/// Get a pointer to start of data. May be NULL if size==0.
 	boost::uint8_t* data() { return _data; }
 
@@ -85,7 +91,7 @@ public:
 		_data = new boost::uint8_t[_capacity];
 		if ( _size )
 		{
-			std::copy(_data, tmp, _size);
+			std::copy(tmp, tmp+_size, _data);
 			delete [] tmp;
 		}
 	}
@@ -105,7 +111,7 @@ public:
 	{
 		size_t curSize = _size;
 		resize(curSize+size);
-		std::copy(_data+curSize, newData, size);
+		std::copy(newData, newData+size, _data+curSize);
 		assert(_size == curSize+size);
 	}
 
