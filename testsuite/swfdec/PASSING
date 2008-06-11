@@ -200,6 +200,10 @@ crash-0.7.1-getTextExtent-5.swf:af71221ce4f99bf1de8a2d22249b0b20
 crash-0.7.1-getTextExtent-6.swf:2908bea995b41b399f4f7a7548964838
 crash-0.7.1-getTextExtent-7.swf:3d0271ae2ef15c60b6e04ea21f832784
 crash-0.7.1-getTextExtent-8.swf:47fcb7f542d3e85976594a5069aa98b9
+crash-0.7.1-throw-5.swf:4a54d089b1fd08ef3f3b8a3863878fa5
+crash-0.7.1-throw-6.swf:9a6eecc2b5c8719e09632b50f582b1e2
+crash-0.7.1-throw-7.swf:5a5ff9577985062102185216f9e7822c
+crash-0.7.1-throw-8.swf:3f7a9f84d42ab0d05b1d035f6ae37d56
 createTextField-returnvalue-6.swf:876f64cb4349313be58d1b9de5ca2ff4
 createTextField-returnvalue-7.swf:397473c78af05cbb9e7e394ec4ce1a07
 createTextField-returnvalue-8.swf:398e15cdabb4c9f9bdb56ee5b07e5126
@@ -491,6 +495,7 @@ movieclip-lockroot-8.swf:4da3e2092446bba32c303d35fdd7e5d7
 movieclip-lockroot-loadmovie-6.swf:679b3cea0d9643744aa29c88ae9908e1
 movieclip-lockroot-loadmovie-7.swf:84ad9218797251db3ee79f9241f27b67
 movieclip-lockroot-loadmovie-8.swf:3ac7430bf84185e34aee32b2d2394600
+movieclip-property-priorities-5.swf:21ffe3baf551c2dea5d2e04db214ff7f
 movieclip-set-prototype-5.swf:99235a738d69d9c78fa2bc5d355c6dae
 movieclip-set-prototype-6.swf:bae79ccbb89bb7c11cd1961d2c473022
 movieclip-set-prototype-7.swf:f147fff166cc46cdcda77d5012faddb0
@@ -732,6 +737,7 @@ removesprite-depths-6.swf:039c217ab8233668d64bffd2e7a6ef79
 removesprite-depths-7.swf:b792dc92c63978c09f9c937a2d5a24cf
 remove-with-onUnload-5.swf:5d41fcdce5757cff3e4c9678c9c3e72b
 replaceText-newline-5.swf:1add6bd68a2b79b0b794e0d6aed2ccbb
+resolve-parent-5.swf:2bfcdac89d2c7dc405ee275324ac8fc3
 rewind-remove-5.swf:70780bb0428e3795f6866a1c47bb46b0
 root-onload-5.swf:4f41e2bffb53d75ce665c54312f66190
 root-onload-6.swf:0d09109c7f942e8268aa0b9661071f1d
@@ -990,6 +996,14 @@ totalframes.swf:cdc0d5e2017d293438ef80fa136c44e8
 transform-properties-5.swf:9332e41f53db6ec456387efffd9e12a7
 transform-properties-5.swf:b0386824584340e1d0a80f986ce779b9
 transform.swf:5c8533f9168ca3e92d000ce1693ed5ef
+try-finally-5.swf:419caca90cf6f0dcd1b202836c5bd8a0
+try-finally-6.swf:8b462341ecc190d6468a6eb143c0cb33
+try-finally-7.swf:28fc37a5dcb77e53519b45128fa8ac3c
+try-finally-8.swf:d6867575c762eb8a0f9408492de920ff
+try-return-in-finally-5.swf:e002d3a27a49d819e4da875ef2d4e33c
+try-return-in-finally-6.swf:c7a6cbdc9c50bc0e94345dc135f0573f
+try-return-in-finally-7.swf:b49d6bc4aa2b5e9165b6a7c9cc30e5f7
+try-return-in-finally-8.swf:f07e0056ed2c700d6670af67d31ba761
 try-throw-in-finally-6.swf:1c12d4b0f949704bd0794d73f0385007
 try-throw-in-finally-7.swf:0342b214948d6bec886863f6f66cab33
 try-throw-in-finally-8.swf:f5b7ae88f4383ebcdb8313674a2d85cb

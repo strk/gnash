@@ -21,7 +21,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Try.as,v 1.2 2008/06/11 15:22:16 bwy Exp $";
+rcsid="$Id: Try.as,v 1.3 2008/06/11 20:54:44 bwy Exp $";
 #include "check.as"
 
 // Some of the test variants.
@@ -54,9 +54,9 @@ finally { r +="finally "; };
 r += ".";
 
 #if OUTPUT_VERSION < 7
-xcheck_equals(r, "1: try body catch  finally .");
+check_equals(r, "1: try body catch  finally .");
 #else
-xcheck_equals(r, "1: try body catch undefined finally .");
+check_equals(r, "1: try body catch undefined finally .");
 #endif
 
 r = "2: ";
@@ -80,7 +80,7 @@ try {
 }
 catch (c) { r += c + " "; };
 r += ".";
-xcheck_equals(r, "4: try finally thrown .");
+check_equals(r, "4: try finally thrown .");
 
 // Also check that the exception is not
 // undefined if nothing is thrown
@@ -89,7 +89,7 @@ r = "5: ";
 try { r += "try "; r += "body "; }
 catch (d) { r += "catch "; r+= d + " "; };
 r += ".";
-xcheck_equals(r, "5: try body catch pre-existing variable d .");
+check_equals(r, "5: try body catch pre-existing variable d .");
 
 r = "6: ";
 try { r += "try "; throw ("thrown"); r += "body "; }
@@ -107,7 +107,7 @@ try {
 }
 catch (f) { r += f + " "; };
 r += ".";
-xcheck_equals(r, "7: try finally finally2 thrown .");
+check_equals(r, "7: try finally finally2 thrown .");
 
 
 try {
@@ -127,9 +127,9 @@ try {
 catch (i) { r += i + " "; };
 r += ".";
 #if OUTPUT_VERSION < 7
-xcheck_equals(r, "8: try finally finally2 try2 catch2  thrown .");
+check_equals(r, "8: try finally finally2 try2 catch2  thrown .");
 #else
-xcheck_equals(r, "8: try finally finally2 try2 catch2 undefined thrown .");
+check_equals(r, "8: try finally finally2 try2 catch2 undefined thrown .");
 #endif
 
 try {
@@ -150,9 +150,9 @@ try {
 catch (l) { r+= "catch3 "; r += l + " "; };
 r += ".";
 #if OUTPUT_VERSION < 7
-xcheck_equals(r, "9: try finally catch thrown finally2 try2 catch2  catch3  .");
+check_equals(r, "9: try finally catch thrown finally2 try2 catch2  catch3  .");
 #else
-xcheck_equals(r, "9: try finally catch thrown finally2 try2 catch2 undefined catch3 undefined .");
+check_equals(r, "9: try finally catch thrown finally2 try2 catch2 undefined catch3 undefined .");
 #endif
 
 r = "10: ";

@@ -43,39 +43,49 @@ public:
 	{
 		TRY_TRY, // In a try block.
 		TRY_CATCH, // In a catch block.
-		TRY_FINALLY // In a finally block.
+		TRY_FINALLY, // In a finally block.
+		TRY_END // Finished with finally
 	};
 
     tryBlock(size_t cur_off, size_t try_size, size_t catch_size,
 		size_t finally_size, std::string catchName, int stack_depth)
-		: mCatchOffset(cur_off + try_size),
-		mFinallyOffset(cur_off + try_size + catch_size),
-		mAfterTriedOffset(cur_off + try_size + catch_size + finally_size),
-		mNamed(true), mName(catchName), mReg(), mState(tryBlock::TRY_TRY),
-		mThrownFromCatch(), mStackDepth(stack_depth)
+		:
+		_catchOffset(cur_off + try_size),
+		_finallyOffset(cur_off + try_size + catch_size),
+		_afterTriedOffset(cur_off + try_size + catch_size + finally_size),
+		_hasName(true),
+		_name(catchName),
+		_registerIndex(),
+		_tryState(tryBlock::TRY_TRY),
+		_lastThrow(),
+		_stackDepth(stack_depth)
 	{/**/}
 
 	tryBlock(size_t cur_off, size_t try_size, size_t catch_size,
 		size_t finally_size, boost::uint8_t register_index, int stack_depth)
-		: mCatchOffset(cur_off + try_size),
-		mFinallyOffset(cur_off + try_size + catch_size),
-		mAfterTriedOffset(cur_off + try_size + catch_size + finally_size),
-		mNamed(false), mName(), mReg(register_index),
-		mState(tryBlock::TRY_TRY), mThrownFromCatch(),
-		mStackDepth(stack_depth)
+		:
+		_catchOffset(cur_off + try_size),
+		_finallyOffset(cur_off + try_size + catch_size),
+		_afterTriedOffset(cur_off + try_size + catch_size + finally_size),
+		_hasName(false),
+		_name(),
+		_registerIndex(register_index),
+		_tryState(tryBlock::TRY_TRY),
+		_lastThrow(),
+		_stackDepth(stack_depth)
 	{/**/}
 
 private:
-	size_t mCatchOffset;
-	size_t mFinallyOffset;
-	size_t mAfterTriedOffset;
-	size_t mSavedEndOffset;
-	bool mNamed;
-	std::string mName;
-	boost::uint8_t mReg;
-	tryState mState;
-	as_value mThrownFromCatch;
-	boost::uint32_t mStackDepth;
+	size_t _catchOffset;
+	size_t _finallyOffset;
+	size_t _afterTriedOffset;
+	size_t _savedEndOffset;
+	bool _hasName;
+	std::string _name;
+	boost::uint8_t _registerIndex;
+	tryState _tryState;
+	as_value _lastThrow;
+	boost::uint32_t _stackDepth;
 };
 
 /// Executor of an action_buffer 
@@ -181,7 +191,7 @@ private:
 
 	character* _original_target;
 
-	std::list<tryBlock> mTryList;
+	std::list<tryBlock> _tryList;
 
 	bool mReturning;
 

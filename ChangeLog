@@ -1,3 +1,18 @@
+2008-06-11 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* testsuite/actionscript.all/Try.as: all my tests pass.
+	* testsuite/swfdec/PASSING: 14 tests pass, 12 new passes for try /
+	  catch / finally, 4 of which were not only failing but crashing
+	  before. One new failure for catch-in-register, but it's not clear
+	  whether that was a valid pass before.
+	* libbase/GnashException.h: add exception for unhandled AS
+	  exceptions.
+	* server/ActionExec.{h,cpp}: fix handling of try / catch / finally.
+	  It's difficult to say how as I'm not really sure what it was
+	  doing before, but comments about what it's supposed to do, and
+	  how it's implemented now, are in the code. It is an ugly patch
+	  at the moment, but will be cleaned up considerably.
+
 2008-06-11 Sandro Santilli <strk@keybit.net>
 
 	* libmedia/ffmpeg/AudioDecoderFfmpeg.cpp (decode): reintroduce
