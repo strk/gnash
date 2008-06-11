@@ -60,7 +60,7 @@ public:
 
 	~Buffer()
 	{
-		delete _data;
+		delete [] _data;
 	}
 
 	/// Copy constructor
