@@ -243,6 +243,7 @@ public:
 		}
   
 		_decodedData->append(data, size);
+		delete [] data; // ownership transferred...
 	}
   
 	/// Set decoded data
