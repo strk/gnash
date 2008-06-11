@@ -95,9 +95,9 @@ public:
 
 		boost::uint8_t* tmp = _data;
 		_data = new boost::uint8_t[_capacity];
-		if ( _size )
+		if ( tmp )
 		{
-			std::copy(tmp, tmp+_size, _data);
+			if ( _size ) std::copy(tmp, tmp+_size, _data);
 			delete [] tmp;
 		}
 	}
