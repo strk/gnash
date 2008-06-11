@@ -21,7 +21,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Try.as,v 1.1 2008/06/11 12:09:33 bwy Exp $";
+rcsid="$Id: Try.as,v 1.2 2008/06/11 15:22:16 bwy Exp $";
 #include "check.as"
 
 // Some of the test variants.
@@ -31,6 +31,8 @@ rcsid="$Id: Try.as,v 1.1 2008/06/11 12:09:33 bwy Exp $";
 // Try (throw) finally
 // Try catch
 // Try (throw) catch
+
+#if MING_VERSION_CODE >= 00040006
 
 throwfunc = function()
 {
@@ -42,7 +44,7 @@ throwfunc2 = function()
     try {
         throw "try";
     }
-    catch (e) {};
+    catch (g) {};
 };
 
 r = "1: ";
@@ -54,7 +56,7 @@ r += ".";
 #if OUTPUT_VERSION < 7
 xcheck_equals(r, "1: try body catch  finally .");
 #else
-check_equals(r, "1: try body catch undefined finally .");
+xcheck_equals(r, "1: try body catch undefined finally .");
 #endif
 
 r = "2: ";
@@ -108,9 +110,79 @@ r += ".";
 xcheck_equals(r, "7: try finally finally2 thrown .");
 
 
+try {
+    try {
+        r = "8: ";
+        try { r += "try "; throw ("thrown"); r += "body "; }
+        finally { r += "finally "; };
+    }
+    finally {
+        r += "finally2 ";
+        try {
+            r += "try2 ";
+        }
+        catch (h) { r += "catch2 "; r += h +" "; };
+    };
+}
+catch (i) { r += i + " "; };
+r += ".";
+#if OUTPUT_VERSION < 7
+xcheck_equals(r, "8: try finally finally2 try2 catch2  thrown .");
+#else
+xcheck_equals(r, "8: try finally finally2 try2 catch2 undefined thrown .");
+#endif
+
+try {
+    try {
+        r = "9: ";
+        try { r += "try "; throw ("thrown"); r += "body "; }
+        finally { r += "finally "; };
+    }
+    catch (j) { r += "catch "; r += j + " "; }
+    finally {
+        r += "finally2 ";
+        try {
+            r += "try2 ";
+        }
+        catch (k) { r += "catch2 "; r += k +" "; };
+    };
+}
+catch (l) { r+= "catch3 "; r += l + " "; };
+r += ".";
+#if OUTPUT_VERSION < 7
+xcheck_equals(r, "9: try finally catch thrown finally2 try2 catch2  catch3  .");
+#else
+xcheck_equals(r, "9: try finally catch thrown finally2 try2 catch2 undefined catch3 undefined .");
+#endif
+
+r = "10: ";
+try {
+    try { throw "try"; }
+    catch (e) { throw "catch"; }
+    finally { throw "finally"; };
+}
+catch (m) { r+= "catch " + m; };
+r += ".";
+check_equals(r, "10: catch finally.");
+
+r = "10: ";
+try {
+    try { throw "try"; }
+    catch (e) { throw "catch"; }
+    finally { throw "finally"; };
+}
+catch (m) { r+= "catch " + m; };
+r += ".";
+check_equals(r, "10: catch finally.");
+
+
 //try { throwfunc(); }
 //catch (g) { trace ("catch"); trace (g); };
 
 //try { throw "thrown"; }
 //finally { };
 //trace ("Don't reach this point");
+
+totals();
+
+#endif
