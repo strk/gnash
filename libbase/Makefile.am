@@ -123,7 +123,7 @@ libgnashbase_la_SOURCES = \
 noinst_HEADERS = \
 	$(LIBLTDLHEAD) \
 	dlmalloc.h \
-	Buffer.h \
+	SimpleBuffer.h \
 	extension.h \
 	GnashException.h \
 	gettext.h \

@@ -23,7 +23,7 @@
 
 #include "sound_handler.h" // for inheritance
 #include "AudioDecoder.h"
-#include "Buffer.h"
+#include "SimpleBuffer.h"
 
 #include "log.h"
 
@@ -62,7 +62,7 @@ class active_sound;
 class sound_data
 {
 	/// The undecoded data
-	Buffer _buf;
+	SimpleBuffer _buf;
 
 public:
 
@@ -151,9 +151,9 @@ public:
 /// Used to hold the info about active sounds
 //
 /// This class contains a pointer to the sound_data used for playing
-/// and an optional Buffer to use when decoding is needed.
+/// and an optional SimpleBuffer to use when decoding is needed.
 ///
-/// When the Buffer is NULL we'll play the sound_data bytes directly
+/// When the SimpleBuffer is NULL we'll play the sound_data bytes directly
 /// (we assume they are decoded already)
 ///
 class active_sound
@@ -239,7 +239,7 @@ public:
 	{
 		if ( ! _decodedData.get() )
 		{
-			_decodedData.reset( new Buffer );
+			_decodedData.reset( new SimpleBuffer );
 		}
   
 		_decodedData->append(data, size);
@@ -258,7 +258,7 @@ public:
 	{
 		if ( ! _decodedData.get() )
 		{
-			_decodedData.reset( new Buffer() );
+			_decodedData.reset( new SimpleBuffer() );
 		}
 
 		_decodedData->resize(0); // shouldn't release memory
@@ -290,7 +290,7 @@ private:
 	/// If NULL, the _undecodedData will be considered
 	/// decoded instead
 	///
-	std::auto_ptr<Buffer> _decodedData;
+	std::auto_ptr<SimpleBuffer> _decodedData;
 
 };
 

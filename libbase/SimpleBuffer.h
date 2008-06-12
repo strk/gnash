@@ -16,8 +16,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-#ifndef GNASH_BUFFER_H
-#define GNASH_BUFFER_H
+#ifndef GNASH_SIMPLEBUFFER_H
+#define GNASH_SIMPLEBUFFER_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -38,18 +38,18 @@ namespace gnash {
 /// It is a kind of a std::vector with a reduced interface
 /// in the intentions of the author.
 ///
-class Buffer {
+class SimpleBuffer {
 
 public:
 
-	/// Construct a Buffer with an optional initial capacity
+	/// Construct a SimpleBuffer with an optional initial capacity
 	//
 	/// @param capacity
 	///	The initial buffer capacity. This is the amount of
 	///	bytes you can append to the buffer before a new reallocation
 	///	will occur.
 	///
-	Buffer(size_t capacity=0)
+	SimpleBuffer(size_t capacity=0)
 		:
 		_data(0),
 		_size(0),
@@ -58,7 +58,7 @@ public:
 		if ( _capacity ) _data = new boost::uint8_t[_capacity];
 	}
 
-	~Buffer()
+	~SimpleBuffer()
 	{
 		delete [] _data;
 	}
@@ -69,7 +69,7 @@ public:
 	/// as small as required to hold the size of the
 	/// model buffer.
 	///
-	Buffer(const Buffer& b)
+	SimpleBuffer(const SimpleBuffer& b)
 		:
 		_data(0),
 		_size(b._size),
@@ -86,7 +86,7 @@ public:
 	//
 	/// The assignment op will not reset capacity
 	///
-	Buffer& operator= (const Buffer& b)
+	SimpleBuffer& operator= (const SimpleBuffer& b)
 	{
 		if ( this != &b )  // don't waste time on self-assignment
 		{
@@ -160,9 +160,9 @@ public:
 	/// the incoming data. The data will be copied.
 	///
 	/// @param newData
-	///	Buffer containing data to append
+	///	SimpleBuffer containing data to append
 	///
-	void append(const Buffer& buf)
+	void append(const SimpleBuffer& buf)
 	{
 		size_t incomingDataSize = buf.size();
 		const boost::uint8_t* incomingData = buf.data();
@@ -181,4 +181,4 @@ private:
 
 }	// namespace gnash
 
-#endif // GNASH_BUFFER_H
+#endif // GNASH_SIMPLEBUFFER_H

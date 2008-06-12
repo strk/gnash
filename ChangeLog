@@ -1,3 +1,10 @@
+2008-06-12 Sandro Santilli <strk@keybit.net>
+
+	* libbase/Buffer.h, SimpleBuffer.h, Makefile.am,
+	  libmedia/ffmpeg/sound_handler_sdl.h:
+	  Renamed Buffer to SimpleBuffer, to avoid name clash
+	  with the one in libamf.
+
 2008-06-12 Russ Nelson <nelson@crynwr.com>
 
 	* configure.ac:
