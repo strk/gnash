@@ -1,10 +1,10 @@
 2008-06-12 Sandro Santilli <strk@keybit.net>
 
-	* libbase/curl_adapter.cpp: drop tu_file references.
+	* libbase/curl_adapter.{h,cpp}: drop tu_file references.
 
 2008-06-12 Sandro Santilli <strk@keybit.net>
 
-	* libbase/noseek_fd_adapter.cpp: drop tu_file use, make the adapter
+	* libbase/noseek_fd_adapter.{cpp,h}: drop tu_file use, make the adapter
 	  an IOChanel subclass.
 
 2008-06-12 Benjamin Wolsey <bwy@benjaminwolsey.de>

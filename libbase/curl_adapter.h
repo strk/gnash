@@ -28,22 +28,22 @@ namespace gnash {
 class IOChannel;
 
 
-/// Code to wrap libcurl around a tu_file stream.
+/// Code to use libcurl as an IOChannel stream.
 namespace curl_adapter {
 
 /// \brief
-/// Returns a read-only tu_file stream that fetches data
+/// Returns a read-only IOChannel that fetches data
 /// from an url.
 //
-/// The caller owns the returned tu_file*.  
+/// The caller owns the returned IOChannel.  
 ///
 DSOEXPORT IOChannel* make_stream(const char* url);
 
 /// \brief
-/// Returns a read-only tu_file stream that fetches data
+/// Returns a read-only IOChannel that fetches data
 /// from an url getting posted to.
 //
-/// The caller owns the returned tu_file*.  
+/// The caller owns the returned IOChannel.  
 ///
 /// @param url
 ///	The url to post to.

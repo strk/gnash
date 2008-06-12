@@ -28,19 +28,20 @@ namespace gnash {
 class IOChannel;
 
 
-/// Code to use volatile (non-back-seekable) streams as tu_files
-/// by storing read bytes in a temporary file.
+/// Code to use volatile (non-back-seekable) streams as IOChannel
+/// objects (which are seekable by definition) by storing read bytes
+/// in a temporary file.
 namespace noseek_fd_adapter
 {
 
 /// \brief
-/// Returns a read-only tu_file stream that fetches data
+/// Returns a read-only IOChannel that fetches data
 /// from an file descriptor open for read.
 //
-/// The caller owns the returned tu_file*.  
+/// The caller owns the returned IOChannel.  
 ///
 /// Specify a cachefilename if you want to be able to access
-/// the full cache after deletion of the returned tu_file.
+/// the full cache after deletion of the returned IOChannel.
 ///
 DSOEXPORT IOChannel* make_stream(int fd, const char* cachefilename=NULL);
 
