@@ -125,8 +125,8 @@ fill_style::read(SWFStream* in, int tag_type, movie_definition* md,
             m_gradient_matrix.concatenate_scale(1.0f/512, 1.0f/512);
         }
 
-        matrix	m;
-        m.set_inverse(input_matrix);
+        matrix m = input_matrix;
+        m.invert();
 
 		if (is_morph)
 		{
@@ -137,7 +137,8 @@ fill_style::read(SWFStream* in, int tag_type, movie_definition* md,
 		if (is_morph)
 		{
 			input_matrix.read(in);
-			m.set_inverse(input_matrix);
+            m = input_matrix;
+            m.invert();
 			pOther->m_gradient_matrix.concatenate(m);
 		}
 		
@@ -288,13 +289,13 @@ fill_style::read(SWFStream* in, int tag_type, movie_definition* md,
 
         // For some reason, it looks like they store the inverse of the
         // TWIPS-to-texcoords matrix.
-        m_bitmap_matrix.set_inverse(m);
+        m_bitmap_matrix = m.invert();
 
 		if (is_morph)
 		{
 			pOther->m_bitmap_character = m_bitmap_character;
 			m.read(in);
-			pOther->m_bitmap_matrix.set_inverse(m);
+            pOther->m_bitmap_matrix = m.invert();
 		}
         IF_VERBOSE_PARSE(
             log_parse("matrix: %s", m_bitmap_matrix);

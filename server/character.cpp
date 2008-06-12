@@ -355,13 +355,10 @@ character::xmouse_get(const fn_call& fn)
 	VM::get().getRoot().get_mouse_state(x, y, buttons);
 
 	matrix m = ptr->get_world_matrix();
-
-	const point a(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
-	point b;
-		
-	m.transform_by_inverse(&b, a);
-
-	return as_value(TWIPS_TO_PIXELS(b.x));
+    point a(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
+    
+    m.invert().transform(a);
+    return as_value(TWIPS_TO_PIXELS(a.x));
 }
 
 as_value
@@ -374,13 +371,9 @@ character::ymouse_get(const fn_call& fn)
 	VM::get().getRoot().get_mouse_state(x, y, buttons);
 
 	matrix m = ptr->get_world_matrix();
-
-	const point a(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
-	point b;
-		
-	m.transform_by_inverse(&b, a);
-
-	return as_value(TWIPS_TO_PIXELS(b.y));
+    point a(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
+    m.invert().transform(a);
+    return as_value(TWIPS_TO_PIXELS(a.y));
 }
 
 as_value

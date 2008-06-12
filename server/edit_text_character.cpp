@@ -805,12 +805,9 @@ edit_text_character::get_topmost_mouse_entity(float x, float y)
 	}
 
 	matrix	m = get_matrix();
-		
-	point	p;
-	m.transform_by_inverse(&p, point(x, y));
+    point p(x, y);
+    m.invert().transform(p);
 
-	//const rect& def_bounds = m_def->get_bounds();
-	//if (def_bounds.point_test(p.x, p.y))
 	if ( _bounds.contains(p.x, p.y) )
 	{
 		return this;
@@ -1873,7 +1870,7 @@ edit_text_character::pointInShape(float x, float y) const
 {
 	matrix wm = get_world_matrix();
 	point lp(x, y);
-	wm.transform_by_inverse(lp);
+    wm.invert().transform(lp);
 	return _bounds.contains(lp.x, lp.y);
 }
 

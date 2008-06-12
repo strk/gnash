@@ -994,13 +994,9 @@ sprite_getBounds(const fn_call& fn)
 
     matrix tgtwmat = target->get_world_matrix();
     matrix srcwmat = sprite->get_world_matrix();
-    matrix invtgtwmat; invtgtwmat.set_inverse(tgtwmat);
-    matrix m = srcwmat;
-    m.concatenate(invtgtwmat);
-
 
     srcwmat.transform(bounds);
-    tgtwmat.transform_by_inverse(bounds);
+    tgtwmat.invert().transform(bounds);
   }
 
   // Magic numbers here... dunno why
@@ -1081,7 +1077,7 @@ sprite_globalToLocal(const fn_call& fn)
 
   point pt(x, y);
   matrix world_mat = sprite->get_world_matrix();
-  world_mat.transform_by_inverse(pt);
+  world_mat.invert().transform(pt);
 
   // These used to be: round(pt.x), which would round negative
   // half-values away from zero (-0.5 - > -1), whereas
@@ -1835,12 +1831,10 @@ sprite_beginGradientFill(const fn_call& fn)
 
     // Finally, and don't know why, take
     // the inverse of the resulting matrix as
-    // the one which would be used
-    mat.set_inverse( input_matrix );
-
+    // the one which would be used.
+    mat = input_matrix;
+    mat.invert();
   }
-
-  //cout << mat << endl;
 
   // ----------------------------
   // Create the gradients vector
@@ -3862,8 +3856,8 @@ sprite_instance::get_topmost_mouse_entity(float x, float y)
 
 
   matrix  m = get_matrix();
-  point pp;
-  m.transform_by_inverse(&pp, point(x, y));
+  point pp(x, y);
+  m.invert().transform(pp);
 
   MouseEntityFinder finder(wp, pp);
   //m_display_list.visitBackward(finder);

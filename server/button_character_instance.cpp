@@ -423,8 +423,8 @@ button_character_instance::get_topmost_mouse_entity(float x, float y)
 		std::sort(actChars.begin(), actChars.end(), charDepthLessThen);
 
 		matrix  m = get_matrix();
-		point p;
-		m.transform_by_inverse(&p, point(x, y));
+		point p(x, y);
+        m.invert().transform(p);
 
 		for (Chars::reverse_iterator it=actChars.rbegin(), itE=actChars.rend(); it!=itE; ++it)
 		{

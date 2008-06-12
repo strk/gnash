@@ -1305,8 +1305,8 @@ public:
     const matrix& fillstyle_matrix,
     const cxform& cx) {
     
-    matrix inv_stage_matrix;
-    inv_stage_matrix.set_inverse(stage_matrix);
+    matrix inv_stage_matrix = stage_matrix;
+    inv_stage_matrix.invert();
     
     size_t fcount = fill_styles.size();
     for (size_t fno=0; fno<fcount; fno++) {
@@ -1319,8 +1319,9 @@ public:
         case SWF::FILL_LINEAR_GRADIENT:
         {    
           matrix m = fill_styles[fno].get_gradient_matrix();
-          matrix cm;
-          cm.set_inverse(fillstyle_matrix);
+          matrix cm = fillstyle_matrix;
+          cm.invert();
+          
           m.concatenate(cm);
           m.concatenate(inv_stage_matrix);
           
@@ -1331,8 +1332,9 @@ public:
         case SWF::FILL_RADIAL_GRADIENT:
         {
           matrix m = fill_styles[fno].get_gradient_matrix();
-          matrix cm;
-          cm.set_inverse(fillstyle_matrix);
+          matrix cm = fillstyle_matrix;
+          cm.invert();
+          
           m.concatenate(cm);
           m.concatenate(inv_stage_matrix);
           
@@ -1343,8 +1345,9 @@ public:
         case SWF::FILL_FOCAL_GRADIENT:
         {
           matrix m = fill_styles[fno].get_gradient_matrix();
-          matrix cm;
-          cm.set_inverse(fillstyle_matrix);
+          matrix cm = fillstyle_matrix;
+          cm.invert();
+          
           m.concatenate(cm);
           m.concatenate(inv_stage_matrix);
           
@@ -1360,8 +1363,9 @@ public:
         case SWF::FILL_CLIPPED_BITMAP_HARD:
         {    
           matrix m = fill_styles[fno].get_bitmap_matrix();
-          matrix cm;
-          cm.set_inverse(fillstyle_matrix);
+          matrix cm = fillstyle_matrix;
+          cm.invert();
+          
           m.concatenate(cm);
           m.concatenate(inv_stage_matrix);
 
@@ -1940,7 +1944,8 @@ public:
   pixel_to_world(int x, int y)
   {
     point p(x, y);
-    stage_matrix.transform_by_inverse(p);
+    matrix mat = stage_matrix;
+    mat.invert().transform(p);
     return p;    
   };
   

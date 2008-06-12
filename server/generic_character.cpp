@@ -47,8 +47,9 @@ bool
 generic_character::pointInShape(float x, float y) const
 {
   matrix wm = get_world_matrix();
+  matrix wm_inverse = wm.invert();
   point lp(x, y);
-  wm.transform_by_inverse(lp);
+  wm_inverse.transform(lp);
   return m_def->point_test_local(lp.x, lp.y, wm);
 }
 

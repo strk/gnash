@@ -993,14 +993,11 @@ movie_root::doMouseDrag()
 		bounds.clamp(world_mouse);
 	}
 
-
-	point	parent_mouse;
-	parent_world_mat.transform_by_inverse(&parent_mouse, world_mouse);
-			
+    parent_world_mat.invert().transform(world_mouse);			
 	// Place our origin so that it coincides with the mouse coords
 	// in our parent frame.
 	matrix	local = dragChar->get_matrix();
-	local.set_translation( parent_mouse.x, parent_mouse.y );
+    local.set_translation(world_mouse.x, world_mouse.y);
 	dragChar->set_matrix(local);
 }
 

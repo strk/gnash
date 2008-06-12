@@ -3,6 +3,14 @@
 	* server/matrix.{h, cpp}: drop transform_by_inverse() and set_inverse(),
 	  add a invert() methord for inverting the matrix. make the interfaces 
 	  clearer. cleanups. 
+	* libbase/utility.h: add a DoubleToFixed16() function.
+	* server/character.cpp,
+	  server/button_character.cpp
+	  server/edit_text_character.cpp
+	  server/movie_root.cpp
+	  server/sprite_instance.cpp
+	  backend/render_handler_agg.cpp: use the simplified interfaces of the new
+	  matrix, cleanups.
 	
 2008-06-11 Benjamin Wolsey <bwy@benjaminwolsey.de>
 

@@ -114,8 +114,7 @@ inline float infinite_to_fzero(float x)
 
 inline int iabs(int i)
 {
-    if (i < 0) return -i;
-    else return i;
+    return (i < 0) ? -i : i;
 }
 
 template <typename T> inline T clamp(T i, T min, T max)
@@ -146,6 +145,12 @@ inline boost::int32_t FloatToFixed16(float a)
 {
     // There might be overflows, but we don't care in our specific case.
     return (boost::int32_t)(a * 65536.0f);
+}
+
+inline boost::int32_t DoubleToFixed16(double a)
+{
+    // There might be overflows, but we don't care in our specific case.
+    return (boost::int32_t)(a * 65536.0);
 }
 
 }
