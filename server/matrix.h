@@ -149,25 +149,10 @@ public:
     /// NULL and WORLD ranges are untouched.
     ///
     void    transform(geometry::Range2d<float>& r) const;
+
+    /// Invert this matrix and return the result.
+    const matrix& invert();
     
-    /// Transform point 'p' by the inverse of our matrix. 
-    void    transform_by_inverse(point& p) const;
-
-    /// Transform point 'p' by the inverse of our matrix. 
-    //
-    /// Put result in *result.
-    ///
-    void    transform_by_inverse(point* result, const point& p) const;
-
-    /// Transform Range2d<float> 'r' by the inverse our matrix. 
-    //
-    /// NULL and WORLD ranges are untouched.
-    ///
-    void    transform_by_inverse(geometry::Range2d<float>& r) const;
-
-    /// Set this matrix to the inverse of the given matrix.
-    void    set_inverse(const matrix& m);
-
     /// return the magnitude scale of our x coord output
     float   get_x_scale() const;
 
@@ -189,8 +174,9 @@ public:
         return ty;
     }
 
+private: 
     /// Return the determinant of this matrix in 32.32 fixed point format.
-    boost::int64_t  get_determinant() const;
+    boost::int64_t  determinant() const;
 };
 
 inline bool operator== (const matrix& a, const matrix& b)

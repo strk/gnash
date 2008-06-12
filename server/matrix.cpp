@@ -27,10 +27,8 @@
 
 #include "matrix.h"
 #include "stream.h" // for reading from SWF
-#include "types.h" // for TWIPS_TO_PIXEL define
-                   // (should probably not use it though)
-#include "log.h"
-#include "utility.h" // for utility::infinite_to_fzero, utility::isFinite
+#include "types.h"  // for TWIPS_TO_PIXELS
+#include "utility.h"
 
 namespace gnash {
 
@@ -86,9 +84,10 @@ matrix::read(SWFStream& in)
 bool
 matrix::is_valid() const
 {
+    // The integer matrix is always valid now from outside.
+    // swallow it if anything wrong inside this class.
     return true;
 }
-
 
 void
 matrix::set_identity()
@@ -247,66 +246,40 @@ matrix::transform(geometry::Range2d<float>& r) const
     r.expandTo(p3.x, p3.y);
 }
 
-
-void
-matrix::transform_by_inverse(point* result, const point& p) const
-// Transform point 'p' by the inverse of our matrix.  Put result in *result.
+const matrix&
+matrix::invert()
+// invert this matrix and return the result.
 {
-    // @@ TODO optimize this!
-    matrix  m;
-    m.set_inverse(*this);
-    m.transform(result, p);
-}
-
-void
-matrix::transform_by_inverse(point& p) const
-// Transform point 'p' by the inverse of our matrix.  
-{
-    // @@ TODO optimize this!
-    matrix  m;
-    m.set_inverse(*this);
-    m.transform(p);
-}
-
-void
-matrix::transform_by_inverse(geometry::Range2d<float>& r) const
-{
-    // @@ TODO optimize this!
-    matrix  m;
-    m.set_inverse(*this);
-    m.transform(r);
-}
-
-
-void
-matrix::set_inverse(const matrix& m)
-// Set this matrix to the inverse of the given matrix.
-{
-    assert(this != &m);
-
-    boost::int64_t  det = m.get_determinant();
-    if (det == 0)
+    boost::int64_t det = determinant();
+    if(det == 0)
     {
-        // cann't invert this matrix, set it to identity.
-        // this might happen when xscale == yscale == 0
+        // TODO: check this.
         set_identity();
     }
     else
     {
-        double  inv_det = 65536.0 * 65536.0 / det;
-        sx  = (boost::int32_t)(m.sy * inv_det);
-        sy  = (boost::int32_t)(m.sx * inv_det);
-        shy = -(boost::int32_t)(m.shy * inv_det);
-        shx = -(boost::int32_t)(m.shx * inv_det);
+        double  d = 65536.0 * 65536.0 / det;
+    
+        boost::int32_t d_fixed = DoubleToFixed16(d);
+        boost::int32_t t0, t4;
         
-        tx = -( Fixed16Mul(sx,  m.tx) + Fixed16Mul(shy, m.ty) );
-        ty = -( Fixed16Mul(shx, m.tx) + Fixed16Mul(sy,  m.ty) );
+        t0 = Fixed16Mul(sy, d_fixed);
+        sy  = Fixed16Mul(sx, d_fixed);
+        shy = Fixed16Mul(-shy, d_fixed);
+        shx = Fixed16Mul(-shx, d_fixed);
+
+        t4 = - ( Fixed16Mul(tx, t0) + Fixed16Mul(ty, shy) );
+        ty = - ( Fixed16Mul(tx, shx)+ Fixed16Mul(ty, sy) );
+
+        sx = t0;
+        tx = t4;
     }
+
+    return *this;
 }
 
-
 boost::int64_t
-matrix::get_determinant() const
+matrix::determinant() const
 // Return the 32.32 fixed point determinant of this matrix.
 {
     return (boost::int64_t)sx * sy - (boost::int64_t)shx * shy;
@@ -327,7 +300,7 @@ matrix::get_y_scale() const
 float
 matrix::get_rotation() const
 {
-    if (get_determinant() < 0)
+    if (determinant() < 0)
     {
         // TODO: check this.
         return atan2f(shx, -sx);
