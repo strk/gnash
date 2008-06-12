@@ -78,13 +78,13 @@ edit_text_character_def::read(SWFStream* in, int tag_type,
 	if (has_font)
 	{
 		in->ensureBytes(4);
-		int fontID = in->read_u16();
-		m_font = m->get_font(fontID);
+		m_font_id = in->read_u16();
+		m_font = m->get_font(m_font_id);
 		if (m_font == NULL)
 		{
-			// this is fine, the textfield would use a default device font
-			//log_debug(_("text style with undefined font; font_id = %d; using a default font"), m_font_id);
-			m_font = fontlib::get_default_font().get();
+			IF_VERBOSE_MALFORMED_SWF(
+			log_swferror("DefineEditText: tag refers to unknown font id %d", m_font_id);
+			);
 		}
 		m_text_height = in->read_u16();
 	}
@@ -140,6 +140,10 @@ edit_text_character_def::read(SWFStream* in, int tag_type,
 const font*
 edit_text_character_def::get_font()
 {
+	if ( ! m_font )
+	{
+		m_font = fontlib::get_default_font().get();
+	}
 	return m_font.get();
 }
 

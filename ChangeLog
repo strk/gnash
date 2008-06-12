@@ -1,3 +1,9 @@
+2008-06-12 Sandro Santilli <strk@keybit.net>
+
+	* server/parser/edit_text_character_def.cpp: fix regression making
+	  dynamically created text not find any font (we'll use the default
+	  one instead).
+
 2008-06-12 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/vm/ActionExec.{h,cpp}: fix throw in register again (prevents
