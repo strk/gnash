@@ -20,12 +20,11 @@
 #endif
 
 #include "noseek_fd_adapter.h"
-#include "tu_file.h"
+#include "IOChannel.h" // for inheritance
 #include "utility.h"
-#include "GnashException.h"
 #include "log.h"
 
-#include <unistd.h>
+#include <unistd.h> // for ::read
 #include <cstring>
 
 #include <boost/scoped_array.hpp>
@@ -61,7 +60,7 @@ namespace noseek_fd_adapter {
  * 
  **********************************************************************/
 
-class NoSeekFile
+class NoSeekFile : public IOChannel
 {
 
 public:
@@ -81,23 +80,25 @@ public:
 
 	~NoSeekFile();
 
-	/// Read 'bytes' bytes into the given buffer.
-	//
-	/// Return number of actually read bytes
-	///
-	size_t read_cache(void *dst, size_t bytes);
+	// See IOChannel.h for description
+	virtual int read(void *dst, int bytes);
 
-	/// Return true if EOF has been reached
-	bool eof();
+	// See IOChannel for description
+	virtual bool eof() const;
 
-	/// Return zero if everything is fine (?)
-	int err() { return 0; }
+	// See IOChannel for description
+	virtual int get_error() const { return 0; }
 
-	/// Report global position within the file
-	size_t tell();
+	// See IOChannel for description
+	virtual int tell() const;
 
-	/// Put read pointer at given position
-	bool seek(size_t pos);
+	// See IOChannel for description
+	virtual int seek(int pos);
+
+	// See IOChannel for description
+	virtual void go_to_end() {
+		throw IOException("noseek_fd_adapter doesn't support seek to end");
+	}
 
 private:
 
@@ -177,7 +178,7 @@ NoSeekFile::cache(void *from, size_t sz)
 			"writing to cache file: requested " SIZET_FMT ", wrote " SIZET_FMT " (%s)",
 			sz, wrote, strerror(errno));
 		fprintf(stderr, "%s\n", errmsg);
-		throw gnash::GnashException(errmsg);
+		throw IOException(errmsg);
 	}
 
 	_cached += sz;
@@ -221,13 +222,13 @@ NoSeekFile::fill_cache(size_t size)
 		fprintf(stderr, " bytes needed = " SIZET_FMT "\n", bytesNeeded);
 #endif
 
-		ssize_t bytesRead = read(_fd, (void*)_buf, bytesNeeded);
+		ssize_t bytesRead = ::read(_fd, (void*)_buf, bytesNeeded);
 		if ( bytesRead < 0 )
 		{
 			std::cerr << boost::format(_("Error reading %d bytes from input stream")) % bytesNeeded;
 			_running = false;
 			// this looks like a CRITICAL error (since we don't handle it..)
-			throw gnash::GnashException("Error reading from input stream");
+			throw IOException("Error reading from input stream");
 			return;
 		}
 
@@ -264,14 +265,14 @@ NoSeekFile::openCacheFile()
 		_cache = fopen(_cachefilename, "w+b");
 		if ( ! _cache )
 		{
-			throw gnash::GnashException("Could not create cache file " + std::string(_cachefilename));
+			throw IOException("Could not create cache file " + std::string(_cachefilename));
 		}
 	}
 	else
 	{
 		_cache = tmpfile();
 		if ( ! _cache ) {
-			throw gnash::GnashException("Could not create temporary cache file");
+			throw IOException("Could not create temporary cache file");
 		}
 	}
 
@@ -296,8 +297,8 @@ NoSeekFile::~NoSeekFile()
 }
 
 /*public*/
-size_t
-NoSeekFile::read_cache(void *dst, size_t bytes)
+int
+NoSeekFile::read(void *dst, int bytes)
 {
 #ifdef GNASH_NOSEEK_FD_VERBOSE
 	fprintf(stderr, "read_cache(%d) called\n", bytes);
@@ -340,12 +341,11 @@ NoSeekFile::read_cache(void *dst, size_t bytes)
 
 	return ret;
 
-
 }
 
 /*public*/
 bool
-NoSeekFile::eof()
+NoSeekFile::eof() const
 {
 	bool ret = ( ! _running && feof(_cache) );
 	
@@ -357,10 +357,10 @@ NoSeekFile::eof()
 }
 
 /*public*/
-size_t
-NoSeekFile::tell()
+int
+NoSeekFile::tell() const
 {
-	long ret =  ftell(_cache);
+	int ret =  ftell(_cache);
 
 #ifdef GNASH_NOSEEK_FD_VERBOSE
 	fprintf(stderr, "tell() returning %ld\n", ret);
@@ -371,8 +371,8 @@ NoSeekFile::tell()
 }
 
 /*public*/
-bool
-NoSeekFile::seek(size_t pos)
+int
+NoSeekFile::seek(int pos)
 {
 #ifdef GNASH_NOSEEK_FD_WARN_SEEKSBACK
 	if ( pos < tell() ) {
@@ -386,9 +386,9 @@ NoSeekFile::seek(size_t pos)
 
 	if ( fseek(_cache, pos, SEEK_SET) == -1 ) {
 		fprintf(stderr, "Warning: fseek failed\n");
-		return false;
+		return -1;
 	} else {
-		return true;
+		return 0;
 	}
 
 }
@@ -398,70 +398,6 @@ NoSeekFile::seek(size_t pos)
  * Adapter calls
  * 
  **********************************************************************/
-
-
-// Return number of bytes actually read.
-static int
-read(void* dst, int bytes, void* appdata)
-{
-	NoSeekFile* stream = (NoSeekFile*) appdata;
-	return stream->read_cache(dst, bytes);
-}
-
-static bool
-eof(void* appdata)
-{
-	NoSeekFile* stream = (NoSeekFile*) appdata;
-	return stream->eof();
-}
-
-static int
-err(void* appdata)
-{
-	NoSeekFile* stream = (NoSeekFile*) appdata;
-	if ( ! stream ) return TU_FILE_OPEN_ERROR;
-	return stream->err();
-}
-
-static int
-write(const void* /*src*/, int /*bytes*/, void* /*appdata*/)
-{
-	abort(); // not supported
-	return 0;
-}
-
-static int
-seek(int pos, void* appdata)
-{
-	NoSeekFile* stream = (NoSeekFile*) appdata;
-	if ( stream->seek(pos) ) return 0;
-	else return TU_FILE_SEEK_ERROR;
-}
-
-static int
-seek_to_end(void* /*appdata*/)
-{
-	abort(); // not supported
-	return 0;
-}
-
-static int
-tell(void* appdata)
-{
-	NoSeekFile* stream = (NoSeekFile*) appdata;
-	return stream->tell();
-}
-
-static int
-close(void* appdata)
-{
-	NoSeekFile* stream = (NoSeekFile*) appdata;
-
-	delete stream;
-
-	//return TU_FILE_CLOSE_ERROR;
-	return 0;
-}
 
 // this is the only exported interface
 IOChannel*
@@ -481,17 +417,7 @@ make_stream(int fd, const char* cachefilename)
 		return NULL;
 	}
 
-	return new tu_file(
-		(void*)stream, // opaque user pointer
-		read, // read
-		write, // write
-		seek, // seek
-		seek_to_end, // seek_to_end
-		tell, // tell
-		eof, // get eof
-		err, // get error
-		NULL, // get stream size
-		close);
+	return stream;
 }
 
 } // namespace gnash::noseek_fd_adapter
