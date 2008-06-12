@@ -344,7 +344,7 @@ return * gettext ("")]ifelse([$2], [need-ngettext], [ + * ngettext ("", "", 0)],
 
   dnl For backward compatibility. Some Makefiles may be using this. OpenBSD
   dnl appears to use $LTLIBINTL instead of "$LIBINTL".
-  if test x$LTLIBINTL != x; then
+  if test x"$LTLIBINTL" != x; then
     INTLLIBS="$LIBINTL $LTLIBINTL"
   else
     INTLLIBS="$LIBINTL"

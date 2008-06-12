@@ -1578,9 +1578,11 @@ fi
 AM_CONDITIONAL(HAVE_QTOPIA, [test x$has_qtopia = xyes])
 AM_CONDITIONAL(HAVE_KDE, [test x$has_kde = xyes])
 AM_CONDITIONAL(HAVE_QT, [test x$has_qt = xyes])
-AM_CONDITIONAL(HAVE_QTOPIA_2, [test "$gnash_qtopia_version " -eq 2])
-AM_CONDITIONAL(HAVE_QTOPIA_3, [test "$gnash_qtopia_version " -eq 3])
-AM_CONDITIONAL(HAVE_QTOPIA_4, [test "$gnash_qtopia_version " -eq 4])
+
+AM_CONDITIONAL(HAVE_QTOPIA_2, [test x"$gnash_qtopia_version" = x2])
+AM_CONDITIONAL(HAVE_QTOPIA_3, [test x"$gnash_qtopia_version" = x3])
+AM_CONDITIONAL(HAVE_QTOPIA_4, [test x"$gnash_qtopia_version" = x4])
+
 AM_CONDITIONAL(HAVE_QT_2, [test x"${gnash_qt_version}" != x && test "${gnash_qt_version}" -eq 2])
 AM_CONDITIONAL(HAVE_QT_3, [test x"${gnash_qt_version}" != x && test "${gnash_qt_version}" -eq 3])
 AM_CONDITIONAL(HAVE_QT_4, [test x"${gnash_qt_version}" != x && test "${gnash_qt_version}" -eq 4])

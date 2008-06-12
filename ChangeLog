@@ -1,3 +1,10 @@
+2008-06-12 Russ Nelson <nelson@crynwr.com>
+
+	* configure.ac:
+	* macros/gettext.m4:
+	  Applying bjacques' https://savannah.gnu.org/patch/?6538
+          Fix strict shell parse errors when variables are null.
+
 2008-06-12 Sandro Santilli <strk@keybit.net>
 
 	* server/parser/edit_text_character_def.cpp: fix regression making
