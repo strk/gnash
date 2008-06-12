@@ -22,7 +22,6 @@
 #include "gnashconfig.h"
 #endif
 
-#include "tu_file.h"
 #include "IOChannel.h"
 #include "curl_adapter.h"
 #include "log.h"
@@ -45,7 +44,7 @@ using gnash::log_error;
 
 namespace curl_adapter
 {
-	tu_file* make_stream(const char * /*url */)
+	IOChannel* make_stream(const char * /*url */)
 	{
 		log_error(_("ERROR: libcurl is not available, but "
 		            "Gnash has attempted to use the curl adapter"));
