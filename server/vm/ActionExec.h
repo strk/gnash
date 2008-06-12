@@ -49,7 +49,7 @@ public:
 	};
 
     tryBlock(size_t cur_off, size_t try_size, size_t catch_size,
-		size_t finally_size, std::string catchName, int stack_depth)
+		size_t finally_size, std::string catchName, int /*stack_depth*/)
 		:
 		_catchOffset(cur_off + try_size),
 		_finallyOffset(cur_off + try_size + catch_size),
@@ -58,12 +58,11 @@ public:
 		_name(catchName),
 		_registerIndex(),
 		_tryState(tryBlock::TRY_TRY),
-		_lastThrow(),
-		_stackDepth(stack_depth)
+		_lastThrow()
 	{/**/}
 
 	tryBlock(size_t cur_off, size_t try_size, size_t catch_size,
-		size_t finally_size, boost::uint8_t register_index, int stack_depth)
+		size_t finally_size, boost::uint8_t register_index, int /* stack_depth */)
 		:
 		_catchOffset(cur_off + try_size),
 		_finallyOffset(cur_off + try_size + catch_size),
@@ -72,8 +71,7 @@ public:
 		_name(),
 		_registerIndex(register_index),
 		_tryState(tryBlock::TRY_TRY),
-		_lastThrow(),
-		_stackDepth(stack_depth)
+		_lastThrow()
 	{/**/}
 
 private:
@@ -86,7 +84,6 @@ private:
 	boost::uint8_t _registerIndex;
 	tryState _tryState;
 	as_value _lastThrow;
-	boost::uint32_t _stackDepth;
 };
 
 /// Executor of an action_buffer 
@@ -444,6 +441,8 @@ public:
 	size_t getCurrentPC() const { return pc; }
 	
 	void skipRemainingBuffer() { next_pc = stop_pc; }
+	
+	void advanceNextPC(int offset) { next_pc += offset; }
 
 // This is just a temporary mess for initialization order
 // while I sort out accessors.

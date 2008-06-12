@@ -54,6 +54,9 @@
 // Max number of stack item to dump. 0 for unlimited.
 # define STACK_DUMP_LIMIT 32
 
+// Define to get debugging messages for try / catch
+//#define GNASH_DEBUG_TRY 1
+
 #endif
 
 
@@ -238,48 +241,49 @@ ActionExec::operator() ()
                 // If we are in a try block, check to see if we have thrown.
                 tryBlock& t = _tryList.back();
 
-                //log_debug ("PC: %d, stop pc: %d, tryState: %d", pc, stop_pc, t._tryState);
-
                 if (t._tryState == tryBlock::TRY_TRY)
                 {
                     if (env.stack_size() && env.top(0).is_exception())
                     {
                         as_value ex = env.top(0);
                         ex.unflag_exception();
-                    
+#ifdef GNASH_DEBUG_TRY                    
                         log_debug("TRY block: Encountered exception (%s). Set PC to catch.", ex);
-                    
+#endif
                         // We have an exception. Don't execute any more of the try
                         // block and process exception.
                         pc = t._catchOffset;
-                        //stop_pc = t._afterTriedOffset;
                         t._tryState = tryBlock::TRY_CATCH;
                       
                         if (!t._hasName)
                         {
-                            // What to do now? Has the exception been handled?
-                            // I don't know what this is for. There seems to be
-                            // one test for it crash-0.5.4-13379-catch-in-register.swf
-                            // for swfdec, which isn't really testing that at all.
-                            // This was left over from a code reorganization that
-                            // fixed try / catch / finally for all normal cases (tested
-                            // extensively in swfdec and actionscript.all). 
+                            // Used when exceptions are thrown in functions.
+                            // This is tested in misc-mtasc.all/exception.as
                             as_value ex = env.pop();
+                            ex.unflag_exception();
                             
                             if (isFunction2() && t._registerIndex < env.num_local_registers())
                             {
+#ifdef GNASH_DEBUG_TRY 
+                                log_debug("isFunction2");
+#endif
                                 env.local_register(t._registerIndex) = ex;
                             }
                             else if (t._registerIndex < 4)
                             {
+#ifdef GNASH_DEBUG_TRY 
+                                log_debug("registerIndex < 4");
+#endif
                                 env.global_register(t._registerIndex) = ex;
                             }
-                            continue;
+                            //continue;
                         }
                     }
                     else
                     {
+#ifdef GNASH_DEBUG_TRY 
                         log_debug("TRY block: No exception, continuing as normal.");
+#endif
                         // All code up to the end of the TryBlock should be
                         // executed.
                         stop_pc = t._afterTriedOffset;
@@ -306,13 +310,16 @@ ActionExec::operator() ()
                         
                         log_debug("CATCH block: top of stack is an exception (%s)", ex);
 
-                        if (!t._name.empty())
+                        if (t._hasName && !t._name.empty())
                         {
                             // If name isn't empty, it means we have a catch block.
                             // We should set its argument to the exception value.
                             setLocalVariable(t._name, ex);
                             t._lastThrow = as_value();
-                            log_debug("CATCH block: encountered exception (%s). assigning to catch arg %d.", ex, t._name);
+#ifdef GNASH_DEBUG_TRY
+                            log_debug("CATCH block: encountered exception (%s). "
+                                      "Assigning to catch arg %d.", ex, t._name);
+#endif
                         }
                     }
 
@@ -324,16 +331,21 @@ ActionExec::operator() ()
                 {
                     // FINALLY. This may or may not exist, but these actions
                     // are carried out anyway.
+#ifdef GNASH_DEBUG_TRY
                     log_debug("FINALLY: tryBlock name = %s", t._name);                 
-
+#endif
                     // If the exception is here, we have thrown in catch.
                     if (env.stack_size() && env.top(0).is_exception())
                     {
                          
                         t._lastThrow = env.pop();
+#ifdef GNASH_DEBUG_TRY 
                         as_value ex = t._lastThrow;
                         ex.unflag_exception();
-                        log_debug("FINALLY: top of stack is an exception again (%s). Replaces any previous uncaught exceptions", ex);
+                        log_debug("FINALLY: top of stack is an exception "
+                                  "again (%s). Replaces any previous "
+                                  "uncaught exceptions", ex);
+#endif
                     }
                     stop_pc = t._afterTriedOffset;
                     t._tryState = tryBlock::TRY_END;
@@ -348,9 +360,12 @@ ActionExec::operator() ()
                     {
                         // Check for exception handlers straight away
                         stop_pc = t._afterTriedOffset;
+#ifdef GNASH_DEBUG_TRY
                         as_value ex = env.top(0);
                         ex.unflag_exception();
-                        log_debug("END: exception thrown in finally(%s). Leaving on the stack", ex);
+                        log_debug("END: exception thrown in finally(%s). "
+                                  "Leaving on the stack", ex);
+#endif
                         _tryList.pop_back();
                         continue;
                     }
@@ -358,15 +373,21 @@ ActionExec::operator() ()
                     {
                         // Check for exception handlers straight away
                         stop_pc = t._afterTriedOffset;
+#ifdef GNASH_DEBUG_TRY
                         as_value ex = t._lastThrow;
                         ex.unflag_exception();
-                        log_debug("END: no new exceptions thrown. Pushing uncaught one (%s) back", ex);
+                        log_debug("END: no new exceptions thrown. Pushing "
+                                  "uncaught one (%s) back", ex);
+#endif
                         env.push(t._lastThrow);
                         _tryList.pop_back();
                         continue;
                     }
+#ifdef GNASH_DEBUG_TRY
                     log_debug("END: no new exceptions thrown. Continuing");
-                    // No uncaught exceptions left in TryBlock, execute rest of code.
+#endif
+                    // No uncaught exceptions left in TryBlock:
+                    // execute rest of code.
                     stop_pc = t._savedEndOffset;
                     
                     // Finished with this TryBlock.

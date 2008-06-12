@@ -2133,7 +2133,7 @@ SWFHandlers::ActionBranchAlways(ActionExec& thread)
     
 
     boost::int16_t offset = thread.code.read_int16(thread.getCurrentPC()+3);
-    thread.next_pc += offset;
+    thread.advanceNextPC(offset);
     // @@ TODO range checks
 }
 
@@ -2553,7 +2553,7 @@ SWFHandlers::ActionBranchIfTrue(ActionExec& thread)
     bool test = env.pop().to_bool();
     if (test)
     {
-        next_pc += offset;
+        thread.advanceNextPC(offset);
 
         if (next_pc > stop_pc)
         {
@@ -4036,7 +4036,7 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
     func->set_length(code_size);
 
     // Skip the function body (don't interpret it now).
-    thread.next_pc += code_size;
+    thread.advanceNextPC(code_size);
 
     // If we have a name, then save the function in this
     // environment under that name.
@@ -4180,7 +4180,7 @@ SWFHandlers::ActionWith(ActionExec& thread)
             with_obj_val);
         );
         // skip the full block
-        thread.next_pc += block_length;
+        thread.advanceNextPC(block_length);
         return;
     }
 
@@ -4190,7 +4190,7 @@ SWFHandlers::ActionWith(ActionExec& thread)
     if ( ! thread.pushWithEntry(with_stack_entry(with_obj, block_end)) )
     {
         // skip the full block
-        thread.next_pc += block_length;
+        thread.advanceNextPC(block_length);
     }
 
 }
@@ -4247,7 +4247,7 @@ SWFHandlers::ActionDefineFunction(ActionExec& thread)
     // next_pc is assumed to point to first action of
     // the function body (one-past the current tag, whic
     // is DefineFunction). We add code_size to it.
-    thread.next_pc += code_size;
+    thread.advanceNextPC(code_size);
 
     // If we have a name, then save the function in this
     // environment under that name.
