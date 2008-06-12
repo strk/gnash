@@ -80,11 +80,11 @@ ActionExec::ActionExec(const swf_function& func, as_environment& newEnv, as_valu
     mReturning(false),
     _abortOnUnload(false),
     code(func.getActionBuffer()),
+    env(newEnv),
+    retval(nRetVal),
     pc(func.getStartPC()),
     stop_pc(pc+func.getLength()),
-    next_pc(pc),
-    env(newEnv),
-    retval(nRetVal)
+    next_pc(pc)
 {
     assert(stop_pc < code.size());
 
@@ -121,11 +121,11 @@ ActionExec::ActionExec(const action_buffer& abuf, as_environment& newEnv, bool a
     mReturning(false),
     _abortOnUnload(abortOnUnloaded),
     code(abuf),
+    env(newEnv),
+    retval(0),
     pc(0),
     stop_pc(code.size()),
-    next_pc(0),
-    env(newEnv),
-    retval(0)
+    next_pc(0)
 {
     //GNASH_REPORT_FUNCTION;
 
@@ -238,12 +238,10 @@ ActionExec::operator() ()
                 // If we are in a try block, check to see if we have thrown.
                 tryBlock& t = _tryList.back();
 
-                log_debug ("PC: %d, stop pc: %d, tryState: %d", pc, stop_pc, t._tryState);
+                //log_debug ("PC: %d, stop pc: %d, tryState: %d", pc, stop_pc, t._tryState);
 
                 if (t._tryState == tryBlock::TRY_TRY)
                 {
-                
-                    log_debug("TRY block");
                     if (env.stack_size() && env.top(0).is_exception())
                     {
                         as_value ex = env.top(0);
@@ -292,7 +290,6 @@ ActionExec::operator() ()
                 }
                 else if (t._tryState == tryBlock::TRY_CATCH)
                 {
-                    log_debug("CATCH block");
                     log_debug("CATCH: tryBlock name = %s", t._name);                
                     // Process exceptions. The code in catch { } will 
                     // be executed whether this block is reached or not.
@@ -327,7 +324,6 @@ ActionExec::operator() ()
                 {
                     // FINALLY. This may or may not exist, but these actions
                     // are carried out anyway.
-                    log_debug("FINALLY block");
                     log_debug("FINALLY: tryBlock name = %s", t._name);                 
 
                     // If the exception is here, we have thrown in catch.
@@ -344,7 +340,6 @@ ActionExec::operator() ()
                 }
                 else // Everything finished. Check for exceptions.
                 {
-                    log_debug("END");
                     // If there's no exception here, we can execute the
                     // rest of the code. If there is, it will be caught
                     // by the next TryBlock or stop execution.
@@ -792,15 +787,6 @@ as_object*
 ActionExec::getThisPointer()
 {
     return _function_var ? _this_ptr.get() : env.get_original_target(); 
-}
-
-boost::uint32_t
-ActionExec::getScriptTimeout()
-{
-    // TODO1: allow specifying this in the .gnashrc file
-    // TODO2: possibly use the SWF tag for this
-    return 15000;
-    //return 2000;
 }
 
 } // end of namespace gnash

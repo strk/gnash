@@ -21,12 +21,13 @@
 #include "with_stack_entry.h"
 #include "as_environment.h" // for ensureStack
 #include "smart_ptr.h"
+#include "swf.h"
+#include "action_buffer.h"
 
 #include <vector>
 
 // Forward declarations
 namespace gnash {
-	class action_buffer;
 	class as_value;
 	class swf_function;
 	class ActionExec;
@@ -207,10 +208,6 @@ private:
 
 	bool _abortOnUnload;
 
-	/// Return the number of milliseconds after which
-	/// execution of a script block should abort.
-	boost::uint32_t getScriptTimeout();
-
 public:
 
 	/// \brief
@@ -248,21 +245,6 @@ public:
 	/// TODO: provide a getter and make private
 	///
 	const action_buffer& code;
-
-	/// Program counter (offset of current action tag)
-	//
-	/// TODO: provide mutator funx and make private
-	///
-	size_t pc;
-
-	/// End of current function execution
-	//
-	/// Used for try/throw/catch blocks.
-	///
-	size_t stop_pc;
-
-	/// Offset to next action tag
-	size_t next_pc;
 
 	/// TODO: provide a getter and make private ?
 	as_environment& env;
@@ -456,6 +438,31 @@ public:
 
 	/// Execute.
 	void operator() ();
+
+    bool atActionTag(SWF::action_type t) { return code[pc] == t; }
+	
+	size_t getCurrentPC() const { return pc; }
+	
+	void skipRemainingBuffer() { next_pc = stop_pc; }
+
+// This is just a temporary mess for initialization order
+// while I sort out accessors.
+
+private:
+
+    /// Program counter (offset of current action tag)
+	size_t pc;
+
+public:
+
+	/// End of current function execution
+	/// Used for try/throw/catch blocks.
+	size_t stop_pc;
+
+	/// Offset to next action tag
+	size_t next_pc;
+
+	
 };
 
 } // namespace gnash

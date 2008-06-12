@@ -1,3 +1,12 @@
+2008-06-12 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/vm/ActionExec.{h,cpp}: remove some of the debug logging.
+	  Start making data members private and provide accessors. Drop
+	  getScriptTimeout(), which should now be obtained from movie_root
+	  when the timeout limits are implemented. 
+	* server/vm/ASHandlers.cpp: use accessors rather than ActionExec
+	  members directly. Delegate some operations entirely to ActionExec.
+
 2008-06-12 Zou Lunkai <zoulunkai@gmail.com>
 	
 	* server/matrix.{h, cpp}: drop transform_by_inverse() and set_inverse(),

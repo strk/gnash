@@ -99,7 +99,7 @@ construct_object(as_function* ctor_as_func,
 static void unsupported_action_handler(ActionExec& thread)
 {
     log_error(_("Unsupported action handler invoked, code at pc is %#x"),
-            static_cast<int>(thread.code[thread.pc]));
+            static_cast<int>(thread.code[thread.getCurrentPC()]));
 }
 
 ActionHandler::ActionHandler()
@@ -458,12 +458,11 @@ SWFHandlers::ActionEnd(ActionExec& thread)
 {
 
 #ifndef NDEBUG
-    const action_buffer& code = thread.code;
-    assert( code[thread.pc] == SWF::ACTION_END );
+    assert(thread.atActionTag(SWF::ACTION_END));
 #endif
 
     log_error (_("%s: CHECKME: was broken"), __PRETTY_FUNCTION__);
-    thread.next_pc=thread.stop_pc;
+    thread.skipRemainingBuffer();
 }
 
 
@@ -474,8 +473,7 @@ SWFHandlers::ActionNextFrame(ActionExec& thread)
     as_environment& env = thread.env;
 
 #ifndef NDEBUG
-    const action_buffer& code = thread.code;
-    assert( code[thread.pc] == SWF::ACTION_NEXTFRAME );
+    assert(thread.atActionTag(SWF::ACTION_NEXTFRAME));
 #endif
 
     sprite_instance* tgt = env.get_target()->to_movie();
@@ -490,8 +488,7 @@ SWFHandlers::ActionPrevFrame(ActionExec& thread)
     as_environment& env = thread.env;
 
 #ifndef NDEBUG
-    const action_buffer& code = thread.code;
-    assert( code[thread.pc] == SWF::ACTION_PREVFRAME );
+    assert(thread.atActionTag(SWF::ACTION_PREVFRAME));
 #endif
 
     sprite_instance* tgt = env.get_target()->to_movie();
@@ -506,8 +503,7 @@ SWFHandlers::ActionPlay(ActionExec& thread)
     as_environment& env = thread.env;
 
 #ifndef NDEBUG
-    const action_buffer& code = thread.code;
-    assert( code[thread.pc] == SWF::ACTION_PLAY );
+    assert(thread.atActionTag(SWF::ACTION_PLAY));
 #endif
 
     sprite_instance* tgt = env.get_target()->to_movie();
@@ -522,8 +518,7 @@ SWFHandlers::ActionStop(ActionExec& thread)
     as_environment& env = thread.env;
 
 #ifndef NDEBUG
-    const action_buffer& code = thread.code;
-    assert( code[thread.pc] == SWF::ACTION_STOP );
+    assert(thread.atActionTag(SWF::ACTION_STOP));
 #endif
 
     sprite_instance* tgt = env.get_target()->to_movie();
@@ -537,8 +532,7 @@ SWFHandlers::ActionToggleQuality(ActionExec& thread)
 {
 
 #ifndef NDEBUG
-    const action_buffer& code = thread.code;
-    assert( code[thread.pc] == SWF::ACTION_TOGGLEQUALITY );
+    assert(thread.atActionTag(SWF::ACTION_TOGGLEQUALITY));
 #endif
 
     log_unimpl (__PRETTY_FUNCTION__);
@@ -549,8 +543,7 @@ SWFHandlers::ActionStopSounds(ActionExec& thread)
 {
 
 #ifndef NDEBUG
-    const action_buffer& code = thread.code;
-    assert( code[thread.pc] == SWF::ACTION_STOPSOUNDS );
+    assert(thread.atActionTag(SWF::ACTION_STOPSOUNDS));
 #endif
 
     media::sound_handler* s = get_sound_handler();
@@ -567,9 +560,9 @@ SWFHandlers::ActionGotoFrame(ActionExec& thread)
     as_environment& env = thread.env;
     const action_buffer& code = thread.code;
 
-    assert( code[thread.pc] == SWF::ACTION_GOTOFRAME );
+    assert(thread.atActionTag(SWF::ACTION_GOTOFRAME));
 
-    size_t frame = code.read_int16(thread.pc+3);
+    size_t frame = code.read_int16(thread.getCurrentPC()+3);
 
     sprite_instance* tgt = env.get_target()->to_movie();
     assert(tgt);
@@ -585,9 +578,9 @@ SWFHandlers::ActionGetUrl(ActionExec& thread)
     as_environment& env = thread.env;
     const action_buffer& code = thread.code;
 
-    assert( code[thread.pc] == SWF::ACTION_GETURL );
+    assert(thread.atActionTag(SWF::ACTION_GETURL));
 
-    size_t& pc = thread.pc;
+    size_t pc = thread.getCurrentPC();
 
     // If this is an FSCommand, then call the callback
     // handler, if any.
@@ -615,10 +608,10 @@ SWFHandlers::ActionWaitForFrame(ActionExec& thread)
     as_environment& env = thread.env;
     const action_buffer& code = thread.code;
 
-    assert( code[thread.pc] == SWF::ACTION_WAITFORFRAME );
+    assert(thread.atActionTag(SWF::ACTION_WAITFORFRAME));
 
     // SWF integrity check
-    size_t tag_len = code.read_int16(thread.pc+1);
+    size_t tag_len = code.read_int16(thread.getCurrentPC()+1);
     if ( tag_len != 3 )
     {
         IF_VERBOSE_MALFORMED_SWF (
@@ -630,8 +623,8 @@ SWFHandlers::ActionWaitForFrame(ActionExec& thread)
     // If we haven't loaded a specified frame yet, then
     // skip the specified number of actions.
     //
-    unsigned int framenum = code.read_int16(thread.pc+3);
-    boost::uint8_t skip = code[thread.pc+5];
+    unsigned int framenum = code.read_int16(thread.getCurrentPC()+3);
+    boost::uint8_t skip = code[thread.getCurrentPC()+5];
 
     character* target = env.get_target();
     sprite_instance* target_sprite = target->to_movie();
@@ -663,9 +656,9 @@ SWFHandlers::ActionSetTarget(ActionExec& thread)
 {
 
     const action_buffer& code = thread.code;
-    size_t pc = thread.pc;
+    size_t pc = thread.getCurrentPC();
 
-    assert(code[pc] == SWF::ACTION_SETTARGET); // 0x8B
+    assert(thread.atActionTag(SWF::ACTION_SETTARGET)); // 0x8B
 
     // Change the movie we're working on.
     std::string target_name ( code.read_string(pc+3) );
@@ -680,7 +673,7 @@ SWFHandlers::ActionGotoLabel(ActionExec& thread)
     as_environment& env = thread.env;
     const action_buffer& code = thread.code;
 
-    const char* frame_label = code.read_string(thread.pc+3);
+    const char* frame_label = code.read_string(thread.getCurrentPC()+3);
     character *target = env.get_target();
     sprite_instance *target_sprite = target->to_movie();
     if ( ! target_sprite )
@@ -758,7 +751,7 @@ SWFHandlers::ActionEqual(ActionExec& thread)
 
     as_environment& env = thread.env;
 
-    assert(thread.code[thread.pc] == SWF::ACTION_EQUAL); // 0x0E
+    assert(thread.atActionTag(SWF::ACTION_EQUAL)); // 0x0E
 
     thread.ensureStack(2);
 
@@ -1235,7 +1228,7 @@ SWFHandlers::ActionStartDragMovie(ActionExec& thread)
 
     as_environment& env = thread.env;
 
-    assert(thread.code[thread.pc] == SWF::ACTION_STARTDRAGMOVIE);
+    assert(thread.atActionTag(SWF::ACTION_STARTDRAGMOVIE));
 
     thread.ensureStack(3);
 
@@ -1335,7 +1328,7 @@ SWFHandlers::ActionThrow(ActionExec& thread)
     env.top(0).flag_exception();
 
     // Proceed to the end of the code block to throw.
-    thread.next_pc = thread.stop_pc;
+    thread.skipRemainingBuffer();
 }
 
 void
@@ -1477,7 +1470,7 @@ SWFHandlers::ActionFscommand2(ActionExec& thread)
 {
     
 
-    assert(thread.code[thread.pc] == SWF::ACTION_FSCOMMAND2); // 0x0E
+    assert(thread.atActionTag(SWF::ACTION_FSCOMMAND2)); // 0x0E
 
     as_environment& env = thread.env;
 
@@ -1882,7 +1875,7 @@ SWFHandlers::ActionWaitForFrameExpression(ActionExec& thread)
     thread.ensureStack(1); // expression
 
     // how many actions to skip if frame has not been loaded
-    boost::uint8_t skip = code[thread.pc+3];
+    boost::uint8_t skip = code[thread.getCurrentPC()+3];
 
     // env.top(0) contains frame specification,
     // evaluated as for ActionGotoExpression
@@ -1960,7 +1953,7 @@ SWFHandlers::ActionPushData(ActionExec& thread)
 
     const action_buffer& code = thread.code;
 
-    size_t pc = thread.pc;
+    size_t pc = thread.getCurrentPC();
     boost::int16_t length = code.read_int16(pc+1);
     assert( length >= 0 );
 
@@ -2139,7 +2132,7 @@ SWFHandlers::ActionBranchAlways(ActionExec& thread)
 {
     
 
-    boost::int16_t offset = thread.code.read_int16(thread.pc+3);
+    boost::int16_t offset = thread.code.read_int16(thread.getCurrentPC()+3);
     thread.next_pc += offset;
     // @@ TODO range checks
 }
@@ -2522,9 +2515,9 @@ SWFHandlers::ActionGetUrl2(ActionExec& thread)
 
     const action_buffer& code = thread.code;
 
-    assert( code[thread.pc] == SWF::ACTION_GETURL2 );
+    assert(thread.atActionTag(SWF::ACTION_GETURL2));
 
-    boost::uint8_t method = code[thread.pc + 3];
+    boost::uint8_t method = code[thread.getCurrentPC() + 3];
 
     as_value url_val = env.top(1);
     if ( url_val.is_undefined() )
@@ -2547,11 +2540,11 @@ SWFHandlers::ActionBranchIfTrue(ActionExec& thread)
     // Alias these
     as_environment& env = thread.env;
     const action_buffer& code = thread.code;
-    size_t& pc = thread.pc;
+    size_t pc = thread.getCurrentPC();
     size_t& next_pc = thread.next_pc;
     size_t& stop_pc = thread.stop_pc;
 
-    assert( code[pc] == SWF::ACTION_BRANCHIFTRUE );
+    assert(thread.atActionTag(SWF::ACTION_BRANCHIFTRUE));
 
     thread.ensureStack(1); // bool
 
@@ -2624,7 +2617,7 @@ SWFHandlers::ActionGotoExpression(ActionExec& thread)
     thread.ensureStack(1); // expression
 
     const action_buffer& code = thread.code;
-    size_t pc = thread.pc;
+    size_t pc = thread.getCurrentPC();
 
 
     // From Alexi's SWF ref:
@@ -2695,7 +2688,7 @@ SWFHandlers::ActionDelete(ActionExec& thread)
     //GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
 
-    assert(thread.code[thread.pc] == SWF::ACTION_DELETE); // 0x3A
+    assert(thread.atActionTag(SWF::ACTION_DELETE)); // 0x3A
 
     thread.ensureStack(2); // obj, member
 
@@ -2728,7 +2721,7 @@ SWFHandlers::ActionDelete2(ActionExec& thread)
 
     as_environment& env = thread.env;
 
-    assert(thread.code[thread.pc] == SWF::ACTION_DELETE2); // 0x3B
+    assert(thread.atActionTag(SWF::ACTION_DELETE2)); // 0x3B
 
     thread.ensureStack(1); // var
 
@@ -2837,7 +2830,7 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
     // If the function threw an exception, do so here.
     if (result.is_exception())
     {
-        thread.next_pc = thread.stop_pc;
+        thread.skipRemainingBuffer();
     }
 
     //env.dump_stack();
@@ -2867,7 +2860,7 @@ SWFHandlers::ActionReturn(ActionExec& thread)
     //env.dump_stack();
 
     // Skip the rest of this buffer (return from this action_buffer).
-    thread.next_pc = thread.stop_pc;
+    thread.skipRemainingBuffer();
 
 }
 
@@ -3223,7 +3216,7 @@ SWFHandlers::ActionNewEquals(ActionExec& thread)
     //GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
 
-    assert(thread.code[thread.pc] == SWF::ACTION_NEWEQUALS);
+    assert(thread.atActionTag(SWF::ACTION_NEWEQUALS));
 
     thread.ensureStack(2);
 
@@ -3615,7 +3608,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
     // Now, if there was an exception, proceed to the end of the block.
     if (result.is_exception())
     {
-        thread.next_pc = thread.stop_pc;
+        thread.skipRemainingBuffer();
     }
     // This is to check stack status after call method
     //log_debug(_("at doActionCallMethod() end, stack: ")); env.dump_stack();
@@ -3629,7 +3622,7 @@ SWFHandlers::ActionNewMethod(ActionExec& thread)
 
     as_environment& env = thread.env;
 
-    assert( thread.code[thread.pc] == SWF::ACTION_NEWMETHOD );
+    assert(thread.atActionTag(SWF::ACTION_NEWMETHOD));
 
     thread.ensureStack(3); // method, object, nargs
 
@@ -3963,7 +3956,7 @@ void
 SWFHandlers::ActionConstantPool(ActionExec& thread)
 {
     
-    thread.code.process_decl_dict(thread.pc, thread.next_pc);
+    thread.code.process_decl_dict(thread.getCurrentPC(), thread.next_pc);
 }
 
 void
@@ -3982,7 +3975,7 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
 
     func->set_is_function2();
 
-    size_t i = thread.pc + 3; // skip tag id and length
+    size_t i = thread.getCurrentPC() + 3; // skip tag id and length
 
     // Extract name.
     // @@ security: watch out for possible missing terminator here!
@@ -4089,11 +4082,10 @@ SWFHandlers::ActionTry(ActionExec& thread)
     const action_buffer& code = thread.code;
 
 #ifndef NDEBUG
-    size_t pc = thread.pc;
-    assert( code[pc] == SWF::ACTION_TRY );
+    assert(thread.atActionTag(SWF::ACTION_TRY));
 #endif
 
-    size_t i = thread.pc + 3; // skip tag id and length
+    size_t i = thread.getCurrentPC() + 3; // skip tag id and length
 
     boost::uint8_t flags = code[i];
     ++i;
@@ -4148,9 +4140,9 @@ SWFHandlers::ActionWith(ActionExec& thread)
 
     as_environment& env = thread.env;
     const action_buffer& code = thread.code;
-    size_t pc = thread.pc;
+    size_t pc = thread.getCurrentPC();
 
-    assert( code[pc] == SWF::ACTION_WITH );
+    assert(thread.atActionTag(SWF::ACTION_WITH));
 
     thread.ensureStack(1);  // the object
     as_value with_obj_val = env.pop().to_object();
@@ -4212,7 +4204,7 @@ SWFHandlers::ActionDefineFunction(ActionExec& thread)
     const action_buffer& code = thread.code;
 
 #ifndef NDEBUG
-    boost::int16_t length = code.read_int16(thread.pc+1);
+    boost::int16_t length = code.read_int16(thread.getCurrentPC()+1);
     assert( length >= 0 );
 #endif
 
@@ -4223,7 +4215,7 @@ SWFHandlers::ActionDefineFunction(ActionExec& thread)
     swf_function* func = new swf_function(
         &code, &env, thread.next_pc, thread.getScopeStack());
 
-    size_t i = thread.pc + 3;
+    size_t i = thread.getCurrentPC() + 3;
 
     // Extract name.
     // @@ security: watch out for possible missing terminator here!
@@ -4306,7 +4298,7 @@ SWFHandlers::ActionSetRegister(ActionExec& thread)
 
     const action_buffer& code = thread.code;
 
-    unsigned int reg = code[thread.pc + 3];
+    unsigned int reg = code[thread.getCurrentPC() + 3];
 
     // Save top of stack in specified register.
     if ( thread.isFunction2() && env.num_local_registers() )
