@@ -26,7 +26,7 @@
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
 #include <OpenGL/glext.h>
-# if defined(__APPLE_CC__) && (GLU_VERSION >= 100800)
+# if defined(__APPLE_CC__) && (__APPLE_CC__ >= 5465)
 # define GLUCALLBACKTYPE GLvoid (*)()
 # else
 # define GLUCALLBACKTYPE GLvoid (*)(...)
