@@ -1149,27 +1149,8 @@ ensureType (boost::intrusive_ptr<as_object> obj)
 	boost::intrusive_ptr<T> ret = boost::dynamic_pointer_cast<T>(obj);
 
 	if (!ret) {
-		std::string     target = typeid(T).name(),
-				source = typeid(*obj.get()).name();
-#if defined(__GNUC__) && __GNUC__ > 2
-		int status;
-		char* target_unmangled = 
-			abi::__cxa_demangle (target.c_str(), NULL, NULL,
-					     &status);
-		if (status == 0) {
-			target = target_unmangled;
-			free(target_unmangled);
-		}
-
-		char* source_unmangled =
-			abi::__cxa_demangle (source.c_str(), NULL, NULL,
-					     &status);
-
-		if (status == 0) {
-			source = source_unmangled;
-			free(source_unmangled);
-		}
-#endif // __GNUC__ > 2
+		std::string     target = typeName(ret.get()),
+				source = typeName(*obj.get());
 
 		std::string msg = "builtin method or gettersetter for " +
 			target + " called from " + source + " instance.";

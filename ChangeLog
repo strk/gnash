@@ -1,5 +1,10 @@
 2008-06-13 Bastiaan Jacques <bastiaan@bjacques.org>
 
+	* server/as_object.h: Make use of the typeName function that magically
+	appeared in my checkout.
+
+2008-06-13 Bastiaan Jacques <bastiaan@bjacques.org>
+
 	* backend/render_handler_ogl.cpp: Stick the push-pop matrix sequence
 	in a scoped class.
 
