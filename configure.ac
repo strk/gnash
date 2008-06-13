@@ -2553,7 +2553,7 @@ fi
         echo "               This version of ffmpeg may not work!" >&3
         echo "               Version 51.27.0 or newer is highly recommended." >&3
       else
-	if test x"${avformat_h}" == x; then
+	if test x"${avformat_h}" = x; then
           echo "        ERROR: FFMPEG's libavcodec header is installed but not libavformat." >&3
           echo "               You can install FFMPEG from http://ffmpeg.mplayerhq.hu" >&3
           echo "               or .deb users: apt-get install libavformat-dev" >&3
@@ -2920,7 +2920,7 @@ if test x$ext_mysql = xyes; then
   fi
 fi
 
-if test "$GMSGFMT" == ":"; then
+if test "$GMSGFMT" = ":"; then
   echo "        WARNING: You need the gettext package installed to use translations." >&4
   echo "                 Required for building a package or 'make distcheck'" >&4
   echo "                 Install it from http://www.gnu.org/software/gettext/" >&4

@@ -1,3 +1,8 @@
+2008-06-13 Jeremy C. Reed <reed@reedmedia.net>
+
+	* configure.ac, macros/docbook.m4: The world doesn't always use bash's
+	  builtin test.
+
 2008-06-13 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/System.cpp: LOG_ONCE log_unimpl..
