@@ -114,9 +114,8 @@ matrix::concatenate(const matrix& m)
     *this = t;
 }
 
-
 void
-matrix::concatenate_translation(float xoffset, float yoffset)
+matrix::concatenate_translation(int xoffset, int yoffset)
 // Concatenate a translation onto the front of our
 // matrix.  When transforming points, the translation
 // happens first, then our original xform.
@@ -125,16 +124,15 @@ matrix::concatenate_translation(float xoffset, float yoffset)
     ty += Fixed16Mul(shx, xoffset) + Fixed16Mul(sy, yoffset);
 }
 
-
 void
-matrix::concatenate_scale(float xscale, float yscale)
+matrix::concatenate_scale(double xscale, double yscale)
 // Concatenate scales to our matrix. When transforming points, these 
 // scales happen first, then our matirx.
 {
-    sx  = Fixed16Mul(sx, FloatToFixed16(xscale));
-    shy = Fixed16Mul(shy,FloatToFixed16(yscale));
-    shx = Fixed16Mul(shx,FloatToFixed16(xscale));
-    sy  = Fixed16Mul(sy, FloatToFixed16(yscale));
+    sx  = Fixed16Mul(sx, DoubleToFixed16(xscale));
+    shy = Fixed16Mul(shy,DoubleToFixed16(yscale));
+    shx = Fixed16Mul(shx,DoubleToFixed16(xscale));
+    sy  = Fixed16Mul(sy, DoubleToFixed16(yscale)); 
 }
 
 void
@@ -150,9 +148,8 @@ matrix::set_lerp(const matrix& m1, const matrix& m2, float t)
     ty = flerp(m1.ty, m2.ty, t);
 }
 
-
 void
-matrix::set_scale_rotation(float x_scale, float y_scale, float angle)
+matrix::set_scale_rotation(double x_scale, double y_scale, double angle)
 // Set the scale & rotation part of the matrix.
 // angle in radians.
 {
@@ -161,53 +158,42 @@ matrix::set_scale_rotation(float x_scale, float y_scale, float angle)
     sx  = FloatToFixed16(x_scale * cos_angle);
     shy = FloatToFixed16(y_scale * -sin_angle);
     shx = FloatToFixed16(x_scale * sin_angle);
-    sy  = FloatToFixed16(y_scale * cos_angle);
+    sy  = FloatToFixed16(y_scale * cos_angle); 
 }
 
 void
-matrix::set_x_scale(float xscale)
+matrix::set_x_scale(double xscale)
 {
-    float angle = get_rotation();
-    float cos_v = cosf(angle);
-    float sin_v = sinf(angle);
-    sx  =  FloatToFixed16(xscale * cos_v);
-    shx =  FloatToFixed16(xscale * sin_v);
+    double angle = get_rotation();
+    double cos_v = cos(angle);
+    double sin_v = sin(angle);
+    sx  =  DoubleToFixed16(xscale * cos_v);
+    shx =  DoubleToFixed16(xscale * sin_v); 
 }
 
 void
-matrix::set_y_scale(float yscale)
+matrix::set_y_scale(double yscale)
 {
-    float angle = get_rotation();
-    float cos_v = cosf(angle);
-    float sin_v = sinf(angle);
-    shy =  - FloatToFixed16(yscale * sin_v);
-    sy  =  FloatToFixed16(yscale * cos_v);
+    double angle = get_rotation();
+    double cos_v = cos(angle);
+    double sin_v = sin(angle);
+    shy =  - DoubleToFixed16(yscale * sin_v);
+    sy  =  DoubleToFixed16(yscale * cos_v); 
 }
 
 void
-matrix::set_scale(float xscale, float yscale)
+matrix::set_scale(double xscale, double yscale)
 {
-    float rotation = get_rotation();
-    set_scale_rotation(xscale, yscale, rotation);
+    double rotation = get_rotation();
+    set_scale_rotation(xscale, yscale, rotation); 
 }
 
 void
-matrix::set_rotation(float rotation)
+matrix::set_rotation(double rotation)
 {   
-    float xscale = get_x_scale();
-    float yscale = get_y_scale();
+    double xscale = get_x_scale();
+    double yscale = get_y_scale();
     set_scale_rotation(xscale, yscale, rotation);
-}
-
-void
-matrix::transform(point &p) const
-{
-    //boost::int32_t x = Fixed16Mul(sx,  p.x) + Fixed16Mul(shy, p.y) + tx;
-    //boost::int32_t y = Fixed16Mul(shx, p.x) + Fixed16Mul(sy,  p.y) + ty;
-    float x = sx / 65536.0f * p.x + shy/ 65536.0f * p.y + tx;
-    float y = shx/ 65536.0f * p.x + sy / 65536.0f * p.y + ty;
-    p.x = x;
-    p.y = y;
 }
 
 void
@@ -285,29 +271,29 @@ matrix::determinant() const
     return (boost::int64_t)sx * sy - (boost::int64_t)shx * shy;
 }
 
-float
+double
 matrix::get_x_scale() const
 {
-    return sqrtf(((float)sx * sx + (float)shx * shx)) / 65536.0f;
+    return sqrt(((double)sx * sx + (double)shx * shx)) / 65536.0;
 }
 
-float
+double
 matrix::get_y_scale() const
 {
-    return sqrtf(((float)sy * sy + (float)shy * shy)) / 65536.0f;
+    return sqrt(((double)sy * sy + (double)shy * shy)) / 65536.0;
 }
 
-float
+double
 matrix::get_rotation() const
 {
     if (determinant() < 0)
     {
         // TODO: check this.
-        return atan2f(shx, -sx);
+        return atan2(shx, -sx);
     }
     else
     {
-        return atan2f(shx, sx);
+        return atan2(shx, sx);
     }
 }
 

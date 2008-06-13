@@ -242,7 +242,7 @@ character::x_getset(const fn_call& fn)
 	{
 		const double newx = fn.arg(0).to_number();
 		matrix m = ptr->get_matrix();
-		m.set_x_translation(std::floor(utility::infinite_to_fzero(PIXELS_TO_TWIPS(newx))));
+        m.set_x_translation(PIXELS_TO_TWIPS(utility::infinite_to_zero(newx)));
 		ptr->set_matrix(m);
 		ptr->transformedByScript(); // m_accept_anim_moves = false; 
 	}
@@ -265,7 +265,7 @@ character::y_getset(const fn_call& fn)
 	{
 		const double newy = fn.arg(0).to_number();
 		matrix m = ptr->get_matrix();
-		m.set_y_translation(std::floor(utility::infinite_to_fzero(PIXELS_TO_TWIPS(newy))));
+		m.set_y_translation(PIXELS_TO_TWIPS(utility::infinite_to_zero(newy)));
 		ptr->set_matrix(m);
 		ptr->transformedByScript(); // m_accept_anim_moves = false; 
 	}
@@ -282,7 +282,7 @@ character::xscale_getset(const fn_call& fn)
 	if ( fn.nargs == 0 ) // getter
 	{
 		matrix m = ptr->get_matrix();
-		const float xscale = m.get_x_scale();
+		const double xscale = m.get_x_scale();
 		rv = as_value(xscale * 100); // result in percent
 	}
 	else // setter
@@ -298,11 +298,11 @@ character::xscale_getset(const fn_call& fn)
 			log_aserror(_("Attempt to set _xscale to %g, refused"),
                             scale_percent);
 			);
-                        return as_value();
+            return as_value();
 		}
 
 		// input is in percent
-		float scale = static_cast<float>(scale_percent) / 100.f;
+		double scale = scale_percent / 100.0;
 		ptr->set_x_scale(scale);
 	}
 	return rv;
@@ -384,7 +384,7 @@ character::alpha_getset(const fn_call& fn)
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
 	{
-		rv = as_value(ptr->get_cxform().aa / 2.56f);
+		rv = as_value(ptr->get_cxform().aa / 2.56);
 	}
 	else // setter
 	{

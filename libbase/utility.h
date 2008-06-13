@@ -107,9 +107,15 @@ inline bool isFinite(double d)
 #endif
 }
 
+// TODO: deprecate this.
 inline float infinite_to_fzero(float x)
 {
     return utility::isFinite(x) ? x : 0.0f;
+}
+
+inline double infinite_to_zero(double x)
+{
+    return utility::isFinite(x) ? x : 0.0;
 }
 
 inline int iabs(int i)
@@ -137,20 +143,20 @@ inline int frnd(float f)
 
 inline boost::int32_t Fixed16Mul(boost::int32_t a, boost::int32_t b)
 {
-    // There might be overflows, but we don't care in our specific case.
+    // truncate when overflow occurs.
     return (boost::int32_t)((boost::int64_t)a * (boost::int64_t)b >> 16);
 }
 
 inline boost::int32_t FloatToFixed16(float a)
 {
-    // There might be overflows, but we don't care in our specific case.
-    return (boost::int32_t)(a * 65536.0f);
+    // truncate when overflow occurs.
+    return (boost::int32_t)(boost::uint32_t)(a * 65536.0f);
 }
 
 inline boost::int32_t DoubleToFixed16(double a)
 {
-    // There might be overflows, but we don't care in our specific case.
-    return (boost::int32_t)(a * 65536.0);
+    // truncate when overflow occurs.
+    return (boost::int32_t)(boost::uint32_t)(a * 65536.0);
 }
 
 }

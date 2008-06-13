@@ -12,7 +12,8 @@
 #include <boost/cstdint.hpp> // for boost::?int??_t 
 
 inline double TWIPS_TO_PIXELS(int i) { return i / 20.0; }
-inline int PIXELS_TO_TWIPS(double d) { return d * 20; }
+// truncate when overflow occurs.
+inline int PIXELS_TO_TWIPS(double d) { return (int)(unsigned int)(d * 20); }
 
 namespace gnash {
 	class SWFStream;	// forward declaration

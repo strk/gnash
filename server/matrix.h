@@ -83,47 +83,47 @@ public:
     /// When transforming points, the translation
     /// happens first, then our original xform.
     ///
-    void    concatenate_translation(float tx, float ty);
+    void    concatenate_translation(int tx, int ty);
 
     /// Concatenate scale x and y to the front of our matrix 
     //
     /// When transforming points, these scales happen first, then
     /// our original matrix. 
     /// 
-    void    concatenate_scale(float x, float y);
+    void    concatenate_scale(double x, double y);
 
     /// Set this matrix to a blend of m1 and m2, parameterized by t.
     void    set_lerp(const matrix& m1, const matrix& m2, float t);
 
     /// Set the scale & rotation part of the matrix. angle in radians.
-    void    set_scale_rotation(float x_scale, float y_scale, float rotation);
+    void    set_scale_rotation(double x_scale, double y_scale, double rotation);
 
     /// Set x and y scales, rotation is unchanged.
-    void    set_scale(float x_scale, float y_scale);
+    void    set_scale(double x_scale, double y_scale);
 
     /// Set x scale, rotation any y scale are unchanged.
-    void    set_x_scale(float scale);
+    void    set_x_scale(double scale);
 
     /// Set y scale, rotation and x scale are unchanged.
-    void    set_y_scale(float scale);
+    void    set_y_scale(double scale);
 
     /// Set rotation in radians, scales component are unchanged.
-    void    set_rotation(float rotation);
+    void    set_rotation(double rotation);
 
     /// Set x translation in TWIPS
-    void set_x_translation(float x)
+    void set_x_translation(int x)
     {
         tx = x;
     }
 
     /// Set y translation in TWIPS.
-    void set_y_translation(float y)
+    void set_y_translation(int y)
     {
         ty = y;
     }
 
     /// Set x and y translation in TWIPS.
-    void set_translation(float x, float y)
+    void set_translation(int x, int y)
     {
         tx = x;
         ty = y;
@@ -136,7 +136,14 @@ public:
     void    read(SWFStream* in) { read(*in); }
 
     /// Transform a given point by our matrix
-    void    transform(point &p) const;
+    template <typename U>
+    void    transform(geometry::Point2d<U>& p) const
+    {
+        float x = sx / 65536.0f * p.x + shy/ 65536.0f * p.y + tx;
+        float y = shx/ 65536.0f * p.x + sy / 65536.0f * p.y + ty;
+        p.x = x;
+        p.y = y;
+    }
     
     /// Transform point 'p' by our matrix. 
     //
@@ -154,22 +161,22 @@ public:
     const matrix& invert();
     
     /// return the magnitude scale of our x coord output
-    float   get_x_scale() const;
+    double   get_x_scale() const;
 
     /// return the magnitude scale of our y coord output
-    float   get_y_scale() const;
+    double   get_y_scale() const;
 
     /// return rotation component in radians.
-    float   get_rotation() const;
+    double   get_rotation() const;
 
     /// return x translation n TWIPS unit.
-    float   get_x_translation() const
+    int   get_x_translation() const
     {
         return tx;
     }
 
     /// return y translation in TWIPS unit.
-    float   get_y_translation() const
+    int   get_y_translation() const
     {
         return ty;
     }

@@ -1079,13 +1079,8 @@ sprite_globalToLocal(const fn_call& fn)
   matrix world_mat = sprite->get_world_matrix();
   world_mat.invert().transform(pt);
 
-  // These used to be: round(pt.x), which would round negative
-  // half-values away from zero (-0.5 - > -1), whereas
-  // std::floor(x + 0.5) always rounds towards +Infinity (-0.5 -> 0).
-  // All other cases should be the same. The testsuite doesn't
-  // notice the difference.
-  obj->set_member(NSV::PROP_X, TWIPS_TO_PIXELS(std::floor(pt.x + 0.5)));
-  obj->set_member(NSV::PROP_Y, TWIPS_TO_PIXELS(std::floor(pt.y + 0.5)));
+  obj->set_member(NSV::PROP_X, TWIPS_TO_PIXELS(pt.x));
+  obj->set_member(NSV::PROP_Y, TWIPS_TO_PIXELS(pt.y));
 
   return ret;
 }
@@ -1146,14 +1141,8 @@ sprite_localToGlobal(const fn_call& fn)
   matrix world_mat = sprite->get_world_matrix();
   world_mat.transform(pt);
 
-  // These used to be: round(pt.x), which would round negative
-  // half-values away from zero (-0.5 - > -1), whereas
-  // std::floor(x + 0.5) always rounds towards +Infinity (-0.5 -> 0).
-  // All other cases should be the same. The testsuite doesn't
-  // notice the difference.
-  obj->set_member(NSV::PROP_X, TWIPS_TO_PIXELS(std::floor(pt.x + 0.5)));
-  obj->set_member(NSV::PROP_Y, TWIPS_TO_PIXELS(std::floor(pt.y + 0.5)));
-
+  obj->set_member(NSV::PROP_X, TWIPS_TO_PIXELS(pt.x));
+  obj->set_member(NSV::PROP_Y, TWIPS_TO_PIXELS(pt.y));
   return ret;
 
 }
@@ -1245,6 +1234,7 @@ sprite_lineTo(const fn_call& fn)
   float x = PIXELS_TO_TWIPS(fn.arg(0).to_number());
   float y = PIXELS_TO_TWIPS(fn.arg(1).to_number());
 
+  // FIXME: x and y are always valid after function PIXELS_TO_TWIPS()
   if ( ! utility::isFinite(x) )
   {
     IF_VERBOSE_ASCODING_ERRORS(
@@ -1299,6 +1289,7 @@ sprite_moveTo(const fn_call& fn)
   float x = PIXELS_TO_TWIPS(fn.arg(0).to_number());
   float y = PIXELS_TO_TWIPS(fn.arg(1).to_number());
 
+  // FIXME: x and y are always valid after function PIXELS_TO_TWIPS()
   if ( ! utility::isFinite(x) )
   {
     IF_VERBOSE_ASCODING_ERRORS(
