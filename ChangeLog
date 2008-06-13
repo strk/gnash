@@ -2,6 +2,8 @@
 
 	* libmedia/ffmpeg/AudioDecoderFfmpeg.cpp: Fixed typecasting for 
 	  std::max().
+	* configure.ac: Fix for Leopard and OGL, see:
+	  http://wiki.finkproject.org/index.php/Fink:Packaging:Preparing_for_10.5#OpenGL_Bug
  
 2008-06-13 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
