@@ -142,7 +142,7 @@ IOChannel::write_byte(boost::uint8_t u)
 }
 
 int
-IOChannel::write(const void* src, int num)
+IOChannel::write(const void* /*src*/, int /*num*/)
 {
 	throw IOException("This IOChannel implementation doesn't support output");
 }
