@@ -4,6 +4,7 @@
 	  std::max().
 	* macros/opengl.m4: Fix for Leopard and OGL, see:
 	  http://wiki.finkproject.org/index.php/Fink:Packaging:Preparing_for_10.5#OpenGL_Bug
+	* backend/render_handler_ogl.h: Should fix bug #23352.
  
 2008-06-13 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
