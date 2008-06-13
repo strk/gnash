@@ -38,13 +38,13 @@
         check_equals(mc1._xscale, 100);
         check_equals(mc1._yscale, 100);
         mc1._rotation = 30;
-        check_equals(mc1._xscale, 100);
-        check_equals(mc1._yscale, 100);
+        xcheck_equals(mc1._xscale, 100);
+        xcheck_equals(mc1._yscale, 100);
         mc1._rotation = 60;
-        check_equals(mc1._xscale, 100);
-        check_equals(mc1._yscale, 100);
+        xcheck_equals(mc1._xscale, 100);
+        xcheck_equals(mc1._yscale, 100);
         mc1._xscale = 200;
-        check_equals(mc1._rotation, 60);
+        xcheck_equals(mc1._rotation, 60);
         
         // reset mc1 to normal status for later tests.
         mc1._xscale = 100; 
@@ -54,21 +54,21 @@
 .frame 3
     .action:
         mc1._x = 0x3fffffff;
-        xcheck_equals(mc1._x, -1);
+        check_equals(mc1._x, -1);
         mc1._y = 0x3fffff00;
-        xcheck_equals(mc1._y, -256);
+        check_equals(mc1._y, -256);
         mc1._x = mc1._y = 100;
         
         mc1._xscale = -1;
-        check_equals(mc1._xscale, -1);
+        xcheck_equals(mc1._xscale, -1);
         mc1._xscale = 4294967295.0; // (unsigned)(0xffffffff);
         xcheck_equals(mc1._xscale, 4294967295.0);
         xcheck_equals(mc1._width, 2359295);
         check_equals(mc1._height, 30);
         mc1._yscale = 65536 * 100;
-        xcheck_equals(mc1._height, 0);
+        check_equals(mc1._height, 0);
         mc1._yscale = 65530 * 100;
-        xcheck_equals(mc1._height, 180);
+        check_equals(mc1._height, 180);
         
         // reset mc1 to normal status for later tests.
         // Gnash aborts without this.

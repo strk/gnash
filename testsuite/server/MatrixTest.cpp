@@ -72,9 +72,8 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(identity.get_y_translation(), 0);
 
 	// The inverse of identity is still the identity
-	matrix invert;
-	invert.set_inverse(identity);
-	check_equals(invert, identity);
+	matrix mat;
+	check_equals(mat.invert(), identity);
 
 	//---------------------------------------------
 	// Test canonic parameter setting and getting
@@ -218,6 +217,19 @@ main(int /*argc*/, char** /*argv*/)
 	m1.transform(&r, p2);
 	check_equals(r.x, 100);
 	check_equals(r.y, 100);
+
+	// test matrix invert
+    m1.set_identity();
+    m1.set_translation(50*20, -30*20);
+    m1.set_scale(0.5, 2);
+    m1.set_rotation(90*3.141593/180);
+    
+    matrix m1_inverse = m1;
+    m1_inverse.invert();
+    m1_inverse.concatenate(m1); 
+
+    check_equals(m1_inverse.get_x_translation(), 0);    
+    check_equals(m1_inverse.get_y_translation(), 0);  
 #endif
 }
 

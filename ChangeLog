@@ -6,6 +6,8 @@
 	  integers for x_translation and y_translation. Add a template function transform(point2d),
 	  since renderer agg and ogl use different point formats.
 	* server/character.cpp, server/sprite_instance.cpp: take care of data types, minor cleanups.
+	* testsuite/misc-swfc.all/matrix_accuracy_test1.sc, makefile.am: enable this test file.
+	* testsuite/server/MatrixTest.cpp: add test for Matrix::invert().
 	
 2008-06-12 Sandro Santilli <strk@keybit.net>
 
