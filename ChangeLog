@@ -1,3 +1,15 @@
+2008-06-13 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/vm/ActionExec.{h,cpp}: rename advanceNextPC to adjustNextPC.
+	  Move try block processing into a separate function to make it tidier
+	  (if it were obvious what the meaning of the return value was it would
+	  be still better). Use switch instead of ifs now that it isn't directly
+	  in a while loop. Drop an apparently useless assignment of false to
+	  mReturning. Add doxygen comments to header.
+	* server/vm/ASHandlers.cpp: update advanceNextPC to adjustNextPC.
+	* libbase/curl_adapter.cpp: include utility.h directly and don't
+	  redefine UNUSED.
+
 2008-06-13 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/as_object.h: Make use of the typeName function that magically

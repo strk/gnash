@@ -35,7 +35,7 @@ namespace gnash {
 
 namespace gnash {
 
-class tryBlock
+class TryBlock
 {
 public:
 	friend class ActionExec;
@@ -48,7 +48,7 @@ public:
 		TRY_END // Finished with finally
 	};
 
-    tryBlock(size_t cur_off, size_t try_size, size_t catch_size,
+    TryBlock(size_t cur_off, size_t try_size, size_t catch_size,
 		size_t finally_size, std::string catchName, int /*stack_depth*/)
 		:
 		_catchOffset(cur_off + try_size),
@@ -57,11 +57,11 @@ public:
 		_hasName(true),
 		_name(catchName),
 		_registerIndex(),
-		_tryState(tryBlock::TRY_TRY),
+		_tryState(TryBlock::TRY_TRY),
 		_lastThrow()
 	{/**/}
 
-	tryBlock(size_t cur_off, size_t try_size, size_t catch_size,
+	TryBlock(size_t cur_off, size_t try_size, size_t catch_size,
 		size_t finally_size, boost::uint8_t register_index, int /* stack_depth */)
 		:
 		_catchOffset(cur_off + try_size),
@@ -70,7 +70,7 @@ public:
 		_hasName(false),
 		_name(),
 		_registerIndex(register_index),
-		_tryState(tryBlock::TRY_TRY),
+		_tryState(TryBlock::TRY_TRY),
 		_lastThrow()
 	{/**/}
 
@@ -117,6 +117,22 @@ private:
 		return with_stack;
 	}
 
+    /// Processes the current try - catch - finally block
+    //
+    /// This function is called after each stage of a
+    /// try/catch/finally block. It ensures it is called
+    /// after each stage by setting stop_pc to the appropriate
+    /// number. If an exception is on the stack at any stage,
+    /// it takes the appropriate action (catch, set register
+    /// values, return, or leave it on the stack). Return
+    /// false means that the action processing loop should be
+    /// interrupted.
+    //
+    /// @return whether to continue executing the buffer
+    //
+    /// @param t the try block to process.
+    
+    bool processExceptions(TryBlock& t);
 
 	/// Run after a complete run, or after an run interrupted by 
 	/// a bail-out exception (ActionLimitException, for example)
@@ -189,7 +205,7 @@ private:
 
 	character* _original_target;
 
-	std::list<tryBlock> _tryList;
+	std::list<TryBlock> _tryList;
 
 	bool mReturning;
 
@@ -231,7 +247,7 @@ public:
 	/// \brief
 	/// Use this to push a try block.
 	/// t will be copied
-	void pushTryBlock(tryBlock& t);
+	void pushTryBlock(TryBlock& t);
 
 	/// \brief
 	/// Set the return value.
@@ -277,7 +293,7 @@ public:
 	ActionExec(const swf_function& func, as_environment& newEnv, as_value* nRetVal, as_object* this_ptr);
 
 	/// Is this execution thread a function2 call ?
-	bool isFunction2() { return _function_var==2; }
+	bool isFunction2() { return _function_var == 2; }
 
 	/// Is this execution thread a function call ?
 	bool isFunction() { return _function_var!=0; }
@@ -442,7 +458,7 @@ public:
 	
 	void skipRemainingBuffer() { next_pc = stop_pc; }
 	
-	void advanceNextPC(int offset) { next_pc += offset; }
+	void adjustNextPC(int offset) { next_pc += offset; }
 
 // This is just a temporary mess for initialization order
 // while I sort out accessors.

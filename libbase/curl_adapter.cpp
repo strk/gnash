@@ -22,6 +22,7 @@
 #include "gnashconfig.h"
 #endif
 
+#include "utility.h" // UNUSED macro
 #include "IOChannel.h"
 #include "curl_adapter.h"
 #include "log.h"
@@ -33,10 +34,6 @@
 
 using gnash::log_debug;
 using gnash::log_error;
-
-#ifndef UNUSED
-# define UNUSED(x) x=x
-#endif
 
 
 #ifndef USE_CURL

@@ -2133,7 +2133,7 @@ SWFHandlers::ActionBranchAlways(ActionExec& thread)
     
 
     boost::int16_t offset = thread.code.read_int16(thread.getCurrentPC()+3);
-    thread.advanceNextPC(offset);
+    thread.adjustNextPC(offset);
     // @@ TODO range checks
 }
 
@@ -2553,7 +2553,7 @@ SWFHandlers::ActionBranchIfTrue(ActionExec& thread)
     bool test = env.pop().to_bool();
     if (test)
     {
-        thread.advanceNextPC(offset);
+        thread.adjustNextPC(offset);
 
         if (next_pc > stop_pc)
         {
@@ -4036,7 +4036,7 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
     func->set_length(code_size);
 
     // Skip the function body (don't interpret it now).
-    thread.advanceNextPC(code_size);
+    thread.adjustNextPC(code_size);
 
     // If we have a name, then save the function in this
     // environment under that name.
@@ -4111,7 +4111,7 @@ SWFHandlers::ActionTry(ActionExec& thread)
     {
         catchName = code.read_string(i);
         i += strlen(catchName) + 1;
-        tryBlock t(i, trySize, catchSize, finallySize, catchName, 
+        TryBlock t(i, trySize, catchSize, finallySize, catchName, 
             env.stack_size());
         thread.pushTryBlock(t);
     }
@@ -4119,7 +4119,7 @@ SWFHandlers::ActionTry(ActionExec& thread)
     {
         catchRegister = code[i];
         ++i;
-        tryBlock t(i, trySize, catchSize, finallySize, catchRegister,
+        TryBlock t(i, trySize, catchSize, finallySize, catchRegister,
             env.stack_size());
         thread.pushTryBlock(t);
     }
@@ -4180,7 +4180,7 @@ SWFHandlers::ActionWith(ActionExec& thread)
             with_obj_val);
         );
         // skip the full block
-        thread.advanceNextPC(block_length);
+        thread.adjustNextPC(block_length);
         return;
     }
 
@@ -4190,7 +4190,7 @@ SWFHandlers::ActionWith(ActionExec& thread)
     if ( ! thread.pushWithEntry(with_stack_entry(with_obj, block_end)) )
     {
         // skip the full block
-        thread.advanceNextPC(block_length);
+        thread.adjustNextPC(block_length);
     }
 
 }
@@ -4247,7 +4247,7 @@ SWFHandlers::ActionDefineFunction(ActionExec& thread)
     // next_pc is assumed to point to first action of
     // the function body (one-past the current tag, whic
     // is DefineFunction). We add code_size to it.
-    thread.advanceNextPC(code_size);
+    thread.adjustNextPC(code_size);
 
     // If we have a name, then save the function in this
     // environment under that name.

@@ -55,7 +55,7 @@
 # define STACK_DUMP_LIMIT 32
 
 // Define to get debugging messages for try / catch
-#define GNASH_DEBUG_TRY 1
+//#define GNASH_DEBUG_TRY 1
 
 #endif
 
@@ -210,207 +210,18 @@ ActionExec::operator() ()
                         // Stop execution (for how long?) if an exception
                         // is still on the stack and there is nothing
                         // left to catch it.
-                        //throw ActionScriptException();
+                        throw ActionScriptException();
                     }
                     break;
                 }
-                
-                // Try / catch / finally rules:
-                //
-                // The actionscript code looks like this:
-                // try { }
-                // catch { }
-                // finally { };
-                //
-                // The catch and finally blocks are both optional.
-                // 1. the catch block is *always* executed, even when no exception is thrown.
-                // 2. the finally block is *always* executed, even when an uncaught exception
-                //    is thrown.
-                //
-                //    try { throw "fail"; } finally { "trace ("finally"); " };
-                //
-                // 3. execution is interrupted after the last try block if no
-                //    catch is found.
-                //
-                // Implementation:
-                // 
-                // 1. If in a try block, check for a throw.
-                // 2. Continue to execute catch and finally in the present block.
 
                 // If we are in a try block, check to see if we have thrown.
-                tryBlock& t = _tryList.back();
+                TryBlock& t = _tryList.back();
+                
+                if (! processExceptions(t)) break;
 
-                if (t._tryState == tryBlock::TRY_TRY)
-                {
-                    if (env.stack_size() && env.top(0).is_exception())
-                    {
-#ifdef GNASH_DEBUG_TRY
-                        as_value ex = env.top(0);
-                        ex.unflag_exception();
-                        log_debug("TRY block: Encountered exception (%s). Set PC to catch.", ex);
-#endif
-                        // We have an exception. Don't execute any more of the try
-                        // block and process exception.
-                        pc = t._catchOffset;
-                        t._tryState = tryBlock::TRY_CATCH;
-                      
-                        if (!t._hasName)
-                        {
-                            // Used when exceptions are thrown in functions.
-                            // This is tested in misc-mtasc.all/exception.as
-                            as_value ex = env.pop();
-                            ex.unflag_exception();
-                            
-                            if (isFunction2() && t._registerIndex < env.num_local_registers())
-                            {
-#ifdef GNASH_DEBUG_TRY 
-                                log_debug("isFunction2");
-#endif
-                                env.local_register(t._registerIndex) = ex;
-                            }
-                            else if (t._registerIndex < 4)
-                            {
-#ifdef GNASH_DEBUG_TRY 
-                                log_debug("registerIndex < 4");
-#endif
-                                env.global_register(t._registerIndex) = ex;
-                            }
-                        }
-                    }
-                    else
-                    {
-#ifdef GNASH_DEBUG_TRY 
-                        log_debug("TRY block: No exception, continuing as normal.");
-#endif
-                        // All code up to the end of the TryBlock should be
-                        // executed.
-                        stop_pc = t._afterTriedOffset;
-                        t._tryState = tryBlock::TRY_FINALLY;
-                    }
-
-
-                }
-                else if (t._tryState == tryBlock::TRY_CATCH)
-                {
-#ifdef GNASH_DEBUG_TRY
-                    log_debug("CATCH: tryBlock name = %s", t._name); 
-#endif               
-                    // Process exceptions. The code in catch { } will 
-                    // be executed whether this block is reached or not.
-                    
-                    if (env.stack_size() && env.top(0).is_exception())
-                    {
-                        // This was thrown in "try". Remove it from
-                        // the stack and remember it so that
-                        // further exceptions can be caught.
-                        t._lastThrow = env.pop();
-#ifdef GNASH_DEBUG_TRY
-                        as_value ex = t._lastThrow;
-                        ex.unflag_exception();
-                        log_debug("CATCH block: top of stack is an exception (%s)", ex);
-#endif
-
-                        if (t._hasName && !t._name.empty())
-                        {
-                            // If name isn't empty, it means we have a catch block.
-                            // We should set its argument to the exception value.
-                            setLocalVariable(t._name, ex);
-                            t._lastThrow = as_value();
-#ifdef GNASH_DEBUG_TRY
-                            log_debug("CATCH block: encountered exception (%s). "
-                                      "Assigning to catch arg %d.", ex, t._name);
-#endif
-                        }
-                    }
-
-                    // Go to finally
-                    stop_pc = t._finallyOffset;
-                    t._tryState = tryBlock::TRY_FINALLY;
-                }
-                else if (t._tryState == tryBlock::TRY_FINALLY)
-                {
-                    // FINALLY. This may or may not exist, but these actions
-                    // are carried out anyway.
-#ifdef GNASH_DEBUG_TRY
-                    log_debug("FINALLY: tryBlock name = %s", t._name);                 
-#endif
-                    // If the exception is here, we have thrown in catch.
-                    if (env.stack_size() && env.top(0).is_exception())
-                    {
-                         
-                        t._lastThrow = env.pop();
-#ifdef GNASH_DEBUG_TRY 
-                        as_value ex = t._lastThrow;
-                        ex.unflag_exception();
-                        log_debug("FINALLY: top of stack is an exception "
-                                  "again (%s). Replaces any previous "
-                                  "uncaught exceptions", ex);
-#endif
-                    }
-                    stop_pc = t._afterTriedOffset;
-                    t._tryState = tryBlock::TRY_END;
-                }
-                else // Everything finished. Check for exceptions.
-                {
-                    // If there's no exception here, we can execute the
-                    // rest of the code. If there is, it will be caught
-                    // by the next TryBlock or stop execution.
-                    if (env.stack_size() && env.top(0).is_exception())
-                    {
-                        // Check for exception handlers straight away
-                        stop_pc = t._afterTriedOffset;
-#ifdef GNASH_DEBUG_TRY
-                        as_value ex = env.top(0);
-                        ex.unflag_exception();
-                        log_debug("END: exception thrown in finally(%s). "
-                                  "Leaving on the stack", ex);
-#endif
-                        _tryList.pop_back();
-                        continue;
-                    }
-                    else if (t._lastThrow.is_exception())
-                    {
-                        // Check for exception handlers straight away
-                        stop_pc = t._afterTriedOffset;
-#ifdef GNASH_DEBUG_TRY
-                        as_value ex = t._lastThrow;
-                        ex.unflag_exception();
-                        log_debug("END: no new exceptions thrown. Pushing "
-                                  "uncaught one (%s) back", ex);
-#endif
-                        env.push(t._lastThrow);
-                        if ((t._finallyOffset == t._savedEndOffset) && retval)
-                        {
-                            // This was taken over from the previous
-                            // implementation. It happens when there is
-                            // no 'finally' block. It seems to be a bit of
-                            // a hack now, though it may be correct. It
-                            // passes misc-mtasc.all/exceptions.swf.
-                            // TODO: more tests needed.                            
-                            *retval = t._lastThrow;
-                        }
-                        _tryList.pop_back();
-                        continue;
-                    }
-#ifdef GNASH_DEBUG_TRY
-                    log_debug("END: no new exceptions thrown. Continuing");
-#endif
-                    // No uncaught exceptions left in TryBlock:
-                    // execute rest of code.
-                    stop_pc = t._savedEndOffset;
-                    
-                    // Finished with this TryBlock.
-                    _tryList.pop_back();
-                    if (mReturning)
-					{
-						mReturning = false;
-						break;
-					}
-                    
-                }
-
-                continue; // Walk up the try chain if necessary.
-            } // end of try checking.
+                continue;
+            }
 
             // Cleanup any expired "with" blocks.
             while ( ! with_stack.empty() && pc >= with_stack.back().end_pc() )
@@ -574,6 +385,207 @@ ActionExec::operator() ()
 
     cleanupAfterRun();
 
+}
+
+
+// Try / catch / finally rules:
+//
+// The actionscript code looks like this:
+// try { }
+// catch { }
+// finally { };
+//
+// The catch and finally blocks are both optional.
+// 1. the catch block is *always* executed, even when no exception is thrown.
+// 2. the finally block is *always* executed, even when an exception is thrown.
+// 3. execution is interrupted if there are no catchers left and an exception
+//    is still on the stack.
+//
+bool
+ActionExec::processExceptions(TryBlock& t)
+{
+
+    switch (t._tryState)
+    {
+
+        case TryBlock::TRY_TRY:
+        {
+            if (env.stack_size() && env.top(0).is_exception())
+            {
+#ifdef GNASH_DEBUG_TRY
+                as_value ex = env.top(0);
+                ex.unflag_exception();
+                log_debug("TRY block: Encountered exception (%s). Set PC to catch.", ex);
+#endif
+                // We have an exception. Don't execute any more of the try
+                // block and process exception.
+                pc = t._catchOffset;
+                t._tryState = TryBlock::TRY_CATCH;
+              
+                if (!t._hasName)
+                {
+                    // Used when exceptions are thrown in functions.
+                    // Tests in misc-mtasc.all/exception.as
+                    as_value ex = env.pop();
+                    ex.unflag_exception();
+                    
+                    if (isFunction2() && t._registerIndex < env.num_local_registers())
+                    {
+#ifdef GNASH_DEBUG_TRY 
+                        log_debug("isFunction2");
+#endif
+                        env.local_register(t._registerIndex) = ex;
+                    }
+                    else if (t._registerIndex < 4)
+                    {
+#ifdef GNASH_DEBUG_TRY 
+                        log_debug("registerIndex < 4");
+#endif
+                        env.global_register(t._registerIndex) = ex;
+                    }
+                }
+            }
+            else
+            {
+#ifdef GNASH_DEBUG_TRY 
+                log_debug("TRY block: No exception, continuing as normal.");
+#endif
+                // All code up to the end of the TryBlock should be
+                // executed.
+                stop_pc = t._afterTriedOffset;
+                t._tryState = TryBlock::TRY_FINALLY;
+            }
+            break;
+        }
+
+
+        case TryBlock::TRY_CATCH:
+        {
+#ifdef GNASH_DEBUG_TRY
+            log_debug("CATCH: TryBlock name = %s", t._name); 
+#endif               
+            // Process exceptions. The code in catch { } will 
+            // be executed whether this block is reached or not.
+            
+            if (env.stack_size() && env.top(0).is_exception())
+            {
+                // This was thrown in "try". Remove it from
+                // the stack and remember it so that
+                // further exceptions can be caught.
+                t._lastThrow = env.pop();
+                as_value ex = t._lastThrow;
+                ex.unflag_exception();
+
+#ifdef GNASH_DEBUG_TRY
+                log_debug("CATCH block: top of stack is an exception (%s)", ex);
+#endif
+
+                if (t._hasName && !t._name.empty())
+                {
+                    // If name isn't empty, it means we have a catch block.
+                    // We should set its argument to the exception value.
+                    setLocalVariable(t._name, ex);
+                    t._lastThrow = as_value();
+#ifdef GNASH_DEBUG_TRY
+                    log_debug("CATCH block: encountered exception (%s). "
+                              "Assigning to catch arg %d.", ex, t._name);
+#endif
+                }
+            }
+
+            // Go to finally
+            stop_pc = t._finallyOffset;
+            t._tryState = TryBlock::TRY_FINALLY;
+            break;
+        }
+
+
+        case TryBlock::TRY_FINALLY:
+        {
+            // FINALLY. This may or may not exist, but these actions
+            // are carried out anyway.
+#ifdef GNASH_DEBUG_TRY
+            log_debug("FINALLY: TryBlock name = %s", t._name);                 
+#endif
+            // If the exception is here, we have thrown in catch.
+            if (env.stack_size() && env.top(0).is_exception())
+            {
+                 
+                t._lastThrow = env.pop();
+#ifdef GNASH_DEBUG_TRY 
+                as_value ex = t._lastThrow;
+                ex.unflag_exception();
+                log_debug("FINALLY: top of stack is an exception "
+                          "again (%s). Replaces any previous "
+                          "uncaught exceptions", ex);
+#endif
+            }
+            stop_pc = t._afterTriedOffset;
+            t._tryState = TryBlock::TRY_END;
+            break;
+        }
+
+        case TryBlock::TRY_END:
+        {
+            // If there's no exception here, we can execute the
+            // rest of the code. If there is, it will be caught
+            // by the next TryBlock or stop execution.
+            if (env.stack_size() && env.top(0).is_exception())
+            {
+                // Check for exception handlers straight away
+                stop_pc = t._afterTriedOffset;
+#ifdef GNASH_DEBUG_TRY
+                as_value ex = env.top(0);
+                ex.unflag_exception();
+                log_debug("END: exception thrown in finally(%s). "
+                          "Leaving on the stack", ex);
+#endif
+                _tryList.pop_back();
+                return true;
+            }
+            else if (t._lastThrow.is_exception())
+            {
+                // Check for exception handlers straight away
+                stop_pc = t._afterTriedOffset;
+#ifdef GNASH_DEBUG_TRY
+                as_value ex = t._lastThrow;
+                ex.unflag_exception();
+                log_debug("END: no new exceptions thrown. Pushing "
+                          "uncaught one (%s) back", ex);
+#endif
+                env.push(t._lastThrow);
+                if ((t._finallyOffset == t._savedEndOffset) && retval)
+                {
+                    // This was taken over from the previous
+                    // implementation. It happens when there is
+                    // no 'finally' block. It seems to be a bit of
+                    // a hack now, though it may be correct. It
+                    // passes misc-mtasc.all/exceptions.swf.
+                    // TODO: more tests needed.                            
+                    *retval = t._lastThrow;
+                }
+                _tryList.pop_back();
+                return true;
+            }
+#ifdef GNASH_DEBUG_TRY
+            log_debug("END: no new exceptions thrown. Continuing");
+#endif
+            // No uncaught exceptions left in TryBlock:
+            // execute rest of code.
+            stop_pc = t._savedEndOffset;
+            
+            // Finished with this TryBlock.
+            _tryList.pop_back();
+            
+            // Will break of of action execution.
+            if (mReturning) return false;
+		    
+            break;
+        }
+
+
+    } // end switch
+    return true;
 }
 
 /*private*/
@@ -767,7 +779,7 @@ ActionExec::getTarget()
 }
 
 void
-ActionExec::pushTryBlock(tryBlock& t)
+ActionExec::pushTryBlock(TryBlock& t)
 {
     // The current block should end at the end of the try block.
     t._savedEndOffset = stop_pc;
