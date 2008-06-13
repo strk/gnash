@@ -1,3 +1,8 @@
+2008-03-13 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* libmedia/ffmpeg/AudioDecoderFfmpeg.cpp: Fixed typecasting for 
+	  std::max().
+ 
 2008-06-13 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/vm/ActionExec.h, server/vm/ASHandlers.cpp: drop stack depth

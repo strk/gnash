@@ -20,7 +20,7 @@
 
 #include "AudioDecoderFfmpeg.h"
 #include <cmath> // for std::ceil
-#include <algorithm> // for std::copy
+#include <algorithm> // for std::copy, std::max
 
 //#define GNASH_DEBUG_AUDIO_DECODING
 
@@ -268,7 +268,7 @@ AudioDecoderFfmpeg::decode(boost::uint8_t* input, boost::uint32_t inputSize, boo
 		}
 
 #ifdef GNASH_DEBUG_AUDIO_DECODING
-		log_debug("   decoded frame is %d bytes, would grow return buffer size to %d bytes", outSize, retBufSize+(unsigned)outSize);
+		log_debug("   decoded frame is %d bytes, would grow return buffer size to %d bytes", outSize, retBufSize+static_cast<unsigned int>(outSize));
 #endif // GNASH_DEBUG_AUDIO_DECODING
 
 		//
@@ -284,7 +284,7 @@ AudioDecoderFfmpeg::decode(boost::uint8_t* input, boost::uint32_t inputSize, boo
 				retBufSize+(unsigned)outSize, retCapacity);
 #endif // GNASH_DEBUG_AUDIO_DECODING
 			boost::uint8_t* tmp = retBuf;
-			retCapacity = std::max(retBufSize+(unsigned)outSize, retCapacity*2);
+			retCapacity = std::max(retBufSize+static_cast<size_t>(outSize), retCapacity*2);
 #ifdef GNASH_DEBUG_AUDIO_DECODING
 			log_debug("    reallocating it to hold up to %d bytes", retCapacity);
 #endif // GNASH_DEBUG_AUDIO_DECODING
@@ -293,7 +293,7 @@ AudioDecoderFfmpeg::decode(boost::uint8_t* input, boost::uint32_t inputSize, boo
 			delete [] tmp;
 		}
 		std::copy(outBuf, outBuf+outSize, retBuf+retBufSize);
-		retBufSize+=(unsigned)outSize;
+		retBufSize += static_cast<unsigned int>(outSize);
 	}
 
 	
