@@ -189,6 +189,34 @@ private:
   GLenum _cap;
 };
 
+
+class oglScopeMatrix : public boost::noncopyable
+{
+public:
+  oglScopeMatrix(const matrix& m)
+  {
+    glPushMatrix();
+
+    // Multiply (AKA "append") the new matrix with the current OpenGL one.
+    float mat[16];
+    memset(&mat[0], 0, sizeof(mat));
+    mat[0] = m.sx / 65536.0f;
+    mat[1] = m.shx / 65536.0f;
+    mat[4] = m.shy / 65536.0f;
+    mat[5] = m.sy / 65536.0f;
+    mat[10] = 1;
+    mat[12] = m.tx;
+    mat[13] = m.ty;
+    mat[15] = 1;
+    glMultMatrixf(mat);
+  }
+  
+  ~oglScopeMatrix()
+  {
+    glPopMatrix();
+  }
+};
+
 static void
 check_error()
 {
@@ -769,25 +797,6 @@ public:
     
   }
   
-  static void
-  apply_matrix(const gnash::matrix& m)
-  // multiply current matrix with opengl matrix
-  {
-    // FIXME: applying matrix transformations is faster than using glMultMatrix!
-  
-    float mat[16];
-    memset(&mat[0], 0, sizeof(mat));
-    mat[0] = m.sx / 65536.0f;
-    mat[1] = m.shx / 65536.0f;
-    mat[4] = m.shy / 65536.0f;
-    mat[5] = m.sy / 65536.0f;
-    mat[10] = 1;
-    mat[12] = m.tx;
-    mat[13] = m.ty;
-    mat[15] = 1;
-    glMultMatrixf(mat);
-  }
-
   virtual void
   end_display()
   {
@@ -871,8 +880,7 @@ public:
   draw_line_strip(const boost::int16_t* coords, int vertex_count, const rgba& color,
                   const matrix& mat)
   {
-    glPushMatrix();
-    apply_matrix(mat);
+    oglScopeMatrix scope_mat(mat);
 
     glColor3ub(color.m_r, color.m_g, color.m_b);
 
@@ -890,7 +898,6 @@ public:
     glPointSize(1); // return to default
 
     glDisableClientState(GL_VERTEX_ARRAY);
-    glPopMatrix();
   }
 
   // NOTE: this implementation can't handle complex polygons (such as concave
@@ -902,8 +909,7 @@ public:
       return;
     }
 
-    glPushMatrix();
-    apply_matrix(mat);
+    oglScopeMatrix scope_mat(mat);
 
     glColor4ub(fill.m_r, fill.m_g, fill.m_b, fill.m_a);
 
@@ -1550,7 +1556,7 @@ public:
 
       
       apply_fill_style(fill_styles[i], mat, cx);
-      
+
       if (fill_styles[i].get_type() != SWF::FILL_SOLID) {     
         // Apply alpha premultiplication.
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
@@ -1614,8 +1620,7 @@ public:
       return; // invisible character
     }    
     
-    glPushMatrix();
-    apply_matrix(mat);
+    oglScopeMatrix scope_mat(mat);
 
     std::vector<PathVec::const_iterator> subshapes = find_subshapes(path_vec);
     
@@ -1631,8 +1636,6 @@ public:
       draw_subshape(subshape_paths, mat, cx, pixel_scale, fill_styles,
                     line_styles);
     }
-    
-    glPopMatrix();    
   }
 
   virtual void draw_glyph(shape_character_def *def, const matrix& mat,
@@ -1649,12 +1652,9 @@ public:
     
     std::vector<line_style> dummy_ls;
     
-    glPushMatrix();
-    apply_matrix(mat);
+    oglScopeMatrix scope_mat(mat);
     
     draw_subshape(def->get_paths(), mat, dummy_cx, pixel_scale, glyph_fs, dummy_ls);
-    
-    glPopMatrix();
   }
 
   virtual void set_scale(float xscale, float yscale) {
