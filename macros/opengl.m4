@@ -1,5 +1,5 @@
 dnl  
-dnl    Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+dnl    Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 dnl  
 dnl  This program is free software; you can redistribute it and/or modify
 dnl  it under the terms of the GNU General Public License as published by
@@ -133,6 +133,7 @@ AC_DEFUN([GNASH_PATH_OPENGL],
   
   if test x"${darwin}" = xyes; then
 	  OPENGL_LIBS="${OPENGL_LIBS} -dylib_file /System/Library/Frameworks/OpenGL.framework/Versions/Current/Libraries/libGL.dylib:/System/Library/Frameworks/OpenGL.framework/Versions/Current/Libraries/libGL.dylib"
+	  LDFLAGS="$LDFLAGS -Wl,-dylib_file,/System/Library/Frameworks/OpenGL.framework/Versions/Current/Libraries/libGL.dylib:/System/Library/Frameworks/OpenGL.framework/Versions/Current/Libraries/libGL.dylib"
   fi
 
   AC_SUBST(OPENGL_CFLAGS)

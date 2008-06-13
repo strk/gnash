@@ -1906,10 +1906,6 @@ AC_ARG_ENABLE([strict],
   [strict=no]
 )
 
-if test x"$darwin" = x"yes" -a x$build_ogl = xyes; then
-	LDFLAGS="$LDFLAGS -Wl,-dylib_file,/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib:/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib"
-fi
-
 if test x"$strict" = x"yes" -a x$build_agg = xyes; then
    AC_MSG_ERROR([agg renderer will fail with --enable-strict.]);	
 fi
