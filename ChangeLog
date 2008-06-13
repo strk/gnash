@@ -1,3 +1,10 @@
+2008-06-13 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/vm/ActionExec.cpp: return an exception if there is no
+	  'finally' block. I'm not yet sure why (or if) this is correct,
+	  but it fixes the mtasc tests again.
+	* server/vm/ASHandlers.cpp: fix typo in debugging message.
+
 2008-06-12 Zou Lunkai <zoulunkai@gmail.com>
 	
 	* libbase/utility.h,

@@ -2784,7 +2784,7 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
         if (!obj->get_member(NSV::PROP_CONSTRUCTOR, &function) )
         {
             IF_VERBOSE_ASCODING_ERRORS (
-            log_aserror(_("Object doensn't have a constructor"));
+            log_aserror(_("Object doesn't have a constructor"));
             )
         }
     }

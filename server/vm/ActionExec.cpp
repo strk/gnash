@@ -55,7 +55,7 @@
 # define STACK_DUMP_LIMIT 32
 
 // Define to get debugging messages for try / catch
-//#define GNASH_DEBUG_TRY 1
+#define GNASH_DEBUG_TRY 1
 
 #endif
 
@@ -200,7 +200,6 @@ ActionExec::operator() ()
         {
             if (pc >= stop_pc)
             {
-                    
                 // No try blocks
                 if (_tryList.empty()) {
                 
@@ -211,7 +210,7 @@ ActionExec::operator() ()
                         // Stop execution (for how long?) if an exception
                         // is still on the stack and there is nothing
                         // left to catch it.
-                        throw ActionScriptException();
+                        //throw ActionScriptException();
                     }
                     break;
                 }
@@ -245,9 +244,9 @@ ActionExec::operator() ()
                 {
                     if (env.stack_size() && env.top(0).is_exception())
                     {
+#ifdef GNASH_DEBUG_TRY
                         as_value ex = env.top(0);
                         ex.unflag_exception();
-#ifdef GNASH_DEBUG_TRY                    
                         log_debug("TRY block: Encountered exception (%s). Set PC to catch.", ex);
 #endif
                         // We have an exception. Don't execute any more of the try
@@ -276,7 +275,6 @@ ActionExec::operator() ()
 #endif
                                 env.global_register(t._registerIndex) = ex;
                             }
-                            //continue;
                         }
                     }
                     else
@@ -294,21 +292,23 @@ ActionExec::operator() ()
                 }
                 else if (t._tryState == tryBlock::TRY_CATCH)
                 {
-                    log_debug("CATCH: tryBlock name = %s", t._name);                
+#ifdef GNASH_DEBUG_TRY
+                    log_debug("CATCH: tryBlock name = %s", t._name); 
+#endif               
                     // Process exceptions. The code in catch { } will 
                     // be executed whether this block is reached or not.
                     
                     if (env.stack_size() && env.top(0).is_exception())
                     {
-                        // Should be renamed to "currentException"
                         // This was thrown in "try". Remove it from
                         // the stack and remember it so that
                         // further exceptions can be caught.
                         t._lastThrow = env.pop();
+#ifdef GNASH_DEBUG_TRY
                         as_value ex = t._lastThrow;
                         ex.unflag_exception();
-                        
                         log_debug("CATCH block: top of stack is an exception (%s)", ex);
+#endif
 
                         if (t._hasName && !t._name.empty())
                         {
@@ -355,7 +355,6 @@ ActionExec::operator() ()
                     // If there's no exception here, we can execute the
                     // rest of the code. If there is, it will be caught
                     // by the next TryBlock or stop execution.
-                    
                     if (env.stack_size() && env.top(0).is_exception())
                     {
                         // Check for exception handlers straight away
@@ -380,6 +379,16 @@ ActionExec::operator() ()
                                   "uncaught one (%s) back", ex);
 #endif
                         env.push(t._lastThrow);
+                        if ((t._finallyOffset == t._savedEndOffset) && retval)
+                        {
+                            // This was taken over from the previous
+                            // implementation. It happens when there is
+                            // no 'finally' block. It seems to be a bit of
+                            // a hack now, though it may be correct. It
+                            // passes misc-mtasc.all/exceptions.swf.
+                            // TODO: more tests needed.                            
+                            *retval = t._lastThrow;
+                        }
                         _tryList.pop_back();
                         continue;
                     }
@@ -749,7 +758,6 @@ ActionExec::getTarget()
 {
     if ( ! with_stack.empty() )
     {
-        //return const_cast<as_object*>(with_stack.back().object());
         return with_stack.back().object();
     }
     else
@@ -766,6 +774,7 @@ ActionExec::pushTryBlock(tryBlock& t)
     stop_pc = t._catchOffset;
 
     _tryList.push_back(t);
+
 }
 
 void
