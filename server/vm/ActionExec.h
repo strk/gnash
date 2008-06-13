@@ -49,7 +49,7 @@ public:
 	};
 
     TryBlock(size_t cur_off, size_t try_size, size_t catch_size,
-		size_t finally_size, std::string catchName, int /*stack_depth*/)
+		size_t finally_size, std::string catchName)
 		:
 		_catchOffset(cur_off + try_size),
 		_finallyOffset(cur_off + try_size + catch_size),
@@ -59,10 +59,10 @@ public:
 		_registerIndex(),
 		_tryState(TryBlock::TRY_TRY),
 		_lastThrow()
-	{/**/}
+	{}
 
 	TryBlock(size_t cur_off, size_t try_size, size_t catch_size,
-		size_t finally_size, boost::uint8_t register_index, int /* stack_depth */)
+		size_t finally_size, boost::uint8_t register_index)
 		:
 		_catchOffset(cur_off + try_size),
 		_finallyOffset(cur_off + try_size + catch_size),
@@ -72,7 +72,7 @@ public:
 		_registerIndex(register_index),
 		_tryState(TryBlock::TRY_TRY),
 		_lastThrow()
-	{/**/}
+	{}
 
 private:
 	size_t _catchOffset;

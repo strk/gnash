@@ -4102,25 +4102,21 @@ SWFHandlers::ActionTry(ActionExec& thread)
     const char* catchName = NULL;
     boost::uint8_t catchRegister = 0;
 
-    if (!doFinally)
-        finallySize = 0;
-    if (!doCatch)
-        catchSize = 0;
+    if (!doFinally) finallySize = 0;
+    if (!doCatch) catchSize = 0;
 
     if (!catchInRegister)
     {
         catchName = code.read_string(i);
         i += strlen(catchName) + 1;
-        TryBlock t(i, trySize, catchSize, finallySize, catchName, 
-            env.stack_size());
+        TryBlock t(i, trySize, catchSize, finallySize, catchName);
         thread.pushTryBlock(t);
     }
     else
     {
         catchRegister = code[i];
         ++i;
-        TryBlock t(i, trySize, catchSize, finallySize, catchRegister,
-            env.stack_size());
+        TryBlock t(i, trySize, catchSize, finallySize, catchRegister);
         thread.pushTryBlock(t);
     }
 
