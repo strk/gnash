@@ -1,5 +1,8 @@
 2008-06-14  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* libnet/network.{h,cpp}: Read and write Buffers too. Set _port for
+	client connections too.
+	
 	* libbase/URL.h: Add method to return the port number, and another
 	one to fix the hostname if there is a port number attached.
 	* libbase/URL.cpp: Properly parse the optional port number instead

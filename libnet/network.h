@@ -39,6 +39,10 @@
 #include <cassert>
 #include <string>
 
+namespace amf {
+class Buffer;
+}
+
 namespace gnash {
 
 // Define the ports for the RTMP protocols
@@ -91,14 +95,14 @@ public:
     bool createClient(const std::string &hostname, short port);
 
     // Read from the connection
-//    int readNet(Buffer &buffer);
+    int readNet(amf::Buffer *buffer);
     int readNet(byte_t *buffer, int nbytes);
     int readNet(byte_t *buffer, int nbytes, int timeout);
     int readNet(int fd, byte_t *buffer, int nbytes);
     int readNet(int fd, byte_t *buffer, int nbytes, int timeout);
     
     // Write to the connection
-//    int writeNet(gnash::Buffer &buffer);
+    int writeNet(amf::Buffer *buffer);
     int writeNet(const std::string &buffer);
     int writeNet(const byte_t *buffer, int nbytes);
 //    int writeNet(int fd, const byte_t *buffer);

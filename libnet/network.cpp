@@ -48,6 +48,8 @@
 # include <sys/select.h>
 #endif
 
+#include "buffer.h"
+
 #ifndef MAXHOSTNAMELEN
 #define MAXHOSTNAMELEN 256
 #endif
@@ -473,6 +475,7 @@ Network::createClient(const string &hostname, short port)
         return false;
     }
 
+    _port = port;    
     log_debug(_("%s: to host %s at port %d"), __FUNCTION__, hostname, port);
 
     memset(&sock_in, 0, sizeof(struct sockaddr_in));
@@ -580,6 +583,7 @@ Network::createClient(const string &hostname, short port)
 #endif
 
     _connected = true;
+    _port = port;
     assert(_sockfd > 0);
     return true;
 }
@@ -680,6 +684,12 @@ Network::closeConnection(int fd)
 
 // Read from the connection
 int
+Network::readNet(amf::Buffer *buffer)
+{
+    return readNet(_sockfd, buffer->reference(), buffer->size(), _timeout);
+}
+
+int
 Network::readNet(byte_t *buffer, int nbytes)
 {
     return readNet(_sockfd, buffer, nbytes, _timeout);
@@ -763,6 +773,12 @@ Network::readNet(int fd, byte_t *buffer, int nbytes, int timeout)
 }
 
 // Write to the connection
+int
+Network::writeNet(amf::Buffer *buffer)
+{
+    return writeNet(buffer->reference(), buffer->size());
+};
+
 int
 Network::writeNet(const std::string& buffer)
 {
