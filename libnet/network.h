@@ -63,23 +63,23 @@ const short RTMPTS_PORT = 443;
 // Adjust for the constant size
 const size_t NETBUFSIZE = 1357*2;	// 1500 appears to be the default size as used by FMS
 
-class Network {
+class DSOEXPORT Network {
 public:
     typedef boost::uint8_t byte_t;
 
-    DSOEXPORT Network();
-    DSOEXPORT ~Network();
+    Network();
+    ~Network();
     
     // Create a new server. After creating it, then you have to wait
     // for an incoming connection.
     int createServer(void);
-    DSOEXPORT int createServer(short port);
+    int createServer(short port);
     
     // Accept a client connection for the current server.
     int newConnection(void);
     int newConnection(int fd);
     int newConnection(bool block, int fd);
-    DSOEXPORT int newConnection(bool block);
+    int newConnection(bool block);
 
     // Connect to a named pipe
     bool connectSocket(const std::string &sock);
@@ -88,27 +88,27 @@ public:
     bool createClient(void);
     bool createClient(short port);
     bool createClient(const std::string &hostname);
-    DSOEXPORT bool createClient(const std::string &hostname, short port);
+    bool createClient(const std::string &hostname, short port);
 
     // Read from the connection
 //    int readNet(Buffer &buffer);
     int readNet(byte_t *buffer, int nbytes);
-    DSOEXPORT int readNet(byte_t *buffer, int nbytes, int timeout);
+    int readNet(byte_t *buffer, int nbytes, int timeout);
     int readNet(int fd, byte_t *buffer, int nbytes);
     int readNet(int fd, byte_t *buffer, int nbytes, int timeout);
     
     // Write to the connection
 //    int writeNet(gnash::Buffer &buffer);
     int writeNet(const std::string &buffer);
-    DSOEXPORT int writeNet(const byte_t *buffer, int nbytes);
+    int writeNet(const byte_t *buffer, int nbytes);
 //    int writeNet(int fd, const byte_t *buffer);
     int writeNet(int fd, const byte_t *buffer, int nbytes);
     int writeNet(int fd, const byte_t *buffer, int nbytes, int timeout);
     
     // Close the connection
-    DSOEXPORT bool closeNet();
+    bool closeNet();
     bool closeNet(int fd);
-    DSOEXPORT bool closeConnection();
+    bool closeConnection();
     bool closeConnection(int fd);
 
     // Change the debug flag

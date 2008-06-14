@@ -33,6 +33,7 @@
 #include "network.h"
 #include "buffer.h"
 #include "utility.h"
+#include "dsodefs.h" //For DSOEXPORT.
 
 #include "rtmp.h"
 #include "rtmp_server.h"
@@ -45,7 +46,7 @@ using namespace boost;
 namespace gnash
 {
 
-map<int, Handler *> handlers;
+map<int, Handler *> DSOEXPORT handlers;
 
 Handler::Handler()
     : _die(false), _netfd(0)

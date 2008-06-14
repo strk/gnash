@@ -27,6 +27,7 @@
 #include "getclocktime.hpp"
 #include "buffer.h"
 #include "network.h"
+#include "dsodefs.h" //For DSOEXPORT.
 
 // _definst_ is the default instance name
 namespace gnash
@@ -53,7 +54,7 @@ public:
     // Peek at the first date element witjhout removing it from the que
     amf::Buffer *peek();
     // Get the number of elements in the que
-    size_t size();
+    size_t DSOEXPORT size();
     // Wait for a condition variable to trigger
     void wait();
     // Notify a condition variable to trigger
