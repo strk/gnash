@@ -47,6 +47,11 @@ AM_CPPFLAGS = \
         -I$(top_srcdir)/libgeometry \
         -I$(top_srcdir)/testsuite \
 	$(BOOST_CFLAGS) \
+	$(OPENGL_CFLAGS) \
+	$(NULL)
+
+AM_LDFLAGS = \
+	$(OPENGL_LIBS) \
 	$(NULL)
 
 gravity_embedded_TestRunner_SOURCES = \

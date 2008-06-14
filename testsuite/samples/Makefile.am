@@ -32,8 +32,13 @@ AM_CPPFLAGS = \
         -I$(top_srcdir)/server/parser  \
         -I$(top_srcdir)/libgeometry \
         -I$(top_srcdir)/testsuite \
+	$(OPENGL_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(FFMPEG_CFLAGS) \
+	$(NULL)
+
+AM_LDFLAGS = \
+	$(OPENGL_LIBS) \
 	$(NULL)
 
 GNASH_LIBS = \
