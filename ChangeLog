@@ -1,3 +1,10 @@
+2008-06-14  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* libbase/URL.h: Add method to return the port number, and another
+	one to fix the hostname if there is a port number attached.
+	* libbase/URL.cpp: Properly parse the optional port number instead
+	of blindly adding it to the hostname.
+
 2008-03-14 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* libnet/{handler, network, cque}.h: Added DSOEXPORT.

@@ -63,6 +63,13 @@ public:
 	///
 	const std::string& hostname() const { return _host; }
 
+	/// Return the 'port' member of this URL, as a string
+	//
+	/// NOTE: return the empty string if the port isn't specified,
+        /// as this is an optional field.
+	///
+	const std::string& port() const { return _port; }
+
 	/// Return the 'path' member of this URL, as a string
 	const std::string& path() const { return _path; }
 
@@ -156,6 +163,9 @@ private:
 	/// Extract anchor from path
 	void split_anchor_from_path();
 
+	/// Extract tcp/ip port from path
+	void split_port_from_host();
+
 	/// Extract and parse query string from path
 	void split_querystring_from_path();
 
@@ -168,13 +178,10 @@ private:
 	void normalize_path(std::string& path);
 
 	std::string _proto;
-
 	std::string _host;
-
+	std::string _port;
 	std::string _path;
-
 	std::string _anchor;
-
 	std::string _querystring;
 };
 

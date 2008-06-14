@@ -84,7 +84,7 @@ URL::init_absolute(const std::string& in)
 		}
 
 		// copy hostname
-		_host = in.substr(pos, pos1-pos);
+                _host = in.substr(pos, pos1-pos);
                 
 		// next come path
 		_path = in.substr(pos1);
@@ -97,6 +97,9 @@ URL::init_absolute(const std::string& in)
 
 	// Extract anchor from path, if any
 	split_anchor_from_path();
+
+	// Extract the port number from the hostname, if any
+	split_port_from_host();
 
 	split_querystring_from_path();
 
@@ -209,6 +212,7 @@ URL::init_relative(const std::string& relative_url, const URL& baseurl)
 	{
 		_proto = baseurl._proto;
 		_host = baseurl._host;
+                _port= baseurl._port;
 		_path = baseurl._path;
 		_anchor = relative_url.substr(1);
 		return;
@@ -300,6 +304,9 @@ URL::init_relative(const std::string& relative_url, const URL& baseurl)
 
 		split_anchor_from_path();
 
+                // Extract the port number from the hostname, if any
+                split_port_from_host();
+
 		split_querystring_from_path();
 
 		normalize_path(_path);
@@ -312,7 +319,13 @@ URL::init_relative(const std::string& relative_url, const URL& baseurl)
 string
 URL::str() const
 {
-	string ret = _proto + "://" + _host + _path;
+        string ret = _proto + "://" + _host;
+	if ( _port != "" )
+	{
+		ret += ":" + _port;
+	}
+    
+        ret += _path;
 	if ( _querystring != "" )
 	{
 		ret += "?" + _querystring;
@@ -336,6 +349,21 @@ URL::split_anchor_from_path()
 	{
 		_anchor = _path.substr(hashpos+1);
 		_path.erase(hashpos);
+	}
+}
+
+/*private*/
+void
+URL::split_port_from_host()
+{
+	assert(_port == "");
+
+	// Extract anchor from path, if any
+	string::size_type hashpos = _host.find(':');
+	if ( hashpos != string::npos )
+	{
+		_port = _host.substr(hashpos+1);
+		_host.erase(hashpos);
 	}
 }
 
