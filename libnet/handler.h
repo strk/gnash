@@ -29,6 +29,7 @@
 #include "buffer.h"
 #include "cque.h"
 #include "network.h"
+#include "dsodefs.h"
 
 // _definst_ is the default instance name
 namespace gnash
@@ -38,7 +39,7 @@ namespace gnash
 class Handler : public gnash::Network
 {
 public:
-    Handler();
+    DSOEXPORT Handler();
     ~Handler();
 
     typedef enum {
@@ -125,7 +126,7 @@ public:
     void waitout() { _outgoing.wait(); };
 
     // start the two thread handlers for the queues
-    bool start(thread_params_t *args);
+    bool DSOEXPORT start(thread_params_t *args);
 
     // Take a buffer and write it to the network
     int writeNet(int fd, amf::Buffer *buf)

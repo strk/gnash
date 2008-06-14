@@ -1,9 +1,15 @@
+2008-03-14 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* libnet/handler.h: Added DSOEXPORT.
+	* libnet/{handler, rtmp}.cpp: Fixed uninitilzied vars.
+
 2008-03-13 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* libmedia/ffmpeg/AudioDecoderFfmpeg.cpp: Fixed typecasting for 
 	  std::max().
 	* macros/opengl.m4: Fix for Leopard and OGL, see:
-	  http://wiki.finkproject.org/index.php/Fink:Packaging:Preparing_for_10.5#OpenGL_Bug
+	  http://wiki.finkproject.org/index.php/Fink:
+	  Packaging:Preparing_for_10.5#OpenGL_Bug
 	* backend/render_handler_ogl.h: Should fix bug #23352.
 	* testsuite/samples/Makefile.am, testsuite/movies.all/Makefile.am:
 	  Let testcases run on OS X.

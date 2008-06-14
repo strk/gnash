@@ -258,7 +258,7 @@ RTMP::encodeHeader(int amf_index, rtmp_headersize_e head_size,
 {
     GNASH_REPORT_FUNCTION;
 
-    amf::Buffer *buf;
+    amf::Buffer *buf = NULL;
     switch(head_size) {
       case HEADER_1:
 	  buf = new Buffer(1);

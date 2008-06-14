@@ -93,7 +93,7 @@ amf::Buffer *
 Handler::pop(fifo_e direction)
 {
 //    GNASH_REPORT_FUNCTION;
-    amf::Buffer *buf;
+    amf::Buffer *buf = NULL;
     
     if (direction == Handler::OUTGOING) {
 	if (_outgoing.size()) {
@@ -248,7 +248,7 @@ void
 netout_handler(Handler::thread_params_t *args)
 {
 //    GNASH_REPORT_FUNCTION;
-    int ret;
+    int ret = 0;
     Handler *hand = reinterpret_cast<Handler *>(args->handle);
 
     log_debug("Starting to wait for data in que for fd #%d", args->netfd);
