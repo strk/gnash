@@ -132,8 +132,7 @@ AC_DEFUN([GNASH_PATH_OPENGL],
   fi
   
   if test x"${darwin}" = xyes; then
-	  OPENGL_LIBS="${OPENGL_LIBS} -dylib_file /System/Library/Frameworks/OpenGL.framework/Versions/Current/Libraries/libGL.dylib:/System/Library/Frameworks/OpenGL.framework/Versions/Current/Libraries/libGL.dylib"
-	  LDFLAGS="$LDFLAGS -Wl,-dylib_file,/System/Library/Frameworks/OpenGL.framework/Versions/Current/Libraries/libGL.dylib:/System/Library/Frameworks/OpenGL.framework/Versions/Current/Libraries/libGL.dylib"
+	  OPENGL_LIBS="${OPENGL_LIBS} -dylib_file /System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib:/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib"
   fi
 
   AC_SUBST(OPENGL_CFLAGS)
