@@ -792,8 +792,8 @@ Gui::display(movie_root* m)
 				corners[2].y = ymax;
 				corners[3].x = xmin;
 				corners[3].y = ymax;
-                matrix no_transform;
-				gnash::render::draw_poly(&corners[0], 4,
+				matrix no_transform;
+				gnash::render::draw_poly(corners, 4,
 					rgba(0,0,0,0), rgba(255,0,0,255), no_transform, false);
 					
 			}

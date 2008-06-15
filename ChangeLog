@@ -1,3 +1,18 @@
+2008-06-14 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* backend/render_handler_cairo.cpp: Remove init_cairo_matrix, which is
+	unused and broken.
+	* gui/gtk.cpp: Use GTK's internal region invalidation instead of our
+	own bounds invalidation, because the former seems to be more portable.
+	This change makes the GTK GUI fully functional when compiled against
+	GTK's native Mac port.
+	* gui/{gtk.cpp, gtk_glue.h, gtk_glue_cairo.h, gtksup.h}: Don't include
+	gdkx.h, since we don't use it.
+	* gui/gtk_glue_agg.cpp: Disable double buffering in all cases, because
+	we always render into our own offscreen buffer (rather than GTK's).
+	Make sure we pass the right row stride when blitting.
+	* gui/gui.cpp: tiny cleanup.
+
 2008-06-14  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* libnet/network.{h,cpp}: Read and write Buffers too. Set _port for

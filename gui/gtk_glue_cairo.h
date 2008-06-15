@@ -18,11 +18,7 @@
 #include "gtk_glue.h"
 
 #include <gtk/gtk.h>
-#ifndef _WIN32
-#include <gdk/gdkx.h>
-#else
 #include <gdk/gdk.h>
-#endif
 
 # include <cairo.h>
 

@@ -21,11 +21,7 @@
 #include "gnash.h"
 
 #include <gtk/gtk.h>
-#ifndef _WIN32
-#include <gdk/gdkx.h>
-#else
 #include <gdk/gdk.h>
-#endif
 
 namespace gnash
 {

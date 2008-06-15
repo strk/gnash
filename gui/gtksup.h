@@ -25,11 +25,7 @@
 #include "gnash.h"
 #include "gtk_glue.h"
 
-#ifndef _WIN32
-#include <gdk/gdkx.h>
-#else
 #include <gdk/gdk.h>
-#endif
 #include <gtk/gtk.h>
 
 #ifdef GUI_HILDON
@@ -183,8 +179,8 @@ class GtkGui : public Gui
 
     gchar* find_pixmap_file(const gchar *filename);
     
-    void rerenderPixels(int xmin, int ymin, int xmax, int ymax);
-    
+    void expose(const GdkRegion* region);
+
     void setInvalidatedRegions(const InvalidatedRanges& ranges);
 
     bool want_multiple_regions() { return true; }
@@ -211,8 +207,6 @@ class GtkGui : public Gui
     GtkMenu     *_popup_menu;
     GtkWidget   *_menubar;
     GtkWidget   *_vbox;
-
-    std::vector< geometry::Range2d<int> > _drawbounds;
 
     // Adds the gnash icon to a window.
     void addGnashIcon(GtkWindow* window);

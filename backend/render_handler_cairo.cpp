@@ -968,15 +968,6 @@ draw_subshape(const PathVec& path_vec, const matrix& mat, const cxform& cx,
     _cr = context;
   }
   
-  void
-  init_cairo_matrix(cairo_matrix_t* cairo_matrix, const matrix& gnash_matrix)
-  {
-    cairo_matrix_init(cairo_matrix,
-	    gnash_matrix.m_[0][0], gnash_matrix.m_[1][0],
-	    gnash_matrix.m_[0][1], gnash_matrix.m_[1][1],
-	    gnash_matrix.m_[0][2], gnash_matrix.m_[1][2]);
-  }
-  
   bool initTestBuffer(unsigned width, unsigned height)
   {
     cairo_surface_t* test_surface =

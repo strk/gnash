@@ -39,11 +39,7 @@
 #endif
 
 #include <gtk/gtk.h>
-#ifndef _WIN32
-#include <gdk/gdkx.h>
-#else
 #include <gdk/gdk.h>
-#endif
 #include <gdk/gdkkeysyms.h>
 #include <string>
 
@@ -109,7 +105,6 @@ GtkGui::GtkGui(unsigned long xid, float scale, bool loop, unsigned int depth)
 	,_popup_menu(0)
 	,_menubar(0)
 	,_vbox(0)
-	,_drawbounds()
 	,_glue()
 {
 }
@@ -827,42 +822,28 @@ GtkGui::beforeRendering()
 void
 GtkGui::renderBuffer()
 {
-    if ( _drawbounds.size() == 0 ) return; // nothing to do..
-    
-    for (unsigned bno=0; bno < _drawbounds.size(); bno++) {
-	
-        geometry::Range2d<int>& bounds = _drawbounds[bno];
-        
-        assert ( bounds.isFinite() );
-        
-        _glue->render(bounds.getMinX(), bounds.getMinY(),
-                      bounds.getMaxX(), bounds.getMaxY());
-	
-    }
+    gdk_window_process_updates(_drawingArea->window, false);
 }
 
 void
-GtkGui::rerenderPixels(int xmin, int ymin, int xmax, int ymax) 
+GtkGui::expose(const GdkRegion *region) 
 {
+    gint num_rects;
+    GdkRectangle* rects;
 
-    // This function is called in expose events to force partly re-rendering
-    // of the window. The coordinates are PIXELS.
-    
-    // The macro PIXELS_TO_TWIPS can't be used since the renderer might do 
-    // scaling.
-    
-    InvalidatedRanges ranges;
-    
-    geometry::Range2d<int> exposed_pixels(xmin, ymin, xmax, ymax);
-    
-    geometry::Range2d<float> exposed_twips = 
-        _renderer->pixel_to_world(exposed_pixels);	
-    
-    ranges.add(exposed_twips);
-    setInvalidatedRegions(ranges);
-    
-    renderBuffer();   
-    
+    // In some versions of GTK this can't be const...
+    GdkRegion* nonconst_region = const_cast<GdkRegion*>(region);
+
+    gdk_region_get_rectangles (nonconst_region, &rects, &num_rects);
+    assert(num_rects);
+
+    for (int i=0; i<num_rects; ++i) {
+      const GdkRectangle& cur_rect = rects[i];
+      _glue->render(cur_rect.x, cur_rect.y, cur_rect.x + cur_rect.width,
+                    cur_rect.y + cur_rect.height);
+    }
+
+    g_free(rects);
 }
 
 void
@@ -871,17 +852,19 @@ GtkGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
     // forward to renderer
     //
     // Why? Why have the region been invalidated ??
+    //   A: I don't understand this question.
     // Was the renderer offscreen buffer also invalidated
     // (need to rerender)?
+    //   A: Yes.
     // Was only the 'onscreen' buffer be invalidated (no need to rerender,
     // just to blit) ??
+    //   A: I don't understand this question.
     //
-    // To be safe just assume this 'invalidated' region is actually
-    // the offscreen buffer, for safety, but we need to clarify this.
-    //
+    // Clarification: the render (optionally) only draws to the invalidated
+    // (i.e., changed) part of the buffer. So we need to tell the renderer
+    // where that is. The renderer draws to the offscreen buffer. (Although
+    // that should be obvious!)
     _renderer->set_invalidated_regions(ranges);
-    
-    _drawbounds.clear();
     
     for (unsigned rno=0; rno<ranges.size(); rno++) {
         geometry::Range2d<int> bounds = Intersection(
@@ -894,10 +877,18 @@ GtkGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
         
         assert(bounds.isFinite()); 
         
-        _drawbounds.push_back(bounds);
-        
+        GdkRectangle rect;
+        rect.x = bounds.getMinX();
+        rect.y = bounds.getMinY();
+        rect.width = bounds.width();
+        rect.height = bounds.height();
+
+        // We add the rectangle to the part of the window to be redrawn
+        // (also known as the "clipping" or "damaged" area). in renderBuffer(),
+        // we force a redraw.
+        gdk_window_invalidate_rect(_drawingArea->window, &rect, false);
     }
-    
+
 }
 
 /// This method is called when the "OK" button is clicked in the open file
@@ -1739,12 +1730,7 @@ GtkGui::expose_event(GtkWidget *const /*widget*/,
 
     GtkGui* gui = static_cast<GtkGui*>(data);
 
-    const int xmin = event->area.x;
-    const int xmax = event->area.x + event->area.width;
-    const int ymin = event->area.y;
-    const int ymax = event->area.y + event->area.height;
-
-    gui->rerenderPixels(xmin, ymin, xmax, ymax);
+    gui->expose(event->region);
 
     return TRUE;
 }

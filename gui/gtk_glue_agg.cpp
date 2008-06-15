@@ -210,9 +210,6 @@ GtkAggGlue::create_shm_image(unsigned int width, unsigned int height)
     return;
   }
   
-  // Disable double buffering, otherwise gtk tries to update widget
-  // contents from offscreen buffer at the end of expose event
-  gtk_widget_set_double_buffered(_drawing_area, FALSE);
   //log_debug("create_shm_image() OK"); // <-- remove this
 #endif // ENABLE_MIT_SHM
    
@@ -239,6 +236,10 @@ void
 GtkAggGlue::prepDrawingArea(GtkWidget *drawing_area)
 {
     _drawing_area = drawing_area;
+
+    // Disable double buffering, otherwise gtk tries to update widget
+    // contents from its internal offscreen buffer at the end of expose event
+    gtk_widget_set_double_buffered(_drawing_area, FALSE);
 }
 
 bool 
@@ -498,7 +499,7 @@ GtkAggGlue::render()
   		_height,
   		GDK_RGB_DITHER_NONE,
   		_offscreenbuf,
-  		(int)(_width*_bpp/8)
+  		_width*((_bpp+7)/8)
   	);  	
 
 #ifdef ENABLE_MIT_SHM
@@ -510,7 +511,6 @@ GtkAggGlue::render()
 void
 GtkAggGlue::render(int minx, int miny, int maxx, int maxy)
 {
-
 #ifdef ENABLE_MIT_SHM
   if (_shm_image) {
   
@@ -528,7 +528,6 @@ GtkAggGlue::render(int minx, int miny, int maxx, int maxy)
   
   } else {
 #endif       
-
   	// Update only the invalidated rectangle
   	gdk_draw_rgb_image (
   		_drawing_area->window,
