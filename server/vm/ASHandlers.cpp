@@ -4076,9 +4076,7 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
 void
 SWFHandlers::ActionTry(ActionExec& thread)
 {
-    
 
-    as_environment& env = thread.env;
     const action_buffer& code = thread.code;
 
 #ifndef NDEBUG

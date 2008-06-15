@@ -1,3 +1,7 @@
+2008-06-15 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/vm/ASHandlers.cpp: drop unused env variable.
+
 2008-06-14 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* backend/render_handler_cairo.cpp: Remove init_cairo_matrix, which is
