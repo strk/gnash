@@ -75,6 +75,10 @@ public:
 
 private:
 
+	/// Initialize parser, figuring format and 
+	/// creating VideoInfo and AudioInfo objects
+	void initializeParser();
+
 	/// Video frame cursor position 
 	//
 	/// This is the video frame number that will

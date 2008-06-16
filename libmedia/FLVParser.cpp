@@ -43,7 +43,6 @@ FLVParser::FLVParser(std::auto_ptr<IOChannel> lt)
 	:
 	MediaParser(lt),
 	_lastParsedPosition(0),
-	_bytesLoaded(0),
 	_nextAudioFrame(0),
 	_nextVideoFrame(0),
 	_audio(false),
@@ -51,6 +50,7 @@ FLVParser::FLVParser(std::auto_ptr<IOChannel> lt)
 {
 	if ( ! parseHeader() ) 
 		throw GnashException("FLVParser couldn't parse header from input");
+	startParserThread();
 }
 
 FLVParser::~FLVParser()
@@ -384,7 +384,6 @@ boost::uint64_t
 FLVParser::getBytesLoaded() const
 {
 	boost::mutex::scoped_lock lock(_bytesLoadedMutex);
-	//log_debug("FLVParser::getBytesLoaded returning %d/%d", _bytesLoaded, _stream->size()); // _stream->size would need mutex-protection..
 	return _bytesLoaded;
 }
 

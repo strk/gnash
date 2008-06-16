@@ -376,6 +376,8 @@ public:
 
 protected:
 
+	/// Start the parser thread
+	void startParserThread();
 
 	/// Clear the a/v buffers
 	void clearBuffers();
@@ -472,6 +474,12 @@ protected:
 
 	/// mutex protecting access to the a/v encoded frames queues
 	mutable boost::mutex _qMutex;
+
+	/// Number of bytes loaded
+	boost::uint64_t _bytesLoaded;
+
+	/// Mutex protecting _bytesLoaded (read by main, set by parser)
+	mutable boost::mutex _bytesLoadedMutex;
 
 private:
 

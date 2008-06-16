@@ -192,6 +192,10 @@ MediaParserFfmpeg::parseAudioFrame(AVPacket& packet)
 bool
 MediaParserFfmpeg::parseNextFrame()
 {
+	// lock the stream while reading from it, so actionscript
+	// won't mess with the parser on seek  or on getBytesLoaded
+	boost::mutex::scoped_lock streamLock(_streamMutex);
+
 	if ( _parsingComplete )
 	{
 		log_debug("MediaParserFfmpeg::parseNextFrame: parsing complete, nothing to do");
@@ -280,6 +284,15 @@ MediaParserFfmpeg::MediaParserFfmpeg(std::auto_ptr<IOChannel> stream)
 	_audioStream(0),
 	_lastParsedPosition(0)
 {
+	initializeParser();
+
+	startParserThread();
+}
+
+/*private*/
+void
+MediaParserFfmpeg::initializeParser()
+{
 	av_register_all(); // TODO: needs to be invoked only once ?
 
 	_byteIOCxt.buffer = NULL;
@@ -291,6 +304,7 @@ MediaParserFfmpeg::MediaParserFfmpeg(std::auto_ptr<IOChannel> stream)
 	}
 
 	_formatCtx = av_alloc_format_context();
+	assert(_formatCtx);
 
 	// Setup the filereader/seeker mechanism. 7th argument (NULL) is the writer function,
 	// which isn't needed.
@@ -310,7 +324,7 @@ MediaParserFfmpeg::MediaParserFfmpeg(std::auto_ptr<IOChannel> stream)
 	// Open the stream. the 4th argument is the filename, which we ignore.
 	if(av_open_input_stream(&_formatCtx, &_byteIOCxt, "", _inputFmt, NULL) < 0)
 	{
-		throw GnashException("MediaParserFfmpeg couldn't open input stream");
+		throw IOException("MediaParserFfmpeg couldn't open input stream");
 	}
 
 	// Find audio and video stream
@@ -369,8 +383,8 @@ MediaParserFfmpeg::MediaParserFfmpeg(std::auto_ptr<IOChannel> stream)
 #endif
 		_audioInfo.reset( new AudioInfo(codec, sampleRate, sampleSize, stereo, duration, FFMPEG /*codec type*/) );
 	}
-
 }
+
 
 MediaParserFfmpeg::~MediaParserFfmpeg()
 {

@@ -209,12 +209,6 @@ private:
 	/// flag, if found to be true will clear the buffers and reset to false.
 	bool _seekRequested;
 
-	/// Number of bytes loaded
-	boost::uint64_t _bytesLoaded;
-
-	/// Mutex protecting _bytesLoaded (read by main, set by parser)
-	mutable boost::mutex _bytesLoadedMutex;
-
 	/// Audio frame cursor position 
 	//
 	/// This is the video frame number that will

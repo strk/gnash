@@ -1,5 +1,16 @@
 2008-06-16 Sandro Santilli <strk@keybit.net>
 
+	* libmedia/MediaParser.{cpp,h}: move _bytesLoaded to superclass, don't
+	  forget to initialize _seekRequested(), move parser thread starter
+	  in its own method so subclasses can do other initializations before
+	  starting it.
+	* libmedia/FLVParser.{cpp,h}: start parser thread after having
+	  parsed the header.
+	* libmedia/ffmpeg/MediaParserFfmpeg.{cpp,h}: start the parser thread
+	  after having initialized the parser.
+
+2008-06-16 Sandro Santilli <strk@keybit.net>
+
 	* libmedia/MediaParser.cpp: fix members initialization order.
 
 2008-06-16 Sandro Santilli <strk@keybit.net>

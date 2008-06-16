@@ -33,9 +33,17 @@ MediaParser::MediaParser(std::auto_ptr<IOChannel> stream)
 	_stream(stream),
 	_parsingComplete(false),
 	_bufferTime(100), // 100 ms 
+	_seekRequest(false),
+	_bytesLoaded(0),
 	_parserThread(0),
 	_parserThreadStartBarrier(2),
 	_parserThreadKillRequested(false)
+{
+}
+
+/*protected*/
+void
+MediaParser::startParserThread()
 {
 #ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
 	log_debug("Starting MediaParser thread");
