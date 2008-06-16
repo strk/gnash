@@ -1,5 +1,9 @@
 2008-06-16 Sandro Santilli <strk@keybit.net>
 
+	* libmedia/MediaParser.cpp: fix members initialization order.
+
+2008-06-16 Sandro Santilli <strk@keybit.net>
+
 	* libmedia/MediaParser.{cpp,h}: move more functionality to
 	  the base class: management of encoded audio/video queues and
 	  threaded loading (compile-time opt-out available);
