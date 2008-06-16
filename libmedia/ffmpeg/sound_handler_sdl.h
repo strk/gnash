@@ -320,6 +320,8 @@ private:
 
 	/// The SDL_audio specs
 	SDL_AudioSpec audioSpec;
+
+	void initAudioSpec();
 	
 	/// Keeps track of numbers of playing sounds
 	int soundsPlaying;

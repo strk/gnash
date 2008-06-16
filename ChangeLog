@@ -1,5 +1,12 @@
 2008-06-16 Sandro Santilli <strk@keybit.net>
 
+	* libmedia/ffmpeg/sound_handler_sdl.{cpp,h}: don't fail to initialize
+	  audio spec in the constructor not taking an audio file.
+	  Fixes timeout running NetStream-SquareTestRunner with ffmpeg
+	  media handler.
+
+2008-06-16 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/NetStreamFfmpeg.cpp (pushDecodedAudioFrames): don't
 	  consume *all* of the audio queue if there's no sound handler..
 	* libmedia/MediaParser.cpp: members initialization order, debugging

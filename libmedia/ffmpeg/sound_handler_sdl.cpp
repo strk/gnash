@@ -74,10 +74,9 @@ typedef struct{
 namespace gnash {
 namespace media {
 
-SDL_sound_handler::SDL_sound_handler(const std::string& wavefile)
-	: soundOpened(false),
-	  soundsPlaying(0),
-	  muted(false)
+
+void
+SDL_sound_handler::initAudioSpec()
 {
 	// This is our sound settings
 	audioSpec.freq = 44100;
@@ -86,6 +85,15 @@ SDL_sound_handler::SDL_sound_handler(const std::string& wavefile)
 	audioSpec.callback = SDL_sound_handler::sdl_audio_callback;
 	audioSpec.userdata = this;
 	audioSpec.samples = 2048;		//512 - not enough for  videostream
+}
+
+
+SDL_sound_handler::SDL_sound_handler(const std::string& wavefile)
+	: soundOpened(false),
+	  soundsPlaying(0),
+	  muted(false)
+{
+	initAudioSpec();
 
 	if (! wavefile.empty() ) {
         file_stream.open(wavefile.c_str());
@@ -107,6 +115,7 @@ SDL_sound_handler::SDL_sound_handler()
 	soundsPlaying(0),
 	muted(false)
 {
+	initAudioSpec();
 }
 
 void
