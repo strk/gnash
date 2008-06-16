@@ -28,8 +28,15 @@
 #include "dsodefs.h" // DSOEXPORT
 
 #include <boost/scoped_array.hpp>
+#include <boost/thread/thread.hpp>
+#include <boost/thread/condition.hpp>
+#include <boost/thread/barrier.hpp>
 #include <memory>
 #include <deque>
+
+// Undefine this to load/parse media files in main thread
+#define LOAD_MEDIA_IN_A_SEPARATE_THREAD 1
+
 
 namespace gnash {
 namespace media {
@@ -235,6 +242,22 @@ public:
 	//
 	virtual ~MediaParser();
 
+	/// \brief
+	/// Seeks to the closest possible position the given position,
+	/// and returns the new position.
+	//
+	///
+	/// TODO: throw something for sending Seek.InvalidTime ?
+	///       (triggered by seeks beyond the end of video or beyond what's
+	///        downloaded so far)
+	///
+	/// @param time input/output parameter, input requests a time, output
+	///        return the actual time seeked to.
+	/// 
+	/// @return true if the seek was valid, false otherwise
+	///
+	virtual bool seek(boost::uint32_t& time)=0;
+
 	/// Returns mininum length of available buffers in milliseconds
 	//
 	/// TODO: FIXME: NOTE: this is currently used by NetStream.bufferLength
@@ -245,6 +268,20 @@ public:
 	/// time to find out...
 	///
 	DSOEXPORT boost::uint64_t getBufferLength() const;
+
+	/// Return the time we want the parser thread to maintain in the buffer
+	DSOEXPORT boost::uint64_t getBufferTime() const
+	{
+		boost::mutex::scoped_lock lock(_bufferTimeMutex);
+		return _bufferTime;
+	}
+
+	/// Set the time we want the parser thread to maintain in the buffer
+	DSOEXPORT void setBufferTime(boost::uint64_t t)
+	{
+		boost::mutex::scoped_lock lock(_bufferTimeMutex);
+		_bufferTime=t;
+	}
 
 	/// Get timestamp of the video frame which would be returned on nextVideoFrame
 	//
@@ -308,50 +345,12 @@ public:
 	///
 	AudioInfo* getAudioInfo() { return _audioInfo.get(); }
 
-	/// Seeks to the closest possible position the given position.
-	//
-	/// Valid seekable position are constrained by key-frames when
-	/// video data is available. Actual seek position should be always
-	/// less of equal the requested one.
-	///
-	/// @return the position the seek reached
-	///
-	virtual boost::uint32_t seek(boost::uint32_t) { return 0; }
-
-	/// Returns the framedelay from the last to the current
-	/// audioframe in milliseconds. This is used for framerate.
-	//
-	/// @return the diff between the current and last frame
-	///
-	//virtual boost::uint32_t audioFrameDelay() { return 0; }
-
-	/// Returns the framedelay from the last to the current
-	/// videoframe in milliseconds. 
-	//
-	/// @return the diff between the current and last frame
-	///
-	//virtual boost::uint32_t videoFrameDelay() { return 0; }
-
-	/// Returns the framerate of the video
-	//
-	/// @return the framerate of the video
-	///
-	//virtual boost::uint16_t videoFrameRate() { return 0; }
-
-	/// Returns the last parsed position in the file in bytes
-	//virtual boost::uint32_t getLastParsedPos() { return 0; }
-
-	/// Parse next input chunk
-	//
-	/// Returns true if something was parsed, false otherwise.
-	/// See parsingCompleted().
-	///
-	virtual bool parseNextChunk() { return false; }
-
 	/// Return true of parsing is completed
 	//
 	/// If this function returns true, any call to nextVideoFrame()
 	/// or nextAudioFrame() will always return NULL
+	///
+	/// TODO: make thread-safe
 	///
 	bool parsingCompleted() const { return _parsingComplete; }
 
@@ -364,22 +363,28 @@ public:
 		return _stream->size();
 	}
 
+	/// Parse next chunk of input
+	//
+	/// The implementations are required to parse a small chunk
+	/// of input, so to avoid blocking too much if parsing conditions
+	/// change (ie: seek or destruction requested)
+	///
+	/// When LOAD_MEDIA_IN_A_SEPARATE_THREAD is defined, this should
+	/// never be called by users (consider protected).
+	///
+	virtual bool parseNextChunk()=0;
+
 protected:
 
-	typedef std::deque<EncodedVideoFrame*> VideoFrames;
-	typedef std::deque<EncodedAudioFrame*> AudioFrames;
 
-	/// Queue of video frames (the video buffer)
-	//
-	/// Elements owned by this class.
-	///
-	VideoFrames _videoFrames;
+	/// Clear the a/v buffers
+	void clearBuffers();
 
-	/// Queue of audio frames (the audio buffer)
-	//
-	/// Elements owned by this class.
-	///
-	AudioFrames _audioFrames;
+	/// Push an encoded audio frame to buffer, will wait on a condition if buffer is full
+	void pushEncodedAudioFrame(std::auto_ptr<EncodedAudioFrame> frame);
+
+	/// Push an encoded video frame to buffer, will wait on a condition if buffer is full
+	void pushEncodedVideoFrame(std::auto_ptr<EncodedVideoFrame> frame);
 
 	/// Return pointer to next encoded video frame in buffer
 	//
@@ -413,17 +418,99 @@ protected:
 
 	/// The stream used to access the file
 	std::auto_ptr<IOChannel> _stream;
+	mutable boost::mutex _streamMutex;
 
 	/// Whether the parsing is complete or not
 	bool _parsingComplete;
 
+	static void parserLoopStarter(MediaParser* mp)
+	{
+		mp->parserLoop();
+	}
+
+	/// The parser loop runs in a separate thread
+	/// and calls parseNextChunk until killed.
+	///
+	/// parseNextChunk is expected to push encoded frames
+	/// on the queue, which may trigger the thread to be
+	/// put to sleep when queues are full or parsing
+	/// was completed.
+	///
+	void parserLoop();
+
+	bool parserThreadKillRequested() const
+	{
+		boost::mutex::scoped_lock lock(_parserThreadKillRequestMutex);
+		return _parserThreadKillRequested;
+	}
+
+	boost::uint64_t _bufferTime;
+	mutable boost::mutex _bufferTimeMutex;
+
+	std::auto_ptr<boost::thread> _parserThread;
+	boost::barrier _parserThreadStartBarrier;
+	mutable boost::mutex _parserThreadKillRequestMutex;
+	bool _parserThreadKillRequested;
+	boost::condition _parserThreadWakeup;
+
+	bool _seekRequest;
+	mutable boost::mutex _seekRequestMutex;
+
+	bool seekRequested() const;
+
+	void seekBegin();
+	void seekEnd();
+	
+	/// Wait on the _parserThreadWakeup condition if buffer is full
+	/// or parsing was completed.
+	/// 
+	/// Callers *must* pass a locked lock on _qMutex
+	///
+	void waitIfNeeded(boost::mutex::scoped_lock& qMutexLock);
+
+	void wakeupParserThread();
+
+	/// mutex protecting access to the a/v encoded frames queues
+	mutable boost::mutex _qMutex;
+
 private:
+
+	// Method to check if buffer is full w/out locking the _qMutex
+	// This is intended for being called by waitIfNeeded, which 
+	// is passed a locked lock on _qMutex
+	bool bufferFull() const;
+
+	typedef std::deque<EncodedVideoFrame*> VideoFrames;
+	typedef std::deque<EncodedAudioFrame*> AudioFrames;
+
+	/// Queue of video frames (the video buffer)
+	//
+	/// Elements owned by this class.
+	///
+	VideoFrames _videoFrames;
+
+	/// Queue of audio frames (the audio buffer)
+	//
+	/// Elements owned by this class.
+	///
+	AudioFrames _audioFrames;
+
+	void requestParserThreadKill()
+	{
+		boost::mutex::scoped_lock lock(_parserThreadKillRequestMutex);
+		_parserThreadKillRequested=true;
+		_parserThreadWakeup.notify_all();
+	}
 
 	/// Return diff between timestamp of last and first audio frame
 	boost::uint64_t audioBufferLength() const;
 
 	/// Return diff between timestamp of last and first video frame
 	boost::uint64_t videoBufferLength() const;
+
+	/// A getBufferLength method not locking the _qMutex (expected to be locked by caller already).
+	boost::uint64_t getBufferLengthNoLock() const;
+	
 };
 
 

@@ -65,7 +65,7 @@ public:
 	~MediaParserFfmpeg();
 
 	// See dox in MediaParser.h
-	virtual boost::uint32_t seek(boost::uint32_t);
+	virtual bool seek(boost::uint32_t&);
 
 	// See dox in MediaParser.h
 	virtual bool parseNextChunk();

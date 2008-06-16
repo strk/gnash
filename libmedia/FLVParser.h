@@ -29,6 +29,8 @@
 #include <vector>
 #include <memory>
 
+#include <boost/thread/mutex.hpp>
+
 namespace gnash {
 namespace media {
 
@@ -175,18 +177,8 @@ public:
 	/// Kills the parser...
 	~FLVParser();
 
-	/// \brief
-	/// Seeks to the closest possible position the given position,
-	/// and returns the new position.
-	//
-	///
-	/// TODO: throw something for sending Seek.InvalidTime ?
-	///       (triggered by seeks beyond the end of video or beyond what's
-	///        downloaded so far)
-	///
-	boost::uint32_t seek(boost::uint32_t);
-
-	virtual bool parseNextChunk();
+	// see dox in MediaParser.h
+	virtual bool seek(boost::uint32_t&);
 
 	/// Parses next tag from the file
 	//
@@ -200,6 +192,8 @@ public:
 
 private:
 
+	virtual bool parseNextChunk();
+
 	/// Parses the header of the file
 	bool parseHeader();
 
@@ -207,7 +201,19 @@ private:
 	inline boost::uint32_t getUInt24(boost::uint8_t* in);
 
 	/// The position where the parsing should continue from.
+	/// Will be reset on seek, and will be protected by the _streamMutex
 	boost::uint64_t _lastParsedPosition;
+
+	/// On seek, this flag will be set, while holding a lock on _streamMutex.
+	/// The parser, when obtained a lock on _streamMutex, will check this
+	/// flag, if found to be true will clear the buffers and reset to false.
+	bool _seekRequested;
+
+	/// Number of bytes loaded
+	boost::uint64_t _bytesLoaded;
+
+	/// Mutex protecting _bytesLoaded (read by main, set by parser)
+	mutable boost::mutex _bytesLoadedMutex;
 
 	/// Audio frame cursor position 
 	//

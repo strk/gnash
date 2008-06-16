@@ -191,6 +191,9 @@ static as_value netstream_setbuffertime(const fn_call& fn)
 	{
 		time = fn.arg(0).to_number();
 	}
+
+	// TODO: don't allow a limit < 100 
+
 	ns->setBufferTime(boost::uint32_t(time*1000));
 
 	return as_value();
@@ -523,6 +526,7 @@ NetStream::setBufferTime(boost::uint32_t time)
 {
 	// The argument is in milliseconds,
 	m_bufferTime = time;
+	if ( m_parser.get() ) m_parser->setBufferTime(time);
 }
 
 long

@@ -82,9 +82,12 @@ MediaParserFfmpeg::probeStream()
 	return ret;
 }
 
-boost::uint32_t
-MediaParserFfmpeg::seek(boost::uint32_t pos)
+bool
+MediaParserFfmpeg::seek(boost::uint32_t& pos)
 {
+	LOG_ONCE(log_unimpl("MediaParserFfmpeg::seek()"));
+	return false;
+
 	log_debug("MediaParserFfmpeg::seek(%d) TESTING", pos);
 
 	AVStream* videostream = _formatCtx->streams[_videoStreamIndex];
@@ -150,7 +153,7 @@ MediaParserFfmpeg::parseVideoFrame(AVPacket& packet)
 	info->dataPosition = pos;
 	info->timestamp = timestamp;
 
-	_videoFrames.push_back(info); // takes ownership
+	pushEncodedVideoFrame(info);
 
 	return true;
 #endif
@@ -180,7 +183,7 @@ MediaParserFfmpeg::parseAudioFrame(AVPacket& packet)
 	frame->dataSize = packet.size
 	frame->timestamp = timestamp;
 
-	_audioFrames.push_back(frame.release()); // takes ownership
+	pushEncodedAudioFrame(frame); 
 
 	return true;
 #endif
@@ -244,13 +247,6 @@ MediaParserFfmpeg::parseNextFrame()
 	{
 		_lastParsedPosition = curPos;
 	}
-	log_debug("parseNextFrame: parsed %d+%d/%d bytes (byteIOCxt: pos:%d, buf_ptr:%p, buf_end:%p); "
-		" AVFormatContext: data_offset:%d, cur_ptr:%p,; "
-		"%d video frames, %d audio frames",
-		curPos, _formatCtx->cur_ptr-_formatCtx->cur_pkt.data, _stream->size(),
-		_byteIOCxt.pos, (void*)_byteIOCxt.buf_ptr, (void*)_byteIOCxt.buf_end,
-		_formatCtx->data_offset, (void*)_formatCtx->cur_ptr,
-		_videoFrames.size(), _audioFrames.size());
 
 	return ret;
 }

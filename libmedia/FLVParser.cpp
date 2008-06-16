@@ -43,6 +43,7 @@ FLVParser::FLVParser(std::auto_ptr<IOChannel> lt)
 	:
 	MediaParser(lt),
 	_lastParsedPosition(0),
+	_bytesLoaded(0),
 	_nextAudioFrame(0),
 	_nextVideoFrame(0),
 	_audio(false),
@@ -58,27 +59,55 @@ FLVParser::~FLVParser()
 }
 
 
-boost::uint32_t
-FLVParser::seek(boost::uint32_t time)
+// would be called by main thread
+bool
+FLVParser::seek(boost::uint32_t& time)
 {
-	if ( time ) // seek to 0 should be fine..
+	//GNASH_REPORT_FUNCTION;
+
+	if ( time )
 	{
-		LOG_ONCE( log_unimpl("%s", __PRETTY_FUNCTION__) );
+		LOG_ONCE( log_unimpl("FLVParser::seek with non-zero arg") );
+		return false;
 	}
 
-	// In particular, what to do if there's no frames in queue ?
-	// just seek to the the later available first timestamp
-	_audioFrames.clear();
-	_videoFrames.clear();
-	_stream->seek(0);
-	_parsingComplete=false;
-	return 0;
+	boost::mutex::scoped_lock streamLock(_streamMutex);
+	// we might obtain this lock while the parser is pushing the last
+	// encoded frame on the queue, or while it is waiting on the wakeup
+	// condition
+
+	// Setting _seekRequested to true will make the parser thread
+	// take care of cleaning up the buffers before going on with
+	// parsing, thus fixing the case in which streamLock was obtained
+	// while the parser was pushing to queue
+	_seekRequested = true;
+
+	_lastParsedPosition=9; // 9 is FLV header size...
+	_parsingComplete=false; // or NetStream will send the Play.Stop event...
+
+	time = 0; // this is the only place we want to go to
+
+	// Finally, in case the parser is now waiting on the wakeup condition,
+	// we wake it up.
+	//
+	// WARNING: a race condition is pending here:
+	// If we notify *before* the parser waits, it'll still wait undefinitely
+	// here, or we might notify the wakeup before the thread
+	// starts waiting on it (it'll have _qMutex locked when this happens).
+	// 
+	//boost::mutex::scoped_lock qLock(_qMutex);
+
+	// we might just clean the buffers here..
+	_parserThreadWakeup.notify_all();
+
+	return true;
 }
 
+// would be called by parser thread
 bool
 FLVParser::parseNextChunk()
 {
-	static const int tagsPerChunk=10;
+	static const int tagsPerChunk=1;
 	for (int i=0; i<tagsPerChunk; ++i)
 	{
 		if ( ! parseNextTag() ) return false;
@@ -86,9 +115,21 @@ FLVParser::parseNextChunk()
 	return true;
 }
 
+// would be called by parser thread
 bool FLVParser::parseNextTag()
 {
+	// lock the stream while reading from it, so actionscript
+	// won't mess with the parser on seek  or on getBytesLoaded
+	boost::mutex::scoped_lock streamLock(_streamMutex);
+
 	if ( _parsingComplete ) return false;
+
+	if ( _seekRequested )
+	{
+		clearBuffers();
+		_seekRequested = false;
+	}
+
 
 	// Seek to next frame and skip the size of the last tag
 	if ( _stream->seek(_lastParsedPosition+4) )
@@ -115,6 +156,11 @@ bool FLVParser::parseNextTag()
 	boost::uint32_t timestamp = getUInt24(&tag[4]);
 
 	_lastParsedPosition += 15 + bodyLength;
+	
+	if ( _lastParsedPosition > _bytesLoaded ) {
+		boost::mutex::scoped_lock lock(_bytesLoadedMutex);
+		_bytesLoaded = _lastParsedPosition;
+	}
 
 	// check for empty tag
 	if (bodyLength == 0) return true;
@@ -130,7 +176,16 @@ bool FLVParser::parseNextTag()
 	{
 		std::auto_ptr<EncodedAudioFrame> frame = readAudioFrame(bodyLength-1, timestamp);
 		if ( ! frame.get() ) { log_error("could not read audio frame?"); }
-		else _audioFrames.push_back(frame.release());
+		else
+		{
+			// Release the stream lock 
+			// *before* pushing the frame as that 
+			// might block us waiting for buffers flush
+			// the _qMutex...
+			// We've done using the stream for this tag parsing anyway
+			streamLock.unlock();
+			pushEncodedAudioFrame(frame);
+		}
 
 		// If this is the first audioframe no info about the
 		// audio format has been noted, so we do that now
@@ -149,9 +204,10 @@ bool FLVParser::parseNextTag()
 			_audioInfo.reset( new AudioInfo((tag[11] & 0xf0) >> 4, samplerate, samplesize, (tag[11] & 0x01) >> 0, 0, FLASH) );
 		}
 
-
+		return true;
 	}
-	else if (tag[0] == VIDEO_TAG)
+
+	if (tag[0] == VIDEO_TAG)
 	{
 		bool isKeyFrame = (tag[11] & 0xf0) >> 4;
 		UNUSED(isKeyFrame); // may be used for building seekable indexes...
@@ -159,8 +215,11 @@ bool FLVParser::parseNextTag()
 		size_t dataPosition = _stream->tell();
 
 		std::auto_ptr<EncodedVideoFrame> frame = readVideoFrame(bodyLength-1, timestamp);
-		if ( ! frame.get() ) { log_error("could not read video frame?"); }
-		else _videoFrames.push_back(frame.release());
+		if ( ! frame.get() )
+		{
+			log_error("could not read video frame?");
+			return true;
+		}
 
 		// If this is the first videoframe no info about the
 		// video format has been noted, so we do that now
@@ -179,7 +238,7 @@ bool FLVParser::parseNextTag()
 
 				size_t bkpos = _stream->tell();
 				if ( _stream->seek(dataPosition) ) {
-					log_error(" Couldn't seek to VideoTag data position");
+					log_error(" Couldn't seek to VideoTag data position -- should never happen, as we just read that!");
 					_parsingComplete=true;
 					return false;
 				}
@@ -235,7 +294,19 @@ bool FLVParser::parseNextTag()
 			_videoInfo.reset( new VideoInfo(codec, width, height, 0 /*frameRate*/, 0 /*duration*/, FLASH /*codec type*/) );
 		}
 
-	} else if (tag[0] == META_TAG) {
+		// Release the stream lock 
+		// *before* pushing the frame as that 
+		// might block us waiting for buffers flush
+		// the _qMutex...
+		streamLock.unlock();
+		pushEncodedVideoFrame(frame);
+
+		return true;
+
+	}
+
+	if (tag[0] == META_TAG)
+	{
 		LOG_ONCE( log_unimpl("FLV MetaTag parser") );
 		// Extract information from the meta tag
 		/*_stream->seek(_lastParsedPosition+16);
@@ -251,15 +322,18 @@ bool FLVParser::parseNextTag()
 		amf::AMF* amfParser = new amf::AMF();
 		amfParser->parseAMF(metaTag);*/
 
-	} else {
-		log_error("Unknown FLV tag type %d", tag[0]);
-		//_parsingComplete = true;
-		//return false;
+		return true;
+
 	}
+
+	log_error("Unknown FLV tag type %d", tag[0]);
+	//_parsingComplete = true;
+	//return false;
 
 	return true;
 }
 
+// would be called by MAIN thread
 bool FLVParser::parseHeader()
 {
 	// seek to the begining of the file
@@ -272,7 +346,7 @@ bool FLVParser::parseHeader()
 		log_error("FLVParser::parseHeader: couldn't read 9 bytes of header");
 		return false;
 	}
-	_lastParsedPosition = 9;
+	_lastParsedPosition = _bytesLoaded = 9;
 
 	// Check if this is really a FLV file
 	if (header[0] != 'F' || header[1] != 'L' || header[2] != 'V') return false;
@@ -309,10 +383,12 @@ inline boost::uint32_t FLVParser::getUInt24(boost::uint8_t* in)
 boost::uint64_t
 FLVParser::getBytesLoaded() const
 {
-	return _lastParsedPosition;
-	//return _stream->getBytesLoaded();
+	boost::mutex::scoped_lock lock(_bytesLoadedMutex);
+	//log_debug("FLVParser::getBytesLoaded returning %d/%d", _bytesLoaded, _stream->size()); // _stream->size would need mutex-protection..
+	return _bytesLoaded;
 }
 
+// would be called by parser thread
 /*private*/
 std::auto_ptr<EncodedAudioFrame>
 FLVParser::readAudioFrame(boost::uint32_t dataSize, boost::uint32_t timestamp)
@@ -339,6 +415,7 @@ FLVParser::readAudioFrame(boost::uint32_t dataSize, boost::uint32_t timestamp)
 	return frame;
 }
 
+// would be called by parser thread
 /*private*/
 std::auto_ptr<EncodedVideoFrame>
 FLVParser::readVideoFrame(boost::uint32_t dataSize, boost::uint32_t timestamp)

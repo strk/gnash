@@ -52,10 +52,6 @@
 #include <memory>
 #include <cassert>
 
-
-/// Uncomment the following to load media in a separate thread
-//#define LOAD_MEDIA_IN_A_SEPARATE_THREAD
-
 // Forward declarations
 namespace gnash {
 	class IOChannel;
@@ -96,11 +92,6 @@ public:
 	// See dox in NetStream.h
 	void advance();
 
-#ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
-	/// The parsing thread. Sets up the decoder, and decodes.
-	static void parseAllInput(NetStreamFfmpeg* ns);
-#endif
-
 	/// Callback used by sound_handler to get audio data
 	//
 	/// This is a sound_handler::aux_streamer_ptr type.
@@ -126,7 +117,7 @@ private:
 		DEC_NONE,
 		DEC_STOPPED,
 		DEC_DECODING,
-		DEC_BUFFERING,
+		DEC_BUFFERING
 	};
 
 	/// Gets video info from the parser and initializes _videoDecoder
@@ -234,57 +225,11 @@ private:
 	/// Audio decoder
 	std::auto_ptr<media::AudioDecoder> _audioDecoder;
 
-#ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
-	/// The parser thread
-	boost::thread* _parserThread;
-
-	/// Barrier to synchronize thread and thread starter
-	boost::barrier _parserThreadBarrier;
-
-	/// Mutex serializing access to parser,
-	/// when reading from a separate thread
-	boost::mutex _parserMutex;
-
-	/// Kill decoder thread, if any
-	//
-	/// POSTCONDITIONS:
-	/// 	_decodeThread is NULL
-	/// 	decoder thread is not running
-	///
-	/// Uses the _qMutex
-	///
-	void killParserThread();
-
-	/// Return true if kill of parser thread was requested
-	bool parserThreadKillRequested();
-
-	/// Protected by _parserKillRequestMutex
-	bool _parserKillRequest;
-
-	/// Mutex protecting _parserKillRequest
-	boost::mutex _parserKillRequestMutex;
-
-#endif // LOAD_MEDIA_IN_A_SEPARATE_THREAD
-
-
-	// The timestamp of the last decoded video frame, in seconds.
-	volatile boost::uint32_t m_last_video_timestamp;
-
-	// The timestamp of the last decoded audio frame, in seconds.
-	volatile boost::uint32_t m_last_audio_timestamp;
-
-	/// Queues filler will wait on this condition when queues are full
-	boost::condition _qFillerResume;
-
 	/// Virtual clock used as playback clock source
 	std::auto_ptr<InterruptableVirtualClock> _playbackClock;
 
 	/// Playback control device 
 	PlayHead _playHead;
-
-	// When the queues are full, this is where we keep the audio/video frame
-	// there wasn't room for on its queue
-	media::raw_mediadata_t* m_unqueued_data;
 
 	// Current sound handler
 	media::sound_handler* _soundHandler;
@@ -304,11 +249,14 @@ private:
 	///
 	std::auto_ptr<IOChannel> _inputStream;
 
-        typedef std::deque<media::raw_mediadata_t*> AudioQueue;
+	typedef std::deque<media::raw_mediadata_t*> AudioQueue;
 
 	/// This is where audio frames are pushed by ::advance
 	/// and consumed by sound_handler callback (audio_streamer)
-        AudioQueue _audioQueue;
+	AudioQueue _audioQueue;
+
+	/// Number of bytes in the audio queue, protected by _audioQueueMutex
+	size_t _audioQueueSize;
 
 	/// The queue needs to be protected as sound_handler callback
 	/// is invoked by a separate thread (dunno if it makes sense actually)

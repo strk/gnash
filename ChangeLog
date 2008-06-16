@@ -1,3 +1,17 @@
+2008-06-16 Sandro Santilli <strk@keybit.net>
+
+	* libmedia/MediaParser.{cpp,h}: move more functionality to
+	  the base class: management of encoded audio/video queues and
+	  threaded loading (compile-time opt-out available);
+	  change seek() signature to allow for InvalidTime return.
+	* libmedia/FLVParser.{cpp,h}: adapt to MediaParser changes.
+	* libmedia/ffmpeg/MediaParserFfmpeg.{cpp,h}: adapt to MediaParser
+	  changes.
+	* server/asobj/NetStream.cpp: notify buffer time to parser, when
+	  available (it'll take care of it).
+	* server/asobj/NetStreamFfmpeg.{cpp,h}: push time *ahead* to decoded
+	  audio queue.
+
 2008-06-15 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/vm/ASHandlers.{cpp,h}: use std::string instead of C strings
