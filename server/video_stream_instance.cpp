@@ -32,20 +32,20 @@
 
 namespace gnash {
 
-static as_object* getVideoInterface();
+static as_object* getVideoInterface(as_object& where);
 static void attachVideoInterface(as_object& o);
 static void attachVideoProperties(as_object& o);
 static as_value video_ctor(const fn_call& fn);
 static as_value video_attach(const fn_call& fn);
 static as_value video_clear(const fn_call& fn);
 
-static as_object* getVideoInterface()
+static as_object* getVideoInterface(as_object& where)
 {
 	static boost::intrusive_ptr<as_object> proto;
 	if ( proto == NULL )
 	{
 		proto = new as_object(getObjectInterface());
-		VM::get().addStatic(proto.get());
+		where.getVM().addStatic(proto.get());
 
 		attachVideoInterface(*proto);
 		//proto->init_member("constructor", new builtin_function(video_ctor));
@@ -169,7 +169,7 @@ video_stream_instance::video_stream_instance(video_stream_definition* def,
 		attachVideoProperties(*this);
 	}
 
-	set_prototype(getVideoInterface());
+	set_prototype(getVideoInterface(*this));
 }
 
 video_stream_instance::~video_stream_instance()
@@ -273,8 +273,8 @@ void video_class_init(as_object& global)
 
 	if ( cl == NULL )
 	{
-		cl=new builtin_function(&video_ctor, getVideoInterface());
-		VM::get().addStatic(cl.get());
+		cl=new builtin_function(&video_ctor, getVideoInterface(global));
+		global.getVM().addStatic(cl.get());
 
 		// replicate all interface to class, to be able to access
 		// all methods as static functions

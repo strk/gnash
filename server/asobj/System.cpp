@@ -32,7 +32,7 @@
 
 namespace gnash {
 
-static const std::string& systemLanguage();
+static const std::string& systemLanguage(as_object& proto);
 
 static as_value system_security_allowdomain(const fn_call& fn);
 static as_value system_security_allowinsecuredomain(const fn_call& fn);
@@ -80,7 +80,7 @@ getSystemSecurityInterface(as_object& o)
 }
 
 static as_object*
-getSystemCapabilitiesInterface()
+getSystemCapabilitiesInterface(as_object& o)
 {
 	RcInitFile& rcfile = RcInitFile::getDefaultInstance();
 
@@ -91,11 +91,11 @@ getSystemCapabilitiesInterface()
     // "Windows XP", "Windows 2000", "Windows NT", "Windows 98/ME",
     // "Windows 95", "Windows CE", "Linux", "MacOS"
     // Override in gnashrc
-    VM& vm = VM::get();
+    VM& vm = o.getVM();
     
     const std::string os = vm.getOSName();
 
-    const std::string language = systemLanguage();
+    const std::string language = systemLanguage(o);
 
     // FIXME: these need to be implemented properly 
     // Does the NetStream object natively support SSL?
@@ -176,7 +176,7 @@ getSystemCapabilitiesInterface()
 
     // "LNX 9,0,22,0", "MAC 8,0,99,0"
     // Override in gnashrc
-    const std::string version = VM::get().getPlayerVersion();
+    const std::string version = vm.getPlayerVersion();
 
     // "Macromedia Windows", "Macromedia Linux", "Macromedia MacOS"
     // Override in gnashrc
@@ -278,7 +278,7 @@ attachSystemInterface(as_object& proto)
 
 	// Initialize Function prototype
 	proto.init_member("security", getSystemSecurityInterface(proto));
-	proto.init_member("capabilities", getSystemCapabilitiesInterface());
+	proto.init_member("capabilities", getSystemCapabilitiesInterface(proto));
 	proto.init_member("setClipboard", new builtin_function(system_setclipboard));
 	proto.init_member("showSettings", vm.getNative(2107, 0));
 
@@ -397,7 +397,7 @@ system_class_init(as_object& global)
 
 
 const std::string&
-systemLanguage()
+systemLanguage(as_object& proto)
 {
 	// Two-letter language code ('en', 'de') corresponding to ISO 639-1
 	// Chinese can be either zh-CN or zh-TW. English used to have a 
@@ -408,7 +408,7 @@ systemLanguage()
 	// some scripts rely on there being only 20 possible languages. It could
 	// be a run time option if it's important enough to care.
 
-	static std::string lang = VM::get().getSystemLanguage();
+	static std::string lang = proto.getVM().getSystemLanguage();
 	
 	const char* languages[] = {"en", "fr", "ko", "ja", "sv",
 				"de", "es", "it", "zh", "pt",
