@@ -351,8 +351,8 @@ AudioDecoderFfmpeg::decodeFrame(boost::uint8_t* input, boost::uint32_t inputSize
 
 	if (outSize < 1)
 	{
-		log_error(_("outputSize:%d after decoding audio data. Upgrading ffmpeg/libavcodec might fix this issue."),
-			outputSize);
+		log_error(_("outputSize:%d after decoding %d bytes of input audio data. Upgrading ffmpeg/libavcodec might fix this issue."),
+			outputSize, inputSize);
 		outputSize = 0;
 		delete [] output;
 		return NULL;
