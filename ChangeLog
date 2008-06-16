@@ -1,11 +1,18 @@
+2008-06-15 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/vm/ASHandlers.{cpp,h}: use std::string instead of C strings
+	  for CommonGetUrl (saves converting back and forth several times).
+
 2008-06-16 Zou Lunkai <zoulunkai@gmail.com>
 
 	* libbase/utility.h: implement a safer but slower PIXEL_TO_TWIPS().
 	* server/types.h: move PIXEL_TO_TWIPS to utility.h
-	* server/matrix.h: safe but slower version of FloatToFixed16() and DoubleToFixed16().
-	* server/parser/movie_def_impl.h, character.cpp: head file and data types cleanups.
-	* testsuite/server/MatrixTest.cpp: more telerrant about matrix test, from 10e-6 to 10-3,
-	  enable the test file.
+	* server/matrix.h: safe but slower version of FloatToFixed16() and
+	  DoubleToFixed16().
+	* server/parser/movie_def_impl.h, character.cpp: head file and data
+	  types cleanups.
+	* testsuite/server/MatrixTest.cpp: more telerrant about matrix test,
+	  from 10e-6 to 10-3, enable the test file.
 
 2008-06-15 Benjamin Wolsey <bwy@benjaminwolsey.de>
 

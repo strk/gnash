@@ -50,6 +50,7 @@
 #include "sound_handler.h"
 #include "namedStrings.h"
 #include "utf8.h"
+#include "StringPredicates.h" // StringNoCaseEqual
 
 #include <unistd.h>  // For write() on BSD
 #include <string>
@@ -591,8 +592,12 @@ SWFHandlers::ActionGetUrl(ActionExec& thread)
     // and use tag length as maxlen
     //size_t tag_length = code.read_int16(pc+1);
     const char* url = code.read_string(pc+3);
-    size_t url_len = strlen(url)+1;
-    const char* target = code.read_string(pc+3+url_len);
+    size_t urlLength = strlen(url)+1;
+    
+    // Will abort if code.read_string returns 0, but action
+    // buffer should always have a null terminator at the
+    // end.
+    const std::string target(code.read_string(pc + 3 + urlLength));
 
     IF_VERBOSE_ACTION (
         log_action(_("GetUrl: target=%s url=%s"), target, url);
@@ -2155,24 +2160,18 @@ SWFHandlers::ActionBranchAlways(ActionExec& thread)
 // - http://www.uptoten.com
 //   Should load in _level0, with loadTargetFlag set.
 //
+// Method isbBit-packed as follows:
+// SendVarsMethod:2 (0:NONE 1:GET 2:POST)
+// Reserved:4
+// LoadTargetFlag:1
+// LoadVariableFlag:1
 void
 SWFHandlers::CommonGetUrl(as_environment& env,
         as_value target, // the target window, or _level1..10
-        const char* url_c,
-                boost::uint8_t method /*
-                * Bit-packed as follow
-                *
-                            * SendVarsMethod:2 (0:NONE 1:GET 2:POST)
-                            * Reserved:4
-                            * LoadTargetFlag:1
-                            * LoadVariableFlag:1
-                        */
-        )
+        const std::string& urlTarget, boost::uint8_t method)
 {
 
-    assert(url_c);
-
-    if ( *url_c == '\0' )
+    if (urlTarget.empty())
     {
         log_error(_("Bogus empty GetUrl url in SWF file, skipping"));
         return;
@@ -2191,7 +2190,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
     {
         log_error(_("Bogus GetUrl2 send vars method "
             " in SWF file (both GET and POST requested), use GET"));
-        sendVarsMethod=1;
+        sendVarsMethod = 1;
     }
 
     std::string target_string;
@@ -2202,14 +2201,16 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 
 
     movie_root& m = VM::get().getRoot();
+ 
     // If the url starts with "FSCommand:", then this is
     // a message for the host app.
-    if (strncasecmp(url_c, "FSCommand:", 10) == 0)
+    StringNoCaseEqual noCaseCompare;
+    if (noCaseCompare(urlTarget.substr(0, 10), "FSCommand:"))
     {
         if (m.fsCommandHandle)
         {
             // Call into the app.
-            (*m.fsCommandHandle)(env.get_target()->get_root(), url_c + 10, target_string.c_str());
+            (*m.fsCommandHandle)(env.get_target()->get_root(), urlTarget.substr(10), target_string.c_str());
         }
 
         return;
@@ -2217,7 +2218,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 
     // If the url starts with "print:", then this is
     // a print request.
-    if (strncmp(url_c, "print:", 6) == 0)
+    if (noCaseCompare(urlTarget.substr(0, 6), "print:"))
     {
         log_unimpl("print: URL");
         return;
@@ -2239,13 +2240,11 @@ SWFHandlers::CommonGetUrl(as_environment& env,
     // The base url must be set with the set_base_url() command.
     //
 
-    std::string url_s(url_c);
-
     const URL& baseurl = get_base_url();
-    URL url(url_s, baseurl);
+    URL url(urlTarget, baseurl);
 
     log_debug(_("get url: target=%s, url=%s (%s), method=%x (sendVars:%X, loadTarget:%d, loadVariable:%d)"), target_string,
-        url.str(), url_c, static_cast<int>(method), sendVarsMethod, loadTargetFlag, loadVariableFlag);
+        url.str(), urlTarget, static_cast<int>(method), sendVarsMethod, loadTargetFlag, loadVariableFlag);
 
     if ( ! URLAccessManager::allow(url) )
     {
@@ -2447,7 +2446,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 
         // use the original url, non parsed (the browser will know better how to resolve
         // relative urls and handle hactionscript)
-        request << "GET " << target_string << ":" << url_c << std::endl;
+        request << "GET " << target_string << ":" << urlTarget << std::endl;
 
         std::string requestString = request.str();
         const char* cmd = requestString.c_str();
@@ -2527,7 +2526,7 @@ SWFHandlers::ActionGetUrl2(ActionExec& thread)
     else
     {
         const std::string& url = url_val.to_string();
-        CommonGetUrl(env, env.top(0), url.c_str(), method);
+        CommonGetUrl(env, env.top(0), url, method);
     }
 
     env.drop(2);
@@ -2927,7 +2926,7 @@ SWFHandlers::ActionNew(ActionExec& thread)
     //          will be left with a deleted object !!
     //          Rob: we don't want to use void pointers here..
     newobj->add_ref(); // this will leak, but at least debugger won't end up
-                         // with a dandling reference...
+                         // with a dangling reference...
 #endif //ndef GNASH_USE_GC
         debugger.addSymbol(newobj.get(), classname);
 #endif
@@ -3134,8 +3133,7 @@ SWFHandlers::ActionNewAdd(ActionExec& thread)
 
 #if GNASH_DEBUG
     log_debug(_("ActionNewAdd(%s, %s) [primitive conversion done]"),
-            v1,
-            v2);
+                v1, v2);
 #endif
 
     if (v1.is_string() || v2.is_string() )

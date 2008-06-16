@@ -14,8 +14,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef __ASHANDLERS_H__
-#define __ASHANDLERS_H__
+#ifndef GNASH_ASHANDLERS_H
+#define GNASH_ASHANDLERS_H
 
 #include <string>
 #include <map>
@@ -55,7 +55,7 @@ typedef enum {
 // @@strk@@ should we move this to .cpp file ? it's only
 // use is within SWFHandlers, anyway...
 typedef void (*action_callback_t)(ActionExec& thread);
-//as_environment &env, action_buffer& code, size_t& PC);
+
 class ActionHandler
 {
 public:
@@ -111,12 +111,10 @@ public:
 	action_type lastType() const
 	{
 		return ACTION_GOTOEXPRESSION;
-		//return _handlers[ACTION_GOTOEXPRESSION].getType();
 	}
 
 	const ActionHandler &operator[] (action_type x) const
 	{
-		//return const_cast<ActionHandler>(_handlers[x]);
 		return get_handlers()[x];
 	}
 
@@ -139,7 +137,7 @@ private:
 	///	0:NONE, 1:GET, 2:POST
 	///
 	static void CommonGetUrl(as_environment& env, 
-			as_value target, const char* url,
+			as_value target, const std::string& url,
 			boost::uint8_t method);
 
 	/// Common code for SetTarget and SetTargetExpression
