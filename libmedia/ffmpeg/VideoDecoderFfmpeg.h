@@ -81,7 +81,7 @@ public:
 
 private:
 
-  void init(enum CodecID format, int width, int height);
+  void init(enum CodecID format, int width, int height, boost::uint8_t* extradata=0, int extradataSize=0);
 
   std::auto_ptr<image::rgb> decode(const boost::uint8_t* input, boost::uint32_t input_size);
 

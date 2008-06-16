@@ -19,6 +19,8 @@
 
 
 #include "AudioDecoderFfmpeg.h"
+#include "MediaParserFfmpeg.h" // for ExtraAudioInfoFfmpeg
+
 #include <cmath> // for std::ceil
 #include <algorithm> // for std::copy, std::max
 
@@ -162,6 +164,14 @@ bool AudioDecoderFfmpeg::setup(AudioInfo* info)
 	if (!_audioCodecCtx) {
 		log_error(_("libavcodec couldn't allocate context"));
 		return false;
+	}
+
+	if ( info->extra.get() )
+	{
+		assert(dynamic_cast<ExtraAudioInfoFfmpeg*>(info->extra.get()));
+		const ExtraAudioInfoFfmpeg& ei = static_cast<ExtraAudioInfoFfmpeg&>(*info->extra);
+		_audioCodecCtx->extradata = ei.data;
+		_audioCodecCtx->extradata_size = ei.dataSize;
 	}
 
 	int ret = avcodec_open(_audioCodecCtx, _audioCodec);

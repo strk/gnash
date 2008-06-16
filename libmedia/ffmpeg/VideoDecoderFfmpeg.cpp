@@ -19,6 +19,7 @@
 
 
 #include "VideoDecoderFfmpeg.h"
+#include "MediaParserFfmpeg.h" // for ExtraVideoInfoFfmpeg 
 
 #ifdef HAVE_FFMPEG_SWSCALE_H
 #define HAVE_SWSCALE_H 1
@@ -61,11 +62,20 @@ VideoDecoderFfmpeg::VideoDecoderFfmpeg(VideoInfo& info)
   if ( info.type == FLASH ) codec_id = FlashToFfmpegCodec(static_cast<videoCodecType>(info.codec));
   else codec_id = static_cast<enum CodecID>(info.codec);
 
-  init(codec_id, info.width, info.height);
+  boost::uint8_t* extradata=0;
+  int extradataSize=0;
+  if ( info.extra.get() )
+  {
+    assert(dynamic_cast<ExtraVideoInfoFfmpeg*>(info.extra.get()));
+    const ExtraVideoInfoFfmpeg& ei = static_cast<ExtraVideoInfoFfmpeg&>(*info.extra);
+    extradata = ei.data;
+    extradataSize = ei.dataSize;
+  }
+  init(codec_id, info.width, info.height, extradata, extradataSize);
 }
 
 void
-VideoDecoderFfmpeg::init(enum CodecID codecId, int width, int height)
+VideoDecoderFfmpeg::init(enum CodecID codecId, int width, int height, boost::uint8_t* extradata, int extradataSize)
 {
   // Init the avdecoder-decoder
   avcodec_init();
@@ -83,6 +93,9 @@ VideoDecoderFfmpeg::init(enum CodecID codecId, int width, int height)
     log_error(_("libavcodec couldn't allocate context"));
     return;
   }
+
+  _videoCodecCtx->extradata = extradata;
+  _videoCodecCtx->extradata_size = extradataSize;
 
   int ret = avcodec_open(_videoCodecCtx, _videoCodec);
   if (ret < 0) {

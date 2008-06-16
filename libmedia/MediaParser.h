@@ -132,6 +132,16 @@ public:
 	bool stereo;
 	boost::uint64_t duration;
 	codecType type;
+
+	/// An abstract class to hold any additional info
+	/// required for proper decoder initialization
+	class ExtraInfo {
+	public:
+		virtual ~ExtraInfo() {}
+	};
+
+	/// Extra info about audio stream, if when needed
+	std::auto_ptr<ExtraInfo> extra;
 };
 
 /// \brief
@@ -158,6 +168,16 @@ public:
 	boost::uint16_t frameRate;
 	boost::uint64_t duration;
 	codecType type;
+
+	/// An abstract class to hold any additional info
+	/// required for proper decoder initialization
+	class ExtraInfo {
+	public:
+		virtual ~ExtraInfo() {}
+	};
+
+	/// Extra info about audio stream, if when needed
+	std::auto_ptr<ExtraInfo> extra;
 };
 
 /// An encoded video frame
@@ -455,14 +475,11 @@ protected:
 	bool _parserThreadKillRequested;
 	boost::condition _parserThreadWakeup;
 
+	/// On seek, this flag will be set, while holding a lock on _streamMutex.
+	/// The parser, when obtained a lock on _streamMutex, will check this
+	/// flag, if found to be true will clear the buffers and reset to false.
 	bool _seekRequest;
-	mutable boost::mutex _seekRequestMutex;
 
-	bool seekRequested() const;
-
-	void seekBegin();
-	void seekEnd();
-	
 	/// Wait on the _parserThreadWakeup condition if buffer is full
 	/// or parsing was completed.
 	/// 

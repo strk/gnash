@@ -204,11 +204,6 @@ private:
 	/// Will be reset on seek, and will be protected by the _streamMutex
 	boost::uint64_t _lastParsedPosition;
 
-	/// On seek, this flag will be set, while holding a lock on _streamMutex.
-	/// The parser, when obtained a lock on _streamMutex, will check this
-	/// flag, if found to be true will clear the buffers and reset to false.
-	bool _seekRequested;
-
 	/// Audio frame cursor position 
 	//
 	/// This is the video frame number that will

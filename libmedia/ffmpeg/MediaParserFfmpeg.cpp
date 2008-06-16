@@ -73,7 +73,7 @@ MediaParserFfmpeg::probeStream()
 
 	if (actuallyRead < 1)
 	{
- 		log_error(_("Gnash could not read from movie url"));
+ 		throw IOException(_("MediaParserFfmpeg could not read probe data from input"));
  		return NULL;
 	}
 
@@ -139,21 +139,19 @@ MediaParserFfmpeg::parseVideoFrame(AVPacket& packet)
 	//
 	boost::uint64_t timestamp = static_cast<boost::uint64_t>(packet.dts * as_double(_videoStream->time_base) * 1000.0); 
 
+#if 1
 	LOG_ONCE( log_unimpl("%s", __PRETTY_FUNCTION__) );
 	return false;
-
-#if 0
+#else
 
 	// flags, for keyframe
-	bool isKeyFrame = packet.flags&PKT_FLAG_KEY;
+	//bool isKeyFrame = packet.flags&PKT_FLAG_KEY;
 
-	VideoFrameInfo* info = new VideoFrameInfo;
-	info->dataSize = packet.size;
-	info->isKeyFrame = isKeyFrame;
-	info->dataPosition = pos;
-	info->timestamp = timestamp;
+	// TODO: check if we need to copy the packet.data
+	std::auto_ptr<EncodedVideoFrame> frame(new EncodedVideoFrame(packet.data, packet.size, 0, timestamp));
+	packet.data = 0;
 
-	pushEncodedVideoFrame(info);
+	pushEncodedVideoFrame(frame);
 
 	return true;
 #endif
@@ -175,12 +173,14 @@ MediaParserFfmpeg::parseAudioFrame(AVPacket& packet)
 	//
 	boost::uint64_t timestamp = static_cast<boost::uint64_t>(packet.dts * as_double(_audioStream->time_base) * 1000.0); 
 
+#if 1
 	LOG_ONCE( log_unimpl("%s", __PRETTY_FUNCTION__) );
 	return false;
-#if 0
+#else
 	std::auto_ptr<EncodedAudioFrame> frame ( new EncodedAudioFrame );
 
-	frame->dataSize = packet.size
+	frame->data.reset(packet.data); // TODO: check if we need to copy this
+	frame->dataSize = packet.size;
 	frame->timestamp = timestamp;
 
 	pushEncodedAudioFrame(frame); 
@@ -198,14 +198,14 @@ MediaParserFfmpeg::parseNextFrame()
 
 	if ( _parsingComplete )
 	{
-		log_debug("MediaParserFfmpeg::parseNextFrame: parsing complete, nothing to do");
+		//log_debug("MediaParserFfmpeg::parseNextFrame: parsing complete, nothing to do");
 		return false;
 	}
 
 	// position the stream where we left parsing as
 	// it could be somewhere else for reading a specific
 	// or seeking.
-	_stream->seek(_lastParsedPosition);
+	//_stream->seek(_lastParsedPosition);
 
 	assert(_formatCtx);
 
@@ -258,8 +258,6 @@ MediaParserFfmpeg::parseNextFrame()
 bool
 MediaParserFfmpeg::parseNextChunk()
 {
-	// parse 2 frames...
-	if ( ! parseNextFrame() ) return false;
 	if ( ! parseNextFrame() ) return false;
 	return true;
 }
@@ -327,7 +325,14 @@ MediaParserFfmpeg::initializeParser()
 		throw IOException("MediaParserFfmpeg couldn't open input stream");
 	}
 
-	// Find audio and video stream
+	log_debug("Parsing FFMPEG media file: %d streams", _formatCtx->nb_streams);
+	if ( _formatCtx->title[0] )     log_debug(_("  Title:'%s'"), _formatCtx->title);
+	if ( _formatCtx->author[0] )    log_debug(_("  Author:'%s'"), _formatCtx->author);
+	if ( _formatCtx->copyright[0] ) log_debug(_("  Copyright:'%s'"), _formatCtx->copyright);
+	if ( _formatCtx->comment[0] )   log_debug(_("  Comment:'%s'"), _formatCtx->comment);
+	if ( _formatCtx->album[0] )     log_debug(_("  Album:'%s'"), _formatCtx->album);
+
+	// Find first audio and video stream
 	for (unsigned int i = 0; i < (unsigned)_formatCtx->nb_streams; i++)
 	{
 		AVCodecContext* enc = _formatCtx->streams[i]->codec; 
@@ -339,6 +344,9 @@ MediaParserFfmpeg::initializeParser()
 				{
 					_audioStreamIndex = i;
 					_audioStream = _formatCtx->streams[i];
+					log_debug(_("  Using stream %d for audio: codec id %d"),
+						i, _audioStream->codec->codec_id);
+					// codec_name will only be filled by avcodec_find_decoder (later);
 				}
 				break;
 
@@ -347,6 +355,9 @@ MediaParserFfmpeg::initializeParser()
 				{
 					_videoStreamIndex = i;
 					_videoStream = _formatCtx->streams[i];
+					log_debug(_("  Using stream %d for video: codec id %d"),
+						i, _videoStream->codec->codec_id);
+					// codec_name will only be filled by avcodec_find_decoder (later);
 				}
 				break;
 			default:
@@ -367,6 +378,8 @@ MediaParserFfmpeg::initializeParser()
 		boost::uint64_t duration = _videoStream->duration;
 #endif
 		_videoInfo.reset( new VideoInfo(codec, width, height, frameRate, duration, FFMPEG /*codec type*/) );
+		//log_debug("EXTRA: %d bytes of video extra data", _videoStream->codec->extradata_size);
+		_videoInfo->extra.reset(new ExtraVideoInfoFfmpeg(_videoStream->codec->extradata, _videoStream->codec->extradata_size));
 	}
 
 	// Create AudioInfo
@@ -382,7 +395,11 @@ MediaParserFfmpeg::initializeParser()
 		boost::uint64_t duration = _videoStream->duration;
 #endif
 		_audioInfo.reset( new AudioInfo(codec, sampleRate, sampleSize, stereo, duration, FFMPEG /*codec type*/) );
+		//log_debug("EXTRA: %d bytes of audio extra data", _videoStream->codec->extradata_size);
+		_audioInfo->extra.reset(new ExtraAudioInfoFfmpeg(_audioStream->codec->extradata, _audioStream->codec->extradata_size));
 	}
+
+
 }
 
 

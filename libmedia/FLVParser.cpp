@@ -76,11 +76,11 @@ FLVParser::seek(boost::uint32_t& time)
 	// encoded frame on the queue, or while it is waiting on the wakeup
 	// condition
 
-	// Setting _seekRequested to true will make the parser thread
+	// Setting _seekRequest to true will make the parser thread
 	// take care of cleaning up the buffers before going on with
 	// parsing, thus fixing the case in which streamLock was obtained
 	// while the parser was pushing to queue
-	_seekRequested = true;
+	_seekRequest = true;
 
 	_lastParsedPosition=9; // 9 is FLV header size...
 	_parsingComplete=false; // or NetStream will send the Play.Stop event...
@@ -124,10 +124,10 @@ bool FLVParser::parseNextTag()
 
 	if ( _parsingComplete ) return false;
 
-	if ( _seekRequested )
+	if ( _seekRequest )
 	{
 		clearBuffers();
-		_seekRequested = false;
+		_seekRequest = false;
 	}
 
 
