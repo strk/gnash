@@ -2,6 +2,8 @@
 
 	* server/asobj/NetStreamFfmpeg.cpp (pushDecodedAudioFrames): don't
 	  consume *all* of the audio queue if there's no sound handler..
+	* libmedia/MediaParser.cpp: members initialization order, debugging
+	  lines (commented out).
 
 2008-06-16 Benjamin Wolsey <bwy@benjaminwolsey.de>
 

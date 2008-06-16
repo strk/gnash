@@ -33,11 +33,11 @@ MediaParser::MediaParser(std::auto_ptr<IOChannel> stream)
 	_stream(stream),
 	_parsingComplete(false),
 	_bufferTime(100), // 100 ms 
-	_seekRequest(false),
-	_bytesLoaded(0),
 	_parserThread(0),
 	_parserThreadStartBarrier(2),
-	_parserThreadKillRequested(false)
+	_parserThreadKillRequested(false),
+	_seekRequest(false),
+	_bytesLoaded(0)
 {
 }
 
@@ -88,7 +88,11 @@ boost::uint64_t
 MediaParser::videoBufferLength() const
 {
 	if (_videoFrames.empty()) return 0;
-	//log_debug("videoBufferLength: first video frame has timestamp %d", _videoFrames.front()->timestamp());
+#if 0 // debugging
+	log_debug("videoBufferLength: %d - %d == %d",
+		_videoFrames.back()->timestamp(), _videoFrames.front()->timestamp(),
+		_videoFrames.back()->timestamp() - _videoFrames.front()->timestamp());
+#endif
 	return _videoFrames.back()->timestamp() - _videoFrames.front()->timestamp(); 
 }
 
@@ -96,7 +100,11 @@ boost::uint64_t
 MediaParser::audioBufferLength() const
 {
 	if (_audioFrames.empty()) return 0;
-	//log_debug("audioBufferLength: first audio frame has timestamp %d", _audioFrames.front()->timestamp);
+#if 0 // debugging
+	log_debug("audioBufferLength: %d - %d == %d",
+		_audioFrames.back()->timestamp, _audioFrames.front()->timestamp,
+		_audioFrames.back()->timestamp - _audioFrames.front()->timestamp);
+#endif
 	return _audioFrames.back()->timestamp - _audioFrames.front()->timestamp; 
 }
 
@@ -266,6 +274,7 @@ MediaParser::pushEncodedAudioFrame(std::auto_ptr<EncodedAudioFrame> frame)
 		_audioFrames.clear();
 	}
 	
+	//log_debug("Pushing audio frame with timestamp %d", frame->timestamp);
 	_audioFrames.push_back(frame.release());
 #ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
 	waitIfNeeded(lock); // if the push reaches a "buffer full" condition, wait to be waken up
@@ -297,6 +306,7 @@ MediaParser::pushEncodedVideoFrame(std::auto_ptr<EncodedVideoFrame> frame)
 		_videoFrames.clear();
 	}
 
+	//log_debug("Pushing video frame with timestamp %d", frame->timestamp());
 	_videoFrames.push_back(frame.release());
 #ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
 	waitIfNeeded(lock); // if the push reaches a "buffer full" condition, wait to be waken up
