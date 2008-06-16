@@ -139,7 +139,7 @@ MediaParserFfmpeg::parseVideoFrame(AVPacket& packet)
 	//
 	boost::uint64_t timestamp = static_cast<boost::uint64_t>(packet.dts * as_double(_videoStream->time_base) * 1000.0); 
 
-#if 1
+#if 0
 	LOG_ONCE( log_unimpl("%s", __PRETTY_FUNCTION__) );
 	return false;
 #else
@@ -147,9 +147,13 @@ MediaParserFfmpeg::parseVideoFrame(AVPacket& packet)
 	// flags, for keyframe
 	//bool isKeyFrame = packet.flags&PKT_FLAG_KEY;
 
-	// TODO: check if we need to copy the packet.data
-	std::auto_ptr<EncodedVideoFrame> frame(new EncodedVideoFrame(packet.data, packet.size, 0, timestamp));
-	packet.data = 0;
+	// TODO: FIXME: *2 is an hack to avoid libavcodec reading past end of allocated space
+	//       we might do proper padding or (better) avoid the copy as a whole by making
+	//       EncodedVideoFrame virtual.
+	size_t allocSize = packet.size*2;
+	boost::uint8_t* data = new boost::uint8_t[allocSize];
+	std::copy(packet.data, packet.data+packet.size, data);
+	std::auto_ptr<EncodedVideoFrame> frame(new EncodedVideoFrame(data, packet.size, 0, timestamp));
 
 	pushEncodedVideoFrame(frame);
 
@@ -173,13 +177,20 @@ MediaParserFfmpeg::parseAudioFrame(AVPacket& packet)
 	//
 	boost::uint64_t timestamp = static_cast<boost::uint64_t>(packet.dts * as_double(_audioStream->time_base) * 1000.0); 
 
-#if 1
+#if 0
 	LOG_ONCE( log_unimpl("%s", __PRETTY_FUNCTION__) );
 	return false;
 #else
 	std::auto_ptr<EncodedAudioFrame> frame ( new EncodedAudioFrame );
 
-	frame->data.reset(packet.data); // TODO: check if we need to copy this
+	// TODO: FIXME: *2 is an hack to avoid libavcodec reading past end of allocated space
+	//       we might do proper padding or (better) avoid the copy as a whole by making
+	//       EncodedVideoFrame virtual.
+	size_t allocSize = packet.size*2;
+	boost::uint8_t* data = new boost::uint8_t[allocSize];
+	std::copy(packet.data, packet.data+packet.size, data);
+
+	frame->data.reset(data); 
 	frame->dataSize = packet.size;
 	frame->timestamp = timestamp;
 
@@ -211,9 +222,9 @@ MediaParserFfmpeg::parseNextFrame()
 
   	AVPacket packet;
 
-	log_debug("av_read_frame call");
+	//log_debug("av_read_frame call");
   	int rc = av_read_frame(_formatCtx, &packet);
-	log_debug("av_read_frame returned %d", rc);
+	//log_debug("av_read_frame returned %d", rc);
 	if ( rc < 0 )
 	{
 		log_error(_("MediaParserFfmpeg::parseNextChunk: Problems parsing next frame"));

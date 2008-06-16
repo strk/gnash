@@ -1,3 +1,8 @@
+2008-06-16 Sandro Santilli <strk@keybit.net>
+
+	* libmedia/ffmpeg/MediaParserFfmpeg.cpp: push encoded frames to
+	  queue. NetStream-SquareTest.swf shows the ogg now.
+
 2008-06-16 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/array.cpp: remove direct dependence on VM::get() (it's now
