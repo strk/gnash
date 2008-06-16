@@ -34,7 +34,7 @@ struct D {
 	double _d;
 	double _t; // tolerance
 
-	D(double d) : _d(d), _t(1e-6) {}
+	D(double d) : _d(d), _t(1e-3) {}
 
 	// Set tolerance
 	D(double d, double t) : _d(d), _t(t) {}
@@ -58,7 +58,6 @@ std::ostream& operator<<(std::ostream& os, const D& d)
 int
 main(int /*argc*/, char** /*argv*/)
 {
-#if 0
     std::string label;
 
 	// Check attributes of the identity
@@ -230,6 +229,5 @@ main(int /*argc*/, char** /*argv*/)
 
     check_equals(m1_inverse.get_x_translation(), 0);    
     check_equals(m1_inverse.get_y_translation(), 0);  
-#endif
 }
 

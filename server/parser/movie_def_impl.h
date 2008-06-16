@@ -37,6 +37,7 @@
 #include "resource.h" // for boost::intrusive_ptr visibility of dtor
 #include "stream.h" // for get_bytes_loaded and visitbility of dtor (composition)
 #include "StringPredicates.h" // for case-insensitive string comparision (ExportMap)
+#include "utility.h" // for TWIPS_TO_PIXELS 
 
 #include <map> // for CharacterDictionary
 #include <set> // for _importSources

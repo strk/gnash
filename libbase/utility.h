@@ -85,8 +85,13 @@ void	operator delete[](void* ptr);
 
 
 #ifndef M_PI
-#define M_PI 3.141592654
+    #define M_PI 3.1415926536
 #endif // M_PI
+
+// Define this to enable fast float&double to uint32 conversion.
+// If the behaviour is undefined when overflow occurs with your 
+// compiler, disable this macro.
+#define TRUST_FLOAT_TO_UINT32_CONVERSION  1 
 
 // Commonly-used inlined mathematical functions are defined in
 // namespace gnash::utility so that it's clear where they
@@ -141,26 +146,38 @@ inline int frnd(float f)
 
 } // end of namespace utility
 
+inline double TWIPS_TO_PIXELS(int i) 
+{ 
+    return i / 20.0; 
+}
+
+// truncate when overflow occurs.
+inline int PIXELS_TO_TWIPS(double a) 
+{ 
+#ifdef TRUST_FLOAT_TO_UINT32_CONVERSION
+    // truncate when overflow occurs.
+    return (boost::int32_t)(boost::uint32_t)(a * 20); 
+#else
+    boost::int32_t  b;
+    if(a >= 0)
+    {
+       b = (boost::uint32_t)(std::fmod(a * 20.0, 4294967296.0));
+    }
+    else
+    {
+       b = -(boost::uint32_t)(std::fmod(-a * 20, 4294967296.0));
+    }
+    return b;
+#endif
+}
+
 inline boost::int32_t Fixed16Mul(boost::int32_t a, boost::int32_t b)
 {
     // truncate when overflow occurs.
     return (boost::int32_t)((boost::int64_t)a * (boost::int64_t)b >> 16);
 }
 
-inline boost::int32_t FloatToFixed16(float a)
-{
-    // truncate when overflow occurs.
-    return (boost::int32_t)(boost::uint32_t)(a * 65536.0f);
 }
-
-inline boost::int32_t DoubleToFixed16(double a)
-{
-    // truncate when overflow occurs.
-    return (boost::int32_t)(boost::uint32_t)(a * 65536.0);
-}
-
-}
-
 
 /// \brief
 /// Return the smallest multiple of given base greater or equal

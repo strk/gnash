@@ -27,6 +27,7 @@
 #include "dsodefs.h" // for DSOEXPORT
 #include "Range2d.h" // for transforming Range2d<float>
 #include "Point2d.h" // for transforming Point2d<float> (typedefe'd to point)
+#include "utility.h" // for TRUST_FLOAT_TO_UINT32_CONVERSION
 
 #include <boost/cstdint.hpp>
 #include <iosfwd>
@@ -184,7 +185,46 @@ public:
 private: 
     /// Return the determinant of this matrix in 32.32 fixed point format.
     boost::int64_t  determinant() const;
-};
+
+    inline boost::int32_t FloatToFixed16(float a)
+    {
+#ifdef TRUST_FLOAT_TO_UINT32_CONVERSION
+        // truncate when overflow occurs.
+        return (boost::int32_t)(boost::uint32_t)(a * 65536.0f);
+#else
+        boost::int32_t  b;
+        if(a >= 0)
+        {
+            b = (boost::uint32_t)(std::fmod(a*65536.0, 4294967296.0));
+        }
+        else
+        {
+            b = -(boost::uint32_t)(std::fmod(-a*65536.0, 4294967296.0));
+        }
+        return b;
+#endif
+    }
+
+    inline boost::int32_t DoubleToFixed16(double a)
+    {
+#ifdef TRUST_FLOAT_TO_UINT32_CONVERSION
+        // truncate when overflow occurs.
+        return (boost::int32_t)(boost::uint32_t)(a * 65536.0);
+#else
+        boost::int32_t  b;
+        if(a >= 0)
+        {
+            b = (boost::uint32_t)(std::fmod(a*65536.0, 4294967296.0));
+        }
+        else
+        {
+            b = -(boost::uint32_t)(std::fmod(-a*65536.0, 4294967296.0));
+        }
+        return b;
+#endif
+    }
+
+}; //end of matrix
 
 inline bool operator== (const matrix& a, const matrix& b)
 {

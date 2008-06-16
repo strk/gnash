@@ -338,7 +338,7 @@ character::yscale_getset(const fn_call& fn)
 		}
 
 		// input is in percent
-		float scale = static_cast<float>(scale_percent) / 100.f;
+		double scale = scale_percent / 100.0;
 		ptr->set_y_scale(scale);
 	}
 	return rv;
@@ -498,7 +498,7 @@ character::height_getset(const fn_call& fn)
 			matrix m = ptr->get_matrix();
 			m.transform(bounds);
 			assert(bounds.isFinite());
-			h = TWIPS_TO_PIXELS(std::floor(bounds.height() + 0.5));
+			h = TWIPS_TO_PIXELS(std::floor(bounds.height() + 0.5));        
 		}
 		rv = as_value(h);
 	}
@@ -543,7 +543,7 @@ character::rotation_getset(const fn_call& fn)
 	if ( fn.nargs == 0 ) // getter
 	{
 		// Verified against Macromedia player using samples/test_rotation.swf
-		float	angle = ptr->get_matrix().get_rotation();
+		double	angle = ptr->get_matrix().get_rotation();
 
 		// Result is CLOCKWISE DEGREES, [-180,180]
 		angle *= 180.0f / float(M_PI);
@@ -556,7 +556,7 @@ character::rotation_getset(const fn_call& fn)
 		matrix m = ptr->get_matrix();
 
 		// input is in degrees
-		const float rotation = (float) fn.arg(0).to_number() * float(M_PI) / 180.f;
+		const double rotation = fn.arg(0).to_number() * float(M_PI) / 180.f;
 		m.set_rotation(rotation);
 
 		ptr->set_matrix(m);
