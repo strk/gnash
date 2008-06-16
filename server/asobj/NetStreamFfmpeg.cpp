@@ -603,16 +603,6 @@ NetStreamFfmpeg::pushDecodedAudioFrames(boost::uint32_t ts)
 	// nothing to do if we don't have an audio decoder
 	if ( ! _audioDecoder.get() ) return;
 
-	// just flush any pending audio frame if we're
-	// not willing to play sounds anyway
-	if ( ! _soundHandler )
-	{
-		while ( media::raw_mediadata_t* audio = decodeNextAudioFrame() )
-			delete audio;
-		_playHead.setAudioConsumed();
-		return;
-	}
-
 	bool consumed = false;
 
 	boost::uint64_t nextTimestamp;
@@ -757,8 +747,16 @@ NetStreamFfmpeg::pushDecodedAudioFrames(boost::uint32_t ts)
 		// be take note about how many things we're pushing over
 		log_debug("pushDecodedAudioFrames(%d) pushing %dth frame with timestamp %d", ts, _audioQueue.size()+1, nextTimestamp); 
 #endif
-		_audioQueue.push_back(audio);
-		_audioQueueSize += audio->m_size;
+
+		if ( _soundHandler )
+		{
+			_audioQueue.push_back(audio);
+			_audioQueueSize += audio->m_size;
+		}
+		else // don't bother pushing audio to the queue, nobody would consume it...
+		{
+			delete audio;
+		}
 	}
 
 	// If we consumed audio of current position, feel free to advance if needed,
