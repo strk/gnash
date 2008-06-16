@@ -33,10 +33,7 @@
 #include "ASHandlers.h"
 #include "as_environment.h"
 #include "debugger.h"
-#include "WallClockTimer.h"
-
-#include <typeinfo>
-#include <boost/algorithm/string/case_conv.hpp>
+//#include "WallClockTimer.h" // will probably be used for scriptTimeout
 
 #include <sstream>
 #include <string>
@@ -72,15 +69,14 @@ ActionExec::ActionExec(const swf_function& func, as_environment& newEnv, as_valu
     with_stack(),
     _scopeStack(func.getScopeStack()),
     // See comment in header
-    _with_stack_limit(7),
-    _function_var(func.isFunction2() ? 2 : 1),
+    _withStackLimit(7),
     _func(&func),
     _this_ptr(this_ptr),
-    _initial_stack_size(0),
+    _initialStackSize(0),
     _initialCallStackDepth(0),
-    _original_target(0),
+    _originalTarget(0),
     _tryList(),
-    mReturning(false),
+    _returning(false),
     _abortOnUnload(false),
     code(func.getActionBuffer()),
     env(newEnv),
@@ -91,11 +87,9 @@ ActionExec::ActionExec(const swf_function& func, as_environment& newEnv, as_valu
 {
     assert(stop_pc < code.size());
 
-    //GNASH_REPORT_FUNCTION;
-
     // See comment in header
     if ( env.get_version() > 5 ) {
-        _with_stack_limit = 15;
+        _withStackLimit = 15;
     }
 
     // SWF version 6 and higher pushes the activation object to the scope stack
@@ -114,14 +108,13 @@ ActionExec::ActionExec(const action_buffer& abuf, as_environment& newEnv, bool a
     :
     with_stack(),
     _scopeStack(), // TODO: initialize the scope stack somehow
-    _with_stack_limit(7),
-    _function_var(0),
+    _withStackLimit(7),
     _func(NULL),
-    _initial_stack_size(0),
+    _initialStackSize(0),
     _initialCallStackDepth(0),
-    _original_target(0),
+    _originalTarget(0),
     _tryList(),
-    mReturning(false),
+    _returning(false),
     _abortOnUnload(abortOnUnloaded),
     code(abuf),
     env(newEnv),
@@ -134,7 +127,7 @@ ActionExec::ActionExec(const action_buffer& abuf, as_environment& newEnv, bool a
 
     /// See comment in header
     if ( env.get_version() > 5 ) {
-        _with_stack_limit = 15;
+        _withStackLimit = 15;
     }
 }
 
@@ -142,21 +135,14 @@ void
 ActionExec::operator() ()
 {
 
-#if 0
-    // Check the time
-    if (periodic_events.expired()) {
-    periodic_events.poll_event_handlers(&env);
-    }
-#endif
-
     // Do not execute if scripts are disabled
     if ( VM::get().getRoot().scriptsDisabled() ) return;
 
     static const SWF::SWFHandlers& ash = SWF::SWFHandlers::instance();
         
-    _original_target = env.get_target();
+    _originalTarget = env.get_target();
 
-    _initial_stack_size = env.stack_size();
+    _initialStackSize = env.stack_size();
 
     _initialCallStackDepth = env.callStackDepth();
 
@@ -177,10 +163,7 @@ ActionExec::operator() ()
     // TODO: specify in the .gnashrc !!
     static const size_t maxBranchCount = 65536; // what's enough ?
 
-#if 0
-    boost::uint32_t timeLimit = getScriptTimeout();
-#endif
-    WallClockTimer timer;
+    //WallClockTimer timer;
 
     // stop_pc: set to the code boundary at which we should check
     // for exceptions. If there is no exception in a TryBlock, it
@@ -261,7 +244,8 @@ ActionExec::operator() ()
                     log_swferror(_("Length %u (%d) of action tag"
                                    " id %u at pc %d"
                                    " overflows actions buffer size %d"),
-                      length, (int)length, (unsigned)action_id, pc,
+                      length, static_cast<int>(length),
+                      static_cast<unsigned>(action_id), pc,
                       stop_pc);
                     );
                     
@@ -289,7 +273,7 @@ ActionExec::operator() ()
 
             #if 0
                 // curveball.swf and feed.swf break with this
-                character* guardedChar = env.get_original_target(); // watch out : _original_target is not necessarely the same
+                character* guardedChar = env.get_original_target(); // watch out : _originalTarget is not necessarely the same
             #else
                 // curveball.swf and feed.swf suggest that it is the *current* target,
                 // not the *original* one that matters.
@@ -578,7 +562,7 @@ ActionExec::processExceptions(TryBlock& t)
             _tryList.pop_back();
             
             // Will break of of action execution.
-            if (mReturning) return false;
+            if (_returning) return false;
 		    
             break;
         }
@@ -592,56 +576,63 @@ ActionExec::processExceptions(TryBlock& t)
 void
 ActionExec::cleanupAfterRun(bool expectInconsistencies)
 {
-    assert(_original_target);
-    env.set_target(_original_target);
-    _original_target = NULL;
+    assert(_originalTarget);
+    env.set_target(_originalTarget);
+    _originalTarget = NULL;
 
     // check if the stack was smashed
-    if ( _initial_stack_size > env.stack_size() ) {
-    log_error(_("Stack smashed (ActionScript compiler bug?)."
-            "Fixing by pushing undefined values to the missing slots, "
-            " but don't expect things to work afterwards"));
-    size_t missing = _initial_stack_size - env.stack_size();
-    for (size_t i=0; i<missing; ++i) {
-        env.push(as_value());
+    if ( _initialStackSize > env.stack_size() )
+    {
+        log_error(_("Stack smashed (ActionScript compiler bug?)."
+                "Fixing by pushing undefined values to the missing slots, "
+                " but don't expect things to work afterwards"));
+        const size_t missing = _initialStackSize - env.stack_size();
+
+        for (size_t i = 0; i < missing; ++i)
+        {
+            env.push(as_value());
+        }
     }
-    } else if ( _initial_stack_size < env.stack_size() ) {
+    else if ( _initialStackSize < env.stack_size() )
+    {
         if ( ! expectInconsistencies )
         {
-    // We can argue this would be an "size-optimized" SWF instead...
-    IF_VERBOSE_MALFORMED_SWF(
-        log_swferror(_("%d elements left on the stack after block execution.  "
-            "Cleaning up"), env.stack_size()-_initial_stack_size);
-        );
+            // We can argue this would be an "size-optimized" SWF instead...
+            IF_VERBOSE_MALFORMED_SWF(
+            log_swferror(_("%d elements left on the stack after block execution.  "
+                "Cleaning up"), env.stack_size() - _initialStackSize);
+            );
         }
-    env.drop(env.stack_size()-_initial_stack_size);
+        env.drop(env.stack_size() - _initialStackSize);
     }
 
     // Have movie_root flush any newly pushed actions in higher priority queues
     VM::get().getRoot().flushHigherPriorityActionQueues();
 
-    //log_debug("After cleanup of ActionExec %p, env %p has stack size of %d and callStackDepth of %d", (void*)this, (void*)&env, env.stack_size(), env.callStackDepth());
+//    log_debug("After cleanup of ActionExec %p, env %p has "
+//        "stack size of %d and callStackDepth of %d",
+//        (void*)this, (void*)&env, env.stack_size(), env.callStackDepth());
 }
 
 void
 ActionExec::skip_actions(size_t offset)
 {
-    //pc = next_pc;
 
-    for(size_t i=0; i<offset; ++i) {
+    for(size_t i=0; i<offset; ++i)
+    {
 #if 1
         // we need to check at every iteration because
         // an action can be longer then a single byte
-        if ( next_pc >= stop_pc ) {
-        IF_VERBOSE_MALFORMED_SWF (
-        log_swferror(_("End of DoAction block hit while skipping "
-              "%d action tags (pc:%d"
-              ", stop_pc:%d) "
-              "(WaitForFrame, probably)"), offset, next_pc,
-              stop_pc);
-        )
-        next_pc = stop_pc;
-        return;
+        if ( next_pc >= stop_pc )
+        {
+            IF_VERBOSE_MALFORMED_SWF (
+                log_swferror(_("End of DoAction block hit while skipping "
+                  "%d action tags (pc:%d, stop_pc:%d) "
+                  "(WaitForFrame, probably)"), offset, next_pc,
+                  stop_pc);
+            )
+            next_pc = stop_pc;
+            return;
         }
 #endif
 
@@ -650,32 +641,33 @@ ActionExec::skip_actions(size_t offset)
 
         // Set default next_pc offset, control flow action handlers
         // will be able to reset it.
-        if ((action_id & 0x80) == 0) {
-        // action with no extra data
-        next_pc++;
-        } else {
-        // action with extra data
-        boost::int16_t length = code.read_int16(next_pc+1);
-        assert( length >= 0 );
-        next_pc += length + 3;
+        if ((action_id & 0x80) == 0)
+        {
+            // action with no extra data
+            next_pc++;
         }
-
-        //pc = next_pc;
+        else
+        {
+            // action with extra data
+            boost::int16_t length = code.read_int16(next_pc+1);
+            assert( length >= 0 );
+            next_pc += length + 3;
+        }
     }
 }
 
 bool
 ActionExec::pushWithEntry(const with_stack_entry& entry)
 {
-    // See comment in header about _with_stack_limit
-    if (with_stack.size() >= _with_stack_limit)
+    // See comment in header about _withStackLimit
+    if (with_stack.size() >= _withStackLimit)
     {
         IF_VERBOSE_ASCODING_ERRORS (
         log_aserror(_("'With' stack depth (%d) "
             "exceeds the allowed limit for current SWF "
             "target version (%d for version %d)."
             " Don't expect this movie to work with all players."),
-            with_stack.size()+1, _with_stack_limit,
+            with_stack.size()+1, _withStackLimit,
             env.get_version());
         );
         return false;
@@ -749,7 +741,7 @@ ActionExec::getObjectMember(as_object& obj, const std::string& var, as_value& va
 void
 ActionExec::fixStackUnderrun(size_t required)
 {
-    size_t slots_left = env.stack_size() - _initial_stack_size;
+    size_t slots_left = env.stack_size() - _initialStackSize;
     size_t missing = required-slots_left;
 
     // FIXME, the IF_VERBOSE used to be commented out.  strk, know why?
@@ -758,11 +750,11 @@ ActionExec::fixStackUnderrun(size_t required)
         "%d/%d available. "
         "Fixing by inserting %d undefined values on the"
         " missing slots."),
-        required, _initial_stack_size, env.stack_size(),
+        required, _initialStackSize, env.stack_size(),
         missing);
     );
 
-    env.padStack(_initial_stack_size, missing);
+    env.padStack(_initialStackSize, missing);
 }
 
 as_object*
@@ -796,7 +788,13 @@ ActionExec::pushReturn(const as_value& t)
     {
         *retval = t;
     }
-    mReturning = true;
+    _returning = true;
+}
+
+bool
+ActionExec::isFunction2() const
+{
+    return _func ? _func->isFunction2() : false;
 }
 
 void
@@ -812,14 +810,15 @@ ActionExec::dumpActions(size_t from, size_t to, std::ostream& os)
 
         // Set default next_pc offset, control flow action handlers
         // will be able to reset it.
-        if ((action_id & 0x80) == 0) {
-        // action with no extra data
-        lpc++;
+        if ((action_id & 0x80) == 0)
+        {
+            // action with no extra data
+            lpc++;
         } else {
-        // action with extra data
-        boost::int16_t length = code.read_int16(lpc+1);
-        assert( length >= 0 );
-        lpc += length + 3;
+            // action with extra data
+            boost::int16_t length = code.read_int16(lpc+1);
+            assert( length >= 0 );
+            lpc += length + 3;
         }
 
     }
@@ -828,7 +827,7 @@ ActionExec::dumpActions(size_t from, size_t to, std::ostream& os)
 as_object*
 ActionExec::getThisPointer()
 {
-    return _function_var ? _this_ptr.get() : env.get_original_target(); 
+    return _func ? _this_ptr.get() : env.get_original_target(); 
 }
 
 } // end of namespace gnash

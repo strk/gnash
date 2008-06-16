@@ -596,7 +596,7 @@ SWFHandlers::ActionGetUrl(ActionExec& thread)
     
     // Will abort if code.read_string returns 0, but action
     // buffer should always have a null terminator at the
-    // end.
+    // end. This replaces an assertion in CommonGetUrl.
     const std::string target(code.read_string(pc + 3 + urlLength));
 
     IF_VERBOSE_ACTION (
@@ -2540,8 +2540,8 @@ SWFHandlers::ActionBranchIfTrue(ActionExec& thread)
     as_environment& env = thread.env;
     const action_buffer& code = thread.code;
     size_t pc = thread.getCurrentPC();
-    size_t& next_pc = thread.next_pc;
-    size_t& stop_pc = thread.stop_pc;
+    size_t next_pc = thread.next_pc;
+    size_t stop_pc = thread.stop_pc;
 
     assert(thread.atActionTag(SWF::ACTION_BRANCHIFTRUE));
 

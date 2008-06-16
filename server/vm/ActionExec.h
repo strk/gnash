@@ -179,10 +179,7 @@ private:
 	/// warnings for coders (if ActionScript errors verbosity is
 	/// enabled).
 	///
-	size_t _with_stack_limit;
-
-	/// 1 for function execution, 2 for function2 execution, 0 otherwise.
-	int _function_var;
+	size_t _withStackLimit;
 
 	/// A pointer to the function being executed, or NULL
 	/// for non-function execution
@@ -198,16 +195,16 @@ private:
 	boost::intrusive_ptr<as_object> _this_ptr;
 
 	/// Stack size at start of execution
-	size_t _initial_stack_size;
+	size_t _initialStackSize;
 
 	/// Call stack depth at start of execution
 	size_t _initialCallStackDepth;
 
-	character* _original_target;
+	character* _originalTarget;
 
 	std::list<TryBlock> _tryList;
 
-	bool mReturning;
+	bool _returning;
 
 	/// Warn about a stack underrun and fix it 
 	//
@@ -233,11 +230,11 @@ public:
 	///
 	void ensureStack(size_t required)
 	{
-		// The stack_size() < _initial_stack_size case should
+		// The stack_size() < _initialStackSize case should
 		// be handled this by stack smashing checks
-		assert( env.stack_size() >= _initial_stack_size );
+		assert( env.stack_size() >= _initialStackSize );
 
-		size_t slots_left = env.stack_size() - _initial_stack_size;
+		size_t slots_left = env.stack_size() - _initialStackSize;
 		if ( slots_left < required )
 		{
 			fixStackUnderrun(required);
@@ -293,10 +290,10 @@ public:
 	ActionExec(const swf_function& func, as_environment& newEnv, as_value* nRetVal, as_object* this_ptr);
 
 	/// Is this execution thread a function2 call ?
-	bool isFunction2() { return _function_var == 2; }
+	bool isFunction2() const;
 
 	/// Is this execution thread a function call ?
-	bool isFunction() { return _function_var!=0; }
+	bool isFunction() const { return _func != 0; }
 
 	/// Get the current 'this' pointer, for use in function calls
 	as_object* getThisPointer();
@@ -322,7 +319,7 @@ public:
 	///
 	size_t getWithStackLimit() const 
 	{
-		return _with_stack_limit;
+		return _withStackLimit;
 	}
 
 	/// Push an entry to the with stack

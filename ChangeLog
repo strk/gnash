@@ -1,3 +1,10 @@
+2008-06-16 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/vm/ASHandlers.cpp: minor cleanups.
+	* server/vm/ActionExec.{cpp,h}: drop _function_var member as it can be
+	  retrieved inexpensively from _func on the few occasions when it's
+	  needed.
+
 2008-06-16 Sandro Santilli <strk@keybit.net>
 
 	* libmedia/MediaParser.{cpp,h}: move _bytesLoaded to superclass, don't
@@ -27,7 +34,7 @@
 	* server/asobj/NetStreamFfmpeg.{cpp,h}: push time *ahead* to decoded
 	  audio queue.
 
-2008-06-15 Benjamin Wolsey <bwy@benjaminwolsey.de>
+2008-06-16 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/vm/ASHandlers.{cpp,h}: use std::string instead of C strings
 	  for CommonGetUrl (saves converting back and forth several times).
