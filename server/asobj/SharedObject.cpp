@@ -80,7 +80,7 @@ public:
 
     void operator() (string_table::key key, const as_value& val) const
         {
-            GNASH_REPORT_FUNCTION;
+            //GNASH_REPORT_FUNCTION;
             AMF amf;
             Element *el = 0;
 
