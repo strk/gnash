@@ -32,7 +32,7 @@ namespace gnash
 
 /* static private */
 character*
-as_value::CharacterProxy::find_character_by_target(const std::string& tgtstr)
+CharacterProxy::find_character_by_target(const std::string& tgtstr)
 {
 	if ( tgtstr.empty() ) return NULL;
 
@@ -40,7 +40,7 @@ as_value::CharacterProxy::find_character_by_target(const std::string& tgtstr)
 }
 
 void
-as_value::CharacterProxy::checkDangling() const
+CharacterProxy::checkDangling() const
 {
 	if ( _ptr && _ptr->isDestroyed() ) 
 	{
@@ -54,7 +54,7 @@ as_value::CharacterProxy::checkDangling() const
 }
 
 std::string
-as_value::CharacterProxy::getTarget() const
+CharacterProxy::getTarget() const
 {
 	checkDangling(); // set _ptr to NULL and _tgt to original target if destroyed
 	if ( _ptr ) return _ptr->getTarget();
@@ -62,7 +62,7 @@ as_value::CharacterProxy::getTarget() const
 }
 
 void
-as_value::CharacterProxy::setReachable() const
+CharacterProxy::setReachable() const
 {
 	checkDangling();
 	if ( _ptr ) _ptr->setReachable();
