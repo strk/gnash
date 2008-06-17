@@ -1,7 +1,7 @@
 2008-06-17 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* configure.ac, libbase/utility.h, libamf/element.cpp:
-	  Some non-GLIBC lacks strndup, so use Nils Möller's version
+	  Some non-GLIBC lacks strndup, so use Niels Möller's version
 	  that is in the public domain for it.
 
 2008-06-17 Benjamin Wolsey <bwy@benjaminwolsey.de>
