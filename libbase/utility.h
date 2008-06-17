@@ -316,7 +316,7 @@ inline unsigned long int /* pthread_t */ get_thread_id(void)
 #ifndef HAVE_STRNDUP
 /* Written by Niels Möller <nisse@lysator.liu.se> and placed in the public domain. */
 
-char *strndup(const char *s, size_t size)
+inline char *strndup(const char *s, size_t size)
 {
   char *r, *end = static_cast<char *>(memchr(s, 0, size));
 
