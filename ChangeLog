@@ -1,5 +1,11 @@
 2008-06-17 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/NetStream-SquareTest.c: add tests for
+	  Sound-driven audio control. Volunteers adding sound to square.flv
+	  are highly welcome (I did test it with another flv already).
+
+2008-06-17 Sandro Santilli <strk@keybit.net>
+
 	* server/character.cpp (getWorldVolume): fix loss of precision.
 	* server/asobj/NetStream.{cpp,h}: add setAudioController interface
 	  to register a character to use for audio control.

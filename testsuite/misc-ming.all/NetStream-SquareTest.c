@@ -214,6 +214,88 @@ main(int argc, char** argv)
   check(mo, "NetStream.prototype.hasOwnProperty('time')"); // check time
   check(mo, "NetStream.prototype.hasOwnProperty('bytesLoaded')"); // check bytesLoaded
   check(mo, "NetStream.prototype.hasOwnProperty('bytesTotal')"); // check bytesTotal
+
+  //-----------------------------------------
+  // Dynamic volume tests using Sound object
+  //-----------------------------------------
+
+  // create a movieclip to use as sound controller
+  add_actions(mo, "createEmptyMovieClip('dv1', 1);");
+
+  // attach Sound s1 to character dv1
+  add_actions(mo, "s1 = new Sound(dv1);");
+  // Sound.getVolume fetches volume from dv1 (see s2 below)
+  check_equals(mo, "s1.getVolume()", "100");
+
+  // Change volume of Sound s1 (will change volume of attached character, see below)
+  add_actions(mo, "s1.setVolume(1000);");
+  check_equals(mo, "s1.getVolume()", "1000"); 
+
+  // attach Sound s2 to character dv2
+  add_actions(mo, "s2 = new Sound(dv1);");
+  // Sound s2 finds volume of dv1 being 1000
+  check_equals(mo, "s2.getVolume()", "1000");
+
+  // This shows that setVolume/getVolume make callbacks
+  // to attached character as changing volume of one Sound
+  // influence the other attached sound...
+  add_actions(mo, "s2.setVolume(5);");
+  check_equals(mo, "s2.getVolume()", "5"); 
+  check_equals(mo, "s1.getVolume()", "5"); 
+  add_actions(mo, "s1.setVolume(80);");
+  check_equals(mo, "s2.getVolume()", "80"); 
+  check_equals(mo, "s1.getVolume()", "80");
+  // btw, negative volume is fine..
+  add_actions(mo, "s1.setVolume(-20);");
+  check_equals(mo, "s2.getVolume()", "-20"); 
+  check_equals(mo, "s1.getVolume()", "-20");
+
+  // If the attached-to character gets unloaded,
+  // getVolume returns undefined...
+  add_actions(mo, "dv1.removeMovieClip();");
+  check_equals(mo, "typeof(s2.getVolume())", "'undefined'"); 
+  check_equals(mo, "typeof(s1.getVolume())", "'undefined'");
+  // even if you reset it explicitly
+  add_actions(mo, "s2.setVolume(50);");
+  check_equals(mo, "typeof(s2.getVolume())", "'undefined'"); 
+  check_equals(mo, "typeof(s1.getVolume())", "'undefined'");
+  // but you get it back when you create a replacement..
+  add_actions(mo, "createEmptyMovieClip('dv1', 2);");
+  check_equals(mo, "s2.getVolume()", "100"); 
+  check_equals(mo, "s1.getVolume()", "100");
+  add_actions(mo, "s1.setVolume(80);");
+  check_equals(mo, "s2.getVolume()", "80"); 
+  check_equals(mo, "s1.getVolume()", "80");
+
+  // And you can attach a Sound to any character, not
+  // just MovieClip ones.
+  // This is against a video instance
+  add_actions(mo, "s1 = new Sound(video); s2 = new Sound(video);");
+  check_equals(mo, "s2.getVolume()", "100"); 
+  check_equals(mo, "s1.getVolume()", "100");
+  add_actions(mo, "s1.setVolume(80);");
+  check_equals(mo, "s2.getVolume()", "80"); 
+  check_equals(mo, "s1.getVolume()", "80");
+
+  // Here's a 3 level volume controller. Our square.flv doesn't have sound
+  // so you can't really see if it's working or not... Anyway, change
+  // the code to load a movie with sound and see what happens changing the volumes
+  // below
+  add_actions(mo, 
+		"dv1.createEmptyMovieClip('dv2', 1);"
+		"dv1.dv2.createEmptyMovieClip('dv3', 1);"
+                "dv1.dv2.dv3.attachAudio(stream);" // attach stream to 3rd level
+                "s1 = new Sound(dv1);"
+                "s2 = new Sound(dv1.dv2);"
+                "s3 = new Sound(dv1.dv2.dv3);"
+		"s3.setVolume(50);" // ---------- level1 volume (change me for tests)
+		"s1.setVolume(50);" // ---------- level2 volume (change me for tests)
+		"s2.setVolume(400);" // --------- level3 volume (change me for tests)
+                );
+
+  //------------------------------------------
+  // Now attach video to the video characters
+  //------------------------------------------
   
   add_actions(mo, "video.attachVideo(stream);"); 
   add_actions(mo, "video2.attachVideo(stream2);"); 
