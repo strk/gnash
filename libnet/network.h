@@ -95,7 +95,9 @@ public:
     bool createClient(const std::string &hostname, short port);
 
     // Read from the connection
+    amf::Buffer *readNet();
     int readNet(amf::Buffer *buffer);
+    int readNet(amf::Buffer *buffer, int timeout);
     int readNet(byte_t *buffer, int nbytes);
     int readNet(byte_t *buffer, int nbytes, int timeout);
     int readNet(int fd, byte_t *buffer, int nbytes);
@@ -117,6 +119,7 @@ public:
 
     // Change the debug flag
     void toggleDebug(bool val);
+    bool netDebug() { return _debug; };
     
     bool send(const char *str);
 

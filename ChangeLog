@@ -1,3 +1,16 @@
+2008-06-17  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* libamf/amf.cpp: Drop a few debug messages.
+	* libamf/element.{h,cpp}: Add a findProperty() method. Use a NULL
+	terminated string for printing.
+	* libnet/network.{h,cpp}: Read data into a Buffer. Add a readNet
+	with a timeout value.
+	* libnet/rtmp.{h,cpp}: Add array's for printing of enum types for
+	debugging purposes. Delete all allocated pointers. Add method for
+	sending messages, this does a complete send/receive process.
+	* libnet/rtmp_client.cpp: Make client side RTMP handshake
+	negotiation work again. 
+
 2008-06-17 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/NetStream-SquareTest.c: add tests for

@@ -75,7 +75,7 @@ RTMPClient::encodeConnect(const char *app, const char *swfUrl, const char *tcUrl
                           double audioCodecs, double videoCodecs, double videoFunction,
                           const char *pageUrl)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
     AMF amf_obj;
 
@@ -171,7 +171,7 @@ RTMPClient::encodeConnect(const char *app, const char *swfUrl, const char *tcUrl
 amf::Buffer *
 RTMPClient::encodeStream(double id)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
     struct timespec now;
     clock_gettime (CLOCK_REALTIME, &now);
@@ -238,7 +238,7 @@ RTMPClient::encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string
 amf::Buffer *
 RTMPClient::encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string &name, double pos)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     // Set the operations command name
     Element str;
@@ -298,8 +298,8 @@ RTMPClient::encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string
     // Add 2 bytes for the Boolean, and 16 bytes for the two doubles, which are
     // 8 bytes apiece.
     pktsize += (sizeof(double) * 2) + 2;
-//    Buffer *buf = new Buffer(pktsize);
-    Buffer *buf = new Buffer;
+    Buffer *buf = new Buffer(pktsize);
+//    Buffer *buf = new Buffer;
     
     if (!buf) {
 	return 0;
@@ -345,30 +345,28 @@ RTMPClient::handShakeRequest()
 {
     GNASH_REPORT_FUNCTION;
 
-#if 0
-    char buffer[RTMP_BODY_SIZE+1];
-    char c = 0x3;
-    int  i, ret;
-    
-    ret = writeNet(&c, 1);
-    _outbytes += 1;
-    // something went wrong, chances are the other end of the network
-    // connection is down, or never initialized.
-    if (ret <= 0) {
-        return false;
+    // Make a buffer to hold the handshake data.
+    _handshake = new Buffer(RTMP_BODY_SIZE+1);
+    if (!_handshake) {
+	return false;
     }
+
+    // All RTMP connections start with a 0x3
+    _handshake->copy(RTMP_HANDSHAKE);
 
     // Since we don't know what the format is, create a pattern we can
     // recognize if we stumble across it later on.
-    for (i=0; i<RTMP_BODY_SIZE; i++) {
-        buffer[i] = i^256;
+    for (int i=0; i<RTMP_BODY_SIZE; i++) {
+	Network::byte_t pad = i^256;
+        _handshake->append(pad);
     }
     
-    _outbytes += RTMP_BODY_SIZE;
-    ret = writeNet(buffer, RTMP_BODY_SIZE);
-#endif
-    
-    return true;
+    int ret = writeNet(_handshake);
+    if (ret) {
+	return true;
+    } else {
+	return false;
+    }
 }
 
 // The client finished the handshake process by sending the second
@@ -378,30 +376,43 @@ RTMPClient::clientFinish()
 {
     GNASH_REPORT_FUNCTION;
 
-#if 0
-    char buffer[RTMP_BODY_SIZE+1];
-    memset(buffer, 0, RTMP_BODY_SIZE+1);
-
-    if (readNet(buffer, RTMP_BODY_SIZE) == RTMP_BODY_SIZE) {        
+    int ret = 0;
+    _handshake->clear();
+    
+    ret = readNet(_handshake->reference(), RTMP_BODY_SIZE);
+    if (ret == RTMP_BODY_SIZE) {
         log_debug (_("Read first data block in handshake"));
     } else {
         log_error (_("Couldn't read first data block in handshake"));
-        return false;
+//        return false;
     }
-    _inbytes += RTMP_BODY_SIZE;
-    if (readNet(buffer, RTMP_BODY_SIZE) == RTMP_BODY_SIZE) {        
+    if (ret > RTMP_BODY_SIZE) {
+	ret = readNet(_handshake->reference(), RTMP_BODY_SIZE);
+	if (ret == RTMP_BODY_SIZE) {        
+	    log_debug (_("Read second data block in handshake"));
+	} else {
+	    log_error (_("Couldn't read second data block in handshake"));
+//        return false;
+	}
+    }
+    ret = readNet(_handshake->reference(), RTMP_BODY_SIZE);
+    if (ret == RTMP_BODY_SIZE) {        
         log_debug (_("Read second data block in handshake"));
-//         _body = new char(RTMP_BODY_SIZE+1);
-//         memcpy(_body, buffer, RTMP_BODY_SIZE);
     } else {
         log_error (_("Couldn't read second data block in handshake"));
-        return false;
+//        return false;
     }
-    _inbytes += RTMP_BODY_SIZE;
+    if (ret > RTMP_BODY_SIZE) {
+	ret = readNet(_handshake->reference(), RTMP_BODY_SIZE);
+	if (ret == RTMP_BODY_SIZE) {        
+	    log_debug (_("Read second data block in handshake"));
+	} else {
+	    log_error (_("Couldn't read second data block in handshake"));
+//        return false;
+	}
+    }
 
-    writeNet(buffer, RTMP_BODY_SIZE);
-    _outbytes += RTMP_BODY_SIZE;
-#endif
+    writeNet(_handshake->reference(), RTMP_BODY_SIZE);
     
     return true;
 }

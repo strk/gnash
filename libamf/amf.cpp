@@ -675,7 +675,7 @@ AMF::extractAMF(Buffer *buf)
 Element *
 AMF::extractAMF(Network::byte_t *in, Network::byte_t* tooFar)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     Element *el = new Element;
     Network::byte_t *tmpptr = in;
@@ -790,7 +790,7 @@ AMF::extractProperty(Buffer *buf)
 Element *
 AMF::extractProperty(Network::byte_t *in, Network::byte_t* tooFar)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     Network::byte_t *tmpptr = in;
     boost::uint16_t length;
 
@@ -815,7 +815,7 @@ AMF::extractProperty(Network::byte_t *in, Network::byte_t* tooFar)
     }
     
     // name is just debugging help to print cleaner, and should be removed later
-    log_debug(_("AMF property name length is: %d"), length);
+//    log_debug(_("AMF property name length is: %d"), length);
     std::string name(reinterpret_cast<const char *>(tmpptr), length);
     log_debug(_("AMF property name is: %s"), name);
 

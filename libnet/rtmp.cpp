@@ -71,6 +71,66 @@ const char *content_str[] = {
     "Invoke"
 };
 
+const char *ping_str[] = {
+    "PING_CLEAR",
+    "PING_PLAY",
+    "Unknown Ping 2",
+    "PING_TIME",
+    "PING_RESET",
+    "Unknown Ping 2",
+    "PING_CLIENT",
+    "PONG_CLIENT"
+};
+
+const char *status_str[] = {
+    "APP_GC",
+    "APP_RESOURCE_LOWMEMORY",
+    "APP_SCRIPT_ERROR",
+    "APP_SCRIPT_WARNING",
+    "APP_SHUTDOWN",
+    "NC_CALL_BADVERSION",
+    "NC_CALL_FAILED",
+    "NC_CONNECT_APPSHUTDOWN",
+    "NC_CONNECT_CLOSED",
+    "NC_CONNECT_FAILED",
+    "NC_CONNECT_INVALID_APPLICATION",
+    "NC_CONNECT_REJECTED",
+    "NC_CONNECT_SUCCESS",
+    "NS_CLEAR_FAILED",
+    "NS_CLEAR_SUCCESS",
+    "NS_DATA_START",
+    "NS_FAILED",
+    "NS_INVALID_ARGUMENT",
+    "NS_PAUSE_NOTIFY",
+    "NS_PLAY_COMPLETE",
+    "NS_PLAY_FAILED",
+    "NS_PLAY_FILE_STRUCTURE_INVALID",
+    "NS_PLAY_INSUFFICIENT_BW",
+    "NS_PLAY_NO_SUPPORTED_TRACK_FOUND",
+    "NS_PLAY_PUBLISHNOTIFY",
+    "NS_PLAY_RESET",
+    "NS_PLAY_START",
+    "NS_PLAY_STOP",
+    "NS_PLAY_STREAMNOTFOUND",
+    "NS_PLAY_SWITCH",
+    "NS_PLAY_UNPUBLISHNOTIFY",
+    "NS_PUBLISH_BADNAME",
+    "NS_PUBLISH_START",
+    "NS_RECORD_FAILED",
+    "NS_RECORD_NOACCESS",
+    "NS_RECORD_START",
+    "NS_RECORD_STOP",
+    "NS_SEEK_FAILED",
+    "NS_SEEK_NOTIFY",
+    "NS_UNPAUSE_NOTIFY",
+    "NS_UNPUBLISHED_SUCCESS",
+    "SO_CREATION_FAILED",
+    "SO_NO_READ_ACCESS",
+    "SO_NO_WRITE_ACCESS",
+    "SO_PERSISTENCE_MISMATCH"
+};
+
+
 // These are the textual responses
 const char *response_str[] = {
     "/onStatus",
@@ -96,7 +156,7 @@ RTMP::headerSize(Network::byte_t header)
           headersize = 4;
           break;
       case HEADER_1:
-          headersize = 11;
+          headersize = 1;
           break;
       default:
           log_error(_("AMF Header size bits (0x%X) out of range"),
@@ -123,6 +183,12 @@ RTMP::~RTMP()
 {
 //    GNASH_REPORT_FUNCTION;
     _variables.clear();
+    if (_handshake) {
+	delete _handshake;
+    }
+    if (_handler) {
+	delete _handler;
+    }
 //    delete _body;
 }
 
@@ -195,6 +261,7 @@ RTMP::decodeHeader(Network::byte_t *in)
 
     if (_header.head_size >= 8) {
         _header.type = *(content_types_e *)tmpptr;
+        _header.bodysize = sizeof(boost::uint16_t) * 2;
         tmpptr++;
         log_debug(_("The type is: %s"), content_str[_header.type]);
     }
@@ -239,7 +306,7 @@ RTMP::decodeHeader(Network::byte_t *in)
 amf::Buffer *
 RTMP::encodeHeader(int amf_index, rtmp_headersize_e head_size)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     amf::Buffer *buf = new Buffer(1);
     Network::byte_t *ptr = buf->reference();
     
@@ -258,7 +325,7 @@ RTMP::encodeHeader(int amf_index, rtmp_headersize_e head_size,
 {
     GNASH_REPORT_FUNCTION;
 
-    amf::Buffer *buf = NULL;
+    amf::Buffer *buf = 0;
     switch(head_size) {
       case HEADER_1:
 	  buf = new Buffer(1);
@@ -273,13 +340,14 @@ RTMP::encodeHeader(int amf_index, rtmp_headersize_e head_size,
 	  buf = new Buffer(12);
 	  break;
     }
-	
+    
 // FIXME: this is only to make this more readeable with GDB, and is a performance hit.
-//    buf->clear();
+    buf->clear();
     Network::byte_t *ptr = buf->reference();
     
     // Make the channel index & header size byte
-    *ptr = head_size & RTMP_HEADSIZE_MASK;  
+//    *ptr = head_size & RTMP_HEADSIZE_MASK;
+    *ptr = head_size; // & RTMP_INDEX_MASK;
     *ptr += amf_index  & RTMP_INDEX_MASK;
     ptr++;
 
@@ -558,15 +626,15 @@ RTMP::decodeMsgBody(Network::byte_t *data, size_t size)
     while (ptr < tooFar) {
 	// These pointers get deleted automatically when the msg object is deleted
         amf::Element *el = amf_obj.extractAMF(ptr, tooFar);
+	ptr += amf_obj.totalsize();
         if (el == 0) {
 	    break;
 	}
-//	el->dump();
+	el->dump();
 	msg->addObject(el);
  	if (status) {
 	    msg->checkStatus(el);
 	}
-	ptr += amf_obj.totalsize();
     };
     
     // cleanup after ourselves
@@ -715,6 +783,109 @@ RTMP::decodeInvoke()
 {
     GNASH_REPORT_FUNCTION;
     log_unimpl(__PRETTY_FUNCTION__);
+}
+
+// Send a message, usually a single ActionScript object. This message
+// may be broken down into a series of packets on a regular byte
+// interval. (128 bytes for video data). Each message main contain
+// multiple packets.
+bool
+RTMP::sendMsg(amf::Buffer *buf)
+{
+    GNASH_REPORT_FUNCTION;
+
+    size_t partial = RTMP_VIDEO_PACKET_SIZE;
+    size_t nbytes = 0;
+    Network::byte_t header = 0xc3;
+
+    while (nbytes <= buf->size()) {
+	if ((buf->size() - nbytes) < RTMP_VIDEO_PACKET_SIZE) {
+	    partial = buf->size() - nbytes;
+	}    
+	writeNet(buf->reference() + nbytes, partial);
+	if (partial == RTMP_VIDEO_PACKET_SIZE) {
+	    writeNet(&header, 1);
+	}
+	nbytes += RTMP_VIDEO_PACKET_SIZE;	
+    };
+}
+    
+// Send a Msg, and expect a response back of some kind.
+amf::Element *
+RTMP::sendRecvMsg(int amf_index, rtmp_headersize_e head_size,
+		  size_t total_size, content_types_e type,
+		  RTMPMsg::rtmp_source_e routing, amf::Buffer *bufin)
+{
+    GNASH_REPORT_FUNCTION;
+//    size_t total_size = buf2->size() - 6; // FIXME: why drop 6 bytes ?
+    Buffer *head = encodeHeader(amf_index, head_size, total_size,
+				type, routing);
+    int ret = writeNet(head);
+//     if (netDebug()) {
+//         cerr << __FUNCTION__ << ": " <<__LINE__ << ": " << hexify(head->reference(), headerSize(head_size), false) << endl;
+//     }
+
+    ret = sendMsg(bufin);
+    if (netDebug()) {
+        cerr << __FUNCTION__ << ": " << __LINE__ << ": " << hexify(head->reference(), headerSize(head_size), false) << hexify(bufin->reference(), ret, true) << endl;
+    }
+
+    Buffer buf;
+    ret = readNet(&buf, 5);
+    if (ret < 0) {
+	log_error("Never got any data!");
+	return 0;
+    }
+    if ((ret == 1) && (*buf.reference() == 0xff)) {
+	log_error("Got an error from the server sending object of type %s",
+		  content_str[type]);
+	ret = readNet(&buf, 5);	
+	if (ret < 0) {
+	    log_error("Never got any data!");
+	    return 0;
+	}
+	if ((ret == 1) && (*buf.reference() == 0xff)) {
+	    cerr << __FUNCTION__ << ": " << __LINE__ << ": " <<
+		hexify(buf.reference(), buf.size(), false) << endl;
+	    log_error("Got an error from the server sending object of type %s",
+		      content_str[type]);
+//	exit(-1);
+	}
+    }
+
+    RTMP::rtmp_head_t *rthead = decodeHeader(&buf);
+
+    RTMPMsg *msg;
+    if (rthead) {
+	if (rthead->head_size == 1) {
+	    log_debug("Response header: %s", hexify(buf.reference(),
+						    7, false));
+	} else {
+	    log_debug("Response header: %s", hexify(buf.reference(),
+						    rthead->head_size, false));
+	}
+	if (rthead->type == RTMP::PING) {
+	    RTMP::rtmp_ping_t *ping = decodePing(buf.reference());
+	    log_debug("FIXME: Ping type is: %d, ignored for now", ping->type);
+	} else if (rthead->type != RTMP::PING) {
+	    msg = decodeMsgBody(buf.reference() + rthead->head_size, rthead->bodysize);
+	    if (msg) {
+		log_debug("%s: Msg status is: %d: %s", __FUNCTION__,
+			  msg->getStatus(), status_str[msg->getStatus()]);
+	    } else {
+		log_error("Couldn't decode message body for type %s!",
+			  content_str[rthead->type]);
+	    }
+	} else {
+	    log_error("Couldn't decode message header for type %s!",
+		      content_str[type]);
+	}
+    }
+    
+    
+//    Element *el = new Element;  
+//    el.
+    return 0;
 }
 
 } // end of gnash namespace

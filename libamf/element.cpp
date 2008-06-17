@@ -396,7 +396,7 @@ Element::operator==(bool x)
 Buffer *
 Element::encode()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     Buffer *buf = 0;
     size_t size = 0;
     if (_type == Element::OBJECT_AMF0) {
@@ -430,7 +430,7 @@ Element::encode()
 		break;
 	    }
 	}
-	log_debug("FIXME: Terminating object");
+//	log_debug("FIXME: Terminating object");
 	Network::byte_t pad = 0;
 	buf->append(pad);
 	buf->append(pad);
@@ -466,7 +466,7 @@ Element::operator=(Element &el)
 Element &
 Element::operator=(Element *el)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     _type = el->getType();
     if (el->getNameSize()) {
         _name = strdup(el->getName());
@@ -946,7 +946,8 @@ Element::dump()
       case Element::STRING_AMF0:
 	  cerr << "(" << getLength() << " bytes): ";
 	  if (getLength() > 0) {
-	      cerr << "\t\"" << to_string() << "\"" << endl;
+	      char *term = strndup(to_string(), getLength());
+	      cerr << "\t\"" << term << "\"" << endl;
 	  } else {
 	      cerr << endl;
 	  }
@@ -990,12 +991,29 @@ Element::dump()
 
     if (_properties.size() > 0) {
 	vector<amf::Element *>::iterator ait;
-	cerr << "# of Properties in object" << _properties.size() << endl;
+	cerr << "# of Properties in object: " << _properties.size() << endl;
 	for (ait = _properties.begin(); ait != _properties.end(); ait++) {
 	    amf::Element *el = (*(ait));
 	    el->dump();
 	}
     }
+}
+
+Element *
+Element::findProperty(const std::string &name)
+{
+    if (_properties.size() > 0) {
+	vector<amf::Element *>::iterator ait;
+//	cerr << "# of Properties in object: " << _properties.size() << endl;
+	for (ait = _properties.begin(); ait != _properties.end(); ait++) {
+	    amf::Element *el = (*(ait));
+	    if (el->getName() == name) {
+		return el;
+	    }
+//	    el->dump();
+	}
+    }
+    return 0;
 }
 
 } // end of amf namespace

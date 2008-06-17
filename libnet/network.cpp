@@ -682,11 +682,34 @@ Network::closeConnection(int fd)
     return false;
 }
 
+amf::Buffer *
+Network::readNet()
+{
+    GNASH_REPORT_FUNCTION;
+
+    amf::Buffer *buffer = new amf::Buffer;
+    int nbytes = readNet(buffer);
+    if (nbytes > 0) {
+	buffer->resize(nbytes);
+	return buffer;
+    }
+
+    return 0;
+}
+
 // Read from the connection
 int
 Network::readNet(amf::Buffer *buffer)
 {
+    GNASH_REPORT_FUNCTION;
     return readNet(_sockfd, buffer->reference(), buffer->size(), _timeout);
+}
+
+int
+Network::readNet(amf::Buffer *buffer, int timeout)
+{
+    GNASH_REPORT_FUNCTION;
+    return readNet(_sockfd, buffer->reference(), buffer->size(), timeout);
 }
 
 int

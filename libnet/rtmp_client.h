@@ -40,7 +40,7 @@ public:
     ~RTMPClient();
 
     bool handShakeWait();
-    bool handShakeResponse();
+//    bool handShakeResponse();
     bool clientFinish();
     bool handShakeRequest();
     
@@ -55,7 +55,7 @@ public:
     amf::Buffer *encodeStreamOp(double id, rtmp_op_e op, bool flag, double pos);
     amf::Buffer *encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string &name);
     amf::Buffer *encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string &name, double pos);
-    
+
     void dump();
   private:
     double _connections;

@@ -32,7 +32,7 @@
 namespace gnash
 {
 
-const int  RTMP_HANDSHAKE = 0x3;
+const Network::byte_t RTMP_HANDSHAKE = 0x3;
 const int  RTMP_BODY_SIZE = 1536;
 const int  MAX_AMF_INDEXES = 64;
 
@@ -71,7 +71,7 @@ typedef enum {
     onDebugEvents
 } amfresponse_e;
 
-class DSOEXPORT RTMP
+class DSOEXPORT RTMP : public Network
 {
 public:
     typedef enum {
@@ -263,7 +263,22 @@ public:
     
     virtual amf::Buffer *encodeInvoke();
     virtual void decodeInvoke();
+
+    // Receive a message, which is a series of AMF elements, seperated
+    // by a one byte header at regular byte intervals. (128 bytes for
+    // video data). Each message main contain multiple packets.
+    amf::Buffer *recvMsg();
+
+    // Send a message, usually a single ActionScript object. This message
+    // may be broken down into a series of packets on a regular byte
+    // interval. (128 bytes for video data). Each message main contain
+    // multiple packets.
+    bool sendMsg(amf::Buffer *buf);
     
+    // Send a Msg, and expect a response back of some kind.
+    amf::Element *sendRecvMsg(int amf_index, rtmp_headersize_e head_size,
+			      size_t total_size, content_types_e type,
+			      RTMPMsg::rtmp_source_e routing, amf::Buffer *buf);
     void dump();
   protected:
     std::map<const char *, amf::Element *> _variables;

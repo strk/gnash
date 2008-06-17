@@ -195,6 +195,7 @@ public:
     void setName(const char *name, size_t x);
 
     // Manipulate the children Elements of an object
+    Element *findProperty(const std::string &name);
     Element *getProperty(size_t x) { return _properties[x]; };
     
     void addProperty(Element &el) { _properties.push_back(&el); };
