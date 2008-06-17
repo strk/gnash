@@ -57,6 +57,16 @@ namespace media {
 /// You may define a subclass of this, and pass an instance to
 /// set_sound_handler().
 ///
+/// NOTE
+/// The role of this class is currently somewhat confusing.
+/// The main service it should offer is mixing of gnash core sounds.
+/// Additionally it currently does on-demand decoding too for
+/// some kind of sounds (but not all).
+/// Also, it is unspecified what drives consumption of sound.
+/// For SDL handler the clock is driven by SDL lib itself.
+/// For GST, I have no idea..
+/// TODO: clean this up.
+///
 class DSOEXPORT sound_handler
 {
 public:
