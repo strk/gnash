@@ -1,5 +1,12 @@
 2008-06-17 Sandro Santilli <strk@keybit.net>
 
+	* server/: Makefile.am, as_value.{cpp,h}, ChracterProxy.{cpp,h}:
+	  Move CharacterProxy class in its own files (they are useful
+	  for other classes, not only as_value - surely for Sound, possibly
+	  for as_environment too [ target ]).
+
+2008-06-17 Sandro Santilli <strk@keybit.net>
+
 	* server/impl.cpp: add recognition of FLV files as
 	  top level movie (just to log_unimpl about it).
 

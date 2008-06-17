@@ -1652,48 +1652,6 @@ as_value::as_value(asNamespace &)
 {
 }
 
-//-------------------------------------
-// as_value::CharacterProxy
-//-------------------------------------
-
-/* static private */
-character*
-as_value::CharacterProxy::find_character_by_target(const std::string& tgtstr)
-{
-	if ( tgtstr.empty() ) return NULL;
-
-	return VM::get().getRoot().findCharacterByTarget(tgtstr);
-}
-
-void
-as_value::CharacterProxy::checkDangling() const
-{
-	if ( _ptr && _ptr->isDestroyed() ) 
-	{
-		_tgt = _ptr->getOrigTarget();
-#ifdef GNASH_DEBUG_SOFT_REFERENCES
-		log_debug("char %s (%s) was destroyed, stored it's orig target (%s) for later rebinding", _ptr->getTarget(),
-			typeName(*_ptr), _tgt);
-#endif
-		_ptr = 0;
-	}
-}
-
-std::string
-as_value::CharacterProxy::getTarget() const
-{
-	checkDangling(); // set _ptr to NULL and _tgt to original target if destroyed
-	if ( _ptr ) return _ptr->getTarget();
-	else return _tgt;
-}
-
-void
-as_value::CharacterProxy::setReachable() const
-{
-	checkDangling();
-	if ( _ptr ) _ptr->setReachable();
-}
-
 as_value&
 as_value::newAdd(const as_value& op2)
 {

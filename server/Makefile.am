@@ -59,6 +59,7 @@ libgnashserver_la_SOURCES = \
 	as_value.cpp \
 	asClass.cpp \
 	character.cpp \
+	CharacterProxy.cpp \
 	cxform.cpp \
 	DynamicShape.cpp	\
 	edit_text_character.cpp \
@@ -128,6 +129,7 @@ noinst_HEADERS = \
 	builtin_function.h \
 	button_character_instance.h \
 	character.h \
+	CharacterProxy.h \
 	cxform.h \
 	debugger.h \
 	DynamicShape.h	\

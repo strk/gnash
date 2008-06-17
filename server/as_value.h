@@ -25,6 +25,7 @@
 
 #include "dsodefs.h"
 #include "smart_ptr.h"
+#include "CharacterProxy.h"
 
 #include <cmath>
 #include <limits>
@@ -580,115 +581,6 @@ public:
 	void setReachable() const;
 
 private:
-
-	/// A proxy for character pointers.
-	//
-	/// The proxy will store a pointer to a character until the 
-	/// character is destroyed, in which case it will only store the original
-	/// target path of it and always use that for rebinding when needed.
-	///
-	class CharacterProxy {
-
-		mutable character* _ptr;
-
-		mutable std::string _tgt;
-
-		static character* find_character_by_target(const std::string& target);
-
-		/// If we still have a sprite pointer check if it was destroyed
-		/// in which case we drop the pointer and only keep the target.
-		void checkDangling() const;
-
-	public:
-
-		/// Construct a CharacterProxy pointing to the given sprite
-		CharacterProxy(character* sp)
-			:
-			_ptr(sp)
-		{
-			checkDangling();
-		}
-
-		/// Construct a copy of the given CharacterProxy 
-		//
-		/// @param sp
-		///	The CharacterProxy to make a copy of.
-		///	NOTE: if the given proxy is dangling, this proxy
-		///	      will also be dangling. If you want to 
-		///	      create a non-dangling proxy you can
-		///           use the constructor taking a character
-		///	      as in CharacterProxy newProxy(oldProxy.get())
-		///
-		CharacterProxy(const CharacterProxy& sp)
-		{
-			sp.checkDangling();
-			_ptr=sp._ptr;
-			if ( ! _ptr ) _tgt=sp._tgt;
-		}
-
-		/// Make this proxy a copy of the given one
-		//
-		/// @param sp
-		///	The CharacterProxy to make a copy of.
-		///	NOTE: if the given proxy is dangling, this proxy
-		///	      will also be dangling. If you want to 
-		///	      create a non-dangling proxy you can
-		///           use the constructor taking a character
-		///	      as in CharacterProxy newProxy(oldProxy.get())
-		///
-		CharacterProxy& operator=(const CharacterProxy& sp)
-		{
-			sp.checkDangling();
-			_ptr=sp._ptr;
-			if ( ! _ptr ) _tgt=sp._tgt;
-			return *this;
-		}
-
-		/// Get the pointed sprite, either original or rebound
-		//
-		/// @return the currently bound sprite, NULL if none
-		///
-		character* get(bool skipRebinding=false) const
-		{
-			if ( skipRebinding ) return _ptr;
-
-			checkDangling(); // set _ptr to NULL and _tgt to original target if destroyed
-			if ( _ptr ) return _ptr;
-			else return find_character_by_target(_tgt);
-		}
-
-		/// Get the sprite target, either current (if not dangling) or bounded-to one.
-		std::string getTarget() const;
-
-		/// Return true if this sprite is dangling
-		//
-		/// Dangling means that it doesn't have a pointer to the original
-		/// sprite anymore, not that it doesn't point to anything.
-		/// To know if it points to something or not use get(), which will
-		/// return NULL if it doesn't point to anyhing.
-		///
-		bool isDangling() const
-		{
-			checkDangling();
-			return !_ptr;
-		}
-
-		/// \brief
-		/// Two sprite_proxies are equal if they point to the
-		/// same sprite
-		///
-		bool operator==(const CharacterProxy& sp) const
-		{
-			return get() == sp.get();
-		}
-
-		/// Set the original sprite (if any) as reachable
-		//
-		/// NOTE: if this value is dangling, we won't keep anything
-		///       alive.
-		///
-		void setReachable() const;
-	};
 
 	/// Compare values of the same type
 	//
