@@ -527,20 +527,24 @@ GtkAggGlue::render(int minx, int miny, int maxx, int maxy)
     // NOTE: Data will be copied in background, see beforeRendering()
   
   } else {
-#endif       
+#endif
+	size_t copy_width = std::min(_width * (_bpp/8), maxx - minx + 1);
+	size_t copy_height = std::min(_height, maxy - miny + 1);
+  	size_t stride = _width*((_bpp+7)/8);
+
   	// Update only the invalidated rectangle
   	gdk_draw_rgb_image (
   		_drawing_area->window,
   		_drawing_area->style->fg_gc[GTK_STATE_NORMAL],
   		minx,
-    	miny,
-  		maxx-minx+1,
-  		maxy-miny+1,
+	    	miny,
+  		copy_width,
+  		copy_height,
   		GDK_RGB_DITHER_NORMAL,
-  		_offscreenbuf + miny*(_width*(_bpp/8)) + minx*(_bpp/8),
-  		(int)((_width)*_bpp/8)
+  		_offscreenbuf + miny*stride + minx*(_bpp/8),
+  		stride
   	);
-  	
+
 #ifdef ENABLE_MIT_SHM
   }
 #endif  

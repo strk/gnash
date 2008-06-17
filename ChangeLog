@@ -1,3 +1,8 @@
+2008-06-17 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* gui/gtk_glue_agg.cpp: Make sure we don't overflow the buffer.
+	Fixes bug #23620.
+
 2008-06-17  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* libamf/amf.cpp: Drop a few debug messages.
