@@ -75,8 +75,31 @@ public:
 		boost::intrusive_ptr<as_object> o = v.to_object();
 		if ( ! o ) return;
 
+#if 1 // oh boy.. I forgot to clean the "super" stuff up :! TODO: make fetching super easier...
+		as_object* super = NULL;
+		as_object* owner = NULL;
+		Property* p = o->findProperty(_eventName, 0, &owner);
+		if ( ! p )
+		{
+			//log_debug("Object %p has no event handler named %s", o, VM::get().getStringTable().value(_eventName));
+			// Older code used to increment this even when method
+			// was not found, so I guess we'll do the same..
+			++_dispatched;
+			return;
+		}
+		if ( o->isSuper() )
+		{
+			log_unimpl("Getting super from a super in AsBroadcaster");
+		}
+		super = owner->get_super();
+		as_value method = p->getValue(*o);
+
+		_fn.super = super;
+		//log_debug("AsBroadcaster calling function with super %p", super);
+#else
 		as_value method;
 		o->get_member(_eventName, &method);
+#endif
 
 		if ( method.is_function() )
 		{

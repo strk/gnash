@@ -3470,7 +3470,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
                     }
                 }
             }
-            super = proto->get_super();
+            super = proto ? proto->get_super() : 0;
         }
         else
         {

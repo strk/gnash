@@ -1,3 +1,13 @@
+2008-06-17 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/AsBroadcaster.as: add test for 'super'
+	  referenced in AsBroadcaster event handlers.
+	* server/vm/ASHandlers.cpp (ActionCallMethod): don't dereference
+	  null prototypes...
+	* server/asobj/AsBroadcaster.cpp: add initial support for 'super'
+	  in AsBroadcasters (I now realized I forgot to cleanup the
+	  super stuff, and it hurts indeed!).
+
 2008-06-17 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* gui/gtk_glue_agg.cpp: Make sure we don't overflow the buffer.

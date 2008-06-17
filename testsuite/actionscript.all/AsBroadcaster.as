@@ -20,7 +20,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: AsBroadcaster.as,v 1.9 2008/03/11 19:31:46 strk Exp $";
+rcsid="$Id: AsBroadcaster.as,v 1.10 2008/06/17 18:05:42 strk Exp $";
 #include "check.as"
 
 #if OUTPUT_VERSION < 6
@@ -31,6 +31,8 @@ note("AsBroadcaster exists but doesn't provide any 'prototype' or 'initialize' f
 check_equals(typeof(AsBroadcaster), 'function'); // ???
 xcheck_equals(typeof(AsBroadcaster.prototype), 'undefined'); 
 check_equals(typeof(AsBroadcaster.initialize), 'undefined');
+
+check_totals(3);
 
 #else // OUTPUT_VERSION >= 6
 
@@ -273,6 +275,27 @@ check_equals(_root.total, 36);
 bcast.broadcastMessage('setSum', 'one', 'two', 'three');
 check_equals(_root.total, '0onetwothree');
 
+//--------------------------------
+// event handlers calling super
+//--------------------------------
+
+function A1() {}
+A1.prototype.add = function(o) { o.msg += 'A'; };
+function B1() {}
+B1.prototype = new A1;
+B1.prototype.add = function(o) { super.add(o); o.msg += 'B'; };
+
+bobj = new B1;
+o = { msg:'' };
+bobj.add(o);
+check_equals(o.msg, "AB");
+o.msg = '';
+
+bcast._listeners.length=0;
+bcast.addListener(bobj);
+bcast.broadcastMessage('add', o);
+check_equals(o.msg, "AB");
+
 //-----------------------------------------------------------------------------------
 // TODO: test override of AsBroadcaster.{addListener,removeListener,broadcastMessage}
 // swfdec contains tests for this, which should now be pretty succeeding except for
@@ -281,6 +304,6 @@ check_equals(_root.total, '0onetwothree');
 // See swfdec/test/trace/asbroadcaster-override.as for more info
 //-----------------------------------------------------------------------------------
 
-#endif // OUTPUT_VERSION >= 6
+check_totals(108);
 
-totals();
+#endif // OUTPUT_VERSION < 6
