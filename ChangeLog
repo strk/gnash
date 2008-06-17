@@ -1,3 +1,8 @@
+2008-06-17 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/array.{cpp,h}: drop unused variable, reduce calls to .size()
+	  and .end(). Replace std::auto_ptr with boost::intrusive_ptr.
+
 2008-06-16 Sandro Santilli <strk@keybit.net>
 
 	* libmedia/ffmpeg/sound_handler_sdl.{cpp,h}: don't fail to initialize

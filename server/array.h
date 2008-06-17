@@ -187,7 +187,7 @@ public:
 	///	index to one-past element to include in result
 	///	0-based index.
 	///
-	std::auto_ptr<as_array_object> slice(
+	boost::intrusive_ptr<as_array_object> slice(
 		unsigned int start, unsigned int one_past_end);
 
 	/// Remove first element matching the given value
