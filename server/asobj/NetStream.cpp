@@ -23,6 +23,7 @@
 #endif
 
 #include "NetStream.h"
+#include "CharacterProxy.h"
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "log.h"
@@ -629,6 +630,12 @@ NetStream::clearStatusQueue()
 	_statusQueue.clear();
 }
 
+void
+NetStream::setAudioController(character* ch)
+{
+	_audioController.reset(new CharacterProxy(ch));
+}
+
 #ifdef GNASH_USE_GC
 void
 NetStream::markReachableResources() const
@@ -637,6 +644,8 @@ NetStream::markReachableResources() const
 	if ( _netCon ) _netCon->setReachable();
 
 	if ( m_statusHandler ) m_statusHandler->setReachable();
+
+	if ( _audioController ) _audioController->setReachable();
 
 	// Invoke generic as_object marker
 	markAsObjectReachable();

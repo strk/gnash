@@ -35,11 +35,13 @@
 #include "as_function.h" // for visibility of destructor by intrusive_ptr
 
 #include <deque>
+#include <boost/scoped_ptr.hpp>
 
 // Forward declarations
 namespace gnash {
 	//class NetConnection;
 	class VirtualClock;
+	class CharacterProxy;
 }
 
 namespace gnash {
@@ -224,6 +226,8 @@ protected:
 
 	boost::intrusive_ptr<NetConnection> _netCon;
 
+	boost::scoped_ptr<CharacterProxy> _audioController;
+
 	/// Set stream status.
 	//
 	/// Valid statuses are:
@@ -317,6 +321,9 @@ public:
 	/// except the FLV-parser (this might not be correct).
 	virtual void close(){}
 
+	/// Make audio controlled by given character
+	void setAudioController(character* controller);
+ 
 	/// Pauses/starts the playback of the media played by the current instance
 	//
 	/// @param mode

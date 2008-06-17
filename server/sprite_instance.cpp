@@ -56,6 +56,7 @@
 #include "fill_style.h" // for beginGradientFill
 #include "styles.h" // for cap_style_e and join_style_e enums
 #include "PlaceObject2Tag.h" 
+#include "NetStream.h"
 
 #ifdef USE_SWFTREE
 # include "tree.hh"
@@ -280,9 +281,36 @@ static as_value sprite_attach_movie(const fn_call& fn)
 static as_value sprite_attach_audio(const fn_call& fn)
 {
   boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
-  UNUSED(sprite);
 
-  LOG_ONCE( log_unimpl("MovieClip.attachAudio()") );
+  if ( ! fn.nargs )
+  {
+    IF_VERBOSE_ASCODING_ERRORS(
+    log_aserror("MovieClip.attachAudio(): %s", _("missing arguments"));
+    );
+    return as_value();
+  }
+
+  as_object* obj = fn.arg(0).to_object().get();
+  if ( ! obj )
+  { 
+    std::stringstream ss; fn.dump_args(ss);
+    // TODO: find out what to do here
+    log_error("MovieClip.attachAudio(%s): first arg doesn't cast to an object", ss.str());
+    return as_value();
+  }
+
+  NetStream* ns = dynamic_cast<NetStream*>(obj);
+  if ( ! ns )
+  { 
+    std::stringstream ss; fn.dump_args(ss);
+    // TODO: find out what to do here
+    log_error("MovieClip.attachAudio(%s): first arg doesn't cast to a NetStream", ss.str());
+    return as_value();
+  }
+
+  ns->setAudioController(sprite.get());
+
+  LOG_ONCE( log_unimpl("MovieClip.attachAudio() - TESTING") );
   return as_value();
 }
 

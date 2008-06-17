@@ -82,7 +82,7 @@ character::getWorldVolume() const
 	int volume=_volume;
 	if (m_parent != NULL)
 	{
-	    volume *= (m_parent->getVolume()/100);
+	    volume = int(volume*m_parent->getVolume()/100.0);
 	}
 
 	return volume;

@@ -64,6 +64,14 @@
 
 namespace gnash {
 
+// AS-volume adjustment
+void adjust_volume(boost::int16_t* data, int size, int volume)
+{
+	for (int i=0; i < size*0.5; i++) {
+		data[i] = data[i] * volume/100;
+	}
+}
+
 
 NetStreamFfmpeg::NetStreamFfmpeg()
 	:
@@ -462,6 +470,22 @@ NetStreamFfmpeg::decodeNextAudioFrame()
 
     	media::raw_mediadata_t* raw = new media::raw_mediadata_t();
 	raw->m_data = _audioDecoder->decode(*frame, raw->m_size); 
+
+	if ( _audioController ) // TODO: let the sound_handler do this .. sounds cleaner
+	{
+		character* ch = _audioController->get();
+		if ( ch )
+		{
+			int vol = ch->getWorldVolume();
+			if ( vol != 100 )
+			{
+				// NOTE: adjust_volume assumes samples 
+				// are 16 bits in size, and signed.
+				// Size is still given in bytes..
+				adjust_volume(reinterpret_cast<boost::int16_t*>(raw->m_data), raw->m_size, vol);
+			}
+		}
+	}
 
 #ifdef GNASH_DEBUG_DECODING
 	log_debug("NetStreamFfmpeg::decodeNextAudioFrame: "
