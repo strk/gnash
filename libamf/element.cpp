@@ -30,6 +30,7 @@
 #include "log.h"
 #include "amf.h"
 #include "amfutf8.h"
+#include "utility.h"
 #include "element.h"
 #include <boost/cstdint.hpp> // for boost::?int??_t
 
