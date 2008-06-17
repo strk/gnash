@@ -89,6 +89,7 @@ noinst_HEADERS = \
 	AudioDecoderNellymoser.h \
 	AudioDecoderSimple.h \
 	sound_handler.h \
+	NullSoundHandler.h \
 	SoundInfo.h \
 	Util.h \
 	$(NULL)

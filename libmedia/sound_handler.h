@@ -175,6 +175,13 @@ public:
 	/// 	where 0 is off and 100 is full volume. The default setting is 100.
 	///
 	virtual int	get_volume(int sound_handle) = 0;
+
+	/// Get the volume to apply to mixed output
+	//
+	/// @return percent value. 100 is full, 0 is none.
+	///        Can be negative or over 100 too.
+	///
+	int getFinalVolume() { return _volume; }
 	
 	/// Sets the volume for a given sound buffer slot.
 	//
@@ -189,6 +196,13 @@ public:
 	///	The default setting is 100.
 	///
 	virtual void	set_volume(int sound_handle, int volume) = 0;
+
+	/// Set the volume to apply to mixed output
+	//
+	/// @param v percent value. 100 is full, 0 is none.
+	///       Can be negative or over 100 too.
+	///
+	void setFinalVolume(int v) { _volume=v; }
 		
 	/// Remove scheduled requests to play the specified sound buffer slot
 	//
@@ -302,7 +316,8 @@ protected:
 	sound_handler()
 		:
 		_soundsStarted(0),
-		_soundsStopped(0)
+		_soundsStopped(0),
+		_volume(100)
 	{}
 
 	/// Special test-member. Stores count of started sounds.
@@ -310,6 +325,11 @@ protected:
 
 	/// Special test-member. Stores count of stopped sounds.
 	size_t _soundsStopped;
+
+private:
+
+	/// Final output volume
+	int _volume;
 };
 
 // TODO: move to appropriate specific sound handlers
