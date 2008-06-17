@@ -1,5 +1,10 @@
 2008-06-17 Sandro Santilli <strk@keybit.net>
 
+	* libmedia/ffmpeg/sound_handler_sdl.cpp: concatenate final
+	  volume to mixer.
+
+2008-06-17 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/Sound.{cpp,h}: fix constructor taking
 	  arg; fix getVolume/setVolume to query either global
 	  volume or associated-character-local one; fix visibility

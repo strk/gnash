@@ -675,7 +675,7 @@ use_envelopes(active_sound& sound, unsigned int length)
 static void
 do_mixing(Uint8* stream, active_sound& sound, Uint8* data, unsigned int mix_length, unsigned int volume)
 {
-	// If the volume needs adjustments we call a function to do that
+	// If the volume needs adjustments we call a function to do that (why are we doing this manually ?)
 	if (volume != 100) {
 		adjust_volume(reinterpret_cast<boost::int16_t*>(data), mix_length, volume);
 	} else if (sound.envelopes != NULL) {
@@ -761,6 +761,8 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 
 	boost::mutex::scoped_lock lock(handler->_mutex);
 
+  int finalVolume = int(128*handler->getFinalVolume()/100.0);
+
 	// If nothing to play there is no reason to play
 	// Is this a potential deadlock problem?
 	if (handler->soundsPlaying == 0 && handler->m_aux_streamer.empty()) {
@@ -798,7 +800,7 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 			} else {
 				++it;
 			}
-			SDL_MixAudio(stream, buf.get(), buffer_length, SDL_MIX_MAXVOLUME);
+			SDL_MixAudio(stream, buf.get(), buffer_length, finalVolume);
 
 		}
 	}
@@ -840,6 +842,8 @@ SDL_sound_handler::mixActiveSound(active_sound& sound, sound_data& sounddata, Ui
 	// If there exist no decoder, then we can't decode!
 	if (sound.decoder == NULL) return;
 
+	int volume = int(sounddata.volume*getFinalVolume()/100.0); // concatenate global volume
+
 	// When the current sound don't have enough decoded data to fill the buffer, 
 	// we first mix what is already decoded, then decode some more data, and
 	// mix some more until the buffer is full. If a sound loops the magic
@@ -855,7 +859,7 @@ SDL_sound_handler::mixActiveSound(active_sound& sound, sound_data& sounddata, Ui
 			index = sound.rawDataSize() - sound.raw_position;
 
 			do_mixing(buffer, sound, sound.get_raw_data_ptr(sound.raw_position),
-				index, sounddata.volume);
+				index, volume);
 
 		}
 
@@ -927,7 +931,7 @@ SDL_sound_handler::mixActiveSound(active_sound& sound, sound_data& sounddata, Ui
 			log_error("Something went terribly wrong during mixing of an active sound");
 			return; // something went terrible wrong
 		}
-		do_mixing(buffer+index, sound, sound.get_raw_data_ptr(0), mix_length, sounddata.volume);
+		do_mixing(buffer+index, sound, sound.get_raw_data_ptr(0), mix_length, volume);
 
 	}
 
@@ -937,7 +941,7 @@ SDL_sound_handler::mixActiveSound(active_sound& sound, sound_data& sounddata, Ui
 	{
 
 		do_mixing(buffer, sound, sound.get_raw_data_ptr(sound.raw_position), 
-			buffer_length, sounddata.volume);
+			buffer_length, volume);
 
 	}
 
@@ -949,7 +953,7 @@ SDL_sound_handler::mixActiveSound(active_sound& sound, sound_data& sounddata, Ui
 	
 
 		do_mixing(buffer, sound, sound.get_raw_data_ptr(sound.raw_position), 
-			sound.rawDataSize() - sound.raw_position, sounddata.volume);
+			sound.rawDataSize() - sound.raw_position, volume);
 
 		sound.raw_position = sound.rawDataSize();
 	} 
