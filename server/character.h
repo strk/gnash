@@ -441,6 +441,12 @@ public:
     void setVolume(int vol) { _volume=vol; }
 
     /// Get concatenated sound volume for this character
+    //
+    /// NOTE: the concatenated volume does NOT include
+    ///       global volume settings, which is the one
+    ///       controlled by Sound instances created passing
+    ///       null, undefined or no argument to constructor.
+    ///
     int getWorldVolume() const;
 
     /// Get local transform matrix for this character
