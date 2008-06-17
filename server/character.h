@@ -81,6 +81,17 @@ private:
   int m_depth;
   cxform  m_color_transform;
   matrix  m_matrix;
+
+  /// Volume control associated to this character
+  //
+  /// This is used by Sound objects
+  ///
+  /// NOTE: probably only ActionScript-referenceable characters
+  ///       need this (assuming soft ref don't rebind to other
+  ///       kind of characters).
+  ///
+  int  _volume;
+
   int   m_ratio;
   int m_clip_depth;
   Events  _event_handlers;
@@ -363,23 +374,26 @@ public:
     static const int dynClipDepthValue = -2000000;
 
     character(character* parent, int id)
-  :
-  m_id(id),
-  m_depth(0),
-  m_ratio(0),
-  m_clip_depth(noClipDepthValue),
-  _unloaded(false),
-  _destroyed(false),
-  _mask(0),
-  _maskee(0),
-  _origTarget(),
-  m_visible(true),
-  m_parent(parent),
-  m_invalidated(true),
-  m_child_invalidated(true),
-  m_old_invalidated_ranges(),
-  _scriptTransformed(false),
-  _dynamicallyCreated(false)
+        :
+        m_id(id),
+        m_depth(0),
+        m_color_transform(),
+        m_matrix(),
+        _volume(100),
+        m_ratio(0),
+        m_clip_depth(noClipDepthValue),
+        _unloaded(false),
+        _destroyed(false),
+        _mask(0),
+        _maskee(0),
+        _origTarget(),
+        m_visible(true),
+        m_parent(parent),
+        m_invalidated(true),
+        m_child_invalidated(true),
+        m_old_invalidated_ranges(),
+        _scriptTransformed(false),
+        _dynamicallyCreated(false)
     {
       assert((parent == NULL && m_id == -1)
        || (parent != NULL && m_id >= 0));
@@ -420,16 +434,28 @@ public:
 
     void  set_depth(int d) { m_depth = d; }
 
+    /// Get sound volume for this character
+    int getVolume() const { return _volume; }
+
+    /// Set sound volume for this character
+    void setVolume(int vol) { _volume=vol; }
+
+    /// Get concatenated sound volume for this character
+    int getWorldVolume() const;
+
+    /// Get local transform matrix for this character
     const matrix& get_matrix() const { return m_matrix; }
 
+    /// Set local transform matrix for this character
     void  set_matrix(const matrix& m)
-  {
-      assert(m.is_valid());
-      if (!(m == m_matrix)) {
-        set_invalidated(__FILE__, __LINE__);
-        m_matrix = m;
-      }
-  }
+    {
+        assert(m.is_valid());
+        if (!(m == m_matrix))
+        {
+            set_invalidated(__FILE__, __LINE__);
+            m_matrix = m;
+        }
+    }
 
     /// Set the xscale value of current matrix
     //
@@ -1191,7 +1217,6 @@ public: // istn't this 'public' reduntant ?
 #endif
 
 };
-
 
 
 } // end namespace gnash

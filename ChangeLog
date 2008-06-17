@@ -1,5 +1,11 @@
 2008-06-17 Sandro Santilli <strk@keybit.net>
 
+	* server/character.{cpp,h}: add interface to get/set volume
+	  of sounds associated to the character, both local and
+	  concatenated one.
+
+2008-06-17 Sandro Santilli <strk@keybit.net>
+
 	* libmedia/: Makefile.am, NullSoundHandler.h, sound_handler.h:
 	  Add interface to set/get final volume. Add NullSoundHandler
 	  for use in gprocessor.

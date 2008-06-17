@@ -76,6 +76,18 @@ character::get_world_matrix() const
 	return m;
 }
 
+int
+character::getWorldVolume() const
+{
+	int volume=_volume;
+	if (m_parent != NULL)
+	{
+	    volume *= (m_parent->getVolume()/100);
+	}
+
+	return volume;
+}
+
 cxform
 character::get_world_cxform() const
 {
