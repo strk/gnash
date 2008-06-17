@@ -4119,8 +4119,11 @@ SWFHandlers::ActionTry(ActionExec& thread)
     thread.next_pc = i; // Proceed into the try block.
 
     IF_VERBOSE_ACTION(
-    log_action(_("ActionTry: reserved:%x doFinally:%d doCatch:%d trySize:%u catchSize:%u finallySize:%u catchName:%s catchRegister:%u"),
-        reserved, doFinally, doCatch, trySize, catchSize, finallySize, catchName ? catchName : "(null)", catchRegister);
+    log_action(_("ActionTry: reserved:%x doFinally:%d doCatch:%d trySize:%u "
+                "catchSize:%u finallySize:%u catchName:%s catchRegister:%u"),
+                static_cast<int>(reserved), doFinally, doCatch, trySize,
+                catchSize, finallySize,
+                catchName ? catchName : "(null)", catchRegister);
     );
 }
 

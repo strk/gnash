@@ -1,3 +1,11 @@
+2008-06-17 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/vm/action_buffer.cpp: rewrite disasm_instruction so that it
+	  doesn't read uninitialized memory so much (still not entirely
+	  unbreakable). Use switch and hexify whole instructions where the
+	  length is known.
+	* server/vm/ASHandlers.cpp: fix output of uint8_t. 	  
+
 2008-06-17 Sandro Santilli <strk@keybit.net>
 
 	* server/: Makefile.am, as_value.{cpp,h}, ChracterProxy.{cpp,h}:
