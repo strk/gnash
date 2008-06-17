@@ -218,6 +218,16 @@ private:
 
 	bool _abortOnUnload;
 
+    /// Program counter (offset of current action tag)
+	size_t pc;
+
+	/// Offset to next action tag
+	size_t next_pc;
+
+	/// End of current function execution
+	/// Used for try/throw/catch blocks.
+	size_t stop_pc;
+
 public:
 
 	/// \brief
@@ -449,6 +459,8 @@ public:
 	/// Execute.
 	void operator() ();
 
+
+    // TODO: cut down these accessors.
     bool atActionTag(SWF::action_type t) { return code[pc] == t; }
 	
 	size_t getCurrentPC() const { return pc; }
@@ -456,24 +468,12 @@ public:
 	void skipRemainingBuffer() { next_pc = stop_pc; }
 	
 	void adjustNextPC(int offset) { next_pc += offset; }
-
-// This is just a temporary mess for initialization order
-// while I sort out accessors.
-
-private:
-
-    /// Program counter (offset of current action tag)
-	size_t pc;
-
-public:
-
-	/// End of current function execution
-	/// Used for try/throw/catch blocks.
-	size_t stop_pc;
-
-	/// Offset to next action tag
-	size_t next_pc;
-
+	
+	size_t getNextPC() const { return next_pc; }
+	
+	void setNextPC(size_t pc) { next_pc = pc; }
+	
+	size_t getStopPC() const { return stop_pc; }
 	
 };
 

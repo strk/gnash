@@ -78,12 +78,12 @@ ActionExec::ActionExec(const swf_function& func, as_environment& newEnv, as_valu
     _tryList(),
     _returning(false),
     _abortOnUnload(false),
+    pc(func.getStartPC()),
+    next_pc(pc),
+    stop_pc(pc+func.getLength()),
     code(func.getActionBuffer()),
     env(newEnv),
-    retval(nRetVal),
-    pc(func.getStartPC()),
-    stop_pc(pc+func.getLength()),
-    next_pc(pc)
+    retval(nRetVal)
 {
     assert(stop_pc < code.size());
 
@@ -116,12 +116,12 @@ ActionExec::ActionExec(const action_buffer& abuf, as_environment& newEnv, bool a
     _tryList(),
     _returning(false),
     _abortOnUnload(abortOnUnloaded),
+    pc(0),
+    next_pc(0),
+    stop_pc(abuf.size()),
     code(abuf),
     env(newEnv),
-    retval(0),
-    pc(0),
-    stop_pc(code.size()),
-    next_pc(0)
+    retval(0)
 {
     //GNASH_REPORT_FUNCTION;
 

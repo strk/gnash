@@ -1,3 +1,8 @@
+2008-06-17 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/vm/ActionExec.{h,cpp}, ASHandlers.cpp: add more accessors to
+	  data members.
+
 2008-06-17 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/AsBroadcaster.as: add test for 'super'

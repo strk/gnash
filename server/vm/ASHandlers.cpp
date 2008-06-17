@@ -2540,8 +2540,8 @@ SWFHandlers::ActionBranchIfTrue(ActionExec& thread)
     as_environment& env = thread.env;
     const action_buffer& code = thread.code;
     size_t pc = thread.getCurrentPC();
-    size_t next_pc = thread.next_pc;
-    size_t stop_pc = thread.stop_pc;
+    size_t nextPC = thread.getNextPC();
+    size_t stopPC = thread.getStopPC();
 
     assert(thread.atActionTag(SWF::ACTION_BRANCHIFTRUE));
 
@@ -2554,12 +2554,12 @@ SWFHandlers::ActionBranchIfTrue(ActionExec& thread)
     {
         thread.adjustNextPC(offset);
 
-        if (next_pc > stop_pc)
+        if (nextPC > stopPC)
         {
             IF_VERBOSE_MALFORMED_SWF (
             log_swferror(_("branch to offset %d  -- "
                 " this section only runs to %d"),
-                    next_pc, stop_pc);
+                    nextPC, stopPC);
             )
         }
     }
@@ -3954,7 +3954,7 @@ void
 SWFHandlers::ActionConstantPool(ActionExec& thread)
 {
     
-    thread.code.process_decl_dict(thread.getCurrentPC(), thread.next_pc);
+    thread.code.process_decl_dict(thread.getCurrentPC(), thread.getNextPC());
 }
 
 void
@@ -3965,11 +3965,11 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
     as_environment& env = thread.env;
     const action_buffer& code = thread.code;
 
-    // Code starts at thread.next_pc as the DefineFunction tag
+    // Code starts at thread.getNextPC() as the DefineFunction tag
     // contains name and args, while next tag is first tag
     // of the function body.
     swf_function* func = new swf_function(
-        &code, &env, thread.next_pc, thread.getScopeStack());
+        &code, &env, thread.getNextPC(), thread.getScopeStack());
 
     func->set_is_function2();
 
@@ -4016,7 +4016,7 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
 
     // Check code_size value consistency
     size_t actionbuf_size = thread.code.size();
-    if ( thread.next_pc+code_size > actionbuf_size )
+    if ( thread.getNextPC() + code_size > actionbuf_size )
     {
         IF_VERBOSE_MALFORMED_SWF(
             log_swferror(_("function2 code len (%u) "
@@ -4025,9 +4025,9 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
                 ", function2 code offset=%d). "
                 "Forcing code len to eat the whole buffer "
                 "(would this work?)."),
-                code_size, actionbuf_size, thread.next_pc);
+                code_size, actionbuf_size, thread.getNextPC());
         );
-        code_size = actionbuf_size-thread.next_pc;
+        code_size = actionbuf_size-thread.getNextPC();
     }
 
     i += 2;
@@ -4116,7 +4116,7 @@ SWFHandlers::ActionTry(ActionExec& thread)
         thread.pushTryBlock(t);
     }
 
-    thread.next_pc = i; // Proceed into the try block.
+    thread.setNextPC(i); // Proceed into the try block.
 
     IF_VERBOSE_ACTION(
     log_action(_("ActionTry: reserved:%x doFinally:%d doCatch:%d trySize:%u "
@@ -4166,7 +4166,7 @@ SWFHandlers::ActionWith(ActionExec& thread)
     pc += 2; // skip with body size
 
     // now we should be on the first action of the 'with' body
-    assert(thread.next_pc == pc);
+    assert(thread.getNextPC() == pc);
 
     if ( ! with_obj )
     {
@@ -4180,7 +4180,7 @@ SWFHandlers::ActionWith(ActionExec& thread)
     }
 
     // where does the 'with' block ends ?
-    unsigned block_end = thread.next_pc + block_length;
+    unsigned block_end = thread.getNextPC() + block_length;
 
     if ( ! thread.pushWithEntry(with_stack_entry(with_obj, block_end)) )
     {
@@ -4204,11 +4204,11 @@ SWFHandlers::ActionDefineFunction(ActionExec& thread)
 #endif
 
     // Create a new swf_function
-    // Code starts at thread.next_pc as the DefineFunction tag
+    // Code starts at thread.getNextPC() as the DefineFunction tag
     // contains name and args, while next tag is first tag
     // of the function body.
     swf_function* func = new swf_function(
-        &code, &env, thread.next_pc, thread.getScopeStack());
+        &code, &env, thread.getNextPC(), thread.getScopeStack());
 
     size_t i = thread.getCurrentPC() + 3;
 
@@ -4239,7 +4239,7 @@ SWFHandlers::ActionDefineFunction(ActionExec& thread)
 
 
     // Skip the function body (don't interpret it now).
-    // next_pc is assumed to point to first action of
+    // getNextPC() is assumed to point to first action of
     // the function body (one-past the current tag, whic
     // is DefineFunction). We add code_size to it.
     thread.adjustNextPC(code_size);
