@@ -43,7 +43,7 @@
 #include "gui.h"
 #include "kdesup.h"
 #include "klash.moc"
-#include "types.h" // for PIXELS_TO_TWIPS 
+#include "utility.h" // for PIXELS_TO_TWIPS 
 
 using namespace std;
 

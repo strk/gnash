@@ -1,5 +1,9 @@
 2008-06-17 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* gui/kde.cpp: PIXELS_TO_TWIPS is now in utility.h.
+
+2008-06-17 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* server/array.{cpp,h}: drop unused variable, reduce calls to .size()
 	  and .end(). Replace std::auto_ptr with boost::intrusive_ptr.
 
