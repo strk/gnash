@@ -1,5 +1,14 @@
 2008-06-17 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* server/asobj/Error_as.{cpp,h}: regenerate unimplemented Error
+	  class.
+	* server/asobj/ClassHierarchy.cpp: Error also works in SWF6.
+	  Update includes.
+	* server/asobj/Global.cpp: update include (it's not necessary at
+	  all now, but may be if Error is an ASnative function).
+
+2008-06-17 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* gui/kde.cpp: PIXELS_TO_TWIPS is now in utility.h.
 
 2008-06-17 Benjamin Wolsey <bwy@benjaminwolsey.de>

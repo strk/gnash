@@ -50,7 +50,7 @@ libgnashasobjs_la_SOURCES = \
 	ContextMenu.cpp	\
 	CustomActions.cpp\
 	Date.cpp \
-	Error.cpp \
+	Error_as.cpp \
 	Global.cpp \
 	Key.cpp	\
 	LoadVars.cpp \
@@ -113,7 +113,7 @@ noinst_HEADERS = \
 	ContextMenu.h \
 	CustomActions.h	\
 	Date.h \
-	Error.h	\
+	Error_as.h	\
 	GMath.h	\
 	Global.h\
 	Key.h \

@@ -29,7 +29,7 @@
 #include "ContextMenu.h"
 #include "CustomActions.h"
 #include "Date.h"
-#include "Error.h"
+#include "Error_as.h"
 #include "Global.h"
 #include "gstring.h"
 #include "Key.h"
@@ -289,7 +289,7 @@ static ClassHierarchy::nativeClass knownClasses[] =
 	{ netstream_class_init, NSV::CLASS_NET_STREAM, NSV::CLASS_OBJECT, NSV::NS_FLASH_NET, 6 },
 	{ contextmenu_class_init, NSV::CLASS_CONTEXT_MENU, NSV::CLASS_OBJECT, NSV::NS_FLASH_UI, 7 },
 	{ moviecliploader_class_init, NSV::CLASS_MOVIE_CLIP_LOADER, NSV::CLASS_OBJECT, NS_GLOBAL, 7 },
-	{ error_class_init, NSV::CLASS_ERROR, NSV::CLASS_OBJECT, NS_GLOBAL, 7 },
+	{ Error_class_init, NSV::CLASS_ERROR, NSV::CLASS_OBJECT, NS_GLOBAL, 6 },
 };
 
 void
