@@ -1,5 +1,11 @@
 2008-06-17 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* server/asobj/Error_as.cpp: partial implementation of Error class.
+	* server/asobj/ClassHierarchy.cpp: Error available from SWF5.
+	* testsuite/actionscript.all/Error.as: more tests, some pass now.
+
+2008-06-17 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* server/asobj/Error_as.{cpp,h}: regenerate unimplemented Error
 	  class.
 	* server/asobj/ClassHierarchy.cpp: Error also works in SWF6.

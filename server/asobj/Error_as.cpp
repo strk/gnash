@@ -35,6 +35,7 @@
 
 namespace gnash {
 
+static as_value Error_toString(const fn_call& fn);
 static as_value Error_message_getset(const fn_call& fn);
 static as_value Error_name_getset(const fn_call& fn);
 
@@ -44,6 +45,7 @@ as_value Error_ctor(const fn_call& fn);
 static void
 attachErrorInterface(as_object& o)
 {
+    o.init_member("toString", new builtin_function(Error_toString));
     o.init_property("message", Error_message_getset, Error_message_getset);
     o.init_property("name", Error_name_getset, Error_name_getset);
 }
@@ -61,8 +63,6 @@ getErrorInterface()
 
 	if ( ! o )
 	{
-		// TODO: check if this class should inherit from Object
-		//       or from a different class
 		o = new as_object(getObjectInterface());
 		VM::get().addStatic(o.get());
 
@@ -80,32 +80,63 @@ public:
 
 	Error_as()
 		:
-		as_object(getErrorInterface())
+		as_object(getErrorInterface()),
+		_name("Error"),
+		_message("Error")
 	{}
 
-	// override from as_object ?
-	//std::string get_text_value() const { return "Error"; }
+    void setName(const std::string& n) { _name = n; }
+    const std::string& getName() const { return _name; }
 
-	// override from as_object ?
-	//double get_numeric_value() const { return 0; }
+    void setMessage(const std::string& m) { _message = m; }
+    const std::string& getMessage() const { return _message; }
+
+private:
+    std::string _name;
+    std::string _message;
 };
+
+static as_value
+Error_toString(const fn_call& fn)
+{
+ 	boost::intrusive_ptr<Error_as> ptr = ensureType<Error_as>(fn.this_ptr);
+	return as_value(ptr->getMessage());   
+}
 
 static as_value
 Error_message_getset(const fn_call& fn)
 {
 	boost::intrusive_ptr<Error_as> ptr = ensureType<Error_as>(fn.this_ptr);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+	if (fn.nargs == 0)
+	{
+	    // Getter
+	    return as_value(ptr->getMessage());
+	}
+	else
+	{
+	    // Setter
+	    ptr->setMessage(fn.arg(0).to_string());
+	    return as_value();
+	}
 }
 
 static as_value
 Error_name_getset(const fn_call& fn)
 {
 	boost::intrusive_ptr<Error_as> ptr = ensureType<Error_as>(fn.this_ptr);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+	
+	if (fn.nargs == 0)
+	{
+	    // Getter
+	    return as_value(ptr->getName());
+	}
+	else
+	{
+	    // Setter
+	    ptr->setName(fn.arg(0).to_string());
+	    return as_value();
+	}
+	
 }
 
 
@@ -113,16 +144,14 @@ Error_name_getset(const fn_call& fn)
 as_value
 Error_ctor(const fn_call& fn)
 {
-	boost::intrusive_ptr<as_object> obj = new Error_as;
+	boost::intrusive_ptr<Error_as> err = new Error_as;
 
-	if ( fn.nargs )
+	if ( fn.nargs > 0)
 	{
-		std::stringstream ss;
-		fn.dump_args(ss);
-		LOG_ONCE( log_unimpl("Error(%s): %s", ss.str(), _("arguments discarded")) );
+		err->setMessage(fn.arg(0).to_string());
 	}
 
-	return as_value(obj.get()); // will keep alive
+	return as_value(err.get()); // will keep alive
 }
 
 // extern 

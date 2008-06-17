@@ -22,20 +22,19 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Error.as,v 1.13 2008/03/11 19:31:47 strk Exp $";
+rcsid="$Id: Error.as,v 1.14 2008/06/17 08:45:36 bwy Exp $";
 #include "check.as"
 
+#if OUTPUT_VERSION > 5
+check(Error.prototype.hasOwnProperty("name"));
+check(Error.prototype.hasOwnProperty("toString"));
+check(Error.prototype.hasOwnProperty("message"));
+#endif
+
+xcheck_equals(typeof(Error.prototype.message), "string");
+xcheck_equals(typeof(Error.prototype.name), "string");
+
 var errorObj = new Error;
-
-#if OUTPUT_VERSION < 7
-
-// test the Error constuctor
-xcheck_equals (typeof(errorObj), 'object');
-
-// test the Error::tostring method
-xcheck_equals (typeof(errorObj.toString), 'function');
-
-#else // OUTPUT_VERSION >= 7
 
 // test the Error constuctor
 check_equals (typeof(errorObj), 'object');
@@ -43,5 +42,38 @@ check_equals (typeof(errorObj), 'object');
 // test the Error::tostring method
 check_equals (typeof(errorObj.toString), 'function');
 
-#endif
+
+e = new Error;
+check_equals(e.toString(), "Error");
+check_equals(e.message, "Error");
+check_equals(e.name, "Error");
+
+e = new Error("NameOfError");
+check_equals(e.toString(), "NameOfError");
+check_equals(e.name, "Error");
+check_equals(e.message, "NameOfError");
+
+
+e = new Error(7.8898);
+check_equals(e.toString(), "7.8898");
+check_equals(e.name, "Error");
+check_equals(e.message, "7.8898");
+
+
+// Is there any sense in this?
+e = new Error(new Color);
+xcheck_equals(typeof(e.toString()), "object");
+check_equals(e.toString().toString(), "[object Object]");
+check_equals(e.name, "Error");
+xcheck_equals(typeof(e.message), "object");
+
+e.name = "ANewName";
+check_equals(e.name, "ANewName");
+e.message = "New message";
+check_equals(e.message, "New message");
+
+
+e = Error("NameOfSecondError");
+xcheck_equals(typeof(e), "undefined");
+
 totals();
