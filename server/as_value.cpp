@@ -1497,7 +1497,7 @@ as_value::setReachable() const
 		}
 		case MOVIECLIP:
 		{
-			as_value::CharacterProxy sp = getCharacterProxy();
+			CharacterProxy sp = getCharacterProxy();
 			sp.setReachable();
 			break;
 		}
@@ -1520,7 +1520,7 @@ as_value::getObj() const
 	return boost::get<AsObjPtr>(_value);
 }
 
-as_value::CharacterProxy
+CharacterProxy
 as_value::getCharacterProxy() const
 {
 	assert(m_type == MOVIECLIP);
