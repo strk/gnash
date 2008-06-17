@@ -307,6 +307,7 @@ enum FileType {
     GNASH_FILETYPE_JPEG,
     GNASH_FILETYPE_PNG,
     GNASH_FILETYPE_SWF,
+    GNASH_FILETYPE_FLV,
     GNASH_FILETYPE_UNKNOWN
 };
 
@@ -346,12 +347,17 @@ getFileType(IOChannel* in)
     in->seek(0);
     return GNASH_FILETYPE_SWF;
   }
+
+  if ((buf[0] == 'F') && (buf[1] == 'L') && (buf[2] == 'V') ) {
+    return GNASH_FILETYPE_FLV;
+  }
   
   // Check if it is an swf embedded in a player (.exe-file)
   if ((buf[0] == 'M') && (buf[1] == 'Z')) {
 
     if ( 3 < in->read(buf, 3) )
     {
+      log_error(_("Can't read 3 bytes after an MZ (.exe) header"));
       in->seek(0);
       return GNASH_FILETYPE_UNKNOWN;
     }
@@ -363,6 +369,7 @@ getFileType(IOChannel* in)
       buf[2] = in->read_byte();
       if (in->eof())
       {
+        log_error(_("Could not find SWF inside an exe file"));
         in->seek(0);
         return GNASH_FILETYPE_UNKNOWN;
       }
@@ -370,6 +377,8 @@ getFileType(IOChannel* in)
     in->seek(in->tell()-3); // position to start of the swf itself
     return GNASH_FILETYPE_SWF;
   }
+
+  log_error("unknown file type, buf is %c%c%c", buf[0], buf[1], buf[2]);
   return GNASH_FILETYPE_UNKNOWN;
 }
 
@@ -427,6 +436,11 @@ create_movie(std::auto_ptr<IOChannel> in, const std::string& url, bool startLoad
   else if ( type == GNASH_FILETYPE_SWF )
   {
     return create_swf_movie(in, url, startLoaderThread);
+  }
+  else if ( type == GNASH_FILETYPE_FLV )
+  {
+    log_unimpl(_("FLV can't be loaded directly as a movie"));
+    return NULL;
   }
 
   log_error(_("unknown file type (%s)"), type);

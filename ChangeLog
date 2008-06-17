@@ -1,3 +1,8 @@
+2008-06-17 Sandro Santilli <strk@keybit.net>
+
+	* server/impl.cpp: add recognition of FLV files as
+	  top level movie (just to log_unimpl about it).
+
 2008-06-17 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/asobj/Error_as.cpp: partial implementation of Error class.
