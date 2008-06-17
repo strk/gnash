@@ -64,12 +64,21 @@ static as_value sound_stop(const fn_call& fn);
 static as_value checkPolicyFile_getset(const fn_call& fn);
 static as_object* getSoundInterface();
 
-Sound::Sound() 	:
+Sound::Sound() 
+	:
 	as_object(getSoundInterface()),
+	attachedCharacter(0),
 	soundId(-1),
 	externalSound(false),
-	isStreaming(false)
+	isStreaming(false),
+	_soundHandler(get_sound_handler())
 {
+}
+
+void
+Sound::attachCharacter(character* attachTo) 
+{
+	attachedCharacter.reset(new CharacterProxy(attachTo));
 }
 
 Sound::~Sound()
@@ -128,16 +137,50 @@ Sound::getTransform()
 	}
 }
 
-int
-Sound::getVolume()
+bool
+Sound::getVolume(int& volume)
 {
-	int volume = 0;
-	media::sound_handler* s = get_sound_handler();
-	if (s != NULL)
-	{
-		volume = s->get_volume(soundId);
-	}
-	return volume;
+    // TODO: check what takes precedence in case we
+    //       have both an attached character *and*
+    //       some other sound...
+    //
+    if ( attachedCharacter )
+    {
+        log_debug("Sound has an attached character");
+        character* ch = attachedCharacter->get();
+        if ( ! ch )
+        {
+            log_debug("Character attached to Sound was unloaded and couldn't rebind");
+            return false;
+        }
+        volume = ch->getVolume();
+        return true;
+    }
+    else log_debug("Sound has NO attached character, _soundHandler is %p, soundId is %d", _soundHandler, soundId);
+
+    // If we're not attached to a character we'll need to query
+    // sound_handler for volume. If we have no sound handler, we
+    // can't do much, so we'll return false
+    if (!_soundHandler)
+    {
+        log_debug("We have no sound handler here...");
+        return false;
+    }
+
+    // Now, we may be controlling a specific sound or
+    // the final output as a whole.
+    // If soundId is -1 we're controlling as a whole
+    //
+    if ( soundId == -1 )
+    {
+        volume = _soundHandler->getFinalVolume();
+    }
+    else
+    {
+        volume = _soundHandler->get_volume(soundId);
+    }
+
+    return true;
 }
 
 void
@@ -180,36 +223,76 @@ Sound::setTransform()
 void
 Sound::setVolume(int volume)
 {
-	// sanity check
-	if (volume >= 0 && volume <=100)
-	{
-		media::sound_handler* s = get_sound_handler();
-		if (s != NULL)
-		{
-			s->set_volume(soundId, volume);
-		}
-	}
+    // TODO: check what takes precedence in case we
+    //       have both an attached character *and*
+    //       some other sound...
+    //
+    if ( attachedCharacter )
+    {
+        character* ch = attachedCharacter->get();
+        if ( ! ch )
+        {
+            log_debug("Character attached to Sound was unloaded and couldn't rebind");
+            return;
+        }
+        ch->setVolume(volume);
+        return;
+    }
+
+    // If we're not attached to a character we'll need to use
+    // sound_handler for volume. If we have no sound handler, we
+    // can't do much, so we'll just return
+    if (!_soundHandler)
+    {
+        return;
+    }
+
+    // Now, we may be controlling a specific sound or
+    // the final output as a whole.
+    // If soundId is -1 we're controlling as a whole
+    //
+    if ( soundId == -1 )
+    {
+        _soundHandler->setFinalVolume(volume);
+    }
+    else
+    {
+        _soundHandler->set_volume(soundId, volume);
+    }
 }
 
 void
 Sound::start(int offset, int loops)
 {
-	    media::sound_handler* s = get_sound_handler();
-	    if (s) s->play_sound(soundId, loops, offset, 0, NULL);
-    
+    if ( soundId == -1 )
+    {
+        // FIXME: find out what to do here
+        log_error("Sound.start() called against a Sound that has no sound handle attached");
+        return;
+    }
+
+    if (_soundHandler)
+    {
+        _soundHandler->play_sound(soundId, loops, offset, 0, NULL);
+    }
 }
 
 void
 Sound::stop(int si)
 {
+    if ( soundId == -1 )
+    {
+        // FIXME: find out what to do here
+        log_error("Sound.stop() called against a Sound that has no sound handle attached");
+        return;
+    }
 
-	media::sound_handler* s = get_sound_handler();
-	if (s != NULL)
+	if (_soundHandler)
 	{
 	    if (si > -1) {
-			s->stop_sound(soundId);
+			_soundHandler->stop_sound(soundId);
 		} else {
-			s->stop_sound(si);
+			_soundHandler->stop_sound(si);
 		}
 	}
 }
@@ -240,10 +323,10 @@ Sound::getPosition()
 
 
 as_value
-sound_new(const fn_call& /* fn */)
+sound_new(const fn_call& fn)
 {
 	Sound* sound_obj;
-       
+
 #ifdef SOUND_GST
 	sound_obj = new SoundGst();
 #elif defined(USE_FFMPEG)
@@ -253,6 +336,36 @@ sound_new(const fn_call& /* fn */)
 #else
 	sound_obj = new Sound();
 #endif
+
+    if ( fn.nargs )
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        if ( fn.nargs > 1 )
+        {
+            std::stringstream ss; fn.dump_args(ss);
+            log_aserror("new Sound(%d) : args after first one ignored", ss.str());
+        }
+        );
+
+        as_value& arg0 = fn.arg(0);
+        if ( ! arg0.is_null() && ! arg0.is_undefined() )
+        {
+            as_object* obj = arg0.to_object().get();
+            character* ch = obj ? obj->to_character() : 0;
+            IF_VERBOSE_ASCODING_ERRORS(
+            if ( ! ch )
+            {
+                std::stringstream ss; fn.dump_args(ss);
+                log_aserror("new Sound(%s) : first argument isn't null "
+                    "nor undefined, and doesn't cast to a character. "
+                    "We'll take as an invalid character ref.",
+                    ss.str());
+            }
+            );
+            sound_obj->attachCharacter(ch);
+        }
+    }
+       
 	return as_value(sound_obj);
 }
 
@@ -396,7 +509,7 @@ sound_getbytestotal(const fn_call& /*fn*/)
 as_value
 sound_getpan(const fn_call& /*fn*/)
 {
-	LOG_ONCE( log_unimpl ("Sound.getDuration()") );
+	LOG_ONCE( log_unimpl ("Sound.getPan()") );
 	return as_value();
 }
 
@@ -441,10 +554,17 @@ sound_getvolume(const fn_call& fn)
 
 	boost::intrusive_ptr<Sound> so = ensureType<Sound>(fn.this_ptr);
 
-	int volume = so->getVolume();
+	if ( fn.nargs )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		std::stringstream ss; fn.dump_args(ss);
+		log_aserror("Sound.getVolume(%s) : arguments ignored");
+		);
+	}
 
-	return as_value(volume);
-
+	int volume;
+	if ( so->getVolume(volume) ) return as_value(volume);
+	return as_value();
 }
 
 as_value
@@ -537,15 +657,10 @@ attachSoundInterface(as_object& o)
 	int fl_hpc = as_prop_flags::dontEnum|as_prop_flags::dontDelete|as_prop_flags::readOnly;
 
 	o.init_member("attachSound", new builtin_function(sound_attachsound), fl_hpc);
-	o.init_member("getDuration", new builtin_function(sound_getDuration), fl_hpc);
-	o.init_member("setDuration", new builtin_function(sound_setDuration), fl_hpc);
 	o.init_member("getPan", new builtin_function(sound_getpan), fl_hpc);
 	o.init_member("setPan", new builtin_function(sound_setpan), fl_hpc);
-	o.init_member("loadSound", new builtin_function(sound_loadsound), fl_hpc);
 	o.init_member("start", new builtin_function(sound_start), fl_hpc);
 	o.init_member("stop", new builtin_function(sound_stop), fl_hpc);
-	o.init_member("getPosition", new builtin_function(sound_getPosition), fl_hpc);
-	o.init_member("setPosition", new builtin_function(sound_setPosition), fl_hpc);
 	o.init_member("getTransform", new builtin_function(sound_gettransform), fl_hpc);
 	o.init_member("setTransform", new builtin_function(sound_settransform), fl_hpc);
 	o.init_member("getVolume", new builtin_function(sound_getvolume), fl_hpc);
@@ -553,6 +668,11 @@ attachSoundInterface(as_object& o)
 
 	int fl_hpcn6 = fl_hpc|as_prop_flags::onlySWF6Up;
 
+	o.init_member("getDuration", new builtin_function(sound_getDuration), fl_hpcn6);
+	o.init_member("setDuration", new builtin_function(sound_setDuration), fl_hpcn6);
+	o.init_member("loadSound", new builtin_function(sound_loadsound), fl_hpcn6);
+	o.init_member("getPosition", new builtin_function(sound_getPosition), fl_hpcn6);
+	o.init_member("setPosition", new builtin_function(sound_setPosition), fl_hpcn6);
 	o.init_member("getBytesLoaded", new builtin_function(sound_getbytesloaded), fl_hpcn6);
 	o.init_member("getBytesTotal", new builtin_function(sound_getbytestotal), fl_hpcn6);
 
@@ -608,12 +728,20 @@ void sound_class_init(as_object& global)
 		as_object* iface = getSoundInterface();
 		cl=new builtin_function(&sound_new, iface);
 		iface->set_member_flags(NSV::PROP_CONSTRUCTOR, as_prop_flags::readOnly);
-		     
 	}
 
 	// Register _global.String
 	global.init_member("Sound", cl.get());
 
 }
+
+#ifdef GNASH_USE_GC
+void
+Sound::markReachableResources() const
+{
+	if ( connection ) connection->setReachable();
+	if ( attachedCharacter ) attachedCharacter->setReachable();
+}
+#endif // GNASH_USE_GC
 
 } // end of gnash namespace

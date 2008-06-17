@@ -21,6 +21,8 @@
 #include "gnashconfig.h"
 #endif
 
+#include "NullSoundHandler.h"
+
 #include <iostream>
 #include <cstdio>
 #include <sys/time.h>
@@ -311,6 +313,9 @@ main(int argc, char *argv[])
         dbglogfile.removeLog();
 	exit(1);
     }
+
+    std::auto_ptr<media::sound_handler> soundHandler(new media::NullSoundHandler());
+    gnash::set_sound_handler(soundHandler.get());
         
     std::vector<movie_data>	data;
 

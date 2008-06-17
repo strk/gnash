@@ -32,6 +32,16 @@
 #include "as_object.h" // for inheritance
 #include "NetConnection.h"
 
+#include <boost/scoped_ptr.hpp>
+
+/// Forward declarations
+namespace gnash {
+	class CharacterProxy;
+	namespace media {
+		class sound_handler;
+	}
+}
+
 namespace gnash {
 
 // Forward declarations
@@ -40,17 +50,33 @@ class fn_call;
 class Sound : public as_object {
 public:
 	Sound();
+
+	/// Make this sound control the given character
+	//
+	/// NOTE: 0 is accepted, to implement an "invalid"
+	///       controller type.
+	///
+	void attachCharacter(character* attachedChar);
+
 	~Sound();
 	virtual void attachSound(int si, const std::string& name);
 	virtual void getBytesLoaded();
 	virtual void getBytesTotal();
 	virtual void getPan();
 	virtual void getTransform();
-	virtual int getVolume();
+
+	/// Get volume from associated resource
+	//
+	/// @return true of volume was obtained, false
+	///         otherwise (for example if the associated
+	///         character was unloaded).
+	///
+	bool getVolume(int& volume);
+	void setVolume(int volume);
+
 	virtual void loadSound(const std::string& file, bool streaming);
 	virtual void setPan();
 	virtual void setTransform();
-	virtual void setVolume(int volume);
 	virtual void start(int offset, int loops);
 	virtual void stop(int si);
 	virtual unsigned int getDuration();
@@ -66,10 +92,7 @@ protected:
 	/// Reachable resources are:
 	///	- associated NetConnection object (connection)
 	///
-	void markReachableResources() const
-	{
-		if ( connection ) connection->setReachable();
-	}
+	void markReachableResources() const;
 #endif // GNASH_USE_GC
 
 	bool _duration;
@@ -78,12 +101,17 @@ protected:
 	bool _onLoad;
 	bool _onComplete;
 	bool _position;
+
 	boost::intrusive_ptr<NetConnection> connection;
 
+	boost::scoped_ptr<CharacterProxy> attachedCharacter;
 	int soundId;
 	bool externalSound;
 	std::string externalURL;
 	bool isStreaming;
+
+	media::sound_handler* _soundHandler;
+
 };
 
 void sound_class_init(as_object& global);

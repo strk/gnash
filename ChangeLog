@@ -1,5 +1,17 @@
 2008-06-17 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/Sound.{cpp,h}: fix constructor taking
+	  arg; fix getVolume/setVolume to query either global
+	  volume or associated-character-local one; fix visibility
+	  of a few method found to be only available in SWF6+
+	  by the new Sound.as testcase.
+	* testsuite/actionscript.all: Makefile.am, Sound.as: initial
+	  test for Sound class.
+	* utilities/processor.cpp: register a NullSoundHandler so we
+	  can query global volume from actionscript.all
+
+2008-06-17 Sandro Santilli <strk@keybit.net>
+
 	* server/character.{cpp,h}: add interface to get/set volume
 	  of sounds associated to the character, both local and
 	  concatenated one.

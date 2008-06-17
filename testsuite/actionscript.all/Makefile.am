@@ -101,6 +101,7 @@ ASTESTS =			\
 	Random.as		\
 	Selection.as		\
 	SharedObject.as		\
+	Sound.as		\
 	Stage.as		\
 	String.as		\
 	System.as		\
