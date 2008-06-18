@@ -941,7 +941,11 @@ Element::dump()
       case Element::STRING_AMF0:
 	  cerr << "(" << getLength() << " bytes): ";
 	  if (getLength() > 0) {
-	      char *term = strndup(to_string(), getLength());
+#ifdef HAVE_STRNDUP
+		char *term = strndup(to_string(), getLength());
+#else
+		char *term = const_cast<char *>(to_string());
+#endif	      
 	      cerr << "\t\"" << term << "\"" << endl;
 	  } else {
 	      cerr << endl;

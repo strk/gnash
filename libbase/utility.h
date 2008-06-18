@@ -313,28 +313,6 @@ inline unsigned long int /* pthread_t */ get_thread_id(void)
 #endif
 }
 
-#ifndef HAVE_STRNDUP
-/* Written by Niels Möller <nisse@lysator.liu.se> and placed in the public domain. */
-
-inline char *strndup(const char *s, size_t size)
-{
-  char *r, *end = static_cast<char *>(memchr(s, 0, size));
-
-  if (end)
-    /* Length + 1 */
-    size = end - s + 1;
-
-  r = static_cast<char *>(malloc(size));
-
-  if (size)
-    {
-      memcpy(r, s, size-1);
-      r[size-1] = '\0';
-    }
-  return r;
-}
-#endif
-
 #endif // UTILITY_H
 
 
