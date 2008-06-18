@@ -1,5 +1,5 @@
 dnl
-dnl    Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+dnl    Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 dnl
 dnl  This program is free software; you can redistribute it and/or modify
 dnl  it under the terms of the GNU General Public License as published by
@@ -15,12 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl
 
-# Configure paths for Ming
-# Author: Sandro Santilli <strk@keybit.net>
-#
-# This macro uses ming-config, which was
-# not available as of Ming 0.3beta1
-#
+
 #
 # Use: 
 #	AC_PATH_MTASC
@@ -56,6 +51,8 @@ AC_DEFUN([AC_PATH_MTASC], [
     # cross your fingers !
     if test -d "`dirname ${MTASC}`/std"; then
     dir="`dirname ${MTASC}`/std"
+    elif test -d "/usr/share/mtasc/std"; then
+    dir="/usr/share/mtasc/std"
     else
     dnl FIXME
     dir="/usr/share/ocaml/mtasc/std"
