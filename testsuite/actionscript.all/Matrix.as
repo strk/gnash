@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Matrix.as,v 1.8 2008/06/18 07:53:47 bwy Exp $";
+rcsid="$Id: Matrix.as,v 1.9 2008/06/18 08:11:36 bwy Exp $";
 
 
 // There are lots of floating point calculations here. Comparing them
@@ -29,7 +29,7 @@ rcsid="$Id: Matrix.as,v 1.8 2008/06/18 07:53:47 bwy Exp $";
 // an epsilon; others may fail for other people - so please edit as necessary
 // - but it's good to be as accurate as possible.
 //
-// A ming bug up to version 0.4.5 makes very large numbers fail.
+// A ming bug up to version 0.4 beta 5 makes very large numbers fail.
 #include "check.as"
 
 #if OUTPUT_VERSION < 8
@@ -114,10 +114,10 @@ m.scale(4798747e+98, 0.33874983);
 #if MING_VERSION_CODE > 00040005
 check(m.a < -6.7518325360784e+107 && m.a > -6.7518325360786e+107)
 check_equals(m.c.toString(), "2.46844592063091e+107");
+check_equals(m.tx.toString(), "1.597982751e+107");
 #endif
 check_equals(m.b.toString(), "-0.419012258900892");
 check_equals(m.d.toString(), "-0.505976396967328");
-check_equals(m.tx.toString(), "1.597982751e+107");
 check_equals(m.ty.toString(), "-96119.3225379726");
 
 m.rotate(-1.2873874);
