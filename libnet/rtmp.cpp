@@ -243,6 +243,10 @@ RTMP::decodeHeader(Network::byte_t *in)
     _header.head_size = headerSize(*tmpptr++);
     log_debug (_("The header size is %d"), _header.head_size);
 
+    if (_header.head_size == 1) {
+        _header.bodysize = sizeof(boost::uint16_t) * 2;
+    }
+    
     if (_header.head_size >= 4) {
         _mystery_word = *tmpptr++;
         _mystery_word = (_mystery_word << 12) + *tmpptr++;
@@ -261,7 +265,7 @@ RTMP::decodeHeader(Network::byte_t *in)
 
     if (_header.head_size >= 8) {
         _header.type = *(content_types_e *)tmpptr;
-        _header.bodysize = sizeof(boost::uint16_t) * 2;
+//        _header.bodysize = sizeof(boost::uint16_t) * 2;
         tmpptr++;
         log_debug(_("The type is: %s"), content_str[_header.type]);
     }
@@ -885,6 +889,11 @@ RTMP::sendRecvMsg(int amf_index, rtmp_headersize_e head_size,
     
 //    Element *el = new Element;  
 //    el.
+    
+    if (rthead->bodysize < ret) {
+	log_debug("more bytes left to read ! %d", (rthead->bodysize < ret));
+    }
+    
     return 0;
 }
 
