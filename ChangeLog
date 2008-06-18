@@ -1,3 +1,10 @@
+2008-06-18 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/vm/ActionExec.cpp: fix try/catch in functions without using
+	  a special case. Also passes the ordinary try tests in swfdec (needed
+	  Error too).
+	* server/swfdec/PASSING: three passes in try.
+
 2008-06-17 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* configure.ac, libbase/utility.h, libamf/element.cpp:

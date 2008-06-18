@@ -52,7 +52,7 @@
 # define STACK_DUMP_LIMIT 32
 
 // Define to get debugging messages for try / catch
-//#define GNASH_DEBUG_TRY 1
+#define GNASH_DEBUG_TRY 1
 
 #endif
 
@@ -380,14 +380,20 @@ ActionExec::operator() ()
 // finally { };
 //
 // The catch and finally blocks are both optional.
-// 1. the catch block is *always* executed, even when no exception is thrown.
+// 1. the catch block is *always* executed, even when no exception is thrown. This
+//    may be different when the catch variable is typed ( "catch (e:Error) {};" )
 // 2. the finally block is *always* executed, even when an exception is thrown.
 // 3. execution is interrupted if there are no catchers left and an exception
 //    is still on the stack.
-//
+// 4. If an exception is thrown in a function and not caught within that function,
+//    the return value is the exception, unless the 'finally' block has its own
+//    return. (In that case, the exception is never handled).
 bool
 ActionExec::processExceptions(TryBlock& t)
 {
+
+    if (retval) log_debug("Retval exists");
+    if (t._hasName) log_debug("Has name");
 
     switch (t._tryState)
     {
@@ -503,6 +509,13 @@ ActionExec::processExceptions(TryBlock& t)
                           "again (%s). Replaces any previous "
                           "uncaught exceptions", ex);
 #endif
+
+                // Return any exceptions thrown in catch. This
+                // can be overridden by a return in finally. 
+                // Should these be thrown to the register too
+                // if it is a catch-in-register case?
+                if (retval) *retval = t._lastThrow;
+
             }
             stop_pc = t._afterTriedOffset;
             t._tryState = TryBlock::TRY_END;
@@ -530,24 +543,17 @@ ActionExec::processExceptions(TryBlock& t)
             else if (t._lastThrow.is_exception())
             {
                 // Check for exception handlers straight away
-                stop_pc = t._afterTriedOffset;
+                stop_pc = t._afterTriedOffset;                
 #ifdef GNASH_DEBUG_TRY
                 as_value ex = t._lastThrow;
                 ex.unflag_exception();
                 log_debug("END: no new exceptions thrown. Pushing "
-                          "uncaught one (%s) back", ex);
-#endif
+                      "uncaught one (%s) back on stack", ex);
+#endif                   
+
                 env.push(t._lastThrow);
-                if ((t._finallyOffset == t._savedEndOffset) && retval)
-                {
-                    // This was taken over from the previous
-                    // implementation. It happens when there is
-                    // no 'finally' block. It seems to be a bit of
-                    // a hack now, though it may be correct. It
-                    // passes misc-mtasc.all/exceptions.swf.
-                    // TODO: more tests needed.                            
-                    *retval = t._lastThrow;
-                }
+ 
+
                 _tryList.pop_back();
                 return true;
             }
@@ -561,7 +567,7 @@ ActionExec::processExceptions(TryBlock& t)
             // Finished with this TryBlock.
             _tryList.pop_back();
             
-            // Will break of of action execution.
+            // Will break out of action execution.
             if (_returning) return false;
 		    
             break;
