@@ -52,7 +52,7 @@
 # define STACK_DUMP_LIMIT 32
 
 // Define to get debugging messages for try / catch
-#define GNASH_DEBUG_TRY 1
+//#define GNASH_DEBUG_TRY 1
 
 #endif
 
@@ -66,7 +66,7 @@ static Debugger& debugger = Debugger::getDefaultInstance();
 
 ActionExec::ActionExec(const swf_function& func, as_environment& newEnv, as_value* nRetVal, as_object* this_ptr)
     :
-    with_stack(),
+    _withStack(),
     _scopeStack(func.getScopeStack()),
     // See comment in header
     _withStackLimit(7),
@@ -106,7 +106,7 @@ ActionExec::ActionExec(const swf_function& func, as_environment& newEnv, as_valu
 
 ActionExec::ActionExec(const action_buffer& abuf, as_environment& newEnv, bool abortOnUnloaded)
     :
-    with_stack(),
+    _withStack(),
     _scopeStack(), // TODO: initialize the scope stack somehow
     _withStackLimit(7),
     _func(NULL),
@@ -207,12 +207,12 @@ ActionExec::operator() ()
             }
 
             // Cleanup any expired "with" blocks.
-            while ( ! with_stack.empty() && pc >= with_stack.back().end_pc() )
+            while ( ! _withStack.empty() && pc >= _withStack.back().end_pc() )
             {
            
                 // Drop last stack element
-                assert(with_stack.back().object() == _scopeStack.back().get());
-                with_stack.pop_back();
+                assert(_withStack.back().object() == _scopeStack.back().get());
+                _withStack.pop_back();
                 
                 // hopefully nothing gets after the 'with' stack.
                 _scopeStack.pop_back();
@@ -663,20 +663,20 @@ bool
 ActionExec::pushWithEntry(const with_stack_entry& entry)
 {
     // See comment in header about _withStackLimit
-    if (with_stack.size() >= _withStackLimit)
+    if (_withStack.size() >= _withStackLimit)
     {
         IF_VERBOSE_ASCODING_ERRORS (
         log_aserror(_("'With' stack depth (%d) "
             "exceeds the allowed limit for current SWF "
             "target version (%d for version %d)."
             " Don't expect this movie to work with all players."),
-            with_stack.size()+1, _withStackLimit,
+            _withStack.size()+1, _withStackLimit,
             env.get_version());
         );
         return false;
     }
     
-    with_stack.push_back(entry);
+    _withStack.push_back(entry);
     _scopeStack.push_back(const_cast<as_object*>(entry.object()));
     return true;
 }
@@ -763,9 +763,9 @@ ActionExec::fixStackUnderrun(size_t required)
 as_object*
 ActionExec::getTarget()
 {
-    if ( ! with_stack.empty() )
+    if ( ! _withStack.empty() )
     {
-        return with_stack.back().object();
+        return _withStack.back().object();
     }
     else
     {

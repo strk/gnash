@@ -1,3 +1,8 @@
+2008-06-18 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/vm/ActionExec.{cpp,h}: drop unused method, rename
+	  with_stack.
+
 2008-06-18 Sandro Santilli <strk@keybit.net>
 
 	* server/character.cpp (getTarget): don't abort when called for 

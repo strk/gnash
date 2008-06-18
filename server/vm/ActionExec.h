@@ -106,17 +106,6 @@ private:
 	///
 	void dumpActions(size_t start, size_t end, std::ostream& os);
 
-	/// Returns 'with' stack associated with this execution thread
-	// 
-	/// If you need to modify it, use the pushWithEntry() function.
-	///
-	/// TODO: deprecate this
-	///
-	const std::vector<with_stack_entry>& getWithStack() const
-	{
-		return with_stack;
-	}
-
     /// Processes the current try - catch - finally block
     //
     /// This function is called after each stage of a
@@ -131,7 +120,6 @@ private:
     /// @return whether to continue executing the buffer
     //
     /// @param t the try block to process.
-    
     bool processExceptions(TryBlock& t);
 
 	/// Run after a complete run, or after an run interrupted by 
@@ -158,7 +146,7 @@ private:
 	void cleanupAfterRun(bool expectInconsistencies=false);
 
 	/// the 'with' stack associated with this execution thread
-	std::vector<with_stack_entry> with_stack;
+	std::vector<with_stack_entry> _withStack;
 
 	typedef as_environment::ScopeStack ScopeStack;
 
