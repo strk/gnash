@@ -392,9 +392,6 @@ bool
 ActionExec::processExceptions(TryBlock& t)
 {
 
-    if (retval) log_debug("Retval exists");
-    if (t._hasName) log_debug("Has name");
-
     switch (t._tryState)
     {
 
