@@ -1,3 +1,9 @@
+2008-06-18 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/Inheritance.as: drop useless duplicated
+	  function call in check_equals argument, as it would be called twice
+	  confusing results.
+
 2008-06-18 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/vm/ClassHierarchy.{h,cpp}: drop no-op dump() because an
