@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Matrix.as,v 1.7 2008/06/10 16:52:00 bwy Exp $";
+rcsid="$Id: Matrix.as,v 1.8 2008/06/18 07:53:47 bwy Exp $";
 
 
 // There are lots of floating point calculations here. Comparing them
@@ -28,6 +28,8 @@ rcsid="$Id: Matrix.as,v 1.7 2008/06/10 16:52:00 bwy Exp $";
 // isn't always unreasonable. I've handled the ones that failed for me with
 // an epsilon; others may fail for other people - so please edit as necessary
 // - but it's good to be as accurate as possible.
+//
+// A ming bug up to version 0.4.5 makes very large numbers fail.
 #include "check.as"
 
 #if OUTPUT_VERSION < 8
@@ -109,9 +111,11 @@ check_equals (m.toString(), "(a=-1406.99906373029, b=-1.23693717839177, c=514.39
 m.scale(4798747e+98, 0.33874983);
 // PP: (a=-6.75183253607854e+107, b=-0.419012258900892, c=2.46844592063091e+107, d=-0.505976396967328, tx=1.597982751e+107, ty=-96119.3225379726)
 // I get one discrepancy in 'a' here.
+#if MING_VERSION_CODE > 00040005
 check(m.a < -6.7518325360784e+107 && m.a > -6.7518325360786e+107)
-check_equals(m.b.toString(), "-0.419012258900892");
 check_equals(m.c.toString(), "2.46844592063091e+107");
+#endif
+check_equals(m.b.toString(), "-0.419012258900892");
 check_equals(m.d.toString(), "-0.505976396967328");
 check_equals(m.tx.toString(), "1.597982751e+107");
 check_equals(m.ty.toString(), "-96119.3225379726");
@@ -119,13 +123,14 @@ check_equals(m.ty.toString(), "-96119.3225379726");
 m.rotate(-1.2873874);
 // PP: (a=-1.888016310255e+107, b=6.48248694618508e+107, c=6.9025203664787e+106, d=-2.36997413255563e+107, tx=4.46844242844096e+106, ty=-1.53423567131344e+107)
 // tx is slightly different for me.
+#if MING_VERSION_CODE > 00040005
 check_equals(m.a.toString(), "-1.888016310255e+107");
 check_equals(m.b.toString(), "6.48248694618508e+107");
 check_equals(m.c.toString(), "6.9025203664787e+106");
 check_equals(m.d.toString(), "-2.36997413255563e+107");
 check(m.tx < 4.46844242844097e+106 && m.tx > 4.46844242844095e+106)
 check_equals(m.ty.toString(), "-1.53423567131344e+107");
-
+#endif
 
 m1 = new Matrix(8);
 check_equals(m1.toString(), "(a=8, b=undefined, c=undefined, d=undefined, tx=undefined, ty=undefined)");
@@ -274,7 +279,10 @@ check_equals(m8.toString(), "(a=-0.0012699793595799, b=0.00332994663144171, c=-0
 //-------------------------------------------------------------
 // END OF TEST
 //-------------------------------------------------------------
-
+#if MING_VERSION_CODE > 00040005
 totals(115);
+#else
+totals(107);
+#endif
 
 #endif // OUTPUT_VERSION >= 8
