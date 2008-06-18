@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Matrix.as,v 1.9 2008/06/18 08:11:36 bwy Exp $";
+rcsid="$Id: Matrix.as,v 1.10 2008/06/18 08:43:12 bwy Exp $";
 
 
 // There are lots of floating point calculations here. Comparing them
@@ -282,7 +282,7 @@ check_equals(m8.toString(), "(a=-0.0012699793595799, b=0.00332994663144171, c=-0
 #if MING_VERSION_CODE > 00040005
 totals(115);
 #else
-totals(107);
+totals(106);
 #endif
 
 #endif // OUTPUT_VERSION >= 8
