@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Inheritance.as,v 1.62 2008/06/18 21:48:17 strk Exp $";
+rcsid="$Id: Inheritance.as,v 1.63 2008/06/18 22:35:04 strk Exp $";
 #include "check.as"
 
 check_equals(typeof(Object.prototype.constructor), 'function');
@@ -530,6 +530,7 @@ check(! t4 instanceOf Test5);
 
 #ifdef MING_SUPPORTS_ASM_IMPLEMENTS
 
+
 A = {};
 A.prototype = {}; // need a prototype to set as interface of B.prototype
 B = {};
@@ -557,11 +558,6 @@ check (! ob instanceof C );
 C.prototype = A.prototype;
 check (  ob instanceof C ); 
 
-a = {}; b = {};
-a.__proto__ = b;
-b.__proto__ = a;
-check(!a instanceof b); // really just tests if we survive :)
-
 #endif // MING_SUPPORTS_ASM_IMPLEMENTS
 
 //------------------------------------------------
@@ -571,7 +567,7 @@ check(!a instanceof b); // really just tests if we survive :)
 #if OUTPUT_VERSION < 6
 
 # ifdef MING_SUPPORTS_ASM_IMPLEMENTS
-    check_totals(107); 
+    check_totals(106); 
 # else
     check_totals(102); 
 # endif
@@ -579,9 +575,23 @@ check(!a instanceof b); // really just tests if we survive :)
 #else // SWF6,7,8
 
 # ifdef MING_SUPPORTS_ASM_IMPLEMENTS
-    check_totals(164);
+    check_totals(163);
 # else
     check_totals(159); 
 # endif
 
 #endif
+
+dangerousStuff = function()
+{
+	a = {}; b = {};
+	a.__proto__ = b;
+	b.__proto__ = a;
+	check(!a instanceof b); // really just tests if we survive :)
+};
+
+note("");
+note("Now you're flash player will try to answer the egg/chicken question. Kill it if it hangs your machine");
+setTimeout(dangerousStuff, 0);
+
+

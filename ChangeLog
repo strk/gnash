@@ -1,3 +1,9 @@
+2008-06-19 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/Inheritance.as: run the egg/chicken
+	  test after totals are printed, so we get some info from the
+	  pp before it hangs.
+
 2008-06-19 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* libnet/rtmp.cpp: Fixed warnings.
