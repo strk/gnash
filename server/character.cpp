@@ -865,12 +865,23 @@ character::getTarget() const
 		// Don't push the _root name on the stack
 		if ( ! parent )
 		{
-			assert(dynamic_cast<const movie_instance*>(ch));
 			std::stringstream ss;
-			ss << "_level" << ch->get_depth()-character::staticDepthOffset;
-			path.push_back(ss.str());
-			// it is completely legal to set root's _name
-			//assert(ch->get_name().empty());
+			if (!dynamic_cast<const movie_instance*>(ch))
+			{
+				// must be an as-referenceable
+				// character created using 'new'
+				// like, new MovieClip, new Video, new TextField...
+				// 
+				log_debug("Character %p (%s) doesn't have a parent and is not a movie_instance",
+					ch, typeName(*ch));
+				ss << "<no parent, depth" << ch->get_depth() << ">";
+				path.push_back(ss.str());
+			}
+			else
+			{
+				ss << "_level" << ch->get_depth()-character::staticDepthOffset;
+				path.push_back(ss.str());
+			}
 			break;
 		}
 
