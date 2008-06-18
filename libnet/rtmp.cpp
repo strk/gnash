@@ -803,15 +803,16 @@ RTMP::sendMsg(amf::Buffer *buf)
     Network::byte_t header = 0xc3;
 
     while (nbytes <= buf->size()) {
-	if ((buf->size() - nbytes) < RTMP_VIDEO_PACKET_SIZE) {
+	if ((buf->size() - nbytes) < static_cast<signed int>(RTMP_VIDEO_PACKET_SIZE)) {
 	    partial = buf->size() - nbytes;
 	}    
 	writeNet(buf->reference() + nbytes, partial);
-	if (partial == RTMP_VIDEO_PACKET_SIZE) {
+	if (partial == static_cast<signed int>(RTMP_VIDEO_PACKET_SIZE)) {
 	    writeNet(&header, 1);
 	}
 	nbytes += RTMP_VIDEO_PACKET_SIZE;	
     };
+    return true;
 }
     
 // Send a Msg, and expect a response back of some kind.
