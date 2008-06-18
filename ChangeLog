@@ -1,5 +1,16 @@
 2008-06-18 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* server/vm/ClassHierarchy.{h,cpp}: drop no-op dump() because an
+	  ostream operator<< is defined. Make knownClasses table const; pass
+	  nativeClasses by const ref. Add comments.
+	* libamf/element.{h,cpp}: delete(NULL) is a no-op, so there's no need
+	  to check first. Add GNASH to header guard.
+	* server/parser/abc_block.cpp: don't use ClassHierarchy::dump().
+	* libbase/string_table.{h,cpp}: make mEmpty, the universal empty string
+	  const, as it's not likely to change.
+
+2008-06-18 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* server/vm/ActionExec.{cpp,h}: drop unused method, rename
 	  with_stack.
 

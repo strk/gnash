@@ -1136,7 +1136,7 @@ abc_block::read(SWFStream* in)
 			return false;
 	}
 	mTraits.clear();
-	mCH->dump();
+	//mCH->dump();
 	return true;
 }
 

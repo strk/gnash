@@ -121,7 +121,7 @@ public:
 	/// The nativeClass structure which defines the class.
 	///
 	/// @return true, unless the class with c.name already existed.
-	bool declareClass(nativeClass& c);
+	bool declareClass(const nativeClass& c);
 
 	/// \brief
 	/// Declare all of the native and extension classes from the
@@ -222,8 +222,6 @@ public:
 	/// \brief
 	/// Delete our private namespaces.
 	~ClassHierarchy();
-
-	void dump();
 
 private:
 	as_object *mGlobal;

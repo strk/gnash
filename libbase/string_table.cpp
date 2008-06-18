@@ -25,7 +25,7 @@
 
 using namespace gnash;
 
-std::string string_table::mEmpty = "";
+const std::string string_table::mEmpty;
 
 string_table::key
 string_table::find(const std::string& t_f, bool insert_unfound)

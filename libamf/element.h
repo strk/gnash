@@ -15,8 +15,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef _ELEMENT_H_
-#define _ELEMENT_H_
+#ifndef GNASH_ELEMENT_H
+#define GNASH_ELEMENT_H
 
 #include <vector>
 #include <string>

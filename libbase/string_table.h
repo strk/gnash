@@ -151,7 +151,7 @@ public:
 
 private:
 	table mTable;
-	static std::string mEmpty; // The empty string, universally.
+	static const std::string mEmpty; // The empty string, universally.
 	boost::mutex mLock;
 	std::size_t mHighestKey;
 	bool mSetToLower; // If true, affects the next group addition.

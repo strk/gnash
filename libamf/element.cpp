@@ -74,16 +74,14 @@ Element::Element()
 Element::~Element()
 {
 //    GNASH_REPORT_FUNCTION;
-    if (_buffer) {
 	delete _buffer;
-    }
+
     for (size_t i=0; i< _properties.size(); i++) {
 	delete _properties[i];
     }
-    if (_name) {
 	delete[] _name;
-    }
 }
+
 
 Element::Element(Network::byte_t *indata) 
     : _name(),
@@ -265,12 +263,8 @@ void
 Element::clear()
 {
 //    GNASH_REPORT_FUNCTION;
-    if (_name) {
 	delete [] _name;
-    }
-    if (_buffer) {
 	delete _buffer;
-    }
 }
 
 Network::byte_t *

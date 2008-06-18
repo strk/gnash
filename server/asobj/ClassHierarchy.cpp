@@ -146,7 +146,7 @@ private:
 public:
 	bool isBuiltin() { return true; }
 
-	declare_native_function(ClassHierarchy::nativeClass &c,
+	declare_native_function(const ClassHierarchy::nativeClass &c,
 		as_object *g, Extension *e) :
 		as_function(getObjectInterface()),
 		mDeclaration(c), mTarget(g), mExtension(e)
@@ -229,7 +229,7 @@ ClassHierarchy::declareClass(extensionClass& c)
 }
 
 bool
-ClassHierarchy::declareClass(nativeClass& c)
+ClassHierarchy::declareClass(const nativeClass& c)
 {
 	// For AS2 and below, registering with mGlobal _should_ make it equivalent
 	// to being in the global namespace, since everything is global there.
@@ -247,17 +247,15 @@ ClassHierarchy::declareClass(nativeClass& c)
 		*getter);
 }
 
-static ClassHierarchy::nativeClass knownClasses[] =
+static const ClassHierarchy::nativeClass knownClasses[] =
 {
-// This makes it clear the difference between "We don't know where the
+// This makes clear the difference between "We don't know where the
 // class belongs" and "it belongs in the global namespace", even though
 // the result is the same.
-#define NS_GLOBAL 0
-#define NS_UNKNOWN 0
-	/* { function_name, name key, super name key, lowest version }, */
-//	{ object_class_init, NSV::CLASS_OBJECT, 0, NS_GLOBAL, 5 }, // Object is special
-//	{ function_class_init, NSV::CLASS_FUNCTION, NSV::CLASS_OBJECT, NS_GLOBAL, 6 }, // Function is special
-//	{ array_class_init, NSV::CLASS_ARRAY, NSV::CLASS_OBJECT, NS_GLOBAL, 5 }, // Array is special
+    #define NS_GLOBAL 0
+    #define NS_UNKNOWN 0
+
+//  { function_name, name key, super name key, lowest version },
 	{ system_class_init, NSV::CLASS_SYSTEM, 0, NSV::NS_FLASH_SYSTEM, 1 },
 	{ stage_class_init, NSV::CLASS_STAGE, 0, NSV::NS_FLASH_DISPLAY, 1 },
 	{ movieclip_class_init, NSV::CLASS_MOVIE_CLIP, 0, NSV::NS_FLASH_DISPLAY, 3 },
@@ -275,7 +273,6 @@ static ClassHierarchy::nativeClass knownClasses[] =
 	{ mouse_class_init, NSV::CLASS_MOUSE, NSV::CLASS_OBJECT, NSV::NS_FLASH_UI, 5 },
 	{ number_class_init, NSV::CLASS_NUMBER, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
 	{ textformat_class_init, NSV::CLASS_TEXT_FORMAT, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
-//	{ string_class_init, NSV::CLASS_STRING, NSV::CLASS_OBJECT, NS_GLOBAL, 5 }, // string is special
 	{ key_class_init, NSV::CLASS_KEY, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
 	{ AsBroadcaster_init, NSV::CLASS_AS_BROADCASTER, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
 	{ textsnapshot_class_init, NSV::CLASS_TEXT_SNAPSHOT, NSV::CLASS_OBJECT, NSV::NS_FLASH_TEXT, 6 },
@@ -289,7 +286,15 @@ static ClassHierarchy::nativeClass knownClasses[] =
 	{ netstream_class_init, NSV::CLASS_NET_STREAM, NSV::CLASS_OBJECT, NSV::NS_FLASH_NET, 6 },
 	{ contextmenu_class_init, NSV::CLASS_CONTEXT_MENU, NSV::CLASS_OBJECT, NSV::NS_FLASH_UI, 7 },
 	{ moviecliploader_class_init, NSV::CLASS_MOVIE_CLIP_LOADER, NSV::CLASS_OBJECT, NS_GLOBAL, 7 },
-	{ Error_class_init, NSV::CLASS_ERROR, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
+	{ Error_class_init, NSV::CLASS_ERROR, NSV::CLASS_OBJECT, NS_GLOBAL, 5 }
+
+// These classes are all implicitly constructed; that is, it is not necessary for
+// the class name to be used to construct the class, so they must always be available.
+//	{ object_class_init, NSV::CLASS_OBJECT, 0, NS_GLOBAL, 5 }
+//	{ function_class_init, NSV::CLASS_FUNCTION, NSV::CLASS_OBJECT, NS_GLOBAL, 6 }
+//	{ array_class_init, NSV::CLASS_ARRAY, NSV::CLASS_OBJECT, NS_GLOBAL, 5 }
+//	{ string_class_init, NSV::CLASS_STRING, NSV::CLASS_OBJECT, NS_GLOBAL, 5 }
+
 };
 
 void
@@ -301,9 +306,9 @@ ClassHierarchy::massDeclare(int version)
 	const size_t size = sizeof (knownClasses) / sizeof (nativeClass);
 	for (size_t i = 0; i < size; ++i)
 	{
-		nativeClass& c = knownClasses[i];
-		if (c.version > version)
-			continue;
+		const nativeClass& c = knownClasses[i];
+		if (c.version > version) continue;
+
 		if ( ! declareClass(c) )
 		{
 			log_error("Could not declare class %s", c);
@@ -322,10 +327,6 @@ ClassHierarchy::markReachableResources() const
 	// TODO
 }
 
-void
-ClassHierarchy::dump()
-{
-}
 std::ostream& operator << (std::ostream& os, const ClassHierarchy::nativeClass& c)
 {
 	string_table& st = VM::get().getStringTable();
