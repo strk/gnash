@@ -401,9 +401,9 @@ MediaParserFfmpeg::initializeParser()
 		boost::uint16_t sampleSize = SampleFormatToSampleSize(_audioStream->codec->sample_fmt);
 		bool stereo = (_audioStream->codec->channels == 2);
 #if !defined(HAVE_LIBAVFORMAT_AVFORMAT_H) && !defined(HAVE_FFMPEG_AVCODEC_H)
-		boost::uint64_t duration = _videoStream->codec_info_duration;
+		boost::uint64_t duration = _audioStream->codec_info_duration;
 #else
-		boost::uint64_t duration = _videoStream->duration;
+		boost::uint64_t duration = _audioStream->duration;
 #endif
 		_audioInfo.reset( new AudioInfo(codec, sampleRate, sampleSize, stereo, duration, FFMPEG /*codec type*/) );
 		//log_debug("EXTRA: %d bytes of audio extra data", _videoStream->codec->extradata_size);

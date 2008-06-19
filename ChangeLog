@@ -1,5 +1,10 @@
 2008-06-19 Sandro Santilli <strk@keybit.net>
 
+	* libmedia/ffmpeg/MediaParserFfmpeg.cpp (initializeParser): don't
+	  try to fetch audio info from video stream (eh..).
+
+2008-06-19 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/Sound.{cpp,h}: any virtual class needs a virtual
 	  destructor !
 
