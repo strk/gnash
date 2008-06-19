@@ -436,7 +436,7 @@ int
 MediaParserFfmpeg::readPacket(boost::uint8_t* buf, int buf_size)
 {
 	//GNASH_REPORT_FUNCTION;
-	log_debug("readPacket(%d)", buf_size);
+	//log_debug("readPacket(%d)", buf_size);
 
 	size_t ret = _stream->read(static_cast<void*>(buf), buf_size);
 
