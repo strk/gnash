@@ -47,7 +47,19 @@
 /// where boost::ublas is overcomplicated and can easily fail its own
 /// consistency checks. For simpler multiplication, boost::ublas is very
 /// helpful for keep the code clear and tidy.
-
+//
+/// Most of the methods can be faked: that is, applied to non-Matrices by
+/// setting an object's method to the corresponding Matrix prototype method.
+/// The following code successfully inverts o as if it were a Matrix:
+//
+/// o = { a:3, b: 0, c: 1, d: 4, tx: 4, ty: 6};
+/// o.invert = flash.geom.Matrix.prototype.invert;
+/// o.invert();
+//
+/// Methods that apparently only work on Matrices are rotate, scale and
+/// createGradientBox. The method createBox fills in two values, which
+/// suggests how the PP implements it.
+///
 // Define this to get verbose debugging messages for matrix calculations
 //#define GNASH_DEBUG_GEOM_MATRIX 1
 
@@ -69,7 +81,7 @@ static as_value Matrix_scale(const fn_call& fn);
 static as_value Matrix_toString(const fn_call& fn);
 static as_value Matrix_transformPoint(const fn_call& fn);
 static as_value Matrix_translate(const fn_call& fn);
-static void fillMatrix(MatrixType& matrix, as_object* const matrixObject);
+static void fillMatrix(MatrixType& matrix, as_object& matrixObject);
 static PointType transformPoint(as_object* const pointObject, as_object* const matrixObject);
 
 as_value Matrix_ctor(const fn_call& fn);
@@ -128,12 +140,6 @@ public:
     {
     }
 
-    // override from as_object ?
-    //std::string get_text_value() const { return "Matrix"; }
-
-    // override from as_object ?
-    //double get_numeric_value() const { return 0; }
-
 };
 
 as_function* getFlashGeomMatrixConstructor()
@@ -152,7 +158,9 @@ as_function* getFlashGeomMatrixConstructor()
 static as_value
 Matrix_clone(const fn_call& fn)
 {
-    boost::intrusive_ptr<Matrix_as> ptr = ensureType<Matrix_as>(fn.this_ptr);
+    // It doesn't matter whether it is a matrix or not; a new Matrix
+    // is created using any Matrix properties the object may have.
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
     as_value a, b, c, d, tx, ty;
     ptr->get_member(NSV::PROP_A, &a);
@@ -177,7 +185,8 @@ Matrix_clone(const fn_call& fn)
 static as_value
 Matrix_concat(const fn_call& fn)
 {
-    boost::intrusive_ptr<Matrix_as> ptr = ensureType<Matrix_as>(fn.this_ptr);
+    // Doesn't have to be a Matrix.
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
     if (fn.nargs < 1)
     {
@@ -202,26 +211,17 @@ Matrix_concat(const fn_call& fn)
         );
         return as_value();
     }
-    
+
+    // The object to concatenate doesn't have to be a matrix.    
     as_object* obj = arg.to_object().get();
     assert(obj);
-    if ( ! obj->instanceOf(getFlashGeomMatrixConstructor()) )
-    {
-        /// Isn't a point.
-        IF_VERBOSE_ASCODING_ERRORS(
-            std::ostringstream ss;
-            fn.dump_args(ss);
-            log_aserror("Matrix.concat(%s): object must be a Matrix", ss.str());
-        );
-        return as_value();
-    }
 
     MatrixType concatMatrix;
-    fillMatrix(concatMatrix, obj);
+    fillMatrix(concatMatrix, *obj);
 
     // Current ('this') Matrix
     MatrixType currentMatrix;
-    fillMatrix(currentMatrix, ptr.get());
+    fillMatrix(currentMatrix, *ptr);
 
 #ifdef GNASH_DEBUG_GEOM_MATRIX
     log_debug("(Matrix.concat) This matrix (pre-transform): %s", currentMatrix);
@@ -253,7 +253,8 @@ Matrix_concat(const fn_call& fn)
 static as_value
 Matrix_createBox(const fn_call& fn)
 {
-    boost::intrusive_ptr<Matrix_as> ptr = ensureType<Matrix_as>(fn.this_ptr);
+    // Doesn't have to be a Matrix
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
     if (fn.nargs < 2)
     {
@@ -384,7 +385,8 @@ Matrix_createGradientBox(const fn_call& fn)
 static as_value
 Matrix_deltaTransformPoint(const fn_call& fn)
 {
-    boost::intrusive_ptr<Matrix_as> ptr = ensureType<Matrix_as>(fn.this_ptr);
+    // Doesn't have to be a Matrix
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
     if (fn.nargs < 1)
     {
@@ -408,19 +410,11 @@ Matrix_deltaTransformPoint(const fn_call& fn)
         );
         return as_value();
     }
-    
+
+    // It doesn't have to be a point. If it has x and y
+    // properties, they will be used.    
     as_object* obj = arg.to_object().get();
     assert(obj);
-    if ( ! obj->instanceOf(getFlashGeomPointConstructor()) )
-    {
-        /// Isn't a point.
-        IF_VERBOSE_ASCODING_ERRORS(
-            std::ostringstream ss;
-            fn.dump_args(ss);
-            log_aserror("Matrix.deltaTransformPoint(%s): object must be a Point", ss.str());
-        );
-        return as_value();
-    }
 
     const PointType& point = transformPoint(obj, ptr.get());
 
@@ -442,7 +436,8 @@ Matrix_deltaTransformPoint(const fn_call& fn)
 static as_value
 Matrix_identity(const fn_call& fn)
 {
-    boost::intrusive_ptr<Matrix_as> ptr = ensureType<Matrix_as>(fn.this_ptr);
+    // Doesn't have to be a Matrix
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
     ptr->set_member(NSV::PROP_A, 1.0);
     ptr->set_member(NSV::PROP_B, 0.0);
@@ -465,13 +460,14 @@ static as_value
 Matrix_invert(const fn_call& fn)
 {
 
-    boost::intrusive_ptr<Matrix_as> ptr = ensureType<Matrix_as>(fn.this_ptr);
+    // Doesn't have to be a Matrix
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
     MatrixType currentMatrix;
     
     // This just saves repeating code to get doubles for each
     // value.
-    fillMatrix(currentMatrix, ptr.get());
+    fillMatrix(currentMatrix, *ptr);
 
     const double determinant = getMinorDeterminant(currentMatrix);
     
@@ -511,6 +507,7 @@ Matrix_invert(const fn_call& fn)
 static as_value
 Matrix_rotate(const fn_call& fn)
 {
+    // Apparently has to be a Matrix.
     boost::intrusive_ptr<Matrix_as> ptr = ensureType<Matrix_as>(fn.this_ptr);
 
     if (fn.nargs < 1)
@@ -583,6 +580,7 @@ Matrix_rotate(const fn_call& fn)
 static as_value
 Matrix_scale(const fn_call& fn)
 {
+    // Apparently does have to be a Matrix.
     boost::intrusive_ptr<Matrix_as> ptr = ensureType<Matrix_as>(fn.this_ptr);
 
     if (fn.nargs < 2)
@@ -650,7 +648,8 @@ Matrix_scale(const fn_call& fn)
 static as_value
 Matrix_toString(const fn_call& fn)
 {
-    boost::intrusive_ptr<Matrix_as> ptr = ensureType<Matrix_as>(fn.this_ptr);
+    // Doesn't have to be a Matrix
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
     as_value a, b, c, d, tx, ty;
 
@@ -676,7 +675,8 @@ Matrix_toString(const fn_call& fn)
 static as_value
 Matrix_transformPoint(const fn_call& fn)
 {
-    boost::intrusive_ptr<Matrix_as> ptr = ensureType<Matrix_as>(fn.this_ptr);
+    // Doesn't have to be a Matrix
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
     if (fn.nargs < 1)
     {
@@ -730,7 +730,8 @@ Matrix_transformPoint(const fn_call& fn)
 static as_value
 Matrix_translate(const fn_call& fn)
 {
-    boost::intrusive_ptr<Matrix_as> ptr = ensureType<Matrix_as>(fn.this_ptr);
+    // Doesn't have to be a Matrix
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
     
     if (fn.nargs < 2)
     {
@@ -810,7 +811,7 @@ transformPoint(as_object* const pointObject, as_object* const matrixObject)
 
 // A helper function to create a boost matrix from a Matrix object
 static void fillMatrix(MatrixType& matrix,
-                         as_object* const matrixObject)
+                         as_object& matrixObject)
 {
 
     const double u = 0.0;
@@ -819,12 +820,12 @@ static void fillMatrix(MatrixType& matrix,
 
     as_value a, b, c, d, tx, ty;
 
-    matrixObject->get_member(NSV::PROP_A, &a);
-    matrixObject->get_member(NSV::PROP_B, &b);
-    matrixObject->get_member(NSV::PROP_C, &c);
-    matrixObject->get_member(NSV::PROP_D, &d);
-    matrixObject->get_member(NSV::PROP_TX, &tx);
-    matrixObject->get_member(NSV::PROP_TY, &ty);
+    matrixObject.get_member(NSV::PROP_A, &a);
+    matrixObject.get_member(NSV::PROP_B, &b);
+    matrixObject.get_member(NSV::PROP_C, &c);
+    matrixObject.get_member(NSV::PROP_D, &d);
+    matrixObject.get_member(NSV::PROP_TX, &tx);
+    matrixObject.get_member(NSV::PROP_TY, &ty);
 
     matrix(0, 0) = a.to_number();
     matrix(0, 1) = c.to_number();
@@ -845,7 +846,7 @@ Matrix_ctor(const fn_call& fn)
     
     as_value a, b, c, d, tx, ty;
 
-    if (fn.nargs  == 0)
+    if (fn.nargs == 0)
     {
         a.set_double(1);
         b.set_double(0);

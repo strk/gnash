@@ -1,3 +1,17 @@
+2008-06-19 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/as_object.h: typeid can cope with null pointers, but
+	  deferencing them beforehand is UB. Pass the pointer to typeName
+	  without deferencing. Fixes a crash in the swfdec testsuite.
+	* server/asobj/flash/geom/Rectangle_as, Point_as, Matrix_as: don't
+	  be so fussy about what sort of object methods are applied to. Most
+	  of them work anyway.
+	* testsuite/actionscript.all/{Point,Matrix}.as: add tests with
+	  faked Matrix and Point objects.
+	* libbase/utility.h: add a much faster version of non-UB
+	  PIXELS_TO_TWIPS that only uses fmod when it would otherwise
+	  overflow.
+
 2008-06-19 Sandro Santilli <strk@keybit.net>
 
 	* server/as_object.{cpp,h}: change get_super semantic again,

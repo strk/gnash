@@ -104,7 +104,7 @@ public:
 static as_value
 Point_add(const fn_call& fn)
 {
-	boost::intrusive_ptr<Point_as> ptr = ensureType<Point_as>(fn.this_ptr);
+	boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
 	as_value x, y;
 	ptr->get_member(NSV::PROP_X, &x);
@@ -143,7 +143,7 @@ Point_add(const fn_call& fn)
 				IF_VERBOSE_ASCODING_ERRORS(
 				std::stringstream ss; fn.dump_args(ss);
 				log_aserror("Point.add(%s): %s", ss.str(),
-					_("first argument casted to object doesn't contain an 'x' member"));
+					_("first argument cast to object doesn't contain an 'x' member"));
 				);
 			}
 			if ( ! o->get_member(NSV::PROP_Y, &y1) )
@@ -151,7 +151,7 @@ Point_add(const fn_call& fn)
 				IF_VERBOSE_ASCODING_ERRORS(
 				std::stringstream ss; fn.dump_args(ss);
 				log_aserror("Point.add(%s): %s", ss.str(),
-					_("first argument casted to object doesn't contain an 'y' member"));
+					_("first argument cast to object doesn't contain an 'y' member"));
 				);
 			}
 		}
@@ -170,7 +170,7 @@ Point_add(const fn_call& fn)
 static as_value
 Point_clone(const fn_call& fn)
 {
-	boost::intrusive_ptr<Point_as> ptr = ensureType<Point_as>(fn.this_ptr);
+	boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
 	as_value x, y;
 	ptr->get_member(NSV::PROP_X, &x);
@@ -186,7 +186,7 @@ Point_clone(const fn_call& fn)
 static as_value
 Point_equals(const fn_call& fn)
 {
-	boost::intrusive_ptr<Point_as> ptr = ensureType<Point_as>(fn.this_ptr);
+	boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
 	if ( ! fn.nargs )
 	{

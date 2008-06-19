@@ -31,6 +31,7 @@
 #include <cmath>
 #include <boost/cstdint.hpp>
 #include <algorithm> // std::min, std::max
+#include <limits>
 
 #if defined(__GNUC__) && __GNUC__ > 2
 #  include <cxxabi.h>
@@ -91,7 +92,7 @@ void	operator delete[](void* ptr);
 // Define this to enable fast float&double to uint32 conversion.
 // If the behaviour is undefined when overflow occurs with your 
 // compiler, disable this macro.
-#define TRUST_FLOAT_TO_UINT32_CONVERSION  1 
+//#define TRUST_FLOAT_TO_UINT32_CONVERSION  1 
 
 // Commonly-used inlined mathematical functions are defined in
 // namespace gnash::utility so that it's clear where they
@@ -158,16 +159,29 @@ inline int PIXELS_TO_TWIPS(double a)
     // truncate when overflow occurs.
     return (boost::int32_t)(boost::uint32_t)(a * 20); 
 #else
-    boost::int32_t  b;
-    if(a >= 0)
+
+    // This truncates large values without relying on undefined behaviour.
+    // For very large values of 'a' it is noticeably slower than the UB
+    // version (due to fmod), but should always be legal behaviour. For
+    // ordinary values (within ±1.07374e+08 pixels) it is comparable to
+    // the UB version for speed. Because values outside the limit are
+    // extremely rare, using this safe version has no implications for
+    // performance under normal circumstances.
+    static const double upperUnsignedLimit =
+                std::numeric_limits<boost::uint32_t>::max() + 1.0;
+    static const double upperSignedLimit =
+                std::numeric_limits<boost::int32_t>::max() / 20.0;
+    static const double lowerSignedLimit =
+                std::numeric_limits<boost::int32_t>::min() / 20.0;
+
+    if (a >= lowerSignedLimit && a <= upperSignedLimit)
     {
-       b = (boost::uint32_t)(std::fmod(a * 20.0, 4294967296.0));
+        return static_cast<boost::int32_t>(a * 20.0);
     }
-    else
-    {
-       b = -(boost::uint32_t)(std::fmod(-a * 20, 4294967296.0));
-    }
-    return b;
+
+    // This slow truncation happens only in very unlikely cases.
+    return a >= 0 ? static_cast<boost::uint32_t>(std::fmod(a * 20.0, upperUnsignedLimit))
+                : - static_cast<boost::uint32_t>(std::fmod( - a * 20.0, upperUnsignedLimit));
 #endif
 }
 

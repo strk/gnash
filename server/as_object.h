@@ -1149,8 +1149,8 @@ ensureType (boost::intrusive_ptr<as_object> obj)
 	boost::intrusive_ptr<T> ret = boost::dynamic_pointer_cast<T>(obj);
 
 	if (!ret) {
-		std::string     target = typeName(ret.get()),
-				source = typeName(*obj.get());
+		std::string target = typeName(ret.get());
+		std::string source = typeName(obj.get());
 
 		std::string msg = "builtin method or gettersetter for " +
 			target + " called from " + source + " instance.";

@@ -137,7 +137,9 @@ public:
 static as_value
 Rectangle_clone(const fn_call& fn)
 {
-	boost::intrusive_ptr<Rectangle_as> ptr = ensureType<Rectangle_as>(fn.this_ptr);
+    // The object will be interpreted as a rectangle. Any Rectangle
+    // properties that the object has (width, height, x, y) are used.
+	boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
 	as_value x, y, w, h;
 

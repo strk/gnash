@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Matrix.as,v 1.10 2008/06/18 08:43:12 bwy Exp $";
+rcsid="$Id: Matrix.as,v 1.11 2008/06/19 11:49:17 bwy Exp $";
 
 
 // There are lots of floating point calculations here. Comparing them
@@ -102,11 +102,29 @@ check (m.d < -4.40932475 && m.d > -4.40932476);
 check (m.tx == 0);
 check (m.ty == 0);
 
+// A non-matrix with a matrix's rotate method (fails?).
+fakematrix = {a:1, b:1, c: 1, d: 1, tx:5, ty: 5};
+fakematrix.rotate = Matrix.prototype.rotate;
+fakematrix.rotate(2);
+check_equals(fakematrix.a.toString(), 1);
+check_equals(fakematrix.b.toString(), 1);
+check_equals(fakematrix.c.toString(), 1);
+check_equals(fakematrix.d.toString(), 1);
+check_equals(fakematrix.tx.toString(), 5);
+check_equals(fakematrix.ty.toString(), 5);
+
 m.scale(-343, 0.33874983);
 check_equals (m.toString(), "(a=-1406.99906373029, b=-1.23693717839177, c=514.393845024734, d=-1.49365801000499, tx=0, ty=0)");
 
 m.translate(333,-283747.22);
 check_equals (m.toString(), "(a=-1406.99906373029, b=-1.23693717839177, c=514.393845024734, d=-1.49365801000499, tx=333, ty=-283747.22)");
+
+// A non-matrix with a matrix's translate method (works).
+fakematrix = {a:1, b:1, c: 1, d: 1, tx:5, ty: 5};
+fakematrix.translate = Matrix.prototype.translate;
+fakematrix.translate(200,400);
+check_equals(fakematrix.tx.toString(), 205);
+check_equals(fakematrix.ty.toString(), 405);
 
 m.scale(4798747e+98, 0.33874983);
 // PP: (a=-6.75183253607854e+107, b=-0.419012258900892, c=2.46844592063091e+107, d=-0.505976396967328, tx=1.597982751e+107, ty=-96119.3225379726)
@@ -173,16 +191,45 @@ newP = m2.deltaTransformPoint(p);
 check_equals(typeof(newP), "object");
 check_equals(newP.toString(), "(x=31.2567984378314, y=26.6085052458191)");
 
+fakepoint = {x: 34, y: -23};
+newP2 = m2.deltaTransformPoint(fakepoint);
+check_equals(typeof(newP2), "object");
+check(newP2 instanceof Point);
+check_equals(newP.toString(), newP2.toString());
+
+
+
+
 // Scale
 m3 = new Matrix(2, 0, 0, 2, 100, 100);
 m3.scale(3, 4);
 check_equals(m3.toString(), "(a=6, b=0, c=0, d=8, tx=300, ty=400)");
 // Do not change m3; it is used to test invert!
 
+// A non-matrix with a matrix's invert method (fails?).
+fakematrix = {a:3, b:2, c: 5, d: 3, tx:5, ty: 5};
+fakematrix.scale = Matrix.prototype.scale;
+fakematrix.scale(4, 5);
+check_equals(fakematrix.a.toString(), "3");
+check_equals(fakematrix.b.toString(), "2");
+check_equals(fakematrix.c.toString(), "5");
+check_equals(fakematrix.d.toString(), "3");
+check_equals(fakematrix.tx.toString(), "5");
+check_equals(fakematrix.ty.toString(), "5");
+fakematrix.toString = Matrix.prototype.toString;
+check_equals(fakematrix.toString(), "(a=3, b=2, c=5, d=3, tx=5, ty=5)");
+
 // Test clone
 m4 = m3.clone();
 check_equals(m4.toString(), "(a=6, b=0, c=0, d=8, tx=300, ty=400)");
 // Do not change m4; it's used later to test concat!
+
+// A non-matrix with a matrix's invert method (works).
+fakematrix = {a:3, b:2, c: 5, d: 3, tx:5, ty: 5};
+fakematrix.clone = Matrix.prototype.clone;
+r = fakematrix.clone();
+check_equals(r.toString(), "(a=3, b=2, c=5, d=3, tx=5, ty=5)");
+check(r instanceof Matrix);
 
 
 // Test invert
@@ -194,6 +241,13 @@ m6 = new Matrix(4, 5, 44, 55, 2, 4);
 check_equals(m6.toString(), "(a=4, b=5, c=44, d=55, tx=2, ty=4)");
 m6.invert();
 check_equals(m6.toString(), "(a=1, b=0, c=0, d=1, tx=0, ty=0)");
+
+// A non-matrix with a matrix's invert method (half works).
+fakematrix = {a:3, b:2, c: 5, d: 3, tx:5, ty: 5};
+fakematrix.invert = Matrix.prototype.invert;
+fakematrix.invert();
+xcheck_equals(fakematrix.tx.toString(), "NaN");
+check_equals(fakematrix.a.toString(), -3);
 
 // Valid inverse2.
 m6 = new Matrix(4, 5, 0, 5, 2, 3);
@@ -215,6 +269,19 @@ check_equals(p3.toString(), "(x=-101.444108975683, y=345.180517617807)");
 p2 = m6.transformPoint(p2);
 check_equals(p2.toString(), "(x=-1014.78819244077, y=21.420285172384)");
 
+// Transforming points with a fake matrix.
+fakematrix = {a:3, b:2, c: 5, d: 3, tx:5, ty: 5};
+fakematrix.deltaTransformPoint = Matrix.prototype.deltaTransformPoint;
+f = fakematrix.deltaTransformPoint(p2);
+check (f instanceof Point);
+check_equals (f.toString(), "(x=-2937.26315146039, y=-1965.31552936439)");
+
+fakematrix.transformPoint = Matrix.prototype.transformPoint;
+f = fakematrix.transformPoint(p2);
+check (f instanceof Point);
+check_equals (f.toString(), "(x=-2932.26315146039, y=-1960.31552936439)");
+
+
 // Rotation applies to translation
 m3 = new Matrix(1, 0, 0, 1, 2, 2);
 m3.rotate (Math.PI / 2);
@@ -234,12 +301,30 @@ check_equals(m3.d.toString(), "1");
 check_equals(m3.tx.toString(), "0");
 check_equals(m3.ty.toString(), "0");
 
+t = new Object();
+check_equals(t.a, undefined)
+t.identity = Matrix.prototype.identity;
+t.identity();
+check_equals(t.a.toString(), "1");
+check_equals(t.b.toString(), "0");
+check_equals(t.c.toString(), "0");
+check_equals(t.d.toString(), "1");
+check_equals(t.tx.toString(), "0");
+check_equals(t.ty.toString(), "0");
+
 // m4 is still interesting
 m4.concat(m1);
 check_equals(m4.toString(), "(a=192, b=-40.8, c=768, d=-108.8, tx=48160, ty=-7500.4)");
 m4.concat(m2);
 // Works for me.
 check_equals(m4.toString(), "(a=90.6729490609422, b=174.089219392218, c=310.274230957074, d=710.908813846049, tx=20109.8154004632, ty=44398.6139954762)");
+
+// A non-matrix with a matrix's concat method (works).
+fakematrix = {a:1, b:1, c: 1, d: 1, tx:5, ty: 5};
+fakematrix.concat = Matrix.prototype.concat;
+fakematrix.concat(new Matrix(4, 4, 4, 4, 4, 4));
+check_equals(fakematrix.tx.toString(), 44);
+check_equals(fakematrix.a.toString(), 8);
 
 m7 = new Matrix ("A string", undefined, new Object, true, NaN, new Point);
 check_equals("" + m7, "(a=A string, b=undefined, c=[object Object], d=true, tx=NaN, ty=(x=0, y=0))");
@@ -257,6 +342,19 @@ m8.createBox(4, 3, new Object(), "a string");
 check_equals(m8.toString(), "(a=NaN, b=NaN, c=NaN, d=NaN, tx=a string, ty=0)");
 m8.createBox("a", "b");
 check_equals(m8.toString(), "(a=NaN, b=NaN, c=NaN, d=NaN, tx=0, ty=0)");
+
+// A non-matrix with a matrix's createBox method (half works).
+delete fakematrix;
+fakematrix = new Object();
+fakematrix.createBox = Matrix.prototype.createBox;
+fakematrix.createBox(4, 3, 4, 2, 3);
+xcheck_equals(fakematrix.a.toString(), undefined);
+xcheck_equals(fakematrix.b.toString(), undefined);
+xcheck_equals(fakematrix.c.toString(), undefined);
+xcheck_equals(fakematrix.d.toString(), undefined);
+check_equals(fakematrix.tx.toString(), "2");
+check_equals(fakematrix.ty.toString(), "3");
+
 
 m8.createGradientBox(20, 30, 2 * Math.PI, 10, 25);
 
@@ -276,13 +374,26 @@ check_equals(m8.toString(), "(a=0.0030517578125, b=0, c=0, d=0.003662109375, tx=
 m8.createGradientBox(5, 6, 2, 1, 1);
 check_equals(m8.toString(), "(a=-0.0012699793595799, b=0.00332994663144171, c=-0.00277495552620142, d=-0.00152397523149588, tx=3.5, ty=4)");
 
+// A non-matrix with a matrix's createGradientBox method (fails).
+delete fakematrix;
+fakematrix = new Object();
+fakematrix.createGradientBox = Matrix.prototype.createGradientBox;
+fakematrix.createGradientBox(20, 30, 2 * Math.PI, 10, 25);
+check_equals(fakematrix.a.toString(), undefined);
+check_equals(fakematrix.b.toString(), undefined);
+check_equals(fakematrix.c.toString(), undefined);
+check_equals(fakematrix.d.toString(), undefined);
+check_equals(fakematrix.tx.toString(), undefined);
+check_equals(fakematrix.ty.toString(), undefined);
+
+
 //-------------------------------------------------------------
 // END OF TEST
 //-------------------------------------------------------------
 #if MING_VERSION_CODE > 00040005
-totals(115);
+totals(162);
 #else
-totals(106);
+totals(153);
 #endif
 
 #endif // OUTPUT_VERSION >= 8

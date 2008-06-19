@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Point.as,v 1.6 2008/05/19 16:32:24 strk Exp $";
+rcsid="$Id: Point.as,v 1.7 2008/06/19 11:49:17 bwy Exp $";
 
 #include "check.as"
 
@@ -130,6 +130,13 @@ check_equals(ret.toString(), '(x=3, y=4)');
 ret = p0.add(p1, 4, 5, 6);
 check_equals(ret.toString(), '(x=3, y=4)');
 
+// A non-point with a point's add method.
+fakepoint = {x:20, y:30};
+fakepoint.add = Point.prototype.add;
+ret = fakepoint.add(p0);
+check_equals(ret.toString(), "(x=22, y=33)");
+check(ret instanceof Point);
+
 //-------------------------------------------------------------
 // Test Point.clone
 //-------------------------------------------------------------
@@ -143,6 +150,13 @@ check_equals(typeof(p2.z), 'undefined');
 p2 = p0.clone(1, 2, 3);
 check(p2 instanceof Point);
 check_equals(p2.toString(), "(x=3, y=4)");
+
+// A non-point with a point's clone method.
+fakepoint = {x:20, y:30};
+fakepoint.clone = Point.prototype.clone;
+ret = fakepoint.clone(p0);
+check_equals(ret.toString(), "(x=20, y=30)");
+check(ret instanceof Point);
 
 //-------------------------------------------------------------
 // Test Point.distance (static)
@@ -254,6 +268,12 @@ String.prototype.y = o1;
 String.prototype.__proto__ = Point.prototype;
 check(!p1.equals('string'));
 
+// A non-point with a point's equals method.
+fakepoint = {x:20, y:30};
+fakepoint.equals = Point.prototype.equals;
+ret = fakepoint.equals(new Point(20,30));
+check_equals(ret.toString(), "true");
+check_equals(typeof(ret), "boolean");
 
 //-------------------------------------------------------------
 // Test Point.interpolate (static)
@@ -400,6 +420,12 @@ ret = p0.offset('-6', -8);
 check_equals(typeof(ret), 'undefined');
 check_equals(p0.toString(), '(x=4-6, y=-3)');
 
+// A non-point with a point's offset method (fails)
+fakepoint = {x:20, y:30};
+fakepoint.offset = Point.prototype.offset;
+ret = fakepoint.offset(new Point(1, 3));
+check_equals(ret.toString(), undefined);
+check(! ret instanceof Point);
 //-------------------------------------------------------------
 // Test Point.polar (static)
 //-------------------------------------------------------------
@@ -482,6 +508,6 @@ check_equals(ret.toString(), '(x=1, y=2)');
 // END OF TEST
 //-------------------------------------------------------------
 
-check_totals(178);
+check_totals(186);
 
 #endif // OUTPUT_VERSION >= 8
