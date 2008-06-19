@@ -42,6 +42,7 @@ DISTCHECK_CONFIGURE_FLAGS = \
 
 STD_DIRS = \
 	libbase \
+	libgeometry \
 	libamf \
 	libnet \
 	libmedia \
