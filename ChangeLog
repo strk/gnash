@@ -1,3 +1,7 @@
+2008-06-19 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* testsuite/actionscript.all/BitmapData.as: some initial tests.
+
 2008-06-19 Sandro Santilli <strk@keybit.net>
 
 	* libmedia/ffmpeg/MediaParserFfmpeg.cpp (initializeParser): don't

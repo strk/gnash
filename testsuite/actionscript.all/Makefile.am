@@ -73,6 +73,7 @@ ASTESTS =			\
 	AsBroadcaster.as	\
 	ASnative.as		\
 	array.as		\
+	BitmapData.as \
 	delete.as		\
 	getvariable.as		\
 	swap.as			\
