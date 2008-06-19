@@ -57,15 +57,21 @@ SoundFfmpeg::getAudio(boost::uint8_t* stream, int len)
 	{
 		if ( ! _leftOverData )
 		{
+			bool parsingComplete = _mediaParser->parsingCompleted(); // check *before* calling nextAudioFrame
 			std::auto_ptr<media::EncodedAudioFrame> frame = _mediaParser->nextAudioFrame();
 			if ( ! frame.get() )
 			{
 				// just wait some more if parsing isn't complete yet
-				if ( ! _mediaParser->parsingCompleted() ) break;
+				if ( ! parsingComplete )
+				{
+					//log_debug("Parsing not complete and no more audio frames in input, try again later");
+					break;
+				}
 
 				// or detach and stop here...
 				// (should really honour loopings if any)
 				//if ( remainingLoops.. )
+				//log_debug("Parsing complete and no more audio frames in input, detaching");
 				return false; // will detach us
 			}
 
@@ -172,6 +178,11 @@ SoundFfmpeg::loadSound(const std::string& file, bool streaming)
 		log_error(_("Could not create audio decoder for codec %d"), audioInfo->codec);
 	}
 
+	// start playing ASAP, a call to ::start will just change _startTime
+	//log_debug("Attaching the aux streamer");
+	_soundHandler->attach_aux_streamer(getAudioWrapper, (void*) this);
+	isAttached = true;
+
 }
 
 void
@@ -210,8 +221,11 @@ SoundFfmpeg::start(int offset, int loops)
 			remainingLoops = loops;
 		}
 
-		_soundHandler->attach_aux_streamer(getAudioWrapper, (void*) this);
-		isAttached = true;
+		if ( ! isAttached ) 
+		{
+			_soundHandler->attach_aux_streamer(getAudioWrapper, (void*) this);
+			isAttached = true;
+		}
 	}
 	else
 	{

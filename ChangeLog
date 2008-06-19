@@ -1,5 +1,10 @@
 2008-06-19 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/SoundFfmpeg.cpp: attach aux streamer on loadSound,
+	  don't wait for .start() to be called..
+
+2008-06-19 Sandro Santilli <strk@keybit.net>
+
 	* libmedia/ffmpeg/sound_handler_sdl.cpp: fix mute() and unmute().
 	  Have fun with the gtk menu control of it.
 
