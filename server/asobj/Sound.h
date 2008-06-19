@@ -99,6 +99,7 @@ protected:
 	//
 	/// Reachable resources are:
 	///	- associated NetConnection object (connection)
+	///	- attached character object (attachedCharacter)
 	///
 	void markReachableResources() const;
 #endif // GNASH_USE_GC

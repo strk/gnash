@@ -1,5 +1,10 @@
 2008-06-19 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/Sound.h: document the 'attachedCharacter' as a
+	  reachable resource..
+
+2008-06-19 Sandro Santilli <strk@keybit.net>
+
 	* libmedia/MediaParser.h: document setBufferTime unit.
 	* server/asobj/Sound.{cpp,h}: document and fix signature
 	  of getBytes{Loaded/Total}.
