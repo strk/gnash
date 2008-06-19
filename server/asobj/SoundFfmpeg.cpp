@@ -72,7 +72,7 @@ SoundFfmpeg::getAudio(boost::uint8_t* stream, int len)
 				// (should really honour loopings if any)
 				//if ( remainingLoops.. )
 				//log_debug("Parsing complete and no more audio frames in input, detaching");
-				return false; // will detach us
+				return false; // will detach us (we should change isAttached, but need thread safety!)
 			}
 
 			// if we've been asked to start at a specific time, skip
@@ -136,12 +136,20 @@ SoundFfmpeg::loadSound(const std::string& file, bool streaming)
 		return;
 	}
 
-	if (_mediaParser)
+	/// If we are already streaming stop doing so as we'll replace
+	/// the media parser
+	if ( isAttached )
 	{
-		// TODO: check what to do in these cases
-		log_error("FIXME: Sound.loadSound() called while already streaming");
-		return;
+		_soundHandler->detach_aux_streamer(this);
+		isAttached = false;
 	}
+
+	/// Delete any media parser being used (make sure we have detached!)
+	_mediaParser.reset();
+
+	/// Start at offset 0, in case a previous ::start() call
+	/// changed that.
+	_startTime=0;
 
 	URL url(file, get_base_url());
 	externalURL = url.str(); // what for ? bah!
