@@ -1,5 +1,9 @@
 2008-06-19 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/swfdec/PASSING: sound-target-reference-5.swf pass.
+
+2008-06-19 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/SoundFfmpeg.cpp: re-implement start offset again
 	  by keeping note of where to start. Fixes bug #20685 again
 	  (at least for dynamically loaded sound).
