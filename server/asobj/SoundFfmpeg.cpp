@@ -197,8 +197,8 @@ SoundFfmpeg::start(int offset, int loops)
 			_mediaParser->seek(seekms); // well, we try...
 		}
 
-		// Save how many loops to do
-		if (loops > 0)
+		// Save how many loops to do (not when streaming)
+		if (! isStreaming && loops > 0)
 		{
 			remainingLoops = loops;
 		}

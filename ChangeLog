@@ -1,5 +1,11 @@
 2008-06-19 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/SoundFfmpeg.cpp (start): when streaming we
+	  won't loop (at least this is what happens with pp, gnash
+	  itself doesn't implement looping yet).
+
+2008-06-19 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/Sound.h: document the 'attachedCharacter' as a
 	  reachable resource..
 
