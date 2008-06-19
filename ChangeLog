@@ -1,5 +1,10 @@
 2008-06-19 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/Sound.{cpp,h}: any virtual class needs a virtual
+	  destructor !
+
+2008-06-19 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/Sound.cpp (sound_loadsound): second argument
 	  is NOT mandatory. log warning when passed more then two args
 	  (in case we miss something).

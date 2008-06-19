@@ -58,7 +58,7 @@ public:
 	///
 	void attachCharacter(character* attachedChar);
 
-	~Sound();
+	virtual ~Sound() {}
 	virtual void attachSound(int si, const std::string& name);
 	virtual void getBytesLoaded();
 	virtual void getBytesTotal();

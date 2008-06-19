@@ -81,11 +81,6 @@ Sound::attachCharacter(character* attachTo)
 	attachedCharacter.reset(new CharacterProxy(attachTo));
 }
 
-Sound::~Sound()
-{
-}
-
-
 void
 Sound::attachSound(int si, const std::string& name)
 {
