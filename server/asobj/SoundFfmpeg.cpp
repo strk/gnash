@@ -29,484 +29,288 @@
 #include "fn_call.h"
 #include "GnashException.h"
 #include "builtin_function.h"
+#include "URL.h"
+#include "StreamProvider.h"
 
 #include <string>
 
 namespace gnash {
 
-// ffmpeg callback function
-int 
-SoundFfmpeg::readPacket(void* opaque, boost::uint8_t* buf, int buf_size)
+SoundFfmpeg::SoundFfmpeg()
+	: // REMEMBER TO ALWAYS INITIALIZE ALL MEMBERS !
+	_mediaHandler(media::MediaHandler::get()),
+	_leftOverData(),
+	_leftOverPtr(0),
+	_leftOverSize(0),
+	isAttached(false),
+	remainingLoops(0)
+{}
+
+
+bool
+SoundFfmpeg::getAudio(boost::uint8_t* stream, int len)
 {
+	//GNASH_REPORT_FUNCTION;
 
-	SoundFfmpeg* so = static_cast<SoundFfmpeg*>(opaque);
-	boost::intrusive_ptr<NetConnection> nc = so->connection;
-
-	size_t ret = nc->read(static_cast<void*>(buf), buf_size);
-	so->inputPos += ret;
-	return ret;
-
-}
-
-// ffmpeg callback function
-offset_t 
-SoundFfmpeg::seekMedia(void *opaque, offset_t offset, int whence){
-
-	SoundFfmpeg* so = static_cast<SoundFfmpeg*>(opaque);
-	boost::intrusive_ptr<NetConnection> nc = so->connection;
-
-
-	// Offset is absolute new position in the file
-	if (whence == SEEK_SET) {
-		nc->seek(offset);
-		so->inputPos = offset;
-
-	// New position is offset + old position
-	} else if (whence == SEEK_CUR) {
-		nc->seek(so->inputPos + offset);
-		so->inputPos = so->inputPos + offset;
-
-	// 	// New position is offset + end of file
-	} else if (whence == SEEK_END) {
-		// This is (most likely) a streamed file, so we can't seek to the end!
-		// Instead we seek to 50.000 bytes... seems to work fine...
-		nc->seek(50000);
-		so->inputPos = 50000;
-		
-	}
-
-	return so->inputPos;
-}
-
-
-void
-SoundFfmpeg::setupDecoder()
-{
-	SoundFfmpeg* so = this;
-
-	boost::intrusive_ptr<NetConnection> nc = so->connection;
-	assert(nc);
-
-	// Pass stuff from/to the NetConnection object.
-	assert(so);
-	if ( !nc->openConnection(so->externalURL) ) {
-		log_error(_("%s could not open audio url: %s"), 
-				__FUNCTION__, so->externalURL.c_str());
-#ifdef LOADS_IN_SEPARATE_THREAD
-		delete so->lock;
-#endif
-		return;
-	}
-
-	so->inputPos = 0;
-
-	// This registers all available file formats and codecs 
-	// with the library so they will be used automatically when
-	// a file with the corresponding format/codec is opened
-
-	av_register_all();
-
-	// Open video file
-
-	// Probe the file to detect the format
-	AVProbeData probe_data, *pd = &probe_data;
-	pd->filename = "";
-	pd->buf = new boost::uint8_t[2048];
-	pd->buf_size = 2048;
-
-	if (readPacket(so, pd->buf, pd->buf_size) < 1){
- 		log_error(_("%s: could not read from audio url: %s"), 
-				__FUNCTION__, so->externalURL.c_str());
- 		delete[] pd->buf;
-#ifdef LOADS_IN_SEPARATE_THREAD
- 		delete so->lock;
-#endif
- 		return;
-	}
-
-	AVInputFormat* inputFmt = av_probe_input_format(pd, 1);
-
-	// After the format probe, reset to the beginning of the file.
-	nc->seek(0);
-
-	// Setup the filereader/seeker mechanism. 7th argument (NULL) is the writer function,
-	// which isn't needed.
-	init_put_byte(&so->ByteIOCxt, new boost::uint8_t[500000], 500000, 0, so, SoundFfmpeg::readPacket, NULL, SoundFfmpeg::seekMedia);
-	so->ByteIOCxt.is_streamed = 1;
-
-	so->formatCtx = av_alloc_format_context();
-
-	// Open the stream. the 4th argument is the filename, which we ignore.
-	if(av_open_input_stream(&so->formatCtx, &so->ByteIOCxt, "", inputFmt, NULL) < 0){
-		log_error(_("Couldn't open file '%s' for decoding"), so->externalURL.c_str());
-#ifdef LOADS_IN_SEPARATE_THREAD
-		delete so->lock;
-#endif
-		return;
-	}
-
-	// Next, we need to retrieve information about the streams contained in the file
-	// This fills the streams field of the AVFormatContext with valid information
-	int ret = av_find_stream_info(so->formatCtx);
-	if (ret < 0)
+	while (len > 0)
 	{
-		log_error(_("Couldn't find stream information from '%s', error code: %d"), so->externalURL.c_str(), ret);
-#ifdef LOADS_IN_SEPARATE_THREAD
-		delete so->lock;
-#endif
-		return;
-	}
-
-	// Find the first audio stream
-	so->audioIndex = -1;
-
-	for (unsigned int i = 0; i < (unsigned)so->formatCtx->nb_streams; i++)
-	{
-		AVCodecContext* enc = so->formatCtx->streams[i]->codec; 
-
-		switch (enc->codec_type)
+		if ( ! _leftOverData )
 		{
-			case CODEC_TYPE_AUDIO:
-				if (so->audioIndex < 0)
-				{
-					so->audioIndex = i;
-					so->audioStream = so->formatCtx->streams[i];
-				}
-				break;
+			std::auto_ptr<media::EncodedAudioFrame> frame = _mediaParser->nextAudioFrame();
+			if ( ! frame.get() )
+			{
+				// just wait some more if parsing isn't complete yet
+				if ( ! _mediaParser->parsingCompleted() ) break;
 
-			default:
-				log_error(_("Non-audio data (type %d) found in file %s"),
-				   enc->codec_type, so->externalURL.c_str());
-		
-				break;
+				// or detach and stop here...
+				_soundHandler->detach_aux_streamer(this);
+				return true; // return false might do the detach itself actually...
+			}
+
+			_leftOverData.reset( _audioDecoder->decode(*frame, _leftOverSize) );
+			_leftOverPtr = _leftOverData.get();
+			if ( ! _leftOverData )
+			{
+				log_error("No samples decoded from input of %d bytes", frame->dataSize);
+				continue;
+			}
 		}
+
+		int n = std::min<int>(_leftOverSize, len);
+		memcpy(stream, _leftOverPtr, n);
+		stream += n;
+		_leftOverPtr += n;
+		_leftOverSize -= n;
+		len -= n;
+
+		if (_leftOverSize == 0)
+		{
+			_leftOverData.reset();
+			_leftOverPtr = 0;
+		}
+
 	}
 
-	if (so->audioIndex < 0)
-	{
-		log_error(_("Didn't find a audio stream from '%s'"), so->externalURL.c_str());
-		return;
-	}
+	// drop any queued video frame
+	while (_mediaParser->nextVideoFrame().get());
 
-	// Get a pointer to the audio codec context for the video stream
-	so->audioCodecCtx = so->formatCtx->streams[so->audioIndex]->codec;
-
-	// Find the decoder for the audio stream
-	AVCodec* pACodec = avcodec_find_decoder(so->audioCodecCtx->codec_id);
-    if(pACodec == NULL)
-	{
-		log_error(_("No available audio decoder %d to process file: '%s'"),
-		   so->audioCodecCtx->codec_id, so->externalURL.c_str());
-#ifdef LOADS_IN_SEPARATE_THREAD
-		delete so->lock;
-#endif
-		return;
-	}
-    
-	// Open codec
-	if (avcodec_open(so->audioCodecCtx, pACodec) < 0)
-	{
-		log_error(_("Could not open audio codec %d for %s"),
-		   so->audioCodecCtx->codec_id, so->externalURL.c_str());
-#ifdef LOADS_IN_SEPARATE_THREAD
-		delete so->lock;
-#endif
-		return;
-	}
-
-	// By deleting this lock we allow start() to start playback
-#ifdef LOADS_IN_SEPARATE_THREAD
-	delete so->lock;
-#endif
-	return;
+	return true;
 }
 
 // audio callback is running in sound handler thread
-bool SoundFfmpeg::getAudio(void* owner, boost::uint8_t* stream, int len)
+bool
+SoundFfmpeg::getAudioWrapper(void* owner, boost::uint8_t* stream, int len)
 {
 	SoundFfmpeg* so = static_cast<SoundFfmpeg*>(owner);
-
-	int pos = 0;
-
-	// First use the data left over from last time
-	if (so->leftOverSize > 0) {
-
-		// If we have enough "leftover" data to fill the buffer,
-		// we don't bother to decode some new.
-		if (so->leftOverSize >= len) {
-			memcpy(stream, so->leftOverData, len);
-			int rest = so->leftOverSize - len;
-			if (rest < 1) {
-				delete[] so->leftOverData;
-				so->leftOverSize = 0;
-			} else {
-				boost::uint8_t* buf = new boost::uint8_t[rest];
-				memcpy(stream, so->leftOverData+len, rest);
-				delete[] so->leftOverData;
-				so->leftOverData = buf;
-				so->leftOverSize -= len;
-			}	
-			return true;
-		} else {
-			memcpy(stream, so->leftOverData, so->leftOverSize);
-			pos += so->leftOverSize;
-			so->leftOverSize = 0;
-			delete[] so->leftOverData;
-		}
-	}
-
-	AVPacket packet;
-	int rc;
-	bool loop = true;
-	boost::uint8_t* ptr = new boost::uint8_t[AVCODEC_MAX_AUDIO_FRAME_SIZE];
-	bool ret = true;
-	while (loop) {
-		// Parse file
-		rc = av_read_frame(so->formatCtx, &packet);
-		if (rc >= 0)
-		{
-			if (packet.stream_index == so->audioIndex)
-			{
-				media::sound_handler* s = get_sound_handler();
-				if (s)
-				{
-					// Decode audio
-					int frame_size;
-#ifdef FFMPEG_AUDIO2
-					frame_size = (AVCODEC_MAX_AUDIO_FRAME_SIZE * 3) / 2;
-					if (avcodec_decode_audio2(so->audioCodecCtx, (boost::int16_t*) ptr, &frame_size, packet.data, packet.size) >= 0)
-#else
-					if (avcodec_decode_audio(so->audioCodecCtx, (boost::int16_t*) ptr, &frame_size, packet.data, packet.size) >= 0)
-#endif
-					{
-
-						bool stereo = so->audioCodecCtx->channels > 1 ? true : false;
-						int samples = stereo ? frame_size >> 2 : frame_size >> 1;
-						int newDataSize = 0;
-						boost::int16_t* output_data = NULL;
-						bool output_data_allocated = false;
-
-						// Resample if needed
-						if (so->audioCodecCtx->channels != 2 || so->audioCodecCtx->sample_rate != 44100) {
-							// Resampeling using ffmpegs (libavcodecs) resampler
-							if (!so->resampleCtx) {
-								// arguments: (output channels, input channels, output rate, input rate)
-								so->resampleCtx = audio_resample_init (2, so->audioCodecCtx->channels, 44100, so->audioCodecCtx->sample_rate);
-							}
-							// The size of this is a guess, we don't know yet... Lets hope it's big enough
-							output_data = new boost::int16_t[AVCODEC_MAX_AUDIO_FRAME_SIZE];
-							output_data_allocated = true;
-							samples = audio_resample (so->resampleCtx, output_data, (boost::int16_t*)ptr, samples);
-							newDataSize =  samples * 2 * 2; // 2 for stereo and 2 for samplesize = 2 bytes
-						} else {
-							output_data = (boost::int16_t*)ptr;
-							newDataSize = samples * 2 * 2;
-						}
-
-						// Copy the data to buffer
-						// If the decoded data isn't enough to fill the buffer, we put the decoded
-						// data into the buffer, and continues decoding.
-						if (newDataSize <= len-pos) {
-							memcpy(stream+pos, (boost::uint8_t*)output_data, newDataSize);
-							pos += newDataSize;
-						} else {
-						// If we can fill the buffer, and still have "leftovers", we save them
-						// and use them later.
-							int rest = len-pos;
-							so->leftOverSize = newDataSize - rest;
-							memcpy(stream+pos, (boost::uint8_t*)output_data, rest);
-							so->leftOverData = new boost::uint8_t[so->leftOverSize];
-							memcpy(so->leftOverData, ((boost::uint8_t*)output_data)+rest, so->leftOverSize);
-							loop = false;
-							pos += rest;
-						}
-						if ( output_data_allocated ) delete[] output_data;
-					}
-				}
-			}
-		} else {
-			// If we should loop we make sure we do.
-			if (so->remainingLoops != 0) {
-				so->remainingLoops--;
-
-				// Seek to begining of file
-				if (av_seek_frame(so->formatCtx, so->audioIndex, 0, 0) < 0) {
-					log_error(_("seeking to start of file (for looping) failed"));
-					so->remainingLoops = 0;
-				}
-			} else {
-			 // Stops playback by returning false which makes the soundhandler
-			 // detach this sound.
-			 ret = false;
-			 so->isAttached = false;
-			 break;
-			}
-		} 
-	} // while
-	delete[] ptr;
-	return ret;
+	return so->getAudio(stream, len);
 }
 
-SoundFfmpeg::~SoundFfmpeg() {
-	if (externalSound) {
-		 if (leftOverData && leftOverSize) delete[] leftOverData;
+SoundFfmpeg::~SoundFfmpeg()
+{
+	//GNASH_REPORT_FUNCTION;
 
-		if (audioCodecCtx) avcodec_close(audioCodecCtx);
-		audioCodecCtx = NULL;
-
-		if (formatCtx) {
-			formatCtx->iformat->flags = AVFMT_NOFILE;
-			av_close_input_file(formatCtx);
-			formatCtx = NULL;
-		}
-
-		if (resampleCtx) {
-			audio_resample_close (resampleCtx);
-		}
-
-		if (isAttached) {
-			media::sound_handler* s = get_sound_handler();
-			if (s) {
-				s->detach_aux_streamer(this);
-			}
-		}
+	if (isAttached && _soundHandler)
+	{
+		_soundHandler->detach_aux_streamer(this);
 	}
 }
 
 void
 SoundFfmpeg::loadSound(const std::string& file, bool streaming)
 {
-	leftOverData = NULL;
-	leftOverSize = 0;
-	audioIndex = -1;
-	resampleCtx = NULL;
-	remainingLoops = 0;
-
-	if (connection) {
-		log_error(_("This sound already has a connection.  (We try to handle this by overriding the old one...)"));
+	if ( ! _mediaHandler || ! _soundHandler ) 
+	{
+		log_debug("No media or sound handlers, won't load any sound");
+		return;
 	}
-	externalURL = file;
 
-	connection = new NetConnection();
+	if (_mediaParser)
+	{
+		// TODO: check what to do in these cases
+		log_error("FIXME: Sound.loadSound() called while already streaming");
+		return;
+	}
+
+	URL url(file, get_base_url());
+	externalURL = url.str(); // what for ? bah!
+
+	StreamProvider& streamProvider = StreamProvider::getDefaultInstance();
+	std::auto_ptr<IOChannel> inputStream( streamProvider.getStream( externalURL ) );
+	if ( ! inputStream.get() )
+	{
+		log_error( _("Gnash could not open this url: %s"), url );
+		return;
+	}
 
 	externalSound = true;
 	isStreaming = streaming;
 
-#ifdef LOADS_IN_SEPARATE_THREAD
-	lock = new boost::mutex::scoped_lock(setupMutex);
+	_mediaParser.reset( _mediaHandler->createMediaParser(inputStream).release() );
+	if ( ! _mediaParser )
+	{
+		log_error(_("Unable to create parser for Sound input"));
+		// not necessarely correct, the stream might have been found...
+		return;
+	}
+	_mediaParser->setBufferTime(60000); // one minute buffer... should be fine
 
-	// To avoid blocking while connecting, we use a thread.
-	setupThread = new boost::thread(boost::bind(&SoundFfmpeg::setupDecoder, this));
-#else
-	setupDecoder();
-#endif
+	media::AudioInfo* audioInfo =  _mediaParser->getAudioInfo();
+	if (!audioInfo) {
+		log_debug("No audio in Sound input");
+		return;
+	}
+
+	_audioDecoder.reset( _mediaHandler->createAudioDecoder(*audioInfo).release() );
+	if ( ! _audioDecoder.get() )
+	{
+		log_error(_("Could not create audio decoder for codec %d"), audioInfo->codec);
+	}
 
 }
 
 void
 SoundFfmpeg::start(int offset, int loops)
 {
-#ifdef LOADS_IN_SEPARATE_THREAD
-	boost::mutex::scoped_lock lock(setupMutex);
-#endif
-
-	if (externalSound) {
-		if (offset > 0) {
-			// Seek to offset position
-			double timebase = (double)formatCtx->streams[audioIndex]->time_base.num / (double)formatCtx->streams[audioIndex]->time_base.den;
-
-			long newpos = (long)(offset / timebase);
-
-			if (av_seek_frame(formatCtx, audioIndex, newpos, 0) < 0) {
-				log_error(_("%s: seeking to offset failed"),
-					__FUNCTION__);
-			}
-		}
-		// Save how many loops to do
-		if (loops > 0) {
-			remainingLoops = loops;
-		}
+	if ( ! _soundHandler )
+	{
+		log_error("No sound handler, nothing to start...");
+		return;
 	}
 
-	// Start sound
-	media::sound_handler* s = get_sound_handler();
-	if (s) {
-		if (externalSound) {
-			if (audioIndex >= 0)
-			{
-				s->attach_aux_streamer(getAudio, (void*) this);
-				isAttached = true;
-			} 
-		} else {
-	    	s->play_sound(soundId, loops, offset, 0, NULL);
-	    }
+	if (externalSound)
+	{
+		if ( ! _mediaParser )
+		{
+			log_error("No MediaParser initialized, can't start an external sound");
+			return;
+		}
+		if ( ! _audioDecoder )
+		{
+			log_error("No AudioDecoder initialized, can't start an external sound");
+			return;
+		}
+
+		if (offset > 0)
+		{
+			boost::uint32_t seekms = boost::uint32_t(offset*1000);
+			// TODO: boost::mutex::scoped_lock parserLock(_parserMutex);
+			_mediaParser->seek(seekms); // well, we try...
+		}
+
+		// Save how many loops to do
+		if (loops > 0)
+		{
+			remainingLoops = loops;
+		}
+
+		_soundHandler->attach_aux_streamer(getAudioWrapper, (void*) this);
+		isAttached = true;
+	}
+	else
+	{
+	    	_soundHandler->play_sound(soundId, loops, offset, 0, NULL);
 	}
 }
 
 void
 SoundFfmpeg::stop(int si)
 {
-	// stop the sound
-	media::sound_handler* s = get_sound_handler();
-	if (s != NULL)
+	if ( ! _soundHandler )
 	{
-	    if (si < 0) {
-	    	if (externalSound) {
-	    		s->detach_aux_streamer(this);
-	    	} else {
-				s->stop_sound(soundId);
-			}
-		} else {
-			s->stop_sound(si);
+		log_error("No sound handler, nothing to stop...");
+		return;
+	}
+
+	// stop the sound
+	if (si < 0)
+	{
+	    	if (externalSound)
+		{
+	    		_soundHandler->detach_aux_streamer(this);
+	    	}
+		else
+		{
+			_soundHandler->stop_sound(soundId);
 		}
+	}
+	else
+	{
+		_soundHandler->stop_sound(si);
 	}
 }
 
 unsigned int
 SoundFfmpeg::getDuration()
 {
+	if ( ! _soundHandler )
+	{
+		log_error("No sound handler, can't check duration...");
+		return 0;
+	}
 
 	// If this is a event sound get the info from the soundhandler
-	if (!externalSound) {
-		media::sound_handler* s = get_sound_handler();
-		if (s) {		
-	    	return (s->get_duration(soundId));
-	    } else {
-	    	return 0; // just in case
+	if (!externalSound)
+	{
+		return _soundHandler->get_duration(soundId);
+	}
+
+	// If we have a media parser (we'd do for an externalSound)
+	// try fetching duration from it
+	if ( _mediaParser )
+	{
+		media::AudioInfo* info = _mediaParser->getAudioInfo();
+		if ( info )
+		{
+			return info->duration;
 		}
 	}
 
-	// Return the duration of the file in milliseconds
-	if (formatCtx && audioIndex) {
-		return static_cast<unsigned int>(formatCtx->duration * 1000);
-	} else {
-		return 0;
-	}
+	return 0;
 }
 
 unsigned int
 SoundFfmpeg::getPosition()
 {
+	if ( ! _soundHandler )
+	{
+		log_error("No sound handler, can't check position (we're likely not playing anyway)...");
+		return 0;
+	}
+
 	// If this is a event sound get the info from the soundhandler
-	if (!externalSound) {
-		media::sound_handler* s = get_sound_handler();
-		if (s) {
-			return s->tell(soundId);
-	    } else {
-	    	return 0; // just in case
+	if (!externalSound)
+	{
+		return _soundHandler->tell(soundId);
+	}
+
+	if ( _mediaParser )
+	{
+		boost::uint64_t ts;
+		if ( _mediaParser->nextAudioFrameTimestamp(ts) )
+		{
+			return ts;
 		}
 	}
 
-	// Return the position in the file in milliseconds
-	if (formatCtx && audioIndex >= 0)
-	{
-		double time = (double)formatCtx->streams[audioIndex]->time_base.num / formatCtx->streams[audioIndex]->time_base.den * (double)formatCtx->streams[audioIndex]->cur_dts;
-		return static_cast<unsigned int>(time * 1000);
-	}
-	else
-	{
-		return 0;
-	}
+	return 0;
+
 }
+
+long
+SoundFfmpeg::getBytesLoaded()
+{
+	if ( _mediaParser ) return _mediaParser->getBytesLoaded();
+	return 0;
+}
+
+long
+SoundFfmpeg::getBytesTotal()
+{
+	if ( _mediaParser ) return _mediaParser->getBytesTotal();
+	return -1;
+}
+
+
+
 
 } // end of gnash namespace

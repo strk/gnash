@@ -24,13 +24,15 @@
 #endif
 #include "log.h"
 #include "Sound.h" // for inheritance
+#include "MediaHandler.h"
+#include "MediaParser.h"
+#include "AudioDecoder.h"
+
 #include <boost/thread/thread.hpp>
+#include <boost/thread/barrier.hpp>
 #include <boost/bind.hpp> 
 #include <boost/thread/mutex.hpp>
-
-// Undefined the following macro to disable threading
-// TODO: use a global define for disabling all threads at once
-#define LOADS_IN_SEPARATE_THREAD
+#include <boost/scoped_ptr.hpp>
 
 #ifdef HAVE_FFMPEG_AVFORMAT_H
 extern "C" {
@@ -52,25 +54,7 @@ class fn_call;
 class SoundFfmpeg : public Sound {
 public:
 
-	SoundFfmpeg()
-		: // REMEMBER TO ALWAYS INITIALIZE ALL MEMBERS !
-		audioCodecCtx(NULL),
-		audioStream(NULL),
-		formatCtx(NULL),
-		audioFrame(NULL),
-		resampleCtx(NULL)
-#ifdef LOADS_IN_SEPARATE_THREAD
-		,setupThread(NULL)
-		,lock(NULL)
-#endif
-		,inputPos(0),
-		ByteIOCxt(), // ?
-		audioIndex(-1),
-		leftOverData(NULL),
-		leftOverSize(0),
-		isAttached(false),
-		remainingLoops(0)
-	{}
+	SoundFfmpeg();
 
 	~SoundFfmpeg();
 
@@ -80,43 +64,25 @@ public:
 	unsigned int getDuration();
 	unsigned int getPosition();
 
-	// Used for ffmpeg data read and seek callbacks
-	static int readPacket(void* opaque, boost::uint8_t* buf, int buf_size);
-	static offset_t seekMedia(void *opaque, offset_t offset, int whence);
+	// see dox in Sound.h
+	virtual long getBytesLoaded();
+
+	// see dox in Sound.h
+	virtual long getBytesTotal();
 
 private:
 
-	void setupDecoder();
-	static bool getAudio(void *owner, boost::uint8_t *stream, int len);
+	media::MediaHandler* _mediaHandler;
+	boost::scoped_ptr<media::MediaParser> _mediaParser;
+	boost::scoped_ptr<media::AudioDecoder> _audioDecoder;
 
-	// audio
-	AVCodecContext *audioCodecCtx;
-	AVStream* audioStream;
+	boost::scoped_array<boost::uint8_t> _leftOverData;
+	boost::uint8_t* _leftOverPtr;
+	size_t _leftOverSize;
 
-	AVFormatContext *formatCtx;
+	static bool getAudioWrapper(void *owner, boost::uint8_t *stream, int len);
 
-	AVFrame* audioFrame;
-
-	ReSampleContext *resampleCtx;
-
-#ifdef LOADS_IN_SEPARATE_THREAD
-	boost::thread *setupThread;
-	boost::mutex setupMutex;
-
-	// TODO: it makes NO SENSE for a scoped_lock to be allocated on the heap !
-	boost::mutex::scoped_lock *lock;
-#endif
-
-	long inputPos;
-
-	ByteIOContext ByteIOCxt;
-
-	// The stream in the file that we use
-	int audioIndex;
-
-	// If the decoded data doesn't fit the buffer we put the leftovers here
-	boost::uint8_t* leftOverData;
-	int leftOverSize;
+	bool getAudio(boost::uint8_t *stream, int len);
 
 	// Are this sound attached to the soundhandler?
 	bool isAttached;

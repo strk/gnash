@@ -297,6 +297,10 @@ public:
 	}
 
 	/// Set the time we want the parser thread to maintain in the buffer
+	//
+	/// @param t
+	///	Number of milliseconds to keep in the buffers.
+	///
 	DSOEXPORT void setBufferTime(boost::uint64_t t)
 	{
 		boost::mutex::scoped_lock lock(_bufferTimeMutex);

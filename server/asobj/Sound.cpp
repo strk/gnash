@@ -88,26 +88,18 @@ Sound::attachSound(int si, const std::string& name)
 	soundName = name;
 }
 
-void
+long
 Sound::getBytesLoaded()
 {
-	static bool warned = false;
-	if ( ! warned )
-	{
-		log_unimpl (__FUNCTION__);
-		warned = true;
-	}
+	LOG_ONCE( log_unimpl("Sound.getBytesLoaded() [default impl]") );
+	return 0;
 }
 
-void
+long
 Sound::getBytesTotal()
 {
-	static bool warned = false;
-	if ( ! warned )
-	{
-		log_unimpl (__FUNCTION__);
-		warned = true;
-	}
+	LOG_ONCE( log_unimpl("Sound.getBytesTotal() [default impl]") );
+	return -1;
 }
 
 void

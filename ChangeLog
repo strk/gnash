@@ -1,3 +1,13 @@
+2008-06-19 Sandro Santilli <strk@keybit.net>
+
+	* libmedia/MediaParser.h: document setBufferTime unit.
+	* server/asobj/Sound.{cpp,h}: document and fix signature
+	  of getBytes{Loaded/Total}.
+	* server/asobj/SoundFfmpeg.{cpp,h}: drop any FFMPEG-specific
+	  reference, convert to be a pure MediaHandler user.
+	  Test: http://foo.keybit.net/~strk/tmp/SoundTest.swf (and .as)
+	  Should fix bug #23636.
+
 2008-06-19 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* testsuite/actionscript.all/BitmapData.as: some initial tests.

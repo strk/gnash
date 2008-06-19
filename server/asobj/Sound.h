@@ -60,8 +60,16 @@ public:
 
 	virtual ~Sound() {}
 	virtual void attachSound(int si, const std::string& name);
-	virtual void getBytesLoaded();
-	virtual void getBytesTotal();
+
+	/// Get number of bytes loaded from the external sound (if any)
+	virtual long getBytesLoaded();
+
+	/// Get total number of bytes in the external sound being loaded
+	//
+	/// @return -1 if unknown
+	///
+	virtual long getBytesTotal();
+
 	virtual void getPan();
 	virtual void getTransform();
 
