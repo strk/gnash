@@ -39,6 +39,7 @@ namespace gnash {
 SoundFfmpeg::SoundFfmpeg()
 	: // REMEMBER TO ALWAYS INITIALIZE ALL MEMBERS !
 	_mediaHandler(media::MediaHandler::get()),
+	_startTime(0),
 	_leftOverData(),
 	_leftOverPtr(0),
 	_leftOverSize(0),
@@ -63,8 +64,14 @@ SoundFfmpeg::getAudio(boost::uint8_t* stream, int len)
 				if ( ! _mediaParser->parsingCompleted() ) break;
 
 				// or detach and stop here...
+				// (should really honour loopings if any)
+				//if ( remainingLoops.. )
 				return false; // will detach us
 			}
+
+			// if we've been asked to start at a specific time, skip
+			// any frame with earlier timestamp
+			if ( frame->timestamp < _startTime ) continue;
 
 			_leftOverData.reset( _audioDecoder->decode(*frame, _leftOverSize) );
 			_leftOverPtr = _leftOverData.get();
@@ -191,6 +198,7 @@ SoundFfmpeg::start(int offset, int loops)
 
 		if (offset > 0)
 		{
+			_startTime=offset*1000;
 			boost::uint32_t seekms = boost::uint32_t(offset*1000);
 			// TODO: boost::mutex::scoped_lock parserLock(_parserMutex);
 			_mediaParser->seek(seekms); // well, we try...

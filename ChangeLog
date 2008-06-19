@@ -1,5 +1,11 @@
 2008-06-19 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/SoundFfmpeg.cpp: re-implement start offset again
+	  by keeping note of where to start. Fixes bug #20685 again
+	  (at least for dynamically loaded sound).
+
+2008-06-19 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/SoundFfmpeg.cpp (getAudio): return false
 	  when willing to be detached. Manually detaching would result
 	  in a deadlock.

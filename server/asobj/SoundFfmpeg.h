@@ -76,6 +76,11 @@ private:
 	boost::scoped_ptr<media::MediaParser> _mediaParser;
 	boost::scoped_ptr<media::AudioDecoder> _audioDecoder;
 
+	/// Number of milliseconds into the sound to start it
+	//
+	/// This is set by start()
+	boost::uint64_t _startTime;
+
 	boost::scoped_array<boost::uint8_t> _leftOverData;
 	boost::uint8_t* _leftOverPtr;
 	size_t _leftOverSize;
