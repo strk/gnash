@@ -455,18 +455,25 @@ SoundInfo* SDL_sound_handler::get_sound_info(int sound_handle) {
 }
 
 // gnash calls this to mute audio
-void SDL_sound_handler::mute() {
-	stop_all_sounds();
+void
+SDL_sound_handler::mute()
+{
+	//stop_all_sounds();
+	boost::mutex::scoped_lock lock(_mutex);
 	muted = true;
 }
 
 // gnash calls this to unmute audio
-void SDL_sound_handler::unmute() {
+void
+SDL_sound_handler::unmute()
+{
+	boost::mutex::scoped_lock lock(_mutex);
 	muted = false;
 }
 
 bool SDL_sound_handler::is_muted()
 {
+	boost::mutex::scoped_lock lock(_mutex);
 	return muted;
 }
 
@@ -819,6 +826,13 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
             handler->file_stream.write((char*) stream, buffer_length_in);
             // now, mute all audio
             memset ((void*) stream, 0, buffer_length_in);
+	}
+
+	// Now, after having "consumed" all sounds, blank out
+	// the buffer if muted..
+	if ( handler->muted )
+	{
+		memset ((void*) stream, 0, buffer_length_in);
 	}
 
 

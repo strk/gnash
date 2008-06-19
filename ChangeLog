@@ -1,5 +1,10 @@
 2008-06-19 Sandro Santilli <strk@keybit.net>
 
+	* libmedia/ffmpeg/sound_handler_sdl.cpp: fix mute() and unmute().
+	  Have fun with the gtk menu control of it.
+
+2008-06-19 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/swfdec/PASSING: sound-target-reference-5.swf pass.
 
 2008-06-19 Sandro Santilli <strk@keybit.net>
