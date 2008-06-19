@@ -570,15 +570,33 @@ sound_getvolume(const fn_call& fn)
 as_value
 sound_loadsound(const fn_call& fn)
 {
-	if (fn.nargs != 2) {
+	boost::intrusive_ptr<Sound> so = ensureType<Sound>(fn.this_ptr);
+
+	if (!fn.nargs)
+	{
 		IF_VERBOSE_ASCODING_ERRORS(
-	    log_aserror(_("loadSound needs 2 arguments"));
+		log_aserror(_("Sound.loadSound() needs at least 1 argument"));
 	    	);
-	    return as_value();		
+		return as_value();		
 	}
 
-	boost::intrusive_ptr<Sound> so = ensureType<Sound>(fn.this_ptr);
-	so->loadSound(fn.arg(0).to_string(), fn.arg(1).to_bool());
+	std::string url = fn.arg(0).to_string();
+
+	bool streaming = false;
+	if ( fn.nargs > 1 )
+	{
+		streaming = fn.arg(1).to_bool();
+
+		IF_VERBOSE_ASCODING_ERRORS(
+		if ( fn.nargs > 2 )
+		{
+			std::stringstream ss; fn.dump_args(ss);
+			log_aserror(_("Sound.loadSound(%s): arguments after first 2 discarded"), ss.str());
+		}
+		);
+	}
+
+	so->loadSound(url, streaming);
 
 	return as_value();
 }

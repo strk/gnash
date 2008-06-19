@@ -1,3 +1,9 @@
+2008-06-19 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/Sound.cpp (sound_loadsound): second argument
+	  is NOT mandatory. log warning when passed more then two args
+	  (in case we miss something).
+
 2008-06-19 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
 	* server/as_object.h: typeid can cope with null pointers, but
