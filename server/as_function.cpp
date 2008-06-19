@@ -328,15 +328,15 @@ function_call(const fn_call& fn)
 		{
 			new_fn_call.this_ptr = this_ptr;
 			as_object* proto = this_ptr->get_prototype().get();
-			if ( proto )
-			{
-				new_fn_call.super = proto->get_super();
-			}
-			else
-			{
-				// TODO: check this !
-				log_debug("No prototype in 'this' pointer passed to Function.call");
-				new_fn_call.super = function_obj->get_super();
+                        if ( proto )
+                        {
+                                new_fn_call.super = this_ptr->get_super();
+                        }
+                        else
+                        {
+                                // TODO: check this !
+                                log_debug("No prototype in 'this' pointer passed to Function.call");
+                                new_fn_call.super = function_obj->get_super();
 			}
 		}
 		new_fn_call.nargs--;
@@ -435,10 +435,10 @@ as_function::constructInstance( as_environment& env,
 			newobj->init_member(NSV::PROP_CONSTRUCTOR, as_value(this), flags);
 		}
 
-		// Super is constructed from this function's prototype
-		as_object* super = NULL;
-		as_object* iface = getPrototype().get(); // this function's prototype
-		if ( iface ) super = iface->get_super();
+		// Super is computed from the object we're constructing,
+		// It will work as long as we did set it's __proto__ and __constructor__
+		// properties already.
+		as_object* super = newobj->get_super();
 
 		// Call the actual constructor function; new_obj is its 'this'.
 

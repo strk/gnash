@@ -68,9 +68,12 @@ public:
 		_proto(proto)
 	{
 		set_prototype(proto);
+		//log_debug("as_super %p constructed with ctor %p and proto %p", this, ctor, proto);
 	}
 
 	virtual bool isSuper() const { return true; }
+
+	virtual as_object* get_super(const char* fname=0);
 
 	std::string get_text_value() const
 	{
@@ -120,6 +123,96 @@ private:
 	as_function* _ctor;
 	as_object* _proto;
 };
+
+as_object*
+as_super::get_super(const char* fname)
+{
+	// Super references the super class of our class prototype.
+	// Our class prototype is __proto__.
+	// Our class superclass prototype is __proto__.__proto__
+
+	// Our class prototype is __proto__.
+	as_object* proto = get_prototype().get(); 
+	if ( ! proto )
+	{
+		//log_debug("We (a super) have no associated prototype, returning a null-referencing as_super from get_super()");
+		return new as_super(0, 0);
+	}
+
+	// proto's __proto__ is superProto 
+	as_object* superProto = proto->get_prototype().get();
+
+	// proto's __constructor__ is superCtor
+	as_function* superCtor = proto->get_constructor();
+	assert(superCtor == get_constructor());
+
+	//log_debug("super %p proto is %p, its prototype %p", this, proto, proto->get_prototype());
+
+	VM& vm = getVM();
+	if ( fname && vm.getSWFVersion() > 6)
+	{
+		as_object* owner = 0;
+		string_table& st = vm.getStringTable();
+		string_table::key k = st.find(fname);
+
+		proto->findProperty(k, 0, &owner);
+		if ( ! owner )
+		{
+			//log_debug("get_super: can't find property %s", fname);
+			return 0;
+		}
+
+		//log_debug("object containing method %s is %p, its __proto__ is %p", fname, owner, owner->get_prototype());
+
+		assert(owner);
+
+		if ( owner != proto )
+		{
+			as_object* tmp = proto;
+			while (tmp && tmp->get_prototype() != owner) tmp = tmp->get_prototype().get();
+			// ok, now 'tmp' should be the object whose __proto__ member contains
+			// the actual named method.
+			//
+			// in the C:B:A:F case this would be B when calling super.myName() from
+			// C.prototype.myName()
+			//
+
+			assert(tmp); // well, since we found the property, it must be somewhere!
+
+			//log_debug("tmp is %p", tmp);
+
+			if ( tmp != proto )
+			{
+				//assert(superProto == tmp->get_prototype().get());
+
+				//superCtor = superProto->get_constructor();
+				superCtor = tmp->get_constructor();
+				//if ( ! superCtor ) log_debug("superProto (owner) has no __constructor__");
+			}
+			else
+			{
+				//log_debug("tmp == proto");
+				superCtor = owner->get_constructor(); // most likely..
+				if ( superProto ) superProto = superProto->get_prototype().get();
+			}
+		}
+		else
+		{
+			// TODO: check if we've anything to do here...
+			//log_debug("owner == proto == %p", owner);
+			//if ( superProto ) superProto = superProto->get_prototype().get();
+			//superCtor = superProto->get_constructor();
+			//if ( superProto )
+			//{
+			//	superCtor = superProto->get_constructor();
+			//} // else superCtor = NULL ?
+		}
+	}
+
+	as_object* super = new as_super(superCtor, superProto);
+
+	return super;
+}
 
 
 // A PropertyList visitor copying properties to an object
@@ -254,136 +347,34 @@ as_object::getByIndex(int index)
 }
 
 as_object*
-as_object::get_super()
+as_object::get_super(const char* fname)
 {
-#if 1
-	// Assuming we're a prototype...
+	// Super references the super class of our class prototype.
+	// Our class prototype is __proto__.
+	// Our class superclass prototype is __proto__.__proto__
 
-	// __constructor__ is superCtor
-	as_function* superCtor = get_constructor();     
+	// Our class prototype is __proto__.
+	as_object* proto = get_prototype().get();
 
-	// __proto__ is superProto
-	// NOTE: we don't use get_prototype as it would skip the get_member 
-	// override of as_super.. A solution would likely be having as_super
-	// register the associated prototype as it's own __proto__ member
-	// so that get_prototype() returns it and can be threated exactly
-	// the same as other objects in ActionCallMethod
-	// TODO: try this, for simplification
-	//
-	as_object* superProto = NULL; // get_prototype().get();
-	as_value val;
-	if ( get_member(NSV::PROP_uuPROTOuu, &val) )
+	VM& vm = getVM();
+	if ( fname && vm.getSWFVersion() > 6)
 	{
-		superProto = val.to_object().get();
+		as_object* owner = 0;
+		string_table& st = vm.getStringTable();
+		string_table::key k = st.find(fname);
+		Property* p = findProperty(k, 0, &owner);
+		if ( owner != this ) proto = owner; // should be 0 if findProperty returned 0
 	}
+
+	// proto's __proto__ is superProto 
+	as_object* superProto = proto ? proto->get_prototype().get() : 0;
+
+	// proto's __constructor__ is superCtor
+	as_function* superCtor = proto ? proto->get_constructor() : 0;
 
 	as_object* super = new as_super(superCtor, superProto);
 
 	return super;
-#else
-
-	static bool getting = false;
-	as_object *owner = NULL;
-
-	Property *p = NULL;
-
-	if (getting)
-	{
-		log_debug("Already getting super, return NULL");
-		return NULL;
-	}
-
-	getting = true;
-
-#if 1
-	// Super is prototype.__constructor__
-	p = findProperty(NSV::PROP_PROTOTYPE, 0, &owner);
-	if (!p)
-	{
-		log_debug("This object (%s @ %p) has no 'prototype' get_super returns NULL", typeName(*this), (void*)this);
-		getting = false;
-		return NULL;
-	}
-
-	as_value protoval = p->getValue(*owner);
-	as_object *proto = protoval.to_object().get();
-	if (!proto)
-	{
-		log_debug("This object's (%s @ %p) 'prototype' member is not an object (%s) - get_super returns NULL", typeName(*this), (void*)this, protoval);
-		getting = false;
-		return NULL;
-	}
-
-	as_function* constructor = proto->get_constructor();
-	if ( ! constructor )
-	{
-		log_debug("This object's (%s @ %p) 'prototype' has no constructor", typeName(*this), (void*)this);
-	}
-
-	// prototype of the constructor is constructor.prototype (I think)
-#if 1
-	as_object* prototype = NULL;
-	if ( constructor && constructor->get_member(NSV::PROP_PROTOTYPE, &protoval) )
-	{
-		prototype = protoval.to_object().get();
-	}
-#else
-	as_object* prototype = get_prototype().get();
-	if ( ! prototype )
-	{
-		log_debug("This object (%s @ %p) has no __proto__", typeName(*this), (void*)this);
-	}
-#endif
-
-	getting = false;
-
-	return new as_super(constructor, prototype);
-#else
-	// Super is this.__proto__.__constructor__.prototype
-	as_object *proto = get_prototype().get();
-	if (!proto)
-	{
-		getting = false;
-		return NULL;
-	}
-
-	// If an object is its own prototype, we stop looking.
-	if (proto == this)
-	{
-		getting = false;
-		return this;
-	}
-
-	p = proto->findProperty(NSV::PROP_uuCONSTRUCTORuu, 0, &owner);
-	if (!p)
-	{
-		getting = false;
-		return NULL;
-	}
-
-	as_value ctor = p->getValue(*owner);
-	as_object *ctor_obj = ctor.to_object().get();
-	if (!ctor_obj)
-	{
-		getting = false;
-		return NULL;
-	}
-
-	p = ctor_obj->findProperty(NSV::PROP_PROTOTYPE, 0, &owner);
-	if (!p)
-	{
-		getting = false;
-		return NULL;
-	}
-
-	as_value ctor_proto = p->getValue(*owner);
-	as_object *super = ctor_proto.to_object().get();
-
-	getting = false;
-
-	return super;
-#endif
-#endif
 }
 
 as_function*

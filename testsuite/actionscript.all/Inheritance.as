@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Inheritance.as,v 1.63 2008/06/18 22:35:04 strk Exp $";
+rcsid="$Id: Inheritance.as,v 1.64 2008/06/19 10:51:44 strk Exp $";
 #include "check.as"
 
 check_equals(typeof(Object.prototype.constructor), 'function');
@@ -333,8 +333,8 @@ n = co.myName();
  check_equals(ActorCalls, 1); 
 #endif
 #if OUTPUT_VERSION > 6
- xcheck_equals(n, "undefinedFFC");  // gnash gives undefinedFC here
- xcheck_equals(FctorCalls, 1); // gnash gives 0 here
+ check_equals(n, "undefinedFFC");  
+ check_equals(FctorCalls, 1); 
  check_equals(BctorCalls, 1); 
  check_equals(ActorCalls, 0); 
 #endif

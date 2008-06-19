@@ -126,7 +126,7 @@ Timer::execute()
 
     as_value timer_method;
 
-    as_object* super = NULL;
+    as_object* super = _object->get_super(_function ? 0 : _methodName.c_str());
 
     if ( _function.get() )
     {
@@ -134,25 +134,17 @@ Timer::execute()
     }
     else
     {
-	VM& vm = VM::get();
-	string_table::key k = vm.getStringTable().find(_methodName);
-	as_object* owner = NULL;
-	Property* p = _object->findProperty(k, 0, &owner);
-	if ( ! p )
-	{
+        VM& vm = _object->getVM();
+        string_table::key k = vm.getStringTable().find(_methodName);
+        as_value tmp;
+        if ( ! _object->get_member(k, &tmp) )
+        {
             IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror("member %s of object %p (interval method) can't be found",
-                 _methodName, (void*)_object.get());
+            log_aserror("object %p has no member named %s (interval method)",
+                 _object, _methodName);
             );
             return;
-	}
-	if ( _object->isSuper() )
-	{
-		log_unimpl("Getting super from a super in inteval timers");
-	}
-	super = owner->get_super();
-
-        as_value tmp = p->getValue(*_object); // TODO: check visibility flags ?
+        }
         as_function* f = tmp.to_as_function();
         if ( ! f )
         {

@@ -41,7 +41,8 @@ class BroadcasterVisitor
 	/// Name of the event being broadcasted
 	/// appropriately cased based on SWF version
 	/// of the current VM
-	string_table::key _eventName;
+	std::string _eventName;
+	string_table::key _eventKey;
 
 	// These two will be needed for consistency checking
 	//size_t _origEnvStackSize;
@@ -61,11 +62,13 @@ public:
 	///
 	BroadcasterVisitor(const fn_call& fn)
 		:
-		_eventName(0),
+		_eventName(),
+		_eventKey(0),
 		_dispatched(0),
 		_fn(fn)
 	{
-		_eventName = VM::get().getStringTable().find(PROPNAME(fn.arg(0).to_string()));
+		_eventName = fn.arg(0).to_string();
+		_eventKey = VM::get().getStringTable().find(_eventName);
 		_fn.drop_bottom();
 	}
 
@@ -75,31 +78,9 @@ public:
 		boost::intrusive_ptr<as_object> o = v.to_object();
 		if ( ! o ) return;
 
-#if 1 // oh boy.. I forgot to clean the "super" stuff up :! TODO: make fetching super easier...
-		as_object* super = NULL;
-		as_object* owner = NULL;
-		Property* p = o->findProperty(_eventName, 0, &owner);
-		if ( ! p )
-		{
-			//log_debug("Object %p has no event handler named %s", o, VM::get().getStringTable().value(_eventName));
-			// Older code used to increment this even when method
-			// was not found, so I guess we'll do the same..
-			++_dispatched;
-			return;
-		}
-		if ( o->isSuper() )
-		{
-			log_unimpl("Getting super from a super in AsBroadcaster");
-		}
-		super = owner->get_super();
-		as_value method = p->getValue(*o);
-
-		_fn.super = super;
-		//log_debug("AsBroadcaster calling function with super %p", super);
-#else
 		as_value method;
-		o->get_member(_eventName, &method);
-#endif
+		o->get_member(_eventKey, &method);
+        _fn.super = o->get_super(_eventName.c_str());
 
 		if ( method.is_function() )
 		{

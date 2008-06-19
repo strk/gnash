@@ -4400,10 +4400,18 @@ sprite_instance::constructAsScriptObject()
       {
         //log_debug(_("Calling the user-defined constructor against this sprite_instance"));
 
+
+        set_member(NSV::PROP_uuCONSTRUCTORuu, ctor);
+        if ( swfversion == 6 )
+        {
+          set_member(NSV::PROP_CONSTRUCTOR, ctor);
+        }
+
 	// Provide a 'super' reference..
-	as_object* super = NULL;
-	as_object* iface = ctor->getPrototype().get(); // this function's prototype
-	if ( iface ) super = iface->get_super();
+	// Super is computed from the object we're constructing,
+	// It will work as long as we did set it's __proto__ and __constructor__
+	// properties already.
+	as_object* super = get_super();
 
         fn_call call(this, &(get_environment()), 0, 0, super);
 
@@ -4411,11 +4419,6 @@ sprite_instance::constructAsScriptObject()
         (*ctor)(call);
 
 
-        set_member(NSV::PROP_uuCONSTRUCTORuu, ctor);
-        if ( swfversion == 6 )
-        {
-          set_member(NSV::PROP_CONSTRUCTOR, ctor);
-        }
       }
     }
 

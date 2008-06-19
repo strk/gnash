@@ -2779,7 +2779,7 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
         log_error("ActionCallFunction: function name %s evaluated to non-function value %s", funcname, function);
         // Calling super ? 
         boost::intrusive_ptr<as_object> obj = function.to_object();
-            this_ptr = thread.getThisPointer();
+        this_ptr = thread.getThisPointer();
         if (!obj->get_member(NSV::PROP_CONSTRUCTOR, &function) )
         {
             IF_VERBOSE_ASCODING_ERRORS (
@@ -2789,12 +2789,11 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
     }
     else if ( function.to_as_function()->isSuper() )
     {
-    this_ptr = thread.getThisPointer();
+        this_ptr = thread.getThisPointer();
 
-    // the new 'super' will be computed from the old one
-    // NOTE: this is equivalent to oldSuper->get_super() [ looks like.. ]
-    as_function* oldSuper = function.to_as_function();
-    super = oldSuper->get_super();
+        // the new 'super' will be computed from the old one
+        as_function* oldSuper = function.to_as_function();
+        super = oldSuper->get_super();
     }
 
     // Get number of args, modifying it if not enough values are on the stack.
@@ -3443,62 +3442,25 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 
     bool hasMethodName = ( (!method_name.is_undefined()) && (!method_string.empty()) );
 
-    as_object* this_ptr = obj.get();
-    as_object* super = NULL;
-    if ( obj.get() )
+    if ( ! obj )
     {
-        if ( obj->isSuper() ) 
-        {
-            if ( thread.isFunction() ) this_ptr = thread.getThisPointer();
-
-            as_object* proto = obj->get_prototype().get();
-            as_object* owner = proto;
-            if ( hasMethodName )
-            {
-                VM& vm = VM::get();
-                if ( vm.getSWFVersion() > 6 )
-                {
-                    string_table::key k = vm.getStringTable().find(method_string);
-                    Property* p = obj->findProperty(k, 0, &owner);
-                    if ( p )
-                    {
-                        assert(owner);
-                        if ( owner != obj.get() ) // I think it would be impossible for owner to be == obj (since obj is super.)
-                        {
-                            proto = owner;
-                        }
-                    }
-                }
-            }
-            super = proto ? proto->get_super() : 0;
-        }
-        else
-        {
-            as_object* proto = obj->get_prototype().get();
-            as_object* owner = proto;
-            if ( hasMethodName )
-            {
-                VM& vm = VM::get();
-                if ( vm.getSWFVersion() > 6 )
-                {
-                    string_table::key k = vm.getStringTable().find(method_string);
-                    Property* p = obj->findProperty(k, 0, &owner);
-                    if ( p )
-                    {
-                        assert(owner);
-                        if ( owner != obj.get() )
-                        {
-                            proto = owner;
-                        }
-                    }
-                }
-            }
-
-            //log_debug("%p.%s() call", obj.get(), method_string);
-            if ( proto ) super = proto->get_super();
-            else super = obj->get_super();
-        }
+        // SWF integrity check
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_error(_("ActionCallMethod invoked with "
+            "non-object object/func (%s)"), obj_value);
+        );
+        env.drop(nargs+2);
+        env.top(0).set_undefined();
+        return;
     }
+
+    as_object* this_ptr = obj.get();
+
+    if ( obj->isSuper() )
+    {
+        if ( thread.isFunction() ) this_ptr = thread.getThisPointer();
+    }
+    as_object* super = obj->get_super(hasMethodName ? method_string.c_str() : 0);
 
     if ( ! hasMethodName )
     {
@@ -3507,17 +3469,6 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 
         if ( ! method_val.is_function() )
         {
-            // TODO: log_aserror ? or try to invoke a [[Call]] method
-            //       ala ECMA262 ?
-            if ( ! obj )
-            {
-                log_error(_("ActionCallMethod invoked with "
-                        "undefined method_name "
-                        "and non-object object/func"));
-                env.drop(nargs+2);
-                env.top(0).set_undefined();
-                return;
-            }
 
 //#ifdef GNASH_DEBUG
             log_debug(_("Function object given to ActionCallMethod"
@@ -3551,20 +3502,6 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
     }
     else
     {
-        if ( ! obj )
-        {
-            // SWF integrity check
-            IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("ActionCallMethod: "
-                "Tried to invoke method '%s' on non-object value %s."),
-                method_name,
-                obj_value.typeOf());
-            );
-            env.drop(nargs+2);
-            env.top(0).set_undefined();
-            return;
-        }
-
         if ( ! thread.getObjectMember(*obj, method_string, method_val) )
         {
             IF_VERBOSE_ASCODING_ERRORS(
