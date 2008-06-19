@@ -63,8 +63,7 @@ SoundFfmpeg::getAudio(boost::uint8_t* stream, int len)
 				if ( ! _mediaParser->parsingCompleted() ) break;
 
 				// or detach and stop here...
-				_soundHandler->detach_aux_streamer(this);
-				return true; // return false might do the detach itself actually...
+				return false; // will detach us
 			}
 
 			_leftOverData.reset( _audioDecoder->decode(*frame, _leftOverSize) );

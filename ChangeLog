@@ -1,5 +1,11 @@
 2008-06-19 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/SoundFfmpeg.cpp (getAudio): return false
+	  when willing to be detached. Manually detaching would result
+	  in a deadlock.
+
+2008-06-19 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/SoundFfmpeg.cpp (start): when streaming we
 	  won't loop (at least this is what happens with pp, gnash
 	  itself doesn't implement looping yet).
