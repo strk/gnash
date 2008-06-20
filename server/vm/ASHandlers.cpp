@@ -2036,7 +2036,7 @@ SWFHandlers::ActionPushData(ActionExec& thread)
                         env.push(as_value());
                         IF_VERBOSE_MALFORMED_SWF(
                         log_swferror(_("register %d "
-                            "out of local registers bounds (0..%d)!"), reg, env.num_local_registers());
+                            "out of local registers bounds (0..%d)!"), reg, env.num_local_registers()-1);
                         );
                     }
                 }
@@ -4247,7 +4247,7 @@ SWFHandlers::ActionSetRegister(ActionExec& thread)
         else
         {
             IF_VERBOSE_MALFORMED_SWF(
-            log_swferror(_("store_register[%d] -- register out of local registers bounds (0..%d)!"), reg, env.num_local_registers());
+            log_swferror(_("store_register[%d] -- register out of local registers bounds (0..%d)!"), reg, env.num_local_registers()-1);
             );
         }
     }
