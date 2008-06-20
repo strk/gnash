@@ -60,24 +60,22 @@ main(int /*argc*/, char** /*argv*/)
 {
     std::string label;
 
-	// Check attributes of the identity
+	// 
+    //  Test identity matrix.
+    // 
 	matrix identity; 
 	check(identity.is_valid());
-	identity.set_identity();
 	check_equals(identity.get_x_scale(), 1);
 	check_equals(identity.get_y_scale(), 1);
 	check_equals(identity.get_rotation(), 0);
 	check_equals(identity.get_x_translation(), 0);
 	check_equals(identity.get_y_translation(), 0);
 
-	// The inverse of identity is still the identity
-	matrix mat;
-	check_equals(mat.invert(), identity);
+	check_equals(identity.invert(), identity);
 
-	//---------------------------------------------
-	// Test canonic parameter setting and getting
-	//---------------------------------------------
-
+	//
+	// Test parameter setting and getting, interfaces for AS.
+	//
 	matrix m1;
 	m1.set_scale_rotation(1, 3, 0);
 	check_equals(m1.get_x_scale(), 1);
@@ -142,10 +140,9 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(m1.get_x_translation(), 5);
 	check_equals(m1.get_y_translation(), 6);
 
-	//---------------------------------------------
-	// Test concatenation
-	//---------------------------------------------
-
+	//
+	// Test matrix concatenation
+	//
 	m1.concatenate_scale(2, 2);
 	check_equals(D(m1.get_x_scale()), 2);
 	check_equals(D(m1.get_y_scale()), 4);
@@ -167,16 +164,14 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(m1.get_x_translation(), 5);
 	check_equals(m1.get_y_translation(), 6);
 
-	//---------------------------------------------
-	// Test transformations
-	//---------------------------------------------
-
+	//
+	// Test matrix transformations
+	//
 	point p1(0, 0);
 	point p2(64, 64);
 	point r;
 
 	m1.set_identity();
-
 	// Make a distance of 64 become a distance of 20 .. 
 	m1.set_scale(20.0/64, 20.0/64);
 
@@ -200,10 +195,8 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(r.x, 10);
 	check_equals(r.y, 10);
 
-	// Apply a final scaling by 10 keeping
-	// the current origin (reached after
-	// translation)
-
+	//  Apply a final scaling by 10 keeping the current origin 
+    // (reached after translation)
 	matrix final;
 	final.set_scale(10, 10);
 	final.concatenate(m1);
@@ -217,7 +210,9 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(r.x, 100);
 	check_equals(r.y, 100);
 
-	// test matrix invert
+    //
+	// Test matrix invertion
+    // 
     m1.set_identity();
     m1.set_translation(50*20, -30*20);
     m1.set_scale(0.5, 2);
@@ -225,9 +220,31 @@ main(int /*argc*/, char** /*argv*/)
     
     matrix m1_inverse = m1;
     m1_inverse.invert();
+    // concatenate the inverse matrix and orignial matrix.
     m1_inverse.concatenate(m1); 
+    // the result is expected to be an identity matrix. 
+    check_equals(m1_inverse, identity);
 
-    check_equals(m1_inverse.get_x_translation(), 0);    
-    check_equals(m1_inverse.get_y_translation(), 0);  
+    m1.sx  = 4;   // 1/16384
+    m1.shy = 0;
+    m1.tx  = 20;
+    m1.shx = 0;
+    m1.sy  = 4;   // 1/16384
+    m1.ty  = 20;
+    
+    m1_inverse = m1;
+    m1_inverse.invert();
+    
+    check_equals(m1_inverse.sx, 16384 * 65536);
+    check_equals(m1_inverse.shy, 0);
+    check_equals(m1_inverse.tx, -327680);
+    check_equals(m1_inverse.shx, 0);
+    check_equals(m1_inverse.sy, 16384 * 65536);
+    check_equals(m1_inverse.ty, -327680);
+    
+    // concatenate the inverse matrix and orignial matrix.
+    m1_inverse.concatenate(m1);
+    // the result is expected to be an identity matrix. 
+    check_equals(m1_inverse, identity);
 }
 

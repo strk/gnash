@@ -1827,7 +1827,7 @@ sprite_beginGradientFill(const fn_call& fn)
       // Should be 20x20 with center at 0,0
       float g2fs = 20.0/64.0; // gnash to flash scale
       gnashToFlash.set_scale(g2fs, g2fs);
-      gnashToFlash.concatenate_translation(-32.0, -32.0);
+      gnashToFlash.concatenate_translation(-32, -32);
 
     }
     else
@@ -1841,7 +1841,7 @@ sprite_beginGradientFill(const fn_call& fn)
       // Gnash linear gradients are 256x1 with center at 128,0
       // Should be 20x20 with center at 0,0
       gnashToFlash.set_scale(20.0/256.0, 20.0/1);
-      gnashToFlash.concatenate_translation(-128.0, 0.0);
+      gnashToFlash.concatenate_translation(-128, 0);
 
     }
 

@@ -626,7 +626,7 @@ public:
       
       // move the center of the radial fill to where it should be
       gnash::matrix transl;
-      transl.concatenate_translation(-32.0f, -32.0f);
+      transl.set_translation(-32, -32);
       transl.concatenate(mat);    
       
       st_type* st = new st_type(fs, transl, cx, 64/2);  // div 2 because we need radius, not diameter     
@@ -655,7 +655,7 @@ public:
       // move the center of the focal fill (not it's focal point) to where it 
       // should be.
       gnash::matrix transl;      
-      transl.concatenate_translation(-32.0f, -32.0f);
+      transl.set_translation(-32, -32);
       transl.concatenate(mat);
       
       st_type* st = new st_type(fs, transl, cx, 64/2); 
