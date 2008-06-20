@@ -17,8 +17,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-#ifndef __AUDIODECODER_H__
-#define __AUDIODECODER_H__
+#ifndef GNASH_AUDIODECODER_H
+#define GNASH_AUDIODECODER_H
 
 #include "SoundInfo.h"
 #include "Util.h"

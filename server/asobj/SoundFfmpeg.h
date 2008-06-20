@@ -16,8 +16,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef __SOUNDFFMPEG_H__
-#define __SOUNDFFMPEG_H__
+#ifndef GNASH_SOUNDFFMPEG_H
+#define GNASH_SOUNDFFMPEG_H
 
 #ifndef __STDC_CONSTANT_MACROS
 #define __STDC_CONSTANT_MACROS
@@ -83,7 +83,7 @@ private:
 
 	boost::scoped_array<boost::uint8_t> _leftOverData;
 	boost::uint8_t* _leftOverPtr;
-	size_t _leftOverSize;
+	boost::uint32_t _leftOverSize;
 
 	static bool getAudioWrapper(void *owner, boost::uint8_t *stream, int len);
 

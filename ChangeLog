@@ -1,3 +1,9 @@
+2008-06-20 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	* server/asobj/SoundFfmpeg.h: AudioDecoder.h expects _leftOverData to
+	  be uint32_t, which isn't always the same as size_t.
+	* libmedia/AudioDecoder.h: use legal header guards.
+
 2008-06-20 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* backend/render_handler_cairo.cpp: Implement set_translation and the
