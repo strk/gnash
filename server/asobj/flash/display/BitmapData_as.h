@@ -17,24 +17,74 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef __GNASH_ASOBJ_BITMAPDATA_H__
-#define __GNASH_ASOBJ_BITMAPDATA_H__
+#ifndef GNASH_ASOBJ_BITMAPDATA_H
+#define GNASH_ASOBJ_BITMAPDATA_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
 #endif
 
-//#include <memory> // for auto_ptr
+#include "smart_ptr.h"
+#include "as_object.h"
 
 namespace gnash {
 
+class as_function;
 class as_object;
+
+class BitmapData_as: public as_object
+{
+
+    typedef std::vector<boost::uint32_t> BitmapArray;
+
+public:
+
+    // The constructor sets the fill colour and the
+    // immutable size of the bitmap, as well as whether
+    // it can handle transparency or not.
+	BitmapData_as(size_t width, size_t height,
+	              bool transparent, boost::uint32_t fillColor);
+
+    const size_t getWidth() const { return _width; }
+    const size_t getHeight() const { return _height; }
+    const bool isTransparent() const { return _transparent; }
+    
+    const BitmapArray& getBitmapData() const
+    {
+        assert (_bitmapData.get());
+        return *_bitmapData;
+    }
+    
+    // Returns an unsigned int representation of the pixel
+    // at (x, y) either with or without transparency.
+    boost::int32_t getPixel(int x, int y, bool transparency) const;
+    
+    // Fill the bitmap with a colour starting at x, y
+    void fillRect(int x, int y, int w, int h, boost::uint32_t color);
+
+private:
+
+    // The width of the image, max 2880. This is immutable.
+    const size_t _width;
+    
+    // The height of the image, max 2880. This is immutable.
+    const size_t _height;
+    
+    // Whether the image is transparent. This is immutable.
+    const bool _transparent;
+
+    // A static array of 32-bit values holding the actual bitmap data.
+    // The maximum size is 2880 x 2880 * 4 bytes = 33177600 bytes, so
+    // this must be heap allocated.
+    std::auto_ptr<BitmapArray> _bitmapData;
+    
+};
+
 
 /// Initialize the global BitmapData class
 void BitmapData_class_init(as_object& global);
 
-/// Return a BitmapData instance (in case the core lib needs it)
-//std::auto_ptr<as_object> init_BitmapData_instance();
+as_function* getFlashDisplayBitmapDataConstructor();
 
 } // end of gnash namespace
 

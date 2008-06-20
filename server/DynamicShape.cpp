@@ -20,7 +20,6 @@
 
 #include "DynamicShape.h"
 
-#include <cfloat>
 #include <algorithm>
 
 

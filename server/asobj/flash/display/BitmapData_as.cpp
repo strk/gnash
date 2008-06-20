@@ -129,54 +129,16 @@ getBitmapDataInterface()
 	return o.get();
 }
 
-class BitmapData_as: public as_object
-{
-
-    typedef std::vector<boost::uint32_t> BitmapArray;
-
-public:
-
-    // The constructor sets the fill colour and the
-    // immutable size of the bitmap, as well as whether
-    // it can handle transparency or not.
-	BitmapData_as(size_t width, size_t height,
+BitmapData_as::BitmapData_as(size_t width, size_t height,
 	              bool transparent, boost::uint32_t fillColor)
 		:
-		as_object(getBitmapDataInterface()),
-		_width(width),
-		_height(height),
-		_transparent(transparent),
-		_bitmapData(new BitmapArray(width * height, fillColor + (0xff << 24)))
-	{}
-
-    size_t getWidth() const { return _width; }
-    size_t getHeight() const { return _height; }
-    bool isTransparent() const { return _transparent; }
-    
-    // Returns an unsigned int representation of the pixel
-    // at (x, y) either with or without transparency.
-    boost::int32_t getPixel(int x, int y, bool transparency) const;
-    
-    // Fill the bitmap with a colour starting at x, y
-    void fillRect(int x, int y, int w, int h, boost::uint32_t color);
-
-private:
-
-    // The width of the image, max 2880. This is immutable.
-    const size_t _width;
-    
-    // The height of the image, max 2880. This is immutable.
-    const size_t _height;
-    
-    // Whether the image is transparent. This is immutable.
-    const bool _transparent;
-
-    // A static array of 32-bit values holding the actual bitmap data.
-    // The maximum size is 2880 x 2880 * 4 bytes = 33177600 bytes, so
-    // this must be heap allocated.
-    std::auto_ptr<BitmapArray> _bitmapData;
-    
-};
+    as_object(getBitmapDataInterface()),
+    _width(width),
+    _height(height),
+    _transparent(transparent),
+    _bitmapData(new BitmapArray(width * height, fillColor + (0xff << 24)))
+{
+}
 
 
 // 

@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: BitmapData.as,v 1.2 2008/06/20 11:21:09 bwy Exp $";
+rcsid="$Id: BitmapData.as,v 1.3 2008/06/20 13:28:56 bwy Exp $";
 
 
 #include "check.as"
@@ -117,7 +117,7 @@ bmp = new Bitmap(0, 10000);
 xcheck_equals(bmp, undefined);
 
 bmp = new Bitmap(2881, 0);
-xcheck_equals(bmp, undefined);
+xcheck_equals(typeof(bmp), "undefined");
 bmp = new Bitmap(0, 2881);
 xcheck_equals(bmp, undefined);
 

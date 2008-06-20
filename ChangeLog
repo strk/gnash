@@ -1,5 +1,14 @@
 2008-06-20 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* testsuite/actionscript.all/BitmapData.as: minor change.
+	* server/asobj/flash/geom/Point_as.h: header cleanup.
+	* server/asobj/flash/display/BitmapData_as.{h,cpp}: move class
+	  definition to the header, as something will need to get the
+	  bitmap data out.
+	* server/DynamicShape.cpp: drop <cfloat> include.
+
+2008-06-20 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* testsuite/actionscript.all/BitmapData.as: more tests.
 	* server/asobj/flash/display/BitmapData_as.cpp: implement
 	  constructor, getPixel, getPixel32, height, width, transparency,

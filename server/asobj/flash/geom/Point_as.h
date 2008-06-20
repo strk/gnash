@@ -24,12 +24,12 @@
 #include "gnashconfig.h"
 #endif
 
-#include "as_object.h" // For visibility to auto_ptr
-#include <memory> // for auto_ptr
+#include "smart_ptr.h" // boost::intrusive_ptr
 
 namespace gnash {
 
 class as_function;
+class as_object;
 
 /// Initialize the global Point class
 void Point_class_init(as_object& global);
@@ -42,5 +42,4 @@ as_function* getFlashGeomPointConstructor();
 
 } // end of gnash namespace
 
-// __GNASH_ASOBJ_POINT_H__
 #endif
