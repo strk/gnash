@@ -1,3 +1,8 @@
+2008-06-20 Zou Lunkai <zoulunkai@gmail.com>
+
+	* server/matrix.cpp: invert(), fix overflows, should also fix regression
+	 bug#23621.
+
 2008-06-19 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/SoundFfmpeg.cpp: any new loadSound call replaces

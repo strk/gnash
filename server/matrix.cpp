@@ -245,14 +245,12 @@ matrix::invert()
     else
     {
         double  d = 65536.0 * 65536.0 / det;
-    
-        boost::int32_t d_fixed = DoubleToFixed16(d);
         boost::int32_t t0, t4;
         
-        t0 = Fixed16Mul(sy, d_fixed);
-        sy  = Fixed16Mul(sx, d_fixed);
-        shy = Fixed16Mul(-shy, d_fixed);
-        shx = Fixed16Mul(-shx, d_fixed);
+        t0  = (boost::int32_t)(sy * d);
+        sy  = (boost::int32_t)(sx * d);
+        shy = (boost::int32_t)(-shy * d);
+        shx = (boost::int32_t)(-shx * d);
 
         t4 = - ( Fixed16Mul(tx, t0) + Fixed16Mul(ty, shy) );
         ty = - ( Fixed16Mul(tx, shx)+ Fixed16Mul(ty, sy) );
