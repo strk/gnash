@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: BitmapData.as,v 1.1 2008/06/19 17:40:15 bwy Exp $";
+rcsid="$Id: BitmapData.as,v 1.2 2008/06/20 11:21:09 bwy Exp $";
 
 
 #include "check.as"
@@ -80,26 +80,113 @@ check(!bmp.hasOwnProperty("height"));
 check(!bmp.hasOwnProperty("width"));
 check(!bmp.hasOwnProperty("rectangle"));
 check(!bmp.hasOwnProperty("transparent"));
-xcheck_equals(bmp.height, 10);
-xcheck_equals(bmp.width, 10);
-xcheck_equals(bmp.transparent, true);
+check_equals(bmp.height, 10);
+check_equals(bmp.width, 10);
+check_equals(bmp.transparent, true);
 xcheck_equals(bmp.rectangle.toString(), "(x=0, y=0, w=10, h=10)");
-xcheck_equals(bmp.getPixel(1, 1), 16777215);
-xcheck_equals(bmp.getPixel(9, 9), 16777215);
-xcheck_equals(bmp.getPixel32(1, 1), -1);
+check_equals(bmp.getPixel(1, 1), 16777215);
+check_equals(bmp.getPixel(9, 9), 16777215);
+check_equals(bmp.getPixel32(1, 1), -1);
+
+bmp = new Bitmap(10, 10, true);
+check_equals(bmp.getPixel32(1, 1), -1);
+bmp = new Bitmap(10, 10, false);
+check_equals(bmp.getPixel32(1, 1), -1);
+
 
 bmp = new Bitmap(20, 30, false, 0xeeddee);
-xcheck_equals(bmp.height, 30);
-xcheck_equals(bmp.width, 20);
-xcheck_equals(bmp.transparent, false);
+check_equals(bmp.height, 30);
+check_equals(bmp.width, 20);
+check_equals(bmp.transparent, false);
 xcheck_equals(bmp.rectangle.toString(), "(x=0, y=0, w=20, h=30)");
-xcheck_equals(bmp.getPixel(1, 1), 0xeeddee);
-xcheck_equals(bmp.getPixel32(1, 1), -1122834);
+check_equals(bmp.getPixel(1, 1), 0xeeddee);
+check_equals(bmp.getPixel32(1, 1), -1122834);
+
+// limits
+
+check_equals(bmp.getPixel(50, 1), 0);
+check_equals(bmp.getPixel(0, 0), 15654382);
+check_equals(bmp.getPixel(-2, -5), 0);
+
+// 0,0 is inside, 20, 30 outside a 20x30 bitmap.
+check_equals(bmp.getPixel(20, 30), 0);
+
+bmp = new Bitmap(10000, 0);
+xcheck_equals(bmp, undefined);
+bmp = new Bitmap(0, 10000);
+xcheck_equals(bmp, undefined);
+
+bmp = new Bitmap(2881, 0);
+xcheck_equals(bmp, undefined);
+bmp = new Bitmap(0, 2881);
+xcheck_equals(bmp, undefined);
+
+
+// floodFill
+bmp = new Bitmap(20, 20, false);
+bmp.floodFill(10, 10, 0x0000ff00);
+
+xcheck_equals(bmp.getPixel(10, 10), 0x0000ff00);
+bmp.floodFill(5, 5, 0x000000ff);
+xcheck_equals(bmp.getPixel(10, 0), 0x000000ff);
+
+mc = this.createEmptyMovieClip("mc", this.getNextHighestDepth());
+mc.attachBitmap(bmp, this.getNextHighestDepth());
+
+Rectangle = flash.geom.Rectangle;
+
+bmp = new Bitmap(20, 20, false);
+r = new Rectangle(2, 2, 5, 5);
+bmp.fillRect(r, 0xff1100);
+check_equals(bmp.getPixel(1, 1), 0xffffff);
+check_equals(bmp.getPixel(2, 2), 0xff1100);
+check_equals(bmp.getPixel(2, 5), 0xff1100);
+check_equals(bmp.getPixel(5, 2), 0xff1100);
+check_equals(bmp.getPixel(2, 6), 0xff1100);
+check_equals(bmp.getPixel(6, 6), 0xff1100);
+check_equals(bmp.getPixel(6, 7), 0xffffff);
+check_equals(bmp.getPixel(7, 6), 0xffffff);
+
+r = new Rectangle(-2, -2, 8, 8);
+bmp.fillRect(r, 0x00ff00);
+check_equals(bmp.getPixel(1, 1), 0x00ff00);
+
+// Fails.
+r = new Rectangle(18, 18, -4, -4);
+bmp.fillRect(r, 0x0000ff);
+check_equals(bmp.getPixel(7, 6), 0xffffff);
+
+r = new Rectangle(18, 18, 200, 200);
+bmp.fillRect(r, 0x0000ff);
+check_equals(bmp.getPixel(19,19), 0x0000ff);
+
+// Doesn't have to be a rectangle
+g = {x: 15, y: 15, width: 2, height: 2};
+bmp.fillRect(g, 0xff00ff);
+check_equals(bmp.getPixel(16, 16), 0xff00ff);
+
+// Transparency (this bitmap is not transparent).
+g = {x: 18, y: 2, width: 7, height: 7};
+bmp.fillRect(g, 0xddff00ff);
+check_equals(bmp.getPixel32(18, 2), -65281);
+
+mc.attachBitmap(bmp, this.getNextHighestDepth());
+
+// Transparency (transparent bitmap). Fill just obliterates
+// what was there, even if it's transparent.
+bmp = new Bitmap(20, 20, true);
+r = new Rectangle(1, 1, 10, 10);
+bmp.fillRect(r, 0xff00ff00);
+r = new Rectangle(2, 2, 9, 9);
+bmp.fillRect(r, 0x99ff1100);
+check_equals(bmp.getPixel32(3, 3), -1711337216);
+
+mc.attachBitmap(bmp, this.getNextHighestDepth());
 
 //-------------------------------------------------------------
 // END OF TEST
 //-------------------------------------------------------------
 
-totals(51);
+totals(77);
 
 #endif // OUTPUT_VERSION >= 8

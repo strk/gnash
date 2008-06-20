@@ -1,5 +1,12 @@
 2008-06-20 Benjamin Wolsey <bwy@benjaminwolsey.de>
 
+	* testsuite/actionscript.all/BitmapData.as: more tests.
+	* server/asobj/flash/display/BitmapData_as.cpp: implement
+	  constructor, getPixel, getPixel32, height, width, transparency,
+	  fillRect. 
+
+2008-06-20 Benjamin Wolsey <bwy@benjaminwolsey.de>
+
 	* server/asobj/SoundFfmpeg.h: AudioDecoder.h expects _leftOverData to
 	  be uint32_t, which isn't always the same as size_t.
 	* libmedia/AudioDecoder.h: use legal header guards.
