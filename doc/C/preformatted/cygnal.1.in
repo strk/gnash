@@ -5,7 +5,7 @@
 \\$2 \(la\\$1\(ra\\$3
 ..
 .if \n(.g .mso www.tmac
-.TH cygnal 1 "19 February 2008"  
+.TH cygnal 1 "18 June 2008"  
 .SH NAME
 cygnal \- Cygnal
 .SH Synopsis
@@ -16,7 +16,7 @@ cygnal (options)...
 .SH DESCRIPTION
 Cygnal is a multimedia media server for streaming audio, video, and
 video conferencing. Cygnal supports several protocols used by SWF
-file players, including RTMP, RTMPTS, and RTMPT, while encouring the
+file players, including RTMP, RTMPTS, and RTMPT, while encouraging the
 use of patent free codecs.
 .TP 
 (-h) --help
