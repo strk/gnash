@@ -38,9 +38,14 @@ class GtkCairoGlue : public GtkGlue
     void render(int minx, int miny, int maxx, int maxy);
     void configure(GtkWidget *const widget, GdkEventConfigure *const event);
   private:
+    cairo_surface_t* createGdkImageSurface(const int& width, const int& height);
+    cairo_surface_t* createSimilarSurface(const int& width, const int& height);
+    cairo_surface_t* createMemorySurface(const int& width, const int& height);
+
     cairo_t     *_cairo_handle;
     cairo_t     *_cairo_offscreen;
     render_handler* _renderer;
+    GdkImage*       _image;
 };
 
 } // namespace gnash

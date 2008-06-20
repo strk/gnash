@@ -1,3 +1,12 @@
+2008-06-20 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* backend/render_handler_cairo.cpp: Implement set_translation and the
+	"stage matrix".
+	* gui/gtk_glue_cairo.{cpp,h}: Implement rendering to GdkImage, which
+	implicitly enables XShm support in this GUI. This brings the
+	performance I see with cairo to about 70% of GTK-AGG's. Do further
+	cleanups.
+
 2008-06-20 Zou Lunkai <zoulunkai@gmail.com>
 
 	* backend/render_handler_agg_style.h,

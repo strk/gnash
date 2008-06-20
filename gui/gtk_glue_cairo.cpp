@@ -27,16 +27,18 @@ namespace gnash
 {
 
 GtkCairoGlue::GtkCairoGlue()
+  : _image(0),
+    _drawing_area(0),
+    _cairo_handle(0),
+    _cairo_offscreen(0)
 {
-    _drawing_area = 0;
-    _cairo_handle = 0;
-    _cairo_offscreen = 0;
 }
 
 GtkCairoGlue::~GtkCairoGlue()
 {
     if (_cairo_handle)  cairo_destroy(_cairo_handle);
     if (_cairo_offscreen)  cairo_destroy(_cairo_offscreen);
+    if (_image) gdk_image_destroy(_image);
 }
 
 bool
@@ -49,8 +51,6 @@ void
 GtkCairoGlue::prepDrawingArea(GtkWidget *drawing_area)
 {
     _drawing_area = drawing_area;
-    assert(_drawing_area);
-    assert(_drawing_area->window);
     gtk_widget_set_double_buffered(_drawing_area, FALSE);
 }
 
@@ -66,6 +66,21 @@ void
 GtkCairoGlue::render(int minx, int miny, int maxx, int maxy)
 {
     if (!_cairo_offscreen) {
+      return;
+    }
+
+    const int& x = minx;
+    const int& y = miny;
+    int width = maxx - minx;
+    int height = maxy - miny;
+
+    if (_image) {
+      // Using GdkImage for our image buffer, use GdkRgb (potentially shm).
+      GdkGC* gc = gdk_gc_new(_drawing_area->window);
+
+      gdk_draw_image(_drawing_area->window, gc, _image, x, y, x, y, width,
+                     height);
+      gdk_gc_unref(gc);
       return;
     }
 
@@ -90,24 +105,109 @@ GtkCairoGlue::render()
     cairo_paint(_cairo_handle);
 }
 
+bool
+cairoFormatFromVisual(const GdkVisual* visual, cairo_format_t* format /*out*/)
+{
+  switch(visual->depth) {
+    case 24:
+      *format = CAIRO_FORMAT_RGB24;
+      break;
+    case 36:
+      *format = CAIRO_FORMAT_ARGB32;
+      break;
+    default:
+      format = NULL;
+      return false;
+  }
+  return true;
+}
+
+cairo_surface_t*
+GtkCairoGlue::createGdkImageSurface(const int& width, const int& height)
+{
+  GdkVisual* visual = gdk_drawable_get_visual(_drawing_area->window);
+  cairo_format_t format;
+
+  if (!cairoFormatFromVisual(visual, &format)) {
+    return NULL;
+  }
+
+  _image = gdk_image_new (GDK_IMAGE_FASTEST, visual, width, height);
+  if (!_image) {
+    return NULL;
+  }
+
+  cairo_surface_t* surface =
+    cairo_image_surface_create_for_data ((unsigned char *)_image->mem,
+      format, _image->width, _image->height, _image->bpl);
+
+  if (cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS) {
+    cairo_surface_destroy(surface);
+    gdk_image_destroy(_image);
+    _image = 0;
+    return NULL;
+  }
+
+  return surface;
+}
+
+cairo_surface_t*
+GtkCairoGlue::createSimilarSurface(const int& width, const int& height)
+{
+  cairo_surface_t* target = cairo_get_target(_cairo_handle);
+
+  cairo_surface_t* surface = cairo_surface_create_similar(target,
+    cairo_surface_get_content(target), width, height);
+
+  if (cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS) {
+    cairo_surface_destroy(surface);
+    return NULL;
+  }
+  return surface;
+}
+
+cairo_surface_t*
+GtkCairoGlue::createMemorySurface(const int& width, const int& height)
+{
+  cairo_surface_t* surface = cairo_image_surface_create(CAIRO_FORMAT_RGB24,
+                                                        width, height);
+
+  if (cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS) {
+    cairo_surface_destroy(surface);
+    return NULL;
+  }
+  return surface;
+}
+
 void
 GtkCairoGlue::configure(GtkWidget *const /*widget*/,
     GdkEventConfigure *const event)
 {
     if (!_drawing_area)  return;
 
-    // Create cairo handle for output window
-    _cairo_handle = gdk_cairo_create(_drawing_area->window);
+    if (_image) {
+      gdk_image_destroy(_image);
+      _image = 0;
+    }
 
-    cairo_surface_t* target = cairo_get_target(_cairo_handle);
+    cairo_surface_t* surface = createGdkImageSurface(event->width, event->height);
 
-    cairo_surface_t* surface = cairo_surface_create_similar(target,
-      cairo_surface_get_content(target), event->width, event->height);
+    if (!surface) {
 
-    if (cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS) {
-      // fallback image surface
-      surface = cairo_image_surface_create(
-        CAIRO_FORMAT_ARGB32, event->width, event->height);
+      if (!_cairo_handle) {
+        _cairo_handle = gdk_cairo_create(_drawing_area->window);
+      }
+
+      surface = createMemorySurface(event->width, event->height);
+    }
+
+    if (!surface) {
+      surface = createSimilarSurface(event->width, event->height);
+    }
+
+    if (!surface) {
+      log_error("Cairo: failed to create a rendering buffer!");
+      return;
     }
 
     _cairo_offscreen = cairo_create(surface);
@@ -115,8 +215,6 @@ GtkCairoGlue::configure(GtkWidget *const /*widget*/,
     
     renderer::cairo::set_context(_renderer, _cairo_offscreen);
 }
-
-
 
 } // namespace gnash
 

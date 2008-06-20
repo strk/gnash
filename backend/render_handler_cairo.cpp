@@ -190,10 +190,8 @@ public:
     : _video_bufsize(0),
       _drawing_mask(false)
   {    
-  	cairo_surface_t* dummy_surface = cairo_image_surface_create(
-	                                     CAIRO_FORMAT_A8, 1, 1);
-	  _cr = cairo_create(dummy_surface);
-	  cairo_surface_destroy(dummy_surface);
+    _cr = cairo_create(NULL);
+    cairo_matrix_init_scale(&_stage_mat, 1/20.0f, 1/20.0f);
   }
   
   ~render_handler_cairo()
@@ -294,13 +292,20 @@ public:
   }
 
   
-  // FIXME
   geometry::Range2d<int>
   world_to_pixel(const rect& worldbounds)
 {
-  // TODO: verify this is correct
-  geometry::Range2d<int> ret(worldbounds.getRange());
-  ret.scale(1.0/20.0); // twips to pixels
+  double xmin = worldbounds.get_x_min(),
+         ymin = worldbounds.get_y_min(),
+         xmax = worldbounds.get_x_max(),
+         ymax = worldbounds.get_y_max();
+
+  cairo_matrix_transform_point(&_stage_mat, &xmin, &ymin);
+  cairo_matrix_transform_point(&_stage_mat, &xmax, &ymax);
+  
+
+  geometry::Range2d<int> ret(xmin, ymin, xmax, ymax);
+
   return ret;
 }
 
@@ -308,8 +313,15 @@ public:
   point 
   pixel_to_world(int x, int y)
   {
-    // TODO: verify this is correct
-    return point(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
+    cairo_matrix_t inv_stage = _stage_mat;
+    cairo_matrix_invert(&inv_stage);
+
+    double xconv = x;
+    double yconv = y;
+    
+    cairo_matrix_transform_point(&inv_stage, &xconv, &yconv);
+
+    return point(xconv, yconv);
   }
   
   void
@@ -357,9 +369,6 @@ public:
     int viewport_width, int viewport_height,
     float x0, float x1, float y0, float y1)
   {
-    float display_width  = fabsf(x1 - x0);
-    float display_height = fabsf(y1 - y0);
-
     cairo_identity_matrix(_cr);
 
     cairo_save(_cr);
@@ -368,9 +377,7 @@ public:
       set_color(bg_color);
     }
 
-    cairo_scale(_cr, viewport_width / display_width,
-                     viewport_height / display_height);
-    cairo_translate(_cr, x0, y0);
+    cairo_set_matrix(_cr, &_stage_mat);
 
     for (size_t rno=0; rno < _invalidated_ranges.size(); rno++) {
     
@@ -379,8 +386,10 @@ public:
         continue;
       }
       if (range.isWorld()) {
-        cairo_rectangle(_cr, x0, y0, display_width, display_height);
-        break;
+        cairo_paint(_cr);
+        // reset any rectangles that might have been added to the path...
+        cairo_new_path(_cr);
+        return;
       }
 
       double x = range.getMinX(),
@@ -403,6 +412,17 @@ public:
   virtual void  end_display()
   {
     cairo_restore(_cr);
+  }
+
+  void set_scale(float xscale, float yscale)
+  {
+    _stage_mat.xx = xscale / 20;
+    _stage_mat.yy = xscale / 20;
+  }
+
+  virtual void set_translation(float xoff, float yoff) {
+    _stage_mat.x0 = xoff;
+    _stage_mat.y0 = yoff;
   }
     
   virtual void  draw_line_strip(const boost::int16_t coords[], int vertex_count,
@@ -1049,6 +1069,7 @@ private:
   size_t _video_bufsize;
   bool _drawing_mask;
   InvalidatedRanges _invalidated_ranges;
+  cairo_matrix_t _stage_mat;
     
 }; // class render_handler_cairo
 
