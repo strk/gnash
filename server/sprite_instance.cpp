@@ -1246,7 +1246,7 @@ sprite_lineTo(const fn_call& fn)
   if ( fn.nargs < 2 )
   {
     IF_VERBOSE_ASCODING_ERRORS(
-      log_aserror(_("MovieClip.lineTo() needs at least two"));
+      log_aserror(_("MovieClip.lineTo() needs at least two arguments"));
     );
     return as_value();
   }
@@ -1998,6 +1998,47 @@ sprite_stopDrag(const fn_call& fn)
   return as_value();
 }
 
+
+static as_value
+sprite_beginBitmapFill(const fn_call& fn)
+{
+    boost::intrusive_ptr<sprite_instance> ptr = ensureType<sprite_instance>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+
+static as_value
+sprite_getRect(const fn_call& fn)
+{
+    boost::intrusive_ptr<sprite_instance> ptr = ensureType<sprite_instance>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+
+static as_value
+sprite_lineGradientStyle(const fn_call& fn)
+{
+    boost::intrusive_ptr<sprite_instance> ptr = ensureType<sprite_instance>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+
+static as_value
+sprite_attachBitmap(const fn_call& fn)
+{
+    boost::intrusive_ptr<sprite_instance> ptr = ensureType<sprite_instance>(fn.this_ptr);
+	UNUSED(ptr);
+	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	return as_value();
+}
+
+
 static as_value
 movieclip_ctor(const fn_call& /* fn */)
 {
@@ -2149,67 +2190,71 @@ static void registerNatives(VM& vm)
 static void
 attachMovieClipInterface(as_object& o)
 {
-  VM& vm = o.getVM();
-  int target_version = vm.getSWFVersion();
+    VM& vm = o.getVM();
+    const int target_version = vm.getSWFVersion();
 
-  // SWF5 or higher
-  o.init_member("attachMovie", vm.getNative(900, 0)); 
-  o.init_member("swapDepths", vm.getNative(900, 1));
-  o.init_member("localToGlobal", vm.getNative(900, 2));
-  o.init_member("globalToLocal", vm.getNative(900, 3));
-  o.init_member("hitTest", vm.getNative(900, 4));
-  o.init_member("getBounds", vm.getNative(900, 5));
-  o.init_member("getBytesTotal", vm.getNative(900, 6));
-  o.init_member("getBytesLoaded", vm.getNative(900, 7));
-  o.init_member("play", vm.getNative(900, 12));
-  o.init_member("stop", vm.getNative(900, 13));
-  o.init_member("nextFrame", vm.getNative(900, 14));
-  o.init_member("prevFrame", vm.getNative(900, 15));
-  o.init_member("gotoAndPlay", vm.getNative(900, 16));
-  o.init_member("gotoAndStop", vm.getNative(900, 17));
-  o.init_member("duplicateMovieClip", vm.getNative(900, 18));
-  o.init_member("removeMovieClip", vm.getNative(900, 19));
-  o.init_member("startDrag", vm.getNative(900, 20));
-  o.init_member("stopDrag", vm.getNative(900, 21));
-  o.init_member("loadMovie", new builtin_function(sprite_load_movie));
-  o.init_member("loadVariables", new builtin_function(sprite_load_variables));
-  o.init_member("unloadMovie", new builtin_function(sprite_unload_movie));
-  o.init_member("getURL", new builtin_function(sprite_getURL));
-  o.init_member("getSWFVersion", new builtin_function(sprite_getSWFVersion));
-  o.init_member("meth", new builtin_function(sprite_meth));
-  o.init_member("enabled", true); // see MovieClip.as testcase
-  o.init_member("useHandCursor", true); // see MovieClip.as testcase
+    // SWF5 or higher
+    o.init_member("attachMovie", vm.getNative(900, 0)); 
+    o.init_member("swapDepths", vm.getNative(900, 1));
+    o.init_member("localToGlobal", vm.getNative(900, 2));
+    o.init_member("globalToLocal", vm.getNative(900, 3));
+    o.init_member("hitTest", vm.getNative(900, 4));
+    o.init_member("getBounds", vm.getNative(900, 5));
+    o.init_member("getBytesTotal", vm.getNative(900, 6));
+    o.init_member("getBytesLoaded", vm.getNative(900, 7));
+    o.init_member("play", vm.getNative(900, 12));
+    o.init_member("stop", vm.getNative(900, 13));
+    o.init_member("nextFrame", vm.getNative(900, 14));
+    o.init_member("prevFrame", vm.getNative(900, 15));
+    o.init_member("gotoAndPlay", vm.getNative(900, 16));
+    o.init_member("gotoAndStop", vm.getNative(900, 17));
+    o.init_member("duplicateMovieClip", vm.getNative(900, 18));
+    o.init_member("removeMovieClip", vm.getNative(900, 19));
+    o.init_member("startDrag", vm.getNative(900, 20));
+    o.init_member("stopDrag", vm.getNative(900, 21));
+    o.init_member("loadMovie", new builtin_function(sprite_load_movie));
+    o.init_member("loadVariables", new builtin_function(sprite_load_variables));
+    o.init_member("unloadMovie", new builtin_function(sprite_unload_movie));
+    o.init_member("getURL", new builtin_function(sprite_getURL));
+    o.init_member("getSWFVersion", new builtin_function(sprite_getSWFVersion));
+    o.init_member("meth", new builtin_function(sprite_meth));
+    o.init_member("enabled", true); // see MovieClip.as testcase
+    o.init_member("useHandCursor", true); // see MovieClip.as testcase
 
-  as_c_function_ptr gettersetter = &sprite_instance::lockroot_getset;
-  o.init_property("_lockroot", *gettersetter, *gettersetter); // see MovieClip.as testcase
+    as_c_function_ptr gettersetter = &sprite_instance::lockroot_getset;
+    o.init_property("_lockroot", *gettersetter, *gettersetter); // see MovieClip.as testcase
 
-  if ( target_version  < 6 ) return;
+    if ( target_version  < 6 ) return;
 
-  // SWF6 or higher
-  o.init_member("attachAudio", vm.getNative(900, 8));
-  o.init_member("attachVideo", vm.getNative(900, 9));
-  o.init_member("getDepth", vm.getNative(900, 10));
-  o.init_member("setMask", vm.getNative(900, 11));
-  o.init_member("createEmptyMovieClip", vm.getNative(901, 0));
-  o.init_member("beginFill", vm.getNative(901, 1));
-  o.init_member("beginGradientFill", vm.getNative(901, 2));
-  o.init_member("moveTo", vm.getNative(901, 3));
-  o.init_member("lineTo", vm.getNative(901, 4));
-  o.init_member("curveTo", vm.getNative(901, 5));
-  o.init_member("lineStyle", vm.getNative(901, 6));
-  o.init_member("endFill", vm.getNative(901, 7));
-  o.init_member("clear", vm.getNative(901, 8));
+    // SWF6 or higher
+    o.init_member("attachAudio", vm.getNative(900, 8));
+    o.init_member("attachVideo", vm.getNative(900, 9));
+    o.init_member("getDepth", vm.getNative(900, 10));
+    o.init_member("setMask", vm.getNative(900, 11));
+    o.init_member("createEmptyMovieClip", vm.getNative(901, 0));
+    o.init_member("beginFill", vm.getNative(901, 1));
+    o.init_member("beginGradientFill", vm.getNative(901, 2));
+    o.init_member("moveTo", vm.getNative(901, 3));
+    o.init_member("lineTo", vm.getNative(901, 4));
+    o.init_member("curveTo", vm.getNative(901, 5));
+    o.init_member("lineStyle", vm.getNative(901, 6));
+    o.init_member("endFill", vm.getNative(901, 7));
+    o.init_member("clear", vm.getNative(901, 8));
 
-  o.init_member("createTextField", vm.getNative(104, 200));
-  o.init_member("getTextSnapshot", new builtin_function(sprite_getTextSnapshot)); // unknown native
-  if ( target_version  < 7 ) return;
+    o.init_member("createTextField", vm.getNative(104, 200));
+    o.init_member("getTextSnapshot", new builtin_function(sprite_getTextSnapshot)); // unknown native
+    if ( target_version  < 7 ) return;
 
-  // SWF7 or higher
-  o.init_member("getNextHighestDepth", new builtin_function(sprite_getNextHighestDepth));
-  o.init_member("getInstanceAtDepth", new builtin_function(sprite_getInstanceAtDepth));
-  if ( target_version  < 8 ) return;
+    // SWF7 or higher
+    o.init_member("getNextHighestDepth", new builtin_function(sprite_getNextHighestDepth));
+    o.init_member("getInstanceAtDepth", new builtin_function(sprite_getInstanceAtDepth));
+    if ( target_version  < 8 ) return;
 
-  // TODO: many more methods, see MovieClip class ...
+    // SWF8 or higher
+    o.init_member("attachBitmap", new builtin_function(sprite_attachBitmap));
+    o.init_member("beginBitmapFill", new builtin_function(sprite_beginBitmapFill));
+    o.init_member("getRect", new builtin_function(sprite_getRect));
+    o.init_member("lineGradientStyle", new builtin_function(sprite_lineGradientStyle));
 
 }
 
@@ -4947,7 +4992,7 @@ sprite_instance::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
 	InfoTree::iterator selfIt = character::getMovieInfo(tr, it);
 	std::ostringstream os;
 	os << m_display_list.size();
-	InfoTree::iterator localIter = tr.append_child(selfIt, StringPair(_("Childs"), os.str()));	    
+	InfoTree::iterator localIter = tr.append_child(selfIt, StringPair(_("Children"), os.str()));	    
 	//localIter = tr.append_child(localIter, StringPair("child1", "fake"));
 	//localIter = tr.append_child(localIter, StringPair("child2", "fake"));
 
