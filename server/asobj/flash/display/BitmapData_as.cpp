@@ -31,7 +31,6 @@
 #include "Object.h" // for AS inheritance
 #include "VM.h" // for addStatics
 
-#include <memory>
 #include <vector>
 #include <sstream>
 #include <algorithm>
@@ -136,7 +135,7 @@ BitmapData_as::BitmapData_as(size_t width, size_t height,
     _width(width),
     _height(height),
     _transparent(transparent),
-    _bitmapData(new BitmapArray(width * height, fillColor + (0xff << 24)))
+    _bitmapData(width * height, fillColor + (0xff << 24))
 {
 }
 
@@ -154,9 +153,9 @@ BitmapData_as::getPixel(int x, int y, bool transparency) const
 
     const size_t pixelIndex = y * _width + x;
 
-    assert ( pixelIndex < _bitmapData->size());
+    assert ( pixelIndex < _bitmapData.size());
     
-    const boost::uint32_t pixel = (*_bitmapData)[pixelIndex];
+    const boost::uint32_t pixel = _bitmapData[pixelIndex];
     
     if (transparency)
     {
@@ -199,7 +198,7 @@ BitmapData_as::fillRect(int x, int y, int w, int h, boost::uint32_t color)
     w = std::min<size_t>(_width - x, w);
     h = std::min<size_t>(_height - y, h);
     
-    BitmapArray::iterator it = _bitmapData->begin() + y * _width;
+    BitmapArray::iterator it = _bitmapData.begin() + y * _width;
     
     // This cannot be past .end() because h + y is no larger than the
     // height of the image.

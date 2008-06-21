@@ -51,8 +51,7 @@ public:
     
     const BitmapArray& getBitmapData() const
     {
-        assert (_bitmapData.get());
-        return *_bitmapData;
+        return _bitmapData;
     }
     
     // Returns an unsigned int representation of the pixel
@@ -74,9 +73,8 @@ private:
     const bool _transparent;
 
     // A static array of 32-bit values holding the actual bitmap data.
-    // The maximum size is 2880 x 2880 * 4 bytes = 33177600 bytes, so
-    // this must be heap allocated.
-    std::auto_ptr<BitmapArray> _bitmapData;
+    // The maximum size is 2880 x 2880 * 4 bytes = 33177600 bytes.
+    BitmapArray _bitmapData;
     
 };
 
