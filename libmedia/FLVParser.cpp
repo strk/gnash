@@ -65,16 +65,31 @@ FLVParser::seek(boost::uint32_t& time)
 {
 	//GNASH_REPORT_FUNCTION;
 
-	if ( time )
-	{
-		LOG_ONCE( log_unimpl("FLVParser::seek with non-zero arg") );
-		return false;
-	}
-
 	boost::mutex::scoped_lock streamLock(_streamMutex);
 	// we might obtain this lock while the parser is pushing the last
 	// encoded frame on the queue, or while it is waiting on the wakeup
 	// condition
+
+	if ( _cuePoints.empty() )
+	{
+		log_debug("No known cue points yet, can't seek");
+		return false;
+	}
+
+	CuePointsMap::iterator it = _cuePoints.lower_bound(time);
+	if ( it == _cuePoints.end() )
+	{
+		log_debug("No cue points greater or equal requested time %d", time);
+		return false;
+	}
+
+	long lowerBoundPosition = it->second;
+	log_debug("Seek requested to time %d triggered seek to cue point at position %d and time %d", time, it->second, it->first);
+	time = it->first;
+
+	_lastParsedPosition=lowerBoundPosition-4; 
+	_parsingComplete=false; // or NetStream will send the Play.Stop event...
+
 
 	// Setting _seekRequest to true will make the parser thread
 	// take care of cleaning up the buffers before going on with
@@ -82,10 +97,6 @@ FLVParser::seek(boost::uint32_t& time)
 	// while the parser was pushing to queue
 	_seekRequest = true;
 
-	_lastParsedPosition=9; // 9 is FLV header size...
-	_parsingComplete=false; // or NetStream will send the Play.Stop event...
-
-	time = 0; // this is the only place we want to go to
 
 	// Finally, in case the parser is now waiting on the wakeup condition,
 	// we wake it up.
@@ -131,10 +142,12 @@ bool FLVParser::parseNextTag()
 	}
 
 
+	long thisTagPos = _lastParsedPosition+4;
+
 	// Seek to next frame and skip the size of the last tag
-	if ( _stream->seek(_lastParsedPosition+4) )
+	if ( _stream->seek(thisTagPos) )
 	{
-		log_error("FLVParser::parseNextTag: can't seek to %d", _lastParsedPosition+4);
+		log_error("FLVParser::parseNextTag: can't seek to %d", thisTagPos);
 		_parsingComplete=true;
 		return false;
 	}
@@ -174,6 +187,18 @@ bool FLVParser::parseNextTag()
 
 	if (tag[0] == AUDIO_TAG)
 	{
+		if ( ! _video ) // if we have video we let that drive cue points
+		{
+			// we can theoretically seek anywhere, but
+			// let's just keep 5 seconds of distance
+			CuePointsMap::iterator it = _cuePoints.lower_bound(timestamp);
+			if ( it == _cuePoints.end() || it->first - timestamp >= 5000)
+			{
+				log_debug("Added cue point at timestamp %d and position %d (audio frame)", timestamp, thisTagPos);
+				_cuePoints[timestamp] = thisTagPos; 
+			}
+		}
+
 		std::auto_ptr<EncodedAudioFrame> frame = readAudioFrame(bodyLength-1, timestamp);
 		if ( ! frame.get() ) { log_error("could not read audio frame?"); }
 		else
@@ -209,8 +234,15 @@ bool FLVParser::parseNextTag()
 
 	if (tag[0] == VIDEO_TAG)
 	{
-		bool isKeyFrame = (tag[11] & 0xf0) >> 4;
-		UNUSED(isKeyFrame); // may be used for building seekable indexes...
+		// 1:keyframe, 2:interlacedFrame, 3:disposableInterlacedFrame
+		int frameType = (tag[11] & 0xf0) >> 4;
+		
+		bool isKeyFrame = (frameType == 1);
+		if ( isKeyFrame )
+		{
+			log_debug("Added cue point at timestamp %d and position %d (key video frame)", timestamp, thisTagPos);
+			_cuePoints[timestamp] = thisTagPos;
+		}
 
 		size_t dataPosition = _stream->tell();
 

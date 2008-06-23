@@ -28,6 +28,7 @@
 
 #include <vector>
 #include <memory>
+#include <map>
 
 #include <boost/thread/mutex.hpp>
 
@@ -227,6 +228,12 @@ private:
 	std::auto_ptr<EncodedAudioFrame> readAudioFrame(boost::uint32_t dataSize, boost::uint32_t timestamp);
 
 	std::auto_ptr<EncodedVideoFrame> readVideoFrame(boost::uint32_t dataSize, boost::uint32_t timestamp);
+
+	/// Position in input stream for each cue point
+	/// first: timestamp
+	/// second: position in input stream
+	typedef std::map<boost::uint64_t, long> CuePointsMap;
+	CuePointsMap _cuePoints;
 };
 
 } // end of gnash::media namespace
