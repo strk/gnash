@@ -31,6 +31,7 @@
 #include <iostream> // std::cerr
 #include <boost/thread/mutex.hpp>
 #include <boost/version.hpp>
+#include <boost/format.hpp>
 
 using gnash::log_debug;
 using gnash::log_error;
@@ -383,6 +384,9 @@ public:
 	/// Put read pointer at given position
 	virtual int seek(int pos);
 
+	// see dox in IOChannel.h
+	virtual int seekNonBlocking(int pos);
+
 	/// Put read pointer at eof
 	virtual void go_to_end();
 
@@ -443,6 +447,10 @@ private:
 	// Attempt at filling the cache up to the given size.
 	// Will call libcurl routines to fetch data.
 	void fillCache(long unsigned size);
+
+	// Filling the cache with whatever is available w/out blocking
+	// Will call libcurl routines to fetch data.
+	void nonBlockingFill();
 
 	// Append sz bytes to the cache
 	size_t cache(void *from, size_t sz);
@@ -505,11 +513,31 @@ CurlStreamFile::cache(void *from, size_t size)
 	return wrote;
 }
 
+/*private*/
+void
+CurlStreamFile::nonBlockingFill()
+{
+	//GNASH_REPORT_FUNCTION;
+
+	if ( ! _running ) return; // nothing to do...
+	CURLMcode mcode;
+	do
+	{
+		mcode = curl_multi_perform(_mhandle, &_running);
+	} while (mcode == CURLM_CALL_MULTI_PERFORM);
+
+	if (mcode != CURLM_OK)
+	{
+		throw gnash::IOException(curl_multi_strerror(mcode));
+	}
+
+}
 
 /*private*/
 void
 CurlStreamFile::fillCache(long unsigned size)
 {
+	//GNASH_REPORT_FUNCTION;
 
 #if GNASH_CURL_VERBOSE
     gnash::log_debug("fillCache(%d), called, currently cached: %d", size, _cached);
@@ -544,15 +572,7 @@ CurlStreamFile::fillCache(long unsigned size)
 	while (_running)
 	{
 
-		do
-		{
-			mcode = curl_multi_perform(_mhandle, &_running);
-		} while (mcode == CURLM_CALL_MULTI_PERFORM);
-
-		if (mcode != CURLM_OK)
-		{
-			throw gnash::GnashException(curl_multi_strerror(mcode));
-		}
+		nonBlockingFill();
 
 		// Do this here to avoid calling select()
 		// when we have enough bytes anyway, or
@@ -909,7 +929,7 @@ CurlStreamFile::seek(int pos)
 
 	if ( _cached < (unsigned int)pos )
 	{
-		gnash::log_error ("Warning: could not cache anough bytes on seek: %d requested, %d cached", pos, _cached);
+		gnash::log_error ("Warning: could not cache enough bytes on seek: %d requested, %d cached", pos, _cached);
 		return -1; // couldn't cache so many bytes
 	}
 
@@ -920,6 +940,42 @@ CurlStreamFile::seek(int pos)
 		return 0;
 	}
 
+}
+
+/*public*/
+int
+CurlStreamFile::seekNonBlocking(int pos)
+{
+	//GNASH_REPORT_FUNCTION;
+
+#ifdef GNASH_CURL_WARN_SEEKSBACK
+	if ( pos < tell() ) {
+		gnash::log_debug("Warning: seek backward requested (%ld from %ld)",
+			pos, tell());
+	}
+#endif
+
+	nonBlockingFill();
+
+	if ( _cached < (unsigned int)pos )
+	{
+		if ( ! _running )
+		{
+			boost::format fmt = boost::format("CurlStreamFile::seekNonBlocking(%d): can't seek beyond EOF") % pos;
+			throw gnash::IOException(fmt.str());
+		}
+		//log_debug("Coudn't reach requested position w/out blocking");
+		return -1;
+
+	}
+
+	if (std::fseek(_cache, pos, SEEK_SET) == -1)
+	{
+		boost::format fmt = boost::format("CurlStreamFile::seekNonBlocking(%d): can't seek in cache: %s") % pos % strerror(errno);
+		throw gnash::IOException(fmt.str());
+	}
+
+	return 0;
 }
 
 /*public*/

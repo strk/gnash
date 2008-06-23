@@ -166,6 +166,16 @@ public:
 	///
 	virtual int seek(int p)=0;
 
+	/// Seek to the specified position if possible w/out blocking.
+	//
+	/// Throw IOException on error (out of range seek).
+	///
+	/// @return 0 on success, or -1 on failure (would block).
+	///
+	/// The default implementation just blocks..
+	///
+	virtual int seekNonBlocking(int p, bool& invalid) { return seek(p); }
+
 	/// Seek to the end of the stream
 	//
 	/// Throw IOException on error

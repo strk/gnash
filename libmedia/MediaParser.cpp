@@ -318,8 +318,9 @@ MediaParser::waitIfNeeded(boost::mutex::scoped_lock& lock)
 {
 	//  We hold a lock on the queue here...
 	bool pc=parsingCompleted();
+	bool ic=indexingCompleted();
 	bool bf=bufferFull();
-	if ( pc||bf ) // TODO: or seekRequested ?
+	if ( pc || (bf && ic) ) // TODO: or seekRequested ?
 	{
 #ifdef GNASH_DEBUG_MEDIAPARSER
 		log_debug("Parser thread waiting on wakeup lock, parsingComplete=%d, bufferFull=%d", pc, bf);
@@ -340,7 +341,7 @@ MediaParser::bufferFull() const
 #ifdef GNASH_DEBUG_MEDIAPARSER
 	log_debug("bufferFull: %d/%d", bl, bt);
 #endif // GNASH_DEBUG_MEDIAPARSER
-	return bl >= bt;
+	return bl > bt;
 }
 
 void
