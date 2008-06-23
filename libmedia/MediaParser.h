@@ -378,6 +378,16 @@ public:
 	///
 	bool parsingCompleted() const { return _parsingComplete; }
 
+	/// Return true of indexing is completed
+	//
+	/// If this function returns false, parseNextChunk will
+	/// be called even when buffers are full. Parsers
+	/// supporting indexing separated from parsing should 
+	/// override this method and have parseNextChunk figure
+	/// if they only need to index or to parse based on bufferFull.
+	///
+	virtual bool indexingCompleted() const { return true; }
+
 	/// Return number of bytes parsed so far
 	virtual boost::uint64_t getBytesLoaded() const { return 0; }
 
@@ -502,12 +512,16 @@ protected:
 	/// Mutex protecting _bytesLoaded (read by main, set by parser)
 	mutable boost::mutex _bytesLoadedMutex;
 
-private:
-
-	// Method to check if buffer is full w/out locking the _qMutex
-	// This is intended for being called by waitIfNeeded, which 
-	// is passed a locked lock on _qMutex
+	/// Method to check if buffer is full w/out locking the _qMutex
+	//
+	///
+	/// This is intended for being called by waitIfNeeded, which 
+	/// is passed a locked lock on _qMutex, and by parseNextChunk
+	/// to determine whether to index-only or also push on queue.
+	///
 	bool bufferFull() const;
+
+private:
 
 	typedef std::deque<EncodedVideoFrame*> VideoFrames;
 	typedef std::deque<EncodedAudioFrame*> AudioFrames;

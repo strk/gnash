@@ -28,6 +28,7 @@
 
 #include <vector>
 #include <memory>
+#include <map>
 
 #include <boost/thread/mutex.hpp>
 
@@ -164,6 +165,14 @@ class DSOEXPORT FLVParser : public MediaParser
 
 public:
 
+	enum tagType
+	{
+		FLV_AUDIO_TAG = 0x08,
+		FLV_VIDEO_TAG = 0x09,
+		FLV_META_TAG = 0x12
+	};
+
+
 	/// \brief
 	/// Create an FLV parser reading input from
 	/// the given IOChannel
@@ -180,6 +189,20 @@ public:
 	// see dox in MediaParser.h
 	virtual bool seek(boost::uint32_t&);
 
+	// see dox in MediaParser.h
+	virtual bool parseNextChunk();
+
+	// see dox in MediaParser.h
+	boost::uint64_t getBytesLoaded() const;
+
+	// see dox in MediaParser.h
+	bool indexingCompleted() const
+	{
+		return _indexingCompleted;
+	}
+
+private:
+
 	/// Parses next tag from the file
 	//
 	/// Returns true if something was parsed, false otherwise.
@@ -187,12 +210,7 @@ public:
 	///
 	bool parseNextTag();
 
-	/// Return number of bytes parsed so far
-	boost::uint64_t getBytesLoaded() const;
-
-private:
-
-	virtual bool parseNextChunk();
+	bool indexNextTag();
 
 	/// Parses the header of the file
 	bool parseHeader();
@@ -203,6 +221,9 @@ private:
 	/// The position where the parsing should continue from.
 	/// Will be reset on seek, and will be protected by the _streamMutex
 	boost::uint64_t _lastParsedPosition;
+
+	/// Position of next tag to index
+	boost::uint64_t _nextPosToIndex;
 
 	/// Audio frame cursor position 
 	//
@@ -227,6 +248,14 @@ private:
 	std::auto_ptr<EncodedAudioFrame> readAudioFrame(boost::uint32_t dataSize, boost::uint32_t timestamp);
 
 	std::auto_ptr<EncodedVideoFrame> readVideoFrame(boost::uint32_t dataSize, boost::uint32_t timestamp);
+
+	/// Position in input stream for each cue point
+	/// first: timestamp
+	/// second: position in input stream
+	typedef std::map<boost::uint64_t, long> CuePointsMap;
+	CuePointsMap _cuePoints;
+
+	bool _indexingCompleted;
 };
 
 } // end of gnash::media namespace
