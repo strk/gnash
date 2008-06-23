@@ -271,15 +271,58 @@ public:
 		return _localFrames.back().registers.resize(register_count);
 	}
 
-	/// Return the number of local registers currently available
+	/// Set value of a register (local or global).
 	//
-	/// Local registers are only meaningful within a function2 context.
+	/// When not in a function context the register will be
+	/// global or none (if regnum is not in the valid range
+	/// of global registers).
 	///
-	size_t num_local_registers() const
-	{
-		assert(!_localFrames.empty());
-		return _localFrames.back().registers.size();
-	}
+	/// When in a function context defining NO registers, 
+	/// we'll behave the same as for a non-function context.
+	///
+	/// When in a function context defining non-zero number
+	/// of local registers, the register set will be local
+	/// or none (if regnum is not in the valid range of local
+	/// registers).
+	///
+	/// @param regnum
+	///	Register number
+	///
+	/// @param v
+	///	Value to assign to the register
+	///
+	/// @return 0 if register num is invalid
+	///         1 if a global register was set
+	///         2 if a local register was set
+	///
+	int setRegister(int regnum, const as_value& v);
+
+	/// Get value of a register (local or global).
+	//
+	/// When not in a function context the register will be
+	/// global or none (if regnum is not in the valid range
+	/// of global registers).
+	///
+	/// When in a function context defining NO registers, 
+	/// we'll behave the same as for a non-function context.
+	///
+	/// When in a function context defining non-zero number
+	/// of local registers, the register set will be local
+	/// or none (if regnum is not in the valid range of local
+	/// registers).
+	///
+	/// @param regnum
+	///	Register number
+	///
+	/// @param v
+	///	Output parameter, will be set to register
+	///     value or untouched if 0 is returned.
+	///
+	/// @return 0 if register num is invalid (v unmodified in this case)
+	///         1 if a global register was set
+	///         2 if a local register was set
+	///
+	int getRegister(int regnum, as_value& v);
 
 	/// Return a reference to the Nth local register.
 	//

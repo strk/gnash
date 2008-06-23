@@ -164,7 +164,7 @@ swf_function::operator()(const fn_call& fn)
 		if ( (m_function2_flags & PRELOAD_THIS) && ! (m_function2_flags & SUPPRESS_THIS) )
 		{
 			// preload 'this' into a register.
-			our_env->local_register(current_reg).set_as_object(fn.this_ptr); 
+			our_env->setRegister(current_reg, as_value(fn.this_ptr)); 
 			current_reg++;
 		}
 
@@ -188,7 +188,8 @@ swf_function::operator()(const fn_call& fn)
 		if (m_function2_flags & PRELOAD_ARGUMENTS)
 		{
 			// preload 'arguments' into a register.
-			our_env->local_register(current_reg).set_as_object(arg_array.get());
+			//our_env->local_register(current_reg).set_as_object(arg_array.get());
+			our_env->setRegister(current_reg, as_value(arg_array.get()));
 			current_reg++;
 		}
 
@@ -207,7 +208,8 @@ swf_function::operator()(const fn_call& fn)
 			// Put 'super' in a register (SWF6+ only).
 			// TOCHECK: should we still set it if not available ?
 			if ( super ) {
-				our_env->local_register(current_reg).set_as_object(super);
+				//our_env->local_register(current_reg).set_as_object(super);
+				our_env->setRegister(current_reg, as_value(super));
 				current_reg++;
 			}
 		}
@@ -227,8 +229,9 @@ swf_function::operator()(const fn_call& fn)
 		{
 			// Put '_root' in a register.
 			// NOTE: _lockroot will be hanlded by getAsRoot()
-			our_env->local_register(current_reg).set_as_object(
-				const_cast<sprite_instance*>(our_env->get_target()->getAsRoot()));
+			as_object* r = const_cast<sprite_instance*>(our_env->get_target()->getAsRoot());
+			//our_env->local_register(current_reg).set_as_object(r);
+			our_env->setRegister(current_reg, as_value(r));
 			current_reg++;
 		}
 
@@ -236,7 +239,8 @@ swf_function::operator()(const fn_call& fn)
 		{
 			// Put '_parent' in a register.
 			as_value parent = our_env->get_variable("_parent");
-			our_env->local_register(current_reg) = parent;
+			//our_env->local_register(current_reg) = parent;
+			our_env->setRegister(current_reg, parent);
 			current_reg++;
 		}
 
@@ -244,7 +248,8 @@ swf_function::operator()(const fn_call& fn)
 		{
 			// Put '_global' in a register.
 			as_object* global = VM::get().getGlobal();
-			our_env->local_register(current_reg).set_as_object(global);
+			//our_env->local_register(current_reg).set_as_object(global);
+			our_env->setRegister(current_reg, as_value(global));
 			current_reg++;
 		}
 
@@ -274,7 +279,8 @@ swf_function::operator()(const fn_call& fn)
 				{
 					// Pass argument into a register.
 					int	reg = m_args[i].m_register;
-					our_env->local_register(reg) = fn.arg(i);
+					//our_env->local_register(reg) = fn.arg(i);
+					our_env->setRegister(reg, fn.arg(i));
 				}
 				else
 				{
