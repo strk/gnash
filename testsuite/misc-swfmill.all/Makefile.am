@@ -29,6 +29,7 @@ SC_XMLTESTS =			\
 	initaction_in_definesprite.xml \
 	zeroframe_definesprite.xml \
 	background.xml \
+	registers.xml \
 	$(NULL)
 
 EXTRA_DIST = $(SC_XMLTESTS) 
@@ -55,6 +56,7 @@ check_SCRIPTS = \
 	dict_override-runner	\
 	initaction_in_definesprite-runner	\
 	zeroframe_definesprite-runner	\
+	registers-runner \
 	$(NULL)
 
 check_PROGRAMS = \
@@ -74,6 +76,10 @@ initaction_in_definesprite-runner: $(srcdir)/../generic-testrunner.sh initaction
 
 zeroframe_definesprite-runner: $(srcdir)/../generic-testrunner.sh zeroframe_definesprite.swf Makefile
 	sh $< -r 50 -c "END OF TEST" $(top_builddir) zeroframe_definesprite.swf > $@
+	chmod 755 $@
+
+registers-runner: $(srcdir)/../generic-testrunner.sh registers.swf Makefile
+	sh $< -r 50 -c "END OF TEST" $(top_builddir) registers.swf > $@
 	chmod 755 $@
 
 backgroundTestRunner_SOURCES = \
