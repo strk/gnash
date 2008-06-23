@@ -973,6 +973,50 @@ as_environment::CallFrame::markReachableResources() const
 		locals->setReachable();
 }
 
+int
+as_environment::setRegister(int regnum, const as_value& v)
+{
+	if ( regnum < 0 ) return 0;
+
+	if ( _localFrames.empty() || _localFrames.back().registers.empty() )
+	{
+		if ( regnum >= numGlobalRegisters ) return 0;
+		m_global_register[regnum] = v;
+		return 1;
+	}
+
+	Registers& registers = _localFrames.back().registers;
+	if ( regnum < registers.size() )
+	{
+		registers[regnum] = v;
+		return 2;
+	}
+
+	return 0;
+}
+
+int
+as_environment::getRegister(int regnum, as_value& v)
+{
+	if ( regnum < 0 ) return 0;
+
+	if ( _localFrames.empty() || _localFrames.back().registers.empty() )
+	{
+		if ( regnum >= numGlobalRegisters ) return 0;
+		v = m_global_register[regnum];
+		return 1;
+	}
+
+	Registers& registers = _localFrames.back().registers;
+	if ( regnum < registers.size() )
+	{
+		v = registers[regnum];
+		return 2;
+	}
+
+	return 0;
+}
+
 void
 as_environment::markReachableResources() const
 {

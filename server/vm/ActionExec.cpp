@@ -416,20 +416,7 @@ ActionExec::processExceptions(TryBlock& t)
                     as_value ex = env.pop();
                     ex.unflag_exception();
                     
-                    if (isFunction2() && t._registerIndex < env.num_local_registers())
-                    {
-#ifdef GNASH_DEBUG_TRY 
-                        log_debug("isFunction2");
-#endif
-                        env.local_register(t._registerIndex) = ex;
-                    }
-                    else if (t._registerIndex < 4)
-                    {
-#ifdef GNASH_DEBUG_TRY 
-                        log_debug("registerIndex < 4");
-#endif
-                        env.global_register(t._registerIndex) = ex;
-                    }
+                    env.setRegister(t._registerIndex, ex);
                 }
             }
             else

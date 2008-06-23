@@ -2023,35 +2023,16 @@ SWFHandlers::ActionPushData(ActionExec& thread)
 
             case pushRegister: // 4
             {
-                boost::uint8_t reg = code[3 + i];
+                int reg = code[3 + i];
                 ++i;
-                if ( thread.isFunction2() && env.num_local_registers() )
-                {
-                    if ( reg < env.num_local_registers() )
-                    {
-                        env.push(env.local_register(reg));
-                    }
-                    else
-                    {
-                        env.push(as_value());
+		as_value v;
+		if ( ! env.getRegister(reg, v) )
+		{
                         IF_VERBOSE_MALFORMED_SWF(
-                        log_swferror(_("register %d "
-                            "out of local registers bounds (0..%d)!"), reg, env.num_local_registers()-1);
+                        log_swferror(_("Invalid register %d in ActionPush"), reg);
                         );
-                    }
-                }
-                else if (reg >= 4)
-                {
-                    env.push(as_value());
-                    IF_VERBOSE_MALFORMED_SWF(
-                    log_swferror(_("register %d "
-                        "out of global registers bounds"), reg);
-                    );
-                }
-                else
-                {
-                    env.push(env.global_register(reg));
-                }
+		}
+		env.push(v);
                 break;
             }
 
@@ -4233,41 +4214,27 @@ SWFHandlers::ActionSetRegister(ActionExec& thread)
     unsigned int reg = code[thread.getCurrentPC() + 3];
 
     // Save top of stack in specified register.
-    if ( thread.isFunction2() && env.num_local_registers() )
+    int ret = env.setRegister(reg, env.top(0));
+    if ( ! ret )
     {
-        if ( reg < env.num_local_registers() )
-        {
-            env.local_register(reg) = env.top(0);
-
-            IF_VERBOSE_ACTION (
-            log_action(_("-------------- local register[%d] = '%s'"),
-                reg, env.top(0));
-            );
-        }
-        else
-        {
-            IF_VERBOSE_MALFORMED_SWF(
-            log_swferror(_("store_register[%d] -- register out of local registers bounds (0..%d)!"), reg, env.num_local_registers()-1);
-            );
-        }
+        IF_VERBOSE_MALFORMED_SWF(
+        log_swferror(_("Invalid register %d in ActionSetRegister"), reg);
+        );
     }
-    else if (reg < 4)
+    else if ( ret == 1 )
     {
-        env.global_register(reg) = env.top(0);
-
         IF_VERBOSE_ACTION (
         log_action(_("-------------- global register[%d] = '%s'"),
-            (unsigned)reg, env.top(0) );
+            reg, env.top(0));
         );
-
     }
     else
     {
-        IF_VERBOSE_MALFORMED_SWF(
-        log_swferror(_("store_register[%d] -- register out of global registers bounds!"), reg);
+        IF_VERBOSE_ACTION (
+        log_action(_("-------------- local register[%d] = '%s'"),
+            reg, env.top(0));
         );
     }
-
 }
 
 const char*
