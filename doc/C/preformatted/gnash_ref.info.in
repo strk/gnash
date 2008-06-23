@@ -1087,10 +1087,46 @@ Option                               Function
 `--with-qt-libraries'                 Directory where the QT libraries
                                      are installed. This is only used by
                                      the Klash plugin.
+`--with-plugins-install=user|system|prefix' This option sets the install
+                                     policy for NPAPI (mozilla) and
+                                     KPARTS (kde) plugins.  Policy
+                                     'user' means plugin will be
+                                     installed only for the configuring
+                                     user.  Policy 'system' will try to
+                                     find a systemwide place for plugins
+                                     (to enable for all).  Policy
+                                     'prefix' will install under
+                                     ${prefix} (npapi/kparts subdirs);
+                                     WARNING: if 'prefix' policy is
+                                     given, plugins won't be found w/out
+                                     further enabling procudures.  The
+                                     default policy is 'user', can be
+                                     overridden for specific plugins.
+`--with-npapi-install=user|system|prefix' This option sets the install
+                                     policy for NPAPI plugin.  Policy
+                                     'user' means plugin will be
+                                     installed in ~/.mozilla/plugins;
+                                     'system' will try to find an
+                                     existing system-wide mozilla plugin
+                                     dir (or bail out if not found);
+                                     'prefix' will install under
+                                     ${prefix}/npapi.
 `--with-npapi-plugindir'              This is the directory to install
                                      the NPAPI (Mozilla) plugin in.  By
                                      default it goes to
                                      ~/.mozilla/plugins.
+`--with-kparts-install=user|system|prefix' This option sets the install
+                                     policy for all KPARTS (kde) files.
+                                     Policy 'user' means plugin will be
+                                     installed in ~/.kde; 'system' will
+                                     find out using kde-config (or bail
+                                     out if not found); 'prefix' will
+                                     install under ${prefix}/kparts.
+                                     The actual prefix can be overridden
+                                     using `--with-kde-pluginprefix' or
+                                     the fine-tuned options.  The
+                                     default at time of writing
+                                     (2008-05-18) is 'user'.
 `--with-kde-pluginprefix'             This option sets the default
                                      install dir for all KPARTS (kde)
                                      files.  The plugin will be
@@ -4552,123 +4588,123 @@ Node: Features50421
 Ref: Configuration Options - Features51021
 Node: Specifying Custom Paths57418
 Ref: Custom Path Options57888
-Node: Compiling the Code67511
-Node: Creating the Documentation68452
-Node: Running the Tests69798
-Node: Using DejaGnu70252
-Node: Increasing Verbosity70615
-Node: Running Some Tests71151
-Node: Running The Tests Manually71971
-Node: Movie tests72633
-Node: ActionScript Unit Tests72987
-Node: Installation73304
-Node: Libraries74617
-Node: Executables75473
-Node: Documentation76343
-Node: Cross Configuring77098
-Node: Software Internals80178
-Node: A Tour of Gnash80447
-Node: The Libraries81015
-Node: libgnashbase81285
-Node: libgnashserver81712
-Node: libgnashmedia82083
-Node: libgnashamf82572
-Node: libgnashbackend82994
-Node: libgnashplugin83309
-Node: libklashpart83515
-Node: The Applications83685
-Node: The Standalone Player84055
-Node: Gprocessor84352
-Node: SOLdumper84746
-Node: Dumpshm85013
-Node: The Plugin85232
-Node: Current Implementation85722
-Node: GUI Support86263
-Node: Mozplugger87952
-Node: Klash89843
-Node: The Message Logging System90393
-Node: Logging System API91950
-Node: The LogFile Instance94784
-Node: Sound handling in Gnash96268
-Node: Sound types97011
-Node: Sound parsing97548
-Node: Sound playback98116
-Node: The SDL sound backend98646
-Node: The Gstreamer backend99965
-Node: Future audio backends100981
-Node: Detailed description of the Gstreamer backend101471
-Node: Testing103722
-Node: Testing Tools104193
-Node: Test Cases105025
-Node: Writing ActionScript Tests105604
-Node: Writing Ming-based self-contained SWF tests108107
-Node: Using Ming-based test generators facilities109264
-Node: Writing self-contained SWF tests with other compilers111624
-Node: Writing Test Runners114749
-Node: Using the generic test runner for self-contained SWF tests116498
-Node: Writing Movie testers118588
-Node: Adding New ActionScript Class120328
-Node: Prototype121508
-Node: Declaration122925
-Node: Instantiation123190
-Node: Methods123817
-Node: Accessing Arguments124208
-Node: Returning a Value to ActionScript124604
-Node: Additional fn_call Members124983
-Node: Dynamic Properties125837
-Node: The as_value Object Type127342
-Node: Data Types127780
-Node: Determining the Type128101
-Node: Fetching the Value128633
-Node: Setting the Value and Type129123
-Node: Further Reading129717
-Node: Object ActionScript Class130132
-Node: The Methods of the Class130472
-Node: The Properties of the Object Class130811
-Node: Object Class Conformance131126
-Node: Reporting Bugs132665
-Node: Get a Fresh Binary Package133648
-Node: Determine if the bug was previously reported134434
-Node: Review the bug writing guidelines135252
-Node: Filing a bug report136303
-Node: Gnash Extensions136586
-Node: Creating A New Extension138856
-Node: Crafting an Extension140274
-Node: Debugging An Extension144578
-Node: Included Extensions146270
-Node: Gtk Extension146714
-Node: File I/O Extension147701
-Node: MySQL Extension148887
-Node: RTMP Protocol149738
-Node: AMF Format159534
-Node: Mozilla/Firefox NPAPI Plugin160510
-Node: Plugin C API161528
-Node: Plugin C++ API163387
-Node: OpenGL and Threads166651
-Node: Plugin Event Handling167979
-Node: Appendix168948
-Node: Code Style169100
-Node: Authors172930
-Node: GNU Free Documentation License173639
-Node: 0_ PREAMBLE174402
-Node: 1_ APPLICABILITY AND DEFINITIONS175708
-Ref: fdl-document175933
-Ref: fdl-modified176224
-Ref: fdl-secondary176411
-Ref: fdl-invariant177056
-Ref: fdl-cover-texts177305
-Ref: fdl-transparent177518
-Ref: fdl-title-page178808
-Node: 2_ VERBATIM COPYING179197
-Node: 3_ COPYING IN QUANTITY180177
-Node: 4_ MODIFICATIONS182534
-Node: 5_ COMBINING DOCUMENTS188594
-Node: 6_ COLLECTIONS OF DOCUMENTS190091
-Node: 7_ AGGREGATION WITH INDEPENDENT WORKS190982
-Node: 8_ TRANSLATION192210
-Node: 9_ TERMINATION193113
-Node: 10_ FUTURE REVISIONS OF THIS LICENSE193768
-Node: Addendum194908
+Node: Compiling the Code69993
+Node: Creating the Documentation70934
+Node: Running the Tests72280
+Node: Using DejaGnu72734
+Node: Increasing Verbosity73097
+Node: Running Some Tests73633
+Node: Running The Tests Manually74453
+Node: Movie tests75115
+Node: ActionScript Unit Tests75469
+Node: Installation75786
+Node: Libraries77099
+Node: Executables77955
+Node: Documentation78825
+Node: Cross Configuring79580
+Node: Software Internals82660
+Node: A Tour of Gnash82929
+Node: The Libraries83497
+Node: libgnashbase83767
+Node: libgnashserver84194
+Node: libgnashmedia84565
+Node: libgnashamf85054
+Node: libgnashbackend85476
+Node: libgnashplugin85791
+Node: libklashpart85997
+Node: The Applications86167
+Node: The Standalone Player86537
+Node: Gprocessor86834
+Node: SOLdumper87228
+Node: Dumpshm87495
+Node: The Plugin87714
+Node: Current Implementation88204
+Node: GUI Support88745
+Node: Mozplugger90434
+Node: Klash92325
+Node: The Message Logging System92875
+Node: Logging System API94432
+Node: The LogFile Instance97266
+Node: Sound handling in Gnash98750
+Node: Sound types99493
+Node: Sound parsing100030
+Node: Sound playback100598
+Node: The SDL sound backend101128
+Node: The Gstreamer backend102447
+Node: Future audio backends103463
+Node: Detailed description of the Gstreamer backend103953
+Node: Testing106204
+Node: Testing Tools106675
+Node: Test Cases107507
+Node: Writing ActionScript Tests108086
+Node: Writing Ming-based self-contained SWF tests110589
+Node: Using Ming-based test generators facilities111746
+Node: Writing self-contained SWF tests with other compilers114106
+Node: Writing Test Runners117231
+Node: Using the generic test runner for self-contained SWF tests118980
+Node: Writing Movie testers121070
+Node: Adding New ActionScript Class122810
+Node: Prototype123990
+Node: Declaration125407
+Node: Instantiation125672
+Node: Methods126299
+Node: Accessing Arguments126690
+Node: Returning a Value to ActionScript127086
+Node: Additional fn_call Members127465
+Node: Dynamic Properties128319
+Node: The as_value Object Type129824
+Node: Data Types130262
+Node: Determining the Type130583
+Node: Fetching the Value131115
+Node: Setting the Value and Type131605
+Node: Further Reading132199
+Node: Object ActionScript Class132614
+Node: The Methods of the Class132954
+Node: The Properties of the Object Class133293
+Node: Object Class Conformance133608
+Node: Reporting Bugs135147
+Node: Get a Fresh Binary Package136130
+Node: Determine if the bug was previously reported136916
+Node: Review the bug writing guidelines137734
+Node: Filing a bug report138785
+Node: Gnash Extensions139068
+Node: Creating A New Extension141338
+Node: Crafting an Extension142756
+Node: Debugging An Extension147060
+Node: Included Extensions148752
+Node: Gtk Extension149196
+Node: File I/O Extension150183
+Node: MySQL Extension151369
+Node: RTMP Protocol152220
+Node: AMF Format162016
+Node: Mozilla/Firefox NPAPI Plugin162992
+Node: Plugin C API164010
+Node: Plugin C++ API165869
+Node: OpenGL and Threads169133
+Node: Plugin Event Handling170461
+Node: Appendix171430
+Node: Code Style171582
+Node: Authors175412
+Node: GNU Free Documentation License176121
+Node: 0_ PREAMBLE176884
+Node: 1_ APPLICABILITY AND DEFINITIONS178190
+Ref: fdl-document178415
+Ref: fdl-modified178706
+Ref: fdl-secondary178893
+Ref: fdl-invariant179538
+Ref: fdl-cover-texts179787
+Ref: fdl-transparent180000
+Ref: fdl-title-page181290
+Node: 2_ VERBATIM COPYING181679
+Node: 3_ COPYING IN QUANTITY182659
+Node: 4_ MODIFICATIONS185016
+Node: 5_ COMBINING DOCUMENTS191076
+Node: 6_ COLLECTIONS OF DOCUMENTS192573
+Node: 7_ AGGREGATION WITH INDEPENDENT WORKS193464
+Node: 8_ TRANSLATION194692
+Node: 9_ TERMINATION195595
+Node: 10_ FUTURE REVISIONS OF THIS LICENSE196250
+Node: Addendum197390
 
 End Tag Table
 

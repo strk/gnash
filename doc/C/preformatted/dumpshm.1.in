@@ -1,23 +1,29 @@
-.\" -*- coding: us-ascii -*-
+'\" -*- coding: us-ascii -*-
 .if \n(.g .ds T< \\FC
 .if \n(.g .ds T> \\F[\n[.fam]]
 .de URL
 \\$2 \(la\\$1\(ra\\$3
 ..
 .if \n(.g .mso www.tmac
-.TH dumpshm 1 "13 February 2008"  
+.TH dumpshm 1 "20 June 2008" "" ""
 .SH NAME
-dumpshm \- Gnash LocalConnection memory Dumper
+dumpshm \- Gnash LocalConnection Memory Dumper
 .SH Synopsis
 .nf
 
 dumpshm (options)... (file)...
 .fi
 .SH DESCRIPTION
-Dump information about the shared memory segment used by the
-LocalConnection ActionScript class. This memory segment is comprised
-of a header, and a collection of SWF AMF Objects, normally not
-viewable by the user.
+When any Flash player, including the Gnash player,
+plays a Flash "movie", the movie can contain
+scripts. These scripts can call ActionScript classes. One such class
+is LocalConnection. LocalConnection passes objects from one movie to
+another, via your computer's shared memory system.
+.PP
+Dumpshm prints these shared memory segments, which are comprised of
+a header, and a collection of SWF AMF Objects created by the movie.
+It is used for debugging (or understanding the operation of) a Flash 
+movie.
 .TP 
 -h
 Print usage info.
