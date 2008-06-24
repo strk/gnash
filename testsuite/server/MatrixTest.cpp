@@ -237,10 +237,10 @@ main(int /*argc*/, char** /*argv*/)
     
     check_equals(m1_inverse.sx, 16384 * 65536);
     check_equals(m1_inverse.shy, 0);
-    check_equals(m1_inverse.tx, -327680);
+    check_equals(m1_inverse.tx, -16384 * 20);
     check_equals(m1_inverse.shx, 0);
     check_equals(m1_inverse.sy, 16384 * 65536);
-    check_equals(m1_inverse.ty, -327680);
+    check_equals(m1_inverse.ty, -16384 * 20);
     
     // concatenate the inverse matrix and orignial matrix.
     m1_inverse.concatenate(m1);
