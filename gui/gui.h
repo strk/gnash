@@ -270,6 +270,11 @@ public:
     //
     /// @param show true if the menu bar should be shown.
     virtual void showMenu(bool show);
+
+    /// Sets whether scaling should be allowed (for fscommand)
+    //
+    /// @param allow true if stage scaling should be allowed
+    virtual void allowScale(bool allow);
     
     // Toggle between fullscreen and normal mode
     void toggleFullscreen();

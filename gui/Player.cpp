@@ -456,7 +456,7 @@ void
 Player::fs_callback(gnash::sprite_instance* movie, const std::string& command,
                                 const std::string& args)
 {
-    log_debug(_("fs_callback(%p): %s %s"), (void*)movie, command, args);
+    //log_debug(_("fs_callback(%p): %s %s"), (void*)movie, command, args);
 
     gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
 
@@ -550,7 +550,13 @@ Player::fs_callback(gnash::sprite_instance* movie, const std::string& command,
     // FSCommand allowscale
     if (noCaseCompare(command, "allowscale"))
     {
-        log_unimpl(_("FsCommand allowscale called with argument %s"), args);
+	//log_debug("allowscale: %s", args);
+        if (noCaseCompare(args, "true")) _gui->allowScale(true);
+        else
+	{
+		if ( atoi(args.c_str()) ) _gui->allowScale(true);
+		else _gui->allowScale(false);
+	}
         return;
     }
 

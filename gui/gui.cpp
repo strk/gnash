@@ -188,6 +188,19 @@ Gui::showMenu(bool /* show */)
 }
 
 void
+Gui::allowScale(bool allow)
+{
+	if ( ! _stage )
+	{
+		log_error("Gui::allowScale called before a movie_root was available");
+		return;
+	}
+
+	if ( allow ) _stage->setStageScaleMode(movie_root::showAll);
+	else _stage->setStageScaleMode(movie_root::noScale);
+}
+
+void
 Gui::toggleFullscreen()
 {
 	if (_fullscreen) {
