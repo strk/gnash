@@ -98,6 +98,7 @@ libgnashplugin_la_SOURCES  = plugin.cpp \
         mozilla-sdk/np_entry.cpp
 
 libgnashplugin_la_LIBADD   = \
+	$(GLIB_LIBS) \
 	$(NULL)
 
 if PLUGIN_LINK_UNDEFINED
