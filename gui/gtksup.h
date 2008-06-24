@@ -264,6 +264,8 @@ class GtkGui : public Gui
 
     void stopHook();
     void playHook();
+
+    guint _advanceSourceTimer;
 };
 
 // end of namespace gnash 

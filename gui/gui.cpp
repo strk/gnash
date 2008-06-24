@@ -611,6 +611,20 @@ Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed)
 				case gnash::key::LEFT_BRACKET:
 					menu_step_backward();
 					break;
+				case gnash::key::MINUS:
+				{
+					// Max interval allowed: 1 second (1FPS)
+					unsigned int ni = std::min(_interval+2, 1000u);
+					setInterval(ni);
+					break;
+                                }
+				case gnash::key::PLUS:
+				{
+					// Min interval allowed: 1/100 second (100FPS)
+					unsigned int ni = std::max(_interval-2, 10u);
+					setInterval(ni);
+					break;
+                                }
 				default:
 					break;
 			}

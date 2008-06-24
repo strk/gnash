@@ -106,6 +106,7 @@ GtkGui::GtkGui(unsigned long xid, float scale, bool loop, unsigned int depth)
 	,_menubar(0)
 	,_vbox(0)
 	,_glue()
+	,_advanceSourceTimer(0)
 {
 }
 
@@ -237,6 +238,7 @@ GtkGui::run()
     // Kick-start before setting the interval timeout
     advance_movie(this);
     
+#if 0
     // From http://www.idt.mdh.se/kurser/cd5040/ht02/gtk/glib/glib-the-main-event-loop.html#G-TIMEOUT-ADD-FULL
     //
     // Note that timeout functions may be delayed, due to the
@@ -246,10 +248,11 @@ GtkGui::run()
     // on the current time and the given interval (it does not try to
     // 'catch up' time lost in delays).
     //
-    // TODO: this is not what we need here, we want instead to 'catch up' !!
+    // NOTE: this is OK (research on 'elastic frame rate').
     //
-    g_timeout_add_full (G_PRIORITY_LOW, _interval, (GSourceFunc)advance_movie,
+    _advanceSourceTimer = g_timeout_add_full (G_PRIORITY_LOW, _interval, (GSourceFunc)advance_movie,
                         this, NULL);
+#endif
 
     gtk_main();
     return true;
@@ -541,6 +544,15 @@ void
 GtkGui::setInterval(unsigned int interval)
 {
     _interval = interval;
+    if (_advanceSourceTimer)
+    {
+        g_source_remove(_advanceSourceTimer);
+    }
+#if 1
+    _advanceSourceTimer = g_timeout_add_full (G_PRIORITY_LOW, _interval, (GSourceFunc)advance_movie,
+                        this, NULL);
+    log_debug("Advance interval timer set to %d ms (~ %d FPS)", _interval, 1000/_interval);
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
