@@ -611,6 +611,31 @@ Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed)
 				case gnash::key::LEFT_BRACKET:
 					menu_step_backward();
 					break;
+				case gnash::key::MINUS:
+				{
+					// Max interval allowed: 1 second (1FPS)
+					unsigned int ni = std::min(_interval+2, 1000u);
+					setInterval(ni);
+					break;
+                                }
+				case gnash::key::PLUS:
+				{
+					// Min interval allowed: 1/100 second (100FPS)
+					unsigned int ni = std::max(_interval-2, 10u);
+					setInterval(ni);
+					break;
+                                }
+				case gnash::key::EQUALS:
+				{
+					if ( _stage )
+					{
+						float fps = _stage->get_movie_definition()->get_frame_rate();
+						// Min interval allowed: 1/100 second (100FPS)
+						unsigned int ni = 1000.0/fps;
+						setInterval(ni);
+					}
+					break;
+                                }
 				default:
 					break;
 			}
@@ -1163,7 +1188,7 @@ Gui::fpsCounterTick()
       fps_rate_min = rate;
       fps_rate_max = rate; 
     } else {
-      fps_rate_min = std::max<float>(fps_rate_min, rate);
+      fps_rate_min = std::min<float>(fps_rate_min, rate);
       fps_rate_max = std::max<float>(fps_rate_max, rate);
     }
     
