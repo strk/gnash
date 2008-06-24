@@ -625,6 +625,17 @@ Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed)
 					setInterval(ni);
 					break;
                                 }
+				case gnash::key::EQUALS:
+				{
+					if ( _stage )
+					{
+						float fps = _stage->get_movie_definition()->get_frame_rate();
+						// Min interval allowed: 1/100 second (100FPS)
+						unsigned int ni = 1000.0/fps;
+						setInterval(ni);
+					}
+					break;
+                                }
 				default:
 					break;
 			}
