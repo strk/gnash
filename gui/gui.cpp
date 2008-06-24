@@ -1177,7 +1177,7 @@ Gui::fpsCounterTick()
       fps_rate_min = rate;
       fps_rate_max = rate; 
     } else {
-      fps_rate_min = std::max<float>(fps_rate_min, rate);
+      fps_rate_min = std::min<float>(fps_rate_min, rate);
       fps_rate_max = std::max<float>(fps_rate_max, rate);
     }
     
