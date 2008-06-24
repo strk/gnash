@@ -54,3 +54,4 @@ testsuite/samples/Makefile.in
 testsuite/server/Makefile.in
 testsuite/swfdec/Makefile.in
 utilities/Makefile.in
+po/*.gmo
