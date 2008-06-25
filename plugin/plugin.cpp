@@ -788,87 +788,6 @@ nsPluginInstance::startProc(Window win)
 		cout << "ERROR: child to parent pipe() failed: " << strerror(errno) << endl;
 	}
 
-	_childpid = fork();
-
-	// If the fork failed, childpid is -1. So print out an error message.
-	if (_childpid == -1)
-	{
-		cout << "ERROR: dup2() failed: " << strerror(errno) << endl;
-		return;
-	}
-
-	// If we are the parent and fork() worked, childpid is a positive integer.
-	if (_childpid > 0)
-	{
-
-		// we want to write to p2c pipe, so close read-fd0
-		ret = close (p2c_pipe[0]);
-		if (ret == -1)
-		{
-			cout << "ERROR: p2c_pipe[0] close() failed: " << strerror(errno)
-								<< endl;
-		}
-
-		// we want to read from c2p pipe, so close read-fd1
-		ret = close (c2p_pipe[1]);
-		if (ret == -1)
-		{
-			cout << "ERROR: c2p_pipe[1] close() failed: " << strerror(errno)
-								<< endl;
-		}
-	
-
-		cout << "Forked successfully, child process PID is " 
-								<< _childpid
-								<< endl;
-
-		_ichan = g_io_channel_unix_new(c2p_pipe[0]);
-		g_io_channel_set_close_on_unref(_ichan, true);
-		_ichanWatchId = g_io_add_watch(_ichan, (GIOCondition)(G_IO_IN|G_IO_HUP), (GIOFunc)handlePlayerRequestsWrapper, this);
-
-		return;
-	}
-
-	// This is the child scope.
-
-	// We want to read parent to child, so close write-fd1
-	ret = close (p2c_pipe[1]); 
-	if (ret == -1)
-	{
-		cout << "ERROR: close() failed: " << strerror(errno) << endl;
-	}
-
-	// close standard input and direct read-fd1 to standard input
-	ret = dup2 (p2c_pipe[0], fileno(stdin));
-	
-	if (ret == -1)
-	{
-		cout << "ERROR: dup2() failed: " << strerror(errno) << endl;
-	}
-
-	// Close all of the browser's file descriptors that we just 
-	// inherited (including p2c_pipe[0] that we just dup'd to fd 0).
-	// Experiments show seventy or eighty file descriptors open in
-	// typical cases.  Rather than close all the thousands of possible file
-	// descriptors, we start after stderr and keep closing higher numbers
-	// until we encounter ten fd's in a row that
-	// aren't open. This will tend to close most fd's in most programs.
-	int numfailed = 0, closed = 0;
-	int anfd = fileno(stderr)+1;
-	for ( ; numfailed < 10; anfd++)
-	{
-		if ( anfd == c2p_pipe[1] ) continue; // don't close this
-		if ( anfd == c2p_pipe[0] ) continue; // don't close this either (correct?)
-		ret = close (anfd);
-		if (ret < 0) numfailed++;
-		else
-		{
-			numfailed = 0;
-			closed++;
-		}
-	}
-
-	cout << "Closed " << closed << " files." << endl;
 
 	/*
 	Setup the command line for starting Gnash
@@ -959,8 +878,100 @@ nsPluginInstance::startProc(Window win)
 	assert(argc <= maxargc);
 
 	/*
+	  Argument List prepared, now fork(), close file descriptors and execv()
+	 */
+
+	_childpid = fork();
+
+	// If the fork failed, childpid is -1. So print out an error message.
+	if (_childpid == -1)
+	{
+		cout << "ERROR: dup2() failed: " << strerror(errno) << endl;
+		return;
+	}
+
+	// If we are the parent and fork() worked, childpid is a positive integer.
+	if (_childpid > 0)
+	{
+		delete[] argv;//don't need the argument list
+		
+		// we want to write to p2c pipe, so close read-fd0
+		ret = close (p2c_pipe[0]);
+		if (ret == -1)
+		{
+			cout << "ERROR: p2c_pipe[0] close() failed: " << strerror(errno)
+								<< endl;
+		}
+
+		// we want to read from c2p pipe, so close read-fd1
+		ret = close (c2p_pipe[1]);
+		if (ret == -1)
+		{
+			cout << "ERROR: c2p_pipe[1] close() failed: " << strerror(errno)
+								<< endl;
+		}
+	
+
+		cout << "Forked successfully, child process PID is " 
+								<< _childpid
+								<< endl;
+
+		_ichan = g_io_channel_unix_new(c2p_pipe[0]);
+		g_io_channel_set_close_on_unref(_ichan, true);
+		_ichanWatchId = g_io_add_watch(_ichan, (GIOCondition)(G_IO_IN|G_IO_HUP), (GIOFunc)handlePlayerRequestsWrapper, this);
+
+		return;
+	}
+
+	// This is the child scope.
+	//FF3 uses jemalloc and it has problems after the fork(), do NOT
+	//use memory functions (malloc()/free()/new/delete) after the fork()
+	//in the child thread process
+
+	// We want to read parent to child, so close write-fd1
+	ret = close (p2c_pipe[1]); 
+	if (ret == -1)
+	{
+		cout << "ERROR: close() failed: " << strerror(errno) << endl;
+	}
+
+	// close standard input and direct read-fd1 to standard input
+	ret = dup2 (p2c_pipe[0], fileno(stdin));
+	
+	if (ret == -1)
+	{
+		cout << "ERROR: dup2() failed: " << strerror(errno) << endl;
+	}
+
+	// Close all of the browser's file descriptors that we just 
+	// inherited (including p2c_pipe[0] that we just dup'd to fd 0).
+	// Experiments show seventy or eighty file descriptors open in
+	// typical cases.  Rather than close all the thousands of possible file
+	// descriptors, we start after stderr and keep closing higher numbers
+	// until we encounter ten fd's in a row that
+	// aren't open. This will tend to close most fd's in most programs.
+	int numfailed = 0, closed = 0;
+	int anfd = fileno(stderr)+1;
+	for ( ; numfailed < 10; anfd++)
+	{
+		if ( anfd == c2p_pipe[1] ) continue; // don't close this
+		if ( anfd == c2p_pipe[0] ) continue; // don't close this either (correct?)
+		ret = close (anfd);
+		if (ret < 0) numfailed++;
+		else
+		{
+			numfailed = 0;
+			closed++;
+		}
+	}
+
+	cout << "Closed " << closed << " files." << endl;
+
+
+	/*
 	Start the desired executable and go away.
 	*/
+
 	
 	cout << "Starting process: ";
 
@@ -995,9 +1006,11 @@ nsPluginInstance::startProc(Window win)
 	execv(argv[0], const_cast<char**>(argv));
 
 	// if execv returns, an error has occurred.
-        perror("executing standalone gnash");
-
-	delete[] argv;
+	perror("executing standalone gnash");
+	
+	//could actually cause a deadlock due to jemalloc and we
+	//are exiting now anyways
+	//delete[] argv;
 
 	exit (-1);
 }
