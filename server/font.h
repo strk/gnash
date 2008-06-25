@@ -271,8 +271,11 @@ private:
 
 	/// Initialize the freetype rasterizer
 	//
+	/// NOTE: this is 'const' for lazy initialization.
+	///
 	/// Return true on success, false on error
-	bool initDeviceFontProvider();
+	///
+	bool initDeviceFontProvider() const;
 
 	typedef std::vector< GlyphInfo > GlyphInfoVect;
 
@@ -313,7 +316,7 @@ private:
 	typedef std::map<kerning_pair, float> kernings_table;
 	kernings_table m_kerning_pairs;
 
-	std::auto_ptr<FreetypeGlyphsProvider> _ftProvider;
+	mutable std::auto_ptr<FreetypeGlyphsProvider> _ftProvider;
 
 protected:
 

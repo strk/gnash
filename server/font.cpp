@@ -96,6 +96,7 @@ GlyphInfo::markReachableResources() const
 	{
 		assert(!m_name.empty());
 
+#if 0 // will be initialized when needed, hopefully only by main thread
 		if ( ! initDeviceFontProvider() )
 		{
 			log_error(_("Could not initialize device font face '%s'"), m_name.c_str());
@@ -104,6 +105,7 @@ GlyphInfo::markReachableResources() const
 		{
 			log_debug("Initialized device font face '%s'%s%s", m_name, bold ? " bold" : "", italic ? " italic" : "");
 		}
+#endif
 	}
 
 	font::~font()
@@ -143,11 +145,12 @@ GlyphInfo::markReachableResources() const
 			}
 		}
 
-		// TODO: initialize the deviceFontProvider only when needed ?
+#if 0 // initialize the deviceFontProvider only when needed !
 		if ( ! m_name.empty() && ! initDeviceFontProvider() )
 		{
 			log_error("Could not initialize device font face '%s'", m_name.c_str());
 		}
+#endif
 	}
 
 	// Read a DefineFont tag
@@ -421,11 +424,12 @@ GlyphInfo::markReachableResources() const
 		}
 
 		in->read_string_with_length(m_name);
-		// TODO: initialize the deviceFontProvider only when needed ?
+#if 0 // initialize the deviceFontProvider only when needed !
 		if ( ! m_name.empty() && ! initDeviceFontProvider() )
 		{
 			log_error(_("Could not initialize device font face '%s'"), m_name.c_str());
 		}
+#endif
 
 		in->ensureBytes(1);
 		int	flags = in->read_u8();
@@ -488,7 +492,7 @@ GlyphInfo::markReachableResources() const
 		}
 
 		// Try adding an os font, of possible
-		if ( ! embedded && _ftProvider.get() )
+		if ( ! embedded )
 		{
 			glyph_index = const_cast<font*>(this)->add_os_glyph(code);
 		}
@@ -551,8 +555,11 @@ GlyphInfo::markReachableResources() const
 		{
 			if ( ! _ftProvider.get() )
 			{
-				log_error("Device font provider was not initialized, can't get unitsPerEM");
-				return 0; // can't query it..
+				if ( ! initDeviceFontProvider() )
+				{
+					log_error("Device font provider was not initialized, can't get unitsPerEM");
+					return 0; // can't query it..
+				}
 			}
 			return _ftProvider->unitsPerEM();
 		}
@@ -561,7 +568,15 @@ GlyphInfo::markReachableResources() const
 	int
 	font::add_os_glyph(boost::uint16_t code)
 	{
-		assert ( _ftProvider.get() );
+		if ( ! _ftProvider.get() )
+		{
+			if ( ! initDeviceFontProvider() )
+			{
+				log_error("Device font provider was not initialized, can't get unitsPerEM");
+				return -1; // can't provide it...
+			}
+		}
+
 		assert(_device_code_table.find(code) == _device_code_table.end());
 
 		float advance;
@@ -592,7 +607,7 @@ GlyphInfo::markReachableResources() const
 	}
 
 	bool
-	font::initDeviceFontProvider()
+	font::initDeviceFontProvider() const
 	{
 		if ( m_name.empty() )
 		{
