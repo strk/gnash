@@ -33,6 +33,7 @@
 #include "sound_handler.h"
 #include "timers.h" // for Timer use
 #include "GnashKey.h" // key::code
+#include "gui.h"
 
 #include <utility>
 #include <iostream>
@@ -118,7 +119,8 @@ movie_root::movie_root()
 	_scaleMode(showAll),
 	_displayState(normal),
 	_recursionLimit(256),
-	_timeoutLimit(15)
+	_timeoutLimit(15),
+	_gui(0)
 {
 }
 
@@ -195,13 +197,25 @@ movie_root::setRootMovie(movie_instance* movie)
 	}
 	catch (ActionLimitException& al)
 	{
-		log_error(_("ActionLimits hit during setRootMovie: %s. "
-		        		"Disabling scripts"), al.what());
-		disableScripts();
-		clearActionQueue();
+		boost::format fmt = boost::format(_("ActionLimits hit during setRootMovie: %s. Disable scripts ?")) % al.what();
+		handleActionLimitHit(fmt.str());
 	}
 
 	cleanupAndCollect();
+}
+
+/*private*/
+void
+movie_root::handleActionLimitHit(const std::string& msg)
+{
+	bool disable = true;
+	if ( _gui ) disable = _gui->yesno(msg);
+	else log_error("No gui registered, assuming 'Yes' answer to question: %s", msg);
+	if ( disable )
+	{
+		disableScripts();
+		clearActionQueue();
+	}
 }
 
 void
@@ -888,9 +902,8 @@ movie_root::fire_mouse_event()
     }
     catch (ActionLimitException& al)
     {
-        log_error(_("ActionLimits hit during mouse event processing: %s. Disabling scripts"), al.what());
-        disableScripts();
-        clearActionQueue();
+        boost::format fmt = boost::format(_("ActionLimits hit during mouse event processing: %s. Disable scripts ?")) % al.what();
+        handleActionLimitHit(fmt.str());
     }
 
     return need_redraw;

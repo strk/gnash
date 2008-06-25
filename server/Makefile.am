@@ -28,6 +28,7 @@ FREETYPE_SOURCES = FreetypeGlyphsProvider.h FreetypeGlyphsProvider.cpp
 
 # Only enable if we're configured with --enable-mp3
 AM_CPPFLAGS = \
+	-I$(top_srcdir)/gui \
 	-I$(top_srcdir)/libnet \
 	-I$(top_srcdir)/backend \
 	-I$(top_srcdir)/server/swf \
