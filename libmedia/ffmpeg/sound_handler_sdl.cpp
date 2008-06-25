@@ -246,7 +246,7 @@ void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset,
 
 	// If this is called from a streamsoundblocktag, we only start if this
 	// sound isn't already playing.
-	if (start_position > 0 && sounddata->m_active_sounds.size() > 0) {
+	if (start_position > 0 && ! sounddata->m_active_sounds.empty()) {
 		return;
 	}
 
@@ -559,7 +559,7 @@ unsigned int SDL_sound_handler::tell(int sound_handle)
 	if (sounddata->m_active_sounds.empty()) return 0;
 
 	// We use the first active sound of this.
-	active_sound* asound = sounddata->m_active_sounds[0];
+	active_sound* asound = sounddata->m_active_sounds.front();
 
 	// Return the playhead position in milliseconds
 	unsigned int ret = asound->samples_played / audioSpec.freq * 1000;
@@ -849,6 +849,13 @@ sound_data::clearActiveSounds()
 	m_active_sounds.clear();
 }
 
+sound_data::ActiveSounds::iterator
+sound_data::eraseActiveSound(ActiveSounds::iterator i)
+{
+	delete *i;
+	return m_active_sounds.erase(i);
+}
+
 /*private*/
 void
 SDL_sound_handler::mixActiveSound(active_sound& sound, sound_data& sounddata, Uint8* buffer, unsigned int buffer_length)
@@ -899,7 +906,7 @@ SDL_sound_handler::mixActiveSound(active_sound& sound, sound_data& sounddata, Ui
 			assert(sound.dataSize() > sound.position);
 			
 			// temp raw buffer
-			Uint8* tmp_raw_buffer;
+			Uint8* tmp_raw_buffer=0;
 			boost::uint32_t tmp_raw_buffer_size = 0;
 			boost::uint32_t decodedBytes = 0;
 
@@ -977,23 +984,28 @@ SDL_sound_handler::mixActiveSound(active_sound& sound, sound_data& sounddata, Ui
 void
 SDL_sound_handler::mixSoundData(sound_data& sounddata, Uint8* buffer, unsigned int buffer_length)
 {
-	// TODO: don't call size() on every iteration
-	for(boost::uint32_t i = 0; i<sounddata.m_active_sounds.size(); i++)
+	for (sound_data::ActiveSounds::iterator
+		 i=sounddata.m_active_sounds.begin();
+		 i != sounddata.m_active_sounds.end(); // don't cache .end(), isn't necessarely safe on erase
+	    )
 	{
 
 		// Temp variables to make the code simpler and easier to read
-		active_sound* sound = sounddata.m_active_sounds[i];
+		active_sound* sound = *i; 
 
 		mixActiveSound(*sound, sounddata, buffer, buffer_length);
 
 		// Sound is done, remove it from the active list
 		if (sound->position == sound->dataSize() && sound->raw_position == sound->rawDataSize() && sound->loop_count == 0)
 		{
-			sounddata.eraseActiveSound(i);
+			i = sounddata.eraseActiveSound(i);
 			soundsPlaying--;
 			_soundsStopped++;
-
 		} 
+		else
+		{
+			++i;
+		}
 	}
 }
 
