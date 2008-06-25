@@ -372,7 +372,7 @@ AudioDecoderFfmpeg::decodeFrame(boost::uint8_t* input, boost::uint32_t inputSize
 		int resampledFrameSize = int(std::ceil(outSize*resampleFactor));
 
 		// Allocate just the required amount of bytes
-		boost::uint8_t* resampledOutput = new boost::uint8_t[bufsize]; // be safe for now, but should be resampledFrameSize;
+		boost::uint8_t* resampledOutput = new boost::uint8_t[resampledFrameSize]; 
 
 #ifdef GNASH_DEBUG_AUDIO_DECODING
 		log_debug("Calling the resampler; "
