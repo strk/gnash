@@ -267,7 +267,7 @@ AudioDecoderFfmpeg::decode(boost::uint8_t* input, boost::uint32_t inputSize, boo
 		// Now, decode the frame. We use the ::decodeFrame specialized function
 		// here so resampling is done appropriately
 		boost::uint32_t outSize = 0;
-		boost::uint8_t* outBuf = decodeFrame(frame, framesize, outSize);
+		boost::scoped_array<boost::uint8_t> outBuf ( decodeFrame(frame, framesize, outSize) );
 
 		if (!outBuf)
 		{
@@ -302,7 +302,7 @@ AudioDecoderFfmpeg::decode(boost::uint8_t* input, boost::uint32_t inputSize, boo
 			if ( retBufSize ) std::copy(tmp, tmp+retBufSize, retBuf);
 			delete [] tmp;
 		}
-		std::copy(outBuf, outBuf+outSize, retBuf+retBufSize);
+		std::copy(outBuf.get(), outBuf.get()+outSize, retBuf+retBufSize);
 		retBufSize += static_cast<unsigned int>(outSize);
 	}
 

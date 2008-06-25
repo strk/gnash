@@ -134,18 +134,18 @@ public:
 	//
 	/// NOTE: This class *owns* all active sounds
 	///
-	typedef std::vector<active_sound*> ActiveSounds;
+	typedef std::list<active_sound*> ActiveSounds;
 
 	ActiveSounds m_active_sounds;
 
 	/// Drop all active sounds
 	void clearActiveSounds();
 
-	/// Drop an active sound
-	void eraseActiveSound(size_t i)
-	{
-		m_active_sounds.erase(m_active_sounds.begin() + i);
-	}
+	/// Drop an active sound (by iterator)
+	//
+	/// @return iterator after the one being erased
+	///
+	ActiveSounds::iterator eraseActiveSound(ActiveSounds::iterator i);
 };
 
 /// Used to hold the info about active sounds
@@ -174,7 +174,7 @@ public:
 	~active_sound()
 	{
 		deleteDecodedData();
-		if (decoder) delete decoder;
+		delete decoder;
 	}
 
 	/// The decoder object used to convert the data into the playable format
