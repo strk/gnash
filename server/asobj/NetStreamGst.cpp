@@ -530,15 +530,16 @@ NetStreamGst::handleMessage (GstMessage *message)
   switch (GST_MESSAGE_TYPE (message)) {
     case GST_MESSAGE_ERROR:
     {
-      GError *err;
-      gchar *debug;
+      GError *err = NULL;
+      gchar *debug = NULL;
       gst_message_parse_error (message, &err, &debug);
       
       log_error(_("NetStream playback halted; module %s reported: %s\n"),
                 gst_element_get_name(GST_MESSAGE_SRC (message)), err->message);
       
       g_error_free (err);
-      g_free (debug);
+      if(debug)
+      	g_free (debug);
       
       setStatus(streamNotFound);
       setStatus(playStop);
@@ -554,17 +555,18 @@ NetStreamGst::handleMessage (GstMessage *message)
       break;
     case GST_MESSAGE_TAG:
     {
-      GstTagList* taglist;
+      GstTagList* taglist = NULL;
 
       gst_message_parse_tag(message, &taglist);
       
-      gchar* value;
+      gchar* value = NULL;
       if (!gst_tag_list_get_string(taglist, "___function_name___", &value)) {
         break;
       }
       
       std::string funcname(value);
-      g_free(value);
+      if(value)
+      	g_free(value);
       
       gst_tag_list_remove_tag (taglist, "___function_name___");
 
@@ -575,7 +577,9 @@ NetStreamGst::handleMessage (GstMessage *message)
 
       processNotify(funcname, o);
       
-      g_free(taglist);
+      if(taglist)
+	      g_free(taglist);
+      
       break;
     }    
     case GST_MESSAGE_BUFFERING:
@@ -594,9 +598,7 @@ NetStreamGst::handleMessage (GstMessage *message)
     }
     case GST_MESSAGE_STATE_CHANGED:
     {
-      GstState oldstate;
-      GstState newstate;
-      GstState pending;
+      GstState oldstate, newstate, pending;
 
       gst_message_parse_state_changed(message, &oldstate, &newstate, &pending);
     
@@ -639,7 +641,8 @@ NetStreamGst::missingPluginMsg(GstMessage* message)
   if (!gst_install_plugins_supported()) {
     log_error(_("Missing Gstreamer plugin: %s. Please consider installing it."),
       plugin_name);
-    g_free(plugin_name);
+   	if(plugin_name)
+    	g_free(plugin_name);
     return;
   }
 #endif
@@ -650,7 +653,7 @@ NetStreamGst::missingPluginMsg(GstMessage* message)
   
   log_debug(_("Missing plugin: %s. Will attempt to start system installer"),
     plugin_name);
-
+if(plugin_name)
   g_free(plugin_name);
 #else
 UNUSED(message);

@@ -1,3 +1,8 @@
+2008-06-26 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* server/asobj/NetStreamGst.cpp: Make sure
+	we only free alloc'ed pointers.
+
 2008-06-20 Russ Nelson <nelson@crynwr.com>
 
 	* docs/C/preformatted/cygnal.1.in: old typo
