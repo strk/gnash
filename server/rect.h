@@ -26,262 +26,302 @@
 
 #include <cassert> // for inlines
 #include <iostream> // for output operator
+#include <boost/cstdint.hpp>
 
 // Forward decl
 namespace gnash {
-	class matrix;
-	class SWFStream;
+    class matrix;
+    class SWFStream;
 }
 
 namespace gnash {
 
 /// \brief
-/// Rectangle class, basically a wrapper around a
-/// gnash::geometry::Range2d<float> with a few
-/// additional methods for reading it from the
-/// SWFStream ..
-//
-/// used by render handler (?)
+/// Rectangle class, see swf defined rectangel record.
 ///
 class DSOLOCAL rect
 {
 private:
 
-	geometry::Range2d<float> _range;
+    boost::int32_t _xMin; // TWIPS
+    boost::int32_t _yMin; // TWIPS
+    boost::int32_t _xMax; // TWIPS
+    boost::int32_t _yMax; // TWIPS
 
 public:
+    /// Read a bit-packed rectangle from an SWF stream
+    //
+    /// Format of the bit-packed rectangle is:
+    ///
+    /// bits  | name  | description
+    /// ------+-------+-------------------------
+    ///   5   | nbits | number of bits used in subsequent values
+    /// nbits | xmin  | minimum X value
+    /// nbits | xmax  | maximum X value
+    /// nbits | ymin  | minimum Y value
+    /// nbits | ymax  | maximum Y value
+    ///
+    /// If max values are less then min values the SWF is malformed;
+    /// in this case this method will raise an swf_error and set the
+    /// rectangle to the NULL rectangle. See is_null().
+    /// 
+    ///
+    void    read(SWFStream& in);
 
-	/// Ouput operator
-	friend std::ostream& operator<< (std::ostream& os, const rect& rect);
+    // TODO: drop this, currently here to avoid touching all callers
+    void    read(SWFStream* in) { read(*in); }
+    
+    // constants used for this class.
+    enum rect_flags_e
+    {
+        RECT_NULL_MARK = 0x80000000,
+        RECT_MAX_INT32 = 0x7fffffff
+    };
+    
+    /// Ouput operator
+    friend std::ostream& operator<< (std::ostream& os, const rect& rect);
 
-	/// Construct a NULL rectangle
-	rect()
-		:
-		_range()
-	{}
+    /// Construct a NULL rectangle
+    rect()
+        :
+       _xMin(RECT_NULL_MARK), _yMin(RECT_NULL_MARK),
+       _xMax(RECT_NULL_MARK), _yMax(RECT_NULL_MARK)
+    {}
 
-	/// Construct a rectangle with given coordinates
-	rect(float xmin, float ymin, float xmax, float ymax)
-		:
-		_range(xmin, ymin, xmax, ymax)
-	{
-	}
+    /// Construct a rectangle with given coordinates
+    rect(int xmin, int ymin, int xmax, int ymax)
+        :
+        _xMin(xmin), _yMin(ymin), _xMax(xmax), _yMax(ymax)
+    {
+    }
 
-	/// returns true if this is the NULL rectangle
-	bool is_null() const
-	{
-		return _range.isNull();
-	}
+    /// returns true if this is a NULL rectangle
+    bool is_null() const
+    {
+        return (_xMin == (boost::int32_t)(RECT_NULL_MARK)) 
+            && (_xMax == (boost::int32_t)(RECT_NULL_MARK));
+    }
 
-	/// returns true if this is the WORLD rectangle
-	bool is_world() const
-	{
-		return _range.isWorld();
-	}
+    /// set the rectangle to the NULL value
+    void set_null()
+    {
+        _xMin = _yMin = _xMax = _yMax = RECT_NULL_MARK;
+    }
 
-	/// set the rectangle to the NULL value
-	void set_null()
-	{
-		_range.setNull();
-	}
+    /// TODO: deprecate this 'world' concept.
+    bool is_world() const
+    {
+        return _xMin == (- RECT_MAX_INT32 >> 9) 
+            && _yMin == (- RECT_MAX_INT32 >> 9) 
+            && _xMax == (RECT_MAX_INT32 >> 9)
+            && _yMax == (RECT_MAX_INT32 >> 9);
+    }
+    /// set the rectangle to the WORLD value
+    void set_world()
+    {
+        _xMin = _yMin = - RECT_MAX_INT32 >> 9;
+        _xMax = _yMax = RECT_MAX_INT32 >> 9;
+    }
 
-	/// set the rectangle to the WORLD value
-	void set_world()
-	{
-		_range.setWorld();
-	}
+    /// Return width of this rectangle in TWIPS
+    boost::int32_t  width() const
+    {
+        return _xMax - _xMin;
+    }
 
-	/// Read a bit-packed rectangle from an SWF stream
-	//
-	/// Format of the bit-packed rectangle is:
-	///
-	///     bits  | name  | description
-	///     ------+-------+-------------------------
-	///	  5   | nbits | number of bits used in subsequent values
-	///	nbits | xmin  | minimum X value
-	///	nbits | xmax  | maximum X value
-	///	nbits | ymin  | minimum Y value
-	///	nbits | ymax  | maximum Y value
-	///
-	/// If max values are less then min values the SWF is malformed;
-	/// in this case this method will raise an swf_error and set the
-	/// rectangle to the NULL rectangle. See is_null().
-	///	
-	///
-	void	read(SWFStream& in);
+    /// Return height of this rectangle in TWIPS
+     boost::int32_t height() const
+    {
+        return _yMax - _yMin;
+    }
 
-	// TODO: drop this, currently here to avoid touching all callers
-	void	read(SWFStream* in) { read(*in); }
+    /// Get the x coordinate of the left-up corner.
+    boost::int32_t  get_x_min() const
+    {
+        assert( !is_null() );
+        return _xMin;
+    }
 
-	void	print() const;
+    /// Get the x coordinate of the right-down corner.
+    boost::int32_t  get_x_max() const
+    {
+        assert( !is_null() );
+        return _xMax;
+    }
 
-	/// Return true if the specified point is inside this rect.
-	bool	point_test(float x, float y) const
-	{
-		return _range.contains(x, y);
-	}
+    /// Get the y coordinate of the left-up corner.
+    boost::int32_t  get_y_min() const
+    {
+        assert( !is_null() );
+        return _yMin;
+    }
 
-	/// Expand this rectangle to enclose the given point.
-	void	expand_to_point(float x, float y)
-	{
-		_range.expandTo(x, y);
-	}
-	
-	/// Expand this rectangle to enclose the given circle.
-	void	expand_to_circle(float x, float y, float radius)
-	{
-		_range.expandToCircle(x, y, radius);
-	}
+    /// Get the y coordinate of the right-down corner.
+    boost::int32_t  get_y_max() const
+    {
+        assert( !is_null() );
+        return _yMax;
+    }
 
-	/// Set ourself to bound the given point
-	void	enclose_point(float x, float y)
-	{
-		_range.setTo(x, y);
-	}
+    /// Shift this rectangle horizontally
+    //
+    /// A positive offset will shift to the right,
+    /// A negative offset will shift to the left.
+    ///
+    void shift_x(boost::int32_t offset)
+    {
+        if( !is_null() ) {
+            _xMin += offset;
+            _xMax += offset;
+        }
+    }
 
-	/// Return width this rectangle
-	float	width() const
-	{
-		return _range.width();
-	}
+    /// Shift this rectangle vertically
+    //
+    /// A positive offset will increment y values.
+    /// A negative offset will decrement y values.
+    ///
+    void shift_y(boost::int32_t offset)
+    {
+        if( !is_null() ) {
+            _yMin += offset;
+            _yMax += offset;
+        }
+    }
 
-	/// Return height this rectangle
-	float	height() const
-	{
-		return _range.height();
-	}
+    /// Get one of the rect verts.
+    point   get_point(int i) const;
+    
+    /// Return true if the given point is inside this rect.
+    bool    point_test(boost::int32_t x, boost::int32_t y) const
+    {
+        if( is_null() ) {
+            return false;
+        }
+        
+        if (x < _xMin || x > _xMax || y < _yMin || y > _yMax) {
+            return false;
+        }else {
+            return true;
+        }
+    }
 
-	/// Shift this rectangle horizontally
-	//
-	/// A positive offset will shift to the right,
-	/// A negative offset will shift to the left.
-	///
-	void shift_x(float offset)
-	{
-		_range.shiftX(offset);
-	}
+    /// Set ourself to bound the given point
+    void    set_to_point(boost::int32_t x, boost::int32_t y)
+    {
+        _xMin = _xMax = x;
+        _yMin = _yMax = y;
+    }
+    
+    /// Expand this rectangle to enclose the given point.
+    void    expand_to_point(boost::int32_t x, boost::int32_t y)
+    {
+        if( is_null() ) {
+            _xMin = _yMin = x;
+            _xMax = _yMax = y;
+        }else {
+            expand_to(x, y);
+        }
+    }
 
-	/// Shift this rectangle vertically
-	//
-	/// A positive offset will increment y values.
-	/// A negative offset will decrement y values.
-	///
-	/// TODO: document what the orientation is supposed	
-	///	  to be (up/down) ?
-	///
-	void shift_y(float offset)
-	{
-		_range.shiftY(offset);
-	}
+    /// Set ourself to bound a rectangle that has been transformed by m.  
+    /// This is an axial bound of an oriented (and/or
+    /// sheared, scaled, etc) box.
+    void    enclose_transformed_rect(const matrix& m, const rect& r);
+    
+    /// Expand this rectangle to enclose the given circle.
+    void    expand_to_circle(boost::int32_t x, boost::int32_t y, boost::int32_t radius)
+    {
+        // I know it's easy to make code work for minus radius.
+        // would do that untill I see the requirement for a SWF RECTANGLE.
+        assert(radius >= 0); 
+        if( is_null() ) {
+            _xMin = x - radius;
+            _yMin = y - radius;
+            _xMax = x + radius;
+            _yMax = y + radius;
+        }else {
+            _xMin = std::min(_xMin, x - radius);
+            _yMin = std::min(_yMin, y - radius);
+            _xMax = std::max(_xMax, x + radius);
+            _yMax = std::max(_yMax, y + radius);
+        }
+    }
+      
+    /// Same as enclose_transformed_rect but expanding the current rect instead
+    /// of replacing it.
+    DSOEXPORT void  expand_to_transformed_rect(const matrix& m, const rect& r);
+    
+    /// Makes union of the given and the current rect
+    DSOEXPORT void  expand_to_rect(const rect& r);
+    
+    void    set_lerp(const rect& a, const rect& b, float t);
 
-	/// Scale this rectangle horizontally
-	//
-	/// A positive factor will make the rectangle bigger.
-	/// A negative factor will make the rectangle smaller.
-	/// A factor of 1 will leave it unchanged.
-	///
-	void scale_x(float factor)
-	{
-		_range.scaleX(factor);
-	}
+    /// \brief
+    /// Make sure that the given point falls in this rectangle, 
+    /// modifying it's coordinates if needed.
+    void clamp(point& p) const;
 
-	/// Scale this rectangle vertically
-	//
-	/// A positive factor will make the rectangle bigger.
-	/// A negative factor will make the rectangle smaller.
-	/// A factor of 1 will leave it unchanged.
-	///
-	void scale_y(float factor)
-	{
-		_range.scaleY(factor);
-	}
+    /// Construct and return a Range2d object.
+    // TODO: deprecate this.
+    geometry::Range2d<float> getRange() const
+    {
+        if( is_null() )
+        {
+           // Range2d has a differnt idea about what is a null rect.
+           return geometry::Range2d<float>(geometry::nullRange); //null range
+        }
+        else if( is_world() ) 
+        {
+            return geometry::Range2d<float>(geometry::worldRange); //world range
+        }
+        else
+        {
+            return geometry::Range2d<float>(_xMin, _yMin, _xMax, _yMax);
+        }
+    }
 
-	/// Get min X ordinate.
-	//
-	/// Don't call this against a null rectangle
-	///
-	float	get_x_min() const
-	{
-		return _range.getMinX();
-	}
+    /// Return a string representation for this rectangle
+    std::string toString() const;
 
-	/// Get max X ordinate.
-	//
-	/// Don't call this against a null rectangle
-	///
-	float	get_x_max() const
-	{
-		return _range.getMaxX();
-	}
+private:
+    // make ourself to enclose the given point.
+    void expand_to(boost::int32_t x, boost::int32_t y)
+    {
+        _xMin = std::min(_xMin, x);
+        _yMin = std::min(_yMin, y);
+        _xMax = std::max(_xMax, x);
+        _yMax = std::max(_yMax, y);
+    }
 
-	/// Get min Y ordinate.
-	//
-	/// Don't call this against a null rectangle
-	///
-	float	get_y_min() const
-	{
-		return _range.getMinY();
-	}
+    boost::int32_t  min4(boost::int32_t x1, boost::int32_t x2, boost::int32_t x3, boost::int32_t x4)
+    {
+        return std::min(std::min(x1, x2), std::min(x3, x4));
+    }
 
-	/// Get max Y ordinate.
-	//
-	/// Don't call this against a null rectangle
-	///
-	float	get_y_max() const
-	{
-		return _range.getMaxY();
-	}
-
-	/// Get one of the rect verts.
-	//
-	/// Don't call on a NULL rect !
-	///
-	/// TODO: deprecate this ?
-	point	get_corner(int i) const;
-
-	/// \brief
-	/// Make sure that the given point falls
-	/// in this rectangle, modifying it's coordinates
-	/// if needed.
-	///
-	/// Don't call against a NULL rectangle !
-	///
-	void clamp(point& p) const;
-
-	/// Set ourself to bound a rectangle that has been transformed
-	/// by m.  This is an axial bound of an oriented (and/or
-	/// sheared, scaled, etc) box.
-	void	enclose_transformed_rect(const matrix& m, const rect& r);
-	
-	/// Same as enclose_transformed_rect but expanding the current rect instead
-	/// of replacing it.
-	DSOEXPORT void	expand_to_transformed_rect(const matrix& m, const rect& r);
-	
-	/// Makes union of the given and the current rect
-	DSOEXPORT void  expand_to_rect(const rect& r);
-
-	void	set_lerp(const rect& a, const rect& b, float t);
-
-
-	/// \brief
-	/// Returns a const reference to the underlying
-	/// Range2d object.
-	const geometry::Range2d<float> & getRange() const
-	{
-		return _range;
-	}
-
-	/// Return a string representation for this rectangle
-	std::string toString() const;
+    boost::int32_t  max4(boost::int32_t x1, boost::int32_t x2, boost::int32_t x3, boost::int32_t x4)
+    {
+        return std::max(std::max(x1, x2), std::max(x3, x4));
+    }
 };
 
 inline std::ostream&
-operator<< (std::ostream& os, const rect& rect)
+operator<< (std::ostream& os, const rect& r)
 {
-	return os << rect._range;
+    if( !r.is_null() ) {
+        os << "RECT(" 
+           << r.get_x_min() << "," 
+           << r.get_y_min() << "," 
+           << r.get_x_max() << "," 
+           << r.get_y_max() << ")";
+    }else {
+        os << "NULL RECT!";
+    }
+
+    return os;
 }
 
-}	// namespace gnash
+}   // namespace gnash
 
 #endif // GNASH_RECT_H
 

@@ -66,7 +66,7 @@ video_stream_definition::readDefineVideoStream(SWFStream* in, SWF::tag_type tag,
 	_width = in->read_u16();
 	_height = in->read_u16();
 
-	m_bound.enclose_point(0, 0);
+	m_bound.set_to_point(0, 0);
 	m_bound.expand_to_point(PIXELS_TO_TWIPS(_width), PIXELS_TO_TWIPS(_height));
 
 	m_reserved_flags = in->read_uint(5);

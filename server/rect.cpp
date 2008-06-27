@@ -26,155 +26,165 @@
 
 namespace gnash {
 
-void	rect::read(SWFStream& in)
+void    rect::read(SWFStream& in)
 {
-	in.align();
+    in.align();
+    in.ensureBits(5);
+    int nbits = in.read_uint(5);
+    in.ensureBits(nbits*4);
+    
+    _xMin = in.read_sint(nbits);
+    _xMax = in.read_sint(nbits);
+    _yMin = in.read_sint(nbits);
+    _yMax = in.read_sint(nbits);
 
-	in.ensureBits(5);
-	unsigned int nbits = in.read_uint(5);
-
-	in.ensureBits(nbits*4);
-	float xmin = (float) in.read_sint(nbits);
-	float xmax = (float) in.read_sint(nbits);
-	float ymin = (float) in.read_sint(nbits);
-	float ymax = (float) in.read_sint(nbits);
-
-	// Check for swapped X or Y values
-	if (xmax < xmin || ymax < ymin)
-	{
-		// We set invalid rectangles to NULL, but we might instead
-		// want to actually swap the values IFF the proprietary player
-		// does so. TODO: check it out.
-		IF_VERBOSE_MALFORMED_SWF(
-		log_swferror("Invalid rectangle: xmin=%g xmax=%g "
-			"ymin=%g ymax=%g. Read as Null.",
-			xmin, xmax, ymin, ymax);
-		);
-		_range.setNull();
-		return;
-	}
-
-	_range.setTo(xmin, ymin, xmax, ymax);
-
+    // Check if this rect is valid.
+    if (_xMax < _xMin || _yMax < _yMin)
+    {
+        // We set invalid rectangles to NULL, but we might instead
+        // want to actually swap the values IFF the proprietary player
+        // does so. TODO: check it out.
+        IF_VERBOSE_MALFORMED_SWF(
+        log_swferror("Invalid rectangle: "
+            "xMin=%g xMax=%g yMin=%g yMax=%g", _xMin, _xMax, _yMin, _yMax);
+        );
+        set_null();
+    } 
 }
-
-// Debug spew.
-void	rect::print() const
-{
-	log_parse("%s", toString().c_str());
-}
-
 
 point
-rect::get_corner(int i) const
+rect::get_point(int i) const
 // Get one of the rect verts.
 {
-	assert(i >= 0 && i < 4);
-	return point(
-		(i == 0 || i == 3) ? _range.getMinX() : _range.getMaxX(),
-		(i < 2) ? _range.getMinY() : _range.getMaxY() );
+    assert( !is_null() );
+    
+    point p;
+    switch(i)
+    {
+    case 0:
+        p.x = _xMin; p.y = _yMin;
+        break;
+    case 1:
+        p.x = _xMax; p.y = _yMin;
+        break;
+    case 2:
+        p.x = _xMax; p.y = _yMax;
+        break;
+    case 3:
+        p.x = _xMin; p.y = _yMax;
+        break;
+    default:
+        assert(0);
+        break;
+    }
+    return p;
 }
 
 
-void	rect::enclose_transformed_rect(const matrix& m, const rect& r)
-// Set ourself to bound a rectangle that has been transformed
-// by m.  This is an axial bound of an oriented (and/or
-// sheared, scaled, etc) box.
-{
-	// Assertion unneeded as get_corner will
-	// do that
-	//assert ( ! _range.isNull() );
+void    rect::enclose_transformed_rect(const matrix& m, const rect& r)
+// Set ourself to bound a rectangle that has been transformed by m.  
+{   
+    boost::int32_t  x1 = r.get_x_min();
+    boost::int32_t  y1 = r.get_y_min();
+    boost::int32_t  x2 = r.get_x_max();
+    boost::int32_t  y2 = r.get_y_max();
+    
+    point  p0(x1, y1);
+    point  p1(x2, y1);
+    point  p2(x2, y2);
+    point  p3(x1, y2);
+    
+    m.transform(p0);
+    m.transform(p1);
+    m.transform(p2);
+    m.transform(p3);
 
-	// Get the transformed bounding box.
-	point	p0, p1, p2, p3;
-	m.transform(&p0, r.get_corner(0));
-	m.transform(&p1, r.get_corner(1));
-	m.transform(&p2, r.get_corner(2));
-	m.transform(&p3, r.get_corner(3));
-
-	enclose_point(p0.x, p0.y);
-	expand_to_point(p1.x, p1.y);
-	expand_to_point(p2.x, p2.y);
-	expand_to_point(p3.x, p3.y);
+    set_to_point(p0.x, p0.y);
+    expand_to(p1.x, p1.y);
+    expand_to(p2.x, p2.y);
+    expand_to(p3.x, p3.y);
 }
 
 void  rect::expand_to_rect(const rect& r) 
-{
-	_range.expandTo(r._range);
-	return;
-}	
+// Expand ourself to enclose the given rect.
+{    
+    if( r.is_null() ) {
+        return;
+    }
+    
+    if( is_null() ) {
+        *this = r;
+    }else {
+        _xMin = std::min(_xMin, r.get_x_min());
+        _yMin = std::min(_yMin, r.get_y_min());
+        _xMax = std::max(_xMax, r.get_x_max());
+        _yMax = std::max(_yMax, r.get_y_max());
+    }
+}   
 
-void	rect::expand_to_transformed_rect(const matrix& m, const rect& r)
-{
-	// a null rectangle will add nothing, and a world
-	// rectangle will always be world, no matter
-	// how you transform it.
-	if ( is_world() || r.is_null() ) return;
-	if ( r.is_world() ) 
-	{
-		set_world();
-		return;
-	}
+void    rect::expand_to_transformed_rect(const matrix& m, const rect& r)
+// Expand ourself to a transformed rect.
+{   
+    if ( r.is_null() )
+    {
+         return;
+    }
 
-	// Get the transformed bounding box.
-	point	p0, p1, p2, p3;
-	m.transform(&p0, r.get_corner(0));
-	m.transform(&p1, r.get_corner(1));
-	m.transform(&p2, r.get_corner(2));
-	m.transform(&p3, r.get_corner(3));
+    boost::int32_t  x1 = r.get_x_min();
+    boost::int32_t  y1 = r.get_y_min();
+    boost::int32_t  x2 = r.get_x_max();
+    boost::int32_t  y2 = r.get_y_max();
+    
+    point  p0(x1, y1);
+    point  p1(x2, y1);
+    point  p2(x2, y2);
+    point  p3(x1, y2);
+    
+    m.transform(p0);
+    m.transform(p1);
+    m.transform(p2);
+    m.transform(p3);
 
-	// TODO: check for numeric overflow ?
-
-	_range.expandTo(p0.x, p0.y);
-	_range.expandTo(p1.x, p1.y);
-	_range.expandTo(p2.x, p2.y);
-	_range.expandTo(p3.x, p3.y);
+    if( is_null() ) {
+        set_to_point(p0.x, p0.y);   
+    }else {
+        expand_to(p0.x, p0.y);
+    }
+    expand_to(p1.x, p1.y);
+    expand_to(p2.x, p2.y);
+    expand_to(p3.x, p3.y);
 }
 
-
-void	rect::set_lerp(const rect& a, const rect& b, float t)
+void    rect::set_lerp(const rect& a, const rect& b, float t)
 // Set this to the lerp of a and b.
 {
-	// Don't need to assert here, get_{x,y}_{min,max} will do that
-	//assert ( ! a.is_null() ); // caller should check this
-	//assert ( ! b.is_null() ); // caller should check this
-	
-	// TODO: remove double calls to get_{x,y}_{min,max}
-	//       to remove double equivalent assertions
-	using utility::flerp;
-	float xmin = flerp(a.get_x_min(), b.get_x_min(), t);
-	float ymin = flerp(a.get_y_min(), b.get_y_min(), t);
-	float xmax = flerp(a.get_x_max(), b.get_x_max(), t);
-	float ymax = flerp(a.get_y_max(), b.get_y_max(), t);
-
-	_range.setTo(xmin, ymin, xmax, ymax);
+    assert( !a.is_null() );
+    assert( !b.is_null() );
+    
+    using utility::flerp;   
+    _xMin = (boost::int32_t)(flerp(a.get_x_min(), b.get_x_min(), t));
+    _yMin = (boost::int32_t)(flerp(a.get_y_min(), b.get_y_min(), t));
+    _xMax = (boost::int32_t)(flerp(a.get_x_max(), b.get_x_max(), t));
+    _yMax = (boost::int32_t)(flerp(a.get_y_max(), b.get_y_max(), t));
 }
 
 void
 rect::clamp(point& p) const
 {
-	// assertion unneeded, as get{Min,Max}{X,Y}
-	// will assert itself is called against
-	// a Null Range2d
-	//assert( ! _range.isNull() );
-
-	// nothing to do, point is surely inside
-	if ( _range.isWorld() ) return;
-
-	p.x = utility::clamp<float>(p.x, _range.getMinX(), _range.getMaxX());
-	p.y = utility::clamp<float>(p.y, _range.getMinY(), _range.getMaxY());
+    assert( !is_null() );
+    p.x = utility::clamp<float>(p.x, _xMin, _xMax);
+    p.y = utility::clamp<float>(p.y, _yMin, _yMax);
 }
 
 std::string
 rect::toString() const
 {
-	std::stringstream ss;
-	ss << _range;
-	return ss.str();
+    std::stringstream ss;
+    ss << *this;
+    return ss.str();
 }
 
-
-}	// end namespace gnash
+}   // end namespace gnash
 
 
 // Local Variables:

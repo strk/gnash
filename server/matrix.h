@@ -145,6 +145,15 @@ public:
         p.x = x;
         p.y = y;
     }
+
+    /// Transform the given point by our matrix.
+    void    transform(boost::int32_t& x, boost::int32_t& y) const
+    {
+        boost::int32_t t0 = Fixed16Mul(sx, x) + Fixed16Mul(shy,y) + tx;
+        boost::int32_t t1 = Fixed16Mul(shx,x) + Fixed16Mul(sy, y) + ty;
+        x = t0;
+        y = t1;
+    }
     
     /// Transform point 'p' by our matrix. 
     //

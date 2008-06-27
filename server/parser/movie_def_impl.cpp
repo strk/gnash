@@ -416,9 +416,8 @@ SWFMovieDefinition::readHeader(std::auto_ptr<IOChannel> in, const std::string& u
 	if(m_frame_count == 0) m_frame_count++;
 
 	IF_VERBOSE_PARSE(
-		m_frame_size.print();
-		log_parse(_("frame rate = %f, frames = %d"),
-			m_frame_rate, m_frame_count);
+		log_parse(_("frame size = %s, frame rate = %f, frames = %d"),
+			m_frame_size, m_frame_rate, m_frame_count);
 	);
 
 	setBytesLoaded(_str->tell());
