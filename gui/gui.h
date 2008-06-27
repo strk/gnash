@@ -369,6 +369,18 @@ public:
     /// Set the stage to advance/display
     void setStage(movie_root* stage);
 
+    /// Prompt user with a question she can answer with yes/no
+    //
+    /// @param question
+    ///        The question to ask user
+    ///
+    /// @return
+    ///        true for YES, false for NO
+    ///
+    /// The default implementation always returns true.
+    ///
+    virtual bool yesno(const std::string& question);
+
 protected:
 
     /// Default constructor. Initialises members to safe defaults.
@@ -389,8 +401,10 @@ protected:
      * @param depth Colour depth to be used in the client area of our window.
      */
     Gui(unsigned long xid, float scale, bool loop, unsigned int depth);
+
     /// Determines if playback should restart after the movie ends.
     bool            _loop;
+
     /// The X Window ID to attach to. If zero, we create a new window.
     unsigned long   _xid;
 
@@ -408,23 +422,30 @@ protected:
 
     /// Desired colour depth in bits.
     int             _depth;
+
     /// Main loop interval: the time between successive advance_movie calls.
     unsigned int    _interval;
+
     /// The handler which is called to update the client area of our window.
     render_handler* _renderer;
+
     /// Signals that the next frame must be re-rendered completely because the
     /// window size did change.
     bool            _redraw_flag;
+
     // True if Gnash is running in fullscreen
     bool _fullscreen;
+
     // True if mouse pointer is showing
     bool _mouseShown;
+
     // Maximum number of advances before exit; 0 for no limit.
     unsigned long _maxAdvances;
 
     /// Called by Gui::stop().  This can be used by GUIs to implement pause
     /// widgets (so that resuming a stopped animation is more user-friendly)
     virtual void stopHook() {}
+
     /// Called by Gui::play().
     virtual void playHook() {}
 
