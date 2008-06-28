@@ -27,10 +27,9 @@ namespace gnash
 {
 
 GtkCairoGlue::GtkCairoGlue()
-  : _image(0),
-    _drawing_area(0),
-    _cairo_handle(0),
-    _cairo_offscreen(0)
+  : _cairo_handle(0),
+    _cairo_offscreen(0),
+    _image(0)
 {
 }
 
@@ -60,6 +59,14 @@ GtkCairoGlue::createRenderHandler()
     _renderer = renderer::cairo::create_handler();
 
     return _renderer;
+}
+
+void 
+GtkCairoGlue::beforeRendering()
+{
+  if (_image && _image->type == GDK_IMAGE_SHARED) {
+    gdk_flush();
+  }
 }
 
 void
@@ -126,6 +133,8 @@ cairo_surface_t*
 GtkCairoGlue::createGdkImageSurface(const int& width, const int& height)
 {
   GdkVisual* visual = gdk_drawable_get_visual(_drawing_area->window);
+  assert(_drawing_area);
+  assert(visual);
   cairo_format_t format;
 
   if (!cairoFormatFromVisual(visual, &format)) {

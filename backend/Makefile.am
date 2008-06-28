@@ -59,7 +59,8 @@ noinst_HEADERS = \
 	render_handler_agg_compat.h \
 	render_handler_agg_style.h \
 	render_handler_cairo.h \
-	render_handler_ogl.h
+	render_handler_ogl.h \
+        PathParser.h
 
 # bin_PROGRAMS = gnash
 
@@ -69,7 +70,7 @@ if  BUILD_OGL_RENDERER
 if HAVE_OPENGL
 noinst_LTLIBRARIES += libgnashogl.la
 #plugins_LTLIBRARIES += libgnashogl.la
-libgnashogl_la_SOURCES = render_handler_ogl.cpp 
+libgnashogl_la_SOURCES = render_handler_ogl.cpp PathParser.cpp
 #libgnashogl_la_LDFLAGS = -module -avoid-version -no-undefined
 libgnashogl_la_LDFLAGS =
 libgnashogl_la_LIBADD = $(OPENGL_LIBS)
@@ -90,7 +91,7 @@ if  BUILD_CAIRO_RENDERER
 if HAVE_CAIRO
 noinst_LTLIBRARIES += libgnashcairo.la
 # plugins_LTLIBRARIES += libgnashcairo.la
-libgnashcairo_la_SOURCES = render_handler_cairo.cpp
+libgnashcairo_la_SOURCES = render_handler_cairo.cpp PathParser.cpp
 #libgnashcairo_la_LDFLAGS = -module -avoid-version -no-undefined
 libgnashcairo_la_LIBADD = $(CAIRO_LIBS)
 endif
