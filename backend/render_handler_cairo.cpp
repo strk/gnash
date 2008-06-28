@@ -42,6 +42,7 @@
 #include "render_handler.h"
 #include "image.h"
 #include <cmath>
+#include "PathParser.h"
 
 namespace gnash {
 
@@ -69,26 +70,78 @@ rgba_to_cairo_argb(boost::uint8_t* dst, const image::rgba* im)
   boost::uint32_t* dst32 = reinterpret_cast<boost::uint32_t*>(dst);
   for (size_t y = 0;  y < im->height();  y++)
   {
-	  const boost::uint8_t* src = im->scanline(y);
-	  for (size_t x = 0;  x < im->width();  x++, src += 4)
-	  {
+    const boost::uint8_t* src = im->scanline(y);
+    for (size_t x = 0;  x < im->width();  x++, src += 4)
+    {
       const boost::uint8_t& r = src[0],
-                     g = src[1],
-                     b = src[2],
-                     a = src[3];
-      
+                            g = src[1],
+                            b = src[2],
+                            a = src[3];
+
       if (a) {  
         *dst32++ = (a << 24) | (r << 16) | (g << 8) | b;       
       } else {
         *dst32++ = 0;
       }
-	  }
+    }
   }
 }
 
 
+  static void
+  snap_to_pixel(cairo_t* cr, double& x, double& y, bool up)
+  {
+    cairo_user_to_device(cr, &x, &y);
+   
+    if (up) {
+      x = std::ceil(x);
+      y = std::ceil(y);
+    } else {
+      x = std::floor(x);
+      y = std::floor(y);
+    }
 
-class bitmap_info_cairo : public bitmap_info
+    cairo_device_to_user(cr, &x, &y);
+  }
+
+  static void
+  snap_to_half_pixel(cairo_t* cr, double& x, double& y)
+  {
+    cairo_user_to_device(cr, &x, &y);
+
+    x = std::floor(x + 0.5) + 0.5;
+    y = std::floor(y + 0.5) + 0.5;
+   
+    cairo_device_to_user(cr, &x, &y);
+  }
+
+static void
+init_cairo_matrix(cairo_matrix_t* cairo_matrix, const matrix& gnash_matrix)
+{
+  cairo_matrix_init(cairo_matrix,
+    gnash_matrix.sx/65536.0, gnash_matrix.shx/65536.0,
+    gnash_matrix.shy/65536.0, gnash_matrix.sy/65536.0,
+    gnash_matrix.tx, gnash_matrix.ty);
+}
+
+  void
+  pattern_add_color_stops(const fill_style& style, cairo_pattern_t* pattern,
+                          const cxform& cx)
+  {      
+    for (int index = 0; index < style.get_color_stop_count(); ++index) {
+    
+      const gradient_record& grad = style.get_color_stop(index);
+      
+      rgba c = cx.transform(grad.m_color);
+
+      cairo_pattern_add_color_stop_rgba (pattern,
+        grad.m_ratio / 255.0, c.m_r / 255.0, c.m_g / 255.0,
+        c.m_b / 255.0, c.m_a / 255.0);
+    }
+  }
+  
+
+class bitmap_info_cairo : public bitmap_info, boost::noncopyable
 {
   public:
     bitmap_info_cairo(boost::uint8_t* data, int width, int height,
@@ -102,15 +155,21 @@ class bitmap_info_cairo : public bitmap_info
                format, width, height, width * bpp)),
       _pattern(cairo_pattern_create_for_surface (_surface))
     {
+      
+      assert(cairo_surface_status(_surface) == CAIRO_STATUS_SUCCESS);
+      assert(cairo_pattern_status(_pattern) == CAIRO_STATUS_SUCCESS);
     }
     
     ~bitmap_info_cairo()
     {
       cairo_surface_destroy(_surface);
+      cairo_pattern_destroy(_pattern);
     }
     
     cairo_pattern_t* apply(const cairo_matrix_t* mat, int fill_type)
-    {	       
+    {
+      assert(mat);
+      assert(_pattern);
       cairo_pattern_set_matrix(_pattern, mat);
       
       cairo_extend_t extend = CAIRO_EXTEND_REPEAT;
@@ -143,14 +202,178 @@ class bitmap_info_cairo : public bitmap_info
     cairo_pattern_t* _pattern;
 };
 
-static void
-init_cairo_matrix(cairo_matrix_t* cairo_matrix, const matrix& gnash_matrix)
+  cairo_pattern_t*
+  get_cairo_pattern(const fill_style& style, const cxform& cx, const matrix& mat)
+  {
+    int fill_type = style.get_type();
+    cairo_pattern_t* pattern = NULL;
+        
+    switch (fill_type) {
+
+      case SWF::FILL_LINEAR_GRADIENT:
+      {
+        cairo_matrix_t mat; 
+        init_cairo_matrix(&mat, style.get_gradient_matrix());
+        cairo_matrix_scale(&mat, 256, 256);
+        cairo_matrix_invert(&mat);
+        
+        pattern = cairo_pattern_create_linear(-16384/256, 0, 16384/256, 0);
+        cairo_pattern_set_matrix (pattern, &mat);
+        
+        pattern_add_color_stops(style, pattern, cx);
+                                                   
+        break;
+      }
+      case SWF::FILL_RADIAL_GRADIENT:
+      case SWF::FILL_FOCAL_GRADIENT:
+      {        
+        cairo_matrix_t mat; 
+        init_cairo_matrix(&mat, style.get_gradient_matrix());
+        cairo_matrix_scale(&mat, 256, 256);
+        cairo_matrix_invert(&mat);
+ 
+        double focal_pos = 0;
+ 
+        if (fill_type == SWF::FILL_FOCAL_GRADIENT) {
+          focal_pos = 16384/256 * style.get_focal_point();
+        }
+
+        pattern = cairo_pattern_create_radial(focal_pos, 0.0, 0.0, 0.0, 0.0, 16384/256);
+
+        cairo_pattern_set_matrix (pattern, &mat);          
+        
+        pattern_add_color_stops(style, pattern, cx);
+        break;
+      }
+      case SWF::FILL_TILED_BITMAP_HARD:
+      case SWF::FILL_TILED_BITMAP:
+      case SWF::FILL_CLIPPED_BITMAP:
+      case SWF::FILL_CLIPPED_BITMAP_HARD:
+      {
+        matrix m = style.get_bitmap_matrix();        
+        
+        bitmap_info_cairo* binfo
+          = dynamic_cast<bitmap_info_cairo*>(style.get_bitmap_info());
+
+        if (!binfo) {
+          return NULL;
+        }
+        
+        cairo_matrix_t mat;
+        init_cairo_matrix(&mat, m);       
+
+        pattern = binfo->apply(&mat, fill_type);
+        
+        break;
+      } 
+
+      case SWF::FILL_SOLID:
+      {            
+        rgba c = cx.transform(style.get_color());
+        pattern = cairo_pattern_create_rgba (c.m_r / 255.0, c.m_g / 255.0,
+                                             c.m_b / 255.0, c.m_a / 255.0);
+        break;
+      }
+      
+    } // switch
+    
+    return pattern;
+
+  }
+
+class CairoPathRunner : public PathParser
 {
-  cairo_matrix_init(cairo_matrix,
-    gnash_matrix.sx/65536.0, gnash_matrix.shx/65536.0,
-    gnash_matrix.shy/65536.0, gnash_matrix.sy/65536.0,
-    gnash_matrix.tx, gnash_matrix.ty);
-}
+public:
+  CairoPathRunner(const std::vector<path>& paths,
+                  const std::vector<fill_style>& fill_styles, cairo_t* context)
+  : PathParser(paths, fill_styles.size()),
+    _cr(context),
+    _fill_styles(fill_styles), 
+    _pattern(0)
+  {
+  }
+  
+  virtual void prepareFill(int fill_index, const cxform& cx, const matrix& mat)
+  {
+    assert(_fill_styles.size() > fill_index-1);
+    if (!_pattern) {
+      _pattern = get_cairo_pattern(_fill_styles[fill_index-1], cx, mat);
+    }
+  }
+  virtual void terminateFill(int fill_style)
+  {
+    if (!_pattern) {
+      cairo_new_path(_cr);
+      return;
+    }
+    
+    cairo_set_source(_cr, _pattern);
+    
+    cairo_fill(_cr);
+
+    // Surfaces are owned by bitmap_info_cairo
+    if (cairo_pattern_get_type(_pattern) != CAIRO_PATTERN_TYPE_SURFACE) {
+      cairo_pattern_destroy(_pattern);
+      _pattern = 0;
+    }
+  }
+  virtual void fillShape() {}
+  
+  void moveTo(const geometry::Point2d<int>& ap)
+  {
+      double x = ap.x, y = ap.y;
+      snap_to_half_pixel(_cr, x, y);
+    
+      cairo_move_to(_cr, x, y);
+  }
+
+  virtual void curveTo(const Edge<int>& cur_edge)
+  {
+    double x, y;
+    if (cur_edge.isStraight()) {
+      x = cur_edge.ap.x;
+      y = cur_edge.ap.y;
+      snap_to_half_pixel(_cr, x, y);
+      
+      cairo_line_to(_cr, cur_edge.ap.x, cur_edge.ap.y); // fixme: snap
+      return;
+    }
+    const float two_thirds = 2.0/3.0;
+    const float one_third = 1 - two_thirds;
+
+    cairo_get_current_point(_cr, &x, &y);
+
+    double x1 = x + two_thirds * (cur_edge.cp.x - x);
+    double y1 = y + two_thirds * (cur_edge.cp.y - y);
+
+    double x2 = cur_edge.cp.x + one_third * (cur_edge.ap.x - cur_edge.cp.x);
+    double y2 = cur_edge.cp.y + one_third * (cur_edge.ap.y - cur_edge.cp.y);
+
+    x = cur_edge.ap.x;
+    y = cur_edge.ap.y;
+
+    snap_to_half_pixel(_cr, x1, y1);
+    snap_to_half_pixel(_cr, x2, y2);
+    snap_to_half_pixel(_cr, x, y);
+
+    cairo_curve_to(_cr, x1, y1, x2, y2, x, y);
+    
+  }
+
+  void lineTo(const geometry::Point2d<int>& ap)
+  {
+    cairo_line_to(_cr, ap.x, ap.y);
+  }
+
+private:
+  cairo_t* _cr;
+  cairo_pattern_t* _pattern;
+  const std::vector<fill_style>& _fill_styles;
+};
+
+
+
+
 
 
 /// Transforms the current Cairo matrix using the given matrix. When it goes
@@ -334,33 +557,6 @@ public:
   void set_invalidated_regions(const InvalidatedRanges& ranges)
   {
     _invalidated_ranges = ranges;
-  }
-
-  static void
-  snap_to_pixel(cairo_t* cr, double& x, double& y, bool up)
-  {
-    cairo_user_to_device(cr, &x, &y);
-   
-    if (up) {
-      x = std::ceil(x);
-      y = std::ceil(y);
-    } else {
-      x = std::floor(x);
-      y = std::floor(y);
-    }
-
-    cairo_device_to_user(cr, &x, &y);
-  }
-
-  static void
-  snap_to_half_pixel(cairo_t* cr, double& x, double& y)
-  {
-    cairo_user_to_device(cr, &x, &y);
-
-    x = std::floor(x + 0.5) + 0.5;
-    y = std::floor(y + 0.5) + 0.5;
-   
-    cairo_device_to_user(cr, &x, &y);
   }
 
   virtual void  begin_display(
@@ -638,112 +834,13 @@ public:
       const fill_style& cur_style = *it;
       
       cairo_pattern_t* pattern = get_cairo_pattern(cur_style, cx, mat);
+      //assert(pattern);
       styles_vec_cairo.push_back(pattern);
     }
     
     return styles_vec_cairo;
   }
   
-  void
-  pattern_add_color_stops(const fill_style& style, cairo_pattern_t* pattern,
-                          const cxform& cx)
-  {      
-    for (int index = 0; index < style.get_color_stop_count(); ++index) {
-    
-      const gradient_record& grad = style.get_color_stop(index);
-      
-      rgba c = cx.transform(grad.m_color);
-
-      cairo_pattern_add_color_stop_rgba (pattern,
-        grad.m_ratio / 255.0, c.m_r / 255.0, c.m_g / 255.0,
-        c.m_b / 255.0, c.m_a / 255.0);
-    }
-  }
-  
-  cairo_pattern_t*
-  get_cairo_pattern(const fill_style& style, const cxform& cx, const matrix& mat)
-  {
-    int fill_type = style.get_type();
-    cairo_pattern_t* pattern = NULL;
-        
-    switch (fill_type) {
-
-      case SWF::FILL_LINEAR_GRADIENT:
-      {
-        matrix m = style.get_gradient_matrix();
-      
-        cairo_matrix_t mat;
-        init_cairo_matrix(&mat, m);
-        
-        pattern = cairo_pattern_create_linear(0, 0, 256.0, 0);
-        cairo_pattern_set_matrix (pattern, &mat);
-        
-        pattern_add_color_stops(style, pattern, cx);
-                                                   
-        break;
-      }
-      case SWF::FILL_RADIAL_GRADIENT:
-      case SWF::FILL_FOCAL_GRADIENT:
-      {        
-        matrix m = style.get_gradient_matrix();
-        
-        // Undo the translation our parser applied.
-        gnash::matrix transl;
-        transl.concatenate_translation(-32.0f, -32.0f);
-        transl.concatenate(m);  
-      
-        cairo_matrix_t mat;
-        init_cairo_matrix(&mat, transl);
-        
-        double focal_pos = 0;
-        
-        if (fill_type == SWF::FILL_FOCAL_GRADIENT) {
-          focal_pos = 32.0f * style.get_focal_point();
-        }
-
-        pattern = cairo_pattern_create_radial(focal_pos, 0.0, 0.0, 0.0, 0.0, 32.0);
-
-        cairo_pattern_set_matrix (pattern, &mat);          
-        
-        pattern_add_color_stops(style, pattern, cx);
-        break;
-      }
-      case SWF::FILL_TILED_BITMAP_HARD:
-      case SWF::FILL_TILED_BITMAP:
-      case SWF::FILL_CLIPPED_BITMAP:
-      case SWF::FILL_CLIPPED_BITMAP_HARD:
-      {
-        matrix m = style.get_bitmap_matrix();        
-        
-        bitmap_info_cairo* binfo
-          = static_cast<bitmap_info_cairo*>(style.get_bitmap_info());
-
-        if (!binfo) {
-          return NULL;
-        }
-        
-        cairo_matrix_t mat;
-        init_cairo_matrix(&mat, m);       
-
-        pattern = binfo->apply(&mat, fill_type);
-        
-        break;
-      } 
-
-      case SWF::FILL_SOLID:
-      {            
-        rgba c = cx.transform(style.get_color());
-        pattern = cairo_pattern_create_rgba (c.m_r / 255.0, c.m_g / 255.0,
-                                             c.m_b / 255.0, c.m_a / 255.0);
-        break;
-      }
-      
-    } // switch
-    
-    return pattern;
-
-  }
-
   void draw_outlines(const PathVec& path_vec, const std::vector<line_style>& line_styles, const cxform& cx)
   {  
     cairo_set_line_cap(_cr, CAIRO_LINE_CAP_ROUND); // TODO: move to init
@@ -767,9 +864,10 @@ public:
 void
 draw_subshape(const PathVec& path_vec, const matrix& mat, const cxform& cx,
     float pixel_scale,
-    const std::vector<cairo_pattern_t*>& fill_styles,
+    const std::vector<fill_style>& fill_styles,
     const std::vector<line_style>& line_styles)
-  {   
+  { 
+    #if 0  
     for (size_t i = 0; i < fill_styles.size(); ++i) {
       PathPtrVec paths = get_paths_by_style(path_vec, i+1);
       
@@ -788,6 +886,11 @@ draw_subshape(const PathVec& path_vec, const matrix& mat, const cxform& cx,
       }
       
     } // for(std::vector<fill_style> ..)
+    #endif
+
+    CairoPathRunner runner(path_vec, fill_styles, _cr);
+    runner.run(cx, mat);
+    
     
     
     
@@ -917,8 +1020,8 @@ draw_subshape(const PathVec& path_vec, const matrix& mat, const cxform& cx,
 
     std::vector<PathVec::const_iterator> subshapes = find_subshapes(path_vec);
     
-    std::vector<cairo_pattern_t*> fill_styles_cairo
-      = build_cairo_styles(fill_styles, cx, mat);
+//    std::vector<cairo_pattern_t*> fill_styles_cairo
+//      = build_cairo_styles(fill_styles, cx, mat);
     
     for (size_t i = 0; i < subshapes.size()-1; ++i) {
       PathVec subshape_paths;
@@ -929,11 +1032,11 @@ draw_subshape(const PathVec& path_vec, const matrix& mat, const cxform& cx,
         subshape_paths.push_back(*subshapes[i]);
       }
       
-      draw_subshape(subshape_paths, mat, cx, pixel_scale, fill_styles_cairo,
+      draw_subshape(subshape_paths, mat, cx, pixel_scale, fill_styles,
                     line_styles);
     }
     
-    destroy_cairo_patterns(fill_styles_cairo);
+//    destroy_cairo_patterns(fill_styles_cairo);
   }
   
   void
@@ -967,13 +1070,13 @@ draw_subshape(const PathVec& path_vec, const matrix& mat, const cxform& cx,
     
     CairoScopeMatrix mat_transformer(_cr, mat);
     
-    std::vector<cairo_pattern_t*> fill_styles_cairo
-      = build_cairo_styles(glyph_fs, dummy_cx, mat);
+//    std::vector<cairo_pattern_t*> fill_styles_cairo
+//      = build_cairo_styles(glyph_fs, dummy_cx, mat);
       
     
-    draw_subshape(path_vec, mat, dummy_cx, pixel_scale, fill_styles_cairo, dummy_ls);
+    draw_subshape(path_vec, mat, dummy_cx, pixel_scale, glyph_fs, dummy_ls);
     
-    destroy_cairo_patterns(fill_styles_cairo);
+//    destroy_cairo_patterns(fill_styles_cairo);
   }
 
   void
