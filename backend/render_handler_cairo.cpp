@@ -212,33 +212,38 @@ class bitmap_info_cairo : public bitmap_info, boost::noncopyable
 
       case SWF::FILL_LINEAR_GRADIENT:
       {
-        cairo_matrix_t mat; 
-        init_cairo_matrix(&mat, style.get_gradient_matrix());
-        cairo_matrix_scale(&mat, 256, 256);
-        cairo_matrix_invert(&mat);
+        matrix m = style.get_gradient_matrix();
+      
+        cairo_matrix_t mat;
+        init_cairo_matrix(&mat, m);
         
-        pattern = cairo_pattern_create_linear(-16384/256, 0, 16384/256, 0);
+        pattern = cairo_pattern_create_linear(0, 0, 256.0, 0);
         cairo_pattern_set_matrix (pattern, &mat);
-        
+
         pattern_add_color_stops(style, pattern, cx);
                                                    
         break;
       }
       case SWF::FILL_RADIAL_GRADIENT:
       case SWF::FILL_FOCAL_GRADIENT:
-      {        
-        cairo_matrix_t mat; 
-        init_cairo_matrix(&mat, style.get_gradient_matrix());
-        cairo_matrix_scale(&mat, 256, 256);
-        cairo_matrix_invert(&mat);
- 
+      {
+        matrix m = style.get_gradient_matrix();
+        
+        // Undo the translation our parser applied.
+        gnash::matrix transl;
+        transl.concatenate_translation(-32.0f, -32.0f);
+        transl.concatenate(m);
+
+        cairo_matrix_t mat;
+        init_cairo_matrix(&mat, transl);
+
         double focal_pos = 0;
  
         if (fill_type == SWF::FILL_FOCAL_GRADIENT) {
-          focal_pos = 16384/256 * style.get_focal_point();
+          focal_pos = 32.0f * style.get_focal_point();
         }
 
-        pattern = cairo_pattern_create_radial(focal_pos, 0.0, 0.0, 0.0, 0.0, 16384/256);
+        pattern = cairo_pattern_create_radial(focal_pos, 0.0, 0.0, 0.0, 0.0, 32.0f);
 
         cairo_pattern_set_matrix (pattern, &mat);          
         
