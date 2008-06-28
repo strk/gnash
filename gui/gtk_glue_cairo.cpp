@@ -133,6 +133,8 @@ cairo_surface_t*
 GtkCairoGlue::createGdkImageSurface(const int& width, const int& height)
 {
   GdkVisual* visual = gdk_drawable_get_visual(_drawing_area->window);
+  assert(_drawing_area);
+  assert(visual);
   cairo_format_t format;
 
   if (!cairoFormatFromVisual(visual, &format)) {

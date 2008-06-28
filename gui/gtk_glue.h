@@ -29,7 +29,8 @@ namespace gnash
 class GtkGlue
 {
   public:
-    virtual ~GtkGlue() { };
+    GtkGlue() : _drawing_area(0) { }
+    virtual ~GtkGlue() { }
     virtual bool init(int argc, char **argv[]) = 0;
 
     virtual void prepDrawingArea(GtkWidget *drawing_area) = 0;
