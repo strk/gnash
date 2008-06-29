@@ -112,6 +112,7 @@ private:
   
   bool closed_shape();
 
+  void line_to(const Edge<int>& curve);
 
   const std::vector<path>& _paths;
   const size_t             _num_styles;

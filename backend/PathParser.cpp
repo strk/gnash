@@ -119,26 +119,34 @@ PathParser::append(const UnivocalPath& append_path)
 
   if (append_path._fill_type == UnivocalPath::FILL_LEFT) {
 
-    std::for_each(edges.begin(), edges.end(), boost::bind(&PathParser::curveTo, this, _1));
+    std::for_each(edges.begin(), edges.end(), boost::bind(&PathParser::line_to,
+                                                          this, _1));
     _cur_endpoint = edges.back().ap;
 
   } else {
 
-    std::vector<edge>::const_reverse_iterator it = boost::next(edges.rbegin());
-
-    while (it != edges.rend()) {
-      const edge& prev = *boost::prior(it);
-      if (prev.isStraight()) {
+    for (std::vector<edge>::const_reverse_iterator prev = edges.rbegin(),
+         it = boost::next(prev), end = edges.rend(); it != end; ++it, ++prev) {
+      if ((*prev).isStraight()) {
         lineTo((*it).ap);
       } else {
-        curveTo(Edge<int>(prev.cp, (*it).ap));
+        line_to(Edge<int>((*prev).cp, (*it).ap));
       }
-      ++it;
     }
     
     _cur_endpoint = append_path._path->ap;
-    curveTo(Edge<int>(edges.front().cp, _cur_endpoint));
+    line_to(Edge<int>(edges.front().cp, _cur_endpoint));
 
+  }
+}
+
+void
+PathParser::line_to(const Edge<int>& curve)
+{
+  if (curve.isStraight()) {
+    lineTo(curve.ap);
+  } else {
+    curveTo(curve);
   }
 }
 
