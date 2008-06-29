@@ -23,7 +23,7 @@
 #include "MovieTester.h"
 #include "sprite_instance.h"
 #include "character.h"
-#include "dlist.h"
+#include "DisplayList.h"
 #include "log.h"
 #include "GnashKey.h" // for gnash::key::code
 

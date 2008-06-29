@@ -24,7 +24,7 @@
 #include "GnashException.h"
 #include "sprite_instance.h"
 #include "character.h"
-#include "dlist.h"
+#include "DisplayList.h"
 #include "log.h"
 #include "Point2d.h"
 #include "VM.h"
