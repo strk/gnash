@@ -92,7 +92,7 @@ libgnashserver_la_SOURCES = \
 	StreamProvider.cpp \
 	array.cpp \
 	button_character_instance.cpp \
-	dlist.cpp \
+	DisplayList.cpp \
 	fill_style.cpp \
 	font.cpp \
 	fontlib.cpp \
@@ -134,7 +134,7 @@ noinst_HEADERS = \
 	cxform.h \
 	debugger.h \
 	DynamicShape.h	\
-	dlist.h	\
+	DisplayList.h	\
 	drag_state.h \
 	edit_text_character.h \
 	event_id.h \

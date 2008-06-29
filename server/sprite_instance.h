@@ -26,7 +26,7 @@
 #endif
 
 #include "movie_definition.h" // for inlines
-#include "dlist.h" // DisplayList 
+#include "DisplayList.h" // DisplayList 
 #include "log.h"
 #include "as_environment.h" // for composition
 #include "DynamicShape.h" // for composition
