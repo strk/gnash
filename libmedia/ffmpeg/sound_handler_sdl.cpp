@@ -340,6 +340,7 @@ void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset,
 	sounddata->m_active_sounds.push_back(sound.release());
 
 	if (soundsPlaying == 1) {
+		log_debug("Unpausing SDL Audio...");
 		SDL_PauseAudio(0);
 	}
 
@@ -498,6 +499,7 @@ void	SDL_sound_handler::attach_aux_streamer(aux_streamer_ptr ptr, void* owner)
 		}
 		soundOpened = true;
 	}
+	log_debug("Unpausing SDL Audio...");
 	SDL_PauseAudio(0);
 
 }
@@ -773,7 +775,7 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 	// If nothing to play there is no reason to play
 	// Is this a potential deadlock problem?
 	if (handler->soundsPlaying == 0 && handler->m_aux_streamer.empty()) {
-            std::cout << "Pausing Audio now...\n";
+		log_debug("Pausing SDL Audio...");
 		SDL_PauseAudio(1);
 		return;
 	}
