@@ -661,6 +661,7 @@ public:
     const rgba& fill, const rgba& outline, const matrix& mat, bool masked)
   {
     CairoScopeMatrix mat_transformer(_cr, mat);
+    cairo_transform(_cr, &_stage_mat);
 
     if (corner_count < 1) {
       return;
@@ -685,7 +686,7 @@ public:
       // FIXME: coordinate alignment (for single-pixel lines should be in
       //        between two pixels for sharp hair line.
       
-      cairo_set_line_width(_cr, 20.0);
+      cairo_set_line_width(_cr, 1.0);
       cairo_stroke_preserve(_cr);    
     }
     
@@ -800,6 +801,43 @@ public:
   
   void apply_line_style(const line_style& style, const cxform& cx)
   {
+    cairo_line_join_t join_style = CAIRO_LINE_JOIN_MITER;
+    switch(style.joinStyle()) {
+      case JOIN_ROUND:
+        join_style = CAIRO_LINE_JOIN_ROUND;
+      break;
+      case JOIN_BEVEL:
+        join_style = CAIRO_LINE_JOIN_BEVEL;
+      break;
+      case JOIN_MITER:
+      break;
+      default:
+        log_unimpl("join style");
+    }
+    cairo_set_line_join(_cr, join_style);
+
+    if (style.startCapStyle() != style.endCapStyle()) {
+      log_unimpl("differing start and end cap styles");
+    }
+
+    cairo_line_cap_t cap_style = CAIRO_LINE_CAP_ROUND;
+    switch(style.startCapStyle()) {
+      case CAP_ROUND:
+      break;
+      case CAP_NONE:
+        cap_style = CAIRO_LINE_CAP_BUTT;
+      break;
+      case CAP_SQUARE:
+        cap_style = CAIRO_LINE_CAP_SQUARE;
+      break;
+      default:
+        log_unimpl("cap style");
+    }
+
+    cairo_set_line_cap(_cr, cap_style);
+
+    cairo_set_miter_limit(_cr, style.miterLimitFactor());
+
     float width = style.getThickness();
 
     if ( width == 0.0 ) {
@@ -826,9 +864,6 @@ public:
   
   void draw_outlines(const PathVec& path_vec, const std::vector<line_style>& line_styles, const cxform& cx)
   {  
-    cairo_set_line_cap(_cr, CAIRO_LINE_CAP_ROUND); // TODO: move to init
-    cairo_set_line_join(_cr, CAIRO_LINE_JOIN_ROUND);
-
     for (PathVec::const_iterator it = path_vec.begin(), end = path_vec.end();
          it != end; ++it) {
       const path& cur_path = *it;
