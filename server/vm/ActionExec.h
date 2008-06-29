@@ -56,7 +56,7 @@ public:
 		_afterTriedOffset(cur_off + try_size + catch_size + finally_size),
 		_hasName(true),
 		_name(catchName),
-		_registerIndex(),
+		_registerIndex(0),
 		_tryState(TryBlock::TRY_TRY),
 		_lastThrow()
 	{}
@@ -81,7 +81,7 @@ private:
 	size_t _savedEndOffset;
 	bool _hasName;
 	std::string _name;
-	boost::uint8_t _registerIndex;
+	unsigned int _registerIndex;
 	tryState _tryState;
 	as_value _lastThrow;
 };
