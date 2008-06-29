@@ -72,7 +72,7 @@ PathParser::run(const cxform& cx, const matrix& mat)
 
   for (size_t i = 0; i < _num_styles; ++i) {
 
-    start_shapes(i+1, cx, mat);
+    start_shapes(i+1, cx);
     UniPathList& path_list = unipathvec[i];
       
     while (!path_list.empty()) {
@@ -151,9 +151,9 @@ PathParser::line_to(const Edge<int>& curve)
 }
 
 void
-PathParser::start_shapes(int fill_style, const cxform& cx, const matrix& mat)
+PathParser::start_shapes(int fill_style, const cxform& cx)
 {
-  prepareFill(fill_style, cx, mat);
+  prepareFill(fill_style, cx);
 }
 
 void

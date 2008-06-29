@@ -203,7 +203,7 @@ class bitmap_info_cairo : public bitmap_info, boost::noncopyable
 };
 
 cairo_pattern_t*
-get_cairo_pattern(const fill_style& style, const cxform& cx, const matrix& mat)
+get_cairo_pattern(const fill_style& style, const cxform& cx)
 {
   int fill_type = style.get_type();
   cairo_pattern_t* pattern = NULL;
@@ -298,15 +298,16 @@ public:
   {
   }
   
-  virtual void prepareFill(int fill_index, const cxform& cx, const matrix& mat)
+  virtual void prepareFill(int fill_index, const cxform& cx)
   {
-    assert(_fill_styles.size() > fill_index-1);
     if (!_pattern) {
-      _pattern = get_cairo_pattern(_fill_styles[fill_index-1], cx, mat);
+      _pattern = get_cairo_pattern(_fill_styles[fill_index-1], cx);
     }
   }
   virtual void terminateFill(int fill_style)
   {
+    UNUSED(fill_style);
+
     if (!_pattern) {
       cairo_new_path(_cr);
       return;
@@ -561,9 +562,9 @@ public:
 
   virtual void  begin_display(
     const rgba& bg_color,
-    int viewport_x0, int viewport_y0,
-    int viewport_width, int viewport_height,
-    float x0, float x1, float y0, float y1)
+    int /*viewport_x0*/, int /*viewport_y0*/,
+    int /*viewport_width*/, int /*viewport_height*/,
+    float /*x0*/, float /*x1*/, float /*y0*/, float /*y1*/)
   {
     cairo_identity_matrix(_cr);
 
@@ -613,7 +614,7 @@ public:
   void set_scale(float xscale, float yscale)
   {
     _stage_mat.xx = xscale / 20;
-    _stage_mat.yy = xscale / 20;
+    _stage_mat.yy = yscale / 20;
   }
 
   virtual void set_translation(float xoff, float yoff) {
@@ -733,7 +734,7 @@ public:
     _masks.pop_back();
   }
 
-  void add_path(cairo_t* cr, const path& cur_path, bool round_to_half = false)
+  void add_path(cairo_t* cr, const path& cur_path)
   {  
     double x = cur_path.ap.x;
     double y = cur_path.ap.y;
@@ -845,7 +846,7 @@ public:
 
 void
 draw_subshape(const PathVec& path_vec, const matrix& mat, const cxform& cx,
-    float pixel_scale,
+    float /*pixel_scale*/,
     const std::vector<fill_style>& fill_styles,
     const std::vector<line_style>& line_styles)
   { 
