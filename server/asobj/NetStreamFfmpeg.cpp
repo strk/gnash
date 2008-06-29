@@ -688,8 +688,8 @@ NetStreamFfmpeg::pushDecodedAudioFrames(boost::uint32_t ts)
 		float swfFPS = 25; // TODO: get this host app (gnash -d affects this)
 		double msecsPerAdvance = 10000/swfFPS;
 
-		static const int outSampleSize = 2;     // <--- 2 is output sample size
-		static const int outSampleFreq = 44100; // <--- 44100 is output audio frequency
+		//static const int outSampleSize = 2;     // <--- 2 is output sample size
+		//static const int outSampleFreq = 44100; // <--- 44100 is output audio frequency
 		//int samplesPerAdvance = (int)std::floor(secsPerAdvance*outSampleFreq); // round up
 		//unsigned int bufferLimit = outSampleSize*samplesPerAdvance;
 
