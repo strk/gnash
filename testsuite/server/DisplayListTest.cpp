@@ -19,7 +19,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include "dlist.h"
+#include "DisplayList.h"
 #include "as_value.h"
 #include "character.h"
 #include "log.h"
