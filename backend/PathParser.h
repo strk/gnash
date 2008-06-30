@@ -21,6 +21,7 @@
 
 #include "shape.h"
 #include <vector>
+#include <deque>
 #include "cxform.h"
 
 namespace gnash
@@ -73,7 +74,7 @@ public:
 
   /// Prepare the fill style for subsequent use for filling one or more shapes.
   /// @param fill_style fill style number, as indicated by class Path.
-  virtual void prepareFill(int fill_style, const cxform& cx, const matrix& mat) = 0;
+  virtual void prepareFill(int fill_style, const cxform& cx) = 0;
   
   /// Terminates the fill style, that is, precludes the fill style from further
   /// use, which may be freed or otherwise cleaned up. Most renderers should
@@ -100,11 +101,11 @@ public:
   virtual void lineTo(const geometry::Point2d<int>& p) = 0;
 
 private:
-  bool emitConnecting(const UnivocalPath& subject);
+  std::deque<UnivocalPath>::iterator emitConnecting(std::deque<UnivocalPath>& paths);
     
   void append(const UnivocalPath& append_path);
   
-  void start_shapes(int fill_style, const cxform& cx, const matrix& mat);
+  void start_shapes(int fill_style, const cxform& cx);
 
   void end_shapes(int fill_style);
 
@@ -112,6 +113,7 @@ private:
   
   bool closed_shape();
 
+  void line_to(const Edge<int>& curve);
 
   const std::vector<path>& _paths;
   const size_t             _num_styles;
