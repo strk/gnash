@@ -1,4 +1,4 @@
-// movie_def_impl.cpp: load a SWF definition
+// SWFMovieDefinition.cpp: load a SWF definition
 //
 //   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 //
@@ -22,7 +22,7 @@
 #endif
 
 #include "smart_ptr.h" // GNASH_USE_GC
-#include "movie_def_impl.h"
+#include "SWFMovieDefinition.h"
 #include "movie_definition.h" // for inheritance
 #include "sprite_instance.h" // for ??
 #include "zlib_adapter.h"

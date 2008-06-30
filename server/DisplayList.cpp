@@ -18,7 +18,7 @@
 //
 
 #include "smart_ptr.h" // GNASH_USE_GC
-#include "dlist.h"
+#include "DisplayList.h"
 #include "log.h"
 #include "render.h"
 #include "StringPredicates.h"

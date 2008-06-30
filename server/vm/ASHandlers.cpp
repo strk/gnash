@@ -2023,7 +2023,7 @@ SWFHandlers::ActionPushData(ActionExec& thread)
 
             case pushRegister: // 4
             {
-                int reg = code[3 + i];
+                unsigned int reg = code[3 + i];
                 ++i;
 		as_value v;
 		if ( ! env.getRegister(reg, v) )

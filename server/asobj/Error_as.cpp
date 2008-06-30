@@ -51,7 +51,7 @@ attachErrorInterface(as_object& o)
 }
 
 static void
-attachErrorStaticProperties(as_object& o)
+attachErrorStaticProperties(as_object& /*o*/)
 {
    
 }

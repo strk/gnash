@@ -295,7 +295,7 @@ public:
 	///         1 if a global register was set
 	///         2 if a local register was set
 	///
-	int setRegister(int regnum, const as_value& v);
+	unsigned int setRegister(unsigned int regnum, const as_value& v);
 
 	/// Get value of a register (local or global).
 	//
@@ -322,7 +322,7 @@ public:
 	///         1 if a global register was set
 	///         2 if a local register was set
 	///
-	int getRegister(int regnum, as_value& v);
+	unsigned int getRegister(unsigned int regnum, as_value& v);
 
 	/// Return a reference to the Nth local register.
 	//
