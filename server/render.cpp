@@ -155,13 +155,12 @@ namespace gnash {
     
     void draw_glyph(shape_character_def *def,
       const matrix& mat,
-      const rgba& color,
-      float pixel_scale) 
+      const rgba& color)
     {
 #ifdef DEBUG_RENDER_CALLS
 			GNASH_REPORT_FUNCTION;
 #endif
-			if (s_render_handler) s_render_handler->draw_glyph(def, mat, color, pixel_scale);
+			if (s_render_handler) s_render_handler->draw_glyph(def, mat, color);
     }
     
     bool bounds_in_clipping_area(const rect& bounds) {

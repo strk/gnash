@@ -100,7 +100,7 @@ namespace gnash {
       
 		/// See render_handler::draw_glyph (in backend/render_handler.h)
 		void draw_glyph(shape_character_def *def, const matrix& mat,
-				const rgba& color, float pixel_scale);
+				const rgba& color);
 
 		/// See render_handler::bounds_in_clipping_area (in backend/render_handler.h)
 		bool bounds_in_clipping_area(const rect& bounds);

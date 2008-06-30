@@ -862,7 +862,6 @@ public:
 
 void
 draw_subshape(const PathVec& path_vec, const matrix& mat, const cxform& cx,
-    float /*pixel_scale*/,
     const std::vector<fill_style>& fill_styles,
     const std::vector<line_style>& line_styles)
   { 
@@ -931,7 +930,6 @@ draw_subshape(const PathVec& path_vec, const matrix& mat, const cxform& cx,
   virtual void draw_shape_character(shape_character_def *def, 
     const matrix& mat,
     const cxform& cx,
-    float pixel_scale,
     const std::vector<fill_style>& fill_styles,
     const std::vector<line_style>& line_styles)
   {
@@ -965,14 +963,14 @@ draw_subshape(const PathVec& path_vec, const matrix& mat, const cxform& cx,
         subshape_paths.push_back(*subshapes[i]);
       }
       
-      draw_subshape(subshape_paths, mat, cx, pixel_scale, fill_styles,
+      draw_subshape(subshape_paths, mat, cx, fill_styles,
                     line_styles);
     }
     
   }
   
   virtual void draw_glyph(shape_character_def *def, const matrix& mat,
-    const rgba& color, float pixel_scale)
+    const rgba& color)
   {
   
     cxform dummy_cx;
@@ -989,7 +987,7 @@ draw_subshape(const PathVec& path_vec, const matrix& mat, const cxform& cx,
     
     CairoScopeMatrix mat_transformer(_cr, mat);
     
-    draw_subshape(path_vec, mat, dummy_cx, pixel_scale, glyph_fs, dummy_ls);
+    draw_subshape(path_vec, mat, dummy_cx, glyph_fs, dummy_ls);
   }
 
   void

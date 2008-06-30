@@ -897,11 +897,6 @@ public:
   /// to require these functions for all characters.
   /// @{
 
-  virtual float get_pixel_scale() const
-  {
-    return 1.0f;
-  }
-
   virtual movie_definition *get_movie_definition()
   {
     return NULL;

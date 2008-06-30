@@ -744,15 +744,15 @@ namespace gnash
     void  shape_character_def::display(
         const matrix& mat,
         const cxform& cx,
-        float pixel_scale,
         const std::vector<fill_style>& fill_styles,
         const std::vector<line_style>& line_styles) const
     {
         shape_character_def* this_non_const = const_cast<shape_character_def*>(this);
 
         render_handler* renderer = get_render_handler();
-        renderer->draw_shape_character(this_non_const, mat, cx, pixel_scale,
-            fill_styles, line_styles);
+
+        renderer->draw_shape_character(this_non_const, mat, cx, fill_styles,
+                                       line_styles);
     }
 
     // TODO: this should be moved to libgeometry or something
