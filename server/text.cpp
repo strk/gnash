@@ -95,8 +95,6 @@ namespace gnash {
 		mat.concatenate(this_mat);
 
 		cxform	cx = inst->get_world_cxform();
-		float	pixel_scale = inst->get_pixel_scale();
-
 		matrix	base_matrix = mat;
 
 		float x = 0.0f;
@@ -186,7 +184,7 @@ log_error(_("invalid glyph (-1)"));
 log_debug(_("render shape glyph using filled outline (render::draw_glyph)"));
 #endif
 
-						gnash::render::draw_glyph(glyph, mat, transformed_color, pixel_scale);
+						gnash::render::draw_glyph(glyph, mat, transformed_color);
 					}
 				}
 				x += ge.m_glyph_advance;

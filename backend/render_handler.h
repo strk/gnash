@@ -429,7 +429,6 @@ public:
     draw_shape_character(def, 
     inst->get_world_matrix(), 
     inst->get_world_cxform(),
-    inst->get_parent()->get_pixel_scale(),
     def->get_fill_styles(),
     def->get_line_styles());
 
@@ -476,7 +475,6 @@ public:
   virtual void draw_shape_character(shape_character_def *def, 
     const matrix& mat,
     const cxform& cx,
-    float pixel_scale,
     const std::vector<fill_style>& fill_styles,
     const std::vector<line_style>& line_styles) = 0;
     
@@ -494,11 +492,8 @@ public:
   /// @param mat
   ///
   /// @param color
-  ///
-  /// @param pixel_scale
-  ///
   virtual void draw_glyph(shape_character_def *def, const matrix& mat,
-    const rgba& color, float pixel_scale) = 0;
+    const rgba& color) = 0;
 
   /// This function returns the color at any position in the stage. It is used
   /// for automatic testing only, it should not be used for anything else!

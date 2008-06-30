@@ -80,7 +80,6 @@ namespace gnash {
 		void	display(
 			const matrix& mat,
 			const cxform& cx,
-			float pixel_scale,
 			const std::vector<fill_style>& fill_styles,
 			const std::vector<line_style>& line_styles) const;
 
