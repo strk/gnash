@@ -127,7 +127,7 @@ public:
 
 	void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
 	
-	geometry::Range2d<float> getBounds() const;
+	rect getBounds() const;
 	
 	// See dox in character.h
 	bool pointInShape(float x, float y) const;

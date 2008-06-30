@@ -55,7 +55,7 @@ public:
 		return pointInBounds(x, y);
 	}
 
-	geometry::Range2d<float> getBounds() const;
+	rect getBounds() const;
 
 	/// We use the call to ::advance to properly set invalidated status
 	virtual void	advance();

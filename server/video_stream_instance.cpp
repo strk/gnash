@@ -285,16 +285,14 @@ void video_class_init(as_object& global)
 	global.init_member("Video", cl.get());
 }
 
-geometry::Range2d<float>
+rect
 video_stream_instance::getBounds() const
 {
-	if (_embeddedStream) return m_def->get_bound().getRange();
-
-	geometry::Range2d<float> bounds; // null bounds..
+	if (_embeddedStream) return m_def->get_bound();
 
 	// TODO: return the bounds of the dynamically
 	//       loaded video if not embedded ?
-	return bounds;
+	return rect();
 }
 
 #ifdef GNASH_USE_GC

@@ -26,6 +26,7 @@
 
 #include "dsodefs.h" // for DSOEXPORT
 #include "Range2d.h" // for transforming Range2d<float>
+#include "rect.h"
 #include "Point2d.h" // for transforming Point2d<float> (typedefe'd to point)
 #include "utility.h" // for TRUST_FLOAT_TO_UINT32_CONVERSION
 
@@ -137,11 +138,19 @@ public:
     void    read(SWFStream* in) { read(*in); }
 
     /// Transform a given point by our matrix
-    template <typename U>
-    void    transform(geometry::Point2d<U>& p) const
+    void    transform(geometry::Point2d<float>& p) const
     {
         float x = sx / 65536.0f * p.x + shy/ 65536.0f * p.y + tx;
         float y = shx/ 65536.0f * p.x + sy / 65536.0f * p.y + ty;
+        p.x = x;
+        p.y = y;
+    }
+
+    /// Transform a given point by our matrix
+    void    transform(geometry::Point2d<boost::int32_t>& p) const
+    {
+        boost::int32_t x = Fixed16Mul(sx, p.x) + Fixed16Mul(shy, p.y) + tx;
+        boost::int32_t y = Fixed16Mul(shx,p.x) + Fixed16Mul(sy,  p.y) + ty;
         p.x = x;
         p.y = y;
     }
@@ -167,6 +176,8 @@ public:
     ///
     void    transform(geometry::Range2d<float>& r) const;
 
+    void    transform(rect& r) const;
+    
     /// Invert this matrix and return the result.
     const matrix& invert();
     

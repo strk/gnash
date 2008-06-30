@@ -86,7 +86,7 @@ void	operator delete[](void* ptr);
 
 
 #ifndef M_PI
-    #define M_PI 3.1415926536
+    #define M_PI 3.14159265359 
 #endif // M_PI
 
 // Define this to enable fast float&double to uint32 conversion.
@@ -188,7 +188,7 @@ inline int PIXELS_TO_TWIPS(double a)
 inline boost::int32_t Fixed16Mul(boost::int32_t a, boost::int32_t b)
 {
     // truncate when overflow occurs.
-    return (boost::int32_t)((boost::int64_t)a * (boost::int64_t)b >> 16);
+    return (boost::int32_t)(((boost::int64_t)a * (boost::int64_t)b + 0x8000) >> 16);
 }
 
 }

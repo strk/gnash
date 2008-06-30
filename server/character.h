@@ -674,9 +674,8 @@ public:
   ///
   float get_height() const
   {
-    geometry::Range2d<float> bounds = getBounds();
-    if ( bounds.isFinite() ) return bounds.height();
-        return 0;
+    rect bounds = getBounds();
+    return bounds.height();
   }
 
       /// Returns local, untransformed width of this character in TWIPS
@@ -685,9 +684,8 @@ public:
   ///
   float get_width() const
   {
-    geometry::Range2d<float> bounds = getBounds();
-    if ( bounds.isFinite() ) return bounds.width();
-        return 0;
+    rect bounds = getBounds();
+    return bounds.width();
   }
 
       /// Returns local, untransformed bounds of this character in TWIPS
@@ -698,11 +696,11 @@ public:
   /// bounds of all their childrens, appropriaterly transformed with
   /// their local matrix.
   ///
-  virtual geometry::Range2d<float> getBounds() const
+  virtual rect getBounds() const
   {
     log_error("FIXME: character %s did not override the getBounds() method",
         typeid(*this).name());
-    return geometry::Range2d<float>(geometry::nullRange);
+    return rect();
   }
 
   /// Return true if the given point falls in this character's bounds
@@ -711,10 +709,10 @@ public:
   ///
   bool pointInBounds(float x, float y) const
   {
-    geometry::Range2d<float> bounds = getBounds();
+    rect bounds = getBounds();
     matrix wm = get_world_matrix();
     wm.transform(bounds);
-    return bounds.contains(x, y);
+    return bounds.point_test(x, y);
   }
 
   /// Return true if the given point falls in this character's shape

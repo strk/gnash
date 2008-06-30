@@ -232,6 +232,32 @@ matrix::transform(geometry::Range2d<float>& r) const
     r.expandTo(p3.x, p3.y);
 }
 
+void 
+matrix::transform(rect& r) const
+{
+    if ( r.is_null() ) return;
+
+    boost::int32_t x1 = r.get_x_min();
+    boost::int32_t y1 = r.get_y_min();
+    boost::int32_t x2 = r.get_x_max();
+    boost::int32_t y2 = r.get_y_max();
+
+    geometry::Point2d<boost::int32_t> p0(x1, y1);
+    geometry::Point2d<boost::int32_t> p1(x2, y1);
+    geometry::Point2d<boost::int32_t> p2(x2, y2);
+    geometry::Point2d<boost::int32_t> p3(x1, y2);
+
+    transform(p0);
+    transform(p1);
+    transform(p2);
+    transform(p3);
+
+    r.set_to_point(p0.x, p0.y);
+    r.expand_to_point(p1.x, p1.y);
+    r.expand_to_point(p2.x, p2.y);
+    r.expand_to_point(p3.x, p3.y);
+}
+
 const matrix&
 matrix::invert()
 // invert this matrix and return the result.
@@ -302,16 +328,16 @@ std::ostream& operator<< (std::ostream& o, const matrix& m)
 
     o << std::endl << "|"
       << std::setw(fieldWidth) << std::fixed << std::setprecision(4) 
-      << m.sx/65536.0 << " "
+      << m.sx / 65536.0 << " "
       << std::setw(fieldWidth) << std::fixed << std::setprecision(4) 
-      << m.shy/65536.0 << " "
+      << m.shy/ 65536.0 << " "
       << std::setw(fieldWidth) << std::fixed << std::setprecision(4) 
       << TWIPS_TO_PIXELS(m.tx) << " |" 
       << std::endl << "|"
       << std::setw(fieldWidth) << std::fixed << std::setprecision(4) 
-      << m.shx/65536.0 << " "
+      << m.shx/ 65536.0 << " "
       << std::setw(fieldWidth) << std::fixed << std::setprecision(4) 
-      << m.sy/65536.0 << " "
+      << m.sy / 65536.0 << " "
       << std::setw(fieldWidth) << std::fixed << std::setprecision(4) 
       << TWIPS_TO_PIXELS(m.ty) << " |";
       

@@ -127,7 +127,7 @@ public:
 
 	void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
 
-	geometry::Range2d<float> getBounds() const
+	rect getBounds() const
 	{
 		return _bounds;
 	}
@@ -392,7 +392,7 @@ public:
 
 	void setUnderlined(bool v);
 
-	const geometry::Range2d<float>& getTextBoundingBox() const
+	const rect& getTextBoundingBox() const
 	{
 		return m_text_bounding_box;
 	}
@@ -444,12 +444,12 @@ private:
 	boost::intrusive_ptr<edit_text_character_def> m_def;
 
 	/// bounds of dynamic text, as laid out
-	geometry::Range2d<float> m_text_bounding_box;
+	rect m_text_bounding_box;
 
 	/// Reset our text bounding box to the given point.
 	void	reset_bounding_box(float x, float y)
 	{
-		m_text_bounding_box.setTo(x,y);
+		m_text_bounding_box.set_to_point(x, y);
 	}
 
 	typedef std::vector<text_glyph_record> TextGlyphRecords;
@@ -581,7 +581,7 @@ private:
 	/// extended to fit text or hide text overflowing it.
 	/// See the setAutoSize() method to change that.
 	///
-	geometry::Range2d<float> _bounds;
+	rect _bounds;
 
 protected:
 

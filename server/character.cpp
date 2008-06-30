@@ -447,26 +447,20 @@ character::width_getset(const fn_call& fn)
 	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
 
 	// Bounds are used for both getter and setter
-	geometry::Range2d<float> bounds = ptr->getBounds();
-
+	rect bounds = ptr->getBounds();
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
-	{
-		double w = 0;
-		if ( bounds.isFinite() )
-		{
-			matrix m = ptr->get_matrix();
-			m.transform(bounds);
-			assert(bounds.isFinite());
-			w = TWIPS_TO_PIXELS(std::floor(bounds.width() + 0.5));
-		}
+	{ 
+		matrix m = ptr->get_matrix();
+		m.transform(bounds);
+		double w = TWIPS_TO_PIXELS( bounds.width() );
 		rv = as_value(w);
 	}
 	else // setter
 	{
-		if ( ! bounds.isFinite() )
+		if ( ! bounds.is_null() )
 		{
-			log_unimpl(_("FIXME: can't set _width on character %s (%s) with null or world bounds"),
+			log_unimpl(_("FIXME: can't set _width on character %s (%s) with null bounds"),
 				ptr->getTarget(), typeName(*ptr));
 			return rv;
 		}
@@ -488,7 +482,7 @@ character::width_getset(const fn_call& fn)
 			);
 		}
 
-		ptr->set_x_scale(newwidth/oldwidth);
+		ptr->set_x_scale( newwidth / oldwidth );
 	}
 	return rv;
 }
@@ -499,26 +493,20 @@ character::height_getset(const fn_call& fn)
 	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
 
 	// Bounds are used for both getter and setter
-	geometry::Range2d<float> bounds = ptr->getBounds();
-
+	rect bounds = ptr->getBounds();
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
 	{
-		double h = 0;
-		if ( bounds.isFinite() )
-		{
-			matrix m = ptr->get_matrix();
-			m.transform(bounds);
-			assert(bounds.isFinite());
-			h = TWIPS_TO_PIXELS(std::floor(bounds.height() + 0.5));        
-		}
+		matrix m = ptr->get_matrix();
+		m.transform(bounds);
+		double h = TWIPS_TO_PIXELS( bounds.height() );      
 		rv = as_value(h);
 	}
 	else // setter
 	{
-		if ( ! bounds.isFinite() )
+		if ( ! bounds.is_null() )
 		{
-			log_unimpl(_("FIXME: can't set _height on character %s (%s) with null or world bounds"),
+			log_unimpl(_("FIXME: can't set _height on character %s (%s) with null bounds"),
 				ptr->getTarget(), typeName(*ptr));
 			return rv;
 		}
@@ -540,7 +528,7 @@ character::height_getset(const fn_call& fn)
 			);
 		}
 
-		ptr->set_y_scale(newheight/oldheight);
+		ptr->set_y_scale( newheight / oldheight );
 	}
 
 	return rv;
@@ -554,25 +542,20 @@ character::rotation_getset(const fn_call& fn)
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
 	{
-		// Verified against Macromedia player using samples/test_rotation.swf
-		double	angle = ptr->get_matrix().get_rotation();
-
-		// Result is CLOCKWISE DEGREES, [-180,180]
-		angle *= 180.0f / float(M_PI);
-
+		double  angle = ptr->get_matrix().get_rotation();
+        // convert radian to degree
+		angle *= 180.0 / M_PI;
 		rv = as_value(angle);
 	}
 	else // setter
 	{
-		// @@ tulrich: is parameter in world-coords or local-coords?
 		matrix m = ptr->get_matrix();
-
 		// input is in degrees
-		const double rotation = fn.arg(0).to_number() * float(M_PI) / 180.f;
+		double  rotation = fn.arg(0).to_number() * M_PI / 180.0;
 		m.set_rotation(rotation);
 
 		ptr->set_matrix(m);
-		ptr->transformedByScript(); // m_accept_anim_moves = false; 
+		ptr->transformedByScript(); 
 	}
 	return rv;
 }
@@ -1033,10 +1016,10 @@ character::setMaskee(character* maskee)
 bool 
 character::boundsInClippingArea() const 
 {
-  geometry::Range2d<float> mybounds = getBounds();
+  rect mybounds = getBounds();
   get_world_matrix().transform(mybounds);
   
-  return gnash::render::bounds_in_clipping_area(mybounds);  
+  return gnash::render::bounds_in_clipping_area( mybounds.getRange() );  
 }
 
 #ifdef USE_SWFTREE

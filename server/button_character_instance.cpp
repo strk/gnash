@@ -785,11 +785,10 @@ button_character_instance::add_invalidated_bounds(InvalidatedRanges& ranges,
 	);
 }
 
-geometry::Range2d<float>
+rect
 button_character_instance::getBounds() const
 {
-	typedef geometry::Range2d<float> Range;
-	Range allBounds(geometry::nullRange);
+	rect allBounds;
 
 	typedef std::vector<character*> CharVect;
 	CharVect actChars;
@@ -797,13 +796,10 @@ button_character_instance::getBounds() const
 	for(CharVect::iterator i=actChars.begin(),e=actChars.end(); i!=e; ++i)
 	{
 		const character* ch = *i;
-
 		// Child bounds need be transformed in our coordinate space
-		Range lclBounds = ch->getBounds();
+		rect lclBounds = ch->getBounds();
 		matrix m = ch->get_matrix();
-		m.transform(lclBounds);
-
-		allBounds.expandTo(lclBounds);
+		allBounds.expand_to_transformed_rect(m, lclBounds);
 	}
 
 	return allBounds;
