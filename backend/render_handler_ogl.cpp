@@ -998,7 +998,7 @@ public:
     
     std::vector<line_style> dummy_ls;
     
-    draw_subshape(path_vec, matrix(), dummy_cx, 1.0, dummy_fs, dummy_ls);
+    draw_subshape(path_vec, matrix(), dummy_cx, dummy_fs, dummy_ls);
   }
   
   virtual void disable_mask()
