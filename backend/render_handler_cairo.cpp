@@ -357,7 +357,7 @@ public:
     
   }
 
-  inline void lineTo(const geometry::Point2d<int>& ap)
+  void lineTo(const geometry::Point2d<int>& ap)
   {
     double x = ap.x;
     double y = ap.y;
@@ -778,27 +778,6 @@ public:
     }
   }
   
-  
-  PathPtrVec
-  get_paths_by_style(const PathVec& path_vec, unsigned int style)
-  {
-    PathPtrVec paths;
-    for (PathVec::const_iterator it = path_vec.begin(), end = path_vec.end();
-         it != end; ++it) {
-      const path& cur_path = *it;
-      
-      if (cur_path.m_fill0 == style) {
-        paths.push_back(&cur_path);
-      }
-      
-      if (cur_path.m_fill1 == style) {
-        paths.push_back(&cur_path);
-      }
-      
-    }
-    return paths;
-  }
-  
   void apply_line_style(const line_style& style, const cxform& cx)
   {
     cairo_line_join_t join_style = CAIRO_LINE_JOIN_MITER;
@@ -836,6 +815,7 @@ public:
 
     cairo_set_line_cap(_cr, cap_style);
 
+    // TODO: test that this is correct.
     cairo_set_miter_limit(_cr, style.miterLimitFactor());
 
     float width = style.getThickness();
@@ -850,10 +830,11 @@ public:
       //       and !style.scaleThicknessHorizontally().
       //       If that's not the case, we should scale the thickness
       //       togheter with the shapes.
-      if ( style.scaleThicknessVertically() || style.scaleThicknessHorizontally() )
-      {
+      if (style.scaleThicknessVertically() ||
+          style.scaleThicknessHorizontally()) {
         LOG_ONCE( log_unimpl(_("Scaled strokes in Cairo renderer")) );
       }
+
       cairo_set_line_width(_cr, width);
     }
     
@@ -990,19 +971,6 @@ draw_subshape(const PathVec& path_vec, const matrix& mat, const cxform& cx,
     
   }
   
-  void
-  destroy_cairo_patterns(std::vector<cairo_pattern_t*>& patterns)
-  {
-    for (std::vector<cairo_pattern_t*>::iterator it = patterns.begin(),
-         end = patterns.end(); it != end; ++it) {
-      cairo_pattern_t* pattern = *it;
-      if (pattern && cairo_pattern_get_type(pattern) !=
-                     CAIRO_PATTERN_TYPE_SURFACE) {
-        cairo_pattern_destroy(pattern);
-      }
-    }
-  }  
-
   virtual void draw_glyph(shape_character_def *def, const matrix& mat,
     const rgba& color, float pixel_scale)
   {

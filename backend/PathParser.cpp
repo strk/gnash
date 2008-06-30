@@ -36,8 +36,6 @@ UnivocalPath::endPoint() const
   return _fill_type == FILL_LEFT ? _path->m_edges.back().ap : _path->ap;
 }
 
-
-
 PathParser::PathParser(const std::vector<path>& paths, size_t numstyles)
 : _paths(paths),
   _num_styles(numstyles),
@@ -48,6 +46,8 @@ PathParser::PathParser(const std::vector<path>& paths, size_t numstyles)
 void
 PathParser::run(const cxform& cx, const matrix& mat)
 {
+  // Since we frequently remove an element from the front or the back, we use
+  // a double ended queue here.
   typedef std::deque<UnivocalPath> UniPathList;
 
   std::vector<UniPathList> unipathvec(_num_styles);
