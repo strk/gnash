@@ -18,7 +18,6 @@
 
 #include <boost/utility.hpp>
 #include "PathParser.h"
-#include <deque>
 #include <map>
 #include <boost/bind.hpp>
 
@@ -82,8 +81,7 @@ PathParser::run(const cxform& cx, const matrix& mat)
         path_list.pop_front();
       }
 
-      UniPathList::iterator it = std::find_if(path_list.begin(),
-        path_list.end(), boost::bind(&PathParser::emitConnecting, this, _1));
+      UniPathList::iterator it = emitConnecting(path_list);
      
       if (it == path_list.end()) {
         if (!closed_shape()) {
@@ -100,16 +98,24 @@ PathParser::run(const cxform& cx, const matrix& mat)
 
 }
 
-bool
-PathParser::emitConnecting(const UnivocalPath& subject)
+std::deque<UnivocalPath>::iterator
+PathParser::emitConnecting(std::deque<UnivocalPath>& paths)
 {
-  if (subject.startPoint() != _cur_endpoint) {
-    return false;
+  std::deque<UnivocalPath>::iterator it = paths.begin(),
+                                     end = paths.end();
+  while (it != end) {
+
+    if ((*it).startPoint() == _cur_endpoint) {
+      break;
+    }
+
+    ++it;
   }
 
-  append(subject);
-
-  return true;
+  if (it != end) {
+    append(*it);
+  }
+  return it;
 }
 
 void
@@ -121,8 +127,6 @@ PathParser::append(const UnivocalPath& append_path)
 
     std::for_each(edges.begin(), edges.end(), boost::bind(&PathParser::line_to,
                                                           this, _1));
-    _cur_endpoint = edges.back().ap;
-
   } else {
 
     for (std::vector<edge>::const_reverse_iterator prev = edges.rbegin(),
@@ -133,11 +137,11 @@ PathParser::append(const UnivocalPath& append_path)
         line_to(Edge<int>((*prev).cp, (*it).ap));
       }
     }
-    
-    _cur_endpoint = append_path._path->ap;
-    line_to(Edge<int>(edges.front().cp, _cur_endpoint));
 
+    line_to(Edge<int>(edges.front().cp, append_path.endPoint()));
   }
+    
+  _cur_endpoint = append_path.endPoint();
 }
 
 void

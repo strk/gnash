@@ -21,6 +21,7 @@
 
 #include "shape.h"
 #include <vector>
+#include <deque>
 #include "cxform.h"
 
 namespace gnash
@@ -100,7 +101,7 @@ public:
   virtual void lineTo(const geometry::Point2d<int>& p) = 0;
 
 private:
-  bool emitConnecting(const UnivocalPath& subject);
+  std::deque<UnivocalPath>::iterator emitConnecting(std::deque<UnivocalPath>& paths);
     
   void append(const UnivocalPath& append_path);
   

@@ -357,7 +357,7 @@ public:
     
   }
 
-  void lineTo(const geometry::Point2d<int>& ap)
+  inline void lineTo(const geometry::Point2d<int>& ap)
   {
     double x = ap.x;
     double y = ap.y;
