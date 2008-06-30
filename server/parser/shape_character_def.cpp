@@ -751,9 +751,6 @@ namespace gnash
 
         render_handler* renderer = get_render_handler();
 
-	/// FIXME: this is stupid. There is no reason for the renderering
-	/// modifying 'this' or the object 'this' points to, so it should 
-	/// be able to take a const pointer. Or, even better, a const ref.
         renderer->draw_shape_character(this_non_const, mat, cx, fill_styles,
                                        line_styles);
     }
