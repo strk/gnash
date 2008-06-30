@@ -139,7 +139,7 @@ public:
         }
 
 	/// Get the composite bounds of all component drawing elements
-	geometry::Range2d<float> getBounds() const;
+	rect getBounds() const;
 
 	// See dox in character.h
 	bool pointInShape(float x, float y) const;

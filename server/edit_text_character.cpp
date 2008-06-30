@@ -499,7 +499,7 @@ edit_text_character::edit_text_character(character* parent,
 	_selectable(!m_def->get_no_select()),
 	_autoSize(autoSizeNone),
 	_type(m_def->get_readonly() ? typeDynamic : typeInput),
-	_bounds(m_def->get_bounds().getRange())
+	_bounds(m_def->get_bounds())
 {
 	assert(parent);
 	assert(m_def);
@@ -605,15 +605,15 @@ edit_text_character::display()
 
 	matrix	wmat = get_world_matrix();
 
-	if ( (drawBorder || drawBackground) && _bounds.isFinite() )
+	if ( (drawBorder || drawBackground) && !_bounds.is_null() )
 	{
 
 		point	coords[4];
 
-		float xmin = _bounds.getMinX();
-		float xmax = _bounds.getMaxX();
-		float ymin = _bounds.getMinY();
-		float ymax = _bounds.getMaxY();
+		boost::int32_t xmin = _bounds.get_x_min();
+		boost::int32_t xmax = _bounds.get_x_max();
+		boost::int32_t ymin = _bounds.get_y_min();
+		boost::int32_t ymax = _bounds.get_y_max();
 
 		coords[0].setTo(xmin, ymin); 
 		coords[1].setTo(xmax, ymin); 
@@ -646,9 +646,9 @@ edit_text_character::display()
 	// Anyway, see bug #17954 for a testcase.
 	matrix m;
 
-	if ( _bounds.isFinite() ) // ! def_bounds.is_null() && ! def_bounds.is_world() 
+	if ( !_bounds.is_null() ) // ! def_bounds.is_null() && ! def_bounds.is_world() 
 	{
-		m.concatenate_translation(_bounds.getMinX(), _bounds.getMinY()); // def_bounds.get_x_min(), def_bounds.get_y_min()
+		m.concatenate_translation(_bounds.get_x_min(), _bounds.get_y_min()); 
 	}
 	
 	
@@ -674,10 +674,10 @@ edit_text_character::add_invalidated_bounds(InvalidatedRanges& ranges,
 
 	matrix wm = get_world_matrix();
 
-	geometry::Range2d<float> bounds = getBounds();
-	bounds.expandTo(m_text_bounding_box); // add text bounds
+	rect bounds = getBounds();
+	bounds.expand_to_rect(m_text_bounding_box); 
 	wm.transform(bounds);
-	ranges.add(bounds);            
+	ranges.add( bounds.getRange() );            
 }
 
 bool
@@ -808,7 +808,7 @@ edit_text_character::get_topmost_mouse_entity(float x, float y)
     point p(x, y);
     m.invert().transform(p);
 
-	if ( _bounds.contains(p.x, p.y) )
+	if ( _bounds.point_test(p.x, p.y) )
 	{
 		return this;
 	}
@@ -970,7 +970,7 @@ edit_text_character::set_member(string_table::key name,
 #endif
 			return true; // nothing to do
 		}
-		if ( ! _bounds.isFinite() )
+		if ( _bounds.is_null() )
 		{
 #ifdef GNASH_DEBUG_TEXTFIELDS
 			log_debug("Non-finite TextField bounds : %s", _bounds);
@@ -986,16 +986,14 @@ edit_text_character::set_member(string_table::key name,
 
 		// Modify TextField drawing rectangle
 		// TODO: check which anchor point we should use !
-		float xmin = _bounds.getMinX();
-		float ymin = _bounds.getMinY();
-		float ymax = _bounds.getMaxY();
-		float xmax = xmin + nw;
+		boost::int32_t xmin = _bounds.get_x_min();
+		boost::int32_t ymin = _bounds.get_y_min();
+		boost::int32_t ymax = _bounds.get_y_max();
+		boost::int32_t xmax = xmin + nw;
 
 		assert(xmin <= xmax);
-
-		_bounds.setTo(xmin, ymin, xmax, ymax);
-		
-		assert( _bounds.width() - nw < 0.001 && _bounds.width() - nw > -0.001);
+		_bounds.set_to_rect(xmin, ymin, xmax, ymax);
+        assert( _bounds.width() - nw < 0.001 && _bounds.width() - nw > -0.001);
 
 		// previously truncated text might get visible now
 		// TODO: if nested masks were implemented we would 
@@ -1031,11 +1029,8 @@ edit_text_character::set_member(string_table::key name,
 #endif // GNASH_DEBUG_TEXTFIELDS
 			return true; // nothing to do
 		}
-		if ( ! _bounds.isFinite() )
+		if ( _bounds.is_null() )
 		{
-#ifdef GNASH_DEBUG_TEXTFIELDS
-			log_debug("Non-finite TextField bounds : %s", _bounds);
-#endif // GNASH_DEBUG_TEXTFIELDS
 			return true;
 		}
 
@@ -1046,10 +1041,10 @@ edit_text_character::set_member(string_table::key name,
 
 		// Modify TextField drawing rectangle
 		// TODO: check which anchor point we should use !
-		float xmin = _bounds.getMinX();
-		float xmax = _bounds.getMaxX();
-		float ymin = _bounds.getMinY();
-		_bounds.setTo(xmin, ymin, xmax, ymin+nh);
+		boost::int32_t xmin = _bounds.get_x_min();
+		boost::int32_t xmax = _bounds.get_x_max();
+		boost::int32_t ymin = _bounds.get_y_min();
+		_bounds.set_to_rect(xmin, ymin, xmax, ymin+nh);
 
 		assert(_bounds.height() == nh);
 
@@ -1234,15 +1229,14 @@ edit_text_character::format_text()
 	// nothing more to do if text is empty
 	if ( _text.empty() ) return;
 
-	Range2d<float> defBounds = m_def->get_bounds().getRange();
+	rect defBounds = m_def->get_bounds();
 
 	AutoSizeValue autoSize = getAutoSize();
 	if ( autoSize != autoSizeNone )
 	{
 		LOG_ONCE( log_debug(_("TextField.autoSize != 'none' TESTING")) );
 
-		_bounds.setTo(0,0,defBounds.getMaxX(),0); // this is correct for 'true'
-		//_bounds.setNull();
+		_bounds.set_to_rect(0, 0, defBounds.get_x_max(), 0); // this is correct for 'true'
 	}
 
 	// Should get info from autoSize too maybe ?
@@ -1318,7 +1312,7 @@ edit_text_character::format_text()
 
 		// Expand the bounding-box to the lower-right corner of each glyph as
 		// we generate it.
-		m_text_bounding_box.expandTo(x, y + fontDescent);
+		m_text_bounding_box.expand_to_point(x, y + fontDescent);
 
 		if (code == 13 || code == 10)
 		{
@@ -1334,7 +1328,7 @@ edit_text_character::format_text()
 			align_line(textAlignment, last_line_start_record, x);
 
 			// Expand bounding box to include last column of text ...
-			if ( _autoSize != autoSizeNone ) _bounds.expandTo(x+PADDING_TWIPS, y+PADDING_TWIPS);
+			if ( _autoSize != autoSizeNone ) _bounds.expand_to_point(x+PADDING_TWIPS, y+PADDING_TWIPS);
 
 			// new paragraphs get the indent.
 			x = std::max(0, leftMargin + indent) + PADDING_TWIPS;
@@ -1513,7 +1507,7 @@ after_x_advance:
 					}
 					// Expand the bounding-box to the lower-right corner of each glyph,
 					// even if we don't display it 
-					m_text_bounding_box.expandTo(x, y + fontDescent);
+					m_text_bounding_box.expand_to_point(x, y + fontDescent);
 #ifdef GNASH_DEBUG_TEXT_FORMATTING
 					log_debug("Text bbox expanded to %s (width: %f)", m_text_bounding_box, m_text_bounding_box.width());
 #endif
@@ -1624,7 +1618,7 @@ after_x_advance:
 	// Expand bounding box to include the whole text (if autoSize)
 	if ( _autoSize != autoSizeNone )
 	{
-		_bounds.expandTo(x+PADDING_TWIPS, y+PADDING_TWIPS);
+		_bounds.expand_to_point(x+PADDING_TWIPS, y+PADDING_TWIPS);
 	}
 
 	// Add this line to our output.
@@ -1871,7 +1865,7 @@ edit_text_character::pointInShape(float x, float y) const
 	matrix wm = get_world_matrix();
 	point lp(x, y);
     wm.invert().transform(lp);
-	return _bounds.contains(lp.x, lp.y);
+	return _bounds.point_test(lp.x, lp.y);
 }
 
 bool

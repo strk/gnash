@@ -212,6 +212,15 @@ public:
         _xMin = _xMax = x;
         _yMin = _yMax = y;
     }
+
+    
+    void  set_to_rect(boost::int32_t x1, boost::int32_t y1, boost::int32_t x2, boost::int32_t y2)
+    {
+        _xMin = x1;
+        _yMin = y1;
+        _xMax = x2;
+        _yMax = y2;
+    }
     
     /// Expand this rectangle to enclose the given point.
     void    expand_to_point(boost::int32_t x, boost::int32_t y)

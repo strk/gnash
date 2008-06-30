@@ -33,7 +33,7 @@
 #include "sound_handler.h"
 #include "timers.h" // for Timer use
 #include "GnashKey.h" // key::code
-#include "gui.h"
+#include "../gui/gui.h"
 
 #include <utility>
 #include <iostream>
@@ -998,10 +998,8 @@ movie_root::doMouseDrag()
 	if ( m_drag_state.hasBounds() )
 	{
 		rect bounds;
-
 		// bounds are in local coordinate space
 		bounds.enclose_transformed_rect(parent_world_mat, m_drag_state.getBounds());
-
 		// Clamp mouse coords within a defined rect.
 		bounds.clamp(world_mouse);
 	}

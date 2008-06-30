@@ -812,15 +812,15 @@ static as_value sprite_hit_test(const fn_call& fn)
         return as_value();
       }
 
-      geometry::Range2d<float> thisbounds = sprite->getBounds();
+      rect thisbounds = sprite->getBounds();
       matrix thismat = sprite->get_world_matrix();
       thismat.transform(thisbounds);
 
-      geometry::Range2d<float> tgtbounds = target->getBounds();
+      rect tgtbounds = target->getBounds();
       matrix tgtmat = target->get_world_matrix();
       tgtmat.transform(tgtbounds);
 
-      return thisbounds.intersects(tgtbounds);
+      return thisbounds.getRange().intersects(tgtbounds.getRange());
 
       break;
     }
@@ -1006,7 +1006,7 @@ sprite_getBounds(const fn_call& fn)
   boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 
 
-  geometry::Range2d<float> bounds  = sprite->getBounds();
+  rect bounds  = sprite->getBounds();
 
   if ( fn.nargs > 0 )
   {
@@ -1033,13 +1033,13 @@ sprite_getBounds(const fn_call& fn)
   double xMax = 6710886.35;
   double yMax = 6710886.35;
 
-  if ( bounds.isFinite() )
+  if ( !bounds.is_null() )
   {
     // Round to the twip
-    xMin = std::floor(bounds.getMinX() + 0.5) / 20.0;
-    yMin = std::floor(bounds.getMinY() + 0.5) / 20.0;
-    xMax = std::floor(bounds.getMaxX() + 0.5) / 20.0;
-    yMax = std::floor(bounds.getMaxY() + 0.5) / 20.0;
+    xMin = bounds.get_x_min() / 20.0;
+    yMin = bounds.get_y_min() / 20.0;
+    xMax = bounds.get_x_max() / 20.0;
+    yMax = bounds.get_y_max() / 20.0;
   }
 
   boost::intrusive_ptr<as_object> bounds_obj(new as_object());
@@ -1259,8 +1259,8 @@ sprite_lineTo(const fn_call& fn)
   }
   );
 
-  float x = PIXELS_TO_TWIPS(fn.arg(0).to_number());
-  float y = PIXELS_TO_TWIPS(fn.arg(1).to_number());
+  float x = fn.arg(0).to_number();
+  float y = fn.arg(1).to_number();
 
   // FIXME: x and y are always valid after function PIXELS_TO_TWIPS()
   if ( ! utility::isFinite(x) )
@@ -1288,7 +1288,7 @@ sprite_lineTo(const fn_call& fn)
 #ifdef DEBUG_DRAWING_API
   log_debug("%s.lineTo(%g,%g);", sprite->getTarget(), x, y);
 #endif
-  sprite->lineTo(x, y);
+  sprite->lineTo(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
 
   return as_value();
 }
@@ -1314,8 +1314,8 @@ sprite_moveTo(const fn_call& fn)
   }
   );
 
-  float x = PIXELS_TO_TWIPS(fn.arg(0).to_number());
-  float y = PIXELS_TO_TWIPS(fn.arg(1).to_number());
+  float x = fn.arg(0).to_number();
+  float y = fn.arg(1).to_number();
 
   // FIXME: x and y are always valid after function PIXELS_TO_TWIPS()
   if ( ! utility::isFinite(x) )
@@ -1343,7 +1343,7 @@ sprite_moveTo(const fn_call& fn)
 #ifdef DEBUG_DRAWING_API
   log_debug(_("%s.moveTo(%g,%g);"), sprite->getTarget(), x, y);
 #endif
-  sprite->moveTo(x, y);
+  sprite->moveTo(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
 
   return as_value();
 }
@@ -1539,10 +1539,10 @@ sprite_curveTo(const fn_call& fn)
   }
   );
 
-  float cx = PIXELS_TO_TWIPS(fn.arg(0).to_number());
-  float cy = PIXELS_TO_TWIPS(fn.arg(1).to_number());
-  float ax = PIXELS_TO_TWIPS(fn.arg(2).to_number());
-  float ay = PIXELS_TO_TWIPS(fn.arg(3).to_number());
+  float cx = fn.arg(0).to_number();
+  float cy = fn.arg(1).to_number();
+  float ax = fn.arg(2).to_number();
+  float ay = fn.arg(3).to_number();
 
   if ( ! utility::isFinite(cx) )
   {
@@ -1591,7 +1591,7 @@ sprite_curveTo(const fn_call& fn)
 #ifdef DEBUG_DRAWING_API
   log_debug(_("%s.curveTo(%g,%g,%g,%g);"), sprite->getTarget(), cx, cy, ax, ay);
 #endif
-  sprite->curveTo(cx, cy, ax, ay);
+  sprite->curveTo(PIXELS_TO_TWIPS(cx), PIXELS_TO_TWIPS(cy), PIXELS_TO_TWIPS(ax), PIXELS_TO_TWIPS(ay));
 
   return as_value();
 }
@@ -1825,7 +1825,7 @@ sprite_beginGradientFill(const fn_call& fn)
 
       // Gnash radial gradients are 64x64 with center at 32,32
       // Should be 20x20 with center at 0,0
-      float g2fs = 20.0/64.0; // gnash to flash scale
+      const double g2fs = 20.0/64.0; // gnash to flash scale
       gnashToFlash.set_scale(g2fs, g2fs);
       gnashToFlash.concatenate_translation(-32, -32);
 
@@ -2389,8 +2389,8 @@ movieclip_class_init(as_object& global)
 //
 class BoundsFinder {
 public:
-  geometry::Range2d<float>& _bounds;
-  BoundsFinder(geometry::Range2d<float>& b)
+  rect& _bounds;
+  BoundsFinder(rect& b)
     :
     _bounds(b)
   {}
@@ -2398,10 +2398,9 @@ public:
   {
     // don't include bounds of unloaded characters
     if ( ch->isUnloaded() ) return;
-    geometry::Range2d<float> chb = ch->getBounds();
+    rect  chb = ch->getBounds();
     matrix m = ch->get_matrix();
-    m.transform(chb);
-    _bounds.expandTo(chb);
+    _bounds.expand_to_transformed_rect(m, chb);
   }
 };
 
@@ -4718,16 +4717,14 @@ sprite_instance::removeMovieClip()
 
 }
 
-geometry::Range2d<float>
+rect
 sprite_instance::getBounds() const
 {
-  typedef geometry::Range2d<float> Range;
-
-  Range bounds;
+  rect bounds;
   BoundsFinder f(bounds);
   const_cast<DisplayList&>(m_display_list).visitAll(f);
-  Range drawableBounds = _drawable->get_bound().getRange();
-  bounds.expandTo(drawableBounds);
+  rect drawableBounds = _drawable->get_bound();
+  bounds.expand_to_rect(drawableBounds);
   
   return bounds;
 }

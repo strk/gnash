@@ -76,9 +76,9 @@ public:
 
 	virtual void	display();
 
-	geometry::Range2d<float> getBounds() const
+	rect getBounds() const
 	{
-		return m_def->get_bound().getRange();
+		return m_def->get_bound();
 	}
 
 	/// Generic character is NEVER a mouse entity by default, so
