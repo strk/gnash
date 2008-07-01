@@ -477,9 +477,10 @@ SWFHandlers::ActionNextFrame(ActionExec& thread)
     assert(thread.atActionTag(SWF::ACTION_NEXTFRAME));
 #endif
 
-    sprite_instance* tgt = env.get_target()->to_movie();
-    assert(tgt);
-    tgt->goto_frame(tgt->get_current_frame() + 1);
+    character* tgtch = env.get_target();
+    sprite_instance* tgt = tgtch ? tgtch->to_movie() : 0;
+    if ( tgt ) tgt->goto_frame(tgt->get_current_frame() + 1);
+    else log_debug(_("ActionNextFrame: as_environment target is null or not a sprite"));
 }
 
 void
@@ -492,9 +493,10 @@ SWFHandlers::ActionPrevFrame(ActionExec& thread)
     assert(thread.atActionTag(SWF::ACTION_PREVFRAME));
 #endif
 
-    sprite_instance* tgt = env.get_target()->to_movie();
-    assert(tgt);
-    tgt->goto_frame(tgt->get_current_frame() - 1);
+    character* tgtch = env.get_target();
+    sprite_instance* tgt = tgtch ? tgtch->to_movie() : 0;
+    if ( tgt ) tgt->goto_frame(tgt->get_current_frame() - 1);
+    else log_debug(_("ActionPrevFrame: as_environment target is null or not a sprite"));
 }
 
 void
@@ -507,9 +509,10 @@ SWFHandlers::ActionPlay(ActionExec& thread)
     assert(thread.atActionTag(SWF::ACTION_PLAY));
 #endif
 
-    sprite_instance* tgt = env.get_target()->to_movie();
-    assert(tgt);
-    tgt->set_play_state(sprite_instance::PLAY);
+    character* tgtch = env.get_target();
+    sprite_instance* tgt = tgtch ? tgtch->to_movie() : 0;
+    if ( tgt ) tgt->set_play_state(sprite_instance::PLAY);
+    else log_debug(_("ActionPlay: as_environment target is null or not a sprite"));
 }
 
 void
@@ -522,10 +525,10 @@ SWFHandlers::ActionStop(ActionExec& thread)
     assert(thread.atActionTag(SWF::ACTION_STOP));
 #endif
 
-    sprite_instance* tgt = env.get_target()->to_movie();
-    assert(tgt);
-
-    tgt->set_play_state(sprite_instance::STOP);
+    character* tgtch = env.get_target();
+    sprite_instance* tgt = tgtch ? tgtch->to_movie() : 0;
+    if ( tgt ) tgt->set_play_state(sprite_instance::STOP);
+    else log_debug(_("ActionStop: as_environment target is null or not a sprite"));
 }
 
 void
@@ -565,11 +568,12 @@ SWFHandlers::ActionGotoFrame(ActionExec& thread)
 
     size_t frame = code.read_int16(thread.getCurrentPC()+3);
 
-    sprite_instance* tgt = env.get_target()->to_movie();
-    assert(tgt);
+    character* tgtch = env.get_target();
+    sprite_instance* tgt = tgtch ? tgtch->to_movie() : 0;
 
     // frame number within this tag is hard-coded and 0-based
-    tgt->goto_frame(frame);
+    if ( tgt ) tgt->goto_frame(frame);
+    else log_debug(_("ActionGotoFrame: as_environment target is null or not a sprite"));
 }
 
 void
@@ -632,10 +636,10 @@ SWFHandlers::ActionWaitForFrame(ActionExec& thread)
     boost::uint8_t skip = code[thread.getCurrentPC()+5];
 
     character* target = env.get_target();
-    sprite_instance* target_sprite = target->to_movie();
+    sprite_instance* target_sprite = target ? target->to_movie() : 0;
     if ( ! target_sprite )
     {
-        log_error(_("%s: environment target is not a sprite_instance"),
+        log_error(_("%s: environment target is null or not a sprite_instance"),
                 __FUNCTION__);
         return;
     }
@@ -680,10 +684,10 @@ SWFHandlers::ActionGotoLabel(ActionExec& thread)
 
     const char* frame_label = code.read_string(thread.getCurrentPC()+3);
     character *target = env.get_target();
-    sprite_instance *target_sprite = target->to_movie();
+    sprite_instance *target_sprite = target ? target->to_movie() : 0;
     if ( ! target_sprite )
     {
-        log_error(_("%s: environment target is not a sprite_instance"),
+        log_error(_("%s: environment target is null or not a sprite_instance"),
             __FUNCTION__);
     }
     else
@@ -1020,7 +1024,12 @@ SWFHandlers::ActionSetTargetExpression(ActionExec& thread)
     // we don't ues the target sprite directly, instead we fetch the _target(string type)
     // of that sprite first and then search the final target(might be a different one).
     // see tests in opcode_guard_test2.sc
-    const std::string& target_name = env.top(0).to_string();
+    std::string target_name;
+    const as_value& val = env.top(0);
+    if ( ! val.is_undefined() )
+    {
+       target_name = val.to_string();
+    }
 
     CommonSetTarget(thread, target_name);
 
@@ -1307,9 +1316,10 @@ SWFHandlers::ActionStopDragMovie(ActionExec& thread)
 {
     
     as_environment& env = thread.env;
-    sprite_instance *root_movie = env.get_target()->get_root();
-    assert(root_movie);
-    root_movie->stop_drag();
+    character* tgtch = env.get_target();
+    sprite_instance *root_movie = tgtch ? tgtch->get_root() : 0;
+    if ( root_movie ) root_movie->stop_drag();
+    else log_debug(_("ActionStopDragMovie: as_environment target is null or not a sprite"));
 }
 
 void
@@ -1886,11 +1896,11 @@ SWFHandlers::ActionWaitForFrameExpression(ActionExec& thread)
     // evaluated as for ActionGotoExpression
     as_value framespec = env.pop();
 
-    character* target = env.get_target();
-    sprite_instance* target_sprite = target->to_movie();
+    character* tgtch = env.get_target();
+    sprite_instance* target_sprite = tgtch ? tgtch->to_movie() : 0;
     if ( ! target_sprite )
     {
-        log_error(_("%s: environment target is not a sprite_instance"),
+        log_error(_("%s: environment target is null or not a sprite_instance"),
             __FUNCTION__);
         return;
     }
@@ -2191,7 +2201,9 @@ SWFHandlers::CommonGetUrl(as_environment& env,
         if (m.fsCommandHandle)
         {
             // Call into the app.
-            (*m.fsCommandHandle)(env.get_target()->get_root(), urlTarget.substr(10), target_string.c_str());
+            // NOTE: the first argument is a movie_instance, but isn't used
+            // anyway, so we avoid attempting to fetch one
+            (*m.fsCommandHandle)(0, urlTarget.substr(10), target_string.c_str());
         }
 
         return;
@@ -2474,15 +2486,15 @@ SWFHandlers::CommonSetTarget(ActionExec& thread, const std::string& target_name)
         IF_VERBOSE_ASCODING_ERRORS (
         log_aserror(
             _("Couldn't find movie \"%s\" to set target to!"
-            " Resetting to original target..."),
+            " Setting target to NULL..."),
             target_name);
         );
-        return;
+        //return;
     }
-    else
-    {
+    //else
+    //{
         env.set_target(new_target);
-    }
+    //}
 }
 
 void

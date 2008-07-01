@@ -96,7 +96,7 @@ _global.pass_check = pass_check;
 _global.xpass_check = xpass_check;
 
 setTarget(null);
-// getVaiable(_target) would ascend to other target
+// getVariable(_target) would ascend to other target
 check_equals(_target, '/');
 asm{          
     push 'checkpoint'         

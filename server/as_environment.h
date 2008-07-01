@@ -56,6 +56,14 @@ public:
 	}
 
 	character* get_target() { return m_target; }
+
+	/// Set default target for timeline opcodes
+	//
+	/// @param target
+	///	A character to apply timeline opcodes on.
+	///	Zero is a valid target, disabling timeline
+	///	opcodes (would get ignored).
+	///
 	void set_target(character* target);
 
 	character* get_original_target() { return _original_target; }

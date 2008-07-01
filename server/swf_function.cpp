@@ -227,12 +227,15 @@ swf_function::operator()(const fn_call& fn)
 
 		if (m_function2_flags & PRELOAD_ROOT) 
 		{
-			// Put '_root' in a register.
-			// NOTE: _lockroot will be hanlded by getAsRoot()
-			as_object* r = const_cast<sprite_instance*>(our_env->get_target()->getAsRoot());
-			//our_env->local_register(current_reg).set_as_object(r);
-			our_env->setRegister(current_reg, as_value(r));
-			current_reg++;
+			// Put '_root' (if any) in a register.
+			character* tgtch = our_env->get_target();
+			if ( tgtch )
+			{
+				// NOTE: _lockroot will be hanlded by getAsRoot()
+				as_object* r = const_cast<sprite_instance*>(tgtch->getAsRoot());
+				our_env->setRegister(current_reg, as_value(r));
+				current_reg++;
+			}
 		}
 
 		if (m_function2_flags & PRELOAD_PARENT)
