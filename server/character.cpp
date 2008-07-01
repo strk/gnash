@@ -458,7 +458,7 @@ character::width_getset(const fn_call& fn)
 	}
 	else // setter
 	{
-		if ( ! bounds.is_null() )
+		if ( bounds.is_null() )
 		{
 			log_unimpl(_("FIXME: can't set _width on character %s (%s) with null bounds"),
 				ptr->getTarget(), typeName(*ptr));

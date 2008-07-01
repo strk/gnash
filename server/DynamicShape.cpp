@@ -206,7 +206,7 @@ DynamicShape::lineTo(float x, float y, int swfVersion)
 	} else {
 		m_bound.expand_to_circle(x, y, swfVersion < 8 ? thickness : thickness/2.0);
 	}
-
+    
 	// Update current pen position
 	_x = x;
 	_y = y;

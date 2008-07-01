@@ -226,8 +226,7 @@ public:
     void    expand_to_point(boost::int32_t x, boost::int32_t y)
     {
         if( is_null() ) {
-            _xMin = _yMin = x;
-            _xMax = _yMax = y;
+            set_to_point(x, y);
         }else {
             expand_to(x, y);
         }

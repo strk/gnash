@@ -48,7 +48,7 @@
 #include <boost/algorithm/string/case_conv.hpp>
 
 // Text fields have a fixed 2 pixel padding for each side (regardless of border)
-#define PADDING_TWIPS 40.0f
+#define PADDING_TWIPS 40 
 
 // Define the following macro to maintain compatibility with the proprietary
 // player when it comes to opacity of textfields using device fonts.

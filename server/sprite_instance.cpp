@@ -1261,8 +1261,7 @@ sprite_lineTo(const fn_call& fn)
 
   float x = fn.arg(0).to_number();
   float y = fn.arg(1).to_number();
-
-  // FIXME: x and y are always valid after function PIXELS_TO_TWIPS()
+    
   if ( ! utility::isFinite(x) )
   {
     IF_VERBOSE_ASCODING_ERRORS(
@@ -1289,7 +1288,6 @@ sprite_lineTo(const fn_call& fn)
   log_debug("%s.lineTo(%g,%g);", sprite->getTarget(), x, y);
 #endif
   sprite->lineTo(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
-
   return as_value();
 }
 
@@ -1316,8 +1314,7 @@ sprite_moveTo(const fn_call& fn)
 
   float x = fn.arg(0).to_number();
   float y = fn.arg(1).to_number();
-
-  // FIXME: x and y are always valid after function PIXELS_TO_TWIPS()
+   
   if ( ! utility::isFinite(x) )
   {
     IF_VERBOSE_ASCODING_ERRORS(
@@ -1344,7 +1341,6 @@ sprite_moveTo(const fn_call& fn)
   log_debug(_("%s.moveTo(%g,%g);"), sprite->getTarget(), x, y);
 #endif
   sprite->moveTo(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
-
   return as_value();
 }
 
