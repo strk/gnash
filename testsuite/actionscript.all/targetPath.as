@@ -106,7 +106,7 @@ asm{
     setvariable             
 };
 //check current target is undefined
-xcheck_equals(checkpoint, undefined);
+check_equals(checkpoint, undefined);
 setTarget("");
 
 setTarget('...:mc1');
@@ -120,7 +120,7 @@ asm{
     setvariable             
 };
 //check current target is undefined
-xcheck_equals(checkpoint, undefined);
+check_equals(checkpoint, undefined);
 setTarget("");
 
 setTarget('...:mc');
@@ -134,7 +134,7 @@ asm{
     setvariable             
 };
 //check current target is undefined
-xcheck_equals(checkpoint, undefined);
+check_equals(checkpoint, undefined);
 setTarget("");
 
 asm{          

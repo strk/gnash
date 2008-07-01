@@ -146,13 +146,13 @@ main(int argc, char** argv)
     "   setvariable  "
     "}; "
     // non-exist target does not evaluated to _root!
-    " _root.xcheck_equals(current_target, undefined);"
+    " _root.check_equals(current_target, undefined);"
     // No surprise, getVariable will ascend to _root!
     " _root.check_equals(_target, '/');"
     " _root.check_equals(_root._currentframe, 9);"
     " gotoAndPlay(10);"
     // the above gotoFrame has no effect as it was acting on an non-exist-target
-    "   _root.xcheck_equals(_root._currentframe, 9);"
+    "   _root.check_equals(_root._currentframe, 9);"
     // ascend to the orignal target is the current target is undefined
     // we succeed by luck.
     "   _root.check_equals(orignal_target_var, 100);"
