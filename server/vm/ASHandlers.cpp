@@ -1024,12 +1024,10 @@ SWFHandlers::ActionSetTargetExpression(ActionExec& thread)
     // we don't ues the target sprite directly, instead we fetch the _target(string type)
     // of that sprite first and then search the final target(might be a different one).
     // see tests in opcode_guard_test2.sc
-    std::string target_name;
-    const as_value& val = env.top(0);
-    if ( ! val.is_undefined() )
-    {
-       target_name = val.to_string();
-    }
+    //
+    // for _versioned, see swfdec's settarget2-tostring.as (swf 7 and 8)
+    // 
+    std::string target_name = env.top(0).to_string_versioned(env.get_version());
 
     CommonSetTarget(thread, target_name);
 
