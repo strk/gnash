@@ -96,7 +96,7 @@ _global.pass_check = pass_check;
 _global.xpass_check = xpass_check;
 
 setTarget(null);
-// getVaiable(_target) would ascend to other target
+// getVariable(_target) would ascend to other target
 check_equals(_target, '/');
 asm{          
     push 'checkpoint'         
@@ -106,7 +106,7 @@ asm{
     setvariable             
 };
 //check current target is undefined
-xcheck_equals(checkpoint, undefined);
+check_equals(checkpoint, undefined);
 setTarget("");
 
 setTarget('...:mc1');
@@ -120,7 +120,7 @@ asm{
     setvariable             
 };
 //check current target is undefined
-xcheck_equals(checkpoint, undefined);
+check_equals(checkpoint, undefined);
 setTarget("");
 
 setTarget('...:mc');
@@ -134,7 +134,7 @@ asm{
     setvariable             
 };
 //check current target is undefined
-xcheck_equals(checkpoint, undefined);
+check_equals(checkpoint, undefined);
 setTarget("");
 
 asm{          

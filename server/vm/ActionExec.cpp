@@ -271,16 +271,16 @@ ActionExec::operator() ()
 
 #if 1 // See bugs: #20974, #21069, #20996.
 
-            #if 0
-                // curveball.swf and feed.swf break with this
-                character* guardedChar = env.get_original_target(); // watch out : _originalTarget is not necessarely the same
-            #else
-                // curveball.swf and feed.swf suggest that it is the *current* target,
-                // not the *original* one that matters.
-                character* guardedChar = env.get_target();
+#if 0
+            // curveball.swf and feed.swf break with this
+            character* guardedChar = env.get_original_target(); // watch out : _originalTarget is not necessarely the same
+#else
+            // curveball.swf and feed.swf suggest that it is the *current* target,
+            // not the *original* one that matters.
+            character* guardedChar = env.get_target();
 #endif
 
-            if ( _abortOnUnload && guardedChar->isUnloaded() )
+            if ( _abortOnUnload && guardedChar && guardedChar->isUnloaded() )
             // action_execution_order_test8.c shows that the opcode guard is not SWF version based (TODO: automate it!)
             // && VM::get().getSWFVersion() > 5 
             {
@@ -566,7 +566,7 @@ ActionExec::processExceptions(TryBlock& t)
 void
 ActionExec::cleanupAfterRun(bool expectInconsistencies)
 {
-    assert(_originalTarget);
+    //assert(_originalTarget); // this execution context might have been started while target had a null target
     env.set_target(_originalTarget);
     _originalTarget = NULL;
 

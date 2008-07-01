@@ -78,7 +78,7 @@ as_environment::get_variable(const std::string& varname,
             IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("find_object(\"%s\") [ varname = '%s' - "
                         "current target = '%s' ] failed"),
-                        path, varname, m_target->get_text_value());
+                        path, varname, m_target ? m_target->get_text_value() : "<null>");
             as_value tmp = get_variable_raw(path, scopeStack, retTarget);
             if ( ! tmp.is_undefined() )
             {
@@ -183,9 +183,19 @@ as_environment::get_variable_raw(
 
 
     // Check current target members. TODO: shouldn't target be in scope stack ?
-    if (m_target->get_member(key, &val)) {
-        if ( retTarget ) *retTarget = m_target;
-        return val;
+    if (m_target)
+    {
+        if (m_target->get_member(key, &val)) {
+            if ( retTarget ) *retTarget = m_target;
+            return val;
+        }
+    }
+    else if ( _original_target ) // this only for swf5+ ?
+    {
+        if (_original_target->get_member(key, &val)) {
+            if ( retTarget ) *retTarget = _original_target;
+            return val;
+        }
     }
 
     // Looking for "this" 
@@ -379,8 +389,16 @@ as_environment::set_variable_raw(
     }
     
     // TODO: shouldn't m_target be in the scope chain ?
-	assert(m_target);
-	m_target->set_member(varkey, val);
+    //assert(m_target);
+    if ( m_target ) m_target->set_member(varkey, val);
+    else if ( _original_target ) _original_target->set_member(varkey, val);
+    else
+    {
+        log_error("as_environment(%p)::set_variable_raw(%s, %s): "
+	   "neither current target nor original target are defined, "
+           "can't set the variable",
+           this, varname, val);
+    }
 }
 
 void
@@ -545,8 +563,8 @@ as_environment::find_object(const std::string& path_in, const ScopeStack* scopeS
     string_table& st = vm.getStringTable();
     int swfVersion = vm.getSWFVersion(); 
 
-    as_object* env = m_target; 
-    assert(env);
+    as_object* env = 0;
+    env = m_target; 
 
     bool firstElementParsed = false;
     bool dot_allowed=true;
@@ -555,7 +573,21 @@ as_environment::find_object(const std::string& path_in, const ScopeStack* scopeS
     if (*p == '/')
     {
 	// Absolute path.  Start at the (AS) root (handle _lockroot)
-	sprite_instance* root = const_cast<sprite_instance*>(m_target->getAsRoot());
+	sprite_instance* root = 0;
+        if ( m_target ) root = const_cast<sprite_instance*>(m_target->getAsRoot());
+        else {
+            if ( _original_target )
+            {
+                log_debug("current target is undefined on as_environment::find_object, we'll use original");
+                root = const_cast<sprite_instance*>(_original_target->getAsRoot());
+            }
+            else
+            {
+                log_debug("both current and original target are undefined on as_environment::find_object, we'll return 0");
+                return 0;
+            }
+        }
+
 	if ( ! *(++p) )
 	{
 #ifdef DEBUG_TARGET_FINDING 
@@ -583,7 +615,7 @@ as_environment::find_object(const std::string& path_in, const ScopeStack* scopeS
     assert (*p);
 
     std::string	subpart;
-    while (env)
+    while (1)
     {
 	while ( *p == ':' ) ++p;
 
@@ -591,7 +623,7 @@ as_environment::find_object(const std::string& path_in, const ScopeStack* scopeS
 	if ( ! *p )
 	{
 #ifdef DEBUG_TARGET_FINDING 
-		log_debug(_("Path is %s, returning the root"), path);
+		log_debug(_("Path is %s, returning whatever we were up to"), path);
 #endif
 		return env;
 	}
@@ -659,10 +691,14 @@ as_environment::find_object(const std::string& path_in, const ScopeStack* scopeS
 				if ( element ) break;
 			}
 
-			// Try current target 
+			// Try current target  (if any)
 			assert(env == m_target);
-			element = env->get_path_element(subpartKey);
-			if ( element ) break;
+			if ( env )
+			{
+				element = env->get_path_element(subpartKey);
+				if ( element ) break;
+			}
+			// else if ( _original_target) // TODO: try orig target too ?
 
 			// Looking for _global ?
 			as_object* global = VM::get().getGlobal();
@@ -692,6 +728,8 @@ as_environment::find_object(const std::string& path_in, const ScopeStack* scopeS
 	}
 	else
 	{
+
+		assert(env);
 
 #ifdef DEBUG_TARGET_FINDING 
 		log_debug(_("Invoking get_path_element(%s) on object "
@@ -912,8 +950,13 @@ as_environment::popCallFrame()
 void
 as_environment::set_target(character* target)
 {
-	assert(target);
-	if ( ! m_target ) _original_target = target;
+	//assert(target);
+	if ( ! _original_target )
+	{
+		assert(target); // we assume any as_environment creator sets a target too I guess..
+		//log_debug("as_environment(%p)::set_target(%p): setting original target to %s", this, target, target ? target->getTarget() : "<null>");
+		_original_target = target;
+	}
 	m_target = target;
 }
 
