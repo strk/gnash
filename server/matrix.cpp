@@ -152,12 +152,12 @@ matrix::set_lerp(const matrix& m1, const matrix& m2, float t)
 }
 
 void
-matrix::set_scale_rotation(double x_scale, double y_scale, float angle)
+matrix::set_scale_rotation(double x_scale, double y_scale, double angle)
 // Set the scale & rotation part of the matrix.
 // angle in radians.
 {
-    float   cos_angle = cosf(angle);
-    float   sin_angle = sinf(angle);
+    float   cos_angle = cosf(static_cast<float>(angle));
+    float   sin_angle = sinf(static_cast<float>(angle));
     sx  = FloatToFixed16(x_scale * cos_angle);
     shy = FloatToFixed16(y_scale * -sin_angle);
     shx = FloatToFixed16(x_scale * sin_angle);
