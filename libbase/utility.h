@@ -157,7 +157,7 @@ inline int PIXELS_TO_TWIPS(double a)
 { 
 #ifdef TRUST_FLOAT_TO_UINT32_CONVERSION
     // truncate when overflow occurs.
-    return (boost::int32_t)(boost::uint32_t)(a * 20); 
+    return (boost::int32_t)static_cast<boost::uint32_t>(a * 20); 
 #else
 
     // This truncates large values without relying on undefined behaviour.
@@ -188,7 +188,7 @@ inline int PIXELS_TO_TWIPS(double a)
 inline boost::int32_t Fixed16Mul(boost::int32_t a, boost::int32_t b)
 {
     // truncate when overflow occurs.
-    return (boost::int32_t)(((boost::int64_t)a * (boost::int64_t)b + 0x8000) >> 16);
+    return static_cast<boost::int32_t>((static_cast<boost::int64_t>(a) * static_cast<boost::int64_t>(b) + 0x8000) >> 16);
 }
 
 }
@@ -211,7 +211,7 @@ smallestMultipleContaining(unsigned int base, unsigned int x)
 #define ARRAYSIZE(x) (sizeof(x)/sizeof(x[0]))
 
 
-inline size_t	bernstein_hash(const void* data_in, int size, unsigned int seed = 5381)
+inline size_t bernstein_hash(const void* data_in, int size, unsigned int seed = 5381)
 // Computes a hash of the given data buffer.
 // Hash function suggested by http://www.cs.yorku.ca/~oz/hash.html
 // Due to Dan Bernstein.  Allegedly very good on strings.
@@ -221,8 +221,8 @@ inline size_t	bernstein_hash(const void* data_in, int size, unsigned int seed = 
 // concentrated toward zero, instead of randomly distributed in
 // [0,2^32-1], because of shifting up only 5 bits per byte.
 {
-	const unsigned char*	data = static_cast<const unsigned char*>(data_in);
-	unsigned int	h = seed;
+	const unsigned char* data = static_cast<const unsigned char*>(data_in);
+	unsigned int h = seed;
 	while (size > 0) {
 		size--;
 		h = ((h << 5) + h) ^ static_cast<unsigned>(data[size]);
@@ -232,7 +232,7 @@ inline size_t	bernstein_hash(const void* data_in, int size, unsigned int seed = 
 }
 
 
-inline size_t	sdbm_hash(const void* data_in, int size, unsigned int seed = 5381)
+inline size_t sdbm_hash(const void* data_in, int size, unsigned int seed = 5381)
 // Alternative: "sdbm" hash function, suggested at same web page
 // above, http::/www.cs.yorku.ca/~oz/hash.html
 //
@@ -249,7 +249,7 @@ inline size_t	sdbm_hash(const void* data_in, int size, unsigned int seed = 5381)
 	return h;
 }
 
-inline size_t	bernstein_hash_case_insensitive(const void* data_in, int size, unsigned int seed = 5381)
+inline size_t bernstein_hash_case_insensitive(const void* data_in, int size, unsigned int seed = 5381)
 // Computes a hash of the given data buffer; does tolower() on each
 // byte.  Hash function suggested by
 // http://www.cs.yorku.ca/~oz/hash.html Due to Dan Bernstein.
