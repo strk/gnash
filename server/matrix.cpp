@@ -152,7 +152,7 @@ matrix::set_lerp(const matrix& m1, const matrix& m2, float t)
 }
 
 void
-matrix::set_scale_rotation(double x_scale, double y_scale, double angle)
+matrix::set_scale_rotation(double x_scale, double y_scale, float angle)
 // Set the scale & rotation part of the matrix.
 // angle in radians.
 {
