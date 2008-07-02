@@ -827,20 +827,20 @@ static as_value sprite_hit_test(const fn_call& fn)
 
     case 2: // x, y
     {
-      float x = PIXELS_TO_TWIPS(fn.arg(0).to_number());
-      float y = PIXELS_TO_TWIPS(fn.arg(1).to_number());
+      boost::int32_t x = PIXELS_TO_TWIPS(fn.arg(0).to_number());
+      boost::int32_t y = PIXELS_TO_TWIPS(fn.arg(1).to_number());
 
       return sprite->pointInBounds(x, y);
     }
 
     case 3: // x, y, shapeFlag
     {
-      double x = PIXELS_TO_TWIPS(fn.arg(0).to_number());
-      double y = PIXELS_TO_TWIPS(fn.arg(1).to_number());
-      bool shapeFlag = fn.arg(2).to_bool();
+       boost::int32_t x = PIXELS_TO_TWIPS(fn.arg(0).to_number());
+       boost::int32_t y = PIXELS_TO_TWIPS(fn.arg(1).to_number());
+       bool shapeFlag = fn.arg(2).to_bool();
 
-      if ( ! shapeFlag ) return sprite->pointInBounds(x, y);
-      else return sprite->pointInHitableShape(x, y);
+       if ( ! shapeFlag ) return sprite->pointInBounds(x, y);
+       else return sprite->pointInHitableShape(x, y);
     }
 
     default:
@@ -1078,8 +1078,8 @@ sprite_globalToLocal(const fn_call& fn)
   }
 
   as_value tmp;
-  float x = 0;
-  float y = 0;
+  boost::int32_t  x = 0;
+  boost::int32_t  y = 0;
 
   if ( ! obj->get_member(NSV::PROP_X, &tmp) )
   {
@@ -1103,7 +1103,7 @@ sprite_globalToLocal(const fn_call& fn)
   }
   y = PIXELS_TO_TWIPS(tmp.to_number());
 
-  point pt(x, y);
+  geometry::Point2d<boost::int32_t> pt(x, y);
   matrix world_mat = sprite->get_world_matrix();
   world_mat.invert().transform(pt);
 
@@ -1140,8 +1140,8 @@ sprite_localToGlobal(const fn_call& fn)
   }
 
   as_value tmp;
-  float x = 0;
-  float y = 0;
+  boost::int32_t  x = 0;
+  boost::int32_t  y = 0;
 
   if ( ! obj->get_member(NSV::PROP_X, &tmp) )
   {
@@ -1165,7 +1165,7 @@ sprite_localToGlobal(const fn_call& fn)
   }
   y = PIXELS_TO_TWIPS(tmp.to_number());
 
-  point pt(x, y);
+  geometry::Point2d<boost::int32_t>  pt(x, y);
   matrix world_mat = sprite->get_world_matrix();
   world_mat.transform(pt);
 
@@ -1259,8 +1259,8 @@ sprite_lineTo(const fn_call& fn)
   }
   );
 
-  float x = fn.arg(0).to_number();
-  float y = fn.arg(1).to_number();
+  double x = fn.arg(0).to_number();
+  double y = fn.arg(1).to_number();
     
   if ( ! utility::isFinite(x) )
   {
@@ -1312,8 +1312,8 @@ sprite_moveTo(const fn_call& fn)
   }
   );
 
-  float x = fn.arg(0).to_number();
-  float y = fn.arg(1).to_number();
+  double x = fn.arg(0).to_number();
+  double y = fn.arg(1).to_number();
    
   if ( ! utility::isFinite(x) )
   {
@@ -1535,10 +1535,10 @@ sprite_curveTo(const fn_call& fn)
   }
   );
 
-  float cx = fn.arg(0).to_number();
-  float cy = fn.arg(1).to_number();
-  float ax = fn.arg(2).to_number();
-  float ay = fn.arg(3).to_number();
+  double cx = fn.arg(0).to_number();
+  double cy = fn.arg(1).to_number();
+  double ax = fn.arg(2).to_number();
+  double ay = fn.arg(3).to_number();
 
   if ( ! utility::isFinite(cx) )
   {
@@ -1749,16 +1749,16 @@ sprite_beginGradientFill(const fn_call& fn)
     static const string_table::key keyH = st.find("h");
     static const string_table::key keyR = st.find("r");
 
-    float valX = PIXELS_TO_TWIPS(matrixArg->getMember(keyX).to_number()); 
-    float valY = PIXELS_TO_TWIPS(matrixArg->getMember(keyY).to_number()); 
-    float valW = PIXELS_TO_TWIPS(matrixArg->getMember(keyW).to_number()); 
-    float valH = PIXELS_TO_TWIPS(matrixArg->getMember(keyH).to_number()); 
+    boost::int32_t valX = PIXELS_TO_TWIPS(matrixArg->getMember(keyX).to_number()); 
+    boost::int32_t valY = PIXELS_TO_TWIPS(matrixArg->getMember(keyY).to_number()); 
+    boost::int32_t valW = PIXELS_TO_TWIPS(matrixArg->getMember(keyW).to_number()); 
+    boost::int32_t valH = PIXELS_TO_TWIPS(matrixArg->getMember(keyH).to_number()); 
     float valR = matrixArg->getMember(keyR).to_number(); 
 
     if ( radial )
     {
       // Radial gradient is 64x64 twips.
-      input_matrix.set_scale(64.0f/valW, 64.0f/valH);
+      input_matrix.set_scale(64.0/valW, 64.0/valH);
 
       // For radial gradients, dunno why translation must be negative...
       input_matrix.concatenate_translation( -valX, -valY );
@@ -1776,12 +1776,10 @@ sprite_beginGradientFill(const fn_call& fn)
       // seems to give closer results. Note that it only influences rotation,
       // which is still not correct... TODO: fix it !
       //
-      input_matrix.set_scale_rotation(256.0f/valW, 256.0f/valH, -valR);
+      input_matrix.set_scale_rotation(256.0/valW, 256.0/valH, -valR);
 
       // For linear gradients, dunno why translation must be negative...
       input_matrix.concatenate_translation( -valX, -valY );
-      //cout << "inpt matrix with concatenated translation: " << input_matrix << endl;
-
     }
 
     mat.concatenate(input_matrix);
@@ -1800,13 +1798,13 @@ sprite_beginGradientFill(const fn_call& fn)
     float valB = matrixArg->getMember(keyB).to_number() ; // yx
     float valD = matrixArg->getMember(keyD).to_number() ; // xy
     float valE = matrixArg->getMember(keyE).to_number() ; // yy
-    float valG = PIXELS_TO_TWIPS(matrixArg->getMember(keyG).to_number()); // x0
-    float valH = PIXELS_TO_TWIPS(matrixArg->getMember(keyH).to_number()); // y0
+    boost::int32_t valG = PIXELS_TO_TWIPS(matrixArg->getMember(keyG).to_number()); // x0
+    boost::int32_t valH = PIXELS_TO_TWIPS(matrixArg->getMember(keyH).to_number()); // y0
 
-    input_matrix.sx = valA * 65536; // xx
-    input_matrix.shx = valB * 65536; // yx
-    input_matrix.shy = valD * 65536; // xy
-    input_matrix.sy = valE * 65536; // yy
+    input_matrix.sx  = valA * 65536; // sx
+    input_matrix.shx = valB * 65536; // shy
+    input_matrix.shy = valD * 65536; // shx
+    input_matrix.sy  = valE * 65536; // sy
     input_matrix.tx = valG; // x0
     input_matrix.ty = valH; // y0
 
@@ -1934,10 +1932,10 @@ sprite_startDrag(const fn_call& fn)
 
         if ( fn.nargs >= 5)
         {
-            float x0 = PIXELS_TO_TWIPS(fn.arg(1).to_number());
-            float y0 = PIXELS_TO_TWIPS(fn.arg(2).to_number());
-            float x1 = PIXELS_TO_TWIPS(fn.arg(3).to_number());
-            float y1 = PIXELS_TO_TWIPS(fn.arg(4).to_number());
+            double x0 = fn.arg(1).to_number();
+            double y0 = fn.arg(2).to_number();
+            double x1 = fn.arg(3).to_number();
+            double y1 = fn.arg(4).to_number();
 
             // check for infinite values
             bool gotinf = false;
@@ -1963,14 +1961,14 @@ sprite_startDrag(const fn_call& fn)
             IF_VERBOSE_ASCODING_ERRORS(
             if ( gotinf || swapped ) {
                 std::stringstream ss; fn.dump_args(ss);
-		if ( swapped ) 
-		  log_aserror(_("min/max bbox values in MovieClip.startDrag(%s) swapped, fixing"), ss.str());
-		if ( gotinf )
-                  log_aserror(_("non-finite bbox values in MovieClip.startDrag(%s), took as zero"), ss.str());
-            }
+		        if ( swapped ) 
+		            log_aserror(_("min/max bbox values in MovieClip.startDrag(%s) swapped, fixing"), ss.str());
+		        if ( gotinf )
+                    log_aserror(_("non-finite bbox values in MovieClip.startDrag(%s), took as zero"), ss.str());
+                }
             );
 
-            rect bounds(x0, y0, x1, y1);
+            rect bounds(PIXELS_TO_TWIPS(x0), PIXELS_TO_TWIPS(y0), PIXELS_TO_TWIPS(x1), PIXELS_TO_TWIPS(y1));
             st.setBounds(bounds);
         }
     }
@@ -2732,9 +2730,9 @@ sprite_instance::add_textfield(const std::string& name, int depth, float x, floa
   txt_char->setDynamic();
 
   // Set _x and _y
-  txt_matrix.set_translation(
-      utility::infinite_to_fzero(PIXELS_TO_TWIPS(x)),
-      utility::infinite_to_fzero(PIXELS_TO_TWIPS(y)));
+  x = utility::infinite_to_fzero(x);
+  y = utility::infinite_to_fzero(y);
+  txt_matrix.set_translation(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
 
   txt_char->set_matrix(txt_matrix);  
   // Here we add the character to the displayList.  
@@ -2783,7 +2781,7 @@ sprite_instance::duplicateMovieClip(const std::string& newname, int depth,
   
   parent->m_display_list.place_character(newsprite.get(), depth);
   
-  return newsprite;
+  return newsprite; 
 }
 
 /* public */
@@ -3822,7 +3820,7 @@ public:
 }; 
 
 bool
-sprite_instance::pointInShape(float x, float y) const
+sprite_instance::pointInShape(boost::int32_t x, boost::int32_t y) const
 {
     ShapeContainerFinder finder(x, y);
     const_cast<DisplayList&>(m_display_list).visitBackward(finder);
@@ -3831,7 +3829,7 @@ sprite_instance::pointInShape(float x, float y) const
 }
 
 bool
-sprite_instance::pointInVisibleShape(float x, float y) const
+sprite_instance::pointInVisibleShape(boost::int32_t x, boost::int32_t y) const
 {
     if ( ! get_visible() ) return false;
     if ( isDynamicMask() && ! can_handle_mouse_event() )
@@ -3965,13 +3963,13 @@ public:
     _y(y),
     _dragging(dragging),
     _dropch(0),
-		_candidates(),
-		_checked(false)
+    _candidates(),
+    _checked(false)
   {}
 
   void operator() (const character* ch)
   {
-		assert(!_checked);
+    assert(!_checked);
     if ( ch->get_depth() <= _highestHiddenDepth )
     {
       if ( ch->isMaskLayer() )
@@ -4021,21 +4019,21 @@ public:
             e=_candidates.rend(); i!=e; ++i)
     {
       const character* ch = *i;
-			const character* dropChar = ch->findDropTarget(_x, _y, _dragging);
-			if ( dropChar )
-			{
-				_dropch = dropChar;
-				break;
-			}
+      const character* dropChar = ch->findDropTarget(_x, _y, _dragging);
+      if ( dropChar )
+	  {
+        _dropch = dropChar;
+        break;
+      }
     }
     _checked = true;
   }
 
-  const character* getDropChar() const
-	{
-		checkCandidates();
-		return _dropch;
-	}
+    const character* getDropChar() const
+    {
+        checkCandidates();
+        return _dropch;
+    }
 };
 
 const character*

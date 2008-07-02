@@ -707,7 +707,7 @@ public:
   //
   /// Point coordinates are in world TWIPS
   ///
-  bool pointInBounds(float x, float y) const
+  bool pointInBounds(boost::int32_t x, boost::int32_t y) const
   {
     rect bounds = getBounds();
     matrix wm = get_world_matrix();
@@ -723,7 +723,7 @@ public:
   /// override and invokes pointInBounds().
   ///
   ///
-  virtual bool pointInShape(float x, float y) const
+  virtual bool pointInShape(boost::int32_t x, boost::int32_t y) const
   {
     log_error("Character %s did not override pointInShape() - using pointInBounds() instead", typeid(*this).name());
     return pointInBounds(x, y);
@@ -741,7 +741,7 @@ public:
   /// character has childs it must take into account the case
   /// in which some childs are visible and some are not.
   ///
-  virtual bool pointInVisibleShape(float x, float y) const
+  virtual bool pointInVisibleShape(boost::int32_t x, boost::int32_t y) const
   {
     if ( ! get_visible() ) return false;
     if ( isMask() ) return false;

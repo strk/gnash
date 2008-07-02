@@ -1269,13 +1269,10 @@ SWFHandlers::ActionStartDragMovie(ActionExec& thread)
         // we must remember to updated this as required
         thread.ensureStack(7); // original 3 + 4 for bound
 
-        // It looks like coordinates of drag bounds are
-        // given as PIXELS :
-        // http://www.richsalter.btinternet.co.uk/cks1/cks1.swf
-        float y1 = PIXELS_TO_TWIPS(env.top(3).to_number());
-        float x1 = PIXELS_TO_TWIPS(env.top(4).to_number());
-        float y0 = PIXELS_TO_TWIPS(env.top(5).to_number());
-        float x0 = PIXELS_TO_TWIPS(env.top(6).to_number());
+        boost::int32_t y1 = PIXELS_TO_TWIPS(env.top(3).to_number());
+        boost::int32_t x1 = PIXELS_TO_TWIPS(env.top(4).to_number());
+        boost::int32_t y0 = PIXELS_TO_TWIPS(env.top(5).to_number());
+        boost::int32_t x0 = PIXELS_TO_TWIPS(env.top(6).to_number());
 
         // check for swapped values
         if ( y1 < y0 )

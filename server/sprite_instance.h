@@ -142,10 +142,10 @@ public:
 	rect getBounds() const;
 
 	// See dox in character.h
-	bool pointInShape(float x, float y) const;
+	bool pointInShape(boost::int32_t x, boost::int32_t y) const;
 
 	// See dox in character.h
-	bool pointInVisibleShape(float x, float y) const;
+	bool pointInVisibleShape(boost::int32_t x, boost::int32_t y) const;
 
     /// return true if the given point is located in a(this) hitable sprite.
     ///

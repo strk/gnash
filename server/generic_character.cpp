@@ -44,11 +44,11 @@ generic_character::enclose_own_bounds(rect *) const
 }
 
 bool
-generic_character::pointInShape(float x, float y) const
+generic_character::pointInShape(boost::int32_t  x, boost::int32_t  y) const
 {
   matrix wm = get_world_matrix();
   matrix wm_inverse = wm.invert();
-  point lp(x, y);
+  geometry::Point2d<boost::int32_t> lp(x, y);
   wm_inverse.transform(lp);
   return m_def->point_test_local(lp.x, lp.y, wm);
 }

@@ -49,7 +49,7 @@ public:
 
 	~video_stream_instance();
 
-	virtual bool pointInShape(float x, float y) const
+	virtual bool pointInShape(boost::int32_t x, boost::int32_t y) const
 	{
 		// video character shape is always a rectangle..
 		return pointInBounds(x, y);

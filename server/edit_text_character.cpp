@@ -907,14 +907,12 @@ edit_text_character::set_member(string_table::key name,
 	default:
 		break;
 	case NSV::PROP_TEXT:
-		//if (name == "text")
 	{
 		int version = get_parent()->get_movie_definition()->get_version();
 		setTextValue(utf8::decodeCanonicalString(val.to_string_versioned(version), version));
 		return true;
 	}
 	case NSV::PROP_HTML_TEXT:
-		//if (name == "htmlText")
 	{
 		int version = get_parent()->get_movie_definition()->get_version();
 		setTextValue(utf8::decodeCanonicalString(val.to_string_versioned(version), version));
@@ -922,30 +920,28 @@ edit_text_character::set_member(string_table::key name,
 		return true;
 	}
 	case NSV::PROP_uX:
-		//else if (name == "_x")
 	{
 		matrix	m = get_matrix();
-		m.tx = utility::infinite_to_fzero(PIXELS_TO_TWIPS(val.to_number()));	
+        double x =  utility::infinite_to_fzero( val.to_number() );
+		m.tx = PIXELS_TO_TWIPS(x);	
 		set_matrix(m);
 
 		// m_accept_anim_moves = false;
-		
 		return true;
 	}
 	case NSV::PROP_uY:
-		//else if (name == "_y")
 	{
 		matrix	m = get_matrix();
-		m.ty = utility::infinite_to_fzero(PIXELS_TO_TWIPS(val.to_number()));
+        double y =  utility::infinite_to_fzero( val.to_number() );
+		m.ty = PIXELS_TO_TWIPS(y);
 		set_matrix(m);
 
 		// m_accept_anim_moves = false;
-		
 		return true;
 	}
 	case NSV::PROP_uWIDTH:
 	{
-		float nw = PIXELS_TO_TWIPS(val.to_number()); // TODO: pass an as_environment !
+		double nw = val.to_number(); 
 		if ( ! utility::isFinite(nw) )
 		{
 			// might be our fault, see the TODO above (missing to pass as_environment out..)
@@ -955,7 +951,7 @@ edit_text_character::set_member(string_table::key name,
 			return true;
 		}
 
-		if ( nw < 0.0f )
+		if ( nw < 0 )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
 			log_aserror(_("Attempt to set TextField._width to a negative number: %g, toggling sign"), nw);
@@ -963,7 +959,7 @@ edit_text_character::set_member(string_table::key name,
 			nw = -nw;
 		}
 
-		if ( _bounds.width() == nw )
+		if ( _bounds.width() == PIXELS_TO_TWIPS(nw) )
 		{
 #ifdef GNASH_DEBUG_TEXTFIELDS
 			log_debug("TextField width already == %g, nothing to do to change it", nw);
@@ -973,7 +969,7 @@ edit_text_character::set_member(string_table::key name,
 		if ( _bounds.is_null() )
 		{
 #ifdef GNASH_DEBUG_TEXTFIELDS
-			log_debug("Non-finite TextField bounds : %s", _bounds);
+			log_debug("NULL TextField bounds : %s", _bounds);
 #endif
 			return true;
 		}
@@ -989,11 +985,11 @@ edit_text_character::set_member(string_table::key name,
 		boost::int32_t xmin = _bounds.get_x_min();
 		boost::int32_t ymin = _bounds.get_y_min();
 		boost::int32_t ymax = _bounds.get_y_max();
-		boost::int32_t xmax = xmin + nw;
+		boost::int32_t xmax = xmin + PIXELS_TO_TWIPS(nw);
 
 		assert(xmin <= xmax);
 		_bounds.set_to_rect(xmin, ymin, xmax, ymax);
-        assert( _bounds.width() - nw < 0.001 && _bounds.width() - nw > -0.001);
+        assert( _bounds.width() == PIXELS_TO_TWIPS(nw) );
 
 		// previously truncated text might get visible now
 		// TODO: if nested masks were implemented we would 
@@ -1004,7 +1000,7 @@ edit_text_character::set_member(string_table::key name,
 	}
 	case NSV::PROP_uHEIGHT:
 	{
-		float nh = PIXELS_TO_TWIPS(val.to_number()); // TODO: pass an as_environment !
+		double nh = val.to_number(); 
 		if ( ! utility::isFinite(nh) )
 		{
 			// might be our fault, see the TODO above (missing to pass as_environment out..)
@@ -1022,7 +1018,7 @@ edit_text_character::set_member(string_table::key name,
 			nh = -nh;
 		}
 
-		if ( _bounds.height() == nh )
+		if ( _bounds.height() == PIXELS_TO_TWIPS(nh) )
 		{
 #ifdef GNASH_DEBUG_TEXTFIELDS
 			log_debug("TextField height already == %g, nothing to do to change it", nh);
@@ -1044,9 +1040,9 @@ edit_text_character::set_member(string_table::key name,
 		boost::int32_t xmin = _bounds.get_x_min();
 		boost::int32_t xmax = _bounds.get_x_max();
 		boost::int32_t ymin = _bounds.get_y_min();
-		_bounds.set_to_rect(xmin, ymin, xmax, ymin+nh);
+		_bounds.set_to_rect(xmin, ymin, xmax, ymin + PIXELS_TO_TWIPS(nh) );
 
-		assert(_bounds.height() == nh);
+		assert(_bounds.height() == PIXELS_TO_TWIPS(nh));
 
 		// previously truncated text might get visible now
 		// TODO: if nested masks were implemented we would 
@@ -1056,13 +1052,11 @@ edit_text_character::set_member(string_table::key name,
 		return true;
 	}
 	case NSV::PROP_uVISIBLE:
-		//else if (name == "_visible")
 	{
 		set_visible(val.to_bool());
 		return true;
 	}
 	case NSV::PROP_uALPHA:
-		//else if (name == "_alpha")
 	{
 		// @@ TODO this should be generic to class character!
 		// Arg is in percent.
@@ -1092,25 +1086,21 @@ edit_text_character::get_member(string_table::key name, as_value* val,
 	default:
 		break;
 	case NSV::PROP_TEXT:
-		//if (name == "text")
 	{
 		val->set_string(get_text_value());
 		return true;
 	}
 	case NSV::PROP_HTML_TEXT:
-		//if (name == "htmlText")
 	{
 		val->set_string(get_text_value());
 		return true;
 	}
 	case NSV::PROP_uVISIBLE:
-		//else if (name == "_visible")
 	{
 		val->set_bool(get_visible());
 		return true;
 	}
 	case NSV::PROP_uALPHA:
-		//else if (name == "_alpha")
 	{
 		// @@ TODO this should be generic to class character!
 		const cxform&	cx = get_cxform();
@@ -1118,16 +1108,14 @@ edit_text_character::get_member(string_table::key name, as_value* val,
 		return true;
 	}
 	case NSV::PROP_uX:
-		//else if (name == "_x")
 	{
-		matrix	m = get_matrix();	// @@ get_world_matrix()???
+		matrix	m = get_matrix();	
 		val->set_double(TWIPS_TO_PIXELS(m.tx));
 		return true;
 	}
 	case NSV::PROP_uY:
-		//else if (name == "_y")
 	{
-		matrix	m = get_matrix();	// @@ get_world_matrix()???
+		matrix	m = get_matrix();	
 		val->set_double(TWIPS_TO_PIXELS(m.ty));
 		return true;
 	}
@@ -1869,7 +1857,7 @@ textfield_class_init(as_object& global)
 }
 
 bool
-edit_text_character::pointInShape(float x, float y) const
+edit_text_character::pointInShape(boost::int32_t x, boost::int32_t y) const
 {
 	matrix wm = get_world_matrix();
 	point lp(x, y);

@@ -133,7 +133,7 @@ public:
 	}
 
 	// See dox in character.h
-	bool pointInShape(float x, float y) const;
+	bool pointInShape(boost::int32_t x, boost::int32_t y) const;
 
 	/// See dox in character::unload (character.h)
 	//
@@ -447,7 +447,7 @@ private:
 	rect m_text_bounding_box;
 
 	/// Reset our text bounding box to the given point.
-	void	reset_bounding_box(float x, float y)
+	void	reset_bounding_box(boost::int32_t x, boost::int32_t y)
 	{
 		m_text_bounding_box.set_to_point(x, y);
 	}

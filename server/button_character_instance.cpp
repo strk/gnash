@@ -806,7 +806,7 @@ button_character_instance::getBounds() const
 }
 
 bool
-button_character_instance::pointInShape(float x, float y) const
+button_character_instance::pointInShape(boost::int32_t x, boost::int32_t y) const
 {
 	typedef std::vector<character*> CharVect;
 	CharVect actChars;

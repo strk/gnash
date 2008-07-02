@@ -94,7 +94,7 @@ public:
 	}
 
 	// See dox in character.h
-	virtual bool pointInShape(float x, float y) const;
+	virtual bool pointInShape(boost::int32_t  x, boost::int32_t  y) const;
 
 	/// \brief
 	/// Return the character definition from which this

@@ -130,7 +130,7 @@ public:
 	rect getBounds() const;
 	
 	// See dox in character.h
-	bool pointInShape(float x, float y) const;
+	bool pointInShape(boost::int32_t x, boost::int32_t y) const;
 
 	static as_value enabled_getset(const fn_call& fn);
 	
