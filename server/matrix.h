@@ -215,11 +215,11 @@ private:
         boost::int32_t  b;
         if(a >= 0)
         {
-            b = (boost::uint32_t)static_cast<boost::int32_t>(std::fmod(a*65536.0, 4294967296.0));
+            b = (boost::uint32_t)static_cast<boost::int32_t>(std::fmod(a * 65536.0, 4294967296.0));
         }
         else
         {
-            b = -(boost::uint32_t)static_cast<boost::int32_t>(std::fmod(-a*65536.0, 4294967296.0));
+            b = -(boost::uint32_t)static_cast<boost::int32_t>(std::fmod(-a * 65536.0, 4294967296.0));
         }
         return b;
 #endif
