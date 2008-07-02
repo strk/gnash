@@ -25,10 +25,13 @@
 #include "gnashconfig.h"
 #endif
 
+#include <cmath>
 #include "matrix.h"
 #include "stream.h" // for reading from SWF
 #include "types.h"  // for TWIPS_TO_PIXELS
 #include "utility.h"
+
+using namespace std;
 
 namespace gnash {
 
@@ -298,13 +301,13 @@ matrix::determinant() const
 double
 matrix::get_x_scale() const
 {
-    return sqrt(((double)sx * sx + (double)shx * shx)) / 65536.0;
+    return static_cast<double>(sqrt(((double)sx * sx + (double)shx * shx)) / 65536.0f);
 }
 
 double
 matrix::get_y_scale() const
 {
-    return sqrt(((double)sy * sy + (double)shy * shy)) / 65536.0;
+    return static_cast<double>(sqrt(((double)sy * sy + (double)shy * shy)) / 65536.0f);
 }
 
 double
