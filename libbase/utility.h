@@ -137,7 +137,7 @@ template <typename T> inline T clamp(T i, T min, T max)
 
 inline float flerp(float a, float b, float f)
 {
-    return (b - a) * f + a;
+    return static_cast<float>((b - a) * f + a);
 }
 
 inline int frnd(float f) 
@@ -149,7 +149,7 @@ inline int frnd(float f)
 
 inline double TWIPS_TO_PIXELS(int i) 
 { 
-    return i / 20.0; 
+    return static_cast<double>(i / 20.0); 
 }
 
 // truncate when overflow occurs.
