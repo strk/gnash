@@ -357,7 +357,7 @@ RcInitFile::parseFile(const std::string& filespec)
         
     // Read in each line and parse it
     size_t lineno = 0;
-    while (getline(in, line)) {
+    while (std::getline(in, line)) {
 
         ++lineno;
 
@@ -389,7 +389,7 @@ RcInitFile::parseFile(const std::string& filespec)
         {
 
              // The rest of the line is the value
-            if (!getline (ss, value))
+            if (!std::getline (ss, value))
             {
                 cerr << boost::format(_("Warning: missing value for variable \"%s\" in rcfile %s,"
                     " line %d")) % variable % filespec % lineno << endl;
