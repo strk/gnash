@@ -164,7 +164,9 @@ typedef enum
     /// http://sswf.sourceforge.net/SWFalexref.html#tag_definemorphshape2
     DEFINEMORPHSHAPE2     = 84,
 
-    DEFINEFONTNAME        = 88,
+    DEFINESCENEANDFRAMELABELDATA = 86,
+
+    DEFINEFONTNAME        = 88,	
 
     REFLEX                = 777,
 

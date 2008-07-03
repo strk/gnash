@@ -1627,6 +1627,14 @@ abc_loader(SWFStream* in, tag_type tag, movie_definition* /*m*/)
 	log_unimpl(_("%s tag parsed but not yet used"), tag == SWF::DOABC ? "DOABC" : "DOABCDEFINE");
 }
 
+void
+define_scene_frame_label_loader(SWFStream* in, tag_type tag, movie_definition* /*m*/)
+{
+    assert(tag == SWF::DEFINESCENEANDFRAMELABELDATA); //86
+
+    log_unimpl(_("%s tag parsed but not yet used"), "DEFINESCENEANDFRAMELABELDATA");
+}
+
 } // namespace gnash::SWF::tag_loaders
 } // namespace gnash::SWF
 

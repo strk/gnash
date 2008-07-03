@@ -153,6 +153,10 @@ metadata_loader(SWFStream* in, tag_type tag, movie_definition* m);
 void
 serialnumber_loader(SWFStream* in, tag_type tag, movie_definition* /*m*/);
 
+/// Load a SWF::DEFINESCENEANDFRAMELABELDATA tag.
+void
+define_scene_frame_label_loader(SWFStream* in, tag_type tag, movie_definition* /*m*/);
+
 } // namespace gnash::SWF::tag_loaders
 } // namespace gnash::SWF
 } // namespace gnash
