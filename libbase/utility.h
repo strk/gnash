@@ -153,11 +153,11 @@ inline double TWIPS_TO_PIXELS(int i)
 }
 
 // truncate when overflow occurs.
-inline int PIXELS_TO_TWIPS(double a) 
+inline boost::int32_t PIXELS_TO_TWIPS(double a) 
 { 
 #ifdef TRUST_FLOAT_TO_UINT32_CONVERSION
     // truncate when overflow occurs.
-    return (boost::int32_t)static_cast<boost::uint32_t>(a * 20); 
+    return static_cast<boost::int32_t>(static_cast<boost::uint32_t>(a * 20)); 
 #else
 
     // This truncates large values without relying on undefined behaviour.
