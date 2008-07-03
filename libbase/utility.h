@@ -92,7 +92,7 @@ void	operator delete[](void* ptr);
 // Define this to enable fast float&double to uint32 conversion.
 // If the behaviour is undefined when overflow occurs with your 
 // compiler, disable this macro.
-#ifndef __DARWIN__
+#ifndef __APPLE__
 	#define TRUST_FLOAT_TO_UINT32_CONVERSION  1 
 #endif
 
