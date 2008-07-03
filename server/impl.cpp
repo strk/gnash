@@ -244,7 +244,7 @@ static void ensure_loaders_registered()
     register_tag_loader(SWF::DOABCDEFINE, abc_loader); // 82 -- AS3 codeblock.
     register_tag_loader(SWF::DEFINESHAPE4, define_shape_loader); // 83
     register_tag_loader(SWF::DEFINEMORPHSHAPE2, define_shape_morph_loader); // 84
-
+    register_tag_loader(SWF::DEFINESCENEANDFRAMELABELDATA,define_scene_frame_label_loader); //86
     register_tag_loader(SWF::DEFINEFONTNAME, define_font_name_loader); // 88
 
     register_tag_loader(SWF::REFLEX, reflex_loader); // 777
