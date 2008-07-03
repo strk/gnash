@@ -51,11 +51,15 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libgeometry \
 	-I$(top_srcdir)/testsuite \
 	$(MING_CFLAGS) \
+	$(OPENGL_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	-DMING_VERSION_CODE=$(MING_VERSION_CODE) \
 	$(NULL)
 
-AM_LDFLAGS = $(MING_LIBS)
+AM_LDFLAGS = \
+	$(MING_LIBS) \
+	$(OPENGL_LIBS) \
+	$(NULL)
 
 
 check_PROGRAMS = \
