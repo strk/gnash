@@ -156,12 +156,12 @@ matrix::set_scale_rotation(double x_scale, double y_scale, double angle)
 // Set the scale & rotation part of the matrix.
 // angle in radians.
 {
-    float   cos_angle = cosf(static_cast<float>(angle));
-    float   sin_angle = sinf(static_cast<float>(angle));
-    sx  = FloatToFixed16(x_scale * cos_angle);
-    shy = FloatToFixed16(y_scale * -sin_angle);
-    shx = FloatToFixed16(x_scale * sin_angle);
-    sy  = FloatToFixed16(y_scale * cos_angle); 
+    double   cos_angle = cos(angle);
+    double   sin_angle = sin(angle);
+    sx  = DoubleToFixed16(x_scale * cos_angle);
+    shy = DoubleToFixed16(y_scale * -sin_angle);
+    shx = DoubleToFixed16(x_scale * sin_angle);
+    sy  = DoubleToFixed16(y_scale * cos_angle); 
 }
 
 void
@@ -291,23 +291,20 @@ matrix::invert()
     return *this;
 }
 
-boost::int64_t
-matrix::determinant() const
-// Return the 32.32 fixed point determinant of this matrix.
-{
-    return (boost::int64_t)sx * sy - (boost::int64_t)shx * shy;
-}
-
 double
 matrix::get_x_scale() const
 {
-    return static_cast<double>(sqrt(((double)sx * sx + (double)shx * shx)) / 65536.0f);
+	// why do I need a cast here? The result should be already in double type based on the 
+	// prototype of sqrt().
+    return static_cast<double>(sqrt(((double)sx * sx + (double)shx * shx)) / 65536.0);
 }
 
 double
 matrix::get_y_scale() const
 {
-    return static_cast<double>(sqrt(((double)sy * sy + (double)shy * shy)) / 65536.0f);
+	// why do I need a cast here? The result should be already in double type based on the 
+	// prototype of sqrt().
+    return static_cast<double>(sqrt(((double)sy * sy + (double)shy * shy)) / 65536.0);
 }
 
 double
@@ -322,6 +319,14 @@ matrix::get_rotation() const
     {
         return atan2(shx, sx);
     }
+}
+
+// private
+boost::int64_t
+matrix::determinant() const
+// Return the 32.32 fixed point determinant of this matrix.
+{
+    return (boost::int64_t)sx * sy - (boost::int64_t)shx * shy;
 }
 
 std::ostream& operator<< (std::ostream& o, const matrix& m)
