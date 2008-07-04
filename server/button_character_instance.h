@@ -109,7 +109,7 @@ public:
 	//
 	/// I.e. check against ourself.
 	///
-	virtual character* get_topmost_mouse_entity(float x, float y);
+	virtual character* get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y);
 	
 	virtual bool wantsInstanceName() const
 	{

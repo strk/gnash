@@ -960,7 +960,7 @@ private:
     /// @param y
     ///     Y ordinate of the pointer, in world coordiante space (twips).
     ///
-    character* getTopmostMouseEntity(float x, float y);
+    character* getTopmostMouseEntity(boost::int32_t x, boost::int32_t y);
 
     /// Delete characters removed from the stage
     /// from the display lists
@@ -1044,7 +1044,7 @@ private:
         return (_processingActionLevel < apSIZE);
     }
 
-    const character* findDropTarget(float x, float y, character* dragging) const;
+    const character* findDropTarget(boost::int32_t x, boost::int32_t y, character* dragging) const;
 
     /// filedescriptor to write to for host application requests
     //

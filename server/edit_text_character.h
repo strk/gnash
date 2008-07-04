@@ -81,7 +81,7 @@ public:
 	// TODO: should this return isSelectable() ?
 	bool can_handle_mouse_event() const { return true; }
 
-	character* get_topmost_mouse_entity(float x, float y);
+	character* get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y);
 	
 	bool wantsInstanceName() const
 	{

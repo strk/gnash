@@ -3615,10 +3615,10 @@ class MouseEntityFinder {
   Candidates _candidates;
 
   /// Query point in world coordinate space
-  point _wp;
+  geometry::Point2d<boost::int32_t> _wp;
 
   /// Query point in parent coordinate space
-  point _pp;
+  geometry::Point2d<boost::int32_t> _pp;
 
   bool _checked;
 
@@ -3630,7 +3630,7 @@ public:
   /// @param pp
   ///   Query point in parent coordinate space
   ///
-  MouseEntityFinder(point wp, point pp)
+  MouseEntityFinder(geometry::Point2d<boost::int32_t> wp, geometry::Point2d<boost::int32_t> pp)
     :
     _highestHiddenDepth(std::numeric_limits<int>::min()),
     _m(NULL),
@@ -3723,8 +3723,8 @@ public:
 class ShapeContainerFinder {
 
   bool _found;
-  float _x;
-  float _y;
+  boost::int32_t  _x;
+  boost::int32_t  _y;
 
 public:
 
@@ -3756,12 +3756,12 @@ public:
 class VisibleShapeContainerFinder {
 
   bool _found;
-  float _x;
-  float _y;
+  boost::int32_t  _x;
+  boost::int32_t  _y;
 
 public:
 
-  VisibleShapeContainerFinder(float x, float y)
+  VisibleShapeContainerFinder(boost::int32_t x, boost::int32_t  y)
     :
     _found(false),
     _x(x),
@@ -3788,11 +3788,11 @@ public:
 /// 
 class HitableShapeContainerFinder { 
     bool _found; 
-    float _x; 
-    float _y; 
+    boost::int32_t  _x; 
+    boost::int32_t  _y; 
     
 public: 
-    HitableShapeContainerFinder(float x, float y) 
+    HitableShapeContainerFinder(boost::int32_t x, boost::int32_t y) 
         : 
     _found(false), 
     _x(x), 
@@ -3857,7 +3857,7 @@ sprite_instance::pointInVisibleShape(boost::int32_t x, boost::int32_t y) const
 }
 
 bool
-sprite_instance::pointInHitableShape(float x, float y) const
+sprite_instance::pointInHitableShape(boost::int32_t x, boost::int32_t y) const
 {
     if ( isDynamicMask() && !can_handle_mouse_event() )
     {
@@ -3884,7 +3884,7 @@ sprite_instance::pointInHitableShape(float x, float y) const
 }
 
 character*
-sprite_instance::get_topmost_mouse_entity(float x, float y)
+sprite_instance::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y)
 {
   //GNASH_REPORT_FUNCTION;
 
@@ -3893,17 +3893,20 @@ sprite_instance::get_topmost_mouse_entity(float x, float y)
     return NULL;
   }
 
-  // point is in parent's space,
-  // we need to convert it in world space
-  point wp(x,y);
+  // point is in parent's space, we need to convert it in world space
+  geometry::Point2d<boost::int32_t> wp(x,y);
   character* parent = get_parent();
-  if ( parent ) parent->get_world_matrix().transform(wp);
-  // WARNING: if we have NO parent, our parent it the Stage (movie_root)
-  //          so, in case we'll add a "stage" matrix, we'll need to take
-  //          it into account here.
-  // TODO: actually, why are we insisting in using parent's coordinates for
-  //       this method at all ?
-  //
+  if ( parent ) 
+  {
+    // WARNING: if we have NO parent, our parent it the Stage (movie_root)
+    //          so, in case we'll add a "stage" matrix, we'll need to take
+    //          it into account here.
+    // TODO: actually, why are we insisting in using parent's coordinates for
+    //       this method at all ?
+    //
+     parent->get_world_matrix().transform(wp);
+  }
+
 
   if ( can_handle_mouse_event() )
   {
@@ -3913,11 +3916,10 @@ sprite_instance::get_topmost_mouse_entity(float x, float y)
 
 
   matrix  m = get_matrix();
-  point pp(x, y);
+  geometry::Point2d<boost::int32_t> pp(x, y);
   m.invert().transform(pp);
 
   MouseEntityFinder finder(wp, pp);
-  //m_display_list.visitBackward(finder);
   m_display_list.visitAll(finder);
   character* ch = finder.getEntity();
   if ( ! ch ) 
@@ -3944,8 +3946,8 @@ class DropTargetFinder {
   ///
   int _highestHiddenDepth;
 
-  float _x;
-  float _y;
+  boost::int32_t _x;
+  boost::int32_t _y;
   character* _dragging;
   mutable const character* _dropch;
 
@@ -3956,7 +3958,7 @@ class DropTargetFinder {
 
 public:
 
-  DropTargetFinder(float x, float y, character* dragging)
+  DropTargetFinder(boost::int32_t x, boost::int32_t y, character* dragging)
     :
     _highestHiddenDepth(std::numeric_limits<int>::min()),
     _x(x),
@@ -4037,10 +4039,8 @@ public:
 };
 
 const character*
-sprite_instance::findDropTarget(float x, float y, character* dragging) const
+sprite_instance::findDropTarget(boost::int32_t x, boost::int32_t y, character* dragging) const
 {
-  //GNASH_REPORT_FUNCTION;
-
   if ( this == dragging ) return 0; // not here...
 
   if ( ! get_visible() ) return 0; // isn't me !

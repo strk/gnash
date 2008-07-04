@@ -88,7 +88,7 @@ public:
 	/// If you need to check for a generic character to contain a 
 	/// given point, use the pointInShape() function instead.
 	/// 
-	virtual character* get_topmost_mouse_entity(float /*x*/, float /*y*/)
+	virtual character* get_topmost_mouse_entity(boost::int32_t /*x*/, boost::int32_t /*y*/)
 	{
 		return NULL;
 	}

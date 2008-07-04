@@ -957,7 +957,7 @@ public:
   /// @param y
   ///   Y ordinate of the pointer, in parent's coordiante space.
   ///
-  virtual character* get_topmost_mouse_entity(float /* x */, float /* y */)
+  virtual character* get_topmost_mouse_entity(boost::int32_t /* x */, boost::int32_t /* y */)
   {
     return NULL;
   }
@@ -967,7 +967,7 @@ public:
   //
   /// Point coordinates in global twips.
   ///
-  virtual const character* findDropTarget(float x, float y, character* dragging) const
+  virtual const character* findDropTarget(boost::int32_t x, boost::int32_t y, character* dragging) const
   {
     if ( this != dragging && get_visible()
       && pointInVisibleShape(x, y) )

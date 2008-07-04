@@ -401,7 +401,7 @@ button_character_instance::display()
 
 
 character*
-button_character_instance::get_topmost_mouse_entity(float x, float y)
+button_character_instance::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y)
 // Return the topmost entity that the given point covers.  NULL if none.
 // I.e. check against ourself.
 {
@@ -423,7 +423,7 @@ button_character_instance::get_topmost_mouse_entity(float x, float y)
 		std::sort(actChars.begin(), actChars.end(), charDepthLessThen);
 
 		matrix  m = get_matrix();
-		point p(x, y);
+		geometry::Point2d<boost::int32_t> p(x, y);
         m.invert().transform(p);
 
 		for (Chars::reverse_iterator it=actChars.rbegin(), itE=actChars.rend(); it!=itE; ++it)
@@ -445,7 +445,7 @@ button_character_instance::get_topmost_mouse_entity(float x, float y)
 
 	// point is in parent's space,
 	// we need to convert it in world space
-	point wp(x,y);
+	geometry::Point2d<boost::int32_t> wp(x,y);
 	character* parent = get_parent();
 	if ( parent )
 	{

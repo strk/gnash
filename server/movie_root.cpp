@@ -863,8 +863,8 @@ movie_root::fire_mouse_event()
 
 	assert(testInvariant());
 
-    float x = PIXELS_TO_TWIPS(m_mouse_x);
-    float y = PIXELS_TO_TWIPS(m_mouse_y);
+    boost::int32_t x = PIXELS_TO_TWIPS(m_mouse_x);
+    boost::int32_t y = PIXELS_TO_TWIPS(m_mouse_y);
 
     // Generate a mouse event
     m_mouse_button_state.m_topmost_entity = getTopmostMouseEntity(x, y);
@@ -1833,7 +1833,7 @@ movie_root::markReachableResources() const
 #endif // GNASH_USE_GC
 
 character *
-movie_root::getTopmostMouseEntity(float x, float y)
+movie_root::getTopmostMouseEntity(boost::int32_t x, boost::int32_t y)
 {
 	for (Levels::reverse_iterator i=_movies.rbegin(), e=_movies.rend(); i!=e; ++i)
 	{
@@ -1844,7 +1844,7 @@ movie_root::getTopmostMouseEntity(float x, float y)
 }
 
 const character *
-movie_root::findDropTarget(float x, float y, character* dragging) const
+movie_root::findDropTarget(boost::int32_t x, boost::int32_t y, character* dragging) const
 {
 	for (Levels::const_reverse_iterator i=_movies.rbegin(), e=_movies.rend(); i!=e; ++i)
 	{

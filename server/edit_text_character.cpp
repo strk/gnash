@@ -788,7 +788,7 @@ edit_text_character::on_event(const event_id& id)
 }
 
 character*
-edit_text_character::get_topmost_mouse_entity(float x, float y)
+edit_text_character::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y)
 {
 	//log_debug("get_topmost_mouse_entity called on edit_text_character %p, labeled '%s'", (void*)this, get_text_value());
 
@@ -805,7 +805,7 @@ edit_text_character::get_topmost_mouse_entity(float x, float y)
 	}
 
 	matrix	m = get_matrix();
-    point p(x, y);
+    geometry::Point2d<boost::int32_t> p(x, y);
     m.invert().transform(p);
 
 	if ( _bounds.point_test(p.x, p.y) )

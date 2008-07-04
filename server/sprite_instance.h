@@ -152,7 +152,7 @@ public:
     /// all sprites except mouse-insensitive dynamic masks are hitable.
     /// _visible property is ignored for hitable characters.
     ///
-    bool pointInHitableShape(float x, float y) const;
+    bool pointInHitableShape(boost::int32_t x, boost::int32_t y) const;
 
 	/// Return 0-based index to current frame
 	size_t get_current_frame() const
@@ -242,10 +242,10 @@ public:
 	/// Return the topmost entity that the given point
 	/// covers that can receive mouse events.  NULL if
 	/// none.  Coords are in parent's frame.
-	virtual character* get_topmost_mouse_entity(float x, float y);
+	virtual character* get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y);
 
     // see dox in character.h
-	const character* findDropTarget(float x, float y, character* dragging) const;
+	const character* findDropTarget(boost::int32_t x, boost::int32_t y, character* dragging) const;
 
     void setDropTarget(const std::string& tgt)
     {
