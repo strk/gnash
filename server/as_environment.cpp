@@ -953,7 +953,9 @@ as_environment::set_target(character* target)
 	//assert(target);
 	if ( ! _original_target )
 	{
-		assert(target); // we assume any as_environment creator sets a target too I guess..
+		//assert(target); // we assume any as_environment creator sets a target too I guess..
+		// WRONG ASSUMPTION: ^^^^^^^^^ : as_value::to_primitive doesn't care about setting a target here
+
 		//log_debug("as_environment(%p)::set_target(%p): setting original target to %s", this, target, target ? target->getTarget() : "<null>");
 		_original_target = target;
 	}
