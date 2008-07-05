@@ -84,6 +84,32 @@ swf_function::getArguments(swf_function& callee, const fn_call& fn)
 
 }
 
+/// Exception safe (scoped) as_environment's target changer
+//
+/// This class partially helps fixing an SWF5 scoping issue.
+/// Completing the fix would likely reduce complexity of the
+/// code too, in particular the concept of an 'original target'
+/// in as_environment seems bogus, see setProperty.as, the 
+/// failure of setTarget("") construct in SWF5.
+///
+struct TargetGuard {
+	as_environment& env;
+	character* from;
+	TargetGuard(as_environment& e, character* ch)
+		:
+		env(e)
+	{
+		from = env.get_target();
+		//log_debug("TargetGuard set target of env %p from %s to %s", &e, from ? from->getTarget() : "<null>", ch ? ch->getTarget() : "<null>");
+		env.set_target(ch);
+	}
+	~TargetGuard()
+	{
+		//log_debug("TargetGuard reset target of env %p to %s", &env, from ? from->getTarget() : "<null>");
+		env.set_target(from);
+	}
+};
+
 // Dispatch.
 as_value
 swf_function::operator()(const fn_call& fn)
@@ -93,13 +119,15 @@ swf_function::operator()(const fn_call& fn)
 
 	as_environment*	our_env = m_env;
 	assert(our_env);
+
 	// if(our_env->get_original_target()->isDestroyed())
         if (our_env == NULL)
 	{
+		log_error("swf_function own environment is null (possible?)");
 		our_env = &fn.env();
 	}
-	//our_env = &fn.env(); // I think this should be it...
-	assert(our_env);
+
+	character* target = our_env->get_target();
 
 #if 0
 	log_debug("swf_function() stack:\n"); fn.env().dump_stack();
@@ -107,7 +135,6 @@ swf_function::operator()(const fn_call& fn)
 #endif
 	// Some features are version-dependant.
 	unsigned swfversion = VM::get().getSWFVersion();
-	assert(fn.this_ptr);
 	as_object *super = NULL;
 	if (swfversion > 5)
 	{
@@ -115,6 +142,28 @@ swf_function::operator()(const fn_call& fn)
 		//if ( super ) log_debug("Super is %s @ %p", typeName(*super), (void*)super);
 		//else log_debug("Super is not available");
 	}
+	else
+	{
+		// In SWF5, when 'this' is a character it becomes
+		// the target for this function call.
+		// See actionscript.all/setProperty.as
+		// 
+		if ( fn.this_ptr )
+		{
+			character* ch = fn.this_ptr->to_character();
+			if ( ch ) target = ch;
+		}
+	}
+
+	/// This is only needed for SWF5 (temp switch of target)
+	/// We do always and base 'target' value on SWF version.
+	/// TODO: simplify code by maybe using a custom as_environment
+	///       instead, so to get an "original" target being 
+	///       the one set now (rather then the really original one)
+	/// TODO: test scope when calling functions defined in another timeline
+	///       (target, in particular).
+	///
+	TargetGuard targetGuard(*our_env, target);
 
 	if (m_is_function2 == false)
 	{

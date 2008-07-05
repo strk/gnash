@@ -49,9 +49,10 @@ mc1.func = function () {
         setproperty
     };  
 #if OUTPUT_VERSION == 5
-    // failed by looking into the wrong context.
-    xcheck_equals(_root.mc1._xscale, 30);
-    xcheck_equals(_root._xscale, 100);
+    // Gnash might be failed due to accuracy problem.
+    // should we be more tolerant here?
+    check_equals(Math.round(_root.mc1._xscale), 30);
+    check_equals(_root._xscale, 100);
 #else
     // Gnash might be failed due to accuracy problem.
     // should we be more tolerant here?
@@ -70,7 +71,7 @@ mc1.func = function () {
         setvariable
     };
 #if OUTPUT_VERSION == 5
-    xcheck_equals(testvar, 30);
+    check_equals(Math.round(testvar), 30);
 #else
     // Gnash might be failed due to accuracy problem.
     // should we be more tolerant here?
@@ -93,7 +94,7 @@ mc2.remove = function () {
 };
 mc2.remove();
 #if OUTPUT_VERSION == 5
-    xcheck_equals(typeof(mc2), 'undefined');
+    check_equals(typeof(mc2), 'undefined');
 #else
     check_equals(typeof(mc2), 'movieclip');
 #endif
@@ -122,6 +123,8 @@ mc3.set_target();
 check_equals(mc3thisPtr, mc3);
 
 #if OUTPUT_VERSION == 5
+    // gnash fails because it sets the *current* target
+    // rather then the *original* target on function call
     xcheck_equals(_root.checkpoint, "/mc3");
 #else
     check_equals(_root.checkpoint, "/");
@@ -148,10 +151,10 @@ mc4.func = function () {
     check_equals(this, _root.mc4);
 #if OUTPUT_VERSION == 5
     // for swf5, mc4 is the top of the scope chain.
-    xcheck_equals(checkpoint, "var_in_mc4");
-    xcheck_equals(_target, "/mc4");
+    check_equals(checkpoint, "var_in_mc4");
+    check_equals(_target, "/mc4");
     checkpoint = 0;
-    xcheck_equals(this.checkpoint, 0);
+    check_equals(this.checkpoint, 0);
 #else
     // for swf6 and above, current target is the top of the scope chain.
     check_equals(checkpoint, "var_in_root");
