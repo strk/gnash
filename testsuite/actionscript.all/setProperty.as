@@ -139,10 +139,16 @@ _root.checkpoint = "var_in_root";
 createSprite("mc4", 40);
 mc4.checkpoint = "var_in_mc4";
 mc4.func = function () {
+
+    pass_check = _root.pass_check;
+    xpass_check = _root.xpass_check;
+    fail_check = _root.fail_check;
+    xfail_check = _root.xfail_check;
+
     check_equals(this, _root.mc4);
 #if OUTPUT_VERSION == 5
     // for swf5, mc4 is the top of the scope chain.
-    xcheck_equals(checkpoint, var_in_mc4);
+    xcheck_equals(checkpoint, "var_in_mc4");
     xcheck_equals(_target, "/mc4");
     checkpoint = 0;
     xcheck_equals(this.checkpoint, 0);
