@@ -20,6 +20,8 @@
 #ifndef GNASH_SAFESTACK_H
 #define GNASH_SAFESTACK_H
 
+#include "log.h"
+
 #include <vector>
 
 namespace gnash {
@@ -43,9 +45,10 @@ public:
 	/// value.
 	T& top(unsigned int i)
 	{
-		if (i >= mDownstop) 
+		if (i >= size()) 
 			throw StackException();
 		unsigned int offset = mEnd - i;
+		//log_debug("top(%d): mEnd:%d, mDownstop:%d, offset:%d", i, mEnd, mDownstop, offset);
 		return mData[offset >> mChunkShift][offset & mChunkMod];
 	}
 
@@ -53,9 +56,11 @@ public:
 	/// bottommost value.
 	T& value(unsigned int i)
 	{
-		if (i >= mDownstop)
+		if (i >= size())
 			throw StackException();
-		unsigned int offset = mEnd - mDownstop + i;
+
+		unsigned int offset = mDownstop + i + 2;
+		//log_debug("value(%d): mEnd:%d, mDownstop:%d, offset:%d", i, mEnd, mDownstop, offset);
 		return mData[offset >> mChunkShift][offset & mChunkMod];
 	}
 
@@ -63,7 +68,7 @@ public:
 	/// previously given, it just sets the top for pop, push, and top
 	/// operations.
 	void drop(unsigned int i)
-	{ if (i >= mDownstop) throw StackException(); mDownstop -= i; mEnd -= i; }
+	{ if (i > size()) throw StackException(); mEnd -= i; }
 
 	/// Put a new value onto the top of the stack.  The value will be
 	/// copied.
@@ -79,12 +84,12 @@ public:
 	void grow(unsigned int i)
 	{
 		unsigned int available = (1 << mChunkShift) * mData.size() - mEnd + 1;
-		while (available < i)
+		unsigned int n = size()+i;
+		while (available < n)
 		{
 			mData.push_back(new T[1 << mChunkShift]);
 			available += 1 << mChunkShift;
 		}
-		mDownstop += i;
 		mEnd += i;
 	}
 
@@ -93,24 +98,24 @@ public:
 	{ return mDownstop; }
 
 	/// Alias for getDownstop()
-	unsigned int size() const { return getDownstop(); }
+	unsigned int size() const { return mEnd - mDownstop - 1; /*mEnd is one past end*/ }
 
 	/// Is the stack empty to us? (Check totalSize() != for actually empty)
-	bool empty() const { return mDownstop == 0; }
+	bool empty() const { return size() == 0; }
 
 	/// Makes the stack appear empty to subsequent callers.  This can be used
 	/// to simulate multiple stacks with a single stack, as in function
-	/// calling. Returns the portion of the stack which is newly inaccessible.
+	/// calling. Returns the old downstop for restoring it using setDownstop.
 	unsigned int fixDownstop() 
-	{ unsigned int ret = mDownstop; mDownstop = 0; return ret; }
+	{ unsigned int ret = mDownstop; mDownstop = mEnd-1; return ret; }
 
 	/// Makes the stack read to a depth of 'i'. This cannot be more than
 	/// totalSize()
 	void setDownstop(unsigned int i)
-	{ if (mDownstop > mEnd) throw StackException(); mDownstop = i; }
+	{ if (i > mEnd) throw StackException(); mDownstop = i; }
 
 	/// The total size of the stack. This is not what can be read. That
-	/// value is given by getDownstop()
+	/// value is given by size()
 	///
 	/// This function is probably not what you need for anything except for
 	/// setting downstops that weren't returned by either fixDownstop() or
@@ -123,7 +128,7 @@ public:
 	{ mEnd = total + 1; mDownstop = downstop; }
 
 	/// Default constructor.
-	SafeStack() : mData(), mDownstop(1), mEnd(1)
+	SafeStack() : mData(), mDownstop(0), mEnd(1)
 	{ /**/ }
 
 	/// Delete the allocated data. 
