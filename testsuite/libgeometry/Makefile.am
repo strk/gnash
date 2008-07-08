@@ -26,6 +26,7 @@ AM_LDFLAGS =  \
 INCLUDES = \
         -I$(top_srcdir)/libgeometry \
         -I$(top_srcdir)/testsuite \
+	$(BOOST_CFLAGS) \
 	$(NULL)
 
 check_PROGRAMS = \
