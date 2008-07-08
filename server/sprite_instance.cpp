@@ -3801,8 +3801,6 @@ public:
 
     bool operator() (character* ch) 
     { 
-        std::cout << "HitableShapeContainerFinder: " << ch->get_name() << std::endl;
-        std::cout << "(" << _x << ", " << _y << ")" << std::endl;
         if( ch->isDynamicMask() ) 
         { 
             return true; 
