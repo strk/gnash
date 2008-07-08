@@ -121,7 +121,7 @@ PathParser::emitConnecting(std::deque<UnivocalPath>& paths)
 void
 PathParser::append(const UnivocalPath& append_path)
 {
-  const std::vector< Edge<int> >& edges = append_path._path->m_edges;
+  const std::vector<Edge>& edges = append_path._path->m_edges;
 
   if (append_path._fill_type == UnivocalPath::FILL_LEFT) {
 
@@ -134,11 +134,11 @@ PathParser::append(const UnivocalPath& append_path)
       if ((*prev).isStraight()) {
         lineTo((*it).ap);
       } else {
-        line_to(Edge<int>((*prev).cp, (*it).ap));
+        line_to(Edge((*prev).cp, (*it).ap));
       }
     }
 
-    line_to(Edge<int>(edges.front().cp, append_path.endPoint()));
+    line_to(Edge(edges.front().cp, append_path.endPoint()));
   }
     
   _cur_endpoint = append_path.endPoint();
