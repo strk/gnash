@@ -780,7 +780,7 @@ void
 NetStream::startAdvanceTimer()
 {
 	boost::intrusive_ptr<builtin_function> advanceCallback = \
-		new builtin_function(&NetStreamFfmpeg::advanceWrapper);
+		new builtin_function(&NetStream::advanceWrapper);
 	std::auto_ptr<Timer> timer(new Timer);
 	unsigned long delayMS = 50; // TODO: base on media file FPS !!!
 	timer->setInterval(*advanceCallback, delayMS, this);
