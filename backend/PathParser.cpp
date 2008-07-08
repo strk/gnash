@@ -24,13 +24,13 @@
 namespace gnash
 {
 
-const Point2d<int>&
+const point&
 UnivocalPath::startPoint() const
 {
   return _fill_type == FILL_LEFT ? _path->ap : _path->m_edges.back().ap;
 }
 
-const Point2d<int>&
+const point&
 UnivocalPath::endPoint() const
 {
   return _fill_type == FILL_LEFT ? _path->m_edges.back().ap : _path->ap;
@@ -145,7 +145,7 @@ PathParser::append(const UnivocalPath& append_path)
 }
 
 void
-PathParser::line_to(const Edge<int>& curve)
+PathParser::line_to(const edge& curve)
 {
   if (curve.isStraight()) {
     lineTo(curve.ap);

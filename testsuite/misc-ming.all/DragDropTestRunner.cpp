@@ -53,8 +53,6 @@ main(int /*argc*/, char** /*argv*/)
 	// for variables lookup (consistency checking)
 	string_table& st = root->getVM().getStringTable();
 
-	typedef geometry::Point2d<int> IntPoint;
-
 	rgba white(255, 255, 255, 255); // background color
 	rgba blue(0, 0, 255, 255);      // blue circles fill color
 	rgba green(0, 255, 0, 255);     // green circles fill color
@@ -62,19 +60,19 @@ main(int /*argc*/, char** /*argv*/)
 
 	int cs = 20;             // circles size
 
-	IntPoint out(350, 100);  // out of any drawing
+	point out(350, 100);  // out of any drawing
 
-	IntPoint rc1(50, 50);    // first red circle
-	IntPoint gc1(100, 50);   // first green circle
-	IntPoint bc1(70, 100);   // first blue circle
+	point rc1(50, 50);    // first red circle
+	point gc1(100, 50);   // first green circle
+	point bc1(70, 100);   // first blue circle
 
-	IntPoint rc2(150, 50);   // second red circle
-	IntPoint gc2(200, 50);   // second green circle
-	IntPoint bc2(170, 100);  // second blue circle
+	point rc2(150, 50);   // second red circle
+	point gc2(200, 50);   // second green circle
+	point bc2(170, 100);  // second blue circle
 
-	IntPoint rc3(250, 50);   // third red circle
-	IntPoint gc3(300, 50);   // third green circle
-	IntPoint bc3(270, 100);  // third blue circle
+	point rc3(250, 50);   // third red circle
+	point gc3(300, 50);   // third green circle
+	point bc3(270, 100);  // third blue circle
 
 	check_equals(root->get_frame_count(), 2);
 	check_equals(root->get_current_frame(), 0);

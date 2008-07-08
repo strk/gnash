@@ -805,7 +805,7 @@ edit_text_character::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y
 	}
 
 	matrix	m = get_matrix();
-    geometry::Point2d<boost::int32_t> p(x, y);
+    point  p(x, y);
     m.invert().transform(p);
 
 	if ( _bounds.point_test(p.x, p.y) )
@@ -826,7 +826,7 @@ edit_text_character::updateText(const std::string& str)
 void
 edit_text_character::updateText(const std::wstring& wstr)
 {
-	_textDefined=true;
+	_textDefined = true;
 
 	unsigned int maxLen = m_def->get_max_length();
 
@@ -835,7 +835,6 @@ edit_text_character::updateText(const std::wstring& wstr)
 	{
 		newText.resize(maxLen);
 	}
-
 	if (_text == newText)
 	{
 		return;
@@ -844,11 +843,7 @@ edit_text_character::updateText(const std::wstring& wstr)
 	set_invalidated();
 
 	_text = newText;
-
 	format_text();
-
-	//log_debug(_("Text set to %s"), new_text);
-
 }
 
 void

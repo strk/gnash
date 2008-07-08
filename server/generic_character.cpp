@@ -48,7 +48,7 @@ generic_character::pointInShape(boost::int32_t  x, boost::int32_t  y) const
 {
   matrix wm = get_world_matrix();
   matrix wm_inverse = wm.invert();
-  geometry::Point2d<boost::int32_t> lp(x, y);
+  point  lp(x, y);
   wm_inverse.transform(lp);
   return m_def->point_test_local(lp.x, lp.y, wm);
 }

@@ -55,13 +55,13 @@ main(int /*argc*/, char** /*argv*/)
 	rgba red(255,0,0,255);
 	rgba green(0,255,0,255);
 
-	geometry::Point2d<int> cXmm(220,327); // character X center
-	geometry::Point2d<int> cXum(220,440); // character X underline/middle
+	geometry::Point2d cXmm(220,327); // character X center
+	geometry::Point2d cXum(220,440); // character X underline/middle
 
-	geometry::Point2d<int> cOmr(135,326); // character O middle/right
-	geometry::Point2d<int> cOml(21,330); // character O middle/left
-	geometry::Point2d<int> cOmm(77,327); // character O center
-	geometry::Point2d<int> cOum(78,440); // character O underline/middle
+	geometry::Point2d cOmr(135,326); // character O middle/right
+	geometry::Point2d cOml(21,330); // character O middle/left
+	geometry::Point2d cOmm(77,327); // character O center
+	geometry::Point2d cOum(78,440); // character O underline/middle
 
 
 	tester.advance(); // first frame only contains dejagnu

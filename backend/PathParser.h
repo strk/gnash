@@ -45,8 +45,8 @@ struct UnivocalPath
   {
   }
   
-  const Point2d<int>& startPoint() const;
-  const Point2d<int>& endPoint() const;
+  const point& startPoint() const;
+  const point& endPoint() const;
 
   const path* _path;
   fill_type   _fill_type;
@@ -92,13 +92,13 @@ public:
   /// Move the path pencil to the given location. Thus a new shape should be
   /// started. The parser may invoke this method several times for a single
   /// fill style, creating several shapes.
-  virtual void moveTo(const geometry::Point2d<int>& p) = 0;
+  virtual void moveTo(const point& p) = 0;
   
   /// Draw the given curve using the path pencil.
-  virtual void curveTo(const Edge<int>& curve) = 0;
+  virtual void curveTo(const edge& curve) = 0;
 
   /// Draw a straight line to the given point.
-  virtual void lineTo(const geometry::Point2d<int>& p) = 0;
+  virtual void lineTo(const point& p) = 0;
 
 private:
   std::deque<UnivocalPath>::iterator emitConnecting(std::deque<UnivocalPath>& paths);
@@ -113,12 +113,12 @@ private:
   
   bool closed_shape();
 
-  void line_to(const Edge<int>& curve);
+  void line_to(const edge& curve);
 
   const std::vector<path>& _paths;
   const size_t             _num_styles;
-  Point2d<int>       _shape_origin;
-  Point2d<int>       _cur_endpoint;
+  point       _shape_origin;
+  point       _cur_endpoint;
 };
 
 }

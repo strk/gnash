@@ -88,11 +88,11 @@ void    rect::enclose_transformed_rect(const matrix& m, const rect& r)
     boost::int32_t  y1 = r.get_y_min();
     boost::int32_t  x2 = r.get_x_max();
     boost::int32_t  y2 = r.get_y_max();
-    
-    geometry::Point2d<boost::int32_t>  p0(x1, y1);
-    geometry::Point2d<boost::int32_t>  p1(x2, y1);
-    geometry::Point2d<boost::int32_t>  p2(x2, y2);
-    geometry::Point2d<boost::int32_t>  p3(x1, y2);
+
+    point  p0(x1, y1);
+    point  p1(x2, y1);
+    point  p2(x2, y2);
+    point  p3(x1, y2);
     
     m.transform(p0);
     m.transform(p1);
@@ -134,11 +134,11 @@ void    rect::expand_to_transformed_rect(const matrix& m, const rect& r)
     boost::int32_t  y1 = r.get_y_min();
     boost::int32_t  x2 = r.get_x_max();
     boost::int32_t  y2 = r.get_y_max();
-    
-    geometry::Point2d<boost::int32_t>  p0(x1, y1);
-    geometry::Point2d<boost::int32_t>  p1(x2, y1);
-    geometry::Point2d<boost::int32_t>  p2(x2, y2);
-    geometry::Point2d<boost::int32_t>  p3(x1, y2);
+
+    point  p0(x1, y1);
+    point  p1(x2, y1);
+    point  p2(x2, y2);
+    point  p3(x1, y2);
     
     m.transform(p0);
     m.transform(p1);

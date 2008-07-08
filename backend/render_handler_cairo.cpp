@@ -324,7 +324,7 @@ public:
     }
   }
 
-  void moveTo(const geometry::Point2d<int>& ap)
+  void moveTo(const point& ap)
   {
       double x = ap.x, y = ap.y;
       snap_to_half_pixel(_cr, x, y);
@@ -332,7 +332,7 @@ public:
       cairo_move_to(_cr, x, y);
   }
 
-  virtual void curveTo(const Edge<int>& cur_edge)
+  virtual void curveTo(const edge& cur_edge)
   {
     const float two_thirds = 2.0/3.0;
     const float one_third = 1 - two_thirds;
@@ -357,7 +357,7 @@ public:
     
   }
 
-  void lineTo(const geometry::Point2d<int>& ap)
+  void lineTo(const point& ap)
   {
     double x = ap.x;
     double y = ap.y;

@@ -423,7 +423,7 @@ button_character_instance::get_topmost_mouse_entity(boost::int32_t x, boost::int
 		std::sort(actChars.begin(), actChars.end(), charDepthLessThen);
 
 		matrix  m = get_matrix();
-		geometry::Point2d<boost::int32_t> p(x, y);
+        point  p(x, y);
         m.invert().transform(p);
 
 		for (Chars::reverse_iterator it=actChars.rbegin(), itE=actChars.rend(); it!=itE; ++it)
@@ -445,7 +445,7 @@ button_character_instance::get_topmost_mouse_entity(boost::int32_t x, boost::int
 
 	// point is in parent's space,
 	// we need to convert it in world space
-	geometry::Point2d<boost::int32_t> wp(x,y);
+    point  wp(x,y);
 	character* parent = get_parent();
 	if ( parent )
 	{

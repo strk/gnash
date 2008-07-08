@@ -20,8 +20,6 @@
 // Original author: Sandro Santilli <strk@keybit.net>
 //
 
-
-
 #ifndef GNASH_POINT2DH
 #define GNASH_POINT2DH
 
@@ -31,44 +29,36 @@
 #include <cassert> // for inlines
 #include <iostream> // temporary include for debugging
 #include <cmath> // for floor / ceil
+#include <boost/cstdint.hpp>
 
 namespace gnash {
-
-namespace geometry {
-
-/// 2d Point template class
+namespace geometry { 
+    
+/// 2D Point class
 //
-/// The class stores 2 values of the type specified
-/// as template argument, representing the the X and Y oordinates.
-///
-template <typename T>
+/// A point which contains a x and a y coorinate in TWIPS.
+/// 
 class Point2d
 {
-private:
-
 public:
 
-	/// The x ordinate
-	T x;
+	/// The x coordinate
+	boost::int32_t  x;  // TWIPS
 
-	/// The y ordinate
-	T y;
+	/// The y coordinate
+	boost::int32_t  y;  // TWIPS
 
-	/// Construct a Point2d with default X and Y ordinates
-	//
+	/// Construct a Point2d with default x and y coordinates
 	Point2d()
 		:
-		x(T(0.0)),
-		y(T(0.0))
+		x(0), y(0)
 	{
-
 	}
-	/// Construct a Point2d with given X and Y ordinates
-	//
-	Point2d(T nx, T ny)
+
+	/// Construct a Point2d with given x and y ordinates
+	Point2d(boost::int32_t cx, boost::int32_t cy)
 		:
-		x(nx),
-		y(ny)
+		x(cx), y(cy)
 	{
 	}
 
@@ -78,11 +68,10 @@ public:
 	/// @param p1 second point
 	/// @param t interpolation factor, between 0 and 1
 	///
-	template <typename U>
-	Point2d(const Point2d<U>& p0, const Point2d<U>& p1, float t)
+	Point2d(const Point2d& p0, const Point2d& p1, float t)
 		:
-		x( p0.x + (p1.x - p0.x) * t ),
-		y( p0.y + (p1.y - p0.y) * t )
+		x( p0.x + (boost::int32_t)((p1.x - p0.x) * t)),
+		y( p0.y + (boost::int32_t)((p1.y - p0.y) * t))
 	{
 	}
 
@@ -90,11 +79,10 @@ public:
 	//
 	/// @return a reference to this instance
 	///
-	Point2d<T>& setTo(const T& nx, const T& ny)
+	Point2d& setTo(const boost::int32_t cx, const boost::int32_t cy)
 	{
-		x = nx;
-		y = ny;
-
+		x = cx;  
+        y = cy;
 		return *this;
 	}
 
@@ -106,69 +94,60 @@ public:
 	///
 	/// @return a reference to this instance
 	///
-	Point2d<T>& setTo(const Point2d<T>& p0, const Point2d<T>& p1, float t)
+	Point2d& setTo(const Point2d& p0, const Point2d& p1, float t)
 	{
-		x = p0.x + (p1.x - p0.x) * t;
-		y = p0.y + (p1.y - p0.y) * t;
+		x = p0.x + (boost::int32_t)((p1.x - p0.x) * t);
+		y = p0.y + (boost::int32_t)((p1.y - p0.y) * t);
 		return *this;
 	}
 
-	/// Return square distance between two points
-	template <typename U>
+	/// Return square distance between two given points.
 	static
-	float squareDistance(const Point2d<T>& p0, const Point2d<U>& p1)
+	boost::int64_t squareDistance(const Point2d& p0, const Point2d& p1)
 	{
-		float hside = p1.x - p0.x;
-		float vside = p1.y - p0.y;
+		boost::int64_t hside = p1.x - p0.x;
+		boost::int64_t vside = p1.y - p0.y;
 
 		return hside*hside + vside*vside;
 	}
 
 	/// Return square distance between this and the given point
-	template <typename U>
-	float squareDistance(const Point2d<U>& p) const
+	boost::int64_t squareDistance(const Point2d& p) const
 	{
 		return squareDistance(*this, p);
 	}
 
 	/// Return distance between this and the given point
-	float distance(const Point2d<T>& p) const
+	boost::int32_t distance(const Point2d& p) const
 	{
-		return sqrtf(squareDistance(p));
+		return (boost::int32_t)( std::sqrt( squareDistance(p) ) );
 	}
 
-	template <typename U>
-	bool operator== (const Point2d<U>& p) const
+	bool operator== (const Point2d& p) const
 	{
-		return x == static_cast<T>(p.x) && y == static_cast<T>(p.y);
+		return (x == p.x) && (y == p.y);
 	}
 
-	bool operator!=(const Point2d<T>& p) const
+	bool operator!=(const Point2d& p) const
 	{
 		return ! (*this == p);
 	}
 };
 
 /// Output operator
-template <typename T> inline std::ostream&
-operator<< (std::ostream& os, const Point2d<T>& p)
+inline std::ostream&
+operator<< (std::ostream& os, const Point2d& p)
 {
 	return os << "Point2d(" << p.x << "," << p.y << ")";
 }
 
-
-
 } // namespace gnash::geometry
 
-// for backward compatibility
-typedef geometry::Point2d<float> point;
-typedef geometry::Point2d<float> float_point;
-typedef geometry::Point2d<int> int_point;
+typedef geometry::Point2d  point;
 
 } // namespace gnash
 
 #endif // GNASH_POINT2DH
-
 
 // Local Variables:
 // mode: C++

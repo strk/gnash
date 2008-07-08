@@ -44,7 +44,7 @@ namespace gnash {
 
 /// The SWF matrix record.
 /// 
-/// Conceptuall, it represents a 3*3 linear transformation matrix like this:
+/// Conceptually, it represents a 3*3 linear transformation matrix like this:
 /// 
 ///   | scale_x       rotateSkew_y  translate_x |
 ///   | rotateSkey_x  scale_y       traslate_y  |
@@ -138,28 +138,19 @@ public:
     void    read(SWFStream* in) { read(*in); }
 
     /// Transform a given point by our matrix
-    void    transform(geometry::Point2d<float>& p) const
+    void    transform(geometry::Point2d& p) const
     {
-        float x = sx / 65536.0f * p.x + shy/ 65536.0f * p.y + tx;
-        float y = shx/ 65536.0f * p.x + sy / 65536.0f * p.y + ty;
-        p.x = x;
-        p.y = y;
-    }
-
-    /// Transform a given point by our matrix
-    void    transform(geometry::Point2d<boost::int32_t>& p) const
-    {
-        boost::int32_t x = Fixed16Mul(sx, p.x) + Fixed16Mul(shy, p.y) + tx;
-        boost::int32_t y = Fixed16Mul(shx,p.x) + Fixed16Mul(sy,  p.y) + ty;
-        p.x = x;
-        p.y = y;
+        boost::int32_t t0 = Fixed16Mul(sx, p.x) + Fixed16Mul(shy, p.y) + tx;
+        boost::int32_t t1 = Fixed16Mul(shx,p.x) + Fixed16Mul(sy,  p.y) + ty;
+        p.x = t0;
+        p.y = t1;
     }
 
     /// Transform the given point by our matrix.
     void    transform(boost::int32_t& x, boost::int32_t& y) const
     {
-        boost::int32_t t0 = Fixed16Mul(sx, x) + Fixed16Mul(shy,y) + tx;
-        boost::int32_t t1 = Fixed16Mul(shx,x) + Fixed16Mul(sy, y) + ty;
+        boost::int32_t  t0 = Fixed16Mul(sx, x) + Fixed16Mul(shy, y) + tx;
+        boost::int32_t  t1 = Fixed16Mul(shx,x) + Fixed16Mul(sy,  y) + ty;
         x = t0;
         y = t1;
     }

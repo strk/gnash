@@ -74,29 +74,27 @@ main(int /*argc*/, char** /*argv*/)
 	rgba green(0,255,0,255);
 	rgba red(255,0,0,255);
 
-	typedef geometry::Point2d<int> intpoint;
-
 	// A point on the visible green button
-	intpoint visibleGreen(100, 260);
+	point visibleGreen(100, 260);
 
 	// A point on the BIG green button, but not on the small one
-	intpoint bigGreen(100, 352);
+	point bigGreen(100, 352);
 
 	// A point on the yellow box, overlapping the green button
-	intpoint yellowOnGreen(127, 256);
+	point yellowOnGreen(127, 256);
 
 	// A point on the yellow box, not overlapping the green button
-	intpoint yellowOffGreen(136, 231);
+	point yellowOffGreen(136, 231);
 
 	// A point on the BIG yellow box, not overlapping the green button,
 	// would be on the small red box...
-	intpoint bigYellowOffGreen(294,365);
+	point bigYellowOffGreen(294,365);
 
 	// A point on the red box, but out of the red button hit area
-	intpoint redNoHit(241, 351);
+	point redNoHit(241, 351);
 
 	// A point on the BIG red button, but not on the small one
-	intpoint bigRedNoHit(330, 397);
+	point bigRedNoHit(330, 397);
 
 	//----------------------------------------
 	// Test starts

@@ -1103,7 +1103,7 @@ sprite_globalToLocal(const fn_call& fn)
   }
   y = PIXELS_TO_TWIPS(tmp.to_number());
 
-  geometry::Point2d<boost::int32_t> pt(x, y);
+  point  pt(x, y);
   matrix world_mat = sprite->get_world_matrix();
   world_mat.invert().transform(pt);
 
@@ -1165,7 +1165,7 @@ sprite_localToGlobal(const fn_call& fn)
   }
   y = PIXELS_TO_TWIPS(tmp.to_number());
 
-  geometry::Point2d<boost::int32_t>  pt(x, y);
+  point  pt(x, y);
   matrix world_mat = sprite->get_world_matrix();
   world_mat.transform(pt);
 
@@ -3615,10 +3615,10 @@ class MouseEntityFinder {
   Candidates _candidates;
 
   /// Query point in world coordinate space
-  geometry::Point2d<boost::int32_t> _wp;
+  point  _wp;
 
   /// Query point in parent coordinate space
-  geometry::Point2d<boost::int32_t> _pp;
+  point  _pp;
 
   bool _checked;
 
@@ -3630,7 +3630,7 @@ public:
   /// @param pp
   ///   Query point in parent coordinate space
   ///
-  MouseEntityFinder(geometry::Point2d<boost::int32_t> wp, geometry::Point2d<boost::int32_t> pp)
+ MouseEntityFinder(point  wp, point  pp)
     :
     _highestHiddenDepth(std::numeric_limits<int>::min()),
     _m(NULL),
@@ -3728,12 +3728,12 @@ class ShapeContainerFinder {
 
 public:
 
-  ShapeContainerFinder(float x, float y)
+  ShapeContainerFinder(boost::int32_t x, boost::int32_t y)
     :
     _found(false),
     _x(x),
     _y(y)
-  {}
+  { }
 
   bool operator() (character* ch)
   {
@@ -3788,8 +3788,8 @@ public:
 /// 
 class HitableShapeContainerFinder { 
     bool _found; 
-    boost::int32_t  _x; 
-    boost::int32_t  _y; 
+    boost::int32_t  _x; // TWIPS
+    boost::int32_t  _y; // TWIPS
     
 public: 
     HitableShapeContainerFinder(boost::int32_t x, boost::int32_t y) 
@@ -3801,6 +3801,8 @@ public:
 
     bool operator() (character* ch) 
     { 
+        std::cout << "HitableShapeContainerFinder: " << ch->get_name() << std::endl;
+        std::cout << "(" << _x << ", " << _y << ")" << std::endl;
         if( ch->isDynamicMask() ) 
         { 
             return true; 
@@ -3894,7 +3896,7 @@ sprite_instance::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y)
   }
 
   // point is in parent's space, we need to convert it in world space
-  geometry::Point2d<boost::int32_t> wp(x,y);
+  point  wp(x, y);
   character* parent = get_parent();
   if ( parent ) 
   {
@@ -3916,7 +3918,7 @@ sprite_instance::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y)
 
 
   matrix  m = get_matrix();
-  geometry::Point2d<boost::int32_t> pp(x, y);
+  point  pp(x, y);
   m.invert().transform(pp);
 
   MouseEntityFinder finder(wp, pp);

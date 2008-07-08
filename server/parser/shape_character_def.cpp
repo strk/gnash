@@ -52,539 +52,489 @@ bool  gnash_debug_show_paths = false;
 namespace gnash
 {
 
-    // Read fill styles, and push them onto the given style array.
-    static void
-        read_fill_styles(std::vector<fill_style>& styles, SWFStream* in,
-        int tag_type, movie_definition* m)
+// Read fill styles, and push them onto the given style array.
+static void
+read_fill_styles(std::vector<fill_style>& styles, SWFStream* in,
+                 int tag_type, movie_definition* m)
+{
+    in->ensureBytes(1);
+    boost::uint16_t  fill_style_count = in->read_u8();
+    if (tag_type > 2)
     {
-
-        // Get the count.
-        in->ensureBytes(1);
-        boost::uint16_t fill_style_count = in->read_u8();
-        if (tag_type > 2)
-        {
-            if (fill_style_count == 0xFF)
-            {
-                in->ensureBytes(2);
-                fill_style_count = in->read_u16();
-            }
-        }
-
-        IF_VERBOSE_PARSE (
-            log_parse(_("  read_fill_styles: count = %u"), fill_style_count);
-            );
-
-        // Read the styles.
-        styles.reserve(styles.size()+fill_style_count);
-        for (boost::uint16_t i = 0; i < fill_style_count; ++i)
-        {
-            // TODO: add a fill_style constructor directly
-            //       reading from stream
-            fill_style fs;
-            fs.read(in, tag_type, m);
-            // Push a style anyway, so any path referring to
-            // it still finds it..
-            styles.push_back(fs);
-        }
-
-    }
-
-    static void
-        read_line_styles(std::vector<line_style>& styles, SWFStream* in, int tag_type,
-        movie_definition *md)
-    // Read line styles and push them onto the back of the given array.
-    {
-        // Get the count.
-        in->ensureBytes(1);
-        int line_style_count = in->read_u8();
-
-        IF_VERBOSE_PARSE
-            (
-            log_parse(_("  read_line_styles: count = %d"), line_style_count);
-            );
-
-        // @@ does the 0xFF flag apply to all tag types?
-        // if (tag_type > 2)
-        // {
-        if (line_style_count == 0xFF)
+        if (fill_style_count == 0xFF)
         {
             in->ensureBytes(2);
-            line_style_count = in->read_u16();
-            IF_VERBOSE_PARSE
-                (
-                log_parse(_("  read_line_styles: count2 = %d"), line_style_count);
-                );
-        }
-        // }
-
-        // Read the styles.
-        for (int i = 0; i < line_style_count; i++)
-        {
-            styles.resize(styles.size() + 1);
-            //styles[styles.size() - 1].read(in, tag_type);
-            styles.back().read(in, tag_type, md);
+            fill_style_count = in->read_u16();
         }
     }
 
-    shape_character_def::shape_character_def()
-        :
+    IF_VERBOSE_PARSE (
+        log_parse(_("  read_fill_styles: count = %u"), fill_style_count);
+    );
+
+    // Read the styles.
+    styles.reserve(styles.size()+fill_style_count);
+    for (boost::uint16_t i = 0; i < fill_style_count; ++i)
+    {
+        // TODO: add a fill_style constructor directly reading from stream
+        fill_style fs;
+        fs.read(in, tag_type, m);
+        styles.push_back(fs);
+    }
+}
+
+static void
+read_line_styles(std::vector<line_style>& styles, SWFStream* in, int tag_type,
+                 movie_definition *md)
+// Read line styles and push them onto the back of the given array.
+{
+    in->ensureBytes(1);
+    int line_style_count = in->read_u8();
+
+    IF_VERBOSE_PARSE(
+        log_parse(_("  read_line_styles: count = %d"), line_style_count);
+    );
+
+    if (line_style_count == 0xFF)
+    {
+        in->ensureBytes(2);
+        line_style_count = in->read_u16();
+        IF_VERBOSE_PARSE(
+            log_parse(_("  read_line_styles: count2 = %d"), line_style_count);
+        );
+    }
+
+    // Read the styles.
+    for (int i = 0; i < line_style_count; i++)
+    {
+        styles.resize(styles.size() + 1);
+        styles.back().read(in, tag_type, md);
+    }
+}
+
+shape_character_def::shape_character_def()
+    :
     character_def(),
-        m_fill_styles(),
-        m_line_styles(),
-        m_paths(),
-        m_bound()
-    //,m_cached_meshes()
-    {
-    }
+    m_fill_styles(),
+    m_line_styles(),
+    m_paths(),
+    m_bound()
+{  }
 
-    shape_character_def::shape_character_def(const shape_character_def& o)
-        :
+shape_character_def::shape_character_def(const shape_character_def& o)
+    :
     character_def(o),
-        m_fill_styles(o.m_fill_styles),
-        m_line_styles(o.m_line_styles),
-        m_paths(o.m_paths),
-        m_bound(o.m_bound)
-    //,m_cached_meshes()
+    m_fill_styles(o.m_fill_styles),
+    m_line_styles(o.m_line_styles),
+    m_paths(o.m_paths),
+    m_bound(o.m_bound)
     {
     }
 
-    shape_character_def::~shape_character_def()
-    {
-        //clear_meshes();
-    }
+shape_character_def::~shape_character_def()
+{
+}
 
-    void
-        shape_character_def::read(SWFStream* in, int tag_type, bool with_style,
-        movie_definition* m)
+void
+shape_character_def::read(SWFStream* in, int tag_type, bool with_style,
+                          movie_definition* m)
+{
+    if (with_style)
     {
-        if (with_style)
+        m_bound.read(in);
+    
+        IF_VERBOSE_PARSE(
+            std::string b = m_bound.toString();
+            log_parse(_("  bound rect: %s"), b.c_str());
+        );
+    
+        // TODO: Store and use these. Unfinished.
+        if (tag_type == SWF::DEFINESHAPE4 || tag_type == SWF::DEFINESHAPE4_)
         {
-            m_bound.read(in);
-
-            IF_VERBOSE_PARSE
-                (
-                std::string b = m_bound.toString();
-                log_parse(_("  bound rect: %s"), b.c_str());
-                );
-
-            // TODO: Store and use these.  Unfinished.
-            if (tag_type == SWF::DEFINESHAPE4 || tag_type == SWF::DEFINESHAPE4_)
+            rect tbound;
+            tbound.read(in);
+            in->ensureBytes(1);
+            static_cast<void>(in->read_u8());
+            static bool warned = false;
+            if ( ! warned )
             {
-                rect tbound;
-                tbound.read(in);
-                in->ensureBytes(1);
-                /*boost::uint8_t scales =*/static_cast<void>(in->read_u8());
-                static bool warned = false;
-                if ( ! warned )
-                {
-                    log_unimpl("DEFINESHAPE4 edge boundaries and scales");
-                    warned = true;
-                }
+                log_unimpl("DEFINESHAPE4 edge boundaries and scales");
+                warned = true;
             }
-
-            read_fill_styles(m_fill_styles, in, tag_type, m);
-            read_line_styles(m_line_styles, in, tag_type, m);
         }
+    
+        read_fill_styles(m_fill_styles, in, tag_type, m);
+        read_line_styles(m_line_styles, in, tag_type, m);
+    }
 
-        /// Adding a dummy fill style is just needed to make the
-        /// parser somewhat more robust. This fill style is not
-        /// really used, as text rendering will use style information
-        /// from TEXTRECORD tag instead.
+    /// Adding a dummy fill style is just needed to make the
+    /// parser somewhat more robust. This fill style is not
+    /// really used, as text rendering will use style information
+    /// from TEXTRECORD tag instead.
+    ///
+    if ( tag_type == SWF::DEFINEFONT || tag_type == SWF::DEFINEFONT2 )
+    {
+        assert(!with_style);
+    }
+    
+    // Use read_u8 to force alignment.
+    in->ensureBytes(1);
+    boost::uint8_t num_bits = in->read_u8();
+    int num_fill_bits = (num_bits & 0xF0) >> 4;
+    int num_line_bits = (num_bits & 0x0F);
+    
+    IF_VERBOSE_PARSE(
+        log_parse(_("  shape_character_def read: nfillbits = %d, nlinebits = %d"), num_fill_bits, num_line_bits);
+    );
+    
+    if ( !num_fill_bits && !num_line_bits )
+    {
+        /// When reading font glyphs it happens to read 1 byte
+        /// past end boundary of a glyph due to fill/line bits being
+        /// zero.
         ///
-        if ( tag_type == SWF::DEFINEFONT || tag_type == SWF::DEFINEFONT2 )
+        /// Generally returning here seems to break morphs:
+        ///  http://savannah.gnu.org/bugs/?21747
+        /// And other normal shapes:
+        ///  http://savannah.gnu.org/bugs/?21923
+        ///  http://savannah.gnu.org/bugs/?22000
+        ///
+        /// So for now we only return if NOT reading a morph shape.
+        /// Pretty ugly... till next bug report.
+        ///
+        ///
+        if (tag_type == SWF::DEFINEFONT || tag_type == SWF::DEFINEFONT2 || tag_type == SWF::DEFINEFONT3)
         {
-            assert(!with_style);
-            //m_fill_styles.push_back(fill_style());
+            log_debug("Skipping glyph read, being fill and line bits zero. SWF tag is %d.", tag_type);
+            return;
         }
-
-        //log_debug("Read %u fill styles, %u line styles", m_fill_styles.size(), m_line_styles.size());
-
-        // Use read_u8 to force alignment.
-        in->ensureBytes(1);
-        boost::uint8_t num_bits = in->read_u8();
-        int num_fill_bits = (num_bits & 0xF0) >> 4;
-        int num_line_bits = (num_bits & 0x0F);
-
-        IF_VERBOSE_PARSE
-            (
-            log_parse(_("  shape_character_def read: nfillbits = %d, nlinebits = %d"), num_fill_bits, num_line_bits);
-            );
-
-        if ( !num_fill_bits && !num_line_bits )
-        {
-            /// When reading font glyphs it happens to read 1 byte
-            /// past end boundary of a glyph due to fill/line bits being
-            /// zero.
-            ///
-            /// Generally returning here seems to break morphs:
-            ///  http://savannah.gnu.org/bugs/?21747
-            /// And other normal shapes:
-            ///  http://savannah.gnu.org/bugs/?21923
-            ///  http://savannah.gnu.org/bugs/?22000
-            ///
-            /// So for now we only return if NOT reading a morph shape.
-            /// Pretty ugly... till next bug report.
-            ///
-            ///
-            if (tag_type == SWF::DEFINEFONT || tag_type == SWF::DEFINEFONT2 || tag_type == SWF::DEFINEFONT3)
-            {
-                // better log something, so we have an hint
-                // if something is broken
-                log_debug("Skipping glyph read, being fill and line bits zero. SWF tag is %d.", tag_type);
-                return;
-            }
-        }
-
-        // These are state variables that keep the
-        // current position & style of the shape
-        // outline, and vary as we read the edge data.
-        //
-        // At the moment we just store each edge with
-        // the full necessary info to render it, which
-        // is simple but not optimally efficient.
-        int fill_base = 0;
-        int line_base = 0;
-        int   x = 0, y = 0;
-        path  current_path;
+    }
+    
+    // These are state variables that keep the
+    // current position & style of the shape
+    // outline, and vary as we read the edge data.
+    //
+    // At the moment we just store each edge with
+    // the full necessary info to render it, which
+    // is simple but not optimally efficient.
+    int fill_base = 0;
+    int line_base = 0;
+    int   x = 0, y = 0;
+    path  current_path;
 
 #define SHAPE_LOG 0
-
-        // SHAPERECORDS
-        for (;;)
+    
+    // SHAPERECORDS
+    for (;;)
+    {
+        in->ensureBits(1);
+        bool isEdgeRecord = in->read_bit();
+        if (!isEdgeRecord)
         {
-            in->ensureBits(1);
-            bool isEdgeRecord = in->read_bit();
-            if (!isEdgeRecord)
-            {
-                // Parse the record.
-                in->ensureBits(5);
-                int flags = in->read_uint(5);
-                if (flags == flagEnd)
+            // Parse the record.
+            in->ensureBits(5);
+            int flags = in->read_uint(5);
+            if (flags == flagEnd)
+            {  
+                // Store the current path if any.
+                if (! current_path.is_empty())
                 {
-                    // End of shape records.
-
-                    // Store the current path if any.
-                    if (! current_path.is_empty())
-                    {
-                        m_paths.push_back(current_path);
-                        current_path.m_edges.resize(0);
-                    }
-
-                    break;
+                    m_paths.push_back(current_path);
+                    current_path.m_edges.resize(0);
                 }
-                if (flags & flagMove)
+                break;
+            }
+            if (flags & flagMove)
+            {  
+                // Store the current path if any, and prepare a fresh one.
+                if (! current_path.is_empty())
                 {
-                    // move_to = 1;
-
-                    // Store the current path if any, and prepare a fresh one.
-                    if (! current_path.is_empty())
-                    {
-                        m_paths.push_back(current_path);
-                        current_path.m_edges.resize(0);
-                    }
-                    in->ensureBits(5);
-                    int num_move_bits = in->read_uint(5);
-                    in->ensureBits(2 * num_move_bits);
-                    int move_x = in->read_sint(num_move_bits);
-                    int move_y = in->read_sint(num_move_bits);
-
-                    x = move_x;
-                    y = move_y;
-
-                    // Set the beginning of the path.
+                    m_paths.push_back(current_path);
+                    current_path.m_edges.resize(0);
+                }
+                in->ensureBits(5);
+                int num_move_bits = in->read_uint(5);
+                in->ensureBits(2 * num_move_bits);
+                int move_x = in->read_sint(num_move_bits);
+                int move_y = in->read_sint(num_move_bits);
+    
+                x = move_x;
+                y = move_y;
+    
+                // Set the beginning of the path.
+                current_path.ap.x = x;
+                current_path.ap.y = y;
+    
+    #if SHAPE_LOG
+                IF_VERBOSE_PARSE(
+                    log_parse(_("  shape_character read: moveto %d %d"), x, y);
+                );
+    #endif
+            }
+            if ((flags & flagFillStyle0Change) && num_fill_bits > 0)
+            {
+                // fill_style_0_change = 1;
+                if (! current_path.is_empty())
+                {
+                    m_paths.push_back(current_path);
+                    current_path.m_edges.resize(0);
                     current_path.ap.x = x;
                     current_path.ap.y = y;
-
-#if SHAPE_LOG
-                    IF_VERBOSE_PARSE
-                        (
-                        log_parse(_("  shape_character read: moveto %d %d"), x, y);
-                        );
-#endif
                 }
-                if ((flags & flagFillStyle0Change) && num_fill_bits > 0)
+                in->ensureBits(num_fill_bits);
+                unsigned style = in->read_uint(num_fill_bits);
+                if (style > 0)
                 {
-                    // fill_style_0_change = 1;
-                    if (! current_path.is_empty())
-                    {
-                        m_paths.push_back(current_path);
-                        current_path.m_edges.resize(0);
-                        current_path.ap.x = x;
-                        current_path.ap.y = y;
-                    }
-                    in->ensureBits(num_fill_bits);
-                    unsigned style = in->read_uint(num_fill_bits);
-                    if (style > 0)
-                    {
-                        style += fill_base;
-                    }
-
-                    if ( tag_type == SWF::DEFINEFONT || tag_type == SWF::DEFINEFONT2 )
-                    {
-                        if ( style > 1 )          // 0:hide 1:renderer
-                        {
-                            IF_VERBOSE_MALFORMED_SWF(
-                                log_swferror(_("Invalid fill style %d in fillStyle0Change record for font tag (0 or 1 valid). Set to 0."), style);
-                                );
-                            style = 0;
-                        }
-                    }
-                    else
-                    {
-                                                  // 1-based index
-                        if ( style > m_fill_styles.size() )
-                        {
-                            IF_VERBOSE_MALFORMED_SWF(
-                                log_swferror(_("Invalid fill style %d in fillStyle0Change record - " SIZET_FMT " defined. Set to 0."), style, m_fill_styles.size());
-                                );
-                            style = 0;
-                        }
-                    }
-
-                    current_path.setLeftFill(style);
-#if SHAPE_LOG
-                    IF_VERBOSE_PARSE(
-                        log_parse(_("  shape_character read: fill0 (left) = %d"), current_path.getLeftFill());
-                        );
-#endif
-
+                    style += fill_base;
                 }
-                if ((flags & flagFillStyle1Change) && num_fill_bits > 0)
+    
+                if ( tag_type == SWF::DEFINEFONT || tag_type == SWF::DEFINEFONT2 )
                 {
-                    // fill_style_1_change = 1;
-                    if (! current_path.is_empty())
-                    {
-                        m_paths.push_back(current_path);
-                        current_path.m_edges.resize(0);
-                        current_path.ap.x = x;
-                        current_path.ap.y = y;
-                    }
-                    in->ensureBits(num_fill_bits);
-                    unsigned style = in->read_uint(num_fill_bits);
-                    if (style > 0)
-                    {
-                        style += fill_base;
-                    }
-
-                    if ( tag_type == SWF::DEFINEFONT || tag_type == SWF::DEFINEFONT2 )
-                    {
-                        if ( style > 1 )          // 0:hide 1:renderer
-                        {
-                            IF_VERBOSE_MALFORMED_SWF(
-                                log_swferror(_("Invalid fill style %d in fillStyle1Change record for font tag (0 or 1 valid). Set to 0."), style);
-                                );
-                            style = 0;
-                        }
-                    }
-                    else
-                    {
-                                                  // 1-based index
-                        if ( style > m_fill_styles.size() )
-                        {
-                            IF_VERBOSE_MALFORMED_SWF(
-                                log_swferror(_("Invalid fill style %d in fillStyle1Change record - " SIZET_FMT " defined. Set to 0."), style, m_fill_styles.size());
-                                );
-                            style = 0;
-                        }
-                    }
-                                                  // getRightFill() = style;
-                    current_path.setRightFill(style);
-#if SHAPE_LOG
-                    IF_VERBOSE_PARSE (
-                        log_parse(_("  shape_character read: fill1 (right) = %d"), current_path.getRightFill());
-                        )
-    #endif
-                }
-                if ((flags & flagLineStyleChange) && num_line_bits > 0)
-                {
-                    // line_style_change = 1;
-                    if (! current_path.is_empty())
-                    {
-                        m_paths.push_back(current_path);
-                        current_path.m_edges.resize(0);
-                        current_path.ap.x = x;
-                        current_path.ap.y = y;
-                    }
-                    in->ensureBits(num_line_bits);
-                    unsigned style = in->read_uint(num_line_bits);
-                    if (style > 0)
-                    {
-                        style += line_base;
-                    }
-                    if ( tag_type == SWF::DEFINEFONT || tag_type == SWF::DEFINEFONT2 )
-                    {
-                        if ( style > 1 )          // 0:hide 1:renderer
-                        {
-                            IF_VERBOSE_MALFORMED_SWF(
-                                log_swferror(_("Invalid line style %d in lineStyleChange record for font tag (0 or 1 valid). Set to 0."), style);
-                                );
-                            style = 0;
-                        }
-                    }
-                    else
-                    {
-                                                  // 1-based index
-                        if ( style > m_line_styles.size() )
-                        {
-                            IF_VERBOSE_MALFORMED_SWF(
-                                log_swferror(_("Invalid fill style %d in lineStyleChange record - " SIZET_FMT " defined. Set to 0."), style, m_line_styles.size());
-                                );
-                            style = 0;
-                        }
-                    }
-                    current_path.setLineStyle(style);
-#if SHAPE_LOG
-                    IF_VERBOSE_PARSE (
-                        log_parse(_("  shape_character_read: line = %d"), current_path.getLineStyle());
-                        )
-    #endif
-                }
-                if (flags & flagHasNewStyles)
-                {
-                    if (!with_style)
+                    if ( style > 1 )          // 0:hide 1:renderer
                     {
                         IF_VERBOSE_MALFORMED_SWF(
-                            log_swferror("Unexpected HasNewStyle flag in tag %d shape record", tag_type);
-                            )
-                        // Used to be tag_type += SWF::DEFINESHAPE2, but
-                        // I can't belive any such thing could be correct...
-                            continue;
-                    }
-
-                    IF_VERBOSE_PARSE (
-                        log_parse(_("  shape_character read: more fill styles"));
+                             log_swferror(_("Invalid fill style %d in fillStyle0Change record for font tag (0 or 1 valid). Set to 0."), style);
                         );
-
-                    // Store the current path if any.
-                    if (! current_path.is_empty())
-                    {
-                        m_paths.push_back(current_path);
-                        current_path.clear();
+                        style = 0;
                     }
-
-                    // Tack on an empty path signalling a new shape.
-                    // @@ need better understanding of whether this is correct??!?!!
-                    // @@ i.e., we should just start a whole new shape here, right?
-                    m_paths.push_back(path());
-                    m_paths.back().m_new_shape = true;
-
-                    fill_base = m_fill_styles.size();
-                    line_base = m_line_styles.size();
-                    read_fill_styles(m_fill_styles, in, tag_type, m);
-                    read_line_styles(m_line_styles, in, tag_type, m);
-
-                    in->ensureBits(8);
-                    num_fill_bits = in->read_uint(4);
-                    num_line_bits = in->read_uint(4);
-                }
-            }
-            else
-            {
-                // EDGERECORD
-                in->ensureBits(1);
-                bool edge_flag = in->read_bit();
-                if (edge_flag == 0)
-                {
-                    in->ensureBits(4);
-                    int num_bits = 2 + in->read_uint(4);
-                    // curved edge
-                    in->ensureBits(4 * num_bits);
-                    int cx = x + in->read_sint(num_bits);
-                    int cy = y + in->read_sint(num_bits);
-                    int ax = cx + in->read_sint(num_bits);
-                    int ay = cy + in->read_sint(num_bits);
-
-#if SHAPE_LOG
-                    IF_VERBOSE_PARSE (
-                        log_parse(_("  shape_character read: curved edge   = %d %d - %d %d - %d %d"), x, y, cx, cy, ax, ay);
-                        );
-#endif
-
-                    current_path.m_edges.push_back(edge(cx, cy, ax, ay));
-
-                    x = ax;
-                    y = ay;
                 }
                 else
                 {
-                    // straight edge
-                    in->ensureBits(5);
-                    int num_bits = 2 + in->read_uint(4);
-                    bool  line_flag = in->read_bit();
-                    int dx = 0, dy = 0;
-                    if (line_flag)
+                    // 1-based index
+                    if ( style > m_fill_styles.size() )
                     {
-                        // General line.
-                        in->ensureBits(2 * num_bits);
+                        IF_VERBOSE_MALFORMED_SWF(
+                             log_swferror(_("Invalid fill style %d in fillStyle0Change record - " SIZET_FMT " defined. Set to 0."), style, m_fill_styles.size());
+                         );
+                        style = 0;
+                    }
+                }
+    
+                current_path.setLeftFill(style);
+    #if SHAPE_LOG
+                IF_VERBOSE_PARSE(
+                     log_parse(_("  shape_character read: fill0 (left) = %d"), current_path.getLeftFill());
+                );
+    #endif
+            }
+            if ((flags & flagFillStyle1Change) && num_fill_bits > 0)
+            {
+                // fill_style_1_change = 1;
+                if (! current_path.is_empty())
+                {
+                    m_paths.push_back(current_path);
+                    current_path.m_edges.resize(0);
+                    current_path.ap.x = x;
+                    current_path.ap.y = y;
+                }
+                in->ensureBits(num_fill_bits);
+                unsigned style = in->read_uint(num_fill_bits);
+                if (style > 0)
+                {
+                    style += fill_base;
+                }
+    
+                if ( tag_type == SWF::DEFINEFONT || tag_type == SWF::DEFINEFONT2 )
+                {
+                    if ( style > 1 )          // 0:hide 1:renderer
+                    {
+                        IF_VERBOSE_MALFORMED_SWF(
+                             log_swferror(_("Invalid fill style %d in fillStyle1Change record for font tag (0 or 1 valid). Set to 0."), style);
+                        );
+                        style = 0;
+                    }
+                }
+                else
+                {
+                    // 1-based index
+                    if ( style > m_fill_styles.size() )
+                    {
+                        IF_VERBOSE_MALFORMED_SWF(
+                            log_swferror(_("Invalid fill style %d in fillStyle1Change record - " SIZET_FMT " defined. Set to 0."), style, m_fill_styles.size());
+                        );
+                        style = 0;
+                    }
+                }
+                current_path.setRightFill(style);
+    #if SHAPE_LOG
+                IF_VERBOSE_PARSE (
+                    log_parse(_("  shape_character read: fill1 (right) = %d"), current_path.getRightFill());
+                );
+    #endif
+            }
+            if ((flags & flagLineStyleChange) && num_line_bits > 0)
+            {
+                // line_style_change = 1;
+                if (! current_path.is_empty())
+                {
+                    m_paths.push_back(current_path);
+                    current_path.m_edges.resize(0);
+                    current_path.ap.x = x;
+                    current_path.ap.y = y;
+                }
+                in->ensureBits(num_line_bits);
+                unsigned style = in->read_uint(num_line_bits);
+                if (style > 0)
+                {
+                    style += line_base;
+                }
+                if ( tag_type == SWF::DEFINEFONT || tag_type == SWF::DEFINEFONT2 )
+                {
+                    if ( style > 1 )          // 0:hide 1:renderer
+                    {
+                        IF_VERBOSE_MALFORMED_SWF(
+                            log_swferror(_("Invalid line style %d in lineStyleChange record for font tag (0 or 1 valid). Set to 0."), style);
+                        );
+                        style = 0;
+                    }
+                }
+                else
+                {
+                    // 1-based index
+                    if ( style > m_line_styles.size() )
+                    {
+                        IF_VERBOSE_MALFORMED_SWF(
+                            log_swferror(_("Invalid fill style %d in lineStyleChange record - " SIZET_FMT " defined. Set to 0."), style, m_line_styles.size());
+                        );
+                        style = 0;
+                    }
+                }
+                current_path.setLineStyle(style);
+    #if SHAPE_LOG
+                IF_VERBOSE_PARSE (
+                    log_parse(_("  shape_character_read: line = %d"), current_path.getLineStyle());
+                )
+    #endif
+            }
+            if (flags & flagHasNewStyles)
+            {
+                if (!with_style)
+                {
+                    IF_VERBOSE_MALFORMED_SWF(
+                         log_swferror("Unexpected HasNewStyle flag in tag %d shape record", tag_type);
+                    );
+                    continue;
+                }
+                IF_VERBOSE_PARSE (
+                    log_parse(_("  shape_character read: more fill styles"));
+                );
+    
+                // Store the current path if any.
+                if (! current_path.is_empty())
+                {
+                    m_paths.push_back(current_path);
+                    current_path.clear();
+                }
+    
+                // Tack on an empty path signalling a new shape.
+                // @@ need better understanding of whether this is correct??!?!!
+                // @@ i.e., we should just start a whole new shape here, right?
+                m_paths.push_back(path());
+                m_paths.back().m_new_shape = true;
+    
+                fill_base = m_fill_styles.size();
+                line_base = m_line_styles.size();
+                read_fill_styles(m_fill_styles, in, tag_type, m);
+                read_line_styles(m_line_styles, in, tag_type, m);
+    
+                in->ensureBits(8);
+                num_fill_bits = in->read_uint(4);
+                num_line_bits = in->read_uint(4);
+            }
+        }
+        else
+        {
+            // EDGERECORD
+            in->ensureBits(1);
+            bool edge_flag = in->read_bit();
+            if (edge_flag == 0)
+            {
+                in->ensureBits(4);
+                int num_bits = 2 + in->read_uint(4);
+                // curved edge
+                in->ensureBits(4 * num_bits);
+                int cx = x + in->read_sint(num_bits);
+                int cy = y + in->read_sint(num_bits);
+                int ax = cx + in->read_sint(num_bits);
+                int ay = cy + in->read_sint(num_bits);
+    
+    #if SHAPE_LOG
+                IF_VERBOSE_PARSE (
+                    log_parse(_("  shape_character read: curved edge   = %d %d - %d %d - %d %d"), x, y, cx, cy, ax, ay);
+                );
+    #endif
+                current_path.m_edges.push_back(edge(cx, cy, ax, ay));
+                x = ax;
+                y = ay;
+            }
+            else
+            {
+                // straight edge
+                in->ensureBits(5);
+                int num_bits = 2 + in->read_uint(4);
+                bool  line_flag = in->read_bit();
+                int dx = 0, dy = 0;
+                if (line_flag)
+                {
+                    // General line.
+                    in->ensureBits(2 * num_bits);
+                    dx = in->read_sint(num_bits);
+                    dy = in->read_sint(num_bits);
+                }
+                else
+                {
+                    in->ensureBits(1);
+                    bool vert_flag = in->read_bit();
+                    if (vert_flag == 0)
+                    {
+                        // Horizontal line.
+                        in->ensureBits(num_bits);
                         dx = in->read_sint(num_bits);
-                        dy = in->read_sint(num_bits);
                     }
                     else
                     {
-                        in->ensureBits(1);
-                        bool vert_flag = in->read_bit();
-                        if (vert_flag == 0)
-                        {
-                            // Horizontal line.
-                            in->ensureBits(num_bits);
-                            dx = in->read_sint(num_bits);
-                        }
-                        else
-                        {
-                            // Vertical line.
-                            in->ensureBits(num_bits);
-                            dy = in->read_sint(num_bits);
-                        }
+                        // Vertical line.
+                        in->ensureBits(num_bits);
+                        dy = in->read_sint(num_bits);
                     }
-
-#if SHAPE_LOG
-                    IF_VERBOSE_PARSE (
-                        log_parse(_("  shape_character_read: straight edge = %d %d - %d %d"), x, y, x + dx, y + dy);
-                        );
-#endif
-
-                    current_path.m_edges.push_back(edge(x + dx, y + dy, x + dx, y + dy));
-
-                    x += dx;
-                    y += dy;
                 }
+    
+    #if SHAPE_LOG
+                IF_VERBOSE_PARSE (
+                     log_parse(_("  shape_character_read: straight edge = %d %d - %d %d"), x, y, x + dx, y + dy);
+                );
+    #endif
+                current_path.m_edges.push_back(edge(x + dx, y + dy, x + dx, y + dy));
+                x += dx;
+                y += dy;
             }
         }
-
-        if ( ! with_style )
-        {
-            // TODO: performance would be improved by computing
-            //       the bounds as edges are parsed.
-            compute_bound(&m_bound, m->get_version());
-        }
-#ifdef GNASH_DEBUG_SHAPE_BOUNDS
-        else
-        {
-            rect computedBounds;
-            compute_bound(&computedBounds, m->get_version());
-            if ( computedBounds != m_bounds )
-            {
-                log_debug("Shape character read for tag %d contained embedded bounds %s, while we computed bounds %s",
-                    tag_type, m_bound.toString().c_str(), computedBounds.toString().c_str());
-            }
-        }
-#endif                                    // GNASH_DEBUG_SHAPE_BOUNDS
     }
+    
+    if ( ! with_style )
+    {
+        // TODO: performance would be improved by computing
+        //       the bounds as edges are parsed.
+        compute_bound(&m_bound, m->get_version());
+    }
+    #ifdef GNASH_DEBUG_SHAPE_BOUNDS
+    else
+    {
+        rect computedBounds;
+        compute_bound(&computedBounds, m->get_version());
+        if ( computedBounds != m_bounds )
+        {
+            log_debug("Shape character read for tag %d contained embedded bounds %s, while we computed bounds %s",
+                      tag_type, m_bound.toString().c_str(), computedBounds.toString().c_str());
+        }
+    }
+    #endif                                    // GNASH_DEBUG_SHAPE_BOUNDS
+}
 
     void  shape_character_def::display(character* inst)
     // Draw the shape using our own inherent styles.
     {
-        //GNASH_REPORT_FUNCTION;
-
         gnash::render::draw_shape_character(this, inst);
-
-        /*
-            matrix  mat = inst->get_world_matrix();
-            cxform  cx = inst->get_world_cxform();
-
-            float pixel_scale = inst->get_parent()->get_pixel_scale();
-            display(mat, cx, pixel_scale, m_fill_styles, m_line_styles);
-            */
     }
 
 #ifdef DEBUG_DISPLAY_SHAPE_PATHS
@@ -596,10 +546,6 @@ namespace gnash
         float mag2 = p->x * p->x + p->y * p->y;
         if (mag2 < 1e-9f)
         {
-            // Very short vector.
-            // @@ log error
-
-            // Arbitrary unit vector.
             p->x = 1;
             p->y = 0;
         }
@@ -655,7 +601,6 @@ namespace gnash
     {
         for (unsigned int i = 0; i < paths.size(); i++)
         {
-            //      if (i > 0) break;//xxxxxxxx
             const path& p = paths[i];
 
             if (p.getLeftFill() == 0 && p.getRightFill() == 0)
@@ -739,7 +684,7 @@ namespace gnash
             glPopMatrix();
         }
     }
-#endif                                        // DEBUG_DISPLAY_SHAPE_PATHS
+#endif  // DEBUG_DISPLAY_SHAPE_PATHS
 
     void  shape_character_def::display(
         const matrix& mat,
@@ -852,15 +797,6 @@ namespace gnash
 
     bool  shape_character_def::point_test_local(float x, float y, matrix& wm)
     {
-
-        //#define DEBUG_POINT_TEST
-        //#define DEBUG_POINT_TEST_EXT
-
-#ifdef DEBUG_POINT_TEST
-        printf("=== point_test_local ===\n");
-        char debug[1024];
-#endif
-
         /*
         Principle:
         For the fill of the shape, we project a ray from the test point to the left
@@ -877,31 +813,12 @@ namespace gnash
         - wrong fill side (eg. left side set for a clockwise drawen rectangle)
         - intersecting paths
         */
-
-        // Align test coordinates to TWIP coordinate system and shift by a half
-        // TWIP to avoid line junction situations which are hard to handle. Oversample
-        // everything by 100 to get some degree of accuracy (ie. this won't produce
-        // any visible inaccuracy before the shape is scaled more an 2000x). The
-        // resulting coordinate is *very* close to the original one and still in the
-        // same coordinate system.
-        
-        // These used to use round(x), now use std::floor(x + 0.5f), which
-        // means that negative half-values are rounded in a different
-        // direction. The testsuite notices no differences.
-        x = (std::floor(x * 2000.0f + 0.5f) + 0.5f) / 2000.0f;
-        y = (std::floor(y * 2000.0f + 0.5f) + 0.5f) / 2000.0f;
-
         point pt(x, y);
 
-        bool even_odd = true;                     // later we will need non-zero for glyphs... (TODO)
+        bool even_odd = true;  // later we will need non-zero for glyphs... (TODO)
 
         if (m_bound.point_test(x, y) == false)
         {
-            // TODO: not sure it is safe to early-out
-            //       if line strokes are non-scalable !
-#ifdef DEBUG_POINT_TEST
-            log_debug("Point doesn't hit bounds, early out");
-#endif
             return false;
         }
 
@@ -911,70 +828,51 @@ namespace gnash
         // browse all paths
         for (unsigned pno=0; pno<npaths; pno++)
         {
-
             const path& pth = m_paths[pno];
             unsigned nedges = pth.m_edges.size();
 
-            float next_pen_x = pth.ap.x;
-            float next_pen_y = pth.ap.y;
-            float pen_x, pen_y;
+            float  next_pen_x = pth.ap.x;
+            float  next_pen_y = pth.ap.y;
+            float  pen_x, pen_y;
 
             if (pth.m_new_shape)
             {
-                if ( (even_odd && (counter % 2) != 0) ||
-                    (!even_odd && (counter != 0)) )
+                if ( ( even_odd && (counter % 2) != 0) ||
+                     (!even_odd && (counter != 0)) )
                 {
                     // the point is inside the previous subshape, so exit now
-
-#ifdef DEBUG_POINT_TEST
-                    printf("  subshape early out. counter=%d\n", counter);
-#endif
-
                     return true;
                 }
 
                 counter=0;
             }
-
-#ifdef DEBUG_POINT_TEST_EXT
-            printf(" new path, anchor = %.2f / %.2f\n", pth.ap.x, pth.ap.y);
-#endif
-
             if (pth.empty())
                 continue;
 
             // If the path has a line style, check for strokes there
             if (pth.m_line != 0 )
             {
-
                 assert(m_line_styles.size() >= pth.m_line);
-
                 line_style& ls = m_line_styles[pth.m_line-1];
-
-                float thickness = ls.getThickness();
-
+                double thickness = ls.getThickness();
                 if (! thickness )
                 {
-			thickness = 1; 
+                    thickness = 20; // at least ONE PIXEL thick.
                 }
-		else if ( (!ls.scaleThicknessVertically()) && (!ls.scaleThicknessHorizontally()) )
-		{
-			// TODO: pass the matrix to withinSquareDistance instead ?
-			float xScale = wm.get_x_scale();
-			float yScale = wm.get_y_scale();
-			//log_debug("xScale: %g, yScale: %g", xScale, yScale);
+                else if ( (!ls.scaleThicknessVertically()) && (!ls.scaleThicknessHorizontally()) )
+                {
+                    // TODO: pass the matrix to withinSquareDistance instead ?
+                    double xScale = wm.get_x_scale();
+                    double yScale = wm.get_y_scale();
+                    thickness /= std::max(xScale, yScale);
+                }
+                else if ( ls.scaleThicknessVertically() != ls.scaleThicknessHorizontally() )
+                {
+                    LOG_ONCE( log_unimpl("Collision detection for unidirectionally scaled strokes") );
+                }
 
-			thickness /= std::max(xScale, yScale);
-		}
-		else if ( ls.scaleThicknessVertically() != ls.scaleThicknessHorizontally() )
-		{
-			LOG_ONCE( log_unimpl("Collision detection for unidirectionally scaled strokes") );
-		}
-
-		float dist = thickness/2.0;
-		float sqdist = dist*dist;
-
-                //log_debug("Thickness of line is %g squared is %g", thickness, sqdist);
+                double  dist = thickness / 2.0;
+                double  sqdist = dist * dist; 
                 if (pth.withinSquareDistance(pt, sqdist))
                     return true;
             }
@@ -982,48 +880,23 @@ namespace gnash
             // browse all edges of the path
             for (unsigned eno=0; eno<nedges; eno++)
             {
-
                 const edge& edg = pth.m_edges[eno];
-
                 pen_x = next_pen_x;
                 pen_y = next_pen_y;
-
                 next_pen_x = edg.ap.x;
                 next_pen_y = edg.ap.y;
 
-#ifdef DEBUG_POINT_TEST_EXT
-                printf("  to %.2f / %.2f |", edg.ap.x, edg.ap.y);
-#endif
-
-                /* 
-                printf("EDGE #%d #%d [ %d %d ] : %.2f / %.2f -> %.2f / %.2f\n", pno, eno,
-                  pth.m_fill0, pth.m_fill1,
-                  pen_x, pen_y,
-                  edg.ap.x, edg.ap.y);
-                */
-
                 float cross1, cross2;
-                int dir1, dir2=0;                 // +1 = downward, -1 = upward
-                int crosscount=0;
+                int dir1, dir2 = 0; // +1 = downward, -1 = upward
+                int crosscount = 0;
 
                 if (edg.is_straight())
                 {
-
-                    // ==> straight line case
-
-#ifdef DEBUG_POINT_TEST
-                    sprintf(debug, "straight");
-#endif
-
                     // ignore horizontal lines
-                    if (edg.ap.y == pen_y)        // TODO: better check for small difference?
+                    if (edg.ap.y == pen_y)  // TODO: better check for small difference?
                     {
-#ifdef DEBUG_POINT_TEST_EXT
-                        printf("  #%02d, #%02d [%s] horizontal line\n", pno, eno, debug);
-#endif
                         continue;
                     }
-
                     // does this line cross the Y coordinate?
                     if ( ((pen_y <= y) && (edg.ap.y >= y))
                         || ((pen_y >= y) && (edg.ap.y <= y)) )
@@ -1034,38 +907,26 @@ namespace gnash
                             (y - pen_y) / (edg.ap.y - pen_y);
 
                         if (pen_y > edg.ap.y)
-                            dir1 = -1;            // upward
+                            dir1 = -1;  // upward
                         else
-                            dir1 = +1;            // downward
+                            dir1 = +1;  // downward
 
-                        crosscount=1;
-
+                        crosscount = 1;
                     }
                     else
                     {
-
                         // no crossing found
                         crosscount = 0;
-
                     }
-
                 }
                 else
                 {
-
                     // ==> curve case
-
-#ifdef DEBUG_POINT_TEST
-                    sprintf(debug, "curve   ");
-#endif
-
                     crosscount = curve_x_crossings(pen_x, pen_y, edg.ap.x, edg.ap.y,
                         edg.cp.x, edg.cp.y, y, cross1, cross2);
-
                     dir1 = pen_y > y ? -1 : +1;
-                    dir2 = dir1 * (-1);           // second crossing always in opposite dir.
-
-                }                                 // curve
+                    dir2 = dir1 * (-1); // second crossing always in opposite dir.
+                } // curve
 
                 // ==> we have now:
                 //  - one (cross1) or two (cross1, cross2) ray crossings (X coordinate)
@@ -1074,11 +935,8 @@ namespace gnash
                 //  - crosscount tells the number of crossings
 
                 // need at least one crossing
-                if (crosscount==0)
+                if (crosscount == 0)
                 {
-#ifdef DEBUG_POINT_TEST_EXT
-                    printf("  #%02d, #%02d [%s] no crossing\n", pno, eno, debug);
-#endif
                     continue;
                 }
 
@@ -1091,42 +949,22 @@ namespace gnash
                     if (pth.m_fill1 > 0) counter -= dir1;
 
                     touched = true;
-
-#ifdef DEBUG_POINT_TEST
-                    printf("  #%02d, #%02d [%s] crossing at x=%.2f y=%.2f dir=%d fills=[%d,%d] -> C=%d\n",
-                        pno, eno, debug, cross1, y, dir1, pth.m_fill0, pth.m_fill1, counter);
-#endif
                 }
 
                 // check optional second crossing (only possible with curves)
-                if ((crosscount>1) && (cross2 <= x))
+                if ( (crosscount > 1) && (cross2 <= x) )
                 {
                     if (pth.m_fill0 > 0) counter += dir2;
                     if (pth.m_fill1 > 0) counter -= dir2;
 
                     touched = true;
-
-#ifdef DEBUG_POINT_TEST
-                    printf("  #%02d, #%02d [%s] crossing at x=%.2f y=%.2f dir=%d fills=[%d,%d] -> C=%d\n",
-                        pno, eno, debug, cross2, y, dir2, pth.m_fill0, pth.m_fill1, counter);
-#endif
                 }
 
-#ifdef DEBUG_POINT_TEST_EXT
-                if (!touched)
-                    printf("  #%02d, #%02d [%s] no crossing at left side\n", pno, eno, debug);
-#endif
-
-            }                                     // for edge
-
-        }                                         // for path
-
-#ifdef DEBUG_POINT_TEST
-        printf("  all paths processed. counter=%d\n", counter);
-#endif
+            }// for edge
+        } // for path
 
         return ( (even_odd && (counter % 2) != 0) ||
-            (!even_odd && (counter != 0)) );
+                 (!even_odd && (counter != 0)) );
     }
 
     float shape_character_def::get_height_local() const
@@ -1139,8 +977,7 @@ namespace gnash
         return m_bound.width();
     }
 
-    // Find the bounds of this shape, and store them in
-    // the given rectangle.
+    // Find the bounds of this shape, and store them in the given rectangle.
     void  shape_character_def::compute_bound(rect* r, int swfVersion) const
     {
         r->set_null();
@@ -1171,8 +1008,7 @@ namespace gnash
     }
 
 #ifdef GNASH_USE_GC
-    void
-        shape_character_def::markReachableResources() const
+    void  shape_character_def::markReachableResources() const
     {
         assert(isReachable());
         for (FillStyleVect::const_iterator i=m_fill_styles.begin(), e=m_fill_styles.end();
@@ -1183,14 +1019,12 @@ namespace gnash
     }
 #endif                                        // GNASH_USE_GC
 
-    size_t
-        shape_character_def::numPaths() const
+    size_t  shape_character_def::numPaths() const
     {
         return m_paths.size();
     }
 
-    size_t
-        shape_character_def::numEdges() const
+    size_t  shape_character_def::numEdges() const
     {
         typedef std::vector<path> PathList;
 
@@ -1202,7 +1036,7 @@ namespace gnash
         return count;
     }
 
-}                                                 // end namespace gnash
+} // end namespace gnash
 
 // Local Variables:
 // mode: C++

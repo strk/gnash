@@ -25,39 +25,47 @@
 #include <sstream>
 #include <cassert>
 
-using namespace std;
 using namespace gnash;
 using namespace gnash::geometry;
 
 int
 main(int /*argc*/, char** /*argv*/)
 {
-	Point2d<float> p(0, 0);
-	Point2d<float> p1(10, 0);
+    point p1(0, 0);
+    point p2(10, 0);
 
-	check_equals( p.distance(p1), 10 );
+    check_equals( p1.distance(p2), 10 );
 
-	Point2d<float> p2(p, p1, 0.5);
-	check_equals(p2.x, 5);
-	check_equals(p2.y, 0);
+    point p(p1, p2, 0.5);
+    check_equals(p.x, 5);
+    check_equals(p.y, 0);
 
-	p2.setTo(p, p1, 0.2);
-	check_equals(p2.x, 2);
-	check_equals(p2.y, 0);
+    p.setTo(p1, p2, 0.2);
+    check_equals(p.x, 2);
+    check_equals(p.y, 0);
 
-	p2.setTo(p, p1, 0.7);
-	check_equals(p2.x, 7);
-	check_equals(p2.y, 0);
+    p.setTo(999999, 1000000);
+    check_equals(p.x, 999999);
+    check_equals(p.y, 1000000);
 
-	p.setTo(0, 10);
-	p2.setTo(p, p1, 0.5);
-	check_equals(p2.x, 5);
-	check_equals(p2.y, 5);
+    boost::int64_t square_dist = 0;
+    
+    square_dist = Point2d::squareDistance(p1, p2);
+    check_equals(square_dist, 10 * 10);
 
-	p1.setTo(0, 20);
-	p2.setTo(p, p1, 0.7);
-	check_equals(p2.x, 0);
-	check_equals(p2.y, 17); 
+    p1.setTo(65537, 0);
+    p2.setTo(0, 65536);
+    square_dist = Point2d::squareDistance(p1, p2);
+    check_equals(square_dist, 65537.0 * 65537.0 + 65536.0 * 65536.0);
 
+    p1.setTo(0x8000000, 0);
+    p2.setTo(0, 0);
+    square_dist = p1.squareDistance(p2);
+    check_equals(square_dist, 1.0 * 0x8000000 * 0x8000000);
+
+    boost::int32_t  dist = 0;
+    dist = p1.distance(p2);
+    check_equals(dist, 0x8000000);
 }
+
 

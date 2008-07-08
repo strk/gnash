@@ -63,7 +63,7 @@ matrix::read(SWFStream& in)
     }
 
     in.ensureBits(1);
-    bool    has_rotate = in.read_bit();
+    bool  has_rotate = in.read_bit();
     if (has_rotate)
     {
         in.ensureBits(5);
@@ -245,10 +245,10 @@ matrix::transform(rect& r) const
     boost::int32_t x2 = r.get_x_max();
     boost::int32_t y2 = r.get_y_max();
 
-    geometry::Point2d<boost::int32_t> p0(x1, y1);
-    geometry::Point2d<boost::int32_t> p1(x2, y1);
-    geometry::Point2d<boost::int32_t> p2(x2, y2);
-    geometry::Point2d<boost::int32_t> p3(x1, y2);
+    point p0(x1, y1);
+    point p1(x2, y1);
+    point p2(x2, y2);
+    point p3(x1, y2);
 
     transform(p0);
     transform(p1);
@@ -294,17 +294,13 @@ matrix::invert()
 double
 matrix::get_x_scale() const
 {
-	// why do I need a cast here? The result should be already in double type based on the 
-	// prototype of sqrt().
-    return static_cast<double>(sqrt(((double)sx * sx + (double)shx * shx)) / 65536.0);
+    return sqrt(((double)sx * sx + (double)shx * shx)) / 65536.0;
 }
 
 double
 matrix::get_y_scale() const
 {
-	// why do I need a cast here? The result should be already in double type based on the 
-	// prototype of sqrt().
-    return static_cast<double>(sqrt(((double)sy * sy + (double)shy * shy)) / 65536.0);
+    return sqrt(((double)sy * sy + (double)shy * shy)) / 65536.0;
 }
 
 double
