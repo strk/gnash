@@ -301,8 +301,13 @@ protected:
 	///	- onStatus event handler (m_statusHandler)
 	///
 	virtual void markReachableResources() const;
-
 #endif // GNASH_USE_GC
+
+	/// Unplug the advance timer callback
+	void stopAdvanceTimer();
+
+	/// Register the advance timer callback
+	void startAdvanceTimer();
 
 public:
 
@@ -454,6 +459,12 @@ private:
 
 	/// Return a newly allocated information object for the given status
 	boost::intrusive_ptr<as_object> getStatusObject(StatusCode code);
+
+	/// hack for using a Timer to drive ::advance calls
+	static as_value advanceWrapper(const fn_call& fn);
+
+	/// Identifier of the advance timer
+	unsigned int _advanceTimer;
 
 };
 

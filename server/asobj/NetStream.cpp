@@ -34,16 +34,18 @@
 #endif
 #include "fn_call.h"
 #include "builtin_function.h"
+#include "timers.h" // for registering the advance timer
 #include "GnashException.h"
 #include "NetConnection.h"
 #include "render.h"	// for gnash::render::videoFrameFormat()
 #include "Object.h" // for getObjectInterface
 #include "VM.h"
-#include <boost/algorithm/string/case_conv.hpp> // for PROPNAME
 #include "namedStrings.h"
 #include "movie_root.h"
 
 #include "VirtualClock.h" // for PlayHead
+
+#include <boost/algorithm/string/case_conv.hpp> // for PROPNAME
 
 // Define the following macro to have status notification handling debugged
 //#define GNASH_DEBUG_STATUS
@@ -78,7 +80,8 @@ NetStream::NetStream()
 	m_parser(NULL),
 	m_isFLV(false),
 	inputPos(0),
-	_lastStatus(invalidStatus)
+	_lastStatus(invalidStatus),
+	_advanceTimer(0)
 {
 }
 
@@ -753,5 +756,35 @@ PlayHead::seekTo(boost::uint64_t position)
 	_positionConsumers = 0;
 }
 
+/*private static*/
+as_value
+NetStream::advanceWrapper(const fn_call& fn)
+{
+        boost::intrusive_ptr<NetStream> ptr = ensureType<NetStream>(fn.this_ptr);
+        ptr->advance();
+        return as_value();
+}
+
+void
+NetStream::stopAdvanceTimer()
+{
+	if ( _advanceTimer )
+	{
+		VM& vm = getVM();
+		vm.getRoot().clear_interval_timer(_advanceTimer);
+		_advanceTimer = 0;
+	}
+}
+
+void
+NetStream::startAdvanceTimer()
+{
+	boost::intrusive_ptr<builtin_function> advanceCallback = \
+		new builtin_function(&NetStreamFfmpeg::advanceWrapper);
+	std::auto_ptr<Timer> timer(new Timer);
+	unsigned long delayMS = 50; // TODO: base on media file FPS !!!
+	timer->setInterval(*advanceCallback, delayMS, this);
+	_advanceTimer = getVM().getRoot().add_interval_timer(timer, true);
+}
 
 } // end of gnash namespace

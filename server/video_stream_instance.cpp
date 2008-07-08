@@ -234,7 +234,7 @@ void
 video_stream_instance::advance()
 {
 	if (_ns) {
-		_ns->advance();
+		//_ns->advance();
 		if (_ns->newFrameReady()) set_invalidated();
 	}
 }

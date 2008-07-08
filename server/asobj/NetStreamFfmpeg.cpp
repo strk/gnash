@@ -129,6 +129,8 @@ void NetStreamFfmpeg::close()
 
 	m_imageframe.reset();
 
+	stopAdvanceTimer();
+
 }
 
 void
@@ -265,6 +267,9 @@ NetStreamFfmpeg::startPlayback()
 
 	decodingStatus(DEC_BUFFERING);
 	_playbackClock->pause(); // NOTE: should be paused already
+
+	// Register ::advance callback
+	startAdvanceTimer();
 
 #ifdef GNASH_DEBUG_STATUS
 	log_debug("Setting playStart status");
