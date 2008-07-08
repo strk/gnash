@@ -95,18 +95,24 @@ swf_function::getArguments(swf_function& callee, const fn_call& fn)
 struct TargetGuard {
 	as_environment& env;
 	character* from;
-	TargetGuard(as_environment& e, character* ch)
+	character* from_orig;
+	// @param ch : target to set temporarely
+	// @param och : original target to set temporarely
+	TargetGuard(as_environment& e, character* ch, character* och)
 		:
 		env(e)
 	{
 		from = env.get_target();
+		from_orig = env.get_original_target();
 		//log_debug("TargetGuard set target of env %p from %s to %s", &e, from ? from->getTarget() : "<null>", ch ? ch->getTarget() : "<null>");
 		env.set_target(ch);
+		env.set_original_target(och);
 	}
 	~TargetGuard()
 	{
 		//log_debug("TargetGuard reset target of env %p to %s", &env, from ? from->getTarget() : "<null>");
 		env.set_target(from);
+		env.set_original_target(from_orig);
 	}
 };
 
@@ -128,6 +134,7 @@ swf_function::operator()(const fn_call& fn)
 	}
 
 	character* target = our_env->get_target();
+	character* orig_target = our_env->get_original_target();
 
 #if 0
 	log_debug("swf_function() stack:\n"); fn.env().dump_stack();
@@ -151,7 +158,11 @@ swf_function::operator()(const fn_call& fn)
 		if ( fn.this_ptr )
 		{
 			character* ch = fn.this_ptr->to_character();
-			if ( ch ) target = ch;
+			if ( ch )
+			{
+				target = ch;
+				orig_target = ch;
+			}
 		}
 	}
 
@@ -163,7 +174,7 @@ swf_function::operator()(const fn_call& fn)
 	/// TODO: test scope when calling functions defined in another timeline
 	///       (target, in particular).
 	///
-	TargetGuard targetGuard(*our_env, target);
+	TargetGuard targetGuard(*our_env, target, orig_target);
 
 	if (m_is_function2 == false)
 	{

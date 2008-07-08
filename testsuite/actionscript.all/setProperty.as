@@ -125,7 +125,7 @@ check_equals(mc3thisPtr, mc3);
 #if OUTPUT_VERSION == 5
     // gnash fails because it sets the *current* target
     // rather then the *original* target on function call
-    xcheck_equals(_root.checkpoint, "/mc3");
+    check_equals(_root.checkpoint, "/mc3");
 #else
     check_equals(_root.checkpoint, "/");
 #endif
