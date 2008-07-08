@@ -192,6 +192,8 @@ NetStreamGst::close()
   boost::mutex::scoped_lock lock(image_mutex);
 
   m_imageframe.reset();
+
+  stopAdvanceTimer();
 }
 
 void 
