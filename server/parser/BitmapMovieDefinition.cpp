@@ -36,18 +36,15 @@ BitmapMovieDefinition::getShapeDef()
 	_bitmap = new bitmap_character_def(_image);
 
 	// Create the shape definition
-
 	_shapedef = new DynamicShape();
 
 	// Set its boundaries
-
 	_shapedef->set_bound(_framesize);
 
 	// Add the bitmap fill style (fill style 0)
 
 	matrix mat;
-	//mat.concatenate_scale(1.0/20.0);
-	mat.set_scale(1.0/20.0, 1.0/20.0); // bitmap fills get matrix reversed
+	mat.set_scale(1.0/20, 1.0/20); // bitmap fills get matrix reversed
 	fill_style bmFill(_bitmap.get(), mat);
 	const size_t fillLeft = _shapedef->add_fill_style(bmFill);
 
@@ -56,8 +53,8 @@ BitmapMovieDefinition::getShapeDef()
 	// We use one twip for each pixel in the image
 	// The character will be scaled * 20
 	// when placed in BitmapMovieInstance's DisplayList
-	const float w = _framesize.width(); // /20;
-	const float h = _framesize.height(); // /20;
+	boost::int32_t w = _framesize.width(); 
+	boost::int32_t h = _framesize.height(); 
 
 	IF_VERBOSE_PARSE(
 	    log_parse(_("Creating a shape_definition wrapping a %g x %g bitmap"), w, h);

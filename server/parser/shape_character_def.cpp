@@ -795,7 +795,7 @@ shape_character_def::read(SWFStream* in, int tag_type, bool with_style,
         return count;
     }
 
-    bool  shape_character_def::point_test_local(float x, float y, matrix& wm)
+    bool  shape_character_def::point_test_local(boost::int32_t x, boost::int32_t y, matrix& wm)
     {
         /*
         Principle:
@@ -872,7 +872,7 @@ shape_character_def::read(SWFStream* in, int tag_type, bool with_style,
                 }
 
                 double  dist = thickness / 2.0;
-                double  sqdist = dist * dist; 
+                boost::int64_t  sqdist = static_cast<boost::int64_t>(dist * dist); 
                 if (pth.withinSquareDistance(pt, sqdist))
                     return true;
             }

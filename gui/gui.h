@@ -458,10 +458,10 @@ private:
     float           _yscale;
 
     /// Window pixel X offset of stage origin
-    float           _xoffset;
+    boost::int32_t   _xoffset;
 
     /// Window pixel Y offset of stage origin
-    float           _yoffset;
+    boost::int32_t   _yoffset;
 
     bool display(movie_root* m);
     

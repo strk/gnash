@@ -951,13 +951,12 @@ movie_root::set_drag_state(const drag_state& st)
 		chmat.transform(&world_origin, origin);
 
 		// Get current mouse coordinates
-		int x, y, buttons;
+		boost::int32_t x, y, buttons;
 		get_mouse_state(x, y, buttons);
 		point world_mouse(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
 
-		// Compute offset
-		float xoffset = int(world_mouse.x - world_origin.x);
-		float yoffset = int(world_mouse.y - world_origin.y);
+		boost::int32_t xoffset = world_mouse.x - world_origin.x;
+		boost::int32_t yoffset = world_mouse.y - world_origin.y;
 
 		m_drag_state.setOffset(xoffset, yoffset);
 	}
@@ -1348,9 +1347,9 @@ movie_root::getDraggingCharacter() const
 const character*
 movie_root::getEntityUnderPointer() const
 {
-	float x = PIXELS_TO_TWIPS(m_mouse_x);
-	float y = PIXELS_TO_TWIPS(m_mouse_y);
-        const character* dropChar = findDropTarget(x, y, getDraggingCharacter()); 
+	boost::int32_t x = PIXELS_TO_TWIPS(m_mouse_x);
+	boost::int32_t y = PIXELS_TO_TWIPS(m_mouse_y);
+    const character* dropChar = findDropTarget(x, y, getDraggingCharacter()); 
 	return dropChar;
 }
 
@@ -1361,14 +1360,11 @@ movie_root::isMouseOverActiveEntity() const
 	assert(testInvariant());
 
 	boost::intrusive_ptr<character> entity ( m_mouse_button_state.m_active_entity );
-	if ( ! entity.get() ) return false;
-
-#if 0 // debugging...
-	log_debug("The active entity under the pointer is a %s",
-		typeid(*entity).name());
-#endif
-
-	return true;
+	if ( ! entity.get() ) {
+        return false;
+    }else {
+        return true;
+    }
 }
 
 /// Get actionscript width of stage, in pixels. The width

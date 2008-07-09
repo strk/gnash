@@ -11,8 +11,10 @@
 
 #include "character_def.h" // for inheritance of shape_character_def
 #include "smart_ptr.h" // GNASH_USE_GC
-#include "shape.h" // for path
-#include "rect.h" // for composition
+#include "shape.h"     // for path
+#include "rect.h"      // for composition
+#include "fill_style.h" // for fill style
+#include "styles.h"     // for line style
 
 #include <vector> // for composition
 
@@ -47,7 +49,7 @@ namespace gnash {
 		/// Incoming coords are local coords (twips).
 		/// The matrix will be used for lines with non-scalable strokes.
 		///
-		virtual bool point_test_local(float x, float y, matrix& wm);
+		virtual bool point_test_local(boost::int32_t x, boost::int32_t y, matrix& wm);
 
 		float	get_height_local() const;
 		float	get_width_local() const;

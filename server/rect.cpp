@@ -172,8 +172,8 @@ void
 rect::clamp(point& p) const
 {
     assert( !is_null() );
-    p.x = utility::clamp<float>(p.x, _xMin, _xMax);
-    p.y = utility::clamp<float>(p.y, _yMin, _yMax);
+    p.x = utility::clamp<boost::int32_t>(p.x, _xMin, _xMax);
+    p.y = utility::clamp<boost::int32_t>(p.y, _yMin, _yMax);
 }
 
 std::string

@@ -20,25 +20,18 @@
 #define GNASH_SHAPE_H
 
 #include "dsodefs.h"
-#include "styles.h"
-#include "rect.h"
-#include "Point2d.h"
-#include "log.h"
+#include "matrix.h" 
 
 #include <vector> // for path composition
-#include <boost/bind.hpp>  
-#include <algorithm>
 #include <cmath> // sqrt
 
 
 // Forward declarations
 namespace gnash {
-  class rect; // for path::expandBounds
+  class rect; 
 }
 
 namespace gnash { 
-
-  using namespace geometry;
 
   /// \brief
   /// Defines an edge with a control point and an anchor point.
@@ -48,9 +41,10 @@ namespace gnash {
   class Edge
   {
   public:
+  	
     // Quadratic bezier: point = p0 * t^2 + p1 * 2t(1-t) + p2 * (1-t)^2
-    Point2d cp; // control point, TWIPS
-    Point2d ap; // anchor  point, TWIPS
+    point cp; // control point, TWIPS
+    point ap; // anchor  point, TWIPS
 
     Edge() 
         :
@@ -67,7 +61,7 @@ namespace gnash {
       cp(from.cp), ap(from.ap)
     {  }
 
-    Edge(const Point2d& ncp, const Point2d& nap)
+    Edge(const point& ncp, const point& nap)
       :
       cp(ncp), ap(nap)
     {  }
@@ -89,7 +83,7 @@ namespace gnash {
 
     /// Return squared distance between point pt and segment A-B
     static boost::int64_t
-    squareDistancePtSeg(const Point2d& p, const Point2d& A, const Point2d& B)
+    squareDistancePtSeg(const point& p, const point& A, const point& B)
     {
         boost::int32_t dx = B.x - A.x;
         boost::int32_t dy = B.y - A.y;
@@ -114,13 +108,13 @@ namespace gnash {
             return p.squareDistance(B);
         }
 
-        Point2d px(A, B, u);
+        point px(A, B, u);
         return p.squareDistance(px);
     }
 
     /// Return distance between point pt and segment A-B
     static boost::int32_t
-    distancePtSeg(const Point2d& pt, const Point2d& A, const Point2d& B)
+    distancePtSeg(const point& pt, const point& A, const point& B)
     {
         boost::int64_t  square = squareDistancePtSeg(pt, A, B);
         return (boost::int32_t)( std::sqrt(square) );
@@ -135,14 +129,14 @@ namespace gnash {
     /// @param t the step factor between 0 and 1
     ///
 
-    static Point2d
-    pointOnCurve(const Point2d& A, 
-        const Point2d& C, 
-        const Point2d& B, float t)
+    static point
+    pointOnCurve(const point& A, 
+        const point& C, 
+        const point& B, float t)
     {
-        Point2d Q1(A, C, t);
-        Point2d Q2(C, B, t);
-        Point2d R(Q1, Q2, t);
+        point Q1(A, C, t);
+        point Q2(C, B, t);
+        point R(Q1, Q2, t);
 
         return R;
     }
@@ -156,16 +150,15 @@ namespace gnash {
     /// @param p The point we want to compute distance from 
     /// @param t the step factor between 0 and 1
     ///
-    static boost::int64_t squareDistancePtCurve(const Point2d& A,
-               const Point2d& C,
-               const Point2d& B,
-               const Point2d& p, float t)
+    static boost::int64_t squareDistancePtCurve(const point& A,
+               const point& C,
+               const point& B,
+               const point& p, float t)
     {
       return p.squareDistance( pointOnCurve(A, C, B, t) );
     }
   };
 
-  typedef Edge  edge;
 
   ///\brief
   /// A subset of a shape, a series of edges sharing a single set of styles. 
@@ -182,10 +175,10 @@ namespace gnash {
     unsigned m_line;
 
     /// Start point of the path
-    Point2d ap; 
+    point ap; 
 
     /// Edges forming the path
-    std::vector< Edge > m_edges;
+    std::vector<Edge> m_edges;
 
     /// This flag is set when the path is the first one of a new "sub-shape".
     /// All paths with a higher index in the list belong to the same 
@@ -419,17 +412,17 @@ namespace gnash {
     /// NOTE: if the path is empty, false is returned.
     ///
     bool
-    withinSquareDistance(const Point2d& p, boost::int64_t dist) const
+    withinSquareDistance(const point& p, boost::int64_t dist) const
     {
       size_t nedges = m_edges.size();
 
       if ( ! nedges ) return false;
 
-      Point2d px(ap);
+      point px(ap);
       for (size_t i=0; i<nedges; ++i)
       {
         const Edge& e = m_edges[i];
-        Point2d np(e.ap);
+        point np(e.ap);
 
         if ( e.isStraight() )
         {
@@ -440,9 +433,9 @@ namespace gnash {
         else
         {
 
-          const Point2d& A = px;
-          const Point2d& C = e.cp;
-          const Point2d& B = e.ap;
+          const point& A = px;
+          const point& C = e.cp;
+          const point& B = e.ap;
 
           // Approximate the curve to segCount segments
           // and compute distance of query point from each
@@ -452,11 +445,11 @@ namespace gnash {
           //       on rendering scale ?
           //
           int segCount = 10; 
-          Point2d p0(A.x, A.y);
+          point p0(A.x, A.y);
           for (int i=1; i<=segCount; ++i)
           {
             float t1 = (float)(i) / segCount;
-            Point2d p1 = Edge::pointOnCurve(A, C, B, t1);
+            point p1 = Edge::pointOnCurve(A, C, B, t1);
 
             // distance from point and segment being an approximation 
             // of the curve 
@@ -473,23 +466,24 @@ namespace gnash {
     }
 
     /// Transform all path coordinates according to the given matrix.
-    void
-    transform(const matrix& mat)
+    void  transform(const matrix& mat)
     {
-      using namespace boost;
-
-      mat.transform(ap);
-      std::for_each(m_edges.begin(), m_edges.end(), bind(&Edge::transform, _1, ref(mat)));                
+		mat.transform(ap);
+		std::vector<Edge>::iterator it = m_edges.begin(), ie = m_edges.end();
+		for(; it != ie; it++)
+		{
+			(*it).transform(mat);
+		}
     }    
 
     /// Set this path as the start of a new (sub)shape
-    void setNewShape() 
+    void  setNewShape() 
     { 
         m_new_shape=true; 
     }
 
     /// Return true if this path starts a new (sub)shape
-    bool getNewShape() const 
+    bool  getNewShape() const 
     { 
         return m_new_shape; 
     }
@@ -582,7 +576,9 @@ namespace gnash {
     }
  
   }; // end of class Path
-  
+
+
+  typedef Edge  edge;
   typedef Path  path;
 
 }  // end namespace gnash

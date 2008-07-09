@@ -24,11 +24,7 @@
 #define GNASH_POINT2DH
 
 #include <ostream>
-#include <limits>
-#include <algorithm>
-#include <cassert> // for inlines
-#include <iostream> // temporary include for debugging
-#include <cmath> // for floor / ceil
+#include <cmath>    // for sqrt()
 #include <boost/cstdint.hpp>
 
 namespace gnash {

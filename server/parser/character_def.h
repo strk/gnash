@@ -70,7 +70,7 @@ public:
 	///	Current world matrix of the instance we want to check.
 	///	This is needed to properly scale non-scalable strokes.
 	///
-	virtual bool point_test_local(float /*x*/, float /*y*/, matrix& /*wm*/)
+	virtual bool point_test_local(boost::int32_t /*x*/, boost::int32_t /*y*/, matrix& /*wm*/)
 	{
 		return false;
 	}

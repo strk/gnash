@@ -56,8 +56,7 @@ namespace gnash {
 		if (_font == NULL)
 		{
 			IF_VERBOSE_MALFORMED_SWF(
-			log_error(_("text style references unknown font (id = %d)"),
-				id);
+                log_error(_("text style references unknown font (id = %d)"), id);
 			);
 			return false;
 		}

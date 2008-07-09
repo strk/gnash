@@ -931,7 +931,7 @@ edit_text_character::set_member(string_table::key name,
 		m.ty = PIXELS_TO_TWIPS(y);
 		set_matrix(m);
 
-		// m_accept_anim_moves = false;
+		// m_accept_anim_moves = false; 
 		return true;
 	}
 	case NSV::PROP_uWIDTH:
@@ -1259,8 +1259,8 @@ edit_text_character::format_text()
 	rec.m_style.setYOffset( PADDING_TWIPS + fontHeight + (fontLeading - fontDescent) );
 	rec.m_style.m_text_height = fontHeight;
 
-	float	x = rec.m_style.getXOffset();
-	float	y = rec.m_style.getYOffset();
+	boost::int32_t	x = static_cast<boost::int32_t>(rec.m_style.getXOffset());
+	boost::int32_t	y = static_cast<boost::int32_t>(rec.m_style.getYOffset());
 
 	// Start the bbox at the upper-left corner of the first glyph.
 	reset_bounding_box(x, y - fontDescent + fontHeight); 

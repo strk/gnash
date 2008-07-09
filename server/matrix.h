@@ -26,13 +26,12 @@
 
 #include "dsodefs.h" // for DSOEXPORT
 #include "Range2d.h" // for transforming Range2d<float>
-#include "rect.h"
-#include "Point2d.h" // for transforming Point2d<float> (typedefe'd to point)
+#include "rect.h"    // for rect 
+#include "Point2d.h" // for Point2d
 #include "utility.h" // for TRUST_FLOAT_TO_UINT32_CONVERSION
 
+#include <iostream> 
 #include <boost/cstdint.hpp>
-#include <iosfwd>
-#include <iomanip>
 
 // Forward declarations
 namespace gnash {

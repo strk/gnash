@@ -54,6 +54,7 @@
 #include <cstdio> // for snprintf
 #include <string>
 #include <memory> // for auto_ptr
+#include <boost/cstdint.hpp>
 
 // Define the following to make outline decomposition verbose
 //#define DEBUG_OUTLINE_DECOMPOSITION 1
@@ -137,29 +138,35 @@ private:
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
 		log_debug("moveTo: %ld,%ld", to->x, to->y);
 #endif
-		_sh.moveTo(to->x*_scale, -to->y*_scale);
+        boost::int32_t  x = static_cast<boost::int32_t>(to->x * _scale);
+        boost::int32_t  y = static_cast<boost::int32_t>(to->y * _scale);
+		_sh.moveTo(x, -y);
 		return 0;
 	}
 
-	int
-	lineTo(const FT_Vector* to)
+	int lineTo(const FT_Vector* to)
 	{
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
 		log_debug("lineTo: %ld,%ld", to->x, to->y);
 #endif
 		static const int swfVersion = 6; // we have no thickness, so 6 is fine
-		_sh.lineTo(to->x*_scale, -to->y*_scale, swfVersion);
+        boost::int32_t  x = static_cast<boost::int32_t>(to->x * _scale);
+        boost::int32_t  y = static_cast<boost::int32_t>(to->y * _scale);
+		_sh.lineTo(x, -y, swfVersion);
 		return 0;
 	}
 
-	int
-	conicTo(const FT_Vector* ctrl, const FT_Vector* to)
+	int conicTo(const FT_Vector* ctrl, const FT_Vector* to)
 	{
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
 		log_debug("conicTo: %ld,%ld %ld,%ld", ctrl->x, ctrl->y, to->x, to->y);
 #endif
-		static const int swfVersion = 6; // we have no thickness, so 6 is fine
-		_sh.curveTo(ctrl->x*_scale, -ctrl->y*_scale, to->x*_scale, -to->y*_scale, swfVersion);
+        boost::int32_t  x1 = static_cast<boost::int32_t>(ctrl->x * _scale);
+        boost::int32_t  y1 = static_cast<boost::int32_t>(ctrl->y * _scale);
+        boost::int32_t  x2 = static_cast<boost::int32_t>(to->x * _scale);
+        boost::int32_t  y2 = static_cast<boost::int32_t>(to->y * _scale);
+        static const int swfVersion = 6; // we have no thickness, so 6 is fine
+		_sh.curveTo(x1, -y1, x2, -y2, swfVersion);
 		return 0;
 	}
 
@@ -172,9 +179,13 @@ private:
 
 		float x = ctrl1->x + ( (ctrl2->x - ctrl1->x) * 0.5 );
 		float y = ctrl1->y + ( (ctrl2->y - ctrl1->y) * 0.5 );
-
+        boost::int32_t x1 = static_cast<boost::int32_t>(x * _scale);
+        boost::int32_t y1 = static_cast<boost::int32_t>(y * _scale);
+        boost::int32_t x2 = static_cast<boost::int32_t>(to->x * _scale);
+        boost::int32_t y2 = static_cast<boost::int32_t>(to->y * _scale);
+        
 		static const int swfVersion = 6; // we have no thickness, so 6 is fine
-		_sh.curveTo(x*_scale, -y*_scale, to->x*_scale, -to->y*_scale, swfVersion);
+		_sh.curveTo(x1, -y1, x2, -y2, swfVersion);
 		return 0;
 	}
 
@@ -216,7 +227,7 @@ FreetypeGlyphsProvider::draw_bitmap(const FT_Bitmap& bitmap)
 {
 	// You must use power-of-two dimensions!!
 	int	w = 1; while (w < bitmap.pitch) { w <<= 1; }
-	int	h = 1; while (h < bitmap.rows) { h <<= 1; }
+	int	h = 1; while (h < bitmap.rows)  { h <<= 1; }
 
 	std::auto_ptr<image::alpha> alpha ( image::create_alpha(w, h) );
 

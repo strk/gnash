@@ -668,21 +668,21 @@ public:
   /// Render this character
   virtual void  display() {}
 
-      /// Returns local, untransformed height of this character in TWIPS
+  /// Returns local, untransformed height of this character in TWIPS
   //
   /// Use getBounds() if you need more then simply the height.
   ///
-  float get_height() const
+  boost::int32_t get_height() const
   {
     rect bounds = getBounds();
     return bounds.height();
   }
 
-      /// Returns local, untransformed width of this character in TWIPS
+  /// Returns local, untransformed width of this character in TWIPS
   //
   /// Use getBounds() if you need more then simply the width.
   ///
-  float get_width() const
+  boost::int32_t get_width() const
   {
     rect bounds = getBounds();
     return bounds.width();

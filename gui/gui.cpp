@@ -487,10 +487,10 @@ Gui::notify_mouse_moved(int ux, int uy)
 	if ( _stopped ) return;
 
 	// A stage pseudopixel is user pixel / _xscale wide
-	float x = (ux-_xoffset) / _xscale;
+	boost::int32_t x = (ux-_xoffset) / _xscale;
 
 	// A stage pseudopixel is user pixel / _xscale high
-	float y = (uy-_yoffset) / _yscale;
+	boost::int32_t y = (uy-_yoffset) / _yscale;
 
 #ifdef DEBUG_MOUSE_COORDINATES
 	log_debug(_("mouse @ %d,%d"), x, y);

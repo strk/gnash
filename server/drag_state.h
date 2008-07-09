@@ -49,8 +49,8 @@ class drag_state
 	/// at time of drag start. These are used for non
 	/// lock-centered dragging.
 	/// Coordinates are in stage space (TWIPS)
-	float _xoffset;
-	float _yoffset;
+	boost::int32_t  _xoffset;
+	boost::int32_t  _yoffset;
 
 public:
 
@@ -66,18 +66,16 @@ public:
 	/// at time of drag start.
 	/// Coordinates are in stage space (twips)
 	///
-	void setOffset(float x, float y)
+	void setOffset(boost::int32_t x, boost::int32_t y)
 	{
 		_xoffset = x;
 		_yoffset = y;
 	}
 
-	float xOffset() const { return _xoffset; }
-	float yOffset() const { return _yoffset; }
+	boost::int32_t xOffset() const { return _xoffset; }
+	boost::int32_t yOffset() const { return _yoffset; }
 
-	bool hasBounds() const {
-		return _hasbounds;
-	}
+	bool hasBounds() const {return _hasbounds; }
 
 	/// \brief
 	/// Get the boundaries to constraint
@@ -90,9 +88,7 @@ public:
 	/// the returned rectangle is the NULL
 	/// rectangle - see rect::is_null().
 	///
-	const rect& getBounds() const {
-		return _bounds;
-	}
+	const rect& getBounds() const { return _bounds; }
 
 	/// \brief
 	/// Set the boundaries to constraint

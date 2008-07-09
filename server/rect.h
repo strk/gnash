@@ -20,7 +20,6 @@
 #define GNASH_RECT_H
 
 #include "dsodefs.h"
-
 #include "Range2d.h"
 #include "Point2d.h"
 
@@ -116,6 +115,7 @@ public:
             && _xMax == (RECT_MAX_INT32 >> 9)
             && _yMax == (RECT_MAX_INT32 >> 9);
     }
+	
     /// set the rectangle to the WORLD value
     void set_world()
     {
@@ -293,6 +293,7 @@ public:
     std::string toString() const;
 
 private:
+	
     // make ourself to enclose the given point.
     void expand_to(boost::int32_t x, boost::int32_t y)
     {
@@ -312,6 +313,7 @@ private:
         return std::max(std::max(x1, x2), std::max(x3, x4));
     }
 };
+
 
 inline std::ostream&
 operator<< (std::ostream& os, const rect& r)

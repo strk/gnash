@@ -25,13 +25,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include <cmath>
 #include "matrix.h"
 #include "stream.h" // for reading from SWF
-#include "types.h"  // for TWIPS_TO_PIXELS
-#include "utility.h"
 
-using namespace std;
+#include <cmath>
+#include <iomanip>
 
 namespace gnash {
 
@@ -57,7 +55,7 @@ matrix::read(SWFStream& in)
         in.ensureBits(5);
         int scale_nbits = in.read_uint(5);
 
-        in.ensureBits(scale_nbits*2);
+        in.ensureBits(scale_nbits * 2);
         sx = in.read_sint(scale_nbits);
         sy = in.read_sint(scale_nbits);
     }
@@ -69,7 +67,7 @@ matrix::read(SWFStream& in)
         in.ensureBits(5);
         int rotate_nbits = in.read_uint(5);
 
-        in.ensureBits(rotate_nbits*2);
+        in.ensureBits(rotate_nbits * 2);
         shx = in.read_sint(rotate_nbits);
         shy = in.read_sint(rotate_nbits);
     }
@@ -78,7 +76,7 @@ matrix::read(SWFStream& in)
     int translate_nbits = in.read_uint(5);
     if (translate_nbits > 0)
     {
-        in.ensureBits(translate_nbits*2);
+        in.ensureBits(translate_nbits * 2);
         tx = in.read_sint(translate_nbits);
         ty = in.read_sint(translate_nbits);
     }

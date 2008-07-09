@@ -179,7 +179,7 @@ DynamicShape::resetLineStyle()
 }
 
 void
-DynamicShape::moveTo(float x, float y)
+DynamicShape::moveTo(boost::int32_t x, boost::int32_t y)
 {
 	if ( x != _x || y != _y )
 	{
@@ -192,7 +192,7 @@ DynamicShape::moveTo(float x, float y)
 }
 
 void
-DynamicShape::lineTo(float x, float y, int swfVersion)
+DynamicShape::lineTo(boost::int32_t x, boost::int32_t y, int swfVersion)
 {
 	if ( ! _currpath ) startNewPath(true); // first shape is always new (I hope this doesn't break anything)
 	assert(_currpath);
@@ -216,7 +216,8 @@ DynamicShape::lineTo(float x, float y, int swfVersion)
 }
 
 void
-DynamicShape::curveTo(float cx, float cy, float ax, float ay, int swfVersion)
+DynamicShape::curveTo(boost::int32_t cx, boost::int32_t cy, 
+                      boost::int32_t ax, boost::int32_t ay, int swfVersion)
 {
 	if ( ! _currpath ) startNewPath(true); // first shape is always new (I hope this doesn't break anything)
 	assert(_currpath);

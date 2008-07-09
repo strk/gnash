@@ -40,15 +40,16 @@ public:
 	void clear();
 
 	/// Move pen to given coordinates
-	void moveTo(float x, float y);
+	void moveTo(boost::int32_t x, boost::int32_t y);
 
 	/// Draw a straight line from current position to given one
-	void lineTo(float x, float y, int swfVersion);
+	void lineTo(boost::int32_t x, boost::int32_t y, int swfVersion);
 
 	/// \brief
 	/// Draw a curve from current position to given one
 	/// using given control points.
-	void curveTo(float cx, float cy, float ax, float ay, int swfVersion);
+	void curveTo(boost::int32_t cx, boost::int32_t cy, 
+                 boost::int32_t ax, boost::int32_t ay, int swfVersion);
 
 	/// Start drawing with a solid fill
 	void beginFill(const rgba& color);
@@ -133,7 +134,7 @@ public:
 	//       would result in a triangle and a stroke, which should fail the last hitTest(2,8).
 	//
 	//
-	bool point_test_local(float x, float y, matrix& wm)
+	bool point_test_local(boost::int32_t x, boost::int32_t y, matrix& wm)
 	{
 		finalize();
 		return shape_character_def::point_test_local(x, y, wm);
@@ -177,15 +178,13 @@ private:
 	size_t _currline;
 
 	// Current pen X position
-	float _x;
+	boost::int32_t  _x;
 
 	// Current pen Y position
-	float _y;
+	boost::int32_t  _y;
 
 	// Call this function when the drawing changes !
-	void changed() {
-		_changed = true;
-	}
+	void changed() { _changed = true; }
 
 	bool _changed;
 };
