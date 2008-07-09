@@ -16,7 +16,7 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
 AC_PREREQ(2.50)
-AC_INIT(gnash, cvs)
+AC_INIT(gnash, trunk)
 AC_CONFIG_SRCDIR(server/gnash.h)
 AM_CONFIG_HEADER(gnashconfig.h)
 
@@ -168,7 +168,7 @@ dnl Get build date for helping us debugging
 BUILDDATE="`date +%Y%m%d`"
 
 dnl These are required by automake
-dnl AM_INIT_AUTOMAKE(gnash, "cvs$BUILDDATE")
+dnl AM_INIT_AUTOMAKE(gnash, "trunk$BUILDDATE")
 AM_INIT_AUTOMAKE
 AM_MAINTAINER_MODE
 AC_PROG_MAKE_SET
