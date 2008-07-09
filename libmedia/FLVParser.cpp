@@ -143,7 +143,7 @@ FLVParser::indexNextTag()
 
 	if ( _stream->seek(thisTagPos+4) )
 	{
-		//log_debug("FLVParser::indexNextTag failed seeking to %d: %s", thisTagPos+4);
+		log_debug("FLVParser::indexNextTag failed seeking to %d: %s", thisTagPos+4);
 		_indexingCompleted=true;
 		//_parsingComplete=true; // better let ::parseNextTag set this
 		return false;
@@ -157,9 +157,14 @@ FLVParser::indexNextTag()
 		if ( actuallyRead )
 			log_error("FLVParser::indexNextTag: can't read tag info (needed 12 bytes, only got %d)", actuallyRead);
 		// else { assert(_stream->eof(); } ?
-		log_debug("%d bytes read from input stream, when %d were requested", actuallyRead, 12);
+		//log_debug("%d bytes read from input stream, when %d were requested", actuallyRead, 12);
 		_indexingCompleted=true;
 		//_parsingComplete=true; // better let ::parseNextTag set this
+
+		// update bytes loaded
+		boost::mutex::scoped_lock lock(_bytesLoadedMutex);
+		_bytesLoaded = _stream->tell();
+
 		return false;
 	}
 

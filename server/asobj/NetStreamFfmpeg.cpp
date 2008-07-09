@@ -817,7 +817,7 @@ NetStreamFfmpeg::refreshVideoFrame(bool alsoIfPaused)
 	// nothing to do if we don't have a video decoder
 	if ( ! _videoDecoder.get() )
 	{
-		log_debug("refreshVideoFrame: no video decoder, nothing to do");
+		//log_debug("refreshVideoFrame: no video decoder, nothing to do");
 		return;
 	}
 
