@@ -217,17 +217,17 @@ dnl version numbering fail gracefully.
 
 dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfound=no])
   
-    if test "$ffmpeg_num_version" -lt 51110; then
+    if test -z "$ffmpeg_num_version" -o "$ffmpeg_num_version" -lt 51110; then
       AC_MSG_WARN([Wrong ffmpeg/libavcodec version! 51.11.0 or greater required])
     else
       ffmpeg_version=ok
     fi
 
-    if test "$ffmpeg_num_version" -gt 51280; then
+    if test ! -z "$ffmpeg_num_version" -a "$ffmpeg_num_version" -gt 51280; then
       AC_DEFINE(FFMPEG_AUDIO2, 1, [Define if avcodec_decode_audio2 can be used.])
     fi
 
-    if test "$ffmpeg_num_version" -lt 51270; then
+    if test -z "$ffmpeg_num_version" -o "$ffmpeg_num_version" -lt 51270; then
       AC_MSG_WARN([This version of ffmpeg/libavcodec is not able to play VP6 encoded video!])
     else
       AC_DEFINE(FFMPEG_VP6, 1, [Define if ffmpeg can play VP6.])
