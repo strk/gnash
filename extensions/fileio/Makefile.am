@@ -17,6 +17,8 @@
 
 AUTOMAKE_OPTIONS = dejagnu
 
+EXTRA_DIST = test.as
+
 # this is where Gnash plugins get installed
 pluginsdir = $(libdir)/gnash/plugins
 
@@ -70,8 +72,6 @@ install-pluginsLTLIBRARIES: $(plugins_LTLIBRARIES)
 test: $(srcdir)/../../testsuite/generic-testrunner.sh test.swf
 	GNASH_PLUGINS=$(PWD)/.libs GNASHRC=$(srcdir)/../gnashrc sh $< $(top_builddir) test.swf > $@
 	chmod +x $@
-
-test.swf: test.as
 
 # Wrap a single .as tests in dejagnu_so importer.
 # At play time, if the relative url '../ming-misc.all/Dejagnu.swf' 
