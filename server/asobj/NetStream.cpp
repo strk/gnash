@@ -80,6 +80,7 @@ NetStream::NetStream()
 	m_parser(NULL),
 	m_isFLV(false),
 	inputPos(0),
+	_invalidatedVideoCharacter(0),
 	_lastStatus(invalidStatus),
 	_advanceTimer(0)
 {
@@ -649,6 +650,8 @@ NetStream::markReachableResources() const
 	if ( m_statusHandler ) m_statusHandler->setReachable();
 
 	if ( _audioController ) _audioController->setReachable();
+
+	if ( _invalidatedVideoCharacter ) _invalidatedVideoCharacter->setReachable();
 
 	// Invoke generic as_object marker
 	markAsObjectReachable();

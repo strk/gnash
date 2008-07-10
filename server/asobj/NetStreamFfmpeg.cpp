@@ -892,7 +892,14 @@ NetStreamFfmpeg::refreshVideoFrame(bool alsoIfPaused)
 		m_imageframe = video; // ownership transferred
 		assert(!video.get());
 		// A frame is ready for pickup
-		m_newFrameReady = true;
+		if ( _invalidatedVideoCharacter )
+		{
+			_invalidatedVideoCharacter->set_invalidated();
+
+			// NOTE: setting the newFrameReady flag this is not needed anymore,
+			// we don't realy on newFrameReady() call anyore to invalidate the video character
+			//m_newFrameReady = true;
+		}
 	}
 
 	// We consumed video of current position, feel free to advance if needed

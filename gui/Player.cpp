@@ -427,7 +427,8 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
     _gui->setMovieDefinition(_movieDef.get());
 
     if (! _delay) {
-      _delay = static_cast<unsigned int>(1000 / movie_fps) ; // milliseconds per frame
+      //_delay = static_cast<unsigned int>(1000 / movie_fps) ; // milliseconds per frame
+      _delay = 10; // 10ms per heart beat
     }
     _gui->setInterval(_delay);
 

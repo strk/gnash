@@ -298,6 +298,7 @@ protected:
 	//
 	/// Reachable resources are:
 	///	- associated NetConnection object (_netCon)
+	///	- character to invalidate on video updates (_invalidatedVideoCharacter)
 	///	- onStatus event handler (m_statusHandler)
 	///
 	virtual void markReachableResources() const;
@@ -308,6 +309,9 @@ protected:
 
 	/// Register the advance timer callback
 	void startAdvanceTimer();
+
+	/// The character to invalidate on video updates
+	character* _invalidatedVideoCharacter;
 
 public:
 
@@ -418,7 +422,11 @@ public:
 	///
 	std::auto_ptr<image::image_base> get_video();
 	
-
+	/// Register the character to invalidate on video updates
+	void setInvalidatedVideo(character* ch)
+	{
+		_invalidatedVideoCharacter = ch;
+	}
 
 private:
 
