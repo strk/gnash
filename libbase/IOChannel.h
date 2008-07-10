@@ -106,6 +106,22 @@ public:
 	///
 	virtual int read(void* dst, int num)=0;
 
+	/// Read at most the given number of bytes w/out blocking
+	//
+	/// Throw IOException on error
+	///
+	/// @return The number of bytes actually read.
+	///         A short count may mean EOF was hit or 
+	///         data didn't arrive yet.
+	///
+	/// Default implementation proxies the call to the
+	/// blocking version.
+	///
+	virtual int readNonBlocking(void* dst, int num)
+	{
+		return read(dst, num);
+	}
+
 	/// Write the given number of bytes to the stream
 	//
 	/// Throw IOException on error/unsupported op.
