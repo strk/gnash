@@ -850,6 +850,15 @@ CurlStreamFile::CurlStreamFile(const std::string& url, const std::string& vars)
 		throw gnash::GnashException(curl_easy_strerror(ccode));
 	}
 
+	// This is to support binary strings as postdata
+	// NOTE: in version 7.11.1 CURLOPT_POSTFIELDSIZE_LARGE was added
+	//       this one takes a long, that one takes a curl_off_t
+	//
+	ccode = curl_easy_setopt(_handle, CURLOPT_POSTFIELDSIZE, _postdata.size());
+	if ( ccode != CURLE_OK ) {
+		throw gnash::GnashException(curl_easy_strerror(ccode));
+	}
+
 	CURLMcode mcode = curl_multi_add_handle(_mhandle, _handle);
 	if ( mcode != CURLM_OK ) {
 		throw gnash::GnashException(curl_multi_strerror(mcode));
