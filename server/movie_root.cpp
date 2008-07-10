@@ -120,7 +120,9 @@ movie_root::movie_root()
 	_displayState(normal),
 	_recursionLimit(256),
 	_timeoutLimit(15),
-	_gui(0)
+	_gui(0),
+	_movieAdvancementDelay(83), // ~12 fps by default
+	_lastMovieAdvancement(0)
 {
 }
 
@@ -181,6 +183,11 @@ movie_root::setRootMovie(movie_instance* movie)
 	m_viewport_x0 = 0;
 	m_viewport_y0 = 0;
 	movie_definition* md = movie->get_movie_definition();
+	float fps = md->get_frame_rate();
+	_movieAdvancementDelay = static_cast<int>(1000/fps);
+
+	_lastMovieAdvancement = VM::get().getTime();
+
 	m_viewport_width = static_cast<int>(md->get_width_pixels());
 	m_viewport_height = static_cast<int>(md->get_height_pixels());
 
@@ -1050,9 +1057,32 @@ movie_root::clear_interval_timer(unsigned int x)
 	return true;
 
 }
-	
+
 void
 movie_root::advance()
+{
+	VM& vm = VM::get(); // TODO: cache it !
+	unsigned int now = vm.getTime();
+
+	if ( (now - _lastMovieAdvancement) >= _movieAdvancementDelay )
+	{
+		advanceMovie();
+		// setting to 'now' discards time spent on actual rendering and
+		// action processing.
+		// if rendering and action processing takes too much time
+		// we'll always be late here, so FPS will effectively be
+		// slower. Might add a check here allowing a tolerance
+		// and printing a warnign when we're later then tolerated...
+		//
+		_lastMovieAdvancement = now; // or vm.getTime(); ?
+	}
+
+	// TODO: execute timers ?
+	executeTimers();
+}
+	
+void
+movie_root::advanceMovie()
 {
 	// GNASH_REPORT_FUNCTION;
 

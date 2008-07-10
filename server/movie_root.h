@@ -369,6 +369,10 @@ public:
         return m_background_color.m_a / 255.0f;
     }
 
+    /// Main and only callback from hosting application.
+    /// Expected to be called at 10ms resolution.
+    void advance();
+
     /// Entry point for movie advancement
     //
     /// This function does:
@@ -380,7 +384,7 @@ public:
     ///     - Remove unloaded characters from the advanceable characters list.
     ///     - Run the GC collector
     ///
-    void advance();
+    void advanceMovie();
 
     /// 0-based!! delegates to originating root movie
     //
@@ -1070,6 +1074,12 @@ private:
     Gui* _gui;
 
     void handleActionLimitHit(const std::string& ref);
+
+    // delay between movie advancement, in milliseconds
+    unsigned int _movieAdvancementDelay;
+
+    // time of last movie advancement, in milliseconds
+    unsigned int _lastMovieAdvancement;
 };
 
 

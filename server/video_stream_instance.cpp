@@ -235,7 +235,7 @@ video_stream_instance::advance()
 {
 	if (_ns) {
 		//_ns->advance();
-		if (_ns->newFrameReady()) set_invalidated();
+		if (_ns->newFrameReady()) set_invalidated(); // NOTE: only needed for gstreamer !!
 	}
 }
 
@@ -263,6 +263,7 @@ void
 video_stream_instance::setStream(boost::intrusive_ptr<NetStream> ns)
 {
 	_ns = ns;
+	_ns->setInvalidatedVideo(this);
 }
 
 // extern (used by Global.cpp)
