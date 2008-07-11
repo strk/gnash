@@ -116,14 +116,25 @@ public:
 	///
 	media::VideoInfo* getVideoInfo() { return _videoInfo.get(); }
 
-	/// Get the given encoded Video 
+	/// Get a slice of encoded video frames
 	//
-	/// @param frameNum
-	///	0-based frame number of the Video frame.
+	/// @param from
+	///	Frame number of first frame to get
+	/// 
+	/// @param to
+	///	Frame number of last frame to get
 	///
-	/// @return pointer (possibly NULL) to an EncodedVideoFrame. Ownership retained by callee.
+	/// @param ret
+	///	The vector to push defined elements onto. Ownership of elements
+	///	is left to callee.
 	///
-	media::EncodedVideoFrame* getEncodedFrame(boost::uint32_t frameNum);
+	/// NOTE: video definition can have gaps, so you may get NO frames
+	///       if you ask for frames from 1 to 2 when available frames
+	///	  are 0,3,6
+	///
+	void getEncodedFrameSlice(boost::uint32_t from, boost::uint32_t to,
+		std::vector<media::EncodedVideoFrame*>& ret);
+
 
 private:
 

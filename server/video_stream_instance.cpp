@@ -32,6 +32,9 @@
 #include "MediaHandler.h" // for setting up embedded video decoder 
 #include "VideoDecoder.h" // for setting up embedded video decoder
 
+// Define this to get debug logging during embedded video decoding
+//#define DEBUG_EMBEDDED_VIDEO_DECODING
+
 namespace gnash {
 
 static as_object* getVideoInterface(as_object& where);
@@ -246,28 +249,63 @@ video_stream_instance::getVideoFrame()
 	{
 		int current_frame = get_ratio(); 
 
-		// if we jumped backward, we'll restart decoding from scratch
+#ifdef DEBUG_EMBEDDED_VIDEO_DECODING
+		log_debug("Video instance %s need display video frame (ratio) %d",
+			getTarget(), current_frame);
+#endif
+
+		// If current frame is the same then last decoded
+		// we don't need to decode more
 		if ( _lastDecodedVideoFrameNum == current_frame )
 		{
+#ifdef DEBUG_EMBEDDED_VIDEO_DECODING
+			log_debug("  current frame == _lastDecodedVideoFrameNum (%d)", current_frame);
+#endif
 			return _lastDecodedVideoFrame.get();
 		}
-		else if ( _lastDecodedVideoFrameNum > current_frame )
+
+		int from_frame = _lastDecodedVideoFrameNum < 0 ? 0 : _lastDecodedVideoFrameNum+1;
+
+		// If current frame is smaller then last decoded frame
+		// we restart decoding from scratch
+		if ( current_frame < _lastDecodedVideoFrameNum )
 		{
-			_lastDecodedVideoFrameNum = -1;
+#ifdef DEBUG_EMBEDDED_VIDEO_DECODING
+			log_debug("  current frame (%d) < _lastDecodedVideoFrameNum (%d)", current_frame, _lastDecodedVideoFrameNum);
+#endif
+			from_frame = 0;
 		}
 
-		log_debug("Decoding embedded frames from %d to %d for video instance %s",
-			_lastDecodedVideoFrameNum+1, current_frame, getTarget());
+		// Reset last decoded video frame number now, so it's correct 
+		// on early return (ie: nothing more to decode)
+		_lastDecodedVideoFrameNum = current_frame;
 
-		// Push all the frames after the previously decoded frame, until the
-		// target frame has been reached.
-		while (_lastDecodedVideoFrameNum+1 <= boost::int32_t(current_frame))
+#ifdef DEBUG_EMBEDDED_VIDEO_DECODING
+		log_debug("  decoding embedded frames from %d to %d for video instance %s",
+			from_frame, current_frame, getTarget());
+#endif
+
+		typedef std::vector<media::EncodedVideoFrame*> EncodedFrames;
+
+		EncodedFrames toDecode;
+		m_def->getEncodedFrameSlice(from_frame, current_frame, toDecode);
+
+		// Nothing more to decode, return last decoded (possibly null)
+		if ( toDecode.empty() )
 		{
-			log_debug("  getting frame %d", _lastDecodedVideoFrameNum+1);
-			media::EncodedVideoFrame* frame = m_def->getEncodedFrame(_lastDecodedVideoFrameNum+1);
-			if ( ! frame ) break;
+#ifdef DEBUG_EMBEDDED_VIDEO_DECODING
+			log_debug("    no defined frames, we'll return last one");
+#endif
+			return _lastDecodedVideoFrame.get();
+		}
+
+		for (EncodedFrames::iterator it=toDecode.begin(), itEnd=toDecode.end(); it!=itEnd; ++it)
+		{
+			media::EncodedVideoFrame* frame = *it;
+#ifdef DEBUG_EMBEDDED_VIDEO_DECODING
+			log_debug("    pushing frame %d to decoder", frame->frameNum());
+#endif
 			_decoder->push(*frame);
-			_lastDecodedVideoFrameNum = frame->frameNum();
 		}
 
 		_lastDecodedVideoFrame = _decoder->pop();

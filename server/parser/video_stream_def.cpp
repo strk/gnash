@@ -87,7 +87,7 @@ video_stream_definition::readDefineVideoStream(SWFStream* in, SWF::tag_type tag,
 }
 
 void
-video_stream_definition::readDefineVideoFrame(SWFStream* in, SWF::tag_type tag, movie_definition* m)
+video_stream_definition::readDefineVideoFrame(SWFStream* in, SWF::tag_type tag, movie_definition* /*m*/)
 {
 	// Character ID has been read already, and was loaded in the constructor
 
@@ -134,36 +134,34 @@ has_frame_number(media::EncodedVideoFrame* frame, boost::uint32_t frameNumber)
 	return frame->frameNum() == frameNumber;
 }
 
-media::EncodedVideoFrame*
-video_stream_definition::getEncodedFrame(boost::uint32_t frameNum)
+void
+video_stream_definition::getEncodedFrameSlice(boost::uint32_t from, boost::uint32_t to, EmbedFrameVec& ret)
 {
+	assert(from<=to);
+
 	boost::mutex::scoped_lock lock(_video_mutex);
 
-	// Find frame with frame number <= frameNum
-	// TODO: - use upper_bound/lower_bound and friends
-	//       - use an ordered container
-	media::EncodedVideoFrame* found = 0;
-	for (EmbedFrameVec::iterator it=_video_frames.begin(), itE=_video_frames.end(); it!=itE; ++it)
+	EmbedFrameVec::iterator it=_video_frames.begin(), itEnd=_video_frames.end();
+	for (; it!=itEnd; ++it)
 	{
 		media::EncodedVideoFrame* frame = *it;
-		if ( ! found ) found = frame;
-		else if ( frame->frameNum() <= frameNum )
+		if ( frame->frameNum() >= from )
 		{
-			found = frame;
-		}
-		else
-		{
-			// NOTE: we assume frames are guarantee to be
-			//       in frameNum order. Should be verified
-			//       if the assumption is correct
 			break;
 		}
 	}
 
-	return found; // will be 0 if _video_frames.empty() or frameNum > last frame number
+	if (it==itEnd) return; // no element was >= from
+
+	// push remaining frames 
+	for (; it!=itEnd; ++it)
+	{
+		media::EncodedVideoFrame* frame = *it;
+		if ( frame->frameNum() > to ) break; // went too far
+		ret.push_back(frame);
+	}
+
 }
-
-
 
 
 } // namespace gnash
