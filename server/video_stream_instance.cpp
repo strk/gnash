@@ -186,38 +186,39 @@ video_stream_instance::display()
 	matrix m = get_world_matrix();
 	const rect& bounds = m_def->get_bound();
 
-	// If this is a video from a NetStream object, retrieve a video frame from there.
-	if (_ns)
+	image::image_base* img = getVideoFrame();
+	if (img)
 	{
-		boost::intrusive_ptr<NetStream> nso = _ns;
-
-		std::auto_ptr<image::image_base> i ( nso->get_video() );
-		if (i.get())
-		{
-			gnash::render::drawVideoFrame(i.get(), &m, &bounds);
-		}
-
-	// If this is a video from a VideoFrame tag, retrieve a video frame from there.
-	} else if (_embeddedStream) {
-		character* parent = get_parent();
-		assert(parent);
-		sprite_instance* sprite = parent->to_movie();
-		assert(sprite);
-
-		int current_frame = sprite->get_current_frame();
-		assert(m_def);
-
-		// The returned image is owned by "m_def"
-		std::auto_ptr<image::image_base> img = m_def->get_frame_data(current_frame);
-		if (img.get())
-		{
-			gnash::render::drawVideoFrame(img.get(), &m, &bounds);
-		} else {
-			log_debug(_("Video frame data is missing in frame %d"),current_frame);
-		}
+		gnash::render::drawVideoFrame(img, &m, &bounds);
 	}
 
 	clear_invalidated();
+}
+
+image::image_base*
+video_stream_instance::getVideoFrame()
+{
+
+
+	// If this is a video from a NetStream object, retrieve a video frame from there.
+	if (_ns)
+	{
+		std::auto_ptr<image::image_base> tmp = _ns->get_video();
+		if ( tmp.get() ) _lastVideoFrame = tmp;
+	}
+
+	// If this is a video from a VideoFrame tag, retrieve a video frame from there.
+	else if (_embeddedStream)
+	{
+		character* parent = get_parent();
+		sprite_instance* sprite = parent->to_movie();
+		int current_frame = sprite->get_current_frame();
+
+		std::auto_ptr<image::image_base> tmp = m_def->get_frame_data(current_frame);
+		if ( tmp.get() ) _lastVideoFrame = tmp;
+	}
+
+	return _lastVideoFrame.get();
 }
 
 void
