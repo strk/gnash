@@ -90,6 +90,8 @@ protected:
 
 private:
 
+	image::image_base* getVideoFrame();
+
 	// m_video_source - A Camera object that is capturing video data or a NetStream object.
 	// To drop the connection to the Video object, pass null for source.
 	// FIXME: don't use as_object, but a more meaningful type
@@ -100,6 +102,8 @@ private:
 
 	/// Playing an embbeded video stream ?
 	bool _embeddedStream;
+
+	std::auto_ptr<image::image_base> _lastVideoFrame;
 };
 
 void video_class_init(as_object& global);
