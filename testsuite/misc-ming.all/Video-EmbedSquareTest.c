@@ -95,6 +95,14 @@ main(int argc, char** argv)
 	"  else { stop(); stopped=true; }"
 	"};");
 
+  // Pressing a number jumps to the specified frame
+  add_actions(mo,
+	"_root.onKeyDown = function() {"
+	" var fnum = Key.getAscii() - 47;"
+	//" trace('going to frame '+fnum);"
+	" _root.gotoAndPlay(fnum);"
+	"}; Key.addListener(_root);");
+
   // TODO: dynamic frame rate adjust
   frames = SWFVideoStream_getNumFrames(stream);
   for(; frames > 0; frames--)
