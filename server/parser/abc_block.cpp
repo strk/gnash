@@ -375,6 +375,7 @@ abc_block::read_string_constants()
 	{
 		boost::uint32_t length = mS->read_V32();
 		mS->read_string_with_length(length, mStringPool[i]);
+		log_debug("Adding string constant: %s",mStringPool[i]);
 		mStringPoolTableIds[i] = 0;
 	}
 	return true;
@@ -668,16 +669,22 @@ abc_block::pool_value(boost::uint32_t index, boost::uint8_t type, as_value &v)
 bool
 abc_block::read_method_infos()
 {
+	log_debug("Begin read_method_infos.\n");
+
 	boost::uint32_t count = mS->read_V32();
+    log_debug("Method count: %u", count);
+
 	mMethods.resize(count);
 	for (unsigned int i = 0; i < count; ++i)
 	{
+		log_debug(" Reading method %u",i);
 		asMethod *pMethod = mCH->newMethod();
+//		log_debug("Min arg count: %d max: %d",pMethod->minArgumentCount(),pMethod->maxArgumentCount());
 		mMethods[i] = pMethod;
-
 		boost::uint32_t param_count = mS->read_V32();
 		boost::uint32_t return_type = mS->read_V32();
 
+		log_debug("  Param count: %u return type(index): %s(%u)",param_count,mStringPool[return_type],return_type);
 		pMethod->setMinArgumentCount(param_count);
 		pMethod->setMaxArgumentCount(param_count);
 
@@ -686,7 +693,6 @@ abc_block::read_method_infos()
 			ERR((_("ABC: Out of bounds return type for method info.\n")));
 			return false;
 		}
-
 		asClass *rtClass = locateClass(mMultinamePool[return_type]);
 		if (!rtClass)
 		{
@@ -698,43 +704,54 @@ abc_block::read_method_infos()
 
 		for (unsigned int j = 0; j < param_count; ++j)
 		{
+			log_debug("  Reading parameter %u",j);
 			// The parameter type.
 			boost::uint32_t ptype = mS->read_V32();
+			log_debug("   Parameter type(index): %s(%u)",mStringPool[ptype],ptype);
 			if (ptype >= mMultinamePool.size())
 			{
 				ERR((_("ABC: Out of bounds parameter type in method.\n")));
 				return false;
 			}
 			asClass *param_type = locateClass(mMultinamePool[ptype]);
+//			log_debug("Done creating asClass object.\n");
 			if (!param_type)
 			{
 				ERR((_("ABC: Unknown parameter type.\n")));
 				return false;
 			}
+//			log_debug("Trying to add argument to method.\n");
 			pMethod->pushArgument(param_type);
+//			log_debug("Done adding argument to method object.");
 		}
-
+//		log_debug("End loop j.\n");
 		// A skippable name index.
 		mS->skip_V32();
 
 		boost::uint8_t flags = mS->read_u8();
-
+		log_debug("  Flags: %X",flags | 0x0);
+//		log_debug("Check if flags and optional args.");
 		// If there are default parameters, read them now.
 		// Runtime will do validation of whether or not these can actually
 		// be assigned to the corresponding parameters.
 		if (flags & METHOD_OPTIONAL_ARGS)
 		{
+//			log_debug("We have flags and optional args.");
 			boost::uint32_t ocount = mS->read_V32();
+			log_debug("  Optional args: %u",ocount);
 			pMethod->setMinArgumentCount(pMethod->maxArgumentCount() - ocount);
 			for (unsigned int j = 0; j < ocount; ++j)
 			{
+				log_debug("  Reading optional arg: %u",j);
 				boost::uint32_t index = mS->read_V32();
 				boost::uint8_t kindof = mS->read_u8();
+				log_debug("   Index: %u Kindof: %u",index,kindof);
 				as_value v;
 				if (!pool_value(index, kindof, v))
 					return false; // message done by pool_value
 				pMethod->pushOptional(v);
 			}
+			log_debug("Done handling optional args.");
 		}
 
 		// If there are names present for the parameters, skip them.
@@ -773,12 +790,15 @@ bool
 abc_block::read_instances()
 {
 	boost::uint32_t count = mS->read_V32();
+	log_debug("Number of instances: %u\n",count);
 	mClasses.resize(count);
 	for (unsigned int i = 0; i < count; ++i)
 	{
+		log_debug("Reading instance: %u",i);
 		asClass *pClass;
 
 		boost::uint32_t index = mS->read_V32();
+		log_debug("Index: %u",index);
 		// 0 is allowed as a name, typically for the last entry.
 		if (index >= mMultinamePool.size())
 		{
@@ -796,10 +816,12 @@ abc_block::read_instances()
 			ERR((_("ABC: No namespace to use for storing class.\n")));
 			return false;
 		}
-
+		log_debug("Locating class.");
 		pClass = locateClass(mMultinamePool[index]);
+		log_debug("Done locating class.");
 		if (!pClass)
 		{
+			log_debug("pClass is null");
 			pClass = mCH->newClass();
 			if (!mMultinamePool[index].getNamespace()->addClass(
 				mMultinamePool[index].getName(), pClass))
@@ -811,7 +833,7 @@ abc_block::read_instances()
 		pClass->setDeclared();
 		mClasses[i] = pClass;
 		boost::uint32_t super_index = mS->read_V32();
-
+		log_debug("Super index: %u",super_index);
 		if (super_index && super_index >= mMultinamePool.size())
 		{
 			ERR((_("ABC: Out of bounds super type.\n")));
@@ -857,6 +879,7 @@ abc_block::read_instances()
 		}
 
 		boost::uint8_t flags = mS->read_u8();
+		log_debug("Flags: %X",flags | 0x0);
 
 		if (flags & INSTANCE_SEALED)
 			pClass->setSealed();
@@ -884,10 +907,12 @@ abc_block::read_instances()
 		// This is the list of interfaces which the instances has agreed to
 		// implement. They must be interfaces, and they must exist.
 		boost::uint32_t intcount = mS->read_V32();
-
+		log_debug("Interface count: %u",intcount);
 		for (unsigned int j = 0; j < intcount; ++j)
 		{
+			log_debug("Reading interface: %u", j);
 			boost::uint32_t i_index = mS->read_V32();
+			log_debug("Interface index %u",i_index);
 			// 0 is allowed as an interface, typically for the last one.
 			if (i_index >= mMultinamePool.size())
 			{
@@ -903,22 +928,27 @@ abc_block::read_instances()
 			}
 			pClass->pushInterface(pInterface);
 		}
-
+		log_debug("Done reading interface.");
 		// The next thing should be the constructor.
 		// TODO: What does this mean exactly? How does it differ from the one in
 		// the class info block?
 		boost::uint32_t moffset = mS->read_V32();
+		log_debug("Moffset: %u",moffset);
 		if (moffset >= mMethods.size())
 		{
 			ERR((_("ABC: Out of bounds method for initializer.\n")));
 			return false;
 		}
 		// Don't validate for previous owner.
+		log_debug("Setting constructor.");
 		pClass->setConstructor(mMethods[moffset]);
-		mMethods[moffset]->setOwner(pClass);
+		log_debug("Setting owner.");
+//		mMethods[moffset]->setOwner(pClass);
+		log_debug("Done setting owner.");
 
 		// Next come the 'traits' of the instance. (The members.)
 		boost::uint32_t tcount = mS->read_V32();
+		log_debug("Trait count: %u",tcount);
 		for (unsigned int j = 0; j < tcount; ++j)
 		{
 			abc_Trait &aTrait = newTrait();
@@ -948,7 +978,7 @@ abc_block::read_classes()
 		}
 		// Don't validate for previous owner.
 		pClass->setStaticConstructor(mMethods[moffset]);
-		mMethods[moffset]->setOwner(pClass);
+//		mMethods[moffset]->setOwner(pClass);
 		
 		boost::uint32_t tcount = mS->read_V32();
 		for (unsigned int j = 0; j < tcount; ++j)
@@ -982,7 +1012,7 @@ abc_block::read_scripts()
 			return false;
 		}
 		// Don't validate for previous owner.
-		mMethods[moffset]->setOwner(pScript);
+//		mMethods[moffset]->setOwner(pScript);
 		pScript->setConstructor(mMethods[moffset]);
 		pScript->setSuper(mTheObject);
 
@@ -1012,11 +1042,11 @@ abc_block::read_method_bodies()
 			ERR((_("ABC: Out of bounds for method body.\n")));
 			return false;
 		}
-		if (mMethods[moffset]->getBody())
-		{
-			ERR((_("ABC: Only one body per method.\n")));
-			return false;
-		}
+//		if (mMethods[moffset]->getBody())
+//		{
+//			ERR((_("ABC: Only one body per method.\n")));
+//			return false;
+//		}
 		mMethods[moffset]->setBody(new CodeStream);
 
 		// Maximum stack size.
@@ -1117,24 +1147,35 @@ abc_block::read(SWFStream* in)
 	if (!read_version()) return false;
 	if (!read_integer_constants()) return false;
 	if (!read_unsigned_integer_constants()) return false;
+	log_debug("Done reading unsigned integer constants.\n");
 	if (!read_double_constants()) return false;
+	log_debug("Done reading double constants.\n");
 	if (!read_string_constants()) return false;
+	log_debug("Done reading string constants.\n");
 	if (!read_namespaces()) return false;
+	log_debug("Done reading namespaces.\n");
 	if (!read_namespace_sets()) return false;
+	log_debug("Done reading namespace sets.\n");
 	if (!read_multinames()) return false;
+	log_debug("Done reading multinames.\n");
 	if (!read_method_infos()) return false;
+	log_debug("Done reading method infos.\n");
 	if (!skip_metadata()) return false;
+	log_debug("Done reading metadata.\n");
 	if (!read_instances()) return false;
+	log_debug("Done reading instances.\n");
 	if (!read_classes()) return false;
+	log_debug("Done reading classes.\n");
 	if (!read_scripts()) return false;
+	log_debug("Done reading scripts.\n");
 	if (!read_method_bodies()) return false;
-
-	std::vector<abc_Trait*>::iterator i = mTraits.begin();
-	for ( ; i != mTraits.end(); ++i)
-	{
-		if (!(*i)->finalize(this))
-			return false;
-	}
+	log_debug("Done reading stuff.\n");
+//	std::vector<abc_Trait*>::iterator i = mTraits.begin();
+// 	for ( ; i != mTraits.end(); ++i)
+// 	{
+// 		if (!(*i)->finalize(this))
+// 			return false;
+// 	}
 	mTraits.clear();
 	//mCH->dump();
 	return true;

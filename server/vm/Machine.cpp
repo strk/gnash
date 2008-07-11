@@ -258,14 +258,16 @@ void
 Machine::execute()
 {
 	boost::uint8_t opcode;
-
+	
 	for ( ; ; )
 	{
 		std::size_t opStart = mStream->tell();
 
-	if (mIsAS3)
+	if (1/*mIsAS3*/)
 	{
-	switch ((opcode = mStream->read_as3op())) // Assignment intentional
+	opcode = mStream->read_as3op();
+	log_debug("Machine executing opcode: %X",opcode | 0x0);
+	switch ((opcode /*= mStream->read_as3op()*/)) // Assignment intentional
 	{
 	default:
 		throw ASException();
@@ -2228,8 +2230,12 @@ Machine::execute()
 	case SWF::ABC_ACTION_GETLOCAL2:
 	case SWF::ABC_ACTION_GETLOCAL3:
 	{
+		log_debug("Growing mStack by 1");
 		mStack.grow(1);
+		log_debug("DONE.");
+		log_debug("mFrame size: %u",mFrame.totalSize());
 		mStack.top(0) = mFrame.value(opcode - SWF::ABC_ACTION_GETLOCAL0);
+		log_debug("Done setting top value.");
 		break;
 	}
 /// 0xD4 ABC_ACTION_SETLOCAL0
@@ -2499,5 +2505,17 @@ Machine::saveState()
 	s.mCurrentScope = mCurrentScope;
 	s.mGlobalReturn = mGlobalReturn;
 	s.mThis = mThis;
+}
+
+void Machine::loadCodeStream(CodeStream* stream)
+{
+	mStream = stream;
+}
+
+Machine::Machine(string_table &ST, ClassHierarchy *CH):mST(),mFrame()
+{
+	mCH = CH;
+//	mST = new string_table();
+//	mST = ST;
 }
 } // end of namespace gnash

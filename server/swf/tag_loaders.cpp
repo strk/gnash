@@ -54,6 +54,7 @@
 #include "sound_definition.h"
 #include "abc_block.h"
 #include "SoundInfo.h"
+#include "Machine.h"
 
 #ifdef HAVE_ZLIB_H
 #include <zlib.h>
@@ -1620,6 +1621,23 @@ abc_loader(SWFStream* in, tag_type tag, movie_definition* /*m*/)
 		static_cast<void> (in->read_u32());
 		std::string name;
 		in->read_string(name);
+        log_debug("Initializing block...\n");
+        a = abc_block();
+		log_debug("Done Initializing block.\n");
+		log_debug("Begin read...\n");
+		a.read(in);
+		log_debug("Done with read...\n");
+		VM& vm = VM::get();
+		log_debug("getting machine.");
+		Machine *mach = vm.getMachine();
+		log_debug("Getting entry script.");
+		asClass* start_script = a.mScripts.back();
+		log_debug("Getting constructor.");
+		asMethod* method = start_script->getConstructor();
+		log_debug("Loding code stream.");
+		mach->loadCodeStream(method->getBody());
+		log_debug("Executing machine...");
+		mach->execute();
 	}
 
 	//TODO: Move this to execution time so that as_object can be used. bool success = a.read(in);
@@ -1631,6 +1649,14 @@ void
 define_scene_frame_label_loader(SWFStream* in, tag_type tag, movie_definition* /*m*/)
 {
     assert(tag == SWF::DEFINESCENEANDFRAMELABELDATA); //86
+
+    in->ensureBytes(4);
+
+    boost::uint32_t scene_count = in->read_u32();
+    std::stringstream ss;
+    ss << "Scene count is " << scene_count << ".\n";
+
+    log_debug("%s", ss.str());
 
     log_unimpl(_("%s tag parsed but not yet used"), "DEFINESCENEANDFRAMELABELDATA");
 }

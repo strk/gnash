@@ -201,6 +201,8 @@ public:
 		unsigned char stack_in, short stack_out)
 	{ immediateFunction(to_call, pthis, mIgnoreReturn, stack_in, stack_out); }
 
+void loadCodeStream(CodeStream* stream);
+
 	Machine(string_table &ST, ClassHierarchy *CH);
 
 private:

@@ -32,6 +32,7 @@
 #include "namedStrings.h"
 #include "ClassHierarchy.h"
 #include "VirtualClock.h" // for getTime()
+#include "Machine.h"
 
 #ifdef HAVE_SYS_UTSNAME_H
 # include <sys/utsname.h> // For system information
@@ -63,14 +64,17 @@ VM::init(movie_definition& movie, VirtualClock& clock)
 
 	_singleton->mClassHierarchy = new ClassHierarchy;
 	_singleton->setGlobal(new Global(*_singleton, _singleton->mClassHierarchy));
+/*?Ask someone if this is correct.*/
+	_singleton->mMachine = new Machine(_singleton->mStringTable,_singleton->mClassHierarchy);
 	assert(_singleton->getGlobal());
-
+/*ASK*/
 	return *_singleton;
 }
 
 VM&
 VM::get()
 {
+	log_debug("In get.");
 	// Did you call VM::init ?
 	assert(_singleton.get());
 	return *_singleton;

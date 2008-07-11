@@ -31,12 +31,19 @@ namespace gnash {
 
 asMethod::asMethod()
 {
-//TODO
+	//mArguments();
+	mMinArguments = 0;
+	mMaxArguments = 0;
 }
 
 void
 asMethod::setOwner(asClass *pOwner)
 {
+	log_debug("asMethod::setOwner");
+	if(!mPrototype){
+		log_debug("ERROR mPrototype is null.");
+	}
+	log_debug("Prototype text value: %s",mPrototype->get_text_value());
 	mPrototype->set_member(NSV::PROP_PROTOTYPE, pOwner->getPrototype());
 }
 

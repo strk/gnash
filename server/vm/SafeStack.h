@@ -45,7 +45,8 @@ public:
 	{
 		if (i >= mDownstop) 
 			throw StackException();
-		unsigned int offset = mEnd - i;
+		printf("DEBUG: getting top value: i = %d mEnd = %d shift: %d mod: %d stack size: %d.\n",i,mEnd,mChunkShift,mChunkMod,mData.size());
+		unsigned int offset = mEnd - i -2;
 		return mData[offset >> mChunkShift][offset & mChunkMod];
 	}
 
@@ -53,6 +54,7 @@ public:
 	/// bottommost value.
 	T& value(unsigned int i)
 	{
+		log_debug("Calling value: i=%d mEnd=%d mDownstop=%d\n",i,mEnd,mDownstop);
 		if (i >= mDownstop)
 			throw StackException();
 		unsigned int offset = mEnd - mDownstop + i;
@@ -78,9 +80,11 @@ public:
 	/// when you need more than that.
 	void grow(unsigned int i)
 	{
+		log_debug("Growing safe stack by %d: size: %d capacity: %d downstep: %d end: %d",i,mData.size(),mData.capacity(),mDownstop,mEnd);
 		unsigned int available = (1 << mChunkShift) * mData.size() - mEnd + 1;
 		while (available < i)
 		{
+			log_debug("Increasing size of the real stack: %d.",mData.size());
 			mData.push_back(new T[1 << mChunkShift]);
 			available += 1 << mChunkShift;
 		}
