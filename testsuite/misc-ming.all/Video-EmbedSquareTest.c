@@ -85,8 +85,19 @@ main(int argc, char** argv)
   stream = newSWFVideoStream_fromFile(flv);
   item = SWFMovie_add(mo, (SWFBlock)stream);
 
-  item = SWFMovie_add(mo, (SWFBlock)stream);
-  SWFDisplayItem_move(item, 150, 0);
+  // A bug in Ming prevents this from working the
+  // way I liked it to. It was useful to try this
+  // out as it exposed a bad bug in gnash eating up
+  // all memory and a few other issues.
+  //
+  // In order to keep the test *runner* untouched
+  // this will be commented out for now. When Ming
+  // is fixed I'll like to have two instances of
+  // the definition playing one near the other,
+  // both playing all frames.
+  //
+  //item = SWFMovie_add(mo, (SWFBlock)stream);
+  //SWFDisplayItem_move(item, 150, 0);
 
   // Mouse clicks toggle play/stop
   add_actions(mo,
