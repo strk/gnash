@@ -52,6 +52,7 @@ main(int argc, char** argv)
   int frames;
   SWFVideoStream stream;
   SWFDisplayItem item;
+  SWFMovieClip mc;
   FILE *flv;
   char filename[256];
 
@@ -75,7 +76,7 @@ main(int argc, char** argv)
 
 	
   mo = newSWFMovie();
-  SWFMovie_setDimension(mo, 128, 96);
+  SWFMovie_setDimension(mo, 320, 96);
 
   if (mo == NULL) return -1;
 
@@ -83,6 +84,9 @@ main(int argc, char** argv)
 
   stream = newSWFVideoStream_fromFile(flv);
   item = SWFMovie_add(mo, (SWFBlock)stream);
+
+  item = SWFMovie_add(mo, (SWFBlock)stream);
+  SWFDisplayItem_move(item, 150, 0);
 
   // Mouse clicks toggle play/stop
   add_actions(mo,
