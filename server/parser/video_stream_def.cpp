@@ -21,7 +21,7 @@
 #include "video_stream_instance.h"
 #include "render.h"
 #include "BitsReader.h"
-#include "MediaHandler.h"
+//#include "MediaHandler.h"
 #include "MediaParser.h" // for VideoInfo
 #include "VideoDecoder.h"
 #include "stream.h" // for read()
@@ -34,10 +34,8 @@ namespace gnash {
 video_stream_definition::video_stream_definition(boost::uint16_t char_id)
 	:
 	m_char_id(char_id),
-	_last_decoded_frame(-1),
 	_width(0),
-	_height(0),
-	_decoder(NULL)
+	_height(0)
 {
 }
 
@@ -49,14 +47,14 @@ video_stream_definition::~video_stream_definition()
 
 
 void
-video_stream_definition::readDefineVideoStream(SWFStream* in, SWF::tag_type tag, movie_definition* m)
+video_stream_definition::readDefineVideoStream(SWFStream* in, SWF::tag_type tag, movie_definition* /*m*/)
 {
 	// Character ID has been read already, and was loaded in the constructor
 
 	assert(tag == SWF::DEFINEVIDEOSTREAM);
-	assert(!_decoder.get()); // allowed to be called only once
+	assert(!_videoInfo.get()); // allowed to be called only once
 
-	m_start_frame = m->get_loading_frame();
+	//m_start_frame = m->get_loading_frame();
 
 	// numFrames:2 width:2 height:2 flags:1
 	in->ensureBytes(8);
@@ -85,21 +83,7 @@ video_stream_definition::readDefineVideoStream(SWFStream* in, SWF::tag_type tag,
 		return;
 	}
 
-	media::MediaHandler* mh = media::MediaHandler::get();
-	if ( ! mh )
-	{
-		LOG_ONCE( log_error(_("No Media handler registered, "
-			"won't be able to decode embedded video")) );
-		return;
-	}
-
-	media::VideoInfo info(m_codec_id, _width, _height, 0 /*framerate*/, 0 /*duration*/, media::FLASH /*typei*/);
-	_decoder = mh->createVideoDecoder(info); 
-	if ( ! _decoder.get() )
-	{
-		log_error(_("Could not create video decoder for codec id %d"),
-			m_codec_id);
-	}
+	_videoInfo.reset( new media::VideoInfo(m_codec_id, _width, _height, 0 /*framerate*/, 0 /*duration*/, media::FLASH /*typei*/) );
 }
 
 void
@@ -108,17 +92,11 @@ video_stream_definition::readDefineVideoFrame(SWFStream* in, SWF::tag_type tag, 
 	// Character ID has been read already, and was loaded in the constructor
 
 	assert(tag == SWF::VIDEOFRAME);
-	if ( ! _decoder.get() ) return; // --enable-media=none - TODO: create a NullVideoDecoder ?
-	assert ( _decoder.get() ); // not allowed to be called for a dynamically-created video_stream_def
+
+	// TODO: skip if there's no MediaHandler registered ?
 
 	in->ensureBytes(2);
-	unsigned int frameNum = in->read_u16(); // in->skip_bytes(2); 
-	if ( m->get_loading_frame() != frameNum )
-	{
-		log_debug("frameNum field in tag is %d, currently loading frame is %d, we'll use the latter.",
-			frameNum, m->get_loading_frame());
-		frameNum = m->get_loading_frame();
-	}
+	unsigned int frameNum = in->read_u16(); 
 
 	const unsigned int dataLength = in->get_tag_end_position() - in->tell();
 	
@@ -156,58 +134,33 @@ has_frame_number(media::EncodedVideoFrame* frame, boost::uint32_t frameNumber)
 	return frame->frameNum() == frameNumber;
 }
 
-std::auto_ptr<image::image_base>
-video_stream_definition::get_frame_data(boost::uint32_t frameNum)
+media::EncodedVideoFrame*
+video_stream_definition::getEncodedFrame(boost::uint32_t frameNum)
 {
 	boost::mutex::scoped_lock lock(_video_mutex);
 
-	if (_video_frames.empty()) {
-		return std::auto_ptr<image::image_base>();
-	}
-	// Check if the requested frame holds any video data.
-	EmbedFrameVec::iterator it = std::find_if(_video_frames.begin(),
-	  _video_frames.end(), boost::bind(has_frame_number, _1, frameNum));
-	
-	// FIXME: although we return nothing here, we should return the
-	// previously decoded frame.
-	if( it == _video_frames.end() )	{
-		return std::auto_ptr<image::image_base>();
-	}
-
-	// We are going backwards, so start from the beginning.	
-	if (_last_decoded_frame > boost::int32_t(frameNum)) {
-		_last_decoded_frame = -1;
-	}
-	
-	// Push all the frames after the previously decoded frame, until the
-	// target frame has been reached.
-	while (_last_decoded_frame != boost::int32_t(frameNum)) {
-		it = std::find_if(_video_frames.begin(),
-			_video_frames.end(), boost::bind(has_frame_number, _1,
-							 _last_decoded_frame));
-
-		if (it == _video_frames.end()) {
-			it = _video_frames.begin();
-		} else {
-			++it;
+	// Find frame with frame number <= frameNum
+	// TODO: - use upper_bound/lower_bound and friends
+	//       - use an ordered container
+	media::EncodedVideoFrame* found = 0;
+	for (EmbedFrameVec::iterator it=_video_frames.begin(), itE=_video_frames.end(); it!=itE; ++it)
+	{
+		media::EncodedVideoFrame* frame = *it;
+		if ( ! found ) found = frame;
+		else if ( frame->frameNum() <= frameNum )
+		{
+			found = frame;
 		}
-		
-		if (it == _video_frames.end()) {
-			return std::auto_ptr<image::image_base>();
+		else
+		{
+			// NOTE: we assume frames are guarantee to be
+			//       in frameNum order. Should be verified
+			//       if the assumption is correct
+			break;
 		}
-
-		_last_decoded_frame = (*it)->frameNum();
-		_decoder->push(*(*it));
 	}
 
-	std::auto_ptr<image::rgb> buffer = _decoder->pop();
-
-	// If more data has arrived, replace the buffer with the next frame.
-	while (_decoder->peek()) {
-		buffer = _decoder->pop();
-	}
-
-	return std::auto_ptr<image::image_base>(buffer.release());
+	return found; // will be 0 if _video_frames.empty() or frameNum > last frame number
 }
 
 

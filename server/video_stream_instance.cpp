@@ -29,6 +29,8 @@
 #include "builtin_function.h" // for getter/setter properties
 #include "VM.h"
 #include "Object.h"
+#include "MediaHandler.h" // for setting up embedded video decoder 
+#include "VideoDecoder.h" // for setting up embedded video decoder
 
 namespace gnash {
 
@@ -152,6 +154,35 @@ video_ctor(const fn_call& /* fn */)
 	return as_value(obj.get()); // will keep alive
 }
 
+/*private*/
+void
+video_stream_instance::initializeDecoder()
+{
+	//if ( _decoder.get() ) return; // already initialized
+
+	media::MediaHandler* mh = media::MediaHandler::get();
+	if ( ! mh )
+	{
+		LOG_ONCE( log_error(_("No Media handler registered, "
+			"won't be able to decode embedded video")) );
+		return;
+	}
+
+	media::VideoInfo* info = m_def->getVideoInfo();
+	if ( ! info )
+	{
+		log_error(_("No Video info in video definition"));
+		return;
+	}
+
+	_decoder = mh->createVideoDecoder(*info); 
+	if ( ! _decoder.get() )
+	{
+		log_error(_("Could not create video decoder from VideoInfo %s"), *info);
+		return;
+	}
+}
+
 video_stream_instance::video_stream_instance(video_stream_definition* def,
 		character* parent, int id)
 	:
@@ -159,7 +190,9 @@ video_stream_instance::video_stream_instance(video_stream_definition* def,
 	m_def(def),
 	//m_video_source(NULL),
 	_ns(NULL),
-	_embeddedStream(false)
+	_embeddedStream(false),
+	_lastDecodedVideoFrameNum(-1),
+	_lastDecodedVideoFrame()
 {
 	//log_debug("video_stream_instance %p ctor", (void*)this);
 
@@ -167,6 +200,7 @@ video_stream_instance::video_stream_instance(video_stream_definition* def,
 	{
 		_embeddedStream = true;
 		attachVideoProperties(*this);
+		initializeDecoder();
 	}
 
 	set_prototype(getVideoInterface(*this));
@@ -204,21 +238,42 @@ video_stream_instance::getVideoFrame()
 	if (_ns)
 	{
 		std::auto_ptr<image::image_base> tmp = _ns->get_video();
-		if ( tmp.get() ) _lastVideoFrame = tmp;
+		if ( tmp.get() ) _lastDecodedVideoFrame = tmp;
 	}
 
 	// If this is a video from a VideoFrame tag, retrieve a video frame from there.
 	else if (_embeddedStream)
 	{
-		character* parent = get_parent();
-		sprite_instance* sprite = parent->to_movie();
-		int current_frame = sprite->get_current_frame();
+		int current_frame = get_ratio(); 
 
-		std::auto_ptr<image::image_base> tmp = m_def->get_frame_data(current_frame);
-		if ( tmp.get() ) _lastVideoFrame = tmp;
+		// if we jumped backward, we'll restart decoding from scratch
+		if ( _lastDecodedVideoFrameNum == current_frame )
+		{
+			return _lastDecodedVideoFrame.get();
+		}
+		else if ( _lastDecodedVideoFrameNum > current_frame )
+		{
+			_lastDecodedVideoFrameNum = -1;
+		}
+
+		log_debug("Decoding embedded frames from %d to %d for video instance %s",
+			_lastDecodedVideoFrameNum+1, current_frame, getTarget());
+
+		// Push all the frames after the previously decoded frame, until the
+		// target frame has been reached.
+		while (_lastDecodedVideoFrameNum+1 <= boost::int32_t(current_frame))
+		{
+			log_debug("  getting frame %d", _lastDecodedVideoFrameNum+1);
+			media::EncodedVideoFrame* frame = m_def->getEncodedFrame(_lastDecodedVideoFrameNum+1);
+			if ( ! frame ) break;
+			_decoder->push(*frame);
+			_lastDecodedVideoFrameNum = frame->frameNum();
+		}
+
+		_lastDecodedVideoFrame = _decoder->pop();
 	}
 
-	return _lastVideoFrame.get();
+	return _lastDecodedVideoFrame.get();
 }
 
 void
