@@ -355,6 +355,15 @@ MediaParser::parserLoop()
 	}
 }
 
+std::ostream& operator << (std::ostream& os, const VideoInfo& vi)
+{
+	os << "codec:" << vi.codec << " (type " << vi.type << ") - "
+	   << "size:" << vi.width << "x" << vi.height << " - "
+	   << "frameRate:" << vi.frameRate << " - "
+	   << "duration:" << vi.duration;
+	return os;
+}
+
 
 } // end of gnash::media namespace
 } // end of gnash namespace

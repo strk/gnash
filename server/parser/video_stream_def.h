@@ -109,14 +109,32 @@ public:
 		return m_bound;
 	}
 
-	/// Get the Video frame associated with the given SWF frame number
+	/// Get info about video embedded in this definition
 	//
-	/// @param frameNum
-	///	0-based SWF frame number of which we want to fetch associated Video frame.
+	/// May return NULL if there's no embedded video
+	/// (ActionScript created definition - new Video)
 	///
-	/// @return pointer (possibly NULL) to an image. The ownership is with the callee
+	media::VideoInfo* getVideoInfo() { return _videoInfo.get(); }
+
+	/// Get a slice of encoded video frames
+	//
+	/// @param from
+	///	Frame number of first frame to get
+	/// 
+	/// @param to
+	///	Frame number of last frame to get
 	///
-	std::auto_ptr<image::image_base> get_frame_data(boost::uint32_t frameNum);
+	/// @param ret
+	///	The vector to push defined elements onto. Ownership of elements
+	///	is left to callee.
+	///
+	/// NOTE: video definition can have gaps, so you may get NO frames
+	///       if you ask for frames from 1 to 2 when available frames
+	///	  are 0,3,6
+	///
+	void getEncodedFrameSlice(boost::uint32_t from, boost::uint32_t to,
+		std::vector<media::EncodedVideoFrame*>& ret);
+
 
 private:
 
@@ -137,7 +155,7 @@ private:
 	bool m_smoothing_flags;
 
 	/// Frame in which the DEFINEVIDEOSTREAM was found
-	boost::uint16_t m_start_frame;
+	//boost::uint16_t m_start_frame;
 
 	/// Number of frames in the embedded video, as reported
 	/// by the DEFINEVIDEOSTREAM tag
@@ -168,17 +186,18 @@ private:
 
 	EmbedFrameVec _video_frames;
 
-	/// Last decoded frame number
-	boost::int32_t _last_decoded_frame;
-
 	/// Width of the video
 	boost::uint32_t _width;
 
 	/// Height of the video
 	boost::uint32_t _height;
 
-	/// The decoder used to decode the video frames
-	std::auto_ptr<media::VideoDecoder> _decoder;
+	/// Info about embedded video
+	//
+	/// TODO: drop _width/_height/m_codec_id leaving all in this member instead ?
+	///
+	std::auto_ptr<media::VideoInfo> _videoInfo;
+
 };
 
 }	// end namespace gnash

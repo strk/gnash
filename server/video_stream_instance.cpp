@@ -29,6 +29,11 @@
 #include "builtin_function.h" // for getter/setter properties
 #include "VM.h"
 #include "Object.h"
+#include "MediaHandler.h" // for setting up embedded video decoder 
+#include "VideoDecoder.h" // for setting up embedded video decoder
+
+// Define this to get debug logging during embedded video decoding
+//#define DEBUG_EMBEDDED_VIDEO_DECODING
 
 namespace gnash {
 
@@ -152,6 +157,35 @@ video_ctor(const fn_call& /* fn */)
 	return as_value(obj.get()); // will keep alive
 }
 
+/*private*/
+void
+video_stream_instance::initializeDecoder()
+{
+	//if ( _decoder.get() ) return; // already initialized
+
+	media::MediaHandler* mh = media::MediaHandler::get();
+	if ( ! mh )
+	{
+		LOG_ONCE( log_error(_("No Media handler registered, "
+			"won't be able to decode embedded video")) );
+		return;
+	}
+
+	media::VideoInfo* info = m_def->getVideoInfo();
+	if ( ! info )
+	{
+		log_error(_("No Video info in video definition"));
+		return;
+	}
+
+	_decoder = mh->createVideoDecoder(*info); 
+	if ( ! _decoder.get() )
+	{
+		log_error(_("Could not create video decoder from VideoInfo %s"), *info);
+		return;
+	}
+}
+
 video_stream_instance::video_stream_instance(video_stream_definition* def,
 		character* parent, int id)
 	:
@@ -159,7 +193,9 @@ video_stream_instance::video_stream_instance(video_stream_definition* def,
 	m_def(def),
 	//m_video_source(NULL),
 	_ns(NULL),
-	_embeddedStream(false)
+	_embeddedStream(false),
+	_lastDecodedVideoFrameNum(-1),
+	_lastDecodedVideoFrame()
 {
 	//log_debug("video_stream_instance %p ctor", (void*)this);
 
@@ -167,6 +203,7 @@ video_stream_instance::video_stream_instance(video_stream_definition* def,
 	{
 		_embeddedStream = true;
 		attachVideoProperties(*this);
+		initializeDecoder();
 	}
 
 	set_prototype(getVideoInterface(*this));
@@ -204,21 +241,77 @@ video_stream_instance::getVideoFrame()
 	if (_ns)
 	{
 		std::auto_ptr<image::image_base> tmp = _ns->get_video();
-		if ( tmp.get() ) _lastVideoFrame = tmp;
+		if ( tmp.get() ) _lastDecodedVideoFrame = tmp;
 	}
 
 	// If this is a video from a VideoFrame tag, retrieve a video frame from there.
 	else if (_embeddedStream)
 	{
-		character* parent = get_parent();
-		sprite_instance* sprite = parent->to_movie();
-		int current_frame = sprite->get_current_frame();
+		int current_frame = get_ratio(); 
 
-		std::auto_ptr<image::image_base> tmp = m_def->get_frame_data(current_frame);
-		if ( tmp.get() ) _lastVideoFrame = tmp;
+#ifdef DEBUG_EMBEDDED_VIDEO_DECODING
+		log_debug("Video instance %s need display video frame (ratio) %d",
+			getTarget(), current_frame);
+#endif
+
+		// If current frame is the same then last decoded
+		// we don't need to decode more
+		if ( _lastDecodedVideoFrameNum == current_frame )
+		{
+#ifdef DEBUG_EMBEDDED_VIDEO_DECODING
+			log_debug("  current frame == _lastDecodedVideoFrameNum (%d)", current_frame);
+#endif
+			return _lastDecodedVideoFrame.get();
+		}
+
+		int from_frame = _lastDecodedVideoFrameNum < 0 ? 0 : _lastDecodedVideoFrameNum+1;
+
+		// If current frame is smaller then last decoded frame
+		// we restart decoding from scratch
+		if ( current_frame < _lastDecodedVideoFrameNum )
+		{
+#ifdef DEBUG_EMBEDDED_VIDEO_DECODING
+			log_debug("  current frame (%d) < _lastDecodedVideoFrameNum (%d)", current_frame, _lastDecodedVideoFrameNum);
+#endif
+			from_frame = 0;
+		}
+
+		// Reset last decoded video frame number now, so it's correct 
+		// on early return (ie: nothing more to decode)
+		_lastDecodedVideoFrameNum = current_frame;
+
+#ifdef DEBUG_EMBEDDED_VIDEO_DECODING
+		log_debug("  decoding embedded frames from %d to %d for video instance %s",
+			from_frame, current_frame, getTarget());
+#endif
+
+		typedef std::vector<media::EncodedVideoFrame*> EncodedFrames;
+
+		EncodedFrames toDecode;
+		m_def->getEncodedFrameSlice(from_frame, current_frame, toDecode);
+
+		// Nothing more to decode, return last decoded (possibly null)
+		if ( toDecode.empty() )
+		{
+#ifdef DEBUG_EMBEDDED_VIDEO_DECODING
+			log_debug("    no defined frames, we'll return last one");
+#endif
+			return _lastDecodedVideoFrame.get();
+		}
+
+		for (EncodedFrames::iterator it=toDecode.begin(), itEnd=toDecode.end(); it!=itEnd; ++it)
+		{
+			media::EncodedVideoFrame* frame = *it;
+#ifdef DEBUG_EMBEDDED_VIDEO_DECODING
+			log_debug("    pushing frame %d to decoder", frame->frameNum());
+#endif
+			_decoder->push(*frame);
+		}
+
+		_lastDecodedVideoFrame = _decoder->pop();
 	}
 
-	return _lastVideoFrame.get();
+	return _lastDecodedVideoFrame.get();
 }
 
 void

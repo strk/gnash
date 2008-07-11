@@ -90,6 +90,13 @@ protected:
 
 private:
 
+	/// Initialize decoder for embedded video 
+	//
+	/// Call only if given a non-null video definition.
+	///
+	void initializeDecoder();
+
+	/// Get video frame to be displayed
 	image::image_base* getVideoFrame();
 
 	// m_video_source - A Camera object that is capturing video data or a NetStream object.
@@ -103,7 +110,14 @@ private:
 	/// Playing an embbeded video stream ?
 	bool _embeddedStream;
 
-	std::auto_ptr<image::image_base> _lastVideoFrame;
+	/// Last decoded frame number
+	boost::int32_t _lastDecodedVideoFrameNum;
+
+	/// Last decoded frame 
+	std::auto_ptr<image::image_base> _lastDecodedVideoFrame;
+
+	/// The decoder used to decode the video frames
+	std::auto_ptr<media::VideoDecoder> _decoder;
 };
 
 void video_class_init(as_object& global);
