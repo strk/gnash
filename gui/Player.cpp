@@ -378,7 +378,6 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
     // Get info about the width & height of the movie.
     int movie_width = static_cast<int>(_movieDef->get_width_pixels());
     int movie_height = static_cast<int>(_movieDef->get_height_pixels());
-    float movie_fps = _movieDef->get_frame_rate();
 
     if (! _width) {
       _width = static_cast<size_t>(movie_width * _scale);
@@ -427,6 +426,7 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
     _gui->setMovieDefinition(_movieDef.get());
 
     if (! _delay) {
+      //float movie_fps = _movieDef->get_frame_rate();
       //_delay = static_cast<unsigned int>(1000 / movie_fps) ; // milliseconds per frame
       _delay = 10; // 10ms per heart beat
     }
@@ -453,8 +453,11 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
 // For handling notification callbacks from ActionScript. The callback is
 // always sent to a hosting application (i.e. if a file descriptor is
 // supplied). It is never acted on by Gnash when running as a plugin.
+//
+// TODO: drop first argument ?
+//
 void
-Player::fs_callback(gnash::sprite_instance* movie, const std::string& command,
+Player::fs_callback(gnash::sprite_instance* /*movie*/, const std::string& command,
                                 const std::string& args)
 {
     //log_debug(_("fs_callback(%p): %s %s"), (void*)movie, command, args);
