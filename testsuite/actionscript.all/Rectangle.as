@@ -308,6 +308,35 @@ ret = r0.contains('ab', 'ab'); // 'ab' >= 'ac' && 'ab' < 'ac'
 check_equals(typeof(ret), 'boolean');
 xcheck_equals(ret, true);
 
+r0 = new Rectangle('2', '2', '10', '10');
+ret = r0.contains('3', '3');
+check_equals(typeof(ret), 'boolean');
+xcheck_equals(ret, false); // string-wise, '3' > '210' ('2'+'10')
+
+r0 = new Rectangle('2', '2', '10', '10');
+ret = r0.contains(3, 3);
+check_equals(typeof(ret), 'boolean');
+// number-wise, 3 > 2 and < 210 ('2'+'10')
+check_equals(ret, true);
+
+r0 = new Rectangle(2, 2, 10, 10);
+ret = r0.contains('3', '3');
+check_equals(typeof(ret), 'boolean');
+// number-wise, 3 > 2 && 3 < 10
+check_equals(ret, true); 
+
+r0 = new Rectangle(2, 2, '0', '0'); // becomes 2,2,'20','20'
+ret = r0.contains('3', '3');
+check_equals(typeof(ret), 'boolean');
+// '3' > 2 but '3' > '20'
+xcheck_equals(ret, false); 
+
+r0 = new Rectangle(2, 2, '0', '0'); // becomes 2,2,'20','20'
+ret = r0.contains(3, 3);
+check_equals(typeof(ret), 'boolean');
+// 3 > 2 && 3 > '20'
+check_equals(ret, true); 
+
 //-------------------------------------------------------------
 // Test containsPoint
 //-------------------------------------------------------------
@@ -378,6 +407,6 @@ xcheck_equals(ret, true);
 // END OF TEST
 //-------------------------------------------------------------
 
-check_totals(131);
+check_totals(141);
 
 #endif // OUTPUT_VERSION >= 8
