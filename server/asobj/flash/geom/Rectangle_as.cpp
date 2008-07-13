@@ -104,13 +104,10 @@ getRectangleInterface()
 
 	if ( ! o )
 	{
-		// TODO: check if this class should inherit from Object
-		//       or from a different class
 		o = new as_object(getObjectInterface());
 		VM::get().addStatic(o.get());
 
 		attachRectangleInterface(*o);
-
 	}
 
 	return o.get();
@@ -161,10 +158,40 @@ Rectangle_clone(const fn_call& fn)
 static as_value
 Rectangle_contains(const fn_call& fn)
 {
+	//fn.arg(0) => x coordinate
+	//fn.arg(1) => y coordinate
+
 	boost::intrusive_ptr<Rectangle_as> ptr = ensureType<Rectangle_as>(fn.this_ptr);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+
+	as_value rect_x_as, rect_width_as, rect_y_as, rect_height_as;
+	double rect_x, rect_y, x, y;
+
+	ptr->get_member(NSV::PROP_X, &rect_x_as);
+	ptr->get_member(NSV::PROP_WIDTH, &rect_width_as);
+	ptr->get_member(NSV::PROP_Y, &rect_y_as);
+	ptr->get_member(NSV::PROP_HEIGHT, &rect_height_as);
+
+	rect_x = rect_x_as.to_number();
+	rect_y = rect_y_as.to_number();
+	x = fn.arg(0).to_number();
+	y = fn.arg(1).to_number();
+
+	//Points are contained within the Rectangle IFF they lie
+	//on the top or left borders of the rectangle, but not the right or
+	//bottom borders, or they are not on a border but between all.
+	
+	//Double comparison using "<" and ">" here has been verified
+	//to reproduce flash 8's results.
+	if (rect_x <= x
+		&& (rect_x + rect_width_as.to_number()) > x
+		&& rect_y <= y
+		&& (rect_y + rect_height_as.to_number()) > y)
+	{
+		return as_value(true);
+	}
+
+	return as_value(false);
+
 }
 
 static as_value
@@ -244,10 +271,10 @@ Rectangle_isEmpty(const fn_call& fn)
 	if ( h.is_undefined() || h.is_null() ) return as_value(true);
 
 	double wn = w.to_number();
-	if ( ! utility::isFinite(wn) || wn == 0 ) return as_value(true);
+	if ( ! utility::isFinite(wn) || wn <= 0 ) return as_value(true);
 
 	double hn = h.to_number();
-	if ( ! utility::isFinite(hn) || hn == 0 ) return as_value(true);
+	if ( ! utility::isFinite(hn) || hn <= 0 ) return as_value(true);
 
 	log_debug("Width: %g, Height: %g", wn, hn);
 
