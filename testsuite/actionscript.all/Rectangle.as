@@ -278,8 +278,8 @@ o1 = new Object(); o1.valueOf = function() { o1.valueOfCalls++; return 3; };
 o2 = new Object(); o2.valueOf = function() { o2.valueOfCalls++; return 2; };
 o1.valueOfCalls = o2.valueOfCalls = 0;
 ret = r0.contains(o1, o2);
-xcheck_equals(o1.valueOfCalls, 2); // if ( *o1* < r0.x || *o1* >= r0.x+r0.width ) return false
-xcheck_equals(o2.valueOfCalls, 2); // if ( *o2* < r0.y || *o2* >= r0.y+r0.height ) return false
+check_equals(o1.valueOfCalls, 2); // if ( *o1* < r0.x || *o1* >= r0.x+r0.width ) return false
+check_equals(o2.valueOfCalls, 2); // if ( *o2* < r0.y || *o2* >= r0.y+r0.height ) return false
 check_equals(typeof(ret), 'boolean');
 check_equals(ret, true);
 
@@ -288,7 +288,7 @@ o2 = new Object(); o2.valueOf = function() { o2.valueOfCalls++; return 2; };
 o1.valueOfCalls = o2.valueOfCalls = 0;
 ret = r0.contains(o1, o2);
 check_equals(o1.valueOfCalls, 1); // if ( *o1* < r0.x || *o1* >= r0.x+r0.width ) return false
-xcheck_equals(o2.valueOfCalls, 0); // ... (false returned above)
+check_equals(o2.valueOfCalls, 0); // ... (false returned above)
 check_equals(typeof(ret), 'boolean');
 check_equals(ret, false);
 
@@ -299,16 +299,16 @@ ret = r0.contains(o1, o2);
 xcheck_equals(o1.valueOfCalls, 2); // if ( *o1* < r0.x || *o1* >= r0.x+r0.width ) return xxx 
 // Test for Y is skipped, likely because
 // the test for X evaluated to undefined anyway
-xcheck_equals(o2.valueOfCalls, 0);
-xcheck_equals(typeof(ret), 'undefined');
+check_equals(o2.valueOfCalls, 0);
+check_equals(typeof(ret), 'undefined');
 
 o1 = new Object(); o1.valueOf = function() { return null; };
 o2 = new Object(); o2.valueOf = function() { return 2; };
 ret = r0.contains(o1, o2);
-xcheck_equals(typeof(ret), 'undefined');
+check_equals(typeof(ret), 'undefined');
 
 ret = r0.contains(0/0, 2);
-xcheck_equals(typeof(ret), 'undefined');
+check_equals(typeof(ret), 'undefined');
 
 r0 = new Rectangle('d', 'd', '10', '10');
 ret = r0.contains('e', 'e');
@@ -318,17 +318,17 @@ check_equals(ret, false);
 r0 = new Rectangle('a', 'a', 'b', 'b');
 ret = r0.contains('a', 'a'); // 'a' >= 'a' && 'a' < 'ab'
 check_equals(typeof(ret), 'boolean');
-xcheck_equals(ret, true);
+check_equals(ret, true);
 
 r0 = new Rectangle('a', 'a', 'c', 'c');
 ret = r0.contains('ab', 'ab'); // 'ab' >= 'ac' && 'ab' < 'ac'
 check_equals(typeof(ret), 'boolean');
-xcheck_equals(ret, true);
+check_equals(ret, true);
 
 r0 = new Rectangle('2', '2', '10', '10');
 ret = r0.contains('3', '3');
 check_equals(typeof(ret), 'boolean');
-xcheck_equals(ret, false); // string-wise, '3' > '210' ('2'+'10')
+check_equals(ret, false); // string-wise, '3' > '210' ('2'+'10')
 
 r0 = new Rectangle('2', '2', '10', '10');
 ret = r0.contains(3, 3);
@@ -346,7 +346,7 @@ r0 = new Rectangle(2, 2, '0', '0'); // becomes 2,2,'20','20'
 ret = r0.contains('3', '3');
 check_equals(typeof(ret), 'boolean');
 // '3' > 2 but '3' > '20'
-xcheck_equals(ret, false); 
+check_equals(ret, false); 
 
 r0 = new Rectangle(2, 2, '0', '0'); // becomes 2,2,'20','20'
 ret = r0.contains(3, 3);

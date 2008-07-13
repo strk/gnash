@@ -212,29 +212,29 @@ Rectangle_contains(const fn_call& fn)
 		return as_value();
 	}
 
-	// NOTE: Converting values to numbers isn't correct here.
-	//       Instead, we should use AS-level predicates
-
-	double rect_x = rect_x_as.to_number();
-	double rect_y = rect_y_as.to_number();
-	double rect_x1 = rect_x1_as.to_number();
-	double rect_y1 = rect_y1_as.to_number();
-	double x = fn.arg(0).to_number();
-	double y = fn.arg(1).to_number();
-
 	//Points are contained within the Rectangle IFF they lie
 	//on the top or left borders of the rectangle, but not the right or
 	//bottom borders, or they are not on a border but between all.
 	
-	//Double comparison using "<" and ">" here has been verified
-	//to reproduce flash 8's results.
-	if (rect_x <= x && rect_x1 > x
-		&& rect_y <= y && rect_y1 > y)
-	{
-		return as_value(true);
-	}
+	// NOTE: order of tests is important, see actionscript.all/Rectangle.as
 
-	return as_value(false);
+	as_value ret = x_as.newLessThan(rect_x_as);
+	if ( ret.is_undefined() ) return as_value();
+	if ( ret.to_bool() ) return as_value(false); 
+
+	ret = x_as.newLessThan(rect_x1_as);
+	if ( ret.is_undefined() ) return as_value();
+	if ( ! ret.to_bool() ) return as_value(false); 
+
+	ret = y_as.newLessThan(rect_y_as);
+	if ( ret.is_undefined() ) return as_value();
+	if ( ret.to_bool() ) return as_value(false); 
+
+	ret = y_as.newLessThan(rect_y1_as);
+	if ( ret.is_undefined() ) return as_value();
+	if ( ! ret.to_bool() ) return as_value(false); 
+
+	return as_value(true);
 
 }
 
