@@ -1700,6 +1700,51 @@ as_value::newAdd(const as_value& op2)
 	return *this;
 }
 
+as_value
+as_value::newLessThan(const as_value& op2_in)
+{
+    as_value& op1_in = *this;
+
+    as_value operand1;
+    as_value operand2;
+
+    try { operand1 = op1_in.to_primitive(); }
+    catch (ActionTypeError& e)
+    {
+        log_debug("%s.to_primitive() threw an error during ActionNewLessThen",
+            op1_in);
+    }
+
+    try { operand2 = op2_in.to_primitive(); }
+    catch (ActionTypeError& e)
+    {
+        log_debug("%s.to_primitive() threw an error during ActionNewLessThen",
+            op2_in);
+    }
+
+    as_value ret;
+
+    if ( operand1.is_string() && operand2.is_string() )
+    {
+        ret.set_bool(operand1.to_string() < operand2.to_string());
+    }
+    else
+    {
+        const double op1 = operand1.to_number();
+        const double op2 = operand2.to_number();
+
+        if ( isnan(op1) || isnan(op2) )
+        {
+            ret.set_undefined();
+        }
+        else
+        {
+            ret.set_bool(op1<op2);
+        }
+    }
+    return ret;
+}
+
 as_value&
 as_value::subtract(const as_value& op2)
 {
