@@ -473,7 +473,7 @@ main(int /*argc*/, char** /*argv*/)
 	tester.movePointerTo(50, 50); // out of any drawing
 	tester.advance();
 
-        // Inside bottom-left blue fill
+    // Inside bottom-left blue fill
 	check_pixel(60, 215, 2, white, 2); 
 	tester.movePointerTo(60, 215); tester.advance(); // move the mask over it...
 	check_pixel(60, 215, 2, blue, 2); 
