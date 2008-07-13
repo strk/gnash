@@ -303,6 +303,11 @@ ret = r0.contains('a', 'a'); // 'a' >= 'a' && 'a' < 'ab'
 check_equals(typeof(ret), 'boolean');
 check_equals(ret, true);
 
+r0 = new Rectangle('a', 'a', 'c', 'c');
+ret = r0.contains('ab', 'ab'); // 'ab' >= 'ac' && 'ab' < 'ac'
+check_equals(typeof(ret), 'boolean');
+check_equals(ret, true);
+
 //-------------------------------------------------------------
 // Test containsPoint
 //-------------------------------------------------------------
@@ -373,6 +378,6 @@ check_equals(ret, true);
 // END OF TEST
 //-------------------------------------------------------------
 
-check_totals(129);
+check_totals(131);
 
 #endif // OUTPUT_VERSION >= 8
