@@ -280,6 +280,19 @@ ret = r0.contains(o1, o2);
 check_equals(typeof(ret), 'boolean');
 check_equals(ret, true);
 
+o1 = new Object(); o1.valueOf = function() { return undefined; };
+o2 = new Object(); o2.valueOf = function() { return 2; };
+ret = r0.contains(o1, o2);
+check_equals(typeof(ret), 'undefined');
+
+o1 = new Object(); o1.valueOf = function() { return null; };
+o2 = new Object(); o2.valueOf = function() { return 2; };
+ret = r0.contains(o1, o2);
+check_equals(typeof(ret), 'undefined');
+
+ret = r0.contains(0/0, 2);
+check_equals(typeof(ret), 'undefined');
+
 r0 = new Rectangle('d', 'd', '10', '10');
 ret = r0.contains('e', 'e');
 check_equals(typeof(ret), 'boolean');
@@ -355,6 +368,6 @@ check_equals(ret, false);
 // END OF TEST
 //-------------------------------------------------------------
 
-check_totals(124);
+check_totals(127);
 
 #endif // OUTPUT_VERSION >= 8
