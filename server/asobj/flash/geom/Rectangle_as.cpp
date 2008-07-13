@@ -104,13 +104,10 @@ getRectangleInterface()
 
 	if ( ! o )
 	{
-		// TODO: check if this class should inherit from Object
-		//       or from a different class
 		o = new as_object(getObjectInterface());
 		VM::get().addStatic(o.get());
 
 		attachRectangleInterface(*o);
-
 	}
 
 	return o.get();
@@ -161,10 +158,84 @@ Rectangle_clone(const fn_call& fn)
 static as_value
 Rectangle_contains(const fn_call& fn)
 {
+	//fn.arg(0) => x coordinate
+	//fn.arg(1) => y coordinate
+
 	boost::intrusive_ptr<Rectangle_as> ptr = ensureType<Rectangle_as>(fn.this_ptr);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+
+	as_value rect_x_as, rect_width_as, rect_y_as, rect_height_as;
+
+	ptr->get_member(NSV::PROP_X, &rect_x_as);
+	ptr->get_member(NSV::PROP_WIDTH, &rect_width_as);
+	ptr->get_member(NSV::PROP_Y, &rect_y_as);
+	ptr->get_member(NSV::PROP_HEIGHT, &rect_height_as);
+
+	if ( fn.nargs < 2 )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+			std::stringstream ss;
+			fn.dump_args(ss);
+			log_aserror("flash.geom.Rectangle(%s): %s", ss.str(), _("missing arguments"));
+		);
+		return as_value();
+	}
+
+	as_value& x_as = fn.arg(0);
+	as_value& y_as = fn.arg(1);
+	if ( x_as.is_null() || x_as.is_undefined() ||
+	     y_as.is_null() || y_as.is_undefined() )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+			std::stringstream ss;
+			fn.dump_args(ss);
+			log_aserror("flash.geom.Rectangle(%s): %s", ss.str(), _("invalid arguments"));
+		);
+		return as_value();
+	}
+
+	as_value rect_x1_as = rect_x_as;
+	rect_x1_as.newAdd(rect_width_as);
+
+	as_value rect_y1_as = rect_y_as;
+	rect_y1_as.newAdd(rect_height_as);
+
+	if ( rect_x_as.is_null() || rect_x_as.is_undefined() ||
+	     rect_y_as.is_null() || rect_y_as.is_undefined() ||
+	     rect_x1_as.is_null() || rect_x1_as.is_undefined() ||
+	     rect_y1_as.is_null() || rect_y1_as.is_undefined() )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+			std::stringstream ss;
+			fn.dump_args(ss);
+			log_aserror("flash.geom.Rectangle(%s): %s", ss.str(), _("invalid rectangle"));
+		);
+		return as_value();
+	}
+
+	//Points are contained within the Rectangle IFF they lie
+	//on the top or left borders of the rectangle, but not the right or
+	//bottom borders, or they are not on a border but between all.
+	
+	// NOTE: order of tests is important, see actionscript.all/Rectangle.as
+
+	as_value ret = x_as.newLessThan(rect_x_as);
+	if ( ret.is_undefined() ) return as_value();
+	if ( ret.to_bool() ) return as_value(false); 
+
+	ret = x_as.newLessThan(rect_x1_as);
+	if ( ret.is_undefined() ) return as_value();
+	if ( ! ret.to_bool() ) return as_value(false); 
+
+	ret = y_as.newLessThan(rect_y_as);
+	if ( ret.is_undefined() ) return as_value();
+	if ( ret.to_bool() ) return as_value(false); 
+
+	ret = y_as.newLessThan(rect_y1_as);
+	if ( ret.is_undefined() ) return as_value();
+	if ( ! ret.to_bool() ) return as_value(false); 
+
+	return as_value(true);
+
 }
 
 static as_value
@@ -244,10 +315,10 @@ Rectangle_isEmpty(const fn_call& fn)
 	if ( h.is_undefined() || h.is_null() ) return as_value(true);
 
 	double wn = w.to_number();
-	if ( ! utility::isFinite(wn) || wn == 0 ) return as_value(true);
+	if ( ! utility::isFinite(wn) || wn <= 0 ) return as_value(true);
 
 	double hn = h.to_number();
-	if ( ! utility::isFinite(hn) || hn == 0 ) return as_value(true);
+	if ( ! utility::isFinite(hn) || hn <= 0 ) return as_value(true);
 
 	log_debug("Width: %g, Height: %g", wn, hn);
 

@@ -204,7 +204,155 @@ check_equals(r2.custom, undefined);
 // Test contains
 //-------------------------------------------------------------
 
-// TODO
+r0 = new Rectangle(0, 0, 10, 10);
+
+//BORDERS
+
+//test left border
+ret = r0.contains(0, 5);
+check_equals(typeof(ret), "boolean");
+check_equals(ret, true);
+
+//test top border
+ret = r0.contains(5, 0);
+check_equals(typeof(ret), "boolean");
+check_equals(ret, true);
+
+//test right border
+ret = r0.contains(10, 5);
+check_equals(typeof(ret), "boolean");
+check_equals(ret, false);
+
+//test bottom border
+ret = r0.contains(5,10);
+check_equals(typeof(ret), "boolean");
+check_equals(ret, false);
+
+//INTERIOR
+
+//test interior point
+ret = r0.contains(0.1, 0.1);
+check_equals(typeof(ret), "boolean");
+check_equals(ret, true);
+
+//EXTERIOR
+
+//test exterior point, to the left
+ret = r0.contains(-5, 5);
+check_equals(typeof(ret), "boolean");
+check_equals(ret, false);
+
+//test exterior point, to the right
+ret = r0.contains(15, 5);
+check_equals(typeof(ret), "boolean");
+check_equals(ret, false);
+
+//test exterior point, above
+ret = r0.contains(5, -5);
+check_equals(typeof(ret), "boolean");
+check_equals(ret, false);
+
+//test exterior point, below
+ret = r0.contains(5, 15);
+check_equals(typeof(ret), "boolean");
+check_equals(ret, false);
+
+//NONTRIVIAL CALLS
+ret = r0.contains();
+check_equals(typeof(ret), 'undefined');
+
+ret = r0.contains(0);
+check_equals(typeof(ret), 'undefined');
+
+ret = r0.contains(0, undefined);
+check_equals(typeof(ret), 'undefined');
+
+ret = r0.contains(0, null);
+check_equals(typeof(ret), 'undefined');
+
+ret = r0.contains('1', '1');
+check_equals(typeof(ret), 'boolean');
+check_equals(ret, true);
+
+o1 = new Object(); o1.valueOf = function() { o1.valueOfCalls++; return 3; };
+o2 = new Object(); o2.valueOf = function() { o2.valueOfCalls++; return 2; };
+o1.valueOfCalls = o2.valueOfCalls = 0;
+ret = r0.contains(o1, o2);
+check_equals(o1.valueOfCalls, 2); // if ( *o1* < r0.x || *o1* >= r0.x+r0.width ) return false
+check_equals(o2.valueOfCalls, 2); // if ( *o2* < r0.y || *o2* >= r0.y+r0.height ) return false
+check_equals(typeof(ret), 'boolean');
+check_equals(ret, true);
+
+o1 = new Object(); o1.valueOf = function() { o1.valueOfCalls++; return -1; };
+o2 = new Object(); o2.valueOf = function() { o2.valueOfCalls++; return 2; };
+o1.valueOfCalls = o2.valueOfCalls = 0;
+ret = r0.contains(o1, o2);
+check_equals(o1.valueOfCalls, 1); // if ( *o1* < r0.x || *o1* >= r0.x+r0.width ) return false
+check_equals(o2.valueOfCalls, 0); // ... (false returned above)
+check_equals(typeof(ret), 'boolean');
+check_equals(ret, false);
+
+o1 = new Object(); o1.valueOf = function() { o1.valueOfCalls++; return undefined; };
+o2 = new Object(); o2.valueOf = function() { o2.valueOfCalls++; return 2; };
+o1.valueOfCalls = o2.valueOfCalls = 0;
+ret = r0.contains(o1, o2);
+xcheck_equals(o1.valueOfCalls, 2); // if ( *o1* < r0.x || *o1* >= r0.x+r0.width ) return xxx 
+// Test for Y is skipped, likely because
+// the test for X evaluated to undefined anyway
+check_equals(o2.valueOfCalls, 0);
+check_equals(typeof(ret), 'undefined');
+
+o1 = new Object(); o1.valueOf = function() { return null; };
+o2 = new Object(); o2.valueOf = function() { return 2; };
+ret = r0.contains(o1, o2);
+check_equals(typeof(ret), 'undefined');
+
+ret = r0.contains(0/0, 2);
+check_equals(typeof(ret), 'undefined');
+
+r0 = new Rectangle('d', 'd', '10', '10');
+ret = r0.contains('e', 'e');
+check_equals(typeof(ret), 'boolean');
+check_equals(ret, false);
+
+r0 = new Rectangle('a', 'a', 'b', 'b');
+ret = r0.contains('a', 'a'); // 'a' >= 'a' && 'a' < 'ab'
+check_equals(typeof(ret), 'boolean');
+check_equals(ret, true);
+
+r0 = new Rectangle('a', 'a', 'c', 'c');
+ret = r0.contains('ab', 'ab'); // 'ab' >= 'ac' && 'ab' < 'ac'
+check_equals(typeof(ret), 'boolean');
+check_equals(ret, true);
+
+r0 = new Rectangle('2', '2', '10', '10');
+ret = r0.contains('3', '3');
+check_equals(typeof(ret), 'boolean');
+check_equals(ret, false); // string-wise, '3' > '210' ('2'+'10')
+
+r0 = new Rectangle('2', '2', '10', '10');
+ret = r0.contains(3, 3);
+check_equals(typeof(ret), 'boolean');
+// number-wise, 3 > 2 and < 210 ('2'+'10')
+check_equals(ret, true);
+
+r0 = new Rectangle(2, 2, 10, 10);
+ret = r0.contains('3', '3');
+check_equals(typeof(ret), 'boolean');
+// number-wise, 3 > 2 && 3 < 10
+check_equals(ret, true); 
+
+r0 = new Rectangle(2, 2, '0', '0'); // becomes 2,2,'20','20'
+ret = r0.contains('3', '3');
+check_equals(typeof(ret), 'boolean');
+// '3' > 2 but '3' > '20'
+check_equals(ret, false); 
+
+r0 = new Rectangle(2, 2, '0', '0'); // becomes 2,2,'20','20'
+ret = r0.contains(3, 3);
+check_equals(typeof(ret), 'boolean');
+// 3 > 2 && 3 > '20'
+check_equals(ret, true); 
 
 //-------------------------------------------------------------
 // Test containsPoint
@@ -276,6 +424,6 @@ check_equals(r2.custom, undefined);
 // END OF TEST
 //-------------------------------------------------------------
 
-check_totals(96);
+check_totals(149);
 
 #endif // OUTPUT_VERSION >= 8
