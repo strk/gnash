@@ -204,7 +204,81 @@ check_equals(r2.custom, undefined);
 // Test contains
 //-------------------------------------------------------------
 
-// TODO
+r0 = new Rectangle(0, 0, 10, 10);
+
+//BORDERS
+
+//test left border
+ret = r0.contains(0, 5);
+check_equals(typeof(ret), "boolean");
+check_equals(ret, true);
+
+//test top border
+ret = r0.contains(5, 0);
+check_equals(typeof(ret), "boolean");
+check_equals(ret, true);
+
+//test right border
+ret = r0.contains(10, 5);
+check_equals(typeof(ret), "boolean");
+check_equals(ret, false);
+
+//test bottom border
+ret = r0.contains(5,10);
+check_equals(typeof(ret), "boolean");
+check_equals(ret, false);
+
+//INTERIOR
+
+//test interior point
+ret = r0.contains(0.1, 0.1);
+check_equals(typeof(ret), "boolean");
+check_equals(ret, true);
+
+//EXTERIOR
+
+//test exterior point, to the left
+ret = r0.contains(-5, 5);
+check_equals(typeof(ret), "boolean");
+check_equals(ret, false);
+
+//test exterior point, to the right
+ret = r0.contains(15, 5);
+check_equals(typeof(ret), "boolean");
+check_equals(ret, false);
+
+//test exterior point, above
+ret = r0.contains(5, -5);
+check_equals(typeof(ret), "boolean");
+check_equals(ret, false);
+
+//test exterior point, below
+ret = r0.contains(5, 15);
+check_equals(typeof(ret), "boolean");
+check_equals(ret, false);
+
+//NONTRIVIAL CALLS
+ret = r0.contains();
+check_equals(typeof(ret), 'undefined');
+
+ret = r0.contains(0);
+check_equals(typeof(ret), 'undefined');
+
+ret = r0.contains(0, undefined);
+check_equals(typeof(ret), 'undefined');
+
+ret = r0.contains(0, null);
+check_equals(typeof(ret), 'undefined');
+
+ret = r0.contains('1', '1');
+check_equals(typeof(ret), 'boolean');
+check_equals(ret, true);
+
+o1 = new Object(); o1.valueOf = function() { return 3; };
+o2 = new Object(); o2.valueOf = function() { return 2; };
+ret = r0.contains(o1, o2);
+check_equals(typeof(ret), 'boolean');
+check_equals(ret, true);
 
 //-------------------------------------------------------------
 // Test containsPoint
@@ -276,6 +350,6 @@ check_equals(r2.custom, undefined);
 // END OF TEST
 //-------------------------------------------------------------
 
-check_totals(96);
+check_totals(122);
 
 #endif // OUTPUT_VERSION >= 8
