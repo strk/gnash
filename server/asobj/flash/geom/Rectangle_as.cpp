@@ -173,6 +173,17 @@ Rectangle_contains(const fn_call& fn)
 
 	rect_x = rect_x_as.to_number();
 	rect_y = rect_y_as.to_number();
+
+	if ( fn.nargs < 2 )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+			std::stringstream ss;
+			fn.dump_args(ss);
+			log_aserror("flash.geom.Rectangle(%s): %s", ss.str(), _("missing arguments"));
+		);
+		return as_value();
+	}
+
 	x = fn.arg(0).to_number();
 	y = fn.arg(1).to_number();
 

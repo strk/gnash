@@ -265,10 +265,10 @@ ret = r0.contains(0);
 check_equals(typeof(ret), 'undefined');
 
 ret = r0.contains(0, undefined);
-check_equals(typeof(ret), 'undefined');
+xcheck_equals(typeof(ret), 'undefined');
 
 ret = r0.contains(0, null);
-check_equals(typeof(ret), 'undefined');
+xcheck_equals(typeof(ret), 'undefined');
 
 ret = r0.contains('1', '1');
 check_equals(typeof(ret), 'boolean');
@@ -283,15 +283,15 @@ check_equals(ret, true);
 o1 = new Object(); o1.valueOf = function() { return undefined; };
 o2 = new Object(); o2.valueOf = function() { return 2; };
 ret = r0.contains(o1, o2);
-check_equals(typeof(ret), 'undefined');
+xcheck_equals(typeof(ret), 'undefined');
 
 o1 = new Object(); o1.valueOf = function() { return null; };
 o2 = new Object(); o2.valueOf = function() { return 2; };
 ret = r0.contains(o1, o2);
-check_equals(typeof(ret), 'undefined');
+xcheck_equals(typeof(ret), 'undefined');
 
 ret = r0.contains(0/0, 2);
-check_equals(typeof(ret), 'undefined');
+xcheck_equals(typeof(ret), 'undefined');
 
 r0 = new Rectangle('d', 'd', '10', '10');
 ret = r0.contains('e', 'e');
@@ -301,12 +301,12 @@ check_equals(ret, false);
 r0 = new Rectangle('a', 'a', 'b', 'b');
 ret = r0.contains('a', 'a'); // 'a' >= 'a' && 'a' < 'ab'
 check_equals(typeof(ret), 'boolean');
-check_equals(ret, true);
+xcheck_equals(ret, true);
 
 r0 = new Rectangle('a', 'a', 'c', 'c');
 ret = r0.contains('ab', 'ab'); // 'ab' >= 'ac' && 'ab' < 'ac'
 check_equals(typeof(ret), 'boolean');
-check_equals(ret, true);
+xcheck_equals(ret, true);
 
 //-------------------------------------------------------------
 // Test containsPoint
