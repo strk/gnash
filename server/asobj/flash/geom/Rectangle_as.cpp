@@ -164,15 +164,11 @@ Rectangle_contains(const fn_call& fn)
 	boost::intrusive_ptr<Rectangle_as> ptr = ensureType<Rectangle_as>(fn.this_ptr);
 
 	as_value rect_x_as, rect_width_as, rect_y_as, rect_height_as;
-	double rect_x, rect_y, x, y;
 
 	ptr->get_member(NSV::PROP_X, &rect_x_as);
 	ptr->get_member(NSV::PROP_WIDTH, &rect_width_as);
 	ptr->get_member(NSV::PROP_Y, &rect_y_as);
 	ptr->get_member(NSV::PROP_HEIGHT, &rect_height_as);
-
-	rect_x = rect_x_as.to_number();
-	rect_y = rect_y_as.to_number();
 
 	if ( fn.nargs < 2 )
 	{
@@ -184,8 +180,47 @@ Rectangle_contains(const fn_call& fn)
 		return as_value();
 	}
 
-	x = fn.arg(0).to_number();
-	y = fn.arg(1).to_number();
+	as_value& x_as = fn.arg(0);
+	as_value& y_as = fn.arg(1);
+	if ( x_as.is_null() || x_as.is_undefined() ||
+	     y_as.is_null() || y_as.is_undefined() )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+			std::stringstream ss;
+			fn.dump_args(ss);
+			log_aserror("flash.geom.Rectangle(%s): %s", ss.str(), _("invalid arguments"));
+		);
+		return as_value();
+	}
+
+	as_value rect_x1_as = rect_x_as;
+	rect_x1_as.newAdd(rect_width_as);
+
+	as_value rect_y1_as = rect_y_as;
+	rect_y1_as.newAdd(rect_height_as);
+
+	if ( rect_x_as.is_null() || rect_x_as.is_undefined() ||
+	     rect_y_as.is_null() || rect_y_as.is_undefined() ||
+	     rect_x1_as.is_null() || rect_x1_as.is_undefined() ||
+	     rect_y1_as.is_null() || rect_y1_as.is_undefined() )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+			std::stringstream ss;
+			fn.dump_args(ss);
+			log_aserror("flash.geom.Rectangle(%s): %s", ss.str(), _("invalid rectangle"));
+		);
+		return as_value();
+	}
+
+	// NOTE: Converting values to numbers isn't correct here.
+	//       Instead, we should use AS-level predicates
+
+	double rect_x = rect_x_as.to_number();
+	double rect_y = rect_y_as.to_number();
+	double rect_x1 = rect_x1_as.to_number();
+	double rect_y1 = rect_y1_as.to_number();
+	double x = fn.arg(0).to_number();
+	double y = fn.arg(1).to_number();
 
 	//Points are contained within the Rectangle IFF they lie
 	//on the top or left borders of the rectangle, but not the right or
@@ -193,10 +228,8 @@ Rectangle_contains(const fn_call& fn)
 	
 	//Double comparison using "<" and ">" here has been verified
 	//to reproduce flash 8's results.
-	if (rect_x <= x
-		&& (rect_x + rect_width_as.to_number()) > x
-		&& rect_y <= y
-		&& (rect_y + rect_height_as.to_number()) > y)
+	if (rect_x <= x && rect_x1 > x
+		&& rect_y <= y && rect_y1 > y)
 	{
 		return as_value(true);
 	}

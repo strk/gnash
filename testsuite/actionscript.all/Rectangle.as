@@ -265,10 +265,10 @@ ret = r0.contains(0);
 check_equals(typeof(ret), 'undefined');
 
 ret = r0.contains(0, undefined);
-xcheck_equals(typeof(ret), 'undefined');
+check_equals(typeof(ret), 'undefined');
 
 ret = r0.contains(0, null);
-xcheck_equals(typeof(ret), 'undefined');
+check_equals(typeof(ret), 'undefined');
 
 ret = r0.contains('1', '1');
 check_equals(typeof(ret), 'boolean');
