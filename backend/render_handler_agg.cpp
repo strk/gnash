@@ -178,12 +178,12 @@ AGG ressources
 //#include <boost/foreach.hpp>
 
 #ifndef round
-#define round(x) rint(x)
+	#define round(x) rint(x)
 #endif
 
+#define TWIPS_TO_SHIFTED_PIXELS(x) (x*0.05f + 0.5f) 
+
 using namespace gnash;
-
-
 
 
 namespace gnash {
@@ -943,16 +943,18 @@ public:
     const std::vector<line_style>& line_styles) {
     
     bool have_shape, have_outline;
-    
+
     analyze_paths(def->get_paths(), have_shape, have_outline);
 
     if (!have_shape && !have_outline)
-      return; // invisible character
+    {
+        return; // invisible character
+    }    
 
     std::vector< path > paths;
     std::vector< agg::path_storage > agg_paths;  
     std::vector< agg::path_storage > agg_paths_rounded;  
-    
+
     apply_matrix_to_path(def->get_paths(), paths, mat);
 
     // Flash only aligns outlines. Probably this is done at rendering
@@ -1041,12 +1043,15 @@ public:
   }
 
 /// Takes a path and translates it using the given matrix. The new path
-/// is stored in paths_out.  
+/// is stored in paths_out. Both paths_in and paths_out are expected to
+/// be in TWIPS.
 void apply_matrix_to_path(const std::vector<path> &paths_in, 
       std::vector<path>& paths_out, const matrix &source_mat) 
 {
 
     matrix mat = stage_matrix;
+    // make sure paths_out is also in TWIPS to keep accuracy.
+    mat.concatenate_scale(20.0,  20.0);
     mat.concatenate(source_mat);
 
     size_t pcnt = paths_in.size();
@@ -1093,24 +1098,25 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
     {
         const path& path_in_sub = paths[pno]; 
         agg::path_storage& new_path = dest[pno];
-        new_path.move_to(path_in_sub.ap.x + subpixel_offset, 
-                         path_in_sub.ap.y + subpixel_offset);
-    
+
+        new_path.move_to(TWIPS_TO_SHIFTED_PIXELS(path_in_sub.ap.x), 
+                          TWIPS_TO_SHIFTED_PIXELS(path_in_sub.ap.y));
+
         size_t ecnt = path_in_sub.m_edges.size();
         for (size_t eno=0; eno<ecnt; eno++)
         {
             const edge& this_edge = path_in_sub.m_edges[eno];             
             if (this_edge.is_straight())
             {
-                new_path.line_to(this_edge.ap.x + subpixel_offset, 
-                                 this_edge.ap.y + subpixel_offset);
+                new_path.line_to(TWIPS_TO_SHIFTED_PIXELS(this_edge.ap.x), 
+                                  TWIPS_TO_SHIFTED_PIXELS(this_edge.ap.y));
             }
             else
             {
-                new_path.curve3(this_edge.cp.x + subpixel_offset, 
-                                this_edge.cp.y + subpixel_offset,
-                                this_edge.ap.x + subpixel_offset, 
-                                this_edge.ap.y + subpixel_offset);       
+                new_path.curve3(TWIPS_TO_SHIFTED_PIXELS(this_edge.cp.x), 
+                                 TWIPS_TO_SHIFTED_PIXELS(this_edge.cp.y),
+                                 TWIPS_TO_SHIFTED_PIXELS(this_edge.ap.x), 
+                                 TWIPS_TO_SHIFTED_PIXELS(this_edge.ap.y));       
             }
         }// end of for    
     } // end of for  
@@ -1135,11 +1141,10 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
   // TODO: Flash never aligns lines that are wider than 1 pixel on *screen*,
   // but we currently don't check the width.  
   void build_agg_paths_rounded(std::vector<agg::path_storage>& dest, 
-    const std::vector<path>& paths, 
+    const std::vector< path >& paths, 
     const std::vector<line_style>& line_styles) {
 
-    // Shift all coordinates a half pixel for agg specific pixel hinting. 
-    const float subpixel_offset = 0.5;
+    const float subpixel_offset = 0.5f;
     
     size_t pcount = paths.size();
 
@@ -1165,8 +1170,8 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
           hairline = true;
       }
       
-      boost::int32_t prev_ax = this_path.ap.x;
-      boost::int32_t prev_ay = this_path.ap.y;  
+      float prev_ax = TWIPS_TO_PIXELS(this_path.ap.x);
+      float prev_ay = TWIPS_TO_PIXELS(this_path.ap.y);  
       bool prev_align_x = true;
       bool prev_align_y = true;
       
@@ -1180,8 +1185,8 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
         
         const edge& this_edge = this_path.m_edges[eno];
         
-        float this_ax = this_edge.ap.x;  
-        float this_ay = this_edge.ap.y;  
+        float this_ax = TWIPS_TO_PIXELS(this_edge.ap.x);  
+        float this_ay = TWIPS_TO_PIXELS(this_edge.ap.y);  
         
         if (hinting || this_edge.is_straight()) {
         
@@ -1189,18 +1194,38 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
           bool align_x = hinting || (hairline && (prev_ax == this_ax));
           bool align_y = hinting || (hairline && (prev_ay == this_ay));
           
+          if (align_x) 
+            this_ax = round(this_ax);
+          
+          if (align_y)
+            this_ay = round(this_ay);
+          
           // first line?
-          if (eno==0) {             
+          if (eno==0) {
+          
+            if (align_x) 
+              prev_ax = round(prev_ax);
+              
+            if (align_y)
+              prev_ay = round(prev_ay);
+              
             new_path.move_to(prev_ax + subpixel_offset, 
               prev_ay + subpixel_offset);
             
           } else {
+          
             // not the first line, but the previous anchor point
             // might belong to a curve and thus may not be aligned.
             // We need to have both anchors of this new line to be
             // aligned, so it may be neccesary to add a line
             if ((align_x && !prev_align_x) || (align_y && !prev_align_y)) {
-                         
+            
+              if (align_x) 
+                prev_ax = round(prev_ax);
+                
+              if (align_y)
+                prev_ay = round(prev_ay);
+                
               new_path.line_to(prev_ax + subpixel_offset, 
                 prev_ay + subpixel_offset);
               
@@ -1215,12 +1240,14 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
             // but it's not exact...
           
           }
+        
           new_path.line_to(this_ax + subpixel_offset, 
             this_ay + subpixel_offset);
           
           prev_align_x = align_x;
           prev_align_y = align_y;  
-  
+          
+          
         } else {
           
           // first line?
@@ -1228,8 +1255,9 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
             new_path.move_to(prev_ax, prev_ay);
         
           // never align curves!
-          new_path.curve3(this_edge.cp.x + subpixel_offset, 
-            this_edge.cp.y + subpixel_offset,
+          new_path.curve3(
+            TWIPS_TO_PIXELS(this_edge.cp.x) + subpixel_offset, 
+            TWIPS_TO_PIXELS(this_edge.cp.y) + subpixel_offset,
             this_ax + subpixel_offset, 
             this_ay + subpixel_offset);
             
@@ -1245,6 +1273,7 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
       
       if (closed)
         new_path.close_polygon();
+    
     }
   } //build_agg_paths_rounded
     
@@ -1560,7 +1589,8 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
                   this_path.m_fill1==0 ? -1 : 0);
                   
       // starting point of path
-      path.move_to(this_path.ap.x, this_path.ap.y);
+      path.move_to(TWIPS_TO_PIXELS(this_path.ap.x), 
+                   TWIPS_TO_PIXELS(this_path.ap.y));
     
       unsigned int ecount = this_path.m_edges.size();
       for (unsigned int eno=0; eno<ecount; eno++) {
@@ -1568,10 +1598,13 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
         const edge &this_edge = this_path.m_edges[eno];
 
         if (this_edge.is_straight())
-          path.line_to(this_edge.ap.x, this_edge.ap.y);
+          path.line_to(TWIPS_TO_PIXELS(this_edge.ap.x), 
+                       TWIPS_TO_PIXELS(this_edge.ap.y));
         else
-          path.curve3(this_edge.cp.x, this_edge.cp.y,
-                      this_edge.ap.x, this_edge.ap.y);
+          path.curve3(TWIPS_TO_PIXELS(this_edge.cp.x), 
+                      TWIPS_TO_PIXELS(this_edge.cp.y),
+                      TWIPS_TO_PIXELS(this_edge.ap.x), 
+                      TWIPS_TO_PIXELS(this_edge.ap.y));
         
       } // for edge
       

@@ -409,7 +409,6 @@ public:
   virtual void draw_shape_character(shape_character_def *def, 
     character *inst)
   {
-
     // check if the character needs to be rendered at all
     rect cur_bounds;
 
@@ -419,19 +418,17 @@ public:
     if (!bounds_in_clipping_area(cur_bounds))
     {
         return; // no need to draw
-    }
-      
+    }    
 
     // TODO: I don't like that there is a draw_shape_character() version with
     // arbitrary fill and line styles as this may break caching...
 
     // render the character
     draw_shape_character(def, 
-    inst->get_world_matrix(), 
-    inst->get_world_cxform(),
-    def->get_fill_styles(),
-    def->get_line_styles());
-
+        inst->get_world_matrix(), 
+        inst->get_world_cxform(),
+        def->get_fill_styles(),
+        def->get_line_styles());
   }
   
   /// \brief
