@@ -274,16 +274,24 @@ ret = r0.contains('1', '1');
 check_equals(typeof(ret), 'boolean');
 check_equals(ret, true);
 
-o1 = new Object(); o1.valueOf = function() { return 3; };
-o2 = new Object(); o2.valueOf = function() { return 2; };
+o1 = new Object(); o1.valueOf = function() { o1.valueOfCalls++; return 3; };
+o2 = new Object(); o2.valueOf = function() { o2.valueOfCalls++; return 2; };
+o1.valueOfCalls = o2.valueOfCalls = 0;
 ret = r0.contains(o1, o2);
 check_equals(typeof(ret), 'boolean');
 check_equals(ret, true);
+xcheck_equals(o1.valueOfCalls, 2); // *o1* <= r0.x && *o1* > r0.x+r0.width
+xcheck_equals(o2.valueOfCalls, 2); // *o2* <= r0.y && *o2* > r0.y+r0.height
 
-o1 = new Object(); o1.valueOf = function() { return undefined; };
-o2 = new Object(); o2.valueOf = function() { return 2; };
+o1 = new Object(); o1.valueOf = function() { o1.valueOfCalls++; return undefined; };
+o2 = new Object(); o2.valueOf = function() { o2.valueOfCalls++; return 2; };
+o1.valueOfCalls = o2.valueOfCalls = 0;
 ret = r0.contains(o1, o2);
 xcheck_equals(typeof(ret), 'undefined');
+xcheck_equals(o1.valueOfCalls, 2); // *o1* <= r0.x && *o1* > r0.x+r0.width
+// Test for Y is skipped, likely because
+// the test for X evaluated to undefined anyway
+xcheck_equals(o2.valueOfCalls, 0);
 
 o1 = new Object(); o1.valueOf = function() { return null; };
 o2 = new Object(); o2.valueOf = function() { return 2; };
@@ -407,6 +415,6 @@ check_equals(ret, true);
 // END OF TEST
 //-------------------------------------------------------------
 
-check_totals(141);
+check_totals(145);
 
 #endif // OUTPUT_VERSION >= 8
