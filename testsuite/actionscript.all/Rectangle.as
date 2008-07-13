@@ -280,8 +280,17 @@ o1.valueOfCalls = o2.valueOfCalls = 0;
 ret = r0.contains(o1, o2);
 check_equals(typeof(ret), 'boolean');
 check_equals(ret, true);
-xcheck_equals(o1.valueOfCalls, 2); // *o1* <= r0.x && *o1* > r0.x+r0.width
-xcheck_equals(o2.valueOfCalls, 2); // *o2* <= r0.y && *o2* > r0.y+r0.height
+xcheck_equals(o1.valueOfCalls, 2); // if ( *o1* < r0.x || *o1* >= r0.x+r0.width ) return false
+xcheck_equals(o2.valueOfCalls, 2); // if ( *o2* < r0.y || *o2* >= r0.y+r0.height ) return false
+
+o1 = new Object(); o1.valueOf = function() { o1.valueOfCalls++; return -1; };
+o2 = new Object(); o2.valueOf = function() { o2.valueOfCalls++; return 2; };
+o1.valueOfCalls = o2.valueOfCalls = 0;
+ret = r0.contains(o1, o2);
+check_equals(typeof(ret), 'boolean');
+check_equals(ret, false);
+check_equals(o1.valueOfCalls, 1); // if ( *o1* < r0.x || *o1* >= r0.x+r0.width ) return false
+xcheck_equals(o2.valueOfCalls, 0); // ... (false returned above)
 
 o1 = new Object(); o1.valueOf = function() { o1.valueOfCalls++; return undefined; };
 o2 = new Object(); o2.valueOf = function() { o2.valueOfCalls++; return 2; };
@@ -415,6 +424,6 @@ check_equals(ret, true);
 // END OF TEST
 //-------------------------------------------------------------
 
-check_totals(145);
+check_totals(149);
 
 #endif // OUTPUT_VERSION >= 8
