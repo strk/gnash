@@ -155,8 +155,10 @@ void
 sprite_instance::execute_actions(sprite_instance::ActionList& action_list)
 {
   // action_list may be changed due to actions (appended-to)
-  // this loop might be optimized by using an iterator
-  // and a final call to .clear() 
+  // This loop is probably quicker than using an iterator
+  // and a final call to .clear(), as repeated calls to
+  // .size() or .end() are no quicker (and probably slower)
+  // than pop_front(), which is constant time.
   while ( ! action_list.empty() )
   {
     const action_buffer* ab = action_list.front();
@@ -201,9 +203,8 @@ static as_value sprite_attach_movie(const fn_call& fn)
   if (fn.nargs < 3 || fn.nargs > 4)
   {
     IF_VERBOSE_ASCODING_ERRORS(
-    log_aserror(_("attachMovie called with wrong number of arguments"
-      " expected 3 to 4, got (%d) - returning undefined"),
-      fn.nargs);
+        log_aserror(_("attachMovie called with wrong number of arguments"
+          " expected 3 to 4, got (%d) - returning undefined"), fn.nargs);
     );
     return rv;
   }
@@ -236,6 +237,9 @@ static as_value sprite_attach_movie(const fn_call& fn)
   const std::string& newname = fn.arg(1).to_string();
 
   // should we support negative depths ? YES !
+  // TODO: What happens when the argument exceeds the max / min depth?
+  // Casting a number to an int that cannot represent that value is
+  // undefined behaviour. 
   int depth_val = boost::uint16_t(fn.arg(2).to_number());
 
   boost::intrusive_ptr<character> newch = exported_movie->create_character_instance(sprite.get(), depth_val);
