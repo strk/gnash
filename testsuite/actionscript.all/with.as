@@ -293,6 +293,7 @@ setTarget('/clip1/../clip3'); //tag 0x8B
     check_equals(testvar3, undefined);  
 setTarget("");
 
+#ifdef MING_SUPPORTS_ASM 
 // first understand getproperty 
 asm{   
     push  'checkpoint'   
@@ -393,6 +394,7 @@ with (o2)
 	check_equals(_target, "/clip1");
 	asm { push '' settargetexpr }; //setTarget("");
 }
+#endif // MING_SUPPORTS_ASM 
 
 // 
 // TODO: add tests for setTarget
@@ -400,6 +402,7 @@ with (o2)
 
 #endif  //OUTPUT_VERSION > 5
 
+#ifdef MING_SUPPORTS_ASM 
 //---------------------------------------------------------
 // Test with() inside user-defined function context
 //---------------------------------------------------------
@@ -500,6 +503,8 @@ asm {
 check_equals(typeof(checkpoint), "undefined");
 
 newFunc();
+
+#endif //MING_SUPPORTS_ASM 
 
 //---------------------------------------------------------
 // Test with(movieclip) 

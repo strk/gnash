@@ -353,6 +353,7 @@ check_equals(z, y);
 // String comparison (ACTION_STRINGCOMPARE : 0x29)
 //------------------------------------------------
 
+#ifdef MING_SUPPORTS_ASM 
 asm {
 	push "z", undefined, null
 	stringlessthan setvariable
@@ -388,6 +389,7 @@ asm {
 };
 check_equals(typeof(z), 'boolean');
 check(!z);
+#endif
 
 // TODO: add saner tests for stringcompare here
 

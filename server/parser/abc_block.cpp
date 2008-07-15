@@ -18,6 +18,7 @@
 // The AS3 abc block format reader.
 //
 
+#include "gnashconfig.h"
 #include "abc_block.h"
 #include "stream.h" // for use
 #include "VM.h"

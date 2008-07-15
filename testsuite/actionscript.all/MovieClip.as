@@ -1509,6 +1509,7 @@ check_equals(setCalls, 0);
 mc.x = 10; // sets the property, but doesn't call the setter !
 check_equals(getCalls, 1); // assignment did call the getter 
 check_equals(setCalls, 0);
+#ifdef MING_SUPPORTS_ASM
 asm {
 	push 'propinspect'
 	push 'mc'
@@ -1518,6 +1519,7 @@ asm {
 };
 // setMember did set the prop, didn't call the setter
 xcheck_equals(propinspect, 20);
+#endif //MING_SUPPORTS_ASM
 
 createEmptyMovieClip('mc', 10);
 mc._x = 1;
@@ -1531,6 +1533,7 @@ check_equals(setCalls, 0);
 mc.x = 10; // does NOT set the property, but doesn't call the setter !
 check_equals(getCalls, 1); // assignment did call the getter 
 check_equals(setCalls, 0);
+#ifdef MING_SUPPORTS_ASM
 asm {
 	push 'propinspect'
 	push 'mc'
@@ -1540,6 +1543,7 @@ asm {
 };
 // setMember did NOT set the prop, didn't call the setter
 check_equals(propinspect, 0);
+#endif //MING_SUPPORTS_ASM
 
 
 #endif // OUTPUT_VERSION > 5

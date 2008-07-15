@@ -375,6 +375,7 @@ check_equals (ord("Ϧ"), 207);
 //-------------------------------------------
 // Mbchr and mbord
 //-------------------------------------------
+#ifdef MING_SUPPORTS_ASM
 
 // All versions, especially 5:
 var c;
@@ -449,6 +450,7 @@ check_equals (typeof(c), "string");
 // c == "" fails, but when displayed it evaluates to the empty string
 #endif
 
+#endif //MING_SUPPORTS_ASM 
 //-------------------------------------------
 // Check multi-byte chars with all string
 // functions
