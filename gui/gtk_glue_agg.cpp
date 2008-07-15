@@ -553,8 +553,9 @@ GtkAggGlue::render(int minx, int miny, int maxx, int maxy)
 void
 GtkAggGlue::configure(GtkWidget *const /*widget*/, GdkEventConfigure *const event)
 {
-	if (_agg_renderer)
-		setRenderHandlerSize(event->width, event->height);
+    if (_agg_renderer) {
+        setRenderHandlerSize(event->width, event->height);
+    }
 }
 
 
