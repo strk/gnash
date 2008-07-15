@@ -14,3 +14,12 @@ gnashconfig.h.in
 libltdl
 ltmain.sh
 po/*.gmo
+testsuite/swfdec/run_swfdec_testsuite_*
+site.exp
+ete.exp.bak
+testrun.log
+testrun.sum
+testsuite/swfdec/*.log
+testsuite/swfdec/*.out
+testsuite/swfdec/*.err
+testsuite/swfdec/*.trace-gnash
