@@ -83,8 +83,6 @@ RTMPClient::encodeConnect(const char *app, const char *swfUrl, const char *tcUrl
     connect.makeString("connect");
 
     Element connum;
-//     const char *connumStr = "00 00 00 00 00 00 f0 3f";
-//     Buffer *connumBuf = hex2mem(connumStr);
     // update the counter for the number of connections. This number is used heavily
     // in RTMP to help keep communications clear when there are multiple streams.
     _connections++;
@@ -194,11 +192,23 @@ RTMPClient::encodeStream(double id)
     if (!buf) {
 	return 0;
     }
+
+    // Set the NULL object element that follows the stream ID
+    Element null;
+    null.makeNull();
+    Buffer *nullobj = null.encode();    
+    if (!nullobj) {
+	return 0;
+    }
+
     buf->append(strobj);
     buf->append(numobj);
+    buf->append(nullobj);
 
     delete strobj;
     delete numobj;
+    delete nullobj;
+    
     return buf;
 }
 
@@ -299,6 +309,7 @@ RTMPClient::encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string
     // 8 bytes apiece.
     pktsize += (sizeof(double) * 2) + 2;
     Buffer *buf = new Buffer(pktsize);
+    buf->clear();
 //    Buffer *buf = new Buffer;
     
     if (!buf) {

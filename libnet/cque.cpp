@@ -93,7 +93,7 @@ CQue::size()
 bool
 CQue::push(amf::Buffer *data)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     boost::mutex::scoped_lock lock(_mutex);
     _que.push_back(data);
 #ifdef USE_STATS_QUEUE

@@ -196,16 +196,12 @@ private:
 
     /// The state of the log file.
     FileState _state;
-
     bool		 _stamp;
 
     /// Whether to write the log file to disk.
     bool		 _write;
-
     std::string _filespec;
-
-    std::string _logFilename;
-    
+    std::string _logFilename;    
     logListener _listener;
 
 };

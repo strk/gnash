@@ -142,7 +142,7 @@ VideoDecoderFfmpeg::convertRGB24(AVCodecContext* srcCtx,
 
   avpicture_fill(&picture, buffer, PIX_FMT_RGB24, width, height);
 
-#ifdef HAVE_SWSCALE_H
+#ifndef HAVE_SWSCALE_H
   img_convert(&picture, PIX_FMT_RGB24, (AVPicture*) &srcFrame,
       srcCtx->pix_fmt, width, height);
 #else

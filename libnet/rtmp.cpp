@@ -32,6 +32,7 @@
 #include "log.h"
 #include "amf.h"
 #include "rtmp.h"
+#include "cque.h"
 #include "network.h"
 #include "element.h"
 #include "handler.h"
@@ -44,6 +45,8 @@ using namespace amf;
 
 namespace gnash
 {
+
+CQue incoming;
 
 extern map<int, Handler *> handlers;
 
@@ -185,10 +188,13 @@ RTMP::~RTMP()
     _variables.clear();
     if (_handshake) {
 	delete _handshake;
+	_handshake = 0;
     }
     if (_handler) {
 	delete _handler;
+	_handler = 0;
     }
+    
 //    delete _body;
 }
 
@@ -267,7 +273,9 @@ RTMP::decodeHeader(Network::byte_t *in)
         _header.type = *(content_types_e *)tmpptr;
 //        _header.bodysize = sizeof(boost::uint16_t) * 2;
         tmpptr++;
-        log_debug(_("The type is: %s"), content_str[_header.type]);
+	if (_header.type <= RTMP::INVOKE ) {
+	    log_debug(_("The type is: %s"), content_str[_header.type]);
+	}
     }
 
 //     switch(_header.type) {
@@ -794,19 +802,19 @@ RTMP::decodeInvoke()
 // interval. (128 bytes for video data). Each message main contain
 // multiple packets.
 bool
-RTMP::sendMsg(amf::Buffer *buf)
+RTMP::sendMsg(amf::Buffer *data)
 {
     GNASH_REPORT_FUNCTION;
 
     size_t partial = RTMP_VIDEO_PACKET_SIZE;
     size_t nbytes = 0;
     Network::byte_t header = 0xc3;
-
-    while (nbytes <= buf->size()) {
-	if ((buf->size() - nbytes) < static_cast<signed int>(RTMP_VIDEO_PACKET_SIZE)) {
-	    partial = buf->size() - nbytes;
+    
+    while (nbytes <= data->size()) {
+	if ((data->size() - nbytes) < static_cast<signed int>(RTMP_VIDEO_PACKET_SIZE)) {
+	    partial = data->size() - nbytes;
 	}    
-	writeNet(buf->reference() + nbytes, partial);
+	writeNet(data->reference() + nbytes, partial);
 	if (partial == static_cast<signed int>(RTMP_VIDEO_PACKET_SIZE)) {
 	    writeNet(&header, 1);
 	}
@@ -825,77 +833,130 @@ RTMP::sendRecvMsg(int amf_index, rtmp_headersize_e head_size,
 //    size_t total_size = buf2->size() - 6; // FIXME: why drop 6 bytes ?
     Buffer *head = encodeHeader(amf_index, head_size, total_size,
 				type, routing);
+//    int ret = 0;
     int ret = writeNet(head);
-//     if (netDebug()) {
-//         cerr << __FUNCTION__ << ": " <<__LINE__ << ": " << hexify(head->reference(), headerSize(head_size), false) << endl;
-//     }
-
-    ret = sendMsg(bufin);
     if (netDebug()) {
-        cerr << __FUNCTION__ << ": " << __LINE__ << ": " << hexify(head->reference(), headerSize(head_size), false) << hexify(bufin->reference(), ret, true) << endl;
+	head->dump();
+	bufin->dump();
     }
+    delete head;
+    ret = sendMsg(bufin);
 
-    Buffer buf;
-    ret = readNet(&buf, 5);
-    if (ret < 0) {
-	log_error("Never got any data!");
+    Buffer *buf;
+    do {
+	buf = new Buffer;
+//	int left = 0;
+//	ret = readNet(buf->reference() + left, buf->size() - left, 5);	// timeout in 5 seconds
+	ret = readNet(buf, 1);	// timeout in 1 second
+	if (ret <= 0) {
+//	    log_error("Never got any data at line %d", __LINE__);
+	    break;
+	}
+	if ((ret == 1) && (*(buf->reference()) == 0xff)) {
+	    log_debug("Got an empty packet from the server for msg %s, at line %d",
+		      content_str[type], __LINE__);
+	    delete buf;
+	    continue;
+	}
+	buf->resize(ret);
+	incoming.push(buf);
+//	left += ret;
+    } while (ret > 0);
+    log_debug("Done reading network data");
+    
+    RTMP::rtmp_head_t *rthead;
+//    rthead = decodeHeader(buf);
+    Element *el = 0;
+    log_error("Processing %d buffers in the queue", incoming.size());
+    if (incoming.size() == 0) {
 	return 0;
     }
-    if ((ret == 1) && (*buf.reference() == 0xff)) {
-	log_error("Got an error from the server sending object of type %s",
-		  content_str[type]);
-	ret = readNet(&buf, 5);	
-	if (ret < 0) {
-	    log_error("Never got any data!");
-	    return 0;
-	}
-	if ((ret == 1) && (*buf.reference() == 0xff)) {
-	    cerr << __FUNCTION__ << ": " << __LINE__ << ": " <<
-		hexify(buf.reference(), buf.size(), false) << endl;
-	    log_error("Got an error from the server sending object of type %s",
-		      content_str[type]);
-//	exit(-1);
-	}
-    }
-
-    RTMP::rtmp_head_t *rthead = decodeHeader(&buf);
-
-    RTMPMsg *msg;
-    if (rthead) {
-	if (rthead->head_size == 1) {
-	    log_debug("Response header: %s", hexify(buf.reference(),
-						    7, false));
-	} else {
-	    log_debug("Response header: %s", hexify(buf.reference(),
-						    rthead->head_size, false));
-	}
-	if (rthead->type == RTMP::PING) {
-	    RTMP::rtmp_ping_t *ping = decodePing(buf.reference());
-	    log_debug("FIXME: Ping type is: %d, ignored for now", ping->type);
-	} else if (rthead->type != RTMP::PING) {
-	    msg = decodeMsgBody(buf.reference() + rthead->head_size, rthead->bodysize);
-	    if (msg) {
-		log_debug("%s: Msg status is: %d: %s", __FUNCTION__,
-			  msg->getStatus(), status_str[msg->getStatus()]);
+    incoming.dump();
+    while (incoming.size() > 0) {
+	buf = incoming.pop();
+	rthead = decodeHeader(buf);
+	
+	RTMPMsg *msg;
+	if (rthead) {
+	    if (rthead->head_size == 1) {
+		log_debug("Response header: %s", hexify(buf->reference(),
+							7, false));
 	    } else {
-		log_error("Couldn't decode message body for type %s!",
-			  content_str[rthead->type]);
+		log_debug("Response header: %s", hexify(buf->reference(),
+							rthead->head_size, false));
 	    }
-	} else {
-	    log_error("Couldn't decode message header for type %s!",
-		      content_str[type]);
+	    if (rthead->type <= RTMP::INVOKE) {
+		log_error("Processing message of type %s!", content_str[rthead->type]);
+	    }
+	    
+	    switch (rthead->type) {
+	      case CHUNK_SIZE:
+//		  decodeChunkSize();
+		  break;
+	      case BYTES_READ:
+//		  decodeBytesRead();
+		  break;
+	      case PING:
+	      {
+ 		  RTMP::rtmp_ping_t *ping = decodePing(buf->reference());
+ 		  log_debug("FIXME: Ping type is: %d, ignored for now", ping->type);
+		  switch (ping->type) {
+		    case PING_CLEAR:
+			break;
+		    case PING_PLAY:
+			break;
+		    case PING_TIME:
+			break;
+		    case PING_RESET:
+			break;
+		    case PING_CLIENT:
+			break;
+		    case PONG_CLIENT:
+			break;
+		    default:
+			break;
+		  };
+		  break;
+	      }
+	      case SERVER:
+//		  decodeServer();
+		  break;
+	      case CLIENT:
+//		  decodeClient();
+		  break;
+	      case VIDEO_DATA:
+//		  decodeVideoData();
+		  break;
+	      case NOTIFY:
+//		  decodeNotify();
+		  break;
+	      case SHARED_OBJ:
+//		  decodeSharedObj();
+		  break;
+	      case INVOKE:
+		  msg = decodeMsgBody(buf->reference() + rthead->head_size, rthead->bodysize);
+		  if (msg) {
+		      log_debug("%s: Msg status is: %d: %s", __FUNCTION__,
+				msg->getStatus(), status_str[msg->getStatus()]);
+		      el = new Element;
+		      el->init(buf->reference());
+		      return el;
+		  } else {
+		      log_error("Couldn't decode message body for type %s!",
+				content_str[rthead->type]);
+		  }
+//		  decodeInvoke();
+		  break;
+	      case AUDIO_DATA:	  
+//		  decodeAudioData();
+		  break;
+	      default:
+		  break;
+	    } // end of switch
 	}
     }
     
-    
-//    Element *el = new Element;  
-//    el.
-    
-    if (rthead->bodysize < ret) {
-	log_debug("more bytes left to read ! %d", (rthead->bodysize < ret));
-    }
-    
-    return 0;
+    return el;
 }
 
 } // end of gnash namespace

@@ -85,6 +85,7 @@ Gui::Gui() :
     _fullscreen(false),
     _mouseShown(true),
     _maxAdvances(0),
+    _advances(0),
     _xscale(1.0f),
     _yscale(1.0f),
     _xoffset(0),
@@ -126,6 +127,7 @@ Gui::Gui(unsigned long xid, float scale, bool loop, unsigned int depth)
     _fullscreen(false),
     _mouseShown(true),
     _maxAdvances(0),
+    _advances(0),
     _xscale(scale),
     _yscale(scale),
     _xoffset(0), // TODO: x and y offset will need update !
@@ -903,7 +905,6 @@ Gui::start()
 bool
 Gui::advanceMovie()
 {
-    static unsigned long advances = 0;
 
 	if ( isStopped() ) return true;
 
@@ -991,7 +992,7 @@ Gui::advanceMovie()
 	}
 
     /// Quit if we've reached the advance limit.
-    if (_maxAdvances && (advances++ > _maxAdvances))
+    if (_maxAdvances && (_advances++ > _maxAdvances))
     {
         quit();
     }

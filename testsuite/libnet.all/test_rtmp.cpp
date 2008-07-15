@@ -312,6 +312,17 @@ test_header()
          runtest.fail("Encoded RTMP header(size 1)");
      }
      
+     Buffer *buf5 = hex2mem("43 00 00 00 00 00 19 14");
+     Buffer *head5 = server.encodeHeader(0x3, RTMP::HEADER_8, 0x19, RTMP::INVOKE,
+                                         RTMPMsg::FROM_CLIENT);
+//     head5->dump();
+//     cerr << hexify(head5->begin(), 8, false) << endl;
+     if ((memcmp(buf5->reference(), head5->reference(), 8) == 0)) {
+         runtest.pass("Encoded RTMP header(size 8)");
+     } else {
+         runtest.fail("Encoded RTMP header(size 8)");
+     }
+     
      // cleanup after ourselves
      delete buf1;
      delete buf2;

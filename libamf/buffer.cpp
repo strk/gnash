@@ -521,6 +521,7 @@ void
 Buffer::dump()
 {
     cerr << "Buffer is " << _nbytes << " bytes at " << (void *)_ptr << endl;
+    cerr << gnash::hexify((unsigned char *)_ptr, _nbytes, false) << endl;
     cerr << gnash::hexify((unsigned char *)_ptr, _nbytes, true) << endl;
 }
 

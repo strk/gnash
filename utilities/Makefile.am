@@ -40,13 +40,13 @@ AM_LDFLAGS = \
 	$(CURL_LIBS) \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
+	$(LIBINTL) \
 	$(NULL)
 
 localedir = $(datadir)/locale
 
 #AM_CPPFLAGS = # -Wall
-AM_CPPFLAGS = -I.. \
-        -I$(top_srcdir)	\
+AM_CPPFLAGS = \
         -I$(top_srcdir)/libgeometry \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/libnet \
@@ -90,21 +90,18 @@ bin_PROGRAMS = gprocessor soldumper dumpshm rtmpget
 gprocessor_SOURCES = processor.cpp
 gprocessor_CPPFLAGS = $(AM_CPPFLAGS)
 # export our symbols so they can be used by Gnash plugins
-gprocessor_LDFLAGS = -export-dynamic $(LIBLTDL)
-gprocessor_LDADD = $(GNASH_LIBS) # $(AM_LDFLAGS)
+gprocessor_LDFLAGS = -export-dynamic $(AM_LDFLAGS)
+gprocessor_LDADD = $(GNASH_LIBS) 
 #gprocessor_DEPENDENCIES = 
 
-# Manipulate the shared memory segments of LocalConnection
 dumpshm_SOURCES = dumpshm.cpp
-dumpshm_LDADD = $(GNASH_LIBS) # $(AM_LDFLAGS)
+dumpshm_LDADD = $(GNASH_LIBS)
 
-# Download files via rtmp
 rtmpget_SOURCES = rtmpget.cpp
-rtmpget_LDADD = $(GNASH_LIBS) # $(AM_LDFLAGS)
+rtmpget_LDADD = $(GNASH_LIBS)
 
-# Manipulate Local Shared Object files
 soldumper_SOURCES = soldumper.cpp
-soldumper_LDADD = $(GNASH_LIBS) # $(AM_LDFLAGS)
+soldumper_LDADD = $(GNASH_LIBS)
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:

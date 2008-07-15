@@ -273,7 +273,7 @@ public:
     // may be broken down into a series of packets on a regular byte
     // interval. (128 bytes for video data). Each message main contain
     // multiple packets.
-    bool sendMsg(amf::Buffer *buf);
+    bool sendMsg(amf::Buffer *data);
     
     // Send a Msg, and expect a response back of some kind.
     amf::Element *sendRecvMsg(int amf_index, rtmp_headersize_e head_size,
