@@ -311,7 +311,10 @@ test_header()
      } else {
          runtest.fail("Encoded RTMP header(size 1)");
      }
-     
+
+// 43 00 00 00 00 00 15 14 02 00 08 6f 6e 42 57 44    onBWDone
+// 6f 6e 65 00 40 00 00 00 00 00 00 00 05
+
      Buffer *buf5 = hex2mem("43 00 00 00 00 00 19 14");
      Buffer *head5 = server.encodeHeader(0x3, RTMP::HEADER_8, 0x19, RTMP::INVOKE,
                                          RTMPMsg::FROM_CLIENT);
@@ -322,6 +325,14 @@ test_header()
      } else {
          runtest.fail("Encoded RTMP header(size 8)");
      }
+     RTMP::rtmp_head_t *header3 = client.decodeHeader(buf5);
+     if ((header3->channel == 0x3) && (header3->head_size == 8)
+         && (header3->bodysize == 0x19) && (header3->type ==  RTMP::INVOKE)) {
+         runtest.pass("Decoded RTMP header(size 8)");
+     } else {
+         runtest.fail("Decoded RTMP header(size 8)");
+     }
+
      
      // cleanup after ourselves
      delete buf1;
