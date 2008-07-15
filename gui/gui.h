@@ -441,6 +441,9 @@ protected:
 
     // Maximum number of advances before exit; 0 for no limit.
     unsigned long _maxAdvances;
+    
+    /// Counter to keep track of frame advances
+    unsigned long _advances;
 
     /// Called by Gui::stop().  This can be used by GUIs to implement pause
     /// widgets (so that resuming a stopped animation is more user-friendly)
