@@ -544,14 +544,14 @@ character::rotation_getset(const fn_call& fn)
 	{
 		double  angle = ptr->get_matrix().get_rotation();
         // convert radian to degree
-		angle *= 180.0 / M_PI;
+		angle *= 180.0 / PI;
 		rv = as_value(angle);
 	}
 	else // setter
 	{
 		matrix m = ptr->get_matrix();
 		// input is in degrees
-		double  rotation = fn.arg(0).to_number() * M_PI / 180.0;
+		double  rotation = fn.arg(0).to_number() * PI / 180.0;
 		m.set_rotation(rotation);
 
 		ptr->set_matrix(m);
