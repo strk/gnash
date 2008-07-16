@@ -5,8 +5,8 @@
 
 // Handy image utilities for RGB surfaces.
 
-#ifndef IMAGE_H
-#define IMAGE_H
+#ifndef GNASH_IMAGE_H
+#define GNASH_IMAGE_H
 
 #include "dsodefs.h"
 #include <boost/cstdint.hpp>
@@ -20,6 +20,8 @@ namespace gnash { class IOChannel; }
 
 
 /// Handy image utilities for RGB surfaces.
+namespace gnash
+{
 namespace image
 {
 	/// Base class for different types of images
@@ -112,15 +114,6 @@ namespace image
 		virtual ~image_base() {}
 
 
-		/// \brief
-		/// Fast, in-place resample.  For making mip-maps.  Munges the
-		/// input image to produce the output image.
-		//
-		/// @return true if resample happened, false otherwise
-		///         (image can't be shrinked, for example)
-		///
-		virtual bool make_next_miplevel() { return false; }
-
 	protected:
 
 		/// Size of image buffer in bytes
@@ -171,8 +164,6 @@ namespace image
 
 		~rgb();
 
-		// See dox in base class
-		bool make_next_miplevel();
 	};
 
 	/// 32-bit RGBA image.  Packed data, red byte first (RGBARGBA...)
@@ -208,8 +199,6 @@ namespace image
 		///
 		void	set_alpha(size_t x, size_t y, boost::uint8_t a);
 
-		// See dox in base class
-		bool make_next_miplevel();
 	};
 
 	/// 8-bit alpha image.
@@ -229,9 +218,6 @@ namespace image
 		}
 
 		~alpha();
-
-		// See dox in base class
-		bool make_next_miplevel();
 
 		/// Set pixel value 
 		//
@@ -335,8 +321,9 @@ public:
 	/// For reading SWF JPEG3-style image data, like ordinary JPEG, 
 	/// but stores the data in rgba format.
 	DSOEXPORT rgba*	read_swf_jpeg3(gnash::IOChannel* in);
-}
 
+} // namespace image
+} // namespace gnash
 
 #endif // IMAGE_H
 

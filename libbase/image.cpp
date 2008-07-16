@@ -16,6 +16,8 @@
 #include <memory>		// for auto_ptr
 #include <boost/scoped_array.hpp>
 
+namespace gnash
+{
 namespace image
 {
 	//
@@ -96,64 +98,6 @@ namespace image
 		return new rgb(width, height);
 	}
 
-	bool rgb::make_next_miplevel()
-	{
-		assert(m_data.get());
-		assert(m_type == RGB);
-
-		size_t imWidth = m_width;
-		size_t imHeight = m_height;
-
-		size_t new_w = imWidth >> 1;
-		size_t new_h = imHeight >> 1;
-		if (new_w < 1) new_w = 1;
-		if (new_h < 1) new_h = 1;
-
-		if (new_w * 2 != imWidth  || new_h * 2 != imHeight)
-		{
-			// Image can't be shrunk along (at least) one
-			// of its dimensions, so don't bother
-			// resampling.  Technically we should, but
-			// it's pretty useless at this point.  Just
-			// change the image dimensions and leave the
-			// existing pixels.
-			return false;
-		}
-
-		size_t new_pitch = new_w * 3;
-
-		// Round pitch up to the nearest 4-byte boundary.
-		new_pitch = (new_pitch + 3) & ~3;
-
-		// Resample.  Simple average 2x2 --> 1, in-place.
-		size_t	pitch = m_pitch;
-		for (size_t j = 0; j < new_h; j++) {
-			boost::uint8_t*	out = m_data.get() + j * new_pitch;
-			boost::uint8_t*	in = m_data.get() + (j << 1) * pitch;
-			for (size_t i = 0; i < new_w; i++) {
-				int	r, g, b;
-				r = (*(in + 0) + *(in + 3) + *(in + 0 + pitch) + *(in + 3 + pitch));
-				g = (*(in + 1) + *(in + 4) + *(in + 1 + pitch) + *(in + 4 + pitch));
-				b = (*(in + 2) + *(in + 5) + *(in + 2 + pitch) + *(in + 5 + pitch));
-				*(out + 0) = r >> 2;
-				*(out + 1) = g >> 2;
-				*(out + 2) = b >> 2;
-				out += 3;
-				in += 6;
-			}
-		}
-
-		// Munge image's members to reflect the shrunken image.
-		m_width = new_w;
-		m_height = new_h;
-		m_pitch = new_pitch;
-		m_size = m_height*m_pitch;
-
-		assert(m_pitch >= m_width);
-
-		return true;
-	}
-
 
 
 
@@ -211,59 +155,6 @@ namespace image
 		data[3] = a;
 	}
 
-	bool	rgba::make_next_miplevel()
-	{
-		assert(m_data.get());
-		assert(m_type == RGBA);
-
-		size_t	new_w = m_width >> 1;
-		size_t	new_h = m_height >> 1;
-		if (new_w < 1) new_w = 1;
-		if (new_h < 1) new_h = 1;
-
-		if (new_w * 2 != m_width  || new_h * 2 != m_height)
-		{
-			// Image can't be shrunk along (at least) one
-			// of its dimensions, so don't bother
-			// resampling.  Technically we should, but
-			// it's pretty useless at this point.  Just
-			// change the image dimensions and leave the
-			// existing pixels.
-			return false;
-		}
-
-		size_t	new_pitch = new_w * 4;
-
-		// Resample.  Simple average 2x2 --> 1, in-place.
-		size_t	pitch = m_pitch;
-		for (size_t j = 0; j < new_h; j++) {
-			boost::uint8_t*	out = ((boost::uint8_t*) m_data.get()) + j * new_pitch;
-			boost::uint8_t*	in = ((boost::uint8_t*) m_data.get()) + (j << 1) * pitch;
-			for (size_t i = 0; i < new_w; i++) {
-				int	r, g, b, a;
-				r = (*(in + 0) + *(in + 4) + *(in + 0 + pitch) + *(in + 4 + pitch));
-				g = (*(in + 1) + *(in + 5) + *(in + 1 + pitch) + *(in + 5 + pitch));
-				b = (*(in + 2) + *(in + 6) + *(in + 2 + pitch) + *(in + 6 + pitch));
-				a = (*(in + 3) + *(in + 7) + *(in + 3 + pitch) + *(in + 7 + pitch));
-				*(out + 0) = r >> 2;
-				*(out + 1) = g >> 2;
-				*(out + 2) = b >> 2;
-				*(out + 3) = a >> 2;
-				out += 4;
-				in += 8;
-			}
-		}
-
-		// Munge image's members to reflect the shrunken image.
-		m_width = new_w;
-		m_height = new_h;
-		m_pitch = new_pitch;
-		m_size = m_height*m_pitch;
-
-		assert(m_pitch >= m_width);
-
-		return true;
-	}
 
 	//
 	// alpha
@@ -290,64 +181,6 @@ namespace image
 
 	alpha::~alpha()
 	{
-	}
-
-	bool alpha::make_next_miplevel()
-	{
-		assert(m_data.get());
-		assert(m_type == ALPHA);
-
-		size_t	new_w = m_width >> 1;
-		size_t	new_h = m_height >> 1;
-		if (new_w < 1) new_w = 1;
-		if (new_h < 1) new_h = 1;
-
-		if (new_w * 2 != m_width || new_h * 2 != m_height)
-		{
-			// Image can't be shrunk along (at least) one
-			// of its dimensions, so don't bother
-			// resampling.	Technically we should, but
-			// it's pretty useless at this point.  Just
-			// change the image dimensions and leave the
-			// existing pixels.
-			return false;
-		}
-
-		// Resample.  Simple average 2x2 --> 1, in-place.
-		for (size_t j = 0; j < new_h; j++)
-		{
-			boost::uint8_t* out = m_data.get() + j * new_w;
-			boost::uint8_t* in = m_data.get() + (j << 1) * m_width;
-			for (size_t i = 0; i < new_w; i++)
-			{
-				int	a;
-				a = (*(in + 0) + *(in + 1) + *(in + 0 + m_width) + *(in + 1 + m_width));
-				*(out) = a >> 2;
-				out++;
-				in += 2;
-			}
-		}
-
-		// Munge parameters to reflect the shrunken image.
-		m_width = m_pitch = new_w;
-		m_height = new_h;
-		m_size = m_height*m_pitch;
-
-		assert(m_pitch >= m_width);
-
-		return true;
-	}
-
-
-	void	alpha::set_pixel(size_t x, size_t y, boost::uint8_t a)
-	// Set the pixel at the given position.
-	{
-		assert(x < m_width);
-		assert(y < m_height);
-
-		boost::uint8_t*	data = scanline(y) + x;
-
-		data[0] = a;
 	}
 
 
@@ -596,8 +429,8 @@ namespace image
 		}
 	}
 
-}
-
+} // namespace image
+} // namespace gnash
 
 // Local Variables:
 // mode: C++

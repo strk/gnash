@@ -29,9 +29,12 @@
 #include <cassert>
 #include <memory> // for auto_ptr
 
+
+namespace gnash {
 namespace image {
 	class rgba;
 	class rgb;
+}
 }
 
 namespace gnash {
