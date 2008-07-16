@@ -1049,9 +1049,10 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
       std::vector<path>& paths_out, const matrix &source_mat) 
 {
 
-    matrix mat = stage_matrix;
+    matrix mat;
     // make sure paths_out is also in TWIPS to keep accuracy.
     mat.concatenate_scale(20.0,  20.0);
+    mat.concatenate(stage_matrix);
     mat.concatenate(source_mat);
 
     size_t pcnt = paths_in.size();
