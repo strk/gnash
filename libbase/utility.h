@@ -55,40 +55,6 @@
 // (http://www.jaggersoft.com) for this trick.
 #define compiler_assert(x)	switch(0){case 0: case x:;}
 
-
-//
-// new/delete wackiness -- if USE_DL_MALLOC is defined, we're going to
-// try to use Doug Lea's malloc as much as possible by overriding the
-// default operator new/delete.
-//
-#ifdef USE_DL_MALLOC
-
-void*	operator new(size_t size);
-void	operator delete(void* ptr);
-void*	operator new[](size_t size);
-void	operator delete[](void* ptr);
-
-#else	// not USE_DL_MALLOC
-
-// If we're not using DL_MALLOC, then *really* don't use it: #define
-// away dlmalloc(), dlfree(), etc, back to the platform defaults.
-#define dlmalloc	malloc
-#define dlfree	free
-#define dlrealloc	realloc
-#define dlcalloc	calloc
-#define dlmemalign	memalign
-#define dlvalloc	valloc
-#define dlpvalloc	pvalloc
-#define dlmalloc_trim	malloc_trim
-#define dlmalloc_stats	malloc_stats
-
-#endif	// not USE_DL_MALLOC
-
-
-#ifndef M_PI
-    #define M_PI 3.14159265359 
-#endif // M_PI
-
 // Define this to enable fast float&double to uint32 conversion.
 // If the behaviour is undefined when overflow occurs with your 
 // compiler, disable this macro.
@@ -101,6 +67,12 @@ void	operator delete[](void* ptr);
 // come from.
 
 namespace gnash {
+
+// Pi is pi; using an eventual built-in pi constant has no
+// conceivable advantage, so we use this one. Make it as
+// accurate as you like.
+static const double PI = 3.14159265359;
+
 namespace utility {
 
 inline bool isFinite(double d)
@@ -193,7 +165,26 @@ inline boost::int32_t Fixed16Mul(boost::int32_t a, boost::int32_t b)
     return static_cast<boost::int32_t>((static_cast<boost::int64_t>(a) * static_cast<boost::int64_t>(b) + 0x8000) >> 16);
 }
 
+/// Return (unmangled) name of this instance type
+template <class T>
+std::string typeName(const T& inst)
+{
+	std::string typeName = typeid(inst).name();
+#if defined(__GNUC__) && __GNUC__ > 2
+	int status;
+	char* typeNameUnmangled = 
+		abi::__cxa_demangle (typeName.c_str(), NULL, NULL,
+				     &status);
+	if (status == 0)
+	{
+		typeName = typeNameUnmangled;
+		free(typeNameUnmangled);
+	}
+#endif // __GNUC__ > 2
+	return typeName;
 }
+
+} // namespace gnash
 
 /// \brief
 /// Return the smallest multiple of given base greater or equal
@@ -269,28 +260,6 @@ inline size_t bernstein_hash_case_insensitive(const void* data_in, int size, uns
 	// for bytes { h = (h << 16) + (h << 6) - hash + *p; }
 
 	return h;
-}
-
-/// Dump the internal statistics from malloc() so we can track memory leaks
-void dump_memory_stats(const char *from, int line, const char *label);
-
-/// Return (unmangled) name of this instance type
-template <class T>
-std::string typeName(const T& inst)
-{
-	std::string typeName = typeid(inst).name();
-#if defined(__GNUC__) && __GNUC__ > 2
-	int status;
-	char* typeNameUnmangled = 
-		abi::__cxa_demangle (typeName.c_str(), NULL, NULL,
-				     &status);
-	if (status == 0)
-	{
-		typeName = typeNameUnmangled;
-		free(typeNameUnmangled);
-	}
-#endif // __GNUC__ > 2
-	return typeName;
 }
 
 #ifdef HAVE_PTHREADS
