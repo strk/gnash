@@ -229,7 +229,7 @@ FreetypeGlyphsProvider::draw_bitmap(const FT_Bitmap& bitmap)
 	int	w = 1; while (w < bitmap.pitch) { w <<= 1; }
 	int	h = 1; while (h < bitmap.rows)  { h <<= 1; }
 
-	std::auto_ptr<image::alpha> alpha ( image::create_alpha(w, h) );
+	std::auto_ptr<image::alpha> alpha ( new image::alpha(w, h) );
 
 	alpha->clear(0);
 
