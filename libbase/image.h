@@ -44,15 +44,13 @@ namespace image
 			:
 			m_type(o.m_type),
 			m_size(o.size()),
-			m_data(new boost::uint8_t[m_size]),
 			m_width(o.width()),
 			m_height(o.height()),
-			m_pitch(o.m_pitch)
+			m_pitch(o.m_pitch),
+			m_data(new boost::uint8_t[m_size])
 		{
 			update(o);
 		}
-		
-			
 			
 		image_base(boost::uint8_t *data, int width, int height, int pitch, id_image type);
 
@@ -66,19 +64,19 @@ namespace image
 		size_t size() const { return m_size; }
 
 		/// Return size in bytes of a row of this image 
-		size_t pitch() const { return m_pitch; }
+		const size_t pitch() const { return m_pitch; }
 
 		/// Return size in bytes of a single pixel value
-		size_t pixelSize() const
+		const size_t pixelSize() const
 		{
-			return m_pitch/m_width;
+			return m_pitch / m_width;
 		}
 
 		/// Return width of image in pixels
-		size_t width() const { return m_width; }
+		const size_t width() const { return m_width; }
 
 		/// Return height of image in pixels
-		size_t height() const { return m_height; }
+		const size_t height() const { return m_height; }
 
 		/// Copy image data from a buffer.
 		//
@@ -98,6 +96,8 @@ namespace image
 		/// @param from image to copy data from.
 		///
 		void update(const image_base& from);
+		
+		void clear(const boost::uint8_t byteValue = 0);
 
 		/// Return a pointer to the underlying data
 		virtual boost::uint8_t* data() { return m_data.get(); }
@@ -116,17 +116,15 @@ namespace image
 
 	protected:
 
-		/// Size of image buffer in bytes
+		/// Size of image buffer in bytes. YUV has to adjust this, so
+		/// it can't be const.
 		size_t m_size;
 
-		/// Data bytes, geometry defined by members below
-		boost::scoped_array<boost::uint8_t> m_data;
-
 		/// Width of image, in pixels
-		size_t	m_width;
+		const size_t m_width;
 
 		/// Height of image, in pixels
-		size_t	m_height;
+		const size_t m_height;
 
 		/// Byte offset from one row to the next
 		//
@@ -134,7 +132,10 @@ namespace image
 		/// For example, in an alpha image type this is equal to m_width
 		/// while for an RGB this is 3 times the m_width.
 		///
-		size_t	m_pitch;
+		const size_t m_pitch;
+
+		/// Data bytes, geometry defined by members below
+		boost::scoped_array<boost::uint8_t> m_data;
 
 	private:
 

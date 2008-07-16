@@ -29,10 +29,10 @@ namespace image
 		:
 		m_type(type),
 		m_size(height*pitch),
-		m_data(data),
 		m_width(width),
 		m_height(height),
-		m_pitch(pitch)
+		m_pitch(pitch),
+		m_data(data)
 	{
 	}
 
@@ -41,10 +41,10 @@ namespace image
 		:
 		m_type(type),
 		m_size(height*pitch),
-		m_data(new boost::uint8_t[m_size]),
 		m_width(width),
 		m_height(height),
-		m_pitch(pitch)
+		m_pitch(pitch),
+		m_data(new boost::uint8_t[m_size])
 	{
 		assert(pitch >= width);
 	}
