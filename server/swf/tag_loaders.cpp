@@ -655,7 +655,7 @@ define_bits_lossless_2_loader(SWFStream* in, tag_type tag, movie_definition* m)
         // RGBA image data.
         assert(tag == SWF::DEFINELOSSLESS2); // 36
 
-        std::auto_ptr<image::rgba> image ( image::create_rgba(width, height) );
+        std::auto_ptr<image::rgba> image(new image::rgba(width, height));
 
         if (bitmap_format == 3)
         {
