@@ -195,9 +195,9 @@ namespace image
 		//
 		/// TODO: move in base class ?
 		///
-		void	set_pixel(size_t x, size_t y, boost::uint8_t r, boost::uint8_t g, boost::uint8_t b, boost::uint8_t a);
+		void set_pixel(size_t x, size_t y, boost::uint8_t r, boost::uint8_t g, boost::uint8_t b, boost::uint8_t a);
 
-        void mergeAlpha(const image::alpha& a);
+        void mergeAlpha(const boost::uint8_t* alphaData, const size_t bufferLength);
 
 	};
 
@@ -230,31 +230,8 @@ namespace image
 
 	};
 
-	/// Make a system-memory 24-bit bitmap surface.  24-bit packed
-	/// data, red byte first.
-	DSOEXPORT rgb*	create_rgb(int width, int height);
-
-
-	/// \brief
-	/// Make a system-memory 32-bit bitmap surface.  Packed data,
-	/// red byte first.
-	DSOEXPORT rgba*	create_rgba(int width, int height);
-
-
-	/// Make a system-memory 8-bit bitmap surface.
-	DSOEXPORT alpha*	create_alpha(int width, int height);
-
-	DSOEXPORT void	resample(rgb* out, int out_x0, int out_y0, int out_x1, int out_y1,
-			 rgb* in, float in_x0, float in_y0, float in_x1, float in_y1);
-
-	DSOEXPORT void	resample(rgba* out, int out_x0, int out_y0, int out_x1, int out_y1,
-			 rgba* in, float in_x0, float in_y0, float in_x1, float in_y1);
-
 	/// Write the given image to the given out stream, in jpeg format.
 	DSOEXPORT void	write_jpeg(gnash::IOChannel* out, rgb* image, int quality);
-
-	/// Write a 32-bit Targa format bitmap.  Dead simple, no compression.
-	DSOEXPORT void	write_tga(gnash::IOChannel* out, rgba* image);
 
 	/// Create and read a new image from the given filename, if possible.
 	DSOEXPORT rgb*	read_jpeg(const char* filename);
@@ -280,7 +257,7 @@ namespace image
 	/// \brief
 	/// For reading SWF JPEG3-style image data, like ordinary JPEG, 
 	/// but stores the data in rgba format.
-	DSOEXPORT rgba*	read_swf_jpeg3(gnash::IOChannel* in);
+	DSOEXPORT std::auto_ptr<rgba> readSWFJpeg3(gnash::IOChannel* in);
 
 } // namespace image
 } // namespace gnash

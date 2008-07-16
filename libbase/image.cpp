@@ -130,16 +130,12 @@ namespace image
 	}
 
 
-    void rgba::mergeAlpha(const alpha& a)
+    void rgba::mergeAlpha(const boost::uint8_t* alphaData, const size_t bufferLength)
     {
-        const size_t size = a.size();
+        assert (bufferLength * 4 <= m_size);
 
-        assert (a.size() * 4 <= m_size);
-
-        for (size_t i = 0; i < size; i++) {
-            // These const casts are horrible, but agg has problems with
-            // making data() const.
-            m_data[4 * i + 3] = const_cast<image::alpha&>(a).data()[i];
+        for (size_t i = 0; i < bufferLength; i++) {
+            m_data[4 * i + 3] = alphaData[i];
         }
     }
 
@@ -262,17 +258,17 @@ namespace image
 
 	// For reading SWF JPEG3-style image data, like ordinary JPEG, 
 	// but stores the data in rgba format.
-	//
-	// TODO: return by auto_ptr !
-	//
-	rgba* read_swf_jpeg3(gnash::IOChannel* in)
+	std::auto_ptr<rgba> readSWFJpeg3(gnash::IOChannel* in)
 	{
+	
+	    std::auto_ptr<rgba> im(NULL);
+
 		std::auto_ptr<jpeg::input> j_in ( jpeg::input::create_swf_jpeg2_header_only(in, false) );
-		if ( ! j_in.get() ) return 0;
+		if ( ! j_in.get() ) return im;
 		
 		j_in->start_image();
 
-		std::auto_ptr<rgba> im (new image::rgba(j_in->get_width(), j_in->get_height()));
+		im.reset(new image::rgba(j_in->get_width(), j_in->get_height()));
 
 		boost::scoped_array<boost::uint8_t> line ( new boost::uint8_t[3*j_in->get_width()] );
 
@@ -292,40 +288,7 @@ namespace image
 
 		j_in->finish_image();
 
-		return im.release(); // TODO: return by auto_ptr !
-	}
-
-
-	// Write a 32-bit Targa format bitmap.  Dead simple, no compression.
-	void	write_tga(gnash::IOChannel* out, rgba* im)
-	{
-		size_t imWidth = im->width();
-		size_t imHeight = im->height();
-
-		out->write_byte(0);
-		out->write_byte(0);
-		out->write_byte(2);	/* uncompressed RGB */
-		out->write_le16(0);
-		out->write_le16(0);
-		out->write_byte(0);
-		out->write_le16(0);	/* X origin */
-		out->write_le16(0);	/* y origin */
-		out->write_le16(imWidth);
-		out->write_le16(imHeight);
-		out->write_byte(32);	/* 32 bit bitmap */
-		out->write_byte(0);
-
-		for (size_t y = 0; y < imHeight; y++)
-		{
-			boost::uint8_t*	p = im->scanline(y);
-			for (size_t x = 0; x < imWidth; x++)
-			{
-				out->write_byte(p[x * 4]);
-				out->write_byte(p[x * 4 + 1]);
-				out->write_byte(p[x * 4 + 2]);
-				out->write_byte(p[x * 4 + 3]);
-			}
-		}
+		return im;
 	}
 
 } // namespace image
