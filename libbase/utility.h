@@ -62,17 +62,16 @@
 	#define TRUST_FLOAT_TO_UINT32_CONVERSION  1 
 #endif
 
+namespace gnash {
+
+// Using a possible built-in pi constant M_PI, which is not in
+// the C++ standard, has no conceivable advantage, so we will use this
+// one. Make it as accurate as you like.
+static const double PI = 3.14159265358979323846;
+
 // Commonly-used inlined mathematical functions are defined in
 // namespace gnash::utility so that it's clear where they
 // come from.
-
-namespace gnash {
-
-// Pi is pi; using an eventual built-in pi constant has no
-// conceivable advantage, so we use this one. Make it as
-// accurate as you like.
-static const double PI = 3.14159265359;
-
 namespace utility {
 
 inline bool isFinite(double d)
@@ -121,6 +120,9 @@ inline int frnd(float f)
 
 } // end of namespace utility
 
+/// Some of these functions could also be in the gnash::utility namespace,
+/// although some are used so often that it would get annoying.
+
 inline double TWIPS_TO_PIXELS(int i) 
 { 
     return static_cast<double>(i / 20.0); 
@@ -165,7 +167,20 @@ inline boost::int32_t Fixed16Mul(boost::int32_t a, boost::int32_t b)
     return static_cast<boost::int32_t>((static_cast<boost::int64_t>(a) * static_cast<boost::int64_t>(b) + 0x8000) >> 16);
 }
 
-/// Return (unmangled) name of this instance type
+/// \brief
+/// Return the smallest multiple of given base greater or equal
+/// given limit
+inline unsigned int
+smallestMultipleContaining(unsigned int base, unsigned int x)
+{
+        int f=x/base;
+        if ( x%base ) f++;
+        return base*f;
+}
+
+
+/// Return (unmangled) name of this instance type. Used for
+/// logging in various places.
 template <class T>
 std::string typeName(const T& inst)
 {
@@ -184,89 +199,11 @@ std::string typeName(const T& inst)
 	return typeName;
 }
 
-} // namespace gnash
-
-/// \brief
-/// Return the smallest multiple of given base greater or equal
-/// given limit
-inline unsigned int
-smallestMultipleContaining(unsigned int base, unsigned int x)
-{
-        int f=x/base;
-        if ( x%base ) f++;
-        return base*f;
-}
-
-// Handy macro to quiet compiler warnings about unused parameters/variables.
-#define UNUSED(x) (x) = (x)
-
-// Compile-time constant size of array.
-#define ARRAYSIZE(x) (sizeof(x)/sizeof(x[0]))
-
-
-inline size_t bernstein_hash(const void* data_in, int size, unsigned int seed = 5381)
-// Computes a hash of the given data buffer.
-// Hash function suggested by http://www.cs.yorku.ca/~oz/hash.html
-// Due to Dan Bernstein.  Allegedly very good on strings.
-//
-// One problem with this hash function is that e.g. if you take a
-// bunch of 32-bit ints and hash them, their hash values will be
-// concentrated toward zero, instead of randomly distributed in
-// [0,2^32-1], because of shifting up only 5 bits per byte.
-{
-	const unsigned char* data = static_cast<const unsigned char*>(data_in);
-	unsigned int h = seed;
-	while (size > 0) {
-		size--;
-		h = ((h << 5) + h) ^ static_cast<unsigned>(data[size]);
-	}
-
-	return h;
-}
-
-
-inline size_t sdbm_hash(const void* data_in, int size, unsigned int seed = 5381)
-// Alternative: "sdbm" hash function, suggested at same web page
-// above, http::/www.cs.yorku.ca/~oz/hash.html
-//
-// This is somewhat slower, but it works way better than the above
-// hash function for hashing large numbers of 32-bit ints.
-{
-	const unsigned char* data = static_cast<const unsigned char*>(data_in);
-	unsigned int h = seed;
-	while (size > 0) {
-		size--;
-		h = (h << 16) + (h << 6) - h + static_cast<unsigned>(data[size]);
-	}
-
-	return h;
-}
-
-inline size_t bernstein_hash_case_insensitive(const void* data_in, int size, unsigned int seed = 5381)
-// Computes a hash of the given data buffer; does tolower() on each
-// byte.  Hash function suggested by
-// http://www.cs.yorku.ca/~oz/hash.html Due to Dan Bernstein.
-// Allegedly very good on strings.
-{
-	const unsigned char* data = static_cast<const unsigned char*>(data_in);
-	unsigned int h = seed;
-	while (size > 0) {
-		size--;
-		h = ((h << 5) + h) ^ static_cast<unsigned>(std::tolower(data[size]));		
-	}
-
-	// Alternative: "sdbm" hash function, suggested at same web page above.
-	// h = 0;
-	// for bytes { h = (h << 16) + (h << 6) - hash + *p; }
-
-	return h;
-}
-
+/// Used in logging.
 #ifdef HAVE_PTHREADS
 #include <pthread.h>
 #else
 # ifdef _WIN32
-/* We can't pull in all of windows.h here, so lets just copy this here. */
 extern "C" {
     unsigned long int /* DWORD WINAPI */ GetCurrentThreadId(void);
 }
@@ -296,6 +233,35 @@ inline unsigned long int /* pthread_t */ get_thread_id(void)
     return static_cast<unsigned long int>(getpid());
 # endif
 #endif
+}
+
+} // namespace gnash
+
+// Handy macro to quiet compiler warnings about unused parameters/variables.
+#define UNUSED(x) (x) = (x)
+
+// Compile-time constant size of array.
+#define ARRAYSIZE(x) (sizeof(x)/sizeof(x[0]))
+
+
+inline size_t bernstein_hash(const void* data_in, int size, unsigned int seed = 5381)
+// Computes a hash of the given data buffer.
+// Hash function suggested by http://www.cs.yorku.ca/~oz/hash.html
+// Due to Dan Bernstein.  Allegedly very good on strings.
+//
+// One problem with this hash function is that e.g. if you take a
+// bunch of 32-bit ints and hash them, their hash values will be
+// concentrated toward zero, instead of randomly distributed in
+// [0,2^32-1], because of shifting up only 5 bits per byte.
+{
+	const unsigned char* data = static_cast<const unsigned char*>(data_in);
+	unsigned int h = seed;
+	while (size > 0) {
+		size--;
+		h = ((h << 5) + h) ^ static_cast<unsigned>(data[size]);
+	}
+
+	return h;
 }
 
 #endif // UTILITY_H
