@@ -126,16 +126,7 @@ namespace image
 	}
 
 
-	rgba*	create_rgba(int width, int height)
-	// Create an system-memory rgb surface.  The data order is
-	// packed 32-bit, RGBARGBA..., regardless of the endian-ness
-	// of the CPU.
-	{
-		return new rgba(width, height);
-	}
-
-
-	void	rgba::set_pixel(size_t x, size_t y, boost::uint8_t r, boost::uint8_t g, boost::uint8_t b, boost::uint8_t a)
+	void rgba::set_pixel(size_t x, size_t y, boost::uint8_t r, boost::uint8_t g, boost::uint8_t b, boost::uint8_t a)
 	// Set the pixel at the given position.
 	{
 		assert(x < m_width);
@@ -149,24 +140,26 @@ namespace image
 		data[3] = a;
 	}
 
-	// Set alpha value for given pixel 
-	void	rgba::set_alpha(size_t x, size_t y, boost::uint8_t a)
-	{
-		assert(x < m_width);
-		assert(y < m_height);
 
-		boost::uint8_t*	data = scanline(y) + 4 * x;
+    void rgba::mergeAlpha(const alpha& a)
+    {
+        const size_t size = a.size();
 
-		data[3] = a;
-	}
+        assert (a.size() * 4 <= m_size);
 
+        for (size_t i = 0; i < size; i++) {
+            // These const casts are horrible, but agg has problems with
+            // making data() const.
+            m_data[4 * i + 3] = const_cast<image::alpha&>(a).data()[i];
+        }
+    }
 
 	//
 	// alpha
 	//
 
 
-	alpha*	create_alpha(int width, int height)
+	alpha* create_alpha(int width, int height)
 	// Create an system-memory 8-bit alpha surface.
 	{
 		return new alpha(width, height);
@@ -209,85 +202,6 @@ namespace image
 
 		// Images are identical.
 		return true;
-	}
-
-
-	unsigned int	alpha::compute_hash() const
-	// Compute a hash code based on image contents.  Can be useful
-	// for comparing images.
-	{
-		unsigned int	h = bernstein_hash(&m_width, sizeof(m_width));
-		h = bernstein_hash(&m_height, sizeof(m_height), h);
-
-		for (int i = 0, n = m_height; i < n; i++)
-		{
-			h = bernstein_hash(scanline(i), m_width, h);
-		}
-
-		return h;
-	}
-
-	//
-	// yuv
-	//
-	yuv::yuv(int w, int h) :
-		image_base(0, w, h, w, YUV) // pitch initialized to wrong value, will fix m_size below
-
-	{
-		planes[Y].w = m_width;
-		planes[Y].h = m_height;
-		planes[Y].size = m_width * m_height;
-		planes[Y].offset = 0;
-
-		planes[U] = planes[Y];
-		planes[U].w >>= 1;
-		planes[U].h >>= 1;
-		planes[U].size >>= 2;
-		planes[U].offset = planes[Y].size;
-
-		planes[V] = planes[U];
-		planes[V].offset += planes[U].size;
-
-		m_size = planes[Y].size + (planes[U].size << 1);
-
-		for (int i = 0; i < 3; ++i)
-		{
-			planes[i].id = 0;	//texids[i];
-
-			unsigned int ww = planes[i].w;
-			unsigned int hh = planes[i].h;
-			planes[i].unit = 0; // i[units];
-			planes[i].p2w = (ww & (ww - 1)) ? video_nlpo2(ww) : ww;
-			planes[i].p2h = (hh & (hh - 1)) ? video_nlpo2(hh) : hh;
-			float tw = (double) ww / planes[i].p2w;
-			float th = (double) hh / planes[i].p2h;
-
-			planes[i].coords[0][0] = 0.0;
-			planes[i].coords[0][1] = 0.0;
-			planes[i].coords[1][0] = tw;
-			planes[i].coords[1][1] = 0.0;
-			planes[i].coords[2][0] = tw; 
-			planes[i].coords[2][1] = th;
-			planes[i].coords[3][0] = 0.0;
-			planes[i].coords[3][1] = th;
-		}
-
-		m_data.reset( new boost::uint8_t[m_size] );
-
-	//		m_bounds->m_x_min = 0.0f;
-	//		m_bounds->m_x_max = 1.0f;
-	//		m_bounds->m_y_min = 0.0f;
-	//		m_bounds->m_y_max = 1.0f;
-	}
-
-	unsigned int yuv::video_nlpo2(unsigned int x) const
-	{
-		x |= (x >> 1);
-		x |= (x >> 2);
-		x |= (x >> 4);
-		x |= (x >> 8);
-		x |= (x >> 16);
-		return x + 1;
 	}
 
 	//
@@ -371,14 +285,14 @@ namespace image
 	//
 	// TODO: return by auto_ptr !
 	//
-	rgba*	read_swf_jpeg3(gnash::IOChannel* in)
+	rgba* read_swf_jpeg3(gnash::IOChannel* in)
 	{
 		std::auto_ptr<jpeg::input> j_in ( jpeg::input::create_swf_jpeg2_header_only(in, false) );
 		if ( ! j_in.get() ) return 0;
 		
 		j_in->start_image();
 
-		std::auto_ptr<rgba> im ( image::create_rgba(j_in->get_width(), j_in->get_height()) );
+		std::auto_ptr<rgba> im ( new image::rgba(j_in->get_width(), j_in->get_height()) );
 
 		boost::scoped_array<boost::uint8_t> line ( new boost::uint8_t[3*j_in->get_width()] );
 

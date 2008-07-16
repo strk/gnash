@@ -16,7 +16,12 @@
 
 // Forward declarations
 namespace jpeg { class input; }
-namespace gnash { class IOChannel; }
+namespace gnash {
+    class IOChannel;
+    namespace image {
+        class alpha;
+    }    
+}
 
 
 /// Handy image utilities for RGB surfaces.
@@ -34,8 +39,7 @@ namespace image
 			RGB,
 			RGBA,
 			ALPHA,
-			ROW,
-			YUV
+			ROW
 		};
 
 		id_image m_type;
@@ -61,7 +65,7 @@ namespace image
 		virtual std::auto_ptr<image_base> clone() const=0;
 
 		/// Return size of this image buffer, in bytes
-		size_t size() const { return m_size; }
+		const size_t size() const { return m_size; }
 
 		/// Return size in bytes of a row of this image 
 		const size_t pitch() const { return m_pitch; }
@@ -116,9 +120,8 @@ namespace image
 
 	protected:
 
-		/// Size of image buffer in bytes. YUV has to adjust this, so
-		/// it can't be const.
-		size_t m_size;
+		/// Size of image buffer in bytes.
+		const size_t m_size;
 
 		/// Width of image, in pixels
 		const size_t m_width;
@@ -194,11 +197,7 @@ namespace image
 		///
 		void	set_pixel(size_t x, size_t y, boost::uint8_t r, boost::uint8_t g, boost::uint8_t b, boost::uint8_t a);
 
-		/// Set alpha value for given pixel
-		//
-		/// TODO: move in base class ?
-		///
-		void	set_alpha(size_t x, size_t y, boost::uint8_t a);
+        void mergeAlpha(const image::alpha& a);
 
 	};
 
@@ -229,47 +228,7 @@ namespace image
 		// Bitwise content comparison.
 		bool	operator==(const alpha& a) const;
 
-		// Return a hash code based on the image contents.
-		unsigned int	compute_hash() const;
 	};
-
-class DSOEXPORT yuv : public image_base
-{
-
-public:
-
-	enum {Y, U, V, T, NB_TEXS};
-
-	yuv(int w, int h);
-
-	yuv(const yuv& o)
-		:
-		image_base(o)
-	{
-		planes[0] = o.planes[0];
-		planes[1] = o.planes[1];
-		planes[2] = o.planes[2];
-		planes[3] = o.planes[3];
-	}
-
-	~yuv() {}
-
-	std::auto_ptr<image_base> clone() const
-	{
-		return std::auto_ptr<image_base>(new yuv(*this));
-	}
-
-
-	unsigned int video_nlpo2(unsigned int x) const;
-
-	struct plane {
-		unsigned int w, h, p2w, p2h, offset, size;
-		int unit;
-		int id;
-		float coords[4][2];
-	} planes[4];
-
-};
 
 	/// Make a system-memory 24-bit bitmap surface.  24-bit packed
 	/// data, red byte first.
