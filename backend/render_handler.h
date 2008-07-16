@@ -152,18 +152,19 @@
 
 // Forward declarations.
 namespace gnash {
-  class bitmap_info;
-  class rect;
-  class rgba;
-  class matrix;
-  class cxform;
-  
-  class shape_character_def;
-  class generic_character;
+    class bitmap_info;
+    class rect;
+    class rgba;
+    class matrix;
+    class cxform;
+
+    class shape_character_def;
+    class generic_character;
+
+    // @@ forward decl to avoid including base/image.h; TODO change the
+    // render_handler interface to not depend on these classes at all.
+    namespace image { class image_base; class rgb; class rgba; }
 }
-// @@ forward decl to avoid including base/image.h; TODO change the
-// render_handler interface to not depend on these classes at all.
-namespace image { class image_base; class rgb; class rgba; }
 
 namespace gnash {
 

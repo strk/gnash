@@ -469,29 +469,27 @@ define_bits_jpeg3_loader(SWFStream* in, tag_type tag, movie_definition* m)
 
     // Read rgb data.
     std::auto_ptr<tu_file> ad( StreamAdapter::getFile(*in, alpha_position) );
-    std::auto_ptr<image::rgba> im( image::read_swf_jpeg3(ad.get()) );
+    std::auto_ptr<image::rgba> im = image::readSWFJpeg3(ad.get());
+    
+    /// Failure to read the jpeg.
+    if (!im.get()) return;
 
     // Read alpha channel.
     in->seek(alpha_position);
 
-    size_t imWidth = im->width();
-    size_t imHeight = im->height();
+    const size_t imWidth = im->width();
+    const size_t imHeight = im->height();
+    const size_t bufferLength = imWidth * imHeight;
 
-    size_t	buffer_bytes = imWidth * imHeight;
+    boost::scoped_array<boost::uint8_t> buffer (new boost::uint8_t[bufferLength]);
 
-    boost::scoped_array<boost::uint8_t> buffer ( new boost::uint8_t[buffer_bytes] );
-
-    inflate_wrapper(*in, buffer.get(), buffer_bytes);
+    inflate_wrapper(*in, buffer.get(), bufferLength);
 
     // TESTING:
     // magical trevor contains this tag
     //  ea8bbad50ccbc52dd734dfc93a7f06a7  6964trev3c.swf
     //
-    boost::uint8_t* data = im->data();
-    for (size_t i = 0; i < buffer_bytes; ++i)
-    {
-        data[4*i+3] = buffer[i];
-    }
+    im->mergeAlpha(buffer.get(), bufferLength);
 
     // Create bitmap character.
     boost::intrusive_ptr<bitmap_character_def> ch = new bitmap_character_def(im);
@@ -540,7 +538,7 @@ define_bits_lossless_2_loader(SWFStream* in, tag_type tag, movie_definition* m)
     {
 
         // RGB image data.
-        std::auto_ptr<image::rgb> image ( image::create_rgb(width, height) );
+        std::auto_ptr<image::rgb> image ( new image::rgb(width, height) );
 
         if (bitmap_format == 3)
         {
@@ -655,7 +653,7 @@ define_bits_lossless_2_loader(SWFStream* in, tag_type tag, movie_definition* m)
         // RGBA image data.
         assert(tag == SWF::DEFINELOSSLESS2); // 36
 
-        std::auto_ptr<image::rgba> image ( image::create_rgba(width, height) );
+        std::auto_ptr<image::rgba> image(new image::rgba(width, height));
 
         if (bitmap_format == 3)
         {
@@ -1628,7 +1626,7 @@ abc_loader(SWFStream* in, tag_type tag, movie_definition* /*m*/)
 }
 
 void
-define_scene_frame_label_loader(SWFStream* in, tag_type tag, movie_definition* /*m*/)
+define_scene_frame_label_loader(SWFStream* /*in*/, tag_type tag, movie_definition* /*m*/)
 {
     assert(tag == SWF::DEFINESCENEANDFRAMELABELDATA); //86
 
