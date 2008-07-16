@@ -95,17 +95,6 @@ namespace image
 	}
 
 
-	rgb*	create_rgb(int width, int height)
-	// Create an system-memory rgb surface.  The data order is
-	// packed 24-bit, RGBRGB..., regardless of the endian-ness of
-	// the CPU.
-	{
-		return new rgb(width, height);
-	}
-
-
-
-
 	//
 	// rgba
 	//
@@ -159,21 +148,12 @@ namespace image
 	//
 
 
-	alpha* create_alpha(int width, int height)
-	// Create an system-memory 8-bit alpha surface.
-	{
-		return new alpha(width, height);
-	}
-
-
 	alpha::alpha(int width, int height)
 		:
 		image_base(width, height, width, ALPHA)
 	{
 		assert(width > 0);
 		assert(height > 0);
-
-		//m_data = new boost::uint8_t[m_pitch * m_height];
 	}
 
 
@@ -248,7 +228,7 @@ namespace image
 		std::auto_ptr<jpeg::input> j_in ( jpeg::input::create(in) );
 		if (!j_in.get()) return 0;
 		
-		std::auto_ptr<rgb> im ( image::create_rgb(j_in->get_width(), j_in->get_height()) );
+		std::auto_ptr<rgb> im ( new image::rgb(j_in->get_width(), j_in->get_height()) );
 
 		for (int y = 0; y < j_in->get_height(); y++)
 		{
@@ -268,7 +248,7 @@ namespace image
 
 		j_in->start_image();
 
-		rgb*	im = image::create_rgb(j_in->get_width(), j_in->get_height());
+		std::auto_ptr<rgb> im(new image::rgb(j_in->get_width(), j_in->get_height()));
 
 		for (int y = 0; y < j_in->get_height(); y++) {
 			j_in->read_scanline(im->scanline(y));
@@ -276,7 +256,7 @@ namespace image
 
 		j_in->finish_image();
 
-		return im;
+		return im.release();
 	}
 
 
@@ -292,7 +272,7 @@ namespace image
 		
 		j_in->start_image();
 
-		std::auto_ptr<rgba> im ( new image::rgba(j_in->get_width(), j_in->get_height()) );
+		std::auto_ptr<rgba> im (new image::rgba(j_in->get_width(), j_in->get_height()));
 
 		boost::scoped_array<boost::uint8_t> line ( new boost::uint8_t[3*j_in->get_width()] );
 
