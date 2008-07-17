@@ -322,7 +322,7 @@ RTMPClient::encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string
     buf->append(nullobj);
     delete nullobj;
     // Seek doesn't use the boolean flag
-    if (op != STREAM_SEEK) {
+    if ((op != STREAM_SEEK) && (op != STREAM_PLAY)) {
 	buf->append(boolobj);
     }
     delete boolobj;
@@ -331,7 +331,10 @@ RTMPClient::encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string
     // used for the stream. A Play command without this name set play an
     // existing stream that is already open.
     if (!name.empty()) {
-	buf->append(name);
+	Element filespec;
+	filespec.makeString(name);
+	Buffer *fileobj = filespec.encode();
+	buf->append(fileobj);
     }
     
     // The seek command also may have an optional location to seek to

@@ -248,15 +248,15 @@ main(int argc, char *argv[])
 
     // make the createStream for ID 3 encoded object
     log_debug("Sending NetStream::createStream message,");
-    Buffer *buf3 = client.encodeStream(0x3);
+    Buffer *buf3 = client.encodeStream(0x2);
 //    buf3->dump();
     total_size = buf3->size();
-    Element *res2 = client.sendRecvMsg(0x3, RTMP::HEADER_8, total_size,
+    Element *res2 = client.sendRecvMsg(0x3, RTMP::HEADER_12, total_size,
 				      RTMP::INVOKE, RTMPMsg::FROM_CLIENT,
 				      buf3);
     if (res2 == 0) {
 	log_error("Couldn't send NetStream::createStream message,");
-	exit(-1);
+//	exit(-1);
     } else {
 	log_debug("NetStream::createStream message succeeded.");
     }
@@ -266,10 +266,10 @@ main(int argc, char *argv[])
     
     // make the NetStream::play() operations for ID 2 encoded object
     log_debug("Sending NetStream play message,");
-    Buffer *buf4 = client.encodeStreamOp(0x3, RTMP::STREAM_PLAY, false, "lulutest.flv");
+    Buffer *buf4 = client.encodeStreamOp(0, RTMP::STREAM_PLAY, false, "lulutest.flv");
 //     log_debug("TRACE: buf4: %s", hexify(buf4->reference(), buf4->size(), true));
     total_size = buf4->size();
-    Element *res3 = client.sendRecvMsg(0x3, RTMP::HEADER_12, total_size,
+    Element *res3 = client.sendRecvMsg(0x8, RTMP::HEADER_12, total_size,
 				       RTMP::INVOKE, RTMPMsg::FROM_CLIENT, buf4);
     if (res3 == 0) {
 	log_error("Couldn't send NetStream::play message,");
