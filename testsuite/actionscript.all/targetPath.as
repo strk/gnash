@@ -84,7 +84,7 @@ check_equals(typeof(a), 'undefined');
 
 #endif // MING_SUPPORTS_ASM_TARGETPATH
 
-#if MING_SUPPORTS_ASM
+#ifdef MING_SUPPORTS_ASM
 #if OUTPUT_VERSION > 5
 
 mc1 = createEmptyMovieClip('mc', 1);
