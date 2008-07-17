@@ -916,7 +916,11 @@ abc_block::read_instances()
 		}
 		// Don't validate for previous owner.
 		pClass->setConstructor(mMethods[moffset]);
-		mMethods[moffset]->setOwner(pClass);
+
+		/*	Calling the asMethod::setOwner always results in a segmentation fault, 
+		since it tries to modify asMethod.mPrototype, which is never
+		initialized.  The parser seems to work ok without this call.*/
+//		mMethods[moffset]->setOwner(pClass);
 
 		// Next come the 'traits' of the instance. (The members.)
 		boost::uint32_t tcount = mS->read_V32();
@@ -949,7 +953,11 @@ abc_block::read_classes()
 		}
 		// Don't validate for previous owner.
 		pClass->setStaticConstructor(mMethods[moffset]);
-		mMethods[moffset]->setOwner(pClass);
+
+		/*	Calling the asMethod::setOwner always results in a segmentation fault, 
+		since it tries to modify asMethod.mPrototype, which is never
+		initialized.  The parser seems to work ok without this call.*/
+//		mMethods[moffset]->setOwner(pClass);
 		
 		boost::uint32_t tcount = mS->read_V32();
 		for (unsigned int j = 0; j < tcount; ++j)
@@ -982,8 +990,13 @@ abc_block::read_scripts()
 			ERR((_("ABC: Out of bounds method for script.\n")));
 			return false;
 		}
+
+		/*Calling the asMethod::setOwner always results in a segmentation fault,
+		since it tries to modify asMethod.mPrototype, which is never
+		initialized.  The parser seems to work ok without this call.*/
 		// Don't validate for previous owner.
-		mMethods[moffset]->setOwner(pScript);
+//		mMethods[moffset]->setOwner(pScript);
+
 		pScript->setConstructor(mMethods[moffset]);
 		pScript->setSuper(mTheObject);
 
@@ -1130,13 +1143,17 @@ abc_block::read(SWFStream* in)
 	if (!read_scripts()) return false;
 	if (!read_method_bodies()) return false;
 
-	std::vector<abc_Trait*>::iterator i = mTraits.begin();
+/*	The loop below causes a segmentation fault, because it tries to modify 
+	asMethod.mPrototype, which is never initialized.  The parser seems 
+	to work ok without this call.*/
+/*	std::vector<abc_Trait*>::iterator i = mTraits.begin();
 	for ( ; i != mTraits.end(); ++i)
 	{
 		if (!(*i)->finalize(this))
 			return false;
 	}
 	mTraits.clear();
+*/
 	//mCH->dump();
 	return true;
 }
