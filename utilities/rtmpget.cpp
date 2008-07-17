@@ -232,7 +232,8 @@ main(int argc, char *argv[])
     int ret = 0;
     
     log_debug("Sending NetConnection Connect message,");
-    Buffer *buf2 = client.encodeConnect("oflaDemo", "http://192.168.1.70/software/gnash/tests/ofla_demo.swf", "rtmp://localhost/oflaDemo", 615, 124, 1, "http://192.168.1.70/software/gnash/tests/index.html");
+    Buffer *buf2 = client.encodeConnect("video/2006/sekt/gate06/tablan_valentin", "http://videolectures.net/site/media/flvplayer/mediaplayer.swf", "rtmp://velblod.videolectures.net/video/2006/sekt/gate06/tablan_valentin", 615, 124, 1, "http://videolectures.net/gate06_tablan_bcueu/");
+//    Buffer *buf2 = client.encodeConnect("oflaDemo", "http://192.168.1.70/software/gnash/tests/ofla_demo.swf", "rtmp://localhost/oflaDemo", 615, 124, 1, "http://192.168.1.70/software/gnash/tests/index.html");
     buf2->resize(buf2->size() - 6); // FIXME: encodeConnect returns the wrong size for the buffer!
     size_t total_size = buf2->size(); 
     
@@ -266,7 +267,8 @@ main(int argc, char *argv[])
     
     // make the NetStream::play() operations for ID 2 encoded object
     log_debug("Sending NetStream play message,");
-    Buffer *buf4 = client.encodeStreamOp(0, RTMP::STREAM_PLAY, false, "lulutest.flv");
+    Buffer *buf4 = client.encodeStreamOp(0, RTMP::STREAM_PLAY, false, "gate06_tablan_bcueu_01");
+//    Buffer *buf4 = client.encodeStreamOp(0, RTMP::STREAM_PLAY, false, "lulutest.flv");
 //     log_debug("TRACE: buf4: %s", hexify(buf4->reference(), buf4->size(), true));
     total_size = buf4->size();
     Element *res3 = client.sendRecvMsg(0x8, RTMP::HEADER_12, total_size,
