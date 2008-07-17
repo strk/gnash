@@ -437,19 +437,18 @@ bool FLVParser::parseNextTag()
 	}
 	else if (tag[0] == FLV_META_TAG)
 	{
-		LOG_ONCE( log_unimpl("FLV MetaTag parser") );
 		// Extract information from the meta tag
-		/*_stream->seek(_lastParsedPosition+16);
-		char* metaTag = new char[bodyLength];
-		size_t actuallyRead = _stream->read(metaTag, bodyLength);
+		boost::scoped_array<unsigned char> metaTag ( new unsigned char[bodyLength] );
+		size_t actuallyRead = _stream->read(metaTag.get(), bodyLength);
 		if ( actuallyRead < bodyLength )
 		{
 			log_error("FLVParser::parseNextTag: can't read metaTag (%d) body (needed %d bytes, only got %d)",
 				FLV_META_TAG, bodyLength, actuallyRead);
-			_parsingComplete=true;
-			_indexingCompleted=true;
 			return false;
 		}
+		std::string dump = hexify(metaTag.get(), actuallyRead, false);
+		log_unimpl("FLV MetaTag parser. Data: %s", dump);
+		/*
 		amf::AMF* amfParser = new amf::AMF();
 		amfParser->parseAMF(metaTag);*/
 	}
