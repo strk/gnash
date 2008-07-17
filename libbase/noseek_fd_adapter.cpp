@@ -253,7 +253,7 @@ NoSeekFile::fill_cache(size_t size)
 void
 NoSeekFile::printInfo()
 {
-	fprintf(stderr, "_cache.tell = " SIZET_FMT "\n", tell());
+	std::cerr << "_cache.tell = " << tell() << std::endl;
 }
 
 /*private*/
