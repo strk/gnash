@@ -84,6 +84,7 @@ check_equals(typeof(a), 'undefined');
 
 #endif // MING_SUPPORTS_ASM_TARGETPATH
 
+#if MING_SUPPORTS_ASM
 #if OUTPUT_VERSION > 5
 
 mc1 = createEmptyMovieClip('mc', 1);
@@ -110,7 +111,7 @@ check_equals(checkpoint, undefined);
 setTarget("");
 
 setTarget('...:mc1');
-// getVaiable(_target) would ascend to other target
+// getVariable(_target) would ascend to other target
 check_equals(_target, '/');
 asm{          
     push 'checkpoint'         
@@ -156,6 +157,7 @@ check_equals(_target, '/mc/mc');
 setTarget("/");
 check_equals(_target, '/');
 
+#endif
 #endif
 
 #if OUTPUT_VERSION < 6

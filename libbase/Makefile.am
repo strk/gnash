@@ -66,11 +66,6 @@ libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\" \
 # These headers get installed
 # include_HEADERS = log.h err.h proc.h serial.h xantrex.h outback.h
 
-# Don't build Dmalloc support if it's not configured in
-if HAVE_DMALLOC
-DMALLOC_FILE = dlmalloc.c
-endif
-
 libgnashbase_la_LIBADD = \
 	$(JPEG_LIBS) \
 	$(Z_LIBS) \
@@ -93,7 +88,6 @@ MALLOC =
 endif
 
 libgnashbase_la_SOURCES = \
-	$(DMALLOC_FILE)	\
 	extension.cpp \
 	image.cpp \
 	$(MALLOC) \
@@ -109,7 +103,6 @@ libgnashbase_la_SOURCES = \
 	ClockTime.cpp \
 	WallClockTimer.cpp \
 	utf8.cpp \
-	utility.cpp \
 	curl_adapter.cpp \
 	noseek_fd_adapter.cpp \
 	zlib_adapter.cpp \
@@ -122,7 +115,6 @@ libgnashbase_la_SOURCES = \
 
 noinst_HEADERS = \
 	$(LIBLTDLHEAD) \
-	dlmalloc.h \
 	SimpleBuffer.h \
 	extension.h \
 	GnashException.h \

@@ -233,7 +233,7 @@ main(int argc, char *argv[])
     
     log_debug("Sending NetConnection Connect message,");
     Buffer *buf2 = client.encodeConnect("oflaDemo", "http://192.168.1.70/software/gnash/tests/ofla_demo.swf", "rtmp://localhost/oflaDemo", 615, 124, 1, "http://192.168.1.70/software/gnash/tests/index.html");
-    buf2->resize(buf2->size() - 6); // FIXME: why drop 6 bytes ?
+    buf2->resize(buf2->size() - 6); // FIXME: encodeConnect returns the wrong size for the buffer!
     size_t total_size = buf2->size(); 
     
     Element *res1 = client.sendRecvMsg(0x3, RTMP::HEADER_12, total_size,
@@ -241,14 +241,14 @@ main(int argc, char *argv[])
 				      buf2);
     if (res1 == 0) {
 	log_error("Couldn't send NetConnection Connect message,");
-	exit(-1);
+//	exit(-1);
     } else {
 	log_debug("NetConnection Connect message succeeded");
     }
 
-    // make the createStream for ID 2 encoded object
+    // make the createStream for ID 3 encoded object
     log_debug("Sending NetStream::createStream message,");
-    Buffer *buf3 = client.encodeStream(2);
+    Buffer *buf3 = client.encodeStream(0x3);
 //    buf3->dump();
     total_size = buf3->size();
     Element *res2 = client.sendRecvMsg(0x3, RTMP::HEADER_8, total_size,
@@ -260,17 +260,20 @@ main(int argc, char *argv[])
     } else {
 	log_debug("NetStream::createStream message succeeded.");
     }
+    double streamID = res2->to_number();
+    int id = int(streamID);
+    cerr << "Stream ID returned from createStream is: " << id << endl;
     
     // make the NetStream::play() operations for ID 2 encoded object
     log_debug("Sending NetStream play message,");
-    Buffer *buf4 = client.encodeStreamOp(0, RTMP::STREAM_PLAY, false, "lulutest.flv");
+    Buffer *buf4 = client.encodeStreamOp(0x3, RTMP::STREAM_PLAY, false, "lulutest.flv");
 //     log_debug("TRACE: buf4: %s", hexify(buf4->reference(), buf4->size(), true));
     total_size = buf4->size();
-    Element *res3 = client.sendRecvMsg(0x3, RTMP::HEADER_4, total_size,
+    Element *res3 = client.sendRecvMsg(0x3, RTMP::HEADER_12, total_size,
 				       RTMP::INVOKE, RTMPMsg::FROM_CLIENT, buf4);
     if (res3 == 0) {
 	log_error("Couldn't send NetStream::play message,");
-//	exit(-1);
+	exit(-1);
     } else {
 	log_debug("Sent NetStream::play message.");
     }

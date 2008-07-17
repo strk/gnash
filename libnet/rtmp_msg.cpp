@@ -118,6 +118,17 @@ RTMPMsg::checkStatus(amf::Element * /* el */)
     return _status;
 }
 
+Element *
+RTMPMsg::operator[](size_t index)
+{
+//    GNASH_REPORT_FUNCTION;
+    if (index <= _amfobjs.size()) {
+	return _amfobjs[index];
+    }
+    
+    return 0;
+};
+
 void
 RTMPMsg::dump()
 {

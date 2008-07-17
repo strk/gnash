@@ -16,6 +16,8 @@
 #include <memory>		// for auto_ptr
 #include <boost/scoped_array.hpp>
 
+namespace gnash
+{
 namespace image
 {
 	//
@@ -27,10 +29,10 @@ namespace image
 		:
 		m_type(type),
 		m_size(height*pitch),
-		m_data(data),
 		m_width(width),
 		m_height(height),
-		m_pitch(pitch)
+		m_pitch(pitch),
+		m_data(data)
 	{
 	}
 
@@ -39,17 +41,17 @@ namespace image
 		:
 		m_type(type),
 		m_size(height*pitch),
-		m_data(new boost::uint8_t[m_size]),
 		m_width(width),
 		m_height(height),
-		m_pitch(pitch)
+		m_pitch(pitch),
+		m_data(new boost::uint8_t[m_size])
 	{
 		assert(pitch >= width);
 	}
 
 	void image_base::update(boost::uint8_t* data)
 	{
-		memcpy(m_data.get(), data, m_size);
+		std::memcpy(m_data.get(), data, m_size);
 	}
 
 	void image_base::update(const image_base& from)
@@ -57,8 +59,13 @@ namespace image
 		assert(from.m_pitch == m_pitch);
 		assert(m_size <= from.m_size);
 		assert(m_type == from.m_type);
-		memcpy(m_data.get(), const_cast<image_base&>(from).data(), m_size);
+		std::memcpy(m_data.get(), const_cast<image_base&>(from).data(), m_size);
 	}
+
+    void image_base::clear(const boost::uint8_t byteValue)
+    {
+        std::memset(m_data.get(), byteValue, m_size);
+    }
 
 	boost::uint8_t* image_base::scanline(size_t y)
 	{
@@ -88,75 +95,6 @@ namespace image
 	}
 
 
-	rgb*	create_rgb(int width, int height)
-	// Create an system-memory rgb surface.  The data order is
-	// packed 24-bit, RGBRGB..., regardless of the endian-ness of
-	// the CPU.
-	{
-		return new rgb(width, height);
-	}
-
-	bool rgb::make_next_miplevel()
-	{
-		assert(m_data.get());
-		assert(m_type == RGB);
-
-		size_t imWidth = m_width;
-		size_t imHeight = m_height;
-
-		size_t new_w = imWidth >> 1;
-		size_t new_h = imHeight >> 1;
-		if (new_w < 1) new_w = 1;
-		if (new_h < 1) new_h = 1;
-
-		if (new_w * 2 != imWidth  || new_h * 2 != imHeight)
-		{
-			// Image can't be shrunk along (at least) one
-			// of its dimensions, so don't bother
-			// resampling.  Technically we should, but
-			// it's pretty useless at this point.  Just
-			// change the image dimensions and leave the
-			// existing pixels.
-			return false;
-		}
-
-		size_t new_pitch = new_w * 3;
-
-		// Round pitch up to the nearest 4-byte boundary.
-		new_pitch = (new_pitch + 3) & ~3;
-
-		// Resample.  Simple average 2x2 --> 1, in-place.
-		size_t	pitch = m_pitch;
-		for (size_t j = 0; j < new_h; j++) {
-			boost::uint8_t*	out = m_data.get() + j * new_pitch;
-			boost::uint8_t*	in = m_data.get() + (j << 1) * pitch;
-			for (size_t i = 0; i < new_w; i++) {
-				int	r, g, b;
-				r = (*(in + 0) + *(in + 3) + *(in + 0 + pitch) + *(in + 3 + pitch));
-				g = (*(in + 1) + *(in + 4) + *(in + 1 + pitch) + *(in + 4 + pitch));
-				b = (*(in + 2) + *(in + 5) + *(in + 2 + pitch) + *(in + 5 + pitch));
-				*(out + 0) = r >> 2;
-				*(out + 1) = g >> 2;
-				*(out + 2) = b >> 2;
-				out += 3;
-				in += 6;
-			}
-		}
-
-		// Munge image's members to reflect the shrunken image.
-		m_width = new_w;
-		m_height = new_h;
-		m_pitch = new_pitch;
-		m_size = m_height*m_pitch;
-
-		assert(m_pitch >= m_width);
-
-		return true;
-	}
-
-
-
-
 	//
 	// rgba
 	//
@@ -177,16 +115,7 @@ namespace image
 	}
 
 
-	rgba*	create_rgba(int width, int height)
-	// Create an system-memory rgb surface.  The data order is
-	// packed 32-bit, RGBARGBA..., regardless of the endian-ness
-	// of the CPU.
-	{
-		return new rgba(width, height);
-	}
-
-
-	void	rgba::set_pixel(size_t x, size_t y, boost::uint8_t r, boost::uint8_t g, boost::uint8_t b, boost::uint8_t a)
+	void rgba::set_pixel(size_t x, size_t y, boost::uint8_t r, boost::uint8_t g, boost::uint8_t b, boost::uint8_t a)
 	// Set the pixel at the given position.
 	{
 		assert(x < m_width);
@@ -200,81 +129,19 @@ namespace image
 		data[3] = a;
 	}
 
-	// Set alpha value for given pixel 
-	void	rgba::set_alpha(size_t x, size_t y, boost::uint8_t a)
-	{
-		assert(x < m_width);
-		assert(y < m_height);
 
-		boost::uint8_t*	data = scanline(y) + 4 * x;
+    void rgba::mergeAlpha(const boost::uint8_t* alphaData, const size_t bufferLength)
+    {
+        assert (bufferLength * 4 <= m_size);
 
-		data[3] = a;
-	}
-
-	bool	rgba::make_next_miplevel()
-	{
-		assert(m_data.get());
-		assert(m_type == RGBA);
-
-		size_t	new_w = m_width >> 1;
-		size_t	new_h = m_height >> 1;
-		if (new_w < 1) new_w = 1;
-		if (new_h < 1) new_h = 1;
-
-		if (new_w * 2 != m_width  || new_h * 2 != m_height)
-		{
-			// Image can't be shrunk along (at least) one
-			// of its dimensions, so don't bother
-			// resampling.  Technically we should, but
-			// it's pretty useless at this point.  Just
-			// change the image dimensions and leave the
-			// existing pixels.
-			return false;
-		}
-
-		size_t	new_pitch = new_w * 4;
-
-		// Resample.  Simple average 2x2 --> 1, in-place.
-		size_t	pitch = m_pitch;
-		for (size_t j = 0; j < new_h; j++) {
-			boost::uint8_t*	out = ((boost::uint8_t*) m_data.get()) + j * new_pitch;
-			boost::uint8_t*	in = ((boost::uint8_t*) m_data.get()) + (j << 1) * pitch;
-			for (size_t i = 0; i < new_w; i++) {
-				int	r, g, b, a;
-				r = (*(in + 0) + *(in + 4) + *(in + 0 + pitch) + *(in + 4 + pitch));
-				g = (*(in + 1) + *(in + 5) + *(in + 1 + pitch) + *(in + 5 + pitch));
-				b = (*(in + 2) + *(in + 6) + *(in + 2 + pitch) + *(in + 6 + pitch));
-				a = (*(in + 3) + *(in + 7) + *(in + 3 + pitch) + *(in + 7 + pitch));
-				*(out + 0) = r >> 2;
-				*(out + 1) = g >> 2;
-				*(out + 2) = b >> 2;
-				*(out + 3) = a >> 2;
-				out += 4;
-				in += 8;
-			}
-		}
-
-		// Munge image's members to reflect the shrunken image.
-		m_width = new_w;
-		m_height = new_h;
-		m_pitch = new_pitch;
-		m_size = m_height*m_pitch;
-
-		assert(m_pitch >= m_width);
-
-		return true;
-	}
+        for (size_t i = 0; i < bufferLength; i++) {
+            m_data[4 * i + 3] = alphaData[i];
+        }
+    }
 
 	//
 	// alpha
 	//
-
-
-	alpha*	create_alpha(int width, int height)
-	// Create an system-memory 8-bit alpha surface.
-	{
-		return new alpha(width, height);
-	}
 
 
 	alpha::alpha(int width, int height)
@@ -283,71 +150,11 @@ namespace image
 	{
 		assert(width > 0);
 		assert(height > 0);
-
-		//m_data = new boost::uint8_t[m_pitch * m_height];
 	}
 
 
 	alpha::~alpha()
 	{
-	}
-
-	bool alpha::make_next_miplevel()
-	{
-		assert(m_data.get());
-		assert(m_type == ALPHA);
-
-		size_t	new_w = m_width >> 1;
-		size_t	new_h = m_height >> 1;
-		if (new_w < 1) new_w = 1;
-		if (new_h < 1) new_h = 1;
-
-		if (new_w * 2 != m_width || new_h * 2 != m_height)
-		{
-			// Image can't be shrunk along (at least) one
-			// of its dimensions, so don't bother
-			// resampling.	Technically we should, but
-			// it's pretty useless at this point.  Just
-			// change the image dimensions and leave the
-			// existing pixels.
-			return false;
-		}
-
-		// Resample.  Simple average 2x2 --> 1, in-place.
-		for (size_t j = 0; j < new_h; j++)
-		{
-			boost::uint8_t* out = m_data.get() + j * new_w;
-			boost::uint8_t* in = m_data.get() + (j << 1) * m_width;
-			for (size_t i = 0; i < new_w; i++)
-			{
-				int	a;
-				a = (*(in + 0) + *(in + 1) + *(in + 0 + m_width) + *(in + 1 + m_width));
-				*(out) = a >> 2;
-				out++;
-				in += 2;
-			}
-		}
-
-		// Munge parameters to reflect the shrunken image.
-		m_width = m_pitch = new_w;
-		m_height = new_h;
-		m_size = m_height*m_pitch;
-
-		assert(m_pitch >= m_width);
-
-		return true;
-	}
-
-
-	void	alpha::set_pixel(size_t x, size_t y, boost::uint8_t a)
-	// Set the pixel at the given position.
-	{
-		assert(x < m_width);
-		assert(y < m_height);
-
-		boost::uint8_t*	data = scanline(y) + x;
-
-		data[0] = a;
 	}
 
 
@@ -371,85 +178,6 @@ namespace image
 
 		// Images are identical.
 		return true;
-	}
-
-
-	unsigned int	alpha::compute_hash() const
-	// Compute a hash code based on image contents.  Can be useful
-	// for comparing images.
-	{
-		unsigned int	h = bernstein_hash(&m_width, sizeof(m_width));
-		h = bernstein_hash(&m_height, sizeof(m_height), h);
-
-		for (int i = 0, n = m_height; i < n; i++)
-		{
-			h = bernstein_hash(scanline(i), m_width, h);
-		}
-
-		return h;
-	}
-
-	//
-	// yuv
-	//
-	yuv::yuv(int w, int h) :
-		image_base(0, w, h, w, YUV) // pitch initialized to wrong value, will fix m_size below
-
-	{
-		planes[Y].w = m_width;
-		planes[Y].h = m_height;
-		planes[Y].size = m_width * m_height;
-		planes[Y].offset = 0;
-
-		planes[U] = planes[Y];
-		planes[U].w >>= 1;
-		planes[U].h >>= 1;
-		planes[U].size >>= 2;
-		planes[U].offset = planes[Y].size;
-
-		planes[V] = planes[U];
-		planes[V].offset += planes[U].size;
-
-		m_size = planes[Y].size + (planes[U].size << 1);
-
-		for (int i = 0; i < 3; ++i)
-		{
-			planes[i].id = 0;	//texids[i];
-
-			unsigned int ww = planes[i].w;
-			unsigned int hh = planes[i].h;
-			planes[i].unit = 0; // i[units];
-			planes[i].p2w = (ww & (ww - 1)) ? video_nlpo2(ww) : ww;
-			planes[i].p2h = (hh & (hh - 1)) ? video_nlpo2(hh) : hh;
-			float tw = (double) ww / planes[i].p2w;
-			float th = (double) hh / planes[i].p2h;
-
-			planes[i].coords[0][0] = 0.0;
-			planes[i].coords[0][1] = 0.0;
-			planes[i].coords[1][0] = tw;
-			planes[i].coords[1][1] = 0.0;
-			planes[i].coords[2][0] = tw; 
-			planes[i].coords[2][1] = th;
-			planes[i].coords[3][0] = 0.0;
-			planes[i].coords[3][1] = th;
-		}
-
-		m_data.reset( new boost::uint8_t[m_size] );
-
-	//		m_bounds->m_x_min = 0.0f;
-	//		m_bounds->m_x_max = 1.0f;
-	//		m_bounds->m_y_min = 0.0f;
-	//		m_bounds->m_y_max = 1.0f;
-	}
-
-	unsigned int yuv::video_nlpo2(unsigned int x) const
-	{
-		x |= (x >> 1);
-		x |= (x >> 2);
-		x |= (x >> 4);
-		x |= (x >> 8);
-		x |= (x >> 16);
-		return x + 1;
 	}
 
 	//
@@ -496,7 +224,7 @@ namespace image
 		std::auto_ptr<jpeg::input> j_in ( jpeg::input::create(in) );
 		if (!j_in.get()) return 0;
 		
-		std::auto_ptr<rgb> im ( image::create_rgb(j_in->get_width(), j_in->get_height()) );
+		std::auto_ptr<rgb> im ( new image::rgb(j_in->get_width(), j_in->get_height()) );
 
 		for (int y = 0; y < j_in->get_height(); y++)
 		{
@@ -516,7 +244,7 @@ namespace image
 
 		j_in->start_image();
 
-		rgb*	im = image::create_rgb(j_in->get_width(), j_in->get_height());
+		std::auto_ptr<rgb> im(new image::rgb(j_in->get_width(), j_in->get_height()));
 
 		for (int y = 0; y < j_in->get_height(); y++) {
 			j_in->read_scanline(im->scanline(y));
@@ -524,23 +252,23 @@ namespace image
 
 		j_in->finish_image();
 
-		return im;
+		return im.release();
 	}
 
 
 	// For reading SWF JPEG3-style image data, like ordinary JPEG, 
 	// but stores the data in rgba format.
-	//
-	// TODO: return by auto_ptr !
-	//
-	rgba*	read_swf_jpeg3(gnash::IOChannel* in)
+	std::auto_ptr<rgba> readSWFJpeg3(gnash::IOChannel* in)
 	{
+	
+	    std::auto_ptr<rgba> im(NULL);
+
 		std::auto_ptr<jpeg::input> j_in ( jpeg::input::create_swf_jpeg2_header_only(in, false) );
-		if ( ! j_in.get() ) return 0;
+		if ( ! j_in.get() ) return im;
 		
 		j_in->start_image();
 
-		std::auto_ptr<rgba> im ( image::create_rgba(j_in->get_width(), j_in->get_height()) );
+		im.reset(new image::rgba(j_in->get_width(), j_in->get_height()));
 
 		boost::scoped_array<boost::uint8_t> line ( new boost::uint8_t[3*j_in->get_width()] );
 
@@ -560,44 +288,11 @@ namespace image
 
 		j_in->finish_image();
 
-		return im.release(); // TODO: return by auto_ptr !
+		return im;
 	}
 
-
-	// Write a 32-bit Targa format bitmap.  Dead simple, no compression.
-	void	write_tga(gnash::IOChannel* out, rgba* im)
-	{
-		size_t imWidth = im->width();
-		size_t imHeight = im->height();
-
-		out->write_byte(0);
-		out->write_byte(0);
-		out->write_byte(2);	/* uncompressed RGB */
-		out->write_le16(0);
-		out->write_le16(0);
-		out->write_byte(0);
-		out->write_le16(0);	/* X origin */
-		out->write_le16(0);	/* y origin */
-		out->write_le16(imWidth);
-		out->write_le16(imHeight);
-		out->write_byte(32);	/* 32 bit bitmap */
-		out->write_byte(0);
-
-		for (size_t y = 0; y < imHeight; y++)
-		{
-			boost::uint8_t*	p = im->scanline(y);
-			for (size_t x = 0; x < imWidth; x++)
-			{
-				out->write_byte(p[x * 4]);
-				out->write_byte(p[x * 4 + 1]);
-				out->write_byte(p[x * 4 + 2]);
-				out->write_byte(p[x * 4 + 3]);
-			}
-		}
-	}
-
-}
-
+} // namespace image
+} // namespace gnash
 
 // Local Variables:
 // mode: C++

@@ -370,6 +370,7 @@ test_results()
 //         printf("FIXME: %d, %d, %s:%s\n", props.size(), msg1->getStatus(),
 //                props[3]->getName(), props[3]->to_string());
 //         msg1->dump();
+        msg1->dump();
         if ((msg1->getStatus() ==  RTMPMsg::NC_CONNECT_SUCCESS)
             && (msg1->getMethodName() == "_result")
             && (msg1->getStreamID() == 1)

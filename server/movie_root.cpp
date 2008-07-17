@@ -1106,10 +1106,6 @@ movie_root::advanceMovie()
 	//       to be checked if it keeps the swfdec testsuite safe
 	processLoadMovieRequests();
 
-	// Execute expired timers
-	// NOTE: can throw ActionLimitException
-	executeTimers();
-
 	// Process queued actions
 	// NOTE: can throw ActionLimitException
 	processActionQueue();

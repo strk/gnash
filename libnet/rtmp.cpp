@@ -24,6 +24,7 @@
 #include <iostream>
 #include <string>
 #include <map>
+#include <vector>
 
 #if ! (defined(_WIN32) || defined(WIN32))
 #	include <netinet/in.h>
@@ -270,11 +271,13 @@ RTMP::decodeHeader(Network::byte_t *in)
     }
 
     if (_header.head_size >= 8) {
-        _header.type = *(content_types_e *)tmpptr;
-//        _header.bodysize = sizeof(boost::uint16_t) * 2;
+	Network::byte_t byte = *tmpptr;
+        _header.type = (content_types_e)byte;
         tmpptr++;
 	if (_header.type <= RTMP::INVOKE ) {
 	    log_debug(_("The type is: %s"), content_str[_header.type]);
+	} else {
+	    log_debug(_("The type is: 0x%x"), _header.type);
 	}
     }
 
@@ -623,10 +626,11 @@ RTMP::decodeMsgBody(Network::byte_t *data, size_t size)
     // This will need to be deleted manually later after usage, it is not
     // automatically deallocated.
     RTMPMsg *msg = new RTMPMsg;
+//    memset(msg, 0, sizeof(RTMPMsg));
 
     msg->setMethodName(name->to_string());
     double swapped = streamid->to_number();
-    swapBytes(&swapped, amf::AMF0_NUMBER_SIZE);
+//     swapBytes(&swapped, amf::AMF0_NUMBER_SIZE);
     msg->setStreamID(swapped);
 
     if ((msg->getMethodName() == "_result") || (msg->getMethodName() == "error")) {
@@ -642,7 +646,7 @@ RTMP::decodeMsgBody(Network::byte_t *data, size_t size)
         if (el == 0) {
 	    break;
 	}
-	el->dump();
+//	el->dump();
 	msg->addObject(el);
  	if (status) {
 	    msg->checkStatus(el);
@@ -835,10 +839,10 @@ RTMP::sendRecvMsg(int amf_index, rtmp_headersize_e head_size,
 				type, routing);
 //    int ret = 0;
     int ret = writeNet(head);
-    if (netDebug()) {
-	head->dump();
-	bufin->dump();
-    }
+//     if (netDebug()) {
+// 	head->dump();
+// 	bufin->dump();
+//     }
     delete head;
     ret = sendMsg(bufin);
 
@@ -848,6 +852,9 @@ RTMP::sendRecvMsg(int amf_index, rtmp_headersize_e head_size,
 //	int left = 0;
 //	ret = readNet(buf->reference() + left, buf->size() - left, 5);	// timeout in 5 seconds
 	ret = readNet(buf, 1);	// timeout in 1 second
+// 	if (netDebug()) {
+// 	    buf->dump();
+// 	}
 	if (ret <= 0) {
 //	    log_error("Never got any data at line %d", __LINE__);
 	    break;
@@ -871,8 +878,8 @@ RTMP::sendRecvMsg(int amf_index, rtmp_headersize_e head_size,
     if (incoming.size() == 0) {
 	return 0;
     }
-    incoming.dump();
     while (incoming.size() > 0) {
+//	incoming.dump();
 	buf = incoming.pop();
 	rthead = decodeHeader(buf);
 	
@@ -935,11 +942,23 @@ RTMP::sendRecvMsg(int amf_index, rtmp_headersize_e head_size,
 		  break;
 	      case INVOKE:
 		  msg = decodeMsgBody(buf->reference() + rthead->head_size, rthead->bodysize);
+//		  msg->dump();
 		  if (msg) {
-		      log_debug("%s: Msg status is: %d: %s", __FUNCTION__,
-				msg->getStatus(), status_str[msg->getStatus()]);
-		      el = new Element;
-		      el->init(buf->reference());
+		      log_debug("%s: Msg status is: %d: %s, name is %s, size is %d", __FUNCTION__,
+				msg->getStatus(), status_str[msg->getStatus()], msg->getMethodName(), msg->size());
+		      if (msg->size() > 0) {
+			  // A common _result message contains only 2 stream IDs, plus a one byte
+			  // NULL object. tru
+			  if (rthead->bodysize <= 0x1d) {
+			      std::vector<amf::Element *> hell = msg->getElements();
+			      double foo = hell[0]->to_number();
+//			      log_debug("Result is: %g", foo);
+			      el = hell[0]; // some results contain only a stream ID
+			  } else {
+			      el = new Element;
+			      el->init(buf->reference());
+			  }
+		      }
 		      return el;
 		  } else {
 		      log_error("Couldn't decode message body for type %s!",

@@ -5,8 +5,8 @@
 
 // Handy image utilities for RGB surfaces.
 
-#ifndef IMAGE_H
-#define IMAGE_H
+#ifndef GNASH_IMAGE_H
+#define GNASH_IMAGE_H
 
 #include "dsodefs.h"
 #include <boost/cstdint.hpp>
@@ -16,10 +16,17 @@
 
 // Forward declarations
 namespace jpeg { class input; }
-namespace gnash { class IOChannel; }
+namespace gnash {
+    class IOChannel;
+    namespace image {
+        class alpha;
+    }    
+}
 
 
 /// Handy image utilities for RGB surfaces.
+namespace gnash
+{
 namespace image
 {
 	/// Base class for different types of images
@@ -32,8 +39,7 @@ namespace image
 			RGB,
 			RGBA,
 			ALPHA,
-			ROW,
-			YUV
+			ROW
 		};
 
 		id_image m_type;
@@ -42,15 +48,13 @@ namespace image
 			:
 			m_type(o.m_type),
 			m_size(o.size()),
-			m_data(new boost::uint8_t[m_size]),
 			m_width(o.width()),
 			m_height(o.height()),
-			m_pitch(o.m_pitch)
+			m_pitch(o.m_pitch),
+			m_data(new boost::uint8_t[m_size])
 		{
 			update(o);
 		}
-		
-			
 			
 		image_base(boost::uint8_t *data, int width, int height, int pitch, id_image type);
 
@@ -61,22 +65,22 @@ namespace image
 		virtual std::auto_ptr<image_base> clone() const=0;
 
 		/// Return size of this image buffer, in bytes
-		size_t size() const { return m_size; }
+		const size_t size() const { return m_size; }
 
 		/// Return size in bytes of a row of this image 
-		size_t pitch() const { return m_pitch; }
+		const size_t pitch() const { return m_pitch; }
 
 		/// Return size in bytes of a single pixel value
-		size_t pixelSize() const
+		const size_t pixelSize() const
 		{
-			return m_pitch/m_width;
+			return m_pitch / m_width;
 		}
 
 		/// Return width of image in pixels
-		size_t width() const { return m_width; }
+		const size_t width() const { return m_width; }
 
 		/// Return height of image in pixels
-		size_t height() const { return m_height; }
+		const size_t height() const { return m_height; }
 
 		/// Copy image data from a buffer.
 		//
@@ -96,6 +100,8 @@ namespace image
 		/// @param from image to copy data from.
 		///
 		void update(const image_base& from);
+		
+		void clear(const boost::uint8_t byteValue = 0);
 
 		/// Return a pointer to the underlying data
 		virtual boost::uint8_t* data() { return m_data.get(); }
@@ -112,28 +118,16 @@ namespace image
 		virtual ~image_base() {}
 
 
-		/// \brief
-		/// Fast, in-place resample.  For making mip-maps.  Munges the
-		/// input image to produce the output image.
-		//
-		/// @return true if resample happened, false otherwise
-		///         (image can't be shrinked, for example)
-		///
-		virtual bool make_next_miplevel() { return false; }
-
 	protected:
 
-		/// Size of image buffer in bytes
-		size_t m_size;
-
-		/// Data bytes, geometry defined by members below
-		boost::scoped_array<boost::uint8_t> m_data;
+		/// Size of image buffer in bytes.
+		const size_t m_size;
 
 		/// Width of image, in pixels
-		size_t	m_width;
+		const size_t m_width;
 
 		/// Height of image, in pixels
-		size_t	m_height;
+		const size_t m_height;
 
 		/// Byte offset from one row to the next
 		//
@@ -141,7 +135,10 @@ namespace image
 		/// For example, in an alpha image type this is equal to m_width
 		/// while for an RGB this is 3 times the m_width.
 		///
-		size_t	m_pitch;
+		const size_t m_pitch;
+
+		/// Data bytes, geometry defined by members below
+		boost::scoped_array<boost::uint8_t> m_data;
 
 	private:
 
@@ -171,8 +168,6 @@ namespace image
 
 		~rgb();
 
-		// See dox in base class
-		bool make_next_miplevel();
 	};
 
 	/// 32-bit RGBA image.  Packed data, red byte first (RGBARGBA...)
@@ -200,16 +195,10 @@ namespace image
 		//
 		/// TODO: move in base class ?
 		///
-		void	set_pixel(size_t x, size_t y, boost::uint8_t r, boost::uint8_t g, boost::uint8_t b, boost::uint8_t a);
+		void set_pixel(size_t x, size_t y, boost::uint8_t r, boost::uint8_t g, boost::uint8_t b, boost::uint8_t a);
 
-		/// Set alpha value for given pixel
-		//
-		/// TODO: move in base class ?
-		///
-		void	set_alpha(size_t x, size_t y, boost::uint8_t a);
+        void mergeAlpha(const boost::uint8_t* alphaData, const size_t bufferLength);
 
-		// See dox in base class
-		bool make_next_miplevel();
 	};
 
 	/// 8-bit alpha image.
@@ -230,9 +219,6 @@ namespace image
 
 		~alpha();
 
-		// See dox in base class
-		bool make_next_miplevel();
-
 		/// Set pixel value 
 		//
 		/// TODO: move in base class ?
@@ -242,73 +228,10 @@ namespace image
 		// Bitwise content comparison.
 		bool	operator==(const alpha& a) const;
 
-		// Return a hash code based on the image contents.
-		unsigned int	compute_hash() const;
 	};
-
-class DSOEXPORT yuv : public image_base
-{
-
-public:
-
-	enum {Y, U, V, T, NB_TEXS};
-
-	yuv(int w, int h);
-
-	yuv(const yuv& o)
-		:
-		image_base(o)
-	{
-		planes[0] = o.planes[0];
-		planes[1] = o.planes[1];
-		planes[2] = o.planes[2];
-		planes[3] = o.planes[3];
-	}
-
-	~yuv() {}
-
-	std::auto_ptr<image_base> clone() const
-	{
-		return std::auto_ptr<image_base>(new yuv(*this));
-	}
-
-
-	unsigned int video_nlpo2(unsigned int x) const;
-
-	struct plane {
-		unsigned int w, h, p2w, p2h, offset, size;
-		int unit;
-		int id;
-		float coords[4][2];
-	} planes[4];
-
-};
-
-	/// Make a system-memory 24-bit bitmap surface.  24-bit packed
-	/// data, red byte first.
-	DSOEXPORT rgb*	create_rgb(int width, int height);
-
-
-	/// \brief
-	/// Make a system-memory 32-bit bitmap surface.  Packed data,
-	/// red byte first.
-	DSOEXPORT rgba*	create_rgba(int width, int height);
-
-
-	/// Make a system-memory 8-bit bitmap surface.
-	DSOEXPORT alpha*	create_alpha(int width, int height);
-
-	DSOEXPORT void	resample(rgb* out, int out_x0, int out_y0, int out_x1, int out_y1,
-			 rgb* in, float in_x0, float in_y0, float in_x1, float in_y1);
-
-	DSOEXPORT void	resample(rgba* out, int out_x0, int out_y0, int out_x1, int out_y1,
-			 rgba* in, float in_x0, float in_y0, float in_x1, float in_y1);
 
 	/// Write the given image to the given out stream, in jpeg format.
 	DSOEXPORT void	write_jpeg(gnash::IOChannel* out, rgb* image, int quality);
-
-	/// Write a 32-bit Targa format bitmap.  Dead simple, no compression.
-	DSOEXPORT void	write_tga(gnash::IOChannel* out, rgba* image);
 
 	/// Create and read a new image from the given filename, if possible.
 	DSOEXPORT rgb*	read_jpeg(const char* filename);
@@ -334,9 +257,10 @@ public:
 	/// \brief
 	/// For reading SWF JPEG3-style image data, like ordinary JPEG, 
 	/// but stores the data in rgba format.
-	DSOEXPORT rgba*	read_swf_jpeg3(gnash::IOChannel* in);
-}
+	DSOEXPORT std::auto_ptr<rgba> readSWFJpeg3(gnash::IOChannel* in);
 
+} // namespace image
+} // namespace gnash
 
 #endif // IMAGE_H
 

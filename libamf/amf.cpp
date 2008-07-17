@@ -705,8 +705,13 @@ AMF::extractAMF(Network::byte_t *in, Network::byte_t* tooFar)
     AMF amf_obj;
     switch (type) {
       case Element::NUMBER_AMF0:
-	  el->makeNumber(tmpptr); 
+      {
+ 	  double swapped = *reinterpret_cast<const double*>(tmpptr);
+ 	  swapBytes(&swapped, amf::AMF0_NUMBER_SIZE);
+ 	  el->makeNumber(swapped); 
+//	  el->makeNumber(tmpptr); 
 	  tmpptr += AMF0_NUMBER_SIZE; // all numbers are 8 bit big endian
+      }
 	  break;
       case Element::BOOLEAN_AMF0:
 	  el->makeBoolean(tmpptr);

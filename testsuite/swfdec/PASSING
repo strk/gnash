@@ -76,6 +76,8 @@ atan2-7.swf:13e56f3a822c178d329bbe9b90e2d0d1
 atan2-7.swf:b4b0629233685ed5e518e5bf237bf413
 atan2-8.swf:1f1224383517a707df50dcd2ae0209d1
 atan2-8.swf:d780802cf9d18559de95d517248cf027
+attachMovie-height-7.swf:8a2ca2ab02e4d961e0f58458261fe5d8
+attachMovie-height-8.swf:1a13c8a03d52ff4ae0bacb782ceb77e9
 attachmovie-object-5.swf:a1fa0db4e7ac649e5451ff5e96a71436
 attachmovie-object-6.swf:52c0c8d46a3535c7db79d3d827b31b41
 attachmovie-object-7.swf:9a18445affc4ae1dc0e0fe085b13f1e1
@@ -133,6 +135,7 @@ color-setRGB.swf:0841414e9ac7d2f9b57e40aec3d2f44f
 color-setTransform-empty.swf:2a72a5273ab8713ee289ff1726b0959c
 color-setTransform-full.swf:7a8e59cef9592c4546f07fb9f391c61a
 color-setTransform-negative.swf:0bc0510c35fc5c82de31b0db887fe535
+color-transform-concat-5.swf:92f467ed0cee02fbc9618a17c382ef3b
 color-transform-properties-5.swf:74bd1e74d40fd8741000366645b7c776
 color-transform-properties-5.swf:7e620e53cb1e19d5793e3198e9f08993
 comparisons-4.swf:e0bb89e492f3f35e51b1beb190935a14
@@ -192,6 +195,18 @@ crash-0.6.2-try-and-exception-on-dispose-5.swf:8f84852b71f51a23f9e13ddfdfc2a2c5
 crash-0.6.2-try-and-exception-on-dispose-6.swf:d38fff4fefc1cdce2acd57e86fdce995
 crash-0.6.2-try-and-exception-on-dispose-7.swf:25f0b3acc112898018b1636cc1817cc9
 crash-0.6.2-try-and-exception-on-dispose-8.swf:c06c147bca86960edeb61a76d9397a68
+crash-0.6.6-date-5.swf:b031117303d7f300101996718c1d8060
+crash-0.6.6-date-6.swf:d2f3f459a988a3c20453f07ad1ad3d8e
+crash-0.6.6-date-7.swf:4a6bfae31e8bdf89b3fd539f3a927c26
+crash-0.6.6-date-8.swf:dc07a3fd4a98feff370c682f96168a73
+crash-0.6.6-prototype-recursion-5.swf:ecbca56f7f80d0ae0c951d7c45cf60d9
+crash-0.6.6-prototype-recursion-6.swf:54088c163e33ad0678f0bd26807781bc
+crash-0.6.6-prototype-recursion-7.swf:0c996ab78e5af56209dc32e9cbaef6ae
+crash-0.6.6-prototype-recursion-8.swf:9b43bbe0bd3457dc388c9cd1834a3581
+crash-0.6.6-variable-leak-5.swf:eb9ec5ab41a35bd1819605195772884e
+crash-0.6.6-variable-leak-6.swf:d85d0639def5a440172a10eaf1ed7ad4
+crash-0.6.6-variable-leak-7.swf:59fe1ccc2a74e287f980e595cfae702f
+crash-0.6.6-variable-leak-8.swf:bc9e32d3192b0c76edb59b520a267a82
 crash-0.6.6-xmlsocket-5.swf:e9937cdcd235cad110819b6f9de08bf1
 crash-0.6.6-xmlsocket-6.swf:cce08de20a0a1904d8cc97b080d3b810
 crash-0.6.6-xmlsocket-7.swf:2dff96eae2d05f626f4170319bc4e799
@@ -204,6 +219,11 @@ crash-0.7.1-throw-5.swf:4a54d089b1fd08ef3f3b8a3863878fa5
 crash-0.7.1-throw-6.swf:9a6eecc2b5c8719e09632b50f582b1e2
 crash-0.7.1-throw-7.swf:5a5ff9577985062102185216f9e7822c
 crash-0.7.1-throw-8.swf:3f7a9f84d42ab0d05b1d035f6ae37d56
+crash-0.7.1-uncompressed-half-samples-5.swf:660401da7dc98ec2773acc603203d577
+crash-0.7.1-uncompressed-half-samples-6.swf:7ea0fa524a97ac33fa2f76c13ac9c09c
+crash-0.7.1-uncompressed-half-samples-7.swf:bd828f2702ae2d96c31f0ec74e8eb2d9
+crash-0.7.1-uncompressed-half-samples-8.swf:8043058b7c22459d2f8ef3f69884cf04
+crash-0.7.2-TextField-replace-infloop-6.swf:a75b13bb89ab3f2fc673ba2af3fa856f
 createTextField-returnvalue-6.swf:876f64cb4349313be58d1b9de5ca2ff4
 createTextField-returnvalue-7.swf:397473c78af05cbb9e7e394ec4ce1a07
 createTextField-returnvalue-8.swf:398e15cdabb4c9f9bdb56ee5b07e5126
@@ -451,6 +471,10 @@ lots-of-arguments-8.swf:9f73b7b8265b8e5ece847ff29db6cafc
 math-constants-5.swf:ca9d0fc66667d7c7863e699367176573
 math-constants-6.swf:cc4a6b92d473f57cb5479c97ba77c2e0
 math-constants-7.swf:53df046dd67c331c79c0c939215ac770
+matrix-construct-5.swf:bfc2176f4495b5f7465afd1a6f489ead
+matrix-properties-5.swf:a80d726dfde5b460add76a7532e7ee01
+matrix-properties-6.swf:a7934cc5476219b199a40c4feb627dfe
+matrix-properties-7.swf:144e6c666febf556bec9864ee234a54a
 mouse-addProperty-relevant-5.swf:1bfc494379c8192d0b410ab431efbebd
 mouse-movie-below-movie-5.swf:c7d97de8768c341a64df75dca2686c0b
 mouse-movie-below-nonevent-movie-5.swf:9027280bdb516e12f2e4255776c079a1
@@ -504,6 +528,7 @@ movieclip-swap-depths-5.swf:4c337a1aaa285b1e7d000acc06b6a5d7
 movieclip-swap-depths-6.swf:fdb57e8db6df99d66d93f6fd2d39b0c7
 movieclip-swap-depths-7.swf:fb8d472e5da28d95684ce067fccae829
 movieclip-swap-depths-8.swf:a02edb0c644d0a47fee7c3ca5135d748
+movieclip-swap-depths-range-5.swf:7bb6af574af7655b76bc705de95f21a3
 movieclip-target-5.swf:28c37b3a6a910310876edd7cbc801189
 movieclip-target-6.swf:05b920ce25223634a33446718716e51e
 movieclip-target-7.swf:fca8a267d9a4d2e7aa6dd47be281ac02
@@ -837,6 +862,7 @@ settarget-relative-5.swf:221055729979efd8dea86a64474ed731
 settarget-relative-6.swf:18dfc8f881ef9b0f7d52ffd4b4999f6d
 settarget-relative-7.swf:63c614bc2a052ca9f1fb9d87999de285
 settarget-relative-8.swf:f49b0132cd0c545321eb9a8d32b9ea99
+settarget-remove-5.swf:c317c806ebb14ac9dc4a5039591f7ce3
 settarget-tostring-5.swf:f08ae059e37ed95aa18ca77778531ef6
 settarget-tostring-6.swf:31dbe71a86643100339d6b918abdbead
 settarget-tostring-7.swf:aaae1953f0a974bf91587bebc658c370
@@ -925,6 +951,7 @@ string-slice-5.swf:a98bdbd8ce5ff3cfd5406d3a9d04de33
 string-slice-6.swf:cfe7fde1085617b6673fda9895162e32
 string-slice-7.swf:eaed0b05db4e5a01579a94f283f8a068
 string-split-empty-5.swf:0cdbe0cfc78b49bdf37c1e71bfc5743f
+string-split-empty-5.swf:5e9ed1cad7e80dddeed72f6674a034a3
 string-split-empty-6.swf:94aacd4a972c8eae6fa7ebe945074414
 string-split-empty-7.swf:3be198e0f9277bf4749bddddf85dce33
 string-trace-5.swf:14759c53a46b39e873a3f928a3e992f5
@@ -980,6 +1007,8 @@ text-field-init-5.swf:f9c095838e41c5b00de362cef6c20167
 text-field-init-native-5.swf:881f1f6314617bd2d789fa99f9765e60
 text-field-replace-text-5.swf:571ec2f1d311c65f98e5e7f76392cb9e
 text-field-set-text-format-5.swf:f576da900f9e9b8d911f6791d4114983
+text-field-tag-variable-change.swf:4c03970cb4293453219d053f3c07d024
+text-field-tag-variable.swf:a9e93d3ab26a08dafb196ffd7450e4f7
 textformat-init-5.swf:52dec30885359d5bdda450588076eb10
 textformat-init-5.swf:d45b857148b96635af7d18855cb067ae
 this-localfunction-5.swf:f19b0894fdb355070a7358904536a4f4
@@ -997,6 +1026,9 @@ too-many-blocks-6.swf:db4557c9db46fa17623def9ca7201dcc
 too-many-blocks-7.swf:001ea87d7f7a99cae8a50170892ab4ed
 too-many-blocks-8.swf:882a04f9f7aa70a2994c88532d1dcc12
 totalframes.swf:cdc0d5e2017d293438ef80fa136c44e8
+transform-color-transform-5.swf:1b03afaa179024037f5d167556b3f7a9
+transform-color-transform-6.swf:8cfd79068cc9d51db8796bb27186bbda
+transform-color-transform-7.swf:bd48f8529157f81c30caca47ce6bb871
 transform-properties-5.swf:9332e41f53db6ec456387efffd9e12a7
 transform-properties-5.swf:b0386824584340e1d0a80f986ce779b9
 transform.swf:5c8533f9168ca3e92d000ce1693ed5ef
