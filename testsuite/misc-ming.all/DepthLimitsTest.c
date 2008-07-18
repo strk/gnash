@@ -147,21 +147,41 @@ main(int argc, char** argv)
 	                "d = dup1.getDepth();");
 	check_equals(mo, "d", "-1");
 
+	add_actions(mo, "original.duplicateMovieClip('odup1', -1);"
+	                "d = odup1.getDepth();");
+	check_equals(mo, "d", "-1");
+
 	add_actions(mo, "duplicateMovieClip('original', 'dup2', -16384);"
 	                "d = dup2.getDepth();");
 	check_equals(mo, "d", "-16384");
 
+	add_actions(mo, "original.duplicateMovieClip('odup2', -16384);"
+	                "d = odup2.getDepth();");
+	check_equals(mo, "d", "-16384");
+
 	add_actions(mo, "duplicateMovieClip('original', 'dup3', -16385);"
 	                "d = dup3.getDepth();");
-	xcheck_equals(mo, "d", "undefined");
+	check_equals(mo, "d", "undefined");
+
+	add_actions(mo, "original.duplicateMovieClip('odup3', -16385);"
+	                "d = odup3.getDepth();");
+	check_equals(mo, "d", "undefined");
 
 	add_actions(mo, "duplicateMovieClip('original', 'dup4', 2130690044);"
 	                "d = dup4.getDepth();");
 	check_equals(mo, "d", "2130690044");
 
+	add_actions(mo, "original.duplicateMovieClip('odup4', 2130690044);"
+	                "d = odup4.getDepth();");
+	check_equals(mo, "d", "2130690044");
+
 	add_actions(mo, "duplicateMovieClip('original', 'dup5', 2130690045);"
 	                "d = dup5.getDepth();");
-	xcheck_equals(mo, "d", "undefined");
+	check_equals(mo, "d", "undefined");
+
+	add_actions(mo, "original.duplicateMovieClip('odup5', 2130690045);"
+	                "d = odup5.getDepth();");
+	check_equals(mo, "d", "undefined");
     
 	add_actions(mo, "totals(); stop();");
 
