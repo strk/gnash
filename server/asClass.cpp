@@ -29,7 +29,7 @@
 namespace gnash {
 #define STV(x) VM::get().getStringTable().value(x).c_str()
 
-asMethod::asMethod()
+asMethod::asMethod():mBody()
 {
 //TODO
 }
