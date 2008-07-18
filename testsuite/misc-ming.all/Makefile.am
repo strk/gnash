@@ -112,6 +112,7 @@ check_PROGRAMS = \
 	displaylist_depths_test9 \
 	displaylist_depths_test10 \
 	displaylist_depths_test11 \
+	DepthLimitsTest \
 	masks_test \
 	masks_test2 \
 	masks_test2runner \
@@ -905,6 +906,18 @@ displaylist_depths_test11runner: $(srcdir)/../generic-testrunner.sh displaylist_
 	sh $< -f20 $(top_builddir) displaylist_depths_test11.swf > $@
 	chmod 755 $@
 
+
+DepthLimitsTest_SOURCES = DepthLimitsTest.c
+DepthLimitsTest_LDADD = libgnashmingutils.la
+
+DepthLimitsTest.swf: DepthLimitsTest
+	./DepthLimitsTest $(top_srcdir)/testsuite/media
+
+DepthLimitsTestrunner: $(srcdir)/../generic-testrunner.sh DepthLimitsTest.swf
+	sh $< -r5 $(top_builddir) DepthLimitsTest.swf > $@
+	chmod 755 $@
+
+	
 replace_shapes1test_SOURCES = replace_shapes1test.c	
 replace_shapes1test_LDADD = libgnashmingutils.la
 
@@ -1803,6 +1816,7 @@ TEST_CASES = \
 	displaylist_depths_test9runner \
 	displaylist_depths_test10runner \
 	displaylist_depths_test11runner \
+	DepthLimitsTestrunner \
 	matrix_testrunner \
 	frame_label_testrunner \
 	path_format_testrunner \
