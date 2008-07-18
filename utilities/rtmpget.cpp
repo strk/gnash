@@ -188,6 +188,8 @@ main(int argc, char *argv[])
     
     RTMPClient client;    
     short port = 0;
+    string path;
+    string filename;
     
     // Trap ^C (SIGINT) so we can kill all the threads
     act.sa_handler = cntrlc_handler;
@@ -231,19 +233,17 @@ main(int argc, char *argv[])
     RTMPMsg *msg2 = 0;
     int ret = 0;
     string tcUrl = uri.protocol() + "://" + uri.hostname();
-    string path;
     size_t pos = uri.path().rfind('/', uri.path().size());
     if (pos != string::npos) {
 	path = uri.path().substr(1, pos);
+	filename = uri.path().substr(pos+1, uri.path().size());
 	tcUrl += '/' + path;
-	cerr << "FIXME: path is: " << path << endl;
     }
     if (path != "video/2006/sekt/gate06/tablan_valentin") {
 	log_error("Bad application path! %s", path);
     } else {
 	log_debug("Good application path!");
     }
-    
     log_debug("Sending NetConnection Connect message,");
     Buffer *buf2 = client.encodeConnect(path.c_str(), "mediaplayer.swf", tcUrl.c_str(), 615, 124, 1, "http://gnashdev.org");
 //    Buffer *buf2 = client.encodeConnect("video/2006/sekt/gate06/tablan_valentin", "mediaplayer.swf", "rtmp://velblod.videolectures.net/video/2006/sekt/gate06/tablan_valentin", 615, 124, 1, "http://gnashdev.org");

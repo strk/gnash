@@ -86,8 +86,8 @@ push_args = function() {
 
 this_counter = 0;
 this_timer = getTimer();
-this_ms = 0.0001;
-this_interval  = setInterval(do_this, 0.0001);
+this_ms = 1; // 0.0001;
+this_interval  = setInterval(do_this, 1); // 0.0001);
 check_equals(this_interval, 1);
 
 that_counter = 0;

@@ -633,7 +633,7 @@ RTMP::decodeMsgBody(Network::byte_t *data, size_t size)
 //     swapBytes(&swapped, amf::AMF0_NUMBER_SIZE);
     msg->setStreamID(swapped);
 
-    if ((msg->getMethodName() == "_result") || (msg->getMethodName() == "error")) {
+    if ((msg->getMethodName() == "_result") || (msg->getMethodName() == "error") || (msg->getMethodName() == "eonStatus")) {
  	status = true;
     }
     
