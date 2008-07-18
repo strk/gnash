@@ -106,38 +106,63 @@ main(int argc, char** argv)
 	
 	add_actions(mo, "attachMovie('redsquare', 'depthtest', -16, initObj);"
 	                "d = depthtest.getDepth();");
-	xcheck_equals(mo, "d", "-16");
+	check_equals(mo, "d", "-16");
 
 
 	add_actions(mo, "attachMovie('redsquare', 'depthtest', -16384, initObj);"
 	                "d = depthtest.getDepth();");
-	xcheck_equals(mo, "d", "-16384");
+	check_equals(mo, "d", "-16384");
 
     /* Less than -16384 fails */
 	add_actions(mo, "attachMovie('redsquare', 'depthtest2', -20000, initObj);"
 	                "d = depthtest2.getDepth();");
-	xcheck_equals(mo, "d", "undefined");
+	check_equals(mo, "d", "undefined");
 
     /* It really does */
 	add_actions(mo, "attachMovie('redsquare', 'depthtest2', -16385, initObj);"
 	                "d = depthtest2.getDepth();");
-	xcheck_equals(mo, "d", "undefined");
+	check_equals(mo, "d", "undefined");
 
     /* Up to 2130690044 works */
 	add_actions(mo, "attachMovie('redsquare', 'depthtest2', 1147483648, initObj);"
 	                "d = depthtest2.getDepth();");
-	xcheck_equals(mo, "d", "1147483648");
+	check_equals(mo, "d", "1147483648");
 
     /* Up to 2130690044 works */
 	add_actions(mo, "attachMovie('redsquare', 'depthtest3', 2130690044, initObj);"
 	                "d = depthtest3.getDepth();");
-	xcheck_equals(mo, "d", "2130690044");
+	check_equals(mo, "d", "2130690044");
 
     /* 2130690045 doesn't work */
 	add_actions(mo, "attachMovie('redsquare', 'depthtest4', 2130690045, initObj);"
 	                "d = depthtest4.getDepth();");
+	check_equals(mo, "d", "undefined");
+
+    /* duplicateMovieClip */
+    /* Same limits...     */
+
+    add_actions(mo, "createEmptyMovieClip('original', 10);");
+
+	add_actions(mo, "duplicateMovieClip('original', 'dup1', -1);"
+	                "d = dup1.getDepth();");
+	check_equals(mo, "d", "-1");
+
+	add_actions(mo, "duplicateMovieClip('original', 'dup2', -16384);"
+	                "d = dup2.getDepth();");
+	check_equals(mo, "d", "-16384");
+
+	add_actions(mo, "duplicateMovieClip('original', 'dup3', -16385);"
+	                "d = dup3.getDepth();");
 	xcheck_equals(mo, "d", "undefined");
 
+	add_actions(mo, "duplicateMovieClip('original', 'dup4', 2130690044);"
+	                "d = dup4.getDepth();");
+	check_equals(mo, "d", "2130690044");
+
+	add_actions(mo, "duplicateMovieClip('original', 'dup5', 2130690045);"
+	                "d = dup5.getDepth();");
+	xcheck_equals(mo, "d", "undefined");
+    
 	add_actions(mo, "totals(); stop();");
 
 	SWFMovie_nextFrame(mo); /* showFrame */
