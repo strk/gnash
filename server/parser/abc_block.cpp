@@ -477,8 +477,6 @@ abc_block::read_multinames()
 		boost::uint32_t name = 0;
 		boost::uint32_t nsset = 0;
 
-		mMultinamePool[i].mFlags = 0;
-
 		// Read, but don't upper validate until after the switch.
 		switch (kind)
 		{
@@ -487,29 +485,17 @@ abc_block::read_multinames()
         {
             ns = mS->read_V32();
             name = mS->read_V32();
-			mMultinamePool[i].setQName();
-            if (kind == asName::KIND_QnameA)
-				mMultinamePool[i].setAttr();
             break;
         }
         case asName::KIND_RTQname:
         case asName::KIND_RTQnameA:
         {
             name = mS->read_V32();
-            mMultinamePool[i].mFlags |= asName::FLAG_QNAME
-                | asName::FLAG_RTNS;
-            if (kind == asName::KIND_RTQnameA)
-				mMultinamePool[i].setAttr();
             break;
         }
         case asName::KIND_RTQnameL:
         case asName::KIND_RTQnameLA:
         {
-            mMultinamePool[i].mFlags |= asName::FLAG_QNAME
-                | asName::FLAG_RTNAME
-                | asName::FLAG_RTNS;
-            if (kind == asName::KIND_RTQnameLA)
-				mMultinamePool[i].setAttr();
             break;
         }
         case asName::KIND_Multiname:
@@ -523,9 +509,6 @@ abc_block::read_multinames()
                 ERR((_("ABC: 0 selection for namespace set is invalid.\n")));
                 return false;
             }
-            mMultinamePool[i].mFlags |= asName::FLAG_NSSET;
-            if (kind == asName::KIND_MultinameA)
-                mMultinamePool[i].mFlags |= asName::FLAG_ATTR;
             break;
         }
         case asName::KIND_MultinameL:
@@ -538,10 +521,6 @@ abc_block::read_multinames()
                 ERR((_("ABC: 0 selection for namespace set is invalid.\n")));
                 return false;
             }
-            mMultinamePool[i].mFlags |= asName::FLAG_RTNAME
-                | asName::FLAG_NSSET;
-            if (kind == asName::KIND_MultinameLA)
-				mMultinamePool[i].setAttr();
             break;
         }
         default:
@@ -568,6 +547,7 @@ abc_block::read_multinames()
 			return false;
 		}
 
+		mMultinamePool[i].mFlags = kind;
 		mMultinamePool[i].setName(name);
 
 		if (ns)
