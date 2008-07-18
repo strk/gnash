@@ -1156,7 +1156,7 @@ SWFHandlers::ActionDuplicateClip(ActionExec& thread)
 
     // Movies should be attachable from -16384 to 2130690044. See
     // Tests in misc-ming.all/DepthLimitsTest.c.
-    const double depth = env.top(0).to_int() + character::staticDepthOffset;
+    const double depth = env.top(0).to_number() + character::staticDepthOffset;
   
     // This also checks for overflow, as both numbers are expressible as
     // boost::int32_t.
