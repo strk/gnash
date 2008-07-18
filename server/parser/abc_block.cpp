@@ -398,14 +398,7 @@ abc_block::read_namespaces()
 		boost::uint8_t kind = mS->read_u8();
 		boost::uint32_t nameIndex = mS->read_V32();
 
-		if (nameIndex && nameIndex < mStringPool.size())
-		{
-			if (mStringPoolTableIds[nameIndex] == 0)
-				mStringPoolTableIds[nameIndex] =
-					mStringTable->find(mStringPool[nameIndex]);
-			nameIndex = mStringPoolTableIds[nameIndex];
-		}
-		else if (nameIndex >= mStringPool.size())
+		if (nameIndex >= mStringPool.size())
 		{
 			ERR((_("ABC: Out of bounds string given for namespace.\n")));
 			return false;
@@ -427,6 +420,7 @@ abc_block::read_namespaces()
 		{
 			mNamespacePool[i]->setProtected();
 		}
+		mNamespacePool[i]->setURI(nameIndex);
 	}
 	return true;
 }
