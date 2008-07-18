@@ -239,9 +239,8 @@ sprite_attach_movie(const fn_call& fn)
 
   // Movies should be attachable from -16384 to 2130690045, according to
   // kirupa (http://www.kirupa.com/developer/actionscript/depths2.htm)
-  // Tests in misc-ming.all/attachMovieTest.c show that 2130690044 is the
+  // Tests in misc-ming.all/DepthLimitsTest.c show that 2130690044 is the
   // maximum valid depth.
-  
   const double depth = fn.arg(2).to_number();
   
   // This also checks for overflow, as both numbers are expressible as
@@ -368,6 +367,9 @@ static as_value sprite_create_empty_movieclip(const fn_call& fn)
     }
   }
 
+  // Unlike other MovieClip methods, the depth argument of an empty movie clip
+  // can be any number. All numbers are converted to an int32_t, and are valid
+  // depths even when outside the usual bounds.
   character* ch = sprite->add_empty_movieclip(fn.arg(0).to_string().c_str(),
                                               fn.arg(1).to_int());
   return as_value(ch);
@@ -516,7 +518,8 @@ static as_value sprite_swap_depths(const fn_call& fn)
 //       and invoke it from here, this should only be a wrapper
 //
 //duplicateMovieClip(name:String, depth:Number, [initObject:Object]) : MovieClip
-static as_value sprite_duplicate_movieclip(const fn_call& fn)
+static as_value
+sprite_duplicate_movieclip(const fn_call& fn)
 {
   boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
   
@@ -529,7 +532,19 @@ static as_value sprite_duplicate_movieclip(const fn_call& fn)
   }
 
   const std::string& newname = fn.arg(0).to_string();
-  int depth = int(fn.arg(1).to_number());
+
+  // Depth as in attachMovie
+  const double depth = fn.arg(1).to_number();
+  
+  // This also checks for overflow, as both numbers are expressible as
+  // boost::int32_t.
+  if (depth < character::lowerAccessibleBound ||
+      depth > character::upperAccessibleBound)
+  {
+    return as_value();
+  }
+  
+  boost::int32_t depthValue = static_cast<boost::int32_t>(depth);
 
   boost::intrusive_ptr<sprite_instance> ch;
 
@@ -537,11 +552,11 @@ static as_value sprite_duplicate_movieclip(const fn_call& fn)
   if (fn.nargs == 3)
   {
     boost::intrusive_ptr<as_object> initObject = fn.arg(2).to_object();
-    ch = sprite->duplicateMovieClip(newname, depth, initObject.get());
+    ch = sprite->duplicateMovieClip(newname, depthValue, initObject.get());
   }
   else
   {
-    ch = sprite->duplicateMovieClip(newname, depth);
+    ch = sprite->duplicateMovieClip(newname, depthValue);
   }
 
   return as_value(ch.get());

@@ -1154,7 +1154,21 @@ SWFHandlers::ActionDuplicateClip(ActionExec& thread)
 
     thread.ensureStack(3);
 
-    const int depth = env.top(0).to_int() + character::staticDepthOffset;
+    // Movies should be attachable from -16384 to 2130690044. See
+    // Tests in misc-ming.all/DepthLimitsTest.c.
+    const double depth = env.top(0).to_int() + character::staticDepthOffset;
+  
+    // This also checks for overflow, as both numbers are expressible as
+    // boost::int32_t.
+    if (depth < character::lowerAccessibleBound ||
+      depth > character::upperAccessibleBound)
+    {
+        env.drop(3);
+        return;
+    }
+  
+    boost::int32_t depthValue = static_cast<boost::int32_t>(depth);
+    
     const std::string& newname = env.top(1).to_string();
     const std::string& path = env.top(2).to_string();
 
@@ -1180,7 +1194,7 @@ SWFHandlers::ActionDuplicateClip(ActionExec& thread)
         return;
     }
 
-    sprite->duplicateMovieClip(newname, depth);
+    sprite->duplicateMovieClip(newname, depthValue);
     env.drop(3);
 }
 
