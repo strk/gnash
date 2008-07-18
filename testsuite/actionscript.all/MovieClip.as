@@ -27,19 +27,19 @@ rcsid="$Id: MovieClip.as,v 1.133 2008/05/09 13:21:08 strk Exp $";
 endOfTest = function() 
 {
 #if OUTPUT_VERSION <= 5
-	check_totals(231); // SWF5
+	check_totals(236); // SWF5
 #endif
 
 #if OUTPUT_VERSION == 6
-	check_totals(650); // SWF6
+	check_totals(655); // SWF6
 #endif
 
 #if OUTPUT_VERSION == 7
-	check_totals(667); // SWF7
+	check_totals(672); // SWF7
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(668); // SWF8+
+	check_totals(673); // SWF8+
 #endif
 
 	play();
@@ -1594,6 +1594,42 @@ check_equals(typeof(ret), 'undefined');
 	dataLoadInterval = setInterval(onDataCheck, 1000);
 #endif
 
+/// Depth tests.
+
+createEmptyMovieClip("d1", -200000000);
+#if OUTPUT_VERSION > 5
+check_equals(d1.getDepth(), -200000000);
+#else
+xcheck_equals(d1.getDepth(), -200000000);
+#endif
+
+createEmptyMovieClip("d2", -0xffffffff);
+#if OUTPUT_VERSION > 5
+check_equals(d2.getDepth(), 1);
+#else
+xcheck_equals(d2.getDepth(), 1);
+#endif
+
+createEmptyMovieClip("d3", 0xffffffff);
+#if OUTPUT_VERSION > 5
+check_equals(d3.getDepth(), -1);
+#else
+xcheck_equals(d3.getDepth(), -1);
+#endif
+
+createEmptyMovieClip("d4", 0x80000000);
+#if OUTPUT_VERSION > 5
+check_equals(d4.getDepth(), -2147483648);
+#else
+xcheck_equals(d4.getDepth(), -2147483648);
+#endif
+
+createEmptyMovieClip("d5", 0x79999999);
+#if OUTPUT_VERSION > 5
+check_equals(d5.getDepth(), 2040109465);
+#else
+xcheck_equals(d5.getDepth(), 2040109465);
+#endif
 
 //_root.loadVariables(MEDIA(vars.txt), "GET");
 

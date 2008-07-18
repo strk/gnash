@@ -317,15 +317,27 @@ public:  // TODO: make protected
 
 public:
 
-    /// This is the amount added to displaylist tag defined depths.
-    /// Character placed by tags (vs. characters instantiated by ActionScript)
-    /// always have negative depths by effect of this offset.
-    //
+    /// The lowest placeable and accessible depth for a character.
     /// Macromedia Flash help says: depth starts at -16383 (0x3FFF)
     ///
     /// See: http://www.senocular.com/flash/tutorials/depths/?page=2
-    ///
-    static const int staticDepthOffset = -16384;
+    //
+    /// See also http://www.kirupa.com/developer/actionscript/depths2.htm
+    //
+    /// The only way to exceed these bounds is with createEmptyMoveClip(),
+    /// which can be placed at any depth within +/- 2**31.
+    static const int lowerAccessibleBound = -16384;
+    
+    
+    /// This is the maximum depth a MovieClip character can be placed
+    /// at (attachMovie). Kirupa (see above) says 2130690045, but this
+    /// seems not to be included in the range.
+    static const int upperAccessibleBound = 2130690044;
+
+    /// This is the amount added to displaylist tag defined depths.
+    /// Character placed by tags (vs. characters instantiated by ActionScript)
+    /// always have negative depths by effect of this offset.
+    static const int staticDepthOffset = lowerAccessibleBound;
 
     /// This is the offset at which character's depth is
     /// shifted when a character is removed from stage but

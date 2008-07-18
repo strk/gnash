@@ -45,6 +45,8 @@ namespace gnash
 {
 
 // Define static const members or there will be linkage problems.
+const int character::lowerAccessibleBound;
+const int character::upperAccessibleBound;
 const int character::staticDepthOffset;
 const int character::removedDepthOffset;
 const int character::noClipDepthValue;
