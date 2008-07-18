@@ -568,12 +568,7 @@ abc_block::read_multinames()
 			return false;
 		}
 
-		// Load the string table with the name if not already there.
-		if (name && mStringPoolTableIds[name] == 0)
-		{
-			mStringPoolTableIds[name] = mStringTable->find(mStringPool[name]);
-		}
-		mMultinamePool[i].setName(mStringPoolTableIds[name]);
+		mMultinamePool[i].setName(name);
 
 		if (ns)
 			mMultinamePool[i].setNamespace(mNamespacePool[ns]);
