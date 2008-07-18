@@ -230,10 +230,24 @@ main(int argc, char *argv[])
     RTMP::rtmp_head_t *rthead = 0;
     RTMPMsg *msg2 = 0;
     int ret = 0;
+    string tcUrl = uri.protocol() + "://" + uri.hostname();
+    string path;
+    size_t pos = uri.path().rfind('/', uri.path().size());
+    if (pos != string::npos) {
+	path = uri.path().substr(1, pos);
+	tcUrl += '/' + path;
+	cerr << "FIXME: path is: " << path << endl;
+    }
+    if (path != "video/2006/sekt/gate06/tablan_valentin") {
+	log_error("Bad application path! %s", path);
+    } else {
+	log_debug("Good application path!");
+    }
     
     log_debug("Sending NetConnection Connect message,");
-    Buffer *buf2 = client.encodeConnect("video/2006/sekt/gate06/tablan_valentin", "http://videolectures.net/site/media/flvplayer/mediaplayer.swf", "rtmp://velblod.videolectures.net/video/2006/sekt/gate06/tablan_valentin", 615, 124, 1, "http://videolectures.net/gate06_tablan_bcueu/");
-//    Buffer *buf2 = client.encodeConnect("oflaDemo", "http://192.168.1.70/software/gnash/tests/ofla_demo.swf", "rtmp://localhost/oflaDemo", 615, 124, 1, "http://192.168.1.70/software/gnash/tests/index.html");
+    Buffer *buf2 = client.encodeConnect(path.c_str(), "mediaplayer.swf", tcUrl.c_str(), 615, 124, 1, "http://gnashdev.org");
+//    Buffer *buf2 = client.encodeConnect("video/2006/sekt/gate06/tablan_valentin", "mediaplayer.swf", "rtmp://velblod.videolectures.net/video/2006/sekt/gate06/tablan_valentin", 615, 124, 1, "http://gnashdev.org");
+//    Buffer *buf2 = client.encodeConnect("oflaDemo", "http://192.168.1.70/software/gnash/tests/ofla_demo.swf", "rtmp://localhost/oflaDemo/stream", 615, 124, 1, "http://192.168.1.70/software/gnash/tests/index.html");
     buf2->resize(buf2->size() - 6); // FIXME: encodeConnect returns the wrong size for the buffer!
     size_t total_size = buf2->size(); 
     
@@ -255,13 +269,14 @@ main(int argc, char *argv[])
     Element *res2 = client.sendRecvMsg(0x3, RTMP::HEADER_12, total_size,
 				      RTMP::INVOKE, RTMPMsg::FROM_CLIENT,
 				      buf3);
+    double streamID = 0.0;
     if (res2 == 0) {
 	log_error("Couldn't send NetStream::createStream message,");
 //	exit(-1);
     } else {
 	log_debug("NetStream::createStream message succeeded.");
+	streamID = res2->to_number();
     }
-    double streamID = res2->to_number();
     int id = int(streamID);
     cerr << "Stream ID returned from createStream is: " << id << endl;
     
