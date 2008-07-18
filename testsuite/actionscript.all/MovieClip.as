@@ -1594,7 +1594,25 @@ check_equals(typeof(ret), 'undefined');
 	dataLoadInterval = setInterval(onDataCheck, 1000);
 #endif
 
+/// Depth tests.
 
+createEmptyMovieClip("d1", -200000000);
+check_equals(d1.getDepth(), -200000000);
+
+createEmptyMovieClip("d2", -0xffffffff);
+check_equals(d2.getDepth(), 1);
+
+createEmptyMovieClip("d3", 0xffffffff);
+check_equals(d3.getDepth(), -1);
+
+createEmptyMovieClip("d4", 0x80000000);
+check_equals(d4.getDepth(), -2147483648);
+
+createEmptyMovieClip("d5", 0x79999999);
+check_equals(d5.getDepth(), 2040109465);
+
+d5.attachMovie("am1", "newName", -2000000);
+check_equals(am1.getDepth(), -2000000);
 //_root.loadVariables(MEDIA(vars.txt), "GET");
 
 // Can't rely on this to call onData!
