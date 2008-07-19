@@ -248,6 +248,9 @@ sprite_attach_movie(const fn_call& fn)
   if (depth < character::lowerAccessibleBound ||
       depth > character::upperAccessibleBound)
   {
+    IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("MovieClip.attachMovie: invalid depth %d passed; not attaching"), depth);
+    );
     return as_value();
   }
   
@@ -541,6 +544,9 @@ sprite_duplicate_movieclip(const fn_call& fn)
   if (depth < character::lowerAccessibleBound ||
       depth > character::upperAccessibleBound)
   {
+    IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("MovieClip.duplicateMovieClip: invalid depth %d passed; not duplicating"), depth);
+    );  
     return as_value();
   }
   

@@ -1163,6 +1163,9 @@ SWFHandlers::ActionDuplicateClip(ActionExec& thread)
     if (depth < character::lowerAccessibleBound ||
       depth > character::upperAccessibleBound)
     {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("duplicateMovieClip: invalid depth %d passed; not duplicating"), depth);
+        );  
         env.drop(3);
         return;
     }
