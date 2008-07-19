@@ -777,7 +777,9 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 
 	boost::mutex::scoped_lock lock(handler->_mutex);
 
-  int finalVolume = int(128*handler->getFinalVolume()/100.0);
+	if ( handler->isPaused() ) return;
+
+	int finalVolume = int(128*handler->getFinalVolume()/100.0);
 
 	// If nothing to play there is no reason to play
 	// Is this a potential deadlock problem?
