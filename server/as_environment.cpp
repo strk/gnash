@@ -30,6 +30,7 @@
 #include "namedStrings.h"
 #include "as_function.h" // for as_environment::CallFrame::markReachableResources
 
+#include <cstring> // std::strpbrk
 #include <string>
 #include <utility> // for std::pair
 #include <boost/algorithm/string/case_conv.hpp>
@@ -223,7 +224,7 @@ as_environment::get_variable_raw(
     // Fallback.
     // FIXME, should this be log_error?  or log_swferror?
     IF_VERBOSE_ASCODING_ERRORS (
-    log_aserror(_("reference to unexisting variable '%s'"),
+    log_aserror(_("reference to non-existent variable '%s'"),
            varname);
     );
 
@@ -236,7 +237,7 @@ as_environment::del_variable_raw(
     const ScopeStack& scopeStack) 
     // varname must be a plain variable name; no path parsing.
 {
-	assert( ! strpbrk(varname.c_str(), ":/.") );
+	assert( ! std::strpbrk(varname.c_str(), ":/.") );
 
 	string_table::key varkey = VM::get().getStringTable().find(varname);
 	as_value	val;
