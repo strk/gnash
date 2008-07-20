@@ -52,7 +52,7 @@
 # define STACK_DUMP_LIMIT 32
 
 // Define to get debugging messages for try / catch
-//#define GNASH_DEBUG_TRY 1
+#define GNASH_DEBUG_TRY 1
 
 #endif
 
@@ -379,15 +379,16 @@ ActionExec::operator() ()
 // catch { }
 // finally { };
 //
-// The catch and finally blocks are both optional.
-// 1. the catch block is *always* executed, even when no exception is thrown. This
-//    may be different when the catch variable is typed ( "catch (e:Error) {};" )
-// 2. the finally block is *always* executed, even when an exception is thrown.
-// 3. execution is interrupted if there are no catchers left and an exception
-//    is still on the stack.
+// For functions:
+//
+// 1. The catch block is only executed when an exception is thrown.
+// 2. The finally block is *always* executed, even when there is no exception
+//    *and* a return in try!
+// 3. Unhandled executions are handled the same.
 // 4. If an exception is thrown in a function and not caught within that function,
 //    the return value is the exception, unless the 'finally' block has its own
 //    return. (In that case, the exception is never handled).
+
 bool
 ActionExec::processExceptions(TryBlock& t)
 {
@@ -424,9 +425,17 @@ ActionExec::processExceptions(TryBlock& t)
 #ifdef GNASH_DEBUG_TRY 
                 log_debug("TRY block: No exception, continuing as normal.");
 #endif
-                // All code up to the end of the TryBlock should be
-                // executed.
-                stop_pc = t._afterTriedOffset;
+
+                // No exception, so the try block should be executed,
+                // then finally (even if a function return is in try). There
+                // should be an action jump to finally at the end of try; if
+                // this is missing, catch must be executed as well.
+
+                // If there is a return in the try block, go straight to 
+                // finally.
+                if (_returning) pc = t._finallyOffset;
+                else stop_pc = t._finallyOffset;
+
                 t._tryState = TryBlock::TRY_FINALLY;
             }
             break;
@@ -438,8 +447,8 @@ ActionExec::processExceptions(TryBlock& t)
 #ifdef GNASH_DEBUG_TRY
             log_debug("CATCH: TryBlock name = %s", t._name); 
 #endif               
-            // Process exceptions. The code in catch { } will 
-            // be executed whether this block is reached or not.
+            // If we are here, there should have been an exception
+            // in 'try'. 
             
             if (env.stack_size() && env.top(0).is_exception())
             {
