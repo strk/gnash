@@ -134,6 +134,26 @@ class Test
 		}
 	}
 
+	function returnInCatchAndFinally(o)
+	{
+		try {
+			throw 'try'
+			note ("After throw in try");
+			o.num += 1;
+		}
+		catch (e) {
+		    note ("Catch after throw in try");
+			return 'catch';
+		    o.num += 1;
+		}
+		finally {
+		    note ("Finally after returns in catch");
+		    o.num += 1;
+		    return 'finally';
+		}
+	}
+
+
 	function test_all()
 	{
 		var res = 'string';
@@ -215,6 +235,10 @@ class Test
         check_equals(o.sequence, "tryfinally");
         check_equals(o.num, 8);
 
+        ret = returnInCatchAndFinally(o);
+        check_equals(o.num, 9);
+        check_equals(ret, "finally");
+
 		try {
 			throwNested();
 		} catch (e) {
@@ -230,7 +254,7 @@ class Test
 		var myTest = new Test;
 		myTest.test_all();
 
-        check_totals(21);
+        check_totals(23);
         Dejagnu.done();
 	}
 
