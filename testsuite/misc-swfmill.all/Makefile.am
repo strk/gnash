@@ -85,7 +85,7 @@ registers-runner: $(srcdir)/../generic-testrunner.sh registers.swf Makefile
 	chmod 755 $@
 
 Try-without-jump-runner: $(srcdir)/../generic-testrunner.sh Try-without-jump.swf Makefile
-	sh $< -r 50 $(top_builddir) Try-without-jump.swf > $@
+	sh $< -r 50 -c "END OF TEST" $(top_builddir) Try-without-jump.swf > $@
 	chmod 755 $@
 
 
