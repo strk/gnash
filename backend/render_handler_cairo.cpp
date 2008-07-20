@@ -578,7 +578,7 @@ public:
 
     for (size_t rno=0; rno < _invalidated_ranges.size(); rno++) {
     
-      const Range2d<float>& range = _invalidated_ranges.getRange(rno);
+      const geometry::Range2d<float>& range = _invalidated_ranges.getRange(rno);
       if (range.isNull()) {
         continue;
       }
