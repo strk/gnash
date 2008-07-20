@@ -203,17 +203,17 @@ class Test
         try {
             ret = returnInTryAndCatch(o);
         }
-        xcheck_equals(ret, "try");
-        xcheck_equals(o.num, 5);
+        check_equals(ret, "try");
+        check_equals(o.num, 5);
 
         ret = returnInTryCatchAndFinally(o);
-        xcheck_equals(ret, "finally");
-        xcheck_equals(o.num, 6);
+        check_equals(ret, "finally");
+        check_equals(o.num, 6);
         
         o.sequence = "";
         tryCatchAndFinally(o);
         check_equals(o.sequence, "tryfinally");
-        xcheck_equals(o.num, 8);
+        check_equals(o.num, 8);
 
 		try {
 			throwNested();
