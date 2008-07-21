@@ -40,7 +40,7 @@
 #include "action_buffer.h"
 #include "as_object.h"
 #include "Object.h"
-#include "gstring.h" // for automatic as_value::STRING => String as object
+#include "String_as.h" // for automatic as_value::STRING => String as object
 #include "Number.h" // for automatic as_value::NUMBER => Number as object
 #include "types.h" // for PIXELS_TO_TWIPS
 #include "drag_state.h"

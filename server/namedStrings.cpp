@@ -160,6 +160,7 @@ static string_table::svt preload_names[] =
 	string_table::svt( "Object", NSV::CLASS_OBJECT ),
 	string_table::svt( "String", NSV::CLASS_STRING ),
 	string_table::svt( "Number", NSV::CLASS_NUMBER ),
+	string_table::svt( "Accessibility", NSV::CLASS_ACCESSIBILITY ),	
 	string_table::svt( "Array", NSV::CLASS_ARRAY ),
 	string_table::svt( "Key", NSV::CLASS_KEY ),
 	string_table::svt( "AsBroadcaster", NSV::CLASS_AS_BROADCASTER ),

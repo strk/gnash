@@ -34,7 +34,7 @@
 
 #include "VM.h" // get random generator
 #include "fn_call.h"
-#include "GMath.h"
+#include "Math_as.h"
 #include "log.h"
 #include "builtin_function.h" 
 #include "Object.h" // for getObjectInterface

@@ -42,7 +42,8 @@ AM_CPPFLAGS = \
 
 
 libgnashasobjs_la_SOURCES = \
-        AsBroadcaster.cpp \
+	AsBroadcaster.cpp \
+	Accessibility_as.cpp \
 	Boolean.cpp \
 	Camera.cpp \
 	ClassHierarchy.cpp \
@@ -55,7 +56,7 @@ libgnashasobjs_la_SOURCES = \
 	Key.cpp	\
 	LoadVars.cpp \
 	LocalConnection.cpp\
-	Math.cpp \
+	Math_as.cpp \
 	Microphone.cpp	\
 	Mouse.cpp \
 	NetConnection.cpp \
@@ -70,7 +71,7 @@ libgnashasobjs_la_SOURCES = \
 	TextFormat.cpp \
 	TextSnapshot.cpp \
 	MovieClipLoader.cpp\
-	string.cpp \
+	String_as.cpp \
 	xml.cpp \
 	xmlattrs.cpp \
 	xmlnode.cpp \
@@ -105,7 +106,8 @@ libgnashasobjs_la_SOURCES = \
 	$(NULL)
 
 noinst_HEADERS = \
-        AsBroadcaster.h \
+	AsBroadcaster.h \
+	Accessibility_as.h \
 	Boolean.h \
 	Camera.h \
 	ClassHierarchy.h \
@@ -114,7 +116,7 @@ noinst_HEADERS = \
 	CustomActions.h	\
 	Date.h \
 	Error_as.h	\
-	GMath.h	\
+	Math_as.h	\
 	Global.h\
 	Key.h \
 	LoadVars.h \
@@ -139,7 +141,7 @@ noinst_HEADERS = \
 	System.h \
 	TextFormat.h \
 	TextSnapshot.h \
-	gstring.h \
+	String_as.h \
 	xml.h \
 	xmlsocket.h \
 	xmlattrs.h \
