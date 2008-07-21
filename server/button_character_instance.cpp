@@ -504,7 +504,7 @@ button_character_instance::on_button_event(const event_id& event)
 
 	default:
 		//abort();	// missed a case?
-		log_error(_("Unhandled button event %s"), event.get_function_name().c_str());
+		log_error(_("Unhandled button event %s"), event.get_function_name());
 		break;
 	};
 	
@@ -578,21 +578,21 @@ button_character_instance::on_button_event(const event_id& event)
 	std::auto_ptr<ExecutableCode> code ( get_event_handler(event) );
 	if ( code.get() )
 	{
-		//log_debug(_("Got statically-defined handler for event: %s"), event.get_function_name().c_str());
+		//log_debug(_("Got statically-defined handler for event: %s"), event.get_function_name());
 		mr.pushAction(code, movie_root::apDOACTION);
 		//code->execute();
 	}
-	//else log_debug(_("No statically-defined handler for event: %s"), event.get_function_name().c_str());
+	//else log_debug(_("No statically-defined handler for event: %s"), event.get_function_name());
 
 	// Call conventional attached method.
 	boost::intrusive_ptr<as_function> method = getUserDefinedEventHandler(event.get_function_key());
 	if ( method )
 	{
-		//log_debug(_("Got user-defined handler for event: %s"), event.get_function_name().c_str());
+		//log_debug(_("Got user-defined handler for event: %s"), event.get_function_name());
 		mr.pushAction(method, this, movie_root::apDOACTION);
 		//call_method0(as_value(method.get()), &(get_environment()), this);
 	}
-	//else log_debug(_("No statically-defined handler for event: %s"), event.get_function_name().c_str());
+	//else log_debug(_("No statically-defined handler for event: %s"), event.get_function_name());
 }
 
 void 
@@ -977,7 +977,7 @@ button_character_instance::unload()
 		if ( ! ch ) continue;
 		if ( ch->isUnloaded() ) continue;
 		if ( ch->unload() ) childsHaveUnload = true;
-		//log_debug("Button child %s (%s) unloaded", ch->getTarget().c_str(), typeName(*ch).c_str());
+		//log_debug("Button child %s (%s) unloaded", ch->getTarget(), typeName(*ch));
 	}
 
 	// NOTE: we don't need to ::unload or ::destroy here
@@ -1083,7 +1083,7 @@ button_character_instance::get_member(string_table::key name_key, as_value* val,
           "the name of an existing character "
           "in its display list.  "
           "The member will hide the "
-          "character"), name.c_str());
+          "character"), name);
     }
     );
 #endif
