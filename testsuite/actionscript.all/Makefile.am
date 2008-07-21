@@ -72,6 +72,7 @@ AM_CPPFLAGS = \
 ASTESTS =			\
 	AsBroadcaster.as	\
 	ASnative.as		\
+	Accessibility.as \
 	array.as		\
 	BitmapData.as \
 	delete.as		\
