@@ -109,7 +109,7 @@ void
 mouse_class_init(as_object& global)
 {
 	// This is going to be the global Mouse "class"/"function"
-	static boost::intrusive_ptr<as_object> obj = new as_object(getObjectInterface());
+	boost::intrusive_ptr<as_object> obj = new as_object(getObjectInterface());
 	attachMouseInterface(*obj);
 
 	// Register _global.Mouse

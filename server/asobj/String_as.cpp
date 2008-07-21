@@ -33,6 +33,7 @@
 #include "Object.h" // for getObjectInterface
 #include "namedStrings.h"
 #include "utf8.h"
+#include "String_as.h"
 
 #include <boost/algorithm/string/case_conv.hpp>
 #include <algorithm>
