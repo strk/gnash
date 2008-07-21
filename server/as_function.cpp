@@ -104,7 +104,9 @@ as_function::as_function()
 	//as_object(getFunctionPrototype())
 	as_object()
 {
-	int flags = as_prop_flags::dontDelete|as_prop_flags::dontEnum|as_prop_flags::onlySWF6Up;
+	int flags = as_prop_flags::dontDelete |
+	            as_prop_flags::dontEnum | 
+	            as_prop_flags::onlySWF6Up;
 	init_member(NSV::PROP_uuPROTOuu, as_value(getFunctionPrototype()), flags);
 }
 
@@ -116,7 +118,9 @@ as_function::as_function(as_object* iface)
 	//as_object(getFunctionPrototype())
 	as_object()
 {
-	int flags = as_prop_flags::dontDelete|as_prop_flags::dontEnum|as_prop_flags::onlySWF6Up;
+	int flags = as_prop_flags::dontDelete |
+	            as_prop_flags::dontEnum |
+	            as_prop_flags::onlySWF6Up;
 	init_member(NSV::PROP_uuPROTOuu, as_value(getFunctionPrototype()), flags);
 
 	if ( iface )
