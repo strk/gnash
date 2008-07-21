@@ -506,10 +506,10 @@ flag_preprocess(boost::uint8_t flgs, bool* douniq, bool* doindex)
 // Convenience function to process and extract flags from an as_value array
 // of flags (as passed to sortOn when sorting on multiple properties)
 std::deque<boost::uint8_t> 
-get_multi_flags(as_array_object::const_iterator itBegin, 
-    as_array_object::const_iterator itEnd, bool* uniq, bool* index)
+get_multi_flags(as_array_object::ArrayConstIterator itBegin, 
+    as_array_object::ArrayConstIterator itEnd, bool* uniq, bool* index)
 {
-    as_array_object::const_iterator it = itBegin;
+    as_array_object::ArrayConstIterator it = itBegin;
     std::deque<boost::uint8_t> flgs;
 
     // extract fUniqueSort and fReturnIndexedArray from first flag
@@ -561,7 +561,7 @@ as_array_object::get_indexed_elements()
     std::deque<indexed_as_value> indexed_elements;
     int i = 0;
 
-    for (const_iterator it = elements.begin(), e = elements.end();
+    for (ArrayConstIterator it = elements.begin(), e = elements.end();
         it != e; ++it)
     {
         indexed_elements.push_back(indexed_as_value(*it, i++));
@@ -569,13 +569,13 @@ as_array_object::get_indexed_elements()
     return indexed_elements;
 }
 
-as_array_object::const_iterator
+as_array_object::ArrayConstIterator
 as_array_object::begin()
 {
     return elements.begin();
 }
 
-as_array_object::const_iterator
+as_array_object::ArrayConstIterator
 as_array_object::end()
 {
     return elements.end();
@@ -661,7 +661,7 @@ as_array_object::reverse()
     // We create another container, as we want to fill the gaps
     // There could likely be an in-place version for this, but
     // filling the gaps would need more care
-    container newelements(sz);
+    ArrayContainer newelements(sz);
 
     for (size_t i=0, n=sz-1; i<sz; ++i, --n)
     {
@@ -761,7 +761,7 @@ as_array_object::slice(unsigned int start, unsigned int one_past_end)
 bool
 as_array_object::removeFirst(const as_value& v)
 {
-    for (iterator it = elements.begin(), e = elements.end(); it != e; ++it)
+    for (ArrayIterator it = elements.begin(), e = elements.end(); it != e; ++it)
     {
         if ( v.equals(*it) )
         {
@@ -783,7 +783,7 @@ as_array_object::get_member(string_table::key name, as_value *val,
     if ( index >= 0 ) // a valid index was requested
     {
         size_t i = index;
-        const_iterator it = elements.find(i);
+        ArrayConstIterator it = elements.find(i);
         if ( it != elements.end() && it.index() == i )
         {
             *val = *it;
@@ -803,7 +803,7 @@ as_array_object::hasOwnProperty(string_table::key name, string_table::key nsname
     if ( index >= 0 ) // a valid index was requested
     {
         size_t i = index;
-        const_iterator it = elements.find(i);
+        ArrayConstIterator it = elements.find(i);
         if ( it != elements.end() && it.index() == i )
         {
             return true;
@@ -822,7 +822,7 @@ as_array_object::delProperty(string_table::key name, string_table::key nsname)
     if ( index >= 0 ) // a valid index was requested
     {
         size_t i = index;
-        const_iterator it = elements.find(i);
+        ArrayConstIterator it = elements.find(i);
         if ( it != elements.end() && it.index() == i )
         {
             elements.erase_element(i);
@@ -1078,7 +1078,7 @@ array_sortOn(const fn_call& fn)
         std::deque<as_cmp_fn> cmp;
         std::deque<as_cmp_fn> eq;
 
-        for (as_array_object::const_iterator it = props->begin();
+        for (as_array_object::ArrayConstIterator it = props->begin();
             it != props->end(); ++it)
         {
             string_table::key s = st.find(PROPNAME((*it).to_string_versioned(version)));
@@ -1099,7 +1099,7 @@ array_sortOn(const fn_call& fn)
                 ensureType<as_array_object>(fn.arg(1).to_object());
             if (farray->size() == optnum)
             {
-                as_array_object::const_iterator 
+                as_array_object::ArrayConstIterator 
                     fBegin = farray->begin(),
                     fEnd = farray->end();
 
@@ -1570,7 +1570,7 @@ as_array_object::enumerateNonProperties(as_environment& env) const
     // TODO: only actually defined elements should be pushed on the env
     //       but we currently have no way to distinguish between defined
     //       and non-defined elements
-    for (const_iterator it = elements.begin(),
+    for (ArrayConstIterator it = elements.begin(),
         itEnd = elements.end(); it != itEnd; ++it)
     {
             env.push(as_value(it.index()));
@@ -1580,7 +1580,7 @@ as_array_object::enumerateNonProperties(as_environment& env) const
 void
 as_array_object::shiftElementsLeft(unsigned int count)
 {
-    container& v = elements;
+    ArrayContainer& v = elements;
 
     if ( count >= v.size() )
     {
@@ -1590,7 +1590,7 @@ as_array_object::shiftElementsLeft(unsigned int count)
 
     for (unsigned int i=0; i<count; ++i) v.erase_element(i);
 
-    for (container::iterator i=v.begin(), e=v.end(); i!=e; ++i)
+    for (ArrayIterator i=v.begin(), e=v.end(); i!=e; ++i)
     {
         int currentIndex = i.index();
         int newIndex = currentIndex-count;
@@ -1602,10 +1602,10 @@ as_array_object::shiftElementsLeft(unsigned int count)
 void
 as_array_object::shiftElementsRight(unsigned int count)
 {
-    container& v = elements;
+    ArrayContainer& v = elements;
 
     v.resize(v.size()+count);
-        for (container::reverse_iterator i=v.rbegin(), e=v.rend(); i!=e; ++i)
+        for (ArrayContainer::reverse_iterator i=v.rbegin(), e=v.rend(); i!=e; ++i)
     {
         int currentIndex = i.index();
         int newIndex = currentIndex+count;
@@ -1624,7 +1624,7 @@ as_array_object::splice(unsigned int start, unsigned int count, const std::vecto
 
     size_t newsize = sz-count;
     if ( replace ) newsize += replace->size();
-    container newelements(newsize);
+    ArrayContainer newelements(newsize);
 
     size_t ni=0;
 
@@ -1659,7 +1659,7 @@ as_array_object::splice(unsigned int start, unsigned int count, const std::vecto
 void
 as_array_object::markReachableResources() const
 {
-    for (const_iterator i=elements.begin(), e=elements.end(); i!=e; ++i)
+    for (ArrayConstIterator i=elements.begin(), e=elements.end(); i!=e; ++i)
     {
         (*i).setReachable();
     }
