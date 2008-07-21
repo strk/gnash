@@ -259,6 +259,31 @@ abc_Trait::read(SWFStream* in, abc_block *pBlock)
 
 using namespace abc_parsing;
 
+void
+abc_block::check_multiname_name(boost::uint32_t name){
+
+	if (name >= mStringPool.size()){
+		throw ParserException("ABC: Out of bounds string for Multiname.");
+	}
+}
+
+void
+abc_block::check_multiname_namespace(boost::uint32_t ns){
+	if (ns >= mNamespacePool.size()){
+		throw ParserException("ABC: Out of bounds namespace for Multiname.");
+	}
+}
+
+void
+abc_block::check_multiname_namespaceset(boost::uint32_t nsset){
+	if (!nsset){
+		throw ParserException("ABC: 0 selection for namespace set is invalid.");
+	}
+	if (nsset >= mNamespaceSetPool.size()){
+		throw ParserException("ABC: Out of bounds namespace set for Multiname.");
+	}
+}
+
 asClass *
 abc_block::locateClass(asName &m)
 {
@@ -478,43 +503,38 @@ abc_block::read_multinames()
         case asName::KIND_QnameA:
         {
             ns = mS->read_V32();
+            check_multiname_namespace(ns);
             name = mS->read_V32();
+            check_multiname_name(name);
             break;
         }
         case asName::KIND_RTQname:
         case asName::KIND_RTQnameA:
         {
             name = mS->read_V32();
+            check_multiname_name(name);
             break;
         }
         case asName::KIND_RTQnameL:
         case asName::KIND_RTQnameLA:
         {
+
             break;
         }
         case asName::KIND_Multiname:
         case asName::KIND_MultinameA:
         {
             name = mS->read_V32();
+            check_multiname_name(name);
             nsset = mS->read_V32();
-            // 0 is not a valid nsset.
-            if (!nsset)
-            {
-                ERR((_("ABC: 0 selection for namespace set is invalid.\n")));
-                return false;
-            }
+            check_multiname_namespaceset(nsset);
             break;
         }
         case asName::KIND_MultinameL:
         case asName::KIND_MultinameLA:
         {
             nsset = mS->read_V32();
-            // 0 is not a valid nsset.
-            if (!nsset)
-            {
-                ERR((_("ABC: 0 selection for namespace set is invalid.\n")));
-                return false;
-            }
+            check_multiname_namespaceset(nsset);
             break;
         }
         default:
@@ -525,27 +545,10 @@ abc_block::read_multinames()
         } // End of cases.
         } // End of switch.
 
-		if (name >= mStringPool.size())
-		{
-			ERR((_("ABC: Out of bounds string for Multiname.\n")));
-			return false;
-		}
-		if (ns >= mNamespacePool.size())
-		{
-			ERR((_("ABC: Out of bounds namespace for Multiname.\n")));
-			return false;
-		}
-		if (nsset >= mNamespaceSetPool.size())
-		{
-			ERR((_("ABC: Out of bounds namespace set for Multiname.\n")));
-			return false;
-		}
-
 		mMultinamePool[i].mFlags = kind;
 		mMultinamePool[i].setName(name);
+		mMultinamePool[i].setNamespace(mNamespacePool[ns]);
 
-		if (ns)
-			mMultinamePool[i].setNamespace(mNamespacePool[ns]);
 		if (nsset)
 			mMultinamePool[i].mNamespaceSet = &mNamespaceSetPool[nsset];
 	} // End of main loop.

@@ -180,6 +180,12 @@ public:
 	bool pool_value(boost::uint32_t index, boost::uint8_t type, as_value &v);
 
 	abc_block();
+
+private:
+	void check_multiname_name(boost::uint32_t name);
+	void check_multiname_namespace(boost::uint32_t ns);
+	void check_multiname_namespaceset(boost::uint32_t nsset);
+
 };
 
 } /* namespace gnash */
