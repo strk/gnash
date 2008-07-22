@@ -258,19 +258,15 @@ string_split(const fn_call& fn)
         ensureType<string_as_object>(fn.this_ptr);
 
     VM& vm = obj->getVM(); 
-    int SWFVersion = vm.getSWFVersion();
+    const int SWFVersion = vm.getSWFVersion();
 
     std::wstring wstr = utf8::decodeCanonicalString(obj->str(), SWFVersion);
-
-    as_value val;
 
     boost::intrusive_ptr<as_array_object> array(new as_array_object());
 
     if (fn.nargs == 0)
     {
-        val.set_std_string(obj->str());
-        array->push(val);
-
+        array->push(obj->str());
         return as_value(array.get());
     }
 
@@ -281,8 +277,7 @@ string_split(const fn_call& fn)
     {
 	    if ( delim.size() != 1 )
 	    {
-		    val.set_std_string(obj->str());
-		    array->push(val);
+		    array->push(obj->str());
 		    return as_value(array.get());
 	    }
     }
@@ -301,16 +296,14 @@ string_split(const fn_call& fn)
 
     if ( wstr.empty() )
     {
-        val.set_std_string(obj->str());
-        array->push(val);
+        array->push(obj->str());
 
         return as_value(array.get());
     }
 
     if ( delim.empty() ) {
         for (unsigned i=0; i <max; i++) {
-            val.set_std_string(utf8::encodeCanonicalString(wstr.substr(i, 1), SWFVersion));
-            array->push(val);
+            array->push(utf8::encodeCanonicalString(wstr.substr(i, 1), SWFVersion));
         }
 
         return as_value(array.get());
@@ -323,18 +316,16 @@ string_split(const fn_call& fn)
         pos = wstr.find(delim, pos);
 
         if (pos != std::wstring::npos) {
-            val.set_std_string(utf8::encodeCanonicalString(
-            		wstr.substr(prevpos, pos - prevpos),
-            		SWFVersion));
-            array->push(val);
+            array->push(utf8::encodeCanonicalString(
+                    		wstr.substr(prevpos, pos - prevpos),
+                    		SWFVersion));
             num++;
             prevpos = pos + delim.size();
             pos++;
         } else {
-            val.set_std_string(utf8::encodeCanonicalString(
-            		wstr.substr(prevpos),
-            		SWFVersion));
-            array->push(val);
+            array->push(utf8::encodeCanonicalString(
+                    		wstr.substr(prevpos),
+                    		SWFVersion));
             break;
         }
     }
