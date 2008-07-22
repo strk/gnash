@@ -252,6 +252,15 @@ string_slice(const fn_call& fn)
 }
 
 // String.split(delimiter[, limit])
+// For SWF5, the following conditions mean that an array with a single
+// element containing the entire string is returned:
+// 1. No arguments are passed.
+// 2. The delimiter is empty.
+// 3. The delimiter has more than one character or is undefined and limit is not 0.
+// 4. The delimiter is not present in the string and the limit is not 0.
+//
+// Accordingly, an empty array is returned only when the limit is less
+// than 0 and a non-empty delimiter is passed.
 static as_value
 string_split(const fn_call& fn)
 {
@@ -266,28 +275,20 @@ string_split(const fn_call& fn)
 
     boost::intrusive_ptr<as_array_object> array(new as_array_object());
 
+    size_t max;
+
+    if (fn.nargs == 0)
+    {
+        // Condition 1:
+        array->push(str);
+        return as_value(array.get());
+    }
+
+    const std::wstring& delim = utf8::decodeCanonicalString(fn.arg(0).to_string(), version);
+    const size_t delimiterSize = delim.size();
+
     if (version < 6)
     {
-        // SWF5 and below.
-        // For SWF5, the following conditions mean that an array with a single
-        // element containing the entire string is returned:
-        // 1. No arguments are passed.
-        // 2. The delimiter is empty.
-        // 3. The delimiter has more than one character or is undefined and limit is not 0.
-        // 4. The delimiter is not present in the string and the limit is not 0.
-        //
-        // Accordingly, an empty array is returned only when the limit is less
-        // than 0 and a non-empty delimiter is passed.
-        if (fn.nargs == 0)
-        {
-            // Condition 1:
-            array->push(str);
-            return as_value(array.get());
-        }
-
-        const std::wstring& delim = utf8::decodeCanonicalString(fn.arg(0).to_string(), version);
-        
-        const size_t delimiterSize = delim.size();
 
         if (delimiterSize == 0)
         {
@@ -296,7 +297,7 @@ string_split(const fn_call& fn)
 	        return as_value(array.get());
         }
 
-        size_t max = wstr.size() + 1;
+        max = wstr.size() + 1;
 
         if (fn.nargs > 1 && !fn.arg(1).is_undefined())
         {
@@ -316,36 +317,11 @@ string_split(const fn_call& fn)
 	        array->push(str);
 	        return as_value(array.get());            
         }
-
-        // Do the actual split.
-        size_t pos = 0, prevpos = 0;
-        size_t num = 0;
-
-        while (num < max) {
-            pos = wstr.find(delim, pos);
-
-            array->push(utf8::encodeCanonicalString(
-                   		wstr.substr(prevpos, pos - prevpos),
-                   		version));
-                if (pos == std::wstring::npos) break;
-                num++;
-                prevpos = pos + delimiterSize;
-                pos++;
-        }
     }
-    else {
+    else
+    {
         // SWF6+
-
-        if (fn.nargs == 0)
-        {
-            array->push(str);
-            return as_value(array.get());
-        }
-
-        const std::wstring& delim = utf8::decodeCanonicalString(fn.arg(0).to_string(), version);
-        const size_t delimiterSize = delim.size();
-
-        size_t max = wstr.size() + 1;
+        max = wstr.size() + 1;
 
         if (fn.nargs > 1)
         {
@@ -370,20 +346,21 @@ string_split(const fn_call& fn)
             return as_value(array.get());
         }
 
-        size_t pos = 0, prevpos = 0;
-        size_t num = 0;
+    }
 
-        while (num < max) {
-            pos = wstr.find(delim, pos);
+    size_t pos = 0, prevpos = 0;
+    size_t num = 0;
 
-            array->push(utf8::encodeCanonicalString(
-                   		wstr.substr(prevpos, pos - prevpos),
-                   		version));
-                if (pos == std::wstring::npos) break;
-                num++;
-                prevpos = pos + delimiterSize;
-                pos++;
-        }
+    while (num < max) {
+        pos = wstr.find(delim, pos);
+
+        array->push(utf8::encodeCanonicalString(
+               		wstr.substr(prevpos, pos - prevpos),
+               		version));
+            if (pos == std::wstring::npos) break;
+            num++;
+            prevpos = pos + delimiterSize;
+            pos++;
     }
 
     return as_value(array.get());
