@@ -448,7 +448,16 @@ void SWFStream::read_string_with_length(unsigned len, std::string& to)
     // drop trailing nulls (see swf6/Bejeweled.swf)
     std::string::size_type last = to.find_last_not_of('\0');
     if ( last == std::string::npos ) to.clear();
-    else to.erase(last+1);
+    else
+    {
+	++last;
+	if ( last < len )
+	{
+		// seems common to find null-terminated lenght-equipped strings...
+		log_debug("String %s with length %d has %d trailing NULLs, trimming", to, len, len-last);
+        	to.erase(last);
+	}
+    }
 
 }
 
