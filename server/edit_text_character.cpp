@@ -1821,7 +1821,7 @@ textfield_class_init(as_object& global)
 
 	if ( cl == NULL )
 	{
-		VM& vm = VM::get();
+		VM& vm = global.getVM();
 
 		as_object* iface = getTextFieldInterface();
 		cl=new builtin_function(&textfield_ctor, iface);

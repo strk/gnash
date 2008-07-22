@@ -62,15 +62,15 @@ class as_array_object : public as_object
 
 public:
 
+	typedef boost::numeric::ublas::mapped_vector<as_value> ArrayContainer;
+
+	typedef ArrayContainer::const_iterator ArrayConstIterator;
+	typedef ArrayContainer::iterator ArrayIterator;
+
+	typedef std::list<as_value> ValueList;
+
+
 	enum { itemBlank, itemValue };
-
-	//typedef boost::variant<blank, as_value> ValOrNone;
-	//typedef std::deque<ValOrNone> container;
-
-	typedef boost::numeric::ublas::mapped_vector<as_value> container;
-
-	typedef container::const_iterator const_iterator;
-	typedef container::iterator iterator;
 
 	/// Visit all elements 
 	//
@@ -80,10 +80,10 @@ public:
 	{
 		// NOTE: we copy the elements as the visitor might call arbitrary code
 		//       possibly modifying the container itself.
-		container copy = elements;
+		ArrayContainer copy = elements;
 
 		// iterating this way will skip holes
-		for (iterator i=copy.begin(), ie=copy.end(); i!=ie; ++i)
+		for (ArrayIterator i=copy.begin(), ie=copy.end(); i!=ie; ++i)
 			v.visit(*i);
 	}
 
@@ -119,9 +119,9 @@ public:
 
 	std::deque<indexed_as_value> get_indexed_elements();
 
-	const_iterator begin();
+	ArrayConstIterator begin();
 
-	const_iterator end();
+	ArrayConstIterator end();
 
 	/// Push an element to the end of the array
 	//
@@ -250,8 +250,6 @@ public:
 		// instead of the queue. We want to sort a copy anyway
 		// to avoid the comparator changing the original container.
 		//
-
-		typedef std::list<as_value> ValueList;
 		ValueList nelem;
 		ContainerFiller<ValueList> filler(nelem);
 		visitAll(filler);
@@ -398,7 +396,7 @@ protected:
 
 private:
 
-	container elements;
+	ArrayContainer elements;
 
 	// this function is used internally by set_member and get_member
 	// it takes a string that is the member name of the array and returns -1
