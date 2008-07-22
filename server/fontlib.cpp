@@ -71,14 +71,10 @@ get_default_font()
 		for (unsigned int i = 0; i < s_fonts.size(); i++)
 		{
 			font*	f = s_fonts[i].get();
-			if (f != NULL)
+			assert(f);
+			if ( f->matches(name, bold, italic) )
 			{
-				if (f->get_name() == name)
-				{
-					if ( bold && ! f->isBold() ) continue;
-					if ( italic && ! f->isItalic() ) continue;
-					return f;
-				}
+				return f;
 			}
 		}
 		font* f = new font(name, bold, italic);
