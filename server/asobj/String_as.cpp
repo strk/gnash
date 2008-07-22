@@ -255,13 +255,12 @@ string_slice(const fn_call& fn)
 static as_value
 string_split(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_object> obj =  ensureType<as_object>(fn.this_ptr);
+    boost::intrusive_ptr<string_as_object> obj =  ensureType<string_as_object>(fn.this_ptr);
 
     VM& vm = obj->getVM(); 
     const int version = vm.getSWFVersion();
     
-    const as_value& val = obj->callMethod(NSV::PROP_TO_STRING);
-    const std::string& str = val.to_string();
+    const std::string& str = obj->str();
 
     std::wstring wstr = utf8::decodeCanonicalString(str, version);
 

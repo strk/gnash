@@ -113,10 +113,9 @@ o = new Object;
 o.charCodeAt = String.prototype.charCodeAt;
 o.charAt = String.prototype.charAt;
 c = o.charAt(4);
-check_equals(c, "e");
+xcheck_equals(c, "e");
 c = o.charCodeAt(4);
-check_equals(c, "101");
-
+xcheck_equals(c, "101");
 //----------------------------------------
 // Check String.indexOf
 // TODO: test with ASnative(251,8)
@@ -150,8 +149,7 @@ check_equals ( a.indexOf(o2, o), 4 );
 o = new Object;
 o.indexOf = String.prototype.indexOf;
 p = o.indexOf("b");
-check_equals(p, 2);
-
+xcheck_equals(p, 2);
 //----------------------------------------
 // Check String.split
 // See ASNative.as for more tests.
@@ -190,8 +188,8 @@ check_equals ( a.split("la").length, 3 );
 o = new Object;
 o.split = String.prototype.split;
 ar = o.split("b");
-check_equals(ar.length, 3);
-check_equals(ar.toString(), "[o,ject O,ject]");
+xcheck_equals(ar.length, 3);
+xcheck_equals(ar.toString(), "[o,ject O,ject]");
 
 #else
 // empty delimiter doesn't have a special meaning in SWF5
@@ -206,8 +204,8 @@ check_equals ( a.split("la").length, 1 );
 // SWF5:
 str = "h";
 ar = str.split("h");
-check_equals(ar.length, 2);
-check_equals(ar.toString(), ",");
+xcheck_equals(ar.length, 2);
+xcheck_equals(ar.toString(), ",");
 
 str = "";
 ar = str.split("h");
@@ -216,8 +214,8 @@ check_equals(ar.toString(), "");
 
 str = "hh";
 ar = str.split("h");
-check_equals(ar.length, 3);
-check_equals(ar.toString(), ",,");
+xcheck_equals(ar.length, 3);
+xcheck_equals(ar.toString(), ",,");
 
 str = "h";
 ar = str.split("g");
@@ -297,18 +295,18 @@ check_equals(ar.toString(), "aa");
 
 str = "aa";
 ar = str.split("aa", 0);
-check_equals(ar.length, 0);
-check_equals(ar.toString(), "");
+xcheck_equals(ar.length, 0);
+xcheck_equals(ar.toString(), "");
 
 str = "aa";
 ar = str.split("aa", -1);
-check_equals(ar.length, 0);
-check_equals(ar.toString(), "");
+xcheck_equals(ar.length, 0);
+xcheck_equals(ar.toString(), "");
 
 str = "aa";
 ar = str.split(undefined, 0);
-check_equals(ar.length, 0);
-check_equals(ar.toString(), "");
+xcheck_equals(ar.length, 0);
+xcheck_equals(ar.toString(), "");
 
 str = "aa";
 ar = str.split("a", 0);
@@ -318,13 +316,13 @@ check_equals(ar.toString(), "");
 o = new Object;
 o.split = String.prototype.split;
 ar = o.split("b");
-check_equals(ar.length, 3);
-check_equals(ar.toString(), "[o,ject O,ject]");
+xcheck_equals(ar.length, 3);
+xcheck_equals(ar.toString(), "[o,ject O,ject]");
 
 o = new Date(0);
 o.split = String.prototype.split;
 ar = o.split(":");
-check_equals(ar.length, 3);
+xcheck_equals(ar.length, 3);
 // It will be different according to the timezone...
 
 #endif
@@ -452,7 +450,7 @@ check_equals ( b.substr(3, 6), "4");
 
 o = new Object;
 o.substr = String.prototype.substr;
-check_equals(o.substr(0,2), "[o");
+xcheck_equals(o.substr(0,2), "[o");
 
 //-------------------------------------------
 // Check slice 
@@ -483,7 +481,7 @@ check_equals ( a.slice(-4), "wxyz" );
 
 o = new Object;
 o.slice = String.prototype.slice;
-check_equals(o.slice(0,1), "[");
+xcheck_equals(o.slice(0,1), "[");
 
 //-------------------------------------------
 // Check substring
@@ -503,7 +501,7 @@ check_equals ( b.substring(3, 6), "4");
 
 o = new Object;
 o.substring = String.prototype.substring;
-check_equals(o.substring(3,4), "j");
+xcheck_equals(o.substring(3,4), "j");
 
 //-------------------------------------------
 // Concat
