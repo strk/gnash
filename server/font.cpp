@@ -624,6 +624,16 @@ GlyphInfo::markReachableResources() const
 		return true;
 	}
 
+bool
+font::matches(const std::string& name, bool bold, bool italic) const
+{
+	if ( bold != isBold() ) return false;
+	if ( italic != isItalic() ) return false;
+ 	if ( name != get_name() ) return false;
+
+	return true;
+}
+
 #ifdef GNASH_USE_GC
 /// Mark reachable resources (for the GC)
 //

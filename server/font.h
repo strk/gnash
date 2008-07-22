@@ -127,6 +127,19 @@ public:
 	// override from resource.
 	font*	cast_to_font() { return this; }
 
+	/// Return true if this font matches given name and flags
+	//
+	/// @param name
+	///	Font name
+	///
+	/// @param bold
+	///	Bold flag
+	///
+	/// @param italic
+	///	Italic flag
+	///
+	bool matches(const std::string& name, bool bold, bool italic) const;
+
 	void testInvariant()
 	{
 	}
