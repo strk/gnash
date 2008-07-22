@@ -108,6 +108,15 @@ isNaN ( a.charAt(-1) );
 isNaN (a.charAt(21) );
 check_equals ( a.lastIndexOf("lawa"), 8);
 
+// Applied to object.
+o = new Object;
+o.charCodeAt = String.prototype.charCodeAt;
+o.charAt = String.prototype.charAt;
+c = o.charAt(4);
+xcheck_equals(c, "e");
+c = o.charCodeAt(4);
+xcheck_equals(c, "101");
+
 //----------------------------------------
 // Check String.indexOf
 // TODO: test with ASnative(251,8)
@@ -137,9 +146,15 @@ check_equals ( a.indexOf("a", o), 4 );
 o2 = {}; o2.toString = function() { return "a"; };
 check_equals ( a.indexOf(o2, o), 4 ); 
 
+// Applied to object.
+o = new Object;
+o.indexOf = String.prototype.indexOf;
+p = o.indexOf("b");
+xcheck_equals(p, 2);
+
 //----------------------------------------
 // Check String.split
-// TODO: test with ASnative(251,12)
+// See ASNative.as for more tests.
 //-----------------------------------------
 
 check_equals ( typeof(a.split), 'function' );
@@ -171,6 +186,13 @@ check_equals ( a.split("la")[0], "wal" );
 check_equals ( a.split("la")[1], "wal" );
 check_equals ( a.split("la")[2], "washinGTON" );
 check_equals ( a.split("la").length, 3 );
+
+o = new Object;
+o.split = String.prototype.split;
+ar = o.split("b");
+xcheck_equals(ar.length, 3);
+xcheck_equals(ar.toString(), "[o,ject O,ject]");
+
 #else
 // empty delimiter doesn't have a special meaning in SWF5
 check_equals ( a.split("")[0], "wallawallawashinGTON" );
@@ -180,6 +202,131 @@ check_equals ( a.split("la")[0], "wallawallawashinGTON" );
 check_equals ( a.split("la")[1], undefined );
 check_equals ( a.split("la")[2], undefined );
 check_equals ( a.split("la").length, 1 );
+
+// SWF5:
+str = "h";
+ar = str.split("h");
+xcheck_equals(ar.length, 2);
+xcheck_equals(ar.toString(), ",");
+
+str = "";
+ar = str.split("h");
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "");
+
+str = "hh";
+ar = str.split("h");
+xcheck_equals(ar.length, 3);
+xcheck_equals(ar.toString(), ",,");
+
+str = "h";
+ar = str.split("g");
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "h");
+
+// For SWF5, the following conditions mean that an array with a single
+// element containing the entire string is returned:
+// 1. No arguments are passed.
+// 2. The delimiter is empty.
+// 3. The delimiter has more than one character or is undefined and limit is not 0.
+// 4. The delimiter is not present in the string and the limit is not 0.
+//
+// Accordingly, an empty array is returned only when the limit is less
+// than 0 and a non-empty delimiter is passed.str = "";
+str = "a";
+ar = str.split("aa");
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "a");
+
+str = "b";
+ar = str.split("aa");
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "b");
+
+str = "a";
+ar = str.split("aa");
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "a");
+
+str = "aa";
+ar = str.split("aa");
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "aa");
+
+str = "";
+ar = str.split("");
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "");
+
+str = "b";
+ar = str.split("");
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "b");
+
+str = "aa";
+ar = str.split("");
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "aa");
+
+str = "";
+ar = str.split();
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "");
+
+str = "b";
+ar = str.split();
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "b");
+
+str = "aa";
+ar = str.split();
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "aa");
+
+
+// Limit 0 or less:
+str = "aa";
+ar = str.split("", 0);
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "aa");
+
+str = "aa";
+ar = str.split("", -1);
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "aa");
+
+str = "aa";
+ar = str.split("aa", 0);
+xcheck_equals(ar.length, 0);
+xcheck_equals(ar.toString(), "");
+
+str = "aa";
+ar = str.split("aa", -1);
+xcheck_equals(ar.length, 0);
+xcheck_equals(ar.toString(), "");
+
+str = "aa";
+ar = str.split(undefined, 0);
+xcheck_equals(ar.length, 0);
+xcheck_equals(ar.toString(), "");
+
+str = "aa";
+ar = str.split("a", 0);
+check_equals(ar.length, 0);
+check_equals(ar.toString(), "");
+
+o = new Object;
+o.split = String.prototype.split;
+ar = o.split("b");
+xcheck_equals(ar.length, 3);
+xcheck_equals(ar.toString(), "[o,ject O,ject]");
+
+o = new Date(0);
+o.split = String.prototype.split;
+ar = o.split(":");
+xcheck_equals(ar.length, 3);
+// It will be different according to the timezone...
+
 #endif
 
 // TODO: test String.split(delim, limit)  [ second arg ]
@@ -303,6 +450,10 @@ check_equals ( a.substr(-3,2), "xy" );
 var b = new String("1234");
 check_equals ( b.substr(3, 6), "4");
 
+o = new Object;
+o.substr = String.prototype.substr;
+xcheck_equals(o.substr(0,2), "[o");
+
 //-------------------------------------------
 // Check slice 
 // TODO: test with ASnative(251,10)
@@ -330,6 +481,10 @@ check_equals ( String.prototype.slice.call(a, -5, -3), undefined );
 #endif
 check_equals ( a.slice(-4), "wxyz" );
 
+o = new Object;
+o.slice = String.prototype.slice;
+xcheck_equals(o.slice(0,1), "[");
+
 //-------------------------------------------
 // Check substring
 // TODO: test with ASnative(251,11)
@@ -346,6 +501,26 @@ check_equals ( a.concat("sir ","william",15), "abcdefghijklmnopqrstuvwxyzsir wil
 var b = new String("1234");
 check_equals ( b.substring(3, 6), "4");
 
+o = new Object;
+o.substring = String.prototype.substring;
+xcheck_equals(o.substring(3,4), "j");
+
+//-------------------------------------------
+// Concat
+//-------------------------------------------
+
+// Fails if object isn't a String (the only
+// case of this, it seems).
+e = new String("h");
+e.concat("hh");
+e.concat(new Object);
+e.concat(new String);
+check_equals(e, "h");
+
+o = new Object;
+o.concat = String.prototype.concat;
+o.concat("h");
+check_equals(o.toString(), "[object Object]");
 
 //-------------------------------------------
 // Chr and ord
@@ -807,6 +982,17 @@ ASSetPropFlags(Object.prototype, "toString", 0, 2); // unprotect from deletion
 ObjectProtoToStringBackup = Object.prototype.toString;
 check(delete Object.prototype.toString);
 check_equals(typeof(s.toString), 'undefined');
+
+String.prototype.toString = function ()
+{
+    return "fake to string";
+};
+
+g = "teststring";
+check_equals (g.substr(0,4), "test");
+g = new String("teststring");
+check_equals (g.substr(0,4), "test");
+
 Object.prototype.toString = ObjectProtoToStringBackup;
 String.prototype.toString = StringProtoToStringBackup;
 
@@ -901,7 +1087,7 @@ check(!String.prototype.hasOwnProperty('length'));
 #endif
 
 #if OUTPUT_VERSION < 6
- check_totals(258);
+ check_totals(311);
 #else
- check_totals(274);
+ check_totals(286);
 #endif
