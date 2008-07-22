@@ -273,6 +273,8 @@ public:
 
 	font*	get_font(int font_id) const;
 
+	font* get_font(const std::string& name, bool bold, bool italic) const;
+
 	// See dox in movie_definition.h
 	bitmap_character_def*	get_bitmap_character_def(int character_id);
 
