@@ -34,10 +34,9 @@ libgnashmedia_la_CPPFLAGS = \
 	-I$(top_srcdir)/libnet \
 	-I$(top_srcdir)/backend	\
 	-I$(top_srcdir)/libbase	\
-	-I$(top_srcdir)/server	\
-	-I$(top_srcdir)/server/vm \
-	-I$(top_srcdir)/server/parser \
-	-I$(top_srcdir)/libgeometry \
+	-I$(top_srcdir)/libcore	\
+	-I$(top_srcdir)/libcore/vm \
+	-I$(top_srcdir)/libcore/parser \
 	$(PTHREAD_CFLAGS) \
 	$(DMALLOC_CFLAGS) \
 	$(OPENGL_CFLAGS) \

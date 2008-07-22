@@ -35,7 +35,7 @@ AM_CPPFLAGS = # -Wall
 
 AM_LDFLAGS = \
 	../libbase/libgnashbase.la \
-	../server/libgnashserver.la \
+	../libcore/libgnashserver.la \
 	../libnet/libgnashnet.la \
 	../libamf/libgnashamf.la \
 	$(LIBLTDL) \
@@ -53,7 +53,7 @@ INCLUDES = -I.. \
         -I$(top_srcdir)/libnet \
         -I$(top_srcdir)/libamf \
         -I$(top_srcdir)/libbase \
-        -I$(top_srcdir)/server \
+        -I$(top_srcdir)/libcore \
         -DLOCALEDIR=\"$(localedir)\" \
         $(LIBXML_CFLAGS) \
 	$(DMALLOC_CFLAGS) \

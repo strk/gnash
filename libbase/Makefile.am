@@ -49,8 +49,8 @@ libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\" \
 	-DSYSCONFDIR=\"$(sysconfdir)\" \
 	-I$(top_srcdir)/libnet	\
 	-I$(top_srcdir)/libamf	\
-	-I$(top_srcdir)/server	\
-	-I$(top_srcdir)/server/swf	\
+	-I$(top_srcdir)/libcore	\
+	-I$(top_srcdir)/libcore/swf	\
 	$(PTHREAD_CFLAGS) \
 	$(LIBXML_CFLAGS) \
 	$(PNG_CFLAGS) \
@@ -149,6 +149,9 @@ noinst_HEADERS = \
 	BitsReader.h \
 	arg_parser.h \
 	getclocktime.hpp \
+	Point2d.h \
+	Range2d.h \
+	snappingrange.h \
 	$(NULL)
 
 libgnashbase_la_LDFLAGS = -release $(VERSION)

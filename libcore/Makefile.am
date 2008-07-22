@@ -20,7 +20,7 @@ AUTOMAKE_OPTIONS =
 SUBDIRS = asobj parser vm
 
 # noinst_LTLIBRARIES = libserver.la 
-pkglib_LTLIBRARIES = libgnashserver.la
+pkglib_LTLIBRARIES = libgnashcore.la
 # noinst_SCRIPTS = gen-files.sh
 
 # TODO: use a conditional to optionally link ?
@@ -31,13 +31,12 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/gui \
 	-I$(top_srcdir)/libnet \
 	-I$(top_srcdir)/backend \
-	-I$(top_srcdir)/server/swf \
-	-I$(top_srcdir)/server/asobj \
-	-I$(top_srcdir)/server/parser \
+	-I$(top_srcdir)/libcore/swf \
+	-I$(top_srcdir)/libcore/asobj \
+	-I$(top_srcdir)/libcore/parser \
 	-I$(top_srcdir)/libltdl \
-	-I$(top_srcdir)/server/vm \
+	-I$(top_srcdir)/libcore/vm \
 	-I$(top_srcdir)/libbase \
-	-I$(top_srcdir)/libgeometry \
 	-I$(top_srcdir)/libmedia \
 	$(PTHREAD_CFLAGS) \
 	$(DMALLOC_CFLAGS) \
@@ -48,7 +47,7 @@ AM_CPPFLAGS = \
 	$(FONTCONFIG_CFLAGS) \
 	$(NULL)
 
-libgnashserver_la_SOURCES = \
+libgnashcore_la_SOURCES = \
 	BitmapMovieInstance.cpp \
 	Property.cpp \
 	PropertyList.cpp \
@@ -190,14 +189,14 @@ noinst_HEADERS = \
 	video_stream_instance.h \
 	$(NULL)
 
-libgnashserver_la_LIBADD = \
+libgnashcore_la_LIBADD = \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libamf/libgnashamf.la \
 	$(top_builddir)/libnet/libgnashnet.la \
 	$(top_builddir)/libmedia/libgnashmedia.la \
-	$(top_builddir)/server/asobj/libgnashasobjs.la \
-	$(top_builddir)/server/parser/libgnashparser.la \
-	$(top_builddir)/server/vm/libgnashvm.la \
+	$(top_builddir)/libcore/asobj/libgnashasobjs.la \
+	$(top_builddir)/libcore/parser/libgnashparser.la \
+	$(top_builddir)/libcore/vm/libgnashvm.la \
 	$(LIBXML_LIBS) \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
@@ -208,7 +207,7 @@ libgnashserver_la_LIBADD = \
 if USE_SOUND_GST
 AM_CPPFLAGS += $(GSTREAMER_CFLAGS) \
 		-I$(top_srcdir)/libmedia/gst
-libgnashserver_la_LIBADD += $(GSTREAMER_LIBS)
+libgnashcore_la_LIBADD += $(GSTREAMER_LIBS)
 endif
 
 if USE_FFMPEG_ENGINE
@@ -218,11 +217,11 @@ endif
 
 # Enable building the Flash debugger
 if DEBUGGER
-libgnashserver_la_SOURCES += debugger.cpp
+libgnashcore_la_SOURCES += debugger.cpp
 endif
 
 #libserver_la_LIBDADD =  #@DL_LIB@  # $(LIBLTDL)
-libgnashserver_la_LDFLAGS = -release $(VERSION) -export-dynamic #-no-undefined 
+libgnashcore_la_LDFLAGS = -release $(VERSION) -export-dynamic #-no-undefined 
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:
