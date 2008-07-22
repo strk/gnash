@@ -43,16 +43,15 @@ libgnashpython_la_LDFLAGS = \
 	$(NULL)
 		
 libgnashpython_la_CPPFLAGS = \
-        -I$(top_srcdir)/server \
-        -I$(top_srcdir)/server/parser \
-        -I$(top_srcdir)/server/vm \
+        -I$(top_srcdir)/libcore \
+        -I$(top_srcdir)/libcore/parser \
+        -I$(top_srcdir)/libcore/vm \
 	-I$(top_srcdir)/libltdl \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/backend \
-        -I$(top_srcdir)/libgeometry \
-	 	-I$(top_srcdir)/libmedia \
-	 	-I$(top_srcdir)/libmedia/ffmpeg \
-	 	-I$(top_srcdir)/libmedia/gst \
+	-I$(top_srcdir)/libmedia \
+	-I$(top_srcdir)/libmedia/ffmpeg \
+	-I$(top_srcdir)/libmedia/gst \
 	-DLOCALEDIR=\"$(localedir)\" \
 	$(BOOSTPYTHON_CFLAGS) \
         $(LIBXML_CFLAGS) \
@@ -76,16 +75,15 @@ gnash_la_LDFLAGS += -module -lgnashpython
 
 gnash_la_CPPFLAGS = -I.. \
         -I$(top_srcdir) \
-        -I$(top_srcdir)/server \
-        -I$(top_srcdir)/server/parser \
-        -I$(top_srcdir)/server/vm \
+        -I$(top_srcdir)/libcore \
+        -I$(top_srcdir)/libcore/parser \
+        -I$(top_srcdir)/libcore/vm \
 	-I$(top_srcdir)/libltdl \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/backend \
-        -I$(top_srcdir)/libgeometry \
-	 	-I$(top_srcdir)/libmedia \
-	 	-I$(top_srcdir)/libmedia/ffmpeg \
-	 	-I$(top_srcdir)/libmedia/gst \
+	-I$(top_srcdir)/libmedia \
+	-I$(top_srcdir)/libmedia/ffmpeg \
+	-I$(top_srcdir)/libmedia/gst \
 	-DLOCALEDIR=\"$(localedir)\" \
 	-DBOOST_PYTHON_DYNAMIC_LIB \
 	$(BOOSTPYTHON_CFLAGS) \
@@ -95,7 +93,7 @@ gnash_la_CPPFLAGS = -I.. \
 	$(BOOST_CFLAGS) \
 	$(NULL)
 
-libgnashpython_la_LIBADD = $(top_builddir)/server/libgnashserver.la \
+libgnashpython_la_LIBADD = $(top_builddir)/libcore/libgnashcore.la \
 	$(RENDERER_LIBS) \
 	$(GNASH_LIBS)
 

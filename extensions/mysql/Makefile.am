@@ -24,15 +24,15 @@ plugins_LTLIBRARIES = mysql.la
 
 AM_CPPFLAGS = \
             -I$(top_srcdir)/libbase \
-            -I$(top_srcdir)/server \
-            -I$(top_srcdir)/server/vm \
+            -I$(top_srcdir)/libcore \
+            -I$(top_srcdir)/libcore/vm \
             -I$(top_srcdir)/asobjs \
             -I$(top_srcdir)/libltdl \
             $(MYSQL_CFLAGS)
 
 AM_LDFLAGS =  \
         $(MYSQL_LIBS) \
-	$(top_builddir)/server/libgnashserver.la \
+	$(top_builddir)/libcore/libgnashcore.la \
 	$(PTHREAD_LIBS) \
 	$(NULL)
 
