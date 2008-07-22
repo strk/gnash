@@ -253,7 +253,13 @@ textfield_setTextFormat(const fn_call& fn)
 			bool bold = tf->bold();
 			bool italic = tf->italiced();
 
-			font* f = fontlib::get_font(fontName, bold, italic);
+			// NOTE: should query movie-private font lib, not global-shared one
+			movie_instance* mi = text->get_root();
+			assert(mi);
+			movie_definition* md = mi->get_movie_definition();
+			assert(md);
+			font* f = md->get_font(fontName, bold, italic);
+			if ( ! f ) f = fontlib::get_font(fontName, bold, italic);
 			text->setFont( f );
 		}
 	}

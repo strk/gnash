@@ -29,7 +29,7 @@
 #include "IOChannel.h" // for use
 #include "stream.h"
 #include "jpeg.h"
-#include "fontlib.h"
+//#include "fontlib.h"
 #include "font.h"
 #include "log.h"
 #include "sprite_instance.h"
@@ -268,6 +268,18 @@ font* SWFMovieDefinition::get_font(int font_id) const
     boost::intrusive_ptr<font> f = it->second;
     assert(f->get_ref_count() > 1);
     return f.get();
+}
+
+font*
+SWFMovieDefinition::get_font(const std::string& name, bool bold, bool italic) const
+{
+
+    for (FontMap::const_iterator it=m_fonts.begin(), itEnd=m_fonts.end(); it != itEnd; ++it)
+    {
+       font* f = it->second.get();
+       if ( f->matches(name, bold, italic) ) return f;
+    }
+    return 0;
 }
 
 bitmap_character_def* SWFMovieDefinition::get_bitmap_character_def(int character_id)
