@@ -258,75 +258,131 @@ string_split(const fn_call& fn)
         ensureType<string_as_object>(fn.this_ptr);
 
     VM& vm = obj->getVM(); 
-    const int SWFVersion = vm.getSWFVersion();
+    const int version = vm.getSWFVersion();
 
-    std::wstring wstr = utf8::decodeCanonicalString(obj->str(), SWFVersion);
+    std::wstring wstr = utf8::decodeCanonicalString(obj->str(), version);
 
     boost::intrusive_ptr<as_array_object> array(new as_array_object());
 
-    if (fn.nargs == 0)
+    if (version < 6)
     {
-        array->push(obj->str());
-        return as_value(array.get());
-    }
-
-    const std::wstring& delim = utf8::decodeCanonicalString(fn.arg(0).to_string(), SWFVersion);
-
-    // SWF5 didn't support multichar or empty delimiter
-    if ( SWFVersion < 6 )
-    {
-	    if ( delim.size() != 1 )
-	    {
-		    array->push(obj->str());
-		    return as_value(array.get());
-	    }
-    }
-
-    size_t max = wstr.size();
-
-    if (fn.nargs >= 2)
-    {
-	int max_in = fn.arg(1).to_int();
-	if ( SWFVersion < 6 && max_in < 1 )
-	{
-		return as_value(array.get());
-	}
-        max = utility::clamp<size_t>(max_in, 0, wstr.size());
-    }
-
-    if ( wstr.empty() )
-    {
-        array->push(obj->str());
-
-        return as_value(array.get());
-    }
-
-    if ( delim.empty() ) {
-        for (unsigned i=0; i <max; i++) {
-            array->push(utf8::encodeCanonicalString(wstr.substr(i, 1), SWFVersion));
+        // SWF5 and below.
+        if (fn.nargs == 0)
+        {
+            array->push(obj->str());
+            return as_value(array.get());
         }
 
-        return as_value(array.get());
+        const std::wstring& delim = utf8::decodeCanonicalString(fn.arg(0).to_string(), version);
+
+
+        // SWF5 didn't support multi-char delimiter.
+        if ( delim.size() != 1 )
+        {
+	        array->push(obj->str());
+	        return as_value(array.get());
+        }
+
+        size_t max = wstr.size();
+
+        if (fn.nargs >= 2)
+        {
+	        int max_in = fn.arg(1).to_int();
+	        if (max_in < 1 )
+	        {
+		        return as_value(array.get());
+	        }
+            max = utility::clamp<size_t>(max_in, 0, wstr.size());
+        }
+
+        if ( wstr.empty() )
+        {
+            array->push(obj->str());
+
+            return as_value(array.get());
+        }
+
+        if ( delim.empty() ) {
+            for (unsigned i=0; i <max; i++) {
+                array->push(utf8::encodeCanonicalString(wstr.substr(i, 1), version));
+            }
+
+            return as_value(array.get());
+        }
+
+        size_t pos = 0, prevpos = 0;
+        size_t num = 0;
+
+        while (num < max) {
+            pos = wstr.find(delim, pos);
+
+            if (pos != std::wstring::npos) {
+                array->push(utf8::encodeCanonicalString(
+                        		wstr.substr(prevpos, pos - prevpos),
+                        		version));
+                num++;
+                prevpos = pos + delim.size();
+                pos++;
+            } else {
+                array->push(utf8::encodeCanonicalString(
+                        		wstr.substr(prevpos),
+                        		version));
+                break;
+            }
+        }
     }
+    else {
+        // SWF6+
 
-    size_t pos = 0, prevpos = 0;
-    size_t num = 0;
+        if (fn.nargs == 0)
+        {
+            array->push(obj->str());
+            return as_value(array.get());
+        }
 
-    while (num < max) {
-        pos = wstr.find(delim, pos);
+        const std::wstring& delim = utf8::decodeCanonicalString(fn.arg(0).to_string(), version);
 
-        if (pos != std::wstring::npos) {
-            array->push(utf8::encodeCanonicalString(
-                    		wstr.substr(prevpos, pos - prevpos),
-                    		SWFVersion));
-            num++;
-            prevpos = pos + delim.size();
-            pos++;
-        } else {
-            array->push(utf8::encodeCanonicalString(
-                    		wstr.substr(prevpos),
-                    		SWFVersion));
-            break;
+        size_t max = wstr.size();
+
+        if (fn.nargs >= 2)
+        {
+	        int max_in = fn.arg(1).to_int();
+            max = utility::clamp<size_t>(max_in, 0, wstr.size());
+        }
+
+        if ( wstr.empty() )
+        {
+            array->push(obj->str());
+            return as_value(array.get());
+        }
+
+        if ( delim.empty() ) {
+            for (unsigned i=0; i <max; i++) {
+                array->push(utf8::encodeCanonicalString(wstr.substr(i, 1), version));
+            }
+
+            return as_value(array.get());
+        }
+
+        size_t pos = 0, prevpos = 0;
+        size_t num = 0;
+
+        while (num < max) {
+            pos = wstr.find(delim, pos);
+
+            if (pos != std::wstring::npos) {
+                array->push(utf8::encodeCanonicalString(
+                        		wstr.substr(prevpos, pos - prevpos),
+                        		version));
+                num++;
+                prevpos = pos + delim.size();
+                pos++;
+            } else {
+                array->push(utf8::encodeCanonicalString(
+                        		wstr.substr(prevpos),
+                        		version));
+                break;
+            }
         }
     }
 
