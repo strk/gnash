@@ -191,6 +191,122 @@ ar = o.split("b");
 xcheck_equals(ar.length, 3);
 xcheck_equals(ar.toString(), "[o,ject O,ject]");
 
+str = "h";
+ar = str.split("h");
+check_equals(ar.length, 2);
+check_equals(ar.toString(), ",");
+
+str = "";
+ar = str.split("h");
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "");
+
+str = "hh";
+ar = str.split("h");
+check_equals(ar.length, 3);
+check_equals(ar.toString(), ",,");
+
+str = "h";
+ar = str.split("g");
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "h");
+
+// For SWF6 and above:
+
+str = "a";
+ar = str.split("aa");
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "a");
+
+str = "b";
+ar = str.split("aa");
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "b");
+
+str = "a";
+ar = str.split("aa");
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "a");
+
+str = "aa";
+ar = str.split("aa");
+check_equals(ar.length, 2);
+check_equals(ar.toString(), ",");
+
+str = "";
+ar = str.split("");
+xcheck_equals(ar.length, 0);
+check_equals(ar.toString(), "");
+
+str = "b";
+ar = str.split("");
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "b");
+
+str = "aa";
+ar = str.split("");
+check_equals(ar.length, 2);
+check_equals(ar.toString(), "a,a");
+
+str = "";
+ar = str.split();
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "");
+
+str = "b";
+ar = str.split();
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "b");
+
+str = "aa";
+ar = str.split();
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "aa");
+
+
+// Limit 0 or less:
+str = "aa";
+ar = str.split("", 0);
+check_equals(ar.length, 0);
+check_equals(ar.toString(), "");
+
+str = "aa";
+ar = str.split("", -1);
+check_equals(ar.length, 0);
+check_equals(ar.toString(), "");
+
+str = "aa";
+ar = str.split("aa", 0);
+check_equals(ar.length, 0);
+check_equals(ar.toString(), "");
+
+str = "aa";
+ar = str.split("aa", -1);
+xcheck_equals(ar.length, 0);
+xcheck_equals(ar.toString(), "");
+
+str = "aa";
+ar = str.split(undefined, 0);
+xcheck_equals(ar.length, 1);
+xcheck_equals(ar.toString(), "aa");
+
+str = "aa";
+ar = str.split("a", 0);
+check_equals(ar.length, 0);
+check_equals(ar.toString(), "");
+
+o = new Object;
+o.split = String.prototype.split;
+ar = o.split("b");
+xcheck_equals(ar.length, 3);
+xcheck_equals(ar.toString(), "[o,ject O,ject]");
+
+o = new Date(0);
+o.split = String.prototype.split;
+ar = o.split(":");
+xcheck_equals(ar.length, 3);
+
+
 #else
 // empty delimiter doesn't have a special meaning in SWF5
 check_equals ( a.split("")[0], "wallawallawashinGTON" );
@@ -204,8 +320,8 @@ check_equals ( a.split("la").length, 1 );
 // SWF5:
 str = "h";
 ar = str.split("h");
-xcheck_equals(ar.length, 2);
-xcheck_equals(ar.toString(), ",");
+check_equals(ar.length, 2);
+check_equals(ar.toString(), ",");
 
 str = "";
 ar = str.split("h");
@@ -214,8 +330,8 @@ check_equals(ar.toString(), "");
 
 str = "hh";
 ar = str.split("h");
-xcheck_equals(ar.length, 3);
-xcheck_equals(ar.toString(), ",,");
+check_equals(ar.length, 3);
+check_equals(ar.toString(), ",,");
 
 str = "h";
 ar = str.split("g");
@@ -295,18 +411,18 @@ check_equals(ar.toString(), "aa");
 
 str = "aa";
 ar = str.split("aa", 0);
-xcheck_equals(ar.length, 0);
-xcheck_equals(ar.toString(), "");
+check_equals(ar.length, 0);
+check_equals(ar.toString(), "");
 
 str = "aa";
 ar = str.split("aa", -1);
-xcheck_equals(ar.length, 0);
-xcheck_equals(ar.toString(), "");
+check_equals(ar.length, 0);
+check_equals(ar.toString(), "");
 
 str = "aa";
 ar = str.split(undefined, 0);
-xcheck_equals(ar.length, 0);
-xcheck_equals(ar.toString(), "");
+check_equals(ar.length, 0);
+check_equals(ar.toString(), "");
 
 str = "aa";
 ar = str.split("a", 0);
@@ -363,9 +479,9 @@ check_equals(ret[0], 'abcde');
 st = "";
 g = st.split("", 0);
 #if OUTPUT_VERSION > 5
-xcheck_equals(g.length, 0);
-xcheck_equals(typeof(g[0]), "undefined");
-xcheck_equals(g[0], undefined);
+check_equals(g.length, 0);
+check_equals(typeof(g[0]), "undefined");
+check_equals(g[0], undefined);
 #else
 check_equals(g.length, 1);
 check_equals(typeof(g[0]), "string");
@@ -1087,5 +1203,5 @@ check(!String.prototype.hasOwnProperty('length'));
 #if OUTPUT_VERSION < 6
  check_totals(311);
 #else
- check_totals(286);
+ check_totals(329);
 #endif

@@ -343,13 +343,18 @@ string_split(const fn_call& fn)
         }
 
         const std::wstring& delim = utf8::decodeCanonicalString(fn.arg(0).to_string(), version);
+        const size_t delimiterSize = delim.size();
 
-        size_t max = wstr.size();
+        size_t max = wstr.size() + 1;
 
-        if (fn.nargs >= 2)
+        if (fn.nargs > 1)
         {
-	        int max_in = fn.arg(1).to_int();
-            max = utility::clamp<size_t>(max_in, 0, wstr.size());
+	        int limit = fn.arg(1).to_int();
+	        if (limit < 1 && !delimiterSize) {
+	            // Return empty array
+	            return as_value(array.get());
+	        }
+            max = utility::clamp<size_t>(limit, 0, max);
         }
 
         if ( wstr.empty() )
@@ -359,10 +364,9 @@ string_split(const fn_call& fn)
         }
 
         if ( delim.empty() ) {
-            for (unsigned i=0; i <max; i++) {
+            for (unsigned i = 0; i < wstr.size(); i++) {
                 array->push(utf8::encodeCanonicalString(wstr.substr(i, 1), version));
             }
-
             return as_value(array.get());
         }
 
@@ -372,19 +376,13 @@ string_split(const fn_call& fn)
         while (num < max) {
             pos = wstr.find(delim, pos);
 
-            if (pos != std::wstring::npos) {
-                array->push(utf8::encodeCanonicalString(
-                        		wstr.substr(prevpos, pos - prevpos),
-                        		version));
+            array->push(utf8::encodeCanonicalString(
+                   		wstr.substr(prevpos, pos - prevpos),
+                   		version));
+                if (pos == std::wstring::npos) break;
                 num++;
-                prevpos = pos + delim.size();
+                prevpos = pos + delimiterSize;
                 pos++;
-            } else {
-                array->push(utf8::encodeCanonicalString(
-                        		wstr.substr(prevpos),
-                        		version));
-                break;
-            }
         }
     }
 
