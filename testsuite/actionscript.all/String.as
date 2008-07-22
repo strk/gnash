@@ -108,6 +108,15 @@ isNaN ( a.charAt(-1) );
 isNaN (a.charAt(21) );
 check_equals ( a.lastIndexOf("lawa"), 8);
 
+// Applied to object.
+o = new Object;
+o.charCodeAt = String.prototype.charCodeAt;
+o.charAt = String.prototype.charAt;
+c = o.charAt(4);
+check_equals(c, "e");
+c = o.charCodeAt(4);
+check_equals(c, "101");
+
 //----------------------------------------
 // Check String.indexOf
 // TODO: test with ASnative(251,8)
@@ -137,9 +146,15 @@ check_equals ( a.indexOf("a", o), 4 );
 o2 = {}; o2.toString = function() { return "a"; };
 check_equals ( a.indexOf(o2, o), 4 ); 
 
+// Applied to object.
+o = new Object;
+o.indexOf = String.prototype.indexOf;
+p = o.indexOf("b");
+check_equals(p, 2);
+
 //----------------------------------------
 // Check String.split
-// TODO: test with ASnative(251,12)
+// See ASNative.as for more tests.
 //-----------------------------------------
 
 check_equals ( typeof(a.split), 'function' );
@@ -171,6 +186,13 @@ check_equals ( a.split("la")[0], "wal" );
 check_equals ( a.split("la")[1], "wal" );
 check_equals ( a.split("la")[2], "washinGTON" );
 check_equals ( a.split("la").length, 3 );
+
+o = new Object;
+o.split = String.prototype.split;
+ar = o.split("b");
+check_equals(ar.length, 3);
+check_equals(ar.toString(), "[o,ject O,ject]");
+
 #else
 // empty delimiter doesn't have a special meaning in SWF5
 check_equals ( a.split("")[0], "wallawallawashinGTON" );
@@ -428,6 +450,10 @@ check_equals ( a.substr(-3,2), "xy" );
 var b = new String("1234");
 check_equals ( b.substr(3, 6), "4");
 
+o = new Object;
+o.substr = String.prototype.substr;
+check_equals(o.substr(0,2), "[o");
+
 //-------------------------------------------
 // Check slice 
 // TODO: test with ASnative(251,10)
@@ -455,6 +481,10 @@ check_equals ( String.prototype.slice.call(a, -5, -3), undefined );
 #endif
 check_equals ( a.slice(-4), "wxyz" );
 
+o = new Object;
+o.slice = String.prototype.slice;
+check_equals(o.slice(0,1), "[");
+
 //-------------------------------------------
 // Check substring
 // TODO: test with ASnative(251,11)
@@ -471,6 +501,26 @@ check_equals ( a.concat("sir ","william",15), "abcdefghijklmnopqrstuvwxyzsir wil
 var b = new String("1234");
 check_equals ( b.substring(3, 6), "4");
 
+o = new Object;
+o.substring = String.prototype.substring;
+check_equals(o.substring(3,4), "j");
+
+//-------------------------------------------
+// Concat
+//-------------------------------------------
+
+// Fails if object isn't a String (the only
+// case of this, it seems).
+e = new String("h");
+e.concat("hh");
+e.concat(new Object);
+e.concat(new String);
+check_equals(e, "h");
+
+o = new Object;
+o.concat = String.prototype.concat;
+o.concat("h");
+check_equals(o.toString(), "[object Object]");
 
 //-------------------------------------------
 // Chr and ord
@@ -932,6 +982,17 @@ ASSetPropFlags(Object.prototype, "toString", 0, 2); // unprotect from deletion
 ObjectProtoToStringBackup = Object.prototype.toString;
 check(delete Object.prototype.toString);
 check_equals(typeof(s.toString), 'undefined');
+
+String.prototype.toString = function ()
+{
+    return "fake to string";
+};
+
+g = "teststring";
+check_equals (g.substr(0,4), "test");
+g = new String("teststring");
+check_equals (g.substr(0,4), "test");
+
 Object.prototype.toString = ObjectProtoToStringBackup;
 String.prototype.toString = StringProtoToStringBackup;
 
@@ -1026,7 +1087,7 @@ check(!String.prototype.hasOwnProperty('length'));
 #endif
 
 #if OUTPUT_VERSION < 6
- check_totals(301);
+ check_totals(311);
 #else
- check_totals(274);
+ check_totals(286);
 #endif
