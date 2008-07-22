@@ -180,6 +180,131 @@ check_equals ( a.split("la")[0], "wallawallawashinGTON" );
 check_equals ( a.split("la")[1], undefined );
 check_equals ( a.split("la")[2], undefined );
 check_equals ( a.split("la").length, 1 );
+
+// SWF5:
+str = "h";
+ar = str.split("h");
+check_equals(ar.length, 2);
+check_equals(ar.toString(), ",");
+
+str = "";
+ar = str.split("h");
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "");
+
+str = "hh";
+ar = str.split("h");
+check_equals(ar.length, 3);
+check_equals(ar.toString(), ",,");
+
+str = "h";
+ar = str.split("g");
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "h");
+
+// For SWF5, the following conditions mean that an array with a single
+// element containing the entire string is returned:
+// 1. No arguments are passed.
+// 2. The delimiter is empty.
+// 3. The delimiter has more than one character or is undefined and limit is not 0.
+// 4. The delimiter is not present in the string and the limit is not 0.
+//
+// Accordingly, an empty array is returned only when the limit is less
+// than 0 and a non-empty delimiter is passed.str = "";
+str = "a";
+ar = str.split("aa");
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "a");
+
+str = "b";
+ar = str.split("aa");
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "b");
+
+str = "a";
+ar = str.split("aa");
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "a");
+
+str = "aa";
+ar = str.split("aa");
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "aa");
+
+str = "";
+ar = str.split("");
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "");
+
+str = "b";
+ar = str.split("");
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "b");
+
+str = "aa";
+ar = str.split("");
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "aa");
+
+str = "";
+ar = str.split();
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "");
+
+str = "b";
+ar = str.split();
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "b");
+
+str = "aa";
+ar = str.split();
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "aa");
+
+
+// Limit 0 or less:
+str = "aa";
+ar = str.split("", 0);
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "aa");
+
+str = "aa";
+ar = str.split("", -1);
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "aa");
+
+str = "aa";
+ar = str.split("aa", 0);
+check_equals(ar.length, 0);
+check_equals(ar.toString(), "");
+
+str = "aa";
+ar = str.split("aa", -1);
+check_equals(ar.length, 0);
+check_equals(ar.toString(), "");
+
+str = "aa";
+ar = str.split(undefined, 0);
+check_equals(ar.length, 0);
+check_equals(ar.toString(), "");
+
+str = "aa";
+ar = str.split("a", 0);
+check_equals(ar.length, 0);
+check_equals(ar.toString(), "");
+
+o = new Object;
+o.split = String.prototype.split;
+ar = o.split("b");
+check_equals(ar.length, 3);
+check_equals(ar.toString(), "[o,ject O,ject]");
+
+o = new Date(0);
+o.split = String.prototype.split;
+ar = o.split(":");
+check_equals(ar.length, 3);
+// It will be different according to the timezone...
+
 #endif
 
 // TODO: test String.split(delim, limit)  [ second arg ]
@@ -901,7 +1026,7 @@ check(!String.prototype.hasOwnProperty('length'));
 #endif
 
 #if OUTPUT_VERSION < 6
- check_totals(258);
+ check_totals(301);
 #else
  check_totals(274);
 #endif
