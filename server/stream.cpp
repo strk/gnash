@@ -445,6 +445,11 @@ void SWFStream::read_string_with_length(unsigned len, std::string& to)
         to[i] = read_u8();
     }
 
+    // drop trailing nulls (see swf6/Bejeweled.swf)
+    std::string::size_type last = to.find_last_not_of(0);
+    if ( last == std::string::npos ) to.clear();
+    else to.erase(last+1);
+
 }
 
 
