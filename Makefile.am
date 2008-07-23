@@ -84,8 +84,6 @@ EXTRA_DIST =  autogen.sh \
 	packaging/bsd.am \
 	packaging/rpm.am
 
-noinst_HEADERS = compatibility_include.h
-
 # dist-hook:
 # 	@test -d "$(distdir)/packaging" || $(mkinstalldirs) "$(distdir)/packaging"
 # 	cp -p $(srcdir)/*.am $(top_distdir)/packaging/

@@ -24,7 +24,6 @@
 
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
-#include <memory>
 #include <boost/scoped_array.hpp>
 
 #undef ENABLE_MIT_SHM
@@ -94,16 +93,18 @@ class GtkAggGlue : public GtkGlue
     /// Tries to create a AGG render handler based on the X server pixel
     /// format. Returns NULL on failure.
     render_handler *create_shm_handler();    
-    
-    /// converts a bitmask to a shift/size information (used for pixel format
-    /// detection)
-    void decode_mask(unsigned long mask, unsigned int *shift, unsigned int *size);
-    
+        
     /// Tries to detect the pixel format used by the X server (usually RGB24).
     /// It does not have to match the hardware pixel format, just the one
     /// expected for pixmaps. This function is /not/ used for MIT-SHM!
     bool detect_pixelformat();
-    
+
+#ifdef ENABLE_MIT_SHM
+    /// converts a bitmask to a shift/size information (used for pixel format
+    /// detection)
+    static void decodeMask(unsigned long mask, unsigned int& shift, unsigned int& size);
+#endif
+
 };
 
 } // namespace gnash

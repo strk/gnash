@@ -81,7 +81,7 @@ RTMPMsg::~RTMPMsg()
 RTMPMsg::rtmp_status_e
 RTMPMsg::checkStatus(amf::Element * /* el */)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     if (_amfobjs.size() > 0) {
 	vector<amf::Element *>::iterator pit;
 	vector<amf::Element *>::iterator cit;

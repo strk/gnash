@@ -43,7 +43,6 @@
 // Also worth checking: http://en.wikipedia.org/wiki/X_video_extension
 
 #include <cerrno>
-#include <cstring> // std::memset
 #include <exception>
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
@@ -293,9 +292,9 @@ GtkAggGlue::create_shm_handler()
     unsigned int green_shift, green_prec;
     unsigned int blue_shift, blue_prec;
 
-    decode_mask(_shm_image->red_mask,   &red_shift,   &red_prec);
-    decode_mask(_shm_image->green_mask, &green_shift, &green_prec);
-    decode_mask(_shm_image->blue_mask,  &blue_shift,  &blue_prec);
+    decodeMask(_shm_image->red_mask, red_shift, red_prec);
+    decodeMask(_shm_image->green_mask, green_shift, green_prec);
+    decodeMask(_shm_image->blue_mask, blue_shift, blue_prec);
 
   
     log_debug("X server pixel format is (R%d:%d, G%d:%d, B%d:%d, %d bpp)",
@@ -363,7 +362,7 @@ GtkAggGlue::setRenderHandlerSize(int width, int height)
     assert(height > 0);
     assert(_agg_renderer != NULL);
 
-    const size_t CHUNK_SIZE = 100 * 100 * (_bpp / 8);
+    static const size_t chunkSize = 100 * 100 * (_bpp / 8);
     
     if (width == _width && height == _height) return;
        
@@ -399,7 +398,7 @@ GtkAggGlue::setRenderHandlerSize(int width, int height)
         // Reallocate the buffer when it shrinks or grows.
         if (newBufferSize != _offscreenbuf_size) {
 
-            newBufferSize = (newBufferSize / CHUNK_SIZE + 1) * CHUNK_SIZE;
+            newBufferSize = (newBufferSize / chunkSize + 1) * chunkSize;
 
             try {
                   _offscreenbuf.reset(new unsigned char[newBufferSize]);
@@ -416,7 +415,7 @@ GtkAggGlue::setRenderHandlerSize(int width, int height)
             }
       
             _offscreenbuf_size = newBufferSize;
-            std::memset(_offscreenbuf.get(), 0, _offscreenbuf_size);
+
         }
       
         // Only the AGG renderer has the function init_buffer, which is *not* part of
@@ -553,25 +552,26 @@ GtkAggGlue::configure(GtkWidget *const /*widget*/, GdkEventConfigure *const even
     }
 }
 
-
+#ifdef ENABLE_MIT_SHM
 void 
-GtkAggGlue::decode_mask(unsigned long mask, unsigned int *shift, unsigned int *size)
+GtkAggGlue::decodeMask(unsigned long mask, unsigned int& shift, unsigned int& size)
 {
-    *shift = 0;
-    *size = 0;
+    shift = 0;
+    size = 0;
 
-    if (mask==0) return; // invalid mask
+    if (mask == 0) return; // invalid mask
 
     while (!(mask & 1)) {
-        (*shift)++;
+        ++shift;
         mask = mask >> 1;
     }
 
     while (mask & 1) {
-        (*size)++;
+        ++size;
         mask = mask >> 1;
     }
 }
+#endif
 
 } // namespace gnash
 
