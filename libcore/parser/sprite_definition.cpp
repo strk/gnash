@@ -193,7 +193,8 @@ sprite_definition::sprite_definition(movie_definition* m, SWFStream* in)
 	m_movie_def(m),
 	m_frame_count(0),
 	m_loading_frame(0),
-	registeredClass(0)
+	registeredClass(0),
+	_loadingSoundStream(-1)
 {
 	assert(m_movie_def);
 

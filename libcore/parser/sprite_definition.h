@@ -176,17 +176,16 @@ public:
 		m_movie_def->add_sound_sample(id,sam);
 	}
 
-	/// Delegate call to associated root movie
+	// See dox in movie_definition.h
 	virtual void set_loading_sound_stream_id(int id)
 	{
-		m_movie_def->set_loading_sound_stream_id(id);
-
+		_loadingSoundStream = id;
 	}
 
-	/// Delegate call to associated root movie, or return -1
+	// See dox in movie_definition.h
 	virtual int get_loading_sound_stream_id()
 	{
-		return m_movie_def->get_loading_sound_stream_id();
+		return _loadingSoundStream;
 	}
 
 
@@ -342,6 +341,8 @@ private:
 	/// interface.
 	///
 	boost::intrusive_ptr<as_function> registeredClass;
+
+	int	_loadingSoundStream;
 
 protected:
 
