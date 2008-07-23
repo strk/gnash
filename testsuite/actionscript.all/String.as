@@ -169,7 +169,18 @@ check_equals ( a.split("w").length, 4);
 check_equals ( a.split("  w").length, 1);
 
 #if OUTPUT_VERSION > 5
-// TODO: check more of split(''), it seems to be bogus !
+// For SWF6 and above the following condititions apply in
+// this order:
+// Full string returned in 1-element array:
+// 1. If no arguments are passed.
+// 2. If delimiter undefined.
+// 3: empty string, non-empty delimiter.
+//
+// Empty array returned:
+// 4. string and delimiter are empty but defined.
+// 5. non-empty string, non-empty delimiter; 0 or less elements required.
+//
+// If the delimiter is empty, each character is placed in a separate element.
 ret = a.split('');
 check_equals(typeof(ret), 'object');
 check(ret instanceof Array);
@@ -204,8 +215,6 @@ str = "h";
 ar = str.split("g");
 check_equals(ar.length, 1);
 check_equals(ar.toString(), "h");
-
-// For SWF6 and above:
 
 str = "a";
 ar = str.split("aa");
@@ -309,6 +318,13 @@ ar = str.split("a", 0);
 check_equals(ar.length, 0);
 check_equals(ar.toString(), "");
 
+// Limit undefined
+str = "aa";
+ar = str.split("aa", undefined);
+check_equals(ar.length, 2);
+check_equals(ar.toString(), ",");
+
+// String methods on object.
 o = new Object;
 o.split = String.prototype.split;
 ar = o.split("b");
@@ -463,6 +479,12 @@ str = "aa";
 ar = str.split("a", 0);
 check_equals(ar.length, 0);
 check_equals(ar.toString(), "");
+
+// Limit undefined
+str = "aa";
+ar = str.split("a", undefined);
+check_equals(ar.length, 3);
+check_equals(ar.toString(), ",,");
 
 o = new Object;
 o.split = String.prototype.split;
@@ -1246,7 +1268,7 @@ check(!String.prototype.hasOwnProperty('length'));
 #endif
 
 #if OUTPUT_VERSION < 6
- check_totals(321);
+ check_totals(323);
 #else
- check_totals(337);
+ check_totals(339);
 #endif

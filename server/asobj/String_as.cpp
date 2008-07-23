@@ -340,7 +340,7 @@ string_split(const fn_call& fn)
 
         // If we reach this point, the string is not empty and
         // the delimiter is defined.
-        if (fn.nargs > 1)
+        if (fn.nargs > 1 && !fn.arg(1).is_undefined())
         {
 	        int limit = fn.arg(1).to_int();
 	        if (limit < 1) {
