@@ -261,21 +261,28 @@ string_slice(const fn_call& fn)
 //
 // Accordingly, an empty array is returned only when the limit is less
 // than 0 and a non-empty delimiter is passed.
+//
+// For SWF6:
+// Full string returned in 1-element array:
+// 1. If no arguments are passed.
+// 2. If delimiter undefined.
+// 3: empty string, non-empty delimiter.
+//
+// Empty array returned:
+// 4. string and delimiter are empty but defined.
+// 5. non-empty string, non-empty delimiter; 0 or less elements required.
 static as_value
 string_split(const fn_call& fn)
 {
     boost::intrusive_ptr<string_as_object> obj =  ensureType<string_as_object>(fn.this_ptr);
 
-    VM& vm = obj->getVM(); 
-    const int version = vm.getSWFVersion();
+    const int version = obj->getVM().getSWFVersion();
     
     const std::string& str = obj->str();
 
     std::wstring wstr = utf8::decodeCanonicalString(str, version);
 
     boost::intrusive_ptr<as_array_object> array(new as_array_object());
-
-    size_t max;
 
     if (fn.nargs == 0)
     {
@@ -287,18 +294,19 @@ string_split(const fn_call& fn)
     const std::wstring& delim = utf8::decodeCanonicalString(fn.arg(0).to_string(), version);
     const size_t delimiterSize = delim.size();
 
+    if ((version < 6 && delimiterSize == 0) ||
+        (version >= 6 && fn.arg(0).is_undefined()))
+    {
+        // Condition 2:
+        array->push(str);
+        return as_value(array.get());
+    }
+
+    size_t max = wstr.size() + 1;
+
     if (version < 6)
     {
-
-        if (delimiterSize == 0)
-        {
-            // Condition 2:
-	        array->push(str);
-	        return as_value(array.get());
-        }
-
-        max = wstr.size() + 1;
-
+        // SWF5
         if (fn.nargs > 1 && !fn.arg(1).is_undefined())
         {
             int limit = fn.arg(1).to_int();
@@ -321,26 +329,31 @@ string_split(const fn_call& fn)
     else
     {
         // SWF6+
-        max = wstr.size() + 1;
+        if (wstr.empty())
+        {
+            // If the string itself is empty, SWF6 returns a 0-sized
+            // array only if the delimiter is also empty. Otherwise
+            // it returns an array with 1 empty element.
+            if (delimiterSize) array->push(str);
+            return as_value(array.get());
+        }
 
+        // If we reach this point, the string is not empty and
+        // the delimiter is defined.
         if (fn.nargs > 1)
         {
 	        int limit = fn.arg(1).to_int();
-	        if (limit < 1 && !delimiterSize) {
-	            // Return empty array
+	        if (limit < 1) {
+	            // Return empty array if 
 	            return as_value(array.get());
 	        }
             max = utility::clamp<size_t>(limit, 0, max);
         }
 
-        if ( wstr.empty() )
-        {
-            array->push(str);
-            return as_value(array.get());
-        }
-
+        // If the delimiter is empty, put each character in an
+        // array element.
         if ( delim.empty() ) {
-            for (unsigned i = 0; i < wstr.size(); i++) {
+            for (size_t i = 0, e = wstr.size(); i < e; ++i) {
                 array->push(utf8::encodeCanonicalString(wstr.substr(i, 1), version));
             }
             return as_value(array.get());

@@ -185,12 +185,6 @@ check_equals ( a.split("la")[1], "wal" );
 check_equals ( a.split("la")[2], "washinGTON" );
 check_equals ( a.split("la").length, 3 );
 
-o = new Object;
-o.split = String.prototype.split;
-ar = o.split("b");
-xcheck_equals(ar.length, 3);
-xcheck_equals(ar.toString(), "[o,ject O,ject]");
-
 str = "h";
 ar = str.split("h");
 check_equals(ar.length, 2);
@@ -235,7 +229,7 @@ check_equals(ar.toString(), ",");
 
 str = "";
 ar = str.split("");
-xcheck_equals(ar.length, 0);
+check_equals(ar.length, 0);
 check_equals(ar.toString(), "");
 
 str = "b";
@@ -270,6 +264,26 @@ ar = str.split("", 0);
 check_equals(ar.length, 0);
 check_equals(ar.toString(), "");
 
+str = "";
+ar = str.split("x", 0);
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "");
+
+str = "";
+ar = str.split("x", -1);
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "");
+
+str = "";
+ar = str.split("", 0);
+check_equals(ar.length, 0);
+check_equals(ar.toString(), "");
+
+str = "";
+ar = str.split("", -1);
+check_equals(ar.length, 0);
+check_equals(ar.toString(), "");
+
 str = "aa";
 ar = str.split("", -1);
 check_equals(ar.length, 0);
@@ -282,13 +296,13 @@ check_equals(ar.toString(), "");
 
 str = "aa";
 ar = str.split("aa", -1);
-xcheck_equals(ar.length, 0);
-xcheck_equals(ar.toString(), "");
+check_equals(ar.length, 0);
+check_equals(ar.toString(), "");
 
 str = "aa";
 ar = str.split(undefined, 0);
-xcheck_equals(ar.length, 1);
-xcheck_equals(ar.toString(), "aa");
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "aa");
 
 str = "aa";
 ar = str.split("a", 0);
@@ -308,16 +322,17 @@ xcheck_equals(ar.length, 3);
 
 
 #else
+// SWF5:
+
 // empty delimiter doesn't have a special meaning in SWF5
 check_equals ( a.split("")[0], "wallawallawashinGTON" );
 check_equals ( a.split("")[19], undefined );
-// mulit-char delimiter doesn't work in SWF5
+// multi-char delimiter doesn't work in SWF5
 check_equals ( a.split("la")[0], "wallawallawashinGTON" );
 check_equals ( a.split("la")[1], undefined );
 check_equals ( a.split("la")[2], undefined );
 check_equals ( a.split("la").length, 1 );
 
-// SWF5:
 str = "h";
 ar = str.split("h");
 check_equals(ar.length, 2);
@@ -408,6 +423,26 @@ str = "aa";
 ar = str.split("", -1);
 check_equals(ar.length, 1);
 check_equals(ar.toString(), "aa");
+
+str = "";
+ar = str.split("x", 0);
+check_equals(ar.length, 0);
+check_equals(ar.toString(), "");
+
+str = "";
+ar = str.split("x", -1);
+check_equals(ar.length, 0);
+check_equals(ar.toString(), "");
+
+str = "";
+ar = str.split("", 0);
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "");
+
+str = "";
+ar = str.split("", -1);
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "");
 
 str = "aa";
 ar = str.split("aa", 0);
@@ -1102,10 +1137,20 @@ String.prototype.toString = function ()
     return "fake to string";
 };
 
+Object.prototype.toString = function ()
+{
+    return "fake object";
+};
+
 g = "teststring";
 check_equals (g.substr(0,4), "test");
 g = new String("teststring");
 check_equals (g.substr(0,4), "test");
+
+o = new Object;
+check_equals(o.substr(0,4), undefined);
+o.substr = String.prototype.substr;
+xcheck_equals(o.substr(0,4), "fake");
 
 Object.prototype.toString = ObjectProtoToStringBackup;
 String.prototype.toString = StringProtoToStringBackup;
@@ -1201,7 +1246,7 @@ check(!String.prototype.hasOwnProperty('length'));
 #endif
 
 #if OUTPUT_VERSION < 6
- check_totals(311);
+ check_totals(321);
 #else
- check_totals(329);
+ check_totals(337);
 #endif
