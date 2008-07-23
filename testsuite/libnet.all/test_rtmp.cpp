@@ -439,7 +439,7 @@ test_results()
 //         dsLgYohb
     Buffer *hex4 = hex2mem("02 00 08 6f 6e 53 74 61 74 75 73 00 00 00 00 00 00 00 00 00 05 03 00 05 6c 65 76 65 6c 02 00 06 73 74 61 74 75 73 00 04 63 6f 64 65 02 00 14 4e 65 74 53 74 72 65 61 6d 2e 50 6c 61 79 2e 52 65 73 65 74 00 0b 64 65 73 63 72 69 70 74 69 6f 6e 02 00 2a 50 6c 61 79 69 6e 67 20 61 6e 64 20 72 65 73 65 74 74 69 6e 67 20 50 44 5f 45 6e 67 6c 69 73 68 5f 4c 6f 77 40 32 30 30 31 2e 00 07 64 65 74 61 69 6c 73 02 00 13 50 44 5f 45 6e 67 6c 69 73 68 5f 4c 6f 77 40 32 30 30 31 00 08 63 6c 69 65 6e 74 69 64 02 00 08 64 73 4c 67 59 6f 68 62 00 00 09");
     RTMPMsg *msg4 = rtmpserv.decodeMsgBody(hex4);
-    msg4->dump();
+//    msg4->dump();
 //    std::vector<amf::Element *> hell4 = msg4->getElements();
     if ((msg4->getStatus() ==  RTMPMsg::NS_PLAY_RESET)
         && (msg4->getMethodName() == "onStatus")
@@ -458,8 +458,8 @@ test_results()
 // Data.Start
         Buffer *hex5 = hex2mem("02 00 08 6f 6e 53 74 61 74 75 73 03 00 04 63 6f 64 65 02 00 14 4e 65 74 53 74 72 65 61 6d 2e 44 61 74 61 2e 53 74 61 72 74 00 00 09");
     RTMPMsg *msg5 = rtmpserv.decodeMsgBody(hex5);
-    msg5->dump();
-    cout << msg5->getStreamID() << endl;
+//    msg5->dump();
+//    cout << msg5->getStreamID() << endl;
 //    std::vector<amf::Element *> hell4 = msg4->getElements();
     if ((msg5->getStatus() ==  RTMPMsg::NS_DATA_START)
         && (msg5->getMethodName() == "onStatus")
@@ -483,7 +483,7 @@ test_results()
 //         PD_English_Low@20..clientid...dsLgYohb.
     Buffer *hex6 = hex2mem("02 00 08 6f 6e 53 74 61 74 75 73 00 00 00 00 00 00 00 00 00 05 03 00 05 6c 65 76 65 6c 02 00 06 73 74 61 74 75 73 00 04 63 6f 64 65 02 00 14 4e 65 74 53 74 72 65 61 6d 2e 50 6c 61 79 2e 53 74 61 72 74 00 0b 64 65 73 63 72 69 70 74 69 6f 6e 02 00 24 53 74 61 72 74 65 64 20 70 6c 61 79 69 6e 67 20 50 44 5f 45 6e 67 6c 69 73 68 5f 4c 6f 77 40 32 30 30 31 2e 00 07 64 65 74 61 69 6c 73 02 00 13 50 44 5f 45 6e 67 6c 69 73 68 5f 4c 6f 77 40 32 30 30 31 00 08 63 6c 69 65 6e 74 69 64 02 00 08 64 73 4c 67 59 6f 68 62 00 00 09");
     RTMPMsg *msg6 = rtmpserv.decodeMsgBody(hex6);
-    msg6->dump();
+//    msg6->dump();
 //    std::vector<amf::Element *> hell4 = msg4->getElements();
     if ((msg6->getStatus() ==  RTMPMsg::NS_PLAY_START)
         && (msg6->getMethodName() == "onStatus")
