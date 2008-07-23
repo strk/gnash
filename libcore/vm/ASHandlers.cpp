@@ -64,6 +64,15 @@
 #include <boost/lexical_cast.hpp>
 #include <algorithm> // std::swap
 
+// GNASH_PARANOIA_LEVEL:
+// 0 : no assertions
+// 1 : quick assertions
+// 2 : check that handlers are called on correct tag
+//
+#ifndef GNASH_PARANOIA_LEVEL
+# define GNASH_PARANOIA_LEVEL 1
+#endif
+
 namespace {
 #ifdef USE_DEBUGGER
 static gnash::Debugger& debugger = gnash::Debugger::getDefaultInstance();
@@ -458,7 +467,7 @@ void
 SWFHandlers::ActionEnd(ActionExec& thread)
 {
 
-#ifndef NDEBUG
+#if GNASH_PARANOIA_LEVEL > 1
     assert(thread.atActionTag(SWF::ACTION_END));
 #endif
 
@@ -473,7 +482,7 @@ SWFHandlers::ActionNextFrame(ActionExec& thread)
 
     as_environment& env = thread.env;
 
-#ifndef NDEBUG
+#if GNASH_PARANOIA_LEVEL > 1
     assert(thread.atActionTag(SWF::ACTION_NEXTFRAME));
 #endif
 
@@ -489,7 +498,7 @@ SWFHandlers::ActionPrevFrame(ActionExec& thread)
 
     as_environment& env = thread.env;
 
-#ifndef NDEBUG
+#if GNASH_PARANOIA_LEVEL > 1
     assert(thread.atActionTag(SWF::ACTION_PREVFRAME));
 #endif
 
@@ -505,7 +514,7 @@ SWFHandlers::ActionPlay(ActionExec& thread)
 
     as_environment& env = thread.env;
 
-#ifndef NDEBUG
+#if GNASH_PARANOIA_LEVEL > 1
     assert(thread.atActionTag(SWF::ACTION_PLAY));
 #endif
 
@@ -521,7 +530,7 @@ SWFHandlers::ActionStop(ActionExec& thread)
 
     as_environment& env = thread.env;
 
-#ifndef NDEBUG
+#if GNASH_PARANOIA_LEVEL > 1
     assert(thread.atActionTag(SWF::ACTION_STOP));
 #endif
 
@@ -535,18 +544,18 @@ void
 SWFHandlers::ActionToggleQuality(ActionExec& thread)
 {
 
-#ifndef NDEBUG
+#if GNASH_PARANOIA_LEVEL > 1
     assert(thread.atActionTag(SWF::ACTION_TOGGLEQUALITY));
 #endif
 
-    log_unimpl (__PRETTY_FUNCTION__);
+    LOG_ONCE( log_unimpl (__PRETTY_FUNCTION__) );
 }
 
 void
 SWFHandlers::ActionStopSounds(ActionExec& thread)
 {
 
-#ifndef NDEBUG
+#if GNASH_PARANOIA_LEVEL > 1
     assert(thread.atActionTag(SWF::ACTION_STOPSOUNDS));
 #endif
 
@@ -564,7 +573,9 @@ SWFHandlers::ActionGotoFrame(ActionExec& thread)
     as_environment& env = thread.env;
     const action_buffer& code = thread.code;
 
+#if GNASH_PARANOIA_LEVEL > 1
     assert(thread.atActionTag(SWF::ACTION_GOTOFRAME));
+#endif
 
     size_t frame = code.read_int16(thread.getCurrentPC()+3);
 
@@ -583,7 +594,9 @@ SWFHandlers::ActionGetUrl(ActionExec& thread)
     as_environment& env = thread.env;
     const action_buffer& code = thread.code;
 
+#if GNASH_PARANOIA_LEVEL > 1
     assert(thread.atActionTag(SWF::ACTION_GETURL));
+#endif
 
     size_t pc = thread.getCurrentPC();
 
@@ -617,7 +630,9 @@ SWFHandlers::ActionWaitForFrame(ActionExec& thread)
     as_environment& env = thread.env;
     const action_buffer& code = thread.code;
 
+#if GNASH_PARANOIA_LEVEL > 1
     assert(thread.atActionTag(SWF::ACTION_WAITFORFRAME));
+#endif
 
     // SWF integrity check
     size_t tag_len = code.read_int16(thread.getCurrentPC()+1);
@@ -667,7 +682,9 @@ SWFHandlers::ActionSetTarget(ActionExec& thread)
     const action_buffer& code = thread.code;
     size_t pc = thread.getCurrentPC();
 
+#if GNASH_PARANOIA_LEVEL > 1
     assert(thread.atActionTag(SWF::ACTION_SETTARGET)); // 0x8B
+#endif
 
     // Change the movie we're working on.
     std::string target_name ( code.read_string(pc+3) );
@@ -760,7 +777,9 @@ SWFHandlers::ActionEqual(ActionExec& thread)
 
     as_environment& env = thread.env;
 
+#if GNASH_PARANOIA_LEVEL > 1
     assert(thread.atActionTag(SWF::ACTION_EQUAL)); // 0x0E
+#endif
 
     thread.ensureStack(2);
 
@@ -933,9 +952,11 @@ SWFHandlers::ActionSubString(ActionExec& thread)
         size = wstr.length() - start;
     }
 
+#if GNASH_PARANOIA_LEVEL > 1
     assert(start >= 0);
     assert(static_cast<unsigned int>(start) < wstr.length() );
     assert(size >= 0);
+#endif
 
     env.drop(2);
     env.top(0).set_string(utf8::encodeCanonicalString(
@@ -1081,7 +1102,9 @@ SWFHandlers::ActionGetProperty(ActionExec& thread)
         if ( prop_number < get_property_names().size() )
         {
             as_value val;
-            assert( get_property_names().size() );
+#if GNASH_PARANOIA_LEVEL > 1
+            assert( ! get_property_names().empty() );
+#endif
             std::string propname = get_property_names()[prop_number];
 
             thread.getObjectMember(*target, propname, val);
@@ -1257,7 +1280,9 @@ SWFHandlers::ActionStartDragMovie(ActionExec& thread)
 
     as_environment& env = thread.env;
 
+#if GNASH_PARANOIA_LEVEL > 1
     assert(thread.atActionTag(SWF::ACTION_STARTDRAGMOVIE));
+#endif
 
     thread.ensureStack(3);
 
@@ -1497,7 +1522,9 @@ SWFHandlers::ActionFscommand2(ActionExec& thread)
 {
     
 
+#if GNASH_PARANOIA_LEVEL > 1
     assert(thread.atActionTag(SWF::ACTION_FSCOMMAND2)); // 0x0E
+#endif
 
     as_environment& env = thread.env;
 
@@ -1982,7 +2009,7 @@ SWFHandlers::ActionPushData(ActionExec& thread)
 
     size_t pc = thread.getCurrentPC();
     boost::int16_t length = code.read_int16(pc+1);
-    assert( length >= 0 );
+    assert( length >= 0 ); // TODO: trigger this with a testcase !
 
 #if 0 // is this really useful ?
         IF_VERBOSE_ACTION (
@@ -2366,7 +2393,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
             log_debug("TESTME: target of a loadMovie changed its target path");
         }
         movie_root& mr = VM::get().getRoot();
-        assert( mr.findCharacterByTarget(s) == target_movie );
+        assert( mr.findCharacterByTarget(s) == target_movie ); // TODO: try to trigger this !
 
         if ( usePost )
         {
@@ -2519,7 +2546,9 @@ SWFHandlers::ActionGetUrl2(ActionExec& thread)
 
     const action_buffer& code = thread.code;
 
+#if GNASH_PARANOIA_LEVEL > 1
     assert(thread.atActionTag(SWF::ACTION_GETURL2));
+#endif
 
     boost::uint8_t method = code[thread.getCurrentPC() + 3];
 
@@ -2548,7 +2577,9 @@ SWFHandlers::ActionBranchIfTrue(ActionExec& thread)
     size_t nextPC = thread.getNextPC();
     size_t stopPC = thread.getStopPC();
 
+#if GNASH_PARANOIA_LEVEL > 1
     assert(thread.atActionTag(SWF::ACTION_BRANCHIFTRUE));
+#endif
 
     thread.ensureStack(1); // bool
 
@@ -2692,7 +2723,9 @@ SWFHandlers::ActionDelete(ActionExec& thread)
     //GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
 
+#if GNASH_PARANOIA_LEVEL > 1
     assert(thread.atActionTag(SWF::ACTION_DELETE)); // 0x3A
+#endif
 
     thread.ensureStack(2); // obj, member
 
@@ -2725,7 +2758,9 @@ SWFHandlers::ActionDelete2(ActionExec& thread)
 
     as_environment& env = thread.env;
 
+#if GNASH_PARANOIA_LEVEL > 1
     assert(thread.atActionTag(SWF::ACTION_DELETE2)); // 0x3B
+#endif
 
     thread.ensureStack(1); // var
 
@@ -2969,7 +3004,7 @@ SWFHandlers::ActionInitArray(ActionExec& thread)
     thread.ensureStack(1); // array size name
 
     const int array_size = env.pop().to_int();
-    assert(array_size >= 0);
+    assert(array_size >= 0); // TODO: trigger this !!
 
     thread.ensureStack(static_cast<unsigned int>(array_size)); // array elements
 
@@ -3218,7 +3253,9 @@ SWFHandlers::ActionNewEquals(ActionExec& thread)
     //GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
 
+#if GNASH_PARANOIA_LEVEL > 1
     assert(thread.atActionTag(SWF::ACTION_NEWEQUALS));
+#endif
 
     thread.ensureStack(2);
 
@@ -3562,7 +3599,9 @@ SWFHandlers::ActionNewMethod(ActionExec& thread)
 
     as_environment& env = thread.env;
 
+#if GNASH_PARANOIA_LEVEL > 1
     assert(thread.atActionTag(SWF::ACTION_NEWMETHOD));
+#endif
 
     thread.ensureStack(3); // method, object, nargs
 
@@ -4019,7 +4058,7 @@ SWFHandlers::ActionTry(ActionExec& thread)
 
     const action_buffer& code = thread.code;
 
-#ifndef NDEBUG
+#if GNASH_PARANOIA_LEVEL > 1
     assert(thread.atActionTag(SWF::ACTION_TRY));
 #endif
 
@@ -4079,7 +4118,9 @@ SWFHandlers::ActionWith(ActionExec& thread)
     const action_buffer& code = thread.code;
     size_t pc = thread.getCurrentPC();
 
+#if GNASH_PARANOIA_LEVEL > 1
     assert(thread.atActionTag(SWF::ACTION_WITH));
+#endif
 
     thread.ensureStack(1);  // the object
     as_value with_obj_val = env.pop().to_object();
@@ -4141,6 +4182,7 @@ SWFHandlers::ActionDefineFunction(ActionExec& thread)
     const action_buffer& code = thread.code;
 
 #ifndef NDEBUG
+    // TODO: check effects of the following 'length' 
     boost::int16_t length = code.read_int16(thread.getCurrentPC()+1);
     assert( length >= 0 );
 #endif
