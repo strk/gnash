@@ -188,7 +188,7 @@ check_equals (countTS, 0); // calls to toString.
 // String functions (call toString)
 
 a = ASnative(251, 3); // String.toUpperCase
-xcheck_equals(a("Hello World"), "_LEVEL0");
+check_equals(a("Hello World"), "_LEVEL0");
 a = ASnative(102, 0); // SWF5 to upper
 xcheck_equals(a("Hello World"), "_LEVEL0");
 
@@ -196,12 +196,17 @@ xcheck_equals(a("Hello World"), "_LEVEL0");
 // SWF5 has problems with UTF-8, tested in String.as.
 // No need to test here as well.
 
+check_equals (countTS, 0); // calls to toString.
+
 #if OUTPUT_VERSION > 5
 func.a = ASnative(251, 3); // String.toUpperCase
 xcheck_equals(func.a(), "GNASH MUST WORK! ÖÜÄÄ€€");
 
 func.a = ASnative(251, 4); // String.toLowerCase
 xcheck_equals(func.a(), "gnash must work! öüää€€");
+
+// Check calls to toString.
+xcheck_equals (countTS, 2);
 #endif
 
 func.a = ASnative(102, 0); // SWF5 to upper
@@ -209,6 +214,13 @@ xcheck_equals(func.a(), "GNASH MUST WORK! öÜäÄ€€");
 
 func.a = ASnative(102, 1); // SWF5 to lower
 xcheck_equals(func.a(), "gnash must work! öÜäÄ€€");
+
+// Check calls to toString.
+#if OUTPUT_VERSION > 5
+check_equals (countTS, 4);
+#else
+xcheck_equals (countTS, 2);
+#endif
 
 // Stage
 st = ASnative(666, 2);
@@ -239,7 +251,7 @@ st = ASnative(666, 10);
 st = ASnative(666, 9);
 
 #if OUTPUT_VERSION > 5
-xcheck_equals (countTS, 4);
+check_equals (countTS, 4);
 #else
 xcheck_equals (countTS, 2);
 #endif
@@ -247,7 +259,7 @@ xcheck_equals (countTS, 2);
 xcheck_equals (countVO, 25);
 
 #if OUTPUT_VERSION > 5
-check_totals(76);
+check_totals(79);
 #else
-check_totals(74);
+check_totals(76);
 #endif

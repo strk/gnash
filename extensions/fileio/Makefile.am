@@ -28,18 +28,17 @@ DEF_MAKESWF_FLAGS = -I $(top_srcdir)/testsuite/actionscript.all
 
 INCLUDES =  \
             -I$(top_srcdir)/libbase \
-	    -I$(top_srcdir)/libgeometry \
-            -I$(top_srcdir)/server \
-            -I$(top_srcdir)/server/vm \
-	    -I$(top_srcdir)/server/parser \
-	    -I$(top_srcdir)/server/asobjs \
+            -I$(top_srcdir)/libcore \
+            -I$(top_srcdir)/libcore/vm \
+	    -I$(top_srcdir)/libcore/parser \
+	    -I$(top_srcdir)/libcore/asobjs \
 	    $(BOOST_CFLAGS) \
 	    $(PTHREAD_CFLAGS) \
 	    $(INCLTDL)
 
 AM_LDFLAGS =  \
 	$(top_builddir)/libbase/libgnashbase.la \
-	$(top_builddir)/server/libgnashserver.la \
+	$(top_builddir)/libcore/libgnashcore.la \
 	$(PTHREAD_LIBS) \
 	$(NULL)
 

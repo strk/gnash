@@ -55,17 +55,16 @@ AM_CPPFLAGS = -I.. \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/libmedia \
         -I$(top_srcdir)/backend \
-        -I$(top_srcdir)/server  \
-        -I$(top_srcdir)/server/vm  \
-        -I$(top_srcdir)/server/parser  \
-        -I$(top_srcdir)/libgeometry \
+        -I$(top_srcdir)/libcore  \
+        -I$(top_srcdir)/libcore/vm  \
+        -I$(top_srcdir)/libcore/parser  \
         -I$(top_srcdir)/testsuite \
 	$(BOOST_CFLAGS) \
 	$(NULL)
 
 GNASH_LIBS = \
 	$(top_builddir)/testsuite/libtestsuite.la \
-	$(top_builddir)/server/libgnashserver.la \
+	$(top_builddir)/libcore/libgnashcore.la \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libamf/libgnashamf.la \
 	$(NULL)

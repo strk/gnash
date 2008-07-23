@@ -17,7 +17,7 @@ dnl
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, trunk)
-AC_CONFIG_SRCDIR(server/gnash.h)
+AC_CONFIG_SRCDIR(libcore/gnash.h)
 AM_CONFIG_HEADER(gnashconfig.h)
 
 dnl AC_CANONICAL_TARGET
@@ -2091,11 +2091,10 @@ AC_OUTPUT(Makefile
 libmedia/Makefile
 po/Makefile
 libbase/Makefile
-libgeometry/Makefile
-server/Makefile
-server/asobj/Makefile
-server/vm/Makefile
-server/parser/Makefile
+libcore/Makefile
+libcore/asobj/Makefile
+libcore/vm/Makefile
+libcore/parser/Makefile
 libnet/Makefile
 libamf/Makefile
 backend/Makefile
@@ -2106,7 +2105,6 @@ doc/Doxyfile
 pythonmodule/Makefile
 testsuite/Makefile
 testsuite/libbase/Makefile
-testsuite/libgeometry/Makefile
 testsuite/actionscript.all/Makefile
 testsuite/samples/Makefile
 testsuite/swfdec/Makefile
@@ -2115,7 +2113,7 @@ testsuite/misc-mtasc.all/Makefile
 testsuite/misc-swfmill.all/Makefile
 testsuite/misc-swfc.all/Makefile
 testsuite/movies.all/Makefile
-testsuite/server/Makefile
+testsuite/libcore.all/Makefile
 testsuite/libamf.all/Makefile
 testsuite/libnet.all/Makefile
 gui/Makefile

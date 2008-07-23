@@ -37,7 +37,7 @@ localedir = $(datadir)/locale
 INCLUDES = \
         -I$(top_srcdir)/libamf \
         -I$(top_srcdir)/libbase \
-        -I$(top_srcdir)/server \
+        -I$(top_srcdir)/libcore \
         -DLOCALEDIR=\"$(localedir)\" \
         $(LIBXML_CFLAGS) \
 	$(DMALLOC_CFLAGS) \

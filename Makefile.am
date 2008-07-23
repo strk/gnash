@@ -42,11 +42,10 @@ DISTCHECK_CONFIGURE_FLAGS = \
 
 STD_DIRS = \
 	libbase \
-	libgeometry \
 	libamf \
 	libnet \
 	libmedia \
-	server \
+	libcore \
 	backend \
 	utilities \
 	gui \
@@ -84,8 +83,6 @@ EXTRA_DIST =  autogen.sh \
 	packaging/ipkg.am
 	packaging/bsd.am \
 	packaging/rpm.am
-
-noinst_HEADERS = compatibility_include.h
 
 # dist-hook:
 # 	@test -d "$(distdir)/packaging" || $(mkinstalldirs) "$(distdir)/packaging"

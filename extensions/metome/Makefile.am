@@ -24,8 +24,8 @@ plugins_LTLIBRARIES = metome_ext.la
 
 INCLUDES =  \
             -I$(top_srcdir)/libbase \
-            -I$(top_srcdir)/server \
-            -I$(top_srcdir)/server/vm \
+            -I$(top_srcdir)/libcore \
+            -I$(top_srcdir)/libcore/vm \
 	    -I$(top_srcdir)/asobjs \
 	    $(INCLTDL)
 
@@ -33,7 +33,7 @@ metome_ext_la_SOURCES = metome_ext.cpp metome_ext.h
 metome_ext_la_LDFLAGS = -module -avoid-version -no-undefined
 metome_ext_la_LIBDADD = $(LIBADD_DL) $(LIBLTDL) \
 	$(top_builddir)/libbase/libgnashbase.la \
-	$(top_builddir)/server/libgnashserver.la \
+	$(top_builddir)/libcore/libgnashcore.la \
 	$(PTHREAD_LIBS) \
 	$(NULL)
 

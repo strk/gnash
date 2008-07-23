@@ -952,8 +952,11 @@ string-slice-6.swf:cfe7fde1085617b6673fda9895162e32
 string-slice-7.swf:eaed0b05db4e5a01579a94f283f8a068
 string-split-empty-5.swf:0cdbe0cfc78b49bdf37c1e71bfc5743f
 string-split-empty-5.swf:5e9ed1cad7e80dddeed72f6674a034a3
+string-split-empty-6.swf:3a676ec5e92c371427ca38d629943c90
 string-split-empty-6.swf:94aacd4a972c8eae6fa7ebe945074414
+string-split-empty-7.swf:26ed7482148cffa6a9bedf657f44db77
 string-split-empty-7.swf:3be198e0f9277bf4749bddddf85dce33
+string-split-empty-8.swf:0fa43138d18306e83d7cccadd1e8c9e9
 string-trace-5.swf:14759c53a46b39e873a3f928a3e992f5
 string-trace-6.swf:286e55256f525f4220a324a7417e4051
 string-trace-7.swf:f6eac71a2fc50323a5bd4a74eec99dca
@@ -1006,6 +1009,7 @@ text-field-hscroll-5.swf:f0b6b2bdc087164334da9fad1ca0140a
 text-field-init-5.swf:f9c095838e41c5b00de362cef6c20167
 text-field-init-native-5.swf:881f1f6314617bd2d789fa99f9765e60
 text-field-replace-text-5.swf:571ec2f1d311c65f98e5e7f76392cb9e
+text-field-replace-text-5.swf:e89d3694aef9f668e714916e8db3195f
 text-field-set-text-format-5.swf:f576da900f9e9b8d911f6791d4114983
 text-field-tag-variable-change.swf:4c03970cb4293453219d053f3c07d024
 text-field-tag-variable.swf:a9e93d3ab26a08dafb196ffd7450e4f7

@@ -16,18 +16,14 @@
 #   along with this program; if not, write to the Free Software
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-
-#
-
 AUTOMAKE_OPTIONS = dejagnu
 
 AM_CPPFLAGS = \
         -I$(top_srcdir)/testsuite  \
         -I$(top_srcdir)/libbase  \
-        -I$(top_srcdir)/libgeometry  \
-        -I$(top_srcdir)/server  \
-        -I$(top_srcdir)/server/parser  \
-        -I$(top_srcdir)/server/vm  \
+        -I$(top_srcdir)/libcore  \
+        -I$(top_srcdir)/libcore/parser  \
+        -I$(top_srcdir)/libcore/vm  \
 	$(FFMPEG_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(NULL)
@@ -55,7 +51,7 @@ CLEANFILES = \
 	$(NULL)
 
 GNASH_LIBS = \
-	$(top_builddir)/server/libgnashserver.la \
+	$(top_builddir)/libcore/libgnashcore.la \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libamf/libgnashamf.la \
 	$(NULL)

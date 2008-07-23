@@ -294,6 +294,12 @@ public:
 		return NULL;
 	}
 
+	/// Find a font from the movie (not shared) lib
+	virtual font* get_font(const std::string& /*name*/, bool /*bold*/, bool /*italic*/) const
+	{
+		return 0;
+	}
+
 	/// Add an ControlTag to this movie_definition's playlist
 	//
 	/// The default implementation is a no-op.

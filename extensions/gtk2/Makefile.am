@@ -25,12 +25,11 @@ DEF_MAKESWF_FLAGS = -I $(top_srcdir)/testsuite/actionscript.all
 
 INCLUDES = \
 	-I$(top_srcdir)/libbase \
-	-I$(top_srcdir)/libgeometry \
 	-I$(top_srcdir)/gui \
-	-I$(top_srcdir)/server \
-	-I$(top_srcdir)/server/vm \
-	-I$(top_srcdir)/server/parser \
-	-I$(top_srcdir)/server/asobjs \
+	-I$(top_srcdir)/libcore \
+	-I$(top_srcdir)/libcore/vm \
+	-I$(top_srcdir)/libcore/parser \
+	-I$(top_srcdir)/libcore/asobjs \
 	$(LIBXML_CFLAGS) \
 	$(SDL_CFLAGS) \
 	$(DMALLOC_CFLAGS) \
@@ -46,7 +45,7 @@ INCLUDES = \
 
 AM_LDFLAGS =  \
 	$(top_builddir)/libbase/libgnashbase.la \
-	$(top_builddir)/server/libgnashserver.la \
+	$(top_builddir)/libcore/libgnashcore.la \
 	$(GTK2_LIBS) \
 	$(GLEXT_LIBS) \
 	$(CAIRO_LIBS) \

@@ -113,9 +113,9 @@ o = new Object;
 o.charCodeAt = String.prototype.charCodeAt;
 o.charAt = String.prototype.charAt;
 c = o.charAt(4);
-xcheck_equals(c, "e");
+check_equals(c, "e");
 c = o.charCodeAt(4);
-xcheck_equals(c, "101");
+check_equals(c, "101");
 //----------------------------------------
 // Check String.indexOf
 // TODO: test with ASnative(251,8)
@@ -149,7 +149,7 @@ check_equals ( a.indexOf(o2, o), 4 );
 o = new Object;
 o.indexOf = String.prototype.indexOf;
 p = o.indexOf("b");
-xcheck_equals(p, 2);
+check_equals(p, 2);
 //----------------------------------------
 // Check String.split
 // See ASNative.as for more tests.
@@ -328,13 +328,13 @@ check_equals(ar.toString(), ",");
 o = new Object;
 o.split = String.prototype.split;
 ar = o.split("b");
-xcheck_equals(ar.length, 3);
-xcheck_equals(ar.toString(), "[o,ject O,ject]");
+check_equals(ar.length, 3);
+check_equals(ar.toString(), "[o,ject O,ject]");
 
 o = new Date(0);
 o.split = String.prototype.split;
 ar = o.split(":");
-xcheck_equals(ar.length, 3);
+check_equals(ar.length, 3);
 
 
 #else
@@ -489,13 +489,13 @@ check_equals(ar.toString(), ",,");
 o = new Object;
 o.split = String.prototype.split;
 ar = o.split("b");
-xcheck_equals(ar.length, 3);
-xcheck_equals(ar.toString(), "[o,ject O,ject]");
+check_equals(ar.length, 3);
+check_equals(ar.toString(), "[o,ject O,ject]");
 
 o = new Date(0);
 o.split = String.prototype.split;
 ar = o.split(":");
-xcheck_equals(ar.length, 3);
+check_equals(ar.length, 3);
 // It will be different according to the timezone...
 
 #endif
@@ -623,7 +623,7 @@ check_equals ( b.substr(3, 6), "4");
 
 o = new Object;
 o.substr = String.prototype.substr;
-xcheck_equals(o.substr(0,2), "[o");
+check_equals(o.substr(0,2), "[o");
 
 //-------------------------------------------
 // Check slice 
@@ -654,7 +654,7 @@ check_equals ( a.slice(-4), "wxyz" );
 
 o = new Object;
 o.slice = String.prototype.slice;
-xcheck_equals(o.slice(0,1), "[");
+check_equals(o.slice(0,1), "[");
 
 //-------------------------------------------
 // Check substring
@@ -674,7 +674,7 @@ check_equals ( b.substring(3, 6), "4");
 
 o = new Object;
 o.substring = String.prototype.substring;
-xcheck_equals(o.substring(3,4), "j");
+check_equals(o.substring(3,4), "j");
 
 //-------------------------------------------
 // Concat
@@ -1165,6 +1165,7 @@ Object.prototype.toString = function ()
 };
 
 g = "teststring";
+check_equals(g+' ', "teststring ");
 check_equals (g.substr(0,4), "test");
 g = new String("teststring");
 check_equals (g.substr(0,4), "test");
@@ -1172,7 +1173,7 @@ check_equals (g.substr(0,4), "test");
 o = new Object;
 check_equals(o.substr(0,4), undefined);
 o.substr = String.prototype.substr;
-xcheck_equals(o.substr(0,4), "fake");
+check_equals(o.substr(0,4), "fake");
 
 Object.prototype.toString = ObjectProtoToStringBackup;
 String.prototype.toString = StringProtoToStringBackup;
@@ -1268,7 +1269,7 @@ check(!String.prototype.hasOwnProperty('length'));
 #endif
 
 #if OUTPUT_VERSION < 6
- check_totals(323);
+ check_totals(324);
 #else
- check_totals(339);
+ check_totals(340);
 #endif
