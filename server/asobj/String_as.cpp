@@ -370,10 +370,10 @@ string_split(const fn_call& fn)
         array->push(utf8::encodeCanonicalString(
                		wstr.substr(prevpos, pos - prevpos),
                		version));
-            if (pos == std::wstring::npos) break;
-            num++;
-            prevpos = pos + delimiterSize;
-            pos++;
+        if (pos == std::wstring::npos) break;
+        num++;
+        prevpos = pos + delimiterSize;
+        pos++;
     }
 
     return as_value(array.get());
