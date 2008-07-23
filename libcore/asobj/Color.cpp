@@ -184,7 +184,7 @@ color_gettransform(const fn_call& fn)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		std::stringstream ss; fn.dump_args(ss);
-		log_aserror(_("Color.getTransform(%s) : no or unloaded sprite associated with the Color object"), ss.str().c_str());
+		log_aserror(_("Color.getTransform(%s) : no or unloaded sprite associated with the Color object"), ss.str());
 		);
 		return as_value();
 	}
@@ -277,7 +277,7 @@ color_settransform(const fn_call& fn)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		std::stringstream ss; fn.dump_args(ss);
-		log_aserror(_("Color.setTransform(%s) : first argument doesn't cast to an object"), ss.str().c_str());
+		log_aserror(_("Color.setTransform(%s) : first argument doesn't cast to an object"), ss.str());
 		);
 		return as_value();
 	}
@@ -287,7 +287,7 @@ color_settransform(const fn_call& fn)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		std::stringstream ss; fn.dump_args(ss);
-		log_aserror(_("Color.setTransform(%s) : no or unloaded sprite associated with the Color object"), ss.str().c_str());
+		log_aserror(_("Color.setTransform(%s) : no or unloaded sprite associated with the Color object"), ss.str());
 		);
 		return as_value();
 	}
@@ -321,7 +321,7 @@ color_settransform(const fn_call& fn)
 	if ( trans->get_member(st.find("gb"), &tmp) ) ss << " gb:" << tmp.to_number();
 	if ( trans->get_member(st.find("bb"), &tmp) ) ss << " bb:" << tmp.to_number();
 	if ( trans->get_member(st.find("ab"), &tmp) ) ss << " ab:" << tmp.to_number();
-	log_debug("Color.setTransform(%s) : TESTING", ss.str().c_str());
+	log_debug("Color.setTransform(%s) : TESTING", ss.str());
 #endif
 
 	return as_value();
@@ -343,18 +343,28 @@ color_ctor(const fn_call& fn)
 		if ( ! sp )
 		{
 			// must be a target..
-			character* ch = fn.env().find_target(fn.arg(0).to_string());
-			if ( ch ) sp = ch->to_movie();
+			character* ch = fn.env().find_target(arg.to_string());
+			if ( ch )
+			{
+				sp = ch->to_movie();
+				IF_VERBOSE_ASCODING_ERRORS(
+				if ( ! sp )
+				{
+				std::stringstream ss; fn.dump_args(ss);
+				log_aserror(_("new Color(%s) : first argument evaluates to character %s which is a %s (not a sprite)"),
+					ss.str(), ch->getTarget(), typeName(*ch));
+				}
+				)
+			}
+			else
+			{
+				IF_VERBOSE_ASCODING_ERRORS(
+				std::stringstream ss; fn.dump_args(ss);
+				log_aserror(_("new Color(%s) : first argument doesn't evaluate or point to a character"),
+					ss.str());
+				)
+			}
 		}
-
-		IF_VERBOSE_ASCODING_ERRORS(
-		if ( ! sp )
-		{
-			std::stringstream ss; fn.dump_args(ss);
-			log_aserror(_("new Color(%s) : first argument doesn't evaluate or point to a MovieClip"),
-				ss.str().c_str());
-		}
-		)
 	}
 
 	boost::intrusive_ptr<as_object> obj = new color_as_object(sp);
