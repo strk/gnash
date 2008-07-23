@@ -32,7 +32,7 @@ rcsid="$Id: Try.as,v 1.3 2008/06/11 20:54:44 bwy Exp $";
 // Try catch
 // Try (throw) catch
 
-#if MING_VERSION_CODE >= 00040006
+#if MING_VERSION_CODE >= 00040100
 
 throwfunc = function()
 {
@@ -53,11 +53,7 @@ catch (a) { r +="catch "; r += a + " "; }
 finally { r +="finally "; };
 r += ".";
 
-#if OUTPUT_VERSION < 7
-check_equals(r, "1: try body catch  finally .");
-#else
-check_equals(r, "1: try body catch undefined finally .");
-#endif
+check_equals(r, "1: try body finally .");
 
 r = "2: ";
 try { r += "try "; throw ("thrown"); r += "body "; }
@@ -88,8 +84,9 @@ d = "pre-existing variable d";
 r = "5: ";
 try { r += "try "; r += "body "; }
 catch (d) { r += "catch "; r+= d + " "; };
-r += ".";
-check_equals(r, "5: try body catch pre-existing variable d .");
+r += ". ";
+r += d;
+check_equals(r, "5: try body . pre-existing variable d");
 
 r = "6: ";
 try { r += "try "; throw ("thrown"); r += "body "; }
@@ -126,11 +123,7 @@ try {
 }
 catch (i) { r += i + " "; };
 r += ".";
-#if OUTPUT_VERSION < 7
-check_equals(r, "8: try finally finally2 try2 catch2  thrown .");
-#else
-check_equals(r, "8: try finally finally2 try2 catch2 undefined thrown .");
-#endif
+check_equals(r, "8: try finally finally2 try2 thrown .");
 
 try {
     try {
@@ -149,11 +142,7 @@ try {
 }
 catch (l) { r+= "catch3 "; r += l + " "; };
 r += ".";
-#if OUTPUT_VERSION < 7
-check_equals(r, "9: try finally catch thrown finally2 try2 catch2  catch3  .");
-#else
-check_equals(r, "9: try finally catch thrown finally2 try2 catch2 undefined catch3 undefined .");
-#endif
+check_equals(r, "9: try finally catch thrown finally2 try2 .");
 
 r = "10: ";
 try {
@@ -174,14 +163,6 @@ try {
 catch (m) { r+= "catch " + m; };
 r += ".";
 check_equals(r, "10: catch finally.");
-
-
-//try { throwfunc(); }
-//catch (g) { trace ("catch"); trace (g); };
-
-//try { throw "thrown"; }
-//finally { };
-//trace ("Don't reach this point");
 
 totals();
 

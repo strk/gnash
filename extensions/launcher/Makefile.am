@@ -26,8 +26,8 @@ bin_PROGRAMS = launcher-gnash
 AM_CPPFLAGS = -DGNASHBINDIR=\"${bindir}\" 
 INCLUDES =  \
             -I$(top_srcdir)/libbase \
-            -I$(top_srcdir)/server \
-            -I$(top_srcdir)/server/vm \
+            -I$(top_srcdir)/libcore \
+            -I$(top_srcdir)/libcore/vm \
 	    -I$(top_srcdir)/asobjs \
 	    $(BOOST_CFLAGS) \
 	    $(NULL)
@@ -36,7 +36,7 @@ launcher_ext_la_SOURCES = launcher_ext.cpp launcher_ext.h
 launcher_ext_la_LDFLAGS = -module -avoid-version -no-undefined
 launcher_ext_la_LIBDADD = $(LIBADD_DL) $(LIBLTDL) \
 	$(top_builddir)/libbase/libgnashbase.la \
-	$(top_builddir)/server/libgnashserver.la \
+	$(top_builddir)/libcore/libgnashcore.la \
 	$(PTHREAD_LIBS) \
 	$(NULL)
 

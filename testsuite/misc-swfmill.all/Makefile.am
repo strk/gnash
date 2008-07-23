@@ -30,6 +30,7 @@ SC_XMLTESTS =			\
 	zeroframe_definesprite.xml \
 	background.xml \
 	registers.xml \
+	Try-without-jump.xml \
 	$(NULL)
 
 EXTRA_DIST = $(SC_XMLTESTS) 
@@ -38,11 +39,10 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/libmedia \
 	-I$(top_srcdir)/backend \
-	-I$(top_srcdir)/server  \
-	-I$(top_srcdir)/server/parser  \
-	-I$(top_srcdir)/server/vm \
-	-I$(top_srcdir)/server/asobj \
-	-I$(top_srcdir)/libgeometry \
+	-I$(top_srcdir)/libcore  \
+	-I$(top_srcdir)/libcore/parser  \
+	-I$(top_srcdir)/libcore/vm \
+	-I$(top_srcdir)/libcore/asobj \
 	-I$(top_srcdir)/testsuite \
 	$(NULL)
 
@@ -57,6 +57,7 @@ check_SCRIPTS = \
 	initaction_in_definesprite-runner	\
 	zeroframe_definesprite-runner	\
 	registers-runner \
+	Try-without-jump-runner \
 	$(NULL)
 
 check_PROGRAMS = \
@@ -81,6 +82,11 @@ zeroframe_definesprite-runner: $(srcdir)/../generic-testrunner.sh zeroframe_defi
 registers-runner: $(srcdir)/../generic-testrunner.sh registers.swf Makefile
 	sh $< -r 50 -c "END OF TEST" $(top_builddir) registers.swf > $@
 	chmod 755 $@
+
+Try-without-jump-runner: $(srcdir)/../generic-testrunner.sh Try-without-jump.swf Makefile
+	sh $< -r 50 -c "END OF TEST" $(top_builddir) Try-without-jump.swf > $@
+	chmod 755 $@
+
 
 backgroundTestRunner_SOURCES = \
 	backgroundTestRunner.cpp \

@@ -37,7 +37,7 @@ INCLUDES = \
         -I$(top_srcdir)/libnet \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/cygnal \
-        -I$(top_srcdir)/server \
+        -I$(top_srcdir)/libcore \
         -DLOCALEDIR=\"$(localedir)\" \
 	$(BOOST_CFLAGS) \
 	$(DEJAGNU_CFLAGS) \

@@ -54,10 +54,9 @@ dist_noinst_SCRIPTS = gen-test.sh gen-index.sh
 AM_CPPFLAGS = \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/libamf  \
-        -I$(top_srcdir)/server  \
-        -I$(top_srcdir)/server/vm  \
-        -I$(top_srcdir)/server/asobj \
-        -I$(top_srcdir)/libgeometry \
+        -I$(top_srcdir)/libcore  \
+        -I$(top_srcdir)/libcore/vm  \
+        -I$(top_srcdir)/libcore/asobj \
 	-I$(top_srcdir)/testsuite \
 	$(LIBXML_CFLAGS)        \
 	$(OPENGL_CFLAGS)	\
@@ -72,6 +71,7 @@ AM_CPPFLAGS = \
 ASTESTS =			\
 	AsBroadcaster.as	\
 	ASnative.as		\
+	Accessibility.as \
 	array.as		\
 	BitmapData.as \
 	delete.as		\

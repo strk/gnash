@@ -40,12 +40,11 @@ dirs =  $(top_srcdir)/libbase \
 	$(top_srcdir)/libmedia \
 	$(top_srcdir)/libmedia/ffmpeg \
 	$(top_srcdir)/libmedia/gst \
-	$(top_srcdir)/server \
-	$(top_srcdir)/server/vm \
-	$(top_srcdir)/server/swf \
-	$(top_srcdir)/server/parser \
-	$(top_srcdir)/server/asobj \
-	$(top_srcdir)/libgeometry \
+	$(top_srcdir)/libcore \
+	$(top_srcdir)/libcore/vm \
+	$(top_srcdir)/libcore/swf \
+	$(top_srcdir)/libcore/parser \
+	$(top_srcdir)/libcore/asobj \
 	$(top_srcdir)/utilities \
 	$(top_srcdir)/plugin \
 	$(top_srcdir)/gui \

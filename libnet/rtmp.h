@@ -103,7 +103,8 @@ public:
         UNKNOWN3 = 0xa,
         NOTIFY = 0x12,
         SHARED_OBJ = 0x13,
-        INVOKE = 0x14
+        INVOKE = 0x14,
+	FLV_DATA = 0x16
     } content_types_e;
 //     typedef enum {
 //         CONNECT = 0x1,
@@ -287,6 +288,7 @@ public:
     rtmp_head_t	_header;
     int         _packet_size;
     int         _mystery_word;
+    size_t	_chunksize;
 };
 
 } // end of gnash namespace

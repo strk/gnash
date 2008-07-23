@@ -44,8 +44,7 @@ SUBDIRS = \
 	libnet.all \
 	libbase	\
 	libamf.all \
-	libgeometry \
-	server \
+	libcore.all \
 	samples	\
 	$(DIR_MING) \
 	$(DIR_MTASC) \
@@ -73,17 +72,16 @@ libtestsuite_la_SOURCES = \
 libtestsuite_la_LIBADD = \
 	$(RENDERER_LIBS) \
 	$(top_builddir)/libmedia/libgnashmedia.la \
-	$(top_builddir)/server/libgnashserver.la \
+	$(top_builddir)/libcore/libgnashcore.la \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(NULL)
 libtestsuite_la_CXXFLAGS = \
 	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/libmedia \
 	-I$(top_srcdir)/backend \
-	-I$(top_srcdir)/libgeometry \
-	-I$(top_srcdir)/server  \
-	-I$(top_srcdir)/server/parser  \
-	-I$(top_srcdir)/server/vm  \
+	-I$(top_srcdir)/libcore  \
+	-I$(top_srcdir)/libcore/parser  \
+	-I$(top_srcdir)/libcore/vm  \
 	$(BOOST_CFLAGS) \
 	$(CAIRO_CFLAGS) \
 	$(NULL)

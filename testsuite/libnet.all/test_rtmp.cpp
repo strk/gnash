@@ -370,7 +370,7 @@ test_results()
 //         printf("FIXME: %d, %d, %s:%s\n", props.size(), msg1->getStatus(),
 //                props[3]->getName(), props[3]->to_string());
 //         msg1->dump();
-        msg1->dump();
+//        msg1->dump();
         if ((msg1->getStatus() ==  RTMPMsg::NC_CONNECT_SUCCESS)
             && (msg1->getMethodName() == "_result")
             && (msg1->getStreamID() == 1)
@@ -426,8 +426,78 @@ test_results()
 //     }
 //     delete buf4;
 
+// onStatus
+// level
+//     status
+//     code
+//         NetStream.Play.Reset
+//     description
+//         Playing and resetting PD_English_Low@2001
+//     details
+//         PD_English_Low@2001
+//     clientid
+//         dsLgYohb
+    Buffer *hex4 = hex2mem("02 00 08 6f 6e 53 74 61 74 75 73 00 00 00 00 00 00 00 00 00 05 03 00 05 6c 65 76 65 6c 02 00 06 73 74 61 74 75 73 00 04 63 6f 64 65 02 00 14 4e 65 74 53 74 72 65 61 6d 2e 50 6c 61 79 2e 52 65 73 65 74 00 0b 64 65 73 63 72 69 70 74 69 6f 6e 02 00 2a 50 6c 61 79 69 6e 67 20 61 6e 64 20 72 65 73 65 74 74 69 6e 67 20 50 44 5f 45 6e 67 6c 69 73 68 5f 4c 6f 77 40 32 30 30 31 2e 00 07 64 65 74 61 69 6c 73 02 00 13 50 44 5f 45 6e 67 6c 69 73 68 5f 4c 6f 77 40 32 30 30 31 00 08 63 6c 69 65 6e 74 69 64 02 00 08 64 73 4c 67 59 6f 68 62 00 00 09");
+    RTMPMsg *msg4 = rtmpserv.decodeMsgBody(hex4);
+    msg4->dump();
+//    std::vector<amf::Element *> hell4 = msg4->getElements();
+    if ((msg4->getStatus() ==  RTMPMsg::NS_PLAY_RESET)
+        && (msg4->getMethodName() == "onStatus")
+        && (msg4->getStreamID() == 0)
+        && (msg4->size() == 1)) {
+        runtest.pass("Encoded RTMP onStatus(Play Reset)");
+    } else {
+        runtest.fail("Encoded RTMP onStatus(Play Reset)");
+    }
+    delete hex4;
+    delete msg4;
+    
+// onStatus
+// code
+//     NetStream
+// Data.Start
+        Buffer *hex5 = hex2mem("02 00 08 6f 6e 53 74 61 74 75 73 03 00 04 63 6f 64 65 02 00 14 4e 65 74 53 74 72 65 61 6d 2e 44 61 74 61 2e 53 74 61 72 74 00 00 09");
+    RTMPMsg *msg5 = rtmpserv.decodeMsgBody(hex5);
+    msg5->dump();
+    cout << msg5->getStreamID() << endl;
+//    std::vector<amf::Element *> hell4 = msg4->getElements();
+    if ((msg5->getStatus() ==  RTMPMsg::NS_DATA_START)
+        && (msg5->getMethodName() == "onStatus")
+        && (msg5->getStreamID() == -1)
+        && (msg5->size() == 1)) {
+        runtest.pass("Encoded RTMP onStatus(Data Start)");
+    } else {
+        runtest.fail("Encoded RTMP onStatus(Data Start)");
+    }
+    delete hex5;
+    delete msg5;
+
+// onStatus
+//     level
+//     status
+//     code
+//         NetStream.Play.Start
+//     description
+//         Started playing PD_English_Low@2001
+//     details
+//         PD_English_Low@20..clientid...dsLgYohb.
+    Buffer *hex6 = hex2mem("02 00 08 6f 6e 53 74 61 74 75 73 00 00 00 00 00 00 00 00 00 05 03 00 05 6c 65 76 65 6c 02 00 06 73 74 61 74 75 73 00 04 63 6f 64 65 02 00 14 4e 65 74 53 74 72 65 61 6d 2e 50 6c 61 79 2e 53 74 61 72 74 00 0b 64 65 73 63 72 69 70 74 69 6f 6e 02 00 24 53 74 61 72 74 65 64 20 70 6c 61 79 69 6e 67 20 50 44 5f 45 6e 67 6c 69 73 68 5f 4c 6f 77 40 32 30 30 31 2e 00 07 64 65 74 61 69 6c 73 02 00 13 50 44 5f 45 6e 67 6c 69 73 68 5f 4c 6f 77 40 32 30 30 31 00 08 63 6c 69 65 6e 74 69 64 02 00 08 64 73 4c 67 59 6f 68 62 00 00 09");
+    RTMPMsg *msg6 = rtmpserv.decodeMsgBody(hex6);
+    msg6->dump();
+//    std::vector<amf::Element *> hell4 = msg4->getElements();
+    if ((msg6->getStatus() ==  RTMPMsg::NS_PLAY_START)
+        && (msg6->getMethodName() == "onStatus")
+        && (msg6->getStreamID() == 0)
+        && (msg6->size() == 1)) {
+        runtest.pass("Encoded RTMP onStatus(Play Start)");
+    } else {
+        runtest.fail("Encoded RTMP onStatus(Play Start)");
+    }
+    delete hex6;
+    delete msg6;
     
 #if 0
+
 //    const char *x4 = "";
     Buffer *hex4 = hex2mem("");
     Buffer *buf4 = rtmpserv.encodeResult(RTMPMsg::NC_CONNECT_REJECTED);
@@ -501,8 +571,8 @@ test_client()
     delete buf1;
     delete buf2;
     
-    buf1 = hex2mem("02 00 04 70 6c 61 79 00 00 00 00 00 00 00 00 00 05 01 00");
-    buf2 = rtmp.encodeStreamOp(0, RTMP::STREAM_PLAY, false);
+    buf1 = hex2mem("02 00 04 70 6c 61 79 00 00 00 00 00 00 00 00 00 05 02 00 16 67 61 74 65 30 36 5f 74 61 62 6c 616e 5f 62 63 75 65 75 5f 30 31");
+    buf2 = rtmp.encodeStreamOp(0, RTMP::STREAM_PLAY, false, "gate06_tablan_bcueu_01");
     if ((memcmp(buf1->reference(), buf2->reference(), buf1->size()) == 0)) {
         runtest.pass("Encoded RTMPClient::encodeStreamOp(RTMP::STREAM_PLAY)");
     } else {
@@ -564,8 +634,23 @@ test_client()
     }
     delete buf1;
     delete buf2;
-
 }
+
+// FLV data header
+//
+// onMetaData
+// duration
+// width
+// height
+// videodatarate
+// framerate
+// videocodecid
+// audiodatarate
+// audiodelay
+// audiocodecid
+// canSeek
+// ToEnd
+//"02 00 0a 6 6e 4d 65 74 61 44 61 74 61 08 00 00 00 0a 00 08 64 75 72 61 74 69 6f 6e 00 40 ad 04 14 7a e1 47 ae 00 05 77 69 64 74 68 00 40 74 00 00 00 00 00 00 00 06 68 65 69 67 68 74 00 40 6e 00 00 00 00 00 00 0d 76 69 64 65 6f 64 61 74 61 72 61 74 65 00 40 72 c0 00 00 00 00 00 00 09 66 72 61 6d 65 72 61 74 65 00 40 39 00 00 00 00 00 00 00 0c 76 69 64 65 6f 63 6f 64 65 63 69 64 00 40 10 00 00 00 00 00 00 00 0d 61 75 64 69 6f 64 61 74 61 72 61 74 65 00 40 58 00 00 00 00 00 00 00 0a 61 75 64 69 6f 64 65 6c 61 79 00 3f a3 74 bc 6a 7e f9 db 00 0c 61 75 64 69 6f 63 6f 64 65 63 69 64 00 40 00 00 00 00 00 00 00 00 0c 63 61 6e 53 65 65 6b 54 6f 45 6e 64 01 01 00 00 09"
 
 static void
 usage (void)

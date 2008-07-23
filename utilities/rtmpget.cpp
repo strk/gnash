@@ -239,11 +239,6 @@ main(int argc, char *argv[])
 	filename = uri.path().substr(pos+1, uri.path().size());
 	tcUrl += '/' + path;
     }
-    if (path != "video/2006/sekt/gate06/tablan_valentin") {
-	log_error("Bad application path! %s", path);
-    } else {
-	log_debug("Good application path!");
-    }
     log_debug("Sending NetConnection Connect message,");
     Buffer *buf2 = client.encodeConnect(path.c_str(), "mediaplayer.swf", tcUrl.c_str(), 615, 124, 1, "http://gnashdev.org");
 //    Buffer *buf2 = client.encodeConnect("video/2006/sekt/gate06/tablan_valentin", "mediaplayer.swf", "rtmp://velblod.videolectures.net/video/2006/sekt/gate06/tablan_valentin", 615, 124, 1, "http://gnashdev.org");
@@ -281,9 +276,9 @@ main(int argc, char *argv[])
     cerr << "Stream ID returned from createStream is: " << id << endl;
     
     // make the NetStream::play() operations for ID 2 encoded object
-    log_debug("Sending NetStream play message,");
-    Buffer *buf4 = client.encodeStreamOp(0, RTMP::STREAM_PLAY, false, "gate06_tablan_bcueu_01");
-//    Buffer *buf4 = client.encodeStreamOp(0, RTMP::STREAM_PLAY, false, "lulutest.flv");
+//    log_debug("Sending NetStream play message,");
+    Buffer *buf4 = client.encodeStreamOp(0, RTMP::STREAM_PLAY, false, filename.c_str());
+//    Buffer *buf4 = client.encodeStreamOp(0, RTMP::STREAM_PLAY, false, "gate06_tablan_bcueu_01");
 //     log_debug("TRACE: buf4: %s", hexify(buf4->reference(), buf4->size(), true));
     total_size = buf4->size();
     Element *res3 = client.sendRecvMsg(0x8, RTMP::HEADER_12, total_size,
@@ -296,24 +291,27 @@ main(int argc, char *argv[])
     }
 
 #if 1
-    buf.clear();
-    ret = client.readNet(&buf, 5);
-    if (ret <= 0) {
-	log_error("Never got any data!");
-	exit(-1);
-    }
-    
-    if ((ret == 1) && (*buf.reference() == 0xff)) {
-	cerr << __FUNCTION__ << ": " << __LINE__ << ": " << hexify(buf.reference(), ret, false) << endl;
-	log_error("Got an error from the server sending NetStream object");
+    int count = 0;
+    do {
+	buf.clear();
+	ret = client.readNet(&buf, 5);
+	if (ret <= 0) {
+	    log_error("Never got any data!");
+	    exit(-1);
+	}
+	
+	if ((ret == 1) && (*buf.reference() == 0xff)) {
+	    cerr << __FUNCTION__ << ": " << __LINE__ << ": " << hexify(buf.reference(), ret, false) << endl;
+	    log_error("Got an error from the server sending NetStream object");
 //	exit(-1);
-    }
-    if (ret > 1) {
-	cerr << __FUNCTION__ << ": " << __LINE__ << ": " << hexify(buf.reference(), ret, true) << endl;
-	rthead = client.decodeHeader(&buf);
-
-	msg2 = client.decodeMsgBody(buf.reference() + rthead->head_size, rthead->bodysize);
-    }
+	}
+	if (ret > 1) {
+	    cerr << __FUNCTION__ << ": " << __LINE__ << ": " << hexify(buf.reference(), ret, false) << endl;
+	    rthead = client.decodeHeader(&buf);
+	    
+	    msg2 = client.decodeMsgBody(buf.reference() + rthead->head_size, rthead->bodysize);
+	}
+    } while (count++ < 5);
 #endif
     
 //     buf.clear();

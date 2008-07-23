@@ -173,7 +173,7 @@ RTMP::headerSize(Network::byte_t header)
 }
 
 RTMP::RTMP() 
-    : _handshake(0), _handler(0)
+    : _handshake(0), _handler(0), _chunksize(RTMP_VIDEO_PACKET_SIZE)
 {
 //    GNASH_REPORT_FUNCTION;
 //     _inbytes = 0;
@@ -617,7 +617,11 @@ RTMP::decodeMsgBody(Network::byte_t *data, size_t size)
     // at the minimum.
     Element *streamid = amf_obj.extractAMF(ptr, tooFar);
     if (streamid) {
-	ptr += streamid->getLength() + 2;
+	// Most onStatus messages have the stream ID, but the Data Start onStatus
+	// message is basically just a marker that an FLV file is coming next.
+	if (streamid->getType() == Element::NUMBER_AMF0) {
+	    ptr += streamid->getLength() + 2;
+	}
     } else {
 	log_error("Stream ID field of RTMP Message corrupted!");
 	return 0;
@@ -633,7 +637,7 @@ RTMP::decodeMsgBody(Network::byte_t *data, size_t size)
 //     swapBytes(&swapped, amf::AMF0_NUMBER_SIZE);
     msg->setStreamID(swapped);
 
-    if ((msg->getMethodName() == "_result") || (msg->getMethodName() == "error") || (msg->getMethodName() == "eonStatus")) {
+    if ((msg->getMethodName() == "_result") || (msg->getMethodName() == "error") || (msg->getMethodName() == "onStatus")) {
  	status = true;
     }
     
@@ -892,12 +896,14 @@ RTMP::sendRecvMsg(int amf_index, rtmp_headersize_e head_size,
 		log_debug("Response header: %s", hexify(buf->reference(),
 							rthead->head_size, false));
 	    }
-	    if (rthead->type <= RTMP::INVOKE) {
+	    if (rthead->type <= RTMP::FLV_DATA) {
 		log_error("Processing message of type %s!", content_str[rthead->type]);
 	    }
 	    
 	    switch (rthead->type) {
 	      case CHUNK_SIZE:
+		  _chunksize = ntohl(*reinterpret_cast<boost::uint32_t *>(buf->reference() + rthead->head_size));
+		  log_debug("Setting packet chunk size to %d.", _chunksize);
 //		  decodeChunkSize();
 		  break;
 	      case BYTES_READ:
@@ -932,12 +938,14 @@ RTMP::sendRecvMsg(int amf_index, rtmp_headersize_e head_size,
 //		  decodeClient();
 		  break;
 	      case VIDEO_DATA:
+		  log_debug("Got VIDEO packets!!!");
 //		  decodeVideoData();
 		  break;
 	      case NOTIFY:
 //		  decodeNotify();
 		  break;
 	      case SHARED_OBJ:
+		  log_debug("Got Shared Object packet!!!");
 //		  decodeSharedObj();
 		  break;
 	      case INVOKE:
@@ -948,7 +956,7 @@ RTMP::sendRecvMsg(int amf_index, rtmp_headersize_e head_size,
 				msg->getStatus(), status_str[msg->getStatus()], msg->getMethodName(), msg->size());
 		      if (msg->size() > 0) {
 			  // A common _result message contains only 2 stream IDs, plus a one byte
-			  // NULL object. tru
+			  // NULL object. 
 			  if (rthead->bodysize <= 0x1d) {
 			      std::vector<amf::Element *> hell = msg->getElements();
 			      double foo = hell[0]->to_number();

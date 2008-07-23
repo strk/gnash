@@ -24,6 +24,8 @@
 
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
+#include <memory>
+#include <boost/scoped_array.hpp>
 
 #undef ENABLE_MIT_SHM
 
@@ -54,11 +56,19 @@ class GtkAggGlue : public GtkGlue
     void configure(GtkWidget *const widget, GdkEventConfigure *const event);
     
   private:
-    unsigned char *_offscreenbuf;
-    int _offscreenbuf_size;
+  
+    // A buffer to hold the actual image data. A boost::scoped_array
+    // is destroyed on reset and when it goes out of scope (including on
+    // stack unwinding after an exception), so there is no need to delete
+    // it.
+    boost::scoped_array<unsigned char> _offscreenbuf;
+    
+    // The size of the offscreen image buffer.
+    size_t _offscreenbuf_size;
+    
     render_handler *_agg_renderer;
     int _width, _height, _bpp;
-    char _pixelformat[16];
+    std::string _pixelformat;
     bool _have_shm;
 #ifdef ENABLE_MIT_SHM
     XImage *_shm_image;

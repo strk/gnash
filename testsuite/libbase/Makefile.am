@@ -16,9 +16,6 @@
 #   along with this program; if not, write to the Free Software
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-
-#
-
 AUTOMAKE_OPTIONS = dejagnu
 
 LDADD = $(top_builddir)/libbase/libgnashbase.la 
@@ -27,8 +24,7 @@ LDADD = $(top_builddir)/libbase/libgnashbase.la
 # AM_CPPFLAGS
 INCLUDES = \
         -I$(top_srcdir)/libbase \
-        -I$(top_srcdir)/server  \
-        -I$(top_srcdir)/libgeometry \
+        -I$(top_srcdir)/libcore  \
         -I$(top_srcdir)/testsuite \
         $(MING_CFLAGS) \
 	$(LIBXML_CFLAGS) \
@@ -44,6 +40,9 @@ check_PROGRAMS = \
 	RcTest \
 	IntTypesTest \
 	memtest \
+	Point2dTest \
+	snappingrangetest \
+	Range2dTest \
 	$(NULL)
 
 if CURL
@@ -51,11 +50,15 @@ check_PROGRAMS += CurlStreamTest
 endif
 
 CLEANFILES = \
-      testrun.sum \
-      testrun.log \
-      gnash-dbg.log \
-      site.exp.bak \
-      NoSeekFileTestCache
+	testrun.sum \
+	testrun.log \
+	gnash-dbg.log \
+	site.exp.bak \
+	NoSeekFileTestCache \
+	Range2dTest \
+	Point2dTest \
+        snappingrangetest \
+	$(NULL
 
 CurlStreamTest_SOURCES = CurlStreamTest.cpp
 CurlStreamTest_CPPFLAGS = '-DINPUT="$(srcdir)/CurlStreamTest.cpp"'
@@ -75,14 +78,16 @@ IntTypesTest_CPPFLAGS = -DSRCDIR="$(srcdir)"
 # Test the Memory class
 memtest_SOURCES = memtest.cpp
 
+Point2dTest_SOURCES = Point2dTest.cpp
+Range2dTest_SOURCES = Range2dTest.cpp
+snappingrangetest_SOURCES = snappingrangetest.cpp
+
 # LogTest_SOURCES = TCXXLog.cpp
 # LogTest_CPPFLAGS = '-DBUILDDIR="$(abs_builddir)"'
 
 TEST_DRIVERS = ../simple.exp
 TEST_CASES = \
-	NoSeekFileTest \
-	URLTest \
-	RcTest \
+        $(check_PROGRAMS) \
 	$(NULL)
 
 check-DEJAGNU: site-update $(TEST_CASES)

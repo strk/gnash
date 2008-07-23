@@ -855,6 +855,11 @@ Gui::play()
 
     _stopped = false;
     if ( ! _started ) start();
+    else
+    {
+        media::sound_handler* s = get_sound_handler();
+        s->unpause();
+    }
 
     playHook ();
 }
@@ -867,6 +872,9 @@ Gui::stop()
 
     _stopped = true;
 
+    media::sound_handler* s = get_sound_handler();
+    s->pause();
+
     stopHook();
 }
 
@@ -877,7 +885,12 @@ Gui::pause()
     {
         play();
     }
-    else _stopped = true;
+    else
+    {
+    	media::sound_handler* s = get_sound_handler();
+    	s->pause();
+        _stopped = true;
+    }
 }
 
 void
@@ -899,6 +912,8 @@ Gui::start()
     bool background = true; // ??
     _stage->set_background_alpha(background ? 1.0f : 0.05f);
 
+    media::sound_handler* s = get_sound_handler();
+    s->unpause();
     _started = true;
 }
 
