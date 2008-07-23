@@ -144,8 +144,6 @@ install: build
 	install -d $(CURDIR)/debian/tmp/usr/share/lintian/overrides/
 	cp debian/overrides/* $(CURDIR)/debian/tmp/usr/share/lintian/overrides/
 
-	install -d $(CURDIR)/debian/tmp/usr/include/gnash/
-	cp compatibility_include.h $(CURDIR)/debian/tmp/usr/include/gnash/
 	install -d $(CURDIR)/debian/tmp/usr/include/gnash/libbase/
 	cp libbase/*.h $(CURDIR)/debian/tmp/usr/include/gnash/libbase/
 	install -d $(CURDIR)/debian/tmp/usr/include/gnash/libgeometry/

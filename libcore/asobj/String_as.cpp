@@ -186,7 +186,8 @@ private:
     std::string _string;
 };
 
-// all the arguments will be converted to string and concatenated
+// all the arguments will be converted to string and concatenated.
+// This can only be applied to String objects, unlike other methods.
 static as_value
 string_concat(const fn_call& fn)
 {
@@ -220,12 +221,14 @@ validIndex(const std::wstring& subject, int index)
 static as_value
 string_slice(const fn_call& fn)
 {
-    boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+    as_value val(fn.this_ptr);
+    
+    const std::string& str = val.to_string();
 
     int version = obj->getVM().getSWFVersion();
 
-    // Make a copy.
-    std::wstring wstr = utf8::decodeCanonicalString(obj->str(), version);
+    std::wstring wstr = utf8::decodeCanonicalString(str, version);
 
     ENSURE_FN_ARGS(1, 2, as_value());
 
@@ -274,12 +277,13 @@ string_slice(const fn_call& fn)
 static as_value
 string_split(const fn_call& fn)
 {
-    boost::intrusive_ptr<string_as_object> obj =  ensureType<string_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+    as_value val(fn.this_ptr);
+    
+    const std::string& str = val.to_string();
 
     const int version = obj->getVM().getSWFVersion();
     
-    const std::string& str = obj->str();
-
     std::wstring wstr = utf8::decodeCanonicalString(str, version);
 
     boost::intrusive_ptr<as_array_object> array(new as_array_object());
@@ -370,10 +374,10 @@ string_split(const fn_call& fn)
         array->push(utf8::encodeCanonicalString(
                		wstr.substr(prevpos, pos - prevpos),
                		version));
-            if (pos == std::wstring::npos) break;
-            num++;
-            prevpos = pos + delimiterSize;
-            pos++;
+        if (pos == std::wstring::npos) break;
+        num++;
+        prevpos = pos + delimiterSize;
+        pos++;
     }
 
     return as_value(array.get());
@@ -382,9 +386,10 @@ string_split(const fn_call& fn)
 static as_value
 string_last_index_of(const fn_call& fn)
 {
-    boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
-
-    const std::string& str = obj->str();
+    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+    as_value val(fn.this_ptr);
+    
+    const std::string& str = val.to_string();
 
     ENSURE_FN_ARGS(1, 2, -1);
 
@@ -417,13 +422,16 @@ string_last_index_of(const fn_call& fn)
 static as_value
 string_sub_str(const fn_call& fn)
 {
-    boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+    as_value val(fn.this_ptr);
+    
+    const std::string& str = val.to_string();
 
     int version = obj->getVM().getSWFVersion();
 
-    std::wstring wstr = utf8::decodeCanonicalString(obj->str(), version);
+    std::wstring wstr = utf8::decodeCanonicalString(str, version);
 
-    ENSURE_FN_ARGS(1, 2, obj->str());
+    ENSURE_FN_ARGS(1, 2, str);
 
     int start = validIndex(wstr, fn.arg(0).to_int());
 
@@ -454,13 +462,16 @@ string_sub_str(const fn_call& fn)
 static as_value
 string_sub_string(const fn_call& fn)
 {
-    boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+    as_value val(fn.this_ptr);
+    
+    const std::string& str = val.to_string();
 
     int version = obj->getVM().getSWFVersion();
 
-    const std::wstring& wstr = utf8::decodeCanonicalString(obj->str(), version);
+    const std::wstring& wstr = utf8::decodeCanonicalString(str, version);
 
-    ENSURE_FN_ARGS(1, 2, obj->str());
+    ENSURE_FN_ARGS(1, 2, str);
 
     int start = fn.arg(0).to_int();
     int end = wstr.size();
@@ -503,11 +514,14 @@ string_sub_string(const fn_call& fn)
 static as_value
 string_index_of(const fn_call& fn)
 {
-    boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+    as_value val(fn.this_ptr);
+    
+    const std::string& str = val.to_string();
 
     int version = obj->getVM().getSWFVersion();
 
-    const std::wstring& wstr = utf8::decodeCanonicalString(obj->str(), version);
+    const std::wstring& wstr = utf8::decodeCanonicalString(str, version);
 
     ENSURE_FN_ARGS(1, 2, -1);
 
@@ -590,11 +604,14 @@ string_from_char_code(const fn_call& fn)
 static as_value
 string_char_code_at(const fn_call& fn)
 {
-    boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+    as_value val(fn.this_ptr);
+    
+    const std::string& str = val.to_string();
 
     int version = obj->getVM().getSWFVersion();
 
-    const std::wstring& wstr = utf8::decodeCanonicalString(obj->str(), version);
+    const std::wstring& wstr = utf8::decodeCanonicalString(str, version);
 
     if (fn.nargs == 0) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -625,11 +642,14 @@ string_char_code_at(const fn_call& fn)
 static as_value
 string_char_at(const fn_call& fn)
 {
-    boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+    as_value val(fn.this_ptr);
+    
+    const std::string& str = val.to_string();
 
     const int version = obj->getVM().getSWFVersion();
 
-    const std::wstring& wstr = utf8::decodeCanonicalString(obj->str(), version);
+    const std::wstring& wstr = utf8::decodeCanonicalString(str, version);
 
     ENSURE_FN_ARGS(1, 1, "");
 
@@ -649,27 +669,33 @@ string_char_at(const fn_call& fn)
 static as_value
 string_to_upper_case(const fn_call& fn)
 {
-    boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
-    std::string subject = obj->str();
+    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+    as_value val(fn.this_ptr);
+    
+    // Copy the string
+    std::string str = val.to_string();
 
     VM& vm = obj->getVM();
 
-    boost::to_upper(subject, vm.getLocale());
+    boost::to_upper(str, vm.getLocale());
 
-    return as_value(subject);
+    return as_value(str);
 }
 
 static as_value
 string_to_lower_case(const fn_call& fn)
 {
-    boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
-    std::string subject = obj->str();
+    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+    as_value val(fn.this_ptr);
+    
+    // Copy the string.
+    std::string str = val.to_string();
 
     VM& vm = obj->getVM();
 
-    boost::to_lower(subject, vm.getLocale());
+    boost::to_lower(str, vm.getLocale());
 
-    return as_value(subject);
+    return as_value(str);
 }
 
 static as_value
