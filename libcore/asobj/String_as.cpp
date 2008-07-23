@@ -251,69 +251,114 @@ string_slice(const fn_call& fn)
     return as_value(utf8::encodeCanonicalString(wstr.substr(start, retlen), version));
 }
 
+// String.split(delimiter[, limit])
+// For SWF5, the following conditions mean that an array with a single
+// element containing the entire string is returned:
+// 1. No arguments are passed.
+// 2. The delimiter is empty.
+// 3. The delimiter has more than one character or is undefined and limit is not 0.
+// 4. The delimiter is not present in the string and the limit is not 0.
+//
+// Accordingly, an empty array is returned only when the limit is less
+// than 0 and a non-empty delimiter is passed.
+//
+// For SWF6:
+// Full string returned in 1-element array:
+// 1. If no arguments are passed.
+// 2. If delimiter undefined.
+// 3: empty string, non-empty delimiter.
+//
+// Empty array returned:
+// 4. string and delimiter are empty but defined.
+// 5. non-empty string, non-empty delimiter; 0 or less elements required.
 static as_value
 string_split(const fn_call& fn)
 {
-    boost::intrusive_ptr<string_as_object> obj =
-        ensureType<string_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<string_as_object> obj =  ensureType<string_as_object>(fn.this_ptr);
 
-    VM& vm = obj->getVM(); 
-    int SWFVersion = vm.getSWFVersion();
+    const int version = obj->getVM().getSWFVersion();
+    
+    const std::string& str = obj->str();
 
-    std::wstring wstr = utf8::decodeCanonicalString(obj->str(), SWFVersion);
-
-    as_value val;
+    std::wstring wstr = utf8::decodeCanonicalString(str, version);
 
     boost::intrusive_ptr<as_array_object> array(new as_array_object());
 
     if (fn.nargs == 0)
     {
-        val.set_std_string(obj->str());
-        array->push(val);
-
+        // Condition 1:
+        array->push(str);
         return as_value(array.get());
     }
 
-    const std::wstring& delim = utf8::decodeCanonicalString(fn.arg(0).to_string(), SWFVersion);
+    const std::wstring& delim = utf8::decodeCanonicalString(fn.arg(0).to_string(), version);
+    const size_t delimiterSize = delim.size();
 
-    // SWF5 didn't support multichar or empty delimiter
-    if ( SWFVersion < 6 )
+    if ((version < 6 && delimiterSize == 0) ||
+        (version >= 6 && fn.arg(0).is_undefined()))
     {
-	    if ( delim.size() != 1 )
-	    {
-		    val.set_std_string(obj->str());
-		    array->push(val);
-		    return as_value(array.get());
-	    }
-    }
-
-    size_t max = wstr.size();
-
-    if (fn.nargs >= 2)
-    {
-	int max_in = fn.arg(1).to_int();
-	if ( SWFVersion < 6 && max_in < 1 )
-	{
-		return as_value(array.get());
-	}
-        max = utility::clamp<size_t>(max_in, 0, wstr.size());
-    }
-
-    if ( wstr.empty() )
-    {
-        val.set_std_string(obj->str());
-        array->push(val);
-
+        // Condition 2:
+        array->push(str);
         return as_value(array.get());
     }
 
-    if ( delim.empty() ) {
-        for (unsigned i=0; i <max; i++) {
-            val.set_std_string(utf8::encodeCanonicalString(wstr.substr(i, 1), SWFVersion));
-            array->push(val);
+    size_t max = wstr.size() + 1;
+
+    if (version < 6)
+    {
+        // SWF5
+        if (fn.nargs > 1 && !fn.arg(1).is_undefined())
+        {
+            int limit = fn.arg(1).to_int();
+            if (limit < 1)
+            {
+                // Return empty array.
+                return as_value(array.get());
+            }
+            max = utility::clamp<size_t>(limit, 0, max);
         }
 
-        return as_value(array.get());
+        if (delimiterSize > 1 || fn.arg(0).is_undefined() || wstr.empty())
+        {
+            // Condition 3 (plus a shortcut if the string itself
+            // is empty).
+	        array->push(str);
+	        return as_value(array.get());            
+        }
+    }
+    else
+    {
+        // SWF6+
+        if (wstr.empty())
+        {
+            // If the string itself is empty, SWF6 returns a 0-sized
+            // array only if the delimiter is also empty. Otherwise
+            // it returns an array with 1 empty element.
+            if (delimiterSize) array->push(str);
+            return as_value(array.get());
+        }
+
+        // If we reach this point, the string is not empty and
+        // the delimiter is defined.
+        if (fn.nargs > 1 && !fn.arg(1).is_undefined())
+        {
+	        int limit = fn.arg(1).to_int();
+	        if (limit < 1) {
+	            // Return empty array if 
+	            return as_value(array.get());
+	        }
+            max = utility::clamp<size_t>(limit, 0, max);
+        }
+
+        // If the delimiter is empty, put each character in an
+        // array element.
+        if ( delim.empty() ) {
+            for (size_t i = 0, e = wstr.size(); i < e; ++i) {
+                array->push(utf8::encodeCanonicalString(wstr.substr(i, 1), version));
+            }
+            return as_value(array.get());
+        }
+
     }
 
     size_t pos = 0, prevpos = 0;
@@ -322,21 +367,13 @@ string_split(const fn_call& fn)
     while (num < max) {
         pos = wstr.find(delim, pos);
 
-        if (pos != std::wstring::npos) {
-            val.set_std_string(utf8::encodeCanonicalString(
-            		wstr.substr(prevpos, pos - prevpos),
-            		SWFVersion));
-            array->push(val);
+        array->push(utf8::encodeCanonicalString(
+               		wstr.substr(prevpos, pos - prevpos),
+               		version));
+            if (pos == std::wstring::npos) break;
             num++;
-            prevpos = pos + delim.size();
+            prevpos = pos + delimiterSize;
             pos++;
-        } else {
-            val.set_std_string(utf8::encodeCanonicalString(
-            		wstr.substr(prevpos),
-            		SWFVersion));
-            array->push(val);
-            break;
-        }
     }
 
     return as_value(array.get());
