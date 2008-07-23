@@ -445,9 +445,9 @@ test_results()
         && (msg4->getMethodName() == "onStatus")
         && (msg4->getStreamID() == 0)
         && (msg4->size() == 1)) {
-        runtest.pass("Encoded RTMP onStatus(Play Reset)");
+        runtest.pass("Encoded/Decoded RTMP onStatus(Play Reset)");
     } else {
-        runtest.fail("Encoded RTMP onStatus(Play Reset)");
+        runtest.fail("Encoded/Decoded RTMP onStatus(Play Reset)");
     }
     delete hex4;
     delete msg4;
@@ -465,9 +465,9 @@ test_results()
         && (msg5->getMethodName() == "onStatus")
         && (msg5->getStreamID() == -1)
         && (msg5->size() == 1)) {
-        runtest.pass("Encoded RTMP onStatus(Data Start)");
+        runtest.pass("Encoded/Decoded RTMP onStatus(Data Start)");
     } else {
-        runtest.fail("Encoded RTMP onStatus(Data Start)");
+        runtest.fail("Encoded/Decoded RTMP onStatus(Data Start)");
     }
     delete hex5;
     delete msg5;
@@ -489,9 +489,9 @@ test_results()
         && (msg6->getMethodName() == "onStatus")
         && (msg6->getStreamID() == 0)
         && (msg6->size() == 1)) {
-        runtest.pass("Encoded RTMP onStatus(Play Start)");
+        runtest.pass("Encoded/Decoded RTMP onStatus(Play Start)");
     } else {
-        runtest.fail("Encoded RTMP onStatus(Play Start)");
+        runtest.fail("Encoded/Decoded RTMP onStatus(Play Start)");
     }
     delete hex6;
     delete msg6;
