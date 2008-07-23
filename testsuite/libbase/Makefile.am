@@ -58,7 +58,7 @@ CLEANFILES = \
 	Range2dTest \
 	Point2dTest \
         snappingrangetest \
-	$(NULL
+	$(NULL)
 
 CurlStreamTest_SOURCES = CurlStreamTest.cpp
 CurlStreamTest_CPPFLAGS = '-DINPUT="$(srcdir)/CurlStreamTest.cpp"'
