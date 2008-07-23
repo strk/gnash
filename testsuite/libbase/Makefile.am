@@ -34,6 +34,14 @@ INCLUDES = \
 
 abs_builddir=`(cd $(top_builddir)/testsuite/libbase; pwd)`
 
+CLEANFILES = \
+	testrun.sum \
+	testrun.log \
+	gnash-dbg.log \
+	site.exp.bak \
+	NoSeekFileTestCache \
+	$(NULL)
+
 check_PROGRAMS = \
 	NoSeekFileTest \
 	URLTest \
@@ -45,23 +53,12 @@ check_PROGRAMS = \
 	Range2dTest \
 	$(NULL)
 
-if CURL
-check_PROGRAMS += CurlStreamTest
-endif
-
-CLEANFILES = \
-	testrun.sum \
-	testrun.log \
-	gnash-dbg.log \
-	site.exp.bak \
-	NoSeekFileTestCache \
-	Range2dTest \
-	Point2dTest \
-        snappingrangetest \
-	$(NULL)
-
-CurlStreamTest_SOURCES = CurlStreamTest.cpp
-CurlStreamTest_CPPFLAGS = '-DINPUT="$(srcdir)/CurlStreamTest.cpp"'
+#if CURL
+## This test needs an http server running to be useful
+#check_PROGRAMS += CurlStreamTest
+#CurlStreamTest_SOURCES = CurlStreamTest.cpp
+#CurlStreamTest_CPPFLAGS = '-DINPUT="$(srcdir)/CurlStreamTest.cpp"'
+#endif
 
 NoSeekFileTest_SOURCES = NoSeekFileTest.cpp
 NoSeekFileTest_CPPFLAGS = '-DINPUT="$(srcdir)/NoSeekFileTest.cpp"'
