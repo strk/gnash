@@ -265,6 +265,7 @@ check_SCRIPTS = \
 	loop_test7runner \
 	loop_test8runner \
 	loop_test9runner \
+	DepthLimitsTestrunner \
 	loop_test10runner \
 	shape_testrunner \
 	DefineEditTextVariableNameTest-Runner \
