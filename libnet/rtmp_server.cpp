@@ -62,7 +62,7 @@ RTMPServer::RTMPServer()
 RTMPServer::~RTMPServer()
 {
 //    GNASH_REPORT_FUNCTION;
-    _variables.clear();
+    _properties.clear();
 //    delete _body;
 }
 
@@ -234,7 +234,7 @@ RTMPServer::packetRead(amf::Buffer *buf)
 	    if (el != 0) {
 		size += amf_obj.totalsize();
 		ptr += amf_obj.totalsize();
-//		_variables[el->getName()] = el;
+//		_properties[el->getName()] = el;
 	    } else {
 		break;
 	    }

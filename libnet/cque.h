@@ -33,6 +33,8 @@
 namespace gnash
 {
 
+typedef std::deque<amf::Buffer *> Que;
+
 class CQue {
 public:
 #ifdef USE_STATS_QUEUE
@@ -80,7 +82,6 @@ private:
     // an optional name for the queue, only used for debugging messages to make them unique
     std::string _name;
     // The queue itself
-    typedef std::deque<amf::Buffer *> Que;
     Que _que;
 
     // A condition variable used to signal the other thread when the que has data

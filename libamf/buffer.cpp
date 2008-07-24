@@ -491,8 +491,12 @@ Buffer::resize(size_t size)
     } else {
 	size_t diff =_seekptr - _ptr;
 	Network::byte_t *tmp = new Network::byte_t[size];
+	// The size is the same, don't do anything.
+	if (size == _nbytes) {
+	    return _ptr;
+	}
 	// And copy ourselves into it
-	if (size >= _nbytes) {
+	if (size > _nbytes) {
 	    std::copy(_ptr, _ptr + _nbytes, tmp);
 	    // Delete the old block, it's unused now
 	    delete[] _ptr;

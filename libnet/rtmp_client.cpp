@@ -61,7 +61,7 @@ RTMPClient::RTMPClient()
 RTMPClient::~RTMPClient()
 {
 //    GNASH_REPORT_FUNCTION;
-    _variables.clear();
+    _properties.clear();
 //    delete _body;
 }
 

@@ -30,9 +30,9 @@
 #include "buffer.h"
 
 using namespace gnash;
+using namespace amf;
 using namespace std;
 using namespace boost;
-
 
 namespace gnash
 {
@@ -199,24 +199,21 @@ CQue::merge(amf::Buffer *start)
 {
     // Find iterator to first element to merge
     Que::iterator from = std::find(_que.begin(), _que.end(), start); 
-    if ( from == _que.end() ) {
+    if (from == _que.end()) {
         // Didn't find the requested Buffer pointer
         return NULL;
     }
-
 
     // Find iterator to last element to merge (first with size < NETBUFSIZE)
     // computing total size with the same scan
     size_t totalsize = (*from)->size();
     Que::iterator to=from; ++to;
-    for (Que::iterator e=_que.end(); to!=e; ++to)
-    {
+    for (Que::iterator e=_que.end(); to!=e; ++to) {
         size_t sz = (*to)->size();
         totalsize += sz;
         if (sz < gnash::NETBUFSIZE) break;
     }
-    if ( to == _que.end() )
-    {
+    if (to == _que.end()) {
         // Didn't find an element ending the merge
         return NULL;
     }
@@ -225,8 +222,7 @@ CQue::merge(amf::Buffer *start)
     std::auto_ptr<amf::Buffer> newbuf ( new amf::Buffer(totalsize) );
     Network::byte_t *tmp = newbuf->reference();
     ++to;
-    for (Que::iterator i=from; i!=to; ++i)
-    {
+    for (Que::iterator i=from; i!=to; ++i) {
         amf::Buffer *buf = *i;
         size_t sz = buf->size();
         std::copy(buf->reference(), buf->reference() + sz, tmp);
@@ -244,7 +240,7 @@ CQue::merge(amf::Buffer *start)
 
     return newbuf.release(); // ownership is transferred. TODO: return auto_ptr
 }
-    
+
 // Dump internal data.
 void
 CQue::dump()

@@ -230,7 +230,6 @@ main(int argc, char *argv[])
     // Make a buffer to hold the handshake data.
     Buffer buf(1537);
     RTMP::rtmp_head_t *rthead = 0;
-    RTMPMsg *msg2 = 0;
     int ret = 0;
     string tcUrl = uri.protocol() + "://" + uri.hostname();
     size_t pos = uri.path().rfind('/', uri.path().size());
@@ -244,16 +243,18 @@ main(int argc, char *argv[])
 //    Buffer *buf2 = client.encodeConnect("video/2006/sekt/gate06/tablan_valentin", "mediaplayer.swf", "rtmp://velblod.videolectures.net/video/2006/sekt/gate06/tablan_valentin", 615, 124, 1, "http://gnashdev.org");
 //    Buffer *buf2 = client.encodeConnect("oflaDemo", "http://192.168.1.70/software/gnash/tests/ofla_demo.swf", "rtmp://localhost/oflaDemo/stream", 615, 124, 1, "http://192.168.1.70/software/gnash/tests/index.html");
     buf2->resize(buf2->size() - 6); // FIXME: encodeConnect returns the wrong size for the buffer!
-    size_t total_size = buf2->size(); 
-    
-    Element *res1 = client.sendRecvMsg(0x3, RTMP::HEADER_12, total_size,
+    size_t total_size = buf2->size();    
+    RTMPMsg *msg1 = client.sendRecvMsg(0x3, RTMP::HEADER_12, total_size,
 				      RTMP::INVOKE, RTMPMsg::FROM_CLIENT,
 				      buf2);
-    if (res1 == 0) {
-	log_error("Couldn't send NetConnection Connect message,");
-//	exit(-1);
-    } else {
-	log_debug("NetConnection Connect message succeeded");
+    if (msg1) {
+        msg1->dump();
+        if (msg1->getStatus() ==  RTMPMsg::NC_CONNECT_SUCCESS) {
+	    log_debug("Sent NetConnection Connect message sucessfully");
+	} else {
+	    log_error("Couldn't send NetConnection Connect message,");
+//	    exit(-1);
+	}
     }
 
     // make the createStream for ID 3 encoded object
@@ -261,19 +262,21 @@ main(int argc, char *argv[])
     Buffer *buf3 = client.encodeStream(0x2);
 //    buf3->dump();
     total_size = buf3->size();
-    Element *res2 = client.sendRecvMsg(0x3, RTMP::HEADER_12, total_size,
+    RTMPMsg *msg2 = client.sendRecvMsg(0x3, RTMP::HEADER_12, total_size,
 				      RTMP::INVOKE, RTMPMsg::FROM_CLIENT,
 				      buf3);
     double streamID = 0.0;
-    if (res2 == 0) {
-	log_error("Couldn't send NetStream::createStream message,");
-//	exit(-1);
+    if (msg2) {
+	msg2->dump();
+	log_debug("Sent NetStream::createStream message successfully.");
+	std::vector<amf::Element *> hell = msg2->getElements();
+	streamID = hell[0]->to_number();
     } else {
-	log_debug("NetStream::createStream message succeeded.");
-	streamID = res2->to_number();
+	log_error("Couldn't send NetStream::createStream message,");
+	exit(-1);
     }
     int id = int(streamID);
-    cerr << "Stream ID returned from createStream is: " << id << endl;
+    log_debug("Stream ID returned from createStream is: %d", id);
     
     // make the NetStream::play() operations for ID 2 encoded object
 //    log_debug("Sending NetStream play message,");
@@ -281,19 +284,23 @@ main(int argc, char *argv[])
 //    Buffer *buf4 = client.encodeStreamOp(0, RTMP::STREAM_PLAY, false, "gate06_tablan_bcueu_01");
 //     log_debug("TRACE: buf4: %s", hexify(buf4->reference(), buf4->size(), true));
     total_size = buf4->size();
-    Element *res3 = client.sendRecvMsg(0x8, RTMP::HEADER_12, total_size,
+    RTMPMsg *msg3 = client.sendRecvMsg(0x8, RTMP::HEADER_12, total_size,
 				       RTMP::INVOKE, RTMPMsg::FROM_CLIENT, buf4);
-    if (res3 == 0) {
-	log_error("Couldn't send NetStream::play message,");
-	exit(-1);
-    } else {
-	log_debug("Sent NetStream::play message.");
+    if (msg3) {
+        msg3->dump();
+        if (msg3->getStatus() ==  RTMPMsg::NS_PLAY_START) {
+	    log_debug("Sent NetStream::play message sucessfully.");
+	} else {
+	    log_error("Couldn't send NetStream::play message,");
+	    exit(-1);
+	}
     }
 
 #if 1
     int count = 0;
     do {
 	buf.clear();
+//	log_debug("Currently have %d buffers in the queue", incoming.size());
 	ret = client.readNet(&buf, 5);
 	if (ret <= 0) {
 	    log_error("Never got any data!");
@@ -301,17 +308,17 @@ main(int argc, char *argv[])
 	}
 	
 	if ((ret == 1) && (*buf.reference() == 0xff)) {
-	    cerr << __FUNCTION__ << ": " << __LINE__ << ": " << hexify(buf.reference(), ret, false) << endl;
+//	    cerr << __FUNCTION__ << ": " << __LINE__ << ": " << hexify(buf.reference(), ret, false) << endl;
 	    log_error("Got an error from the server sending NetStream object");
 //	exit(-1);
 	}
 	if (ret > 1) {
-	    cerr << __FUNCTION__ << ": " << __LINE__ << ": " << hexify(buf.reference(), ret, false) << endl;
+//	    cerr << __FUNCTION__ << ": " << __LINE__ << ": " << hexify(buf.reference(), ret, true) << endl;
 	    rthead = client.decodeHeader(&buf);
 	    
 	    msg2 = client.decodeMsgBody(buf.reference() + rthead->head_size, rthead->bodysize);
 	}
-    } while (count++ < 5);
+    } while (count++ < 2);
 #endif
     
 //     buf.clear();

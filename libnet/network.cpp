@@ -685,7 +685,7 @@ Network::closeConnection(int fd)
 amf::Buffer *
 Network::readNet()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     amf::Buffer *buffer = new amf::Buffer;
     int nbytes = readNet(buffer);
@@ -701,14 +701,14 @@ Network::readNet()
 int
 Network::readNet(amf::Buffer *buffer)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     return readNet(_sockfd, buffer->reference(), buffer->size(), _timeout);
 }
 
 int
 Network::readNet(amf::Buffer *buffer, int timeout)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     return readNet(_sockfd, buffer->reference(), buffer->size(), timeout);
 }
 
@@ -736,7 +736,7 @@ Network::readNet(int fd, byte_t *buffer, int nbytes)
 int
 Network::readNet(int fd, byte_t *buffer, int nbytes, int timeout)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     fd_set              fdset;
     int                 ret = -1;
