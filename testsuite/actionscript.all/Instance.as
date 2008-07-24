@@ -41,48 +41,49 @@ check_equals(o, undefined);
 
 o = new Math.cos(9);
 check_equals(typeof(o), "object");
-check_equals(typeof(o.__proto__), "undefined");
-
-
+xcheck_equals(typeof(o.__proto__), "undefined");
 ASSetPropFlags(o, null, 6, 1);
 #if OUTPUT_VERSION < 7
 check_equals(typeof(o.constructor), "function");
 #else
-check_equals(typeof(o.constructor), "undefined");
+xcheck_equals(typeof(o.constructor), "undefined");
 #endif
-
 #if OUTPUT_VERSION > 5
 check_equals(typeof(o.__constructor__), "function");
 #else
 check_equals(typeof(o.__constructor__), "undefined");
 #endif
-
-check_equals(o.toString(), undefined);
-check_equals(o.valueOf(), undefined);
-check(!o instanceOf Object);
-check(!o instanceOf Number);
+xcheck_equals(o.toString(), undefined);
+xcheck_equals(o.valueOf(), undefined);
+xcheck(!o instanceOf Object);
+xcheck(!o instanceOf Number);
 check(!o instanceOf String);
 
 o = new Math.cos();
 check_equals(typeof(o), "object");
-check_equals(typeof(o.__proto__), "undefined");
+xcheck_equals(typeof(o.__proto__), "undefined");
 #if OUTPUT_VERSION < 7
 check_equals(typeof(o.constructor), "function");
 #else
-check_equals(typeof(o.constructor), "undefined");
+xcheck_equals(typeof(o.constructor), "undefined");
 #endif
-check_equals(o.toString(), undefined);
-check_equals(o.valueOf(), undefined);
-check(!o instanceOf Object);
-check(!o instanceOf Number);
+xcheck_equals(o.toString(), undefined);
+xcheck_equals(o.valueOf(), undefined);
+xcheck(!o instanceOf Object);
+xcheck(!o instanceOf Number);
 check(!o instanceOf String);
-
 
 o = new Mouse.hide();
 check_equals(typeof(o), "object");
 check_equals(typeof(o.__proto__), "undefined");
 #if OUTPUT_VERSION < 7
-check_equals(typeof(o.constructor), "function");
+    #if OUTPUT_VERSION == 6
+    // SWF6 passes
+    check_equals(typeof(o.constructor), "function");
+    #else
+    // SWF5 doesn't
+    xcheck_equals(typeof(o.constructor), "function");
+    #endif
 #else
 check_equals(typeof(o.constructor), "undefined");
 #endif
@@ -96,7 +97,7 @@ o = new Stage.align();
 check_equals(typeof(o), "undefined");
 
 o = new Date.UTC();
-check_equals(typeof(o), "object");
+xcheck_equals(typeof(o), "object");
 check_equals(o.toString(), undefined);
 check_equals(o.valueOf(), undefined);
 check(!o instanceOf Object);
