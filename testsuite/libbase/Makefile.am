@@ -47,7 +47,6 @@ check_PROGRAMS = \
 	URLTest \
 	RcTest \
 	IntTypesTest \
-	memtest \
 	Point2dTest \
 	snappingrangetest \
 	Range2dTest \
@@ -73,7 +72,7 @@ IntTypesTest_SOURCES = IntTypesTest.cpp
 IntTypesTest_CPPFLAGS = -DSRCDIR="$(srcdir)"
 
 # Test the Memory class
-memtest_SOURCES = memtest.cpp
+#memtest_SOURCES = memtest.cpp
 
 Point2dTest_SOURCES = Point2dTest.cpp
 Range2dTest_SOURCES = Range2dTest.cpp
