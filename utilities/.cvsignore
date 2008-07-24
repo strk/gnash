@@ -1,8 +1,0 @@
-.deps
-.libs
-Makefile
-Makefile.in
-gparser
-gprocessor
-dumpshm
-soldumper
