@@ -1303,7 +1303,8 @@ check_equals(a["Infinite"], 'inf');
 // Force an indexed property to a getter/setter
 //---------------------------------------------
 
-#if OUTPUT_VERSION > 5 // addProperty was added in SWF6
+// addProperty was added in SWF6
+#if OUTPUT_VERSION > 5
 
 function get() { getCalls++; }
 function set() { setCalls++; }
