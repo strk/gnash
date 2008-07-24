@@ -392,7 +392,7 @@ as_function::constructInstance( as_environment& env,
 			ret = call(fn);
 			//newobj = ret.to_object();
 		} catch (std::exception& ex) {
-			log_debug("Native function called as constructor threw %s", ex.what());
+			log_debug("Native function called as constructor threw exception: %s", ex.what());
 			//newobj = new as_object();
 		}
 
