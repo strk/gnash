@@ -111,16 +111,40 @@ check_equals(bmp.getPixel(-2, -5), 0);
 // 0,0 is inside, 20, 30 outside a 20x30 bitmap.
 check_equals(bmp.getPixel(20, 30), 0);
 
-bmp = new Bitmap(10000, 0);
-xcheck_equals(bmp, undefined);
+
+// 2880 is the maximum, 1 the minimum. Returns
+// undefined if the dimensions are invalid.
+bmp = new Bitmap(10000, 3);
+xcheck_equals(typeof(bmp), "undefined");
+check_equals(bmp.height, undefined);
+
 bmp = new Bitmap(0, 10000);
 xcheck_equals(bmp, undefined);
+check_equals(bmp.height, undefined);
 
-bmp = new Bitmap(2881, 0);
+bmp = new Bitmap(2880, 2880);
+check_equals(typeof(bmp), "object");
+check_equals(bmp.height, 2880);
+
+bmp = new Bitmap(2880, 2881);
 xcheck_equals(typeof(bmp), "undefined");
-bmp = new Bitmap(0, 2881);
-xcheck_equals(bmp, undefined);
+check_equals(bmp.height, undefined);
 
+bmp = new Bitmap(0, 2880);
+xcheck_equals(bmp, undefined);
+check_equals(bmp.height, undefined);
+
+bmp = new Bitmap(2879, 2879);
+check_equals(typeof(bmp), "object");
+check_equals(bmp.height, 2879);
+
+bmp = new Bitmap(0, 2879);
+xcheck_equals(bmp, undefined);
+check_equals(bmp.height, undefined);
+
+bmp = new Bitmap(-1, 10, false, 0xff);
+xcheck_equals(bmp, undefined);
+check_equals(bmp.height, undefined);
 
 // floodFill
 bmp = new Bitmap(20, 20, false);
@@ -187,6 +211,6 @@ mc.attachBitmap(bmp, this.getNextHighestDepth());
 // END OF TEST
 //-------------------------------------------------------------
 
-totals(77);
+totals(89);
 
 #endif // OUTPUT_VERSION >= 8
