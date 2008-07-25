@@ -22,6 +22,7 @@
 #endif
 
 #include "BitmapData_as.h"
+#include "flash/geom/Rectangle_as.h" // for BitmapData.rectangle
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
@@ -506,9 +507,15 @@ static as_value
 BitmapData_rectangle_getset(const fn_call& fn)
 {
 	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+
+	boost::intrusive_ptr<as_object> obj = init_Rectangle_instance();
+
+	obj->set_member(NSV::PROP_X, 0);
+	obj->set_member(NSV::PROP_Y, 0);
+	obj->set_member(NSV::PROP_WIDTH, ptr->getWidth());
+	obj->set_member(NSV::PROP_HEIGHT, ptr->getHeight());
+
+	return as_value(obj.get()); // will keep alive
 }
 
 static as_value

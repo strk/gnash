@@ -83,7 +83,8 @@ check(!bmp.hasOwnProperty("transparent"));
 check_equals(bmp.height, 10);
 check_equals(bmp.width, 10);
 check_equals(bmp.transparent, true);
-xcheck_equals(bmp.rectangle.toString(), "(x=0, y=0, w=10, h=10)");
+check_equals(bmp.rectangle.toString(), "(x=0, y=0, w=10, h=10)");
+check(bmp.rectangle instanceOf flash.geom.Rectangle);
 check_equals(bmp.getPixel(1, 1), 16777215);
 check_equals(bmp.getPixel(9, 9), 16777215);
 check_equals(bmp.getPixel32(1, 1), -1);
@@ -98,7 +99,7 @@ bmp = new Bitmap(20, 30, false, 0xeeddee);
 check_equals(bmp.height, 30);
 check_equals(bmp.width, 20);
 check_equals(bmp.transparent, false);
-xcheck_equals(bmp.rectangle.toString(), "(x=0, y=0, w=20, h=30)");
+check_equals(bmp.rectangle.toString(), "(x=0, y=0, w=20, h=30)");
 check_equals(bmp.getPixel(1, 1), 0xeeddee);
 check_equals(bmp.getPixel32(1, 1), -1122834);
 
@@ -207,10 +208,23 @@ check_equals(bmp.getPixel32(3, 3), -1711337216);
 
 mc.attachBitmap(bmp, this.getNextHighestDepth());
 
+bmp.dispose();
+xcheck_equals(bmp.height, -1);
+xcheck_equals(bmp.width, -1);
+xcheck_equals(bmp.transparent, -1);
+xcheck_equals(typeof(bmp.rectangle), "number");
+xcheck_equals(bmp.rectangle, -1);
+xcheck_equals(bmp.rectangle.toString(), "-1");
+
+check(bmp instanceOf Bitmap);
+bmp.height = 2;
+xcheck_equals(bmp.height, -1);
+
+
 //-------------------------------------------------------------
 // END OF TEST
 //-------------------------------------------------------------
 
-totals(89);
+totals(98);
 
 #endif // OUTPUT_VERSION >= 8
