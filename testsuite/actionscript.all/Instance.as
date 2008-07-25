@@ -118,6 +118,12 @@ check(!o instanceOf Object);
 // It should be undefined in SWF8 because the object isn't constructed when the
 // given values are incorrect.
 o = new flash.display.BitmapData();
+#if OUTPUT_VERSION < 8
+check_equals(typeof(o), "undefined");
+check_equals(o, undefined);
+#else
 xcheck_equals(typeof(o), "undefined");
+xcheck_equals(o, undefined);
+#endif
 
-check_totals(33);
+check_totals(34);

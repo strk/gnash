@@ -142,6 +142,10 @@ bmp = new Bitmap(0, 2879);
 xcheck_equals(bmp, undefined);
 check_equals(bmp.height, undefined);
 
+bmp = new Bitmap(-1, 10, false, 0xff);
+xcheck_equals(bmp, undefined);
+check_equals(bmp.height, undefined);
+
 // floodFill
 bmp = new Bitmap(20, 20, false);
 bmp.floodFill(10, 10, 0x0000ff00);
@@ -207,6 +211,6 @@ mc.attachBitmap(bmp, this.getNextHighestDepth());
 // END OF TEST
 //-------------------------------------------------------------
 
-totals(87);
+totals(89);
 
 #endif // OUTPUT_VERSION >= 8
