@@ -114,4 +114,10 @@ check_equals(o.toString(), undefined);
 check_equals(o.valueOf(), undefined);
 check(!o instanceOf Object);
 
-check_totals(32);
+// This should be undefined in SWF7 and below because BitmapData doesn't exist.
+// It should be undefined in SWF8 because the object isn't constructed when the
+// given values are incorrect.
+o = new flash.display.BitmapData();
+xcheck_equals(typeof(o), "undefined");
+
+check_totals(33);
