@@ -583,9 +583,9 @@ BitmapData_ctor(const fn_call& fn)
             break;
     }
     
-    // Should fail to construct the object.
-    if (width > 2880) width = 2880;
-    if (height > 2880) height = 2880;
+    // FIXME: Should fail to construct the object.
+    if (width > 2880 || height > 2880) return as_value();
+    if (width < 1 || height < 1) return as_value();
 
     boost::intrusive_ptr<BitmapData_as> obj =
                 new BitmapData_as(width, height, transparent, fillColor);
