@@ -60,6 +60,9 @@ public:
     
     // Fill the bitmap with a colour starting at x, y
     void fillRect(int x, int y, int w, int h, boost::uint32_t color);
+    
+    // Free the bitmap data (clear the array)
+    void dispose();
 
 private:
 

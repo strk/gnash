@@ -171,6 +171,10 @@ BitmapData_as::getPixel(int x, int y, bool transparency) const
 void
 BitmapData_as::fillRect(int x, int y, int w, int h, boost::uint32_t color)
 {
+    // The bitmap has been "disposed".
+    if (_bitmapData.empty()) return;
+    assert (_bitmapData.size() == _width * _height);
+
     if (w < 0 || h < 0) return;
 
     // Nothing to do if x or y are outside the image (negative height
@@ -219,6 +223,12 @@ BitmapData_as::fillRect(int x, int y, int w, int h, boost::uint32_t color)
 
     }
 
+}
+
+void
+BitmapData_as::dispose()
+{
+    _bitmapData.clear();
 }
 
 as_function* getFlashDisplayBitmapDataConstructor()
@@ -281,12 +291,10 @@ BitmapData_copyPixels(const fn_call& fn)
 static as_value
 BitmapData_dispose(const fn_call& fn)
 {
-
     // Should free the memory storing the bitmap.
-    // What is the size afterwards? Can it be reused?
+    // All properties afterwards are -1 (even the rectangle)
 	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
+    ptr->dispose();
 	return as_value();
 }
 
@@ -499,7 +507,8 @@ BitmapData_height_getset(const fn_call& fn)
     // Read-only
     if (fn.nargs) return as_value();
     
-    // Returns the immutable height of the bitmap.
+    // Returns the immutable height of the bitmap or -1 if dispose() has been called.
+    if (ptr->getBitmapData().empty()) return -1;
 	return as_value(ptr->getHeight());
 }
 
@@ -507,6 +516,9 @@ static as_value
 BitmapData_rectangle_getset(const fn_call& fn)
 {
 	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
+
+    // Returns the immutable rectangle of the bitmap or -1 if dispose() has been called.
+    if (ptr->getBitmapData().empty()) return -1;
 
 	boost::intrusive_ptr<as_object> obj = init_Rectangle_instance();
 
@@ -526,7 +538,8 @@ BitmapData_transparent_getset(const fn_call& fn)
     // Read-only
     if (fn.nargs) return as_value();
     
-    // Returns the immutable height of the bitmap.
+    // Returns whether bitmap is transparent or -1 if dispose() has been called.
+    if (ptr->getBitmapData().empty()) return -1;
 	return as_value(ptr->isTransparent());
 }
 
@@ -538,7 +551,8 @@ BitmapData_width_getset(const fn_call& fn)
     // Read-only
     if (fn.nargs) return as_value();
     
-    // Returns the immutable height of the bitmap.
+    // Returns the immutable width of the bitmap or -1 if dispose() has been called.
+    if (ptr->getBitmapData().empty()) return -1;
 	return as_value(ptr->getWidth());
 }
 
