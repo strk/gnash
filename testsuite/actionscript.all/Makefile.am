@@ -89,6 +89,7 @@ ASTESTS =			\
 	Function.as		\
 	Global.as		\
 	Inheritance.as		\
+	Instance.as \
 	Key.as			\
 	LoadVars.as		\
 	Math.as			\

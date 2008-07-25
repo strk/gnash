@@ -173,14 +173,16 @@ RTMP::headerSize(Network::byte_t header)
 }
 
 RTMP::RTMP() 
-    : _handshake(0), _handler(0), _chunksize(RTMP_VIDEO_PACKET_SIZE), _timeout(1)
+    : _handshake(0),
+      _handler(0),
+      _chunksize(RTMP_VIDEO_PACKET_SIZE),
+      _timeout(1)
 {
 //    GNASH_REPORT_FUNCTION;
-//     _inbytes = 0;
-//     _outbytes = 0;
-    
-//    _body = new unsigned char(RTMP_BODY_SIZE+1);
-//    memset(_body, 0, RTMP_BODY_SIZE+1);
+    _queues.resize(RTMP_MAX_HEADER_SIZE);
+    for (size_t i=0; i<MAX_AMF_INDEXES; i++) {
+	_queues[i] = new CQue;
+    }
 }
 
 RTMP::~RTMP()
@@ -1039,13 +1041,13 @@ RTMP::recvMsg(int timeout)
 // but RTMP uses a weird scheme of a standard header, and then every chunksize
 // bytes another 1 byte RTMP header. The header itself is not part of the byte
 // count.
-std::deque<Buffer *> *
+std::vector<CQue *> *
 RTMP::split(Buffer *buf)
 {
     return split(buf, _chunksize);
 }
 
-Que *
+std::vector<CQue *> *
 RTMP::split(Buffer *buf, size_t chunksize)
 {
     GNASH_REPORT_FUNCTION;
@@ -1059,13 +1061,14 @@ RTMP::split(Buffer *buf, size_t chunksize)
     Network::byte_t *ptr = 0;
     rtmp_head_t *rthead = 0;
     size_t totalsize = 0;
+    size_t count = 0;
     vector<size_t> bodysizes(MAX_AMF_INDEXES);
-//    bodysizes.reserve(MAX_AMF_INDEXES);
     
     ptr = buf->reference();
-    Que *que = new Que;
+//    Que *que = new Que;
     while ((ptr - buf->reference()) < buf->size()) {
 	rthead = decodeHeader(ptr);
+	count++;
 	if ((rthead->head_size > 1)) {
 	    bodysizes[rthead->channel] = rthead->bodysize;
 	}
@@ -1093,8 +1096,10 @@ RTMP::split(Buffer *buf, size_t chunksize)
 	    if (totalsize <= (chunksize + RTMP_MAX_HEADER_SIZE)) {
 		Buffer *chunk = new Buffer(totalsize);
 		chunk->copy(ptr, totalsize);
-		chunk->dump();	// FIXME: 
-		que->push_back(chunk);
+//		chunk->dump();
+ 		if (_queues[rthead->channel] != 0) {
+ 		    _queues[rthead->channel]->push(chunk);
+ 		}
 		ptr += totalsize;
 	    } else {
 		log_error("RTMP packet size is out of range! %d", totalsize);
@@ -1106,7 +1111,7 @@ RTMP::split(Buffer *buf, size_t chunksize)
 	}
     }
 
-    return que;
+    return &_queues;
 }
 
 

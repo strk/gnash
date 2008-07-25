@@ -28,6 +28,7 @@
 #include "network.h"
 #include "buffer.h"
 #include "rtmp_msg.h"
+#include "cque.h"
 
 namespace gnash
 {
@@ -286,8 +287,8 @@ public:
     // but RTMP uses a weird scheme of a standard header, and then every chunksize
     // bytes another 1 byte RTMP header. The header itself is not part of the byte
     // count.
-    Que *split(amf::Buffer *buf);
-    Que *split(amf::Buffer *buf, size_t chunksize);
+    std::vector<CQue *> *split(amf::Buffer *buf);
+    std::vector<CQue *> *split(amf::Buffer *buf, size_t chunksize);
 
     void dump();
   protected:
@@ -299,6 +300,7 @@ public:
     int         _mystery_word;
     size_t	_chunksize;
     int		_timeout;
+    std::vector<CQue *> _queues;
 };
 
 } // end of gnash namespace

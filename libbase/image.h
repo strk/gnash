@@ -16,12 +16,7 @@
 
 // Forward declarations
 namespace jpeg { class input; }
-namespace gnash {
-    class IOChannel;
-    namespace image {
-        class alpha;
-    }    
-}
+namespace gnash { class IOChannel; }
 
 
 /// Handy image utilities for RGB surfaces.
@@ -65,22 +60,22 @@ namespace image
 		virtual std::auto_ptr<image_base> clone() const=0;
 
 		/// Return size of this image buffer, in bytes
-		const size_t size() const { return m_size; }
+		size_t size() const { return m_size; }
 
 		/// Return size in bytes of a row of this image 
-		const size_t pitch() const { return m_pitch; }
+		size_t pitch() const { return m_pitch; }
 
 		/// Return size in bytes of a single pixel value
-		const size_t pixelSize() const
+		size_t pixelSize() const
 		{
 			return m_pitch / m_width;
 		}
 
 		/// Return width of image in pixels
-		const size_t width() const { return m_width; }
+		size_t width() const { return m_width; }
 
 		/// Return height of image in pixels
-		const size_t height() const { return m_height; }
+		size_t height() const { return m_height; }
 
 		/// Copy image data from a buffer.
 		//

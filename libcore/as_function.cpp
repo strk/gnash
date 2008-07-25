@@ -387,10 +387,22 @@ as_function::constructInstance( as_environment& env,
 		);
 
 		fn_call fn(NULL, &env, nargs, first_arg_index);
+		as_value ret;
 		try {
-			newobj = call(fn).to_object();
+			ret = call(fn);
+			//newobj = ret.to_object();
 		} catch (std::exception& ex) {
-			log_debug("Native function called as constructor returned %s", ex.what());
+			log_debug("Native function called as constructor threw exception: %s", ex.what());
+			//newobj = new as_object();
+		}
+
+		if ( ret.is_object() )
+		{
+			newobj = ret.to_object();
+		}
+		else 
+		{
+			log_debug("Native function called as constructor returned %s", ret);
 			newobj = new as_object();
 		}
 		assert(newobj); // we assume builtin functions do return objects !!
@@ -401,7 +413,7 @@ as_function::constructInstance( as_environment& env,
 		int flags = as_prop_flags::dontEnum|as_prop_flags::onlySWF6Up; // can delete, hidden in swf5
 		newobj->init_member(NSV::PROP_uuCONSTRUCTORuu, as_value(this), flags);
 
-		if ( swfversion < 7 )
+		if ( swfversion < 7 ) // && swfversion > 5 ?
 		{
 			newobj->init_member(NSV::PROP_CONSTRUCTOR, as_value(this), flags);
 		}

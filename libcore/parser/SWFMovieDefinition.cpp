@@ -206,6 +206,8 @@ SWFMovieDefinition::SWFMovieDefinition()
 	_frames_loaded_mutex(),
 	_frame_reached_condition(),
 	_waiting_for_frame(0),
+	m_loading_sound_stream(-1),
+	m_file_length(0),
 	m_jpeg_in(0),
 	_loader(*this),
 	_loadingCanceled(false)

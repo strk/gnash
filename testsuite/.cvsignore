@@ -1,9 +1,0 @@
-Makefile
-Makefile.in
-*.lo
-*.la
-.libs
-.deps
-Dejagnu.swf
-gnashrc
-tmpSharedObject

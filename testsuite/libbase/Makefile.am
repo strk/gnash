@@ -34,34 +34,30 @@ INCLUDES = \
 
 abs_builddir=`(cd $(top_builddir)/testsuite/libbase; pwd)`
 
-check_PROGRAMS = \
-	NoSeekFileTest \
-	URLTest \
-	RcTest \
-	IntTypesTest \
-	memtest \
-	Point2dTest \
-	snappingrangetest \
-	Range2dTest \
-	$(NULL)
-
-if CURL
-check_PROGRAMS += CurlStreamTest
-endif
-
 CLEANFILES = \
 	testrun.sum \
 	testrun.log \
 	gnash-dbg.log \
 	site.exp.bak \
 	NoSeekFileTestCache \
-	Range2dTest \
-	Point2dTest \
-        snappingrangetest \
 	$(NULL)
 
-CurlStreamTest_SOURCES = CurlStreamTest.cpp
-CurlStreamTest_CPPFLAGS = '-DINPUT="$(srcdir)/CurlStreamTest.cpp"'
+check_PROGRAMS = \
+	NoSeekFileTest \
+	URLTest \
+	RcTest \
+	IntTypesTest \
+	Point2dTest \
+	snappingrangetest \
+	Range2dTest \
+	$(NULL)
+
+#if CURL
+## This test needs an http server running to be useful
+#check_PROGRAMS += CurlStreamTest
+#CurlStreamTest_SOURCES = CurlStreamTest.cpp
+#CurlStreamTest_CPPFLAGS = '-DINPUT="$(srcdir)/CurlStreamTest.cpp"'
+#endif
 
 NoSeekFileTest_SOURCES = NoSeekFileTest.cpp
 NoSeekFileTest_CPPFLAGS = '-DINPUT="$(srcdir)/NoSeekFileTest.cpp"'
@@ -76,7 +72,7 @@ IntTypesTest_SOURCES = IntTypesTest.cpp
 IntTypesTest_CPPFLAGS = -DSRCDIR="$(srcdir)"
 
 # Test the Memory class
-memtest_SOURCES = memtest.cpp
+#memtest_SOURCES = memtest.cpp
 
 Point2dTest_SOURCES = Point2dTest.cpp
 Range2dTest_SOURCES = Range2dTest.cpp
