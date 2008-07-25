@@ -654,6 +654,11 @@ static as_value get_flash_geom_rectangle_constructor(const fn_call& /*fn*/)
 	return cl;
 }
 
+boost::intrusive_ptr<as_object> init_Rectangle_instance()
+{
+    return boost::intrusive_ptr<as_object>(new Rectangle_as);
+}
+
 // extern 
 void Rectangle_class_init(as_object& where)
 {
