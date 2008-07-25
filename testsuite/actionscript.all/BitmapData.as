@@ -209,22 +209,48 @@ check_equals(bmp.getPixel32(3, 3), -1711337216);
 mc.attachBitmap(bmp, this.getNextHighestDepth());
 
 bmp.dispose();
-xcheck_equals(bmp.height, -1);
-xcheck_equals(bmp.width, -1);
-xcheck_equals(bmp.transparent, -1);
-xcheck_equals(typeof(bmp.rectangle), "number");
-xcheck_equals(bmp.rectangle, -1);
-xcheck_equals(bmp.rectangle.toString(), "-1");
+check_equals(bmp.height, -1);
+check_equals(bmp.width, -1);
+check_equals(bmp.transparent, -1);
+check_equals(typeof(bmp.rectangle), "number");
+check_equals(bmp.rectangle, -1);
+check_equals(bmp.rectangle.toString(), "-1");
 
 check(bmp instanceOf Bitmap);
 bmp.height = 2;
-xcheck_equals(bmp.height, -1);
+check_equals(bmp.height, -1);
 
+bmp = new Bitmap(20, 10, true);
+backup = flash.geom.Rectangle;
+flash.geom.Rectangle = 2;
+xcheck_equals(bmp.rectangle, -1);
+
+flash.geom.Rectangle = function (x, y, w, h)
+{
+    this.y = x + 5;
+    this.x = 10.5;
+    this.width = h;
+    this.height = w;
+};
+xcheck_equals(bmp.rectangle.toString(), "[object Object]");
+
+flash.geom.Rectangle = function (x, y, w, h)
+{
+};
+xcheck_equals(bmp.rectangle.toString(), "[object Object]");
+
+flash.geom.Rectangle = function ()
+{
+};
+xcheck_equals(bmp.rectangle.toString(), "[object Object]");
+
+flash.geom.Rectangle = backup;
+check_equals(bmp.rectangle.toString(), "(x=0, y=0, w=20, h=10)");
 
 //-------------------------------------------------------------
 // END OF TEST
 //-------------------------------------------------------------
 
-totals(98);
+totals(103);
 
 #endif // OUTPUT_VERSION >= 8
