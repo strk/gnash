@@ -956,7 +956,7 @@ RTMP::sendRecvMsg(int amf_index, rtmp_headersize_e head_size,
 //   		if (_queues[rthead->channel] != 0) {
 //   		    _queues[rthead->channel].push(chunk);
 //   		}
-	ptr += rthead->head_size + rthead->bodysize;
+//	ptr += rthead->head_size + rthead->bodysize;
     };
     
     return msg;
@@ -1082,7 +1082,7 @@ RTMP::split(Buffer *buf, size_t chunksize)
 	}
     }
 
-    return _queues;
+    return &_queues[0];
 }
 
 
