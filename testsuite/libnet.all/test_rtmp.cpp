@@ -718,19 +718,54 @@ test_results()
     }
     delete hex6;
     delete msg6;
+
+// ..............._error.?......... ..level...error..code...NetConnection.Connect.Rejected..description..A[ Server.Reject ] : Virtual host _defa.ultVHost_ is not available....
+    Buffer *hex7 = hex2mem("02 00 06 5f 65 72 72 6f 72 00 3f f0 00 00 00 00 00 00 05 03 00 05 6c 65 76 65 6c 02 00 05 65 72 72 6f 72 00 04 63 6f 64 65 02 00 1e 4e 65 74 43 6f 6e 6e 65 63 74 69 6f 6e 2e 43 6f 6e 6e 65 63 74 2e 52 65 6a 65 63 74 65 64 00 0b 64 65 73 63 72 69 70 74 69 6f 6e 02 00 41 5b 20 53 65 72 76 65 72 2e 52 65 6a 65 63 74 20 5d 20 3a 20 56 69 72 74 75 61 6c 20 68 6f 73 74 20 5f 64 65 66 61 c3 75 6c 74 56 48 6f 73 74 5f 20 69 73 20 6e 6f 74 20 61 76 61 69 6c 61 62 6c 65 2e 00 00 09");
+    RTMPMsg *msg7 = rtmpserv.decodeMsgBody(hex7);
+    if ((msg7->getStatus() ==  RTMPMsg::NC_CONNECT_REJECTED)
+        && (msg7->getMethodName() == "_error")
+        && (msg7->size() == 1)) {
+        runtest.pass("Decoded RTMP _error(NC_CONNECT_REJECTED");
+    } else {
+        runtest.fail("Decoded RTMP _error(NC_CONNECT_REJECTED)");
+    }
+
+    delete hex7;
+    delete msg7;
+
+//.onStatus.............level...error..code...NetStream.Play.StreamNotFound..description..6Failed to play gate06_tablan_bcueu_; .stream not found...details...gate06_tablan_bcueu_..clientid.A.;..
+    Buffer *hex8 = hex2mem("02 00 08 6f 6e 53 74 61 74 75 73 00 00 00 00 00 00 00 00 00 05 03 00 05 6c 65 76 65 6c 02 00 05 65 72 72 6f 72 00 04 63 6f 64 65 02 00 1d 4e 65 74 53 74 72 65 61 6d 2e 50 6c 61 79 2e 53 74 72 65 61 6d 4e 6f 74 46 6f 75 6e 64 00 0b 64 65 73 63 72 69 70 74 69 6f 6e 02 00 36 46 61 69 6c 65 64 20 74 6f 20 70 6c 61 79 20 67 61 74 65 30 36 5f 74 61 62 6c 61 6e 5f 62 63 75 65 75 5f 3b 20 c4 73 74 72 65 61 6d 20 6e 6f 74 20 66 6f 75 6e 64 2e 00 07 64 65 74 61 69 6c 73 02 00 14 67 61 74 65 30 36 5f 74 61 62 6c 61 6e 5f 62 63 75 65 75 5f 00 08 63 6c 69 65 6e 74 69 64 00 41 d8 3b b4 e4 00 00 00 00 00 09");
+    RTMPMsg *msg8 = rtmpserv.decodeMsgBody(hex8);
+//    msg4->dump();
+//    std::vector<amf::Element *> hell4 = msg4->getElements();
+    if ((msg8->getStatus() ==  RTMPMsg::NS_PLAY_STREAMNOTFOUND)
+        && (msg8->getMethodName() == "onStatus")
+        && (msg8->size() == 1)) {
+        runtest.pass("Encoded/Decoded RTMP onStatus(Play Stream Not Found)");
+    } else {
+        runtest.fail("Encoded/Decoded RTMP onStatus(Play Stream Not Found)");
+    }
+    delete hex8;
+    delete msg8;
+
+
+//.....onStatus.............level...status..code...NetStream.Play.Stop..description..%Stopped playing gate06_tablan_bcueu_...details....gate06_tablan_bcueu_..clientid.A.;.......reason......     
+    Buffer *hex9 = hex2mem("02 00 08 6f 6e 53 74 61 74 75 73 00 00 00 00 00 00 00 00 00 05 03 00 05 6c 65 76 65 6c 02 00 06 73 74 61 74 75 73 00 04 63 6f 64 65 02 00 13 4e 65 74 53 74 72 65 61 6d 2e 50 6c 61 79 2e 53 74 6f 70 00 0b 64 65 73 63 72 69 70 74 69 6f 6e 02 00 25 53 74 6f 70 70 65 64 20 70 6c 61 79 69 6e 67 20 67 61 74 65 30 36 5f 74 61 62 6c 61 6e 5f 62 63 75 65 75 5f 2e 00 07 64 65 74 61 69 6c 73 c4 02 00 14 67 61 74 65 30 36 5f 74 61 62 6c 61 6e 5f 62 63 75 65 75 5f 00 08 63 6c 69 65 6e 74 69 64 00 41 d8 3b b4 e4 00 00 00 00 06 72 65 61 73 6f 6e 02 00 00 00 00 09");
+    RTMPMsg *msg9 = rtmpserv.decodeMsgBody(hex9);
+//    msg4->dump();
+//    std::vector<amf::Element *> hell4 = msg4->getElements();
+    if ((msg9->getStatus() ==  RTMPMsg::NS_PLAY_STOP)
+        && (msg9->getMethodName() == "onStatus")
+        && (msg9->size() == 1)) {
+        runtest.pass("Encoded/Decoded RTMP onStatus(Play Stream Stop)");
+    } else {
+        runtest.fail("Encoded/Decoded RTMP onStatus(Play Stream Stop)");
+    }
+    delete hex9;
+    delete msg9;
+
     
 #if 0
-
-//    const char *x4 = "";
-    Buffer *hex4 = hex2mem("");
-    Buffer *buf4 = rtmpserv.encodeResult(RTMPMsg::NC_CONNECT_REJECTED);
-    if ((memcmp(hex4->reference(), buf4->reference(), buf4->size()) == 0)) {
-        runtest.pass("Encoded RTMP result(NC_CONNECT_REJECTED");
-    } else {
-        runtest.fail("Encoded RTMP result(NC_CONNECT_REJECTED)");
-    }
-    delete buf4;
-    
 //    const char *x5 = "";
     Buffer *hex5 = hex2mem("");
     Buffer *buf5 = rtmpserv.encodeResult(RTMPMsg::NC_CONNECT_APPSHUTDOWN);
@@ -896,24 +931,22 @@ main(int /*argc*/, char /* *argv[]*/)
 
 #endif
 
-// 03 00 00 04 00 01 1f 14 00 00 00 00 02 00 07 63   ...............c
-// 6f 6e 6e 65 63 74 00 3f f0 00 00 00 00 00 00 03   onnect.?........
-// 00 03 61 70 70 02 00 08 6f 66 6c 61 44 65 6d 6f   ..app...oflaDemo
-// 00 08 66 6c 61 73 68 56 65 72 02 00 0c 4c 4e 58   ..flashVer...LNX
-// 20 39 2c 30 2c 33 31 2c 30 00 06 73 77 66 55 72    9,0,31,0..swfUr
-// 6c 02 00 33 68 74 74 70 3a 2f 2f 6c 6f 63 61 6c   l..3http://local
-// 68 6f 73 74 2f 73 6f 66 74 77 61 72 65 2f 67 6e   host/software/gn
-// 61 73 68 2f 74 65 73 74 73 2f 6f 66 6c 61 5f 64   ash/tests/ofla_d
-// 65 6d 6f 2e 73 77 66 00 05 74 63 55 c3 72 6c 02   emo.swf..tcU.rl.
-// 00 19 72 74 6d 70 3a 2f 2f 6c 6f 63 61 6c 68 6f   ..rtmp://localho
-// 73 74 2f 6f 66 6c 61 44 65 6d 6f 00 04 66 70 61   st/oflaDemo..fpa
-// 64 01 00 00 0b 61 75 64 69 6f 43 6f 64 65 63 73   d....audioCodecs
-// 00 40 83 38 00 00 00 00 00 00 0b 76 69 64 65 6f   .@.8.......video
-// 43 6f 64 65 63 73 00 40 5f 00 00 00 00 00 00 00   Codecs.@_.......
-// 0d 76 69 64 65 6f 46 75 6e 63 74 69 6f 6e 00 3f   .videoFunction.?
-// f0 00 00 00 00 00 00 00 07 70 61 67 65 55 72 6c   .........pageUrl
-// 02 00 26 68 74 74 70 3a 2f 2f 6c 6f 63 c3 61 6c   ..&http://loc.al
-// 68 6f 73 74 2f 73 6f 66 74 77 61 72 65 2f 67 6e   host/software/gn
-// 61 73 68 2f 74 65 73 74 73 2f 00 00 09
-
     
+// T 193.2.4.161:1935 -> 192.168.1.103:34693 [AP]
+//   03 00 00 00 00 00 9e 14    00 00 00 00 02 00 06 5f    ..............._
+//   65 72 72 6f 72 00 3f f0    00 00 00 00 00 00 05 03    error.?.........
+//   00 05 6c 65 76 65 6c 02    00 05 65 72 72 6f 72 00    ..level...error.
+//   04 63 6f 64 65 02 00 1e    4e 65 74 43 6f 6e 6e 65    .code...NetConne
+//   63 74 69 6f 6e 2e 43 6f    6e 6e 65 63 74 2e 52 65    ction.Connect.Re
+//   6a 65 63 74 65 64 00 0b    64 65 73 63 72 69 70 74    jected..descript
+//   69 6f 6e 02 00 41 5b 20    53 65 72 76 65 72 2e 52    ion..A[ Server.R
+//   65 6a 65 63 74 20 5d 20    3a 20 56 69 72 74 75 61    eject ] : Virtua
+//   6c 20 68 6f 73 74 20 5f    64 65 66 61 c3 75 6c 74    l host _defa.ult
+//   56 48 6f 73 74 5f 20 69    73 20 6e 6f 74 20 61 76    VHost_ is not av
+//   61 69 6c 61 62 6c 65 2e    00 00 09                   ailable....     
+// #
+
+// T 193.2.4.161:1935 -> 192.168.1.103:34693 [AP]
+//   03 00 00 00 00 00 12 14    00 00 00 00 02 00 05 63    ...............c
+//   6c 6f 73 65 00 00 00 00    00 00 00 00 00 05          lose..........  
+// #
