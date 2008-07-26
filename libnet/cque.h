@@ -33,10 +33,9 @@
 namespace gnash
 {
 
-typedef std::deque<amf::Buffer *> Que;
-
 class CQue {
 public:
+    typedef std::deque<amf::Buffer *> que_t;
 #ifdef USE_STATS_QUEUE
     typedef struct {
 	struct timespec start;
@@ -82,7 +81,7 @@ private:
     // an optional name for the queue, only used for debugging messages to make them unique
     std::string _name;
     // The queue itself
-    Que _que;
+    que_t _que;
 
     // A condition variable used to signal the other thread when the que has data
     boost::condition	_cond;
