@@ -393,6 +393,7 @@ RTMPClient::clientFinish()
     int ret = 0;
     _handshake->clear();
     
+    sleep(1);			// FIXME: why do we still need a delay here, when readNet() does a select ?
     ret = readNet(_handshake->reference(), RTMP_BODY_SIZE);
     if (ret == RTMP_BODY_SIZE) {
         log_debug (_("Read first data block in handshake"));

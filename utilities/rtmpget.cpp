@@ -273,7 +273,7 @@ main(int argc, char *argv[])
 	streamID = hell[0]->to_number();
     } else {
 	log_error("Couldn't send NetStream::createStream message,");
-	exit(-1);
+//	exit(-1);
     }
     int id = int(streamID);
     log_debug("Stream ID returned from createStream is: %d", id);
@@ -292,7 +292,7 @@ main(int argc, char *argv[])
 	    log_debug("Sent NetStream::play message sucessfully.");
 	} else {
 	    log_error("Couldn't send NetStream::play message,");
-	    exit(-1);
+//	    exit(-1);
 	}
     }
 

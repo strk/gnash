@@ -640,7 +640,7 @@ RTMP::decodeMsgBody(Network::byte_t *data, size_t size)
 //     swapBytes(&swapped, amf::AMF0_NUMBER_SIZE);
     msg->setStreamID(swapped);
 
-    if ((msg->getMethodName() == "_result") || (msg->getMethodName() == "error") || (msg->getMethodName() == "onStatus")) {
+    if ((msg->getMethodName() == "_result") || (msg->getMethodName() == "_error") || (msg->getMethodName() == "onStatus")) {
  	status = true;
     }
     
@@ -858,55 +858,23 @@ RTMP::sendRecvMsg(int amf_index, rtmp_headersize_e head_size,
     Buffer *buf = 0;
     Network::byte_t *ptr = 0;
 
-#if 0
-    do {
-	buf = new Buffer;
-//	int left = 0;
-//	ret = readNet(buf->reference() + left, buf->size() - left, 5);	// timeout in 5 seconds
-	ret = readNet(buf, 1);	// timeout in 1 second
-// 	if (netDebug()) {
-// 	    buf->dump();
-// 	}
-	if (ret <= 0) {
-//	    log_error("Never got any data at line %d", __LINE__);
-	    break;
-	}
-	if ((ret == 1) && (*(buf->reference()) == 0xff)) {
-	    log_debug("Got an empty packet from the server for msg %s, at line %d",
-		      content_str[type], __LINE__);
-	    delete buf;
-	    continue;
-	}
-	buf->resize(ret);
-	incoming.push(buf);
-//	left += ret;
-    } while (ret > 0);
-    log_debug("Done reading network data");
-    
-    log_error("Processing %d buffers in the queue", incoming.size());
-    if (incoming.size() == 0) {
+
+    buf = recvMsg(1);	// use a 1 second timeout
+    if (buf == 0) {
 	return 0;
     }
-    while (incoming.size() > 0) {
-//	incoming.dump();
-	buf = incoming.pop();
-#else
-    do {
-	buf = recvMsg(1);
-#endif
-	if (buf == 0) {
-	    break;
-	}
-	ptr = buf->reference();
+    CQue *que = split(buf);
+    while (que->size()) {
+//	ptr = que->pop();
+	ptr = que[0].pop()->reference();
+//	ptr = buf->reference();
 	rthead = decodeHeader(ptr);
 	
 	if (rthead) {
 	    if (rthead->head_size == 1) {
-		log_debug("Response header: %s", hexify(ptr,
-							7, false));
+		log_debug("Response header: %s", hexify(ptr, 7, false));
 	    } else {
-		log_debug("Response header: %s", hexify(ptr,
-							rthead->head_size, false));
+		log_debug("Response header: %s", hexify(ptr, rthead->head_size, false));
 	    }
 	    if (rthead->type <= RTMP::FLV_DATA) {
 		log_error("Processing message of type %s!", content_str[rthead->type]);
@@ -985,8 +953,11 @@ RTMP::sendRecvMsg(int amf_index, rtmp_headersize_e head_size,
 		  break;
 	    } // end of switch
 	}
+//   		if (_queues[rthead->channel] != 0) {
+//   		    _queues[rthead->channel].push(chunk);
+//   		}
 	ptr += rthead->head_size + rthead->bodysize;
-    } while (buf > 0);
+    };
     
     return msg;
 }
@@ -1095,9 +1066,10 @@ RTMP::split(Buffer *buf, size_t chunksize)
 	    if (totalsize <= (chunksize + RTMP_MAX_HEADER_SIZE)) {
 		Buffer *chunk = new Buffer(totalsize);
 		chunk->copy(ptr, totalsize);
-		chunk->dump();
+//		chunk->dump();
 //   		if (_queues[rthead->channel] != 0) {
-   		    _queues[rthead->channel].push(chunk);
+//   		    _queues[rthead->channel].push(chunk);
+   		    _queues[0].push(chunk);
 //   		}
 		ptr += totalsize;
 	    } else {
