@@ -758,6 +758,8 @@ AMF::extractAMF(Network::byte_t *in, Network::byte_t* tooFar)
 	  break;
       }
       case Element::MOVIECLIP_AMF0:
+	  log_debug("AMF0 MovieClip frame");
+	  break;
       case Element::NULL_AMF0:
       case Element::UNDEFINED_AMF0:
       case Element::REFERENCE_AMF0:
