@@ -104,10 +104,14 @@ public:
     gnash::Network::byte_t operator[](int x) { return *(_ptr + x); };
     gnash::Network::byte_t *at(int x) { return _ptr + x; };
 //    Buffer *hex2mem(const char *str);
+
+    // How much room is left in the buffer past the seek pointer. This is
+    // primarily used to see if the buffer is full populated with data.
+    size_t spaceLeft() { return (_nbytes - (_seekptr - _ptr)); };
     
     // debug stuff, not need for running Cygnal
     void dump();
-protected:
+  protected:
     void *init(size_t nbytes);
     gnash::Network::byte_t *_seekptr;
     gnash::Network::byte_t *_ptr;
