@@ -428,7 +428,7 @@ RTMPClient::clientFinish()
     }
 
     writeNet(_handshake->reference(), RTMP_BODY_SIZE);
-    
+
     return true;
 }
 
