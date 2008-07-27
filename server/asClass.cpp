@@ -29,7 +29,7 @@
 namespace gnash {
 #define STV(x) VM::get().getStringTable().value(x).c_str()
 
-asMethod::asMethod()
+asMethod::asMethod():mBody()
 {
 	//mArguments();
 	mMinArguments = 0;
@@ -145,7 +145,7 @@ asClass::addSlot(string_table::key name, asNamespace* ns, boost::uint32_t slotId
 	int flags = as_prop_flags::dontDelete;
 	if (isstatic)
 		flags |= as_prop_flags::staticProp;
-
+	log_debug("Before init_member.");
 	mPrototype->init_member(name, as_value(), flags, nsname, slotId);
 	return true;
 }

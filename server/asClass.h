@@ -27,6 +27,11 @@
 #include "Property.h"
 #include "as_function.h"
 
+#include "abc_block.h"
+
+
+
+
 namespace gnash {
 
 class as_function;
@@ -40,9 +45,13 @@ class asBoundValue;
 class asBoundAccessor;
 class ClassHierarchy;
 class Property;
-
 class asName;
 
+namespace abc_parsing{
+class abc_Trait;
+}
+
+using namespace abc_parsing;
 class asException
 {
 public:
@@ -330,6 +339,7 @@ private:
 
 	int mMinArguments;
 	int mMaxArguments;
+	boost::uint32_t mBodyLength;
 	bool mIsNative;
 	argumentList mArguments;
 	std::list<as_value> mOptionalArguments;
@@ -340,6 +350,11 @@ private:
 	bool addBinding(string_table::key name, asBinding b);
 
 public:
+
+	boost::uint32_t getBodyLength(){ return mBodyLength;}
+
+	void setBodyLength(boost::uint32_t length){ mBodyLength = length;}
+
 	as_function* getPrototype() { return mPrototype; }
 
 	asBinding* getBinding(string_table::key name);
@@ -467,6 +482,22 @@ public:
 	/// Note: This may be NULL, because we might have information about this
 	/// function but not actually have it yet.
 	as_function* getImplementation() { return mImplementation; }
+
+	void print_body(){
+		boost::uint8_t opcode;
+		printf("Method Body: ");
+		boost::uint32_t i;
+		for(i=0;i<mBodyLength;i++){
+			opcode = mBody->read_as3op();
+			printf("0x%X ",opcode);
+		}
+		printf("\n");
+		mBody->seekTo(0);
+	}
+
+	void print_static_constructor(){
+
+	}
 };
 
 /// A class to represent, abstractly, ActionScript prototypes.
@@ -565,7 +596,7 @@ public:
 	asMethod *getConstructor() { return mConstructor; }
 
 	void setStaticConstructor(asMethod *m) { mStaticConstructor = m; }
-
+	asMethod *getStaticConstructor(){return mStaticConstructor;}
 	void setSuper(asClass *p) { mSuper = p; }
 
 	/// Try to build an asClass object from just a prototype.
@@ -585,7 +616,7 @@ public:
 		mInterface(false), mName(0), mInterfaces(), mProtectedNs(NULL),
 		mSuper(NULL), mConstructor(NULL), mStaticConstructor(NULL),
 		mBindings(), mStaticBindings(), mDeclared(false), mInherited(false),
-		mSystem(false)
+		mSystem(false)/*,mTraits()*/
 	{/**/}
 
 
@@ -602,6 +633,8 @@ public:
 
 	asBinding* getGetBinding(as_value& v, asName& n);
 	asBinding* getSetBinding(as_value& v, asName& n);
+
+	std::vector<abc_Trait> mTraits;
 
 private:
 	as_object *mPrototype;

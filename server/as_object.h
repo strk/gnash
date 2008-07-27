@@ -166,6 +166,8 @@ public:
 	Property* findProperty(string_table::key name, string_table::key nsname,
 		as_object **owner = NULL);
 
+//	Property* findProperty(
+
 	/// \brief
 	/// Return a reference to the Virtual Machine that created
 	/// this object. 

@@ -26,6 +26,8 @@
 #include "asClass.h"
 #include "swf.h"
 
+#define LOG_DEBUG_AVM(fmt,...) log_debug("AVM2: " fmt, ## __VA_ARGS__);
+
 namespace gnash {
 
 class character;
@@ -201,7 +203,9 @@ public:
 		unsigned char stack_in, short stack_out)
 	{ immediateFunction(to_call, pthis, mIgnoreReturn, stack_in, stack_out); }
 
-void loadCodeStream(CodeStream* stream);
+	void initMachine(abc_block* pool_block,as_object* global);
+
+	void executeCodeblock(CodeStream* stream);
 
 	Machine(string_table &ST, ClassHierarchy *CH);
 
@@ -236,10 +240,48 @@ private:
 	void saveState();
 	void restoreState();
 
+	as_value get_register(int index){
+		LOG_DEBUG_AVM("Getting value at a register %d ",index);
+		return mFrame.value(index);
+	}
+
+	void push_stack(as_value object){
+		LOG_DEBUG_AVM("Pushing value onto stack.");
+		mStack.push(object);
+	}
+
+	as_value pop_stack(){
+		LOG_DEBUG_AVM("Poping value off the stack.");
+		return mStack.pop();
+	}
+
+	void push_scope_stack(as_value object){
+		LOG_DEBUG_AVM("Pushing value onto the scope stack.");
+		mAsValueScopeStack.push(object);
+	}
+	as_value get_scope_stack(boost::uint8_t depth){
+		LOG_DEBUG_AVM("Geting value from scope stack %u from the top.",depth | 0x0);
+		return as_value(mAsValueScopeStack.top(depth));
+	}
+	Property* find_property(asName multiname){
+		for(int i=0;i<mAsValueScopeStack.size();i++){
+			Property *p = mAsValueScopeStack.top(i).to_object()->findProperty(multiname.getGlobalName(),multiname.getNamespace()->getURI());
+			for(int j=0;j<1000;j++){
+				log_debug("Index:%d string: %s",j,mAsValueScopeStack.top(i).to_object()->asPropName(j));
+			}		
+			if(p){
+				LOG_DEBUG_AVM("Property found.");
+				return p;
+			}
+		}
+		throw GnashException("Cannot find property in scope stack");
+	}
+
 	SafeStack<as_value> mStack;
 	SafeStack<State> mStateStack;
 	SafeStack<Scope> mScopeStack;
 	SafeStack<as_value> mFrame;
+	SafeStack<as_value> mAsValueScopeStack;
 	CodeStream *mStream;
 
 	ClassHierarchy *mCH;

@@ -74,7 +74,6 @@ VM::init(movie_definition& movie, VirtualClock& clock)
 VM&
 VM::get()
 {
-	log_debug("In get.");
 	// Did you call VM::init ?
 	assert(_singleton.get());
 	return *_singleton;

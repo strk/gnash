@@ -35,12 +35,15 @@ public:
 	bool isQName() { return (mFlags & FLAG_QNAME) != 0; }
 	void setQName() { mFlags |= FLAG_QNAME; }
 
-	void setNamespace(asNamespace *ns) { mNamespace = ns; mPairName = 0; }
+	void setNamespace(asNamespace *ns) { mNamespace = ns; }
 	asNamespace* getNamespace() const { return mNamespace; }
 
-	string_table::key getName() const { return mName; }
-	void setName(string_table::key n) { mName = n; mPairName = 0; }
+	string_table::key getABCName() const { return mABCName; }
+	void setABCName(string_table::key n) { mABCName = n;}
 
+	string_table::key getGlobalName() const { return mGlobalName;}
+	void setGlobalName(string_table::key n) {mGlobalName = n;}
+	
 	void setAttr() { mFlags |= FLAG_ATTR; }
 
 	void fill(as_object*) {/*TODO*/}
@@ -72,12 +75,12 @@ public:
 	boost::uint8_t mFlags;
 	std::vector<asNamespace*> *mNamespaceSet;
 
-	asName() : mFlags(0), mNamespaceSet(NULL), mName(0), mPairName(0),
+	asName() : mFlags(0), mNamespaceSet(NULL), mABCName(0), mGlobalName(0),
 		mNamespace(NULL)
 	{/**/}
 private:
-	string_table::key mName;
-	string_table::key mPairName; // Pre-computed ns.name value
+	string_table::key mABCName;
+	string_table::key mGlobalName;
 	asNamespace* mNamespace;
 };
 

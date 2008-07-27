@@ -25,6 +25,7 @@
 #include "abc_block.h"
 #include "fn_call.h"
 
+//#define PRETEND
 namespace gnash {
 
 /// The type of exceptions thrown by ActionScript.
@@ -106,7 +107,9 @@ static inline asName pool_name(boost::uint32_t index, abc_block* pool)
 {
 	if (!pool)
 		throw ASException();
-	return pool->mMultinamePool.at(index);
+	asName multiname = pool->mMultinamePool.at(index);
+	LOG_DEBUG_AVM("Finding property id=%u name=%s flags=0x%X",index,pool->mStringPool[multiname.getABCName()],multiname.mFlags | 0x0);
+	return multiname;
 }
 
 /// ENSURE_NUMBER makes sure that the given argument is a number,
@@ -130,11 +133,15 @@ static inline asName pool_name(boost::uint32_t index, abc_block* pool)
 
 /// ENSURE_OBJECT will throw an exception if the argument isn't an
 /// object. It's a macro to match with the other ENSURE_ macros.
+#ifdef PRETEND
 #define ENSURE_OBJECT(vte)													\
 {																			\
 	if (!vte.is_object())													\
 		throw ASException();												\
 }												   /* end of ENSURE_OBJECT */
+#else
+#define ENSURE_OBJECT(vte)
+#endif
 
 /// ENSURE_STRING makes sure that the given argument is a string,
 /// calling the toString method if necessary -- it's a macro so that
@@ -254,6 +261,31 @@ static inline asName pool_name(boost::uint32_t index, abc_block* pool)
 	break;																	\
 }														  /* end of JUMPIF */
 
+#ifdef PRETEND
+#define GROW_STACK() log_debug("AVM2: Growing stack")
+#else
+#define GROW_STACK() mStack.grow(1)
+#endif
+
+
+
+#define PRINT_GET_REGISTER(index) log_debug("AVM2: Getting value of register %d",index)
+
+#ifdef PRETEND
+#define PUSH_STACK(value) value; log_debug("AVM2: Pushing value onto the stack.")
+#else
+#define PUSH_STACK(value) mStack.push(value)
+#endif
+
+
+
+#define PRINT_FIND_PROPERTY(asName_obj) \
+asNamespace* macro_ns = asName_obj.getNamespace(); \
+log_debug("AVM2: Find property id=%d name=%s flags=0x%X namespace=%s",asName_obj.getABCName(),mPoolObject->mStringPool[asName_obj.getABCName()],asName_obj.mFlags | 0x0,macro_ns ?mPoolObject->mStringPool[macro_ns->getURI()]:"NONE");
+
+#define DEBUG_NOT_COMPLETE() log_debug("AVM2: ***Debug statements not complete for opcode.***");
+
+
 void
 Machine::execute()
 {
@@ -266,11 +298,17 @@ Machine::execute()
 	if (1/*mIsAS3*/)
 	{
 	opcode = mStream->read_as3op();
-	log_debug("Machine executing opcode: %X",opcode | 0x0);
+	log_debug("AVM2: Executing opcode: %X",opcode | 0x0);
+//	continue;
 	switch ((opcode /*= mStream->read_as3op()*/)) // Assignment intentional
 	{
 	default:
+#ifdef PRETEND
+		log_debug("AVM2: Invalid opcode.");
+#else
 		throw ASException();
+#endif
+		break;
 	case 0:
 	{
 // This is not actually an opcode -- it occurs when the stream is
@@ -322,7 +360,7 @@ Machine::execute()
 		// If we don't have a super, throw.
 		if (!super)
 			throw ASReferenceError();
-		Property *b = super->findProperty(a.getName(), 
+		Property *b = super->findProperty(a.getABCName(), 
 			a.getNamespace()->getURI());
 		// The object is on the top already.
 		pushGet(super, mStack.top(0), b);
@@ -349,7 +387,7 @@ Machine::execute()
 		as_object* super = mStack.pop().to_object()->get_prototype().get();
 		if (!super)
 			throw ASReferenceError();
-		Property* b = super->findProperty(a.getName(), 
+		Property* b = super->findProperty(a.getABCName(), 
 			a.getNamespace()->getURI());
 		mStack.push(vobj);
 		pushSet(super, vobj, b);
@@ -664,8 +702,13 @@ Machine::execute()
 		}
 		break;
 	}
-/// 0x1C ABC_ACTION_PUSHWITH
 /// 0x30 ABC_ACTION_PUSHSCOPE
+	case SWF::ABC_ACTION_PUSHSCOPE:
+	{
+		push_scope_stack(pop_stack());
+		break;
+	}
+/// 0x1C ABC_ACTION_PUSHWITH
 /// Stack In:
 ///  scope -- a scope
 /// Stack Out:
@@ -701,12 +744,16 @@ Machine::execute()
 ///  shallower than the base's depth.
 	case SWF::ABC_ACTION_POPSCOPE:
 	{
+#ifdef PRETEND
+		DEBUG_NOT_COMPLETE();
+#else
 		Scope &s = mScopeStack.pop();
 		mScopeStack.setDownstop(s.mHeightAfterPop);
 		if (mScopeStack.empty())
 			mCurrentScope = NULL;
 		else
 			mCurrentScope = mScopeStack.top(0).mScope;
+#endif
 		break;
 	}
 /// 0x1E ABC_ACTION_NEXTNAME
@@ -1091,7 +1138,7 @@ Machine::execute()
 		as_object *super = mStack.top(argc).to_object()->get_super();
 		if (!super)
 			throw ASReferenceError();
-		Property *b = super->findProperty(a.getName(), 
+		Property *b = super->findProperty(a.getABCName(), 
 			a.getNamespace()->getURI());
 		if (!b)
 			throw ASReferenceError();
@@ -1127,7 +1174,7 @@ Machine::execute()
 		int shift = completeName(a, argc);
 		ENSURE_OBJECT(mStack.top(shift + argc));
 		as_object *obj = mStack.top(argc + shift).to_object().get();
-		Property *b = obj->findProperty(a.getName(), 
+		Property *b = obj->findProperty(a.getABCName(), 
 			a.getNamespace()->getURI());
 		if (!b)
 			throw ASReferenceError();
@@ -1163,10 +1210,14 @@ Machine::execute()
 /// Do: Return an undefined object up the callstack.
 	case SWF::ABC_ACTION_RETURNVOID:
 	{
+#ifdef PRETEND
+		log_debug("AVM2: returning void.");
+#else
 		// Slot the return.
 		*mGlobalReturn = as_value();
 		// And restore the previous state.
 		restoreState();
+#endif
 		break;
 	}
 /// 0x48 ABC_ACTION_RETURNVALUE
@@ -1305,12 +1356,17 @@ Machine::execute()
 	{
 		boost::uint32_t cid = mStream->read_V32();
 		asClass *c = pool_class(cid, mPoolObject);
+#ifdef PRETEND
+		log_debug("AVM2: Creating new class id=%u name=%s",c->getName(),mPoolObject->mStringPool[c->getName()]);
+		DEBUG_NOT_COMPLETE();
+#else
 		ENSURE_OBJECT(mStack.top(0));
 		as_object *obj = mStack.top(0).to_object().get();
 		as_function *func = c->getConstructor()->getPrototype();
 		// func is the constructor, obj is 'this' and also the return
 		// value, no arguments, no change in stack.
 		pushCall(func, obj, mStack.top(0), 0, 0);
+#endif
 		break;
 	}
 /// 0x59 ABC_ACTION_GETDESCENDANTS
@@ -1355,10 +1411,15 @@ Machine::execute()
 	case SWF::ABC_ACTION_FINDPROPSTRICT:
 	case SWF::ABC_ACTION_FINDPROPERTY:
 	{
+//		boost::uint32_t property_name = mStream->read_V32();
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
+#ifdef PRETEND
+		FIND_PROPERTY(a);
+		DEBUG_NOT_COMPLETE();
+#else
 		mStack.drop(completeName(a));
 		as_object *owner;
-		Property *b = mCurrentScope->findProperty(a.getName(), 
+		Property *b = mCurrentScope->findProperty(a.getABCName(), 
 			a.getNamespace()->getURI(), &owner);
 		if (!b)
 		{
@@ -1371,6 +1432,7 @@ Machine::execute()
 		{
 			mStack.push(owner);
 		}
+#endif
 		break;
 	}
 /// 0x5F ABC_ACTION_FINDDEF
@@ -1392,14 +1454,14 @@ Machine::execute()
 	case SWF::ABC_ACTION_GETLEX:
 	{
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
-		as_object *owner;
-		Property *b = mCurrentScope->findProperty(a.getName(),
-			a.getNamespace()->getURI(), &owner);
+	
+		Property *b = find_property(a);
+
 		if (!b)
 			throw ASException();
 
 		mStack.grow(1);
-		pushGet(owner, mStack.top(0), b);
+//		pushGet(owner, mStack.top(0), b);
 		break;
 	}
 /// 0x61 ABC_ACTION_SETPROPERTY
@@ -1482,8 +1544,7 @@ Machine::execute()
 	case SWF::ABC_ACTION_GETSCOPEOBJECT:
 	{
 		boost::uint8_t depth = mStream->read_u8();
-		mStack.grow(1);
-		mStack.top(0) = mScopeStack.top(depth).mScope;
+		push_stack(get_scope_stack(depth));
 		break;
 	}
 /// 0x66 ABC_ACTION_GETPROPERTY
@@ -1532,9 +1593,13 @@ Machine::execute()
 	case SWF::ABC_ACTION_INITPROPERTY:
 	{
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
+#ifdef PRETEND
+		log_debug("AVM2: Initializing property id=%u name=%s",a.getABCName(),mPoolObject->mStringPool[a.getABCName()]);
+#else
 		//as_value& v = mStack.pop();
 		mStack.drop(completeName(a));
 		//TODO: mStack.pop().to_object().setProperty(a, v, true); // true for init
+#endif
 		break;
 	}
 /// 0x6A ABC_ACTION_DELETEPROPERTY
@@ -1770,7 +1835,7 @@ Machine::execute()
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
 		mStack.drop(completeName(a));
 		// TODO: Might need some namespace stuff.
-		if (!mStack.top(0).conforms_to(a.getName()))
+		if (!mStack.top(0).conforms_to(a.getABCName()))
 			mStack.top(0).set_null();
 		break;
 	}
@@ -2126,7 +2191,7 @@ Machine::execute()
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
 		mStack.drop(completeName(a));
 		// TODO: Namespace stuff?
-		mStack.top(0).set_bool(mStack.top(0).conforms_to(a.getName()));
+		mStack.top(0).set_bool(mStack.top(0).conforms_to(a.getABCName()));
 	}
 /// 0xB3 ABC_ACTION_ISTYPELATE
 /// Stack In:
@@ -2230,12 +2295,13 @@ Machine::execute()
 	case SWF::ABC_ACTION_GETLOCAL2:
 	case SWF::ABC_ACTION_GETLOCAL3:
 	{
-		log_debug("Growing mStack by 1");
-		mStack.grow(1);
-		log_debug("DONE.");
-		log_debug("mFrame size: %u",mFrame.totalSize());
-		mStack.top(0) = mFrame.value(opcode - SWF::ABC_ACTION_GETLOCAL0);
-		log_debug("Done setting top value.");
+		//We shouldn't need to a call grow stack, because each function should now how big the stack will need to be and should allocate all the space, when it is loaded into the vm.
+//		GROW_STACK();
+//		mStack.grow(1);
+//		mStack.push() instead?
+
+		push_stack(get_register(opcode- SWF::ABC_ACTION_GETLOCAL0));
+//		mStack.top(0) = mFrame.value(opcode - SWF::ABC_ACTION_GETLOCAL0);
 		break;
 	}
 /// 0xD4 ABC_ACTION_SETLOCAL0
@@ -2334,7 +2400,7 @@ Machine::setMember(asClass *pDefinition, asName& name, as_value& instance,
 	return;
 	// TODO:
 #if 0
-	asBinding *pBinding = pDefinition->getBinding(name.getName());
+	asBinding *pBinding = pDefinition->getBinding(name.getABCName());
 
 	if (pBinding->isReadOnly())
 		throw ASReferenceError();
@@ -2507,14 +2573,40 @@ Machine::saveState()
 	s.mThis = mThis;
 }
 
-void Machine::loadCodeStream(CodeStream* stream)
+void Machine::initMachine(abc_block* pool_block,as_object* global)
 {
+	mPoolObject = pool_block;
+	log_debug("Getting entry script.");
+	asClass* start_script = pool_block->mScripts.back();
+	log_debug("Getting constructor.");
+	asMethod* method = start_script->getConstructor();
+
+//	mFrame.push(global);
+ 	int i;
+ 	for(i=0;i<start_script->mTraits.size();i++){
+ 		abc_Trait trait = start_script->mTraits[i];
+		asMethod* constructor = pool_block->mClasses[trait.mClassInfoIndex]->getStaticConstructor();
+ 		boost::uint8_t opcode;
+ 		log_debug("AVM2: TraitConstructor flags: 0x%X, class index=%u Code:",trait.mKind | 0x0,trait.mClassInfoIndex);
+		constructor->print_body();
+		//executeCodeblock(stream);		
+	}
+	log_debug("Loding code stream.");
+	mStream = method->getBody();
+	mFrame.push(as_value(global));
+	log_debug("Value type: %s",mFrame.top(0).typeOf());
+}
+
+void Machine::executeCodeblock(CodeStream* stream){
 	mStream = stream;
+	mFrame.push(NULL);
+	execute();
 }
 
 Machine::Machine(string_table &ST, ClassHierarchy *CH):mST(),mFrame()
 {
 	mCH = CH;
+//	mFrame.grow(4);
 //	mST = new string_table();
 //	mST = ST;
 }

@@ -29,6 +29,8 @@
 #include "asClass.h"
 #include "asName.h"
 
+#define LOG_DEBUG_ABC(fmt,...) log_parse("ABC Parser: " fmt, ## __VA_ARGS__);
+
 namespace gnash {
 	class SWFStream; // for read signature
 }
@@ -39,6 +41,8 @@ typedef std::vector<asNamespace *> abcNamespaceSet;
 
 class abc_block;
 class ClassHierarchy;
+class asMethod;
+class asClass;
 
 namespace abc_parsing {
 
@@ -180,6 +184,14 @@ public:
 	bool pool_value(boost::uint32_t index, boost::uint8_t type, as_value &v);
 
 	abc_block();
+
+private:
+	void check_multiname_name(boost::uint32_t name);
+
+	void check_multiname_namespace(boost::uint32_t ns);
+
+	void check_multiname_namespaceset(boost::uint32_t nsset);
+
 };
 
 } /* namespace gnash */

@@ -1630,12 +1630,13 @@ abc_loader(SWFStream* in, tag_type tag, movie_definition* /*m*/)
 		VM& vm = VM::get();
 		log_debug("getting machine.");
 		Machine *mach = vm.getMachine();
-		log_debug("Getting entry script.");
-		asClass* start_script = a.mScripts.back();
-		log_debug("Getting constructor.");
-		asMethod* method = start_script->getConstructor();
-		log_debug("Loding code stream.");
-		mach->loadCodeStream(method->getBody());
+		as_object* global = vm.getGlobal();
+//		log_debug("Getting entry script.");
+//		asClass* start_script = a.mScripts.back();
+//		log_debug("Getting constructor.");
+//		asMethod* method = start_script->getConstructor();
+//		log_debug("Loding code stream.");
+		mach->initMachine(&a,global);
 		log_debug("Executing machine...");
 		mach->execute();
 	}
