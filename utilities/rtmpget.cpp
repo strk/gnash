@@ -256,7 +256,7 @@ main(int argc, char *argv[])
 //	    exit(-1);
 	}
     }
-
+    
     // make the createStream for ID 3 encoded object
     log_debug("Sending NetStream::createStream message,");
     Buffer *buf3 = client.encodeStream(0x2);
@@ -318,7 +318,7 @@ main(int argc, char *argv[])
 	    
 	    msg2 = client.decodeMsgBody(buf.reference() + rthead->head_size, rthead->bodysize);
 	}
-    } while (count++ < 2);
+    } while (count++ < 4);
 #endif
     
 //     buf.clear();
