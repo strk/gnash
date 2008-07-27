@@ -75,6 +75,7 @@ typedef enum {
 class DSOEXPORT RTMP : public Network
 {
 public:
+    typedef std::deque<CQue *> queues_t;
     typedef enum {
 	RAW=0x0,
 	ADPCM=0x01,
@@ -287,9 +288,10 @@ public:
     // but RTMP uses a weird scheme of a standard header, and then every chunksize
     // bytes another 1 byte RTMP header. The header itself is not part of the byte
     // count.
-    CQue *split(amf::Buffer *buf);
-    CQue *split(amf::Buffer *buf, size_t chunksize);
+    queues_t *split(amf::Buffer *buf);
+    queues_t *split(amf::Buffer *buf, size_t chunksize);
 
+    CQue &operator[] (size_t x) { return _queues[x]; }
     void dump();
   protected:
     std::map<const char *, amf::Element *> _properties;
@@ -301,6 +303,7 @@ public:
     size_t	_chunksize;
     int		_timeout;
     CQue	_queues[MAX_AMF_INDEXES];
+    queues_t    _channels;
 };
 
 } // end of gnash namespace
