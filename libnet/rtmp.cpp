@@ -181,9 +181,11 @@ RTMP::RTMP()
 //    GNASH_REPORT_FUNCTION;
 //    _queues.resize(MAX_AMF_INDEXES);
 //    for (size_t i=0; i<MAX_AMF_INDEXES; i++) {
-//     for (size_t i=0; i<10; i++) {
-//  	_queues.push_back(new CQue);
-//     }
+    string name = "channel #";
+    for (size_t i=0; i<10; i++) {
+	name[9] = i+'0';
+  	_queues[i].setName(name.c_str());
+    }
 }
 
 RTMP::~RTMP()
@@ -863,10 +865,13 @@ RTMP::sendRecvMsg(int amf_index, rtmp_headersize_e head_size,
     if (buf == 0) {
 	return 0;
     }
-    CQue *que = split(buf);
+    RTMP::queues_t *que = split(buf);
+//    CQue *que = split(buf);
     while (que->size()) {
 //	ptr = que->pop();
-	ptr = que[0].pop()->reference();
+	cerr << "QUE SIZE: " << que->size() << endl;
+	ptr = que->front()->pop()->reference();
+	que->pop_front();
 //	ptr = buf->reference();
 	rthead = decodeHeader(ptr);
 	
@@ -882,11 +887,13 @@ RTMP::sendRecvMsg(int amf_index, rtmp_headersize_e head_size,
 	    
 	    switch (rthead->type) {
 	      case CHUNK_SIZE:
+		  log_debug("Got CHUNK_SIZE packet!!!");
 		  _chunksize = ntohl(*reinterpret_cast<boost::uint32_t *>(ptr + rthead->head_size));
 		  log_debug("Setting packet chunk size to %d.", _chunksize);
 //		  decodeChunkSize();
 		  break;
 	      case BYTES_READ:
+		  log_debug("Got Bytes Read packet!!!");
 //		  decodeBytesRead();
 		  break;
 	      case PING:
@@ -912,15 +919,35 @@ RTMP::sendRecvMsg(int amf_index, rtmp_headersize_e head_size,
 		  break;
 	      }
 	      case SERVER:
+	      {
+		  log_debug("Got SERVER packet!!!");
+		  Buffer server_data(rthead->bodysize);
+		  server_data.copy(ptr + rthead->head_size, rthead->bodysize);
 //		  decodeServer();
 		  break;
+	      }
 	      case CLIENT:
+	      {
+		  log_debug("Got CLIENT packet!!!");
+		  Buffer client_data(rthead->bodysize);
+		  client_data.copy(ptr + rthead->head_size, rthead->bodysize);
 //		  decodeClient();
 		  break;
+	      }
 	      case VIDEO_DATA:
+	      {
 		  log_debug("Got VIDEO packets!!!");
-//		  decodeVideoData();
+		  Buffer *frame = 0;
+		  do {
+		      frame = recvMsg(1);	// use a 1 second timeout
+		      if (frame) {
+			  _queues[rthead->channel].push(frame);
+		      }
+//		      decodeVideoData();
+		  } while (frame);
+		  _queues->dump();
 		  break;
+	      }
 	      case NOTIFY:
 //		  decodeNotify();
 		  break;
@@ -933,7 +960,8 @@ RTMP::sendRecvMsg(int amf_index, rtmp_headersize_e head_size,
 //		  msg->dump();
 		  if (msg) {
 		      log_debug("%s: Msg status is: %d: %s, name is %s, size is %d", __FUNCTION__,
-				msg->getStatus(), status_str[msg->getStatus()], msg->getMethodName(), msg->size());
+				msg->getStatus(), status_str[msg->getStatus()],
+				msg->getMethodName(), msg->size());
 		      if (msg->getMethodName() == "onBWDone") {	
 			  log_debug("Got onBWDone packet!!!");
 			  continue;
@@ -1000,9 +1028,9 @@ RTMP::recvMsg(int timeout)
 	nopacket = false;
     }
     buf->resize(ret);
-    if (netDebug()) {
-	buf->dump();
-    }
+//     if (netDebug()) {
+// 	buf->dump();
+//     }
     
     return buf;
 }
@@ -1013,34 +1041,41 @@ RTMP::recvMsg(int timeout)
 // but RTMP uses a weird scheme of a standard header, and then every chunksize
 // bytes another 1 byte RTMP header. The header itself is not part of the byte
 // count.
-CQue *
+RTMP::queues_t *
 RTMP::split(Buffer *buf)
 {
     return split(buf, _chunksize);
 }
 
-CQue *
+RTMP::queues_t *
 RTMP::split(Buffer *buf, size_t chunksize)
 {
     GNASH_REPORT_FUNCTION;
 
     if (buf == 0) {
 	log_error("Buffer pointer is invalid.");
-	return 0;
     }
     
     // split the buffer at the chunksize boundary
     Network::byte_t *ptr = 0;
     rtmp_head_t *rthead = 0;
     size_t totalsize = 0;
+    size_t nbytes = 0;
     vector<size_t> bodysizes(MAX_AMF_INDEXES);
     
     ptr = buf->reference();
 //    Que *que = new Que;
+    Buffer *chunk = 0;
     while ((ptr - buf->reference()) < buf->size()) {
 	rthead = decodeHeader(ptr);
 	if ((rthead->head_size > 1)) {
 	    bodysizes[rthead->channel] = rthead->bodysize;
+	    _channels.push_back(&_queues[rthead->channel]);
+	    cerr << "New packet for channel #" << rthead->channel << " of size "
+		 << (rthead->head_size + rthead->bodysize) << endl;
+	    chunk = new Buffer(rthead->bodysize + rthead->head_size);
+	    chunk->clear();	// FIXME: temporary debug only
+	    _queues[rthead->channel].push(chunk);
 	}
 	if (rthead->head_size <= RTMP_MAX_HEADER_SIZE) {
 	    // Many RTMP messages are smaller than the chunksize
@@ -1064,12 +1099,32 @@ RTMP::split(Buffer *buf, size_t chunksize)
 	    }
 	    // Range check the size of the packet
 	    if (totalsize <= (chunksize + RTMP_MAX_HEADER_SIZE)) {
-		Buffer *chunk = new Buffer(totalsize);
-		chunk->copy(ptr, totalsize);
-//		chunk->dump();
+		nbytes += totalsize;
+//		Buffer *chunk = new Buffer(totalsize);
+		// Skip the header for all but the first packet. The rest are just to
+		// complete all the data up to the body size from the header.
+		cerr << _queues[rthead->channel].size() << " messages in queue for channel "
+		     << rthead->channel << endl;
+		Buffer *current = _queues[rthead->channel].peek();
+		if (rthead->head_size > 1) {
+//		if (current->spaceLeft() >= current->size()) {
+		    cerr << "FIRST PACKET!" << " for channel " << rthead->channel << endl;
+		} else {
+		    cerr << "FOLLOWING PACKET!" << " for channel " << rthead->channel << endl;
+		    cerr << "Space Left in buffer for channel " << rthead->channel << " is: "
+			 << current->spaceLeft() << endl;
+		    ptr += rthead->head_size;
+		}
+		current->append(ptr, totalsize);
+//		chunk->append(ptr, totalsize);
+		current->dump();
 //   		if (_queues[rthead->channel] != 0) {
-//   		    _queues[rthead->channel].push(chunk);
-   		    _queues[0].push(chunk);
+		cerr << "Adding data to existing packet for channel #" << rthead->channel
+		     << ", read " << nbytes << " bytes." << endl;
+		// If there is no space left, then we've read in the whole packet
+//		if (chunk->spaceLeft() == 0) {
+//		    _queues[rthead->channel].push(chunk);
+//		}
 //   		}
 		ptr += totalsize;
 	    } else {
@@ -1082,7 +1137,7 @@ RTMP::split(Buffer *buf, size_t chunksize)
 	}
     }
 
-    return &_queues[0];
+    return &_channels;
 }
 
 
