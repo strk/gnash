@@ -77,6 +77,7 @@ public:
     que_stats_t *stats() { return &_stats; };
 #endif
     void setName(const std::string &str) { _name = str; }
+    const std::string &getName() { return _name; }
 private:
     // an optional name for the queue, only used for debugging messages to make them unique
     std::string _name;
