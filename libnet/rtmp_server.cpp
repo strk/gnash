@@ -488,6 +488,9 @@ RTMPServer::encodeResult(double sid, RTMPMsg::rtmp_status_e status,
 	  level->makeString("level", "status");
 	  string tmp = "Playing and resetting ";
 	  tmp += filename;
+	  // For some silly reason, the description field, which
+	  // otherwise is idential to the details field, (often a
+	  // filename) has a period appended on it.
 	  tmp += '.';
 	  description->makeString("description", tmp);
 	  code->makeString("code", "NetStream.Play.Reset");

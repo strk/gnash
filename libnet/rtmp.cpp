@@ -245,15 +245,15 @@ RTMP::decodeHeader(Buffer *buf)
 RTMP::rtmp_head_t *
 RTMP::decodeHeader(Network::byte_t *in)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
     Network::byte_t *tmpptr = in;
     
     _header.channel = *tmpptr & RTMP_INDEX_MASK;
-    log_debug (_("The AMF channel index is %d"), _header.channel);
+//     log_debug (_("The AMF channel index is %d"), _header.channel);
     
     _header.head_size = headerSize(*tmpptr++);
-    log_debug (_("The header size is %d"), _header.head_size);
+//    log_debug (_("The header size is %d"), _header.head_size);
 
     if (_header.head_size == 1) {
         _header.bodysize = sizeof(boost::uint16_t) * 2;
@@ -264,7 +264,7 @@ RTMP::decodeHeader(Network::byte_t *in)
         _mystery_word = (_mystery_word << 12) + *tmpptr++;
         _mystery_word = (_mystery_word << 8) + *tmpptr++;
 
-        log_debug(_("The mystery word is: %d"), _mystery_word);
+//        log_debug(_("The mystery word is: %d"), _mystery_word);
     }
 
     if (_header.head_size >= 8) {
@@ -272,44 +272,28 @@ RTMP::decodeHeader(Network::byte_t *in)
         _header.bodysize = (_header.bodysize << 12) + *tmpptr++;
         _header.bodysize = (_header.bodysize << 8) + *tmpptr++;
         _header.bodysize = _header.bodysize & 0xffffff;
-        log_debug(_("The body size is: %d"), _header.bodysize);
+//        log_debug(_("The body size is: %d"), _header.bodysize);
     }
 
     if (_header.head_size >= 8) {
 	Network::byte_t byte = *tmpptr;
         _header.type = (content_types_e)byte;
         tmpptr++;
-	if (_header.type <= RTMP::INVOKE ) {
-	    log_debug(_("The type is: %s"), content_str[_header.type]);
-	} else {
-	    log_debug(_("The type is: 0x%x"), _header.type);
-	}
     }
 
-//     switch(_header.type) {
-//       case CHUNK_SIZE:
-//       case BYTES_READ:
-//       case PING:
-//       case SERVER:
-//       case CLIENT:
-//       case VIDEO_DATA:
-//       case NOTIFY:
-//       case SHARED_OBJ:
-//       case INVOKE:
-//           _packet_size = RTMP_VIDEO_PACKET_SIZE;
-//           break;
-//       case AUDIO_DATA:
-//           _packet_size = RTMP_AUDIO_PACKET_SIZE;
-//           break;
-//       default:
-//           log_error (_("ERROR: Unidentified AMF header data type 0x%x"), _type);
-//           break;
-//     };
-    
+    if (_header.type <= RTMP::INVOKE ) {
+	log_debug("Channel: %d, Header size: %d, Body size: %d, type: %s",
+		  _header.channel, _header.head_size, _header.bodysize,
+		  content_str[_header.type]);
+    } else {
+	log_debug("Channel: %d, Header size: %d, Body size: %d, type: %d (unkown)",
+		  _header.channel, _header.head_size, _header.bodysize,
+		  _header.type);
+    }
     if (_header.head_size == 12) {
         _header.src_dest = *(reinterpret_cast<RTMPMsg::rtmp_source_e *>(tmpptr));
         tmpptr += sizeof(unsigned int);
-        log_debug(_("The source/destination is: %x"), _header.src_dest);
+//        log_debug(_("The source/destination is: %x"), _header.src_dest);
     }
 
     return &_header;
@@ -1071,8 +1055,8 @@ RTMP::split(Buffer *buf, size_t chunksize)
 	if ((rthead->head_size > 1)) {
 	    bodysizes[rthead->channel] = rthead->bodysize;
 	    _channels.push_back(&_queues[rthead->channel]);
-	    cerr << "New packet for channel #" << rthead->channel << " of size "
-		 << (rthead->head_size + rthead->bodysize) << endl;
+// 	    cerr << "New packet for channel #" << rthead->channel << " of size "
+// 		 << (rthead->head_size + rthead->bodysize) << endl;
 	    chunk = new Buffer(rthead->bodysize + rthead->head_size);
 	    chunk->clear();	// FIXME: temporary debug only
 	    _queues[rthead->channel].push(chunk);
@@ -1104,30 +1088,25 @@ RTMP::split(Buffer *buf, size_t chunksize)
 //		Buffer *chunk = new Buffer(totalsize);
 		// Skip the header for all but the first packet. The rest are just to
 		// complete all the data up to the body size from the header.
-		cerr << _queues[rthead->channel].size() << " messages in queue for channel "
-		     << rthead->channel << endl;
+// 		cerr << _queues[rthead->channel].size() << " messages in queue for channel "
+// 		     << rthead->channel << endl;
 		Buffer *current = _queues[rthead->channel].peek();
 		if (rthead->head_size > 1) {
 //		if (current->spaceLeft() >= current->size()) {
-		    cerr << "FIRST PACKET!" << " for channel " << rthead->channel << endl;
+//		    cerr << "FIRST PACKET!" << " for channel " << rthead->channel << endl;
 		} else {
-		    cerr << "FOLLOWING PACKET!" << " for channel " << rthead->channel << endl;
-		    cerr << "Space Left in buffer for channel " << rthead->channel << " is: "
-			 << current->spaceLeft() << endl;
+// 		    cerr << "FOLLOWING PACKET!" << " for channel " << rthead->channel << endl;
+// 		    cerr << "Space Left in buffer for channel " << rthead->channel << " is: "
+// 			 << current->spaceLeft() << endl;
 		    ptr += rthead->head_size;
 		    totalsize -= 1;
 		}
 		current->append(ptr, totalsize);
-//		chunk->append(ptr, totalsize);
 		current->dump();
 //   		if (_queues[rthead->channel] != 0) {
-		cerr << "Adding data to existing packet for channel #" << rthead->channel
-		     << ", read " << totalsize << " bytes." << endl;
+// 		cerr << "Adding data to existing packet for channel #" << rthead->channel
+// 		     << ", read " << totalsize << " bytes." << endl;
 		// If there is no space left, then we've read in the whole packet
-//		if (chunk->spaceLeft() == 0) {
-//		    _queues[rthead->channel].push(chunk);
-//		}
-//   		}
 		ptr += totalsize;
 	    } else {
 		log_error("RTMP packet size is out of range! %d", totalsize);
