@@ -1584,7 +1584,8 @@ as_array_object::shiftElementsLeft(unsigned int count)
 
     if ( count >= v.size() )
     {
-        v.clear();
+	// NOTE: v.clear() would NOT set size to 0 !!
+        v.resize(0);
         return;
     }
 
