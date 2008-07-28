@@ -93,7 +93,7 @@ CQue::size()
 bool
 CQue::push(amf::Buffer *data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     boost::mutex::scoped_lock lock(_mutex);
     _que.push_back(data);
 #ifdef USE_STATS_QUEUE
@@ -197,6 +197,8 @@ CQue::remove(amf::Buffer *element)
 amf::Buffer *
 CQue::merge(amf::Buffer *start)
 {
+    GNASH_REPORT_FUNCTION;
+
     // Find iterator to first element to merge
     que_t::iterator from = std::find(_que.begin(), _que.end(), start); 
     if (from == _que.end()) {

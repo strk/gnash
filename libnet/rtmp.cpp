@@ -929,7 +929,7 @@ RTMP::sendRecvMsg(int amf_index, rtmp_headersize_e head_size,
 		      }
 //		      decodeVideoData();
 		  } while (frame);
-		  _queues->dump();
+//		  _queues->dump();
 		  break;
 	      }
 	      case NOTIFY:
@@ -1048,15 +1048,14 @@ RTMP::split(Buffer *buf, size_t chunksize)
     vector<size_t> bodysizes(MAX_AMF_INDEXES);
     
     ptr = buf->reference();
-//    Que *que = new Que;
     Buffer *chunk = 0;
     while ((ptr - buf->reference()) < buf->size()) {
 	rthead = decodeHeader(ptr);
 	if ((rthead->head_size > 1)) {
 	    bodysizes[rthead->channel] = rthead->bodysize;
 	    _channels.push_back(&_queues[rthead->channel]);
-// 	    cerr << "New packet for channel #" << rthead->channel << " of size "
-// 		 << (rthead->head_size + rthead->bodysize) << endl;
+//  	    cerr << "New packet for channel #" << rthead->channel << " of size "
+//  		 << (rthead->head_size + rthead->bodysize) << endl;
 	    chunk = new Buffer(rthead->bodysize + rthead->head_size);
 	    chunk->clear();	// FIXME: temporary debug only
 	    _queues[rthead->channel].push(chunk);
@@ -1072,41 +1071,39 @@ RTMP::split(Buffer *buf, size_t chunksize)
 		} else {
 		    totalsize = rthead->head_size +
 			(bodysizes[rthead->channel] - totalsize);
-		    bodysizes[rthead->channel] = 0;
+//		    bodysizes[rthead->channel] = 0;
 		}
 	    } else { // this RTMP message is larger than the chunksize
 		if (rthead->head_size > 1) {
 		    totalsize = rthead->head_size + chunksize;
 		} else {
 		    totalsize = rthead->head_size + (bodysizes[rthead->channel] - chunksize);
-		    bodysizes[rthead->channel] = 0;
+//		    bodysizes[rthead->channel] = 0;
 		}
 	    }
 	    // Range check the size of the packet
 	    if (totalsize <= (chunksize + RTMP_MAX_HEADER_SIZE)) {
 		nbytes += totalsize;
-//		Buffer *chunk = new Buffer(totalsize);
 		// Skip the header for all but the first packet. The rest are just to
 		// complete all the data up to the body size from the header.
-// 		cerr << _queues[rthead->channel].size() << " messages in queue for channel "
-// 		     << rthead->channel << endl;
+//   		cerr << _queues[rthead->channel].size()
+// 		     << " messages in queue for channel "
+//   		     << rthead->channel << endl;
 		Buffer *current = _queues[rthead->channel].peek();
-		if (rthead->head_size > 1) {
-//		if (current->spaceLeft() >= current->size()) {
-//		    cerr << "FIRST PACKET!" << " for channel " << rthead->channel << endl;
-		} else {
-// 		    cerr << "FOLLOWING PACKET!" << " for channel " << rthead->channel << endl;
-// 		    cerr << "Space Left in buffer for channel " << rthead->channel << " is: "
-// 			 << current->spaceLeft() << endl;
+		// As the pointer to the buffer is already stored
+		// when it's allocated, we just append the current
+		// buffer to the existing one.
+		if (rthead->head_size == 1) {
 		    ptr += rthead->head_size;
-		    totalsize -= 1;
+		    current->append(ptr, totalsize - 1);
+		} else {
+		    current->copy(ptr, totalsize);
 		}
-		current->append(ptr, totalsize);
-		current->dump();
 //   		if (_queues[rthead->channel] != 0) {
-// 		cerr << "Adding data to existing packet for channel #" << rthead->channel
-// 		     << ", read " << totalsize << " bytes." << endl;
+//  		cerr << "Adding data to existing packet for channel #" << rthead->channel
+//  		     << ", read " << totalsize << " bytes." << endl;
 		// If there is no space left, then we've read in the whole packet
+		current->dump();
 		ptr += totalsize;
 	    } else {
 		log_error("RTMP packet size is out of range! %d", totalsize);

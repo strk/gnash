@@ -80,9 +80,9 @@ public:
     const std::string &getName() { return _name; }
 private:
     // an optional name for the queue, only used for debugging messages to make them unique
-    std::string _name;
+    std::string		_name;
     // The queue itself
-    que_t _que;
+    que_t		_que;
 
     // A condition variable used to signal the other thread when the que has data
     boost::condition	_cond;

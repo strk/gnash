@@ -191,6 +191,9 @@ test_split()
     RTMP::rtmp_head_t *rthead = 0;
     CQue *que;
 
+    // Test a buffer that contains two packets for the same channel and
+    // the same message body. This should result in a single RTMP
+    // message.
     Buffer *buf1 = hex2mem("04 00 00 00 00 00 b8 14 01 00 00 00 02 00 08 6f 6e 53 74 61 74 75 73 00 00 00 00 00 00 00 00 00 05 03 00 05 6c 65 76 65 6c 02 00 06 73 74 61 74 75 73 00 04 63 6f 64 65 02 00 14 4e 65 74 53 74 72 65 61 6d 2e 50 6c 61 79 2e 52 65 73 65 74 00 0b 64 65 73 63 72 69 70 74 69 6f 6e 02 00 2d 50 6c 61 79 69 6e 67 20 61 6e 64 20 72 65 73 65 74 74 69 6e 67 20 67 61 74 65 30 36 5f 74 61 62 6c 61 6e 5f 62 63 75 65 75 5f 30 31 2e c4 00 07 64 65 74 61 69 6c 73 02 00 16 67 61 74 65 30 36 5f 74 61 62 6c 61 6e 5f 62 63 75 65 75 5f 30 31 00 08 63 6c 69 65 6e 74 69 64 00 41 bf e4 78 30 00 00 00 00 00 09");
     RTMP::queues_t *queues1 = client.split(buf1, 128);
     if (queues1->size() == 0) {
@@ -208,8 +211,6 @@ test_split()
         }
     }
 
-//     Buffer *tmpbuf = que1.front();
-//     que1.pop_front();
     Buffer *tmpbuf = 0;
     if (notest) {
         runtest.untested("RTMP::split(1st packet header) of 2");
@@ -225,114 +226,100 @@ test_split()
             notest = true;
         }
     }
-#if 0
-//    tmpbuf = client[4].pop();
-    if (notest) {
-        runtest.untested("RTMP::split(2nd packet header) of 2");
+
+    if ((queues1->size() == 0) && (client[4].size() == 0)) {
+        runtest.pass("RTMP::split() 1st queue empty");
     } else {
-        que = queues1->front();
-        cerr << "QUE1: " << que->getName() << " size is: " << que->size()  << endl;
-        tmpbuf = que->pop();
-//        tmpbuf->dump();
-//        queues1->pop_front();
-          if (*tmpbuf->reference() == 0xc4) {
-            runtest.pass("RTMP::split(2nd packet header) of 2");
-        } else {
-            runtest.fail("RTMP::split(2nd packet header) of 2");
-            notest = true;
-        }
-    }    
-#endif
-    client[4].clear();
+        runtest.fail("RTMP::split() 1st queue empty" );
+    }
     
+
+    // Test a bigger buffer with more messages in it.
+    // This one is a ChunkSize->Ping->Invoke->Ping
     Buffer *buf2 = hex2mem("02 00 00 00 00 00 04 01 00 00 00 00 00 00 00 80 02 00 00 00 00 00 06 04 00 00 00 00 00 04 00 00 00 01 04 00 00 00 00 00 b8 14 01 00 00 00 02 00 08 6f 6e 53 74 61 74 75 73 00 00 00 00 00 00 00 00 00 05 03 00 05 6c 65 76 65 6c 02 00 06 73 74 61 74 75 73 00 04 63 6f 64 65 02 00 14 4e 65 74 53 74 72 65 61 6d 2e 50 6c 61 79 2e 52 65 73 65 74 00 0b 64 65 73 63 72 69 70 74 69 6f 6e 02 00 2d 50 6c 61 79 69 6e 67 20 61 6e 64 20 72 65 73 65 74 74 69 6e 67 20 67 61 74 65 30 36 5f 74 61 62 6c 61 6e 5f 62 63 75 65 75 5f 30 31 2e 02 00 00 00 00 00 06 04 00 00 00 00 00 00 00 00 00 01 c4 00 07 64 65 74 61 69 6c 73 02 00 16 67 61 74 65 30 36 5f 74 61 62 6c 61 6e 5f 62 63 75 65 75 5f 30 31 00 08 63 6c 69 65 6e 74 69 64 00 41 d8 fb 78 56 00 00 00 00 00 09");
     RTMP::queues_t *queues2 = client.split(buf2, 128);
     if (queues2->size() == 0) {
         notest = true;
     }    
     if (notest) {
-        runtest.fail("RTMP::split(5 packets)");
+        runtest.fail("RTMP::split(5 packets into 4)");
     } else {
         if (queues2->size() == 4) {
-            runtest.pass("RTMP::split(5 packets)");
+            runtest.pass("RTMP::split(5 packets into 4)");
             notest = false;
         } else {
-            runtest.fail("RTMP::split(5 packets)");
+            runtest.fail("RTMP::split(5 packets into 4)");
         }
     }
     
     if (notest) {
-        runtest.untested("RTMP::split(1st packet header of 5)");
+        runtest.untested("RTMP::split(1st packet header of 4)");
     } else {
         que = queues2->front();
         tmpbuf = que->pop();
-//        tmpbuf->dump();
         queues2->pop_front();
-        if (*tmpbuf->reference() == 0x2) {
-            runtest.pass("RTMP::split(1st packet header) of 5");
+        rthead = client.decodeHeader(tmpbuf);
+        if ((*tmpbuf->reference() == 0x2) && (rthead->type <= RTMP::CHUNK_SIZE)) {
+            runtest.pass("RTMP::split(1st packet header) of 4");
         } else {
-            runtest.fail("RTMP::split(1st packet header) of 5");
+            runtest.fail("RTMP::split(1st packet header) of 4");
+            tmpbuf->dump();
         }
     }
+    
     if (notest) {
-        runtest.untested("RTMP::split(2nd packet header) of 5");
+        runtest.untested("RTMP::split(2nd packet header) of 4");
     } else {
         que = queues2->front();
         tmpbuf = que->pop();
-//        tmpbuf->dump();
         queues2->pop_front();
-        if (*tmpbuf->reference() == 0x2) {
-            runtest.pass("RTMP::split(2nd packet header) of 5");
+        rthead = client.decodeHeader(tmpbuf);
+        if ((*tmpbuf->reference() == 0x2) && (rthead->type <= RTMP::PING)) {
+            runtest.pass("RTMP::split(2nd packet header) of 4");
         } else {
-            runtest.fail("RTMP::split(2nd packet header) of 5");
+            runtest.fail("RTMP::split(2nd packet header) of 4");
+            tmpbuf->dump();
         }
     }
 
     if (notest) {
-        runtest.untested("RTMP::split(3rd packet header) of 5");
+        runtest.untested("RTMP::split(3rd packet header) of 4");
     } else {
         que = queues2->front();
         tmpbuf = que->pop();
-//        tmpbuf->dump();
         queues2->pop_front();
-        if (*tmpbuf->reference() == 0x04) {
-            runtest.pass("RTMP::split(3rd packet header) of 5");
+        rthead = client.decodeHeader(tmpbuf);
+        if ((*tmpbuf->reference() == 04) && (rthead->type <= RTMP::INVOKE)) {
+            runtest.pass("RTMP::split(3rd packet header) of 4");
         } else {
-            runtest.fail("RTMP::split(3rd packet header) of 5");
+            runtest.fail("RTMP::split(3rd packet header) of 4");
+            tmpbuf->dump();
+        }
+    }
+    
+    if (notest) {
+        runtest.untested("RTMP::split(4th packet header) of 4");
+    } else {
+        que = queues2->front();
+        tmpbuf = que->pop();
+        queues2->pop_front();
+        rthead = client.decodeHeader(tmpbuf);
+        if ((*tmpbuf->reference() == 0x2) && (rthead->type <= RTMP::PING)) {
+            runtest.pass("RTMP::split(4th packet header) of 4");
+        } else {
+            runtest.fail("RTMP::split(4th packet header) of 4");
+            tmpbuf->dump();
         }
     }
 
-    queues2->pop_front();
+    if ((queues2->size() == 0) && (client[2].size() == 0)
+        && (client[4].size() == 0)) {
+        runtest.pass("RTMP::split() 2nd queue empty");
+    } else {
+        runtest.fail("RTMP::split() 2nd queue empty" );
+    }
+
 #if 0
-    if (notest) {
-        runtest.untested("RTMP::split(4th packet header) of 5");
-    } else {
-        que = queues2->front();
-        cerr << "QUE: " << que->getName() << " size is: " << que->size() << endl;
-        tmpbuf = que->pop();
-        queues2->pop_front();
-        if (*tmpbuf->reference() == 0x02) {
-            runtest.pass("RTMP::split(4th packet header) of 5");
-        } else {
-            runtest.fail("RTMP::split(4th packet header) of 5");
-        }
-    }
-
-    if (notest) {
-        runtest.untested("RTMP::split(5th packet header) of 5");
-    } else {
-        que = queues2->front();
-        cerr << "QUE: " << que->getName() << " size is: " << que->size() << endl;
-        tmpbuf = que->pop();
-        queues2->pop_front();
-        if (*tmpbuf->reference() == 0x04) {
-            runtest.pass("RTMP::split(5th packet header) of 5");
-        } else {
-            runtest.fail("RTMP::split(5th packet header) of 5");
-        }
-    }
-#endif
-    
     // Try a much more complex packet, similar to the previous one, but with more intermixed packets
     // for other channels.
 //    ...............onStatus.............level...status..code...NetStream.Play.Start..description..'Started playing gate06_tablan_bcueu_01...clie......'.......xF....?j.....@....?..O.]...............................;...../..rP.....K.......m......,......%......................B........M.<.$.....`.......i..9..C..J..........%..........G....2Np.".1`@................;.ntid.A..xV.....
@@ -357,13 +344,13 @@ test_split()
     } else {
         que = queues3->front();
         tmpbuf = que->pop();
-//        tmpbuf->dump();
         queues3->pop_front();
         rthead = client.decodeHeader(tmpbuf);
         if ((*tmpbuf->reference() == 0x05)  && (rthead->type <= RTMP::INVOKE)) {
             runtest.pass("RTMP::split(1st packet header) of 6");
         } else {
             runtest.fail("RTMP::split(1st packet header) of 6");
+            tmpbuf->dump();
         }
     }
     
@@ -372,13 +359,13 @@ test_split()
     } else {
         que = queues3->front();
         tmpbuf = que->pop();
-//        tmpbuf->dump();
         queues3->pop_front();
         rthead = client.decodeHeader(tmpbuf);
         if ((*tmpbuf->reference() == 0x07)  && (rthead->type <= RTMP::VIDEO_DATA)) {
             runtest.pass("RTMP::split(2nd packet header) of 6");
         } else {
             runtest.fail("RTMP::split(2nd packet header) of 6");
+            tmpbuf->dump();
         }
     }
 
@@ -387,13 +374,13 @@ test_split()
     } else {
         que = queues3->front();
         tmpbuf = que->pop();
-//        tmpbuf->dump();
         queues3->pop_front();
         rthead = client.decodeHeader(tmpbuf);
         if ((*tmpbuf->reference() == 0x08)  && (rthead->type <= RTMP::AUDIO_DATA)) {
             runtest.pass("RTMP::split(3rd packet header) of 6");
         } else {
             runtest.fail("RTMP::split(3rd packet header) of 6");
+            tmpbuf->dump();
         }
     }
     
@@ -402,21 +389,21 @@ test_split()
     } else {
         que = queues3->front();
         tmpbuf = que->pop();
-//        tmpbuf->dump();
         queues3->pop_front();
         rthead = client.decodeHeader(tmpbuf);
         if ((*tmpbuf->reference() == 0x08)  && (rthead->type <= RTMP::AUDIO_DATA)) {
             runtest.pass("RTMP::split(4th packet header) of 6");
         } else {
             runtest.fail("RTMP::split(4th packet header) of 6");
+            tmpbuf->dump();
         }
     }
+    
     if (notest) {
         runtest.untested("RTMP::split(5th packet header) of 6");
     } else {
         que = queues3->front();
         tmpbuf = que->pop();
-//        tmpbuf->dump();
         queues3->pop_front();
 
         rthead = client.decodeHeader(tmpbuf);
@@ -424,32 +411,9 @@ test_split()
             runtest.pass("RTMP::split(5th packet header) of 6");
         } else {
             runtest.fail("RTMP::split(5th packet header) of 6");
+            tmpbuf->dump();
         }
     }
-
-#if 0
-    if (notest) {
-        runtest.untested("RTMP::split(6th packet header) of 6");
-    } else {
-        que = queues3->front();
-        cerr << "QUE3: " << que->getName() << " size is: " << que->size() << endl;
-        tmpbuf = que->pop();
-        tmpbuf->dump();
-        queues3->pop_front();
-        if (tmpbuf) {
-            rthead = client.decodeHeader(tmpbuf);
-            if ((*tmpbuf->reference() == 0xc5) && (rthead->type <= RTMP::CHUNK_SIZE)) {
-                runtest.pass("RTMP::split(6th packet header) of 6");
-            } else {
-                runtest.fail("RTMP::split(6th packet header) of 6");
-            }
-        } else {
-            runtest.unresolved("RTMP::split(6th packet header) of 6");
-        }
-    }    
-    
-    delete buf3;
-    delete buf1;
 #endif
     
 //    delete que1;
@@ -751,8 +715,7 @@ test_results()
     } else {
         runtest.fail("Encoded RTMPClient::encodeResult(Play Reset)");
     }
-    hex4->dump();
-    enc4->dump();
+
     delete hex4;
     delete msg4;
     delete enc4;

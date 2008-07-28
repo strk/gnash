@@ -797,7 +797,8 @@ AMF::extractProperty(Buffer *buf)
 Element *
 AMF::extractProperty(Network::byte_t *in, Network::byte_t* tooFar)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
+    
     Network::byte_t *tmpptr = in;
     boost::uint16_t length;
 

@@ -198,7 +198,8 @@ Buffer::append(boost::uint16_t length)
 Network::byte_t *
 Buffer::append(gnash::Network::byte_t *data, size_t nbytes)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
+
     if ((_seekptr + nbytes) <= (_ptr + _nbytes)) {
 	std::copy(data, data + nbytes, _seekptr);    
 	_seekptr += nbytes;
