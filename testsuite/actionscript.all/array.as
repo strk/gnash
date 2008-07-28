@@ -440,6 +440,25 @@ b.shift();
 b.pop();
 check_equals ( b.toString() , "" );
 
+//-----------------------------------------------------
+// Test Array.shift()
+//-----------------------------------------------------
+
+a = new Array(1);
+check_equals(a.length, 1);
+ret = a.shift();
+check_equals(typeof(ret), 'undefined');
+check_equals(a.length, 0);
+a[1] = 'a';
+check_equals(a.length, 2);
+ret = a.shift();
+check_equals(typeof(ret), 'undefined');
+check_equals(a.length, 1);
+ret = a.shift();
+check_equals(typeof(ret), 'string');
+check_equals(ret, 'a');
+check_equals(a.length, 0);
+
 //------------------------------------------------------
 // Test Array.reverse
 //------------------------------------------------------
@@ -1440,11 +1459,11 @@ check_equals(a[1], 'overridden'); // flag was lost
 
 
 #if OUTPUT_VERSION < 6
- check_totals(484);
+ check_totals(493);
 #else
 # if OUTPUT_VERSION < 7
-  check_totals(545);
+  check_totals(554);
 # else
-  check_totals(555);
+  check_totals(564);
 # endif
 #endif
