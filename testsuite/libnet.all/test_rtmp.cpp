@@ -673,7 +673,7 @@ test_results()
     }
     delete msg1;
 
-    Buffer *buf2 = rtmpserv.encodeResult(RTMPMsg::NC_CONNECT_SUCCESS);
+    Buffer *buf2 = rtmpserv.encodeResult(1.0, RTMPMsg::NC_CONNECT_SUCCESS);
 //    cerr << hexify(buf2->begin(), 122, true) << endl;
     if ((memcmp(hex2->reference(), buf2->reference(), 122) == 0)) {
         runtest.pass("Encoded RTMP result(NC_CONNECT_SUCCESS)");
@@ -726,20 +726,36 @@ test_results()
 //         PD_English_Low@2001
 //     clientid
 //         dsLgYohb
-    Buffer *hex4 = hex2mem("02 00 08 6f 6e 53 74 61 74 75 73 00 00 00 00 00 00 00 00 00 05 03 00 05 6c 65 76 65 6c 02 00 06 73 74 61 74 75 73 00 04 63 6f 64 65 02 00 14 4e 65 74 53 74 72 65 61 6d 2e 50 6c 61 79 2e 52 65 73 65 74 00 0b 64 65 73 63 72 69 70 74 69 6f 6e 02 00 2a 50 6c 61 79 69 6e 67 20 61 6e 64 20 72 65 73 65 74 74 69 6e 67 20 50 44 5f 45 6e 67 6c 69 73 68 5f 4c 6f 77 40 32 30 30 31 2e 00 07 64 65 74 61 69 6c 73 02 00 13 50 44 5f 45 6e 67 6c 69 73 68 5f 4c 6f 77 40 32 30 30 31 00 08 63 6c 69 65 6e 74 69 64 02 00 08 64 73 4c 67 59 6f 68 62 00 00 09");
+//    Buffer *hex4 = hex2mem("02 00 08 6f 6e 53 74 61 74 75 73 00 00 00 00 00 00 00 00 00 05 03 00 05 6c 65 76 65 6c 02 00 06 73 74 61 74 75 73 00 04 63 6f 64 65 02 00 14 4e 65 74 53 74 72 65 61 6d 2e 50 6c 61 79 2e 52 65 73 65 74 00 0b 64 65 73 63 72 69 70 74 69 6f 6e 02 00 2a 50 6c 61 79 69 6e 67 20 61 6e 64 20 72 65 73 65 74 74 69 6e 67 20 50 44 5f 45 6e 67 6c 69 73 68 5f 4c 6f 77 40 32 30 30 31 2e 00 07 64 65 74 61 69 6c 73 02 00 13 50 44 5f 45 6e 67 6c 69 73 68 5f 4c 6f 77 40 32 30 30 31 00 08 63 6c 69 65 6e 74 69 64 02 00 08 64 73 4c 67 59 6f 68 62 00 00 09");
+// Rearrange the order of code and description
+    Buffer *hex4 = hex2mem("02 00 08 6f 6e 53 74 61 74 75 73 00 00 00 00 00 00 00 00 00 05 03 00 05 6c 65 76 65 6c 02 00 06 73 74 61 74 75 73 00 0b 64 65 73 63 72 69 70 74 69 6f 6e 02 00 2a 50 6c 61 79 69 6e 67 20 61 6e 64 20 72 65 73 65 74 74 69 6e 67 20 50 44 5f 45 6e 67 6c 69 73 68 5f 4c 6f 77 40 32 30 30 31 2e 00 04 63 6f 64 65 02 00 14 4e 65 74 53 74 72 65 61 6d 2e 50 6c 61 79 2e 52 65 73 65 74 00 07 64 65 74 61 69 6c 73 02 00 13 50 44 5f 45 6e 67 6c 69 73 68 5f 4c 6f 77 40 32 30 30 31 00 08 63 6c 69 65 6e 74 69 64 02 00 08 64 73 4c 67 59 6f 68 62 00 00 09");
     RTMPMsg *msg4 = rtmpserv.decodeMsgBody(hex4);
+
+    Element *cid = new Element;
+    cid->makeString("dsLgYohb");
+    
+    Buffer *enc4 = rtmpserv.encodeResult(0.0, RTMPMsg::NS_PLAY_RESET,
+                          "PD_English_Low@2001", cid);
 //    msg4->dump();
 //    std::vector<amf::Element *> hell4 = msg4->getElements();
     if ((msg4->getStatus() ==  RTMPMsg::NS_PLAY_RESET)
         && (msg4->getMethodName() == "onStatus")
         && (msg4->getStreamID() == 0)
         && (msg4->size() == 1)) {
-        runtest.pass("Encoded/Decoded RTMP onStatus(Play Reset)");
+        runtest.pass("Decoded RTMP onStatus(Play Reset)");
     } else {
-        runtest.fail("Encoded/Decoded RTMP onStatus(Play Reset)");
+        runtest.fail("Decoded RTMP onStatus(Play Reset)");
     }
+    if ((memcmp(hex4->reference(), enc4->reference(), enc4->size()) == 0)) {
+        runtest.pass("Encoded RTMPClient::encodeResult(Play Reset)");
+    } else {
+        runtest.fail("Encoded RTMPClient::encodeResult(Play Reset)");
+    }
+    hex4->dump();
+    enc4->dump();
     delete hex4;
     delete msg4;
+    delete enc4;
     
 // onStatus
 // code
@@ -754,9 +770,9 @@ test_results()
         && (msg5->getMethodName() == "onStatus")
         && (msg5->getStreamID() == -1)
         && (msg5->size() == 1)) {
-        runtest.pass("Encoded/Decoded RTMP onStatus(Data Start)");
+        runtest.pass("Decoded RTMP onStatus(Data Start)");
     } else {
-        runtest.fail("Encoded/Decoded RTMP onStatus(Data Start)");
+        runtest.fail("Decoded RTMP onStatus(Data Start)");
     }
     delete hex5;
     delete msg5;
@@ -778,9 +794,9 @@ test_results()
         && (msg6->getMethodName() == "onStatus")
         && (msg6->getStreamID() == 0)
         && (msg6->size() == 1)) {
-        runtest.pass("Encoded/Decoded RTMP onStatus(Play Start)");
+        runtest.pass("Decoded RTMP onStatus(Play Start)");
     } else {
-        runtest.fail("Encoded/Decoded RTMP onStatus(Play Start)");
+        runtest.fail("Decoded RTMP onStatus(Play Start)");
     }
     delete hex6;
     delete msg6;
@@ -807,9 +823,9 @@ test_results()
     if ((msg8->getStatus() ==  RTMPMsg::NS_PLAY_STREAMNOTFOUND)
         && (msg8->getMethodName() == "onStatus")
         && (msg8->size() == 1)) {
-        runtest.pass("Encoded/Decoded RTMP onStatus(Play Stream Not Found)");
+        runtest.pass("Decoded RTMP onStatus(Play Stream Not Found)");
     } else {
-        runtest.fail("Encoded/Decoded RTMP onStatus(Play Stream Not Found)");
+        runtest.fail("Decoded RTMP onStatus(Play Stream Not Found)");
     }
     delete hex8;
     delete msg8;
@@ -823,9 +839,9 @@ test_results()
     if ((msg9->getStatus() ==  RTMPMsg::NS_PLAY_STOP)
         && (msg9->getMethodName() == "onStatus")
         && (msg9->size() == 1)) {
-        runtest.pass("Encoded/Decoded RTMP onStatus(Play Stream Stop)");
+        runtest.pass("Decoded RTMP onStatus(Play Stream Stop)");
     } else {
-        runtest.fail("Encoded/Decoded RTMP onStatus(Play Stream Stop)");
+        runtest.fail("Decoded RTMP onStatus(Play Stream Stop)");
     }
     delete hex9;
     delete msg9;
