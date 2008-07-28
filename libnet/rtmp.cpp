@@ -1086,7 +1086,8 @@ RTMP::split(Buffer *buf, size_t chunksize)
 		if (rthead->head_size > 1) {
 		    totalsize = rthead->head_size + rthead->bodysize;
 		} else {
-		    totalsize = rthead->head_size + (bodysizes[rthead->channel] - totalsize);
+		    totalsize = rthead->head_size +
+			(bodysizes[rthead->channel] - totalsize);
 		    bodysizes[rthead->channel] = 0;
 		}
 	    } else { // this RTMP message is larger than the chunksize
@@ -1114,13 +1115,14 @@ RTMP::split(Buffer *buf, size_t chunksize)
 		    cerr << "Space Left in buffer for channel " << rthead->channel << " is: "
 			 << current->spaceLeft() << endl;
 		    ptr += rthead->head_size;
+		    totalsize -= 1;
 		}
 		current->append(ptr, totalsize);
 //		chunk->append(ptr, totalsize);
 		current->dump();
 //   		if (_queues[rthead->channel] != 0) {
 		cerr << "Adding data to existing packet for channel #" << rthead->channel
-		     << ", read " << nbytes << " bytes." << endl;
+		     << ", read " << totalsize << " bytes." << endl;
 		// If there is no space left, then we've read in the whole packet
 //		if (chunk->spaceLeft() == 0) {
 //		    _queues[rthead->channel].push(chunk);

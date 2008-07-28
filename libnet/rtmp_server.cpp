@@ -173,12 +173,12 @@ RTMPServer::serverFinish()
     return true;
 }
 
-bool
-RTMPServer::packetSend(amf::Buffer * /* buf */)
-{
-    GNASH_REPORT_FUNCTION;
-    return false;
-}
+// bool
+// RTMPServer::packetSend(amf::Buffer * /* buf */)
+// {
+//     GNASH_REPORT_FUNCTION;
+//     return false;
+// }
 
 bool
 RTMPServer::packetRead(amf::Buffer *buf)
@@ -366,13 +366,30 @@ RTMPServer::packetRead(amf::Buffer *buf)
 // 43 6f 6e 6e 65 63 74 69 6f 6e 2e 43 6f 6e 6e 65   Connection.Conne
 // 63 74 2e 53 75 63 63 65 73 73 00 00 c3 09         ct.Success....
 //
-// _result(double ClientStream, NULL, double ServerStream)
-// These are handlers for the various types
+// error,result,onStatus
+// level	 - error,status
+// code	 - canned
+// description -canned
+// details	 - 
+// clientid - 
+
+// fmsVer	- FMS/3,0,1,123
+// capabilities
+// objectEncoding
+//
 amf::Buffer *
-RTMPServer::encodeResult(RTMPMsg::rtmp_status_e status)
+RTMPServer::encodeResult(double streamid, RTMPMsg::rtmp_status_e status)
 {
     GNASH_REPORT_FUNCTION;
+    return encodeResult(streamid, status, "application", 0);
+}
+
+amf::Buffer *
+RTMPServer::encodeResult(double sid, RTMPMsg::rtmp_status_e status,
+			 const std::string &filename, Element *clientid)
+{
     
+    GNASH_REPORT_FUNCTION;
 //    Buffer *buf = new Buffer;
 //     Network::byte_t *ptr = buf->reference();
 //     buf->clear();		// default everything to zeros, real data gets optionally added.
@@ -382,75 +399,74 @@ RTMPServer::encodeResult(RTMPMsg::rtmp_status_e status)
 //     const char *code = 0;
 //     const char *status = 0;
 
-    Element *str = new Element;
-    str->makeString("_result");
+    // The first field is the type, which is "_result", "_error",
+    // or "onStatus".
+    Element *result_type = new Element;
 
-    Element *number = new Element;
-    // add The server ID
-    number->makeNumber(1);	// FIXME: needs a real value, which should increment
+    // Following the type, the stream ID is always supplied, although
+    // often it is zero.
+    Element *streamid = new Element;
+    streamid->makeNumber(sid);
 
-    Element top;
-    top.makeObject("application");
-    
+    // These properties are used in every RTMP result, error, or
+    // onStatus messages I've ever seen, so allocate the memory for
+    // them now.
+    Element top;	// the top level object that has properties
+    Element *level = new Element;
+    Element *description = new Element;
+    Element *code = new Element;
+
+    // These properties are optional, not all result messages contain
+    // these properties
+    Element *details = 0;
+//    Element *clientid = 0;
+    Element *fmsVer = 0;
+    Element *capabilities = 0;
+    Element *objectEncoding = 0;
+
     switch (status) {
       case RTMPMsg::APP_GC:
       case RTMPMsg::APP_RESOURCE_LOWMEMORY:
       case RTMPMsg::APP_SCRIPT_ERROR:
       case RTMPMsg::APP_SCRIPT_WARNING:
       case RTMPMsg::APP_SHUTDOWN:
+	  break;
       case RTMPMsg::NC_CALL_BADVERSION:
+	  result_type->makeString("_result");
+	  level->makeString("level", "error");
+	  description->makeString("description", "Call BadVersion.");
+	  code->makeString("code", "NetConnection.Call.badVersion");
       case RTMPMsg::NC_CALL_FAILED:
-//	  status = 0;
-//	  code = "NetConnection.Call.Failed";
+	  result_type->makeString("_result");
+	  level->makeString("level", "error");
+	  description->makeString("description", "Call Failed.");
+	  code->makeString("code", "NetConnection.Call.Failed");
       case RTMPMsg::NC_CONNECT_APPSHUTDOWN:
+	  break;
       case RTMPMsg::NC_CONNECT_CLOSED:
+	  break;
       case RTMPMsg::NC_CONNECT_FAILED:
       {
-// 	  errstr = new Element;
-// 	  errstr->makeString("error");
-	  Element *level = new Element;
+	  result_type->makeString("_result");
 	  level->makeString("level", "error");
-	  top.addProperty(level);
-
-	  Element *description = new Element;
 	  description->makeString("description", "Connection Failed.");
-	  top.addProperty(description);
-	  
-	  Element *code = new Element;
 	  code->makeString("code", "Connection.Connect.Failed");
-	  top.addProperty(code);
       }
       case RTMPMsg::NC_CONNECT_INVALID_APPLICATION:
       case RTMPMsg::NC_CONNECT_REJECTED:
       {
-// 	  delete str;
-// 	  str = new Element;
-// 	  str->makeString("error");
-	  Element *level = new Element;
+	  result_type->makeString("_result");
 	  level->makeString("level", "error");
-	  top.addProperty(level);
-
-	  Element *description = new Element;
 	  description->makeString("description", "Connection Rejected.");
-	  top.addProperty(description);
-	  
-	  Element *code = new Element;
 	  code->makeString("code", "NetConnection.Connect.Rejected");
-	  top.addProperty(code);
       }
       case RTMPMsg::NC_CONNECT_SUCCESS:
       {
-	  Element *level = new Element;
+	  top.makeObject("application");
+	  result_type->makeString("_result");
 	  level->makeString("level", "status");
-	  top.addProperty(level);
-
-	  Element *description = new Element;
 	  description->makeString("description", "Connection succeeded.");
-	  top.addProperty(description);
-	  
-	  Element *code = new Element;
 	  code->makeString("code", "NetConnection.Connect.Success");
-	  top.addProperty(code);
       }
       break;
       case RTMPMsg::NS_CLEAR_FAILED:
@@ -466,6 +482,19 @@ RTMPServer::encodeResult(RTMPMsg::rtmp_status_e status)
       case RTMPMsg::NS_PLAY_NO_SUPPORTED_TRACK_FOUND:
       case RTMPMsg::NS_PLAY_PUBLISHNOTIFY:
       case RTMPMsg::NS_PLAY_RESET:
+      {
+	  result_type->makeString("onStatus");
+	  
+	  level->makeString("level", "status");
+	  string tmp = "Playing and resetting ";
+	  tmp += filename;
+	  tmp += '.';
+	  description->makeString("description", tmp);
+	  code->makeString("code", "NetStream.Play.Reset");
+
+	  details = new Element;
+	  details->makeString("details", filename);
+      }
       case RTMPMsg::NS_PLAY_START:
       case RTMPMsg::NS_PLAY_STOP:
       case RTMPMsg::NS_PLAY_STREAMNOTFOUND:
@@ -488,22 +517,69 @@ RTMPServer::encodeResult(RTMPMsg::rtmp_status_e status)
       default:
 	  break;
     };
+
+    // Not all result messages set the "application" name on the
+    // object, so just set the type so encoding works properly.
+    // The ordering of the properties shouldn't be important, but
+    // if it is, they are encoded in the oder they are added to
+    // the top level object.
+    if (top.Element::NOTYPE) {
+	top.makeObject();
+    }
     
-    Buffer *strbuf = str->encode();
-    Buffer *numbuf = number->encode();
+    // These 3 properties are usually always allocated
+    if (level) {
+	top.addProperty(level);
+    }
+    if (description) {
+	top.addProperty(description);
+    }
+    if (code) {
+	top.addProperty(code);
+    }
+    // These next properties are only used for some result messages
+    if (fmsVer) {
+	top.addProperty(fmsVer);
+    }
+    if (capabilities) {
+	top.addProperty(capabilities);
+    }
+    if (objectEncoding) {
+	top.addProperty(objectEncoding);
+    }
+    if (details) {
+	top.addProperty(details);
+    }
+    if (clientid) {
+	clientid->setName("clientid");
+	top.addProperty(clientid);
+    }
+
+    // Encode the 3 top level AMF objects, the type, the streamID
+    // and then the object itself.
+    Buffer *result_buf = result_type->encode();
+    Buffer *streamid_buf = streamid->encode();
     Buffer *topbuf = top.encode();
 
-    Buffer *buf = new Buffer(strbuf->size() + numbuf->size() + topbuf->size());
-    buf->append(strbuf);
-    buf->append(numbuf);
+    if ((result_buf == 0) || (streamid_buf == 0) || (topbuf == 0)) {
+	log_error("Encoding of result message failed!");
+	return 0;
+    }
+    
+    Buffer *buf = new Buffer(result_buf->size() + streamid_buf->size() + topbuf->size());
+    buf->append(result_buf);
+    buf->append(streamid_buf);
     Network::byte_t byte = static_cast<Network::byte_t>(RTMP::SERVER & 0x000000ff);
     buf->append(byte);
     buf->append(topbuf);
 
-    delete str;
-    delete number;
-    delete strbuf;
-    delete numbuf;
+    // The memory allocated for the properties gets deleted when the
+    // top level object is deleted.
+    delete result_type;
+    delete streamid;
+    delete result_buf;
+    delete streamid_buf;
+    
 //    delete topbuf;//   FIXME: deleting this shouldn't core dump.
     
     return buf;

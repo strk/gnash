@@ -20,7 +20,6 @@
 
 #include <boost/cstdint.hpp>
 #include <string>
-#include <map>
 
 #include "rtmp.h"
 #include "amf.h"
@@ -43,7 +42,12 @@ public:
     bool packetRead(amf::Buffer *buf);
     
     // These are handlers for the various types
-    amf::Buffer *encodeResult(RTMPMsg::rtmp_status_e status);
+    amf::Buffer *encodeResult(double streamid,
+			      RTMPMsg::rtmp_status_e status);
+    amf::Buffer *encodeResult(double streamid,
+			      RTMPMsg::rtmp_status_e status,
+			      const std::string &filename,
+			      amf::Element *clientid);
     amf::Buffer *encodePing(rtmp_ping_e type, boost::uint32_t milliseconds);
     amf::Buffer *encodePing(rtmp_ping_e type);
     
