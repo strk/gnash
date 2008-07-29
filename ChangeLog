@@ -1,3 +1,22 @@
+2008-07-29  Dossy Shiobara <dossy@panoptic.com>
+
+	* configure.ac: MinGW gcc 3.4.5 on Win32 won't build with -ansi,
+	  which undefines things like strdup, etc.
+
+	* libbase/Makefile.am: Win32 builds fail when linking against
+	  libltdl.dll.a, as it's missing the lt_* symbols.  Need to look
+	  into this further, but in the meantime, this gets the build
+	  going again.
+
+	* libbase/utility.h: GetCurrentThreadId@0 symbol in kernel32.dll
+	  needs to be defined outside of the gnash C++ namespace.
+	  Needless to say, this change is a fragile hack to get the
+	  build moving again.
+
+	* libmedia/MediaParser.cpp: usleep() not available on Win32.
+	  This should probably go into utility.h or some other platform
+	  abstraction lib.
+
 2008-06-26 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* server/asobj/NetStreamGst.cpp: Make sure

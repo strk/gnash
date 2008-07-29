@@ -167,6 +167,10 @@ libltdl_la_SOURCES = $(top_srcdir)/libltdl/ltdl.c
 libltdl_la_LDFLAGS = -no-undefined -version-info 4:4:1
 libltdl_la_LIBADD = $(LIBADD_DL)
 
+if WIN32
+  libltdl_la_LDFLAGS += -static
+endif
+
 # Rebuild with GCC 4.x Mudflap support
 mudflap:
 	@echo "Rebuilding with GCC Mudflap support"

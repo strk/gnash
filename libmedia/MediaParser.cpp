@@ -23,6 +23,11 @@
 
 #include <boost/bind.hpp>
 
+#ifdef _WIN32
+#include <windows.h>
+#define usleep(usec) ((void) Sleep((usec) / 1000))
+#endif
+
 namespace gnash {
 namespace media {
 

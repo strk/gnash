@@ -1925,8 +1925,8 @@ if test x"$GCC" = x"yes"; then
     -Wnon-virtual-dtor \
     -Wunused \
     -Wextra \   
-    -ansi \
     "
+    #-ansi \
   CFLAGS="$CFLAGS \
     -W \
     -Wall \
