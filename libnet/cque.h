@@ -54,6 +54,7 @@ public:
     amf::Buffer *pop();
     // Peek at the first date element witjhout removing it from the que
     amf::Buffer *peek();
+    amf::Buffer *peek_back();
     // Get the number of elements in the que
     size_t DSOEXPORT size();
     // Wait for a condition variable to trigger

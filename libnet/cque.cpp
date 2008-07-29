@@ -143,6 +143,18 @@ CQue::peek()
     return 0;	
 }
 
+// Peek at the first data element without removing it
+amf::Buffer *
+CQue::peek_back()
+{
+//    GNASH_REPORT_FUNCTION;
+    boost::mutex::scoped_lock lock(_mutex);
+    if (_que.size()) {
+        return _que.back();
+    }
+    return 0;	
+}
+
 // Return the size of the queues
 void
 CQue::clear()
