@@ -60,7 +60,6 @@
 # endif
 #endif
 
-using namespace std;
 namespace gnash {
 
 Extension::Extension() 
@@ -70,18 +69,19 @@ Extension::Extension()
 //     return lt_dlmutex_register (gnash_mutex_lock, gnash_mutex_unlock,
 //                                 gnash_mutex_seterror, gnash_mutex_geterror);
 #endif
-    char *env = getenv ("GNASH_PLUGINS");
-    if (env == 0) {
+    char *env = std::getenv("GNASH_PLUGINS");
+    if (!env) {
         _pluginsdir = PLUGINSDIR;
-    } else {
+    }
+    else {
         _pluginsdir = env;
     }
 
     log_debug("Plugins path: %s", _pluginsdir);
-    lt_dlsetsearchpath(_pluginsdir);
+    lt_dlsetsearchpath(_pluginsdir.c_str());
 }
 
-Extension::Extension(const char *dir)
+Extension::Extension(const std::string& dir)
 {
 //    GNASH_REPORT_FUNCTION;
 #ifdef LT_DLMUTEX
@@ -89,7 +89,7 @@ Extension::Extension(const char *dir)
 //                                 gnash_mutex_seterror, gnash_mutex_geterror);
 #endif
     _pluginsdir = dir;
-    lt_dlsetsearchpath(_pluginsdir);
+    lt_dlsetsearchpath(_pluginsdir.c_str());
 }
 
 Extension::~Extension()
@@ -98,11 +98,11 @@ Extension::~Extension()
 }
 
 bool
-Extension::scanAndLoad(const char *dir, as_object &obj)
+Extension::scanAndLoad(const std::string& dir, as_object &obj)
 {
 //    GNASH_REPORT_FUNCTION;
     
-    lt_dlsetsearchpath(_pluginsdir);
+    lt_dlsetsearchpath(_pluginsdir.c_str());
     _pluginsdir = dir;
     
     return scanAndLoad(obj);
@@ -112,34 +112,33 @@ bool
 Extension::scanAndLoad(as_object &obj)
 {
 //    GNASH_REPORT_FUNCTION;
-    string mod;
+    std::string mod;
     
-    if (_modules.size() == 0) {
+    if (_modules.empty()) {
         scanDir(_pluginsdir);
     }
     
-    vector<string>::iterator it;
+    std::vector<std::string>::iterator it;
     for (it = _modules.begin(); it != _modules.end(); it++) {
         mod = *(it);
-        log_security(_("Loading module: %s"), mod.c_str());
+        log_security(_("Loading module: %s"), mod);
         SharedLib sl;
-        initModule(mod.c_str(), obj);
+        initModule(mod, obj);
     }   
 		return true;
 }
 
 bool
-Extension::initModule(const char *module, as_object &obj)
+Extension::initModule(const std::string& module, as_object &obj)
 {
 //    GNASH_REPORT_FUNCTION;
 
     SharedLib::initentry *symptr;
     SharedLib *sl;
-    string symbol;
+    std::string symbol(module);
 
-    log_security(_("Initializing module: \"%s\""), module);
+    log_security(_("Initializing module: \"%s\""), symbol);
     
-    symbol = module;
     if (_plugins[module] == 0) {
         sl = new SharedLib(module);
         sl->openLib();
@@ -149,7 +148,7 @@ Extension::initModule(const char *module, as_object &obj)
     }
     
     symbol += "_class_init";
-    symptr = sl->getInitEntry(symbol.c_str());
+    symptr = sl->getInitEntry(symbol);
 
     if (symptr) {    
         symptr(obj);
@@ -161,7 +160,7 @@ Extension::initModule(const char *module, as_object &obj)
 }
 
 bool
-Extension::initModuleWithFunc(const char *module, const char *func,
+Extension::initModuleWithFunc(const std::string& module, const std::string& func,
 	as_object &obj)
 {
 	SharedLib::initentry *symptr;
@@ -193,11 +192,11 @@ Extension::scanDir()
 {
 //    GNASH_REPORT_FUNCTION;
     scanDir(_pluginsdir);
-		return true;
+	return true;
 }
 
 bool
-Extension::scanDir(const char *dirlist)
+Extension::scanDir(const std::string& dirlist)
 {
 //    GNASH_REPORT_FUNCTION;
     
@@ -210,9 +209,9 @@ Extension::scanDir(const char *dirlist)
 
 //    scoped_lock lock(lib_mutex);
 
-    dirlistcopy = strdup(dirlist);
+    dirlistcopy = strdup(dirlist.c_str());
     
-    dir = strtok(dirlistcopy, ":");
+    dir = std::strtok(dirlistcopy, ":");
     if (dir == NULL) {
         dir = dirlistcopy;
     }
@@ -237,18 +236,18 @@ Extension::scanDir(const char *dirlist)
                 continue;
             }
 
-            if (strncmp(entry->d_name, ".", 1) == 0) {
+            if (std::strncmp(entry->d_name, ".", 1) == 0) {
                 continue;
             }            
             
-            suffix = strrchr(entry->d_name, '.');
+            suffix = std::strrchr(entry->d_name, '.');
             if (suffix == 0) {
                 continue;
             }
 
             log_debug(_("Gnash Plugin name: %s"), entry->d_name);
             
-            if (strcmp(suffix, ".so") == 0) {
+            if (std::strcmp(suffix, ".so") == 0) {
                 *suffix = 0;
                 log_debug(_("Gnash Plugin name: %s"), entry->d_name);
                 _modules.push_back(entry->d_name);
@@ -260,7 +259,7 @@ Extension::scanDir(const char *dirlist)
         if (closedir(library_dir) != 0) {
             return false;
         }
-        dir = strtok(NULL, ":");
+        dir = std::strtok(NULL, ":");
     }
 	return true;
 }
@@ -270,10 +269,10 @@ Extension::dumpModules()
 {
     GNASH_REPORT_FUNCTION;
     
-    cerr << _modules.size() << " plugin(s) for Gnash installed" << endl;    
-    vector<string>::iterator it;
+    std::cerr << _modules.size() << " plugin(s) for Gnash installed" << std::endl;    
+    std::vector<std::string>::iterator it;
     for (it = _modules.begin(); it != _modules.end(); it++) {
-        cerr << "Module name is: \"" << *(it) << "\"" << endl;
+        std::cerr << "Module name is: \"" << *(it) << "\"" << std::endl;
     }
 }
 

@@ -15,8 +15,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef __SHAREDLIB_H__
-#define __SHAREDLIB_H__
+#ifndef GNASH_SHAREDLIB_H
+#define GNASH_SHAREDLIB_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -50,17 +50,15 @@ public:
     typedef void initentry (as_object &obj);
     
     SharedLib();
-    SharedLib(const char *filespec);
+    SharedLib(const std::string& filespec);
     ~SharedLib();
     bool openLib();
-    bool openLib(std::string &filespec);
-    bool openLib(const char *filespec);
+    bool openLib(const std::string &filespec);
     bool closeLib();
     
     // Get a C symbol from the shared library based on the name
-    entrypoint *getDllSymbol (std::string &name);
-    entrypoint *getDllSymbol (const char *name);
-    initentry *getInitEntry (const char *name);
+    entrypoint *getDllSymbol (const std::string& symbol);
+    initentry *getInitEntry (const std::string& symbol);
 
     // Extract file info from the shared library
     const char *getDllFileName();
@@ -68,12 +66,12 @@ public:
     int getDllRefCount();
     const char *moduleName();
 //    lt_dlhandle getDllHandle { return _dlhandle; }
-    const char *getFilespec() { return _filespec; };
+    const char *getFilespec() { return _filespec.c_str(); };
     
     
 private:
     lt_dlhandle _dlhandle;
-    const char *_filespec;
+    std::string _filespec;
     const char *_pluginsdir;    
 };
 
