@@ -129,7 +129,7 @@ movie_root::movie_root()
 void
 movie_root::disableScripts()
 {
-	_disableScripts=true;
+	_disableScripts = true;
 
 	// NOTE: we won't clear the action queue now
 	//       to avoid invalidating iterators as we've
@@ -1064,21 +1064,34 @@ movie_root::advance()
 	VM& vm = VM::get(); // TODO: cache it !
 	unsigned int now = vm.getTime();
 
-	if ( (now - _lastMovieAdvancement) >= _movieAdvancementDelay )
-	{
-		advanceMovie();
-		// setting to 'now' discards time spent on actual rendering and
-		// action processing.
-		// if rendering and action processing takes too much time
-		// we'll always be late here, so FPS will effectively be
-		// slower. Might add a check here allowing a tolerance
-		// and printing a warnign when we're later then tolerated...
-		//
-		_lastMovieAdvancement = now; // or vm.getTime(); ?
-	}
+    try {
 
-	// TODO: execute timers ?
-	executeTimers();
+	    if ( (now - _lastMovieAdvancement) >= _movieAdvancementDelay )
+	    {
+		    advanceMovie();
+		    // setting to 'now' discards time spent on actual rendering and
+		    // action processing.
+		    // if rendering and action processing takes too much time
+		    // we'll always be late here, so FPS will effectively be
+		    // slower. Might add a check here allowing a tolerance
+		    // and printing a warnign when we're later then tolerated...
+		    //
+		    _lastMovieAdvancement = now; // or vm.getTime(); ?
+	    }
+
+	    // TODO: execute timers ?
+	    executeTimers();
+	}
+	catch (ActionLimitException& al)
+    {
+	    //log_error(_("ActionLimits hit during advance: %s. Disabling scripts"), al.what());
+	    //disableScripts();
+
+        // The PP does not disable scripts when the stack limit is reached,
+        // but rather struggles on. 
+	    log_error(_("Action limit hit during advance: %s."), al.what());
+	    clearActionQueue();
+    }
 }
 	
 void
@@ -1088,9 +1101,6 @@ movie_root::advanceMovie()
 
 	// Do mouse drag, if needed
 	doMouseDrag();
-
-	try
-	{
 
 	// Advance all non-unloaded characters in the LiveChars list
 	// in reverse order (last added, first advanced)
@@ -1109,18 +1119,6 @@ movie_root::advanceMovie()
 	// Process queued actions
 	// NOTE: can throw ActionLimitException
 	processActionQueue();
-
-	}
-	catch (ActionLimitException& al)
-	{
-		//log_error(_("ActionLimits hit during advance: %s. Disabling scripts"), al.what());
-		//disableScripts();
-
-	    // The PP does not disable scripts when the stack limit is reached,
-	    // but rather struggles on. 
-		log_error(_("Action limit hit during advance: %s."), al.what());
-		clearActionQueue();
-	}
 
 	cleanupAndCollect();
 
