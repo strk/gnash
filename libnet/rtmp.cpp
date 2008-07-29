@@ -1086,9 +1086,9 @@ RTMP::split(Buffer *buf, size_t chunksize)
 		nbytes += totalsize;
 		// Skip the header for all but the first packet. The rest are just to
 		// complete all the data up to the body size from the header.
-   		cerr << _queues[rthead->channel].size()
- 		     << " messages in queue for channel "
-   		     << rthead->channel << endl;
+//    		cerr << _queues[rthead->channel].size()
+//  		     << " messages in queue for channel "
+//    		     << rthead->channel << endl;
 		Buffer *current = _queues[rthead->channel].peek_back();
 		// As the pointer to the buffer is already stored
 		// when it's allocated, we just append the current
@@ -1096,16 +1096,16 @@ RTMP::split(Buffer *buf, size_t chunksize)
 		if (rthead->head_size == 1) {
 		    ptr += rthead->head_size;
 		    current->append(ptr, totalsize - 1);
-		    cerr << "Adding data to existing packet for channel #" << rthead->channel
-			 << ", read " << totalsize << " bytes." << endl;
+// 		    cerr << "Adding data to existing packet for channel #" << rthead->channel
+// 			 << ", read " << totalsize << " bytes." << endl;
 		} else {
 		    current->copy(ptr, totalsize);
-		    cerr << "Adding data to new packet for channel #" << rthead->channel
-			 << ", read " << totalsize << " bytes." << endl;
+// 		    cerr << "Adding data to new packet for channel #" << rthead->channel
+// 			 << ", read " << totalsize << " bytes." << endl;
 		}
 //   		if (_queues[rthead->channel] != 0) {
 		// If there is no space left, then we've read in the whole packet
-		current->dump();
+//		current->dump();
 		ptr += totalsize;
 	    } else {
 		log_error("RTMP packet size is out of range! %d", totalsize);
@@ -1116,13 +1116,6 @@ RTMP::split(Buffer *buf, size_t chunksize)
 	    break;
 	}
     }
-#if 0
-    deque<CQue *>::iterator it;
-    for (it = _channels.begin(); it != _channels.end(); it++) {
-	CQue *ptr = *(it);
-        ptr->dump();
-    }
-#endif
 
     return &_channels;
 }

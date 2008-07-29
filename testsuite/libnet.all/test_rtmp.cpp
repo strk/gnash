@@ -31,6 +31,7 @@
 #include <fcntl.h>
 #include <iostream>
 #include <string>
+#include <deque>
 
 #include "as_object.h"
 #include "dejagnu.h"
@@ -240,7 +241,7 @@ test_split()
     RTMP::queues_t *queues2 = client.split(buf2, 128);
     if (queues2->size() == 0) {
         notest = true;
-    }    
+    }
     if (notest) {
         runtest.fail("RTMP::split(5 packets into 4)");
     } else {
@@ -257,13 +258,13 @@ test_split()
     } else {
         que = queues2->front();
         tmpbuf = que->pop();
+//        tmpbuf->dump();
         queues2->pop_front();
         rthead = client.decodeHeader(tmpbuf);
         if ((*tmpbuf->reference() == 0x2) && (rthead->type <= RTMP::CHUNK_SIZE)) {
             runtest.pass("RTMP::split(1st packet header) of 4");
         } else {
             runtest.fail("RTMP::split(1st packet header) of 4");
-            tmpbuf->dump();
         }
     }
     
@@ -272,13 +273,13 @@ test_split()
     } else {
         que = queues2->front();
         tmpbuf = que->pop();
+//        tmpbuf->dump();
         queues2->pop_front();
         rthead = client.decodeHeader(tmpbuf);
         if ((*tmpbuf->reference() == 0x2) && (rthead->type <= RTMP::PING)) {
             runtest.pass("RTMP::split(2nd packet header) of 4");
         } else {
             runtest.fail("RTMP::split(2nd packet header) of 4");
-            tmpbuf->dump();
         }
     }
 
@@ -293,7 +294,7 @@ test_split()
             runtest.pass("RTMP::split(3rd packet header) of 4");
         } else {
             runtest.fail("RTMP::split(3rd packet header) of 4");
-            tmpbuf->dump();
+//            tmpbuf->dump();
         }
     }
     
@@ -308,7 +309,7 @@ test_split()
             runtest.pass("RTMP::split(4th packet header) of 4");
         } else {
             runtest.fail("RTMP::split(4th packet header) of 4");
-            tmpbuf->dump();
+//            tmpbuf->dump();
         }
     }
 
