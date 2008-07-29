@@ -320,7 +320,6 @@ test_split()
         runtest.fail("RTMP::split() 2nd queue empty" );
     }
 
-#if 0
     // Try a much more complex packet, similar to the previous one, but with more intermixed packets
     // for other channels.
 //    ...............onStatus.............level...status..code...NetStream.Play.Start..description..'Started playing gate06_tablan_bcueu_01...clie......'.......xF....?j.....@....?..O.]...............................;...../..rP.....K.......m......,......%......................B........M.<.$.....`.......i..9..C..J..........%..........G....2Np.".1`@................;.ntid.A..xV.....
@@ -415,7 +414,6 @@ test_split()
             tmpbuf->dump();
         }
     }
-#endif
     
 //    delete que1;
 
