@@ -112,7 +112,6 @@ bool
 Extension::scanAndLoad(as_object& where)
 {
 //    GNASH_REPORT_FUNCTION;
-    std::string mod;
     
     if (_modules.empty()) {
         scanDir(_pluginsdir);
@@ -120,11 +119,11 @@ Extension::scanAndLoad(as_object& where)
     
     std::vector<std::string>::iterator it;
     for (it = _modules.begin(); it != _modules.end(); it++) {
-        mod = *(it);
+        const std::string& mod = *it;
         log_security(_("Loading module: %s"), mod);
         initModule(mod, where);
-    }   
-		return true;
+    }
+    return true;
 }
 
 bool
@@ -161,7 +160,6 @@ bool
 Extension::initModuleWithFunc(const std::string& module, const std::string& func,
 	as_object &obj)
 {
-	SharedLib::initentry *symptr;
 	SharedLib *sl;
 
 	log_security(_("Initializing module: \"%s\""), module);
@@ -174,7 +172,7 @@ Extension::initModuleWithFunc(const std::string& module, const std::string& func
 		sl = _plugins[module];
 	}
 
-	symptr = sl->getInitEntry(func);
+	SharedLib::initentry *symptr = sl->getInitEntry(func);
 
 	if (symptr) {
 		symptr(obj);
@@ -190,7 +188,7 @@ Extension::scanDir()
 {
 //    GNASH_REPORT_FUNCTION;
     scanDir(_pluginsdir);
-	return true;
+    return true;
 }
 
 bool
@@ -198,68 +196,55 @@ Extension::scanDir(const std::string& dirlist)
 {
 //    GNASH_REPORT_FUNCTION;
     
-    int i;
-    struct dirent *entry;
-    //string::size_type pos;
-    char *dirlistcopy;
-    char *dir;
-    char *suffix = 0;
+    Tok t(dirlist, Sep(":"));
+    for (Tok::iterator i = t.begin(), e = t.end(); i != e; ++i)
+    {
+        const std::string& dir = *i;
 
-//    scoped_lock lock(lib_mutex);
-
-    dirlistcopy = strdup(dirlist.c_str());
-    
-    dir = std::strtok(dirlistcopy, ":");
-    if (dir == NULL) {
-        dir = dirlistcopy;
-    }
-
-            
-    while (dir) {
         log_debug(_("Scanning directory \"%s\" for plugins"), dir);
-        DIR *library_dir = opendir(dir);
+        DIR *libdir = opendir(dir.c_str());
 
-        if (library_dir == NULL) {
+        if (!libdir) {
             log_error(_("Can't open directory %s"), dir);
             return false;
-        }
+	}   
         
-        entry = readdir(library_dir);
-        for (i=0; entry>0; i++) {
-            // We only want shared libraries than end with the suffix, otherwise
+        struct dirent *entry = readdir(libdir);
+        for (int i = 0; entry > 0; ++i) {
+            // We only want shared libraries that end with the suffix, otherwise
             // we get all the duplicates.
-            entry = readdir(library_dir);
+            entry = readdir(libdir);
 
-            if (entry <= NULL) { // All done
+            if (entry <= 0) { // All done
                 continue;
             }
 
-            if (std::strncmp(entry->d_name, ".", 1) == 0) {
+	    std::string name(entry->d_name);
+
+	    // Hidden files.
+            if (name.at(0) == '.') {
                 continue;
             }            
             
-            suffix = std::strrchr(entry->d_name, '.');
-            if (suffix == 0) {
-                continue;
-            }
+	    const std::string::size_type pos = name.find_last_of('.');
+	    if (pos == std::string::npos) continue;
+	    const std::string suffix = name.substr(pos);
+	    name.erase(pos);
 
-            log_debug(_("Gnash Plugin name: %s"), entry->d_name);
-            
-            if (std::strcmp(suffix, ".so") == 0) {
-                *suffix = 0;
-                log_debug(_("Gnash Plugin name: %s"), entry->d_name);
-                _modules.push_back(entry->d_name);
-            } else {
+            if (suffix == ".so") {
+                log_debug(_("Gnash Plugin name: %s"), name);
+                _modules.push_back(name);
+            }
+	    else {
                 continue;
             }
         }
         
-        if (closedir(library_dir) != 0) {
+        if (closedir(libdir) != 0) {
             return false;
         }
-        dir = std::strtok(NULL, ":");
     }
-	return true;
+    return true;
 }
 
 void

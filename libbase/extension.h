@@ -20,15 +20,20 @@
 
 #include <vector>
 #include <string>
+#include <boost/tokenizer.hpp>
 #include "sharedlib.h"
 #include "dsodefs.h"
+
 
 namespace gnash 
 {  
   
 class DSOEXPORT Extension
 {
-  public:
+    typedef boost::char_separator<char> Sep;
+    typedef boost::tokenizer< Sep > Tok;
+      
+public:
 
     Extension();
 
