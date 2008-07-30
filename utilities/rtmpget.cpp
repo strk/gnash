@@ -270,7 +270,15 @@ main(int argc, char *argv[])
 	msg2->dump();
 	log_debug("Sent NetStream::createStream message successfully.");
 	std::vector<amf::Element *> hell = msg2->getElements();
-	streamID = hell[0]->to_number();
+	if (hell.size() > 0) {
+	    streamID = hell[0]->to_number();
+	} else {
+	    if (msg2->getMethodName() == "close") {	
+		log_debug("Got close packet!!! Exiting...");
+		exit(0);
+	    }
+	    streamID = 0.0;
+	}
     } else {
 	log_error("Couldn't send NetStream::createStream message,");
 //	exit(-1);
@@ -296,52 +304,28 @@ main(int argc, char *argv[])
 	}
     }
 
-#if 1
-    int count = 0;
+    int loop = 5;
     do {
-	buf.clear();
-//	log_debug("Currently have %d buffers in the queue", incoming.size());
-	ret = client.readNet(&buf, 5);
-	if (ret <= 0) {
+	Buffer *msgs = client.recvMsg(1);	// use a 1 second timeout
+	if (msgs == 0) {
 	    log_error("Never got any data!");
 	    exit(-1);
 	}
-	
-	if ((ret == 1) && (*buf.reference() == 0xff)) {
-//	    cerr << __FUNCTION__ << ": " << __LINE__ << ": " << hexify(buf.reference(), ret, false) << endl;
-	    log_error("Got an error from the server sending NetStream object");
-//	exit(-1);
+	RTMP::queues_t *que = client.split(msgs);
+	while (que->size()) {
+	    cerr << "QUE SIZE: " << que->size() << endl;
+	    Buffer *ptr = que->front()->pop();
+	    if ((ptr->size() >= 0) && (ptr->size() <= 0xffff)) {
+		que->pop_front();	// delete the item from the queue
+		RTMP::rtmp_head_t *rthead = client.decodeHeader(ptr);
+		msg2 = client.processMsg(ptr);
+	    } else {
+		log_error("Buffer size (%d) out of range at %d", ptr->size(), __LINE__);
+		break;
+	    }
 	}
-	if (ret > 1) {
-//	    cerr << __FUNCTION__ << ": " << __LINE__ << ": " << hexify(buf.reference(), ret, true) << endl;
-	    rthead = client.decodeHeader(&buf);
-	    
-	    msg2 = client.decodeMsgBody(buf.reference() + rthead->head_size, rthead->bodysize);
-	}
-    } while (count++ < 4);
-#endif
-    
-//     buf.clear();
-//     ret = client.readNet(buf.begin(), buf.size());
-//     if ((ret == 1) && (*buf.reference() == 0xff)) {
-// 	cerr << hexify(buf.reference(), ret, true) << endl;
-// 	log_error("Got an error from the server sending NetStream object");
-// //	exit(-1);
-//     }
+    } while(loop--);
 
-
-//    msg2->dump();
-
-//    cerr << msg2->getStatus() << endl;
-//     if (msg2->getStatus() != RTMPMsg::NC_CONNECT_SUCCESS) {
-// 	Element *disp = msg2->getElements()[0]->findProperty("code");
-// 	if (disp) {
-// 	    log_error("code is: %s", disp->to_string());
-// 	} else {
-// 	    log_error("code is: \"undefined\"");
-// 	}
-//     }
-    
 //     std::vector<amf::Element *> hell = msg2->getElements();
 //     std::vector<amf::Element *> props = hell[0]->getProperties();
 
