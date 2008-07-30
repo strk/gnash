@@ -283,6 +283,11 @@ public:
     RTMPMsg *sendRecvMsg(int amf_index, rtmp_headersize_e head_size,
 			      size_t total_size, content_types_e type,
 			      RTMPMsg::rtmp_source_e routing, amf::Buffer *buf);
+
+    // Process a message, which includes executing the system level commands.
+    RTMPMsg *processMsg(amf::Buffer *buf);
+    RTMPMsg *processMsg(Network::byte_t *buf, size_t size);
+    
     // Split a large buffer into multiple smaller ones of the default chunksize
     // of 128 bytes. We read network data in big chunks because it's more efficient,
     // but RTMP uses a weird scheme of a standard header, and then every chunksize
@@ -290,8 +295,12 @@ public:
     // count.
     queues_t *split(amf::Buffer *buf);
     queues_t *split(amf::Buffer *buf, size_t chunksize);
-
+    
     CQue &operator[] (size_t x) { return _queues[x]; }
+
+    // Accessors for debug and testing
+    size_t chunksize() { return _chunksize; };
+    
     void dump();
   protected:
     std::map<const char *, amf::Element *> _properties;
