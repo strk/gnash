@@ -526,8 +526,13 @@ void
 Buffer::dump()
 {
     cerr << "Buffer is " << _nbytes << " bytes at " << (void *)_ptr << endl;
-    cerr << gnash::hexify((unsigned char *)_ptr, _nbytes, false) << endl;
-    cerr << gnash::hexify((unsigned char *)_ptr, _nbytes, true) << endl;
+    if (_nbytes < 0xffff) {
+	cerr << gnash::hexify((unsigned char *)_ptr, _nbytes, false) << endl;
+	cerr << gnash::hexify((unsigned char *)_ptr, _nbytes, true) << endl;
+    } else {
+	cerr << "ERROR: Buffer size out of range!" << endl;
+	abort();
+    }
 }
 
 } // end of amf namespace
