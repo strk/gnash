@@ -45,7 +45,7 @@
 
 #if HAVE_DIRENT_H || WIN32==1	// win32 hack
 # include <dirent.h>
-# define NAMLEN(dirent) strlen((dirent)->d_name)
+# define NAMLEN(dirent) std::strlen((dirent)->d_name)
 #else
 # define dirent direct
 # define NAMLEN(dirent) (dirent)->d_namlen
@@ -109,7 +109,7 @@ Extension::scanAndLoad(const std::string& dir, as_object &obj)
 }
 
 bool
-Extension::scanAndLoad(as_object &obj)
+Extension::scanAndLoad(as_object& where)
 {
 //    GNASH_REPORT_FUNCTION;
     std::string mod;
@@ -122,18 +122,15 @@ Extension::scanAndLoad(as_object &obj)
     for (it = _modules.begin(); it != _modules.end(); it++) {
         mod = *(it);
         log_security(_("Loading module: %s"), mod);
-        SharedLib sl;
-        initModule(mod, obj);
+        initModule(mod, where);
     }   
 		return true;
 }
 
 bool
-Extension::initModule(const std::string& module, as_object &obj)
+Extension::initModule(const std::string& module, as_object &where)
 {
-//    GNASH_REPORT_FUNCTION;
 
-    SharedLib::initentry *symptr;
     SharedLib *sl;
     std::string symbol(module);
 
@@ -147,11 +144,12 @@ Extension::initModule(const std::string& module, as_object &obj)
         sl = _plugins[module];
     }
     
-    symbol += "_class_init";
-    symptr = sl->getInitEntry(symbol);
+    symbol.append("_class_init");
+    
+    SharedLib::initentry *symptr = sl->getInitEntry(symbol);
 
     if (symptr) {    
-        symptr(obj);
+        symptr(where);
     } else {
         log_error(_("Couldn't get class_init symbol"));
     }
