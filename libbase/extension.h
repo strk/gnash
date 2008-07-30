@@ -15,8 +15,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef __EXTENSION_H__
-#define __EXTENSION_H__
+#ifndef GNASH_EXTENSION_H
+#define GNASH_EXTENSION_H
 
 #include <vector>
 #include <string>
@@ -29,32 +29,62 @@ namespace gnash
 class DSOEXPORT Extension
 {
   public:
-//    typedef bool init_func_t (as_object &obj);
+
     Extension();
-    Extension(const char *dir);
+
+    Extension(const std::string& dir);
+
     ~Extension();
-    // scan a directory for Gnash modules
+
+    /// Scan a directory for Gnash modules
     bool scanDir();
-    bool scanDir(const char *dir);
-    // scan the directory and open the module
-    bool scanAndLoad(as_object &obj);
-    bool scanAndLoad(const char *dir, as_object &obj);
-    // open a module
-    // initialize the module within Gnash
-    bool initModule(const char *module, as_object &obj);
+
+    /// Scan the given directory for modules
+    //
+    /// @param dir  The directory to scan.
+    bool scanDir(const std::string& dir);
+
+    /// Scan the plugins directory and attach any found modules to
+    /// the given object.
+    //
+    /// @param where     The as_object to which the modules should be
+    ///                  attached (usually the global object)
+    bool scanAndLoad(as_object &where);
+
+    /// Scan the given directory and attach any found modules to
+    /// the given object.
+    //
+    /// @param where     The as_object to which the modules should be
+    ///                  attached (usually the global object)
+    /// @param dir       A directory to scan.
+    bool scanAndLoad(const std::string& dir, as_object &where);
+
 	// open a module, initialize the module within Gnash. Known function name.
-	bool initModuleWithFunc(const char *module, const char *func, as_object &obj);
+	bool initModuleWithFunc(const std::string& module, const std::string& func, as_object &obj);
     bool initNewObject(as_object &obj);
     void dumpModules();
 private:
+
+    /// Initialize the named module within Gnash
+    //
+    /// @param symbol   The name of the module to find and
+    ///                 initialize.
+    /// @param obj      The object to attach the module to.
+    bool initModule(const std::string& module, as_object &obj);
+
+    /// A list of modules
     std::vector<std::string> _modules;
-    std::map<const char *, SharedLib *> _plugins;
-    const char *_pluginsdir;
+    
+    /// A map of loaded modules
+    std::map<std::string, SharedLib *> _plugins;
+    
+    /// The default directory to search for modules.
+    std::string _pluginsdir;
 };
 
 } // end of gnash namespace
 
-// __EXTENSION_H__
+// GNASH_EXTENSION_H
 #endif
 
 // Local Variables:

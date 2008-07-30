@@ -118,8 +118,8 @@ public:
 				return super;
 			}
 		}
-		if (mExtension->initModuleWithFunc(mDeclaration.file_name.c_str(),
-			mDeclaration.init_name.c_str(), *mTarget))
+		if (mExtension->initModuleWithFunc(mDeclaration.file_name,
+			mDeclaration.init_name, *mTarget))
 		{
 			// Successfully loaded it, now find it, set its proto, and return.
 			as_value us;

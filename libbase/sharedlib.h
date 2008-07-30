@@ -15,22 +15,24 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef __SHAREDLIB_H__
-#define __SHAREDLIB_H__
+#ifndef GNASH_SHAREDLIB_H
+#define GNASH_SHAREDLIB_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
 #endif
+
+#include <boost/thread/mutex.hpp>
+#include <string>
+#include <map>
+#include "as_object.h"
 
 #ifdef _WIN32
 #undef DLL_EXPORT
 #define LIBLTDL_DLL_IMPORT 1
 #endif
 
-#include <string>
-#include <map>
 #include <ltdl.h>
-#include "as_object.h"
 
 // Used on Darwin for basename
 #ifdef HAVE_LIBGEN_H
@@ -44,42 +46,45 @@ namespace gnash
 /// TODO: document this class
 class SharedLib
 {
+    typedef boost::mutex::scoped_lock scoped_lock;
+
 public:
     // Typedefs for function pointers to keep the code readable
     typedef bool entrypoint (void *obj);
     typedef void initentry (as_object &obj);
     
     SharedLib();
-    SharedLib(const char *filespec);
+    SharedLib(const std::string& filespec);
     ~SharedLib();
+
     bool openLib();
-    bool openLib(std::string &filespec);
-    bool openLib(const char *filespec);
-    bool closeLib();
+    bool openLib(const std::string &filespec);
     
     // Get a C symbol from the shared library based on the name
-    entrypoint *getDllSymbol (std::string &name);
-    entrypoint *getDllSymbol (const char *name);
-    initentry *getInitEntry (const char *name);
+    entrypoint *getDllSymbol (const std::string& symbol);
+    initentry *getInitEntry (const std::string& symbol);
 
     // Extract file info from the shared library
     const char *getDllFileName();
     const char *getDllModuleName();
     int getDllRefCount();
     const char *moduleName();
-//    lt_dlhandle getDllHandle { return _dlhandle; }
-    const char *getFilespec() { return _filespec; };
+
+    const std::string& getFilespec() { return _filespec; };
     
     
 private:
+
+    bool closeLib();
+
     lt_dlhandle _dlhandle;
-    const char *_filespec;
-    const char *_pluginsdir;    
+    std::string _filespec;
+    boost::mutex _libMutex;    
 };
 
 } // end of gnash namespace
 
-// __SHAREDLIB_H__
+// GNASH_SHAREDLIB_H
 #endif
 
 // Local Variables:
