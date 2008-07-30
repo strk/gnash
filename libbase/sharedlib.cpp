@@ -42,44 +42,11 @@
 #include <boost/thread/mutex.hpp>
 
 #if defined(_WIN32) || defined(WIN32)
-//Get boost !
-//# define lock(lib_mutex) ;
-//# define scoped_lock ;
 #	define PLUGINSDIR "./"
 #endif
 
-typedef boost::mutex::scoped_lock scoped_lock;
-static boost::mutex lib_mutex;
 
 namespace gnash {
-
-#ifdef LT_DLMUTEX
-//static void
-//gnash_mutex_seterror (void)
-//{
-//    GNASH_REPORT_FUNCTION;
-//}
-//
-//static const char *
-//gnash_mutex_geterror (void)
-//{
-//    GNASH_REPORT_FUNCTION;
-//    return NULL;
-//}
-
-void
-gnash_mutex_lock (void)
-{
-    GNASH_REPORT_FUNCTION;
-}
-
-void
-gnash_mutex_unlock (void)
-{
-    GNASH_REPORT_FUNCTION;
-}
-
-#endif
 
 SharedLib::SharedLib()
 {
@@ -98,7 +65,7 @@ SharedLib::SharedLib(const std::string& filespec)
 //                                 gnash_mutex_seterror, gnash_mutex_geterror);
 #endif
     _filespec = filespec;
-    scoped_lock lock(lib_mutex);
+    scoped_lock lock(_libMutex);
     
     // Initialize libtool's dynamic library loader
     int errors = lt_dlinit ();
@@ -150,7 +117,7 @@ SharedLib::openLib (const std::string& filespec)
     // Make sure preloaded modules are initialised
 //  LTDL_SET_PRELOADED_SYMBOLS();
     
-    scoped_lock lock(lib_mutex);
+    scoped_lock lock(_libMutex);
     
 //     // libtool's dynamic library loader is already initialized in constructor
     
@@ -191,7 +158,7 @@ SharedLib::getInitEntry (const std::string& symbol)
 //    GNASH_REPORT_FUNCTION;
     lt_ptr run = NULL;
     
-    scoped_lock lock(lib_mutex);
+    scoped_lock lock(_libMutex);
 
     run  = lt_dlsym (_dlhandle, symbol.c_str());
     
@@ -212,7 +179,7 @@ SharedLib::getDllSymbol(const std::string& symbol)
     
     lt_ptr run = NULL;
     
-    scoped_lock lock(lib_mutex);
+    scoped_lock lock(_libMutex);
 
     run  = lt_dlsym (_dlhandle, symbol.c_str());
     

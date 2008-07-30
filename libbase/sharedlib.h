@@ -22,15 +22,17 @@
 #include "gnashconfig.h"
 #endif
 
+#include <boost/thread/mutex.hpp>
+#include <string>
+#include <map>
+#include "as_object.h"
+
 #ifdef _WIN32
 #undef DLL_EXPORT
 #define LIBLTDL_DLL_IMPORT 1
 #endif
 
-#include <string>
-#include <map>
 #include <ltdl.h>
-#include "as_object.h"
 
 // Used on Darwin for basename
 #ifdef HAVE_LIBGEN_H
@@ -44,6 +46,8 @@ namespace gnash
 /// TODO: document this class
 class SharedLib
 {
+    typedef boost::mutex::scoped_lock scoped_lock;
+
 public:
     // Typedefs for function pointers to keep the code readable
     typedef bool entrypoint (void *obj);
@@ -52,9 +56,9 @@ public:
     SharedLib();
     SharedLib(const std::string& filespec);
     ~SharedLib();
+
     bool openLib();
     bool openLib(const std::string &filespec);
-    bool closeLib();
     
     // Get a C symbol from the shared library based on the name
     entrypoint *getDllSymbol (const std::string& symbol);
@@ -65,19 +69,22 @@ public:
     const char *getDllModuleName();
     int getDllRefCount();
     const char *moduleName();
-//    lt_dlhandle getDllHandle { return _dlhandle; }
-    const char *getFilespec() { return _filespec.c_str(); };
+
+    const std::string& getFilespec() { return _filespec; };
     
     
 private:
+
+    bool closeLib();
+
     lt_dlhandle _dlhandle;
     std::string _filespec;
-    const char *_pluginsdir;    
+    boost::mutex _libMutex;    
 };
 
 } // end of gnash namespace
 
-// __SHAREDLIB_H__
+// GNASH_SHAREDLIB_H
 #endif
 
 // Local Variables:
