@@ -70,6 +70,8 @@ static as_value string_char_at(const fn_call& fn);
 static as_value string_to_upper_case(const fn_call& fn);
 static as_value string_to_lower_case(const fn_call& fn);
 static as_value string_to_string(const fn_call& fn);
+static as_value string_oldToLower(const fn_call& fn);
+static as_value string_oldToUpper(const fn_call& fn);
 static as_value string_ctor(const fn_call& fn);
 
 static void
@@ -88,12 +90,12 @@ attachStringInterface(as_object& o)
 	o.init_member("toString", vm.getNative(251, 2));
 
 	// ASnative(251, 3) - [String.prototype] toUpperCase
-	// TODO: register as ASnative(102, 0) for SWF5 ?
+	vm.registerNative(string_oldToUpper, 102, 0);
 	vm.registerNative(string_to_upper_case, 251, 3);
 	o.init_member("toUpperCase", vm.getNative(251, 3));
 
 	// ASnative(251, 4) - [String.prototype] toLowerCase
-	// TODO: register as ASnative(102, 1) for SWF5 ?
+	vm.registerNative(string_oldToLower, 102, 1);
 	vm.registerNative(string_to_lower_case, 251, 4);
 	o.init_member("toLowerCase", vm.getNative(251, 4));
 
@@ -699,9 +701,36 @@ string_to_lower_case(const fn_call& fn)
 }
 
 static as_value
+string_oldToLower(const fn_call& fn)
+{
+    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+    as_value val(fn.this_ptr);
+
+    // Copy the string.
+    std::string str = val.to_string();
+    boost::to_lower(str);
+    return as_value(str);
+}
+
+
+static as_value
+string_oldToUpper(const fn_call& fn)
+{
+    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+    as_value val(fn.this_ptr);
+
+    // Copy the string.
+    std::string str = val.to_string();
+    boost::to_upper(str);
+    return as_value(str);
+}
+
+
+static as_value
 string_to_string(const fn_call& fn)
 {
-    boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<string_as_object> obj 
+	   = ensureType<string_as_object>(fn.this_ptr);
     return as_value(obj->str());
 }
 
