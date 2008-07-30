@@ -142,16 +142,6 @@ SharedLib::openLib (const std::string& filespec)
     return true;
 }
 
-const char *
-SharedLib::moduleName()
-{
-#ifdef WIN32
-	return NULL;	//TODO, hack
-#else
-	return basename(const_cast<char *>(_filespec.c_str()));
-#endif
-}
-
 SharedLib::initentry *
 SharedLib::getInitEntry (const std::string& symbol)
 {
@@ -195,29 +185,6 @@ SharedLib::getDllSymbol(const std::string& symbol)
     }
     
     return (entrypoint*)(run);
-}
-
-// Get information about the DLL
-const char *
-SharedLib::getDllFileName ()
-{
-//    GNASH_REPORT_FUNCTION;
-
-    return  lt_dlgetinfo(_dlhandle)->filename;
-}
-
-const char *
-SharedLib::getDllModuleName ()
-{
-//    GNASH_REPORT_FUNCTION;
-    return  lt_dlgetinfo(_dlhandle)->name;
-}
-
-int
-SharedLib::getDllRefCount ()
-{
-//    GNASH_REPORT_FUNCTION;
-    return  lt_dlgetinfo(_dlhandle)->ref_count;
 }
 
 } // end of gnash namespace

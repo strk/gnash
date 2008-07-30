@@ -63,15 +63,6 @@ public:
     // Get a C symbol from the shared library based on the name
     entrypoint *getDllSymbol (const std::string& symbol);
     initentry *getInitEntry (const std::string& symbol);
-
-    // Extract file info from the shared library
-    const char *getDllFileName();
-    const char *getDllModuleName();
-    int getDllRefCount();
-    const char *moduleName();
-
-    const std::string& getFilespec() { return _filespec; };
-    
     
 private:
 
