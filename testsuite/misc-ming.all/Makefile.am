@@ -1,4 +1,4 @@
-## Process this fill with automake to generate Makefile.in
+## Process this file with automake to generate Makefile.in
 # 
 # Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 #
@@ -165,7 +165,6 @@ check_PROGRAMS = \
 	shape_test \
 	morph_test1 \
 	morph_test1runner \
-	opcode_guard_test \
 	runtime_vm_stack_test \
 	new_child_in_unload_test \
 	instanceNameTest \
@@ -173,6 +172,7 @@ check_PROGRAMS = \
 
 if MING_VERSION_0_4
 check_PROGRAMS += \
+	opcode_guard_test
 	get_frame_number_test
 endif
 
@@ -270,7 +270,6 @@ check_SCRIPTS = \
 	shape_testrunner \
 	DefineEditTextVariableNameTest-Runner \
 	DefineEditTextVariableNameTest2-Runner \
-	opcode_guard_testrunner \
 	runtime_vm_stack_testrunner \
 	new_child_in_unload_testrunner \
 	instanceNameTestRunner \
@@ -284,6 +283,7 @@ endif
 
 if MING_VERSION_0_4
 check_SCRIPTS += \
+	opcode_guard_testrunner \
 	get_frame_number_testrunner \
 	$(NULL)	
 endif
@@ -1843,13 +1843,13 @@ TEST_CASES = \
 	loop_test10runner \
 	shape_testrunner \
 	morph_test1runner \
-	opcode_guard_testrunner \
 	runtime_vm_stack_testrunner \
 	instanceNameTestRunner \
 	$(NULL)
 
 if MING_VERSION_0_4
 TEST_CASES += \
+	opcode_guard_testrunner \
 	get_frame_number_testrunner
 endif
 
