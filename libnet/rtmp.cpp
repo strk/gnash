@@ -252,8 +252,8 @@ RTMP::decodeHeader(Network::byte_t *in)
     
     _header.channel = *tmpptr & RTMP_INDEX_MASK;
 //     log_debug (_("The AMF channel index is %d"), _header.channel);
-    if ((_header.channel < 0) || (_header.channel > MAX_AMF_INDEXES)) {
-	log_parse("Channel %d is out of range! Must be 0-64.", _header.channel);
+    if ((_header.channel < 2) || (_header.channel > MAX_AMF_INDEXES)) {
+	log_parse("Channel %d is out of range! Must be 2-64.", _header.channel);
     }
     
     
@@ -862,8 +862,14 @@ RTMP::processMsg(Network::byte_t *buf, size_t size)
 				   rthead->bodysize, true));
 	}
 	if (rthead->type <= RTMP::FLV_DATA) {
-	    log_debug("Processing message of type %s!", content_str[rthead->type]);
+	    log_debug("Processing message of type %s, chunksize is: %d!", content_str[rthead->type], _chunksize);
 	}
+	
+	if (rthead->bodysize > size) {
+	    log_debug("Only have %d bytes out of the desired %d",
+		      size, rthead->bodysize);
+	    return 0;
+	}   
 	
 	switch (rthead->type) {
 	  case CHUNK_SIZE:
@@ -1005,6 +1011,9 @@ RTMP::sendRecvMsg(int amf_index, rtmp_headersize_e head_size,
 	Buffer *ptr = que->front()->pop();
 	que->pop_front();
 	msg = processMsg(ptr);
+	if (msg == 0) {
+	    break;
+	}
     };
     
     return msg;
@@ -1068,14 +1077,14 @@ RTMP::split(Buffer *buf)
 }
 
 RTMP::queues_t *
-RTMP::split(Buffer *buf, size_t chunksize)
+RTMP::split(Buffer *buf, size_t pktsize)
 {
     GNASH_REPORT_FUNCTION;
 
     if (buf == 0) {
  	log_error("Buffer pointer is invalid.");
     }
-    
+
     // split the buffer at the chunksize boundary
     Network::byte_t *ptr = 0;
     rtmp_head_t *rthead = 0;
@@ -1093,19 +1102,61 @@ RTMP::split(Buffer *buf, size_t chunksize)
 	    ptr += rthead->head_size;
 	    continue;
 	}
+	if (rthead->bodysize > 65535) {
+	    log_error("Bad body size! Got %d", rthead->bodysize);
+	    return 0;
+	}
+#if 1
+	size_t left = 0;
+	Buffer *current = 0;
+	if (rthead->head_size == 1) {
+	    Buffer *current = _queues[rthead->channel].peek_back(); 
+	    ptr += rthead->head_size;
+	    left = _chunksize - current->spaceLeft();
+	    if (left > _chunksize) {
+		left = _chunksize;
+	    }
+	    cerr << "Adding data to existing packet for channel #" << rthead->channel
+		 << ", " << current->spaceLeft() << " bytes left in Buffer" << endl;
+	    current->append(ptr, left - rthead->head_size);
+	    ptr += left - rthead->head_size;
+	} else {
+	    if (rthead->bodysize <= 65535) {
+		int bufsize = ( + rthead->head_size + rthead->bodysize + (rthead->bodysize / _chunksize));
+		cerr << "New packet for channel #" << rthead->channel << " of size "
+		     << bufsize
+		     << " Chunksize is: " << _chunksize << endl;
+		chunk = new Buffer(bufsize);
+		chunk->clear();	// FIXME: temporary debug only
+		if (rthead->bodysize > _chunksize) {
+		    left = _chunksize;
+		} else {
+		    left = rthead->bodysize;
+		}
+		chunk->copy(ptr, rthead->head_size + left);
+		_queues[rthead->channel].push(chunk);
+		_channels.push_back(&_queues[rthead->channel]);
+		ptr += rthead->head_size + left;
+	    } else {
+		log_error("Body size %d out of range!", rthead->bodysize);
+	    }
+	}
+#else
 	if (rthead->head_size > 1) {
-	    bodysizes[rthead->channel] = rthead->bodysize;
+	    if (rthead->bodysize) {
+		bodysizes[rthead->channel] = rthead->bodysize;
+	    }
 	    _channels.push_back(&_queues[rthead->channel]);
-   	    cerr << "New packet for channel #" << rthead->channel << " of size "
-   		 << (rthead->head_size + rthead->bodysize)
-		 << " Chunksize is: " << _chunksize << endl;
+    	    cerr << "New packet for channel #" << rthead->channel << " of size "
+    		 << (rthead->head_size + rthead->bodysize)
+ 		 << " Chunksize is: " << _chunksize << endl;
 	    chunk = new Buffer(rthead->bodysize + rthead->head_size);
 	    chunk->clear();	// FIXME: temporary debug only
 	    _queues[rthead->channel].push(chunk);
 	}
 	if (rthead->head_size <= RTMP_MAX_HEADER_SIZE) {
 	    // Many RTMP messages are smaller than the chunksize
-	    if (bodysizes[rthead->channel] <= chunksize) {
+	    if (bodysizes[rthead->channel] <= _chunksize) {
 		// a single byte header has no length field. As these are often
 		// used as continuation packets, the body size is the same as the
 		// previous header with a length field.
@@ -1118,20 +1169,24 @@ RTMP::split(Buffer *buf, size_t chunksize)
 		}
 	    } else { // this RTMP message is larger than the chunksize
 		if (rthead->head_size > 1) {
-		    totalsize = rthead->head_size + chunksize;
+		    totalsize = rthead->head_size + _chunksize;
 		} else {
-		    totalsize = rthead->head_size + (bodysizes[rthead->channel] - chunksize);
+		    totalsize = rthead->head_size + (bodysizes[rthead->channel] - _chunksize);
 //		    bodysizes[rthead->channel] = 0;
 		}
 	    }
+ 	    if (rthead->type == CHUNK_SIZE) {
+ 		_chunksize = ntohl(*reinterpret_cast<boost::uint32_t *>(ptr + rthead->head_size));
+ 		log_debug("Setting chunk size for packets to %d.", _chunksize);
+ 	    }	    
 	    // Range check the size of the packet
-	    if (totalsize <= (chunksize + RTMP_MAX_HEADER_SIZE)) {
+	    if (totalsize <= (_chunksize + RTMP_MAX_HEADER_SIZE)) {
 		nbytes += totalsize;
 		// Skip the header for all but the first packet. The rest are just to
 		// complete all the data up to the body size from the header.
-//    		cerr << _queues[rthead->channel].size()
-//  		     << " messages in queue for channel "
-//    		     << rthead->channel << endl;
+    		cerr << _queues[rthead->channel].size()
+  		     << " messages in queue for channel "
+    		     << rthead->channel << endl;
 		Buffer *current = _queues[rthead->channel].peek_back();
 		// As the pointer to the buffer is already stored
 		// when it's allocated, we just append the current
@@ -1139,12 +1194,12 @@ RTMP::split(Buffer *buf, size_t chunksize)
 		if (rthead->head_size == 1) {
 		    ptr += rthead->head_size;
 		    current->append(ptr, totalsize - 1);
-// 		    cerr << "Adding data to existing packet for channel #" << rthead->channel
-// 			 << ", read " << totalsize << " bytes." << endl;
+ 		    cerr << "Adding data to existing packet for channel #" << rthead->channel
+ 			 << ", read " << totalsize << " bytes." << endl;
 		} else {
 		    current->copy(ptr, totalsize);
-// 		    cerr << "Adding data to new packet for channel #" << rthead->channel
-// 			 << ", read " << totalsize << " bytes." << endl;
+ 		    cerr << "Adding data to new packet for channel #" << rthead->channel
+ 			 << ", read " << totalsize << " bytes." << endl;
 		}
 //   		if (_queues[rthead->channel] != 0) {
 		// If there is no space left, then we've read in the whole packet
@@ -1158,6 +1213,7 @@ RTMP::split(Buffer *buf, size_t chunksize)
 	    log_error("RTMP header size is out of range! %d", rthead->head_size);
 	    break;
 	}
+#endif
     }
 
     return &_channels;
