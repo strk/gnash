@@ -361,7 +361,7 @@ XML::parseXML(const std::string& xml_in)
 {
     //GNASH_REPORT_FUNCTION;
 
-    //log_debug(_("Parse XML from memory: %s"), xml_in.c_str());
+    //log_debug(_("Parse XML from memory: %s"), xml_in);
 
     if (xml_in.empty()) {
         log_error(_("XML data is empty"));
@@ -571,14 +571,14 @@ XML::load(const URL& url)
     std::auto_ptr<IOChannel> str ( StreamProvider::getDefaultInstance().getStream(url) );
     if ( ! str.get() ) 
     {
-        log_error(_("Can't load XML file: %s (security?)"), url.str().c_str());
+        log_error(_("Can't load XML file: %s (security?)"), url.str());
         return false;
         // TODO: this is still not correct.. we should still send onData later...
         //as_value nullValue; nullValue.set_null();
         //callMethod(NSV::PROP_ON_DATA, nullValue);
     }
 
-    log_security(_("Loading XML file from url: '%s'"), url.str().c_str());
+    log_security(_("Loading XML file from url: '%s'"), url.str());
     queueLoad(str);
 
     return true;
@@ -645,14 +645,14 @@ XML::sendAndLoad(const URL& url, XML& target)
     std::auto_ptr<IOChannel> str ( StreamProvider::getDefaultInstance().getStream(url, data) );
     if ( ! str.get() ) 
     {
-        log_error(_("Can't load XML file: %s (security?)"), url.str().c_str());
+        log_error(_("Can't load XML file: %s (security?)"), url.str());
         return false;
         // TODO: this is still not correct.. we should still send onData later...
         //as_value nullValue; nullValue.set_null();
         //callMethod(NSV::PROP_ON_DATA, nullValue);
     }
 
-    log_security(_("Loading XML file from url: '%s'"), url.str().c_str());
+    log_security(_("Loading XML file from url: '%s'"), url.str());
     target.queueLoad(str);
 
     return true;
@@ -914,7 +914,7 @@ xml_sendandload(const fn_call& fn)
         std::stringstream ss;
         fn.dump_args(ss);
         log_aserror(_("XML.sendAndLoad(%s): missing arguments"),
-		ss.str().c_str());
+		ss.str());
         );
         return as_value(false);
     }
@@ -928,7 +928,7 @@ xml_sendandload(const fn_call& fn)
         std::stringstream ss;
         fn.dump_args(ss);
         log_aserror(_("XML.sendAndLoad(%s): second argument doesn't cast to an object"),
-		ss.str().c_str());
+		ss.str());
         );
         return as_value(false);
     }
@@ -939,7 +939,7 @@ xml_sendandload(const fn_call& fn)
         std::stringstream ss;
         fn.dump_args(ss);
         log_aserror(_("XML.sendAndLoad(%s): second argument is not an XML object"),
-		ss.str().c_str());
+		ss.str());
         );
         return as_value(false);
     }
