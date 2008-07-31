@@ -178,7 +178,8 @@ XML::~XML()
 {
     //GNASH_REPORT_FUNCTION;
 
-    for (LoadThreadList::iterator it=_loadThreads.begin(); it != _loadThreads.end(); ++it)
+    for (LoadThreadList::iterator it = _loadThreads.begin(),
+		    e = _loadThreads.end(); it != e; ++it)
     {
         delete *it; // supposedly joins the thread
     }
