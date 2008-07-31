@@ -652,10 +652,6 @@ xmlsocket_as_object::checkForIncomingData()
         log_debug(_("Still processing data"));
     }
     
-#ifndef USE_DMALLOC
-    //dump_memory_stats(__FUNCTION__, __LINE__, "memory checkpoint");
-#endif
-
     std::vector<std::string > msgs;
     if (obj.anydata(msgs))
     {
@@ -676,18 +672,12 @@ xmlsocket_as_object::checkForIncomingData()
 				std::string& s = *it;
 				as_value datain( s );
 
-#ifndef USE_DMALLOC
-                //dump_memory_stats(__FUNCTION__, __LINE__, "start");
-#endif
 				as_environment env;
 				env.push(datain);
 				fn_call call(this, &env, 1, env.stack_size() - 1);
 				onDataHandler->call(call);
 //                call_method(as_value(onDataHandler.get()), &env, this, 1, env.stack_size()-1);
 
-#ifndef USE_DMALLOC
-                //dump_memory_stats(__FUNCTION__, __LINE__, "end");
-#endif  
             }
             obj.processing(false);
         }
