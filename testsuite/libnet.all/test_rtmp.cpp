@@ -351,7 +351,7 @@ test_split()
             runtest.pass("RTMP::split(1st packet header) of 6");
         } else {
             runtest.fail("RTMP::split(1st packet header) of 6");
-            tmpbuf->dump();
+//            tmpbuf->dump();
         }
     }
     
@@ -366,7 +366,7 @@ test_split()
             runtest.pass("RTMP::split(2nd packet header) of 6");
         } else {
             runtest.fail("RTMP::split(2nd packet header) of 6");
-            tmpbuf->dump();
+//            tmpbuf->dump();
         }
     }
 
@@ -381,7 +381,7 @@ test_split()
             runtest.pass("RTMP::split(3rd packet header) of 6");
         } else {
             runtest.fail("RTMP::split(3rd packet header) of 6");
-            tmpbuf->dump();
+//            tmpbuf->dump();
         }
     }
     
@@ -396,7 +396,7 @@ test_split()
             runtest.pass("RTMP::split(4th packet header) of 6");
         } else {
             runtest.fail("RTMP::split(4th packet header) of 6");
-            tmpbuf->dump();
+//            tmpbuf->dump();
         }
     }
     
