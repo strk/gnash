@@ -367,12 +367,6 @@ XML::parseXML(const std::string& xml_in)
         return false;
     }
 
-#ifndef USE_DMALLOC
-    //dump_memory_stats(__FUNCTION__, __LINE__, "before xmlParseMemory");
-#endif
-
-    //_bytes_total = _bytes_loaded = xml_in.size();
-
     // Clear current data
     clear(); 
     
@@ -410,9 +404,6 @@ XML::parseXML(const std::string& xml_in)
     else if ( firstNode ) xmlFreeNodeList(firstNode);
     xmlMemoryDump();
 
-#ifndef USE_DMALLOC
-    //dump_memory_stats(__FUNCTION__, __LINE__, "after xmlParseMemory");
-#endif
     return ret;
   
 }
