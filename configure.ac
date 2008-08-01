@@ -2813,7 +2813,7 @@ if test x$cross_compiling = xno; then
     echo "        WARNING: You need to have the Ming utilities package" >&4
     echo "                 installed to run most of the tests in Gnash testsuite." >&4
     echo "                 Install it from http://www.libming.org" >&4
-    echo "                 or .deb users: apt-get install libming-utils" >&4
+    echo "                 or .deb users: apt-get install libming-util" >&4
   fi
 
   if test x"$MAKESWF" != x && test $MING_VERSION_CODE -lt 00040006; then
