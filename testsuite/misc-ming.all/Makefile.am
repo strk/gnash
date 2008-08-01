@@ -172,7 +172,7 @@ check_PROGRAMS = \
 
 if MING_VERSION_0_4
 check_PROGRAMS += \
-	opcode_guard_test
+	opcode_guard_test \
 	get_frame_number_test
 endif
 
