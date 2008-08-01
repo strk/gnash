@@ -260,9 +260,9 @@ void
 CQue::dump()
 {
 //    GNASH_REPORT_FUNCTION;
-    deque<amf::Buffer *>::iterator it;
     boost::mutex::scoped_lock lock(_mutex);
     cerr << endl << "CQue \"" << _name << "\" has "<< _que.size() << " buffers." << endl;
+    deque<amf::Buffer *>::iterator it;
     for (it = _que.begin(); it != _que.end(); it++) {
 	amf::Buffer *ptr = *(it);
         ptr->dump();

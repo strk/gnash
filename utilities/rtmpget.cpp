@@ -312,6 +312,18 @@ main(int argc, char *argv[])
 	    exit(-1);
 	}
 	RTMP::queues_t *que = client.split(msgs);
+	if (que == 0) {
+	    log_error("Never got any messages!");
+	    exit(-1);
+	}
+
+#if 0
+	deque<CQue *>::iterator it;
+	for (it = que->begin(); it != que->end(); it++) {
+	    CQue *q = *(it);
+	    q->dump();
+	}
+#endif
 	while (que->size()) {
 	    cerr << "QUE SIZE: " << que->size() << endl;
 	    Buffer *ptr = que->front()->pop();
@@ -319,6 +331,10 @@ main(int argc, char *argv[])
 		que->pop_front();	// delete the item from the queue
 		RTMP::rtmp_head_t *rthead = client.decodeHeader(ptr);
 		msg2 = client.processMsg(ptr);
+		if (msg2 == 0) {
+		    log_error("Couldn't process the RTMP message!");
+		    continue;
+		}
 	    } else {
 		log_error("Buffer size (%d) out of range at %d", ptr->size(), __LINE__);
 		break;

@@ -254,6 +254,7 @@ RTMP::decodeHeader(Network::byte_t *in)
 //     log_debug (_("The AMF channel index is %d"), _header.channel);
     if ((_header.channel < 2) || (_header.channel > MAX_AMF_INDEXES)) {
 	log_parse("Channel %d is out of range! Must be 2-64.", _header.channel);
+	return 0;
     }
     
     
@@ -265,6 +266,7 @@ RTMP::decodeHeader(Network::byte_t *in)
     }
     if ((_header.head_size < 0) || (_header.head_size > RTMP_MAX_HEADER_SIZE)) {
 	log_parse("Header size %d is out of range! Must be 1-12.", _header.head_size);
+	return 0;
     }
     
     if (_header.head_size >= 4) {
@@ -294,9 +296,10 @@ RTMP::decodeHeader(Network::byte_t *in)
 		  _header.channel, _header.head_size, _header.bodysize,
 		  content_str[_header.type]);
     } else {
-	log_debug("Channel: %d, Header size: %d, Body size: %d, type: %d (unkown)",
+	log_error("Channel: %d, Header size: %d, Body size: %d, type: %d (unkown)",
 		  _header.channel, _header.head_size, _header.bodysize,
 		  _header.type);
+	return 0;
     }
     if (_header.head_size == 12) {
         _header.src_dest = *(reinterpret_cast<RTMPMsg::rtmp_source_e *>(tmpptr));
@@ -306,6 +309,7 @@ RTMP::decodeHeader(Network::byte_t *in)
 
     if ((_header.bodysize < 0) || (_header.bodysize > 0xffff)) {
 	log_parse("Body size in header, %d, is out of range! Must be 1-65535.", _header.bodysize);
+	return 0;
     }
 
     return &_header;
@@ -850,6 +854,11 @@ RTMP::processMsg(Network::byte_t *buf, size_t size)
     RTMPMsg *msg = 0;
     Network::byte_t *ptr = buf;
     RTMP::rtmp_head_t *rthead = decodeHeader(ptr);
+
+    if (rthead == 0) {
+	log_error("Failed to decode the RTMP header!");
+	return 0;
+    }
     
     if (rthead) {
 	if (rthead->head_size == 1) {
@@ -1096,6 +1105,10 @@ RTMP::split(Buffer *buf, size_t pktsize)
     Buffer *chunk = 0;
     while ((ptr - buf->reference()) < buf->size()) {
 	rthead = decodeHeader(ptr);
+	if (rthead == 0) {
+	    log_error("Failed to decode the RTMP header!");
+	    return 0;
+	}
 	// Sometimes we get a packet with a zero body size, which we just
 	// ignore.
 	if (rthead->bodysize == 0) {
