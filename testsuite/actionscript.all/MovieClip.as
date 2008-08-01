@@ -27,19 +27,19 @@ rcsid="$Id: MovieClip.as,v 1.133 2008/05/09 13:21:08 strk Exp $";
 endOfTest = function() 
 {
 #if OUTPUT_VERSION <= 5
-	check_totals(231); // SWF5
+	check_totals(235); // SWF5
 #endif
 
 #if OUTPUT_VERSION == 6
-	check_totals(655); // SWF6
+	check_totals(659); // SWF6
 #endif
 
 #if OUTPUT_VERSION == 7
-	check_totals(672); // SWF7
+	check_totals(676); // SWF7
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(673); // SWF8+
+	check_totals(677); // SWF8+
 #endif
 
 	play();
@@ -1086,6 +1086,14 @@ check_equals(b.xMin, 10);
 check_equals(b.xMax, 20);
 check_equals(b.yMin, 5);
 check_equals(b.yMax, 15);
+
+draw._yscale = -50;
+check_equals(draw._yscale, -50);
+check_equals(draw._height, 10);
+
+draw._xscale = -50;
+check_equals(draw._xscale, -50);
+check_equals(draw._width, 5);
 
 container._xscale = 100;
 container._yscale = 100;

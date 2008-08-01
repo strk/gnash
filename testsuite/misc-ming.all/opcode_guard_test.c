@@ -21,6 +21,7 @@
  */
 
 #include <stdlib.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <ming.h>
 
@@ -29,6 +30,16 @@
 #define OUTPUT_VERSION  7
 #define OUTPUT_FILENAME "opcode_guard_test.swf"
 
+void
+my_error(const char *msg, ...)
+{
+        va_list args;
+
+        va_start(args, msg);
+        vprintf(msg, args);
+        va_end(args);
+        exit(1);
+}
 
 int
 main(int argc, char** argv)
@@ -47,6 +58,7 @@ main(int argc, char** argv)
   }
 
   Ming_init();
+  Ming_setErrorFunction(my_error);
   mo = newSWFMovieWithVersion(OUTPUT_VERSION);
   SWFMovie_setDimension(mo, 800, 600);
   SWFMovie_setRate (mo, 1);

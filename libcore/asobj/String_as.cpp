@@ -37,6 +37,7 @@
 
 #include <boost/algorithm/string/case_conv.hpp>
 #include <algorithm>
+#include <locale>
 
 #define ENSURE_FN_ARGS(min, max, rv)                                    \
     if (fn.nargs < min) {                                               \
@@ -70,6 +71,8 @@ static as_value string_char_at(const fn_call& fn);
 static as_value string_to_upper_case(const fn_call& fn);
 static as_value string_to_lower_case(const fn_call& fn);
 static as_value string_to_string(const fn_call& fn);
+static as_value string_oldToLower(const fn_call& fn);
+static as_value string_oldToUpper(const fn_call& fn);
 static as_value string_ctor(const fn_call& fn);
 
 static void
@@ -88,12 +91,14 @@ attachStringInterface(as_object& o)
 	o.init_member("toString", vm.getNative(251, 2));
 
 	// ASnative(251, 3) - [String.prototype] toUpperCase
-	// TODO: register as ASnative(102, 0) for SWF5 ?
+	// ASnative(102, 0) - SWF5 to upper.
+	vm.registerNative(string_oldToUpper, 102, 0);
 	vm.registerNative(string_to_upper_case, 251, 3);
 	o.init_member("toUpperCase", vm.getNative(251, 3));
 
 	// ASnative(251, 4) - [String.prototype] toLowerCase
-	// TODO: register as ASnative(102, 1) for SWF5 ?
+	// ASnative(102, 1) - SWF5 to lower.
+	vm.registerNative(string_oldToLower, 102, 1);
 	vm.registerNative(string_to_lower_case, 251, 4);
 	o.init_member("toLowerCase", vm.getNative(251, 4));
 
@@ -671,15 +676,20 @@ string_to_upper_case(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
     as_value val(fn.this_ptr);
-    
-    // Copy the string
-    std::string str = val.to_string();
 
     VM& vm = obj->getVM();
+    const int version = vm.getSWFVersion();
 
-    boost::to_upper(str, vm.getLocale());
+    std::wstring wstr = utf8::decodeCanonicalString(val.to_string(), version);
 
-    return as_value(str);
+    // If this is the C locale, the conversion will be wrong.
+    // Most other locales are correct. FIXME: get this to
+    // work regardless of user's current settings.
+    std::locale currentLocale("");
+    boost::to_upper(wstr, currentLocale);
+
+    return as_value(utf8::encodeCanonicalString(wstr, version));
+
 }
 
 static as_value
@@ -688,20 +698,50 @@ string_to_lower_case(const fn_call& fn)
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
     as_value val(fn.this_ptr);
     
-    // Copy the string.
-    std::string str = val.to_string();
-
     VM& vm = obj->getVM();
+    const int version = vm.getSWFVersion();
 
-    boost::to_lower(str, vm.getLocale());
+    std::wstring wstr = utf8::decodeCanonicalString(val.to_string(), version);
 
+    // If this the C locale, the conversion will be wrong.
+    // Most other locales are correct.
+    std::locale currentLocale("");
+    boost::to_lower(wstr, currentLocale);
+
+    return as_value(utf8::encodeCanonicalString(wstr, version));
+}
+
+static as_value
+string_oldToLower(const fn_call& fn)
+{
+    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+    as_value val(fn.this_ptr);
+
+    // This should use the C locale; extended characters are
+    // left alone. FIXME: SWF5 should garble the output.
+    std::string str = boost::to_lower_copy(val.to_string());
     return as_value(str);
 }
+
+
+static as_value
+string_oldToUpper(const fn_call& fn)
+{
+    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+    as_value val(fn.this_ptr);
+
+    // This should use the C locale; extended characters are
+    // left alone. FIXME: SWF5 should garble the output.
+    std::string str = boost::to_upper_copy(val.to_string());
+    return as_value(str);
+}
+
 
 static as_value
 string_to_string(const fn_call& fn)
 {
-    boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<string_as_object> obj 
+	   = ensureType<string_as_object>(fn.this_ptr);
     return as_value(obj->str());
 }
 

@@ -52,7 +52,7 @@
 # define STACK_DUMP_LIMIT 32
 
 // Define to get debugging messages for try / catch
-#define GNASH_DEBUG_TRY 1
+//#define GNASH_DEBUG_TRY 1
 
 #endif
 

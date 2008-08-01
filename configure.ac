@@ -1925,7 +1925,7 @@ if test x"$GCC" = x"yes"; then
     -Wnon-virtual-dtor \
     -Wunused \
     -Wextra \   
-    -ansi \
+    #-ansi \
     "
   CFLAGS="$CFLAGS \
     -W \
@@ -2814,6 +2814,12 @@ if test x$cross_compiling = xno; then
     echo "                 installed to run most of the tests in Gnash testsuite." >&4
     echo "                 Install it from http://www.libming.org" >&4
     echo "                 or .deb users: apt-get install libming-utils" >&4
+  fi
+
+  if test x"$MAKESWF" != x && test $MING_VERSION_CODE -lt 00040006; then
+    echo "        WARNING: You have an older version of Ming installed and will not" >&4
+    echo "                 be able to run all of the tests in Gnash testsuite." >&4
+    echo "                 Install the latest version from http://www.libming.org" >&4
   fi
 
   if test x"$SWFDEC_TESTSUITE" != x; then

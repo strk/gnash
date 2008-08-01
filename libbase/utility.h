@@ -204,9 +204,9 @@ std::string typeName(const T& inst)
 #include <pthread.h>
 #else
 # ifdef _WIN32
-extern "C" {
-    unsigned long int /* DWORD WINAPI */ GetCurrentThreadId(void);
-}
+} // end namespace gnash
+extern "C" unsigned long int /* DWORD WINAPI */ GetCurrentThreadId(void);
+namespace gnash {
 # else
 /* getpid() */
 #include <sys/types.h>
