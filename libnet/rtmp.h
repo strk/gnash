@@ -153,12 +153,6 @@ public:
         RTMP_STATE_HEADER,
         RTMP_STATE_DONE
     } rtmp_state_t;
-//     typedef struct {
-// 	rtmp_status_e status;
-// 	std::string   method;
-// 	double        streamid;
-// 	std::vector<amf::Element *> objs;
-//     } rtmp_msg_t;
     typedef enum {
         RTMP_ERR_UNDEF=0,
         RTMP_ERR_NOTFOUND,
