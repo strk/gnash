@@ -52,6 +52,7 @@ static void test_encoding();
 static void test_string();
 static void test_object();
 static void test_boolean();
+static void test_array();
 
 // Enable the display of memory allocation and timing data
 static bool memdebug = false;
@@ -176,6 +177,7 @@ main(int argc, char *argv[])
     // run the tests
     test_encoding();
     test_object();
+    test_array();
 
 #if defined(HAVE_MALLINFO) && defined(USE_STATS_MEMORY)
    if (memdebug) {
@@ -303,7 +305,8 @@ test_encoding()
         runtest.fail("Encoded AMF NULL String");
     }
     delete encnull;
-    
+
+// amf::AMF::encodeECMAArray(unsigned char*, int)
 }
 // amf::encodeDate(unsigned char*)
 // amf::AMF::encodeLongString(unsigned char*, int)
@@ -312,13 +315,31 @@ test_encoding()
 // amf::AMF::encodeUnsupported()
 // amf::AMF::encodeNull()
 // amf::AMF::encodeElement(amf::Element*)
-// amf::AMF::encodeECMAArray(unsigned char*, int)
 // amf::AMF::encodeMovieClip(unsigned char*, int)
 // amf::AMF::encodeRecordSet(unsigned char*, int)
 // amf::AMF::encodeReference(unsigned char*, int)
 // amf::AMF::encodeUndefined()
 // amf::AMF::encodeXMLObject(unsigned char*, int)
 
+void
+test_array()
+{
+    Element top;
+    AMF amf;
+    top.makeObject();
+
+    Buffer *hex1 = hex2mem("08 00 00 00 0a 00 08 64 75 72 61 74 69 6f 6e 00 40 ad 04 14 7a e1 47 ae 00 05 77 69 64 74 68 00 40 74 00 00 00 00 00 00 00 06 68 65 69 67 68 74 00 40 6e 00 00 00 00 00 00 00 0d 76 69 64 65 6f 64 61 74 61 72 61 74 65 00 40 72 c0 00 00 00 00 00 00 09 66 72 61 6d 65 72 61 74 65 00 40 39 00 00 00 00 00 00 00 0c 76 69 64 65 6f 63 6f 64 65 63 69 64 00 40 10 00 00 00 00 00 00 00 0d 61 75 64 69 6f 64 61 74 61 72 61 74 65 00 40 58 00 00 00 00 00 00 00 0a 61 75 64 69 6f 64 65 6c 61 79 00 3f a3 74 bc 6a 7e f9 db 00 0c 61 75 64 69 6f 63 6f 64 65 63 69 64 00 40 00 00 00 00 00 00 00 00 0c 63 61 6e 53 65 65 6b 54 6f 45 6e 64 01 01 00 00 09");
+    Element *el1 = amf.extractAMF(hex1);
+    if ((el1->getType() == Element::ECMA_ARRAY_AMF0)
+        && (el1->propertySize() == 10)) {
+        runtest.pass("Extracted ECMA Array");
+    } else {
+        runtest.fail("Extracted ECMA Array");
+    }
+    el1->dump();
+    delete el1;
+}
+    
 void
 test_object()
 {
@@ -423,5 +444,3 @@ main(int /*argc*/, char /* *argv[]*/)
 }
 
 #endif
-
-
