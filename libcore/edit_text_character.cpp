@@ -1285,6 +1285,12 @@ edit_text_character::format_text()
 	assert(! _text.empty() );
 	
 	boost::uint32_t code = 0;
+	
+	// String iterators are very sensitive to 
+	// potential changes to the string (to allow for copy-on-write).
+	// So there must be no external changes to the string or
+	// calls to most non-const member functions during this loop.
+	// Especially not c_str() or data().
     std::wstring::const_iterator it = _text.begin();
     const std::wstring::const_iterator e = _text.end();
 
