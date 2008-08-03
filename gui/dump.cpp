@@ -37,6 +37,7 @@
 
 #include <iostream>
 #include <string>
+#include <fstream>
 
 #ifndef RENDERER_AGG
 #error Dump gui requires AGG renderer
@@ -77,39 +78,28 @@ void terminate_signal(int /*signo*/) {
 }
 #endif
 
+// TODO:  Let user decide bits-per-pixel
+// TODO:  let user decide colorspace (see also _bpp above!)
 DumpGui::DumpGui(unsigned long xid, float scale, bool loop, unsigned int depth) :
-    Gui(xid, scale, loop, depth)
+    Gui(xid, scale, loop, depth),
+    _agg_renderer(NULL),
+    _offscreenbuf(NULL),
+    _offscreenbuf_size(-1),
+    _timeout(0),
+    _framecount(0),
+    _bpp(32),
+    _pixelformat("BGRA32")
 {
-
-    _agg_renderer = NULL;
-    _offscreenbuf = NULL;
-    _offscreenbuf_size = -1;
-    _file_output = NULL;
-    _file_stream = NULL;
-    _timeout = 0;
-    _framecount = 0;
-    _bpp = 32;                  // TODO:  Let user decide bits-per-pixel
-
-    // TODO:  let user decide colorspace (see also _bpp above!)
-    strncpy(_pixelformat, "BGRA32", sizeof(_pixelformat));
     if (loop) {
-        std::cout << "# WARNING:  Gnash was told to loop the movie" << std::endl;
+        std::cerr << "# WARNING:  Gnash was told to loop the movie" << std::endl;
     }
     if (_xid) {
-        std::cout << "# WARNING:  Ignoring request to display in X11 window" << std::endl;
+        std::cerr << "# WARNING:  Ignoring request to display in X11 window" << std::endl;
     }
 }
 
 DumpGui::~DumpGui()
 {
-    if (_offscreenbuf) {
-        free(_offscreenbuf);
-        _offscreenbuf=NULL;
-    }
-    if ((DumpGui::_file_stream != NULL) && (DumpGui::_file_stream->is_open())) {
-        DumpGui::_file_stream->close();
-        std::cout << "# Finished writing file" << std::endl;
-    }
     std::cout << "FRAMECOUNT=" << _framecount << "" << std::endl;
 }
 
@@ -128,14 +118,19 @@ DumpGui::init(int argc, char **argv[])
     opterr = 0;
     while ((c = getopt (argc, *argv, "D:")) != -1) {
         if (c == 'D') {
-            _file_output = optarg;
+            // Terminate if no filename is given.
+            if (!optarg) {
+                std::cout << 
+                    _("# FATAL:  No filename given with -D argument.") << std::endl;      
+                return false;
+            }      
+            _fileOutput = optarg;
         }
     }
     opterr = origopterr;
 
-    if (_file_output == NULL) {
-        std::cout << 
-            _("# FATAL:  No filename given with -D argument.") << std::endl;
+    if (_fileOutput.empty()) {
+        // Terminate if filename is empty.
         return false;
     }
 
@@ -145,7 +140,7 @@ DumpGui::init(int argc, char **argv[])
 #endif
 
     init_dumpfile();
-    _agg_renderer = create_render_handler_agg(_pixelformat);
+    _agg_renderer = create_render_handler_agg(_pixelformat.c_str());
     set_render_handler(_agg_renderer);
 
     return true;
@@ -249,12 +244,12 @@ DumpGui::createWindow(int width, int height)
 void
 DumpGui::writeFrame()
 {
-    assert(_file_stream != NULL);
-    if (_file_stream->is_open()) {
-        _file_stream->write((char*)_offscreenbuf, _offscreenbuf_size);
-        //_file_stream->flush();
+    assert(_fileStream);
+    if (_fileStream.is_open()) {
+        _fileStream.write(reinterpret_cast<char*>(_offscreenbuf.get()), _offscreenbuf_size);
         _framecount++;
-    } else {
+    }
+    else {
         std::cout << _("# FATAL:  Unable to write to closed output file.") << "" << std::endl;
         log_error(_("Unable to write to closed output file."));
         quit();
@@ -264,71 +259,69 @@ DumpGui::writeFrame()
 void
 DumpGui::init_dumpfile()
 {
-    if (_file_output == NULL) {
-        log_error(_("Please supply a dump filename for gnash-dump."));
+    // This should never be empty.
+    assert (!_fileOutput.empty());
+
+    _fileStream.open(_fileOutput.c_str());
+    
+    if (!_fileStream) {
+        log_error(_("Unable to write file '%s'."), _fileOutput);
+        std::cerr << "# FATAL:  Unable to write file '" << _fileOutput << "'" << std::endl;
         exit(1);
-    } else {
-        _file_stream = new std::ofstream();
-        _file_stream->open(_file_output);
-        if (_file_stream->fail()) {
-            log_error(_("Unable to write file '%s'."), _file_output);
-            std::cout << "# FATAL:  Unable to write file '" << _file_output << "'" << std::endl;
-            exit(1);
-        } else {
-            // Yes, this should go to cout.  The user needs to know this
-            // information in order to process the file.  Print out in a
-            // format that is easy to source into shell.
-            std::cout << 
-                "# Gnash created a raw dump file with the following properties:" << std::endl <<
-                "COLORSPACE=" << _pixelformat << std::endl <<
-                "NAME=" << _file_output  << std::endl;
-        }
     }
+    
+    // Yes, this should go to cout.  The user needs to know this
+    // information in order to process the file.  Print out in a
+    // format that is easy to source into shell.
+    std::cout << 
+        "# Gnash created a raw dump file with the following properties:" << std::endl <<
+        "COLORSPACE=" << _pixelformat << std::endl <<
+        "NAME=" << _fileOutput  << std::endl;
+    
 }
 
 void
 DumpGui::setRenderHandlerSize(int width, int height)
 {
-    assert(width>0);
-    assert(height>0);
-    assert(_agg_renderer!=NULL);
+    assert(width > 0);
+    assert(height > 0);
+    assert(_agg_renderer != NULL);
     
-    if ((_offscreenbuf != NULL) && (width == _width) && (height == _height))
+    if (_offscreenbuf.get() && (width == _width) && (height == _height)) {
         return;
+    }
 	   
     _width = width;
     _height = height;
     std::cout << "WIDTH=" << _width  << std::endl <<
         "HEIGHT=" << _height  << std::endl;
-    if (_offscreenbuf) {  
-        free(_offscreenbuf);
-        _offscreenbuf = NULL;
-    }
 
     int row_size = width*((_bpp+7)/8);
-    int new_bufsize = row_size * height;
+    int newBufferSize = row_size * height;
   	
-    // TODO: At the moment we only increase the buffer and never decrease it. Should be
-    // changed sometime; movies which change the stage size will probably cause
-    // all sorts of havok with raw data, but that's not our problem...
-    if (new_bufsize > _offscreenbuf_size) {
-        // TODO: C++ conform alternative to realloc?
-        _offscreenbuf	= static_cast<unsigned char *>( realloc(_offscreenbuf, new_bufsize) );
-        if (!_offscreenbuf) {
-            log_debug("Could not allocate %i bytes for offscreen buffer: %s",
-                      new_bufsize, strerror(errno)
-                      );
-            return;
+    // Reallocate the buffer when it shrinks or grows.
+    if (newBufferSize != _offscreenbuf_size) {
+
+        try {
+              _offscreenbuf.reset(new unsigned char[newBufferSize]);
+              log_debug("DUMP-AGG: %i bytes offscreen buffer allocated", newBufferSize);
+        }
+        catch (std::bad_alloc &e)
+        {
+            log_error("Could not allocate %i bytes for offscreen buffer: %s",
+                  newBufferSize, e.what());
+                  
+              // TODO: what to do here? An assertion in render_handler_agg.cpp
+              // fails if we just return.
+              return;
         }
   
-        log_debug("DUMP-AGG: %i bytes offscreen buffer allocated", new_bufsize);
-  
-        _offscreenbuf_size = new_bufsize;
-        memset(_offscreenbuf, 0, new_bufsize);
+        _offscreenbuf_size = newBufferSize;
+
     }
-  	
+
     static_cast<render_handler_agg_base *> (_agg_renderer)->init_buffer
-        (_offscreenbuf,
+        (_offscreenbuf.get(),
          _offscreenbuf_size,
          _width,
          _height,
