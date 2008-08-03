@@ -24,7 +24,7 @@
 // #if defined(_WIN32) || defined(WIN32)
 // # define lock(lib_mutex);
 // # define scoped_lock ;
-// #define PLUGINSDIR "./"	//hack
+// #define PLUGINSDIR "./"    //hack
 // #define USE_DIRENT 1
 // #else
 // # include <boost/detail/lightweight_mutex.hpp>
@@ -43,7 +43,7 @@
 #include "extension.h"
 #include "as_object.h"
 
-#if HAVE_DIRENT_H || WIN32==1	// win32 hack
+#if HAVE_DIRENT_H || WIN32==1    // win32 hack
 # include <dirent.h>
 # define NAMLEN(dirent) std::strlen((dirent)->d_name)
 #else
@@ -139,7 +139,8 @@ Extension::initModule(const std::string& module, as_object &where)
         sl = new SharedLib(module);
         sl->openLib();
         _plugins[module] = sl;
-    } else {
+    }
+    else {
         sl = _plugins[module];
     }
     
@@ -149,7 +150,8 @@ Extension::initModule(const std::string& module, as_object &where)
 
     if (symptr) {    
         symptr(where);
-    } else {
+    }
+    else {
         log_error(_("Couldn't get class_init symbol"));
     }
     
@@ -158,29 +160,31 @@ Extension::initModule(const std::string& module, as_object &where)
 
 bool
 Extension::initModuleWithFunc(const std::string& module, const std::string& func,
-	as_object &obj)
+    as_object &obj)
 {
-	SharedLib *sl;
+    SharedLib *sl;
 
-	log_security(_("Initializing module: \"%s\""), module);
+    log_security(_("Initializing module: \"%s\""), module);
 
-	if (_plugins[module] == 0) {
-		sl = new SharedLib(module);
-		sl->openLib();
-		_plugins[module] = sl;
-	} else {
-		sl = _plugins[module];
-	}
+    if (_plugins[module] == 0) {
+        sl = new SharedLib(module);
+        sl->openLib();
+        _plugins[module] = sl;
+    }
+    else {
+        sl = _plugins[module];
+    }
 
-	SharedLib::initentry *symptr = sl->getInitEntry(func);
+    SharedLib::initentry *symptr = sl->getInitEntry(func);
 
-	if (symptr) {
-		symptr(obj);
-	} else {
-		log_error(_("Couldn't get class_init symbol: \"%s\""), func);
-	}
+    if (symptr) {
+        symptr(obj);
+    }
+    else {
+        log_error(_("Couldn't get class_init symbol: \"%s\""), func);
+    }
 
-	return true;
+    return true;
 }
 
 bool
@@ -197,8 +201,8 @@ Extension::scanDir(const std::string& dirlist)
 //    GNASH_REPORT_FUNCTION;
     
     Tok t(dirlist, Sep(":"));
-    for (Tok::iterator i = t.begin(), e = t.end(); i != e; ++i)
-    {
+    for (Tok::iterator i = t.begin(), e = t.end(); i != e; ++i) {
+
         const std::string& dir = *i;
 
         log_debug(_("Scanning directory \"%s\" for plugins"), dir);
@@ -207,9 +211,10 @@ Extension::scanDir(const std::string& dirlist)
         if (!libdir) {
             log_error(_("Can't open directory %s"), dir);
             return false;
-	}   
+        }   
         
         struct dirent *entry = readdir(libdir);
+
         for (int i = 0; entry > 0; ++i) {
             // We only want shared libraries that end with the suffix, otherwise
             // we get all the duplicates.
@@ -219,23 +224,25 @@ Extension::scanDir(const std::string& dirlist)
                 continue;
             }
 
-	    std::string name(entry->d_name);
+            std::string name(entry->d_name);
 
-	    // Hidden files.
+            // Hidden files.
             if (name.at(0) == '.') {
                 continue;
             }            
-            
-	    const std::string::size_type pos = name.find_last_of('.');
-	    if (pos == std::string::npos) continue;
-	    const std::string suffix = name.substr(pos);
-	    name.erase(pos);
+                
+            const std::string::size_type pos = name.find_last_of('.');
+ 
+            if (pos == std::string::npos) continue;
+ 
+            const std::string suffix = name.substr(pos);
+            name.erase(pos);
 
             if (suffix == ".so") {
                 log_debug(_("Gnash Plugin name: %s"), name);
                 _modules.push_back(name);
             }
-	    else {
+            else {
                 continue;
             }
         }
