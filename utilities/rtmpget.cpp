@@ -108,7 +108,7 @@ main(int argc, char *argv[])
     bindtextdomain (PACKAGE, LOCALEDIR);
     textdomain (PACKAGE);
 #endif
-
+    
     // If no command line arguments have been supplied, do nothing but
     // print the  usage message.
     if (argc < 2) {
@@ -123,6 +123,12 @@ main(int argc, char *argv[])
         { 'p', "port-offset",   Arg_parser::yes },
         { 'v', "verbose",       Arg_parser::no  },
         { 'd', "dump",          Arg_parser::no  },
+        { 'a', "app",           Arg_parser::yes  },
+        { 'p', "path",          Arg_parser::yes  },
+        { 'f', "filename",      Arg_parser::yes  },
+        { 't', "tcurl",		Arg_parser::yes  },
+        { 's', "swfurl",	Arg_parser::yes  },
+        { 'u', "url",	        Arg_parser::yes  },
         { 'n', "netdebug",      Arg_parser::no  }
         };
 
@@ -141,6 +147,18 @@ main(int argc, char *argv[])
         dbglogfile.setVerbosity(rcfile.verbosityLevel());
     }    
 
+    RTMPClient client;    
+    short port = 0;
+    string protocol;		// the network protocol, rtmp or http
+    string app;			// the application name
+    string path;		// the path to the file on the server
+    string query;		// any queries for the host
+    string filename;		// the filename to play
+    string tcUrl;		// the tcUrl field
+    string swfUrl;		// the swfUrl field
+    string pageUrl;		// the pageUrl field
+    string hostname;		// the hostname of the server
+	
     // Handle command line arguments
     for( int i = 0; i < parser.arguments(); ++i ) {
 	const int code = parser.code(i);
@@ -156,6 +174,21 @@ main(int argc, char *argv[])
 	      case 'v':
 		  dbglogfile.setVerbosity();
 		  log_debug (_("Verbose output turned on"));
+		  break;
+	      case 'a':
+		  app = parser.argument(i);
+		  break;
+	      case 'p':
+		  path = parser.argument(i);
+		  break;
+	      case 't':
+		  tcUrl = parser.argument(i);
+		  break;
+	      case 's':
+		  swfUrl = parser.argument(i);
+		  break;
+	      case 'f':
+		  filename = parser.argument(i);
 		  break;
 	      case 'n':
 		  netdebug = true;
@@ -183,73 +216,124 @@ main(int argc, char *argv[])
         usage();
         return EXIT_FAILURE;
     }
-
-    string url = infiles[0];
     
-    RTMPClient client;    
-    short port = 0;
-    string path;
-    string filename;
+    string url = infiles[0];
+    string portstr;
     
     // Trap ^C (SIGINT) so we can kill all the threads
     act.sa_handler = cntrlc_handler;
     sigaction (SIGINT, &act, NULL);
-    
-    // Take a standard URL apart
-    URL uri(url);
-    
-    // convert the port number from a string
-    if (uri.port().empty()) {
-	if ((uri.protocol() == "http") || (uri.protocol() == "rtmpt")) {
-	    port = RTMPT_PORT;
+
+    // Take a standard URL apart.
+    string::size_type start = url.find(':', 0);
+    if (start != string::npos) {
+	protocol = url.substr(0, start);
+	start += 3;		// skip past the "://" part after the protocol
+    }
+    string::size_type end = url.find('/', start);
+    if (end != string::npos) {
+	string::size_type pos = url.find(':', start);
+	if (pos != string::npos) {
+	    hostname = url.substr(start, pos - start);
+	    portstr = url.substr(pos + 1, (end - pos) - 1);
+	    port = strtol(portstr.c_str(), NULL, 0) & 0xffff;
+	} else {
+	    hostname = url.substr(start, end - start);
+	    if ((protocol == "http") || (protocol == "rtmpt")) {
+		port = RTMPT_PORT;
+	    }
+	    if (protocol == "rtmp") {
+		port = RTMP_PORT;
+	    }
 	}
-	if (uri.protocol() == "rtmp") {
-	    port = RTMP_PORT;
-	}
+	start = end;
+    }
+    end = url.rfind('/');
+    if (end != string::npos) {
+	path = url.substr(start + 1, end - start - 1);
+	start = end;
+	filename = url.substr(end + 1);
+    }
+
+    start = path.find('?', 0);
+    if (start != string::npos) {
+	end = path.find('/', 0);
+	query = path.substr(0, end);
+	app = query;
+	path = path.substr(end, path.size());
     } else {
-	port = strtol(uri.port().c_str(), NULL, 0) & 0xffff;
+	app = path;
+    }
+
+    if (tcUrl.empty()) {
+	tcUrl = protocol + "://" + hostname;
+	if (!portstr.empty()) {
+	    tcUrl += ":" + portstr;
+	}
+	if (!query.empty()) {
+	    tcUrl += "/" + query;
+	} else {
+	    tcUrl += path;
+	}
+    }
+    
+    if (app.empty()) {
+	// Get the application name
+	app = path;
+	
+	if (!query.empty()) {
+	    app = path;
+	    app += "?" + query;
+	}
+    }
+
+    if (swfUrl.empty()) {
+	swfUrl = "mediaplayer.swf";
+    }
+    if (pageUrl.empty()) {
+	pageUrl = "http://gnashdev.org";
     }
     
     if (netdebug) {
-	cerr << "URL is " << uri.str() << endl;
-        cerr << "Protocol is " << uri.protocol() << endl;
-        cerr << "Host is " << uri.hostname() << endl;
-        cerr << "Port is " << port << endl;
-	cerr << "Path is " << uri.path() << endl;
+	cerr << "URL is " << url << endl;
+	cerr << "Protocol is " << protocol << endl;
+	cerr << "Host is "  << hostname << endl;
+	cerr << "Port is "  << port << endl;
+	cerr << "Path is "  << path << endl;
+	cerr << "Filename is "  << filename << endl;
+	cerr << "App is "   << app << endl;
+	cerr << "Query is " << query << endl;
+	cerr << "tcUrl is " << tcUrl << endl;
+	cerr << "swfUrl is " << swfUrl << endl;
+	cerr << "pageUrl is " << pageUrl << endl;
     }
+
     client.toggleDebug(netdebug);
-    if (client.createClient(uri.hostname(), port) == false) {
-	log_error("Can't connect to RTMP server %s", uri.hostname());
+    if (client.createClient(hostname, port) == false) {
+	log_error("Can't connect to RTMP server %s", hostname);
 	exit(-1);
     }
-
+    
     client.handShakeRequest();
-
+    
     client.clientFinish();
-	
+    
     // Make a buffer to hold the handshake data.
     Buffer buf(1537);
     RTMP::rtmp_head_t *rthead = 0;
     int ret = 0;
-    string tcUrl = uri.protocol() + "://" + uri.hostname();
-    size_t pos = uri.path().rfind('/', uri.path().size());
-    if (pos != string::npos) {
-	path = uri.path().substr(1, pos);
-	filename = uri.path().substr(pos+1, uri.path().size());
-	tcUrl += '/' + path;
-    }
     log_debug("Sending NetConnection Connect message,");
-    Buffer *buf2 = client.encodeConnect(path.c_str(), "mediaplayer.swf", tcUrl.c_str(), 615, 124, 1, "http://gnashdev.org");
+    Buffer *buf2 = client.encodeConnect(app.c_str(), swfUrl.c_str(), tcUrl.c_str(), 615, 124, 1, pageUrl.c_str());
 //    Buffer *buf2 = client.encodeConnect("video/2006/sekt/gate06/tablan_valentin", "mediaplayer.swf", "rtmp://velblod.videolectures.net/video/2006/sekt/gate06/tablan_valentin", 615, 124, 1, "http://gnashdev.org");
 //    Buffer *buf2 = client.encodeConnect("oflaDemo", "http://192.168.1.70/software/gnash/tests/ofla_demo.swf", "rtmp://localhost/oflaDemo/stream", 615, 124, 1, "http://192.168.1.70/software/gnash/tests/index.html");
     buf2->resize(buf2->size() - 6); // FIXME: encodeConnect returns the wrong size for the buffer!
     size_t total_size = buf2->size();    
     RTMPMsg *msg1 = client.sendRecvMsg(0x3, RTMP::HEADER_12, total_size,
-				      RTMP::INVOKE, RTMPMsg::FROM_CLIENT,
-				      buf2);
+				       RTMP::INVOKE, RTMPMsg::FROM_CLIENT,
+				       buf2);
     if (msg1) {
-        msg1->dump();
-        if (msg1->getStatus() ==  RTMPMsg::NC_CONNECT_SUCCESS) {
+	msg1->dump();
+	if (msg1->getStatus() ==  RTMPMsg::NC_CONNECT_SUCCESS) {
 	    log_debug("Sent NetConnection Connect message sucessfully");
 	} else {
 	    log_error("Couldn't send NetConnection Connect message,");
@@ -263,8 +347,8 @@ main(int argc, char *argv[])
 //    buf3->dump();
     total_size = buf3->size();
     RTMPMsg *msg2 = client.sendRecvMsg(0x3, RTMP::HEADER_12, total_size,
-				      RTMP::INVOKE, RTMPMsg::FROM_CLIENT,
-				      buf3);
+				       RTMP::INVOKE, RTMPMsg::FROM_CLIENT,
+				       buf3);
     double streamID = 0.0;
     if (msg2) {
 	msg2->dump();
@@ -332,7 +416,7 @@ main(int argc, char *argv[])
 		RTMP::rtmp_head_t *rthead = client.decodeHeader(ptr);
 		msg2 = client.processMsg(ptr);
 		if (msg2 == 0) {
-		    log_error("Couldn't process the RTMP message!");
+//		    log_error("Couldn't process the RTMP message!");
 		    continue;
 		}
 	    } else {
