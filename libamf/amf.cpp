@@ -764,6 +764,28 @@ AMF::extractAMF(Network::byte_t *in, Network::byte_t* tooFar)
       case Element::UNDEFINED_AMF0:
       case Element::REFERENCE_AMF0:
       case Element::ECMA_ARRAY_AMF0:
+      {
+	  el->makeECMAArray();
+	  // get the number of elements in the array
+	  length = ntohs((*(boost::uint32_t *)tmpptr) & 0xffff);
+	  tmpptr += sizeof(boost::uint32_t);
+	  while (tmpptr < (tooFar - AMF_HEADER_SIZE)) {
+	      if (*tmpptr == TERMINATOR) {
+//		  log_debug("No data associated with Property in object");
+		  tmpptr++;
+		  break;
+	      }
+	      Element *child = amf_obj.extractProperty(tmpptr, tooFar); 
+	      if (child == 0) {
+		  break;
+	      }
+//	      child->dump();
+	      el->addProperty(child);
+	      tmpptr += amf_obj.totalsize();
+	  };
+	  tmpptr += AMF_HEADER_SIZE;		// skip past the terminator bytes
+	  break;
+      }
       case Element::OBJECT_END_AMF0:
       case Element::STRICT_ARRAY_AMF0:
       case Element::DATE_AMF0:
