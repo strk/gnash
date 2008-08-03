@@ -1142,14 +1142,16 @@ RTMP::split(Buffer *buf, size_t pktsize)
 	    if (left > _chunksize) {
 		left = _chunksize;
 	    }
-  	    cerr << "Adding data (" << left - rthead->head_size
+  	    cerr << "Adding data (" << left
 		 << " bytes) to existing packet for channel #" << rthead->channel
   		 << ", " << current->spaceLeft() << " bytes left in Buffer." <<endl;
-	    current->append(ptr, left - rthead->head_size);
-//  	    log_debug("Appending to 0x%x: %s", int(current->reference()),
-// 		      hexify(ptr, left - rthead->head_size, true));
-// 	    current->dump();
-	    ptr += left - rthead->head_size;
+	    current->append(ptr, left);
+//   	    log_debug("Appending to 0x%x: %s", int(current->reference()),
+//  		      hexify(ptr, left, true));
+//   	    log_debug("Appending to 0x%x: %s", int(current->reference()),
+//  		      hexify(ptr, left, false));
+//  	    current->dump();
+	    ptr += left;
 	} else {
 	    if (rthead->bodysize <= 65535) {
 		// Sometimes we get a packet with a zero body size, which we just
@@ -1159,9 +1161,10 @@ RTMP::split(Buffer *buf, size_t pktsize)
 		    continue;
 		}
 		size_t pktsize = 0;
-		// Add space for the additional 1 byte headers used for continuation messages
-		// to avoid having to do a resize later.
-		int bufsize = (rthead->head_size + rthead->bodysize + (rthead->bodysize / _chunksize));
+		// The buffer is sized to hold the initial header, plus the data
+		// for this channel. The data arrives as a series of 1 byte headers
+		// until the body size specified in the initial header is achieved.
+		int bufsize = (rthead->head_size + rthead->bodysize);
   		cerr << "New packet for channel #" << rthead->channel << " of size "
   		     << bufsize << " Chunksize is: " << _chunksize << endl;
 		chunk = new Buffer(bufsize);
