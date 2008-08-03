@@ -73,7 +73,10 @@ const char *content_str[] = {
     "Blank 0x11",
     "Notify",
     "Shared object",
-    "Invoke"
+    "Invoke",
+    "Blank 0x15",
+    "FLV DATA",
+    "Continuation"
 };
 
 const char *ping_str[] = {
@@ -283,16 +286,20 @@ RTMP::decodeHeader(Network::byte_t *in)
         _header.bodysize = (_header.bodysize << 8) + *tmpptr++;
         _header.bodysize = _header.bodysize & 0xffffff;
 //        log_debug(_("The body size is: %d"), _header.bodysize);
+     } else {
+ 	_header.bodysize = 0;
     }
 
     if (_header.head_size >= 8) {
 	Network::byte_t byte = *tmpptr;
         _header.type = (content_types_e)byte;
         tmpptr++;
+    } else {
+	_header.type = RTMP::CONTINUATION;
     }
 
-    if (_header.type <= RTMP::INVOKE ) {
-	log_debug("Channel: %d, Header size: %d, Body size: %d, type: %s",
+    if (_header.type <= RTMP::CONTINUATION ) {
+	log_debug("Channel: #%d, Header size: %d, Body size: %d, type: %s",
 		  _header.channel, _header.head_size, _header.bodysize,
 		  content_str[_header.type]);
     } else {
@@ -1092,7 +1099,7 @@ RTMP::split(Buffer *buf)
 RTMP::queues_t *
 RTMP::split(Buffer *buf, size_t pktsize)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     if (buf == 0) {
  	log_error("Buffer pointer is invalid.");
@@ -1115,12 +1122,6 @@ RTMP::split(Buffer *buf, size_t pktsize)
 	}
 // 	log_debug("Msg header is: %s", hexify(ptr, rthead->head_size + rthead->bodysize, false));
 // 	log_debug("Msg is: %s", hexify(ptr, rthead->head_size + rthead->bodysize, true));
-	// Sometimes we get a packet with a zero body size, which we just
-	// ignore.
-	if (rthead->bodysize == 0) {
-	    ptr += rthead->head_size;
-	    continue;
-	}
 	if (rthead->bodysize > 65535) {
 	    log_error("Bad body size! Got %d", rthead->bodysize);
 	    return 0;
@@ -1141,19 +1142,22 @@ RTMP::split(Buffer *buf, size_t pktsize)
 	    if (left > _chunksize) {
 		left = _chunksize;
 	    }
-  	    cerr << "Adding data to existing packet for channel #" << rthead->channel
+  	    cerr << "Adding data (" << left - rthead->head_size
+		 << " bytes) to existing packet for channel #" << rthead->channel
   		 << ", " << current->spaceLeft() << " bytes left in Buffer." <<endl;
 	    current->append(ptr, left - rthead->head_size);
 //  	    log_debug("Appending to 0x%x: %s", int(current->reference()),
 // 		      hexify(ptr, left - rthead->head_size, true));
 // 	    current->dump();
 	    ptr += left - rthead->head_size;
-	    if (current->spaceLeft() == 0) {
-		_header.type = RTMP::NONE;
-		_header.bodysize = 0;
-	    }
 	} else {
 	    if (rthead->bodysize <= 65535) {
+		// Sometimes we get a packet with a zero body size, which we just
+		// ignore.
+		if (rthead->bodysize == 0) {
+		    ptr += rthead->head_size;
+		    continue;
+		}
 		size_t pktsize = 0;
 		// Add space for the additional 1 byte headers used for continuation messages
 		// to avoid having to do a resize later.
@@ -1174,8 +1178,8 @@ RTMP::split(Buffer *buf, size_t pktsize)
 		if (rthead->type == CHUNK_SIZE) {
 		    _chunksize = ntohl(*reinterpret_cast<boost::uint32_t *>(ptr + rthead->head_size));
 		    log_debug("Setting chunk size for packets to %d.", _chunksize);
-//  		    log_debug("FIXME: %s", hexify(ptr, pktsize, false));
-//  		    log_debug("FIXME: %s", hexify(ptr, pktsize, true));
+//    		    log_debug("FIXME: %s", hexify(ptr + pktsize, pktsize, false));
+//    		    log_debug("FIXME: %s", hexify(ptr + pktsize, pktsize, true));
 		}
 		// Advance to the next AMF object
 		ptr += pktsize;

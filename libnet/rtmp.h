@@ -106,7 +106,8 @@ public:
         NOTIFY = 0x12,
         SHARED_OBJ = 0x13,
         INVOKE = 0x14,
-	FLV_DATA = 0x16
+	FLV_DATA = 0x16,	// for AMF 3
+	CONTINUATION = 0x17	// Internal to Gnash
     } content_types_e;
 //     typedef enum {
 //         CONNECT = 0x1,
