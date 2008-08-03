@@ -304,7 +304,7 @@ main(int argc, char *argv[])
 	}
     }
 
-    int loop = 5;
+    int loop = 20;
     do {
 	Buffer *msgs = client.recvMsg(1);	// use a 1 second timeout
 	if (msgs == 0) {
