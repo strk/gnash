@@ -15,6 +15,10 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+// This counts calls to toString() and valueOf() regularly to check that native
+// methods are correctly applied. So it saves much effort if new tests are added
+// after the end of the present ones.
+
 rcsid="$Id: ASnative.as,v 1.8 2008/04/29 10:23:50 bwy Exp $";
 #include "check.as"
 
@@ -206,8 +210,7 @@ func.a = ASnative(251, 4); // String.toLowerCase
 check_equals(func.a(), "gnash must work! öüää€€");
 
 // Check calls to toString.
-// This is called twice as often as it should be.
-//xcheck_equals (countTS, 2);
+check_equals (countTS, 2);
 #endif
 
 func.a = ASnative(102, 0); // SWF5 to upper
@@ -218,9 +221,9 @@ check_equals(func.a(), "gnash must work! öÜäÄ€€");
 
 // Check calls to toString.
 #if OUTPUT_VERSION > 5
-//check_equals (countTS, 4);
+check_equals (countTS, 4);
 #else
-//xcheck_equals (countTS, 2);
+check_equals (countTS, 2);
 #endif
 
 // Stage
@@ -252,15 +255,15 @@ st = ASnative(666, 10);
 st = ASnative(666, 9);
 
 #if OUTPUT_VERSION > 5
-//check_equals (countTS, 4);
+check_equals (countTS, 4);
 #else
-//xcheck_equals (countTS, 2);
+check_equals (countTS, 2);
 #endif
 
 xcheck_equals (countVO, 25);
 
 #if OUTPUT_VERSION > 5
-check_totals(76);
+check_totals(79);
 #else
-check_totals(74);
+check_totals(76);
 #endif
