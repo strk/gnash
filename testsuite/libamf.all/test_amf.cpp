@@ -336,7 +336,6 @@ test_array()
     } else {
         runtest.fail("Extracted ECMA Array");
     }
-    el1->dump();
     delete el1;
 }
     
