@@ -847,7 +847,7 @@ AMF::extractProperty(Network::byte_t *in, Network::byte_t* tooFar)
     // name is just debugging help to print cleaner, and should be removed later
 //    log_debug(_("AMF property name length is: %d"), length);
     std::string name(reinterpret_cast<const char *>(tmpptr), length);
-    log_debug(_("AMF property name is: %s"), name);
+//    log_debug(_("AMF property name is: %s"), name);
 
     Element *el = 0;
     // If we get a NULL object, there is no data. In that case, we only return
