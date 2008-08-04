@@ -189,10 +189,10 @@ public:
     virtual std::string getScreenColor() { return ""; }
 
     /// @return Whether or not the movie should be looped indefinitely.
-    bool loops();
+    bool loops() const { return _loop; }
 
     /// @return Whether the movie is running fullscreen or not.    
-    bool isFullscreen() { return _fullscreen; }
+    bool isFullscreen() const { return _fullscreen; }
 
     /// Mouse notification callback to be called when the mouse is moved.
     //

@@ -49,7 +49,7 @@ class Buffer;
 // All numbers in AMF format are 8 byte doubles.
 const size_t AMF0_NUMBER_SIZE = 0x08;
 
-// The header of an AMF object is a type filed (1 byte), followed by a
+// The header of an AMF object is a type field (1 byte), followed by a
 // length field. (short)
 const gnash::Network::byte_t AMF_HEADER_SIZE = 3;
 
