@@ -295,7 +295,10 @@ public:
 
     // Accessors for debug and testing
     size_t chunksize() { return _chunksize; };
-    
+
+    bool isDataStarted(int x) { return _streaming[x]; };
+    void setDataStarted(int x, bool y) { _streaming[x] = y; };
+	
     void dump();
   protected:
     std::map<const char *, amf::Element *> _properties;
@@ -308,6 +311,7 @@ public:
     int		_timeout;
     CQue	_queues[MAX_AMF_INDEXES];
     queues_t    _channels;
+    bool	_streaming[MAX_AMF_INDEXES];
 };
 
 } // end of gnash namespace
