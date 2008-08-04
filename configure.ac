@@ -1531,15 +1531,17 @@ fi
 AM_CONDITIONAL(ENABLE_SWFDEC_TESTSUITE, [ test x"$SWFDEC_TESTSUITE" != x ])
 
 dnl
-dnl See if we can use the swfmill, mtasc and swfc based testsuites 
+dnl See if we can use the swfmill, mtasc, swfc and haxe based testsuites 
 dnl
 if test x$cross_compiling = xno; then
   AC_PATH_PROG(SWFMILL, swfmill)
   AC_PATH_PROG(SWFC, swfc)
   AC_PATH_MTASC
+  AC_PATH_HAXE
 fi
 AM_CONDITIONAL(ENABLE_SWFMILL, [ test x"$SWFMILL" != x ])
 AM_CONDITIONAL(ENABLE_MTASC, [ test x"$MTASC" != x ])
+AM_CONDITIONAL(ENABLE_HAXE, [ test x"$HAXE" != x ])
 AM_CONDITIONAL(ENABLE_SWFC, [ test x"$SWFC" != x ])
 
 AC_PATH_PROG(DOXYGEN, doxygen)
@@ -2110,6 +2112,7 @@ testsuite/samples/Makefile
 testsuite/swfdec/Makefile
 testsuite/misc-ming.all/Makefile
 testsuite/misc-mtasc.all/Makefile
+testsuite/misc-haxe.all/Makefile
 testsuite/misc-swfmill.all/Makefile
 testsuite/misc-swfc.all/Makefile
 testsuite/movies.all/Makefile
@@ -2834,6 +2837,16 @@ if test x$cross_compiling = xno; then
     echo "                 to run some of the tests in Gnash testsuite." >&4
     echo "                 You can install it from http://mtasc.org" >&4
     echo "                 or .deb users: apt-get install mtasc" >&4
+  fi
+
+  if test x"$HAXE" != x; then
+    echo "        HAXE is $HAXE"
+    echo "        HAXE CLASSPATH is $HAXE_CLASSPATH"
+  else
+    echo "        WARNING: You need to have the HAXE compiler packages installed" >&4
+    echo "                 to run some of the tests in Gnash testsuite." >&4
+    echo "                 You can install it from http://haxe.org" >&4
+    echo "                 or .deb users: apt-get install haxe (version 2 or later required)" >&4
   fi
 
   if test x"$SWFMILL" != x; then
