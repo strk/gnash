@@ -1026,12 +1026,6 @@ Gui::want_redraw()
     return false;
 }
 
-bool
-Gui::loops()
-{
-    return _loop;
-}
-
 void
 Gui::setInvalidatedRegion(const rect& /*bounds*/)
 {

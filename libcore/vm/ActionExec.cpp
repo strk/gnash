@@ -790,6 +790,17 @@ ActionExec::pushReturn(const as_value& t)
     _returning = true;
 }
 
+void
+ActionExec::adjustNextPC(int offset)
+{
+    const int tagPos = offset + static_cast<int>(pc);
+    if (tagPos < 0) {
+        log_unimpl(_("Jump outside DoAction tag requested (offset %d before tag start)"), -tagPos);
+        return;
+    }
+    next_pc += offset;
+}
+
 bool
 ActionExec::isFunction2() const
 {

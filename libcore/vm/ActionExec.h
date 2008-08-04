@@ -455,7 +455,7 @@ public:
 	
 	void skipRemainingBuffer() { next_pc = stop_pc; }
 	
-	void adjustNextPC(int offset) { next_pc += offset; }
+	void adjustNextPC(int offset);
 	
 	size_t getNextPC() const { return next_pc; }
 	
