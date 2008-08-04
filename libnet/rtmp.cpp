@@ -877,15 +877,15 @@ RTMP::processMsg(Network::byte_t *buf, size_t size)
     }
     
     if (rthead) {
-	if (rthead->head_size == 1) {
-	    log_debug("Response header: %s", hexify(ptr, 7, false));
-	} else {
-	    log_debug("Response header: %s", hexify(ptr, rthead->head_size, false));
-// 	    log_debug("Msg body is: %s", hexify(ptr+rthead->head_size,
-// 						rthead->bodysize, false));
-// 	    log_debug("%s", hexify(ptr+rthead->head_size,
-// 				   rthead->bodysize, true));
-	}
+// 	if (rthead->head_size == 1) {
+// 	    log_debug("Response header: %s", hexify(ptr, 7, false));
+// 	} else {
+// 	    log_debug("Response header: %s", hexify(ptr, rthead->head_size, false));
+// // 	    log_debug("Msg body is: %s", hexify(ptr+rthead->head_size,
+// // 						rthead->bodysize, false));
+// // 	    log_debug("%s", hexify(ptr+rthead->head_size,
+// // 				   rthead->bodysize, true));
+// 	}
 	if (rthead->type <= RTMP::CONTINUATION) {
 	    log_debug("Processing message of type %s, chunksize is: %d!", content_str[rthead->type], _chunksize);
 	}
@@ -1187,9 +1187,12 @@ RTMP::split(Buffer *buf, size_t pktsize)
 	    if (left > _chunksize) {
 		left = _chunksize;
 	    }
-  	    cerr << "Adding data (" << left
-		 << " bytes) to existing packet for channel #" << rthead->channel
-  		 << ", " << current->spaceLeft() << " bytes left in Buffer." <<endl;
+	    if (left == 0) {
+		continue;
+	    }
+//    	    cerr << "Adding data (" << left
+// 		 << " bytes) to existing packet for channel #" << rthead->channel
+//   		 << ", " << current->spaceLeft() << " bytes left in Buffer." <<endl;
 	    current->append(ptr, left);
 //   	    log_debug("Appending to 0x%x: %s", int(current->reference()),
 //  		      hexify(ptr, left, true));
@@ -1210,8 +1213,8 @@ RTMP::split(Buffer *buf, size_t pktsize)
 		// for this channel. The data arrives as a series of 1 byte headers
 		// until the body size specified in the initial header is achieved.
 		int bufsize = (rthead->head_size + rthead->bodysize);
-  		cerr << "New packet for channel #" << rthead->channel << " of size "
-  		     << bufsize << " Chunksize is: " << _chunksize << endl;
+//   		cerr << "New packet for channel #" << rthead->channel << " of size "
+//   		     << bufsize << " Chunksize is: " << _chunksize << endl;
 		chunk = new Buffer(bufsize);
 //		bodysizes[rthead->channel] = rthead->bodysize;
 		chunk->clear();	// FIXME: temporary debug only
