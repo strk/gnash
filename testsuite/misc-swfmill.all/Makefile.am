@@ -25,6 +25,7 @@ abs_builddir=$(shell cd $(top_builddir)/testsuite/misc-swfmill.all; pwd)
 SC_XMLTESTS =			\
 	hello.xml		\
 	jump_after_end.xml	\
+	jump_to_prev_block.xml  \
 	dict_override.xml	\
 	initaction_in_definesprite.xml \
 	zeroframe_definesprite.xml \
@@ -53,6 +54,7 @@ $(SC_XMLTESTS_OUT) :
 
 check_SCRIPTS = \
 	jump_after_end-runner	\
+	jump_to_prev_block-runner	\
 	dict_override-runner	\
 	initaction_in_definesprite-runner	\
 	zeroframe_definesprite-runner	\
@@ -65,6 +67,10 @@ check_PROGRAMS = \
 
 jump_after_end-runner: $(srcdir)/../generic-testrunner.sh jump_after_end.swf Makefile
 	sh $< -r 50 -c "END OF TEST" $(top_builddir) jump_after_end.swf > $@
+	chmod 755 $@
+
+jump_to_prev_block-runner: $(srcdir)/../generic-testrunner.sh jump_to_prev_block.swf Makefile
+	sh $< -r 50 -C "ABA" $(top_builddir) jump_to_prev_block.swf > $@
 	chmod 755 $@
 
 dict_override-runner: $(srcdir)/../generic-testrunner.sh dict_override.swf Makefile
