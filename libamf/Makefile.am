@@ -23,6 +23,7 @@ libgnashamf_la_SOURCES = \
 	amf.cpp \
 	buffer.cpp \
 	element.cpp \
+	flv.cpp \
 	lcshm.cpp \
 	sol.cpp
 #	rtmp.cpp
@@ -48,6 +49,7 @@ noinst_HEADERS = \
 	amf.h \
 	buffer.h \
 	element.h \
+	flv.h \
 	lcshm.h \
 	protocol.h \
 	sol.h
