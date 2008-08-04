@@ -20,18 +20,10 @@ AUTOMAKE_OPTIONS = dejagnu
 
 # These will get executed and parsed for test output
 SANE_ASTESTS = \
-	hello.as \
-	inheritance.as \
-	function_test.as \
-	enum.as \
-	exception.as \
-	levels.as \
-	implementsOpTest.as \
-	TextFieldTest.as \
-	super_test1.as \
 	$(NULL)
 # These ones are the ones for which consistency check fail 
 BOGUS_ASTESTS = \
+	Hello.hx \
 	$(NULL)
 
 ASTESTS = $(SANE_ASTESTS) $(BOGUS_ASTESTS)
@@ -40,23 +32,21 @@ ASTESTS = $(SANE_ASTESTS) $(BOGUS_ASTESTS)
 # These will get compiled to SWFs just as above, but will not be executed as a test
 # They are for secondary movies to be loaded by the above tests.
 AUXMOVIES = \
-	    level5.as \
-	    level99.as \
-	    level87.as \
 	    $(NULL)
 
-EXTRA_DIST = $(ASTESTS) $(AUXMOVIES) TestClass.as Dejagnu.as check.as Derived1.as Base1.as  implementsOp/BExtendingImplementation.as  implementsOp/ImplementationA.as  implementsOp/ImplementationB.as implementsOp/SimpleInterface.as
+EXTRA_DIST = $(ASTESTS) $(AUXMOVIES) 
 
-MTASC_FLAGS = -version 6 -cp $(MTASC_CLASSPATH) -cp $(srcdir) -v -header 800:600:20
-MTASC_CPP = $(CPP) -x c -P -I$(srcdir)
+HAXE_FLAGS = -swf-version 9 -cp $(HAXE_CLASSPATH) -cp $(srcdir) 
+# hopefully preprocessor is builtin in this case
+HAXE_CPP = $(CPP) -x c -P -I$(srcdir)
 
-SANE_ASTESTS_OUT = $(SANE_ASTESTS:.as=.swf)
-BOGUS_ASTESTS_OUT = $(BOGUS_ASTESTS:.as=.swf)
+SANE_ASTESTS_OUT = $(SANE_ASTESTS:.hx=.swf)
+BOGUS_ASTESTS_OUT = $(BOGUS_ASTESTS:.hx=.swf)
 ASTESTS_OUT = $(SANE_ASTESTS_OUT) $(BOGUS_ASTESTS_OUT)
 
-AUXMOVIES_OUT = $(AUXMOVIES:.as=.swf)
+AUXMOVIES_OUT = $(AUXMOVIES:.hx=.swf)
 
-$(ASTESTS_OUT) $(AUXMOVIES_OUT): Dejagnu.as check.as
+$(ASTESTS_OUT) $(AUXMOVIES_OUT): Dejagnu.hx check.as
 
 
 TEST_DRIVERS = ../simple.exp
@@ -73,9 +63,9 @@ bogustests-runner: $(srcdir)/../generic-testrunner.sh $(BOGUS_ASTESTS_OUT) $(AUX
 	sh $< -C __END_OF_TEST__ -r 50 $(top_builddir) $(BOGUS_ASTESTS_OUT) > $@
 	chmod 755 $@
 
-.as.swf: 
-	$(MTASC_CPP) $< > $(@:%.swf=pp_%.as) 
-	$(MTASC) $(MTASC_FLAGS) -swf $@ -main $(@:%.swf=pp_%.as)
+.hx.swf: 
+	$(HAXE_CPP) $< > $(@:%.swf=PP_%.hx) 
+	$(HAXE) $(HAXE_FLAGS) -swf $@ -main $(@:%.swf=PP_%.hx)
 
 CLEANFILES =  \
 	gnash-dbg.log \
@@ -83,8 +73,7 @@ CLEANFILES =  \
 	*-runner \
 	testrun.* \
 	*.swf \
-	*.pp \
-	pp_*.as \
+	PP_*.hx \
 	*_testrunner \
 	*_Runner
 

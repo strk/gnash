@@ -25,6 +25,10 @@ if ENABLE_MTASC
 DIR_MTASC = misc-mtasc.all
 endif
 
+if ENABLE_HAXE
+DIR_HAXE = misc-haxe.all
+endif
+
 if ENABLE_SWFMILL
 DIR_SWFMILL = misc-swfmill.all
 endif
@@ -37,7 +41,21 @@ if ENABLE_SWFDEC_TESTSUITE
 DIR_SWFDEC_TESTSUITE = swfdec
 endif
 
-# movies.all
+DIST_SUBDIRS = \
+	libnet.all \
+	libbase	\
+	libamf.all \
+	libcore.all \
+	samples	\
+	swfdec \
+	misc-ming.all \
+	misc-mtasc.all \
+	misc-haxe.all \
+	misc-swfmill.all \
+	misc-swfc.all \
+	movies.all \
+	$(NULL)
+
 SUBDIRS = \
 	.	\
 	$(DIR_SWFDEC_TESTSUITE) \
@@ -48,6 +66,7 @@ SUBDIRS = \
 	samples	\
 	$(DIR_MING) \
 	$(DIR_MTASC) \
+	$(DIR_HAXE) \
 	$(DIR_SWFMILL) \
 	$(DIR_SWFC) \
 	movies.all \

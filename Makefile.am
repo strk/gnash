@@ -241,6 +241,10 @@ if ENABLE_MTASC
 	@echo "	MTASC $(MTASC)"
 	@echo "	MTASC CLASSPATH $(MTASC_CLASSPATH)"
 endif
+if ENABLE_HAXE
+	@echo "	HAXE $(HAXE)"
+	@echo "	HAXE CLASSPATH $(HAXE_CLASSPATH)"
+endif
 if ENABLE_SWFMILL
 	@echo "	SWFMILL $(SWFMILL) "
 endif
