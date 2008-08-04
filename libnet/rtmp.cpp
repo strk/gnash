@@ -26,12 +26,16 @@
 #include <map>
 #include <vector>
 #include <boost/cstdint.hpp>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 #if ! (defined(_WIN32) || defined(WIN32))
 #	include <netinet/in.h>
 #endif
 
 #include "log.h"
+#include "flv.h"
 #include "amf.h"
 #include "rtmp.h"
 #include "cque.h"
@@ -183,13 +187,16 @@ RTMP::RTMP()
       _timeout(1)
 {
 //    GNASH_REPORT_FUNCTION;
-//    _queues.resize(MAX_AMF_INDEXES);
 //    for (size_t i=0; i<MAX_AMF_INDEXES; i++) {
+    // For debug only to set a name for each channel.
     string name = "channel #";
     for (size_t i=0; i<10; i++) {
 	name[9] = i+'0';
   	_queues[i].setName(name.c_str());
     }
+    
+    // Set all the bools to false
+    memset(&_streaming, 0, MAX_AMF_INDEXES);
 }
 
 RTMP::~RTMP()
@@ -859,8 +866,10 @@ RTMP::processMsg(Network::byte_t *buf, size_t size)
     GNASH_REPORT_FUNCTION;
     
     RTMPMsg *msg = 0;
+    AMF amf;
     Network::byte_t *ptr = buf;
     RTMP::rtmp_head_t *rthead = decodeHeader(ptr);
+    static int fd = 0;			// file descriptor for the output file
 
     if (rthead == 0) {
 	log_error("Failed to decode the RTMP header!");
@@ -872,12 +881,12 @@ RTMP::processMsg(Network::byte_t *buf, size_t size)
 	    log_debug("Response header: %s", hexify(ptr, 7, false));
 	} else {
 	    log_debug("Response header: %s", hexify(ptr, rthead->head_size, false));
-	    log_debug("Msg body is: %s", hexify(ptr+rthead->head_size,
-						rthead->bodysize, false));
-	    log_debug("%s", hexify(ptr+rthead->head_size,
-				   rthead->bodysize, true));
+// 	    log_debug("Msg body is: %s", hexify(ptr+rthead->head_size,
+// 						rthead->bodysize, false));
+// 	    log_debug("%s", hexify(ptr+rthead->head_size,
+// 				   rthead->bodysize, true));
 	}
-	if (rthead->type <= RTMP::FLV_DATA) {
+	if (rthead->type <= RTMP::CONTINUATION) {
 	    log_debug("Processing message of type %s, chunksize is: %d!", content_str[rthead->type], _chunksize);
 	}
 	
@@ -939,23 +948,58 @@ RTMP::processMsg(Network::byte_t *buf, size_t size)
 	  case VIDEO_DATA:
 	  {
 	      log_debug("Got VIDEO packets!!!");
-#if 0
-	      Buffer *frame = 0;
-	      do {
-		  frame = recvMsg(1);	// use a 1 second timeout
-		  if (frame) {
-		      printf(".");
-//		      _queues[rthead->channel].push(frame);
-		  }
-//		      decodeVideoData();
-	      } while (frame);
-	      log_debug("\nDone grabbing VIDEO packets!!!");
-//		  _queues->dump();
-#endif
-	      break;
+              Buffer *frame = 0;
+ 	      size_t total = 0;
+              do {
+                  frame = recvMsg(1);   // use a 1 second timeout
+                  if (frame) {
+                      printf(".");
+		      total += frame->size();
+		      write(fd, frame->reference(), frame->size());
+                  }
+//                    decodeVideoData();
+              } while (frame);
+	      _streaming[rthead->channel] = false;
+	      close(fd);
+	      fd = 0;
+              log_debug("\nDone grabbing VIDEO packets, read %d bytes", total);
 	  }
 	  case NOTIFY:
 	      log_debug("Got Notify packet!!!");
+	      msg = decodeMsgBody(ptr + rthead->head_size, rthead->bodysize);
+	      if (msg) {
+		  if (msg->getStatus() == RTMPMsg::NS_DATA_START) {
+		      log_debug("Video data coming next, got DATA START packet");
+		      _streaming[rthead->channel] = true;
+		  }
+		  if (msg->getMethodName() == "onMetaData") {
+		      log_debug("Got onMetaData packet for FLV stream!");
+		      // Write the packet to disk so we can anaylze it with other tools
+		      fd = open("outbuf.raw", O_WRONLY|O_CREAT, S_IRWXU);
+		      if (fd == -1) {
+			  perror("open");
+		      }
+		      // Write the FLV magic number
+		      Flv flv;
+		      write(fd, &flv, sizeof(Flv::flv_header_t) + sizeof(Flv::flv_tag_t));
+		      write(fd, ptr + rthead->head_size, rthead->bodysize);
+		      // the onMetaData packet has only 1 top level object, which
+		      // is the one that contains the properties.
+		      flv.setProperties(msg->getElements()[0]->getProperties());
+		      flv.dump(); // FIXME: dump FLV Meta Data
+		  }
+ 		  log_debug("%s: Msg status is: %d: %s, name is %s, size is %d", __FUNCTION__,
+ 			    msg->getStatus(), status_str[msg->getStatus()],
+ 			    msg->getMethodName(), msg->size());
+		  break;
+	      } else {
+		  log_error("Couldn't decode message body for type %s at line #%d!",
+			    content_str[rthead->type], __LINE__);
+	      }
+//  	      log_debug("Notify msg is: %s", hexify(ptr,
+//  						  rthead->bodysize+rthead->head_size, false));
+//  	      log_debug("Notify msg is: %s", hexify(ptr,
+//  				     rthead->bodysize+rthead->head_size, true));
 //		  decodeNotify();
 	      break;
 	  case SHARED_OBJ:
@@ -964,8 +1008,8 @@ RTMP::processMsg(Network::byte_t *buf, size_t size)
 	      break;
 	  case INVOKE:
 	      msg = decodeMsgBody(ptr + rthead->head_size, rthead->bodysize);
-//		  msg->dump();
 	      if (msg) {
+//		  msg->dump();
 		  log_debug("%s: Msg status is: %d: %s, name is %s, size is %d", __FUNCTION__,
 			    msg->getStatus(), status_str[msg->getStatus()],
 			    msg->getMethodName(), msg->size());
@@ -978,12 +1022,13 @@ RTMP::processMsg(Network::byte_t *buf, size_t size)
 //		  delete buf;
 		  break;
 	      } else {
-		  log_error("Couldn't decode message body for type %s!",
-			    content_str[rthead->type]);
+		  log_error("Couldn't decode message body for type %s at line #%d!",
+			    content_str[rthead->type], __LINE__);
 	      }
 //		  decodeInvoke();
 	      break;
 	  case AUDIO_DATA:	  
+	      log_debug("Got Audio Data packet!!!");
 //		  decodeAudioData();
 	      break;
 	  default:
