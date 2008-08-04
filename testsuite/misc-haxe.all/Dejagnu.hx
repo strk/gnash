@@ -167,7 +167,7 @@ class Dejagnu {
 
     static function xtrace(msg) {
         tf.text += msg + "\n";
-        //flash.Lib.trace(msg);
+        flash.Lib.trace(msg);
     }
 
     static function untested(msg) {
