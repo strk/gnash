@@ -42,13 +42,19 @@ namespace amf
 {
 
 
-Flv::Flv()
+Flv::Flv() 
 {
 //    GNASH_REPORT_FUNCTION;
     memcpy(&_header.sig, "FLV", 3);
     _header.version = 1;
-    _header.type = Flv::VIDEO | Flv::AUDIO;
+    _header.type = Flv::FLV_VIDEO | Flv::FLV_AUDIO;
     _header.head_size = 9;
+    
+    memset(&_tag, 0, sizeof(flv_tag_t));
+    _tag.type = Flv::FLV_TAG_METADATA;
+    _tag.bodysize[0] = 0x0f;
+    _tag.bodysize[1] = 0x30;
+    _tag.bodysize[2] = 0x00;
 }
 
 Flv::~Flv()
@@ -82,7 +88,15 @@ Flv::dump()
 	cerr << "# of Properties in object: " << _properties.size() << endl;
 	for (ait = _properties.begin(); ait != _properties.end(); ait++) {
 	    amf::Element *el = (*(ait));
-	    el->dump();
+            // an onMetaData packet of an FLV stream only contains number or
+            // boolean bydefault
+            if (el->getType() == Element::NUMBER_AMF0) {
+                log_debug("FLV MetaData: %s: %s", el->getName(), el->to_number());
+            } else if (el->getType() == Element::BOOLEAN_AMF0) {
+                log_debug("FLV MetaData: %s: %s", el->getName(), (el->to_bool() ? "true" : "false") );
+            } else {
+                log_debug("FLV MetaData: %s: %s", el->getName(), el->to_string());
+            }
 	}
     }
 }
