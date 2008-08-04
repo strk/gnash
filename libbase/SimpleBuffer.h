@@ -146,12 +146,58 @@ public:
 	/// @param size
 	///	Size of data to append
 	///
-	void append(const boost::uint8_t* newData, size_t size)
+	void append(const void* inData, size_t size)
 	{
+		const boost::uint8_t* newData = reinterpret_cast<const uint8_t*>(inData);
 		size_t curSize = _size;
 		resize(curSize+size);
 		std::copy(newData, newData+size, _data+curSize);
 		assert(_size == curSize+size);
+	}
+
+	/// Append a byte to the buffer
+	//
+	/// The buffer will be appropriately resized to have space.
+	///
+	/// @param b
+	///	Byte to append.
+	///
+	void appendByte(const boost::uint8_t b)
+	{
+		resize(_size + 1);
+		_data[_size - 1] = b;
+	}
+
+	/// Append 2 bytes to the buffer
+	//
+	/// The buffer will be appropriately resized to have space.
+	///
+	/// @param s
+	///	Short to append. Will be appended in network order. ie
+	///  with high order byte first.
+	///
+	void appendNetworkShort(const boost::uint16_t s)
+	{
+		resize(_size + 2);
+		_data[_size - 2] = s >> 8;
+		_data[_size - 1] = s & 0xff;
+	}
+
+	/// Append 4 bytes to the buffer
+	//
+	/// The buffer will be appropriately resized to have space.
+	///
+	/// @param l
+	///	Long to append. Will be appended in network order. ie
+	///  with high order bytes first.
+	///
+	void appendNetworkLong(const boost::uint32_t l)
+	{
+		resize(_size + 4);
+		_data[_size - 4] = l >> 24;
+		_data[_size - 3] = (l >> 16) & 0xff;
+		_data[_size - 2] = (l >> 8) & 0xff;
+		_data[_size - 1] = l & 0xff;
 	}
 
 	/// Append data to the buffer

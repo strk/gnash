@@ -706,7 +706,7 @@ AMF::extractAMF(Network::byte_t *in, Network::byte_t* tooFar)
     switch (type) {
       case Element::NUMBER_AMF0:
 	  el->makeNumber(tmpptr); 
-	  tmpptr += AMF0_NUMBER_SIZE; // all numbers are 8 bit big endian
+	  tmpptr += AMF0_NUMBER_SIZE; // all numbers are 8 byte big endian
 	  break;
       case Element::BOOLEAN_AMF0:
 	  el->makeBoolean(tmpptr);
