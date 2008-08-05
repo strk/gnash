@@ -24,8 +24,8 @@ plugins_LTLIBRARIES = dbus.la
 
 INCLUDES =  \
             -I$(top_srcdir)/libbase \
-            -I$(top_srcdir)/server \
-            -I$(top_srcdir)/server/vm \
+            -I$(top_srcdir)/libcore \
+            -I$(top_srcdir)/libcore/vm \
 	    -I$(top_srcdir)/asobjs \
 	    $(INCLTDL)
 
@@ -33,7 +33,7 @@ dbus_la_SOURCES = dbus_ext.cpp dbus_ext.h
 dbus_la_LDFLAGS = -module -avoid-version -no-undefined
 dbus_la_LIBDADD = $(LIBADD_DL) $(LIBLTDL) \
 	$(top_builddir)/libbase/libgnashbase.la \
-	$(top_builddir)/server/libgnashserver.la \
+	$(top_builddir)/libcore/libgnashcore.la \
 	$(PTHREAD_LIBS) \
 	$(NULL)
 

@@ -203,7 +203,7 @@ class bitmap_info_cairo : public bitmap_info, boost::noncopyable
 };
 
 cairo_pattern_t*
-get_cairo_pattern(const fill_style& style, const cxform& cx, const matrix& mat)
+get_cairo_pattern(const fill_style& style, const cxform& cx)
 {
   int fill_type = style.get_type();
   cairo_pattern_t* pattern = NULL;
@@ -231,7 +231,7 @@ get_cairo_pattern(const fill_style& style, const cxform& cx, const matrix& mat)
       
       // Undo the translation our parser applied.
       gnash::matrix transl;
-      transl.concatenate_translation(-32.0f, -32.0f);
+      transl.concatenate_translation(-32, -32);
       transl.concatenate(m);
 
       cairo_matrix_t mat;
@@ -293,20 +293,21 @@ public:
                   const std::vector<fill_style>& fill_styles, cairo_t* context)
   : PathParser(paths, fill_styles.size()),
     _cr(context),
-    _fill_styles(fill_styles), 
-    _pattern(0)
+    _pattern(0),
+    _fill_styles(fill_styles)
   {
   }
   
-  virtual void prepareFill(int fill_index, const cxform& cx, const matrix& mat)
+  virtual void prepareFill(int fill_index, const cxform& cx)
   {
-    assert(_fill_styles.size() > fill_index-1);
     if (!_pattern) {
-      _pattern = get_cairo_pattern(_fill_styles[fill_index-1], cx, mat);
+      _pattern = get_cairo_pattern(_fill_styles[fill_index-1], cx);
     }
   }
   virtual void terminateFill(int fill_style)
   {
+    UNUSED(fill_style);
+
     if (!_pattern) {
       cairo_new_path(_cr);
       return;
@@ -322,9 +323,8 @@ public:
       _pattern = 0;
     }
   }
-  virtual void fillShape() {}
-  
-  void moveTo(const geometry::Point2d<int>& ap)
+
+  void moveTo(const point& ap)
   {
       double x = ap.x, y = ap.y;
       snap_to_half_pixel(_cr, x, y);
@@ -332,20 +332,12 @@ public:
       cairo_move_to(_cr, x, y);
   }
 
-  virtual void curveTo(const Edge<int>& cur_edge)
+  virtual void curveTo(const edge& cur_edge)
   {
-    double x, y;
-    if (cur_edge.isStraight()) {
-      x = cur_edge.ap.x;
-      y = cur_edge.ap.y;
-      snap_to_half_pixel(_cr, x, y);
-      
-      cairo_line_to(_cr, cur_edge.ap.x, cur_edge.ap.y); // fixme: snap
-      return;
-    }
     const float two_thirds = 2.0/3.0;
     const float one_third = 1 - two_thirds;
 
+    double x, y;
     cairo_get_current_point(_cr, &x, &y);
 
     double x1 = x + two_thirds * (cur_edge.cp.x - x);
@@ -365,9 +357,13 @@ public:
     
   }
 
-  void lineTo(const geometry::Point2d<int>& ap)
+  void lineTo(const point& ap)
   {
-    cairo_line_to(_cr, ap.x, ap.y);
+    double x = ap.x;
+    double y = ap.y;
+    snap_to_half_pixel(_cr, x, y);
+      
+    cairo_line_to(_cr, x, y);
   }
 
 private:
@@ -566,9 +562,9 @@ public:
 
   virtual void  begin_display(
     const rgba& bg_color,
-    int viewport_x0, int viewport_y0,
-    int viewport_width, int viewport_height,
-    float x0, float x1, float y0, float y1)
+    int /*viewport_x0*/, int /*viewport_y0*/,
+    int /*viewport_width*/, int /*viewport_height*/,
+    float /*x0*/, float /*x1*/, float /*y0*/, float /*y1*/)
   {
     cairo_identity_matrix(_cr);
 
@@ -582,7 +578,7 @@ public:
 
     for (size_t rno=0; rno < _invalidated_ranges.size(); rno++) {
     
-      const Range2d<float>& range = _invalidated_ranges.getRange(rno);
+      const geometry::Range2d<float>& range = _invalidated_ranges.getRange(rno);
       if (range.isNull()) {
         continue;
       }
@@ -618,7 +614,7 @@ public:
   void set_scale(float xscale, float yscale)
   {
     _stage_mat.xx = xscale / 20;
-    _stage_mat.yy = xscale / 20;
+    _stage_mat.yy = yscale / 20;
   }
 
   virtual void set_translation(float xoff, float yoff) {
@@ -665,6 +661,7 @@ public:
     const rgba& fill, const rgba& outline, const matrix& mat, bool masked)
   {
     CairoScopeMatrix mat_transformer(_cr, mat);
+    cairo_transform(_cr, &_stage_mat);
 
     if (corner_count < 1) {
       return;
@@ -689,7 +686,7 @@ public:
       // FIXME: coordinate alignment (for single-pixel lines should be in
       //        between two pixels for sharp hair line.
       
-      cairo_set_line_width(_cr, 20.0);
+      cairo_set_line_width(_cr, 1.0);
       cairo_stroke_preserve(_cr);    
     }
     
@@ -738,7 +735,7 @@ public:
     _masks.pop_back();
   }
 
-  void add_path(cairo_t* cr, const path& cur_path, bool round_to_half = false)
+  void add_path(cairo_t* cr, const path& cur_path)
   {  
     double x = cur_path.ap.x;
     double y = cur_path.ap.y;
@@ -781,29 +778,46 @@ public:
     }
   }
   
-  
-  PathPtrVec
-  get_paths_by_style(const PathVec& path_vec, unsigned int style)
-  {
-    PathPtrVec paths;
-    for (PathVec::const_iterator it = path_vec.begin(), end = path_vec.end();
-         it != end; ++it) {
-      const path& cur_path = *it;
-      
-      if (cur_path.m_fill0 == style) {
-        paths.push_back(&cur_path);
-      }
-      
-      if (cur_path.m_fill1 == style) {
-        paths.push_back(&cur_path);
-      }
-      
-    }
-    return paths;
-  }
-  
   void apply_line_style(const line_style& style, const cxform& cx)
   {
+    cairo_line_join_t join_style = CAIRO_LINE_JOIN_MITER;
+    switch(style.joinStyle()) {
+      case JOIN_ROUND:
+        join_style = CAIRO_LINE_JOIN_ROUND;
+      break;
+      case JOIN_BEVEL:
+        join_style = CAIRO_LINE_JOIN_BEVEL;
+      break;
+      case JOIN_MITER:
+      break;
+      default:
+        log_unimpl("join style");
+    }
+    cairo_set_line_join(_cr, join_style);
+
+    if (style.startCapStyle() != style.endCapStyle()) {
+      log_unimpl("differing start and end cap styles");
+    }
+
+    cairo_line_cap_t cap_style = CAIRO_LINE_CAP_ROUND;
+    switch(style.startCapStyle()) {
+      case CAP_ROUND:
+      break;
+      case CAP_NONE:
+        cap_style = CAIRO_LINE_CAP_BUTT;
+      break;
+      case CAP_SQUARE:
+        cap_style = CAIRO_LINE_CAP_SQUARE;
+      break;
+      default:
+        log_unimpl("cap style");
+    }
+
+    cairo_set_line_cap(_cr, cap_style);
+
+    // TODO: test that this is correct.
+    cairo_set_miter_limit(_cr, style.miterLimitFactor());
+
     float width = style.getThickness();
 
     if ( width == 0.0 ) {
@@ -816,10 +830,11 @@ public:
       //       and !style.scaleThicknessHorizontally().
       //       If that's not the case, we should scale the thickness
       //       togheter with the shapes.
-      if ( style.scaleThicknessVertically() || style.scaleThicknessHorizontally() )
-      {
+      if (style.scaleThicknessVertically() ||
+          style.scaleThicknessHorizontally()) {
         LOG_ONCE( log_unimpl(_("Scaled strokes in Cairo renderer")) );
       }
+
       cairo_set_line_width(_cr, width);
     }
     
@@ -828,29 +843,8 @@ public:
     set_color(color);
   }
   
-  std::vector<cairo_pattern_t*>
-  build_cairo_styles(const std::vector<fill_style>& fill_styles, const cxform& cx,
-                     const matrix& mat)
-  {
-    std::vector<cairo_pattern_t*> styles_vec_cairo;
-
-    for (std::vector<fill_style>::const_iterator it = fill_styles.begin(),
-         end = fill_styles.end(); it != end; ++it) {
-      const fill_style& cur_style = *it;
-      
-      cairo_pattern_t* pattern = get_cairo_pattern(cur_style, cx, mat);
-      //assert(pattern);
-      styles_vec_cairo.push_back(pattern);
-    }
-    
-    return styles_vec_cairo;
-  }
-  
   void draw_outlines(const PathVec& path_vec, const std::vector<line_style>& line_styles, const cxform& cx)
   {  
-    cairo_set_line_cap(_cr, CAIRO_LINE_CAP_ROUND); // TODO: move to init
-    cairo_set_line_join(_cr, CAIRO_LINE_JOIN_ROUND);
-
     for (PathVec::const_iterator it = path_vec.begin(), end = path_vec.end();
          it != end; ++it) {
       const path& cur_path = *it;
@@ -868,7 +862,6 @@ public:
 
 void
 draw_subshape(const PathVec& path_vec, const matrix& mat, const cxform& cx,
-    float pixel_scale,
     const std::vector<fill_style>& fill_styles,
     const std::vector<line_style>& line_styles)
   { 
@@ -925,57 +918,18 @@ draw_subshape(const PathVec& path_vec, const matrix& mat, const cxform& cx,
       add_path(_cr, cur_path);
     }  
   }
-  
-  /// Takes a path and translates it using the given matrix. The new path
-  /// is stored in paths_out.
-  /// Taken from render_handler_agg.cpp.  
-  void apply_matrix_to_paths(const std::vector<path> &paths_in, 
-    std::vector<path> &paths_out, const matrix& mat) {
-    
-    int pcount, ecount;
-    int pno, eno;
-    
-    // copy path
-    paths_out = paths_in;    
-    pcount = paths_out.size();        
-    
-    for (pno=0; pno<pcount; pno++) {
-    
-      path &the_path = paths_out[pno];     
-      point oldpnt(the_path.ap.x, the_path.ap.y);
-      point newpnt;
-      mat.transform(&newpnt, oldpnt);
-      the_path.ap.x = newpnt.x;    
-      the_path.ap.y = newpnt.y;
-      
-      ecount = the_path.m_edges.size();
-      for (eno=0; eno<ecount; eno++) {
-      
-        edge &the_edge = the_path.m_edges[eno];
-        
-        oldpnt.x = the_edge.ap.x;
-        oldpnt.y = the_edge.ap.y;
-        mat.transform(&newpnt, oldpnt);
-        the_edge.ap.x = newpnt.x;
-        the_edge.ap.y = newpnt.y;
-        
-        oldpnt.x = the_edge.cp.x;
-        oldpnt.y = the_edge.cp.y;
-        mat.transform(&newpnt, oldpnt);
-        the_edge.cp.x = newpnt.x;
-        the_edge.cp.y = newpnt.y;
-      
-      }          
-      
-    } 
-    
+
+  /// Takes a path and translates it using the given matrix.
+  void
+  apply_matrix_to_paths(std::vector<path>& paths, const matrix& mat)
+  {  
+    std::for_each(paths.begin(), paths.end(),
+                  boost::bind(&path::transform, _1, boost::ref(mat)));
   }
-
-
+                  
   virtual void draw_shape_character(shape_character_def *def, 
     const matrix& mat,
     const cxform& cx,
-    float pixel_scale,
     const std::vector<fill_style>& fill_styles,
     const std::vector<line_style>& line_styles)
   {
@@ -989,9 +943,9 @@ draw_subshape(const PathVec& path_vec, const matrix& mat, const cxform& cx,
     cairo_set_fill_rule(_cr, CAIRO_FILL_RULE_EVEN_ODD); // TODO: Move to init
         
     if (_drawing_mask) {      
-      PathVec scaled_path_vec;
+      PathVec scaled_path_vec = path_vec;
       
-      apply_matrix_to_paths(path_vec, scaled_path_vec, mat);
+      apply_matrix_to_paths(scaled_path_vec, mat);
       draw_mask(scaled_path_vec); 
       return;
     }
@@ -999,9 +953,6 @@ draw_subshape(const PathVec& path_vec, const matrix& mat, const cxform& cx,
     CairoScopeMatrix mat_transformer(_cr, mat);
 
     std::vector<PathVec::const_iterator> subshapes = find_subshapes(path_vec);
-    
-//    std::vector<cairo_pattern_t*> fill_styles_cairo
-//      = build_cairo_styles(fill_styles, cx, mat);
     
     for (size_t i = 0; i < subshapes.size()-1; ++i) {
       PathVec subshape_paths;
@@ -1012,28 +963,14 @@ draw_subshape(const PathVec& path_vec, const matrix& mat, const cxform& cx,
         subshape_paths.push_back(*subshapes[i]);
       }
       
-      draw_subshape(subshape_paths, mat, cx, pixel_scale, fill_styles,
+      draw_subshape(subshape_paths, mat, cx, fill_styles,
                     line_styles);
     }
     
-//    destroy_cairo_patterns(fill_styles_cairo);
   }
   
-  void
-  destroy_cairo_patterns(std::vector<cairo_pattern_t*>& patterns)
-  {
-    for (std::vector<cairo_pattern_t*>::iterator it = patterns.begin(),
-         end = patterns.end(); it != end; ++it) {
-      cairo_pattern_t* pattern = *it;
-      if (pattern && cairo_pattern_get_type(pattern) !=
-                     CAIRO_PATTERN_TYPE_SURFACE) {
-        cairo_pattern_destroy(pattern);
-      }
-    }
-  }  
-
   virtual void draw_glyph(shape_character_def *def, const matrix& mat,
-    const rgba& color, float pixel_scale)
+    const rgba& color)
   {
   
     cxform dummy_cx;
@@ -1050,13 +987,7 @@ draw_subshape(const PathVec& path_vec, const matrix& mat, const cxform& cx,
     
     CairoScopeMatrix mat_transformer(_cr, mat);
     
-//    std::vector<cairo_pattern_t*> fill_styles_cairo
-//      = build_cairo_styles(glyph_fs, dummy_cx, mat);
-      
-    
-    draw_subshape(path_vec, mat, dummy_cx, pixel_scale, glyph_fs, dummy_ls);
-    
-//    destroy_cairo_patterns(fill_styles_cairo);
+    draw_subshape(path_vec, mat, dummy_cx, glyph_fs, dummy_ls);
   }
 
   void

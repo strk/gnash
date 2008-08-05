@@ -1,8 +1,0 @@
-.deps
-.libs
-Makefile
-Makefile.in
-libmozsdk.la
-np_entry.lo
-npn_gate.lo
-npp_gate.lo

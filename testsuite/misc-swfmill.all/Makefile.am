@@ -25,11 +25,13 @@ abs_builddir=$(shell cd $(top_builddir)/testsuite/misc-swfmill.all; pwd)
 SC_XMLTESTS =			\
 	hello.xml		\
 	jump_after_end.xml	\
+	jump_to_prev_block.xml  \
 	dict_override.xml	\
 	initaction_in_definesprite.xml \
 	zeroframe_definesprite.xml \
 	background.xml \
 	registers.xml \
+	Try-without-jump.xml \
 	$(NULL)
 
 EXTRA_DIST = $(SC_XMLTESTS) 
@@ -38,11 +40,10 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/libmedia \
 	-I$(top_srcdir)/backend \
-	-I$(top_srcdir)/server  \
-	-I$(top_srcdir)/server/parser  \
-	-I$(top_srcdir)/server/vm \
-	-I$(top_srcdir)/server/asobj \
-	-I$(top_srcdir)/libgeometry \
+	-I$(top_srcdir)/libcore  \
+	-I$(top_srcdir)/libcore/parser  \
+	-I$(top_srcdir)/libcore/vm \
+	-I$(top_srcdir)/libcore/asobj \
 	-I$(top_srcdir)/testsuite \
 	$(NULL)
 
@@ -53,10 +54,12 @@ $(SC_XMLTESTS_OUT) :
 
 check_SCRIPTS = \
 	jump_after_end-runner	\
+	jump_to_prev_block-runner	\
 	dict_override-runner	\
 	initaction_in_definesprite-runner	\
 	zeroframe_definesprite-runner	\
 	registers-runner \
+	Try-without-jump-runner \
 	$(NULL)
 
 check_PROGRAMS = \
@@ -64,6 +67,10 @@ check_PROGRAMS = \
 
 jump_after_end-runner: $(srcdir)/../generic-testrunner.sh jump_after_end.swf Makefile
 	sh $< -r 50 -c "END OF TEST" $(top_builddir) jump_after_end.swf > $@
+	chmod 755 $@
+
+jump_to_prev_block-runner: $(srcdir)/../generic-testrunner.sh jump_to_prev_block.swf Makefile
+	sh $< -r 50 -C "ABA" $(top_builddir) jump_to_prev_block.swf > $@
 	chmod 755 $@
 
 dict_override-runner: $(srcdir)/../generic-testrunner.sh dict_override.swf Makefile
@@ -81,6 +88,11 @@ zeroframe_definesprite-runner: $(srcdir)/../generic-testrunner.sh zeroframe_defi
 registers-runner: $(srcdir)/../generic-testrunner.sh registers.swf Makefile
 	sh $< -r 50 -c "END OF TEST" $(top_builddir) registers.swf > $@
 	chmod 755 $@
+
+Try-without-jump-runner: $(srcdir)/../generic-testrunner.sh Try-without-jump.swf Makefile
+	sh $< -r 50 -c "END OF TEST" $(top_builddir) Try-without-jump.swf > $@
+	chmod 755 $@
+
 
 backgroundTestRunner_SOURCES = \
 	backgroundTestRunner.cpp \

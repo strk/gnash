@@ -16,8 +16,8 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
 AC_PREREQ(2.50)
-AC_INIT(gnash, cvs)
-AC_CONFIG_SRCDIR(server/gnash.h)
+AC_INIT(gnash, trunk)
+AC_CONFIG_SRCDIR(libcore/gnash.h)
 AM_CONFIG_HEADER(gnashconfig.h)
 
 dnl AC_CANONICAL_TARGET
@@ -168,7 +168,7 @@ dnl Get build date for helping us debugging
 BUILDDATE="`date +%Y%m%d`"
 
 dnl These are required by automake
-dnl AM_INIT_AUTOMAKE(gnash, "cvs$BUILDDATE")
+dnl AM_INIT_AUTOMAKE(gnash, "trunk$BUILDDATE")
 AM_INIT_AUTOMAKE
 AM_MAINTAINER_MODE
 AC_PROG_MAKE_SET
@@ -1531,15 +1531,17 @@ fi
 AM_CONDITIONAL(ENABLE_SWFDEC_TESTSUITE, [ test x"$SWFDEC_TESTSUITE" != x ])
 
 dnl
-dnl See if we can use the swfmill, mtasc and swfc based testsuites 
+dnl See if we can use the swfmill, mtasc, swfc and haxe based testsuites 
 dnl
 if test x$cross_compiling = xno; then
   AC_PATH_PROG(SWFMILL, swfmill)
   AC_PATH_PROG(SWFC, swfc)
   AC_PATH_MTASC
+  AC_PATH_HAXE
 fi
 AM_CONDITIONAL(ENABLE_SWFMILL, [ test x"$SWFMILL" != x ])
 AM_CONDITIONAL(ENABLE_MTASC, [ test x"$MTASC" != x ])
+AM_CONDITIONAL(ENABLE_HAXE, [ test x"$HAXE" != x ])
 AM_CONDITIONAL(ENABLE_SWFC, [ test x"$SWFC" != x ])
 
 AC_PATH_PROG(DOXYGEN, doxygen)
@@ -1925,7 +1927,7 @@ if test x"$GCC" = x"yes"; then
     -Wnon-virtual-dtor \
     -Wunused \
     -Wextra \   
-    -ansi \
+    #-ansi \
     "
   CFLAGS="$CFLAGS \
     -W \
@@ -2091,11 +2093,10 @@ AC_OUTPUT(Makefile
 libmedia/Makefile
 po/Makefile
 libbase/Makefile
-libgeometry/Makefile
-server/Makefile
-server/asobj/Makefile
-server/vm/Makefile
-server/parser/Makefile
+libcore/Makefile
+libcore/asobj/Makefile
+libcore/vm/Makefile
+libcore/parser/Makefile
 libnet/Makefile
 libamf/Makefile
 backend/Makefile
@@ -2106,16 +2107,16 @@ doc/Doxyfile
 pythonmodule/Makefile
 testsuite/Makefile
 testsuite/libbase/Makefile
-testsuite/libgeometry/Makefile
 testsuite/actionscript.all/Makefile
 testsuite/samples/Makefile
 testsuite/swfdec/Makefile
 testsuite/misc-ming.all/Makefile
 testsuite/misc-mtasc.all/Makefile
+testsuite/misc-haxe.all/Makefile
 testsuite/misc-swfmill.all/Makefile
 testsuite/misc-swfc.all/Makefile
 testsuite/movies.all/Makefile
-testsuite/server/Makefile
+testsuite/libcore.all/Makefile
 testsuite/libamf.all/Makefile
 testsuite/libnet.all/Makefile
 gui/Makefile
@@ -2804,7 +2805,7 @@ if test x$cross_compiling = xno; then
   else
     echo "        WARNING: You need to have the Ming development package" >&4
     echo "                 installed to run most of the tests in Gnash testsuite." >&4
-    echo "                 Install it from http://ming.sourceforge.net" >&4
+    echo "                 Install it from http://www.libming.org/" >&4
     echo "                 or .deb users: apt-get install libming-dev" >&4
   fi
 
@@ -2814,8 +2815,14 @@ if test x$cross_compiling = xno; then
   else
     echo "        WARNING: You need to have the Ming utilities package" >&4
     echo "                 installed to run most of the tests in Gnash testsuite." >&4
-    echo "                 Install it from http://ming.sourceforge.net" >&4
-    echo "                 or .deb users: apt-get install libming-utils" >&4
+    echo "                 Install it from http://www.libming.org" >&4
+    echo "                 or .deb users: apt-get install libming-util" >&4
+  fi
+
+  if test x"$MAKESWF" != x && test $MING_VERSION_CODE -lt 00040006; then
+    echo "        WARNING: You have an older version of Ming installed and will not" >&4
+    echo "                 be able to run all of the tests in Gnash testsuite." >&4
+    echo "                 Install the latest version from http://www.libming.org" >&4
   fi
 
   if test x"$SWFDEC_TESTSUITE" != x; then
@@ -2830,6 +2837,16 @@ if test x$cross_compiling = xno; then
     echo "                 to run some of the tests in Gnash testsuite." >&4
     echo "                 You can install it from http://mtasc.org" >&4
     echo "                 or .deb users: apt-get install mtasc" >&4
+  fi
+
+  if test x"$HAXE" != x; then
+    echo "        HAXE is $HAXE"
+    echo "        HAXE CLASSPATH is $HAXE_CLASSPATH"
+  else
+    echo "        WARNING: You need to have the HAXE compiler packages installed" >&4
+    echo "                 to run some of the tests in Gnash testsuite." >&4
+    echo "                 You can install it from http://haxe.org" >&4
+    echo "                 or .deb users: apt-get install haxe (version 2 or later required)" >&4
   fi
 
   if test x"$SWFMILL" != x; then

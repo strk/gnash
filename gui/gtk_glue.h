@@ -15,8 +15,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef __GTK_GLUE_H__
-#define __GTK_GLUE_H__
+#ifndef GNASH_GTK_GLUE_H
+#define GNASH_GTK_GLUE_H
 
 #include "gnash.h"
 
@@ -48,5 +48,5 @@ class GtkGlue
 
 } // namespace gnash
 
-// end of __GTK_GLUE_H__
+// end of GNASH_GTK_GLUE_H
 #endif

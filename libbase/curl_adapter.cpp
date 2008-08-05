@@ -363,16 +363,16 @@ public:
 
 	~CurlStreamFile();
 
-	/// Read 'bytes' bytes into the given buffer.
-	//
-	/// Return number of actually read bytes
-	///
+	// See dox in IOChannel.h
 	virtual int read(void *dst, int bytes);
 
-	/// Return true if EOF has been reached
+	// See dox in IOChannel.h
+	virtual int readNonBlocking(void *dst, int bytes);
+
+	// See dox in IOChannel.h
 	virtual bool eof() const;
 
-	/// Return the error condition of current stream
+	// See dox in IOChannel.h
 	virtual int get_error() const {
 		return _error;
 	}
@@ -444,6 +444,10 @@ private:
 	// Will call libcurl routines to fetch data.
 	void fillCache(long unsigned size);
 
+	// Filling the cache as much as possible w/out blocking.
+	// Will call libcurl routines to fetch data.
+	void fillCacheNonBlocking();
+
 	// Append sz bytes to the cache
 	size_t cache(void *from, size_t sz);
 
@@ -505,6 +509,31 @@ CurlStreamFile::cache(void *from, size_t size)
 	return wrote;
 }
 
+/*private*/
+void
+CurlStreamFile::fillCacheNonBlocking()
+{
+	if ( ! _running )
+	{
+#if GNASH_CURL_VERBOSE
+		gnash::log_debug("Not running: fillCacheNonBlocking returning");
+#endif
+		return;
+	}
+
+	CURLMcode mcode;
+
+	do
+	{
+		mcode = curl_multi_perform(_mhandle, &_running);
+	} while (mcode == CURLM_CALL_MULTI_PERFORM); // && _running ?
+
+	if (mcode != CURLM_OK)
+	{
+		throw gnash::GnashException(curl_multi_strerror(mcode));
+	}
+}
+
 
 /*private*/
 void
@@ -544,15 +573,7 @@ CurlStreamFile::fillCache(long unsigned size)
 	while (_running)
 	{
 
-		do
-		{
-			mcode = curl_multi_perform(_mhandle, &_running);
-		} while (mcode == CURLM_CALL_MULTI_PERFORM);
-
-		if (mcode != CURLM_OK)
-		{
-			throw gnash::GnashException(curl_multi_strerror(mcode));
-		}
+		fillCacheNonBlocking();
 
 		// Do this here to avoid calling select()
 		// when we have enough bytes anyway, or
@@ -829,6 +850,15 @@ CurlStreamFile::CurlStreamFile(const std::string& url, const std::string& vars)
 		throw gnash::GnashException(curl_easy_strerror(ccode));
 	}
 
+	// This is to support binary strings as postdata
+	// NOTE: in version 7.11.1 CURLOPT_POSTFIELDSIZE_LARGE was added
+	//       this one takes a long, that one takes a curl_off_t
+	//
+	ccode = curl_easy_setopt(_handle, CURLOPT_POSTFIELDSIZE, _postdata.size());
+	if ( ccode != CURLE_OK ) {
+		throw gnash::GnashException(curl_easy_strerror(ccode));
+	}
+
 	CURLMcode mcode = curl_multi_add_handle(_mhandle, _handle);
 	if ( mcode != CURLM_OK ) {
 		throw gnash::GnashException(curl_multi_strerror(mcode));
@@ -863,6 +893,41 @@ CurlStreamFile::read(void *dst, int bytes)
 #endif
 
 	return std::fread(dst, 1, bytes, _cache);
+
+}
+
+/*public*/
+int
+CurlStreamFile::readNonBlocking(void *dst, int bytes)
+{
+	if ( eof() ) return 0;
+	if ( _error )
+	{
+		log_error("curl adaptor's readNonBlocking called while _error != 0 - should we throw an exception?");
+		return 0;
+	}
+
+#ifdef GNASH_CURL_VERBOSE
+	gnash::log_debug ("readNonBlocking(%d) called", bytes);
+#endif
+
+	fillCacheNonBlocking();
+	if ( _error )
+	{
+		// I guess an exception would be thrown in this case ?
+		log_error("curl adaptor's fillCacheNonBlocking set _error rather then throwing an exception");
+		return -1; // error can be set by fillCacheNonBlocking (shouldn't an exception be thrown an exception?)
+	}
+
+	int actuallyRead = std::fread(dst, 1, bytes, _cache);
+	if ( _running )
+	{
+		// if we're still running drop any eof flag
+		// on the cache
+		clearerr(_cache);
+	}
+
+	return actuallyRead;
 
 }
 

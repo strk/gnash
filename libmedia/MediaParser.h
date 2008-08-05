@@ -180,6 +180,8 @@ public:
 	std::auto_ptr<ExtraInfo> extra;
 };
 
+DSOEXPORT std::ostream& operator << (std::ostream& os, const VideoInfo& vi);
+
 /// An encoded video frame
 class EncodedVideoFrame
 {

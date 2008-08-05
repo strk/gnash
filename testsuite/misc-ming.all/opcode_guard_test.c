@@ -21,6 +21,7 @@
  */
 
 #include <stdlib.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <ming.h>
 
@@ -29,6 +30,16 @@
 #define OUTPUT_VERSION  7
 #define OUTPUT_FILENAME "opcode_guard_test.swf"
 
+void
+my_error(const char *msg, ...)
+{
+        va_list args;
+
+        va_start(args, msg);
+        vprintf(msg, args);
+        va_end(args);
+        exit(1);
+}
 
 int
 main(int argc, char** argv)
@@ -47,6 +58,7 @@ main(int argc, char** argv)
   }
 
   Ming_init();
+  Ming_setErrorFunction(my_error);
   mo = newSWFMovieWithVersion(OUTPUT_VERSION);
   SWFMovie_setDimension(mo, 800, 600);
   SWFMovie_setRate (mo, 1);
@@ -146,13 +158,13 @@ main(int argc, char** argv)
     "   setvariable  "
     "}; "
     // non-exist target does not evaluated to _root!
-    " _root.xcheck_equals(current_target, undefined);"
+    " _root.check_equals(current_target, undefined);"
     // No surprise, getVariable will ascend to _root!
     " _root.check_equals(_target, '/');"
     " _root.check_equals(_root._currentframe, 9);"
     " gotoAndPlay(10);"
     // the above gotoFrame has no effect as it was acting on an non-exist-target
-    "   _root.xcheck_equals(_root._currentframe, 9);"
+    "   _root.check_equals(_root._currentframe, 9);"
     // ascend to the orignal target is the current target is undefined
     // we succeed by luck.
     "   _root.check_equals(orignal_target_var, 100);"

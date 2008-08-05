@@ -49,8 +49,8 @@ libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\" \
 	-DSYSCONFDIR=\"$(sysconfdir)\" \
 	-I$(top_srcdir)/libnet	\
 	-I$(top_srcdir)/libamf	\
-	-I$(top_srcdir)/server	\
-	-I$(top_srcdir)/server/swf	\
+	-I$(top_srcdir)/libcore	\
+	-I$(top_srcdir)/libcore/swf	\
 	$(PTHREAD_CFLAGS) \
 	$(LIBXML_CFLAGS) \
 	$(PNG_CFLAGS) \
@@ -65,11 +65,6 @@ libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\" \
 
 # These headers get installed
 # include_HEADERS = log.h err.h proc.h serial.h xantrex.h outback.h
-
-# Don't build Dmalloc support if it's not configured in
-if HAVE_DMALLOC
-DMALLOC_FILE = dlmalloc.c
-endif
 
 libgnashbase_la_LIBADD = \
 	$(JPEG_LIBS) \
@@ -93,7 +88,6 @@ MALLOC =
 endif
 
 libgnashbase_la_SOURCES = \
-	$(DMALLOC_FILE)	\
 	extension.cpp \
 	image.cpp \
 	$(MALLOC) \
@@ -109,7 +103,6 @@ libgnashbase_la_SOURCES = \
 	ClockTime.cpp \
 	WallClockTimer.cpp \
 	utf8.cpp \
-	utility.cpp \
 	curl_adapter.cpp \
 	noseek_fd_adapter.cpp \
 	zlib_adapter.cpp \
@@ -122,7 +115,6 @@ libgnashbase_la_SOURCES = \
 
 noinst_HEADERS = \
 	$(LIBLTDLHEAD) \
-	dlmalloc.h \
 	SimpleBuffer.h \
 	extension.h \
 	GnashException.h \
@@ -157,6 +149,9 @@ noinst_HEADERS = \
 	BitsReader.h \
 	arg_parser.h \
 	getclocktime.hpp \
+	Point2d.h \
+	Range2d.h \
+	snappingrange.h \
 	$(NULL)
 
 libgnashbase_la_LDFLAGS = -release $(VERSION)
@@ -171,6 +166,10 @@ CLEANFILES = libltdl.la libltdlc.la gnashrc gnashpluginrc
 libltdl_la_SOURCES = $(top_srcdir)/libltdl/ltdl.c
 libltdl_la_LDFLAGS = -no-undefined -version-info 4:4:1
 libltdl_la_LIBADD = $(LIBADD_DL)
+
+if WIN32
+  libltdl_la_LDFLAGS += -static
+endif
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:

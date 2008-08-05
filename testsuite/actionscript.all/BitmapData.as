@@ -83,7 +83,8 @@ check(!bmp.hasOwnProperty("transparent"));
 check_equals(bmp.height, 10);
 check_equals(bmp.width, 10);
 check_equals(bmp.transparent, true);
-xcheck_equals(bmp.rectangle.toString(), "(x=0, y=0, w=10, h=10)");
+check_equals(bmp.rectangle.toString(), "(x=0, y=0, w=10, h=10)");
+check(bmp.rectangle instanceOf flash.geom.Rectangle);
 check_equals(bmp.getPixel(1, 1), 16777215);
 check_equals(bmp.getPixel(9, 9), 16777215);
 check_equals(bmp.getPixel32(1, 1), -1);
@@ -98,7 +99,7 @@ bmp = new Bitmap(20, 30, false, 0xeeddee);
 check_equals(bmp.height, 30);
 check_equals(bmp.width, 20);
 check_equals(bmp.transparent, false);
-xcheck_equals(bmp.rectangle.toString(), "(x=0, y=0, w=20, h=30)");
+check_equals(bmp.rectangle.toString(), "(x=0, y=0, w=20, h=30)");
 check_equals(bmp.getPixel(1, 1), 0xeeddee);
 check_equals(bmp.getPixel32(1, 1), -1122834);
 
@@ -111,16 +112,40 @@ check_equals(bmp.getPixel(-2, -5), 0);
 // 0,0 is inside, 20, 30 outside a 20x30 bitmap.
 check_equals(bmp.getPixel(20, 30), 0);
 
-bmp = new Bitmap(10000, 0);
-xcheck_equals(bmp, undefined);
+
+// 2880 is the maximum, 1 the minimum. Returns
+// undefined if the dimensions are invalid.
+bmp = new Bitmap(10000, 3);
+xcheck_equals(typeof(bmp), "undefined");
+check_equals(bmp.height, undefined);
+
 bmp = new Bitmap(0, 10000);
 xcheck_equals(bmp, undefined);
+check_equals(bmp.height, undefined);
 
-bmp = new Bitmap(2881, 0);
+bmp = new Bitmap(2880, 2880);
+check_equals(typeof(bmp), "object");
+check_equals(bmp.height, 2880);
+
+bmp = new Bitmap(2880, 2881);
 xcheck_equals(typeof(bmp), "undefined");
-bmp = new Bitmap(0, 2881);
-xcheck_equals(bmp, undefined);
+check_equals(bmp.height, undefined);
 
+bmp = new Bitmap(0, 2880);
+xcheck_equals(bmp, undefined);
+check_equals(bmp.height, undefined);
+
+bmp = new Bitmap(2879, 2879);
+check_equals(typeof(bmp), "object");
+check_equals(bmp.height, 2879);
+
+bmp = new Bitmap(0, 2879);
+xcheck_equals(bmp, undefined);
+check_equals(bmp.height, undefined);
+
+bmp = new Bitmap(-1, 10, false, 0xff);
+xcheck_equals(bmp, undefined);
+check_equals(bmp.height, undefined);
 
 // floodFill
 bmp = new Bitmap(20, 20, false);
@@ -183,10 +208,49 @@ check_equals(bmp.getPixel32(3, 3), -1711337216);
 
 mc.attachBitmap(bmp, this.getNextHighestDepth());
 
+bmp.dispose();
+check_equals(bmp.height, -1);
+check_equals(bmp.width, -1);
+check_equals(bmp.transparent, -1);
+check_equals(typeof(bmp.rectangle), "number");
+check_equals(bmp.rectangle, -1);
+check_equals(bmp.rectangle.toString(), "-1");
+
+check(bmp instanceOf Bitmap);
+bmp.height = 2;
+check_equals(bmp.height, -1);
+
+bmp = new Bitmap(20, 10, true);
+backup = flash.geom.Rectangle;
+flash.geom.Rectangle = 2;
+xcheck_equals(bmp.rectangle, -1);
+
+flash.geom.Rectangle = function (x, y, w, h)
+{
+    this.y = x + 5;
+    this.x = 10.5;
+    this.width = h;
+    this.height = w;
+};
+xcheck_equals(bmp.rectangle.toString(), "[object Object]");
+
+flash.geom.Rectangle = function (x, y, w, h)
+{
+};
+xcheck_equals(bmp.rectangle.toString(), "[object Object]");
+
+flash.geom.Rectangle = function ()
+{
+};
+xcheck_equals(bmp.rectangle.toString(), "[object Object]");
+
+flash.geom.Rectangle = backup;
+check_equals(bmp.rectangle.toString(), "(x=0, y=0, w=20, h=10)");
+
 //-------------------------------------------------------------
 // END OF TEST
 //-------------------------------------------------------------
 
-totals(77);
+totals(103);
 
 #endif // OUTPUT_VERSION >= 8

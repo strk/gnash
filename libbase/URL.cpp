@@ -375,7 +375,7 @@ URL::split_querystring_from_path()
 
 	// extract the parameters from the URL
 
-    	size_t qmpos = _path.rfind("?");
+    	size_t qmpos = _path.find("?");
 	if (qmpos == string::npos)
 	{
 		// no query string

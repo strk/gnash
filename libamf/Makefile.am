@@ -35,7 +35,7 @@ libgnashamf_la_LDFLAGS =  -release $(VERSION) ${AM_LDFLAGS}
 
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/libnet \
-	-I$(top_srcdir)/server \
+	-I$(top_srcdir)/libcore \
 	-I$(top_srcdir)/libbase \
 	$(BOOST_CFLAGS) \
 	$(PTHREAD_CFLAGS) \

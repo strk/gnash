@@ -15,8 +15,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef HAVE_GUI_H
-#define HAVE_GUI_H
+#ifndef GNASH_GUI_H
+#define GNASH_GUI_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -189,10 +189,10 @@ public:
     virtual std::string getScreenColor() { return ""; }
 
     /// @return Whether or not the movie should be looped indefinitely.
-    bool loops();
+    bool loops() const { return _loop; }
 
     /// @return Whether the movie is running fullscreen or not.    
-    bool isFullscreen() { return _fullscreen; }
+    bool isFullscreen() const { return _fullscreen; }
 
     /// Mouse notification callback to be called when the mouse is moved.
     //
@@ -441,6 +441,9 @@ protected:
 
     // Maximum number of advances before exit; 0 for no limit.
     unsigned long _maxAdvances;
+    
+    /// Counter to keep track of frame advances
+    unsigned long _advances;
 
     /// Called by Gui::stop().  This can be used by GUIs to implement pause
     /// widgets (so that resuming a stopped animation is more user-friendly)
@@ -458,10 +461,10 @@ private:
     float           _yscale;
 
     /// Window pixel X offset of stage origin
-    float           _xoffset;
+    boost::int32_t   _xoffset;
 
     /// Window pixel Y offset of stage origin
-    float           _yoffset;
+    boost::int32_t   _yoffset;
 
     bool display(movie_root* m);
     

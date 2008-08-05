@@ -178,12 +178,12 @@ AGG ressources
 //#include <boost/foreach.hpp>
 
 #ifndef round
-#define round(x) rint(x)
+	#define round(x) rint(x)
 #endif
 
+#define TWIPS_TO_SHIFTED_PIXELS(x) (x*0.05f + 0.5f) 
+
 using namespace gnash;
-
-
 
 
 namespace gnash {
@@ -219,9 +219,9 @@ class agg_cache_manager : private render_cache_manager
   /// Returns NULL if no cache item matches 
   std::vector <agg::path_storage>* search(const matrix& mat, bool rounded) {
   
-    size_t ccount = m_items.size();
+    const size_t ccount = m_items.size();
     
-    for (size_t cno=0; cno<ccount; cno++) {    
+    for (size_t cno=0; cno<ccount; ++cno) {    
       agg_transformed_path& item = m_items[cno];
           
       if ((item.m_mat == mat) && (item.m_rounded == rounded)) {
@@ -307,7 +307,7 @@ public:
     unsigned int width=region.width()+1;
 
     const unsigned int max_y = region.getMaxY();
-          for (unsigned int y=region.getMinY(); y<=max_y; y++) 
+          for (unsigned int y=region.getMinY(); y<=max_y; ++y) 
     {
        m_pixf.copy_hline(left, y, width, black);
     }
@@ -531,7 +531,7 @@ public:
 
       agg::scanline_u8 sl;
   
-      for (unsigned int cno=0; cno<_clipbounds.size(); cno++) {    
+      for (unsigned int cno=0; cno<_clipbounds.size(); ++cno) {    
       
         const geometry::Range2d<int>& cbounds = _clipbounds[cno];
         apply_clip_box<ras_type> (ras, cbounds);
@@ -552,7 +552,7 @@ public:
       typedef agg::scanline_u8_am<agg::alpha_mask_gray8> scanline_type;
       scanline_type sl(m_alpha_mask.back()->get_amask());
   
-      for (unsigned int cno=0; cno<_clipbounds.size(); cno++) {    
+      for (unsigned int cno=0; cno<_clipbounds.size(); ++cno) {    
       
         const geometry::Range2d<int>& cbounds = _clipbounds[cno];
         apply_clip_box<ras_type> (ras, cbounds);
@@ -652,7 +652,7 @@ public:
     
     assert(scale_set);
     // clear the stage using the background color
-    for (unsigned int i=0; i<_clipbounds.size(); i++) 
+    for (unsigned int i=0; i<_clipbounds.size(); ++i) 
       clear_framebuffer(_clipbounds[i], agg::rgba8_pre(background_color.m_r,
         background_color.m_g, background_color.m_b,
         background_color.m_a));        
@@ -723,13 +723,12 @@ public:
                   const matrix& line_mat)
   // Draw the line strip formed by the sequence of points.
   {
-  
     assert(m_pixf.get());
 
     matrix mat = stage_matrix;
     mat.concatenate(line_mat);    
 
-    if ( _clipbounds.size()==0 ) return;
+    if ( _clipbounds.empty() ) return;
 
     point pnt;
     
@@ -767,7 +766,7 @@ public:
       
       agg::scanline_p8 sl;      
       
-      for (unsigned int cno=0; cno<_clipbounds.size(); cno++) {
+      for (unsigned int cno=0; cno<_clipbounds.size(); ++cno) {
       
         const geometry::Range2d<int>& bounds = _clipbounds[cno];
               
@@ -791,7 +790,7 @@ public:
       
       sl_type sl(m_alpha_mask.back()->get_amask());      
       
-      for (unsigned int cno=0; cno<_clipbounds.size(); cno++) {
+      for (unsigned int cno=0; cno<_clipbounds.size(); ++cno) {
       
         const geometry::Range2d<int>& bounds = _clipbounds[cno];
               
@@ -819,7 +818,7 @@ public:
     
     agg_alpha_mask* new_mask = new agg_alpha_mask(xres, yres);
     
-    for (unsigned int cno=0; cno<_clipbounds.size(); cno++)  
+    for (unsigned int cno=0; cno<_clipbounds.size(); ++cno)  
       new_mask->clear(_clipbounds[cno]);
     
     m_alpha_mask.push_back(new_mask);
@@ -840,15 +839,14 @@ public:
   
 
   void draw_glyph(shape_character_def *def,
-      const matrix& mat, const rgba& color, float /*pixel_scale*/) {
-    
-    std::vector< Path<float> > paths;    
+      const matrix& mat, const rgba& color) 
+  {
+    std::vector<path> paths;
     apply_matrix_to_path(def->get_paths(), paths, mat);
-    
-    // convert to AGG paths
-    std::vector<agg::path_storage> agg_paths;
+    // convert gnash paths to agg paths.
+    std::vector<agg::path_storage> agg_paths;    
     build_agg_paths(agg_paths, paths);
-    
+ 
     // make sure m_single_fill_styles contains the required color 
     need_single_fill_style(color);
 
@@ -916,63 +914,56 @@ public:
     );
     
     
-    int count = _clipbounds.size();
-    for (int cno=0; cno<count; cno++) {
+    const int count = _clipbounds.size();
+    for (int cno=0; cno<count; ++cno) {
           
       if (_clipbounds[cno].intersects(bounds.getRange())) 
         _clipbounds_selected.push_back(&_clipbounds[cno]);
 
-    }
-  
-    /*  
-    printf("Selected %d out of %d bounds.\n", _clipbounds_selected.size(),
-      _clipbounds.size());
-    */
+    }  
   }
   
   void select_all_clipbounds() {
   
-    if (_clipbounds_selected.size() == _clipbounds.size()) 
+    const unsigned int count = _clipbounds.size();
+
+    if (_clipbounds_selected.size() == count)
       return; // already all selected
   
     _clipbounds_selected.clear();
-    _clipbounds_selected.resize(_clipbounds.size());
+    _clipbounds_selected.resize(count);
     
-    int count = _clipbounds.size();
-    for (int cno=0; cno<count; cno++) 
+    for (unsigned int cno=0; cno<count; ++cno) 
       _clipbounds_selected[cno] = &_clipbounds[cno];
   }
 
   void draw_shape_character(shape_character_def *def, 
     const matrix& mat,
     const cxform& cx,
-    float /*pixel_scale*/,
     const std::vector<fill_style>& fill_styles,
     const std::vector<line_style>& line_styles) {
     
     bool have_shape, have_outline;
-    
+
     analyze_paths(def->get_paths(), have_shape, have_outline);
 
     if (!have_shape && !have_outline)
-      return; // invisible character
+    {
+        return; // invisible character
+    }    
 
+    std::vector< path > paths;
+    std::vector< agg::path_storage > agg_paths;  
+    std::vector< agg::path_storage > agg_paths_rounded;  
 
-    std::vector< Path<float> > paths;
-    std::vector< agg::path_storage > agg_paths;
-    std::vector< agg::path_storage > agg_paths_rounded;
-    
     apply_matrix_to_path(def->get_paths(), paths, mat);
-    
+
     // Flash only aligns outlines. Probably this is done at rendering
     // level.
-
     if (have_outline)
-      build_agg_paths_rounded(agg_paths_rounded, paths, line_styles);
-    
+      build_agg_paths_rounded(agg_paths_rounded, paths, line_styles);   
     if (have_shape)
       build_agg_paths(agg_paths, paths);
-      
     
     if (m_drawing_mask) {
       
@@ -1001,9 +992,9 @@ public:
       */
       
       // We need to separate sub-shapes during rendering. 
-      const unsigned int subshape_count=count_sub_shapes(paths);
-      
-      for (unsigned int subshape=0; subshape<subshape_count; subshape++)
+      const unsigned int subshape_count = count_sub_shapes(paths);
+     
+      for (unsigned int subshape=0; subshape<subshape_count; ++subshape)
       {
         if (have_shape)
         {
@@ -1032,9 +1023,9 @@ public:
     have_shape=false;
     have_outline=false;
     
-    int pcount = paths.size();
+    const int pcount = paths.size();
     
-    for (int pno=0; pno<pcount; pno++) {
+    for (int pno=0; pno<pcount; ++pno) {
     
       const path &the_path = paths[pno];
     
@@ -1052,47 +1043,42 @@ public:
     
   }
 
-  /// Takes a path and translates it using the given matrix. The new path
-  /// is stored in paths_out.  
-  void apply_matrix_to_path(const std::vector<path> &paths_in, 
-    std::vector< Path<float> > &paths_out, const matrix &source_mat) {
-    
-    matrix mat = stage_matrix;
+/// Takes a path and translates it using the given matrix. The new path
+/// is stored in paths_out. Both paths_in and paths_out are expected to
+/// be in TWIPS.
+void apply_matrix_to_path(const std::vector<path> &paths_in, 
+      std::vector<path>& paths_out, const matrix &source_mat) 
+{
+
+    matrix mat;
+    // make sure paths_out is also in TWIPS to keep accuracy.
+    mat.concatenate_scale(20.0,  20.0);
+    mat.concatenate(stage_matrix);
     mat.concatenate(source_mat);
-    
-    paths_out.reserve(paths_in.size());
-    
+
+    size_t pcnt = paths_in.size();
+    paths_out.resize(pcnt);
     typedef std::vector<path> PathVect;
     for (PathVect::const_iterator i=paths_in.begin(), e=paths_in.end(); i!=e; ++i)
     {
-  Path<float> floating_path = *i;
-  floating_path.transform(mat);
-  paths_out.push_back(floating_path);
+        path  p = *i;
+        p.transform(mat);
+        paths_out.push_back( p );
     }
-#if 0
-    BOOST_FOREACH(const path& in_path, paths_in) {
-      Path<float> floating_path = in_path;
-      floating_path.transform(mat);
-      paths_out.push_back(floating_path);
-    }
-#endif
-
-  } // apply_matrix
-
+} // apply_matrix
 
 
   /// A shape can have sub-shapes. This can happen when there are multiple
   /// layers of the same frame count. Flash combines them to one single shape.
   /// The problem with sub-shapes is, that outlines can be hidden by other
   /// layers so they must be rendered separately. 
-  unsigned int count_sub_shapes(const std::vector< Path<float> > &paths)
+  unsigned int count_sub_shapes(const std::vector<path> &path_in)
   {
     unsigned int sscount=1;
+    const size_t pcnt = path_in.size();
     
-    size_t pcount = paths.size();
-    
-    for (size_t pno=0; pno<pcount; pno++) {
-      const Path<float>& this_path = paths[pno];
+    for (size_t pno=0; pno<pcnt; ++pno) {
+      const path& this_path = path_in[pno];
       
       if (this_path.m_new_shape)
         sscount++;
@@ -1100,49 +1086,45 @@ public:
     
     return sscount;
   }
-  
-  
+
   /// Transposes Gnash paths to AGG paths, which can be used for both outlines
   /// and shapes. Subshapes are ignored (ie. all paths are converted). Converts 
   /// TWIPS to pixels on the fly.
-  void build_agg_paths(std::vector<agg::path_storage>& dest, const std::vector< Path<float> >& paths) {
-  
-    // Shift all coordinates a half pixel for correct results (the middle of
-    // a pixel is at .5 / .5, ie. it's subpixel center) 
-    const float subpixel_offset = 0.5f;
+  void build_agg_paths(std::vector<agg::path_storage>& dest, const std::vector<path>& paths) 
+  {
+    //const double subpixel_offset = 0.5; // unused, should be ?
+    size_t pcnt = paths.size();
+    dest.resize(pcnt);
     
-    size_t pcount = paths.size();
+    for (size_t pno=0; pno<pcnt; ++pno)
+    {
+        const path& path_in_sub = paths[pno]; 
+        agg::path_storage& new_path = dest[pno];
 
-    dest.resize(pcount);
+        new_path.move_to(TWIPS_TO_SHIFTED_PIXELS(path_in_sub.ap.x), 
+                          TWIPS_TO_SHIFTED_PIXELS(path_in_sub.ap.y));
+
+        const size_t ecnt = path_in_sub.m_edges.size();
+        for (size_t eno=0; eno<ecnt; ++eno)
+        {
+            const edge& this_edge = path_in_sub.m_edges[eno];             
+            if (this_edge.is_straight())
+            {
+                new_path.line_to(TWIPS_TO_SHIFTED_PIXELS(this_edge.ap.x), 
+                                  TWIPS_TO_SHIFTED_PIXELS(this_edge.ap.y));
+            }
+            else
+            {
+                new_path.curve3(TWIPS_TO_SHIFTED_PIXELS(this_edge.cp.x), 
+                                 TWIPS_TO_SHIFTED_PIXELS(this_edge.cp.y),
+                                 TWIPS_TO_SHIFTED_PIXELS(this_edge.ap.x), 
+                                 TWIPS_TO_SHIFTED_PIXELS(this_edge.ap.y));       
+            }
+        }// end of for    
+    } // end of for  
     
-    for (size_t pno=0; pno<pcount; pno++) {
-      
-      const Path<float>& this_path = paths[pno];
-      agg::path_storage& new_path = dest[pno];
-      
-      new_path.move_to(this_path.ap.x + subpixel_offset, 
-        this_path.ap.y + subpixel_offset);
-      
-      size_t ecount = this_path.m_edges.size();
-      
-      for (size_t eno=0; eno<ecount; eno++) {
-        
-        const Edge<float>& this_edge = this_path.m_edges[eno];
-        
-        if (this_edge.is_straight())
-          new_path.line_to(this_edge.ap.x + subpixel_offset, 
-            this_edge.ap.y + subpixel_offset);
-        else
-          new_path.curve3(this_edge.cp.x + subpixel_offset, 
-            this_edge.cp.y + subpixel_offset,
-            this_edge.ap.x + subpixel_offset, 
-            this_edge.ap.y + subpixel_offset);       
-        
-      }    
-    }    
   } //build_agg_paths
-  
-  
+
   // Version of build_agg_paths that uses rounded coordinates (pixel hinting)
   // for line styles that want it.  
   // This is used for outlines which are aligned to the pixel grid to avoid
@@ -1161,20 +1143,18 @@ public:
   // TODO: Flash never aligns lines that are wider than 1 pixel on *screen*,
   // but we currently don't check the width.  
   void build_agg_paths_rounded(std::vector<agg::path_storage>& dest, 
-    const std::vector< Path<float> >& paths, 
+    const std::vector< path >& paths, 
     const std::vector<line_style>& line_styles) {
 
-    // Shift all coordinates a half pixel for correct results (the middle of
-    // a pixel is at .5 / .5, ie. it's subpixel center) 
     const float subpixel_offset = 0.5f;
     
-    size_t pcount = paths.size();
+    const size_t pcount = paths.size();
 
     dest.resize(pcount);    
     
-    for (size_t pno=0; pno<pcount; pno++) {
+    for (size_t pno=0; pno<pcount; ++pno) {
       
-      const Path<float>& this_path = paths[pno];
+      const path& this_path = paths[pno];
       agg::path_storage& new_path = dest[pno];
       
       bool hinting=false, closed=false, hairline=false;
@@ -1192,8 +1172,8 @@ public:
           hairline = true;
       }
       
-      float prev_ax = this_path.ap.x;
-      float prev_ay = this_path.ap.y;  
+      float prev_ax = TWIPS_TO_PIXELS(this_path.ap.x);
+      float prev_ay = TWIPS_TO_PIXELS(this_path.ap.y);  
       bool prev_align_x = true;
       bool prev_align_y = true;
       
@@ -1203,12 +1183,12 @@ public:
       if (closed && ecount && 
         this_path.m_edges.back().is_straight()) ecount--;      
       
-      for (size_t eno=0; eno<ecount; eno++) {
+      for (size_t eno=0; eno<ecount; ++eno) {
         
-        const Edge<float>& this_edge = this_path.m_edges[eno];
+        const edge& this_edge = this_path.m_edges[eno];
         
-        float this_ax = this_edge.ap.x;  
-        float this_ay = this_edge.ap.y;  
+        float this_ax = TWIPS_TO_PIXELS(this_edge.ap.x);  
+        float this_ay = TWIPS_TO_PIXELS(this_edge.ap.y);  
         
         if (hinting || this_edge.is_straight()) {
         
@@ -1277,8 +1257,9 @@ public:
             new_path.move_to(prev_ax, prev_ay);
         
           // never align curves!
-          new_path.curve3(this_edge.cp.x + subpixel_offset, 
-            this_edge.cp.y + subpixel_offset,
+          new_path.curve3(
+            TWIPS_TO_PIXELS(this_edge.cp.x) + subpixel_offset, 
+            TWIPS_TO_PIXELS(this_edge.cp.y) + subpixel_offset,
             this_ax + subpixel_offset, 
             this_ay + subpixel_offset);
             
@@ -1297,7 +1278,6 @@ public:
     
     }
   } //build_agg_paths_rounded
-  
     
   // Initializes the internal styles class for AGG renderer
   void build_agg_styles(agg_style_handler& sh, 
@@ -1308,8 +1288,8 @@ public:
     matrix inv_stage_matrix = stage_matrix;
     inv_stage_matrix.invert();
     
-    size_t fcount = fill_styles.size();
-    for (size_t fno=0; fno<fcount; fno++) {
+    const size_t fcount = fill_styles.size();
+    for (size_t fno=0; fno<fcount; ++fno) {
     
       bool smooth=false;
       int fill_type = fill_styles[fno].get_type();
@@ -1407,7 +1387,7 @@ public:
   /// @param subshape_id
   ///    Defines which subshape to draw. -1 means all subshapes.
   ///
-  void draw_shape(int subshape_id, const std::vector< Path<float> > &paths,
+  void draw_shape(int subshape_id, const std::vector<path> &paths,
     const std::vector<agg::path_storage>& agg_paths,  
     agg_style_handler& sh, int even_odd) {
     
@@ -1441,7 +1421,7 @@ public:
   /// one with and one without an alpha mask. This makes drawing without masks
   /// much faster.  
   template <class scanline_type>
-  void draw_shape_impl(int subshape_id, const std::vector< Path<float> > &paths,
+  void draw_shape_impl(int subshape_id, const std::vector<path> &paths,
     const std::vector<agg::path_storage>& agg_paths,
     agg_style_handler& sh, int even_odd, scanline_type& sl) {
     /*
@@ -1457,7 +1437,7 @@ public:
     
     assert(!m_drawing_mask);
     
-    if ( _clipbounds.size()==0 ) return;
+    if ( _clipbounds.empty() ) return;
 
     // AGG stuff
     typedef agg::rasterizer_compound_aa<agg::rasterizer_sl_clip_dbl> ras_type;
@@ -1475,7 +1455,7 @@ public:
       rasc.filling_rule(agg::fill_non_zero);
       
     
-    for (unsigned int cno=0; cno<_clipbounds_selected.size(); cno++) {
+    for (unsigned int cno=0; cno<_clipbounds_selected.size(); ++cno) {
     
       const geometry::Range2d<int>* bounds = _clipbounds_selected[cno];
       
@@ -1484,17 +1464,17 @@ public:
       int current_subshape=0;
         
       // push paths to AGG
-      size_t pcount = paths.size();
+      const size_t pcount = paths.size();
   
-      for (size_t pno=0; pno<pcount; pno++) {
-      
-        const Path<float> &this_path_gnash = paths[pno];
+      for (size_t pno=0; pno<pcount; ++pno) {
+          
+        const path &this_path_gnash = paths[pno];
         agg::path_storage &this_path_agg = 
           const_cast<agg::path_storage&>(agg_paths[pno]);
         agg::conv_curve< agg::path_storage > curve(this_path_agg);        
         
         if (this_path_gnash.m_new_shape)
-          current_subshape++;
+          ++current_subshape;
           
         if ((subshape_id>=0) && (current_subshape!=subshape_id)) {
           // Skip this path as it is not part of the requested sub-shape.
@@ -1530,8 +1510,8 @@ public:
 
   // very similar to draw_shape but used for generating masks. There are no
   // fill styles nor subshapes and such. Just render plain solid shapes.
-  void draw_mask_shape(const std::vector< Path<float> > &paths, int even_odd) {
-  
+  void draw_mask_shape(const std::vector<path> &paths, int even_odd) {
+
     unsigned int mask_count = m_alpha_mask.size();
     
     if (mask_count < 2) {
@@ -1561,7 +1541,7 @@ public:
   
   
   template <class scanline_type>
-  void draw_mask_shape_impl(const std::vector< Path<float> > &paths, int even_odd,
+  void draw_mask_shape_impl(const std::vector<path> &paths, int even_odd,
     scanline_type& sl) {
     
     typedef agg::pixfmt_gray8 pixfmt;
@@ -1597,12 +1577,13 @@ public:
       
     
     // push paths to AGG
-    agg::path_storage path;
+    agg::path_storage path; // be carefull about this name 
     agg::conv_curve< agg::path_storage > curve(path);
 
-    for (size_t pno=0, pcount=paths.size(); pno < pcount; pno++) {
-    
-      const Path<float>& this_path = paths[pno];
+    for (size_t pno=0, pcount=paths.size(); pno < pcount; ++pno) {
+
+      const Path& this_path = paths[pno];
+
       path.remove_all();
       
       // reduce everything to just one fill style!
@@ -1610,18 +1591,22 @@ public:
                   this_path.m_fill1==0 ? -1 : 0);
                   
       // starting point of path
-      path.move_to(this_path.ap.x, this_path.ap.y);
+      path.move_to(TWIPS_TO_PIXELS(this_path.ap.x), 
+                   TWIPS_TO_PIXELS(this_path.ap.y));
     
-      unsigned int ecount = this_path.m_edges.size();
-      for (unsigned int eno=0; eno<ecount; eno++) {
-      
-        const Edge<float> &this_edge = this_path.m_edges[eno];
+      const unsigned int ecount = this_path.m_edges.size();
+      for (unsigned int eno=0; eno<ecount; ++eno) {
+
+        const edge &this_edge = this_path.m_edges[eno];
 
         if (this_edge.is_straight())
-          path.line_to(this_edge.ap.x, this_edge.ap.y);
+          path.line_to(TWIPS_TO_PIXELS(this_edge.ap.x), 
+                       TWIPS_TO_PIXELS(this_edge.ap.y));
         else
-          path.curve3(this_edge.cp.x, this_edge.cp.y,
-                      this_edge.ap.x, this_edge.ap.y);
+          path.curve3(TWIPS_TO_PIXELS(this_edge.cp.x), 
+                      TWIPS_TO_PIXELS(this_edge.cp.y),
+                      TWIPS_TO_PIXELS(this_edge.ap.x), 
+                      TWIPS_TO_PIXELS(this_edge.ap.y));
         
       } // for edge
       
@@ -1635,13 +1620,12 @@ public:
     agg::render_scanlines_compound_layered (rasc, sl, rbase, alloc, sh);
     //agg::render_scanlines(rasc, sl, ren_sl);
         
-        
   } // draw_mask_shape
 
 
 
   /// Just like draw_shapes() except that it draws an outline.
-  void draw_outlines(int subshape_id, const std::vector< Path<float> > &paths,
+  void draw_outlines(int subshape_id, const std::vector<path> &paths,
     const std::vector<agg::path_storage>& agg_paths,
     const std::vector<line_style> &line_styles, const cxform& cx,
     const matrix& linestyle_matrix) {
@@ -1675,7 +1659,7 @@ public:
 
   /// Template for draw_outlines(), see draw_shapes_impl().
   template <class scanline_type>
-  void draw_outlines_impl(int subshape_id, const std::vector< Path<float> > &paths,
+  void draw_outlines_impl(int subshape_id, const std::vector<path> &paths,
     const std::vector<agg::path_storage>& agg_paths,
     const std::vector<line_style> &line_styles, const cxform& cx, 
     const matrix& linestyle_matrix, scanline_type& sl) {
@@ -1685,7 +1669,7 @@ public:
     if (m_drawing_mask)    // Flash ignores lines in mask /definitions/
       return;    
     
-    if ( _clipbounds.size()==0 ) return;
+    if ( _clipbounds.empty() ) return;
 
     // TODO: While walking the paths for filling them, remember when a path
     // has a line style associated, so that we avoid walking the paths again
@@ -1707,7 +1691,7 @@ public:
       agg::renderer_base<PixelFormat> > ren_sl(rbase); // solid fills
       
     
-    for (unsigned int cno=0; cno<_clipbounds_selected.size(); cno++) {
+    for (unsigned int cno=0; cno<_clipbounds_selected.size(); ++cno) {
     
       const geometry::Range2d<int>* bounds = _clipbounds_selected[cno];
           
@@ -1715,14 +1699,15 @@ public:
       
       int current_subshape=0;
 
-      for (size_t pno=0, pcount=paths.size(); pno<pcount; pno++) {
-        
-        const Path<float>& this_path_gnash = paths[pno];
+      for (size_t pno=0, pcount=paths.size(); pno<pcount; ++pno) {
+
+        const path& this_path_gnash = paths[pno];
+
         agg::path_storage &this_path_agg = 
           const_cast<agg::path_storage&>(agg_paths[pno]);
         
         if (this_path_gnash.m_new_shape)
-          current_subshape++;
+          ++current_subshape;
           
         if ((subshape_id>=0) && (current_subshape!=subshape_id)) {
           // Skip this path as it is not part of the requested sub-shape.
@@ -1800,7 +1785,7 @@ public:
 
     if (corner_count<1) return;
     
-    if ( _clipbounds.size()==0 ) return;
+    if ( _clipbounds.empty() ) return;
     
     matrix mat = stage_matrix;
     mat.concatenate(poly_mat);
@@ -1823,7 +1808,7 @@ public:
       point(trunc(corners[0].x), trunc(corners[0].y)));
     path.move_to(trunc(origin.x)+0.5, trunc(origin.y)+0.5);
     
-    for (unsigned int i=1; i<corner_count; i++) {
+    for (unsigned int i=1; i<corner_count; ++i) {
     
       mat.transform(&pnt, point(corners[i].x, corners[i].y));
         
@@ -1838,7 +1823,7 @@ public:
     // -- render --
       
     // iterate through clipping bounds
-    for (unsigned int cno=0; cno<_clipbounds.size(); cno++) {
+    for (unsigned int cno=0; cno<_clipbounds.size(); ++cno) {
     
       const geometry::Range2d<int>& bounds = _clipbounds[cno];         
       apply_clip_box<ras_type> (ras, bounds);     
@@ -1978,7 +1963,7 @@ public:
     Range2d<int> visiblerect;
     if ( xres && yres ) visiblerect = Range2d<int>(0, 0, xres-1, yres-1);
     
-    for (size_t rno=0; rno<ranges.size(); rno++) {
+    for (size_t rno=0; rno<ranges.size(); ++rno) {
     
       const Range2d<float>& range = ranges.getRange(rno);
 
@@ -1992,7 +1977,7 @@ public:
       
       _clipbounds.push_back(bounds);
       
-      count++;
+      ++count;
     }
     //log_debug("%d inv. bounds in frame", count);
     
@@ -2005,7 +1990,7 @@ public:
   
     Range2d<int> pixbounds = world_to_pixel(bounds);
     
-    for (unsigned int cno=0; cno<_clipbounds.size(); cno++) {  
+    for (unsigned int cno=0; cno<_clipbounds.size(); ++cno) {  
       if (Intersect(pixbounds, _clipbounds[cno]))
         return true;
     }

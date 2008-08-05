@@ -1,4 +1,4 @@
-## Process this fill with automake to generate Makefile.in
+## Process this file with automake to generate Makefile.in
 # 
 # Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 #
@@ -44,18 +44,21 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/libmedia \
 	-I$(top_srcdir)/backend \
-	-I$(top_srcdir)/server  \
-	-I$(top_srcdir)/server/parser  \
-	-I$(top_srcdir)/server/vm \
-	-I$(top_srcdir)/server/asobj \
-	-I$(top_srcdir)/libgeometry \
+	-I$(top_srcdir)/libcore  \
+	-I$(top_srcdir)/libcore/parser  \
+	-I$(top_srcdir)/libcore/vm \
+	-I$(top_srcdir)/libcore/asobj \
 	-I$(top_srcdir)/testsuite \
 	$(MING_CFLAGS) \
+	$(OPENGL_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	-DMING_VERSION_CODE=$(MING_VERSION_CODE) \
 	$(NULL)
 
-AM_LDFLAGS = $(MING_LIBS)
+AM_LDFLAGS = \
+	$(MING_LIBS) \
+	$(OPENGL_LIBS) \
+	$(NULL)
 
 
 check_PROGRAMS = \
@@ -108,6 +111,7 @@ check_PROGRAMS = \
 	displaylist_depths_test9 \
 	displaylist_depths_test10 \
 	displaylist_depths_test11 \
+	DepthLimitsTest \
 	masks_test \
 	masks_test2 \
 	masks_test2runner \
@@ -161,7 +165,6 @@ check_PROGRAMS = \
 	shape_test \
 	morph_test1 \
 	morph_test1runner \
-	opcode_guard_test \
 	runtime_vm_stack_test \
 	new_child_in_unload_test \
 	instanceNameTest \
@@ -169,6 +172,7 @@ check_PROGRAMS = \
 
 if MING_VERSION_0_4
 check_PROGRAMS += \
+	opcode_guard_test \
 	get_frame_number_test
 endif
 
@@ -261,11 +265,11 @@ check_SCRIPTS = \
 	loop_test7runner \
 	loop_test8runner \
 	loop_test9runner \
+	DepthLimitsTestrunner \
 	loop_test10runner \
 	shape_testrunner \
 	DefineEditTextVariableNameTest-Runner \
 	DefineEditTextVariableNameTest2-Runner \
-	opcode_guard_testrunner \
 	runtime_vm_stack_testrunner \
 	new_child_in_unload_testrunner \
 	instanceNameTestRunner \
@@ -279,6 +283,7 @@ endif
 
 if MING_VERSION_0_4
 check_SCRIPTS += \
+	opcode_guard_testrunner \
 	get_frame_number_testrunner \
 	$(NULL)	
 endif
@@ -901,6 +906,18 @@ displaylist_depths_test11runner: $(srcdir)/../generic-testrunner.sh displaylist_
 	sh $< -f20 $(top_builddir) displaylist_depths_test11.swf > $@
 	chmod 755 $@
 
+
+DepthLimitsTest_SOURCES = DepthLimitsTest.c
+DepthLimitsTest_LDADD = libgnashmingutils.la
+
+DepthLimitsTest.swf: DepthLimitsTest
+	./DepthLimitsTest $(top_srcdir)/testsuite/media
+
+DepthLimitsTestrunner: $(srcdir)/../generic-testrunner.sh DepthLimitsTest.swf
+	sh $< -r5 $(top_builddir) DepthLimitsTest.swf > $@
+	chmod 755 $@
+
+	
 replace_shapes1test_SOURCES = replace_shapes1test.c	
 replace_shapes1test_LDADD = libgnashmingutils.la
 
@@ -1799,6 +1816,7 @@ TEST_CASES = \
 	displaylist_depths_test9runner \
 	displaylist_depths_test10runner \
 	displaylist_depths_test11runner \
+	DepthLimitsTestrunner \
 	matrix_testrunner \
 	frame_label_testrunner \
 	path_format_testrunner \
@@ -1825,13 +1843,13 @@ TEST_CASES = \
 	loop_test10runner \
 	shape_testrunner \
 	morph_test1runner \
-	opcode_guard_testrunner \
 	runtime_vm_stack_testrunner \
 	instanceNameTestRunner \
 	$(NULL)
 
 if MING_VERSION_0_4
 TEST_CASES += \
+	opcode_guard_testrunner \
 	get_frame_number_testrunner
 endif
 

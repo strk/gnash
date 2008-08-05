@@ -85,6 +85,75 @@ class Test
 		}
 	}
 
+	function returnInTryAndCatch(o)
+	{
+		try {
+			return 'try';
+			note ("After return in try");
+			o.num += 1;
+		}
+		catch (e) {
+		    note ("Catch after return in try");
+		    o.num += 1;
+			return 'catch';
+		}
+	}
+
+	function returnInTryCatchAndFinally(o)
+	{
+		try {
+			return 'try';
+			note ("After return in try");
+			o.num += 1;
+		}
+		catch (e) {
+		    note ("Catch after return in try");
+		    o.num += 1;
+			return 'catch';
+		}
+		finally {
+		    note ("Finally after returns in try and catch");
+		    o.num += 1;
+		    return 'finally';
+		}
+	}
+
+	function tryCatchAndFinally(o)
+	{
+		try {
+		    o.sequence += "try";
+			o.num += 1;
+		}
+		catch (e) {
+		    o.sequence += "catch";
+		    o.num += 1;
+		}
+		finally {
+		    o.sequence += "finally";
+		    o.num += 1;
+		}
+	}
+
+	function returnInCatchAndFinally(o)
+	{
+		try {
+			throw 'try'
+			note ("After throw in try");
+			o.num += 1;
+		}
+		catch (e) {
+		    note ("Catch after throw in try");
+			return 'catch';
+		    o.num += 1;
+		}
+		finally {
+		    note ("Finally after returns in catch");
+		    o.num += 1;
+		    return 'finally';
+		}
+	}
+
+
 	function test_all()
 	{
 		var res = 'string';
@@ -150,6 +219,26 @@ class Test
 		check_equals(ret, 'finally');
 		check_equals(o.num, 5);
 
+
+        try {
+            ret = returnInTryAndCatch(o);
+        }
+        check_equals(ret, "try");
+        check_equals(o.num, 5);
+
+        ret = returnInTryCatchAndFinally(o);
+        check_equals(ret, "finally");
+        check_equals(o.num, 6);
+        
+        o.sequence = "";
+        tryCatchAndFinally(o);
+        check_equals(o.sequence, "tryfinally");
+        check_equals(o.num, 8);
+
+        ret = returnInCatchAndFinally(o);
+        check_equals(o.num, 9);
+        check_equals(ret, "finally");
+
 		try {
 			throwNested();
 		} catch (e) {
@@ -161,11 +250,12 @@ class Test
 
 	static function main(mc)
 	{
+	
 		var myTest = new Test;
 		myTest.test_all();
 
-                check_totals(15);
-                Dejagnu.done();
+        check_totals(23);
+        Dejagnu.done();
 	}
 
 }

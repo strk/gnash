@@ -32,11 +32,10 @@ pluginsdir = $(libdir)/gnash/plugins
 AM_CPPFLAGS = -I.. \
         -I$(srcdir) \
         -I$(top_srcdir) \
-        -I$(top_srcdir)/server \
-        -I$(top_srcdir)/server/parser \
+        -I$(top_srcdir)/libcore \
+        -I$(top_srcdir)/libcore/parser \
         -I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/backend \
-        -I$(top_srcdir)/libgeometry \
 	$(PTHREAD_CFLAGS) \
         $(SDL_CFLAGS) \
 	$(PANGO_CFLAGS) \

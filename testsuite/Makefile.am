@@ -25,6 +25,10 @@ if ENABLE_MTASC
 DIR_MTASC = misc-mtasc.all
 endif
 
+if ENABLE_HAXE
+DIR_HAXE = misc-haxe.all
+endif
+
 if ENABLE_SWFMILL
 DIR_SWFMILL = misc-swfmill.all
 endif
@@ -37,18 +41,32 @@ if ENABLE_SWFDEC_TESTSUITE
 DIR_SWFDEC_TESTSUITE = swfdec
 endif
 
-# movies.all
+DIST_SUBDIRS = \
+	libnet.all \
+	libbase	\
+	libamf.all \
+	libcore.all \
+	samples	\
+	swfdec \
+	misc-ming.all \
+	misc-mtasc.all \
+	misc-haxe.all \
+	misc-swfmill.all \
+	misc-swfc.all \
+	movies.all \
+	$(NULL)
+
 SUBDIRS = \
 	.	\
 	$(DIR_SWFDEC_TESTSUITE) \
 	libnet.all \
 	libbase	\
 	libamf.all \
-	libgeometry \
-	server \
+	libcore.all \
 	samples	\
 	$(DIR_MING) \
 	$(DIR_MTASC) \
+	$(DIR_HAXE) \
 	$(DIR_SWFMILL) \
 	$(DIR_SWFC) \
 	movies.all \
@@ -73,17 +91,16 @@ libtestsuite_la_SOURCES = \
 libtestsuite_la_LIBADD = \
 	$(RENDERER_LIBS) \
 	$(top_builddir)/libmedia/libgnashmedia.la \
-	$(top_builddir)/server/libgnashserver.la \
+	$(top_builddir)/libcore/libgnashcore.la \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(NULL)
 libtestsuite_la_CXXFLAGS = \
 	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/libmedia \
 	-I$(top_srcdir)/backend \
-	-I$(top_srcdir)/libgeometry \
-	-I$(top_srcdir)/server  \
-	-I$(top_srcdir)/server/parser  \
-	-I$(top_srcdir)/server/vm  \
+	-I$(top_srcdir)/libcore  \
+	-I$(top_srcdir)/libcore/parser  \
+	-I$(top_srcdir)/libcore/vm  \
 	$(BOOST_CFLAGS) \
 	$(CAIRO_CFLAGS) \
 	$(NULL)

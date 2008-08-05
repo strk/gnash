@@ -44,8 +44,8 @@ plugindir   = $(FIREFOX_PLUGINS)
 #		api gets control.
 AM_CPPFLAGS = -DPLUGIN_TRACE -DXP_UNIX -DMOZ_X11 -DGNASHBINDIR=\"$(bindir)\" \
 	-DSYSCONFDIR=\"$(sysconfdir)\" \
-        -I$(top_srcdir)/server \
-        -I$(top_srcdir)/server/parser \
+        -I$(top_srcdir)/libcore \
+        -I$(top_srcdir)/libcore/parser \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/backend \
 	-I$(srcdir)/mozilla-sdk \

@@ -1,0 +1,102 @@
+<?xml version="1.0"?>
+<swf version="6" compressed="1">
+
+<!--
+
+ This file wants to test if branch to a previous block is allowed.
+
+ It is hard to make it self-contained as if the branch fails
+ we'll loose control over the execution so nothing will be 
+ traced.  Tracing successes is fine.
+
+ The only solution I found was making the test *runner* 
+ aware of what signals end of test, and verify the end of test
+ is reached. The expected final pattern (ABA) is set in the
+ Makefile.am so if you change last trace from this test please
+ update that as well.
+
+ A good way to find jump offset after editing is using 'listswf'
+ from a fairly recent Ming version, in that you can read absolute
+ offsets and computed targets from it.
+
+-->
+
+  <Header framerate="12" frames="1">
+    <size>
+      <Rectangle left="0" right="12800" top="0" bottom="9600"/>
+    </size>
+    <tags>
+
+      <DoAction>
+        <actions>
+          <PushData>
+            <items>
+              <StackString value="jumpval"/>
+              <StackString value=""/>
+            </items>
+          </PushData>
+          <SetVariable/>
+          <EndAction/>
+        </actions>
+      </DoAction>
+
+      <DoAction>
+        <actions>
+          <PushData>
+            <items>
+              <StackString value="jumpval"/>
+            </items>
+          </PushData>
+          <Duplicate/>
+          <GetVariable/>
+          <PushData>
+            <items>
+              <StackString value="A"/>
+            </items>
+          </PushData>
+          <AddTyped/>
+          <SetVariable/>
+          <EndAction/>
+        </actions>
+      </DoAction>
+
+      <DoAction>
+        <actions>
+          <PushData>
+            <items>
+              <StackString value="jumpval"/>
+            </items>
+          </PushData>
+          <Duplicate/>
+          <GetVariable/>
+          <PushData>
+            <items>
+              <StackString value="B"/>
+            </items>
+          </PushData>
+          <AddTyped/>
+          <SetVariable/>
+          <BranchAlways byteOffset="-56"/>
+          <EndAction/>
+        </actions>
+      </DoAction>
+
+      <DoAction>
+        <actions>
+          <PushData>
+            <items>
+              <StackString value="jumpval"/>
+            </items>
+          </PushData>
+          <GetVariable/>
+          <Trace/> <!-- EXPECT: ABA -->
+          <EndAction/>
+        </actions>
+      </DoAction>
+
+
+      <ShowFrame/>
+      <End/>
+    </tags>
+  </Header>
+</swf>

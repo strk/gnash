@@ -42,49 +42,13 @@
 #include <boost/thread/mutex.hpp>
 
 #if defined(_WIN32) || defined(WIN32)
-//Get boost !
-//# define lock(lib_mutex) ;
-//# define scoped_lock ;
 #	define PLUGINSDIR "./"
 #endif
 
-typedef boost::mutex::scoped_lock scoped_lock;
-static boost::mutex lib_mutex;
-
-using namespace std;
 
 namespace gnash {
 
-#ifdef LT_DLMUTEX
-//static void
-//gnash_mutex_seterror (void)
-//{
-//    GNASH_REPORT_FUNCTION;
-//}
-//
-//static const char *
-//gnash_mutex_geterror (void)
-//{
-//    GNASH_REPORT_FUNCTION;
-//    return NULL;
-//}
-
-void
-gnash_mutex_lock (void)
-{
-    GNASH_REPORT_FUNCTION;
-}
-
-void
-gnash_mutex_unlock (void)
-{
-    GNASH_REPORT_FUNCTION;
-}
-
-#endif
-
-SharedLib::SharedLib() 
-    : _filespec(0)
+SharedLib::SharedLib()
 {
 //    GNASH_REPORT_FUNCTION;
 #ifdef LT_DLMUTEX
@@ -93,7 +57,7 @@ SharedLib::SharedLib()
 #endif
 }
 
-SharedLib::SharedLib(const char *filespec)
+SharedLib::SharedLib(const std::string& filespec)
 {
 //    GNASH_REPORT_FUNCTION;
 #ifdef LT_DLMUTEX
@@ -101,7 +65,7 @@ SharedLib::SharedLib(const char *filespec)
 //                                 gnash_mutex_seterror, gnash_mutex_geterror);
 #endif
     _filespec = filespec;
-    scoped_lock lock(lib_mutex);
+    scoped_lock lock(_libMutex);
     
     // Initialize libtool's dynamic library loader
     int errors = lt_dlinit ();
@@ -110,13 +74,13 @@ SharedLib::SharedLib(const char *filespec)
 //     } else {
 //         log_debug ("Initialized ltdl");
     }
-    const char *pluginsdir = PLUGINSDIR;
+    std::string pluginsdir = PLUGINSDIR;
+    
     char *env = std::getenv ("GNASH_PLUGINS");
-    if (env != NULL)
-        pluginsdir = env;
+    if (env) pluginsdir = env;
    
 
-    lt_dlsetsearchpath(pluginsdir);
+    lt_dlsetsearchpath(pluginsdir.c_str());
 }
 
 SharedLib::~SharedLib()
@@ -139,13 +103,7 @@ SharedLib::openLib()
 }
 
 bool
-SharedLib::openLib (std::string &filespec)
-{
-    return openLib(filespec.c_str());
-}
-
-bool
-SharedLib::openLib (const char *filespec)
+SharedLib::openLib (const std::string& filespec)
 {
 //    GNASH_REPORT_FUNCTION;
     
@@ -159,7 +117,7 @@ SharedLib::openLib (const char *filespec)
     // Make sure preloaded modules are initialised
 //  LTDL_SET_PRELOADED_SYMBOLS();
     
-    scoped_lock lock(lib_mutex);
+    scoped_lock lock(_libMutex);
     
 //     // libtool's dynamic library loader is already initialized in constructor
     
@@ -167,7 +125,7 @@ SharedLib::openLib (const char *filespec)
 //          << "for database drivers" << endl;
 
 //    log_debug ("Trying to open shared library \"%s\"", filespec);
-    _dlhandle = lt_dlopenext (filespec);
+    _dlhandle = lt_dlopenext (filespec.c_str());
     
     if (_dlhandle == NULL) {
         log_error ("%s", lt_dlerror());
@@ -184,32 +142,15 @@ SharedLib::openLib (const char *filespec)
     return true;
 }
 
-const char *
-SharedLib::moduleName()
-{
-#ifdef WIN32
-	return NULL;	//TODO, hack
-#else
-	return basename(const_cast<char *>(_filespec));
-#endif
-}
-
-SharedLib::entrypoint *
-SharedLib::getDllSymbol (std::string &symbol)
-{
-    GNASH_REPORT_FUNCTION;
-    return getDllSymbol(symbol.c_str());
-}
-
 SharedLib::initentry *
-SharedLib::getInitEntry (const char *symbol)
+SharedLib::getInitEntry (const std::string& symbol)
 {
 //    GNASH_REPORT_FUNCTION;
     lt_ptr run = NULL;
     
-    scoped_lock lock(lib_mutex);
+    scoped_lock lock(_libMutex);
 
-    run  = lt_dlsym (_dlhandle, symbol);
+    run  = lt_dlsym (_dlhandle, symbol.c_str());
     
     if (run == NULL) {
         log_error (_("Couldn't find symbol: %s"), symbol);
@@ -218,19 +159,19 @@ SharedLib::getInitEntry (const char *symbol)
         log_debug (_("Found symbol %s @ %p"), symbol, (void *)run);
     }
     
-    return (initentry *)run;
+    return (initentry*)(run);
 }
 
 SharedLib::entrypoint *
-SharedLib::getDllSymbol(const char *symbol)
+SharedLib::getDllSymbol(const std::string& symbol)
 {
     GNASH_REPORT_FUNCTION;
     
     lt_ptr run = NULL;
     
-    scoped_lock lock(lib_mutex);
+    scoped_lock lock(_libMutex);
 
-    run  = lt_dlsym (_dlhandle, symbol);
+    run  = lt_dlsym (_dlhandle, symbol.c_str());
     
     /* 
     Realistically, we should never get a valid pointer with a value of 0
@@ -243,30 +184,7 @@ SharedLib::getDllSymbol(const char *symbol)
         log_debug (_("Found symbol %s @ %p"), symbol, (void *)run);
     }
     
-    return (entrypoint *)run;
-}
-
-// Get information about the DLL
-const char *
-SharedLib::getDllFileName ()
-{
-//    GNASH_REPORT_FUNCTION;
-
-    return  lt_dlgetinfo(_dlhandle)->filename;
-}
-
-const char *
-SharedLib::getDllModuleName ()
-{
-//    GNASH_REPORT_FUNCTION;
-    return  lt_dlgetinfo(_dlhandle)->name;
-}
-
-int
-SharedLib::getDllRefCount ()
-{
-//    GNASH_REPORT_FUNCTION;
-    return  lt_dlgetinfo(_dlhandle)->ref_count;
+    return (entrypoint*)(run);
 }
 
 } // end of gnash namespace

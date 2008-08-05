@@ -15,8 +15,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef __DUMP_H__
-#define __DUMP_H__
+#ifndef GNASH_DUMP_H
+#define GNASH_DUMP_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -24,6 +24,8 @@
 
 #include "dsodefs.h" // for DSOEXPORT
 #include "gui.h" // for inheritance
+#include <fstream>
+#include <boost/scoped_array.hpp>
 
 namespace gnash
 {
@@ -61,17 +63,28 @@ class DSOEXPORT DumpGui : public Gui
     bool want_redraw() { return false; }
     void writeFrame();
 
- private:
-    unsigned int _bpp;                  /* bits per pixel */
-    char _pixelformat[16];              /* colorspace name (eg, "RGB24") */
-    char* _file_output;                 /* path to output file */
-    std::ofstream* _file_stream;        /* stream for output file */
+private:
+    render_handler *_agg_renderer;      /* pointer to AGG renderer */
+
+    // A buffer to hold the actual image data. A boost::scoped_array
+    // is destroyed on reset and when it goes out of scope (including on
+    // stack unwinding after an exception), so there is no need to delete
+    // it.
+    boost::scoped_array<unsigned char> _offscreenbuf;
+
+    int _offscreenbuf_size;             /* size of window (bytes) */
+
     unsigned int _timeout;              /* maximum length of movie */
     unsigned int _framecount;           /* number of frames rendered */
+
+    unsigned int _bpp;                  /* bits per pixel */
+    std::string _pixelformat;              /* colorspace name (eg, "RGB24") */
+
+    std::string _fileOutput;                 /* path to output file */
+    std::ofstream _fileStream;        /* stream for output file */
     void init_dumpfile();               /* convenience method to create dump file */
-    render_handler *_agg_renderer;      /* pointer to AGG renderer */
-    unsigned char *_offscreenbuf;       /* our "window" */
-    int _offscreenbuf_size;             /* size of window (bytes) */
+
+
 
 };
 

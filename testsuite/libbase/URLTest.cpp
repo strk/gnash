@@ -195,6 +195,38 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals (u21.path(), "/~gnash/movie2.swf");
 	check_equals (u21.hostname(), "www.gnu.org");
 
+	// Test url with mixed query string and anchor
+	URL u22("http://localhost/?query#anchor"); // simple case
+	check_equals (u22.querystring(), "query");
+	check_equals (u22.anchor(), "anchor");
+	check_equals (u22.hostname(), "localhost");
+	check_equals (u22.path(), "/");
+	URL u23("http://localhost/?query#questions?"); 
+	check_equals (u23.querystring(), "query");
+	check_equals (u23.anchor(), "questions?");
+	check_equals (u23.hostname(), "localhost");
+	check_equals (u23.path(), "/");
+	URL u24("http://localhost/?query#questions?yes"); 
+	check_equals (u24.querystring(), "query");
+	check_equals (u24.anchor(), "questions?yes");
+	check_equals (u24.hostname(), "localhost");
+	check_equals (u24.path(), "/");
+	URL u25("http://localhost/#anchor?query");
+	check_equals (u25.querystring(), "");
+	check_equals (u25.anchor(), "anchor?query");
+	check_equals (u25.hostname(), "localhost");
+	check_equals (u25.path(), "/");
+	URL u26("http://localhost/?query1?query2?query3");
+	check_equals (u26.querystring(), "query1?query2?query3");
+	check_equals (u26.anchor(), "");
+	check_equals (u26.hostname(), "localhost");
+	check_equals (u26.path(), "/");
+	URL u27("http://localhost/?query1?query2#anchor?query3");
+	check_equals (u27.querystring(), "query1?query2");
+	check_equals (u27.anchor(), "anchor?query3");
+	check_equals (u27.hostname(), "localhost");
+	check_equals (u27.path(), "/");
+
 
 	// TODO: Samba paths
 }

@@ -27,19 +27,19 @@ rcsid="$Id: MovieClip.as,v 1.133 2008/05/09 13:21:08 strk Exp $";
 endOfTest = function() 
 {
 #if OUTPUT_VERSION <= 5
-	check_totals(231); // SWF5
+	check_totals(235); // SWF5
 #endif
 
 #if OUTPUT_VERSION == 6
-	check_totals(650); // SWF6
+	check_totals(659); // SWF6
 #endif
 
 #if OUTPUT_VERSION == 7
-	check_totals(667); // SWF7
+	check_totals(676); // SWF7
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(668); // SWF8+
+	check_totals(677); // SWF8+
 #endif
 
 	play();
@@ -1087,6 +1087,14 @@ check_equals(b.xMax, 20);
 check_equals(b.yMin, 5);
 check_equals(b.yMax, 15);
 
+draw._yscale = -50;
+check_equals(draw._yscale, -50);
+check_equals(draw._height, 10);
+
+draw._xscale = -50;
+check_equals(draw._xscale, -50);
+check_equals(draw._width, 5);
+
 container._xscale = 100;
 container._yscale = 100;
 draw._yscale = 100;
@@ -1509,6 +1517,7 @@ check_equals(setCalls, 0);
 mc.x = 10; // sets the property, but doesn't call the setter !
 check_equals(getCalls, 1); // assignment did call the getter 
 check_equals(setCalls, 0);
+#ifdef MING_SUPPORTS_ASM
 asm {
 	push 'propinspect'
 	push 'mc'
@@ -1518,6 +1527,7 @@ asm {
 };
 // setMember did set the prop, didn't call the setter
 xcheck_equals(propinspect, 20);
+#endif //MING_SUPPORTS_ASM
 
 createEmptyMovieClip('mc', 10);
 mc._x = 1;
@@ -1531,6 +1541,7 @@ check_equals(setCalls, 0);
 mc.x = 10; // does NOT set the property, but doesn't call the setter !
 check_equals(getCalls, 1); // assignment did call the getter 
 check_equals(setCalls, 0);
+#ifdef MING_SUPPORTS_ASM
 asm {
 	push 'propinspect'
 	push 'mc'
@@ -1540,6 +1551,7 @@ asm {
 };
 // setMember did NOT set the prop, didn't call the setter
 check_equals(propinspect, 0);
+#endif //MING_SUPPORTS_ASM
 
 
 #endif // OUTPUT_VERSION > 5
@@ -1590,6 +1602,27 @@ check_equals(typeof(ret), 'undefined');
 	dataLoadInterval = setInterval(onDataCheck, 1000);
 #endif
 
+/// Depth tests for createEmptyMovieClip, which was introduced
+/// in SWF6.
+
+
+#if OUTPUT_VERSION > 5
+createEmptyMovieClip("d1", -200000000);
+check_equals(d1.getDepth(), -200000000);
+
+createEmptyMovieClip("d2", -0xffffffff);
+check_equals(d2.getDepth(), 1);
+
+createEmptyMovieClip("d3", 0xffffffff);
+check_equals(d3.getDepth(), -1);
+
+createEmptyMovieClip("d4", 0x80000000);
+check_equals(d4.getDepth(), -2147483648);
+
+createEmptyMovieClip("d5", 0x79999999);
+check_equals(d5.getDepth(), 2040109465);
+
+#endif
 
 //_root.loadVariables(MEDIA(vars.txt), "GET");
 

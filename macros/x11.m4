@@ -67,7 +67,7 @@ AC_DEFUN([GNASH_PATH_X11],
 
   dnl If the header doesn't exist, there is no point looking for the library.
   if test x"${ac_cv_path_x11_incl}" != x ; then
-    newlist="/Developer/SDKs/MacOSX10.4*.sdk/usr/lib /Developer/SDKs/MacOSX10.4*.sdk/usr/X11R6/lib ${libslist}"
+    newlist="/Developer/SDKs/MacOSX10.5*.sdk/usr/lib /Developer/SDKs/MacOSX10.5*.sdk/usr/X11R6/lib /Developer/SDKs/MacOSX10.4*.sdk/usr/lib /Developer/SDKs/MacOSX10.4*.sdk/usr/X11R6/lib ${libslist}"
     for i in $newlist; do
       if test -f $i/libX11.a -o -f $i/libX11.${shlibext}; then
         if test ! x"${i}" = x"/usr/lib" -a ! x"$i" = x"/usr/lib64"; then

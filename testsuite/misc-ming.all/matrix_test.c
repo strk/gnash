@@ -90,7 +90,7 @@ main(int argc, char** argv)
 	dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
 	SWFMovie_add(mo, (SWFBlock)dejagnuclip);
 
-	add_actions(mo, "printBounds = function(b) { return ''+Math.round(b.xMin*100)/100+','+Math.round(b.yMin*100)/100+' '+Math.round(b.xMax*100)/100+','+Math.round(b.yMax*100)/100; };");
+	add_actions(mo, "printBounds = function(b) { return '' + b.xMin + ','+ b.yMin + ' '+ b.xMax + ',' + b.yMax; };");
 
 	SWFMovie_nextFrame(mo); 
 
@@ -105,8 +105,8 @@ main(int argc, char** argv)
 	check_equals(mo, "staticmc._xscale", "100");
 	check_equals(mo, "staticmc._yscale", "100");
 	check_equals(mo, "staticmc._rotation", "0");
-	check_equals(mo, "Math.round(staticmc._width)", "60");
-	check_equals(mo, "Math.round(staticmc._height)", "60");
+	check_equals(mo, "staticmc._width", "60.1");
+	check_equals(mo, "staticmc._height", "60.1");
 
 	SWFMovie_nextFrame(mo);        
 
@@ -147,7 +147,7 @@ main(int argc, char** argv)
 	check_equals(mo, "Math.round(staticmc._rotation*1000)", "18435");
 	check_equals(mo, "printBounds(staticmc.getBounds())", "'-30.05,-30.05 30.05,30.05'");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'-141.25,193.75 241.25,406.25'");
-	xcheck_equals(mo, "staticmc._width", "382.5");
+	check_equals(mo, "staticmc._width", "382.5");
 	check_equals(mo, "staticmc._height", "212.5");
 
 	// TODO:

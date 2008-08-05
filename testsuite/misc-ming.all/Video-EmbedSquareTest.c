@@ -52,6 +52,7 @@ main(int argc, char** argv)
   int frames;
   SWFVideoStream stream;
   SWFDisplayItem item;
+  SWFMovieClip mc;
   FILE *flv;
   char filename[256];
 
@@ -75,7 +76,7 @@ main(int argc, char** argv)
 
 	
   mo = newSWFMovie();
-  SWFMovie_setDimension(mo, 128, 96);
+  SWFMovie_setDimension(mo, 320, 96);
 
   if (mo == NULL) return -1;
 
@@ -84,12 +85,34 @@ main(int argc, char** argv)
   stream = newSWFVideoStream_fromFile(flv);
   item = SWFMovie_add(mo, (SWFBlock)stream);
 
+  // A bug in Ming prevents this from working the
+  // way I liked it to. It was useful to try this
+  // out as it exposed a bad bug in gnash eating up
+  // all memory and a few other issues.
+  //
+  // In order to keep the test *runner* untouched
+  // this will be commented out for now. When Ming
+  // is fixed I'll like to have two instances of
+  // the definition playing one near the other,
+  // both playing all frames.
+  //
+  //item = SWFMovie_add(mo, (SWFBlock)stream);
+  //SWFDisplayItem_move(item, 150, 0);
+
   // Mouse clicks toggle play/stop
   add_actions(mo,
 	"_root.onMouseDown = function() {"
 	"  if (stopped) { play(); stopped=false; }"
 	"  else { stop(); stopped=true; }"
 	"};");
+
+  // Pressing a number jumps to the specified frame
+  add_actions(mo,
+	"_root.onKeyDown = function() {"
+	" var fnum = Key.getAscii() - 47;"
+	//" trace('going to frame '+fnum);"
+	" _root.gotoAndPlay(fnum);"
+	"}; Key.addListener(_root);");
 
   // TODO: dynamic frame rate adjust
   frames = SWFVideoStream_getNumFrames(stream);

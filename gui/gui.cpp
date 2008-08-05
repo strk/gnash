@@ -85,6 +85,7 @@ Gui::Gui() :
     _fullscreen(false),
     _mouseShown(true),
     _maxAdvances(0),
+    _advances(0),
     _xscale(1.0f),
     _yscale(1.0f),
     _xoffset(0),
@@ -126,6 +127,7 @@ Gui::Gui(unsigned long xid, float scale, bool loop, unsigned int depth)
     _fullscreen(false),
     _mouseShown(true),
     _maxAdvances(0),
+    _advances(0),
     _xscale(scale),
     _yscale(scale),
     _xoffset(0), // TODO: x and y offset will need update !
@@ -487,10 +489,10 @@ Gui::notify_mouse_moved(int ux, int uy)
 	if ( _stopped ) return;
 
 	// A stage pseudopixel is user pixel / _xscale wide
-	float x = (ux-_xoffset) / _xscale;
+	boost::int32_t x = (ux-_xoffset) / _xscale;
 
 	// A stage pseudopixel is user pixel / _xscale high
-	float y = (uy-_yoffset) / _yscale;
+	boost::int32_t y = (uy-_yoffset) / _yscale;
 
 #ifdef DEBUG_MOUSE_COORDINATES
 	log_debug(_("mouse @ %d,%d"), x, y);
@@ -853,6 +855,11 @@ Gui::play()
 
     _stopped = false;
     if ( ! _started ) start();
+    else
+    {
+        media::sound_handler* s = get_sound_handler();
+        if ( s ) s->unpause();
+    }
 
     playHook ();
 }
@@ -865,6 +872,9 @@ Gui::stop()
 
     _stopped = true;
 
+    media::sound_handler* s = get_sound_handler();
+    if ( s ) s->pause();
+
     stopHook();
 }
 
@@ -875,7 +885,12 @@ Gui::pause()
     {
         play();
     }
-    else _stopped = true;
+    else
+    {
+    	media::sound_handler* s = get_sound_handler();
+    	if ( s ) s->pause();
+        _stopped = true;
+    }
 }
 
 void
@@ -897,13 +912,14 @@ Gui::start()
     bool background = true; // ??
     _stage->set_background_alpha(background ? 1.0f : 0.05f);
 
+    media::sound_handler* s = get_sound_handler();
+    if ( s ) s->unpause();
     _started = true;
 }
 
 bool
 Gui::advanceMovie()
 {
-    static unsigned long advances = 0;
 
 	if ( isStopped() ) return true;
 
@@ -991,7 +1007,7 @@ Gui::advanceMovie()
 	}
 
     /// Quit if we've reached the advance limit.
-    if (_maxAdvances && (advances++ > _maxAdvances))
+    if (_maxAdvances && (_advances++ > _maxAdvances))
     {
         quit();
     }
@@ -1008,12 +1024,6 @@ bool
 Gui::want_redraw()
 {
     return false;
-}
-
-bool
-Gui::loops()
-{
-    return _loop;
 }
 
 void

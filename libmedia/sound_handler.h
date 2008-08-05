@@ -256,6 +256,15 @@ public:
 	///
 	virtual bool	is_muted() = 0;
 
+	/// gnash calls this to pause audio
+	virtual void pause() { _paused=true; }
+
+	/// gnash calls this to unpause audio
+	virtual void unpause() { _paused=false; }
+
+	/// gnash calls this to unpause audio
+	bool isPaused() const { return _paused; }
+
 #ifdef USE_FFMPEG
 	/// This is called by AS classes NetStream or Sound to attach callback, so
 	/// that audio from the classes will be played through the soundhandler.
@@ -327,6 +336,7 @@ protected:
 		:
 		_soundsStarted(0),
 		_soundsStopped(0),
+		_paused(false),
 		_volume(100)
 	{}
 
@@ -336,10 +346,14 @@ protected:
 	/// Special test-member. Stores count of stopped sounds.
 	size_t _soundsStopped;
 
+	/// True if sound is paused
+	bool _paused;
+
 private:
 
 	/// Final output volume
 	int _volume;
+
 };
 
 // TODO: move to appropriate specific sound handlers

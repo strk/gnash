@@ -204,7 +204,7 @@ main(int argc, char **argv)
     //
     SWFDisplayItem_remove(it1);
     SWFDisplayItem_remove(it2);
-    add_actions(mo, "_root.msg = 'Frame3: move the mouse on the squares'; ");
+    add_actions(mo, "_root.msg = 'Frame4: move the mouse on the squares'; ");
     
     it3 = add_square(mo, 0, 0, 0, 10);
     SWFDisplayItem_moveTo(it3, 60, 100);

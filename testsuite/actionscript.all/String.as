@@ -108,6 +108,14 @@ isNaN ( a.charAt(-1) );
 isNaN (a.charAt(21) );
 check_equals ( a.lastIndexOf("lawa"), 8);
 
+// Applied to object.
+o = new Object;
+o.charCodeAt = String.prototype.charCodeAt;
+o.charAt = String.prototype.charAt;
+c = o.charAt(4);
+check_equals(c, "e");
+c = o.charCodeAt(4);
+check_equals(c, "101");
 //----------------------------------------
 // Check String.indexOf
 // TODO: test with ASnative(251,8)
@@ -137,9 +145,14 @@ check_equals ( a.indexOf("a", o), 4 );
 o2 = {}; o2.toString = function() { return "a"; };
 check_equals ( a.indexOf(o2, o), 4 ); 
 
+// Applied to object.
+o = new Object;
+o.indexOf = String.prototype.indexOf;
+p = o.indexOf("b");
+check_equals(p, 2);
 //----------------------------------------
 // Check String.split
-// TODO: test with ASnative(251,12)
+// See ASNative.as for more tests.
 //-----------------------------------------
 
 check_equals ( typeof(a.split), 'function' );
@@ -156,7 +169,18 @@ check_equals ( a.split("w").length, 4);
 check_equals ( a.split("  w").length, 1);
 
 #if OUTPUT_VERSION > 5
-// TODO: check more of split(''), it seems to be bogus !
+// For SWF6 and above the following condititions apply in
+// this order:
+// Full string returned in 1-element array:
+// 1. If no arguments are passed.
+// 2. If delimiter undefined.
+// 3: empty string, non-empty delimiter.
+//
+// Empty array returned:
+// 4. string and delimiter are empty but defined.
+// 5. non-empty string, non-empty delimiter; 0 or less elements required.
+//
+// If the delimiter is empty, each character is placed in a separate element.
 ret = a.split('');
 check_equals(typeof(ret), 'object');
 check(ret instanceof Array);
@@ -171,15 +195,309 @@ check_equals ( a.split("la")[0], "wal" );
 check_equals ( a.split("la")[1], "wal" );
 check_equals ( a.split("la")[2], "washinGTON" );
 check_equals ( a.split("la").length, 3 );
+
+str = "h";
+ar = str.split("h");
+check_equals(ar.length, 2);
+check_equals(ar.toString(), ",");
+
+str = "";
+ar = str.split("h");
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "");
+
+str = "hh";
+ar = str.split("h");
+check_equals(ar.length, 3);
+check_equals(ar.toString(), ",,");
+
+str = "h";
+ar = str.split("g");
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "h");
+
+str = "a";
+ar = str.split("aa");
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "a");
+
+str = "b";
+ar = str.split("aa");
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "b");
+
+str = "a";
+ar = str.split("aa");
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "a");
+
+str = "aa";
+ar = str.split("aa");
+check_equals(ar.length, 2);
+check_equals(ar.toString(), ",");
+
+str = "";
+ar = str.split("");
+check_equals(ar.length, 0);
+check_equals(ar.toString(), "");
+
+str = "b";
+ar = str.split("");
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "b");
+
+str = "aa";
+ar = str.split("");
+check_equals(ar.length, 2);
+check_equals(ar.toString(), "a,a");
+
+str = "";
+ar = str.split();
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "");
+
+str = "b";
+ar = str.split();
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "b");
+
+str = "aa";
+ar = str.split();
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "aa");
+
+
+// Limit 0 or less:
+str = "aa";
+ar = str.split("", 0);
+check_equals(ar.length, 0);
+check_equals(ar.toString(), "");
+
+str = "";
+ar = str.split("x", 0);
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "");
+
+str = "";
+ar = str.split("x", -1);
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "");
+
+str = "";
+ar = str.split("", 0);
+check_equals(ar.length, 0);
+check_equals(ar.toString(), "");
+
+str = "";
+ar = str.split("", -1);
+check_equals(ar.length, 0);
+check_equals(ar.toString(), "");
+
+str = "aa";
+ar = str.split("", -1);
+check_equals(ar.length, 0);
+check_equals(ar.toString(), "");
+
+str = "aa";
+ar = str.split("aa", 0);
+check_equals(ar.length, 0);
+check_equals(ar.toString(), "");
+
+str = "aa";
+ar = str.split("aa", -1);
+check_equals(ar.length, 0);
+check_equals(ar.toString(), "");
+
+str = "aa";
+ar = str.split(undefined, 0);
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "aa");
+
+str = "aa";
+ar = str.split("a", 0);
+check_equals(ar.length, 0);
+check_equals(ar.toString(), "");
+
+// Limit undefined
+str = "aa";
+ar = str.split("aa", undefined);
+check_equals(ar.length, 2);
+check_equals(ar.toString(), ",");
+
+// String methods on object.
+o = new Object;
+o.split = String.prototype.split;
+ar = o.split("b");
+check_equals(ar.length, 3);
+check_equals(ar.toString(), "[o,ject O,ject]");
+
+o = new Date(0);
+o.split = String.prototype.split;
+ar = o.split(":");
+check_equals(ar.length, 3);
+
+
 #else
+// SWF5:
+
 // empty delimiter doesn't have a special meaning in SWF5
 check_equals ( a.split("")[0], "wallawallawashinGTON" );
 check_equals ( a.split("")[19], undefined );
-// mulit-char delimiter doesn't work in SWF5
+// multi-char delimiter doesn't work in SWF5
 check_equals ( a.split("la")[0], "wallawallawashinGTON" );
 check_equals ( a.split("la")[1], undefined );
 check_equals ( a.split("la")[2], undefined );
 check_equals ( a.split("la").length, 1 );
+
+str = "h";
+ar = str.split("h");
+check_equals(ar.length, 2);
+check_equals(ar.toString(), ",");
+
+str = "";
+ar = str.split("h");
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "");
+
+str = "hh";
+ar = str.split("h");
+check_equals(ar.length, 3);
+check_equals(ar.toString(), ",,");
+
+str = "h";
+ar = str.split("g");
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "h");
+
+// For SWF5, the following conditions mean that an array with a single
+// element containing the entire string is returned:
+// 1. No arguments are passed.
+// 2. The delimiter is empty.
+// 3. The delimiter has more than one character or is undefined and limit is not 0.
+// 4. The delimiter is not present in the string and the limit is not 0.
+//
+// Accordingly, an empty array is returned only when the limit is less
+// than 0 and a non-empty delimiter is passed.str = "";
+str = "a";
+ar = str.split("aa");
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "a");
+
+str = "b";
+ar = str.split("aa");
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "b");
+
+str = "a";
+ar = str.split("aa");
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "a");
+
+str = "aa";
+ar = str.split("aa");
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "aa");
+
+str = "";
+ar = str.split("");
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "");
+
+str = "b";
+ar = str.split("");
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "b");
+
+str = "aa";
+ar = str.split("");
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "aa");
+
+str = "";
+ar = str.split();
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "");
+
+str = "b";
+ar = str.split();
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "b");
+
+str = "aa";
+ar = str.split();
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "aa");
+
+
+// Limit 0 or less:
+str = "aa";
+ar = str.split("", 0);
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "aa");
+
+str = "aa";
+ar = str.split("", -1);
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "aa");
+
+str = "";
+ar = str.split("x", 0);
+check_equals(ar.length, 0);
+check_equals(ar.toString(), "");
+
+str = "";
+ar = str.split("x", -1);
+check_equals(ar.length, 0);
+check_equals(ar.toString(), "");
+
+str = "";
+ar = str.split("", 0);
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "");
+
+str = "";
+ar = str.split("", -1);
+check_equals(ar.length, 1);
+check_equals(ar.toString(), "");
+
+str = "aa";
+ar = str.split("aa", 0);
+check_equals(ar.length, 0);
+check_equals(ar.toString(), "");
+
+str = "aa";
+ar = str.split("aa", -1);
+check_equals(ar.length, 0);
+check_equals(ar.toString(), "");
+
+str = "aa";
+ar = str.split(undefined, 0);
+check_equals(ar.length, 0);
+check_equals(ar.toString(), "");
+
+str = "aa";
+ar = str.split("a", 0);
+check_equals(ar.length, 0);
+check_equals(ar.toString(), "");
+
+// Limit undefined
+str = "aa";
+ar = str.split("a", undefined);
+check_equals(ar.length, 3);
+check_equals(ar.toString(), ",,");
+
+o = new Object;
+o.split = String.prototype.split;
+ar = o.split("b");
+check_equals(ar.length, 3);
+check_equals(ar.toString(), "[o,ject O,ject]");
+
+o = new Date(0);
+o.split = String.prototype.split;
+ar = o.split(":");
+check_equals(ar.length, 3);
+// It will be different according to the timezone...
+
 #endif
 
 // TODO: test String.split(delim, limit)  [ second arg ]
@@ -218,9 +536,9 @@ check_equals(ret[0], 'abcde');
 st = "";
 g = st.split("", 0);
 #if OUTPUT_VERSION > 5
-xcheck_equals(g.length, 0);
-xcheck_equals(typeof(g[0]), "undefined");
-xcheck_equals(g[0], undefined);
+check_equals(g.length, 0);
+check_equals(typeof(g[0]), "undefined");
+check_equals(g[0], undefined);
 #else
 check_equals(g.length, 1);
 check_equals(typeof(g[0]), "string");
@@ -303,6 +621,10 @@ check_equals ( a.substr(-3,2), "xy" );
 var b = new String("1234");
 check_equals ( b.substr(3, 6), "4");
 
+o = new Object;
+o.substr = String.prototype.substr;
+check_equals(o.substr(0,2), "[o");
+
 //-------------------------------------------
 // Check slice 
 // TODO: test with ASnative(251,10)
@@ -330,6 +652,10 @@ check_equals ( String.prototype.slice.call(a, -5, -3), undefined );
 #endif
 check_equals ( a.slice(-4), "wxyz" );
 
+o = new Object;
+o.slice = String.prototype.slice;
+check_equals(o.slice(0,1), "[");
+
 //-------------------------------------------
 // Check substring
 // TODO: test with ASnative(251,11)
@@ -346,6 +672,26 @@ check_equals ( a.concat("sir ","william",15), "abcdefghijklmnopqrstuvwxyzsir wil
 var b = new String("1234");
 check_equals ( b.substring(3, 6), "4");
 
+o = new Object;
+o.substring = String.prototype.substring;
+check_equals(o.substring(3,4), "j");
+
+//-------------------------------------------
+// Concat
+//-------------------------------------------
+
+// Fails if object isn't a String (the only
+// case of this, it seems).
+e = new String("h");
+e.concat("hh");
+e.concat(new Object);
+e.concat(new String);
+check_equals(e, "h");
+
+o = new Object;
+o.concat = String.prototype.concat;
+o.concat("h");
+check_equals(o.toString(), "[object Object]");
 
 //-------------------------------------------
 // Chr and ord
@@ -375,6 +721,7 @@ check_equals (ord("Ϧ"), 207);
 //-------------------------------------------
 // Mbchr and mbord
 //-------------------------------------------
+#ifdef MING_SUPPORTS_ASM
 
 // All versions, especially 5:
 var c;
@@ -449,6 +796,7 @@ check_equals (typeof(c), "string");
 // c == "" fails, but when displayed it evaluates to the empty string
 #endif
 
+#endif //MING_SUPPORTS_ASM 
 //-------------------------------------------
 // Check multi-byte chars with all string
 // functions
@@ -805,6 +1153,28 @@ ASSetPropFlags(Object.prototype, "toString", 0, 2); // unprotect from deletion
 ObjectProtoToStringBackup = Object.prototype.toString;
 check(delete Object.prototype.toString);
 check_equals(typeof(s.toString), 'undefined');
+
+String.prototype.toString = function ()
+{
+    return "fake to string";
+};
+
+Object.prototype.toString = function ()
+{
+    return "fake object";
+};
+
+g = "teststring";
+check_equals(g+' ', "teststring ");
+check_equals (g.substr(0,4), "test");
+g = new String("teststring");
+check_equals (g.substr(0,4), "test");
+
+o = new Object;
+check_equals(o.substr(0,4), undefined);
+o.substr = String.prototype.substr;
+check_equals(o.substr(0,4), "fake");
+
 Object.prototype.toString = ObjectProtoToStringBackup;
 String.prototype.toString = StringProtoToStringBackup;
 
@@ -899,7 +1269,7 @@ check(!String.prototype.hasOwnProperty('length'));
 #endif
 
 #if OUTPUT_VERSION < 6
- check_totals(258);
+ check_totals(324);
 #else
- check_totals(274);
+ check_totals(340);
 #endif

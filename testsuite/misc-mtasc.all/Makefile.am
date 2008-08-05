@@ -45,7 +45,7 @@ AUXMOVIES = \
 	    level87.as \
 	    $(NULL)
 
-EXTRA_DIST = $(ASTESTS) $(AUXMOVIES) TestClass.as ../check.h Dejagnu.as check.as Derived1.as Base1.as  implementsOp/BExtendingImplementation.as  implementsOp/ImplementationA.as  implementsOp/ImplementationB.as implementsOp/SimpleInterface.as
+EXTRA_DIST = $(ASTESTS) $(AUXMOVIES) TestClass.as Dejagnu.as check.as Derived1.as Base1.as  implementsOp/BExtendingImplementation.as  implementsOp/ImplementationA.as  implementsOp/ImplementationB.as implementsOp/SimpleInterface.as
 
 MTASC_FLAGS = -version 6 -cp $(MTASC_CLASSPATH) -cp $(srcdir) -v -header 800:600:20
 MTASC_CPP = $(CPP) -x c -P -I$(srcdir)

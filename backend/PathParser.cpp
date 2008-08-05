@@ -18,26 +18,23 @@
 
 #include <boost/utility.hpp>
 #include "PathParser.h"
-#include <deque>
 #include <map>
 #include <boost/bind.hpp>
 
 namespace gnash
 {
 
-const Point2d<int>&
+const point&
 UnivocalPath::startPoint() const
 {
   return _fill_type == FILL_LEFT ? _path->ap : _path->m_edges.back().ap;
 }
 
-const Point2d<int>&
+const point&
 UnivocalPath::endPoint() const
 {
   return _fill_type == FILL_LEFT ? _path->m_edges.back().ap : _path->ap;
 }
-
-
 
 PathParser::PathParser(const std::vector<path>& paths, size_t numstyles)
 : _paths(paths),
@@ -49,6 +46,8 @@ PathParser::PathParser(const std::vector<path>& paths, size_t numstyles)
 void
 PathParser::run(const cxform& cx, const matrix& mat)
 {
+  // Since we frequently remove an element from the front or the back, we use
+  // a double ended queue here.
   typedef std::deque<UnivocalPath> UniPathList;
 
   std::vector<UniPathList> unipathvec(_num_styles);
@@ -72,7 +71,7 @@ PathParser::run(const cxform& cx, const matrix& mat)
 
   for (size_t i = 0; i < _num_styles; ++i) {
 
-    start_shapes(i+1, cx, mat);
+    start_shapes(i+1, cx);
     UniPathList& path_list = unipathvec[i];
       
     while (!path_list.empty()) {
@@ -82,8 +81,7 @@ PathParser::run(const cxform& cx, const matrix& mat)
         path_list.pop_front();
       }
 
-      UniPathList::iterator it = std::find_if(path_list.begin(),
-        path_list.end(), boost::bind(&PathParser::emitConnecting, this, _1));
+      UniPathList::iterator it = emitConnecting(path_list);
      
       if (it == path_list.end()) {
         if (!closed_shape()) {
@@ -100,52 +98,66 @@ PathParser::run(const cxform& cx, const matrix& mat)
 
 }
 
-bool
-PathParser::emitConnecting(const UnivocalPath& subject)
+std::deque<UnivocalPath>::iterator
+PathParser::emitConnecting(std::deque<UnivocalPath>& paths)
 {
-  if (subject.startPoint() != _cur_endpoint) {
-    return false;
+  std::deque<UnivocalPath>::iterator it = paths.begin(),
+                                     end = paths.end();
+  while (it != end) {
+
+    if ((*it).startPoint() == _cur_endpoint) {
+      break;
+    }
+
+    ++it;
   }
 
-  append(subject);
-
-  return true;
+  if (it != end) {
+    append(*it);
+  }
+  return it;
 }
 
 void
 PathParser::append(const UnivocalPath& append_path)
 {
-  const std::vector< Edge<int> >& edges = append_path._path->m_edges;
+  const std::vector<Edge>& edges = append_path._path->m_edges;
 
   if (append_path._fill_type == UnivocalPath::FILL_LEFT) {
 
-    std::for_each(edges.begin(), edges.end(), boost::bind(&PathParser::curveTo, this, _1));
-    _cur_endpoint = edges.back().ap;
-
+    std::for_each(edges.begin(), edges.end(), boost::bind(&PathParser::line_to,
+                                                          this, _1));
   } else {
 
-    std::vector<edge>::const_reverse_iterator it = boost::next(edges.rbegin());
-
-    while (it != edges.rend()) {
-      const edge& prev = *boost::prior(it);
-      if (prev.isStraight()) {
+    for (std::vector<edge>::const_reverse_iterator prev = edges.rbegin(),
+         it = boost::next(prev), end = edges.rend(); it != end; ++it, ++prev) {
+      if ((*prev).isStraight()) {
         lineTo((*it).ap);
       } else {
-        curveTo(Edge<int>(prev.cp, (*it).ap));
+        line_to(Edge((*prev).cp, (*it).ap));
       }
-      ++it;
     }
-    
-    _cur_endpoint = append_path._path->ap;
-    curveTo(Edge<int>(edges.front().cp, _cur_endpoint));
 
+    line_to(Edge(edges.front().cp, append_path.endPoint()));
+  }
+    
+  _cur_endpoint = append_path.endPoint();
+}
+
+void
+PathParser::line_to(const edge& curve)
+{
+  if (curve.isStraight()) {
+    lineTo(curve.ap);
+  } else {
+    curveTo(curve);
   }
 }
 
 void
-PathParser::start_shapes(int fill_style, const cxform& cx, const matrix& mat)
+PathParser::start_shapes(int fill_style, const cxform& cx)
 {
-  prepareFill(fill_style, cx, mat);
+  prepareFill(fill_style, cx);
 }
 
 void

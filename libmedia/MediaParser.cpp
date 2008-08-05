@@ -23,6 +23,11 @@
 
 #include <boost/bind.hpp>
 
+#ifdef _WIN32
+#include <windows.h>
+#define usleep(usec) ((void) Sleep((usec) / 1000))
+#endif
+
 namespace gnash {
 namespace media {
 
@@ -353,6 +358,15 @@ MediaParser::parserLoop()
 		parseNextChunk();
 		usleep(100); // no rush....
 	}
+}
+
+std::ostream& operator << (std::ostream& os, const VideoInfo& vi)
+{
+	os << "codec:" << vi.codec << " (type " << vi.type << ") - "
+	   << "size:" << vi.width << "x" << vi.height << " - "
+	   << "frameRate:" << vi.frameRate << " - "
+	   << "duration:" << vi.duration;
+	return os;
 }
 
 

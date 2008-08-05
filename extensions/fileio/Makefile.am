@@ -17,6 +17,8 @@
 
 AUTOMAKE_OPTIONS = dejagnu
 
+EXTRA_DIST = test.as
+
 # this is where Gnash plugins get installed
 pluginsdir = $(libdir)/gnash/plugins
 
@@ -26,18 +28,17 @@ DEF_MAKESWF_FLAGS = -I $(top_srcdir)/testsuite/actionscript.all
 
 INCLUDES =  \
             -I$(top_srcdir)/libbase \
-	    -I$(top_srcdir)/libgeometry \
-            -I$(top_srcdir)/server \
-            -I$(top_srcdir)/server/vm \
-	    -I$(top_srcdir)/server/parser \
-	    -I$(top_srcdir)/server/asobjs \
+            -I$(top_srcdir)/libcore \
+            -I$(top_srcdir)/libcore/vm \
+	    -I$(top_srcdir)/libcore/parser \
+	    -I$(top_srcdir)/libcore/asobjs \
 	    $(BOOST_CFLAGS) \
 	    $(PTHREAD_CFLAGS) \
 	    $(INCLTDL)
 
 AM_LDFLAGS =  \
 	$(top_builddir)/libbase/libgnashbase.la \
-	$(top_builddir)/server/libgnashserver.la \
+	$(top_builddir)/libcore/libgnashcore.la \
 	$(PTHREAD_LIBS) \
 	$(NULL)
 
@@ -70,8 +71,6 @@ install-pluginsLTLIBRARIES: $(plugins_LTLIBRARIES)
 test: $(srcdir)/../../testsuite/generic-testrunner.sh test.swf
 	GNASH_PLUGINS=$(PWD)/.libs GNASHRC=$(srcdir)/../gnashrc sh $< $(top_builddir) test.swf > $@
 	chmod +x $@
-
-test.swf: test.as
 
 # Wrap a single .as tests in dejagnu_so importer.
 # At play time, if the relative url '../ming-misc.all/Dejagnu.swf' 

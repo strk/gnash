@@ -152,18 +152,19 @@
 
 // Forward declarations.
 namespace gnash {
-  class bitmap_info;
-  class rect;
-  class rgba;
-  class matrix;
-  class cxform;
-  
-  class shape_character_def;
-  class generic_character;
+    class bitmap_info;
+    class rect;
+    class rgba;
+    class matrix;
+    class cxform;
+
+    class shape_character_def;
+    class generic_character;
+
+    // @@ forward decl to avoid including base/image.h; TODO change the
+    // render_handler interface to not depend on these classes at all.
+    namespace image { class image_base; class rgb; class rgba; }
 }
-// @@ forward decl to avoid including base/image.h; TODO change the
-// render_handler interface to not depend on these classes at all.
-namespace image { class image_base; class rgb; class rgba; }
 
 namespace gnash {
 
@@ -409,7 +410,6 @@ public:
   virtual void draw_shape_character(shape_character_def *def, 
     character *inst)
   {
-
     // check if the character needs to be rendered at all
     rect cur_bounds;
 
@@ -419,20 +419,17 @@ public:
     if (!bounds_in_clipping_area(cur_bounds))
     {
         return; // no need to draw
-    }
-      
+    }    
 
     // TODO: I don't like that there is a draw_shape_character() version with
     // arbitrary fill and line styles as this may break caching...
 
     // render the character
     draw_shape_character(def, 
-    inst->get_world_matrix(), 
-    inst->get_world_cxform(),
-    inst->get_parent()->get_pixel_scale(),
-    def->get_fill_styles(),
-    def->get_line_styles());
-
+        inst->get_world_matrix(), 
+        inst->get_world_cxform(),
+        def->get_fill_styles(),
+        def->get_line_styles());
   }
   
   /// \brief
@@ -476,7 +473,6 @@ public:
   virtual void draw_shape_character(shape_character_def *def, 
     const matrix& mat,
     const cxform& cx,
-    float pixel_scale,
     const std::vector<fill_style>& fill_styles,
     const std::vector<line_style>& line_styles) = 0;
     
@@ -494,11 +490,8 @@ public:
   /// @param mat
   ///
   /// @param color
-  ///
-  /// @param pixel_scale
-  ///
   virtual void draw_glyph(shape_character_def *def, const matrix& mat,
-    const rgba& color, float pixel_scale) = 0;
+    const rgba& color) = 0;
 
   /// This function returns the color at any position in the stage. It is used
   /// for automatic testing only, it should not be used for anything else!

@@ -44,6 +44,9 @@
 #include <boost/scoped_array.hpp>
 #include <SDL.h>
 
+// Define this to get debugging call about pausing/unpausing audio
+//#define GNASH_DEBUG_SDL_AUDIO_PAUSING
+
 namespace { // anonymous
 
 // Header of a wave file
@@ -340,6 +343,9 @@ void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset,
 	sounddata->m_active_sounds.push_back(sound.release());
 
 	if (soundsPlaying == 1) {
+#ifdef GNASH_DEBUG_SDL_AUDIO_PAUSING
+		log_debug("Unpausing SDL Audio...");
+#endif
 		SDL_PauseAudio(0);
 	}
 
@@ -498,6 +504,9 @@ void	SDL_sound_handler::attach_aux_streamer(aux_streamer_ptr ptr, void* owner)
 		}
 		soundOpened = true;
 	}
+#ifdef GNASH_DEBUG_SDL_AUDIO_PAUSING
+	log_debug("Unpausing SDL Audio...");
+#endif
 	SDL_PauseAudio(0);
 
 }
@@ -768,12 +777,16 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 
 	boost::mutex::scoped_lock lock(handler->_mutex);
 
-  int finalVolume = int(128*handler->getFinalVolume()/100.0);
+	if ( handler->isPaused() ) return;
+
+	int finalVolume = int(128*handler->getFinalVolume()/100.0);
 
 	// If nothing to play there is no reason to play
 	// Is this a potential deadlock problem?
 	if (handler->soundsPlaying == 0 && handler->m_aux_streamer.empty()) {
-            std::cout << "Pausing Audio now...\n";
+#ifdef GNASH_DEBUG_SDL_AUDIO_PAUSING
+		log_debug("Pausing SDL Audio...");
+#endif
 		SDL_PauseAudio(1);
 		return;
 	}

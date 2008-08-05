@@ -17,6 +17,8 @@
 
 AUTOMAKE_OPTIONS = 
 
+EXTRA_DIST = gnashrc
+
 # Don't try to build the MySQL extension unless MySQL is actually installed.
 OTHER_DIRS =
 if BUILD_MYSQL_EXT

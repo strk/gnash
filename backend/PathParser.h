@@ -21,6 +21,7 @@
 
 #include "shape.h"
 #include <vector>
+#include <deque>
 #include "cxform.h"
 
 namespace gnash
@@ -44,8 +45,8 @@ struct UnivocalPath
   {
   }
   
-  const Point2d<int>& startPoint() const;
-  const Point2d<int>& endPoint() const;
+  const point& startPoint() const;
+  const point& endPoint() const;
 
   const path* _path;
   fill_type   _fill_type;
@@ -73,7 +74,7 @@ public:
 
   /// Prepare the fill style for subsequent use for filling one or more shapes.
   /// @param fill_style fill style number, as indicated by class Path.
-  virtual void prepareFill(int fill_style, const cxform& cx, const matrix& mat) = 0;
+  virtual void prepareFill(int fill_style, const cxform& cx) = 0;
   
   /// Terminates the fill style, that is, precludes the fill style from further
   /// use, which may be freed or otherwise cleaned up. Most renderers should
@@ -91,20 +92,20 @@ public:
   /// Move the path pencil to the given location. Thus a new shape should be
   /// started. The parser may invoke this method several times for a single
   /// fill style, creating several shapes.
-  virtual void moveTo(const geometry::Point2d<int>& p) = 0;
+  virtual void moveTo(const point& p) = 0;
   
   /// Draw the given curve using the path pencil.
-  virtual void curveTo(const Edge<int>& curve) = 0;
+  virtual void curveTo(const edge& curve) = 0;
 
   /// Draw a straight line to the given point.
-  virtual void lineTo(const geometry::Point2d<int>& p) = 0;
+  virtual void lineTo(const point& p) = 0;
 
 private:
-  bool emitConnecting(const UnivocalPath& subject);
+  std::deque<UnivocalPath>::iterator emitConnecting(std::deque<UnivocalPath>& paths);
     
   void append(const UnivocalPath& append_path);
   
-  void start_shapes(int fill_style, const cxform& cx, const matrix& mat);
+  void start_shapes(int fill_style, const cxform& cx);
 
   void end_shapes(int fill_style);
 
@@ -112,11 +113,12 @@ private:
   
   bool closed_shape();
 
+  void line_to(const edge& curve);
 
   const std::vector<path>& _paths;
   const size_t             _num_styles;
-  Point2d<int>       _shape_origin;
-  Point2d<int>       _cur_endpoint;
+  point       _shape_origin;
+  point       _cur_endpoint;
 };
 
 }

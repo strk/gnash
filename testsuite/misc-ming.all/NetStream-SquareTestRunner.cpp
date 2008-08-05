@@ -25,7 +25,7 @@
 #include "string_table.h"
 #include "sprite_instance.h"
 #include "character.h"
-#include "dlist.h"
+#include "DisplayList.h"
 #include "log.h"
 
 #include "check.h"
