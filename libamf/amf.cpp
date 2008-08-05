@@ -793,7 +793,7 @@ AMF::extractAMF(Network::byte_t *in, Network::byte_t* tooFar)
 	  el->makeStrictArray();
 	  // get the number of numbers in the array
 	  length = ntohl((*(boost::uint32_t *)tmpptr));
-	  log_debug("Strict Array, body size is %d.", length);
+//	  log_debug("Strict Array, body size is %d.", length);
 	  tmpptr += sizeof(boost::uint32_t) + 1;
 	  // each number is 8 bytes, plus one byte for the type.
 	  tooFar = tmpptr += length * AMF0_NUMBER_SIZE + 1;
