@@ -35,8 +35,6 @@ namespace png  {
 	public:
 
 		input()
-			:
-			_errorOccurred(0)
 		{}
 
 		virtual ~input() {}
@@ -95,17 +93,6 @@ namespace png  {
 		virtual size_t getWidth() const = 0;
 		virtual void readScanline(unsigned char* rgb_data) = 0;
 
-		virtual void errorOccurred(const char* msg);
-
-	protected:
-
-		/// This flag will be set to true by the error callback
-		/// invoked by jpeg lib. Will be later used to throw
-		/// a ParserException.
-		///
-		const char* _errorOccurred;
-
-		jmp_buf _jmpBuf;
 	};
 
 } // namespace png

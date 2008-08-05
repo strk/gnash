@@ -18,8 +18,6 @@ extern "C" {
 #include "GnashException.h"
 
 #include <sstream>
-#include <csetjmp>
-
 
 namespace gnash {
 namespace png {
@@ -28,46 +26,7 @@ namespace png {
 namespace IOChannel_wrappers
 {
 
-	// Helper object for reading png image data.  Basically a thin
-	static const int IO_BUF_SIZE = 4096;
-
-	// A jpeglib source manager that reads from a IOChannel.  Paraphrased
-	// from IJG jpeglib jdatasrc.c.
-	class rw_source_IOChannel
-	{
-	public:
-
-		// Constructor.  The caller is responsible for closing the input stream
-		// after it's done using us.
-		//
-		rw_source_IOChannel(gnash::IOChannel* in)
-			:
-			m_in_stream(in)
-		{
-			init();
-		}
-
-		~rw_source_IOChannel()
-		{
-		}
-
-
-		void	discard_partial_buffer()
-		{
-			// Discard existing bytes in our buffer.
-		}
-
-        void init() {}
-
-	private:
-
-		gnash::IOChannel*	m_in_stream;		/* source stream */
-
-	};
-
-
-	/// Basically this is a thin wrapper
-	class input_IOChannel : public input
+	class pngIOChannel : public input
 	{
 	private:
    		// State needed for input.
@@ -86,7 +45,7 @@ namespace IOChannel_wrappers
 		//
 		/// @param in
 		/// 	The stream to read from.
-		input_IOChannel(gnash::IOChannel& in) :
+		pngIOChannel(gnash::IOChannel& in) :
 		    _pngPtr(0),
 		    _infoPtr(0),
 		    _inStream(in),
@@ -95,12 +54,16 @@ namespace IOChannel_wrappers
 		    init();
     	}
 
-        static void error(png_struct*, const char* err)
+        static void error(png_struct*, const char* msg)
         {
+            std::ostringstream ss;
+            ss << "PNG error: " << msg;
+            throw ParserException(ss.str());
         }
         
-        static void warning(png_struct*, const char* warning)
+        static void warning(png_struct*, const char* msg)
         {
+            log_debug(_("PNG warning: %s"), msg);
         }
 
         // Read function using a gnash::IOChannel
@@ -121,6 +84,7 @@ namespace IOChannel_wrappers
             if (!_pngPtr) return;
 
             _infoPtr = png_create_info_struct(_pngPtr);
+
             if (!_infoPtr)
             {
                 png_destroy_read_struct(&_pngPtr, (png_infopp)NULL, (png_infopp)NULL);
@@ -139,7 +103,7 @@ namespace IOChannel_wrappers
         }
 
 		// Destructor. Free libpng-allocated memory.
-		~input_IOChannel()
+		~pngIOChannel()
 		{
             png_destroy_read_struct(&_pngPtr, &_infoPtr, (png_infopp)NULL);
 		}
@@ -183,33 +147,14 @@ namespace IOChannel_wrappers
 } // namespace IOChannel_wrappers
 
 
-void
-input::errorOccurred(const char* msg)
-{
-	gnash::log_debug("Long jump: banzaaaaaai!");
-	_errorOccurred = msg;
-	std::longjmp(_jmpBuf, 1);
-}
-
-
 std::auto_ptr<input>
 input::create(gnash::IOChannel& in)
 {
-	using IOChannel_wrappers::input_IOChannel;
-	std::auto_ptr<input> ret ( new input_IOChannel(in) );
+	using IOChannel_wrappers::pngIOChannel;
+	std::auto_ptr<input> ret ( new pngIOChannel(in) );
 	if ( ret.get() ) ret->read(); // might throw an exception (I guess)
 	return ret;
 }
-
-/*static*/
-//input*
-//input::create_swf_jpeg2_header_only(gnash::IOChannel* in, unsigned int maxHeaderBytes, bool takeOwnership)
-//{
-//	using IOChannel_wrappers::input_IOChannel;
-//	std::auto_ptr<input_IOChannel> ret ( new input_IOChannel(in, takeOwnership) );
-//	if ( ret.get() ) ret->readHeader(maxHeaderBytes); // might throw an exception
-//	return ret.release();
-//}
 
 
 } // namespace png
