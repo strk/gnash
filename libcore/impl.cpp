@@ -278,13 +278,11 @@ create_jpeg_movie(std::auto_ptr<IOChannel> in, const std::string& url)
 // Create a movie_definition from a png stream
 // NOTE: this method assumes this *is* a png stream
 static movie_definition*
-create_png_movie(std::auto_ptr<IOChannel> /*in*/, const std::string& /*url*/)
+create_png_movie(std::auto_ptr<IOChannel> in, const std::string& url)
 {
-  log_unimpl(_("Loading of png"));
-  return NULL;
-
-#if 0
-  std::auto_ptr<image::rgb> im ( image::read_png(in.get()) );
+  assert (in.get());
+ 
+  std::auto_ptr<image::rgb> im ( image::readSWFPng(*in) );
 
   if ( ! im.get() )
   {
@@ -293,9 +291,7 @@ create_png_movie(std::auto_ptr<IOChannel> /*in*/, const std::string& /*url*/)
   } 
 
   BitmapMovieDefinition* mdef = new BitmapMovieDefinition(im, url);
-  //log_debug(_("BitmapMovieDefinition %p created"), mdef);
   return mdef;
-#endif
 
 }
 
