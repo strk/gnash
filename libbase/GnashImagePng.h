@@ -1,4 +1,4 @@
-// png.h: libpng wrapper for Gnash.
+// GnashImagePng.h: libpng wrapper for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
@@ -48,6 +48,8 @@ namespace gnash {
         // A counter for keeping track of the last row copied.
         size_t _currentRow;
 
+        void init();
+
 	public:
 
 		/// Constructor.  
@@ -59,8 +61,6 @@ namespace gnash {
 		// Destructor. Free libpng-allocated memory.
 		~PngImageInput();
 		
-        void init();
-
         void read();
 
 		// Return the height of the image.
