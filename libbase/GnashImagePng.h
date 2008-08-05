@@ -20,82 +20,77 @@
 #ifndef GNASH_IMAGE_PNG_H
 #define GNASH_IMAGE_PNG_H
 
-#include "dsodefs.h"
-#include <csetjmp> // for jmp_buf
 #include <memory>
+
+#include "dsodefs.h"
+#include "GnashImage.h"
+
+
+extern "C" {
+#include <png.h>
+}
 
 // Forward declarations
 namespace gnash { class IOChannel; }
 
 namespace gnash {
-namespace png  {
 
-	class input {
+	class PngImageInput : public ImageInput
+	{
+	private:
+   		// State needed for input.
+        png_structp _pngPtr;
+        png_infop _infoPtr;
+       
+        // A reference to the stream containing the PNG data.
+        IOChannel& _inStream;
+        
+        // A counter for keeping track of the last row copied.
+        size_t _currentRow;
 
 	public:
 
-		input()
-		{}
-
-		virtual ~input() {}
-
-
-		/// \brief
-		/// Create and return a jpeg-input object that will read from the
-		/// given input stream.
+		/// Constructor.  
 		//
-		/// The created input reads the jpeg header
-		///
 		/// @param in
-		///	The stream to read from. Ownership specified by last arg.
-		///
-		/// @param takeOwnership
-		///	If false, ownership of the stream 
-		///	is left to caller, otherwise we take it.
-		///	NOTE: In case the caller retains ownership, it must
-		///	make sure the stream is alive and not modified
-		///	for the whole lifetime of the returned instance.
-		///
-		/// @return NULL on error
-		///
-		DSOEXPORT static std::auto_ptr<input> create(gnash::IOChannel& in);
+		/// 	The stream to read from.
+		PngImageInput(gnash::IOChannel& in);
+		
+		// Destructor. Free libpng-allocated memory.
+		~PngImageInput();
+		
+        void init();
 
-		/// Read SWF JPEG2-style header. 
+        void read();
+
+		// Return the height of the image.
+		size_t getHeight() const;
+
+		// Return the width of the image.
+		size_t getWidth() const;
+
+		// Return number of components (i.e. == 3 for RGB
+		// data).  The size of the data for a scanline is
+		// get_width() * get_components().
 		//
-		/// App needs to call start_image() before loading any
-		/// image data.  Multiple images can be loaded by
-		/// bracketing within start_image()/finish_image() pairs.
-		///
-		/// @param in
-		///	The gnash::IOChannel to use for input. Ownership specified
-		///	by last arg.
-		///
-		/// @param maxHeaderBytes
-		///	Max number of bytes to read from input for header.
-		///
-		/// @param takeOwnership
-		///	If false, ownership of the stream 
-		///	is left to caller, otherwise we take it.
-		///	NOTE: In case the caller retains ownership, it must
-		///	make sure the stream is alive and not modified
-		///	for the whole lifetime of the returned instance.
-		///
-		/// @return NULL on error
-		///
-//		DSOEXPORT std::auto_ptr<input> create_swf_jpeg2_header_only(gnash::IOChannel* in,
-//				unsigned int maxHeaderBytes, bool takeOwnership=false);
+		int	getComponents() const { return 3; }
 
-		/// Discard existing bytes in our buffer.
+		// Read a scanline's worth of image data into the
+		// given buffer.  The amount of data read is
+		// get_width() * get_components().
+		//
+		void readScanline(unsigned char* rgb_data);
 
-        virtual void read() = 0;
 
-		virtual size_t getHeight() const = 0;
-		virtual size_t getWidth() const = 0;
-		virtual void readScanline(unsigned char* rgb_data) = 0;
+        DSOEXPORT static std::auto_ptr<ImageInput> create(gnash::IOChannel& in)
+        {
+	        std::auto_ptr<ImageInput> ret ( new PngImageInput(in) );
+	        if ( ret.get() ) ret->read();
+	        return ret;
+        }
 
-	};
+    };
 
-} // namespace png
 } // namespace gnash
 
 

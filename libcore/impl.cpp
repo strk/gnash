@@ -275,16 +275,16 @@ create_jpeg_movie(std::auto_ptr<IOChannel> in, const std::string& url)
 // NOTE: this method assumes this *is* a png stream
 // TODO: The pp won't display PNGs for SWF7 or below.
 static movie_definition*
-createPNGMovie(std::auto_ptr<IOChannel> in, const std::string& url)
+createBitmapMovie(std::auto_ptr<IOChannel> in, const std::string& url, FileType type)
 {
     assert (in.get());
 
     try
     {
-        std::auto_ptr<image::rgb> im(image::readSWFPng(*in));
+        std::auto_ptr<image::rgb> im(image::readImageData(*in, type));
         if (!im.get())
         {
-            log_error(_("Can't read png from %s"), url);
+            log_error(_("Can't read image file from %s"), url);
             return NULL;
         } 
 
@@ -303,15 +303,6 @@ createPNGMovie(std::auto_ptr<IOChannel> in, const std::string& url)
 // Get type of file looking at first bytes
 // return "jpeg", "png", "swf" or "unknown"
 //
-
-enum FileType {
-    GNASH_FILETYPE_JPEG,
-    GNASH_FILETYPE_PNG,
-    GNASH_FILETYPE_SWF,
-    GNASH_FILETYPE_FLV,
-    GNASH_FILETYPE_UNKNOWN
-};
-
 FileType
 getFileType(IOChannel* in)
 {
@@ -416,36 +407,46 @@ create_movie(std::auto_ptr<IOChannel> in, const std::string& url, bool startLoad
   // see if it's a jpeg or an swf
   FileType type = getFileType(in.get());
 
-  if ( type == GNASH_FILETYPE_JPEG )
-  {
-    if ( startLoaderThread == false )
+    switch (type)
     {
-      log_unimpl(_("Requested to keep from completely loading a movie, but the movie in question is a jpeg, for which we don't yet have the concept of a 'loading thread'"));
-    }
-    return create_jpeg_movie(in, url);
-  }
-  else if ( type == GNASH_FILETYPE_PNG )
-  {
-    if ( startLoaderThread == false )
-    {
-      log_unimpl(_("Requested to keep from completely loading a movie, but the"
-              " movie in question is a png, for which we don't yet have the "
-              "concept of a 'loading thread'"));
-    }
-    return createPNGMovie(in, url);
-  }
-  else if ( type == GNASH_FILETYPE_SWF )
-  {
-    return create_swf_movie(in, url, startLoaderThread);
-  }
-  else if ( type == GNASH_FILETYPE_FLV )
-  {
-    log_unimpl(_("FLV can't be loaded directly as a movie"));
-    return NULL;
-  }
+        case GNASH_FILETYPE_JPEG:
+        {
+            if ( startLoaderThread == false )
+            {
+              log_unimpl(_("Requested to keep from completely loading "
+                           "a movie, but the movie in question is a "
+                           "jpeg, for which we don't yet have the "
+                           "concept of a 'loading thread'"));
+            }
+            return create_jpeg_movie(in, url);
+        }            
 
-  log_error(_("unknown file type (%s)"), type);
-  return NULL;
+        case GNASH_FILETYPE_PNG:
+        case GNASH_FILETYPE_GIF:
+        {
+            if ( startLoaderThread == false )
+            {
+              log_unimpl(_("Requested to keep from completely loading "
+                           "a movie, but the movie in question is an "
+                           "image, for which we don't yet have the "
+                           "concept of a 'loading thread'"));
+            }            
+            return createBitmapMovie(in, url, type);
+        }
+
+
+        case GNASH_FILETYPE_SWF:
+            return create_swf_movie(in, url, startLoaderThread);
+
+        case GNASH_FILETYPE_FLV:
+            log_unimpl(_("FLV can't be loaded directly as a movie"));
+            return NULL;
+        default:
+            log_error(_("unknown file type (%s)"), type);
+            break;
+    }
+
+    return NULL;
 }
 
 movie_definition*
