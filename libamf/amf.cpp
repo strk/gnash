@@ -787,7 +787,33 @@ AMF::extractAMF(Network::byte_t *in, Network::byte_t* tooFar)
 	  break;
       }
       case Element::OBJECT_END_AMF0:
+	  // A strict array is only numbers
       case Element::STRICT_ARRAY_AMF0:
+      {
+	  el->makeStrictArray();
+	  // get the number of numbers in the array
+	  length = ntohl((*(boost::uint32_t *)tmpptr));
+	  log_debug("Strict Array, body size is %d.", length);
+	  tmpptr += sizeof(boost::uint32_t) + 1;
+	  // each number is 8 bytes, plus one byte for the type.
+	  tooFar = tmpptr += length * AMF0_NUMBER_SIZE + 1;
+// 	  Element *name = amf_obj.extractAMF(tmpptr, tooFar);
+// 	  tmpptr += amf_obj.totalsize();
+// 	  el->setName(name->getName());
+	  length -= 2;
+	  while (length) {
+	      Element *child = amf_obj.extractAMF(tmpptr, tooFar); 
+	      if (child == 0) {
+		  break;
+	      } else {
+//		  child->dump();
+		  el->addProperty(child);
+		  tmpptr += amf_obj.totalsize();
+		  length -= amf_obj.totalsize();
+	      }
+	  };
+	  break;
+      }
       case Element::DATE_AMF0:
       case Element::LONG_STRING_AMF0:
       case Element::UNSUPPORTED_AMF0:
