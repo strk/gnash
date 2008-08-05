@@ -256,10 +256,6 @@ static void ensure_loaders_registered()
 static movie_definition*
 create_jpeg_movie(std::auto_ptr<IOChannel> in, const std::string& url)
 {
-  // FIXME: temporarly disabled
-  //log_unimpl(_("Loading of jpegs"));
-  //return NULL;
-
 
   std::auto_ptr<image::rgb> im ( image::read_jpeg(in.get()) );
 
@@ -277,25 +273,30 @@ create_jpeg_movie(std::auto_ptr<IOChannel> in, const std::string& url)
 
 // Create a movie_definition from a png stream
 // NOTE: this method assumes this *is* a png stream
+// TODO: The pp won't display PNGs for SWF7 or below.
 static movie_definition*
-create_png_movie(std::auto_ptr<IOChannel> /*in*/, const std::string& /*url*/)
+createPNGMovie(std::auto_ptr<IOChannel> in, const std::string& url)
 {
-  log_unimpl(_("Loading of png"));
-  return NULL;
+    assert (in.get());
 
-#if 0
-  std::auto_ptr<image::rgb> im ( image::read_png(in.get()) );
+    try
+    {
+        std::auto_ptr<image::rgb> im(image::readSWFPng(*in));
+        if (!im.get())
+        {
+            log_error(_("Can't read png from %s"), url);
+            return NULL;
+        } 
 
-  if ( ! im.get() )
-  {
-    log_error(_("Can't read png from %s"), url);
-    return NULL;
-  } 
+        BitmapMovieDefinition* mdef = new BitmapMovieDefinition(im, url);
+        return mdef;
 
-  BitmapMovieDefinition* mdef = new BitmapMovieDefinition(im, url);
-  //log_debug(_("BitmapMovieDefinition %p created"), mdef);
-  return mdef;
-#endif
+    }
+    catch (ParserException& e)
+    {
+        log_error(_("Parsing error: %s"), e.what());
+        return NULL;
+    }
 
 }
 
@@ -332,7 +333,7 @@ getFileType(IOChannel* in)
     return GNASH_FILETYPE_JPEG;
   }
 
-  // This is the magic number for any JPEG format file
+  // This is the magic number for any PNG format file
   if ((buf[0] == 137) && (buf[1] == 'P') && (buf[2] == 'N')) // buf[3] == 'G' (we didn't read so far)
   {
     in->seek(0);
@@ -431,7 +432,7 @@ create_movie(std::auto_ptr<IOChannel> in, const std::string& url, bool startLoad
               " movie in question is a png, for which we don't yet have the "
               "concept of a 'loading thread'"));
     }
-    return create_png_movie(in, url);
+    return createPNGMovie(in, url);
   }
   else if ( type == GNASH_FILETYPE_SWF )
   {

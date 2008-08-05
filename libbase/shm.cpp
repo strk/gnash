@@ -168,7 +168,7 @@ Shm::attach(char const *filespec, bool nuke)
     filespec = absfilespec.c_str();
     strncpy(_filespec, absfilespec.c_str(), MAX_SHM_NAME_SIZE);
     if (static_cast<int>(absfilespec.size()) > MAX_SHM_NAME_SIZE) {
-	log_error("Shared Memory segment name is " SIZET_FMT " bytes too long!\n",
+	log_error("Shared Memory segment name is %d bytes too long!",
 		  absfilespec.size() - MAX_SHM_NAME_SIZE);
     }    
     
@@ -390,7 +390,7 @@ Shm::attach(char const *filespec, bool nuke)
 #else // else of FLAT_ADDR_SPACE
 #endif // end of FLAT_ADDR_SPACE
     
-	log_debug("Opened Shared Memory segment \"%s\": " SIZET_FMT " bytes at %p.\n",
+	log_debug("Opened Shared Memory segment \"%s\": %d bytes at %p.",
 		filespec, _size, _addr);
 	}
 
