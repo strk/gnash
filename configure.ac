@@ -1493,6 +1493,7 @@ AC_SUBST(WINDRES)
 GNASH_PKG_FIND(z, [zlib.h], [zlib compression library], compress)
 GNASH_PKG_FIND(jpeg, [jpeglib.h], [jpeg images], jpeg_mem_init)
 GNASH_PKG_FIND(png, [png.h], [png images], png_info_init)
+GNASH_PKG_FIND(gif, [gif_lib.h], [gif images], DGifOpen)
 GNASH_PKG_INCLUDES([dejagnu], [dejagnu.h])
 
 dnl Find freetype and fontconfig
