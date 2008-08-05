@@ -9,7 +9,7 @@
 
 #include "utility.h"
 #include "jpeg.h"
-#include "GnashPNG.h"
+#include "GnashImagePng.h"
 #include "IOChannel.h"
 #include "tu_file.h" // some functions take a filename, tu_file is created in that case..
 

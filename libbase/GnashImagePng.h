@@ -17,8 +17,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef GNASH_PNG_H
-#define GNASH_PNG_H
+#ifndef GNASH_IMAGE_PNG_H
+#define GNASH_IMAGE_PNG_H
 
 #include "dsodefs.h"
 #include <csetjmp> // for jmp_buf

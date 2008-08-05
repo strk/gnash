@@ -93,7 +93,7 @@ libgnashbase_la_SOURCES = \
 	image.cpp \
 	$(MALLOC) \
 	jpeg.cpp \
-	GnashPNG.cpp \
+	GnashImagePng.cpp \
 	log.cpp	\
 	memory.cpp \
 	rc.cpp \
@@ -124,7 +124,7 @@ noinst_HEADERS = \
 	image.h	\
 	jemtree.h \
 	jpeg.h \
-	GnashPNG.h \
+	GnashImagePng.h \
 	gmemory.h \
 	log.h \
 	ogl.h \
