@@ -109,6 +109,14 @@ class DSOEXPORT Flv {
     } flv_tag_t;
     Flv();
     ~Flv();
+
+    // Encode the data into a Buffer
+    amf::Buffer *encodeHeader(gnash::Network::byte_t type);
+    // Decode a Buffer into a header
+    flv_header_t *decodeHeader(amf::Buffer *buf);
+
+    // Decode the tag header
+    Element *decodeTagHeader(flv_tag_t *tag);
     
     amf::Element *findProperty(const std::string &name);
     void setProperties(std::vector<amf::Element *> x) { _properties = x; };

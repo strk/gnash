@@ -62,6 +62,43 @@ Flv::~Flv()
 //    GNASH_REPORT_FUNCTION;
 }
 
+// Encode the data into a Buffer
+Buffer *
+Flv::encodeHeader(Network::byte_t type)
+{
+//    GNASH_REPORT_FUNCTION;
+    Buffer *buf = new Buffer(sizeof(Flv::flv_header_t));
+    buf->clear();
+    
+    Network::byte_t version = 0x1;
+    buf->copy("FLV");
+    buf->append(version);
+
+    buf->append(type);
+
+    boost::uint32_t size = htonl(0x9);
+    buf->append(size);
+
+    return buf;
+}
+
+// Decode a Buffer into a header
+Flv::flv_header_t *
+Flv::decodeHeader(amf::Buffer *buf)
+{
+//    GNASH_REPORT_FUNCTION;
+    memcpy(&_header, buf->begin(), sizeof(Flv::flv_header_t));
+    
+    return &_header;
+}
+
+// Decode the tag header
+amf::Element *
+Flv::decodeTagHeader(flv_tag_t *tag)
+{
+//    GNASH_REPORT_FUNCTION;
+}
+
 amf::Element *
 Flv::findProperty(const std::string &name)
 {
