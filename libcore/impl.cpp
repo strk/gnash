@@ -331,6 +331,13 @@ getFileType(IOChannel* in)
     return GNASH_FILETYPE_PNG;
   }
 
+  // This is the magic number for any GIF format file
+  if ((buf[0] == 'G') && (buf[1] == 'I') && (buf[2] == 'F'))
+  {
+    in->seek(0);
+    return GNASH_FILETYPE_GIF;
+  }
+
   // This is for SWF (FWS or CWS)
   if (  (buf[0] == 'F' || buf[0] == 'C') &&
     (buf[1] == 'W') &&
