@@ -48,10 +48,10 @@ Flv::Flv()
     memcpy(&_header.sig, "FLV", 3);
     _header.version = 1;
     _header.type = Flv::FLV_VIDEO | Flv::FLV_AUDIO;
-    _header.head_size = 9;
+//    _header.head_size = 9;
     
     memset(&_tag, 0, sizeof(flv_tag_t));
-    _tag.type = Flv::FLV_TAG_METADATA;
+    _tag.type = Flv::TAG_METADATA;
     _tag.bodysize[0] = 0x0f;
     _tag.bodysize[1] = 0x30;
     _tag.bodysize[2] = 0x00;
