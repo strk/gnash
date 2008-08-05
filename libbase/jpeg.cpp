@@ -14,13 +14,11 @@
 #include "GnashException.h"
 
 #include <sstream>
+#include <csetjmp>
 
 extern "C" {
-
-// do we reall want to undefine HAVE_STDLIB_H here ??
 #include <jpeglib.h>
 }
-
 
 namespace jpeg
 {
@@ -92,7 +90,7 @@ namespace IOChannel_wrappers
 				if (src->m_start_of_file) {
 					// Treat this as a fatal error.
 					gnash::log_error("empty jpeg source stream.");
-					return FALSE;
+					return false;
 				}
 				// warn("jpeg end-of-stream");
 
@@ -122,7 +120,7 @@ namespace IOChannel_wrappers
 			src->m_pub.bytes_in_buffer = bytes_read;
 			src->m_start_of_file = false;
 
-			return TRUE;
+			return true;
 		}
 
 		// Called by client when it wants to advance past some
@@ -258,7 +256,7 @@ namespace IOChannel_wrappers
 		}
 
 		/// Write the output buffer into the stream.
-		static boolean	empty_output_buffer(j_compress_ptr cinfo)
+		static boolean empty_output_buffer(j_compress_ptr cinfo)
 		{
 			rw_dest_IOChannel*	dest = (rw_dest_IOChannel*) cinfo->dest;
 			assert(dest);
@@ -547,8 +545,8 @@ namespace IOChannel_wrappers
 	{
 	public:
 		// State needed for output.
-		struct jpeg_compress_struct	m_cinfo;
-		struct jpeg_error_mgr m_jerr;
+		jpeg_compress_struct m_cinfo;
+		jpeg_error_mgr m_jerr;
 
 		/// Constructor. 
 		//
@@ -630,7 +628,7 @@ input::errorOccurred(const char* msg)
 {
 	gnash::log_debug("Long jump: banzaaaaaai!");
 	_errorOccurred = msg;
-	longjmp(_jmpBuf, 1);
+	std::longjmp(_jmpBuf, 1);
 }
 
 

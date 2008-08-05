@@ -141,6 +141,7 @@ check_PROGRAMS = \
 	action_execution_order_test11 \
 	reverse_execute_PlaceObject2_test1 \
 	reverse_execute_PlaceObject2_test2 \
+    loadPNGTest \
 	loadMovieTest \
 	loadMovieTestRunner \
 	eventSoundTest1 \
@@ -1499,6 +1500,13 @@ SpriteButtonEventsTest_Runner_DEPENDENCIES = \
 SpriteButtonEventsTest_Runner_CXXFLAGS = \
 	-DTGTDIR='"$(abs_builddir)"' \
 	$(NULL)
+
+loadPNGTest_SOURCES =	\
+	loadPNGTest.c	\
+	$(NULL)
+loadPNGTest_LDADD = libgnashmingutils.la
+loadPNGTest.swf: loadPNGTest
+	./loadPNGTest $(top_srcdir)/testsuite/media
 
 loadMovieTest_SOURCES =	\
 	loadMovieTest.c	\
