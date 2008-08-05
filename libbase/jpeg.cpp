@@ -14,13 +14,11 @@
 #include "GnashException.h"
 
 #include <sstream>
+#include <csetjmp>
 
 extern "C" {
-
-// do we reall want to undefine HAVE_STDLIB_H here ??
 #include <jpeglib.h>
 }
-
 
 namespace jpeg
 {
@@ -630,7 +628,7 @@ input::errorOccurred(const char* msg)
 {
 	gnash::log_debug("Long jump: banzaaaaaai!");
 	_errorOccurred = msg;
-	longjmp(_jmpBuf, 1);
+	std::longjmp(_jmpBuf, 1);
 }
 
 
