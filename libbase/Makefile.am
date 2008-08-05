@@ -124,6 +124,7 @@ noinst_HEADERS = \
 	image.h	\
 	jemtree.h \
 	jpeg.h \
+	GnashImage.h \
 	GnashImagePng.h \
 	gmemory.h \
 	log.h \
