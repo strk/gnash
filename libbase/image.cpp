@@ -9,6 +9,7 @@
 
 #include "utility.h"
 #include "jpeg.h"
+#include "GnashPNG.h"
 #include "IOChannel.h"
 #include "tu_file.h" // some functions take a filename, tu_file is created in that case..
 
@@ -214,7 +215,6 @@ namespace image
 		}
 	}
 
-
 	// Create and read a new image from the stream.
 	//
 	// TODO: return by auto_ptr !
@@ -234,6 +234,22 @@ namespace image
 		return im.release();
 	}
 
+    std::auto_ptr<rgb> readSWFPng(gnash::IOChannel& in)
+    {
+        std::auto_ptr<rgb> im (NULL);
+    
+        std::auto_ptr<png::input> infile(png::input::create(in));
+        
+        if (!infile.get()) return im;
+        
+        im.reset(new image::rgb(infile->getWidth(), infile->getHeight()));
+        
+        for (size_t i = 0, e = infile->getHeight(); i < e; ++i)
+        {
+            infile->readScanline(im->scanline(i));
+        }
+        return im;
+    }
 
 	rgb*	read_swf_jpeg2_with_tables(jpeg::input* j_in)
 	// Create and read a new image, using a input object that

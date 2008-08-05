@@ -253,6 +253,8 @@ namespace image
 	/// For reading SWF JPEG3-style image data, like ordinary JPEG, 
 	/// but stores the data in rgba format.
 	DSOEXPORT std::auto_ptr<rgba> readSWFJpeg3(gnash::IOChannel* in);
+	
+	DSOEXPORT std::auto_ptr<rgb> readSWFPng(gnash::IOChannel& in);
 
 } // namespace image
 } // namespace gnash
