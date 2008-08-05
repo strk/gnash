@@ -107,7 +107,7 @@ public:
         SHARED_OBJ = 0x13,
         INVOKE = 0x14,
 	FLV_DATA = 0x16,	// for AMF 3
-	CONTINUATION = 0x17	// Internal to Gnash
+	CONTINUATION = 0x17	// Internal to Gnash, used for single header byte msgs
     } content_types_e;
 //     typedef enum {
 //         CONNECT = 0x1,
