@@ -212,11 +212,14 @@ public:
 	/// What is the Uri of the namespace?
 	string_table::key getURI() const { return mUri; }
 
+	string_table::key getAbcURI() const {return mAbcURI;}
+	void setAbcURI(string_table::key n){ mAbcURI = n; }
+
 	/// What is the XML prefix?
 	string_table::key getPrefix() const { return mPrefix; }
 
 	/// Create an empty namespace
-	asNamespace() : mParent(NULL), mUri(0), mPrefix(0), mClasses(),
+	asNamespace() : mParent(NULL), mUri(0), mAbcURI(0), mPrefix(0), mClasses(),
 		mRecursePrevent(false), mPrivate(false), mProtected(false)
 	{/**/}
 
@@ -261,6 +264,8 @@ private:
 	asNamespace *mParent;
 	string_table::key mUri;
 	string_table::key mPrefix;
+
+	string_table::key mAbcURI;
 
 	typedef std::map<string_table::key, asClass*> container;
 	container mClasses;

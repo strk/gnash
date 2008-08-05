@@ -176,6 +176,7 @@ noinst_HEADERS = \
 	swf/PlaceObject2Tag.h \
 	swf/RemoveObjectTag.h \
 	swf/DisplayListTag.h \
+	swf/DoABCTag.h \
 	swf/DoActionTag.h \
 	swf/DoInitActionTag.h \
 	swf/SetBackgroundColorTag.h \

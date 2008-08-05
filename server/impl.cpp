@@ -47,6 +47,7 @@
 #include "DefineFontAlignZonesTag.h"
 #include "PlaceObject2Tag.h"
 #include "RemoveObjectTag.h"
+#include "DoABCTag.h"
 #include "DoActionTag.h"
 #include "DoInitActionTag.h"
 #include "SetBackgroundColorTag.h"
@@ -233,7 +234,7 @@ static void ensure_loaders_registered()
     register_tag_loader(SWF::PLACEOBJECT3, PlaceObject2Tag::loader); // 70
     register_tag_loader(SWF::IMPORTASSETS2, import_loader); // 71
 
-    register_tag_loader(SWF::DOABC, abc_loader); // 72 -- AS3 codeblock.
+    register_tag_loader(SWF::DOABC, DoABCTag::doABCLoader); // 72 -- AS3 codeblock.
     register_tag_loader(SWF::DEFINEALIGNZONES, DefineFontAlignZonesTag::loader); // 73
 
     register_tag_loader(SWF::CSMTEXTSETTINGS, fixme_loader); // 74
@@ -241,7 +242,7 @@ static void ensure_loaders_registered()
     register_tag_loader(SWF::SYMBOLCLASS, fixme_loader); // 76 
     register_tag_loader(SWF::METADATA, metadata_loader); // 77
     register_tag_loader(SWF::DEFINESCALINGGRID, fixme_loader); // 78
-    register_tag_loader(SWF::DOABCDEFINE, abc_loader); // 82 -- AS3 codeblock.
+    register_tag_loader(SWF::DOABCDEFINE, DoABCTag::doABCLoader); // 82 -- AS3 codeblock.
     register_tag_loader(SWF::DEFINESHAPE4, define_shape_loader); // 83
     register_tag_loader(SWF::DEFINEMORPHSHAPE2, define_shape_morph_loader); // 84
     register_tag_loader(SWF::DEFINESCENEANDFRAMELABELDATA,define_scene_frame_label_loader); //86

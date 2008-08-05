@@ -49,7 +49,7 @@ string_table::find(const std::string& t_f, bool insert_unfound)
 	table::nth_index<0>::type::iterator i =
 		mTable.get<0>().find(*to_find);
 
-	if (i == mTable.end() && insert_unfound)
+	if (i == mTable.end())
 	{
 		if (insert_unfound)
 		{

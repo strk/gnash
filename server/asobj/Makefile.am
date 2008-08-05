@@ -50,8 +50,12 @@ libgnashasobjs_la_SOURCES = \
 	ContextMenu.cpp	\
 	CustomActions.cpp\
 	Date.cpp \
+	DisplayObject.cpp \
+	DisplayObjectContainer.cpp \
 	Error_as.cpp \
+	EventDispatcher.cpp \
 	Global.cpp \
+	InteractiveObject.cpp \
 	Key.cpp	\
 	LoadVars.cpp \
 	LocalConnection.cpp\
@@ -65,6 +69,7 @@ libgnashasobjs_la_SOURCES = \
 	Selection.cpp \
 	SharedObject.cpp\
 	Sound.cpp \
+	Sprite_as.cpp \
 	Stage.cpp \
 	System.cpp \
 	TextFormat.cpp \
@@ -113,9 +118,13 @@ noinst_HEADERS = \
 	ContextMenu.h \
 	CustomActions.h	\
 	Date.h \
+	DisplayObject.h \
+	DisplayObjectContainer.h \
 	Error_as.h	\
+	EventDispatcher.h \
 	GMath.h	\
 	Global.h\
+	InteractiveObject.h \
 	Key.h \
 	LoadVars.h \
 	LocalConnection.h\
@@ -135,6 +144,7 @@ noinst_HEADERS = \
 	SoundFfmpeg.h \
 	SoundGst.h \
 	SoundMad.h \
+	Sprite_as.h \
 	Stage.h	\
 	System.h \
 	TextFormat.h \

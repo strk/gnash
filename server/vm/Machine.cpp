@@ -108,7 +108,7 @@ static inline asName pool_name(boost::uint32_t index, abc_block* pool)
 	if (!pool)
 		throw ASException();
 	asName multiname = pool->mMultinamePool.at(index);
-	LOG_DEBUG_AVM("Finding property id=%u name=%s flags=0x%X",index,pool->mStringPool[multiname.getABCName()],multiname.mFlags | 0x0);
+	LOG_DEBUG_AVM("Finding property id=%u abc name=%u global name = %u abc string=%s flags=0x%X name_space=%u",index,multiname.getABCName(),multiname.getGlobalName(),pool->mStringPool[multiname.getABCName()],multiname.mFlags | 0x0,multiname.getNamespace()->getURI());
 	return multiname;
 }
 
@@ -285,7 +285,7 @@ log_debug("AVM2: Find property id=%d name=%s flags=0x%X namespace=%s",asName_obj
 
 #define DEBUG_NOT_COMPLETE() log_debug("AVM2: ***Debug statements not complete for opcode.***");
 
-
+#define LOG_AVM_UNIMPLEMENTED() log_debug("AVM2: Opcode not implemented.");
 void
 Machine::execute()
 {
@@ -294,9 +294,10 @@ Machine::execute()
 	for ( ; ; )
 	{
 		std::size_t opStart = mStream->tell();
-
+//		std::size_t opStart = mStreamStack.top(0)->tell();
 	if (1/*mIsAS3*/)
 	{
+//	opcode = mStreamStack.top(0)->read_as3op();
 	opcode = mStream->read_as3op();
 	log_debug("AVM2: Executing opcode: %X",opcode | 0x0);
 //	continue;
@@ -313,7 +314,8 @@ Machine::execute()
 	{
 // This is not actually an opcode -- it occurs when the stream is
 // empty. We may need to return from a function, or we may be done.
-		break;
+//		break;
+		return;
 	}
 /// 0x01 ABC_ACTION_BKPT
 /// Do: Enter the debugger if one has been invoked.
@@ -744,16 +746,14 @@ Machine::execute()
 ///  shallower than the base's depth.
 	case SWF::ABC_ACTION_POPSCOPE:
 	{
-#ifdef PRETEND
-		DEBUG_NOT_COMPLETE();
-#else
-		Scope &s = mScopeStack.pop();
-		mScopeStack.setDownstop(s.mHeightAfterPop);
-		if (mScopeStack.empty())
-			mCurrentScope = NULL;
-		else
-			mCurrentScope = mScopeStack.top(0).mScope;
-#endif
+//		LOG_AVM_UNIMPLEMENTED();
+		pop_scope_stack();
+// 		Scope &s = mScopeStack.pop();
+// 		mScopeStack.setDownstop(s.mHeightAfterPop);
+// 		if (mScopeStack.empty())
+// 			mCurrentScope = NULL;
+// 		else
+// 			mCurrentScope = mScopeStack.top(0).mScope;
 		break;
 	}
 /// 0x1E ABC_ACTION_NEXTNAME
@@ -1210,14 +1210,13 @@ Machine::execute()
 /// Do: Return an undefined object up the callstack.
 	case SWF::ABC_ACTION_RETURNVOID:
 	{
-#ifdef PRETEND
-		log_debug("AVM2: returning void.");
-#else
+		if(!pop_stream_stack()){
+			return;
+		}
 		// Slot the return.
-		*mGlobalReturn = as_value();
+//		*mGlobalReturn = as_value();
 		// And restore the previous state.
-		restoreState();
-#endif
+//		restoreState();
 		break;
 	}
 /// 0x48 ABC_ACTION_RETURNVALUE
@@ -1354,19 +1353,17 @@ Machine::execute()
 /// NB: This depends on scope and scope base (to determine lifetime(?))
 	case SWF::ABC_ACTION_NEWCLASS:
 	{
+		LOG_AVM_UNIMPLEMENTED();
 		boost::uint32_t cid = mStream->read_V32();
 		asClass *c = pool_class(cid, mPoolObject);
-#ifdef PRETEND
-		log_debug("AVM2: Creating new class id=%u name=%s",c->getName(),mPoolObject->mStringPool[c->getName()]);
-		DEBUG_NOT_COMPLETE();
-#else
-		ENSURE_OBJECT(mStack.top(0));
-		as_object *obj = mStack.top(0).to_object().get();
-		as_function *func = c->getConstructor()->getPrototype();
+		LOG_DEBUG_AVM("Creating new class id=%u name=%s",c->getName(),mPoolObject->mStringPool[c->getName()]);
+		push_stream_stack(c->getStaticConstructor()->getBody());
+//		ENSURE_OBJECT(mStack.top(0));
+//		as_object *obj = mStack.top(0).to_object().get();
+//		as_function *func = c->getConstructor()->getPrototype();
 		// func is the constructor, obj is 'this' and also the return
 		// value, no arguments, no change in stack.
-		pushCall(func, obj, mStack.top(0), 0, 0);
-#endif
+//		pushCall(func, obj, mStack.top(0), 0, 0);
 		break;
 	}
 /// 0x59 ABC_ACTION_GETDESCENDANTS
@@ -1455,12 +1452,18 @@ Machine::execute()
 	{
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
 	
-		Property *b = find_property(a);
+		Property *b = find_prop_strict(a);
 
 		if (!b)
 			throw ASException();
+		
+		as_value val;
 
-		mStack.grow(1);
+//		get_property(a.getGlobalName(),a.getNamespace()->getURI());
+//		mStack.pop().to_object()->get_member(a.getGlobalName(),&val);
+//		mStack.push(val);
+		get_property(b);
+//		mStack.grow(1);
 //		pushGet(owner, mStack.top(0), b);
 		break;
 	}
@@ -2593,6 +2596,7 @@ void Machine::initMachine(abc_block* pool_block,as_object* global)
 	}
 	log_debug("Loding code stream.");
 	mStream = method->getBody();
+	mStreamStack.push(mStream);
 	mFrame.push(as_value(global));
 	log_debug("Value type: %s",mFrame.top(0).typeOf());
 }

@@ -26,7 +26,7 @@
 #include "asClass.h"
 #include "swf.h"
 
-#define LOG_DEBUG_AVM(fmt,...) log_debug("AVM2: " fmt, ## __VA_ARGS__);
+#define LOG_DEBUG_AVM(fmt,...) log_action("AVM2: " fmt, ## __VA_ARGS__);
 
 namespace gnash {
 
@@ -245,9 +245,26 @@ private:
 		return mFrame.value(index);
 	}
 
+	void push_stream_stack(CodeStream* stream){
+		LOG_DEBUG_AVM("Pushing new stream to stream stack.");
+		mStream = stream;
+		mStreamStack.push(stream);
+	}
+
+	bool pop_stream_stack(){
+		LOG_DEBUG_AVM("Poping stream off of stream stack.");
+		if(mStreamStack.size() == 1){
+			return false;
+		}
+		mStreamStack.pop();
+		mStream = mStreamStack.top(0);
+		return true;
+	}
+
 	void push_stack(as_value object){
 		LOG_DEBUG_AVM("Pushing value onto stack.");
 		mStack.push(object);
+		LOG_DEBUG_AVM("There are now %u items in the stack",mStack.size());
 	}
 
 	as_value pop_stack(){
@@ -258,23 +275,48 @@ private:
 	void push_scope_stack(as_value object){
 		LOG_DEBUG_AVM("Pushing value onto the scope stack.");
 		mAsValueScopeStack.push(object);
+		LOG_DEBUG_AVM("There are now %u items on the scope stack.",mAsValueScopeStack.size());
+	}
+
+	as_value pop_scope_stack(){
+		LOG_DEBUG_AVM("Poping value off the scope stack.  There will be %u items left.",mAsValueScopeStack.size()-1);
+		return mAsValueScopeStack.pop();
 	}
 	as_value get_scope_stack(boost::uint8_t depth){
 		LOG_DEBUG_AVM("Geting value from scope stack %u from the top.",depth | 0x0);
 		return as_value(mAsValueScopeStack.top(depth));
 	}
-	Property* find_property(asName multiname){
+
+	Property* find_prop_strict(asName multiname){
 		for(int i=0;i<mAsValueScopeStack.size();i++){
+//			LOG_DEBUG_AVM("Looking at object %d",i);
 			Property *p = mAsValueScopeStack.top(i).to_object()->findProperty(multiname.getGlobalName(),multiname.getNamespace()->getURI());
-			for(int j=0;j<1000;j++){
-				log_debug("Index:%d string: %s",j,mAsValueScopeStack.top(i).to_object()->asPropName(j));
-			}		
+ //			for(int j=0;j<multiname.getGlobalName()+1;j++){
+ //				log_debug("Index:%d string: %s",j,mAsValueScopeStack.top(i).to_object()->asPropName(j));
+ //			}
 			if(p){
-				LOG_DEBUG_AVM("Property found.");
+//				LOG_DEBUG_AVM("Property found.");
+				mStack.push(mAsValueScopeStack.top(i));
 				return p;
 			}
 		}
 		throw GnashException("Cannot find property in scope stack");
+	}
+	
+	void get_property(string_table::key name,string_table::key ns){
+		boost::intrusive_ptr<gnash::as_object> object = mStack.pop().to_object();
+		mStack.push(object->getMember(name,ns));
+	}
+	
+	void get_property(Property* p){
+		LOG_DEBUG_AVM("Getting property's value and pushing it onto the stack");
+		//GET PROPERTY
+		boost::intrusive_ptr<gnash::as_object> object = mStack.pop().to_object();
+//		LOG_DEBUG_AVM("Here are the members in the object the property was resolved in:");
+//		object->dump_members();
+		as_value value = p->getValue(*object);
+		LOG_DEBUG_AVM("Property's value is %s",value.toDebugString());
+		mStack.push(value);
 	}
 
 	SafeStack<as_value> mStack;
@@ -283,6 +325,8 @@ private:
 	SafeStack<as_value> mFrame;
 	SafeStack<as_value> mAsValueScopeStack;
 	CodeStream *mStream;
+
+	SafeStack<CodeStream*> mStreamStack;
 
 	ClassHierarchy *mCH;
 	string_table& mST;

@@ -298,6 +298,26 @@ abc_block::check_multiname_namespaceset(boost::uint32_t nsset){
 	}
 }
 
+void
+abc_block::setMultinameNames(asName *n,string_table::key ABCName){
+	
+	n->setABCName(ABCName);
+	std::string name = mStringPool[ABCName];
+	string_table::key global_key = mStringTable->find(name,false);
+	LOG_DEBUG_ABC("Global key %u",global_key);
+	n->setGlobalName(global_key);
+	LOG_DEBUG_ABC("Multiname: %s ABCName set to %u global name set to %u",name,n->getABCName(),n->getGlobalName());
+}
+
+void
+abc_block::setNamespaceURI(asNamespace *ns,string_table::key ABCName){
+	
+	ns->setAbcURI(ABCName);
+	std::string name = mStringPool[ABCName];
+	string_table::key global_key = mStringTable->find(name,false);
+	ns->setURI(global_key);
+}
+
 asClass *
 abc_block::locateClass(asName &m)
 {
@@ -465,7 +485,8 @@ abc_block::read_namespaces()
 		{
 			mNamespacePool[i]->setProtected();
 		}
-		mNamespacePool[i]->setURI(nameIndex);
+//		mNamespacePool[i]->setURI(nameIndex);
+		setNamespaceURI(mNamespacePool[i],nameIndex);
 	}
 	return true;
 }
@@ -507,7 +528,8 @@ abc_block::read_multinames()
 	mMultinamePool.resize(count);
 	if (count)
 	{
-		mMultinamePool[0].setABCName(0);
+//		mMultinamePool[0].setABCName(0);
+		setMultinameNames(&mMultinamePool[0],0);
 		mMultinamePool[0].setNamespace(mCH->getGlobalNs());
 	}
 	for (unsigned int i = 1; i < count; ++i)
@@ -571,7 +593,9 @@ abc_block::read_multinames()
         } // End of switch.
 
 		mMultinamePool[i].mFlags = kind;
-		mMultinamePool[i].setABCName(name);
+//		mMultinamePool[i].setABCName(name);
+		setMultinameNames(&mMultinamePool[i],name);
+		LOG_DEBUG_ABC("Done setting multinames: abc=%u global=%u",mMultinamePool[i].getABCName(),mMultinamePool[i].getGlobalName());
 		mMultinamePool[i].setNamespace(mNamespacePool[ns]);
 
 		if (nsset)
@@ -1160,9 +1184,7 @@ bool
 abc_block::read(SWFStream* in)
 {
 	mS = in;
-	for(int i=0;i<1000;i++){
-	log_debug("String table highest index=%d name=%s",i,mStringTable->value(i));
-	}
+
 	if (!read_version()) return false;
 	if (!read_integer_constants()) return false;
 	if (!read_unsigned_integer_constants()) return false;

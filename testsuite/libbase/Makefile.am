@@ -44,6 +44,7 @@ check_PROGRAMS = \
 	RcTest \
 	IntTypesTest \
 	memtest \
+	string_tableTest \
 	$(NULL)
 
 if CURL
@@ -71,6 +72,9 @@ RcTest_CPPFLAGS = -DSRCDIR="$(srcdir)"
 
 IntTypesTest_SOURCES = IntTypesTest.cpp
 IntTypesTest_CPPFLAGS = -DSRCDIR="$(srcdir)"
+
+string_tableTest_SOURCES = string_tableTest.cpp
+string_tableTest_CPPFLAGS = -DSRCDIR="$(srcdir)"
 
 # Test the Memory class
 memtest_SOURCES = memtest.cpp

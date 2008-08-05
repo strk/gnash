@@ -1621,6 +1621,7 @@ abc_loader(SWFStream* in, tag_type tag, movie_definition* /*m*/)
 		static_cast<void> (in->read_u32());
 		std::string name;
 		in->read_string(name);
+		log_debug("Name is %s",name);
         log_debug("Initializing block...\n");
         a = abc_block();
 		log_debug("Done Initializing block.\n");
@@ -1645,6 +1646,23 @@ abc_loader(SWFStream* in, tag_type tag, movie_definition* /*m*/)
 
 	log_unimpl(_("%s tag parsed but not yet used"), tag == SWF::DOABC ? "DOABC" : "DOABCDEFINE");
 }
+void
+symbol_class_loader(SWFStream* in, tag_type tag, movie_definition* /*m*/){
+
+	assert(tag == SYMBOLCLASS); //76
+
+	log_unimpl(_("%s tag parsed but not yet used"), "SYMBOLCLASS");
+// 	boost::uint16_t num_symbols = in->read_u16();
+// 	log_debug("There are %u symbols.",num_symbols);
+// 	for(unsigned int i = 0;i<num_symbols;i++){
+// 		//Skip the Tag.  I am not sure what this.
+// 		in->skip_bytes(2);
+// 		std::string name;
+// 		in->read_string(name);
+// 		log_debug("Name is %s ",name);
+// 	}
+}
+
 
 void
 define_scene_frame_label_loader(SWFStream* in, tag_type tag, movie_definition* /*m*/)

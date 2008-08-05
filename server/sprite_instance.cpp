@@ -3217,14 +3217,14 @@ sprite_instance::execute_frame_tags(size_t frame, DisplayList& dlist, int typefl
 
     if ( (typeflags&TAG_DLIST) && (typeflags&TAG_ACTION) )
     {
-        for(; it != e; it++)
+		for(; it != e; it++)
         {
-            (*it)->execute(this, dlist);
+	         (*it)->execute(this, dlist);
         }
     }
     else if ( typeflags & TAG_DLIST )
     {
-        for(; it != e; it++)
+		for(; it != e; it++)
         {
             (*it)->execute_state(this, dlist);
         }

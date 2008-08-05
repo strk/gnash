@@ -192,6 +192,10 @@ private:
 
 	void check_multiname_namespaceset(boost::uint32_t nsset);
 
+	void setMultinameNames(asName *n,string_table::key ABCName);
+
+	void setNamespaceURI(asNamespace *ns,string_table::key ABCName);
+
 };
 
 } /* namespace gnash */
