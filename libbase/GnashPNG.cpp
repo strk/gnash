@@ -20,9 +20,6 @@ extern "C" {
 #include <sstream>
 #include <csetjmp>
 
-static void pngError(png_struct*, const char*) {}
-static void pngWarning(png_struct*, const char*) {}
-
 
 namespace gnash {
 namespace png {
@@ -76,8 +73,12 @@ namespace IOChannel_wrappers
    		// State needed for input.
         png_structp _pngPtr;
         png_infop _infoPtr;
-        png_infop _endInfo;
+       
+        // A reference to the stream containing the PNG data.
         IOChannel& _inStream;
+        
+        // A counter for keeping track of the last row copied.
+        size_t _currentRow;
 
 	public:
 
@@ -88,11 +89,19 @@ namespace IOChannel_wrappers
 		input_IOChannel(gnash::IOChannel& in) :
 		    _pngPtr(0),
 		    _infoPtr(0),
-		    _endInfo(0),
-		    _inStream(in)
+		    _inStream(in),
+		    _currentRow(0)
 		{
 		    init();
     	}
+
+        static void error(png_struct*, const char* err)
+        {
+        }
+        
+        static void warning(png_struct*, const char* warning)
+        {
+        }
 
         // Read function using a gnash::IOChannel
         static void readData(png_structp pngptr,
@@ -108,7 +117,7 @@ namespace IOChannel_wrappers
         {
             // Initialize png library.
             _pngPtr = png_create_read_struct(PNG_LIBPNG_VER_STRING,
-                                                NULL, &pngError, &pngWarning);
+                                                NULL, &error, &warning);
             if (!_pngPtr) return;
 
             _infoPtr = png_create_info_struct(_pngPtr);
@@ -117,15 +126,6 @@ namespace IOChannel_wrappers
                 png_destroy_read_struct(&_pngPtr, (png_infopp)NULL, (png_infopp)NULL);
                 return;
             }
-
-            _endInfo = png_create_info_struct(_pngPtr);
-            if (!_endInfo)
-            {
-                png_destroy_read_struct(&_pngPtr, &_infoPtr,
-                  (png_infopp)NULL);
-                return;
-            }
-
         }
 
         void read()
@@ -135,12 +135,13 @@ namespace IOChannel_wrappers
             
             // read
             // TODO: sort out transform options.
-            png_read_png(_pngPtr, _infoPtr, PNG_TRANSFORM_STRIP_ALPHA, NULL);            
+            png_read_png(_pngPtr, _infoPtr, PNG_TRANSFORM_STRIP_ALPHA, NULL);
         }
 
-		// Destructor.  Clean up our png reader state.
+		// Destructor. Free libpng-allocated memory.
 		~input_IOChannel()
 		{
+            png_destroy_read_struct(&_pngPtr, &_infoPtr, (png_infopp)NULL);
 		}
 
 		// Return the height of the image.
@@ -166,21 +167,18 @@ namespace IOChannel_wrappers
             return 3;
 		}
 
-
 		// Read a scanline's worth of image data into the
 		// given buffer.  The amount of data read is
 		// get_width() * get_components().
 		//
 		void readScanline(unsigned char* rgb_data)
 		{
-		    log_debug("Height: %d", getHeight());
-		    static size_t c = 0;
+            assert (_currentRow < getHeight());
 		    png_bytepp row_pointers = png_get_rows(_pngPtr, _infoPtr);
-		    log_debug("Row pointer: %d, %p, %d", c, (void*)row_pointers[c], *row_pointers[c]);
-		    std::memcpy (rgb_data, row_pointers[c], getWidth() * getComponents());
-		    c++;
+		    std::memcpy(rgb_data, row_pointers[_currentRow], getWidth() * getComponents());
+            ++_currentRow;
 		}
-    }; // class
+    };
 
 } // namespace IOChannel_wrappers
 

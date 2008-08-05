@@ -30,8 +30,6 @@ namespace gnash { class IOChannel; }
 namespace gnash {
 namespace png  {
 
-
-	/// Wrapper around jpeg_decompress_struct.
 	class input {
 
 	public:
