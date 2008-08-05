@@ -273,7 +273,7 @@ main(int argc, char *argv[])
 	if (!query.empty()) {
 	    tcUrl += "/" + query;
 	} else {
-	    tcUrl += path;
+	    tcUrl += "/" + path;
 	}
     }
     
