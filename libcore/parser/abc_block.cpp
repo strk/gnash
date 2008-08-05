@@ -274,7 +274,6 @@ abc_Trait::read(SWFStream* in, abc_block *pBlock)
 
 using namespace abc_parsing;
 
-<<<<<<< TREE
 void
 abc_block::check_multiname_name(boost::uint32_t name){
 

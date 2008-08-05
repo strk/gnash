@@ -1678,13 +1678,6 @@ define_scene_frame_label_loader(SWFStream* in, tag_type tag, movie_definition* /
     log_unimpl(_("%s tag parsed but not yet used"), "DEFINESCENEANDFRAMELABELDATA");
 }
 
-void
-define_scene_frame_label_loader(SWFStream* /*in*/, tag_type tag, movie_definition* /*m*/)
-{
-    assert(tag == SWF::DEFINESCENEANDFRAMELABELDATA); //86
-
-    log_unimpl(_("%s tag parsed but not yet used"), "DEFINESCENEANDFRAMELABELDATA");
-}
 
 } // namespace gnash::SWF::tag_loaders
 } // namespace gnash::SWF

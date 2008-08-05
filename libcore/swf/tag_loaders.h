@@ -173,4 +173,3 @@ symbol_class_loader(SWFStream* in, tag_type tag, movie_definition* /*m*/);
 // mode: C++
 // indent-tabs-mode: t
 // End:
-s
