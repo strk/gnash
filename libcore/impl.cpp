@@ -294,7 +294,7 @@ createPNGMovie(std::auto_ptr<IOChannel> in, const std::string& url)
     }
     catch (ParserException& e)
     {
-        log_error(_("Error parsing PNG data"));
+        log_error(_("Parsing error: %s"), e.what());
         return NULL;
     }
 
