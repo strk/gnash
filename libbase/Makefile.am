@@ -68,6 +68,7 @@ libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\" \
 
 libgnashbase_la_LIBADD = \
 	$(JPEG_LIBS) \
+	$(PNG_LIBS) \
 	$(Z_LIBS) \
 	$(CURL_LIBS) \
 	$(OPENGL_LIBS) \
@@ -92,6 +93,7 @@ libgnashbase_la_SOURCES = \
 	image.cpp \
 	$(MALLOC) \
 	jpeg.cpp \
+	GnashPNG.cpp \
 	log.cpp	\
 	memory.cpp \
 	rc.cpp \
@@ -122,6 +124,7 @@ noinst_HEADERS = \
 	image.h	\
 	jemtree.h \
 	jpeg.h \
+	GnashPNG.h \
 	gmemory.h \
 	log.h \
 	ogl.h \
