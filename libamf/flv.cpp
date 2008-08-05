@@ -33,6 +33,8 @@
 #include "utility.h"
 #include "flv.h"
 
+//#include <boost/detail/endian.hpp>
+
 #include <boost/cstdint.hpp> // for boost::?int??_t
 
 using namespace std;
@@ -92,11 +94,72 @@ Flv::decodeHeader(amf::Buffer *buf)
     return &_header;
 }
 
-// Decode the tag header
+// Decode a MetaData object, which is after the header, but before all the tags
 amf::Element *
-Flv::decodeTagHeader(flv_tag_t *tag)
+Flv::decodeMetaData(amf::Buffer *buf)
 {
 //    GNASH_REPORT_FUNCTION;
+    AMF amf;
+    Network::byte_t *ptr = buf->reference();
+    Network::byte_t *tooFar = ptr+buf->size();
+
+    // Extract the onMetaData object name
+    Element *name = amf.extractAMF(ptr, tooFar);
+    if (name == 0) {
+        log_error("Failed to get the onMetaData string");
+        return 0;
+    }
+    ptr += name->getLength() + AMF_HEADER_SIZE;
+    
+    // Extract the properties for this metadata object.
+    Element *el = amf.extractAMF(ptr, tooFar);
+    ptr += amf.totalsize();
+
+    if (name) {
+        el->setName(name->to_string());
+    }
+
+    return el;
+}
+
+Flv::flv_audio_t *
+Flv::decodeAudioData(amf::Buffer *buf)
+{
+//    GNASH_REPORT_FUNCTION;
+}
+
+Flv::flv_video_t *
+Flv::decodeVideoData(amf::Buffer *buf)
+{
+//    GNASH_REPORT_FUNCTION;
+}
+
+// Convert a 24 bit integer to a 32 bit one so we can use it.
+boost::uint32_t
+Flv::convert24(boost::uint8_t *num)
+{
+//    GNASH_REPORT_FUNCTION;
+    boost::uint32_t bodysize = 0;
+    // FIXME: I bet thi sis endian dependant
+    memcpy((char *)(&bodysize) + 1, num, 3);
+//                swapBytes(&bodysize, 3);
+    bodysize = ntohl(bodysize);
+}
+
+// Decode the tag header
+Flv::flv_tag_t *
+Flv::decodeTagHeader(amf::Buffer *buf)
+{
+//    GNASH_REPORT_FUNCTION;
+    flv_tag_t *tag = new flv_tag_t;
+    memcpy(tag, buf->reference(), sizeof(flv_tag_t));
+
+    // These fields are all 24 bit, big endian integers
+    swapBytes(tag->bodysize, 3);
+    swapBytes(tag->timestamp, 3);
+    swapBytes(tag->streamid, 3);
+
+    return tag;
 }
 
 amf::Element *

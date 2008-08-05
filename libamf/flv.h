@@ -93,6 +93,16 @@ class DSOEXPORT Flv {
         INTERFRAME = 0x2,
         DISPOSABLE = 0x3
     } flv_video_frame_type_e;
+    typedef struct {
+        flv_sound_type_e   type;
+        flv_sound_size_e   size;
+        flv_sound_rate_e   rate;
+        flv_sound_format_e format;
+    } flv_audio_t;
+    typedef struct {
+        flv_video_codec_e codecID;
+        flv_video_frame_type_e type;
+    } flv_video_t;
     // Data structures used for the headers. These are binary compatible
     typedef struct {
         boost::uint8_t  sig[3];      // always "FLV"
@@ -115,11 +125,19 @@ class DSOEXPORT Flv {
     // Decode a Buffer into a header
     flv_header_t *decodeHeader(amf::Buffer *buf);
 
+    // Decode a MetaData object, which is after the header, but before all the tags
+    amf::Element *decodeMetaData(amf::Buffer *buf);
+    flv_audio_t *decodeAudioData(amf::Buffer *buf);
+    flv_video_t *decodeVideoData(amf::Buffer *buf);
+    
     // Decode the tag header
-    Element *decodeTagHeader(flv_tag_t *tag);
+    flv_tag_t *decodeTagHeader(amf::Buffer *buf);
     
     amf::Element *findProperty(const std::string &name);
     void setProperties(std::vector<amf::Element *> x) { _properties = x; };
+
+    // Convert a 24 bit integer to a 32 bit one so we can use it.
+    boost::uint32_t convert24(boost::uint8_t *);
     
     void dump();
   private:

@@ -52,8 +52,7 @@ static void usage (void);
 static void test_headers();
 static void test_tags();
 
-// Enable the display of memory allocation and timing data
-static bool memdebug = false;
+static bool notest = false;
 
 // We use the Memory profiling class to check the malloc buffers
 // in the kernel to make sure the allocations and frees happen
@@ -118,13 +117,6 @@ main(int argc, char *argv[])
         {
             { 'h', "help",          Arg_parser::no  },
             { 'v', "verbose",       Arg_parser::no  },
-            { 'w', "write",         Arg_parser::no  },
-// Unless you have support for memory debugging turned on, and
-// you have support for the Linux mallinfo() system call,
-// this option is totally useless. This doesn't really matter
-// as the memory testing is primarily used only during
-// debugging or development.
-            { 'm', "memstats",      Arg_parser::no  },
             { 'd', "dump",          Arg_parser::no  },
         };
     
@@ -145,11 +137,6 @@ main(int argc, char *argv[])
                     dbglogfile.setVerbosity();
                     // This happens once per 'v' flag 
                     log_debug(_("Verbose output turned on"));
-                    break;
-              case 'm':
-                    // This happens once per 'v' flag 
-                    log_debug(_("Enabling memory statistics"));
-                    memdebug = true;
                     break;
               case 'w':
                   rcfile.useWriteLog(true); // dbglogfile.setWriteDisk(true);
@@ -190,7 +177,7 @@ test_headers()
 //  00 0c 63 72 65 61 74 69 6f 6e 64 61 74 65	creationdate
 //     02 00 18 54 75 65 20 4a 75 6e 20 32 34 20 30 38 3a 30 33 3a 34 38 20 32 30 30 38
 //  00 00 09					Tue Jun 24 08:03:48 2008
-    Buffer *hex1 = hex2mem("46 4c 56 01 0d 00 00 00 09 00 00 00 00 12 00 00 a4 00 00 00 00 00 00 00 02 00 0a 6f 6e 4d 65 74 61 44 61 74 61 08 00 00 00 00 00 08 64 75 72 61 74 69 6f 6e 00 40 6d 6e 24 dd 2f 1a a0 00 0c 76 69 64 65 6f 63 6f 64 65 63 69 64 00 40 00 00 00 00 00 00 00 00 0c 61 75 64 69 6f 63 6f 64 65 63 69 64 00 40 00 00 00 00 00 00 00 00 0c 63 61 6e 53 65 65 6b 54 6f 45 6e 64 01 00 00 09 63 72 65 61 74 65 64 62 79 02 00 07 46 4d 53 20 33 2e 30 00 0c 63 72 65 61 74 69 6f 6e 64 61 74 65 02 00 18 54 75 65 20 4a 75 6e 20 32 34 20 30 38 3a 30 33 3a 34 38 20 32 30 30 38 00 00 09");
+    Buffer *hex1 = hex2mem("46 4c 56 01 0d 00 00 00 09 00 00 00 00");
     Flv::flv_header_t *head = flv.decodeHeader(hex1);
     if ((memcmp(head->sig, "FLV", 0) == 0)
         && (head->version == 1)
@@ -211,6 +198,36 @@ test_headers()
     } else {
         runtest.fail("Encoded FLV header");
     }
+
+    Buffer *hex2 = hex2mem("12 00 00 a4 00 00 00 00 00 00 00");
+    Flv::flv_tag_t *tag2 = flv.decodeTagHeader(hex2);
+    if ((tag2->type == Flv::TAG_METADATA)
+        && (flv.convert24(tag2->bodysize) == 164)) {
+        runtest.pass("Decoded FLV MetaData object");
+    } else {
+        runtest.fail("Decoded FLV MetaData object");
+    }
+    delete tag2;
+    delete hex2;
+    
+    Buffer *hex3 = hex2mem("02 00 0a 6f 6e 4d 65 74 61 44 61 74 61 08 00 00 00 00 00 08 64 75 72 61 74 69 6f 6e 00 40 6d 6e 24 dd 2f 1a a0 00 0c 76 69 64 65 6f 63 6f 64 65 63 69 64 00 40 00 00 00 00 00 00 00 00 0c 61 75 64 69 6f 63 6f 64 65 63 69 64 00 40 00 00 00 00 00 00 00 00 0c 63 61 6e 53 65 65 6b 54 6f 45 6e 64 01 00 00 09 63 72 65 61 74 65 64 62 79 02 00 07 46 4d 53 20 33 2e 30 00 0c 63 72 65 61 74 69 6f 6e 64 61 74 65 02 00 18 54 75 65 20 4a 75 6e 20 32 34 20 30 38 3a 30 33 3a 34 38 20 32 30 30 38 00 00 09");
+    Element *el3 = flv.decodeMetaData(hex3);
+    if (el3 == 0) {
+        notest = true;
+    } 
+    if (notest) {
+        runtest.untested("Decoded FLV MetaData object");
+    } else {
+        el3->dump();
+        if ((el3->getType() ==Element::ECMA_ARRAY_AMF0)
+            && (el3->propertySize() == 6)) {
+            runtest.pass("Decoded FLV MetaData object");
+        } else {
+            runtest.fail("Decoded FLV MetaData object");
+        }
+        delete hex3;
+        delete el3;
+    }
 }
 
 void
@@ -226,7 +243,6 @@ usage (void)
          << _("Usage: test_amf [options...]") << endl
          << _("  -h,  --help          Print this help and exit") << endl
          << _("  -v,  --verbose       Output verbose debug info") << endl
-         << _("  -m,  --memdebug      Output memory statistics") << endl
          << endl;
 }
 
