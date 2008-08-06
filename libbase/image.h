@@ -9,6 +9,7 @@
 #define GNASH_IMAGE_H
 
 #include "dsodefs.h"
+#include "gnash.h" // for image file types
 #include <boost/cstdint.hpp>
 
 #include <boost/scoped_array.hpp>
@@ -254,7 +255,7 @@ namespace image
 	/// but stores the data in rgba format.
 	DSOEXPORT std::auto_ptr<rgba> readSWFJpeg3(gnash::IOChannel* in);
 	
-	DSOEXPORT std::auto_ptr<rgb> readSWFPng(gnash::IOChannel& in);
+	DSOEXPORT std::auto_ptr<rgb> readImageData(gnash::IOChannel& in, FileType type);
 
 } // namespace image
 } // namespace gnash

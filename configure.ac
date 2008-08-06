@@ -1493,6 +1493,7 @@ AC_SUBST(WINDRES)
 GNASH_PKG_FIND(z, [zlib.h], [zlib compression library], compress)
 GNASH_PKG_FIND(jpeg, [jpeglib.h], [jpeg images], jpeg_mem_init)
 GNASH_PKG_FIND(png, [png.h], [png images], png_info_init)
+GNASH_PKG_FIND(gif, [gif_lib.h], [gif images], DGifOpen)
 GNASH_PKG_INCLUDES([dejagnu], [dejagnu.h])
 
 dnl Find freetype and fontconfig
@@ -2352,6 +2353,20 @@ else
   echo "               Install it from http://ijg.org" >&3
   echo "               or .deb users: apt-get install libjpeg-dev" >&3
   echo "               or .rpm users: yum install libjpeg-devel" >&3
+fi
+
+if test x"${GIF_LIBS}" != x ; then
+  if test x"${GIF_CFLAGS}" != x ; then
+    echo "        GIF flags are: $GIF_CFLAGS"
+  else
+    echo "        GIF flags are: default include path"
+  fi
+  echo "        GIF libs are: $GIF_LIBS"
+else
+  echo "        ERROR: No GIF library development package installed!" >&3
+  echo "               Install it from http://sourceforge.net/projects/giflib/" >&3
+  echo "               or .deb users: apt-get install libungif-dev" >&3
+  echo "               or .rpm users: yum install libungif-devel" >&3
 fi
 
 if test x"${PNG_LIBS}" != x ; then
