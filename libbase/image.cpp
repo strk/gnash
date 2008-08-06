@@ -259,7 +259,7 @@ namespace image
 	{
 		assert(j_in);
 
-		j_in->start_image();
+		j_in->startImage();
 
 		std::auto_ptr<rgb> im(new image::rgb(j_in->getWidth(), j_in->getHeight()));
 
@@ -267,7 +267,7 @@ namespace image
 			j_in->readScanline(im->scanline(y));
 		}
 
-		j_in->finish_image();
+		j_in->finishImage();
 
 		return im.release();
 	}
@@ -284,7 +284,7 @@ namespace image
 		std::auto_ptr<JpegImageInput> j_in ( JpegImageInput::create_swf_jpeg2_header_only(in, 0) );
 		if ( ! j_in.get() ) return im;
 		
-		j_in->start_image();
+		j_in->startImage();
 
 		im.reset(new image::rgba(j_in->getWidth(), j_in->getHeight()));
 
@@ -304,7 +304,7 @@ namespace image
 			}
 		}
 
-		j_in->finish_image();
+		j_in->finishImage();
 
 		return im;
 	}

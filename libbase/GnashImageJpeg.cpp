@@ -175,7 +175,7 @@ public:
 	}
 
 
-	void	discard_partial_buffer()
+	void	discardPartialBuffer()
 	{
 		// Discard existing bytes in our buffer.
 		m_pub.bytes_in_buffer = 0;
@@ -243,7 +243,7 @@ JpegImageInput::JpegImageInput(boost::shared_ptr<IOChannel> in)
 
 JpegImageInput::~JpegImageInput()
 {
-	finish_image();
+	finishImage();
 
 	rw_source_IOChannel* src = (rw_source_IOChannel*) m_cinfo.src;
 	delete src;
@@ -254,14 +254,14 @@ JpegImageInput::~JpegImageInput()
 
 
 void
-JpegImageInput::discard_partial_buffer()
+JpegImageInput::discardPartialBuffer()
 {
 	rw_source_IOChannel* src = (rw_source_IOChannel*) m_cinfo.src;
 
 	// We only have to discard the input buffer after reading the tables.
 	if (src)
 	{
-		src->discard_partial_buffer();
+		src->discardPartialBuffer();
 	}
 }
 
@@ -313,7 +313,7 @@ JpegImageInput::readHeader(unsigned int maxHeaderBytes)
 
 
 void
-JpegImageInput::start_image()
+JpegImageInput::startImage()
 {
 	assert(_compressorOpened == false);
 
@@ -369,7 +369,7 @@ JpegImageInput::start_image()
 
 
 void
-JpegImageInput::finish_image()
+JpegImageInput::finishImage()
 {
 	if (_compressorOpened)
 	{

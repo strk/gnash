@@ -66,9 +66,6 @@ private:
 
 public:
 
-	enum SWF_DEFINE_BITS_JPEG2 { SWF_JPEG2 };
-	enum SWF_DEFINE_BITS_JPEG2_HEADER_ONLY { SWF_JPEG2_HEADER_ONLY };
-
 	/// \brief
 	/// Constructor.  
 	//
@@ -84,13 +81,13 @@ public:
 
     void read()
     {
-        start_image();
+        startImage();
     }
 
 	// Discard any data sitting in our input buffer.  Use
 	// this before/after reading headers or partial image
 	// data, to avoid screwing up future reads.
-	void discard_partial_buffer();
+	void discardPartialBuffer();
 
 	// This is something you can do with "abbreviated"
 	// streams; i.e. if you constructed this inputter
@@ -98,9 +95,9 @@ public:
 	// tables, or if you called finish_image() and want to
 	// load another image using the existing tables.
 	// 
-	void start_image();
+	void startImage();
 
-	void finish_image();
+	void finishImage();
 
 	// Return the height of the image.  Take the data from our m_cinfo struct.
 	size_t getHeight() const;
