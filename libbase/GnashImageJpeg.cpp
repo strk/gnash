@@ -33,9 +33,12 @@
 #include <sstream>
 #include <csetjmp>
 
-extern "C" {
-#include <jpeglib.h>
-}
+
+// jpeglib.h is included in the namespace jpeg because otherwise it
+// causes horrible conflicts with qt includes. How do C coders sustain
+// the will to live?
+using namespace jpeg;
+
 
 namespace gnash
 {

@@ -29,11 +29,16 @@
 #include <csetjmp> // for jmp_buf
 #include "GnashImage.h"
 
+
+namespace jpeg {
+
 extern "C" {
 // jpeglib.h redefines HAVE_STDLIB_H. This silences
 // the warnings, but it's not good.
 #include <jpeglib.h>
 #undef HAVE_STDLIB_H
+}
+
 }
 
 // Forward declarations
@@ -57,8 +62,8 @@ private:
 	jmp_buf _jmpBuf;
 
 	// State needed for input.
-	jpeg_decompress_struct m_cinfo;
-	jpeg_error_mgr m_jerr;
+	jpeg::jpeg_decompress_struct m_cinfo;
+	jpeg::jpeg_error_mgr m_jerr;
 
 	bool _compressorOpened;
 	
@@ -124,7 +129,7 @@ public:
         return ret;
     }
 
-    static std::auto_ptr<JpegImageInput> create_swf_jpeg2_header_only(boost::shared_ptr<IOChannel> in, unsigned int maxHeaderBytes)
+    static std::auto_ptr<JpegImageInput> createSWFJpeg2HeaderOnly(boost::shared_ptr<IOChannel> in, unsigned int maxHeaderBytes)
     {
         std::auto_ptr<JpegImageInput> ret ( new JpegImageInput(in) );
         if ( ret.get() ) ret->readHeader(maxHeaderBytes); // might throw an exception

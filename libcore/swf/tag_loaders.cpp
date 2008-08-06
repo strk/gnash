@@ -54,6 +54,7 @@
 #include "sound_definition.h"
 #include "abc_block.h"
 #include "SoundInfo.h"
+#include "gnash.h" // FileType enum
 
 #ifdef HAVE_ZLIB_H
 #include <zlib.h>
@@ -249,7 +250,7 @@ jpeg_tables_loader(SWFStream* in, tag_type tag, movie_definition* m)
 	//
         boost::shared_ptr<tu_file> ad( StreamAdapter::getFile(*in, std::numeric_limits<unsigned long>::max()) );
         //  transfer ownership to the JpegImageInput
-        j_in = JpegImageInput::create_swf_jpeg2_header_only(ad, jpegHeaderSize);
+        j_in = JpegImageInput::createSWFJpeg2HeaderOnly(ad, jpegHeaderSize);
 
     }
     catch (std::exception& e)
@@ -295,7 +296,7 @@ define_bits_jpeg_loader(SWFStream* in, tag_type tag, movie_definition* m)
     std::auto_ptr<image::rgb> im;
     try
     {
-        im.reset ( image::read_swf_jpeg2_with_tables(j_in) );
+        im.reset ( image::readSWFJpeg2WithTables(j_in) );
     }
     catch (std::exception& e)
     {
@@ -340,7 +341,7 @@ define_bits_jpeg2_loader(SWFStream* in, tag_type tag, movie_definition* m)
     //
 
     boost::shared_ptr<tu_file> ad( StreamAdapter::getFile(*in, in->get_tag_end_position()) );
-    std::auto_ptr<image::rgb> im ( image::read_jpeg(ad) );
+    std::auto_ptr<image::rgb> im (image::readImageData(ad, GNASH_FILETYPE_JPEG));
 
     if ( m->get_bitmap_character_def(character_id) )
     {

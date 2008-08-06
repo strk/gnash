@@ -231,23 +231,10 @@ namespace image
 	/// Write the given image to the given out stream, in jpeg format.
 	DSOEXPORT void	write_jpeg(boost::shared_ptr<gnash::IOChannel> out, rgb* image, int quality);
 
-	/// Create and read a new image from the stream.
-	//
-	/// @param in
-	/// 	Stream to read from. Ownership to the caller,
-	///	not needed after return.
-	///
-	DSOEXPORT rgb* read_jpeg(boost::shared_ptr<gnash::IOChannel> in);
-
-	/// \brief
-	/// For reading SWF JPEG2-style image data (slight variation on
-	/// ordinary JPEG).
-	DSOEXPORT rgb* read_swf_jpeg2(boost::shared_ptr<gnash::IOChannel> in);
-
 	/// \brief
 	/// For reading SWF JPEG2-style image data, using pre-loaded
 	/// headers stored in the given jpeg::input object.
-	DSOEXPORT rgb* read_swf_jpeg2_with_tables(JpegImageInput* loader);
+	DSOEXPORT rgb* readSWFJpeg2WithTables(JpegImageInput* loader);
 
 	/// \brief
 	/// For reading SWF JPEG3-style image data, like ordinary JPEG, 

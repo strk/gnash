@@ -201,25 +201,6 @@ namespace image
 
 	}
 
-	// Create and read a new image from the stream.
-	//
-	// TODO: return by auto_ptr !
-	//
-	rgb*	read_jpeg(boost::shared_ptr<gnash::IOChannel> in)
-	{
-		std::auto_ptr<ImageInput> j_in (JpegImageInput::create(in));
-		if (!j_in.get()) return 0;
-		
-		std::auto_ptr<rgb> im ( new image::rgb(j_in->getWidth(), j_in->getHeight()) );
-
-		for (size_t y = 0; y < j_in->getHeight(); y++)
-		{
-			j_in->readScanline(im->scanline(y));
-		}
-
-		return im.release();
-	}
-
     // See gnash.h for file types.
     std::auto_ptr<rgb> readImageData(boost::shared_ptr<IOChannel> in, FileType type)
     {
@@ -252,7 +233,7 @@ namespace image
         return im;
     }
 
-	rgb*	read_swf_jpeg2_with_tables(JpegImageInput* j_in)
+	rgb* readSWFJpeg2WithTables(JpegImageInput* j_in)
 	// Create and read a new image, using a input object that
 	// already has tables loaded.  The IJG documentation describes
 	// this as "abbreviated" format.
@@ -281,7 +262,7 @@ namespace image
 	    std::auto_ptr<rgba> im(NULL);
 
         // Calling with headerBytes as 0 has a special effect...
-		std::auto_ptr<JpegImageInput> j_in ( JpegImageInput::create_swf_jpeg2_header_only(in, 0) );
+		std::auto_ptr<JpegImageInput> j_in ( JpegImageInput::createSWFJpeg2HeaderOnly(in, 0) );
 		if ( ! j_in.get() ) return im;
 		
 		j_in->startImage();
