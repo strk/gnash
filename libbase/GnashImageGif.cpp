@@ -43,9 +43,9 @@ readData(GifFileType* ft, GifByteType* data, int length)
 }
 
 
-GifImageInput::GifImageInput(gnash::IOChannel& in) :
+GifImageInput::GifImageInput(boost::shared_ptr<IOChannel> in) :
+    ImageInput(in),
     _gif(NULL),
-    _inStream(in),
     _currentRow(0)
 {
 }
@@ -97,7 +97,7 @@ GifImageInput::readScanline(unsigned char* rgbData)
 void
 GifImageInput::read()
 {
-    _gif = DGifOpen(&_inStream, &readData); 
+    _gif = DGifOpen(_inStream.get(), &readData); 
 
     GifRecordType record;
 

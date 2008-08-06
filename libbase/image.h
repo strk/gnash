@@ -14,11 +14,13 @@
 
 #include <boost/scoped_array.hpp>
 #include <memory> // for auto_ptr
+#include <boost/shared_ptr.hpp>
 
 // Forward declarations
-namespace jpeg { class input; }
-namespace gnash { class IOChannel; }
-
+namespace gnash {
+    class IOChannel;
+    class JpegImageInput;
+}
 
 /// Handy image utilities for RGB surfaces.
 namespace gnash
@@ -227,10 +229,7 @@ namespace image
 	};
 
 	/// Write the given image to the given out stream, in jpeg format.
-	DSOEXPORT void	write_jpeg(gnash::IOChannel* out, rgb* image, int quality);
-
-	/// Create and read a new image from the given filename, if possible.
-	DSOEXPORT rgb*	read_jpeg(const char* filename);
+	DSOEXPORT void	write_jpeg(boost::shared_ptr<gnash::IOChannel> out, rgb* image, int quality);
 
 	/// Create and read a new image from the stream.
 	//
@@ -238,24 +237,24 @@ namespace image
 	/// 	Stream to read from. Ownership to the caller,
 	///	not needed after return.
 	///
-	DSOEXPORT rgb*	read_jpeg(gnash::IOChannel* in);
+	DSOEXPORT rgb* read_jpeg(boost::shared_ptr<gnash::IOChannel> in);
 
 	/// \brief
 	/// For reading SWF JPEG2-style image data (slight variation on
 	/// ordinary JPEG).
-	DSOEXPORT rgb*	read_swf_jpeg2(gnash::IOChannel* in);
+	DSOEXPORT rgb* read_swf_jpeg2(boost::shared_ptr<gnash::IOChannel> in);
 
 	/// \brief
 	/// For reading SWF JPEG2-style image data, using pre-loaded
 	/// headers stored in the given jpeg::input object.
-	DSOEXPORT rgb*	read_swf_jpeg2_with_tables(jpeg::input* loader);
+	DSOEXPORT rgb* read_swf_jpeg2_with_tables(JpegImageInput* loader);
 
 	/// \brief
 	/// For reading SWF JPEG3-style image data, like ordinary JPEG, 
 	/// but stores the data in rgba format.
-	DSOEXPORT std::auto_ptr<rgba> readSWFJpeg3(gnash::IOChannel* in);
+	DSOEXPORT std::auto_ptr<rgba> readSWFJpeg3(boost::shared_ptr<gnash::IOChannel> in);
 	
-	DSOEXPORT std::auto_ptr<rgb> readImageData(gnash::IOChannel& in, FileType type);
+	DSOEXPORT std::auto_ptr<rgb> readImageData(boost::shared_ptr<gnash::IOChannel> in, FileType type);
 
 } // namespace image
 } // namespace gnash

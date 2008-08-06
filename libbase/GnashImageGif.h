@@ -25,6 +25,7 @@
 #include "dsodefs.h"
 #include "GnashImage.h"
 #include <boost/scoped_array.hpp>
+#include <boost/shared_ptr.hpp>
 
 extern "C" {
 #include <gif_lib.h>
@@ -46,9 +47,6 @@ class GifImageInput : public ImageInput
 private:
 	// State needed for input.
 	GifFileType* _gif;
-  
-    // A reference to the stream containing the PNG data.
-    IOChannel& _inStream;
     
     // A counter for keeping track of the last row copied.
     size_t _currentRow;
@@ -62,7 +60,7 @@ public:
 	//
 	/// @param in
 	/// 	The stream to read from.
-	GifImageInput(gnash::IOChannel& in);
+	GifImageInput(boost::shared_ptr<IOChannel> in);
 	
 	// Destructor. Free libpng-allocated memory.
 	~GifImageInput();
@@ -90,7 +88,7 @@ public:
 	void readScanline(unsigned char* rgb_data);
 
 
-    DSOEXPORT static std::auto_ptr<ImageInput> create(gnash::IOChannel& in)
+    DSOEXPORT static std::auto_ptr<ImageInput> create(boost::shared_ptr<IOChannel> in)
     {
         std::auto_ptr<ImageInput> ret ( new GifImageInput(in) );
         if ( ret.get() ) ret->read();

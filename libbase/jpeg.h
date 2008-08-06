@@ -11,6 +11,14 @@
 
 #include "dsodefs.h"
 #include <csetjmp> // for jmp_buf
+#include "GnashImage.h"
+
+extern "C" {
+// jpeglib.h redefines HAVE_STDLIB_H. This silences
+// the warnings, but it's not good.
+#include <jpeglib.h>
+#undef HAVE_STDLIB_H
+}
 
 // Forward declarations
 namespace gnash { class IOChannel; }
@@ -20,108 +28,119 @@ namespace gnash { class IOChannel; }
 /// The actual work is done by the
 /// IJG jpeg lib.
 ///
-namespace jpeg
+namespace gnash
 {
-	/// Wrapper around jpeg_decompress_struct.
-	class input {
+/// Bascially this is a thin wrapper around jpeg_decompress object.
+class JpegImageInput : public gnash::ImageInput
+{
 
-	public:
+private:
 
-		input()
-			:
-			_errorOccurred(0)
-		{}
+    const char* _errorOccurred;
 
-		virtual ~input() {}
+	jmp_buf _jmpBuf;
+
+	// State needed for input.
+	jpeg_decompress_struct m_cinfo;
+	jpeg_error_mgr m_jerr;
+
+	bool _compressorOpened;
+	
+	bool _ownStream;
+
+public:
+
+	enum SWF_DEFINE_BITS_JPEG2 { SWF_JPEG2 };
+	enum SWF_DEFINE_BITS_JPEG2_HEADER_ONLY { SWF_JPEG2_HEADER_ONLY };
+
+	/// \brief
+	/// Constructor.  
+	//
+	/// @param in
+	/// 	The stream to read from. Ownership specified by
+	///	second argument.
+	JpegImageInput(boost::shared_ptr<IOChannel> in);
+
+	void readHeader(unsigned int maxHeaderBytes);
+
+	// Destructor.  Clean up our jpeg reader state.
+	~JpegImageInput();
+
+    void read()
+    {
+        start_image();
+    }
+
+	// Discard any data sitting in our input buffer.  Use
+	// this before/after reading headers or partial image
+	// data, to avoid screwing up future reads.
+	void discard_partial_buffer();
+
+	// This is something you can do with "abbreviated"
+	// streams; i.e. if you constructed this inputter
+	// using (SWF_JPEG2_HEADER_ONLY) to just load the
+	// tables, or if you called finish_image() and want to
+	// load another image using the existing tables.
+	// 
+	void start_image();
+
+	void finish_image();
+
+	// Return the height of the image.  Take the data from our m_cinfo struct.
+	size_t getHeight() const;
+
+	// Return the width of the image.  Take the data from our m_cinfo struct.
+	size_t getWidth() const;
+
+	// Return number of components (i.e. == 3 for RGB
+	// data).  The size of the data for a scanline is
+	// get_width() * get_components().
+	//
+	int	getComponents() const;
+
+	// Read a scanline's worth of image data into the
+	// given buffer.  The amount of data read is
+	// get_width() * get_components().
+	//
+	void readScanline(unsigned char* rgb_data);
+
+    static std::auto_ptr<gnash::ImageInput> create(boost::shared_ptr<IOChannel> in)
+    {
+        std::auto_ptr<gnash::ImageInput> ret ( new JpegImageInput(in) );
+        if ( ret.get() ) ret->read(); // might throw an exception (I guess)
+        return ret;
+    }
+
+    static std::auto_ptr<JpegImageInput> create_swf_jpeg2_header_only(boost::shared_ptr<IOChannel> in, unsigned int maxHeaderBytes)
+    {
+        std::auto_ptr<JpegImageInput> ret ( new JpegImageInput(in) );
+        if ( ret.get() ) ret->readHeader(maxHeaderBytes); // might throw an exception
+        return ret;
+    }
+
+    void errorOccurred(const char* msg);
 
 
-		/// \brief
-		/// Create and return a jpeg-input object that will read from the
-		/// given input stream.
-		//
-		/// The created input reads the jpeg header
-		///
-		/// @param in
-		///	The stream to read from. Ownership specified by last arg.
-		///
-		/// @param takeOwnership
-		///	If false, ownership of the stream 
-		///	is left to caller, otherwise we take it.
-		///	NOTE: In case the caller retains ownership, it must
-		///	make sure the stream is alive and not modified
-		///	for the whole lifetime of the returned instance.
-		///
-		/// @return NULL on error
-		///
-		DSOEXPORT static input*	create(gnash::IOChannel* in, bool takeOwnership=false);
+};
 
-		/// Read SWF JPEG2-style header. 
-		//
-		/// App needs to call start_image() before loading any
-		/// image data.  Multiple images can be loaded by
-		/// bracketing within start_image()/finish_image() pairs.
-		///
-		/// @param in
-		///	The gnash::IOChannel to use for input. Ownership specified
-		///	by last arg.
-		///
-		/// @param maxHeaderBytes
-		///	Max number of bytes to read from input for header.
-		///
-		/// @param takeOwnership
-		///	If false, ownership of the stream 
-		///	is left to caller, otherwise we take it.
-		///	NOTE: In case the caller retains ownership, it must
-		///	make sure the stream is alive and not modified
-		///	for the whole lifetime of the returned instance.
-		///
-		/// @return NULL on error
-		///
-		DSOEXPORT static input*	create_swf_jpeg2_header_only(gnash::IOChannel* in,
-				unsigned int maxHeaderBytes, bool takeOwnership=false);
+// Helper object for writing jpeg image data.
+class JpegImageOutput
+{
+public:
+	/// Create an output object bount to a gnash::IOChannel
+	//
+	/// @param quality
+	///	Quality goes from 1-100.
+	///
+	DSOEXPORT static JpegImageOutput*	create(gnash::IOChannel* out, int width, int height, int quality);
 
-		/// Discard existing bytes in our buffer.
-		virtual void	discard_partial_buffer() = 0;
+	virtual ~JpegImageOutput() {}
 
-		virtual void	start_image() = 0;
-		virtual void	finish_image() = 0;
+	// ...
+	virtual void	write_scanline(unsigned char* rgb_data) = 0;
+};
 
-		virtual int	get_height() const = 0;
-		virtual int	get_width() const = 0;
-		virtual void	read_scanline(unsigned char* rgb_data) = 0;
-
-		void    errorOccurred(const char* msg);
-
-	protected:
-
-		/// This flag will be set to true by the error callback
-		/// invoked by jpeg lib. Will be later used to throw
-		/// a ParserException.
-		///
-		const char* _errorOccurred;
-
-		jmp_buf _jmpBuf;
-	};
-
-
-	// Helper object for writing jpeg image data.
-	class output
-	{
-	public:
-		/// Create an output object bount to a gnash::IOChannel
-		//
-		/// @param quality
-		///	Quality goes from 1-100.
-		///
-		DSOEXPORT static output*	create(gnash::IOChannel* out, int width, int height, int quality);
-
-		virtual ~output() {}
-
-		// ...
-		virtual void	write_scanline(unsigned char* rgb_data) = 0;
-	};
-
-} // namespace jpeg
+} // namespace gnash
 
 
 #endif // JPEG_H
