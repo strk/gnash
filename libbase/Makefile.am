@@ -54,6 +54,7 @@ libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\" \
 	$(PTHREAD_CFLAGS) \
 	$(LIBXML_CFLAGS) \
 	$(PNG_CFLAGS) \
+	$(GIF_CFLAG) \
 	$(GLIB_CFLAGS) \
 	$(GSTREAMER_CFLAGS) \
 	$(CURL_CFLAGS) \
@@ -69,6 +70,7 @@ libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\" \
 libgnashbase_la_LIBADD = \
 	$(JPEG_LIBS) \
 	$(PNG_LIBS) \
+	$(GIF_LIBS) \
 	$(Z_LIBS) \
 	$(CURL_LIBS) \
 	$(OPENGL_LIBS) \
@@ -94,6 +96,7 @@ libgnashbase_la_SOURCES = \
 	$(MALLOC) \
 	jpeg.cpp \
 	GnashImagePng.cpp \
+	GnashImageGif.cpp \
 	log.cpp	\
 	memory.cpp \
 	rc.cpp \
@@ -126,6 +129,7 @@ noinst_HEADERS = \
 	jpeg.h \
 	GnashImage.h \
 	GnashImagePng.h \
+	GnashImageGif.h \
 	gmemory.h \
 	log.h \
 	ogl.h \

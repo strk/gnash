@@ -13,6 +13,7 @@
 #include "image.h"
 #include "GnashImage.h"
 #include "GnashImagePng.h"
+#include "GnashImageGif.h"
 #include "jpeg.h"
 #include "IOChannel.h"
 #include "tu_file.h" // some functions take a filename, tu_file is created in that case..
@@ -245,6 +246,9 @@ namespace image
         {
             case GNASH_FILETYPE_PNG:
                 infile = PngImageInput::create(in);
+                break;
+            case GNASH_FILETYPE_GIF:
+                infile = GifImageInput::create(in);
                 break;
             default:
                 break;
