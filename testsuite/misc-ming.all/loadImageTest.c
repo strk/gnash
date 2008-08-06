@@ -127,9 +127,11 @@ main(int argc, char** argv)
 
 	char url_png[256];
     char url_gif[256];
+    char url_igif[256];
 
     char png_action[256];
     char gif_action[256];
+    char igif_action[256];
 
 	/*********************************************
 	 *
@@ -146,6 +148,7 @@ main(int argc, char** argv)
 
 	sprintf(url_png, "%s/png.png", mediadir);
 	sprintf(url_gif, "%s/gif.gif", mediadir);
+	sprintf(url_igif, "%s/gif-interlaced.gif", mediadir);
 
 	puts("Setting things up");
 
@@ -180,6 +183,9 @@ main(int argc, char** argv)
 
     sprintf(gif_action, "_root.window.loadMovie(\"%s\");", url_gif);
     add_button(mo, 50, 150, "Load GIF", newSWFAction(gif_action));
+
+    sprintf(igif_action, "_root.window.loadMovie(\"%s\");", url_igif);
+    add_button(mo, 50, 200, "Load interlaced GIF", newSWFAction(igif_action));
 
 
 	/*****************************************************
