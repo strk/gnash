@@ -309,7 +309,7 @@ public:
 
 	/// Set an input object for later loading DefineBits
 	/// images (JPEG images without the table info).
-	void	set_jpeg_loader(std::auto_ptr<jpeg::input> j_in)
+	void set_jpeg_loader(std::auto_ptr<JpegImageInput> j_in)
 	{
 	    if (m_jpeg_in.get())
 	    {
@@ -326,7 +326,7 @@ public:
 	}
 
 	// See dox in movie_definition.h
-	jpeg::input*	get_jpeg_loader()
+	JpegImageInput* get_jpeg_loader()
 	{
 	    return m_jpeg_in.get();
 	}
@@ -527,7 +527,7 @@ private:
 	int	m_loading_sound_stream;
 	boost::uint32_t	m_file_length;
 
-	std::auto_ptr<jpeg::input> m_jpeg_in;
+	std::auto_ptr<JpegImageInput> m_jpeg_in;
 
 	std::string _url;
 
