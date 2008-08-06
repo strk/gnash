@@ -15,7 +15,7 @@
 #include "GnashImage.h"
 #include "GnashImagePng.h"
 #include "GnashImageGif.h"
-#include "jpeg.h"
+#include "GnashImageJpeg.h"
 #include "IOChannel.h"
 
 namespace gnash

@@ -28,7 +28,7 @@
 #include "zlib_adapter.h"
 #include "IOChannel.h" // for use
 #include "stream.h"
-#include "jpeg.h"
+#include "GnashImageJpeg.h"
 //#include "fontlib.h"
 #include "font.h"
 #include "log.h"

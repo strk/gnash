@@ -29,7 +29,7 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "fontlib.h"
 #include "font.h"
-#include "jpeg.h"
+#include "GnashImageJpeg.h"
 #include "IOChannel.h"
 #include "movie_definition.h" // for inheritance
 #include "character_def.h" // for boost::intrusive_ptr visibility of dtor

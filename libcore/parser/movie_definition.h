@@ -53,7 +53,7 @@
 
 #include "character_def.h" // for inheritance
 #include "fontlib.h"
-#include "jpeg.h"
+#include "GnashImageJpeg.h"
 
 #include <string>
 #include <memory> // for auto_ptr
