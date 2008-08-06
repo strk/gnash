@@ -42,6 +42,17 @@ namespace gnash {
 
 namespace gnash {
 
+
+// The file types that Gnash can handle
+enum FileType {
+    GNASH_FILETYPE_JPEG,
+    GNASH_FILETYPE_PNG,
+    GNASH_FILETYPE_GIF,
+    GNASH_FILETYPE_SWF,
+    GNASH_FILETYPE_FLV,
+    GNASH_FILETYPE_UNKNOWN
+};
+
 // Sound callbacks stuff
 
 /// \brief

@@ -127,8 +127,8 @@ class DSOEXPORT Flv {
 
     // Decode a MetaData object, which is after the header, but before all the tags
     amf::Element *decodeMetaData(amf::Buffer *buf);
-    flv_audio_t *decodeAudioData(amf::Buffer *buf);
-    flv_video_t *decodeVideoData(amf::Buffer *buf);
+    flv_audio_t *decodeAudioTag(amf::Buffer *buf);
+    flv_video_t *decodeVideoTag(amf::Buffer *buf);
     
     // Decode the tag header
     flv_tag_t *decodeTagHeader(amf::Buffer *buf);

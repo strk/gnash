@@ -41,7 +41,7 @@
 
 // In version 7 or below PNGs shouldn't work.
 #define OUTPUT_VERSION 8
-#define OUTPUT_FILENAME "loadPNGTest.swf"
+#define OUTPUT_FILENAME "loadImageTest.swf"
 
 void add_clip(SWFMovie mo, char* file, char* name, char* url, int x, int y);
 void add_button(SWFMovie mo, int x, int y, const char* label, SWFAction ac);
@@ -125,10 +125,13 @@ main(int argc, char** argv)
 	SWFMovieClip dejagnuclip;
 	SWFDisplayItem it;
 
-	char file_png[256];
 	char url_png[256];
+    char url_gif[256];
+    char url_igif[256];
 
     char png_action[256];
+    char gif_action[256];
+    char igif_action[256];
 
 	/*********************************************
 	 *
@@ -144,7 +147,8 @@ main(int argc, char** argv)
 	}
 
 	sprintf(url_png, "%s/png.png", mediadir);
-
+	sprintf(url_gif, "%s/gif.gif", mediadir);
+	sprintf(url_igif, "%s/gif-interlaced.gif", mediadir);
 
 	puts("Setting things up");
 
@@ -175,8 +179,14 @@ main(int argc, char** argv)
 	 *****************************************************/
 
     sprintf(png_action, "_root.window.loadMovie(\"%s\");", url_png);
-
     add_button(mo, 50, 100, "Load PNG", newSWFAction(png_action));
+
+    sprintf(gif_action, "_root.window.loadMovie(\"%s\");", url_gif);
+    add_button(mo, 50, 150, "Load GIF", newSWFAction(gif_action));
+
+    sprintf(igif_action, "_root.window.loadMovie(\"%s\");", url_igif);
+    add_button(mo, 50, 200, "Load interlaced GIF", newSWFAction(igif_action));
+
 
 	/*****************************************************
 	 *

@@ -52,8 +52,6 @@ static void usage (void);
 static void test_headers();
 static void test_tags();
 
-static bool notest = false;
-
 // We use the Memory profiling class to check the malloc buffers
 // in the kernel to make sure the allocations and frees happen
 // the way we expect them too. There is no real other way to tell.
@@ -161,6 +159,8 @@ void
 test_headers()
 {
     Flv flv;
+    bool notest = false;
+
 // 02 00 00 a4 00 00 00 00 00 00 00
 // 02 00 0a 6f 6e 4d 65 74 61 44 61 74 61		<--- onMetaData
 // 08 00 00 00 00
@@ -179,12 +179,20 @@ test_headers()
 //  00 00 09					Tue Jun 24 08:03:48 2008
     Buffer *hex1 = hex2mem("46 4c 56 01 0d 00 00 00 09 00 00 00 00");
     Flv::flv_header_t *head = flv.decodeHeader(hex1);
-    if ((memcmp(head->sig, "FLV", 0) == 0)
-        && (head->version == 1)
-        && (head->head_size[3] == 9)) {
-        runtest.pass("Decoded FLV header");
+    if (head == 0) {
+        notest = true;
+    }
+
+    if (notest) {
+        runtest.untested("Decoded FLV header");
     } else {
-        runtest.fail("Decoded FLV header");
+        if ((memcmp(head->sig, "FLV", 0) == 0)
+            && (head->version == 1)
+            && (head->head_size[0] == 9)) {
+            runtest.pass("Decoded FLV header");
+        } else {
+            runtest.fail("Decoded FLV header");
+        }
     }
     delete hex1;
 
@@ -216,6 +224,7 @@ void
 test_tags()
 {
     Flv flv;
+    bool notest = false;
 
     Buffer *hex1 = hex2mem("02 00 0a 6f 6e 4d 65 74 61 44 61 74 61 08 00 00 00 00 00 08 64 75 72 61 74 69 6f 6e 00 40 6d 6e 24 dd 2f 1a a0 00 0c 76 69 64 65 6f 63 6f 64 65 63 69 64 00 40 00 00 00 00 00 00 00 00 0c 61 75 64 69 6f 63 6f 64 65 63 69 64 00 40 00 00 00 00 00 00 00 00 0c 63 61 6e 53 65 65 6b 54 6f 45 6e 64 01 00 00 09 63 72 65 61 74 65 64 62 79 02 00 07 46 4d 53 20 33 2e 30 00 0c 63 72 65 61 74 69 6f 6e 64 61 74 65 02 00 18 54 75 65 20 4a 75 6e 20 32 34 20 30 38 3a 30 33 3a 34 38 20 32 30 30 38 00 00 09");
     Element *el1 = flv.decodeMetaData(hex1);
@@ -225,7 +234,7 @@ test_tags()
     if (notest) {
         runtest.untested("Decoded FLV MetaData object");
     } else {
-        el1->dump();
+//        el1->dump();
         if ((el1->getType() ==Element::ECMA_ARRAY_AMF0)
             && (el1->propertySize() == 6)) {
             runtest.pass("Decoded FLV MetaData object");
@@ -235,6 +244,14 @@ test_tags()
         delete hex1;
         delete el1;
     }
+
+    // Test decoding Audio tags
+    Buffer *hex2 = hex2mem("08 00 00 00 00 00 00 00 00 00 00 00");    
+    Flv::flv_audio_t *tag2 = flv.decodeAudioTag(hex2);
+
+
+    Buffer *hex3 = hex2mem("08 00 00 1b 00 00 00 00 00 00 00 2a");
+    Flv::flv_audio_t *tag3 = flv.decodeAudioTag(hex3);
 }
 
 static void

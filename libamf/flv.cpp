@@ -90,6 +90,40 @@ Flv::decodeHeader(amf::Buffer *buf)
 {
 //    GNASH_REPORT_FUNCTION;
     memcpy(&_header, buf->begin(), sizeof(Flv::flv_header_t));
+
+    // test the magic number
+    if (memcmp(_header.sig, "FLV", 3) != 0) {
+	log_parse("Bad magic number for FLV file!");
+	return 0;
+    }
+
+    // Make sure the version is legit, it should alwys be 1
+    if (_header.version != 0x1) {
+	log_parse("Bad version in FLV header! %d", _header.version);
+		  return 0;
+    }
+
+    // Make sure the type is set correctly
+    if (((_header.type & Flv::FLV_AUDIO) && (_header.type & Flv::FLV_VIDEO))
+	|| (_header.type & Flv::FLV_AUDIO) || (_header.type & Flv::FLV_VIDEO)) {
+    } else {
+	    log_error("Bad FLV file Type: %d", _header.type);
+    }
+    
+    // Be lazy, as head_size is an array of 4 bytes, and not an integer in the data
+    // structure. This is to get around possible padding done to the data structure
+    // done by some compilers.
+    boost::uint32_t *size = reinterpret_cast<boost::uint32_t *>(_header.head_size);
+
+    // The header size is big endian
+    *size = ntohl(*size);
+    
+    // The header size is always 9, guess it could change some day in the far future, so
+    // we should use it.
+    if (*size != 0x9) {
+	log_parse("Bad header size in FLV header! %d", _header.head_size);
+		  return 0;
+    }
     
     return &_header;
 }
@@ -123,13 +157,69 @@ Flv::decodeMetaData(amf::Buffer *buf)
 }
 
 Flv::flv_audio_t *
-Flv::decodeAudioData(amf::Buffer *buf)
+Flv::decodeAudioTag(amf::Buffer *buf)
 {
 //    GNASH_REPORT_FUNCTION;
+    flv_tag_t *tag = decodeTagHeader(buf);
+    flv_audio_t *audio = new flv_audio_t;
+    
+    Network::byte_t byte= *(buf->reference() + sizeof(flv_tag_t));
+
+    // Get the sound type
+    if (byte & Flv::AUDIO_MONO) {
+	audio->type = Flv::AUDIO_MONO;
+    } else if (byte & Flv::AUDIO_STEREO) {
+	audio->type = Flv::AUDIO_STEREO;
+    } else {
+	log_error("Bad FLV Audio Sound Type: %d", byte);
+    }
+
+    // Get the sound size
+    if ((byte >> 1) & Flv::AUDIO_8BIT) {
+	audio->size = Flv::AUDIO_8BIT;	
+    } else if ((byte >> 1) & Flv::AUDIO_16BIT) {
+	audio->size = Flv::AUDIO_16BIT;	
+    } else {
+	log_error("Bad FLV Audio Sound size: %d", byte >> 1);
+    }
+
+    // Get the sound rate
+    if ((byte >> 2) & Flv::AUDIO_55KHZ) {
+	audio->rate = Flv::AUDIO_55KHZ;	
+    } else if ((byte >> 2) & Flv::AUDIO_11KHZ) {
+	audio->rate = Flv::AUDIO_11KHZ;	
+    } else if ((byte >> 2) & Flv::AUDIO_22KHZ) {
+	audio->rate = Flv::AUDIO_22KHZ;	
+    } else if ((byte >> 2) & Flv::AUDIO_44KHZ) {
+	audio->rate = Flv::AUDIO_44KHZ;	
+    } else {
+	log_error("Bad FLV Audio Sound Rate: %d", byte >> 2);
+    }
+
+    // Get the sound format
+    if ((byte >> 4) & Flv::AUDIO_UNCOMPRESSED) {
+	audio->format = Flv::AUDIO_UNCOMPRESSED;	
+    } else if ((byte >> 4) & Flv::AUDIO_ADPCM) {
+	audio->format = Flv::AUDIO_ADPCM;	
+    } else if ((byte >> 4) & Flv::AUDIO_MP3) {
+	audio->format = Flv::AUDIO_MP3;	
+    } else if ((byte >> 4) & Flv::AUDIO_NELLYMOSER_8KHZ) {
+	audio->format = Flv::AUDIO_NELLYMOSER_8KHZ;	
+    } else if ((byte >> 4) & Flv::AUDIO_NELLYMOSER) {
+	audio->format = Flv::AUDIO_NELLYMOSER;	
+    } else if ((byte >> 4) & Flv::AUDIO_VORBIS) {
+	audio->format = Flv::AUDIO_VORBIS;	
+    } else {
+	log_error("Bad FLV Audio Sound format: %d", byte >> 4);
+    }
+    
+    delete tag;
+
+    return audio;
 }
 
 Flv::flv_video_t *
-Flv::decodeVideoData(amf::Buffer *buf)
+Flv::decodeVideoTag(amf::Buffer *buf)
 {
 //    GNASH_REPORT_FUNCTION;
 }

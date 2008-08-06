@@ -5,17 +5,19 @@
 
 // Handy image utilities for RGB surfaces.
 
-#include "image.h"
-
-#include "utility.h"
-#include "jpeg.h"
-#include "GnashImagePng.h"
-#include "IOChannel.h"
-#include "tu_file.h" // some functions take a filename, tu_file is created in that case..
-
 #include <cstring>
 #include <memory>		// for auto_ptr
 #include <boost/scoped_array.hpp>
+
+    #include "gnash.h" // for image file types
+#include "image.h"
+#include "GnashImage.h"
+#include "GnashImagePng.h"
+#include "GnashImageGif.h"
+#include "jpeg.h"
+#include "IOChannel.h"
+#include "tu_file.h" // some functions take a filename, tu_file is created in that case..
+
 
 namespace gnash
 {
@@ -234,11 +236,23 @@ namespace image
 		return im.release();
 	}
 
-    std::auto_ptr<rgb> readSWFPng(gnash::IOChannel& in)
+    // See gnash.h for file types.
+    std::auto_ptr<rgb> readImageData(gnash::IOChannel& in, FileType type)
     {
         std::auto_ptr<rgb> im (NULL);
-    
-        std::auto_ptr<png::input> infile(png::input::create(in));
+        std::auto_ptr<ImageInput> infile;
+
+        switch (type)
+        {
+            case GNASH_FILETYPE_PNG:
+                infile = PngImageInput::create(in);
+                break;
+            case GNASH_FILETYPE_GIF:
+                infile = GifImageInput::create(in);
+                break;
+            default:
+                break;
+        }
         
         if (!infile.get()) return im;
         
