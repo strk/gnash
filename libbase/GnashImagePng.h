@@ -42,9 +42,6 @@ namespace gnash {
         png_structp _pngPtr;
         png_infop _infoPtr;
        
-        // A reference to the stream containing the PNG data.
-        IOChannel& _inStream;
-        
         // A counter for keeping track of the last row copied.
         size_t _currentRow;
 
@@ -56,7 +53,7 @@ namespace gnash {
 		//
 		/// @param in
 		/// 	The stream to read from.
-		PngImageInput(gnash::IOChannel& in);
+		PngImageInput(boost::shared_ptr<IOChannel> in);
 		
 		// Destructor. Free libpng-allocated memory.
 		~PngImageInput();
@@ -82,7 +79,7 @@ namespace gnash {
 		void readScanline(unsigned char* rgb_data);
 
 
-        DSOEXPORT static std::auto_ptr<ImageInput> create(gnash::IOChannel& in)
+        DSOEXPORT static std::auto_ptr<ImageInput> create(boost::shared_ptr<IOChannel> in)
         {
 	        std::auto_ptr<ImageInput> ret ( new PngImageInput(in) );
 	        if ( ret.get() ) ret->read();

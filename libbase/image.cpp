@@ -8,16 +8,15 @@
 #include <cstring>
 #include <memory>		// for auto_ptr
 #include <boost/scoped_array.hpp>
+#include <boost/shared_ptr.hpp>
 
-    #include "gnash.h" // for image file types
+#include "gnash.h" // for image file types
 #include "image.h"
 #include "GnashImage.h"
 #include "GnashImagePng.h"
 #include "GnashImageGif.h"
-#include "jpeg.h"
+#include "GnashImageJpeg.h"
 #include "IOChannel.h"
-#include "tu_file.h" // some functions take a filename, tu_file is created in that case..
-
 
 namespace gnash
 {
@@ -193,7 +192,7 @@ namespace image
 	{
 		size_t height = image->height();
 
-		std::auto_ptr<jpeg::output> j_out ( jpeg::output::create(out, image->width(), height, quality) );
+		std::auto_ptr<JpegImageOutput> j_out ( JpegImageOutput::create(out, image->width(), height, quality) );
 
 		for (size_t y = 0; y < height; ++y)
 		{
@@ -202,42 +201,8 @@ namespace image
 
 	}
 
-
-	rgb*	read_jpeg(const char* filename)
-	// Create and read a new image from the given filename, if possible.
-	{
-		tu_file	in(filename, "rb");	// file automatically closes when 'in' goes out of scope.
-		if (! in.get_error())
-		{
-			return read_jpeg(&in);
-		}
-		else
-		{
-			return NULL;
-		}
-	}
-
-	// Create and read a new image from the stream.
-	//
-	// TODO: return by auto_ptr !
-	//
-	rgb*	read_jpeg(gnash::IOChannel* in)
-	{
-		std::auto_ptr<jpeg::input> j_in ( jpeg::input::create(in) );
-		if (!j_in.get()) return 0;
-		
-		std::auto_ptr<rgb> im ( new image::rgb(j_in->get_width(), j_in->get_height()) );
-
-		for (int y = 0; y < j_in->get_height(); y++)
-		{
-			j_in->read_scanline(im->scanline(y));
-		}
-
-		return im.release();
-	}
-
     // See gnash.h for file types.
-    std::auto_ptr<rgb> readImageData(gnash::IOChannel& in, FileType type)
+    std::auto_ptr<rgb> readImageData(boost::shared_ptr<IOChannel> in, FileType type)
     {
         std::auto_ptr<rgb> im (NULL);
         std::auto_ptr<ImageInput> infile;
@@ -249,6 +214,9 @@ namespace image
                 break;
             case GNASH_FILETYPE_GIF:
                 infile = GifImageInput::create(in);
+                break;
+            case GNASH_FILETYPE_JPEG:
+                infile = JpegImageInput::create(in);
                 break;
             default:
                 break;
@@ -265,22 +233,22 @@ namespace image
         return im;
     }
 
-	rgb*	read_swf_jpeg2_with_tables(jpeg::input* j_in)
+	rgb* readSWFJpeg2WithTables(JpegImageInput* j_in)
 	// Create and read a new image, using a input object that
 	// already has tables loaded.  The IJG documentation describes
 	// this as "abbreviated" format.
 	{
 		assert(j_in);
 
-		j_in->start_image();
+		j_in->startImage();
 
-		std::auto_ptr<rgb> im(new image::rgb(j_in->get_width(), j_in->get_height()));
+		std::auto_ptr<rgb> im(new image::rgb(j_in->getWidth(), j_in->getHeight()));
 
-		for (int y = 0; y < j_in->get_height(); y++) {
-			j_in->read_scanline(im->scanline(y));
+		for (size_t y = 0; y < j_in->getHeight(); y++) {
+			j_in->readScanline(im->scanline(y));
 		}
 
-		j_in->finish_image();
+		j_in->finishImage();
 
 		return im.release();
 	}
@@ -288,26 +256,27 @@ namespace image
 
 	// For reading SWF JPEG3-style image data, like ordinary JPEG, 
 	// but stores the data in rgba format.
-	std::auto_ptr<rgba> readSWFJpeg3(gnash::IOChannel* in)
+	std::auto_ptr<rgba> readSWFJpeg3(boost::shared_ptr<gnash::IOChannel> in)
 	{
 	
 	    std::auto_ptr<rgba> im(NULL);
 
-		std::auto_ptr<jpeg::input> j_in ( jpeg::input::create_swf_jpeg2_header_only(in, false) );
+        // Calling with headerBytes as 0 has a special effect...
+		std::auto_ptr<JpegImageInput> j_in ( JpegImageInput::createSWFJpeg2HeaderOnly(in, 0) );
 		if ( ! j_in.get() ) return im;
 		
-		j_in->start_image();
+		j_in->startImage();
 
-		im.reset(new image::rgba(j_in->get_width(), j_in->get_height()));
+		im.reset(new image::rgba(j_in->getWidth(), j_in->getHeight()));
 
-		boost::scoped_array<boost::uint8_t> line ( new boost::uint8_t[3*j_in->get_width()] );
+		boost::scoped_array<boost::uint8_t> line ( new boost::uint8_t[3*j_in->getWidth()] );
 
-		for (int y = 0; y < j_in->get_height(); y++) 
+		for (size_t y = 0; y < j_in->getHeight(); y++) 
 		{
-			j_in->read_scanline(line.get());
+			j_in->readScanline(line.get());
 
 			boost::uint8_t*	data = im->scanline(y);
-			for (int x = 0; x < j_in->get_width(); x++) 
+			for (size_t x = 0; x < j_in->getWidth(); x++) 
 			{
 				data[4*x+0] = line[3*x+0];
 				data[4*x+1] = line[3*x+1];
@@ -316,7 +285,7 @@ namespace image
 			}
 		}
 
-		j_in->finish_image();
+		j_in->finishImage();
 
 		return im;
 	}

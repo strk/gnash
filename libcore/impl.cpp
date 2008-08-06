@@ -250,27 +250,6 @@ static void ensure_loaders_registered()
     register_tag_loader(SWF::REFLEX, reflex_loader); // 777
 }
 
-
-// Create a movie_definition from a jpeg stream
-// NOTE: this method assumes this *is* a jpeg stream
-static movie_definition*
-create_jpeg_movie(std::auto_ptr<IOChannel> in, const std::string& url)
-{
-
-  std::auto_ptr<image::rgb> im ( image::read_jpeg(in.get()) );
-
-  if ( ! im.get() )
-  {
-    log_error(_("Can't read jpeg from %s"), url);
-    return NULL;
-  } 
-
-  BitmapMovieDefinition* mdef = new BitmapMovieDefinition(im, url);
-  //log_debug(_("BitmapMovieDefinition %p created"), mdef);
-  return mdef;
-
-}
-
 // Create a movie_definition from a png stream
 // NOTE: this method assumes this *is* a png stream
 // TODO: The pp won't display PNGs for SWF7 or below.
@@ -279,9 +258,13 @@ createBitmapMovie(std::auto_ptr<IOChannel> in, const std::string& url, FileType 
 {
     assert (in.get());
 
+    // readImageData takes a shared pointer because JPEG streams sometimes need
+    // to transfer ownership.
+    boost::shared_ptr<IOChannel> imageData(in.release());
+
     try
     {
-        std::auto_ptr<image::rgb> im(image::readImageData(*in, type));
+        std::auto_ptr<image::rgb> im(image::readImageData(imageData, type));
         if (!im.get())
         {
             log_error(_("Can't read image file from %s"), url);
@@ -417,17 +400,6 @@ create_movie(std::auto_ptr<IOChannel> in, const std::string& url, bool startLoad
     switch (type)
     {
         case GNASH_FILETYPE_JPEG:
-        {
-            if ( startLoaderThread == false )
-            {
-              log_unimpl(_("Requested to keep from completely loading "
-                           "a movie, but the movie in question is a "
-                           "jpeg, for which we don't yet have the "
-                           "concept of a 'loading thread'"));
-            }
-            return create_jpeg_movie(in, url);
-        }            
-
         case GNASH_FILETYPE_PNG:
         case GNASH_FILETYPE_GIF:
         {
@@ -437,7 +409,7 @@ create_movie(std::auto_ptr<IOChannel> in, const std::string& url, bool startLoad
                            "a movie, but the movie in question is an "
                            "image, for which we don't yet have the "
                            "concept of a 'loading thread'"));
-            }            
+            }
             return createBitmapMovie(in, url, type);
         }
 

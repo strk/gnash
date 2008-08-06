@@ -20,7 +20,7 @@
 #ifndef GNASH_GNASHIMAGE_H
 #define GNASH_GNASHIMAGE_H
 
-#include <memory> // std::auto_ptr
+#include <boost/shared_ptr.hpp> 
 
 #include "dsodefs.h"
 
@@ -33,7 +33,9 @@ class ImageInput {
 
 public:
 
-	ImageInput() {}
+	ImageInput(boost::shared_ptr<IOChannel> in) :
+	    _inStream(in)
+	{}
 
 	virtual ~ImageInput() {}
 
@@ -62,6 +64,10 @@ public:
 	virtual size_t getHeight() const = 0;
 	virtual size_t getWidth() const = 0;
 	virtual void readScanline(unsigned char* rgb_data) = 0;
+
+protected:
+
+    boost::shared_ptr<IOChannel> _inStream;
 
 };
 

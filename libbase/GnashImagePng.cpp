@@ -51,10 +51,10 @@ readData(png_structp pngptr, png_bytep data, png_size_t length)
     in->read(reinterpret_cast<char*>(data), length);
 }
 
-PngImageInput::PngImageInput(gnash::IOChannel& in) :
+PngImageInput::PngImageInput(boost::shared_ptr<IOChannel> in) :
+    ImageInput(in),
     _pngPtr(0),
     _infoPtr(0),
-    _inStream(in),
     _currentRow(0)
 {
     init();
@@ -109,7 +109,7 @@ void
 PngImageInput::read()
 {
     // Set our user-defined reader function
-    png_set_read_fn(_pngPtr, &_inStream, &readData);
+    png_set_read_fn(_pngPtr, _inStream.get(), &readData);
     
     // read
     // TODO: sort out transform options.
