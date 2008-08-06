@@ -2355,6 +2355,20 @@ else
   echo "               or .rpm users: yum install libjpeg-devel" >&3
 fi
 
+if test x"${GIF_LIBS}" != x ; then
+  if test x"${GIF_CFLAGS}" != x ; then
+    echo "        GIF flags are: $GIF_CFLAGS"
+  else
+    echo "        GIF flags are: default include path"
+  fi
+  echo "        GIF libs are: $GIF_LIBS"
+else
+  echo "        ERROR: No GIF library development package installed!" >&3
+  echo "               Install it from http://sourceforge.net/projects/giflib/" >&3
+  echo "               or .deb users: apt-get install libungif-dev" >&3
+  echo "               or .rpm users: yum install libungif-devel" >&3
+fi
+
 if test x"${PNG_LIBS}" != x ; then
   if test x"${PNG_CFLAGS}" != x ; then
     echo "        PNG flags are: $PNG_CFLAGS"
