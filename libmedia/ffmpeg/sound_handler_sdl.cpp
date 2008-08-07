@@ -135,9 +135,12 @@ SDL_sound_handler::delete_all_sounds()
 
 	boost::mutex::scoped_lock lock(_mutex);
 
-	for (size_t i=0, e=m_sound_data.size(); i < e; ++i)
+	for (Sounds::iterator i = m_sound_data.begin(),
+	                      e = m_sound_data.end(); i != e; ++i)
 	{
-		sound_data* sounddata = m_sound_data[i];
+		sound_data* sounddata = *i;
+        // The sound may have been deleted already.
+        if (!sounddata) continue;
 
 		size_t nActiveSounds = sounddata->m_active_sounds.size();
 		soundsPlaying -= nActiveSounds;
@@ -381,6 +384,8 @@ void	SDL_sound_handler::delete_sound(int sound_handle)
 {
 	boost::mutex::scoped_lock lock(_mutex);
 
+    log_debug ("deleting sound :%d", sound_handle);
+
 	if (sound_handle >= 0 && static_cast<unsigned int>(sound_handle) < m_sound_data.size())
 	{
 		delete m_sound_data[sound_handle];
@@ -396,9 +401,13 @@ void	SDL_sound_handler::stop_all_sounds()
 {
 	boost::mutex::scoped_lock lock(_mutex);
 
-	for (Sounds::iterator i=m_sound_data.begin(), e=m_sound_data.end(); i!=e; ++i)
+	for (Sounds::iterator i = m_sound_data.begin(),
+	                      e = m_sound_data.end(); i != e; ++i)
 	{
 		sound_data* sounddata = *i;
+
+        // The sound may have been deleted already.		
+		if (!sounddata) continue;
 		size_t nActiveSounds = sounddata->m_active_sounds.size();
 
 		soundsPlaying -= nActiveSounds;
