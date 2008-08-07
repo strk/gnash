@@ -1360,8 +1360,15 @@ Machine::execute()
 		boost::uint32_t cid = mStream->read_V32();
 		asClass *c = pool_class(cid, mPoolObject);
 		LOG_DEBUG_AVM("Creating new class id=%u name=%s",c->getName(),mPoolObject->mStringPool[c->getName()]);
+
+		//Create the class.
+		as_object* new_class = new as_object();
+		push_stack(as_value(new_class));
+
+		//Call the class's static constructor.
 		saveState();
 		mStream = c->getStaticConstructor()->getBody();
+
 //		ENSURE_OBJECT(mStack.top(0));
 //		as_object *obj = mStack.top(0).to_object().get();
 //		as_function *func = c->getConstructor()->getPrototype();
