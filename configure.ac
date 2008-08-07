@@ -179,6 +179,9 @@ AM_GNU_GETTEXT([external])
 AM_CONDITIONAL(HAS_GETTEXT, test x$ac_cv_path_XGETTEXT != x)
 dnl AM_GNU_GETTEXT_VERSION(0.15)
 
+dnl We shouldn't need SIZET_FMT anywhere anymore, so all of this
+dnl is useless.
+
 dnl AC_CHECK_SIZEOF([size_t], 4, AC_INCLUDES_DEFAULT)
 
 dnl AC_DEFINE(SIZET_FMT, ["%z"], [size_t printf modifier is z])
@@ -187,46 +190,45 @@ dnl NOTE: Using AC_TRY_COMPILE is bogus when cross-compiling !
 dnl       We need to know the size of size_t in the *target* host, 
 dnl       not the build host (right?)
 dnl
-AC_LANG_PUSH(C++)
-if test "$GXX" = yes; then
-save_CXXFLAGS="$CXXFLAGS"
-CXXFLAGS="$CXXFLAGS -Werror -Wformat"
-fi
+dnl AC_LANG_PUSH(C++)
+dnl if test "$GXX" = yes; then
+dnl save_CXXFLAGS="$CXXFLAGS"
+dnl CXXFLAGS="$CXXFLAGS -Werror -Wformat"
+dnl fi
 
-AC_TRY_COMPILE([#include <sys/types.h>
-  #include <stdio.h>], [
-  size_t num = 0;
-  printf("%d", num); ],
-  AC_DEFINE(SIZET_FMT, ["%d"], [size_t printf modifier is d]), [
+dnl AC_TRY_COMPILE([#include <sys/types.h>
+dnl   #include <stdio.h>], [
+dnl   size_t num = 0;
+dnl   printf("%d", num); ],
+dnl   AC_DEFINE(SIZET_FMT, ["%d"], [size_t printf modifier is d]), [
 
-AC_TRY_COMPILE([#include <sys/types.h>
-  #include <stdio.h>], [
-  size_t num = 0;
-  printf("%u", num); ],
-   AC_DEFINE(SIZET_FMT, ["%u"], [size_t printf modifier is u]), [
+dnl AC_TRY_COMPILE([#include <sys/types.h>
+dnl   #include <stdio.h>], [
+dnl   size_t num = 0;
+dnl   printf("%u", num); ],
+dnl   AC_DEFINE(SIZET_FMT, ["%u"], [size_t printf modifier is u]), [
 
-AC_TRY_COMPILE([#include <sys/types.h>
-  #include <stdio.h>], [
-  size_t num = 0;
-  printf("%lu", num); ],
-  AC_DEFINE(SIZET_FMT, ["%lu"], [size_t printf modifier is lu]), [
+dnl AC_TRY_COMPILE([#include <sys/types.h>
+dnl   #include <stdio.h>], [
+dnl   size_t num = 0;
+dnl   printf("%lu", num); ],
+dnl   AC_DEFINE(SIZET_FMT, ["%lu"], [size_t printf modifier is lu]), [
 
-AC_TRY_COMPILE([#include <sys/types.h> 
-  #include <stdio.h>], [
-  size_t num = 0;
-  printf("%ld", num); ],
-  AC_DEFINE(SIZET_FMT, ["%ld"], [size_t printf modifier is ld])
-)])])])
+dnl AC_TRY_COMPILE([#include <sys/types.h> 
+dnl   #include <stdio.h>], [
+dnl   size_t num = 0;
+dnl   printf("%ld", num); ],
+dnl   AC_DEFINE(SIZET_FMT, ["%ld"], [size_t printf modifier is ld])
+dnl )])])])
 
-if test "$GXX" = yes; then
-CXXFLAGS="$save_CXXFLAGS"
-fi
-AC_LANG_POP(C++)
+dnl if test "$GXX" = yes; then
+dnl CXXFLAGS="$save_CXXFLAGS"
+dnl fi
+dnl AC_LANG_POP(C++)
 
 dnl This is primarily used when compiling for a similar architecture,
 dnl like pentium->geode, which can use the same compiler, but have
-dnl different developmentAC_ARG_WITH(top_level, AC_HELP_STRING([--with-top-level], [top level directory for cross compiling files]), with_top_level=${withval} ; cross_compiling=yes)
-
+dnl different development libraries.
 
 AC_ARG_WITH(top_level,
   AC_HELP_STRING([--with-top-level],

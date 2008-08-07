@@ -127,7 +127,7 @@ action_buffer::process_decl_dict(size_t start_pc, size_t stop_pc) const
     
 #if 0 // debugging
     if (m_decl_dict_processed_at != -1)    {
-    log_debug(_("process_decl_dict(" SIZET_FMT ", " SIZET_FMT "): decl_dict was already processed at %d. "
+    log_debug(_("process_decl_dict(%d, %d): decl_dict was already processed at %d. "
         "Overriding."),
           start_pc, stop_pc, m_decl_dict_processed_at);
     //return;

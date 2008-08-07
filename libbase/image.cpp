@@ -233,7 +233,7 @@ namespace image
         return im;
     }
 
-	rgb* readSWFJpeg2WithTables(JpegImageInput* j_in)
+	std::auto_ptr<rgb> readSWFJpeg2WithTables(JpegImageInput* j_in)
 	// Create and read a new image, using a input object that
 	// already has tables loaded.  The IJG documentation describes
 	// this as "abbreviated" format.
@@ -250,7 +250,7 @@ namespace image
 
 		j_in->finishImage();
 
-		return im.release();
+		return im;
 	}
 
 

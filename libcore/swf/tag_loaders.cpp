@@ -296,7 +296,7 @@ define_bits_jpeg_loader(SWFStream* in, tag_type tag, movie_definition* m)
     std::auto_ptr<image::rgb> im;
     try
     {
-        im.reset ( image::readSWFJpeg2WithTables(j_in) );
+        im = image::readSWFJpeg2WithTables(j_in);
     }
     catch (std::exception& e)
     {

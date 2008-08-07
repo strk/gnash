@@ -234,7 +234,7 @@ namespace image
 	/// \brief
 	/// For reading SWF JPEG2-style image data, using pre-loaded
 	/// headers stored in the given jpeg::input object.
-	DSOEXPORT rgb* readSWFJpeg2WithTables(JpegImageInput* loader);
+	DSOEXPORT std::auto_ptr<rgb> readSWFJpeg2WithTables(JpegImageInput* loader);
 
 	/// \brief
 	/// For reading SWF JPEG3-style image data, like ordinary JPEG, 

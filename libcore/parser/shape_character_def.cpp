@@ -304,7 +304,7 @@ shape_character_def::read(SWFStream* in, int tag_type, bool with_style,
                     if ( style > m_fill_styles.size() )
                     {
                         IF_VERBOSE_MALFORMED_SWF(
-                             log_swferror(_("Invalid fill style %d in fillStyle0Change record - " SIZET_FMT " defined. Set to 0."), style, m_fill_styles.size());
+                             log_swferror(_("Invalid fill style %d in fillStyle0Change record - %d defined. Set to 0."), style, m_fill_styles.size());
                          );
                         style = 0;
                     }
@@ -350,7 +350,7 @@ shape_character_def::read(SWFStream* in, int tag_type, bool with_style,
                     if ( style > m_fill_styles.size() )
                     {
                         IF_VERBOSE_MALFORMED_SWF(
-                            log_swferror(_("Invalid fill style %d in fillStyle1Change record - " SIZET_FMT " defined. Set to 0."), style, m_fill_styles.size());
+                            log_swferror(_("Invalid fill style %d in fillStyle1Change record - %d defined. Set to 0."), style, m_fill_styles.size());
                         );
                         style = 0;
                     }
@@ -394,7 +394,7 @@ shape_character_def::read(SWFStream* in, int tag_type, bool with_style,
                     if ( style > m_line_styles.size() )
                     {
                         IF_VERBOSE_MALFORMED_SWF(
-                            log_swferror(_("Invalid fill style %d in lineStyleChange record - " SIZET_FMT " defined. Set to 0."), style, m_line_styles.size());
+                            log_swferror(_("Invalid fill style %d in lineStyleChange record - %d defined. Set to 0."), style, m_line_styles.size());
                         );
                         style = 0;
                     }
