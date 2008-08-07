@@ -223,6 +223,11 @@ private:
 		as_object *mCurrentScope;
 		as_value *mGlobalReturn;
 		as_object *mThis;
+
+	void to_debug_string(){
+		LOG_DEBUG_AVM("StackDepth=%u StackTotalSize=%u ScopeStackDepth=%u ScopeTotalSize=%u",mStackDepth,mStackTotalSize,mScopeStackDepth,mScopeTotalSize);
+
+	}
 	};
 
 	class Scope
@@ -243,22 +248,6 @@ private:
 	as_value get_register(int index){
 		LOG_DEBUG_AVM("Getting value at a register %d ",index);
 		return mFrame.value(index);
-	}
-
-	void push_stream_stack(CodeStream* stream){
-		LOG_DEBUG_AVM("Pushing new stream to stream stack.");
-		mStream = stream;
-		mStreamStack.push(stream);
-	}
-
-	bool pop_stream_stack(){
-		LOG_DEBUG_AVM("Poping stream off of stream stack.");
-		if(mStreamStack.size() == 1){
-			return false;
-		}
-		mStreamStack.pop();
-		mStream = mStreamStack.top(0);
-		return true;
 	}
 
 	void push_stack(as_value object){
@@ -325,8 +314,6 @@ private:
 	SafeStack<as_value> mFrame;
 	SafeStack<as_value> mAsValueScopeStack;
 	CodeStream *mStream;
-
-	SafeStack<CodeStream*> mStreamStack;
 
 	ClassHierarchy *mCH;
 	string_table& mST;

@@ -1210,8 +1210,11 @@ Machine::execute()
 /// Do: Return an undefined object up the callstack.
 	case SWF::ABC_ACTION_RETURNVOID:
 	{
-		if(!pop_stream_stack()){
+		if(mStateStack.size() == 0){
 			return;
+		}
+		else{
+			restoreState();
 		}
 		// Slot the return.
 //		*mGlobalReturn = as_value();
@@ -1357,7 +1360,8 @@ Machine::execute()
 		boost::uint32_t cid = mStream->read_V32();
 		asClass *c = pool_class(cid, mPoolObject);
 		LOG_DEBUG_AVM("Creating new class id=%u name=%s",c->getName(),mPoolObject->mStringPool[c->getName()]);
-		push_stream_stack(c->getStaticConstructor()->getBody());
+		saveState();
+		mStream = c->getStaticConstructor()->getBody();
 //		ENSURE_OBJECT(mStack.top(0));
 //		as_object *obj = mStack.top(0).to_object().get();
 //		as_function *func = c->getConstructor()->getPrototype();
@@ -2549,31 +2553,39 @@ Machine::pushCall(as_function *func, as_object *pthis, as_value& return_slot,
 void
 Machine::restoreState()
 {
+	LOG_DEBUG_AVM("Restoring state.");
 	State &s = mStateStack.top(0);
-	mStack.setAllSizes(s.mStackTotalSize, s.mStackDepth);
-	mScopeStack.setAllSizes(s.mScopeTotalSize, s.mScopeStackDepth);
+	s.to_debug_string();
+//	mStack.setAllSizes(s.mStackTotalSize, s.mStackDepth);
+//	mScopeStack.setAllSizes(s.mScopeTotalSize, s.mScopeStackDepth);
+	mAsValueScopeStack.setAllSizes(s.mScopeTotalSize, s.mScopeStackDepth);
 	mStream = s.mStream;
-	mDefaultXMLNamespace = s.mDefaultXMLNamespace;
-	mCurrentScope = s.mCurrentScope;
-	mGlobalReturn = s.mGlobalReturn;
-	mThis = s.mThis;
-	mStateStack.drop(1);
+//	mDefaultXMLNamespace = s.mDefaultXMLNamespace;
+//	mCurrentScope = s.mCurrentScope;
+//	mGlobalReturn = s.mGlobalReturn;
+//	mThis = s.mThis;
+//	mStateStack.drop(1);
+	mStateStack.pop();
 }
 
 void
 Machine::saveState()
 {
+	LOG_DEBUG_AVM("Saving state.");
 	mStateStack.grow(1);
 	State &s = mStateStack.top(0);
 	s.mStackDepth = mStack.getDownstop();
 	s.mStackTotalSize = mStack.totalSize();
-	s.mScopeStackDepth = mScopeStack.getDownstop();
-	s.mScopeTotalSize = mScopeStack.totalSize();
+	s.mScopeStackDepth = mAsValueScopeStack.getDownstop();
+	s.mScopeTotalSize = mAsValueScopeStack.totalSize();
+//	s.mScopeStackDepth = mScopeStack.getDownstop();
+//	s.mScopeTotalSize = mScopeStack.totalSize();
 	s.mStream = mStream;
-	s.mDefaultXMLNamespace = mDefaultXMLNamespace;
-	s.mCurrentScope = mCurrentScope;
-	s.mGlobalReturn = mGlobalReturn;
-	s.mThis = mThis;
+	s.to_debug_string();
+//	s.mDefaultXMLNamespace = mDefaultXMLNamespace;
+//	s.mCurrentScope = mCurrentScope;
+//	s.mGlobalReturn = mGlobalReturn;
+//	s.mThis = mThis;
 }
 
 void Machine::initMachine(abc_block* pool_block,as_object* global)
@@ -2596,7 +2608,6 @@ void Machine::initMachine(abc_block* pool_block,as_object* global)
 	}
 	log_debug("Loding code stream.");
 	mStream = method->getBody();
-	mStreamStack.push(mStream);
 	mFrame.push(as_value(global));
 	log_debug("Value type: %s",mFrame.top(0).typeOf());
 }
