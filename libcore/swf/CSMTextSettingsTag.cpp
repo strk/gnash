@@ -1,4 +1,4 @@
-// DefineFontAlignZonesTag.cpp:  for Gnash.
+// CSMTextSettingsTag.cpp:  for Gnash.
 //
 //   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
 //
