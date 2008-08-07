@@ -212,6 +212,10 @@ dnl version numbering fail gracefully.
         ffmpeg_num_version=$ffmpeg_version
       fi
     fi
+    if test x"${ffmpeg_version}" = x ; then
+      ffmpeg_version=`$EGREP "define LIBAVCODEC_VERSION_TRIPLET " ${avcodec_h} | sed -e "s%[[^0-9]]%%g"`
+      ffmpeg_num_version=$ffmpeg_version
+    fi
 
     AC_MSG_RESULT($ffmpeg_num_version)
 
