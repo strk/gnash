@@ -85,9 +85,6 @@ snappingrangetest_SOURCES = snappingrangetest.cpp
 # LogTest_SOURCES = TCXXLog.cpp
 # LogTest_CPPFLAGS = '-DBUILDDIR="$(abs_builddir)"'
 
-string_tableTest_SOURCES = string_tableTest.cpp
-string_tableTest_CPPFLAGS = -DSRCDIR="$(srcdir)"
-
 TEST_DRIVERS = ../simple.exp
 TEST_CASES = \
         $(check_PROGRAMS) \
