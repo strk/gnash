@@ -300,7 +300,7 @@ void button_character_definition::sound_info::read(SWFStream* in)
 	log_parse("	in_point = %d", m_in_point);
 	log_parse("	out_point = %d", m_out_point);
 	log_parse("	loop_count = %d", m_loop_count);
-	log_parse("	envelope size = " SIZET_FMT , m_envelopes.size());
+	log_parse("	envelope size = %d", m_envelopes.size());
 	);
 }
 
