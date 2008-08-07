@@ -45,6 +45,7 @@
 #include "ScriptLimitsTag.h"
 #include "BitmapMovieDefinition.h"
 #include "DefineFontAlignZonesTag.h"
+#include "CSMTextSettingsTag.h"
 #include "PlaceObject2Tag.h"
 #include "RemoveObjectTag.h"
 #include "DoActionTag.h"
@@ -236,7 +237,7 @@ static void ensure_loaders_registered()
     register_tag_loader(SWF::DOABC, abc_loader); // 72 -- AS3 codeblock.
     register_tag_loader(SWF::DEFINEALIGNZONES, DefineFontAlignZonesTag::loader); // 73
 
-    register_tag_loader(SWF::CSMTEXTSETTINGS, fixme_loader); // 74
+    register_tag_loader(SWF::CSMTEXTSETTINGS, CSMTextSettingsTag::loader); // 74
     register_tag_loader(SWF::DEFINEFONT3, define_font_loader); // 75
     register_tag_loader(SWF::SYMBOLCLASS, fixme_loader); // 76 
     register_tag_loader(SWF::METADATA, metadata_loader); // 77
