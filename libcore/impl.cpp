@@ -200,8 +200,8 @@ static void ensure_loaders_registered()
     register_tag_loader(SWF::PLACEFUNCTION, fixme_loader); // 54 
     register_tag_loader(SWF::GENTAGOBJECT, fixme_loader); // 55 
 
-    register_tag_loader(SWF::EXPORTASSETS,  export_loader); // 56
-    register_tag_loader(SWF::IMPORTASSETS,  import_loader); // 57
+    register_tag_loader(SWF::EXPORTASSETS, export_loader); // 56
+    register_tag_loader(SWF::IMPORTASSETS, import_loader); // 57
 
     //  We're not an authoring tool so we don't care.
     // (might be nice to dump the password instead..)
@@ -509,8 +509,6 @@ void  clear()
 //
 
 
-//static stringi_hash< boost::intrusive_ptr<movie_definition> > s_movie_library;
-
 /// Library of SWF movies indexed by URL strings
 //
 /// Elements are actually SWFMovieDefinition, the ones
@@ -581,9 +579,10 @@ public:
   {
   
     if (_limit)
+    {
       limit_size(_limit-1);
-    else
-      return;  // zero limit, library is a no-op
+    }
+    else return;  // zero limit, library is a no-op
   
     item temp;
     
@@ -628,33 +627,11 @@ private:
 };
 
 static MovieLibrary s_movie_library;
-
-typedef std::map< movie_definition*, boost::intrusive_ptr<sprite_instance> > library_container_t;
-static library_container_t  s_movie_library_inst;
 static std::vector<sprite_instance*> s_extern_sprites;
-
-static std::string s_workdir;
 
 void save_extern_movie(sprite_instance* m)
 {
     s_extern_sprites.push_back(m);
-}
-
-movie_root*
-get_current_root()
-{
-  return &(VM::get().getRoot());
-}
-
-const char* get_workdir()
-{
-    return s_workdir.c_str();
-}
-
-void set_workdir(const char* dir)
-{
-    assert(dir != NULL);
-    s_workdir = dir;
 }
 
 static void clear_library()
@@ -662,7 +639,6 @@ static void clear_library()
     // can be cleaned up.
 {
     s_movie_library.clear();
-    s_movie_library_inst.clear();
 }
 
 // Try to load a movie from the given url, if we haven't
