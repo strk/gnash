@@ -1606,14 +1606,17 @@ Machine::execute()
 ///  Set obj::(resolve)'name_id' to value, set bindings from the context.
 	case SWF::ABC_ACTION_INITPROPERTY:
 	{
+		LOG_AVM_UNIMPLEMENTED();
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
-#ifdef PRETEND
-		log_debug("AVM2: Initializing property id=%u name=%s",a.getABCName(),mPoolObject->mStringPool[a.getABCName()]);
-#else
-		//as_value& v = mStack.pop();
-		mStack.drop(completeName(a));
+		LOG_DEBUG_AVM("Initializing property id=%u name=%s",a.getABCName(),mPoolObject->mStringPool[a.getABCName()]);
+		as_value v = pop_stack();
+		//TODO: There may or may not be a namespace, or a name object on the stack, we need to figure 
+		//out how to determine what is on the stack.
+		as_value ns = pop_stack();
+		as_value object = pop_stack();
+		object.to_object()->init_member(mPoolObject->mStringPool[a.getABCName()],v,0,0);
+//		mStack.drop(completeName(a));
 		//TODO: mStack.pop().to_object().setProperty(a, v, true); // true for init
-#endif
 		break;
 	}
 /// 0x6A ABC_ACTION_DELETEPROPERTY
