@@ -227,7 +227,7 @@ main(int argc, char *argv[])
 		   case Flv::TAG_AUDIO:
 		   {
 		       if (all) {
-			   log_debug("FLV Tag type is: Audio");
+			   cerr << "FLV Tag type is: Audio" << endl;
 			   Flv::flv_audio_t *data = flv.decodeAudioData(*(buf.reference() + sizeof(Flv::flv_tag_t)));
 			   cerr << "\tSound Type is: " << type_strs[data->type] << endl;
 			   cerr << "\tSound Size is: " << size_strs[data->size] << endl;
@@ -272,6 +272,8 @@ usage ()
          << endl;
     cerr << _("Usage: flvdumper [h] filename") << endl;
     cerr << _("-h\tHelp") << endl;
+    cerr << _("-m\tPrint any Meta tags only (default)") << endl;
+    cerr << _("-a\tPrint al the tags too.") << endl;
     exit (-1);
 }
 
