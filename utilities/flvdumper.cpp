@@ -192,15 +192,20 @@ main(int argc, char *argv[])
 		 ifs.read(reinterpret_cast<char *>(&previous), sizeof(Flv::previous_size_t));
 		 previous = ntohl(previous);
 		 total -= sizeof(Flv::previous_size_t);
-		 log_debug("FLV Previous Tag Size was: %d", previous);
+		 cerr << "FLV Previous Tag Size was: " << previous << endl;
 		 ifs.read(reinterpret_cast<char *>(buf.reference()), sizeof(Flv::flv_tag_t));
 		 tag  = flv.decodeTagHeader(&buf);
 		 
 		 total -= sizeof(Flv::previous_size_t);
 		 boost::uint32_t bodysize = flv.convert24(tag->bodysize);
-		 log_error("FLV Tag size is of %d.", bodysize);
+		 cerr << "FLV Tag size is of " << bodysize << endl;
 		 buf.resize(bodysize);
 		 ifs.read(reinterpret_cast<char *>(buf.reference()), bodysize);
+		 // Got to the end of the file
+		 if (ifs.eof()) {
+		     break;
+		 }
+		 total -= bodysize;
 		 switch (tag->type) {
 		   case Flv::TAG_AUDIO:
 		   {
@@ -225,10 +230,7 @@ main(int argc, char *argv[])
 		       Element *metadata = flv.decodeMetaData(buf.reference(), bodysize);
 		       metadata->dump();
 		       continue;
-		 };
-		 
-// 		 Buffer data(bodysize);
-// 		 ifs.read(reinterpret_cast<char *>(buf.reference()), bodysize);
+		 };		 
              };
         } catch (std::exception& e) {
 	    log_error("Reading  %s: %s", filespec, e.what());
