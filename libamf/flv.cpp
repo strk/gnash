@@ -164,49 +164,50 @@ Flv::decodeAudioData(gnash::Network::byte_t byte)
     memset(audio, 0, sizeof(flv_audio_t));
 
     // Get the sound type
-    if (byte && Flv::AUDIO_MONO) {
-	audio->type = Flv::AUDIO_MONO;
-    } else if (byte && Flv::AUDIO_STEREO) {
+    if (byte && Flv::AUDIO_STEREO) {
 	audio->type = Flv::AUDIO_STEREO;
+    } else if (!byte && Flv::AUDIO_STEREO) {
+	audio->type = Flv::AUDIO_MONO;
     } else {
-	log_error("Bad FLV Audio Sound Type: 0x%x", byte + 0);
+	log_error("Bad FLV Audio Sound Type: %x", byte + 0);
     }
 
     // Get the sound size
-    if ((byte >> 1) && Flv::AUDIO_8BIT) {
-	audio->size = Flv::AUDIO_8BIT;	
-    } else if ((byte >> 1) && Flv::AUDIO_16BIT) {
+    if ((byte >> 1) && Flv::AUDIO_16BIT) {
 	audio->size = Flv::AUDIO_16BIT;	
+    } else if (!(byte >> 1) && Flv::AUDIO_16BIT) {
+	audio->size = Flv::AUDIO_8BIT;	
     } else {
 	log_error("Bad FLV Audio Sound size: %d", byte >> 1);
     }
 
     // Get the sound rate
-    if ((byte >> 2) && Flv::AUDIO_55KHZ) {
-	audio->rate = Flv::AUDIO_55KHZ;	
-    } else if ((byte >> 2) && Flv::AUDIO_11KHZ) {
+
+    if ((byte >> 2) && Flv::AUDIO_11KHZ) {
 	audio->rate = Flv::AUDIO_11KHZ;	
     } else if ((byte >> 2) & Flv::AUDIO_22KHZ) {
 	audio->rate = Flv::AUDIO_22KHZ;	
     } else if ((byte >> 2) & Flv::AUDIO_44KHZ) {
-	audio->rate = Flv::AUDIO_44KHZ;	
+	audio->rate = Flv::AUDIO_44KHZ;
+    } else if ((byte >> 2) == 0) {
+	audio->rate = Flv::AUDIO_55KHZ;
     } else {
 	log_error("Bad FLV Audio Sound Rate: %d", byte >> 2);
     }
 
     // Get the sound format
-    if ((byte >> 4) && Flv::AUDIO_UNCOMPRESSED) {
-	audio->format = Flv::AUDIO_UNCOMPRESSED;	
-    } else if ((byte >> 4) && Flv::AUDIO_ADPCM) {
+    if ((byte >> 4) && Flv::AUDIO_ADPCM) {
 	audio->format = Flv::AUDIO_ADPCM;	
     } else if ((byte >> 4) && Flv::AUDIO_MP3) {
-	audio->format = Flv::AUDIO_MP3;	
+	audio->format = Flv::AUDIO_MP3;
     } else if ((byte >> 4) && Flv::AUDIO_NELLYMOSER_8KHZ) {
-	audio->format = Flv::AUDIO_NELLYMOSER_8KHZ;	
+	audio->format = Flv::AUDIO_NELLYMOSER_8KHZ;
     } else if ((byte >> 4) && Flv::AUDIO_NELLYMOSER) {
-	audio->format = Flv::AUDIO_NELLYMOSER;	
+	audio->format = Flv::AUDIO_NELLYMOSER;
     } else if ((byte >> 4) && Flv::AUDIO_VORBIS) {
-	audio->format = Flv::AUDIO_VORBIS;	
+	audio->format = Flv::AUDIO_VORBIS;
+    } else if (!(byte >> 4) && Flv::AUDIO_ADPCM) {
+	audio->format = Flv::AUDIO_UNCOMPRESSED;
     } else {
 	log_error("Bad FLV Audio Sound format: %d", byte >> 4);
     }
