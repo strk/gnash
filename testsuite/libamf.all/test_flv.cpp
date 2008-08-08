@@ -254,9 +254,9 @@ test_tags()
         && (data2->size == Flv::AUDIO_8BIT)
         && (data2->rate == Flv::AUDIO_55KHZ)
         && (data2->format == Flv::AUDIO_UNCOMPRESSED)) {
-        runtest.pass("Decoded FLV Video Data flags");
+        runtest.pass("Decoded FLV Audio Data flags");
     } else {
-        runtest.fail("Decoded FLV Video Data flags");
+        runtest.fail("Decoded FLV Audio Data flags");
     }
     delete hex2;
     delete tag2;
