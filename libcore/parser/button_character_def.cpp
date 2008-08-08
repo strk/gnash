@@ -184,36 +184,30 @@ button_record::read(SWFStream* in, int tag_type,
 	in->ensureBytes(2);
 	m_button_layer = in->read_u16();
 
-	// TODO: pass available range to button matrix read
+    // matrix::read() checks the length of the stream
 	m_button_matrix.read(in);
 
 	if (tag_type == SWF::DEFINEBUTTON2)
 	{
-		// TODO: pass available range to button cxform read
+		// cxform::read_rgba() checks the length of the stream.
 		m_button_cxform.read_rgba(in);
 	}
 
 	if ( buttonHasFilterList )
 	{
 		filter_factory::read(*in, true, &_filters);
-		static bool warned=false;
-		if ( ! warned )
-		{
+		LOG_ONCE(
 			log_unimpl("Button filters"); 
-			warned=true;
-		}
+		);
 	}
 
 	if ( buttonHasBlendMode )
 	{
 		in->ensureBytes(1);
-        	_blendMode = in->read_u8();
-		static bool warned=false;
-		if ( ! warned )
-		{
+        _blendMode = in->read_u8();
+		LOG_ONCE(
 			log_unimpl("Button blend mode");
-			warned=true;
-		}
+		);
 	}
 
 	return true;
