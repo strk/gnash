@@ -27,11 +27,6 @@
 
 namespace gnash {
 
-// Forward declarations
-class sprite_instance;
-
-DSOEXPORT void save_extern_movie(sprite_instance* m);
-
 //
 // Loader callbacks.
 //

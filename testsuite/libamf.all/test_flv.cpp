@@ -211,9 +211,9 @@ test_headers()
     Flv::flv_tag_t *tag2 = flv.decodeTagHeader(hex2);
     if ((tag2->type == Flv::TAG_METADATA)
         && (flv.convert24(tag2->bodysize) == 164)) {
-        runtest.pass("Decoded FLV MetaData object");
+        runtest.pass("Decoded FLV MetaData header");
     } else {
-        runtest.fail("Decoded FLV MetaData object");
+        runtest.fail("Decoded FLV MetaData header");
     }
     delete tag2;
     delete hex2;

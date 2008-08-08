@@ -186,17 +186,17 @@ main(int argc, char *argv[])
 	    ifs.read(reinterpret_cast<char *>(buf.reference()), sizeof(Flv::flv_header_t));
 	    head  = flv.decodeHeader(&buf);
 	    if ((head->type & Flv::FLV_VIDEO) && (head->type & Flv::FLV_AUDIO)) {
-                cerr <<"FLV File type: Video and Audio" << endl;
+                cout <<"FLV File type: Video and Audio" << endl;
             } else if (head->type && Flv::FLV_VIDEO) {
-		cerr << "FLV File type: Video" << endl;
+		cout << "FLV File type: Video" << endl;
             } else if (head->type && Flv::FLV_AUDIO) {
-		cerr <<"FLV File type: Audio" << endl;
+		cout <<"FLV File type: Audio" << endl;
 	    }
 	    
-	    cerr << "FLV Version: " << int(head->version) << " (should always be 1)" << endl;
+	    cout << "FLV Version: " << int(head->version) << " (should always be 1)" << endl;
 	    boost::uint32_t headsize = flv.convert24(head->head_size);
 	    if (all) {   
-		cerr << "FLV Header size: " << headsize << " (should always be 9)" << endl;
+		cout << "FLV Header size: " << headsize << " (should always be 9)" << endl;
 	    }
             // Extract all the Tags
             size_t total = st.st_size - sizeof(Flv::flv_header_t);
@@ -205,15 +205,20 @@ main(int argc, char *argv[])
 		 previous = ntohl(previous);
 		 total -= sizeof(Flv::previous_size_t);
 		 if (all) {   
-		     cerr << "FLV Previous Tag Size was: " << previous << endl;
+		     cout << "FLV Previous Tag Size was: " << previous << endl;
 		 }
 		 ifs.read(reinterpret_cast<char *>(buf.reference()), sizeof(Flv::flv_tag_t));
 		 tag  = flv.decodeTagHeader(&buf);
 		 
 		 total -= sizeof(Flv::previous_size_t);
 		 boost::uint32_t bodysize = flv.convert24(tag->bodysize);
-		 if (all) {   
-		     cerr << "FLV Tag size is: " << bodysize << endl;
+		 if (bodysize == 0) {
+		     cerr << "FLV Tag size is zero, skipping reading packet body " << bodysize << endl;
+		     continue;
+		 } else {
+		     if (all) {   
+			 cout << "FLV Tag size is: " << bodysize +  sizeof(Flv::previous_size_t) << endl;
+		     }
 		 }
 		 buf.resize(bodysize);
 		 ifs.read(reinterpret_cast<char *>(buf.reference()), bodysize);
@@ -228,28 +233,28 @@ main(int argc, char *argv[])
 		   {
 		       if (all) {
 			   cerr << "FLV Tag type is: Audio" << endl;
-			   Flv::flv_audio_t *data = flv.decodeAudioData(*(buf.reference() + sizeof(Flv::flv_tag_t)));
-			   cerr << "\tSound Type is: " << type_strs[data->type] << endl;
-			   cerr << "\tSound Size is: " << size_strs[data->size] << endl;
-			   cerr << "\tSound Rate is: " << rate_strs[data->rate] << endl;
-			   cerr << "\tSound Format is: " << format_strs[data->format] << endl;
-			   break;
+ 			   Flv::flv_audio_t *data = flv.decodeAudioData(*(buf.reference() + sizeof(Flv::flv_tag_t)));
+ 			   cout << "\tSound Type is: "   << type_strs[data->type] << endl;
+ 			   cout << "\tSound Size is: "   << size_strs[data->size] << endl;
+ 			   cout << "\tSound Rate is: "   << rate_strs[data->rate] << endl;
+ 			   cout << "\tSound Format is: " << format_strs[data->format] << endl;
 		       }
+		       break;
 		   }
 		   case Flv::TAG_VIDEO:
 		   {
 		       if (all) {
-			   cerr << "FLV Tag type is: Video" << endl;
-			   Flv::flv_video_t *data = flv.decodeVideoData(*(buf.reference() + sizeof(Flv::flv_tag_t)));
-			   cerr << "\tCodec ID is: " << codec_strs[data->codecID] << endl;
-			   cerr << "\tFrame Type is: " << frame_strs[data->type] << endl;
-			   break;
+			   cout << "FLV Tag type is: Video" << endl;
+ 			   Flv::flv_video_t *data = flv.decodeVideoData(*(buf.reference() + sizeof(Flv::flv_tag_t)));
+ 			   cout << "\tCodec ID is: "   << codec_strs[data->codecID] << endl;
+ 			   cout << "\tFrame Type is: " << frame_strs[data->type] << endl;
 		       }
+		       break;
 		   }
 		   case Flv::TAG_METADATA:
-		       if (all) {
-			   cerr << "FLV Tag type is: MetaData" << endl;
-		       }
+ 		       if (meta || all) {
+ 			   cout << "FLV Tag type is: MetaData" << endl;
+ 		       }
 		       Element *metadata = flv.decodeMetaData(buf.reference(), bodysize);
 		       if (meta && metadata) {
 			   metadata->dump();
