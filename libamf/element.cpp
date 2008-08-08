@@ -984,9 +984,9 @@ Element::dump()
 	  break;
     }
 
-    if (_buffer) {
-	_buffer->dump();
-    }
+//     if (_buffer) {
+// 	_buffer->dump();
+//     }
 
     if (_properties.size() > 0) {
 	vector<amf::Element *>::iterator ait;
