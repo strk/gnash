@@ -132,10 +132,16 @@ Flv::decodeHeader(amf::Buffer *buf)
 amf::Element *
 Flv::decodeMetaData(amf::Buffer *buf)
 {
+    return decodeMetaData(buf->reference(), buf->size());
+}
+
+amf::Element *
+Flv::decodeMetaData(gnash::Network::byte_t *buf, size_t size)
+{
 //    GNASH_REPORT_FUNCTION;
     AMF amf;
-    Network::byte_t *ptr = buf->reference();
-    Network::byte_t *tooFar = ptr+buf->size();
+    Network::byte_t *ptr = buf;
+    Network::byte_t *tooFar = ptr + size;
 
     // Extract the onMetaData object name
     Element *name = amf.extractAMF(ptr, tooFar);

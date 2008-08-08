@@ -49,6 +49,55 @@ gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
 
 static void usage ();
 
+static const char *codec_strs[] = {
+    "None",
+    "None",
+    "H263",
+    "Screen",
+    "VP6",
+    "VP6_Alpha",
+    "Screen2",
+    "Theora",
+    "Dirac",
+    "Speex"
+};
+
+static const char *format_strs[] = {
+    "Uncompressed",
+    "ADPCM",
+    "MP3",
+    "Unknown",
+    "Unknown",
+    "Nellymoser_8KHZ",
+    "Nellymoser",
+    // These next are only supported by Gnash
+    "Vorbis"
+};
+
+static const char *frame_strs[] = {
+    "NO_frame",
+    "Keyframe",
+    "Interframe",
+    "Disposable"
+};
+
+static const char *size_strs[] = {
+    "8Bit",
+    "16Bit"
+};
+
+static const char *type_strs[] = {
+    "Mono",
+    "Stereo"
+};
+
+static const char *rate_strs[] = {
+    "55Khz",
+    "11Khz",
+    "22Khz",
+    "44Khz",
+};
+
 int
 main(int argc, char *argv[])
 {
@@ -113,97 +162,74 @@ main(int argc, char *argv[])
     struct stat st;
     Network::byte_t *buf = 0;
     Network::byte_t *ptr = 0;
-    Flv::flv_header_t head;
+    Flv::flv_header_t *head;
     Flv::previous_size_t   previous = 0;
-    Flv::flv_tag_t         tag;
+    Flv::flv_tag_t     *tag;
     
     // Make sure it's an SOL file
     if (stat(filespec.c_str(), &st) == 0) {
 	try {
             // Open the binary file
 	    ifstream ifs(filespec.c_str(), ios::binary);
-
+	    Buffer buf;
             // Read just the initial 9 byte header
-	    ifs.read(reinterpret_cast<char *>(&head), sizeof(Flv::flv_header_t));
-            cerr << "sizeof(Flv::flv_header_t): " << sizeof(Flv::flv_header_t) << endl;
-            
-            // Does the magic number match ?
-            if (memcmp(head.sig, "FLV", 3) == 0) {
-                log_debug("%s is an FLV video file.", filespec);
-            } else {
-                log_error("%s is not an FLV video file!", filespec);
-            }
-            log_debug("FLV Version: %d (should always be 1)", int(head.version));
-            if ((head.type & Flv::FLV_VIDEO) && (head.type & Flv::FLV_AUDIO)) {
+	    ifs.read(reinterpret_cast<char *>(buf.reference()), sizeof(Flv::flv_header_t));
+	    head  = flv.decodeHeader(&buf);
+	    if ((head->type & Flv::FLV_VIDEO) && (head->type & Flv::FLV_AUDIO)) {
                 log_debug("FLV File type: Video and Audio");         
-            } else if (head.type && Flv::FLV_VIDEO) {
+            } else if (head->type && Flv::FLV_VIDEO) {
                 log_debug("FLV File type: Video");
-            } else if (head.type && Flv::FLV_AUDIO) {
+            } else if (head->type && Flv::FLV_AUDIO) {
                 log_debug("FLV File type: Audio");
-            }
-            boost::uint32_t head_size;
-            memcpy(&head_size, head.head_size, 4);
-            head_size = ntohl(head_size);
-            log_debug("FLV Header size: %d (should always be 9)", head_size);
-            
+	    }
+	    
+ 	    log_debug("FLV Version: %d (should always be 1)", int(head->version));
+	    boost::uint32_t headsize = flv.convert24(head->head_size);
+ 	    log_debug("FLV Header size: %d (should always be 9)", headsize);
             // Extract all the Tags
-            size_t total = st.st_size - head_size;
-            while (total) {
-                ifs.read(reinterpret_cast<char *>(&previous), sizeof(Flv::previous_size_t));
-                previous = ntohl(previous);
-                total -= sizeof(Flv::previous_size_t);
-                log_debug("FLV Previous Tag Size was: %d", previous);
-                ifs.read(reinterpret_cast<char *>(&tag), sizeof(Flv::flv_tag_t));
-                total -= sizeof(Flv::previous_size_t);
-                boost::uint32_t bodysize = 0;
-                memcpy((char *)(&bodysize) + 1, tag.bodysize, 3);
-//                swapBytes(&bodysize, 3);
-                bodysize = ntohl(bodysize);
-                total -= bodysize;
-                switch (tag.type) {
-                  case Flv::TAG_AUDIO:
-                      log_debug("FLV Tag type is: Audio");
-                      break;
-                  case Flv::TAG_VIDEO: 
-                      log_debug("FLV Tag type is: Video");
-                      break;
-                  case Flv::TAG_METADATA:
-                  {
-                      AMF amf;
-                      log_debug("FLV Tag type is: MetaData");
-                      Buffer *meta = new Buffer(500);
-                      Network::byte_t *ptr = meta->reference();
-                      meta->clear();
-                      ifs.read(reinterpret_cast<char *>(meta->reference()), 500);
-                      Network::byte_t* tooFar = ptr + meta->size();
-                      // Extract the onMetaData object name
-                      Element *el1 = amf.extractAMF(ptr, tooFar);
-                      size_t seek = ifs.tellg();
-                      ptr += amf.totalsize();
-                      // Extract the properties for this metadata object.
-                      Element *el2 = amf.extractAMF(ptr, tooFar);
-                      ptr += amf.totalsize();
-//                      ifs.seekg (seek + 424 + 9, ios::beg);
-                      meta->clear();
-                      ifs.read(reinterpret_cast<char *>(meta->reference()), 500);
-                      seek = ifs.tellg();
-                      continue;
-                  }
-                  default:
-                      log_error("FLV Tag type out of range! was %d, should be 0x8, 0x9, or 0x12.",
-                                bodysize);
-                      break;
-                }
-                if (bodysize < FLV_MAX_LENGTH) {
-                    boost::uint8_t *buf = new boost::uint8_t[bodysize];
-                    ifs.read(reinterpret_cast<char *>(&buf), bodysize);
-                    total -= bodysize;
-                    log_debug("FLV Body size is: %d", bodysize);
-                } else {
-                    log_error("Bad bodysize of 0x%x.", bodysize);
-                }
-            };
-            
+            size_t total = st.st_size - sizeof(Flv::flv_header_t);
+             while (total) {
+		 ifs.read(reinterpret_cast<char *>(&previous), sizeof(Flv::previous_size_t));
+		 previous = ntohl(previous);
+		 total -= sizeof(Flv::previous_size_t);
+		 log_debug("FLV Previous Tag Size was: %d", previous);
+		 ifs.read(reinterpret_cast<char *>(buf.reference()), sizeof(Flv::flv_tag_t));
+		 tag  = flv.decodeTagHeader(&buf);
+		 
+		 total -= sizeof(Flv::previous_size_t);
+		 boost::uint32_t bodysize = flv.convert24(tag->bodysize);
+		 log_error("FLV Tag size is of %d.", bodysize);
+		 buf.resize(bodysize);
+		 ifs.read(reinterpret_cast<char *>(buf.reference()), bodysize);
+		 switch (tag->type) {
+		   case Flv::TAG_AUDIO:
+		   {
+		       log_debug("FLV Tag type is: Audio");
+		       Flv::flv_audio_t *data = flv.decodeAudioData(*(buf.reference() + sizeof(Flv::flv_tag_t)));
+		       cerr << "Sound Type is: " << type_strs[data->type] << endl;
+		       cerr << "Sound Size is: " << size_strs[data->size] << endl;
+		       cerr << "Sound Rate is: " << rate_strs[data->rate] << endl;
+		       cerr << "Sound Format is: " << format_strs[data->format] << endl;
+		       break;
+		   }
+		   case Flv::TAG_VIDEO:
+		   {
+		       log_debug("FLV Tag type is: Video");
+		       Flv::flv_video_t *data = flv.decodeVideoData(*(buf.reference() + sizeof(Flv::flv_tag_t)));
+		       cerr << "Codec ID is: " << codec_strs[data->codecID] << endl;
+		       cerr << "Frame Type is: " << frame_strs[data->type] << endl;
+		       break;
+		   }
+		   case Flv::TAG_METADATA:
+		       log_debug("FLV Tag type is: MetaData");
+		       Element *metadata = flv.decodeMetaData(buf.reference(), bodysize);
+		       metadata->dump();
+		       continue;
+		 };
+		 
+// 		 Buffer data(bodysize);
+// 		 ifs.read(reinterpret_cast<char *>(buf.reference()), bodysize);
+             };
         } catch (std::exception& e) {
 	    log_error("Reading  %s: %s", filespec, e.what());
 	    return false;

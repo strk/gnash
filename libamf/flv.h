@@ -85,8 +85,8 @@ class DSOEXPORT Flv {
         VIDEO_VP6_ALPHA = 0x5,
         VIDEO_SCREEN2 = 0x6,
         VIDEO_THEORA = 0x7,
-        VIDEO_DIRAC = 0x0,
-        VIDEO_SPEEX = 0x0,
+        VIDEO_DIRAC = 0x8,
+        VIDEO_SPEEX = 0x9,
     } flv_video_codec_e;
     // frameType (byte & 0x0f) >> 4
     typedef enum {
@@ -129,6 +129,7 @@ class DSOEXPORT Flv {
 
     // Decode a MetaData object, which is after the header, but before all the tags
     amf::Element *decodeMetaData(amf::Buffer *buf);
+    amf::Element *decodeMetaData(gnash::Network::byte_t *buf, size_t size);
     flv_audio_t *decodeAudioData(gnash::Network::byte_t flags);
     flv_video_t *decodeVideoData(gnash::Network::byte_t flags);
     
