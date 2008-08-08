@@ -102,6 +102,8 @@ int
 main(int argc, char *argv[])
 {
     bool dump = false;          // dump the FLV data
+    bool all = false;		// dump all the tags too
+    bool meta = true;		// dump all Meta tags only
     vector<string> infiles;
     
     // Enable native language support, i.e. internationalization
@@ -115,6 +117,8 @@ main(int argc, char *argv[])
             { 'h', "help",          Arg_parser::no  },
             { 'v', "verbose",       Arg_parser::no  },
             { 'd', "dump",          Arg_parser::no  },
+            { 'a', "all",           Arg_parser::no  },
+            { 'm', "meta",           Arg_parser::no  },
         };
     
     Arg_parser parser(argc, argv, opts);
@@ -136,6 +140,12 @@ main(int argc, char *argv[])
                   break;
               case 'd':
                   dump = true;
+                  break;
+              case 'a':
+                  all = true;
+                  break;
+              case 'm':
+                  meta = true;
                   break;
 	      case 0:
 		  infiles.push_back(parser.argument(i));
@@ -183,22 +193,28 @@ main(int argc, char *argv[])
 		cerr <<"FLV File type: Audio" << endl;
 	    }
 	    
- 	    log_debug("FLV Version: %d (should always be 1)", int(head->version));
+	    cerr << "FLV Version: " << int(head->version) << " (should always be 1)" << endl;
 	    boost::uint32_t headsize = flv.convert24(head->head_size);
- 	    cerr << "FLV Header size: " << headsize << " (should always be 9)" << endl;
+	    if (all) {   
+		cerr << "FLV Header size: " << headsize << " (should always be 9)" << endl;
+	    }
             // Extract all the Tags
             size_t total = st.st_size - sizeof(Flv::flv_header_t);
              while (total) {
 		 ifs.read(reinterpret_cast<char *>(&previous), sizeof(Flv::previous_size_t));
 		 previous = ntohl(previous);
 		 total -= sizeof(Flv::previous_size_t);
-		 cerr << "FLV Previous Tag Size was: " << previous << endl;
+		 if (all) {   
+		     cerr << "FLV Previous Tag Size was: " << previous << endl;
+		 }
 		 ifs.read(reinterpret_cast<char *>(buf.reference()), sizeof(Flv::flv_tag_t));
 		 tag  = flv.decodeTagHeader(&buf);
 		 
 		 total -= sizeof(Flv::previous_size_t);
 		 boost::uint32_t bodysize = flv.convert24(tag->bodysize);
-		 cerr << "FLV Tag size is of " << bodysize << endl;
+		 if (all) {   
+		     cerr << "FLV Tag size is: " << bodysize << endl;
+		 }
 		 buf.resize(bodysize);
 		 ifs.read(reinterpret_cast<char *>(buf.reference()), bodysize);
 		 // Got to the end of the file
@@ -210,26 +226,34 @@ main(int argc, char *argv[])
 		 switch (tag->type) {
 		   case Flv::TAG_AUDIO:
 		   {
-		       log_debug("FLV Tag type is: Audio");
-		       Flv::flv_audio_t *data = flv.decodeAudioData(*(buf.reference() + sizeof(Flv::flv_tag_t)));
-		       cerr << "Sound Type is: " << type_strs[data->type] << endl;
-		       cerr << "Sound Size is: " << size_strs[data->size] << endl;
-		       cerr << "Sound Rate is: " << rate_strs[data->rate] << endl;
-		       cerr << "Sound Format is: " << format_strs[data->format] << endl;
-		       break;
+		       if (all) {
+			   log_debug("FLV Tag type is: Audio");
+			   Flv::flv_audio_t *data = flv.decodeAudioData(*(buf.reference() + sizeof(Flv::flv_tag_t)));
+			   cerr << "\tSound Type is: " << type_strs[data->type] << endl;
+			   cerr << "\tSound Size is: " << size_strs[data->size] << endl;
+			   cerr << "\tSound Rate is: " << rate_strs[data->rate] << endl;
+			   cerr << "\tSound Format is: " << format_strs[data->format] << endl;
+			   break;
+		       }
 		   }
 		   case Flv::TAG_VIDEO:
 		   {
-		       cerr << "FLV Tag type is: Video" << endl;
-		       Flv::flv_video_t *data = flv.decodeVideoData(*(buf.reference() + sizeof(Flv::flv_tag_t)));
-		       cerr << "Codec ID is: " << codec_strs[data->codecID] << endl;
-		       cerr << "Frame Type is: " << frame_strs[data->type] << endl;
-		       break;
+		       if (all) {
+			   cerr << "FLV Tag type is: Video" << endl;
+			   Flv::flv_video_t *data = flv.decodeVideoData(*(buf.reference() + sizeof(Flv::flv_tag_t)));
+			   cerr << "\tCodec ID is: " << codec_strs[data->codecID] << endl;
+			   cerr << "\tFrame Type is: " << frame_strs[data->type] << endl;
+			   break;
+		       }
 		   }
 		   case Flv::TAG_METADATA:
-		       cerr << "FLV Tag type is: MetaData" << endl;
+		       if (all) {
+			   cerr << "FLV Tag type is: MetaData" << endl;
+		       }
 		       Element *metadata = flv.decodeMetaData(buf.reference(), bodysize);
-		       metadata->dump();
+		       if (meta && metadata) {
+			   metadata->dump();
+		       }
 		       continue;
 		 };		 
              };
