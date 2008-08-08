@@ -34,11 +34,6 @@
 #include <cfloat>
 #include <algorithm>
 
-//#ifdef __sgi
-//extern double round(double);
-//#pragma optional round
-//#endif
-
 // Define the macro below to always compute bounds for shape characters
 // and compare them with the bounds encoded in the SWF
 //#define GNASH_DEBUG_SHAPE_BOUNDS 1

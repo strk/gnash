@@ -21,19 +21,11 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "IOChannel.h"
 #include "utility.h"
-//#include "action.h"
 #include "impl.h"
 #include "font.h"
 #include "fontlib.h"
 #include "log.h"
 #include "image.h"
-//#include "render.h"
-//#include "shape.h"
-//#include "styles.h"
-//#include "dlist.h"
-//#include "timers.h"
-//#include "zlib_adapter.h"
-//#include "generic_character.h"
 #include "sprite_definition.h"
 #include "SWFMovieDefinition.h"
 #include "swf.h"
@@ -45,6 +37,7 @@
 #include "ScriptLimitsTag.h"
 #include "BitmapMovieDefinition.h"
 #include "DefineFontAlignZonesTag.h"
+#include "DefineButtonCxformTag.h"
 #include "CSMTextSettingsTag.h"
 #include "PlaceObject2Tag.h"
 #include "RemoveObjectTag.h"
@@ -134,7 +127,7 @@ static void ensure_loaders_registered()
 
     // End tag doesn't really need to exist.
     // TODO: use null_loader here ?
-    register_tag_loader(SWF::END,   end_loader);
+    register_tag_loader(SWF::END, end_loader);
 
     register_tag_loader(SWF::DEFINESHAPE, define_shape_loader);
     register_tag_loader(SWF::FREECHARACTER, fixme_loader); // 03
@@ -160,7 +153,7 @@ static void ensure_loaders_registered()
     register_tag_loader(SWF::DEFINELOSSLESS, define_bits_lossless_2_loader);
     register_tag_loader(SWF::DEFINEBITSJPEG2, define_bits_jpeg2_loader);
     register_tag_loader(SWF::DEFINESHAPE2,  define_shape_loader);
-    register_tag_loader(SWF::DEFINEBUTTONCXFORM, fixme_loader); // 23
+    register_tag_loader(SWF::DEFINEBUTTONCXFORM, DefineButtonCxformTag::loader); // 23
     // "protect" tag; we're not an authoring tool so we don't care.
     // (might be nice to dump the password instead..)
     register_tag_loader(SWF::PROTECT, null_loader);
@@ -628,12 +621,6 @@ private:
 };
 
 static MovieLibrary s_movie_library;
-static std::vector<sprite_instance*> s_extern_sprites;
-
-void save_extern_movie(sprite_instance* m)
-{
-    s_extern_sprites.push_back(m);
-}
 
 static void clear_library()
     // Drop all library references to movie_definitions, so they
