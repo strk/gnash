@@ -4573,8 +4573,6 @@ sprite_instance::loadMovie(const URL& url, const std::string* postdata)
     assert ( extern_movie->get_event_handlers().empty() );
     extern_movie->set_event_handlers(clipEvs);
 
-    save_extern_movie(extern_movie.get());
-
     const std::string& name = get_name();
     assert ( parent == extern_movie->get_parent() );
 
