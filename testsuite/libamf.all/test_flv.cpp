@@ -188,7 +188,7 @@ test_headers()
     } else {
         if ((memcmp(head->sig, "FLV", 0) == 0)
             && (head->version == 1)
-            && (head->head_size[0] == 9)) {
+            && (head->head_size[0] == 9)) { // this part of the test is little endian dependant
             runtest.pass("Decoded FLV header");
         } else {
             runtest.fail("Decoded FLV header");
@@ -235,7 +235,7 @@ test_tags()
         runtest.untested("Decoded FLV MetaData object");
     } else {
 //        el1->dump();
-        if ((el1->getType() ==Element::ECMA_ARRAY_AMF0)
+        if ((el1->getType() == Element::ECMA_ARRAY_AMF0)
             && (el1->propertySize() == 6)) {
             runtest.pass("Decoded FLV MetaData object");
         } else {
@@ -246,12 +246,35 @@ test_tags()
     }
 
     // Test decoding Audio tags
-    Buffer *hex2 = hex2mem("08 00 00 00 00 00 00 00 00 00 00 00");    
-    Flv::flv_audio_t *tag2 = flv.decodeAudioTag(hex2);
-
+    Buffer *hex2 = hex2mem("09 00 00 00 00 00 00 00 00 00 00 00");    
+    Flv::flv_tag_t *tag2 = flv.decodeTagHeader(hex2);
+    Flv::flv_audio_t *data2 = flv.decodeAudioData(*(hex2->reference() + 11));
+    if ((tag2->type && Flv::TAG_AUDIO)
+        && (data2->type == Flv::AUDIO_MONO)
+        && (data2->size == Flv::AUDIO_8BIT)
+        && (data2->rate == Flv::AUDIO_55KHZ)
+        && (data2->format == Flv::AUDIO_UNCOMPRESSED)) {
+        runtest.pass("Decoded FLV Video Data flags");
+    } else {
+        runtest.fail("Decoded FLV Video Data flags");
+    }
+    delete hex2;
+    delete tag2;
+    delete data2;
 
     Buffer *hex3 = hex2mem("08 00 00 1b 00 00 00 00 00 00 00 2a");
-    Flv::flv_audio_t *tag3 = flv.decodeAudioTag(hex3);
+    Flv::flv_tag_t *tag3 = flv.decodeTagHeader(hex3);
+    Flv::flv_video_t *data3 = flv.decodeVideoData(*(hex3->reference() + 11));
+    if ((tag3->type && Flv::TAG_VIDEO)
+        && (data3->codecID == Flv::VIDEO_H263)
+        && (data3->type == Flv::KEYFRAME)) {
+        runtest.pass("Decoded FLV Video Data flags");
+    } else {
+        runtest.fail("Decoded FLV Video Data flags");
+    }
+    delete hex3;
+    delete tag3;
+    delete data3;
 }
 
 static void

@@ -45,6 +45,7 @@
 #include "ScriptLimitsTag.h"
 #include "BitmapMovieDefinition.h"
 #include "DefineFontAlignZonesTag.h"
+#include "CSMTextSettingsTag.h"
 #include "PlaceObject2Tag.h"
 #include "RemoveObjectTag.h"
 #include "DoActionTag.h"
@@ -200,8 +201,8 @@ static void ensure_loaders_registered()
     register_tag_loader(SWF::PLACEFUNCTION, fixme_loader); // 54 
     register_tag_loader(SWF::GENTAGOBJECT, fixme_loader); // 55 
 
-    register_tag_loader(SWF::EXPORTASSETS,  export_loader); // 56
-    register_tag_loader(SWF::IMPORTASSETS,  import_loader); // 57
+    register_tag_loader(SWF::EXPORTASSETS, export_loader); // 56
+    register_tag_loader(SWF::IMPORTASSETS, import_loader); // 57
 
     //  We're not an authoring tool so we don't care.
     // (might be nice to dump the password instead..)
@@ -236,7 +237,7 @@ static void ensure_loaders_registered()
     register_tag_loader(SWF::DOABC, abc_loader); // 72 -- AS3 codeblock.
     register_tag_loader(SWF::DEFINEALIGNZONES, DefineFontAlignZonesTag::loader); // 73
 
-    register_tag_loader(SWF::CSMTEXTSETTINGS, fixme_loader); // 74
+    register_tag_loader(SWF::CSMTEXTSETTINGS, CSMTextSettingsTag::loader); // 74
     register_tag_loader(SWF::DEFINEFONT3, define_font_loader); // 75
     register_tag_loader(SWF::SYMBOLCLASS, fixme_loader); // 76 
     register_tag_loader(SWF::METADATA, metadata_loader); // 77
@@ -250,27 +251,6 @@ static void ensure_loaders_registered()
     register_tag_loader(SWF::REFLEX, reflex_loader); // 777
 }
 
-
-// Create a movie_definition from a jpeg stream
-// NOTE: this method assumes this *is* a jpeg stream
-static movie_definition*
-create_jpeg_movie(std::auto_ptr<IOChannel> in, const std::string& url)
-{
-
-  std::auto_ptr<image::rgb> im ( image::read_jpeg(in.get()) );
-
-  if ( ! im.get() )
-  {
-    log_error(_("Can't read jpeg from %s"), url);
-    return NULL;
-  } 
-
-  BitmapMovieDefinition* mdef = new BitmapMovieDefinition(im, url);
-  //log_debug(_("BitmapMovieDefinition %p created"), mdef);
-  return mdef;
-
-}
-
 // Create a movie_definition from a png stream
 // NOTE: this method assumes this *is* a png stream
 // TODO: The pp won't display PNGs for SWF7 or below.
@@ -279,9 +259,13 @@ createBitmapMovie(std::auto_ptr<IOChannel> in, const std::string& url, FileType 
 {
     assert (in.get());
 
+    // readImageData takes a shared pointer because JPEG streams sometimes need
+    // to transfer ownership.
+    boost::shared_ptr<IOChannel> imageData(in.release());
+
     try
     {
-        std::auto_ptr<image::rgb> im(image::readImageData(*in, type));
+        std::auto_ptr<image::rgb> im(image::readImageData(imageData, type));
         if (!im.get())
         {
             log_error(_("Can't read image file from %s"), url);
@@ -417,17 +401,6 @@ create_movie(std::auto_ptr<IOChannel> in, const std::string& url, bool startLoad
     switch (type)
     {
         case GNASH_FILETYPE_JPEG:
-        {
-            if ( startLoaderThread == false )
-            {
-              log_unimpl(_("Requested to keep from completely loading "
-                           "a movie, but the movie in question is a "
-                           "jpeg, for which we don't yet have the "
-                           "concept of a 'loading thread'"));
-            }
-            return create_jpeg_movie(in, url);
-        }            
-
         case GNASH_FILETYPE_PNG:
         case GNASH_FILETYPE_GIF:
         {
@@ -437,7 +410,7 @@ create_movie(std::auto_ptr<IOChannel> in, const std::string& url, bool startLoad
                            "a movie, but the movie in question is an "
                            "image, for which we don't yet have the "
                            "concept of a 'loading thread'"));
-            }            
+            }
             return createBitmapMovie(in, url, type);
         }
 
@@ -537,8 +510,6 @@ void  clear()
 //
 
 
-//static stringi_hash< boost::intrusive_ptr<movie_definition> > s_movie_library;
-
 /// Library of SWF movies indexed by URL strings
 //
 /// Elements are actually SWFMovieDefinition, the ones
@@ -609,9 +580,10 @@ public:
   {
   
     if (_limit)
+    {
       limit_size(_limit-1);
-    else
-      return;  // zero limit, library is a no-op
+    }
+    else return;  // zero limit, library is a no-op
   
     item temp;
     
@@ -656,33 +628,11 @@ private:
 };
 
 static MovieLibrary s_movie_library;
-
-typedef std::map< movie_definition*, boost::intrusive_ptr<sprite_instance> > library_container_t;
-static library_container_t  s_movie_library_inst;
 static std::vector<sprite_instance*> s_extern_sprites;
-
-static std::string s_workdir;
 
 void save_extern_movie(sprite_instance* m)
 {
     s_extern_sprites.push_back(m);
-}
-
-movie_root*
-get_current_root()
-{
-  return &(VM::get().getRoot());
-}
-
-const char* get_workdir()
-{
-    return s_workdir.c_str();
-}
-
-void set_workdir(const char* dir)
-{
-    assert(dir != NULL);
-    s_workdir = dir;
 }
 
 static void clear_library()
@@ -690,7 +640,6 @@ static void clear_library()
     // can be cleaned up.
 {
     s_movie_library.clear();
-    s_movie_library_inst.clear();
 }
 
 // Try to load a movie from the given url, if we haven't

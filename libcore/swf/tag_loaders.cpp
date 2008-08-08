@@ -54,6 +54,7 @@
 #include "sound_definition.h"
 #include "abc_block.h"
 #include "SoundInfo.h"
+#include "gnash.h" // FileType enum
 
 #ifdef HAVE_ZLIB_H
 #include <zlib.h>
@@ -236,7 +237,7 @@ jpeg_tables_loader(SWFStream* in, tag_type tag, movie_definition* m)
         log_debug(_("No bytes to read in JPEGTABLES tag at offset %d"), currPos);
     }
 
-    std::auto_ptr<jpeg::input> j_in;
+    std::auto_ptr<JpegImageInput> j_in;
 
     try
     {
@@ -247,9 +248,9 @@ jpeg_tables_loader(SWFStream* in, tag_type tag, movie_definition* m)
 	// Anyway the actual reads are limited to currently opened tag as 
 	// of gnash::SWFStream::read(), so this is not a problem.
 	//
-        std::auto_ptr<tu_file> ad( StreamAdapter::getFile(*in, std::numeric_limits<unsigned long>::max()) );
-        //  transfer ownership to the jpeg::input
-        j_in.reset(jpeg::input::create_swf_jpeg2_header_only(ad.release(), jpegHeaderSize, true));
+        boost::shared_ptr<tu_file> ad( StreamAdapter::getFile(*in, std::numeric_limits<unsigned long>::max()) );
+        //  transfer ownership to the JpegImageInput
+        j_in = JpegImageInput::createSWFJpeg2HeaderOnly(ad, jpegHeaderSize);
 
     }
     catch (std::exception& e)
@@ -266,7 +267,7 @@ jpeg_tables_loader(SWFStream* in, tag_type tag, movie_definition* m)
 
 
 // A JPEG image without included tables; those should be in an
-// existing jpeg::input object stored in the movie.
+// existing JpegImageInput object stored in the movie.
 void
 define_bits_jpeg_loader(SWFStream* in, tag_type tag, movie_definition* m)
 {
@@ -280,7 +281,7 @@ define_bits_jpeg_loader(SWFStream* in, tag_type tag, movie_definition* m)
     // Read the image data.
     //
 
-    jpeg::input*	j_in = m->get_jpeg_loader();
+    JpegImageInput* j_in = m->get_jpeg_loader();
     if ( ! j_in )
     {
         IF_VERBOSE_MALFORMED_SWF(
@@ -290,12 +291,12 @@ define_bits_jpeg_loader(SWFStream* in, tag_type tag, movie_definition* m)
     }
 
     assert(j_in);
-    j_in->discard_partial_buffer();
+    j_in->discardPartialBuffer();
     
     std::auto_ptr<image::rgb> im;
     try
     {
-        im.reset ( image::read_swf_jpeg2_with_tables(j_in) );
+        im = image::readSWFJpeg2WithTables(j_in);
     }
     catch (std::exception& e)
     {
@@ -339,8 +340,8 @@ define_bits_jpeg2_loader(SWFStream* in, tag_type tag, movie_definition* m)
     // Read the image data.
     //
 
-    std::auto_ptr<tu_file> ad( StreamAdapter::getFile(*in, in->get_tag_end_position()) );
-    std::auto_ptr<image::rgb> im ( image::read_jpeg(ad.get()) );
+    boost::shared_ptr<tu_file> ad( StreamAdapter::getFile(*in, in->get_tag_end_position()) );
+    std::auto_ptr<image::rgb> im (image::readImageData(ad, GNASH_FILETYPE_JPEG));
 
     if ( m->get_bitmap_character_def(character_id) )
     {
@@ -468,8 +469,8 @@ define_bits_jpeg3_loader(SWFStream* in, tag_type tag, movie_definition* m)
     //
 
     // Read rgb data.
-    std::auto_ptr<tu_file> ad( StreamAdapter::getFile(*in, alpha_position) );
-    std::auto_ptr<image::rgba> im = image::readSWFJpeg3(ad.get());
+    boost::shared_ptr<tu_file> ad( StreamAdapter::getFile(*in, alpha_position) );
+    std::auto_ptr<image::rgba> im = image::readSWFJpeg3(ad);
     
     /// Failure to read the jpeg.
     if (!im.get()) return;

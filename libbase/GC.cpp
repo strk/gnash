@@ -67,7 +67,7 @@ GC::cleanup()
 GC::~GC()
 {
 #ifdef GNASH_GC_DEBUG 
-	log_debug(_("GC %p deleted, deleting all managed resources - collector run " SIZET_FMT " times"), (void*)this, _collectorRuns);
+	log_debug(_("GC %p deleted, deleting all managed resources - collector run %d times"), (void*)this, _collectorRuns);
 #endif
 
 #if 1
@@ -109,7 +109,7 @@ GC::cleanUnreachable()
 		}
 	}
 #ifdef GNASH_GC_DEBUG 
-	log_debug(_("GC %p: cleanUnreachable deleted " SIZET_FMT
+	log_debug(_("GC %p: cleanUnreachable deleted %d"
 			" resources marked as unreachable"),
 			(void*)this, deleted);
 #endif
@@ -124,7 +124,7 @@ GC::collect()
 	if ( (curResSize - _lastResCount) < maxNewCollectablesCount )
 	{
 #if GNASH_GC_DEBUG  > 1
-		log_debug(_("Garbage collection skipped since number of collectables added since last run is too low (" SIZET_FMT ")"),
+		log_debug(_("Garbage collection skipped since number of collectables added since last run is too low (%d)"),
 			       curResSize - _lastResCount);
 #endif // GNASH_GC_DEBUG
 		return;
@@ -135,7 +135,7 @@ GC::collect()
 #endif
 
 #ifdef GNASH_GC_DEBUG 
-	log_debug(_("GC %p Starting collector: " SIZET_FMT " collectables"), (void *)this, curResSize);
+	log_debug(_("GC %p Starting collector: %d collectables"), (void *)this, curResSize);
 #endif // GNASH_GC_DEBUG
 
 #ifndef NDEBUG

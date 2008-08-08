@@ -157,36 +157,34 @@ Flv::decodeMetaData(amf::Buffer *buf)
 }
 
 Flv::flv_audio_t *
-Flv::decodeAudioTag(amf::Buffer *buf)
+Flv::decodeAudioData(gnash::Network::byte_t byte)
 {
 //    GNASH_REPORT_FUNCTION;
-    flv_tag_t *tag = decodeTagHeader(buf);
     flv_audio_t *audio = new flv_audio_t;
-    
-    Network::byte_t byte= *(buf->reference() + sizeof(flv_tag_t));
+    memset(audio, 0, sizeof(flv_audio_t));
 
     // Get the sound type
-    if (byte & Flv::AUDIO_MONO) {
+    if (byte && Flv::AUDIO_MONO) {
 	audio->type = Flv::AUDIO_MONO;
-    } else if (byte & Flv::AUDIO_STEREO) {
+    } else if (byte && Flv::AUDIO_STEREO) {
 	audio->type = Flv::AUDIO_STEREO;
     } else {
-	log_error("Bad FLV Audio Sound Type: %d", byte);
+	log_error("Bad FLV Audio Sound Type: 0x%x", byte + 0);
     }
 
     // Get the sound size
-    if ((byte >> 1) & Flv::AUDIO_8BIT) {
+    if ((byte >> 1) && Flv::AUDIO_8BIT) {
 	audio->size = Flv::AUDIO_8BIT;	
-    } else if ((byte >> 1) & Flv::AUDIO_16BIT) {
+    } else if ((byte >> 1) && Flv::AUDIO_16BIT) {
 	audio->size = Flv::AUDIO_16BIT;	
     } else {
 	log_error("Bad FLV Audio Sound size: %d", byte >> 1);
     }
 
     // Get the sound rate
-    if ((byte >> 2) & Flv::AUDIO_55KHZ) {
+    if ((byte >> 2) && Flv::AUDIO_55KHZ) {
 	audio->rate = Flv::AUDIO_55KHZ;	
-    } else if ((byte >> 2) & Flv::AUDIO_11KHZ) {
+    } else if ((byte >> 2) && Flv::AUDIO_11KHZ) {
 	audio->rate = Flv::AUDIO_11KHZ;	
     } else if ((byte >> 2) & Flv::AUDIO_22KHZ) {
 	audio->rate = Flv::AUDIO_22KHZ;	
@@ -197,31 +195,64 @@ Flv::decodeAudioTag(amf::Buffer *buf)
     }
 
     // Get the sound format
-    if ((byte >> 4) & Flv::AUDIO_UNCOMPRESSED) {
+    if ((byte >> 4) && Flv::AUDIO_UNCOMPRESSED) {
 	audio->format = Flv::AUDIO_UNCOMPRESSED;	
-    } else if ((byte >> 4) & Flv::AUDIO_ADPCM) {
+    } else if ((byte >> 4) && Flv::AUDIO_ADPCM) {
 	audio->format = Flv::AUDIO_ADPCM;	
-    } else if ((byte >> 4) & Flv::AUDIO_MP3) {
+    } else if ((byte >> 4) && Flv::AUDIO_MP3) {
 	audio->format = Flv::AUDIO_MP3;	
-    } else if ((byte >> 4) & Flv::AUDIO_NELLYMOSER_8KHZ) {
+    } else if ((byte >> 4) && Flv::AUDIO_NELLYMOSER_8KHZ) {
 	audio->format = Flv::AUDIO_NELLYMOSER_8KHZ;	
-    } else if ((byte >> 4) & Flv::AUDIO_NELLYMOSER) {
+    } else if ((byte >> 4) && Flv::AUDIO_NELLYMOSER) {
 	audio->format = Flv::AUDIO_NELLYMOSER;	
-    } else if ((byte >> 4) & Flv::AUDIO_VORBIS) {
+    } else if ((byte >> 4) && Flv::AUDIO_VORBIS) {
 	audio->format = Flv::AUDIO_VORBIS;	
     } else {
 	log_error("Bad FLV Audio Sound format: %d", byte >> 4);
     }
     
-    delete tag;
-
     return audio;
 }
 
 Flv::flv_video_t *
-Flv::decodeVideoTag(amf::Buffer *buf)
+Flv::decodeVideoData(gnash::Network::byte_t byte)
 {
 //    GNASH_REPORT_FUNCTION;
+    flv_video_t *video = new flv_video_t;
+    memset(video, 0, sizeof(flv_video_t));
+
+    // Get the codecID codecID
+    if (byte && Flv::VIDEO_H263) {
+	video->codecID = Flv::VIDEO_H263;
+    } else if (byte && Flv::VIDEO_SCREEN) {
+	video->codecID = Flv::VIDEO_SCREEN;
+    } else if (byte && Flv::VIDEO_VP6) {
+	video->codecID = Flv::VIDEO_VP6;
+    } else if (byte && Flv::VIDEO_VP6_ALPHA) {
+	video->codecID = Flv::VIDEO_VP6_ALPHA;
+    } else if (byte && Flv::VIDEO_SCREEN2) {
+	video->codecID = Flv::VIDEO_SCREEN2;
+    } else if (byte && Flv::VIDEO_THEORA) {
+	video->codecID = Flv::VIDEO_THEORA;
+    } else if (byte && Flv::VIDEO_DIRAC) {
+	video->codecID = Flv::VIDEO_DIRAC;
+    } else if (byte && Flv::VIDEO_SPEEX) {
+	video->codecID = Flv::VIDEO_SPEEX;
+    } else {
+	log_error("Bad FLV Video Codec CodecID: 0x%x", byte + 0);
+    }
+
+    if (byte && Flv::KEYFRAME) {
+	video->type = Flv::KEYFRAME;
+    } else if (byte && Flv::INTERFRAME) {
+	video->type = Flv::INTERFRAME;
+    } else if (byte && Flv::DISPOSABLE) {
+	video->type = Flv::DISPOSABLE;
+    } else {
+	log_error("Bad FLV Video Frame CodecID: 0x%x", byte + 0);
+    }
+    
+    return video;
 }
 
 // Convert a 24 bit integer to a 32 bit one so we can use it.

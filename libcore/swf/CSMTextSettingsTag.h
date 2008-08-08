@@ -1,3 +1,4 @@
+// CSMTextSettingsTag.h: parse SWF CSMTextSettings tag
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
@@ -16,38 +17,38 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-#ifndef GNASH_IMPL_H
-#define GNASH_IMPL_H
+#ifndef GNASH_SWF_CSMTEXTSETTINGSTAG_H
+#define GNASH_SWF_CSMTEXTSETTINGSTAG_H
 
-#include "dsodefs.h"
-
-#include "types.h"
-#include "smart_ptr.h"
-#include "swf/TagLoadersTable.h"
-
-namespace gnash {
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h"
+#endif
 
 // Forward declarations
-class sprite_instance;
+namespace gnash {
+	class movie_definition;
+	class SWFStream;
+}
 
-DSOEXPORT void save_extern_movie(sprite_instance* m);
+namespace gnash {
+namespace SWF {
 
-//
-// Loader callbacks.
-//
-	
-// Register a loader function for a certain tag type.  Most
-// standard tags are handled within gnash.  Host apps might want
-// to call this in order to handle special tag types.
+class CSMTextSettingsTag {
+public:
 
-/// Register a tag loader for the given tag
-void register_tag_loader(SWF::tag_type t,
-        SWF::TagLoadersTable::loader_function lf);
-	
-}	// end namespace gnash
+	CSMTextSettingsTag(movie_definition& m, SWFStream& in);
+
+	static void loader(SWFStream* in, tag_type tag, movie_definition* m);
+
+private:
+
+};
+
+} // namespace gnash::SWF
+} // namespace gnash
 
 
-#endif // GNASH_IMPL_H
+#endif // GNASH_SWF_CSMTEXTSETTINGSTAG_H
 
 
 // Local Variables:
