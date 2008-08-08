@@ -176,16 +176,16 @@ main(int argc, char *argv[])
 	    ifs.read(reinterpret_cast<char *>(buf.reference()), sizeof(Flv::flv_header_t));
 	    head  = flv.decodeHeader(&buf);
 	    if ((head->type & Flv::FLV_VIDEO) && (head->type & Flv::FLV_AUDIO)) {
-                log_debug("FLV File type: Video and Audio");         
+                cerr <<"FLV File type: Video and Audio" << endl;
             } else if (head->type && Flv::FLV_VIDEO) {
-                log_debug("FLV File type: Video");
+		cerr << "FLV File type: Video" << endl;
             } else if (head->type && Flv::FLV_AUDIO) {
-                log_debug("FLV File type: Audio");
+		cerr <<"FLV File type: Audio" << endl;
 	    }
 	    
  	    log_debug("FLV Version: %d (should always be 1)", int(head->version));
 	    boost::uint32_t headsize = flv.convert24(head->head_size);
- 	    log_debug("FLV Header size: %d (should always be 9)", headsize);
+ 	    cerr << "FLV Header size: " << headsize << " (should always be 9)" << endl;
             // Extract all the Tags
             size_t total = st.st_size - sizeof(Flv::flv_header_t);
              while (total) {
@@ -203,6 +203,7 @@ main(int argc, char *argv[])
 		 ifs.read(reinterpret_cast<char *>(buf.reference()), bodysize);
 		 // Got to the end of the file
 		 if (ifs.eof()) {
+		     cerr << "end of file" << endl;
 		     break;
 		 }
 		 total -= bodysize;
@@ -219,14 +220,14 @@ main(int argc, char *argv[])
 		   }
 		   case Flv::TAG_VIDEO:
 		   {
-		       log_debug("FLV Tag type is: Video");
+		       cerr << "FLV Tag type is: Video" << endl;
 		       Flv::flv_video_t *data = flv.decodeVideoData(*(buf.reference() + sizeof(Flv::flv_tag_t)));
 		       cerr << "Codec ID is: " << codec_strs[data->codecID] << endl;
 		       cerr << "Frame Type is: " << frame_strs[data->type] << endl;
 		       break;
 		   }
 		   case Flv::TAG_METADATA:
-		       log_debug("FLV Tag type is: MetaData");
+		       cerr << "FLV Tag type is: MetaData" << endl;
 		       Element *metadata = flv.decodeMetaData(buf.reference(), bodysize);
 		       metadata->dump();
 		       continue;
