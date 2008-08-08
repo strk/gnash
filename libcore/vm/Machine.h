@@ -257,7 +257,7 @@ private:
 	}
 
 	as_value pop_stack(){
-		LOG_DEBUG_AVM("Poping value off the stack.");
+		LOG_DEBUG_AVM("Poping value off the stack.  There will be %u items in the stack",mStack.size()-1);
 		return mStack.pop();
 	}
 
