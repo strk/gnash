@@ -37,6 +37,7 @@
 #include "ScriptLimitsTag.h"
 #include "BitmapMovieDefinition.h"
 #include "DefineFontAlignZonesTag.h"
+#include "DefineButtonCxformTag.h"
 #include "CSMTextSettingsTag.h"
 #include "PlaceObject2Tag.h"
 #include "RemoveObjectTag.h"
@@ -152,7 +153,7 @@ static void ensure_loaders_registered()
     register_tag_loader(SWF::DEFINELOSSLESS, define_bits_lossless_2_loader);
     register_tag_loader(SWF::DEFINEBITSJPEG2, define_bits_jpeg2_loader);
     register_tag_loader(SWF::DEFINESHAPE2,  define_shape_loader);
-    register_tag_loader(SWF::DEFINEBUTTONCXFORM, fixme_loader); // 23
+    register_tag_loader(SWF::DEFINEBUTTONCXFORM, DefineButtonCxformTag::loader); // 23
     // "protect" tag; we're not an authoring tool so we don't care.
     // (might be nice to dump the password instead..)
     register_tag_loader(SWF::PROTECT, null_loader);

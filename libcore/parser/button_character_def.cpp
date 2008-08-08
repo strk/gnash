@@ -342,6 +342,20 @@ button_character_definition::readDefineButton(SWFStream* in, movie_definition* m
 }
 
 void
+button_character_definition::readDefineButtonCxform(SWFStream* in, movie_definition* /*m*/)
+{
+    // A simple rgb cxform for SWF2 buttons, superseded by DefineButton2.
+    for (ButtonRecVect::iterator i = m_button_records.begin(), e = m_button_records.end();
+            i != e; ++i)
+    {
+        (*i).m_button_cxform.read_rgb(in);
+        IF_VERBOSE_PARSE(
+            log_parse("Read DefineButtonCxform: %s", (*i).m_button_cxform);
+        );
+    }
+}
+
+void
 button_character_definition::readDefineButton2(SWFStream* in, movie_definition* m)
 {
 	// Character ID has been read already
