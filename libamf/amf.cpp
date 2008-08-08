@@ -857,7 +857,7 @@ AMF::extractProperty(Network::byte_t *in, Network::byte_t* tooFar)
     // sanity check the length of the data. The length is usually only zero if
     // we've gone all the way to the end of the object.
 
-    // valrind comlains length is unintialized, which as we just set
+    // valgrind complains if length is unintialized, which as we just set
     // length to a value, this is tottaly bogus, and I'm tired of
     // braindamaging code to keep valgrind happy.
     if (length <= 0) {

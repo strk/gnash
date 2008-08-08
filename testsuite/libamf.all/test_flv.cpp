@@ -165,7 +165,7 @@ test_headers()
 // 02 00 0a 6f 6e 4d 65 74 61 44 61 74 61		<--- onMetaData
 // 08 00 00 00 00
 //  00 08 64 75 72 61 74 69 6f 6e			duration
-//      00 40 6d 6e 24 dd 2f 1a a0
+//     00 40 6d 6e 24 dd 2f 1a a0
 //  00 0c 76 69 64 65 6f 63 6f 64 65 63 69 64	videocodecid
 //     00 40 00 00 00 00 00 00 00
 //  00 0c 61 75 64 69 6f 63 6f 64 65 63 69 64	audiocodecid

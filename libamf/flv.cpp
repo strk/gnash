@@ -142,21 +142,38 @@ Flv::decodeMetaData(gnash::Network::byte_t *buf, size_t size)
     AMF amf;
     Network::byte_t *ptr = buf;
     Network::byte_t *tooFar = ptr + size;
-
+    const char *name = 0;
+    
     // Extract the onMetaData object name
-    Element *name = amf.extractAMF(ptr, tooFar);
-    if (name == 0) {
-        log_error("Failed to get the onMetaData string");
-        return 0;
+    // In disk files, I always see the 0x2 type field for
+    // a string, but not always in streaming, at leat according to
+    // Gnash's libmedia/FLVParser code. So if we see the begining
+    // of "onMetaData", then just grab the length without the type
+    // field.
+    if ((*ptr == 0) && (*ptr+3 == 'o')) {
+	boost::uint32_t length;
+	length = convert24(ptr);
+	ptr += 3;		// the size is a 24bit integer
+	name = new char(length);
+	std::copy(name, name + length, ptr);
+	ptr += length + 3;
+    } else {	
+	Element *objname = amf.extractAMF(ptr, tooFar);
+	if (objname == 0) {
+	    log_error("Failed to get the onMetaData string");
+	    return 0;
+	}
+	ptr += objname->getLength() + AMF_HEADER_SIZE;
+	name = objname->to_string();
     }
-    ptr += name->getLength() + AMF_HEADER_SIZE;
+    
     
     // Extract the properties for this metadata object.
     Element *el = amf.extractAMF(ptr, tooFar);
     ptr += amf.totalsize();
 
     if (name) {
-        el->setName(name->to_string());
+        el->setName(name);
     }
 
     return el;
