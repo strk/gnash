@@ -51,10 +51,18 @@ AC_DEFUN([AC_PATH_MING], [
 
   if test x"$MING_CONFIG" != "x"; then
     MING_VERSION=`$MING_CONFIG --version`
-    major=`echo $MING_VERSION | sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\).*/\1/'`
-    minor=`echo $MING_VERSION | sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\).*/\2/'`
-    micro=`echo $MING_VERSION | sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\).*/\3/'`
+    major=`echo $MING_VERSION | cut -d '.' -f 1`
+    minor=`echo $MING_VERSION | cut -d '.' -f 2`
+    micro=`echo $MING_VERSION | cut -d '.' -f 3`
     beta=`echo $MING_VERSION | sed -ne 's/.*beta\([[0-9]]*\).*/\1/p'`
+    dnl This is a little screwy. The previous Ming release was tagged beta5,
+    dnl but the newer one is tagged rc1. This makes it look like rc1 is older the
+    dnl beta 5 release, as it only looks at the last integer. So we fudge the
+    dnl numbers so tc1 comes after beta 5. ie.. this looks like beta 6.
+    if test -z $beta; then
+      beta=`echo $MING_VERSION | sed -ne 's/.*rc\([[0-9]]*\).*/\1/p'`
+      beta=`eval expr $beta + 5`
+    fi
     MING_VERSION_CODE=`printf %2.2d%2.2d%2.2d%2.2d $major $minor $micro $beta`
     MING_CFLAGS=`$MING_CONFIG --cflags`
     MING_LIBS=`$MING_CONFIG --libs`
