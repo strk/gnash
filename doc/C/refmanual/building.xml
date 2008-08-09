@@ -22,12 +22,14 @@
     </para>
 
     <para>
-      If you are compiling with GCC you will probably need to use a machine
+      If you are compiling with GCC you will need to use a machine
       with at least 128 megabytes of physical RAM; 64MB is not enough for a
       couple of the files, even with swap enabled and optimisation turned off.
+      With less than 512 megabytes available, many build combinations can 
+      still be a long and painful experience.
     </para>
     <para>
-      At present the Gnash source is about 30 MB extracted and configured
+      At present the &app; source is about 30 MB extracted and configured
       and requires a total of about 125 megabytes to compile it.
     </para>
     <para>
@@ -58,19 +60,23 @@
     </sect2>
 
     <sect2 id="sourcecvs">
-      <title>CVS Access</title>
+      <title>Bzr Access</title>
       <para>
-	The latest Gnash development sources are available via anonymous CVS.
-	Use the following commands to check them out
-	(just hit return when you are prompted for the password):
+	The latest &app; development sources are available via bzr.
+	Use the following commands to check them out:
 	<programlisting>
-	  export CVS_RSH=ssh
-	  cvs -z3 -d:pserver:anonymous@cvs.sv.gnu.org:/sources/gnash co gnash
+	mkdir gnash
+	cd gnash
+	bzr branch http://bzr.savannah.gnu.org/r/gnash/trunk
 	</programlisting>
-	You will then be able to update your copy from the repository using
+	At any time, other temporary development branches may also
+	be available. Replace <emphasis>trunk</emphasis> with the
+	branch name to check these out.
+	You can update your copy from the main 
+	repository using:
 	<programlisting>
-	  cd gnash
-	  cvs update -d
+	  cd trunk
+	  bzr pull
 	</programlisting>
       </para>
       <para>
