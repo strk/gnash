@@ -75,17 +75,18 @@
     <sect3 id="sourcecvs">
       <title>CVS Access</title>
       <para>
-	The latest Gnash development sources are available via anonymous CVS.
+	The latest Gnash development sources are available via bzr.
 	Use the following commands to check them out
 	(just hit return when you are prompted for the password):
 	<programlisting>
-	  export CVS_RSH=ssh
-	  cvs -z3 -d:pserver:anonymous@cvs.sv.gnu.org:/sources/gnash co gnash
+	  bzr branch http://bzr.savannah.gnu.org/r/gnash/trunk
 	</programlisting>
-	you will then be able to update your copy from the repository using
+	At any time, temporary branches other than trunk may be available. To check
+	these out, replace 'trunk' with the name of the branch.
+	You can update your copy from the main repository using
 	<programlisting>
-	  cd gnash
-	  cvs update -d
+	  cd trunk
+	  bzr pull
 	</programlisting>
       </para>
       <para>
@@ -345,19 +346,37 @@
     </sect3>
 
     <sect3 id="png">
-      <title>PNG</title>
+      <title>libpng</title>
       <para>
 	<ulink type="http"
 	       url="http://www.libpng.org/pub/png/">PNG</ulink> is a
 	patent-free image format that is comparable to
-	<emphasis>GIF</emphasis>. This is primarily used as a
-	depenency by other libraries, and not directly by Gnash.
+	<emphasis>GIF</emphasis>. This is necessary for &app; to read PNG
+	images, a feature of SWF version 8. &app; also uses the library
+	to write PNG-format images. 
       </para>
       <para>
 	To install a binary package using apt-get (on Debian based
 	systems), install <emphasis>libpng12-dev </emphasis>. For RPM
 	or Yum based systems, install the <emphasis>libpng </emphasis>
 	package. For BSD systems, install the <emphasis>png
+	</emphasis> package.
+      </para>
+
+    <sect3 id="gif">
+      <title>giflib / libungif</title>
+      <para>
+	<ulink type="http"
+	       url="http://www.libpng.org/pub/png/">GIF</ulink> is an
+	image format that should now be free of patent restrictions. This
+	library is required for &app; to support loading GIF images, a feature
+	of SWF version 8.
+      </para>
+      <para>
+	To install a binary package using apt-get (on Debian based
+	systems), install <emphasis>libungif-dev </emphasis>. For RPM
+	or Yum based systems, install the <emphasis>libungif-devel </emphasis>
+	package. For BSD systems, install the <emphasis>gif
 	</emphasis> package.
       </para>
 
@@ -369,7 +388,8 @@
 	<ulink type="http"
 	       url="http://www.ijg.org/">JPEG</ulink> is a lossy image
 	format, heavily used for images because of the smaller size of
-	the file. This is used directly by Gnash to load JPEGs.
+	the file. This is used directly by &app; to load both external
+	and embedded JPEGs.
       </para>
       <para>
 	To install a binary package using apt-get (on Debian based
@@ -403,7 +423,7 @@
       <para>
 	<ulink type="http" url="http://www.vorbis.com/">Ogg
 	Vorbis</ulink> is a patent free audio format that is
-	comparable (many people say better) to MP3. You can get Ogg
+	comparable to (many people say better than) mp3. You can get Ogg
 	Vorbis from this 
 	link: <ulink type="http" url="http://www.vorbis.com/">
 	http://www.vorbis.com/</ulink>. Ogg Vorbis is the prefered
@@ -425,7 +445,7 @@
       <para>
 	The Mozilla development package is no longer needed to build
 	the plugin. The required header files are now included in
-	Gnash, so it builds without Mozilla or Firefox installed at
+	&app;, so it builds without Mozilla or Firefox installed at
 	all.
       </para>
 	
