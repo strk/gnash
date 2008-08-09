@@ -5,12 +5,12 @@
     &app; has a number of dependencies on other packages.
     If you install the dependencies using a package
     manager, be certain to install the development versions
-    of the packages.  The normal versions are often missing
+    of the packages.  The normal versions often lack
     the headers &app; needs to compile.
   </para>
 
   <para>
-    Some dependencies have other dependencies, like GTk also needs
+    Some dependencies have other dependencies: for instance, GTK also needs
     glib2, atk, and pango to produce a fully linked
     executable. Different distributions also use differing
     dependencies, sometimes a package will depend on libxml2 on one
@@ -298,14 +298,15 @@
 	
 	<row>
 	  <entry>JPEG</entry>
-	  <entry>Optional</entry>
+	  <entry>Required</entry>
 	  <entry></entry>
 	  <entry>
 	    <ulink type="http" url="http://www.ijg.org/">JPEG</ulink>
 	    is a lossy image format which is heavily used for images.
 	  </entry>
 	  <entry>
-	    This library is used for rendering JPEGs.
+		  This library is used for reading external JPEGs and JPEG
+		  data embedded in SWF files.
 	  </entry>
 	  <entry><filename>libjpeg62-dev</filename></entry>
 	  <entry><filename>libjpeg</filename></entry>
@@ -314,7 +315,7 @@
 	
 	<row>
 	  <entry>PNG</entry>
-	  <entry>Optional</entry>
+	  <entry>Required</entry>
 	  <entry></entry>
 	  <entry>
 	    <ulink type="http" 
@@ -323,12 +324,31 @@
 	    <emphasis>GIF</emphasis>.
 	  </entry>
 	  <entry>
-	    This library is used for rendering PNGs.
+		  This library is used for loading external PNG
+		  images (part of the SWF8 specification) and for writing
+		  images in the PNG format.
 	  </entry>
 	  <entry><filename>libpng12-dev</filename></entry>
 	  <entry><filename>libpng</filename></entry>
 	  <entry><filename>png</filename></entry>
 	</row>
+
+        <row>
+          <entry>GIF</entry>
+            <entry>Required</entry>
+              <entry></entry>
+	      <entry>GIF is a common image format that should now
+		      be free of patent restrictions.
+               <emphasis>GIF</emphasis>.
+                </entry>
+                <entry>
+                This library is used for loading external GIF
+                images (part of the SWF8 specification).
+	        </entry>
+	            <entry><filename>libungif-dev</filename></entry>
+                    <entry><filename>libungif-devel</filename></entry>
+                    <entry><filename>gif</filename></entry>
+        </row>
 	
 	<row>
 	  <entry>libcurl</entry>
