@@ -55,6 +55,7 @@ libgnashcore_la_SOURCES = \
 	SystemClock.cpp \
 	as_environment.cpp \
 	as_function.cpp	\
+	abc_function.cpp \
 	as_object.cpp \
 	as_value.cpp \
 	asClass.cpp \
@@ -120,6 +121,7 @@ noinst_HEADERS = \
 	array.h	\
 	as_environment.h \
 	as_function.h \
+	abc_function.h \
 	as_object.h \
 	as_prop_flags.h	\
 	as_value.h \
