@@ -24,6 +24,7 @@
 #include "array.h"
 #include "abc_block.h"
 #include "fn_call.h"
+#include "abc_function.h"
 
 //#define PRETEND
 namespace gnash {
@@ -1361,8 +1362,11 @@ Machine::execute()
 		asClass *c = pool_class(cid, mPoolObject);
 		LOG_DEBUG_AVM("Creating new class id=%u name=%s",c->getName(),mPoolObject->mStringPool[c->getName()]);
 
-		//Create the class.
 		as_object* new_class = new as_object();
+		//Create the class.
+		abc_function* constructor = new abc_function(c->getConstructor()->getBody());
+		new_class->init_member(NSV::PROP_uuCONSTRUCTORuu,as_value(constructor),0);
+
 		push_stack(as_value(new_class));
 
 		//Call the class's static constructor.
