@@ -64,16 +64,16 @@ namespace gnash {
 		return true;
 	}
 
-	void text_glyph_record::read(SWFStream* in, int glyph_count,
+	void text_glyph_record::read(SWFStream& in, int glyph_count,
 			int glyph_bits, int advance_bits)
 	{
 		// TODO: shouldn't we take unsigned for *_bits ?
 		m_glyphs.resize(glyph_count);
-		in->ensureBits(glyph_count * (glyph_bits+advance_bits));
+		in.ensureBits(glyph_count * (glyph_bits+advance_bits));
 		for (int i = 0; i < glyph_count; i++)
 		{
-			m_glyphs[i].m_glyph_index = in->read_uint(glyph_bits);
-			m_glyphs[i].m_glyph_advance = (float) in->read_sint(advance_bits);
+			m_glyphs[i].m_glyph_index = in.read_uint(glyph_bits);
+			m_glyphs[i].m_glyph_advance = (float) in.read_sint(advance_bits);
 		}
 	}
 

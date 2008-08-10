@@ -166,6 +166,7 @@ AM_CONDITIONAL(WIN32, test x$windows = xyes)
 
 dnl Get build date for helping us debugging
 BUILDDATE="`date +%Y%m%d`"
+AC_SUBST(BUILDDATE)
 
 dnl These are required by automake
 dnl AM_INIT_AUTOMAKE(gnash, "trunk$BUILDDATE")
@@ -1197,6 +1198,10 @@ AC_HEADER_DIRENT
 dnl -----------------------------------------------------------------
 dnl PLUGIN RELATED STUFF
 dnl -----------------------------------------------------------------
+
+dnl Zip is used insted of tar when building an xpi package
+dnl for Mozilla/Firefox.
+AC_PATH_PROG(ZIP, zip, ,[${pathlist}])
 
 dnl !! This has been moved here to make --enable-npapi work
 dnl !! All of plugin-related macro calls could be moved into

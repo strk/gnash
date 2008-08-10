@@ -67,9 +67,6 @@ public:
     ///
     void    read(SWFStream& in);
 
-    // TODO: drop this, currently here to avoid touching all callers
-    void    read(SWFStream* in) { read(*in); }
-    
     // constants used for this class.
     enum rect_flags_e
     {

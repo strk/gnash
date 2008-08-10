@@ -194,7 +194,7 @@ private:
 	}
 
 
-	void	morph2_character_def::read(SWFStream* in, int tag_type, bool with_style, movie_definition* md)
+	void	morph2_character_def::read(SWFStream& in, int tag_type, bool with_style, movie_definition* md)
 	{
 		assert(tag_type == SWF::DEFINEMORPHSHAPE
 			|| tag_type == SWF::DEFINEMORPHSHAPE2
@@ -216,15 +216,15 @@ private:
 		// This should be used -- first 6 bits reserved, then 'non-scaling' stroke,
 		// then 'scaling' stroke -- these can be used to optimize morphing.
 		
-		in->ensureBytes(1);
-		static_cast<void>(in->read_u8());
+		in.ensureBytes(1);
+		static_cast<void>(in.read_u8());
 	}
 
-		in->ensureBytes(4);
-		offset = in->read_u32();
+		in.ensureBytes(4);
+		offset = in.read_u32();
 
 		// Next line will throw ParserException on malformed SWF
-		fill_style_count = in->read_variable_count();
+		fill_style_count = in.read_variable_count();
 		int i;
 		fill_style fs1, fs2;
 		for (i = 0; i < fill_style_count; ++i)
@@ -234,7 +234,7 @@ private:
 			m_shape2->m_fill_styles.push_back(fs2);
 		}
 
-		line_style_count = in->read_variable_count();
+		line_style_count = in.read_variable_count();
 		line_style ls1, ls2;
 		for (i = 0; i < line_style_count; ++i)
 		{
@@ -244,7 +244,7 @@ private:
 		}
 
 		m_shape1->read(in, tag_type, false, md);
-		in->align();
+		in.align();
 		m_shape2->read(in, tag_type, false, md);
 
 		// Set bounds as read in *this* tags rather then

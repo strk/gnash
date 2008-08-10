@@ -84,17 +84,17 @@ namespace gnash {
 		/// Throw a ParserException if there's no enough bytes in the
 		/// currently opened tag for reading. See stream::ensureBytes()
 		///
-		void	read(SWFStream* in, int tag_type);
+		void	read(SWFStream& in, int tag_type);
 
 		/// Initialize from intput stream (reads RGBA)
 		//
 		/// Throw a ParserException if there's no enough bytes in the
 		/// currently opened tag for reading. See stream::ensureBytes()
 		///
-		void	read_rgba(SWFStream* in);
+		void	read_rgba(SWFStream& in);
 
 		/// Initialize from intput stream (reads RGB)
-		void	read_rgb(SWFStream* in);
+		void	read_rgb(SWFStream& in);
 
 		/// Set r,g,b.a values
 		void	set(boost::uint8_t r, boost::uint8_t g, boost::uint8_t b, boost::uint8_t a)

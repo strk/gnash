@@ -179,7 +179,7 @@ public:
 	/// @param m is the movie_definition containing this definition
 	///          (used to resolve dictionary simbols referred to by glyphs, if any)
 	///
-	void	read(SWFStream* in, SWF::tag_type tag, movie_definition* m);
+	void	read(SWFStream& in, SWF::tag_type tag, movie_definition* m);
 
 	/// \brief
 	/// Read additional information about this font, from a
@@ -189,7 +189,7 @@ public:
 	///
 	/// @see SWF::define_font_info_loader
 	///
-	void	read_font_info(SWFStream* in, SWF::tag_type tag, movie_definition* m);
+	void	read_font_info(SWFStream& in, SWF::tag_type tag, movie_definition* m);
 
         /// \brief
         /// Read the name of this font, from a DEFINEFONTNAME tag.
@@ -198,7 +198,7 @@ public:
         //
         /// @see SWF::define_font_name_loader
         ///
-        void read_font_name(SWFStream* in, SWF::tag_type tag, movie_definition* m);
+        void read_font_name(SWFStream& in, SWF::tag_type tag, movie_definition* m);
 
 	/// Get name of this font. Warning: can be NULL.
 	const std::string& get_name() const { return m_name; }

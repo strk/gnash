@@ -56,12 +56,12 @@ public:
 	{}
 
 	/// Read SWF::REMOVEOBJECT or SWF::REMOVEOBJECT2 
-	void read(SWFStream* in, tag_type tag);
+	void read(SWFStream& in, tag_type tag);
 
 	/// Remove object at specified depth from sprite_instance DisplayList.
 	void execute(sprite_instance* m, DisplayList& dlist) const;
 
-	static void loader(SWFStream* in, tag_type tag, movie_definition* m);
+	static void loader(SWFStream& in, tag_type tag, movie_definition* m);
 
 private:
 

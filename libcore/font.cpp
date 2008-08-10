@@ -129,16 +129,16 @@ GlyphInfo::markReachableResources() const
 	}
 
 
-	void	font::read(SWFStream* in, SWF::tag_type tag, movie_definition* m)
+	void	font::read(SWFStream& in, SWF::tag_type tag, movie_definition* m)
 	{
 		if (tag == SWF::DEFINEFONT)
 		{
-			readDefineFont(*in, m);
+			readDefineFont(in, m);
 		}
 		else
 		{
 			assert (tag == SWF::DEFINEFONT2 || tag == SWF::DEFINEFONT3);
-			readDefineFont2_or_3(*in, m);
+			readDefineFont2_or_3(in, m);
 			if (tag == SWF::DEFINEFONT3)
 			{
 				m_subpixel_font = true;
@@ -206,7 +206,7 @@ GlyphInfo::markReachableResources() const
 
 			// Create & read the shape.
 			shape_character_def* s = new shape_character_def;
-			s->read(&in, SWF::DEFINEFONT, false, m); 
+			s->read(in, SWF::DEFINEFONT, false, m); 
 
 			_embedGlyphTable[i].glyph = s;
 		}
@@ -312,7 +312,7 @@ GlyphInfo::markReachableResources() const
 
 			// Create & read the shape.
 			shape_character_def* s = new shape_character_def;
-			s->read(&in, SWF::DEFINEFONT2, false, m); // .. or DEFINEFONT3 actually..
+			s->read(in, SWF::DEFINEFONT2, false, m); // .. or DEFINEFONT3 actually..
 
 			_embedGlyphTable[i].glyph = s;
 		}
@@ -397,18 +397,18 @@ GlyphInfo::markReachableResources() const
 	}
 
         // Read the font name, display and legal, from a DefineFontName tag.
-        void font::read_font_name(SWFStream* in, SWF::tag_type tag,
+        void font::read_font_name(SWFStream& in, SWF::tag_type tag,
             movie_definition* /*m*/) 
         {
             assert(tag == SWF::DEFINEFONTNAME);
-            in->read_string(m_display_name);
-            in->read_string(m_copyright_name);
+            in.read_string(m_display_name);
+            in.read_string(m_copyright_name);
         }
 
 	// Read additional information about this font, from a
 	// DefineFontInfo tag.  The caller has already read the tag
 	// type and font id.
-	void	font::read_font_info(SWFStream* in, SWF::tag_type tag,
+	void	font::read_font_info(SWFStream& in, SWF::tag_type tag,
 			movie_definition* /*m*/)
 	{
 		assert(tag == SWF::DEFINEFONTINFO || tag == SWF::DEFINEFONTINFO2); 
@@ -423,7 +423,7 @@ GlyphInfo::markReachableResources() const
 			}
 		}
 
-		in->read_string_with_length(m_name);
+		in.read_string_with_length(m_name);
 #if 0 // initialize the deviceFontProvider only when needed !
 		if ( ! m_name.empty() && ! initDeviceFontProvider() )
 		{
@@ -431,8 +431,8 @@ GlyphInfo::markReachableResources() const
 		}
 #endif
 
-		in->ensureBytes(1);
-		int	flags = in->read_u8();
+		in.ensureBytes(1);
+		int	flags = in.read_u8();
         // highest two bits are reserved.
 		m_unicode_chars   = flags & (1 << 5); //???
 		m_shift_jis_chars = flags & (1 << 4);
@@ -441,7 +441,7 @@ GlyphInfo::markReachableResources() const
 		m_is_bold         = flags & (1 << 1);
 		m_wide_codes      = flags & (1 << 0);
 
-		read_code_table(*in);
+		read_code_table(in);
 	}
 
 	void	font::read_code_table(SWFStream& in)
