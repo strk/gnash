@@ -62,7 +62,7 @@ private:
 		m_color.read_rgb(&in);
 
 		IF_VERBOSE_PARSE (
-		log_parse(_("  SetBackgroundColor: %s"), m_color.toString().c_str());
+		log_parse(_("  SetBackgroundColor: %s"), m_color.toString());
 		);
 	}
 

@@ -955,7 +955,7 @@ void	button_sound_loader(SWFStream* in, tag_type tag, movie_definition* m)
         return;
     }
 
-    ch->read(in, tag, m);
+    ch->read(*in, tag, m);
 }
 
 
@@ -973,7 +973,7 @@ void	button_character_loader(SWFStream* in, tag_type tag, movie_definition* m)
     );
 
     button_character_definition* ch = new button_character_definition(m);
-    ch->read(in, tag, m);
+    ch->read(*in, tag, m);
 
     m->add_character(character_id, ch);
 }

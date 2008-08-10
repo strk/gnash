@@ -68,7 +68,7 @@ void loader(SWFStream* in, tag_type tag, movie_definition* m)
         return;
     }
 
-    ch->readDefineButtonCxform(in, m);
+    ch->readDefineButtonCxform(*in, m);
     }
 }
 
