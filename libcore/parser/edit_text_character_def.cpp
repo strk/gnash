@@ -35,7 +35,7 @@ namespace gnash {
 class movie_definition;
 
 void
-edit_text_character_def::read(SWFStream* in, int tag_type,
+edit_text_character_def::read(SWFStream& in, int tag_type,
 		movie_definition* m)
 {
 	//assert(m != NULL);
@@ -43,10 +43,10 @@ edit_text_character_def::read(SWFStream* in, int tag_type,
 
 	m_rect.read(in);
 
-	in->align();
-	in->ensureBytes(2);
+	in.align();
+	in.ensureBytes(2);
     
-    int flags = in->read_u8();
+    int flags = in.read_u8();
 	m_has_text  = flags & (1 << 7);
 	m_word_wrap = flags & (1 << 6);
 	m_multiline = flags & (1 << 5);
@@ -56,7 +56,7 @@ edit_text_character_def::read(SWFStream* in, int tag_type,
 	bool  has_max_length = flags & (1 << 1); 
 	bool  has_font       = flags & (1 << 0); 
 
-    flags = in->read_u8();
+    flags = in.read_u8();
 	// 0: no font class, 1 font class and height, can't be true if has_font was true
 	bool hasFontClass = flags & (1 << 7);
 	if ( hasFontClass && has_font )
@@ -77,8 +77,8 @@ edit_text_character_def::read(SWFStream* in, int tag_type,
 
 	if (has_font)
 	{
-		in->ensureBytes(4);
-		m_font_id = in->read_u16();
+		in.ensureBytes(4);
+		m_font_id = in.read_u16();
 		m_font = m->get_font(m_font_id);
 		if (m_font == NULL)
 		{
@@ -86,12 +86,12 @@ edit_text_character_def::read(SWFStream* in, int tag_type,
 			log_swferror("DefineEditText: tag refers to unknown font id %d", m_font_id);
 			);
 		}
-		m_text_height = in->read_u16();
+		m_text_height = in.read_u16();
 	}
 	else if ( hasFontClass )
 	{
 		std::string fontClassName;
-		in->read_string(fontClassName);
+		in.read_string(fontClassName);
 		log_unimpl("Font class support for DefineEditText (%d)", fontClassName);
 	}
 	
@@ -103,25 +103,25 @@ edit_text_character_def::read(SWFStream* in, int tag_type,
 
 	if (has_max_length)
 	{
-		in->ensureBytes(2);
-		m_max_length = in->read_u16();
+		in.ensureBytes(2);
+		m_max_length = in.read_u16();
 	}
 
 	if (has_layout)
 	{
-		in->ensureBytes(9); //1 + 2 + 2 + 2 + 2
-		m_alignment = static_cast<alignment>(in->read_u8());
-		m_left_margin = in->read_u16(); // used to be cast to float
-		m_right_margin = in->read_u16(); // used to be cast to float
-		m_indent = in->read_s16();
-		m_leading = in->read_s16();
+		in.ensureBytes(9); //1 + 2 + 2 + 2 + 2
+		m_alignment = static_cast<alignment>(in.read_u8());
+		m_left_margin = in.read_u16(); // used to be cast to float
+		m_right_margin = in.read_u16(); // used to be cast to float
+		m_indent = in.read_s16();
+		m_leading = in.read_s16();
 	}
 
-	in->read_string(m_variable_name);
+	in.read_string(m_variable_name);
 
 	if (m_has_text)
 	{
-		in->read_string(m_default_text);
+		in.read_string(m_default_text);
 	}
 
 	IF_VERBOSE_PARSE (

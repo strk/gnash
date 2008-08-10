@@ -218,7 +218,7 @@ public:
 	struct button_sound_def
 	{
 		// TODO: implement ?
-		//void	read(SWFStream* in, movie_definition* m);
+		//void	read(SWFStream& in, movie_definition* m);
 
 		button_sound_info m_button_sounds[4];
 

@@ -133,9 +133,6 @@ public:
     /// Initialize from the SWF input stream.
     void    read(SWFStream& in);
 
-    // temp hack, should drop..
-    void    read(SWFStream* in) { read(*in); }
-
     /// Transform a given point by our matrix
     void    transform(geometry::Point2d& p) const
     {

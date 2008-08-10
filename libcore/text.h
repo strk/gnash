@@ -206,7 +206,7 @@ namespace gnash {
 		text_style	m_style;
 		std::vector<glyph_entry>	m_glyphs;
 
-		void read(SWFStream* in, int glyph_count,
+		void read(SWFStream& in, int glyph_count,
 			int glyph_bits, int advance_bits);
 
 	};

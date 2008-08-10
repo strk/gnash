@@ -36,13 +36,13 @@ namespace SWF {
 namespace DefineButtonCxformTag
 {
 
-void loader(SWFStream* in, tag_type tag, movie_definition* m)
+void loader(SWFStream& in, tag_type tag, movie_definition* m)
 {
 
     assert(tag == SWF::DEFINEBUTTONCXFORM);
 
-    in->ensureBytes(2);
-    const boost::uint16_t buttonID = in->read_u16();
+    in.ensureBytes(2);
+    const boost::uint16_t buttonID = in.read_u16();
 
     IF_VERBOSE_PARSE (
         log_debug("DefineButtonCxformTag: ButtonId=%d", buttonID);
@@ -68,7 +68,7 @@ void loader(SWFStream* in, tag_type tag, movie_definition* m)
         return;
     }
 
-    ch->readDefineButtonCxform(*in, m);
+    ch->readDefineButtonCxform(in, m);
     }
 }
 
