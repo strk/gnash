@@ -1266,6 +1266,8 @@ AC_ARG_WITH(plugins-install,
 
 
 GNASH_PATH_FIREFOX
+GNASH_PATH_XPCOM
+AM_CONDITIONAL(XPCOM, test x$xpcom = xyes)
 
 dnl -----------------------------------------------------------------
 dnl END OF PLUGIN RELATED STUFF
@@ -2138,6 +2140,7 @@ extensions/lirc/Makefile
 extensions/dbus/Makefile
 extensions/metome/Makefile
 plugin/Makefile
+plugin/xpcom/Makefile
 plugin/klash/Makefile
 plugin/mozilla-sdk/Makefile
 plugin/win32/Makefile
@@ -2988,6 +2991,16 @@ if test x"${build_alp}" = xyes; then
     echo "        ERROR: No ALP development package is installed." >&3
   fi
 fi
+
+dnl XPCOM support for Mozilla/Firefox
+if test x"$npapi" = x"yes" -a x"$xpcom" = x"yes"; then
+    echo "        XPCOM flags are: $XPCOM_CFLAGS"
+    echo "        XPCOM libs are: $XPCOM_LIBS"
+    echo "        XPIDL path is: $XPIDL"
+else
+    echo "        ERROR: No XPCOM development package is installed." >&3
+fi
+
 
 if test x$cross_compiling = xyes; then
   AC_MSG_NOTICE([This build is setup for cross compiling])
