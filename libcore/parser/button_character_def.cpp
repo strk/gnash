@@ -113,11 +113,11 @@ computeButtonStatesString(int flags)
 }
 
 bool
-button_record::read(SWFStream* in, int tag_type,
+button_record::read(SWFStream& in, int tag_type,
 		movie_definition* m, unsigned long endPos)
 {
 	// caller should check this
-	if (in->tell()+1 > endPos)
+	if (in.tell()+1 > endPos)
 	{
 		IF_VERBOSE_MALFORMED_SWF(
 		log_swferror(_("   premature end of button record input stream, can't read flags"));
@@ -125,8 +125,8 @@ button_record::read(SWFStream* in, int tag_type,
 		return false;
 	}
 
-	in->ensureBytes(1);
-	int	flags = in->read_u8();
+	in.ensureBytes(1);
+	int	flags = in.read_u8();
 	if (flags == 0)
 	{
 		return false;
@@ -142,15 +142,15 @@ button_record::read(SWFStream* in, int tag_type,
 	m_over     = flags & (1<<1); // 2 ? true : false;
 	m_up       = flags & (1<<0); // 1 ? true : false;
 
-	if (in->tell()+2 > endPos)
+	if (in.tell()+2 > endPos)
 	{
 		IF_VERBOSE_MALFORMED_SWF(
 		log_swferror(_("   premature end of button record input stream, can't read character id"));
 		);
 		return false;
 	}
-	in->ensureBytes(2);
-	m_character_id = in->read_u16();
+	in.ensureBytes(2);
+	m_character_id = in.read_u16();
 
 	// Get character definition now (safer)
 	m_character_def = m->get_character_def(m_character_id);
@@ -174,15 +174,15 @@ button_record::read(SWFStream* in, int tag_type,
 		);
 	}
 
-	if (in->tell()+2 > endPos)
+	if (in.tell()+2 > endPos)
 	{
 		IF_VERBOSE_MALFORMED_SWF(
 		log_swferror(_("   premature end of button record input stream, can't read button layer (depth?)"));
 		);
 		return false;
 	}
-	in->ensureBytes(2);
-	m_button_layer = in->read_u16();
+	in.ensureBytes(2);
+	m_button_layer = in.read_u16();
 
     // matrix::read() checks the length of the stream
 	m_button_matrix.read(in);
@@ -195,7 +195,7 @@ button_record::read(SWFStream* in, int tag_type,
 
 	if ( buttonHasFilterList )
 	{
-		filter_factory::read(*in, true, &_filters);
+		filter_factory::read(in, true, &_filters);
 		LOG_ONCE(
 			log_unimpl("Button filters"); 
 		);
@@ -203,8 +203,8 @@ button_record::read(SWFStream* in, int tag_type,
 
 	if ( buttonHasBlendMode )
 	{
-		in->ensureBytes(1);
-        _blendMode = in->read_u8();
+		in.ensureBytes(1);
+        _blendMode = in.read_u8();
 		LOG_ONCE(
 			log_unimpl("Button blend mode");
 		);
@@ -238,13 +238,13 @@ button_character_definition::~button_character_definition()
 }
 
 
-void button_character_definition::sound_info::read(SWFStream* in)
+void button_character_definition::sound_info::read(SWFStream& in)
 {
-	in->ensureBytes(1);
+	in.ensureBytes(1);
 	m_in_point = m_out_point = m_loop_count = 0;
     
     // highest 2 bits are reserved(unused).
-    int flags = in->read_u8();
+    int flags = in.read_u8();
 	m_stop_playback = flags & (1 << 5); 
 	m_no_multiple   = flags & (1 << 4); 
 	m_has_envelope  = flags & (1 << 3); 
@@ -254,30 +254,30 @@ void button_character_definition::sound_info::read(SWFStream* in)
     
 	if (m_has_in_point)
 	{
-		in->ensureBytes(4);
-		m_in_point = in->read_u32();
+		in.ensureBytes(4);
+		m_in_point = in.read_u32();
 	}
 	if (m_has_out_point)
 	{
-		in->ensureBytes(4);
-		m_out_point = in->read_u32();
+		in.ensureBytes(4);
+		m_out_point = in.read_u32();
 	}
 	if (m_has_loops)
 	{
-		in->ensureBytes(2);
-		m_loop_count = in->read_u16();
+		in.ensureBytes(2);
+		m_loop_count = in.read_u16();
 	}
 	if (m_has_envelope)
 	{
-		in->ensureBytes(1);
-		int nPoints = in->read_u8();
+		in.ensureBytes(1);
+		int nPoints = in.read_u8();
 		m_envelopes.resize(nPoints);
-		in->ensureBytes(8 * nPoints);
+		in.ensureBytes(8 * nPoints);
 		for (int i=0; i < nPoints; i++)
 		{
-			m_envelopes[i].m_mark44 = in->read_u32();
-			m_envelopes[i].m_level0 = in->read_u16();
-			m_envelopes[i].m_level1 = in->read_u16();
+			m_envelopes[i].m_mark44 = in.read_u32();
+			m_envelopes[i].m_level0 = in.read_u16();
+			m_envelopes[i].m_level1 = in.read_u16();
 		}
 	}
 	else
@@ -299,16 +299,15 @@ void button_character_definition::sound_info::read(SWFStream* in)
 }
 
 void
-button_character_definition::readDefineButton(SWFStream* in, movie_definition* m)
+button_character_definition::readDefineButton(SWFStream& in, movie_definition* m)
 {
 	assert(m);
-	assert(in);
 
 	// Character ID has been read already
 
 	// Old button tag.
 
-	unsigned long endTagPos = in->get_tag_end_position();
+	unsigned long endTagPos = in.get_tag_end_position();
 
 	// Read button character records.
 	for (;;)
@@ -328,7 +327,7 @@ button_character_definition::readDefineButton(SWFStream* in, movie_definition* m
 		}
 	}
 
-	if ( in->tell() >= endTagPos )
+	if ( in.tell() >= endTagPos )
 	{
 		IF_VERBOSE_MALFORMED_SWF(
 		log_swferror(_("Premature end of DEFINEBUTTON tag, won't read actions"));
@@ -337,12 +336,12 @@ button_character_definition::readDefineButton(SWFStream* in, movie_definition* m
 	}
 
 	// Read actions.
-	m_button_actions.push_back(new button_action(*in, SWF::DEFINEBUTTON, endTagPos, *m));
+	m_button_actions.push_back(new button_action(in, SWF::DEFINEBUTTON, endTagPos, *m));
 
 }
 
 void
-button_character_definition::readDefineButtonCxform(SWFStream* in, movie_definition* /*m*/)
+button_character_definition::readDefineButtonCxform(SWFStream& in, movie_definition* /*m*/)
 {
     // A simple rgb cxform for SWF2 buttons, superseded by DefineButton2.
     for (ButtonRecVect::iterator i = m_button_records.begin(), e = m_button_records.end();
@@ -356,22 +355,22 @@ button_character_definition::readDefineButtonCxform(SWFStream* in, movie_definit
 }
 
 void
-button_character_definition::readDefineButton2(SWFStream* in, movie_definition* m)
+button_character_definition::readDefineButton2(SWFStream& in, movie_definition* m)
 {
 	// Character ID has been read already
 
-	in->ensureBytes(1 + 2); // flags + actions offset
+	in.ensureBytes(1 + 2); // flags + actions offset
 
 	// Read the menu flag
 	// (this is a single bit, the other 7 bits are reserved)
-	m_menu = in->read_u8() != 0;
+	m_menu = in.read_u8() != 0;
 	if ( m_menu ) LOG_ONCE(log_unimpl("DEFINEBUTTON2 'menu' flag"));
 
 	// Read the action offset
-	unsigned button_2_action_offset = in->read_u16();
+	unsigned button_2_action_offset = in.read_u16();
 
-	unsigned long tagEndPosition = in->get_tag_end_position();
-	unsigned next_action_pos = in->tell() + button_2_action_offset - 2;
+	unsigned long tagEndPosition = in.get_tag_end_position();
+	unsigned next_action_pos = in.tell() + button_2_action_offset - 2;
 
 	if ( next_action_pos > tagEndPosition )
 	{
@@ -388,7 +387,7 @@ button_character_definition::readDefineButton2(SWFStream* in, movie_definition* 
 	// Read button records.
 	// takes at least 1 byte for the end mark button record, so 
 	// we don't attempt to parse at all unless we have at least 1 byte left
-	while ( in->tell() < endOfButtonRecords )
+	while ( in.tell() < endOfButtonRecords )
 	{
 		button_record	r;
 		if (r.read(in, SWF::DEFINEBUTTON2, m, endOfButtonRecords) == false)
@@ -407,17 +406,17 @@ button_character_definition::readDefineButton2(SWFStream* in, movie_definition* 
 
 	if ( button_2_action_offset )
 	{
-		in->seek(next_action_pos);
+		in.seek(next_action_pos);
 
 		// Read Button2ActionConditions
 		// Don't read past tag end
-		while ( in->tell() < tagEndPosition ) 
+		while ( in.tell() < tagEndPosition ) 
 		{
-			in->ensureBytes(2);
-			unsigned next_action_offset = in->read_u16();
+			in.ensureBytes(2);
+			unsigned next_action_offset = in.read_u16();
 			if ( next_action_offset )
 			{
-				next_action_pos = in->tell() + next_action_offset - 2;
+				next_action_pos = in.tell() + next_action_offset - 2;
 				if ( next_action_pos > tagEndPosition )
 				{
 					IF_VERBOSE_MALFORMED_SWF(
@@ -430,7 +429,7 @@ button_character_definition::readDefineButton2(SWFStream* in, movie_definition* 
 
 			unsigned long endActionPos = next_action_offset ? next_action_pos : tagEndPosition;
 
-			m_button_actions.push_back(new button_action(*in, SWF::DEFINEBUTTON2, endActionPos, *m));
+			m_button_actions.push_back(new button_action(in, SWF::DEFINEBUTTON2, endActionPos, *m));
 
 			if (next_action_offset == 0 )
 			{
@@ -439,13 +438,13 @@ button_character_definition::readDefineButton2(SWFStream* in, movie_definition* 
 			}
 
 			// seek to next action.
-			in->seek(next_action_pos);
+			in.seek(next_action_pos);
 		}
 	}
 }
 
 void
-button_character_definition::readDefineButtonSound(SWFStream* in, movie_definition* m)
+button_character_definition::readDefineButtonSound(SWFStream& in, movie_definition* m)
 {
 	// Character ID has been read already
 
@@ -466,8 +465,8 @@ button_character_definition::readDefineButtonSound(SWFStream* in, movie_definiti
 	for (int i = 0; i < 4; i++)
 	{
 		button_sound_info& bs = m_sound->m_button_sounds[i];
-		in->ensureBytes(2);
-		bs.m_sound_id = in->read_u16();
+		in.ensureBytes(2);
+		bs.m_sound_id = in.read_u16();
 		if (bs.m_sound_id)
 		{
 			bs.m_sam = m->get_sound_sample(bs.m_sound_id);
@@ -487,7 +486,7 @@ button_character_definition::readDefineButtonSound(SWFStream* in, movie_definiti
 
 
 void
-button_character_definition::read(SWFStream* in, int tag_type, movie_definition* m)
+button_character_definition::read(SWFStream& in, int tag_type, movie_definition* m)
 {
 	// Character ID has been read already
 

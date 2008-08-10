@@ -31,7 +31,7 @@ CSMTextSettingsTag::CSMTextSettingsTag(movie_definition& /* m */,
 }
 
 void
-CSMTextSettingsTag::loader(SWFStream* in, tag_type tag, movie_definition* /*m*/)
+CSMTextSettingsTag::loader(SWFStream& in, tag_type tag, movie_definition* /*m*/)
 {
     assert(tag == SWF::CSMTEXTSETTINGS); // 73
 
@@ -43,27 +43,27 @@ CSMTextSettingsTag::loader(SWFStream* in, tag_type tag, movie_definition* /*m*/)
     // Sharpness F32
     // res UI8 must be 0. 8 bit int? 
 
-    in->ensureBytes(2 + 1 + 4 + 4 + 1);
+    in.ensureBytes(2 + 1 + 4 + 4 + 1);
 
-    boost::uint16_t textID = in->read_u16();
+    boost::uint16_t textID = in.read_u16();
     
     // Should be either 1 or 0. TODO: what if it's something else?
-    bool flashType = in->read_uint(2); 
+    bool flashType = in.read_uint(2); 
     
     // 0: no grid fitting.
     // 1: Pixel grid fit (only for left-aligned dynamic text)
     // 2: Sub-pixel grid fit.
-    boost::uint8_t gridFit = in->read_uint(3);
+    boost::uint8_t gridFit = in.read_uint(3);
 
     // Should be 0:
-    boost::uint8_t reserved = in->read_uint(3);
+    boost::uint8_t reserved = in.read_uint(3);
 
-    float thickness = in->read_long_float();
+    float thickness = in.read_long_float();
     
-    float sharpness = in->read_long_float();
+    float sharpness = in.read_long_float();
     
     // Should also be 0.
-    reserved = in->read_u8();
+    reserved = in.read_u8();
 
     IF_VERBOSE_PARSE (
         log_parse(_("  CSMTextSettings: TextID=%d, FlashType=%d, "
@@ -72,7 +72,7 @@ CSMTextSettingsTag::loader(SWFStream* in, tag_type tag, movie_definition* /*m*/)
                     static_cast<int>(gridFit), thickness, sharpness);
     );
 
-    in->skip_to_tag_end();
+    in.skip_to_tag_end();
 
     LOG_ONCE(log_unimpl(_("CSMTextSettings")));
 

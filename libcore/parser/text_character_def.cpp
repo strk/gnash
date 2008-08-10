@@ -14,7 +14,7 @@
 
 namespace gnash {
 
-void text_character_def::read(SWFStream* in, int tag_type,
+void text_character_def::read(SWFStream& in, int tag_type,
 		movie_definition* m)
 {
 	assert(m != NULL);
@@ -23,9 +23,9 @@ void text_character_def::read(SWFStream* in, int tag_type,
 	m_rect.read(in);
 	m_matrix.read(in);
 
-	in->ensureBytes(2); // glyph_bits + advance_bits
-	int glyph_bits = in->read_u8();
-	int advance_bits = in->read_u8();
+	in.ensureBytes(2); // glyph_bits + advance_bits
+	int glyph_bits = in.read_u8();
+	int advance_bits = in.read_u8();
 
 	IF_VERBOSE_PARSE(
 	log_parse(_("begin text records for text_character_def %p"), (void*)this);
@@ -36,8 +36,8 @@ void text_character_def::read(SWFStream* in, int tag_type,
 	text_style	style;
 	for (;;)
 	{
-		in->ensureBytes(1);
-		unsigned int first_byte = in->read_u8();
+		in.ensureBytes(1);
+		unsigned int first_byte = in.read_u8();
 		
 		if (first_byte == 0)
 		{
@@ -67,8 +67,8 @@ void text_character_def::read(SWFStream* in, int tag_type,
 
 			if (has_font)
 			{
-				in->ensureBytes(2);
-				boost::uint16_t	font_id = in->read_u16();
+				in.ensureBytes(2);
+				boost::uint16_t	font_id = in.read_u16();
 				if ( ! style.setFont(font_id, *m) )
 				{
 					// setFont would have already printed an swferror on failure
@@ -97,8 +97,8 @@ void text_character_def::read(SWFStream* in, int tag_type,
 
 			if (has_x_offset)
 			{
-				in->ensureBytes(2);
-				style.setXOffset(in->read_s16());
+				in.ensureBytes(2);
+				style.setXOffset(in.read_s16());
 				IF_VERBOSE_PARSE(
 				log_parse(_("  has_x_offset = %g"), style.getXOffset());
 				);
@@ -111,8 +111,8 @@ void text_character_def::read(SWFStream* in, int tag_type,
 
 			if (has_y_offset)
 			{
-				in->ensureBytes(2);
-				style.setYOffset(in->read_s16());
+				in.ensureBytes(2);
+				style.setYOffset(in.read_s16());
 				IF_VERBOSE_PARSE(
 				log_parse(_("  has_y_offset = %g"), style.getYOffset());
 				);
@@ -124,8 +124,8 @@ void text_character_def::read(SWFStream* in, int tag_type,
 			}
 			if (has_font)
 			{
-				in->ensureBytes(2);
-				style.m_text_height = in->read_u16();
+				in.ensureBytes(2);
+				style.m_text_height = in.read_u16();
 				IF_VERBOSE_PARSE(
 				log_parse(_("  text_height = %g"), style.m_text_height);
 				);

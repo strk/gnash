@@ -98,16 +98,8 @@ public:
     /// Read RGB from the SWF input stream.
     void read_rgb(SWFStream& in);
 
-    // TODO: temp hack, should drop! 
-    // why read_xxx(stream *) and read_xxx(stream &) are mixed together?
-    void read_rgb(SWFStream* in) { read_rgb(*in); }
-    
     /// Read RGBA from the SWF input stream.
     void read_rgba(SWFStream& in);
-
-    // TODO: temp hack, should drop!
-    // why read_xxx(stream *) and read_xxx(stream &) are mixed together?
-    void read_rgba(SWFStream* in) { read_rgba(*in); }
 
     friend bool operator== (const cxform&, const cxform&);
 	

@@ -67,12 +67,12 @@ sprite_definition::~sprite_definition()
 /*private*/
 // only called from constructors
 void
-sprite_definition::read(SWFStream* in)
+sprite_definition::read(SWFStream& in)
 {
-    unsigned long tag_end = in->get_tag_end_position();
+    unsigned long tag_end = in.get_tag_end_position();
 
-    in->ensureBytes(2);
-    m_frame_count = in->read_u16();
+    in.ensureBytes(2);
+    m_frame_count = in.read_u16();
 
     IF_VERBOSE_PARSE (
         log_parse(_("  frames = %d"), m_frame_count);
@@ -80,15 +80,15 @@ sprite_definition::read(SWFStream* in)
 
 	m_loading_frame = 0;
 
-	while ( in->tell() < tag_end )
+	while ( in.tell() < tag_end )
 	{
-		SWF::tag_type tag_type = in->open_tag();
+		SWF::tag_type tag_type = in.open_tag();
 
 		SWF::TagLoadersTable::loader_function lf = NULL;
 
 		if (tag_type == SWF::END)
                 {
-			if (in->tell() != tag_end)
+			if (in.tell() != tag_end)
                         {
 		    		IF_VERBOSE_MALFORMED_SWF(
 				// Safety break, so we don't read past
@@ -97,7 +97,7 @@ sprite_definition::read(SWFStream* in)
 					"before the advertised DEFINESPRITE end; "
 					"stopping for safety."));
 		    		)
-				in->close_tag();
+				in.close_tag();
 		    		break;
 			}
 		}
@@ -117,8 +117,8 @@ sprite_definition::read(SWFStream* in)
 			{
 				// better break then sorry
 
-				in->close_tag();
-				if ( in->open_tag() != SWF::END )
+				in.close_tag();
+				if ( in.open_tag() != SWF::END )
 				{
 					IF_VERBOSE_MALFORMED_SWF(
 					log_swferror(_("last SHOWFRAME of a "
@@ -126,7 +126,7 @@ sprite_definition::read(SWFStream* in)
 						"isn't followed by an END."
 						" Stopping for safety."));
 					);
-					in->close_tag();
+					in.close_tag();
 					return;
 				}
 			}
@@ -145,7 +145,7 @@ sprite_definition::read(SWFStream* in)
                               tag_type);
 		}
 
-		in->close_tag();
+		in.close_tag();
 	}
 
         if ( m_frame_count > m_loading_frame )
@@ -206,7 +206,7 @@ sprite_definition::sprite_definition(movie_definition* m, SWFStream* in)
 	}
 	else
 	{
-		read(in);
+		read(*in);
 	}
 }
 

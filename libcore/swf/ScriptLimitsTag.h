@@ -33,19 +33,19 @@ namespace SWF {
 /// movie_root is overridden.
 namespace ScriptLimitsTag
 {
-    void loader(SWFStream* in, tag_type tag, movie_definition* /*m*/)
+    void loader(SWFStream& in, tag_type tag, movie_definition* /*m*/)
     {
 
         assert(VM::isInitialized());
 
-        in->ensureBytes(4); // recursion and timeout.
+        in.ensureBytes(4); // recursion and timeout.
 
         // We need to get the root movie or the VM from somewhere
         // in order to make the VM not a singleton.
         movie_root& r = VM::get().getRoot();
 
-        const boost::uint16_t recursionLimit = in->read_u16();
-        const boost::uint16_t timeoutLimit = in->read_u16();      
+        const boost::uint16_t recursionLimit = in.read_u16();
+        const boost::uint16_t timeoutLimit = in.read_u16();      
 
         IF_VERBOSE_PARSE (
             log_parse(_("  ScriptLimits tag(%d): recursion: %d, timeout: %d"),

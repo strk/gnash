@@ -35,24 +35,24 @@ DefineFontAlignZonesTag::DefineFontAlignZonesTag(movie_definition& /* m */,
 
 /* public static */
 void
-DefineFontAlignZonesTag::loader(SWFStream* in, tag_type tag, movie_definition* m)
+DefineFontAlignZonesTag::loader(SWFStream& in, tag_type tag, movie_definition* m)
 {
 	assert(tag == SWF::DEFINEALIGNZONES); // 73
 
-    in->ensureBytes(1);
-	unsigned short ref = in->read_u8(); // must reference a valid DEFINEFONT3 tag
+    in.ensureBytes(1);
+	unsigned short ref = in.read_u8(); // must reference a valid DEFINEFONT3 tag
 	font* referencedFont = m->get_font(ref);
 	if ( ! referencedFont )
 	{
 		IF_VERBOSE_MALFORMED_SWF(
 		log_swferror(_("DefineFontAlignZones tag references an undefined font %d"), ref);
 		);
-		in->skip_to_tag_end();
+		in.skip_to_tag_end();
 		return;
 	}
 
-    in->ensureBytes(1);
-	unsigned flags = in->read_u8(); // 2bits are cms table, 6bits are reserved
+    in.ensureBytes(1);
+	unsigned flags = in.read_u8(); // 2bits are cms table, 6bits are reserved
 
 	// TODO:
 	// 	- parse swf_zone_array
@@ -63,7 +63,7 @@ DefineFontAlignZonesTag::loader(SWFStream* in, tag_type tag, movie_definition* m
 	log_parse(_("  DefineFontAlignZones: font=%d, flags=%d"), ref, flags);
 	);
 
-	in->skip_to_tag_end();
+	in.skip_to_tag_end();
 	LOG_ONCE(log_unimpl(_("DefineFontAlignZoneTag")));
 
 }
