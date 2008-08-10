@@ -22,7 +22,7 @@
 #include "sprite_instance.h"
 #include "swf.h" // for tag_type definition
 #include "log.h"
-#include "stream.h"
+#include "SWFStream.h"
 
 namespace gnash {
 namespace SWF {

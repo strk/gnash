@@ -24,7 +24,7 @@
 #include "utility.h"
 #include "impl.h"
 #include "shape_character_def.h"
-#include "stream.h"
+#include "SWFStream.h"
 #include "log.h"
 #include "font.h"
 #include "fontlib.h"

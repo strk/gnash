@@ -10,7 +10,7 @@
 #include "impl.h"
 #include "log.h"
 #include "render.h"
-#include "stream.h"
+#include "SWFStream.h"
 #include "movie_definition.h"
 #include "swf.h"
 #include "GnashException.h"

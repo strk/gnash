@@ -7,7 +7,7 @@
 
 
 #include "sound_definition.h"
-#include "stream.h"
+#include "SWFStream.h"
 #include "impl.h"
 //#include "ControlTag.h" // for start_sound_tag inheritance
 #include "movie_definition.h"

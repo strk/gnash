@@ -25,7 +25,7 @@
 #include "sprite_definition.h"
 #include "ControlTag.h" // for dtor visibility
 #include "as_function.h" // for dtor visibility
-#include "stream.h" // for use
+#include "SWFStream.h" // for use
 
 #include <vector>
 #include <string>

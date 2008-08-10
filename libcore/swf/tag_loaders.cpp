@@ -32,7 +32,7 @@
 #include "log.h"
 #include "morph2_character_def.h"
 #include "shape.h"
-#include "stream.h"
+#include "SWFStream.h"
 #include "styles.h"
 //#include "dlist.h"
 #include "timers.h"

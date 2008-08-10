@@ -23,7 +23,7 @@
 #include "movie_definition.h" // for addControlTag
 #include "sprite_instance.h" // for execute
 #include "SoundInfo.h" // for loader
-#include "stream.h"
+#include "SWFStream.h"
 #include "log.h" 
 //#include "sound_definition.h" // for sound_sample
 
