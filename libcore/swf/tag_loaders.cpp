@@ -907,7 +907,7 @@ sprite_loader(SWFStream& in, tag_type tag, movie_definition* m)
     );
 
     // will automatically read the sprite
-    sprite_definition* ch = new sprite_definition(m, &in);
+    sprite_definition* ch = new sprite_definition(m, in);
     //ch->read(in);
 
     IF_VERBOSE_MALFORMED_SWF(
