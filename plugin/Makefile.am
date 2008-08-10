@@ -27,22 +27,27 @@ endif
 if NPAPI
 SUBDIRS += mozilla-sdk
 
+if XPCOM
+SUBDIRS += xpcom
+endif
 if WIN32
 SUBDIRS += win32
 endif
 endif # NPAPI
 
-# if DMALLOC
-# MALL_CFLAGS = $(DMALLOC_CFLAGS)
-# MALL_LIBS = $(DMALLOC_LIBS)
-# endif
+# make sure these files make it into the distribution tarball.
+DIST_SUBDIRS = klash mozilla-sdk xpcom win32
 
+# This is a hard coded path to where the plugin gets installed.
+GNASHBINDIR = $(bindir)
+
+# This is the directory the plugin gets installed.
 plugindir   = $(FIREFOX_PLUGINS)
 
 # XP_UNIX	This needs to get defined for npapi.h on unix platforms.
 # PLUGIN_TRACE	Enable this define to get debug prints whenever the plugin
 #		api gets control.
-AM_CPPFLAGS = -DPLUGIN_TRACE -DXP_UNIX -DMOZ_X11 -DGNASHBINDIR=\"$(bindir)\" \
+AM_CPPFLAGS = -DPLUGIN_TRACE -DXP_UNIX -DMOZ_X11 -DGNASHBINDIR=\"$(GNASHBINDIR)\" \
 	-DSYSCONFDIR=\"$(sysconfdir)\" \
         -I$(top_srcdir)/libcore \
         -I$(top_srcdir)/libcore/parser \
