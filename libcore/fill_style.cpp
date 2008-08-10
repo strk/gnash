@@ -37,10 +37,10 @@ namespace gnash {
 //
 
 void
-gradient_record::read(SWFStream* in, int tag_type)
+gradient_record::read(SWFStream& in, int tag_type)
 {
-    in->ensureBytes(1);
-    m_ratio = in->read_u8();
+    in.ensureBytes(1);
+    m_ratio = in.read_u8();
     m_color.read(in, tag_type);
 }
 
@@ -60,13 +60,13 @@ fill_style::fill_style()
 
 
 void
-fill_style::read(SWFStream* in, int tag_type, movie_definition* md,
+fill_style::read(SWFStream& in, int tag_type, movie_definition* md,
     fill_style *pOther)
 {
     const bool is_morph = pOther != NULL;
 
-    in->ensureBytes(1);
-    m_type = in->read_u8();
+    in.ensureBytes(1);
+    m_type = in.read_u8();
     if (is_morph)
     {
         pOther->m_type = m_type;
@@ -139,9 +139,9 @@ fill_style::read(SWFStream* in, int tag_type, movie_definition* md,
         }
         
         // GRADIENT
-        in->ensureBytes(1);
+        in.ensureBytes(1);
 
-        uint8_t grad_props = in->read_u8();
+        uint8_t grad_props = in.read_u8();
     
         if (tag_type == SWF::DEFINESHAPE4 ||
             tag_type == SWF::DEFINESHAPE4_) {
@@ -212,8 +212,8 @@ fill_style::read(SWFStream* in, int tag_type, movie_definition* md,
         // A focal gradient also has a focal point.
         if (m_type == SWF::FILL_FOCAL_GRADIENT)
         {
-           in->ensureBytes(2);
-           m_focal_point = in->read_short_sfixed();
+           in.ensureBytes(2);
+           m_focal_point = in.read_short_sfixed();
            if (m_focal_point < -1.0f)
                m_focal_point = -1.0f;
            else if (m_focal_point > 1.0f)
@@ -255,8 +255,8 @@ fill_style::read(SWFStream* in, int tag_type, movie_definition* md,
         // 0x42: tiled bitmap fill with hard edges
         // 0x43: clipped bitmap fill with hard edges
 
-        in->ensureBytes(2);
-        int bitmap_char_id = in->read_u16();
+        in.ensureBytes(2);
+        int bitmap_char_id = in.read_u16();
         IF_VERBOSE_PARSE
         (
             log_parse("  bitmap_char = %d", bitmap_char_id);

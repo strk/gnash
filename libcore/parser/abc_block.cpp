@@ -1097,9 +1097,11 @@ abc_block::read_method_bodies()
 
 // Load up all of the data.
 bool
-abc_block::read(SWFStream* in)
+abc_block::read(SWFStream& in)
 {
-	mS = in;
+    // This isn't very nice:
+	mS = &in;
+
 	if (!read_version()) return false;
 	if (!read_integer_constants()) return false;
 	if (!read_unsigned_integer_constants()) return false;

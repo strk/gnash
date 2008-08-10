@@ -29,16 +29,16 @@ namespace SWF {
 
 /* public static */
 void
-StartSoundTag::loader(SWFStream* in, tag_type tag, movie_definition* m)
+StartSoundTag::loader(SWFStream& in, tag_type tag, movie_definition* m)
 {
     assert(tag == SWF::STARTSOUND); // 15 
 
     // Make static ?
     media::sound_handler* handler = get_sound_handler();
 
-    in->ensureBytes(2); // sound_id
+    in.ensureBytes(2); // sound_id
 
-    int sound_id = in->read_u16();
+    int sound_id = in.read_u16();
 
     sound_sample* sam = m->get_sound_sample(sound_id);
     if ( ! sam ) // invalid id... nothing to do
@@ -57,7 +57,7 @@ StartSoundTag::loader(SWFStream* in, tag_type tag, movie_definition* m)
     //       sam->m_sound_handler_id is the sound_handler-provided id
     //
     StartSoundTag*  sst = new StartSoundTag(sam->m_sound_handler_id);
-    sst->read(*in);
+    sst->read(in);
 
     IF_VERBOSE_PARSE (
          log_parse(_("StartSound: id=%d, stop = %d, loop ct = %d"),

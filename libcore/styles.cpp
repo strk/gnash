@@ -39,27 +39,27 @@ line_style::line_style()
 }
 
 void
-line_style::read_morph(SWFStream* in, int tag_type, movie_definition *md,
+line_style::read_morph(SWFStream& in, int tag_type, movie_definition *md,
     line_style *pOther)
 {
     if (tag_type == SWF::DEFINEMORPHSHAPE)
     {
-        in->ensureBytes(2 + 2);
-        m_width = in->read_u16();
-        pOther->m_width = in->read_u16();
+        in.ensureBytes(2 + 2);
+        m_width = in.read_u16();
+        pOther->m_width = in.read_u16();
         m_color.read(in, tag_type);
         pOther->m_color.read(in, tag_type);
         return;
     }
 
     // MorphShape 2 from here down.
-    in->ensureBytes(4 + 2);
+    in.ensureBytes(4 + 2);
 
-    m_width = in->read_u16();
-    pOther->m_width = in->read_u16();
+    m_width = in.read_u16();
+    pOther->m_width = in.read_u16();
 
-    int flags1 = in->read_u8();
-    int flags2 = in->read_u8();
+    int flags1 = in.read_u8();
+    int flags2 = in.read_u8();
     _startCapStyle =  (cap_style_e)((flags1 & 0xC0) >> 6);
     _joinStyle     = (join_style_e)((flags1 & 0x30) >> 4);
     bool has_fill      =   flags1 & (1 << 3);
@@ -71,8 +71,8 @@ line_style::read_morph(SWFStream* in, int tag_type, movie_definition *md,
 
     if (_joinStyle == JOIN_MITER)  
     {
-        in->ensureBytes(2);
-        _miterLimitFactor = in->read_short_ufixed();
+        in.ensureBytes(2);
+        _miterLimitFactor = in.read_short_ufixed();
     }
     if (has_fill)
     {
@@ -91,23 +91,23 @@ line_style::read_morph(SWFStream* in, int tag_type, movie_definition *md,
 }
 
 void
-line_style::read(SWFStream* in, int tag_type, movie_definition *md)
+line_style::read(SWFStream& in, int tag_type, movie_definition *md)
 {
     if (!(tag_type == SWF::DEFINESHAPE4 || tag_type == SWF::DEFINESHAPE4_))
     {
-        in->ensureBytes(2);
-        m_width = in->read_u16();
+        in.ensureBytes(2);
+        m_width = in.read_u16();
         m_color.read(in, tag_type);
         return;
     }
 
     // TODO: Unfinished. Temporary to allow DefineShape4 to work in many
     // cases, but does not work correctly in all cases.
-    in->ensureBytes(2+2);
-    m_width = in->read_u16();
+    in.ensureBytes(2+2);
+    m_width = in.read_u16();
 
-    int flags1 = in->read_u8();
-    int flags2 = in->read_u8();
+    int flags1 = in.read_u8();
+    int flags2 = in.read_u8();
     _startCapStyle =  (cap_style_e)((flags1 & 0xC0) >> 6);
     _joinStyle     = (join_style_e)((flags1 & 0x30) >> 4);
     bool has_fill      =   flags1 & (1 << 3);
@@ -119,8 +119,8 @@ line_style::read(SWFStream* in, int tag_type, movie_definition *md)
 
     if (_joinStyle == JOIN_MITER) 
     {
-        in->ensureBytes(2);
-        _miterLimitFactor = in->read_short_ufixed();
+        in.ensureBytes(2);
+        _miterLimitFactor = in.read_short_ufixed();
     }
     if (has_fill)
     {

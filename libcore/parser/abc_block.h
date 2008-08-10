@@ -143,7 +143,7 @@ public:
 	std::vector<abc_parsing::abc_Trait*> mTraits;
 
 	string_table* mStringTable;
-	SWFStream *mS; // Not stored beyond one read.
+	SWFStream* mS; // Not stored beyond one read.
 
 	asClass *mTheObject;
 	ClassHierarchy *mCH;
@@ -175,7 +175,7 @@ public:
 	bool read_scripts();
 	bool read_method_bodies();
 
-	bool read(SWFStream* in);
+	bool read(SWFStream& in);
 
 	bool pool_value(boost::uint32_t index, boost::uint8_t type, as_value &v);
 

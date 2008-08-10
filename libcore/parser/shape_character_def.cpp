@@ -49,17 +49,17 @@ namespace gnash
 
 // Read fill styles, and push them onto the given style array.
 static void
-read_fill_styles(std::vector<fill_style>& styles, SWFStream* in,
+read_fill_styles(std::vector<fill_style>& styles, SWFStream& in,
                  int tag_type, movie_definition* m)
 {
-    in->ensureBytes(1);
-    boost::uint16_t  fill_style_count = in->read_u8();
+    in.ensureBytes(1);
+    boost::uint16_t  fill_style_count = in.read_u8();
     if (tag_type > 2)
     {
         if (fill_style_count == 0xFF)
         {
-            in->ensureBytes(2);
-            fill_style_count = in->read_u16();
+            in.ensureBytes(2);
+            fill_style_count = in.read_u16();
         }
     }
 
@@ -79,12 +79,12 @@ read_fill_styles(std::vector<fill_style>& styles, SWFStream* in,
 }
 
 static void
-read_line_styles(std::vector<line_style>& styles, SWFStream* in, int tag_type,
+read_line_styles(std::vector<line_style>& styles, SWFStream& in, int tag_type,
                  movie_definition *md)
 // Read line styles and push them onto the back of the given array.
 {
-    in->ensureBytes(1);
-    int line_style_count = in->read_u8();
+    in.ensureBytes(1);
+    int line_style_count = in.read_u8();
 
     IF_VERBOSE_PARSE(
         log_parse(_("  read_line_styles: count = %d"), line_style_count);
@@ -92,8 +92,8 @@ read_line_styles(std::vector<line_style>& styles, SWFStream* in, int tag_type,
 
     if (line_style_count == 0xFF)
     {
-        in->ensureBytes(2);
-        line_style_count = in->read_u16();
+        in.ensureBytes(2);
+        line_style_count = in.read_u16();
         IF_VERBOSE_PARSE(
             log_parse(_("  read_line_styles: count2 = %d"), line_style_count);
         );
@@ -131,7 +131,7 @@ shape_character_def::~shape_character_def()
 }
 
 void
-shape_character_def::read(SWFStream* in, int tag_type, bool with_style,
+shape_character_def::read(SWFStream& in, int tag_type, bool with_style,
                           movie_definition* m)
 {
     if (with_style)
@@ -148,8 +148,8 @@ shape_character_def::read(SWFStream* in, int tag_type, bool with_style,
         {
             rect tbound;
             tbound.read(in);
-            in->ensureBytes(1);
-            static_cast<void>(in->read_u8());
+            in.ensureBytes(1);
+            static_cast<void>(in.read_u8());
             static bool warned = false;
             if ( ! warned )
             {
@@ -173,8 +173,8 @@ shape_character_def::read(SWFStream* in, int tag_type, bool with_style,
     }
     
     // Use read_u8 to force alignment.
-    in->ensureBytes(1);
-    boost::uint8_t num_bits = in->read_u8();
+    in.ensureBytes(1);
+    boost::uint8_t num_bits = in.read_u8();
     int num_fill_bits = (num_bits & 0xF0) >> 4;
     int num_line_bits = (num_bits & 0x0F);
     
@@ -222,13 +222,13 @@ shape_character_def::read(SWFStream* in, int tag_type, bool with_style,
     // SHAPERECORDS
     for (;;)
     {
-        in->ensureBits(1);
-        bool isEdgeRecord = in->read_bit();
+        in.ensureBits(1);
+        bool isEdgeRecord = in.read_bit();
         if (!isEdgeRecord)
         {
             // Parse the record.
-            in->ensureBits(5);
-            int flags = in->read_uint(5);
+            in.ensureBits(5);
+            int flags = in.read_uint(5);
             if (flags == flagEnd)
             {  
                 // Store the current path if any.
@@ -247,11 +247,11 @@ shape_character_def::read(SWFStream* in, int tag_type, bool with_style,
                     m_paths.push_back(current_path);
                     current_path.m_edges.resize(0);
                 }
-                in->ensureBits(5);
-                int num_move_bits = in->read_uint(5);
-                in->ensureBits(2 * num_move_bits);
-                int move_x = in->read_sint(num_move_bits);
-                int move_y = in->read_sint(num_move_bits);
+                in.ensureBits(5);
+                int num_move_bits = in.read_uint(5);
+                in.ensureBits(2 * num_move_bits);
+                int move_x = in.read_sint(num_move_bits);
+                int move_y = in.read_sint(num_move_bits);
     
                 x = move_x;
                 y = move_y;
@@ -276,8 +276,8 @@ shape_character_def::read(SWFStream* in, int tag_type, bool with_style,
                     current_path.ap.x = x;
                     current_path.ap.y = y;
                 }
-                in->ensureBits(num_fill_bits);
-                unsigned style = in->read_uint(num_fill_bits);
+                in.ensureBits(num_fill_bits);
+                unsigned style = in.read_uint(num_fill_bits);
                 if (style > 0)
                 {
                     style += fill_base;
@@ -322,8 +322,8 @@ shape_character_def::read(SWFStream* in, int tag_type, bool with_style,
                     current_path.ap.x = x;
                     current_path.ap.y = y;
                 }
-                in->ensureBits(num_fill_bits);
-                unsigned style = in->read_uint(num_fill_bits);
+                in.ensureBits(num_fill_bits);
+                unsigned style = in.read_uint(num_fill_bits);
                 if (style > 0)
                 {
                     style += fill_base;
@@ -367,8 +367,8 @@ shape_character_def::read(SWFStream* in, int tag_type, bool with_style,
                     current_path.ap.x = x;
                     current_path.ap.y = y;
                 }
-                in->ensureBits(num_line_bits);
-                unsigned style = in->read_uint(num_line_bits);
+                in.ensureBits(num_line_bits);
+                unsigned style = in.read_uint(num_line_bits);
                 if (style > 0)
                 {
                     style += line_base;
@@ -432,26 +432,26 @@ shape_character_def::read(SWFStream* in, int tag_type, bool with_style,
                 read_fill_styles(m_fill_styles, in, tag_type, m);
                 read_line_styles(m_line_styles, in, tag_type, m);
     
-                in->ensureBits(8);
-                num_fill_bits = in->read_uint(4);
-                num_line_bits = in->read_uint(4);
+                in.ensureBits(8);
+                num_fill_bits = in.read_uint(4);
+                num_line_bits = in.read_uint(4);
             }
         }
         else
         {
             // EDGERECORD
-            in->ensureBits(1);
-            bool edge_flag = in->read_bit();
+            in.ensureBits(1);
+            bool edge_flag = in.read_bit();
             if (edge_flag == 0)
             {
-                in->ensureBits(4);
-                int num_bits = 2 + in->read_uint(4);
+                in.ensureBits(4);
+                int num_bits = 2 + in.read_uint(4);
                 // curved edge
-                in->ensureBits(4 * num_bits);
-                int cx = x + in->read_sint(num_bits);
-                int cy = y + in->read_sint(num_bits);
-                int ax = cx + in->read_sint(num_bits);
-                int ay = cy + in->read_sint(num_bits);
+                in.ensureBits(4 * num_bits);
+                int cx = x + in.read_sint(num_bits);
+                int cy = y + in.read_sint(num_bits);
+                int ax = cx + in.read_sint(num_bits);
+                int ay = cy + in.read_sint(num_bits);
     
     #if SHAPE_LOG
                 IF_VERBOSE_PARSE (
@@ -465,32 +465,32 @@ shape_character_def::read(SWFStream* in, int tag_type, bool with_style,
             else
             {
                 // straight edge
-                in->ensureBits(5);
-                int num_bits = 2 + in->read_uint(4);
-                bool  line_flag = in->read_bit();
+                in.ensureBits(5);
+                int num_bits = 2 + in.read_uint(4);
+                bool  line_flag = in.read_bit();
                 int dx = 0, dy = 0;
                 if (line_flag)
                 {
                     // General line.
-                    in->ensureBits(2 * num_bits);
-                    dx = in->read_sint(num_bits);
-                    dy = in->read_sint(num_bits);
+                    in.ensureBits(2 * num_bits);
+                    dx = in.read_sint(num_bits);
+                    dy = in.read_sint(num_bits);
                 }
                 else
                 {
-                    in->ensureBits(1);
-                    bool vert_flag = in->read_bit();
+                    in.ensureBits(1);
+                    bool vert_flag = in.read_bit();
                     if (vert_flag == 0)
                     {
                         // Horizontal line.
-                        in->ensureBits(num_bits);
-                        dx = in->read_sint(num_bits);
+                        in.ensureBits(num_bits);
+                        dx = in.read_sint(num_bits);
                     }
                     else
                     {
                         // Vertical line.
-                        in->ensureBits(num_bits);
-                        dy = in->read_sint(num_bits);
+                        in.ensureBits(num_bits);
+                        dy = in.read_sint(num_bits);
                     }
                 }
     
