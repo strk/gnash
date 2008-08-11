@@ -192,11 +192,11 @@ namespace image
 	{
 		size_t height = image->height();
 
-		std::auto_ptr<JpegImageOutput> j_out ( JpegImageOutput::create(out, image->width(), height, quality) );
+		std::auto_ptr<ImageOutput> j_out ( JpegImageOutput::create(*out, image->width(), height, quality) );
 
 		for (size_t y = 0; y < height; ++y)
 		{
-			j_out->write_scanline(image->scanline(y));
+			j_out->writeScanline(image->scanline(y));
 		}
 
 	}

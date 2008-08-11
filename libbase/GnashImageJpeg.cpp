@@ -530,61 +530,39 @@ private:
 };
 
 
-
-
-
-
-// Basically this is a thin wrapper around jpeg_compress
-// object.
-class output_IOChannel : public JpegImageOutput
+JpegImageOutput::JpegImageOutput(gnash::IOChannel& out, size_t width, size_t height, int quality)
+    :
+    ImageOutput(width, height)
 {
-public:
-	// State needed for output.
-	jpeg_compress_struct m_cinfo;
-	jpeg_error_mgr m_jerr;
-
-	/// Constructor. 
-	//
-	/// Read the header data from in, and
-	///  prepare to read data.
-	output_IOChannel(gnash::IOChannel& out, int width, int height, int quality)
-	{
 		m_cinfo.err = jpeg_std_error(&m_jerr);
 
 		// Initialize decompression object.
 		jpeg_create_compress(&m_cinfo);
 
 		rw_dest_IOChannel::setup(&m_cinfo, out);
-		m_cinfo.image_width = width;
-		m_cinfo.image_height = height;
+		m_cinfo.image_width = _width;
+		m_cinfo.image_height = _height;
 		m_cinfo.input_components = 3;
 		m_cinfo.in_color_space = JCS_RGB;
 		jpeg_set_defaults(&m_cinfo);
 		jpeg_set_quality(&m_cinfo, quality, TRUE);
 
 		jpeg_start_compress(&m_cinfo, TRUE);
-	}
+}
 
 
-	~output_IOChannel()
-	// Destructor.  Clean up our jpeg reader state.
-	{
+JpegImageOutput::~JpegImageOutput()
+{
 		jpeg_finish_compress(&m_cinfo);
-/*
-		rw_dest_IOChannel* src = (rw_source_IOChannel*) m_cinfo.dest;
-		delete dest;
-		m_cinfo.dest = NULL;
-*/
 		jpeg_destroy_compress(&m_cinfo);
-	}
+}
 
 
-	void	write_scanline(unsigned char* rgb_data)
-	// Write out a single scanline.
-	{
-		jpeg_write_scanlines(&m_cinfo, &rgb_data, 1);
-	}
-};
+void
+JpegImageOutput::writeScanline(unsigned char* rgbData)
+{
+	jpeg_write_scanlines(&m_cinfo, &rgbData, 1);
+}
 
 
 void
@@ -596,11 +574,11 @@ JpegImageInput::errorOccurred(const char* msg)
 }
 
 
-/*static*/
-JpegImageOutput*
-JpegImageOutput::create(gnash::IOChannel* in, int width, int height, int quality)
+std::auto_ptr<ImageOutput>
+JpegImageOutput::create(gnash::IOChannel& out, size_t width, size_t height, int quality)
 {
-	return new output_IOChannel(*in, width, height, quality);
+    std::auto_ptr<ImageOutput> outChannel(new JpegImageOutput(out, width, height, quality));
+    return outChannel;
 }
 
 } // namespace gnash

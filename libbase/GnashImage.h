@@ -71,6 +71,28 @@ protected:
 
 };
 
+class ImageOutput
+{
+
+public:
+
+    ImageOutput(size_t width, size_t height) :
+        _width(width),
+        _height(height)
+        {}
+
+    virtual ~ImageOutput() {}
+
+    virtual void writeScanline(unsigned char* rgbData) = 0;
+
+protected:
+
+    size_t _width;
+
+    size_t _height;
+
+};
+
 } // namespace gnash
 
 
