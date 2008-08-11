@@ -232,9 +232,10 @@ namespace image
 	//
 	/// @param type     The image format to write in (see libcore/gnash.h)
 	/// @param out      The IOChannel to write to.
-	/// @param image    The image data to write
+	/// @param image    The image to write.
 	/// @param quality  The quality of the image output (not used for all formats)
-	DSOEXPORT void writeImageData(FileType type, gnash::IOChannel& out, rgb* image, int quality);
+	DSOEXPORT void writeImageData(FileType type, gnash::IOChannel& out,
+	                              image_base* image, int quality);
 
 	/// \brief
 	/// For reading SWF JPEG2-style image data, using pre-loaded

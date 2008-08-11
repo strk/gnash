@@ -187,13 +187,17 @@ namespace image
 	// utility
 	//
 
-
 	// Write the given image to the given out stream, in jpeg format.
-	void writeImageData(FileType type, gnash::IOChannel& out, rgb* image, int quality)
+	void writeImageData(FileType type, gnash::IOChannel& out, image::image_base* image, int quality)
 	{
-		const size_t height = image->height();
-		const size_t width = image->width();
+		image::rgb* im = dynamic_cast<image::rgb*>(image);
 		
+		// We only handle rgb data at the moment.
+		assert(im);
+		
+		const size_t width = im->width();
+		const size_t height = im->height();
+				
 		std::auto_ptr<ImageOutput> outChannel;
 
         switch (type)
@@ -209,11 +213,7 @@ namespace image
                 break;
         }
 
-		for (size_t y = 0; y < height; ++y)
-		{
-			outChannel->writeScanline(image->scanline(y));
-		}
-
+        outChannel->writeImageRGB(im->data());
 	}
 
     // See gnash.h for file types.

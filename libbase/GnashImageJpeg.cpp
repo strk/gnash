@@ -559,9 +559,16 @@ JpegImageOutput::~JpegImageOutput()
 
 
 void
-JpegImageOutput::writeScanline(unsigned char* rgbData)
+JpegImageOutput::writeImageRGB(unsigned char* rgbData)
 {
-	jpeg_write_scanlines(&m_cinfo, &rgbData, 1);
+    // RGB...
+    const size_t components = 3;
+
+    for (size_t y = 0; y < _height; ++y)
+    {
+        unsigned char* ypos = &rgbData[y * _width * components];
+        jpeg_write_scanlines(&m_cinfo, &ypos, 1);
+    }
 }
 
 

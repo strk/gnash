@@ -82,14 +82,14 @@ public:
         {}
 
     virtual ~ImageOutput() {}
-
-    virtual void writeScanline(unsigned char* rgbData) = 0;
+    
+    virtual void writeImageRGB(unsigned char* rgbData) = 0;
 
 protected:
 
-    size_t _width;
+    const size_t _width;
 
-    size_t _height;
+    const size_t _height;
 
 };
 

@@ -156,7 +156,7 @@ public:
 	
 	~JpegImageOutput();
 
-	void writeScanline(unsigned char* rgbData);
+	void writeImageRGB(unsigned char* rgbData);
 
 	DSOEXPORT static std::auto_ptr<ImageOutput> create(gnash::IOChannel& out, size_t width, size_t height, int quality);
 	
