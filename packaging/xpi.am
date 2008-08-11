@@ -45,7 +45,7 @@ xpi-configure: xpi-unpack $(XPI_BUILD)
 	cd $(XPI_BUILD); ./configure $(CONFIG_OPTS) --disable-shared --enable-static
 	@touch xpi-configure
 
-xpi-build: #xpi-configure
+xpi-build: xpi-configure
 	-@rm -f xpi-build
 	$(MAKE) -C $(XPI_BUILD) all
 	$(MAKE) -C $(XPI_BUILD) install DESTDIR=$(XPI_TMP)
@@ -53,10 +53,10 @@ xpi-build: #xpi-configure
 
 xpi-plugin: 
 	cd $(XPI_BUILD); ./configure $(CONFIG_OPTS) --disable-static --enable-shared
-	$(MAKE) -C $(XPI_BUILD)/plugin clean all
+	$(MAKE) -C $(XPI_BUILD)/plugin clean all GNASHBINDIR=
 	$(MAKE) -C $(XPI_BUILD) install-plugin DESTDIR=$(XPI_TMP)
 
-xpi xpi-bundle: # xpi-build xpi-plugin
+xpi xpi-bundle: xpi-build xpi-plugin
 	if ! test -d $(XPI_BUNDLE)/ ; then \
 	  mkdir $(XPI_BUNDLE); \
 	fi
