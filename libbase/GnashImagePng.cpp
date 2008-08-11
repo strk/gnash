@@ -135,7 +135,7 @@ PngImageInput::read()
 /// PNG output
 ///
 
-PngImageOutput::PngImageOutput(boost::shared_ptr<IOChannel> out, size_t width, size_t height, int quality)
+PngImageOutput::PngImageOutput(boost::shared_ptr<IOChannel> out, size_t width, size_t height, int /* quality */)
     :
     ImageOutput(out, width, height),
     _pngPtr(0),

@@ -432,6 +432,15 @@ JpegImageInput::readScanline(unsigned char* rgb_data)
 }
 
 
+void
+JpegImageInput::errorOccurred(const char* msg)
+{
+	gnash::log_debug("Long jump: banzaaaaaai!");
+	_errorOccurred = msg;
+	std::longjmp(_jmpBuf, 1);
+}
+
+
 // A jpeglib destination manager that writes to a gnash::IOChannel.
 // Paraphrased from IJG jpeglib jdatadst.c.
 class rw_dest_IOChannel
@@ -569,15 +578,6 @@ JpegImageOutput::writeImageRGB(unsigned char* rgbData)
         unsigned char* ypos = &rgbData[y * _width * components];
         jpeg_write_scanlines(&m_cinfo, &ypos, 1);
     }
-}
-
-
-void
-JpegImageInput::errorOccurred(const char* msg)
-{
-	gnash::log_debug("Long jump: banzaaaaaai!");
-	_errorOccurred = msg;
-	std::longjmp(_jmpBuf, 1);
 }
 
 
