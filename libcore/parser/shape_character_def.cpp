@@ -28,7 +28,7 @@
 #include "impl.h"
 #include "log.h"
 #include "render.h"
-#include "stream.h"
+#include "SWFStream.h"
 #include "sprite_instance.h"
 
 #include <cfloat>

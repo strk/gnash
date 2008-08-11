@@ -24,7 +24,7 @@
 //#include "MediaHandler.h"
 #include "MediaParser.h" // for VideoInfo
 #include "VideoDecoder.h"
-#include "stream.h" // for read()
+#include "SWFStream.h" // for read()
 
 #include <boost/bind.hpp>
 

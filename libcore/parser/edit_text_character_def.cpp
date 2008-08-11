@@ -21,7 +21,7 @@
 // Based on the public domain text.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
 #include "smart_ptr.h" // GNASH_USE_GC
-#include "stream.h"
+#include "SWFStream.h"
 #include "log.h"
 #include "movie_definition.h" // for m_root_def use
 

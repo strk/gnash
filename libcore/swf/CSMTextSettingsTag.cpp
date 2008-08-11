@@ -18,7 +18,7 @@
 //
 
 #include "log.h"
-#include "stream.h"
+#include "SWFStream.h"
 #include "movie_definition.h"
 #include "CSMTextSettingsTag.h"
 
