@@ -19,20 +19,20 @@
 #define _MY_COMPONENT_H_
 
 #include "iGnashComponent.h"
+#include "nsStringAPI.h"
 
-#define MY_COMPONENT_CONTRACTID "@mydomain.com/XPCOMSample/GnashComponent;1"
-#define MY_COMPONENT_CLASSNAME "Gnash Component"
-#define MY_COMPONENT_CID  "gnash-dev@gnu.org"
+#define GNASH_COMPONENT_CONTRACTID "@getgnash.org/updates/GnashComponent;1"
+#define GNASH_COMPONENT_CID  {0x9ff0fae7, 0x8ffa, 0x4489, { 0xb3, 0x3d, 0xb7, 0xe8, 0x17, 0xb1, 0x1b, 0xf6 }}
 
 class GnashComponent : public iGnashComponent
 {
 public:
-  NS_DECL_ISUPPORTS
-  NS_DECL_IGNASHCOMPONENT
-
-  GnashComponent();
-  virtual ~GnashComponent();
-  /* additional members */
+    NS_DECL_ISUPPORTS
+    NS_DECL_IGNASHCOMPONENT
+    
+    GnashComponent();
+    // additional members
+    virtual ~GnashComponent();
 };
 
 #endif

@@ -37,7 +37,8 @@ AM_LDFLAGS = \
 BUILT_SOURCES = $(IDL_OUTPUT)
 
 pkglib_LTLIBRARIES = libgnashcomponent.la
-libgnashcomponent_la_SOURCES = GnashComponent.cpp
+libgnashcomponent_la_SOURCES = GnashComponent.cpp GnashComponentModule.cpp
+libgnashcomponent_la_CFLAGS = -DXPCOM_GLUE -fno-rtti -fno-exceptions
 libgnashcomponent_la_LDFLAGS = -avoid-version -module
 
 noinst_HEADERS = GnashComponent.h

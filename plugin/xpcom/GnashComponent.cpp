@@ -25,14 +25,16 @@ GnashComponent::GnashComponent()
   /* member initializers and constructor code */
 }
 
+
 GnashComponent::~GnashComponent()
 {
   /* destructor code */
 }
 
 /* long Add (in long a, in long b); */
-NS_IMETHODIMP GnashComponent::Add(PRInt32 a, PRInt32 b, PRInt32 *_retval)
+NS_IMETHODIMP
+GnashComponent::Add(PRInt32 a, PRInt32 b, PRInt32 *_retval)
 {
-        *_retval = a + b;
-        return NS_OK;
+    *_retval = a + b;
+    return NS_OK;
 }

@@ -15,12 +15,23 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
-#include "nsISupports.idl"
 
-[scriptable, uuid(9ff0fae7-8ffa-4489-b33d-b7e817b11bf6)]
-interface iGnashComponent : nsISupports
+#include "nsIGenericFactory.h"
+#include "GnashComponent.h"
+
+NS_GENERIC_FACTORY_CONSTRUCTOR(GnashComponent)
+NS_COM_GLUE nsresult
+NS_NewGenericModule2(nsModuleInfo const *info, nsIModule* *result);
+
+static nsModuleComponentInfo components[] =
 {
-  attribute AString name;
-  long Add(in long a, in long b);
+    {
+       "GnashComponent", 
+       GNASH_COMPONENT_CID,
+       GNASH_COMPONENT_CONTRACTID,
+       GnashComponentConstructor,
+    }
 };
+
+NS_IMPL_NSGETMODULE("GnashComponentsModule", components) 
 
