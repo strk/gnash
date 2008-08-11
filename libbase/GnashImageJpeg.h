@@ -152,13 +152,13 @@ public:
 	/// @param quality
 	///	Quality goes from 1-100.
 	///
-	JpegImageOutput(gnash::IOChannel& out, size_t width, size_t height, int quality);
+	JpegImageOutput(boost::shared_ptr<IOChannel> out, size_t width, size_t height, int quality);
 	
 	~JpegImageOutput();
 
 	void writeImageRGB(unsigned char* rgbData);
 
-	DSOEXPORT static std::auto_ptr<ImageOutput> create(gnash::IOChannel& out, size_t width, size_t height, int quality);
+	DSOEXPORT static std::auto_ptr<ImageOutput> create(boost::shared_ptr<IOChannel> out, size_t width, size_t height, int quality);
 	
 private:
 

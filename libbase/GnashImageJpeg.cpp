@@ -530,16 +530,16 @@ private:
 };
 
 
-JpegImageOutput::JpegImageOutput(gnash::IOChannel& out, size_t width, size_t height, int quality)
+JpegImageOutput::JpegImageOutput(boost::shared_ptr<IOChannel> out, size_t width, size_t height, int quality)
     :
-    ImageOutput(width, height)
+    ImageOutput(out, width, height)
 {
 		m_cinfo.err = jpeg_std_error(&m_jerr);
 
 		// Initialize decompression object.
 		jpeg_create_compress(&m_cinfo);
 
-		rw_dest_IOChannel::setup(&m_cinfo, out);
+		rw_dest_IOChannel::setup(&m_cinfo, *_outStream);
 		m_cinfo.image_width = _width;
 		m_cinfo.image_height = _height;
 		m_cinfo.input_components = 3;
@@ -582,7 +582,7 @@ JpegImageInput::errorOccurred(const char* msg)
 
 
 std::auto_ptr<ImageOutput>
-JpegImageOutput::create(gnash::IOChannel& out, size_t width, size_t height, int quality)
+JpegImageOutput::create(boost::shared_ptr<IOChannel> out, size_t width, size_t height, int quality)
 {
     std::auto_ptr<ImageOutput> outChannel(new JpegImageOutput(out, width, height, quality));
     return outChannel;

@@ -234,7 +234,7 @@ namespace image
 	/// @param out      The IOChannel to write to.
 	/// @param image    The image to write.
 	/// @param quality  The quality of the image output (not used for all formats)
-	DSOEXPORT void writeImageData(FileType type, gnash::IOChannel& out,
+	DSOEXPORT void writeImageData(FileType type, boost::shared_ptr<gnash::IOChannel> out,
 	                              image_base* image, int quality);
 
 	/// \brief

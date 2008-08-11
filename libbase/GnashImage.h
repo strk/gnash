@@ -76,9 +76,10 @@ class ImageOutput
 
 public:
 
-    ImageOutput(size_t width, size_t height) :
+    ImageOutput(boost::shared_ptr<IOChannel> out, size_t width, size_t height) :
         _width(width),
-        _height(height)
+        _height(height),
+        _outStream(out)
         {}
 
     virtual ~ImageOutput() {}
@@ -90,6 +91,8 @@ protected:
     const size_t _width;
 
     const size_t _height;
+    
+    boost::shared_ptr<IOChannel> _outStream;
 
 };
 

@@ -188,7 +188,7 @@ namespace image
 	//
 
 	// Write the given image to the given out stream, in jpeg format.
-	void writeImageData(FileType type, gnash::IOChannel& out, image::image_base* image, int quality)
+	void writeImageData(FileType type, boost::shared_ptr<IOChannel> out, image::image_base* image, int quality)
 	{
 		image::rgb* im = dynamic_cast<image::rgb*>(image);
 		
@@ -203,7 +203,7 @@ namespace image
         switch (type)
         {
             case GNASH_FILETYPE_PNG:
-                gnash::log_error("PNG writing not yet implemented");
+                outChannel = PngImageOutput::create(out, width, height, quality);
                 break;
             case GNASH_FILETYPE_JPEG:
                 outChannel = JpegImageOutput::create(out, width, height, quality);
