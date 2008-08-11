@@ -17,6 +17,7 @@
 #include "GnashImageGif.h"
 #include "GnashImageJpeg.h"
 #include "IOChannel.h"
+#include "log.h"
 
 namespace gnash
 {
@@ -188,15 +189,29 @@ namespace image
 
 
 	// Write the given image to the given out stream, in jpeg format.
-	void	write_jpeg(gnash::IOChannel* out, rgb* image, int quality)
+	void writeImageData(FileType type, gnash::IOChannel& out, rgb* image, int quality)
 	{
-		size_t height = image->height();
+		const size_t height = image->height();
+		const size_t width = image->width();
+		
+		std::auto_ptr<ImageOutput> outChannel;
 
-		std::auto_ptr<ImageOutput> j_out ( JpegImageOutput::create(*out, image->width(), height, quality) );
+        switch (type)
+        {
+            case GNASH_FILETYPE_PNG:
+                gnash::log_error("PNG writing not yet implemented");
+                break;
+            case GNASH_FILETYPE_JPEG:
+                outChannel = JpegImageOutput::create(out, width, height, quality);
+                break;
+            default:
+                log_error("Requested to write image as unsupported filetype");
+                break;
+        }
 
 		for (size_t y = 0; y < height; ++y)
 		{
-			j_out->writeScanline(image->scanline(y));
+			outChannel->writeScanline(image->scanline(y));
 		}
 
 	}
@@ -205,30 +220,33 @@ namespace image
     std::auto_ptr<rgb> readImageData(boost::shared_ptr<IOChannel> in, FileType type)
     {
         std::auto_ptr<rgb> im (NULL);
-        std::auto_ptr<ImageInput> infile;
+        std::auto_ptr<ImageInput> inChannel;
 
         switch (type)
         {
             case GNASH_FILETYPE_PNG:
-                infile = PngImageInput::create(in);
+                inChannel = PngImageInput::create(in);
                 break;
             case GNASH_FILETYPE_GIF:
-                infile = GifImageInput::create(in);
+                inChannel = GifImageInput::create(in);
                 break;
             case GNASH_FILETYPE_JPEG:
-                infile = JpegImageInput::create(in);
+                inChannel = JpegImageInput::create(in);
                 break;
             default:
                 break;
         }
         
-        if (!infile.get()) return im;
+        if (!inChannel.get()) return im;
         
-        im.reset(new image::rgb(infile->getWidth(), infile->getHeight()));
+        const size_t height = inChannel->getHeight();
+        const size_t width = inChannel->getWidth();
         
-        for (size_t i = 0, e = infile->getHeight(); i < e; ++i)
+        im.reset(new image::rgb(width, height));
+        
+        for (size_t i = 0; i < height; ++i)
         {
-            infile->readScanline(im->scanline(i));
+            inChannel->readScanline(im->scanline(i));
         }
         return im;
     }
