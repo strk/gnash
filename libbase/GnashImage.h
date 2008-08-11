@@ -71,6 +71,31 @@ protected:
 
 };
 
+class ImageOutput
+{
+
+public:
+
+    ImageOutput(boost::shared_ptr<IOChannel> out, size_t width, size_t height) :
+        _width(width),
+        _height(height),
+        _outStream(out)
+        {}
+
+    virtual ~ImageOutput() {}
+    
+    virtual void writeImageRGB(unsigned char* rgbData) = 0;
+
+protected:
+
+    const size_t _width;
+
+    const size_t _height;
+    
+    boost::shared_ptr<IOChannel> _outStream;
+
+};
+
 } // namespace gnash
 
 
