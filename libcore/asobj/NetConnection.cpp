@@ -498,7 +498,10 @@ class AMFQueue {
 private:
 	NetConnection& _nc;
 	static const int NCCALLREPLYMAX=200000;
-	std::map<std::string, boost::intrusive_ptr<as_object> > callbacks;
+
+	typedef std::map<std::string, boost::intrusive_ptr<as_object> > CallbacksMap;
+	CallbacksMap callbacks;
+
 	SimpleBuffer postdata;
 	URL url;
 	boost::scoped_ptr<IOChannel> connection;
@@ -754,6 +757,14 @@ public:
 		return as_value();
 	};
 
+	void markReachableResources() const
+	{
+		for (CallbacksMap::const_iterator i=callbacks.begin(), e=callbacks.end(); i!=e; ++i)
+		{
+			i->second->setReachable();
+		}
+	}
+
 private:
 	void start_ticking() {
 
@@ -767,14 +778,15 @@ private:
 		ticker = _nc.getVM().getRoot().add_interval_timer(timer, true);
 	}
 	void push_amf(const SimpleBuffer &amf) {
-		log_debug("pushing amf");
+		GNASH_REPORT_FUNCTION;
+
 		postdata.append(amf.data(), amf.size());
 		queued_count++;
-		log_debug("pushed amf");
+
 		start_ticking();
 	}
 	void stop_ticking() {
-		if(ticker) return;
+		if(!ticker) return;
 		_nc.getVM().getRoot().clear_interval_timer(ticker);
 		ticker=0;
 	}
@@ -782,7 +794,7 @@ private:
 		callbacks.insert(std::pair<std::string, boost::intrusive_ptr<as_object> >(id, callback));
 	}
 	boost::intrusive_ptr<as_object> pop_callback(std::string id) {
-		std::map<std::string, boost::intrusive_ptr<as_object> >::iterator it = callbacks.find(id);
+		CallbacksMap::iterator it = callbacks.find(id);
 		if(it != callbacks.end()) {
 			boost::intrusive_ptr<as_object> callback = it->second;
 			//boost::intrusive_ptr<as_object> callback;
@@ -812,10 +824,14 @@ NetConnection::call_method(const fn_call& fn)
 	as_value& methodName_as = fn.arg(0);
 	if (!methodName_as.is_string()) {
                 IF_VERBOSE_ASCODING_ERRORS(
-                log_aserror(_("NetConnection.call(): first argument (methodName) must be a string"));
+		std::stringstream ss; fn.dump_args(ss);
+                log_aserror(_("NetConnection.call(%s): first argument (methodName) must be a string"), ss.str());
                 );
 		return as_value(false); // FIXME should we return true anyway?
 	}
+
+	std::stringstream ss; fn.dump_args(ss);
+        log_debug("NetConnection.call(%s)", ss.str());
 
 	// TODO: arg(1) is the response object. let it know when data comes back
 	boost::intrusive_ptr<as_object> asCallback = 0;
@@ -823,7 +839,10 @@ NetConnection::call_method(const fn_call& fn)
 		if(fn.arg(1).is_object()) {
 			asCallback = (fn.arg(1).to_object());
 		} else {
-			log_aserror("NetConnection::call(): called with a non-object as the callback");
+                	IF_VERBOSE_ASCODING_ERRORS(
+			std::stringstream ss; fn.dump_args(ss);
+			log_aserror("NetConnection::call(%s): second argument must be an object", ss.str());
+			);
 		}
 	}
 
@@ -891,7 +910,6 @@ NetConnection::call_method(const fn_call& fn)
 	URL url(ptr->validateURL(std::string()));
 
 
-
 	// FIXME check if it's possible for the URL of a NetConnection to change between call()s
 	if(ptr->call_queue == 0) {
 		ptr->call_queue = new AMFQueue(*ptr, url);
@@ -908,105 +926,6 @@ NetConnection::call_method(const fn_call& fn)
 	}
 	log_debug("called enqueue");
 
-#if 0
-	
-	std::string postdata(reinterpret_cast<char*>(buf->data()), buf->size());
-	std::auto_ptr<IOChannel> stream(StreamProvider::getDefaultInstance().getStream(url, postdata));
-	SimpleBuffer reply(256);
-	int count = 0;
-	int read_size;
-
-	// FIXME this needs to be in a thread, as does the getStream() above
-	//while(!stream->eof()) {
-	//	reply.reserve(count + 256);
- 	//	read_size = stream->readNonBlocking(reply.data() + count, 256);
- 	//	if(read_size > 0) { // currently readNonBlocking returns -1 on error
- 	//		count += read_size;
- 	//	}
- 	//}
-	while(!stream->eof()) {
-		reply.reserve(count + 50000);
- 		read_size = stream->read(reply.data() + count, 50000);
- 		log_debug("stream->read() returned: %i", read_size);
- 		if(read_size > 0) { // currently readNonBlocking returns -1 on error
- 			if(read_size == 50000) { // ?????
- 				log_error("stream->read() said that it read 50000 characters... seems unlikely");
- 			} else {
- 				count += read_size;
- 			}
- 		}
- 	}
- 	reply.resize(count);
-
-	// if they didn't pass an object to be notified of the reply, exit now
-	// ( ne need to parse the server response
- 	if(asCallback == 0) {
- 		// TODO check if there's any cleanup needed here
- 		return as_value();
- 	}
-	
-
-	log_debug(_("NetConnection.call(): response: "));
-	log_debug("%s", hexify(reply.data(), reply.size(), false));
-
-	// parse server reply
-	if(reply.size() < 21) {
-		log_error(_("NetConnection.call(): response from server too short to be valid"));
-		// TODO call onStatus callback
-	} else {
-		boost::uint8_t *b = reply.data();
-		boost::uint8_t *end = b + reply.size();
-		boost::uint16_t si;
-		boost::uint16_t li;
-
-		b += 2; // skip header bytes (version, client_id)
-		si = readNetworkShort(b); b += 2;
-		if(si != 0) {
-			// FIXME just skip them. but make sure the buffer is long enough to at least have the type byte for the value in the body.
-			log_unimpl("NetConnection.call(): server sent back headers");
-		} else {
-			si = readNetworkShort(b); b += 2;
-			if(si != 1) {
-				// TODO decide what to do in this case
-				log_error(_("NetConnection.call(): server sent back a weird number of bodies"));
-			} else {
-				// scan past response message (something like /1/onResult)
-				si = readNetworkShort(b); b += 2;
-				b += si; // TODO make sure this ends with onResult, not onStatus
-
-				// scan past "null"
-				si = readNetworkShort(b); b += 2;
-				b += si; // FIXME check if this is bigger than 4. if so check that the buffer is long enouggh for the rest of the header
-
-				// read length
-				li = readNetworkLong(b); b += 4;
-				if(li != end - b) {
-					if(li < end - b) {
-						log_error(_("NetConnection.call(): server sent us a length that's less than the number of bytes it sent. Continuing anyway."));
-					} else {
-						// note: potlatch (which works in the proprietary player) gets 0xffffffff here
-						log_error(_("NetConnection.call(): server sent us a length that's more than the number of bytes it sent. Continuing anyway."));
-					}
-				}
-	
-				as_value response;
-				if ( amf0_read_value(b, end, response) )
-				{
-					asCallback->callMethod(NSV::PROP_ON_RESULT, response);
-				}
-				else
-				{
-					// TODO construct an object with info about the failure to pass to onStatus
-					// see: http://livedocs.adobe.com/fms/2/docs/00000742.html
-					log_unimpl("NetConnection.call() : triggering responder's onStatus on decoding error");
-					//asCallback->callMethod(NSV::PROP_ON_STATUS, TODO);
-				}
-			}
-		}
-	}
-
-	log_unimpl("NetConnection.call()");
-#endif
 	return as_value();
 }
 
@@ -1128,6 +1047,13 @@ void netconnection_class_init(as_object& global)
 NetConnection::~NetConnection()
 {
 	delete call_queue;
+}
+
+void
+NetConnection::markReachableResources() const
+{
+	if ( call_queue ) call_queue->markReachableResources();
+	markAsObjectReachable();
 }
 
 

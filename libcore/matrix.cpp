@@ -27,6 +27,7 @@
 
 #include "matrix.h"
 #include "SWFStream.h" // for reading from SWF
+#include "log.h"
 
 #include <cmath>
 #include <iomanip>
