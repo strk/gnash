@@ -46,6 +46,8 @@
 #include "amf.h"
 #include "SimpleBuffer.h"
 #include "timers.h"
+#include "namedStrings.h"
+
 using namespace amf;
 
 namespace gnash {
@@ -496,7 +498,10 @@ class AMFQueue {
 private:
 	NetConnection& _nc;
 	static const int NCCALLREPLYMAX=200000;
-	std::map<std::string, boost::intrusive_ptr<as_object> > callbacks;
+
+	typedef std::map<std::string, boost::intrusive_ptr<as_object> > CallbacksMap;
+	CallbacksMap callbacks;
+
 	SimpleBuffer postdata;
 	URL url;
 	boost::scoped_ptr<IOChannel> connection;
@@ -504,8 +509,8 @@ private:
 	int reply_start;
 	int reply_end;
 	int queued_count;
-	uint8_t am_ticking;
 	unsigned int ticker;
+
 public:
 	AMFQueue(NetConnection& nc, URL url)
 		:
@@ -517,7 +522,7 @@ public:
 		reply_start(0),
 		reply_end(0),
 		queued_count(0),
-		am_ticking(0)
+		ticker(0)
 	{
 		// leave space for header
 		postdata.append("\000\000\000\000\000\000", 6);
@@ -527,12 +532,12 @@ public:
 		stop_ticking();
 	}
 	
-	void enqueue(SimpleBuffer &amf, std::string identifier, boost::intrusive_ptr<as_object> callback) {
+	void enqueue(const SimpleBuffer &amf, const std::string& identifier, boost::intrusive_ptr<as_object> callback) {
 		push_amf(amf);
 		push_callback(identifier, callback);
 		//log_aserror("NetConnection::call(): called with a non-object as the callback");
 	};
-	void enqueue(SimpleBuffer &amf) {
+	void enqueue(const SimpleBuffer &amf) {
 		push_amf(amf);
 	};
 	
@@ -542,8 +547,10 @@ public:
 	// it handles all networking for NetConnection::call() and dispatches
 	// callbacks when needed
 	void tick() {
+
 		log_debug("tick running");
-		if(connection) {
+		if(connection)
+		{
 			log_debug("have connection");
 			int read = connection->readNonBlocking(reply.data() + reply_end, NCCALLREPLYMAX - reply_end);
 			if(read > 0) {
@@ -564,126 +571,161 @@ public:
 			// FIXME make this parse on other conditions, including: 1) when
 			// the buffer is full, 2) when we have a "length in bytes" value
 			// thas is satisfied
-			
-			if(connection->eof() && reply_end > 8) {
-				log_debug("hit eof");
-				boost::int16_t si;
-				boost::uint16_t li;
-				boost::uint8_t *b = reply.data() + reply_start;
-				boost::uint8_t *end = reply.data() + reply_end;
 
-				// parse header
-				b += 2; // skip version indicator and client id
-				si = readNetworkShort(b); b += 2; // number of headers
-				uint8_t headers_ok = 1;
-				if(si != 0)
-				{
-					log_debug("NetConnection::call(): amf headers section parsing");
-					as_value tmp;
-					for(int i = si; i > 0; --i)
-					{
-						if(b + 2 > end) {
-							headers_ok = 0;
-							break;
-						}
-						si = readNetworkShort(b); b += 2; // name length
-						if(b + si > end) {
-							headers_ok = 0;
-							break;
-						}
-						b += si;
-						if ( b + 5 > end ) {
-							headers_ok = 0;
-							break;
-						}
-						b += 5; // skip past bool and length long
-						if( !amf0_read_value(b, end, tmp) )
-						{
-							headers_ok = 0;
-							break;
-						}
-						log_debug("Header value %s", tmp);
-					}
-				}
+			if(connection->get_error())
+			{
+				log_debug("connection is in error condition, calling NetConnection.onStatus");
+				reply_start = 0;
+				reply_end = 0;
 
-				if(headers_ok == 1) {
-
-					si = readNetworkShort(b); b += 2; // number of replies
-
-					// TODO consider counting number of replies we
-					// actually parse and doing something if it
-					// doesn't match this value (does it matter?
-					if(si > 0) {
-						// parse replies until we get a parse error or we reach the end of the buffer
-						while(b < end) {
-							if(b + 2 > end) break;
-							si = readNetworkShort(b); b += 2; // reply length
-							if(si < 11) {
-								log_error("NetConnection::call(): reply message name too short");
-								break;
-							}
-							if(b + si > end) break;
-							// TODO check that the last 9 bytes are "/onResult"
-							// this should either split on the 2nd / or require onResult or onStatus
-							std::string id(reinterpret_cast<char*>(b), si - 9);
-							b += si;
-
-							// parse past unused string in header
-							if(b + 2 > end) break;
-							si = readNetworkShort(b); b += 2; // reply length
-							if(b + si > end) break;
-							b += si;
-
-							// this field is supposed to hold the
-							// total number of bytes in the rest of
-							// this particular reply value, but
-							// openstreetmap.org (which works great
-							// in the adobe player) sends
-							// 0xffffffff. So we just ignore it
-							if(b + 4 > end) break;
-							li = readNetworkLong(b); b += 4; // reply length
-
-							log_debug("about to parse amf value");
-							// this updates b to point to the next unparsed byte
-							as_value reply_as_value;
-							if ( ! amf0_read_value(b, end, reply_as_value) )
-							{
-								log_error("parse amf failed");
-								// this will happen if we get
-								// bogus data, or if the data runs
-								// off the end of the buffer
-								// provided, or if we get data we
-								// don't know how to parse
-								break;
-							}
-							log_debug("parsed amf");
-
-							// update variable to show how much we've parsed
-							reply_start = b - reply.data();
-
-							// if actionscript specified a callback object, call it
-							boost::intrusive_ptr<as_object> callback = pop_callback(id);
-							if(callback) {
-								log_debug("calling callback");
-								string_table::key callback_method = callback -> getVM() . getStringTable() . find(std::string("onResult"));
-								// FIXME check if above line can fail and we have to react
-								callback->callMethod(callback_method, reply_as_value);
-								log_debug("callback called");
-							} else {
-								log_debug("couldn't find callback object");
-							}
-						}
-					}
-				}
+				// FIXME: should only call NetConnection's onStatus
+				//        if the IOChannel is in error condition.
+				//        (tipically 404).
+				//        When the response is empty, just nothing happens.
+				_nc.callMethod(NSV::PROP_ON_STATUS, as_value());
+				return;
 			}
+			
+			if(connection->eof() )
+			{
+				if ( reply_end > 8)
+				{
+					log_debug("hit eof");
+					boost::int16_t si;
+					boost::uint16_t li;
+					boost::uint8_t *b = reply.data() + reply_start;
+					boost::uint8_t *end = reply.data() + reply_end;
 
-			if(connection->eof()) {
+					// parse header
+					b += 2; // skip version indicator and client id
+
+					// NOTE: this looks much like parsing of an OBJECT_AMF0
+					si = readNetworkShort(b); b += 2; // number of headers
+					uint8_t headers_ok = 1;
+					if(si != 0)
+					{
+						log_debug("NetConnection::call(): amf headers section parsing");
+						as_value tmp;
+						for(int i = si; i > 0; --i)
+						{
+							if(b + 2 > end) {
+								headers_ok = 0;
+								break;
+							}
+							si = readNetworkShort(b); b += 2; // name length
+							if(b + si > end) {
+								headers_ok = 0;
+								break;
+							}
+							std::string headerName((char*)b, si); // end-b);
+							//if( !amf0_read_value(b, end, tmp) )
+							//{
+							//	headers_ok = 0;
+							//	break;
+							//}
+							log_debug("Header name %s", headerName);
+							b += si;
+							if ( b + 5 > end ) {
+								headers_ok = 0;
+								break;
+							}
+							b += 5; // skip past bool and length long
+							if( !amf0_read_value(b, end, tmp) )
+							{
+								headers_ok = 0;
+								break;
+							}
+							log_debug("Header value %s", tmp);
+
+							{ // method call for each header
+							  // FIXME: it seems to me that the call should happen
+								VM& vm = _nc.getVM();
+								string_table& st = vm.getStringTable();
+								string_table::key key = st.find(headerName);
+								log_debug("Calling NetConnection.%s(%s)", headerName, tmp);
+								_nc.callMethod(key, tmp);
+							}
+						}
+					}
+
+					if(headers_ok == 1) {
+
+						si = readNetworkShort(b); b += 2; // number of replies
+
+						// TODO consider counting number of replies we
+						// actually parse and doing something if it
+						// doesn't match this value (does it matter?
+						if(si > 0) {
+							// parse replies until we get a parse error or we reach the end of the buffer
+							while(b < end) {
+								if(b + 2 > end) break;
+								si = readNetworkShort(b); b += 2; // reply length
+								if(si < 11) {
+									log_error("NetConnection::call(): reply message name too short");
+									break;
+								}
+								if(b + si > end) break;
+								// TODO check that the last 9 bytes are "/onResult"
+								// this should either split on the 2nd / or require onResult or onStatus
+								std::string id(reinterpret_cast<char*>(b), si - 9);
+								b += si;
+
+								// parse past unused string in header
+								if(b + 2 > end) break;
+								si = readNetworkShort(b); b += 2; // reply length
+								if(b + si > end) break;
+								b += si;
+
+								// this field is supposed to hold the
+								// total number of bytes in the rest of
+								// this particular reply value, but
+								// openstreetmap.org (which works great
+								// in the adobe player) sends
+								// 0xffffffff. So we just ignore it
+								if(b + 4 > end) break;
+								li = readNetworkLong(b); b += 4; // reply length
+
+								log_debug("about to parse amf value");
+								// this updates b to point to the next unparsed byte
+								as_value reply_as_value;
+								if ( ! amf0_read_value(b, end, reply_as_value) )
+								{
+									log_error("parse amf failed");
+									// this will happen if we get
+									// bogus data, or if the data runs
+									// off the end of the buffer
+									// provided, or if we get data we
+									// don't know how to parse
+									break;
+								}
+								log_debug("parsed amf");
+
+								// update variable to show how much we've parsed
+								reply_start = b - reply.data();
+
+								// if actionscript specified a callback object, call it
+								boost::intrusive_ptr<as_object> callback = pop_callback(id);
+								if(callback) {
+									log_debug("calling callback");
+									// FIXME check if above line can fail and we have to react
+									callback->callMethod(NSV::PROP_ON_RESULT, reply_as_value);
+									log_debug("callback called");
+								} else {
+									log_debug("couldn't find callback object");
+								}
+							}
+						}
+					}
+				}
+				else
+				{
+					log_error("Response from remoting service < 8 bytes");
+				}
+
 				log_debug("deleting connection");
 				connection.reset();
 				reply_start = 0;
 				reply_end = 0;
-
-				// FIXME send onStatus callback to any callback objects from this batch (must change some code to distinguish somehow)
 			}
 		}
 
@@ -715,40 +757,44 @@ public:
 		return as_value();
 	};
 
+	void markReachableResources() const
+	{
+		for (CallbacksMap::const_iterator i=callbacks.begin(), e=callbacks.end(); i!=e; ++i)
+		{
+			i->second->setReachable();
+		}
+	}
+
 private:
 	void start_ticking() {
-		if(am_ticking) {
-			return;
-		}
+
+		if(ticker) return;
 
 		boost::intrusive_ptr<builtin_function> ticker_as = \
 			new builtin_function(&AMFQueue::amfqueue_tick_wrapper);
 		std::auto_ptr<Timer> timer(new Timer);
-		unsigned long delayMS = 500; // FIXME crank up to 50 or so
+		unsigned long delayMS = 50; // FIXME crank up to 50 or so
 		timer->setInterval(*ticker_as, delayMS, &_nc);
 		ticker = _nc.getVM().getRoot().add_interval_timer(timer, true);
-
-		am_ticking = 1;
 	}
-	void push_amf(SimpleBuffer &amf) {
-		log_debug("pushing amf");
+	void push_amf(const SimpleBuffer &amf) {
+		GNASH_REPORT_FUNCTION;
+
 		postdata.append(amf.data(), amf.size());
 		queued_count++;
-		log_debug("pushed amf");
+
 		start_ticking();
 	}
 	void stop_ticking() {
-		if(!am_ticking) {
-			return;
-		}
+		if(!ticker) return;
 		_nc.getVM().getRoot().clear_interval_timer(ticker);
-		am_ticking = 0;
+		ticker=0;
 	}
-	void push_callback(std::string id, boost::intrusive_ptr<as_object> callback) {
+	void push_callback(const std::string& id, boost::intrusive_ptr<as_object> callback) {
 		callbacks.insert(std::pair<std::string, boost::intrusive_ptr<as_object> >(id, callback));
 	}
 	boost::intrusive_ptr<as_object> pop_callback(std::string id) {
-		std::map<std::string, boost::intrusive_ptr<as_object> >::iterator it = callbacks.find(id);
+		CallbacksMap::iterator it = callbacks.find(id);
 		if(it != callbacks.end()) {
 			boost::intrusive_ptr<as_object> callback = it->second;
 			//boost::intrusive_ptr<as_object> callback;
@@ -778,10 +824,14 @@ NetConnection::call_method(const fn_call& fn)
 	as_value& methodName_as = fn.arg(0);
 	if (!methodName_as.is_string()) {
                 IF_VERBOSE_ASCODING_ERRORS(
-                log_aserror(_("NetConnection.call(): first argument (methodName) must be a string"));
+		std::stringstream ss; fn.dump_args(ss);
+                log_aserror(_("NetConnection.call(%s): first argument (methodName) must be a string"), ss.str());
                 );
 		return as_value(false); // FIXME should we return true anyway?
 	}
+
+	std::stringstream ss; fn.dump_args(ss);
+        log_debug("NetConnection.call(%s)", ss.str());
 
 	// TODO: arg(1) is the response object. let it know when data comes back
 	boost::intrusive_ptr<as_object> asCallback = 0;
@@ -789,7 +839,10 @@ NetConnection::call_method(const fn_call& fn)
 		if(fn.arg(1).is_object()) {
 			asCallback = (fn.arg(1).to_object());
 		} else {
-			log_aserror("NetConnection::call(): called with a non-object as the callback");
+                	IF_VERBOSE_ASCODING_ERRORS(
+			std::stringstream ss; fn.dump_args(ss);
+			log_aserror("NetConnection::call(%s): second argument must be an object", ss.str());
+			);
 		}
 	}
 
@@ -857,7 +910,6 @@ NetConnection::call_method(const fn_call& fn)
 	URL url(ptr->validateURL(std::string()));
 
 
-
 	// FIXME check if it's possible for the URL of a NetConnection to change between call()s
 	if(ptr->call_queue == 0) {
 		ptr->call_queue = new AMFQueue(*ptr, url);
@@ -874,106 +926,6 @@ NetConnection::call_method(const fn_call& fn)
 	}
 	log_debug("called enqueue");
 
-#if 0
-	
-	std::string postdata(reinterpret_cast<char*>(buf->data()), buf->size());
-	std::auto_ptr<IOChannel> stream(StreamProvider::getDefaultInstance().getStream(url, postdata));
-	SimpleBuffer reply(256);
-	int count = 0;
-	int read_size;
-
-	// FIXME this needs to be in a thread, as does the getStream() above
-	//while(!stream->eof()) {
-	//	reply.reserve(count + 256);
- 	//	read_size = stream->readNonBlocking(reply.data() + count, 256);
- 	//	if(read_size > 0) { // currently readNonBlocking returns -1 on error
- 	//		count += read_size;
- 	//	}
- 	//}
-	while(!stream->eof()) {
-		reply.reserve(count + 50000);
- 		read_size = stream->read(reply.data() + count, 50000);
- 		log_debug("stream->read() returned: %i", read_size);
- 		if(read_size > 0) { // currently readNonBlocking returns -1 on error
- 			if(read_size == 50000) { // ?????
- 				log_error("stream->read() said that it read 50000 characters... seems unlikely");
- 			} else {
- 				count += read_size;
- 			}
- 		}
- 	}
- 	reply.resize(count);
-
-	// if they didn't pass an object to be notified of the reply, exit now
-	// ( ne need to parse the server response
- 	if(asCallback == 0) {
- 		// TODO check if there's any cleanup needed here
- 		return as_value();
- 	}
-	
-
-	log_debug(_("NetConnection.call(): response: "));
-	log_debug("%s", hexify(reply.data(), reply.size(), false));
-
-	// parse server reply
-	if(reply.size() < 21) {
-		log_error(_("NetConnection.call(): response from server too short to be valid"));
-		// TODO call onStatus callback
-	} else {
-		boost::uint8_t *b = reply.data();
-		boost::uint8_t *end = b + reply.size();
-		boost::uint16_t si;
-		boost::uint16_t li;
-
-		b += 2; // skip header bytes (version, client_id)
-		si = readNetworkShort(b); b += 2;
-		if(si != 0) {
-			// FIXME just skip them. but make sure the buffer is long enough to at least have the type byte for the value in the body.
-			log_unimpl("NetConnection.call(): server sent back headers");
-		} else {
-			si = readNetworkShort(b); b += 2;
-			if(si != 1) {
-				// TODO decide what to do in this case
-				log_error(_("NetConnection.call(): server sent back a weird number of bodies"));
-			} else {
-				// scan past response message (something like /1/onResult)
-				si = readNetworkShort(b); b += 2;
-				b += si; // TODO make sure this ends with onResult, not onStatus
-
-				// scan past "null"
-				si = readNetworkShort(b); b += 2;
-				b += si; // FIXME check if this is bigger than 4. if so check that the buffer is long enouggh for the rest of the header
-
-				// read length
-				li = readNetworkLong(b); b += 4;
-				if(li != end - b) {
-					if(li < end - b) {
-						log_error(_("NetConnection.call(): server sent us a length that's less than the number of bytes it sent. Continuing anyway."));
-					} else {
-						// note: potlatch (which works in the proprietary player) gets 0xffffffff here
-						log_error(_("NetConnection.call(): server sent us a length that's more than the number of bytes it sent. Continuing anyway."));
-					}
-				}
-	
-				as_value response;
-				if ( amf0_read_value(b, end, response) )
-				{
-					string_table::key callbackMethod = asCallback -> getVM() . getStringTable() . find(std::string("onResult"));
-					asCallback->callMethod(callbackMethod, response);
-				}
-				else
-				{
-					// TODO construct an object with info about the failure to pass to onStatus
-					// see: http://livedocs.adobe.com/fms/2/docs/00000742.html
-					//string_table::key callbackMethod = asCallback->getVM().getStringTable().find(std::string("onStatus"));
-					//asCallback->callMethod(callbackMethod, TODO);
-				}
-			}
-		}
-	}
-
-	log_unimpl("NetConnection.call()");
-#endif
 	return as_value();
 }
 
@@ -1095,6 +1047,13 @@ void netconnection_class_init(as_object& global)
 NetConnection::~NetConnection()
 {
 	delete call_queue;
+}
+
+void
+NetConnection::markReachableResources() const
+{
+	if ( call_queue ) call_queue->markReachableResources();
+	markAsObjectReachable();
 }
 
 
