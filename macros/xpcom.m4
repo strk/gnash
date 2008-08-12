@@ -44,7 +44,6 @@ AC_DEFUN([GNASH_PATH_XPCOM],
     fi
   ])
 
-  if test x$xpcom = xyes; then
     dnl Look for the library
     AC_ARG_WITH(xpcom_lib, AC_HELP_STRING([--with-xpcom-lib], [directory where XPCOM libraries are]), with_xpcom_lib=${withval})
     AC_CACHE_VAL(ac_cv_path_xpcom_lib, [
@@ -55,6 +54,7 @@ AC_DEFUN([GNASH_PATH_XPCOM],
       fi
     ])
 
+  if test x$xpcom = xyes; then
     if test x$cross_compiling = xno; then
       if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_xpcom_incl}" = x; then
         $PKG_CONFIG --exists libxul && ac_cv_path_xpcom_incl="`$PKG_CONFIG --cflags-only-I libxul`"
