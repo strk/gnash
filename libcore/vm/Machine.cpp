@@ -1246,21 +1246,24 @@ Machine::execute()
 ///  .
 	case SWF::ABC_ACTION_CONSTRUCTSUPER:
 	{
-		// TODO
+		LOG_AVM_UNIMPLEMENTED();
 		boost::uint32_t argc = mStream->read_V32();
-		ENSURE_OBJECT(mStack.top(argc));
-		as_object *obj = mStack.top(argc).to_object().get();
-		as_object *super = mStack.top(argc).to_object()->get_super();
-		if (!super)
-		{
-			throw ASException();
-			break;
-		}
-		as_function *func = super->get_constructor();
+		LOG_DEBUG_AVM("There are %u arguments.",argc);
+		std::vector<as_value> args = get_args(argc);
+//		ENSURE_OBJECT(mStack.top(argc));
+		as_object *super = pop_stack().to_object().get()->get_super();
+		//TODO: Actually construct the super.
+//		as_object *super = mStack.top(argc).to_object()->get_super();
+// 		if (!super)
+// 		{
+// 			throw ASException();
+// 			break;
+// 		}
+// 		as_function *func = super->get_constructor();
 		// 'obj' is the 'this' for the call, we ignore the return, there are
 		// argc arguments, and we drop all of the arguments plus 'obj' from
 		// the stack.
-		pushCall(func, obj, mIgnoreReturn, argc, -1);
+//		pushCall(func, obj, mIgnoreReturn, argc, -1);
 		break;
 	}
 /// 0x4A ABC_ACTION_CONSTRUCTPROP
@@ -1423,13 +1426,11 @@ Machine::execute()
 	case SWF::ABC_ACTION_FINDPROPSTRICT:
 	case SWF::ABC_ACTION_FINDPROPERTY:
 	{
+		LOG_AVM_UNIMPLEMENTED();
 //		boost::uint32_t property_name = mStream->read_V32();
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
-#ifdef PRETEND
-		FIND_PROPERTY(a);
-		DEBUG_NOT_COMPLETE();
-#else
-		mStack.drop(completeName(a));
+		find_prop_strict(a);
+/*		mStack.drop(completeName(a));
 		as_object *owner;
 		Property *b = mCurrentScope->findProperty(a.getABCName(), 
 			a.getNamespace()->getURI(), &owner);
@@ -1443,8 +1444,7 @@ Machine::execute()
 		else
 		{
 			mStack.push(owner);
-		}
-#endif
+		}*/
 		break;
 	}
 /// 0x5F ABC_ACTION_FINDDEF

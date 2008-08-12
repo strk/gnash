@@ -310,6 +310,15 @@ private:
 		mStack.push(value);
 	}
 
+	std::vector<as_value> get_args(int argc){
+		std::vector<as_value> args;
+		args.resize(argc);
+		for(unsigned int i=0;i<argc;i++){
+			args.push_back(pop_stack());
+		}
+		return args;
+	}
+
 	SafeStack<as_value> mStack;
 	SafeStack<State> mStateStack;
 	SafeStack<Scope> mScopeStack;
