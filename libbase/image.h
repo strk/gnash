@@ -228,8 +228,14 @@ namespace image
 
 	};
 
-	/// Write the given image to the given out stream, in jpeg format.
-	DSOEXPORT void	write_jpeg(boost::shared_ptr<gnash::IOChannel> out, rgb* image, int quality);
+	/// Write the given image to the given out channel in a specified format.
+	//
+	/// @param type     The image format to write in (see libcore/gnash.h)
+	/// @param out      The IOChannel to write to.
+	/// @param image    The image to write.
+	/// @param quality  The quality of the image output (not used for all formats)
+	DSOEXPORT void writeImageData(FileType type, boost::shared_ptr<gnash::IOChannel> out,
+	                              image_base* image, int quality);
 
 	/// \brief
 	/// For reading SWF JPEG2-style image data, using pre-loaded

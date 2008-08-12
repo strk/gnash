@@ -22,7 +22,7 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "font.h"
-#include "stream.h"
+#include "SWFStream.h"
 #include "log.h"
 #include "movie_definition.h"
 #include "shape_character_def.h"

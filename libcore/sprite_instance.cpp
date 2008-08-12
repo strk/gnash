@@ -2727,8 +2727,8 @@ void sprite_instance::call_frame_actions(const as_value& frame_spec)
 
 character* sprite_instance::add_empty_movieclip(const char* name, int depth)
 {
-  // empty_sprite_def will be deleted during deliting sprite
-  sprite_definition* empty_sprite_def = new sprite_definition(get_movie_definition(), NULL);
+  // empty_sprite_def will be deleted during deleting sprite
+  sprite_definition* empty_sprite_def = new sprite_definition(get_movie_definition());
 
   sprite_instance* sprite = new sprite_instance(empty_sprite_def, m_root, this, 0);
   sprite->set_name(name);

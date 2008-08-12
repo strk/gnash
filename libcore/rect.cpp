@@ -17,7 +17,7 @@
 
 #include "rect.h"
 #include "log.h"
-#include "stream.h"
+#include "SWFStream.h"
 #include "matrix.h"
 #include "types.h" // for TWIPS_TO_PIXELS
 #include "utility.h" // for flerp, clamp...

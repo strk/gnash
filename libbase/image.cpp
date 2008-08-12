@@ -17,6 +17,7 @@
 #include "GnashImageGif.h"
 #include "GnashImageJpeg.h"
 #include "IOChannel.h"
+#include "log.h"
 
 namespace gnash
 {
@@ -186,49 +187,73 @@ namespace image
 	// utility
 	//
 
-
 	// Write the given image to the given out stream, in jpeg format.
-	void	write_jpeg(gnash::IOChannel* out, rgb* image, int quality)
+	void writeImageData(FileType type, boost::shared_ptr<IOChannel> out, image::image_base* image, int quality)
 	{
-		size_t height = image->height();
+		
+		const size_t width = image->width();
+		const size_t height = image->height();
+				
+		std::auto_ptr<ImageOutput> outChannel;
 
-		std::auto_ptr<JpegImageOutput> j_out ( JpegImageOutput::create(out, image->width(), height, quality) );
+        switch (type)
+        {
+            case GNASH_FILETYPE_PNG:
+                outChannel = PngImageOutput::create(out, width, height, quality);
+                break;
+            case GNASH_FILETYPE_JPEG:
+                outChannel = JpegImageOutput::create(out, width, height, quality);
+                break;
+            default:
+                log_error("Requested to write image as unsupported filetype");
+                break;
+        }
 
-		for (size_t y = 0; y < height; ++y)
-		{
-			j_out->write_scanline(image->scanline(y));
-		}
+        image::rgb* imageRGB = dynamic_cast<image::rgb*>(image);
+        if (imageRGB)
+        {
+            outChannel->writeImageRGB(imageRGB->data());
+            return;        
+        }
 
+        image::rgba* imageRGBA = dynamic_cast<image::rgba*>(image);
+        if (imageRGBA)
+        {
+            outChannel->writeImageRGBA(imageRGBA->data());
+        }
 	}
 
     // See gnash.h for file types.
     std::auto_ptr<rgb> readImageData(boost::shared_ptr<IOChannel> in, FileType type)
     {
         std::auto_ptr<rgb> im (NULL);
-        std::auto_ptr<ImageInput> infile;
+        std::auto_ptr<ImageInput> inChannel;
 
         switch (type)
         {
             case GNASH_FILETYPE_PNG:
-                infile = PngImageInput::create(in);
+                inChannel = PngImageInput::create(in);
                 break;
             case GNASH_FILETYPE_GIF:
-                infile = GifImageInput::create(in);
+                inChannel = GifImageInput::create(in);
                 break;
             case GNASH_FILETYPE_JPEG:
-                infile = JpegImageInput::create(in);
+                inChannel = JpegImageInput::create(in);
                 break;
             default:
                 break;
         }
         
-        if (!infile.get()) return im;
+        if (!inChannel.get()) return im;
         
-        im.reset(new image::rgb(infile->getWidth(), infile->getHeight()));
+        const size_t height = inChannel->getHeight();
+        const size_t width = inChannel->getWidth();
         
-        for (size_t i = 0, e = infile->getHeight(); i < e; ++i)
+        im.reset(new image::rgb(width, height));
+        
+        for (size_t i = 0; i < height; ++i)
         {
-            infile->readScanline(im->scanline(i));
+            inChannel->readScanline(im->scanline(i));
         }
         return im;
     }

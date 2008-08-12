@@ -21,8 +21,7 @@
 #define GNASH_GNASHIMAGE_H
 
 #include <boost/shared_ptr.hpp> 
-
-#include "dsodefs.h"
+#include "log.h"
 
 // Forward declarations
 namespace gnash { class IOChannel; }
@@ -68,6 +67,36 @@ public:
 protected:
 
     boost::shared_ptr<IOChannel> _inStream;
+
+};
+
+class ImageOutput
+{
+
+public:
+
+    ImageOutput(boost::shared_ptr<IOChannel> out, size_t width, size_t height) :
+        _width(width),
+        _height(height),
+        _outStream(out)
+        {}
+
+    virtual ~ImageOutput() {}
+    
+    virtual void writeImageRGB(unsigned char* rgbData) = 0;
+    
+    virtual void writeImageRGBA(unsigned char* /*rgbaData*/)
+    {
+        log_error("This image format does not support writing RGBA images");
+    }
+
+protected:
+
+    const size_t _width;
+
+    const size_t _height;
+    
+    boost::shared_ptr<IOChannel> _outStream;
 
 };
 

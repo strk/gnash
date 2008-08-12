@@ -28,7 +28,7 @@
 #include "GradientBevelFilter.h"
 
 #include "log.h"
-#include "stream.h"
+#include "SWFStream.h"
 
 namespace gnash {
 

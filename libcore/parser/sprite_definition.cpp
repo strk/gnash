@@ -25,7 +25,7 @@
 #include "sprite_definition.h"
 #include "ControlTag.h" // for dtor visibility
 #include "as_function.h" // for dtor visibility
-#include "stream.h" // for use
+#include "SWFStream.h" // for use
 
 #include <vector>
 #include <string>
@@ -186,7 +186,7 @@ sprite_definition::get_labeled_frame(const std::string& label, size_t& frame_num
     return true;
 }
 
-sprite_definition::sprite_definition(movie_definition* m, SWFStream* in)
+sprite_definition::sprite_definition(movie_definition* m, SWFStream& in)
 	:
 	// FIXME: use a class-static TagLoadersTable for sprite_definition
 	_tag_loaders(SWF::TagLoadersTable::getInstance()),
@@ -198,17 +198,22 @@ sprite_definition::sprite_definition(movie_definition* m, SWFStream* in)
 {
 	assert(m_movie_def);
 
-	// create empty sprite_definition (it is used for createEmptyMovieClip() method)
-	if (in == NULL)
-	{
-		m_frame_count = 1;
-		m_loading_frame = 1;
-	}
-	else
-	{
-		read(*in);
-	}
+	read(in);
 }
+
+sprite_definition::sprite_definition(movie_definition* m)
+	:
+	// FIXME: use a class-static TagLoadersTable for sprite_definition
+	_tag_loaders(SWF::TagLoadersTable::getInstance()),
+	m_movie_def(m),
+	m_frame_count(1),
+	m_loading_frame(1),
+	registeredClass(0),
+	_loadingSoundStream(-1)
+{
+	assert(m_movie_def);
+}
+
 
 /*
  * This function is not inlined to avoid having to include as_function.h

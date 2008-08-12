@@ -22,7 +22,7 @@
 #include "sprite_instance.h"
 #include "swf_event.h"
 #include "log.h"
-#include "stream.h"
+#include "SWFStream.h"
 #include "filter_factory.h"
 
 namespace gnash {
