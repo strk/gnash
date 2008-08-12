@@ -49,7 +49,6 @@ public:
 
 		mach->instantiateClass(rootClass);
 		log_debug("Executing machine...");
-		mach->execute();
 	}
 
 	// Tell the caller that we are an action tag.
