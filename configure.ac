@@ -3002,18 +3002,22 @@ if test x"${build_alp}" = xyes; then
 fi
 
 dnl XPCOM support for Mozilla/Firefox
-if test x"$npapi" = x"yes" -a x"$has_xpcom" = x"yes"; then
+if test x"$xpcom" = x"yes"; then
+  if test x"$has_xpcom" = x"yes"; then
     echo "        XPCOM flags are: $XPCOM_CFLAGS"
     echo "        XPCOM libs are: $XPCOM_LIBS"
     echo "        XPIDL path is: $XPIDL"
-else
+  else
     echo "        ERROR: No XPCOM development package is installed." >&3
+  fi
 fi
-if test x"$npapi" = x"yes" -a x"$has_nspr" = x"yes"; then
+if test x"$nspr4" = x"yes"; then
+  if test x"$has_nspr" = x"yes"; then
     echo "        NSPR flags are: $NSPR_CFLAGS"
     echo "        NSPR libs are: $NSPR_LIBS"
-else
+  else
     echo "        ERROR: No NSPR development package is installed." >&3
+  fi
 fi
 
 if test x$cross_compiling = xyes; then
