@@ -595,6 +595,8 @@ public:
 
 					// parse header
 					b += 2; // skip version indicator and client id
+
+					// NOTE: this looks much like parsing of an OBJECT_AMF0
 					si = readNetworkShort(b); b += 2; // number of headers
 					uint8_t headers_ok = 1;
 					if(si != 0)
@@ -612,6 +614,13 @@ public:
 								headers_ok = 0;
 								break;
 							}
+							std::string headerName((char*)b, si); // end-b);
+							//if( !amf0_read_value(b, end, tmp) )
+							//{
+							//	headers_ok = 0;
+							//	break;
+							//}
+							log_debug("Header name %s", headerName);
 							b += si;
 							if ( b + 5 > end ) {
 								headers_ok = 0;
@@ -624,6 +633,15 @@ public:
 								break;
 							}
 							log_debug("Header value %s", tmp);
+
+							{ // method call for each header
+							  // FIXME: it seems to me that the call should happen
+								VM& vm = _nc.getVM();
+								string_table& st = vm.getStringTable();
+								string_table::key key = st.find(headerName);
+								log_debug("Calling NetConnection.%s(%s)", headerName, tmp);
+								_nc.callMethod(key, tmp);
+							}
 						}
 					}
 
