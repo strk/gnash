@@ -31,7 +31,8 @@ XPI_BUILD=gnash-${VERSION}
 
 CONFIG_OPTS = $(DISTCHECK_CONFIGURE_FLAGS) \
 	--disable-kparts \
-	--enable-gui=gtk
+	--enable-gui=gtk \
+	--with-npapi-plugindir=/tmp/plugin
 
 xpi-unpack: Makefile #$(top_builddir)/config.status
 	-@rm -f xpi-*		# nuke everything, we're starting over
@@ -53,10 +54,11 @@ xpi-build: #xpi-configure
 
 xpi-plugin: 
 	cd $(XPI_BUILD); ./configure $(CONFIG_OPTS) --disable-static --enable-shared
-	$(MAKE) -C $(XPI_BUILD)/plugin clean all
+	$(MAKE) -C $(XPI_BUILD)/plugin clean all GNASHBINDIR=
 	$(MAKE) -C $(XPI_BUILD) install-plugin DESTDIR=$(XPI_TMP)
+	$(MAKE) -C $(XPI_BUILD)/plugin/xpcom install-pkglib DESTDIR=$(XPI_TMP)
 
-xpi xpi-bundle: # xpi-build xpi-plugin
+xpi xpi-bundle: #xpi-build xpi-plugin
 	if ! test -d $(XPI_BUNDLE)/ ; then \
 	  mkdir $(XPI_BUNDLE); \
 	fi
@@ -64,9 +66,11 @@ xpi xpi-bundle: # xpi-build xpi-plugin
 	for i in install.rdf; do \
 	  cp -fr $${topdir}/packaging/xpi/$$i $(XPI_BUNDLE)/; \
 	done;
-	cp -fr $(XPI_TMP)/usr/local/bin/*gnash $(XPI_BUNDLE)/
-	cp -fr $(XPI_TMP)/usr/local/share/locale $(XPI_BUNDLE)/
-	cp -fr $(XPI_TMP)/usr/local/npapi/libgnashplugin.so $(XPI_BUNDLE)/
+	cp -fr $(XPI_TMP)$(bindir)/*gnash $(XPI_BUNDLE)/
+	cp -fr $(XPI_TMP)$(localedir) $(XPI_BUNDLE)/
+	cp -fr $(XPI_TMP)/tmp/plugin/libgnashplugin.so $(XPI_BUNDLE)/
+	cp -fr $(XPI_TMP)/tmp/extensions/*/*.xpt $(XPI_BUNDLE)/
+	cp -fr $(XPI_TMP)/tmp/extensions/*/*.so $(XPI_BUNDLE)/
 	(cd $(XPI_BUNDLE) ; $(ZIP) -r /tmp/gnash.xpi *)
 
 xpi-clean:
