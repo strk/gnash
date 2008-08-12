@@ -27,6 +27,7 @@
 
 #include "matrix.h"
 #include "SWFStream.h" // for reading from SWF
+#include "log.h"
 
 #include <cmath>
 #include <iomanip>
@@ -48,37 +49,44 @@ matrix::read(SWFStream& in)
 
     set_identity();
 
-    in.ensureBits(1);
-    bool    has_scale = in.read_bit(); 
-    if (has_scale)
-    {
+    try {
+        in.ensureBits(1);
+        bool    has_scale = in.read_bit(); 
+        if (has_scale)
+        {
+            in.ensureBits(5);
+            int scale_nbits = in.read_uint(5);
+    
+            in.ensureBits(scale_nbits * 2);
+            sx = in.read_sint(scale_nbits);
+            sy = in.read_sint(scale_nbits);
+        }
+    
+        in.ensureBits(1);
+        bool  has_rotate = in.read_bit();
+        if (has_rotate)
+        {
+            in.ensureBits(5);
+            int rotate_nbits = in.read_uint(5);
+    
+            in.ensureBits(rotate_nbits * 2);
+            shx = in.read_sint(rotate_nbits);
+            shy = in.read_sint(rotate_nbits);
+        }
+    
         in.ensureBits(5);
-        int scale_nbits = in.read_uint(5);
-
-        in.ensureBits(scale_nbits * 2);
-        sx = in.read_sint(scale_nbits);
-        sy = in.read_sint(scale_nbits);
-    }
-
-    in.ensureBits(1);
-    bool  has_rotate = in.read_bit();
-    if (has_rotate)
-    {
-        in.ensureBits(5);
-        int rotate_nbits = in.read_uint(5);
-
-        in.ensureBits(rotate_nbits * 2);
-        shx = in.read_sint(rotate_nbits);
-        shy = in.read_sint(rotate_nbits);
-    }
-
-    in.ensureBits(5);
-    int translate_nbits = in.read_uint(5);
-    if (translate_nbits > 0)
-    {
-        in.ensureBits(translate_nbits * 2);
-        tx = in.read_sint(translate_nbits);
-        ty = in.read_sint(translate_nbits);
+        int translate_nbits = in.read_uint(5);
+        if (translate_nbits > 0)
+        {
+            in.ensureBits(translate_nbits * 2);
+            tx = in.read_sint(translate_nbits);
+            ty = in.read_sint(translate_nbits);
+        }
+    } catch (ParserException& pe) {
+        // See http://savannah.gnu.org/bugs/index.php?21756 (comment #27)
+        IF_VERBOSE_MALFORMED_SWF(
+        log_swferror("Parsing matrix: %s", pe.what());
+        )
     }
 }
 
