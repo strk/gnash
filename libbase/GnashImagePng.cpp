@@ -70,7 +70,8 @@ flushData(png_structp /*pngptr*/)
 PngImageInput::PngImageInput(boost::shared_ptr<IOChannel> in) :
     ImageInput(in),
     _pngPtr(0),
-    _infoPtr(0)
+    _infoPtr(0),
+    _currentRow(0)
 {
     init();
 }
