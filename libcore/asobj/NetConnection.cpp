@@ -578,7 +578,12 @@ public:
 							headers_ok = 0;
 							break;
 						}
-						b += 1; // skip past bool
+						b += si;
+						if ( b + 5 > end ) {
+							headers_ok = 0;
+							break;
+						}
+						b += 5; // skip past bool and length long
 						if(amf0_read_value(b, end) == 0) {
 							headers_ok = 0;
 							break;
@@ -976,7 +981,7 @@ NetConnection::isConnected_getset(const fn_call& fn)
 	if ( fn.nargs == 0 ) // getter
 	{
 		log_unimpl("NetConnection.isConnected get");
-	  return as_value();
+		return as_value();
 	}
 	else // setter
 	{
