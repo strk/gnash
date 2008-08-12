@@ -269,6 +269,15 @@ if BUILD_AGG_RENDERER
 	@echo "	AGG_CFLAGS is $(AGG_CFLAGS)"
 	@echo "	AGG_LIBS is $(AGG_LIBS)"
 endif
+if XPCOM
+	@echo "	XPCOM_CFLAGS is $(XPCOM_CFLAGS)"
+	@echo "	XPCOM_LIBS is $(XPCOM_LIBS)"
+	@echo "	XPIDL path is $(XPIDL)"
+endif
+if NSPR
+	@echo "	NSPR_CFLAGS is $(NSPR_CFLAGS)"
+	@echo "	NSPR_LIBS is $(NSPR_LIBS)"
+endif
 	@echo ""
 	@echo "A blank value for CFLAGS means the header is installed in the"
 	@echo "default system header location. All the LIBS should have a"
@@ -277,7 +286,6 @@ endif
 	@echo "Configurable options are:"
 	@echo "	Media handler: $(MEDIA_CONFIG)"
 	@echo "	Renderer engine: $(RENDERER_CONFIG)"
-
 
 if BUILD_GTK_GUI
 	@echo "	Supported GUI: GTK"
@@ -308,6 +316,9 @@ if BUILD_AQUA_GUI
 endif
 if BUILD_FB_GUI
 	@echo "	Supported GUI: FB"
+endif
+if XPCOM
+	@echo "	XPCOM support for Mozilla/Firefox"
 endif
 
 	@if test -n "$(EXTENSIONS_LIST)" ; then \
