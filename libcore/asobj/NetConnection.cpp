@@ -577,16 +577,17 @@ public:
 				log_debug("connection is in error condition, calling NetConnection.onStatus");
 				reply_start = 0;
 				reply_end = 0;
+				log_debug("deleting connection");
+				connection.reset(); // reset connection before calling the callback
 
 				// FIXME: should only call NetConnection's onStatus
 				//        if the IOChannel is in error condition.
 				//        (tipically 404).
 				//        When the response is empty, just nothing happens.
 				_nc.callMethod(NSV::PROP_ON_STATUS, as_value());
-				return;
+
 			}
-			
-			if(connection->eof() )
+			else if(connection->eof() )
 			{
 				if ( reply_end > 8)
 				{
