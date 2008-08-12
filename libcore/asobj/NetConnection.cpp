@@ -762,7 +762,7 @@ private:
 		boost::intrusive_ptr<builtin_function> ticker_as = \
 			new builtin_function(&AMFQueue::amfqueue_tick_wrapper);
 		std::auto_ptr<Timer> timer(new Timer);
-		unsigned long delayMS = 500; // FIXME crank up to 50 or so
+		unsigned long delayMS = 50; // FIXME crank up to 50 or so
 		timer->setInterval(*ticker_as, delayMS, &_nc);
 		ticker = _nc.getVM().getRoot().add_interval_timer(timer, true);
 	}
