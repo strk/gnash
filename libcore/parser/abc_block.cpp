@@ -1230,6 +1230,17 @@ abc_block::read(SWFStream& in)
 	return true;
 }
 
+asClass *abc_block::locateClass(std::string className){
+	
+	std::vector<asClass*>::iterator i = mClasses.begin();
+	for( ; i!=mClasses.end(); ++i){
+		if(mStringPool[(*i)->getName()].compare(className) == 0){
+			return *i;
+		}
+	}	
+	throw GnashException("LocateClass: Class not found.");
+}
+
 abc_block::abc_block() : mStringTable(&VM::get().getStringTable())
 {
 	mCH = VM::get().getClassHierarchy();
