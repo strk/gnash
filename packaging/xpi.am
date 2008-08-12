@@ -58,7 +58,6 @@ xpi-plugin:
 	$(MAKE) -C $(XPI_BUILD) install-plugin DESTDIR=$(XPI_TMP)
 	$(MAKE) -C $(XPI_BUILD)/plugin/xpcom install-pkglib DESTDIR=$(XPI_TMP)
 
-EXT_DIR = "$(dir $(FIREFOX_PLUGINS))/extensions/{2b70f2b1-fc72-4734-bb81-4eb2a7713e49}"
 xpi xpi-bundle: #xpi-build xpi-plugin
 	if ! test -d $(XPI_BUNDLE)/ ; then \
 	  mkdir $(XPI_BUNDLE); \
