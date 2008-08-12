@@ -248,7 +248,7 @@ jpeg_tables_loader(SWFStream& in, tag_type tag, movie_definition* m)
 	// Anyway the actual reads are limited to currently opened tag as 
 	// of gnash::SWFStream::read(), so this is not a problem.
 	//
-        boost::shared_ptr<tu_file> ad( StreamAdapter::getFile(in, std::numeric_limits<unsigned long>::max()) );
+        boost::shared_ptr<tu_file> ad(StreamAdapter::getFile(in, std::numeric_limits<unsigned long>::max()).release());
         //  transfer ownership to the JpegImageInput
         j_in = JpegImageInput::createSWFJpeg2HeaderOnly(ad, jpegHeaderSize);
 
@@ -339,7 +339,7 @@ define_bits_jpeg2_loader(SWFStream& in, tag_type tag, movie_definition* m)
     // Read the image data.
     //
 
-    boost::shared_ptr<tu_file> ad( StreamAdapter::getFile(in, in.get_tag_end_position()) );
+    boost::shared_ptr<tu_file> ad( StreamAdapter::getFile(in, in.get_tag_end_position()).release() );
     std::auto_ptr<image::rgb> im (image::readImageData(ad, GNASH_FILETYPE_JPEG));
 
     if ( m->get_bitmap_character_def(character_id) )
@@ -468,7 +468,7 @@ define_bits_jpeg3_loader(SWFStream& in, tag_type tag, movie_definition* m)
     //
 
     // Read rgb data.
-    boost::shared_ptr<tu_file> ad( StreamAdapter::getFile(in, alpha_position) );
+    boost::shared_ptr<tu_file> ad( StreamAdapter::getFile(in, alpha_position).release() );
     std::auto_ptr<image::rgba> im = image::readSWFJpeg3(ad);
     
     /// Failure to read the jpeg.
