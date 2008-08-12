@@ -30,7 +30,7 @@ AC_DEFUN([GNASH_PATH_NSPR],
     yes) nspr=yes ;;
     no)  nspr=no ;;
     *)   AC_MSG_ERROR([bad value ${enableval} for --enable-nspr option]) ;;
-   esac],nspr=yes)
+   esac],nspr4=no)
 
   dnl Look for the header
   AC_ARG_WITH(nspr-incl, AC_HELP_STRING([--with-nspr-incl], [directory where NSPR headers are]), with_nspr_incl=${withval})
@@ -54,7 +54,7 @@ AC_DEFUN([GNASH_PATH_NSPR],
       fi
     ])
 
-  if test x$nspr = xyes; then
+  if test x$nspr4 = xyes; then
     if test x$cross_compiling = xno; then
       if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_nspr_incl}" = x; then
         $PKG_CONFIG --exists nspr && ac_cv_path_nspr_incl="`$PKG_CONFIG --cflags-only-I nspr`"

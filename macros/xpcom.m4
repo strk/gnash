@@ -30,7 +30,7 @@ AC_DEFUN([GNASH_PATH_XPCOM],
     yes) xpcom=yes ;;
     no)  xpcom=no ;;
     *)   AC_MSG_ERROR([bad value ${enableval} for --enable-xpcom option]) ;;
-   esac],xpcom=yes)
+   esac],xpcom=no)
 
   dnl Look for the header
   AC_ARG_WITH(xpcom-incl, AC_HELP_STRING([--with-xpcom-incl], [directory where XPCOM headers are]), with_xpcom_incl=${withval})
