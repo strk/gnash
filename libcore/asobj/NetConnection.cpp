@@ -25,6 +25,8 @@
 #include <iostream>
 #include <string>
 #include <new>
+#include <boost/scoped_ptr.hpp>
+
 #include "NetConnection.h"
 #include "log.h"
 #include "GnashException.h"
@@ -487,7 +489,7 @@ private:
 	std::map<std::string, boost::intrusive_ptr<as_object> > callbacks;
 	SimpleBuffer postdata;
 	URL url;
-	IOChannel *connection;
+	boost::scoped_ptr<IOChannel> connection;
 	SimpleBuffer reply;
 	int reply_start;
 	int reply_end;
@@ -511,9 +513,6 @@ public:
 	}
 
 	~AMFQueue() {
-		if(connection) {
-			delete connection;
-		}
 		stop_ticking();
 	}
 	
@@ -663,8 +662,7 @@ public:
 
 			if(connection->eof()) {
 				log_debug("deleting connection");
-				delete connection;
-				connection = 0;
+				connection.reset();
 				reply_start = 0;
 				reply_end = 0;
 
@@ -680,7 +678,7 @@ public:
 			log_debug("NetConnection.call(): encoded args from %1% calls:", queued_count);
 			log_debug("%s", hexify(postdata.data(), postdata.size(), false));
 			queued_count = 0;
-			connection = StreamProvider::getDefaultInstance().getStream(url, postdata_str);
+			connection.reset( StreamProvider::getDefaultInstance().getStream(url, postdata_str) );
 			postdata.resize(6);
 			log_debug("connection created");
 		}
