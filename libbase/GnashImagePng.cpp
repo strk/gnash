@@ -168,6 +168,30 @@ PngImageOutput::init()
     }
 }
 
+void
+PngImageOutput::writeImageRGBA(unsigned char* rgbaData)
+{
+    png_set_write_fn(_pngPtr, _outStream.get(), &writeData, &flushData);
+
+    boost::scoped_array<png_bytep> rows(new png_bytep[_height]);
+
+    // RGB
+    const size_t components = 4;
+
+    for (size_t y = 0; y < _height; ++y)
+    {
+        rows[y] = rgbaData + _width * y * components;
+    }
+
+    png_set_rows(_pngPtr, _infoPtr, rows.get());
+
+    png_set_IHDR(_pngPtr, _infoPtr, _width, _height,
+       8, PNG_COLOR_TYPE_RGBA, PNG_INTERLACE_NONE,
+       PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
+
+    png_write_png(_pngPtr, _infoPtr, PNG_TRANSFORM_IDENTITY, NULL);
+}
+
 
 void
 PngImageOutput::writeImageRGB(unsigned char* rgbData)

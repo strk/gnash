@@ -190,13 +190,9 @@ namespace image
 	// Write the given image to the given out stream, in jpeg format.
 	void writeImageData(FileType type, boost::shared_ptr<IOChannel> out, image::image_base* image, int quality)
 	{
-		image::rgb* im = dynamic_cast<image::rgb*>(image);
 		
-		// We only handle rgb data at the moment.
-		assert(im);
-		
-		const size_t width = im->width();
-		const size_t height = im->height();
+		const size_t width = image->width();
+		const size_t height = image->height();
 				
 		std::auto_ptr<ImageOutput> outChannel;
 
@@ -213,7 +209,18 @@ namespace image
                 break;
         }
 
-        outChannel->writeImageRGB(im->data());
+        image::rgb* imageRGB = dynamic_cast<image::rgb*>(image);
+        if (imageRGB)
+        {
+            outChannel->writeImageRGB(imageRGB->data());
+            return;        
+        }
+
+        image::rgba* imageRGBA = dynamic_cast<image::rgba*>(image);
+        if (imageRGBA)
+        {
+            outChannel->writeImageRGBA(imageRGBA->data());
+        }
 	}
 
     // See gnash.h for file types.
