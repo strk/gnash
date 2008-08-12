@@ -349,24 +349,28 @@ readNetworkLong(const boost::uint8_t* buf) {
 // Pass pointer to buffer and pointer to end of buffer. Buffer is raw AMF
 // encoded data. Must start with a type byte unless third parameter is set.
 //
-// On success, returns *as_value. On error returns 0 (premature end of buffer,
-// etc.)
+// On success, sets the given as_value and returns true.
+// On error (premature end of buffer, etc.) returns false and leaves the given
+// as_value untouched.
 //
-// IF you pass a third parameter, it WILL NOT READ A TYPE BYTE, but use what
+// IF you pass a fourth parameter, it WILL NOT READ A TYPE BYTE, but use what
 // you passed instead.
 //
 // The l-value you pass as the first parameter (buffer start) is updated to
 // point just past the last byte parsed
 //
 // TODO restore first parameter on parse errors
-as_value* amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, int inType = -1) {
+//
+static bool
+amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inType = -1)
+{
 	boost::uint16_t si;
 	boost::uint16_t li;
 	double dub;
 	int amf_type;
 
 	if(b > end) {
-		return 0;
+		return false;
 	}
 	if(inType != -1) {
 		amf_type = inType;
@@ -374,7 +378,7 @@ as_value* amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, int inType = 
 		if(b < end) {
 			amf_type = *b; b += 1;
 		} else {
-			return 0;
+			return false;
 		}
 	}
 
@@ -382,29 +386,29 @@ as_value* amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, int inType = 
 		case Element::NUMBER_AMF0:
 			if(b + 8 > end) {
 				log_error(_("NetConnection.call(): server sent us a number which goes past the end of the data sent"));
-				return 0;
+				return false;
 			}
 			dub = *(reinterpret_cast<double*>(b)); b += 8;
 			swapBytes(&dub, 8);
 			log_debug("nc read double: %e", dub);
-			return new as_value(dub);
+			ret.set_double(dub);
+			return true;
 		case Element::STRING_AMF0:
 			if(b + 2 > end) {
 				log_error(_("NetConnection.call(): server sent us a string which goes past the end of the data sent"));
-				return 0;
+				return false;
 			}
 			si = readNetworkShort(b); b += 2;
 			if(b + si > end) {
 				log_error(_("NetConnection.call(): server sent us a string which goes past the end of the data sent"));
-				return 0;
+				return false;
 			}
 
 			{
-				as_value *asStr;
 				std::string str(reinterpret_cast<char *>(b), si); b += si;
-				log_debug("nc read string: %s", str.c_str());
-				asStr = new as_value(str);
-				return asStr;
+				log_debug("nc read string: %s", str);
+				ret.set_string(str);
+				return true;
 
 			}
 			break;
@@ -413,59 +417,70 @@ as_value* amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, int inType = 
 				boost::intrusive_ptr<as_array_object> array(new as_array_object());
 				li = readNetworkLong(b); b += 4;
 				log_debug("nc starting read of array with %i elements", li);
-				for(int i = 0; i < li; ++i) {
-					as_value* ret = amf0_read_value(b, end);
-					if(ret == 0) {
-						return 0;
+				as_value arrayElement;
+				for(int i = 0; i < li; ++i)
+				{
+					if ( ! amf0_read_value(b, end, arrayElement) )
+					{
+						return false;
 					}
-					array->push(*ret);
+					array->push(arrayElement);
 				}
 
-				return new as_value(array.get());
+				ret.set_as_object(array);
+				return true;
 			}
 		case Element::OBJECT_AMF0:
 			{
 				// need this? boost::intrusive_ptr<as_object> obj(new as_object(getObjectInterface()));
 				boost::intrusive_ptr<as_object> obj(new as_object());
 				log_debug("nc starting read of object");
-				for(;;) {
-					as_value* key = amf0_read_value(b, end, Element::STRING_AMF0);
-					if(key == 0) {
-						return 0;
+				as_value tmp;
+				std::string keyString;
+				for(;;)
+				{
+					if ( ! amf0_read_value(b, end, tmp, Element::STRING_AMF0) )
+					{
+						return false;
 					}
-					if(key->to_string().size() == 0) {
+					keyString = tmp.to_string();
+
+					if ( keyString.empty() )
+					{
 						if(b < end) {
 							b += 1; // AMF0 has a redundant "object end" byte
 						} else {
 							log_error("AMF buffer terminated just before object end byte. continueing anyway.");
 						}
-						return new as_value(obj.get());
+						ret.set_as_object(obj);
+						return true;
 					}
-					as_value* val = amf0_read_value(b, end);
-					if(val == 0) {
-						return 0;
+
+					if ( ! amf0_read_value(b, end, tmp) )
+					{
+						return false;
 					}
-					obj->init_member(key->to_string(), *val);
+					obj->init_member(keyString, tmp);
 				}
 			}
 		case Element::UNDEFINED_AMF0:
 			{
-				return new as_value();
+				ret.set_undefined();
+				return true;
 			}
 		case Element::NULL_AMF0:
 			{
-				as_value* n = new as_value();
-				n->set_null();
-				return n;
+				ret.set_null();
+				return true;
 			}
 		// TODO define other types (function, sprite, etc)
 		default:
 			log_unimpl("NetConnection.call(): server sent us a value of unsupported type: %i", amf_type);
-			return 0;
+			return false;
 	}
 
 	// this function was called with a zero-length buffer
-	return 0;
+	return false;
 }
 
 
@@ -564,9 +579,12 @@ public:
 				b += 2; // skip version indicator and client id
 				si = readNetworkShort(b); b += 2; // number of headers
 				uint8_t headers_ok = 1;
-				if(si != 0) {
+				if(si != 0)
+				{
 					log_debug("NetConnection::call(): amf headers section parsing");
-					for(int i = si; i > 0; --i) {
+					as_value tmp;
+					for(int i = si; i > 0; --i)
+					{
 						if(b + 2 > end) {
 							headers_ok = 0;
 							break;
@@ -582,10 +600,12 @@ public:
 							break;
 						}
 						b += 5; // skip past bool and length long
-						if(amf0_read_value(b, end) == 0) {
+						if( !amf0_read_value(b, end, tmp) )
+						{
 							headers_ok = 0;
 							break;
 						}
+						log_debug("Header value %s", tmp);
 					}
 				}
 
@@ -628,8 +648,9 @@ public:
 
 							log_debug("about to parse amf value");
 							// this updates b to point to the next unparsed byte
-							as_value *reply_as_value = amf0_read_value(b, end);
-							if(!reply_as_value) {
+							as_value reply_as_value;
+							if ( ! amf0_read_value(b, end, reply_as_value) )
+							{
 								log_error("parse amf failed");
 								// this will happen if we get
 								// bogus data, or if the data runs
@@ -649,7 +670,7 @@ public:
 								log_debug("calling callback");
 								string_table::key callback_method = callback -> getVM() . getStringTable() . find(std::string("onResult"));
 								// FIXME check if above line can fail and we have to react
-								callback->callMethod(callback_method, *reply_as_value);
+								callback->callMethod(callback_method, reply_as_value);
 								log_debug("callback called");
 							} else {
 								log_debug("couldn't find callback object");
@@ -936,14 +957,14 @@ NetConnection::call_method(const fn_call& fn)
 					}
 				}
 	
-				as_value *response = amf0_read_value(b, end);
-
-				if(response) {
+				as_value response;
+				if ( amf0_read_value(b, end, response) )
+				{
 					string_table::key callbackMethod = asCallback -> getVM() . getStringTable() . find(std::string("onResult"));
-					asCallback->callMethod(callbackMethod, *response);
-
-					delete response;
-				} else {
+					asCallback->callMethod(callbackMethod, response);
+				}
+				else
+				{
 					// TODO construct an object with info about the failure to pass to onStatus
 					// see: http://livedocs.adobe.com/fms/2/docs/00000742.html
 					//string_table::key callbackMethod = asCallback->getVM().getStringTable().find(std::string("onStatus"));
