@@ -814,7 +814,11 @@ shape_character_def::read(SWFStream& in, int tag_type, bool with_style,
 
         if (m_bound.point_test(x, y) == false)
         {
-            return false;
+		// FIXME: if the shape contains non-scaled strokes
+		//        we can't rely on boundary itself for a quick
+		//        way out. At least, we should expand the bounds
+		//        with the thickness...
+		//return false;
         }
 
         unsigned npaths = m_paths.size();
@@ -859,15 +863,17 @@ shape_character_def::read(SWFStream& in, int tag_type, bool with_style,
                     // TODO: pass the matrix to withinSquareDistance instead ?
                     double xScale = wm.get_x_scale();
                     double yScale = wm.get_y_scale();
-                    thickness /= std::max(xScale, yScale);
+			//log_debug("thickness:%d, xScale:%g, yScale:%g", thickness, xScale, yScale);
+                    thickness *= std::max(xScale, yScale);
+			//log_debug("after scaling, thickness:%d", thickness);
                 }
                 else if ( ls.scaleThicknessVertically() != ls.scaleThicknessHorizontally() )
                 {
                     LOG_ONCE( log_unimpl("Collision detection for unidirectionally scaled strokes") );
                 }
 
-                double  dist = thickness / 2.0;
-                boost::int64_t  sqdist = static_cast<boost::int64_t>(dist * dist); 
+                double dist = thickness / 2.0;
+                double sqdist = dist * dist;
                 if (pth.withinSquareDistance(pt, sqdist))
                     return true;
             }
