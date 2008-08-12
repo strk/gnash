@@ -379,28 +379,28 @@ as_value* amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, int inType = 
 	switch(amf_type) {
 		case Element::NUMBER_AMF0:
 			if(b + 8 > end) {
-				log_aserror(_("NetConnection.call(): server sent us a number which goes past the end of the data sent"));
+				log_error(_("NetConnection.call(): server sent us a number which goes past the end of the data sent"));
 				return 0;
 			}
 			dub = *(reinterpret_cast<double*>(b)); b += 8;
 			swapBytes(&dub, 8);
-			log_aserror("nc read double: %e", dub);
+			log_debug("nc read double: %e", dub);
 			return new as_value(dub);
 		case Element::STRING_AMF0:
 			if(b + 2 > end) {
-				log_aserror(_("NetConnection.call(): server sent us a string which goes past the end of the data sent"));
+				log_error(_("NetConnection.call(): server sent us a string which goes past the end of the data sent"));
 				return 0;
 			}
 			si = readNetworkShort(b); b += 2;
 			if(b + si > end) {
-				log_aserror(_("NetConnection.call(): server sent us a string which goes past the end of the data sent"));
+				log_error(_("NetConnection.call(): server sent us a string which goes past the end of the data sent"));
 				return 0;
 			}
 
 			{
 				as_value *asStr;
 				std::string str(reinterpret_cast<char *>(b), si); b += si;
-				log_aserror("nc read string: %s", str.c_str());
+				log_debug("nc read string: %s", str.c_str());
 				asStr = new as_value(str);
 				return asStr;
 
@@ -410,7 +410,7 @@ as_value* amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, int inType = 
 			{
 				boost::intrusive_ptr<as_array_object> array(new as_array_object());
 				li = readNetworkLong(b); b += 4;
-				log_aserror("nc starting read of array with %i elements\n", li);
+				log_debug("nc starting read of array with %i elements", li);
 				for(int i = 0; i < li; ++i) {
 					as_value* ret = amf0_read_value(b, end);
 					if(ret == 0) {
@@ -425,7 +425,7 @@ as_value* amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, int inType = 
 			{
 				// need this? boost::intrusive_ptr<as_object> obj(new as_object(getObjectInterface()));
 				boost::intrusive_ptr<as_object> obj(new as_object());
-				log_aserror("nc starting read of object");
+				log_debug("nc starting read of object");
 				for(;;) {
 					as_value* key = amf0_read_value(b, end, Element::STRING_AMF0);
 					if(key == 0) {
@@ -435,7 +435,7 @@ as_value* amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, int inType = 
 						if(b < end) {
 							b += 1; // AMF0 has a redundant "object end" byte
 						} else {
-							log_aserror("AMF buffer terminated just before object end byte. continueing anyway.");
+							log_error("AMF buffer terminated just before object end byte. continueing anyway.");
 						}
 						return new as_value(obj.get());
 					}
@@ -532,13 +532,13 @@ public:
 	// it handles all networking for NetConnection::call() and dispatches
 	// callbacks when needed
 	void tick() {
-		log_aserror("tick running");
+		log_debug("tick running");
 		if(connection) {
-			log_aserror("have connection");
+			log_debug("have connection");
 			int read = connection->readNonBlocking(reply.data() + reply_end, NCCALLREPLYMAX - reply_end);
 			if(read > 0) {
-				log_aserror("read '%1%' bytes:", read);
-				log_aserror(_(hexify(reply.data() + reply_end, read, false).c_str()));
+				log_debug("read '%1%' bytes:", read);
+				log_debug(_(hexify(reply.data() + reply_end, read, false).c_str()));
 				reply_end += read;
 			}
 
@@ -556,7 +556,7 @@ public:
 			// thas is satisfied
 			
 			if(connection->eof() && reply_end > 8) {
-				log_aserror("hit eof");
+				log_debug("hit eof");
 				boost::int16_t si;
 				boost::uint16_t li;
 				boost::uint8_t *b = reply.data() + reply_start;
@@ -567,7 +567,7 @@ public:
 				si = readNetworkShort(b); b += 2; // number of headers
 				uint8_t headers_ok = 1;
 				if(si != 0) {
-					log_aserror("NetConnection::call(): amf headers section parsing");
+					log_debug("NetConnection::call(): amf headers section parsing");
 					for(int i = si; i > 0; --i) {
 						if(b + 2 > end) {
 							headers_ok = 0;
@@ -599,7 +599,7 @@ public:
 							if(b + 2 > end) break;
 							si = readNetworkShort(b); b += 2; // reply length
 							if(si < 11) {
-								log_aserror("NetConnection::call(): reply message name too short");
+								log_error("NetConnection::call(): reply message name too short");
 								break;
 							}
 							if(b + si > end) break;
@@ -623,11 +623,11 @@ public:
 							if(b + 4 > end) break;
 							li = readNetworkLong(b); b += 4; // reply length
 
-							log_aserror("about to parse amf value");
+							log_debug("about to parse amf value");
 							// this updates b to point to the next unparsed byte
 							as_value *reply_as_value = amf0_read_value(b, end);
 							if(!reply_as_value) {
-								log_aserror("parse amf failed");
+								log_error("parse amf failed");
 								// this will happen if we get
 								// bogus data, or if the data runs
 								// off the end of the buffer
@@ -635,7 +635,7 @@ public:
 								// don't know how to parse
 								break;
 							}
-							log_aserror("parsed amf");
+							log_debug("parsed amf");
 
 							// update variable to show how much we've parsed
 							reply_start = b - reply.data();
@@ -643,13 +643,13 @@ public:
 							// if actionscript specified a callback object, call it
 							boost::intrusive_ptr<as_object> callback = pop_callback(id);
 							if(callback) {
-								log_aserror("calling callback");
+								log_debug("calling callback");
 								string_table::key callback_method = callback -> getVM() . getStringTable() . find(std::string("onResult"));
 								// FIXME check if above line can fail and we have to react
 								callback->callMethod(callback_method, *reply_as_value);
-								log_aserror("callback called");
+								log_debug("callback called");
 							} else {
-								log_aserror("couldn't find callback object");
+								log_debug("couldn't find callback object");
 							}
 						}
 					}
@@ -657,7 +657,7 @@ public:
 			}
 
 			if(connection->eof()) {
-				log_aserror("deleting connection");
+				log_debug("deleting connection");
 				delete connection;
 				connection = 0;
 				reply_start = 0;
@@ -668,22 +668,22 @@ public:
 		}
 
 		if(connection == 0 && queued_count > 0) {
-			log_aserror("creating connection");
+			log_debug("creating connection");
 			// set the "number of bodies" header
 			(reinterpret_cast<boost::uint16_t*>(postdata.data() + 4))[0] = htons(queued_count);
 			std::string postdata_str(reinterpret_cast<char*>(postdata.data()), postdata.size());
-			log_aserror("NetConnection.call(): encoded args from %1% calls:", queued_count);
-			log_aserror(_(hexify(postdata.data(), postdata.size(), false).c_str()));
+			log_debug("NetConnection.call(): encoded args from %1% calls:", queued_count);
+			log_debug("%s", hexify(postdata.data(), postdata.size(), false));
 			queued_count = 0;
 			connection = StreamProvider::getDefaultInstance().getStream(url, postdata_str);
 			postdata.resize(6);
-			log_aserror("connection created");
+			log_debug("connection created");
 		}
 
 		if(connection == 0 && queued_count == 0) {
-			log_aserror("stopping ticking");
+			log_debug("stopping ticking");
 			stop_ticking();
-			log_aserror("ticking stopped");
+			log_debug("ticking stopped");
 		}
 	};
 
@@ -709,10 +709,10 @@ private:
 		am_ticking = 1;
 	}
 	void push_amf(SimpleBuffer &amf) {
-		log_aserror("pushing amf");
+		log_debug("pushing amf");
 		postdata.append(amf.data(), amf.size());
 		queued_count++;
-		log_aserror("pushed amf");
+		log_debug("pushed amf");
 		start_ticking();
 	}
 	void stop_ticking() {
@@ -819,7 +819,7 @@ NetConnection::call_method(const fn_call& fn)
 			//	boost::intrusive_ptr<as_object> o = fn.arg(i).to_object();
 			//	tmp = AMF::encodeObject(o);
 			} else {
-				log_aserror(_("NetConnection.call(): unknown argument type"));
+				log_error(_("NetConnection.call(): unknown argument type"));
 				buf->appendByte(Element::UNDEFINED_AMF0);
 			}
 		}
@@ -829,8 +829,8 @@ NetConnection::call_method(const fn_call& fn)
 	*(reinterpret_cast<uint32_t*>(buf->data() + total_size_offset)) = htonl(buf->size() - 4 - total_size_offset);
 	
 
-	log_aserror(_("NetConnection.call(): encoded args: "));
-	log_aserror(_(hexify(buf->data(), buf->size(), false).c_str()));
+	log_debug(_("NetConnection.call(): encoded args: "));
+	log_debug("%s", hexify(buf->data(), buf->size(), false));
 
 	// FIXME check that ptr->_prefixURL is valid
 	URL url(ptr->validateURL(std::string()));
@@ -845,14 +845,14 @@ NetConnection::call_method(const fn_call& fn)
 
 	if(asCallback) {
 		//boost::intrusive_ptr<as_object> intrusive_callback(asCallback);
-		log_aserror("calling enqueue with callback");
+		log_debug("calling enqueue with callback");
 		ptr->call_queue->enqueue(*buf, call_number_str, asCallback);
 		//? delete asCallback;
 	} else {
-		log_aserror("calling enqueue without callback");
+		log_debug("calling enqueue without callback");
 		ptr->call_queue->enqueue(*buf);
 	}
-	log_aserror("called enqueue");
+	log_debug("called enqueue");
 
 #if 0
 	
@@ -873,10 +873,10 @@ NetConnection::call_method(const fn_call& fn)
 	while(!stream->eof()) {
 		reply.reserve(count + 50000);
  		read_size = stream->read(reply.data() + count, 50000);
- 		log_aserror("stream->read() returned: %i", read_size);
+ 		log_debug("stream->read() returned: %i", read_size);
  		if(read_size > 0) { // currently readNonBlocking returns -1 on error
- 			if(read_size == 50000) {
- 				log_aserror("stream->read() said that it read 50000 characters... seems unlikely");
+ 			if(read_size == 50000) { // ?????
+ 				log_error("stream->read() said that it read 50000 characters... seems unlikely");
  			} else {
  				count += read_size;
  			}
@@ -892,12 +892,12 @@ NetConnection::call_method(const fn_call& fn)
  	}
 	
 
-	log_aserror(_("NetConnection.call(): response: "));
-	log_aserror(_(hexify(reply.data(), reply.size(), false).c_str()));
+	log_debug(_("NetConnection.call(): response: "));
+	log_debug("%s", hexify(reply.data(), reply.size(), false));
 
 	// parse server reply
 	if(reply.size() < 21) {
-		log_aserror(_("NetConnection.call(): response from server too short to be valid"));
+		log_error(_("NetConnection.call(): response from server too short to be valid"));
 		// TODO call onStatus callback
 	} else {
 		boost::uint8_t *b = reply.data();
@@ -914,7 +914,7 @@ NetConnection::call_method(const fn_call& fn)
 			si = readNetworkShort(b); b += 2;
 			if(si != 1) {
 				// TODO decide what to do in this case
-				log_aserror(_("NetConnection.call(): server sent back a weird number of bodies"));
+				log_error(_("NetConnection.call(): server sent back a weird number of bodies"));
 			} else {
 				// scan past response message (something like /1/onResult)
 				si = readNetworkShort(b); b += 2;
@@ -928,10 +928,10 @@ NetConnection::call_method(const fn_call& fn)
 				li = readNetworkLong(b); b += 4;
 				if(li != end - b) {
 					if(li < end - b) {
-						log_aserror(_("NetConnection.call(): server sent us a length that's less than the number of bytes it sent. Continuing anyway."));
+						log_error(_("NetConnection.call(): server sent us a length that's less than the number of bytes it sent. Continuing anyway."));
 					} else {
 						// note: potlatch (which works in the proprietary player) gets 0xffffffff here
-						log_aserror(_("NetConnection.call(): server sent us a length that's more than the number of bytes it sent. Continuing anyway."));
+						log_error(_("NetConnection.call(): server sent us a length that's more than the number of bytes it sent. Continuing anyway."));
 					}
 				}
 	
