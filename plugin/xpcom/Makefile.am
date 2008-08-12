@@ -57,7 +57,7 @@ SUFFIXES = idl xpt
 .idl.xpt:
 	$(XPIDL) -m typelib -v $(XPCOM_IDL_CFLAGS) $<
 
-EXT_DIR = "$(dir $(FIREFOX_PLUGINS))/extensions/{2b70f2b1-fc72-4734-bb81-4eb2a7713e49}"
+EXT_DIR = "`dirname $(FIREFOX_PLUGINS))/extensions/{2b70f2b1-fc72-4734-bb81-4eb2a7713e49}`"
 
 install-pkglib: $(pkglib_LTLIBRARIES)
 	@test -d "$(DESTDIR)/$(EXT_DIR)" || $(mkinstalldirs) "$(DESTDIR)/$(EXT_DIR)"
