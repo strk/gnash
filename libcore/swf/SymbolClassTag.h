@@ -47,9 +47,11 @@ public:
 		assert(tag == SYMBOLCLASS); //76
 
 		log_unimpl(_("%s tag parsed but not yet used"), "SYMBOLCLASS");
+		in.ensureBytes(2);
 		boost::uint16_t num_symbols = in.read_u16();
 		log_debug("There are %u symbols.",num_symbols);
 		for(unsigned int i = 0;i<num_symbols;i++){
+			in.ensureBytes(2);
 			boost::uint16_t character = in.read_u16();
 			std::string name;
 			in.read_string(name);
