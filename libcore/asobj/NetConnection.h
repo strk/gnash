@@ -155,6 +155,11 @@ public:
 	///
 	bool loadCompleted();
 
+protected:
+
+	/// Mark responders associated with remoting calls
+	void markReachableResources() const;
+
 private:
 	friend class AMFQueue;
 

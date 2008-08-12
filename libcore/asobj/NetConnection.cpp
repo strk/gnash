@@ -498,7 +498,10 @@ class AMFQueue {
 private:
 	NetConnection& _nc;
 	static const int NCCALLREPLYMAX=200000;
-	std::map<std::string, boost::intrusive_ptr<as_object> > callbacks;
+
+	typedef std::map<std::string, boost::intrusive_ptr<as_object> > CallbacksMap;
+	CallbacksMap callbacks;
+
 	SimpleBuffer postdata;
 	URL url;
 	boost::scoped_ptr<IOChannel> connection;
@@ -754,6 +757,14 @@ public:
 		return as_value();
 	};
 
+	void markReachableResources() const
+	{
+		for (CallbacksMap::const_iterator i=callbacks.begin(), e=callbacks.end(); i!=e; ++i)
+		{
+			i->second->setReachable();
+		}
+	}
+
 private:
 	void start_ticking() {
 
@@ -782,7 +793,7 @@ private:
 		callbacks.insert(std::pair<std::string, boost::intrusive_ptr<as_object> >(id, callback));
 	}
 	boost::intrusive_ptr<as_object> pop_callback(std::string id) {
-		std::map<std::string, boost::intrusive_ptr<as_object> >::iterator it = callbacks.find(id);
+		CallbacksMap::iterator it = callbacks.find(id);
 		if(it != callbacks.end()) {
 			boost::intrusive_ptr<as_object> callback = it->second;
 			//boost::intrusive_ptr<as_object> callback;
@@ -1035,6 +1046,13 @@ void netconnection_class_init(as_object& global)
 NetConnection::~NetConnection()
 {
 	delete call_queue;
+}
+
+void
+NetConnection::markReachableResources() const
+{
+	if ( call_queue ) call_queue->markReachableResources();
+	markAsObjectReachable();
 }
 
 
