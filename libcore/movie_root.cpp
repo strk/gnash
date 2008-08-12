@@ -207,6 +207,10 @@ movie_root::setRootMovie(movie_instance* movie)
 		boost::format fmt = boost::format(_("ActionLimits hit during setRootMovie: %s. Disable scripts ?")) % al.what();
 		handleActionLimitHit(fmt.str());
 	}
+    catch (ActionParserException& e)
+    {
+        log_error("ActionParserException thrown during setRootMovie: %s", e.what());
+    }
 
 	cleanupAndCollect();
 }

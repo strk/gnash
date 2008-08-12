@@ -47,9 +47,9 @@ public:
 
 	/// Read a DoAction block from the stream
 	//
-	void read(SWFStream* in)
+	void read(SWFStream& in)
 	{
-            m_buf.read(*in, in->get_tag_end_position());
+            m_buf.read(in, in.get_tag_end_position());
 	}
 
 	virtual void execute(sprite_instance* m, DisplayList& /* dlist */) const
@@ -63,7 +63,7 @@ public:
 	    return true;
 	}
 
-	static void doActionLoader(SWFStream* in, tag_type tag, movie_definition* m)
+	static void doActionLoader(SWFStream& in, tag_type tag, movie_definition* m)
 	{
 		DoActionTag* da = new DoActionTag(*m);
 		da->read(in);

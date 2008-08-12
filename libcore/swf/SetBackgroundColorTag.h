@@ -59,10 +59,10 @@ private:
 	void read(SWFStream& in)
 	{
 		// may throw ParserException
-		m_color.read_rgb(&in);
+		m_color.read_rgb(in);
 
 		IF_VERBOSE_PARSE (
-		log_parse(_("  SetBackgroundColor: %s"), m_color.toString().c_str());
+		log_parse(_("  SetBackgroundColor: %s"), m_color.toString());
 		);
 	}
 
@@ -96,14 +96,13 @@ public:
 	}
 
 	/// Set background color tag loader (SWF::SETBACKGROUNDCOLOR)
-	static void loader(SWFStream* in, tag_type tag, movie_definition* m)
+	static void loader(SWFStream& in, tag_type tag, movie_definition* m)
 	{
 		assert(tag == SWF::SETBACKGROUNDCOLOR); // 9
 		assert(m);
-		assert(in);
 
 		// this one may throw, we'll let caller catch it
-		SetBackgroundColorTag* t = new SetBackgroundColorTag(*in);
+		SetBackgroundColorTag* t = new SetBackgroundColorTag(in);
 		m->addControlTag(t); // takes ownership
 	}
 };

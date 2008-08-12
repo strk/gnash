@@ -28,7 +28,7 @@ namespace gnash {
 namespace SWF {
 
 void
-RemoveObjectTag::read(SWFStream* in, tag_type tag)
+RemoveObjectTag::read(SWFStream& in, tag_type tag)
 {
 	assert(tag == SWF::REMOVEOBJECT || tag == SWF::REMOVEOBJECT2);
 
@@ -37,12 +37,12 @@ RemoveObjectTag::read(SWFStream* in, tag_type tag)
 		// Older SWF's allow multiple objects at the same depth;
 		// this m_id disambiguates.  Later SWF's just use one
 		// object per depth.
-		in->ensureBytes(2);
-		m_id = in->read_u16();
+		in.ensureBytes(2);
+		m_id = in.read_u16();
 	}
 
-    in->ensureBytes(2);
-	m_depth = in->read_u16() + character::staticDepthOffset;
+    in.ensureBytes(2);
+	m_depth = in.read_u16() + character::staticDepthOffset;
 }
 
 void
@@ -54,7 +54,7 @@ RemoveObjectTag::execute(sprite_instance* m, DisplayList& dlist) const
 
 /* public static */
 void
-RemoveObjectTag::loader(SWFStream* in, tag_type tag, movie_definition* m)
+RemoveObjectTag::loader(SWFStream& in, tag_type tag, movie_definition* m)
 {
     assert(tag == SWF::REMOVEOBJECT || tag == SWF::REMOVEOBJECT2);
 

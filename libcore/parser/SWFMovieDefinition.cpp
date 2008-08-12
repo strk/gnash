@@ -155,21 +155,21 @@ MovieLoader::start()
 //
 
 /// Log the contents of the current tag, in hex to the output strream
-static void	dumpTagBytes(SWFStream* in, std::ostream& os)
+static void	dumpTagBytes(SWFStream& in, std::ostream& os)
 {
     const unsigned int rowlength = 16;
     os << std::endl;
     
     // This decremented until we reach the end of the stream.
-    unsigned int toRead = in->get_tag_end_position() - in->tell();
-    in->ensureBytes(toRead);
+    unsigned int toRead = in.get_tag_end_position() - in.tell();
+    in.ensureBytes(toRead);
 
     unsigned char buf[rowlength];    
     while (toRead)
     {
         // Read in max row length or remainder of stream.
         const unsigned int thisRow = std::min<unsigned int>(toRead, rowlength);
-        const unsigned int got = in->read(reinterpret_cast<char*>(&buf), thisRow);
+        const unsigned int got = in.read(reinterpret_cast<char*>(&buf), thisRow);
         
         // Check that we read all the bytes we expected.
         if (got < thisRow)
@@ -233,7 +233,7 @@ SWFMovieDefinition::~SWFMovieDefinition()
 
 	// It's supposed to be cleaned up in read()
 	// TODO: join with loader thread instead ?
-	//assert(m_jpeg_in.get() == NULL);
+	//assert(m_jpeg_in->get() == NULL);
 }
 
 void SWFMovieDefinition::add_character(int character_id, character_def* c)
@@ -389,7 +389,7 @@ SWFMovieDefinition::readHeader(std::auto_ptr<IOChannel> in, const std::string& u
 
 	_str.reset(new SWFStream(_in.get()));
 
-	m_frame_size.read(_str.get());
+	m_frame_size.read(*_str);
 	// If the rect is malformed, rect::read would already 
 	// print an error. We check again here just to give 
 	// the error are better context.
@@ -679,7 +679,7 @@ parse_tag:
                 {
 			// call the tag loader.  The tag loader should add
 			// characters or tags to the movie data structure.
-			(*lf)(&str, tag_type, this);
+			(*lf)(str, tag_type, this);
 		}
 		else
 		{
@@ -687,7 +687,7 @@ parse_tag:
             log_error(_("*** no tag loader for type %d (movie)"), tag_type);
             IF_VERBOSE_PARSE(
                 std::ostringstream ss;
-                dumpTagBytes(&str, ss);
+                dumpTagBytes(str, ss);
                 log_error("tag dump follows: %s", ss.str());
             );
 		}

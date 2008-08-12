@@ -45,7 +45,7 @@ StreamSoundBlockTag::execute(sprite_instance* m, DisplayList& /*dlist*/) const
 
 /* public static */
 void
-StreamSoundBlockTag::loader(SWFStream* in, tag_type tag, movie_definition* m)
+StreamSoundBlockTag::loader(SWFStream& in, tag_type tag, movie_definition* m)
 {
     assert(tag == SWF::SOUNDSTREAMBLOCK); // 19
 
@@ -80,14 +80,14 @@ StreamSoundBlockTag::loader(SWFStream* in, tag_type tag, movie_definition* m)
     // MP3 format blocks have additional info
     if (format == media::AUDIO_CODEC_MP3)
     {
-        in->ensureBytes(4);
+        in.ensureBytes(4);
 	// FIXME: use these values !
-        unsigned int samplesCount = in->read_u16(); UNUSED(samplesCount);
-        unsigned int seekSamples = in->read_u16();
+        unsigned int samplesCount = in.read_u16(); UNUSED(samplesCount);
+        unsigned int seekSamples = in.read_u16();
 	LOG_ONCE ( if ( seekSamples ) log_unimpl("MP3 soundblock seek samples") );
     }
 
-    const unsigned int dataLength = in->get_tag_end_position() - in->tell();
+    const unsigned int dataLength = in.get_tag_end_position() - in.tell();
     if ( ! dataLength )
     {
         IF_VERBOSE_MALFORMED_SWF(
@@ -97,7 +97,7 @@ StreamSoundBlockTag::loader(SWFStream* in, tag_type tag, movie_definition* m)
     }
 
     unsigned char *data = new unsigned char[dataLength];
-    const unsigned int bytesRead = in->read(reinterpret_cast<char*>(data), dataLength);
+    const unsigned int bytesRead = in.read(reinterpret_cast<char*>(data), dataLength);
     
     if (bytesRead < dataLength)
     {

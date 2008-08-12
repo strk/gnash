@@ -47,7 +47,7 @@ video_stream_definition::~video_stream_definition()
 
 
 void
-video_stream_definition::readDefineVideoStream(SWFStream* in, SWF::tag_type tag, movie_definition* /*m*/)
+video_stream_definition::readDefineVideoStream(SWFStream& in, SWF::tag_type tag, movie_definition* /*m*/)
 {
 	// Character ID has been read already, and was loaded in the constructor
 
@@ -57,21 +57,21 @@ video_stream_definition::readDefineVideoStream(SWFStream* in, SWF::tag_type tag,
 	//m_start_frame = m->get_loading_frame();
 
 	// numFrames:2 width:2 height:2 flags:1
-	in->ensureBytes(8);
+	in.ensureBytes(8);
 
-	m_num_frames = in->read_u16();
+	m_num_frames = in.read_u16();
 
-	_width = in->read_u16();
-	_height = in->read_u16();
+	_width = in.read_u16();
+	_height = in.read_u16();
 
 	m_bound.set_to_point(0, 0);
 	m_bound.expand_to_point(PIXELS_TO_TWIPS(_width), PIXELS_TO_TWIPS(_height));
 
-	m_reserved_flags = in->read_uint(5);
-	m_deblocking_flags = in->read_uint(2);
-	m_smoothing_flags = in->read_bit(); 
+	m_reserved_flags = in.read_uint(5);
+	m_deblocking_flags = in.read_uint(2);
+	m_smoothing_flags = in.read_bit(); 
 
-	m_codec_id = static_cast<media::videoCodecType>(in->read_u8());
+	m_codec_id = static_cast<media::videoCodecType>(in.read_u8());
 
 	if (!m_codec_id) {
 		IF_VERBOSE_PARSE(
@@ -87,7 +87,7 @@ video_stream_definition::readDefineVideoStream(SWFStream* in, SWF::tag_type tag,
 }
 
 void
-video_stream_definition::readDefineVideoFrame(SWFStream* in, SWF::tag_type tag, movie_definition* /*m*/)
+video_stream_definition::readDefineVideoFrame(SWFStream& in, SWF::tag_type tag, movie_definition* /*m*/)
 {
 	// Character ID has been read already, and was loaded in the constructor
 
@@ -95,14 +95,14 @@ video_stream_definition::readDefineVideoFrame(SWFStream* in, SWF::tag_type tag, 
 
 	// TODO: skip if there's no MediaHandler registered ?
 
-	in->ensureBytes(2);
-	unsigned int frameNum = in->read_u16(); 
+	in.ensureBytes(2);
+	unsigned int frameNum = in.read_u16(); 
 
-	const unsigned int dataLength = in->get_tag_end_position() - in->tell();
+	const unsigned int dataLength = in.get_tag_end_position() - in.tell();
 	
 	boost::uint8_t* buffer = new uint8_t[dataLength + 8]; // FIXME: catch bad_alloc
 
-	const size_t bytesRead = in->read(reinterpret_cast<char*>(buffer), dataLength);
+	const size_t bytesRead = in.read(reinterpret_cast<char*>(buffer), dataLength);
 
     if (bytesRead < dataLength)
     {

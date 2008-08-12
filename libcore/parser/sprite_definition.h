@@ -236,7 +236,7 @@ public:
 
 private:
 
-	void read(SWFStream* in);
+	void read(SWFStream& in);
 
 	/// Tags loader table.
 	//
