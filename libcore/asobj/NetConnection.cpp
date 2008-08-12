@@ -778,14 +778,15 @@ private:
 		ticker = _nc.getVM().getRoot().add_interval_timer(timer, true);
 	}
 	void push_amf(const SimpleBuffer &amf) {
-		log_debug("pushing amf");
+		GNASH_REPORT_FUNCTION;
+
 		postdata.append(amf.data(), amf.size());
 		queued_count++;
-		log_debug("pushed amf");
+
 		start_ticking();
 	}
 	void stop_ticking() {
-		if(ticker) return;
+		if(!ticker) return;
 		_nc.getVM().getRoot().clear_interval_timer(ticker);
 		ticker=0;
 	}
