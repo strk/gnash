@@ -1168,10 +1168,13 @@ Machine::execute()
 	case SWF::ABC_ACTION_CALLPROPLEX:
 	case SWF::ABC_ACTION_CALLPROPVOID:
 	{
-		bool lex_only = (opcode == SWF::ABC_ACTION_CALLPROPLEX);
+//		bool lex_only = (opcode == SWF::ABC_ACTION_CALLPROPLEX);
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
 		boost::uint32_t argc = mStream->read_V32();
-		int shift = completeName(a, argc);
+		std::vector<as_value> args = get_args(argc);
+		as_object object = pop_stack().to_object();
+		object.callMethod(a.getGlobalName(),args[0]);
+/*		int shift = completeName(a, argc);
 		ENSURE_OBJECT(mStack.top(shift + argc));
 		as_object *obj = mStack.top(argc + shift).to_object().get();
 		Property *b = obj->findProperty(a.getABCName(), 
@@ -1203,7 +1206,7 @@ Machine::execute()
 		if (opcode == SWF::ABC_ACTION_CALLPROPVOID)
 			pushCall(func, obj, mIgnoreReturn, argc, -shift - 1);
 		else
-			pushCall(func, obj, mStack.top(argc + shift), argc, -shift);
+			pushCall(func, obj, mStack.top(argc + shift), argc, -shift);*/
 		break;
 	}
 /// 0x47 ABC_ACTION_RETURNVOID
