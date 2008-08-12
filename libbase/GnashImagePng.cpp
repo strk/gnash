@@ -175,7 +175,7 @@ PngImageOutput::writeImageRGBA(unsigned char* rgbaData)
 
     boost::scoped_array<png_bytep> rows(new png_bytep[_height]);
 
-    // RGB
+    // RGBA
     const size_t components = 4;
 
     for (size_t y = 0; y < _height; ++y)
