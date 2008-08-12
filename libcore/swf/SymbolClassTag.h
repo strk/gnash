@@ -38,10 +38,25 @@ class SymbolClassTag : public ControlTag
 {
 public:
 
-	SymbolClassTag()
+	SymbolClassTag(std::string name):rootClass(name)
 
 	{}
 
+	virtual void execute(sprite_instance* m, DisplayList& /* dlist */) const
+	{
+		VM& vm = VM::get();
+		Machine *mach = vm.getMachine();
+
+		mach->instantiateClass(rootClass);
+		log_debug("Executing machine...");
+		mach->execute();
+	}
+
+	// Tell the caller that we are an action tag.
+	virtual bool is_action_tag() const
+	{
+	    return true;
+	}
 	static void loader(SWFStream& in,tag_type tag, movie_definition* m)
 	{
 		assert(tag == SYMBOLCLASS); //76
@@ -56,9 +71,15 @@ public:
 			std::string name;
 			in.read_string(name);
 			log_debug("Symbol %u name=%s tag=%u",i,name,character);
+			if(character == 0){
+				SymbolClassTag *symbolClassTag = new SymbolClassTag(name);
+				m->addControlTag(symbolClassTag);
+			}
 		}
 	}
-	
+private:
+
+std::string rootClass;
 };
 
 } // namespace gnash::SWF
