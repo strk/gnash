@@ -1645,24 +1645,6 @@ abc_loader(SWFStream& in, tag_type tag, movie_definition* /*m*/)
 }
 
 void
-symbol_class_loader(SWFStream& in, tag_type tag, movie_definition* /*m*/){
-
-	assert(tag == SYMBOLCLASS); //76
-
-	log_unimpl(_("%s tag parsed but not yet used"), "SYMBOLCLASS");
-	boost::uint16_t num_symbols = in.read_u16();
-	log_debug("There are %u symbols.",num_symbols);
-	for(unsigned int i = 0;i<num_symbols;i++){
-		//Skip the Tag.  I am not sure what this.
-		boost::uint16_t character = in.read_u16();
-		std::string name;
-		in.read_string(name);
-		log_debug("Symbol %u name=%s tag=%u",i,name,character);
-	}
-}
-
-
-void
 define_scene_frame_label_loader(SWFStream& in, tag_type tag, movie_definition* /*m*/)
 {
     assert(tag == SWF::DEFINESCENEANDFRAMELABELDATA); //86

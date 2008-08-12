@@ -53,6 +53,7 @@
 #include "SetBackgroundColorTag.h"
 #include "StartSoundTag.h"
 #include "StreamSoundBlockTag.h"
+#include "SymbolClassTag.h"
 #include "swf/tag_loaders.h" // for all tag loaders..
 #include "sound_handler.h" // for get_sound_handler
 #ifdef GNASH_USE_GC
@@ -239,7 +240,7 @@ static void ensure_loaders_registered()
 
     register_tag_loader(SWF::CSMTEXTSETTINGS, fixme_loader); // 74
     register_tag_loader(SWF::DEFINEFONT3, define_font_loader); // 75
-    register_tag_loader(SWF::SYMBOLCLASS, symbol_class_loader); // 76 
+    register_tag_loader(SWF::SYMBOLCLASS, SymbolClassTag::loader); // 76 
     register_tag_loader(SWF::METADATA, metadata_loader); // 77
     register_tag_loader(SWF::DEFINESCALINGGRID, fixme_loader); // 78
     register_tag_loader(SWF::DOABCDEFINE, DoABCTag::doABCLoader); // 82 -- AS3 codeblock.
