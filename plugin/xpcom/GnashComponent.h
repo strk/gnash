@@ -22,7 +22,8 @@
 #include "nsStringAPI.h"
 
 #define GNASH_COMPONENT_CONTRACTID "@getgnash.org/updates/GnashComponent;1"
-#define GNASH_COMPONENT_CID  {0x9ff0fae7, 0x8ffa, 0x4489, { 0xb3, 0x3d, 0xb7, 0xe8, 0x17, 0xb1, 0x1b, 0xf6 }}
+// 2b70f2b1-fc72-4734-bb81-4eb2a7713e49
+#define GNASH_COMPONENT_CID  {0x2b70f2b1, 0xfc72, 0xbb81, { 0x4e, 0xb2, 0xa7, 0x71, 0x3e, 0x49 }}
 
 class GnashComponent : public iGnashComponent
 {

@@ -274,6 +274,10 @@ if XPCOM
 	@echo "	XPCOM_LIBS is $(XPCOM_LIBS)"
 	@echo "	XPIDL path is $(XPIDL)"
 endif
+if NSPR
+	@echo "	NSPR_CFLAGS is $(NSPR_CFLAGS)"
+	@echo "	NSPR_LIBS is $(NSPR_LIBS)"
+endif
 	@echo ""
 	@echo "A blank value for CFLAGS means the header is installed in the"
 	@echo "default system header location. All the LIBS should have a"

@@ -21,6 +21,8 @@ IDL_OUTPUT = \
 	iGnashComponent.xpt \
 	iGnashComponent.h
 
+EXTRA_DIST = iGnashComponent.idl
+
 INCLUDES = \
         -DLOCALEDIR=\"$(localedir)\" \
         $(XPCOM_CFLAGS)
@@ -39,7 +41,8 @@ BUILT_SOURCES = $(IDL_OUTPUT)
 pkglib_LTLIBRARIES = libgnashcomponent.la
 libgnashcomponent_la_SOURCES = GnashComponent.cpp GnashComponentModule.cpp
 libgnashcomponent_la_CFLAGS = -DXPCOM_GLUE -fno-rtti -fno-exceptions
-libgnashcomponent_la_LDFLAGS = -avoid-version -module
+libgnashcomponent_la_LDFLAGS = -avoid-version -module -no-undefined \
+	$(XPCOM_LIBS)
 
 noinst_HEADERS = GnashComponent.h
 
@@ -53,5 +56,14 @@ SUFFIXES = idl xpt
 	$(XPIDL) -m header  -v $(XPCOM_IDL_CFLAGS) $<
 .idl.xpt:
 	$(XPIDL) -m typelib -v $(XPCOM_IDL_CFLAGS) $<
+
+EXT_DIR = "$(dir $(FIREFOX_PLUGINS))/extensions/{2b70f2b1-fc72-4734-bb81-4eb2a7713e49}"
+
+install-pkglib: $(pkglib_LTLIBRARIES)
+	@test -d "$(DESTDIR)/$(EXT_DIR)" || $(mkinstalldirs) "$(DESTDIR)/$(EXT_DIR)"
+	@if test -d .libs; then \
+	  cp -f .libs/libgnashcomponent.so* $(DESTDIR)$(EXT_DIR)/libgnashcomponent.so; \
+	  cp -f iGnashComponent.xpt $(DESTDIR)$(EXT_DIR)/iGnashComponent.xpt; \
+	fi
 
 force:

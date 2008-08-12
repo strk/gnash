@@ -5,7 +5,7 @@
 
 	<Description about="urn:mozilla:install-manifest">
 	
-	<em:id>gnash-dev@gnashdev.org</em:id>
+	<em:id>{2b70f2b1-fc72-4734-bb81-4eb2a7713e49}</em:id>
 	<em:version>0.8.3</em:version>
 	
 	<!-- Target Application this extension can install into, 
@@ -60,7 +60,7 @@
 	<em:name>Gnash</em:name>
 	<em:description>The GNU Flash player</em:description>
 	<em:creator>Gnash Team</em:creator>
-	<em:homepageURL>http://adblockplus.org/</em:homepageURL>
+	<em:homepageURL>http://www.gnashdev.org/</em:homepageURL>
 	
 	<!-- Front End Integration Hooks (used by Extension Manager)-->
 <!--    <em:updateURL>"http://www.getgnash.org/updates/update.rdf"</em:updateURL> -->

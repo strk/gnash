@@ -1266,8 +1266,17 @@ AC_ARG_WITH(plugins-install,
 
 
 GNASH_PATH_FIREFOX
+dnl XPCOM and NSPR can be used in the plugin for better integration
+dnl within Firefox.
 GNASH_PATH_XPCOM
-AM_CONDITIONAL(XPCOM, test x$xpcom = xyes)
+GNASH_PATH_NSPR
+dnl If we don't have both XPCOM and NSPR, we can't build either.
+if test x$has_xpcom = xno -o x$has_nspr = xno; then
+  has_xpcom=no
+  has_nspr=no
+fi
+AM_CONDITIONAL(XPCOM, test x$has_xpcom = xyes)
+AM_CONDITIONAL(NSPR, test x$has_nspr = xyes)
 
 dnl -----------------------------------------------------------------
 dnl END OF PLUGIN RELATED STUFF
@@ -2993,14 +3002,19 @@ if test x"${build_alp}" = xyes; then
 fi
 
 dnl XPCOM support for Mozilla/Firefox
-if test x"$npapi" = x"yes" -a x"$xpcom" = x"yes"; then
+if test x"$npapi" = x"yes" -a x"$has_xpcom" = x"yes"; then
     echo "        XPCOM flags are: $XPCOM_CFLAGS"
     echo "        XPCOM libs are: $XPCOM_LIBS"
     echo "        XPIDL path is: $XPIDL"
 else
     echo "        ERROR: No XPCOM development package is installed." >&3
 fi
-
+if test x"$npapi" = x"yes" -a x"$has_nspr" = x"yes"; then
+    echo "        NSPR flags are: $NSPR_CFLAGS"
+    echo "        NSPR libs are: $NSPR_LIBS"
+else
+    echo "        ERROR: No NSPR development package is installed." >&3
+fi
 
 if test x$cross_compiling = xyes; then
   AC_MSG_NOTICE([This build is setup for cross compiling])

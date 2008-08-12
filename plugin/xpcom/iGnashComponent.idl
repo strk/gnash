@@ -17,10 +17,10 @@
 //
 #include "nsISupports.idl"
 
-[scriptable, uuid(9ff0fae7-8ffa-4489-b33d-b7e817b11bf6)]
+[scriptable, uuid(2b70f2b1-fc72-4734-bb81-4eb2a7713e49)]
 interface iGnashComponent : nsISupports
 {
-  attribute AString name;
+  //  attribute AString name;
   long Add(in long a, in long b);
 };
 

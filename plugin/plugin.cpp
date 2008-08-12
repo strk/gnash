@@ -64,6 +64,16 @@
 #include <iostream>
 #include <sstream>
 
+// Mozilla XPCOM headers
+// #include "nsXPCOM.h"
+// #include "nsCOMPtr.h"
+// #include "nsIProperties.h"
+
+// #include "xpcom/nsDirectoryService.h"
+// #include "nsDirectoryServiceDefs.h"
+// #include "xpcom/nsLocalFile.h"
+// #include "nsIServiceManager.h"
+
 // Mozilla SDK headers
 #include "prinit.h"
 #include "prlock.h"
@@ -81,6 +91,7 @@ NPBool plugInitialized = FALSE;
 static bool waitforgdb = false;
 
 static const char* getPluginDescription();
+//static nsresult getTempDir(nsIFile **);
 
 void
 PR_CALLBACK Destructor(void * /* data */)
@@ -1072,6 +1083,48 @@ static const char* getPluginDescription()
 	}
 	return desc;
 }
+
+// /**
+//   * Get the location of the system's "temp" directory.
+//   */
+// static nsresult getTempDir(nsIFile **aResult)
+// {
+//     nsresult rv;
+    
+//     nsCOMPtr<nsIServiceManager> svcMgr;
+//     rv = NS_GetServiceManager(getter_AddRefs(svcMgr));
+//     if (NS_FAILED(rv))
+// 	return rv;
+// #if 0
+//     nsCOMPtr<nsIProperties> directory;
+//     rv = svcMgr->GetServiceByContractID("@mozilla.org/file/directory_service;1",
+// 					NS_GET_IID(nsIProperties),
+// 					getter_AddRefs(directory));
+//     if (NS_FAILED(rv))
+// 	return rv;
+    
+//     rv = directory->Get(NS_OS_TEMP_DIR, NS_GET_IID(nsIFile), aResult);
+// #endif
+
+// #if 0
+//     nsCOMPtr<nsIProperties> dirService;
+//     rv = nsDirectoryService::Create(nsnull, 
+//                                     NS_GET_IID(nsIProperties), 
+//                                     getter_AddRefs(dirService)); 
+//     if (dirService) {
+// 	nsCOMPtr <nsILocalFile> aLocalFile;
+// 	dirService->Get(NS_XPCOM_INIT_CURRENT_PROCESS_DIR, NS_GET_IID(nsILocalFile), getter_AddRefs(aLocalFile));
+// 	if (aLocalFile) {
+// 	    *aFile = aLocalFile;
+// 	    NS_ADDREF(*aFile);
+// 	    return NS_OK;
+// 	}
+//     }
+//     nsLocalFile* localFile = new nsLocalFile;
+// #endif
+
+//     return rv;
+// }
 
 // Local Variables:
 // mode: C++
