@@ -94,6 +94,7 @@ static string_table::svt preload_names[] =
 	string_table::svt( "onKillFocus", NSV::PROP_ON_KILL_FOCUS ),
 	string_table::svt( "onSelect", NSV::PROP_ON_SELECT ),
 	string_table::svt( "onStatus", NSV::PROP_ON_STATUS ),
+	string_table::svt( "onResult", NSV::PROP_ON_RESULT ),
 	string_table::svt( "onMetaData", NSV::PROP_ON_META_DATA ),
 	string_table::svt( "onSockClose", NSV::PROP_ON_SOCK_CLOSE ),
 	string_table::svt( "onSockConnect", NSV::PROP_ON_SOCK_CONNECT ),
