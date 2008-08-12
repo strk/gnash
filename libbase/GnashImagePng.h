@@ -106,6 +106,8 @@ public:
 	~PngImageOutput();
 
 	void writeImageRGB(unsigned char* rgbData);
+	
+	void writeImageRGBA(unsigned char* rgbaData);
 
 	DSOEXPORT static std::auto_ptr<ImageOutput> create(boost::shared_ptr<IOChannel> out, size_t width, size_t height, int quality);
 	
