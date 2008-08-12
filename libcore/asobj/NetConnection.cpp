@@ -469,23 +469,22 @@ as_value* amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, int inType = 
 }
 
 
-// class AMFQueue
+/// Queue of remoting calls 
 //
-// This class in made to handle data and do defered processing for
-// NetConnection::call();
-//
-// Usage:
-//
-// pass a URL to the constructor
-//
-// call enqueue with a SimpleBuffer containing an encoded AMF call. If action
-// script specified a callback function, use the optional parameters to specify
-// the identifier (which must be unique) and the callback object as an as_value
-
-#define NCCALLREPLYMAX 200000
-
+/// This class in made to handle data and do defered processing for
+/// NetConnection::call()
+///
+/// Usage:
+///
+/// pass a URL to the constructor
+///
+/// call enqueue with a SimpleBuffer containing an encoded AMF call. If action
+/// script specified a callback function, use the optional parameters to specify
+/// the identifier (which must be unique) and the callback object as an as_value
+///
 class AMFQueue : public as_object {
 private:
+	static const int NCCALLREPLYMAX=200000;
 	std::map<std::string, boost::intrusive_ptr<as_object> > callbacks;
 	SimpleBuffer postdata;
 	URL url;
@@ -747,7 +746,6 @@ NetConnection::call_method(const fn_call& fn)
 {
 	static int call_number = 0;
 	boost::intrusive_ptr<NetConnection> ptr = ensureType<NetConnection>(fn.this_ptr); 
-	UNUSED(ptr);
 
 	if (fn.nargs < 1)
 	{
