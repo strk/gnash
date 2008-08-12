@@ -68,11 +68,6 @@ NetConnection::NetConnection()
 }
 
 
-NetConnection::~NetConnection()
-{
-}
-
-
 /*public*/
 bool NetConnection::openConnection(const std::string& url)
 {
@@ -497,8 +492,9 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 /// script specified a callback function, use the optional parameters to specify
 /// the identifier (which must be unique) and the callback object as an as_value
 ///
-class AMFQueue : public as_object {
+class AMFQueue {
 private:
+	NetConnection& _nc;
 	static const int NCCALLREPLYMAX=200000;
 	std::map<std::string, boost::intrusive_ptr<as_object> > callbacks;
 	SimpleBuffer postdata;
@@ -511,8 +507,9 @@ private:
 	uint8_t am_ticking;
 	unsigned int ticker;
 public:
-	AMFQueue(URL url)
+	AMFQueue(NetConnection& nc, URL url)
 		:
+		_nc(nc),
 		postdata(),
 		url(url),
 		connection(0),
@@ -710,10 +707,12 @@ public:
 		}
 	};
 
-	static as_value amfqueue_tick_wrapper(const fn_call& fn) {
-        	   boost::intrusive_ptr<AMFQueue> ptr = ensureType<AMFQueue>(fn.this_ptr);
-        	   ptr->tick();
-        	   return as_value();
+	static as_value amfqueue_tick_wrapper(const fn_call& fn)
+	{
+		boost::intrusive_ptr<NetConnection> ptr = ensureType<NetConnection>(fn.this_ptr);
+		// FIXME check if it's possible for the URL of a NetConnection to change between call()s
+		ptr->call_queue->tick();
+		return as_value();
 	};
 
 private:
@@ -726,8 +725,8 @@ private:
 			new builtin_function(&AMFQueue::amfqueue_tick_wrapper);
 		std::auto_ptr<Timer> timer(new Timer);
 		unsigned long delayMS = 500; // FIXME crank up to 50 or so
-		timer->setInterval(*ticker_as, delayMS, this);
-		ticker = getVM().getRoot().add_interval_timer(timer, true);
+		timer->setInterval(*ticker_as, delayMS, &_nc);
+		ticker = _nc.getVM().getRoot().add_interval_timer(timer, true);
 
 		am_ticking = 1;
 	}
@@ -742,7 +741,7 @@ private:
 		if(!am_ticking) {
 			return;
 		}
-		getVM().getRoot().clear_interval_timer(ticker);
+		_nc.getVM().getRoot().clear_interval_timer(ticker);
 		am_ticking = 0;
 	}
 	void push_callback(std::string id, boost::intrusive_ptr<as_object> callback) {
@@ -861,8 +860,7 @@ NetConnection::call_method(const fn_call& fn)
 
 	// FIXME check if it's possible for the URL of a NetConnection to change between call()s
 	if(ptr->call_queue == 0) {
-		ptr->call_queue = new AMFQueue(url);
-		// FIXME this is a memory leak
+		ptr->call_queue = new AMFQueue(*ptr, url);
 	}
 
 	if(asCallback) {
@@ -1092,6 +1090,13 @@ void netconnection_class_init(as_object& global)
 {
 	NetConnection::registerConstructor(global);
 }
+
+// here to have AMFQueue definition available
+NetConnection::~NetConnection()
+{
+	delete call_queue;
+}
+
 
 
 } // end of gnash namespace
