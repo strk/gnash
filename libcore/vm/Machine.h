@@ -207,6 +207,8 @@ public:
 
 	void executeCodeblock(CodeStream* stream);
 
+	void instantiateClass(std::string className);
+
 	Machine(string_table &ST, ClassHierarchy *CH);
 
 private:

@@ -2632,6 +2632,12 @@ void Machine::executeCodeblock(CodeStream* stream){
 	execute();
 }
 
+void Machine::instantiateClass(std::string className){
+
+	asClass* theClass = mPoolObject->locateClass(className);
+	executeCodeblock(theClass->getConstructor()->getBody());
+}
+
 Machine::Machine(string_table &ST, ClassHierarchy *CH):mST(),mFrame()
 {
 	mCH = CH;
