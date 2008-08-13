@@ -48,7 +48,6 @@ public:
 		Machine *mach = vm.getMachine();
 
 		mach->instantiateClass(rootClass);
-		log_debug("Executing machine...");
 	}
 
 	// Tell the caller that we are an action tag.
