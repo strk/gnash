@@ -28,9 +28,9 @@ namespace image
 	//
 
 	/// Create an image taking ownership of the given buffer, supposedly of height*pitch bytes
-	image_base::image_base(boost::uint8_t* data, int width, int height, int pitch, id_image type)
+	image_base::image_base(boost::uint8_t* data, int width, int height, int pitch, ImageType type)
 		:
-		m_type(type),
+		_type(type),
 		m_size(height*pitch),
 		m_width(width),
 		m_height(height),
@@ -40,9 +40,9 @@ namespace image
 	}
 
 	/// Create an image allocating a buffer of height*pitch bytes
-	image_base::image_base(int width, int height, int pitch, id_image type)
+	image_base::image_base(int width, int height, int pitch, ImageType type)
 		:
-		m_type(type),
+		_type(type),
 		m_size(height*pitch),
 		m_width(width),
 		m_height(height),
@@ -61,7 +61,7 @@ namespace image
 	{
 		assert(from.m_pitch == m_pitch);
 		assert(m_size <= from.m_size);
-		assert(m_type == from.m_type);
+		assert(_type == from._type);
 		std::memcpy(m_data.get(), const_cast<image_base&>(from).data(), m_size);
 	}
 
@@ -158,29 +158,6 @@ namespace image
 
 	alpha::~alpha()
 	{
-	}
-
-
-	bool	alpha::operator==(const alpha& a) const
-	// Bitwise content comparison.
-	{
-		if (m_width != a.m_width
-		    || m_height != a.m_height)
-		{
-			return false;
-		}
-
-		for (int j = 0, n = m_height; j < n; j++)
-		{
-			if (memcmp(scanline(j), a.scanline(j), m_width))
-			{
-				// Mismatch.
-				return false;
-			}
-		}
-
-		// Images are identical.
-		return true;
 	}
 
 	//
