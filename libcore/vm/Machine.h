@@ -253,14 +253,15 @@ private:
 	}
 
 	void push_stack(as_value object){
-		LOG_DEBUG_AVM("Pushing value onto stack.");
+		LOG_DEBUG_AVM("Pushing value %s onto stack.",object.toDebugString());
 		mStack.push(object);
 		LOG_DEBUG_AVM("There are now %u items in the stack",mStack.size());
 	}
 
 	as_value pop_stack(){
-		LOG_DEBUG_AVM("Poping value off the stack.  There will be %u items in the stack",mStack.size()-1);
-		return mStack.pop();
+		as_value value = mStack.pop();
+		LOG_DEBUG_AVM("Poping value %s off the stack.  There are now %u items in the stack",value.toDebugString(),mStack.size());
+		return value;
 	}
 
 	void push_scope_stack(as_value object){
