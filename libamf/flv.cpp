@@ -93,13 +93,13 @@ Flv::decodeHeader(amf::Buffer *buf)
 
     // test the magic number
     if (memcmp(_header.sig, "FLV", 3) != 0) {
-	log_parse("Bad magic number for FLV file!");
+	log_error("Bad magic number for FLV file!");
 	return 0;
     }
 
     // Make sure the version is legit, it should alwys be 1
     if (_header.version != 0x1) {
-	log_parse("Bad version in FLV header! %d", _header.version);
+	log_error("Bad version in FLV header! %d", _header.version);
 		  return 0;
     }
 
@@ -113,15 +113,15 @@ Flv::decodeHeader(amf::Buffer *buf)
     // Be lazy, as head_size is an array of 4 bytes, and not an integer in the data
     // structure. This is to get around possible padding done to the data structure
     // done by some compilers.
-    boost::uint32_t *size = reinterpret_cast<boost::uint32_t *>(_header.head_size);
+    boost::uint32_t size = *(reinterpret_cast<boost::uint32_t *>(_header.head_size));
 
     // The header size is big endian
-    *size = ntohl(*size);
+    size = ntohl(size);
     
     // The header size is always 9, guess it could change some day in the far future, so
     // we should use it.
-    if (*size != 0x9) {
-	log_parse("Bad header size in FLV header! %d", _header.head_size);
+    if (size != 0x9) {
+	log_error("Bad header size in FLV header! %d", _header.head_size);
 		  return 0;
     }
     
@@ -284,9 +284,7 @@ Flv::convert24(boost::uint8_t *num)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::uint32_t bodysize = 0;
-    // FIXME: I bet thi sis endian dependant
-    memcpy((char *)(&bodysize) + 1, num, 3);
-//                swapBytes(&bodysize, 3);
+    memcpy((char *)(&bodysize), num, 4);
     bodysize = ntohl(bodysize);
 }
 
