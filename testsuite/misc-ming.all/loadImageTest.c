@@ -125,13 +125,18 @@ main(int argc, char** argv)
 	SWFMovieClip dejagnuclip;
 	SWFDisplayItem it;
 
-	char url_png[256];
-    char url_gif[256];
-    char url_igif[256];
+	char url_png[512];
+    char url_indexpng[512];
+    char url_greypng[512];
+    char url_gif[512];
+    char url_igif[512];
 
     char png_action[256];
+    char indexpng_action[256];
+    char greypng_action[256];
     char gif_action[256];
     char igif_action[256];
+
 
 	/*********************************************
 	 *
@@ -147,6 +152,8 @@ main(int argc, char** argv)
 	}
 
 	sprintf(url_png, "%s/png.png", mediadir);
+	sprintf(url_indexpng, "%s/indexed.png", mediadir);
+	sprintf(url_greypng, "%s/greyscale.png", mediadir);
 	sprintf(url_gif, "%s/gif.gif", mediadir);
 	sprintf(url_igif, "%s/gif-interlaced.gif", mediadir);
 
@@ -181,8 +188,14 @@ main(int argc, char** argv)
     sprintf(png_action, "_root.window.loadMovie(\"%s\");", url_png);
     add_button(mo, 50, 100, "Load PNG", newSWFAction(png_action));
 
+    sprintf(indexpng_action, "_root.window.loadMovie(\"%s\");", url_indexpng);
+    add_button(mo, 50, 125, "Load indexed PNG", newSWFAction(indexpng_action));
+
+    sprintf(greypng_action, "_root.window.loadMovie(\"%s\");", url_greypng);
+    add_button(mo, 50, 150, "Load greyscale PNG", newSWFAction(greypng_action));
+
     sprintf(gif_action, "_root.window.loadMovie(\"%s\");", url_gif);
-    add_button(mo, 50, 150, "Load GIF", newSWFAction(gif_action));
+    add_button(mo, 50, 175, "Load GIF", newSWFAction(gif_action));
 
     sprintf(igif_action, "_root.window.loadMovie(\"%s\");", url_igif);
     add_button(mo, 50, 200, "Load interlaced GIF", newSWFAction(igif_action));
