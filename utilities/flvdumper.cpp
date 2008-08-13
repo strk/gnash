@@ -184,7 +184,12 @@ main(int argc, char *argv[])
 	    Buffer buf;
             // Read just the initial 9 byte header
 	    ifs.read(reinterpret_cast<char *>(buf.reference()), sizeof(Flv::flv_header_t));
+	    log_debug("header is: %s",  hexify(buf.reference(), 9, false));
 	    head  = flv.decodeHeader(&buf);
+	    if (head == 0) {
+		log_error("Couldn't decode the header! %s",  hexify(buf.reference(), 9, false));
+		exit(-1);
+	    }
 	    if ((head->type & Flv::FLV_VIDEO) && (head->type & Flv::FLV_AUDIO)) {
                 cout <<"FLV File type: Video and Audio" << endl;
             } else if (head->type && Flv::FLV_VIDEO) {
@@ -195,7 +200,7 @@ main(int argc, char *argv[])
 	    
 	    cout << "FLV Version: " << int(head->version) << " (should always be 1)" << endl;
 	    boost::uint32_t headsize = flv.convert24(head->head_size);
-	    if (all) {   
+	    if (all) {
 		cout << "FLV Header size: " << headsize << " (should always be 9)" << endl;
 	    }
             // Extract all the Tags
