@@ -24,6 +24,7 @@
 
 #include "dsodefs.h"
 #include "GnashImage.h"
+#include "boost/scoped_array.hpp"
 
 
 extern "C" {
@@ -42,7 +43,8 @@ private:
 	// State needed for input.
     png_structp _pngPtr;
     png_infop _infoPtr;
-    png_bytepp _rowPtrs;
+    boost::scoped_array<png_bytep> _rowPtrs;
+    boost::scoped_array<png_byte> _pixelData;
    
     // A counter for keeping track of the last row copied.
     size_t _currentRow;
