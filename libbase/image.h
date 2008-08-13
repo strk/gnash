@@ -27,24 +27,23 @@ namespace gnash
 {
 namespace image
 {
+
+enum ImageType
+{
+	GNASH_IMAGE_INVALID,
+	GNASH_IMAGE_RGB,
+	GNASH_IMAGE_RGBA,
+	GNASH_IMAGE_ALPHA
+};
+
 	/// Base class for different types of images
 	class DSOEXPORT image_base
 	{
 	public:
-		enum id_image
-		{
-			INVALID,
-			RGB,
-			RGBA,
-			ALPHA,
-			ROW
-		};
-
-		id_image m_type;
 
 		image_base(const image_base& o)
 			:
-			m_type(o.m_type),
+			_type(o._type),
 			m_size(o.size()),
 			m_width(o.width()),
 			m_height(o.height()),
@@ -54,13 +53,12 @@ namespace image
 			update(o);
 		}
 			
-		image_base(boost::uint8_t *data, int width, int height, int pitch, id_image type);
+		image_base(boost::uint8_t *data, int width, int height, int pitch, ImageType type);
 
 		/// Construct an image_base allocating data for height*pitch bytes
-		image_base(int width, int height, int pitch, id_image type);
+		image_base(int width, int height, int pitch, ImageType type);
 
-		/// Return a copy of this image
-		virtual std::auto_ptr<image_base> clone() const=0;
+        ImageType type() const { return _type; }
 
 		/// Return size of this image buffer, in bytes
 		size_t size() const { return m_size; }
@@ -92,7 +90,7 @@ namespace image
 
 		/// Copy image data from another image data
 		//
-		/// Note that this buffer MUST have the same m_pitch and m_type
+		/// Note that this buffer MUST have the same m_pitch and _type
 		/// or an assertion will fail.
 		///
 		/// @param from image to copy data from.
@@ -107,16 +105,12 @@ namespace image
 		/// Return a pointer to first byte of given line
 		DSOEXPORT boost::uint8_t* scanline(size_t y);
 
-		/// Return a read-only pointer to first byte of given line
-		DSOEXPORT const boost::uint8_t* scanline(size_t y) const
-		{
-			return const_cast<image_base*>(this)->scanline(y);
-		}
-
 		virtual ~image_base() {}
 
 
 	protected:
+
+		const ImageType _type;
 
 		/// Size of image buffer in bytes.
 		const size_t m_size;
@@ -156,13 +150,8 @@ namespace image
 		{}
 
 		rgb(boost::uint8_t* data, int width, int height, int stride)
-			: image_base(data, width, height, stride, RGB)
+			: image_base(data, width, height, stride, GNASH_IMAGE_RGB)
 		{}
-
-		std::auto_ptr<image_base> clone() const
-		{
-			return std::auto_ptr<image_base>(new rgb(*this));
-		}
 
 		~rgb();
 
@@ -182,12 +171,6 @@ namespace image
 		{}
 
 		~rgba();
-
-		std::auto_ptr<image_base> clone() const
-		{
-			return std::auto_ptr<image_base>(new rgba(*this));
-		}
-
 
 		/// Set pixel value 
 		//
@@ -210,11 +193,6 @@ namespace image
 			image_base(o)
 		{}
 
-		std::auto_ptr<image_base> clone() const
-		{
-			return std::auto_ptr<image_base>(new alpha(*this));
-		}
-
 		~alpha();
 
 		/// Set pixel value 
@@ -222,9 +200,6 @@ namespace image
 		/// TODO: move in base class ?
 		///
 		void	set_pixel(size_t x, size_t y, boost::uint8_t a);
-
-		// Bitwise content comparison.
-		bool	operator==(const alpha& a) const;
 
 	};
 

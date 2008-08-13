@@ -42,6 +42,7 @@ private:
 	// State needed for input.
     png_structp _pngPtr;
     png_infop _infoPtr;
+    png_bytepp _rowPtrs;
    
     // A counter for keeping track of the last row copied.
     size_t _currentRow;
@@ -71,7 +72,7 @@ public:
 	// data).  The size of the data for a scanline is
 	// get_width() * get_components().
 	//
-	int	getComponents() const { return 3; }
+	size_t getComponents() const;
 
 	// Read a scanline's worth of image data into the
 	// given buffer.  The amount of data read is

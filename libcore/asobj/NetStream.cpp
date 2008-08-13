@@ -560,7 +560,7 @@ NetStream::get_video()
 	if (!m_imageframe.get()) return std::auto_ptr<image::image_base>(0);
 
 	// TODO: inspect if we could return m_imageframe directly...
-	return m_imageframe->clone();	
+	return m_imageframe;	
 }
 
 std::pair<const char*, const char*>

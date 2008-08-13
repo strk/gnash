@@ -71,6 +71,7 @@ PngImageInput::PngImageInput(boost::shared_ptr<IOChannel> in) :
     ImageInput(in),
     _pngPtr(0),
     _infoPtr(0),
+    _rowPtrs(0),
     _currentRow(0)
 {
     init();
@@ -99,9 +100,45 @@ void
 PngImageInput::readScanline(unsigned char* rgbData)
 {
     assert (_currentRow < getHeight());
-    png_bytepp row_pointers = png_get_rows(_pngPtr, _infoPtr);
-    std::memcpy(rgbData, row_pointers[_currentRow], getWidth() * getComponents());
+    assert (_rowPtrs);
+   
+    const size_t components = getComponents();
+
+    // Bit-depth must be 8!
+    assert (png_get_rowbytes(_pngPtr, _infoPtr) == components * getWidth());
+    
+    switch (components)
+    {
+
+        case 3:
+            // Data packed as RGB
+            std::memcpy(rgbData, _rowPtrs[_currentRow],
+                        getWidth() * components);
+            break;
+
+        case 1:
+            // Greyscale data: we have to convert to RGB
+            for (size_t x = 0; x < getWidth(); ++x)
+            {
+                std::memset(rgbData, _rowPtrs[_currentRow][x], 3);
+                rgbData += 3;
+            }
+            break;
+
+        default:
+            boost::format fmt = boost::format("Cannot handle pixels "
+                                     "with %d channels!") % components;
+            throw ParserException(fmt.str());
+
+    }
+    
     ++_currentRow;
+}
+
+size_t
+PngImageInput::getComponents() const
+{
+    return png_get_channels(_pngPtr, _infoPtr);
 }
 
 void
@@ -127,9 +164,15 @@ PngImageInput::read()
     // Set our user-defined reader function
     png_set_read_fn(_pngPtr, _inStream.get(), &readData);
     
-    // read
+    // read PNG into memory.
     // TODO: sort out transform options.
-    png_read_png(_pngPtr, _infoPtr, PNG_TRANSFORM_STRIP_ALPHA, NULL);
+    // At present we strip alpha because Gnash can't handle it and reduce the bit depth
+    // to 8 bits, as that's all the image class can handle.
+    png_read_png(_pngPtr, _infoPtr, PNG_TRANSFORM_STRIP_ALPHA | PNG_TRANSFORM_STRIP_16, NULL);
+
+    // Allocate and fill array of pointers to each row. This should be
+    // cleaned up by png_destroy_read_struct.
+    _rowPtrs = png_get_rows(_pngPtr, _infoPtr);    
 }
 
 ///
