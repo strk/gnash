@@ -249,22 +249,22 @@ namespace image
         return im;
     }
 
-	std::auto_ptr<rgb> readSWFJpeg2WithTables(JpegImageInput* j_in)
+	std::auto_ptr<rgb> readSWFJpeg2WithTables(JpegImageInput& loader)
 	// Create and read a new image, using a input object that
 	// already has tables loaded.  The IJG documentation describes
 	// this as "abbreviated" format.
 	{
-		assert(j_in);
 
-		j_in->startImage();
+		loader.startImage();
 
-		std::auto_ptr<rgb> im(new image::rgb(j_in->getWidth(), j_in->getHeight()));
+		std::auto_ptr<rgb> im(new image::rgb(loader.getWidth(), loader.getHeight()));
 
-		for (size_t y = 0; y < j_in->getHeight(); y++) {
-			j_in->readScanline(im->scanline(y));
+
+		for (size_t y = 0, height = loader.getHeight(); y < height; y++) {
+			loader.readScanline(im->scanline(y));
 		}
 
-		j_in->finishImage();
+		loader.finishImage();
 
 		return im;
 	}
