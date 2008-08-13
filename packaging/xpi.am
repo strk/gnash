@@ -16,21 +16,25 @@
 # 
 
 #
-# Build a Debian Familiar .ipk GNU/Linux package. These are always
-# cross compiled, typically for the ARM or XScale.
+# Build a Firefox XPI package
 #
 
 # this is where the output of "make install" goes, which is what
 # we use to build the package.
-XPI_TMP=/tmp/$(host_alias)-gnash
+XPI_TMP=/tmp/gnash-$(BUILDDATE)
 
 # this is where we build the bundle that goes in the xpi file
-XPI_BUNDLE=$(XPI_TMP)/bundle
+XPI_BUNDLE=/tmp/gnash-$(BUILDDATE)-bundle
 
 # this is where the gnash gets compiled
 XPI_BUILD=gnash-${VERSION}
 
-xpi-unpack: $(top_builddir)/config.status
+CONFIG_OPTS = $(DISTCHECK_CONFIGURE_FLAGS) \
+	--disable-kparts \
+	--enable-gui=gtk \
+	--with-npapi-plugindir=/tmp/plugin
+
+xpi-unpack: Makefile #$(top_builddir)/config.status
 	-@rm -f xpi-*		# nuke everything, we're starting over
 	-@rm -f xpi-unpack
 	rm -rf $(XPI_BUILD)
@@ -39,38 +43,37 @@ xpi-unpack: $(top_builddir)/config.status
 
 xpi-configure: xpi-unpack $(XPI_BUILD)
 	-@rm -f ipkg-configure
-	cd $(XPI_BUILD); ./configure \
-	  --disable-kparts --enable-gui=gtk \
-	--with-plugins-install=system
-	@touch xpi-configure 
+	cd $(XPI_BUILD); ./configure $(CONFIG_OPTS) --disable-shared --enable-static
+	@touch xpi-configure
 
-xpi-build: xpi-configure
+xpi-build: #xpi-configure
 	-@rm -f xpi-build
 	$(MAKE) -C $(XPI_BUILD) all
+	$(MAKE) -C $(XPI_BUILD) install DESTDIR=$(XPI_TMP)
 	@touch xpi-build
 
-xpi-install: xpi-build Makefile
-	-@rm -f xpi-install
-	$(MAKE) -C $(XPI_BUILD) install install-plugin DESTDIR=$(XPI_TMP)
-	@touch xpi-install
+xpi-plugin: 
+	cd $(XPI_BUILD); ./configure $(CONFIG_OPTS) --disable-static --enable-shared
+	$(MAKE) -C $(XPI_BUILD)/plugin clean all GNASHBINDIR=
+	$(MAKE) -C $(XPI_BUILD) install-plugin DESTDIR=$(XPI_TMP)
+	$(MAKE) -C $(XPI_BUILD)/plugin/xpcom install-pkglib DESTDIR=$(XPI_TMP)
 
-xpi-depend: 
-	-@rm -f xpi-depend
-	@touch xpi-depend
-
-xpi xpi-bundle: xpi-install # xpi-depend
-	if ! test -d $(XPI_TMP)/plugins ; then \
-	  mkdir $(XPI_TMP)/plugins; \
+xpi xpi-bundle: #xpi-build xpi-plugin
+	if ! test -d $(XPI_BUNDLE)/ ; then \
+	  mkdir $(XPI_BUNDLE); \
 	fi
 	topdir=`cd ${top_srcdir}; pwd`; \
 	for i in install.rdf; do \
-	  cp -f $${topdir}/packaging/xpi/$$i $(XPI_BUNDLE)/; \
-	done; \
-	xpi-build $(XPI_TMP)
+	  cp -fr $${topdir}/packaging/xpi/$$i $(XPI_BUNDLE)/; \
+	done;
+	cp -fr $(XPI_TMP)$(bindir)/*gnash $(XPI_BUNDLE)/
+	cp -fr $(XPI_TMP)$(localedir) $(XPI_BUNDLE)/
+	cp -fr $(XPI_TMP)/tmp/plugin/libgnashplugin.so $(XPI_BUNDLE)/
+	cp -fr $(XPI_TMP)/tmp/extensions/*/*.xpt $(XPI_BUNDLE)/
+	cp -fr $(XPI_TMP)/tmp/extensions/*/*.so $(XPI_BUNDLE)/
+	(cd $(XPI_BUNDLE) ; $(ZIP) -r /tmp/gnash.xpi *)
 
 xpi-clean:
-	rm -fr xpi-* $(XPI_BUILD) $(XPI_TMP) gnash*$(VERSION)*.ipk
+	rm -fr xpi-* $(XPI_BUILD) $(XPI_TMP) gnash-$(VERSION)*.xpi
 
 .PHONY : xpi xpi-bundle
-
-

@@ -82,7 +82,7 @@ namespace gnash {
     }
 
     /// Return squared distance between point pt and segment A-B
-    static boost::int64_t
+    static double
     squareDistancePtSeg(const point& p, const point& A, const point& B)
     {
         boost::int32_t dx = B.x - A.x;
@@ -96,7 +96,7 @@ namespace gnash {
         boost::int32_t pdx = p.x - A.x;
         boost::int32_t pdy = p.y - A.y;
 
-        float u = ( (float)(pdx) * dx + (float)(pdy) * dy ) / ( (float)(dx)*dx + (float)(dy)*dy );
+        double u = ( (double)(pdx) * dx + (double)(pdy) * dy ) / ( (double)(dx)*dx + (double)(dy)*dy );
 
         if (u <= 0)
         {
@@ -108,16 +108,16 @@ namespace gnash {
             return p.squareDistance(B);
         }
 
-        point px(A, B, u);
+        point px(A, B, u); // FIXME: this interpolation introduce a precision loss (point is int-based)
         return p.squareDistance(px);
     }
 
     /// Return distance between point pt and segment A-B
-    static boost::int32_t
+    static double
     distancePtSeg(const point& pt, const point& A, const point& B)
     {
-        boost::int64_t  square = squareDistancePtSeg(pt, A, B);
-        return (boost::int32_t)( std::sqrt(square) );
+        double square = squareDistancePtSeg(pt, A, B);
+        return std::sqrt(square);
     }
 
     /// Find point of the quadratic curve defined by points A,C,B
@@ -412,7 +412,7 @@ namespace gnash {
     /// NOTE: if the path is empty, false is returned.
     ///
     bool
-    withinSquareDistance(const point& p, boost::int64_t dist) const
+    withinSquareDistance(const point& p, double dist) const
     {
       size_t nedges = m_edges.size();
 
@@ -426,7 +426,7 @@ namespace gnash {
 
         if ( e.isStraight() )
         {
-          boost::int64_t  d = Edge::squareDistancePtSeg(p, px, np);
+          double d = Edge::squareDistancePtSeg(p, px, np);
 
           if ( d <= dist ) return true;
         }
@@ -453,7 +453,7 @@ namespace gnash {
 
             // distance from point and segment being an approximation 
             // of the curve 
-            boost::int64_t  d = Edge::squareDistancePtSeg(p, p0, p1);
+            double d = Edge::squareDistancePtSeg(p, p0, p1);
             if ( d <= dist ) return true;
 
             p0.setTo(p1.x, p1.y);

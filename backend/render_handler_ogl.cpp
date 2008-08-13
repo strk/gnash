@@ -129,8 +129,8 @@ public:
     // FIXME: is there any reason to do this?
     OSMesaColorClamp(GL_TRUE);
 
-    log_debug("OSMesa handle successfully created. with width " SIZET_FMT \
-            " and height " SIZET_FMT ".", width, height);  
+    log_debug("OSMesa handle successfully created. with width %d"
+            " and height %d.", width, height);  
   }
   
   ~OSRenderMesa()

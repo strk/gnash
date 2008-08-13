@@ -19,7 +19,7 @@
 
 #include "gnash.h" // get_sound_handler
 #include "StartSoundTag.h"
-#include "stream.h"
+#include "SWFStream.h"
 #include "movie_definition.h"
 #include "log.h" // for log_parse
 #include "sound_definition.h" // for sound_sample

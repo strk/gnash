@@ -27,8 +27,8 @@
 #include "sprite_instance.h" // for ??
 #include "zlib_adapter.h"
 #include "IOChannel.h" // for use
-#include "stream.h"
-#include "jpeg.h"
+#include "SWFStream.h"
+#include "GnashImageJpeg.h"
 //#include "fontlib.h"
 #include "font.h"
 #include "log.h"

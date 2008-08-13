@@ -25,63 +25,7 @@
 #include "smart_ptr.h"
 #include "swf/TagLoadersTable.h"
 
-#include <cassert>
-
 namespace gnash {
-
-// Forward declarations
-//class action_buffer;
-class bitmap_character_def;
-class bitmap_info;
-class character;
-class character_def;
-class font;
-class movie_root;
-class sprite_instance;
-
-DSOEXPORT void save_extern_movie(sprite_instance* m);
-
-
-// for extern movies
-
-DSOEXPORT movie_root* get_current_root();
-DSOEXPORT const char* get_workdir();
-DSOEXPORT void set_workdir(const char* dir);
-
-#if 0
-// Information about how to display a character.
-class display_info
-{
-public:
-    movie*	m_parent;
-    int	m_depth;
-    cxform	m_color_transform;
-    matrix	m_matrix;
-    float	m_ratio;
-    boost::uint16_t 	m_clip_depth;
-
-    display_info()
-	:
-	m_parent(NULL),
-	m_depth(0),
-	m_ratio(0.0f),
-	m_clip_depth(0)
-	{
-	}
-
-    void	concatenate(const display_info& di)
-	// Concatenate the transforms from di into our
-	// transforms.
-	{
-	    m_depth = di.m_depth;
-	    m_color_transform.concatenate(di.m_color_transform);
-	    m_matrix.concatenate(di.m_matrix);
-	    m_ratio = di.m_ratio;
-	    m_clip_depth = di.m_clip_depth;
-	}
-};
-#endif
-
 
 //
 // Loader callbacks.
@@ -92,8 +36,8 @@ public:
 // to call this in order to handle special tag types.
 
 /// Register a tag loader for the given tag
-void	register_tag_loader(SWF::tag_type t,
-		SWF::TagLoadersTable::loader_function lf);
+void register_tag_loader(SWF::tag_type t,
+        SWF::TagLoadersTable::loader_function lf);
 	
 }	// end namespace gnash
 

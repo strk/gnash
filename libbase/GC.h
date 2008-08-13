@@ -238,7 +238,7 @@ public:
 
 		_resList.push_back(item);
 #if GNASH_GC_DEBUG > 1
-		log_debug(_("GC %p: collectable %p added, num collectables: " SIZET_FMT), (void*)this, (void*)item, _resList.size());
+		log_debug(_("GC %p: collectable %p added, num collectables: %d"), (void*)this, (void*)item, _resList.size());
 #endif
 	}
 

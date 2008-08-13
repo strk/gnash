@@ -444,6 +444,9 @@ private:
 	// Will call libcurl routines to fetch data.
 	void fillCache(long unsigned size);
 
+	// Process pending curl messages (handles 404)
+	void processMessages();
+
 	// Filling the cache as much as possible w/out blocking.
 	// Will call libcurl routines to fetch data.
 	void fillCacheNonBlocking();
@@ -532,6 +535,9 @@ CurlStreamFile::fillCacheNonBlocking()
 	{
 		throw gnash::GnashException(curl_multi_strerror(mcode));
 	}
+
+	// handle 404
+	processMessages();
 }
 
 
@@ -573,12 +579,12 @@ CurlStreamFile::fillCache(long unsigned size)
 	while (_running)
 	{
 
-		fillCacheNonBlocking();
+		fillCacheNonBlocking(); // NOTE: will handle 404
 
 		// Do this here to avoid calling select()
 		// when we have enough bytes anyway, or
 		// we reached EOF
-		if (_cached >= size || !_running) break;
+		if (_cached >= size || !_running) break; // || _error ?
 
 #if GNASH_CURL_VERBOSE
 		//gnash::log_debug("cached: %d, size: %d", _cached, size);
@@ -655,11 +661,22 @@ CurlStreamFile::fillCache(long unsigned size)
 
 	}
 
+	// Processing messages is already done by fillCacheNonBlocking,
+	// so we might likely avoid it here.
+	processMessages();
+
+}
+
+/*private*/
+void
+CurlStreamFile::processMessages()
+{
 	CURLMsg *curl_msg;
 	
 	// The number of messages left in the queue (not used by us).
 	int msgs;
-	while ((curl_msg = curl_multi_info_read(_mhandle, &msgs))) {
+	while ((curl_msg = curl_multi_info_read(_mhandle, &msgs)))
+	{
 
 		// Only for completed transactions
 		if (curl_msg->msg == CURLMSG_DONE) {
@@ -696,7 +713,6 @@ CurlStreamFile::fillCache(long unsigned size)
 		}
 
 	}
-
 }
 
 

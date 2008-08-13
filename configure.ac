@@ -166,6 +166,7 @@ AM_CONDITIONAL(WIN32, test x$windows = xyes)
 
 dnl Get build date for helping us debugging
 BUILDDATE="`date +%Y%m%d`"
+AC_SUBST(BUILDDATE)
 
 dnl These are required by automake
 dnl AM_INIT_AUTOMAKE(gnash, "trunk$BUILDDATE")
@@ -179,6 +180,9 @@ AM_GNU_GETTEXT([external])
 AM_CONDITIONAL(HAS_GETTEXT, test x$ac_cv_path_XGETTEXT != x)
 dnl AM_GNU_GETTEXT_VERSION(0.15)
 
+dnl We shouldn't need SIZET_FMT anywhere anymore, so all of this
+dnl is useless.
+
 dnl AC_CHECK_SIZEOF([size_t], 4, AC_INCLUDES_DEFAULT)
 
 dnl AC_DEFINE(SIZET_FMT, ["%z"], [size_t printf modifier is z])
@@ -187,46 +191,45 @@ dnl NOTE: Using AC_TRY_COMPILE is bogus when cross-compiling !
 dnl       We need to know the size of size_t in the *target* host, 
 dnl       not the build host (right?)
 dnl
-AC_LANG_PUSH(C++)
-if test "$GXX" = yes; then
-save_CXXFLAGS="$CXXFLAGS"
-CXXFLAGS="$CXXFLAGS -Werror -Wformat"
-fi
+dnl AC_LANG_PUSH(C++)
+dnl if test "$GXX" = yes; then
+dnl save_CXXFLAGS="$CXXFLAGS"
+dnl CXXFLAGS="$CXXFLAGS -Werror -Wformat"
+dnl fi
 
-AC_TRY_COMPILE([#include <sys/types.h>
-  #include <stdio.h>], [
-  size_t num = 0;
-  printf("%d", num); ],
-  AC_DEFINE(SIZET_FMT, ["%d"], [size_t printf modifier is d]), [
+dnl AC_TRY_COMPILE([#include <sys/types.h>
+dnl   #include <stdio.h>], [
+dnl   size_t num = 0;
+dnl   printf("%d", num); ],
+dnl   AC_DEFINE(SIZET_FMT, ["%d"], [size_t printf modifier is d]), [
 
-AC_TRY_COMPILE([#include <sys/types.h>
-  #include <stdio.h>], [
-  size_t num = 0;
-  printf("%u", num); ],
-   AC_DEFINE(SIZET_FMT, ["%u"], [size_t printf modifier is u]), [
+dnl AC_TRY_COMPILE([#include <sys/types.h>
+dnl   #include <stdio.h>], [
+dnl   size_t num = 0;
+dnl   printf("%u", num); ],
+dnl   AC_DEFINE(SIZET_FMT, ["%u"], [size_t printf modifier is u]), [
 
-AC_TRY_COMPILE([#include <sys/types.h>
-  #include <stdio.h>], [
-  size_t num = 0;
-  printf("%lu", num); ],
-  AC_DEFINE(SIZET_FMT, ["%lu"], [size_t printf modifier is lu]), [
+dnl AC_TRY_COMPILE([#include <sys/types.h>
+dnl   #include <stdio.h>], [
+dnl   size_t num = 0;
+dnl   printf("%lu", num); ],
+dnl   AC_DEFINE(SIZET_FMT, ["%lu"], [size_t printf modifier is lu]), [
 
-AC_TRY_COMPILE([#include <sys/types.h> 
-  #include <stdio.h>], [
-  size_t num = 0;
-  printf("%ld", num); ],
-  AC_DEFINE(SIZET_FMT, ["%ld"], [size_t printf modifier is ld])
-)])])])
+dnl AC_TRY_COMPILE([#include <sys/types.h> 
+dnl   #include <stdio.h>], [
+dnl   size_t num = 0;
+dnl   printf("%ld", num); ],
+dnl   AC_DEFINE(SIZET_FMT, ["%ld"], [size_t printf modifier is ld])
+dnl )])])])
 
-if test "$GXX" = yes; then
-CXXFLAGS="$save_CXXFLAGS"
-fi
-AC_LANG_POP(C++)
+dnl if test "$GXX" = yes; then
+dnl CXXFLAGS="$save_CXXFLAGS"
+dnl fi
+dnl AC_LANG_POP(C++)
 
 dnl This is primarily used when compiling for a similar architecture,
 dnl like pentium->geode, which can use the same compiler, but have
-dnl different developmentAC_ARG_WITH(top_level, AC_HELP_STRING([--with-top-level], [top level directory for cross compiling files]), with_top_level=${withval} ; cross_compiling=yes)
-
+dnl different development libraries.
 
 AC_ARG_WITH(top_level,
   AC_HELP_STRING([--with-top-level],
@@ -1196,6 +1199,10 @@ dnl -----------------------------------------------------------------
 dnl PLUGIN RELATED STUFF
 dnl -----------------------------------------------------------------
 
+dnl Zip is used insted of tar when building an xpi package
+dnl for Mozilla/Firefox.
+AC_PATH_PROG(ZIP, zip, ,[${pathlist}])
+
 dnl !! This has been moved here to make --enable-npapi work
 dnl !! All of plugin-related macro calls could be moved into
 dnl !! a specialized macros/plugin.m4
@@ -1259,6 +1266,17 @@ AC_ARG_WITH(plugins-install,
 
 
 GNASH_PATH_FIREFOX
+dnl XPCOM and NSPR can be used in the plugin for better integration
+dnl within Firefox.
+GNASH_PATH_XPCOM
+GNASH_PATH_NSPR
+dnl If we don't have both XPCOM and NSPR, we can't build either.
+if test x$has_xpcom = xno -o x$has_nspr = xno; then
+  has_xpcom=no
+  has_nspr=no
+fi
+AM_CONDITIONAL(XPCOM, test x$has_xpcom = xyes)
+AM_CONDITIONAL(NSPR, test x$has_nspr = xyes)
 
 dnl -----------------------------------------------------------------
 dnl END OF PLUGIN RELATED STUFF
@@ -1493,6 +1511,7 @@ AC_SUBST(WINDRES)
 GNASH_PKG_FIND(z, [zlib.h], [zlib compression library], compress)
 GNASH_PKG_FIND(jpeg, [jpeglib.h], [jpeg images], jpeg_mem_init)
 GNASH_PKG_FIND(png, [png.h], [png images], png_info_init)
+GNASH_PKG_FIND(gif, [gif_lib.h], [gif images], DGifOpen)
 GNASH_PKG_INCLUDES([dejagnu], [dejagnu.h])
 
 dnl Find freetype and fontconfig
@@ -2130,6 +2149,7 @@ extensions/lirc/Makefile
 extensions/dbus/Makefile
 extensions/metome/Makefile
 plugin/Makefile
+plugin/xpcom/Makefile
 plugin/klash/Makefile
 plugin/mozilla-sdk/Makefile
 plugin/win32/Makefile
@@ -2352,6 +2372,20 @@ else
   echo "               Install it from http://ijg.org" >&3
   echo "               or .deb users: apt-get install libjpeg-dev" >&3
   echo "               or .rpm users: yum install libjpeg-devel" >&3
+fi
+
+if test x"${GIF_LIBS}" != x ; then
+  if test x"${GIF_CFLAGS}" != x ; then
+    echo "        GIF flags are: $GIF_CFLAGS"
+  else
+    echo "        GIF flags are: default include path"
+  fi
+  echo "        GIF libs are: $GIF_LIBS"
+else
+  echo "        ERROR: No GIF library development package installed!" >&3
+  echo "               Install it from http://sourceforge.net/projects/giflib/" >&3
+  echo "               or .deb users: apt-get install libungif-dev" >&3
+  echo "               or .rpm users: yum install libungif-devel" >&3
 fi
 
 if test x"${PNG_LIBS}" != x ; then
@@ -2964,6 +2998,25 @@ if test x"${build_alp}" = xyes; then
     echo "        ALP libs are: $ALP_LIBS"
   else
     echo "        ERROR: No ALP development package is installed." >&3
+  fi
+fi
+
+dnl XPCOM support for Mozilla/Firefox
+if test x"$xpcom" = x"yes"; then
+  if test x"$has_xpcom" = x"yes"; then
+    echo "        XPCOM flags are: $XPCOM_CFLAGS"
+    echo "        XPCOM libs are: $XPCOM_LIBS"
+    echo "        XPIDL path is: $XPIDL"
+  else
+    echo "        ERROR: No XPCOM development package is installed." >&3
+  fi
+fi
+if test x"$nspr4" = x"yes"; then
+  if test x"$has_nspr" = x"yes"; then
+    echo "        NSPR flags are: $NSPR_CFLAGS"
+    echo "        NSPR libs are: $NSPR_LIBS"
+  else
+    echo "        ERROR: No NSPR development package is installed." >&3
   fi
 fi
 

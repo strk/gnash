@@ -20,7 +20,7 @@
 
 #include "gnashconfig.h"
 #include "abc_block.h"
-#include "stream.h" // for use
+#include "SWFStream.h" // for use
 #include "VM.h"
 #include "log.h"
 #include "ClassHierarchy.h"

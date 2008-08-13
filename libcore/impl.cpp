@@ -21,19 +21,11 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "IOChannel.h"
 #include "utility.h"
-//#include "action.h"
 #include "impl.h"
 #include "font.h"
 #include "fontlib.h"
 #include "log.h"
 #include "image.h"
-//#include "render.h"
-//#include "shape.h"
-//#include "styles.h"
-//#include "dlist.h"
-//#include "timers.h"
-//#include "zlib_adapter.h"
-//#include "generic_character.h"
 #include "sprite_definition.h"
 #include "SWFMovieDefinition.h"
 #include "swf.h"
@@ -45,6 +37,8 @@
 #include "ScriptLimitsTag.h"
 #include "BitmapMovieDefinition.h"
 #include "DefineFontAlignZonesTag.h"
+#include "DefineButtonCxformTag.h"
+#include "CSMTextSettingsTag.h"
 #include "PlaceObject2Tag.h"
 #include "RemoveObjectTag.h"
 #include "DoABCTag.h"
@@ -135,7 +129,7 @@ static void ensure_loaders_registered()
 
     // End tag doesn't really need to exist.
     // TODO: use null_loader here ?
-    register_tag_loader(SWF::END,   end_loader);
+    register_tag_loader(SWF::END, end_loader);
 
     register_tag_loader(SWF::DEFINESHAPE, define_shape_loader);
     register_tag_loader(SWF::FREECHARACTER, fixme_loader); // 03
@@ -161,7 +155,7 @@ static void ensure_loaders_registered()
     register_tag_loader(SWF::DEFINELOSSLESS, define_bits_lossless_2_loader);
     register_tag_loader(SWF::DEFINEBITSJPEG2, define_bits_jpeg2_loader);
     register_tag_loader(SWF::DEFINESHAPE2,  define_shape_loader);
-    register_tag_loader(SWF::DEFINEBUTTONCXFORM, fixme_loader); // 23
+    register_tag_loader(SWF::DEFINEBUTTONCXFORM, DefineButtonCxformTag::loader); // 23
     // "protect" tag; we're not an authoring tool so we don't care.
     // (might be nice to dump the password instead..)
     register_tag_loader(SWF::PROTECT, null_loader);
@@ -202,8 +196,8 @@ static void ensure_loaders_registered()
     register_tag_loader(SWF::PLACEFUNCTION, fixme_loader); // 54 
     register_tag_loader(SWF::GENTAGOBJECT, fixme_loader); // 55 
 
-    register_tag_loader(SWF::EXPORTASSETS,  export_loader); // 56
-    register_tag_loader(SWF::IMPORTASSETS,  import_loader); // 57
+    register_tag_loader(SWF::EXPORTASSETS, export_loader); // 56
+    register_tag_loader(SWF::IMPORTASSETS, import_loader); // 57
 
     //  We're not an authoring tool so we don't care.
     // (might be nice to dump the password instead..)
@@ -238,7 +232,7 @@ static void ensure_loaders_registered()
     register_tag_loader(SWF::DOABC, DoABCTag::doABCLoader); // 72 -- AS3 codeblock.
     register_tag_loader(SWF::DEFINEALIGNZONES, DefineFontAlignZonesTag::loader); // 73
 
-    register_tag_loader(SWF::CSMTEXTSETTINGS, fixme_loader); // 74
+    register_tag_loader(SWF::CSMTEXTSETTINGS, CSMTextSettingsTag::loader); // 74
     register_tag_loader(SWF::DEFINEFONT3, define_font_loader); // 75
     register_tag_loader(SWF::SYMBOLCLASS, SymbolClassTag::loader); // 76 
     register_tag_loader(SWF::METADATA, metadata_loader); // 77
@@ -252,67 +246,42 @@ static void ensure_loaders_registered()
     register_tag_loader(SWF::REFLEX, reflex_loader); // 777
 }
 
-
-// Create a movie_definition from a jpeg stream
-// NOTE: this method assumes this *is* a jpeg stream
-static movie_definition*
-create_jpeg_movie(std::auto_ptr<IOChannel> in, const std::string& url)
-{
-  // FIXME: temporarly disabled
-  //log_unimpl(_("Loading of jpegs"));
-  //return NULL;
-
-
-  std::auto_ptr<image::rgb> im ( image::read_jpeg(in.get()) );
-
-  if ( ! im.get() )
-  {
-    log_error(_("Can't read jpeg from %s"), url);
-    return NULL;
-  } 
-
-  BitmapMovieDefinition* mdef = new BitmapMovieDefinition(im, url);
-  //log_debug(_("BitmapMovieDefinition %p created"), mdef);
-  return mdef;
-
-}
-
 // Create a movie_definition from a png stream
 // NOTE: this method assumes this *is* a png stream
+// TODO: The pp won't display PNGs for SWF7 or below.
 static movie_definition*
-create_png_movie(std::auto_ptr<IOChannel> /*in*/, const std::string& /*url*/)
+createBitmapMovie(std::auto_ptr<IOChannel> in, const std::string& url, FileType type)
 {
-  log_unimpl(_("Loading of png"));
-  return NULL;
+    assert (in.get());
 
-#if 0
-  std::auto_ptr<image::rgb> im ( image::read_png(in.get()) );
+    // readImageData takes a shared pointer because JPEG streams sometimes need
+    // to transfer ownership.
+    boost::shared_ptr<IOChannel> imageData(in.release());
 
-  if ( ! im.get() )
-  {
-    log_error(_("Can't read png from %s"), url);
-    return NULL;
-  } 
+    try
+    {
+        std::auto_ptr<image::rgb> im(image::readImageData(imageData, type));
+        if (!im.get())
+        {
+            log_error(_("Can't read image file from %s"), url);
+            return NULL;
+        } 
 
-  BitmapMovieDefinition* mdef = new BitmapMovieDefinition(im, url);
-  //log_debug(_("BitmapMovieDefinition %p created"), mdef);
-  return mdef;
-#endif
+        BitmapMovieDefinition* mdef = new BitmapMovieDefinition(im, url);
+        return mdef;
+
+    }
+    catch (ParserException& e)
+    {
+        log_error(_("Parsing error: %s"), e.what());
+        return NULL;
+    }
 
 }
 
 // Get type of file looking at first bytes
 // return "jpeg", "png", "swf" or "unknown"
 //
-
-enum FileType {
-    GNASH_FILETYPE_JPEG,
-    GNASH_FILETYPE_PNG,
-    GNASH_FILETYPE_SWF,
-    GNASH_FILETYPE_FLV,
-    GNASH_FILETYPE_UNKNOWN
-};
-
 FileType
 getFileType(IOChannel* in)
 {
@@ -334,11 +303,18 @@ getFileType(IOChannel* in)
     return GNASH_FILETYPE_JPEG;
   }
 
-  // This is the magic number for any JPEG format file
+  // This is the magic number for any PNG format file
   if ((buf[0] == 137) && (buf[1] == 'P') && (buf[2] == 'N')) // buf[3] == 'G' (we didn't read so far)
   {
     in->seek(0);
     return GNASH_FILETYPE_PNG;
+  }
+
+  // This is the magic number for any GIF format file
+  if ((buf[0] == 'G') && (buf[1] == 'I') && (buf[2] == 'F'))
+  {
+    in->seek(0);
+    return GNASH_FILETYPE_GIF;
   }
 
   // This is for SWF (FWS or CWS)
@@ -417,36 +393,35 @@ create_movie(std::auto_ptr<IOChannel> in, const std::string& url, bool startLoad
   // see if it's a jpeg or an swf
   FileType type = getFileType(in.get());
 
-  if ( type == GNASH_FILETYPE_JPEG )
-  {
-    if ( startLoaderThread == false )
+    switch (type)
     {
-      log_unimpl(_("Requested to keep from completely loading a movie, but the movie in question is a jpeg, for which we don't yet have the concept of a 'loading thread'"));
-    }
-    return create_jpeg_movie(in, url);
-  }
-  else if ( type == GNASH_FILETYPE_PNG )
-  {
-    if ( startLoaderThread == false )
-    {
-      log_unimpl(_("Requested to keep from completely loading a movie, but the"
-              " movie in question is a png, for which we don't yet have the "
-              "concept of a 'loading thread'"));
-    }
-    return create_png_movie(in, url);
-  }
-  else if ( type == GNASH_FILETYPE_SWF )
-  {
-    return create_swf_movie(in, url, startLoaderThread);
-  }
-  else if ( type == GNASH_FILETYPE_FLV )
-  {
-    log_unimpl(_("FLV can't be loaded directly as a movie"));
-    return NULL;
-  }
+        case GNASH_FILETYPE_JPEG:
+        case GNASH_FILETYPE_PNG:
+        case GNASH_FILETYPE_GIF:
+        {
+            if ( startLoaderThread == false )
+            {
+              log_unimpl(_("Requested to keep from completely loading "
+                           "a movie, but the movie in question is an "
+                           "image, for which we don't yet have the "
+                           "concept of a 'loading thread'"));
+            }
+            return createBitmapMovie(in, url, type);
+        }
 
-  log_error(_("unknown file type (%s)"), type);
-  return NULL;
+
+        case GNASH_FILETYPE_SWF:
+            return create_swf_movie(in, url, startLoaderThread);
+
+        case GNASH_FILETYPE_FLV:
+            log_unimpl(_("FLV can't be loaded directly as a movie"));
+            return NULL;
+        default:
+            log_error(_("unknown file type (%s)"), type);
+            break;
+    }
+
+    return NULL;
 }
 
 movie_definition*
@@ -530,8 +505,6 @@ void  clear()
 //
 
 
-//static stringi_hash< boost::intrusive_ptr<movie_definition> > s_movie_library;
-
 /// Library of SWF movies indexed by URL strings
 //
 /// Elements are actually SWFMovieDefinition, the ones
@@ -602,9 +575,10 @@ public:
   {
   
     if (_limit)
+    {
       limit_size(_limit-1);
-    else
-      return;  // zero limit, library is a no-op
+    }
+    else return;  // zero limit, library is a no-op
   
     item temp;
     
@@ -650,40 +624,11 @@ private:
 
 static MovieLibrary s_movie_library;
 
-typedef std::map< movie_definition*, boost::intrusive_ptr<sprite_instance> > library_container_t;
-static library_container_t  s_movie_library_inst;
-static std::vector<sprite_instance*> s_extern_sprites;
-
-static std::string s_workdir;
-
-void save_extern_movie(sprite_instance* m)
-{
-    s_extern_sprites.push_back(m);
-}
-
-movie_root*
-get_current_root()
-{
-  return &(VM::get().getRoot());
-}
-
-const char* get_workdir()
-{
-    return s_workdir.c_str();
-}
-
-void set_workdir(const char* dir)
-{
-    assert(dir != NULL);
-    s_workdir = dir;
-}
-
 static void clear_library()
     // Drop all library references to movie_definitions, so they
     // can be cleaned up.
 {
     s_movie_library.clear();
-    s_movie_library_inst.clear();
 }
 
 // Try to load a movie from the given url, if we haven't

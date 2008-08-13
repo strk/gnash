@@ -83,6 +83,7 @@ libgnashcore_la_SOURCES = \
 	swf/TagLoadersTable.cpp	\
 	swf/tag_loaders.cpp \
 	swf/DefineFontAlignZonesTag.cpp \
+	swf/CSMTextSettingsTag.cpp \
 	swf/PlaceObject2Tag.cpp \
 	swf/RemoveObjectTag.cpp \
 	swf/StartSoundTag.cpp \
@@ -100,7 +101,7 @@ libgnashcore_la_SOURCES = \
 	LoadVariablesThread.cpp \
 	render.cpp \
 	shape.cpp \
-	stream.cpp \
+	SWFStream.cpp \
 	styles.cpp \
 	text.cpp \
 	timers.cpp \
@@ -167,13 +168,15 @@ noinst_HEADERS = \
 	resource.h \
 	shape.h	\
 	sprite_instance.h \
-	stream.h \
+	SWFStream.h \
 	styles.h \
 	swf.h \
 	swf/TagLoadersTable.h \
 	swf/tag_loaders.h \
 	swf/ControlTag.h \
 	swf/DefineFontAlignZonesTag.h \
+	swf/CSMTextSettingsTag.h \
+	swf/DefineButtonCxformTag.h \
 	swf/PlaceObject2Tag.h \
 	swf/RemoveObjectTag.h \
 	swf/DisplayListTag.h \

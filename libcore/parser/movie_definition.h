@@ -53,7 +53,7 @@
 
 #include "character_def.h" // for inheritance
 #include "fontlib.h"
-#include "jpeg.h"
+#include "GnashImageJpeg.h"
 
 #include <string>
 #include <memory> // for auto_ptr
@@ -335,7 +335,7 @@ public:
 	/// *is* performed, and it is deleting the jpeg::input instance since
 	/// it is passed in an auto_ptr...
 	///
-	virtual void set_jpeg_loader(std::auto_ptr<jpeg::input> /*j_in*/)
+	virtual void set_jpeg_loader(std::auto_ptr<JpegImageInput> /*j_in*/)
 	{
 	}
 
@@ -350,7 +350,7 @@ public:
 	///
 	/// NOTE: ownership of the returned object is NOT transferred
 	///
-	virtual jpeg::input*	get_jpeg_loader()
+	virtual JpegImageInput* get_jpeg_loader()
 	{
 		return NULL;
 	}

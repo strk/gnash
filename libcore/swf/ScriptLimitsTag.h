@@ -19,7 +19,7 @@
 #define GNASH_SWF_SCRIPTLIMITSTAG_H
 
 #include "swf.h" // for tag_type definition
-#include "stream.h" // for inlines
+#include "SWFStream.h" // for inlines
 #include "movie_definition.h"
 
 namespace gnash {

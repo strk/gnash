@@ -23,7 +23,7 @@
 // Vitalij Alexeev <tishka92@mail.ru> 2004.
 
 #include "morph2_character_def.h"
-#include "stream.h"
+#include "SWFStream.h"
 #include "render.h"
 #include "movie_definition.h"
 #include "bitmap_character_def.h"

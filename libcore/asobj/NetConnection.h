@@ -37,6 +37,7 @@
 // Forward declarations
 namespace gnash {
 	//class NetStream;
+	class AMFQueue;
 }
 
 namespace gnash {
@@ -154,7 +155,15 @@ public:
 	///
 	bool loadCompleted();
 
+protected:
+
+	/// Mark responders associated with remoting calls
+	void markReachableResources() const;
+
 private:
+	friend class AMFQueue;
+
+	AMFQueue *call_queue;
 
 	/// Extend the URL to be used for playing
 	void addToURL(const std::string& url);

@@ -62,7 +62,18 @@ public:
 	///	The stream associated with the sprite. It is assumed
 	///	to be already positioned right before the frame count
 	///
-	sprite_definition(movie_definition* m, SWFStream* in);
+	sprite_definition(movie_definition* m, SWFStream& in);
+
+	/// \brief
+	/// Create an empty sprite
+	//
+	/// A sprite definition consists of a series control tags.
+	///
+	/// @param m
+	///	the Top-Level movie_definition this sprite is read
+	///	from (not a sprite_definition!)
+	sprite_definition(movie_definition* m);
+
 
 	/// Destructor, releases playlist data
 	~sprite_definition();
@@ -301,8 +312,8 @@ private:
 		while ( m_loading_frame < framenum )
 		{
 			log_debug(_("sprite_definition: "
-				"loading of frame " SIZET_FMT " requested "
-				"(we are at " SIZET_FMT "/" SIZET_FMT ")"),
+				"loading of frame %d requested "
+				"(we are at %d/%d)"),
 				framenum, m_loading_frame, m_frame_count);
 			// Could this ever happen ? YES ! See tuner_7_6_0_0_pandora.swf
 			return false;

@@ -28,7 +28,7 @@
 #endif
 
 #include "tu_file.h"
-#include "stream.h"
+#include "SWFStream.h"
 #include "log.h"
 
 #include <cstdio>

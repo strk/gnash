@@ -260,6 +260,9 @@ public:
 	/// Read a SWF::DEFINEBUTTONSOUND tag
 	void	readDefineButtonSound(SWFStream& in, movie_definition* m);
 	
+	/// Read a SWF::DEFINEBUTTONCXFORM tag
+	void readDefineButtonCxform(SWFStream& in, movie_definition* m);
+	
 	const rect&	get_bound() const {
 		// It is required that get_bound() is implemented in character definition
 		// classes. However, button character definitions do not have shape 

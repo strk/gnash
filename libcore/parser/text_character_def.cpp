@@ -7,7 +7,7 @@
 
 // Code for the text tags.
 
-#include "stream.h"
+#include "SWFStream.h"
 #include "log.h"
 #include "text_character_def.h"
 #include "swf.h"

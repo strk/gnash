@@ -25,7 +25,6 @@
 #include "log.h"
 
 #include <unistd.h> // for ::read
-#include <cstring>
 
 #include <boost/scoped_array.hpp>
 
@@ -34,10 +33,8 @@
 // define this if you want seeks back to be reported (on stderr)
 //#define GNASH_NOSEEK_FD_WARN_SEEKSBACK 1
 
-
-#include <stdexcept>
-#include <cstdio>
 #include <cerrno>
+#include <cstdio>
 #include <sys/types.h>
 #include <sys/stat.h>
 
@@ -150,48 +147,46 @@ NoSeekFile::cache(void *from, size_t sz)
 {
 
 #ifdef GNASH_NOSEEK_FD_VERBOSE
-	fprintf(stderr, "cache(%p, " SIZET_FMT ") called\n", from, sz);
+	std::cerr << boost::format("cache(%p, %d) called") % from % sz << std::endl;
 #endif
 	// take note of current position
 	long curr_pos = ftell(_cache);
 
 #ifdef GNASH_NOSEEK_FD_VERBOSE
-	fprintf(stderr, " current position: %ld\n", curr_pos);
+	std::cerr << boost::format(" current position: %ld)") % curr_pos << std::endl;
 #endif
 
 	// seek to the end
 	fseek(_cache, 0, SEEK_END);
 
 #ifdef GNASH_NOSEEK_FD_VERBOSE
-	fprintf(stderr, " after SEEK_END, position: %ld\n", ftell(_cache));
+	std::cerr << boost::format(" after SEEK_END, position: %ld") % ftell(_cache) << std::endl;
 #endif
 
 	size_t wrote = fwrite(from, 1, sz, _cache);
 #ifdef GNASH_NOSEEK_FD_VERBOSE
-	fprintf(stderr, " write " SIZET_FMT " bytes\n", wrote);
+    std::cerr << boost::format(" write %d bytes") % wrote;
 #endif
 	if ( wrote < 1 )
 	{
-		char errmsg[256];
-	
-		snprintf(errmsg, 255,
-			"writing to cache file: requested " SIZET_FMT ", wrote " SIZET_FMT " (%s)",
-			sz, wrote, strerror(errno));
-		fprintf(stderr, "%s\n", errmsg);
-		throw IOException(errmsg);
+        boost::format err = boost::format("writing to cache file: requested %d, wrote %d (%s)")
+            % sz % wrote % std::strerror(errno);
+			
+		std::cerr << err << std::endl;
+		throw IOException(err.str());
 	}
 
 	_cached += sz;
 
 #ifdef GNASH_NOSEEK_FD_VERBOSE
-	fprintf(stderr, " after write, position: %ld\n", ftell(_cache));
+    std::cerr << boost::format(" after write, position: %ld") % std::ftell(_cache) << std::endl;
 #endif
 
 	// reset position for next read
 	fseek(_cache, curr_pos, SEEK_SET);
 
 #ifdef GNASH_NOSEEK_FD_VERBOSE
-	fprintf(stderr, " after seek-back, position: %ld\n", ftell(_cache));
+    std::cerr << boost::format(" after seek-back, position: %ld") % std::ftell(_cache) << std::endl;
 #endif
 
 	clearerr(_cache);
@@ -205,7 +200,7 @@ void
 NoSeekFile::fill_cache(size_t size)
 {
 #ifdef GNASH_NOSEEK_FD_VERBOSE
-	fprintf(stderr, "fill_cache(%d) called\n", size);
+    std::cerr << boost::format(" fill_cache(%d) called") % size << std::endl;
 #endif
 
 	// See how big is the cache
@@ -219,7 +214,7 @@ NoSeekFile::fill_cache(size_t size)
 		bytesNeeded = chunkSize; // why read less ?
 
 #ifdef GNASH_NOSEEK_FD_VERBOSE
-		fprintf(stderr, " bytes needed = " SIZET_FMT "\n", bytesNeeded);
+	std::cerr << boost::format(" bytes needed = %d") % bytesNeeded << std::endl;
 #endif
 
 		ssize_t bytesRead = ::read(_fd, (void*)_buf, bytesNeeded);
@@ -237,7 +232,7 @@ NoSeekFile::fill_cache(size_t size)
 			if ( bytesRead == 0 )
 			{
 #ifdef GNASH_NOSEEK_FD_VERBOSE
-				fprintf(stderr, "EOF reached\n");
+    std::cerr << "EOF reached" << std::endl;
 #endif
 				_running = false;
 				return;
@@ -301,13 +296,13 @@ int
 NoSeekFile::read(void *dst, int bytes)
 {
 #ifdef GNASH_NOSEEK_FD_VERBOSE
-	fprintf(stderr, "read_cache(%d) called\n", bytes);
+	std::cerr << boost::format("read_cache(%d) called") % bytes << std::endl;
 #endif
 
 	if ( eof() )
 	{
 #ifdef GNASH_NOSEEK_FD_VERBOSE
-		fprintf(stderr, "read_cache: at eof!\n");
+	    std::cerr << "read_cache: at eof!" << std::endl;
 #endif
 		return 0;
 	}
@@ -325,18 +320,18 @@ NoSeekFile::read(void *dst, int bytes)
 	{
 		if ( ferror(_cache) )
 		{
-	fprintf(stderr, "an error occurred while reading from cache\n");
+            std::cerr << "an error occurred while reading from cache" << std::endl;
 		}
 #if GNASH_NOSEEK_FD_VERBOSE
 		if ( feof(_cache) )
 		{
-	fprintf(stderr, "EOF reached while reading from cache\n");
+            std::cerr << "EOF reached while reading from cache" << std::endl;
 		}
 #endif
 	}
 
 #ifdef GNASH_NOSEEK_FD_VERBOSE
-	fprintf(stderr, "fread from _cache returned " SIZET_FMT "\n", ret);
+    std::cerr << boost::format("fread from _cache returned %d") % ret << std::endl;
 #endif
 
 	return ret;
@@ -350,7 +345,7 @@ NoSeekFile::eof() const
 	bool ret = ( ! _running && feof(_cache) );
 	
 #ifdef GNASH_NOSEEK_FD_VERBOSE
-	fprintf(stderr, "eof() returning %d\n", ret);
+	std::cerr << boost::format("eof() returning %d") % ret << std::endl;
 #endif
 	return ret;
 
@@ -360,10 +355,10 @@ NoSeekFile::eof() const
 int
 NoSeekFile::tell() const
 {
-	int ret =  ftell(_cache);
+	int ret = std::ftell(_cache);
 
 #ifdef GNASH_NOSEEK_FD_VERBOSE
-	fprintf(stderr, "tell() returning %ld\n", ret);
+	std::cerr << boost::format("tell() returning %ld") % ret << std::endl;
 #endif
 
 	return ret;
@@ -376,16 +371,15 @@ NoSeekFile::seek(int pos)
 {
 #ifdef GNASH_NOSEEK_FD_WARN_SEEKSBACK
 	if ( pos < tell() ) {
-		fprintf(stderr,
-			"Warning: seek backward requested (%ld from %ld)\n",
-			pos, tell());
+		std::cerr << boost::format("Warning: seek backward requested "
+		                "(%ld from %ld)") % pos % tell() << std::endl;
 	}
 #endif
 
 	fill_cache(pos);
 
-	if ( fseek(_cache, pos, SEEK_SET) == -1 ) {
-		fprintf(stderr, "Warning: fseek failed\n");
+	if ( std::fseek(_cache, pos, SEEK_SET) == -1 ) {
+		std::cerr << "Warning: fseek failed" << std::endl;
 		return -1;
 	} else {
 		return 0;
@@ -404,7 +398,7 @@ IOChannel*
 make_stream(int fd, const char* cachefilename)
 {
 #ifdef GNASH_NOSEEK_FD_VERBOSE
-	fprintf(stderr, "making NoSeekFile stream for fd %d\n", fd);
+	std::cerr << boost::format("making NoSeekFile stream for fd %d") % fd << std::endl;
 #endif
 
 	NoSeekFile* stream = NULL;
@@ -412,7 +406,7 @@ make_stream(int fd, const char* cachefilename)
 	try {
 		stream = new NoSeekFile(fd, cachefilename);
 	} catch (const std::exception& ex) {
-		fprintf(stderr, "NoSeekFile stream: %s\n", ex.what());
+		std::cerr << boost::format("NoSeekFile stream: %s") % ex.what() << std::endl;
 		delete stream;
 		return NULL;
 	}

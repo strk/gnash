@@ -58,6 +58,7 @@ AM_CPPFLAGS = \
 AM_LDFLAGS = \
 	$(MING_LIBS) \
 	$(OPENGL_LIBS) \
+	$(GIF_LIBS) \
 	$(NULL)
 
 
@@ -141,6 +142,7 @@ check_PROGRAMS = \
 	action_execution_order_test11 \
 	reverse_execute_PlaceObject2_test1 \
 	reverse_execute_PlaceObject2_test2 \
+    loadImageTest \
 	loadMovieTest \
 	loadMovieTestRunner \
 	eventSoundTest1 \
@@ -1499,6 +1501,13 @@ SpriteButtonEventsTest_Runner_DEPENDENCIES = \
 SpriteButtonEventsTest_Runner_CXXFLAGS = \
 	-DTGTDIR='"$(abs_builddir)"' \
 	$(NULL)
+
+loadImageTest_SOURCES =	\
+	loadImageTest.c	\
+	$(NULL)
+loadImageTest_LDADD = libgnashmingutils.la
+loadImageTest.swf: loadImageTest
+	./loadImageTest $(top_srcdir)/testsuite/media
 
 loadMovieTest_SOURCES =	\
 	loadMovieTest.c	\

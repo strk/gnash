@@ -5,16 +5,19 @@
 
 // Handy image utilities for RGB surfaces.
 
-#include "image.h"
-
-#include "utility.h"
-#include "jpeg.h"
-#include "IOChannel.h"
-#include "tu_file.h" // some functions take a filename, tu_file is created in that case..
-
 #include <cstring>
 #include <memory>		// for auto_ptr
 #include <boost/scoped_array.hpp>
+#include <boost/shared_ptr.hpp>
+
+#include "gnash.h" // for image file types
+#include "image.h"
+#include "GnashImage.h"
+#include "GnashImagePng.h"
+#include "GnashImageGif.h"
+#include "GnashImageJpeg.h"
+#include "IOChannel.h"
+#include "log.h"
 
 namespace gnash
 {
@@ -25,9 +28,9 @@ namespace image
 	//
 
 	/// Create an image taking ownership of the given buffer, supposedly of height*pitch bytes
-	image_base::image_base(boost::uint8_t* data, int width, int height, int pitch, id_image type)
+	image_base::image_base(boost::uint8_t* data, int width, int height, int pitch, ImageType type)
 		:
-		m_type(type),
+		_type(type),
 		m_size(height*pitch),
 		m_width(width),
 		m_height(height),
@@ -37,9 +40,9 @@ namespace image
 	}
 
 	/// Create an image allocating a buffer of height*pitch bytes
-	image_base::image_base(int width, int height, int pitch, id_image type)
+	image_base::image_base(int width, int height, int pitch, ImageType type)
 		:
-		m_type(type),
+		_type(type),
 		m_size(height*pitch),
 		m_width(width),
 		m_height(height),
@@ -58,7 +61,7 @@ namespace image
 	{
 		assert(from.m_pitch == m_pitch);
 		assert(m_size <= from.m_size);
-		assert(m_type == from.m_type);
+		assert(_type == from._type);
 		std::memcpy(m_data.get(), const_cast<image_base&>(from).data(), m_size);
 	}
 
@@ -82,7 +85,7 @@ namespace image
 		:
 		image_base( width, height,
 			(width * 3 + 3) & ~3, // round pitch up to nearest 4-byte boundary
-			RGB)
+			GNASH_IMAGE_RGB)
 	{
 		assert(width > 0);
 		assert(height > 0);
@@ -102,7 +105,7 @@ namespace image
 
 	rgba::rgba(int width, int height)
 		:
-		image_base(width, height, width * 4, RGBA)
+		image_base(width, height, width * 4, GNASH_IMAGE_RGBA)
 	{
 		assert(width > 0);
 		assert(height > 0);
@@ -146,7 +149,7 @@ namespace image
 
 	alpha::alpha(int width, int height)
 		:
-		image_base(width, height, width, ALPHA)
+		image_base(width, height, width, GNASH_IMAGE_ALPHA)
 	{
 		assert(width > 0);
 		assert(height > 0);
@@ -157,127 +160,125 @@ namespace image
 	{
 	}
 
-
-	bool	alpha::operator==(const alpha& a) const
-	// Bitwise content comparison.
-	{
-		if (m_width != a.m_width
-		    || m_height != a.m_height)
-		{
-			return false;
-		}
-
-		for (int j = 0, n = m_height; j < n; j++)
-		{
-			if (memcmp(scanline(j), a.scanline(j), m_width))
-			{
-				// Mismatch.
-				return false;
-			}
-		}
-
-		// Images are identical.
-		return true;
-	}
-
 	//
 	// utility
 	//
 
-
 	// Write the given image to the given out stream, in jpeg format.
-	void	write_jpeg(gnash::IOChannel* out, rgb* image, int quality)
+	void writeImageData(FileType type, boost::shared_ptr<IOChannel> out, image::image_base* image, int quality)
 	{
-		size_t height = image->height();
-
-		std::auto_ptr<jpeg::output> j_out ( jpeg::output::create(out, image->width(), height, quality) );
-
-		for (size_t y = 0; y < height; ++y)
-		{
-			j_out->write_scanline(image->scanline(y));
-		}
-
-	}
-
-
-	rgb*	read_jpeg(const char* filename)
-	// Create and read a new image from the given filename, if possible.
-	{
-		tu_file	in(filename, "rb");	// file automatically closes when 'in' goes out of scope.
-		if (! in.get_error())
-		{
-			return read_jpeg(&in);
-		}
-		else
-		{
-			return NULL;
-		}
-	}
-
-
-	// Create and read a new image from the stream.
-	//
-	// TODO: return by auto_ptr !
-	//
-	rgb*	read_jpeg(gnash::IOChannel* in)
-	{
-		std::auto_ptr<jpeg::input> j_in ( jpeg::input::create(in) );
-		if (!j_in.get()) return 0;
 		
-		std::auto_ptr<rgb> im ( new image::rgb(j_in->get_width(), j_in->get_height()) );
+		const size_t width = image->width();
+		const size_t height = image->height();
+				
+		std::auto_ptr<ImageOutput> outChannel;
 
-		for (int y = 0; y < j_in->get_height(); y++)
-		{
-			j_in->read_scanline(im->scanline(y));
-		}
+        switch (type)
+        {
+            case GNASH_FILETYPE_PNG:
+                outChannel = PngImageOutput::create(out, width, height, quality);
+                break;
+            case GNASH_FILETYPE_JPEG:
+                outChannel = JpegImageOutput::create(out, width, height, quality);
+                break;
+            default:
+                log_error("Requested to write image as unsupported filetype");
+                break;
+        }
 
-		return im.release();
+        switch (image->type())
+        {
+            case GNASH_IMAGE_RGB:
+                outChannel->writeImageRGB(image->data());
+                break;
+            case GNASH_IMAGE_RGBA:
+                outChannel->writeImageRGBA(image->data());
+                break;
+            default:
+                break;
+        }
+
 	}
 
+    // See gnash.h for file types.
+    std::auto_ptr<rgb> readImageData(boost::shared_ptr<IOChannel> in, FileType type)
+    {
+        std::auto_ptr<rgb> im (NULL);
+        std::auto_ptr<ImageInput> inChannel;
 
-	rgb*	read_swf_jpeg2_with_tables(jpeg::input* j_in)
+        switch (type)
+        {
+            case GNASH_FILETYPE_PNG:
+                inChannel = PngImageInput::create(in);
+                break;
+            case GNASH_FILETYPE_GIF:
+                inChannel = GifImageInput::create(in);
+                break;
+            case GNASH_FILETYPE_JPEG:
+                inChannel = JpegImageInput::create(in);
+                break;
+            default:
+                break;
+        }
+        
+        if (!inChannel.get()) return im;
+        
+        const size_t height = inChannel->getHeight();
+        const size_t width = inChannel->getWidth();
+        
+        im.reset(new image::rgb(width, height));
+        
+        for (size_t i = 0; i < height; ++i)
+        {
+            inChannel->readScanline(im->scanline(i));
+        }
+        return im;
+    }
+
+	std::auto_ptr<rgb> readSWFJpeg2WithTables(JpegImageInput* j_in)
 	// Create and read a new image, using a input object that
 	// already has tables loaded.  The IJG documentation describes
 	// this as "abbreviated" format.
 	{
 		assert(j_in);
 
-		j_in->start_image();
+		j_in->startImage();
 
-		std::auto_ptr<rgb> im(new image::rgb(j_in->get_width(), j_in->get_height()));
+		std::auto_ptr<rgb> im(new image::rgb(j_in->getWidth(), j_in->getHeight()));
 
-		for (int y = 0; y < j_in->get_height(); y++) {
-			j_in->read_scanline(im->scanline(y));
+		for (size_t y = 0; y < j_in->getHeight(); y++) {
+			j_in->readScanline(im->scanline(y));
 		}
 
-		j_in->finish_image();
+		j_in->finishImage();
 
-		return im.release();
+		return im;
 	}
 
 
 	// For reading SWF JPEG3-style image data, like ordinary JPEG, 
 	// but stores the data in rgba format.
-	std::auto_ptr<rgba> readSWFJpeg3(gnash::IOChannel* in)
+	std::auto_ptr<rgba> readSWFJpeg3(boost::shared_ptr<gnash::IOChannel> in)
 	{
 	
 	    std::auto_ptr<rgba> im(NULL);
 
-		std::auto_ptr<jpeg::input> j_in ( jpeg::input::create_swf_jpeg2_header_only(in, false) );
+        // Calling with headerBytes as 0 has a special effect...
+		std::auto_ptr<JpegImageInput> j_in ( JpegImageInput::createSWFJpeg2HeaderOnly(in, 0) );
 		if ( ! j_in.get() ) return im;
 		
-		j_in->start_image();
+		j_in->startImage();
 
-		im.reset(new image::rgba(j_in->get_width(), j_in->get_height()));
+		im.reset(new image::rgba(j_in->getWidth(), j_in->getHeight()));
 
-		boost::scoped_array<boost::uint8_t> line ( new boost::uint8_t[3*j_in->get_width()] );
+		boost::scoped_array<boost::uint8_t> line ( new boost::uint8_t[3*j_in->getWidth()] );
 
-		for (int y = 0; y < j_in->get_height(); y++) 
+		for (size_t y = 0; y < j_in->getHeight(); y++) 
 		{
-			j_in->read_scanline(line.get());
+			j_in->readScanline(line.get());
 
 			boost::uint8_t*	data = im->scanline(y);
-			for (int x = 0; x < j_in->get_width(); x++) 
+			for (size_t x = 0; x < j_in->getWidth(); x++) 
 			{
 				data[4*x+0] = line[3*x+0];
 				data[4*x+1] = line[3*x+1];
@@ -286,7 +287,7 @@ namespace image
 			}
 		}
 
-		j_in->finish_image();
+		j_in->finishImage();
 
 		return im;
 	}

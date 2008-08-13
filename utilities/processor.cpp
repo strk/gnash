@@ -468,7 +468,7 @@ play_movie(const char* filename)
 	++nadvances;
 	if ( limit_advances && nadvances >= limit_advances)
 	{
-		log_debug("exiting after " SIZET_FMT " advances\n", nadvances);
+		log_debug("exiting after %d advances", nadvances);
 		break;
 	}
 
@@ -479,8 +479,8 @@ play_movie(const char* filename)
 	{
 		if ( allowed_end_hits && ++end_hitcount >= allowed_end_hits )
 		{
-			log_debug("exiting after " SIZET_FMT 
-			       " times last frame was reached\n", end_hitcount);
+			log_debug("exiting after %d" 
+			       " times last frame was reached", end_hitcount);
 	    		break;
 		}
 	}
@@ -520,8 +520,8 @@ play_movie(const char* filename)
 	    if ( last_frame > latest_frame ) latest_frame = last_frame;
 	    if ( ++loop_back_count > allowloopbacks )
 	    {
-		    log_debug(SIZET_FMT " loop backs; jumping one-after "
-				    "latest frame (" SIZET_FMT ")\n",
+		    log_debug("%d loop backs; jumping one-after "
+				    "latest frame (%d)",
 				    loop_back_count, latest_frame+1);
 		    m.goto_frame(latest_frame + 1);
 		    loop_back_count = 0;

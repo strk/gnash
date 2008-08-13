@@ -2727,8 +2727,8 @@ void sprite_instance::call_frame_actions(const as_value& frame_spec)
 
 character* sprite_instance::add_empty_movieclip(const char* name, int depth)
 {
-  // empty_sprite_def will be deleted during deliting sprite
-  sprite_definition* empty_sprite_def = new sprite_definition(get_movie_definition(), NULL);
+  // empty_sprite_def will be deleted during deleting sprite
+  sprite_definition* empty_sprite_def = new sprite_definition(get_movie_definition());
 
   sprite_instance* sprite = new sprite_instance(empty_sprite_def, m_root, this, 0);
   sprite->set_name(name);
@@ -4572,8 +4572,6 @@ sprite_instance::loadMovie(const URL& url, const std::string* postdata)
     // top-level movies can't have clip events, right ?
     assert ( extern_movie->get_event_handlers().empty() );
     extern_movie->set_event_handlers(clipEvs);
-
-    save_extern_movie(extern_movie.get());
 
     const std::string& name = get_name();
     assert ( parent == extern_movie->get_parent() );

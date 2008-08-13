@@ -42,9 +42,10 @@ DIR_SWFDEC_TESTSUITE = swfdec
 endif
 
 DIST_SUBDIRS = \
-	libnet.all \
+	actionscript.all \
 	libbase	\
 	libamf.all \
+	libnet.all \
 	libcore.all \
 	samples	\
 	swfdec \

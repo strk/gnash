@@ -28,16 +28,11 @@
 #include "impl.h"
 #include "log.h"
 #include "render.h"
-#include "stream.h"
+#include "SWFStream.h"
 #include "sprite_instance.h"
 
 #include <cfloat>
 #include <algorithm>
-
-//#ifdef __sgi
-//extern double round(double);
-//#pragma optional round
-//#endif
 
 // Define the macro below to always compute bounds for shape characters
 // and compare them with the bounds encoded in the SWF
@@ -304,7 +299,7 @@ shape_character_def::read(SWFStream& in, int tag_type, bool with_style,
                     if ( style > m_fill_styles.size() )
                     {
                         IF_VERBOSE_MALFORMED_SWF(
-                             log_swferror(_("Invalid fill style %d in fillStyle0Change record - " SIZET_FMT " defined. Set to 0."), style, m_fill_styles.size());
+                             log_swferror(_("Invalid fill style %d in fillStyle0Change record - %d defined. Set to 0."), style, m_fill_styles.size());
                          );
                         style = 0;
                     }
@@ -350,7 +345,7 @@ shape_character_def::read(SWFStream& in, int tag_type, bool with_style,
                     if ( style > m_fill_styles.size() )
                     {
                         IF_VERBOSE_MALFORMED_SWF(
-                            log_swferror(_("Invalid fill style %d in fillStyle1Change record - " SIZET_FMT " defined. Set to 0."), style, m_fill_styles.size());
+                            log_swferror(_("Invalid fill style %d in fillStyle1Change record - %d defined. Set to 0."), style, m_fill_styles.size());
                         );
                         style = 0;
                     }
@@ -394,7 +389,7 @@ shape_character_def::read(SWFStream& in, int tag_type, bool with_style,
                     if ( style > m_line_styles.size() )
                     {
                         IF_VERBOSE_MALFORMED_SWF(
-                            log_swferror(_("Invalid fill style %d in lineStyleChange record - " SIZET_FMT " defined. Set to 0."), style, m_line_styles.size());
+                            log_swferror(_("Invalid fill style %d in lineStyleChange record - %d defined. Set to 0."), style, m_line_styles.size());
                         );
                         style = 0;
                     }
@@ -817,10 +812,16 @@ shape_character_def::read(SWFStream& in, int tag_type, bool with_style,
 
         bool even_odd = true;  // later we will need non-zero for glyphs... (TODO)
 
-        if (m_bound.point_test(x, y) == false)
-        {
-            return false;
-        }
+	// FIXME: if the shape contains non-scaled strokes
+	//        we can't rely on boundary itself for a quick
+	//        way out. Bounds supposedly already include
+	//        thickness, so we might keep a flag telling us
+	//        whether *non_scaled* strokes are present
+	//        and if not still use the boundary check.
+        //if (m_bound.point_test(x, y) == false)
+        //{
+		//return false;
+        //}
 
         unsigned npaths = m_paths.size();
         int counter = 0;
@@ -864,15 +865,17 @@ shape_character_def::read(SWFStream& in, int tag_type, bool with_style,
                     // TODO: pass the matrix to withinSquareDistance instead ?
                     double xScale = wm.get_x_scale();
                     double yScale = wm.get_y_scale();
-                    thickness /= std::max(xScale, yScale);
+			//log_debug("thickness:%d, xScale:%g, yScale:%g", thickness, xScale, yScale);
+                    thickness *= std::max(xScale, yScale);
+			//log_debug("after scaling, thickness:%d", thickness);
                 }
                 else if ( ls.scaleThicknessVertically() != ls.scaleThicknessHorizontally() )
                 {
                     LOG_ONCE( log_unimpl("Collision detection for unidirectionally scaled strokes") );
                 }
 
-                double  dist = thickness / 2.0;
-                boost::int64_t  sqdist = static_cast<boost::int64_t>(dist * dist); 
+                double dist = thickness / 2.0;
+                double sqdist = dist * dist;
                 if (pth.withinSquareDistance(pt, sqdist))
                     return true;
             }

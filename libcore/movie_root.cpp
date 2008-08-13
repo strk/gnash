@@ -427,8 +427,6 @@ movie_root::loadLevel(unsigned int num, const URL& url)
 	character* ch = extern_movie.get();
 	ch->set_depth(num+character::staticDepthOffset);
 
-	save_extern_movie(extern_movie.get());
-
 	setLevel(num, extern_movie);
 
 	return true;

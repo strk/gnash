@@ -437,29 +437,29 @@ Gui::menu_stop()
 void
 Gui::menu_step_forward()
 {
-	movie_root* m = get_current_root();
-	m->goto_frame(m->get_current_frame()+1);
+	movie_root& m = VM::get().getRoot();
+	m.goto_frame(m.get_current_frame()+1);
 }
 
 void
 Gui::menu_step_backward()
 {
-	movie_root* m = get_current_root();
-	m->goto_frame(m->get_current_frame()-1);
+	movie_root& m = VM::get().getRoot();
+	m.goto_frame(m.get_current_frame()-1);
 }
 
 void
 Gui::menu_jump_forward()
 {
-	movie_root* m = get_current_root();
-	m->goto_frame(m->get_current_frame()+10);
+	movie_root& m = VM::get().getRoot();
+	m.goto_frame(m.get_current_frame()+10);
 }
 
 void
 Gui::menu_jump_backward()
 {
-	movie_root* m = get_current_root();
-	m->goto_frame(m->get_current_frame()-10);
+	movie_root& m = VM::get().getRoot();
+	m.goto_frame(m.get_current_frame()-10);
 }
 
 void
