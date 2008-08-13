@@ -44,7 +44,7 @@ private:
     png_structp _pngPtr;
     png_infop _infoPtr;
     boost::scoped_array<png_bytep> _rowPtrs;
-    boost::scoped_array<png_byte> _rows;
+    boost::scoped_array<png_byte> _pixelData;
    
     // A counter for keeping track of the last row copied.
     size_t _currentRow;

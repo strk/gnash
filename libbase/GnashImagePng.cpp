@@ -72,6 +72,7 @@ PngImageInput::PngImageInput(boost::shared_ptr<IOChannel> in) :
     _pngPtr(0),
     _infoPtr(0),
     _rowPtrs(0),
+    _pixelData(0),
     _currentRow(0)
 {
     init();
@@ -176,7 +177,7 @@ PngImageInput::read()
     assert (png_get_channels(_pngPtr, _infoPtr) == components);
 
     // Allocate space for the data (3 bytes per pixel)
-    _rows.reset(new png_byte[width * height * components]);
+    _pixelData.reset(new png_byte[width * height * components]);
 
     // Allocate an array of pointers to the beginning of
     // each row.    
@@ -185,7 +186,7 @@ PngImageInput::read()
     // Fill in the row pointers.
     for (size_t y = 0; y < height; ++y)
     {
-        _rowPtrs[y] = _rows.get() + y * width * components;
+        _rowPtrs[y] = _pixelData.get() + y * width * components;
     }
 
     // Read in the image using the options set.
