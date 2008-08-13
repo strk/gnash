@@ -30,10 +30,10 @@ namespace image
 
 enum ImageType
 {
-	INVALID,
-	RGB,
-	RGBA,
-	ALPHA
+	GNASH_IMAGE_INVALID,
+	GNASH_IMAGE_RGB,
+	GNASH_IMAGE_RGBA,
+	GNASH_IMAGE_ALPHA
 };
 
 	/// Base class for different types of images
@@ -110,7 +110,7 @@ enum ImageType
 
 	protected:
 
-		ImageType _type;
+		const ImageType _type;
 
 		/// Size of image buffer in bytes.
 		const size_t m_size;
@@ -150,7 +150,7 @@ enum ImageType
 		{}
 
 		rgb(boost::uint8_t* data, int width, int height, int stride)
-			: image_base(data, width, height, stride, RGB)
+			: image_base(data, width, height, stride, GNASH_IMAGE_RGB)
 		{}
 
 		~rgb();

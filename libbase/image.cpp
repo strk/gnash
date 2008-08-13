@@ -85,7 +85,7 @@ namespace image
 		:
 		image_base( width, height,
 			(width * 3 + 3) & ~3, // round pitch up to nearest 4-byte boundary
-			RGB)
+			GNASH_IMAGE_RGB)
 	{
 		assert(width > 0);
 		assert(height > 0);
@@ -105,7 +105,7 @@ namespace image
 
 	rgba::rgba(int width, int height)
 		:
-		image_base(width, height, width * 4, RGBA)
+		image_base(width, height, width * 4, GNASH_IMAGE_RGBA)
 	{
 		assert(width > 0);
 		assert(height > 0);
@@ -149,7 +149,7 @@ namespace image
 
 	alpha::alpha(int width, int height)
 		:
-		image_base(width, height, width, ALPHA)
+		image_base(width, height, width, GNASH_IMAGE_ALPHA)
 	{
 		assert(width > 0);
 		assert(height > 0);
@@ -186,18 +186,18 @@ namespace image
                 break;
         }
 
-        image::rgb* imageRGB = dynamic_cast<image::rgb*>(image);
-        if (imageRGB)
+        switch (image->type())
         {
-            outChannel->writeImageRGB(imageRGB->data());
-            return;        
+            case GNASH_IMAGE_RGB:
+                outChannel->writeImageRGB(image->data());
+                break;
+            case GNASH_IMAGE_RGBA:
+                outChannel->writeImageRGBA(image->data());
+                break;
+            default:
+                break;
         }
 
-        image::rgba* imageRGBA = dynamic_cast<image::rgba*>(image);
-        if (imageRGBA)
-        {
-            outChannel->writeImageRGBA(imageRGBA->data());
-        }
 	}
 
     // See gnash.h for file types.
