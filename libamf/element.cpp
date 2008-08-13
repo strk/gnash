@@ -74,12 +74,15 @@ Element::Element()
 Element::~Element()
 {
 //    GNASH_REPORT_FUNCTION;
-	delete _buffer;
-
     for (size_t i=0; i< _properties.size(); i++) {
 	delete _properties[i];
     }
+    if (_buffer) {
+	delete _buffer;
+    }
+    if (_name) {
 	delete[] _name;
+    }
 }
 
 
