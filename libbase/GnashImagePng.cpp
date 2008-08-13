@@ -101,45 +101,13 @@ PngImageInput::readScanline(unsigned char* rgbData)
 {
     assert (_currentRow < getHeight());
     assert (_rowPtrs);
-   
-    const size_t components = getComponents();
 
-    // Bit-depth must be 8!
-    assert (png_get_rowbytes(_pngPtr, _infoPtr) == components * getWidth());
-    
-    switch (components)
-    {
-
-        case 3:
-            // Data packed as RGB
-            std::memcpy(rgbData, _rowPtrs[_currentRow],
-                        getWidth() * components);
-            break;
-
-        case 1:
-            // Greyscale data: we have to convert to RGB
-            for (size_t x = 0; x < getWidth(); ++x)
-            {
-                std::memset(rgbData, _rowPtrs[_currentRow][x], 3);
-                rgbData += 3;
-            }
-            break;
-
-        default:
-            boost::format fmt = boost::format("Cannot handle pixels "
-                                     "with %d channels!") % components;
-            throw ParserException(fmt.str());
-
-    }
+    // Data packed as RGB
+    std::memcpy(rgbData, _rowPtrs[_currentRow], getWidth() * 3);
     
     ++_currentRow;
 }
 
-size_t
-PngImageInput::getComponents() const
-{
-    return png_get_channels(_pngPtr, _infoPtr);
-}
 
 void
 PngImageInput::init()
@@ -163,16 +131,66 @@ PngImageInput::read()
 {
     // Set our user-defined reader function
     png_set_read_fn(_pngPtr, _inStream.get(), &readData);
-    
-    // read PNG into memory.
-    // TODO: sort out transform options.
-    // At present we strip alpha because Gnash can't handle it and reduce the bit depth
-    // to 8 bits, as that's all the image class can handle.
-    png_read_png(_pngPtr, _infoPtr, PNG_TRANSFORM_STRIP_ALPHA | PNG_TRANSFORM_STRIP_16, NULL);
 
-    // Allocate and fill array of pointers to each row. This should be
-    // cleaned up by png_destroy_read_struct.
-    _rowPtrs = png_get_rows(_pngPtr, _infoPtr);    
+
+    png_read_info(_pngPtr, _infoPtr);
+
+    png_byte type = png_get_color_type(_pngPtr, _infoPtr);
+    png_byte bitDepth = png_get_bit_depth(_pngPtr, _infoPtr);
+    
+    // Convert indexed images to RGB
+    if (type == PNG_COLOR_TYPE_PALETTE)
+    {
+        log_debug("Palette->RGB");
+        png_set_palette_to_rgb(_pngPtr);
+    }
+    
+    // Convert less-than-8-bit greyscale to 8 bit.
+    if (type == PNG_COLOR_TYPE_GRAY && bitDepth < 8)
+    {
+        log_debug("Gray bit depth(%d) to 8", bitDepth);
+        png_set_gray_1_2_4_to_8(_pngPtr);
+    }
+
+    // Make 16-bit data into 8-bit data
+    if (bitDepth == 16) png_set_strip_16(_pngPtr);
+
+    // Remove alpha channel because Gnash can't deal with it yet.
+    if (type & PNG_COLOR_MASK_ALPHA) png_set_strip_alpha(_pngPtr);
+
+    // Convert 1-channel grey images to 3-channel RGB.
+    if (type == PNG_COLOR_TYPE_GRAY || type == PNG_COLOR_TYPE_GRAY_ALPHA)
+    {
+        log_debug("Grey->RGB");
+        png_set_gray_to_rgb(_pngPtr);
+    }
+
+    png_read_update_info(_pngPtr, _infoPtr);
+
+    const size_t height = getHeight();
+    const size_t width = getWidth();
+
+    const size_t components = 3;
+
+    // We must have 3-channel data by this point.
+    assert (png_get_channels(_pngPtr, _infoPtr) == components);
+
+    // Allocate space for the data (3 bytes per pixel)
+    _rows.reset(new png_byte[width * height * components]);
+
+    // Allocate an array of pointers to the beginning of
+    // each row.    
+    _rowPtrs.reset(new png_bytep[height]);
+    
+    // Fill in the row pointers.
+    for (size_t y = 0; y < height; ++y)
+    {
+        _rowPtrs[y] = _rows.get() + y * width * components;
+    }
+
+    // Read in the image using the options set.
+    png_read_image(_pngPtr, _rowPtrs.get());
+
 }
 
 ///
