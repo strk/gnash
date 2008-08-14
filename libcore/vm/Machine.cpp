@@ -928,7 +928,7 @@ Machine::execute()
 ///  value -- String object from string_pool[index]
 	case SWF::ABC_ACTION_PUSHSTRING:
 	{
-		push_stack(pool_string(mStream->read_V32(), mPoolObject));
+		push_stack(as_value(pool_string(mStream->read_V32(), mPoolObject)));
 		break;
 	}
 /// 0x2D ABC_ACTION_PUSHINT
