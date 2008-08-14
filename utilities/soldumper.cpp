@@ -55,7 +55,6 @@ gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
 
 const char *SOLDUMPER_VERSION = "0.5";
 static void usage ();
-void dump_ctrl(void *ptr);
 
 int
 main(int argc, char *argv[])

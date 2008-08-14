@@ -52,10 +52,14 @@ check_PROGRAMS = \
 	test_buffer \
 	test_el \
 	test_sol \
-	test_lc
+	test_lc \
+	test_flv
 
 test_el_SOURCES = test_el.cpp
 test_el_LDADD = $(AM_LDFLAGS)
+
+test_flv_SOURCES = test_flv.cpp
+test_flv_LDADD = $(AM_LDFLAGS)
 
 test_sol_SOURCES = test_sol.cpp
 test_sol_LDADD = $(AM_LDFLAGS)

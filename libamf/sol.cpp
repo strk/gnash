@@ -251,26 +251,26 @@ SOL::writeFile(const string &filespec, const string &name)
         size_t outsize = 0;
         switch (el->getType()) {
 	  case Element::BOOLEAN_AMF0:
-	      outsize = el->getNameSize() + 3;
+	      outsize = el->getNameSize() + 4;
 	      memcpy(ptr, var->reference(), outsize); 
 	      ptr += outsize;
 	      break;
 	  case Element::OBJECT_AMF0:
 	      outsize = el->getNameSize() + 5;
               assert(ptr+outsize < endPtr);
-	      outsize = el->getNameSize() + 5;
+//	      outsize = el->getNameSize() + 5;
 	      memcpy(ptr, var->reference(), outsize);
 	      ptr += outsize;
 	      *ptr++ = Element::OBJECT_END_AMF0;
-	      *ptr++ = 0;	// objects are terminated too!
+//	      *ptr++ = 0;	// objects are terminated too!
 	      break;
 	  case Element::NUMBER_AMF0:
-	      outsize = el->getNameSize() + AMF0_NUMBER_SIZE + 2;
+	      outsize = el->getNameSize() + AMF0_NUMBER_SIZE + 3;
               assert(ptr+outsize < endPtr);
 	      memcpy(ptr, var->reference(), outsize);
 	      ptr += outsize;
-	      *ptr++ = 0;	// doubles are terminated too!
-	      *ptr++ = 0;	// doubles are terminated too!
+// 	      *ptr++ = 0;	// doubles are terminated too!
+// 	      *ptr++ = 0;	// doubles are terminated too!
 	      break;
 	  case Element::STRING_AMF0:
 	      if (el->getLength() == 0) {
@@ -338,7 +338,7 @@ SOL::readFile(std::string &filespec)
 	    _filesize = st.st_size;
 	    buf = new Network::byte_t[_filesize + sizeof(int)];
 	    ptr = buf;
-	    Network::byte_t* tooFar = buf+_filesize+sizeof(int);
+	    Network::byte_t* tooFar = buf+_filesize;
 	    
 	    bodysize = st.st_size - 6;
 	    _filespec = filespec;
@@ -399,9 +399,6 @@ SOL::readFile(std::string &filespec)
 		if (ptr) {
 		    el = amf_obj.extractProperty(ptr, tooFar);
 		    if (el != 0) {
-			// Unlike RTMP, SOL files tack an extra
-			// zero byte after every property, so we
-			// want to skip past this one too.
 			ptr += amf_obj.totalsize() + 1;
 			_amfobjs.push_back(el);
 		    } else {
