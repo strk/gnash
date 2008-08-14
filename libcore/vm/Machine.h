@@ -25,6 +25,7 @@
 #include "as_value.h"
 #include "asClass.h"
 #include "swf.h"
+#include "as_environment.h"
 
 #define LOG_DEBUG_AVM(fmt,...) log_action("AVM2: " fmt, ## __VA_ARGS__);
 
@@ -311,12 +312,12 @@ private:
 		mStack.push(value);
 	}
 
-	std::vector<as_value> get_args(int argc){
-		std::vector<as_value> args;
+	as_environment get_args(int argc){
+		as_environment env;
 		for(unsigned int i=0;i<argc;i++){
-			args.push_back(pop_stack());
+			env.push(pop_stack());
 		}
-		return args;
+		return env;
 	}
 
 	SafeStack<as_value> mStack;
