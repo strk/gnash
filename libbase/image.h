@@ -40,8 +40,6 @@ namespace gnash {
 /// Handy image utilities for RGB surfaces.
 namespace gnash
 {
-namespace image
-{
 
 enum ImageType
 {
@@ -50,6 +48,11 @@ enum ImageType
 	GNASH_IMAGE_RGBA,
 	GNASH_IMAGE_ALPHA
 };
+
+namespace image
+{
+
+
 
 	/// Base class for different types of images
 	class DSOEXPORT ImageBase
@@ -115,7 +118,7 @@ enum ImageType
 		void clear(const boost::uint8_t byteValue = 0);
 
 		/// Return a pointer to the underlying data
-		virtual boost::uint8_t* data() { return m_data.get(); }
+		boost::uint8_t* data() { return m_data.get(); }
 
 		/// Return a pointer to first byte of given line
 		DSOEXPORT boost::uint8_t* scanline(size_t y);
@@ -124,6 +127,7 @@ enum ImageType
 
 		virtual ~ImageBase() {}
 
+        virtual std::auto_ptr<ImageBase> clone() = 0;
 
 	protected:
 
@@ -149,8 +153,6 @@ enum ImageType
 		/// Data bytes, geometry defined by members below
 		boost::scoped_array<boost::uint8_t> m_data;
 
-	private:
-
 	};
 
 	/// 24-bit RGB image.  Packed data, red byte first (RGBRGB...)
@@ -171,6 +173,11 @@ enum ImageType
 		{}
 
 		~rgb();
+
+        virtual std::auto_ptr<ImageBase> clone()
+        {
+            return std::auto_ptr<ImageBase>(new rgb(*this));
+        };
 
 	};
 
@@ -197,6 +204,11 @@ enum ImageType
 
         void mergeAlpha(const boost::uint8_t* alphaData, const size_t bufferLength);
 
+        virtual std::auto_ptr<ImageBase> clone()
+        {
+            return std::auto_ptr<ImageBase>(new rgba(*this));
+        };
+
 	};
 
 	/// 8-bit alpha image.
@@ -217,6 +229,11 @@ enum ImageType
 		/// TODO: move in base class ?
 		///
 		void	set_pixel(size_t x, size_t y, boost::uint8_t a);
+
+        virtual std::auto_ptr<ImageBase> clone()
+        {
+            return std::auto_ptr<ImageBase>(new alpha(*this));
+        };
 
 	};
 

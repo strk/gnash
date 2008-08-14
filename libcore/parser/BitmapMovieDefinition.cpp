@@ -37,14 +37,14 @@ BitmapMovieDefinition::getShapeDef()
     // Checking the type allows a neat switch statement.
     switch (_image->type())
     {
-        case image::GNASH_IMAGE_RGB:
+        case GNASH_IMAGE_RGB:
         {
             std::auto_ptr<image::rgb> imageRGB(dynamic_cast<image::rgb*>(_image.release()));
             assert(imageRGB.get());
             _bitmap = new bitmap_character_def(imageRGB);
             break;
         }
-        case image::GNASH_IMAGE_RGBA:
+        case GNASH_IMAGE_RGBA:
         {
             std::auto_ptr<image::rgba> imageRGBA(dynamic_cast<image::rgba*>(_image.release()));
             assert(imageRGBA.get());

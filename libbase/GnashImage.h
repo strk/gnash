@@ -22,6 +22,7 @@
 
 #include <boost/shared_ptr.hpp> 
 #include "log.h"
+#include "image.h"
 
 // Forward declarations
 namespace gnash { class IOChannel; }
@@ -33,7 +34,8 @@ class ImageInput {
 public:
 
 	ImageInput(boost::shared_ptr<IOChannel> in) :
-	    _inStream(in)
+	    _inStream(in),
+	    _type(GNASH_IMAGE_INVALID)
 	{}
 
 	virtual ~ImageInput() {}
@@ -64,9 +66,13 @@ public:
 	virtual size_t getWidth() const = 0;
 	virtual void readScanline(unsigned char* rgb_data) = 0;
 
+    ImageType imageType() { return _type; }
+
 protected:
 
     boost::shared_ptr<IOChannel> _inStream;
+
+    ImageType _type;
 
 };
 
