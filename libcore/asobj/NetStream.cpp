@@ -552,12 +552,12 @@ NetStream::newFrameReady()
 	}
 }
 
-std::auto_ptr<image::image_base>
+std::auto_ptr<image::ImageBase>
 NetStream::get_video()
 {
 	boost::mutex::scoped_lock lock(image_mutex);
 
-	if (!m_imageframe.get()) return std::auto_ptr<image::image_base>(0);
+	if (!m_imageframe.get()) return std::auto_ptr<image::ImageBase>(0);
 
 	// TODO: inspect if we could return m_imageframe directly...
 	return m_imageframe;	

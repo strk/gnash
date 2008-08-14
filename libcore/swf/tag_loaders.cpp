@@ -338,8 +338,6 @@ define_bits_jpeg2_loader(SWFStream& in, tag_type tag, movie_definition* m)
     // Read the image data.
     //
 
-    boost::shared_ptr<tu_file> ad( StreamAdapter::getFile(in, in.get_tag_end_position()).release() );
-    std::auto_ptr<image::rgb> im (image::readImageData(ad, GNASH_FILETYPE_JPEG));
 
     if ( m->get_bitmap_character_def(character_id) )
     {
@@ -349,7 +347,15 @@ define_bits_jpeg2_loader(SWFStream& in, tag_type tag, movie_definition* m)
     }
     else
     {
-        boost::intrusive_ptr<bitmap_character_def> ch = new bitmap_character_def(im);
+        boost::shared_ptr<tu_file> ad( StreamAdapter::getFile(in, in.get_tag_end_position()).release() );
+
+        std::auto_ptr<image::ImageBase> im (image::readImageData(ad, GNASH_FILETYPE_JPEG));
+
+        // It must be an RGB image, as normal JPEG images don't support RGBA.
+        std::auto_ptr<image::rgb> imageRGB(dynamic_cast<image::rgb*>(im.release()));
+        assert(imageRGB.get());            
+
+        boost::intrusive_ptr<bitmap_character_def> ch = new bitmap_character_def(imageRGB);
         m->add_bitmap_character_def(character_id, ch.get());
     }
 }

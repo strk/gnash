@@ -1,3 +1,4 @@
+
 // Image.h: image data class for Gnash.
 // 
 //   Copyright (C) 2006, 2007, 2008 Free Software Foundation, Inc.
@@ -51,11 +52,11 @@ enum ImageType
 };
 
 	/// Base class for different types of images
-	class DSOEXPORT image_base
+	class DSOEXPORT ImageBase
 	{
 	public:
 
-		image_base(const image_base& o)
+		ImageBase(const ImageBase& o)
 			:
 			_type(o._type),
 			m_size(o.size()),
@@ -67,10 +68,10 @@ enum ImageType
 			update(o);
 		}
 			
-		image_base(boost::uint8_t *data, int width, int height, int pitch, ImageType type);
+		ImageBase(boost::uint8_t *data, int width, int height, int pitch, ImageType type);
 
-		/// Construct an image_base allocating data for height*pitch bytes
-		image_base(int width, int height, int pitch, ImageType type);
+		/// Construct an ImageBase allocating data for height*pitch bytes
+		ImageBase(int width, int height, int pitch, ImageType type);
 
         ImageType type() const { return _type; }
 
@@ -95,7 +96,7 @@ enum ImageType
 		/// Copy image data from a buffer.
 		//
 		/// Note that this buffer MUST have the same m_pitch, or unexpected things
-		/// will happen. In general, it is only safe to copy from another image_base
+		/// will happen. In general, it is only safe to copy from another ImageBase
 		/// (or derivative thereof) or unexpected things will happen. 
 		///
 		/// @param data buffer to copy data from.
@@ -109,7 +110,7 @@ enum ImageType
 		///
 		/// @param from image to copy data from.
 		///
-		void update(const image_base& from);
+		void update(const ImageBase& from);
 		
 		void clear(const boost::uint8_t byteValue = 0);
 
@@ -121,7 +122,7 @@ enum ImageType
 
         DSOEXPORT boost::uint8_t* const scanlinePointer(size_t y) const;
 
-		virtual ~image_base() {}
+		virtual ~ImageBase() {}
 
 
 	protected:
@@ -153,7 +154,7 @@ enum ImageType
 	};
 
 	/// 24-bit RGB image.  Packed data, red byte first (RGBRGB...)
-	class DSOEXPORT rgb : public image_base
+	class DSOEXPORT rgb : public ImageBase
 	{
 
 	public:
@@ -162,11 +163,11 @@ enum ImageType
 
 		rgb(const rgb& o)
 			:
-			image_base(o)
+			ImageBase(o)
 		{}
 
 		rgb(boost::uint8_t* data, int width, int height, int stride)
-			: image_base(data, width, height, stride, GNASH_IMAGE_RGB)
+			: ImageBase(data, width, height, stride, GNASH_IMAGE_RGB)
 		{}
 
 		~rgb();
@@ -174,7 +175,7 @@ enum ImageType
 	};
 
 	/// 32-bit RGBA image.  Packed data, red byte first (RGBARGBA...)
-	class DSOEXPORT rgba : public image_base
+	class DSOEXPORT rgba : public ImageBase
 	{
 
 	public:
@@ -183,7 +184,7 @@ enum ImageType
 
 		rgba(const rgba& o)
 			:
-			image_base(o)
+			ImageBase(o)
 		{}
 
 		~rgba();
@@ -199,14 +200,14 @@ enum ImageType
 	};
 
 	/// 8-bit alpha image.
-	class DSOEXPORT alpha : public image_base
+	class DSOEXPORT alpha : public ImageBase
 	{
 	public:
 		alpha(int width, int height);
 
 		alpha(const alpha& o)
 			:
-			image_base(o)
+			ImageBase(o)
 		{}
 
 		~alpha();
@@ -226,7 +227,7 @@ enum ImageType
 	/// @param image    The image to write.
 	/// @param quality  The quality of the image output (not used for all formats)
 	DSOEXPORT void writeImageData(FileType type, boost::shared_ptr<gnash::IOChannel> out,
-	                              image_base* image, int quality);
+	                              ImageBase* image, int quality);
 
 	/// \brief
 	/// For reading SWF JPEG2-style image data, using pre-loaded
@@ -238,7 +239,7 @@ enum ImageType
 	/// but stores the data in rgba format.
 	DSOEXPORT std::auto_ptr<rgba> readSWFJpeg3(boost::shared_ptr<gnash::IOChannel> in);
 	
-	DSOEXPORT std::auto_ptr<rgb> readImageData(boost::shared_ptr<gnash::IOChannel> in, FileType type);
+	DSOEXPORT std::auto_ptr<ImageBase> readImageData(boost::shared_ptr<gnash::IOChannel> in, FileType type);
 
 } // namespace image
 } // namespace gnash

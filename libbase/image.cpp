@@ -38,11 +38,11 @@ namespace gnash
 namespace image
 {
 	//
-	// image_base
+	// ImageBase
 	//
 
 	/// Create an image taking ownership of the given buffer, supposedly of height*pitch bytes
-	image_base::image_base(boost::uint8_t* data, int width, int height, int pitch, ImageType type)
+	ImageBase::ImageBase(boost::uint8_t* data, int width, int height, int pitch, ImageType type)
 		:
 		_type(type),
 		m_size(height*pitch),
@@ -54,7 +54,7 @@ namespace image
 	}
 
 	/// Create an image allocating a buffer of height*pitch bytes
-	image_base::image_base(int width, int height, int pitch, ImageType type)
+	ImageBase::ImageBase(int width, int height, int pitch, ImageType type)
 		:
 		_type(type),
 		m_size(height*pitch),
@@ -66,31 +66,31 @@ namespace image
 		assert(pitch >= width);
 	}
 
-	void image_base::update(boost::uint8_t* data)
+	void ImageBase::update(boost::uint8_t* data)
 	{
 		std::memcpy(m_data.get(), data, m_size);
 	}
 
-	void image_base::update(const image_base& from)
+	void ImageBase::update(const ImageBase& from)
 	{
 		assert(from.m_pitch == m_pitch);
 		assert(m_size <= from.m_size);
 		assert(_type == from._type);
-		std::memcpy(m_data.get(), const_cast<image_base&>(from).data(), m_size);
+		std::memcpy(m_data.get(), const_cast<ImageBase&>(from).data(), m_size);
 	}
 
-    void image_base::clear(const boost::uint8_t byteValue)
+    void ImageBase::clear(const boost::uint8_t byteValue)
     {
         std::memset(m_data.get(), byteValue, m_size);
     }
 
-	boost::uint8_t* image_base::scanline(size_t y)
+	boost::uint8_t* ImageBase::scanline(size_t y)
 	{
 		assert(y < m_height);
 		return m_data.get() + m_pitch * y;
 	}
 
-	boost::uint8_t* const image_base::scanlinePointer(size_t y) const
+	boost::uint8_t* const ImageBase::scanlinePointer(size_t y) const
 	{
 		assert(y < m_height);
 		return m_data.get() + m_pitch * y;
@@ -103,7 +103,7 @@ namespace image
 
 	rgb::rgb(int width, int height)
 		:
-		image_base( width, height,
+		ImageBase( width, height,
 			(width * 3 + 3) & ~3, // round pitch up to nearest 4-byte boundary
 			GNASH_IMAGE_RGB)
 	{
@@ -125,7 +125,7 @@ namespace image
 
 	rgba::rgba(int width, int height)
 		:
-		image_base(width, height, width * 4, GNASH_IMAGE_RGBA)
+		ImageBase(width, height, width * 4, GNASH_IMAGE_RGBA)
 	{
 		assert(width > 0);
 		assert(height > 0);
@@ -169,7 +169,7 @@ namespace image
 
 	alpha::alpha(int width, int height)
 		:
-		image_base(width, height, width, GNASH_IMAGE_ALPHA)
+		ImageBase(width, height, width, GNASH_IMAGE_ALPHA)
 	{
 		assert(width > 0);
 		assert(height > 0);
@@ -185,7 +185,7 @@ namespace image
 	//
 
 	// Write the given image to the given out stream, in jpeg format.
-	void writeImageData(FileType type, boost::shared_ptr<IOChannel> out, image::image_base* image, int quality)
+	void writeImageData(FileType type, boost::shared_ptr<IOChannel> out, image::ImageBase* image, int quality)
 	{
 		
 		const size_t width = image->width();
@@ -221,9 +221,9 @@ namespace image
 	}
 
     // See gnash.h for file types.
-    std::auto_ptr<rgb> readImageData(boost::shared_ptr<IOChannel> in, FileType type)
+    std::auto_ptr<ImageBase> readImageData(boost::shared_ptr<IOChannel> in, FileType type)
     {
-        std::auto_ptr<rgb> im (NULL);
+        std::auto_ptr<ImageBase> im (NULL);
         std::auto_ptr<ImageInput> inChannel;
 
         switch (type)

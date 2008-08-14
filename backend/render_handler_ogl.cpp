@@ -413,10 +413,10 @@ bool isEven(const size_t& n)
 
 // Use the image class copy constructor; it's not important any more
 // what kind of image it is.
-bitmap_info_ogl::bitmap_info_ogl(image::image_base* image, GLenum pixelformat,
+bitmap_info_ogl::bitmap_info_ogl(image::ImageBase* image, GLenum pixelformat,
                                  bool ogl_accessible)
 :
-  _img(new image::image_base(*image)),
+  _img(new image::ImageBase(*image)),
   _pixel_format(pixelformat),
   _ogl_img_type(_img->height() == 1 ? GL_TEXTURE_1D : GL_TEXTURE_2D),
   _ogl_accessible(ogl_accessible),
@@ -674,7 +674,7 @@ public:
   // anti-aliased with the rest of the drawing. Since display lists cannot be
   // concatenated this means we'll add up with several display lists for normal
   // drawing operations.
-  virtual void drawVideoFrame(image::image_base* baseframe, const matrix* m, const rect* bounds)
+  virtual void drawVideoFrame(image::ImageBase* baseframe, const matrix* m, const rect* bounds)
   {
     GLint index;
 
@@ -705,7 +705,7 @@ public:
     _render_indices.push_back(index);
   }
   
-  virtual void reallyDrawVideoFrame(image::image_base* baseframe, const matrix* m, const rect* bounds)
+  virtual void reallyDrawVideoFrame(image::ImageBase* baseframe, const matrix* m, const rect* bounds)
   {
     image::rgb* frame = static_cast<image::rgb*>(baseframe);
 

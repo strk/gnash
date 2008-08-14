@@ -439,7 +439,7 @@ public:
   }
   
 
-  void drawVideoFrame(image::image_base* baseframe, const matrix* source_mat, 
+  void drawVideoFrame(image::ImageBase* baseframe, const matrix* source_mat, 
     const rect* bounds) {
   
     // NOTE: Assuming that the source image is RGB 8:8:8
