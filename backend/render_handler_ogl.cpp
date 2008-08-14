@@ -411,11 +411,12 @@ bool isEven(const size_t& n)
   return n % 2 == 0;
 }
 
-
+// Use the image class copy constructor; it's not important any more
+// what kind of image it is.
 bitmap_info_ogl::bitmap_info_ogl(image::image_base* image, GLenum pixelformat,
                                  bool ogl_accessible)
 :
-  _img(image->clone()),
+  _img(new image::image_base(*image)),
   _pixel_format(pixelformat),
   _ogl_img_type(_img->height() == 1 ? GL_TEXTURE_1D : GL_TEXTURE_2D),
   _ogl_accessible(ogl_accessible),

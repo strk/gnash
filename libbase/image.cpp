@@ -1,9 +1,23 @@
-// image.cpp	-- Thatcher Ulrich <tu@tulrich.com> 2002
+// Image.cpp: image data class for Gnash.
+// 
+//   Copyright (C) 2006, 2007, 2008 Free Software Foundation, Inc.
+// 
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
 
-// This source code has been donated to the Public Domain.  Do
-// whatever you want with it.
-
-// Handy image utilities for RGB surfaces.
+// Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2002
 
 #include <cstring>
 #include <memory>		// for auto_ptr
@@ -71,6 +85,12 @@ namespace image
     }
 
 	boost::uint8_t* image_base::scanline(size_t y)
+	{
+		assert(y < m_height);
+		return m_data.get() + m_pitch * y;
+	}
+
+	boost::uint8_t* const image_base::scanlinePointer(size_t y) const
 	{
 		assert(y < m_height);
 		return m_data.get() + m_pitch * y;
@@ -235,22 +255,22 @@ namespace image
         return im;
     }
 
-	std::auto_ptr<rgb> readSWFJpeg2WithTables(JpegImageInput* j_in)
+	std::auto_ptr<rgb> readSWFJpeg2WithTables(JpegImageInput& loader)
 	// Create and read a new image, using a input object that
 	// already has tables loaded.  The IJG documentation describes
 	// this as "abbreviated" format.
 	{
-		assert(j_in);
 
-		j_in->startImage();
+		loader.startImage();
 
-		std::auto_ptr<rgb> im(new image::rgb(j_in->getWidth(), j_in->getHeight()));
+		std::auto_ptr<rgb> im(new image::rgb(loader.getWidth(), loader.getHeight()));
 
-		for (size_t y = 0; y < j_in->getHeight(); y++) {
-			j_in->readScanline(im->scanline(y));
+
+		for (size_t y = 0, height = loader.getHeight(); y < height; y++) {
+			loader.readScanline(im->scanline(y));
 		}
 
-		j_in->finishImage();
+		loader.finishImage();
 
 		return im;
 	}

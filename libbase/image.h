@@ -1,9 +1,23 @@
-// image.h	-- Thatcher Ulrich <tu@tulrich.com> 2002
+// Image.h: image data class for Gnash.
+// 
+//   Copyright (C) 2006, 2007, 2008 Free Software Foundation, Inc.
+// 
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
 
-// This source code has been donated to the Public Domain.  Do
-// whatever you want with it.
-
-// Handy image utilities for RGB surfaces.
+// Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2002
 
 #ifndef GNASH_IMAGE_H
 #define GNASH_IMAGE_H
@@ -104,6 +118,8 @@ enum ImageType
 
 		/// Return a pointer to first byte of given line
 		DSOEXPORT boost::uint8_t* scanline(size_t y);
+
+        DSOEXPORT boost::uint8_t* const scanlinePointer(size_t y) const;
 
 		virtual ~image_base() {}
 
@@ -215,7 +231,7 @@ enum ImageType
 	/// \brief
 	/// For reading SWF JPEG2-style image data, using pre-loaded
 	/// headers stored in the given jpeg::input object.
-	DSOEXPORT std::auto_ptr<rgb> readSWFJpeg2WithTables(JpegImageInput* loader);
+	DSOEXPORT std::auto_ptr<rgb> readSWFJpeg2WithTables(JpegImageInput& loader);
 
 	/// \brief
 	/// For reading SWF JPEG3-style image data, like ordinary JPEG, 

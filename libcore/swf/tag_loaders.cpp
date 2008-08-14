@@ -289,13 +289,12 @@ define_bits_jpeg_loader(SWFStream& in, tag_type tag, movie_definition* m)
         return;
     }
 
-    assert(j_in);
     j_in->discardPartialBuffer();
     
     std::auto_ptr<image::rgb> im;
     try
     {
-        im = image::readSWFJpeg2WithTables(j_in);
+        im = image::readSWFJpeg2WithTables(*j_in);
     }
     catch (std::exception& e)
     {
