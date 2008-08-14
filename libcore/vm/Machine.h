@@ -25,6 +25,7 @@
 #include "as_value.h"
 #include "asClass.h"
 #include "swf.h"
+#include "as_environment.h"
 
 #define LOG_DEBUG_AVM(fmt,...) log_action("AVM2: " fmt, ## __VA_ARGS__);
 
@@ -253,14 +254,15 @@ private:
 	}
 
 	void push_stack(as_value object){
-		LOG_DEBUG_AVM("Pushing value onto stack.");
+		LOG_DEBUG_AVM("Pushing value %s onto stack.",object.toDebugString());
 		mStack.push(object);
 		LOG_DEBUG_AVM("There are now %u items in the stack",mStack.size());
 	}
 
 	as_value pop_stack(){
-		LOG_DEBUG_AVM("Poping value off the stack.  There will be %u items in the stack",mStack.size()-1);
-		return mStack.pop();
+		as_value value = mStack.pop();
+		LOG_DEBUG_AVM("Poping value %s off the stack.  There are now %u items in the stack",value.toDebugString(),mStack.size());
+		return value;
 	}
 
 	void push_scope_stack(as_value object){
@@ -310,13 +312,12 @@ private:
 		mStack.push(value);
 	}
 
-	std::vector<as_value> get_args(int argc){
-		std::vector<as_value> args;
-		args.resize(argc);
+	as_environment get_args(int argc){
+		as_environment env;
 		for(unsigned int i=0;i<argc;i++){
-			args.push_back(pop_stack());
+			env.push(pop_stack());
 		}
-		return args;
+		return env;
 	}
 
 	SafeStack<as_value> mStack;

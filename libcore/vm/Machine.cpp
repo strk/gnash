@@ -25,6 +25,7 @@
 #include "abc_block.h"
 #include "fn_call.h"
 #include "abc_function.h"
+#include "action.h"
 
 //#define PRETEND
 namespace gnash {
@@ -928,7 +929,7 @@ Machine::execute()
 ///  value -- String object from string_pool[index]
 	case SWF::ABC_ACTION_PUSHSTRING:
 	{
-		push_stack(pool_string(mStream->read_V32(), mPoolObject));
+		push_stack(as_value(pool_string(mStream->read_V32(), mPoolObject)));
 		break;
 	}
 /// 0x2D ABC_ACTION_PUSHINT
@@ -1171,9 +1172,14 @@ Machine::execute()
 //		bool lex_only = (opcode == SWF::ABC_ACTION_CALLPROPLEX);
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
 		boost::uint32_t argc = mStream->read_V32();
-		std::vector<as_value> args = get_args(argc);
-		as_object object = pop_stack().to_object();
-		object.callMethod(a.getGlobalName(),args[0]);
+		as_environment env = get_args(argc);
+		as_object *object = pop_stack().to_object().get();
+		
+		//TODO: Determine namespace.
+		as_value property = object->getMember(a.getGlobalName(),0);
+		call_method(property,&env,object,argc,env.stack_size() - 1);
+		env.drop(argc);
+
 /*		int shift = completeName(a, argc);
 		ENSURE_OBJECT(mStack.top(shift + argc));
 		as_object *obj = mStack.top(argc + shift).to_object().get();
@@ -1251,7 +1257,7 @@ Machine::execute()
 		LOG_AVM_UNIMPLEMENTED();
 		boost::uint32_t argc = mStream->read_V32();
 		LOG_DEBUG_AVM("There are %u arguments.",argc);
-		std::vector<as_value> args = get_args(argc);
+		get_args(argc);
 //		ENSURE_OBJECT(mStack.top(argc));
 		as_object *super = pop_stack().to_object().get()->get_super();
 		//TODO: Actually construct the super.
