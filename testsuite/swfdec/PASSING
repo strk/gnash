@@ -783,6 +783,10 @@ root-onload-6.swf:0d09109c7f942e8268aa0b9661071f1d
 root-onload-7.swf:baed64fdde7c5f27344daa4268ce6202
 root-onload-8.swf:25d71869e59a04c1576efb74f5b5763f
 rotation2-5.swf:4edcd35e1076a14037d3531ec780d292
+rotation2-6.swf:4d97baf5830bb84b17ac9cd0847c126e
+rotation2-7.swf:832fdea08108c8329af50416d8905abb
+rotation2-8.swf:41b3692750ea8ee67989e6d764b93473
+rotation-5.swf:b06eb9fc7a109d796d5d4ade7d30cbeb
 round-direction-5.swf:3a69581d4483d995a04ab3a2aa005278
 round-direction-6.swf:2f7d7580490e0c4a3ddfb107849dc6d8
 round-direction-7.swf:66f77f46b6695bbb4d2a2e556ed737fa
@@ -1050,6 +1054,7 @@ too-many-blocks-6.swf:db4557c9db46fa17623def9ca7201dcc
 too-many-blocks-7.swf:001ea87d7f7a99cae8a50170892ab4ed
 too-many-blocks-8.swf:882a04f9f7aa70a2994c88532d1dcc12
 totalframes.swf:cdc0d5e2017d293438ef80fa136c44e8
+transform2.swf:95d19c9ed6592c459d7f6836a0365df2
 transform-color-transform-5.swf:1b03afaa179024037f5d167556b3f7a9
 transform-color-transform-6.swf:8cfd79068cc9d51db8796bb27186bbda
 transform-color-transform-7.swf:bd48f8529157f81c30caca47ce6bb871
@@ -1105,3 +1110,4 @@ xml-socket-properties-5.swf:856b75b9d2e45a688649afd247224176
 xml-socket-properties-6.swf:c2a153377e55fd70aed74a5711dc8bfd
 xml-socket-properties-7.swf:ad8a3f3b1ed9a4b6f068f74f003f2260
 xml-socket-properties-8.swf:a97dbf0b46416298ea32e285ea04f74f
+xscale.swf:812327246d1fea5a69001191aa45a2ef
