@@ -114,14 +114,13 @@ Flv::decodeHeader(amf::Buffer *buf)
     // structure. This is to get around possible padding done to the data structure
     // done by some compilers.
     boost::uint32_t size = *(reinterpret_cast<boost::uint32_t *>(_header.head_size));
-
     // The header size is big endian
-    size = ntohl(size);
+    swapBytes(_header.head_size, sizeof(boost::uint32_t));
     
     // The header size is always 9, guess it could change some day in the far future, so
     // we should use it.
-    if (size != 0x9) {
-	log_error("Bad header size in FLV header! %d", _header.head_size);
+    if (ntohl(size) != 0x9) {
+	log_error("Bad header size in FLV header! %d", size);
 		  return 0;
     }
     
@@ -284,8 +283,11 @@ Flv::convert24(boost::uint8_t *num)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::uint32_t bodysize = 0;
-    memcpy((char *)(&bodysize), num, 4);
+    bodysize = *(reinterpret_cast<boost::uint32_t *>(num)) << 8;
+    
     bodysize = ntohl(bodysize);
+
+    return bodysize;
 }
 
 // Decode the tag header
