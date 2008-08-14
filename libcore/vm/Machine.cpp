@@ -1172,8 +1172,8 @@ Machine::execute()
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
 		boost::uint32_t argc = mStream->read_V32();
 		std::vector<as_value> args = get_args(argc);
-		as_object object = pop_stack().to_object();
-		object.callMethod(a.getGlobalName(),args[0]);
+		as_object *object = pop_stack().to_object().get();
+		object->callMethod(a.getGlobalName(),args[0]);
 /*		int shift = completeName(a, argc);
 		ENSURE_OBJECT(mStack.top(shift + argc));
 		as_object *obj = mStack.top(argc + shift).to_object().get();
