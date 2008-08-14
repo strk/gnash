@@ -56,9 +56,9 @@ public:
     return GST_BUFFER_DATA(_buffer);
   }
 
-  std::auto_ptr<image::image_base> clone() const
+  std::auto_ptr<image::ImageBase> clone() const
   {
-    return std::auto_ptr<image_base>(new rgb(*this));
+    return std::auto_ptr<ImageBase>(new rgb(*this));
   }
 
 private:

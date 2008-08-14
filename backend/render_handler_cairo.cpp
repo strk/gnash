@@ -454,7 +454,7 @@ public:
     return render_handler::RGB;
   }
   
-  virtual void drawVideoFrame(image::image_base* baseframe, const matrix* m, const rect* bounds)
+  virtual void drawVideoFrame(image::ImageBase* baseframe, const matrix* m, const rect* bounds)
   {
     // Extract frame attributes
     image::rgb* frame = static_cast<image::rgb*>(baseframe);

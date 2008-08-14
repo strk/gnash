@@ -258,7 +258,7 @@ createBitmapMovie(std::auto_ptr<IOChannel> in, const std::string& url, FileType 
 
     try
     {
-        std::auto_ptr<image::rgb> im(image::readImageData(imageData, type));
+        std::auto_ptr<image::ImageBase> im(image::readImageData(imageData, type));
         if (!im.get())
         {
             log_error(_("Can't read image file from %s"), url);

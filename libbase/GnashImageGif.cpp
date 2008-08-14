@@ -207,6 +207,10 @@ GifImageInput::read()
         }
     } while (record != TERMINATE_RECORD_TYPE);
 
+    // Set the type to RGB
+    // TODO: implement RGBA!
+    _type = GNASH_IMAGE_RGB;
+
 }
 
 } // namespace gnash

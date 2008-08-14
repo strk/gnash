@@ -80,7 +80,7 @@ public:
 	}
 
 	/// Pointer to the data. The data is owned by this class.
-	std::auto_ptr<image::image_base> image;
+	std::auto_ptr<image::ImageBase> image;
 
 	/// Timestamp in millisec
 	boost::uint32_t timestamp;

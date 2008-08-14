@@ -62,7 +62,7 @@ namespace gnash {
 		int videoFrameFormat();
 
 		/// See render_handler::drawVideoFrame (in backend/render_handler.h)
-		void drawVideoFrame(image::image_base* frame, const matrix* mat, const rect* bounds);
+		void drawVideoFrame(image::ImageBase* frame, const matrix* mat, const rect* bounds);
 
 		/// See render_handler::begin_display (in backend/render_handler.h)
 		void	begin_display(

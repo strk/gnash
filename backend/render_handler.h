@@ -163,7 +163,7 @@ namespace gnash {
 
     // @@ forward decl to avoid including base/image.h; TODO change the
     // render_handler interface to not depend on these classes at all.
-    namespace image { class image_base; class rgb; class rgba; }
+    namespace image { class ImageBase; class rgb; class rgba; }
 }
 
 namespace gnash {
@@ -268,7 +268,7 @@ public:
   ///   The width and height determine the size of the Flash video instance
   ///   on the stage (in TWIPS) prior to matrix transformations.         
   ///
-  virtual void drawVideoFrame(image::image_base* frame, const matrix* mat, const rect* bounds) = 0;
+  virtual void drawVideoFrame(image::ImageBase* frame, const matrix* mat, const rect* bounds) = 0;
 
   /// Sets the update region (called prior to begin_display).
   //

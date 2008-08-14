@@ -276,7 +276,7 @@ protected:
 	boost::mutex image_mutex;
 
 	// The image/videoframe which is given to the renderer
-	std::auto_ptr<image::image_base> m_imageframe;
+	std::auto_ptr<image::ImageBase> m_imageframe;
 
 	// The video URL
 	std::string url;
@@ -420,7 +420,7 @@ public:
 	//
 	/// @return a image containing the video frame, a NULL auto_ptr if none were ready
 	///
-	std::auto_ptr<image::image_base> get_video();
+	std::auto_ptr<image::ImageBase> get_video();
 	
 	/// Register the character to invalidate on video updates
 	void setInvalidatedVideo(character* ch)

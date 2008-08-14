@@ -368,6 +368,11 @@ JpegImageInput::startImage()
 	}
 
 	_compressorOpened = true;
+	
+	// Until this point the type should be GNASH_IMAGE_INVALID.
+	// It's possible to create transparent JPEG data by merging an
+	// alpha channel, but that is handled explicitly elsewhere.
+	_type = GNASH_IMAGE_RGB;
 }
 
 
