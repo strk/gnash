@@ -416,7 +416,7 @@ bool isEven(const size_t& n)
 bitmap_info_ogl::bitmap_info_ogl(image::ImageBase* image, GLenum pixelformat,
                                  bool ogl_accessible)
 :
-  _img(new image::ImageBase(*image)),
+  _img(image->clone()),
   _pixel_format(pixelformat),
   _ogl_img_type(_img->height() == 1 ? GL_TEXTURE_1D : GL_TEXTURE_2D),
   _ogl_accessible(ogl_accessible),
