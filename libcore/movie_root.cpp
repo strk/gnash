@@ -1015,9 +1015,10 @@ movie_root::doMouseDrag()
     parent_world_mat.invert().transform(world_mouse);			
 	// Place our origin so that it coincides with the mouse coords
 	// in our parent frame.
+	// TODO: add a character::set_translation ?
 	matrix	local = dragChar->get_matrix();
-    local.set_translation(world_mouse.x, world_mouse.y);
-	dragChar->set_matrix(local);
+	local.set_translation(world_mouse.x, world_mouse.y);
+	dragChar->set_matrix(local); //no need to update caches when only changing translation
 }
 
 
