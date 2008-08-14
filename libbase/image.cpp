@@ -90,6 +90,12 @@ namespace image
 		return m_data.get() + m_pitch * y;
 	}
 
+	boost::uint8_t* const image_base::scanlinePointer(size_t y) const
+	{
+		assert(y < m_height);
+		return m_data.get() + m_pitch * y;
+	}
+
 
 	//
 	// rgb

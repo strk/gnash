@@ -119,6 +119,8 @@ enum ImageType
 		/// Return a pointer to first byte of given line
 		DSOEXPORT boost::uint8_t* scanline(size_t y);
 
+        DSOEXPORT boost::uint8_t* const scanlinePointer(size_t y) const;
+
 		virtual ~image_base() {}
 
 

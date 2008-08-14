@@ -55,7 +55,7 @@ rgb_to_cairo_rgb24(boost::uint8_t* dst, const image::rgb* im)
   boost::uint32_t* dst32 = reinterpret_cast<boost::uint32_t*>(dst);
   for (size_t y = 0;  y < im->height();  y++)
   {
-	  const boost::uint8_t* src = im->scanline(y);
+	  const boost::uint8_t* src = im->scanlinePointer(y);
 	  for (size_t x = 0;  x < im->width();  x++, src += 3)
 	  {
 	      *dst32++ = (src[0] << 16) | (src[1] << 8) | src[2];
@@ -70,7 +70,7 @@ rgba_to_cairo_argb(boost::uint8_t* dst, const image::rgba* im)
   boost::uint32_t* dst32 = reinterpret_cast<boost::uint32_t*>(dst);
   for (size_t y = 0;  y < im->height();  y++)
   {
-    const boost::uint8_t* src = im->scanline(y);
+    const boost::uint8_t* src = im->scanlinePointer(y);
     for (size_t x = 0;  x < im->width();  x++, src += 4)
     {
       const boost::uint8_t& r = src[0],
