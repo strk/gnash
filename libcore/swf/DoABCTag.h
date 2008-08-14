@@ -83,10 +83,12 @@ public:
 	
 	static void doABCLoader(SWFStream& in,tag_type tag, movie_definition* m)
 	{
-		in.ensureBytes(4);
-		static_cast<void> (in.read_u32());
-		std::string name;
-		in.read_string(name);
+		if(tag == SWF::DOABCDEFINE){
+			in.ensureBytes(4);
+			static_cast<void> (in.read_u32());
+			std::string name;
+			in.read_string(name);
+		}
 
 		abc_block* block = new abc_block();
 		block->read(in);
