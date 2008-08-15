@@ -59,8 +59,6 @@ namespace gnash {
 /// Vectorial glyphs are instances of a shape_character_def, same class
 /// resulting from parsing of embedded fonts.
 ///
-/// TODO: rename this class to something like FreetypeGlyphProvider...
-///
 class FreetypeGlyphsProvider 
 {
 

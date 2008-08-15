@@ -391,7 +391,7 @@ FreetypeGlyphsProvider::FreetypeGlyphsProvider(const std::string& name, bool bol
 	scale = (float)unitsPerEM()/m_face->units_per_EM;
 
 #ifdef GNASH_DEBUG_DEVICEFONTS
-	log_debug("EM square for font '%s' is %d, scale is thus %g", name.c_str(), m_face->units_per_EM, scale);
+	log_debug("EM square for font '%s' is %d, scale is thus %g", name, m_face->units_per_EM, scale);
 #endif
 }
 #else // ndef(USE_FREETYPE)
