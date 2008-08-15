@@ -250,7 +250,7 @@ private:
 
 	as_value get_register(int index){
 		LOG_DEBUG_AVM("Getting value at a register %d ",index);
-		return mFrame.value(index);
+		return mRegisters[index];
 	}
 
 	void push_stack(as_value object){
@@ -323,7 +323,7 @@ private:
 	SafeStack<as_value> mStack;
 	SafeStack<State> mStateStack;
 	SafeStack<Scope> mScopeStack;
-	SafeStack<as_value> mFrame;
+	std::vector<as_value> mRegisters;
 	SafeStack<as_value> mAsValueScopeStack;
 	CodeStream *mStream;
 

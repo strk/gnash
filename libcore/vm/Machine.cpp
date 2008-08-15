@@ -431,7 +431,7 @@ Machine::execute()
 	case SWF::ABC_ACTION_KILL:
 	{
 		boost::uint32_t regNum = mStream->read_V32();
-		mFrame.value(regNum).set_undefined();
+		mRegisters[regNum].set_undefined();
 		break;
 	}
 /// 0x09 ABC_ACTION_LABEL
@@ -987,8 +987,8 @@ Machine::execute()
 	{
 		boost::int32_t oindex = mStream->read_V32();
 		boost::int32_t iindex = mStream->read_V32();
-		as_value &objv = mFrame.value(oindex);
-		as_value &indexv = mFrame.value(iindex);
+		as_value &objv = mRegisters[oindex];
+		as_value &indexv = mRegisters[iindex];
 		ENSURE_OBJECT(objv);
 		ENSURE_NUMBER(indexv);
 		as_object *obj = objv.to_object().get();
@@ -1000,16 +1000,16 @@ Machine::execute()
 		{
 			mStack.top(0).set_bool(true);
 			if (owner)
-				mFrame.value(oindex) = owner;
+				mRegisters[oindex] = owner;
 			else
-				mFrame.value(oindex).set_null();
-			mFrame.value(iindex) = next;
+				mRegisters[oindex].set_null();
+			mRegisters[iindex] = next;
 		}
 		else
 		{
 			mStack.top(0).set_bool(false);
-			mFrame.value(oindex).set_null();
-			mFrame.value(iindex) = 0;
+			mRegisters[oindex].set_null();
+			mRegisters[iindex] = 0;
 		}
 		break;
 	}
@@ -1538,7 +1538,7 @@ Machine::execute()
 	case SWF::ABC_ACTION_GETLOCAL:
 	{
 		mStack.grow(1);
-		mStack.top(0) = mFrame.value(mStream->read_V32());
+		mStack.top(0) = mRegisters[mStream->read_V32()];
 		break;
 	}
 /// 0x63 ABC_ACTION_SETLOCAL
@@ -1550,7 +1550,7 @@ Machine::execute()
 ///  .
 	case SWF::ABC_ACTION_SETLOCAL:
 	{
-		mFrame.value(mStream->read_V32()) = mStack.top(0);
+		mRegisters[mStream->read_V32()] = mStack.top(0);
 		mStack.drop(1);
 		break;
 	}
@@ -1921,7 +1921,7 @@ Machine::execute()
 	case SWF::ABC_ACTION_INCLOCAL:
 	{
 		boost::uint32_t foff = mStream->read_V32();
-		mFrame.value(foff) = mFrame.value(foff).to_number() + 1;
+		mRegisters[foff] = mRegisters[foff].to_number() + 1;
 		break;
 	}
 /// 0x93 ABC_ACTION_DECREMENT
@@ -1940,7 +1940,7 @@ Machine::execute()
 	case SWF::ABC_ACTION_DECLOCAL:
 	{
 		boost::uint32_t foff = mStream->read_V32();
-		mFrame.value(foff) = mFrame.value(foff).to_number() - 1;
+		mRegisters[foff] = mRegisters[foff].to_number() - 1;
 		break;
 	}
 /// 0x95 ABC_ACTION_ABC_TYPEOF
@@ -2269,7 +2269,7 @@ Machine::execute()
 	case SWF::ABC_ACTION_INCLOCAL_I:
 	{
 		boost::uint32_t foff = mStream->read_V32();
-		mFrame.value(foff) = mFrame.value(foff).to_int() + 1;
+		mRegisters[foff] = mRegisters[foff].to_int() + 1;
 		break;
 	}
 /// 0xC3 ABC_ACTION_DECLOCAL_I
@@ -2277,7 +2277,7 @@ Machine::execute()
 	case SWF::ABC_ACTION_DECLOCAL_I:
 	{
 		boost::uint32_t foff = mStream->read_V32();
-		mFrame.value(foff) = mFrame.value(foff).to_int() - 1;
+		mRegisters[foff] = mRegisters[foff].to_int() - 1;
 		break;
 	}
 /// 0xC4 ABC_ACTION_NEGATE_I
@@ -2329,7 +2329,7 @@ Machine::execute()
 //		mStack.push() instead?
 
 		push_stack(get_register(opcode- SWF::ABC_ACTION_GETLOCAL0));
-//		mStack.top(0) = mFrame.value(opcode - SWF::ABC_ACTION_GETLOCAL0);
+//		mStack.top(0) = mRegisters.value(opcode - SWF::ABC_ACTION_GETLOCAL0);
 		break;
 	}
 /// 0xD4 ABC_ACTION_SETLOCAL0
@@ -2346,8 +2346,7 @@ Machine::execute()
 	case SWF::ABC_ACTION_SETLOCAL2:
 	case SWF::ABC_ACTION_SETLOCAL3:
 	{
-		mFrame.value(opcode - SWF::ABC_ACTION_SETLOCAL0) = mStack.top(0);
-		mStack.drop(1);
+		mRegisters[opcode - SWF::ABC_ACTION_SETLOCAL0] = pop_stack();
 		break;
 	}
 
@@ -2617,7 +2616,7 @@ void Machine::initMachine(abc_block* pool_block,as_object* global)
 	log_debug("Getting constructor.");
 	asMethod* method = start_script->getConstructor();
 
-//	mFrame.push(global);
+//	mRegisters.push(global);
  	int i;
  	for(i=0;i<start_script->mTraits.size();i++){
  		abc_Trait trait = start_script->mTraits[i];
@@ -2629,13 +2628,11 @@ void Machine::initMachine(abc_block* pool_block,as_object* global)
 	}
 	log_debug("Loding code stream.");
 	mStream = method->getBody();
-	mFrame.push(as_value(global));
-	log_debug("Value type: %s",mFrame.top(0).typeOf());
+	mRegisters[0] = as_value(global);
 }
 
 void Machine::executeCodeblock(CodeStream* stream){
 	mStream = stream;
-	mFrame.push(NULL);
 	execute();
 }
 
@@ -2645,10 +2642,12 @@ void Machine::instantiateClass(std::string className){
 	executeCodeblock(theClass->getConstructor()->getBody());
 }
 
-Machine::Machine(string_table &ST, ClassHierarchy *CH):mST(),mFrame()
+Machine::Machine(string_table &ST, ClassHierarchy *CH):mST(),mRegisters()
 {
 	mCH = CH;
-//	mFrame.grow(4);
+	//Local registers should be initialized at the beginning of each function call, but
+	//we don't currently parse the number of local registers for each function.
+	mRegisters.resize(4);
 //	mST = new string_table();
 //	mST = ST;
 }
