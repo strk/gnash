@@ -149,13 +149,14 @@ Flv::decodeMetaData(gnash::Network::byte_t *buf, size_t size)
     // Gnash's libmedia/FLVParser code. So if we see the begining
     // of "onMetaData", then just grab the length without the type
     // field.
-    if ((*ptr == 0) && (*ptr+3 == 'o')) {
+    if ((*ptr == 0) && (*(ptr+2) == 'o')) {
 	boost::uint16_t length;
 	length = ntohs((*(boost::uint16_t *)ptr) & 0xffff);
 	name = new char(length+1);
 	memset(name, 0, length+1);
+	ptr += sizeof(boost::uint16_t);
 	std::copy(name, name + length, ptr);
-	ptr += length + AMF_HEADER_SIZE;
+	ptr += length;
     } else {	
 	Element *objname = amf.extractAMF(ptr, tooFar);
 	if (objname == 0) {
