@@ -1946,7 +1946,6 @@ if test x"$GCC" = x"yes"; then
     -Wreturn-type \
     -Wnon-virtual-dtor \
     -Wunused \
-    -Wextra \   
     #-ansi \
     "
   CFLAGS="$CFLAGS \
@@ -1962,6 +1961,7 @@ if test x"$GCC" = x"yes"; then
     "
   if test x"$strict" = x"yes"; then
     CXXFLAGS="$CXXFLAGS \
+      -Wextra \   
       -pedantic \
       -Wno-long-long \
       "
