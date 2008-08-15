@@ -32,12 +32,5 @@ abc_function::operator()(const fn_call& fn)
 	return as_value();
 }
 
-#ifdef GNASH_USE_GC
-void
-abc_function::markReachableResources() const
-{
-	
-}
-#endif // GNASH_USE_GC
 
 }
