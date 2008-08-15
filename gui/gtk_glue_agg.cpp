@@ -201,6 +201,9 @@ GtkAggGlue::create_shm_image(unsigned int width, unsigned int height)
         destroy_shm_image();
         return;
     }
+
+    // mark segment for automatic destruction after last process detaches
+    shmctl(_shm_info->shmid, IPC_RMID, 0);
   
     //log_debug("create_shm_image() OK"); // <-- remove this
 #endif // ENABLE_MIT_SHM
