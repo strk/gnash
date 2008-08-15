@@ -156,7 +156,7 @@ public:
 
 	asClass *locateClass(asName &m);
 
-	asClass *locateClass(std::string className);
+	asClass *locateClass(const std::string& className);
 
 	abc_parsing::abc_Trait &newTrait()
 	{

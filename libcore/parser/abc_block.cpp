@@ -1230,7 +1230,7 @@ abc_block::read(SWFStream& in)
 	return true;
 }
 
-asClass *abc_block::locateClass(std::string className){
+asClass *abc_block::locateClass(const std::string& className){
 	
 	std::vector<asClass*>::iterator i = mClasses.begin();
 	for( ; i!=mClasses.end(); ++i){
@@ -1238,7 +1238,7 @@ asClass *abc_block::locateClass(std::string className){
 			return *i;
 		}
 	}	
-	throw GnashException("LocateClass: Class not found.");
+	return NULL;
 }
 
 abc_block::abc_block() : mStringTable(&VM::get().getStringTable())
