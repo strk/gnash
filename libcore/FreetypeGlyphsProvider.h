@@ -59,8 +59,6 @@ namespace gnash {
 /// Vectorial glyphs are instances of a shape_character_def, same class
 /// resulting from parsing of embedded fonts.
 ///
-/// TODO: rename this class to something like FreetypeGlyphProvider...
-///
 class FreetypeGlyphsProvider 
 {
 
@@ -159,13 +157,6 @@ private:
 	static void init();
 
 	static void close();
-
-	/// Used by getRenderedGlyph to get the glyph bitmap.
-	//
-	/// NOTE: calls the currently registered renderer (create_alpha)
-	///
-	std::auto_ptr<image::alpha> draw_bitmap(const FT_Bitmap& bitmap);
-
 
 	/// Mutex protecting FreeType library (for initialization basically)
 	static boost::mutex	m_lib_mutex;
