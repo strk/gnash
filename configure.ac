@@ -707,7 +707,8 @@ AC_ARG_ENABLE(mit-shm,
   no)  xmitshm=no ;;
   *)   AC_MSG_ERROR([bad value ${enableval} for --enable-mit-shm option]) ;;
 esac],xmitshm=yes)
-if test "x${xmitshm}" = "xyes"; then
+dnl as windows doesn't run X11, don't enable this extension there.
+if test "x${xmitshm}" = "xyes" -a "x${windows}" = "xno"; then
 	AC_DEFINE(ENABLE_MIT_SHM, [1], [Use MIT-SHM X extension if available])
 fi
 
@@ -1510,7 +1511,7 @@ AC_SUBST(WINDRES)
 
 GNASH_PKG_FIND(z, [zlib.h], [zlib compression library], compress)
 GNASH_PKG_FIND(jpeg, [jpeglib.h], [jpeg images], jpeg_mem_init)
-GNASH_PKG_FIND(png, [png.h], [png images], png_info_init)
+GNASH_PKG_FIND(libpng, [png.h], [png images], png_info_init)
 GNASH_PKG_FIND(gif, [gif_lib.h], [gif images], DGifOpen)
 GNASH_PKG_INCLUDES([dejagnu], [dejagnu.h])
 
@@ -2388,13 +2389,13 @@ else
   echo "               or .rpm users: yum install libungif-devel" >&3
 fi
 
-if test x"${PNG_LIBS}" != x ; then
-  if test x"${PNG_CFLAGS}" != x ; then
-    echo "        PNG flags are: $PNG_CFLAGS"
+if test x"${LIBPNG_LIBS}" != x ; then
+  if test x"${LIBPNG_CFLAGS}" != x ; then
+    echo "        PNG flags are: $LIBPNG_CFLAGS"
   else
     echo "        PNG flags are: default include path"
   fi
-  echo "        PNG libs are: $PNG_LIBS"
+  echo "        PNG libs are: $LIBPNG_LIBS"
 else
   echo "        WARNING: No PNG library development package installed!" >&4
   echo "                 Gnash will be built without support for dynamic loading of PNG files." >&4
