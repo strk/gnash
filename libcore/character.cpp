@@ -761,9 +761,12 @@ character::set_x_scale(double scale_percent)
 {
 	_xscale = scale_percent;
 
-	double scale = scale_percent / 100.0;
+	double xscale = _xscale / 100.0;
+	double yscale = _yscale / 100.0;
+	double rotation = _rotation * PI / 180.0;
+
 	matrix m = get_matrix();
-	m.set_x_scale(scale);
+	m.set_scale_rotation(xscale, yscale, rotation);
 	set_matrix(m); // we updated the cache ourselves
 
 	transformedByScript(); 
@@ -782,10 +785,14 @@ character::set_rotation(double rot)
 	//log_debug("_rotation: %d", rot);
 	_rotation = rot;
 
-	double rotation = rot * PI / 180.0;
+	double xscale = _xscale / 100.0;
+	double yscale = _yscale / 100.0;
+	double rotation = _rotation * PI / 180.0;
+
 	matrix m = get_matrix();
-	m.set_rotation(rotation);
+	m.set_scale_rotation(xscale, yscale, rotation);
 	set_matrix(m); // we updated the cache ourselves
+
 	transformedByScript(); 
 }
 
@@ -794,9 +801,12 @@ character::set_y_scale(double scale_percent)
 {
 	_yscale = scale_percent;
 
-	double scale = scale_percent / 100.0;
+	double xscale = _xscale / 100.0;
+	double yscale = _yscale / 100.0;
+	double rotation = _rotation * PI / 180.0;
+
 	matrix m = get_matrix();
-	m.set_y_scale(scale);
+	m.set_scale_rotation(xscale, yscale, rotation);
 	set_matrix(m); // we updated the cache ourselves
 
 	transformedByScript(); 
