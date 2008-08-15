@@ -925,7 +925,7 @@ edit_text_character::set_member(string_table::key name,
 		matrix	m = get_matrix();
         double x =  utility::infinite_to_fzero( val.to_number() );
 		m.tx = PIXELS_TO_TWIPS(x);	
-		set_matrix(m);
+		set_matrix(m); // no need to update caches when only changing translation
 
 		// m_accept_anim_moves = false;
 		return true;
@@ -935,7 +935,7 @@ edit_text_character::set_member(string_table::key name,
 		matrix	m = get_matrix();
         double y =  utility::infinite_to_fzero( val.to_number() );
 		m.ty = PIXELS_TO_TWIPS(y);
-		set_matrix(m);
+		set_matrix(m); // no need to update caches when only changing translation
 
 		// m_accept_anim_moves = false; 
 		return true;

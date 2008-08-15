@@ -881,7 +881,7 @@ check_equals(tf._x, 10);
 check_equals(tf._y, 11);
 check_equals(tf._visible, false);
 check_equals(tf._xscale, 200);
-xcheck_equals(tf._yscale, 201);
+check_equals(tf._yscale, 201);
 check_equals(tf._target, '/fake_name');
 check_equals(tf._parent, _level0); 
 check_equals(tf._name, 'fake_name');
