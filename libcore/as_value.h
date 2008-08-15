@@ -50,17 +50,19 @@ class asNamespace;
 class asName;
 
 #ifndef NAN
-#       define NAN (std::numeric_limits<double>::quiet_NaN())
+# define NAN (std::numeric_limits<double>::quiet_NaN())
 #endif
 
 #ifndef INFINITY
-#       define INFINITY (std::numeric_limits<double>::infinity())
+# define INFINITY (std::numeric_limits<double>::infinity())
 #endif
 
+// NetBSD has issues with isnan, and tries to force us to use
+// the macro even when we want to use our own type safe version.
+#undef isnan
 
 // The following template works just like its C counterpart, with added
 // type safety (i.e., they will only compile for floating point arguments).
-
 template <typename T>
 inline bool
 isnan(const T& num, typename boost::enable_if<boost::is_floating_point<T> >::type* dummy = 0)
