@@ -1559,8 +1559,7 @@ Machine::execute()
 ///  global -- The global scope object
 	case SWF::ABC_ACTION_GETGLOBALSCOPE:
 	{
-		mStack.grow(1);
-		mStack.top(0) = mGlobalScope;
+		push_stack(mAsValueScopeStack.value(0));
 		break;
 	}
 /// 0x65 ABC_ACTION_GETSCOPEOBJECT
