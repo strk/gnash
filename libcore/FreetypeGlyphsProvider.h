@@ -160,13 +160,6 @@ private:
 
 	static void close();
 
-	/// Used by getRenderedGlyph to get the glyph bitmap.
-	//
-	/// NOTE: calls the currently registered renderer (create_alpha)
-	///
-	std::auto_ptr<image::alpha> draw_bitmap(const FT_Bitmap& bitmap);
-
-
 	/// Mutex protecting FreeType library (for initialization basically)
 	static boost::mutex	m_lib_mutex;
 

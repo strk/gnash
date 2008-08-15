@@ -223,32 +223,6 @@ void FreetypeGlyphsProvider::close()
 	}
 }
 
-// private
-std::auto_ptr<image::alpha>
-FreetypeGlyphsProvider::draw_bitmap(const FT_Bitmap& bitmap)
-{
-	// You must use power-of-two dimensions!!
-	int	w = 1; while (w < bitmap.pitch) { w <<= 1; }
-	int	h = 1; while (h < bitmap.rows)  { h <<= 1; }
-
-	std::auto_ptr<image::alpha> alpha ( new image::alpha(w, h) );
-
-	alpha->clear(0);
-
-	// copy image to alpha
-	for (int i = 0; i < bitmap.rows; i++)
-	{
-		boost::uint8_t*	src = bitmap.buffer + bitmap.pitch * i;
-		boost::uint8_t*	dst = alpha->scanline(i); 
-		int	x = bitmap.width;
-		while (x-- > 0)
-		{
-			*dst++ = *src++;
-		}
-	}
-
-	return alpha;
-}
 
 // private
 bool
