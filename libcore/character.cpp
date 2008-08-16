@@ -302,7 +302,7 @@ character::xscale_getset(const fn_call& fn)
 		const double scale_percent = fn.arg(0).to_number();
 
 		// Handle bogus values
-		if (isnan(scale_percent))
+		if (isNaN(scale_percent))
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
 			log_aserror(_("Attempt to set _xscale to %g, refused"),
@@ -333,7 +333,7 @@ character::yscale_getset(const fn_call& fn)
 		const double scale_percent = fn.arg(0).to_number();
 
 		// Handle bogus values
-		if (isnan(scale_percent))
+		if (isNaN(scale_percent))
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
 			log_aserror(_("Attempt to set _yscale to %g, refused"),
@@ -542,7 +542,7 @@ character::rotation_getset(const fn_call& fn)
 		double  rotation_val = fn.arg(0).to_number();
 
 		// Handle bogus values
-		if (isnan(rotation_val))
+		if (isNaN(rotation_val))
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
 			log_aserror(_("Attempt to set _rotation to %g, refused"),

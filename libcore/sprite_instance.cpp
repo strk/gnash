@@ -469,7 +469,7 @@ static as_value sprite_swap_depths(const fn_call& fn)
   else
   {
     double td = fn.arg(0).to_number();
-    if ( isnan(td) )
+    if ( isNaN(td) )
     {
       IF_VERBOSE_ASCODING_ERRORS(
       std::stringstream ss; fn.dump_args(ss);

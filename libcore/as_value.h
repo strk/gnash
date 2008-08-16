@@ -49,27 +49,21 @@ class character;
 class asNamespace;
 class asName;
 
-#ifndef NAN
-#       define NAN (std::numeric_limits<double>::quiet_NaN())
-#endif
 
-#ifndef INFINITY
-#       define INFINITY (std::numeric_limits<double>::infinity())
-#endif
-
+// NaN constant for use in as_value implementation
+static const double NaN = std::numeric_limits<double>::quiet_NaN();
 
 // The following template works just like its C counterpart, with added
 // type safety (i.e., they will only compile for floating point arguments).
-
 template <typename T>
 inline bool
-isnan(const T& num, typename boost::enable_if<boost::is_floating_point<T> >::type* dummy = 0)
+isNaN(const T& num, typename boost::enable_if<boost::is_floating_point<T> >::type* dummy = 0)
 {
 	UNUSED(dummy);
 	return num != num;
 }
 
-#define isinf(x) (isnan(x - x))
+#define isinf(x) (isNaN(x - x))
 
 /// Use this methods to obtain a properly-formatted property name
 /// The methods will convert the name to lowercase if the current VM target
@@ -480,7 +474,7 @@ public:
 
 	void	set_int(int val) { set_double(val); }
 
-	void	set_nan() { set_double(NAN); }
+	void	set_nan() { set_double(NaN); }
 
 	/// Make this value a NULL, OBJECT, MOVIECLIP or AS_FUNCTION value
 	//

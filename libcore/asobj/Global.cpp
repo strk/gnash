@@ -96,7 +96,7 @@ namespace gnash {
 
 // Forward declarations
 static as_value as_global_trace(const fn_call& fn);
-static as_value as_global_isnan(const fn_call& fn);
+static as_value as_global_isNaN(const fn_call& fn);
 static as_value as_global_isfinite(const fn_call& fn);
 static as_value as_global_unescape(const fn_call& fn);
 static as_value as_global_escape(const fn_call& fn);
@@ -215,7 +215,7 @@ Global::Global(VM& vm, ClassHierarchy *ch)
             vm.registerNative(as_global_unescape, 100, 1);
             vm.registerNative(as_global_parseint, 100, 2);
             vm.registerNative(as_global_parsefloat, 100, 3);
-            vm.registerNative(as_global_isnan, 200, 18);
+            vm.registerNative(as_global_isNaN, 200, 18);
             vm.registerNative(as_global_isfinite, 200, 19);
 
             init_member("escape", vm.getNative(100, 0));
@@ -275,11 +275,11 @@ as_global_trace(const fn_call& fn)
 
 
 as_value
-as_global_isnan(const fn_call& fn)
+as_global_isNaN(const fn_call& fn)
 {
     ASSERT_FN_ARGS_IS_1
 
-    return as_value( static_cast<bool>(isnan(fn.arg(0).to_number()) ));
+    return as_value( static_cast<bool>(isNaN(fn.arg(0).to_number()) ));
 }
 
 
