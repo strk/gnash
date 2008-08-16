@@ -1367,6 +1367,10 @@ fi
 dnl AC_CHECK_FUNCS(strcasecmp stricmp)
 dnl AC_CHECK_FUNCS(vsnprintf)
 
+dnl These two tests need the math library or they won't link
+dnl on OpenBSD, even if the functions exist.
+save_LIBS=$LIBS
+LIBS="$LIBS -lm"
 AC_CACHE_CHECK([for finite], ac_cv_finite,
  [AC_TRY_LINK([#include <math.h>],
  [double x; int y; y = finite(x);],
@@ -1386,6 +1390,7 @@ AC_CACHE_CHECK([for isfinite], ac_cv_isfinite,
 if test x"$ac_cv_isfinite" = x"yes"; then
   AC_DEFINE(HAVE_ISFINITE, [1], [Has isfinite])
 fi
+LIBS=$save_LIBS
 
 AC_LANG_PUSH(C++)
 AC_CACHE_CHECK([whether $CXX implements __PRETTY_FUNCTION__], ac_cv_implements___PRETTY_FUNCTION__, [
