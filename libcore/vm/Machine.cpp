@@ -1341,13 +1341,14 @@ Machine::execute()
 	case SWF::ABC_ACTION_NEWARRAY:
 	{
 		boost::uint32_t asize = mStream->read_V32();
+		LOG_DEBUG_AVM("Creating array of size %u",asize);
 		as_array_object *arr = new as_array_object;
 		arr->resize(asize);
 		boost::uint32_t i = asize;
-		while (i--)
-			arr->set_indexed(i, mStack.value(i));
-		mStack.drop(asize - 1);
-		mStack.top(0) = arr;
+		while (i--){
+			arr->set_indexed(i, pop_stack());
+		}
+		push_stack(as_value(arr));
 		break;
 	}
 /// 0x57 ABC_ACTION_NEWACTIVATION
