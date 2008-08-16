@@ -1509,25 +1509,15 @@ Machine::execute()
 	case SWF::ABC_ACTION_SETPROPERTY:
 	{
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
-		//as_value &v = mStack.pop();
+		as_value value = pop_stack();
 		if (!a.isRuntime())
 		{
-			//TODO: Set the property of mStack.top(0) v,a
+			//TODO: Get Namespace and name value off of the stack.
 		}
 		else
 		{
-			if (a.isRtns() || !(mStack.top(0).is_object()
-				&& mStack.top(1).to_object()->isDictionary()))
-			{
-				mStack.drop(completeName(a));
-				//TODO: mStack.top(0).setProperty(a, v);
-				mStack.drop(1);
-			}
-			else
-			{
-				//TODO: mStack.top(1).setDictProperty(mStack.top(0), v);
-				mStack.drop(2);
-			}
+			as_object *object = pop_stack().to_object().get();
+			object->set_member(a.getGlobalName(),value);
 		}
 		break;
 	}
@@ -1620,12 +1610,12 @@ Machine::execute()
 	{
 		LOG_AVM_UNIMPLEMENTED();
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
-		LOG_DEBUG_AVM("Initializing property id=%u name=%s",a.getABCName(),mPoolObject->mStringPool[a.getABCName()]);
 		as_value v = pop_stack();
 		//TODO: There may or may not be a namespace, or a name object on the stack, we need to figure 
 		//out how to determine what is on the stack.
 		as_value ns = pop_stack();
 		as_value object = pop_stack();
+		LOG_DEBUG_AVM("Initializing property ABC_id=%u name=%s on object %s",a.getABCName(),mPoolObject->mStringPool[a.getABCName()],object.toDebugString());
 		object.to_object()->init_member(mPoolObject->mStringPool[a.getABCName()],v,0,0);
 //		mStack.drop(completeName(a));
 		//TODO: mStack.pop().to_object().setProperty(a, v, true); // true for init
