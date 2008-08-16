@@ -94,8 +94,8 @@ struct as_value_lt
         if (b.is_null()) return true;
         double aval = a.to_number();
         double bval = b.to_number();
-        if (isnan(aval)) return false;
-        if (isnan(bval)) return true;
+        if (isNaN(aval)) return false;
+        if (isNaN(bval)) return true;
         return aval < bval;
     }
 
@@ -107,8 +107,8 @@ struct as_value_lt
         if (a.is_null()) return true;
         double aval = a.to_number();
         double bval = b.to_number();
-        if (isnan(bval)) return false;
-        if (isnan(aval)) return true;
+        if (isNaN(bval)) return false;
+        if (isNaN(aval)) return true;
         return aval > bval;
     }
 
@@ -118,7 +118,7 @@ struct as_value_lt
         if (a.is_null() && b.is_null()) return true;
         double aval = a.to_number();
         double bval = b.to_number();
-        if (isnan(aval) && isnan(bval)) return true;
+        if (isNaN(aval) && isNaN(bval)) return true;
         return aval == bval;
     }
 

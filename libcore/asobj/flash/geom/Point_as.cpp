@@ -462,22 +462,22 @@ Point_distance(const fn_call& fn)
 	as_value x1val;
 	o1->get_member(NSV::PROP_X, &x1val);
 	double x1 = x1val.to_number();
-	//if ( ! utility::isFinite(x1) ) return as_value(NAN);
+	//if ( ! utility::isFinite(x1) ) return as_value(NaN);
 
 	as_value y1val;
 	o1->get_member(NSV::PROP_Y, &y1val);
 	double y1 = y1val.to_number();
-	//if ( ! utility::isFinite(y1) ) return as_value(NAN);
+	//if ( ! utility::isFinite(y1) ) return as_value(NaN);
 
 	as_value x2val;
 	o2->get_member(NSV::PROP_X, &x2val);
 	double x2 = x2val.to_number();
-	//if ( ! utility::isFinite(x2) ) return as_value(NAN);
+	//if ( ! utility::isFinite(x2) ) return as_value(NaN);
 
 	as_value y2val;
 	o2->get_member(NSV::PROP_Y, &y2val);
 	double y2 = y2val.to_number();
-	//if ( ! utility::isFinite(y2) ) return as_value(NAN);
+	//if ( ! utility::isFinite(y2) ) return as_value(NaN);
 
 	double hside = x2 - x1; // p1.x - p0.x;
 	double vside = y2 - y1; // p1.y - p0.y;

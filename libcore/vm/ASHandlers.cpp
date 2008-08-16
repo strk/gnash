@@ -3235,7 +3235,7 @@ SWFHandlers::ActionNewLessThan(ActionExec& thread)
         const double op1 = operand1.to_number();
         const double op2 = operand2.to_number();
 
-        if ( isnan(op1) || isnan(op2) )
+        if ( isNaN(op1) || isNaN(op2) )
         {
             env.top(1).set_undefined();
         }
@@ -3872,7 +3872,7 @@ SWFHandlers::ActionGreater(ActionExec& thread)
         const double op1 = operand1.to_number();
         const double op2 = operand2.to_number();
 
-        if ( isnan(op1) || isnan(op2) )
+        if ( isNaN(op1) || isNaN(op2) )
         {
             env.top(1).set_undefined();
         }
