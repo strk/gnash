@@ -5,6 +5,13 @@
 
 // A file class that can be customized with callbacks.
 
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h"
+#endif
+
+#ifdef HAVE_PTHREADS
+#include <pthread.h>
+#endif
 
 #include "tu_file.h"
 #include "utility.h"

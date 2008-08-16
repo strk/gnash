@@ -22,6 +22,13 @@
 // Wrapper for jpeg file operations.  The actual work is done by the
 // IJG jpeg lib.
 
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h"
+#endif
+
+#ifdef HAVE_PTHREADS
+#include <pthread.h>
+#endif
 
 #include "utility.h"
 #include "GnashImage.h"

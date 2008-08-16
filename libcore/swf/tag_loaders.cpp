@@ -22,6 +22,10 @@
 #include "gnashconfig.h" // HAVE_ZLIB_H, USE_SWFTREE
 #endif
 
+#ifdef HAVE_PTHREADS
+#include <pthread.h>
+#endif
+
 #include "tu_file.h" // for StreamAdapter (bitmap tag loaders)
 #include "utility.h"
 #include "action.h"

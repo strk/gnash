@@ -17,6 +17,14 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h" // HAVE_ZLIB_H, USE_SWFTREE
+#endif
+
+#ifdef HAVE_PTHREADS
+#include <pthread.h>
+#endif
+
 #include "PlaceObject2Tag.h"
 #include "character.h"
 #include "sprite_instance.h"

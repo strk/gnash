@@ -116,6 +116,9 @@ AGG ressources
 #include "gnashconfig.h"
 #endif
 
+#ifdef HAVE_PTHREADS
+#include <pthread.h>
+#endif
 
 #include <vector>
 #include <cmath>

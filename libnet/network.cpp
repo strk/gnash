@@ -20,6 +20,10 @@
 #include "gnashconfig.h"
 #endif
 
+#ifdef HAVE_PTHREADS
+#include <pthread.h>
+#endif
+
 #include "utility.h"
 #include "log.h"
 #include "network.h"

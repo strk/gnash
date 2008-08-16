@@ -20,6 +20,13 @@
 #ifndef GNASH_GNASHIMAGE_H
 #define GNASH_GNASHIMAGE_H
 
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h"
+#endif
+
+#ifdef HAVE_PTHREADS
+#include <pthread.h>
+#endif
 #include <boost/shared_ptr.hpp> 
 #include "log.h"
 #include "image.h"
