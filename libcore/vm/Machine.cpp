@@ -877,8 +877,7 @@ Machine::execute()
 ///  false -- the False object
 	case SWF::ABC_ACTION_PUSHFALSE:
 	{
-		mStack.grow(1);
-		mStack.top(0).set_bool(false);
+		push_stack(as_value(false));
 		break;
 	}
 /// 0x28 ABC_ACTION_PUSHNAN
