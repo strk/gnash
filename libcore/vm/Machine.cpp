@@ -537,9 +537,13 @@ Machine::execute()
 /// Do: If a is 'false', move by jump in stream, as ABC_ACTION_JUMP does.
 	case SWF::ABC_ACTION_IFFALSE:
 	{
-		bool truth = mStack.top(0).to_bool();
-		mStack.drop(1);
-		JUMPIF(!truth);
+		bool truth = pop_stack().to_bool();
+		if(!truth){
+			LOG_DEBUG_AVM("Jumping...");
+			boost::int32_t bytes = mStream->read_S24();
+			LOG_DEBUG_AVM("%d bytes.",bytes);
+			mStream->seekBy(bytes);
+		}
 		break;
 	}
 /// 0x13 ABC_ACTION_IFEQ
