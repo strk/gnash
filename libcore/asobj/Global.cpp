@@ -75,7 +75,7 @@
 #include "xml.h"
 #include "xmlsocket.h"
 
-#include <limits> // for numeric_limits<double>::quiet_NaN
+#include <limits> // for numeric_limits<double>::infinity
 #include <sstream>
 
 // Common code to warn and return if a required single arg is not present
@@ -228,8 +228,8 @@ Global::Global(VM& vm, ClassHierarchy *ch)
             // NaN and Infinity should only be in _global since SWF6,
             // but this is just because SWF5 or lower did not have a "_global"
             // reference at all, most likely.
-            init_member("NaN", as_value(NAN));
-            init_member("Infinity", as_value(INFINITY));
+            init_member("NaN", as_value(NaN));
+            init_member("Infinity", as_value(std::numeric_limits<double>::infinity()));
 
             registerColorNative(*this);
             registerTextFormatNative(*this);

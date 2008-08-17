@@ -150,7 +150,7 @@ getNumberConstructor()
 
 		cl->init_member("MAX_VALUE", std::numeric_limits<double>::max(), cflags);
 		cl->init_member("MIN_VALUE", std::numeric_limits<double>::denorm_min(), cflags);
-		cl->init_member("NaN", as_value(NAN), cflags);
+		cl->init_member("NaN", as_value(NaN), cflags);
 		cl->init_member("POSITIVE_INFINITY", as_value(std::numeric_limits<double>::infinity()), cflags);
 		cl->init_member("NEGATIVE_INFINITY", as_value(-std::numeric_limits<double>::infinity()), cflags);
 
