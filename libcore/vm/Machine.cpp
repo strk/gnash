@@ -1349,6 +1349,7 @@ Machine::execute()
 			arr->set_indexed(i, pop_stack());
 		}
 		push_stack(as_value(arr));
+		print_stack();
 		break;
 	}
 /// 0x57 ABC_ACTION_NEWACTIVATION
@@ -1385,6 +1386,7 @@ Machine::execute()
 		saveState();
 		mStream = c->getStaticConstructor()->getBody();
 
+		print_stack();
 //		ENSURE_OBJECT(mStack.top(0));
 //		as_object *obj = mStack.top(0).to_object().get();
 //		as_function *func = c->getConstructor()->getPrototype();
@@ -1551,6 +1553,7 @@ Machine::execute()
 	case SWF::ABC_ACTION_GETGLOBALSCOPE:
 	{
 		push_stack(mAsValueScopeStack.value(0));
+		print_stack();
 		break;
 	}
 /// 0x65 ABC_ACTION_GETSCOPEOBJECT

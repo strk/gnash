@@ -20,7 +20,7 @@
 #define GNASH_MACHINE_H
 
 #include <vector>
-
+#include <sstream>
 #include "SafeStack.h"
 #include "as_value.h"
 #include "asClass.h"
@@ -311,6 +311,29 @@ private:
 		LOG_DEBUG_AVM("Property's value is %s",value.toDebugString());
 		mStack.push(value);
 	}
+
+	void print_stack(){
+		
+		std::stringstream ss;
+		ss << "Stack: ";
+//		log_debug("Stack size is %u",mStack.size());
+		for(unsigned int i=0;i<mStack.size();++i){
+			as_value value = mStack.value(i);
+			ss << mStack.top(i).toDebugString();
+		}
+//		printf("\n");
+		LOG_DEBUG_AVM("%s", ss.str());
+	}
+
+	void print_scope_stack(){
+		
+		std::stringstream ss;
+		ss << "ScopeStack: ";
+		for(unsigned int i=0;i<mAsValueScopeStack.size();++i){
+			ss << mAsValueScopeStack.top(i).toDebugString();
+		}
+		LOG_DEBUG_AVM("%s", ss.str());
+	}	
 
 	as_environment get_args(int argc){
 		as_environment env;
