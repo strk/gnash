@@ -1170,14 +1170,15 @@ Machine::execute()
 	case SWF::ABC_ACTION_CALLPROPLEX:
 	case SWF::ABC_ACTION_CALLPROPVOID:
 	{
-//		bool lex_only = (opcode == SWF::ABC_ACTION_CALLPROPLEX);
+
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
 		boost::uint32_t argc = mStream->read_V32();
 		as_environment env = get_args(argc);
+		//TODO: If multiname is runtime also pop namespace and/or name values.
 		as_object *object = pop_stack().to_object().get();
 		
-		//TODO: Determine namespace.
 		as_value property = object->getMember(a.getGlobalName(),0);
+		LOG_DEBUG_AVM("Calling method %s on object %s",property.toDebugString(),object->get_text_value());
 		call_method(property,&env,object,argc,env.stack_size() - 1);
 		env.drop(argc);
 
