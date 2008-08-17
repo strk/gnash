@@ -297,7 +297,7 @@ private:
 	}
 	
 	void get_property(string_table::key name,string_table::key ns){
-		as_object* object = mStack.pop().to_object().get();
+		as_object* object = pop_stack().to_object().get();
 		push_stack(object->getMember(name,ns));
 	}
 	
@@ -335,7 +335,8 @@ private:
 		LOG_DEBUG_AVM("%s", ss.str());
 	}	
 
-	as_environment get_args(int argc){
+	as_environment get_args(unsigned int argc){
+		LOG_DEBUG_AVM("There are %u args",argc);
 		as_environment env;
 		for(unsigned int i=0;i<argc;i++){
 			env.push(pop_stack());
