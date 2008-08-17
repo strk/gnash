@@ -812,7 +812,9 @@ Machine::execute()
 ///  n -- a Null object.
 	case SWF::ABC_ACTION_PUSHNULL:
 	{
-		push_stack(as_value(NULL));
+		as_value value = as_value();
+		value.set_null();
+		push_stack(value);
 		break;
 	}
 /// 0x21 ABC_ACTION_PUSHUNDEFINED
