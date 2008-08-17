@@ -493,12 +493,12 @@ Matrix_invert(const fn_call& fn)
     const double ty = - (b * currentMatrix(0, 2) + d * currentMatrix(1, 2));
 
     // Returns the identity matrix if unsuccessful.
-    ptr->set_member(NSV::PROP_A, as_value(as_value(a)));
-    ptr->set_member(NSV::PROP_B, as_value(as_value(b)));
-    ptr->set_member(NSV::PROP_C, as_value(as_value(c)));
-    ptr->set_member(NSV::PROP_D, as_value(as_value(d)));
-    ptr->set_member(NSV::PROP_TX, as_value(as_value(tx)));
-    ptr->set_member(NSV::PROP_TY, as_value(as_value(ty)));
+    ptr->set_member(NSV::PROP_A, as_value(a));
+    ptr->set_member(NSV::PROP_B, as_value(b));
+    ptr->set_member(NSV::PROP_C, as_value(c));
+    ptr->set_member(NSV::PROP_D, as_value(d));
+    ptr->set_member(NSV::PROP_TX, as_value(tx));
+    ptr->set_member(NSV::PROP_TY, as_value(ty));
 
     return as_value();
 }
