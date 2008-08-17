@@ -1612,14 +1612,18 @@ Machine::execute()
 	case SWF::ABC_ACTION_INITPROPERTY:
 	{
 		LOG_AVM_UNIMPLEMENTED();
-		asName a = pool_name(mStream->read_V32(), mPoolObject);
+		boost::uint32_t index = mStream->read_V32();
+		asName a = pool_name(index, mPoolObject);
 		as_value v = pop_stack();
 		//TODO: There may or may not be a namespace, or a name object on the stack, we need to figure 
 		//out how to determine what is on the stack.
 		as_value ns = pop_stack();
 		as_value object = pop_stack();
 		LOG_DEBUG_AVM("Initializing property ABC_id=%u name=%s on object %s",a.getABCName(),mPoolObject->mStringPool[a.getABCName()],object.toDebugString());
+
 		object.to_object()->init_member(mPoolObject->mStringPool[a.getABCName()],v,0,0);
+
+		mPoolObject->update_global_name(index);
 //		mStack.drop(completeName(a));
 		//TODO: mStack.pop().to_object().setProperty(a, v, true); // true for init
 		break;

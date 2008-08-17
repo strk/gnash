@@ -185,6 +185,8 @@ public:
 
 	bool pool_value(boost::uint32_t index, boost::uint8_t type, as_value &v);
 
+	void update_global_name(unsigned int multiname_index);
+
 	abc_block();
 
 private:

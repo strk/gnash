@@ -1241,6 +1241,13 @@ asClass *abc_block::locateClass(const std::string& className){
 	return NULL;
 }
 
+void abc_block::update_global_name(unsigned int multiname_index){
+	
+	asName* multiname = &mMultinamePool[multiname_index];
+	string_table::key new_key = mStringTable->find(mStringPool[multiname->getABCName()],false);
+	multiname->setGlobalName(new_key);	
+}
+
 abc_block::abc_block() : mStringTable(&VM::get().getStringTable())
 {
 	mCH = VM::get().getClassHierarchy();
