@@ -1548,8 +1548,9 @@ Machine::execute()
 ///  .
 	case SWF::ABC_ACTION_SETLOCAL:
 	{
-		mRegisters[mStream->read_V32()] = mStack.top(0);
-		mStack.drop(1);
+		boost::uint32_t index = mStream->read_V32();
+		LOG_DEBUG_AVM("Register index: %u",index);
+		mRegisters[index] = pop_stack();
 		break;
 	}
 /// 0x64 ABC_ACTION_GETGLOBALSCOPE
@@ -2631,7 +2632,7 @@ Machine::Machine(string_table &ST, ClassHierarchy *CH):mST(),mRegisters()
 	mCH = CH;
 	//Local registers should be initialized at the beginning of each function call, but
 	//we don't currently parse the number of local registers for each function.
-	mRegisters.resize(4);
+	mRegisters.resize(8);
 //	mST = new string_table();
 //	mST = ST;
 }
