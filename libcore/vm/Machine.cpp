@@ -1652,11 +1652,9 @@ Machine::execute()
 	case SWF::ABC_ACTION_SETSLOT:
 	{
 		boost::uint32_t sindex = mStream->read_V32();
-		if (!sindex)
-			throw ASException();
-		--sindex;
-		//TODO: mStack.top(0).setSlot(sindex, mStack.top(1));
-		mStack.drop(2);
+		as_value value = pop_stack();
+		as_value object = pop_stack();
+		//TODO: Actually set the object's value.
 		break;
 	}
 /// 0x6E ABC_ACTION_GETGLOBALSLOT
