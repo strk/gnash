@@ -169,9 +169,15 @@ public:
 	/// Read a signed integer encoded in 24 bits.
 	boost::int32_t read_S24()
 	{
-		if (mEnd - mCurrent < 3)
+		if (mEnd == mCurrent)
 			throw CodeStreamException();
-		int result = *mCurrent++ + (*mCurrent++ << 8) + (*mCurrent ++ << 16);
+		int result = *mCurrent++;
+		if(mEnd == mCurrent)
+			throw CodeStreamException();
+		result += (*mCurrent++ << 8);
+		if(mEnd== mCurrent)
+			throw CodeStreamException();
+		result += (*mCurrent ++ << 16);
 		if (result & (1 << 23)) // Negative result, adjust appropriately.
 			result = -(result & ~(1 << 23));
 		return static_cast<boost::int32_t>(result);
