@@ -902,7 +902,7 @@ Machine::execute()
 ///  .
 	case SWF::ABC_ACTION_POP:
 	{
-		mStack.drop(1);
+		pop_stack();
 		break;
 	}
 /// 0x2A ABC_ACTION_DUP
