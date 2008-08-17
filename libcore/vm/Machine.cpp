@@ -1021,9 +1021,8 @@ Machine::execute()
 ///  function from this information and bind the current scope.
 	case SWF::ABC_ACTION_NEWFUNCTION:
 	{
-		mStack.grow(1);
 		asMethod *m = pool_method(mStream->read_V32(), mPoolObject);
-		mStack.top(0) = m->construct(mCurrentScope);
+		push_stack(as_value(new abc_function(m->getBody())));
 		break;
 	}
 /// 0x41 ABC_ACTION_CALL
