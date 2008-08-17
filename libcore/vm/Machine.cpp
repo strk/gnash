@@ -1374,7 +1374,8 @@ Machine::execute()
 		boost::uint32_t cid = mStream->read_V32();
 		asClass *c = pool_class(cid, mPoolObject);
 		LOG_DEBUG_AVM("Creating new class id=%u name=%s",c->getName(),mPoolObject->mStringPool[c->getName()]);
-
+		
+		as_object* base_class = pop_stack().to_object().get();
 		as_object* new_class = new as_object();
 		//Create the class.
 		abc_function* constructor = new abc_function(c->getConstructor()->getBody());
@@ -1612,9 +1613,7 @@ Machine::execute()
 		boost::uint32_t index = mStream->read_V32();
 		asName a = pool_name(index, mPoolObject);
 		as_value v = pop_stack();
-		//TODO: There may or may not be a namespace, or a name object on the stack, we need to figure 
-		//out how to determine what is on the stack.
-		as_value ns = pop_stack();
+		//TODO: If multiname is a runtime mutiname we need to also pop name and namespace values.
 		as_value object = pop_stack();
 		LOG_DEBUG_AVM("Initializing property ABC_id=%u name=%s on object %s",a.getABCName(),mPoolObject->mStringPool[a.getABCName()],object.toDebugString());
 
