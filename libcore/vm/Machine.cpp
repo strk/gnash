@@ -556,10 +556,13 @@ Machine::execute()
 /// Do: If a == b (weakly), move by jump in stream, as ABC_ACTION_JUMP does.
 	case SWF::ABC_ACTION_IFEQ:
 	{
-		bool truth;
-		ABSTRACT_EQUALITY(truth, mStack.top(1), mStack.top(0), false);
-		mStack.drop(2);
-		JUMPIF(truth);
+		boost::int32_t bytes = mStream->read_S24();
+		as_value b = pop_stack();
+		as_value a = pop_stack();
+		if(a.equals(b)){
+			LOG_DEBUG_AVM("Jumping %d bytes.",bytes);
+			mStream->seekBy(bytes);
+		}
 		break;
 	}
 /// 0x14 ABC_ACTION_IFNE
