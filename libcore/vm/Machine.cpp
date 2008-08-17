@@ -1535,8 +1535,7 @@ Machine::execute()
 ///  value
 	case SWF::ABC_ACTION_GETLOCAL:
 	{
-		mStack.grow(1);
-		mStack.top(0) = mRegisters[mStream->read_V32()];
+		push_stack(mRegisters[mStream->read_V32()]);
 		break;
 	}
 /// 0x63 ABC_ACTION_SETLOCAL
