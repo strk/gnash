@@ -1512,15 +1512,12 @@ Machine::execute()
 	{
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
 		as_value value = pop_stack();
-		if (!a.isRuntime())
-		{
-			//TODO: Get Namespace and name value off of the stack.
+		//TODO: Get Namespace and name value off of the stack if it is a runtime multiname.
+		as_object *object = pop_stack().to_object().get();
+		if(!object->set_member_default(a.getGlobalName(),value,0,true)){
+			object->init_member(mPoolObject->mStringPool[a.getABCName()],value,0,0);
 		}
-		else
-		{
-			as_object *object = pop_stack().to_object().get();
-			object->set_member(a.getGlobalName(),value);
-		}
+		print_stack();
 		break;
 	}
 /// 0x62 ABC_ACTION_GETLOCAL
