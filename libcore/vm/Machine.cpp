@@ -1807,8 +1807,9 @@ Machine::execute()
 	case SWF::ABC_ACTION_COERCE:
 	{
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
-		mStack.drop(completeName(a));
-		//TODO: mStack.top(0) = mStack.top(0).coerce(a);
+		as_value value = pop_stack();
+		//TODO: Actually coerce the value.
+		push_stack(value);
 		break;
 	}
 /// 0x82 ABC_ACTION_COERCE_A
