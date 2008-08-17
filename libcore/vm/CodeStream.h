@@ -152,10 +152,15 @@ public:
 	/// Change the current position by a relative value.
 	void seekBy(int change)
 	{
-		if ((change > 0 && change > (mEnd - mCurrent)) ||
-			(change < 0 && -change > (mCurrent - mRaw)))
-			throw CodeStreamException();
-		mCurrent += change;
+		//This is ugly, but I don't think we have any way of knowing what index of the stream we are at,
+		//so the only way to make sure we don't go past the end of the stream is to jump one byte at a
+		//time.
+		for(int i=0;i<change;i++){
+			if (mCurrent == mEnd){
+				throw CodeStreamException();
+			}
+			mCurrent ++;
+		}
 	}
 
 	/// Set the current position to an absolute value (relative to the start)
