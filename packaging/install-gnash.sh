@@ -334,7 +334,7 @@ install ()
 
   # install the libraries
   if [ -e lib/gnash/libgnashbase.so -o x$yes = xyes ]; then
-    for i in lib/gnash/libgnash*cvs.so; do
+    for i in lib/gnash/libgnash*trunk.so; do
       ${COPY} $i /usr/lib/
       linkname=`echo $i | sed -e 's:\-.*.so:.so:' -e 's:\.3.*::'`
       linkname=`basename ${linkname}`

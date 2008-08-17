@@ -29,31 +29,32 @@ SNAPSHOT_TMP = /tmp/gnash-$(NOW)
 #
 
 # start by creating the initial tarball using the dist-bzip2 target.
-# This uses the default version for Gnash. which is 'cvs'. So we
+# This uses the default version for Gnash. which is 'trunk'. So we
 # rename it to the dir we want to stay clear. Then we change the default
-# version from 'cvs' to a date stamped version of cvs, like '20080202cvs'
+# version from 'trunk' to a date stamped version of trunk, like
+# '20080202trunk'
 snapshot: distdir
 	-@now=`date "+%Y%m%d"`; \
-	pkgname="gnash-$${now}cvs"; \
+	pkgname="gnash-$${now}trunk"; \
 	snapshot_dir="$${pkgname}"; \
 	snapshot_tar="$${pkgname}.tar.gz"; \
 	if test -d $${snapshot_dir}; then \
 	  rm -fr $${snapshot_dir}; \
 	fi; \
-	mv -f gnash-cvs $${snapshot_dir}; \
+	mv -f gnash-trunk $${snapshot_dir}; \
 	if test ! -f $${snapshot_dir}/configure.ac.orig; then \
 	  mv -f $${snapshot_dir}/configure.ac $${snapshot_dir}/configure.ac.orig; \
-	  sed -e "s/AC_INIT(gnash, cvs)/AC_INIT(gnash, $${now}cvs)/" \
+	  sed -e "s/AC_INIT(gnash, trunk)/AC_INIT(gnash, $${now}trunk)/" \
 	    $${snapshot_dir}/configure.ac.orig > $${snapshot_dir}/configure.ac; \
 	  cd $${snapshot_dir} ; ./autogen.sh; cd .. ;\
 	fi; \
-	tar zcvf $${snapshot_tar} --exclude="*CVS" --exclude=$${snapshot_dir}/autom4te.cache \
+	tar zcvf $${snapshot_tar} --exclude=$${snapshot_dir}/autom4te.cache \
 	  --exclude=$${snapshot_dir}/configure.ac.orig $${snapshot_dir}
 #	$(RM) -fr $${snapshot_dir}
 
 snapshot-configure: snapshot
 	-@now=`date "+%Y%m%d"`; \
-	pkgname="gnash-$${now}cvs"; \
+	pkgname="gnash-$${now}trunk"; \
 	snapshot_dir="$${pkgname}"; \
 	snapshot_build="$${snapshot_dir}/_build"; \
 	if test ! -d $${snapshot_build}; then \
@@ -79,7 +80,7 @@ snapshot-configure: snapshot
 
 snapshot-build: snapshot-configure
 	-@now=`date "+%Y%m%d"`; \
-	pkgname="gnash-$${now}cvs"; \
+	pkgname="gnash-$${now}trunk"; \
 	snapshot_dir="$${pkgname}"; \
 	snapshot_build="$${snapshot_dir}/_build"; \
 	$(LN_S) -f $${snapshot_build}/packaging/doc $${snapshot_build}/packaging/; \
@@ -90,16 +91,16 @@ snapshot-build: snapshot-configure
 # DocBook and DocBook2X aren't installed on this machine.
 snapshot-install: #snapshot-build
 	now=`date "+%Y%m%d"`; \
-	snapshot_dir="gnash-$${now}cvs"; \
+	snapshot_dir="gnash-$${now}trunk"; \
 	snapshot_build="$${snapshot_dir}/_build"; \
-	snapshot_dest="/tmp/gnash-$${now}cvs-tmp"; \
+	snapshot_dest="/tmp/gnash-$${now}trunk-tmp"; \
 	$(MAKE) $(AM_MAKEFLAGS) -C $${snapshot_build} install install-plugins DESTDIR=$${snapshot_dest}
 
 # We only want to bundle an installed gnash, so all the linker paths are
 # correct
 snapshot-bundle: #snapshot-install
 	-@now=`date "+%Y%m%d"`; \
-	pkgname="gnash-$${now}cvs"; \
+	pkgname="gnash-$${now}trunk"; \
 	snapshot_dest="/tmp/$${pkgname}-tmp"; \
 	snapshot_tmp="/tmp/$${pkgname}"; \
 	snapshot_tar="$${snapshot_tmp}-$(host_cpu)-$(host_os).tar.gz"; \
@@ -124,7 +125,7 @@ snapshot-bundle: #snapshot-install
 snapshot-rpm: snapshot $(srcdir)/packaging/redhat/gnash.spec
 	-@rm -f /usr/src/redhat/SPECS/gnash.spec
 	now=`date "+%Y%m%d"`; \
-	pkgname="gnash-$${now}cvs"; \
+	pkgname="gnash-$${now}trunk"; \
 	snapshot_tar="$${pkgname}.tar.gz"; \
 	sed -e "s:%define version .*:%define version $${now}:" $(srcdir)/packaging/redhat/gnash.spec > /usr/src/redhat/SPECS/gnash.spec; \
 	cp $${snapshot_tar} /usr/src/redhat/SOURCES/
