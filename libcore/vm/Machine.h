@@ -297,8 +297,8 @@ private:
 	}
 	
 	void get_property(string_table::key name,string_table::key ns){
-		boost::intrusive_ptr<gnash::as_object> object = mStack.pop().to_object();
-		mStack.push(object->getMember(name,ns));
+		as_object* object = mStack.pop().to_object().get();
+		push_stack(object->getMember(name,ns));
 	}
 	
 	void get_property(Property* p){

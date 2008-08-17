@@ -1576,24 +1576,8 @@ Machine::execute()
 	case SWF::ABC_ACTION_GETPROPERTY:
 	{
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
-		if (!a.isRuntime())
-		{
-			//TODO: mStack.top(0) = mStack.top(0).getProperty(a, v);
-		}
-		else
-		{
-			if (a.isRtns() || !(mStack.top(0).is_object()
-				&& mStack.top(1).to_object()->isDictionary()))
-			{
-				mStack.drop(completeName(a));
-				//TODO: mStack.top(0) = mStack.top(0).getProperty(a);
-			}
-			else
-			{
-				//TODO: mStack.top(1) = mStack.top(1).getDictProperty(mStack.top(0));
-				mStack.drop(1);
-			}
-		}
+		//TODO: If multiname is runtime we need to also pop namespace and name values of the stack.
+		get_property(a.getGlobalName(),0);
 		break;
 	}
 /// 0x68 ABC_ACTION_INITPROPERTY
