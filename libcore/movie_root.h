@@ -700,19 +700,27 @@ public:
         return _hostfd;
     }
 
+    /// Signature of interface event callback.
+    typedef std::string (*interfaceEventCallback)(const std::string& event,
+                                              const std::string& arg);
+
 	/// A callback to the GUI (or whatever is listening) for sending
 	/// events and receiving replies. Used for ActionScript interface
 	/// with the gui (Mouse visibility, Stage alignment etc and System
 	/// information, for instance).
-	gnash::interfaceEventCallback interfaceHandle;
+	interfaceEventCallback interfaceHandle;
 
 	DSOEXPORT void registerEventCallback(interfaceEventCallback handler)
 	{
 	   	interfaceHandle = handler;
 	}
 
-    // Callback to send FsCommands somewhere.
-    gnash::fscommand_callback fsCommandHandle;
+    /// Signature of fscommand callback function
+    typedef void (*fsCommandCallback)(sprite_instance* movie,
+                  const std::string& command, const std::string& arg);
+
+    /// Callback to send FsCommands somewhere.
+    fsCommandCallback fsCommandHandle;
 
 
     /// ActionScript embedded in a movie can use the built-in
@@ -724,7 +732,7 @@ public:
     /// The handler gets the sprite_instance* that the script is
     /// embedded in, and the two string arguments passed by the
     /// script to fscommand().
-    DSOEXPORT void registerFSCommandCallback(fscommand_callback handler)
+    DSOEXPORT void registerFSCommandCallback(fsCommandCallback handler)
     {
         fsCommandHandle = handler;
     }

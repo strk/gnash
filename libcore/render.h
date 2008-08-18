@@ -71,17 +71,6 @@ namespace gnash {
 		/// See render_handler::end_display (in backend/render_handler.h)
 		void	end_display();
 
-		/// \brief
-		/// Draw triangles using the current fill-style 0.
-		/// Clears the style list after rendering.
-		//
-		/// coords is a list of (x,y) coordinate pairs, in
-		/// triangle-strip order.  The type of the array should
-		/// be float[vertex_count*2]
-		///
-		void	draw_mesh_strip(const boost::int16_t coords[],
-				int vertex_count);
-
 		/// See render_handler::draw_line_strip (in backend/render_handler.h)
 		void	draw_line_strip(const boost::int16_t coords[],
 				int vertex_count, const rgba& color, const matrix& mat);
