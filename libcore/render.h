@@ -1,21 +1,38 @@
-// render.h	-- Thatcher Ulrich <tu@tulrich.com> 2003
+// render.h Rendering interface for Gnash
+// 
+//   Copyright (C) 2008 Free Software Foundation, Inc.
+// 
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// This source code has been donated to the Public Domain.  Do
-// whatever you want with it.
-
-// Interface to renderer back-end.
+// Based on original by Willem Kokke <willem@mindparity.com> 2003
 
 
 #ifndef GNASH_RENDER_H
 #define GNASH_RENDER_H
 
-
-#include "types.h"
 #include "gnash.h"
-#include "image.h"
 #include "render_handler.h"
 #include "dsodefs.h"
 
+// Forward declarations
+namespace gnash {
+    class rgba;
+    namespace image {
+        class ImageBase;
+    }
+}
 
 namespace gnash {
 
