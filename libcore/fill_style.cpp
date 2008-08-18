@@ -441,7 +441,7 @@ fill_style::create_gradient_bitmap() const
         for (size_t i = 0; i < im->width(); i++)
     {
             rgba    sample = sample_gradient(i);
-            im->set_pixel(i, 0, sample.m_r, sample.m_g, sample.m_b, sample.m_a);
+            im->setPixel(i, 0, sample.m_r, sample.m_g, sample.m_b, sample.m_a);
         }
     }
     else if (m_type == SWF::FILL_RADIAL_GRADIENT)
@@ -459,7 +459,7 @@ fill_style::create_gradient_bitmap() const
                     ratio = 255;
                 }
                 rgba    sample = sample_gradient( ratio );
-                im->set_pixel(i, j, sample.m_r, sample.m_g, sample.m_b, sample.m_a);
+                im->setPixel(i, j, sample.m_r, sample.m_g, sample.m_b, sample.m_a);
             }
         }
     }
@@ -482,7 +482,7 @@ fill_style::create_gradient_bitmap() const
                     ratio = 255;
                 }
                 rgba sample = sample_gradient(ratio);
-                im->set_pixel(i, j, sample.m_r, sample.m_g, sample.m_b, sample.m_a);
+                im->setPixel(i, j, sample.m_r, sample.m_g, sample.m_b, sample.m_a);
             }
         }
     }
