@@ -487,7 +487,8 @@ fill_style::create_gradient_bitmap() const
         }
     }
         
-    gnash::bitmap_info* bi = gnash::render::create_bitmap_info_rgba(im.get());
+    bitmap_info* bi = render::createBitmapInfo(
+                    static_cast<std::auto_ptr<image::ImageBase> >(im));
 
     return bi;
 }

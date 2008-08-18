@@ -32,8 +32,7 @@
 
 namespace gnash {
 namespace image {
-	class ImageRGBA;
-	class ImageRGB;
+	class ImageBase;
 }
 }
 
@@ -68,15 +67,7 @@ public:
 	///       create a bitmap_info, don't call before a renderer
 	///	  has been registered
 	///
- 	bitmap_character_def(std::auto_ptr<image::ImageRGB> image);
-
-	/// Construct a bitmap_character_def from an image::ImageRGBA
-	//
-	/// NOTE: uses currently registered render_handler to
-	///       create a bitmap_info, don't call before a renderer
-	///	  has been registered
-	///
- 	bitmap_character_def(std::auto_ptr<image::ImageRGBA> image);
+ 	bitmap_character_def(std::auto_ptr<image::ImageBase> image);
 
 	bitmap_info* get_bitmap_info() {
 		return _bitmap_info.get();

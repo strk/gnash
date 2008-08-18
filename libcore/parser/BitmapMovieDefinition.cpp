@@ -34,28 +34,13 @@ BitmapMovieDefinition::getShapeDef()
 {
 	if ( _shapedef ) return _shapedef.get();
 
-    // Checking the type allows a neat switch statement.
-    switch (_image->type())
-    {
-        case GNASH_IMAGE_RGB:
-        {
-            std::auto_ptr<image::ImageRGB> imageRGB(dynamic_cast<image::ImageRGB*>(_image.release()));
-            assert(imageRGB.get());
-            _bitmap = new bitmap_character_def(imageRGB);
-            break;
-        }
-        case GNASH_IMAGE_RGBA:
-        {
-            std::auto_ptr<image::ImageRGBA> imageRGBA(dynamic_cast<image::ImageRGBA*>(_image.release()));
-            assert(imageRGBA.get());
-            _bitmap = new bitmap_character_def(imageRGBA);
-            break;        
-        }
-        default:
-            log_error ("Attempt to create a bitmap character "
-                       "from unsupported image type");
-            return NULL;
-    }
+    _bitmap = new bitmap_character_def(_image);
+
+    // It's possible for this to fail.
+    if (!_bitmap.get()) return 0;
+
+    // Ownership transferred.
+    assert (!_image.get());
 
 	// Create the shape definition
 	_shapedef = new DynamicShape();

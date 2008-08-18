@@ -39,10 +39,7 @@ namespace gnash {
 	namespace render
 	{
 		/// See render_handler::create_bitmap_info_rgb (in backend/render_handler.h)
-		bitmap_info* create_bitmap_info_rgb(image::ImageRGB* im);
-
-		/// See render_handler::create_bitmap_info_rgba (in backend/render_handler.h)
-		bitmap_info* create_bitmap_info_rgba(image::ImageRGBA* im);
+		bitmap_info* createBitmapInfo(std::auto_ptr<image::ImageBase> im);
 
 		/// See render_handler::drawVideoFrame (in backend/render_handler.h)
 		void drawVideoFrame(image::ImageBase* frame, const matrix* mat, const rect* bounds);
