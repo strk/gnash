@@ -657,18 +657,6 @@ public:
     delete bi;
   }
   
-  enum video_frame_format
-  {
-    NONE,
-    YUV,
-    RGB
-  };
-
-  virtual int videoFrameFormat()
-  {
-    return RGB;
-  }
-  
   // Since we store drawing operations in display lists, we take special care
   // to store video frame operations in their own display list, lest they be
   // anti-aliased with the rest of the drawing. Since display lists cannot be

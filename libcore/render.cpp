@@ -77,12 +77,6 @@ namespace gnash {
 			if (s_render_handler) s_render_handler->delete_bitmap_info(bi);
 		}
 
-	 	// Returns the format the current renderer wants videoframes in.
-		int videoFrameFormat() {
-			if (s_render_handler) return s_render_handler->videoFrameFormat();
-			else return NONE;
-		}
-		
 		// Draws the video frames
 		void drawVideoFrame(image::ImageBase* frame, const matrix* mat, const rect* bounds){
 			if (s_render_handler) return s_render_handler->drawVideoFrame(frame, mat, bounds);

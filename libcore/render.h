@@ -47,20 +47,6 @@ namespace gnash {
 		/// See render_handler::delete_bitmap_info (in backend/render_handler.h)
 		void	delete_bitmap_info(bitmap_info* bi);
 
-		/// The different video frame formats
-		//
-		/// TODO: remove this duplication, original is in gnash::render_handler
-		///
-		enum video_frame_format
-		{
-			NONE,
-			YUV,
-			RGB
-		};
-
-		/// See render_handler::videoFrameFormat (in backend/render_handler.h)
-		int videoFrameFormat();
-
 		/// See render_handler::drawVideoFrame (in backend/render_handler.h)
 		void drawVideoFrame(image::ImageBase* frame, const matrix* mat, const rect* bounds);
 

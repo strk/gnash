@@ -266,9 +266,6 @@ protected:
 	// The size of the buffer in milliseconds
 	boost::uint32_t m_bufferTime;
 
-	// The video outputformat
-	int m_videoFrameFormat;
-
 	// Are a new frame ready to be returned?
 	volatile bool m_newFrameReady;
 

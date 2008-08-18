@@ -163,7 +163,7 @@ namespace gnash {
 
     // @@ forward decl to avoid including base/image.h; TODO change the
     // render_handler interface to not depend on these classes at all.
-    namespace image { class ImageBase; class rgb; class rgba; }
+    namespace image { class ImageBase; class ImageRGB; class ImageRGBA; }
 }
 
 namespace gnash {
@@ -236,23 +236,11 @@ public:
   /// Delete the given bitmap info class.
   virtual void  delete_bitmap_info(bitmap_info* bi) = 0;
 
-  /// The different video frame formats
-  enum video_frame_format
-  {
-    NONE,
-    YUV,
-    RGB
-  };
-
-  /// Returns the format the current renderer wants videoframes in.
-  virtual int videoFrameFormat() = 0;
-  
   /// Draws a video frame. 
   //
-  /// The frame has already been decoded and is available in the format
-  /// specified by videoFrameFormat().    
+  /// The frame has already been decoded and is available in RGB format only.    
   ///         
-  /// @param frame The RGB or YUV video buffer frame.
+  /// @param frame The RGB video buffer frame.
   ///   Ownership of the buffer is left to the caller.
   ///
   /// @param mat The matrix with world coordinates used to retrieve the x

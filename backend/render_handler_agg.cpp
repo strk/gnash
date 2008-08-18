@@ -435,13 +435,6 @@ public:
     free(bi);
   }
   
-  
-  // Returns the format the current renderer wants videoframes in.
-  int videoFrameFormat() {
-    return RGB;
-  }
-  
-
   void drawVideoFrame(image::ImageBase* baseframe, const matrix* source_mat, 
     const rect* bounds) {
   

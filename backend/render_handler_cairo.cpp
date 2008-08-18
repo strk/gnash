@@ -449,11 +449,6 @@ public:
     delete bi;
   }
 
-  virtual int videoFrameFormat()
-  {
-    return render_handler::RGB;
-  }
-  
   virtual void drawVideoFrame(image::ImageBase* baseframe, const matrix* m, const rect* bounds)
   {
     // Extract frame attributes
