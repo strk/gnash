@@ -690,7 +690,9 @@ public:
   
   virtual void reallyDrawVideoFrame(image::ImageBase* baseframe, const matrix* m, const rect* bounds)
   {
-    image::ImageRGB* frame = static_cast<image::ImageRGB*>(baseframe);
+    image::ImageRGB* frame = dynamic_cast<image::ImageRGB*>(baseframe);
+    
+    assert(frame);
 
     glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT);
 

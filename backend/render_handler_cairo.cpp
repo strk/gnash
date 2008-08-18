@@ -447,7 +447,10 @@ public:
   virtual void drawVideoFrame(image::ImageBase* baseframe, const matrix* m, const rect* bounds)
   {
     // Extract frame attributes
-    image::ImageRGB* frame = static_cast<image::ImageRGB*>(baseframe);
+    image::ImageRGB* frame = dynamic_cast<image::ImageRGB*>(baseframe);
+    
+    assert(frame);
+    
     int         w = frame->width();
     int         h = frame->height();
 

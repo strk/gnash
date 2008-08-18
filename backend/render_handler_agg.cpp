@@ -447,9 +447,9 @@ public:
       
     typedef agg::pixfmt_rgb24_pre baseformat;
     
-    assert(dynamic_cast<image::ImageRGB*>(baseframe));
-  
-    image::ImageRGB* frame = static_cast<image::ImageRGB*>(baseframe);
+    image::ImageRGB* frame = dynamic_cast<image::ImageRGB*>(baseframe);
+
+    assert(frame);
     
     matrix mat = stage_matrix;
     mat.concatenate(*source_mat);
