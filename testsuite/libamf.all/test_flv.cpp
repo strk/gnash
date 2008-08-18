@@ -196,7 +196,7 @@ test_headers()
         }
     }
     delete hex1;
-
+    
     Buffer *enc1 = flv.encodeHeader(Flv::FLV_AUDIO | Flv::FLV_VIDEO);
     Network::byte_t *ptr = enc1->reference();
     if ((enc1->size() == sizeof(Flv::flv_header_t))
@@ -207,7 +207,8 @@ test_headers()
     } else {
         runtest.fail("Encoded FLV header");
     }
-
+    delete enc1;
+    
     // Test converting 3 byte "integers" to a real 4 byte one. The
     // 0xf on each end should be ignore to be correct.
     Buffer *hex2 = hex2mem("0f 00 00 a4 0f");
@@ -220,20 +221,16 @@ test_headers()
     }
     delete hex2;
 
-    if (notest) {
-        runtest.unresolved("Decoded FLV MetaData header");
+    Buffer *hex3 = hex2mem("12 00 00 a4 00 00 00 00 00 00 00");
+    Flv::flv_tag_t *tag3 = flv.decodeTagHeader(hex3);
+    if ((tag3->type == Flv::TAG_METADATA)
+        && (flv.convert24(tag3->bodysize) == 164)) {
+        runtest.pass("Decoded FLV MetaData header");
     } else {
-        Buffer *hex3 = hex2mem("12 00 00 a4 00 00 00 00 00 00 00");
-        Flv::flv_tag_t *tag3 = flv.decodeTagHeader(hex3);
-        if ((tag3->type == Flv::TAG_METADATA)
-            && (flv.convert24(tag3->bodysize) == 164)) {
-            runtest.pass("Decoded FLV MetaData header");
-        } else {
-            runtest.fail("Decoded FLV MetaData header");
-        }
-        delete tag3;
-        delete hex3;
+        runtest.fail("Decoded FLV MetaData header");
     }
+    delete tag3;
+    delete hex3;
 }
 
 void
