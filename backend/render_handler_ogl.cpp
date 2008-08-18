@@ -483,7 +483,7 @@ bitmap_info_ogl::setup()
   // _img (or a modified version thereof) has been uploaded to OpenGL. We
   // no longer need to keep it around. Of course this goes against the
   // principles of auto_ptr...
-  delete _img.release();
+  _img.reset();
 }
 
 void
