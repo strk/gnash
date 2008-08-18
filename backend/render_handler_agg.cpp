@@ -429,12 +429,6 @@ public:
     return new agg_bitmap_info<agg::pixfmt_rgb24_pre> (0, 0, 0, &dummy, 24);
   }
 
-  void  delete_bitmap_info(gnash::bitmap_info* bi)
-  // Delete the given bitmap info class.
-  {
-    free(bi);
-  }
-  
   void drawVideoFrame(image::ImageBase* baseframe, const matrix* source_mat, 
     const rect* bounds) {
   

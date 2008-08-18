@@ -44,9 +44,6 @@ namespace gnash {
 		/// See render_handler::create_bitmap_info_rgba (in backend/render_handler.h)
 		bitmap_info* create_bitmap_info_rgba(image::ImageRGBA* im);
 
-		/// See render_handler::delete_bitmap_info (in backend/render_handler.h)
-		void	delete_bitmap_info(bitmap_info* bi);
-
 		/// See render_handler::drawVideoFrame (in backend/render_handler.h)
 		void drawVideoFrame(image::ImageBase* frame, const matrix* mat, const rect* bounds);
 

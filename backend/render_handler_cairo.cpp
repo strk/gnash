@@ -444,11 +444,6 @@ public:
                                  CAIRO_FORMAT_ARGB32);
   }
 
-  virtual void  delete_bitmap_info(bitmap_info* bi)
-  {
-    delete bi;
-  }
-
   virtual void drawVideoFrame(image::ImageBase* baseframe, const matrix* m, const rect* bounds)
   {
     // Extract frame attributes

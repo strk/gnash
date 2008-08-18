@@ -233,9 +233,6 @@ public:
   ///
   virtual bitmap_info*  create_bitmap_info_rgba(image::ImageRGBA* im) = 0;
 
-  /// Delete the given bitmap info class.
-  virtual void  delete_bitmap_info(bitmap_info* bi) = 0;
-
   /// Draws a video frame. 
   //
   /// The frame has already been decoded and is available in RGB format only.    

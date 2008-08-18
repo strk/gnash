@@ -69,14 +69,6 @@ namespace gnash {
 			else return new bogus_bi;
 		}
 
-		void	delete_bitmap_info(bitmap_info* bi)
-		{
-#ifdef DEBUG_RENDER_CALLS
-			GNASH_REPORT_FUNCTION;
-#endif
-			if (s_render_handler) s_render_handler->delete_bitmap_info(bi);
-		}
-
 		// Draws the video frames
 		void drawVideoFrame(image::ImageBase* frame, const matrix* mat, const rect* bounds){
 			if (s_render_handler) return s_render_handler->drawVideoFrame(frame, mat, bounds);
