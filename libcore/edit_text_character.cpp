@@ -143,11 +143,7 @@ textfield_getFontList(const fn_call& fn)
 	boost::intrusive_ptr<edit_text_character> text = ensureType<edit_text_character>(fn.this_ptr);
 	UNUSED(text);
 
-	static bool warned = false;
-	if ( ! warned ) {
-		log_unimpl("TextField.getFontList()");
-		warned = true;
-	}
+	LOG_ONCE(log_unimpl("TextField.getFontList()"));
 
 	return as_value();
 }
@@ -290,11 +286,7 @@ textfield_replaceSel(const fn_call& fn)
 	boost::intrusive_ptr<edit_text_character> text = ensureType<edit_text_character>(fn.this_ptr);
 	UNUSED(text);
 
-	static bool warned = false;
-	if ( ! warned ) {
-		log_unimpl("TextField.replaceSel()");
-		warned = true;
-	}
+	LOG_ONCE (log_unimpl("TextField.replaceSel()"));
 
 	return as_value();
 }
@@ -305,11 +297,7 @@ textfield_replaceText(const fn_call& fn)
 	boost::intrusive_ptr<edit_text_character> text = ensureType<edit_text_character>(fn.this_ptr);
 	UNUSED(text);
 
-	static bool warned = false;
-	if ( ! warned ) {
-		log_unimpl("TextField.replaceText()");
-		warned = true;
-	}
+	LOG_ONCE(log_unimpl("TextField.replaceText()"));
 
 	return as_value();
 }
@@ -321,11 +309,7 @@ textfield_removeTextField(const fn_call& fn)
 
 	text->removeTextField();
 
-	static bool warned = false;
-	if ( ! warned ) {
-		log_debug("TextField.removeTextField() TESTING");
-		warned = true;
-	}
+	LOG_ONCE(log_debug("TextField.removeTextField() TESTING"));
 
 	return as_value();
 }
