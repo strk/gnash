@@ -31,6 +31,7 @@
 
 #include "utility.h"
 
+using namespace std;
 using namespace gnash;
 
 int
