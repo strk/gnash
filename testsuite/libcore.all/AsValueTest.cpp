@@ -31,7 +31,6 @@
 
 #include "utility.h"
 
-using namespace std;
 using namespace gnash;
 
 int
@@ -41,33 +40,33 @@ main(int /*argc*/, char** /*argv*/)
 
 	std::cout << "sizeof(as_value): " << (sizeof(as_value)) << std::endl;
 
-	check(!isnan(num));
+	check(!isNaN(num));
 
 	num /= 9999999;
 
-	check(!isnan(num));
+	check(!isNaN(num));
         check(utility::isFinite(num));
 
 	num = std::numeric_limits<float>::quiet_NaN();
 
-	check(isnan(num));
+	check(isNaN(num));
 	check(!utility::isFinite(num));
 
 	num = std::numeric_limits<float>::infinity();
 	
-	check(!isnan(num));
+	check(!isNaN(num));
 	check(!utility::isFinite(num));
 
 	num = 1.0 / 0.0;
 
 	check(!utility::isFinite(num));
-	check(!isnan(num));
+	check(!isNaN(num));
 
 	int intgr = num;
 
 	num = intgr;
 
-	check(!isnan(num));
+	check(!isNaN(num));
 	check(utility::isFinite(num));
 
 }
