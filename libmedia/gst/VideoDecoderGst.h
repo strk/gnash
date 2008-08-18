@@ -17,8 +17,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-#ifndef __VIDEODECODERGST_H__
-#define __VIDEODECODERGST_H__
+#ifndef GNASH_VIDEODECODERGST_H
+#define GNASH_VIDEODECODERGST_H
 
 
 #ifdef HAVE_CONFIG_H
@@ -74,7 +74,7 @@ public:
 
   void push(const EncodedVideoFrame& buffer);
 
-  std::auto_ptr<image::ImageRGB> pop();
+  std::auto_ptr<image::ImageBase> pop();
   
   bool peek();
 

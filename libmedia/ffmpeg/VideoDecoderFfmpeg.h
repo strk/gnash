@@ -57,7 +57,7 @@ public:
   
   void push(const EncodedVideoFrame& buffer);
 
-  std::auto_ptr<image::ImageRGB> pop();
+  std::auto_ptr<image::ImageBase> pop();
   
   bool peek();
   
@@ -77,15 +77,15 @@ public:
   //
   /// @return CODEC_ID_NONE for unsupported flash codecs
   ///
-  DSOEXPORT static enum CodecID FlashToFfmpegCodec(videoCodecType format);
+  DSOEXPORT static enum CodecID flashToFfmpegCodec(videoCodecType format);
 
 private:
 
   void init(enum CodecID format, int width, int height, boost::uint8_t* extradata=0, int extradataSize=0);
 
-  std::auto_ptr<image::ImageRGB> decode(const boost::uint8_t* input, boost::uint32_t input_size);
+  std::auto_ptr<image::ImageBase> decode(const boost::uint8_t* input, boost::uint32_t input_size);
 
-  std::auto_ptr<image::ImageRGB> decode(const EncodedVideoFrame* vf)
+  std::auto_ptr<image::ImageBase> decode(const EncodedVideoFrame* vf)
   {
   	return decode(vf->data(), vf->dataSize());
   }

@@ -186,7 +186,7 @@ private:
 	//
 	/// @return 0 on EOF or error, a decoded video otherwise
 	///
-	std::auto_ptr<image::ImageRGB> decodeNextVideoFrame();
+	std::auto_ptr<image::ImageBase> decodeNextVideoFrame();
 
 	/// Decode next audio frame fetching it MediaParser cursor
 	//
@@ -209,7 +209,7 @@ private:
 	///	3. next element in cursor has timestamp > tx
 	///	4. there was an error decoding
 	///
-	std::auto_ptr<image::ImageRGB> getDecodedVideoFrame(boost::uint32_t ts);
+	std::auto_ptr<image::ImageBase> getDecodedVideoFrame(boost::uint32_t ts);
 
 	// Used to calculate a decimal value from a ffmpeg fraction
 	inline double as_double(AVRational time)
