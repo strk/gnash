@@ -45,11 +45,11 @@ namespace image
 	ImageBase::ImageBase(boost::uint8_t* data, int width, int height, int pitch, ImageType type)
 		:
 		_type(type),
-		m_size(height*pitch),
-		m_width(width),
-		m_height(height),
-		m_pitch(pitch),
-		m_data(data)
+		_size(height*pitch),
+		_width(width),
+		_height(height),
+		_pitch(pitch),
+		_data(data)
 	{
 	}
 
@@ -57,43 +57,43 @@ namespace image
 	ImageBase::ImageBase(int width, int height, int pitch, ImageType type)
 		:
 		_type(type),
-		m_size(height*pitch),
-		m_width(width),
-		m_height(height),
-		m_pitch(pitch),
-		m_data(new boost::uint8_t[m_size])
+		_size(height*pitch),
+		_width(width),
+		_height(height),
+		_pitch(pitch),
+		_data(new boost::uint8_t[_size])
 	{
 		assert(pitch >= width);
 	}
 
 	void ImageBase::update(boost::uint8_t* data)
 	{
-		std::memcpy(m_data.get(), data, m_size);
+		std::memcpy(_data.get(), data, _size);
 	}
 
 	void ImageBase::update(const ImageBase& from)
 	{
-		assert(from.m_pitch == m_pitch);
-		assert(m_size <= from.m_size);
+		assert(from._pitch == _pitch);
+		assert(_size <= from._size);
 		assert(_type == from._type);
-		std::memcpy(m_data.get(), const_cast<ImageBase&>(from).data(), m_size);
+		std::memcpy(_data.get(), from._data.get(), _size);
 	}
 
     void ImageBase::clear(const boost::uint8_t byteValue)
     {
-        std::memset(m_data.get(), byteValue, m_size);
+        std::memset(_data.get(), byteValue, _size);
     }
 
 	boost::uint8_t* ImageBase::scanline(size_t y)
 	{
-		assert(y < m_height);
-		return m_data.get() + m_pitch * y;
+		assert(y < _height);
+		return _data.get() + _pitch * y;
 	}
 
-	boost::uint8_t* const ImageBase::scanlinePointer(size_t y) const
+	const boost::uint8_t* ImageBase::scanlinePointer(size_t y) const
 	{
-		assert(y < m_height);
-		return m_data.get() + m_pitch * y;
+		assert(y < _height);
+		return _data.get() + _pitch * y;
 	}
 
 
@@ -109,8 +109,8 @@ namespace image
 	{
 		assert(width > 0);
 		assert(height > 0);
-		assert(m_pitch >= m_width * 3);
-		assert((m_pitch & 3) == 0);
+		assert(_pitch >= _width * 3);
+		assert((_pitch & 3) == 0);
 	}
 
 	rgb::~rgb()
@@ -129,8 +129,8 @@ namespace image
 	{
 		assert(width > 0);
 		assert(height > 0);
-		assert(m_pitch >= m_width * 4);
-		assert((m_pitch & 3) == 0);
+		assert(_pitch >= _width * 4);
+		assert((_pitch & 3) == 0);
 	}
 
 	rgba::~rgba()
@@ -141,8 +141,8 @@ namespace image
 	void rgba::set_pixel(size_t x, size_t y, boost::uint8_t r, boost::uint8_t g, boost::uint8_t b, boost::uint8_t a)
 	// Set the pixel at the given position.
 	{
-		assert(x < m_width);
-		assert(y < m_height);
+		assert(x < _width);
+		assert(y < _height);
 
 		boost::uint8_t*	data = scanline(y) + 4 * x;
 
@@ -155,10 +155,10 @@ namespace image
 
     void rgba::mergeAlpha(const boost::uint8_t* alphaData, const size_t bufferLength)
     {
-        assert (bufferLength * 4 <= m_size);
+        assert (bufferLength * 4 <= _size);
 
         for (size_t i = 0; i < bufferLength; i++) {
-            m_data[4 * i + 3] = alphaData[i];
+            _data[4 * i + 3] = alphaData[i];
         }
     }
 
