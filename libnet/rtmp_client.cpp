@@ -61,7 +61,7 @@ RTMPClient::RTMPClient()
 RTMPClient::~RTMPClient()
 {
 //    GNASH_REPORT_FUNCTION;
-    _properties.clear();
+    _variables.clear();
 //    delete _body;
 }
 
@@ -83,6 +83,8 @@ RTMPClient::encodeConnect(const char *app, const char *swfUrl, const char *tcUrl
     connect.makeString("connect");
 
     Element connum;
+//     const char *connumStr = "00 00 00 00 00 00 f0 3f";
+//     Buffer *connumBuf = hex2mem(connumStr);
     // update the counter for the number of connections. This number is used heavily
     // in RTMP to help keep communications clear when there are multiple streams.
     _connections++;
@@ -192,23 +194,11 @@ RTMPClient::encodeStream(double id)
     if (!buf) {
 	return 0;
     }
-
-    // Set the NULL object element that follows the stream ID
-    Element null;
-    null.makeNull();
-    Buffer *nullobj = null.encode();    
-    if (!nullobj) {
-	return 0;
-    }
-
     buf->append(strobj);
     buf->append(numobj);
-    buf->append(nullobj);
 
     delete strobj;
     delete numobj;
-    delete nullobj;
-    
     return buf;
 }
 
@@ -309,7 +299,6 @@ RTMPClient::encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string
     // 8 bytes apiece.
     pktsize += (sizeof(double) * 2) + 2;
     Buffer *buf = new Buffer(pktsize);
-    buf->clear();
 //    Buffer *buf = new Buffer;
     
     if (!buf) {
@@ -322,7 +311,7 @@ RTMPClient::encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string
     buf->append(nullobj);
     delete nullobj;
     // Seek doesn't use the boolean flag
-    if ((op != STREAM_SEEK) && (op != STREAM_PLAY)) {
+    if (op != STREAM_SEEK) {
 	buf->append(boolobj);
     }
     delete boolobj;
@@ -331,10 +320,7 @@ RTMPClient::encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string
     // used for the stream. A Play command without this name set play an
     // existing stream that is already open.
     if (!name.empty()) {
-	Element filespec;
-	filespec.makeString(name);
-	Buffer *fileobj = filespec.encode();
-	buf->append(fileobj);
+	buf->append(name);
     }
     
     // The seek command also may have an optional location to seek to
@@ -393,7 +379,6 @@ RTMPClient::clientFinish()
     int ret = 0;
     _handshake->clear();
     
-    sleep(1);			// FIXME: why do we still need a delay here, when readNet() does a select ?
     ret = readNet(_handshake->reference(), RTMP_BODY_SIZE);
     if (ret == RTMP_BODY_SIZE) {
         log_debug (_("Read first data block in handshake"));
@@ -428,7 +413,7 @@ RTMPClient::clientFinish()
     }
 
     writeNet(_handshake->reference(), RTMP_BODY_SIZE);
-
+    
     return true;
 }
 

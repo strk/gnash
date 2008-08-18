@@ -83,7 +83,7 @@ endif
  GNASH_LIBS += $(GLIB_LIBS) $(GSTREAMER_LIBS)
 #endif
 
-bin_PROGRAMS = gprocessor soldumper dumpshm rtmpget flvdumper
+bin_PROGRAMS = gprocessor soldumper dumpshm flvdumper
 #check_PROGRAMS = gdebug.swf
 
 gprocessor_SOURCES = processor.cpp
@@ -95,9 +95,6 @@ gprocessor_LDADD = $(GNASH_LIBS)
 
 dumpshm_SOURCES = dumpshm.cpp
 dumpshm_LDADD = $(GNASH_LIBS)
-
-rtmpget_SOURCES = rtmpget.cpp
-rtmpget_LDADD = $(GNASH_LIBS)
 
 soldumper_SOURCES = soldumper.cpp
 soldumper_LDADD = $(GNASH_LIBS)

@@ -30,9 +30,9 @@
 #include "buffer.h"
 
 using namespace gnash;
-using namespace amf;
 using namespace std;
 using namespace boost;
+
 
 namespace gnash
 {
@@ -53,7 +53,7 @@ CQue::~CQue()
 {
 //    GNASH_REPORT_FUNCTION;
 //    clear();
-    que_t::iterator it;
+    Que::iterator it;
     boost::mutex::scoped_lock lock(_mutex);
     for (it = _que.begin(); it != _que.end(); it++) {
 	amf::Buffer *ptr = *(it);
@@ -143,18 +143,6 @@ CQue::peek()
     return 0;	
 }
 
-// Peek at the first data element without removing it
-amf::Buffer *
-CQue::peek_back()
-{
-//    GNASH_REPORT_FUNCTION;
-    boost::mutex::scoped_lock lock(_mutex);
-    if (_que.size()) {
-        return _que.back();
-    }
-    return 0;	
-}
-
 // Return the size of the queues
 void
 CQue::clear()
@@ -209,25 +197,26 @@ CQue::remove(amf::Buffer *element)
 amf::Buffer *
 CQue::merge(amf::Buffer *start)
 {
-    GNASH_REPORT_FUNCTION;
-
     // Find iterator to first element to merge
-    que_t::iterator from = std::find(_que.begin(), _que.end(), start); 
-    if (from == _que.end()) {
+    Que::iterator from = std::find(_que.begin(), _que.end(), start); 
+    if ( from == _que.end() ) {
         // Didn't find the requested Buffer pointer
         return NULL;
     }
 
+
     // Find iterator to last element to merge (first with size < NETBUFSIZE)
     // computing total size with the same scan
     size_t totalsize = (*from)->size();
-    que_t::iterator to=from; ++to;
-    for (que_t::iterator e=_que.end(); to!=e; ++to) {
+    Que::iterator to=from; ++to;
+    for (Que::iterator e=_que.end(); to!=e; ++to)
+    {
         size_t sz = (*to)->size();
         totalsize += sz;
         if (sz < gnash::NETBUFSIZE) break;
     }
-    if (to == _que.end()) {
+    if ( to == _que.end() )
+    {
         // Didn't find an element ending the merge
         return NULL;
     }
@@ -236,7 +225,8 @@ CQue::merge(amf::Buffer *start)
     std::auto_ptr<amf::Buffer> newbuf ( new amf::Buffer(totalsize) );
     Network::byte_t *tmp = newbuf->reference();
     ++to;
-    for (que_t::iterator i=from; i!=to; ++i) {
+    for (Que::iterator i=from; i!=to; ++i)
+    {
         amf::Buffer *buf = *i;
         size_t sz = buf->size();
         std::copy(buf->reference(), buf->reference() + sz, tmp);
@@ -249,20 +239,20 @@ CQue::merge(amf::Buffer *start)
     }
 
     // Finally erase all merged elements, and replace with the composite one
-    que_t::iterator nextIter = _que.erase(from, to);
+    Que::iterator nextIter = _que.erase(from, to);
     _que.insert(nextIter, newbuf.get());
 
     return newbuf.release(); // ownership is transferred. TODO: return auto_ptr
 }
-
+    
 // Dump internal data.
 void
 CQue::dump()
 {
 //    GNASH_REPORT_FUNCTION;
+    deque<amf::Buffer *>::iterator it;
     boost::mutex::scoped_lock lock(_mutex);
     cerr << endl << "CQue \"" << _name << "\" has "<< _que.size() << " buffers." << endl;
-    deque<amf::Buffer *>::iterator it;
     for (it = _que.begin(); it != _que.end(); it++) {
 	amf::Buffer *ptr = *(it);
         ptr->dump();

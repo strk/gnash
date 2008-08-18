@@ -58,6 +58,7 @@ AM_CPPFLAGS = \
 AM_LDFLAGS = \
 	$(MING_LIBS) \
 	$(OPENGL_LIBS) \
+	$(GIF_LIBS) \
 	$(NULL)
 
 

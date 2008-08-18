@@ -707,7 +707,8 @@ AC_ARG_ENABLE(mit-shm,
   no)  xmitshm=no ;;
   *)   AC_MSG_ERROR([bad value ${enableval} for --enable-mit-shm option]) ;;
 esac],xmitshm=yes)
-if test "x${xmitshm}" = "xyes"; then
+dnl as windows doesn't run X11, don't enable this extension there.
+if test "x${xmitshm}" = "xyes" -a "x${windows}" = "xno"; then
 	AC_DEFINE(ENABLE_MIT_SHM, [1], [Use MIT-SHM X extension if available])
 fi
 
@@ -1266,6 +1267,17 @@ AC_ARG_WITH(plugins-install,
 
 
 GNASH_PATH_FIREFOX
+dnl XPCOM and NSPR can be used in the plugin for better integration
+dnl within Firefox.
+GNASH_PATH_XPCOM
+GNASH_PATH_NSPR
+dnl If we don't have both XPCOM and NSPR, we can't build either.
+if test x$has_xpcom = xno -o x$has_nspr = xno; then
+  has_xpcom=no
+  has_nspr=no
+fi
+AM_CONDITIONAL(XPCOM, test x$has_xpcom = xyes)
+AM_CONDITIONAL(NSPR, test x$has_nspr = xyes)
 
 dnl -----------------------------------------------------------------
 dnl END OF PLUGIN RELATED STUFF
@@ -1302,6 +1314,7 @@ AC_CHECK_HEADERS(signal.h)
 AC_CHECK_HEADERS(unistd.h)
 AC_CHECK_HEADERS(sys/time.h)
 AC_CHECK_LIB(lber, ber_free)
+AC_CHECK_LIB(utempter, utempter_pathname)
 dnl AC_CHECK_LIB(m, sqrt)
 AC_CHECK_LIB(c, getpwnam, AC_DEFINE(HAVE_GETPWNAM, 1, [Has getpwnam] ))
 
@@ -1355,6 +1368,10 @@ fi
 dnl AC_CHECK_FUNCS(strcasecmp stricmp)
 dnl AC_CHECK_FUNCS(vsnprintf)
 
+dnl These two tests need the math library or they won't link
+dnl on OpenBSD, even if the functions exist.
+save_LIBS=$LIBS
+LIBS="$LIBS -lm"
 AC_CACHE_CHECK([for finite], ac_cv_finite,
  [AC_TRY_LINK([#include <math.h>],
  [double x; int y; y = finite(x);],
@@ -1374,6 +1391,7 @@ AC_CACHE_CHECK([for isfinite], ac_cv_isfinite,
 if test x"$ac_cv_isfinite" = x"yes"; then
   AC_DEFINE(HAVE_ISFINITE, [1], [Has isfinite])
 fi
+LIBS=$save_LIBS
 
 AC_LANG_PUSH(C++)
 AC_CACHE_CHECK([whether $CXX implements __PRETTY_FUNCTION__], ac_cv_implements___PRETTY_FUNCTION__, [
@@ -1499,7 +1517,7 @@ AC_SUBST(WINDRES)
 
 GNASH_PKG_FIND(z, [zlib.h], [zlib compression library], compress)
 GNASH_PKG_FIND(jpeg, [jpeglib.h], [jpeg images], jpeg_mem_init)
-GNASH_PKG_FIND(png, [png.h], [png images], png_info_init)
+GNASH_PKG_FIND(libpng, [png.h], [png images], png_info_init)
 GNASH_PKG_FIND(gif, [gif_lib.h], [gif images], DGifOpen)
 GNASH_PKG_INCLUDES([dejagnu], [dejagnu.h])
 
@@ -1934,7 +1952,6 @@ if test x"$GCC" = x"yes"; then
     -Wreturn-type \
     -Wnon-virtual-dtor \
     -Wunused \
-    -Wextra \   
     #-ansi \
     "
   CFLAGS="$CFLAGS \
@@ -1950,6 +1967,7 @@ if test x"$GCC" = x"yes"; then
     "
   if test x"$strict" = x"yes"; then
     CXXFLAGS="$CXXFLAGS \
+      -Wextra \   
       -pedantic \
       -Wno-long-long \
       "
@@ -2138,6 +2156,7 @@ extensions/lirc/Makefile
 extensions/dbus/Makefile
 extensions/metome/Makefile
 plugin/Makefile
+plugin/xpcom/Makefile
 plugin/klash/Makefile
 plugin/mozilla-sdk/Makefile
 plugin/win32/Makefile
@@ -2376,13 +2395,13 @@ else
   echo "               or .rpm users: yum install libungif-devel" >&3
 fi
 
-if test x"${PNG_LIBS}" != x ; then
-  if test x"${PNG_CFLAGS}" != x ; then
-    echo "        PNG flags are: $PNG_CFLAGS"
+if test x"${LIBPNG_LIBS}" != x ; then
+  if test x"${LIBPNG_CFLAGS}" != x ; then
+    echo "        PNG flags are: $LIBPNG_CFLAGS"
   else
     echo "        PNG flags are: default include path"
   fi
-  echo "        PNG libs are: $PNG_LIBS"
+  echo "        PNG libs are: $LIBPNG_LIBS"
 else
   echo "        WARNING: No PNG library development package installed!" >&4
   echo "                 Gnash will be built without support for dynamic loading of PNG files." >&4
@@ -2986,6 +3005,25 @@ if test x"${build_alp}" = xyes; then
     echo "        ALP libs are: $ALP_LIBS"
   else
     echo "        ERROR: No ALP development package is installed." >&3
+  fi
+fi
+
+dnl XPCOM support for Mozilla/Firefox
+if test x"$xpcom" = x"yes"; then
+  if test x"$has_xpcom" = x"yes"; then
+    echo "        XPCOM flags are: $XPCOM_CFLAGS"
+    echo "        XPCOM libs are: $XPCOM_LIBS"
+    echo "        XPIDL path is: $XPIDL"
+  else
+    echo "        ERROR: No XPCOM development package is installed." >&3
+  fi
+fi
+if test x"$nspr4" = x"yes"; then
+  if test x"$has_nspr" = x"yes"; then
+    echo "        NSPR flags are: $NSPR_CFLAGS"
+    echo "        NSPR libs are: $NSPR_LIBS"
+  else
+    echo "        ERROR: No NSPR development package is installed." >&3
   fi
 fi
 

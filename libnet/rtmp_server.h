@@ -20,6 +20,7 @@
 
 #include <boost/cstdint.hpp>
 #include <string>
+#include <map>
 
 #include "rtmp.h"
 #include "amf.h"
@@ -41,22 +42,11 @@ public:
     bool packetSend(amf::Buffer *buf);
     bool packetRead(amf::Buffer *buf);
     
-    // Encode a Result message for the client. This is an INVOKE
-    // message type with a "_result", "_error", or "onStatus"
-    // method name.
-    amf::Buffer *encodeResult(double streamid,
-			      RTMPMsg::rtmp_status_e status);
-    amf::Buffer *encodeResult(double streamid,
-			      RTMPMsg::rtmp_status_e status,
-			      const std::string &filename,
-			      amf::Element *clientid);
-    
-    // Encode a ping message, of which there are several times.
+    // These are handlers for the various types
+    amf::Buffer *encodeResult(RTMPMsg::rtmp_status_e status);
     amf::Buffer *encodePing(rtmp_ping_e type, boost::uint32_t milliseconds);
     amf::Buffer *encodePing(rtmp_ping_e type);
-
-    // Encode a close message for the specified stream ID
-    amf::Buffer *encodeClose(double streamid);
+    
     void dump();
   private:
 };

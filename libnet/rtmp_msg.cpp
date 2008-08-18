@@ -74,10 +74,6 @@ RTMPMsg::~RTMPMsg()
     
 }
 
-// All the result messages from the server are ASCII text, so they have to be parsed to
-// determine what really happened. We return the numerical equivalant for each _result,
-// error, or onStatus message, the actual data can be obtained from the Element.
-// 
 RTMPMsg::rtmp_status_e
 RTMPMsg::checkStatus(amf::Element * /* el */)
 {
@@ -101,155 +97,18 @@ RTMPMsg::checkStatus(amf::Element * /* el */)
 			value = child->to_string();
 			if (name == "code") {
 //			    log_debug("Name is: %s, Value is: %s", name.c_str(), value.c_str());
-			    // Error messages we get as the result of a NetConnection::connect()
 			    if (value == "NetConnection.Connect.Success") {
 				_status = RTMPMsg::NC_CONNECT_SUCCESS;
-				return _status;
-			    }
-			    if (value == "NetConnection.Call.Failed") {
-				_status = RTMPMsg::NC_CALL_FAILED;
-				return _status;
-			    }
-			    if (value == "NetConnection.Call.BadVersion") {
-				_status = RTMPMsg::NC_CALL_BADVERSION;
-				return _status;
-			    }
-			    if (value == "NetConnection.AppShutdown") {
-				_status = RTMPMsg::NC_CONNECT_APPSHUTDOWN;
 				return _status;
 			    }
 			    if (value == "NetConnection.Connect.Failed") {
 				_status = RTMPMsg::NC_CONNECT_FAILED;
 				return _status;
 			    }
-			    if (value == "NetConnection.Invalid.Application") {
-				_status = RTMPMsg::NC_CONNECT_INVALID_APPLICATION;
+			    if (value == "NetConnection.Call.Failed") {
+				_status = RTMPMsg::NC_CALL_FAILED;	
 				return _status;
 			    }
-			    if (value == "NetConnection.Connect.Rejected") {
-				_status = RTMPMsg::NC_CONNECT_REJECTED;
-				return _status;
-			    }
-			    
-			    // we get this and then the FLV file data is next
-			    if (value == "NetStream.Data.Start") {
-				_status = RTMPMsg::NS_DATA_START;
-				return _status;
-			    }
-			    // Error messages we get as the result of a NetStream::play()
-			    if (value == "NetStream.Pause.Notify") {
-				_status = RTMPMsg::NS_PAUSE_NOTIFY;
-				return _status;
-			    }
-			    if (value == "NetStream.Play.Complete") {
-				_status = RTMPMsg::NS_PLAY_COMPLETE;
-				return _status;
-			    }
-			    if (value == "NetStream.Play.Failed") {
-				_status = RTMPMsg::NS_PLAY_FAILED;
-				return _status;
-			    }
-			    if (value == "NetStream.Play.File.Structure.Invalid") {
-				_status = RTMPMsg::NS_PLAY_FILE_STRUCTURE_INVALID;
-				return _status;
-			    }
-			    if (value == "NetStream.Play.Insufficient.BW") {
-				_status = RTMPMsg::NS_PLAY_INSUFFICIENT_BW;
-				return _status;
-			    }
-			    if (value == "NetStream.Play.No.Supported.Track.Found") {
-				_status = RTMPMsg::NS_PLAY_NO_SUPPORTED_TRACK_FOUND;
-				return _status;
-			    }
-			    if (value == "NetStream.Play.PublishNotify") {
-				_status = RTMPMsg::NS_PLAY_PUBLISHNOTIFY;
-				return _status;
-			    }
-			    if (value == "NetStream.Play.StreamNotFound") {
-				_status = RTMPMsg::NS_PLAY_STREAMNOTFOUND;
-				return _status;
-			    }
-			    if (value == "NetStream.Play.SWITCH") {
-				_status = RTMPMsg::NS_PLAY_SWITCH;
-				return _status;
-			    }
-			    if (value == "NetStream.Play.UnpublishNotify") {
-				_status = RTMPMsg::NS_PLAY_UNPUBLISHNOTIFY;
-				return _status;
-			    }
-			    if (value == "NetStream.Play.Start") {
-				_status = RTMPMsg::NS_PLAY_START;
-				return _status;
-			    }
-			    if (value == "NetStream.Play.Stop") {
-				_status = RTMPMsg::NS_PLAY_STOP;
-				return _status;
-			    }
-			    if (value == "NetStream.Play.Reset") {
-				_status = RTMPMsg::NS_PLAY_RESET;
-				return _status;
-			    }
-			    if (value == "NetStream.Publish.Badname") {
-				_status = RTMPMsg::NS_PUBLISH_BADNAME;
-				return _status;
-			    }
-			    if (value == "NetStream.Publish.Start") {
-				_status = RTMPMsg::NS_PUBLISH_START;
-				return _status;
-			    }
-
-			    if (value == "NetStream.Record.Failed") {
-				_status = RTMPMsg::NS_RECORD_FAILED;
-				return _status;
-			    }
-			    if (value == "NetStream.Record.Noaccess") {
-				_status = RTMPMsg::NS_RECORD_NOACCESS;
-				return _status;
-			    }
-			    if (value == "NetStream.Record.Start") {
-				_status = RTMPMsg::NS_RECORD_START;
-				return _status;
-			    }
-			    if (value == "NetStream.Record.Stop") {
-				_status = RTMPMsg::NS_RECORD_STOP;
-				return _status;
-			    }
-			    if (value == "NetStream.Seek.Failed") {
-				_status = RTMPMsg::NS_SEEK_FAILED;
-				return _status;
-			    }
-			    if (value == "NetStream.Seek.NOTIFY") {
-				_status = RTMPMsg::NS_SEEK_NOTIFY;
-				return _status;
-			    }
-			    if (value == "NetStream.Unpause.Notify") {
-				_status = RTMPMsg::NS_UNPAUSE_NOTIFY;
-				return _status;
-			    }
-			    if (value == "NetStream.Unpublished.Success") {
-				_status = RTMPMsg::NS_UNPUBLISHED_SUCCESS;
-				return _status;
-			    }
-
-			    // Error messages we get as the result of a SharedObject operation
-			    if (value == "SharedObject.Creation.Failed") {
-				_status = RTMPMsg::SO_CREATION_FAILED;
-				return _status;
-			    }
-			    if (value == "SharedObject.No.Read.Access") {
-				_status = RTMPMsg::SO_NO_READ_ACCESS;
-				return _status;
-			    }
-			    if (value == "SharedObject.No.Write.Access") {
-				_status = RTMPMsg::SO_NO_WRITE_ACCESS;
-				return _status;
-			    }
-			    if (value == "SharedObject.Persistence.Mismatch") {
-				_status = RTMPMsg::SO_PERSISTENCE_MISMATCH;
-				return _status;
-			    }
-			    
-
 			}
 		    }
 		}
@@ -258,17 +117,6 @@ RTMPMsg::checkStatus(amf::Element * /* el */)
     }
     return _status;
 }
-
-Element *
-RTMPMsg::operator[](size_t index)
-{
-//    GNASH_REPORT_FUNCTION;
-    if (index <= _amfobjs.size()) {
-	return _amfobjs[index];
-    }
-    
-    return 0;
-};
 
 void
 RTMPMsg::dump()

@@ -28,7 +28,6 @@
 #include "network.h"
 #include "buffer.h"
 #include "rtmp_msg.h"
-#include "cque.h"
 
 namespace gnash
 {
@@ -75,7 +74,6 @@ typedef enum {
 class DSOEXPORT RTMP : public Network
 {
 public:
-    typedef std::deque<CQue *> queues_t;
     typedef enum {
 	RAW=0x0,
 	ADPCM=0x01,
@@ -105,9 +103,7 @@ public:
         UNKNOWN3 = 0xa,
         NOTIFY = 0x12,
         SHARED_OBJ = 0x13,
-        INVOKE = 0x14,
-	FLV_DATA = 0x16,	// for AMF 3
-	CONTINUATION = 0x17	// Internal to Gnash, used for single header byte msgs
+        INVOKE = 0x14
     } content_types_e;
 //     typedef enum {
 //         CONNECT = 0x1,
@@ -154,6 +150,12 @@ public:
         RTMP_STATE_HEADER,
         RTMP_STATE_DONE
     } rtmp_state_t;
+//     typedef struct {
+// 	rtmp_status_e status;
+// 	std::string   method;
+// 	double        streamid;
+// 	std::vector<amf::Element *> objs;
+//     } rtmp_msg_t;
     typedef enum {
         RTMP_ERR_UNDEF=0,
         RTMP_ERR_NOTFOUND,
@@ -228,7 +230,7 @@ public:
     int getPacketSize()         { return _packet_size; };
     int getMysteryWord()        { return _mystery_word; };
 
-    // Decode an RTMP message
+    // Decode the an RTMP message
     RTMPMsg *decodeMsgBody(Network::byte_t *data, size_t size);
     RTMPMsg *decodeMsgBody(amf::Buffer *buf);
     
@@ -264,54 +266,27 @@ public:
 
     // Receive a message, which is a series of AMF elements, seperated
     // by a one byte header at regular byte intervals. (128 bytes for
-    // video data by default). Each message main contain multiple packets.
+    // video data). Each message main contain multiple packets.
     amf::Buffer *recvMsg();
-    amf::Buffer *recvMsg(int timeout);
 
     // Send a message, usually a single ActionScript object. This message
     // may be broken down into a series of packets on a regular byte
-    // interval. (128 bytes for video data by default). Each message main
-    // contain multiple packets.
-    bool sendMsg(amf::Buffer *data);
+    // interval. (128 bytes for video data). Each message main contain
+    // multiple packets.
+    bool sendMsg(amf::Buffer *buf);
     
     // Send a Msg, and expect a response back of some kind.
-    RTMPMsg *sendRecvMsg(int amf_index, rtmp_headersize_e head_size,
+    amf::Element *sendRecvMsg(int amf_index, rtmp_headersize_e head_size,
 			      size_t total_size, content_types_e type,
 			      RTMPMsg::rtmp_source_e routing, amf::Buffer *buf);
-
-    // Process a message, which includes executing the system level commands.
-    RTMPMsg *processMsg(amf::Buffer *buf);
-    RTMPMsg *processMsg(Network::byte_t *buf, size_t size);
-    
-    // Split a large buffer into multiple smaller ones of the default chunksize
-    // of 128 bytes. We read network data in big chunks because it's more efficient,
-    // but RTMP uses a weird scheme of a standard header, and then every chunksize
-    // bytes another 1 byte RTMP header. The header itself is not part of the byte
-    // count.
-    queues_t *split(amf::Buffer *buf);
-    queues_t *split(amf::Buffer *buf, size_t chunksize);
-    
-    CQue &operator[] (size_t x) { return _queues[x]; }
-
-    // Accessors for debug and testing
-    size_t chunksize() { return _chunksize; };
-
-    bool isDataStarted(int x) { return _streaming[x]; };
-    void setDataStarted(int x, bool y) { _streaming[x] = y; };
-	
     void dump();
   protected:
-    std::map<const char *, amf::Element *> _properties;
+    std::map<const char *, amf::Element *> _variables;
     amf::Buffer	*_handshake;
     Handler	*_handler;
     rtmp_head_t	_header;
     int         _packet_size;
     int         _mystery_word;
-    size_t	_chunksize;
-    int		_timeout;
-    CQue	_queues[MAX_AMF_INDEXES];
-    queues_t    _channels;
-    bool	_streaming[MAX_AMF_INDEXES];
 };
 
 } // end of gnash namespace

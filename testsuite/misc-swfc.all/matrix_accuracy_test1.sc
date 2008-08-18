@@ -38,13 +38,13 @@
         check_equals(mc1._xscale, 100);
         check_equals(mc1._yscale, 100);
         mc1._rotation = 30;
-        xcheck_equals(mc1._xscale, 100);
-        xcheck_equals(mc1._yscale, 100);
+        check_equals(mc1._xscale, 100);
+        check_equals(mc1._yscale, 100);
         mc1._rotation = 60;
-        xcheck_equals(mc1._xscale, 100);
-        xcheck_equals(mc1._yscale, 100);
+        check_equals(mc1._xscale, 100);
+        check_equals(mc1._yscale, 100);
         mc1._xscale = 200;
-        xcheck_equals(mc1._rotation, 60);
+        check_equals(mc1._rotation, 60);
         
         // reset mc1 to normal status for later tests.
         mc1._xscale = 100; 
@@ -60,10 +60,10 @@
         mc1._x = mc1._y = 100;
         
         mc1._xscale = -1;
-        xcheck_equals(mc1._xscale, -1);
+        check_equals(mc1._xscale, -1);
         mc1._xscale = 4294967295.0; // (unsigned)(0xffffffff);
-        xcheck_equals(mc1._xscale, 4294967295.0);
-        xcheck_equals(mc1._width, 2359295);
+        check_equals(mc1._xscale, 4294967295.0);
+        check_equals(mc1._width, 2359295);
         check_equals(mc1._height, 30);
         mc1._yscale = 65536 * 100;
         check_equals(mc1._height, 0);

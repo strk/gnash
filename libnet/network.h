@@ -65,8 +65,7 @@ const short RTMPTS_PORT = 443;
 #endif
 
 // Adjust for the constant size
-const size_t NETBUFSIZE = 1448;	// 1500 appears to be the default size as used by FMS
-//const size_t NETBUFSIZE = 1357*2;	// 1500 appears to be the default size as used by FMS
+const size_t NETBUFSIZE = 1357*2;	// 1500 appears to be the default size as used by FMS
 
 class DSOEXPORT Network {
 public:
