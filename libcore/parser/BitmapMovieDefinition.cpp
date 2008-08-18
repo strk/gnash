@@ -39,14 +39,14 @@ BitmapMovieDefinition::getShapeDef()
     {
         case GNASH_IMAGE_RGB:
         {
-            std::auto_ptr<image::rgb> imageRGB(dynamic_cast<image::rgb*>(_image.release()));
+            std::auto_ptr<image::ImageRGB> imageRGB(dynamic_cast<image::ImageRGB*>(_image.release()));
             assert(imageRGB.get());
             _bitmap = new bitmap_character_def(imageRGB);
             break;
         }
         case GNASH_IMAGE_RGBA:
         {
-            std::auto_ptr<image::rgba> imageRGBA(dynamic_cast<image::rgba*>(_image.release()));
+            std::auto_ptr<image::ImageRGBA> imageRGBA(dynamic_cast<image::ImageRGBA*>(_image.release()));
             assert(imageRGBA.get());
             _bitmap = new bitmap_character_def(imageRGBA);
             break;        
@@ -100,7 +100,7 @@ BitmapMovieDefinition::BitmapMovieDefinition(
 		const std::string& url)
 	:
 	_version(6),
-	// image::rgb size is in pixels
+	// image::ImageBase size is in pixels
 	_framesize(0, 0, image->width()*20, image->height()*20),
 	_framecount(1),
 	_framerate(12),

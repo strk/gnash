@@ -32,8 +32,8 @@
 
 namespace gnash {
 namespace image {
-	class rgba;
-	class rgb;
+	class ImageRGBA;
+	class ImageRGB;
 }
 }
 
@@ -49,34 +49,34 @@ namespace gnash {
 ///	- SWF::DEFINELOSSLESS
 ///	- SWF::DEFINELOSSLESS2
 ///
-/// The definition currently only takes an image::rgb 
-/// or image::rgba pointer. We should probably move
+/// The definition currently only takes an image::ImageRGB 
+/// or image::ImageRGBA pointer. We should probably move
 /// the methods for actually reading such tags instead.
 ///
 /// One problem with this class is that it relies on the
 /// availability of a render_handler in order to transform
-/// image::rgb or image::rgba to a bitmap_info.
+/// image::ImageRGB or image::ImageRGBA to a bitmap_info.
 ///
 class bitmap_character_def : public ref_counted // @@ why not character_def ?
 {
 
 public:
 
-	/// Construct a bitmap_character_def from an image::rgb
+	/// Construct a bitmap_character_def from an image::ImageRGB
 	//
 	/// NOTE: uses currently registered render_handler to
 	///       create a bitmap_info, don't call before a renderer
 	///	  has been registered
 	///
- 	bitmap_character_def(std::auto_ptr<image::rgb> image);
+ 	bitmap_character_def(std::auto_ptr<image::ImageRGB> image);
 
-	/// Construct a bitmap_character_def from an image::rgba
+	/// Construct a bitmap_character_def from an image::ImageRGBA
 	//
 	/// NOTE: uses currently registered render_handler to
 	///       create a bitmap_info, don't call before a renderer
 	///	  has been registered
 	///
- 	bitmap_character_def(std::auto_ptr<image::rgba> image);
+ 	bitmap_character_def(std::auto_ptr<image::ImageRGBA> image);
 
 	bitmap_info* get_bitmap_info() {
 		return _bitmap_info.get();

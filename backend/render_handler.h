@@ -222,7 +222,7 @@ public:
   /// Given an image, returns a pointer to a bitmap_info class
   /// that can later be passed to fill_styleX_bitmap(), to set a
   /// bitmap fill style.
-  virtual bitmap_info*  create_bitmap_info_rgb(image::rgb* im) = 0;
+  virtual bitmap_info*  create_bitmap_info_rgb(image::ImageRGB* im) = 0;
 
   /// \brief
   /// Given an image, returns a pointer to a bitmap_info class
@@ -231,7 +231,7 @@ public:
   //
   /// This version takes an image with an alpha channel.
   ///
-  virtual bitmap_info*  create_bitmap_info_rgba(image::rgba* im) = 0;
+  virtual bitmap_info*  create_bitmap_info_rgba(image::ImageRGBA* im) = 0;
 
   /// Delete the given bitmap info class.
   virtual void  delete_bitmap_info(bitmap_info* bi) = 0;

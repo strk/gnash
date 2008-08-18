@@ -48,7 +48,7 @@ namespace gnash {
 			bogus_bi() {}
 		};
 
-		bitmap_info*	create_bitmap_info_rgb(image::rgb* im)
+		bitmap_info*	create_bitmap_info_rgb(image::ImageRGB* im)
 		{
 #ifdef DEBUG_RENDER_CALLS
 			GNASH_REPORT_FUNCTION;
@@ -58,7 +58,7 @@ namespace gnash {
 			else return new bogus_bi;
 		}
 
-		bitmap_info*	create_bitmap_info_rgba(image::rgba* im)
+		bitmap_info*	create_bitmap_info_rgba(image::ImageRGBA* im)
 		{
 #ifdef DEBUG_RENDER_CALLS
 			GNASH_REPORT_FUNCTION;

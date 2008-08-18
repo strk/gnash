@@ -27,13 +27,13 @@
 
 namespace gnash {
 
-bitmap_character_def::bitmap_character_def(std::auto_ptr<image::rgb> image)
+bitmap_character_def::bitmap_character_def(std::auto_ptr<image::ImageRGB> image)
 	:
  	_bitmap_info ( gnash::render::create_bitmap_info_rgb(image.get()) )
 {
 }
 
-bitmap_character_def::bitmap_character_def(std::auto_ptr<image::rgba> image)
+bitmap_character_def::bitmap_character_def(std::auto_ptr<image::ImageRGBA> image)
 	:
  	_bitmap_info ( gnash::render::create_bitmap_info_rgba(image.get()) )
 {

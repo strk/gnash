@@ -642,12 +642,12 @@ public:
 #endif
   }    
 
-  virtual bitmap_info*  create_bitmap_info_rgb(image::rgb* im)
+  virtual bitmap_info*  create_bitmap_info_rgb(image::ImageRGB* im)
   {
     return new bitmap_info_ogl(im, GL_RGB, ogl_accessible());
   }
 
-  virtual bitmap_info*  create_bitmap_info_rgba(image::rgba* im)
+  virtual bitmap_info*  create_bitmap_info_rgba(image::ImageRGBA* im)
   {
     return new bitmap_info_ogl(im, GL_RGBA, ogl_accessible());
   }
@@ -707,7 +707,7 @@ public:
   
   virtual void reallyDrawVideoFrame(image::ImageBase* baseframe, const matrix* m, const rect* bounds)
   {
-    image::rgb* frame = static_cast<image::rgb*>(baseframe);
+    image::ImageRGB* frame = static_cast<image::ImageRGB*>(baseframe);
 
     glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT);
 

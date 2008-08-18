@@ -98,10 +98,10 @@ namespace image
 
 
 	//
-	// rgb
+	// ImageRGB
 	//
 
-	rgb::rgb(int width, int height)
+	ImageRGB::ImageRGB(int width, int height)
 		:
 		ImageBase( width, height,
 			(width * 3 + 3) & ~3, // round pitch up to nearest 4-byte boundary
@@ -113,17 +113,17 @@ namespace image
 		assert((_pitch & 3) == 0);
 	}
 
-	rgb::~rgb()
+	ImageRGB::~ImageRGB()
 	{
 	}
 
 
 	//
-	// rgba
+	// ImageRGBA
 	//
 
 
-	rgba::rgba(int width, int height)
+	ImageRGBA::ImageRGBA(int width, int height)
 		:
 		ImageBase(width, height, width * 4, GNASH_IMAGE_RGBA)
 	{
@@ -133,12 +133,12 @@ namespace image
 		assert((_pitch & 3) == 0);
 	}
 
-	rgba::~rgba()
+	ImageRGBA::~ImageRGBA()
 	{
 	}
 
 
-	void rgba::set_pixel(size_t x, size_t y, boost::uint8_t r, boost::uint8_t g, boost::uint8_t b, boost::uint8_t a)
+	void ImageRGBA::setPixel(size_t x, size_t y, boost::uint8_t r, boost::uint8_t g, boost::uint8_t b, boost::uint8_t a)
 	// Set the pixel at the given position.
 	{
 		assert(x < _width);
@@ -153,7 +153,7 @@ namespace image
 	}
 
 
-    void rgba::mergeAlpha(const boost::uint8_t* alphaData, const size_t bufferLength)
+    void ImageRGBA::mergeAlpha(const boost::uint8_t* alphaData, const size_t bufferLength)
     {
         assert (bufferLength * 4 <= _size);
 
@@ -249,10 +249,10 @@ namespace image
         switch (inChannel->imageType())
         {
             case GNASH_IMAGE_RGB:
-                im.reset(new image::rgb(width, height));
+                im.reset(new image::ImageRGB(width, height));
                 break;
             case GNASH_IMAGE_RGBA:
-                im.reset(new image::rgba(width, height));
+                im.reset(new image::ImageRGBA(width, height));
                 break;
             default:
                 log_error("Invalid image returned");
@@ -267,7 +267,7 @@ namespace image
         return im;
     }
 
-	std::auto_ptr<rgb> readSWFJpeg2WithTables(JpegImageInput& loader)
+	std::auto_ptr<ImageRGB> readSWFJpeg2WithTables(JpegImageInput& loader)
 	// Create and read a new image, using a input object that
 	// already has tables loaded.  The IJG documentation describes
 	// this as "abbreviated" format.
@@ -275,7 +275,7 @@ namespace image
 
 		loader.startImage();
 
-		std::auto_ptr<rgb> im(new image::rgb(loader.getWidth(), loader.getHeight()));
+		std::auto_ptr<ImageRGB> im(new image::ImageRGB(loader.getWidth(), loader.getHeight()));
 
 
 		for (size_t y = 0, height = loader.getHeight(); y < height; y++) {
@@ -289,11 +289,11 @@ namespace image
 
 
 	// For reading SWF JPEG3-style image data, like ordinary JPEG, 
-	// but stores the data in rgba format.
-	std::auto_ptr<rgba> readSWFJpeg3(boost::shared_ptr<gnash::IOChannel> in)
+	// but stores the data in ImageRGBA format.
+	std::auto_ptr<ImageRGBA> readSWFJpeg3(boost::shared_ptr<gnash::IOChannel> in)
 	{
 	
-	    std::auto_ptr<rgba> im(NULL);
+	    std::auto_ptr<ImageRGBA> im(NULL);
 
         // Calling with headerBytes as 0 has a special effect...
 		std::auto_ptr<JpegImageInput> j_in ( JpegImageInput::createSWFJpeg2HeaderOnly(in, 0) );
@@ -301,7 +301,7 @@ namespace image
 		
 		j_in->startImage();
 
-		im.reset(new image::rgba(j_in->getWidth(), j_in->getHeight()));
+		im.reset(new image::ImageRGBA(j_in->getWidth(), j_in->getHeight()));
 
 		boost::scoped_array<boost::uint8_t> line ( new boost::uint8_t[3*j_in->getWidth()] );
 

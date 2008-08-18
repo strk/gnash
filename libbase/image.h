@@ -156,57 +156,57 @@ namespace image
 	};
 
 	/// 24-bit RGB image.  Packed data, red byte first (RGBRGB...)
-	class DSOEXPORT rgb : public ImageBase
+	class DSOEXPORT ImageRGB : public ImageBase
 	{
 
 	public:
 
-		rgb(int width, int height);
+		ImageRGB(int width, int height);
 
-		rgb(const rgb& o)
+		ImageRGB(const ImageRGB& o)
 			:
 			ImageBase(o)
 		{}
 
-		rgb(boost::uint8_t* data, int width, int height, int stride)
+		ImageRGB(boost::uint8_t* data, int width, int height, int stride)
 			: ImageBase(data, width, height, stride, GNASH_IMAGE_RGB)
 		{}
 
-		~rgb();
+		~ImageRGB();
 
         virtual std::auto_ptr<ImageBase> clone()
         {
-            return std::auto_ptr<ImageBase>(new rgb(*this));
+            return std::auto_ptr<ImageBase>(new ImageRGB(*this));
         };
 
 	};
 
 	/// 32-bit RGBA image.  Packed data, red byte first (RGBARGBA...)
-	class DSOEXPORT rgba : public ImageBase
+	class DSOEXPORT ImageRGBA : public ImageBase
 	{
 
 	public:
 
-		rgba(int width, int height);
+		ImageRGBA(int width, int height);
 
-		rgba(const rgba& o)
+		ImageRGBA(const ImageRGBA& o)
 			:
 			ImageBase(o)
 		{}
 
-		~rgba();
+		~ImageRGBA();
 
 		/// Set pixel value 
 		//
 		/// TODO: move in base class ?
 		///
-		void set_pixel(size_t x, size_t y, boost::uint8_t r, boost::uint8_t g, boost::uint8_t b, boost::uint8_t a);
+		void setPixel(size_t x, size_t y, boost::uint8_t r, boost::uint8_t g, boost::uint8_t b, boost::uint8_t a);
 
         void mergeAlpha(const boost::uint8_t* alphaData, const size_t bufferLength);
 
         virtual std::auto_ptr<ImageBase> clone()
         {
-            return std::auto_ptr<ImageBase>(new rgba(*this));
+            return std::auto_ptr<ImageBase>(new ImageRGBA(*this));
         };
 
 	};
@@ -223,12 +223,6 @@ namespace image
 		{}
 
 		~alpha();
-
-		/// Set pixel value 
-		//
-		/// TODO: move in base class ?
-		///
-		void	set_pixel(size_t x, size_t y, boost::uint8_t a);
 
         virtual std::auto_ptr<ImageBase> clone()
         {
@@ -249,12 +243,12 @@ namespace image
 	/// \brief
 	/// For reading SWF JPEG2-style image data, using pre-loaded
 	/// headers stored in the given jpeg::input object.
-	DSOEXPORT std::auto_ptr<rgb> readSWFJpeg2WithTables(JpegImageInput& loader);
+	DSOEXPORT std::auto_ptr<ImageRGB> readSWFJpeg2WithTables(JpegImageInput& loader);
 
 	/// \brief
 	/// For reading SWF JPEG3-style image data, like ordinary JPEG, 
-	/// but stores the data in rgba format.
-	DSOEXPORT std::auto_ptr<rgba> readSWFJpeg3(boost::shared_ptr<gnash::IOChannel> in);
+	/// but stores the data in ImageRGBA format.
+	DSOEXPORT std::auto_ptr<ImageRGBA> readSWFJpeg3(boost::shared_ptr<gnash::IOChannel> in);
 	
 	DSOEXPORT std::auto_ptr<ImageBase> readImageData(boost::shared_ptr<gnash::IOChannel> in, FileType type);
 

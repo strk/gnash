@@ -176,10 +176,10 @@ VideoDecoderFfmpeg::convertRGB24(AVCodecContext* srcCtx,
   return picture;
 }
 
-std::auto_ptr<image::rgb>
+std::auto_ptr<image::ImageRGB>
 VideoDecoderFfmpeg::decode(const boost::uint8_t* input, boost::uint32_t input_size)
 {
-  std::auto_ptr<image::rgb> ret;
+  std::auto_ptr<image::ImageRGB> ret;
 
   AVFrame* frame = avcodec_alloc_frame();
   if ( ! frame ) {
@@ -199,7 +199,7 @@ VideoDecoderFfmpeg::decode(const boost::uint8_t* input, boost::uint32_t input_si
 
   AVPicture rgbpicture = convertRGB24(_videoCodecCtx, *frame);
   
-  ret.reset(new image::rgb(rgbpicture.data[0], _videoCodecCtx->width,
+  ret.reset(new image::ImageRGB(rgbpicture.data[0], _videoCodecCtx->width,
                            _videoCodecCtx->height, rgbpicture.linesize[0]));
 
   // FIXME: av_free doesn't free frame->data!
@@ -215,10 +215,10 @@ VideoDecoderFfmpeg::push(const EncodedVideoFrame& buffer)
 
 }
 
-std::auto_ptr<image::rgb>
+std::auto_ptr<image::ImageRGB>
 VideoDecoderFfmpeg::pop()
 {
-  std::auto_ptr<image::rgb> ret;
+  std::auto_ptr<image::ImageRGB> ret;
 
   for (std::vector<const EncodedVideoFrame*>::iterator it =
        _video_frames.begin(), end = _video_frames.end(); it != end; ++it) {

@@ -431,12 +431,12 @@ fill_style::create_gradient_bitmap() const
         || m_type == SWF::FILL_RADIAL_GRADIENT
         || m_type == SWF::FILL_FOCAL_GRADIENT);
 
-    std::auto_ptr<image::rgba> im(NULL);
+    std::auto_ptr<image::ImageRGBA> im(NULL);
 
     if (m_type == SWF::FILL_LINEAR_GRADIENT)
     {
         // Linear gradient.
-        im.reset(new image::rgba(256, 1));
+        im.reset(new image::ImageRGBA(256, 1));
 
         for (size_t i = 0; i < im->width(); i++)
     {
@@ -447,7 +447,7 @@ fill_style::create_gradient_bitmap() const
     else if (m_type == SWF::FILL_RADIAL_GRADIENT)
     {
         // Radial gradient.
-        im.reset(new image::rgba(64, 64));
+        im.reset(new image::ImageRGBA(64, 64));
 
         for (size_t j = 0; j < im->height(); j++) {
             for (size_t i = 0; i < im->width(); i++) {
@@ -466,7 +466,7 @@ fill_style::create_gradient_bitmap() const
     else if (m_type == SWF::FILL_FOCAL_GRADIENT)
     {
         // Focal gradient.
-        im.reset(new image::rgba(64, 64));
+        im.reset(new image::ImageRGBA(64, 64));
 
         for (size_t j = 0; j < im->height(); j++)
         {
