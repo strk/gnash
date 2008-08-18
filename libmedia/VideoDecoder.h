@@ -59,7 +59,7 @@ public:
   //
   /// @return The decoded video frame, or a NULL-containing auto_ptr if an
   ///         error occurred.
-  virtual std::auto_ptr<image::rgb> pop() = 0;
+  virtual std::auto_ptr<image::ImageRGB> pop() = 0;
   
   /// \brief
   /// Check whether a decoded frame is ready to be popped.

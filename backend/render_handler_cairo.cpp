@@ -50,7 +50,7 @@ namespace gnash {
 
 // Converts from RGB image to 32-bit pixels in CAIRO_FORMAT_RGB24 format
 static void
-rgb_to_cairo_rgb24(boost::uint8_t* dst, const image::rgb* im)
+rgb_to_cairo_rgb24(boost::uint8_t* dst, const image::ImageRGB* im)
 {
   boost::uint32_t* dst32 = reinterpret_cast<boost::uint32_t*>(dst);
   for (size_t y = 0;  y < im->height();  y++)
@@ -65,7 +65,7 @@ rgb_to_cairo_rgb24(boost::uint8_t* dst, const image::rgb* im)
 
 // Converts from RGBA image to 32-bit pixels in CAIRO_FORMAT_ARGB32 format
 static void
-rgba_to_cairo_argb(boost::uint8_t* dst, const image::rgba* im)
+rgba_to_cairo_argb(boost::uint8_t* dst, const image::ImageRGBA* im)
 {
   boost::uint32_t* dst32 = reinterpret_cast<boost::uint32_t*>(dst);
   for (size_t y = 0;  y < im->height();  y++)
@@ -422,7 +422,7 @@ public:
   {
   }
 
-  virtual bitmap_info*  create_bitmap_info_rgb(image::rgb* im) 
+  virtual bitmap_info*  create_bitmap_info_rgb(image::ImageRGB* im) 
   {
     int buf_size = im->width() * im->height() * 4;
     boost::uint8_t* buffer = new boost::uint8_t[buf_size];
@@ -433,7 +433,7 @@ public:
                                  CAIRO_FORMAT_RGB24);
   }
 
-  virtual bitmap_info*  create_bitmap_info_rgba(image::rgba* im)
+  virtual bitmap_info*  create_bitmap_info_rgba(image::ImageRGBA* im)
   {        
     int buf_size = im->width() * im->height() * 4;
     boost::uint8_t* buffer = new boost::uint8_t[buf_size];
@@ -444,20 +444,13 @@ public:
                                  CAIRO_FORMAT_ARGB32);
   }
 
-  virtual void  delete_bitmap_info(bitmap_info* bi)
-  {
-    delete bi;
-  }
-
-  virtual int videoFrameFormat()
-  {
-    return render_handler::RGB;
-  }
-  
   virtual void drawVideoFrame(image::ImageBase* baseframe, const matrix* m, const rect* bounds)
   {
     // Extract frame attributes
-    image::rgb* frame = static_cast<image::rgb*>(baseframe);
+    image::ImageRGB* frame = dynamic_cast<image::ImageRGB*>(baseframe);
+    
+    assert(frame);
+    
     int         w = frame->width();
     int         h = frame->height();
 

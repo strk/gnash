@@ -738,7 +738,7 @@ NetStreamGst::video_data_cb(GstElement* /*c*/, GstBuffer *buffer,
   
   if (!ns->m_imageframe.get() || unsigned(width) != ns->m_imageframe->width() ||
       unsigned(height) != ns->m_imageframe->height()) {
-    ns->m_imageframe.reset( new image::rgb(width, height) );
+    ns->m_imageframe.reset( new image::ImageRGB(width, height) );
   }    
   
   ns->m_imageframe->update(GST_BUFFER_DATA(buffer));

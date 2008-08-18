@@ -295,7 +295,7 @@ define_bits_jpeg_loader(SWFStream& in, tag_type tag, movie_definition* m)
 
     j_in->discardPartialBuffer();
     
-    std::auto_ptr<image::rgb> im;
+    std::auto_ptr<image::ImageBase> im;
     try
     {
         im = image::readSWFJpeg2WithTables(*j_in);
@@ -355,11 +355,7 @@ define_bits_jpeg2_loader(SWFStream& in, tag_type tag, movie_definition* m)
 
         std::auto_ptr<image::ImageBase> im (image::readImageData(ad, GNASH_FILETYPE_JPEG));
 
-        // It must be an RGB image, as normal JPEG images don't support RGBA.
-        std::auto_ptr<image::rgb> imageRGB(dynamic_cast<image::rgb*>(im.release()));
-        assert(imageRGB.get());            
-
-        boost::intrusive_ptr<bitmap_character_def> ch = new bitmap_character_def(imageRGB);
+        boost::intrusive_ptr<bitmap_character_def> ch = new bitmap_character_def(im);
         m->add_bitmap_character_def(character_id, ch.get());
     }
 }
@@ -478,7 +474,7 @@ define_bits_jpeg3_loader(SWFStream& in, tag_type tag, movie_definition* m)
 
     // Read rgb data.
     boost::shared_ptr<tu_file> ad( StreamAdapter::getFile(in, alpha_position).release() );
-    std::auto_ptr<image::rgba> im = image::readSWFJpeg3(ad);
+    std::auto_ptr<image::ImageRGBA> im = image::readSWFJpeg3(ad);
     
     /// Failure to read the jpeg.
     if (!im.get()) return;
@@ -501,7 +497,8 @@ define_bits_jpeg3_loader(SWFStream& in, tag_type tag, movie_definition* m)
     im->mergeAlpha(buffer.get(), bufferLength);
 
     // Create bitmap character.
-    boost::intrusive_ptr<bitmap_character_def> ch = new bitmap_character_def(im);
+    boost::intrusive_ptr<bitmap_character_def> ch =
+            new bitmap_character_def(static_cast<std::auto_ptr<image::ImageBase> >(im));
 
     m->add_bitmap_character_def(character_id, ch.get());
 #endif
@@ -547,7 +544,7 @@ define_bits_lossless_2_loader(SWFStream& in, tag_type tag, movie_definition* m)
     {
 
         // RGB image data.
-        std::auto_ptr<image::rgb> image ( new image::rgb(width, height) );
+        std::auto_ptr<image::ImageBase> image ( new image::ImageRGB(width, height) );
 
         if (bitmap_format == 3)
         {
@@ -662,7 +659,7 @@ define_bits_lossless_2_loader(SWFStream& in, tag_type tag, movie_definition* m)
         // RGBA image data.
         assert(tag == SWF::DEFINELOSSLESS2); // 36
 
-        std::auto_ptr<image::rgba> image(new image::rgba(width, height));
+        std::auto_ptr<image::ImageBase> image(new image::ImageRGBA(width, height));
 
         if (bitmap_format == 3)
         {

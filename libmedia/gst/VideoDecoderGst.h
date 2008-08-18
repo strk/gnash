@@ -38,11 +38,11 @@ namespace gnash {
 namespace media {
 
 // Convenience wrapper for GstBuffer. Intended to be wrapped in an auto_ptr.
-class gnashGstBuffer : public image::rgb
+class gnashGstBuffer : public image::ImageRGB
 {
 public:
   gnashGstBuffer(GstBuffer* buf, int width, int height)
-  : rgb(NULL, width, height, (width * 3 + 3) & ~3),
+  : ImageRGB(NULL, width, height, (width * 3 + 3) & ~3),
     _buffer(buf)
   {}
   
@@ -58,7 +58,7 @@ public:
 
   std::auto_ptr<image::ImageBase> clone() const
   {
-    return std::auto_ptr<ImageBase>(new rgb(*this));
+    return std::auto_ptr<ImageBase>(new ImageRGB(*this));
   }
 
 private:
@@ -74,7 +74,7 @@ public:
 
   void push(const EncodedVideoFrame& buffer);
 
-  std::auto_ptr<image::rgb> pop();
+  std::auto_ptr<image::ImageRGB> pop();
   
   bool peek();
 

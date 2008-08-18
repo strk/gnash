@@ -394,7 +394,7 @@ public:
   };
 
 
-  gnash::bitmap_info* create_bitmap_info_rgb(image::rgb* im)
+  gnash::bitmap_info* create_bitmap_info_rgb(image::ImageRGB* im)
   // Given an image, returns a pointer to a bitmap_info class
   // that can later be passed to fill_styleX_bitmap(), to set a
   // bitmap fill style.
@@ -405,7 +405,7 @@ public:
   }
 
 
-  gnash::bitmap_info* create_bitmap_info_rgba(image::rgba* im)
+  gnash::bitmap_info* create_bitmap_info_rgba(image::ImageRGBA* im)
   // Given an image, returns a pointer to a bitmap_info class
   // that can later be passed to fill_style_bitmap(), to set a
   // bitmap fill style.
@@ -429,19 +429,6 @@ public:
     return new agg_bitmap_info<agg::pixfmt_rgb24_pre> (0, 0, 0, &dummy, 24);
   }
 
-  void  delete_bitmap_info(gnash::bitmap_info* bi)
-  // Delete the given bitmap info class.
-  {
-    free(bi);
-  }
-  
-  
-  // Returns the format the current renderer wants videoframes in.
-  int videoFrameFormat() {
-    return RGB;
-  }
-  
-
   void drawVideoFrame(image::ImageBase* baseframe, const matrix* source_mat, 
     const rect* bounds) {
   
@@ -460,9 +447,9 @@ public:
       
     typedef agg::pixfmt_rgb24_pre baseformat;
     
-    assert(dynamic_cast<image::rgb*>(baseframe));
-  
-    image::rgb* frame = static_cast<image::rgb*>(baseframe);
+    image::ImageRGB* frame = dynamic_cast<image::ImageRGB*>(baseframe);
+
+    assert(frame);
     
     matrix mat = stage_matrix;
     mat.concatenate(*source_mat);

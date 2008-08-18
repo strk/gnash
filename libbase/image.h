@@ -62,11 +62,11 @@ namespace image
 		ImageBase(const ImageBase& o)
 			:
 			_type(o._type),
-			m_size(o.size()),
-			m_width(o.width()),
-			m_height(o.height()),
-			m_pitch(o.m_pitch),
-			m_data(new boost::uint8_t[m_size])
+			_size(o.size()),
+			_width(o.width()),
+			_height(o.height()),
+			_pitch(o._pitch),
+			_data(new boost::uint8_t[_size])
 		{
 			update(o);
 		}
@@ -79,26 +79,26 @@ namespace image
         ImageType type() const { return _type; }
 
 		/// Return size of this image buffer, in bytes
-		size_t size() const { return m_size; }
+		size_t size() const { return _size; }
 
 		/// Return size in bytes of a row of this image 
-		size_t pitch() const { return m_pitch; }
+		size_t pitch() const { return _pitch; }
 
 		/// Return size in bytes of a single pixel value
 		size_t pixelSize() const
 		{
-			return m_pitch / m_width;
+			return _pitch / _width;
 		}
 
 		/// Return width of image in pixels
-		size_t width() const { return m_width; }
+		size_t width() const { return _width; }
 
 		/// Return height of image in pixels
-		size_t height() const { return m_height; }
+		size_t height() const { return _height; }
 
 		/// Copy image data from a buffer.
 		//
-		/// Note that this buffer MUST have the same m_pitch, or unexpected things
+		/// Note that this buffer MUST have the same _pitch, or unexpected things
 		/// will happen. In general, it is only safe to copy from another ImageBase
 		/// (or derivative thereof) or unexpected things will happen. 
 		///
@@ -108,7 +108,7 @@ namespace image
 
 		/// Copy image data from another image data
 		//
-		/// Note that this buffer MUST have the same m_pitch and _type
+		/// Note that this buffer MUST have the same _pitch and _type
 		/// or an assertion will fail.
 		///
 		/// @param from image to copy data from.
@@ -118,12 +118,12 @@ namespace image
 		void clear(const boost::uint8_t byteValue = 0);
 
 		/// Return a pointer to the underlying data
-		boost::uint8_t* data() { return m_data.get(); }
+		boost::uint8_t* data() { return _data.get(); }
 
 		/// Return a pointer to first byte of given line
 		DSOEXPORT boost::uint8_t* scanline(size_t y);
 
-        DSOEXPORT boost::uint8_t* const scanlinePointer(size_t y) const;
+        DSOEXPORT const boost::uint8_t* scanlinePointer(size_t y) const;
 
 		virtual ~ImageBase() {}
 
@@ -134,79 +134,79 @@ namespace image
 		const ImageType _type;
 
 		/// Size of image buffer in bytes.
-		const size_t m_size;
+		const size_t _size;
 
 		/// Width of image, in pixels
-		const size_t m_width;
+		const size_t _width;
 
 		/// Height of image, in pixels
-		const size_t m_height;
+		const size_t _height;
 
 		/// Byte offset from one row to the next
 		//
 		/// This is basically width in bytes of each line.
-		/// For example, in an alpha image type this is equal to m_width
-		/// while for an RGB this is 3 times the m_width.
+		/// For example, in an alpha image type this is equal to _width
+		/// while for an RGB this is 3 times the _width.
 		///
-		const size_t m_pitch;
+		const size_t _pitch;
 
 		/// Data bytes, geometry defined by members below
-		boost::scoped_array<boost::uint8_t> m_data;
+		boost::scoped_array<boost::uint8_t> _data;
 
 	};
 
 	/// 24-bit RGB image.  Packed data, red byte first (RGBRGB...)
-	class DSOEXPORT rgb : public ImageBase
+	class DSOEXPORT ImageRGB : public ImageBase
 	{
 
 	public:
 
-		rgb(int width, int height);
+		ImageRGB(int width, int height);
 
-		rgb(const rgb& o)
+		ImageRGB(const ImageRGB& o)
 			:
 			ImageBase(o)
 		{}
 
-		rgb(boost::uint8_t* data, int width, int height, int stride)
+		ImageRGB(boost::uint8_t* data, int width, int height, int stride)
 			: ImageBase(data, width, height, stride, GNASH_IMAGE_RGB)
 		{}
 
-		~rgb();
+		~ImageRGB();
 
         virtual std::auto_ptr<ImageBase> clone()
         {
-            return std::auto_ptr<ImageBase>(new rgb(*this));
+            return std::auto_ptr<ImageBase>(new ImageRGB(*this));
         };
 
 	};
 
 	/// 32-bit RGBA image.  Packed data, red byte first (RGBARGBA...)
-	class DSOEXPORT rgba : public ImageBase
+	class DSOEXPORT ImageRGBA : public ImageBase
 	{
 
 	public:
 
-		rgba(int width, int height);
+		ImageRGBA(int width, int height);
 
-		rgba(const rgba& o)
+		ImageRGBA(const ImageRGBA& o)
 			:
 			ImageBase(o)
 		{}
 
-		~rgba();
+		~ImageRGBA();
 
 		/// Set pixel value 
 		//
 		/// TODO: move in base class ?
 		///
-		void set_pixel(size_t x, size_t y, boost::uint8_t r, boost::uint8_t g, boost::uint8_t b, boost::uint8_t a);
+		void setPixel(size_t x, size_t y, boost::uint8_t r, boost::uint8_t g, boost::uint8_t b, boost::uint8_t a);
 
         void mergeAlpha(const boost::uint8_t* alphaData, const size_t bufferLength);
 
         virtual std::auto_ptr<ImageBase> clone()
         {
-            return std::auto_ptr<ImageBase>(new rgba(*this));
+            return std::auto_ptr<ImageBase>(new ImageRGBA(*this));
         };
 
 	};
@@ -223,12 +223,6 @@ namespace image
 		{}
 
 		~alpha();
-
-		/// Set pixel value 
-		//
-		/// TODO: move in base class ?
-		///
-		void	set_pixel(size_t x, size_t y, boost::uint8_t a);
 
         virtual std::auto_ptr<ImageBase> clone()
         {
@@ -249,12 +243,12 @@ namespace image
 	/// \brief
 	/// For reading SWF JPEG2-style image data, using pre-loaded
 	/// headers stored in the given jpeg::input object.
-	DSOEXPORT std::auto_ptr<rgb> readSWFJpeg2WithTables(JpegImageInput& loader);
+	DSOEXPORT std::auto_ptr<ImageBase> readSWFJpeg2WithTables(JpegImageInput& loader);
 
 	/// \brief
 	/// For reading SWF JPEG3-style image data, like ordinary JPEG, 
-	/// but stores the data in rgba format.
-	DSOEXPORT std::auto_ptr<rgba> readSWFJpeg3(boost::shared_ptr<gnash::IOChannel> in);
+	/// but stores the data in ImageRGBA format.
+	DSOEXPORT std::auto_ptr<ImageRGBA> readSWFJpeg3(boost::shared_ptr<gnash::IOChannel> in);
 	
 	DSOEXPORT std::auto_ptr<ImageBase> readImageData(boost::shared_ptr<gnash::IOChannel> in, FileType type);
 

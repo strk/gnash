@@ -45,11 +45,11 @@ namespace image
 	ImageBase::ImageBase(boost::uint8_t* data, int width, int height, int pitch, ImageType type)
 		:
 		_type(type),
-		m_size(height*pitch),
-		m_width(width),
-		m_height(height),
-		m_pitch(pitch),
-		m_data(data)
+		_size(height*pitch),
+		_width(width),
+		_height(height),
+		_pitch(pitch),
+		_data(data)
 	{
 	}
 
@@ -57,51 +57,51 @@ namespace image
 	ImageBase::ImageBase(int width, int height, int pitch, ImageType type)
 		:
 		_type(type),
-		m_size(height*pitch),
-		m_width(width),
-		m_height(height),
-		m_pitch(pitch),
-		m_data(new boost::uint8_t[m_size])
+		_size(height*pitch),
+		_width(width),
+		_height(height),
+		_pitch(pitch),
+		_data(new boost::uint8_t[_size])
 	{
 		assert(pitch >= width);
 	}
 
 	void ImageBase::update(boost::uint8_t* data)
 	{
-		std::memcpy(m_data.get(), data, m_size);
+		std::memcpy(_data.get(), data, _size);
 	}
 
 	void ImageBase::update(const ImageBase& from)
 	{
-		assert(from.m_pitch == m_pitch);
-		assert(m_size <= from.m_size);
+		assert(from._pitch == _pitch);
+		assert(_size <= from._size);
 		assert(_type == from._type);
-		std::memcpy(m_data.get(), const_cast<ImageBase&>(from).data(), m_size);
+		std::memcpy(_data.get(), from._data.get(), _size);
 	}
 
     void ImageBase::clear(const boost::uint8_t byteValue)
     {
-        std::memset(m_data.get(), byteValue, m_size);
+        std::memset(_data.get(), byteValue, _size);
     }
 
 	boost::uint8_t* ImageBase::scanline(size_t y)
 	{
-		assert(y < m_height);
-		return m_data.get() + m_pitch * y;
+		assert(y < _height);
+		return _data.get() + _pitch * y;
 	}
 
-	boost::uint8_t* const ImageBase::scanlinePointer(size_t y) const
+	const boost::uint8_t* ImageBase::scanlinePointer(size_t y) const
 	{
-		assert(y < m_height);
-		return m_data.get() + m_pitch * y;
+		assert(y < _height);
+		return _data.get() + _pitch * y;
 	}
 
 
 	//
-	// rgb
+	// ImageRGB
 	//
 
-	rgb::rgb(int width, int height)
+	ImageRGB::ImageRGB(int width, int height)
 		:
 		ImageBase( width, height,
 			(width * 3 + 3) & ~3, // round pitch up to nearest 4-byte boundary
@@ -109,40 +109,40 @@ namespace image
 	{
 		assert(width > 0);
 		assert(height > 0);
-		assert(m_pitch >= m_width * 3);
-		assert((m_pitch & 3) == 0);
+		assert(_pitch >= _width * 3);
+		assert((_pitch & 3) == 0);
 	}
 
-	rgb::~rgb()
+	ImageRGB::~ImageRGB()
 	{
 	}
 
 
 	//
-	// rgba
+	// ImageRGBA
 	//
 
 
-	rgba::rgba(int width, int height)
+	ImageRGBA::ImageRGBA(int width, int height)
 		:
 		ImageBase(width, height, width * 4, GNASH_IMAGE_RGBA)
 	{
 		assert(width > 0);
 		assert(height > 0);
-		assert(m_pitch >= m_width * 4);
-		assert((m_pitch & 3) == 0);
+		assert(_pitch >= _width * 4);
+		assert((_pitch & 3) == 0);
 	}
 
-	rgba::~rgba()
+	ImageRGBA::~ImageRGBA()
 	{
 	}
 
 
-	void rgba::set_pixel(size_t x, size_t y, boost::uint8_t r, boost::uint8_t g, boost::uint8_t b, boost::uint8_t a)
+	void ImageRGBA::setPixel(size_t x, size_t y, boost::uint8_t r, boost::uint8_t g, boost::uint8_t b, boost::uint8_t a)
 	// Set the pixel at the given position.
 	{
-		assert(x < m_width);
-		assert(y < m_height);
+		assert(x < _width);
+		assert(y < _height);
 
 		boost::uint8_t*	data = scanline(y) + 4 * x;
 
@@ -153,12 +153,12 @@ namespace image
 	}
 
 
-    void rgba::mergeAlpha(const boost::uint8_t* alphaData, const size_t bufferLength)
+    void ImageRGBA::mergeAlpha(const boost::uint8_t* alphaData, const size_t bufferLength)
     {
-        assert (bufferLength * 4 <= m_size);
+        assert (bufferLength * 4 <= _size);
 
         for (size_t i = 0; i < bufferLength; i++) {
-            m_data[4 * i + 3] = alphaData[i];
+            _data[4 * i + 3] = alphaData[i];
         }
     }
 
@@ -249,10 +249,10 @@ namespace image
         switch (inChannel->imageType())
         {
             case GNASH_IMAGE_RGB:
-                im.reset(new image::rgb(width, height));
+                im.reset(new image::ImageRGB(width, height));
                 break;
             case GNASH_IMAGE_RGBA:
-                im.reset(new image::rgba(width, height));
+                im.reset(new image::ImageRGBA(width, height));
                 break;
             default:
                 log_error("Invalid image returned");
@@ -267,7 +267,7 @@ namespace image
         return im;
     }
 
-	std::auto_ptr<rgb> readSWFJpeg2WithTables(JpegImageInput& loader)
+	std::auto_ptr<ImageBase> readSWFJpeg2WithTables(JpegImageInput& loader)
 	// Create and read a new image, using a input object that
 	// already has tables loaded.  The IJG documentation describes
 	// this as "abbreviated" format.
@@ -275,7 +275,7 @@ namespace image
 
 		loader.startImage();
 
-		std::auto_ptr<rgb> im(new image::rgb(loader.getWidth(), loader.getHeight()));
+		std::auto_ptr<ImageBase> im(new image::ImageRGB(loader.getWidth(), loader.getHeight()));
 
 
 		for (size_t y = 0, height = loader.getHeight(); y < height; y++) {
@@ -289,11 +289,11 @@ namespace image
 
 
 	// For reading SWF JPEG3-style image data, like ordinary JPEG, 
-	// but stores the data in rgba format.
-	std::auto_ptr<rgba> readSWFJpeg3(boost::shared_ptr<gnash::IOChannel> in)
+	// but stores the data in ImageRGBA format.
+	std::auto_ptr<ImageRGBA> readSWFJpeg3(boost::shared_ptr<gnash::IOChannel> in)
 	{
 	
-	    std::auto_ptr<rgba> im(NULL);
+	    std::auto_ptr<ImageRGBA> im(NULL);
 
         // Calling with headerBytes as 0 has a special effect...
 		std::auto_ptr<JpegImageInput> j_in ( JpegImageInput::createSWFJpeg2HeaderOnly(in, 0) );
@@ -301,7 +301,7 @@ namespace image
 		
 		j_in->startImage();
 
-		im.reset(new image::rgba(j_in->getWidth(), j_in->getHeight()));
+		im.reset(new image::ImageRGBA(j_in->getWidth(), j_in->getHeight()));
 
 		boost::scoped_array<boost::uint8_t> line ( new boost::uint8_t[3*j_in->getWidth()] );
 
