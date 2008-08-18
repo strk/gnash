@@ -146,11 +146,11 @@ VideoDecoderGst::push(const EncodedVideoFrame& frame)
 }
   
 
-std::auto_ptr<image::ImageRGB>
+std::auto_ptr<image::ImageBase>
 VideoDecoderGst::pop()
 {
   if (!_pipeline) {
-    return std::auto_ptr<image::ImageRGB>();
+    return std::auto_ptr<image::ImageBase>();
   }
 
   checkMessages();
@@ -158,7 +158,7 @@ VideoDecoderGst::pop()
   GstBuffer* buffer = gst_app_sink_pull_buffer_timed (GST_APP_SINK(_appsink));
   
   if (!buffer) {
-    return std::auto_ptr<image::ImageRGB>();
+    return std::auto_ptr<image::ImageBase>();
   }
   
   GstCaps* caps = gst_buffer_get_caps(buffer);
@@ -174,7 +174,7 @@ VideoDecoderGst::pop()
   
   gst_caps_unref(caps);
   
-  std::auto_ptr<image::ImageRGB> ret(new gnashGstBuffer(buffer, width, height));
+  std::auto_ptr<image::ImageBase> ret(new gnashGstBuffer(buffer, width, height));
   
   return ret;
 }
