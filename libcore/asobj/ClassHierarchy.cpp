@@ -35,6 +35,7 @@
 #include "EventDispatcher.h"
 #include "Error_as.h"
 #include "Global.h"
+#include "int_as.h"
 #include "InteractiveObject.h"
 #include "String_as.h"
 #include "Key.h"
@@ -298,7 +299,8 @@ static const ClassHierarchy::nativeClass knownClasses[] =
 	{ display_object_class_init, NSV::CLASS_DISPLAYOBJECT, NSV::CLASS_EVENTDISPATCHER, 9 },
 	{ interactive_object_class_init, NSV::CLASS_INTERACTIVEOBJECT, NSV::CLASS_DISPLAYOBJECT, 9 },
 	{ display_object_container_class_init, NSV::CLASS_DISPLAYOBJECTCONTAINER, NSV::CLASS_INTERACTIVEOBJECT, 9 },
-	{ sprite_as_class_init, NSV::CLASS_SPRITE, NSV::CLASS_DISPLAYOBJECTCONTAINER, 9 }
+	{ sprite_as_class_init, NSV::CLASS_SPRITE, NSV::CLASS_DISPLAYOBJECTCONTAINER, 9 },
+	{ int_class_init, NSV::CLASS_INT, NSV::CLASS_OBJECT, 9 }
 
 // These classes are all implicitly constructed; that is, it is not necessary for
 // the class name to be used to construct the class, so they must always be available.

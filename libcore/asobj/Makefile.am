@@ -55,6 +55,7 @@ libgnashasobjs_la_SOURCES = \
 	Error_as.cpp \
 	EventDispatcher.cpp \
 	Global.cpp \
+	int_as.cpp \
 	InteractiveObject.cpp \
 	Key.cpp	\
 	LoadVars.cpp \
@@ -125,6 +126,7 @@ noinst_HEADERS = \
 	EventDispatcher.h \
 	Math_as.h	\
 	Global.h\
+	int_as.h \
 	InteractiveObject.h \
 	Key.h \
 	LoadVars.h \
