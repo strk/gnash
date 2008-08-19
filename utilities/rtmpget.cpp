@@ -25,7 +25,7 @@
 #include <string>
 #include <iostream>
 #include <sstream>
-#include <signal.h>
+#include <csignal>
 #include <vector>
 #include <sys/mman.h>
 #include <cerrno>
