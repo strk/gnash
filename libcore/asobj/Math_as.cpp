@@ -86,7 +86,7 @@ math_class_init(as_object& global)
 	as_value math_##funcname(const fn_call& fn)		\
 	{							\
 		double result;					\
-		if (fn.nargs < 1) result = NAN;			\
+		if (fn.nargs < 1) result = NaN;			\
 		else {						\
 			double	arg = fn.arg(0).to_number();	\
 			result = std::funcname(arg);			\
@@ -130,7 +130,7 @@ MATH_WRAP_FUNC1(tan)
 	as_value math_##funcname(const fn_call& fn)		\
 	{							\
 		double result;					\
-		if (fn.nargs < 2) result = NAN;			\
+		if (fn.nargs < 2) result = NaN;			\
 		else {						\
 			double	arg0 = fn.arg(0).to_number();	\
 			double	arg1 = fn.arg(1).to_number();	\
@@ -167,7 +167,7 @@ math_round(const fn_call& fn)
 	// round argument to nearest int. 0.5 goes to 1 and -0.5 goes to 0
 	double result;
 
-	if (fn.nargs < 1) result = NAN;
+	if (fn.nargs < 1) result = NaN;
 	else {
 		double arg0 = fn.arg(0).to_number();
 		result = std::floor(arg0 + 0.5);

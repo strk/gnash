@@ -28,13 +28,13 @@ deb debian: dist-bzip2 $(srcdir)/packaging/debian/rules
 # file. Configure.ac is edited by the snapshot target.
 snapshot-deb: # snapshot
 	now=`date "+%Y%m%d"`; \
-	snapshot_dir="gnash-$${now}cvs"; \
+	snapshot_dir="gnash-$${now}trunk"; \
 	if test ! -d $${snapshot_dir}/debian; then \
 	  cp -rp $(srcdir)/packaging/debian $${snapshot_dir}/; \
 	fi; \
 	if test -e $${snapshot_dir}/debian/changelog; then \
 	  mv -f $${snapshot_dir}/debian/changelog $${snapshot_dir}/debian/changelog.orig; \
-	  sed -e "s:(.*):($${now}cvs):" $${snapshot_dir}/debian/changelog.orig > $${snapshot_dir}/debian/changelog; \
+	  sed -e "s:(.*):($${now}trunk):" $${snapshot_dir}/debian/changelog.orig > $${snapshot_dir}/debian/changelog; \
 	fi; \
 	(cd $${snapshot_dir}; dpkg-buildpackage -rfakeroot)
 

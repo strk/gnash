@@ -21,6 +21,7 @@
 #include "gnashconfig.h"
 #endif
 
+#include <boost/detail/endian.hpp>
 #include <string>
 #include <vector>
 #include <cmath>
@@ -141,39 +142,29 @@ Flv::decodeMetaData(gnash::Network::byte_t *buf, size_t size)
     AMF amf;
     Network::byte_t *ptr = buf;
     Network::byte_t *tooFar = ptr + size;
-    char *name = 0;
     
     // Extract the onMetaData object name
     // In disk files, I always see the 0x2 type field for
     // a string, but not always in streaming, at least according to
-    // Gnash's libmedia/FLVParser code. So if we see the begining
-    // of "onMetaData", then just grab the length without the type
-    // field.
-    if ((*ptr == 0) && (*(ptr+2) == 'o')) {
-	boost::uint16_t length;
-	length = ntohs((*(boost::uint16_t *)ptr) & 0xffff);
-	name = new char(length+1);
-	memset(name, 0, length+1);
-	ptr += sizeof(boost::uint16_t);
-	std::copy(name, name + length, ptr);
-	ptr += length;
-    } else {	
-	Element *objname = amf.extractAMF(ptr, tooFar);
-	if (objname == 0) {
-	    log_error("Failed to get the onMetaData string");
-	    return 0;
-	}
-	ptr += objname->getLength() + AMF_HEADER_SIZE;
-	name = const_cast<char *>(objname->to_string());
-    }    
+    // Gnash's libmedia/FLVParser code. Since this is always 
+    if (*ptr == Element::STRING_AMF0) {
+	ptr++;
+    }
+    
+    boost::uint16_t length;
+    length = ntohs((*(boost::uint16_t *)ptr) & 0xffff);
+    if (length >= SANE_STR_SIZE) {
+	log_error("%d bytes for a string is over the safe limit of %d",
+		  length, SANE_STR_SIZE);
+    }
+    ptr += sizeof(boost::uint16_t);
+    std::string name(reinterpret_cast<const char *>(ptr), length);
+    ptr += length;
     
     // Extract the properties for this metadata object.
     Element *el = amf.extractAMF(ptr, tooFar);
     ptr += amf.totalsize();
-
-    if (name) {
-        el->setName(name);
-    }
+    el->setName(name.c_str(), length);
 
     return el;
 }
@@ -284,10 +275,13 @@ Flv::convert24(boost::uint8_t *num)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::uint32_t bodysize = 0;
+#ifdef BOOST_BIG_ENDIAN
+    bodysize = *(reinterpret_cast<boost::uint32_t *>(num)) >> 8;
+#else
     bodysize = *(reinterpret_cast<boost::uint32_t *>(num)) << 8;
-    
     bodysize = ntohl(bodysize);
-
+#endif
+    
     return bodysize;
 }
 
