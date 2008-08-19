@@ -328,17 +328,16 @@ main(int argc, char *argv[])
 //    Buffer *buf2 = client.encodeConnect("oflaDemo", "http://192.168.1.70/software/gnash/tests/ofla_demo.swf", "rtmp://localhost/oflaDemo/stream", 615, 124, 1, "http://192.168.1.70/software/gnash/tests/index.html");
     buf2->resize(buf2->size() - 6); // FIXME: encodeConnect returns the wrong size for the buffer!
     size_t total_size = buf2->size();    
-    RTMPMsg *msg1 = client.sendRecvMsg(0x3, RTMP::HEADER_12, total_size,
-				       RTMP::INVOKE, RTMPMsg::FROM_CLIENT,
-				       buf2);
+    RTMPMsg *msg1 = client.sendRecvMsg(0x3, RTMP::HEADER_12, total_size, RTMP::INVOKE, RTMPMsg::FROM_CLIENT, buf2);
+    
     if (msg1) {
-	msg1->dump();
-	if (msg1->getStatus() ==  RTMPMsg::NC_CONNECT_SUCCESS) {
-	    log_debug("Sent NetConnection Connect message sucessfully");
-	} else {
+		msg1->dump();
+		if (msg1->getStatus() ==  RTMPMsg::NC_CONNECT_SUCCESS) {
+	    	log_debug("Sent NetConnection Connect message sucessfully");
+		} else {
 	    log_error("Couldn't send NetConnection Connect message,");
-//	    exit(-1);
-	}
+	//	    exit(-1);
+		}
     }
     
     // make the createStream for ID 3 encoded object
@@ -346,9 +345,7 @@ main(int argc, char *argv[])
     Buffer *buf3 = client.encodeStream(0x2);
 //    buf3->dump();
     total_size = buf3->size();
-    RTMPMsg *msg2 = client.sendRecvMsg(0x3, RTMP::HEADER_12, total_size,
-				       RTMP::INVOKE, RTMPMsg::FROM_CLIENT,
-				       buf3);
+    RTMPMsg *msg2 = client.sendRecvMsg(0x3, RTMP::HEADER_12, total_size, RTMP::INVOKE, RTMPMsg::FROM_CLIENT, buf3);
     double streamID = 0.0;
     if (msg2) {
 	msg2->dump();
@@ -376,8 +373,7 @@ main(int argc, char *argv[])
 //    Buffer *buf4 = client.encodeStreamOp(0, RTMP::STREAM_PLAY, false, "gate06_tablan_bcueu_01");
 //     log_debug("TRACE: buf4: %s", hexify(buf4->reference(), buf4->size(), true));
     total_size = buf4->size();
-    RTMPMsg *msg3 = client.sendRecvMsg(0x8, RTMP::HEADER_12, total_size,
-				       RTMP::INVOKE, RTMPMsg::FROM_CLIENT, buf4);
+    RTMPMsg *msg3 = client.sendRecvMsg(0x8, RTMP::HEADER_12, total_size, RTMP::INVOKE, RTMPMsg::FROM_CLIENT, buf4);
     if (msg3) {
         msg3->dump();
         if (msg3->getStatus() ==  RTMPMsg::NS_PLAY_START) {
@@ -452,7 +448,7 @@ main(int argc, char *argv[])
 #if 0
     // Write the packet to disk so we can anaylze it with other tools
     int fd = open("outbuf.raw",O_WRONLY|O_CREAT, S_IRWXU);
-    if (fd == -1) {
+    if (fd < 0) {
         perror("open");
     }
     cout << "Writing packet to disk: \"outbuf.raw\"" << endl;
