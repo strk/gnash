@@ -21,6 +21,7 @@
 #include "gnashconfig.h"
 #endif
 
+#include <boost/detail/endian.hpp>
 #include <iostream>
 #include <string>
 #include <map>
@@ -264,35 +265,15 @@ RTMP::decodeHeader(Network::byte_t *in)
     }
 
     if (_header.head_size >= 8) {
-        _header.type = *(content_types_e *)tmpptr;
-//        _header.bodysize = sizeof(boost::uint16_t) * 2;
+	char c = *(reinterpret_cast<char *>(tmpptr));
+	_header.type = static_cast<content_types_e>(c);
         tmpptr++;
         log_debug(_("The type is: %s"), content_str[_header.type]);
     }
-
-//     switch(_header.type) {
-//       case CHUNK_SIZE:
-//       case BYTES_READ:
-//       case PING:
-//       case SERVER:
-//       case CLIENT:
-//       case VIDEO_DATA:
-//       case NOTIFY:
-//       case SHARED_OBJ:
-//       case INVOKE:
-//           _packet_size = RTMP_VIDEO_PACKET_SIZE;
-//           break;
-//       case AUDIO_DATA:
-//           _packet_size = RTMP_AUDIO_PACKET_SIZE;
-//           break;
-//       default:
-//           log_error (_("ERROR: Unidentified AMF header data type 0x%x"), _type);
-//           break;
-//     };
     
     if (_header.head_size == 12) {
         _header.src_dest = *(reinterpret_cast<RTMPMsg::rtmp_source_e *>(tmpptr));
-        tmpptr += sizeof(unsigned int);
+        tmpptr += sizeof(boost::uint32_t);
         log_debug(_("The source/destination is: %x"), _header.src_dest);
     }
 
@@ -365,24 +346,13 @@ RTMP::encodeHeader(int amf_index, rtmp_headersize_e head_size,
     // Add the size of the message if the header size is 8 or more.
     // and add the type of the object if the header size is 8 or more.
     if ((head_size == HEADER_8) || (head_size == HEADER_12)) {
-        int length = total_size;
-	Network::byte_t *lenptr = reinterpret_cast<Network::byte_t *>(&length);
-//#ifndef	BOOST_BIG_ENDIAN
-//	swapBytes(&length, 4);
-	*ptr++ = *(lenptr + 2);
-	*ptr++ = *(lenptr + 1);
-	*ptr++ = *lenptr;	
-//	*(lenptr + 3) = *(lenptr);
-//	memcpy(ptr, lenptr, 3);
-// #else
-// #ifdef BOOST_BIG_ENDIAN
-// 	memcpy(ptr, &length, 3);
-// #else
-// #error "No Endianess specified!"
-// #endif
-//#endif
-//      swapBytes(&length, 4);
-//        ptr += 3;
+// RTMP uses a 3 byte length field, which is the total size of the packet
+	boost::uint32_t length = total_size << 8;
+	swapBytes(&length, 4);
+	memcpy(ptr, &length, 3);
+	ptr += 3;
+	
+	// Add the type
         *ptr = type;
         ptr++;
     }
@@ -618,7 +588,6 @@ RTMP::decodeMsgBody(Network::byte_t *data, size_t size)
 
     msg->setMethodName(name->to_string());
     double swapped = streamid->to_number();
-    swapBytes(&swapped, amf::AMF0_NUMBER_SIZE);
     msg->setStreamID(swapped);
 
     if ((msg->getMethodName() == "_result") || (msg->getMethodName() == "error")) {
