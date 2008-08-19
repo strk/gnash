@@ -236,6 +236,13 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
     else
       AC_DEFINE(FFMPEG_VP6, 1, [Define if ffmpeg can play VP6.])
     fi
+
+    if test -z "$ffmpeg_num_version" -o "$ffmpeg_num_version" -lt 51490; then
+      AC_MSG_WARN([This version of ffmpeg/libavcodec is not able to play VP6A encoded video!])
+    else
+      AC_DEFINE(FFMPEG_VP6A, 1, [Define if ffmpeg can play VP6A.])
+    fi
+
   else
     AC_MSG_WARN([Could not check ffmpeg version (dunno where avcodec.h is)])
     ffmpeg_version=ok # trust the user-specified dir
