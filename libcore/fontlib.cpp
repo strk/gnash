@@ -5,6 +5,13 @@
 
 // A module to take care of all of gnash's loaded fonts.
 
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h" // HAVE_ZLIB_H, USE_SWFTREE
+#endif
+
+#ifdef HAVE_PTHREADS
+#include <pthread.h>
+#endif
 
 #include "tu_file.h"
 #include "font.h"

@@ -20,7 +20,7 @@
 #define GNASH_SWF_DEFINEBUTTONCXFORMTAG_H
 
 #include "swf.h" // for tag_type definition
-#include "stream.h" // for inlines
+#include "SWFStream.h" // for inlines
 #include "movie_definition.h"
 #include "button_character_def.h"
 

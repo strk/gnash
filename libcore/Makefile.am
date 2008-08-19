@@ -100,7 +100,7 @@ libgnashcore_la_SOURCES = \
 	LoadVariablesThread.cpp \
 	render.cpp \
 	shape.cpp \
-	stream.cpp \
+	SWFStream.cpp \
 	styles.cpp \
 	text.cpp \
 	timers.cpp \
@@ -166,7 +166,7 @@ noinst_HEADERS = \
 	resource.h \
 	shape.h	\
 	sprite_instance.h \
-	stream.h \
+	SWFStream.h \
 	styles.h \
 	swf.h \
 	swf/TagLoadersTable.h \

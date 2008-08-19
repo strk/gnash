@@ -349,8 +349,8 @@ Date::toString() const
     const char* dayweekname[7] = { "Sun", "Mon", "Tue", "Wed",
                                    "Thu", "Fri", "Sat" };
   
-    /// NAN and infinities all print as "Invalid Date"
-    if (isnan(_value) || isinf(_value)) {
+    /// NaN and infinities all print as "Invalid Date"
+    if (isNaN(_value) || isinf(_value)) {
         return as_value("Invalid Date");
     }
   
@@ -487,7 +487,7 @@ date_new(const fn_call& fn)
 #define date_get_proto(function, timefn, element) \
   static as_value function(const fn_call& fn) { \
     boost::intrusive_ptr<Date> date = ensureType<Date>(fn.this_ptr); \
-    if (isnan(date->getTimeValue()) || isinf(date->getTimeValue())) { as_value rv; rv.set_nan(); return rv; } \
+    if (isNaN(date->getTimeValue()) || isinf(date->getTimeValue())) { as_value rv; rv.set_nan(); return rv; } \
     GnashTime gt; \
     timefn(date->getTimeValue(), gt); \
     return as_value(gt.element); \
@@ -692,9 +692,9 @@ static as_value _date_setfullyear(const fn_call& fn, bool utc) {
       IF_VERBOSE_ASCODING_ERRORS(
     log_aserror(_("Date.setFullYear needs one argument"));
       )
-      date->setTimeValue(NAN);
+      date->setTimeValue(NaN);
   } else if (rogue_date_args(fn, 3) != 0.0) {
-      date->setTimeValue(NAN);
+      date->setTimeValue(NaN);
   } else {
       GnashTime gt;
 
@@ -738,10 +738,10 @@ date_setyear(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("Date.setYear needs one argument"));
         )
-        date->setTimeValue(NAN);
+        date->setTimeValue(NaN);
     }
     else if (rogue_date_args(fn, 3) != 0.0) {
-        date->setTimeValue(NAN);
+        date->setTimeValue(NaN);
     }
     else {
         GnashTime gt;
@@ -772,7 +772,7 @@ date_setyear(const fn_call& fn)
 // If no arguments are given or if an invalid type is given,
 // the commercial player sets the month to January in the same year.
 // Only if the second parameter is present and has a non-numeric value,
-// the result is NAN.
+// the result is NaN.
 // We do not do the same because it's a bugger to code.
 static as_value
 _date_setmonth(const fn_call& fn, bool utc)
@@ -784,10 +784,10 @@ _date_setmonth(const fn_call& fn, bool utc)
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("Date.setMonth needs one argument"));
         )
-        date->setTimeValue(NAN);
+        date->setTimeValue(NaN);
     }
     else if (rogue_date_args(fn, 2) != 0.0) {
-        date->setTimeValue(NAN);
+        date->setTimeValue(NaN);
     }
     else {
 
@@ -798,14 +798,14 @@ _date_setmonth(const fn_call& fn, bool utc)
         // It seems odd, but FlashPlayer takes all bad month values to mean
         // January
         double monthvalue =  fn.arg(0).to_number();
-        if (isnan(monthvalue) || isinf(monthvalue)) monthvalue = 0.0;
+        if (isNaN(monthvalue) || isinf(monthvalue)) monthvalue = 0.0;
         gt.month = static_cast<int>(monthvalue);
 
-        // If the day-of-month value is invalid instead, the result is NAN.
+        // If the day-of-month value is invalid instead, the result is NaN.
         if (fn.nargs >= 2) {
             double mdayvalue = fn.arg(1).to_number();
-            if (isnan(mdayvalue) || isinf(mdayvalue)) {
-                date->setTimeValue(NAN);
+            if (isNaN(mdayvalue) || isinf(mdayvalue)) {
+                date->setTimeValue(NaN);
                 return as_value(date->getTimeValue());
             }
             else {
@@ -835,9 +835,9 @@ _date_setdate(const fn_call& fn, bool utc) {
       IF_VERBOSE_ASCODING_ERRORS(
     log_aserror(_("Date.setDate needs one argument"));
       )
-      date->setTimeValue(NAN);  // Is what FlashPlayer sets
+      date->setTimeValue(NaN);  // Is what FlashPlayer sets
   } else if (rogue_date_args(fn, 1) != 0.0) {
-      date->setTimeValue(NAN);
+      date->setTimeValue(NaN);
   } else {
     GnashTime gt;
 
@@ -874,10 +874,10 @@ _date_sethours(const fn_call& fn, bool utc)
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("Date.setHours needs one argument"));
         )
-        date->setTimeValue(NAN);  // Is what FlashPlayer sets
+        date->setTimeValue(NaN);  // Is what FlashPlayer sets
     }
     else if (rogue_date_args(fn, 4) != 0.0) {
-        date->setTimeValue(NAN);
+        date->setTimeValue(NaN);
     }
     else {
       
@@ -917,11 +917,11 @@ _date_setminutes(const fn_call& fn, bool utc)
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("Date.setMinutes needs one argument"));
         )
-        date->setTimeValue(NAN);  // FlashPlayer instead leaves the date set to
+        date->setTimeValue(NaN);  // FlashPlayer instead leaves the date set to
         // a random value such as 9th December 2077 BC
     }
     else if (rogue_date_args(fn, 3) != 0.0) {
-        date->setTimeValue(NAN);
+        date->setTimeValue(NaN);
     }
     else {
         GnashTime gt;
@@ -955,10 +955,10 @@ _date_setseconds(const fn_call& fn, bool utc)
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("Date.setSeconds needs one argument"));
         )
-        date->setTimeValue(NAN);  // Same as commercial player
+        date->setTimeValue(NaN);  // Same as commercial player
     }
     else if (rogue_date_args(fn, 2) != 0.0) {
-        date->setTimeValue(NAN);
+        date->setTimeValue(NaN);
     }
     else {
         // We *could* set seconds [and milliseconds] without breaking the
@@ -993,10 +993,10 @@ _date_setmilliseconds(const fn_call& fn, bool utc)
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("Date.setMilliseconds needs one argument"));
         )
-        date->setTimeValue(NAN);
+        date->setTimeValue(NaN);
     }
     else if (rogue_date_args(fn, 1) != 0.0) {
-        date->setTimeValue(NAN);
+        date->setTimeValue(NaN);
     }
     else {
     
@@ -1086,11 +1086,11 @@ date_tostring(const fn_call& fn)
 // - if both +Infinity and -Infinity are present in the optional args,
 //  or if one of the first two arguments is not numeric (including Inf),
 //  the result is NaN.
-// Actually, given a first parameter of Infinity,-Infinity or NAN,
+// Actually, given a first parameter of Infinity,-Infinity or NaN,
 // it returns -6.77681005679712e+19 but that's just crazy.
 //
 // We test for < 2 parameters and return undefined, but given any other
-// non-numeric arguments we give NAN.
+// non-numeric arguments we give NaN.
 
 
 static as_value
@@ -1110,7 +1110,7 @@ date_utc(const fn_call& fn) {
     // Check for presence of NaNs and Infinities in the arguments 
     // and return the appropriate value if so.
     if ( (result = rogue_date_args(fn, 7)) != 0.0) {
-        return as_value(NAN);
+        return as_value(NaN);
     }
 
     // Preset default values
@@ -1153,7 +1153,7 @@ date_utc(const fn_call& fn) {
 // Auxillary function checks for Infinities and NaN in a function's args and
 // returns 0.0 if there are none,
 // plus (or minus) infinity if positive (or negative) infinites are present,
-// NAN is there are NANs present, or a mixture of positive and negative infs.
+// NaN is there are NaNs present, or a mixture of positive and negative infs.
 static double
 rogue_date_args(const fn_call& fn, unsigned maxargs)
 {
@@ -1171,7 +1171,7 @@ rogue_date_args(const fn_call& fn, unsigned maxargs)
     for (unsigned int i = 0; i < maxargs; i++) {
         double arg = fn.arg(i).to_number();
 
-        if (isnan(arg)) return(NAN);
+        if (isNaN(arg)) return(NaN);
 
         if (isinf(arg)) {
             if (arg > 0) {  // Plus infinity
@@ -1186,7 +1186,7 @@ rogue_date_args(const fn_call& fn, unsigned maxargs)
     }
     // If both kinds of infinity were present in the args,
     // the result is NaN.
-    if (plusinf && minusinf) return(NAN);
+    if (plusinf && minusinf) return(NaN);
 
     // If only one kind of infinity was in the args, return that.
     if (plusinf || minusinf) return(infinity);

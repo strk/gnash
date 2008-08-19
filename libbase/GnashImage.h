@@ -20,9 +20,16 @@
 #ifndef GNASH_GNASHIMAGE_H
 #define GNASH_GNASHIMAGE_H
 
-#include <boost/shared_ptr.hpp> 
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h"
+#endif
 
-#include "dsodefs.h"
+#ifdef HAVE_PTHREADS
+#include <pthread.h>
+#endif
+#include <boost/shared_ptr.hpp> 
+#include "log.h"
+#include "image.h"
 
 // Forward declarations
 namespace gnash { class IOChannel; }
@@ -34,7 +41,8 @@ class ImageInput {
 public:
 
 	ImageInput(boost::shared_ptr<IOChannel> in) :
-	    _inStream(in)
+	    _inStream(in),
+	    _type(GNASH_IMAGE_INVALID)
 	{}
 
 	virtual ~ImageInput() {}
@@ -65,9 +73,43 @@ public:
 	virtual size_t getWidth() const = 0;
 	virtual void readScanline(unsigned char* rgb_data) = 0;
 
+    ImageType imageType() { return _type; }
+
 protected:
 
     boost::shared_ptr<IOChannel> _inStream;
+
+    ImageType _type;
+
+};
+
+class ImageOutput
+{
+
+public:
+
+    ImageOutput(boost::shared_ptr<IOChannel> out, size_t width, size_t height) :
+        _width(width),
+        _height(height),
+        _outStream(out)
+        {}
+
+    virtual ~ImageOutput() {}
+    
+    virtual void writeImageRGB(unsigned char* rgbData) = 0;
+    
+    virtual void writeImageRGBA(unsigned char* /*rgbaData*/)
+    {
+        log_error("This image format does not support writing RGBA images");
+    }
+
+protected:
+
+    const size_t _width;
+
+    const size_t _height;
+    
+    boost::shared_ptr<IOChannel> _outStream;
 
 };
 

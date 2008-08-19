@@ -39,6 +39,7 @@
 #include "Object.h" // for getObjectInterface
 #include "StringPredicates.h"
 #include "GnashKey.h" // key::code
+#include <boost/bind.hpp>
 
 /** \page buttons Buttons and mouse behaviour
 

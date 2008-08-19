@@ -52,7 +52,7 @@ namespace gnash { class IOChannel; }
 namespace gnash
 {
 /// Bascially this is a thin wrapper around jpeg_decompress object.
-class JpegImageInput : public gnash::ImageInput
+class JpegImageInput : public ImageInput
 {
 
 private:
@@ -142,20 +142,29 @@ public:
 };
 
 // Helper object for writing jpeg image data.
-class JpegImageOutput
+class JpegImageOutput : public ImageOutput
 {
+
 public:
+
 	/// Create an output object bount to a gnash::IOChannel
 	//
 	/// @param quality
 	///	Quality goes from 1-100.
 	///
-	DSOEXPORT static JpegImageOutput*	create(gnash::IOChannel* out, int width, int height, int quality);
+	JpegImageOutput(boost::shared_ptr<IOChannel> out, size_t width, size_t height, int quality);
+	
+	~JpegImageOutput();
 
-	virtual ~JpegImageOutput() {}
+	void writeImageRGB(unsigned char* rgbData);
 
-	// ...
-	virtual void	write_scanline(unsigned char* rgb_data) = 0;
+	DSOEXPORT static std::auto_ptr<ImageOutput> create(boost::shared_ptr<IOChannel> out, size_t width, size_t height, int quality);
+	
+private:
+
+	jpeg::jpeg_compress_struct m_cinfo;
+	jpeg::jpeg_error_mgr m_jerr;
+	
 };
 
 } // namespace gnash

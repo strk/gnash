@@ -21,7 +21,7 @@
 #include "font.h"
 #include "log.h"
 #include "shape.h"
-#include "stream.h"
+#include "SWFStream.h"
 #include "movie_definition.h"
 #include "DefineFontAlignZonesTag.h"
 

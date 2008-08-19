@@ -24,7 +24,7 @@
 
 // Forward declarations
 namespace image {
-	class image_base;
+	class ImageBase;
 }
 
 
@@ -37,8 +37,8 @@ namespace gnash {
 class DSOEXPORT bitmap_info : public ref_counted
 {
 public:
-//	virtual void layout_image(image::image_base* /*im*/) { };
-//	image::image_base*  m_suspended_image;
+//	virtual void layout_image(image::ImageBase* /*im*/) { };
+//	image::ImageBase*  m_suspended_image;
 
 	unsigned int	m_texture_id;		// nuke?
 	int		m_original_width;	// nuke?

@@ -17,12 +17,20 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h" // HAVE_ZLIB_H, USE_SWFTREE
+#endif
+
+#ifdef HAVE_PTHREADS
+#include <pthread.h>
+#endif
+
 #include "PlaceObject2Tag.h"
 #include "character.h"
 #include "sprite_instance.h"
 #include "swf_event.h"
 #include "log.h"
-#include "stream.h"
+#include "SWFStream.h"
 #include "filter_factory.h"
 
 namespace gnash {
@@ -35,36 +43,34 @@ PlaceObject2Tag::readPlaceObject(SWFStream& in)
     in.ensureBytes(2 + 2);
     m_character_id = in.read_u16();
     m_depth = in.read_u16() + character::staticDepthOffset;
-    m_matrix.read(in);
-
-    IF_VERBOSE_PARSE
-    (
-            log_parse(_("  PLACEOBJECT: depth=%d(%d) char=%d"),
-            m_depth, m_depth - character::staticDepthOffset,
-            m_character_id);
-            log_parse("  matrix: %s", m_matrix);
-    );
-
-    // If these flags2 values aren't set here, nothing will
-    // ever be displayed.
-    m_has_flags2 |= ( HAS_CHARACTER_MASK
-                    | HAS_MATRIX_MASK );
 
     // PlaceObject doesn't know about masks.
     m_clip_depth = character::noClipDepthValue;
 
+    // If these flags2 values aren't set here, nothing will
+    // ever be displayed.
+    m_has_flags2 = HAS_CHARACTER_MASK;
+
     if (in.tell() < in.get_tag_end_position())
     {
-        m_color_transform.read_rgb(in);
-
-        m_has_flags2 |= HAS_CXFORM_MASK;
-
-        IF_VERBOSE_PARSE
-        (
-            log_parse(_("  cxform: %s"), m_color_transform);
-        );
-
+        m_matrix.read(in);
+        m_has_flags2 |= HAS_MATRIX_MASK;
+        if (in.tell() < in.get_tag_end_position())
+        {
+            m_color_transform.read_rgb(in);
+            m_has_flags2 |= HAS_CXFORM_MASK;
+        }
     }
+
+    IF_VERBOSE_PARSE
+    (
+            log_parse(_("  PLACEOBJECT: depth=%d(%d) char=%d"),
+            	m_depth, m_depth - character::staticDepthOffset,
+            	m_character_id);
+            if (hasMatrix()) log_parse("  matrix: %s", m_matrix);
+            if (hasCxform()) log_parse(_("  cxform: %s"), m_color_transform);
+    );
+
     
 }
 

@@ -153,6 +153,31 @@ main(int /*argc*/, char** /*argv*/)
     check_equals(m1.get_x_translation(), 5);
     check_equals(m1.get_y_translation(), 6);
 
+    matrix m2;
+    check_equals(D(m2.get_rotation()), 0);
+    m2.set_x_scale(16);
+    check_equals(D(m2.get_x_scale()), 16);
+    check_equals(D(m2.get_y_scale()), 1);
+    check_equals(D(m2.get_rotation()), 0);
+    m2.set_x_scale(-16);
+    check_equals(D(m2.get_x_scale()), -16);
+    check_equals(D(m2.get_y_scale()), 1);
+    check_equals(D(m2.get_rotation()), 0);
+    m2.set_x_scale(16);
+    check_equals(D(m2.get_x_scale()), 16);
+    check_equals(D(m2.get_y_scale()), 1);
+    check_equals(D(m2.get_rotation()), 0);
+    m2.set_x_scale(16);
+    m2.set_y_scale(-64);
+    check_equals(D(m2.get_x_scale()), 16);
+    check_equals(D(m2.get_y_scale()), -64);
+    check_equals(D(m2.get_rotation()), 0);
+    m2.set_x_scale(16);
+    m2.set_x_scale(-128);
+    check_equals(D(m2.get_x_scale()), -128);
+    check_equals(D(m2.get_y_scale()), -64);
+    check_equals(D(m2.get_rotation()), 0);
+
     //
     // Test matrix concatenation
     //

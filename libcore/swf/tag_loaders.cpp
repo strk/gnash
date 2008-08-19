@@ -22,6 +22,10 @@
 #include "gnashconfig.h" // HAVE_ZLIB_H, USE_SWFTREE
 #endif
 
+#ifdef HAVE_PTHREADS
+#include <pthread.h>
+#endif
+
 #include "tu_file.h" // for StreamAdapter (bitmap tag loaders)
 #include "utility.h"
 #include "action.h"
@@ -32,7 +36,7 @@
 #include "log.h"
 #include "morph2_character_def.h"
 #include "shape.h"
-#include "stream.h"
+#include "SWFStream.h"
 #include "styles.h"
 //#include "dlist.h"
 #include "timers.h"
@@ -248,7 +252,7 @@ jpeg_tables_loader(SWFStream& in, tag_type tag, movie_definition* m)
 	// Anyway the actual reads are limited to currently opened tag as 
 	// of gnash::SWFStream::read(), so this is not a problem.
 	//
-        boost::shared_ptr<tu_file> ad( StreamAdapter::getFile(in, std::numeric_limits<unsigned long>::max()) );
+        boost::shared_ptr<tu_file> ad(StreamAdapter::getFile(in, std::numeric_limits<unsigned long>::max()).release());
         //  transfer ownership to the JpegImageInput
         j_in = JpegImageInput::createSWFJpeg2HeaderOnly(ad, jpegHeaderSize);
 
@@ -289,13 +293,12 @@ define_bits_jpeg_loader(SWFStream& in, tag_type tag, movie_definition* m)
         return;
     }
 
-    assert(j_in);
     j_in->discardPartialBuffer();
     
-    std::auto_ptr<image::rgb> im;
+    std::auto_ptr<image::ImageBase> im;
     try
     {
-        im = image::readSWFJpeg2WithTables(j_in);
+        im = image::readSWFJpeg2WithTables(*j_in);
     }
     catch (std::exception& e)
     {
@@ -339,8 +342,6 @@ define_bits_jpeg2_loader(SWFStream& in, tag_type tag, movie_definition* m)
     // Read the image data.
     //
 
-    boost::shared_ptr<tu_file> ad( StreamAdapter::getFile(in, in.get_tag_end_position()) );
-    std::auto_ptr<image::rgb> im (image::readImageData(ad, GNASH_FILETYPE_JPEG));
 
     if ( m->get_bitmap_character_def(character_id) )
     {
@@ -350,6 +351,10 @@ define_bits_jpeg2_loader(SWFStream& in, tag_type tag, movie_definition* m)
     }
     else
     {
+        boost::shared_ptr<tu_file> ad( StreamAdapter::getFile(in, in.get_tag_end_position()).release() );
+
+        std::auto_ptr<image::ImageBase> im (image::readImageData(ad, GNASH_FILETYPE_JPEG));
+
         boost::intrusive_ptr<bitmap_character_def> ch = new bitmap_character_def(im);
         m->add_bitmap_character_def(character_id, ch.get());
     }
@@ -468,8 +473,8 @@ define_bits_jpeg3_loader(SWFStream& in, tag_type tag, movie_definition* m)
     //
 
     // Read rgb data.
-    boost::shared_ptr<tu_file> ad( StreamAdapter::getFile(in, alpha_position) );
-    std::auto_ptr<image::rgba> im = image::readSWFJpeg3(ad);
+    boost::shared_ptr<tu_file> ad( StreamAdapter::getFile(in, alpha_position).release() );
+    std::auto_ptr<image::ImageRGBA> im = image::readSWFJpeg3(ad);
     
     /// Failure to read the jpeg.
     if (!im.get()) return;
@@ -492,7 +497,8 @@ define_bits_jpeg3_loader(SWFStream& in, tag_type tag, movie_definition* m)
     im->mergeAlpha(buffer.get(), bufferLength);
 
     // Create bitmap character.
-    boost::intrusive_ptr<bitmap_character_def> ch = new bitmap_character_def(im);
+    boost::intrusive_ptr<bitmap_character_def> ch =
+            new bitmap_character_def(static_cast<std::auto_ptr<image::ImageBase> >(im));
 
     m->add_bitmap_character_def(character_id, ch.get());
 #endif
@@ -538,7 +544,7 @@ define_bits_lossless_2_loader(SWFStream& in, tag_type tag, movie_definition* m)
     {
 
         // RGB image data.
-        std::auto_ptr<image::rgb> image ( new image::rgb(width, height) );
+        std::auto_ptr<image::ImageBase> image ( new image::ImageRGB(width, height) );
 
         if (bitmap_format == 3)
         {
@@ -653,7 +659,7 @@ define_bits_lossless_2_loader(SWFStream& in, tag_type tag, movie_definition* m)
         // RGBA image data.
         assert(tag == SWF::DEFINELOSSLESS2); // 36
 
-        std::auto_ptr<image::rgba> image(new image::rgba(width, height));
+        std::auto_ptr<image::ImageBase> image(new image::ImageRGBA(width, height));
 
         if (bitmap_format == 3)
         {
@@ -907,7 +913,7 @@ sprite_loader(SWFStream& in, tag_type tag, movie_definition* m)
     );
 
     // will automatically read the sprite
-    sprite_definition* ch = new sprite_definition(m, &in);
+    sprite_definition* ch = new sprite_definition(m, in);
     //ch->read(in);
 
     IF_VERBOSE_MALFORMED_SWF(

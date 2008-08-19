@@ -8,7 +8,7 @@
 #include "types.h"
 
 #include "log.h"
-#include "stream.h"
+#include "SWFStream.h"
 #include "render.h"
 
 #include <sstream> // for ::print and ::toString

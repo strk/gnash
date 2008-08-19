@@ -1305,6 +1305,7 @@ esac
 
 AM_CONDITIONAL(LIRC, [test x$lirc_ext = xyes])
 
+AC_CHECK_HEADERS(endian.h)
 AC_CHECK_HEADERS(malloc.h)
 AC_CHECK_HEADERS(getopt.h)
 AC_CHECK_HEADERS(libgen.h)
@@ -1314,7 +1315,6 @@ AC_CHECK_HEADERS(signal.h)
 AC_CHECK_HEADERS(unistd.h)
 AC_CHECK_HEADERS(sys/time.h)
 AC_CHECK_LIB(lber, ber_free)
-AC_CHECK_LIB(utempter, utempter_pathname)
 dnl AC_CHECK_LIB(m, sqrt)
 AC_CHECK_LIB(c, getpwnam, AC_DEFINE(HAVE_GETPWNAM, 1, [Has getpwnam] ))
 

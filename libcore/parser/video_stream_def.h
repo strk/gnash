@@ -168,6 +168,7 @@ private:
 	/// 2: H.263
 	/// 3: screen video (Flash 7+ only)
 	/// 4: VP6
+	/// 5: VP6 video with alpha
 	///
 	media::videoCodecType m_codec_id;
 

@@ -24,7 +24,7 @@
 #include "button_character_def.h"
 #include "button_character_instance.h" // for create_character_instance()
 
-#include "stream.h" // for read()
+#include "SWFStream.h" // for read()
 #include "movie_definition.h"
 #include "action_buffer.h"
 #include "filter_factory.h"

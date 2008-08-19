@@ -19,6 +19,10 @@
 #include "gnashconfig.h"
 #endif
 
+#ifdef HAVE_PTHREADS
+#include <pthread.h>
+#endif
+
 #include "noseek_fd_adapter.h"
 #include "IOChannel.h" // for inheritance
 #include "utility.h"

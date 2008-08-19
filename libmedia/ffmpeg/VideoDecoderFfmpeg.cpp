@@ -48,7 +48,7 @@ VideoDecoderFfmpeg::VideoDecoderFfmpeg(videoCodecType format, int width, int hei
   _videoCodec(NULL),
   _videoCodecCtx(NULL)
 {
-  enum CodecID codec_id = FlashToFfmpegCodec(format);
+  enum CodecID codec_id = flashToFfmpegCodec(format);
 
   init(codec_id, width, height);
 }
@@ -59,8 +59,14 @@ VideoDecoderFfmpeg::VideoDecoderFfmpeg(VideoInfo& info)
   _videoCodecCtx(NULL)
 {
   enum CodecID codec_id = CODEC_ID_NONE;
-  if ( info.type == FLASH ) codec_id = FlashToFfmpegCodec(static_cast<videoCodecType>(info.codec));
+  if ( info.type == FLASH )
+  {
+    codec_id = flashToFfmpegCodec(static_cast<videoCodecType>(info.codec));
+  }
   else codec_id = static_cast<enum CodecID>(info.codec);
+
+  // This would cause nasty segfaults.
+  assert(codec_id != CODEC_ID_NONE);
 
   boost::uint8_t* extradata=0;
   int extradataSize=0;
@@ -176,10 +182,10 @@ VideoDecoderFfmpeg::convertRGB24(AVCodecContext* srcCtx,
   return picture;
 }
 
-std::auto_ptr<image::rgb>
+std::auto_ptr<image::ImageBase>
 VideoDecoderFfmpeg::decode(const boost::uint8_t* input, boost::uint32_t input_size)
 {
-  std::auto_ptr<image::rgb> ret;
+  std::auto_ptr<image::ImageBase> ret;
 
   AVFrame* frame = avcodec_alloc_frame();
   if ( ! frame ) {
@@ -199,7 +205,7 @@ VideoDecoderFfmpeg::decode(const boost::uint8_t* input, boost::uint32_t input_si
 
   AVPicture rgbpicture = convertRGB24(_videoCodecCtx, *frame);
   
-  ret.reset(new image::rgb(rgbpicture.data[0], _videoCodecCtx->width,
+  ret.reset(new image::ImageRGB(rgbpicture.data[0], _videoCodecCtx->width,
                            _videoCodecCtx->height, rgbpicture.linesize[0]));
 
   // FIXME: av_free doesn't free frame->data!
@@ -215,10 +221,10 @@ VideoDecoderFfmpeg::push(const EncodedVideoFrame& buffer)
 
 }
 
-std::auto_ptr<image::rgb>
+std::auto_ptr<image::ImageBase>
 VideoDecoderFfmpeg::pop()
 {
-  std::auto_ptr<image::rgb> ret;
+  std::auto_ptr<image::ImageBase> ret;
 
   for (std::vector<const EncodedVideoFrame*>::iterator it =
        _video_frames.begin(), end = _video_frames.end(); it != end; ++it) {
@@ -238,23 +244,25 @@ VideoDecoderFfmpeg::peek()
 
 /* public static */
 enum CodecID
-VideoDecoderFfmpeg::FlashToFfmpegCodec(videoCodecType format)
+VideoDecoderFfmpeg::flashToFfmpegCodec(videoCodecType format)
 {
-  // Find the decoder and init the parser
-  switch(format) {
-    case VIDEO_CODEC_H263:
-      return CODEC_ID_FLV1; // why not CODEC_ID_H263I ?
+    // Find the decoder and init the parser
+    switch(format) {
+        case VIDEO_CODEC_H263:
+             return CODEC_ID_FLV1; // why not CODEC_ID_H263I ?
 #ifdef FFMPEG_VP6
-    case VIDEO_CODEC_VP6:
-      return CODEC_ID_VP6F;
+        case VIDEO_CODEC_VP6:
+            return CODEC_ID_VP6F;
+        case VIDEO_CODEC_VP6A:
+            return CODEC_ID_VP6A;
 #endif
-    case VIDEO_CODEC_SCREENVIDEO:
-      return CODEC_ID_FLASHSV;
-    default:
-      log_error(_("Unsupported video codec %d"),
+        case VIDEO_CODEC_SCREENVIDEO:
+            return CODEC_ID_FLASHSV;
+        default:
+        log_error(_("Unsupported video codec %d"),
             static_cast<int>(format));
-      return CODEC_ID_NONE;
-  }
+        return CODEC_ID_NONE;
+    }
 }
 
 

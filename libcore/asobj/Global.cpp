@@ -75,7 +75,7 @@
 #include "xml.h"
 #include "xmlsocket.h"
 
-#include <limits> // for numeric_limits<double>::quiet_NaN
+#include <limits> // for numeric_limits<double>::infinity
 #include <sstream>
 
 // Common code to warn and return if a required single arg is not present
@@ -96,7 +96,7 @@ namespace gnash {
 
 // Forward declarations
 static as_value as_global_trace(const fn_call& fn);
-static as_value as_global_isnan(const fn_call& fn);
+static as_value as_global_isNaN(const fn_call& fn);
 static as_value as_global_isfinite(const fn_call& fn);
 static as_value as_global_unescape(const fn_call& fn);
 static as_value as_global_escape(const fn_call& fn);
@@ -215,7 +215,7 @@ Global::Global(VM& vm, ClassHierarchy *ch)
             vm.registerNative(as_global_unescape, 100, 1);
             vm.registerNative(as_global_parseint, 100, 2);
             vm.registerNative(as_global_parsefloat, 100, 3);
-            vm.registerNative(as_global_isnan, 200, 18);
+            vm.registerNative(as_global_isNaN, 200, 18);
             vm.registerNative(as_global_isfinite, 200, 19);
 
             init_member("escape", vm.getNative(100, 0));
@@ -228,8 +228,8 @@ Global::Global(VM& vm, ClassHierarchy *ch)
             // NaN and Infinity should only be in _global since SWF6,
             // but this is just because SWF5 or lower did not have a "_global"
             // reference at all, most likely.
-            init_member("NaN", as_value(NAN));
-            init_member("Infinity", as_value(INFINITY));
+            init_member("NaN", as_value(NaN));
+            init_member("Infinity", as_value(std::numeric_limits<double>::infinity()));
 
             registerColorNative(*this);
             registerTextFormatNative(*this);
@@ -275,11 +275,11 @@ as_global_trace(const fn_call& fn)
 
 
 as_value
-as_global_isnan(const fn_call& fn)
+as_global_isNaN(const fn_call& fn)
 {
     ASSERT_FN_ARGS_IS_1
 
-    return as_value( static_cast<bool>(isnan(fn.arg(0).to_number()) ));
+    return as_value( static_cast<bool>(isNaN(fn.arg(0).to_number()) ));
 }
 
 

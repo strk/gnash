@@ -31,23 +31,6 @@
 #include <sstream>
 #include <cmath>
 
-// Why ?
-//#undef fpclassify
-//#define fpclassify(x) _fpclassify(x)
-
-/* C99: 7.12 6 defines for floating point classification */
-
-#undef FP_ZERO
-#define FP_ZERO          1
-#undef FP_SUBNORMAL
-#define FP_SUBNORMAL     2
-#undef FP_NORMAL
-#define FP_NORMAL        4
-#undef FP_INFINITE
-#define FP_INFINITE      8
-#undef FP_NAN
-#define FP_NAN           16 
-
 namespace gnash {
 
 // Forward declarations
@@ -167,9 +150,9 @@ getNumberConstructor()
 
 		cl->init_member("MAX_VALUE", std::numeric_limits<double>::max(), cflags);
 		cl->init_member("MIN_VALUE", std::numeric_limits<double>::denorm_min(), cflags);
-		cl->init_member("NaN", as_value(NAN), cflags);
-		cl->init_member("POSITIVE_INFINITY", as_value(INFINITY), cflags);
-		cl->init_member("NEGATIVE_INFINITY", as_value(-INFINITY), cflags);
+		cl->init_member("NaN", as_value(NaN), cflags);
+		cl->init_member("POSITIVE_INFINITY", as_value(std::numeric_limits<double>::infinity()), cflags);
+		cl->init_member("NEGATIVE_INFINITY", as_value(-std::numeric_limits<double>::infinity()), cflags);
 
 	}
 

@@ -411,8 +411,9 @@ bool isEven(const size_t& n)
   return n % 2 == 0;
 }
 
-
-bitmap_info_ogl::bitmap_info_ogl(image::image_base* image, GLenum pixelformat,
+// Use the image class copy constructor; it's not important any more
+// what kind of image it is.
+bitmap_info_ogl::bitmap_info_ogl(image::ImageBase* image, GLenum pixelformat,
                                  bool ogl_accessible)
 :
   _img(image->clone()),
@@ -482,7 +483,7 @@ bitmap_info_ogl::setup()
   // _img (or a modified version thereof) has been uploaded to OpenGL. We
   // no longer need to keep it around. Of course this goes against the
   // principles of auto_ptr...
-  delete _img.release();
+  _img.reset();
 }
 
 void
@@ -641,39 +642,22 @@ public:
 #endif
   }    
 
-  virtual bitmap_info*  create_bitmap_info_rgb(image::rgb* im)
+  virtual bitmap_info*  create_bitmap_info_rgb(image::ImageRGB* im)
   {
     return new bitmap_info_ogl(im, GL_RGB, ogl_accessible());
   }
 
-  virtual bitmap_info*  create_bitmap_info_rgba(image::rgba* im)
+  virtual bitmap_info*  create_bitmap_info_rgba(image::ImageRGBA* im)
   {
     return new bitmap_info_ogl(im, GL_RGBA, ogl_accessible());
   }
 
-  virtual void  delete_bitmap_info(bitmap_info* bi)
-  {
-    delete bi;
-  }
-  
-  enum video_frame_format
-  {
-    NONE,
-    YUV,
-    RGB
-  };
-
-  virtual int videoFrameFormat()
-  {
-    return RGB;
-  }
-  
   // Since we store drawing operations in display lists, we take special care
   // to store video frame operations in their own display list, lest they be
   // anti-aliased with the rest of the drawing. Since display lists cannot be
   // concatenated this means we'll add up with several display lists for normal
   // drawing operations.
-  virtual void drawVideoFrame(image::image_base* baseframe, const matrix* m, const rect* bounds)
+  virtual void drawVideoFrame(image::ImageBase* baseframe, const matrix* m, const rect* bounds)
   {
     GLint index;
 
@@ -704,9 +688,11 @@ public:
     _render_indices.push_back(index);
   }
   
-  virtual void reallyDrawVideoFrame(image::image_base* baseframe, const matrix* m, const rect* bounds)
+  virtual void reallyDrawVideoFrame(image::ImageBase* baseframe, const matrix* m, const rect* bounds)
   {
-    image::rgb* frame = static_cast<image::rgb*>(baseframe);
+    image::ImageRGB* frame = dynamic_cast<image::ImageRGB*>(baseframe);
+    
+    assert(frame);
 
     glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT);
 

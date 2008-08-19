@@ -23,7 +23,8 @@
 #include "fill_style.h"
 #include "shape.h" // for class path and class edge
 #include "render.h" // for ::display
-
+#include "image.h"
+#include "log.h"
 
 namespace gnash {
 
@@ -33,7 +34,13 @@ BitmapMovieDefinition::getShapeDef()
 {
 	if ( _shapedef ) return _shapedef.get();
 
-	_bitmap = new bitmap_character_def(_image);
+    _bitmap = new bitmap_character_def(_image);
+
+    // It's possible for this to fail.
+    if (!_bitmap.get()) return 0;
+
+    // Ownership transferred.
+    assert (!_image.get());
 
 	// Create the shape definition
 	_shapedef = new DynamicShape();
@@ -74,11 +81,11 @@ BitmapMovieDefinition::getShapeDef()
 }
 
 BitmapMovieDefinition::BitmapMovieDefinition(
-		std::auto_ptr<image::rgb> image,
+		std::auto_ptr<image::ImageBase> image,
 		const std::string& url)
 	:
 	_version(6),
-	// image::rgb size is in pixels
+	// image::ImageBase size is in pixels
 	_framesize(0, 0, image->width()*20, image->height()*20),
 	_framecount(1),
 	_framerate(12),

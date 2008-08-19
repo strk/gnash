@@ -20,7 +20,7 @@
 
 #include "cxform.h"
 #include "types.h" // for rgba type :(
-#include "stream.h" // for reading from SWF
+#include "SWFStream.h" // for reading from SWF
 #include "log.h"
 #include "utility.h" // for utility::clamp
 #include <iomanip>

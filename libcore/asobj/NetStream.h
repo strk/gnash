@@ -16,8 +16,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-#ifndef __NETSTREAM_H__
-#define __NETSTREAM_H__
+#ifndef GNASH_NETSTREAM_H
+#define GNASH_NETSTREAM_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -266,9 +266,6 @@ protected:
 	// The size of the buffer in milliseconds
 	boost::uint32_t m_bufferTime;
 
-	// The video outputformat
-	int m_videoFrameFormat;
-
 	// Are a new frame ready to be returned?
 	volatile bool m_newFrameReady;
 
@@ -276,7 +273,7 @@ protected:
 	boost::mutex image_mutex;
 
 	// The image/videoframe which is given to the renderer
-	std::auto_ptr<image::image_base> m_imageframe;
+	std::auto_ptr<image::ImageBase> m_imageframe;
 
 	// The video URL
 	std::string url;
@@ -420,7 +417,7 @@ public:
 	//
 	/// @return a image containing the video frame, a NULL auto_ptr if none were ready
 	///
-	std::auto_ptr<image::image_base> get_video();
+	std::auto_ptr<image::ImageBase> get_video();
 	
 	/// Register the character to invalidate on video updates
 	void setInvalidatedVideo(character* ch)

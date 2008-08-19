@@ -24,7 +24,7 @@
 //#include "MediaHandler.h"
 #include "MediaParser.h" // for VideoInfo
 #include "VideoDecoder.h"
-#include "stream.h" // for read()
+#include "SWFStream.h" // for read()
 
 #include <boost/bind.hpp>
 
@@ -106,7 +106,9 @@ video_stream_definition::readDefineVideoFrame(SWFStream& in, SWF::tag_type tag, 
 
     if (bytesRead < dataLength)
     {
-        throw ParserException(_("Tag boundary reported past end of stream!"));
+        throw ParserException(_("Could not read enough bytes when parsing "
+                                "VideoFrame tag. Perhaps we reached the "
+                                "end of the stream!"));
     }	
 	
 	memset(buffer + bytesRead, 0, 8);

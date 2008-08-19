@@ -24,7 +24,7 @@
 
 #include "action_buffer.h"
 #include "log.h"
-#include "stream.h"
+#include "SWFStream.h"
 #include "swf.h"
 #include "ASHandlers.h"
 #include "as_environment.h"

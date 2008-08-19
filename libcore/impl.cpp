@@ -55,6 +55,7 @@
 #include <string>
 #include <map>
 #include <memory> // for auto_ptr
+#include <algorithm>
 
 namespace gnash
 {
@@ -258,7 +259,7 @@ createBitmapMovie(std::auto_ptr<IOChannel> in, const std::string& url, FileType 
 
     try
     {
-        std::auto_ptr<image::rgb> im(image::readImageData(imageData, type));
+        std::auto_ptr<image::ImageBase> im(image::readImageData(imageData, type));
         if (!im.get())
         {
             log_error(_("Can't read image file from %s"), url);
@@ -512,111 +513,101 @@ void  clear()
 ///
 class MovieLibrary
 {
-private:
-
-  typedef struct {
-    boost::intrusive_ptr<movie_definition> def;
-    unsigned hit_count;
-  } item;
-
-  typedef std::map< std::string, item > container;
-
-  container _map;
-  unsigned _limit;
-
 public:
 
-  MovieLibrary() : 
-    _limit(8) 
-  {
-	RcInitFile& rcfile = RcInitFile::getDefaultInstance();
-	set_limit(rcfile.getMovieLibraryLimit());
-  }
-  
-  /// Sets the maximum number of items to hold in the library. When adding new
-  /// items, the one with the least hit count is being removed in that case.
-  /// Zero is a valid limit (disables library). 
-  void set_limit(unsigned limit)
-  {
-    _limit = limit;  
-    limit_size(_limit);  
-  }
+    struct LibraryItem {
+        boost::intrusive_ptr<movie_definition> def;
+        unsigned hitCount;
+    };
 
-  bool get(const std::string& key, boost::intrusive_ptr<movie_definition>* ret)
-  {
-    container::iterator it = _map.find(key);
-    if ( it != _map.end() )
+    typedef std::map<std::string, LibraryItem> LibraryContainer;
+
+    MovieLibrary() : 
+        _limit(8) 
     {
-      *ret = it->second.def;
-      it->second.hit_count++;
+        RcInitFile& rcfile = RcInitFile::getDefaultInstance();
+	    setLimit(rcfile.getMovieLibraryLimit());
+    }
+  
+    /// Sets the maximum number of items to hold in the library. When adding new
+    /// items, the one with the least hit count is being removed in that case.
+    /// Zero is a valid limit (disables library). 
+    void setLimit(unsigned limit)
+    {
+        _limit = limit;  
+        limitSize(_limit);  
+    }
+
+    bool get(const std::string& key, boost::intrusive_ptr<movie_definition>* ret)
+    {
+        LibraryContainer::iterator it = _map.find(key);
+        if ( it != _map.end() )
+        {
+            *ret = it->second.def;
+            it->second.hitCount++;
       
-      return true;
+            return true;
+        }
+        return false;
     }
-    else
-    {
-      return false;
-    }
-  }
 
 #ifdef GNASH_USE_GC
-  /// Mark all library elements as reachable (for GC)
-  void markReachableResources() const
-  {
-    for ( container::const_iterator i=_map.begin(), e=_map.end(); i!=e; ++i)
+    /// Mark all library elements as reachable (for GC)
+    void markReachableResources() const
     {
-      i->second.def->setReachable();
+        for ( LibraryContainer::const_iterator i=_map.begin(), e=_map.end(); i!=e; ++i)
+        {
+            i->second.def->setReachable();
+        }
     }
-  }
 #endif
 
-  void add(const std::string& key, movie_definition* mov)
-  {
-  
-    if (_limit)
+    void add(const std::string& key, movie_definition* mov)
     {
-      limit_size(_limit-1);
+
+        if (_limit)
+        {
+            limitSize(_limit-1);
+        }
+        else return;  // zero limit, library is a no-op
+
+        LibraryItem temp;
+
+        temp.def = mov;
+        temp.hitCount=0;
+
+        _map[key] = temp;
     }
-    else return;  // zero limit, library is a no-op
-  
-    item temp;
-    
-    temp.def = mov;
-    temp.hit_count=0;
-    
-    _map[key] = temp;
-  }
   
 
-  void clear() { _map.clear(); }
+    void clear() { _map.clear(); }
   
 private:
 
-  void limit_size(unsigned max) 
-  {
-
-    if (max < 1) 
+    static bool findWorstHitCount(const MovieLibrary::LibraryContainer::value_type& a,
+                                const MovieLibrary::LibraryContainer::value_type& b)
     {
-      clear();
-      return;
+        return (a.second.hitCount < b.second.hitCount);
     }
 
-    while (_map.size() > max) 
+    LibraryContainer _map;
+    unsigned _limit;
+
+    void limitSize(unsigned max) 
     {
 
-      // find the item with the worst hit count and remove it
-      container::iterator worst = _map.begin();
-      
-      for ( container::iterator i=_map.begin(), e=_map.end(); i!=e; ++i)
-      {
-        if (i->second.hit_count < worst->second.hit_count) 
-          worst = i;
-      }
-      
-      _map.erase(worst);
+        if (max < 1) 
+        {
+            clear();
+            return;
+        }
+
+        while (_map.size() > max) 
+        {
+            _map.erase(std::min_element(_map.begin(), _map.end(), &findWorstHitCount));
+        }
     
     }
-    
-  } //limit_size
   
 };
 

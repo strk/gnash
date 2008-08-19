@@ -22,6 +22,13 @@
 // Wrapper for jpeg file operations.  The actual work is done by the
 // IJG jpeg lib.
 
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h"
+#endif
+
+#ifdef HAVE_PTHREADS
+#include <pthread.h>
+#endif
 
 #include "utility.h"
 #include "GnashImage.h"
@@ -368,6 +375,11 @@ JpegImageInput::startImage()
 	}
 
 	_compressorOpened = true;
+	
+	// Until this point the type should be GNASH_IMAGE_INVALID.
+	// It's possible to create transparent JPEG data by merging an
+	// alpha channel, but that is handled explicitly elsewhere.
+	_type = GNASH_IMAGE_RGB;
 }
 
 
@@ -429,6 +441,15 @@ JpegImageInput::readScanline(unsigned char* rgb_data)
 			*dst-- = *src;
 		}
 	}	
+}
+
+
+void
+JpegImageInput::errorOccurred(const char* msg)
+{
+	gnash::log_debug("Long jump: banzaaaaaai!");
+	_errorOccurred = msg;
+	std::longjmp(_jmpBuf, 1);
 }
 
 
@@ -530,77 +551,53 @@ private:
 };
 
 
-
-
-
-
-// Basically this is a thin wrapper around jpeg_compress
-// object.
-class output_IOChannel : public JpegImageOutput
+JpegImageOutput::JpegImageOutput(boost::shared_ptr<IOChannel> out, size_t width, size_t height, int quality)
+    :
+    ImageOutput(out, width, height)
 {
-public:
-	// State needed for output.
-	jpeg_compress_struct m_cinfo;
-	jpeg_error_mgr m_jerr;
-
-	/// Constructor. 
-	//
-	/// Read the header data from in, and
-	///  prepare to read data.
-	output_IOChannel(gnash::IOChannel& out, int width, int height, int quality)
-	{
 		m_cinfo.err = jpeg_std_error(&m_jerr);
 
 		// Initialize decompression object.
 		jpeg_create_compress(&m_cinfo);
 
-		rw_dest_IOChannel::setup(&m_cinfo, out);
-		m_cinfo.image_width = width;
-		m_cinfo.image_height = height;
+		rw_dest_IOChannel::setup(&m_cinfo, *_outStream);
+		m_cinfo.image_width = _width;
+		m_cinfo.image_height = _height;
 		m_cinfo.input_components = 3;
 		m_cinfo.in_color_space = JCS_RGB;
 		jpeg_set_defaults(&m_cinfo);
 		jpeg_set_quality(&m_cinfo, quality, TRUE);
 
 		jpeg_start_compress(&m_cinfo, TRUE);
-	}
-
-
-	~output_IOChannel()
-	// Destructor.  Clean up our jpeg reader state.
-	{
-		jpeg_finish_compress(&m_cinfo);
-/*
-		rw_dest_IOChannel* src = (rw_source_IOChannel*) m_cinfo.dest;
-		delete dest;
-		m_cinfo.dest = NULL;
-*/
-		jpeg_destroy_compress(&m_cinfo);
-	}
-
-
-	void	write_scanline(unsigned char* rgb_data)
-	// Write out a single scanline.
-	{
-		jpeg_write_scanlines(&m_cinfo, &rgb_data, 1);
-	}
-};
-
-
-void
-JpegImageInput::errorOccurred(const char* msg)
-{
-	gnash::log_debug("Long jump: banzaaaaaai!");
-	_errorOccurred = msg;
-	std::longjmp(_jmpBuf, 1);
 }
 
 
-/*static*/
-JpegImageOutput*
-JpegImageOutput::create(gnash::IOChannel* in, int width, int height, int quality)
+JpegImageOutput::~JpegImageOutput()
 {
-	return new output_IOChannel(*in, width, height, quality);
+		jpeg_finish_compress(&m_cinfo);
+		jpeg_destroy_compress(&m_cinfo);
+}
+
+
+void
+JpegImageOutput::writeImageRGB(unsigned char* rgbData)
+{
+    // RGB...
+    const size_t components = 3;
+
+    for (size_t y = 0; y < _height; ++y)
+    {
+        unsigned char* ypos = &rgbData[y * _width * components];
+        jpeg_write_scanlines(&m_cinfo, &ypos, 1);
+    }
+}
+
+
+std::auto_ptr<ImageOutput>
+JpegImageOutput::create(boost::shared_ptr<IOChannel> out, size_t width, size_t height, int quality)
+{
+    std::auto_ptr<ImageOutput> outChannel(new JpegImageOutput(out, width, height, quality));
+    return outChannel;
 }
 
 } // namespace gnash

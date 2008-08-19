@@ -30,7 +30,6 @@
 
 namespace gnash {
 	class IOChannel;
-	class sprite_instance; // for fscommand_callback typedef
 	class movie_definition; // for create_movie
 	class render_handler; // for set_render_handler 
 	class URL; // for set_base_url
@@ -78,14 +77,6 @@ DSOEXPORT void set_base_url(const URL& url);
 
 /// Return base url
 DSOEXPORT const gnash::URL& get_base_url();
-
-/// Signature of fscommand callback function
-typedef void (*fscommand_callback)(sprite_instance* movie,
-						const std::string& command, const std::string& arg);
-
-/// Signature of interface event callback.
-typedef std::string (*interfaceEventCallback)(const std::string& event,
-                                              const std::string& arg);
 
 // Some helpers that may or may not be compiled into your
 // version of the library, depending on platform etc.

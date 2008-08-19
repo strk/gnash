@@ -256,8 +256,8 @@ character::x_getset(const fn_call& fn)
 	{
 		const double newx = fn.arg(0).to_number();
 		matrix m = ptr->get_matrix();
-        m.set_x_translation(PIXELS_TO_TWIPS(utility::infinite_to_zero(newx)));
-		ptr->set_matrix(m);
+		m.set_x_translation(PIXELS_TO_TWIPS(utility::infinite_to_zero(newx)));
+		ptr->set_matrix(m); // no need to update caches when only changing translation
 		ptr->transformedByScript(); // m_accept_anim_moves = false; 
 	}
 	return rv;
@@ -280,7 +280,7 @@ character::y_getset(const fn_call& fn)
 		const double newy = fn.arg(0).to_number();
 		matrix m = ptr->get_matrix();
 		m.set_y_translation(PIXELS_TO_TWIPS(utility::infinite_to_zero(newy)));
-		ptr->set_matrix(m);
+		ptr->set_matrix(m); // no need to update caches when only changing translation
 		ptr->transformedByScript(); // m_accept_anim_moves = false; 
 	}
 	return rv;
@@ -295,29 +295,24 @@ character::xscale_getset(const fn_call& fn)
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
 	{
-		matrix m = ptr->get_matrix();
-		const double xscale = m.get_x_scale();
-		rv = as_value(xscale * 100); // result in percent
+		return as_value(ptr->_xscale);
 	}
 	else // setter
 	{
-		matrix m = ptr->get_matrix();
-
 		const double scale_percent = fn.arg(0).to_number();
 
 		// Handle bogus values
-		if (isnan(scale_percent))
+		if (isNaN(scale_percent))
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
 			log_aserror(_("Attempt to set _xscale to %g, refused"),
                             scale_percent);
 			);
-            return as_value();
+			return as_value();
 		}
 
 		// input is in percent
-		double scale = scale_percent / 100.0;
-		ptr->set_x_scale(scale);
+		ptr->set_x_scale(scale_percent);
 	}
 	return rv;
 
@@ -331,18 +326,14 @@ character::yscale_getset(const fn_call& fn)
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
 	{
-		matrix m = ptr->get_matrix();
-		const float yscale = m.get_y_scale();
-		rv = as_value(yscale * 100); // result in percent
+		return ptr->_yscale;
 	}
 	else // setter
 	{
-		matrix m = ptr->get_matrix();
-
 		const double scale_percent = fn.arg(0).to_number();
 
 		// Handle bogus values
-		if (isnan(scale_percent))
+		if (isNaN(scale_percent))
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
 			log_aserror(_("Attempt to set _yscale to %g, refused"),
@@ -352,8 +343,7 @@ character::yscale_getset(const fn_call& fn)
 		}
 
 		// input is in percent
-		double scale = scale_percent / 100.0;
-		ptr->set_y_scale(scale);
+		ptr->set_y_scale(scale_percent);
 	}
 	return rv;
 
@@ -530,7 +520,7 @@ character::height_getset(const fn_call& fn)
 			);
 		}
 
-		ptr->set_y_scale( newheight / oldheight );
+		ptr->set_y_scale( 100 * (newheight / oldheight) );
 	}
 
 	return rv;
@@ -544,20 +534,24 @@ character::rotation_getset(const fn_call& fn)
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
 	{
-		double  angle = ptr->get_matrix().get_rotation();
-        // convert radian to degree
-		angle *= 180.0 / PI;
-		rv = as_value(angle);
+		return ptr->_rotation;
 	}
 	else // setter
 	{
-		matrix m = ptr->get_matrix();
 		// input is in degrees
-		double  rotation = fn.arg(0).to_number() * PI / 180.0;
-		m.set_rotation(rotation);
+		double  rotation_val = fn.arg(0).to_number();
 
-		ptr->set_matrix(m);
-		ptr->transformedByScript(); 
+		// Handle bogus values
+		if (isNaN(rotation_val))
+		{
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror(_("Attempt to set _rotation to %g, refused"),
+                            rotation_val);
+			);
+			return as_value();
+		}
+
+		ptr->set_rotation(rotation_val);
 	}
 	return rv;
 }
@@ -608,6 +602,34 @@ character::name_getset(const fn_call& fn)
 	}
 
 	return as_value();
+}
+
+void
+character::copyMatrix(const character& c)
+{
+	m_matrix = c.m_matrix;
+	_xscale = c._xscale;
+	_yscale = c._yscale;
+	_rotation = c._rotation;
+}
+
+void
+character::set_matrix(const matrix& m, bool updateCache)
+{
+        assert(m.is_valid());
+        if (!(m == m_matrix))
+        {
+		set_invalidated(__FILE__, __LINE__);
+		m_matrix = m;
+
+		if ( updateCache ) // don't update caches if matrix wasn't updated too
+		{
+			_xscale = m_matrix.get_x_scale() * 100.0;
+			_yscale = m_matrix.get_y_scale() * 100.0;
+			_rotation = m_matrix.get_rotation() * 180.0 / PI;
+		}
+        }
+	
 }
 
 void
@@ -735,25 +757,59 @@ character::getUserDefinedEventHandler(string_table::key key) const
 }
 
 void
-character::set_x_scale(float x_scale)
+character::set_x_scale(double scale_percent)
 {
+	_xscale = scale_percent;
+
+	double xscale = _xscale / 100.0;
+	double yscale = _yscale / 100.0;
+	double rotation = _rotation * PI / 180.0;
+
 	matrix m = get_matrix();
+	m.set_scale_rotation(xscale, yscale, rotation);
+	set_matrix(m); // we updated the cache ourselves
 
-	m.set_x_scale(x_scale);
-
-	set_matrix(m);
-	transformedByScript(); // m_accept_anim_moves = false; 
+	transformedByScript(); 
 }
 
 void
-character::set_y_scale(float y_scale)
+character::set_rotation(double rot)
 {
+	// Translate to the -180 .. 180 range
+	rot = fmod (rot, 360.0);
+	if (rot > 180.0)
+		rot -= 360.0;
+	else if (rot < -180.0)
+		rot += 360.0;
+
+	//log_debug("_rotation: %d", rot);
+	_rotation = rot;
+
+	double xscale = _xscale / 100.0;
+	double yscale = _yscale / 100.0;
+	double rotation = _rotation * PI / 180.0;
+
 	matrix m = get_matrix();
+	m.set_scale_rotation(xscale, yscale, rotation);
+	set_matrix(m); // we updated the cache ourselves
 
-	m.set_y_scale(y_scale);
+	transformedByScript(); 
+}
 
-	set_matrix(m);
-	transformedByScript(); // m_accept_anim_moves = false; 
+void
+character::set_y_scale(double scale_percent)
+{
+	_yscale = scale_percent;
+
+	double xscale = _xscale / 100.0;
+	double yscale = _yscale / 100.0;
+	double rotation = _rotation * PI / 180.0;
+
+	matrix m = get_matrix();
+	m.set_scale_rotation(xscale, yscale, rotation);
+	set_matrix(m); // we updated the cache ourselves
+
+	transformedByScript(); 
 }
 
 

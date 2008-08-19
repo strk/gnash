@@ -305,7 +305,7 @@ DisplayList::replace_character(
     if (use_old_matrix)
     {
       // Use the matrix from the old character.
-      ch->set_matrix(oldch->get_matrix());
+      ch->copyMatrix(*oldch); // copy matrix and caches
     }
     
     // remember bounds of old char
@@ -390,7 +390,7 @@ DisplayList::move_character(
   }
   if (mat)
   {
-    ch->set_matrix(*mat);
+    ch->set_matrix(*mat, true); // update matrix caches
   }
   if(ratio)
   {
@@ -981,7 +981,7 @@ DisplayList::mergeDisplayList(DisplayList & newList)
 					// static transformation.
                     if( chOld->get_accept_anim_moves() )
                     {
-                        chOld->set_matrix(chNew->get_matrix());
+                        chOld->copyMatrix(*chNew); // copy matrix and caches 
                         chOld->set_cxform(chNew->get_cxform());
                     }
                     chNew->unload();
