@@ -370,16 +370,14 @@ fill_style::sample_gradient(boost::uint8_t ratio) const
     if (ratio < m_gradients[0].m_ratio)
     {
         IF_VERBOSE_MALFORMED_SWF(
-            static bool warned=false;
-            if ( ! warned ) {
-            log_swferror(
-                _("First gradient in a fill_style "
-                "have position==%d (expected 0)."
-                " This seems to be common, so will"
-                " warn only once."),
-                    (int)m_gradients[0].m_ratio);
-            warned=true;
-            }
+            LOG_ONCE(
+                log_swferror(
+                    _("First gradient in a fill_style "
+                    "have position==%d (expected 0)."
+                    " This seems to be common, so will"
+                    " warn only once."),
+                    (int)m_gradients[0].m_ratio)
+            );
         );
         return m_gradients[0].m_color;
     }
