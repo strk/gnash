@@ -52,15 +52,7 @@
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/scoped_array.hpp>
 
-#ifndef MAXHOSTNAMELEN
-#define MAXHOSTNAMELEN 256
-#endif
-
 #define GNASH_XMLSOCKET_DEBUG
-
-int xml_fd = 0;                 // FIXME: This file descriptor is used by
-                                // XML::checkSocket() when called from the main
-                                // processing loop. 
 
 namespace gnash {
 
@@ -78,16 +70,12 @@ static as_object* getXMLSocketInterface();
 static void attachXMLSocketInterface(as_object& o);
 static void attachXMLSocketProperties(as_object& o);
 
-const int SOCKET_DATA = 1;
-  
-const int INBUF = 10000;
-
-class DSOLOCAL xmlsocket_as_object : public gnash::as_object
+class XMLSocket_as : public as_object
 {
 
 public:
 
-        xmlsocket_as_object()
+        XMLSocket_as()
                 :
                 as_object(getXMLSocketInterface())
         {
@@ -111,15 +99,13 @@ public:
 
   
 XMLSocket::XMLSocket()
+    :
+    _data(false),
+    _xmldata(false),
+    _closed(false),
+    _processing(false)
 {
-//    GNASH_REPORT_FUNCTION;
-    _data = false;
-    _xmldata = false;
-    _closed = false;
-    _processing = false;
-    _port = 0;
-    _sockfd = 0;
-    xml_fd = 0;
+    GNASH_REPORT_FUNCTION;
 }
 
 XMLSocket::~XMLSocket()
@@ -196,7 +182,9 @@ XMLSocket::anydata(int fd, MessageList& msgs)
     //GNASH_REPORT_FUNCTION;
 
 
-    char                  buf[INBUF];
+    const int bufSize = 10000;
+
+    char                  buf[bufSize];
     char                  *packet;
     char                  *ptr, *eom;
     int                   cr, index = 0;
@@ -237,9 +225,9 @@ XMLSocket::anydata(int fd, MessageList& msgs)
             //    __FUNCTION__, fd);
         }
 
-        memset(buf, 0, INBUF);
+        memset(buf, 0, bufSize);
 
-        ret = read(_sockfd, buf, INBUF-2);
+        ret = read(_sockfd, buf, bufSize - 2);
         cr = strlen(buf);
 
         log_debug(_("%s: read %d bytes, first msg terminates at %d"), __FUNCTION__, ret, cr);
@@ -431,7 +419,7 @@ xmlsocket_connect(const fn_call& fn)
     log_debug(_("XMLSocket.connect(%s) called"), ss.str().c_str());
 #endif
 
-    boost::intrusive_ptr<xmlsocket_as_object> ptr = ensureType<xmlsocket_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<XMLSocket_as> ptr = ensureType<XMLSocket_as>(fn.this_ptr);
 
     if (ptr->obj.connected())
     {
@@ -479,7 +467,7 @@ xmlsocket_send(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
     
-    boost::intrusive_ptr<xmlsocket_as_object> ptr = ensureType<xmlsocket_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<XMLSocket_as> ptr = ensureType<XMLSocket_as>(fn.this_ptr);
     const std::string& object = fn.arg(0).to_string();
     //  log_debug(_("%s: host=%s, port=%g"), __FUNCTION__, host, port);
     return as_value(ptr->obj.send(object));
@@ -490,7 +478,7 @@ xmlsocket_close(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
     
-    boost::intrusive_ptr<xmlsocket_as_object> ptr = ensureType<xmlsocket_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<XMLSocket_as> ptr = ensureType<XMLSocket_as>(fn.this_ptr);
     // Since the return code from close() doesn't get used by Shockwave,
     // we don't care either.
     ptr->obj.close();
@@ -503,7 +491,7 @@ xmlsocket_new(const fn_call& fn)
     //GNASH_REPORT_FUNCTION;
     //log_debug(_("%s: nargs=%d"), __FUNCTION__, nargs);
     
-    boost::intrusive_ptr<as_object> xmlsock_obj = new xmlsocket_as_object;
+    boost::intrusive_ptr<as_object> xmlsock_obj = new XMLSocket_as;
 
 #ifdef GNASH_XMLSOCKET_DEBUG
     std::stringstream ss;
@@ -525,7 +513,7 @@ xmlsocket_inputChecker(const fn_call& fn)
     as_value	method;
     as_value	val;
     
-    boost::intrusive_ptr<xmlsocket_as_object> ptr = ensureType<xmlsocket_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<XMLSocket_as> ptr = ensureType<XMLSocket_as>(fn.this_ptr);
     if ( ! ptr->obj.connected() )
     {
         log_error(_("%s: not connected"), __FUNCTION__);
@@ -545,7 +533,7 @@ xmlsocket_onData(const fn_call& fn)
     as_value	method;
     as_value	val;
     
-    boost::intrusive_ptr<xmlsocket_as_object> ptr = ensureType<xmlsocket_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<XMLSocket_as> ptr = ensureType<XMLSocket_as>(fn.this_ptr);
 
     if ( fn.nargs < 1 )
     {
@@ -631,7 +619,7 @@ void xmlsocket_class_init(as_object& global)
 }
 
 boost::intrusive_ptr<as_function>
-xmlsocket_as_object::getEventHandler(const std::string& name)
+XMLSocket_as::getEventHandler(const std::string& name)
 {
 	boost::intrusive_ptr<as_function> ret;
 
@@ -643,7 +631,7 @@ xmlsocket_as_object::getEventHandler(const std::string& name)
 }
 
 void
-xmlsocket_as_object::checkForIncomingData()
+XMLSocket_as::checkForIncomingData()
 {
     assert(obj.connected());
 

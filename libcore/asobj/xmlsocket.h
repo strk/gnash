@@ -26,10 +26,8 @@
 #include <string>
 
 namespace gnash {
-
-extern const int SOCKET_DATA;
   
-class DSOLOCAL XMLSocket : public Network {
+class XMLSocket : public Network {
 public:
     XMLSocket();
     ~XMLSocket();
