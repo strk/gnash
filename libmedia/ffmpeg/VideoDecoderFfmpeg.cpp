@@ -36,8 +36,6 @@ extern "C" {
 #endif
 
 #include <boost/scoped_array.hpp>
-//#include <boost/foreach.hpp>
-#include <boost/bind.hpp>
 #include <algorithm>
 
 namespace gnash {
@@ -253,15 +251,17 @@ VideoDecoderFfmpeg::flashToFfmpegCodec(videoCodecType format)
 #ifdef FFMPEG_VP6
         case VIDEO_CODEC_VP6:
             return CODEC_ID_VP6F;
+#endif
+#ifdef FFMPEG_VP6A
         case VIDEO_CODEC_VP6A:
-            return CODEC_ID_VP6A;
+	        return CODEC_ID_VP6A;
 #endif
         case VIDEO_CODEC_SCREENVIDEO:
             return CODEC_ID_FLASHSV;
         default:
-        log_error(_("Unsupported video codec %d"),
-            static_cast<int>(format));
-        return CODEC_ID_NONE;
+            log_error(_("Unsupported video codec %d"),
+                static_cast<int>(format));
+            return CODEC_ID_NONE;
     }
 }
 
