@@ -21,6 +21,7 @@
 
 namespace gnash{
 
+//TODO: Should we create a new machine for each abc_function.
 abc_function::abc_function(CodeStream* stream, Machine* machine):as_function(){
 		mStream = stream;
 		mMachine = machine;
@@ -31,7 +32,7 @@ as_value
 abc_function::operator()(const fn_call& fn)
 {
 	log_debug("Calling an abc_function.");
-	mMachine->executeCodeblock(mStream);
+	mMachine->executeFunction(mStream);
 	return as_value();
 }
 

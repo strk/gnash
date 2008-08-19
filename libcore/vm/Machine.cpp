@@ -1237,6 +1237,9 @@ Machine::execute()
 		}
 		else{
 			restoreState();
+			if(mExitWithReturn){
+				return;
+			}
 		}
 		// Slot the return.
 //		*mGlobalReturn = as_value();
@@ -2623,8 +2626,19 @@ void Machine::initMachine(abc_block* pool_block,as_object* global)
 	mRegisters[0] = as_value(global);
 }
 
-void Machine::executeCodeblock(CodeStream* stream){
+//This is called by abc_functions to execute their code stream.
+//TODO: There is probably a better way to do this, once we understand what the VM is supposed
+//todo, this should be fixed.
+void Machine::executeFunction(CodeStream* stream){
+	
+	mExitWithReturn = true;
 	saveState();
+	executeCodeblock(stream);
+	mExitWithReturn = false;
+}
+
+void Machine::executeCodeblock(CodeStream* stream){
+
 	mStream = stream;
 	execute();
 //	restoreState();
@@ -2636,7 +2650,7 @@ void Machine::instantiateClass(std::string className){
 	executeCodeblock(theClass->getConstructor()->getBody());
 }
 
-Machine::Machine(string_table &ST, ClassHierarchy *CH):mST(),mRegisters()
+Machine::Machine(string_table &ST, ClassHierarchy *CH):mST(),mRegisters(),mExitWithReturn(false)
 {
 	mCH = CH;
 	//Local registers should be initialized at the beginning of each function call, but

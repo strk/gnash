@@ -206,7 +206,7 @@ public:
 
 	void initMachine(abc_block* pool_block,as_object* global);
 
-	void executeCodeblock(CodeStream* stream);
+	void executeFunction(CodeStream* stream);
 
 	void instantiateClass(std::string className);
 
@@ -344,6 +344,8 @@ private:
 		return env;
 	}
 
+	void executeCodeblock(CodeStream* stream);
+
 	SafeStack<as_value> mStack;
 	SafeStack<State> mStateStack;
 	SafeStack<Scope> mScopeStack;
@@ -364,6 +366,7 @@ private:
 	as_value mIgnoreReturn; // Throw away returns go here.
 
 	bool mIsAS3; // Is the stream an AS3 stream.
+	bool mExitWithReturn;
 	abc_block* mPoolObject; // Where all of the pools are stored.
 };
 
