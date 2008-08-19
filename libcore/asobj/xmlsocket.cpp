@@ -186,25 +186,27 @@ void XMLSocket::processing(bool x)
 bool
 XMLSocket::anydata(int fd, MessageList& msgs)
 {
-    //GNASH_REPORT_FUNCTION;
-
-    fd_set                fdset;
-    struct timeval        tval;
-    int                   ret = 0;
-    char                  buf[INBUF];
-    char                  *packet;
-    int                   retries = 10;
-    char                  *ptr, *eom;
-    int                   cr, index = 0;
-    boost::scoped_array<char> leftover;
-    int                   adjusted_size;
-    
-    
+   
     if (fd <= 0) {
 	log_error(_("%s: fd <= 0, returning false (timer not unregistered while socket disconnected?"), __FUNCTION__);
         return false;
     }
+
+
+    //GNASH_REPORT_FUNCTION;
+
+
+    char                  buf[INBUF];
+    char                  *packet;
+    char                  *ptr, *eom;
+    int                   cr, index = 0;
+    boost::scoped_array<char> leftover;
     
+
+    fd_set                fdset;
+    struct timeval        tval;
+    size_t retries = 10;
+
     while (retries-- > 0) {
         FD_ZERO(&fdset);
         FD_SET(fd, &fdset);
@@ -212,7 +214,7 @@ XMLSocket::anydata(int fd, MessageList& msgs)
         tval.tv_sec = 0;
         tval.tv_usec = 103;
         
-        ret = ::select(fd+1, &fdset, NULL, NULL, &tval);
+        int ret = select(fd + 1, &fdset, NULL, NULL, &tval);
         
         // If interupted by a system call, try again
         if (ret == -1 && errno == EINTR) {
@@ -234,16 +236,20 @@ XMLSocket::anydata(int fd, MessageList& msgs)
             //log_debug(_("%s: There is data in the socket for fd #%d"),
             //    __FUNCTION__, fd);
         }
+
         memset(buf, 0, INBUF);
-        ret = ::read(_sockfd, buf, INBUF-2);
+
+        ret = read(_sockfd, buf, INBUF-2);
         cr = strlen(buf);
+
         log_debug(_("%s: read %d bytes, first msg terminates at %d"), __FUNCTION__, ret, cr);
-        //log_debug(_("%s: read (%d,%d) %s"), __FUNCTION__, buf[0], buf[1], buf);
+
         ptr = buf;
+
         // If we get a single XML message, do less work
         if (ret == cr + 1)
 		{
-            adjusted_size = memadjust(ret + 1);
+            int adjusted_size = memadjust(ret + 1);
             packet = new char[adjusted_size];
             log_debug(_("Packet size is %d at %p"), ret + 1, packet);
             memset(packet, 0, adjusted_size);
@@ -265,7 +271,7 @@ XMLSocket::anydata(int fd, MessageList& msgs)
                 processing(false);
                 //log_debug(_("%s: The remainder is: \"%s\""), __FUNCTION__, leftover.get());
                 //log_debug(_("%s: The rest of the message is: \"%s\""), __FUNCTION__, ptr);
-                adjusted_size = memadjust(cr + strlen(leftover.get()) + 1);
+                int adjusted_size = memadjust(cr + strlen(leftover.get()) + 1);
                 packet = new char[adjusted_size];
                 memset(packet, 0, adjusted_size);
                 strcpy(packet, leftover.get());
@@ -278,7 +284,7 @@ XMLSocket::anydata(int fd, MessageList& msgs)
                 ptr = strchr(ptr, '\n') + 2; // messages are delimited by a "\n\0"
                 leftover.reset();
             } else {
-                adjusted_size = memadjust(cr + 1);
+                int adjusted_size = memadjust(cr + 1);
                 packet = new char[adjusted_size];
                 memset(packet, 0, adjusted_size);
                 strcpy(packet, ptr);
@@ -313,7 +319,7 @@ XMLSocket::anydata(int fd, MessageList& msgs)
         log_debug(_("%s: Returning %d messages"), __FUNCTION__, index);
         return true;
         
-    } // end of while (retires)
+    } // end of while (retries)
     
     return true;
 }
@@ -332,7 +338,7 @@ XMLSocket::send(std::string str)
     
     int ret = write(_sockfd, str.c_str(), str.size());
     
-    log_debug(_("%s: sent %d bytes, data was %s"), __FUNCTION__, ret, str.c_str());
+    log_debug(_("%s: sent %d bytes, data was %s"), __FUNCTION__, ret, str);
     if (ret == static_cast<signed int>(str.size())) {
         return true;
     } else {
