@@ -156,7 +156,7 @@ PngImageInput::read()
     // Convert indexed images to RGB
     if (type == PNG_COLOR_TYPE_PALETTE)
     {
-        log_debug("Convertin palette PNG to RGB(A)");
+        log_debug("Converting palette PNG to RGB(A)");
         png_set_palette_to_rgb(_pngPtr);
     }
     
@@ -167,19 +167,30 @@ PngImageInput::read()
         png_set_gray_1_2_4_to_8(_pngPtr);
     }
 
+    // Apply the transparency block if it exists.
+    if (png_get_valid(_pngPtr, _infoPtr, PNG_INFO_tRNS))
+    {
+        log_debug("Applying transparency block");
+        png_set_tRNS_to_alpha(_pngPtr);
+        _type = GNASH_IMAGE_RGBA;
+    }
+
     // Make 16-bit data into 8-bit data
     if (bitDepth == 16) png_set_strip_16(_pngPtr);
 
-    // Set the type of the image.
-    if (type & PNG_COLOR_MASK_ALPHA)
+    // Set the type of the image if it hasn't been set already.
+    if (_type == GNASH_IMAGE_INVALID)
     {
-        log_debug("Loading PNG image with alpha");
-        _type = GNASH_IMAGE_RGBA;
-    }
-    else
-    {
-        log_debug("Loading PNG image without alpha");
-        _type = GNASH_IMAGE_RGB;
+        if (type & PNG_COLOR_MASK_ALPHA)
+        {
+            log_debug("Loading PNG image with alpha");
+            _type = GNASH_IMAGE_RGBA;
+        }
+        else
+        {
+            log_debug("Loading PNG image without alpha");
+            _type = GNASH_IMAGE_RGB;
+        }
     }
 
     // Convert 1-channel grey images to 3-channel RGB.
@@ -196,9 +207,11 @@ PngImageInput::read()
 
     const size_t components = getComponents();
 
+    log_debug ("Components: %d, type: %d", components, _type);
+
     // We must have 3 or 4-channel data by this point.
-    assert((_type == GNASH_IMAGE_RGB && components == 3) ||
-           (_type == GNASH_IMAGE_RGBA && components == 4));
+    assert(_type == GNASH_IMAGE_RGB && components == 3 ||
+           _type == GNASH_IMAGE_RGBA && components == 4);
 
     // Allocate space for the data
     _pixelData.reset(new png_byte[width * height * components]);
