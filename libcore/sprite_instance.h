@@ -590,7 +590,7 @@ public:
     virtual void    on_event_xmlsocket_onxml()
     {
         log_debug("FIXME: %s: unimplemented\n", __FUNCTION__);
-        on_event(event_id::SOCK_XML);
+        on_event(event_id::XML);
     }
         
     /// Do the events that (appear to) happen on a
