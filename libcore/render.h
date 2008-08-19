@@ -1,21 +1,38 @@
-// render.h	-- Thatcher Ulrich <tu@tulrich.com> 2003
+// render.h Rendering interface for Gnash
+// 
+//   Copyright (C) 2008 Free Software Foundation, Inc.
+// 
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// This source code has been donated to the Public Domain.  Do
-// whatever you want with it.
-
-// Interface to renderer back-end.
+// Based on original by Willem Kokke <willem@mindparity.com> 2003
 
 
 #ifndef GNASH_RENDER_H
 #define GNASH_RENDER_H
 
-
-#include "types.h"
 #include "gnash.h"
-#include "image.h"
 #include "render_handler.h"
 #include "dsodefs.h"
 
+// Forward declarations
+namespace gnash {
+    class rgba;
+    namespace image {
+        class ImageBase;
+    }
+}
 
 namespace gnash {
 
@@ -39,30 +56,10 @@ namespace gnash {
 	namespace render
 	{
 		/// See render_handler::create_bitmap_info_rgb (in backend/render_handler.h)
-		bitmap_info*	create_bitmap_info_rgb(image::rgb* im);
-
-		/// See render_handler::create_bitmap_info_rgba (in backend/render_handler.h)
-		bitmap_info*	create_bitmap_info_rgba(image::rgba* im);
-
-		/// See render_handler::delete_bitmap_info (in backend/render_handler.h)
-		void	delete_bitmap_info(bitmap_info* bi);
-
-		/// The different video frame formats
-		//
-		/// TODO: remove this duplication, original is in gnash::render_handler
-		///
-		enum video_frame_format
-		{
-			NONE,
-			YUV,
-			RGB
-		};
-
-		/// See render_handler::videoFrameFormat (in backend/render_handler.h)
-		int videoFrameFormat();
+		bitmap_info* createBitmapInfo(std::auto_ptr<image::ImageBase> im);
 
 		/// See render_handler::drawVideoFrame (in backend/render_handler.h)
-		void drawVideoFrame(image::image_base* frame, const matrix* mat, const rect* bounds);
+		void drawVideoFrame(image::ImageBase* frame, const matrix* mat, const rect* bounds);
 
 		/// See render_handler::begin_display (in backend/render_handler.h)
 		void	begin_display(
@@ -73,17 +70,6 @@ namespace gnash {
 
 		/// See render_handler::end_display (in backend/render_handler.h)
 		void	end_display();
-
-		/// \brief
-		/// Draw triangles using the current fill-style 0.
-		/// Clears the style list after rendering.
-		//
-		/// coords is a list of (x,y) coordinate pairs, in
-		/// triangle-strip order.  The type of the array should
-		/// be float[vertex_count*2]
-		///
-		void	draw_mesh_strip(const boost::int16_t coords[],
-				int vertex_count);
 
 		/// See render_handler::draw_line_strip (in backend/render_handler.h)
 		void	draw_line_strip(const boost::int16_t coords[],

@@ -17,8 +17,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-#ifndef __VIDEODECODERFFMPEG_H__
-#define __VIDEODECODERFFMPEG_H__
+#ifndef GNASH_VIDEODECODERFFMPEG_H
+#define GNASH_VIDEODECODERFFMPEG_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -57,7 +57,7 @@ public:
   
   void push(const EncodedVideoFrame& buffer);
 
-  std::auto_ptr<image::rgb> pop();
+  std::auto_ptr<image::ImageBase> pop();
   
   bool peek();
   
@@ -77,15 +77,15 @@ public:
   //
   /// @return CODEC_ID_NONE for unsupported flash codecs
   ///
-  DSOEXPORT static enum CodecID FlashToFfmpegCodec(videoCodecType format);
+  DSOEXPORT static enum CodecID flashToFfmpegCodec(videoCodecType format);
 
 private:
 
   void init(enum CodecID format, int width, int height, boost::uint8_t* extradata=0, int extradataSize=0);
 
-  std::auto_ptr<image::rgb> decode(const boost::uint8_t* input, boost::uint32_t input_size);
+  std::auto_ptr<image::ImageBase> decode(const boost::uint8_t* input, boost::uint32_t input_size);
 
-  std::auto_ptr<image::rgb> decode(const EncodedVideoFrame* vf)
+  std::auto_ptr<image::ImageBase> decode(const EncodedVideoFrame* vf)
   {
   	return decode(vf->data(), vf->dataSize());
   }

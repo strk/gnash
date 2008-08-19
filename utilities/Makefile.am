@@ -35,7 +35,7 @@ GNASH_LIBS = \
 AM_LDFLAGS = \
 	$(LIBADD_DL) \
 	$(LIBLTDL) \
-        $(MYSQL_LIBS) \
+	$(MYSQL_LIBS) \
 	$(LIBXML_LIBS) \
 	$(CURL_LIBS) \
 	$(BOOST_LIBS) \
@@ -83,7 +83,7 @@ endif
  GNASH_LIBS += $(GLIB_LIBS) $(GSTREAMER_LIBS)
 #endif
 
-bin_PROGRAMS = gprocessor soldumper dumpshm
+bin_PROGRAMS = gprocessor soldumper dumpshm flvdumper #rtmpget
 #check_PROGRAMS = gdebug.swf
 
 gprocessor_SOURCES = processor.cpp
@@ -98,6 +98,12 @@ dumpshm_LDADD = $(GNASH_LIBS)
 
 soldumper_SOURCES = soldumper.cpp
 soldumper_LDADD = $(GNASH_LIBS)
+
+flvdumper_SOURCES = flvdumper.cpp
+flvdumper_LDADD = $(GNASH_LIBS)
+
+rtmpget_SOURCES = rtmpget.cpp
+rtmpget_LDADD = $(GNASH_LIBS)
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:

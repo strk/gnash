@@ -212,6 +212,7 @@ test_read(std::string &filespec)
         }
 //        sol.dump();
     }
+    delete hex1;
 }
 
 void
@@ -304,7 +305,7 @@ test_write(std::string &filespec)
     } else {
         runtest.fail("defaultcamera set");
     }
-
+    
     dub = 100.0;
     el = new amf::Element;
 //    el = new amf::Element("defaultklimit", dub);

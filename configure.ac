@@ -707,7 +707,8 @@ AC_ARG_ENABLE(mit-shm,
   no)  xmitshm=no ;;
   *)   AC_MSG_ERROR([bad value ${enableval} for --enable-mit-shm option]) ;;
 esac],xmitshm=yes)
-if test "x${xmitshm}" = "xyes"; then
+dnl as windows doesn't run X11, don't enable this extension there.
+if test "x${xmitshm}" = "xyes" -a "x${windows}" = "xno"; then
 	AC_DEFINE(ENABLE_MIT_SHM, [1], [Use MIT-SHM X extension if available])
 fi
 
@@ -1366,6 +1367,10 @@ fi
 dnl AC_CHECK_FUNCS(strcasecmp stricmp)
 dnl AC_CHECK_FUNCS(vsnprintf)
 
+dnl These two tests need the math library or they won't link
+dnl on OpenBSD, even if the functions exist.
+save_LIBS=$LIBS
+LIBS="$LIBS -lm"
 AC_CACHE_CHECK([for finite], ac_cv_finite,
  [AC_TRY_LINK([#include <math.h>],
  [double x; int y; y = finite(x);],
@@ -1385,6 +1390,7 @@ AC_CACHE_CHECK([for isfinite], ac_cv_isfinite,
 if test x"$ac_cv_isfinite" = x"yes"; then
   AC_DEFINE(HAVE_ISFINITE, [1], [Has isfinite])
 fi
+LIBS=$save_LIBS
 
 AC_LANG_PUSH(C++)
 AC_CACHE_CHECK([whether $CXX implements __PRETTY_FUNCTION__], ac_cv_implements___PRETTY_FUNCTION__, [
@@ -1510,7 +1516,7 @@ AC_SUBST(WINDRES)
 
 GNASH_PKG_FIND(z, [zlib.h], [zlib compression library], compress)
 GNASH_PKG_FIND(jpeg, [jpeglib.h], [jpeg images], jpeg_mem_init)
-GNASH_PKG_FIND(png, [png.h], [png images], png_info_init)
+GNASH_PKG_FIND(libpng, [png.h], [png images], png_info_init)
 GNASH_PKG_FIND(gif, [gif_lib.h], [gif images], DGifOpen)
 GNASH_PKG_INCLUDES([dejagnu], [dejagnu.h])
 
@@ -1945,7 +1951,6 @@ if test x"$GCC" = x"yes"; then
     -Wreturn-type \
     -Wnon-virtual-dtor \
     -Wunused \
-    -Wextra \   
     #-ansi \
     "
   CFLAGS="$CFLAGS \
@@ -1961,6 +1966,7 @@ if test x"$GCC" = x"yes"; then
     "
   if test x"$strict" = x"yes"; then
     CXXFLAGS="$CXXFLAGS \
+      -Wextra \   
       -pedantic \
       -Wno-long-long \
       "
@@ -2388,13 +2394,13 @@ else
   echo "               or .rpm users: yum install libungif-devel" >&3
 fi
 
-if test x"${PNG_LIBS}" != x ; then
-  if test x"${PNG_CFLAGS}" != x ; then
-    echo "        PNG flags are: $PNG_CFLAGS"
+if test x"${LIBPNG_LIBS}" != x ; then
+  if test x"${LIBPNG_CFLAGS}" != x ; then
+    echo "        PNG flags are: $LIBPNG_CFLAGS"
   else
     echo "        PNG flags are: default include path"
   fi
-  echo "        PNG libs are: $PNG_LIBS"
+  echo "        PNG libs are: $LIBPNG_LIBS"
 else
   echo "        WARNING: No PNG library development package installed!" >&4
   echo "                 Gnash will be built without support for dynamic loading of PNG files." >&4

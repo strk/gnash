@@ -183,7 +183,7 @@ static inline asName pool_name(boost::uint32_t index, abc_block* pool)
 		ENSURE_NUMBER(a); 													\
 		ENSURE_NUMBER(b); 													\
 		double ad = a.to_number(); double bd = b.to_number();				\
-		if (isnan(ad) || isnan(bd))											\
+		if (isNaN(ad) || isNaN(bd))											\
 			store = truth_of_undefined; 									\
 		else if (isinf(ad) && ad > 0)	 									\
 			store = false; 													\
@@ -218,7 +218,7 @@ static inline asName pool_name(boost::uint32_t index, abc_block* pool)
 	else if (a.is_number())													\
 	{																		\
 		double ad = a.to_number(); double bd = b.to_number();				\
-		if (isnan(ad) || isnan(bd))											\
+		if (isNaN(ad) || isNaN(bd))											\
 			*store = false;													\
 		else if (isinf(ad) && ad > 0)										\
 			*store = (isinf(bd) && bd > 0);									\

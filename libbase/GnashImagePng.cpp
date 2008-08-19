@@ -17,6 +17,14 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h"
+#endif
+
+#ifdef HAVE_PTHREADS
+#include <pthread.h>
+#endif
+
 #include "utility.h"
 #include "GnashImagePng.h"
 #include "log.h"
@@ -97,14 +105,20 @@ PngImageInput::getWidth() const
     return png_get_image_width(_pngPtr, _infoPtr);
 }
 
+size_t
+PngImageInput::getComponents() const
+{
+    return png_get_channels(_pngPtr, _infoPtr);
+}
+
 void
-PngImageInput::readScanline(unsigned char* rgbData)
+PngImageInput::readScanline(unsigned char* imageData)
 {
     assert (_currentRow < getHeight());
     assert (_rowPtrs);
 
-    // Data packed as RGB
-    std::memcpy(rgbData, _rowPtrs[_currentRow], getWidth() * 3);
+    // Data packed as RGB / RGBA
+    std::memcpy(imageData, _rowPtrs[_currentRow], getWidth() * getComponents());
     
     ++_currentRow;
 }
@@ -142,27 +156,47 @@ PngImageInput::read()
     // Convert indexed images to RGB
     if (type == PNG_COLOR_TYPE_PALETTE)
     {
-        log_debug("Palette->RGB");
+        log_debug("Converting palette PNG to RGB(A)");
         png_set_palette_to_rgb(_pngPtr);
     }
     
     // Convert less-than-8-bit greyscale to 8 bit.
     if (type == PNG_COLOR_TYPE_GRAY && bitDepth < 8)
     {
-        log_debug("Gray bit depth(%d) to 8", bitDepth);
+        log_debug("Setting grey bit depth(%d) to 8", bitDepth);
         png_set_gray_1_2_4_to_8(_pngPtr);
+    }
+
+    // Apply the transparency block if it exists.
+    if (png_get_valid(_pngPtr, _infoPtr, PNG_INFO_tRNS))
+    {
+        log_debug("Applying transparency block, image is RGBA");
+        png_set_tRNS_to_alpha(_pngPtr);
+        _type = GNASH_IMAGE_RGBA;
     }
 
     // Make 16-bit data into 8-bit data
     if (bitDepth == 16) png_set_strip_16(_pngPtr);
 
-    // Remove alpha channel because Gnash can't deal with it yet.
-    if (type & PNG_COLOR_MASK_ALPHA) png_set_strip_alpha(_pngPtr);
+    // Set the type of the image if it hasn't been set already.
+    if (_type == GNASH_IMAGE_INVALID)
+    {
+        if (type & PNG_COLOR_MASK_ALPHA)
+        {
+            log_debug("Loading PNG image with alpha");
+            _type = GNASH_IMAGE_RGBA;
+        }
+        else
+        {
+            log_debug("Loading PNG image without alpha");
+            _type = GNASH_IMAGE_RGB;
+        }
+    }
 
     // Convert 1-channel grey images to 3-channel RGB.
     if (type == PNG_COLOR_TYPE_GRAY || type == PNG_COLOR_TYPE_GRAY_ALPHA)
     {
-        log_debug("Grey->RGB");
+        log_debug("Converting greyscale PNG to RGB(A)");
         png_set_gray_to_rgb(_pngPtr);
     }
 
@@ -171,12 +205,13 @@ PngImageInput::read()
     const size_t height = getHeight();
     const size_t width = getWidth();
 
-    const size_t components = 3;
+    const size_t components = getComponents();
 
-    // We must have 3-channel data by this point.
-    assert (png_get_channels(_pngPtr, _infoPtr) == components);
+    // We must have 3 or 4-channel data by this point.
+    assert(_type == GNASH_IMAGE_RGB && components == 3 ||
+           _type == GNASH_IMAGE_RGBA && components == 4);
 
-    // Allocate space for the data (3 bytes per pixel)
+    // Allocate space for the data
     _pixelData.reset(new png_byte[width * height * components]);
 
     // Allocate an array of pointers to the beginning of

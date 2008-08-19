@@ -37,7 +37,6 @@
 #include "timers.h" // for registering the advance timer
 #include "GnashException.h"
 #include "NetConnection.h"
-#include "render.h"	// for gnash::render::videoFrameFormat()
 #include "Object.h" // for getObjectInterface
 #include "VM.h"
 #include "namedStrings.h"
@@ -74,7 +73,6 @@ NetStream::NetStream()
 	as_object(getNetStreamInterface()),
 	_netCon(NULL),
 	m_bufferTime(100), // The default size needed to begin playback of media is 100 miliseconds
-	m_videoFrameFormat(gnash::render::videoFrameFormat()),
 	m_newFrameReady(false),
 	m_imageframe(),
 	m_parser(NULL),
@@ -552,12 +550,12 @@ NetStream::newFrameReady()
 	}
 }
 
-std::auto_ptr<image::image_base>
+std::auto_ptr<image::ImageBase>
 NetStream::get_video()
 {
 	boost::mutex::scoped_lock lock(image_mutex);
 
-	if (!m_imageframe.get()) return std::auto_ptr<image::image_base>(0);
+	if (!m_imageframe.get()) return std::auto_ptr<image::ImageBase>(0);
 
 	// TODO: inspect if we could return m_imageframe directly...
 	return m_imageframe;	

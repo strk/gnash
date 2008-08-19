@@ -17,8 +17,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-#ifndef __VIDEODECODERGST_H__
-#define __VIDEODECODERGST_H__
+#ifndef GNASH_VIDEODECODERGST_H
+#define GNASH_VIDEODECODERGST_H
 
 
 #ifdef HAVE_CONFIG_H
@@ -38,11 +38,11 @@ namespace gnash {
 namespace media {
 
 // Convenience wrapper for GstBuffer. Intended to be wrapped in an auto_ptr.
-class gnashGstBuffer : public image::rgb
+class gnashGstBuffer : public image::ImageRGB
 {
 public:
   gnashGstBuffer(GstBuffer* buf, int width, int height)
-  : rgb(NULL, width, height, (width * 3 + 3) & ~3),
+  : ImageRGB(NULL, width, height, (width * 3 + 3) & ~3),
     _buffer(buf)
   {}
   
@@ -56,9 +56,9 @@ public:
     return GST_BUFFER_DATA(_buffer);
   }
 
-  std::auto_ptr<image::image_base> clone() const
+  std::auto_ptr<image::ImageBase> clone() const
   {
-    return std::auto_ptr<image_base>(new rgb(*this));
+    return std::auto_ptr<ImageBase>(new ImageRGB(*this));
   }
 
 private:
@@ -74,7 +74,7 @@ public:
 
   void push(const EncodedVideoFrame& buffer);
 
-  std::auto_ptr<image::rgb> pop();
+  std::auto_ptr<image::ImageBase> pop();
   
   bool peek();
 

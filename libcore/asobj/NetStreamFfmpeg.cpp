@@ -326,12 +326,12 @@ bool NetStreamFfmpeg::audio_streamer(void *owner, boost::uint8_t *stream, int le
 	return true;
 }
 
-std::auto_ptr<image::rgb> 
+std::auto_ptr<image::ImageBase> 
 NetStreamFfmpeg::getDecodedVideoFrame(boost::uint32_t ts)
 {
 	assert(_videoDecoder.get()); // caller should check this
 
-	std::auto_ptr<image::rgb> video;
+	std::auto_ptr<image::ImageBase> video;
 
 	assert(m_parser.get());
 	if ( ! m_parser.get() )
@@ -409,10 +409,10 @@ NetStreamFfmpeg::getDecodedVideoFrame(boost::uint32_t ts)
 	return video;
 }
 
-std::auto_ptr<image::rgb> 
+std::auto_ptr<image::ImageBase> 
 NetStreamFfmpeg::decodeNextVideoFrame()
 {
-	std::auto_ptr<image::rgb> video;
+	std::auto_ptr<image::ImageBase> video;
 
 	if ( ! m_parser.get() )
 	{
@@ -859,7 +859,7 @@ NetStreamFfmpeg::refreshVideoFrame(bool alsoIfPaused)
 #endif // GNASH_DEBUG_DECODING
 
 	// Get next decoded video frame from parser, will have the lowest timestamp
-	std::auto_ptr<image::rgb> video = getDecodedVideoFrame(curPos);
+	std::auto_ptr<image::ImageBase> video = getDecodedVideoFrame(curPos);
 
 	// to be decoded or we're out of data
 	if (!video.get())

@@ -51,10 +51,10 @@
 # include <fontconfig/fcfreetype.h>
 #endif
 
-#include <cstdio> // for snprintf
 #include <string>
 #include <memory> // for auto_ptr
 #include <boost/cstdint.hpp>
+#include <boost/format.hpp>
 
 // Define the following to make outline decomposition verbose
 //#define DEBUG_OUTLINE_DECOMPOSITION 1
@@ -206,7 +206,8 @@ void FreetypeGlyphsProvider::init()
 	int	error = FT_Init_FreeType(&m_lib);
 	if (error)
 	{
-		fprintf(stderr, "can't init FreeType!  error = %d\n", error);
+		std::cerr << boost::format(_("Can't init FreeType! Error "
+					"= %d")) % error << std::endl;
 		exit(1);
 	}
 }
@@ -217,36 +218,11 @@ void FreetypeGlyphsProvider::close()
 	int error = FT_Done_FreeType(m_lib);
 	if (error)
 	{
-		fprintf(stderr, "can't close FreeType!  error = %d\n", error);
+		std::cerr << boost::format(_("Can't close FreeType! Error "
+				"= %d")) % error << std::endl;
 	}
 }
 
-// private
-std::auto_ptr<image::alpha>
-FreetypeGlyphsProvider::draw_bitmap(const FT_Bitmap& bitmap)
-{
-	// You must use power-of-two dimensions!!
-	int	w = 1; while (w < bitmap.pitch) { w <<= 1; }
-	int	h = 1; while (h < bitmap.rows)  { h <<= 1; }
-
-	std::auto_ptr<image::alpha> alpha ( new image::alpha(w, h) );
-
-	alpha->clear(0);
-
-	// copy image to alpha
-	for (int i = 0; i < bitmap.rows; i++)
-	{
-		boost::uint8_t*	src = bitmap.buffer + bitmap.pitch * i;
-		boost::uint8_t*	dst = alpha->scanline(i); 
-		int	x = bitmap.width;
-		while (x-- > 0)
-		{
-			*dst++ = *src++;
-		}
-	}
-
-	return alpha;
-}
 
 // private
 bool
@@ -259,7 +235,8 @@ FreetypeGlyphsProvider::getFontFilename(const std::string &name,
 	if (!FcInit ())
 	{
 
-		log_error("Can't init fontconfig library, using hard-coded font filename");
+		log_error("Can't init fontconfig library, using hard-"
+				"coded font filename");
 		filename = DEFAULT_FONTFILE;
 		return true;
 		//return false;
@@ -295,7 +272,8 @@ FreetypeGlyphsProvider::getFontFilename(const std::string &name,
 	if ( fs )
 	{
 #ifdef GNASH_DEBUG_DEVICEFONTS
-		log_debug("Found %d fonts matching the family %s (using first)", fs->nfont, name.c_str());
+		log_debug("Found %d fonts matching the family %s (using "
+				"first)", fs->nfont, name);
 #endif
 
 		for (int j = 0; j < fs->nfont; j++)
@@ -322,12 +300,14 @@ FreetypeGlyphsProvider::getFontFilename(const std::string &name,
 		FcFontSetDestroy(fs);
 	}
 
-	log_error("No device font matches the name '%s', using hard-coded font filename", name.c_str());
+	log_error("No device font matches the name '%s', using hard-coded"
+			" font filename", name);
 	filename = DEFAULT_FONTFILE;
 	return true;
 #else
-	log_error("Font filename matching not implemented (no fontconfig support built-in), using hard-coded font filename",
-			name.c_str());
+	log_error("Font filename matching not implemented (no fontconfig"
+			" support built-in), using hard-coded font filename",
+			name);
 	filename = DEFAULT_FONTFILE;
 	return true;
 #endif
@@ -367,8 +347,6 @@ FreetypeGlyphsProvider::FreetypeGlyphsProvider(const std::string& name, bool bol
 	:
 	m_face(NULL)
 {
-	const unsigned maxerrlen = 64;
-	char buf[maxerrlen];
 
 	if (m_lib == NULL)
 	{
@@ -378,9 +356,9 @@ FreetypeGlyphsProvider::FreetypeGlyphsProvider(const std::string& name, bool bol
 	std::string filename;
 	if (getFontFilename(name, bold, italic, filename) == false)
 	{
-		snprintf(buf, maxerrlen, _("Can't find font file for font '%s'"), name.c_str());
-		buf[maxerrlen-1] = '\0';
-		throw GnashException(buf);
+		boost::format msg = boost::format(_("Can't find font file "
+				       "for font '%s'")) % name;
+		throw GnashException(msg.str());
 	}
 
 	int error = FT_New_Face(m_lib, filename.c_str(), 0, &m_face);
@@ -390,17 +368,22 @@ FreetypeGlyphsProvider::FreetypeGlyphsProvider(const std::string& name, bool bol
 			break;
 
 		case FT_Err_Unknown_File_Format:
-			snprintf(buf, maxerrlen, _("Font file '%s' has bad format"), filename.c_str());
-			buf[maxerrlen-1] = '\0';
-			throw GnashException(buf);
+		{
+			boost::format msg = boost::format(_("Font file '%s' "
+						"has bad format")) % filename;
+			throw GnashException(msg.str());
 			break;
+		}
 
 		default:
+		{
 			// TODO: return a better error message !
-			snprintf(buf, maxerrlen, _("Some error opening font '%s'"), filename.c_str());
-			buf[maxerrlen-1] = '\0';
-			throw GnashException(buf);
+			boost::format msg = boost::format(_("Some error "
+						"opening font '%s'"))
+			       			% filename;
+			throw GnashException(msg.str());
 			break;
+		}
 	}
 
 	// We want an EM of unitsPerEM, so if units_per_EM is different
@@ -408,7 +391,7 @@ FreetypeGlyphsProvider::FreetypeGlyphsProvider(const std::string& name, bool bol
 	scale = (float)unitsPerEM()/m_face->units_per_EM;
 
 #ifdef GNASH_DEBUG_DEVICEFONTS
-	log_debug("EM square for font '%s' is %d, scale is thus %g", name.c_str(), m_face->units_per_EM, scale);
+	log_debug("EM square for font '%s' is %d, scale is thus %g", name, m_face->units_per_EM, scale);
 #endif
 }
 #else // ndef(USE_FREETYPE)
@@ -434,13 +417,16 @@ FreetypeGlyphsProvider::getGlyph(boost::uint16_t code, float& advance)
 	// Scale advance by current scale, to match expected output coordinate space
 	advance = m_face->glyph->metrics.horiAdvance * scale;
 #ifdef GNASH_DEBUG_DEVICEFONTS 
-	log_debug("Advance value for glyph '%c' is %g (horiAdvance:%ld, scale:%g)", code, advance, m_face->glyph->metrics.horiAdvance, scale);
+	log_debug("Advance value for glyph '%c' is %g (horiAdvance:%ld, "
+			"scale:%g)", code, advance, 
+			m_face->glyph->metrics.horiAdvance, scale);
 #endif
 
 	if ( m_face->glyph->format != FT_GLYPH_FORMAT_OUTLINE )
 	{
 		unsigned long gf = m_face->glyph->format;
-		log_unimpl("FT_Load_Char() returned a glyph format != FT_GLYPH_FORMAT_OUTLINE (%c%c%c%c)",
+		log_unimpl("FT_Load_Char() returned a glyph format != "
+			"FT_GLYPH_FORMAT_OUTLINE (%c%c%c%c)",
 			static_cast<char>((gf>>24)&0xff),
 			static_cast<char>((gf>>16)&0xff),
 			static_cast<char>((gf>>8)&0xff),
@@ -476,7 +462,8 @@ FreetypeGlyphsProvider::getGlyph(boost::uint16_t code, float& advance)
 	FT_Outline_Decompose(outline, &walk, &walker);
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
 	rect bound; sh->compute_bound(&bound, VM::get().getSWFVersion());
-	log_debug("Decomposed glyph for character '%c' has bounds %s", code, bound.toString().c_str());
+	log_debug("Decomposed glyph for character '%c' has bounds %s",
+			code, bound.toString());
 #endif
 
 	return sh.get();

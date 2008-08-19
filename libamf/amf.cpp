@@ -677,7 +677,6 @@ AMF::extractAMF(Network::byte_t *in, Network::byte_t* tooFar)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    Element *el = new Element;
     Network::byte_t *tmpptr = in;
     boost::uint16_t length;
 
@@ -698,20 +697,25 @@ AMF::extractAMF(Network::byte_t *in, Network::byte_t* tooFar)
     // mostly to make valgrind shut up, as it has a tendency to
     // complain about legit code when it comes to all this byte
     // manipulation stuff.
-    char c = *(reinterpret_cast<char *>(tmpptr));
-    Element::amf0_type_e type = static_cast<Element::amf0_type_e>(c);
+    Element *el = new Element;
+    AMF amf_obj;
+    // Jump through hoops to get the type so valgrind stays happy
+//    char c = *(reinterpret_cast<char *>(tmpptr));
+    Element::amf0_type_e type = static_cast<Element::amf0_type_e>(*tmpptr);
     tmpptr++;                        // skip past the header byte
 
-    AMF amf_obj;
     switch (type) {
       case Element::NUMBER_AMF0:
-	  el->makeNumber(tmpptr); 
-	  tmpptr += AMF0_NUMBER_SIZE; // all numbers are 8 byte big endian
+      {
+ 	  double swapped = *reinterpret_cast<const double*>(tmpptr);
+ 	  swapBytes(&swapped, amf::AMF0_NUMBER_SIZE);
+ 	  el->makeNumber(swapped); 
+	  tmpptr += AMF0_NUMBER_SIZE; // all numbers are 8 bit big endian
+      }
 	  break;
       case Element::BOOLEAN_AMF0:
 	  el->makeBoolean(tmpptr);
-	  tmpptr += sizeof(bool);
-//	  tmpptr += sizeof(boost::uint16_t); // although a bool is one byte, it's stored as a short
+	  tmpptr += 1;		// sizeof(bool) isn't always 1 for all compilers 
 	  break;
       case Element::STRING_AMF0:
 	  // get the length of the name
@@ -720,6 +724,7 @@ AMF::extractAMF(Network::byte_t *in, Network::byte_t* tooFar)
 	  if (length >= SANE_STR_SIZE) {
 	      log_error("%d bytes for a string is over the safe limit of %d",
 			length, SANE_STR_SIZE);
+	      delete el;
 	      return 0;
 	  }
 //	  log_debug(_("AMF String length is: %d"), length);
@@ -735,6 +740,37 @@ AMF::extractAMF(Network::byte_t *in, Network::byte_t* tooFar)
       case Element::OBJECT_AMF0:
       {
 	  el->makeObject();
+	  while (tmpptr < tooFar) { // FIXME: was tooFar - AMF_HEADER_SIZE)
+	      if (*tmpptr == TERMINATOR) {
+//		  log_debug("No data associated with Property in object");
+		  tmpptr++;
+		  break;
+	      }
+	      Element *child = amf_obj.extractProperty(tmpptr, tooFar); 
+	      if (child == 0) {
+		  // skip past zero length string (2 bytes), null (1 byte) and end object (1 byte)
+		  tmpptr += 4;
+		  break;
+	      }
+//	      child->dump();
+	      el->addProperty(child);
+	      tmpptr += amf_obj.totalsize();
+	  };
+//	  tmpptr += AMF_HEADER_SIZE;		// skip past the terminator bytes
+	  break;
+      }
+      case Element::MOVIECLIP_AMF0:
+	  log_debug("AMF0 MovieClip frame");
+	  break;
+      case Element::NULL_AMF0:
+      case Element::UNDEFINED_AMF0:
+      case Element::REFERENCE_AMF0:
+      case Element::ECMA_ARRAY_AMF0:
+      {
+	  el->makeECMAArray();
+	  // get the number of elements in the array
+	  length = ntohs((*(boost::uint32_t *)tmpptr) & 0xffff);
+	  tmpptr += sizeof(boost::uint32_t);
 	  while (tmpptr < (tooFar - AMF_HEADER_SIZE)) {
 	      if (*tmpptr == TERMINATOR) {
 //		  log_debug("No data associated with Property in object");
@@ -752,13 +788,34 @@ AMF::extractAMF(Network::byte_t *in, Network::byte_t* tooFar)
 	  tmpptr += AMF_HEADER_SIZE;		// skip past the terminator bytes
 	  break;
       }
-      case Element::MOVIECLIP_AMF0:
-      case Element::NULL_AMF0:
-      case Element::UNDEFINED_AMF0:
-      case Element::REFERENCE_AMF0:
-      case Element::ECMA_ARRAY_AMF0:
       case Element::OBJECT_END_AMF0:
+	  // A strict array is only numbers
       case Element::STRICT_ARRAY_AMF0:
+      {
+	  el->makeStrictArray();
+	  // get the number of numbers in the array
+	  length = ntohl((*(boost::uint32_t *)tmpptr));
+//	  log_debug("Strict Array, body size is %d.", length);
+	  tmpptr += sizeof(boost::uint32_t) + 1;
+	  // each number is 8 bytes, plus one byte for the type.
+	  tooFar = tmpptr += length * AMF0_NUMBER_SIZE + 1;
+// 	  Element *name = amf_obj.extractAMF(tmpptr, tooFar);
+// 	  tmpptr += amf_obj.totalsize();
+// 	  el->setName(name->getName());
+	  length -= 2;
+	  while (length) {
+	      Element *child = amf_obj.extractAMF(tmpptr, tooFar); 
+	      if (child == 0) {
+		  break;
+	      } else {
+//		  child->dump();
+		  el->addProperty(child);
+		  tmpptr += amf_obj.totalsize();
+		  length -= amf_obj.totalsize();
+	      }
+	  };
+	  break;
+      }
       case Element::DATE_AMF0:
       case Element::LONG_STRING_AMF0:
       case Element::UNSUPPORTED_AMF0:
@@ -768,6 +825,7 @@ AMF::extractAMF(Network::byte_t *in, Network::byte_t* tooFar)
       case Element::AMF3_DATA:
       default:
 	  log_unimpl("%s: type %d", __PRETTY_FUNCTION__, (int)type);
+	  delete el;
 	  return 0;
       }
     
@@ -791,6 +849,7 @@ Element *
 AMF::extractProperty(Network::byte_t *in, Network::byte_t* tooFar)
 {
 //    GNASH_REPORT_FUNCTION;
+    
     Network::byte_t *tmpptr = in;
     boost::uint16_t length;
 
@@ -801,38 +860,41 @@ AMF::extractProperty(Network::byte_t *in, Network::byte_t* tooFar)
     // sanity check the length of the data. The length is usually only zero if
     // we've gone all the way to the end of the object.
 
-    // valrind comlains length is unintialized, which as we just set
+    // valgrind complains if length is unintialized, which as we just set
     // length to a value, this is tottaly bogus, and I'm tired of
     // braindamaging code to keep valgrind happy.
     if (length <= 0) {
  	log_debug("No Property name, object done");
  	return 0;
     }
-    if (length >= SANE_STR_SIZE) {
-	log_error("%d bytes for a string is over the safe limit of %d",
-		  length, SANE_STR_SIZE);
-	return 0;
-    }
+    
+    if (length + tmpptr > tooFar) {
+	log_error("%d bytes for a string is over the safe limit of %d. Putting the rest of the buffer into the string", length, SANE_STR_SIZE);
+	length = tooFar - tmpptr;
+    }    
     
     // name is just debugging help to print cleaner, and should be removed later
 //    log_debug(_("AMF property name length is: %d"), length);
     std::string name(reinterpret_cast<const char *>(tmpptr), length);
-    log_debug(_("AMF property name is: %s"), name);
+//    log_debug(_("AMF property name is: %s"), name);
+    tmpptr += length;
 
     Element *el = 0;
+    char c = *(reinterpret_cast<char *>(tmpptr));
+    Element::amf0_type_e type = static_cast<Element::amf0_type_e>(c);
     // If we get a NULL object, there is no data. In that case, we only return
     // the name of the property.
-    if (*(tmpptr+length) == Element::NULL_AMF0) {
+    if (type == Element::NULL_AMF0) {
 	log_debug("No data associated with Property \"%s\"", name);
 	el = new Element;
 	el->setName(name.c_str(), length);
-	tmpptr += length + 1;
+	tmpptr += 1;
 	// Calculate the offset for the next read
     } else {
 	// process the data with associated with the property.
 	// Go past the data to the start of the next AMF object, which
 	// should be a type byte.
-	tmpptr += length;
+//	tmpptr += length;
 	el = extractAMF(tmpptr, tooFar);
 	if (el) {
 	    el->setName(name.c_str(), length);

@@ -22,6 +22,13 @@
 // Wrapper for jpeg file operations.  The actual work is done by the
 // IJG jpeg lib.
 
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h"
+#endif
+
+#ifdef HAVE_PTHREADS
+#include <pthread.h>
+#endif
 
 #include "utility.h"
 #include "GnashImage.h"
@@ -368,6 +375,11 @@ JpegImageInput::startImage()
 	}
 
 	_compressorOpened = true;
+	
+	// Until this point the type should be GNASH_IMAGE_INVALID.
+	// It's possible to create transparent JPEG data by merging an
+	// alpha channel, but that is handled explicitly elsewhere.
+	_type = GNASH_IMAGE_RGB;
 }
 
 

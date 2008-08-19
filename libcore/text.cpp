@@ -19,6 +19,13 @@
 
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h" // HAVE_ZLIB_H, USE_SWFTREE
+#endif
+
+#ifdef HAVE_PTHREADS
+#include <pthread.h>
+#endif
 
 #include "utf8.h"
 #include "utility.h"

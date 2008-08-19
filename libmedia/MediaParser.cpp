@@ -21,6 +21,7 @@
 #include "MediaParser.h"
 #include "log.h"
 
+#include <unistd.h>             // for usleep()
 #include <boost/bind.hpp>
 
 #ifdef _WIN32

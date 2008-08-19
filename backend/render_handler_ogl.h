@@ -15,8 +15,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-#ifndef __RENDER_HANDLER_OGL_H__
-#define __RENDER_HANDLER_OGL_H__
+#ifndef GNASH_RENDER_HANDLER_OGL_H
+#define GNASH_RENDER_HANDLER_OGL_H
 
 
 #if defined(NOT_SGI_GL) || defined(__APPLE_CC__)
@@ -148,7 +148,7 @@ private:
 class bitmap_info_ogl : public bitmap_info
 {
   public:
-    bitmap_info_ogl(image::image_base* image, GLenum pixelformat,
+    bitmap_info_ogl(image::ImageBase* image, GLenum pixelformat,
                     bool ogl_accessible);
     ~bitmap_info_ogl();
 
@@ -159,7 +159,7 @@ class bitmap_info_ogl : public bitmap_info
     void setup();    
     void upload(boost::uint8_t* data, size_t width, size_t height);
     
-    std::auto_ptr<image::image_base> _img;
+    std::auto_ptr<image::ImageBase> _img;
     GLenum _pixel_format;
     GLenum _ogl_img_type;
     bool _ogl_accessible;  

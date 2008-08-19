@@ -22,7 +22,9 @@
 #define UTILITY_H
 
 // HAVE_FINITE, HAVE_PTHREADS, WIN32, NDEBUG etc.
+#ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
+#endif
 
 #include <cassert>
 #include <cctype>

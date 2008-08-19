@@ -21,6 +21,10 @@
 #include "gnashconfig.h"
 #endif
 
+#ifdef HAVE_PTHREADS
+#include <pthread.h>
+#endif
+
 #include "network.h"
 #include "utility.h"
 #include "xml.h"

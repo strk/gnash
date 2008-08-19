@@ -82,6 +82,11 @@ private:
   cxform  m_color_transform;
   matrix  m_matrix;
 
+  /// Cache values for ActionScript access.
+  /// NOTE: not all characters need this, just the
+  ///       ones which are ActionScript-referenceable
+  double _xscale, _yscale, _rotation;
+
   /// Volume control associated to this character
   //
   /// This is used by Sound objects
@@ -391,6 +396,9 @@ public:
         m_depth(0),
         m_color_transform(),
         m_matrix(),
+	_xscale(100),
+	_yscale(100),
+	_rotation(0),
         _volume(100),
         m_ratio(0),
         m_clip_depth(noClipDepthValue),
@@ -465,30 +473,45 @@ public:
     const matrix& get_matrix() const { return m_matrix; }
 
     /// Set local transform matrix for this character
-    void  set_matrix(const matrix& m)
-    {
-        assert(m.is_valid());
-        if (!(m == m_matrix))
-        {
-            set_invalidated(__FILE__, __LINE__);
-            m_matrix = m;
-        }
-    }
+    //
+    /// @param m the new matrix to assign to this character
+    ///
+    /// @param updateCache if true, updates the cache values
+    ///        from the matrix (only if matrix != current matrix)
+    ///
+    void  set_matrix(const matrix& m, bool updateCache=false);
 
     /// Set the xscale value of current matrix
     //
     /// This is used when setting either _xscale or _width.
     /// See xscale_getset and width_getset
     ///
-    void set_x_scale(float factor);
+    /// @param factor scale factor, in percent
+    ///
+    void set_x_scale(double factor);
+
+    /// Copy matrix and caches from given character
+    void copyMatrix(const character& ch);
 
     /// Set the yscale value of current matrix
     //
-    ///
     /// This is used when setting either _yscale or _height
     /// See xscale_getset and width_getset
     ///
-    void set_y_scale(float factor);
+    /// @param factor scale factor, in percent
+    ///
+    void set_y_scale(double factor);
+
+    /// Set the rotation value of current matrix
+    //
+    ///
+    /// This is used when setting _rotation
+    /// See rotation_getset 
+    ///
+    /// @param rot rotation in degrees. will be trimmed to
+    ///        the -180 .. 180 range, can be passed outside it.
+    ///
+    void set_rotation(double rot);
 
     const cxform& get_cxform() const { return m_color_transform; }
 

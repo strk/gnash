@@ -469,7 +469,7 @@ static as_value sprite_swap_depths(const fn_call& fn)
   else
   {
     double td = fn.arg(0).to_number();
-    if ( isnan(td) )
+    if ( isNaN(td) )
     {
       IF_VERBOSE_ASCODING_ERRORS(
       std::stringstream ss; fn.dump_args(ss);
@@ -2746,8 +2746,6 @@ character* sprite_instance::add_empty_movieclip(const char* name, int depth)
 boost::intrusive_ptr<character>
 sprite_instance::add_textfield(const std::string& name, int depth, float x, float y, float width, float height)
 {
-  matrix txt_matrix;
-
   // Create a definition (TODO: cleanup this thing, definitions should be immutable!)
   boost::intrusive_ptr<edit_text_character_def> txt = new edit_text_character_def();
 
@@ -2769,9 +2767,10 @@ sprite_instance::add_textfield(const std::string& name, int depth, float x, floa
   // Set _x and _y
   x = utility::infinite_to_fzero(x);
   y = utility::infinite_to_fzero(y);
+  matrix txt_matrix;
   txt_matrix.set_translation(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
+  txt_char->set_matrix(txt_matrix, true); // update caches (altought shouldn't be needed as we only set translation)
 
-  txt_char->set_matrix(txt_matrix);  
   // Here we add the character to the displayList.  
   m_display_list.place_character(txt_char.get(), depth); 
 
@@ -2812,7 +2811,7 @@ sprite_instance::duplicateMovieClip(const std::string& newname, int depth,
   newsprite->_drawable = new DynamicShape(*_drawable);
   
   newsprite->set_cxform(get_cxform());  
-  newsprite->set_matrix(get_matrix());  
+  newsprite->copyMatrix(*this); // copy matrix and caches
   newsprite->set_ratio(get_ratio());  
   newsprite->set_clip_depth(get_clip_depth());  
   
@@ -3497,7 +3496,7 @@ sprite_instance::add_display_object(const SWF::PlaceObject2Tag* tag, DisplayList
 
         // TODO: check if we should check those has_xxx flags first.
         ch->set_cxform(tag->getCxform());
-        ch->set_matrix(tag->getMatrix());
+        ch->set_matrix(tag->getMatrix(), true); // update caches
         ch->set_ratio(tag->getRatio());
         ch->set_clip_depth(tag->getClipDepth());
         
@@ -3568,7 +3567,7 @@ void sprite_instance::replace_display_object(const SWF::PlaceObject2Tag* tag, Di
             }
             if(tag->hasMatrix())
             {
-                ch->set_matrix(tag->getMatrix());
+                ch->set_matrix(tag->getMatrix(), true); // update caches
             }
 			dlist.replace_character(ch.get(), tag->getDepth(), 
 				!tag->hasCxform(), // use matrix from the old character if tag doesn't provide one.

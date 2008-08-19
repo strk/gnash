@@ -20,6 +20,8 @@
 
 #include "FLVParser.h"
 #include "amf.h"
+#include "element.h"
+#include "flv.h"
 #include "log.h"
 #include "utility.h"
 #include "GnashException.h"
@@ -448,6 +450,9 @@ bool FLVParser::parseNextTag()
 		}
 		std::string dump = hexify(metaTag.get(), actuallyRead, false);
 		log_unimpl("FLV MetaTag parser. Data: %s", dump);
+                amf::Flv flv;
+                amf::Element *el = flv.decodeMetaData(metaTag.get(), actuallyRead);
+                el->dump();
 		/*
 		amf::AMF* amfParser = new amf::AMF();
 		amfParser->parseAMF(metaTag);*/

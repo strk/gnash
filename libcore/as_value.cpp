@@ -303,7 +303,7 @@ as_value::to_primitive(type hint) const
 #if 1
 		if ( m_type == MOVIECLIP )
 		{
-			return as_value(NAN);
+			return as_value(NaN);
 		}
 #endif
 		if ( m_type == OBJECT ) obj = getObj().get();
@@ -413,7 +413,7 @@ as_value::convert_to_primitive(type hint)
 	{
 		if ( m_type == MOVIECLIP )
 		{
-			set_double(NAN);
+			set_double(NaN);
 			return *this;
 		}
 		if ( m_type == OBJECT ) obj = getObj().get();
@@ -553,7 +553,7 @@ as_value::to_number() const
             // just like for any other non-numerical text. This is correct
             // behaviour.
             {
-            	return static_cast<double>(NAN);
+            	return static_cast<double>(NaN);
             }
         }
 
@@ -562,7 +562,7 @@ as_value::to_number() const
 	{
             // Evan: from my tests
             // Martin: FlashPlayer6 gives 0; FP9 gives NaN.
-            return ( swfversion >= 7 ? NAN : 0 );
+            return ( swfversion >= 7 ? NaN : 0 );
 	}
 
         case BOOLEAN: 
@@ -600,7 +600,7 @@ as_value::to_number() const
                 }
                 else
                 {
-                    return NAN;
+                    return NaN;
                 }
             }
         }
@@ -609,13 +609,13 @@ as_value::to_number() const
 	{
             // This is tested, no valueOf is going
             // to be invoked for movieclips.
-            return NAN; 
+            return NaN; 
 	}
 
         default:
             // Other object types should return NaN, but if we implement that,
             // every GUI's movie canvas shrinks to size 0x0. No idea why.
-            return NAN; // 0.0;
+            return NaN; // 0.0;
     }
     /* NOTREACHED */
 }
@@ -655,7 +655,7 @@ as_value::to_bool_v7() const
 		case NUMBER:
 		{
 			double d = getNum();
-			return d && ! isnan(d);
+			return d && ! isNaN(d);
 		}
 		case BOOLEAN:
 			return getBool();
@@ -681,13 +681,13 @@ as_value::to_bool_v5() const
 		case  STRING:
 		{
 			double num = to_number();
-			bool ret = num && ! isnan(num);
+			bool ret = num && ! isNaN(num);
 			return ret;
 		}
 		case NUMBER:
 		{
 			double d = getNum();
-			return ! isnan(d) && d; 
+			return ! isNaN(d) && d; 
 		}
 		case BOOLEAN:
 			return getBool();
@@ -713,7 +713,7 @@ as_value::to_bool_v6() const
 		case  STRING:
 		{
 			double num = to_number();
-			bool ret = num && ! isnan(num);
+			bool ret = num && ! isNaN(num);
 			return ret;
 		}
 		case NUMBER:
@@ -1203,9 +1203,9 @@ as_value::equalsSameType(const as_value& v) const
 			double b = v.getNum();
 
 			// Nan != NaN
-			//if ( isnan(a) || isnan(b) ) return false;
+			//if ( isNaN(a) || isNaN(b) ) return false;
 
-			if ( isnan(a) && isnan(b) ) return true;
+			if ( isNaN(a) && isNaN(b) ) return true;
 
 			// -0.0 == 0.0
 			if ( (a == -0 && b == 0) || (a == 0 && b == -0) ) return true;
@@ -1400,7 +1400,7 @@ as_value::doubleToString(double val, int radix)
 
 	// Handle non-numeric values.
 	// "printf" gives "nan", "inf", "-inf", so we check explicitly
-	if(isnan(val))
+	if(isNaN(val))
 	{
 		return "NaN";
 	}
@@ -1732,7 +1732,7 @@ as_value::newLessThan(const as_value& op2_in)
         const double op1 = operand1.to_number();
         const double op2 = operand2.to_number();
 
-        if ( isnan(op1) || isnan(op2) )
+        if ( isNaN(op1) || isNaN(op2) )
         {
             ret.set_undefined();
         }

@@ -51,6 +51,10 @@ private:
 
     void init();
 
+	// Return number of components (i.e. == 3 for RGB
+	// data).
+    size_t getComponents() const;
+
 public:
 
 	/// Constructor.  
@@ -70,17 +74,11 @@ public:
 	// Return the width of the image.
 	size_t getWidth() const;
 
-	// Return number of components (i.e. == 3 for RGB
-	// data).  The size of the data for a scanline is
-	// get_width() * get_components().
-	//
-	size_t getComponents() const;
-
 	// Read a scanline's worth of image data into the
 	// given buffer.  The amount of data read is
-	// get_width() * get_components().
+	// getWidth() * getComponents().
 	//
-	void readScanline(unsigned char* rgb_data);
+	void readScanline(unsigned char* imageData);
 
 
     DSOEXPORT static std::auto_ptr<ImageInput> create(boost::shared_ptr<IOChannel> in)

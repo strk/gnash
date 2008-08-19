@@ -116,7 +116,7 @@ public:
 	/// Return distance between this and the given point
 	boost::int32_t distance(const Point2d& p) const
 	{
-		return (boost::int32_t)( std::sqrt( squareDistance(p) ) );
+	    return (boost::int32_t)( std::sqrt( static_cast<double>(squareDistance(p)) ) );
 	}
 
 	bool operator== (const Point2d& p) const

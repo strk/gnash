@@ -143,11 +143,7 @@ textfield_getFontList(const fn_call& fn)
 	boost::intrusive_ptr<edit_text_character> text = ensureType<edit_text_character>(fn.this_ptr);
 	UNUSED(text);
 
-	static bool warned = false;
-	if ( ! warned ) {
-		log_unimpl("TextField.getFontList()");
-		warned = true;
-	}
+	LOG_ONCE(log_unimpl("TextField.getFontList()"));
 
 	return as_value();
 }
@@ -290,11 +286,7 @@ textfield_replaceSel(const fn_call& fn)
 	boost::intrusive_ptr<edit_text_character> text = ensureType<edit_text_character>(fn.this_ptr);
 	UNUSED(text);
 
-	static bool warned = false;
-	if ( ! warned ) {
-		log_unimpl("TextField.replaceSel()");
-		warned = true;
-	}
+	LOG_ONCE (log_unimpl("TextField.replaceSel()"));
 
 	return as_value();
 }
@@ -305,11 +297,7 @@ textfield_replaceText(const fn_call& fn)
 	boost::intrusive_ptr<edit_text_character> text = ensureType<edit_text_character>(fn.this_ptr);
 	UNUSED(text);
 
-	static bool warned = false;
-	if ( ! warned ) {
-		log_unimpl("TextField.replaceText()");
-		warned = true;
-	}
+	LOG_ONCE(log_unimpl("TextField.replaceText()"));
 
 	return as_value();
 }
@@ -321,11 +309,7 @@ textfield_removeTextField(const fn_call& fn)
 
 	text->removeTextField();
 
-	static bool warned = false;
-	if ( ! warned ) {
-		log_debug("TextField.removeTextField() TESTING");
-		warned = true;
-	}
+	LOG_ONCE(log_debug("TextField.removeTextField() TESTING"));
 
 	return as_value();
 }
@@ -925,7 +909,7 @@ edit_text_character::set_member(string_table::key name,
 		matrix	m = get_matrix();
         double x =  utility::infinite_to_fzero( val.to_number() );
 		m.tx = PIXELS_TO_TWIPS(x);	
-		set_matrix(m);
+		set_matrix(m); // no need to update caches when only changing translation
 
 		// m_accept_anim_moves = false;
 		return true;
@@ -935,7 +919,7 @@ edit_text_character::set_member(string_table::key name,
 		matrix	m = get_matrix();
         double y =  utility::infinite_to_fzero( val.to_number() );
 		m.ty = PIXELS_TO_TWIPS(y);
-		set_matrix(m);
+		set_matrix(m); // no need to update caches when only changing translation
 
 		// m_accept_anim_moves = false; 
 		return true;
