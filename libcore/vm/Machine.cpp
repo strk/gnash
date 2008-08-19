@@ -1187,9 +1187,12 @@ Machine::execute()
 		
 		as_value property = object->getMember(a.getGlobalName(),0);
 		LOG_DEBUG_AVM("Calling method %s on object %s",property.toDebugString(),object->get_text_value());
-		call_method(property,&env,object,argc,env.stack_size() - 1);
+		as_value result = call_method(property,&env,object,argc,env.stack_size() - 1);
 		env.drop(argc);
 
+		if(opcode == SWF::ABC_ACTION_CALLPROPERTY){
+			push_stack(result);
+		}
 /*		int shift = completeName(a, argc);
 		ENSURE_OBJECT(mStack.top(shift + argc));
 		as_object *obj = mStack.top(argc + shift).to_object().get();
