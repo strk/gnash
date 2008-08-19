@@ -25,6 +25,7 @@
 #include "as_function.h"
 #include "as_value.h"
 #include "CodeStream.h"
+#include "Machine.h"
 
 namespace gnash {
 
@@ -34,11 +35,12 @@ class abc_function : public as_function
 
 private:
 	CodeStream* mStream;
+	Machine* mMachine;
 
 public:
-	abc_function(CodeStream* stream);
+	abc_function(CodeStream* stream, Machine* mMachine);
 
-as_value	operator()(const fn_call& fn);
+	as_value operator()(const fn_call& fn);
 
 };
 

@@ -21,14 +21,17 @@
 
 namespace gnash{
 
-abc_function::abc_function(CodeStream* stream):as_function(){
+abc_function::abc_function(CodeStream* stream, Machine* machine):as_function(){
 		mStream = stream;
+		mMachine = machine;
 }
 
 // Dispatch.
 as_value
 abc_function::operator()(const fn_call& fn)
 {
+	log_debug("Calling an abc_function.");
+	mMachine->executeCodeblock(mStream);
 	return as_value();
 }
 
