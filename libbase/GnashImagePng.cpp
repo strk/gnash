@@ -163,14 +163,14 @@ PngImageInput::read()
     // Convert less-than-8-bit greyscale to 8 bit.
     if (type == PNG_COLOR_TYPE_GRAY && bitDepth < 8)
     {
-        log_debug("Gray bit depth(%d) to 8", bitDepth);
+        log_debug("Setting grey bit depth(%d) to 8", bitDepth);
         png_set_gray_1_2_4_to_8(_pngPtr);
     }
 
     // Apply the transparency block if it exists.
     if (png_get_valid(_pngPtr, _infoPtr, PNG_INFO_tRNS))
     {
-        log_debug("Applying transparency block");
+        log_debug("Applying transparency block, image is RGBA");
         png_set_tRNS_to_alpha(_pngPtr);
         _type = GNASH_IMAGE_RGBA;
     }
@@ -206,8 +206,6 @@ PngImageInput::read()
     const size_t width = getWidth();
 
     const size_t components = getComponents();
-
-    log_debug ("Components: %d, type: %d", components, _type);
 
     // We must have 3 or 4-channel data by this point.
     assert(_type == GNASH_IMAGE_RGB && components == 3 ||
