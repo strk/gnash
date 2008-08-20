@@ -1,5 +1,6 @@
 use IO::Socket;
 use IO::Select;
+use Time::HiRes;
 
 $SIG{PIPE}='IGNORE';
 
@@ -28,7 +29,10 @@ while (@S = $O->can_read) {
                 }
             }
             else {
-
+            
+                # Sleep a bit before sending a reply to mimic web traffic
+                # (well, sort of).
+                Time::HiRes::sleep(0.5);
                 print "XmlSocketServer: sending \"$i\" \n";
               
                 $i =~ s/\*NEWLINE\*/\n/;
