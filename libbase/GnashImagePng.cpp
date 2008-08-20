@@ -208,8 +208,8 @@ PngImageInput::read()
     const size_t components = getComponents();
 
     // We must have 3 or 4-channel data by this point.
-    assert(_type == GNASH_IMAGE_RGB && components == 3 ||
-           _type == GNASH_IMAGE_RGBA && components == 4);
+    assert((_type == GNASH_IMAGE_RGB && components == 3) ||
+           (_type == GNASH_IMAGE_RGBA && components == 4));
 
     // Allocate space for the data
     _pixelData.reset(new png_byte[width * height * components]);
