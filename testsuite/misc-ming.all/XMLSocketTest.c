@@ -54,7 +54,7 @@ main(int argc, char** argv)
 
     mo = newSWFMovieWithVersion(OUTPUT_VERSION);
     SWFMovie_setDimension(mo, 800, 600);
-    SWFMovie_setRate (mo, 12.0);
+    SWFMovie_setRate (mo, 4.0);
 
     dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
     SWFMovie_add(mo, (SWFBlock)dejagnuclip);
@@ -78,9 +78,10 @@ main(int argc, char** argv)
        frame */
     add_actions(mo, 
         "function handleData(data) {                "
+        "    play();                                "
         "    trace('Data received: ' + data);       "
         "    receivedArray.push(data);              "
-        "    _root.gotoAndStop(4);                  "
+        "    trace ('Pushed data');"
         "};                                         "
     );
 
@@ -97,6 +98,7 @@ main(int argc, char** argv)
     add_actions(mo, "stop();");
 
     add_actions(mo,
+        "wait = 0;"
         "count = -1;"
         "connected = false;"
         "myXML = new XMLSocket;"
@@ -127,6 +129,7 @@ main(int argc, char** argv)
         "xmlArray[8] = undefined;"
         "xmlArray[9] = 9;"
         "xmlArray[10] = '';"
+        "xmlArray[11] = 'Last Item';"
     );
 
     /* The data we should get back */
@@ -147,6 +150,7 @@ main(int argc, char** argv)
         "expectedArray[12] = 'undefined';"
         "expectedArray[13] = 9;"
         "expectedArray[14] = '';"
+        "expectedArray[15] = 'Last Item';"
     );
 
 
@@ -171,34 +175,53 @@ main(int argc, char** argv)
 
     add_actions(mo,
         "count++;"
-        "if (count >= xmlArray.length) { _root.gotoAndStop(5); };"
-        "trace('Frame 3: sending ' + xmlArray[count]);"
+        "if (count >= xmlArray.length) { _root.gotoAndStop(4); };"
+        "trace('Frame 3 (iteration ' + count + '): sending ' + xmlArray[count]);"
         "myXML.send(xmlArray[count]);"
         "play();"
     );
     
 
     /* Frame 4 */
-    /* We arrive here when we have data and go back to  */
+    /* This is here to make a small pause between each send 
+       (a quarter of a second) */
     SWFMovie_nextFrame(mo);
 
     add_actions(mo,
-        "if (count < xmlArray.length - 1 ) { _root.gotoAndStop(3); };"
+        "trace ('Frame 4');"
         "play();"
     );
 
     /* Frame 5 */
-    /* We wait here when we've sent all the data' */
-    SWFMovie_nextFrame(mo); 
+    /* If we have sent all the data, continue. Otherwise send the next item */
+    SWFMovie_nextFrame(mo);
+
+    add_actions(mo,
+        "trace ('Frame 5');"
+        "if (count < xmlArray.length - 1 ) { _root.gotoAndStop(3); };"
+        "play();"
+    );
+
+    /* Frame 6 */
+    /* This is a bit of a hackish loop to wait for data */
+    SWFMovie_nextFrame(mo);
 
     add_actions(mo,
         "play();"
     );
 
-
-    /* Last frame (7) */
+    /* Frame 7 */
     SWFMovie_nextFrame(mo);
 
+    add_actions(mo,
+        "if (receivedArray[receivedArray.length -1] != 'Last Item' && wait++ < 10)"
+        "{ _root.gotoAndStop(6); };"
+        "play();"
+    );
+
+
+    /* Last frame (8) */
+    SWFMovie_nextFrame(mo);
 
     check_equals(mo, "receivedArray.length", "expectedArray.length");
     
