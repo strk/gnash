@@ -304,7 +304,7 @@ abc_block::setMultinameNames(asName *n,string_table::key ABCName){
 	
 	n->setABCName(ABCName);
 	std::string name = mStringPool[ABCName];
-	string_table::key global_key = mStringTable->find(name,false);
+	string_table::key global_key = mStringTable->find(name,true);
 	LOG_DEBUG_ABC("Global key %u",global_key);
 	n->setGlobalName(global_key);
 	LOG_DEBUG_ABC("Multiname: %s ABCName set to %u global name set to %u",name,n->getABCName(),n->getGlobalName());

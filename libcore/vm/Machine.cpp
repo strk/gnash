@@ -1621,7 +1621,6 @@ Machine::execute()
 
 		object.to_object()->init_member(mPoolObject->mStringPool[a.getABCName()],v,0,0);
 
-		mPoolObject->update_global_name(index);
 //		mStack.drop(completeName(a));
 		//TODO: mStack.pop().to_object().setProperty(a, v, true); // true for init
 		break;
