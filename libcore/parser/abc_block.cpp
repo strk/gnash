@@ -703,7 +703,7 @@ abc_block::read_method_infos()
 		boost::uint32_t param_count = mS->read_V32();
 		boost::uint32_t return_type = mS->read_V32();
 
-		log_debug("  Param count: %u return type(index): %s(%u)",param_count,mStringPool[return_type],return_type);
+		log_debug("  Param count: %u return type(index): %s(%u)",param_count,mStringPool[mMultinamePool[return_type].getABCName()],return_type);
 		pMethod->setMinArgumentCount(param_count);
 		pMethod->setMaxArgumentCount(param_count);
 
@@ -726,7 +726,7 @@ abc_block::read_method_infos()
 			log_debug("  Reading parameter %u",j);
 			// The parameter type.
 			boost::uint32_t ptype = mS->read_V32();
-			log_debug("   Parameter type(index): %s(%u)",mStringPool[ptype],ptype);
+			log_debug("   Parameter type(index): %s(%u)",mStringPool[mMultinamePool[ptype].getABCName()],ptype);
 			if (ptype >= mMultinamePool.size())
 			{
 				ERR((_("ABC: Out of bounds parameter type in method.\n")));
@@ -1062,11 +1062,11 @@ bool
 abc_block::read_method_bodies()
 {
 	boost::uint32_t count = mS->read_V32();
-
+	LOG_DEBUG_ABC("There are %u method bodies.",count);
 	for (unsigned int i = 0; i < count; ++i)
 	{
 		boost::uint32_t moffset = mS->read_V32();
-		log_debug("Method body offset: %u",moffset);
+		LOG_DEBUG_ABC("Method body %u method offset=%u",i,moffset);
 		if (moffset >= mMethods.size())
 		{
 			ERR((_("ABC: Out of bounds for method body.\n")));
@@ -1103,12 +1103,6 @@ abc_block::read_method_bodies()
 		else{
 			mMethods[moffset]->getBody()->reInitialize(&body.front(), clength, true);
 		}
-		printf("CODE: method %u offset: %u ",i,moffset);
-		unsigned int ex;
-		for(ex=0;ex<body.size();ex++){
-			printf("0x%X ",body[ex] | 0x0);
-		}
-		printf("\n");
 		boost::uint32_t ecount = mS->read_V32();
 		for (unsigned int j = 0; j < ecount; ++j)
 		{
