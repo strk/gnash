@@ -44,7 +44,6 @@ using namespace gnash;
 namespace amf 
 {
 
-
 Flv::Flv() 
 {
 //    GNASH_REPORT_FUNCTION;

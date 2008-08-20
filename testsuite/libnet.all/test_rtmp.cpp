@@ -179,6 +179,7 @@ main(int argc, char *argv[])
 //    test_types();
 }
 
+// 00 00 cf 03 04 c3 00 00
 void
 test_system()
 {
@@ -208,7 +209,7 @@ test_system()
 
     boost::uint32_t time = *(reinterpret_cast<boost::uint32_t *>(buf2->reference() + 2));
     Buffer *enc2 = server.encodePing(RTMP::PING_CLIENT, htonl(time));
-//    cerr << hexify(enc2->begin(), enc2->size(), false) << endl;
+    cerr << hexify(enc2->begin(), enc2->size(), false) << endl;
     if ((memcmp(buf2->reference(), enc2->reference(), 6) == 0)) {
         runtest.pass("Encoded RTMP Ping Client message");
     } else {
@@ -259,7 +260,6 @@ test_header()
     Buffer *buf1 = hex2mem("03 00 00 00 00 01 1f 14 00 00 00 00");
     Buffer *head1 = server.encodeHeader(0x3, RTMP::HEADER_12, 287,
                                         RTMP::INVOKE, RTMPMsg::FROM_SERVER);
-//    cerr << hexify(head1->begin(), RTMP_MAX_HEADER_SIZE, false) << endl;
     
      if ((memcmp(buf1->reference(), head1->reference(), RTMP_MAX_HEADER_SIZE) == 0)) {
          runtest.pass("Encoded RTMP header(Invoke)");
@@ -278,7 +278,6 @@ test_header()
      Buffer *buf2 = hex2mem("02 00 00 00 00 00 06 04 00 00 00 00");
      Buffer *head2 = server.encodeHeader(0x2, RTMP::HEADER_12, PING_MSG_SIZE,
                                      RTMP::PING, RTMPMsg::FROM_SERVER);
-//     cerr << hexify(head2->begin(), RTMP_MAX_HEADER_SIZE, false) << endl;
      if ((memcmp(buf2->reference(), head2->reference(), 8) == 0)) {
          runtest.pass("Encoded RTMP header(Ping 0)");
      } else {
@@ -347,7 +346,7 @@ test_results()
         std::vector<amf::Element *> props = hell[0]->getProperties();        
 //         printf("FIXME: %d, %d, %s:%s\n", props.size(), msg1->getStatus(),
 //                props[3]->getName(), props[3]->to_string());
-//         msg1->dump();
+//        msg1->dump();
         if ((msg1->getStatus() ==  RTMPMsg::NC_CONNECT_SUCCESS)
             && (msg1->getMethodName() == "_result")
             && (msg1->getStreamID() == 1)
@@ -557,7 +556,7 @@ usage (void)
 #else
 
 int
-main(int /*argc*/, char /* *argv[]*/)
+main(int /* argc */, char /* *argv[] */ )
 {
   // nop
   return 0;  

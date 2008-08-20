@@ -492,6 +492,7 @@ RTMP::decodePing(Network::byte_t *data)
     memset(ping, 0, sizeof(rtmp_ping_t));
 
     // All the data fields in a ping message are 2 bytes long.
+    // FIXME: FIXME: FIXME: breaks on big endian, ppc
     boost::uint16_t type = ntohs(*reinterpret_cast<rtmp_ping_e *>(ptr));
     ping->type = static_cast<rtmp_ping_e>(type);
     ptr += sizeof(boost::uint16_t);
@@ -510,6 +511,7 @@ RTMP::decodePing(Network::byte_t *data)
 
     return ping;    
 }
+
 RTMP::rtmp_ping_t *
 RTMP::decodePing(amf::Buffer *buf)
 {
