@@ -619,15 +619,16 @@ RTMPServer::encodePing(rtmp_ping_e type)
 amf::Buffer *
 RTMPServer::encodePing(rtmp_ping_e type, boost::uint32_t milliseconds)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     Buffer *buf = new Buffer(sizeof(boost::uint16_t) * 4);
     Network::byte_t *ptr = buf->reference();
-    buf->clear();		// default everything to zeros, real data gets optionally added.
-    boost::uint16_t typefield = *reinterpret_cast<boost::uint16_t *>(&type);
+    // default everything to zeros, real data gets optionally added.
+    buf->clear();
+//    boost::uint16_t typefield = (reinterpret_cast<boost::uint16_t>(type));
+    boost::uint16_t typefield = ntohs(type);
     ptr += sizeof(boost::uint16_t); // go past the first short
-
     boost::uint32_t swapped = 0;
-    swapBytes(&typefield, sizeof(boost::uint16_t));
+//     swapBytes(&typefield, sizeof(boost::uint16_t));
     buf->copy(typefield);
     switch (type) {
         // These two don't appear to have any paramaters
