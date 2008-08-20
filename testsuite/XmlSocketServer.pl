@@ -35,8 +35,8 @@ while (@S = $O->can_read) {
                 Time::HiRes::sleep(0.5);
                 print "XmlSocketServer: sending \"$i\" \n";
               
-                $i =~ s/\*NEWLINE\*/\n/;
-                $i =~ s/\*NULL\*/\0/;
+                $i =~ s/\*NEWLINE\*/\n/g;
+                $i =~ s/\*NULL\*/\0/g;
 
                 foreach $C($O->handles) {
                     $T=syswrite($C, $i, 2048);
