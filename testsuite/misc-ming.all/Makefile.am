@@ -122,6 +122,7 @@ check_PROGRAMS = \
 	attachMovieLoopingTestRunner \
 	registerClassTest \
 	registerClassTestRunner \
+	XMLSocketTest \
 	goto_frame_test \
 	consecutive_goto_frame_test \
 	matrix_test \
@@ -1401,6 +1402,14 @@ action_execution_order_extend_testrunner: $(srcdir)/../generic-testrunner.sh act
 	sh $< $(top_builddir) action_execution_order_extend_test.swf > $@
 	chmod 755 $@
 
+XMLSocketTest_SOURCES =	\
+	XMLSocketTest.c	\
+	$(NULL)
+XMLSocketTest_LDADD = libgnashmingutils.la
+
+XMLSocketTest.swf: XMLSocketTest
+	./XMLSocketTest $(top_srcdir)/testsuite/media
+
 registerClassTest_SOURCES =	\
 	registerClassTest.c	\
 	$(NULL)
@@ -1614,6 +1623,7 @@ DrawingApiTestRunner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	DrawingApiTest.swf	\
 	$(NULL)
+
 
 PrototypeEventListeners.swf: $(srcdir)/PrototypeEventListeners.as Dejagnu.swf Makefile ../actionscript.all/check.as ../actionscript.all/utils.as
 	$(MAKESWF) -r12 -o $@ -v6 -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=6 Dejagnu.swf $(srcdir)/PrototypeEventListeners.as
