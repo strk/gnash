@@ -54,7 +54,7 @@ main(int argc, char** argv)
 
     mo = newSWFMovieWithVersion(OUTPUT_VERSION);
     SWFMovie_setDimension(mo, 800, 600);
-    SWFMovie_setRate (mo, 4.0);
+    SWFMovie_setRate (mo, 10.0);
 
     dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
     SWFMovie_add(mo, (SWFBlock)dejagnuclip);
@@ -214,7 +214,7 @@ main(int argc, char** argv)
     SWFMovie_nextFrame(mo);
 
     add_actions(mo,
-        "if (receivedArray[receivedArray.length -1] != 'Last Item' && wait++ < 10)"
+        "if (receivedArray[receivedArray.length -1] != 'Last Item' && wait++ < 100)"
         "{ _root.gotoAndStop(6); };"
         "play();"
     );
@@ -236,6 +236,12 @@ main(int argc, char** argv)
     check_equals(mo, "receivedArray[8]", "expectedArray[8]");
     check_equals(mo, "receivedArray[9]", "expectedArray[9]");
     check_equals(mo, "receivedArray[10]", "expectedArray[10]");    
+    check_equals(mo, "receivedArray[11]", "expectedArray[11]"); 
+    check_equals(mo, "receivedArray[12]", "expectedArray[12]"); 
+    check_equals(mo, "receivedArray[13]", "expectedArray[13]");         
+    check_equals(mo, "receivedArray[14]", "expectedArray[14]");         
+    check_equals(mo, "receivedArray[15]", "expectedArray[15]");         
+
     
 
     add_actions(mo, "totals(); stop();");
