@@ -29,6 +29,9 @@ while (@S = $O->can_read) {
                 }
             }
             else {
+            
+                # Sleep a bit before sending a reply to mimic web traffic
+                # (well, sort of).
                 Time::HiRes::sleep(0.5);
                 print "XmlSocketServer: sending \"$i\" \n";
               
