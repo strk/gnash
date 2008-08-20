@@ -40,38 +40,19 @@
 
 #include "log.h"
 
-#include <sys/types.h>
-#include <fcntl.h>
+// For select() and read()
 #ifdef HAVE_WINSOCK2_H
 # include <winsock2.h>
-# include <windows.h>
-# include <sys/stat.h>
-# include <io.h>
 #else
-# include <sys/time.h>
+# include <sys/types.h>
+# include <sys/stat.h>
 # include <unistd.h>
-# include <sys/select.h>
-# include <netinet/in.h>
-# include <arpa/inet.h>
-# include <sys/socket.h>
-# include <netdb.h>
-# include <cerrno>
-# include <sys/param.h>
-# include <sys/select.h>
 #endif
 
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/scoped_array.hpp>
 
-#ifndef MAXHOSTNAMELEN
-#define MAXHOSTNAMELEN 256
-#endif
-
 #define GNASH_XMLSOCKET_DEBUG
-
-int xml_fd = 0;                 // FIXME: This file descriptor is used by
-                                // XML::checkSocket() when called from the main
-                                // processing loop. 
 
 namespace gnash {
 
@@ -89,16 +70,12 @@ static as_object* getXMLSocketInterface();
 static void attachXMLSocketInterface(as_object& o);
 static void attachXMLSocketProperties(as_object& o);
 
-const int SOCKET_DATA = 1;
-  
-const int INBUF = 10000;
-
-class DSOLOCAL xmlsocket_as_object : public gnash::as_object
+class XMLSocket_as : public as_object
 {
 
 public:
 
-        xmlsocket_as_object()
+        XMLSocket_as()
                 :
                 as_object(getXMLSocketInterface())
         {
@@ -122,15 +99,13 @@ public:
 
   
 XMLSocket::XMLSocket()
+    :
+    _data(false),
+    _xmldata(false),
+    _closed(false),
+    _processing(false)
 {
-//    GNASH_REPORT_FUNCTION;
-    _data = false;
-    _xmldata = false;
-    _closed = false;
-    _processing = false;
-    _port = 0;
-    _sockfd = 0;
-    xml_fd = 0;
+    GNASH_REPORT_FUNCTION;
 }
 
 XMLSocket::~XMLSocket()
@@ -197,25 +172,23 @@ void XMLSocket::processing(bool x)
 bool
 XMLSocket::anydata(int fd, MessageList& msgs)
 {
-    //GNASH_REPORT_FUNCTION;
-
-    fd_set                fdset;
-    struct timeval        tval;
-    int                   ret = 0;
-    char                  buf[INBUF];
-    char                  *packet;
-    int                   retries = 10;
-    char                  *ptr, *eom;
-    int                   cr, index = 0;
-    boost::scoped_array<char> leftover;
-    int                   adjusted_size;
-    
-    
+   
     if (fd <= 0) {
 	log_error(_("%s: fd <= 0, returning false (timer not unregistered while socket disconnected?"), __FUNCTION__);
         return false;
     }
-    
+
+
+    //GNASH_REPORT_FUNCTION;
+
+
+    fd_set                fdset;
+    struct timeval        tval;
+    size_t retries = 10;
+
+    const int bufSize = 10000;
+    boost::scoped_array<char> buf(new char[bufSize]);
+
     while (retries-- > 0) {
         FD_ZERO(&fdset);
         FD_SET(fd, &fdset);
@@ -223,7 +196,7 @@ XMLSocket::anydata(int fd, MessageList& msgs)
         tval.tv_sec = 0;
         tval.tv_usec = 103;
         
-        ret = ::select(fd+1, &fdset, NULL, NULL, &tval);
+        int ret = select(fd + 1, &fdset, NULL, NULL, &tval);
         
         // If interupted by a system call, try again
         if (ret == -1 && errno == EINTR) {
@@ -245,86 +218,24 @@ XMLSocket::anydata(int fd, MessageList& msgs)
             //log_debug(_("%s: There is data in the socket for fd #%d"),
             //    __FUNCTION__, fd);
         }
-        memset(buf, 0, INBUF);
-        ret = ::read(_sockfd, buf, INBUF-2);
-        cr = strlen(buf);
-        log_debug(_("%s: read %d bytes, first msg terminates at %d"), __FUNCTION__, ret, cr);
-        //log_debug(_("%s: read (%d,%d) %s"), __FUNCTION__, buf[0], buf[1], buf);
-        ptr = buf;
-        // If we get a single XML message, do less work
-        if (ret == cr + 1)
-		{
-            adjusted_size = memadjust(ret + 1);
-            packet = new char[adjusted_size];
-            log_debug(_("Packet size is %d at %p"), ret + 1, packet);
-            memset(packet, 0, adjusted_size);
-            strcpy(packet, ptr);
-            eom = strrchr(packet, '\n'); // drop the CR off the end if there is one
-            if (eom) {
-                *eom = 0;
-            }
-            msgs.push_back( packet );
-            log_debug(_("%d: Pushing Packet of size %d at %p"), __LINE__, strlen(packet), packet);
-            processing(false);
-            return true;
-        }
-        
-        // If we get multiple messages in a single transmission, break the buffer
-        // into separate messages.
-        while (strchr(ptr, '\n') > 0) {
-            if (leftover) {
-                processing(false);
-                //log_debug(_("%s: The remainder is: \"%s\""), __FUNCTION__, leftover.get());
-                //log_debug(_("%s: The rest of the message is: \"%s\""), __FUNCTION__, ptr);
-                adjusted_size = memadjust(cr + strlen(leftover.get()) + 1);
-                packet = new char[adjusted_size];
-                memset(packet, 0, adjusted_size);
-                strcpy(packet, leftover.get());
-                strcat(packet, ptr);
-                eom = strrchr(packet, '\n'); // drop the CR off the end there is one
-                if (eom) {
-                    *eom = 0;
-                }
-                //log_debug(_("%s: The whole message is: \"%s\""), __FUNCTION__, packet);
-                ptr = strchr(ptr, '\n') + 2; // messages are delimited by a "\n\0"
-                leftover.reset();
-            } else {
-                adjusted_size = memadjust(cr + 1);
-                packet = new char[adjusted_size];
-                memset(packet, 0, adjusted_size);
-                strcpy(packet, ptr);
-                ptr += cr + 1;
-            } // end of if remainder
-            if (*packet == '<') {
-                //log_debug(_("%d: Pushing Packet #%d of size %d at %p: %s"), __LINE__,
-                //       data.size(), strlen(packet), packet, packet);
-                eom = strrchr(packet, '\n'); // drop the CR off the end there is one
-                if (eom) {
-                    *eom = 0;
-                }
-                //log_debug(_("Allocating new packet at %p"), packet);
-                //data.push_back(packet);
-                msgs.push_back( std::string(packet) );
-            } else {
-                log_error(_("Throwing out partial packet %s"), packet);
-            }
-            
-            //log_debug(_("%d messages in array now"), data.size());
-            cr = strlen(ptr);
-        } // end of while (cr)
-        
-        if (strlen(ptr) > 0) {
-            leftover.reset( new char[strlen(ptr) + 1] );
-            strcpy(leftover.get(), ptr);
-            processing(true);
-            //log_debug(_("%s: Adding remainder: \"%s\""), __FUNCTION__, leftover.get());
+
+        processing(true);
+
+        ret = read(_sockfd, buf.get(), bufSize - 1);
+        buf[ret + 1] = 0;
+
+        char* ptr = buf.get();
+        while (ptr -buf.get() < ret )
+        {
+            msgs.push_back(ptr);
+            ptr += strlen(ptr) + 1;
         }
         
         processing(false);
         log_debug(_("%s: Returning %d messages"), __FUNCTION__, index);
         return true;
         
-    } // end of while (retires)
+    }
     
     return true;
 }
@@ -341,9 +252,10 @@ XMLSocket::send(std::string str)
 	return false;
     }
     
-    int ret = write(_sockfd, str.c_str(), str.size());
+    // We have to write the NULL terminator as well.
+    int ret = write(_sockfd, str.c_str(), str.size() + 1);
     
-    log_debug(_("%s: sent %d bytes, data was %s"), __FUNCTION__, ret, str.c_str());
+    log_debug(_("%s: sent %d bytes, data was %s"), __FUNCTION__, ret, str);
     if (ret == static_cast<signed int>(str.size())) {
         return true;
     } else {
@@ -436,7 +348,7 @@ xmlsocket_connect(const fn_call& fn)
     log_debug(_("XMLSocket.connect(%s) called"), ss.str().c_str());
 #endif
 
-    boost::intrusive_ptr<xmlsocket_as_object> ptr = ensureType<xmlsocket_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<XMLSocket_as> ptr = ensureType<XMLSocket_as>(fn.this_ptr);
 
     if (ptr->obj.connected())
     {
@@ -484,7 +396,7 @@ xmlsocket_send(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
     
-    boost::intrusive_ptr<xmlsocket_as_object> ptr = ensureType<xmlsocket_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<XMLSocket_as> ptr = ensureType<XMLSocket_as>(fn.this_ptr);
     const std::string& object = fn.arg(0).to_string();
     //  log_debug(_("%s: host=%s, port=%g"), __FUNCTION__, host, port);
     return as_value(ptr->obj.send(object));
@@ -495,7 +407,7 @@ xmlsocket_close(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
     
-    boost::intrusive_ptr<xmlsocket_as_object> ptr = ensureType<xmlsocket_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<XMLSocket_as> ptr = ensureType<XMLSocket_as>(fn.this_ptr);
     // Since the return code from close() doesn't get used by Shockwave,
     // we don't care either.
     ptr->obj.close();
@@ -508,7 +420,7 @@ xmlsocket_new(const fn_call& fn)
     //GNASH_REPORT_FUNCTION;
     //log_debug(_("%s: nargs=%d"), __FUNCTION__, nargs);
     
-    boost::intrusive_ptr<as_object> xmlsock_obj = new xmlsocket_as_object;
+    boost::intrusive_ptr<as_object> xmlsock_obj = new XMLSocket_as;
 
 #ifdef GNASH_XMLSOCKET_DEBUG
     std::stringstream ss;
@@ -530,7 +442,7 @@ xmlsocket_inputChecker(const fn_call& fn)
     as_value	method;
     as_value	val;
     
-    boost::intrusive_ptr<xmlsocket_as_object> ptr = ensureType<xmlsocket_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<XMLSocket_as> ptr = ensureType<XMLSocket_as>(fn.this_ptr);
     if ( ! ptr->obj.connected() )
     {
         log_error(_("%s: not connected"), __FUNCTION__);
@@ -550,7 +462,7 @@ xmlsocket_onData(const fn_call& fn)
     as_value	method;
     as_value	val;
     
-    boost::intrusive_ptr<xmlsocket_as_object> ptr = ensureType<xmlsocket_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<XMLSocket_as> ptr = ensureType<XMLSocket_as>(fn.this_ptr);
 
     if ( fn.nargs < 1 )
     {
@@ -636,7 +548,7 @@ void xmlsocket_class_init(as_object& global)
 }
 
 boost::intrusive_ptr<as_function>
-xmlsocket_as_object::getEventHandler(const std::string& name)
+XMLSocket_as::getEventHandler(const std::string& name)
 {
 	boost::intrusive_ptr<as_function> ret;
 
@@ -648,7 +560,7 @@ xmlsocket_as_object::getEventHandler(const std::string& name)
 }
 
 void
-xmlsocket_as_object::checkForIncomingData()
+XMLSocket_as::checkForIncomingData()
 {
     assert(obj.connected());
 

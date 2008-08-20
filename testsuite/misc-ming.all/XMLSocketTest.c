@@ -43,6 +43,8 @@ main(int argc, char** argv)
     SWFMovie mo;
 	const char* srcdir = ".";
 
+    char longString[15000];
+
 	if ( argc>1 ) srcdir=argv[1];
 	else
 	{
@@ -54,7 +56,7 @@ main(int argc, char** argv)
 
     mo = newSWFMovieWithVersion(OUTPUT_VERSION);
     SWFMovie_setDimension(mo, 800, 600);
-    SWFMovie_setRate (mo, 4.0);
+    SWFMovie_setRate (mo, 10.0);
 
     dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
     SWFMovie_add(mo, (SWFBlock)dejagnuclip);
@@ -129,8 +131,16 @@ main(int argc, char** argv)
         "xmlArray[8] = undefined;"
         "xmlArray[9] = 9;"
         "xmlArray[10] = '';"
-        "xmlArray[11] = 'Last Item';"
     );
+
+    memset(longString, 'a', 15000);
+    strncpy(longString, "xmlArray[11] = '", 16);
+    longString[14998] = '\'';
+    longString[14999] = ';';
+
+    add_actions(mo, longString);
+
+    add_actions(mo, "xmlArray[12] = 'Last Item';");
 
     /* The data we should get back */
     add_actions(mo, 
@@ -150,7 +160,8 @@ main(int argc, char** argv)
         "expectedArray[12] = 'undefined';"
         "expectedArray[13] = 9;"
         "expectedArray[14] = '';"
-        "expectedArray[15] = 'Last Item';"
+        "expectedArray[15] = 'aaa';"
+        "expectedArray[16] = 'Last Item';"
     );
 
 
@@ -214,7 +225,7 @@ main(int argc, char** argv)
     SWFMovie_nextFrame(mo);
 
     add_actions(mo,
-        "if (receivedArray[receivedArray.length -1] != 'Last Item' && wait++ < 10)"
+        "if (receivedArray[receivedArray.length -1] != 'Last Item' && wait++ < 100)"
         "{ _root.gotoAndStop(6); };"
         "play();"
     );
@@ -236,6 +247,15 @@ main(int argc, char** argv)
     check_equals(mo, "receivedArray[8]", "expectedArray[8]");
     check_equals(mo, "receivedArray[9]", "expectedArray[9]");
     check_equals(mo, "receivedArray[10]", "expectedArray[10]");    
+    check_equals(mo, "receivedArray[11]", "expectedArray[11]"); 
+    check_equals(mo, "receivedArray[12]", "expectedArray[12]"); 
+    check_equals(mo, "receivedArray[13]", "expectedArray[13]");         
+    check_equals(mo, "receivedArray[14]", "expectedArray[14]");
+    check_equals(mo, "receivedArray[15].length", "14982");         
+    
+             
+    check_equals(mo, "receivedArray[16]", "expectedArray[16]");         
+
     
 
     add_actions(mo, "totals(); stop();");
@@ -246,3 +266,4 @@ main(int argc, char** argv)
 
   return 0;
 }
+
