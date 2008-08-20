@@ -1232,6 +1232,7 @@ Machine::execute()
 /// Do: Return an undefined object up the callstack.
 	case SWF::ABC_ACTION_RETURNVOID:
 	{
+		mStream->seekTo(0);
 		if(mStateStack.size() == 0){
 			return;
 		}
@@ -1402,8 +1403,7 @@ Machine::execute()
 		push_stack(as_value(new_class));
 
 		//Call the class's static constructor.
-		saveState();
-		mStream = c->getStaticConstructor()->getBody();
+		load_function(c->getStaticConstructor()->getBody());
 
 		print_stack();
 //		ENSURE_OBJECT(mStack.top(0));
@@ -2631,8 +2631,8 @@ void Machine::initMachine(abc_block* pool_block,as_object* global)
 void Machine::executeFunction(CodeStream* stream){
 	
 	mExitWithReturn = true;
-	saveState();
-	executeCodeblock(stream);
+	load_function(stream);
+	execute();
 	mExitWithReturn = false;
 }
 

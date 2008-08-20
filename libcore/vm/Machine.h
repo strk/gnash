@@ -344,6 +344,11 @@ private:
 		return env;
 	}
 
+	void load_function(CodeStream* stream){
+		saveState();
+		mStream = stream;
+	}
+
 	void executeCodeblock(CodeStream* stream);
 
 	SafeStack<as_value> mStack;
