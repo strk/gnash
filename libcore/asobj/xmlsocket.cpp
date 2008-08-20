@@ -182,18 +182,12 @@ XMLSocket::anydata(int fd, MessageList& msgs)
     //GNASH_REPORT_FUNCTION;
 
 
-    const int bufSize = 10000;
-
-    char                  buf[bufSize];
-    char                  *packet;
-    char                  *ptr, *eom;
-    int                   cr, index = 0;
-    boost::scoped_array<char> leftover;
-    
-
     fd_set                fdset;
     struct timeval        tval;
     size_t retries = 10;
+
+    const int bufSize = 10000;
+    boost::scoped_array<char> buf(new char[bufSize]);
 
     while (retries-- > 0) {
         FD_ZERO(&fdset);
@@ -225,89 +219,23 @@ XMLSocket::anydata(int fd, MessageList& msgs)
             //    __FUNCTION__, fd);
         }
 
-        memset(buf, 0, bufSize);
+        processing(true);
 
-        ret = read(_sockfd, buf, bufSize - 2);
-        cr = strlen(buf);
+        ret = read(_sockfd, buf.get(), bufSize - 1);
+        buf[ret + 1] = 0;
 
-        log_debug(_("%s: read %d bytes, first msg terminates at %d"), __FUNCTION__, ret, cr);
-
-        ptr = buf;
-
-        // If we get a single XML message, do less work
-        if (ret == cr + 1)
-		{
-            int adjusted_size = memadjust(ret + 1);
-            packet = new char[adjusted_size];
-            log_debug(_("Packet size is %d at %p"), ret + 1, packet);
-            memset(packet, 0, adjusted_size);
-            strcpy(packet, ptr);
-            eom = strrchr(packet, '\n'); // drop the CR off the end if there is one
-            if (eom) {
-                *eom = 0;
-            }
-            msgs.push_back( packet );
-            log_debug(_("%d: Pushing Packet of size %d at %p"), __LINE__, strlen(packet), packet);
-            processing(false);
-            return true;
-        }
-        
-        // If we get multiple messages in a single transmission, break the buffer
-        // into separate messages.
-        while (strchr(ptr, '\n') > 0) {
-            if (leftover) {
-                processing(false);
-                //log_debug(_("%s: The remainder is: \"%s\""), __FUNCTION__, leftover.get());
-                //log_debug(_("%s: The rest of the message is: \"%s\""), __FUNCTION__, ptr);
-                int adjusted_size = memadjust(cr + strlen(leftover.get()) + 1);
-                packet = new char[adjusted_size];
-                memset(packet, 0, adjusted_size);
-                strcpy(packet, leftover.get());
-                strcat(packet, ptr);
-                eom = strrchr(packet, '\n'); // drop the CR off the end there is one
-                if (eom) {
-                    *eom = 0;
-                }
-                //log_debug(_("%s: The whole message is: \"%s\""), __FUNCTION__, packet);
-                ptr = strchr(ptr, '\n') + 2; // messages are delimited by a "\n\0"
-                leftover.reset();
-            } else {
-                int adjusted_size = memadjust(cr + 1);
-                packet = new char[adjusted_size];
-                memset(packet, 0, adjusted_size);
-                strcpy(packet, ptr);
-                ptr += cr + 1;
-            } // end of if remainder
-            if (*packet == '<') {
-                //log_debug(_("%d: Pushing Packet #%d of size %d at %p: %s"), __LINE__,
-                //       data.size(), strlen(packet), packet, packet);
-                eom = strrchr(packet, '\n'); // drop the CR off the end there is one
-                if (eom) {
-                    *eom = 0;
-                }
-                //log_debug(_("Allocating new packet at %p"), packet);
-                //data.push_back(packet);
-                msgs.push_back( std::string(packet) );
-            } else {
-                log_error(_("Throwing out partial packet %s"), packet);
-            }
-            
-            //log_debug(_("%d messages in array now"), data.size());
-            cr = strlen(ptr);
-        } // end of while (cr)
-        
-        if (strlen(ptr) > 0) {
-            leftover.reset( new char[strlen(ptr) + 1] );
-            strcpy(leftover.get(), ptr);
-            processing(true);
-            //log_debug(_("%s: Adding remainder: \"%s\""), __FUNCTION__, leftover.get());
+        char* ptr = buf.get();
+        while (ptr -buf.get() < ret )
+        {
+            msgs.push_back(ptr);
+            ptr += strlen(ptr) + 1;
         }
         
         processing(false);
         log_debug(_("%s: Returning %d messages"), __FUNCTION__, index);
         return true;
         
-    } // end of while (retries)
+    }
     
     return true;
 }
@@ -324,7 +252,8 @@ XMLSocket::send(std::string str)
 	return false;
     }
     
-    int ret = write(_sockfd, str.c_str(), str.size());
+    // We have to write the NULL terminator as well.
+    int ret = write(_sockfd, str.c_str(), str.size() + 1);
     
     log_debug(_("%s: sent %d bytes, data was %s"), __FUNCTION__, ret, str);
     if (ret == static_cast<signed int>(str.size())) {
