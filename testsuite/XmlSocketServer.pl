@@ -17,13 +17,13 @@ while (@S = $O->can_read) {
             $O->add($C);
         }
         else {
-            my $R=sysread($_, $i, 2048);
+            my $R=sysread($_, $i, 16000);
             
             # Log message received:
             print "XmlSocketServer: received \"$i\"\n";
             
             if ($R==0) {
-                $T=syswrite($_, "\n", 2048);
+                $T=syswrite($_, "\n", 16000);
                 if ($T==undef) {
                     $O->remove($_);
                 }
@@ -39,7 +39,7 @@ while (@S = $O->can_read) {
                 $i =~ s/\*NULL\*/\0/g;
 
                 foreach $C($O->handles) {
-                    $T=syswrite($C, $i, 2048);
+                    $T=syswrite($C, $i, 16000);
                 }
             }
         }
