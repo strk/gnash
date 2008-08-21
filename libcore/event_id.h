@@ -172,6 +172,8 @@ public:
 	id_code id() const { return m_id; }
 };
 
+std::ostream& operator<< (std::ostream& o, const event_id& ev);
+
 }	// end namespace gnash
 
 

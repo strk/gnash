@@ -2846,7 +2846,7 @@ sprite_instance::on_event(const event_id& id)
   testInvariant();
 
 #ifdef GNASH_DEBUG
-  log_debug(_("Event %s invoked for sprite %s"), id.get_function_name(), getTarget());
+  log_debug(_("Event %s invoked for sprite %s"), id, getTarget());
 #endif
 
   // We do not execute ENTER_FRAME if unloaded
@@ -2862,7 +2862,7 @@ sprite_instance::on_event(const event_id& id)
   {
 #ifdef GNASH_DEBUG
     log_debug(_("Sprite %s ignored button-like event %s as not 'enabled'"),
-      getTarget(), id.get_function_name());
+      getTarget(), id);
 #endif
     return false;
   }

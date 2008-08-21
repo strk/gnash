@@ -184,8 +184,6 @@ event_id::get_function_key() const
 		NSV::PROP_ON_KILL_FOCUS 	// onKillFocus
 	};
 
-    log_debug("m_id: %d", m_id);
-
 	assert(m_id > INVALID && m_id < EVENT_COUNT);
 	return function_keys[m_id];
 }
@@ -241,6 +239,11 @@ event_id::is_button_event() const
 		default:
 			return false;
 	}
+}
+
+std::ostream& operator<< (std::ostream& o, const event_id& ev)
+{
+    return (o << ev.get_function_name());
 }
 
 } // end of namespace gnash

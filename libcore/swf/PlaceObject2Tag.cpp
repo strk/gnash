@@ -219,7 +219,7 @@ PlaceObject2Tag::readPlaceActions(SWFStream& in)
                     action_buffer* thisAction = _actionBuffers.back();
                     std::auto_ptr<swf_event> ev ( new swf_event(s_code_bits[i], *thisAction) );
                     IF_VERBOSE_PARSE (
-                    log_parse("---- actions for event %s", ev->event().get_function_name().c_str());
+                    log_parse("---- actions for event %s", ev->event());
                     );
     
                     if (i == 17)    // has KeyPress event
