@@ -1371,7 +1371,7 @@ Machine::execute()
 		LOG_DEBUG_AVM("Creating new class id=%u name=%s",c->getName(),mPoolObject->mStringPool[c->getName()]);
 		
 		as_object* base_class = pop_stack().to_object().get();
-		as_object* new_class = new as_object();
+		as_object* new_class = new as_object(base_class);
 		//Create the class.
 		abc_function* constructor = new abc_function(c->getConstructor()->getBody(),this);
 		new_class->init_member(NSV::PROP_uuCONSTRUCTORuu,as_value(constructor),0);
