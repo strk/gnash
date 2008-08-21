@@ -481,7 +481,10 @@ Machine::execute()
 /// Equivalent: ACTION_BRANCHALWAYS
 	case SWF::ABC_ACTION_JUMP:
 	{
-		JUMPIF(true);
+		boost::int32_t bytes = mStream->read_S24();
+		LOG_DEBUG_AVM("Jumping %d bytes.",bytes);
+		mStream->seekBy(bytes);
+
 		break;
 	}
 /// 0x11 ABC_ACTION_IFTRUE
