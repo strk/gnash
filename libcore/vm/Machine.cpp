@@ -110,7 +110,7 @@ static inline asName pool_name(boost::uint32_t index, abc_block* pool)
 	if (!pool)
 		throw ASException();
 	asName multiname = pool->mMultinamePool.at(index);
-	LOG_DEBUG_AVM("Finding property id=%u abc name=%u global name = %u abc string=%s flags=0x%X name_space=%u",index,multiname.getABCName(),multiname.getGlobalName(),pool->mStringPool[multiname.getABCName()],multiname.mFlags | 0x0,multiname.getNamespace()->getURI());
+	LOG_DEBUG_AVM("Searching multiname pool for property id=%u abc name=%u global name = %u abc string=%s flags=0x%X name_space=%u",index,multiname.getABCName(),multiname.getGlobalName(),pool->mStringPool[multiname.getABCName()],multiname.mFlags | 0x0,multiname.getNamespace()->getURI());
 	return multiname;
 }
 
@@ -263,31 +263,6 @@ static inline asName pool_name(boost::uint32_t index, abc_block* pool)
 	break;																	\
 }														  /* end of JUMPIF */
 
-#ifdef PRETEND
-#define GROW_STACK() log_debug("AVM2: Growing stack")
-#else
-#define GROW_STACK() mStack.grow(1)
-#endif
-
-
-
-#define PRINT_GET_REGISTER(index) log_debug("AVM2: Getting value of register %d",index)
-
-#ifdef PRETEND
-#define PUSH_STACK(value) value; log_debug("AVM2: Pushing value onto the stack.")
-#else
-#define PUSH_STACK(value) mStack.push(value)
-#endif
-
-
-
-#define PRINT_FIND_PROPERTY(asName_obj) \
-asNamespace* macro_ns = asName_obj.getNamespace(); \
-log_debug("AVM2: Find property id=%d name=%s flags=0x%X namespace=%s",asName_obj.getABCName(),mPoolObject->mStringPool[asName_obj.getABCName()],asName_obj.mFlags | 0x0,macro_ns ?mPoolObject->mStringPool[macro_ns->getURI()]:"NONE");
-
-#define DEBUG_NOT_COMPLETE() log_debug("AVM2: ***Debug statements not complete for opcode.***");
-
-#define LOG_AVM_UNIMPLEMENTED() log_debug("AVM2: Opcode not implemented.");
 void
 Machine::execute()
 {
@@ -301,16 +276,12 @@ Machine::execute()
 	{
 //	opcode = mStreamStack.top(0)->read_as3op();
 	opcode = mStream->read_as3op();
-	log_debug("AVM2: Executing opcode: %X",opcode | 0x0);
+	LOG_DEBUG_AVM("** Executing opcode: %X **",opcode | 0x0);
 //	continue;
 	switch ((opcode /*= mStream->read_as3op()*/)) // Assignment intentional
 	{
 	default:
-#ifdef PRETEND
-		log_debug("AVM2: Invalid opcode.");
-#else
 		throw ASException();
-#endif
 		break;
 	case 0:
 	{
@@ -1271,7 +1242,6 @@ Machine::execute()
 ///  .
 	case SWF::ABC_ACTION_CONSTRUCTSUPER:
 	{
-		LOG_AVM_UNIMPLEMENTED();
 		boost::uint32_t argc = mStream->read_V32();
 		LOG_DEBUG_AVM("There are %u arguments.",argc);
 		get_args(argc);
@@ -1366,7 +1336,6 @@ Machine::execute()
 			arr->set_indexed(i, pop_stack());
 		}
 		push_stack(as_value(arr));
-		print_stack();
 		break;
 	}
 /// 0x57 ABC_ACTION_NEWACTIVATION
@@ -1389,7 +1358,6 @@ Machine::execute()
 /// NB: This depends on scope and scope base (to determine lifetime(?))
 	case SWF::ABC_ACTION_NEWCLASS:
 	{
-		LOG_AVM_UNIMPLEMENTED();
 		boost::uint32_t cid = mStream->read_V32();
 		asClass *c = pool_class(cid, mPoolObject);
 		LOG_DEBUG_AVM("Creating new class id=%u name=%s",c->getName(),mPoolObject->mStringPool[c->getName()]);
@@ -1405,7 +1373,6 @@ Machine::execute()
 		//Call the class's static constructor.
 		load_function(c->getStaticConstructor()->getBody());
 
-		print_stack();
 //		ENSURE_OBJECT(mStack.top(0));
 //		as_object *obj = mStack.top(0).to_object().get();
 //		as_function *func = c->getConstructor()->getPrototype();
@@ -1456,7 +1423,6 @@ Machine::execute()
 	case SWF::ABC_ACTION_FINDPROPSTRICT:
 	case SWF::ABC_ACTION_FINDPROPERTY:
 	{
-		LOG_AVM_UNIMPLEMENTED();
 //		boost::uint32_t property_name = mStream->read_V32();
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
 		find_prop_strict(a);
@@ -1536,7 +1502,6 @@ Machine::execute()
 		if(!object->set_member_default(a.getGlobalName(),value,0,true)){
 			object->init_member(mPoolObject->mStringPool[a.getABCName()],value,0,0);
 		}
-		print_stack();
 		break;
 	}
 /// 0x62 ABC_ACTION_GETLOCAL
@@ -1569,7 +1534,7 @@ Machine::execute()
 	case SWF::ABC_ACTION_GETGLOBALSCOPE:
 	{
 		push_stack(mAsValueScopeStack.value(0));
-		print_stack();
+//		print_stack();
 		break;
 	}
 /// 0x65 ABC_ACTION_GETSCOPEOBJECT
@@ -1611,7 +1576,6 @@ Machine::execute()
 ///  Set obj::(resolve)'name_id' to value, set bindings from the context.
 	case SWF::ABC_ACTION_INITPROPERTY:
 	{
-		LOG_AVM_UNIMPLEMENTED();
 		boost::uint32_t index = mStream->read_V32();
 		asName a = pool_name(index, mPoolObject);
 		as_value v = pop_stack();
@@ -2377,6 +2341,7 @@ Machine::execute()
 		break;
 	}
 	} // end of switch statement
+		LOG_DEBUG_AVM("* DONE *");
 	} // end of AS3 conditional
 	else // beginning of !AS3 (this code is AS2)
 	{

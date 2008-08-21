@@ -256,12 +256,13 @@ private:
 	void push_stack(as_value object){
 		LOG_DEBUG_AVM("Pushing value %s onto stack.",object.toDebugString());
 		mStack.push(object);
-		LOG_DEBUG_AVM("There are now %u items in the stack",mStack.size());
+		print_stack();
 	}
 
 	as_value pop_stack(){
 		as_value value = mStack.pop();
-		LOG_DEBUG_AVM("Poping value %s off the stack.  There are now %u items in the stack",value.toDebugString(),mStack.size());
+		LOG_DEBUG_AVM("Poping value %s off the stack.",value.toDebugString());
+		print_stack();
 		return value;
 	}
 
@@ -315,8 +316,8 @@ private:
 	void print_stack(){
 		
 		std::stringstream ss;
-		ss << "Stack: ";
-//		log_debug("Stack size is %u",mStack.size());
+		ss << "Stack: size=";
+		ss<< mStack.size()<<" Items: ";
 		for(unsigned int i=0;i<mStack.size();++i){
 			as_value value = mStack.value(i);
 			ss << mStack.top(i).toDebugString();
@@ -346,6 +347,18 @@ private:
 
 	void load_function(CodeStream* stream){
 		saveState();
+		std::stringstream ss;
+		ss << "Loading function:\n";
+		int length = 0;
+		while(int opcode = stream->read_as3op()){
+			ss << "0x" << std::hex << opcode << " ";
+			length ++;
+			if(length%20 == 0){
+				ss << "\n";
+			}
+		}
+		LOG_DEBUG_AVM("%s",ss.str());
+		stream->seekTo(0);
 		mStream = stream;
 	}
 
