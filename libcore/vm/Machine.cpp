@@ -537,6 +537,9 @@ Machine::execute()
 			LOG_DEBUG_AVM("Jumping %d bytes.",bytes);
 			mStream->seekBy(bytes);
 		}
+		else{
+			LOG_DEBUG_AVM("Would have jumped %d bytes", bytes);
+		}
 		break;
 	}
 /// 0x14 ABC_ACTION_IFNE
@@ -1005,7 +1008,9 @@ Machine::execute()
 ///  function from this information and bind the current scope.
 	case SWF::ABC_ACTION_NEWFUNCTION:
 	{
-		asMethod *m = pool_method(mStream->read_V32(), mPoolObject);
+		boost::int32_t method_index = mStream->read_V32();
+		LOG_DEBUG_AVM("Creating new abc_function: method index=%u",method_index);
+		asMethod *m = pool_method(method_index, mPoolObject);
 		push_stack(as_value(new abc_function(m->getBody(),this)));
 		break;
 	}
@@ -1634,6 +1639,7 @@ Machine::execute()
 		boost::uint32_t sindex = mStream->read_V32();
 		as_value value = pop_stack();
 		as_value object = pop_stack();
+		LOG_DEBUG_AVM("We should be setting the property at slot %u",sindex);
 		//TODO: Actually set the object's value.
 		break;
 	}

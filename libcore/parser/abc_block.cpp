@@ -893,7 +893,7 @@ abc_block::read_instances()
 		}
 
 		boost::uint8_t flags = mS->read_u8();
-		LOG_DEBUG_ABC("Instance %u multiname index=%u super index=%u flags=%X",i,index,super_index,flags | 0x0);
+		LOG_DEBUG_ABC("Instance %u multiname index=%u name=%s super index=%u flags=%X",i,index,mStringPool[mMultinamePool[index].getABCName()],super_index,flags | 0x0);
 
 		if (flags & INSTANCE_SEALED)
 			pClass->setSealed();
