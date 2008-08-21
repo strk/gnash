@@ -226,6 +226,7 @@ private:
 		as_object *mCurrentScope;
 		as_value *mGlobalReturn;
 		as_object *mThis;
+		std::vector<as_value> mRegisters;
 
 	void to_debug_string(){
 		LOG_DEBUG_AVM("StackDepth=%u StackTotalSize=%u ScopeStackDepth=%u ScopeTotalSize=%u",mStackDepth,mStackTotalSize,mScopeStackDepth,mScopeTotalSize);
@@ -347,19 +348,9 @@ private:
 
 	void load_function(CodeStream* stream){
 		saveState();
-		std::stringstream ss;
-		ss << "Loading function:\n";
-		int length = 0;
-		while(int opcode = stream->read_as3op()){
-			ss << "0x" << std::hex << opcode << " ";
-			length ++;
-			if(length%20 == 0){
-				ss << "\n";
-			}
-		}
-		LOG_DEBUG_AVM("%s",ss.str());
-		stream->seekTo(0);
 		mStream = stream;
+		mRegisters.clear();
+		mRegisters.resize(8);
 	}
 
 	void executeCodeblock(CodeStream* stream);

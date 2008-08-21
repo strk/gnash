@@ -2548,6 +2548,7 @@ Machine::restoreState()
 //	mScopeStack.setAllSizes(s.mScopeTotalSize, s.mScopeStackDepth);
 	mAsValueScopeStack.setAllSizes(s.mScopeTotalSize, s.mScopeStackDepth);
 	mStream = s.mStream;
+	mRegisters = s.mRegisters;
 //	mDefaultXMLNamespace = s.mDefaultXMLNamespace;
 //	mCurrentScope = s.mCurrentScope;
 //	mGlobalReturn = s.mGlobalReturn;
@@ -2570,6 +2571,7 @@ Machine::saveState()
 //	s.mScopeTotalSize = mScopeStack.totalSize();
 	s.mStream = mStream;
 	s.to_debug_string();
+	s.mRegisters = mRegisters;
 //	s.mDefaultXMLNamespace = mDefaultXMLNamespace;
 //	s.mCurrentScope = mCurrentScope;
 //	s.mGlobalReturn = mGlobalReturn;
