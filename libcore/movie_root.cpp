@@ -1302,7 +1302,7 @@ void
 movie_root::notify_mouse_listeners(const event_id& event)
 {
 	//log_debug("Notifying %d listeners about %s",
-	//		m_mouse_listeners.size(), event.get_function_name());
+	//		m_mouse_listeners.size(), event);
 
 	CharacterList copy = m_mouse_listeners;
 	for (CharacterList::iterator iter = copy.begin(), itEnd=copy.end();

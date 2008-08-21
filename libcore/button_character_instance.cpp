@@ -359,7 +359,7 @@ button_character_instance::on_event(const event_id& id)
 		// See bug #22982
 #if 0 // debugging..
 		log_debug("Button %s received %s event while unloaded: ignored",
-			getTarget(), id.get_function_name());
+			getTarget(), id);
 #endif
 		return false; 
 	}
@@ -476,7 +476,7 @@ button_character_instance::on_button_event(const event_id& event)
 		// We dont' respond to events while unloaded
 		// See bug #22982
 		log_debug("Button %s received %s button event while unloaded: ignored",
-			getTarget(), event.get_function_name());
+			getTarget(), event);
 		return;
 	}
 
@@ -505,7 +505,7 @@ button_character_instance::on_button_event(const event_id& event)
 
 	default:
 		//abort();	// missed a case?
-		log_error(_("Unhandled button event %s"), event.get_function_name());
+		log_error(_("Unhandled button event %s"), event);
 		break;
 	};
 	
@@ -579,21 +579,21 @@ button_character_instance::on_button_event(const event_id& event)
 	std::auto_ptr<ExecutableCode> code ( get_event_handler(event) );
 	if ( code.get() )
 	{
-		//log_debug(_("Got statically-defined handler for event: %s"), event.get_function_name());
+		//log_debug(_("Got statically-defined handler for event: %s"), event);
 		mr.pushAction(code, movie_root::apDOACTION);
 		//code->execute();
 	}
-	//else log_debug(_("No statically-defined handler for event: %s"), event.get_function_name());
+	//else log_debug(_("No statically-defined handler for event: %s"), event);
 
 	// Call conventional attached method.
 	boost::intrusive_ptr<as_function> method = getUserDefinedEventHandler(event.get_function_key());
 	if ( method )
 	{
-		//log_debug(_("Got user-defined handler for event: %s"), event.get_function_name());
+		//log_debug(_("Got user-defined handler for event: %s"), event);
 		mr.pushAction(method, this, movie_root::apDOACTION);
 		//call_method0(as_value(method.get()), &(get_environment()), this);
 	}
-	//else log_debug(_("No statically-defined handler for event: %s"), event.get_function_name());
+	//else log_debug(_("No statically-defined handler for event: %s"), event);
 }
 
 void 

@@ -222,10 +222,16 @@ XMLSocket::anydata(int fd, MessageList& msgs)
         processing(true);
 
         ret = read(_sockfd, buf.get(), bufSize - 1);
-        buf[ret + 1] = 0;
+        
+        if (buf[ret] != 0)
+        {
+            // We received a partial message, so bung
+            // a null-terminator on the end.
+            buf[ret + 1] = 0;
+        }
 
         char* ptr = buf.get();
-        while (ptr -buf.get() < ret )
+        while (ptr - buf.get() < ret )
         {
             msgs.push_back(ptr);
             ptr += strlen(ptr) + 1;

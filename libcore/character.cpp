@@ -654,7 +654,7 @@ character::add_event_handler(const event_id& id, const action_buffer& code)
 {
 	_event_handlers[id].push_back(&code);
 
-	//log_debug(_("Setting handler for event %s"), id.get_function_name().c_str());
+	//log_debug(_("Setting handler for event %s"), id);
 
 	// Set the character as a listener iff the
 	// kind of event is a KEY or MOUSE one 
