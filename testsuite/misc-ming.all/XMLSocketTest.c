@@ -160,7 +160,7 @@ main(int argc, char** argv)
         "expectedArray[12] = 'undefined';"
         "expectedArray[13] = 9;"
         "expectedArray[14] = '';"
-        "expectedArray[15] = 'aaa';"
+        "expectedArray[15] = 'aaa...';" /* Don't test this, we'll check the length */
         "expectedArray[16] = 'Last Item';"
     );
 
