@@ -32,19 +32,6 @@ public:
     typedef long (* get_stream_size_func)(void* appdata);
     typedef int (* close_func)(void* appdata);
     
-    // The generic constructor; supply functions for the implementation.
-    tu_file(
-	void * appdata,
-	read_func rf,
-	write_func wf,
-	seek_func sf,
-	seek_to_end_func ef,
-	tell_func tf,
-	get_eof_func gef,
-	get_err_func ger,
-	get_stream_size_func gss,
-	close_func cf=NULL);
-    
     // Make a file from an ordinary FILE*.
     tu_file(FILE* fp, bool autoclose);
     

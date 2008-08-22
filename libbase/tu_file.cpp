@@ -167,27 +167,6 @@ std_close_func(void *appdata)
 
 } // end namespace gnash
 
-//
-// generic functionality
-//
-
-// Create a file using the custom callbacks.
-tu_file::tu_file(void * appdata, read_func rf, write_func wf,
-		 seek_func sf, seek_to_end_func ef, tell_func tf,
-		 get_eof_func gef, get_err_func ger, get_stream_size_func gss, close_func cf)
-{
-    m_data = appdata;
-    m_read = rf;
-    m_write = wf;
-    m_seek = sf;
-    m_seek_to_end = ef;
-    m_tell = tf;
-    m_get_eof = gef;
-    m_get_err = ger;
-    m_get_stream_size = gss;
-    m_close = cf;
-}
-
 //// Create a file from a standard file pointer.
 tu_file::tu_file(FILE* fp, bool autoclose=false)
 {
