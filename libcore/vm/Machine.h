@@ -206,7 +206,7 @@ public:
 
 	void initMachine(abc_block* pool_block,as_object* global);
 
-	void executeFunction(CodeStream* stream);
+	void executeFunction(CodeStream* stream,const fn_call& fn);
 
 	void instantiateClass(std::string className);
 

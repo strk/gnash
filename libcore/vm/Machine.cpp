@@ -2604,10 +2604,14 @@ void Machine::initMachine(abc_block* pool_block,as_object* global)
 //This is called by abc_functions to execute their code stream.
 //TODO: There is probably a better way to do this, once we understand what the VM is supposed
 //todo, this should be fixed.
-void Machine::executeFunction(CodeStream* stream){
+void Machine::executeFunction(CodeStream* stream,const fn_call& fn){
 	
 	mExitWithReturn = true;
 	load_function(stream);
+	mRegisters[0] = as_value(fn.this_ptr);
+	for(unsigned int i=0;i<fn.nargs;i++){
+		mRegisters[i+1] = fn.arg(i);
+	}
 	execute();
 	mExitWithReturn = false;
 }
