@@ -928,8 +928,7 @@ Machine::execute()
 ///  value -- Integer object from integer_pool[index]
 	case SWF::ABC_ACTION_PUSHINT:
 	{
-		mStack.grow(1);
-		mStack.top(0) = pool_int(mStream->read_V32(), mPoolObject);
+		push_stack(pool_int(mStream->read_V32(), mPoolObject));
 		break;
 	}
 /// 0x2E ABC_ACTION_PUSHUINT
