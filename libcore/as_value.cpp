@@ -1394,6 +1394,7 @@ as_value::doubleToString(double val, int radix)
 	// but that may just be a better compiler.
 
 	// Handle non-numeric values.
+	// "printf" gives "nan", "inf", "-inf", so we check explicitly
 	if(isNaN(val))
 	{
 		return "NaN";
@@ -1428,7 +1429,9 @@ as_value::doubleToString(double val, int radix)
 			if (pos != std::string::npos) {
 				str.erase(pos + 1);
 			}
+			
 		}
+		
 		else
 		{
 			ostr << std::setprecision(15) << val;
@@ -1441,27 +1444,25 @@ as_value::doubleToString(double val, int radix)
 			if (pos != std::string::npos && str.at(pos + 2) == '0') {
 				str.erase(pos + 2, 1);
 			}
+			
 		}
-
-        return str;
-
 	}
-
-    // Radix isn't 10
-
-	bool negative = (val < 0);
-	if ( negative ) val = -val;
-
-	double left = std::floor(val);
-	if ( left < 1 ) return "0";
-	while ( left != 0 )
+	else
 	{
-		double n = left;
-		left = std::floor(left / radix);
-		n -= (left * radix);
-		str.insert(0, 1, (n < 10 ? ((int)n+'0') : ((int)n+('a'-10))));
+		bool negative = (val < 0);
+		if ( negative ) val = -val;
+
+		double left = std::floor(val);
+		if ( left < 1 ) return "0";
+		while ( left != 0 )
+		{
+			double n = left;
+			left = std::floor(left / radix);
+			n -= (left * radix);
+			str.insert(0, 1, (n < 10 ? ((int)n+'0') : ((int)n+('a'-10))));
+		}
+		if ( negative ) str.insert(0, 1, '-'); 
 	}
-	if ( negative ) str.insert(0, 1, '-'); 
 
 	return str;
 	

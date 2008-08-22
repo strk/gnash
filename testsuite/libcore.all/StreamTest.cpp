@@ -49,7 +49,7 @@ using namespace gnash;
 
 TestState runtest;
 
-struct ByteReader : public IOChannel
+struct ByteReader
 {
 	unsigned char b;
 	unsigned int pos;
@@ -65,41 +65,32 @@ struct ByteReader : public IOChannel
 		b=by;
 	}
 
-	int read(void* dst, int bytes) 
+	static int readFunc(void* dst, int bytes, void* appdata) 
 	{
+		ByteReader* br = (ByteReader*) appdata;
 
 		unsigned char* ptr = static_cast<unsigned char*>(dst);
 		for (int i=0; i<bytes; ++i)
 		{
-			memcpy(ptr+i, &b, sizeof(unsigned char));
+			memcpy(ptr+i, &(br->b), sizeof(unsigned char));
 		}
 
-		pos += bytes;
+		br->pos += bytes;
 		return bytes;
 	}
 
-	int tell() const
+	static int tellFunc(void* appdata)
 	{
-		return pos;
+		ByteReader* br = (ByteReader*) appdata;
+		return br->pos;
 	}
 
-	int seek(int newPos)
+	static int seekFunc(int newPos, void* appdata)
 	{
-		pos=newPos;
+		ByteReader* br = (ByteReader*) appdata;
+		br->pos=newPos;
 		return 0; // ok, no error (urgh)
 	}
-	
-	
-	// These here to satisfy the IOChannel interface requirements.
-	// I wouldn't call them, if I were you.
-	void go_to_end() { abort(); }
-
-	bool eof() const { abort(); return false; }
-    
-	int get_error() const { return 0; }
-
-	int size() const { abort(); return -1; }
-	
 };
 
 int
@@ -110,25 +101,25 @@ main(int /*argc*/, char** /*argv*/)
 
 	ByteReader br(0xAA);
 
-//	tu_file fakeIn(
-//		&br,
-//		ByteReader::readFunc,
-//		0, // write_func wf,
-//		ByteReader::seekFunc, // seek_func sf,
-//		0, //seek_to_end_func ef,
-//		ByteReader::tellFunc, // tell_func tf,
-//		0, //get_eof_func gef,
-//		0, //get_err_func ger
-//		0, // get_stream_size_func gss,
-//		0 // close_func cf
-//	);
+	tu_file fakeIn(
+		&br,
+		ByteReader::readFunc,
+		0, // write_func wf,
+		ByteReader::seekFunc, // seek_func sf,
+		0, //seek_to_end_func ef,
+		ByteReader::tellFunc, // tell_func tf,
+		0, //get_eof_func gef,
+		0, //get_err_func ger
+		0, // get_stream_size_func gss,
+		0 // close_func cf
+	);
 
 	int ret;
 
 	{
 	/// bits: 10101010 (0xAA)
 	br.setByte(0xAA);
-	SWFStream s(&br);
+	SWFStream s(&fakeIn);
 
 
 	check_equals(s.tell(), 0);
@@ -358,7 +349,7 @@ main(int /*argc*/, char** /*argv*/)
 	{
 	/// bits: 10011001 (0x99)
 	br.setByte(0x99);
-	SWFStream s(&br);
+	SWFStream s(&fakeIn);
 	s.seek(27);
 
 	s.align();

@@ -15,8 +15,6 @@
 
 #include <cstdio>
 
-namespace gnash {
-
 // a file abstraction that can be customized with callbacks.
 // Designed to be easy to hook up to FILE*, SDL_RWops*, or
 // whatever stream type(s) you might use in your game or
@@ -24,12 +22,55 @@ namespace gnash {
 class DSOEXPORT tu_file : public gnash::IOChannel
 {
 public:
-
+    typedef int (* read_func)(void* dst, int bytes, void* appdata);
+    typedef int (* write_func)(const void* src, int bytes, void* appdata);
+    typedef int (* seek_func)(int pos, void* appdata);
+    typedef int (* seek_to_end_func)(void* appdata);
+    typedef int (* tell_func)(void* appdata);
+    typedef bool (* get_eof_func)(void* appdata);
+    typedef int (* get_err_func)(void* appdata);
+    typedef long (* get_stream_size_func)(void* appdata);
+    typedef int (* close_func)(void* appdata);
+    
+    // The generic constructor; supply functions for the implementation.
+    tu_file(
+	void * appdata,
+	read_func rf,
+	write_func wf,
+	seek_func sf,
+	seek_to_end_func ef,
+	tell_func tf,
+	get_eof_func gef,
+	get_err_func ger,
+	get_stream_size_func gss,
+	close_func cf=NULL);
+    
     // Make a file from an ordinary FILE*.
     tu_file(FILE* fp, bool autoclose);
     
+    // Open a file using ordinary fopen().  Automatically closes the
+    // file when we are destroyed.
+    tu_file(const char* name, const char* mode);
+   
     ~tu_file();
     
+    /// Copy remaining contents of *in into *this.
+    //
+    /// TODO: define what happens when the stream
+    ///       is in error condition, see get_error().
+    ///
+    void copy_from(tu_file* in);
+    
+    /// Copy a fixed number of bytes from *in to *this.
+    //
+    /// Returns number of bytes copied.
+    ///
+    /// TODO: define what happens when either one of the streams
+    ///       is in error condition, see get_error().
+    ///
+    int	copy_bytes(tu_file* in, int bytes);
+    
+
     /// \brief Read a 32-bit word from a little-endian stream.
     ///	returning it as a native-endian word.
     //
@@ -115,21 +156,27 @@ public:
     /// TODO: define what happens when the stream
     ///       is in error condition, see get_error().
     ///
-    int read(void* dst, int num);
+    int read(void* dst, int num)
+    {
+        return m_read(dst, num, m_data);
+    }
 
     /// \brief Write the given number of bytes to the stream
     //
     /// TODO: define what happens when the stream
     ///       is in error condition, see get_error().
     ///
-    int write(const void* src, int num);
+    int write(const void* src, int num)
+    {
+        return m_write(src, num, m_data);
+    }
 
     /// \brief Return current stream position
     //
     /// TODO: define what to return when the stream
     ///       is in error condition, see get_error().
     ///
-    int	tell() const;
+    int	tell() const { return m_tell(m_data); }
 
     /// \brief Seek to the specified position
     //
@@ -139,20 +186,20 @@ public:
     ///
     /// @return 0 on success, or TU_FILE_SEEK_ERROR on failure.
     ///
-    int	seek(int p);
+    int	seek(int p) { return m_seek(p, m_data); }
 
     /// \brief Seek to the end of the stream
     //
     /// TODO: define what happens when an error occurs
     ///
-    void go_to_end();
+    void	go_to_end() { m_seek_to_end(m_data); }
 
     /// \brief Return true if the end of the stream has been reached.
     //
     /// TODO: define what to return when in error condition
     /// see get_error().
     ///
-    bool eof() const;
+    bool eof() const { return m_get_eof(m_data); }
     
     /// \brief Return non-zero if the stream is in an error state
     //
@@ -162,72 +209,80 @@ public:
     /// There are some rough meaning for possible returned values
     /// but I don't think they make much sense currently.
     ///
-    int	get_error() const;
+    int	get_error() const { return m_get_err(m_data); }
     
 
     /// \brief Get the size of the stream
-    int size() const;
+    int size() const { return m_get_stream_size(m_data); }
+    
+    // \brief UNSAFE back door, for testing only.
+    void* get_app_data_DEBUG() { return m_data; }
+    
     
 private:
 
     boost::uint64_t	read64()
     {
         boost::uint64_t u;
-        read(&u, 8);
+        m_read(&u, 8, m_data);
         return u;
     }
 
     boost::uint32_t	read32()
     {
         boost::uint32_t u;
-        read(&u, 4);
+        m_read(&u, 4, m_data);
         return u;
     }
 
     boost::uint16_t read16()
     {
         boost::uint16_t u;
-        read(&u, 2);
+        m_read(&u, 2, m_data);
         return u;
     }
     
     boost::uint8_t	read8()
     {
         boost::uint8_t u;
-        read(&u, 1);
+        m_read(&u, 1, m_data);
         return u;
     }
     
     void write64(boost::uint64_t u)
     {
-        write(&u, 8);
+        m_write(&u, 8, m_data);
     }
 
     void write32(boost::uint32_t u)
     {
-        write(&u, 4);
+        m_write(&u, 4, m_data);
     }
 
     void write16(boost::uint16_t u)
     {
-        write(&u, 2);
+        m_write(&u, 2, m_data);
     }
 
     void write8(boost::uint8_t u)
     {
-        write(&u, 1);
+        m_write(&u, 1, m_data);
     }
     
     void close();
     
-    void *	m_data;
-
-    bool _autoclose;
-
+    void *		m_data;
+    read_func		m_read;
+    write_func		m_write;
+    seek_func		m_seek;
+    seek_to_end_func 	m_seek_to_end;
+    tell_func		m_tell;
+    get_eof_func	m_get_eof;
+    get_err_func	m_get_err;
+    get_stream_size_func	m_get_stream_size;
+    close_func		m_close;
 };
 
-
-} // namespace gnash
 #endif // TU_FILE_H
 
 
