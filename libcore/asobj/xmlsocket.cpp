@@ -256,7 +256,6 @@ XMLSocket::anydata(int fd, MessageList& msgs)
         }
         
         processing(false);
-        log_debug(_("%s: Returning %d messages"), __FUNCTION__, index);
         return true;
         
     }
