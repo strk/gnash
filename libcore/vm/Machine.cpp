@@ -559,6 +559,9 @@ Machine::execute()
 			LOG_DEBUG_AVM("Jumping... %d bytes.",bytes);
 			mStream->seekBy(bytes);
 		}
+		else{
+			LOG_DEBUG_AVM("Would have jumped %d bytes",bytes);
+		}
 		break;
 	}
 /// 0x15 ABC_ACTION_IFLT
