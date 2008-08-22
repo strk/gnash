@@ -349,7 +349,8 @@ private:
 		saveState();
 		mStream = stream;
 		mRegisters.clear();
-		mRegisters.resize(8);
+		//TODO: Parse and use maximum stack size value for methods.
+		mRegisters.resize(16);
 	}
 
 	void executeCodeblock(CodeStream* stream);

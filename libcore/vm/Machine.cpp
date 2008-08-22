@@ -836,8 +836,7 @@ Machine::execute()
 	case SWF::ABC_ACTION_PUSHBYTE:
 	{
 		int8_t b = mStream->read_s8();
-		mStack.grow(1);
-		mStack.top(0) = b;
+		push_stack(as_value(b));
 		break;
 	}
 /// 0x25 ABC_ACTION_PUSHSHORT
@@ -2636,7 +2635,7 @@ Machine::Machine(string_table &ST, ClassHierarchy *CH):mST(),mRegisters(),mExitW
 	mCH = CH;
 	//Local registers should be initialized at the beginning of each function call, but
 	//we don't currently parse the number of local registers for each function.
-	mRegisters.resize(8);
+	mRegisters.resize(16);
 //	mST = new string_table();
 //	mST = ST;
 }
