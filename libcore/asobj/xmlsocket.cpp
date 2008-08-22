@@ -114,7 +114,7 @@ XMLSocket::~XMLSocket()
 }
 
 bool
-XMLSocket::connect(const char *host, short port)
+XMLSocket::connect(const std::string& host, short port)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -223,18 +223,36 @@ XMLSocket::anydata(int fd, MessageList& msgs)
 
         ret = read(_sockfd, buf.get(), bufSize - 1);
         
-        if (buf[ret] != 0)
+        if (buf[ret - 1] != 0)
         {
             // We received a partial message, so bung
             // a null-terminator on the end.
-            buf[ret + 1] = 0;
+            buf[ret] = 0;
         }
 
         char* ptr = buf.get();
-        while (ptr - buf.get() < ret )
+        while (ptr - buf.get() < ret - 1)
         {
+            log_debug ("read: %d, this string ends: %d", ret, ptr + std::strlen(ptr) - buf.get());
+            // If the string reaches to the final byte read, it's
+            // incomplete. Store it and continue. 
+            if (ptr + std::strlen(ptr) - buf.get() == ret)
+            {
+                log_debug ("Setting remainder");
+                _remainder += std::string(ptr);
+                break;
+            }
+            if (!_remainder.empty())
+            {
+                log_debug ("Adding and clearing remainder");
+                msgs.push_back(_remainder + std::string(ptr));
+                ptr += std::strlen(ptr);
+                _remainder.clear();
+                continue;
+            }
+            
             msgs.push_back(ptr);
-            ptr += strlen(ptr) + 1;
+            ptr += std::strlen(ptr) + 1;
         }
         
         processing(false);
@@ -351,7 +369,7 @@ xmlsocket_connect(const fn_call& fn)
 #ifdef GNASH_XMLSOCKET_DEBUG
     std::stringstream ss;
     fn.dump_args(ss);
-    log_debug(_("XMLSocket.connect(%s) called"), ss.str().c_str());
+    log_debug(_("XMLSocket.connect(%s) called"), ss.str());
 #endif
 
     boost::intrusive_ptr<XMLSocket_as> ptr = ensureType<XMLSocket_as>(fn.this_ptr);
@@ -365,11 +383,8 @@ xmlsocket_connect(const fn_call& fn)
     const std::string& host = hostval.to_string();
     int port = int(fn.arg(1).to_number());
     
-    bool success = ptr->obj.connect(host.c_str(), port);
+    bool success = ptr->obj.connect(host, port);
 
-    VM& vm = ptr->getVM();
-    string_table& st = vm.getStringTable();
-    
     // Actually, if first-stage connection was successful, we
     // should NOT invoke onConnect(true) here, but postpone
     // that event call to a second-stage connection checking,
@@ -378,16 +393,18 @@ xmlsocket_connect(const fn_call& fn)
     // XMLSocket.connect() returned in these cases.
     //
     log_debug(_("XMLSocket.connect(): tring to call onConnect"));
-    ptr->callMethod(st.find(PROPNAME("onConnect")), success);
+    ptr->callMethod(NSV::PROP_ON_CONNECT, success);
 	    
     if ( success )
     {
         log_debug(_("Setting up timer for calling XMLSocket.onData()"));
 
-	std::auto_ptr<Timer> timer(new Timer);
+	    std::auto_ptr<Timer> timer(new Timer);
         boost::intrusive_ptr<builtin_function> ondata_handler = new builtin_function(&xmlsocket_inputChecker, NULL);
         unsigned interval = 50; // just make sure it's expired at every frame iteration (20 FPS used here)
         timer->setInterval(*ondata_handler, interval, boost::dynamic_pointer_cast<as_object>(ptr));
+
+        VM& vm = ptr->getVM();
         vm.getRoot().add_interval_timer(timer, true);
 
         log_debug(_("Timer set"));
@@ -431,7 +448,7 @@ xmlsocket_new(const fn_call& fn)
 #ifdef GNASH_XMLSOCKET_DEBUG
     std::stringstream ss;
     fn.dump_args(ss);
-    log_debug(_("new XMLSocket(%s) called - created object at %p"), ss.str().c_str(), (void*)xmlsock_obj.get());
+    log_debug(_("new XMLSocket(%s) called - created object at %p"), ss.str(), (void*)xmlsock_obj.get());
 #else
     UNUSED(fn);
 #endif
@@ -490,13 +507,9 @@ xmlsocket_onData(const fn_call& fn)
     boost::intrusive_ptr<as_object> xml = new XML(xmlin);
     as_value arg(xml.get());
 
-    VM& vm = VM::get();
-    string_table& st = vm.getStringTable();
-    
-    ptr->callMethod(st.find(PROPNAME("onXML")), arg);
+    ptr->callMethod(NSV::PROP_ON_XML, arg);
 
     return as_value();
-
 
 }
 
@@ -574,13 +587,15 @@ XMLSocket_as::checkForIncomingData()
         log_debug(_("Still processing data"));
     }
     
-    std::vector<std::string > msgs;
-    if (obj.anydata(msgs))
+    std::vector<std::string> msgs;
+    obj.anydata(msgs);
+   
+    if (!msgs.empty())
     {
         log_debug(_("Got %d messages: "), msgs.size());
         for (size_t i=0; i<msgs.size(); ++i)
         {
-            log_debug(_(" Message %d: %s "), i, msgs[i].c_str());
+            log_debug(_(" Message %d: %s "), i, msgs[i]);
         }
 
         boost::intrusive_ptr<as_function> onDataHandler = getEventHandler("onData");

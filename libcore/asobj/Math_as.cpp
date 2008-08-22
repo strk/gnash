@@ -43,7 +43,7 @@ namespace gnash {
 
 // Forward declarations
 static void attachMathInterface(as_object& proto);
-static as_value math_fabs(const fn_call& fn);	// Implements AS "abs"
+static as_value math_abs(const fn_call& fn);	// Implements AS "abs"
 static as_value math_acos(const fn_call& fn);
 static as_value math_asin(const fn_call& fn);
 static as_value math_atan(const fn_call& fn);
@@ -82,27 +82,19 @@ math_class_init(as_object& global)
 // All one-argument Math functions called with no args return NaN
 //
 
+// If it is called with two arguments, the valueOf method
+// (i.e. to_number()) of the second method is called, but 
+// not used. Strange, but true.
 #define MATH_WRAP_FUNC1(funcname)				\
 	as_value math_##funcname(const fn_call& fn)		\
 	{							\
-		double result;					\
-		if (fn.nargs < 1) result = NaN;			\
-		else {						\
-			double	arg = fn.arg(0).to_number();	\
-			result = std::funcname(arg);			\
-		}						\
-		return as_value(result);			\
+		if (fn.nargs < 1) return as_value(NaN);			\
+		if (fn.nargs == 2) fn.arg(1).to_number(); \
+		double	arg = fn.arg(0).to_number();	\
+		return as_value(std::funcname(arg));			\
 	}
 
-// Dirty it is, but what's it for? All the functions used here are
-// in the standard cmath header, so there *ought* to be no need for
-// a hack.
-//#ifndef __GNUC__  //Some hacks are ugly and dirty, we call them 'fulhack'.
-//#	undef TU_MATH_H
-//#	include "tu_math.h"
-//#endif
-
-MATH_WRAP_FUNC1(fabs)
+MATH_WRAP_FUNC1(abs)
 MATH_WRAP_FUNC1(acos)
 MATH_WRAP_FUNC1(asin)
 MATH_WRAP_FUNC1(atan)
@@ -140,10 +132,41 @@ MATH_WRAP_FUNC1(tan)
 	}
 
 MATH_WRAP_FUNC2_EXP(atan2, (std::atan2(arg0, arg1)))
-MATH_WRAP_FUNC2_EXP(max, (arg0 > arg1 ? arg0 : arg1))
-MATH_WRAP_FUNC2_EXP(min, (arg0 < arg1 ? arg0 : arg1))
 MATH_WRAP_FUNC2_EXP(pow, (std::pow(arg0, arg1)))
 
+
+as_value
+math_min(const fn_call& fn)
+{
+	if (fn.nargs < 2) return as_value(NaN);
+
+	double arg0 = fn.arg(0).to_number();
+	double arg1 = fn.arg(1).to_number();
+
+	if (isNaN(arg0) || isNaN(arg1))
+	{
+		return as_value(NaN);
+	}
+
+	return as_value(std::min(arg0, arg1));
+
+}
+
+as_value
+math_max(const fn_call& fn)
+{
+	if (fn.nargs < 2) return as_value(NaN);
+
+	double arg0 = fn.arg(0).to_number();
+	double arg1 = fn.arg(1).to_number();
+
+	if (isNaN(arg0) || isNaN(arg1))
+	{
+		return as_value(NaN);
+	}
+
+	return as_value(std::max(arg0, arg1));
+}
 
 // A couple of oddballs.
 as_value
@@ -180,7 +203,7 @@ void registerMathNative(as_object& proto)
 {
     VM& vm = proto.getVM();
     
-    vm.registerNative(math_fabs, 200, 0);
+    vm.registerNative(math_abs, 200, 0);
     vm.registerNative(math_min, 200, 1);
     vm.registerNative(math_max, 200, 2);
     vm.registerNative(math_sin, 200, 3);

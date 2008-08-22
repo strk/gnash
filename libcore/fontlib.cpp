@@ -13,7 +13,6 @@
 #include <pthread.h>
 #endif
 
-#include "tu_file.h"
 #include "font.h"
 #include "impl.h"
 #include "log.h"

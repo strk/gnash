@@ -32,7 +32,7 @@ public:
     XMLSocket();
     ~XMLSocket();
     
-    bool connect(const char *host, short port);
+    bool connect(const std::string& host, short port);
     bool send(std::string str);
     void close();
 
@@ -72,7 +72,8 @@ private:
     bool          _closed;
     bool          _processing;
     std::vector<std::string> _messages;
-    //std::vector< boost::intrusive_ptr<as_object> >  _nodes;
+
+    std::string _remainder;
 
 };
 
