@@ -206,7 +206,7 @@ public:
 
 	void initMachine(abc_block* pool_block,as_object* global);
 
-	void executeFunction(CodeStream* stream,const fn_call& fn);
+	as_value executeFunction(CodeStream* stream,const fn_call& fn);
 
 	void instantiateClass(std::string className);
 
@@ -371,7 +371,7 @@ private:
 	as_object* mDefaultThis;
 	as_object* mThis;
 
-	as_value *mGlobalReturn;
+	as_value mGlobalReturn;
 	as_value mIgnoreReturn; // Throw away returns go here.
 
 	bool mIsAS3; // Is the stream an AS3 stream.

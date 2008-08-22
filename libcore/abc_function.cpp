@@ -32,8 +32,8 @@ as_value
 abc_function::operator()(const fn_call& fn)
 {
 	log_debug("Calling an abc_function.");
-	mMachine->executeFunction(mStream,fn);
-	return as_value();
+	return mMachine->executeFunction(mStream,fn);
+
 }
 
 
