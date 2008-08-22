@@ -1288,9 +1288,11 @@ Machine::execute()
 		boost::uint32_t argc = mStream->read_V32();
 		as_environment env = get_args(argc);
 		as_object* object = pop_stack().to_object().get();
-		object->dump_members();
-		as_value property = object->getMember(NSV::PROP_uuCONSTRUCTORuu,0);
-		as_value value = call_method(property,&env,object,argc,env.stack_size() - 1);
+		as_value prop = object->getMember(a.getGlobalName(),a.getNamespace()->getURI());
+		as_object* object_to_construct = prop.to_object().get();
+		object_to_construct->dump_members();
+		as_value property = object_to_construct->getMember(NSV::PROP_CONSTRUCTOR,0);
+		as_value value = call_method(property,&env,object_to_construct,argc,env.stack_size() - 1);
 		push_stack(value);
 		
 		break;
