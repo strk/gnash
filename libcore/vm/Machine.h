@@ -308,7 +308,6 @@ private:
 		//GET PROPERTY
 		boost::intrusive_ptr<gnash::as_object> object = mStack.pop().to_object();
 //		LOG_DEBUG_AVM("Here are the members in the object the property was resolved in:");
-//		object->dump_members();
 		as_value value = p->getValue(*object);
 		LOG_DEBUG_AVM("Property's value is %s",value.toDebugString());
 		mStack.push(value);

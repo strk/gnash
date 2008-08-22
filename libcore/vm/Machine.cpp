@@ -1166,7 +1166,6 @@ Machine::execute()
 		as_environment env = get_args(argc);
 		//TODO: If multiname is runtime also pop namespace and/or name values.
 		as_object *object = pop_stack().to_object().get();
-		
 		as_value property = object->getMember(a.getGlobalName(),0);
 		LOG_DEBUG_AVM("Calling method %s on object %s",property.toDebugString(),object->get_text_value());
 		as_value result = call_method(property,&env,object,argc,env.stack_size() - 1);
@@ -1290,7 +1289,6 @@ Machine::execute()
 		as_object* object = pop_stack().to_object().get();
 		as_value prop = object->getMember(a.getGlobalName(),a.getNamespace()->getURI());
 		as_object* object_to_construct = prop.to_object().get();
-		object_to_construct->dump_members();
 		as_value property = object_to_construct->getMember(NSV::PROP_CONSTRUCTOR,0);
 		as_value value = call_method(property,&env,object_to_construct,argc,env.stack_size() - 1);
 		push_stack(value);
@@ -1829,10 +1827,9 @@ Machine::execute()
 	case SWF::ABC_ACTION_ASTYPE:
 	{
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
-		mStack.drop(completeName(a));
-		// TODO: Might need some namespace stuff.
-		if (!mStack.top(0).conforms_to(a.getABCName()))
-			mStack.top(0).set_null();
+		as_value value = pop_stack();
+		//TODO: Make sure the value is of the correct type;
+		push_stack(value);
 		break;
 	}
 /// 0x87 ABC_ACTION_ASTYPELATE
