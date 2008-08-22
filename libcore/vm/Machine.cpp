@@ -1588,12 +1588,14 @@ Machine::execute()
 		as_value v = pop_stack();
 		//TODO: If multiname is a runtime mutiname we need to also pop name and namespace values.
 		as_value object = pop_stack();
-		LOG_DEBUG_AVM("Initializing property ABC_id=%u name=%s on object %s",a.getABCName(),mPoolObject->mStringPool[a.getABCName()],object.toDebugString());
+		if(object.is_undefined()){
+			LOG_DEBUG_AVM("Object is undefined will skip trying to initialize property.");
+		}
+		else{
+			LOG_DEBUG_AVM("Initializing property ABC_id=%u name=%s on object %s",a.getABCName(),mPoolObject->mStringPool[a.getABCName()],object.toDebugString());
 
-		object.to_object()->init_member(mPoolObject->mStringPool[a.getABCName()],v,0,0);
-
-//		mStack.drop(completeName(a));
-		//TODO: mStack.pop().to_object().setProperty(a, v, true); // true for init
+			object.to_object().get()->init_member(mPoolObject->mStringPool[a.getABCName()],v,0,0);
+		}
 		break;
 	}
 /// 0x6A ABC_ACTION_DELETEPROPERTY
