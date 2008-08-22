@@ -26,7 +26,7 @@
 #include <pthread.h>
 #endif
 
-#include "tu_file.h" // for StreamAdapter (bitmap tag loaders)
+#include "IOChannel.h" // for StreamAdapter inheritance
 #include "utility.h"
 #include "action.h"
 #include "action_buffer.h"
@@ -38,7 +38,6 @@
 #include "shape.h"
 #include "SWFStream.h"
 #include "styles.h"
-//#include "dlist.h"
 #include "timers.h"
 #include "image.h"
 #include "zlib_adapter.h"
@@ -74,14 +73,12 @@ namespace SWF {
 namespace tag_loaders {
 
 
-namespace { // anonymous
+/// Anonymous namespace
+namespace {
 
-///
-/// tu_file adapter using a stream underneath
-///
-
-/// Provide a tu_file interface around a gnash::stream
-class StreamAdapter
+/// Provide an IOChannel interface around a SWFStream for reading 
+/// embedded image data
+class StreamAdapter : public IOChannel
 {
 	SWFStream& s;
 	unsigned long startPos;
@@ -98,70 +95,73 @@ class StreamAdapter
 		assert(endPos > startPos);
 	}
 
-	static int readFunc(void* dst, int bytes, void* appdata) 
-	{
-		StreamAdapter* br = (StreamAdapter*) appdata;
+    virtual ~StreamAdapter()
+    {
+    }
 
-		unsigned bytesLeft = br->endPos - br->currPos;
+	virtual int read(void* dst, int bytes) 
+	{
+		unsigned bytesLeft = endPos - currPos;
 		if ( bytesLeft < (unsigned)bytes )
 		{
 			if ( ! bytesLeft ) return 0;
 			//log_debug("Requested to read past end of stream range");
 			bytes = bytesLeft;
 		}
-		unsigned actuallyRead = br->s.read((char*)dst, bytes);
-		br->currPos += actuallyRead;
+		unsigned actuallyRead = s.read((char*)dst, bytes);
+		currPos += actuallyRead;
 		return actuallyRead;
 	}
 
-	static long int getStreamSizeFunc(void* appdata)
+    virtual void go_to_end()
+    {
+        s.seek(endPos);
+    }
+
+    virtual bool eof() const
+    {
+        return (currPos == endPos);
+    }
+
+    // Return -1 on failure, 0 on success
+    virtual int seek(int pos)
+    {
+        // SWFStream::seek() returns true on success
+        if (s.seek(pos))
+        {
+            currPos = pos;
+            return 0;
+        }
+        return -1;
+    }
+
+	virtual int size() const
 	{
-		StreamAdapter* br = (StreamAdapter*) appdata;
-		return (br->endPos - br->startPos);
+		return (endPos - startPos);
 	}
 
-	static int tellFunc(void* appdata)
+	virtual int tell() const
 	{
-		StreamAdapter* br = (StreamAdapter*) appdata;
-		return br->currPos;
+		return currPos;
 	}
-
-	static int closeFunc(void* appdata)
+	
+	virtual int get_error() const
 	{
-		StreamAdapter* br = (StreamAdapter*) appdata;
-		delete br;
-		return 0; // ok ? or TU_FILE_CLOSE_ERROR ?
+	    // Is there any point in this?
+	    return TU_FILE_NO_ERROR;
 	}
 
 public:
 
-	/// Get a tu_file from a gnash::SWFStream
-	static std::auto_ptr<tu_file> getFile(SWFStream& str, unsigned long endPos)
+	/// Get an IOChannel from a gnash::SWFStream
+	static std::auto_ptr<IOChannel> getFile(SWFStream& str, unsigned long endPos)
 	{
-		std::auto_ptr<tu_file> ret ( 
-			new tu_file (
-				new StreamAdapter(str, endPos),
-				readFunc,
-				0, // write_func wf,
-				0, //seek_func sf,
-				0, //seek_to_end_func ef,
-				tellFunc, //tell_func tf,
-				0, //get_eof_func gef,
-				0, //get_err_func ger
-				getStreamSizeFunc, // get_stream_size_func gss,
-				closeFunc
-			)
-		);
-
+		std::auto_ptr<IOChannel> ret (new StreamAdapter(str, endPos));
 		return ret;
 	}
 };
 
 } // anonymous namespace
-
-//
-// Some tag implementations
-//
 
 
 //
@@ -191,7 +191,7 @@ frame_label_loader(SWFStream& in, tag_type tag, movie_definition* m)
     // if it is 1 this label can be accessed by #name and it's
     // entrance sets the browser URL with anchor appended
     //
-    // To avoid relaying on SWFStream::tell (see task #5838)
+    // To avoid relying on SWFStream::tell (see task #5838)
     // we should add a new method to that class
     // (ie: SWFStream::current_tag_length)
     //
@@ -252,7 +252,7 @@ jpeg_tables_loader(SWFStream& in, tag_type tag, movie_definition* m)
 	// Anyway the actual reads are limited to currently opened tag as 
 	// of gnash::SWFStream::read(), so this is not a problem.
 	//
-        boost::shared_ptr<tu_file> ad(StreamAdapter::getFile(in, std::numeric_limits<unsigned long>::max()).release());
+        boost::shared_ptr<IOChannel> ad(StreamAdapter::getFile(in, std::numeric_limits<unsigned long>::max()).release());
         //  transfer ownership to the JpegImageInput
         j_in = JpegImageInput::createSWFJpeg2HeaderOnly(ad, jpegHeaderSize);
 
@@ -351,7 +351,7 @@ define_bits_jpeg2_loader(SWFStream& in, tag_type tag, movie_definition* m)
     }
     else
     {
-        boost::shared_ptr<tu_file> ad( StreamAdapter::getFile(in, in.get_tag_end_position()).release() );
+        boost::shared_ptr<IOChannel> ad( StreamAdapter::getFile(in, in.get_tag_end_position()).release() );
 
         std::auto_ptr<image::ImageBase> im (image::readImageData(ad, GNASH_FILETYPE_JPEG));
 
@@ -473,7 +473,7 @@ define_bits_jpeg3_loader(SWFStream& in, tag_type tag, movie_definition* m)
     //
 
     // Read rgb data.
-    boost::shared_ptr<tu_file> ad( StreamAdapter::getFile(in, alpha_position).release() );
+    boost::shared_ptr<IOChannel> ad( StreamAdapter::getFile(in, alpha_position).release() );
     std::auto_ptr<image::ImageRGBA> im = image::readSWFJpeg3(ad);
     
     /// Failure to read the jpeg.
