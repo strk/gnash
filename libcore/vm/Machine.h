@@ -295,7 +295,9 @@ private:
 				return p;
 			}
 		}
-		throw GnashException("Cannot find property in scope stack");
+		print_scope_stack();
+		LOG_DEBUG_AVM("Cannot find property in scope stack.");
+		push_stack(as_value());
 	}
 	
 	void get_property(string_table::key name,string_table::key ns){
