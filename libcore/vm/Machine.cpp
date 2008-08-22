@@ -1947,8 +1947,10 @@ Machine::execute()
 /// a + b (double if numeric)
 	case SWF::ABC_ACTION_ADD:
 	{
-		//TODO: mStack.top(1) = mStack.top(1).add(mStack.top(0));
-		mStack.drop(1);
+		as_value a = pop_stack();
+		as_value b = pop_stack();
+		a.newAdd(b);
+		push_stack(a);
 		break;
 	}
 /// 0xA1 ABC_ACTION_SUBTRACT
