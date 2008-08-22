@@ -291,7 +291,7 @@ private:
  //			}
 			if(p){
 //				LOG_DEBUG_AVM("Property found.");
-				mStack.push(mAsValueScopeStack.top(i));
+				push_stack(mAsValueScopeStack.top(i));
 				return p;
 			}
 		}
