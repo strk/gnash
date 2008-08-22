@@ -43,7 +43,7 @@ namespace gnash {
 
 // Forward declarations
 static void attachMathInterface(as_object& proto);
-static as_value math_fabs(const fn_call& fn);	// Implements AS "abs"
+static as_value math_abs(const fn_call& fn);	// Implements AS "abs"
 static as_value math_acos(const fn_call& fn);
 static as_value math_asin(const fn_call& fn);
 static as_value math_atan(const fn_call& fn);
@@ -94,7 +94,7 @@ math_class_init(as_object& global)
 		return as_value(std::funcname(arg));			\
 	}
 
-MATH_WRAP_FUNC1(fabs)
+MATH_WRAP_FUNC1(abs)
 MATH_WRAP_FUNC1(acos)
 MATH_WRAP_FUNC1(asin)
 MATH_WRAP_FUNC1(atan)
@@ -203,7 +203,7 @@ void registerMathNative(as_object& proto)
 {
     VM& vm = proto.getVM();
     
-    vm.registerNative(math_fabs, 200, 0);
+    vm.registerNative(math_abs, 200, 0);
     vm.registerNative(math_min, 200, 1);
     vm.registerNative(math_max, 200, 2);
     vm.registerNative(math_sin, 200, 3);
