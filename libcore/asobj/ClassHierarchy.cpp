@@ -56,6 +56,7 @@
 #include "Sprite_as.h"
 #include "Stage.h"
 #include "System.h"
+#include "TextFieldAutoSize_as.h"
 #include "TextSnapshot.h"
 #include "TextFormat.h"
 #include "video_stream_instance.h"
@@ -300,7 +301,8 @@ static const ClassHierarchy::nativeClass knownClasses[] =
 	{ interactive_object_class_init, NSV::CLASS_INTERACTIVEOBJECT, NSV::CLASS_DISPLAYOBJECT, 9 },
 	{ display_object_container_class_init, NSV::CLASS_DISPLAYOBJECTCONTAINER, NSV::CLASS_INTERACTIVEOBJECT, 9 },
 	{ sprite_as_class_init, NSV::CLASS_SPRITE, NSV::CLASS_DISPLAYOBJECTCONTAINER, 9 },
-	{ int_class_init, NSV::CLASS_INT, NSV::CLASS_OBJECT, 9 }
+	{ int_class_init, NSV::CLASS_INT, NSV::CLASS_OBJECT, 9 },
+	{ text_field_auto_size_class_init, NSV::CLASS_TEXTFIELDAUTOSIZE, NSV::CLASS_OBJECT, 9 }
 
 // These classes are all implicitly constructed; that is, it is not necessary for
 // the class name to be used to construct the class, so they must always be available.

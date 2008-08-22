@@ -74,6 +74,7 @@ libgnashasobjs_la_SOURCES = \
 	Stage.cpp \
 	System.cpp \
 	TextFormat.cpp \
+	TextFieldAutoSize_as.cpp \
 	TextSnapshot.cpp \
 	MovieClipLoader.cpp\
 	String_as.cpp \
@@ -150,6 +151,7 @@ noinst_HEADERS = \
 	Sprite_as.h \
 	Stage.h	\
 	System.h \
+	TextFieldAutoSize_as.h \
 	TextFormat.h \
 	TextSnapshot.h \
 	String_as.h \

@@ -185,6 +185,7 @@ static string_table::svt preload_names[] =
 	string_table::svt( "DisplayObjectContainer", NSV::CLASS_DISPLAYOBJECTCONTAINER ),
 	string_table::svt( "Sprite", NSV::CLASS_SPRITE ),
 	string_table::svt( "int", NSV::CLASS_INT ),
+	string_table::svt( "TextFieldAutoSize", NSV::CLASS_TEXTFIELDAUTOSIZE),
 	string_table::svt( "flash.display", NSV::NS_FLASH_DISPLAY ),
 	string_table::svt( "flash.text", NSV::NS_FLASH_TEXT ),
 	string_table::svt( "flash.geom", NSV::NS_FLASH_GEOM ),
