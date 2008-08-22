@@ -45,10 +45,7 @@ abc_Trait::finalize(abc_block *pBlock, asClass *pClass, bool do_static)
 	case KIND_SLOT:
 	case KIND_CONST:
 	{
-		//TODO: Remove break.
-		break;
 		// Validate the type.
-		LOG_DEBUG_ABC("In finalize.A");
 		asClass *pType;
 		if (mTypeIndex){
 			LOG_DEBUG_ABC("mTypeIndex = %u\n",mTypeIndex);
@@ -57,7 +54,6 @@ abc_Trait::finalize(abc_block *pBlock, asClass *pClass, bool do_static)
 		else{
 			pType = pBlock->mTheObject;
 		}
-		LOG_DEBUG_ABC("In finalize.B");
 		if (!pType)
 		{
 			ERR((_("ABC: Finalizing trait yielded bad type for slot.\n")));
@@ -65,18 +61,14 @@ abc_Trait::finalize(abc_block *pBlock, asClass *pClass, bool do_static)
 		}
 		// The name has been validated in read.
 		if (mHasValue){
-			LOG_DEBUG_ABC("In finalize.2");
 			pClass->addValue(mName, mNamespace, mSlotId, pType, 
 				mValue, mKind == KIND_CONST, do_static);
-				LOG_DEBUG_ABC("In finalize.1");
 			}
 		else{
 			LOG_DEBUG_ABC("In finalize.C");
 			pClass->addSlot(mName, mNamespace, mSlotId, pType,
 				do_static);
-
 			}
-			LOG_DEBUG_ABC("In finalize.D");
 		break;
 	}
 	case KIND_METHOD:
@@ -203,7 +195,7 @@ abc_Trait::read(SWFStream* in, abc_block *pBlock)
 	boost::uint8_t kind = in->read_u8();
 	mKind = static_cast<kinds> (kind & 0x0F);
 
-	LOG_DEBUG_ABC("Trait kind is 0x%X", kind | 0x0);
+	LOG_DEBUG_ABC("Trai name=%s Trait kind is 0x%X", pBlock->mStringPool[multiname.getABCName()],kind | 0x0);
 	switch (mKind)
 	{
 	case KIND_SLOT:
