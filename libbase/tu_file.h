@@ -41,23 +41,6 @@ public:
    
     ~tu_file();
     
-    /// Copy remaining contents of *in into *this.
-    //
-    /// TODO: define what happens when the stream
-    ///       is in error condition, see get_error().
-    ///
-    void copy_from(tu_file* in);
-    
-    /// Copy a fixed number of bytes from *in to *this.
-    //
-    /// Returns number of bytes copied.
-    ///
-    /// TODO: define what happens when either one of the streams
-    ///       is in error condition, see get_error().
-    ///
-    int	copy_bytes(tu_file* in, int bytes);
-    
-
     /// \brief Read a 32-bit word from a little-endian stream.
     ///	returning it as a native-endian word.
     //
