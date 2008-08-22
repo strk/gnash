@@ -1286,17 +1286,13 @@ Machine::execute()
 		// TODO
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
 		boost::uint32_t argc = mStream->read_V32();
-		int shift = completeName(a, argc);
-		ENSURE_OBJECT(mStack.top(argc + shift));
-		// We have to move the stack if there was a shift.
-		if (shift)
-		{
-			boost::uint32_t i = argc;
-			while (i--)
-				mStack.top(i + shift) = mStack.top(i);
-			mStack.drop(shift);
-		}
-		// TODO: Finish this (See ECMA spec)
+		as_environment env = get_args(argc);
+		as_object* object = pop_stack().to_object().get();
+		object->dump_members();
+		as_value property = object->getMember(NSV::PROP_uuCONSTRUCTORuu,0);
+		as_value value = call_method(property,&env,object,argc,env.stack_size() - 1);
+		push_stack(value);
+		
 		break;
 	}
 /// 0x55 ABC_ACTION_NEWOBJECT
