@@ -15,8 +15,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef __XML_NODE_H__
-#define __XML_NODE_H__
+#ifndef GNASH_ASOBJ_XML_NODE_H
+#define GNASH_ASOBJ_XML_NODE_H
 
 //#define DEBUG_MEMORY_ALLOCATION 1
 

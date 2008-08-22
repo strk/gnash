@@ -45,9 +45,6 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 #include <libxml/xmlreader.h>
-//#include <unistd.h>
-//#include <sys/types.h>
-//#include <sys/stat.h>
 #include <string>
 #include <sstream>
 #include <vector>
@@ -354,14 +351,12 @@ XML::parseDoc(xmlNodePtr cur, bool mem)
     return true;
 }
 
-// This reads in an XML file from disk and parses into into a memory resident
+// This parses an XML string into a
 // tree which can be walked through later.
 bool
 XML::parseXML(const std::string& xml_in)
 {
     //GNASH_REPORT_FUNCTION;
-
-    //log_debug(_("Parse XML from memory: %s"), xml_in);
 
     if (xml_in.empty()) {
         log_error(_("XML data is empty"));
@@ -439,11 +434,13 @@ XML::queueLoad(std::auto_ptr<IOChannel> str)
 
     if ( startTimer )
     {
-        boost::intrusive_ptr<builtin_function> loadsChecker = \
+        boost::intrusive_ptr<builtin_function> loadsChecker = 
             new builtin_function(&XML::checkLoads_wrapper);
+
         std::auto_ptr<Timer> timer(new Timer);
         timer->setInterval(*loadsChecker, 50, this);
         _loadCheckerTimer = getVM().getRoot().add_interval_timer(timer, true);
+
 #ifdef DEBUG_XML_LOADS
         log_debug("Registered XML loads interval %d", _loadCheckerTimer);
 #endif
@@ -1009,23 +1006,6 @@ void xml_class_init(as_object& global)
 
 }
 
-#if 0 // not time for this (yet)
-static
-void _xmlErrorHandler(void* ctx, const char* fmt, ...)
-{
-    va_list ap;
-    static const unsigned long BUFFER_SIZE = 128;
-    char tmp[BUFFER_SIZE];
-
-    va_start (ap, fmt);
-    vsnprintf (tmp, BUFFER_SIZE, fmt, ap);
-    tmp[BUFFER_SIZE-1] = '\0';
-
-    log_error(_("XML parser: %s"), tmp);
-    
-    va_end (ap);    
-}
-#endif // disabled
 
 void
 XML::initParser()

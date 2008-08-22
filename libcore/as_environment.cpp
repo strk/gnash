@@ -117,23 +117,7 @@ as_environment::get_variable(const std::string& varname) const
 
 static bool validRawVariableName(const std::string& varname)
 {
-	// check raw variable name validity
-	const char* ptr = varname.c_str();
-	for (;;)
-	{
-		ptr = strchr(ptr, ':');
-		if ( ! ptr ) break;
-
-		int num=1;
-		while (*(++ptr) == ':') ++num;
-		if (num>2) 
-		{
-			//log_debug("Invalid raw variable name...");
-			return false;
-		}
-	} 
-
-	return true;
+    return (varname.find(":::") == std::string::npos);
 }
 
 as_value
