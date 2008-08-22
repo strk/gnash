@@ -26,52 +26,39 @@
 // tu_file functions using FILE
 //
 
-using namespace gnash;
-
 namespace gnash {
 
-static int std_read_func(void* dst, int bytes, void* appdata);
-static int std_write_func(const void* src, int bytes, void* appdata);
-static int std_seek_func(int pos, void *appdata);
-static int std_seek_to_end_func(void *appdata);
-static int std_tell_func(void *appdata);
-static bool std_get_eof_func(void *appdata);
-static int std_get_err_func(void *appdata);
-static long std_get_stream_size_func(void *appdata);
 
-static int
-std_read_func(void* dst, int bytes, void* appdata) 
+int
+tu_file::read(void* dst, int bytes) 
 // Return the number of bytes actually read.  EOF or an error would
 // cause that to not be equal to "bytes".
 {
 //    GNASH_REPORT_FUNCTION;
     
-    assert(appdata);
     assert(dst);
-    return fread( dst, 1, bytes, static_cast<FILE*>(appdata) );
+    return fread( dst, 1, bytes, static_cast<FILE*>(m_data) );
 }
 
-static int
-std_write_func(const void* src, int bytes, void* appdata)
+int
+tu_file::write(const void* src, int bytes)
 // Return the number of bytes actually written.
 {
-    assert(appdata);
     assert(src);
-    return std::fwrite( src, 1, bytes, static_cast<FILE*>(appdata));
+    return std::fwrite( src, 1, bytes, static_cast<FILE*>(m_data));
 }
 
-static int
-std_seek_func(int pos, void *appdata)
+int
+tu_file::seek(int pos)
 {
-    assert(appdata);
 
     // TODO: optimize this by caching total stream size ?
-    if (pos > std_get_stream_size_func(appdata))
+    if (pos > size())
     {
 	    return TU_FILE_SEEK_ERROR;
     }
 
-    FILE* file = static_cast<FILE*>(appdata);
+    FILE* file = static_cast<FILE*>(m_data);
 
     clearerr(file); // make sure EOF flag is cleared.
     int	result = fseek(file, pos, SEEK_SET);
@@ -85,61 +72,58 @@ std_seek_func(int pos, void *appdata)
     return 0;
 }
 
-static int
-std_seek_to_end_func(void *appdata)
+void
+tu_file::go_to_end()
 // Return 0 on success, TU_FILE_SEEK_ERROR on failure.
 {
-    assert(appdata);
-    int	result = fseek(static_cast<FILE*>(appdata), 0, SEEK_END);
+
+    int	result = fseek(static_cast<FILE*>(m_data), 0, SEEK_END);
     if (result == EOF) {
-	// @@ TODO should set m_error to something relevant based on errno.
-	return TU_FILE_SEEK_ERROR;
+	    // Can't do anything here
     }
-    return 0;
+
 }
 
-static int
-std_tell_func(void *appdata)
+int
+tu_file::tell() const
 // Return the file position, or -1 on failure.
 {
-    assert(appdata);
-    FILE* f = static_cast<FILE*>(appdata);
+    FILE* f = static_cast<FILE*>(m_data);
 
     //if ( feof(f) )
     //assert ( ! feof(f) ); // I guess it's legal to call tell() while at eof.
 
     int ret = ftell(f);
-    assert(ret <= std_get_stream_size_func(appdata));
+    assert(ret <= size());
     return ret;
 }
 
-static bool
-std_get_eof_func(void *appdata)
+bool
+tu_file::eof() const
 // Return true if we're at EOF.
 {
-    assert(appdata);
-    if (feof((FILE*) appdata)) {
+    if (feof((FILE*) m_data)) {
 	return true;
     } else {
 	return false;
     }
 }
 
-static int
-std_get_err_func(void *appdata)
+int
+tu_file::get_error() const
 // Return true if we're at EOF.
 {
-    if ( ! appdata ) return TU_FILE_OPEN_ERROR;
-    return (ferror((FILE*) appdata));
+    if ( ! m_data ) return TU_FILE_OPEN_ERROR;
+    return (ferror((FILE*) m_data));
 }
 
-static long
-std_get_stream_size_func(void *appdata)
+int
+tu_file::size() const
 // Return -1 on failure, or the size
 {
-    assert(appdata);
+    assert(m_data);
 
-    FILE* f = static_cast<FILE*>(appdata);
+    FILE* f = static_cast<FILE*>(m_data);
 
     struct stat statbuf;
     if ( -1 == fstat(fileno(f), &statbuf) )
@@ -151,62 +135,35 @@ std_get_stream_size_func(void *appdata)
 }
 
 
-static int
-std_close_func(void *appdata)
+void
+tu_file::close()
 // Return 0 on success, or TU_FILE_CLOSE_ERROR on failure.
 {
-    assert(appdata);
-    int	result = std::fclose(static_cast<FILE*>(appdata));
+    assert(m_data);
+    int	result = std::fclose(static_cast<FILE*>(m_data));
     if (result == EOF) {
-	// @@ TODO should set m_error to something relevant based on errno.
-	return TU_FILE_CLOSE_ERROR;
+	    // @@ TODO should set m_error to something relevant based on errno.
     }
-    return 0;
 }
 
 
-} // end namespace gnash
-
 //// Create a file from a standard file pointer.
-tu_file::tu_file(FILE* fp, bool autoclose=false)
+tu_file::tu_file(FILE* fp, bool autoclose=false) :
+    m_data(fp),
+    _autoclose(autoclose)
 {
     //GNASH_REPORT_FUNCTION;
-
-    m_data = static_cast<void*>(fp);
-    m_read = std_read_func;
-    m_write = std_write_func;
-    m_seek = std_seek_func;
-    m_seek_to_end = std_seek_to_end_func;
-    m_tell = std_tell_func;
-    m_get_eof = std_get_eof_func;
-    m_get_err = std_get_err_func;
-    m_get_stream_size = std_get_stream_size_func;
-    m_close = autoclose ? std_close_func : NULL;
 }
 
 
 tu_file::~tu_file()
 // Close this file when destroyed.
 {
-    close();
+    if (_autoclose) close();
 }
 
 
-void
-tu_file::close() 
-// Close this file.
-{ 
-    if (m_close && m_data) {
-	m_close(m_data);
-    }
-    m_data = NULL; 
-    m_read = NULL; 
-    m_write = NULL; 
-    m_seek = NULL; 
-    m_tell = NULL; 
-    m_close = NULL; 
-}
-
+} // end namespace gnash
 
 // Local Variables:
 // mode: C++
