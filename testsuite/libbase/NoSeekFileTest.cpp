@@ -144,7 +144,9 @@ main(int /*argc*/, char** /*argv*/)
 	reader->seek(0);
 	compare_reads(reader, raw, "wrapped-rewind", "raw-rewind");
 
-	tu_file orig(cachename, "r");
+
+    FILE* f = std::fopen(cachename, "r");
+	gnash::tu_file orig(f, false);
 	lseek(raw, 0, SEEK_SET);
 	compare_reads(&orig, raw, "cache", "raw");
 
