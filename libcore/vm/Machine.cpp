@@ -26,10 +26,10 @@
 #include "fn_call.h"
 #include "abc_function.h"
 #include "action.h"
+#include "Object.h"
 
 //#define PRETEND
 namespace gnash {
-
 /// The type of exceptions thrown by ActionScript.
 class ASException
 {
@@ -1311,16 +1311,16 @@ Machine::execute()
 /// NB: This builds an object from its properties, it's not a constructor.
 	case SWF::ABC_ACTION_NEWOBJECT:
 	{
-		as_object *obj = new as_object;
+		as_object *obj = new as_object(getObjectInterface());
 		boost::uint32_t argc = mStream->read_V32();
 		int i = argc;
 		while (i--)
 		{
-			obj->set_member(mST.find(mStack.top(i * 2 + 1).to_string()),
-				mStack.top(i * 2));
+			as_value val = pop_stack();
+			as_value name = pop_stack();
+			obj->init_member(name.to_string(),val,0,0);
 		}
-		mStack.drop(argc * 2 - 1);
-		mStack.top(0) = obj;
+		push_stack(as_value(obj));
 		break;
 	}
 /// 0x56 ABC_ACTION_NEWARRAY
@@ -1371,7 +1371,7 @@ Machine::execute()
 		LOG_DEBUG_AVM("Creating new class id=%u name=%s",c->getName(),mPoolObject->mStringPool[c->getName()]);
 		
 		as_object* base_class = pop_stack().to_object().get();
-		as_object* new_class = new as_object(base_class);
+		as_object* new_class = c->getPrototype();
 		//Create the class.
 		abc_function* constructor = new abc_function(c->getConstructor()->getBody(),this);
 		new_class->init_member(NSV::PROP_uuCONSTRUCTORuu,as_value(constructor),0);

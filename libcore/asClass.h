@@ -587,6 +587,8 @@ public:
 
 	string_table::key getName() const { return mName; }
 
+	void initPrototype(){ mPrototype = new as_object();}
+
 	/// Set our Name
 	void setName(string_table::key name) { mName = name; }
 

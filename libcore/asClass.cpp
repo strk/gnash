@@ -25,6 +25,7 @@
 #include "VM.h"
 #include "namedStrings.h"
 #include "as_value.h"
+#include "abc_function.h"
 
 namespace gnash {
 #define STV(x) VM::get().getStringTable().value(x).c_str()
@@ -153,26 +154,27 @@ asClass::addSlot(string_table::key name, asNamespace* ns, boost::uint32_t slotId
 bool
 asMethod::addMethod(string_table::key name, asNamespace* ns, asMethod* method)
 {
-	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
-	as_value val(method->getPrototype());
-
-	mPrototype->init_member(name, val, as_prop_flags::readOnly |
-		as_prop_flags::dontDelete | as_prop_flags::dontEnum, nsname);
-	return true;
+//	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
+//	as_value val(method->getPrototype());
+// 	as value val = new as_value(abc_function(asMethod->getBody,mPrototype->getVM().getMachine()));
+// 	mPrototype->init_member(name, val, as_prop_flags::readOnly |
+// 		as_prop_flags::dontDelete | as_prop_flags::dontEnum, nsname);
+// 	return true;
+return false;
 }
 
 bool
 asClass::addMethod(string_table::key name, asNamespace* ns, asMethod* method,
 	bool isstatic)
 {
-	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
-	as_value val(method->getPrototype());
-	int flags = as_prop_flags::readOnly | as_prop_flags::dontDelete
-		| as_prop_flags::dontEnum;
-	if (isstatic)
-		flags |= as_prop_flags::staticProp;
+	log_debug("in add method");
+	as_value val = as_value(new abc_function(method->getBody(),mPrototype->getVM().getMachine()));
+	mPrototype->init_member(name, val);
+//	int flags = as_prop_flags::readOnly | as_prop_flags::dontDelete
+//		| as_prop_flags::dontEnum;
+//	if (isstatic)
+//		flags |= as_prop_flags::staticProp;
 
-	mPrototype->init_member(name, val, flags, nsname);
 	return true;
 }
 

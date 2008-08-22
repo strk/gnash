@@ -69,6 +69,7 @@ public:
 	boost::uint32_t mClassInfoIndex;
 	as_value mValue;
 	string_table::key mName;
+	string_table::key mGlobalName;
 	asNamespace *mNamespace;
 	asMethod *mMethod;
 	bool mValueSet;

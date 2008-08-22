@@ -39,12 +39,14 @@ namespace abc_parsing {
 bool
 abc_Trait::finalize(abc_block *pBlock, asClass *pClass, bool do_static)
 {
-	LOG_DEBUG_ABC("In finalize pClass=%u.",pClass);
+	LOG_DEBUG_ABC("In finalize class name=%s kind=0x%X",pBlock->mStringPool[pClass->getName()],mKind | 0x0);
 	switch (mKind)
 	{
 	case KIND_SLOT:
 	case KIND_CONST:
 	{
+		//TODO: Remove break.
+		break;
 		// Validate the type.
 		LOG_DEBUG_ABC("In finalize.A");
 		asClass *pType;
@@ -79,27 +81,31 @@ abc_Trait::finalize(abc_block *pBlock, asClass *pClass, bool do_static)
 	}
 	case KIND_METHOD:
 	{
-		pClass->addMethod(mName, mNamespace, mMethod, do_static);
+		pClass->addMethod(mGlobalName, mNamespace, mMethod, false);
 		break;
 	}
 	case KIND_GETTER:
 	{
+		break;
 		pClass->addGetter(mName, mNamespace, mMethod, do_static);
 		break;
 	}
 	case KIND_SETTER:
 	{
+		break;
 		pClass->addSetter(mName, mNamespace, mMethod, do_static);
 		break;
 	}
 	case KIND_CLASS:
 	{
+		break;
 		pClass->addMemberClass(mName, mNamespace, mSlotId,
 			pBlock->mClasses[mClassInfoIndex], do_static);
 		break;
 	}
 	case KIND_FUNCTION:
 	{
+		break;
 		pClass->addSlotFunction(mName, mNamespace, mSlotId, mMethod, do_static);
 		break;
 	}
@@ -114,6 +120,8 @@ abc_Trait::finalize(abc_block *pBlock, asClass *pClass, bool do_static)
 bool
 abc_Trait::finalize_mbody(abc_block *pBlock, asMethod *pMethod)
 {
+	LOG_DEBUG_ABC("Finalize_mbody doesn't work. Returning.");
+	return true;
 	switch (mKind)
 	{
 	case KIND_SLOT:
@@ -187,12 +195,15 @@ abc_Trait::read(SWFStream* in, abc_block *pBlock)
 		ERR((_("ABC: Trait name must be fully qualified.\n")));
 		return false;
 	}
+	asName multiname = pBlock->mMultinamePool[name];
 	mName = pBlock->mMultinamePool[name].getABCName();
+	mGlobalName = pBlock->mMultinamePool[name].getGlobalName();
 	mNamespace = pBlock->mMultinamePool[name].getNamespace();
 
 	boost::uint8_t kind = in->read_u8();
 	mKind = static_cast<kinds> (kind & 0x0F);
 
+	LOG_DEBUG_ABC("Trait kind is 0x%X", kind | 0x0);
 	switch (mKind)
 	{
 	case KIND_SLOT:
@@ -219,6 +230,7 @@ abc_Trait::read(SWFStream* in, abc_block *pBlock)
 		in->skip_V32();
 
 		boost::uint32_t moffset = in->read_V32();
+		LOG_DEBUG_ABC("Method index=%u",moffset);
 		if (moffset >= pBlock->mMethods.size())
 		{
 			ERR((_("Bad method id in trait.\n")));
@@ -1000,6 +1012,7 @@ abc_block::read_classes()
 //		mMethods[moffset]->setOwner(pClass);
 		
 		boost::uint32_t tcount = mS->read_V32();
+		LOG_DEBUG_ABC("This class has %u traits.",tcount);
 		for (unsigned int j = 0; j < tcount; ++j)
 		{
 			abc_Trait &aTrait = newTrait();

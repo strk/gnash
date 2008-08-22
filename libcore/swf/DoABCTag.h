@@ -55,6 +55,17 @@ public:
 
 	virtual void execute(sprite_instance* m, DisplayList& /* dlist */) const
 	{
+		std::vector<asClass*>::iterator ci = mABC->mClasses.begin();
+		for(; ci != mABC->mClasses.end(); ++ci){
+			(*ci)->initPrototype();
+		}
+		std::vector<abc_Trait*>::iterator i = mABC->mTraits.begin();
+		
+		for ( ; i != mABC->mTraits.end(); ++i)
+		{
+			(*i)->finalize(mABC);
+		}
+		mABC->mTraits.clear();
 		log_debug("Begin execute abc_block.");
 		VM& vm = VM::get();
 		log_debug("getting machine.");
