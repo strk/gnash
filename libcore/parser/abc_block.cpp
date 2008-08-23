@@ -1082,7 +1082,7 @@ abc_block::read_method_bodies()
 			ERR((_("ABC: Only one body per method.\n")));
 			return false;
 		}
-		mMethods[moffset]->setBody(new CodeStream);
+		//TODO: Read values.
 
 		// Maximum stack size.
 		mS->skip_V32();
@@ -1096,18 +1096,12 @@ abc_block::read_method_bodies()
 		boost::uint32_t clength = mS->read_V32();
 		mMethods[moffset]->setBodyLength(clength);
 		// The code.
-		std::vector<char> body(clength);
-		body.resize(clength);
-		unsigned int got_length;
-		if ((got_length = mS->read(&body.front(), clength)) != clength)
-		{
-			ERR((_("ABC: Not enough method body. Wanted %d but got %d.\n"),
-				clength, got_length));
-			return false;
-		}
-		else{
-			mMethods[moffset]->getBody()->reInitialize(&body.front(), clength, true);
-		}
+		//TODO: Clean this up.
+		std::string body;
+		mS->read_string_with_length(clength,body);
+
+		mMethods[moffset]->setBody(new CodeStream(body));
+		
 		boost::uint32_t ecount = mS->read_V32();
 		for (unsigned int j = 0; j < ecount; ++j)
 		{

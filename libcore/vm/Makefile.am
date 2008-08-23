@@ -45,6 +45,7 @@ libgnashvm_la_SOURCES = \
 	ActionExec.cpp \
 	VM.cpp		\
         action.cpp \
+	CodeStream.cpp \
 	$(NULL)
 
 noinst_HEADERS =		\

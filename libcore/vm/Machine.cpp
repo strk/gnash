@@ -270,7 +270,7 @@ Machine::execute()
 	
 	for ( ; ; )
 	{
-		std::size_t opStart = mStream->tell();
+		std::size_t opStart = mStream->tellg();
 //		std::size_t opStart = mStreamStack.top(0)->tell();
 	if (1/*mIsAS3*/)
 	{
@@ -672,7 +672,7 @@ Machine::execute()
 ///  Otherwise, move by cases[index] - 1 from stream position on op entry.
 	case SWF::ABC_ACTION_LOOKUPSWITCH:
 	{
-		std::size_t npos = mStream->tell();
+		std::size_t npos = mStream->tellg();
 		if (!mStack.top(0).is_number())
 			throw ASException();
 

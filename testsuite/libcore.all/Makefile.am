@@ -40,6 +40,7 @@ check_PROGRAMS = \
 	AsValueTest \
 	ClassSizes \
 	SafeStackTest \
+	CodeStreamTest \
 	$(NULL)
 
 CLEANFILES = \
@@ -112,6 +113,11 @@ ClassSizes_LDADD = \
 
 SafeStackTest_SOURCES = SafeStackTest.cpp
 SafeStackTest_LDADD = \
+	$(GNASH_LIBS) \
+	$(NULL)
+
+CodeStreamTest_SOURCES = CodeStreamTest.cpp
+CodeStreamTest_LDADD = \
 	$(GNASH_LIBS) \
 	$(NULL)
 
