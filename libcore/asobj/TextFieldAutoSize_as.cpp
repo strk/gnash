@@ -67,12 +67,7 @@ getTextFieldAutoSizeInterface()
 // extern (used by Global.cpp)
 void text_field_auto_size_class_init(as_object& global)
 {
-    static boost::intrusive_ptr<builtin_function> cl;
-
-	cl=new builtin_function(&text_field_auto_size_ctor, getTextFieldAutoSizeInterface());
-
-	// Register _global.DisplayObject
-	global.init_member("TextFieldAutoSize", cl.get());
+	global.init_member("TextFieldAutoSize", getTextFieldAutoSizeInterface());
 }
 
 std::auto_ptr<as_object>
