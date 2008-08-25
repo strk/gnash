@@ -27,19 +27,19 @@ rcsid="$Id: MovieClip.as,v 1.133 2008/05/09 13:21:08 strk Exp $";
 endOfTest = function() 
 {
 #if OUTPUT_VERSION <= 5
-	check_totals(235); // SWF5
+	check_totals(233); // SWF5
 #endif
 
 #if OUTPUT_VERSION == 6
-	check_totals(659); // SWF6
+	check_totals(661); // SWF6
 #endif
 
 #if OUTPUT_VERSION == 7
-	check_totals(676); // SWF7
+	check_totals(678); // SWF7
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(677); // SWF8+
+	check_totals(679); // SWF8+
 #endif
 
 	play();
@@ -1567,7 +1567,12 @@ onData = function()
 {
 	note("onData called, dataLoaded: "+dataLoaded);
 	check_equals(arguments.length, 0);
+#if OUTPUT_VERSION > 5
 	check_equals(_root.var1, 'val1');
+#else
+	check_equals(typeof(_root.var1), 'undefined'); // leading BOM confuses player 5
+#endif
+	check_equals(_root.var2, 'val2');
 	check_equals(_root.var3, 'val3\n');
 	delete _root.var1; // = 'val1custom';
 	delete _root.var2; // = 'val2custom';
@@ -1596,7 +1601,8 @@ check_equals(typeof(ret), 'undefined');
 	// neighter does onEnterFrame work..
 	onDataCheck = function()
 	{
-		if ( _root.var1 != undefined ) onData();
+		note("1000 interval called");
+		if ( _root.var3 != undefined ) onData();
 	};
 	//dataLoadInterval = setInterval(onData, 1000);
 	dataLoadInterval = setInterval(onDataCheck, 1000);
