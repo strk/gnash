@@ -2252,8 +2252,8 @@ attachMovieClipInterface(as_object& o)
     o.init_member("enabled", true); // see MovieClip.as testcase
     o.init_member("useHandCursor", true); // see MovieClip.as testcase
 
-    as_c_function_ptr gettersetter = &sprite_instance::lockroot_getset;
-    o.init_property("_lockroot", *gettersetter, *gettersetter); // see MovieClip.as testcase
+    o.init_property("_lockroot", &sprite_instance::lockroot_getset,
+                                &sprite_instance::lockroot_getset); // see MovieClip.as testcase
 
     if ( target_version  < 6 ) return;
 

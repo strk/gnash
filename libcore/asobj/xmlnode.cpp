@@ -63,6 +63,12 @@ static as_value xmlnode_nextsibling(const fn_call& fn);
 static as_value xmlnode_previoussibling(const fn_call& fn);
 static as_value xmlnode_childNodes(const fn_call& fn);
 static as_value xmlnode_parentNode(const fn_call& fn);
+static as_value xmlnode_getPrefixForNamespace(const fn_call& fn);
+static as_value xmlnode_getNamespaceForPrefix(const fn_call& fn);
+static as_value xmlnode_namespaceURI(const fn_call& fn);
+static as_value xmlnode_localName(const fn_call& fn);
+static as_value xmlnode_prefix(const fn_call& fn);
+
 as_object* getXMLNodeInterface();
 
 //static LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
@@ -357,38 +363,23 @@ attachXMLNodeInterface(as_object& o)
     o.init_member("insertBefore", new builtin_function(xmlnode_insertbefore));
     o.init_member("removeNode", new builtin_function(xmlnode_removenode));
     o.init_member("toString", new builtin_function(xmlnode_tostring));
+    o.init_member("getPrefixForNamespace", new builtin_function(xmlnode_getPrefixForNamespace));
+    o.init_member("getNamespaceForPrefix", new builtin_function(xmlnode_getNamespaceForPrefix));
 
-    as_c_function_ptr gettersetter;
+    o.init_property("nodeValue", &xmlnode_nodevalue, &xmlnode_nodevalue);
+    o.init_property("nodeName", &xmlnode_nodename, &xmlnode_nodename);
 
-    gettersetter = &xmlnode_nodevalue;
-    o.init_property("nodeValue", *gettersetter, *gettersetter);
-
-    gettersetter = &xmlnode_nodename;
-    o.init_property("nodeName", *gettersetter, *gettersetter);
-
-    gettersetter = &xmlnode_nodetype;
-    o.init_readonly_property("nodeType", *gettersetter);
-
-    gettersetter = &xmlnode_attributes;
-    o.init_readonly_property("attributes", *gettersetter);
-
-    gettersetter = xmlnode_childNodes;
-    o.init_readonly_property("childNodes", *gettersetter);
-
-    gettersetter = &xmlnode_firstchild;
-    o.init_readonly_property("firstChild", *gettersetter);
-
-    gettersetter = &xmlnode_lastchild;
-    o.init_readonly_property("lastChild", *gettersetter);
-
-    gettersetter = &xmlnode_nextsibling;
-    o.init_readonly_property("nextSibling", *gettersetter);
-
-    gettersetter = &xmlnode_previoussibling;
-    o.init_readonly_property("previousSibling", *gettersetter);
-
-    gettersetter = &xmlnode_parentNode;
-    o.init_readonly_property("parentNode", *gettersetter);
+    o.init_readonly_property("namespaceURI", &xmlnode_namespaceURI);
+    o.init_readonly_property("localName", &xmlnode_localName);
+    o.init_readonly_property("prefix", &xmlnode_prefix);
+    o.init_readonly_property("nodeType", &xmlnode_nodetype);
+    o.init_readonly_property("attributes", &xmlnode_attributes);
+    o.init_readonly_property("childNodes", &xmlnode_childNodes);
+    o.init_readonly_property("firstChild", &xmlnode_firstchild);
+    o.init_readonly_property("lastChild", &xmlnode_lastchild);
+    o.init_readonly_property("nextSibling", &xmlnode_nextsibling);
+    o.init_readonly_property("previousSibling", &xmlnode_previoussibling);
+    o.init_readonly_property("parentNode", &xmlnode_parentNode);
 
 }
 
@@ -511,18 +502,100 @@ xmlnode_insertbefore(const fn_call& fn)
     return as_value();
 }
 
-static as_value
+
+as_value
+xmlnode_getNamespaceForPrefix(const fn_call& fn)
+{
+    boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
+    log_unimpl("XMLNode.getNamespaceForPrefix");
+    return as_value();
+}
+
+
+as_value
+xmlnode_getPrefixForNamespace(const fn_call& fn)
+{
+    boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
+    log_unimpl("XMLNode.getPrefixForNamespace");
+    return as_value();
+}
+
+
+as_value
+xmlnode_namespaceURI(const fn_call& fn)
+{
+    boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
+
+    if (fn.nargs > 0)
+    {
+        // no setter
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror("XMLNode.namespaceURI is readonly!");
+        );
+        
+        return as_value();
+    }
+    
+    // TODO: implement getter
+    log_unimpl("XMLNode.namespaceURI");
+    return as_value();
+}
+
+
+as_value
+xmlnode_prefix(const fn_call& fn)
+{
+    boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
+
+    if (fn.nargs > 0)
+    {
+        // no setter
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror("XMLNode.prefix is readonly!");
+        );
+        
+        return as_value();
+    }
+    
+    // TODO: implement getter
+    log_unimpl("XMLNode.prefix");
+    return as_value();
+}
+
+
+as_value
+xmlnode_localName(const fn_call& fn)
+{
+    boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
+
+    if (fn.nargs > 0)
+    {
+        // no setter
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror("XMLNode.localName is readonly!");
+        );
+        
+        return as_value();
+    }
+    
+    // TODO: implement getter
+    log_unimpl("XMLNode.localName");
+    return as_value();
+}
+
+
+as_value
 xmlnode_removenode(const fn_call& fn)
 {
-    //GNASH_REPORT_FUNCTION;
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
     
     ptr->removeNode();
     return as_value();
 }
 
+
 // TODO: shouldn't overriding get_text_value() be fine ?
-static as_value
+as_value
 xmlnode_tostring(const fn_call& fn)
 {
     //GNASH_REPORT_FUNCTION;
@@ -536,20 +609,16 @@ xmlnode_tostring(const fn_call& fn)
     return as_value(ss.str());
 }
 
-static as_value
+as_value
 xmlnode_haschildnodes(const fn_call& fn)
 {
-//    GNASH_REPORT_FUNCTION;
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
     return as_value(ptr->hasChildNodes());
 }
 
-// Both a getter and a setter for nodeValue
-static as_value
+as_value
 xmlnode_nodevalue(const fn_call& fn)
 {
-    //GNASH_REPORT_FUNCTION;
-
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
     as_value rv;
     rv.set_null();
@@ -568,11 +637,9 @@ xmlnode_nodevalue(const fn_call& fn)
     return rv;
 }
 
-// Both a getter and a setter for nodeName
-static as_value
+as_value
 xmlnode_nodename(const fn_call& fn)
 {
-//    GNASH_REPORT_FUNCTION;
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
     as_value rv;
     rv.set_null();
@@ -588,22 +655,17 @@ xmlnode_nodename(const fn_call& fn)
     return rv;
 }
 
-// Both a getter and a (do-nothing) setter for nodeType
-static as_value
+as_value
 xmlnode_nodetype(const fn_call& fn)
 {
-//    GNASH_REPORT_FUNCTION;
-    
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
-
     return as_value(ptr->nodeType());
 }
 
-// Both a getter and a (do-nothing) setter for attributes
-static as_value
+
+as_value
 xmlnode_attributes(const fn_call& fn)
 {
-    //GNASH_REPORT_FUNCTION;
     
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
 
@@ -629,8 +691,6 @@ xmlnode_attributes(const fn_call& fn)
     return as_value(ret); 
 }
 
-/// A getter and a (do-nothing) setter for XMLNode.firstChild property
-//
 /// Read-only property; evaluates the specified XML object and
 /// references the first child in the parent node's child
 /// list. This property is null if the node does not have
@@ -639,10 +699,9 @@ xmlnode_attributes(const fn_call& fn)
 /// manipulate child nodes; use the appendChild(), insertBefore(),
 /// and removeNode() methods to manipulate child nodes. 
 ///
-static as_value
+as_value
 xmlnode_firstchild(const fn_call& fn)
 {
-//    GNASH_REPORT_FUNCTION;
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
     as_value rv;
     rv.set_null();
@@ -655,18 +714,15 @@ xmlnode_firstchild(const fn_call& fn)
     return rv;
 }
 
-/// A getter and a (do-nothing) setter for XMLNode.lastChild
-//
 /// Read-only property; an XMLNode value that references the last
 /// child in the node's child list. The XML.lastChild property
 /// is null if the node does not have children. This property cannot
 /// be used to manipulate child nodes; use the appendChild(),
 /// insertBefore(), and removeNode() methods to manipulate child
 /// nodes.
-static as_value
+as_value
 xmlnode_lastchild(const fn_call& fn)
 {
-    //GNASH_REPORT_FUNCTION;
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
     as_value rv;
     rv.set_null();
@@ -677,11 +733,10 @@ xmlnode_lastchild(const fn_call& fn)
     return rv;
 }
 
-// Both a getter and a (do-nothing) setter for nextSibling
-static as_value
+
+as_value
 xmlnode_nextsibling(const fn_call& fn)
 {
-    //GNASH_REPORT_FUNCTION;
     as_value rv;
     rv.set_null();
 
@@ -693,11 +748,9 @@ xmlnode_nextsibling(const fn_call& fn)
     return rv;
 }
 
-// Both a getter and a (do-nothing) setter for previousSibling
-static as_value
+as_value
 xmlnode_previoussibling(const fn_call& fn)
 {
-    //GNASH_REPORT_FUNCTION;
     as_value rv;
     rv.set_null();
 
@@ -709,11 +762,9 @@ xmlnode_previoussibling(const fn_call& fn)
     return rv;
 }
 
-// Both a getter and a (do-nothing) setter for parentNode
-static as_value
+as_value
 xmlnode_parentNode(const fn_call& fn)
 {
-    //GNASH_REPORT_FUNCTION;
     as_value rv;
     rv.set_null();
 
@@ -725,11 +776,10 @@ xmlnode_parentNode(const fn_call& fn)
     return rv;
 }
 
-// Both a getter and a (do-nothing) setter for childNodes
-static as_value
+
+as_value
 xmlnode_childNodes(const fn_call& fn)
 {
-//    GNASH_REPORT_FUNCTION;
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
     boost::intrusive_ptr<as_array_object> ary = new as_array_object();
 
@@ -746,11 +796,9 @@ xmlnode_childNodes(const fn_call& fn)
     return as_value(ary.get());
 }
 
-// extern (used by Global.cpp)
 void xmlnode_class_init(as_object& global)
 {
-//    GNASH_REPORT_FUNCTION;
-    // This is going to be the global XMLNode "class"/"function"
+    // This is the global XMLNode "class"
     static boost::intrusive_ptr<builtin_function> cl;
 
     if ( cl == NULL )
@@ -758,7 +806,6 @@ void xmlnode_class_init(as_object& global)
         cl=new builtin_function(&xmlnode_new, getXMLNodeInterface());
     }
 
-    // Register _global.String
     global.init_member("XMLNode", cl.get());
 
 }

@@ -38,13 +38,13 @@ check(XMLNode.prototype.hasOwnProperty("insertBefore"));
 check(XMLNode.prototype.hasOwnProperty("removeNode"));
 check(XMLNode.prototype.hasOwnProperty("toString"));
 
-xcheck(XMLNode.prototype.hasOwnProperty("getPrefixForNamespace"));
-xcheck(XMLNode.prototype.hasOwnProperty("getNamespaceForPrefix"));
+check(XMLNode.prototype.hasOwnProperty("getPrefixForNamespace"));
+check(XMLNode.prototype.hasOwnProperty("getNamespaceForPrefix"));
 
 check(XMLNode.prototype.hasOwnProperty("firstChild"));
 check(XMLNode.prototype.hasOwnProperty("lastChild"));
-xcheck(XMLNode.prototype.hasOwnProperty("namespaceURI"));
-xcheck(XMLNode.prototype.hasOwnProperty("localName"));
+check(XMLNode.prototype.hasOwnProperty("namespaceURI"));
+check(XMLNode.prototype.hasOwnProperty("localName"));
 check(XMLNode.prototype.hasOwnProperty("attributes"));
 check(XMLNode.prototype.hasOwnProperty("childNodes"));
 check(XMLNode.prototype.hasOwnProperty("nextSibling"));
@@ -52,7 +52,7 @@ check(XMLNode.prototype.hasOwnProperty("nodeName"));
 check(XMLNode.prototype.hasOwnProperty("nodeType"));
 check(XMLNode.prototype.hasOwnProperty("nodeValue"));
 check(XMLNode.prototype.hasOwnProperty("parentNode"));
-xcheck(XMLNode.prototype.hasOwnProperty("prefix"));
+check(XMLNode.prototype.hasOwnProperty("prefix"));
 check(XMLNode.prototype.hasOwnProperty("previousSibling"));
 
 var doc = new XML();

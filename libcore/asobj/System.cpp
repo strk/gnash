@@ -275,24 +275,19 @@ static void
 attachSystemInterface(as_object& proto)
 {
 	VM& vm = proto.getVM();
+    const int version = vm.getSWFVersion();
 
-	// Initialize Function prototype
 	proto.init_member("security", getSystemSecurityInterface(proto));
 	proto.init_member("capabilities", getSystemCapabilitiesInterface(proto));
 	proto.init_member("setClipboard", new builtin_function(system_setclipboard));
 	proto.init_member("showSettings", vm.getNative(2107, 0));
 
-    const int version = vm.getSWFVersion();
+	proto.init_property("useCodepage", &system_usecodepage, &system_usecodepage);
 
-	as_c_function_ptr gettersetter;
-    
-    if (version > 5) {
-	    gettersetter = &system_exactsettings;
-	    proto.init_property("exactSettings", *gettersetter, *gettersetter);
-	}
+    if (version < 6) return;
 
-	gettersetter = &system_usecodepage;
-	proto.init_property("useCodepage", *gettersetter, *gettersetter);
+    proto.init_property("exactSettings", &system_exactsettings, &system_exactsettings);
+
 }
 
 
