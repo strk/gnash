@@ -16,10 +16,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef __GNASH_ASOBJ_LOADVARS_H__
-#define __GNASH_ASOBJ_LOADVARS_H__
-
-#include <memory> // for auto_ptr
+#ifndef GNASH_ASOBJ_LOADVARS_H
+#define GNASH_ASOBJ_LOADVARS_H
 
 namespace gnash {
 
