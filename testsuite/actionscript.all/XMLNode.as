@@ -23,22 +23,25 @@
 
 rcsid="$Id: XMLNode.as,v 1.17 2008/03/11 19:31:48 strk Exp $";
 #include "check.as"
-//#include "dejagnu.as"
+
+
+// Test properties
+
+#if OUTPUT_VERSION > 5
+check(XMLNode.prototype.hasOwnProperty("appendChild"));
+check(XMLNode.prototype.hasOwnProperty("cloneNode"));
+check(XMLNode.prototype.hasOwnProperty("hasChildNodes"));
+check(XMLNode.prototype.hasOwnProperty("insertBefore"));
+check(XMLNode.prototype.hasOwnProperty("removeNode"));
+check(XMLNode.prototype.hasOwnProperty("toString"));
+#endif
+
 
 var doc = new XML();
 
 check(doc);
 var textnode = doc.createTextNode("text content");
 check_equals(typeOf(textnode), 'object');
-
-// test the XMLNode constuctor
-//dejagnu(node, "XMLNode::XMLNode()");
-
-//note("Test the existance of all the methods");
-
-//check_equals(typeOf(myXML.createElement), 'function');
-
-
 
 check(textnode.appendChild);
 check(textnode.cloneNode);
@@ -47,7 +50,7 @@ check(textnode.insertBefore);
 check(textnode.removeNode);
 check(textnode.toString);
 
-//note("Now test the functionality of the properties");
+// functionality of the properties
 
 textnode.nodeName = "foo";
 check_equals(textnode.nodeName, "foo");
@@ -86,6 +89,26 @@ var node3 = doc.createElement("node3");
 var textnode3 = doc.createTextNode("third text node");
 node3.appendChild(textnode3);
 node1.appendChild(node3);
+
+
+// Childnodes is an array.
+
+check_equals(typeOf(node1.childNodes), "object");
+check(node1.childNodes.push);
+check(node1.childNodes instanceOf Array);
+
+// node1 has three children (textnode1, node2, node 3)
+check_equals(node1.childNodes.length, 3);
+
+// Now it has 4:
+node1.childNodes.push("new Node");
+check_equals(node1.childNodes.length, 4);
+
+check_equals(node1.childNodes[0], "first text node");
+check_equals(node1.childNodes[2], "<node3>third text node</node3>");
+node1.childNodes.sort();
+check_equals(node1.childNodes[0], "<node2>second text node</node2>");
+check_equals(node1.childNodes[2], "first text node");
 
 // trace(node1.toString());
 trace("===========================================");
