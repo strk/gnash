@@ -27,51 +27,34 @@
 
 namespace gnash {
   
-class XMLSocket : public Network {
+class XMLSocket_as : public Network, public as_object {
+
 public:
-    XMLSocket();
-    ~XMLSocket();
-    
-    bool connect(const std::string& host, short port);
-    bool send(std::string str);
-    void close();
 
     typedef std::vector<std::string> MessageList;
 
-    bool anydata(MessageList& msgs);
-    bool anydata(int sockfd, MessageList& msgs);
+    XMLSocket_as();
+    ~XMLSocket_as();
     
-    bool fdclosed() { return _closed; }
-    bool xmlmsg() { return _xmldata; }
-    
-    void messagesClear()      { _messages.clear(); }
-    void messageRemove(int x) { _messages.erase(_messages.begin() + x); }
-    int messagesCount()       { return _messages.size(); }
-    std::string operator [] (int x)  { return _messages[x]; }
-    
-    bool processingData();
-    void processing(bool x);
-    
-    // Event Handlers
-    void onClose(std::string);
-    void onConnect(std::string);
-    void onData(std::string);
-    void onXML(std::string);
-    
-    // These handle the array of XML nodes
-    //void push(as_object *obj) { _nodes.push_back(obj); }
-    //void clear() { _nodes.clear(); }
-    //int  count() { return _nodes.size(); }
-    
-    int checkSockets(void);
-    int checkSockets(int x);
-    
+    bool connect(const std::string& host, short port);
+
+    // Actionscript doesn't care about the result of either of these
+    // operations.
+    void send(std::string str);
+    void close();
+
+	void checkForIncomingData();
+
 private:
-    bool          _data;
-    bool          _xmldata;
-    bool          _closed;
-    bool          _processing;
-    std::vector<std::string> _messages;
+
+    bool fillMessageList(MessageList& msgs);
+
+	/// Return the as_function with given name, converting case if needed
+	boost::intrusive_ptr<as_function> getEventHandler(const std::string& name);
+
+    bool _data;
+
+    MessageList _messages;
 
     std::string _remainder;
 
@@ -81,8 +64,6 @@ void xmlsocket_class_init(as_object& global);
 
 } // end of gnash namespace
 
-
-// __XMLSOCKETSOCKET_H__
 #endif
 
 // Local Variables:

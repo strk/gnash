@@ -63,78 +63,47 @@ static as_value xmlsocket_close(const fn_call& fn);
 
 // These are the event handlers called for this object
 static as_value xmlsocket_inputChecker(const fn_call& fn);
-
 static as_value xmlsocket_onData(const fn_call& fn);
 
 static as_object* getXMLSocketInterface();
 static void attachXMLSocketInterface(as_object& o);
 static void attachXMLSocketProperties(as_object& o);
 
-class XMLSocket_as : public as_object
-{
-
-public:
-
-        XMLSocket_as()
-                :
-                as_object(getXMLSocketInterface())
-        {
-            attachXMLSocketProperties(*this);
-        }
-
-		/// This function should be called everytime we're willing
-		/// to check if any data is available on the socket.
-		//
-		/// The method will take care of polling from the
-		/// socket and invoking any onData handler.
-		///
-		void checkForIncomingData();
-
-        XMLSocket obj;
-
-		/// Return the as_function with given name, converting case if needed
-		boost::intrusive_ptr<as_function> getEventHandler(const std::string& name);
-
-};
-
   
-XMLSocket::XMLSocket()
+XMLSocket_as::XMLSocket_as()
     :
-    _data(false),
-    _xmldata(false),
-    _closed(false),
-    _processing(false)
+    as_object(getXMLSocketInterface()),
+    _data(false)
 {
-    GNASH_REPORT_FUNCTION;
+    attachXMLSocketProperties(*this);
 }
 
-XMLSocket::~XMLSocket()
+XMLSocket_as::~XMLSocket_as()
 {
-//    GNASH_REPORT_FUNCTION;
 }
 
 bool
-XMLSocket::connect(const std::string& host, short port)
+XMLSocket_as::connect(const std::string& host, short port)
 {
-    GNASH_REPORT_FUNCTION;
 
     if ( ! URLAccessManager::allowXMLSocket(host, port) )
     {
 	    return false;
     }
-	    
 
     bool success = createClient(host, port);
 
-    assert( success || ! connected() );
+    assert( success || ! _connected );
 
     return success;
 }
 
 void
-XMLSocket::close()
+XMLSocket_as::close()
 {
     GNASH_REPORT_FUNCTION;
+
+    assert(_connected);
 
     closeNet();
     // dunno why Network::closeNet() returns false always
@@ -142,45 +111,20 @@ XMLSocket::close()
     // Anyway, let's make sure we're clean
     assert(!_sockfd);
     assert(!_connected);
-    assert(!connected());
 }
 
-// Return true if there is data in the socket, otherwise return false.
-bool
-XMLSocket::anydata(MessageList& msgs)
-{
-    //GNASH_REPORT_FUNCTION;
-    assert(connected());
-    assert(_sockfd > 0);
-    return anydata(_sockfd, msgs);
-}
-
-bool XMLSocket::processingData()
-{
-    //GNASH_REPORT_FUNCTION;
-    //log_debug(_("%s: processing flag is %d"), __FUNCTION__, _processing);
-    return _processing;
-}
-
-void XMLSocket::processing(bool x)
-{
-    GNASH_REPORT_FUNCTION;
-    //log_debug(_("%s: set processing flag to %d"), __FUNCTION__, x);
-    _processing = x;
-}
 
 bool
-XMLSocket::anydata(int fd, MessageList& msgs)
+XMLSocket_as::fillMessageList(MessageList& msgs)
 {
+
+    const int fd = _sockfd;
    
     if (fd <= 0) {
-	log_error(_("%s: fd <= 0, returning false (timer not unregistered while socket disconnected?"), __FUNCTION__);
+	log_error(_("%s: fd <= 0, returning false (timer not unregistered "
+		"while socket disconnected?"), __FUNCTION__);
         return false;
     }
-
-
-    //GNASH_REPORT_FUNCTION;
-
 
     fd_set                fdset;
     struct timeval        tval;
@@ -219,8 +163,6 @@ XMLSocket::anydata(int fd, MessageList& msgs)
             //    __FUNCTION__, fd);
         }
 
-        processing(true);
-
         ret = read(_sockfd, buf.get(), bufSize - 1);
         
         if (buf[ret - 1] != 0)
@@ -255,7 +197,6 @@ XMLSocket::anydata(int fd, MessageList& msgs)
             ptr += std::strlen(ptr) + 1;
         }
         
-        processing(false);
         return true;
         
     }
@@ -263,107 +204,32 @@ XMLSocket::anydata(int fd, MessageList& msgs)
     return true;
 }
 
-bool
-XMLSocket::send(std::string str)
+
+// XMLSocket.send doesn't return anything, so we don't need
+// to here either.
+void
+XMLSocket_as::send(std::string str)
 {
-    //GNASH_REPORT_FUNCTION;
-    
-    if ( ! connected() )
+    if (!_connected)
     {
-        log_error(_("%s: socket not initialized"), __FUNCTION__);
-	assert(_sockfd <= 0);
-	return false;
+        log_error(_("XMLSocket.send(): socket not initialized"));
+	    assert(_sockfd <= 0);
+	    return;
     }
     
     // We have to write the NULL terminator as well.
     int ret = write(_sockfd, str.c_str(), str.size() + 1);
     
-    log_debug(_("%s: sent %d bytes, data was %s"), __FUNCTION__, ret, str);
-    if (ret == static_cast<signed int>(str.size())) {
-        return true;
-    } else {
-        return false;
-    }
+    log_debug(_("XMLSocket.send(): sent %d bytes, data was %s"), ret, str);
+    return;
 }
 
-// Callbacks
 
-void
-XMLSocket::onClose(std::string /* str */)
-{
-    GNASH_REPORT_FUNCTION;
-}
-
-void
-XMLSocket::onConnect(std::string /* str */)
-{
-    GNASH_REPORT_FUNCTION;
-}
-
-void
-XMLSocket::onData(std::string /* str */)
-{
-    GNASH_REPORT_FUNCTION;
-}
-
-void
-XMLSocket::onXML(std::string /* str */)
-{
-    GNASH_REPORT_FUNCTION;
-}
-
-int
-XMLSocket::checkSockets(void)
-{
-    GNASH_REPORT_FUNCTION;
-    return checkSockets(_sockfd);
-}
-
-int
-XMLSocket::checkSockets(int fd)
-{
-    GNASH_REPORT_FUNCTION;
-    fd_set                fdset;
-    int                   ret = 0;
-    struct timeval        tval;
-    
-
-    FD_ZERO(&fdset);
-    FD_SET(fd, &fdset);
-    
-    tval.tv_sec = 2;
-    tval.tv_usec = 10;
-    
-    ret = ::select(fd+1, &fdset, NULL, NULL, &tval); // &tval
-    
-    // If interupted by a system call, try again
-    if (ret == -1 && errno == EINTR) {
-        log_debug(_("%s: The socket for fd #%d was interupted by a system call in this thread"),
-                __FUNCTION__, fd);
-    }
-    if (ret == -1) {
-        log_error(_("%s: The socket for fd #%d never was available"),
-            __FUNCTION__, fd);
-    }
-    if (ret == 0) {
-        log_debug(_("%s: There is no data in the socket for fd #%d"),
-            __FUNCTION__, fd);
-    }
-    if (ret > 0) {
-        log_debug(_("%s: There is data in the socket for fd #%d"),
-            __FUNCTION__, fd);
-    }
-    
-    return ret;
-}
-
+// XMLSocket.connect() returns true if the initial connection was
+// successful, false if no connection was established.
 as_value
 xmlsocket_connect(const fn_call& fn)
 {
-    //GNASH_REPORT_FUNCTION;
-
-    as_value	method;
-    as_value	val;
 
 #ifdef GNASH_XMLSOCKET_DEBUG
     std::stringstream ss;
@@ -373,7 +239,7 @@ xmlsocket_connect(const fn_call& fn)
 
     boost::intrusive_ptr<XMLSocket_as> ptr = ensureType<XMLSocket_as>(fn.this_ptr);
 
-    if (ptr->obj.connected())
+    if (ptr->connected())
     {
         log_error(_("XMLSocket.connect() called while already connected, ignored"));
     }
@@ -382,7 +248,7 @@ xmlsocket_connect(const fn_call& fn)
     const std::string& host = hostval.to_string();
     int port = int(fn.arg(1).to_number());
     
-    bool success = ptr->obj.connect(host, port);
+    bool success = ptr->connect(host, port);
 
     // Actually, if first-stage connection was successful, we
     // should NOT invoke onConnect(true) here, but postpone
@@ -413,41 +279,49 @@ xmlsocket_connect(const fn_call& fn)
 }
 
 
+/// XMLSocket.send()
+//
+/// Does not return anything.
 as_value
 xmlsocket_send(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
     
     boost::intrusive_ptr<XMLSocket_as> ptr = ensureType<XMLSocket_as>(fn.this_ptr);
-    const std::string& object = fn.arg(0).to_string();
-    //  log_debug(_("%s: host=%s, port=%g"), __FUNCTION__, host, port);
-    return as_value(ptr->obj.send(object));
+    const std::string& str = fn.arg(0).to_string();
+    ptr->send(str);
+    return as_value();
 }
 
+
+/// XMLSocket.close()
+//
+/// Always returns void
 as_value
 xmlsocket_close(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
     
     boost::intrusive_ptr<XMLSocket_as> ptr = ensureType<XMLSocket_as>(fn.this_ptr);
-    // Since the return code from close() doesn't get used by Shockwave,
-    // we don't care either.
-    ptr->obj.close();
+
+    // If we're not connected, there's nothing to do
+    if (!ptr->connected()) return as_value();
+
+    ptr->close();
     return as_value();
 }
 
 as_value
 xmlsocket_new(const fn_call& fn)
 {
-    //GNASH_REPORT_FUNCTION;
-    //log_debug(_("%s: nargs=%d"), __FUNCTION__, nargs);
-    
+
     boost::intrusive_ptr<as_object> xmlsock_obj = new XMLSocket_as;
 
 #ifdef GNASH_XMLSOCKET_DEBUG
     std::stringstream ss;
     fn.dump_args(ss);
-    log_debug(_("new XMLSocket(%s) called - created object at %p"), ss.str(), (void*)xmlsock_obj.get());
+    log_debug(_("new XMLSocket(%s) called - created object at "
+            "%p"), ss.str(), static_cast<void*>(xmlsock_obj.get()));
 #else
     UNUSED(fn);
 #endif
@@ -459,13 +333,8 @@ xmlsocket_new(const fn_call& fn)
 as_value
 xmlsocket_inputChecker(const fn_call& fn)
 {
-    //GNASH_REPORT_FUNCTION;
-
-    as_value	method;
-    as_value	val;
-    
     boost::intrusive_ptr<XMLSocket_as> ptr = ensureType<XMLSocket_as>(fn.this_ptr);
-    if ( ! ptr->obj.connected() )
+    if ( ! ptr->connected() )
     {
         log_error(_("%s: not connected"), __FUNCTION__);
         return as_value();
@@ -481,9 +350,7 @@ xmlsocket_onData(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
 
-    as_value	method;
-    as_value	val;
-    
+   
     boost::intrusive_ptr<XMLSocket_as> ptr = ensureType<XMLSocket_as>(fn.this_ptr);
 
     if ( fn.nargs < 1 )
@@ -539,25 +406,22 @@ attachXMLSocketInterface(as_object& o)
     onDataIface->init_member(NSV::PROP_CONSTRUCTOR, as_value(onDataFun));
 }
 
-static void
+void
 attachXMLSocketProperties(as_object& /*o*/)
 {
-    // this is attached to proto
-    //o.init_member("onData", new builtin_function(xmlsocket_onData));
+    // Has no own properties
 }
 
 // extern (used by Global.cpp)
 void xmlsocket_class_init(as_object& global)
 {
-//    GNASH_REPORT_FUNCTION;
-    // This is going to be the global XMLSocket "class"/"function"
+    // This is the global XMLSocket class
     static boost::intrusive_ptr<builtin_function> cl;
 
     if ( cl == NULL )
     {
         cl=new builtin_function(&xmlsocket_new, getXMLSocketInterface());
         // Do not replicate all interface to class!
-        //attachXMLSocketInterface(*cl);
     }
     
     // Register _global.String
@@ -580,49 +444,39 @@ XMLSocket_as::getEventHandler(const std::string& name)
 void
 XMLSocket_as::checkForIncomingData()
 {
-    assert(obj.connected());
-
-    if (obj.processingData()) {
-        log_debug(_("Still processing data"));
-    }
+    assert(_connected);
     
     std::vector<std::string> msgs;
-    obj.anydata(msgs);
+    fillMessageList(msgs);
    
-    if (!msgs.empty())
+    if (msgs.empty()) return;
+    
+    log_debug(_("Got %d messages: "), msgs.size());
+
+#ifdef GNASH_DEBUG
+    for (size_t i = 0,, e = msgs.size(); i != e; ++i)
     {
-        log_debug(_("Got %d messages: "), msgs.size());
-        for (size_t i=0; i<msgs.size(); ++i)
-        {
-            log_debug(_(" Message %d: %s "), i, msgs[i]);
-        }
-
-        boost::intrusive_ptr<as_function> onDataHandler = getEventHandler("onData");
-        if ( onDataHandler )
-        {
-            //log_debug(_("Got %d messages from XMLsocket"), msgs.size());
-            for (XMLSocket::MessageList::iterator it=msgs.begin(),
-							itEnd=msgs.end();
-			    it != itEnd; ++it)
-            {
-				std::string& s = *it;
-				as_value datain( s );
-
-				as_environment env;
-				env.push(datain);
-				fn_call call(this, &env, 1, env.stack_size() - 1);
-				onDataHandler->call(call);
-//                call_method(as_value(onDataHandler.get()), &env, this, 1, env.stack_size()-1);
-
-            }
-            obj.processing(false);
-        }
-        else
-        {
-            log_error(_("%s: Couldn't find onData"), __FUNCTION__);
-        }
-
+        log_debug(_(" Message %d: %s "), i, msgs[i]);
     }
+#endif
+
+    boost::intrusive_ptr<as_function> onDataHandler = getEventHandler("onData");
+    if ( onDataHandler )
+    {
+        for (XMLSocket_as::MessageList::iterator it=msgs.begin(),
+						itEnd=msgs.end();
+		    it != itEnd; ++it)
+        {
+			std::string& s = *it;
+			as_value datain( s );
+
+			as_environment env;
+			env.push(datain);
+			fn_call call(this, &env, 1, env.stack_size() - 1);
+			onDataHandler->call(call);
+        }
+    }
+
 }
 
 } // end of gnash namespace
