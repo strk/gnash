@@ -49,8 +49,8 @@
 # include <unistd.h>
 #endif
 
-#include <boost/algorithm/string/case_conv.hpp>
 #include <boost/scoped_array.hpp>
+#include <boost/thread.hpp>
 
 #define GNASH_XMLSOCKET_DEBUG
 
@@ -117,6 +117,9 @@ XMLSocket_as::close()
 bool
 XMLSocket_as::fillMessageList(MessageList& msgs)
 {
+
+    // Prevent simultaneous reading and writing of the message list.
+    boost::mutex::scoped_lock lock(_dataMutex);
 
     const int fd = _sockfd;
    
@@ -248,7 +251,12 @@ xmlsocket_connect(const fn_call& fn)
     const std::string& host = hostval.to_string();
     int port = int(fn.arg(1).to_number());
     
-    bool success = ptr->connect(host, port);
+    if (!ptr->connect(host, port))
+    {
+        return as_value(false);
+        // onConnect(false) should not be called here, but rather
+        // only if a failure occurs after the initial connection.
+    }
 
     // Actually, if first-stage connection was successful, we
     // should NOT invoke onConnect(true) here, but postpone
@@ -256,26 +264,28 @@ xmlsocket_connect(const fn_call& fn)
     // to be done in a separate thread. The visible effect to
     // confirm this is that onConnect is invoked *after* 
     // XMLSocket.connect() returned in these cases.
+    // The same applies to onConnect(false), which will never
+    // be called at the moment.
     //
     log_debug(_("XMLSocket.connect(): tring to call onConnect"));
-    ptr->callMethod(NSV::PROP_ON_CONNECT, success);
+    ptr->callMethod(NSV::PROP_ON_CONNECT, true);
 	    
-    if ( success )
-    {
-        log_debug(_("Setting up timer for calling XMLSocket.onData()"));
 
-	    std::auto_ptr<Timer> timer(new Timer);
-        boost::intrusive_ptr<builtin_function> ondata_handler = new builtin_function(&xmlsocket_inputChecker, NULL);
-        unsigned interval = 50; // just make sure it's expired at every frame iteration (20 FPS used here)
-        timer->setInterval(*ondata_handler, interval, boost::dynamic_pointer_cast<as_object>(ptr));
+    // This is bad and should be rewritten.
+    log_debug(_("Setting up timer for calling XMLSocket.onData()"));
 
-        VM& vm = ptr->getVM();
-        vm.getRoot().add_interval_timer(timer, true);
+    std::auto_ptr<Timer> timer(new Timer);
+    boost::intrusive_ptr<builtin_function> ondata_handler = new builtin_function(&xmlsocket_inputChecker, NULL);
+    // just make sure it's expired at every frame iteration (20 FPS used here)
+    unsigned interval = 50;
+    timer->setInterval(*ondata_handler, interval, boost::dynamic_pointer_cast<as_object>(ptr));
 
-        log_debug(_("Timer set"));
-    }
+    VM& vm = ptr->getVM();
+    vm.getRoot().add_interval_timer(timer, true);
 
-    return as_value(success);
+    log_debug(_("Timer set"));
+
+    return as_value(true);
 }
 
 

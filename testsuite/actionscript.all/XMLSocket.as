@@ -28,7 +28,7 @@ rcsid="$Id: XMLSocket.as,v 1.10 2008/04/01 09:26:54 strk Exp $";
 #include "check.as"
 
 #if OUTPUT_VERSION < 6
-XMLNode.prototype.hasOwnProperty = ASnative(101, 5);
+XMLSocket.prototype.hasOwnProperty = ASnative(101, 5);
 #endif
 
 check(XMLSocket.prototype.hasOwnProperty("connect"));
@@ -113,4 +113,4 @@ check_equals(ret, undefined);
 ret = socketObj.send("This won't work'");
 check_equals(ret, undefined);
 
-totals(31);
+totals(29);

@@ -24,6 +24,7 @@
 #include "dsodefs.h"
 
 #include <string>
+#include <boost/thread.hpp>
 
 namespace gnash {
   
@@ -57,6 +58,8 @@ private:
     MessageList _messages;
 
     std::string _remainder;
+    
+    boost::mutex _dataMutex;
 
 };
 
