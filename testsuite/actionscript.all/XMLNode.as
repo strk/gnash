@@ -27,14 +27,16 @@ rcsid="$Id: XMLNode.as,v 1.17 2008/03/11 19:31:48 strk Exp $";
 
 // Test properties
 
-#if OUTPUT_VERSION > 5
+#if OUTPUT_VERSION < 6
+XMLNode.prototype.hasOwnProperty = ASnative(101, 5);
+#endif
+
 check(XMLNode.prototype.hasOwnProperty("appendChild"));
 check(XMLNode.prototype.hasOwnProperty("cloneNode"));
 check(XMLNode.prototype.hasOwnProperty("hasChildNodes"));
 check(XMLNode.prototype.hasOwnProperty("insertBefore"));
 check(XMLNode.prototype.hasOwnProperty("removeNode"));
 check(XMLNode.prototype.hasOwnProperty("toString"));
-#endif
 
 
 var doc = new XML();
@@ -92,7 +94,6 @@ node1.appendChild(node3);
 
 
 // Childnodes is an array.
-
 check_equals(typeOf(node1.childNodes), "object");
 check(node1.childNodes.push);
 check(node1.childNodes instanceOf Array);
@@ -100,29 +101,73 @@ check(node1.childNodes instanceOf Array);
 // node1 has three children (textnode1, node2, node 3)
 check_equals(node1.childNodes.length, 3);
 
-// Now it has 4:
-node1.childNodes.push("new Node");
-check_equals(node1.childNodes.length, 4);
+// Now it has 4, but the latest element is not an XMLNode
+node1.childNodes.push("not a node");
+xcheck_equals(node1.childNodes.length, 4);
+check(!node1.childNodes[3] instanceOf XMLNode);
 
-check_equals(node1.childNodes[0], "first text node");
-check_equals(node1.childNodes[2], "<node3>third text node</node3>");
+// Now 5. The latest element is an XMLNode, but it does not become
+// lastChild
+node1.childNodes.push(new XMLNode (1, "an XMLNode"));
+xcheck_equals(node1.childNodes.length, 5);
+xcheck(node1.childNodes[4] instanceOf XMLNode);
+check_equals(node1.lastChild.toString(), "<node3>third text node</node3>");
+
+// childNodes really is just an array: it can be sorted
+check_equals(node1.childNodes[0].toString(), "first text node");
+check_equals(node1.childNodes[2].toString(), "<node3>third text node</node3>");
+xcheck_equals(node1.childNodes[3].toString(), "not a node");
 node1.childNodes.sort();
-check_equals(node1.childNodes[0], "<node2>second text node</node2>");
-check_equals(node1.childNodes[2], "first text node");
+xcheck_equals(node1.childNodes[0].toString(), "<an XMLNode />");
+check_equals(node1.childNodes[2].toString(), "<node3>third text node</node3>");
+xcheck_equals(node1.childNodes[3].toString(), "first text node");
 
-// trace(node1.toString());
-trace("===========================================");
+// It can store anything
+node1.childNodes.push(new Date());
+xcheck_equals(node1.childNodes.length, 6);
+xcheck(node1.childNodes[5] instanceOf Date);
+check_equals(node1.childNodes.childNodes[5].hasChildNodes(), undefined);
 
-// trace(node1.firstChild.nodeValue);
-// trace(node1.lastChild.nodeValue);
+node1.childNodes.lastChild.appendChild(new XMLNode(1, "datenode"));
+check_equals(node1.childNodes.childNodes[5].hasChildNodes(), undefined);
+
+o = {};
+o.toString = function() {
+    return "o.toString()";
+};
+
+xcheck_equals(node1.childNodes.length, 6);
+node1.childNodes.push(o);
+xcheck_equals(node1.childNodes.length, 7);
+xcheck_equals(node1.childNodes[6].toString(), "o.toString()");
+
+// The last child is still node3
+check(node1.lastChild != node1.childNodes[6]);
+check_equals(node1.lastChild.nodeName, "node3");
+check_equals(node1.firstChild.toString(), "first text node");
+
+// Only when a new valid element is added does the lastChild change, and the 'fake'
+// items disappear.
+var node4 = doc.createElement("4node");
+node1.appendChild(node4);
+check_equals(node1.lastChild.toString(), "<4node />");
+check_equals(node1.childNodes.length, 4);
+check_equals(node1.childNodes[node1.childNodes.length - 1].toString(), "<4node />")
+
+// And sorting makes no difference to the lastChild, only to the last in the
+// array of childNodes.
+node1.childNodes.sort();
+check_equals(node1.lastChild.toString(), "<4node />");
+xcheck_equals(node1.childNodes[node1.childNodes.length - 1].toString(), "first text node")
+
+
+
+
 check_equals(node1.firstChild.nodeValue, "first text node");
 check_equals(typeof(node1.lastChild.nodeValue), 'null');
 
-trace(node1.lastChild.previousSibling);
-trace(node1.firstChild.nextSibling);
-
 check_equals(typeof(node1.firstChild.nodeName), "null");
-check_equals(node1.lastChild.nodeName, "node3");
+check_equals(node1.lastChild.nodeName, "4node");
 
 check_equals(node2.previousSibling.nodeValue, "first text node");
 
@@ -133,4 +178,4 @@ check_equals(node2.previousSibling.nodeValue, "first text node");
 // }
 
 
-check_totals(27);
+check_totals(63);
