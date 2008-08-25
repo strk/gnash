@@ -51,6 +51,7 @@
 
 #include <boost/scoped_array.hpp>
 #include <boost/thread.hpp>
+#include <string>
 
 #define GNASH_XMLSOCKET_DEBUG
 
@@ -68,6 +69,42 @@ static as_value xmlsocket_onData(const fn_call& fn);
 static as_object* getXMLSocketInterface();
 static void attachXMLSocketInterface(as_object& o);
 static void attachXMLSocketProperties(as_object& o);
+
+
+class XMLSocket_as : public Network, public as_object {
+
+public:
+
+    typedef std::vector<std::string> MessageList;
+
+    XMLSocket_as();
+    ~XMLSocket_as();
+    
+    bool connect(const std::string& host, short port);
+
+    // Actionscript doesn't care about the result of either of these
+    // operations.
+    void send(std::string str);
+    void close();
+
+	void checkForIncomingData();
+
+private:
+
+    bool fillMessageList(MessageList& msgs);
+
+	/// Return the as_function with given name, converting case if needed
+	boost::intrusive_ptr<as_function> getEventHandler(const std::string& name);
+
+    bool _data;
+
+    MessageList _messages;
+
+    std::string _remainder;
+    
+    boost::mutex _dataMutex;
+
+};
 
   
 XMLSocket_as::XMLSocket_as()

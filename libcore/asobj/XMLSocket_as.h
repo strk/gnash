@@ -18,51 +18,8 @@
 #ifndef GNASH_XMLSOCKET_H
 #define GNASH_XMLSOCKET_H
 
-#include "xml.h"
-#include "impl.h"
-#include "network.h"
-#include "dsodefs.h"
-
-#include <string>
-#include <boost/thread.hpp>
-
 namespace gnash {
   
-class XMLSocket_as : public Network, public as_object {
-
-public:
-
-    typedef std::vector<std::string> MessageList;
-
-    XMLSocket_as();
-    ~XMLSocket_as();
-    
-    bool connect(const std::string& host, short port);
-
-    // Actionscript doesn't care about the result of either of these
-    // operations.
-    void send(std::string str);
-    void close();
-
-	void checkForIncomingData();
-
-private:
-
-    bool fillMessageList(MessageList& msgs);
-
-	/// Return the as_function with given name, converting case if needed
-	boost::intrusive_ptr<as_function> getEventHandler(const std::string& name);
-
-    bool _data;
-
-    MessageList _messages;
-
-    std::string _remainder;
-    
-    boost::mutex _dataMutex;
-
-};
-
 void xmlsocket_class_init(as_object& global);
 
 } // end of gnash namespace
