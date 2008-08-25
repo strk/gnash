@@ -113,4 +113,4 @@ check_equals(ret, undefined);
 ret = socketObj.send("This won't work'");
 check_equals(ret, undefined);
 
-totals();
+totals(31);
