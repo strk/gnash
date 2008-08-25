@@ -992,14 +992,8 @@ NetConnection::attachNetConnectionInterface(as_object& o)
 void
 NetConnection::attachProperties()
 {
-	as_c_function_ptr gettersetter;
-
-	gettersetter = NetConnection::isConnected_getset;
-	init_property("isConnected", *gettersetter, *gettersetter);
-
-	gettersetter = NetConnection::uri_getset;
-	init_property("uri", *gettersetter, *gettersetter);
-
+	init_property("isConnected", &NetConnection::isConnected_getset, &NetConnection::isConnected_getset);
+	init_property("uri", &NetConnection::uri_getset, &NetConnection::uri_getset);
 }
 
 as_object*

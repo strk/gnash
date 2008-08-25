@@ -685,22 +685,12 @@ attachSoundInterface(as_object& o)
 	o.init_member("areSoundsInaccessible", new builtin_function(sound_areSoundsInaccessible), fl_hpcn9);
 
 	// Properties
-
-	as_c_function_ptr gettersetter;
-
-	gettersetter = &sound_duration;
-	o.init_readonly_property("duration", *gettersetter);
-
 	//there's no such thing as an ID3 member (swfdec shows)
-	//gettersetter = &sound_ID3;
-	//o.init_property("ID3", *gettersetter, *gettersetter);
+	o.init_readonly_property("duration", &sound_duration);
+	o.init_readonly_property("position", &sound_position);
 
-	gettersetter = &checkPolicyFile_getset;
 	int fl_hp = as_prop_flags::dontEnum|as_prop_flags::dontDelete;
-	o.init_property("checkPolicyFile", *gettersetter, *gettersetter, fl_hp);
-
-	gettersetter = &sound_position;
-	o.init_readonly_property("position", *gettersetter);
+	o.init_property("checkPolicyFile", &checkPolicyFile_getset, &checkPolicyFile_getset, fl_hp);
 
 }
 
