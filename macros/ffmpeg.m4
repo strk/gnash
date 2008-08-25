@@ -204,7 +204,8 @@ dnl version numbering fail gracefully.
     ffmpeg_num_version=$ffmpeg_version
     if test x"${ffmpeg_version}" = x ; then
 
-      ffmpeg_version=`$EGREP "define LIBAVCODEC_VERSION " ${avcodec_h} | sed -e "s%[[^0-9]]%%g"`
+      dnl NOTE: the [0-9]*d. pattern discards deb-heads rubbish prefix
+      ffmpeg_version=`$EGREP "define LIBAVCODEC_VERSION " ${avcodec_h} | sed -e "s% [[0-9]]*d\.%%" -e "s%[[^0-9]]%%g"`
       ffmpeg_num_version=$ffmpeg_version
 
       if test x"${ffmpeg_version}" = x ; then
