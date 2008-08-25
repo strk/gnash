@@ -1570,7 +1570,8 @@ onData = function()
 #if OUTPUT_VERSION > 5
 	check_equals(_root.var1, 'val1');
 #else
-	check_equals(typeof(_root.var1), 'undefined'); // leading BOM confuses player 5
+	// leading BOM confuses player 5 (but not gnash)
+	xcheck_equals(typeof(_root.var1), 'undefined');
 #endif
 	check_equals(_root.var2, 'val2');
 	check_equals(_root.var3, 'val3\n');
@@ -1601,7 +1602,7 @@ check_equals(typeof(ret), 'undefined');
 	// neighter does onEnterFrame work..
 	onDataCheck = function()
 	{
-		note("1000 interval called");
+		//note("1000 interval called");
 		if ( _root.var3 != undefined ) onData();
 	};
 	//dataLoadInterval = setInterval(onData, 1000);
