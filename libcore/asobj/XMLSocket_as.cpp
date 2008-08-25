@@ -50,7 +50,6 @@
 #endif
 
 #include <boost/scoped_array.hpp>
-#include <boost/thread.hpp>
 #include <string>
 
 #define GNASH_XMLSOCKET_DEBUG
@@ -101,8 +100,6 @@ private:
     MessageList _messages;
 
     std::string _remainder;
-    
-    boost::mutex _dataMutex;
 
 };
 
@@ -154,9 +151,6 @@ XMLSocket_as::close()
 bool
 XMLSocket_as::fillMessageList(MessageList& msgs)
 {
-
-    // Prevent simultaneous reading and writing of the message list.
-    boost::mutex::scoped_lock lock(_dataMutex);
 
     const int fd = _sockfd;
    
@@ -228,7 +222,7 @@ XMLSocket_as::fillMessageList(MessageList& msgs)
             {
                 log_debug ("Adding and clearing remainder");
                 msgs.push_back(_remainder + std::string(ptr));
-                ptr += std::strlen(ptr);
+                ptr += std::strlen(ptr) + 1;
                 _remainder.clear();
                 continue;
             }
@@ -501,7 +495,7 @@ XMLSocket_as::checkForIncomingData()
     log_debug(_("Got %d messages: "), msgs.size());
 
 #ifdef GNASH_DEBUG
-    for (size_t i = 0,, e = msgs.size(); i != e; ++i)
+    for (size_t i = 0, e = msgs.size(); i != e; ++i)
     {
         log_debug(_(" Message %d: %s "), i, msgs[i]);
     }

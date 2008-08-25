@@ -16,14 +16,6 @@
  *
  */ 
 
-
-
-/* The test sends all the 
-
-
-
-*/
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <ming.h>
