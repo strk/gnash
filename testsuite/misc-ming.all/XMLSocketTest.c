@@ -16,14 +16,6 @@
  *
  */ 
 
-
-
-/* The test sends all the 
-
-
-
-*/
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <ming.h>
@@ -99,6 +91,8 @@ main(int argc, char** argv)
     /* Wait for connection */
     add_actions(mo, "stop();");
 
+    /* Check here that a successful XMLSocket.connect() returns
+       true */
     add_actions(mo,
         "wait = 0;"
         "count = -1;"
@@ -107,14 +101,9 @@ main(int argc, char** argv)
         "myXML.onConnect = handleConnect;"
         "myXML.onData = handleData;"
         "myXML.onClose = handleDisconnect;"
-        "myXML.connect(\"localhost\", 2229);"
+        "ret = myXML.connect(\"localhost\", 2229);"
+        "check_equals(ret, true);"
     );
-
-/*function closeConnection(){*/
-/*    trace("Closing connection to server.");*/
-/*    myXML.close();*/
-/*}*/
-
 
     /* The data we're going to send */
 
@@ -233,6 +222,11 @@ main(int argc, char** argv)
 
     /* Last frame (8) */
     SWFMovie_nextFrame(mo);
+
+    /* Close the connection to make sure it has no evil effects */
+    add_actions(mo,
+        "myXML.close();"
+    );
 
     check_equals(mo, "receivedArray.length", "expectedArray.length");
     

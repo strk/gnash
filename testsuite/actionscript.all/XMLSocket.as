@@ -20,9 +20,26 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
+// The attempted connections here should always fail. See
+// misc-ming.all/XMLSocketTest.c and testsuite/XmlSocketServer.pl
+// for tests with a running server.
 
 rcsid="$Id: XMLSocket.as,v 1.10 2008/04/01 09:26:54 strk Exp $";
 #include "check.as"
+
+#if OUTPUT_VERSION < 6
+XMLSocket.prototype.hasOwnProperty = ASnative(101, 5);
+#endif
+
+check(XMLSocket.prototype.hasOwnProperty("connect"));
+check(XMLSocket.prototype.hasOwnProperty("send"));
+check(XMLSocket.prototype.hasOwnProperty("close"));
+check(XMLSocket.prototype.hasOwnProperty("onData"));
+
+check(!XMLSocket.prototype.hasOwnProperty("onXML"));
+check(!XMLSocket.prototype.hasOwnProperty("onConnect"));
+check(!XMLSocket.prototype.hasOwnProperty("onClose"));
+
 
 check_equals(typeof(XMLSocket), 'function');
 check_equals(typeof(XMLSocket.connect), 'undefined');
@@ -36,12 +53,7 @@ check_equals(typeof(XMLSocket.prototype.close), 'function');
 check_equals(typeof(XMLSocket.prototype.send), 'function');
 check_equals(typeof(XMLSocket.prototype.Connected), 'undefined');
 check_equals(typeof(XMLSocket.prototype.connected), 'undefined');
-#if OUTPUT_VERSION >= 6
-check(XMLSocket.prototype.hasOwnProperty('connect'));
-check(XMLSocket.prototype.hasOwnProperty('close'));
-check(XMLSocket.prototype.hasOwnProperty('send'));
-check(XMLSocket.prototype.hasOwnProperty('onData'));
-#endif
+
 
 socketObj = new XMLSocket;
 
@@ -68,14 +80,6 @@ socketObj.onConnect = function(success) {
 	}
 };
 
-#if 0 // the default onData calls onXML
-socketObj.onData = function(src) {
-	check_equals(this.secret, 4);
-	check_equals(typeof(src), 'string');
-	note("XMLSocket.onData("+src+") called with "+arguments.length+" args");
-    this.onXML(new XML(src));
-};
-#endif
 
 socketObj.onXML = function(x) {
 	check_equals(this.secret, 4);
@@ -90,32 +94,23 @@ socketObj.onClose = function() {
 	note("XMLSocket.onClose() called with "+arguments.length);
 };
 
-host = 'localhost';
-port = 3660;
-ret = socketObj.connect(host, port);
-if (ret) {
-	note("XMLSocket.connect("+host+", "+port+") returned true");
-} else {
-	note("XMLSocket.connect("+host+", "+port+") returned false");
-}
+host = 'madeuphost';
+port = 1090929898;
 
-#if 0 // disabled reconnect to avoid closing the socket prematurely
-host = null;
-port = 3660;
-ret = socketObj.connect(host, port);
-if (ret) {
-	note("XMLSocket.connect("+host+", "+port+") returned true");
-} else {
-	note("XMLSocket.connect("+host+", "+port+") returned false");
-}
+// Connect should fail
+check_equals(socketObj.connect(host, port), false);
+// And again
+check_equals(socketObj.connect(host, port), false);
 
-host = 'localhost';
-port = 3661;
-ret = socketObj.connect(host, port);
-if (ret) {
-	note("XMLSocket.connect("+host+", "+port+") returned true");
-} else {
-	note("XMLSocket.connect("+host+", "+port+") returned false");
-}
-#endif
-totals();
+// Close returns undefined, and we'd like not to crash if we call
+// close when not connected.
+ret = socketObj.close();
+check_equals(ret, undefined);
+// And again.
+ret = socketObj.close();
+check_equals(ret, undefined);
+
+ret = socketObj.send("This won't work'");
+check_equals(ret, undefined);
+
+totals(29);

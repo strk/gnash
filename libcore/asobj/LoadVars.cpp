@@ -364,7 +364,7 @@ LoadVars::addLoadVariablesThread(const std::string& urlstr, const char* postdata
 
 	if ( startTimer )
 	{
-		boost::intrusive_ptr<builtin_function> loadsChecker = \
+		boost::intrusive_ptr<builtin_function> loadsChecker = 
 			new builtin_function(&LoadVars::checkLoads_wrapper);
 		std::auto_ptr<Timer> timer(new Timer);
 		timer->setInterval(*loadsChecker, 50, this);

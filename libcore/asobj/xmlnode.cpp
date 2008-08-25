@@ -403,7 +403,7 @@ xmlnode_new(const fn_call& fn)
     XMLNode *xml_obj = new XMLNode;
     if ( fn.nargs > 0 )
     {
-        xml_obj->nodeTypeSet(XMLNode::NodeType(int(fn.arg(0).to_number())));
+        xml_obj->nodeTypeSet(XMLNode::NodeType(fn.arg(0).to_int()));
         if (fn.nargs > 1)
         {
             xml_obj->nodeValueSet(fn.arg(1).to_string());

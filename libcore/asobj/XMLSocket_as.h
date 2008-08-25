@@ -18,71 +18,12 @@
 #ifndef GNASH_XMLSOCKET_H
 #define GNASH_XMLSOCKET_H
 
-#include "xml.h"
-#include "impl.h"
-#include "network.h"
-#include "dsodefs.h"
-
-#include <string>
-
 namespace gnash {
   
-class XMLSocket : public Network {
-public:
-    XMLSocket();
-    ~XMLSocket();
-    
-    bool connect(const std::string& host, short port);
-    bool send(std::string str);
-    void close();
-
-    typedef std::vector<std::string> MessageList;
-
-    bool anydata(MessageList& msgs);
-    bool anydata(int sockfd, MessageList& msgs);
-    
-    bool fdclosed() { return _closed; }
-    bool xmlmsg() { return _xmldata; }
-    
-    void messagesClear()      { _messages.clear(); }
-    void messageRemove(int x) { _messages.erase(_messages.begin() + x); }
-    int messagesCount()       { return _messages.size(); }
-    std::string operator [] (int x)  { return _messages[x]; }
-    
-    bool processingData();
-    void processing(bool x);
-    
-    // Event Handlers
-    void onClose(std::string);
-    void onConnect(std::string);
-    void onData(std::string);
-    void onXML(std::string);
-    
-    // These handle the array of XML nodes
-    //void push(as_object *obj) { _nodes.push_back(obj); }
-    //void clear() { _nodes.clear(); }
-    //int  count() { return _nodes.size(); }
-    
-    int checkSockets(void);
-    int checkSockets(int x);
-    
-private:
-    bool          _data;
-    bool          _xmldata;
-    bool          _closed;
-    bool          _processing;
-    std::vector<std::string> _messages;
-
-    std::string _remainder;
-
-};
-
 void xmlsocket_class_init(as_object& global);
 
 } // end of gnash namespace
 
-
-// __XMLSOCKETSOCKET_H__
 #endif
 
 // Local Variables:
