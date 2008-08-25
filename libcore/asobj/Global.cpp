@@ -73,7 +73,7 @@
 #include "sprite_instance.h"
 
 #include "xml.h"
-#include "xmlsocket.h"
+#include "XMLSocket_as.h"
 
 #include <limits> // for numeric_limits<double>::infinity
 #include <sstream>

@@ -28,7 +28,7 @@
 #include "network.h"
 #include "utility.h"
 #include "xml.h"
-#include "xmlsocket.h"
+#include "XMLSocket_as.h"
 #include "timers.h"
 #include "as_function.h"
 #include "fn_call.h"
