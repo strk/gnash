@@ -83,8 +83,6 @@ RTMPClient::encodeConnect(const char *app, const char *swfUrl, const char *tcUrl
     connect.makeString("connect");
 
     Element connum;
-//     const char *connumStr = "00 00 00 00 00 00 f0 3f";
-//     Buffer *connumBuf = hex2mem(connumStr);
     // update the counter for the number of connections. This number is used heavily
     // in RTMP to help keep communications clear when there are multiple streams.
     _connections++;
@@ -147,21 +145,20 @@ RTMPClient::encodeConnect(const char *app, const char *swfUrl, const char *tcUrl
     objencodingnode->makeNumber("objectEncoding", 0.0);
     obj.addProperty(objencodingnode);
     
-//    size_t total_size = 227;
-//     Buffer *out = encodeHeader(0x3, RTMP::HEADER_12, total_size,
-//                                      RTMP::INVOKE, RTMP::FROM_CLIENT);
-//     const char *rtmpStr = "03 00 00 04 00 01 1f 14 00 00 00 00";
-//     Buffer *rtmpBuf = hex2mem(rtmpStr);
     Buffer *conobj = connect.encode();
     Buffer *numobj = connum.encode();
     Buffer *encobj = obj.encode();
 
     Buffer *buf = new Buffer(conobj->size() + numobj->size() + encobj->size());
-//    buf->append(out);
     buf->append(conobj);
     buf->append(numobj);
     buf->append(encobj);
 
+    // We don't need these temporary buffers anymore
+    delete conobj;
+    delete numobj;
+    delete encobj;
+    
     return buf;
 }
 
