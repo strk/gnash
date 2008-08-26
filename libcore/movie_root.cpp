@@ -102,9 +102,6 @@ movie_root::movie_root()
 	m_mouse_x(0),
 	m_mouse_y(0),
 	m_mouse_buttons(0),
-	m_on_event_xmlsocket_ondata_called(false),
-	m_on_event_xmlsocket_onxml_called(false),
-	m_on_event_load_progress_called(false),
 	_lastTimerId(0),
 	m_active_input_text(NULL),
 	m_time_remainder(0.0f),
@@ -315,7 +312,7 @@ movie_root::swapLevels(boost::intrusive_ptr<sprite_instance> movie, int depth)
 	if ( oldDepth < character::staticDepthOffset ) // should include _level0 !
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("%s.swapDepth(%d): movie has a depth (%d) below static depth zone (%d), won't swap it's depth"),
+		log_aserror(_("%s.swapDepth(%d): movie has a depth (%d) below static depth zone (%d), won't swap its depth"),
 			movie->getTarget(), depth, oldDepth, character::staticDepthOffset);
 		);
 		return;
@@ -324,7 +321,7 @@ movie_root::swapLevels(boost::intrusive_ptr<sprite_instance> movie, int depth)
 	if ( oldDepth >= 0 ) 
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("%s.swapDepth(%d): movie has a depth (%d) below static depth zone (%d), won't swap it's depth"),
+		log_aserror(_("%s.swapDepth(%d): movie has a depth (%d) below static depth zone (%d), won't swap its depth"),
 			movie->getTarget(), depth, oldDepth, character::staticDepthOffset);
 		);
 		return;
@@ -599,7 +596,7 @@ movie_root::notify_global_key(key::code k, bool down)
 	}
 	else
 	{
-		log_error("gnash::notify_key_event(): _global.Key doesn't exist, or isn't the expected built-in\n");
+		log_error("gnash::notify_key_event(): _global.Key doesn't exist, or isn't the expected built-in");
 	}
 
 	return _keyobject.get();
@@ -700,9 +697,7 @@ generate_mouse_button_events(mouse_button_state* ms)
 	if (ms->m_mouse_button_state_last == mouse_button_state::DOWN)
 	{
 		// Mouse button was down.
-
 		// TODO: Handle trackAsMenu dragOver
-
 		// Handle onDragOut, onDragOver
 		if (ms->m_mouse_inside_entity_last == false)
 		{
@@ -1389,7 +1384,8 @@ movie_root::isMouseOverActiveEntity() const
 	boost::intrusive_ptr<character> entity ( m_mouse_button_state.m_active_entity );
 	if ( ! entity.get() ) {
         return false;
-    }else {
+    }
+    else {
         return true;
     }
 }
@@ -1477,7 +1473,9 @@ movie_root::setStageScaleMode(ScaleMode sm)
         // movie size
         movie_definition* md = _rootMovie->get_movie_definition();
 
-        log_debug("Going to or from scaleMode=noScale. Viewport:%dx%d Def:%dx%d", m_viewport_width, m_viewport_height, md->get_width_pixels(), md->get_height_pixels());
+        log_debug("Going to or from scaleMode=noScale. Viewport:%dx%d Def:%dx%d",
+                    m_viewport_width, m_viewport_height,
+                    md->get_width_pixels(), md->get_height_pixels());
 
         if ( m_viewport_width != md->get_width_pixels()
              || m_viewport_height != md->get_height_pixels() )
@@ -1564,7 +1562,8 @@ movie_root::processActionQueue(int lvl)
 	bool actionsToProcess = !q.empty();
 	if ( actionsToProcess )
 	{
-		log_debug(" Processing %d actions in priority queue %d (call %u)", q.size(), lvl, calls);
+		log_debug(" Processing %d actions in priority queue %d (call %u)",
+		            q.size(), lvl, calls);
 	}
 #endif
 
@@ -1573,16 +1572,17 @@ movie_root::processActionQueue(int lvl)
 	// and a final call to .clear() 
 	while ( ! q.empty() )
 	{
-		ExecutableCode* code = q.front();
+		std::auto_ptr<ExecutableCode> code(q.front());
 		q.pop_front(); 
 		code->execute();
-		delete code;
 
 		int minLevel = minPopulatedPriorityQueue();
 		if ( minLevel < lvl )
 		{
 #ifdef GNASH_DEBUG
-			log_debug(" Actions pushed in priority %d (< %d), restarting the scan (call %u)", minLevel, lvl, calls);
+			log_debug(" Actions pushed in priority %d (< "
+					"%d), restarting the scan (call"
+					" %u)", minLevel, lvl, calls);
 #endif
 			return minLevel;
 		}
@@ -1593,7 +1593,8 @@ movie_root::processActionQueue(int lvl)
 #ifdef GNASH_DEBUG
 	if ( actionsToProcess )
 	{
-		log_debug(" Done processing actions in priority queue %d (call %u)", lvl, calls);
+		log_debug(" Done processing actions in priority queue "
+				"%d (call %u)", lvl, calls);
 	}
 #endif
 
@@ -1606,8 +1607,10 @@ movie_root::flushHigherPriorityActionQueues()
 {
     if( ! processingActions() )
 	{
-		// only flush the actions queue when we are processing the queue.
-		// ie. we don't want to flush the queue during executing user event handlers,
+		// only flush the actions queue when we are 
+		// processing the queue.
+		// ie. we don't want to flush the queue 
+		// during executing user event handlers,
 		// which are not pushed at the moment.
 		return;
 	}
@@ -1670,7 +1673,8 @@ movie_root::pushAction(const action_buffer& buf, boost::intrusive_ptr<character>
 {
 	assert(lvl >= 0 && lvl < apSIZE);
 #ifdef GNASH_DEBUG
-	log_debug("Pushed action buffer for target %s", target->getTargetPath());
+	log_debug("Pushed action buffer for target %s", 
+			target->getTargetPath());
 #endif
 
 	std::auto_ptr<ExecutableCode> code ( new GlobalCode(buf, target) );
@@ -2144,7 +2148,8 @@ movie_root::isLevelTarget(const std::string& name, unsigned int& levelno)
   }
   else
   {
-    if ( strncasecmp(name.c_str(), "_level", 6) ) return false;
+    StringNoCaseEqual noCaseCmp;
+    if (!noCaseCmp(name.substr(0, 6), "_level")) return false;
   }
 
   if ( name.find_first_not_of("0123456789", 7) != std::string::npos ) return false;
