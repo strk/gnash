@@ -466,6 +466,7 @@ character::width_getset(const fn_call& fn)
 		}
 
 		const double newwidth = PIXELS_TO_TWIPS(fn.arg(0).to_number());
+
 		if ( newwidth <= 0 )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
@@ -474,7 +475,7 @@ character::width_getset(const fn_call& fn)
 			);
 		}
 
-		ptr->set_x_scale( newwidth / oldwidth );
+		ptr->set_x_scale( 100 * (newwidth / oldwidth) );
 	}
 	return rv;
 }
