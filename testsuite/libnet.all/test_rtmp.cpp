@@ -177,6 +177,11 @@ main(int argc, char *argv[])
     test_client();
     test_results();
 //    test_types();
+#if defined(HAVE_MALLINFO) && defined(USE_STATS_MEMORY)
+    if (memdebug) {
+        delete mem;
+    }
+#endif
 }
 
 // 00 00 cf 03 04 c3 00 00
@@ -209,7 +214,6 @@ test_system()
 
     boost::uint32_t time = *(reinterpret_cast<boost::uint32_t *>(buf2->reference() + 2));
     Buffer *enc2 = server.encodePing(RTMP::PING_CLIENT, htonl(time));
-    cerr << hexify(enc2->begin(), enc2->size(), false) << endl;
     if ((memcmp(buf2->reference(), enc2->reference(), 6) == 0)) {
         runtest.pass("Encoded RTMP Ping Client message");
     } else {
