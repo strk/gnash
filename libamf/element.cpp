@@ -74,15 +74,15 @@ Element::Element()
 Element::~Element()
 {
 //    GNASH_REPORT_FUNCTION;
+//     if (_name) {
+// 	cerr << "Deleting " << _name << endl;
+//     }
+    
     for (size_t i=0; i< _properties.size(); i++) {
 	delete _properties[i];
     }
-    if (_buffer) {
-	delete _buffer;
-    }
-    if (_name) {
-	delete[] _name;
-    }
+    delete _buffer;
+    delete[] _name;
 }
 
 
@@ -944,15 +944,9 @@ Element::dump()
       case Element::STRING_AMF0:
 	  cerr << "(" << getLength() << " bytes): ";
 	  if (getLength() > 0) {
-#ifdef HAVE_STRNDUP
-		char *term = strndup(to_string(), getLength());
-#else
-		char *term = const_cast<char *>(to_string());
-#endif	      
-	      cerr << "\t\"" << term << "\"" << endl;
-	  } else {
-	      cerr << endl;
+	      cerr << "\t\"" << to_string() << "\"";
 	  }
+	  cerr << endl;
 	  break;
       case Element::OBJECT_AMF0:
 	  break;
