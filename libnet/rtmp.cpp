@@ -377,7 +377,6 @@ RTMP::packetRead(amf::Buffer *buf)
     Network::byte_t *tooFar = ptr+buf->size();
     AMF amf;
     
-//    \003\000\000\017\000\000%G￿%@\024\000\000\000\000\002\000\aconnect\000?%G￿%@\000\000\000\000\000\000\003\000\003app\002\000#software/gnash/tests/1153948634.flv\000\bflashVer\002\000\fLNX 6,0,82,0\000\006swfUrl\002\000\035file:///file|%2Ftmp%2Fout.swf%G￿%@\000\005tcUrl\002\0004rtmp://localhost/software/gnash/tests/1153948634
     amf_index = *buf->reference() & RTMP_INDEX_MASK;
     headersize = headerSize(*buf->reference());
     log_debug (_("The Header size is: %d"), headersize);
@@ -492,8 +491,7 @@ RTMP::decodePing(Network::byte_t *data)
     memset(ping, 0, sizeof(rtmp_ping_t));
 
     // All the data fields in a ping message are 2 bytes long.
-    // FIXME: FIXME: FIXME: breaks on big endian, ppc
-    boost::uint16_t type = ntohs(*reinterpret_cast<rtmp_ping_e *>(ptr));
+    boost::uint16_t type = ntohs(*reinterpret_cast<boost::uint16_t *>(ptr));
     ping->type = static_cast<rtmp_ping_e>(type);
     ptr += sizeof(boost::uint16_t);
 
@@ -605,7 +603,7 @@ RTMP::decodeMsgBody(Network::byte_t *data, size_t size)
         if (el == 0) {
 	    break;
 	}
-	el->dump();
+//	el->dump();
 	msg->addObject(el);
  	if (status) {
 	    msg->checkStatus(el);
