@@ -85,7 +85,7 @@ main(int argc, char** argv)
 	Ming_init();
 	mo = newSWFMovieWithVersion(OUTPUT_VERSION);
 	SWFMovie_setDimension(mo, 800, 600);
-	SWFMovie_setRate (mo, 1);
+	SWFMovie_setRate (mo, 2);
 
 	dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
 	SWFMovie_add(mo, (SWFBlock)dejagnuclip);
@@ -110,7 +110,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);        
 
-	SWFDisplayItem_rotate(it, -45);
+	SWFDisplayItem_rotateTo(it, -45);
 
 	check_equals(mo, "staticmc._x", "50");
 	check_equals(mo, "staticmc._y", "300");
@@ -124,7 +124,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);        
 
-	SWFDisplayItem_scale(it, 2, 3);
+	SWFDisplayItem_scaleTo(it, 2, 3);
 
 	check_equals(mo, "staticmc._x", "50");
 	check_equals(mo, "staticmc._y", "300");
@@ -138,7 +138,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);        
 
-	SWFDisplayItem_skewX(it, 2);
+	SWFDisplayItem_skewXTo(it, 2);
 
 	check_equals(mo, "staticmc._x", "50");
 	check_equals(mo, "staticmc._y", "300");
@@ -150,13 +150,56 @@ main(int argc, char** argv)
 	check_equals(mo, "staticmc._width", "382.5");
 	check_equals(mo, "staticmc._height", "212.5");
 
+	SWFMovie_nextFrame(mo);        
+
+	SWFDisplayItem_scaleTo(it, 2, -3);
+
+	check_equals(mo, "staticmc._x", "50");
+	check_equals(mo, "staticmc._y", "300");
+	check_equals(mo, "Math.round(staticmc._xscale)", "447");
+	check_equals(mo, "Math.round(staticmc._yscale)", "300");
+	xcheck_equals(mo, "Math.round(staticmc._rotation*1000)", "18435");
+	check_equals(mo, "printBounds(staticmc.getBounds())", "'-30.05,-30.05 30.05,30.05'");
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'-141.25,193.75 241.25,406.25'");
+	check_equals(mo, "staticmc._width", "382.5");
+	check_equals(mo, "staticmc._height", "212.5");
+
+	SWFMovie_nextFrame(mo);        
+
+	SWFDisplayItem_skewXTo(it, 0);
+
+	check_equals(mo, "staticmc._x", "50");
+	check_equals(mo, "staticmc._y", "300");
+	check_equals(mo, "Math.round(staticmc._xscale)", "200");
+	check_equals(mo, "Math.round(staticmc._yscale)", "300");
+	xcheck_equals(mo, "Math.round(staticmc._rotation*1000)", "45000");
+	check_equals(mo, "printBounds(staticmc.getBounds())", "'-30.05,-30.05 30.05,30.05'");
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'-56.25,193.75 156.25,406.25'");
+	check_equals(mo, "staticmc._width", "212.5");
+	check_equals(mo, "staticmc._height", "212.5");
+
+	SWFMovie_nextFrame(mo);        
+
+	SWFDisplayItem_scaleTo(it, -2, 2);
+
+	check_equals(mo, "staticmc._x", "50");
+	check_equals(mo, "staticmc._y", "300");
+	check_equals(mo, "Math.round(staticmc._xscale)", "200");
+	check_equals(mo, "Math.round(staticmc._yscale)", "200");
+	xcheck_equals(mo, "Math.round(staticmc._rotation*1000)", "-135000");
+	check_equals(mo, "printBounds(staticmc.getBounds())", "'-30.05,-30.05 30.05,30.05'");
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'-35,215 135,385'");
+	check_equals(mo, "staticmc._width", "170");
+	check_equals(mo, "staticmc._height", "170");
+
+
 	// TODO:
 	// - test more rotations and scales (corner cases too!)
 	// - test 'skew' (since Ming supports it)
 
+	SWFMovie_nextFrame(mo);
 
-
-	add_actions(mo, "_root.totals(); stop();");
+	add_actions(mo, "_root.totals(62); stop();");
 	SWFMovie_nextFrame(mo);        
 
 	//Output movie
