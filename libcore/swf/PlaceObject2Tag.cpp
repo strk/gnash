@@ -499,6 +499,8 @@ PlaceObject2Tag::execute(sprite_instance* m, DisplayList& dlist) const
 }
 
 
+/// Use to delete pointers efficiently with std::for_each,
+/// making sure that the type is complete.
 template<typename T>
 static void deleterHelper(T p)
 {
