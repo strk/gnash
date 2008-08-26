@@ -123,7 +123,7 @@ public:
     const std::string& getName() const { return m_name; }
     const matrix& getMatrix()    const { return m_matrix; }
     const cxform& getCxform()    const { return m_color_transform; }
-    const EventHandlers& getEventHandlers() const { return m_event_handlers; }
+    const EventHandlers& getEventHandlers() const { return _eventHandlers; }
     
     bool hasClipActions() const { return m_has_flags2 & HAS_CLIP_ACTIONS_MASK; }
     bool hasClipDepth()   const { return m_has_flags2 & HAS_CLIP_DEPTH_MASK; };
@@ -152,7 +152,7 @@ private:
     boost::uint32_t all_event_flags; 
     
     /// NOTE: getPlaceType() is dependent on the enum values.
-    enum place_type
+    enum PlaceType
     {
         REMOVE  = 0, 
         MOVE    = 1,
@@ -185,7 +185,7 @@ private:
 
     ActionBuffers _actionBuffers;
 
-    EventHandlers m_event_handlers;
+    EventHandlers _eventHandlers;
 
     // read SWF::PLACEOBJECT 
     void readPlaceObject(SWFStream& in);

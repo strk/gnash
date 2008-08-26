@@ -227,7 +227,7 @@ PlaceObject2Tag::readPlaceActions(SWFStream& in)
                         ev->event().setKeyCode(ch);
                     }
     
-                    m_event_handlers.push_back(ev.release());
+                    _eventHandlers.push_back(ev.release());
                 }
             }
         }
@@ -498,18 +498,20 @@ PlaceObject2Tag::execute(sprite_instance* m, DisplayList& dlist) const
     }
 }
 
+
+template<typename T>
+static void deleterHelper(T p)
+{
+    delete p;
+}
+
 PlaceObject2Tag::~PlaceObject2Tag()
 {
+    std::for_each(_eventHandlers.begin(), _eventHandlers.end(),
+                 &deleterHelper<EventHandlers::value_type>);
 
-    for(size_t i=0; i<m_event_handlers.size(); ++i)
-    {
-        delete m_event_handlers[i];
-    }
-
-    for(size_t i=0; i<_actionBuffers.size(); ++i)
-    {
-        delete _actionBuffers[i];
-    }
+    std::for_each(_actionBuffers.begin(), _actionBuffers.end(),
+                 &deleterHelper<ActionBuffers::value_type>);
 }
 
 /* public static */
