@@ -1573,16 +1573,17 @@ movie_root::processActionQueue(int lvl)
 	// and a final call to .clear() 
 	while ( ! q.empty() )
 	{
-		ExecutableCode* code = q.front();
+		std::auto_ptr<ExecutableCode> code(q.front());
 		q.pop_front(); 
 		code->execute();
-		delete code;
 
 		int minLevel = minPopulatedPriorityQueue();
 		if ( minLevel < lvl )
 		{
 #ifdef GNASH_DEBUG
-			log_debug(" Actions pushed in priority %d (< %d), restarting the scan (call %u)", minLevel, lvl, calls);
+			log_debug(" Actions pushed in priority %d (< "
+					"%d), restarting the scan (call"
+					" %u)", minLevel, lvl, calls);
 #endif
 			return minLevel;
 		}
@@ -1593,7 +1594,8 @@ movie_root::processActionQueue(int lvl)
 #ifdef GNASH_DEBUG
 	if ( actionsToProcess )
 	{
-		log_debug(" Done processing actions in priority queue %d (call %u)", lvl, calls);
+		log_debug(" Done processing actions in priority queue "
+				"%d (call %u)", lvl, calls);
 	}
 #endif
 
@@ -1606,8 +1608,10 @@ movie_root::flushHigherPriorityActionQueues()
 {
     if( ! processingActions() )
 	{
-		// only flush the actions queue when we are processing the queue.
-		// ie. we don't want to flush the queue during executing user event handlers,
+		// only flush the actions queue when we are 
+		// processing the queue.
+		// ie. we don't want to flush the queue 
+		// during executing user event handlers,
 		// which are not pushed at the moment.
 		return;
 	}
@@ -1670,7 +1674,8 @@ movie_root::pushAction(const action_buffer& buf, boost::intrusive_ptr<character>
 {
 	assert(lvl >= 0 && lvl < apSIZE);
 #ifdef GNASH_DEBUG
-	log_debug("Pushed action buffer for target %s", target->getTargetPath());
+	log_debug("Pushed action buffer for target %s", 
+			target->getTargetPath());
 #endif
 
 	std::auto_ptr<ExecutableCode> code ( new GlobalCode(buf, target) );
