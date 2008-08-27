@@ -321,6 +321,7 @@ abc_block::setNamespaceURI(asNamespace *ns,string_table::key ABCName){
 	std::string name = mStringPool[ABCName];
 	string_table::key global_key = mStringTable->find(name,false);
 	ns->setURI(global_key);
+	LOG_DEBUG_ABC("Namespace: %s AbcURI=%u URI=%u.",name,ABCName,global_key);
 }
 
 asClass *
