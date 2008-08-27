@@ -108,11 +108,9 @@ RTMPClient::encodeConnect(const char *app, const char *swfUrl, const char *tcUrl
     obj.addProperty(flashVer);
     
     Element *swfUrlnode = new Element;
-//    swfUrl->makeString("swfUrl", "http://192.168.1.70/software/gnash/tests/ofla_demo.swf");
     swfUrlnode->makeString("swfUrl", swfUrl);
     obj.addProperty(swfUrlnode);
 
-//    filespec = "rtmp://localhost/oflaDemo";
     Element *tcUrlnode = new Element;
     tcUrlnode->makeString("tcUrl", tcUrl);
     obj.addProperty(tcUrlnode);
@@ -122,22 +120,18 @@ RTMPClient::encodeConnect(const char *app, const char *swfUrl, const char *tcUrl
     obj.addProperty(fpad);
 
     Element *audioCodecsnode = new Element;
-//    audioCodecsnode->makeNumber("audioCodecs", 615);
     audioCodecsnode->makeNumber("audioCodecs", audioCodecs);
     obj.addProperty(audioCodecsnode);
     
     Element *videoCodecsnode = new Element;
-//    videoCodecsnode->makeNumber("videoCodecs", 124);
     videoCodecsnode->makeNumber("videoCodecs", videoCodecs);
     obj.addProperty(videoCodecsnode);
 
     Element *videoFunctionnode = new Element;
-//    videoFunctionnode->makeNumber("videoFunction", 0x1);
     videoFunctionnode->makeNumber("videoFunction", videoFunction);
     obj.addProperty(videoFunctionnode);
 
     Element *pageUrlnode = new Element;
-//    pageUrlnode->makeString("pageUrl", "http://x86-ubuntu/software/gnash/tests/");
     pageUrlnode->makeString("pageUrl", pageUrl);
     obj.addProperty(pageUrlnode);
 
