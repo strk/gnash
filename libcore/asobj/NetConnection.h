@@ -67,24 +67,6 @@ public:
 	/// Register the "NetConnection" constructor to the given global object
 	static void registerConstructor(as_object& global);
 
-	/// Open a connection to stream FLV files.
-	//
-	/// If already connected an error is raised and false
-	/// is returned. Otherwise, a connection is attempted
-	/// using a separate thread that starts loading data
-	/// caching it.
-	///
-	/// @param url
-	///	An url portion to append to the base url (???)
-	///
-	/// @return true on success, false on error.
-	///
-	/// @note Older Flash movies can only take a NULL value as
-	/// the parameter, which therefor only connects to the localhost using
-	/// RTMP. Newer Flash movies have a parameter to connect which is a
-	/// URL string like rtmp://foobar.com/videos/bar.flv
-	///
-	bool openConnection(const std::string& url);
 protected:
 
 	/// Mark responders associated with remoting calls

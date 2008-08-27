@@ -65,61 +65,6 @@ NetConnection::NetConnection()
 
 
 /*public*/
-bool NetConnection::openConnection(const std::string& url)
-{
-  // if already running there is no need to setup things again
-  if ( _loader.get() ) {
-    log_debug("NetConnection::openConnection() called when already connected to a stream. Checking if the existing connection can be used.");
-    std::string newurl;
-
-    if (!_prefixUrl.empty()) {
-      newurl += _prefixUrl + "/" + url;
-    }
-    else {
-      newurl += url;
-    }
-    
-    if (newurl.compare(_completeUrl) == 0) {
-      return true;
-    }
-    else { 
-      return false;
-    }
-  }
-
-  if ( !_prefixUrl.empty() ) {
-    _completeUrl += _prefixUrl + "/" + url;
-  }
-  else {
-    _completeUrl += url;
-  }
-
-  URL uri( _completeUrl, get_base_url() );
-
-  std::string uriStr( uri.str() );
-  assert( uriStr.find( "://" ) != std::string::npos );
-
-  // Checking if we're allowed to open url done by getStream
-
-  log_security( _("Connecting to movie: %s"), uriStr );
-
-  StreamProvider& streamProvider = StreamProvider::getDefaultInstance();
-  _loader.reset( streamProvider.getStream( uri ) );
-
-  if ( ! _loader.get() ) {
-    log_error( _("Gnash could not open this url: %s"), uriStr );
-    _loader.reset();
-
-    return false;
-  }
-
-  log_debug( _("Connection established to movie: %s"), uriStr );
-
-  return true;
-}
-
-
-/*public*/
 std::string NetConnection::validateURL(const std::string& url)
 {
 	std::string completeUrl;

@@ -45,14 +45,6 @@
 #include <boost/scoped_array.hpp>
 #include <algorithm> // std::min
 
-
-#if defined(_WIN32) || defined(WIN32)
-# include <windows.h>	// for sleep()
-# define usleep(x) Sleep(x/1000)
-#else
-# include "unistd.h" // for usleep()
-#endif
-
 /// Define this to add debugging prints for locking
 //#define GNASH_DEBUG_THREADS
 

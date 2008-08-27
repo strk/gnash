@@ -179,10 +179,6 @@ Sound::loadSound(const std::string& file, bool /*streaming*/)
 		log_error(_("%s: This sound already has a connection?  (We try to handle this by overriding the old one...)"), __FUNCTION__);
 	}
 	externalURL = file;
-#if 0
-	connection = new NetConnection();
-	connection->openConnection(externalURL);
-#endif
 }
 
 void
