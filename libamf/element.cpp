@@ -77,6 +77,13 @@ Element::~Element()
     for (size_t i=0; i< _properties.size(); i++) {
 	delete _properties[i];
     }
+    // FIXME: for some odd reason, on rare occasions deleting this buffer
+    // makes valgrind complain. It looks like memory corruption caused by something
+    // else, but neither valgrind nor GDB can find it. We could always not delete
+    // the buffer to keep valgrind happy, but then we leak memory. As the problem
+    // appears to be that _buffer has a bogus address that doesn't match any allocated
+    // Element, we assume this is a bug in our test case, but add comment here to be
+    // paranoid.
     delete _buffer;
     delete[] _name;
 }
