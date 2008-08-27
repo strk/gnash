@@ -63,7 +63,7 @@ const char *astype_str[] = {
 };
 
 Element::Element()
-    : _name(),
+    : _name(0),
       _buffer(0),
       _type(NOTYPE)
 {
@@ -74,10 +74,6 @@ Element::Element()
 Element::~Element()
 {
 //    GNASH_REPORT_FUNCTION;
-//     if (_name) {
-// 	cerr << "Deleting " << _name << endl;
-//     }
-    
     for (size_t i=0; i< _properties.size(); i++) {
 	delete _properties[i];
     }
@@ -87,7 +83,7 @@ Element::~Element()
 
 
 Element::Element(Network::byte_t *indata) 
-    : _name(),
+    : _name(0),
       _buffer(0),
       _type(NOTYPE)
 {
