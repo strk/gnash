@@ -86,12 +86,6 @@ private:
 	/// the complete url of the file
 	std::string _completeUrl;
 
-	/// The file/stream loader thread and interface
-	//
-	/// TODO: drop
-	///
-	std::auto_ptr<IOChannel> _loader;
-
 	/// Attach ActionScript instance properties
 	void attachProperties();
 
