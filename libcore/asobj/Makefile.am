@@ -109,6 +109,7 @@ libgnashasobjs_la_SOURCES = \
 	flash_pkg.cpp \
 	flash/text_pkg.cpp \
 	flash/text/TextRenderer_as.cpp \
+	flash/utils_pkg.cpp \
 	$(NULL)
 
 noinst_HEADERS = \
@@ -186,6 +187,7 @@ noinst_HEADERS = \
 	flash_pkg.h \
 	flash/text_pkg.h \
 	flash/text/TextRenderer_as.h \
+	flash/utils_pkg.h \
 	$(NULL)
 
 libgnashasobjs_la_LIBADD = \

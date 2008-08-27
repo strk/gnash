@@ -1,4 +1,4 @@
-// flash_pkg.cpp:  ActionScript "flash" package, for Gnash.
+// utils_pkg.cpp:  ActionScript "flash.utils" package, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
@@ -17,46 +17,40 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#include "log.h"
-#include "VM.h" // for getPlayerVersion() 
 #include "Object.h" // for getObjectInterface
 #include "as_object.h"
-
-#include "flash/display_pkg.h"
-#include "flash/external_pkg.h"
-#include "flash/filters_pkg.h"
-#include "flash/geom_pkg.h"
-#include "flash/net_pkg.h"
-#include "flash/text_pkg.h"
-#include "flash/utils_pkg.h"
+#include "builtin_function.h"
+#include "utils_pkg.h"
+#include "string_table.h"
+#include "VM.h"
+#include "namedStrings.h"
 
 namespace gnash {
 
-static as_value
-get_flash_package(const fn_call& /*fn*/)
+static as_value getQualifiedClassName(const fn_call&);
+
+as_value
+get_flash_utils_package(const fn_call& /*fn*/)
 {
-	log_debug("Loading flash package");
+	log_debug("Loading flash.utils package");
 
 	as_object* pkg = new as_object(getObjectInterface());
 
-	// sub-packages:
-	// TODO: use a destructive getter-setter for these 
-	flash_display_package_init(*pkg);
-	flash_external_package_init(*pkg);
-	flash_filters_package_init(*pkg);
-	flash_geom_package_init(*pkg);
-	flash_net_package_init(*pkg);
-	flash_text_package_init(*pkg);
-	flash_utils_package_init(*pkg);
+	pkg->init_member("getQualifiedClassName", new builtin_function(getQualifiedClassName));
 	return pkg;
 }
 
 void
-flash_package_init(as_object& global)
+flash_utils_package_init(as_object& where)
 {
-	string_table& st = global.getVM().getStringTable();
-	global.init_destructive_property(st.find("flash"), get_flash_package,
-		as_prop_flags::dontEnum|as_prop_flags::onlySWF8Up);
+	string_table& st = where.getVM().getStringTable();
+	where.init_destructive_property(st.find("utils"), get_flash_utils_package);
+}
+
+static as_value
+getQualifiedClassName(const fn_call& fn){
+
+	return as_value(fn.arg(0).typeOf());
 }
 
 } // end of gnash namespace
