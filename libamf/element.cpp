@@ -92,7 +92,7 @@ Element::Element(Network::byte_t *indata)
 }
 
 Element::Element(double indata)
-    : _name(),
+    : _name(0),
       _buffer(0),
       _type(NOTYPE)
 {
@@ -107,7 +107,7 @@ Element::Element(double indata)
 // }
 
 Element::Element(const string &indata)
-    : _name(),
+    : _name(0),
       _buffer(0),
       _type(NOTYPE)
 {
@@ -116,7 +116,7 @@ Element::Element(const string &indata)
 }
 
 Element::Element(const string &name, const string &indata)
-    : _name(),
+    : _name(0),
       _buffer(0),
       _type(NOTYPE)
 {
@@ -125,7 +125,7 @@ Element::Element(const string &name, const string &indata)
 }
 
 Element::Element(const string &name, bool indata)
-    : _name(),
+    : _name(0),
       _buffer(0),
       _type(NOTYPE)
 {
@@ -134,7 +134,7 @@ Element::Element(const string &name, bool indata)
 }
 
 Element::Element(bool indata)
-    : _name(),
+    : _name(0),
       _buffer(0),
       _type(NOTYPE)
 {
@@ -145,7 +145,7 @@ Element::Element(bool indata)
 // Create a function block for AMF
 Element::Element(bool flag, double unknown1, double unknown2,
 		 const string &methodname)
-    : _name(),
+    : _name(0),
       _buffer(0),
       _type(NOTYPE)
 {
