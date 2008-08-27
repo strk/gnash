@@ -16,17 +16,10 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-#ifndef __NETCONNECTION_H__
-#define __NETCONNECTION_H__
+#ifndef GNASH_NETCONNECTION_H
+#define GNASH_NETCONNECTION_H
 
 #include "IOChannel.h"
-
-#include <stdexcept>
-#include <cstdio>
-#include <cerrno>
-#include <sys/types.h>
-#include <sys/stat.h>
-
 #include <string>
 
 // TODO: port to new AS architecture
@@ -92,69 +85,6 @@ public:
 	/// URL string like rtmp://foobar.com/videos/bar.flv
 	///
 	bool openConnection(const std::string& url);
-
-	/// Put read pointer at given position
-	//
-	/// If the position has not been loaded yet
-	/// this call blocks. If not connected false
-	/// is returned w/out blocking.
-	///
-	bool seek(size_t pos);
-
-	/// Read 'bytes' bytes into the given buffer.
-	//
-	/// If not enough bytes have been loaded yet
-	/// this call blocks. If not connected false
-	/// is returned w/out blocking.
-	///
-	/// Return number of actually read bytes
-	///
-	/// TODO: drop
-	///
-	size_t read(void *dst, size_t bytes);
-
-	/// Return true if EOF has been reached
-	//
-	/// This call never blocks.
-	/// If not connected, true is returned (is this correct behaviour?)
-	///
-	bool eof();
-
-	/// Report global position within the file
-	//
-	/// This call never blocks.
-	/// If not connected, 0 is returned (is this correct behaviour?)
-	///
-	/// TODO: drop
-	///
-	size_t tell();
-
-	/// Returns the number of bytes cached
-	//
-	/// This call never blocks.
-	/// If not connected, 0 is returned (is this correct behaviour?)
-	///
-	/// TODO: drop
-	///
-	long getBytesLoaded();
-
-	/// Returns the total size of the file
-	//
-	/// This call never blocks.
-	/// If not connected, 0 is returned (is this correct behaviour?)
-	///
-	/// TODO: drop
-	///
-	long getBytesTotal();
-
-	/// Returns whether the load is complete
-	//
-	/// This call never blocks.
-	///
-	/// TODO: drop
-	///
-	bool loadCompleted();
-
 protected:
 
 	/// Mark responders associated with remoting calls
@@ -163,7 +93,7 @@ protected:
 private:
 	friend class AMFQueue;
 
-	AMFQueue *call_queue;
+	std::auto_ptr<AMFQueue> _callQueue;
 
 	/// Extend the URL to be used for playing
 	void addToURL(const std::string& url);
