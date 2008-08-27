@@ -297,7 +297,9 @@ private:
 		}
 		print_scope_stack();
 		LOG_DEBUG_AVM("Cannot find property in scope stack.");
-		push_stack(as_value());
+		as_environment env;
+		as_object* obj = env.find_object(mPoolObject->mStringPool[multiname.getNamespace()->getAbcURI()],getScopeStack());
+		push_stack(as_value(obj));
 	}
 	
 	void get_property(string_table::key name,string_table::key ns){
@@ -353,6 +355,14 @@ private:
 		mRegisters.clear();
 		//TODO: Parse and use maximum stack size value for methods.
 		mRegisters.resize(16);
+	}
+
+	as_environment::ScopeStack* getScopeStack(){
+		as_environment::ScopeStack *stack = new as_environment::ScopeStack();
+		for(int i=0;i<mAsValueScopeStack.size();i++){
+			stack->push_back(mAsValueScopeStack.top(i).to_object());
+		}
+		return stack;
 	}
 
 	void executeCodeblock(CodeStream* stream);
