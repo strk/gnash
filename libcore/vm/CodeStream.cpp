@@ -76,17 +76,17 @@ CodeStream::seekTo(unsigned int set)
 	seekg(set);
 }
 
+//TODO: Is there a better way to read a 24 bit signed int?
 boost::int32_t
 CodeStream::read_S24()
 {
 	char buffer[3];
 	read(buffer,3);
-	uint32_t result = buffer[0];
-	result |= buffer[1] << 8;
-	result |= buffer[2] << 8;
-
+	uint32_t result = buffer[0] & 0xFF;
+	result |= buffer[1] & 0xFF << 8;
+	result |= buffer[2] & 0xFF << 16;
 	if (result & (1 << 23)) {
-        	result |= -1 << 23;
+	       	result |= -1 << 24;
    	}
 
 	return static_cast<boost::int32_t>(result);

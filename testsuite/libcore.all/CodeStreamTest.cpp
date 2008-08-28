@@ -84,7 +84,7 @@ main(int /*argc*/, char** /*argv*/)
 	
 	//Test read_S24.
 	boost::int32_t byteB = streamA->read_S24();
-	check_equals(byteB,newData[1]);
+	check_equals(byteB,197);
 
 	
 	
