@@ -84,7 +84,7 @@ Element::~Element()
     // appears to be that _buffer has a bogus address that doesn't match any allocated
     // Element, we assume this is a bug in our test case, but add comment here to be
     // paranoid.
-    delete _buffer;
+//    delete _buffer;
     delete[] _name;
 }
 
@@ -270,7 +270,9 @@ Element::clear()
 {
 //    GNASH_REPORT_FUNCTION;
 	delete [] _name;
+	_name = 0;
 	delete _buffer;
+	_buffer = 0;
 }
 
 Network::byte_t *
