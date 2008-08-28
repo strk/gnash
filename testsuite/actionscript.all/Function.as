@@ -784,6 +784,11 @@ check_equals(typeof(f()), 'undefined');
 #endif
 
 #ifdef MING_SUPPORTS_ASM
+
+//-----------------------------------------------------------------------------
+// Test stack management on underrun/overrun 
+//-----------------------------------------------------------------------------
+
 //
 // --case1--
 //
@@ -808,6 +813,37 @@ function stack_test1()
 }
 
 stack_test1();
+
+xcheck_equals(testvar1, 1);
+xcheck_equals(testvar2, 2);
+xcheck_equals(testvar3, 3);
+
+//
+// --case1bis--
+//
+// same as the above, but passing args to function call
+//
+testvar1 = 0;
+testvar2 = 0;
+testvar3 = 0;
+asm{
+    push 'testvar1'
+    push 1
+    push 'testvar2'
+    push 2
+    push 'testvar3'
+    push 3
+};
+function stack_test1()
+{
+    asm{
+        setvariable
+        setvariable
+        setvariable
+    };
+}
+
+stack_test1(4, 5, 6);
 
 xcheck_equals(testvar1, 1);
 xcheck_equals(testvar2, 2);
@@ -915,11 +951,11 @@ check_equals(a.count, 2);
 check_equals(b.count, 1); // See bug #22203
 
 #if OUTPUT_VERSION == 5
- check_totals(147); // SWF5
+ check_totals(150); // SWF5
 #endif
 #if OUTPUT_VERSION == 6
- check_totals(207); // SWF6
+ check_totals(210); // SWF6
 #endif
 #if OUTPUT_VERSION >= 7
- check_totals(208); // SWF7,SWF8
+ check_totals(211); // SWF7,SWF8
 #endif
