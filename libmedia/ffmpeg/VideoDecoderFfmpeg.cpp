@@ -40,7 +40,32 @@ extern "C" {
 
 namespace gnash {
 namespace media {
-  
+
+#ifdef HAVE_SWSCALE_H
+/// A wrapper round an SwsContext that ensures it's
+/// freed on destruction.
+class SwsContextWrapper
+{
+public:
+
+    SwsContextWrapper(SwsContext* context)
+        :
+        _context(context)
+    {}
+
+    ~SwsContextWrapper()
+    {
+         sws_freeContext(_context);
+    }
+    
+    SwsContext* getContext() { return _context; }
+
+private:
+    SwsContext* _context;
+
+};
+#endif
+
 VideoDecoderFfmpeg::VideoDecoderFfmpeg(videoCodecType format, int width, int height)
   :
   _videoCodec(NULL),
@@ -128,7 +153,7 @@ VideoDecoderFfmpeg::~VideoDecoderFfmpeg()
   }
 }
 
-AVPicture /*static*/
+AVPicture
 VideoDecoderFfmpeg::convertRGB24(AVCodecContext* srcCtx,
                                  const AVFrame& srcFrame)
 {
@@ -150,25 +175,37 @@ VideoDecoderFfmpeg::convertRGB24(AVCodecContext* srcCtx,
   img_convert(&picture, PIX_FMT_RGB24, (AVPicture*) &srcFrame,
       srcCtx->pix_fmt, width, height);
 #else
-  // FIXME: this will live forever ...
-  static struct SwsContext* context = NULL;
 
-  if (!context) {
+  // Check whether the context wrapper exists
+  // already.
+  if (!_swsContext.get()) {
     // FIXME: this leads to wrong results (read: segfaults) if this method
     //        is called from two unrelated video contexts, for example from
     //        a NetStreamFfmpeg and an embedded video context. Or two
     //        separate instances of one of the former two.    
-    context = sws_getContext(width, height, srcCtx->pix_fmt,
-           width, height, PIX_FMT_RGB24,
-           SWS_FAST_BILINEAR, NULL, NULL, NULL);
+    _swsContext.reset(
+            new SwsContextWrapper(
+                sws_getContext(width, height, srcCtx->pix_fmt,
+                width, height, PIX_FMT_RGB24,
+                SWS_FAST_BILINEAR, NULL, NULL, NULL)
+            ));
     
-    if (!context) {
+    // Check that the context was assigned.
+    if (!_swsContext->getContext()) {
       delete [] buffer;
+
+      // This means we will try to assign the 
+      // context again next time.
+      _swsContext.reset();
       return picture;
     }
   }
 
-  int rv = sws_scale(context, const_cast<uint8_t**>(srcFrame.data),
+  // Is it possible for the context to be reset
+  // to NULL once it's been created?
+  assert(_swsContext->getContext());
+
+  int rv = sws_scale(_swsContext->getContext(), const_cast<uint8_t**>(srcFrame.data),
     const_cast<int*>(srcFrame.linesize), 0, height, picture.data,
     picture.linesize);
 

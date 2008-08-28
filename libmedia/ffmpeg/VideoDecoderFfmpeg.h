@@ -1,6 +1,6 @@
 // VideoDecoderFfmpeg.h: Video decoding using the FFMPEG library.
 // 
-//   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
+//     Copyright (C) 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,12 +9,12 @@
 // 
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.    See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA    02110-1301    USA
 
 
 #ifndef GNASH_VIDEODECODERFFMPEG_H
@@ -41,60 +41,82 @@ extern "C" {
 }
 #endif
 
+
+#if defined(HAVE_LIBSWSCALE_SWSCALE_H) || defined(HAVE_FFMPEG_SWSCALE_H)
+# define HAVE_SWSCALE_H 1
+#endif
+
+
 namespace gnash {
 namespace media {
 
 
+/// Forward declarations
+#ifdef HAVE_SWSCALE_H
+class SwsContextWrapper;
+#endif
+
 class VideoDecoderFfmpeg : public VideoDecoder {
-  
+    
 public:
 
-  DSOEXPORT VideoDecoderFfmpeg(videoCodecType format, int width, int height);
+    DSOEXPORT VideoDecoderFfmpeg(videoCodecType format, int width, int height);
 
-  DSOEXPORT VideoDecoderFfmpeg(VideoInfo& info);
+    DSOEXPORT VideoDecoderFfmpeg(VideoInfo& info);
 
-  DSOEXPORT ~VideoDecoderFfmpeg();
-  
-  void push(const EncodedVideoFrame& buffer);
+    DSOEXPORT ~VideoDecoderFfmpeg();
+    
+    void push(const EncodedVideoFrame& buffer);
 
-  std::auto_ptr<image::ImageBase> pop();
-  
-  bool peek();
-  
-  
-  /// \brief converts an video frame from (almost) any type to RGB24.
-  ///
-  /// @param srcCtx The source context that was used to decode srcFrame.
-  /// @param srcFrame the source frame to be converted.
-  /// @return an AVPicture containing the converted image. Please be advised
-  ///         that the RGB data pointer is stored in AVPicture::data[0]. The
-  ///         caller owns that pointer, which must be freed with delete [].
-  ///         It is advised to wrap the pointer in a boost::scoped_array.
-  ///         If conversion fails, AVPicture::data[0] will be NULL.
-  DSOEXPORT static AVPicture convertRGB24(AVCodecContext* srcCtx, const AVFrame& srcFrame);
+    std::auto_ptr<image::ImageBase> pop();
+    
+    bool peek();
+    
+    
+    /// \brief converts an video frame from (almost) any type to RGB24.
+    ///
+    /// @param srcCtx The source context that was used to decode srcFrame.
+    /// @param srcFrame the source frame to be converted.
+    /// @return an AVPicture containing the converted image. Please be advised
+    ///                 that the RGB data pointer is stored in AVPicture::data[0]. The
+    ///                 caller owns that pointer, which must be freed with delete [].
+    ///                 It is advised to wrap the pointer in a boost::scoped_array.
+    ///                 If conversion fails, AVPicture::data[0] will be NULL.
+    AVPicture convertRGB24(AVCodecContext* srcCtx, const AVFrame& srcFrame);
 
-  /// Convert FLASH codec id to FFMPEG codec id
-  //
-  /// @return CODEC_ID_NONE for unsupported flash codecs
-  ///
-  DSOEXPORT static enum CodecID flashToFfmpegCodec(videoCodecType format);
+    /// Convert FLASH codec id to FFMPEG codec id
+    //
+    /// @return CODEC_ID_NONE for unsupported flash codecs
+    ///
+    DSOEXPORT static enum CodecID flashToFfmpegCodec(videoCodecType format);
 
 private:
 
-  void init(enum CodecID format, int width, int height, boost::uint8_t* extradata=0, int extradataSize=0);
+    void init(enum CodecID format, int width, int height, boost::uint8_t* extradata=0, int extradataSize=0);
 
-  std::auto_ptr<image::ImageBase> decode(const boost::uint8_t* input, boost::uint32_t input_size);
+    std::auto_ptr<image::ImageBase> decode(const boost::uint8_t* input, boost::uint32_t input_size);
 
-  std::auto_ptr<image::ImageBase> decode(const EncodedVideoFrame* vf)
-  {
-  	return decode(vf->data(), vf->dataSize());
-  }
+    std::auto_ptr<image::ImageBase> decode(const EncodedVideoFrame* vf)
+    {
+    	return decode(vf->data(), vf->dataSize());
+    }
 
-  AVCodec* _videoCodec;
-  AVCodecContext* _videoCodecCtx;
-  std::vector<const EncodedVideoFrame*> _video_frames;
+    AVCodec* _videoCodec;
+    AVCodecContext* _videoCodecCtx;
+
+#if HAVE_SWSCALE_H
+    /// A pointer to a wrapper round an SwsContext
+    //
+    /// This is constructed with a SwsContext*, which
+    /// can be NULL, so it is important to check
+    /// not only that the wrapper exists, but also
+    /// the context inside it.    
+    std::auto_ptr<SwsContextWrapper> _swsContext;
+#endif
+
+    std::vector<const EncodedVideoFrame*> _video_frames;
 };
-  
+    
 } // gnash.media namespace 
 } // gnash namespace
 
