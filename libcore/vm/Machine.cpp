@@ -1739,7 +1739,7 @@ Machine::execute()
 	case SWF::ABC_ACTION_CONVERT_D:
 	case SWF::ABC_ACTION_COERCE_D:
 	{
-		mStack.top(0) = mStack.top(0).to_number();
+		push_stack(pop_stack().to_number());
 		break;
 	}
 /// 0x76 ABC_ACTION_CONVERT_B
