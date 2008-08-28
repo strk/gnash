@@ -1914,8 +1914,8 @@ Machine::execute()
 /// Stack Out:
 ///  type -- typeof(obj) as a string
 	case SWF::ABC_ACTION_ABC_TYPEOF:
-	{
-		mStack.top(0) = mStack.top(0).typeOf();
+	{	
+		push_stack(pop_stack().typeOf());
 		break;
 	}
 /// 0x96 ABC_ACTION_NOT
