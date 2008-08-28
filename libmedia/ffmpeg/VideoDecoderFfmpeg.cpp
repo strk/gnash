@@ -41,7 +41,7 @@ extern "C" {
 namespace gnash {
 namespace media {
 
-
+#ifdef HAVE_SWSCALE_H
 /// A wrapper round an SwsContext that ensures it's
 /// freed on destruction.
 class SwsContextWrapper
@@ -64,7 +64,7 @@ private:
     SwsContext* _context;
 
 };
-
+#endif
 
 VideoDecoderFfmpeg::VideoDecoderFfmpeg(videoCodecType format, int width, int height)
   :

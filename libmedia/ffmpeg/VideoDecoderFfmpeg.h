@@ -41,12 +41,20 @@ extern "C" {
 }
 #endif
 
+
+#if defined(HAVE_LIBSWSCALE_SWSCALE_H) || defined(HAVE_FFMPEG_SWSCALE_H)
+# define HAVE_SWSCALE_H 1
+#endif
+
+
 namespace gnash {
 namespace media {
 
 
 /// Forward declarations
+#ifdef HAVE_SWSCALE_H
 class SwsContextWrapper;
+#endif
 
 class VideoDecoderFfmpeg : public VideoDecoder {
     
@@ -96,6 +104,7 @@ private:
     AVCodec* _videoCodec;
     AVCodecContext* _videoCodecCtx;
 
+#if HAVE_SWSCALE_H
     /// A pointer to a wrapper round an SwsContext
     //
     /// This is constructed with a SwsContext*, which
@@ -103,7 +112,8 @@ private:
     /// not only that the wrapper exists, but also
     /// the context inside it.    
     std::auto_ptr<SwsContextWrapper> _swsContext;
-    
+#endif
+
     std::vector<const EncodedVideoFrame*> _video_frames;
 };
     
