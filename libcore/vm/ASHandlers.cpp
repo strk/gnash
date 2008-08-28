@@ -2800,7 +2800,7 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
     //env.dump_stack();
 
     // Let's consider it a as a string and lookup the function.
-    const std::string& funcname = env.top(0).to_string();
+    const std::string& funcname = env.pop().to_string();
     as_object* this_ptr = thread.getThisPointer();
     as_object* super = NULL;
 
@@ -2811,7 +2811,7 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
     if ( ! function.is_object() )
     {
         IF_VERBOSE_ASCODING_ERRORS (
-        log_aserror(_("ActionCallFunction: %s is not an object"), env.top(0).to_string());
+        log_aserror(_("ActionCallFunction: %s is not an object"), funcname);
         )
     }
     else if ( ! function.is_function() )
@@ -2837,8 +2837,8 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
     }
 
     // Get number of args, modifying it if not enough values are on the stack.
-    unsigned nargs = unsigned(env.top(1).to_number());
-    unsigned available_args = env.stack_size()-2; // 2 for func name and nargs
+    unsigned nargs = unsigned(env.pop().to_number());
+    unsigned available_args = env.stack_size(); 
     if ( available_args < nargs )
     {
         IF_VERBOSE_MALFORMED_SWF(
@@ -2858,12 +2858,12 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
 
     //log_debug("ActionCallFunction calling call_method with %p as this_ptr", this_ptr);
     as_value result = call_method(function, &env, this_ptr,
-                  nargs, env.get_top_index() - 2, super);
+                  nargs, env.get_top_index(), super);
 
     //log_debug(_("Function's result: %s"), result.to_string();
 
-    env.drop(nargs + 1);
-    env.top(0) = result;
+    env.drop(nargs);
+    env.push(result);
 
     // If the function threw an exception, do so here.
     if (result.is_exception())
@@ -3453,14 +3453,14 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
     //const int version = env.get_version();
 
     // Get name function of the method
-    as_value& method_name = env.top(0);
+    as_value method_name = env.pop();
 
     // Get an object
-    as_value& obj_value = env.top(1);
+    as_value obj_value = env.pop();
 
     // Get number of args, modifying it if not enough values are on the stack.
-    unsigned nargs = unsigned(env.top(2).to_number());
-    unsigned available_args = env.stack_size()-3; // 3 for obj, func and nargs
+    unsigned nargs = unsigned(env.pop().to_number());
+    unsigned available_args = env.stack_size(); 
     if ( available_args < nargs )
     {
         IF_VERBOSE_MALFORMED_SWF(
@@ -3491,8 +3491,8 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
         log_error(_("ActionCallMethod invoked with "
             "non-object object/func (%s)"), obj_value);
         );
-        env.drop(nargs+2);
-        env.top(0).set_undefined();
+        env.drop(nargs);
+        env.push(as_value());
         return;
     }
 
@@ -3526,8 +3526,8 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
                 IF_VERBOSE_ASCODING_ERRORS(
                 log_aserror(_("ActionCallMethod: object has no constructor"));
                 );
-                env.drop(nargs+2);
-                env.top(0).set_undefined();
+                env.drop(nargs);
+        	env.push(as_value());
                 return;
             }
             if ( ! ctor.is_function() )
@@ -3535,8 +3535,8 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
                 IF_VERBOSE_ASCODING_ERRORS(
                 log_aserror(_("ActionCallMethod: object constructor is not a function"));
                 );
-                env.drop(nargs+2);
-                env.top(0).set_undefined();
+                env.drop(nargs);
+        	env.push(as_value());
                 return;
             }
             method_val = ctor;
@@ -3552,8 +3552,8 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
                 method_name,
                 obj_value);
             );
-            env.drop(nargs+2);
-            env.top(0).set_undefined(); // should we push an object anyway ?
+            env.drop(nargs);
+            env.push(as_value()); // should we push an object anyway ?
             return;
         }
     }
@@ -3568,19 +3568,15 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
     }
     else
     {
-        static bool warned=false;
-        if ( ! warned ) {
-            log_unimpl(_("FIXME: debugger doesn't deal with anonymous function calls"));
-            warned=true;
-        }
+        LOG_ONCE( log_unimpl(_("FIXME: debugger doesn't deal with anonymous function calls")) );
     }
 #endif
 
     as_value result = call_method(method_val, &env, this_ptr, 
-            nargs, env.get_top_index()-3, super);
+            nargs, env.get_top_index(), super);
 
-    env.drop(nargs + 2);
-    env.top(0) = result;
+    env.drop(nargs);
+    env.push(result);
 
     // Now, if there was an exception, proceed to the end of the block.
     if (result.is_exception())

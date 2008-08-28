@@ -64,6 +64,16 @@ public:
 		return mData[offset >> mChunkShift][offset & mChunkMod];
 	}
 
+	const T& value(unsigned int i) const
+	{
+		if (i >= size())
+			throw StackException();
+
+		unsigned int offset = mDownstop + i + 2;
+		//log_debug("value(%d): mEnd:%d, mDownstop:%d, offset:%d", i, mEnd, mDownstop, offset);
+		return mData[offset >> mChunkShift][offset & mChunkMod];
+	}
+
 	/// Shrink the stack by i entries. Does not invalidate any entries
 	/// previously given, it just sets the top for pop, push, and top
 	/// operations.
@@ -135,7 +145,7 @@ public:
 	~SafeStack()
 	{
 		for (unsigned int i = 0; i < mData.size(); ++i)
-			delete mData[i];
+			delete [] mData[i];
 	}
 
 private:

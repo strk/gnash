@@ -579,6 +579,7 @@ ActionExec::cleanupAfterRun(bool expectInconsistencies)
     // check if the stack was smashed
     if ( _initialStackSize > env.stack_size() )
     {
+#if 0
         log_error(_("Stack smashed (ActionScript compiler bug?)."
                 "Fixing by pushing undefined values to the missing slots, "
                 " but don't expect things to work afterwards"));
@@ -588,9 +589,19 @@ ActionExec::cleanupAfterRun(bool expectInconsistencies)
         {
             env.push(as_value());
         }
+#else
+        log_error(_("Stack smashed (ActionScript compiler bug?)."
+                "Taking no action to fix (as expected)."));
+#endif
     }
     else if ( _initialStackSize < env.stack_size() )
     {
+#if 0
+            log_error(_("%d elements left on the stack after block execution.  "
+                "Leaving there"), env.stack_size() - _initialStackSize);
+#else
+	// we need to cleanup after run, or the GC will need to scan
+	// the stack as well..
         if ( ! expectInconsistencies )
         {
             // We can argue this would be an "size-optimized" SWF instead...
@@ -600,6 +611,7 @@ ActionExec::cleanupAfterRun(bool expectInconsistencies)
             );
         }
         env.drop(env.stack_size() - _initialStackSize);
+#endif
     }
 
     // Have movie_root flush any newly pushed actions in higher priority queues
