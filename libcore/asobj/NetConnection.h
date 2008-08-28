@@ -16,17 +16,10 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-#ifndef __NETCONNECTION_H__
-#define __NETCONNECTION_H__
+#ifndef GNASH_NETCONNECTION_H
+#define GNASH_NETCONNECTION_H
 
 #include "IOChannel.h"
-
-#include <stdexcept>
-#include <cstdio>
-#include <cerrno>
-#include <sys/types.h>
-#include <sys/stat.h>
-
 #include <string>
 
 // TODO: port to new AS architecture
@@ -74,87 +67,6 @@ public:
 	/// Register the "NetConnection" constructor to the given global object
 	static void registerConstructor(as_object& global);
 
-	/// Open a connection to stream FLV files.
-	//
-	/// If already connected an error is raised and false
-	/// is returned. Otherwise, a connection is attempted
-	/// using a separate thread that starts loading data
-	/// caching it.
-	///
-	/// @param url
-	///	An url portion to append to the base url (???)
-	///
-	/// @return true on success, false on error.
-	///
-	/// @note Older Flash movies can only take a NULL value as
-	/// the parameter, which therefor only connects to the localhost using
-	/// RTMP. Newer Flash movies have a parameter to connect which is a
-	/// URL string like rtmp://foobar.com/videos/bar.flv
-	///
-	bool openConnection(const std::string& url);
-
-	/// Put read pointer at given position
-	//
-	/// If the position has not been loaded yet
-	/// this call blocks. If not connected false
-	/// is returned w/out blocking.
-	///
-	bool seek(size_t pos);
-
-	/// Read 'bytes' bytes into the given buffer.
-	//
-	/// If not enough bytes have been loaded yet
-	/// this call blocks. If not connected false
-	/// is returned w/out blocking.
-	///
-	/// Return number of actually read bytes
-	///
-	/// TODO: drop
-	///
-	size_t read(void *dst, size_t bytes);
-
-	/// Return true if EOF has been reached
-	//
-	/// This call never blocks.
-	/// If not connected, true is returned (is this correct behaviour?)
-	///
-	bool eof();
-
-	/// Report global position within the file
-	//
-	/// This call never blocks.
-	/// If not connected, 0 is returned (is this correct behaviour?)
-	///
-	/// TODO: drop
-	///
-	size_t tell();
-
-	/// Returns the number of bytes cached
-	//
-	/// This call never blocks.
-	/// If not connected, 0 is returned (is this correct behaviour?)
-	///
-	/// TODO: drop
-	///
-	long getBytesLoaded();
-
-	/// Returns the total size of the file
-	//
-	/// This call never blocks.
-	/// If not connected, 0 is returned (is this correct behaviour?)
-	///
-	/// TODO: drop
-	///
-	long getBytesTotal();
-
-	/// Returns whether the load is complete
-	//
-	/// This call never blocks.
-	///
-	/// TODO: drop
-	///
-	bool loadCompleted();
-
 protected:
 
 	/// Mark responders associated with remoting calls
@@ -163,7 +75,7 @@ protected:
 private:
 	friend class AMFQueue;
 
-	AMFQueue *call_queue;
+	std::auto_ptr<AMFQueue> _callQueue;
 
 	/// Extend the URL to be used for playing
 	void addToURL(const std::string& url);
@@ -173,12 +85,6 @@ private:
 
 	/// the complete url of the file
 	std::string _completeUrl;
-
-	/// The file/stream loader thread and interface
-	//
-	/// TODO: drop
-	///
-	std::auto_ptr<IOChannel> _loader;
 
 	/// Attach ActionScript instance properties
 	void attachProperties();
