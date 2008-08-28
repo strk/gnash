@@ -476,7 +476,8 @@ test_system()
 
     boost::uint32_t time = *(reinterpret_cast<boost::uint32_t *>(buf2->reference() + 2));
     Buffer *enc2 = server.encodePing(RTMP::PING_CLIENT, htonl(time));
-//    cerr << hexify(enc2->begin(), enc2->size(), false) << endl;
+//     cerr << hexify(buf2->begin(), buf2->size(), false) << endl;
+//     cerr << hexify(enc2->begin(), enc2->size(), false) << endl;
     if ((memcmp(buf2->reference(), enc2->reference(), 6) == 0)) {
         runtest.pass("Encoded RTMP Ping Client message");
     } else {
@@ -537,7 +538,8 @@ test_header()
     Buffer *buf1 = hex2mem("03 00 00 00 00 01 1f 14 00 00 00 00");
     Buffer *head1 = server.encodeHeader(0x3, RTMP::HEADER_12, 287,
                                         RTMP::INVOKE, RTMPMsg::FROM_SERVER);
-//    cerr << hexify(head1->begin(), RTMP_MAX_HEADER_SIZE, false) << endl;
+//     cerr << hexify(buf1->begin(), RTMP_MAX_HEADER_SIZE, false) << endl;
+//     cerr << hexify(head1->begin(), RTMP_MAX_HEADER_SIZE, false) << endl;
     
      if ((memcmp(buf1->reference(), head1->reference(), RTMP_MAX_HEADER_SIZE) == 0)) {
          runtest.pass("Encoded RTMP header(Invoke)");
@@ -890,8 +892,8 @@ test_client()
 #if 0
     buf1 = hex2mem("02 00 07 70 75 62 6c 69 73 68 00 00 00 00 00 00 00 00 00 05 02 00 06 73 74 72 65 61 6d 02 00 04 6c 69 76 65 0d 00 02 ba 00 00 1a 14 02 00 00 00 02 00");
     buf2 = rtmp.encodeStreamOp(0, RTMP::STREAM_PUBLISH, false);
-    cerr << hexify(buf1->begin(), buf1->size(), false) << endl;
-    cerr << hexify(buf2->begin(), buf1->size(), false) << endl;
+//     cerr << hexify(buf1->begin(), buf1->size(), false) << endl;
+//     cerr << hexify(buf2->begin(), buf1->size(), false) << endl;
     if ((memcmp(buf1->reference(), buf2->reference(), buf1->size()) == 0)) {
         runtest.pass("Encoded RTMPClient::encodeStreamOp(RTMP::STREAM_PUBLISH)");
     } else {
