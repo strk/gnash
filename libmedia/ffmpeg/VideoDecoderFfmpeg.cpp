@@ -153,68 +153,93 @@ VideoDecoderFfmpeg::~VideoDecoderFfmpeg()
   }
 }
 
-AVPicture
-VideoDecoderFfmpeg::convertRGB24(AVCodecContext* srcCtx,
+std::auto_ptr<image::ImageBase>
+VideoDecoderFfmpeg::frameToImage(AVCodecContext* srcCtx,
                                  const AVFrame& srcFrame)
 {
-  AVPicture picture;
-  int width = srcCtx->width, height = srcCtx->height;
-  
-  picture.data[0] = NULL;
-  
-  int bufsize = avpicture_get_size(PIX_FMT_RGB24, width, height);
-  if (bufsize == -1) {
-    return picture;
+
+  const int width = srcCtx->width;
+  const int height = srcCtx->height;
+
+  PixelFormat pixFmt;
+  std::auto_ptr<image::ImageBase> im;
+
+  if (srcCtx->codec->id == CODEC_ID_VP6A)
+  {
+    // Expect RGBA data
+    //log_debug("alpha image");
+    pixFmt = PIX_FMT_RGBA;
+    im.reset(new image::ImageRGBA(width, height));    
+  }
+  else
+  {
+    // Expect RGB data
+    pixFmt = PIX_FMT_RGB24;
+    im.reset(new image::ImageRGB(width, height));
   }
 
-  boost::uint8_t* buffer = new boost::uint8_t[bufsize];
-
-  avpicture_fill(&picture, buffer, PIX_FMT_RGB24, width, height);
-
-#ifndef HAVE_SWSCALE_H
-  img_convert(&picture, PIX_FMT_RGB24, (AVPicture*) &srcFrame,
-      srcCtx->pix_fmt, width, height);
-#else
-
+#ifdef HAVE_SWSCALE_H
   // Check whether the context wrapper exists
   // already.
   if (!_swsContext.get()) {
-    // FIXME: this leads to wrong results (read: segfaults) if this method
-    //        is called from two unrelated video contexts, for example from
-    //        a NetStreamFfmpeg and an embedded video context. Or two
-    //        separate instances of one of the former two.    
+
     _swsContext.reset(
             new SwsContextWrapper(
                 sws_getContext(width, height, srcCtx->pix_fmt,
-                width, height, PIX_FMT_RGB24,
-                SWS_FAST_BILINEAR, NULL, NULL, NULL)
+                width, height, pixFmt,
+                SWS_BILINEAR, NULL, NULL, NULL)
             ));
     
     // Check that the context was assigned.
     if (!_swsContext->getContext()) {
-      delete [] buffer;
 
       // This means we will try to assign the 
       // context again next time.
       _swsContext.reset();
-      return picture;
+      
+      // Can't do anything now, though.
+      im.reset();
+      return im;
     }
   }
+#endif
+
+  int bufsize = avpicture_get_size(pixFmt, width, height);
+      if (bufsize == -1) {
+        im.reset();
+        return im;
+      }
+
+  boost::uint8_t* buffer = new boost::uint8_t[bufsize];
+
+  AVPicture picture;
+  picture.data[0] = NULL;
+
+  avpicture_fill(&picture, buffer, pixFmt, width, height);
 
   // Is it possible for the context to be reset
   // to NULL once it's been created?
   assert(_swsContext->getContext());
 
+
+#ifndef HAVE_SWSCALE_H
+  img_convert(&picture, PIX_FMT_RGB24, (AVPicture*) &srcFrame,
+      srcCtx->pix_fmt, width, height);
+#else
   int rv = sws_scale(_swsContext->getContext(), const_cast<uint8_t**>(srcFrame.data),
     const_cast<int*>(srcFrame.linesize), 0, height, picture.data,
     picture.linesize);
 
   if (rv == -1) {
     delete [] buffer;
+    im.reset();
+    return im;
   }
+#endif
 
-#endif // HAVE_SWSCALE_H
-  return picture;
+  im->update(picture.data[0]);
+  return im;
+
 }
 
 std::auto_ptr<image::ImageBase>
@@ -238,10 +263,7 @@ VideoDecoderFfmpeg::decode(const boost::uint8_t* input, boost::uint32_t input_si
     return ret;
   }
 
-  AVPicture rgbpicture = convertRGB24(_videoCodecCtx, *frame);
-  
-  ret.reset(new image::ImageRGB(rgbpicture.data[0], _videoCodecCtx->width,
-                           _videoCodecCtx->height, rgbpicture.linesize[0]));
+  ret = frameToImage(_videoCodecCtx, *frame);
 
   // FIXME: av_free doesn't free frame->data!
   av_free(frame);

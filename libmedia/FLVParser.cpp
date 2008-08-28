@@ -337,7 +337,7 @@ bool FLVParser::parseNextTag()
 
 		boost::uint16_t codec = (tag[11] & 0x0f) >> 0;
 
-        if (codec == VIDEO_CODEC_VP6)
+        if (codec == VIDEO_CODEC_VP6 || codec == VIDEO_CODEC_VP6A)
         {
             _stream->read_byte();
             --bodyLength;

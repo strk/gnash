@@ -657,7 +657,7 @@ public:
   // anti-aliased with the rest of the drawing. Since display lists cannot be
   // concatenated this means we'll add up with several display lists for normal
   // drawing operations.
-  virtual void drawVideoFrame(image::ImageBase* baseframe, const matrix* m, const rect* bounds)
+  virtual void drawVideoFrame(image::ImageBase* frame, const matrix* m, const rect* bounds)
   {
     GLint index;
 
@@ -678,7 +678,7 @@ public:
     glNewList(index, GL_COMPILE);
     _video_indices.push_back(index);
 
-    reallyDrawVideoFrame(baseframe, m, bounds);
+    reallyDrawVideoFrame(frame, m, bounds);
 
     glEndList();
 
@@ -688,11 +688,16 @@ public:
     _render_indices.push_back(index);
   }
   
-  virtual void reallyDrawVideoFrame(image::ImageBase* baseframe, const matrix* m, const rect* bounds)
+  virtual void reallyDrawVideoFrame(image::ImageBase* frame, const matrix* m, const rect* bounds)
   {
-    image::ImageRGB* frame = dynamic_cast<image::ImageRGB*>(baseframe);
-    
-    assert(frame);
+  
+    if (frame->type() == GNASH_IMAGE_RGBA)
+    {
+        LOG_ONCE(log_error(_("Can't render videos with alpha")));
+        return;
+    }
+  
+    assert(frame->type() == GNASH_IMAGE_RGB);
 
     glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT);
 

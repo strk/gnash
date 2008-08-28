@@ -24,6 +24,7 @@
 #include "gnashconfig.h"
 #endif
 
+#include <memory>
 #include "dsodefs.h" //For DSOEXPORT
 #include "log.h"
 #include "VideoDecoder.h"
@@ -52,9 +53,11 @@ namespace media {
 
 
 /// Forward declarations
+class image::ImageBase;
 #ifdef HAVE_SWSCALE_H
 class SwsContextWrapper;
 #endif
+
 
 class VideoDecoderFfmpeg : public VideoDecoder {
     
@@ -82,7 +85,7 @@ public:
     ///                 caller owns that pointer, which must be freed with delete [].
     ///                 It is advised to wrap the pointer in a boost::scoped_array.
     ///                 If conversion fails, AVPicture::data[0] will be NULL.
-    AVPicture convertRGB24(AVCodecContext* srcCtx, const AVFrame& srcFrame);
+    std::auto_ptr<image::ImageBase> frameToImage(AVCodecContext* srcCtx, const AVFrame& srcFrame);
 
     /// Convert FLASH codec id to FFMPEG codec id
     //
