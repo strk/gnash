@@ -62,7 +62,7 @@ RTMPServer::RTMPServer()
 RTMPServer::~RTMPServer()
 {
 //    GNASH_REPORT_FUNCTION;
-    _variables.clear();
+    _properties.clear();
 //    delete _body;
 }
 
@@ -190,6 +190,10 @@ RTMPServer::packetRead(amf::Buffer *buf)
     AMF amf;
     
 //    \003\000\000\017\000\000%G￿%@\024\000\000\000\000\002\000\aconnect\000?%G￿%@\000\000\000\000\000\000\003\000\003app\002\000#software/gnash/tests/1153948634.flv\000\bflashVer\002\000\fLNX 6,0,82,0\000\006swfUrl\002\000\035file:///file|%2Ftmp%2Fout.swf%G￿%@\000\005tcUrl\002\0004rtmp://localhost/software/gnash/tests/1153948634
+    if (buf->reference() == 0) {
+	return false;
+    }
+    
     amf_index = *buf->reference() & RTMP_INDEX_MASK;
     headersize = headerSize(*buf->reference());
     log_debug (_("The Header size is: %d"), headersize);
@@ -230,7 +234,7 @@ RTMPServer::packetRead(amf::Buffer *buf)
 	    if (el != 0) {
 		size += amf_obj.totalsize();
 		ptr += amf_obj.totalsize();
-//		_variables[el->getName()] = el;
+//		_properties[el->getName()] = el;
 	    } else {
 		break;
 	    }
@@ -619,16 +623,15 @@ RTMPServer::encodePing(rtmp_ping_e type)
 amf::Buffer *
 RTMPServer::encodePing(rtmp_ping_e type, boost::uint32_t milliseconds)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     Buffer *buf = new Buffer(sizeof(boost::uint16_t) * 4);
     Network::byte_t *ptr = buf->reference();
-    // default everything to zeros, real data gets optionally added.
-    buf->clear();
-//    boost::uint16_t typefield = (reinterpret_cast<boost::uint16_t>(type));
-    boost::uint16_t typefield = ntohs(type);
+    buf->clear();		// default everything to zeros, real data gets optionally added.
+    boost::uint16_t typefield = *reinterpret_cast<boost::uint16_t *>(&type);
     ptr += sizeof(boost::uint16_t); // go past the first short
+
     boost::uint32_t swapped = 0;
-//     swapBytes(&typefield, sizeof(boost::uint16_t));
+    swapBytes(&typefield, sizeof(boost::uint16_t));
     buf->copy(typefield);
     switch (type) {
         // These two don't appear to have any paramaters
