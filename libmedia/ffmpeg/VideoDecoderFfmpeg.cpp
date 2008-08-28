@@ -154,7 +154,7 @@ VideoDecoderFfmpeg::~VideoDecoderFfmpeg()
 }
 
 std::auto_ptr<image::ImageBase>
-VideoDecoderFfmpeg::ffmpegToGnashImage(AVCodecContext* srcCtx,
+VideoDecoderFfmpeg::frameToImage(AVCodecContext* srcCtx,
                                  const AVFrame& srcFrame)
 {
 
@@ -262,7 +262,7 @@ VideoDecoderFfmpeg::decode(const boost::uint8_t* input, boost::uint32_t input_si
     return ret;
   }
 
-  ret = ffmpegToGnashImage(_videoCodecCtx, *frame);
+  ret = frameToImage(_videoCodecCtx, *frame);
 
   // FIXME: av_free doesn't free frame->data!
   av_free(frame);

@@ -85,7 +85,7 @@ public:
     ///                 caller owns that pointer, which must be freed with delete [].
     ///                 It is advised to wrap the pointer in a boost::scoped_array.
     ///                 If conversion fails, AVPicture::data[0] will be NULL.
-    std::auto_ptr<image::ImageBase> ffmpegToGnashImage(AVCodecContext* srcCtx, const AVFrame& srcFrame);
+    std::auto_ptr<image::ImageBase> frameToImage(AVCodecContext* srcCtx, const AVFrame& srcFrame);
 
     /// Convert FLASH codec id to FFMPEG codec id
     //
