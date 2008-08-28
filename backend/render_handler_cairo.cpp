@@ -446,11 +446,18 @@ public:
 
   virtual void drawVideoFrame(image::ImageBase* baseframe, const matrix* m, const rect* bounds)
   {
-    // Extract frame attributes
+
+    if (baseframe->type() == GNASH_IMAGE_RGBA)
+    {
+        LOG_ONCE(log_error(_("Can't render videos with alpha")));
+        return;
+    }
+
     image::ImageRGB* frame = dynamic_cast<image::ImageRGB*>(baseframe);
-    
+
     assert(frame);
-    
+
+    // Extract frame attributes
     int         w = frame->width();
     int         h = frame->height();
 
