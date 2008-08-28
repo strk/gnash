@@ -106,7 +106,8 @@ public:
     void setChannel(Network::byte_t num) { _channel = num; };
     Network::byte_t getChannel()         { return _channel; } ;
 
-    
+    amf::Element *operator[](size_t x);
+
     // Dump internal status to the terminal
     void dump();
     
