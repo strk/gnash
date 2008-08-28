@@ -25,6 +25,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <boost/detail/endian.hpp>
 
 #if ! (defined(_WIN32) || defined(WIN32))
 #	include <netinet/in.h>
@@ -374,27 +375,22 @@ RTMP::encodeHeader(int amf_index, rtmp_headersize_e head_size,
     
     // Add the size of the message if the header size is 8 or more.
     // and add the type of the object if the header size is 8 or more.
+    // length is a 3 byte field
     if ((head_size == HEADER_8) || (head_size == HEADER_12)) {
-        int length = total_size;
-	Network::byte_t *lenptr = reinterpret_cast<Network::byte_t *>(&length);
-//#ifndef	BOOST_BIG_ENDIAN
-//	swapBytes(&length, 4);
-	*ptr++ = *(lenptr + 2);
-	*ptr++ = *(lenptr + 1);
-	*ptr++ = *lenptr;	
-//	*(lenptr + 3) = *(lenptr);
-//	memcpy(ptr, lenptr, 3);
-// #else
-// #ifdef BOOST_BIG_ENDIAN
-// 	memcpy(ptr, &length, 3);
+#ifdef BOOST_BIG_ENDIAN
+	boost::uint32_t length = total_size << 8;
+#else
+	boost::uint32_t length = (htonl(*reinterpret_cast<boost::uint32_t *>(&total_size))) >> 8;
+#endif
+ 	memcpy(ptr, &length, 3);
 // #else
 // #error "No Endianess specified!"
 // #endif
 //#endif
-//      swapBytes(&length, 4);
-//        ptr += 3;
-        *ptr = type;
-        ptr++;
+        ptr += 3;
+	// The type is a one byte field
+	*ptr = type;
+	ptr++;
     }
     
     // Add the routing of the message if the header size is 12, the maximum.
