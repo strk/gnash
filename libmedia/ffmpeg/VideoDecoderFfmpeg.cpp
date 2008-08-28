@@ -167,7 +167,8 @@ VideoDecoderFfmpeg::frameToImage(AVCodecContext* srcCtx,
   if (srcCtx->codec->id == CODEC_ID_VP6A)
   {
     // Expect RGBA data
-    pixFmt = PIX_FMT_RGBA32;
+    log_debug("alpha image");
+    pixFmt = PIX_FMT_RGBA;
     im.reset(new image::ImageRGBA(width, height));    
   }
   else
@@ -186,7 +187,7 @@ VideoDecoderFfmpeg::frameToImage(AVCodecContext* srcCtx,
             new SwsContextWrapper(
                 sws_getContext(width, height, srcCtx->pix_fmt,
                 width, height, pixFmt,
-                SWS_FAST_BILINEAR, NULL, NULL, NULL)
+                SWS_BICUBIC, NULL, NULL, NULL)
             ));
     
     // Check that the context was assigned.
