@@ -61,7 +61,7 @@ RTMPClient::RTMPClient()
 RTMPClient::~RTMPClient()
 {
 //    GNASH_REPORT_FUNCTION;
-    _variables.clear();
+    _properties.clear();
 //    delete _body;
 }
 
@@ -108,9 +108,11 @@ RTMPClient::encodeConnect(const char *app, const char *swfUrl, const char *tcUrl
     obj.addProperty(flashVer);
     
     Element *swfUrlnode = new Element;
+//    swfUrl->makeString("swfUrl", "http://192.168.1.70/software/gnash/tests/ofla_demo.swf");
     swfUrlnode->makeString("swfUrl", swfUrl);
     obj.addProperty(swfUrlnode);
 
+//    filespec = "rtmp://localhost/oflaDemo";
     Element *tcUrlnode = new Element;
     tcUrlnode->makeString("tcUrl", tcUrl);
     obj.addProperty(tcUrlnode);
@@ -120,18 +122,22 @@ RTMPClient::encodeConnect(const char *app, const char *swfUrl, const char *tcUrl
     obj.addProperty(fpad);
 
     Element *audioCodecsnode = new Element;
+//    audioCodecsnode->makeNumber("audioCodecs", 615);
     audioCodecsnode->makeNumber("audioCodecs", audioCodecs);
     obj.addProperty(audioCodecsnode);
     
     Element *videoCodecsnode = new Element;
+//    videoCodecsnode->makeNumber("videoCodecs", 124);
     videoCodecsnode->makeNumber("videoCodecs", videoCodecs);
     obj.addProperty(videoCodecsnode);
 
     Element *videoFunctionnode = new Element;
+//    videoFunctionnode->makeNumber("videoFunction", 0x1);
     videoFunctionnode->makeNumber("videoFunction", videoFunction);
     obj.addProperty(videoFunctionnode);
 
     Element *pageUrlnode = new Element;
+//    pageUrlnode->makeString("pageUrl", "http://x86-ubuntu/software/gnash/tests/");
     pageUrlnode->makeString("pageUrl", pageUrl);
     obj.addProperty(pageUrlnode);
 
@@ -139,16 +145,21 @@ RTMPClient::encodeConnect(const char *app, const char *swfUrl, const char *tcUrl
     objencodingnode->makeNumber("objectEncoding", 0.0);
     obj.addProperty(objencodingnode);
     
+//    size_t total_size = 227;
+//     Buffer *out = encodeHeader(0x3, RTMP::HEADER_12, total_size,
+//                                      RTMP::INVOKE, RTMP::FROM_CLIENT);
+//     const char *rtmpStr = "03 00 00 04 00 01 1f 14 00 00 00 00";
+//     Buffer *rtmpBuf = hex2mem(rtmpStr);
     Buffer *conobj = connect.encode();
     Buffer *numobj = connum.encode();
     Buffer *encobj = obj.encode();
 
     Buffer *buf = new Buffer(conobj->size() + numobj->size() + encobj->size());
+//    buf->append(out);
     buf->append(conobj);
     buf->append(numobj);
     buf->append(encobj);
 
-    // We don't need these temporary buffers anymore
     delete conobj;
     delete numobj;
     delete encobj;
@@ -185,11 +196,23 @@ RTMPClient::encodeStream(double id)
     if (!buf) {
 	return 0;
     }
+
+    // Set the NULL object element that follows the stream ID
+    Element null;
+    null.makeNull();
+    Buffer *nullobj = null.encode();    
+    if (!nullobj) {
+	return 0;
+    }
+
     buf->append(strobj);
     buf->append(numobj);
+    buf->append(nullobj);
 
     delete strobj;
     delete numobj;
+    delete nullobj;
+    
     return buf;
 }
 
@@ -290,6 +313,7 @@ RTMPClient::encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string
     // 8 bytes apiece.
     pktsize += (sizeof(double) * 2) + 2;
     Buffer *buf = new Buffer(pktsize);
+    buf->clear();
 //    Buffer *buf = new Buffer;
     
     if (!buf) {
@@ -302,7 +326,7 @@ RTMPClient::encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string
     buf->append(nullobj);
     delete nullobj;
     // Seek doesn't use the boolean flag
-    if (op != STREAM_SEEK) {
+    if ((op != STREAM_SEEK) && (op != STREAM_PLAY)) {
 	buf->append(boolobj);
     }
     delete boolobj;
@@ -311,7 +335,11 @@ RTMPClient::encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string
     // used for the stream. A Play command without this name set play an
     // existing stream that is already open.
     if (!name.empty()) {
-	buf->append(name);
+	Element filespec;
+	filespec.makeString(name);
+	Buffer *fileobj = filespec.encode();
+	buf->append(fileobj);
+	delete fileobj;
     }
     
     // The seek command also may have an optional location to seek to
@@ -370,6 +398,7 @@ RTMPClient::clientFinish()
     int ret = 0;
     _handshake->clear();
     
+    sleep(1);			// FIXME: why do we still need a delay here, when readNet() does a select ?
     ret = readNet(_handshake->reference(), RTMP_BODY_SIZE);
     if (ret == RTMP_BODY_SIZE) {
         log_debug (_("Read first data block in handshake"));
@@ -404,7 +433,7 @@ RTMPClient::clientFinish()
     }
 
     writeNet(_handshake->reference(), RTMP_BODY_SIZE);
-    
+
     return true;
 }
 
