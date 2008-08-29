@@ -180,8 +180,8 @@ Rectangle_contains(const fn_call& fn)
 		return as_value();
 	}
 
-	as_value& x_as = fn.arg(0);
-	as_value& y_as = fn.arg(1);
+	const as_value& x_as = fn.arg(0);
+	const as_value& y_as = fn.arg(1);
 	if ( x_as.is_null() || x_as.is_undefined() ||
 	     y_as.is_null() || y_as.is_undefined() )
 	{
