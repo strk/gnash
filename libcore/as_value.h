@@ -563,7 +563,7 @@ public:
 	as_value& newAdd(const as_value& v1);
 
 	/// Equivalent of ActionNewLessThan
-	as_value newLessThan(const as_value& op2_in);
+	as_value newLessThan(const as_value& op2_in) const;
 
 	// Equivalent of ActionSubtract
 	as_value& subtract(const as_value& o);

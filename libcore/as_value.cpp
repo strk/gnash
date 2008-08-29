@@ -1693,9 +1693,9 @@ as_value::newAdd(const as_value& op2)
 }
 
 as_value
-as_value::newLessThan(const as_value& op2_in)
+as_value::newLessThan(const as_value& op2_in) const
 {
-    as_value& op1_in = *this;
+    const as_value& op1_in = *this;
 
     as_value operand1;
     as_value operand2;
