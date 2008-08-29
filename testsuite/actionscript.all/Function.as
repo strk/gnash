@@ -930,9 +930,9 @@ asm{
     swap
     setvariable
 };
-xcheck_equals(testvar1, 9);
-xcheck_equals(testvar2, 8);
-xcheck_equals(testvar3, 7);
+check_equals(testvar1, 9);
+check_equals(testvar2, 8);
+check_equals(testvar3, 7);
 
 #endif //MING_SUPPORTS_ASM
 
