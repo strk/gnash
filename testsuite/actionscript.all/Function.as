@@ -845,9 +845,9 @@ function stack_test1()
 
 stack_test1(4, 5, 6);
 
-xcheck_equals(testvar1, 1);
-xcheck_equals(testvar2, 2);
-xcheck_equals(testvar3, 3);
+check_equals(testvar1, 1);
+check_equals(testvar2, 2);
+check_equals(testvar3, 3);
 
 //
 // --case2--

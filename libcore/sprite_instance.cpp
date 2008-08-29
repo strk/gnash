@@ -4487,7 +4487,9 @@ sprite_instance::constructAsScriptObject()
 	// properties already.
 	as_object* super = get_super();
 
-        fn_call call(this, &(get_environment()), 0, 0, super);
+	as_environment& env = get_environment();
+        fn_call call(this, &env);
+	call.super = super;
 
         // we don't use the constructor return (should we?)
         (*ctor)(call);

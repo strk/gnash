@@ -98,11 +98,13 @@ namespace SWF { // gnash::SWF
 //
 static boost::intrusive_ptr<as_object>
 construct_object(as_function* ctor_as_func,
-    as_environment& env, unsigned int nargs,
-    unsigned int first_arg_index)
+    as_environment& env, unsigned int nargs)
 {
     assert(ctor_as_func);
-    return ctor_as_func->constructInstance(env, nargs, first_arg_index);
+    std::auto_ptr< std::vector<as_value> > args (new std::vector<as_value> );
+    for (unsigned int i=0; i<nargs; ++i)
+        args->push_back(env.pop());
+    return ctor_as_func->constructInstance(env, args);
 }
 
 
@@ -2856,13 +2858,16 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
     debugger.matchBreakPoint(function_name, true);
 #endif
 
+    std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
+    for (int i=0; i<nargs; ++i)
+        args->push_back(env.pop()); // TODO: drop !
+
     //log_debug("ActionCallFunction calling call_method with %p as this_ptr", this_ptr);
     as_value result = call_method(function, &env, this_ptr,
-                  nargs, env.get_top_index(), super);
+                  args, super);
 
     //log_debug(_("Function's result: %s"), result.to_string();
 
-    env.drop(nargs);
     env.push(result);
 
     // If the function threw an exception, do so here.
@@ -2956,7 +2961,7 @@ SWFHandlers::ActionNew(ActionExec& thread)
     }
 
     boost::intrusive_ptr<as_object> newobj = construct_object(constructor.get(),
-            env, nargs, env.get_top_index());
+            env, nargs);
 
 #ifdef USE_DEBUGGER
 #ifndef GNASH_USE_GC
@@ -2970,7 +2975,6 @@ SWFHandlers::ActionNew(ActionExec& thread)
         debugger.addSymbol(newobj.get(), classname);
 #endif
 
-    env.drop(nargs);
     env.push(as_value(newobj));
 
 }
@@ -3009,7 +3013,7 @@ SWFHandlers::ActionInitArray(ActionExec& thread)
     thread.ensureStack(static_cast<unsigned int>(array_size)); // array elements
 
     // Call the array constructor, to create an empty array.
-    as_value result = array_new(fn_call(NULL, &env, 0, env.get_top_index()));
+    as_value result = array_new(fn_call(NULL, &env));
 
     boost::intrusive_ptr<as_object> ao = result.to_object();
     assert(ao);
@@ -3572,10 +3576,13 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
     }
 #endif
 
-    as_value result = call_method(method_val, &env, this_ptr, 
-            nargs, env.get_top_index(), super);
+    std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
+    for (int i=0; i<nargs; ++i)
+        args->push_back(env.pop()); // TODO: drop !
 
-    env.drop(nargs);
+    as_value result = call_method(method_val, &env, this_ptr, 
+            args, super);
+
     env.push(result);
 
     // Now, if there was an exception, proceed to the end of the block.
@@ -3665,13 +3672,12 @@ SWFHandlers::ActionNewMethod(ActionExec& thread)
 
     // Construct the object
     boost::intrusive_ptr<as_object> new_obj = construct_object(method.get(),
-            env, nargs, env.get_top_index());
+            env, nargs);
 
     //log_debug(_("%s( [%d args] ) returned %s"), method_val.to_string(),
     //    nargs, new_obj.to_string();
 
 
-    env.drop(nargs);
     env.push(as_value(new_obj));
 
 }

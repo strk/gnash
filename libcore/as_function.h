@@ -85,15 +85,11 @@ public:
 	///	The environment to use for stack, local variables,
 	///	registers and scope chain.
 	/// 
-	/// @param nargs
-	///	Number of arguments passed to this constructor
+	/// @param args
+	///	Arguments for the constructor invocation
 	///
-	/// @param first_arg_index
-	///	Index of the as_environment stack element to use
-	///     as first argument.
-	/// 
 	boost::intrusive_ptr<as_object> constructInstance( as_environment& env,
-			unsigned nargs, unsigned first_arg_index);
+			std::auto_ptr< std::vector<as_value> > args);
 
 	/// Get this function's "prototype" member (exported interface).
 	///

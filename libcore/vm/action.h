@@ -63,6 +63,15 @@ namespace gnash {
 		as_object* this_ptr, // this is ourself
 		int nargs, int first_arg_bottom_index, as_object* super=NULL);
 
+	/// Call a method, be it an as_function or a c_function. 
+	//
+	/// This is a thin wrapper around operator() and fn_call,
+	/// probably worth dropping.
+	///
+	DSOEXPORT as_value call_method(const as_value& method, as_environment* env,
+		as_object* this_ptr, // this is ourself
+		std::auto_ptr<std::vector<as_value> > args, as_object* super=NULL);
+
 
 }	// end namespace gnash
 

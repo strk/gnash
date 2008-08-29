@@ -431,12 +431,12 @@ Rectangle_bottomRight_getset(const fn_call& fn)
 		as_function* pointCtor = getFlashGeomPointConstructor();
 
 		as_environment& env = fn.env();
-		env.push(bottom);
-		env.push(right);
 
-		ret = pointCtor->constructInstance(env, 2, env.stack_size()-1);
+		std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
+		args->push_back(right);
+		args->push_back(bottom);
 
-		env.drop(2);
+		ret = pointCtor->constructInstance(env, args);
 	}
 	else // setter
 	{
@@ -520,12 +520,12 @@ Rectangle_size_getset(const fn_call& fn)
 		as_function* pointCtor = getFlashGeomPointConstructor();
 
 		as_environment& env = fn.env();
-		env.push(h);
-		env.push(w);
 
-		ret = pointCtor->constructInstance(env, 2, env.stack_size()-1);
+		std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
+		args->push_back(w);
+		args->push_back(h);
 
-		env.drop(2);
+		ret = pointCtor->constructInstance(env, args);
 	}
 	else // setter
 	{
@@ -582,12 +582,13 @@ Rectangle_topLeft_getset(const fn_call& fn)
 		as_function* pointCtor = getFlashGeomPointConstructor();
 
 		as_environment& env = fn.env();
-		env.push(y);
-		env.push(x);
 
-		ret = pointCtor->constructInstance(env, 2, env.stack_size()-1);
+		std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
+		args->push_back(x);
+		args->push_back(y);
 
-		env.drop(2);
+		ret = pointCtor->constructInstance(env, args);
+
 	}
 	else // setter
 	{

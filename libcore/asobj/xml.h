@@ -184,12 +184,6 @@ private:
 
     Status      _status;	
 
-    /// Trigger the onLoad event, if any
-    void onLoadEvent(bool success, as_environment& env);
-
-    /// Trigger the onClose event, if any
-    void onCloseEvent(as_environment& env);
-  
     /// Initialize an XMLNode from an xmlNodePtr
     //
     /// @param element

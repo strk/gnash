@@ -196,7 +196,7 @@ function_class_init(as_object& global)
 as_value
 function_apply(const fn_call& fn)
 {
-	int pushed=0; // new values we push on the stack
+	//int pushed=0; // new values we push on the stack
 
 	// Get function body 
 	boost::intrusive_ptr<as_function> function_obj = ensureType<as_function>(fn.this_ptr);
@@ -204,7 +204,7 @@ function_apply(const fn_call& fn)
 	// Copy new function call from old one, we'll modify 
 	// the copy only if needed
 	fn_call new_fn_call(fn);
-	new_fn_call.nargs=0; 
+	new_fn_call.resetArgs();
 
 	if ( ! fn.nargs )
 	{
@@ -267,15 +267,15 @@ function_apply(const fn_call& fn)
 
 			unsigned int nelems = arg_array->size();
 
-			//log_error(_("Function.apply(this_ref, array[%d])\n"), nelems);
-			for (unsigned int i=nelems; i; i--)
+			//log_debug(_("Function.apply(this_ref, array[%d])"), nelems);
+			for (unsigned int i=0; i<nelems; ++i)
 			{
-				fn.env().push(arg_array->at(i-1));
-				pushed++;
+				new_fn_call.pushArg(arg_array->at(i));
+				//pushed++;
 			}
 
-			new_fn_call.set_offset(fn.env().get_top_index());
-			new_fn_call.nargs=nelems;
+			//new_fn_call.set_offset(fn.env().get_top_index());
+			//new_fn_call.nargs=nelems;
 		}
 	}
 
@@ -285,7 +285,7 @@ function_apply(const fn_call& fn)
 	as_value rv = function_obj->call(new_fn_call);
 
 	// Drop additional values we pushed on the stack 
-	fn.env().drop(pushed);
+	//fn.env().drop(pushed);
 
         return rv;
 }
@@ -343,8 +343,7 @@ function_call(const fn_call& fn)
                                 new_fn_call.super = function_obj->get_super();
 			}
 		}
-		new_fn_call.nargs--;
-		new_fn_call.set_offset(new_fn_call.offset()-1);
+		new_fn_call.drop_bottom();
 	}
 
 	// Call the function 
@@ -357,7 +356,7 @@ function_call(const fn_call& fn)
 
 boost::intrusive_ptr<as_object>
 as_function::constructInstance( as_environment& env,
-			unsigned nargs, unsigned first_arg_index)
+	std::auto_ptr< std::vector<as_value> > args)
 {
 //	GNASH_REPORT_FUNCTION;
 
@@ -386,7 +385,7 @@ as_function::constructInstance( as_environment& env,
 		log_action(_("it's a built-in class"));
 		);
 
-		fn_call fn(NULL, &env, nargs, first_arg_index);
+		fn_call fn(NULL, &env, args);
 		as_value ret;
 		try {
 			ret = call(fn);
@@ -459,7 +458,8 @@ as_function::constructInstance( as_environment& env,
 		// Call the actual constructor function; new_obj is its 'this'.
 
 		// We don't need the function result.
-		call(fn_call(newobj.get(), &env, nargs, first_arg_index, super));
+		fn_call fn(newobj.get(), &env, args, super);
+		call(fn);
 	}
 
 	if (!has_proto)

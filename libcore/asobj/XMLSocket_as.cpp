@@ -511,9 +511,13 @@ XMLSocket_as::checkForIncomingData()
 			std::string& s = *it;
 			as_value datain( s );
 
-			as_environment env;
-			env.push(datain);
-			fn_call call(this, &env, 1, env.stack_size() - 1);
+			as_environment env; // TODO: set target !
+
+			std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
+			args->push_back(datain);
+			
+			fn_call call(this, &env, args);
+
 			onDataHandler->call(call);
         }
     }

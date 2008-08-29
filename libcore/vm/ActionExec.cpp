@@ -596,22 +596,22 @@ ActionExec::cleanupAfterRun(bool expectInconsistencies)
     }
     else if ( _initialStackSize < env.stack_size() )
     {
-#if 0
-            log_error(_("%d elements left on the stack after block execution.  "
-                "Leaving there"), env.stack_size() - _initialStackSize);
-#else
-	// we need to cleanup after run, or the GC will need to scan
-	// the stack as well..
-        if ( ! expectInconsistencies )
-        {
-            // We can argue this would be an "size-optimized" SWF instead...
-            IF_VERBOSE_MALFORMED_SWF(
-            log_swferror(_("%d elements left on the stack after block execution.  "
-                "Cleaning up"), env.stack_size() - _initialStackSize);
-            );
-        }
-        env.drop(env.stack_size() - _initialStackSize);
-#endif
+            log_debug(_("%d elements left on the stack after block execution.  ")
+                , env.stack_size() - _initialStackSize);
+	if ( ! isFunction() )
+	{
+		// we need to cleanup after run, or the GC will need to scan
+		// the stack as well..
+		if ( ! expectInconsistencies )
+		{
+		    // We can argue this would be an "size-optimized" SWF instead...
+		    IF_VERBOSE_MALFORMED_SWF(
+		    log_swferror(_("%d elements left on the stack after block execution.  "
+			"Cleaning up"), env.stack_size() - _initialStackSize);
+		    );
+		}
+		env.drop(env.stack_size() - _initialStackSize);
+	}
     }
 
     // Have movie_root flush any newly pushed actions in higher priority queues

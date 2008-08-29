@@ -166,8 +166,10 @@ init_boolean_instance(bool val)
 {
 	boost::intrusive_ptr<builtin_function> cl = getBooleanConstructor();
 	as_environment env;
-	env.push(val);
-	return cl->constructInstance(env, 1, 0);
+
+	std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
+	args->push_back(val);
+	return cl->constructInstance(env, args);
 }
 
 } // end of gnash namespace

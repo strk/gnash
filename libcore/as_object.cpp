@@ -1246,7 +1246,7 @@ as_object::on_event(const event_id& id )
 
 	if (get_member(id.get_function_key(), &event_handler) )
 	{
-		call_method(event_handler, NULL, this, 0, 0);
+		call_method0(event_handler, NULL, this);
 		return true;
 	}
 
@@ -1275,7 +1275,7 @@ as_object::callMethod(string_table::key methodName)
 
 	as_environment env;
 
-	return call_method(method, &env, this, 0, env.stack_size());
+	return call_method0(method, &env, this);
 }
 
 as_value
@@ -1290,11 +1290,11 @@ as_object::callMethod(string_table::key methodName, const as_value& arg0)
 	}
 
 	as_environment env;
-	env.push(arg0);
 
-	ret = call_method(method, &env, this, 1, env.stack_size()-1);
+	std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
+	args->push_back(arg0);
 
-	env.drop(1);
+	ret = call_method(method, &env, this, args);
 
 	return ret;
 }
@@ -1317,12 +1317,11 @@ as_object::callMethod(string_table::key methodName,
 	size_t origStackSize = env.stack_size();
 #endif
 
-	env.push(arg1);
-	env.push(arg0);
+	std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
+	args->push_back(arg0);
+	args->push_back(arg1);
 
-	ret = call_method(method, &env, this, 2, env.stack_size()-1);
-
-	env.drop(2);
+	ret = call_method(method, &env, this, args);
 
 #ifndef NDEBUG
 	assert(origStackSize == env.stack_size());
@@ -1349,13 +1348,12 @@ as_object::callMethod(string_table::key methodName,
 	size_t origStackSize = env.stack_size();
 #endif
 
-	env.push(arg2);
-	env.push(arg1);
-	env.push(arg0);
+	std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
+	args->push_back(arg0);
+	args->push_back(arg1);
+	args->push_back(arg2);
 
-	ret = call_method(method, &env, this, 3, env.stack_size()-1);
-
-	env.drop(3);
+	ret = call_method(method, &env, this, args);
 
 #ifndef NDEBUG
 	assert(origStackSize == env.stack_size());
@@ -1383,14 +1381,13 @@ as_object::callMethod(string_table::key methodName,
 	size_t origStackSize = env.stack_size();
 #endif
 
-	env.push(arg3);
-	env.push(arg2);
-	env.push(arg1);
-	env.push(arg0);
+	std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
+	args->push_back(arg0);
+	args->push_back(arg1);
+	args->push_back(arg2);
+	args->push_back(arg3);
 
-	ret = call_method(method, &env, this, 4, env.stack_size()-1);
-
-	env.drop(4);
+	ret = call_method(method, &env, this, args);
 
 #ifndef NDEBUG
 	assert(origStackSize == env.stack_size());
@@ -1521,13 +1518,15 @@ Trigger::call(const as_value& oldval, const as_value& newval, as_object& this_ob
 		size_t origStackSize = env.stack_size();
 #endif
 
-		env.push(_customArg);
-		env.push(newval);
-		env.push(oldval);
-		env.push(_propname);
-		fn_call fn(const_cast<as_object*>(&this_obj), &env, 4, env.stack_size()-1);
+		std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
+		args->push_back(_propname);
+		args->push_back(oldval);
+		args->push_back(newval);
+		args->push_back(_customArg);
+
+		fn_call fn(const_cast<as_object*>(&this_obj), &env, args);
+
 		as_value ret = _func->call(fn);
-		env.drop(4);
 
 #ifndef NDEBUG
 		assert(origStackSize == env.stack_size());
