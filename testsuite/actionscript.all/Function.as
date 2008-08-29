@@ -814,9 +814,9 @@ function stack_test1()
 
 stack_test1();
 
-xcheck_equals(testvar1, 1);
-xcheck_equals(testvar2, 2);
-xcheck_equals(testvar3, 3);
+check_equals(testvar1, 1);
+check_equals(testvar2, 2);
+check_equals(testvar3, 3);
 
 //
 // --case1bis--
@@ -875,9 +875,9 @@ clip1.stack_test2 = function () {
 clip1.stack_test2();
 
 #if OUTPUT_VERSION > 5
-    xcheck_equals(testvar1, 4);
-    xcheck_equals(testvar2, 5);
-    xcheck_equals(testvar3, 6);
+    check_equals(testvar1, 4);
+    check_equals(testvar2, 5);
+    check_equals(testvar3, 6);
 #endif
 
 //
