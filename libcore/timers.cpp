@@ -159,18 +159,17 @@ Timer::execute()
 
     as_environment env;
 
-    // Push args to the as_environment stack if needed
-    for ( ArgsContainer::reverse_iterator it=_args.rbegin(), itEnd=_args.rend();
+    // Prepare args 
+    std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
+    for ( ArgsContainer::iterator it=_args.begin(), itEnd=_args.end();
 		    it != itEnd; ++it )
     {
 	    //log_debug("Env-pushing %s", *it);
-	    env.push(*it);
+	    args->push_back(*it);
     }
 
-    size_t firstArgBottomIndex = env.stack_size()-1; 
-
-    as_value val = call_method(timer_method, &env, _object.get(),
-		    _args.size(), firstArgBottomIndex, super);
+    /* as_value val = */
+    call_method(timer_method, &env, _object.get(), args, super);
 
 }
 

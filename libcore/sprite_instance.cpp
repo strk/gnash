@@ -709,7 +709,7 @@ static as_value sprite_load_movie(const fn_call& fn)
   bool sendVars = false;
   if (fn.nargs > 1)
   {
-	as_value arg = fn.arg(1);
+	const as_value& arg = fn.arg(1);
 	std::string methodString = arg.to_string();
 	boost::to_lower(methodString);
 	if ( methodString == "post" ) 
@@ -838,7 +838,7 @@ static as_value sprite_hit_test(const fn_call& fn)
   {
     case 1: // target
     {
-      as_value& tgt_val = fn.arg(0);
+      const as_value& tgt_val = fn.arg(0);
       character* target = fn.env().find_target(tgt_val.to_string());
       if ( ! target )
       {
@@ -1005,7 +1005,7 @@ sprite_meth(const fn_call& fn)
 
   if ( ! fn.nargs ) return as_value(0); // optimization ...
 
-  as_value v = fn.arg(0);
+  const as_value& v = fn.arg(0);
   boost::intrusive_ptr<as_object> o = v.to_object();
   if ( ! o )
   {
@@ -1228,7 +1228,7 @@ sprite_setMask(const fn_call& fn)
     return as_value();
   }
 
-  as_value& arg = fn.arg(0);
+  const as_value& arg = fn.arg(0);
   if ( arg.is_null() || arg.is_undefined() )
   {
     // disable mask
@@ -4487,7 +4487,9 @@ sprite_instance::constructAsScriptObject()
 	// properties already.
 	as_object* super = get_super();
 
-        fn_call call(this, &(get_environment()), 0, 0, super);
+	as_environment& env = get_environment();
+        fn_call call(this, &env);
+	call.super = super;
 
         // we don't use the constructor return (should we?)
         (*ctor)(call);

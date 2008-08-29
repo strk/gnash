@@ -46,6 +46,8 @@ namespace gnash {
 
 as_environment::CallStack as_environment::_localFrames = as_environment::CallStack();
 
+as_value as_environment::undefVal;
+
 // Return the value of the given var, if it's defined.
 as_value
 as_environment::get_variable(const std::string& varname,
@@ -894,8 +896,9 @@ as_environment::setLocal(LocalVars& locals,
 void
 as_environment::padStack(size_t offset, size_t count)
 {
-	assert( offset <= m_stack.size() );
-	m_stack.insert(m_stack.begin()+offset, count, as_value());
+	// do nothing here, instead return undefined from top() and pop()
+	//assert( offset <= _stack.size() );
+	//m_stack.insert(m_stack.begin()+offset, count, as_value());
 }
 
 void
@@ -967,7 +970,7 @@ as_environment::CallFrame::CallFrame(as_function* funcPtr)
 void
 as_environment::dump_stack(std::ostream& out, unsigned int limit) const
 {
-	unsigned int si=0, n=m_stack.size();
+	unsigned int si=0, n=_stack.size();
 	if ( limit && n > limit )
 	{
 		si=n-limit;
@@ -981,7 +984,7 @@ as_environment::dump_stack(std::ostream& out, unsigned int limit) const
 	for (unsigned int i=si; i<n; i++)
 	{
 		if (i!=si) out << " | ";
-		out << '"' << m_stack[i] << '"';
+		out << '"' << _stack.value(i) << '"';
 	}
 	out << std::endl;
 }
@@ -1062,13 +1065,7 @@ as_environment::markReachableResources() const
 	}
 #endif
 
-	assert ( m_stack.empty() );
-#if 1 // I think we expect the stack to be empty !
-	for (std::vector<as_value>::const_iterator i=m_stack.begin(), e=m_stack.end(); i!=e; ++i)
-	{
-		i->setReachable();
-	}
-#endif
+	assert ( _stack.empty() );
 }
 #endif // GNASH_USE_GC
 

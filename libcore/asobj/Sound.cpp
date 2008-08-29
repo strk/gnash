@@ -330,7 +330,7 @@ sound_new(const fn_call& fn)
         }
         );
 
-        as_value& arg0 = fn.arg(0);
+        const as_value& arg0 = fn.arg(0);
         if ( ! arg0.is_null() && ! arg0.is_undefined() )
         {
             as_object* obj = arg0.to_object().get();

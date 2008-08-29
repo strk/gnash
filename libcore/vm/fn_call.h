@@ -55,13 +55,19 @@ public:
 
 public:
 	fn_call(const fn_call& fn) : this_ptr(fn.this_ptr), super(fn.super),
-		nargs(fn.nargs), _env(fn._env), _stack_offset(fn._stack_offset)
-	{/**/}
+		nargs(fn.nargs), _env(fn._env)
+	{
+		if ( fn._args.get() )
+			_args.reset(new std::vector<as_value>(*fn._args));
+	}
 
 	fn_call(const fn_call& fn, as_object* this_in, as_object* sup=NULL)
 		: this_ptr(this_in), super(sup), nargs(fn.nargs),
-		_env(fn._env), _stack_offset(fn._stack_offset)
-	{/**/}
+		_env(fn._env)
+	{
+		if ( fn._args.get() )
+			_args.reset(new std::vector<as_value>(*fn._args));
+	}
 
 	fn_call(as_object* this_in,
 			as_environment* env_in,
@@ -70,21 +76,32 @@ public:
 		this_ptr(this_in),
 		super(sup),
 		nargs(nargs_in),
-		_env(env_in),
-		_stack_offset(first_in)
+		_env(env_in)
 	{
+		assert(first_in == env_in->get_top_index());
+		readArgs(env_in, first_in, nargs);
 	}
 
-	fn_call(boost::intrusive_ptr<as_object> this_in,
+	fn_call(as_object* this_in,
 			as_environment* env_in,
-			int nargs_in, int first_in,
-			as_object* sup=NULL)
+			std::auto_ptr<std::vector<as_value> > args, as_object* sup=NULL)
 		:
 		this_ptr(this_in),
 		super(sup),
-		nargs(nargs_in),
+		nargs(args->size()),
 		_env(env_in),
-		_stack_offset(first_in)
+		_args(args)
+	{
+	}
+
+	fn_call(as_object* this_in,
+			as_environment* env_in)
+		:
+		this_ptr(this_in),
+		super(0),
+		nargs(0),
+		_env(env_in),
+		_args(0)
 	{
 	}
 
@@ -101,31 +118,21 @@ public:
 	}
 
 	/// Access a particular argument.
-	as_value& arg(unsigned int n) const
+	const as_value& arg(unsigned int n) const
 	{
 		assert(n < nargs);
-		return _env->bottom(_stack_offset - n);
-	}
-
-	void drop_top()
-	{
-		--nargs;
+		return (*_args)[n]; // _env->bottom(_stack_offset - n);
 	}
 
 	void drop_bottom()
 	{
+		assert(_args.get() && !(*_args).empty());
+		for (size_t i=0; i<(*_args).size()-1; ++i)
+		{
+			(*_args)[i] = (*_args)[i+1];
+		}
+		_args->pop_back();
 		--nargs;
-		--_stack_offset;
-	}
-
-	int offset() const
-	{
-		return _stack_offset;
-	}
-
-	void set_offset(int offset)
-	{
-		_stack_offset = offset;
 	}
 
 	as_environment& env() const
@@ -151,14 +158,33 @@ public:
 		return ss.str();
 	}
 
+	void resetArgs()
+	{
+		nargs=0;
+		_args->clear();
+	}
+
+	void pushArg(const as_value& arg)
+	{
+		nargs++;
+		_args->push_back(arg);
+	}
+
 private:
+
 	/// The ActionScript environment in which the function call is taking
 	/// place. This contains, among other things, the function arguments.
 	as_environment* _env;
 
-	/// The offset from the bottom of the env callstack to the first
-	/// argument to our fn_call.
-	unsigned int _stack_offset;
+	/// The actual arguments
+	std::auto_ptr< std::vector<as_value> > _args;
+
+	void readArgs(as_environment* env, int first_in, int nargs)
+	{
+		_args.reset(new std::vector<as_value>);
+		for (int i=0; i<nargs; ++i)
+			_args->push_back(env->bottom(first_in - i));
+	}
 
 };
 

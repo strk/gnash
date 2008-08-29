@@ -844,9 +844,11 @@ init_string_instance(const std::string& val)
 #ifndef NDEBUG
 	size_t prevStackSize = env.stack_size();
 #endif
-	env.push(val);
-	boost::intrusive_ptr<as_object> ret = cl->constructInstance(env, 1, 0);
-	env.drop(1);
+
+	std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
+	args->push_back(val);
+	boost::intrusive_ptr<as_object> ret = cl->constructInstance(env, args);
+
 #ifndef NDEBUG
 	assert( prevStackSize == env.stack_size());
 #endif

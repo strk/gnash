@@ -145,7 +145,7 @@ NetConnection::connect_method(const fn_call& fn)
 		return as_value(false);
 	}
 
-	as_value& url_val = fn.arg(0);
+	const as_value& url_val = fn.arg(0);
 
 	// Check first arg for validity 
 	if ( url_val.is_null())
@@ -691,7 +691,7 @@ NetConnection::call_method(const fn_call& fn)
 		return as_value(false); // FIXME should we return true anyway?
 	}
 
-	as_value& methodName_as = fn.arg(0);
+	const as_value& methodName_as = fn.arg(0);
 	if (!methodName_as.is_string()) {
                 IF_VERBOSE_ASCODING_ERRORS(
 		std::stringstream ss; fn.dump_args(ss);

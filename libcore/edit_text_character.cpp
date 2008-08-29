@@ -2311,7 +2311,7 @@ textfield_autoSize_getset(const fn_call& fn)
 	}
 	else // setter
 	{
-		as_value& arg = fn.arg(0);
+		const as_value& arg = fn.arg(0);
 		if ( arg.is_bool() )
 		{
 			if ( arg.to_bool() ) // true == left
@@ -2346,7 +2346,7 @@ textfield_type_getset(const fn_call& fn)
 	}
 
 	// setter
-	as_value& arg = fn.arg(0);
+	const as_value& arg = fn.arg(0);
 	std::string strval = arg.to_string();
 	edit_text_character::TypeValue val = ptr->parseTypeValue(strval);
 	//log_debug("setting %s.type : %s (toString->%s) => %d", ptr->getTarget(), arg, strval, val);

@@ -374,7 +374,7 @@ object_hasOwnProperty(const fn_call& fn)
 		);
 		return as_value(false);
 	}
-	as_value& arg = fn.arg(0);
+	const as_value& arg = fn.arg(0);
 	const std::string& propname = arg.to_string();
 	if ( arg.is_undefined() || propname.empty() )
 	{
@@ -400,7 +400,7 @@ object_isPropertyEnumerable(const fn_call& fn)
 		);
 		return as_value();
 	}
-	as_value& arg = fn.arg(0);
+	const as_value& arg = fn.arg(0);
 	const std::string& propname = arg.to_string();
 	if ( arg.is_undefined() || propname.empty() )
 	{
@@ -458,8 +458,8 @@ object_watch(const fn_call& fn)
 		return as_value(false);
 	}
 
-	as_value& propval = fn.arg(0);
-	as_value& funcval = fn.arg(1);
+	const as_value& propval = fn.arg(0);
+	const as_value& funcval = fn.arg(1);
 
 	if ( ! funcval.is_function() )
 	{
@@ -495,7 +495,7 @@ object_unwatch(const fn_call& fn)
 		return as_value(false);
 	}
 
-	as_value& propval = fn.arg(0);
+	const as_value& propval = fn.arg(0);
 
 	VM& vm = obj->getVM();
 	string_table& st = vm.getStringTable();

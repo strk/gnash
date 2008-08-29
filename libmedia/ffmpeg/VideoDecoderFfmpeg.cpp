@@ -164,7 +164,11 @@ VideoDecoderFfmpeg::frameToImage(AVCodecContext* srcCtx,
   PixelFormat pixFmt;
   std::auto_ptr<image::ImageBase> im;
 
+#ifdef FFMPEG_VP6A
   if (srcCtx->codec->id == CODEC_ID_VP6A)
+#else
+  if (0)
+#endif // def FFMPEG_VP6A
   {
     // Expect RGBA data
     //log_debug("alpha image");
@@ -217,15 +221,15 @@ VideoDecoderFfmpeg::frameToImage(AVCodecContext* srcCtx,
 
   avpicture_fill(&picture, buffer, pixFmt, width, height);
 
-  // Is it possible for the context to be reset
-  // to NULL once it's been created?
-  assert(_swsContext->getContext());
-
-
 #ifndef HAVE_SWSCALE_H
   img_convert(&picture, PIX_FMT_RGB24, (AVPicture*) &srcFrame,
       srcCtx->pix_fmt, width, height);
 #else
+
+  // Is it possible for the context to be reset
+  // to NULL once it's been created?
+  assert(_swsContext->getContext());
+
   int rv = sws_scale(_swsContext->getContext(), const_cast<uint8_t**>(srcFrame.data),
     const_cast<int*>(srcFrame.linesize), 0, height, picture.data,
     picture.linesize);

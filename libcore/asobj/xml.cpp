@@ -25,7 +25,6 @@
 #include "log.h"
 #include "as_function.h" // for as_function
 #include "fn_call.h"
-#include "action.h" // for call_method
 #include "utf8.h" // for BOM stripping
 
 #include "xmlattrs.h"
@@ -191,46 +190,6 @@ XML::~XML()
     log_debug(_("\tDeleting XML top level node at %p"), this);
 #endif
   
-}
-
-void
-XML::onLoadEvent(bool success, as_environment& env)
-{
-    // Do the events that (appear to) happen as the movie
-    // loads.  frame1 tags and actions are executed (even
-    // before advance() is called).  Then the onLoad event
-    // is triggered.
-
-    as_value	method;
-    if (!get_member(NSV::PROP_ON_LOAD, &method) ) return;
-    if ( method.is_undefined() ) return;
-    if ( ! method.is_function() ) return;
-
-#ifndef NDEBUG
-    size_t prevStackSize = env.stack_size();
-#endif
-    env.push(as_value(success));
-    call_method(method, &env, this, 1, env.stack_size()-1);
-    env.drop(1);
-#ifndef NDEBUG
-    assert( prevStackSize == env.stack_size());
-#endif
-}
-
-void
-XML::onCloseEvent(as_environment& env)
-{
-    // Do the events that (appear to) happen as the movie
-    // loads.  frame1 tags and actions are executed (even
-    // before advance() is called).  Then the onLoad event
-    // is triggered.
-
-    as_value	method;
-    if (! get_member(NSV::PROP_ON_CLOSE, &method) ) return;
-    if ( method.is_undefined() ) return;
-    if ( ! method.is_function() ) return;
-
-    call_method(method, &env, this, 0, 0);
 }
 
 bool

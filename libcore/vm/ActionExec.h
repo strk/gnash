@@ -228,6 +228,7 @@ public:
 	///
 	void ensureStack(size_t required)
 	{
+#if 0 // obsoleted
 		// The stack_size() < _initialStackSize case should
 		// be handled this by stack smashing checks
 		assert( env.stack_size() >= _initialStackSize );
@@ -237,6 +238,7 @@ public:
 		{
 			fixStackUnderrun(required);
 		}
+#endif
 	}
 
 	/// \brief
