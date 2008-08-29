@@ -90,6 +90,7 @@ abc_Trait::finalize(abc_block *pBlock, asClass *pClass, bool do_static)
 	}
 	case KIND_CLASS:
 	{
+		LOG_DEBUG_ABC("Finalize class not implemented.");
 		break;
 		pClass->addMemberClass(mName, mNamespace, mSlotId,
 			pBlock->mClasses[mClassInfoIndex], do_static);
