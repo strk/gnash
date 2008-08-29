@@ -86,30 +86,6 @@ call_method(
 	return val;
 }
 
-as_value
-call_method(
-    const as_value& method,
-    as_environment* env,
-    as_object* this_ptr, // this is ourself
-    int nargs,
-    int first_arg_bottom_index,
-    as_object* super)
-    // first_arg_bottom_index is the stack index, from the bottom,
-    // of the first argument.
-    // Subsequent arguments are at *lower* indices.
-    // E.g. if first_arg_bottom_index = 7, then arg1 is at env->bottom(7),
-    // arg2 is at env->bottom(6), etc.
-{
-	assert(first_arg_bottom_index == env->get_top_index());
-
-	std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
-	for (int i=0; i<nargs; ++i)
-		args->push_back(env->top(i)); // TODO: drop !
-
-	return call_method(method, env, this_ptr, args, super);
-}
-
-
 as_value	call_method0(
     const as_value& method,
     as_environment* env,
