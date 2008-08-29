@@ -881,6 +881,31 @@ clip1.stack_test2();
 #endif
 
 //
+// --case2bis--
+// same as case2, but with args passed
+//
+
+testvar1 = 0;
+testvar2 = 0;
+testvar3 = 0;
+asm{
+    push 'testvar1'
+    push 4
+    push 'testvar2'
+    push 5
+    push 'testvar3'
+    push 6
+};
+
+clip1.stack_test2(7, 8, 9);
+
+#if OUTPUT_VERSION > 5
+    check_equals(testvar1, 4);
+    check_equals(testvar2, 5);
+    check_equals(testvar3, 6);
+#endif
+
+//
 // --case3--
 //
 
@@ -954,8 +979,8 @@ check_equals(b.count, 1); // See bug #22203
  check_totals(150); // SWF5
 #endif
 #if OUTPUT_VERSION == 6
- check_totals(210); // SWF6
+ check_totals(213); // SWF6
 #endif
 #if OUTPUT_VERSION >= 7
- check_totals(211); // SWF7,SWF8
+ check_totals(214); // SWF7,SWF8
 #endif
