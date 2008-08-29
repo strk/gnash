@@ -159,7 +159,7 @@ AsBroadcaster::initialize_method(const fn_call& fn)
 	}
 
 	// TODO: check if automatic primitive to object conversion apply here
-	as_value& tgtval = fn.arg(0);
+	const as_value& tgtval = fn.arg(0);
 	if ( ! tgtval.is_object() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
