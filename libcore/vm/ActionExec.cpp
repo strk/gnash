@@ -598,7 +598,12 @@ ActionExec::cleanupAfterRun(bool expectInconsistencies)
     {
             log_debug(_("%d elements left on the stack after block execution.  ")
                 , env.stack_size() - _initialStackSize);
-	if ( ! isFunction() )
+
+	//
+	// cleanup if NOT a function 
+	// cleanup if an exception is on stack
+	//
+	if ( ! isFunction() || (env.stack_size() && env.top(0).is_exception() ) )
 	{
 		// we need to cleanup after run, or the GC will need to scan
 		// the stack as well..
