@@ -141,7 +141,7 @@ public:
 	{
 		// in case count > stack size, just drop all, forget about
 		// exceptions...
-		_stack.drop(std::min(count, _stack.size()));
+		_stack.drop(std::min(count, static_cast<size_t>(_stack.size())));
 		//size_t ssize = m_stack.size();
 		//assert ( ssize >= count );
 		//m_stack.resize(ssize - count);
