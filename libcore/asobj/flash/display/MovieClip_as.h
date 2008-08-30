@@ -1,4 +1,3 @@
-// display_pkg.cpp:  ActionScript "flash.display" package, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
@@ -11,44 +10,35 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-//
+// 
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+// 
+//
 //
 
-#include "Object.h" // for getObjectInterface
-#include "as_object.h"
+// Implementation for ActionScript MovieClip object.
 
-#include "string_table.h"
-#include "VM.h"
+#ifndef GNASH_MOVIECLIP_AS_H
+#define GNASH_MOVIECLIP_AS_H
 
-#include "flash/display/BitmapData_as.h"
-#include "Stage.h"
-#include "flash/display/MovieClip_as.h"
+#include <memory> // for auto_ptr
 
 namespace gnash {
 
-static as_value
-get_flash_display_package(const fn_call& /*fn*/)
-{
-	log_debug("Loading flash.display package");
+class as_object;
 
-	as_object* pkg = new as_object(getObjectInterface());
+/// Initialize the MovieClip class
+void movie_clip_class_init(as_object& global);
 
-	BitmapData_class_init(*pkg);
-	stage_class_init(*pkg);
-	movie_clip_class_init(*pkg);
+/// Return a MovieClip instance
+std::auto_ptr<as_object> init_movie_clip_instance();
 
-	return pkg;
+as_object* getMovieClipInterface();
+
+
 }
 
-void
-flash_display_package_init(as_object& where)
-{
-	string_table& st = where.getVM().getStringTable();
-	where.init_destructive_property(st.find("display"), get_flash_display_package);
-}
-
-
-} // end of gnash namespace
+#endif // GNASH_MOVIECLIP_AS_H
