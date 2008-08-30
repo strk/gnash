@@ -1790,8 +1790,15 @@ Machine::execute()
 	{
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
 		as_value value = pop_stack();
+
 		//TODO: Actually coerce the value.
-		push_stack(value);
+		if(value.is_null()){
+			as_value new_type = get_property_value(a);
+			push_stack(new_type);
+		}
+		else{
+			push_stack(value);
+		}
 		break;
 	}
 /// 0x82 ABC_ACTION_COERCE_A

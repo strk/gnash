@@ -317,6 +317,12 @@ private:
 		mStack.push(value);
 	}
 
+	as_value get_property_value(asName multiname){
+		as_environment env;
+		as_value val = env.get_variable(mPoolObject->mStringPool[multiname.getNamespace()->getAbcURI()],*getScopeStack(),NULL);
+		return val;
+	}
+
 	void print_stack(){
 		
 		std::stringstream ss;
