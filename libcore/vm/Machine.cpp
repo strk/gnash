@@ -606,11 +606,18 @@ Machine::execute()
 /// Do: If a > b move by jump in stream, as ABC_ACTION_JUMP does.
 	case SWF::ABC_ACTION_IFGT:
 	{
+		boost::int32_t bytes = mStream->read_S24();
 		bool truth;
 		// If b < a, then a > b, with undefined as false
 		ABSTRACT_COMPARE(truth, mStack.top(0), mStack.top(1), false);
 		mStack.drop(2);
-		JUMPIF(truth); // truth is: b < a
+		if(truth){
+			LOG_DEBUG_AVM("Jumping %d bytes.",bytes);
+			mStream->seekBy(bytes);
+		}
+		else{
+			LOG_DEBUG_AVM("Would have jumped %d bytes.",bytes);
+		}
 		break;
 	}
 /// 0x18 ABC_ACTION_IFGE
@@ -1370,20 +1377,17 @@ Machine::execute()
 		as_object* base_class = pop_stack().to_object().get();
 		as_object* new_class = c->getPrototype();
 		//Create the class.
+		abc_function* static_constructor = new abc_function(c->getStaticConstructor()->getBody(),this);
 		abc_function* constructor = new abc_function(c->getConstructor()->getBody(),this);
-		new_class->init_member(NSV::PROP_uuCONSTRUCTORuu,as_value(constructor),0);
-
+		new_class->init_member(NSV::PROP_uuCONSTRUCTORuu,as_value(static_constructor),0);
+		new_class->init_member(NSV::PROP_CONSTRUCTOR,as_value(constructor),0);
 		push_stack(as_value(new_class));
 
 		//Call the class's static constructor.
-		load_function(c->getStaticConstructor()->getBody());
+		as_environment env;
+		as_value property = new_class->getMember(NSV::PROP_uuCONSTRUCTORuu,0);
+		as_value value = call_method(property,&env,new_class,0,-1);
 
-//		ENSURE_OBJECT(mStack.top(0));
-//		as_object *obj = mStack.top(0).to_object().get();
-//		as_function *func = c->getConstructor()->getPrototype();
-		// func is the constructor, obj is 'this' and also the return
-		// value, no arguments, no change in stack.
-//		pushCall(func, obj, mStack.top(0), 0, 0);
 		break;
 	}
 /// 0x59 ABC_ACTION_GETDESCENDANTS
