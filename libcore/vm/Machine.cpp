@@ -2099,8 +2099,11 @@ Machine::execute()
 	{
 		bool truth;
 		ABSTRACT_EQUALITY(truth, mStack.top(1), mStack.top(0), false);
-		mStack.drop(1);
-		mStack.top(0).set_bool(truth);
+		pop_stack();
+		pop_stack();
+		as_value result = as_value();
+		result.set_bool(truth);
+		push_stack(result);
 		break;
 	}
 /// 0xAC ABC_ACTION_STRICTEQUALS
