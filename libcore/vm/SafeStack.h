@@ -108,7 +108,7 @@ public:
 	{ return mDownstop; }
 
 	/// Alias for getDownstop()
-	unsigned int size() const { return mEnd - mDownstop - 1; /*mEnd is one past end*/ }
+	size_t size() const { return mEnd - mDownstop - 1; /*mEnd is one past end*/ }
 
 	/// Is the stack empty to us? (Check totalSize() != for actually empty)
 	bool empty() const { return size() == 0; }
