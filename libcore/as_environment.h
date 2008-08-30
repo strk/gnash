@@ -47,7 +47,7 @@ public:
 
 	/// Stack of as_values in this environment
 	//std::vector<as_value>	m_stack;
-	SafeStack<as_value>	_stack;
+	DSOEXPORT SafeStack<as_value>	_stack;
 
 	as_environment()
 		:
