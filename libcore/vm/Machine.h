@@ -318,9 +318,28 @@ private:
 	}
 
 	as_value get_property_value(asName multiname){
+		return get_property_value(NULL,multiname);
+	}
+
+	as_value get_property_value(boost::intrusive_ptr<as_object> obj, asName multiname){
+		as_environment::ScopeStack stack;
 		as_environment env;
-		as_value val = env.get_variable(mPoolObject->mStringPool[multiname.getNamespace()->getAbcURI()],*getScopeStack(),NULL);
-		return val;
+		if(obj == NULL){
+			stack = *getScopeStack();
+		}
+		else{
+			stack.push_back(obj);
+		}
+		std::string ns = mPoolObject->mStringPool[multiname.getNamespace()->getAbcURI()];
+		std::string path;
+		if(ns.size() == 0){
+			path = mPoolObject->mStringPool[multiname.getABCName()];
+		}
+		else{
+			path = ns + "." + mPoolObject->mStringPool[multiname.getABCName()];
+		}
+		return env.get_variable(path,stack,NULL);
+		
 	}
 
 	void print_stack(){
