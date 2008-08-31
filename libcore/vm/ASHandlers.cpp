@@ -2859,7 +2859,7 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
 #endif
 
     std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
-    for (int i=0; i<nargs; ++i)
+    for (size_t i=0; i<nargs; ++i)
         args->push_back(env.pop()); // TODO: drop !
 
     //log_debug("ActionCallFunction calling call_method with %p as this_ptr", this_ptr);
@@ -3577,7 +3577,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 #endif
 
     std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
-    for (int i=0; i<nargs; ++i)
+    for (size_t i=0; i<nargs; ++i)
         args->push_back(env.pop()); // TODO: drop !
 
     as_value result = call_method(method_val, &env, this_ptr, 

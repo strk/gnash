@@ -226,7 +226,7 @@ public:
 	/// stack frame, so that undefined function arguments are the
 	/// *last* ones in the list.
 	///
-	void ensureStack(size_t required)
+	void ensureStack(size_t /*required*/)
 	{
 #if 0 // obsoleted
 		// The stack_size() < _initialStackSize case should

@@ -894,7 +894,7 @@ as_environment::setLocal(LocalVars& locals,
 
 
 void
-as_environment::padStack(size_t offset, size_t count)
+as_environment::padStack(size_t /*offset*/, size_t /*count*/)
 {
 	// do nothing here, instead return undefined from top() and pop()
 	//assert( offset <= _stack.size() );
