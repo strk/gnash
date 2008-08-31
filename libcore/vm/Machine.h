@@ -221,6 +221,7 @@ private:
 		unsigned int mStackTotalSize;
 		unsigned int mScopeStackDepth;
 		unsigned int mScopeTotalSize;
+		bool mReturn;
 		CodeStream *mStream;
 		asNamespace *mDefaultXMLNamespace;
 		as_object *mCurrentScope;

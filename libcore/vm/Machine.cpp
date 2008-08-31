@@ -2568,6 +2568,7 @@ Machine::restoreState()
 	mAsValueScopeStack.setAllSizes(s.mScopeTotalSize, s.mScopeStackDepth);
 	mStream = s.mStream;
 	mRegisters = s.mRegisters;
+//	mExitWithReturn = s.mReturn;
 //	mDefaultXMLNamespace = s.mDefaultXMLNamespace;
 //	mCurrentScope = s.mCurrentScope;
 //	mGlobalReturn = s.mGlobalReturn;
@@ -2591,6 +2592,7 @@ Machine::saveState()
 	s.mStream = mStream;
 	s.to_debug_string();
 	s.mRegisters = mRegisters;
+//	s.mReturn = mExitWithReturn;
 //	s.mDefaultXMLNamespace = mDefaultXMLNamespace;
 //	s.mCurrentScope = mCurrentScope;
 //	s.mGlobalReturn = mGlobalReturn;
@@ -2625,14 +2627,16 @@ void Machine::initMachine(abc_block* pool_block,as_object* global)
 //todo, this should be fixed.
 as_value Machine::executeFunction(CodeStream* stream,const fn_call& fn){
 	
-	mExitWithReturn = true;
+//TODO: Figure out a good way to use the State object to handle returning values.
+	bool prev_ext = mExitWithReturn;
 	load_function(stream);
+	mExitWithReturn = true;
 	mRegisters[0] = as_value(fn.this_ptr);
 	for(unsigned int i=0;i<fn.nargs;i++){
 		mRegisters[i+1] = fn.arg(i);
 	}
 	execute();
-	mExitWithReturn = false;
+	mExitWithReturn = prev_ext;
 	return mGlobalReturn;
 }
 
