@@ -39,15 +39,21 @@ class character;
 /// ActionScript execution environment.
 class as_environment
 {
+
 public:
 
 	/// A stack of objects used for variables/members lookup
 	//typedef std::vector<with_stack_entry> ScopeStack;
 	typedef std::vector< boost::intrusive_ptr<as_object> > ScopeStack;
 
-	/// Stack of as_values in this environment
-	//std::vector<as_value>	m_stack;
-	DSOEXPORT SafeStack<as_value>	_stack;
+	/// The variables container (case-insensitive)
+	typedef std::map<std::string, as_value, StringNoCaseLessThen> Variables;
+
+	/// The locals container 
+	//typedef std::vector<frame_slot>	LocalVars;
+	typedef boost::intrusive_ptr<as_object> LocalVars;
+
+	typedef std::vector<as_value> Registers;
 
 	as_environment()
 		:
@@ -500,15 +506,6 @@ public:
 	///
 	bool parse_path(const std::string& var_path, as_object** target, as_value& val);
 
-	/// The variables container (case-insensitive)
-	typedef std::map<std::string, as_value, StringNoCaseLessThen> Variables;
-
-	/// The locals container 
-	//typedef std::vector<frame_slot>	LocalVars;
-	typedef boost::intrusive_ptr<as_object> LocalVars;
-
-	typedef std::vector<as_value> Registers;
-
 	struct CallFrame
 	{
 		CallFrame(as_function* funcPtr);
@@ -561,6 +558,10 @@ public:
 
 private:
 
+	/// Stack of as_values in this environment
+	//std::vector<as_value>	m_stack;
+	SafeStack<as_value>	_stack;
+
 	static const short unsigned int numGlobalRegisters = 4;
 
 	typedef std::vector<CallFrame> CallStack;
@@ -586,13 +587,13 @@ private:
 	/// @param func
 	///	The function being called
 	///
-	static DSOEXPORT void pushCallFrame(as_function* func);
+	static void pushCallFrame(as_function* func);
 
 	/// Remove current call frame from the stack
 	//
 	/// This should happen when an ActionScript function returns.
 	///
-	static DSOEXPORT void popCallFrame();
+	static void popCallFrame();
 	
 	/// Return the (possibly UNDEFINED) value of the named variable.
 	//
@@ -696,6 +697,7 @@ private:
 	static bool setLocal(LocalVars& locals, const std::string& varname, const as_value& val);
 
 	static as_value undefVal;
+		
 };
 
 
