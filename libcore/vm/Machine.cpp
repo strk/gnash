@@ -1722,7 +1722,9 @@ Machine::execute()
 	case SWF::ABC_ACTION_CONVERT_I:
 	case SWF::ABC_ACTION_COERCE_I:
 	{
-		mStack.top(0) = mStack.top(0).to_int();
+		as_value val = pop_stack();
+		val.to_int();
+		push_stack(val);
 		break;
 	}
 /// 0x74 ABC_ACTION_CONVERT_U
