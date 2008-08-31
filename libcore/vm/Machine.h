@@ -27,7 +27,7 @@
 #include "swf.h"
 #include "as_environment.h"
 
-#define LOG_DEBUG_AVM(fmt,...) log_action("AVM2: " fmt, ## __VA_ARGS__);
+#define LOG_DEBUG_AVM(fmt,...) IF_VERBOSE_ACTION(log_action("AVM2: " fmt, ## __VA_ARGS__));
 
 namespace gnash {
 
