@@ -17,13 +17,13 @@
 
 #include "log.h"
 #include "abc_function.h"
+#include "asClass.h"
 #include "fn_call.h"
 
 namespace gnash{
 
-//TODO: Should we create a new machine for each abc_function.
-abc_function::abc_function(CodeStream* stream, Machine* machine):as_function(){
-		mStream = stream;
+abc_function::abc_function(asMethod *methodInfo, Machine* machine):as_function(){
+		mMethodInfo = methodInfo;
 		mMachine = machine;
 }
 
@@ -31,8 +31,10 @@ abc_function::abc_function(CodeStream* stream, Machine* machine):as_function(){
 as_value
 abc_function::operator()(const fn_call& fn)
 {
-	log_debug("Calling an abc_function.");
-	return mMachine->executeFunction(mStream,fn);
+	log_debug("Calling an abc_function id=%u.",mMethodInfo->mMethodID);
+	as_value val = mMachine->executeFunction(mMethodInfo->getBody(),fn);
+	log_debug("Done calling abc_function id=%u value=%s",mMethodInfo->mMethodID,val.toDebugString());
+	return val;
 
 }
 

@@ -704,6 +704,7 @@ abc_block::read_method_infos()
 	{
 		log_debug(" Reading method %u",i);
 		asMethod *pMethod = mCH->newMethod();
+		pMethod->mMethodID = i;
 //		log_debug("Min arg count: %d max: %d",pMethod->minArgumentCount(),pMethod->maxArgumentCount());
 		mMethods[i] = pMethod;
 		boost::uint32_t param_count = mS->read_V32();

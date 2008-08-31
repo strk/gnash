@@ -24,6 +24,7 @@
 
 #include "as_function.h"
 #include "as_value.h"
+#include "asClass.h"
 #include "CodeStream.h"
 #include "Machine.h"
 
@@ -34,11 +35,11 @@ class abc_function : public as_function
 {
 
 private:
-	CodeStream* mStream;
+	asMethod *mMethodInfo;
 	Machine* mMachine;
 
 public:
-	abc_function(CodeStream* stream, Machine* mMachine);
+	abc_function(asMethod *methodInfo, Machine* mMachine);
 
 	as_value operator()(const fn_call& fn);
 

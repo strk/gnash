@@ -1019,7 +1019,7 @@ Machine::execute()
 		boost::int32_t method_index = mStream->read_V32();
 		LOG_DEBUG_AVM("Creating new abc_function: method index=%u",method_index);
 		asMethod *m = pool_method(method_index, mPoolObject);
-		push_stack(as_value(new abc_function(m->getBody(),this)));
+		push_stack(as_value(new abc_function(m,this)));
 		break;
 	}
 /// 0x41 ABC_ACTION_CALL
@@ -1377,8 +1377,8 @@ Machine::execute()
 		as_object* base_class = pop_stack().to_object().get();
 		as_object* new_class = c->getPrototype();
 		//Create the class.
-		abc_function* static_constructor = new abc_function(c->getStaticConstructor()->getBody(),this);
-		abc_function* constructor = new abc_function(c->getConstructor()->getBody(),this);
+		abc_function* static_constructor = new abc_function(c->getStaticConstructor(),this);
+		abc_function* constructor = new abc_function(c->getConstructor(),this);
 		new_class->init_member(NSV::PROP_uuCONSTRUCTORuu,as_value(static_constructor),0);
 		new_class->init_member(NSV::PROP_CONSTRUCTOR,as_value(constructor),0);
 		push_stack(as_value(new_class));

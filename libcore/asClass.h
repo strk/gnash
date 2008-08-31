@@ -356,6 +356,8 @@ private:
 
 public:
 
+	boost::uint32_t mMethodID;
+
 	boost::uint32_t getBodyLength(){ return mBodyLength;}
 
 	void setBodyLength(boost::uint32_t length){ mBodyLength = length;}
