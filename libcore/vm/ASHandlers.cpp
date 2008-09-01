@@ -154,17 +154,6 @@ ActionHandler::ActionHandler(action_type type, std::string name,
 {
 }
 
-ActionHandler::ActionHandler(action_type type, std::string name,
-                             action_callback_t func, as_arg_t format, int nargs)
-    :
-    _type(type),
-    _name(name),
-    _callback(func),
-    _debug(false),
-    _arg_format(format)
-{
-}
-
 void
 ActionHandler::execute(ActionExec& thread) const
 {
