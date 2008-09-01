@@ -102,8 +102,8 @@ construct_object(as_function* ctor_as_func,
 {
     assert(ctor_as_func);
     std::auto_ptr< std::vector<as_value> > args (new std::vector<as_value> );
-    for (unsigned int i=0; i<nargs; ++i)
-        args->push_back(env.pop());
+    args->reserve(nargs);
+    for (unsigned int i=0; i<nargs; ++i) args->push_back(env.pop());
     return ctor_as_func->constructInstance(env, args);
 }
 
@@ -2795,8 +2795,8 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
 #endif
 
     std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
-    for (size_t i=0; i<nargs; ++i)
-        args->push_back(env.pop()); // TODO: drop !
+    args->reserve(nargs);
+    for (int i=0; i<nargs; ++i) args->push_back(env.pop()); 
 
     //log_debug("ActionCallFunction calling call_method with %p as this_ptr", this_ptr);
     as_value result = call_method(function, &env, this_ptr,
@@ -3451,8 +3451,8 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 #endif
 
     std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
-    for (size_t i=0; i<nargs; ++i)
-        args->push_back(env.pop()); // TODO: drop !
+    args->reserve(nargs);
+    for (int i=0; i<nargs; ++i) args->push_back(env.pop()); 
 
     as_value result = call_method(method_val, &env, this_ptr, 
             args, super);
