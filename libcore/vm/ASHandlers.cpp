@@ -119,7 +119,6 @@ ActionHandler::ActionHandler()
     _name("unsupported"),
     _callback(unsupported_action_handler),
     _debug(false),
-    _stack_args(0),
     _arg_format(ARG_NONE)
 {
 }
@@ -129,7 +128,6 @@ ActionHandler::ActionHandler(action_type type, action_callback_t func)
     _type(type),
     _callback(func),
     _debug(false),
-    _stack_args(0),
     _arg_format(ARG_NONE)
 {
 }
@@ -141,7 +139,6 @@ ActionHandler::ActionHandler(action_type type, std::string name,
     _name(name),
     _callback(func),
     _debug(false),
-    _stack_args(0),
     _arg_format(ARG_NONE)
 {
 }
@@ -153,7 +150,6 @@ ActionHandler::ActionHandler(action_type type, std::string name,
     _name(name),
     _callback(func),
     _debug(false),
-    _stack_args(0),
     _arg_format(format)
 {
 }
@@ -165,7 +161,6 @@ ActionHandler::ActionHandler(action_type type, std::string name,
     _name(name),
     _callback(func),
     _debug(false),
-    _stack_args(nargs),
     _arg_format(format)
 {
 }
