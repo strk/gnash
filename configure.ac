@@ -1270,14 +1270,10 @@ GNASH_PATH_FIREFOX
 dnl XPCOM and NSPR can be used in the plugin for better integration
 dnl within Firefox.
 GNASH_PATH_XPCOM
+if test x$has_xpcom = xyes; then nspr4=yes; fi
 GNASH_PATH_NSPR
 dnl If we don't have both XPCOM and NSPR, we can't build either.
-if test x$has_xpcom = xno -o x$has_nspr = xno; then
-  has_xpcom=no
-  has_nspr=no
-fi
-AM_CONDITIONAL(XPCOM, test x$has_xpcom = xyes)
-AM_CONDITIONAL(NSPR, test x$has_nspr = xyes)
+AM_CONDITIONAL(XPCOM, test x$has_xpcom = xyes -a x$has_nspr = xyes)
 
 dnl -----------------------------------------------------------------
 dnl END OF PLUGIN RELATED STUFF
@@ -1951,6 +1947,7 @@ if test x"$GCC" = x"yes"; then
     -Wreturn-type \
     -Wnon-virtual-dtor \
     -Wunused \
+    -fshort-wchar \
     #-ansi \
     "
   CFLAGS="$CFLAGS \
@@ -2391,6 +2388,7 @@ else
   echo "        ERROR: No GIF library development package installed!" >&3
   echo "               Install it from http://sourceforge.net/projects/giflib/" >&3
   echo "               or .deb users: apt-get install libungif-dev" >&3
+  echo "               or maybe     : apt-get install libgif-dev" >&3
   echo "               or .rpm users: yum install libungif-devel" >&3
 fi
 
@@ -3015,6 +3013,8 @@ if test x"$xpcom" = x"yes"; then
     echo "        XPIDL path is: $XPIDL"
   else
     echo "        ERROR: No XPCOM development package is installed." >&3
+    echo "                Install it from http://www.mozilla.org/projects/xpcom/" >&3
+    echo "                or .deb users: apt-get install xulrunner-1.9-dev" >&3
   fi
 fi
 if test x"$nspr4" = x"yes"; then
