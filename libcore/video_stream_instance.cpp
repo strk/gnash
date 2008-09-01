@@ -161,7 +161,6 @@ video_ctor(const fn_call& /* fn */)
 void
 video_stream_instance::initializeDecoder()
 {
-	//if ( _decoder.get() ) return; // already initialized
 
 	media::MediaHandler* mh = media::MediaHandler::get();
 	if ( ! mh )
@@ -178,11 +177,13 @@ video_stream_instance::initializeDecoder()
 		return;
 	}
 
-	_decoder = mh->createVideoDecoder(*info); 
-	if ( ! _decoder.get() )
+    try
+    {
+	    _decoder = mh->createVideoDecoder(*info);
+	}
+	catch (MediaException &e)
 	{
-		log_error(_("Could not create video decoder from VideoInfo %s"), *info);
-		return;
+	    log_error("Could not create Video Decoder: %s", e.what());
 	}
 }
 
@@ -247,6 +248,12 @@ video_stream_instance::getVideoFrame()
 	// If this is a video from a VideoFrame tag, retrieve a video frame from there.
 	else if (_embeddedStream)
 	{
+
+        // Don't try to do anything if there is no decoder. If it was
+        // never constructed (most likely), we'll return nothing,
+        // otherwise the last decoded frame.
+        if (!_decoder.get()) return _lastDecodedVideoFrame.get();
+
 		int current_frame = get_ratio(); 
 
 #ifdef DEBUG_EMBEDDED_VIDEO_DECODING
