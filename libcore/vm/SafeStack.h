@@ -87,6 +87,10 @@ public:
 	void drop(StackSize i)
 	{ if (i > size()) throw StackException(); mEnd -= i; }
 
+	/// Drop all stack elements reguardless of the "downstop"
+	void clear()
+	{ mDownstop=0; mEnd=1; }
+
 	/// Put a new value onto the top of the stack.  The value will be
 	/// copied.
 	void push(const T t)
