@@ -349,6 +349,7 @@ ActionExec::operator() ()
     }
     catch (ActionLimitException& ex)
     {
+        // Script execution should stop (for this frame only?)
         // Here's were we should pop-up a window to prompt user about
         // what to do next (abort or not ?)
         //log_error("Script aborted due to exceeded limit: %s - cleaning up after run", ex.what());
@@ -358,8 +359,14 @@ ActionExec::operator() ()
     catch (ActionScriptException& ex)
     {
         // An unhandled ActionScript exception was thrown.
-        // Script execution should stop (for this frame only?)
         cleanupAfterRun(true);
+
+	// Forceably clear the stack.
+	// - Fixes misc-mtasc.all/exception.swf
+	// By commenting the line above, we get an XPASS in
+	// - swfdec/catch-in-caller.swf
+	env.drop(env.stack_size());
+
         return;
     }
     // TODO: catch other exceptions ?
