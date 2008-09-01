@@ -19,7 +19,7 @@
 #define GNASH_ACTIONEXEC_H
 
 #include "with_stack_entry.h"
-#include "as_environment.h" // for ensureStack
+#include "as_environment.h" // for ScopeStack
 #include "smart_ptr.h"
 #include "swf.h"
 #include "action_buffer.h"
@@ -217,29 +217,6 @@ private:
 	size_t stop_pc;
 
 public:
-
-	/// \brief
-	/// Ensure the current stack frame has at least 'required' elements,
-	/// fixing it if required.
-	//
-	/// Underruns are fixed by inserting elements at the start of
-	/// stack frame, so that undefined function arguments are the
-	/// *last* ones in the list.
-	///
-	void ensureStack(size_t /*required*/)
-	{
-#if 0 // obsoleted
-		// The stack_size() < _initialStackSize case should
-		// be handled this by stack smashing checks
-		assert( env.stack_size() >= _initialStackSize );
-
-		size_t slots_left = env.stack_size() - _initialStackSize;
-		if ( slots_left < required )
-		{
-			fixStackUnderrun(required);
-		}
-#endif
-	}
 
 	/// \brief
 	/// Use this to push a try block.
