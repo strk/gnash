@@ -158,7 +158,8 @@ VideoDecoderFfmpeg::frameToImage(AVCodecContext* srcCtx,
                                  const AVFrame& srcFrame)
 {
 
-  const int width = srcCtx->width;
+  // Adjust to next highest 4-pixel value.
+  const int width = (srcCtx->width + 3) &~ 3;
   const int height = srcCtx->height;
 
   PixelFormat pixFmt;
