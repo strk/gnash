@@ -41,14 +41,14 @@
   .action:
    #include "Dejagnu.sc"
 
-	trace("doaction1");
+	trace("doaction1 in frame1");
     	asm {
 		push '_root.var1'
 		push 'val1'
 	};
   .end
   .action:
-	trace("doaction2");
+	trace("doaction2 in frame1");
     	asm {
 		setvariable
 		push '_root.var2'
@@ -59,9 +59,11 @@
   .sprite mc1 
     .frame 1
       .action:
-	trace("mc1");
+	trace("mc1 placed in frame1");
         asm {
 		setvariable
+		push '_root.var3'
+		push 'val3'
 	};
       .end
   .end
@@ -70,9 +72,18 @@
 
 .frame 2
   .action:
+	trace("doaction1 in frame2");
+        asm {
+		setvariable
+	};
+  .end
+
+.frame 3
+  .action:
     xcheck_equals(var1, 'val1');
     xcheck_equals(var2, 'val2');
-    totals(2);
+    check_equals(typeof(var3), 'undefined');
+    totals(3);
     stop();
   .end
 .end
