@@ -762,8 +762,6 @@ SWFHandlers::ActionEqual(ActionExec& thread)
     assert(thread.atActionTag(SWF::ACTION_EQUAL)); // 0x0E
 #endif
 
-    
-
     as_value& op1 = env.top(0);
     as_value& op2 = env.top(1);
 
@@ -855,7 +853,6 @@ SWFHandlers::ActionSubString(ActionExec& thread)
 
     as_environment& env = thread.env;
     
-
     const as_value& strval = env.top(2);
 
     // input checks
@@ -898,7 +895,6 @@ SWFHandlers::ActionSubString(ActionExec& thread)
 
     // TODO: if 'start' or 'size' do not evaluate to numbers return
     //       the empty string (how do we check if they evaluate ??)
-
     if ( start < 1 )
     {
         IF_VERBOSE_ASCODING_ERRORS (
@@ -996,9 +992,6 @@ SWFHandlers::ActionSetVariable(ActionExec& thread)
 
     as_environment& env = thread.env;
 
-    // stack must be contain at least two items
-    
-
     const std::string& name = env.top(1).to_string();
     thread.setVariable(name, env.top(0));
 
@@ -1021,8 +1014,6 @@ SWFHandlers::ActionSetTargetExpression(ActionExec& thread)
 
     as_environment& env = thread.env;
 
-    
-
     // we don't ues the target sprite directly, instead we fetch the _target(string type)
     // of that sprite first and then search the final target(might be a different one).
     // see tests in opcode_guard_test2.sc
@@ -1042,8 +1033,6 @@ SWFHandlers::ActionStringConcat(ActionExec& thread)
 
     as_environment& env = thread.env;
 
-    
-
     const int version = env.get_version();
     env.top(1).convert_to_string_versioned(version);
     env.top(1).string_concat(env.top(0).to_string_versioned(version));
@@ -1055,8 +1044,6 @@ SWFHandlers::ActionGetProperty(ActionExec& thread)
 {
     
     as_environment& env = thread.env;
-
-    
 
     as_value& tgt_val = env.top(1);
     std::string tgt_str = tgt_val.to_string();
@@ -1116,8 +1103,6 @@ SWFHandlers::ActionSetProperty(ActionExec& thread)
     
     as_environment& env = thread.env;
 
-    
-
     character *target = env.find_target(env.top(2).to_string());
     unsigned int prop_number = (unsigned int)env.top(1).to_number();
     as_value prop_val = env.top(0);
@@ -1155,8 +1140,6 @@ SWFHandlers::ActionDuplicateClip(ActionExec& thread)
 {
     //GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
-
-    
 
     // Movies should be attachable from -16384 to 2130690044. See
     // Tests in misc-ming.all/DepthLimitsTest.c.
@@ -1211,8 +1194,6 @@ SWFHandlers::ActionRemoveClip(ActionExec& thread)
 
     as_environment& env = thread.env;
 
-    
-
     const std::string path = env.pop().to_string();
 
     character* ch = env.find_target(path);
@@ -1244,8 +1225,6 @@ SWFHandlers::ActionTrace(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
-
-    
 
     const std::string val = env.pop().to_string();
     
@@ -2521,8 +2500,6 @@ SWFHandlers::ActionGetUrl2(ActionExec& thread)
     
     as_environment& env = thread.env;
 
-    
-
     const action_buffer& code = thread.code;
 
 #if GNASH_PARANOIA_LEVEL > 1
@@ -2560,8 +2537,6 @@ SWFHandlers::ActionBranchIfTrue(ActionExec& thread)
     assert(thread.atActionTag(SWF::ACTION_BRANCHIFTRUE));
 #endif
 
-    
-
     boost::int16_t offset = code.read_int16(pc+3);
 
     bool test = env.pop().to_bool();
@@ -2585,8 +2560,6 @@ SWFHandlers::ActionCallFrame(ActionExec& thread)
 {
     //GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
-
-    
 
     const std::string& target_frame = env.top(0).to_string();
     std::string target_path;
@@ -2624,17 +2597,14 @@ SWFHandlers::ActionCallFrame(ActionExec& thread)
 void
 SWFHandlers::ActionGotoExpression(ActionExec& thread)
 {
-    
 
     as_environment& env = thread.env;
-
-    
 
     const action_buffer& code = thread.code;
     size_t pc = thread.getCurrentPC();
 
 
-    // From Alexi's SWF ref:
+    // From Alexis SWF ref:
     //
     // Pop a value or a string and jump to the specified
     // frame. When a string is specified, it can include a
@@ -2706,8 +2676,6 @@ SWFHandlers::ActionDelete(ActionExec& thread)
     assert(thread.atActionTag(SWF::ACTION_DELETE)); // 0x3A
 #endif
 
-    
-
     // TODO: some parameter checking ?
     const std::string& propname = env.top(0).to_string();
     boost::intrusive_ptr<as_object> obj = env.top(1).to_object();
@@ -2741,8 +2709,6 @@ SWFHandlers::ActionDelete2(ActionExec& thread)
     assert(thread.atActionTag(SWF::ACTION_DELETE2)); // 0x3B
 #endif
 
-    
-
     // See bug #18482, this works fine now (assuming the bug report is correct)
     env.top(0) = thread.delVariable(env.top(0).to_string());
 }
@@ -2752,7 +2718,6 @@ SWFHandlers::ActionVarEquals(ActionExec& thread)
 {
     
     as_environment& env = thread.env;
-    
 
     as_value& value = env.top(0);
     as_value& varname = env.top(1);
@@ -2771,12 +2736,6 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
 
     as_environment& env = thread.env;
     std::string function_name;
-
-    
-
-    //log_debug("ActionCallFunction: %s", env.top(0));
-
-    //env.dump_stack();
 
     // Let's consider it a as a string and lookup the function.
     const std::string& funcname = env.pop().to_string();
@@ -2862,11 +2821,6 @@ SWFHandlers::ActionReturn(ActionExec& thread)
 //        GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
 
-    //log_debug(_("Before top/drop (retval=%p)"), (void*)retval);
-    //env.dump_stack();
-
-    
-
     // Put top of stack in the provided return slot, if
     // it's not NULL.
     thread.pushReturn(env.top(0));
@@ -2890,17 +2844,13 @@ SWFHandlers::ActionModulo(ActionExec& thread)
     
     as_environment& env = thread.env;
 
-    
-
     as_value    result;
     const double y = env.pop().to_number();
     const double x = env.pop().to_number();
 //  Don't need to check for y being 0 here - if it's zero, fmod returns NaN
 //  which is what flash would do too
-    result = fmod(x, y);
-//  env.top(1).set_double(fmod(env.top(1).to_bool() && env.top(0).to_bool());
-//  env.drop(1);
-//  log_error(_("modulo x=%f, y=%f, z=%f"), x, y, result.to_number());
+    result = std::fmod(x, y);
+
     env.push(result);
 }
 
@@ -2909,8 +2859,6 @@ SWFHandlers::ActionNew(ActionExec& thread)
 {
     
     as_environment& env = thread.env;
-
-    
 
     as_value val = env.pop();
     const std::string& classname = val.to_string();
@@ -2921,7 +2869,6 @@ SWFHandlers::ActionNew(ActionExec& thread)
     );
 
     unsigned nargs = unsigned(env.pop().to_number());
-
 
     as_value constructorval = thread.getVariable(classname);
     boost::intrusive_ptr<as_function> constructor = constructorval.to_as_function();
@@ -2981,8 +2928,6 @@ SWFHandlers::ActionInitArray(ActionExec& thread)
     
     as_environment& env = thread.env;
 
-    
-
     const int array_size = env.pop().to_int();
     assert(array_size >= 0); // TODO: trigger this !!
 
@@ -3007,8 +2952,6 @@ SWFHandlers::ActionInitObject(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
-
-    
 
     //
     //    SWFACTION_PUSH
@@ -3041,11 +2984,7 @@ SWFHandlers::ActionInitObject(ActionExec& thread)
 void
 SWFHandlers::ActionTypeOf(ActionExec& thread)
 {
-    
     as_environment& env = thread.env;
-
-    
-
     env.top(0).set_string(env.top(0).typeOf());
 }
 
@@ -3055,8 +2994,6 @@ SWFHandlers::ActionTargetPath(ActionExec& thread)
     
 
     as_environment& env = thread.env;
-
-    
 
     boost::intrusive_ptr<sprite_instance> sp = env.top(0).to_sprite();
     if ( sp )
@@ -3080,7 +3017,6 @@ SWFHandlers::ActionTargetPath(ActionExec& thread)
 static void
 enumerateObject(as_environment& env, const as_object& obj)
 {
-    
     assert( env.top(0).is_null() );
     obj.enumerateProperties(env);
 }
@@ -3090,8 +3026,6 @@ SWFHandlers::ActionEnumerate(ActionExec& thread)
 {
     
     as_environment& env = thread.env;
-
-    
 
     // Get the object
     as_value var_name = env.top(0);
@@ -3120,8 +3054,6 @@ SWFHandlers::ActionNewAdd(ActionExec& thread)
 {
     //GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
-
-    
 
 #ifndef NDEBUG
     size_t stackSize = env.stack_size();
@@ -3180,8 +3112,6 @@ SWFHandlers::ActionNewLessThan(ActionExec& thread)
 
     as_environment& env = thread.env;
 
-    
-
     as_value& op1_in = env.top(1);
     as_value& op2_in = env.top(0);
 
@@ -3233,8 +3163,6 @@ SWFHandlers::ActionNewEquals(ActionExec& thread)
     assert(thread.atActionTag(SWF::ACTION_NEWEQUALS));
 #endif
 
-    
-
     int swfVersion = VM::get().getSWFVersion();
     if ( swfVersion <= 5 )
     {
@@ -3267,16 +3195,13 @@ SWFHandlers::ActionNewEquals(ActionExec& thread)
 void
 SWFHandlers::ActionToNumber(ActionExec& thread)
 {
-    
     as_environment& env = thread.env;
-    
     env.top(0).convert_to_number();
 }
 
 void
 SWFHandlers::ActionToString(ActionExec& thread)
 {
-    
     as_environment& env = thread.env;
     
     const int version = env.get_version();
@@ -3286,7 +3211,6 @@ SWFHandlers::ActionToString(ActionExec& thread)
 void
 SWFHandlers::ActionDup(ActionExec& thread)
 {
-    
     as_environment& env = thread.env;
     
     env.push(env.top(0));
@@ -3295,7 +3219,6 @@ SWFHandlers::ActionDup(ActionExec& thread)
 void
 SWFHandlers::ActionSwap(ActionExec& thread)
 {
-    
     as_environment& env = thread.env;
     
     as_value    temp = env.top(1);
@@ -3308,11 +3231,6 @@ SWFHandlers::ActionGetMember(ActionExec& thread)
 {
         
     as_environment& env = thread.env;
-
-    
-
-    // Some corner case behaviors depend on the SWF file version.
-    //const int version = env.get_version();
 
     as_value member_name = env.top(0);
     as_value target = env.top(1);
@@ -3362,8 +3280,6 @@ SWFHandlers::ActionSetMember(ActionExec& thread)
     
     as_environment& env = thread.env;
 
-    
-
     boost::intrusive_ptr<as_object> obj = env.top(2).to_object();
     const std::string& member_name = env.top(1).to_string();
     const as_value& member_value = env.top(0);
@@ -3392,41 +3308,27 @@ SWFHandlers::ActionSetMember(ActionExec& thread)
         );
     }
 
-
     env.drop(3);
 }
 
 void
 SWFHandlers::ActionIncrement(ActionExec& thread)
 {
-    
     as_environment& env = thread.env;
-
-    
-
     env.top(0).set_double(env.top(0).to_number()+1);
 }
 
 void
 SWFHandlers::ActionDecrement(ActionExec& thread)
 {
-    
     as_environment& env = thread.env;
-    
     env.top(0).set_double(env.top(0).to_number()-1);
 }
 
 void
 SWFHandlers::ActionCallMethod(ActionExec& thread)
 {
-    
-
     as_environment& env = thread.env;
-
-    
-
-    // Some corner case behaviors depend on the SWF file version.
-    //const int version = env.get_version();
 
     // Get name function of the method
     as_value method_name = env.pop();
@@ -3570,15 +3472,12 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 void
 SWFHandlers::ActionNewMethod(ActionExec& thread)
 {
-    
 
     as_environment& env = thread.env;
 
 #if GNASH_PARANOIA_LEVEL > 1
     assert(thread.atActionTag(SWF::ACTION_NEWMETHOD));
 #endif
-
-    
 
     as_value method_name = env.pop();
     as_value obj_val = env.pop();
@@ -3660,8 +3559,6 @@ SWFHandlers::ActionInstanceOf(ActionExec& thread)
     
     as_environment& env = thread.env;
 
-    
-
     // Get the "super" function
     as_object* super = env.top(0).to_object().get();
 
@@ -3688,11 +3585,8 @@ SWFHandlers::ActionInstanceOf(ActionExec& thread)
 void
 SWFHandlers::ActionEnum2(ActionExec& thread)
 {
-    
 
     as_environment& env = thread.env;
-
-    
 
     // Get the object.
     // Copy it so we can override env.top(0)
@@ -3719,10 +3613,7 @@ SWFHandlers::ActionEnum2(ActionExec& thread)
 void
 SWFHandlers::ActionBitwiseAnd(ActionExec& thread)
 {
-    
-
     as_environment& env = thread.env;
-    
 
     int operand1 = env.top(1).to_int();
     int operand2 = env.top(0).to_int();
@@ -3736,7 +3627,6 @@ SWFHandlers::ActionBitwiseOr(ActionExec& thread)
 {
     
     as_environment& env = thread.env;
-    
 
     int operand1 = env.top(1).to_int();
     int operand2 = env.top(0).to_int();
@@ -3748,10 +3638,8 @@ SWFHandlers::ActionBitwiseOr(ActionExec& thread)
 void
 SWFHandlers::ActionBitwiseXor(ActionExec& thread)
 {
-    
 
     as_environment& env = thread.env;
-    
 
     int operand1 = env.top(1).to_int();
     int operand2 = env.top(0).to_int();
@@ -3765,7 +3653,6 @@ SWFHandlers::ActionShiftLeft(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
-    
 
     /// A left shift of more than or equal to the size in
     /// bits of the left operand, or a negative shift, results
@@ -3786,14 +3673,11 @@ SWFHandlers::ActionShiftRight(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
-    
 
     boost::uint32_t amount = env.top(0).to_int();
     boost::int32_t value = env.top(1).to_int();
 
     value = value >> amount;
-
-    //log_debug("%d >> %d == %d", value, amount, res);
 
     env.top(1) = value;
     env.drop(1);
@@ -3804,7 +3688,6 @@ SWFHandlers::ActionShiftRight2(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
-    
 
     boost::uint32_t amount = env.top(0).to_int(); 
     boost::int32_t value = env.top(1).to_int();
@@ -3831,8 +3714,6 @@ SWFHandlers::ActionGreater(ActionExec& thread)
     //GNASH_REPORT_FUNCTION;
 
     as_environment& env = thread.env;
-
-    
 
     as_value& operand1 = env.top(1);
     as_value& operand2 = env.top(0);
@@ -3872,10 +3753,8 @@ SWFHandlers::ActionStringGreater(ActionExec& thread)
 void
 SWFHandlers::ActionExtends(ActionExec& thread)
 {
-    
 
     as_environment& env = thread.env;
-    
 
     as_function* super = env.top(0).to_as_function();
     as_function* sub = env.top(1).to_as_function();
@@ -3908,14 +3787,12 @@ SWFHandlers::ActionExtends(ActionExec& thread)
 void
 SWFHandlers::ActionConstantPool(ActionExec& thread)
 {
-    
     thread.code.process_decl_dict(thread.getCurrentPC(), thread.getNextPC());
 }
 
 void
 SWFHandlers::ActionDefineFunction2(ActionExec& thread)
 {
-    
 
     as_environment& env = thread.env;
     const action_buffer& code = thread.code;
@@ -4150,7 +4027,6 @@ SWFHandlers::ActionWith(ActionExec& thread)
 void
 SWFHandlers::ActionDefineFunction(ActionExec& thread)
 {
-//        GNASH_REPORT_FUNCTION;
 
     as_environment& env = thread.env;
     const action_buffer& code = thread.code;
@@ -4243,11 +4119,8 @@ SWFHandlers::ActionDefineFunction(ActionExec& thread)
 void
 SWFHandlers::ActionSetRegister(ActionExec& thread)
 {
-    
 
     as_environment& env = thread.env;
-
-    
 
     const action_buffer& code = thread.code;
 
