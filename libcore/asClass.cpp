@@ -168,7 +168,6 @@ bool
 asClass::addMethod(string_table::key name, asNamespace* ns, asMethod* method,
 	bool isstatic)
 {
-	log_debug("in add method");
 	as_value val = as_value(new abc_function(method,mPrototype->getVM().getMachine()));
 	mPrototype->init_member(name, val);
 //	int flags = as_prop_flags::readOnly | as_prop_flags::dontDelete

@@ -39,7 +39,7 @@ namespace abc_parsing {
 bool
 abc_Trait::finalize(abc_block *pBlock, asClass *pClass, bool do_static)
 {
-	LOG_DEBUG_ABC("In finalize class name=%s kind=0x%X",pBlock->mStringPool[pClass->getName()],mKind | 0x0);
+	LOG_DEBUG_ABC("In finalize class name=%s trait kind=0x%X",pBlock->mStringPool[pClass->getName()],mKind | 0x0);
 	switch (mKind)
 	{
 	case KIND_SLOT:
@@ -48,7 +48,7 @@ abc_Trait::finalize(abc_block *pBlock, asClass *pClass, bool do_static)
 		// Validate the type.
 		asClass *pType;
 		if (mTypeIndex){
-			LOG_DEBUG_ABC("mTypeIndex = %u\n",mTypeIndex);
+			LOG_DEBUG_ABC("Trait type is %s",pBlock->mStringPool[pBlock->mMultinamePool[mTypeIndex].getABCName()]);
 			pType = pBlock->locateClass(pBlock->mMultinamePool[mTypeIndex]);
 		}
 		else{
@@ -61,11 +61,14 @@ abc_Trait::finalize(abc_block *pBlock, asClass *pClass, bool do_static)
 		}
 		// The name has been validated in read.
 		if (mHasValue){
+			LOG_DEBUG_ABC("Adding value to class not implemented.");
+			break;
 			pClass->addValue(mName, mNamespace, mSlotId, pType, 
 				mValue, mKind == KIND_CONST, do_static);
 			}
 		else{
-			LOG_DEBUG_ABC("In finalize.C");
+			LOG_DEBUG_ABC("Adding slot value to class not implemented.");
+			break;
 			pClass->addSlot(mName, mNamespace, mSlotId, pType,
 				do_static);
 			}
@@ -78,12 +81,14 @@ abc_Trait::finalize(abc_block *pBlock, asClass *pClass, bool do_static)
 	}
 	case KIND_GETTER:
 	{
+		LOG_DEBUG_ABC("Finalize getter not implemented.");
 		break;
 		pClass->addGetter(mName, mNamespace, mMethod, do_static);
 		break;
 	}
 	case KIND_SETTER:
 	{
+		LOG_DEBUG_ABC("Finalize setter not implemented.");
 		break;
 		pClass->addSetter(mName, mNamespace, mMethod, do_static);
 		break;
@@ -98,6 +103,7 @@ abc_Trait::finalize(abc_block *pBlock, asClass *pClass, bool do_static)
 	}
 	case KIND_FUNCTION:
 	{
+		LOG_DEBUG_ABC("Finalize function not implemented.");
 		break;
 		pClass->addSlotFunction(mName, mNamespace, mSlotId, mMethod, do_static);
 		break;
