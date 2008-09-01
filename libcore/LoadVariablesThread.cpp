@@ -27,6 +27,7 @@
 #include "utf8.h"
 
 #include <string>
+#include <boost/scoped_array.hpp>
 
 //#define DEBUG_LOAD_VARIABLES 1
 
@@ -39,7 +40,6 @@ LoadVariablesThread::completeLoad()
 	log_debug("completeLoad called");
 #endif
 
-	using std::string;
 
 	// TODO: how to set _bytesTotal ?
 
@@ -48,57 +48,62 @@ LoadVariablesThread::completeLoad()
 	_bytesLoaded = 0;
 	_bytesTotal = _stream->size();
 
-	string toparse;
+	std::string toparse;
 
-	size_t CHUNK_SIZE = 1024;
-	char* buf = new char[CHUNK_SIZE];
+	const size_t chunkSize = 1024;
+	boost::scoped_array<char> buf(new char[chunkSize]);
 	unsigned int parsedLines = 0;
 	// TODO: use read_string ?
-	while ( size_t read = _stream->read(buf, CHUNK_SIZE) )
+	while ( size_t bytesRead = _stream->read(buf.get(), chunkSize) )
 	{
 #ifdef DEBUG_LOAD_VARIABLES
-		log_debug("Read %u bytes", read);
+		log_debug("Read %u bytes", bytesRead);
 #endif
 
 		if ( _bytesLoaded )
 		{
-			string chunk(buf, read);
+			std::string chunk(buf.get(), bytesRead);
 			toparse += chunk;
 		}
 		else
 		{
-			size_t dataSize = read;
+			size_t dataSize = bytesRead;
 			utf8::TextEncoding encoding;
-			char* ptr = utf8::stripBOM(buf, dataSize, encoding);
-			if ( encoding != utf8::encUTF8 && encoding != utf8::encUNSPECIFIED )
+			char* ptr = utf8::stripBOM(buf.get(), dataSize,
+					encoding);
+			if ( encoding != utf8::encUTF8 &&
+			     encoding != utf8::encUNSPECIFIED )
 			{
-				log_unimpl("%s to utf8 conversion in MovieClip.loadVariables input parsing", utf8::textEncodingName(encoding));
+				log_unimpl("%s to utf8 conversion in "
+					    "MovieClip.loadVariables "
+					    "input parsing",
+					    utf8::textEncodingName(encoding));
 			}
-			string chunk(ptr, dataSize);
+			std::string chunk(ptr, dataSize);
 			toparse += chunk;
 		}
 
 #ifdef DEBUG_LOAD_VARIABLES
-		log_debug("toparse: %s", toparse.c_str());
+		log_debug("toparse: %s", toparse);
 #endif
 
 		// parse remainder
 		size_t lastamp = toparse.rfind('&');
-		if ( lastamp != string::npos )
+		if ( lastamp != std::string::npos )
 		{
-			string parseable = toparse.substr(0, lastamp);
+			std::string parseable = toparse.substr(0, lastamp);
 #ifdef DEBUG_LOAD_VARIABLES
-			log_debug("parseable: %s", parseable.c_str());
+			log_debug("parseable: %s", parseable);
 #endif
 			parse(parseable);
 			toparse = toparse.substr(lastamp+1);
 #ifdef DEBUG_LOAD_VARIABLES
-			log_debug("toparse nextline: %s", toparse.c_str());
+			log_debug("toparse nextline: %s", toparse);
 #endif
 			++parsedLines;
 		}
 
-		_bytesLoaded += read;
+		_bytesLoaded += bytesRead;
 		//dispatchDataEvent();
 
 		// eof, get out !
@@ -127,7 +132,6 @@ LoadVariablesThread::completeLoad()
 	}
 
 	//dispatchLoadEvent();
-	delete[] buf;
 	setCompleted();
 }
 

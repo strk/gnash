@@ -429,7 +429,7 @@ public:
     return new agg_bitmap_info<agg::pixfmt_rgb24_pre> (0, 0, 0, &dummy, 24);
   }
 
-  void drawVideoFrame(image::ImageBase* baseframe, const matrix* source_mat, 
+  void drawVideoFrame(image::ImageBase* frame, const matrix* source_mat, 
     const rect* bounds) {
   
     // NOTE: Assuming that the source image is RGB 8:8:8
@@ -444,12 +444,15 @@ public:
     
     // TODO: Maybe implement specialization for 1:1 scaled videos
     
+    if (frame->type() == GNASH_IMAGE_RGBA)
+    {
+        LOG_ONCE(log_error(_("Can't render videos with alpha")));
+        return;
+    }
       
     typedef agg::pixfmt_rgb24_pre baseformat;
-    
-    image::ImageRGB* frame = dynamic_cast<image::ImageRGB*>(baseframe);
 
-    assert(frame);
+    assert(frame->type() == GNASH_IMAGE_RGB);
     
     matrix mat = stage_matrix;
     mat.concatenate(*source_mat);

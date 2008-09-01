@@ -334,6 +334,14 @@ bool FLVParser::parseNextTag()
 	{
 		// 1:keyframe, 2:interlacedFrame, 3:disposableInterlacedFrame
 		int frameType = (tag[11] & 0xf0) >> 4;
+
+		boost::uint16_t codec = (tag[11] & 0x0f) >> 0;
+
+        if (codec == VIDEO_CODEC_VP6 || codec == VIDEO_CODEC_VP6A)
+        {
+            _stream->read_byte();
+            --bodyLength;
+        }
 		
 		if ( doIndex )
 		{
@@ -358,7 +366,6 @@ bool FLVParser::parseNextTag()
 		// video format has been noted, so we do that now
 		if ( ! _videoInfo.get() )
 		{
-			boost::uint16_t codec = (tag[11] & 0x0f) >> 0;
 			// Set standard guessed size...
 			boost::uint16_t width = 320;
 			boost::uint16_t height = 240;

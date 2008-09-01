@@ -92,7 +92,8 @@ VM::VM(movie_definition& topmovie, VirtualClock& clock)
 	_swfurl(topmovie.get_url()),
 	mClassHierarchy(0),
 	mMachine(0),
-	_clock(clock)
+	_clock(clock),
+	_stack()
 {
 	_clock.restart();
 	assert(!_swfurl.empty());

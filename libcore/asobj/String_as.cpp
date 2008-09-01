@@ -804,11 +804,12 @@ void string_class_init(as_object& global)
 boost::intrusive_ptr<as_object>
 init_string_instance(const std::string& val)
 {
-	// TODO: get the environment passed in !!
-	as_environment env;
-
 	// TODO: get VM from the environment ?
 	VM& vm = VM::get();
+
+	// TODO: get the environment passed in !!
+	as_environment env(vm);
+
 	int swfVersion = vm.getSWFVersion();
 
 	boost::intrusive_ptr<as_function> cl;
@@ -844,9 +845,11 @@ init_string_instance(const std::string& val)
 #ifndef NDEBUG
 	size_t prevStackSize = env.stack_size();
 #endif
-	env.push(val);
-	boost::intrusive_ptr<as_object> ret = cl->constructInstance(env, 1, 0);
-	env.drop(1);
+
+	std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
+	args->push_back(val);
+	boost::intrusive_ptr<as_object> ret = cl->constructInstance(env, args);
+
 #ifndef NDEBUG
 	assert( prevStackSize == env.stack_size());
 #endif

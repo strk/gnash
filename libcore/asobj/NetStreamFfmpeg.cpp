@@ -45,14 +45,6 @@
 #include <boost/scoped_array.hpp>
 #include <algorithm> // std::min
 
-
-#if defined(_WIN32) || defined(WIN32)
-# include <windows.h>	// for sleep()
-# define usleep(x) Sleep(x/1000)
-#else
-# include "unistd.h" // for usleep()
-#endif
-
 /// Define this to add debugging prints for locking
 //#define GNASH_DEBUG_THREADS
 
@@ -207,9 +199,13 @@ NetStreamFfmpeg::initVideoDecoder(media::MediaParser& parser)
 
 	assert ( _mediaHandler ); // caller should check this
 
-	_videoDecoder = _mediaHandler->createVideoDecoder(*videoInfo);
-	if ( ! _videoDecoder.get() )
-		log_error(_("Could not create video decoder for codec %d"), videoInfo->codec);
+    try {
+	    _videoDecoder = _mediaHandler->createVideoDecoder(*videoInfo);
+	}
+	catch (MediaException& e) {
+	    log_error("Could not create Video decoder: %s", e.what());
+	}
+
 }
 
 

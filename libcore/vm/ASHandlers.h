@@ -65,8 +65,6 @@ public:
                   action_callback_t func);
     ActionHandler(action_type type, std::string name, 
                   action_callback_t func, as_arg_t format);
-    ActionHandler(action_type type, std::string name, 
-                  action_callback_t func, as_arg_t format, int nargs);
 
     /// Execute the action
     void execute(ActionExec& thread) const;
@@ -74,14 +72,12 @@ public:
     void toggleDebug(bool state) const { _debug = state; }
     action_type getType()   const { return _type; }
     std::string getName()   const { return _name; }
-    int getNumArgs()        const { return _stack_args; }
     as_arg_t getArgFormat() const { return _arg_format; }
 private:
     action_type       _type;
     std::string       _name;
     action_callback_t _callback;
     mutable bool      _debug;
-    int               _stack_args; // the number of args to pop from the stack
     as_arg_t          _arg_format;
 };
 

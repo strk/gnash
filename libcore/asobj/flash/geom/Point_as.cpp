@@ -127,7 +127,7 @@ Point_add(const fn_call& fn)
 			log_aserror("Point.add(%s): %s", ss.str(), _("arguments after first discarded"));
 		}
 		);
-		as_value& arg1 = fn.arg(0);
+		const as_value& arg1 = fn.arg(0);
 		as_object* o = arg1.to_object().get();
 		if ( ! o )
 		{
@@ -196,7 +196,7 @@ Point_equals(const fn_call& fn)
 		return as_value(false);
 	}
 
-	as_value& arg1 = fn.arg(0);
+	const as_value& arg1 = fn.arg(0);
 	if ( ! arg1.is_object() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -332,7 +332,7 @@ Point_subtract(const fn_call& fn)
 			log_aserror("Point.add(%s): %s", ss.str(), _("arguments after first discarded"));
 		}
 		);
-		as_value& arg1 = fn.arg(0);
+		const as_value& arg1 = fn.arg(0);
 		as_object* o = arg1.to_object().get();
 		if ( ! o )
 		{
@@ -434,7 +434,7 @@ Point_distance(const fn_call& fn)
 	}
 	);
 
-	as_value& arg1 = fn.arg(0);
+	const as_value& arg1 = fn.arg(0);
 	if ( ! arg1.is_object() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -454,7 +454,7 @@ Point_distance(const fn_call& fn)
 		return as_value();
 	}
 
-	as_value& arg2 = fn.arg(1);
+	const as_value& arg2 = fn.arg(1);
 	as_object* o2 = arg2.to_object().get();
 	assert(o2);
 	// it seems there's no need to check arg2 (see actionscript.all/Point.as)
@@ -514,7 +514,7 @@ Point_interpolate(const fn_call& fn)
 		}
 		);
 
-		as_value& p0val = fn.arg(0);
+		const as_value& p0val = fn.arg(0);
 		as_object* p0 = p0val.to_object().get();
 		if ( ! p0 )
 		{
@@ -529,7 +529,7 @@ Point_interpolate(const fn_call& fn)
 			p0->get_member(NSV::PROP_Y, &y0val);
 		}
 
-		as_value& p1val = fn.arg(1);
+		const as_value& p1val = fn.arg(1);
 		as_object* p1 = p1val.to_object().get();
 		if ( ! p1 )
 		{

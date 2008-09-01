@@ -466,6 +466,7 @@ character::width_getset(const fn_call& fn)
 		}
 
 		const double newwidth = PIXELS_TO_TWIPS(fn.arg(0).to_number());
+
 		if ( newwidth <= 0 )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
@@ -474,7 +475,7 @@ character::width_getset(const fn_call& fn)
 			);
 		}
 
-		ptr->set_x_scale( newwidth / oldwidth );
+		ptr->set_x_scale( 100 * (newwidth / oldwidth) );
 	}
 	return rv;
 }
@@ -654,7 +655,7 @@ character::add_event_handler(const event_id& id, const action_buffer& code)
 {
 	_event_handlers[id].push_back(&code);
 
-	//log_debug(_("Setting handler for event %s"), id.get_function_name().c_str());
+	//log_debug(_("Setting handler for event %s"), id);
 
 	// Set the character as a listener iff the
 	// kind of event is a KEY or MOUSE one 

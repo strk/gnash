@@ -27,20 +27,13 @@
 #include "types.h"
 #include "smart_ptr.h"
 
+#include <vector>
+#include <memory>
+
 namespace gnash {
-	class sprite_instance;
 	class as_environment;
 	class as_object;
 	class as_value;
-	class swf_function;
-
-
-	class DSOLOCAL as_property_interface
-	{
-	public:
-		virtual ~as_property_interface() {}
-		virtual bool set_property(int index, const as_value& val) = 0;
-	};
 
 	//
 	// Some handy helpers
@@ -54,14 +47,9 @@ namespace gnash {
 	/// This is a thin wrapper around operator() and fn_call,
 	/// probably worth dropping.
 	///
-	/// first_arg_bottom_index is the stack index, from the bottom,
-	/// of the first argument.  Subsequent arguments are at *lower*
-	/// indices.  E.g. if first_arg_bottom_index = 7, then arg1 is
-	/// at env->bottom(7), arg2 is at env->bottom(6), etc.
-	///
 	DSOEXPORT as_value call_method(const as_value& method, as_environment* env,
 		as_object* this_ptr, // this is ourself
-		int nargs, int first_arg_bottom_index, as_object* super=NULL);
+		std::auto_ptr<std::vector<as_value> > args, as_object* super=NULL);
 
 
 }	// end namespace gnash

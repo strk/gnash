@@ -369,10 +369,10 @@ public:
         size_t prevStackSize = _env.stack_size();
 #endif
 
-        _env.push(a);
-        _env.push(b);
-        ret = call_method(cmp_method, &_env, _object, 2, _env.stack_size()-1);
-        _env.drop(2);
+	std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
+	args->push_back(b);
+	args->push_back(a);
+        ret = call_method(cmp_method, &_env, _object, args);
 
 #ifndef NDEBUG
         assert(prevStackSize == _env.stack_size());

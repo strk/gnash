@@ -319,15 +319,6 @@ as_value::to_primitive(type hint) const
             // and many swfdec tests, with no new failures (though
             // perhaps we aren't testing enough).
             return as_value();
-            
-//			if ( (!obj->get_member(NSV::PROP_TO_STRING, &method)) || (!method.is_object()) ) // ECMA says ! is_object()
-//			{
-//#if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
-//				log_debug(" toString not found");
-//#endif
-//                
-//				throw ActionTypeError();
-//			}
 		}
 	}
 	else
@@ -378,7 +369,7 @@ as_value::to_primitive(type hint) const
 
 	assert(obj);
 
-	as_environment env;
+	as_environment env(obj->getVM());
 	as_value ret = call_method0(method, &env, obj);
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
 	log_debug("to_primitive: method call returned %s", ret);
@@ -480,7 +471,7 @@ as_value::convert_to_primitive(type hint)
 
 	assert(obj);
 
-	as_environment env;
+	as_environment env(obj->getVM());
 	as_value ret = call_method0(method, &env, obj);
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
 	log_debug("to_primitive: method call returned %s", ret);
@@ -525,9 +516,7 @@ as_value::to_number() const
             {
                 // For SWF4, any valid number before non-numerical
                 // characters is returned, including exponent, positive
-                // and negative signs and whitespace before. A stringstream
-                // does the job. Locale differences (decimal separator) arise
-                // with strtod.                
+                // and negative signs and whitespace before.
                 double d = 0;
                 std::istringstream is (getStr());
                 is >> d;
@@ -634,11 +623,11 @@ as_value::to_int() const
 
     if (d < 0)
     {   
-	    i = - static_cast<boost::uint32_t>(std::fmod (-d, 4294967296.0));
+	    i = - static_cast<boost::uint32_t>(std::fmod(-d, 4294967296.0));
     }
     else
     {
-	    i = static_cast<boost::uint32_t>(std::fmod (d, 4294967296.0));
+	    i = static_cast<boost::uint32_t>(std::fmod(d, 4294967296.0));
     }
     
     return i;
@@ -816,11 +805,11 @@ as_function*
 as_value::to_as_function() const
 {
     if (m_type == AS_FUNCTION) {
-	// OK.
-	return getFun().get();
-    } else {
-	return NULL;
+	    // OK.
+	    return getFun().get();
     }
+
+    return NULL;
 }
 
 // Force type to number.
@@ -1167,7 +1156,9 @@ as_value::typeOf() const
 
 		default:
 			if (is_exception())
+			{
 				return "exception";
+		    }
 			abort();
 			return NULL;
 	}
@@ -1214,7 +1205,9 @@ as_value::equalsSameType(const as_value& v) const
 		}
 		default:
 			if (is_exception())
+			{
 				return false; // Exceptions equal nothing.
+		    }
 
 	}
 	abort();
@@ -1290,9 +1283,10 @@ as_value::toDebugString() const
 		}
 		default:
 			if (is_exception())
+			{
 				return "[exception]";
+			}
 			abort();
-			return "[invalid type]";
 	}
 }
 
@@ -1399,7 +1393,6 @@ as_value::doubleToString(double val, int radix)
 	// but that may just be a better compiler.
 
 	// Handle non-numeric values.
-	// "printf" gives "nan", "inf", "-inf", so we check explicitly
 	if(isNaN(val))
 	{
 		return "NaN";
@@ -1418,11 +1411,11 @@ as_value::doubleToString(double val, int radix)
 
 	if ( radix == 10 )
 	{
-		// ActionScript always expects dot as decimal point?
-		ostr.imbue(std::locale("C")); 
+		// ActionScript always expects dot as decimal point.
+		ostr.imbue(std::locale::classic()); 
 		
 		// force to decimal notation for this range (because the reference player does)
-		if (fabs(val) < 0.0001 && fabs(val) >= 0.00001)
+		if (std::abs(val) < 0.0001 && std::abs(val) >= 0.00001)
 		{
 			// All nineteen digits (4 zeros + up to 15 significant digits)
 			ostr << std::fixed << std::setprecision(19) << val;
@@ -1434,9 +1427,7 @@ as_value::doubleToString(double val, int radix)
 			if (pos != std::string::npos) {
 				str.erase(pos + 1);
 			}
-			
 		}
-		
 		else
 		{
 			ostr << std::setprecision(15) << val;
@@ -1449,26 +1440,27 @@ as_value::doubleToString(double val, int radix)
 			if (pos != std::string::npos && str.at(pos + 2) == '0') {
 				str.erase(pos + 2, 1);
 			}
-			
 		}
-	}
-	else
-	{
-		bool negative = (val < 0);
-		if ( negative ) val = -val;
 
-		double left = floor(val);
-		if ( left < 1 ) return "0";
-		while ( left != 0 )
-		{
-			double n = left;
-			left = floor(left/radix);
-			n -= (left*radix);
-			//str = std::string(n < 10 ? ((int)n+'0') : ((int)n+('a'-10))) + str;
-			str.insert(0, 1, (n < 10 ? ((int)n+'0') : ((int)n+('a'-10))));
-		}
-		if ( negative ) str.insert(0, 1, '-'); 
+        return str;
+
 	}
+
+    // Radix isn't 10
+
+	bool negative = (val < 0);
+	if ( negative ) val = -val;
+
+	double left = std::floor(val);
+	if ( left < 1 ) return "0";
+	while ( left != 0 )
+	{
+		double n = left;
+		left = std::floor(left / radix);
+		n -= (left * radix);
+		str.insert(0, 1, (n < 10 ? ((int)n+'0') : ((int)n+('a'-10))));
+	}
+	if ( negative ) str.insert(0, 1, '-'); 
 
 	return str;
 	
@@ -1700,9 +1692,9 @@ as_value::newAdd(const as_value& op2)
 }
 
 as_value
-as_value::newLessThan(const as_value& op2_in)
+as_value::newLessThan(const as_value& op2_in) const
 {
-    as_value& op1_in = *this;
+    const as_value& op1_in = *this;
 
     as_value operand1;
     as_value operand2;
@@ -1738,7 +1730,7 @@ as_value::newLessThan(const as_value& op2_in)
         }
         else
         {
-            ret.set_bool(op1<op2);
+            ret.set_bool(op1 < op2);
         }
     }
     return ret;

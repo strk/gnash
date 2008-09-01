@@ -28,7 +28,6 @@
 #include "builtin_function.h"
 #include "VM.h" // for getPlayerVersion() 
 #include "Object.h" // for getObjectInterface
-#include "action.h" // for call_method
 #include "namedStrings.h"
 
 #include <boost/algorithm/string/case_conv.hpp> // for PROPNAME
@@ -57,8 +56,7 @@ public:
 
 	/// @param eName name of event, will be converted to lowercase if needed
 	///
-	/// @param env Environment to use for marhalling and functions invocation.
-	///	   Note that visit() will push values on it !
+	/// @param env Environment to use for functions invocation.
 	///
 	BroadcasterVisitor(const fn_call& fn)
 		:
@@ -159,7 +157,7 @@ AsBroadcaster::initialize_method(const fn_call& fn)
 	}
 
 	// TODO: check if automatic primitive to object conversion apply here
-	as_value& tgtval = fn.arg(0);
+	const as_value& tgtval = fn.arg(0);
 	if ( ! tgtval.is_object() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(

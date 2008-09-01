@@ -81,7 +81,7 @@ libgnashasobjs_la_SOURCES = \
 	xml.cpp \
 	xmlattrs.cpp \
 	xmlnode.cpp \
-	xmlsocket.cpp \
+	XMLSocket_as.cpp \
 	flash/display/BitmapData_as.cpp \
 	flash/display/MovieClip_as.cpp \
 	flash/display_pkg.cpp \
@@ -158,7 +158,7 @@ noinst_HEADERS = \
 	TextSnapshot.h \
 	String_as.h \
 	xml.h \
-	xmlsocket.h \
+	XMLSocket_as.h \
 	xmlattrs.h \
 	xmlnode.h \
 	flash/display/BitmapData_as.h \

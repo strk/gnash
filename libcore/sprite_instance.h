@@ -569,44 +569,7 @@ public:
         int newdepth, as_object* init_object=NULL);
         
     /// Dispatch event handler(s), if any.
-    virtual bool    on_event(const event_id& id);
-
-
-    /// Do the events that (appear to) happen as the movie
-    /// loads.  frame1 tags and actions are executed (even
-    /// before advance() is called).  Then the onLoad event
-    /// is triggered.
-
-//  virtual void    on_event_load()
-//  {
-//      execute_frame_tags(0);
-//      do_actions();
-//      on_event(event_id::LOAD);
-//  }
-
-    /// Do the events that happen when there is XML data waiting
-    /// on the XML socket connection.
-    /// FIXME: unimplemented
-    virtual void    on_event_xmlsocket_onxml()
-    {
-        log_debug("FIXME: %s: unimplemented\n", __FUNCTION__);
-        on_event(event_id::SOCK_XML);
-    }
-        
-    /// Do the events that (appear to) happen on a
-    /// specified interval.
-    virtual void    on_event_interval_timer()
-    {
-        log_debug("FIXME: %s: unimplemented\n", __FUNCTION__);
-        on_event(event_id::TIMER);
-    }
-
-    /// Do the events that happen as a MovieClip (swf 7 only) loads.
-    virtual void    on_event_load_progress()
-    {
-        log_debug("FIXME: %s: unimplemented\n", __FUNCTION__);
-        on_event(event_id::LOAD_PROGRESS);
-    }
+    virtual bool on_event(const event_id& id);
 
     // inherited from character class, see dox in character.h
     as_environment& get_environment() {

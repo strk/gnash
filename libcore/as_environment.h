@@ -23,6 +23,7 @@
 #include "as_value.h" // for composition (vector + frame_slot)
 #include "StringPredicates.h" // for Variables 
 #include "as_object.h"
+#include "SafeStack.h"
 
 #include <map> // for composition (Variables)
 #include <string> // for frame_slot name
@@ -33,27 +34,30 @@ namespace gnash {
 
 // Forward declarations
 class character;
-//class with_stack_entry;
+class VM;
 
 /// ActionScript execution environment.
 class as_environment
 {
+
 public:
 
 	/// A stack of objects used for variables/members lookup
 	//typedef std::vector<with_stack_entry> ScopeStack;
 	typedef std::vector< boost::intrusive_ptr<as_object> > ScopeStack;
 
-	/// Stack of as_values in this environment
-	std::vector<as_value>	m_stack;
+	/// The variables container (case-insensitive)
+	typedef std::map<std::string, as_value, StringNoCaseLessThen> Variables;
 
-	as_environment()
-		:
-		m_stack(),
-		m_target(0),
-		_original_target(0)
-	{
-	}
+	/// The locals container 
+	//typedef std::vector<frame_slot>	LocalVars;
+	typedef boost::intrusive_ptr<as_object> LocalVars;
+
+	typedef std::vector<as_value> Registers;
+
+	as_environment(VM& vm);
+
+	VM& getVM() { return _vm; }
 
 	character* get_target() { return m_target; }
 
@@ -78,46 +82,71 @@ public:
 	/// Push a value on the stack
 	void	push(const as_value& val)
 	{
-		m_stack.push_back(val);
+		_stack.push(val);
 	}
 
 
 	/// Pops an as_value off the stack top and return it.
 	as_value pop()
 	{
-		assert( ! m_stack.empty() );
-		as_value result = m_stack.back();
-		m_stack.pop_back();
-		return result;
+		try {
+			return _stack.pop();
+		} catch (StackException&) {
+			return undefVal;
+		}
+		//assert( ! _stack.empty() );
+		//as_value result = m_stack.back();
+		//m_stack.pop_back();
+		//return result;
 	}
 
 	/// Get stack value at the given distance from top.
 	//
 	/// top(0) is actual stack top
 	///
+	/// Throw StackException if index is out of range
+	///
 	as_value& top(size_t dist)
 	{
-		size_t ssize = m_stack.size();
-		assert ( ssize > dist );
-		return m_stack[ssize - 1 - dist];
+		try {
+			return _stack.top(dist);
+		} catch (StackException&) {
+			return undefVal;
+		}
+		//size_t ssize = m_stack.size();
+		//assert ( ssize > dist );
+		//return m_stack[ssize - 1 - dist];
 	}
 
 	/// Get stack value at the given distance from bottom.
 	//
 	/// bottom(stack_size()-1) is actual stack top
 	///
+	/// Throw StackException if index is out of range
+	///
 	as_value& bottom(size_t index)
 	{
-		assert ( m_stack.size() > index );
-		return m_stack[index];
+		try {
+			return _stack.value(index);
+		} catch (StackException&) {
+			return undefVal;
+		}
+		//assert ( m_stack.size() > index );
+		//return m_stack[index];
 	}
 
 	/// Drop 'count' values off the top of the stack.
+	//
+	/// Throw StackException if there's not enough to drop
+	///
 	void drop(size_t count)
 	{
-		size_t ssize = m_stack.size();
-		assert ( ssize >= count );
-		m_stack.resize(ssize - count);
+		// in case count > stack size, just drop all, forget about
+		// exceptions...
+		_stack.drop(std::min(count, _stack.size()));
+		//size_t ssize = m_stack.size();
+		//assert ( ssize >= count );
+		//m_stack.resize(ssize - count);
 	}
 
 	/// Insert 'count' undefined values before 'offset'.
@@ -127,13 +156,7 @@ public:
 	///
 	void padStack(size_t offset, size_t count);
 
-	/// Returns index of top stack element
-	// FIXME: what if stack is empty ??
-	// I'd obsolete this and convert calling code to use
-	// stack_size() instead.
-	int	get_top_index() const { return m_stack.size() - 1; }
-
-	size_t stack_size() const { return m_stack.size(); }
+	size_t stack_size() const { return _stack.size(); }
 
 	/// @}  stack access/manipulation
 	///
@@ -473,15 +496,6 @@ public:
 	///
 	bool parse_path(const std::string& var_path, as_object** target, as_value& val);
 
-	/// The variables container (case-insensitive)
-	typedef std::map<std::string, as_value, StringNoCaseLessThen> Variables;
-
-	/// The locals container 
-	//typedef std::vector<frame_slot>	LocalVars;
-	typedef boost::intrusive_ptr<as_object> LocalVars;
-
-	typedef std::vector<as_value> Registers;
-
 	struct CallFrame
 	{
 		CallFrame(as_function* funcPtr);
@@ -534,10 +548,16 @@ public:
 
 private:
 
+	VM& _vm;
+
+	/// Stack of as_values in this environment
+	//std::vector<as_value>	m_stack;
+	SafeStack<as_value>&	_stack;
+
 	static const short unsigned int numGlobalRegisters = 4;
 
 	typedef std::vector<CallFrame> CallStack;
-		
+
 	static CallStack _localFrames;
 
 	as_value m_global_register[numGlobalRegisters];
@@ -559,13 +579,13 @@ private:
 	/// @param func
 	///	The function being called
 	///
-	static DSOEXPORT void pushCallFrame(as_function* func);
+	static void pushCallFrame(as_function* func);
 
 	/// Remove current call frame from the stack
 	//
 	/// This should happen when an ActionScript function returns.
 	///
-	static DSOEXPORT void popCallFrame();
+	static void popCallFrame();
 	
 	/// Return the (possibly UNDEFINED) value of the named variable.
 	//
@@ -668,6 +688,8 @@ private:
 	///
 	static bool setLocal(LocalVars& locals, const std::string& varname, const as_value& val);
 
+	static as_value undefVal;
+		
 };
 
 

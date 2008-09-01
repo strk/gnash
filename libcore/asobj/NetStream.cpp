@@ -413,28 +413,13 @@ attachNetStreamInterface(as_object& o)
 	// Properties
 	// TODO: attach to each instance rather then to the class ? check it ..
 
-	as_c_function_ptr gettersetter;
-
-	gettersetter = &netstream_time;
-	o.init_readonly_property("time", *gettersetter);
-
-	gettersetter = &netstream_bytesloaded;
-	o.init_readonly_property("bytesLoaded", *gettersetter);
-
-	gettersetter = &netstream_bytestotal;
-	o.init_readonly_property("bytesTotal", *gettersetter);
-
-	gettersetter = &netstream_currentFPS;
-	o.init_readonly_property("currentFps", *gettersetter);
-
-	gettersetter = &netstream_bufferLength;
-	o.init_readonly_property("bufferLength", *gettersetter);
-
-	gettersetter = &netstream_bufferTime;
-	o.init_readonly_property("bufferTime", *gettersetter);
-
-	gettersetter = &netstream_liveDelay;
-	o.init_readonly_property("liveDelay", *gettersetter);
+	o.init_readonly_property("time", &netstream_time);
+	o.init_readonly_property("bytesLoaded", &netstream_bytesloaded);
+	o.init_readonly_property("bytesTotal", &netstream_bytestotal);
+	o.init_readonly_property("currentFps", &netstream_currentFPS);
+	o.init_readonly_property("bufferLength", &netstream_bufferLength);
+	o.init_readonly_property("bufferTime", &netstream_bufferTime);
+	o.init_readonly_property("liveDelay", &netstream_liveDelay);
 
 }
 

@@ -219,7 +219,7 @@ PlaceObject2Tag::readPlaceActions(SWFStream& in)
                     action_buffer* thisAction = _actionBuffers.back();
                     std::auto_ptr<swf_event> ev ( new swf_event(s_code_bits[i], *thisAction) );
                     IF_VERBOSE_PARSE (
-                    log_parse("---- actions for event %s", ev->event().get_function_name().c_str());
+                    log_parse("---- actions for event %s", ev->event());
                     );
     
                     if (i == 17)    // has KeyPress event
@@ -227,7 +227,7 @@ PlaceObject2Tag::readPlaceActions(SWFStream& in)
                         ev->event().setKeyCode(ch);
                     }
     
-                    m_event_handlers.push_back(ev.release());
+                    _eventHandlers.push_back(ev.release());
                 }
             }
         }
@@ -411,12 +411,32 @@ PlaceObject2Tag::readPlaceObject3(SWFStream& in)
     {
         Filters v; // TODO: Attach the filters to the display object.
         filter_factory::read(in, true, &v);
+	// at time of writing no renderer supports bitmap filters
+	LOG_ONCE( log_unimpl("Bitmap filters") );
     }
 
     if ( hasBlendMode() )
     {
         in.ensureBytes(1);
         blend_mode = in.read_u8();
+	// 0 or 1 : normal
+	// 2 : layer
+	// 3 : multiply
+	// 4 : screen
+	// 5 : lighten
+	// 6 : darken
+	// 7 : add
+	// 8 : subtract
+	// 9 : difference
+	// 10 : invert
+	// 11 : alpha
+	// 12 : erase
+	// 13 : overlay
+	// 14 : hardlight
+	// 15 to 255 reserved	
+	//
+	// at time of writing no renderer supports blend modes
+	LOG_ONCE( log_unimpl("Blend mode") );
     }
 
     if ( hasBitmapCaching() )
@@ -425,6 +445,8 @@ PlaceObject2Tag::readPlaceObject3(SWFStream& in)
         // is broken, it is probably here!
         in.ensureBytes(1);
         bitmask = in.read_u8();
+	// at time of writing no renderer supports bitmap caching 
+	LOG_ONCE( log_unimpl("Bitmap caching") );
     }
 
     if ( hasClipActions() )
@@ -498,18 +520,22 @@ PlaceObject2Tag::execute(sprite_instance* m, DisplayList& dlist) const
     }
 }
 
+
+/// Use to delete pointers efficiently with std::for_each,
+/// making sure that the type is complete.
+template<typename T>
+static void deleterHelper(T p)
+{
+    delete p;
+}
+
 PlaceObject2Tag::~PlaceObject2Tag()
 {
+    std::for_each(_eventHandlers.begin(), _eventHandlers.end(),
+                 &deleterHelper<EventHandlers::value_type>);
 
-    for(size_t i=0; i<m_event_handlers.size(); ++i)
-    {
-        delete m_event_handlers[i];
-    }
-
-    for(size_t i=0; i<_actionBuffers.size(); ++i)
-    {
-        delete _actionBuffers[i];
-    }
+    std::for_each(_actionBuffers.begin(), _actionBuffers.end(),
+                 &deleterHelper<ActionBuffers::value_type>);
 }
 
 /* public static */

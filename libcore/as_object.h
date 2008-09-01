@@ -34,13 +34,10 @@
 #include "GnashException.h"
 #include "event_id.h" // for event_id
 
-#if defined(__GNUC__) && __GNUC__ > 2
-#  include <cxxabi.h>
-#endif
-
 #include <cmath>
 #include <utility> // for std::pair
 #include <set>
+#include <sstream>
 
 // Forward declarations
 namespace gnash {
@@ -224,10 +221,12 @@ public:
 	/// The default implementation converts the text value
 	/// to a number, override for a more performant implementation
 	///
-	virtual double get_numeric_value() const {
-		std::string txt = get_text_value();
-		if ( ! txt.empty() ) return atof(txt.c_str());
-		else return 0; 
+	virtual double get_numeric_value() const
+	{
+		double d = 0;
+		std::istringstream is(get_text_value());
+		is >> d;
+		return d;
 	}
 
 	/// Return the "primitive" value of this object

@@ -15,8 +15,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef __XML_H__
-#define __XML_H__
+#ifndef GNASH_ASOBJ_XML_H
+#define GNASH_ASOBJ_XML_H
 
 #include "action.h"
 #include "LoadThread.h"
@@ -41,7 +41,7 @@ class URL;
 class LoaderThread;
 
 /// XML class and ActionScript object
-class DSOLOCAL XML : public XMLNode
+class XML : public XMLNode
 {
 public:
 
@@ -184,12 +184,6 @@ private:
 
     Status      _status;	
 
-    /// Trigger the onLoad event, if any
-    void onLoadEvent(bool success, as_environment& env);
-
-    /// Trigger the onClose event, if any
-    void onCloseEvent(as_environment& env);
-  
     /// Initialize an XMLNode from an xmlNodePtr
     //
     /// @param element

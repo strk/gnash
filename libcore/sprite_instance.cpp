@@ -709,7 +709,7 @@ static as_value sprite_load_movie(const fn_call& fn)
   bool sendVars = false;
   if (fn.nargs > 1)
   {
-	as_value arg = fn.arg(1);
+	const as_value& arg = fn.arg(1);
 	std::string methodString = arg.to_string();
 	boost::to_lower(methodString);
 	if ( methodString == "post" ) 
@@ -838,7 +838,7 @@ static as_value sprite_hit_test(const fn_call& fn)
   {
     case 1: // target
     {
-      as_value& tgt_val = fn.arg(0);
+      const as_value& tgt_val = fn.arg(0);
       character* target = fn.env().find_target(tgt_val.to_string());
       if ( ! target )
       {
@@ -1005,7 +1005,7 @@ sprite_meth(const fn_call& fn)
 
   if ( ! fn.nargs ) return as_value(0); // optimization ...
 
-  as_value v = fn.arg(0);
+  const as_value& v = fn.arg(0);
   boost::intrusive_ptr<as_object> o = v.to_object();
   if ( ! o )
   {
@@ -1228,7 +1228,7 @@ sprite_setMask(const fn_call& fn)
     return as_value();
   }
 
-  as_value& arg = fn.arg(0);
+  const as_value& arg = fn.arg(0);
   if ( arg.is_null() || arg.is_undefined() )
   {
     // disable mask
@@ -2252,8 +2252,8 @@ attachMovieClipInterface(as_object& o)
     o.init_member("enabled", true); // see MovieClip.as testcase
     o.init_member("useHandCursor", true); // see MovieClip.as testcase
 
-    as_c_function_ptr gettersetter = &sprite_instance::lockroot_getset;
-    o.init_property("_lockroot", *gettersetter, *gettersetter); // see MovieClip.as testcase
+    o.init_property("_lockroot", &sprite_instance::lockroot_getset,
+                                &sprite_instance::lockroot_getset); // see MovieClip.as testcase
 
     if ( target_version  < 6 ) return;
 
@@ -2490,7 +2490,7 @@ sprite_instance::sprite_instance(
   m_current_frame(0),
   m_has_looped(false),
   _callingFrameActions(false),
-  m_as_environment(),
+  m_as_environment(_vm),
   _text_variables(),
   m_sound_stream_id(-1),
   _userCxform(),
@@ -2846,7 +2846,7 @@ sprite_instance::on_event(const event_id& id)
   testInvariant();
 
 #ifdef GNASH_DEBUG
-  log_debug(_("Event %s invoked for sprite %s"), id.get_function_name(), getTarget());
+  log_debug(_("Event %s invoked for sprite %s"), id, getTarget());
 #endif
 
   // We do not execute ENTER_FRAME if unloaded
@@ -2862,7 +2862,7 @@ sprite_instance::on_event(const event_id& id)
   {
 #ifdef GNASH_DEBUG
     log_debug(_("Sprite %s ignored button-like event %s as not 'enabled'"),
-      getTarget(), id.get_function_name());
+      getTarget(), id);
 #endif
     return false;
   }
@@ -4487,7 +4487,9 @@ sprite_instance::constructAsScriptObject()
 	// properties already.
 	as_object* super = get_super();
 
-        fn_call call(this, &(get_environment()), 0, 0, super);
+	as_environment& env = get_environment();
+        fn_call call(this, &env);
+	call.super = super;
 
         // we don't use the constructor return (should we?)
         (*ctor)(call);

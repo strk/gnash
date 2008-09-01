@@ -155,7 +155,14 @@ private:
 
 	VirtualClock& _clock;
 
+	SafeStack<as_value>	_stack;
+
 public:
+
+	SafeStack<as_value>& getStack()
+	{
+		return _stack;
+	}
 
 	/// \brief
 	/// Initialize the virtual machine singleton with the given

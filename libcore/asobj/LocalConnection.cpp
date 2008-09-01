@@ -260,7 +260,11 @@ localconnection_send(const fn_call& fn)
     GNASH_REPORT_FUNCTION;
     boost::intrusive_ptr<LocalConnection> ptr = ensureType<LocalConnection>(fn.this_ptr);
 
-    LOG_ONCE(log_unimpl(_("LocalConnection.send unimplemented")));
+    std::ostringstream os;
+    fn.dump_args(os);
+
+    // It is useful to see what's supposed being sent, so we log this every time.
+    log_unimpl(_("LocalConnection.send unimplemented %s"), os.str());
 
     if (!ptr->connected()) {
         ptr->connect();
