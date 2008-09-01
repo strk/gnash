@@ -53,6 +53,7 @@ namespace media {
 
 
 /// Forward declarations
+class CodecContextWrapper;
 class image::ImageBase;
 #ifdef HAVE_SWSCALE_H
 class SwsContextWrapper;
@@ -105,7 +106,7 @@ private:
     }
 
     AVCodec* _videoCodec;
-    AVCodecContext* _videoCodecCtx;
+    std::auto_ptr<CodecContextWrapper> _videoCodecCtx;
 
 #if HAVE_SWSCALE_H
     /// A pointer to a wrapper round an SwsContext
