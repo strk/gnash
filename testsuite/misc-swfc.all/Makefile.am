@@ -38,6 +38,7 @@ SANE_SCTESTS = \
 	gotoFrameFromInterval2.sc \
 	gotoFrameLabelAsFunction.sc \
 	matrix_accuracy_test1.sc \
+	stackscope.sc \
 	$(NULL)
 
 # These ones are the ones for which consistency check fail 
