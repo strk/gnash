@@ -100,9 +100,9 @@ main(int argc, char** argv)
   SWFDisplayItem_setDepth(it2, 20);
   SWFMovie_nextFrame(mo); // frame2
 
-  xcheck_equals(mo, "testvar1", "1");
-  xcheck_equals(mo, "testvar2", "2");
-  xcheck_equals(mo, "testvar3", "3");
+  check_equals(mo, "testvar1", "1");
+  check_equals(mo, "testvar2", "2");
+  check_equals(mo, "testvar3", "3");
   add_actions(mo, 
     "asm{"
     "   push 'testvar1'"
@@ -120,9 +120,9 @@ main(int argc, char** argv)
     "   setvariable"
     "   setvariable"
     "};");
-  xcheck_equals(mo, "testvar1", "1");
-  xcheck_equals(mo, "testvar2", "2");
-  xcheck_equals(mo, "testvar3", "3");
+  check_equals(mo, "testvar1", "1");
+  check_equals(mo, "testvar2", "2");
+  check_equals(mo, "testvar3", "3");
   SWFMovie_nextFrame(mo); // frame3
   
   add_actions(mo, " _root.totals(6); stop(); ");
