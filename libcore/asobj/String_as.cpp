@@ -804,11 +804,12 @@ void string_class_init(as_object& global)
 boost::intrusive_ptr<as_object>
 init_string_instance(const std::string& val)
 {
-	// TODO: get the environment passed in !!
-	as_environment env;
-
 	// TODO: get VM from the environment ?
 	VM& vm = VM::get();
+
+	// TODO: get the environment passed in !!
+	as_environment env(vm);
+
 	int swfVersion = vm.getSWFVersion();
 
 	boost::intrusive_ptr<as_function> cl;

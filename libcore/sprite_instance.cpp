@@ -2490,7 +2490,7 @@ sprite_instance::sprite_instance(
   m_current_frame(0),
   m_has_looped(false),
   _callingFrameActions(false),
-  m_as_environment(),
+  m_as_environment(_vm),
   _text_variables(),
   m_sound_stream_id(-1),
   _userCxform(),

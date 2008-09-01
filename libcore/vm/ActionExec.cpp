@@ -349,6 +349,7 @@ ActionExec::operator() ()
     }
     catch (ActionLimitException& ex)
     {
+        // Script execution should stop (for this frame only?)
         // Here's were we should pop-up a window to prompt user about
         // what to do next (abort or not ?)
         //log_error("Script aborted due to exceeded limit: %s - cleaning up after run", ex.what());
@@ -358,8 +359,14 @@ ActionExec::operator() ()
     catch (ActionScriptException& ex)
     {
         // An unhandled ActionScript exception was thrown.
-        // Script execution should stop (for this frame only?)
         cleanupAfterRun(true);
+
+	// Forceably clear the stack.
+	// - Fixes misc-mtasc.all/exception.swf
+	// By commenting the line above, we get an XPASS in
+	// - swfdec/catch-in-caller.swf
+	env.drop(env.stack_size());
+
         return;
     }
     // TODO: catch other exceptions ?
@@ -576,48 +583,20 @@ ActionExec::cleanupAfterRun(bool expectInconsistencies)
     env.set_target(_originalTarget);
     _originalTarget = NULL;
 
-    // check if the stack was smashed
-    if ( _initialStackSize > env.stack_size() )
-    {
-#if 0
-        log_error(_("Stack smashed (ActionScript compiler bug?)."
-                "Fixing by pushing undefined values to the missing slots, "
-                " but don't expect things to work afterwards"));
-        const size_t missing = _initialStackSize - env.stack_size();
-
-        for (size_t i = 0; i < missing; ++i)
+    IF_VERBOSE_MALFORMED_SWF
+    (
+        // check if the stack was smashed
+        if ( _initialStackSize > env.stack_size() )
         {
-            env.push(as_value());
+            log_swferror(_("Stack smashed (ActionScript compiler bug, or obfuscated SWF)."
+                 " Taking no action to fix (as expected)."));
         }
-#else
-        log_error(_("Stack smashed (ActionScript compiler bug?)."
-                "Taking no action to fix (as expected)."));
-#endif
-    }
-    else if ( _initialStackSize < env.stack_size() )
-    {
-            log_debug(_("%d elements left on the stack after block execution.  ")
-                , env.stack_size() - _initialStackSize);
-
-	//
-	// cleanup if NOT a function 
-	// cleanup if an exception is on stack
-	//
-	if ( ! isFunction() || (env.stack_size() && env.top(0).is_exception() ) )
-	{
-		// we need to cleanup after run, or the GC will need to scan
-		// the stack as well..
-		if ( ! expectInconsistencies )
-		{
-		    // We can argue this would be an "size-optimized" SWF instead...
-		    IF_VERBOSE_MALFORMED_SWF(
-		    log_swferror(_("%d elements left on the stack after block execution.  "
-			"Cleaning up"), env.stack_size() - _initialStackSize);
-		    );
-		}
-		env.drop(env.stack_size() - _initialStackSize);
-	}
-    }
+        else if ( _initialStackSize < env.stack_size() )
+        {
+           log_swferror(_("%d elements left on the stack after block execution.  "),
+                 env.stack_size() - _initialStackSize);
+        }
+    );
 
     // Have movie_root flush any newly pushed actions in higher priority queues
     VM::get().getRoot().flushHigherPriorityActionQueues();

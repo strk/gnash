@@ -27,7 +27,7 @@ Property::getDelayedValue(const as_object& this_ptr) const
 {
 	const GetterSetter* a = boost::get<const GetterSetter>(&mBound);
 
-	as_environment env;
+	as_environment env(this_ptr.getVM());
 	fn_call fn(const_cast<as_object*>(&this_ptr), &env);
 	if (mDestructive)
 	{
@@ -49,7 +49,7 @@ Property::setDelayedValue(as_object& this_ptr, const as_value& value)
 {
 	GetterSetter* a = boost::get<GetterSetter>(&mBound);
 
-	as_environment env;
+	as_environment env(this_ptr.getVM());
 
 	std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
 	args->push_back(value);

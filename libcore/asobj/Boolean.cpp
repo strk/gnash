@@ -165,7 +165,7 @@ boost::intrusive_ptr<as_object>
 init_boolean_instance(bool val)
 {
 	boost::intrusive_ptr<builtin_function> cl = getBooleanConstructor();
-	as_environment env;
+	as_environment env(VM::get());
 
 	std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
 	args->push_back(val);

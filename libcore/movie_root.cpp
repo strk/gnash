@@ -229,6 +229,11 @@ movie_root::handleActionLimitHit(const std::string& msg)
 void
 movie_root::cleanupAndCollect()
 {
+	// Cleanup the stack.
+	// TODO: don't access VM as a singleton
+	VM& vm = VM::get();
+	vm.getStack().clear();
+
 	cleanupUnloadedListeners();
 	cleanupDisplayList();
 	GC::get().collect();
@@ -472,6 +477,11 @@ movie_root::clear()
 	m_key_listeners.clear();
 	m_mouse_listeners.clear();
 
+	// Cleanup the stack.
+	// TODO: don't access VM as a singleton
+	VM& vm = VM::get();
+	vm.getStack().clear();
+
 #ifdef GNASH_USE_GC
 	// Run the garbage collector again
 	GC::get().collect();
@@ -693,6 +703,8 @@ generate_mouse_button_events(mouse_button_state* ms)
 
 	// Did this event trigger any action that needs redisplay ?
 	bool need_redisplay = false;
+
+	VM& vm = VM::get();
 
 	if (ms->m_mouse_button_state_last == mouse_button_state::DOWN)
 	{
@@ -1599,7 +1611,6 @@ movie_root::processActionQueue(int lvl)
 #endif
 
 	return minPopulatedPriorityQueue();
-
 }
 
 void
@@ -1647,6 +1658,12 @@ movie_root::processActionQueue()
 	{
 		_processingActionLevel = processActionQueue(_processingActionLevel);
 	}
+
+	// Cleanup the stack.
+	// TODO: don't access VM as a singleton
+	VM& vm = VM::get();
+	vm.getStack().clear();
+
 }
 
 void

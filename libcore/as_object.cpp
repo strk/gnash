@@ -1273,7 +1273,7 @@ as_object::callMethod(string_table::key methodName)
 		return ret;
 	}
 
-	as_environment env;
+	as_environment env(_vm);
 
 	return call_method0(method, &env, this);
 }
@@ -1289,7 +1289,7 @@ as_object::callMethod(string_table::key methodName, const as_value& arg0)
 		return ret;
 	}
 
-	as_environment env;
+	as_environment env(_vm);
 
 	std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
 	args->push_back(arg0);
@@ -1311,7 +1311,7 @@ as_object::callMethod(string_table::key methodName,
 		return ret;
 	}
 
-	as_environment env;
+	as_environment env(_vm);
 
 #ifndef NDEBUG
 	size_t origStackSize = env.stack_size();
@@ -1342,7 +1342,7 @@ as_object::callMethod(string_table::key methodName,
 		return ret;
 	}
 
-	as_environment env;
+	as_environment env(_vm);
 
 #ifndef NDEBUG
 	size_t origStackSize = env.stack_size();
@@ -1375,7 +1375,7 @@ as_object::callMethod(string_table::key methodName,
 		return ret;
 	}
 
-	as_environment env;
+	as_environment env(_vm);
 
 #ifndef NDEBUG
 	size_t origStackSize = env.stack_size();
@@ -1512,7 +1512,7 @@ Trigger::call(const as_value& oldval, const as_value& newval, as_object& this_ob
 	_executing = true;
 
 	try {
-		as_environment env;
+		as_environment env(VM::get()); // TODO: get VM in some other way 
 
 #ifndef NDEBUG
 		size_t origStackSize = env.stack_size();
