@@ -122,7 +122,6 @@ ActionHandler::ActionHandler()
     _stack_args(0),
     _arg_format(ARG_NONE)
 {
-    
 }
 
 ActionHandler::ActionHandler(action_type type, action_callback_t func)
@@ -133,7 +132,6 @@ ActionHandler::ActionHandler(action_type type, action_callback_t func)
     _stack_args(0),
     _arg_format(ARG_NONE)
 {
-    
 }
 
 ActionHandler::ActionHandler(action_type type, std::string name,
@@ -146,30 +144,30 @@ ActionHandler::ActionHandler(action_type type, std::string name,
     _stack_args(0),
     _arg_format(ARG_NONE)
 {
-    
 }
 
 ActionHandler::ActionHandler(action_type type, std::string name,
                              action_callback_t func, as_arg_t format)
-    : _debug(false), _stack_args(0)
+    :
+    _type(type),
+    _name(name),
+    _callback(func),
+    _debug(false),
+    _stack_args(0),
+    _arg_format(format)
 {
-    
-    _name = name;
-    _type = type;
-    _callback = func;
-    _arg_format = format;
 }
 
 ActionHandler::ActionHandler(action_type type, std::string name,
                              action_callback_t func, as_arg_t format, int nargs)
-    : _debug(false)
+    :
+    _type(type),
+    _name(name),
+    _callback(func),
+    _debug(false),
+    _stack_args(nargs),
+    _arg_format(format)
 {
-    
-    _name = name;
-    _type = type;
-    _callback = func;
-    _stack_args = nargs;
-    _arg_format = format;
 }
 
 void
@@ -180,9 +178,6 @@ ActionHandler::execute(ActionExec& thread) const
 
 SWFHandlers::SWFHandlers()
 {
-    
-
-    using std::string;
 
     // Just to be sure we can start using different handler
     // based on version (would make sense)
@@ -218,215 +213,215 @@ SWFHandlers::SWFHandlers()
     property_names.push_back("_ymouse"); // 21
 
     container_type & handlers = get_handlers();
+
     handlers[ACTION_END] = ActionHandler(ACTION_END,
-             string("<End>"), SWFHandlers::ActionEnd);
+             "<End>", SWFHandlers::ActionEnd);
     handlers[ACTION_NEXTFRAME] = ActionHandler(ACTION_NEXTFRAME,
-             string("NextFrame"), SWFHandlers::ActionNextFrame);
+             "NextFrame", SWFHandlers::ActionNextFrame);
     handlers[ACTION_PREVFRAME] =  ActionHandler(ACTION_PREVFRAME,
-             string("PreviousFrame"), SWFHandlers::ActionPrevFrame);
+             "PreviousFrame", SWFHandlers::ActionPrevFrame);
     handlers[ACTION_PLAY] = ActionHandler(ACTION_PLAY,
-             string("Play"), SWFHandlers::ActionPlay);
+             "Play", SWFHandlers::ActionPlay);
     handlers[ACTION_STOP] = ActionHandler(ACTION_STOP,
-             string("Stop"), SWFHandlers::ActionStop);
+             "Stop", SWFHandlers::ActionStop);
     handlers[ACTION_TOGGLEQUALITY] = ActionHandler(ACTION_TOGGLEQUALITY,
-             string("ToggleQuality"), SWFHandlers::ActionToggleQuality);
+             "ToggleQuality", SWFHandlers::ActionToggleQuality);
     handlers[ACTION_STOPSOUNDS] = ActionHandler(ACTION_STOPSOUNDS,
-             string("StopSounds"), SWFHandlers::ActionStopSounds);
+             "StopSounds", SWFHandlers::ActionStopSounds);
     handlers[ACTION_GOTOFRAME] = ActionHandler(ACTION_GOTOFRAME,
-             string("GotoFrame"), SWFHandlers::ActionGotoFrame, ARG_U16);
+             "GotoFrame", SWFHandlers::ActionGotoFrame, ARG_U16);
     handlers[ACTION_GETURL] = ActionHandler(ACTION_GETURL,
-             string("GetUrl"), SWFHandlers::ActionGetUrl, ARG_STR);
+             "GetUrl", SWFHandlers::ActionGetUrl, ARG_STR);
     handlers[ACTION_WAITFORFRAME] = ActionHandler(ACTION_WAITFORFRAME,
-             string("WaitForFrame"), SWFHandlers::ActionWaitForFrame, ARG_HEX);
+             "WaitForFrame", SWFHandlers::ActionWaitForFrame, ARG_HEX);
     handlers[ACTION_SETTARGET] = ActionHandler(ACTION_SETTARGET,
-             string("SetTarget"), SWFHandlers::ActionSetTarget, ARG_STR);
+             "SetTarget", SWFHandlers::ActionSetTarget, ARG_STR);
     handlers[ACTION_GOTOLABEL] = ActionHandler(ACTION_GOTOLABEL,
-             string("GotoLabel"), SWFHandlers::ActionGotoLabel, ARG_STR);
+             "GotoLabel", SWFHandlers::ActionGotoLabel, ARG_STR);
     handlers[ACTION_ADD] = ActionHandler(ACTION_ADD,
-             string("Add"), SWFHandlers::ActionAdd);
+             "Add", SWFHandlers::ActionAdd);
     handlers[ACTION_SUBTRACT] = ActionHandler(ACTION_SUBTRACT,
-             string("Subtract"), SWFHandlers::ActionSubtract);
+             "Subtract", SWFHandlers::ActionSubtract);
     handlers[ACTION_MULTIPLY] = ActionHandler(ACTION_MULTIPLY,
-             string("Multiply"), SWFHandlers::ActionMultiply);
+             "Multiply", SWFHandlers::ActionMultiply);
     handlers[ACTION_DIVIDE] = ActionHandler(ACTION_DIVIDE,
-             string("Divide"), SWFHandlers::ActionDivide);
+             "Divide", SWFHandlers::ActionDivide);
     handlers[ACTION_EQUAL] = ActionHandler(ACTION_EQUAL,
-             string("Equal"), SWFHandlers::ActionEqual);
+             "Equal", SWFHandlers::ActionEqual);
     handlers[ACTION_LESSTHAN] = ActionHandler(ACTION_LESSTHAN,
-             string("LessThan"), SWFHandlers::ActionLessThan);
+             "LessThan", SWFHandlers::ActionLessThan);
     handlers[ACTION_LOGICALAND] = ActionHandler(ACTION_LOGICALAND,
-             string("LogicalAnd"), SWFHandlers::ActionLogicalAnd);
+             "LogicalAnd", SWFHandlers::ActionLogicalAnd);
     handlers[ACTION_LOGICALOR] = ActionHandler(ACTION_LOGICALOR,
-             string("LogicalOr"), SWFHandlers::ActionLogicalOr);
+             "LogicalOr", SWFHandlers::ActionLogicalOr);
     handlers[ACTION_LOGICALNOT] = ActionHandler(ACTION_LOGICALNOT,
-             string("LogicalNot"), SWFHandlers::ActionLogicalNot);
+             "LogicalNot", SWFHandlers::ActionLogicalNot);
     handlers[ACTION_STRINGEQ] = ActionHandler(ACTION_STRINGEQ,
-             string("StringEq"), SWFHandlers::ActionStringEq);
+             "StringEq", SWFHandlers::ActionStringEq);
     handlers[ACTION_STRINGLENGTH] = ActionHandler(ACTION_STRINGLENGTH,
-             string("ActionStringLength"), SWFHandlers::ActionStringLength);
+             "ActionStringLength", SWFHandlers::ActionStringLength);
     handlers[ACTION_SUBSTRING] = ActionHandler(ACTION_SUBSTRING,
-             string("ActionSubString"), SWFHandlers::ActionSubString);
+             "ActionSubString", SWFHandlers::ActionSubString);
     handlers[ACTION_POP] = ActionHandler(ACTION_POP,
-             string("ActionPop"), SWFHandlers::ActionPop);
+             "ActionPop", SWFHandlers::ActionPop);
     handlers[ACTION_INT] = ActionHandler(ACTION_INT,
-             string("ActionInt"), SWFHandlers::ActionInt);
+             "ActionInt", SWFHandlers::ActionInt);
     handlers[ACTION_GETVARIABLE] = ActionHandler(ACTION_GETVARIABLE,
-             string("ActionGetVariable"), SWFHandlers::ActionGetVariable);
+             "ActionGetVariable", SWFHandlers::ActionGetVariable);
     handlers[ACTION_SETVARIABLE] = ActionHandler(ACTION_SETVARIABLE,
-             string("ActionSetVariable"), SWFHandlers::ActionSetVariable);
+             "ActionSetVariable", SWFHandlers::ActionSetVariable);
     handlers[ACTION_SETTARGETEXPRESSION] = ActionHandler(ACTION_SETTARGETEXPRESSION,
-             string("ActionSetTargetExpression"), SWFHandlers::ActionSetTargetExpression);
+             "ActionSetTargetExpression", SWFHandlers::ActionSetTargetExpression);
     handlers[ACTION_STRINGCONCAT] = ActionHandler(ACTION_STRINGCONCAT,
-             string("ActionStringConcat"), SWFHandlers::ActionStringConcat);
+             "ActionStringConcat", SWFHandlers::ActionStringConcat);
     handlers[ACTION_GETPROPERTY] = ActionHandler(ACTION_GETPROPERTY,
-             string("ActionGetProperty"), SWFHandlers::ActionGetProperty);
+             "ActionGetProperty", SWFHandlers::ActionGetProperty);
     handlers[ACTION_SETPROPERTY] = ActionHandler(ACTION_SETPROPERTY,
-             string("ActionSetProperty"), SWFHandlers::ActionSetProperty);
+             "ActionSetProperty", SWFHandlers::ActionSetProperty);
     handlers[ACTION_DUPLICATECLIP] = ActionHandler(ACTION_DUPLICATECLIP,
-             string("ActionDuplicateClip"), SWFHandlers::ActionDuplicateClip);
+             "ActionDuplicateClip", SWFHandlers::ActionDuplicateClip);
     handlers[ACTION_REMOVECLIP] = ActionHandler(ACTION_REMOVECLIP,
-             string("ActionRemoveClip"), SWFHandlers::ActionRemoveClip);
+             "ActionRemoveClip", SWFHandlers::ActionRemoveClip);
     handlers[ACTION_TRACE] = ActionHandler(ACTION_TRACE,
-             string("ActionTrace"), SWFHandlers::ActionTrace);
+             "ActionTrace", SWFHandlers::ActionTrace);
     handlers[ACTION_STARTDRAGMOVIE] = ActionHandler(ACTION_STARTDRAGMOVIE,
-             string("ActionStartDragMovie"), SWFHandlers::ActionStartDragMovie);
+             "ActionStartDragMovie", SWFHandlers::ActionStartDragMovie);
     handlers[ACTION_STOPDRAGMOVIE] = ActionHandler(ACTION_STOPDRAGMOVIE,
-             string("ActionStopDragMovie"), SWFHandlers::ActionStopDragMovie);
+             "ActionStopDragMovie", SWFHandlers::ActionStopDragMovie);
     handlers[ACTION_STRINGCOMPARE] = ActionHandler(ACTION_STRINGCOMPARE,
-             string("ActionStringCompare"), SWFHandlers::ActionStringCompare);
+             "ActionStringCompare", SWFHandlers::ActionStringCompare);
     handlers[ACTION_THROW] = ActionHandler(ACTION_THROW,
-             string("ActionThrow"), SWFHandlers::ActionThrow);
+             "ActionThrow", SWFHandlers::ActionThrow);
     handlers[ACTION_CASTOP] = ActionHandler(ACTION_CASTOP,
-             string("ActionCastOp"), SWFHandlers::ActionCastOp);
+             "ActionCastOp", SWFHandlers::ActionCastOp);
     handlers[ACTION_IMPLEMENTSOP] = ActionHandler(ACTION_IMPLEMENTSOP,
-             string("ActionImplementsOp"), SWFHandlers::ActionImplementsOp);
+             "ActionImplementsOp", SWFHandlers::ActionImplementsOp);
     handlers[ACTION_FSCOMMAND2] = ActionHandler(ACTION_FSCOMMAND2,
-             string("ActionFscommand2"), SWFHandlers::ActionFscommand2);
+             "ActionFscommand2", SWFHandlers::ActionFscommand2);
     handlers[ACTION_RANDOM] = ActionHandler(ACTION_RANDOM,
-             string("ActionRandom"), SWFHandlers::ActionRandom);
+             "ActionRandom", SWFHandlers::ActionRandom);
     handlers[ACTION_MBLENGTH] = ActionHandler(ACTION_MBLENGTH,
-             string("ActionMbLength"), SWFHandlers::ActionMbLength);
+             "ActionMbLength", SWFHandlers::ActionMbLength);
     handlers[ACTION_ORD] = ActionHandler(ACTION_ORD,
-             string("ActionOrd"), SWFHandlers::ActionOrd);
+             "ActionOrd", SWFHandlers::ActionOrd);
     handlers[ACTION_CHR] = ActionHandler(ACTION_CHR,
-             string("ActionChr"), SWFHandlers::ActionChr);
+             "ActionChr", SWFHandlers::ActionChr);
     handlers[ACTION_GETTIMER] = ActionHandler(ACTION_GETTIMER,
-             string("ActionGetTimer"), SWFHandlers::ActionGetTimer);
+             "ActionGetTimer", SWFHandlers::ActionGetTimer);
     handlers[ACTION_MBSUBSTRING] = ActionHandler(ACTION_MBSUBSTRING,
-             string("ActionMbSubString"), SWFHandlers::ActionMbSubString);
+             "ActionMbSubString", SWFHandlers::ActionMbSubString);
     handlers[ACTION_MBORD] = ActionHandler(ACTION_MBORD,
-             string("ActionMbOrd"), SWFHandlers::ActionMbOrd);
+             "ActionMbOrd", SWFHandlers::ActionMbOrd);
     handlers[ACTION_MBCHR] = ActionHandler(ACTION_MBCHR,
-             string("ActionMbChr"), SWFHandlers::ActionMbChr);
+             "ActionMbChr", SWFHandlers::ActionMbChr);
     handlers[ACTION_WAITFORFRAMEEXPRESSION] = ActionHandler(ACTION_WAITFORFRAMEEXPRESSION,
-             string("ActionWaitForFrameExpression"),
+             "ActionWaitForFrameExpression",
              SWFHandlers::ActionWaitForFrameExpression, ARG_HEX);
     handlers[ACTION_PUSHDATA] = ActionHandler(ACTION_PUSHDATA,
-             string("ActionPushData"), SWFHandlers::ActionPushData, ARG_PUSH_DATA);
+             "ActionPushData", SWFHandlers::ActionPushData, ARG_PUSH_DATA);
     handlers[ACTION_BRANCHALWAYS] = ActionHandler(ACTION_BRANCHALWAYS,
-             string("ActionBranchAlways"), SWFHandlers::ActionBranchAlways, ARG_S16);
+             "ActionBranchAlways", SWFHandlers::ActionBranchAlways, ARG_S16);
     handlers[ACTION_GETURL2] = ActionHandler(ACTION_GETURL2,
-             string("ActionGetUrl2"), SWFHandlers::ActionGetUrl2, ARG_HEX);
+             "ActionGetUrl2", SWFHandlers::ActionGetUrl2, ARG_HEX);
     handlers[ACTION_BRANCHIFTRUE] = ActionHandler(ACTION_BRANCHIFTRUE,
-             string("ActionBranchIfTrue"), SWFHandlers::ActionBranchIfTrue, ARG_S16);
+             "ActionBranchIfTrue", SWFHandlers::ActionBranchIfTrue, ARG_S16);
     handlers[ACTION_CALLFRAME] = ActionHandler(ACTION_CALLFRAME,
-             string("ActionCallFrame"), SWFHandlers::ActionCallFrame, ARG_HEX);
+             "ActionCallFrame", SWFHandlers::ActionCallFrame, ARG_HEX);
     handlers[ACTION_GOTOEXPRESSION] = ActionHandler(ACTION_GOTOEXPRESSION,
-             string("ActionGotoExpression"), SWFHandlers::ActionGotoExpression, ARG_HEX);
+             "ActionGotoExpression", SWFHandlers::ActionGotoExpression, ARG_HEX);
     handlers[ACTION_DELETE] = ActionHandler(ACTION_DELETE,
-             string("ActionDelete"), SWFHandlers::ActionDelete);
+             "ActionDelete", SWFHandlers::ActionDelete);
     handlers[ACTION_DELETE2] = ActionHandler(ACTION_DELETE2,
-             string("ActionDelete2"), SWFHandlers::ActionDelete2);
+             "ActionDelete2", SWFHandlers::ActionDelete2);
     handlers[ACTION_VAREQUALS] = ActionHandler(ACTION_VAREQUALS,
-             string("ActionVarEquals"), SWFHandlers::ActionVarEquals);
+             "ActionVarEquals", SWFHandlers::ActionVarEquals);
     handlers[ACTION_CALLFUNCTION] = ActionHandler(ACTION_CALLFUNCTION,
-             string("ActionCallFunction"), SWFHandlers::ActionCallFunction);
+             "ActionCallFunction", SWFHandlers::ActionCallFunction);
     handlers[ACTION_RETURN] = ActionHandler(ACTION_RETURN,
-             string("ActionReturn"), SWFHandlers::ActionReturn);
+             "ActionReturn", SWFHandlers::ActionReturn);
     handlers[ACTION_MODULO] = ActionHandler(ACTION_MODULO,
-             string("ActionModulo"), SWFHandlers::ActionModulo);
+             "ActionModulo", SWFHandlers::ActionModulo);
     handlers[ACTION_NEW] = ActionHandler(ACTION_NEW,
-             string("ActionNew"), SWFHandlers::ActionNew);
+             "ActionNew", SWFHandlers::ActionNew);
     handlers[ACTION_VAR] = ActionHandler(ACTION_VAR,
-             string("ActionVar"), SWFHandlers::ActionVar);
+             "ActionVar", SWFHandlers::ActionVar);
     handlers[ACTION_INITARRAY] = ActionHandler(ACTION_INITARRAY,
-             string("ActionInitArray"), SWFHandlers::ActionInitArray);
+             "ActionInitArray", SWFHandlers::ActionInitArray);
     handlers[ACTION_INITOBJECT] = ActionHandler(ACTION_INITOBJECT,
-             string("ActionInitObject"), SWFHandlers::ActionInitObject);
+             "ActionInitObject", SWFHandlers::ActionInitObject);
     handlers[ACTION_TYPEOF] = ActionHandler(ACTION_TYPEOF,
-             string("ActionTypeOf"), SWFHandlers::ActionTypeOf);
+             "ActionTypeOf", SWFHandlers::ActionTypeOf);
     handlers[ACTION_TARGETPATH] = ActionHandler(ACTION_TARGETPATH,
-             string("ActionTargetPath"), SWFHandlers::ActionTargetPath);
+             "ActionTargetPath", SWFHandlers::ActionTargetPath);
     handlers[ACTION_ENUMERATE] = ActionHandler(ACTION_ENUMERATE,
-             string("ActionEnumerate"), SWFHandlers::ActionEnumerate);
+             "ActionEnumerate", SWFHandlers::ActionEnumerate);
     handlers[ACTION_NEWADD] = ActionHandler(ACTION_NEWADD,
-             string("ActionNewAdd"), SWFHandlers::ActionNewAdd);
+             "ActionNewAdd", SWFHandlers::ActionNewAdd);
     handlers[ACTION_NEWLESSTHAN] = ActionHandler(ACTION_NEWLESSTHAN,
-             string("ActionNewLessThan"), SWFHandlers::ActionNewLessThan);
+             "ActionNewLessThan", SWFHandlers::ActionNewLessThan);
     handlers[ACTION_NEWEQUALS] = ActionHandler(ACTION_NEWEQUALS,
-             string("ActionNewEquals"), SWFHandlers::ActionNewEquals);
+             "ActionNewEquals", SWFHandlers::ActionNewEquals);
     handlers[ACTION_TONUMBER] = ActionHandler(ACTION_TONUMBER,
-             string("ActionToNumber"), SWFHandlers::ActionToNumber);
+             "ActionToNumber", SWFHandlers::ActionToNumber);
     handlers[ACTION_TOSTRING] = ActionHandler(ACTION_TOSTRING,
-             string("ActionToString"), SWFHandlers::ActionToString);
+             "ActionToString", SWFHandlers::ActionToString);
     handlers[ACTION_DUP] = ActionHandler(ACTION_DUP,
-             string("ActionDup"), SWFHandlers::ActionDup);
+             "ActionDup", SWFHandlers::ActionDup);
     handlers[ACTION_SWAP] = ActionHandler(ACTION_SWAP,
-             string("ActionSwap"), SWFHandlers::ActionSwap);
+             "ActionSwap", SWFHandlers::ActionSwap);
     handlers[ACTION_GETMEMBER] = ActionHandler(ACTION_GETMEMBER,
-             string("ActionGetMember"), SWFHandlers::ActionGetMember);
+             "ActionGetMember", SWFHandlers::ActionGetMember);
     handlers[ACTION_SETMEMBER] = ActionHandler(ACTION_SETMEMBER,
-             string("ActionSetMember"), SWFHandlers::ActionSetMember);
+             "ActionSetMember", SWFHandlers::ActionSetMember);
     handlers[ACTION_INCREMENT] = ActionHandler(ACTION_INCREMENT,
-             string("ActionIncrement"), SWFHandlers::ActionIncrement);
+             "ActionIncrement", SWFHandlers::ActionIncrement);
     handlers[ACTION_DECREMENT] = ActionHandler(ACTION_DECREMENT,
-             string("ActionDecrement"), SWFHandlers::ActionDecrement);
+             "ActionDecrement", SWFHandlers::ActionDecrement);
     handlers[ACTION_CALLMETHOD] = ActionHandler(ACTION_CALLMETHOD,
-             string("ActionCallMethod"), SWFHandlers::ActionCallMethod);
+             "ActionCallMethod", SWFHandlers::ActionCallMethod);
     handlers[ACTION_NEWMETHOD] = ActionHandler(ACTION_NEWMETHOD,
-             string("ActionNewMethod"), SWFHandlers::ActionNewMethod);
+             "ActionNewMethod", SWFHandlers::ActionNewMethod);
     handlers[ACTION_INSTANCEOF] = ActionHandler(ACTION_INSTANCEOF,
-             string("ActionInstanceOf"), SWFHandlers::ActionInstanceOf);
+             "ActionInstanceOf", SWFHandlers::ActionInstanceOf);
     handlers[ACTION_ENUM2] = ActionHandler(ACTION_ENUM2,
-             string("ActionEnum2"), SWFHandlers::ActionEnum2);
+             "ActionEnum2", SWFHandlers::ActionEnum2);
     handlers[ACTION_BITWISEAND] = ActionHandler(ACTION_BITWISEAND,
-             string("ActionBitwiseAnd"), SWFHandlers::ActionBitwiseAnd);
+             "ActionBitwiseAnd", SWFHandlers::ActionBitwiseAnd);
     handlers[ACTION_BITWISEOR] = ActionHandler(ACTION_BITWISEOR,
-             string("ActionBitwiseOr"), SWFHandlers::ActionBitwiseOr);
+             "ActionBitwiseOr", SWFHandlers::ActionBitwiseOr);
     handlers[ACTION_BITWISEXOR] = ActionHandler(ACTION_BITWISEXOR,
-             string("ActionBitwiseXor"), SWFHandlers::ActionBitwiseXor);
+             "ActionBitwiseXor", SWFHandlers::ActionBitwiseXor);
     handlers[ACTION_SHIFTLEFT] = ActionHandler(ACTION_SHIFTLEFT,
-             string("ActionShiftLeft"), SWFHandlers::ActionShiftLeft);
+             "ActionShiftLeft", SWFHandlers::ActionShiftLeft);
     handlers[ACTION_SHIFTRIGHT] = ActionHandler(ACTION_SHIFTRIGHT,
-             string("ActionShiftRight"), SWFHandlers::ActionShiftRight);
+             "ActionShiftRight", SWFHandlers::ActionShiftRight);
     handlers[ACTION_SHIFTRIGHT2] = ActionHandler(ACTION_SHIFTRIGHT2,
-             string("ActionShiftRight2"), SWFHandlers::ActionShiftRight2);
+             "ActionShiftRight2", SWFHandlers::ActionShiftRight2);
     handlers[ACTION_STRICTEQ] = ActionHandler(ACTION_STRICTEQ,
-             string("ActionStrictEq"), SWFHandlers::ActionStrictEq);
+             "ActionStrictEq", SWFHandlers::ActionStrictEq);
     handlers[ACTION_GREATER] = ActionHandler(ACTION_GREATER,
-             string("ActionGreater"), SWFHandlers::ActionGreater);
+             "ActionGreater", SWFHandlers::ActionGreater);
     handlers[ACTION_STRINGGREATER] = ActionHandler(ACTION_STRINGGREATER,
-             string("ActionStringGreater"), SWFHandlers::ActionStringGreater);
+             "ActionStringGreater", SWFHandlers::ActionStringGreater);
     handlers[ACTION_EXTENDS] = ActionHandler(ACTION_EXTENDS,
-             string("ActionExtends"), SWFHandlers::ActionExtends);
+             "ActionExtends", SWFHandlers::ActionExtends);
     handlers[ACTION_CONSTANTPOOL] = ActionHandler(ACTION_CONSTANTPOOL,
-             string("ActionConstantPool"), SWFHandlers::ActionConstantPool, ARG_DECL_DICT);
+             "ActionConstantPool", SWFHandlers::ActionConstantPool, ARG_DECL_DICT);
     handlers[ACTION_DEFINEFUNCTION2] = ActionHandler(ACTION_DEFINEFUNCTION2,
-             string("ActionDefineFunction2"), SWFHandlers::ActionDefineFunction2,
+             "ActionDefineFunction2", SWFHandlers::ActionDefineFunction2,
              ARG_FUNCTION2);
     handlers[ACTION_TRY] = ActionHandler(ACTION_TRY,
-             string("ActionTry"), SWFHandlers::ActionTry, ARG_FUNCTION2);
+             "ActionTry", SWFHandlers::ActionTry, ARG_FUNCTION2);
     handlers[ACTION_WITH] = ActionHandler(ACTION_WITH,
-             string("ActionWith"), SWFHandlers::ActionWith, ARG_U16);
+             "ActionWith", SWFHandlers::ActionWith, ARG_U16);
     handlers[ACTION_DEFINEFUNCTION] = ActionHandler(ACTION_DEFINEFUNCTION,
-             string("ActionDefineFunction"), SWFHandlers::ActionDefineFunction, ARG_HEX);
+             "ActionDefineFunction", SWFHandlers::ActionDefineFunction, ARG_HEX);
     handlers[ACTION_SETREGISTER] = ActionHandler(ACTION_SETREGISTER,
-             string("ActionSetRegister"), SWFHandlers::ActionSetRegister, ARG_U8);
+             "ActionSetRegister", SWFHandlers::ActionSetRegister, ARG_U8);
 }
 
 SWFHandlers::~SWFHandlers()
 {
-    
 }
 
 
