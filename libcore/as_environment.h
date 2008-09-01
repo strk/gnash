@@ -160,12 +160,6 @@ public:
 	///
 	void padStack(size_t offset, size_t count);
 
-	/// Returns index of top stack element
-	// FIXME: what if stack is empty ??
-	// I'd obsolete this and convert calling code to use
-	// stack_size() instead.
-	int	get_top_index() const { return _stack.size() - 1; }
-
 	size_t stack_size() const { return _stack.size(); }
 
 	/// @}  stack access/manipulation
@@ -565,7 +559,7 @@ private:
 	static const short unsigned int numGlobalRegisters = 4;
 
 	typedef std::vector<CallFrame> CallStack;
-		
+
 	static CallStack _localFrames;
 
 	as_value m_global_register[numGlobalRegisters];

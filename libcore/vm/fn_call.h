@@ -71,14 +71,14 @@ public:
 
 	fn_call(as_object* this_in,
 			as_environment* env_in,
-			int nargs_in, int first_in, as_object* sup=NULL)
+			int nargs_in, size_t first_in, as_object* sup=NULL)
 		:
 		this_ptr(this_in),
 		super(sup),
 		nargs(nargs_in),
 		_env(env_in)
 	{
-		assert(first_in == env_in->get_top_index());
+		assert(first_in + 1 == env_in->stack_size());
 		readArgs(env_in, first_in, nargs);
 	}
 
