@@ -61,7 +61,8 @@ main(int /*argc*/, char** /*argv*/)
 
 	// Now timers are set and counters initialized
 
-	string_table& st = VM::get().getStringTable();
+	VM& vm = VM::get();
+	string_table& st = vm.getStringTable();
 	root->get_member(st.find("this_counter"), &tmp);
 	check_equals(tmp.to_number(), 0);
 	root->get_member(st.find("that_counter"), &tmp);
@@ -124,7 +125,7 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(tmp.to_number(), 4);
 
 	root->get_member(st.find("pushed_args"), &tmp);
-	as_environment env; // needed for proper to_string()
+	as_environment env(vm); // needed for proper to_string()
 	check_equals(tmp.to_string(), std::string("8,9,10"));
 
 	tester.advanceClock(100); // "sleep" another 100 milliseconds

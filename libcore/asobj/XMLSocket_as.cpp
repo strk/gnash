@@ -504,6 +504,8 @@ XMLSocket_as::checkForIncomingData()
     boost::intrusive_ptr<as_function> onDataHandler = getEventHandler("onData");
     if ( onDataHandler )
     {
+	as_environment env(_vm); // TODO: set target !
+
         for (XMLSocket_as::MessageList::iterator it=msgs.begin(),
 						itEnd=msgs.end();
 		    it != itEnd; ++it)
@@ -511,14 +513,14 @@ XMLSocket_as::checkForIncomingData()
 			std::string& s = *it;
 			as_value datain( s );
 
-			as_environment env; // TODO: set target !
-
 			std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
 			args->push_back(datain);
 			
 			fn_call call(this, &env, args);
 
 			onDataHandler->call(call);
+
+			// TODO: clear the stack ?
         }
     }
 

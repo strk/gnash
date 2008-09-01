@@ -174,7 +174,7 @@ init_number_instance(double val)
 {
 	boost::intrusive_ptr<builtin_function> cl=getNumberConstructor();
 
-	as_environment env;
+	as_environment env(VM::get());
 
 	std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
 	args->push_back(val);

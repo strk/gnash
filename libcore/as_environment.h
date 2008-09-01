@@ -34,7 +34,7 @@ namespace gnash {
 
 // Forward declarations
 class character;
-//class with_stack_entry;
+class VM;
 
 /// ActionScript execution environment.
 class as_environment
@@ -55,13 +55,9 @@ public:
 
 	typedef std::vector<as_value> Registers;
 
-	as_environment()
-		:
-		_stack(),
-		m_target(0),
-		_original_target(0)
-	{
-	}
+	as_environment(VM& vm);
+
+	VM& getVM() { return _vm; }
 
 	character* get_target() { return m_target; }
 
@@ -552,9 +548,11 @@ public:
 
 private:
 
+	VM& _vm;
+
 	/// Stack of as_values in this environment
 	//std::vector<as_value>	m_stack;
-	SafeStack<as_value>	_stack;
+	SafeStack<as_value>&	_stack;
 
 	static const short unsigned int numGlobalRegisters = 4;
 
