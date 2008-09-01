@@ -144,15 +144,15 @@ VideoDecoderFfmpeg::init(enum CodecID codecId, int width, int height, boost::uin
     avcodec_init();
     avcodec_register_all();// change this to only register need codec?
 
-    _videoCodec = avcodec_find_decoder(CodecID(0)); 
+    _videoCodec = avcodec_find_decoder(codecId); 
 
     if (!_videoCodec) {
-        throw MediaException("libavcodec can't decode the current video format");
+        throw MediaException(_("libavcodec can't decode this video format"));
     }
 
     _videoCodecCtx.reset(new CodecContextWrapper(avcodec_alloc_context()));
     if (!_videoCodecCtx->getContext()) {
-        throw MediaException("libavcodec couldn't allocate context");
+        throw MediaException(_("libavcodec couldn't allocate context"));
     }
 
     AVCodecContext* const ctx = _videoCodecCtx->getContext();
@@ -162,8 +162,8 @@ VideoDecoderFfmpeg::init(enum CodecID codecId, int width, int height, boost::uin
 
     int ret = avcodec_open(ctx, _videoCodec);
     if (ret < 0) {
-        boost::format msg = boost::format(_("VideoDecoderFfmpeg::init: "
-                            "avcodec_open: failed to initialize FFMPEG "
+        boost::format msg = boost::format(_("libavcodec"
+                            "failed to initialize FFMPEG "
                             "codec %s (%d)")) % 
                             _videoCodec->name % (int)codecId;
 
@@ -173,7 +173,7 @@ VideoDecoderFfmpeg::init(enum CodecID codecId, int width, int height, boost::uin
     ctx->width = width;
     ctx->height = height;
 
-    log_debug(_("VideoDecoderFfmpeg::init: initialized FFMPEG codec %s (%d)"), 
+    log_debug(_("VideoDecoder: initialized FFMPEG codec %s (%d)"), 
 		_videoCodec->name, (int)codecId);
 
     assert(ctx->width > 0);
@@ -186,7 +186,7 @@ VideoDecoderFfmpeg::~VideoDecoderFfmpeg()
 
 std::auto_ptr<image::ImageBase>
 VideoDecoderFfmpeg::frameToImage(AVCodecContext* srcCtx,
-                                                                 const AVFrame& srcFrame)
+                                 const AVFrame& srcFrame)
 {
 
     // Adjust to next highest 4-pixel value.
@@ -316,7 +316,6 @@ void
 VideoDecoderFfmpeg::push(const EncodedVideoFrame& buffer)
 {
     _video_frames.push_back(&buffer);
-
 }
 
 std::auto_ptr<image::ImageBase>
