@@ -80,8 +80,8 @@
 
 .frame 3
   .action:
-    xcheck_equals(var1, 'val1');
-    xcheck_equals(var2, 'val2');
+    check_equals(var1, 'val1');
+    check_equals(var2, 'val2');
     check_equals(typeof(var3), 'undefined');
     totals(3);
     stop();
