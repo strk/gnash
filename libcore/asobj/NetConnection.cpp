@@ -241,6 +241,13 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 	}
 
 	switch(amf_type) {
+		case amf::Element::BOOLEAN_AMF0:
+		{
+			bool val = *b; b += 1;
+			//log_debug("amf0 read bool: %d", val);
+			ret.set_bool(val);
+			return true;
+		}
 		case amf::Element::NUMBER_AMF0:
 			if(b + 8 > end) {
 				log_error(_("NetConnection.call(): server sent us a number which goes past the end of the data sent"));
@@ -248,7 +255,7 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 			}
 			dub = *(reinterpret_cast<double*>(b)); b += 8;
 			amf::swapBytes(&dub, 8);
-			log_debug("nc read double: %e", dub);
+			log_debug("amf0 read double: %e", dub);
 			ret.set_double(dub);
 			return true;
 		case amf::Element::STRING_AMF0:
@@ -274,7 +281,7 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 			{
 				boost::intrusive_ptr<as_array_object> array(new as_array_object());
 				li = readNetworkLong(b); b += 4;
-				log_debug("nc starting read of array with %i elements", li);
+				log_debug("amf0 starting read of array with %i elements", li);
 				as_value arrayElement;
 				for(int i = 0; i < li; ++i)
 				{
@@ -299,8 +306,8 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 				for(int i = 0; i < li; ++i)
 				{
     					boost::uint16_t strlen = readNetworkShort(b); b+=2; 
-					string name((char*)b, strlen);
-					//log_debug("Object prop name is %s", name);
+					std::string name((char*)b, strlen);
+					log_debug("Object prop name is %s", name);
 					b += strlen;
 					if ( ! amf0_read_value(b, end, objectElement) )
 					{
