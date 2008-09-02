@@ -455,14 +455,10 @@ bool FLVParser::parseNextTag()
 				FLV_META_TAG, bodyLength, actuallyRead);
 			return false;
 		}
-		std::string dump = hexify(metaTag.get(), actuallyRead, false);
-		log_unimpl("FLV MetaTag parser. Data: %s", dump);
                 amf::Flv flv;
-                amf::Element *el = flv.decodeMetaData(metaTag.get(), actuallyRead);
-                el->dump();
-		/*
-		amf::AMF* amfParser = new amf::AMF();
-		amfParser->parseAMF(metaTag);*/
+                std::auto_ptr<amf::Element> el ( flv.decodeMetaData(metaTag.get(), actuallyRead) );
+		log_unimpl("FLV MetaTag handling. Data: %s", *el);
+                //el->dump();
 	}
 	else
 	{
