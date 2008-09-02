@@ -99,11 +99,6 @@ inline double infinite_to_zero(double x)
     return utility::isFinite(x) ? x : 0.0;
 }
 
-inline int iabs(int i)
-{
-    return (i < 0) ? -i : i;
-}
-
 template <typename T> inline T clamp(T i, T min, T max)
 {
 	assert( min <= max );
