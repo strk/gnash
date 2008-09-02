@@ -61,15 +61,13 @@ abc_Trait::finalize(abc_block *pBlock, asClass *pClass, bool do_static)
 		}
 		// The name has been validated in read.
 		if (mHasValue){
-			LOG_DEBUG_ABC("Adding value to class not implemented.");
-			break;
-			pClass->addValue(mName, mNamespace, mSlotId, pType, 
+			LOG_DEBUG_ABC("Adding property=%s with value=%s",pBlock->mStringPool[mName],mValue.toDebugString());
+			pClass->addValue(mGlobalName, mNamespace, mSlotId, pType, 
 				mValue, mKind == KIND_CONST, do_static);
 			}
 		else{
-			LOG_DEBUG_ABC("Adding slot value to class not implemented.");
-			break;
-			pClass->addSlot(mName, mNamespace, mSlotId, pType,
+			LOG_DEBUG_ABC("Adding property=%s",pBlock->mStringPool[mName],mValue.toDebugString());
+			pClass->addSlot(mGlobalName, mNamespace, mSlotId, pType,
 				do_static);
 			}
 		break;
