@@ -34,8 +34,6 @@ namespace media {
 
 MediaParser::MediaParser(std::auto_ptr<IOChannel> stream)
 	:
-	_isAudioMp3(false),
-	_isAudioNellymoser(false),
 	_stream(stream),
 	_parsingComplete(false),
 	_bufferTime(100), // 100 ms 
