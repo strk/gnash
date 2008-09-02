@@ -995,6 +995,9 @@ NetStreamFfmpeg::advance()
 	// Refill audio buffer to consume all samples
 	// up to current playhead
 	refreshAudioBuffer();
+
+	// Process media tags
+	m_parser->processTags(_playHead.getPosition(), this, getVM());
 }
 
 boost::int32_t

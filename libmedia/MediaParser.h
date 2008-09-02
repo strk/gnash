@@ -38,6 +38,12 @@
 #define LOAD_MEDIA_IN_A_SEPARATE_THREAD 1
 
 
+// Forward declarations
+namespace gnash {
+	class as_object;
+	class VM;
+}
+
 namespace gnash {
 namespace media {
 
@@ -389,6 +395,8 @@ public:
 	/// never be called by users (consider protected).
 	///
 	virtual bool parseNextChunk()=0;
+
+	virtual void processTags(boost::uint64_t ts, as_object* thisPtr, VM& env);
 
 protected:
 

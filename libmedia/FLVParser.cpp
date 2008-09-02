@@ -26,6 +26,12 @@
 #include "utility.h"
 #include "GnashException.h"
 #include "IOChannel.h"
+#include "SimpleBuffer.h"
+
+#include "as_object.h"
+#include "array.h"
+#include "element.h"
+#include "VM.h"
 
 #include <string>
 #include <iosfwd>
@@ -60,7 +66,10 @@ FLVParser::FLVParser(std::auto_ptr<IOChannel> lt)
 
 FLVParser::~FLVParser()
 {
-	// nothing to do here, all done in base class now
+	for (MetaTags::iterator i=_metaTags.begin(), e=_metaTags.end(); i!=e; ++i)
+	{
+		delete *i;
+	}
 }
 
 
@@ -447,18 +456,18 @@ bool FLVParser::parseNextTag()
 	else if (tag[0] == FLV_META_TAG)
 	{
 		// Extract information from the meta tag
-		boost::scoped_array<unsigned char> metaTag ( new unsigned char[bodyLength] );
-		size_t actuallyRead = _stream->read(metaTag.get(), bodyLength);
+		std::auto_ptr<SimpleBuffer> metaTag(new SimpleBuffer(bodyLength));
+		size_t actuallyRead = _stream->read(metaTag->data(), bodyLength);
 		if ( actuallyRead < bodyLength )
 		{
 			log_error("FLVParser::parseNextTag: can't read metaTag (%d) body (needed %d bytes, only got %d)",
 				FLV_META_TAG, bodyLength, actuallyRead);
 			return false;
 		}
-                amf::Flv flv;
-                std::auto_ptr<amf::Element> el ( flv.decodeMetaData(metaTag.get(), actuallyRead) );
-		log_unimpl("FLV MetaTag handling. Data: %s", *el);
-                //el->dump();
+		metaTag->resize(actuallyRead);
+
+		// TODO: make thread-safe
+		_metaTags.push_back(new MetaTag(timestamp, metaTag));
 	}
 	else
 	{
@@ -572,6 +581,45 @@ FLVParser::readVideoFrame(boost::uint32_t dataSize, boost::uint32_t timestamp)
 	// NOTE: ownership of 'data' is transferred here
 	frame.reset( new EncodedVideoFrame(data, dataSize, 0, timestamp) );
 	return frame;
+}
+
+void
+FLVParser::processTags(boost::uint64_t ts, as_object* thisPtr, VM& vm)
+{
+	while (!_metaTags.empty())
+	{
+		if ( _metaTags.front()->timestamp() > ts ) break;
+
+		std::auto_ptr<MetaTag> tag ( _metaTags.front() );
+		_metaTags.pop_front();
+		tag->execute(thisPtr, vm);
+		
+	}
+}
+
+void
+FLVParser::MetaTag::execute(as_object* thisPtr, VM& vm)
+{
+	amf::Flv flv;
+	std::auto_ptr<amf::Element> el ( flv.decodeMetaData(_buffer->data(), _buffer->size()) );
+	log_debug("FLV MetaTag handling. Data: %s", *el);
+
+	string_table& st = vm.getStringTable();
+	string_table::key funcName = st.find(el->getName());
+
+	boost::uint8_t* ptr = _buffer->data();
+	boost::uint8_t* endptr = ptr+_buffer->size();
+
+	ptr += 1 /*type*/ + strlen(el->getName()) + sizeof(boost::uint16_t);
+
+	as_value arg;
+	if ( ! arg.readAMF0(ptr, endptr, el->getType()) )
+	{
+		log_error("Could not convert FLV metatag to as_value");
+		return;
+	}
+
+	thisPtr->callMethod(funcName, arg);
 }
 
 } // end of gnash::media namespace
