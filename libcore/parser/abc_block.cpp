@@ -61,12 +61,12 @@ abc_Trait::finalize(abc_block *pBlock, asClass *pClass, bool do_static)
 		}
 		// The name has been validated in read.
 		if (mHasValue){
-			LOG_DEBUG_ABC("Adding property=%s with value=%s",pBlock->mStringPool[mName],mValue.toDebugString());
+			LOG_DEBUG_ABC("Adding property=%s with value=%s slot=%u",pBlock->mStringPool[mName],mValue.toDebugString(),mSlotId);
 			pClass->addValue(mGlobalName, mNamespace, mSlotId, pType, 
 				mValue, mKind == KIND_CONST, do_static);
 			}
 		else{
-			LOG_DEBUG_ABC("Adding property=%s",pBlock->mStringPool[mName],mValue.toDebugString());
+			LOG_DEBUG_ABC("Adding property=%s slot=%u",pBlock->mStringPool[mName],mSlotId);
 			pClass->addSlot(mGlobalName, mNamespace, mSlotId, pType,
 				do_static);
 			}
