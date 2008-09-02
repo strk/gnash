@@ -601,26 +601,39 @@ FLVParser::processTags(boost::uint64_t ts, as_object* thisPtr, VM& vm)
 void
 FLVParser::MetaTag::execute(as_object* thisPtr, VM& vm)
 {
-	amf::Flv flv;
-	std::auto_ptr<amf::Element> el ( flv.decodeMetaData(_buffer->data(), _buffer->size()) );
-	log_debug("FLV MetaTag handling. Data: %s", *el);
-
-	string_table& st = vm.getStringTable();
-	string_table::key funcName = st.find(el->getName());
-
 	boost::uint8_t* ptr = _buffer->data();
 	boost::uint8_t* endptr = ptr+_buffer->size();
 
-	ptr += 1 /*type*/ + strlen(el->getName()) + sizeof(boost::uint16_t);
+	//log_debug("FLV meta: %s", hexify(ptr, 32, 0));
+	//log_debug("FLV meta: %s", hexify(ptr, 32, 1));
+
+	if ( ptr + 2 > endptr ) {
+		log_error("Premature end of AMF in FLV metatag");
+		return;
+	}
+	boost::uint16_t length = ntohs((*(boost::uint16_t *)ptr) & 0xffff);
+	ptr+=2;
+
+	if ( ptr + length > endptr ) {
+		log_error("Premature end of AMF in FLV metatag");
+		return;
+	}
+	std::string funcName((char*)ptr, length); // TODO: check for OOB !
+	ptr += length;
+
+	log_debug("funcName: %s", funcName);
+
+	string_table& st = vm.getStringTable();
+	string_table::key funcKey = st.find(funcName);
 
 	as_value arg;
-	if ( ! arg.readAMF0(ptr, endptr, el->getType()) )
+	if ( ! arg.readAMF0(ptr, endptr) )
 	{
 		log_error("Could not convert FLV metatag to as_value");
 		return;
 	}
 
-	thisPtr->callMethod(funcName, arg);
+	thisPtr->callMethod(funcKey, arg);
 }
 
 } // end of gnash::media namespace
