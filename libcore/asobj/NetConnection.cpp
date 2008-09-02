@@ -241,17 +241,17 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 	}
 
 	switch(amf_type) {
-		case Element::NUMBER_AMF0:
+		case amf::Element::NUMBER_AMF0:
 			if(b + 8 > end) {
 				log_error(_("NetConnection.call(): server sent us a number which goes past the end of the data sent"));
 				return false;
 			}
 			dub = *(reinterpret_cast<double*>(b)); b += 8;
-			swapBytes(&dub, 8);
+			amf::swapBytes(&dub, 8);
 			log_debug("nc read double: %e", dub);
 			ret.set_double(dub);
 			return true;
-		case Element::STRING_AMF0:
+		case amf::Element::STRING_AMF0:
 			if(b + 2 > end) {
 				log_error(_("NetConnection.call(): server sent us a string which goes past the end of the data sent"));
 				return false;
@@ -270,7 +270,7 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 
 			}
 			break;
-		case Element::STRICT_ARRAY_AMF0:
+		case amf::Element::STRICT_ARRAY_AMF0:
 			{
 				boost::intrusive_ptr<as_array_object> array(new as_array_object());
 				li = readNetworkLong(b); b += 4;
@@ -288,7 +288,31 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 				ret.set_as_object(array);
 				return true;
 			}
-		case Element::OBJECT_AMF0:
+		case amf::Element::ECMA_ARRAY_AMF0:
+			{
+				boost::intrusive_ptr<as_object> obj(new as_object());
+				li = readNetworkLong(b); b += 4;
+				log_debug("nc starting read of object with %i elements", li);
+				as_value objectElement;
+				VM& vm = VM::get(); // TODO: get VM from outside
+				string_table& st = vm.getStringTable();
+				for(int i = 0; i < li; ++i)
+				{
+    					boost::uint16_t strlen = readNetworkShort(b); b+=2; 
+					string name((char*)b, strlen);
+					//log_debug("Object prop name is %s", name);
+					b += strlen;
+					if ( ! amf0_read_value(b, end, objectElement) )
+					{
+						return false;
+					}
+					obj->set_member(st.find(name), objectElement);
+				}
+
+				ret.set_as_object(obj);
+				return true;
+			}
+		case amf::Element::OBJECT_AMF0:
 			{
 				// need this? boost::intrusive_ptr<as_object> obj(new as_object(getObjectInterface()));
 				boost::intrusive_ptr<as_object> obj(new as_object());
@@ -297,7 +321,7 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 				std::string keyString;
 				for(;;)
 				{
-					if ( ! amf0_read_value(b, end, tmp, Element::STRING_AMF0) )
+					if ( ! amf0_read_value(b, end, tmp, amf::Element::STRING_AMF0) )
 					{
 						return false;
 					}
@@ -321,12 +345,12 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 					obj->init_member(keyString, tmp);
 				}
 			}
-		case Element::UNDEFINED_AMF0:
+		case amf::Element::UNDEFINED_AMF0:
 			{
 				ret.set_undefined();
 				return true;
 			}
-		case Element::NULL_AMF0:
+		case amf::Element::NULL_AMF0:
 			{
 				ret.set_null();
 				return true;
@@ -746,14 +770,14 @@ NetConnection::call_method(const fn_call& fn)
 
 
 	// encode array of arguments to remote method
-	buf->appendByte(Element::STRICT_ARRAY_AMF0);
+	buf->appendByte(amf::Element::STRICT_ARRAY_AMF0);
 	buf->appendNetworkLong(fn.nargs - 2);
 	if (fn.nargs > 2) {
 
 		for (unsigned int i = 2; i < fn.nargs; ++i) {
 
 			if (fn.arg(i).is_string()) {
-				buf->appendByte(Element::STRING_AMF0);
+				buf->appendByte(amf::Element::STRING_AMF0);
 				std::string str = fn.arg(i).to_string();
 				buf->appendNetworkShort(str.size());
 				buf->append(str.c_str(), str.size());
@@ -765,7 +789,7 @@ NetConnection::call_method(const fn_call& fn)
 
 			else if(fn.arg(i).is_number()) {
 				double d = fn.arg(i).to_number();
-				buf->appendByte(Element::NUMBER_AMF0);
+				buf->appendByte(amf::Element::NUMBER_AMF0);
 				swapBytes(&d, 8); // this actually only swapps on little-endian machines
 				buf->append(&d, 8);
  	 	 	// FIXME implement this
@@ -776,7 +800,7 @@ NetConnection::call_method(const fn_call& fn)
 			
 			else {
 				log_error(_("NetConnection.call(): unknown argument type"));
-				buf->appendByte(Element::UNDEFINED_AMF0);
+				buf->appendByte(amf::Element::UNDEFINED_AMF0);
 			}
 		}
 	}
