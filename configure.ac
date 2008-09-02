@@ -1947,7 +1947,6 @@ if test x"$GCC" = x"yes"; then
     -Wreturn-type \
     -Wnon-virtual-dtor \
     -Wunused \
-    -fshort-wchar \
     #-ansi \
     "
   CFLAGS="$CFLAGS \
