@@ -281,7 +281,7 @@ Element::getData()
 };
 
 size_t
-Element::getLength()
+Element::getLength() const
 {
 //    GNASH_REPORT_FUNCTION;
     if (_buffer) {
@@ -291,7 +291,7 @@ Element::getLength()
 };
 
 double
-Element::to_number()
+Element::to_number() const
 {
 //    GNASH_REPORT_FUNCTION;
     if (_buffer) {
@@ -302,7 +302,7 @@ Element::to_number()
 }
 
 const char *
-Element::to_string()
+Element::to_string() const
 {
 //    GNASH_REPORT_FUNCTION;
     if (_buffer) {
@@ -315,7 +315,7 @@ Element::to_string()
 };
 
 bool
-Element::to_bool()
+Element::to_bool() const
 {
 //    GNASH_REPORT_FUNCTION;
     if (_buffer) {
@@ -924,34 +924,34 @@ Element::check_buffer(size_t size)
 }
 
 void
-Element::dump()
+Element::dump(std::ostream& os) const
 {
 //    GNASH_REPORT_FUNCTION;
     
     if (_name) {
- 	cerr << "AMF object name: " << _name << ", length is " << getLength() << endl;
+ 	os << "AMF object name: " << _name << ", length is " << getLength() << endl;
     }
 
-    cerr << astype_str[_type] << ": ";
+    os << astype_str[_type] << ": ";
 
     switch (_type) {
       case Element::NUMBER_AMF0:
-	  cerr << to_number() << endl;
+	  os << to_number() << endl;
 	  break;
       case Element::BOOLEAN_AMF0:
-	  cerr << (to_bool() ? "true" : "false") << endl;
+	  os << (to_bool() ? "true" : "false") << endl;
 	  break;
       case Element::STRING_AMF0:
-	  cerr << "(" << getLength() << " bytes): ";
+	  os << "(" << getLength() << " bytes): ";
 	  if (getLength() > 0) {
 #ifdef HAVE_STRNDUP
 		char *term = strndup(to_string(), getLength());
 #else
 		char *term = const_cast<char *>(to_string());
 #endif	      
-	      cerr << "\t\"" << term << "\"" << endl;
+	      os << "\t\"" << term << "\"" << endl;
 	  } else {
-	      cerr << endl;
+	      os << endl;
 	  }
 	  break;
       case Element::OBJECT_AMF0:
@@ -977,7 +977,7 @@ Element::dump()
 	  break;
 //       case Element::VARIABLE:
 //       case Element::FUNCTION:
-//  	  cerr << "# of properties in object: " << properties.size() << endl;
+//  	  os << "# of properties in object: " << properties.size() << endl;
 // 	  for (size_t i=0; i< properties.size(); i++) {
 // 	      properties[i]->dump();
 // 	  }
@@ -992,11 +992,11 @@ Element::dump()
 //     }
 
     if (_properties.size() > 0) {
-	vector<amf::Element *>::iterator ait;
-	cerr << "# of Properties in object: " << _properties.size() << endl;
+	vector<amf::Element *>::const_iterator ait;
+	os << "# of Properties in object: " << _properties.size() << endl;
 	for (ait = _properties.begin(); ait != _properties.end(); ait++) {
-	    amf::Element *el = (*(ait));
-	    el->dump();
+	    const amf::Element *el = (*(ait));
+	    el->dump(os);
 	}
     }
 }
