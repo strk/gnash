@@ -466,7 +466,7 @@ bool FLVParser::parseNextTag()
 		}
 		metaTag->resize(actuallyRead);
 
-		// TODO: make thread-safe
+		boost::mutex::scoped_lock lock(_metaTagsMutex);
 		_metaTags.push_back(new MetaTag(timestamp, metaTag));
 	}
 	else
@@ -586,6 +586,7 @@ FLVParser::readVideoFrame(boost::uint32_t dataSize, boost::uint32_t timestamp)
 void
 FLVParser::processTags(boost::uint64_t ts, as_object* thisPtr, VM& vm)
 {
+	boost::mutex::scoped_lock lock(_metaTagsMutex);
 	while (!_metaTags.empty())
 	{
 		if ( _metaTags.front()->timestamp() > ts ) break;

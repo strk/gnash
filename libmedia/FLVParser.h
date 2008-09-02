@@ -159,6 +159,7 @@ private:
 
 	typedef std::deque<MetaTag*> MetaTags;
 	MetaTags _metaTags;
+	boost::mutex _metaTagsMutex;
 };
 
 } // end of gnash::media namespace
