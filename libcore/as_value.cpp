@@ -54,6 +54,9 @@
 // Define this macro to make soft references activity verbose
 //#define GNASH_DEBUG_SOFT_REFERENCES
 
+// Define this macto to make AMF parsing verbose
+//#define GNASH_DEBUG_AMF_PARSING
+
 namespace {
 
 struct invalidHexDigit {};
@@ -1803,7 +1806,9 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 		case amf::Element::BOOLEAN_AMF0:
 		{
 			bool val = *b; b += 1;
-			//log_debug("amf0 read bool: %d", val);
+#ifdef GNASH_DEBUG_AMF_PARSING
+			log_debug("amf0 read bool: %d", val);
+#endif
 			ret.set_bool(val);
 			return true;
 		}
@@ -1814,7 +1819,9 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 			}
 			dub = *(reinterpret_cast<double*>(b)); b += 8;
 			amf::swapBytes(&dub, 8);
+#ifdef GNASH_DEBUG_AMF_PARSING
 			log_debug("amf0 read double: %e", dub);
+#endif
 			ret.set_double(dub);
 			return true;
 		case amf::Element::STRING_AMF0:
@@ -1830,7 +1837,9 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 
 			{
 				std::string str(reinterpret_cast<char *>(b), si); b += si;
+#ifdef GNASH_DEBUG_AMF_PARSING
 				log_debug("amf0 read string: %s", str);
+#endif
 				ret.set_string(str);
 				return true;
 
@@ -1840,7 +1849,9 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 			{
 				boost::intrusive_ptr<as_array_object> array(new as_array_object());
 				li = readNetworkLong(b); b += 4;
+#ifdef GNASH_DEBUG_AMF_PARSING
 				log_debug("amf0 starting read of array with %i elements", li);
+#endif
 				as_value arrayElement;
 				for(int i = 0; i < li; ++i)
 				{
@@ -1858,7 +1869,9 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 			{
 				boost::intrusive_ptr<as_object> obj(new as_object(getObjectInterface()));
 				li = readNetworkLong(b); b += 4;
-				log_debug("nc starting read of object with %i elements", li);
+#ifdef GNASH_DEBUG_AMF_PARSING
+				log_debug("amf0 starting read of object with %i elements", li);
+#endif
 				as_value objectElement;
 				VM& vm = VM::get(); // TODO: get VM from outside
 				string_table& st = vm.getStringTable();
@@ -1866,7 +1879,9 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 				{
     					boost::uint16_t strlen = readNetworkShort(b); b+=2; 
 					std::string name((char*)b, strlen);
-					log_debug("Object prop name is %s", name);
+#ifdef GNASH_DEBUG_AMF_PARSING
+					log_debug("amf0 Object prop name is %s", name);
+#endif
 					b += strlen;
 					if ( ! amf0_read_value(b, end, objectElement) )
 					{
@@ -1882,7 +1897,9 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 			{
 				// TODO: need this? boost::intrusive_ptr<as_object> obj(new as_object(getObjectInterface()));
 				boost::intrusive_ptr<as_object> obj(new as_object());
-				log_debug("nc starting read of object");
+#ifdef GNASH_DEBUG_AMF_PARSING
+				log_debug("amf0 starting read of object");
+#endif
 				as_value tmp;
 				std::string keyString;
 				for(;;)
