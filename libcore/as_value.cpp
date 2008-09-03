@@ -1737,9 +1737,7 @@ as_value::as_value(Element &el)
 		  if (prop == 0) {
 		      break;
 		  } else {
-//		      obj->set_member(st.string_table::find(prop->getName()), as_value(prop));
-		      obj->set_member(st.string_table::find("foo"), as_value("bar"));
-		      obj->set_member(st.string_table::find("bar"), as_value(1.234));
+		      obj->set_member(st.string_table::find(prop->getName()), as_value(prop->getValue()));
 		  }
 	      }
 	  }
