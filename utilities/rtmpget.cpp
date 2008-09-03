@@ -32,7 +32,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <gettext.h>
+#include "gettext.h"
 
 // classes internal to Gnash
 #include "gnash.h"
