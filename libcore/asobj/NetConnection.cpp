@@ -582,7 +582,7 @@ NetConnection::call_method(const fn_call& fn)
 		}
 	}
 
-	SimpleBuffer *buf = new SimpleBuffer(32);
+	boost::scoped_ptr<SimpleBuffer> buf ( new SimpleBuffer(32) );
 
 	std::string methodName = methodName_as.to_string();
 
@@ -613,9 +613,11 @@ NetConnection::call_method(const fn_call& fn)
 	buf->appendNetworkLong(fn.nargs - 2);
 	if (fn.nargs > 2) {
 
-		for (unsigned int i = 2; i < fn.nargs; ++i) {
+		for (unsigned int i = 2; i < fn.nargs; ++i)
+		{
+			const as_value& arg = fn.arg(i);
 
-			if (fn.arg(i).is_string()) {
+			if (arg.is_string()) {
 				buf->appendByte(amf::Element::STRING_AMF0);
 				std::string str = fn.arg(i).to_string();
 				buf->appendNetworkShort(str.size());
@@ -626,7 +628,8 @@ NetConnection::call_method(const fn_call& fn)
 			//	tmp = AMF::encodefunction(f);
 			}
 
-			else if(fn.arg(i).is_number()) {
+			else if(arg.is_number())
+			{
 				double d = fn.arg(i).to_number();
 				buf->appendByte(amf::Element::NUMBER_AMF0);
 				amf::swapBytes(&d, 8); // this actually only swapps on little-endian machines
@@ -637,8 +640,9 @@ NetConnection::call_method(const fn_call& fn)
 			//	tmp = AMF::encodeObject(o);
 			}
 			
-			else {
-				log_error(_("NetConnection.call(): unknown argument type"));
+			else
+			{
+				log_unimpl(_("NetConnection.call(): unsupported argument type %s"), arg);
 				buf->appendByte(amf::Element::UNDEFINED_AMF0);
 			}
 		}
