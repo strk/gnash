@@ -163,8 +163,8 @@ public:
 	as_value(asNamespace &);
 
 	/// Construct a value from an AMF element
-	as_value(amf::Element &);
-	as_value &operator=(amf::Element &);
+	as_value(amf::Element *el);
+	as_value &operator=(amf::Element *el);
 	
 	/// Construct a NULL, OBJECT, MOVIECLIP or AS_FUNCTION value
 	//
