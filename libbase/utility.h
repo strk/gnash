@@ -16,8 +16,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-
-
 #ifndef UTILITY_H
 #define UTILITY_H
 
@@ -27,7 +25,6 @@
 #endif
 
 #include <cassert>
-#include <cctype>
 #include <string>
 #include <typeinfo>
 #include <cmath>
@@ -44,18 +41,13 @@
 
 // On windows, replace ANSI assert with our own, for a less annoying
 // debugging experience.
-//int	tu_testbed_assert_break(const char* filename, int linenum, const char* expression);
 #ifndef __MINGW32__
 #undef assert
-#define assert(x)	if (!(x)) { __asm { int 3 } }	// tu_testbed_assert_break(__FILE__, __LINE__, #x))
+#define assert(x)	if (!(x)) { __asm { int 3 } }
 #endif
 #endif // not NDEBUG
 #endif // _WIN32
 
-
-// Compile-time assert.  Thanks to Jon Jagger
-// (http://www.jaggersoft.com) for this trick.
-#define compiler_assert(x)	switch(0){case 0: case x:;}
 
 // Define this to enable fast float&double to uint32 conversion.
 // If the behaviour is undefined when overflow occurs with your 
@@ -88,12 +80,6 @@ inline bool isFinite(double d)
 #endif
 }
 
-// TODO: deprecate this.
-inline float infinite_to_fzero(float x)
-{
-    return utility::isFinite(x) ? x : 0.0f;
-}
-
 inline double infinite_to_zero(double x)
 {
     return utility::isFinite(x) ? x : 0.0;
@@ -107,7 +93,7 @@ template <typename T> inline T clamp(T i, T min, T max)
 
 inline float flerp(float a, float b, float f)
 {
-    return static_cast<float>((b - a) * f + a);
+    return (b - a) * f + a;
 }
 
 inline int frnd(float f) 
@@ -170,9 +156,9 @@ inline boost::int32_t Fixed16Mul(boost::int32_t a, boost::int32_t b)
 inline unsigned int
 smallestMultipleContaining(unsigned int base, unsigned int x)
 {
-        int f=x/base;
-        if ( x%base ) f++;
-        return base*f;
+    int f = x / base;
+    if (x % base) f++;
+    return base*f;
 }
 
 
@@ -190,7 +176,7 @@ std::string typeName(const T& inst)
 	if (status == 0)
 	{
 		typeName = typeNameUnmangled;
-		free(typeNameUnmangled);
+		std::free(typeNameUnmangled);
 	}
 #endif // __GNUC__ > 2
 	return typeName;
@@ -236,30 +222,6 @@ inline unsigned long int /* pthread_t */ get_thread_id(void)
 
 // Handy macro to quiet compiler warnings about unused parameters/variables.
 #define UNUSED(x) (x) = (x)
-
-// Compile-time constant size of array.
-#define ARRAYSIZE(x) (sizeof(x)/sizeof(x[0]))
-
-
-inline size_t bernstein_hash(const void* data_in, int size, unsigned int seed = 5381)
-// Computes a hash of the given data buffer.
-// Hash function suggested by http://www.cs.yorku.ca/~oz/hash.html
-// Due to Dan Bernstein.  Allegedly very good on strings.
-//
-// One problem with this hash function is that e.g. if you take a
-// bunch of 32-bit ints and hash them, their hash values will be
-// concentrated toward zero, instead of randomly distributed in
-// [0,2^32-1], because of shifting up only 5 bits per byte.
-{
-	const unsigned char* data = static_cast<const unsigned char*>(data_in);
-	unsigned int h = seed;
-	while (size > 0) {
-		size--;
-		h = ((h << 5) + h) ^ static_cast<unsigned>(data[size]);
-	}
-
-	return h;
-}
 
 #endif // UTILITY_H
 
