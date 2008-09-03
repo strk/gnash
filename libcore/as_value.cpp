@@ -45,6 +45,7 @@
 #include <locale>
 #include <sstream>
 #include <iomanip>
+#include <string>
 
 // Define the macro below to make abstract equality operator verbose
 //#define GNASH_DEBUG_EQUALITY 1
@@ -59,6 +60,7 @@
 //#define GNASH_DEBUG_AMF_PARSING
 
 using namespace amf;
+using namespace std;
 
 namespace {
 
@@ -88,10 +90,61 @@ boost::uint8_t parseHex(char c)
 	}
 }
 
-}
+} // end of namespace
+
 
 namespace gnash {
 
+class PropsSerializer {
+    Element& _obj;
+    string_table& _st;
+public:
+    PropsSerializer(Element& el, VM& vm)
+        : _obj(el),
+	  _st(vm.getStringTable())
+	{};
+    
+    void operator() (string_table::key key, const as_value& val) const
+        {
+            //GNASH_REPORT_FUNCTION;
+            AMF amf;
+            Element *el = 0;
+	    
+            const string& name = _st.string_table::value(key);
+	    
+//          cerr << "FIXME: yes!!!!! " << name << ": "<< val << std::endl;
+	    
+            if (val.is_string()) {
+                string str;
+                if (!val.is_undefined()) {
+                    str = val.to_string();
+                }
+                el = new amf::Element;
+                el->init(name, str);
+            }
+            if (val.is_bool()) {
+                bool flag = val.to_bool();
+                el = new amf::Element;
+                el->init(name, flag);
+            }
+            if (val.is_number()) { 
+                double dub;
+                if (val.is_undefined()) {
+                    dub = 0.0;
+                } else {
+                    dub = val.to_number();
+                }
+                el = new amf::Element;
+                el->init(name, dub);
+            }
+	    
+            if (el) {
+                _obj.addProperty(el);
+            }
+        }
+};
+
+    
 //
 // as_value -- ActionScript value type
 //
@@ -1728,6 +1781,11 @@ as_value::as_value(Element &el)
 	  break;
       }
       case Element::OBJECT_AMF0:
+      case Element::REFERENCE_AMF0:
+	  log_unimpl("References don't work for AMF0 yet");
+      case Element::ECMA_ARRAY_AMF0:
+      case Element::OBJECT_END_AMF0:
+      case Element::STRICT_ARRAY_AMF0:
       {
  	  m_type = OBJECT;
  	  boost::intrusive_ptr<as_object> obj(new as_object());	
@@ -1737,21 +1795,11 @@ as_value::as_value(Element &el)
 		  if (prop == 0) {
 		      break;
 		  } else {
-		      obj->set_member(st.string_table::find(prop->getName()), as_value(prop->getValue()));
+		      obj->set_member(st.string_table::find(prop->getName()), as_value(prop));
 		  }
 	      }
 	  }
 	  _value = obj;
-	  break;
-      }
-      case Element::REFERENCE_AMF0:
-      case Element::ECMA_ARRAY_AMF0:
-      case Element::OBJECT_END_AMF0:
-      case Element::STRICT_ARRAY_AMF0:
-      {
- 	  m_type = OBJECT;
-	  _value = el.getData();
-	  break;
       }
       case Element::DATE_AMF0:
       {
@@ -1771,7 +1819,6 @@ as_value::as_value(Element &el)
       case Element::RECORD_SET_AMF0:
       case Element::XML_OBJECT_AMF0:
       case Element::TYPED_OBJECT_AMF0:
-	  break;
       case Element::AMF3_DATA:
       case Element::NOTYPE:
 	  throw ParserException("No type set for amf0 element");
