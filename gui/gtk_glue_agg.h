@@ -26,8 +26,6 @@
 #include <gdk/gdk.h>
 #include <boost/scoped_array.hpp>
 
-#undef ENABLE_MIT_SHM
-
 // Experimental support for MIT-SHM
 // see http://www.xfree86.org/current/mit-shm.html
 // currently has some problems, see https://savannah.gnu.org/bugs/?20301
