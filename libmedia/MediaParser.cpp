@@ -34,8 +34,6 @@ namespace media {
 
 MediaParser::MediaParser(std::auto_ptr<IOChannel> stream)
 	:
-	_isAudioMp3(false),
-	_isAudioNellymoser(false),
 	_stream(stream),
 	_parsingComplete(false),
 	_bufferTime(100), // 100 ms 
@@ -359,6 +357,12 @@ MediaParser::parserLoop()
 		parseNextChunk();
 		usleep(100); // no rush....
 	}
+}
+
+
+void
+MediaParser::processTags(boost::uint64_t /*ts*/, as_object* /*thisPtr*/, VM& /*env*/)
+{
 }
 
 std::ostream& operator << (std::ostream& os, const VideoInfo& vi)

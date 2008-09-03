@@ -45,14 +45,6 @@
 #include <boost/scoped_array.hpp>
 #include <algorithm> // std::min
 
-
-#if defined(_WIN32) || defined(WIN32)
-# include <windows.h>	// for sleep()
-# define usleep(x) Sleep(x/1000)
-#else
-# include "unistd.h" // for usleep()
-#endif
-
 /// Define this to add debugging prints for locking
 //#define GNASH_DEBUG_THREADS
 
@@ -63,6 +55,12 @@
 //#define GNASH_DEBUG_DECODING 1
 
 namespace gnash {
+
+static void
+cleanQueue(NetStreamFfmpeg::AudioQueue::value_type data)
+{
+    delete data;
+}
 
 // AS-volume adjustment
 void adjust_volume(boost::int16_t* data, int size, int volume)
@@ -119,6 +117,12 @@ void NetStreamFfmpeg::pause( PauseMode mode )
 void NetStreamFfmpeg::close()
 {
 	GNASH_REPORT_FUNCTION;
+
+    // Delete any samples in the audio queue.
+	{
+		boost::mutex::scoped_lock lock(_audioQueueMutex);
+		std::for_each(_audioQueue.begin(), _audioQueue.end(), &cleanQueue);
+    }
 
 	// When closing gnash before playback is finished, the soundhandler 
 	// seems to be removed before netstream is destroyed.
@@ -207,9 +211,13 @@ NetStreamFfmpeg::initVideoDecoder(media::MediaParser& parser)
 
 	assert ( _mediaHandler ); // caller should check this
 
-	_videoDecoder = _mediaHandler->createVideoDecoder(*videoInfo);
-	if ( ! _videoDecoder.get() )
-		log_error(_("Could not create video decoder for codec %d"), videoInfo->codec);
+    try {
+	    _videoDecoder = _mediaHandler->createVideoDecoder(*videoInfo);
+	}
+	catch (MediaException& e) {
+	    log_error("Could not create Video decoder: %s", e.what());
+	}
+
 }
 
 
@@ -550,11 +558,7 @@ NetStreamFfmpeg::seek(boost::uint32_t posSeconds)
 
 	{ // cleanup audio queue, so won't be consumed while seeking
 		boost::mutex::scoped_lock lock(_audioQueueMutex);
-		for (AudioQueue::iterator i=_audioQueue.begin(), e=_audioQueue.end();
-				i!=e; ++i)
-		{
-			delete (*i);
-		}
+		std::for_each(_audioQueue.begin(), _audioQueue.end(), &cleanQueue);
 		_audioQueue.clear();
 	}
 	
@@ -999,6 +1003,9 @@ NetStreamFfmpeg::advance()
 	// Refill audio buffer to consume all samples
 	// up to current playhead
 	refreshAudioBuffer();
+
+	// Process media tags
+	m_parser->processTags(_playHead.getPosition(), this, getVM());
 }
 
 boost::int32_t

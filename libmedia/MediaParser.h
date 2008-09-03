@@ -38,6 +38,12 @@
 #define LOAD_MEDIA_IN_A_SEPARATE_THREAD 1
 
 
+// Forward declarations
+namespace gnash {
+	class as_object;
+	class VM;
+}
+
 namespace gnash {
 namespace media {
 
@@ -269,14 +275,10 @@ public:
 	/// and returns the new position.
 	//
 	///
-	/// TODO: throw something for sending Seek.InvalidTime ?
-	///       (triggered by seeks beyond the end of video or beyond what's
-	///        downloaded so far)
-	///
 	/// @param time input/output parameter, input requests a time, output
 	///        return the actual time seeked to.
 	/// 
-	/// @return true if the seek was valid, false otherwise
+	/// @return true if the seek was valid, false otherwise.
 	///
 	virtual bool seek(boost::uint32_t& time)=0;
 
@@ -341,22 +343,6 @@ public:
 	///
 	DSOEXPORT std::auto_ptr<EncodedAudioFrame> nextAudioFrame();
 
-	/// Is the input MP3?
-	//
-	/// @return if the input audio is MP3
-	///
-	/// TODO: drop ?
-	///
-	bool isAudioMp3() { return _isAudioMp3; }
-
-	/// Is the input Nellymoser?
-	//
-	/// @return if the input audio is Nellymoser
-	///
-	/// TODO: drop ?
-	///
-	bool isAudioNellymoser() { return _isAudioNellymoser; }
-
 	/// Returns a VideoInfo class about the videostream
 	//
 	/// @return a VideoInfo class about the videostream,
@@ -410,6 +396,8 @@ public:
 	///
 	virtual bool parseNextChunk()=0;
 
+	virtual void processTags(boost::uint64_t ts, as_object* thisPtr, VM& env);
+
 protected:
 
 	/// Start the parser thread
@@ -441,18 +429,6 @@ protected:
 
 	/// Info about the audio stream (if any)
 	std::auto_ptr<AudioInfo> _audioInfo;
-
-	/// Is the input audio MP3?
-	//
-	/// TODO: drop ?
-	///
-	bool _isAudioMp3;
-
-	/// Is the input audio Nellymoser?
-	//
-	/// TODO: drop ?
-	///
-	bool _isAudioNellymoser;
 
 	/// The stream used to access the file
 	std::auto_ptr<IOChannel> _stream;

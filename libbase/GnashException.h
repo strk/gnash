@@ -49,8 +49,27 @@ private:
 	std::string _msg;
 };
 
+class MediaException : public GnashException
+{
+
+public:
+
+	MediaException(const std::string& s)
+		:
+		GnashException(s)
+	{}
+
+	MediaException()
+		:
+		GnashException("Media error")
+	{}
+
+	virtual ~MediaException() throw() {}
+
+};
+
 /// An SWF parsing exception 
-class ParserException: public GnashException
+class ParserException : public GnashException
 {
 
 public:

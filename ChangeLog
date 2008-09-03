@@ -1,2747 +1,1168 @@
-2008-07-29  Dossy Shiobara <dossy@panoptic.com>
+2008-09-03  Sandro Santilli <strk@keybit.net>
 
-	* configure.ac: MinGW gcc 3.4.5 on Win32 won't build with -ansi,
-	  which undefines things like strdup, etc.
+	[9665] Reintroduce MIT_SHM for agg (was forced off); testsuite
+	(matrix) cleanups; remoting cleanups
 
-	* libbase/Makefile.am: Win32 builds fail when linking against
-	  libltdl.dll.a, as it's missing the lt_* symbols.  Need to look
-	  into this further, but in the meantime, this gets the build
-	  going again.
+2008-09-03  bastiaan <bastiaan@rimmer>
 
+	[9664] Use boost's numeric conversion instead of trunc to improve
+	portability. This should not result in a change of behaviour.
+
+2008-09-03  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9663] Failing tests for try.
+
+2008-09-03  Sandro Santilli <strk@keybit.net>
+
+	[9662] add tag interface to MediaParser; implement it in FLVParser and
+	use from NetStreamFfmpeg
+
+2008-09-02  Russell Nelson <nelson@nelson-desktop>
+
+	[9661] removing -fshort-wchar; we need to use it only on the NPAPI
+
+2008-09-02  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9660] Small cleanups.
+
+2008-09-02  Sandro Santilli <strk@keybit.net>
+
+	[9659] Cleanups in amf::Element class and libmedia
+
+2008-09-01  Russell Nelson <nelson@nelson-desktop>
+
+	[9658] Changes needed to make --enable-xpcom to compile on Gutsy
+	Gibbon
+
+2008-09-01  Sandro Santilli <strk@keybit.net>
+
+	[9657] Use a single stack (VM-owned) for ActionScript execution
+
+2008-09-01  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9656] Fix segfault when video pitch is not a multiple of 4. Fix
+	segfault when decoder setup fails for embedded video. Don't abort when
+	an unknown codec is encountered; instead, log error, fail to construct
+	a VideoDecoder, and continue. Also don't construct a VideoDecoder when
+	other fatal errors occur.  Add MediaException class for use in
+	libmedia.
+
+2008-09-01  Sandro Santilli <strk@keybit.net>
+
+	[9655] some missing unimplemented messages and args marshalling
+	optimization
+
+2008-09-01  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9654] Remove obsolete code.
+
+2008-08-31  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9653] Use an appropriate size_type for SafeStack so that it is always
+	guaranteed to be valid (although the stack size is never likely to
+	exceed an unsigned int).  Make more members private, which ought to
+	fix any visibility problems. There's something wrong if private
+	members need to be exported, and it builds fine for me now with
+	visibility support enabled.  Comment out unused variables in obsolete
+	functions.
+
+2008-08-31  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9652] fix std::min() as suggested by Bastiaan. TODO: Fix Debugger.cpp
+
+2008-08-31  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9651] visbility fix
+
+2008-08-30  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9650] Fix std:min on BSD
+
+2008-08-30  Sandro Santilli <strk@keybit.net>
+
+	[9649] Change AVM1 stack management to allow smashing as expected. Fix
+	build with older ffmpeg.
+
+2008-08-28  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9648] Convert VP6A video to image::ImageRGBA. This only succeeds with
+	SwScale, not with older versions of ffmpeg.  Make renderers accept but
+	ignore RGBA data. It is easy to get agg to render the RGBA images,
+	slightly harder to get it to handle both RGB and RGBA, and so far I
+	don't see how to get it to handle transparency correctly.
+
+2008-08-28  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9647] Fix for bug #24144. It isn't very elegant, but should work
+	until FLVParser gets some much needed attention.
+
+2008-08-28  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9646] Drop the unused half of NetConnection so that it's clear how
+	the class  works and what it's for. Some minor cleanups to logging and
+	code. Use smart pointers when it's useful.  Allocate a SwsContext for
+	each instance of the VideoDecoderFfmpeg class so that newer versions
+	of Ffmpeg can decode more than one NetStream simultaneously. Make sure
+	it's freed on destruction. The ifdefs make the code a bit messier, but
+	that's ffmpeg's fault for changing its API.
+
+2008-08-26  Sandro Santilli <strk@keybit.net>
+
+	[9645] Add test for effects of setting _width on _xscale and _height
+	on _yscale
+
+2008-08-26  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9644] Minor optimizations and removal of unused functions.
+
+2008-08-26  Sandro Santilli <strk@keybit.net>
+
+	[9643] Fix the matrix regression (youtube, potlatch and friends). See
+	bug #24094 and bug #21756.
+
+2008-08-25  Sandro Santilli <strk@keybit.net>
+
+	[9642] fix up the annoinlgy failing testcase
+
+2008-08-25  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9641] Reduce XMLSocket code, various bugfixes and AS compatibility
+	corrections.  Improve tests.
+
+2008-08-25  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9640] Stub unimplemented XMLNode functions.
+
+2008-08-25  Sandro Santilli <strk@keybit.net>
+
+	[9639] Fix ffmpeg version detection for deb-based packages
+
+2008-08-25  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9638] Some maintenance on XMLSocket class.  Tests for XMLNode.
+	Update swfdec testsuite results.
+
+2008-08-22  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9637] Fix build bug.
+
+2008-08-22  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9636] Remerge of last few commits for the sake of the log messages.
+
+2008-08-22  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9635] Apparently a partial merge doesn't include all the individual
+	commit messages, which is rubbish and makes it hard to see what I've
+	done, so I'm reverting and recommitting this.
+
+2008-08-22  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9634] Missed in last merge.
+
+2008-08-22  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9633] Fixes to Math class, cleanup in as_value.cpp.
+
+2008-08-22  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9632] Progress in making tu_file redundant. It is now an ordinary
+	derived class of IOChannel, with no custom callbacks, and is only used
+	for opening files or file descriptors so can be replaced easily with
+	anything  suitable.
+
+2008-08-22  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9631] Some cleanups.
+
+2008-08-21  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9630] Drop temporary debug logging, add ostream operator<< for
+	event_id.
+
+2008-08-20  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9629] Partial fix and major cleanup for XMLSocket. It is unfinished,
+	but appears to fix a crash occurring whenever XMLSocket.onXML() is
+	called (that is, when XMLSocket.onData is undefined), gets onData
+	generally correct, and produces some sensible output for onXML.
+	Remove non-existent names from namedStrings.
+
+2008-08-20  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9628] Minor cleanups only.
+
+2008-08-20  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9627] Refine the test and make it a bit more robust.
+
+2008-08-20  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9626] Add a Perl XMLSocket server and a self-contained test for
+	XMLSocket.onData, which Gnash fails.  The server must be running
+	before the SWF starts. It sends back everything it receives, replacing
+	certain patterns with \n or \0.  Does anyone have any idea how to
+	automate this?
+
+2008-08-19  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9625] Use tRNS block, setting the image type to RGBA when it's used.
+
+2008-08-19  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9624] Fix build with older versions of ffmpeg (which will abort if
+	they encounter a VP6A video).
+
+2008-08-19  Markus Gothe <markus@Coetzee>
+
+	[9623] Leave out rtmpget
+
+2008-08-19  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9622] Fixed building
+
+2008-08-19  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9621] tidy up
+
+2008-08-19  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9620] Use csignal instead of signal.h
+
+2008-08-19  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9619] rtmpget added, take 1
+
+2008-08-19  rob@welcomehome.org
+
+	[9618] merge from rtmp branch.
+
+2008-08-18  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9617] We use our own isNaN() now, not any non-standard isnan (whether
+	or not it is in namespace std), and that it what we should test.
+
+2008-08-18  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9616] use namespace std for isnan
+
+2008-08-18  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9615] Some abstractions and class clean-ups to make implementing
+	transparent video possible.  Fix gstreamer again, which subclasses
+	ImageBase (this seems unnecessary,  but it needs an immediate fix).
+
+2008-08-18  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9614] More image abstraction, cleanup, and removal of unused code.
+
+2008-08-17  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9613] Clean up some silly as_value constructors.
+
+2008-08-17  rob@welcomehome.org
+
+	[9612] Use trunk instead of cvs in the version string.
+
+2008-08-17  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9611] Add some missing NAN->NaN and a missing
+	INFINITY->numeric_limits<double>:: infinity().
+
+2008-08-16  rob@welcomehome.org
+
+	[9610] Don't use bogus test case as it has 64bit issues as well.
+
+2008-08-16  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9609] Fix isnan conflict by renaming rather than undefining it. Drop
+	other reliance on macros that may or may not exist and use our own
+	methods everywhere.
+
+2008-08-16  rob@welcomehome.org
+
+	[9608] Include pthread.h, so it'll compile on the latest OpenBSD
+
+2008-08-16  rob@welcomehome.org
+
+	[9607] Cast squareDistance() to a double, whioch sqrt wants.
+
+2008-08-16  rob@welcomehome.org
+
+	[9606] Use -lm when looking for finite or isfinite as they are link
+	tests.
+
+2008-08-15  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9605] Minor cleanups in FreetypeGlyphsProvider. Drop unused function.
+
+2008-08-15  rob@welcomehome.org
+
+	[9604] Only use -Wextra for strict compiling.
+
+2008-08-15  rob@welcomehome.org
+
+	[9603] Decode the MetaData tag in the video stream. FLVParser needs to
+	be fixed to pass in the entire packet before this will work 100%.
+
+2008-08-15  rob@welcomehome.org
+
+	[9602] Properly handle meta data tags without the leading type field.
+
+2008-08-15  rob@welcomehome.org
+
+	[9601] Add test cases for decoding meta tag headers without the
+	leading type field.
+
+2008-08-15  rob@welcomehome.org
+
+	[9600] Change png to libpng, so it works with pkg-config.
+
+2008-08-15  rob@welcomehome.org
+
+	[9599] include boost/bin.hpp too
+
+2008-08-15  rob@welcomehome.org
+
+	[9598] undef isnan, otherwise we get conflicts on NetBSD.
+
+2008-08-15  rob@welcomehome.org
+
+	[9597] Use older version of the test case that actually compiles.
+
+2008-08-15  Sandro Santilli <strk@keybit.net>
+
+	[9596] Recompute matrix from parameters on update. Fixes MovieClip.as
+	but still not potlatch.
+
+2008-08-15  Sandro Santilli <strk@keybit.net>
+
+	[9595] make check fixes and mit-shm leak fix (bug #24068)
+
+2008-08-15  Sandro Santilli <strk@keybit.net>
+
+	[9594] Cache matrix parameters in character instances.
+
+2008-08-14  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9593] Let BitmapMovieDefinition take RGBA as well as RGB images,
+	which allows creating transparent bitmap characters from PNG,
+	potentially from GIF (not yet implemented) and should make
+	implementing MovieClip.attachBitmap() possible.  Restore the clone()
+	method of ImageBase, as I'm not sure it was a good idea to drop it.
+
+2008-08-14  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9592] Fix cairo and ogl builds (oops).
+
+2008-08-14  rob@welcomehome.org
+
+	[9591] Merge from rtmp branch the new flvdumper utility, various other
+	libamf patches, and some new test cases.
+
+2008-08-13  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9590] Do PNG reading better.
+
+2008-08-13  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9589] Various image-related bugfixes and improvements.
+
+2008-08-13  rob@welcomehome.org
+
+	[9588] We need to link against GIF_LIBS too.
+
+2008-08-12  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9587] Bugfix to PNG image input.
+
+2008-08-12  Sandro Santilli <strk@keybit.net>
+
+	[9586] collision detection fixes, minor cleanups to remoting
+
+2008-08-12  rob@welcomehome.org
+
+	[9585] Merge new XPCOM support from branch.
+
+2008-08-12  Sandro Santilli <strk@keybit.net>
+
+	[9584] Fix remoting for GC, cleanups, fix support for short
+	PLACEOBJECT tag
+
+2008-08-12  Sandro Santilli <strk@keybit.net>
+
+	[9583] improve headers parsing
+
+2008-08-12  Sandro Santilli <strk@keybit.net>
+
+	[9582] Fix 404 handling with non-blocking read (well, kind-of).
+	Improve remoting by dropping any string_table lookups and properly
+	handle 404.
+
+2008-08-12  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9581] Write an RGBA image if an image::rgba is passed.
+
+2008-08-12  Sandro Santilli <strk@keybit.net>
+
+	[9580] Initial remoting support. Needs further cleanup, test and
+	improvement .
+
+2008-08-12  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9579] Minor cleanups to ImageOutput.
+
+2008-08-12  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9578] Attempt to fix the Debian Etch build.
+
+2008-08-11  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9577] Provide a unified image-writing interface: ImageOutput. Bring
+	JPEG writing under this structure and implement PNG writing. I see no
+	point in implementing GIF writing.  There are no users of these yet.
+	They will write any valid image_base (presently just image::rgb) to
+	the provided IOChannel.
+
+2008-08-11  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9576] Rename stream.{h,cpp} to SWFStream.{h,cpp} to reflect the class
+	name.  Add constructor to sprite_definition.cpp for creating an empty
+	MovieClip; the SWFStream can then be passed by reference like
+	everywhere else.
+
+2008-08-10  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9575] Pass SWFStream always by reference, except in a couple of cases
+	where a  NULL pointer has a meaning.  This is an unfinished general
+	cleanup to take SWFStream always by reference instead of a mixture of
+	pointers and references, with some classes having hacks to convert one
+	to the other. It's being committed because others are also working on
+	parsing and need to adapt them to this  tag loader interface change.
+
+2008-08-10  rob@welcomehome.org
+
+	[9574] update from branch, XPI packaging now works.
+
+2008-08-10  rob@welcomehome.org
+
+	[9573] Add actionscript.all and libnet.all into DIST_SUBDIRS Ming
+	release rc1 is *after* beta5.
+
+2008-08-09  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9572] Delete unused files in doc/C. I keep wasting time editing the
+	wrong ones.  Update the correct files with current information.
+
+2008-08-08  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9571] Some cleanups, drop unused functions.  Parse and implement
+	DefineButtonCxform tag (SWF2 only).
+
+2008-08-08  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9570] Restore support for SWF2 (PlaceObject tag), which stopped
+	working sometime between 2006 and now.
+
+2008-08-08  rob@welcomehome.org
+
+	[9569] Newer version of ffmpeg use LIBAVCODEC_VERSION_TRIPLET instead
+	of LIBAVCODEC_VERSION.
+
+2008-08-07  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9568] Parse CSMTextSettings tag (used by myspace).
+
+2008-08-07  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9567] Fix for a segfault in sound_handler_sdl.cpp.  Drop some unused
+	functions.
+
+2008-08-07  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9566] Minor addition to image cleanup.  Drop SIZET_FMT everywhere.
+
+2008-08-06  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9565] Unify and clean up the image input interface.
+
+2008-08-06  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9564] Add an interlaced gif in the test suite.
+
+2008-08-06  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9563] Add GIF reading support, improve PNG reading support. Both are
+	now a  subclass of ImageInput, which keeps format complications well
+	away from the core.
+
+2008-08-05  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9562] Manual test for loading gifs.
+
+2008-08-05  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9561] Clean up logging.
+
+2008-08-05  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9560] Add PNG-reading capabilities. This is only for PNG movies;
+	there isn't a way of embedding them in a SWF (at least up to version
+	8).  There still might be something to be said for unifying the
+	interface to JPEG and PNG.
+
+2008-08-04  Sandro Santilli <strk@keybit.net>
+
+	[9559] Fix xtrace to also do off-visual trace
+
+2008-08-04  Sandro Santilli <strk@keybit.net>
+
+	[9558] First draft of an haxe-based testing framework plus some
+	distribution fixes (looks like we weren't distributing the testsuite
+	if configure didn't find the required tools to run them !)
+
+2008-08-04  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9557] Enable toString() counting tests.
+
+2008-08-04  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9556] Minor cleanup to gui code.  Log unimplemented when trying to
+	jump to before the tag start. This gives a lot of logging when a movie
+	is thoroughly obfuscated, but that corresponds to the way the SWF
+	looks when it plays.
+
+2008-08-04  Sandro Santilli <strk@keybit.net>
+
+	[9555] SimpleBuffer and cross-blocks branching
+
+2008-08-03  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9554] Give dump gui the C++ treatment. Minor cleanups to
+	extention.cpp, comment on implementation of edit_text_character.cpp.
+
+2008-08-01  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9553] Fix autogen.
+
+2008-08-01  Russell Nelson <nelson@nelson-desktop>
+
+	[9552] Fix typo in advice about libming-util
+
+2008-07-31  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9551] Minor cleanups.
+
+2008-07-31  Russell Nelson <nelson@nelson-desktop>
+
+	[9550] Be more paranoid about ming versions
+
+2008-07-31  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9549] Complete implementation of string methods with SWF5 to
+	upper/lower. Improve String.toUpper and .toLower. Both need more work.
+
+2008-07-30  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9548] New swfdec tests.
+
+2008-07-30  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9547] Drop -ansi again.
+
+2008-07-30  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9546] Cleanups of extension handling, replace C-style implementation
+	with (unoptimized) C++ one. It won't be a bottleneck, but some further
+	cleanup would be fine.  Other minor cleanups.  Restore -ansi now that
+	some non-standard functions have gone and see how far the win32 build
+	gets.
+
+2008-07-30  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9545] Cleanup of extension / module / plugin loading, part I.
+
+2008-07-30  Dossy Shiobara <dossy@panoptic.com>
+
+	[9544] * configure.ac: MinGW gcc 3.4.5 on Win32 won't build with
+	-ansi,   which undefines things like strdup, etc.  *
+	libbase/Makefile.am: Win32 builds fail when linking against
+	libltdl.dll.a, as it's missing the lt_* symbols.  Need to look   into
+	this further, but in the meantime, this gets the build   going again.
 	* libbase/utility.h: GetCurrentThreadId@0 symbol in kernel32.dll
-	  needs to be defined outside of the gnash C++ namespace.
-	  Needless to say, this change is a fragile hack to get the
-	  build moving again.
+	needs to be defined outside of the gnash C++ namespace.   Needless to
+	say, this change is a fragile hack to get the   build moving again.  *
+	libmedia/MediaParser.cpp: usleep() not available on Win32.   This
+	should probably go into utility.h or some other platform   abstraction
+	lib.
 
-	* libmedia/MediaParser.cpp: usleep() not available on Win32.
-	  This should probably go into utility.h or some other platform
-	  abstraction lib.
+2008-07-29  Benjamin Wolsey <bwy@benjaminwolsey.de>
 
-2008-06-26 Markus Gothe <nietzsche@lysator.liu.se>
+	[9543] Catch actionlimits exception thrown in executeTimers.
 
-	* server/asobj/NetStreamGst.cpp: Make sure
-	we only free alloc'ed pointers.
+2008-07-28  Sandro Santilli <strk@keybit.net>
 
-2008-06-20 Russ Nelson <nelson@crynwr.com>
+	[9542] Array fixes and negative matrix scale tests
 
-	* docs/C/preformatted/cygnal.1.in: old typo
+2008-07-28  Sandro Santilli <strk@keybit.net>
 
-2008-06-20 Sandro Santilli <strk@keybit.net>
+	[9541] Tom's avm2 patches
 
-	* server/vm/ASHandlers.cpp: fix message about out of valid 
-	  local register range numbers.
+2008-07-25  Benjamin Wolsey <bwy@benjaminwolsey.de>
 
-2008-06-20 Benjamin Wolsey <bwy@benjaminwolsey.de>
+	[9540] Some minor improvements to BitmapData. This needs more testing.
 
-	* server/sprite_instance.cpp: stub SWF8 methods attachBitmap,
-	  beginBitmapFill, getRect, and lineGradientStyle.
+2008-07-25  Benjamin Wolsey <bwy@benjaminwolsey.de>
 
-2008-06-20 Benjamin Wolsey <bwy@benjaminwolsey.de>
+	[9539] A bit more BitmapData.
 
-	* testsuite/actionscript.all/BitmapData.as: minor change.
-	* server/asobj/flash/geom/Point_as.h: header cleanup.
-	* server/asobj/flash/display/BitmapData_as.{h,cpp}: move class
-	  definition to the header, as something will need to get the
-	  bitmap data out.
-	* server/DynamicShape.cpp: drop <cfloat> include.
+2008-07-25  Sandro Santilli <strk@keybit.net>
 
-2008-06-20 Benjamin Wolsey <bwy@benjaminwolsey.de>
+	[9538] check fixes
 
-	* testsuite/actionscript.all/BitmapData.as: more tests.
-	* server/asobj/flash/display/BitmapData_as.cpp: implement
-	  constructor, getPixel, getPixel32, height, width, transparency,
-	  fillRect. 
+2008-07-25  Benjamin Wolsey <bwy@benjaminwolsey.de>
 
-2008-06-20 Benjamin Wolsey <bwy@benjaminwolsey.de>
+	[9537] More tests for instance construction, minor change to
+	BitmapData.
 
-	* server/asobj/SoundFfmpeg.h: AudioDecoder.h expects _leftOverData to
-	  be uint32_t, which isn't always the same as size_t.
-	* libmedia/AudioDecoder.h: use legal header guards.
+2008-07-24  Markus Gothe <nietzsche@lysator.liu.se>
 
-2008-06-20 Bastiaan Jacques <bastiaan@bjacques.org>
+	[9536] comment might be threated as part of the preprocessor-statement
 
-	* backend/render_handler_cairo.cpp: Implement set_translation and the
-	"stage matrix".
-	* gui/gtk_glue_cairo.{cpp,h}: Implement rendering to GdkImage, which
-	implicitly enables XShm support in this GUI. This brings the
-	performance I see with cairo to about 70% of GTK-AGG's. Do further
+2008-07-24  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9535] Removed all .cvsignore
+
+2008-07-24  Sandro Santilli <strk@keybit.net>
+
+	[9534] fix most of bwy new testcases (more needed)
+
+2008-07-24  Sandro Santilli <strk@keybit.net>
+
+	[9533] another "check" fix
+
+2008-07-24  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9532] Tests for instance construction.
+
+2008-07-23  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9531] Minor cleanups / Makefile bugfix.
+
+2008-07-23  Sandro Santilli <strk@keybit.net>
+
+	[9530] Fix 'make check' and runs with sound disabled
+
+2008-07-23  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9529] Kill zombie files.
+
+2008-07-23  Sandro Santilli <strk@keybit.net>
+
+	[9528] Embedded streaming sound fix
+
+2008-07-23  Sandro Santilli <strk@keybit.net>
+
+	[9527] URL querystring parsing fix, agg cleanups, avm1 reduced
+	paranoia
+
+2008-07-23  Sandro Santilli <strk@keybit.net>
+
+	[9526] Color class as verbosity cleanups
+
+2008-07-23  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9525] Drop compatibility_include.h. Improve string implementation,
+	many new passes in testsuite.
+
+2008-07-23  Sandro Santilli <strk@keybit.net>
+
+	[9524] typo
+
+2008-07-23  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9523] Minor cleanups.
+
+2008-07-23  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9522] Implement String.split more correctly. Document.
+
+2008-07-23  Sandro Santilli <strk@keybit.net>
+
+	[9521] ignore renames
+
+2008-07-22  rob@welcomehome.org
+
+	[9520]   Rename server directory to libcore. Change path in all
+	Makefiles. Change   libgnashserver to libgnashcore, change name in all
+	Makefiles. Move files from   libgeometry to libbase, and from
+	testsuite/libgeometry to testsuite/libbase.   Rename testsuite/server
+	to testsuite/libcore.all.
+
+2008-07-22  Sandro Santilli <strk@keybit.net>
+
+	[9519] Have TextFormat query fonts from relative movie root before
+	then the global shared font lib; trim trailing nulls in string-with-
+	length to avoid false negative equality comparisons. Fixes bug #23323.
+
+2008-07-22  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9518] Add xcheck to failing tests.
+
+2008-07-22  Sandro Santilli <strk@keybit.net>
+
+	[9517] hopefully enough to fix 'distcheck'
+
+2008-07-22  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9516] C++ify gtk_glue_agg.
+
+2008-07-22  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9515] Minor cleanups.
+
+2008-07-22  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9514] Fixed DSOEXPORT
+
+2008-07-22  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9513] Added Leopard X11 support
+
+2008-07-21  Sandro Santilli <strk@keybit.net>
+
+	[9512] avm2 contributed patch
+
+2008-07-21  Sandro Santilli <strk@keybit.net>
+
+	[9511] more ignores
+
+2008-07-21  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9510] Stub Accessibility class. Rename some asobj files for
+	consistency.
+
+2008-07-21  Sandro Santilli <strk@keybit.net>
+
+	[9509] more ignores
+
+2008-07-20  Sandro Santilli <strk@keybit.net>
+
+	[9508] more ignores
+
+2008-07-20  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9507] Fix to try/catch/finally with function returns. The fix is
+	suspiciously simple, but has no more unexpected failures. There's more
+	to do on try/catch.
+
+2008-07-20  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9506] Modify Try.as for a bug-fixed ming. Don't build for versions of
+	ming under 0.4.1 (CVS head of today).
+
+2008-07-20  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9505] Add a test for try / catch with malformed output, as ming
+	should now be correct. Add further tests for try / catch in mtasc
+	(which produces correct output).
+
+2008-07-20  Sandro Santilli <strk@keybit.net>
+
+	[9504] pause/unpause sound handler, cairo build fix
+
+2008-07-19  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9503] Logging changes.
+
+2008-07-19  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9502] Correct MovieClip depth tests.
+
+2008-07-18  Sandro Santilli <strk@keybit.net>
+
+	[9501] Tom Stellard patches for AVM2 (sorry, I missed to use the
+	'avm2' branch, still learning)
+
+2008-07-18  Russell Nelson <nelson@nelson-desktop>
+
+	[9500] libming has its own domain; ming.sourceforget.net redirects
+	there.
+
+2008-07-18  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9499] Add a group of tests for depth limits. Do depth checking on
+	MovieClip.attachMovie, duplicateMovieClip and
+	MovieClip.duplicateMovieClip. This conveniently also prevents UB when
+	converting to int.  Allow attachMovie to accept all legal depths, not
+	just 0-65535. Don't use depth as ID.  Add static constants to
+	character class for upper and lower bounds.
+
+2008-07-17  Sandro Santilli <strk@keybit.net>
+
+	[9498] testsuite fixes, flv meta tag dumping
+
+2008-07-17  Sandro Santilli <strk@keybit.net>
+
+	[9497] avm2 starts to get some love (and bzr branches too)
+
+2008-07-17  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9496] Fix SIZET_FMT warning.
+
+2008-07-16  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9495] Merge of image class changes: slim down the class by removing
+	unused code, move into gnash namespace, const correct where possible.
+
+2008-07-16  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9494] Zou's fix to bug 23846 (stage matrix).
+
+2008-07-16  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9493] Define PI properly and update character.cpp. This belongs with
+	the last revision, but I forgot to commit locally before merging.
+
+2008-07-16  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9492] Remove obsolete support for dlmalloc and dmalloc. Drop dlmalloc
+	files and utility.cpp.
+
+2008-07-15  Russell Nelson <nelson@nelson-desktop>
+
+	[9491] abc_block.cpp requires gnashconfig.h because a boost header
+	requires it. Added some protectors for asm blocks, but make check
+	still not succeeding. It's a start....
+
+2008-07-15  Sandro Santilli <strk@keybit.net>
+
+	[9490] timers execution and ignores.
+
+2008-07-15  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9489] Update for new swfdec tests.
+
+2008-07-15  Russell Nelson <nelson@nelson-desktop>
+
+	[9488] Add ChangeLog-0.8.3 and adjust ChangeLog
+
+2008-07-15  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9487] Partial fix to bug #23624, minor changes to advance counter,
 	cleanups.
 
-2008-06-20 Zou Lunkai <zoulunkai@gmail.com>
+2008-07-14  Benjamin Wolsey <bwy@benjaminwolsey.de>
 
-	* backend/render_handler_agg_style.h,
-	  server/fill_style.cpp, server/sprite_instance.cpp:
-	  tirval cleanups, indent, fix compiler warnings.
-	* testsuite/server/MatrixTest.cpp: more tests for matrix::invert().
-	 
-2008-06-20 Zou Lunkai <zoulunkai@gmail.com>
+	[9486] server/sprite_instance.cpp: minor comments update, added TODO
+	about excessive depth handling (undefined behaviour if not checked
+	elsewhere)
 
-	* server/matrix.cpp: invert(), fix overflows, should also fix regression
-	 bug#23621.
+2008-07-13  Sandro Santilli <strk@keybit.net>
 
-2008-06-19 Sandro Santilli <strk@keybit.net>
+	[9485] Implement Rectangle.contains and add tests for it. Thanks to
+	Sean Stangl for the initial draft.
 
-	* server/asobj/SoundFfmpeg.cpp: any new loadSound call replaces
-	  the streaming sound (tested).
+2008-07-13  zou lunkai <zoulunkai@gmail.com>
 
-2008-06-19 Sandro Santilli <strk@keybit.net>
+	[9484] fixed rendering quality regression; fixed bug#23811
 
-	* server/asobj/SoundFfmpeg.cpp: attach aux streamer on loadSound,
-	  don't wait for .start() to be called..
+2008-07-11  Sandro Santilli <strk@keybit.net>
 
-2008-06-19 Sandro Santilli <strk@keybit.net>
+	[9483] Embedded video refactoring
 
-	* libmedia/ffmpeg/sound_handler_sdl.cpp: fix mute() and unmute().
-	  Have fun with the gtk menu control of it.
+2008-07-11  Sandro Santilli <strk@keybit.net>
 
-2008-06-19 Sandro Santilli <strk@keybit.net>
+	[9482] maintain last decoded frame for reuse on refresh or gaps
 
-	* testsuite/swfdec/PASSING: sound-target-reference-5.swf pass.
+2008-07-10  Sandro Santilli <strk@keybit.net>
 
-2008-06-19 Sandro Santilli <strk@keybit.net>
+	[9481] Allow for binary post data
 
-	* server/asobj/SoundFfmpeg.cpp: re-implement start offset again
-	  by keeping note of where to start. Fixes bug #20685 again
-	  (at least for dynamically loaded sound).
+2008-07-10  Sandro Santilli <strk@keybit.net>
 
-2008-06-19 Sandro Santilli <strk@keybit.net>
+	[9480] Non-blocking IOChannel, heart-beating and distcheck
 
-	* server/asobj/SoundFfmpeg.cpp (getAudio): return false
-	  when willing to be detached. Manually detaching would result
-	  in a deadlock.
+2008-07-09  Sandro Santilli <strk@keybit.net>
 
-2008-06-19 Sandro Santilli <strk@keybit.net>
+	[9479] version label change: cvs->trunk
 
-	* server/asobj/SoundFfmpeg.cpp (start): when streaming we
-	  won't loop (at least this is what happens with pp, gnash
-	  itself doesn't implement looping yet).
+2008-07-09  Markus Gothe <nietzsche@lysator.liu.se>
 
-2008-06-19 Sandro Santilli <strk@keybit.net>
+	[9478] Try to do some sanity checks, should fix bug #21095
 
-	* server/asobj/Sound.h: document the 'attachedCharacter' as a
-	  reachable resource..
+2008-07-09  zou lunkai <zoulunkai@gmail.com>
 
-2008-06-19 Sandro Santilli <strk@keybit.net>
+	[9477] get rid of 'float to int conversion' warnings messages,
+	cleanups, tabs to spaces
 
-	* libmedia/MediaParser.h: document setBufferTime unit.
-	* server/asobj/Sound.{cpp,h}: document and fix signature
-	  of getBytes{Loaded/Total}.
-	* server/asobj/SoundFfmpeg.{cpp,h}: drop any FFMPEG-specific
-	  reference, convert to be a pure MediaHandler user.
-	  Test: http://foo.keybit.net/~strk/tmp/SoundTest.swf (and .as)
-	  Should fix bug #23636.
+2008-07-09  Markus Gothe <nietzsche@lysator.liu.se>
 
-2008-06-19 Benjamin Wolsey <bwy@benjaminwolsey.de>
+	[9476] Fixed ls -dr check
 
-	* testsuite/actionscript.all/BitmapData.as: some initial tests.
+2008-07-09  Sandro Santilli <strk@keybit.net>
 
-2008-06-19 Sandro Santilli <strk@keybit.net>
+	[9475] update bytes loaded on EOF during FLV indexing - reduce
+	debugging noise while playing audio-only flvs with ffmpeg handler.
 
-	* libmedia/ffmpeg/MediaParserFfmpeg.cpp (initializeParser): don't
-	  try to fetch audio info from video stream (eh..).
+2008-07-09  Sandro Santilli <strk@keybit.net>
 
-2008-06-19 Sandro Santilli <strk@keybit.net>
+	[9474] Oops, I knew gstreamer would suffer (fix build)
 
-	* server/asobj/Sound.{cpp,h}: any virtual class needs a virtual
-	  destructor !
+2008-07-09  Sandro Santilli <strk@keybit.net>
 
-2008-06-19 Sandro Santilli <strk@keybit.net>
+	[9473] Use a private timer to advance a NetStream (don't rely on a
+	video character driving it). Fixes bug #23802.
 
-	* server/asobj/Sound.cpp (sound_loadsound): second argument
-	  is NOT mandatory. log warning when passed more then two args
-	  (in case we miss something).
+2008-07-08  Markus Gothe <nietzsche@lysator.liu.se>
 
-2008-06-19 Benjamin Wolsey <bwy@benjaminwolsey.de>
+	[9472] Added BOOST_CFLAGS to INCLUDE-path
 
-	* server/as_object.h: typeid can cope with null pointers, but
-	  deferencing them beforehand is UB. Pass the pointer to typeName
-	  without deferencing. Fixes a crash in the swfdec testsuite.
-	* server/asobj/flash/geom/Rectangle_as, Point_as, Matrix_as: don't
-	  be so fussy about what sort of object methods are applied to. Most
-	  of them work anyway.
-	* testsuite/actionscript.all/{Point,Matrix}.as: add tests with
-	  faked Matrix and Point objects.
-	* libbase/utility.h: add a much faster version of non-UB
-	  PIXELS_TO_TWIPS that only uses fmod when it would otherwise
-	  overflow.
+2008-07-08  Markus Gothe <nietzsche@lysator.liu.se>
 
-2008-06-19 Sandro Santilli <strk@keybit.net>
+	[9471] Edge is not a template anymore
 
-	* server/as_object.{cpp,h}: change get_super semantic again,
-	  now to be called against the object on which a method
-	  is being called, with an optional method name too.
-	* server/as_function.cpp, server/sprite_instance.cpp,
-	  server/timers.cpp, server/asobj/AsBroadcaster.cpp,
-	  server/vm/ASHandlers.cpp: simplify extraction of 'super'
-	  object by delegating all to the virtual as_object::get_super.
-	* testsuite/swfdec/PASSING: super-missing-{7,8}.swf
-	* testsuite/actionscript.all/Inheritance.as: no more failures here.
+2008-07-08  zou lunkai <zoulunkai@gmail.com>
 
-2008-06-19 Sandro Santilli <strk@keybit.net>
+	[9470] get rid of debugging prints left in my last commit
 
-	* testsuite/actionscript.all/Inheritance.as: run the egg/chicken
-	  test after totals are printed, so we get some info from the
-	  pp before it hangs.
+2008-07-08  zou lunkai <zoulunkai@gmail.com>
 
-2008-06-19 Markus Gothe <nietzsche@lysator.liu.se>
+	[9469] refactoring of Point2d, Edge and Path classes, now they are all
+	implemented by integers
 
-	* libnet/rtmp.cpp: Fixed warnings.
+2008-07-08  Sandro Santilli <strk@keybit.net>
 
-2008-06-18 Sandro Santilli <strk@keybit.net>
+	[9468] Summer games : v9
 
-	* testsuite/actionscript.all/Inheritance.as: drop useless duplicated
-	  function call in check_equals argument, as it would be called twice
-	  confusing results.
+2008-07-08  Sandro Santilli <strk@keybit.net>
 
-2008-06-18 Benjamin Wolsey <bwy@benjaminwolsey.de>
+	[9467] More swf5 scoping issues
 
-	* server/vm/ClassHierarchy.{h,cpp}: drop no-op dump() because an
-	  ostream operator<< is defined. Make knownClasses table const; pass
-	  nativeClasses by const ref. Add comments.
-	* libamf/element.{h,cpp}: delete(NULL) is a no-op, so there's no need
-	  to check first. Add GNASH to header guard.
-	* server/parser/abc_block.cpp: don't use ClassHierarchy::dump().
-	* libbase/string_table.{h,cpp}: make mEmpty, the universal empty string
-	  const, as it's not likely to change.
+2008-07-05  Sandro Santilli <strk@keybit.net>
 
-2008-06-18 Benjamin Wolsey <bwy@benjaminwolsey.de>
+	[9466] When calling a function in SWF5, set target to the 'this'
+	pointer, if it is a character. Fixes many tests in setProperty.as but
+	nothing new in other testsuites. We need more tests on this.
 
-	* server/vm/ActionExec.{cpp,h}: drop unused method, rename
-	  with_stack.
+2008-07-04  zou lunkai <zoulunkai@gmail.com>
 
-2008-06-18 Sandro Santilli <strk@keybit.net>
+	[9465] fix some remaining warnings with float points and coordinates,
+	cleanups
 
-	* server/character.cpp (getTarget): don't abort when called for 
-	  characters created by new (MovieClip, Video, TextField).
+2008-07-04  zou lunkai <zoulunkai@gmail.com>
 
-2008-06-18 Benjamin Wolsey <bwy@benjaminwolsey.de>
+	[9464] add tests for boost types(intxx_x), minor cleanups in
+	matrix.cpp
 
-	* testsuite/actionscript.all/Matrix.as: some tests fail on ming
-	  versions below 0.4 beta 6 (confirmed by zou).
+2008-07-04  Tom Stellard <tstellar@gmail.com>
 
-2008-06-18 Benjamin Wolsey <bwy@benjaminwolsey.de>
+	[9463] Patch #6556: Add tag_loader stub for
+	DEFINESCENEANDFRAMELABELDATA tag
 
-	* server/vm/ActionExec.cpp: fix try/catch in functions without using
-	  a special case. Also passes the ordinary try tests in swfdec
-	  (needed Error too).
-	* server/swfdec/PASSING: three passes in try.
+2008-07-03  Markus Gothe <nietzsche@lysator.liu.se>
 
-2008-06-17 Markus Gothe <nietzsche@lysator.liu.se>
+	[9462] Added OpenGL dependencies
 
-	* configure.ac, libamf/element.cpp:
-	  Some non-GLIBC lacks strndup.
+2008-07-03  Markus Gothe <nietzsche@lysator.liu.se>
 
-2008-06-17 Benjamin Wolsey <bwy@benjaminwolsey.de>
+	[9461] __APPLE__ should be dinfined by CPP
 
-	* server/vm/ActionExec.{h,cpp}, ASHandlers.cpp: add more accessors to
-	  data members.
+2008-07-03  Markus Gothe <nietzsche@lysator.liu.se>
 
-2008-06-17 Sandro Santilli <strk@keybit.net>
+	[9460] Use fmod() in favor of typecasting on OS X
 
-	* testsuite/actionscript.all/AsBroadcaster.as: add test for 'super'
-	  referenced in AsBroadcaster event handlers.
-	* server/vm/ASHandlers.cpp (ActionCallMethod): don't dereference
-	  null prototypes...
-	* server/asobj/AsBroadcaster.cpp: add initial support for 'super'
-	  in AsBroadcasters (I now realized I forgot to cleanup the
-	  super stuff, and it hurts indeed!).
+2008-07-03  Markus Gothe <nietzsche@lysator.liu.se>
 
-2008-06-17 Bastiaan Jacques <bastiaan@bjacques.org>
+	[9459] Opppssss
 
-	* gui/gtk_glue_agg.cpp: Make sure we don't overflow the buffer.
-	Fixes bug #23620.
+2008-07-03  Markus Gothe <nietzsche@lysator.liu.se>
 
-2008-06-17  Rob Savoye  <rob@ripple.welcomehome.org>
+	[9458] Revert back to old behaviour but keep C++-typecsting
 
-	* libamf/amf.cpp: Drop a few debug messages.
-	* libamf/element.{h,cpp}: Add a findProperty() method. Use a NULL
-	terminated string for printing.
-	* libnet/network.{h,cpp}: Read data into a Buffer. Add a readNet
-	with a timeout value.
-	* libnet/rtmp.{h,cpp}: Add array's for printing of enum types for
-	debugging purposes. Delete all allocated pointers. Add method for
-	sending messages, this does a complete send/receive process.
-	* libnet/rtmp_client.cpp: Make client side RTMP handshake
-	negotiation work again. 
+2008-07-02  Markus Gothe <nietzsche@lysator.liu.se>
 
-2008-06-17 Sandro Santilli <strk@keybit.net>
+	[9457] Fixes the fmod() issue as seen on OS X.
 
-	* testsuite/misc-ming.all/NetStream-SquareTest.c: add tests for
-	  Sound-driven audio control. Volunteers adding sound to square.flv
-	  are highly welcome (I did test it with another flv already).
+2008-07-02  Markus Gothe <nietzsche@lysator.liu.se>
 
-2008-06-17 Sandro Santilli <strk@keybit.net>
+	[9456] downcast double to float
 
-	* server/character.cpp (getWorldVolume): fix loss of precision.
-	* server/asobj/NetStream.{cpp,h}: add setAudioController interface
-	  to register a character to use for audio control.
-	* server/asobj/NetStreamFfmpeg.cpp: use any registered audio
-	  controller to controle volume.
-	* server/sprite_instance.cpp: implement MovieClip.attachAudio
-	  taking a NetStream argument.
+2008-07-02  Markus Gothe <nietzsche@lysator.liu.se>
 
-2008-06-17 Sandro Santilli <strk@keybit.net>
+	[9455] Pass floats to sinf and cosf.
 
-	* libmedia/ffmpeg/sound_handler_sdl.cpp: concatenate final
-	  volume to mixer.
+2008-07-02  Markus Gothe <nietzsche@lysator.liu.se>
 
-2008-06-17 Sandro Santilli <strk@keybit.net>
+	[9454] beautify
 
-	* server/asobj/Sound.{cpp,h}: fix constructor taking
-	  arg; fix getVolume/setVolume to query either global
-	  volume or associated-character-local one; fix visibility
-	  of a few method found to be only available in SWF6+
-	  by the new Sound.as testcase.
-	* testsuite/actionscript.all: Makefile.am, Sound.as: initial
-	  test for Sound class.
-	* utilities/processor.cpp: register a NullSoundHandler so we
-	  can query global volume from actionscript.all
+2008-07-02  Markus Gothe <nietzsche@lysator.liu.se>
 
-2008-06-17 Sandro Santilli <strk@keybit.net>
+	[9453] More typecast fixes
 
-	* server/character.{cpp,h}: add interface to get/set volume
-	  of sounds associated to the character, both local and
-	  concatenated one.
+2008-07-02  Markus Gothe <nietzsche@lysator.liu.se>
 
-2008-06-17 Sandro Santilli <strk@keybit.net>
+	[9452] Fixed fmod() on some systems...
 
-	* libmedia/: Makefile.am, NullSoundHandler.h, sound_handler.h:
-	  Add interface to set/get final volume. Add NullSoundHandler
-	  for use in gprocessor.
+2008-07-02  Markus Gothe <nietzsche@lysator.liu.se>
 
-2008-06-17 Benjamin Wolsey <bwy@benjaminwolsey.de>
+	[9451] Clean-up typecasting...
 
-	* server/vm/action_buffer.cpp: rewrite disasm_instruction so that it
-	  doesn't read uninitialized memory so much (still not entirely
-	  unbreakable). Use switch and hexify whole instructions where the
-	  length is known.
-	* server/vm/ASHandlers.cpp: fix output of uint8_t. 	  
+2008-07-02  Markus Gothe <nietzsche@lysator.liu.se>
 
-2008-06-17 Sandro Santilli <strk@keybit.net>
+	[9450] Added #include <cmath>
 
-	* server/: Makefile.am, as_value.{cpp,h}, ChracterProxy.{cpp,h}:
-	  Move CharacterProxy class in its own files (they are useful
-	  for other classes, not only as_value - surely for Sound, possibly
-	  for as_environment too [ target ]).
+2008-07-02  Markus Gothe <nietzsche@lysator.liu.se>
 
-2008-06-17 Sandro Santilli <strk@keybit.net>
+	[9449] use std::getline instead of getline() to avoid confusion.
 
-	* server/impl.cpp: add recognition of FLV files as
-	  top level movie (just to log_unimpl about it).
+2008-07-02  zou lunkai <zoulunkai@gmail.com>
 
-2008-06-17 Benjamin Wolsey <bwy@benjaminwolsey.de>
+	[9448] cleanups, float --> int32 conversion for coordinates related
+	stuff
 
-	* server/asobj/Error_as.cpp: partial implementation of Error class.
-	* server/asobj/ClassHierarchy.cpp: Error available from SWF5.
-	* testsuite/actionscript.all/Error.as: more tests, some pass now.
+2008-07-01  Sandro Santilli <strk@keybit.net>
 
-2008-06-17 Benjamin Wolsey <bwy@benjaminwolsey.de>
+	[9447] Allow null target in as_environment. Fixes bug #23735 and a few
+	cases in our and swfdec's testsuite.
 
-	* server/asobj/Error_as.{cpp,h}: regenerate unimplemented Error
-	  class.
-	* server/asobj/ClassHierarchy.cpp: Error also works in SWF6.
-	  Update includes.
-	* server/asobj/Global.cpp: update include (it's not necessary at
-	  all now, but may be if Error is an ASnative function).
+2008-07-01  zou lunkai <zoulunkai@gmail.com>
 
-2008-06-17 Benjamin Wolsey <bwy@benjaminwolsey.de>
+	[9446] fix rect::expand_to_point(), fix regressions detected in swfdec
+	and cvrveball.swf
 
-	* gui/kde.cpp: PIXELS_TO_TWIPS is now in utility.h.
+2008-06-30  Sandro Santilli <strk@keybit.net>
 
-2008-06-17 Benjamin Wolsey <bwy@benjaminwolsey.de>
+	[9445] dlist.{cpp,h} -> DisplayList.{cpp,h} movie_def_impl.{cpp,h} ->
+	SWFMovieDefinition.{cpp,h} Cleanups.
 
-	* server/array.{cpp,h}: drop unused variable, reduce calls to .size()
-	  and .end(). Replace std::auto_ptr with boost::intrusive_ptr.
+2008-06-30  Markus Gothe <nietzsche@lysator.liu.se>
 
-2008-06-16 Sandro Santilli <strk@keybit.net>
+	[9444] 1.0?
 
-	* libmedia/ffmpeg/sound_handler_sdl.{cpp,h}: don't fail to initialize
-	  audio spec in the constructor not taking an audio file.
-	  Fixes timeout running NetStream-SquareTestRunner with ffmpeg
-	  media handler.
+2008-06-30  Bastiaan Jacques <bastiaan@bjacques.org>
 
-2008-06-16 Sandro Santilli <strk@keybit.net>
+	[9443] Remove the unused and undocumented pixel-scale argument from
+	many methods.
 
-	* server/asobj/NetStreamFfmpeg.cpp (pushDecodedAudioFrames): don't
-	  consume *all* of the audio queue if there's no sound handler..
-	* libmedia/MediaParser.cpp: members initialization order, debugging
-	  lines (commented out).
+2008-06-30  zou lunkai <zoulunkai@gmail.com>
 
-2008-06-16 Benjamin Wolsey <bwy@benjaminwolsey.de>
+	[9442] don't set the height when the bounds is null, fix a regression
+	made by my last commit
 
-	* server/asobj/System.cpp, server/video_stream_instance.cpp: remove
-	  reliance on VM::get().
+2008-06-30  zou lunkai <zoulunkai@gmail.com>
 
-2008-06-16 Sandro Santilli <strk@keybit.net>
+	[9441] use integer rect instead of float Range2D for instance bounds,
+	more integer math
 
-	* libmedia/ffmpeg/MediaParserFfmpeg.cpp: push encoded frames to
-	  queue. NetStream-SquareTest.swf shows the ogg now.
+2008-06-30  Bastiaan Jacques <bastiaan@bjacques.org>
 
-2008-06-16 Benjamin Wolsey <bwy@benjaminwolsey.de>
+	[9440] PathParser: optimize by allowing inlining and other small
+	cleanups. Cairo: Implement cap and line styles and cleanups.
 
-	* server/array.cpp: remove direct dependence on VM::get() (it's now
-	  obtained from as_object.h), stop passing env around uselessly and
-	  pass version instead.
+2008-06-28  Bastiaan Jacques <bastiaan@bjacques.org
 
-2008-06-16 Sandro Santilli <strk@keybit.net>
+	[9439] Introducing PathParser for correct shape rendering for Cairo,
+	compilation fixes for the Cairo GUI and related changes.
 
-	* libmedia/FLVParser.{cpp,h}: use _seekRequest from base class,
-	  not the custom one.
-	* libmedia/MediaParser.h: add an ExtraInfo class pointer to VideoInfo
-	  and AudioInfo classes, to allow for custom additional info to be
-	  passed to decoders.
-	* libmedia/ffmpeg/MediaParserFfmpeg.{cpp,h}: pass extradata and
-	  extradataSize trough an ffmpeg-specific ExtraInfo class for
-	  VideoInfo and AudioInfo.
-	* libmedia/ffmpeg/AudioDecoderFfmpeg.cpp: use extra info for
-	  initialization of decoder. Fixes decoder inititialization for
-	  square.ogg case.
-	* libmedia/ffmpeg/VideoDecoderFfmpeg.{cpp,h}: extend the private
-	  ::init() method to take extra data, use extradata passed with
-	  VideoInfo when available. Fixes decoder initialization for
-	  square.ogg case.
+2008-06-27  zou lunkai <zoulunkai@gmail.com>
 
-2008-06-16 Benjamin Wolsey <bwy@benjaminwolsey.de>
+	[9438] rect class refactory, use integer math instead of float
 
-	* server/vm/ASHandlers.cpp: minor cleanups.
-	* server/vm/ActionExec.{cpp,h}: drop _function_var member as it can be
-	  retrieved inexpensively from _func on the few occasions when it's
-	  needed.
+2008-06-27  Sandro Santilli <strk@keybit.net>
 
-2008-06-16 Sandro Santilli <strk@keybit.net>
+	[9437] Register Gui with movie_root, have movie_root ask gui to prompt
+	user on action limit hit.
 
-	* libmedia/MediaParser.{cpp,h}: move _bytesLoaded to superclass, don't
-	  forget to initialize _seekRequested(), move parser thread starter
-	  in its own method so subclasses can do other initializations before
-	  starting it.
-	* libmedia/FLVParser.{cpp,h}: start parser thread after having
-	  parsed the header.
-	* libmedia/ffmpeg/MediaParserFfmpeg.{cpp,h}: start the parser thread
-	  after having initialized the parser.
+2008-06-26  Markus Gothe <nietzsche@lysator.liu.se>
 
-2008-06-16 Sandro Santilli <strk@keybit.net>
+	[9436] Make sure we free only alloc'ed pointers.
 
-	* libmedia/MediaParser.cpp: fix members initialization order.
+2008-06-25  Sandro Santilli <strk@keybit.net>
 
-2008-06-16 Sandro Santilli <strk@keybit.net>
+	[9435] Fix leak in ffmpeg audio decoder, other minor cleanups
 
-	* libmedia/MediaParser.{cpp,h}: move more functionality to
-	  the base class: management of encoded audio/video queues and
-	  threaded loading (compile-time opt-out available);
-	  change seek() signature to allow for InvalidTime return.
-	* libmedia/FLVParser.{cpp,h}: adapt to MediaParser changes.
-	* libmedia/ffmpeg/MediaParserFfmpeg.{cpp,h}: adapt to MediaParser
-	  changes.
-	* server/asobj/NetStream.cpp: notify buffer time to parser, when
-	  available (it'll take care of it).
-	* server/asobj/NetStreamFfmpeg.{cpp,h}: push time *ahead* to decoded
-	  audio queue.
+2008-06-25  Petr Pisar <petr.pisar@atlas.cz>
 
-2008-06-16 Benjamin Wolsey <bwy@benjaminwolsey.de>
+	[9434] updated Czech translation
 
-	* server/vm/ASHandlers.{cpp,h}: use std::string instead of C strings
-	  for CommonGetUrl (saves converting back and forth several times).
+2008-06-25  Ed Martin <edman007@edman007.com>
 
-2008-06-16 Zou Lunkai <zoulunkai@gmail.com>
+	[9433] This patch moves the argument list creation to before the fork
+	removing the malloc/free calls preventing bogus FF3 jemalloc from
+	causing a deadlock
 
-	* libbase/utility.h: implement a safer but slower PIXEL_TO_TWIPS().
-	* server/types.h: move PIXEL_TO_TWIPS to utility.h
-	* server/matrix.h: safe but slower version of FloatToFixed16() and
-	  DoubleToFixed16().
-	* server/parser/movie_def_impl.h, character.cpp: head file and data
-	  types cleanups.
-	* testsuite/server/MatrixTest.cpp: more telerrant about matrix test,
-	  from 10e-6 to 10-3, enable the test file.
+2008-06-25  Sandro Santilli <strk@keybit.net>
 
-2008-06-15 Benjamin Wolsey <bwy@benjaminwolsey.de>
+	[9432] Only use fontconfig from main thread. Fixes bug #23697.
 
-	* server/vm/ASHandlers.cpp: drop unused env variable.
+2008-06-25  Sandro Santilli <strk@keybit.net>
 
-2008-06-14 Bastiaan Jacques <bastiaan@bjacques.org>
+	[9431] Allocate just the required amount of bytes on audio resample
+	(ffmpeg)
 
-	* backend/render_handler_cairo.cpp: Remove init_cairo_matrix, which is
-	unused and broken.
-	* gui/gtk.cpp: Use GTK's internal region invalidation instead of our
-	own bounds invalidation, because the former seems to be more portable.
-	This change makes the GTK GUI fully functional when compiled against
-	GTK's native Mac port.
-	* gui/{gtk.cpp, gtk_glue.h, gtk_glue_cairo.h, gtksup.h}: Don't include
-	gdkx.h, since we don't use it.
-	* gui/gtk_glue_agg.cpp: Disable double buffering in all cases, because
-	we always render into our own offscreen buffer (rather than GTK's).
-	Make sure we pass the right row stride when blitting.
-	* gui/gui.cpp: tiny cleanup.
+2008-06-25  Markus Gothe <nietzsche@lysator.liu.se>
 
-2008-06-14  Rob Savoye  <rob@ripple.welcomehome.org>
+	[9430] bzr ci
 
-	* libnet/network.{h,cpp}: Read and write Buffers too. Set _port for
-	client connections too.
-	
-	* libbase/URL.h: Add method to return the port number, and another
-	one to fix the hostname if there is a port number attached.
-	* libbase/URL.cpp: Properly parse the optional port number instead
-	of blindly adding it to the hostname.
+2008-06-25  Sandro Santilli <strk@keybit.net>
 
-2008-03-14 Markus Gothe <nietzsche@lysator.liu.se>
+	[9429] simplify ignores, add Makefile (in any dir!)
 
-	* libnet/{handler, network, cque}.h: Added DSOEXPORT.
-	* libnet/{handler, rtmp}.cpp: Added DSOEXPORT and Fixed uninitilzied
-	  vars.
+2008-06-25  Daniel Drake <dsd@laptop.org>
 
-2008-03-13 Markus Gothe <nietzsche@lysator.liu.se>
+	[9428] Fix missing libgnashplugin.so glib link. libgnashplugin uses
+	functions like g_io_channel_unix_get_fd()
+	http://dev.laptop.org/ticket/7328
 
-	* libmedia/ffmpeg/AudioDecoderFfmpeg.cpp: Fixed typecasting for 
-	  std::max().
-	* macros/opengl.m4: Fix for Leopard and OGL, see:
-	  "http://wiki.finkproject.org/index.php/Fink:
-	  Packaging:Preparing_for_10.5#OpenGL_Bug"
-	* backend/render_handler_ogl.h: Should fix bug #23352.
-	* testsuite/samples/Makefile.am, testsuite/movies.all/Makefile.am:
-	  Let testcases run on OS X.
- 
-2008-06-13 Benjamin Wolsey <bwy@benjaminwolsey.de>
+2008-06-25  Sandro Santilli <strk@keybit.net>
 
-	* server/vm/ActionExec.h, server/vm/ASHandlers.cpp: drop stack depth
-	  argument to TryBlock.
+	[9427] few more ignores (gmo don't get cleared on distcheck,
+	expected?)
 
-2008-06-13 Jeremy C. Reed <reed@reedmedia.net>
+2008-06-24  Sandro Santilli <strk@keybit.net>
 
-	* configure.ac, macros/docbook.m4: The world doesn't always use bash's
-	  builtin test.
+	[9426] Add CTRL-equals, CTRL-minus and CTRL-plus keystroke controlling
+	FPS (gtk guys around willing to have fun with some slidebar?) Fix
+	computation of "min" fps for fps-debugging.
 
-2008-06-13 Sandro Santilli <strk@keybit.net>
+2008-06-24  Sandro Santilli <strk@keybit.net>
 
-	* server/asobj/System.cpp: LOG_ONCE log_unimpl..
+	[9425] Implement fscommand:allowscale, drop debug output at each
+	fscommand (unhandled ones will still be printed)
 
-2008-06-13 Benjamin Wolsey <bwy@benjaminwolsey.de>
+2008-06-24  zou lunkai <zoulunkai@gmail.com>
 
-	* server/vm/ActionExec.{h,cpp}: rename advanceNextPC to adjustNextPC.
-	  Move try block processing into a separate function to make it tidier
-	  (if it were obvious what the meaning of the return value was it would
-	  be still better). Use switch instead of ifs now that it isn't directly
-	  in a while loop. Drop an apparently useless assignment of false to
-	  mReturning. Add doxygen comments to header.
-	* server/vm/ASHandlers.cpp: update advanceNextPC to adjustNextPC.
-	* libbase/curl_adapter.cpp: include utility.h directly and don't
-	  redefine UNUSED.
+	[9424] bzr test
 
-2008-06-13 Bastiaan Jacques <bastiaan@bjacques.org>
+2008-06-23  Sandro Santilli <strk@keybit.net>
 
-	* server/as_object.h: Make use of the typeName function that magically
-	appeared in my checkout.
+	[9423] Implement seeking in FLVParser, hopefully fix (or greatly
+	reduce chances to incur in) race condition on seek.
 
-2008-06-13 Bastiaan Jacques <bastiaan@bjacques.org>
+2008-06-23  Sandro Santilli <strk@keybit.net>
 
-	* backend/render_handler_ogl.cpp: Stick the push-pop matrix sequence
-	in a scoped class.
+	[9422] Add test for global/local registers; make registers access
+	safer and more general
 
-2008-06-13 Benjamin Wolsey <bwy@benjaminwolsey.de>
+2008-06-23  Russell Nelson <nelson@nelson-desktop>
 
-	* server/vm/ActionExec.cpp: return an exception if there is no
-	  'finally' block. I'm not yet sure why (or if) this is correct,
-	  but it fixes the mtasc tests again.
-	* server/vm/ASHandlers.cpp: fix typo in debugging message.
+	[9421] Update the preformatted docs.
 
-2008-06-12 Zou Lunkai <zoulunkai@gmail.com>
-	
-	* libbase/utility.h,
-	  server/types.h:  make sure truncation is used when convert float to integer.
-	* server/matrix.{h,cpp} : use double instead of float for ActionScripts, use
-	  integers for x_translation and y_translation. Add a template function transform(point2d),
-	  since renderer agg and ogl use different point formats.
-	* server/character.cpp, server/sprite_instance.cpp: take care of data types, minor cleanups.
-	* testsuite/misc-swfc.all/matrix_accuracy_test1.sc, makefile.am: enable this test file.
-	* testsuite/server/MatrixTest.cpp: add test for Matrix::invert().
-	
-2008-06-12 Sandro Santilli <strk@keybit.net>
+2008-06-22  Sandro Santilli <strk@keybit.net>
 
-	* libbase/Buffer.h, SimpleBuffer.h, Makefile.am,
-	  libmedia/ffmpeg/sound_handler_sdl.h:
-	  Renamed Buffer to SimpleBuffer, to avoid name clash
-	  with the one in libamf.
+	[9420] ignores
 
-2008-06-12 Russ Nelson <nelson@crynwr.com>
+2008-06-21  rob@welcomehome.org
 
-	* configure.ac:
-	* macros/gettext.m4:
-	  Applying bjacques' https://savannah.gnu.org/patch/?6538
-          Fix strict shell parse errors when variables are null.
+	[9419] Disable for now
 
-2008-06-12 Sandro Santilli <strk@keybit.net>
+2008-06-21  rob@welcomehome.org
 
-	* server/parser/edit_text_character_def.cpp: fix regression making
-	  dynamically created text not find any font (we'll use the default
-	  one instead).
+	[9418] merge from cygnal branch, drop old files
 
-2008-06-12 Benjamin Wolsey <bwy@benjaminwolsey.de>
+2008-06-21  Benjamin Wolsey <bwy@benjaminwolsey.de>
 
-	* server/vm/ActionExec.{h,cpp}: fix throw in register again (prevents
-	  infinite recursion and segfault in misc-mtasc.all/exception.as).
-	  Still one failure, but no crashes. Make heavy debug-logging optional
-	  at compile. Provide more accessors to ActionExec data.
-	* server/vm/ASHandlers.cpp: reduce direct access to ActionExec data.
+	[9417] Don't heap allocate vectors, as they allocate their elements on
+	the heap anyway.
 
-2008-06-12 Sandro Santilli <strk@keybit.net>
-
-	* libbase/curl_adapter.{h,cpp}: drop tu_file references.
-
-2008-06-12 Sandro Santilli <strk@keybit.net>
-
-	* libbase/noseek_fd_adapter.{cpp,h}: drop tu_file use, make the adapter
-	  an IOChanel subclass.
-
-2008-06-12 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/vm/ActionExec.{h,cpp}: remove some of the debug logging.
-	  Start making data members private and provide accessors. Drop
-	  getScriptTimeout(), which should now be obtained from movie_root
-	  when the timeout limits are implemented. 
-	* server/vm/ASHandlers.cpp: use accessors rather than ActionExec
-	  members directly. Delegate some operations entirely to ActionExec.
-
-2008-06-12 Zou Lunkai <zoulunkai@gmail.com>
-	
-	* server/matrix.{h, cpp}: drop transform_by_inverse() and set_inverse(),
-	  add a invert() methord for inverting the matrix. make the interfaces 
-	  clearer. cleanups. 
-	* libbase/utility.h: add a DoubleToFixed16() function.
-	* server/character.cpp,
-	  server/button_character.cpp
-	  server/edit_text_character.cpp
-	  server/movie_root.cpp
-	  server/sprite_instance.cpp
-	  backend/render_handler_agg.cpp: use the simplified interfaces of the new
-	  matrix, cleanups.
-	
-2008-06-11 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* testsuite/actionscript.all/Try.as: all my tests pass.
-	* testsuite/swfdec/PASSING: 14 tests pass, 12 new passes for try /
-	  catch / finally, 4 of which were not only failing but crashing
-	  before. One new failure for catch-in-register, but it's not clear
-	  whether that was a valid pass before.
-	* libbase/GnashException.h: add exception for unhandled AS
-	  exceptions.
-	* server/ActionExec.{h,cpp}: fix handling of try / catch / finally.
-	  It's difficult to say how as I'm not really sure what it was
-	  doing before, but comments about what it's supposed to do, and
-	  how it's implemented now, are in the code. It is an ugly patch
-	  at the moment, but will be cleaned up considerably.
-
-2008-06-11 Sandro Santilli <strk@keybit.net>
-
-	* libmedia/ffmpeg/AudioDecoderFfmpeg.cpp (decode): reintroduce
-	  support for the 'parse' parameter. Still not sure if that's
-	  a clean way to decode *sets* of frames, but at least it works
-	  for the time being.
-
-2008-06-11 Sandro Santilli <strk@keybit.net>
-
-	* libbase/Buffer.h: add copy ctor and assignment op.
-
-2008-06-11 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* testsuite/actionscript.all/Try.as: more tests, only build with
-	  ming 0.4 beta 6.
-
-2008-06-11 Sandro Santilli <strk@keybit.net>
-
-	* libmedia/sound_handler.h: drop the Buffer here, use the one in
-	  libbase.
-	* libmedia/ffmpeg/sound_handler_sdl.{cpp,h}: updated to use the
-	  Buffer in libbase, split body of the SDL callbacks in subfunction
-	  (still too big the lower one).
-	* libmedia/ffmpeg/AudioDecoderFfmpeg.cpp: try at reintroducing the
-	  parsing feature (isn't really working).
-
-2008-06-11 Sandro Santilli <strk@keybit.net>
-
-	* libbase/: Buffer.h, Makefile.am: add a generic Buffer class aimed
-	  at unifying buffer types among the whole gnash lib.
-
-2008-06-11 Sandro Santilli <strk@keybit.net>
-
-	* utilities/Makefile.am: add full AM_LDFLAGS to gprocessor, otherwise
-	  only using the LDFLAGS explicitly put in overridden _LDFLAGS
-	  automake variable (at least on some systems, reported on bug
-	  #21536). Might need back-port to 0.8.3.
-
-2008-06-11 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* testsuite/actionscript.all/Try.as: initial tests for try / catch
-	  / finally.
-
-2008-06-11 Zou Lunkai <zoulunkai@gmail.com>
-	
-	* server/matrix.h: drop helpless templates, docs, cleanups. 
-	
-2008-06-10 Sandro Santilli <strk@keybit.net>
-
-	* libbase/BitsReader.h: add constructor taking a "parent" BitsReader
-	  (to create a reader for a portion of a buffer).
-
-2008-06-10 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/asobj/flash/geom/Matrix_as.cpp: finish implementing
-	  flash.geom.Matrix (createBox, createGradientBox, transformPoint).
-	* server/testsuite/actionscript.all/Matrix_as.cpp: more tests.
-
-2008-06-10 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/asobj/flash/geom/Point_as{.cpp.h},Matrix_as.cpp: drop auto_ptr
-	  for intrusive_ptr to pass a Point object.
-	* server/testsuite/actionscript.all/Matrix_as.cpp: uncommitted tests.
-
-2008-06-10 Sandro Santilli <strk@keybit.net>
-
-	* libbase/IOChannel.h: give a default implementation for get_size()
-	  and a meaning to -1 (unknown).
-	* libbase/zlib_adapter.cpp: implement zlib adapter as a proper
-	  IOChannel subclass.
-
-2008-06-10 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/FreetypeGlyphsProvider.h: boost/cstdint.h include.
-
-2008-06-10 Sandro Santilli <strk@keybit.net>
-
-	* server/asobj/gen-asclass.pl: since we're at it, stop generating
-	  auto_ptr use for GC-managed objects.
-
-2008-06-10 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/asobj/gen-asclass.pl: stop generating bad header guard names.
-	* server/asobj/flash/geom/Matrix_as.cpp: using boost ublas for
-	  inverting was massively over-complicated; do a simpler implementation
-	  (as in server/matrix.h, but without the oddities needed for the SWF
-	  matrix). Add notes and a typedef.
-	* server/FreetypeGlyphsProvider.h: boost/cstdint.h include.
-
-2008-06-10 Sandro Santilli <strk@keybit.net>
-
-	* server/parser/edit_text_character.cpp (read): handle hasFontClass
-	  (log_unimpl, and some log_swferror).
-
-2008-06-10 Zou Lunkai <zoulunkai@gmail.com>
-	
-	* server/matrix.h: drop matrix::concatenate_scale(float s), not used any more.
-	
-2008-06-10 Sandro Santilli <strk@keybit.net>
-
-	* libbase/LoadThread.cpp: make seek() blocking, as advertised
-	  in method documentation.
-
-2008-06-10 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* libmedia/gst/SoundHandlerGst.h: include <algorithm> for std::for_each.
-
-2008-06-10 Zou Lunkai <zoulunkai@gmail.com>
-	
-	* server/matrix.{h,cpp}: more cleanups, drop some unncessary interfaces.
-	* server/text.cpp, server/fill_style.cpp: synchronization with the new concatenate_scale().
-	* utility.h: add a FloatToFixed16() function.
-	* backend/render_handler_ogl.cpp: fix building with patch from bug#23515.
-	* testsuite/server/MatrixTest.cpp: drop some useless tests. 
-	
-2008-06-10 Sandro Santilli <strk@keybit.net>
-
-	* libbase/LoadThread.{cpp,h}: take the IOChannel input at construction
-	  time
-	* server/asobj/LoadVars.cpp: update calls to LoadThread.
-	* server/asobj/xml.cpp: update calls to LoadThread.
-
-2008-06-10 Sandro Santilli <strk@keybit.net>
-
-	* testsuite/libbase/NoSeekFileTest.cpp: fix build (don't use
-	  'read' as a variable name, being already a library function).
-
-2008-06-10 Sandro Santilli <strk@keybit.net>
-
-	* libbase/LoadThread.{cpp,h}: change seek to return 0 on success
-	  and -1 on error (to be closer to IOChannel iface). There were no
-	  users of it, I tested. Note that seek() doesn't do what dox say
-	  (ie: block) so that'll need to be fixed next ...
-	* libmedia/FLVParser.cpp: don't assume _stream is an IOChannel.
-	* libmedia/MediaParser.{cpp,h}: don't inline the constructor.
-	* libmedia/ffmpeg/MediaParserFfmpeg.cpp: don't assume _stream is 
-	  an IOChannel.
-
-2008-06-10 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/asobj/flash/geom/Matrix_as.cpp: add optional debugging output;
-	  lu_factorize's failure to notice that some matrices aren't invertible
-	  is a known problem with that solving method. Add a try/catch to handle
-	  the exception. As the exception is only thrown when NDEBUG is defined,
-	  I'll find a more reliable solver. Gnash is about 60-70% faster than
-	  the PP for flash.geom.Matrix operations in a loop, despite being
-	  almost 50% slower executing the loop itself...
-
-2008-06-09  Rob Savoye  <rob@ripple.welcomehome.org>
-
-	* libamf/element.cpp: Actually calculate the size of the output
-	buffer when encoding AMF0 Objects.
-	* libnet/rtmp_client.cpp: Add the "ObjectEncoding" property when
-	creating a NetConnection object.
-	* testsuite/libnet.all/test_rtmp.cpp: Add a test for creating a
-	NetConnection object.
-
-2008-06-09 Patrice Dumas  <pertusus at free.fr>
-
-	(patch #6525)
-	* autogen.sh: work with AC_CONFIG_HEADER and not only AM_CONFIG_HEADER
-	* configure.ac: use --enable-extensions instead of --with-extensions
-	* remove unneeded -I in INCLUDES in Makefile.am, namely:
-	  $(srcdir), ../, $(top_srcdir)
-	* add some includes
-	* extensions/lirc/Makefile.am: add libnet include.
-	* extensions/mysql/Makefile.am: add libltdl include.
-	* server/vm/Makefile.am: add libltdl include.
-	* extensions/dbus/dbus_ext.h: use gnashconfig instead of config 
-	* libbase/lirc.h: add an #include "GnashKey.h" 
-	* fixes in po when gettext only installed by the maintainer
-	* minor changes to have make distcheck work better
-	* testsuite/Makefile.am: select the directories in based on ming...
-	  being there or not, and don't disable portions of Makefile.am
-	* automatically generated changes in po and pot files
-	* libmedia/gst/SoundHandlerGst.cpp:  include "VM.h" instead of "vm/VM.h"
-	* server/asobj/TextFormat.cpp: include "types.h" instead of "server/types.h" 
-
-2008-06-09 Sandro Santilli <strk@keybit.net>
-
-	* libbase/LoadThread.{cpp,h}: const correctness, 'size' alias
-	  for getBytesTotal. This is aimed at making a LoadThread more
-	  or less pluggable with an IOChannel [ still misses a blocking
-	  seek to be 100% compatible ].
-
-2008-06-09 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/asobj/flash/geom/Matrix_as.cpp: specify template arguments
-	  for matrix factorization, see if it fixes strk's problem. Round
-	  two will be catching the exception.
-	
-2008-06-09 Sandro Santilli <strk@keybit.net>
-
-	* still on IOChannel-related, rename:
-		read_bytes  -> read
-		write_bytes -> write
-
-2008-06-09 Sandro Santilli <strk@keybit.net>
-
-	* lots of files: methods rename:
-		get_position -> tell
-		set_position -> seek
-		get_eof      -> eof
-		get_size     -> size
-
-2008-06-09 Sandro Santilli <strk@keybit.net>
-
-	* server/font.cpp: more parse logging, log unimplemented when
-	  a language code is specified.
-	* server/stream.cpp (read_string_with_length): fix regression
-	  introduced in revision 1.52.
-
-2008-06-09 Sandro Santilli <strk@keybit.net>
-
-	* libbase/IOChannel.{cpp,h}: docs cleanup, have write_bytes
-	  throw IOException by default (unsupported op).
-	* libbase/curl_adapter.cpp: implement the Curl adapter by
-	  subclassing IOChannel (get rid of tu_file use in it).
-
-2008-06-09 Sandro Santilli <strk@keybit.net>
-
-	* testsuite/server/StreamTest.cpp: fix build.
-
-2008-06-09 Sandro Santilli <strk@keybit.net>
-
-	* testsuite/libbase/: CurlStreamTest.cpp, NoSeekFileTest.cpp:
-	  fix build...
-
-2008-06-09 Sandro Santilli <strk@keybit.net>
-
-	* server/parser/button_character_def.h: don't redefine UNUSED
-
-2008-06-09 Sandro Santilli <strk@keybit.net>
-
-	* libbase/IOChannel.{cpp,h}: read_byte and write_byte don't
-	  need to be virtual, implement in terms of read_bytes and
-	  write_bytes, with exception throwing on error. Fix IOException
-	  to be actually instantiatable..
-
-2008-06-09 Sandro Santilli <strk@keybit.net>
-
-	* lots of files: use IOChannel instead of tu_file for input.
-
-2008-06-09 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* testsuite/actionscript.all/Matrix.as: test non-numerical values
-	  in Matrix constructor (Gnash passes).
-
-2008-06-09 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/asobj/flash/geom/Matrix_as.{cpp,h}: implement concat and
-	  invert. Clean up and provide a helper function for filling
-	  boost matrices with AS matrix properties.
-	* testsuite/actionscript.all/Matrix.as: test Matrix more.
-
-2008-06-09 Sandro Santilli <strk@keybit.net>
-
-	* libbase/: Makefile.am, IOChannel.{cpp,h}: initial draft for a virtual
-	  IO class (to replace tu_file).
-	* libbase/tu_file.{cpp,h}: make tu_file derive from IOChannel.
-
-2008-06-09 Sandro Santilli <strk@keybit.net>
-
-	* lots of files: renames gnash::stream to gnash::SWFStream.
-
-2008-06-09 Sandro Santilli <strk@keybit.net>
-
-	* libbase/: Makefile.am, tu_file_SDL.cpp: drop unused file.
-
-2008-06-09 Sandro Santilli <strk@keybit.net>
-
-	* server/swf/tag_loaders.cpp: document need for tu_file.h include.
-	* server/parser/shape_character_def.cpp: drop tu_file.h include.
-
-2008-06-09 Sandro Santilli <strk@keybit.net>
-
-	* server/font.{cpp,h}: drop tu_file include and forward decl.
-
-2008-06-07 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/asobj/flash/geom/Point_as{h,cpp}: move class declaration
-	  back into the implementation file and implement the handy auto_ptr
-	  function that was lying about (thanks strk).
-	* server/asobj/flash/geom/Matrix_as.{cpp,h}: add
-	  getFlashGeomMatrixConstructor() in header (will probably be
-	  needed).
-
-2008-06-07  Rob Savoye  <rob@ripple.welcomehome.org>
-
-	* Makefile.am: Include xpi.am for XPI packages.
-	* packaging/xpi.am: XPI packaging support.
-	* packaging/xpi/install.rdf: Install data file for XPI.
-
-2008-06-07 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* testsuite/actionscript.all/Matrix_as: tests for clone() and
-	  properties.
-
-2008-06-07 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/asobj/flash/geom/Point_as{h,cpp}: move class declaration
-	  to header, as Matrix_as needs to construct points.
-	* server/asobj/flash/geom/Matrix_as.{cpp,h}: implement getter/setters,
-	  deltaTransformPoint, scale, rotate, identity, translate (also
-	  clone, but this is untested).
-	* server/namedStrings.{cpp,h}: add named properties to string table.
-	  This breaks something in the testsuite (because the .a property is
-	  now a named string), but is not a new bug; it confirms the
-	  implementation problem. If 'X' or 'Y' rather than 'A' were tested
-	  in the testsuite, the same failure would already be there.
-	* testsuite/actionscript.all/Matrix_as: lots of test passes.
-	* testsuite/actionscript.all/case.as: expect failures for SWF6 and
-	  below.
-	  
-2008-06-07 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* testsuite/actionscript.all/Matrix.as: add tests for the
-	  flash.geom.Matrix object (which is an ActionScript matrix of
-	  double-precision values and nothing to do with Zou's matrices).
-
-2008-06-07 Markus Gothe <nietzsche@lysator.liu.se>
-
-	* configure.ac: #define HAVE_(IS)FINITE to 1 and removed
-	  -Wunsafe-loop-optimizations since not all versions of
-	  gcc supports it.
-	* utility.h: Fixed a quirk on Leopard/BSD for isfinite();
-	* libmedia/ffmpeg/MediaParserFfmpeg.cpp: Fixed #ifndef,
-	  see bug #23502.
-	* server/edit_text_character.cpp: Use isFinite(), instead of 
-	  finite().
-	* libmedia/MediaParser.h: Added DSOEXPORT definitions for building
-	  with -fvisibility=hidden.
-
-2008-06-06 Russ Nelson <nelson@crynwr.com>
-
-	* configure.ac: Added warning about missing makeswf.
-
-2008-06-06 Sandro Santilli <strk@keybit.net>
-
-	* server/asobj/NetStream.{cpp,h}: keep m_imageframe
-	  by auto_ptr, fixes memory leaks with NetStreamFfmpeg by
-	  making memory management automatic.
-	* server/asobj/NetStreamFfmpeg.cpp: update use of m_imageframe.
-	* server/asobj/NetStreamGst.cpp: update use of m_imageframe
-	  (drop manual memory management).
-
-2008-06-06 Sandro Santilli <strk@keybit.net>
-
-	* server/asobj/NetStreamFfmpeg.cpp (advance): don't feed the
-	  buffer if it's already full.
-
-2008-06-06 Sandro Santilli <strk@keybit.net>
-
-	* server/asobj/NetStreamFfmpeg.cpp (advance): if not paused
-	  and haven't yet decoded any video frame, do so, reguardless
-	  of buffer length (tested as being the expected behaviour).
-
-2008-06-06 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* libmedia/MediaHandler.h: add GNASH to header guard.
-
-2008-06-06 Sandro Santilli <strk@keybit.net>
-
-	* libmedia/ffmpeg/MediaParserFfmpeg.{cpp,h}: fix build with more
-	  recent ffmpeg (bug #23502).
-
-2008-06-06 Russ Nelson <nelson@crynwr.com>
-
-	* macros/ffmpeg.m4: Previous method for location of ffmpeg
-	  libraries didn't work on Mandriva.  Current method should be
-	  more supportable.
-	* ..: throw up our hands and give up if we can't autolocate
-	  avcodec.h; suggest that they use --with-ffmpeg-incl.
-
-2008-06-06 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* libmedia/MediaHandler.h, libmedia/MediaParser.h,
-	  libmedia/gst/MediaHandlerGst.h: fix visibility build, use legal
-	  header guards.
-
-2008-06-06 Sandro Santilli <strk@keybit.net>
-
-	* libmedia/: Makefile.am, MediaParser.{cpp,h}:
-	  Change MediaParser so that "The Buffer" is queues
-	  of encoded frames, move all buffer inspectors
-	  in the base class.
-	* libmedia/FLVParser.{cpp,h}: drop all buffer inspectors
-	  (now in base class), reimplemnet fillers to push encoded
-	  frames.
-	* libmedia/ffmpeg/MediaParserFfmpeg.{cpp,h}: drop all
-	  buffer inspectors (now in base class), reimplement
-	  fillers to push encoded frames.
-	* server/asobj/NetStream.cpp: minor comment cleanup
-	* server/asobj/NetStreamFfmpeg.h: don't override bufferLength,
-	  the one in NetStream is kind of fine for now (not 100%,
-	  but could be when PlayHead will be in the base class).
-	* server/asobj/NetStreamFfmpeg.cpp: drop bufferLength override,
-	  cleanup some debugging calls.
-
-2008-06-06  Rob Savoye  <rob@ripple.welcomehome.org>
-
-	* libamf/amf.cpp: Add support for NULL objects.
-	* libamf/element.cpp: Set the boolean data correctly, it was
-	offset by one byte. Make a NULL object.
-	* libnet/rtmp.h: Add Stream operations, play, stop, pause, seek,
-	publish.
-	* libnet/rtmp_client.{h,cpp}: Build NetStream operation packets.
-	* testsuite/libnet.all/test_rtmp.cpp: Test NetStream operations
-	packets for the client side.
-
-2008-06-06 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* libbase/utility.h: include gnashconfig.h, fix some old-style casts,
-	  use Dossy's 0.8.3 branch solution for isfinite on win32 in HEAD
-	  too.
-	* libbase/tu_file.{cpp,h}: fix old-style casts, add some indentation.
-	* libgeometry/Point2d.h: old-style casts, std:: mathematic functions.
-	* libgeometry/Range2d.h: ditto.
-	* server/cxform.h, server/types.h, server/shape.h, server/event_id.h,
-	  server/as_value.h: old-style casts.
-	* configure.ac: drop tests for hash map extensions, add -ansi to
-	  standard CXXFLAGS (this simply disables gcc extensions, so there
-	  should be (and are) no problems building). Add extra warnings to
-	  standard CXXFLAGS. Replace NSAPI with NPAPI.
-	* macros/firefox.m4: replace $nsapi with $npapi.
-	* plugins/Makefile.am, plugins/win32/Makefile.am, Makefile.am:
-	  NSAPI->NPAPI.
-	* GnashException.h: header guard used reserved identifier.
-
-2008-06-06 Sandro Santilli <strk@keybit.net>
-
-	* libmedia/AudioDecoder.h: add a decode(EncodedAudioFrame&) method.
-	* libmedia/ffmpeg/AudioDecoderFfmpeg.{cpp,h}: Implement
-	  decode(EncodeAudioFrame), fix resampling code, disable (log_unimp)
-	  the "parsing" feature (should be dropped)
-	* server/asobj/NetStreamFfmpeg.cpp: use
-	  AudioDecoder::decode(EncodedAudioFrame) interface, cleaner.
-
-2008-06-06 Zou Lunkai <zoulunkai@gmail.com>
-	
-	* server/matrix.{h,cpp}: more floats to integers migration, cleanups.
-	* testsuite/misc-ming.all/DrawingApiTest.as: make the tests saner.
-
-2008-06-06 Sandro Santilli <strk@keybit.net>
-
-	* gui/kde.cpp: include types.h for PIXELS_TO_TWIPS
-
-2008-06-05 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/movie_root.cpp: not disabling scripts in setMovieRoot is
-	  wrong (tested in swfdec testsuite) and wasn't supposed to be
-	  committed.
-
-2008-06-05 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/dlist.cpp: use list::remove_if() instead of std::remove_if()
-	  on a list.
-	* server/movie_root.cpp: use list::remove_if() rather than iterating
-	  to remove listeners.
-
-2008-06-05 Sandro Santilli <strk@keybit.net>
-
-	* libmedia/ffmpeg/VideoDecoderFfmpeg.cpp (init): print codec
-	  name in error and debug.
-	* libmedia/ffmpeg/AudioDecoderFfmpeg.cpp (setup): print codec
-	  name in error and debug.
-
-2008-06-05 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/as_environment.cpp: fix warning, minor changes.
-	* server/movie_root.cpp: don't disable scripts when we hit
-	  the recursion limit. A recursion limit can be 0 or 1, so
-	  mouse and key notifiers need to catch the ActionLimits exception.
-	  It may be better not to call them. This makes Gnash behaviour more
-	  or less compatible, though in some cases we may be pushing less on
-	  the stack than we should, which of course changes behaviour.
-
-2008-06-05 Sandro Santilli <strk@keybit.net>
-
-	* libmedia/ffmpeg/: AudioDecoderFfmpeg.cpp, VideoDecoderFfmpeg.cpp:
-	  Be more verbose about codecs initialization failure.
-
-2008-06-05 Sandro Santilli <strk@keybit.net>
-
-	* libmedia/ffmpeg/MediaHandlerFfmpeg.cpp: construct VideoDecoder
-	  by VideoInfo (to support non-FLASH codecs).
-	* libmedia/ffmpeg/VideoDecoderFfmpeg.{cpp,h}: add constructor
-	  taking a VideoInfo&.
-
-2008-06-05 Zou Lunkai <zoulunkai@gmail.com>
-
-	* server/matrix.{h,cpp}: code refactory, use integer math for swf matrix, 
-	  which would be more compatible later.
-	* libbase/utility.h: add a Fixed16Mul() for fixed point multiplication.
-	* server/edit_text_character.cpp, sprite_instance.cpp,
-	  gui/gui.cpp,
-	  backend/render_handler_agg.cpp
-	  backend/render_handler_agg_style.h
-	  backend/render_handler_cairo.cpp
-	  backend/render_handler_ogl.cpp: synchronize the new matrix interfaces.
-	* testsuite/server/MatrixTest.cpp: disable the tests temporarily, which are
-	  too accurate for the new matrix.
-	* testsuite/actionscript.all/TextField.as: accept an accuracy lost temporarily.  
-	  
-2008-06-04 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* libbase/test_ogl.cpp: make your own if you want to test OGL
-	  (dropped).
-	* server/types.h: __TYPES_H__ is a likely candidate for a name
-	  conflict (using a double underscore in an identifier is undefined
-	  behaviour). Make macros into inlines for better compile time
-	  checking, and so that the compiler (which knows best) can
-	  decide what to do with them.
-
-2008-06-04 Sandro Santilli <strk@keybit.net>
-
-	* libmedia/ffmpeg/MediaParserFfmpeg.{cpp,h}:
-	  Impement getVideoInfo/getAudioInfo.
-
-2008-06-04 Sandro Santilli <strk@keybit.net>
-
-	* libmedia/ffmpeg/AudioDecoderFfmpeg.cpp: don't close audio codec
-	  context if it wasn't opened.
-	* libmedia/ffmpeg/VideoDecoderFfmpeg.cpp: don't close video codec
-	  context if it wasn't opened.
-
-2008-06-04 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/movie_root.{cpp,h}: add methods to set and retrieve
-	  script limits.
-	* server/swf/ScriptLimits.h: inform movie_root of ScriptLimits.
-	* server/as_environment.cpp: stack limit is affected by the recursion
-	  limit. Replace snprintf with boost::format.
-	* server/as_object.cpp: add comments; these recursion protections
-	  seem not to be present in the pp, which instead times out.
-
-2008-06-04 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/impl.cpp: remove obsolete comment.
-
-2008-06-04 Sandro Santilli <strk@keybit.net>
-
-	* server/asobj/NetStreamFfmpeg.cpp (pushDecodedAudioFrames):
-	  do nothing if no audio decoder is available.
-	* libmedia/ffmpeg/MediaParserFfmpeg.{cpp,h}:
-	  Implement nextAudioFrameTimestamp and nextVideoFrameTimestamp.
-
-2008-06-04 Sandro Santilli <strk@keybit.net>
-
-	* libmedia/ffmpeg/MediaParserFfmpeg.{cpp,h}: implement
-	  getBufferLength; reduce chunk size for reads; modify
-	  getBytesLoaded to be immune to seek backs; don't check
-	  eof in the ffmpeg callback routine but just at the
-	  end of each frame parsing.
-
-2008-06-04 Sandro Santilli <strk@keybit.net>
-
-	* libmedia/FLVParser.cpp (getBufferLength): don't rely
-	  on cursor to tell how much time the buffer contains;
-	  add notes about need to sort out a rationale for
-	  what to return when both audio/video buffers exist..
-
-2008-06-04 Sandro Santilli <strk@keybit.net>
-
-	* testsuite/misc-ming.all/NetStream-SquareTest.c: don't let
-	  the buffer loaded bar become > 100%, but keep it at alpha
-	  50 while not saturated, and bring to 100 when saturated.
-
-2008-06-04 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/swf/ScriptLimitsTag.h: parse the ScriptLimits tag (not
-	  a lot to do). Not yet used, but will be passed to movie_root.
-	* server/impl.cpp: register the ScriptLimits tag loader. Use an
-	  enum for file types rather than a std::string.
-	* server/Makefile.am: add ScriptLimits header.
-
-2008-06-04 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/swf/DefineFontAlignZonesTag.cpp: typo.
-
-2008-06-04 Sandro Santilli <strk@keybit.net>
-
-	* testsuite/misc-ming.all/NetStream-SquareTest.c: add progress bar
-	  for bufferLength/bufferTime.
-
-2008-06-04 Sandro Santilli <strk@keybit.net>
-
-	* testsuite/misc-ming.all/NetStream-SquareTest.c: add progress bars
-	  for bytesLoaded/bytesTotal.
-
-2008-06-04 Sandro Santilli <strk@keybit.net>
-
-	* libmedia/ffmpeg/MediaParserFfmpeg.{cpp,h}: implement frame parsing.
-	* server/asobj/NetStreamFfmpeg.cpp (refreshVideoFrame): don't do
-	  anything if video decoder wasn't initialized.
-
-2008-06-04 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/movie_root.cpp: add metadata to Movie Properties tree.
-
-2008-06-04 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/fill_style.cpp, server/sprite_instance.cpp: update
-	  comments.
-
-2008-06-04 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/parser/movie_def_impl.{cpp,h}: rename movie_def_impl class
-	  to SWFMovieDefinition. Add {store,get}DescriptiveMetadata() for
-	  dealing with the METADATA tag, disabled if Movie Properties
-	  isn't used (--disable-swftree). Rearrange class so public methods
-	  are first, like in almost all other classes. 
-	* server/parser/movie_definition.h: add virtual
-	  {store,get}DescriptiveMetadata() with no-op as default
-	  implementation. (Not used for sprite_instance).
-	* server/swf/tag_loaders.cpp: copy metadata to SWFMovieDefinition, add
-	  comments.
-	* server/impl.cpp: renamed movie_def_impl.
-
-2008-06-04 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/actionscript.all/Microphone.as: a couple of tests.
-	* server/fontlib.h: clean up forward declarations.
-	* server/parser/character_def.h: header cleanups.
-
-2008-06-04 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/swf/tag_loaders.h: header cleanup.
-
-2008-06-04 Sandro Santilli <strk@keybit.net>
-
-	* testsuite/MovieTester.{cpp,h}: register media handler.
-
-2008-06-04 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/stream.cpp: silence debug logging.
-
-2008-06-04 Sandro Santilli <strk@keybit.net>
-
-	* libmedia/FLVParser.{cpp,h}: don't leak encoded frame info.
-
-2008-06-04 Sandro Santilli <strk@keybit.net>
-
-	* libmedia/ffmpeg/MediaParserFfmpeg.{cpp,h}: don't
-	  miss to call av_register_all, so probing works (thanks bjacques);
-	  LOG_ONCE for log_unimpl; don't leak ByteIO buffer;
-	  don't leak _inputFmt and _formatCtx.
-
-2008-06-04 Sandro Santilli <strk@keybit.net>
-
-	* libmedia/MediaHandler.{cpp,h}: add protected isFLV
-	  method, for use by subclasses to figure if FLVParser
-	  would be enough for input.
-	* libmedia/MediaParser.h: comment out unneeded interfaces
-	  (dont' seem to fit in the design, were left over from
-	   tgc draft)
-	* libmedia/Makefile.am, libmedia/ffmpeg/MediaParserFfmpeg.{cpp,h}:
-	  Stub non-FLV ffmpeg-based media parser (still not working).
-	* libmedia/ffmpeg/MediaHandlerFfmpeg.cpp: for non-FLV input, try
-	  to create an FFMPEG-based MediaParser.
-
-2008-06-04 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/swf/tag_loaders.cpp: no need to log_unimpl with metadata
-	  tag as it should be ignored by the player.
-	* server/swf/DoActionTag.h: replace SIZET_FMT, drop gnashconfig.h
-	  include.
-
-2008-06-03 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/impl.cpp: indentation.
-	* server/stream.cpp: always check return of read() to avoid reading
-	  past the end of the stream; throw parser exception on failure.
-	* server/movie_def_impl.{h,cpp}: rename confusing typedefs. Add
-	  ostream operator<< for CharacterDictionary, drop dump_chars().
-	  Check return of read, throw parser exception on failure: fixes
-	  a few hangs with -vp for truncated unhandled tags (all my
-	  malformed movies also succeed with -vp now).
-
-2008-06-03 Sandro Santilli <strk@keybit.net>
-
-	* server/asobj/NetStreamFfmpeg.{cpp,h}: drop ffmpeg includes, as this
-	  class is finally media-handler agnostic (except for expecting
-	  the sound_handler to implement the aux streamers).
-
-2008-06-03 Sandro Santilli <strk@keybit.net>
-
-	* libmedia/MediaHandler.h: add createAudioDecoder, taking AudioInfo
-	  as input, change createVideoDecoder to take VideoInfo for
-	  consistency.
-	* libmedia/AudioDecoder.h: minor comment for interface cleanup
-	* libmedia/ffmpeg/MediaHandlerFfmpeg.{cpp,h}: implement
-	  createAudioDecoder, fix createVideoDecoder.
-	* libmedia/gst/MediaHandlerGst.{cpp,h}: implement createAudioDecoder,
-	  fix createVideoDecoder.
-	* server/asobj/NetStreamFfmpeg.{cpp,h}: drop all decoding code,
-	  rely solely on the MediaHandler for that.
-	* server/parser/video_stream_def.cpp: update calls to
-	  createVideoDecoder now that a VideoInfo is required.
-
-2008-06-03 Sandro Santilli <strk@keybit.net>
-
-	* libmedia/MediaHandler.{cpp,h},
-	  libmedia/gst/MediaHandlerGst.{cpp,h},
-	  libmedia/ffmpeg/MediaHandlerFfmpeg.{cpp,h}
-	  libmedia/Makefile.am:
-	  First stub at a MediaHandler/factory class.
-	* gui/Player.{cpp,h}: register a MediaHandler
-	  based on compile-time define.
-	* libmedia/MediaParser.h: comment header inclusion
-	* server/parser/video_stream_def.{cpp,h}: drop
-	  compile time defines for media handler to use,
-	  fetch whatever is currently registered instead.
-
-2008-06-03 Sandro Santilli <strk@keybit.net>
-
-	* libbase/FLVParser.{cpp,h} => libmedia/FLVParser.{cpp,h},
-	  libbase/Makefile.am, libmedia/Makefile.am:
-	  Moved FLVParser under libmedia and make it a MediaParser.
-	* libmedia/AudioDecoder.h, libmedia/AudioDecoderNellymoser.h,
-	  libmedia/SoundInfo.h
-	  Streamline headers inclusion.
-	* libmedia/VideoDecoder.h: drop EncodedVideoFrame, moved to
-	   MediaParser
-	* libmedia/MediaDecoder.{cpp,h}, libmedia/gst/MediaDecoderGst.{cpp,h}:
-	  drop unused files.
-	* libmedia/MediaParser.h: extend MediaParser interface to expose all
-	  needed stuff.
-	* libmedia/ffmpeg/AudioDecoderFfmpeg.cpp,
-	  libmedia/ffmpeg/VideoDecoderFfmpeg.{cpp,h},
-	  libmedia/gst/VideoDecoderGst.{cpp,h}: minor cleanups
-	* server/asobj/NetConnection.{cpp,h}: cleanups
-	* server/asobj/NetStream.h: m_parser is a MediaParser now.
-	* server/asobj/NetStreamFfmpeg.cpp: update use of the parser
-	* server/parser/video_stream_def.h: include MediaParser for enums.
-
-2008-06-03 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/cxform.{cpp,h}: drop cxform::print().
-	* server/swf/PlaceObject2Tag.cpp: use cxform ostream operator.
-
-2008-06-03 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/parser/movie_def_impl.cpp: add ensureBytes.
-	* server/matrix.{h,cpp}: drop matrix::print() method in favour
-	  of the ostream operator. Make output prettier.
-	* server/fill_style.cpp, server/swf/PlaceObject2Tag.cpp: use matrix
-	  ostream operator.
-
-2008-06-03 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/impl.cpp: the memset is unnecessary anyway.
-
-2008-06-03 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/fill_style.cpp: missing ensureBytes.
-	* server/parser/morph_character2_def.cpp: missing ensureBytes, const
-	  correct function, drop SIZET_FMT.
-	* server/sprite_definition.cpp: missing ensureBytes.
-	* server/swf/DoInitActionTag.h, server/swf/RemoveObjectTag.cpp,
-	  server/swf/DefineFontAlignZonesTag.cpp: missing ensureBytes,
-	  drop gnashconfig.h include.
-	* server/swf/tag_loaders.cpp, server/swf/StreamSoundBlockTag.cpp,
-	  server/parser/video_stream_def.cpp: check return of stream::read()
-	  and throw parser exception if it's shorter than expected (means
-	  the reported tag end position was outside the stream).
-	* server/impl.cpp: drop deprecated (and commented-out) code, include
-	  cstring for std::memset, drop gnashconfig.h include.
-	* server/parser/bitmap_character_def.cpp: drop gnashconfig.h include.
-
-2008-06-03 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/GnashKey.h: yes, REGISTERED does cause problems on mingw.
-
-2008-06-03 Sandro Santilli <strk@keybit.net>
-
-	* server/video_stream_instance.h: drop unneeded include.
-
-2008-06-03 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* utilities/processor.cpp: use an intrusive_ptr so that gprocessor
-	  doesn't segfault with movie library limit of 1.
-
-2008-06-02 Sandro Santilli <strk@keybit.net>
-
-	* server/asobj/NetStreamFfmpeg.h: forward declare sound_handler.
-
-2008-06-02 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/movie_def_impl.cpp: use hexify() to format tag dumps - it
-	  takes a useful length parameter that avoids writing uninitialized
-	  values. Read more than a single byte at a time from the stream and
-	  check return of read().
-	* libbase/log.cpp: adapt hexify so it can be used in movie_def_impl
-	  (not printing newlines, using '.' instead of '^' for non-print
-	  characters).
-
-2008-06-02 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/asobj/NetStreamFfmpeg.cpp: gnash.h for get_sound_handler().
-
-2008-06-02 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/dlist.cpp, server/fontlib.cpp, server/sprite_instance.cpp,
-	  server/types.cpp, testsuite/FuzzyPixel.h, testsuite/MovieTester.h,
-	  testsuite/misc-ming.all/DrawingApiTestRunner.cpp,
-	  testsuite/misc-ming.all/PrototypeEventListenersTestRunner.cpp: minor
-	  header cleanups.
-
-2008-06-02 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* testsuite/swfdec/PASSING: new tests.
-
-2008-06-02 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/GnashKey.h, server/gnash.h: move key::code enums
-	  into a separate file, stop undefining some names to see
-	  if it still causes problems.
-	* server/as_function.cpp, server/button_character_instance.cpp
-	  server/character.h, server/edit_text_character.cpp,
-	  server/event_id.h, server/movie_root.cpp server/movie_root.h,
-	  server/swf_function.cpp, server/asobj/Key.{h,cpp},
-	  server/parser/abc_block.h, server/parser/action_buffer.h,
-	  server/vm/action.h, server/parser/button_character_def.cpp,
-	  server/swf/PlaceObject2Tag.cpp, gui/gui.h, libnet/lirc{h,cpp}:
-	  replace gnash.h with GnashKey.h where only key::code is required,
-	  drop gnash.h where it's not needed. General header and header
-	  guard cleanups.
-	* server/timers.{cpp,h}: drop c_str() for logging, clean up, 
-	  use legal header guard define. 
-
-2008-06-01 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/asobj/Key.{cpp,h}: small change, lots of rebuilding:
-	  any name containing a double underscore is reserved to the
-	  implementation, so don't use them even as header guards. Drop
-	  bounds assertion before std::bitset, which has its own checks.
-	* gui/gui.{cpp,h}: an initial underscore followed by a capital
-	  letter is also a reserved identifier. Boost-formatize FPS
-	  debugging and use iostreams, not printf. Drop GNASH_REPORT_FUNCTION
-	  where it's commented out. Use LOG_ONCE.
-	* server/sprite_instance.cpp: very minor comment cleanup.
-	
-
-2008-05-30 Sandro Santilli <strk@keybit.net>
-
-	* gui/Player.{cpp,h}: keep the toplevel movie in an intrusive_ptr
-	  just in case someone else will get it in and out of one while
-	  we're still using it (would prematurely destroy it).
-	* server/parser/: movie_definition.h, sprite_definition.h,
-	  movie_def_impl.{cpp,h}:
-	  Add new importResources() method taking care of IMPORT
-	  details; have movie_def_impl maintain a list of movies
-	  from which it imports from: fixes bug #23364.
-	* server/swf/tag_loaders.cpp (import_loader): just parse
-	  and load the source movie, let the rest be done
-	  by the new importResources() method.
-
-2008-05-30 Sandro Santilli <strk@keybit.net>
-
-	* testsuite/gnashrc.in: limit MovieLibrary to 1 element.
-	  Exposes the segfault in bug #23364 on make check.
-
-2008-05-30 Sandro Santilli <strk@keybit.net>
-
-	* server/parser/movie_def_impl.cpp (get_exported_resource):
-	  Rework the check/timeout loop to really sleep between
-	  checks (old code wasn't...). Avoid valgrind runs timing-out
-	  on Dejagnu.swf import.
-
-2008-05-29 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/asobj/Global.cpp: add note on undefined 'this'.
-
-2008-05-29 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/vm/action.cpp: register_component is not the way to
-	  register extensions.
-	* server/parser/character_def.cpp: drop unused forward declaration.
-	* server/parser/movie_def_impl.cpp: drop progress_callback related
-	  stuff.
-	* server/parser/bitmap_character_def.cpp: add forward declaration
-	  dropped from gnash.h
-	* server/gnash.h: drop unused global callback functions, unnecessary
-	  forward declarations and some other useless code.
-
-2008-05-29 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/asobj/string.cpp: last commit was the wrong version of
-	  string.cpp.
-
-2008-05-29 Bastiaan Jacques <bastiaan@bjacques.org>
-
-	* backend/render_handler_ogl.cpp: Apply the requested matrix
-	transformation in draw_line_strip. Implement draw_poly.
-
-2008-05-29 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/movie_root.{h,cpp}: drop some dead code.
-	* server/as_value.cpp: pass std::string, not const char*.
-	* server/as_object.h: drop sstream header (may as well do
-	  this while touching movie_root.h).
-	* server/movie_instance.cpp: header cleanup.
-	* server/sprite_instance.cpp: pointless bit of const correctness.
-
-2008-05-29 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/asobj/{string.cpp,gstring.h}: get VM from object. Make
-	  init_string_instance take const std::string&, as that's what
-	  is usually passed to it.
-	* server/asobj/Mouse.cpp, server/asobj/System.cpp,
-	  server/asobj/Stage.cpp, server/asobj/Sound.cpp,
-	  server/asobj/Object.cpp, server/asobj/Global.cpp get VM from
-	  object.
-	* server/asobj/xml.cpp: ditto.
-
-2008-05-29 Sandro Santilli <strk@keybit.net>
-
-	* libbase/curl_adapter.cpp: avoid the _perform on cookies
-	  export (we need _cleanup only); add note about this.
-
-2008-05-29 Sandro Santilli <strk@keybit.net>
-
-	* libbase/curl_adapter.cpp: remove confusing comment about 
-	  _runnign and curl_multi_info_read.
-
-2008-05-29 Sandro Santilli <strk@keybit.net>
-
-	* server/edit_text_character.cpp, server/sprite_instance.cpp,
-	  server/text.{cpp,h}, server/parser/edit_text_character_def.{cpp,h},
-	  server/parser/text_character_def.{cpp,h},
-	  server/swf/tag_loaders.{cpp,h}:
-	  Drop references from font, edit_text_character_def and
-	  text_character_def to defining movie (unused).
-	  
-
-2008-05-29 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/generic_character.cpp: header cleanup.
-	* server/sprite_instance.cpp, server/edit_text_character.cpp: replace
-	  deprecated to_number<>().
-	* server/asobj/Key.cpp, server/asobj/NetStream.cpp: ditto.
-	* server/vm/Machine.cpp: ditto.
-	* server/array.cpp: use to_int() instead of casting to_number().
-
-2008-05-29 Sandro Santilli <strk@keybit.net>
-
-	* server/font.{cpp,h}: drop reference to "owning movie"
-	* server/parser/movie_def_impl.{cpp,h}: drop unused
-	  get_owned_fonts.
-
-2008-05-29 Bastiaan Jacques <bastiaan@bjacques.org>
-
-	* backend/render_handler{.h,_agg.cpp,_ogl.cpp,_cairo.cpp}: Replace the
-	void pointer to draw_line_strip with the actual type.
-
-2008-05-29 Bastiaan Jacques <bastiaan@bjacques.org>
-
-	* backend/render_handler.h: Add anti-alias types for future
-	use. Document draw_line_strip.
-	* backend/render_handler_cairo.cpp: Implement draw_line_strip.
-
-2008-05-29 Sandro Santilli <strk@keybit.net>
-
-	* libbase/curl_adapter.cpp: include boost/version.hpp
-	  for the scoped_lock second arg...
-
-2008-05-29 Sandro Santilli <strk@keybit.net>
-
-	* libbase/curl_adapter.cpp: have the CurlSession created
-	  on first get (singleton) so we have proper logging support
-	  by that time; have CurlSession constructor import cookies
-	  (if requested) and destructor export cookies (if requested)
-	  - if neither input nor output are requested, cookies are
-	  simply disabled; change second argument to scoped_lock
-	  based on boost version, fixing bug #23419.
-
-2008-05-28 Sandro Santilli <strk@keybit.net>
-
-	* libbase/curl_adapter.cpp: move all one-time initialization
-	  of curl subsystem in a class, instantiated in a static;
-	  have the static (curlSession) initialize a "share" handle,
-	  for sharing cookies and DNS cache.
-
-2008-05-28 Sandro Santilli <strk@keybit.net>
-
-	* server/button_character_instance.cpp (on_event): if-0 out
-	  debugging line.
-
-2008-05-28 Sandro Santilli <strk@keybit.net>
-
-	* libbase/curl_adapter.cpp: keep select() timeout low (1/100 of
-	  second), to allow thread switching while waiting for input.
-	  Re-intruduce the WallClock to implement user-requested
-	  streams timeout.
-
-2008-05-28 Sandro Santilli <strk@keybit.net>
-
-	* libbase/curl_adapter.cpp (fillCache): spaces to tabs, comments
-	  about timeout constraints.
-
-2008-05-28 Sandro Santilli <strk@keybit.net>
-
-	* testsuite/swfdec/REALTIME: run the sec-0.6.2-local-access.as
-	  tests in realtime (they load an xml file).
-
-2008-05-28 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* libbase/curl_adapter.cpp: silence some debugging output
-	  except when GNASH_CURL_VERBOSE is defined.
-
-2008-05-28 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/impl.cpp: store a local copy of URL string to
-	  prevent illegal reads.
-
-2008-05-28 Sandro Santilli <strk@keybit.net>
-
-	* server/button_character_instance.cpp,
-	  server/sprite_instance.cpp:
-	  Remove a couple of annoying debugging prints.
-
-2008-05-28 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* libbase/curl_adapter.cpp: don't pass _running to
-	  curl_multi_info_read (completely wrong). Return from
-	  fillCache when enough bytes have been cached.
-
-2008-05-28 Udo Giacomozzi <udo.gnu@nova-sys.net>
-
-	* backend/render_handler_agg_style.h: fix a bug with alpha-gradients
-	  (fixes bug #23365)	
-
-2008-05-28 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* plugin/win32/plugin.cpp: fix build.
-
-2008-05-28 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/asobj/TextFormat.cpp: correct some typos (should fix
-	  the silly debug message: "Invalid align string left, take
-	  as left").
-
-2008-05-28 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* libbase/curl_adapter.cpp: drop support for curl pre-7.12
-	  (was released in 2004).
-
-2008-05-28 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* libbase/curl_adapter.cpp: use select() to wait for data instead
-	  of sleeping. Correct includes, logging and cstdio.
-
-2008-05-28 Bastiaan Jacques <bastiaan@bjacques.org>
-
-	* server/fill_style.cpp: Add missing breaks in switch statement.
-
-2008-05-28 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/parser/shape_character_def.cpp: drop unused global
-	  functions and flags.
-	* server/parser/movie_definition.h: drop gnash.h include.
-	* server/swf/StartSoundTag.cpp: include gnash.h for sound handler.
-	* server/impl.{cpp,h}: drop gnash.h include, old verbosity functions.
-	* server/gnash.h: remove long-dead global functions.
-	* server/character.h: drop gnash.h include.
-	* gui/Player.cpp, utilities/processor.cpp: setting cache flag
-	  didn't do anything.
-
-2008-05-28 Sandro Santilli <strk@keybit.net>
-
-	* testsuite/server/ClassSizes.cpp: print sizeof(rgba).
-
-2008-05-28 Bastiaan Jacques <bastiaan@bjacques.org>
-
-	* server/style.{h,cpp}: Parse gradient spread and interpolation modes
-	(available in DEFINESHAPE4).
-	* server/swf.h: Add gradient spread and interpolation modes.
-
-2008-05-27 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* extensions/launcher/launcher.cpp, gui/fb.cpp, gui/gnash.cpp
-	  libbase/GC.cpp, libbase/rc.cpp, libbase/sharedlib.cpp,
-	  plugin/plugin.cpp, plugin/win32/plugin.cpp, server/vm/VM.cpp,
-	  utilities/dumpshm.cpp, utilities/processor.cpp,
-	  utilities/soldumper.cpp: use std::setlocale, and from cstdlib
-	  std::getenv; only set locale if ENABLE_NLS is defined. 
-
-2008-05-27 Sandro Santilli <strk@keybit.net>
-
-	* libbase/curl_adapter.cpp (CurlStreamFile::init): add support
-	  for GNASH_COOKIES_IN and GNASH_COOKIES_OUT environment variable;
-	  always enable the libcurl cookie engine.
-
-2008-05-27 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* libbase/container.h, libbase/grid_index.h: drop more dead files.
-	  I think Gnash works by magic.
-
-2008-05-27 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/button_character_instance.cpp: compare std::strings for
-	  portability (no strcasecmp).
-
-2008-05-27 Sandro Santilli <strk@keybit.net>
-
-	* libmedia/ffmpeg/sound_handler_sdl.cpp (delete_all_sounds):
-	  Don't try to lock an already locked mutex. Fixes bug #23381.
-
-2008-05-27 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* testsuite/swfdec/PASSING: update swfdec passes.
-
-2008-05-27 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/impl.cpp: clean up logging, drop the global bool
-	  s_no_recurse_while_loading, which has been used to disable parts
-	  of the code since before Gnash existed.
-	* server/swf/tag_loaders.cpp: drop code depending
-	  on the above bool being true.
-	* server/parser/movie_def_impl.{h,cpp},
-	  server/parser/movie_definition.h: drop methods only used by the
-	  disabled code above.
-
-2008-05-27 Sandro Santilli <strk@keybit.net>
-
-	* libbase/FLVParser.cpp (seek): have video stream drive
-	  the actual time, having more constraints over which
-	  frame will be legal to pick.
-	* server/asobj/NetStream.cpp: if-0 out PlayHead advancement
-	  debugging lines.
-	* server/asobj/NetStreamFfmpeg.cpp (seek): close the playback
-	  clockpipe tap while seeking, or time will keep flowing
-	  while buffering, with consequent audio buffer overruns.
-
-2008-05-27 Sandro Santilli <strk@keybit.net>
-
-	* libbase/FLVParser.{cpp,h}: take ownership of the input stream.
-	* server/asobj/NetConnection.{cpp,h}: drop getConnectedParser().
-	* server/asobj/NetStreamFfmpeg.{cpp,h}: load, parse and decode
-	  in main thread, consume audio in audio buffers in sdl thread.
-	  Have a compile-time macro to enable load&parsing in a separate
-	  thread
-
-2008-05-27 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* libbase/log.{cpp,h}: header cleanup, rename DEBUGLEVEL to
-	  GNASH_DEBUG_LEVEL to avoid conflict with OS X system headers.
-	  Should fix bug #23369. Drop unused defines. Use C functions
-	  in the std namespace.
-
-2008-05-27 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* libbase/jpeg.cpp, libbase/rc.cpp, libbase/zlib_adapter.cpp:
-	  header cleanup - include sstream where it's used (It'll be
-	  dropped from log.h shortly). Drop c_str() for logging, use
-	  ostringstream where there's no >>. Try dropping #undef
-	  HAVE_STDLIB_H in jpeg.cpp (as queried in comment) to see
-	  who squeals.
-	* configure.ac: drop tests for unused C library functions.
-	* libmedia/GstUtil.cpp, libnet/http.h: include sstream, don't
-	  rely on other headers to include it.
-	* server/as_environment.cpp: drop c_str() in logging.
-
-2008-05-26 Bastiaan Jacques <bastiaan@bjacques.org>
-
-	* backend/render_handler_cairo.cpp: Don't apply the shape matrix to
-	patterns, because that's already taken care of in
-	draw_shape_character. Implement focal gradients. Shift all pixel
-	positions by one half, so that single width lines will show up.
-
-2008-05-26 Bastiaan Jacques <bastiaan@bjacques.org>
-
-	* gui/aqua.cpp: Remove function reports and define _width and
-	_height.
-	* gui/aqua_ogl_glue.cpp: Enable the accumulation buffer. Don't
-	flip the OpenGL screen, because this now happens inside the
-	renderer.
-
-2008-05-26 Sandro Santilli <strk@keybit.net>
-
-	* server/FreetypeGlyphsProvider.{cpp,h}: mutex-protect access to
-	  static Freetype lib.
-
-2008-05-26 Sandro Santilli <strk@keybit.net>
-
-	* libmedia/ffmpeg/sound_handler_sdl.cpp: add some missing lockings.
-	* server/asobj/NetStreamFfmpeg.cpp (seek): seek time is given in
-	  second, not milliseconds...
-	* libbase/FLVParser.cpp (seek): don't parse on seek, just don't
-	  allow seeking past the currently parsed range.
-
-2008-05-26 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* testsuite/misc-ming.all: fix testsuite.
-
-2008-05-26 Sandro Santilli <strk@keybit.net>
-
-	* libmedia/sound_handler.h: tried to generalize methods documentation.
-
-2008-05-26 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* plugin/win32/plugin.cpp: use boost cstdint for portability.
-
-2008-05-26 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* plugin/win32/plugin.cpp: fscommand is now registered with the
-	  movie_root.
-
-2008-05-25 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/sprite_instance.cpp: replace sprintf with boost::lexical_cast.
-	  Remove some old header includes.
-
-2008-05-25 Sandro Santilli <strk@keybit.net>
-
-	* gui/Player.cpp: don't forget to initialize hasOverriddenBaseUrl.
-	  (thanks Bastiaan for finding out)
-
-2008-05-25 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* testsuite/actionscript.all/Microphone.as: more tests for Microphone
-	  class.
-
-2008-05-25 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/array.cpp, server/as_environment.cpp,
-	  server/as_function.cpp, server/as_object.cpp server/as_value.cpp,
-	  server/as_value.h, server/character.cpp, server/debugger.cpp,
-	  server/edit_text_character.cpp, server/movie_root.cpp,
-	  server/sprite_instance.cpp, server/timers.cpp,
-	  server/video_stream_instance.cpp, server/asobj/AsBroadcaster.cpp,
-	  server/asobj/ClassHierarchy.cpp, server/asobj/Global.cpp,
-	  server/asobj/Key.cpp, server/asobj/MovieClipLoader.cpp,
-	  server/asobj/NetStream.cpp, server/asobj/Number.cpp,
-	  server/asobj/Object.cpp, server/asobj/string.cpp,
-	  server/asobj/xml.cpp, server/asobj/xmlsocket.cpp,
-	  server/vm/fn_call.h: logging cleanups, dropping c_str() and
-	  to_debug_string(). Should slim down the source a bit.
-
-2008-05-24 Sandro Santilli <strk@keybit.net>
-
-	* libbase/FLVParser.{cpp,h}: re-add nextMediaFrame as it's still
-	  used by current NetStreamFfmpeg.
-	* server/asobj/NetStreamFfmpeg.{cpp,h}: re-add m_start_onbuffer, still
-	  used by current NetStreamFfmpeg.
-	  Fixes bug #23346.
-
-2008-05-24 Bastiaan Jacques <bastiaan@bjacques.org>
-
-	* server/matrix.cpp: Use std::max instead of fmax to fix build on BSD
-	and friends.
-
-2008-05-24 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/vm/action.{cpp,h}: drop unused call_method{1,2,3,4} and
-	  va_list call_method_parsed. Drop unused variables. Replace snprintf
-	  (error message) with boost::format (speed shouldn't be an issue
-	  here).
-	* server/sprite_instance.{cpp,h}: drop virtual call_method_args
-	  (va_list method).
-	* server/movie_instance.{h,cpp}: drop call_method_args and unused
-	  call_method (the only caller of call_method_args).
-	* server/gnash.h: drop <cstdarg> include.
-
-2008-05-24  Rob Savoye  <rob@ute.welcomehome.org>
-
-	* libnet/rtmp_server.cpp: Use swapBytes() instead of ntohl(), so
-	mingw32 is happy.
-
-2008-05-24 Sandro Santilli <strk@keybit.net>
-
-	* server/VirtualClock.h: add interruptable wrapper for VirtualClocks.
-
-2008-05-23 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/vm/ActionExec.cpp: clean up using directives.
-	* server/vm/ASHandlers.cpp: check that an object exists and that it's
-	  a proper object before enumerating it. Fixes bug #23331.
-
-2008-05-23 Russ Nelson <nelson@crynwr.com>
-
-	* configure.ac: make the user's life a little easier by telling them
-	  explicitly what guis each renderer supports.
-
-2008-05-23 Sandro Santilli <strk@keybit.net>
-
-	* libbase/FLVParser.{cpp,h}: add peekNextVideoFrameInfo
-	  and peekNextAudioFrameInfo to check timestamp of next frame
-	  w/out advancing cursor; make parseNextTag public to be
-	  eventually used from a parser thread; drop embedded
-	  mutex locking as we'll want to control mutexes from outside.
-
-2008-05-23 Sandro Santilli <strk@keybit.net>
-
-	* server/asobj/NetStream.{cpp,h}: Add PlayHead class implementation.
-
-2008-05-23 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/sprite_instance.{h,cpp},
-	  server/parser/movie_def_impl.{h,cpp}: use StringNoCaseLessThen
-	  as a comparator for the frame name map (_namedFrames), use insert
-	  instead of operator[] so that the first inserted named frame is not
-	  replaced by a subsequent one with the same name (case insensitive).
-	  3 passes in misc-ming.all, fixes bug #23327. Const-correct some
-	  iterators.
-	* testsuite/misc-ming.all/frame_label_test.c: 3 passes.
-
-2008-05-23 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* testsuite/misc-ming.all/frame_label_test.c: test for
-	  case sensitivity.
-
-2008-05-23 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/vm/ASHandlers.cpp: bitwise left shift of more than the size of
-	  the left operand is bad (undefined behaviour).
-
-2008-05-23 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/vm/ASHandlers.cpp: drop many dead, old debugging messages,
-	  drop all to_debug_string() and c_str() in logging (except log_trace,
-	  comment added). Use to_int() instead of to_number() more.
-
-2008-05-23 Bastiaan Jacques <bastiaan@bjacques.org>
-
-	* backend/render_handler_cairo.cpp: Unlike AGG, the Cairo renderer
-	accepts measurements in TWIPS.
-
-2008-05-23 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/asobj/SharedObject.cpp: restrict using directives, use
-	  a const iterator for vector of Elements, as they shouldn't be
-	  changed while reading. Clean up logging (c_str(),
-	  to_debug_string()).
-	* server/vm/ASHandlers.cpp: drop to_debug_string().c_str().
-
-2008-05-23 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* gui/aqua_ogl_glue.h gui/fltk_glue_agg.h gui/fltk_glue_cairo.h
-	  gui/gtk_glue_gtkglext.h, gui/kde_glue_opengl.h,
-	  gui/sdl_cairo_glue.h, gui/sdl_ogl_glue.h: Do not put
-	  "using namespace std;" in header files. It's wrong.
-
-2008-05-23 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* parser/BitmapMovieDefinition.cpp, parser/bitmap_character_def.cpp,
-	  parser/sprite_definition.cpp, server/sprite_instance.cpp: minor
-	  cleanups, drop (already unnecessary) "using namespace std;", wrap
-	  log_parse in verbose parsing macro.
-
-2008-05-23 Russ Nelson <nelson@crynwr.com>
-
-	* README.dump-gnash: I don't know where to put this information
-	  where someone will be sure to find it, other than a README.
-	  If someone has a better idea, Just Do It(tm).
-
-2008-05-23 Russ Nelson <nelson@crynwr.com>
-
-	* All files were changed to support the new method for location
-	  of ffmpeg include files.  They were moved from .../ffmpeg/* into
-	  .../lib*/*.  Also, they changed the way they express the version
-	  number in avcodec.h, which we are parsing to avoid compiling
-	  because we support cross-compilation.  We now support that also.
-
-2008-05-23 Zou Lunkai <zoulunkai@gmail.com>
-	
-	* server/styles.cpp: read_bit() reduction, cleanups. 
-	* testsuite/actionscript.all/color.as: one xcheck to check, probably
-	  already passed before. 
-	
-2008-05-22 Russ Nelson <nelson@crynwr.com>
-
-	* doc/C/Makefile.am: list the files one by one, not the subdir.
-	* testsuite/Makefile.am: list the files one by one, not the subdir.
-	* testsuite/media/README: list and describe the files to include
-
-2008-05-22 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/vm/ASHandlers.cpp: partial revert of last commit, restricted
-	  to dropping using namespace std, const correcting some variables,
-	  and as an extra using boost::lexical_cast not as_value for
-	  converting ints to strings. The changes to take some variables
-	  by reference and to logging have been reverted for now. 
-
-2008-05-22 Sandro Santilli <strk@keybit.net>
-
-	* testsuite/swfdec/PASSING: color-setTransform-full.swf passes
-	  (I guess since zou touched the relative code).
-
-2008-05-22 Sandro Santilli <strk@keybit.net>
-
-	* server/asobj/NetStreamFfmpeg.{cpp,h}: have the decoder thread
-	  only exit if explicitly requested; on EOF just wait on the 
-	  condition, will be waked up on destruction or seek.
-
-2008-05-22 Sandro Santilli <strk@keybit.net>
-
-	* server/asobj/NetStreamFfmpeg.cpp: reduce code complexity.
-
-2008-05-21 Bastiaan Jacques <bastiaan@bjacques.org>
-
-	* backend/render_handler_ogl.cpp: Allow multiple videos to be shown
-	simultaneously.
-
-2008-05-21 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/vm/ASHandlers.cpp: clean up logging a lot (dropping
-	  to_debug_string() and c_str()), drop using namespace std;,
-	  const correct. Use references more often (using existing
-	  code as a guide).
-
-2008-05-21 Sandro Santilli <strk@keybit.net>
-
-	* server/asobj/NetStreamFfmpeg.cpp (av_streamer):
-	  Wait to be waked up when *any* (not both) 
-	  media frame buffer is full, or the actual
-	  decoder would just do discard the product of work
-	  done for an already full queue...
-
-2008-05-21 Sandro Santilli <strk@keybit.net>
-
-	* libmedia/ffmpeg/ffmpegNetStreamUtil.h,
-	  server/asobj/NetStreamFfmpeg.cpp:
-	  Sorry, reverted previous patch, it consumed
-	  more frames from "the buffer" then required
-	  (really consumes only based timestamp)
-
-2008-05-21 Sandro Santilli <strk@keybit.net>
-
-	* libmedia/ffmpeg/ffmpegNetStreamUtil.h,
-	  server/asobj/NetStreamFfmpeg.cpp:
-	  Change ElementsOwningQueue::pop to return 
-	  the element and transfer ownership. Make 
-	  things clearer to me.
-
-2008-05-21 Sandro Santilli <strk@keybit.net>
-
-	* server/asobj/NetStream.{cpp,h}: drop m_pause and m_go.
-	* server/asobj/NetStreamFfmpeg.{cpp,h}: drop m_pause and m_go,
-	  use separate variables for playback and decoding status.
-	  Add a lot more debugging (not really meant for final user, but
-	  helpful for later progress on this).
-
-2008-05-21 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/array.cpp, server/as_function.cpp,
-	  server/BitmapMovieInstance.cpp, server/movie_instance.cpp,
-	  server/swf_function.cpp: don't use namespace std, drop
-	  some gnashconfig.h includes.
-
-2008-05-21 Sandro Santilli <strk@keybit.net>
-
-	* server/asobj/NetStreamFfmpeg.{cpp,h}: use a barrier
-	  to wait for start of decoder thread.
-
-2008-05-21 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* gui/Player.cpp: register FScommand callback again.
-
-2008-05-21 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/movie_root.{cpp,h}: make AS callback handlers and
-	  registering functions into non-static members of movie_root
-	  (FScommand and interfaceEvent).
-	* server/vm/ActionExec.cpp: registerFSCommandCallback moved to
-	  movie_root.
-	* server/ASHandlers.cpp: get FScommand callback from movie_root,
-	  reduces use of globals and 'extern'.
-	* gui/Player.cpp, utilities/processor.cpp: update registering
-	  callback handlers (after VM is initialized).
-	* server/gnash.h: drop declaration of callback-registering
-	  functions (done in movie_root now).
-	* server/character.h, server/impl.h, server/swf/ControlTag.h,
-	  server/parser/bitmap_character_def.h
-	* server/asobj/{Mouse,System}.cpp: get interfaceHandle from
-	  movie_root.
-
-2008-05-21 Sandro Santilli <strk@keybit.net>
-
-	* testsuite/misc-ming.all/NetStream-SquareTest.c: fix the test
-	  for number of onMetaData invocations (gnash gst fails).
-
-2008-05-21 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* gui/Player.cpp: comment on <unistd.h> include.
-
-2008-05-21 Sandro Santilli <strk@keybit.net>
-
-	* libbase/FLVParser.cpp (parseNextFrame): handle premature EOF while
-	  parsing meta tags.
-
-2008-05-21 Brad Smith <brad@comstyle.com>
-
-	* libnet/network.h: Ensure data types are defined before including
-	netinet.h (for OpenBSD).
-	* gui/Player.cpp: Make sure write() is defined (for OpenBSD).
-
-2008-05-21 Zou Lunkai <zoulunkai@gmail.com>
-	
-	* server/cxform.{h,cpp}: docs, minor cleanup.
-	* testsuite/actionscript.all/color.as: more accuracy tests.  
-	
-2008-05-21 Sandro Santilli <strk@keybit.net>
-
-	* cygnal/Makefile.am, utilities/Makefile.am: add LIBINTL
-	  to AM_LDFLAGS. Patch in bug #21536, modified to use LIBINT
-	  consistently (also used in libbase/Makefile.am).
-
-2008-05-21 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* testsuite/tmpSharedObject/: remove malformed sol files - they can
-	  wait for git (where renaming and moving directories is hopefully
-	  not such a pain).
-
-2008-05-20 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/fill_style.cpp: squash more non-standard functions (the
-	  operations are on doubles anyway, so it doesn't involve any more
-	  casts than before). Clean up logging.
-	* server/parser/{BitmapMovieDefinition,movie_def_impl}.h: ditto.
-	* server/as_value.cpp: use std::fmod, drop using namespace std;, 
-	  drop c_str() for logging, replace snprintf with boost::format
-	  (will be slightly slower for those cases), drop snprintf ifdef.
-	  A slightly faster alternative to boost::format that also avoids
-	  using non-standard functions would be stringstreams, but it is
-	  not as clear.	
-
-2008-05-20 Zou Lunkai <zoulunkai@gmail.com>
-	
-	* server/cxform.{h,cpp}: code refactory, using integral alrithmatic for cxform.
-	* server/character.cpp, server/edit_text_character.cpp, 
-	  server/asobj/Color.cpp: update to synchronize the new cxform.
-	* testsuite/actionscript.all/Color.as: passing.
-	  More compatible, much faster, 50% less memory per cxform... 
-	
-2008-05-19 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* po/ja.po: correct variable order (only one instance).
-
-2008-05-19 Sandro Santilli <strk@keybit.net>
-
-	* server/asobj/flash/geom/Point_as.cpp (attachPointStaticProperties):
-	  Don't protect static properties. Gets closer to succeed swfdec's
-	  point-properties-*.swf. Won't get any further at would require
-	  either an ugly hack (providing an empty useless-looking prototype)
-	  or some longer support (prototype by destructive setter).
-
-2008-05-19 Sandro Santilli <strk@keybit.net>
-
-	* server/asobj/Global.cpp, server/asobj/flash_pkg.cpp:
-	  Register the 'flash' package starting at swf6, just 
-	  hide by prop flags (so to get more successes in swfdec testsuite).
-	* testsuite/swfdec/PASSING: point-{6,7}.swf succeed, completing
-	  the set.
-
-2008-05-19 Sandro Santilli <strk@keybit.net>
-
-	* server/asobj/flash/geom/Point_as.cpp: sqrtf->std::sqrt,
-	  drop some early outs with wrong assumption (non-finite is not
-	  necessarely NaN)
-	* testsuite/actionscript.all/Point.as: test that length of a Point
-	  with Infinite ordinate is Infinite.
-	* testsuite/swfdec/PASSING: point-8.swf succeeds now.
-
-2008-05-19 Sandro Santilli <strk@keybit.net>
-
-	* server/asobj/flash/geom/Point_as.cpp: 
-	  Implement Point.normalize(), Point.offset(), Point.subtract()
-	  and Point.polar().
-	* testsuite/actionscript.all/Point.as:
-	  Test Point.normalize(), Point.offset(), Point.subtract()
-	  and Point.polar().
-
-2008-05-19 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* po/Makefile.am, po/ja.po: add Japanese translation by 
-	  Makoto Kato.
-
-2008-05-19 Sandro Santilli <strk@keybit.net>
-
-	* server/asobj/flash/geom/Point_as.cpp: implement Point.interpolate().
-	* testsuite/actionscript.all/Point.as: test Point.interpolate().
-
-2008-05-19 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* win32: drop old win32 files in head too. Anyone wanting to update
-	  them (if they're at all useful) can easily resurrect them from
-	  CVS.
-
-2008-05-19 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* libbase/utility.h: use std::min / std::max, drop custom fmin/fmax,
-	  imin/imax functions, replace iclamp/fclamp with templated clamp<> 
-	  using std::min/max.
-	* server/array.cpp, server/as_value.h, server/character.h,
-	  server/cxform.cpp, server/edit_text_character.cpp, server/impl.h,
-	  server/movie_instance.cpp, server/movie_root.cpp, server/rect.cpp,
-	  server/sprite_instance.cpp, server/asobj/ContextMenu.cpp,
-	  server/asobj/NetStreamFfmpeg.cpp, server/asobj/string.cpp,
-	  server/parser/bitmap_character_def.h, gui/gnash.cpp,
-	  gui/gui.cpp, libbase/FLVParser.cpp, libbase/container.h, 
-	  libbase/smart_ptr.h, libbase/tu_file.cpp, libbase/zlib_adapter.cpp,
-	  libgeometry/snappingrange.h, libmedia/AudioDecoderSimple.cpp,
-	  server/parser/shape_character_def.cpp: replace iclamp with
-	  clamp<T> as appropriate, replace custom min/max methods with
-	  std methods. Add / remove utility.h include as necessary.
-
-2008-05-19 Sandro Santilli <strk@keybit.net>
-
-	* testsuite/swfdec/REALTIME: movieclip-version-*.swf must run in
-	  real time (loads external resources).
-
-2008-05-19 Sandro Santilli <strk@keybit.net>
-
-	* server/asobj/flash/geom/Point_as.cpp: implement Point.distance().
-	* testsuite/actionscript.all/Point.as: test Point.distance().
-
-2008-05-19 Sandro Santilli <strk@keybit.net>
-
-	* server/asobj/flash/geom/Point_as.cpp: implement Point.add(),
-	  Point.equals() and Point.clone()
-	* testsuite/actionscript.all/Point.as: test Point.add(),
-	  Point.equals() and Point.clone().
-
-2008-05-19 Sandro Santilli <strk@keybit.net>
-
-	* configure.ac: add --with-plugins-install=user|system|prefix,
-	  default to user.
-	* doc/C/refmanual/custompath_configuration.xml: document
-	--with-plugins-install.
-	* Makefile.am: use --with-plugins-install=prefix on 'make distcheck'
-	* macros/firefox.m4: inherit npapi install policy from global plugins
-	  install policy.
-	* macros/kde.m4: inherit kparts install policy from global plugins 
-	  install policy.
-
-2008-05-19 Sandro Santilli <strk@keybit.net>
-
-	* macros/firefox.m4: add --with-npapi-install=user|system|prefix,
-	  default to user.
-	* doc/C/refmanual/custompath_configuration.xml: document
-	  --with-npapi-install.
-
-2008-05-18 Zou Lunkai <zoulunkai@gmail.com>
-	
-	* server/cxform.cpp, server/swf/StartSoundTag.cpp: more read_bit() reduction.
-	
-2008-05-18 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* libbase/utility.h: move general mathematical functions under
-	  gnash::utility namespace so that their origin is clearer in
-	  the code.
-	* server/sprite_instance.cpp: replace C99 round function with
-	  std::floor(x + 0.5). This is different for negative half-values
-	  but the testsuite passes and the original use of round doesn't
-	  seem to have any particular reasoning. Comments explaining why
-	  in case it causes problems.
-	* server/parser/shape_character_def.cpp: ditto.
-	* libbase/noseek_fd_adapter.cpp: fix some sizet_fmt warnings (there
-	  are plenty more, but are ifdeffed out at the moment).
-	* server/font.cpp: silence unused variable warning.
-	* many files: add gnash::utility namespace for flerp, frnd etc.
-
-2008-05-18 Sandro Santilli <strk@keybit.net>
-
-	* macros/kde.m4: add --with-kparts-install=user|system|prefix,
-	  default to user, overridable with --with-kde-pluginprefix
-	  and further overridable by specific kparts components
-	  switches.
-	* Makefile.am: use --with-kparts-install=prefix on 'distcheck'.
-	* doc/C/refmanual/custompath_configuration.xml: document
-	  --with-kparts-install.
-
-2008-05-18 Sandro Santilli <strk@keybit.net>
-
-	* configure.ac: have KPARTS install dir summary use 'KPARTS' label,
-	  to conform with that given by 'make dumpconfig'.
-
-2008-05-17 Sandro Santilli <strk@keybit.net>
-
-	* server/vm/ActionExec.cpp (setLocalVariable): use scope stack
-	  when out of a function context (as comment suggested).
-	* testsuite/swfdec/PASSING: definelocal-scope.as in all versions.
-
-2008-05-17 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/asobj/NetStreamGst.cpp: replace rint with std::floor
-	  properly.
-
-2008-05-17 Sandro Santilli <strk@keybit.net>
-
-	* server/namedStrings.{cpp,h}: add PROP_TEXT_HEIGHT.
-	* server/edit_text_character.{cpp,h}: implement missing textHeight,
-	  turn textWidth into a proper property.
-	* testsuite/actionscript.all/TextField.as: updated expected results.
-
-2008-05-17 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/asobj/NetStreamGst.cpp: replace rint with std::floor.
-	* server/asobj/flash/geom/Point_as.cpp: drop code after return,
-	  fix compile warning.
-
-2008-05-17 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* libbase/utility.h: add inline bool utility::isFinite() to replace
-	  use of non-portable and non-standard isfinite in the code. Drop
-	  define of isfinite. Moved infinite_to_fzero under gnash::utility
-	  namespace. Please make any portability fixes here and *not*
-	  anywhere else.
-	* libbase/utility.cpp: drop dead include.
-	* server/array.cpp: replace isfinite.
-	* server/as_value.cpp: replace isfinite.
-	* server/as_value.h: drop second define of isfinite.
-	* server/character.cpp: drop using namespace std; (was for isfinite),
-	  replace isfinite.
-	* server/edit_text_character.cpp: update infinite_to_fzero namespace.
-	* server/matrix.cpp: drop another define of isfinite, drop using
-	  namespace std;, replace isfinite.
-	* server/resource.h: drop yet another define of isfinite.
-	* server/sprite_instance.cpp: replace isfinite.
-	* server/types.cpp: another define of isfinite...
-	* server/asobj/Global.cpp: replace isfinite
-	* server/asobj/flash/geom/{Point,Rectangle}_as.cpp: replace isfinite.
-	* testsuite/server/AsValueTest.cpp: replace isfinite.	
-
-2008-05-17 Sandro Santilli <strk@keybit.net>
-
-	* gui/Player.cpp (run): support relative urls in 'base' parameter,
-	  always resolve against baseurl given with -U or derived from -u
-	  or filename. Fixes bug #23260.
-
-2008-05-17 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* libbase/utility.h: drop LN_2, log2, trunc replacements as they
-	  aren't used anywhere in the code. Move exp2 define to
-	  MovieTester.cpp as it's only used there.
-	* testsuite/MovieTester.{cpp,h}: add inline exp2 function in case
-	  it's missing.
-
-2008-05-16 Russ Nelson <nelson@crynwr.com>
-
-	Fix references to Bitstream-Vera-Sans:
-	* testsuite/misc-ming.all/DefineTextTest.c
-	* testsuite/misc-ming.all/ming_utils.c
-	* testsuite/misc-ming.all/DefineEditTextTest.c
-	* testsuite/misc-ming.all/RollOverOutTest.c
-	* testsuite/misc-ming.all/SpriteButtonEventsTest.c
-	* testsuite/misc-ming.all/DefineEditTextVariableNameTest2.c
-
-2008-05-16 Russ Nelson <nelson@crynwr.com>
-
-	* testsuite/media/Bitstream Vera Sans.COPYRIGHT rename to:
-	* testsuite/media/Bitstream-Vera-Sans.COPYRIGHT
-	* testsuite/media/Bitstream Vera Sans.fdb rename to:
-	* testsuite/media/Bitstream-Vera-Sans.fdb
-	* testsuite/media/README: Modify the file to include *everything*
-	  which should go in the distro.
-
-2008-05-16 Sandro Santilli <strk@keybit.net>
-
-	* gui/gui.cpp (start): call resize_view rather then setting display
-	  viewport directly. This should ensure stage matrix is properly
-	  updated when -s or -j/-k are given.
-
-2008-05-16 Sandro Santilli <strk@keybit.net>
-
-	* libmedia/ffmpeg/sound_handler_sdl.{cpp,h}: fix memory leak in
-	  stop_all_sounds too..
-
-2008-05-16 Russ Nelson <nelson@crynwr.com>
-
-	* NEWS, README: removing conflicts
-
-2008-05-16 Russ Nelson <nelson@crynwr.com>
-
-	* NEWS: add notes about this release, make formatting consistent
-          across all the release notes.
-	* README: remove first person, update to 0.8.3
-	* doc/C/actionscript.xml: update version number
-	* doc/C/app_authors.xml: add myself as author
-	* doc/C/conformance.xml: add Implements 
-	* doc/C/gnashref.xml: update version number
-	* doc/C/gnashuser.xml: update version number
-	* doc/C/introduction.xml: change the tense
-	* doc/C/preformatted/gnash.1.in: regenerate
-	* doc/C/preformatted/gnash_ref.info.in: regenerate
-	* doc/C/preformatted/gnash_user.info.in: regenerate
-	* doc/C/preformatted/gnashref.html.in: regenerate
-	* doc/C/preformatted/gnashuser.html.in: regenerate
-	* doc/C/refmanual/documentation_dependencies.xml: spelling
-	* doc/C/refmanual/feature_configuration.xml: spelling/grammar and note
-          that AGG is the default.
-	* doc/C/refmanual/testing_dependencies.xml: spelling
-	* doc/C/usermanual/usage.xml: spelling and add options for dump-gnash.
-	* macros/docbook.m4: improve FOP and jre location code
-
-2008-05-16 Sandro Santilli <strk@keybit.net>
-
-	* libmedia/ffmpeg/sound_handler_sdl.h: add an
-	  sound_data::clearActiveSounds() method to properly
-	  drop active sounds w/out memory leaks.
-	* libmedia/ffmpeg/sound_handler_sdl.cpp (stop_sound):
-	  use sound_data::clearActiveSounds() fixing leak of
-	  actual active sounds..
-
-2008-05-16 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* testsuite/libamf.all/gen_malformed_sol_tests.pl: skip directories
-	  and other files not ending in .sol.
-
-2008-05-16 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* testsuite/tmpSharedObjects/malformed: add 10 sol files that cause
-	  an abort in Gnash - std::logic_error exceptions (construction of
-	  std::string from NULL), so they result from earlier memory errors.
-	  This were the only aborts in 3400 malformed files, so still
-	  seems fairly good performance.
-
-2008-05-16 Sandro Santilli <strk@keybit.net>
-
-	* testsuite/libamf.all/zzufsol: print usage on stderr when
-	  insufficient number of arg is given; accept dir names containing
-	  spaces as input.
-
-2008-05-16 Sandro Santilli <strk@keybit.net>
-
-	* server/sprite_instance.{cpp,h}: remove unloaded TextField references
-	  from TextField variables container on ::cleanupDisplayList.
-	  Fixes bug #20076 (leak on curve_ball.swf).
-
-2008-05-16 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* testsuite/libamf.all/zzufsol: script to corrupt all your .sol files.
-	* testsuite/libamf.all/gen_malformed_sol_tests.pl: script to generate
-	  an AS file to open all the corrupted .sol files in turn (test
-	  robustness).
-
-2008-05-16 Sandro Santilli <strk@keybit.net>
-
-	* NEWS, README: forward-port nelson changes here (docbook changes
-	  will need to be ported too).
-
-2008-05-16 Sandro Santilli <strk@keybit.net>
-
-	* Makefile.am: isn't clear to me which of INTLLIB and LIBINTL we 
-	  should be using (macro/gettext.m4 sets both), so we print them
-	  in 'make dumpconfig' now to tell (I get both empty, if anyone
-	  gets values there please let me know - see bug #21536).
-
-2008-05-16 Zou Lunkai <zoulunkai@gmail.com>
-	
-	* server/cxform.cpp: use read_u8() instead of read_bit(), parser optimize.
-	* server/font.cpp: use read_u8() instead of read_bit(), parser optimize.
-	* server/parser/button_character_def.cpp,
-	  server/parser/edit_text_character_def.cpp: use read_u8() instead of read_bit(), 
-	  parser optimize.
-	
-2008-05-16 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/asobj/Global.cpp: handle versions higher than SWF9.
-
-2008-05-15  Rob Savoye  <rob@ripple.welcomehome.org>
-
-	* libamf/amf.cpp: Trap the new AMF3 type. Decode objects
-	correctly. 
-	* libamf.buffer.{h,cpp}: Resize to hold the data up to the current
-	seek pointer if no argument.
-	* libamf/element.cpp: Trap the switch from AMF0 to AMF3. Dump
-	properties too.
-	* libamf/sol.cpp: Properties in a SOL file have a zero byte
-	terminator after each one.
-	* libnet/Makefile.am: Add new files, rtmp_msg.* and rtmp_client.*.
-	* libnet/rtmp_client.{g,cpp}: Client side support for RTMP.
-	* libnet/rtmp_msg.{g,cpp}: Represent an RTMP packet, inckuding the
-	header. 
-	* libnet/http.cpp: Cleanup warnings.
-	* libnet/rtmp.cpp: Move client side methods to new RTMPClient
-	class and other to RTMPMsg. Decode result messages from media
-	server. Cleanup warnings.
-	* libnet/rtmp_server.cpp: Build result messages for client.
-
-2008-05-15 Sandro Santilli <strk@keybit.net>
-
-	* server/parser/movie_def_impl.cpp (readHeader): limit FPS to a max of
-	  84 (limit found by trial and error). Can be turned into a
-	  compile-time define. Use this upper bound when FPS 0 is requested.
-
-2008-05-15 Sandro Santilli <strk@keybit.net>
-
-	* configure.ac: bail out if sdl gui is selected in conjuntion
-	  with cairo renderer (unsupported).
-
-2008-05-15 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* testsuite/swfdec/PASSING: new tests.
-
-2008-05-15 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/tools.cpp: drop unused file.
-
-2008-05-15 Sandro Santilli <strk@keybit.net>
-
-	* testsuite/misc-ming.all/loop_test.c: test no unload event occurs,
-	  and actions in first frame of the characters being swapped
-	  are executed only once.
-
-2008-05-15 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/asobj/GMath.h: drop all the undefs.
-
-2008-05-15 Sandro Santilli <strk@keybit.net>
-
-	* server/asobj/NetStream.{cpp,h}: drop unused as_environment member.
-
-2008-05-15 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* libbase/image_filters.cpp: drop (hasn't been used or built since
-	  before 0.8.2).
-	* libbase/tu_math.cpp: drop (was only included in a couple of cpp files
-	  for isfinite, which is also defined in utility.h).
-	* libbase/Makefile.am: remove tu_math.h
-	* server/asobj/Global.cpp: replace tu_math.h include with utility.h.
-
-2008-05-15 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/asobj/Math.cpp: drop the hack, drop using namespace std,
-	  qualify all cmath functions with std::, and see if that causes
-	  problems on any platforms. As all the functions are from C89 and
-	  in the C++ standard, the hackery ought to be unnecessary.
-
-2008-05-15 Zou Lunkai <zoulunkai@gmail.com>
-	
-	* server/dlist.{h,cpp}: mergeDisplayList(), don't forget to merge characters
-	  placed in dynamic zone. fix bug #23248.
-	* testsuite/misc-ming.all/loop_test-Runner.cpp: minor fix, the test swf was
-	  updated yestoday.
-	
-2008-05-14 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/character.cpp: rint isn't a standard function, and isn't
-	  defined on some platforms, but is equivalent to std::floor(x + 0.5).
-	  Minor const correctness changes, drop c_str() usage where
-	  appropriate. 
-	* server/sprite_instance.cpp: replace rint. Don't construct an int
-	  from a double, only to divide by a float to get a double again.
-
-2008-05-14 Sandro Santilli <strk@keybit.net>
-
-	* testsuite/misc-ming.all/loop_test.c: place the subject of the test
-	  at depth 64000, triggering a failure in the mergeDisplayList
-	  assertion checking (when GNASH_PARANOIA_LEVEL>1).
-
-2008-05-14 Sandro Santilli <strk@keybit.net>
-
-	* server/dlist.cpp (mergeDisplayList): add assertion checking
-	  when GNASH_PARANOIA_LEVEL > 1. The assertion fails running
-	  movie attached to bug #23248.
-
-2008-05-14 Sandro Santilli <strk@keybit.net>
-
-	* server/asobj/NetStreamGst.cpp (time,bytesLoaded,bytesTotal): check
-	  existance of the elements before querying them. Fixes some
-	  gst-CRITICAL errors.
-
-2008-05-13 Bastiaan Jacques <bastiaan@bjacques.org>
-
-	* libmedia/ffmpeg/VideoDecoderFfmpeg.cpp: Don't neglect to return the
-	decoded frame.
-
-2008-05-13 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* pythonmodule/pyGnash.cpp, pythonmodule/gnashpython.{cpp,h}: make
-	  it build again; allow fetching log messages; let Python handle the
-	  file object, not Gnash; clean up a bit. There's no option to build
-	  this code, so it's irrelevant for the release.
-
-2008-05-13 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* server/swf/tag_loaders.cpp: minor cleanups, typo corrections,
-	  include used headers.
-	* server/parser/movie_def_impl.h: log malformed SWF and return
-	  when more than one JPEGTABLES tag present. Fixes bug #23201.
-
-2008-05-12 Sandro Santilli <strk@keybit.net>
-
-	* server/asobj/NetStreamFfmpeg.cpp (pausePlayback): detach aux
-	  streamer so sound doesn't come out while in pause mode.
-
-2008-05-12 Sandro Santilli <strk@keybit.net>
-
-	* server/asobj/NetStreamFfmpeg.cpp: stop touching m_imageframe from
-	  decoder thread. No more need to lock mutexes, should fix a deadlock.
-
-2008-05-12 Sandro Santilli <strk@keybit.net>
-
-	* server/asobj/NetStreamFfmpeg.{cpp,h}: use a conditional in
-	  av_streamer to wait till more frames are needed, signal
-	  the condition from refreshVideoFrame and audio_streamer
-	  everytime a new frame is popped from the queue.
-
-2008-05-12 Sandro Santilli <strk@keybit.net>
-
-	* libmedia/ffmpeg/ffmpegNetStreamUtil.h: drop multithread_queue,
-	  substitute with ElementsOwningQueue.
-	* server/asobj/NetStreamFfmpeg.{cpp,h}: use a simple
-	  ElementsOwningQueue for audio/video queues, document more
-	  the overlycomplex methods, sleep more in av_streamer when
-	  queues are full.
-
-2008-05-12 Sandro Santilli <strk@keybit.net>
-
-	* server/asobj/NetStreamFfmpeg.{cpp,h}: complete use of cached
-	  sound_handler; add a mutex protecting generic access to the
-	  audio/video queues. The mutex will be locked by
-	  loader/parser/decoder thread, main thread (refreshVideoFrame)
-	  and audio streamer (audio_streamer).
-	  The rationale here is that locking on each inspector or modifier
-	  on the single queue is pretty useless, as code relies on cached
-	  informations about them, like their size, their composition and
-	  so on. Should be pretty safe to remove any locking on the 
-	  multiqueue_threads now (should also change name...) but better
-	  postpone this.
-
-
-2008-05-12 Sandro Santilli <strk@keybit.net>
-
-	* testsuite/misc-ming.all/NetStream-SquareTest.c: have the second
-	  NetStream play an ogg. This is to help testing both access methods
-	  from ffmpeg handler, and to keep an eye on ogg support (gstreamer
-	  works pretty nicely here).
-
-2008-05-12 Sandro Santilli <strk@keybit.net>
-
-	* server/asobj/NetStreamFfmpeg.{cpp,h}: cache sound_handler pointer
-	  as class member (to reduce function calls).
-
-2008-05-12 Sandro Santilli <strk@keybit.net>
-
-	* libbase/FLVParser.{cpp,h}: keep audio/video stream info object
-	  by auto_ptr, fixing a memory leak. Have getVideoInfo/getAudioInfo
-	  NOT transfer ownership, avoiding useless memory copies. Document
-	  the functions.
-	* server/asobj/NetStreamFfmpeg.cpp: update uses of getVideoInfo and
-	  getAudioInfo to not take ownership, change initFlv{Audio/Video} 
-	  statics to take FLVParser by ref, not pointer.
-
-2008-05-12 Sandro Santilli <strk@keybit.net>
-
-	* libbase/FLVParser.{cpp,h}: more dox about utility classes,
-	  rename FLVVideoFrame and FLVAudioFrame to FLVVideoFrameInfo
-	  and FLVAudioFrameInfo as they don't contain the actual data,
-	  just offsets in the input.
-	* server/asobj/NetStreamFfmpeg.cpp: update use of FLVVideoFrame
-	  and FLVAudioFrame.
-
-2008-05-12 Robert Millan <rmh@aybabtu.com>
-
-	* libbase/: Makefile.am, gnashpluginrc.in, gnashrc.in,
-	  sysgnashpluginrc.in, sysgnashrc.in:
-	  Use 'gnashrc' and 'gnashpluginrc', w/out 'sys' prefix.
-	  Patch #6509.
-
-2008-05-11 Sandro Santilli <strk@keybit.net>
-
-	* testsuite/misc-ming.all/NetStream-SquareTest.c: add a second
-	  video character, will be attached a second NetStream using
-	  the same NetConnection as the first.
-
-2008-05-11 Sandro Santilli <strk@keybit.net>
-
-	* testsuite/misc-ming.all/NetStream-SquareTest.c: test that
-	  NetConnection.isConnected returns true after .connect(null).
-
-2008-05-10 Bastiaan Jacques <bastiaan@bjacques.org>
-
-	* server/asobj/NetStreamFfmpeg.cpp: Mutex-protect m_imageframe,
-	which is used across threads.
-
-2008-05-10 Sandro Santilli <strk@keybit.net>
-
-	* libbase/FLVParser.cpp (parseNextTag): don't log_error 
-	  if we just reached EOF outside any tag...
-
-2008-05-10 Sandro Santilli <strk@keybit.net>
-
-	* libbase/FLVParser.{cpp,h}: rename parseNextFrame to
-	  parseNextTag, as that's really what the function does;
-	  fix parsing of audio/video flag, add parsing of FLV version.
-
-2008-05-10 Sandro Santilli <strk@keybit.net>
-
-	* testsuite/misc-ming.all/: NetStream-SquareTest.c,
-	  NetStream-SquareTestRunner.cpp: add test for pause/play
-	  using user-interaction + some events-related tests.
-
-2008-05-10 Sandro Santilli <strk@keybit.net>
-
-	* libbase/utility.h: add smallestMultipleContaining
-	  utility function.
-	* libbase/FLVParser.{cpp,h}: always allocate a multiple
-	  of 64 (READ_CHUNK) greater or equal the actual frame
-	  size augmented by 64 bytes (PADDING_BYTES): the multiple
-	  thing was suggested by bjacques, the PADDING_BYTES I found
-	  by myself (for h264 parser in ffmpeg...). Always check
-	  return from tu_file::read_bytes to catch premature end
-	  of input. Merge duplicated code into makeAudioFrame and
-	  makeVideoFrame static functions.
-
-2008-05-09 Benjamin Wolsey <bwy@benjaminwolsey.de>
-
-	* gui/gnash.cpp: add comments for options handled elsewhere. What is
-	  -m supposed to do?
-
-2008-05-09 Russell Nelson <nelson@crynwr.com>
-
-	* branch off gnash_0_8_3.

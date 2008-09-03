@@ -156,30 +156,41 @@ PngImageInput::read()
     // Convert indexed images to RGB
     if (type == PNG_COLOR_TYPE_PALETTE)
     {
-        log_debug("Convertin palette PNG to RGB(A)");
+        log_debug("Converting palette PNG to RGB(A)");
         png_set_palette_to_rgb(_pngPtr);
     }
     
     // Convert less-than-8-bit greyscale to 8 bit.
     if (type == PNG_COLOR_TYPE_GRAY && bitDepth < 8)
     {
-        log_debug("Gray bit depth(%d) to 8", bitDepth);
+        log_debug("Setting grey bit depth(%d) to 8", bitDepth);
         png_set_gray_1_2_4_to_8(_pngPtr);
+    }
+
+    // Apply the transparency block if it exists.
+    if (png_get_valid(_pngPtr, _infoPtr, PNG_INFO_tRNS))
+    {
+        log_debug("Applying transparency block, image is RGBA");
+        png_set_tRNS_to_alpha(_pngPtr);
+        _type = GNASH_IMAGE_RGBA;
     }
 
     // Make 16-bit data into 8-bit data
     if (bitDepth == 16) png_set_strip_16(_pngPtr);
 
-    // Set the type of the image.
-    if (type & PNG_COLOR_MASK_ALPHA)
+    // Set the type of the image if it hasn't been set already.
+    if (_type == GNASH_IMAGE_INVALID)
     {
-        log_debug("Loading PNG image with alpha");
-        _type = GNASH_IMAGE_RGBA;
-    }
-    else
-    {
-        log_debug("Loading PNG image without alpha");
-        _type = GNASH_IMAGE_RGB;
+        if (type & PNG_COLOR_MASK_ALPHA)
+        {
+            log_debug("Loading PNG image with alpha");
+            _type = GNASH_IMAGE_RGBA;
+        }
+        else
+        {
+            log_debug("Loading PNG image without alpha");
+            _type = GNASH_IMAGE_RGB;
+        }
     }
 
     // Convert 1-channel grey images to 3-channel RGB.

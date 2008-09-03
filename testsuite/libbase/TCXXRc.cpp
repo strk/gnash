@@ -59,14 +59,6 @@ bool nodelay = false;           // FIXME: this flag gets set based on
 				// can optimize it's own performance
 				// when needed,
 
-#ifdef HAVE_LIBXML
-extern int xml_fd;		// FIXME: this is the file descriptor
-				// from XMLSocket::connect(). This
-				// needs to be propogated up through
-				// the layers properly, but first I
-				// want to make sure it all works.
-#endif // HAVE_LIBXML
-
 TestState runtest;
 
 int

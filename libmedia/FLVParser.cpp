@@ -26,6 +26,12 @@
 #include "utility.h"
 #include "GnashException.h"
 #include "IOChannel.h"
+#include "SimpleBuffer.h"
+
+#include "as_object.h"
+#include "array.h"
+#include "element.h"
+#include "VM.h"
 
 #include <string>
 #include <iosfwd>
@@ -60,7 +66,10 @@ FLVParser::FLVParser(std::auto_ptr<IOChannel> lt)
 
 FLVParser::~FLVParser()
 {
-	// nothing to do here, all done in base class now
+	for (MetaTags::iterator i=_metaTags.begin(), e=_metaTags.end(); i!=e; ++i)
+	{
+		delete *i;
+	}
 }
 
 
@@ -334,6 +343,14 @@ bool FLVParser::parseNextTag()
 	{
 		// 1:keyframe, 2:interlacedFrame, 3:disposableInterlacedFrame
 		int frameType = (tag[11] & 0xf0) >> 4;
+
+		boost::uint16_t codec = (tag[11] & 0x0f) >> 0;
+
+        if (codec == VIDEO_CODEC_VP6 || codec == VIDEO_CODEC_VP6A)
+        {
+            _stream->read_byte();
+            --bodyLength;
+        }
 		
 		if ( doIndex )
 		{
@@ -358,7 +375,6 @@ bool FLVParser::parseNextTag()
 		// video format has been noted, so we do that now
 		if ( ! _videoInfo.get() )
 		{
-			boost::uint16_t codec = (tag[11] & 0x0f) >> 0;
 			// Set standard guessed size...
 			boost::uint16_t width = 320;
 			boost::uint16_t height = 240;
@@ -440,22 +456,18 @@ bool FLVParser::parseNextTag()
 	else if (tag[0] == FLV_META_TAG)
 	{
 		// Extract information from the meta tag
-		boost::scoped_array<unsigned char> metaTag ( new unsigned char[bodyLength] );
-		size_t actuallyRead = _stream->read(metaTag.get(), bodyLength);
+		std::auto_ptr<SimpleBuffer> metaTag(new SimpleBuffer(bodyLength));
+		size_t actuallyRead = _stream->read(metaTag->data(), bodyLength);
 		if ( actuallyRead < bodyLength )
 		{
 			log_error("FLVParser::parseNextTag: can't read metaTag (%d) body (needed %d bytes, only got %d)",
 				FLV_META_TAG, bodyLength, actuallyRead);
 			return false;
 		}
-		std::string dump = hexify(metaTag.get(), actuallyRead, false);
-		log_unimpl("FLV MetaTag parser. Data: %s", dump);
-                amf::Flv flv;
-                amf::Element *el = flv.decodeMetaData(metaTag.get(), actuallyRead);
-                el->dump();
-		/*
-		amf::AMF* amfParser = new amf::AMF();
-		amfParser->parseAMF(metaTag);*/
+		metaTag->resize(actuallyRead);
+
+		boost::mutex::scoped_lock lock(_metaTagsMutex);
+		_metaTags.push_back(new MetaTag(timestamp, metaTag));
 	}
 	else
 	{
@@ -569,6 +581,59 @@ FLVParser::readVideoFrame(boost::uint32_t dataSize, boost::uint32_t timestamp)
 	// NOTE: ownership of 'data' is transferred here
 	frame.reset( new EncodedVideoFrame(data, dataSize, 0, timestamp) );
 	return frame;
+}
+
+void
+FLVParser::processTags(boost::uint64_t ts, as_object* thisPtr, VM& vm)
+{
+	boost::mutex::scoped_lock lock(_metaTagsMutex);
+	while (!_metaTags.empty())
+	{
+		if ( _metaTags.front()->timestamp() > ts ) break;
+
+		std::auto_ptr<MetaTag> tag ( _metaTags.front() );
+		_metaTags.pop_front();
+		tag->execute(thisPtr, vm);
+		
+	}
+}
+
+void
+FLVParser::MetaTag::execute(as_object* thisPtr, VM& vm)
+{
+	boost::uint8_t* ptr = _buffer->data();
+	boost::uint8_t* endptr = ptr+_buffer->size();
+
+	//log_debug("FLV meta: %s", hexify(ptr, 32, 0));
+	//log_debug("FLV meta: %s", hexify(ptr, 32, 1));
+
+	if ( ptr + 2 > endptr ) {
+		log_error("Premature end of AMF in FLV metatag");
+		return;
+	}
+	boost::uint16_t length = ntohs((*(boost::uint16_t *)ptr) & 0xffff);
+	ptr+=2;
+
+	if ( ptr + length > endptr ) {
+		log_error("Premature end of AMF in FLV metatag");
+		return;
+	}
+	std::string funcName((char*)ptr, length); // TODO: check for OOB !
+	ptr += length;
+
+	log_debug("funcName: %s", funcName);
+
+	string_table& st = vm.getStringTable();
+	string_table::key funcKey = st.find(funcName);
+
+	as_value arg;
+	if ( ! arg.readAMF0(ptr, endptr) )
+	{
+		log_error("Could not convert FLV metatag to as_value");
+		return;
+	}
+
+	thisPtr->callMethod(funcKey, arg);
 }
 
 } // end of gnash::media namespace

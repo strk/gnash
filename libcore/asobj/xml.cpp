@@ -25,7 +25,6 @@
 #include "log.h"
 #include "as_function.h" // for as_function
 #include "fn_call.h"
-#include "action.h" // for call_method
 #include "utf8.h" // for BOM stripping
 
 #include "xmlattrs.h"
@@ -45,9 +44,6 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 #include <libxml/xmlreader.h>
-//#include <unistd.h>
-//#include <sys/types.h>
-//#include <sys/stat.h>
 #include <string>
 #include <sstream>
 #include <vector>
@@ -196,46 +192,6 @@ XML::~XML()
   
 }
 
-void
-XML::onLoadEvent(bool success, as_environment& env)
-{
-    // Do the events that (appear to) happen as the movie
-    // loads.  frame1 tags and actions are executed (even
-    // before advance() is called).  Then the onLoad event
-    // is triggered.
-
-    as_value	method;
-    if (!get_member(NSV::PROP_ON_LOAD, &method) ) return;
-    if ( method.is_undefined() ) return;
-    if ( ! method.is_function() ) return;
-
-#ifndef NDEBUG
-    size_t prevStackSize = env.stack_size();
-#endif
-    env.push(as_value(success));
-    call_method(method, &env, this, 1, env.stack_size()-1);
-    env.drop(1);
-#ifndef NDEBUG
-    assert( prevStackSize == env.stack_size());
-#endif
-}
-
-void
-XML::onCloseEvent(as_environment& env)
-{
-    // Do the events that (appear to) happen as the movie
-    // loads.  frame1 tags and actions are executed (even
-    // before advance() is called).  Then the onLoad event
-    // is triggered.
-
-    as_value	method;
-    if (! get_member(NSV::PROP_ON_CLOSE, &method) ) return;
-    if ( method.is_undefined() ) return;
-    if ( ! method.is_function() ) return;
-
-    call_method(method, &env, this, 0, 0);
-}
-
 bool
 XML::extractNode(XMLNode& element, xmlNodePtr node, bool mem)
 {
@@ -354,14 +310,12 @@ XML::parseDoc(xmlNodePtr cur, bool mem)
     return true;
 }
 
-// This reads in an XML file from disk and parses into into a memory resident
+// This parses an XML string into a
 // tree which can be walked through later.
 bool
 XML::parseXML(const std::string& xml_in)
 {
     //GNASH_REPORT_FUNCTION;
-
-    //log_debug(_("Parse XML from memory: %s"), xml_in);
 
     if (xml_in.empty()) {
         log_error(_("XML data is empty"));
@@ -439,11 +393,13 @@ XML::queueLoad(std::auto_ptr<IOChannel> str)
 
     if ( startTimer )
     {
-        boost::intrusive_ptr<builtin_function> loadsChecker = \
+        boost::intrusive_ptr<builtin_function> loadsChecker = 
             new builtin_function(&XML::checkLoads_wrapper);
+
         std::auto_ptr<Timer> timer(new Timer);
         timer->setInterval(*loadsChecker, 50, this);
         _loadCheckerTimer = getVM().getRoot().add_interval_timer(timer, true);
+
 #ifdef DEBUG_XML_LOADS
         log_debug("Registered XML loads interval %d", _loadCheckerTimer);
 #endif
@@ -1009,23 +965,6 @@ void xml_class_init(as_object& global)
 
 }
 
-#if 0 // not time for this (yet)
-static
-void _xmlErrorHandler(void* ctx, const char* fmt, ...)
-{
-    va_list ap;
-    static const unsigned long BUFFER_SIZE = 128;
-    char tmp[BUFFER_SIZE];
-
-    va_start (ap, fmt);
-    vsnprintf (tmp, BUFFER_SIZE, fmt, ap);
-    tmp[BUFFER_SIZE-1] = '\0';
-
-    log_error(_("XML parser: %s"), tmp);
-    
-    va_end (ap);    
-}
-#endif // disabled
 
 void
 XML::initParser()

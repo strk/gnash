@@ -907,11 +907,6 @@ private:
 
     mouse_button_state  m_mouse_button_state;
 
-    // Flags for event handlers
-    bool            m_on_event_xmlsocket_ondata_called;
-    bool            m_on_event_xmlsocket_onxml_called;
-    bool            m_on_event_load_progress_called;
-
     typedef std::map<int, Timer*> TimerMap;
 
     TimerMap _intervalTimers;

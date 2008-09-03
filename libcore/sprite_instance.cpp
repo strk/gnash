@@ -709,7 +709,7 @@ static as_value sprite_load_movie(const fn_call& fn)
   bool sendVars = false;
   if (fn.nargs > 1)
   {
-	as_value arg = fn.arg(1);
+	const as_value& arg = fn.arg(1);
 	std::string methodString = arg.to_string();
 	boost::to_lower(methodString);
 	if ( methodString == "post" ) 
@@ -838,7 +838,7 @@ static as_value sprite_hit_test(const fn_call& fn)
   {
     case 1: // target
     {
-      as_value& tgt_val = fn.arg(0);
+      const as_value& tgt_val = fn.arg(0);
       character* target = fn.env().find_target(tgt_val.to_string());
       if ( ! target )
       {
@@ -1005,7 +1005,7 @@ sprite_meth(const fn_call& fn)
 
   if ( ! fn.nargs ) return as_value(0); // optimization ...
 
-  as_value v = fn.arg(0);
+  const as_value& v = fn.arg(0);
   boost::intrusive_ptr<as_object> o = v.to_object();
   if ( ! o )
   {
@@ -1228,7 +1228,7 @@ sprite_setMask(const fn_call& fn)
     return as_value();
   }
 
-  as_value& arg = fn.arg(0);
+  const as_value& arg = fn.arg(0);
   if ( arg.is_null() || arg.is_undefined() )
   {
     // disable mask
@@ -1392,151 +1392,139 @@ sprite_lineStyle(const fn_call& fn)
 {
   boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 
-  boost::uint16_t thickness = 0;
-  boost::uint8_t r = 0;
-  boost::uint8_t g = 0;
-  boost::uint8_t b = 0;
-  boost::uint8_t a = 255;
-
-
-  if ( ! fn.nargs )
-  {
-    sprite->resetLineStyle();
-    return as_value();
-  }
-
-  thickness = boost::uint16_t(PIXELS_TO_TWIPS(boost::uint16_t(utility::clamp<float>(fn.arg(0).to_number(), 0, 255))));
-  bool scaleThicknessVertically = true;
-  bool scaleThicknessHorizontally = true;
-  bool pixelHinting = false;
-  bool noClose = false;
-  cap_style_e capStyle = CAP_ROUND;
-  join_style_e joinStyle = JOIN_ROUND;
-  float miterLimitFactor = 1.0f;
-
-  if ( fn.nargs > 1 )
-  {
-    // 2^24 is the max here
-    boost::uint32_t rgbval = boost::uint32_t(utility::clamp<float>(fn.arg(1).to_number(), 0, 16777216));
-    r = boost::uint8_t( (rgbval&0xFF0000) >> 16);
-    g = boost::uint8_t( (rgbval&0x00FF00) >> 8);
-    b = boost::uint8_t( (rgbval&0x0000FF) );
-
-    if ( fn.nargs > 2 )
+    if ( ! fn.nargs )
     {
-      float alphaval = utility::clamp<float>(fn.arg(2).to_number(), 0, 100);
-      a = boost::uint8_t( 255 * (alphaval/100) );
-
-      if ( fn.nargs > 3 )
-      {
-        int swfVersion = sprite->getVM().getSWFVersion();
-        if ( swfVersion < 8 )
-        {
-          IF_VERBOSE_ASCODING_ERRORS(
-          std::stringstream ss; fn.dump_args(ss);
-          log_aserror(_("MovieClip.lineStyle(%s): args after the first three will be discarded"), ss.str());
-          );
-        }
-        else
-        {
-          pixelHinting = fn.arg(3).to_bool();
-          if ( fn.nargs > 4 )
-          {
-            std::string noScaleString = fn.arg(4).to_string();
-            if ( noScaleString == "none" )
-            {
-              scaleThicknessVertically = scaleThicknessHorizontally = false;
-            }
-            else if ( noScaleString == "vertical" )
-            {
-              scaleThicknessVertically = false;
-              scaleThicknessHorizontally = true;
-            }
-            else if ( noScaleString == "horizontal" )
-            {
-              scaleThicknessVertically = true;
-              scaleThicknessHorizontally = false;
-            }
-            else if ( noScaleString == "normal" )
-            {
-              scaleThicknessVertically = true;
-              scaleThicknessHorizontally = true;
-            }
-            else
-            {
-              IF_VERBOSE_ASCODING_ERRORS(
-              std::stringstream ss; fn.dump_args(ss);
-              log_aserror(_("MovieClip.lineStyle(%s): invalid noScale value '%s' (valid values: %s|%s|%s|%s)"),
-                ss.str(), noScaleString, "none", "vertical", "horizontal", "normal");
-              );
-            }
-          }
-          if ( fn.nargs > 5 )
-          {
-            std::string capStyleStr = fn.arg(5).to_string();
-            if ( capStyleStr == "none" )
-            {
-              capStyle = CAP_NONE;
-            }
-            else if ( capStyleStr == "round" )
-            {
-              capStyle = CAP_ROUND;
-            }
-            else if ( capStyleStr == "square" )
-            {
-              capStyle = CAP_SQUARE;
-            }
-            else
-            {
-              IF_VERBOSE_ASCODING_ERRORS(
-              std::stringstream ss; fn.dump_args(ss);
-              log_aserror(_("MovieClip.lineStyle(%s): invalid capStyle value '%s' (valid values: %s|%s|%s)"), ss.str(),
-                capStyleStr, "none", "round", "square");
-              );
-            }
-          }
-          if ( fn.nargs > 6 )
-          {
-            std::string joinStyleStr = fn.arg(6).to_string();
-            if ( joinStyleStr == "miter" )
-            {
-              joinStyle = JOIN_MITER;
-            }
-            else if ( joinStyleStr == "round" )
-            {
-              joinStyle = JOIN_ROUND;
-            }
-            else if ( joinStyleStr == "bevel" )
-            {
-              joinStyle = JOIN_BEVEL;
-            }
-            else
-            {
-              IF_VERBOSE_ASCODING_ERRORS(
-              std::stringstream ss; fn.dump_args(ss);
-              log_aserror(_("MovieClip.lineStyle(%s): invalid jointStyle value '%s' (valid values: %s|%s|%s)"), ss.str(),
-                joinStyleStr, "miter", "round", "bevel");
-              );
-            }
-          }
-          if ( fn.nargs > 7 )
-          {
-            miterLimitFactor = utility::clamp<int>(fn.arg(7).to_int(), 1, 255);
-          }
-
-          IF_VERBOSE_ASCODING_ERRORS(
-          if ( fn.nargs > 8 ) 
-          {
-            std::stringstream ss; fn.dump_args(ss);
-            log_aserror(_("MovieClip.lineStyle(%s): args after the first eight will be discarded"), ss.str());
-          }
-          )
-
-        }
-      }
+        sprite->resetLineStyle();
+        return as_value();
     }
-  }
 
+    boost::uint8_t r = 0;
+    boost::uint8_t g = 0;
+    boost::uint8_t b = 0;
+    boost::uint8_t a = 255;
+    boost::uint16_t thickness = 0;
+    bool scaleThicknessVertically = true;
+    bool scaleThicknessHorizontally = true;
+    bool pixelHinting = false;
+    bool noClose = false;
+    cap_style_e capStyle = CAP_ROUND;
+    join_style_e joinStyle = JOIN_ROUND;
+    float miterLimitFactor = 1.0f;
+
+    int arguments = fn.nargs;
+
+    const int swfVersion = sprite->getVM().getSWFVersion();
+    if (swfVersion < 8 && fn.nargs > 3)
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::ostringstream ss;
+            fn.dump_args(ss);
+            log_aserror(_("MovieClip.lineStyle(%s): args after the "
+                         "first three will be discarded"), ss.str());
+        );
+        arguments = 3;
+    }
+
+    switch (arguments)
+    {
+        default:
+            IF_VERBOSE_ASCODING_ERRORS(
+                std::ostringstream ss;
+                fn.dump_args(ss);
+                log_aserror(_("MovieClip.lineStyle(%s): args after the "
+                              "first eight will be discarded"), ss.str());
+            );
+        case 8:
+            miterLimitFactor = utility::clamp<int>(fn.arg(7).to_int(), 1, 255);
+        case 7:
+        {
+            std::string joinStyleStr = fn.arg(6).to_string();
+            if (joinStyleStr == "miter") joinStyle = JOIN_MITER;
+            else if (joinStyleStr == "round") joinStyle = JOIN_ROUND;
+            else if (joinStyleStr == "bevel") joinStyle = JOIN_BEVEL;
+            else
+            {
+              IF_VERBOSE_ASCODING_ERRORS(
+                  std::ostringstream ss;
+                  fn.dump_args(ss);
+                  log_aserror(_("MovieClip.lineStyle(%s): invalid joinStyle"
+                                "value '%s' (valid values: %s|%s|%s)"), ss.str(),
+                    joinStyleStr, "miter", "round", "bevel");
+              );
+            }
+        }
+        case 6:
+        {
+
+            const std::string capStyleStr = fn.arg(5).to_string();
+
+            if (capStyleStr == "none") capStyle = CAP_NONE;
+            else if (capStyleStr == "round") capStyle = CAP_ROUND;
+            else if (capStyleStr == "square") capStyle = CAP_SQUARE;
+            else
+            {
+                IF_VERBOSE_ASCODING_ERRORS(
+                    std::ostringstream ss;
+                    fn.dump_args(ss);
+                    log_aserror(_("MovieClip.lineStyle(%s): invalid capStyle "
+                        "value '%s' (valid values: none|round|square)"),
+                        ss.str(), capStyleStr);
+                );
+            }
+        }
+        case 5:
+        {
+            // Both values to be set here are true, so just set the
+            // appropriate values to false.
+            const std::string noScaleString = fn.arg(4).to_string();
+            if (noScaleString == "none")
+            {
+                scaleThicknessVertically = false;
+                scaleThicknessHorizontally = false;
+            }
+            else if (noScaleString == "vertical")
+            {
+                scaleThicknessVertically = false;
+            }
+            else if (noScaleString == "horizontal")
+            {
+                scaleThicknessHorizontally = false;
+            }
+            else if (noScaleString != "normal")
+            {
+                IF_VERBOSE_ASCODING_ERRORS(
+                    std::ostringstream ss;
+                    fn.dump_args(ss);
+                    log_aserror(_("MovieClip.lineStyle(%s): invalid "
+                                  "noScale value '%s' (valid values: "
+                                  "%s|%s|%s|%s)"),
+                                  ss.str(), noScaleString, "none",
+                                  "vertical", "horizontal", "normal");
+                );
+            }
+        }
+        case 4:
+            pixelHinting = fn.arg(3).to_bool();
+        case 3:
+        {
+            const float alphaval = utility::clamp<float>(fn.arg(2).to_number(), 0, 100);
+            a = boost::uint8_t(255 * (alphaval / 100));
+        }
+        case 2:
+        {
+            boost::uint32_t rgbval = boost::uint32_t(utility::clamp<float>(fn.arg(1).to_number(), 0, 16777216));
+            r = boost::uint8_t((rgbval & 0xFF0000) >> 16);
+            g = boost::uint8_t((rgbval & 0x00FF00) >> 8);
+            b = boost::uint8_t((rgbval & 0x0000FF) );
+        }
+        case 1:
+            thickness = boost::uint16_t(
+                    PIXELS_TO_TWIPS(
+                        boost::uint16_t(
+                        utility::clamp<float>(fn.arg(0).to_number(), 0, 255)
+                        )));
+        break;
+    }
 
   rgba color(r, g, b, a);
   //log_debug("Color: %s", color.toString());
@@ -2252,8 +2240,8 @@ attachMovieClipInterface(as_object& o)
     o.init_member("enabled", true); // see MovieClip.as testcase
     o.init_member("useHandCursor", true); // see MovieClip.as testcase
 
-    as_c_function_ptr gettersetter = &sprite_instance::lockroot_getset;
-    o.init_property("_lockroot", *gettersetter, *gettersetter); // see MovieClip.as testcase
+    o.init_property("_lockroot", &sprite_instance::lockroot_getset,
+                                &sprite_instance::lockroot_getset); // see MovieClip.as testcase
 
     if ( target_version  < 6 ) return;
 
@@ -2490,7 +2478,7 @@ sprite_instance::sprite_instance(
   m_current_frame(0),
   m_has_looped(false),
   _callingFrameActions(false),
-  m_as_environment(),
+  m_as_environment(_vm),
   _text_variables(),
   m_sound_stream_id(-1),
   _userCxform(),
@@ -2744,7 +2732,7 @@ character* sprite_instance::add_empty_movieclip(const char* name, int depth)
 }
 
 boost::intrusive_ptr<character>
-sprite_instance::add_textfield(const std::string& name, int depth, float x, float y, float width, float height)
+sprite_instance::add_textfield(const std::string& name, int depth, int x, int y, float width, float height)
 {
   // Create a definition (TODO: cleanup this thing, definitions should be immutable!)
   boost::intrusive_ptr<edit_text_character_def> txt = new edit_text_character_def();
@@ -2765,8 +2753,6 @@ sprite_instance::add_textfield(const std::string& name, int depth, float x, floa
   txt_char->setDynamic();
 
   // Set _x and _y
-  x = utility::infinite_to_fzero(x);
-  y = utility::infinite_to_fzero(y);
   matrix txt_matrix;
   txt_matrix.set_translation(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
   txt_char->set_matrix(txt_matrix, true); // update caches (altought shouldn't be needed as we only set translation)
@@ -2846,7 +2832,7 @@ sprite_instance::on_event(const event_id& id)
   testInvariant();
 
 #ifdef GNASH_DEBUG
-  log_debug(_("Event %s invoked for sprite %s"), id.get_function_name(), getTarget());
+  log_debug(_("Event %s invoked for sprite %s"), id, getTarget());
 #endif
 
   // We do not execute ENTER_FRAME if unloaded
@@ -2862,7 +2848,7 @@ sprite_instance::on_event(const event_id& id)
   {
 #ifdef GNASH_DEBUG
     log_debug(_("Sprite %s ignored button-like event %s as not 'enabled'"),
-      getTarget(), id.get_function_name());
+      getTarget(), id);
 #endif
     return false;
   }
@@ -4119,7 +4105,9 @@ sprite_instance::can_handle_mouse_event() const
     event_id(event_id::DRAG_OUT),
   };
 
-  for (unsigned int i = 0; i < ARRAYSIZE(EH); i++)
+  static const size_t size = sizeof(EH) / sizeof(EH[0]);
+
+  for (size_t i = 0; i < size; i++)
   {
     const event_id &event = EH[i];
 
@@ -4487,7 +4475,9 @@ sprite_instance::constructAsScriptObject()
 	// properties already.
 	as_object* super = get_super();
 
-        fn_call call(this, &(get_environment()), 0, 0, super);
+	as_environment& env = get_environment();
+        fn_call call(this, &env);
+	call.super = super;
 
         // we don't use the constructor return (should we?)
         (*ctor)(call);

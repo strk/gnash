@@ -34,6 +34,8 @@
 #include "namedStrings.h"
 #include "element.h"
 #include "GnashException.h"
+#include "Object.h"
+#include "amf.h"
 #include "array.h"
 
 #include <cmath> // std::fmod
@@ -52,6 +54,9 @@
 
 // Define this macro to make soft references activity verbose
 //#define GNASH_DEBUG_SOFT_REFERENCES
+
+// Define this macto to make AMF parsing verbose
+//#define GNASH_DEBUG_AMF_PARSING
 
 using namespace amf;
 
@@ -325,15 +330,6 @@ as_value::to_primitive(type hint) const
             // and many swfdec tests, with no new failures (though
             // perhaps we aren't testing enough).
             return as_value();
-            
-//			if ( (!obj->get_member(NSV::PROP_TO_STRING, &method)) || (!method.is_object()) ) // ECMA says ! is_object()
-//			{
-//#if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
-//				log_debug(" toString not found");
-//#endif
-//                
-//				throw ActionTypeError();
-//			}
 		}
 	}
 	else
@@ -384,7 +380,7 @@ as_value::to_primitive(type hint) const
 
 	assert(obj);
 
-	as_environment env;
+	as_environment env(obj->getVM());
 	as_value ret = call_method0(method, &env, obj);
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
 	log_debug("to_primitive: method call returned %s", ret);
@@ -486,7 +482,7 @@ as_value::convert_to_primitive(type hint)
 
 	assert(obj);
 
-	as_environment env;
+	as_environment env(obj->getVM());
 	as_value ret = call_method0(method, &env, obj);
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
 	log_debug("to_primitive: method call returned %s", ret);
@@ -531,9 +527,7 @@ as_value::to_number() const
             {
                 // For SWF4, any valid number before non-numerical
                 // characters is returned, including exponent, positive
-                // and negative signs and whitespace before. A stringstream
-                // does the job. Locale differences (decimal separator) arise
-                // with strtod.                
+                // and negative signs and whitespace before.
                 double d = 0;
                 std::istringstream is (getStr());
                 is >> d;
@@ -668,11 +662,11 @@ as_value::to_int() const
 
     if (d < 0)
     {   
-	    i = - static_cast<boost::uint32_t>(std::fmod (-d, 4294967296.0));
+	    i = - static_cast<boost::uint32_t>(std::fmod(-d, 4294967296.0));
     }
     else
     {
-	    i = static_cast<boost::uint32_t>(std::fmod (d, 4294967296.0));
+	    i = static_cast<boost::uint32_t>(std::fmod(d, 4294967296.0));
     }
     
     return i;
@@ -851,11 +845,11 @@ as_function*
 as_value::to_as_function() const
 {
     if (m_type == AS_FUNCTION) {
-	// OK.
-	return getFun().get();
-    } else {
-	return NULL;
+	    // OK.
+	    return getFun().get();
     }
+
+    return NULL;
 }
 
 // Force type to number.
@@ -977,7 +971,7 @@ as_value::equals(const as_value& v) const
     int SWFVersion = VM::get().getSWFVersion();
 
     bool this_nulltype = (m_type == UNDEFINED || m_type == NULLTYPE);
-    bool v_nulltype = (v.get_type() == UNDEFINED || v.get_type() == NULLTYPE);
+    bool v_nulltype = (v.m_type == UNDEFINED || v.m_type == NULLTYPE);
 
     // It seems like functions are considered the same as a NULL type
     // in SWF5 (and I hope below, didn't check)
@@ -1168,7 +1162,7 @@ as_value::string_concat(const std::string& str)
 const char*
 as_value::typeOf() const
 {
-	switch(get_type())
+	switch(m_type)
 	{
 		case as_value::UNDEFINED:
 			return "undefined"; 
@@ -1202,7 +1196,9 @@ as_value::typeOf() const
 
 		default:
 			if (is_exception())
+			{
 				return "exception";
+		    }
 			abort();
 			return NULL;
 	}
@@ -1249,7 +1245,9 @@ as_value::equalsSameType(const as_value& v) const
 		}
 		default:
 			if (is_exception())
+			{
 				return false; // Exceptions equal nothing.
+		    }
 
 	}
 	abort();
@@ -1325,9 +1323,10 @@ as_value::toDebugString() const
 		}
 		default:
 			if (is_exception())
+			{
 				return "[exception]";
+			}
 			abort();
-			return "[invalid type]";
 	}
 }
 
@@ -1434,7 +1433,6 @@ as_value::doubleToString(double val, int radix)
 	// but that may just be a better compiler.
 
 	// Handle non-numeric values.
-	// "printf" gives "nan", "inf", "-inf", so we check explicitly
 	if(isNaN(val))
 	{
 		return "NaN";
@@ -1453,11 +1451,11 @@ as_value::doubleToString(double val, int radix)
 
 	if ( radix == 10 )
 	{
-		// ActionScript always expects dot as decimal point?
-		ostr.imbue(std::locale("C")); 
+		// ActionScript always expects dot as decimal point.
+		ostr.imbue(std::locale::classic()); 
 		
 		// force to decimal notation for this range (because the reference player does)
-		if (fabs(val) < 0.0001 && fabs(val) >= 0.00001)
+		if (std::abs(val) < 0.0001 && std::abs(val) >= 0.00001)
 		{
 			// All nineteen digits (4 zeros + up to 15 significant digits)
 			ostr << std::fixed << std::setprecision(19) << val;
@@ -1469,9 +1467,7 @@ as_value::doubleToString(double val, int radix)
 			if (pos != std::string::npos) {
 				str.erase(pos + 1);
 			}
-			
 		}
-		
 		else
 		{
 			ostr << std::setprecision(15) << val;
@@ -1484,26 +1480,27 @@ as_value::doubleToString(double val, int radix)
 			if (pos != std::string::npos && str.at(pos + 2) == '0') {
 				str.erase(pos + 2, 1);
 			}
-			
 		}
-	}
-	else
-	{
-		bool negative = (val < 0);
-		if ( negative ) val = -val;
 
-		double left = floor(val);
-		if ( left < 1 ) return "0";
-		while ( left != 0 )
-		{
-			double n = left;
-			left = floor(left/radix);
-			n -= (left*radix);
-			//str = std::string(n < 10 ? ((int)n+'0') : ((int)n+('a'-10))) + str;
-			str.insert(0, 1, (n < 10 ? ((int)n+'0') : ((int)n+('a'-10))));
-		}
-		if ( negative ) str.insert(0, 1, '-'); 
+        return str;
+
 	}
+
+    // Radix isn't 10
+
+	bool negative = (val < 0);
+	if ( negative ) val = -val;
+
+	double left = std::floor(val);
+	if ( left < 1 ) return "0";
+	while ( left != 0 )
+	{
+		double n = left;
+		left = std::floor(left / radix);
+		n -= (left * radix);
+		str.insert(0, 1, (n < 10 ? ((int)n+'0') : ((int)n+('a'-10))));
+	}
+	if ( negative ) str.insert(0, 1, '-'); 
 
 	return str;
 	
@@ -1843,9 +1840,9 @@ as_value::newAdd(const as_value& op2)
 }
 
 as_value
-as_value::newLessThan(const as_value& op2_in)
+as_value::newLessThan(const as_value& op2_in) const
 {
-    as_value& op1_in = *this;
+    const as_value& op1_in = *this;
 
     as_value operand1;
     as_value operand2;
@@ -1881,7 +1878,7 @@ as_value::newLessThan(const as_value& op2_in)
         }
         else
         {
-            ret.set_bool(op1<op2);
+            ret.set_bool(op1 < op2);
         }
     }
     return ret;
@@ -1894,6 +1891,207 @@ as_value::subtract(const as_value& op2)
 	double operand2 = op2.to_number();
 	set_double(operand1 - operand2);
 	return *this;
+}
+
+
+static boost::uint16_t
+readNetworkShort(const boost::uint8_t* buf) {
+	boost::uint16_t s = buf[0] << 8 | buf[1];
+	return s;
+}
+
+static boost::uint16_t
+readNetworkLong(const boost::uint8_t* buf) {
+	boost::uint32_t s = buf[0] << 24 | buf[1] << 16 | buf[2] << 8 | buf[3];
+	return s;
+}
+
+// Pass pointer to buffer and pointer to end of buffer. Buffer is raw AMF
+// encoded data. Must start with a type byte unless third parameter is set.
+//
+// On success, sets the given as_value and returns true.
+// On error (premature end of buffer, etc.) returns false and leaves the given
+// as_value untouched.
+//
+// IF you pass a fourth parameter, it WILL NOT READ A TYPE BYTE, but use what
+// you passed instead.
+//
+// The l-value you pass as the first parameter (buffer start) is updated to
+// point just past the last byte parsed
+//
+// TODO restore first parameter on parse errors
+//
+static bool
+amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inType = -1)
+{
+	boost::uint16_t si;
+	boost::uint16_t li;
+	double dub;
+	int amf_type;
+
+	if(b > end) {
+		return false;
+	}
+	if(inType != -1) {
+		amf_type = inType;
+	} else {
+		if(b < end) {
+			amf_type = *b; b += 1;
+		} else {
+			return false;
+		}
+	}
+
+	switch(amf_type) {
+		case amf::Element::BOOLEAN_AMF0:
+		{
+			bool val = *b; b += 1;
+#ifdef GNASH_DEBUG_AMF_PARSING
+			log_debug("amf0 read bool: %d", val);
+#endif
+			ret.set_bool(val);
+			return true;
+		}
+		case amf::Element::NUMBER_AMF0:
+			if(b + 8 > end) {
+				log_error(_("AMF0 read: premature end of input reading Number type"));
+				return false;
+			}
+			dub = *(reinterpret_cast<double*>(b)); b += 8;
+			swapBytes(&dub, 8);
+#ifdef GNASH_DEBUG_AMF_PARSING
+			log_debug("amf0 read double: %e", dub);
+#endif
+			ret.set_double(dub);
+			return true;
+		case amf::Element::STRING_AMF0:
+			if(b + 2 > end) {
+				log_error(_("AMF0 read: premature end of input reading String type"));
+				return false;
+			}
+			si = readNetworkShort(b); b += 2;
+			if(b + si > end) {
+				log_error(_("AMF0 read: premature end of input reading String type"));
+				return false;
+			}
+
+			{
+				std::string str(reinterpret_cast<char *>(b), si); b += si;
+#ifdef GNASH_DEBUG_AMF_PARSING
+				log_debug("amf0 read string: %s", str);
+#endif
+				ret.set_string(str);
+				return true;
+
+			}
+			break;
+		case amf::Element::STRICT_ARRAY_AMF0:
+			{
+				boost::intrusive_ptr<as_array_object> array(new as_array_object());
+				li = readNetworkLong(b); b += 4;
+#ifdef GNASH_DEBUG_AMF_PARSING
+				log_debug("amf0 starting read of array with %i elements", li);
+#endif
+				as_value arrayElement;
+				for(int i = 0; i < li; ++i)
+				{
+					if ( ! amf0_read_value(b, end, arrayElement) )
+					{
+						return false;
+					}
+					array->push(arrayElement);
+				}
+
+				ret.set_as_object(array);
+				return true;
+			}
+		case amf::Element::ECMA_ARRAY_AMF0:
+			{
+				boost::intrusive_ptr<as_object> obj(new as_object(getObjectInterface()));
+				li = readNetworkLong(b); b += 4;
+#ifdef GNASH_DEBUG_AMF_PARSING
+				log_debug("amf0 starting read of object with %i elements", li);
+#endif
+				as_value objectElement;
+				VM& vm = VM::get(); // TODO: get VM from outside
+				string_table& st = vm.getStringTable();
+				for(int i = 0; i < li; ++i)
+				{
+    					boost::uint16_t strlen = readNetworkShort(b); b+=2; 
+					std::string name((char*)b, strlen);
+#ifdef GNASH_DEBUG_AMF_PARSING
+					log_debug("amf0 Object prop name is %s", name);
+#endif
+					b += strlen;
+					if ( ! amf0_read_value(b, end, objectElement) )
+					{
+						return false;
+					}
+					obj->set_member(st.find(name), objectElement);
+				}
+
+				ret.set_as_object(obj);
+				return true;
+			}
+		case amf::Element::OBJECT_AMF0:
+			{
+				// TODO: need this? boost::intrusive_ptr<as_object> obj(new as_object(getObjectInterface()));
+				boost::intrusive_ptr<as_object> obj(new as_object());
+#ifdef GNASH_DEBUG_AMF_PARSING
+				log_debug("amf0 starting read of object");
+#endif
+				as_value tmp;
+				std::string keyString;
+				for(;;)
+				{
+					if ( ! amf0_read_value(b, end, tmp, amf::Element::STRING_AMF0) )
+					{
+						return false;
+					}
+					keyString = tmp.to_string();
+
+					if ( keyString.empty() )
+					{
+						if(b < end) {
+							b += 1; // AMF0 has a redundant "object end" byte
+						} else {
+							log_error("AMF buffer terminated just before object end byte. continueing anyway.");
+						}
+						ret.set_as_object(obj);
+						return true;
+					}
+
+					if ( ! amf0_read_value(b, end, tmp) )
+					{
+						return false;
+					}
+					obj->init_member(keyString, tmp);
+				}
+			}
+		case amf::Element::UNDEFINED_AMF0:
+			{
+				ret.set_undefined();
+				return true;
+			}
+		case amf::Element::NULL_AMF0:
+			{
+				ret.set_null();
+				return true;
+			}
+		// TODO define other types (function, sprite, etc)
+		default:
+			log_unimpl("AMF0 to as_value: unsupported type: %i", amf_type);
+			return false;
+	}
+
+	// this function was called with a zero-length buffer
+	return false;
+}
+
+bool
+as_value::readAMF0(boost::uint8_t *&b, boost::uint8_t *end, int inType)
+{
+	return amf0_read_value(b, end, *this, inType);
 }
 
 } // namespace gnash

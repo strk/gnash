@@ -104,13 +104,10 @@ namespace image
 	ImageRGB::ImageRGB(int width, int height)
 		:
 		ImageBase( width, height,
-			(width * 3 + 3) & ~3, // round pitch up to nearest 4-byte boundary
-			GNASH_IMAGE_RGB)
+			width * 3, GNASH_IMAGE_RGB)
 	{
 		assert(width > 0);
 		assert(height > 0);
-		assert(_pitch >= _width * 3);
-		assert((_pitch & 3) == 0);
 	}
 
 	ImageRGB::~ImageRGB()

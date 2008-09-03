@@ -45,8 +45,6 @@
 #include "URL.h"
 #include "rc.h" // for use of rcfile
 
-using std::string;
-
 namespace {
 gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
@@ -84,12 +82,12 @@ public:
             AMF amf;
             Element *el = 0;
 
-            const string& name = _st.string_table::value(key);
+            const std::string& name = _st.string_table::value(key);
 
 //          cerr << "FIXME: yes!!!!! " << name << ": "<< val << std::endl;
 
             if (val.is_string()) {
-                string str;
+                std::string str;
                 if (!val.is_undefined()) {
                     str = val.to_string();
                 }
@@ -221,7 +219,7 @@ sharedobject_flush(const fn_call& fn)
     PropsSerializer props(sol, vm);
     ptr->visitPropertyValues(props);
     // We only want to access files in this directory
-    string newspec; 
+    std::string newspec; 
     newspec += obj->getFilespec();
     bool ret = sol.writeFile(newspec, obj->getObjectName().c_str());
     if ( ! ret )
@@ -260,26 +258,26 @@ sharedobject_getlocal(const fn_call& fn)
         obj->getVM().addStatic(obj.get());
     }
     
-    string::size_type pos;
-    string rootdir;
+    std::string::size_type pos;
+    std::string rootdir;
     if (fn.nargs > 0) {
-        string filespec = fn.arg(0).to_string();
+        std::string filespec = fn.arg(0).to_string();
         // If there is a second argument to getLocal(), it replaces
         // the default path, which is the swf file name, with this
         // supplied path.
         // the object name appears to be the same as the file name, but
         // minus the suffix. 
-        if ((pos = filespec.find(".sol", 0) == string::npos)) {
+        if ((pos = filespec.find(".sol", 0) == std::string::npos)) {
             obj->setObjectName(filespec);
             filespec += ".sol";
         } else {
-            string objname = filespec.substr(0, filespec.size() - 4);
+            std::string objname = filespec.substr(0, filespec.size() - 4);
             obj->setObjectName(objname);
         }
         obj->setFilespec(filespec);
     }
 
-    string newspec = rcfile.getSOLSafeDir();
+    std::string newspec = rcfile.getSOLSafeDir();
     if (newspec.size() == 0) {
         newspec = "/tmp/";
     }
@@ -310,7 +308,7 @@ sharedobject_getlocal(const fn_call& fn)
     // by the 'base' attribute of OBJECT or EMBED tags trough
     // -P base=xxx
     //
-    const string& origURL = obj->getVM().getSWFUrl(); 
+    const std::string& origURL = obj->getVM().getSWFUrl(); 
     
     URL url(origURL);
 //  log_debug(_("BASE URL=%s (%s)"), url.str(), url.hostname());
@@ -318,11 +316,11 @@ sharedobject_getlocal(const fn_call& fn)
     // Get the domain part, or take as 'localhost' if none
     // (loaded from filesystem)
     //
-    string domain=url.hostname();
+    std::string domain = url.hostname();
     if (domain.empty()) domain = "localhost";
     
     // Get the path part
-    string swfile = url.path();
+    std::string swfile = url.path();
 	// TODO: if the original url was a relative one, the pp uses just
 	// the relative portion rather then the resolved absolute path !
     
@@ -354,16 +352,16 @@ sharedobject_getlocal(const fn_call& fn)
     newspec += obj->getFilespec();
     obj->setFilespec(newspec);
         
-    if (newspec.find("/", 0) != string::npos) {
+    if (newspec.find("/", 0) != std::string::npos) {
         typedef boost::tokenizer<boost::char_separator<char> > Tok;
         boost::char_separator<char> sep("/");
         Tok t(newspec, sep);
         Tok::iterator tit;
-        string newdir = "/";
+        std::string newdir = "/";
         for(tit=t.begin(); tit!=t.end();++tit){
             //cout << *tit << "\n";
             newdir += *tit;
-            if (newdir.find("..", 0) != string::npos) {
+            if (newdir.find("..", 0) != std::string::npos) {
 		log_error("Invalid SharedObject path (contains '..'): %s", newspec);
                 return as_value(false);
             }
@@ -403,31 +401,45 @@ sharedobject_getlocal(const fn_call& fn)
     boost::intrusive_ptr<as_object> ptr = as.to_object();
     
     for (it = els.begin(), e = els.end(); it != e; it++) {
-        Element *el = (*(it));
-//        log_debug("Adding \"%s\"", el->name);
-        if (el->getType() == Element::NUMBER_AMF0) {
-            double dub =  *((double *)el->getData());
-            ptr->set_member(st.string_table::find(el->getName()), as_value(dub));
-        } 
-        if (el->getType() == Element::BOOLEAN_AMF0) {
-            if (el->to_bool() == true) {
-                ptr->set_member(st.string_table::find(el->getName()), as_value(true));
-            } else {
-                ptr->set_member(st.string_table::find(el->getName()), as_value(false));
-            }       
-        } 
-        if (el->getType() == Element::STRING_AMF0) {
-            if (el->getLength() == 0) {
-                ptr->set_member(st.string_table::find(el->getName()), as_value(""));
-            } else {
-                string str = (const char *)el->getData();
-                ptr->set_member(st.string_table::find(el->getName()), as_value(str));
+        Element *el = *it;
+
+        switch (el->getType())
+        {
+            case Element::NUMBER_AMF0:
+            {
+                double dub =  *(reinterpret_cast<double*>(el->getData()));
+                ptr->set_member(st.string_table::find(el->getName()), as_value(dub));
+                break;
             }
+
+            case Element::BOOLEAN_AMF0:
+                ptr->set_member(st.string_table::find(el->getName()),
+                                            as_value(el->to_bool()));
+                break;
+
+            case Element::STRING_AMF0:
+            {
+                if (el->getLength() == 0) {
+                    ptr->set_member(st.string_table::find(el->getName()), as_value(""));
+                    break;
+                }
+                
+                std::string str(reinterpret_cast<const char*>(el->getData()), el->getLength());
+                ptr->set_member(st.string_table::find(el->getName()), as_value(str));
+                break;
+            }
+
+            case Element::OBJECT_AMF0:
+                // TODO: implement!
+                //data.convert_to_object();
+                //ptr->set_member(st.string_table::find(el->name), data);
+                break;
+
+            default:
+                // TODO: what about other types?
+                break;
         } 
-        if (el->getType() == Element::OBJECT_AMF0) {
-//            data.convert_to_object();
-//            ptr->set_member(st.string_table::find(el->name), data);
-        } 
+
     }
 
 //    ptr->dump_members();        // FIXME: debug crap

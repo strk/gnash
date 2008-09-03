@@ -15,35 +15,18 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef GNASH_URLACCESSMANAGER_H
-#define GNASH_URLACCESSMANAGER_H
-
-#include <string>
-
-// Forward declarations
-namespace gnash {
-	class URL;
-}
+#ifndef GNASH_XMLSOCKET_H
+#define GNASH_XMLSOCKET_H
 
 namespace gnash {
+  
+void xmlsocket_class_init(as_object& global);
 
-/// Manage a list of URL access configuration
-// stuff for an URLAccessManager
-namespace URLAccessManager {
+} // end of gnash namespace
 
-/// Return true if access to given url is allowed, false otherwise.
-//
-/// Will use rc file for whitelist/blacklist and localSendbox.
-///
-bool allow(const URL& url);
+#endif
 
-//bool allowHost(const std::string& str);
-
-// Used by XMLSocket::connect (and others?)
-bool allowXMLSocket(const std::string& str, short port);
-
-} // AccessManager
-
-} // namespace gnash
-
-#endif // _GNASH_URLACCESSMANAGER_H
+// Local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:

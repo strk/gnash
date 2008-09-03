@@ -68,14 +68,9 @@ public:
 		LOAD_INIT,
 		
 		// These are for the XMLSocket ActionScript only
-		SOCK_CLOSE,
-		SOCK_CONNECT,
-		SOCK_DATA,
-		SOCK_XML,
-		
-		// These are for the XML ActionScript only
-		XML_LOAD,
-		XML_DATA,
+		CLOSE,
+		CONNECT,
+		XML,
 		
 		// This is for setInterval
 		TIMER,
@@ -176,6 +171,8 @@ public:
 
 	id_code id() const { return m_id; }
 };
+
+std::ostream& operator<< (std::ostream& o, const event_id& ev);
 
 }	// end namespace gnash
 

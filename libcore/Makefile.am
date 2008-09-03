@@ -39,6 +39,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libcore/vm \
 	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/libmedia \
+	-I$(top_srcdir)/libamf \
 	$(PTHREAD_CFLAGS) \
 	$(DMALLOC_CFLAGS) \
 	$(GLIB_CFLAGS) \

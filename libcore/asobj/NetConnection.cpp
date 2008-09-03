@@ -24,8 +24,8 @@
 
 #include <iostream>
 #include <string>
-#include <new>
 #include <boost/scoped_ptr.hpp>
+#include <arpa/inet.h> // for htons
 
 #include "NetConnection.h"
 #include "log.h"
@@ -38,100 +38,30 @@
 #include "URLAccessManager.h"
 #include "URL.h"
 
-#include "FLVParser.h"
-
 // for NetConnection.call()
 #include "VM.h"
-#include "array.h"
+//#include "array.h"
 #include "amf.h"
 #include "SimpleBuffer.h"
 #include "timers.h"
 #include "namedStrings.h"
 
-using namespace amf;
+//using namespace amf;
 
 namespace gnash {
 
 static as_value netconnection_new(const fn_call& fn);
-//static as_object* getNetConnectionInterface();
 
 /// \class NetConnection
 /// \brief Opens a local connection through which you can play
 /// back video (FLV) files from an HTTP address or from the local file
 /// system, using curl.
-
-
 NetConnection::NetConnection()
 	:
 	as_object(getNetConnectionInterface()),
-	call_queue(0)
+	_callQueue(0)
 {
 	attachProperties();
-}
-
-
-/*public*/
-bool NetConnection::openConnection(const std::string& url)
-{
-  // if already running there is no need to setup things again
-  if ( _loader.get() ) {
-    log_debug("NetConnection::openConnection() called when already connected to a stream. Checking if the existing connection can be used.");
-    std::string newurl;
-    if (_prefixUrl.size() > 0) {
-      newurl += _prefixUrl + "/" + url;
-    } else {
-      newurl += url;
-    }
-    if (newurl.compare(_completeUrl) == 0) {
-      return true;
-    } else { 
-      return false;
-    }
-  }
-
-  if ( _prefixUrl.size() > 0 ) {
-    _completeUrl += _prefixUrl + "/" + url;
-  } else {
-    _completeUrl += url;
-  }
-
-  URL uri( _completeUrl, get_base_url() );
-
-  std::string uriStr( uri.str() );
-  assert( uriStr.find( "://" ) != std::string::npos );
-
-  // Check if we're allowed to open url
-#if 1 // done by getStream I guess...
-  if ( ! URLAccessManager::allow( uri ) ) {
-    log_security( _("Gnash is not allowed to open this url: %s"), uriStr.c_str() );
-    return false;
-  }
-#endif
-
-  log_security( _("Connecting to movie: %s"), uriStr );
-
-  StreamProvider& streamProvider = StreamProvider::getDefaultInstance();
-  _loader.reset( streamProvider.getStream( uri ) );
-
-  if ( ! _loader.get() ) {
-    log_error( _("Gnash could not open this url: %s"), uriStr );
-    _loader.reset();
-
-    return false;
-  }
-
-  log_debug( _("Connection established to movie: %s"), uriStr );
-
-  return true;
-}
-
-
-/*public*/
-bool
-NetConnection::eof()
-{
-	if (!_loader.get()) return true; // @@ correct ?
-	return _loader->eof();
 }
 
 
@@ -156,11 +86,11 @@ std::string NetConnection::validateURL(const std::string& url)
 
 	// Check if we're allowed to open url
 	if (!URLAccessManager::allow(uri)) {
-		log_security(_("Gnash is not allowed to open this url: %s"), uriStr.c_str());
+		log_security(_("Gnash is not allowed to open this url: %s"), uriStr);
 		return "";
 	}
 
-	log_debug(_("Connection to movie: %s"), uriStr.c_str());
+	log_debug(_("Connection to movie: %s"), uriStr);
 
 	return uriStr;
 }
@@ -177,74 +107,6 @@ NetConnection::addToURL(const std::string& url)
 	if (_prefixUrl.size() > 0) return;
 
 	_prefixUrl += url;
-}
-
-
-/*public*/
-size_t
-NetConnection::read( void *dst, size_t bytes )
-{
-  if ( ! _loader.get() ) {
-    return 0;
-  }
-
-  return _loader->read( dst, bytes );
-}
-
-
-/*public*/
-bool
-NetConnection::seek( size_t pos )
-{
-  if ( ! _loader.get() ) {
-    return false;
-  }
-
-  return ! _loader->seek( pos );
-}
-
-
-/*public*/
-/// TODO: drop
-size_t
-NetConnection::tell()
-{
-	if (!_loader.get()) return 0; // @@ correct ?
-	return _loader->tell();
-}
-
-
-/*public*/
-/// TODO: drop
-long
-NetConnection::getBytesLoaded()
-{
-	if (!_loader.get()) return 0; // @@ correct ?
-	return _loader->tell(); // getBytesLoaded();
-}
-
-
-/*public*/
-/// TODO: drop
-long
-NetConnection::getBytesTotal()
-{
-	if (!_loader.get()) return 0; // @@ correct ?
-	return _loader->size(); // getBytesTotal();
-}
-
-
-/*public*/
-/// TODO: drop
-bool
-NetConnection::loadCompleted()
-{
-  if ( ! _loader.get() ) {
-    return false;
-  }
-
-  // is the below correct ?
-  return _loader->eof(); // completed();
 }
 
 
@@ -284,7 +146,7 @@ NetConnection::connect_method(const fn_call& fn)
 		return as_value(false);
 	}
 
-	as_value& url_val = fn.arg(0);
+	const as_value& url_val = fn.arg(0);
 
 	// Check first arg for validity 
 	if ( url_val.is_null())
@@ -312,7 +174,7 @@ NetConnection::connect_method(const fn_call& fn)
 	if ( fn.nargs > 1 )
 	{
 		std::stringstream ss; fn.dump_args(ss);
-		log_unimpl("NetConnection.connect(%s): args after the first are not supported", ss.str().c_str());
+		log_unimpl("NetConnection.connect(%s): args after the first are not supported", ss.str());
 	}
 
 
@@ -331,155 +193,17 @@ NetConnection::addHeader_method(const fn_call& fn)
 	return as_value();
 }
 
-boost::uint16_t
+static boost::uint16_t
 readNetworkShort(const boost::uint8_t* buf) {
 	boost::uint16_t s = buf[0] << 8 | buf[1];
 	return s;
 }
 
-boost::uint16_t
+static boost::uint16_t
 readNetworkLong(const boost::uint8_t* buf) {
 	boost::uint32_t s = buf[0] << 24 | buf[1] << 16 | buf[2] << 8 | buf[3];
 	return s;
 }
-
-// Pass pointer to buffer and pointer to end of buffer. Buffer is raw AMF
-// encoded data. Must start with a type byte unless third parameter is set.
-//
-// On success, sets the given as_value and returns true.
-// On error (premature end of buffer, etc.) returns false and leaves the given
-// as_value untouched.
-//
-// IF you pass a fourth parameter, it WILL NOT READ A TYPE BYTE, but use what
-// you passed instead.
-//
-// The l-value you pass as the first parameter (buffer start) is updated to
-// point just past the last byte parsed
-//
-// TODO restore first parameter on parse errors
-//
-static bool
-amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inType = -1)
-{
-	boost::uint16_t si;
-	boost::uint16_t li;
-	double dub;
-	int amf_type;
-
-	if(b > end) {
-		return false;
-	}
-	if(inType != -1) {
-		amf_type = inType;
-	} else {
-		if(b < end) {
-			amf_type = *b; b += 1;
-		} else {
-			return false;
-		}
-	}
-
-	switch(amf_type) {
-		case Element::NUMBER_AMF0:
-			if(b + 8 > end) {
-				log_error(_("NetConnection.call(): server sent us a number which goes past the end of the data sent"));
-				return false;
-			}
-			dub = *(reinterpret_cast<double*>(b)); b += 8;
-			swapBytes(&dub, 8);
-			log_debug("nc read double: %e", dub);
-			ret.set_double(dub);
-			return true;
-		case Element::STRING_AMF0:
-			if(b + 2 > end) {
-				log_error(_("NetConnection.call(): server sent us a string which goes past the end of the data sent"));
-				return false;
-			}
-			si = readNetworkShort(b); b += 2;
-			if(b + si > end) {
-				log_error(_("NetConnection.call(): server sent us a string which goes past the end of the data sent"));
-				return false;
-			}
-
-			{
-				std::string str(reinterpret_cast<char *>(b), si); b += si;
-				log_debug("nc read string: %s", str);
-				ret.set_string(str);
-				return true;
-
-			}
-			break;
-		case Element::STRICT_ARRAY_AMF0:
-			{
-				boost::intrusive_ptr<as_array_object> array(new as_array_object());
-				li = readNetworkLong(b); b += 4;
-				log_debug("nc starting read of array with %i elements", li);
-				as_value arrayElement;
-				for(int i = 0; i < li; ++i)
-				{
-					if ( ! amf0_read_value(b, end, arrayElement) )
-					{
-						return false;
-					}
-					array->push(arrayElement);
-				}
-
-				ret.set_as_object(array);
-				return true;
-			}
-		case Element::OBJECT_AMF0:
-			{
-				// need this? boost::intrusive_ptr<as_object> obj(new as_object(getObjectInterface()));
-				boost::intrusive_ptr<as_object> obj(new as_object());
-				log_debug("nc starting read of object");
-				as_value tmp;
-				std::string keyString;
-				for(;;)
-				{
-					if ( ! amf0_read_value(b, end, tmp, Element::STRING_AMF0) )
-					{
-						return false;
-					}
-					keyString = tmp.to_string();
-
-					if ( keyString.empty() )
-					{
-						if(b < end) {
-							b += 1; // AMF0 has a redundant "object end" byte
-						} else {
-							log_error("AMF buffer terminated just before object end byte. continueing anyway.");
-						}
-						ret.set_as_object(obj);
-						return true;
-					}
-
-					if ( ! amf0_read_value(b, end, tmp) )
-					{
-						return false;
-					}
-					obj->init_member(keyString, tmp);
-				}
-			}
-		case Element::UNDEFINED_AMF0:
-			{
-				ret.set_undefined();
-				return true;
-			}
-		case Element::NULL_AMF0:
-			{
-				ret.set_null();
-				return true;
-			}
-		// TODO define other types (function, sprite, etc)
-		default:
-			log_unimpl("NetConnection.call(): server sent us a value of unsupported type: %i", amf_type);
-			return false;
-	}
-
-	// this function was called with a zero-length buffer
-	return false;
-}
-
 
 /// Queue of remoting calls 
 //
@@ -554,8 +278,7 @@ public:
 			log_debug("have connection");
 			int read = connection->readNonBlocking(reply.data() + reply_end, NCCALLREPLYMAX - reply_end);
 			if(read > 0) {
-				log_debug("read '%1%' bytes:", read);
-				log_debug(_(hexify(reply.data() + reply_end, read, false).c_str()));
+				log_debug("read '%1%' bytes: %2%", read, hexify(reply.data() + reply_end, read, false));
 				reply_end += read;
 			}
 
@@ -619,7 +342,7 @@ public:
 								break;
 							}
 							std::string headerName((char*)b, si); // end-b);
-							//if( !amf0_read_value(b, end, tmp) )
+							//if( !tmp.readAMF0(b, end) )
 							//{
 							//	headers_ok = 0;
 							//	break;
@@ -631,7 +354,7 @@ public:
 								break;
 							}
 							b += 5; // skip past bool and length long
-							if( !amf0_read_value(b, end, tmp) )
+							if( !tmp.readAMF0(b, end) )
 							{
 								headers_ok = 0;
 								break;
@@ -689,7 +412,7 @@ public:
 								log_debug("about to parse amf value");
 								// this updates b to point to the next unparsed byte
 								as_value reply_as_value;
-								if ( ! amf0_read_value(b, end, reply_as_value) )
+								if ( ! reply_as_value.readAMF0(b, end) )
 								{
 									log_error("parse amf failed");
 									// this will happen if we get
@@ -735,8 +458,7 @@ public:
 			// set the "number of bodies" header
 			(reinterpret_cast<boost::uint16_t*>(postdata.data() + 4))[0] = htons(queued_count);
 			std::string postdata_str(reinterpret_cast<char*>(postdata.data()), postdata.size());
-			log_debug("NetConnection.call(): encoded args from %1% calls:", queued_count);
-			log_debug("%s", hexify(postdata.data(), postdata.size(), false));
+			log_debug("NetConnection.call(): encoded args from %1% calls: %2%", queued_count, hexify(postdata.data(), postdata.size(), false));
 			queued_count = 0;
 			connection.reset( StreamProvider::getDefaultInstance().getStream(url, postdata_str) );
 			postdata.resize(6);
@@ -754,7 +476,7 @@ public:
 	{
 		boost::intrusive_ptr<NetConnection> ptr = ensureType<NetConnection>(fn.this_ptr);
 		// FIXME check if it's possible for the URL of a NetConnection to change between call()s
-		ptr->call_queue->tick();
+		ptr->_callQueue->tick();
 		return as_value();
 	};
 
@@ -767,18 +489,22 @@ public:
 	}
 
 private:
-	void start_ticking() {
+	void start_ticking() 
+	{
 
-		if(ticker) return;
+		if (ticker) return;
 
-		boost::intrusive_ptr<builtin_function> ticker_as = \
-			new builtin_function(&AMFQueue::amfqueue_tick_wrapper);
+		boost::intrusive_ptr<builtin_function> ticker_as = 
+		        new builtin_function(&AMFQueue::amfqueue_tick_wrapper);
+
 		std::auto_ptr<Timer> timer(new Timer);
 		unsigned long delayMS = 50; // FIXME crank up to 50 or so
 		timer->setInterval(*ticker_as, delayMS, &_nc);
 		ticker = _nc.getVM().getRoot().add_interval_timer(timer, true);
 	}
-	void push_amf(const SimpleBuffer &amf) {
+
+	void push_amf(const SimpleBuffer &amf) 
+	{
 		GNASH_REPORT_FUNCTION;
 
 		postdata.append(amf.data(), amf.size());
@@ -786,23 +512,29 @@ private:
 
 		start_ticking();
 	}
-	void stop_ticking() {
-		if(!ticker) return;
+
+	void stop_ticking() 
+	{
+		if (!ticker) return;
 		_nc.getVM().getRoot().clear_interval_timer(ticker);
 		ticker=0;
 	}
+
 	void push_callback(const std::string& id, boost::intrusive_ptr<as_object> callback) {
 		callbacks.insert(std::pair<std::string, boost::intrusive_ptr<as_object> >(id, callback));
 	}
-	boost::intrusive_ptr<as_object> pop_callback(std::string id) {
+
+	boost::intrusive_ptr<as_object> pop_callback(std::string id)
+	{
 		CallbacksMap::iterator it = callbacks.find(id);
-		if(it != callbacks.end()) {
+		if (it != callbacks.end()) {
 			boost::intrusive_ptr<as_object> callback = it->second;
 			//boost::intrusive_ptr<as_object> callback;
 			//callback = it.second;
 			callbacks.erase(it);
 			return callback;
-		} else {
+		}
+		else {
 			return 0;
 		}
 	}
@@ -822,7 +554,7 @@ NetConnection::call_method(const fn_call& fn)
 		return as_value(false); // FIXME should we return true anyway?
 	}
 
-	as_value& methodName_as = fn.arg(0);
+	const as_value& methodName_as = fn.arg(0);
 	if (!methodName_as.is_string()) {
                 IF_VERBOSE_ASCODING_ERRORS(
 		std::stringstream ss; fn.dump_args(ss);
@@ -837,17 +569,20 @@ NetConnection::call_method(const fn_call& fn)
 	// TODO: arg(1) is the response object. let it know when data comes back
 	boost::intrusive_ptr<as_object> asCallback = 0;
 	if(fn.nargs > 1) {
+
 		if(fn.arg(1).is_object()) {
 			asCallback = (fn.arg(1).to_object());
-		} else {
-                	IF_VERBOSE_ASCODING_ERRORS(
+		}
+
+		else {
+            IF_VERBOSE_ASCODING_ERRORS(
 			std::stringstream ss; fn.dump_args(ss);
 			log_aserror("NetConnection::call(%s): second argument must be an object", ss.str());
 			);
 		}
 	}
 
-	SimpleBuffer *buf = new SimpleBuffer(32);
+	boost::scoped_ptr<SimpleBuffer> buf ( new SimpleBuffer(32) );
 
 	std::string methodName = methodName_as.to_string();
 
@@ -860,23 +595,30 @@ NetConnection::call_method(const fn_call& fn)
 
 	// client id (result number) as counted string
 	// the convention seems to be / followed by a unique (ascending) number
-	call_number += 1;
-	// TODO is there a better way to do this number->string conversion?
-	std::string call_number_str((boost::format("/%1%") % call_number).str());
-	buf->appendNetworkShort(call_number_str.size());
-	buf->append(call_number_str.c_str(), call_number_str.size());
+	++call_number;
+
+	std::ostringstream os;
+	os << "/" << call_number;
+	const std::string callNumberString = os.str();
+
+	buf->appendNetworkShort(callNumberString.size());
+	buf->append(callNumberString.c_str(), callNumberString.size());
 
 	size_t total_size_offset = buf->size();
 	buf->append("\000\000\000\000", 4); // total size to be filled in later
 
 
 	// encode array of arguments to remote method
-	buf->appendByte(Element::STRICT_ARRAY_AMF0);
+	buf->appendByte(amf::Element::STRICT_ARRAY_AMF0);
 	buf->appendNetworkLong(fn.nargs - 2);
-	if(fn.nargs > 2) {
-		for(unsigned int i = 2; i < fn.nargs; ++i) {
-			if(fn.arg(i).is_string()) {
-				buf->appendByte(Element::STRING_AMF0);
+	if (fn.nargs > 2) {
+
+		for (unsigned int i = 2; i < fn.nargs; ++i)
+		{
+			const as_value& arg = fn.arg(i);
+
+			if (arg.is_string()) {
+				buf->appendByte(amf::Element::STRING_AMF0);
 				std::string str = fn.arg(i).to_string();
 				buf->appendNetworkShort(str.size());
 				buf->append(str.c_str(), str.size());
@@ -884,18 +626,24 @@ NetConnection::call_method(const fn_call& fn)
 			//} else if(fn.arg(i).is_function()) {
 			//	as_function f = fn.arg(i).to_function();
 			//	tmp = AMF::encodefunction(f);
-			} else if(fn.arg(i).is_number()) {
+			}
+
+			else if(arg.is_number())
+			{
 				double d = fn.arg(i).to_number();
-				buf->appendByte(Element::NUMBER_AMF0);
-				swapBytes(&d, 8); // this actually only swapps on little-endian machines
+				buf->appendByte(amf::Element::NUMBER_AMF0);
+				amf::swapBytes(&d, 8); // this actually only swapps on little-endian machines
 				buf->append(&d, 8);
  	 	 	// FIXME implement this
 			//} else if(fn.arg(i).is_object()) {
 			//	boost::intrusive_ptr<as_object> o = fn.arg(i).to_object();
 			//	tmp = AMF::encodeObject(o);
-			} else {
-				log_error(_("NetConnection.call(): unknown argument type"));
-				buf->appendByte(Element::UNDEFINED_AMF0);
+			}
+			
+			else
+			{
+				log_unimpl(_("NetConnection.call(): unsupported argument type %s"), arg);
+				buf->appendByte(amf::Element::UNDEFINED_AMF0);
 			}
 		}
 	}
@@ -904,26 +652,27 @@ NetConnection::call_method(const fn_call& fn)
 	*(reinterpret_cast<uint32_t*>(buf->data() + total_size_offset)) = htonl(buf->size() - 4 - total_size_offset);
 	
 
-	log_debug(_("NetConnection.call(): encoded args: "));
-	log_debug("%s", hexify(buf->data(), buf->size(), false));
+	log_debug(_("NetConnection.call(): encoded args: %s"), hexify(buf->data(), buf->size(), false));
 
 	// FIXME check that ptr->_prefixURL is valid
 	URL url(ptr->validateURL(std::string()));
 
 
 	// FIXME check if it's possible for the URL of a NetConnection to change between call()s
-	if(ptr->call_queue == 0) {
-		ptr->call_queue = new AMFQueue(*ptr, url);
+	if (! ptr->_callQueue.get()) {
+		ptr->_callQueue.reset(new AMFQueue(*ptr, url));
 	}
 
-	if(asCallback) {
+	if (asCallback) {
 		//boost::intrusive_ptr<as_object> intrusive_callback(asCallback);
 		log_debug("calling enqueue with callback");
-		ptr->call_queue->enqueue(*buf, call_number_str, asCallback);
+		ptr->_callQueue->enqueue(*buf, callNumberString, asCallback);
 		//? delete asCallback;
-	} else {
+	}
+	
+	else {
 		log_debug("calling enqueue without callback");
-		ptr->call_queue->enqueue(*buf);
+		ptr->_callQueue->enqueue(*buf);
 	}
 	log_debug("called enqueue");
 
@@ -992,14 +741,8 @@ NetConnection::attachNetConnectionInterface(as_object& o)
 void
 NetConnection::attachProperties()
 {
-	as_c_function_ptr gettersetter;
-
-	gettersetter = NetConnection::isConnected_getset;
-	init_property("isConnected", *gettersetter, *gettersetter);
-
-	gettersetter = NetConnection::uri_getset;
-	init_property("uri", *gettersetter, *gettersetter);
-
+	init_property("isConnected", &NetConnection::isConnected_getset, &NetConnection::isConnected_getset);
+	init_property("uri", &NetConnection::uri_getset, &NetConnection::uri_getset);
 }
 
 as_object*
@@ -1047,13 +790,12 @@ void netconnection_class_init(as_object& global)
 // here to have AMFQueue definition available
 NetConnection::~NetConnection()
 {
-	delete call_queue;
 }
 
 void
 NetConnection::markReachableResources() const
 {
-	if ( call_queue ) call_queue->markReachableResources();
+	if ( _callQueue.get() ) _callQueue->markReachableResources();
 	markAsObjectReachable();
 }
 

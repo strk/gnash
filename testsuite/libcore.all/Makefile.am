@@ -42,7 +42,6 @@ check_PROGRAMS = \
 	AsValueTest \
 	ClassSizes \
 	SafeStackTest \
-	AsValue \
 	$(NULL)
 
 CLEANFILES = \
@@ -110,11 +109,6 @@ AsValueTest_LDADD = \
 
 ClassSizes_SOURCES = ClassSizes.cpp
 ClassSizes_LDADD = \
-	$(GNASH_LIBS) \
-	$(NULL)
-
-AsValue_SOURCES = AsValue.cpp
-AsValue_LDADD = \
 	$(GNASH_LIBS) \
 	$(NULL)
 

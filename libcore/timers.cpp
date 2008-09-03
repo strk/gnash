@@ -94,7 +94,7 @@ namespace gnash {
   void
   Timer::start()
   {
-	_start = VM::get().getTime();
+	_start = _object->getVM().getTime();
 	//log_debug("_start at seconds %lu", _start);
   }
   
@@ -127,6 +127,7 @@ Timer::execute()
     as_value timer_method;
 
     as_object* super = _object->get_super(_function ? 0 : _methodName.c_str());
+    VM& vm = _object->getVM();
 
     if ( _function.get() )
     {
@@ -134,7 +135,6 @@ Timer::execute()
     }
     else
     {
-        VM& vm = _object->getVM();
         string_table::key k = vm.getStringTable().find(_methodName);
         as_value tmp;
         if ( ! _object->get_member(k, &tmp) )
@@ -157,20 +157,19 @@ Timer::execute()
         timer_method.set_as_function(f);
     }
 
-    as_environment env;
+    as_environment env(vm); 
 
-    // Push args to the as_environment stack if needed
-    for ( ArgsContainer::reverse_iterator it=_args.rbegin(), itEnd=_args.rend();
+    // Prepare args 
+    std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
+    for ( ArgsContainer::iterator it=_args.begin(), itEnd=_args.end();
 		    it != itEnd; ++it )
     {
 	    //log_debug("Env-pushing %s", *it);
-	    env.push(*it);
+	    args->push_back(*it);
     }
 
-    size_t firstArgBottomIndex = env.stack_size()-1; 
-
-    as_value val = call_method(timer_method, &env, _object.get(),
-		    _args.size(), firstArgBottomIndex, super);
+    /* as_value val = */
+    call_method(timer_method, &env, _object.get(), args, super);
 
 }
 
@@ -268,7 +267,7 @@ timer_setinterval(const fn_call& fn)
 	}
     
     
-	movie_root& root = VM::get().getRoot();
+	movie_root& root = fn.env().getVM().getRoot();
 	int id = root.add_interval_timer(timer);
 	return as_value(id);
 }
@@ -352,7 +351,7 @@ timer_settimeout(const fn_call& fn)
 	}
     
     
-	movie_root& root = VM::get().getRoot();
+	movie_root& root = fn.env().getVM().getRoot();
 
 	int id = root.add_interval_timer(timer);
 	return as_value(id);
@@ -366,7 +365,7 @@ timer_clearinterval(const fn_call& fn)
 
 	int id = int(fn.arg(0).to_number());
 
-	movie_root& root = VM::get().getRoot();
+	movie_root& root = fn.env().getVM().getRoot();
 	bool ret = root.clear_interval_timer(id);
 	return as_value(ret);
 }

@@ -16,8 +16,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef __SOUND_H__
-#define __SOUND_H__
+#ifndef GNASH_ASOBJ_SOUND_H
+#define GNASH_ASOBJ_SOUND_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"

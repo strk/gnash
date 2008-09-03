@@ -273,8 +273,6 @@ if XPCOM
 	@echo "	XPCOM_CFLAGS is $(XPCOM_CFLAGS)"
 	@echo "	XPCOM_LIBS is $(XPCOM_LIBS)"
 	@echo "	XPIDL path is $(XPIDL)"
-endif
-if NSPR
 	@echo "	NSPR_CFLAGS is $(NSPR_CFLAGS)"
 	@echo "	NSPR_LIBS is $(NSPR_LIBS)"
 endif

@@ -35,7 +35,7 @@ GNASH_LIBS = \
 AM_LDFLAGS = \
 	$(LIBADD_DL) \
 	$(LIBLTDL) \
-        $(MYSQL_LIBS) \
+	$(MYSQL_LIBS) \
 	$(LIBXML_LIBS) \
 	$(CURL_LIBS) \
 	$(BOOST_LIBS) \

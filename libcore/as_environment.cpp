@@ -46,6 +46,17 @@ namespace gnash {
 
 as_environment::CallStack as_environment::_localFrames = as_environment::CallStack();
 
+as_value as_environment::undefVal;
+
+as_environment::as_environment(VM& vm)
+	:
+	_vm(vm),
+	_stack(_vm.getStack()),
+	m_target(0),
+	_original_target(0)
+{
+}
+
 // Return the value of the given var, if it's defined.
 as_value
 as_environment::get_variable(const std::string& varname,
@@ -69,7 +80,7 @@ as_environment::get_variable(const std::string& varname,
         if (target)
         {
             as_value	val;
-            target->get_member(VM::get().getStringTable().find(var), &val);
+            target->get_member(_vm.getStringTable().find(var), &val);
             if ( retTarget ) *retTarget = target;
             return val;
         }
@@ -117,23 +128,7 @@ as_environment::get_variable(const std::string& varname) const
 
 static bool validRawVariableName(const std::string& varname)
 {
-	// check raw variable name validity
-	const char* ptr = varname.c_str();
-	for (;;)
-	{
-		ptr = strchr(ptr, ':');
-		if ( ! ptr ) break;
-
-		int num=1;
-		while (*(++ptr) == ':') ++num;
-		if (num>2) 
-		{
-			//log_debug("Invalid raw variable name...");
-			return false;
-		}
-	} 
-
-	return true;
+    return (varname.find(":::") == std::string::npos);
 }
 
 as_value
@@ -154,7 +149,7 @@ as_environment::get_variable_raw(
 
     as_value    val;
 
-    VM& vm = VM::get();
+    VM& vm = _vm;
     int swfVersion = vm.getSWFVersion();
     string_table& st = vm.getStringTable();
     string_table::key key = st.find(varname);
@@ -239,7 +234,7 @@ as_environment::del_variable_raw(
 {
 	assert( ! std::strpbrk(varname.c_str(), ":/.") );
 
-	string_table::key varkey = VM::get().getStringTable().find(varname);
+	string_table::key varkey = _vm.getStringTable().find(varname);
 	as_value	val;
 
 	// Check the with-stack.
@@ -274,7 +269,7 @@ as_environment::del_variable_raw(
 	// TODO: try 'this' ? Add a testcase for it !
 
 	// Try _global 
-	return VM::get().getGlobal()->delProperty(varkey).second;
+	return _vm.getGlobal()->delProperty(varkey).second;
 }
 
 // varname must be a plain variable name; no path parsing.
@@ -309,7 +304,7 @@ as_environment::set_variable(
         target = find_object(path, &scopeStack); 
 	if (target)
 	{
-	    target->set_member(VM::get().getStringTable().find(var), val);
+	    target->set_member(_vm.getStringTable().find(var), val);
 	}
 	else
 	{
@@ -348,7 +343,7 @@ as_environment::set_variable_raw(
 		return;
 	}
 
-    VM& vm = VM::get();
+    VM& vm = _vm;
     int swfVersion = vm.getSWFVersion();
     string_table& st = vm.getStringTable();
     string_table::key varkey = st.find(varname);
@@ -419,7 +414,7 @@ as_environment::set_local(const std::string& varname, const as_value& val)
 	// stack ?
 	assert( ! _localFrames.empty() );
 
-	string_table::key varkey = VM::get().getStringTable().find(varname);
+	string_table::key varkey = _vm.getStringTable().find(varname);
 	// Is it in the current frame already?
 	if ( setLocal(varname, val) )
 	{
@@ -447,7 +442,7 @@ as_environment::declare_local(const std::string& varname)
 		assert( ! varname.empty() );	// null varnames are invalid!
 		LocalVars& locals = _localFrames.back().locals;
 		//locals.push_back(as_environment::frame_slot(varname, as_value()));
-		locals->set_member(VM::get().getStringTable().find(varname), as_value());
+		locals->set_member(_vm.getStringTable().find(varname), as_value());
 	}
 }
 
@@ -511,7 +506,7 @@ as_environment::parse_path(const std::string& var_path,
         as_object* target_ptr = find_object(path); 
 	if ( ! target_ptr ) return false;
 
-	target_ptr->get_member(VM::get().getStringTable().find(var), &val);
+	target_ptr->get_member(_vm.getStringTable().find(var), &val);
 	*target = target_ptr;
 	return true;
 }
@@ -560,7 +555,7 @@ as_environment::find_object(const std::string& path_in, const ScopeStack* scopeS
     }
     
     std::string path = PROPNAME(path_in);
-    VM& vm = VM::get();
+    VM& vm = _vm;
     string_table& st = vm.getStringTable();
     int swfVersion = vm.getSWFVersion(); 
 
@@ -702,7 +697,7 @@ as_environment::find_object(const std::string& path_in, const ScopeStack* scopeS
 			// else if ( _original_target) // TODO: try orig target too ?
 
 			// Looking for _global ?
-			as_object* global = VM::get().getGlobal();
+			as_object* global = _vm.getGlobal();
 			if ( swfVersion > 5 && subpartKey == NSV::PROP_uGLOBAL )
 			{
 				element = global;
@@ -762,7 +757,7 @@ as_environment::find_object(const std::string& path_in, const ScopeStack* scopeS
 int
 as_environment::get_version() const
 {
-	return VM::get().getSWFVersion();
+	return _vm.getSWFVersion();
 }
 
 static void
@@ -869,6 +864,7 @@ as_environment::findLocal(const std::string& varname, as_value& ret, as_object**
 bool
 as_environment::findLocal(LocalVars& locals, const std::string& name, as_value& ret)
 {
+	// TODO: get VM passed as arg
 	return locals->get_member(VM::get().getStringTable().find(name), &ret);
 }
 
@@ -876,6 +872,7 @@ as_environment::findLocal(LocalVars& locals, const std::string& name, as_value& 
 bool
 as_environment::delLocal(LocalVars& locals, const std::string& varname)
 {
+	// TODO: get VM passed as arg
 	return locals->delProperty(VM::get().getStringTable().find(varname)).second;
 }
 
@@ -900,6 +897,7 @@ bool
 as_environment::setLocal(LocalVars& locals,
 		const std::string& varname, const as_value& val)
 {
+	// TODO: get VM passed as arg
 	Property* prop = locals->getOwnProperty(VM::get().getStringTable().find(varname));
 	if ( ! prop ) return false;
 	prop->setValue(*locals, val);
@@ -908,10 +906,11 @@ as_environment::setLocal(LocalVars& locals,
 
 
 void
-as_environment::padStack(size_t offset, size_t count)
+as_environment::padStack(size_t /*offset*/, size_t /*count*/)
 {
-	assert( offset <= m_stack.size() );
-	m_stack.insert(m_stack.begin()+offset, count, as_value());
+	// do nothing here, instead return undefined from top() and pop()
+	//assert( offset <= _stack.size() );
+	//m_stack.insert(m_stack.begin()+offset, count, as_value());
 }
 
 void
@@ -923,7 +922,7 @@ as_environment::pushCallFrame(as_function* func)
     // TODO: override from gnashrc.
     
     // A stack size of 0 is apparently legitimate.
-	const boost::uint16_t maxstacksize = VM::get().getRoot().getRecursionLimit();
+	const boost::uint16_t maxstacksize = func->getVM().getRoot().getRecursionLimit();
 
     // Doesn't proceed if the stack size would reach the limit; should
     // this check be done somewhere after adding to the stack? Would
@@ -970,7 +969,7 @@ as_environment::add_local(const std::string& varname, const as_value& val)
 	assert( ! _localFrames.empty() );
 	LocalVars& locals = _localFrames.back().locals;
 	//locals.push_back(frame_slot(varname, val));
-	locals->set_member(VM::get().getStringTable().find(varname), val);
+	locals->set_member(_vm.getStringTable().find(varname), val);
 }
 
 as_environment::CallFrame::CallFrame(as_function* funcPtr)
@@ -983,7 +982,7 @@ as_environment::CallFrame::CallFrame(as_function* funcPtr)
 void
 as_environment::dump_stack(std::ostream& out, unsigned int limit) const
 {
-	unsigned int si=0, n=m_stack.size();
+	unsigned int si=0, n=_stack.size();
 	if ( limit && n > limit )
 	{
 		si=n-limit;
@@ -997,7 +996,7 @@ as_environment::dump_stack(std::ostream& out, unsigned int limit) const
 	for (unsigned int i=si; i<n; i++)
 	{
 		if (i!=si) out << " | ";
-		out << '"' << m_stack[i] << '"';
+		out << '"' << _stack.value(i) << '"';
 	}
 	out << std::endl;
 }
@@ -1078,13 +1077,7 @@ as_environment::markReachableResources() const
 	}
 #endif
 
-	assert ( m_stack.empty() );
-#if 1 // I think we expect the stack to be empty !
-	for (std::vector<as_value>::const_iterator i=m_stack.begin(), e=m_stack.end(); i!=e; ++i)
-	{
-		i->setReachable();
-	}
-#endif
+	assert ( _stack.empty() );
 }
 #endif // GNASH_USE_GC
 

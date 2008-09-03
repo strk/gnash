@@ -105,14 +105,17 @@ generic_callback(GtkWidget * /*widget*/, gpointer data)
     }
     
     as_value	val;
-    as_environment env;
-    env.push(handler);
-    env.push(event);
-    env.push(handler);
+    as_environment env(VM::get());
+
+    std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
+    args->push_back(handler);
+    args->push_back(event);
+    args->push_back(handler);
+
     as_object obj = val.to_object();
 
     // Call the AS function defined in the source file using this extension
-    (*as_func)(fn_call(&obj, &env, 2, 2));
+    (*as_func)(fn_call(&obj, &env, args));
 }
 
 static void

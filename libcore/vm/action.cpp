@@ -35,6 +35,7 @@
 #include <string>
 #include <algorithm>
 #include <boost/format.hpp>
+#include <cassert>
 
 
 namespace gnash {
@@ -52,17 +53,12 @@ call_method(
     const as_value& method,
     as_environment* env,
     as_object* this_ptr, // this is ourself
-    int nargs,
-    int first_arg_bottom_index,
+    std::auto_ptr< std::vector<as_value> > args,
     as_object* super)
-    // first_arg_bottom_index is the stack index, from the bottom,
-    // of the first argument.
-    // Subsequent arguments are at *lower* indices.
-    // E.g. if first_arg_bottom_index = 7, then arg1 is at env->bottom(7),
-    // arg2 is at env->bottom(6), etc.
 {
 	as_value val;
-	fn_call call(this_ptr, env, nargs, first_arg_bottom_index, super);
+	fn_call call(this_ptr, env, args);
+	call.super = super;
 
 	try
 	{
@@ -90,13 +86,14 @@ call_method(
 	return val;
 }
 
-
 as_value	call_method0(
     const as_value& method,
     as_environment* env,
     as_object* this_ptr)
 {
-    return call_method(method, env, this_ptr, 0, env->get_top_index() + 1);
+    // TODO: avoid allocating a vector here
+    std::auto_ptr< std::vector<as_value> > args(new std::vector<as_value>);
+    return call_method(method, env, this_ptr, args);
 }
 
 
@@ -120,7 +117,6 @@ event_id::get_function_name() const
 		"onDragOut",		 // DRAG_OUT
 		"onKeyPress",		 // KEY_PRESS
 		"onInitialize",		 // INITIALIZE
-
 		"onLoad",		 // LOAD
 		"onUnload",		 // UNLOAD
 		"onEnterFrame",		 // ENTER_FRAME
@@ -130,21 +126,14 @@ event_id::get_function_name() const
 		"onKeyDown",		 // KEY_DOWN
 		"onKeyUp",		 // KEY_UP
 		"onData",		 // DATA
-		// These are for the MoveClipLoader ActionScript only
 		"onLoadStart",		 // LOAD_START
 		"onLoadError",		 // LOAD_ERROR
 		"onLoadProgress",	 // LOAD_PROGRESS
 		"onLoadInit",		 // LOAD_INIT
-		// These are for the XMLSocket ActionScript only
-		"onSockClose",		 // CLOSE
-		"onSockConnect",	 // CONNECT
-		"onSockData",		 // Data
-		"onSockXML",		 // XML
-		// These are for the XML ActionScript only
-		"onXMLLoad",		 // XML_LOAD
-		"onXMLData",		 // XML_DATA
+		"onClose",		 // CLOSE
+		"onConnect",	 // CONNECT
+		"onXML",		 // XML
 		"onTimer",	         // setInterval Timer expired
-
 		"onConstruct",
 		"onSetFocus",
 		"onKillFocus"
@@ -170,7 +159,6 @@ event_id::get_function_key() const
 		NSV::PROP_ON_DRAG_OUT,		// DRAG_OUT
 		NSV::PROP_ON_KEY_PRESS,		// KEY_PRESS
 		NSV::PROP_ON_INITIALIZE,	// INITIALIZE
-
 		NSV::PROP_ON_LOAD,		// LOAD
 		NSV::PROP_ON_UNLOAD,		// UNLOAD
 		NSV::PROP_ON_ENTER_FRAME,	// ENTER_FRAME
@@ -180,21 +168,14 @@ event_id::get_function_key() const
 		NSV::PROP_ON_KEY_DOWN,		// KEY_DOWN
 		NSV::PROP_ON_KEY_UP,		// KEY_UP
 		NSV::PROP_ON_DATA,		// DATA
-		// These are for the MoveClipLoader ActionScript only
 		NSV::PROP_ON_LOAD_START,	// LOAD_START
 		NSV::PROP_ON_LOAD_ERROR,	// LOAD_ERROR
 		NSV::PROP_ON_LOAD_PROGRESS,	// LOAD_PROGRESS
 		NSV::PROP_ON_LOAD_INIT,		// LOAD_INIT
-		// These are for the XMLSocket ActionScript only
-		NSV::PROP_ON_SOCK_CLOSE,	// CLOSE
-		NSV::PROP_ON_SOCK_CONNECT,	// CONNECT
-		NSV::PROP_ON_SOCK_DATA,		// Data
-		NSV::PROP_ON_SOCK_XML,		// XML
-		// These are for the XML ActionScript only
-		NSV::PROP_ON_XML_LOAD,		// XML_LOAD
-		NSV::PROP_ON_XML_DATA,		// XML_DATA
+		NSV::PROP_ON_CLOSE,	// CLOSE
+		NSV::PROP_ON_CONNECT,	// CONNECT
+		NSV::PROP_ON_XML,		// XML
 		NSV::PROP_ON_TIMER,		// setInterval Timer expired
-
 		NSV::PROP_ON_CONSTRUCT,		// onConstruct
 		NSV::PROP_ON_SET_FOCUS, 	// onSetFocus
 		NSV::PROP_ON_KILL_FOCUS 	// onKillFocus
@@ -255,6 +236,11 @@ event_id::is_button_event() const
 		default:
 			return false;
 	}
+}
+
+std::ostream& operator<< (std::ostream& o, const event_id& ev)
+{
+    return (o << ev.get_function_name());
 }
 
 } // end of namespace gnash

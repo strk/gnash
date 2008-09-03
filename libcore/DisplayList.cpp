@@ -465,7 +465,7 @@ DisplayList::swapDepths(character* ch1, int newdepth)
   {
     IF_VERBOSE_ASCODING_ERRORS(
     log_aserror("%s.swapDepth(%d) : ignored call with target depth less then %d",
-      ch1->getTarget().c_str(), newdepth, character::staticDepthOffset);
+      ch1->getTarget(), newdepth, character::staticDepthOffset);
     );
     return;
   }
@@ -727,7 +727,7 @@ DisplayList::dump() const
     const DisplayItem& dobj = *it;
     log_debug(_("Item %d at depth %d (char id %d, name %s, type %s)"),
       num, dobj->get_depth(), dobj->get_id(),
-      dobj->get_name().c_str(), typeName(*dobj).c_str());
+      dobj->get_name(), typeName(*dobj));
     num++;
   }
 }

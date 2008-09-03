@@ -21,6 +21,7 @@
 #include <vector>
 #include <string>
 #include <cstring>
+#include <iostream> // for output operator
 #include <boost/cstdint.hpp>
 
 //#include "buffer.h"
@@ -174,7 +175,7 @@ public:
     Element *operator[](size_t x);
 
     gnash::Network::byte_t *getData();
-    size_t getLength();
+    size_t getLength() const;
     Buffer *getBuffer() { return _buffer; };
     
     // These are all accessors for the various output formats
@@ -183,9 +184,9 @@ public:
 //    void setData(Buffer *buf) { _buffer = buf; };
 
     // These accessors convert the raw data to a standard data type we can use.
-    double to_number();
-    const char *to_string();
-    bool to_bool();
+    double to_number() const;
+    const char *to_string() const;
+    bool to_bool() const;
     void *to_reference();
     
     char *getName() const { return _name; };
@@ -204,7 +205,8 @@ public:
     size_t propertySize()         { return _properties.size(); };
     amf::Buffer *encode();
     std::vector<Element *> getProperties() { return _properties; };
-    void dump();
+    void dump() const { dump(std::cerr); }
+    void dump(std::ostream& os) const;
 private:
     void check_buffer(size_t size);
     char		*_name;
@@ -212,6 +214,12 @@ private:
     amf0_type_e		_type;
     std::vector<Element	*> _properties;
 };                              // end of class definition
+
+inline std::ostream& operator << (std::ostream& os, const Element& el)
+{
+	el.dump(os);
+	return os;
+}
 
 
 } // end of amf namespace

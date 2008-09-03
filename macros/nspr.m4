@@ -24,13 +24,6 @@ AC_DEFUN([GNASH_PATH_NSPR],
 [dnl 
 
   has_nspr=no
-  AC_ARG_ENABLE(nspr4,
-    AC_HELP_STRING([--enable-nspr4],[Enable nspr4 support in NPAPI plugin]),
-  [case "${enableval}" in
-    yes) nspr4=yes ;;
-    no)  nspr4=no ;;
-    *)   AC_MSG_ERROR([bad value ${enableval} for --enable-nspr4 option]) ;;
-   esac],nspr4=no)
 
   dnl Look for the header
   AC_ARG_WITH(nspr-incl, AC_HELP_STRING([--with-nspr-incl], [directory where NSPR headers are]), with_nspr_incl=${withval})
@@ -44,24 +37,25 @@ AC_DEFUN([GNASH_PATH_NSPR],
     fi
   ])
 
-    dnl Look for the library
-    AC_ARG_WITH(nspr_lib, AC_HELP_STRING([--with-nspr-lib], [directory where NSPR libraries are]), with_nspr_lib=${withval})
-    AC_CACHE_VAL(ac_cv_path_nspr_lib, [
-      if test x"${with_nspr_lib}" != x ; then
-        if test -f ${with_nspr_libs}/libnspr.so; then
-          ac_cv_path_nspr_lib="-L`(cd ${with_nspr_lib}; pwd)` -lplds4 -lplc4 -lnspr4"
-        fi
+  dnl Look for the library
+  AC_ARG_WITH(nspr_lib, AC_HELP_STRING([--with-nspr-lib], [directory where NSPR libraries are]), with_nspr_lib=${withval})
+  AC_CACHE_VAL(ac_cv_path_nspr_lib, [
+    if test x"${with_nspr_lib}" != x ; then
+      if test -f ${with_nspr_libs}/libnspr.so; then
+        ac_cv_path_nspr_lib="-L`(cd ${with_nspr_lib}; pwd)` -lplds4 -lplc4 -lnspr4"
       fi
-    ])
+    fi
+  ])
 
-  if test x$nspr4 = xyes; then
+  #always check to see if we have it; we only use the results if XPCOM is set.
+  #if test x$nspr4 = xyes; then
     if test x$cross_compiling = xno; then
       if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_nspr_incl}" = x; then
         $PKG_CONFIG --exists nspr && ac_cv_path_nspr_incl="`$PKG_CONFIG --cflags-only-I nspr`"
         $PKG_CONFIG --exists nspr && ac_cv_path_nspr_lib="`$PKG_CONFIG --libs nspr`"
       fi
     fi
-  fi
+  #fi
 
   if test x"${ac_cv_path_nspr_incl}" != x; then
     NSPR_CFLAGS="${ac_cv_path_nspr_incl}"

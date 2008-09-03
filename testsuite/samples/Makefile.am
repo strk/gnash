@@ -30,6 +30,7 @@ AM_CPPFLAGS = \
         -I$(top_srcdir)/backend \
         -I$(top_srcdir)/libcore  \
         -I$(top_srcdir)/libcore/parser  \
+        -I$(top_srcdir)/libcore/vm  \
         -I$(top_srcdir)/testsuite \
 	$(OPENGL_CFLAGS) \
 	$(BOOST_CFLAGS) \

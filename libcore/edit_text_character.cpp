@@ -907,7 +907,7 @@ edit_text_character::set_member(string_table::key name,
 	case NSV::PROP_uX:
 	{
 		matrix	m = get_matrix();
-        double x =  utility::infinite_to_fzero( val.to_number() );
+        double x =  utility::infinite_to_zero( val.to_number() );
 		m.tx = PIXELS_TO_TWIPS(x);	
 		set_matrix(m); // no need to update caches when only changing translation
 
@@ -917,7 +917,7 @@ edit_text_character::set_member(string_table::key name,
 	case NSV::PROP_uY:
 	{
 		matrix	m = get_matrix();
-        double y =  utility::infinite_to_fzero( val.to_number() );
+        double y =  utility::infinite_to_zero( val.to_number() );
 		m.ty = PIXELS_TO_TWIPS(y);
 		set_matrix(m); // no need to update caches when only changing translation
 
@@ -2311,7 +2311,7 @@ textfield_autoSize_getset(const fn_call& fn)
 	}
 	else // setter
 	{
-		as_value& arg = fn.arg(0);
+		const as_value& arg = fn.arg(0);
 		if ( arg.is_bool() )
 		{
 			if ( arg.to_bool() ) // true == left
@@ -2346,7 +2346,7 @@ textfield_type_getset(const fn_call& fn)
 	}
 
 	// setter
-	as_value& arg = fn.arg(0);
+	const as_value& arg = fn.arg(0);
 	std::string strval = arg.to_string();
 	edit_text_character::TypeValue val = ptr->parseTypeValue(strval);
 	//log_debug("setting %s.type : %s (toString->%s) => %d", ptr->getTarget(), arg, strval, val);

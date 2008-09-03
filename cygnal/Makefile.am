@@ -35,7 +35,7 @@ AM_CPPFLAGS = # -Wall
 
 AM_LDFLAGS = \
 	../libbase/libgnashbase.la \
-	../libcore/libgnashserver.la \
+	../libcore/libgnashcore.la \
 	../libnet/libgnashnet.la \
 	../libamf/libgnashamf.la \
 	$(LIBLTDL) \

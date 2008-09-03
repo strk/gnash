@@ -62,7 +62,7 @@
 #include "namedStrings.h"
 #include "ClassHierarchy.h"
 #include "builtin_function.h"
-#include "xmlsocket.h"
+#include "XMLSocket_as.h"
 #include "xml.h"
 #include "xmlnode.h"
 #include "asClass.h"

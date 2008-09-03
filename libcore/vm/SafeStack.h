@@ -40,26 +40,43 @@ class StackException {/**/};
 template <class T>
 class SafeStack
 {
+
+	typedef std::vector<T*> StackType;
+
 public:
+
+    // May be useful for callers to know.
+    typedef typename StackType::size_type StackSize;
+
 	/// From the top of the stack, get the i'th value down. 0 is the topmost
 	/// value.
-	T& top(unsigned int i)
+	T& top(StackSize i)
 	{
 		if (i >= size()) 
 			throw StackException();
-		unsigned int offset = mEnd - i;
+		StackSize offset = mEnd - i;
 		//log_debug("top(%d): mEnd:%d, mDownstop:%d, offset:%d", i, mEnd, mDownstop, offset);
 		return mData[offset >> mChunkShift][offset & mChunkMod];
 	}
 
 	/// From the bottom of the stack, get the i'th value up. 0 is the
 	/// bottommost value.
-	T& value(unsigned int i)
+	T& value(StackSize i)
 	{
 		if (i >= size())
 			throw StackException();
 
-		unsigned int offset = mDownstop + i + 2;
+		StackSize offset = mDownstop + i + 2;
+		//log_debug("value(%d): mEnd:%d, mDownstop:%d, offset:%d", i, mEnd, mDownstop, offset);
+		return mData[offset >> mChunkShift][offset & mChunkMod];
+	}
+
+	const T& value(StackSize i) const
+	{
+		if (i >= size())
+			throw StackException();
+
+		StackSize offset = mDownstop + i + 2;
 		//log_debug("value(%d): mEnd:%d, mDownstop:%d, offset:%d", i, mEnd, mDownstop, offset);
 		return mData[offset >> mChunkShift][offset & mChunkMod];
 	}
@@ -67,8 +84,12 @@ public:
 	/// Shrink the stack by i entries. Does not invalidate any entries
 	/// previously given, it just sets the top for pop, push, and top
 	/// operations.
-	void drop(unsigned int i)
+	void drop(StackSize i)
 	{ if (i > size()) throw StackException(); mEnd -= i; }
+
+	/// Drop all stack elements reguardless of the "downstop"
+	void clear()
+	{ mDownstop=0; mEnd=1; }
 
 	/// Put a new value onto the top of the stack.  The value will be
 	/// copied.
@@ -81,10 +102,10 @@ public:
 
 	/// Grow by i entries. Normally this is 1, but there might be sometime
 	/// when you need more than that.
-	void grow(unsigned int i)
+	void grow(StackSize i)
 	{
-		unsigned int available = (1 << mChunkShift) * mData.size() - mEnd + 1;
-		unsigned int n = size()+i;
+		StackSize available = (1 << mChunkShift) * mData.size() - mEnd + 1;
+		StackSize n = size()+i;
 		while (available < n)
 		{
 			mData.push_back(new T[1 << mChunkShift]);
@@ -94,11 +115,11 @@ public:
 	}
 
 	/// Gives the size of the stack which is currently accessible.
-	unsigned int getDownstop() const 
+	StackSize getDownstop() const 
 	{ return mDownstop; }
 
 	/// Alias for getDownstop()
-	unsigned int size() const { return mEnd - mDownstop - 1; /*mEnd is one past end*/ }
+	StackSize size() const { return mEnd - mDownstop - 1; /*mEnd is one past end*/ }
 
 	/// Is the stack empty to us? (Check totalSize() != for actually empty)
 	bool empty() const { return size() == 0; }
@@ -106,12 +127,12 @@ public:
 	/// Makes the stack appear empty to subsequent callers.  This can be used
 	/// to simulate multiple stacks with a single stack, as in function
 	/// calling. Returns the old downstop for restoring it using setDownstop.
-	unsigned int fixDownstop() 
-	{ unsigned int ret = mDownstop; mDownstop = mEnd-1; return ret; }
+	StackSize fixDownstop() 
+	{ StackSize ret = mDownstop; mDownstop = mEnd-1; return ret; }
 
 	/// Makes the stack read to a depth of 'i'. This cannot be more than
 	/// totalSize()
-	void setDownstop(unsigned int i)
+	void setDownstop(StackSize i)
 	{ if (i > mEnd) throw StackException(); mDownstop = i; }
 
 	/// The total size of the stack. This is not what can be read. That
@@ -120,11 +141,11 @@ public:
 	/// This function is probably not what you need for anything except for
 	/// setting downstops that weren't returned by either fixDownstop() or
 	/// getDownstop()
-	unsigned int totalSize() const { return mEnd - 1; }
+	StackSize totalSize() const { return mEnd - 1; }
 
 	/// Set the total size and local size of the stack, for restoring a
 	/// stack through unknown changes.
-	void setAllSizes(unsigned int total, unsigned int downstop)
+	void setAllSizes(StackSize total, StackSize downstop)
 	{ mEnd = total + 1; mDownstop = downstop; }
 
 	/// Default constructor.
@@ -134,19 +155,18 @@ public:
 	/// Delete the allocated data. 
 	~SafeStack()
 	{
-		for (unsigned int i = 0; i < mData.size(); ++i)
-			delete mData[i];
+		for (StackSize i = 0; i < mData.size(); ++i)
+			delete [] mData[i];
 	}
 
 private:
-	typedef std::vector<T*> stack_type;
-	stack_type mData;
-	unsigned int mDownstop;
-	unsigned int mEnd;
+	StackType mData;
+	StackSize mDownstop;
+	StackSize mEnd;
 
 	// If mChunkMod is not a power of 2 less 1, it will not work properly.
-	static const unsigned int mChunkShift = 6;
-	static const unsigned int mChunkMod = (1 << mChunkShift) - 1;
+	static const StackSize mChunkShift = 6;
+	static const StackSize mChunkMod = (1 << mChunkShift) - 1;
 };
 
 } // namespace gnash

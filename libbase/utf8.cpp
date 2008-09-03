@@ -31,7 +31,7 @@ std::wstring
 utf8::decodeCanonicalString(const std::string& str, int version)
 {
 	
-	std::wstring wstr = L"";
+	std::wstring wstr;
 	
 	std::string::const_iterator it = str.begin(), e = str.end();
 	
@@ -65,7 +65,7 @@ std::string
 utf8::encodeCanonicalString(const std::wstring& wstr, int version)
 {
 
-	std::string str = "";
+	std::string str;
 	
 	std::wstring::const_iterator it = wstr.begin();
 	while ( it != wstr.end())
@@ -81,7 +81,7 @@ utf8::encodeCanonicalString(const std::wstring& wstr, int version)
 std::string
 utf8::encodeLatin1Character(boost::uint32_t ucsCharacter)
 {
-	std::string text = "";
+	std::string text;
 	text.push_back(static_cast<unsigned char>(ucsCharacter));
 	return text;
 }
@@ -121,7 +121,7 @@ utf8::decodeNextUnicodeCharacter(std::string::const_iterator& it,
 	if (it == e || *it == 0) return 0;	// End of buffer.  Do not advance.
 
 	// Conventional 7-bit ASCII; return and increment iterator:
-	if ((*it & 0x80) == 0) return (boost::uint32_t) *it++;
+	if ((*it & 0x80) == 0) return static_cast<boost::uint32_t>(*it++);
 
 	// Multi-byte sequences
 	if ((*it & 0xE0) == 0xC0)

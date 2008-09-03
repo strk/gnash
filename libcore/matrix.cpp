@@ -309,6 +309,8 @@ matrix::get_y_scale() const
 double
 matrix::get_rotation() const
 {
+    return atan2(shx, sx); // more successes in misc-ming.all/matrix_test.c
+
     if (determinant() < 0)
     {
         // TODO: check this.

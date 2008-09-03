@@ -47,6 +47,16 @@ throwfunc2 = function()
     catch (g) {};
 };
 
+throwfunc3 = function()
+{
+    try {
+        throw "throw";
+    }
+    finally {
+        return "finally";
+    };
+};
+
 r = "1: ";
 try { r +="try "; r +="body "; }
 catch (a) { r +="catch "; r += a + " "; }
@@ -74,7 +84,7 @@ try {
     try { r += "try "; throw ("thrown"); r += "body "; }
     finally { r += "finally "; };
 }
-catch (c) { r += c + " "; };
+catch (c) { trace (c); r += c + " "; };
 r += ".";
 check_equals(r, "4: try finally thrown .");
 
@@ -154,7 +164,7 @@ catch (m) { r+= "catch " + m; };
 r += ".";
 check_equals(r, "10: catch finally.");
 
-r = "10: ";
+r = "11: ";
 try {
     try { throw "try"; }
     catch (e) { throw "catch"; }
@@ -162,8 +172,40 @@ try {
 }
 catch (m) { r+= "catch " + m; };
 r += ".";
-check_equals(r, "10: catch finally.");
+check_equals(r, "11: catch finally.");
 
-totals();
+throwNoCatchFunc = function()
+{
+    throw "throw";
+    return "return";
+};
+
+r = "12: ";
+try {
+    r += "try ";
+    r += throwNoCatchFunc() + " ";
+}
+catch (n) {
+    r += n + " ";
+}
+finally {
+    r += "finally";
+};
+r += ".";
+xcheck_equals(r, "12: try throw finally.");
+
+
+r = "13: ";
+try {
+  r += "try ";
+  r += throwfunc3();
+} catch (e) {
+  r += " " + e;
+};
+r += ".";
+xcheck_equals(r, "13: try finally.");
+
+
+totals(13);
 
 #endif
