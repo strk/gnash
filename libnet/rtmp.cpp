@@ -413,7 +413,6 @@ RTMP::packetRead(amf::Buffer *buf)
     Network::byte_t *tooFar = ptr+buf->size();
     AMF amf;
     
-//    \003\000\000\017\000\000%G￿%@\024\000\000\000\000\002\000\aconnect\000?%G￿%@\000\000\000\000\000\000\003\000\003app\002\000#software/gnash/tests/1153948634.flv\000\bflashVer\002\000\fLNX 6,0,82,0\000\006swfUrl\002\000\035file:///file|%2Ftmp%2Fout.swf%G￿%@\000\005tcUrl\002\0004rtmp://localhost/software/gnash/tests/1153948634
     amf_index = *buf->reference() & RTMP_INDEX_MASK;
     headersize = headerSize(*buf->reference());
     log_debug (_("The Header size is: %d"), headersize);
@@ -1060,7 +1059,7 @@ RTMP::split(Buffer *buf, size_t chunksize)
 	if (rthead->head_size <= RTMP_MAX_HEADER_SIZE) {
 	    // Any packet with a size greater than 1 is a new header, so create
 	    // a new Buffer to hold all the data.
-	    if ((rthead->head_size > 1)) {
+	    if ((rthead->head_size > 1) || (rthead->type == RTMP::PING)) {
 		// This is a queue of channels with active messages
 		_channels.push_back(&_queues[rthead->channel]);
 // 		cerr << "New packet for channel #" << rthead->channel << " of size "
@@ -1077,7 +1076,7 @@ RTMP::split(Buffer *buf, size_t chunksize)
 		// a single byte header has no length field. As these are often
 		// used as continuation packets, the body size is the same as the
 		// previous header with a length field.
-		if (rthead->head_size > 1) {
+		if ((rthead->head_size > 1) || (rthead->type == RTMP::PING)) {
 		    pktsize = chunk->size();
 		} else {
 		    pktsize = rthead->head_size + rthead->bodysize - chunk->size();
@@ -1097,7 +1096,7 @@ RTMP::split(Buffer *buf, size_t chunksize)
 		// complete all the data up to the body size from the header.
 // 		cerr << _queues[rthead->channel].size() << " messages in queue for channel "
 // 		     << rthead->channel << endl;
-		if (rthead->head_size == 1) {
+		if ((rthead->head_size == 1) && (rthead->type != RTMP::PING) ){
 // 		    cerr << "FOLLOWING PACKET!" << " for channel " << rthead->channel << endl;
 // 		    cerr << "Space Left in buffer for channel " << rthead->channel << " is: "
 // 			 << chunk->spaceLeft() << endl;
