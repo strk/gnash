@@ -63,7 +63,7 @@ const char *astype_str[] = {
 };
 
 Element::Element()
-    : _name(),
+    : _name(0),
       _buffer(0),
       _type(NOTYPE)
 {
@@ -77,17 +77,20 @@ Element::~Element()
     for (size_t i=0; i< _properties.size(); i++) {
 	delete _properties[i];
     }
-    if (_buffer) {
-	delete _buffer;
-    }
-    if (_name) {
-	delete[] _name;
-    }
+    // FIXME: for some odd reason, on rare occasions deleting this buffer
+    // makes valgrind complain. It looks like memory corruption caused by something
+    // else, but neither valgrind nor GDB can find it. We could always not delete
+    // the buffer to keep valgrind happy, but then we leak memory. As the problem
+    // appears to be that _buffer has a bogus address that doesn't match any allocated
+    // Element, we assume this is a bug in our test case, but add comment here to be
+    // paranoid.
+//    delete _buffer;
+    delete[] _name;
 }
 
 
 Element::Element(Network::byte_t *indata) 
-    : _name(),
+    : _name(0),
       _buffer(0),
       _type(NOTYPE)
 {
@@ -96,7 +99,7 @@ Element::Element(Network::byte_t *indata)
 }
 
 Element::Element(double indata)
-    : _name(),
+    : _name(0),
       _buffer(0),
       _type(NOTYPE)
 {
@@ -111,7 +114,7 @@ Element::Element(double indata)
 // }
 
 Element::Element(const string &indata)
-    : _name(),
+    : _name(0),
       _buffer(0),
       _type(NOTYPE)
 {
@@ -120,7 +123,7 @@ Element::Element(const string &indata)
 }
 
 Element::Element(const string &name, const string &indata)
-    : _name(),
+    : _name(0),
       _buffer(0),
       _type(NOTYPE)
 {
@@ -129,7 +132,7 @@ Element::Element(const string &name, const string &indata)
 }
 
 Element::Element(const string &name, bool indata)
-    : _name(),
+    : _name(0),
       _buffer(0),
       _type(NOTYPE)
 {
@@ -138,7 +141,7 @@ Element::Element(const string &name, bool indata)
 }
 
 Element::Element(bool indata)
-    : _name(),
+    : _name(0),
       _buffer(0),
       _type(NOTYPE)
 {
@@ -149,7 +152,7 @@ Element::Element(bool indata)
 // Create a function block for AMF
 Element::Element(bool flag, double unknown1, double unknown2,
 		 const string &methodname)
-    : _name(),
+    : _name(0),
       _buffer(0),
       _type(NOTYPE)
 {
@@ -267,7 +270,9 @@ Element::clear()
 {
 //    GNASH_REPORT_FUNCTION;
 	delete [] _name;
+	_name = 0;
 	delete _buffer;
+	_buffer = 0;
 }
 
 Network::byte_t *
@@ -944,15 +949,9 @@ Element::dump(std::ostream& os) const
       case Element::STRING_AMF0:
 	  os << "(" << getLength() << " bytes): ";
 	  if (getLength() > 0) {
-#ifdef HAVE_STRNDUP
-		char *term = strndup(to_string(), getLength());
-#else
-		char *term = const_cast<char *>(to_string());
-#endif	      
-	      os << "\t\"" << term << "\"" << endl;
-	  } else {
-	      os << endl;
+	      cerr << "\t\"" << to_string() << "\"";
 	  }
+	  cerr << endl;
 	  break;
       case Element::OBJECT_AMF0:
 	  break;

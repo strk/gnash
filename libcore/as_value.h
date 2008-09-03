@@ -26,6 +26,7 @@
 #include "dsodefs.h"
 #include "smart_ptr.h"
 #include "CharacterProxy.h"
+#include "element.h"
 
 #include <cmath>
 #include <limits>
@@ -161,6 +162,10 @@ public:
 	/// Chad: Document this
 	as_value(asNamespace &);
 
+	/// Construct a value from an AMF element
+	as_value(amf::Element &);
+	as_value &operator=(amf::Element &);
+	
 	/// Construct a NULL, OBJECT, MOVIECLIP or AS_FUNCTION value
 	//
 	/// See as_object::to_movie and as_object::to_function
@@ -296,6 +301,14 @@ public:
 	///	for object values. If NULL, valueOf() won't be run.
 	///
 	double	to_number() const;
+
+	/// Get an AMF element representation for this value
+	//
+	/// @param env
+	///	The environment to use for running the valueOf() method
+	///	for object values. If NULL, valueOf() won't be run.
+	///
+	amf::Element *to_element() const;
 
 	/// Conversion to 32bit integer
 	//
@@ -586,8 +599,6 @@ public:
 
 	// Equivalent of ActionSubtract
 	as_value& subtract(const as_value& o);
-
-
 
 	/// Set any object value as reachable (for the GC)
 	//

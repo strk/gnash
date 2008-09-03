@@ -903,7 +903,7 @@ public:
 	void setPropFlags(const as_value& props, int set_false, int set_true);
 
 #ifdef USE_DEBUGGER
-	/// Get the properties of this objects 
+	/// Get the properties of this object
 	PropertyList &get_properties() { return _members; };
 #endif
 

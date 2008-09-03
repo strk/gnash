@@ -20,6 +20,8 @@ AUTOMAKE_OPTIONS = dejagnu
 
 AM_CPPFLAGS = \
         -I$(top_srcdir)/testsuite  \
+        -I$(top_srcdir)/libamf  \
+        -I$(top_srcdir)/libnet  \
         -I$(top_srcdir)/libbase  \
         -I$(top_srcdir)/libcore  \
         -I$(top_srcdir)/libcore/parser  \

@@ -1301,6 +1301,7 @@ esac
 
 AM_CONDITIONAL(LIRC, [test x$lirc_ext = xyes])
 
+AC_CHECK_HEADERS(endian.h)
 AC_CHECK_HEADERS(malloc.h)
 AC_CHECK_HEADERS(getopt.h)
 AC_CHECK_HEADERS(libgen.h)

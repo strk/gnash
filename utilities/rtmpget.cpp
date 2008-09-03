@@ -410,7 +410,7 @@ main(int argc, char *argv[])
 	    if ((ptr->size() >= 0) && (ptr->size() <= 0xffff)) {
 		que->pop_front();	// delete the item from the queue
 		RTMP::rtmp_head_t *rthead = client.decodeHeader(ptr);
-		msg2 = client.processMsg(ptr);
+		msg2 = client.decodeMsgBody(ptr);
 		if (msg2 == 0) {
 //		    log_error("Couldn't process the RTMP message!");
 		    continue;
