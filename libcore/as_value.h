@@ -176,6 +176,25 @@ public:
 	/// Construct a NULL or AS_FUNCTION value
 	as_value(as_function* func);
 
+	/// Read AMF0 data from the given buffer
+	//
+	/// Pass pointer to buffer and pointer to end of buffer. Buffer is raw AMF
+	/// encoded data. Must start with a type byte unless third parameter is set.
+	///
+	/// On success, sets the given as_value and returns true.
+	/// On error (premature end of buffer, etc.) returns false and leaves the given
+	/// as_value untouched.
+	///
+	/// IF you pass a fourth parameter, it WILL NOT READ A TYPE BYTE, but use what
+	/// you passed instead.
+	///
+	/// The l-value you pass as the first parameter (buffer start) is updated to
+	/// point just past the last byte parsed
+	///
+	/// TODO restore first parameter on parse errors
+	///
+	bool readAMF0(boost::uint8_t *&b, boost::uint8_t *end, int inType = -1);
+
 	/// Convert numeric value to string value, following ECMA-262 specification
 	//
 	/// TODO: move here some of the good comments found in the function definition.

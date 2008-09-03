@@ -359,6 +359,12 @@ MediaParser::parserLoop()
 	}
 }
 
+
+void
+MediaParser::processTags(boost::uint64_t /*ts*/, as_object* /*thisPtr*/, VM& /*env*/)
+{
+}
+
 std::ostream& operator << (std::ostream& os, const VideoInfo& vi)
 {
 	os << "codec:" << vi.codec << " (type " << vi.type << ") - "
