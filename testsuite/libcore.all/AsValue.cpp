@@ -232,7 +232,6 @@ test_obj()
             }
         }
     }
-
 }
 
 static void

@@ -636,7 +636,6 @@ RTMPServer::encodePing(rtmp_ping_e type, boost::uint32_t milliseconds)
     ptr += sizeof(boost::uint16_t); // go past the first short
 
     boost::uint32_t swapped = 0;
-//    swapBytes(&typefield, sizeof(boost::uint16_t));
     buf->copy(typefield);
     switch (type) {
         // These two don't appear to have any paramaters
