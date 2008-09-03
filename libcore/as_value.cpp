@@ -32,6 +32,9 @@
 #include "action.h" // for call_method0
 #include "utility.h" // for typeName() and utility::isFinite
 #include "namedStrings.h"
+#include "element.h"
+#include "GnashException.h"
+#include "array.h"
 
 #include <cmath> // std::fmod
 #include <boost/algorithm/string/case_conv.hpp>
@@ -50,7 +53,10 @@
 // Define this macro to make soft references activity verbose
 //#define GNASH_DEBUG_SOFT_REFERENCES
 
+using namespace amf;
+
 namespace {
+
 
 struct invalidHexDigit {};
 boost::uint8_t parseHex(char c)
@@ -618,6 +624,34 @@ as_value::to_number() const
             return NaN; // 0.0;
     }
     /* NOTREACHED */
+}
+
+amf::Element *
+as_value::to_element() const
+{
+    Element *el = new Element;
+    switch (m_type) {
+      case  STRING:
+	  el->makeString(getStr());
+	  break;
+      case NUMBER:
+	  el->makeNumber(getNum());
+	  break;
+      case BOOLEAN:
+	  el->makeBoolean(getBool());
+	  break;
+      case OBJECT:
+	  el->makeObject();
+	  break;
+      case AS_FUNCTION:
+	  break;
+      case MOVIECLIP:
+	  break;
+      default:
+	  break;
+    }
+
+    return el;
 }
 
 // This returns an as_value as an integer. It is
@@ -1650,6 +1684,114 @@ as_value::as_value(as_object* obj)
 /// Chad: Document this
 as_value::as_value(asNamespace &)
 {
+}
+
+/// Instantiate this value from an AMF element 
+as_value::as_value(Element &el)
+{
+    VM& vm = VM::get();
+    int swfVersion = vm.getSWFVersion();
+    string_table& st = vm.getStringTable();
+    
+    switch (el.getType()) {
+      case Element::NULL_AMF0:
+      {
+	  m_type = NULLTYPE;
+	  break;
+      }
+      case Element::UNDEFINED_AMF0:
+      {
+	  m_type = UNDEFINED;
+	  break;
+      }
+      case Element::MOVIECLIP_AMF0:
+      {
+	  m_type = MOVIECLIP;
+	  _value = el.getData();
+	  break;
+      }
+      case Element::NUMBER_AMF0:
+      {
+	  m_type = NUMBER;
+	  _value = el.to_number();
+	  break;
+      }
+      case Element::BOOLEAN_AMF0:
+      {
+	  m_type = BOOLEAN;
+	  bool flag = el.to_bool();
+	  _value = flag ;
+	  break;
+      }
+      case Element::STRING_AMF0:
+      {
+	  m_type = STRING;
+	  std::string str = el.to_string();
+	  _value = str;
+	  break;
+      }
+      case Element::OBJECT_AMF0:
+      {
+ 	  m_type = OBJECT;
+ 	  boost::intrusive_ptr<as_object> obj(new as_object());	
+	  if (el.propertySize()) {
+	      for (size_t i=0; i < el.propertySize(); i++) {
+		  Element *prop = el[i];
+		  if (prop == 0) {
+		      break;
+		  } else {
+//		      obj->set_member(st.string_table::find(prop->getName()), as_value(prop));
+		      obj->set_member(st.string_table::find("foo"), as_value("bar"));
+		      obj->set_member(st.string_table::find("bar"), as_value(1.234));
+		  }
+	      }
+	  }
+	  _value = obj;
+	  break;
+      }
+      case Element::REFERENCE_AMF0:
+      case Element::ECMA_ARRAY_AMF0:
+      case Element::OBJECT_END_AMF0:
+      case Element::STRICT_ARRAY_AMF0:
+      {
+ 	  m_type = OBJECT;
+	  _value = el.getData();
+	  break;
+      }
+      case Element::DATE_AMF0:
+      {
+	  if (swfVersion > 5) {
+	      m_type = STRING;
+	  }
+	  break;
+      }
+      case Element::LONG_STRING_AMF0:
+      {
+	  m_type = STRING;
+	  std::string str = el.to_string();
+	  _value = str;
+	  break;
+      }
+      case Element::UNSUPPORTED_AMF0:
+      case Element::RECORD_SET_AMF0:
+      case Element::XML_OBJECT_AMF0:
+      case Element::TYPED_OBJECT_AMF0:
+	  break;
+      case Element::AMF3_DATA:
+      case Element::NOTYPE:
+	  throw ParserException("No type set for amf0 element");
+	  break;
+      default:
+	  throw ParserException("Unsupported value type");
+	  break;
+    }
+}
+
+as_value &
+as_value::operator=(amf::Element &)
+{
+
+    return *this;
 }
 
 as_value&
