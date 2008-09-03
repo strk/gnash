@@ -907,7 +907,7 @@ edit_text_character::set_member(string_table::key name,
 	case NSV::PROP_uX:
 	{
 		matrix	m = get_matrix();
-        double x =  utility::infinite_to_fzero( val.to_number() );
+        double x =  utility::infinite_to_zero( val.to_number() );
 		m.tx = PIXELS_TO_TWIPS(x);	
 		set_matrix(m); // no need to update caches when only changing translation
 
@@ -917,7 +917,7 @@ edit_text_character::set_member(string_table::key name,
 	case NSV::PROP_uY:
 	{
 		matrix	m = get_matrix();
-        double y =  utility::infinite_to_fzero( val.to_number() );
+        double y =  utility::infinite_to_zero( val.to_number() );
 		m.ty = PIXELS_TO_TWIPS(y);
 		set_matrix(m); // no need to update caches when only changing translation
 

@@ -939,7 +939,7 @@ as_value::equals(const as_value& v) const
     int SWFVersion = VM::get().getSWFVersion();
 
     bool this_nulltype = (m_type == UNDEFINED || m_type == NULLTYPE);
-    bool v_nulltype = (v.get_type() == UNDEFINED || v.get_type() == NULLTYPE);
+    bool v_nulltype = (v.m_type == UNDEFINED || v.m_type == NULLTYPE);
 
     // It seems like functions are considered the same as a NULL type
     // in SWF5 (and I hope below, didn't check)
@@ -1130,7 +1130,7 @@ as_value::string_concat(const std::string& str)
 const char*
 as_value::typeOf() const
 {
-	switch(get_type())
+	switch(m_type)
 	{
 		case as_value::UNDEFINED:
 			return "undefined"; 
