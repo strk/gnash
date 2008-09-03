@@ -116,7 +116,7 @@ main(int argc, char** argv)
 	check_equals(mo, "staticmc._y", "300");
 	check_equals(mo, "Math.round(staticmc._xscale)", "100");
 	check_equals(mo, "Math.round(staticmc._yscale)", "100");
-	check_equals(mo, "Math.round(staticmc._rotation*100)", "4500");
+	check_equals(mo, "staticmc._rotation", "45");
 	check_equals(mo, "printBounds(staticmc.getBounds())", "'-30.05,-30.05 30.05,30.05'");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'7.5,257.5 92.5,342.5'");
 	check_equals(mo, "staticmc._width", "85");
@@ -130,7 +130,7 @@ main(int argc, char** argv)
 	check_equals(mo, "staticmc._y", "300");
 	check_equals(mo, "Math.round(staticmc._xscale)", "200");
 	check_equals(mo, "Math.round(staticmc._yscale)", "300");
-	check_equals(mo, "Math.round(staticmc._rotation*100)", "4500");
+	check_equals(mo, "staticmc._rotation", "45");
 	check_equals(mo, "printBounds(staticmc.getBounds())", "'-30.05,-30.05 30.05,30.05'");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'-56.25,193.75 156.25,406.25'");
 	check_equals(mo, "staticmc._width", "212.5");
@@ -144,7 +144,7 @@ main(int argc, char** argv)
 	check_equals(mo, "staticmc._y", "300");
 	check_equals(mo, "Math.round(staticmc._xscale)", "447");
 	check_equals(mo, "Math.round(staticmc._yscale)", "300");
-	check_equals(mo, "Math.round(staticmc._rotation*1000)", "18435");
+	check_equals(mo, "Math.round(staticmc._rotation*1000)", "18435"); // 18.43469...
 	check_equals(mo, "printBounds(staticmc.getBounds())", "'-30.05,-30.05 30.05,30.05'");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'-141.25,193.75 241.25,406.25'");
 	check_equals(mo, "staticmc._width", "382.5");
@@ -158,7 +158,7 @@ main(int argc, char** argv)
 	check_equals(mo, "staticmc._y", "300");
 	check_equals(mo, "Math.round(staticmc._xscale)", "447");
 	check_equals(mo, "Math.round(staticmc._yscale)", "300");
-	check_equals(mo, "Math.round(staticmc._rotation*1000)", "18435");
+	check_equals(mo, "Math.round(staticmc._rotation*1000)", "18435"); // 18.43469...
 	check_equals(mo, "printBounds(staticmc.getBounds())", "'-30.05,-30.05 30.05,30.05'");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'-141.25,193.75 241.25,406.25'");
 	check_equals(mo, "staticmc._width", "382.5");
@@ -172,7 +172,7 @@ main(int argc, char** argv)
 	check_equals(mo, "staticmc._y", "300");
 	check_equals(mo, "Math.round(staticmc._xscale)", "200");
 	check_equals(mo, "Math.round(staticmc._yscale)", "300");
-	check_equals(mo, "Math.round(staticmc._rotation*1000)", "45000");
+	check_equals(mo, "staticmc._rotation", "45");
 	check_equals(mo, "printBounds(staticmc.getBounds())", "'-30.05,-30.05 30.05,30.05'");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'-56.25,193.75 156.25,406.25'");
 	check_equals(mo, "staticmc._width", "212.5");
@@ -186,7 +186,7 @@ main(int argc, char** argv)
 	check_equals(mo, "staticmc._y", "300");
 	check_equals(mo, "Math.round(staticmc._xscale)", "200");
 	check_equals(mo, "Math.round(staticmc._yscale)", "200");
-	check_equals(mo, "Math.round(staticmc._rotation*1000)", "-135000");
+	check_equals(mo, "staticmc._rotation", "-135");
 	check_equals(mo, "printBounds(staticmc.getBounds())", "'-30.05,-30.05 30.05,30.05'");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'-35,215 135,385'");
 	check_equals(mo, "staticmc._width", "170");
@@ -199,9 +199,9 @@ main(int argc, char** argv)
 
 	check_equals(mo, "staticmc._x", "50");
 	check_equals(mo, "staticmc._y", "300");
-	check_equals(mo, "Math.round(staticmc._xscale)", "100");
-	check_equals(mo, "Math.round(staticmc._yscale)", "224");
-	xcheck_equals(mo, "Math.round(staticmc._rotation*1000)", "135000"); // gnash gives 135001
+	check_equals(mo, "Math.round(staticmc._xscale)", "100"); //  non-rounded value differs with Gnash
+	check_equals(mo, "Math.round(staticmc._yscale)", "224"); //  non-rounded value differs with Gnash
+	check_equals(mo, "Math.round(staticmc._rotation)", "135"); // non-rounded value differs with Gnash
 	check_equals(mo, "printBounds(staticmc.getBounds())", "'-30.05,-30.05 30.05,30.05'");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'-35,257.5 135,342.5'");
 	check_equals(mo, "staticmc._width", "170");
@@ -212,9 +212,9 @@ main(int argc, char** argv)
 
 	check_equals(mo, "staticmc._x", "50");
 	check_equals(mo, "staticmc._y", "300");
-	check_equals(mo, "Math.round(staticmc._xscale)", "100");
-	check_equals(mo, "Math.round(staticmc._yscale)", "100");
-	check_equals(mo, "Math.round(staticmc._rotation*1000)", "0");
+	check_equals(mo, "staticmc._xscale", "100");
+	check_equals(mo, "staticmc._yscale", "100");
+	check_equals(mo, "staticmc._rotation", "0");
 	check_equals(mo, "printBounds(staticmc.getBounds())", "'-30.05,-30.05 30.05,30.05'");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'19.95,269.95 80.05,330.05'");
 	check_equals(mo, "staticmc._width", "60.1");
@@ -225,9 +225,9 @@ main(int argc, char** argv)
 
 	check_equals(mo, "staticmc._x", "50");
 	check_equals(mo, "staticmc._y", "300");
-	check_equals(mo, "Math.round(staticmc._xscale)", "100");
-	check_equals(mo, "Math.round(staticmc._yscale)", "100");
-	check_equals(mo, "Math.round(staticmc._rotation*1000)", "180000"); // x scale -1 gets interpreted as a 180 degree rotation
+	check_equals(mo, "staticmc._xscale", "100");
+	check_equals(mo, "staticmc._yscale", "100");
+	check_equals(mo, "staticmc._rotation", "180"); // x scale -1 gets interpreted as a 180 degree rotation
 	check_equals(mo, "printBounds(staticmc.getBounds())", "'-30.05,-30.05 30.05,30.05'");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'19.95,269.95 80.05,330.05'");
 	check_equals(mo, "staticmc._width", "60.1");
@@ -238,9 +238,22 @@ main(int argc, char** argv)
 
 	check_equals(mo, "staticmc._x", "50");
 	check_equals(mo, "staticmc._y", "300");
-	check_equals(mo, "Math.round(staticmc._xscale)", "100");
-	check_equals(mo, "Math.round(staticmc._yscale)", "100");
-	check_equals(mo, "Math.round(staticmc._rotation*1000)", "0"); 
+	check_equals(mo, "staticmc._xscale", "100");
+	check_equals(mo, "staticmc._yscale", "100");
+	check_equals(mo, "staticmc._rotation", "0"); 
+	check_equals(mo, "printBounds(staticmc.getBounds())", "'-30.05,-30.05 30.05,30.05'");
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'19.95,269.95 80.05,330.05'");
+	check_equals(mo, "staticmc._width", "60.1");
+	check_equals(mo, "staticmc._height", "60.1");
+
+	SWFMovie_nextFrame(mo);        
+	SWFDisplayItem_setMatrix(it, -1, 0, 0, -1, 50, 300); // negative x and y scales
+
+	check_equals(mo, "staticmc._x", "50");
+	check_equals(mo, "staticmc._y", "300");
+	check_equals(mo, "staticmc._xscale", "100");
+	check_equals(mo, "staticmc._yscale", "100");
+	check_equals(mo, "staticmc._rotation", "180"); 
 	check_equals(mo, "printBounds(staticmc.getBounds())", "'-30.05,-30.05 30.05,30.05'");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'19.95,269.95 80.05,330.05'");
 	check_equals(mo, "staticmc._width", "60.1");
@@ -253,7 +266,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);
 
-	add_actions(mo, "_root.totals(98); stop();");
+	add_actions(mo, "_root.totals(107); stop();");
 	SWFMovie_nextFrame(mo);        
 
 	//Output movie
