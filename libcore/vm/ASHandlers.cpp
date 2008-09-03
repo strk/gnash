@@ -56,7 +56,6 @@
 #include <string>
 #include <vector>
 #include <locale>
-#include <cerrno>
 #include <cstdlib> // std::mbstowcs
 #include <boost/scoped_array.hpp>
 #include <boost/random.hpp>
@@ -2796,7 +2795,7 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
 
     std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
     args->reserve(nargs);
-    for (int i=0; i<nargs; ++i) args->push_back(env.pop()); 
+    for (size_t i=0; i<nargs; ++i) args->push_back(env.pop()); 
 
     //log_debug("ActionCallFunction calling call_method with %p as this_ptr", this_ptr);
     as_value result = call_method(function, &env, this_ptr,
@@ -3452,7 +3451,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 
     std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
     args->reserve(nargs);
-    for (int i=0; i<nargs; ++i) args->push_back(env.pop()); 
+    for (size_t i=0; i<nargs; ++i) args->push_back(env.pop()); 
 
     as_value result = call_method(method_val, &env, this_ptr, 
             args, super);
