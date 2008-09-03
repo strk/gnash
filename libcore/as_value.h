@@ -603,13 +603,6 @@ private:
 	///
 	bool equalsSameType(const as_value& v) const;
 
-	// TODO: make private. The rationale is that callers of this functions
-	//       should use is_WHAT() instead, or changes in the available
-	//       primitive value types will require modifications in all callers.
-	//       This happened when adding MOVIECLIP.
-	//
-	type get_type() const { return m_type; }
-
 	type m_type;
 
 	typedef sprite_instance* SpritePtr;
