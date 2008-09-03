@@ -25,14 +25,14 @@
 #include <string>
 #include <iostream>
 #include <sstream>
-#include <signal.h>
+#include <csignal>
 #include <vector>
 #include <sys/mman.h>
 #include <cerrno>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <gettext.h>
+#include "gettext.h"
 
 // classes internal to Gnash
 #include "gnash.h"
@@ -452,7 +452,7 @@ main(int argc, char *argv[])
 #if 0
     // Write the packet to disk so we can anaylze it with other tools
     int fd = open("outbuf.raw",O_WRONLY|O_CREAT, S_IRWXU);
-    if (fd == -1) {
+    if (fd < 0) {
         perror("open");
     }
     cout << "Writing packet to disk: \"outbuf.raw\"" << endl;
