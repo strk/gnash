@@ -123,7 +123,7 @@ test_el()
     
     Element el1;
     el1.makeNumber(1.234);
-    as_value as1(&el1);
+    as_value as1(el1);
     if (as1.to_number() == el1.to_number()) {
         runtest.pass("as_value(Element &number)");
     } else {
@@ -235,7 +235,7 @@ test_obj()
         }
     }
 
-    Element *el1 = as1.to_element();
+    std::auto_ptr<Element> el1 = as1.to_element();
     Element *fooel = el1->getProperty(0);
     Element *barel = el1->getProperty(1);
     if ((el1->getType() == Element::OBJECT_AMF0)

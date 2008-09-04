@@ -28,8 +28,13 @@
 
 #include "dsodefs.h" //DSOEXPORT
 #include "network.h"
-#include "element.h"
+//#include "element.h"
 #include "amf.h"
+
+// Forward declarations
+namespace amf {
+	class Element;
+}
 
 // It comprises of a magic number, followed by the file length, a
 // filetype, which appears to always be "TCSO", and what appears to be
@@ -48,7 +53,7 @@ class DSOEXPORT SOL {
 public:
     SOL();
     ~SOL();
-    size_t size() { return _amfobjs.size(); };
+    size_t size() const { return _amfobjs.size(); };
     
     // extract the header
     bool extractHeader(const std::vector<gnash::Network::byte_t> &data);

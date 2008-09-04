@@ -59,7 +59,6 @@
 // Define this macto to make AMF parsing verbose
 //#define GNASH_DEBUG_AMF_PARSING
 
-using namespace amf;
 using namespace std;
 
 namespace {
@@ -98,10 +97,10 @@ namespace gnash {
 // This class is used to iterate through all the properties of an AS object,
 // so we can change them to children of an AMF0 element.
 class PropsSerializer {
-    Element& _obj;
+    amf::Element& _obj;
     string_table& _st;
 public:
-    PropsSerializer(Element& el, VM& vm)
+    PropsSerializer(amf::Element& el, VM& vm)
         : _obj(el),
 	  _st(vm.getStringTable())
 	{};
@@ -109,8 +108,8 @@ public:
     void operator() (string_table::key key, const as_value& val) const
         {
             //GNASH_REPORT_FUNCTION;
-            AMF amf;
-            Element *el = 0;
+            amf::AMF amf;
+            amf::Element *el = 0;
 	    
             const string& name = _st.string_table::value(key);
 	    
@@ -674,12 +673,12 @@ as_value::to_number() const
     /* NOTREACHED */
 }
 
-amf::Element *
+std::auto_ptr<amf::Element>
 as_value::to_element() const
 {
     VM& vm = VM::get();
     int swfVersion = vm.getSWFVersion();
-    Element *el = new Element;
+    std::auto_ptr<amf::Element> el ( new amf::Element );
     boost::intrusive_ptr<as_object> ptr = to_object();
 
     switch (m_type) {
@@ -701,9 +700,11 @@ as_value::to_element() const
       }
       case AS_FUNCTION:
 	  log_unimpl("Converting an AS function to an element is not supported");
+          // TODO: what kind of Element will be left with ? Should we throw an exception ?
 	  break;
       case MOVIECLIP:
 	  log_unimpl("Converting a Movie Clip to an element is not supported");
+          // TODO: what kind of Element will be left with ? Should we throw an exception ?
 	  break;
       default:
 	  break;
@@ -1748,112 +1749,106 @@ as_value::as_value(asNamespace &)
 }
 
 /// Instantiate this value from an AMF element 
-as_value::as_value(Element *el)
+as_value::as_value(const amf::Element& el)
 {
     VM& vm = VM::get();
     int swfVersion = vm.getSWFVersion();
     string_table& st = vm.getStringTable();
     
-    switch (el->getType()) {
-      case Element::NULL_AMF0:
+    switch (el.getType()) {
+      case amf::Element::NULL_AMF0:
       {
 	  m_type = NULLTYPE;
 	  break;
       }
-      case Element::UNDEFINED_AMF0:
+      case amf::Element::UNDEFINED_AMF0:
       {
 	  m_type = UNDEFINED;
 	  break;
       }
-      case Element::MOVIECLIP_AMF0:
+      case amf::Element::MOVIECLIP_AMF0:
       {
 	  m_type = MOVIECLIP;
-	  _value = el->getData();
+	  _value = el.getData();
 	  break;
       }
-      case Element::NUMBER_AMF0:
+      case amf::Element::NUMBER_AMF0:
       {
 	  m_type = NUMBER;
-	  _value = el->to_number();
+	  _value = el.to_number();
 	  break;
       }
-      case Element::BOOLEAN_AMF0:
+      case amf::Element::BOOLEAN_AMF0:
       {
 	  m_type = BOOLEAN;
-	  bool flag = el->to_bool();
+	  bool flag = el.to_bool();
 	  _value = flag ;
 	  break;
       }
-      case Element::STRING_AMF0:
+      case amf::Element::STRING_AMF0:
       {
 	  m_type = STRING;
-	  std::string str = el->to_string();
+	  std::string str = el.to_string();
 	  _value = str;
 	  break;
       }
-      case Element::OBJECT_AMF0:
-      case Element::REFERENCE_AMF0:
-      case Element::ECMA_ARRAY_AMF0:
-      case Element::OBJECT_END_AMF0:
-      case Element::STRICT_ARRAY_AMF0:
+      case amf::Element::OBJECT_AMF0:
+      case amf::Element::REFERENCE_AMF0:
+      case amf::Element::ECMA_ARRAY_AMF0:
+      case amf::Element::OBJECT_END_AMF0:
+      case amf::Element::STRICT_ARRAY_AMF0:
       {
  	  m_type = OBJECT;
  	  boost::intrusive_ptr<as_object> obj(new as_object());	
-	  if (el->propertySize()) {
-	      for (size_t i=0; i < el->propertySize(); i++) {
-		  Element *prop = el->getProperty(i);
+	  if (el.propertySize()) {
+	      for (size_t i=0; i < el.propertySize(); i++) {
+		  const amf::Element *prop = el.getProperty(i);
 		  if (prop == 0) {
 		      break;
 		  } else {
-		      obj->set_member(st.string_table::find(prop->getName()), as_value(prop));
+		      obj->set_member(st.string_table::find(prop->getName()), as_value(*prop));
 		  }
 	      }
 	  }
 	  _value = obj;
       }
       break;
-      case Element::DATE_AMF0:
+      case amf::Element::DATE_AMF0:
       {
 	  if (swfVersion > 5) {
 	      m_type = STRING;
 	  }
 	  break;
       }
-      case Element::LONG_STRING_AMF0:
+      case amf::Element::LONG_STRING_AMF0:
       {
 	  m_type = STRING;
-	  std::string str = el->to_string();
+	  std::string str = el.to_string();
 	  _value = str;
 	  break;
       }
-      case Element::UNSUPPORTED_AMF0:
+      case amf::Element::UNSUPPORTED_AMF0:
 	  log_unimpl("Unsupported data type is not supported yet");
 	  break;
-      case Element::RECORD_SET_AMF0:
+      case amf::Element::RECORD_SET_AMF0:
 	  log_unimpl("Record Set data type is not supported yet");
 	  break;
-      case Element::XML_OBJECT_AMF0:
+      case amf::Element::XML_OBJECT_AMF0:
 	  log_unimpl("XML data type is not supported yet");
 	  break;
-      case Element::TYPED_OBJECT_AMF0:
+      case amf::Element::TYPED_OBJECT_AMF0:
 	  log_unimpl("Typed Object data type is not supported yet");
 	  break;
-      case Element::AMF3_DATA:
+      case amf::Element::AMF3_DATA:
 	  log_unimpl("AMF3 data type is not supported yet");
 	  break;
-      case Element::NOTYPE:
+      case amf::Element::NOTYPE:
 	  throw ParserException("No type set for amf0 element");
 	  break;
       default:
 	  throw ParserException("Unsupported value type");
 	  break;
     }
-}
-
-as_value &
-as_value::operator=(amf::Element *el)
-{
-//    as_value(el);
 }
 
 as_value&
@@ -2023,7 +2018,7 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 				return false;
 			}
 			dub = *(reinterpret_cast<double*>(b)); b += 8;
-			swapBytes(&dub, 8);
+			amf::swapBytes(&dub, 8);
 #ifdef GNASH_DEBUG_AMF_PARSING
 			log_debug("amf0 read double: %e", dub);
 #endif
