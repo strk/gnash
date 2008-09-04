@@ -470,7 +470,7 @@ sound_attachsound(const fn_call& fn)
 	}
 
 	// sanity check
-	assert(si >= 0 && si < 1000);
+	assert(si >= 0);
 	so->attachSound(si, name);
 	return as_value();
 }
