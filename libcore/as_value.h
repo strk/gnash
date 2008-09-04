@@ -169,8 +169,7 @@ public:
 	as_value(asNamespace &);
 
 	/// Construct a value from an AMF element
-	as_value(amf::Element *el);
-	as_value &operator=(amf::Element *el);
+	as_value(const amf::Element& el);
 	
 	/// Construct a NULL, OBJECT, MOVIECLIP or AS_FUNCTION value
 	//
@@ -309,12 +308,7 @@ public:
 	double	to_number() const;
 
 	/// Get an AMF element representation for this value
-	//
-	/// @param env
-	///	The environment to use for running the valueOf() method
-	///	for object values. If NULL, valueOf() won't be run.
-	///
-	amf::Element *to_element() const;
+	std::auto_ptr<amf::Element> to_element() const;
 
 	/// Conversion to 32bit integer
 	//

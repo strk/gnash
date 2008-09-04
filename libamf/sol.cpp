@@ -30,6 +30,7 @@
 #include <cassert>
 
 #include "network.h"
+#include "element.h"
 #include "amf.h"
 #include "buffer.h"
 #include "sol.h"

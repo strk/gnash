@@ -174,12 +174,12 @@ public:
     
     Element *operator[](size_t x);
 
-    gnash::Network::byte_t *getData();
+    gnash::Network::byte_t *getData() const;
     size_t getLength() const;
     Buffer *getBuffer() { return _buffer; };
     
     // These are all accessors for the various output formats
-    amf0_type_e getType() { return _type; };
+    amf0_type_e getType() const { return _type; };
     void setType(amf0_type_e x) { _type = x; };
 //    void setData(Buffer *buf) { _buffer = buf; };
 
@@ -197,12 +197,12 @@ public:
 
     // Manipulate the children Elements of an object
     Element *findProperty(const std::string &name);
-    Element *getProperty(size_t x) { return _properties[x]; };
+    Element *getProperty(size_t x) const { return _properties[x]; };
     
     void addProperty(Element &el) { _properties.push_back(&el); };
     void addProperty(Element *el) { _properties.push_back(el); };
     Element *popProperty()        { return _properties.front(); };
-    size_t propertySize()         { return _properties.size(); };
+    size_t propertySize() const   { return _properties.size(); };
     amf::Buffer *encode();
     std::vector<Element *> getProperties() { return _properties; };
     void dump() const { dump(std::cerr); }
