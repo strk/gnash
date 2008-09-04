@@ -129,13 +129,7 @@ test_el()
     } else {
         runtest.fail("as_value(Element &number)");
     }
-//     Element el11 = as1.to_element();
-//     if (el11.to_number() == as1.to_number()) {
-//         runtest.pass("as_value::to_element(number)");
-//     } else {
-//         runtest.fail("as_value::to_element(number)");
-//     }
-    
+
     Element el2;
     el2.makeString("Hello World");
     as_value as2(&el2);
@@ -223,14 +217,14 @@ test_obj()
             ao1.get()->get_member(st.find(PROPNAME("foo")), &fooas);
             ao1.get()->get_member(st.find(PROPNAME("bar")), &baras);
             if ((fooas.is_string()) && (fooas.to_string() == foo->to_string())) {
-                runtest.pass("as_value(Element &->prop1)");
+                runtest.pass("as_value(Element prop1)");
             } else {
-                runtest.fail("as_value(Element &->prop1)");
+                runtest.fail("as_value(Element prop1)");
             }
             if ((baras.is_number()) && (baras.to_number() == bar->to_number())) {
-                runtest.pass("as_value(Element &->prop2)");
+                runtest.pass("as_value(Element prop2)");
             } else {
-                runtest.fail("as_value(Element &->prop2)");
+                runtest.fail("as_value(Element prop2)");
             }
         }
     }
@@ -250,7 +244,7 @@ test_obj()
     } else {
         runtest.fail("as_value::to_element()");
     }
-    
+    delete el1;
 }
 
 void
