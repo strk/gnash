@@ -234,6 +234,23 @@ test_obj()
             }
         }
     }
+
+    Element *el1 = as1.to_element();
+    Element *fooel = el1->getProperty(0);
+    Element *barel = el1->getProperty(1);
+    if ((el1->getType() == Element::OBJECT_AMF0)
+        && (fooel->getType() == Element::STRING_AMF0)
+        && (strcmp(fooel->getName(), "foo") == 0)
+        && (strcmp(fooel->to_string(), "bar") == 0)
+        && (barel->getType() == Element::NUMBER_AMF0)
+        && (strcmp(barel->getName(), "bar") == 0)
+        && (barel->to_number() == 1.234)
+        ) {
+        runtest.pass("as_value::to_element()");
+    } else {
+        runtest.fail("as_value::to_element()");
+    }
+    
 }
 
 void

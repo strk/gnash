@@ -700,8 +700,10 @@ as_value::to_element() const
 	  break;
       }
       case AS_FUNCTION:
+	  log_unimpl("Converting an AS function to an element is not supported");
 	  break;
       case MOVIECLIP:
+	  log_unimpl("Converting a Movie Clip to an element is not supported");
 	  break;
       default:
 	  break;
