@@ -924,7 +924,7 @@ private:
     float       m_timer;
     int         m_mouse_x, m_mouse_y, m_mouse_buttons;
 
-    mouse_button_state  m_mouse_button_state;
+    MouseButtonState  m_mouse_button_state;
 
     typedef std::map<int, Timer*> TimerMap;
 
@@ -970,6 +970,8 @@ private:
     /// more info.
     ///
     bool fire_mouse_event();
+
+    bool generate_mouse_button_events();
 
     /// \brief
     /// Return the topmost entity covering the given point
