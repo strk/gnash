@@ -46,7 +46,7 @@ sprite_definition::create_character_instance(character* parent,
 	log_debug(_("Instantiating sprite_def %p"), (void*)this);
 #endif
 	sprite_instance* si = new sprite_instance(this,
-		parent->get_root(), parent, id);
+	parent->get_root(), parent, id);
 	return si;
 }
 
@@ -59,9 +59,9 @@ sprite_definition::~sprite_definition()
 
 		for (PlayList::iterator j=pl.begin(), je=pl.end(); j!=je; ++j)
 		{
-                    delete *j;
-                }
+            delete *j;
         }
+    }
 }
 
 /*private*/
@@ -168,12 +168,9 @@ sprite_definition::read(SWFStream& in)
 void
 sprite_definition::add_frame_name(const std::string& name)
 {
-	//log_debug(_("labelframe: frame %d, name %s"), m_loading_frame, name);
 
     // It's fine for loaded frames to exceed frame count. Should be
     // adjusted at the end of parsing.
-    //
-	//assert(m_loading_frame < m_frame_count);
     _namedFrames.insert(std::make_pair(name, m_loading_frame));
 }
 
