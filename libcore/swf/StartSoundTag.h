@@ -110,7 +110,7 @@ public:
 	void	execute(sprite_instance* /* m */, DisplayList& /* dlist */) const;
 
 	/// Load a SWF::STARTSOUND tag.
-	static void loader(SWFStream& in, tag_type tag, movie_definition* m);
+	static void loader(SWFStream& in, tag_type tag, movie_definition& m);
 
 };
 

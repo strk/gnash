@@ -61,7 +61,7 @@ public:
 	character* create_character_instance(character* parent, int id);
 
 	/// Initialize from SWF input stream (tag 37)
-	void read(SWFStream& in, int tag_type, movie_definition* m);
+	void read(SWFStream& in, int tag_type, movie_definition& m);
 
 	/// Return a reference to the default text associated
 	/// with this EditText definition.
