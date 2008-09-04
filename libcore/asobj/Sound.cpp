@@ -105,23 +105,13 @@ Sound::getBytesTotal()
 void
 Sound::getPan()
 {
-	static bool warned = false;
-	if ( ! warned )
-	{
-		log_unimpl (__FUNCTION__);
-		warned = true;
-	}
+	LOG_ONCE(log_unimpl(__FUNCTION__));
 }
 
 void
 Sound::getTransform()
 {
-	static bool warned = false;
-	if ( ! warned )
-	{
-		log_unimpl (__FUNCTION__);
-		warned = true;
-	}
+	LOG_ONCE(log_unimpl(__FUNCTION__));
 }
 
 bool
@@ -184,23 +174,13 @@ Sound::loadSound(const std::string& file, bool /*streaming*/)
 void
 Sound::setPan()
 {
-	static bool warned = false;
-	if ( ! warned )
-	{
-		log_unimpl (__FUNCTION__);
-		warned = true;
-	}
+	LOG_ONCE(log_unimpl(__FUNCTION__));
 }
 
 void
 Sound::setTransform()
 {
-	static bool warned = false;
-	if ( ! warned )
-	{
-		log_unimpl (__FUNCTION__);
-		warned = true;
-	}
+	LOG_ONCE(log_unimpl(__FUNCTION__));
 }
 
 void
@@ -274,7 +254,8 @@ Sound::stop(int si)
 	{
 	    if (si > -1) {
 			_soundHandler->stop_sound(soundId);
-		} else {
+		}
+		else {
 			_soundHandler->stop_sound(si);
 		}
 	}
@@ -283,24 +264,14 @@ Sound::stop(int si)
 unsigned int
 Sound::getDuration()
 {
-	static bool warned = false;
-	if ( ! warned )
-	{
-		log_error(_("%s: only works when ffmpeg, gstreamer or libmad is enabled"), __FUNCTION__);
-		warned = true;
-	}
+    LOG_ONCE(log_error(_("%s: only works when a media handler is enabled"), __FUNCTION__));
 	return 0;
 }
 
 unsigned int
 Sound::getPosition()
 {
-	static bool warned = false;
-	if ( ! warned )
-	{
-		log_error(_("%s: only works when ffmpeg, gstreamer or libmad is enabled"), __FUNCTION__);
-		warned = true;
-	}
+    LOG_ONCE(log_error(_("%s: only works when a media handler is enabled"), __FUNCTION__));
 	return 0;
 }
 
