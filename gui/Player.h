@@ -16,8 +16,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-#ifndef _PLAYER_H_
-#define _PLAYER_H_
+#ifndef GNASH_PLAYER_H
+#define GNASH_PLAYER_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
