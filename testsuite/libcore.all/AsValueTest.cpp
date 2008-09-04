@@ -244,7 +244,8 @@ test_obj()
     } else {
         runtest.fail("as_value::to_element()");
     }
-    delete el1;
+    delete foo;
+    delete bar;
 }
 
 void
