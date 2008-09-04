@@ -540,15 +540,15 @@ PlaceObject2Tag::~PlaceObject2Tag()
 
 /* public static */
 void
-PlaceObject2Tag::loader(SWFStream& in, tag_type tag, movie_definition* m)
+PlaceObject2Tag::loader(SWFStream& in, tag_type tag, movie_definition& m)
 {
     assert(tag == SWF::PLACEOBJECT || tag == SWF::PLACEOBJECT2 || tag == SWF::PLACEOBJECT3);
 
     // TODO: who owns and is going to remove this tag ?
-    PlaceObject2Tag* ch = new PlaceObject2Tag(*m);
+    PlaceObject2Tag* ch = new PlaceObject2Tag(m);
     ch->read(in, tag);
 
-    m->addControlTag(ch);
+    m.addControlTag(ch);
 }
 
 } // namespace gnash::SWF

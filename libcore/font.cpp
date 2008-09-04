@@ -129,7 +129,7 @@ GlyphInfo::markReachableResources() const
 	}
 
 
-	void	font::read(SWFStream& in, SWF::tag_type tag, movie_definition* m)
+	void	font::read(SWFStream& in, SWF::tag_type tag, movie_definition& m)
 	{
 		if (tag == SWF::DEFINEFONT)
 		{
@@ -154,7 +154,7 @@ GlyphInfo::markReachableResources() const
 	}
 
 	// Read a DefineFont tag
-	void font::readDefineFont(SWFStream& in, movie_definition* m)
+	void font::readDefineFont(SWFStream& in, movie_definition& m)
 	{
 		IF_VERBOSE_PARSE (
 		log_parse(_("reading DefineFont"));
@@ -213,7 +213,7 @@ GlyphInfo::markReachableResources() const
 	}
 
 	// Read a DefineFont2 or DefineFont3 tag
-	void font::readDefineFont2_or_3(SWFStream& in, movie_definition* m)
+	void font::readDefineFont2_or_3(SWFStream& in, movie_definition& m)
 	{
 		IF_VERBOSE_PARSE (
 		log_parse(_("reading DefineFont2 or DefineFont3"));
@@ -398,7 +398,7 @@ GlyphInfo::markReachableResources() const
 
         // Read the font name, display and legal, from a DefineFontName tag.
         void font::read_font_name(SWFStream& in, SWF::tag_type tag,
-            movie_definition* /*m*/) 
+            movie_definition& /*m*/) 
         {
             assert(tag == SWF::DEFINEFONTNAME);
             in.read_string(m_display_name);
@@ -409,7 +409,7 @@ GlyphInfo::markReachableResources() const
 	// DefineFontInfo tag.  The caller has already read the tag
 	// type and font id.
 	void	font::read_font_info(SWFStream& in, SWF::tag_type tag,
-			movie_definition* /*m*/)
+			movie_definition& /*m*/)
 	{
 		assert(tag == SWF::DEFINEFONTINFO || tag == SWF::DEFINEFONTINFO2); 
 

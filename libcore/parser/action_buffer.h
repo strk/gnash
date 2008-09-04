@@ -252,7 +252,7 @@ private:
 	// internal pointers and cannot be moved or copied.
 	// If you need to keep an array of them, keep pointers
 	// to new'd instances.
-	action_buffer(const action_buffer& a) : _src(a._src) { abort(); }
+	action_buffer(const action_buffer& a);
 
 	/// the code itself, as read from the SWF
 	std::vector<boost::uint8_t> m_buffer;

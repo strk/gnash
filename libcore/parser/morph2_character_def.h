@@ -43,7 +43,7 @@ namespace gnash {
 		///	Must be not-null or would segfault. 
 		///	TODO: take by reference !
 		///
-		void	read(SWFStream& in, int tag_type, bool with_style, movie_definition* m);
+		void	read(SWFStream& in, int tag_type, bool with_style, movie_definition& m);
 
 		virtual void	display(character* inst);
 		void lerp_matrix(matrix& t, const matrix& m1, const matrix& m2, const float ratio);

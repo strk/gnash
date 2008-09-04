@@ -29,7 +29,7 @@ namespace SWF {
 
 /* public static */
 void
-StartSoundTag::loader(SWFStream& in, tag_type tag, movie_definition* m)
+StartSoundTag::loader(SWFStream& in, tag_type tag, movie_definition& m)
 {
     assert(tag == SWF::STARTSOUND); // 15 
 
@@ -40,7 +40,7 @@ StartSoundTag::loader(SWFStream& in, tag_type tag, movie_definition* m)
 
     int sound_id = in.read_u16();
 
-    sound_sample* sam = m->get_sound_sample(sound_id);
+    sound_sample* sam = m.get_sound_sample(sound_id);
     if ( ! sam ) // invalid id... nothing to do
     {
         IF_VERBOSE_MALFORMED_SWF(
@@ -64,7 +64,7 @@ StartSoundTag::loader(SWFStream& in, tag_type tag, movie_definition* m)
               sound_id, int(sst->m_stop_playback), sst->m_loop_count);
     );
 
-    m->addControlTag(sst); // takes ownership
+    m.addControlTag(sst); // takes ownership
 }
 
 /* private */

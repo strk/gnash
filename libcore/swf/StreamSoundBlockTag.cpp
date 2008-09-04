@@ -45,7 +45,7 @@ StreamSoundBlockTag::execute(sprite_instance* m, DisplayList& /*dlist*/) const
 
 /* public static */
 void
-StreamSoundBlockTag::loader(SWFStream& in, tag_type tag, movie_definition* m)
+StreamSoundBlockTag::loader(SWFStream& in, tag_type tag, movie_definition& m)
 {
     assert(tag == SWF::SOUNDSTREAMBLOCK); // 19
 
@@ -59,7 +59,7 @@ StreamSoundBlockTag::loader(SWFStream& in, tag_type tag, movie_definition* m)
     }
 
     // Get the ID of the sound stream currently being loaded
-    int handle_id = m->get_loading_sound_stream_id();
+    int handle_id = m.get_loading_sound_stream_id();
 
     // Get the SoundInfo object that contains info about the sound stream.
     // Ownership of the object is in the soundhandler
@@ -114,7 +114,7 @@ StreamSoundBlockTag::loader(SWFStream& in, tag_type tag, movie_definition* m)
     // TODO: log_parse ?
 
     StreamSoundBlockTag* ssst = new StreamSoundBlockTag(handle_id, start);
-    m->addControlTag(ssst); // ownership is transferred to movie_definition
+    m.addControlTag(ssst); // ownership is transferred to movie_definition
 }
 
 } // namespace gnash::SWF

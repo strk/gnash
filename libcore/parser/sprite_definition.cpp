@@ -135,7 +135,7 @@ sprite_definition::read(SWFStream& in)
 		{
 		    // call the tag loader.  The tag loader should add
 		    // characters or tags to the movie data structure.
-		    (*lf)(in, tag_type, this);
+		    (*lf)(in, tag_type, *this);
 		}
 		else
 		{
@@ -186,7 +186,7 @@ sprite_definition::get_labeled_frame(const std::string& label, size_t& frame_num
     return true;
 }
 
-sprite_definition::sprite_definition(movie_definition* m, SWFStream& in)
+sprite_definition::sprite_definition(movie_definition& m, SWFStream& in)
 	:
 	// FIXME: use a class-static TagLoadersTable for sprite_definition
 	_tag_loaders(SWF::TagLoadersTable::getInstance()),
@@ -196,12 +196,10 @@ sprite_definition::sprite_definition(movie_definition* m, SWFStream& in)
 	registeredClass(0),
 	_loadingSoundStream(-1)
 {
-	assert(m_movie_def);
-
 	read(in);
 }
 
-sprite_definition::sprite_definition(movie_definition* m)
+sprite_definition::sprite_definition(movie_definition& m)
 	:
 	// FIXME: use a class-static TagLoadersTable for sprite_definition
 	_tag_loaders(SWF::TagLoadersTable::getInstance()),
@@ -211,7 +209,6 @@ sprite_definition::sprite_definition(movie_definition* m)
 	registeredClass(0),
 	_loadingSoundStream(-1)
 {
-	assert(m_movie_def);
 }
 
 

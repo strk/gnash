@@ -33,7 +33,7 @@ namespace SWF {
 /// movie_root is overridden.
 namespace ScriptLimitsTag
 {
-    void loader(SWFStream& in, tag_type tag, movie_definition* /*m*/)
+    void loader(SWFStream& in, tag_type tag, movie_definition& /*m*/)
     {
 
         assert(VM::isInitialized());
