@@ -90,8 +90,8 @@ movie_root::testInvariant() const
 
 movie_root::movie_root()
 	:
-	interfaceHandle(0),
-	fsCommandHandle(0),
+	_interfaceHandler(0),
+	_fsCommandHandler(0),
 	m_viewport_x0(0),
 	m_viewport_y0(0),
 	m_viewport_width(1),
@@ -1436,7 +1436,7 @@ void
 movie_root::setStageAlignment(short s)
 {
     _alignMode = s;
-    if (interfaceHandle) (*interfaceHandle)("Stage.align", "");
+    callInterface("Stage.align", "");
 }
 
 /// Returns a pair of enum values giving the actual alignment
@@ -1497,7 +1497,7 @@ movie_root::setStageScaleMode(ScaleMode sm)
     }
 
     _scaleMode = sm;
-    if (interfaceHandle) (*interfaceHandle)("Stage.align", "");    
+    callInterface("Stage.align", "");    
 
     if ( notifyResize )
     {
@@ -1514,15 +1514,15 @@ movie_root::setStageDisplayState(const DisplayState ds)
     boost::intrusive_ptr<Stage> stage = getStageObject();
     if ( stage ) stage->notifyFullScreen( (_displayState == fullScreen) );
 
-	if (!movie_root::interfaceHandle) return; // No registered callback
+	if (!_interfaceHandler) return; // No registered callback
 	
 	if (_displayState == fullScreen)
 	{
-	    (*movie_root::interfaceHandle)("Stage.displayState", "fullScreen");
+	    callInterface("Stage.displayState", "fullScreen");
 	}
 	else if (_displayState == normal)
 	{
-	    (*movie_root::interfaceHandle)("Stage.displayState", "normal");
+	    callInterface("Stage.displayState", "normal");
 	}   
 }
 
@@ -2260,6 +2260,22 @@ movie_root::getMovieInfo(tree<StringPair>& tr, tree<StringPair>::iterator it)
 
 }
 #endif
+
+void
+movie_root::handleFsCommand(const std::string& cmd, const std::string& arg) const
+{
+	if ( _fsCommandHandler ) _fsCommandHandler->notify(cmd, arg);
+}
+
+std::string
+movie_root::callInterface(const std::string& cmd, const std::string& arg) const
+{
+	if ( _interfaceHandler ) return _interfaceHandler->call(cmd, arg);
+
+	log_error("Hosting application registered no callback for events/queries");
+
+	return "<no iface to hosting app>";
+}
 
 } // namespace gnash
 

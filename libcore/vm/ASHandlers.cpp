@@ -2195,14 +2195,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
     StringNoCaseEqual noCaseCompare;
     if (noCaseCompare(urlTarget.substr(0, 10), "FSCommand:"))
     {
-        if (m.fsCommandHandle)
-        {
-            // Call into the app.
-            // NOTE: the first argument is a movie_instance, but isn't used
-            // anyway, so we avoid attempting to fetch one
-            (*m.fsCommandHandle)(0, urlTarget.substr(10), target_string.c_str());
-        }
-
+        m.handleFsCommand(urlTarget.substr(10), target_string);
         return;
     }
 
