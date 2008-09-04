@@ -112,7 +112,8 @@ LoadVariablesThread::completeLoad()
 		if ( cancelRequested() )
 		{
 			log_debug("Cancelling LoadVariables download thread...");
-			break;
+			_stream.reset();
+			return;
 		}
 	}
 
@@ -130,6 +131,8 @@ LoadVariablesThread::completeLoad()
 			_bytesTotal, _bytesLoaded);
 		_bytesTotal = _bytesLoaded;
 	}
+
+	_stream.reset(); // we don't need the IOChannel anymore
 
 	//dispatchLoadEvent();
 	setCompleted();

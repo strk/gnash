@@ -453,8 +453,8 @@ void SWFStream::read_string_with_length(unsigned len, std::string& to)
 	if ( last < len )
 	{
 		// seems common to find null-terminated lenght-equipped strings...
-		log_debug("String %s with length %d has %d trailing NULLs, trimming", to, len, len-last);
         	to.erase(last);
+		log_debug("String %s with length %d had %d trailing NULLs, trimmed", to, len, len-last);
 	}
     }
 
