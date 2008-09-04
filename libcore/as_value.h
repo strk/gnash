@@ -26,7 +26,6 @@
 #include "dsodefs.h"
 #include "smart_ptr.h"
 #include "CharacterProxy.h"
-#include "element.h"
 
 #include <cmath>
 #include <limits>
@@ -40,15 +39,22 @@
 #include "utility.h" // UNUSED
 #include "string_table.h"
 
+// Forward declarations
+namespace gnash {
+	class as_object;
+	class fn_call;
+	class as_function;
+	class sprite_instance;
+	class character;
+	class asNamespace;
+	class asName;
+}
+namespace amf {
+	class Element;
+}
+
 namespace gnash {
 
-class as_object;
-class fn_call;
-class as_function;
-class sprite_instance;
-class character;
-class asNamespace;
-class asName;
 
 // NaN constant for use in as_value implementation
 static const double NaN = std::numeric_limits<double>::quiet_NaN();
