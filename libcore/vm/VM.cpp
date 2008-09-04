@@ -65,7 +65,7 @@ VM::init(movie_definition& movie, VirtualClock& clock)
 	_singleton->mClassHierarchy = new ClassHierarchy;
 	_singleton->setGlobal(new Global(*_singleton, _singleton->mClassHierarchy));
 /*?Ask someone if this is correct.*/
-	_singleton->mMachine = new Machine(_singleton->mStringTable,_singleton->mClassHierarchy);
+	_singleton->mMachine = new Machine(*_singleton);
 	assert(_singleton->getGlobal());
 /*ASK*/
 	return *_singleton;

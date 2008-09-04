@@ -26,6 +26,7 @@
 #include "asClass.h"
 #include "swf.h"
 #include "as_environment.h"
+#include "VM.h"
 
 #define LOG_DEBUG_AVM(fmt,...) IF_VERBOSE_ACTION(log_action("AVM2: " fmt, ## __VA_ARGS__));
 
@@ -210,7 +211,7 @@ public:
 
 	void instantiateClass(std::string className);
 
-	Machine(string_table &ST, ClassHierarchy *CH);
+	Machine(VM& vm);
 
 private:
 	/// The state of the machine.
@@ -298,7 +299,7 @@ private:
 		}
 		print_scope_stack();
 		LOG_DEBUG_AVM("Cannot find property in scope stack.");
-		as_environment env;
+		as_environment env = as_environment(_vm);
 		as_object* obj = env.find_object(mPoolObject->mStringPool[multiname.getNamespace()->getAbcURI()],getScopeStack());
 		push_stack(as_value(obj));
 	}
@@ -324,7 +325,7 @@ private:
 
 	as_value get_property_value(boost::intrusive_ptr<as_object> obj, asName multiname){
 		as_environment::ScopeStack stack;
-		as_environment env;
+		as_environment env = as_environment(_vm);
 		if(obj == NULL){
 			stack = *getScopeStack();
 		}
@@ -339,6 +340,7 @@ private:
 		else{
 			path = ns + "." + mPoolObject->mStringPool[multiname.getABCName()];
 		}
+
 		return env.get_variable(path,stack,NULL);
 		
 	}
@@ -366,13 +368,13 @@ private:
 		LOG_DEBUG_AVM("%s", ss.str());
 	}	
 
-	as_environment get_args(unsigned int argc){
+	std::auto_ptr< std::vector<as_value> > get_args(unsigned int argc){
 		LOG_DEBUG_AVM("There are %u args",argc);
-		as_environment env;
+		std::auto_ptr< std::vector<as_value> > args = std::auto_ptr< std::vector<as_value> >(new std::vector<as_value>);
 		for(unsigned int i=0;i<argc;i++){
-			env.push(pop_stack());
+			args->push_back(pop_stack());
 		}
-		return env;
+		return args;
 	}
 
 	void load_function(CodeStream* stream){
@@ -415,6 +417,8 @@ private:
 	bool mIsAS3; // Is the stream an AS3 stream.
 	bool mExitWithReturn;
 	abc_block* mPoolObject; // Where all of the pools are stored.
+
+	VM& _vm;
 };
 
 } // namespace gnash

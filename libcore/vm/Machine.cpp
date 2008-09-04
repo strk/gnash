@@ -27,6 +27,7 @@
 #include "abc_function.h"
 #include "action.h"
 #include "Object.h"
+#include "VM.h"
 
 //#define PRETEND
 namespace gnash {
@@ -1168,13 +1169,13 @@ Machine::execute()
 
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
 		boost::uint32_t argc = mStream->read_V32();
-		as_environment env = get_args(argc);
+		std::auto_ptr< std::vector<as_value> > args = get_args(argc);
 		//TODO: If multiname is runtime also pop namespace and/or name values.
 		as_object *object = pop_stack().to_object().get();
 		as_value property = object->getMember(a.getGlobalName(),0);
 		LOG_DEBUG_AVM("Calling method %s on object %s",property.toDebugString(),object->get_text_value());
-		as_value result = call_method(property,&env,object,argc,env.stack_size() - 1);
-		env.drop(argc);
+		as_environment env = as_environment(_vm);
+		as_value result = call_method(property,&env,object,args);
 
 		if(opcode == SWF::ABC_ACTION_CALLPROPERTY){
 			push_stack(result);
@@ -1290,12 +1291,13 @@ Machine::execute()
 		// TODO
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
 		boost::uint32_t argc = mStream->read_V32();
-		as_environment env = get_args(argc);
+		std::auto_ptr< std::vector<as_value> > args = get_args(argc);
 		as_object* object = pop_stack().to_object().get();
 		as_value prop = object->getMember(a.getGlobalName(),a.getNamespace()->getURI());
 		as_object* object_to_construct = prop.to_object().get();
 		as_value property = object_to_construct->getMember(NSV::PROP_CONSTRUCTOR,0);
-		as_value value = call_method(property,&env,object_to_construct,argc,env.stack_size() - 1);
+		as_environment env = as_environment(_vm);
+		as_value value = call_method(property,&env,object_to_construct,args);
 		push_stack(value);
 		
 		break;
@@ -1384,9 +1386,9 @@ Machine::execute()
 		push_stack(as_value(new_class));
 
 		//Call the class's static constructor.
-		as_environment env;
+		as_environment env = as_environment(_vm);
 		as_value property = new_class->getMember(NSV::PROP_uuCONSTRUCTORuu,0);
-		as_value value = call_method(property,&env,new_class,0,-1);
+		as_value value = call_method(property,&env,new_class,get_args(0));
 
 		break;
 	}
@@ -2653,9 +2655,9 @@ void Machine::instantiateClass(std::string className){
 	executeCodeblock(theClass->getConstructor()->getBody());
 }
 
-Machine::Machine(string_table &ST, ClassHierarchy *CH):mST(),mRegisters(),mExitWithReturn(false)
+Machine::Machine(VM& vm):mST(),mRegisters(),mExitWithReturn(false),_vm(vm)
 {
-	mCH = CH;
+	mCH = vm.getClassHierarchy();
 	//Local registers should be initialized at the beginning of each function call, but
 	//we don't currently parse the number of local registers for each function.
 	mRegisters.resize(16);

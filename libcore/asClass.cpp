@@ -89,7 +89,12 @@ asClass::addValue(string_table::key name, asNamespace *ns, boost::uint32_t slotI
 	if (isstatic)
 		flags |= as_prop_flags::staticProp;
 
-	mPrototype->init_member(name, val, flags, nsname, slotId);
+	if(slotId == 0){
+		mPrototype->init_member(name, val, flags, nsname);
+	}
+	else{
+		mPrototype->init_member(name, val, flags, nsname, slotId);
+	}
 	return true;
 }
 
@@ -148,7 +153,12 @@ asClass::addSlot(string_table::key name, asNamespace* ns, boost::uint32_t slotId
 //		flags |= as_prop_flags::staticProp;
 //	log_debug("Before init_member.");
 	//TODO: Set flags.
-	mPrototype->init_member(name, as_value(), 0, nsname, slotId);
+	if(slotId == 0){
+		mPrototype->init_member(name,as_value(), 0, nsname);
+	}
+	else{
+		mPrototype->init_member(name, as_value(), 0, nsname, slotId);
+	}
 	return true;
 }
 
@@ -168,7 +178,6 @@ bool
 asClass::addMethod(string_table::key name, asNamespace* ns, asMethod* method,
 	bool isstatic)
 {
-	log_debug("in add method");
 	as_value val = as_value(new abc_function(method,mPrototype->getVM().getMachine()));
 	mPrototype->init_member(name, val);
 //	int flags = as_prop_flags::readOnly | as_prop_flags::dontDelete
