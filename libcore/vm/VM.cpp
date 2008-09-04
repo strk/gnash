@@ -61,8 +61,8 @@ VM::init(movie_definition& movie, VirtualClock& clock)
 	assert(_singleton.get());
 	NSV::load_strings(&_singleton->mStringTable, _singleton->getSWFVersion());
 
-	_singleton->mClassHierarchy = new ClassHierarchy;
-	_singleton->setGlobal(new Global(*_singleton, _singleton->mClassHierarchy));
+	_singleton->mClassHierarchy.reset(new ClassHierarchy);
+	_singleton->setGlobal(new Global(*_singleton, _singleton->mClassHierarchy.get()));
 	assert(_singleton->getGlobal());
 
 	return *_singleton;
@@ -87,7 +87,6 @@ VM::VM(movie_definition& topmovie, VirtualClock& clock)
 	_root_movie(new movie_root()),
 	_swfversion(topmovie.get_version()),
 	_swfurl(topmovie.get_url()),
-	mClassHierarchy(0),
 	mMachine(0),
 	_clock(clock),
 	_stack()

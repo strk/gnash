@@ -147,8 +147,10 @@ private:
 
 	/// Mutable since it should not affect how the VM runs.
 	mutable string_table mStringTable;
+
 	/// Not mutable since changing this changes behavior of the VM.
-	ClassHierarchy *mClassHierarchy;
+	std::auto_ptr<ClassHierarchy> mClassHierarchy;
+
 	/// A running execution thread.
 	Machine *mMachine;
 
@@ -266,7 +268,7 @@ public:
 	as_object* getGlobal() const;
 
 	/// Get a pointer to this VM's global ClassHierarchy object.
-	ClassHierarchy* getClassHierarchy() const { return mClassHierarchy; }
+	ClassHierarchy* getClassHierarchy() const { return mClassHierarchy.get(); }
 	
 	/// Get the SWF locale to use 
 	std::locale& getLocale() const;
