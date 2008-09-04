@@ -176,17 +176,21 @@ RTMP::headerSize(Network::byte_t header)
 RTMP::RTMP() 
     : _handshake(0),
       _handler(0),
-      _chunksize(RTMP_VIDEO_PACKET_SIZE),
+      _packet_size(0),
+      _mystery_word(0),
       _timeout(1)
 {
 //    GNASH_REPORT_FUNCTION;
 //    _queues.resize(MAX_AMF_INDEXES);
-//    for (size_t i=0; i<MAX_AMF_INDEXES; i++) {
-//     string name = "channel #";
-//     for (size_t i=0; i<10; i++) {
-// 	name[9] = i+'0';
-//   	_queues[i].setName(name.c_str());
-//     }
+    // Initialize all of the queues
+    for (size_t i=0; i<MAX_AMF_INDEXES; i++) {
+	string name = "channel #";
+	for (size_t i=0; i<10; i++) {
+	    name[9] = i+'0';
+	    _queues[i].setName(name.c_str()); // this name is only used for debugging
+	    _chunksize[i] = RTMP_VIDEO_PACKET_SIZE; // each channel can have a different chunksize
+	}
+    }
 }
 
 RTMP::~RTMP()
@@ -195,7 +199,7 @@ RTMP::~RTMP()
     _properties.clear();
     delete _handshake;
     delete _handler;
-    
+
 //    delete _body;
 }
 
@@ -877,7 +881,7 @@ RTMP::sendRecvMsg(int amf_index, rtmp_headersize_e head_size,
 	    switch (rthead->type) {
 	      case CHUNK_SIZE:
 		  log_debug("Got CHUNK_SIZE packet!!!");
-		  _chunksize = ntohl(*reinterpret_cast<boost::uint32_t *>(ptr + rthead->head_size));
+		  _chunksize[rthead->channel] = ntohl(*reinterpret_cast<boost::uint32_t *>(ptr + rthead->head_size));
 		  log_debug("Setting packet chunk size to %d.", _chunksize);
 //		  decodeChunkSize();
 		  break;
@@ -1033,12 +1037,6 @@ RTMP::recvMsg(int timeout)
 RTMP::queues_t *
 RTMP::split(Buffer *buf)
 {
-    return split(buf, _chunksize);
-}
-
-RTMP::queues_t *
-RTMP::split(Buffer *buf, size_t chunksize)
-{
     GNASH_REPORT_FUNCTION;
 
     if (buf == 0) {
@@ -1059,7 +1057,7 @@ RTMP::split(Buffer *buf, size_t chunksize)
 	if (rthead->head_size <= RTMP_MAX_HEADER_SIZE) {
 	    // Any packet with a size greater than 1 is a new header, so create
 	    // a new Buffer to hold all the data.
-	    if ((rthead->head_size > 1) || (rthead->type == RTMP::PING)) {
+	    if ((rthead->head_size > 1)) {
 		// This is a queue of channels with active messages
 		_channels.push_back(&_queues[rthead->channel]);
 // 		cerr << "New packet for channel #" << rthead->channel << " of size "
@@ -1072,31 +1070,31 @@ RTMP::split(Buffer *buf, size_t chunksize)
 		chunk = _queues[rthead->channel].peek();
 	    }
 	    // Many RTMP messages are smaller than the chunksize
-	    if (chunk->size() <= chunksize) {
+	    if (chunk->size() <= _chunksize[rthead->channel]) {
 		// a single byte header has no length field. As these are often
 		// used as continuation packets, the body size is the same as the
 		// previous header with a length field.
-		if ((rthead->head_size > 1) || (rthead->type == RTMP::PING)) {
+		if ((rthead->head_size > 1)) {
 		    pktsize = chunk->size();
 		} else {
 		    pktsize = rthead->head_size + rthead->bodysize - chunk->size();
 		}
 	    } else { // this RTMP message is larger than the chunksize
 		if (rthead->head_size > 1) {
-		    pktsize = rthead->head_size + chunksize;
+		    pktsize = rthead->head_size + _chunksize[rthead->channel];
 		} else {
-		    pktsize = rthead->head_size + (chunk->size() - chunksize);
+		    pktsize = rthead->head_size + (chunk->size() - _chunksize[rthead->channel]);
 		}
 	    }
 	    
 	    // Range check the size of the packet
-	    if (pktsize <= (chunksize + RTMP_MAX_HEADER_SIZE)) {
+	    if (pktsize <= (_chunksize[rthead->channel] + RTMP_MAX_HEADER_SIZE)) {
 		nbytes += pktsize;
 		// Skip the header for all but the first packet. The rest are just to
 		// complete all the data up to the body size from the header.
 // 		cerr << _queues[rthead->channel].size() << " messages in queue for channel "
 // 		     << rthead->channel << endl;
-		if ((rthead->head_size == 1) && (rthead->type != RTMP::PING) ){
+		if ((rthead->head_size == 1)){
 // 		    cerr << "FOLLOWING PACKET!" << " for channel " << rthead->channel << endl;
 // 		    cerr << "Space Left in buffer for channel " << rthead->channel << " is: "
 // 			 << chunk->spaceLeft() << endl;

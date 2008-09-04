@@ -289,7 +289,6 @@ public:
     // bytes another 1 byte RTMP header. The header itself is not part of the byte
     // count.
     queues_t *split(amf::Buffer *buf);
-    queues_t *split(amf::Buffer *buf, size_t chunksize);
 
     CQue &operator[] (size_t x) { return _queues[x]; }
     void dump();
@@ -300,7 +299,7 @@ public:
     rtmp_head_t	_header;
     int         _packet_size;
     int         _mystery_word;
-    size_t	_chunksize;
+    size_t	_chunksize[MAX_AMF_INDEXES];
     int		_timeout;
     CQue	_queues[MAX_AMF_INDEXES];
     queues_t    _channels;
