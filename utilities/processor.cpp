@@ -135,61 +135,69 @@ secondsSinceLastAdvance()
 //
 static int quitrequested = false;
 
-void execFsCommand(sprite_instance* movie, const std::string& command, const std::string& args)
-{
-    log_debug(_("fs_callback(%p): %s %s"), (void*)movie, command, args);
+class FsCommandExecutor: public movie_root::AbstractFsCallback {
+public:
+	void notify(const std::string& command, const std::string& args)
+	{
+	    log_debug(_("fs_callback(%p): %s %s"), command, args);
 
-    StringNoCaseEqual ncasecomp;
-   
-    if ( ncasecomp(command, "quit") ) quitrequested = true;
-}
+	    StringNoCaseEqual ncasecomp;
+	   
+	    if ( ncasecomp(command, "quit") ) quitrequested = true;
+	}
+};
 
-std::string eventCallback(const std::string& event,
-							const std::string& arg)
-{
-    log_debug(_("eventCallback: %s %s"), event, arg);
+class EventCallback: public movie_root::AbstractIfaceCallback {
+public:
+	std::string call(const std::string& event, const std::string& arg)
+	{
+	    log_debug(_("eventCallback: %s %s"), event, arg);
 
-    static bool mouseShown = true;
+	    static bool mouseShown = true;
 
-    // These should return "true" if the mouse was visible before
-    // the call.
-    if ( event == "Mouse.hide" ) {
-        bool state = mouseShown;
-        mouseShown = false;
-        return state ? "true" : "false";
-    }
+	    // These should return "true" if the mouse was visible before
+	    // the call.
+	    if ( event == "Mouse.hide" ) {
+		bool state = mouseShown;
+		mouseShown = false;
+		return state ? "true" : "false";
+	    }
 
-    if ( event == "Mouse.show" ) {
-        bool state = mouseShown;
-        mouseShown = true;
-        return state ? "true" : "false" ;
-    }
-    
-    // Some fake values for consistent test results.
-    
-    if ( event == "System.capabilities.screenResolutionX" ) {
-        return "800";
-    }
+	    if ( event == "Mouse.show" ) {
+		bool state = mouseShown;
+		mouseShown = true;
+		return state ? "true" : "false" ;
+	    }
+	    
+	    // Some fake values for consistent test results.
+	    
+	    if ( event == "System.capabilities.screenResolutionX" ) {
+		return "800";
+	    }
 
-    if ( event == "System.capabilities.screenResolutionY" ) {
-        return "640";
-    } 
+	    if ( event == "System.capabilities.screenResolutionY" ) {
+		return "640";
+	    } 
 
-    if ( event == "System.capabilities.screenDPI" ) {
-        return "72";
-    }        
+	    if ( event == "System.capabilities.screenDPI" ) {
+		return "72";
+	    }        
 
-    if ( event == "System.capabilities.screenColor" ) {
-        return "Color";
-    } 
+	    if ( event == "System.capabilities.screenColor" ) {
+		return "Color";
+	    } 
 
-    if ( event == "System.capabilities.playerType" ) {
-        return "StandAlone";
-    } 
+	    if ( event == "System.capabilities.playerType" ) {
+		return "StandAlone";
+	    } 
 
-    return "";
+	    return "";
 
-}
+	}
+};
+
+EventCallback eventCallback;
+FsCommandExecutor execFsCommand;
 
 int
 main(int argc, char *argv[])

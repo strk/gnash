@@ -29,6 +29,7 @@
 #include "gui.h"
 #include "movie_definition.h" // for visibility of movie_definition destructor
 #include "smart_ptr.h" // for intrusive_ptr holding of top-level movie
+#include "movie_root.h" // for Abstract callbacks
 
 #include <string>
 #include <map>
@@ -54,7 +55,7 @@ public:
 
 	Player();
 
-	~Player() {}
+	~Player();
 
 	/// Play the movie at the given url/path.
 	//
@@ -142,6 +143,30 @@ public:
 	
 private:
 
+	class CallbacksHandler
+		: public movie_root::AbstractIfaceCallback,
+		  public movie_root::AbstractFsCallback
+	{
+	public:
+		CallbacksHandler(Gui* gui)
+			:
+			_gui(gui)
+		{}
+
+		std::string call(const std::string& event, const std::string& arg);
+
+		// For handling notification callbacks from ActionScript. The callback is
+		// always sent to a hosting application (i.e. if a file descriptor is
+		// supplied). It is never acted on by Gnash when running as a plugin.
+		void notify(const std::string& event, const std::string& arg);
+
+	private:
+
+		Gui* _gui;
+	};
+
+	std::auto_ptr<CallbacksHandler> _callbacksHandler;
+
 	void init();
 
 	/// This aux streamer returns a silent audio stream
@@ -171,12 +196,6 @@ private:
 
 	void setFlashVars(const std::string& varstr);
 
-	static void fs_callback(sprite_instance* movie,
-			const std::string& command, const std::string& args);
-
-	static std::string interfaceEventCallback(const std::string& event,
-							const std::string& arg);
-
 	// Movie parameters (for -P)
 	std::map<std::string, std::string> params;
 
@@ -203,7 +222,7 @@ private:
 
 	std::string _baseurl;
 
-	static std::auto_ptr<Gui> _gui;
+	std::auto_ptr<Gui> _gui;
 
 	std::auto_ptr<media::sound_handler> _soundHandler;
 

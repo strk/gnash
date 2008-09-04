@@ -134,22 +134,20 @@ getSystemCapabilitiesInterface(as_object& o)
 
     const movie_root& m = vm.getRoot();
 
-    if (m.interfaceHandle) {
-        ss.str((*m.interfaceHandle)("System.capabilities.screenResolutionX", ""));
-        ss >> screenResolutionX;
+    ss.str(m.callInterface("System.capabilities.screenResolutionX", ""));
+    ss >> screenResolutionX;
         
-        ss.clear();
-        ss.str((*m.interfaceHandle)("System.capabilities.screenResolutionY", ""));
-        ss >> screenResolutionY;
+    ss.clear();
+    ss.str(m.callInterface("System.capabilities.screenResolutionY", ""));
+    ss >> screenResolutionY;
 
-        ss.clear();
-        ss.str((*m.interfaceHandle)("System.capabilities.screenDPI", ""));
-        ss >> screenDPI;
+    ss.clear();
+    ss.str(m.callInterface("System.capabilities.screenDPI", ""));
+    ss >> screenDPI;
         
-        pixelAspectRatio = (*m.interfaceHandle)("System.capabilities.pixelAspectRatio", "");
-        playerType = (*m.interfaceHandle)("System.capabilities.playerType", "");
-        screenColor = (*m.interfaceHandle)("System.capabilities.screenColor", "");
-    }
+    pixelAspectRatio = m.callInterface("System.capabilities.pixelAspectRatio", "");
+    playerType = m.callInterface("System.capabilities.playerType", "");
+    screenColor = m.callInterface("System.capabilities.screenColor", "");
 
     //
 	// Media
