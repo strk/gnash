@@ -20,41 +20,37 @@ namespace gnash {
 namespace gnash {
 
 /// Helper to generate mouse events, given mouse state & history.
-class mouse_button_state
+struct MouseButtonState
 {
 
 public:
 
 	/// Possible button states
-	enum state {
-
-		/// Button is depressed
-		UP=0,
-
-		/// Button is pressed
-		DOWN=1
-	};
+	enum State {
+        UP,
+        DOWN
+    };  
 
 	/// entity that currently owns the mouse pointer
-	boost::intrusive_ptr<character>	m_active_entity;
+	boost::intrusive_ptr<character>	activeEntity;
 
 	/// what's underneath the mouse right now
-	boost::intrusive_ptr<character>	m_topmost_entity;
+	boost::intrusive_ptr<character>	topmostEntity;
 
 	/// previous state of mouse button
-	bool	m_mouse_button_state_last;	
+	bool previousButtonState;	
 
 	/// current state of mouse button
-	bool	m_mouse_button_state_current;	
+	bool currentButtonState;	
 
 	/// whether mouse was inside the active_entity last frame
-	bool	m_mouse_inside_entity_last;
+	bool wasInsideActiveEntity;
 
-	mouse_button_state()
+	MouseButtonState()
 		:
-		m_mouse_button_state_last(UP),
-		m_mouse_button_state_current(UP),
-		m_mouse_inside_entity_last(false)
+		previousButtonState(UP),
+		currentButtonState(UP),
+		wasInsideActiveEntity(false)
 	{
 	}
 
@@ -62,8 +58,8 @@ public:
 	/// Mark reachable objects (active and topmost entities)
 	void markReachableResources() const
 	{
-		if ( m_active_entity.get() ) m_active_entity->setReachable();
-		if ( m_topmost_entity.get() ) m_topmost_entity->setReachable();
+		if ( activeEntity.get() ) activeEntity->setReachable();
+		if ( topmostEntity.get() ) topmostEntity->setReachable();
 	}
 #endif // GNASH_USE_GC
 };

@@ -67,14 +67,7 @@ mouse_hide(const fn_call& fn)
 
     movie_root& m = obj->getVM().getRoot();
 
-	if (m.interfaceHandle)
-	{
-		success = ((*m.interfaceHandle)("Mouse.hide", "") == "true") ? 1 : 0;
-	}
-	else
-	{
-		log_error(_("No callback to handle Mouse.hide"));
-	}
+    success = (m.callInterface("Mouse.hide", "") == "true") ? 1 : 0;
 
     // returns 1 if mouse was visible before call.
     return as_value(success);
@@ -90,14 +83,7 @@ mouse_show(const fn_call& fn)
 
     movie_root& m = obj->getVM().getRoot();
 
-	if (m.interfaceHandle)
-	{
-		success = ((*m.interfaceHandle)("Mouse.show", "") == "true") ? 1 : 0;
-	}
-	else
-	{
-		log_error(_("No callback to handle Mouse.show"));
-	}
+    success = (m.callInterface("Mouse.show", "") == "true") ? 1 : 0;
 
     // returns 1 if Mouse was visible before call.
     return as_value(success);

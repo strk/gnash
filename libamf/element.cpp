@@ -276,7 +276,7 @@ Element::clear()
 }
 
 Network::byte_t *
-Element::getData()
+Element::getData() const
 {
 //    GNASH_REPORT_FUNCTION;
     if (_buffer) {

@@ -90,8 +90,8 @@ movie_root::testInvariant() const
 
 movie_root::movie_root()
 	:
-	interfaceHandle(0),
-	fsCommandHandle(0),
+	_interfaceHandler(0),
+	_fsCommandHandler(0),
 	m_viewport_x0(0),
 	m_viewport_y0(0),
 	m_viewport_width(1),
@@ -129,11 +129,9 @@ movie_root::disableScripts()
 	_disableScripts = true;
 
 	// NOTE: we won't clear the action queue now
-	//       to avoid invalidating iterators as we've
-	//       been probably called during processing
-	//       of the queue.
-	//
-	//clearActionQueue();
+	// to avoid invalidating iterators as we've
+	// been probably called during processing
+	// of the queue.
 }
 
 void
@@ -625,7 +623,7 @@ movie_root::notify_key_event(key::code k, bool down)
 
 	// Notify both character and non-character Key listeners
 	//	for user defined handerlers.
-	if(global_key)
+	if (global_key)
 	{
 	    try
 	    {
@@ -691,184 +689,148 @@ movie_root::notify_mouse_state(int x, int y, int buttons)
 }
 #endif
 
-// Return wheter any action triggered by this event requires display redraw.
+// Return whether any action triggered by this event requires display redraw.
 // See page about events_handling (in movie_interface.h)
 //
 /// TODO: make this code more readable !
 bool
-generate_mouse_button_events(mouse_button_state* ms)
+movie_root::generate_mouse_button_events()
 {
-	boost::intrusive_ptr<character> active_entity = ms->m_active_entity;
-	boost::intrusive_ptr<character> topmost_entity = ms->m_topmost_entity;
+
+    MouseButtonState& ms = m_mouse_button_state;
 
 	// Did this event trigger any action that needs redisplay ?
 	bool need_redisplay = false;
 
-	VM& vm = VM::get();
+    // TODO: have on_button_event return
+    // whether the action must trigger
+    // a redraw.
 
-	if (ms->m_mouse_button_state_last == mouse_button_state::DOWN)
-	{
-		// Mouse button was down.
-		// TODO: Handle trackAsMenu dragOver
-		// Handle onDragOut, onDragOver
-		if (ms->m_mouse_inside_entity_last == false)
-		{
-			if (topmost_entity == active_entity)
-			{
-				// onDragOver
-				if (active_entity != NULL)
-				{
-					active_entity->on_button_event(event_id::DRAG_OVER);
-					// TODO: have on_button_event return
-					//       wheter the action must trigger
-					//       a redraw.
-					need_redisplay=true;
-				}
-				ms->m_mouse_inside_entity_last = true;
-			}
-		}
-		else
-		{
-			// mouse_inside_entity_last == true
-			if (topmost_entity != active_entity)
-			{
-				// onDragOut
-				if (active_entity != NULL)
-				{
-#ifndef GNASH_USE_GC
-					assert(active_entity->get_ref_count() > 1); // we are NOT the only object holder !
-#endif // GNASH_USE_GC
-					active_entity->on_button_event(event_id::DRAG_OUT);
-					// TODO: have on_button_event return
-					//       wheter the action must trigger
-					//       a redraw.
-					need_redisplay=true;
-				}
-				ms->m_mouse_inside_entity_last = false;
-			}
-		}
+    switch (ms.previousButtonState)
+    {
+        case MouseButtonState::DOWN:
+	    {
+		    // TODO: Handle trackAsMenu dragOver
+		    // Handle onDragOut, onDragOver
+		    if (!ms.wasInsideActiveEntity)
+		    {
+			    if (ms.topmostEntity == ms.activeEntity)
+			    {
+				    // onDragOver
+				    if (ms.activeEntity)
+				    {
+					    ms.activeEntity->on_button_event(event_id::DRAG_OVER);
+					    need_redisplay=true;
+				    }
+				    ms.wasInsideActiveEntity = true;
+			    }
+		    }
+		    else if (ms.topmostEntity != ms.activeEntity)
+		    {
+			    // onDragOut
+			    if (ms.activeEntity)
+			    {
+				    ms.activeEntity->on_button_event(event_id::DRAG_OUT);
+				    need_redisplay=true;
+			    }
+			    ms.wasInsideActiveEntity = false;
+		    }
 
-		// Handle onRelease, onReleaseOutside
-		if (ms->m_mouse_button_state_current == mouse_button_state::UP)
-		{
-			// Mouse button just went up.
-			ms->m_mouse_button_state_last = mouse_button_state::UP;
+		    // Handle onRelease, onReleaseOutside
+		    if (ms.currentButtonState == MouseButtonState::UP)
+		    {
+			    // Mouse button just went up.
+			    ms.previousButtonState = MouseButtonState::UP;
 
-			if (active_entity != NULL)
-			{
-				if (ms->m_mouse_inside_entity_last)
-				{
-					// onRelease
-					active_entity->on_button_event(event_id::RELEASE);
-					// TODO: have on_button_event return
-					//       wheter the action must trigger
-					//       a redraw.
-					need_redisplay=true;
-				}
-				else
-				{
-					// TODO: Handle trackAsMenu 
+			    if (ms.activeEntity)
+			    {
+				    if (ms.wasInsideActiveEntity)
+				    {
+					    // onRelease
+					    ms.activeEntity->on_button_event(event_id::RELEASE);
+					    need_redisplay = true;
+				    }
+				    else
+				    {
+					    // TODO: Handle trackAsMenu 
+					    // onReleaseOutside
+					    ms.activeEntity->on_button_event(event_id::RELEASE_OUTSIDE);
+					    // We got out of active entity
+					    ms.activeEntity = NULL; // so we don't get RollOut next...
+					    need_redisplay = true;
+				    }
+			    }
+		    }
+	        return need_redisplay;
+	    }
 
-					// onReleaseOutside
-					active_entity->on_button_event(event_id::RELEASE_OUTSIDE);
 
-					// We got out of active entity
-					//ms->m_mouse_inside_entity_last = false;
-					active_entity = NULL; // so we don't get RollOut next...
+	    case MouseButtonState::UP:
+        {
+	        // New active entity is whatever is below the mouse right now.
+	        if (ms.topmostEntity != ms.activeEntity)
+	        {
+		        // onRollOut
+		        if (ms.activeEntity != NULL)
+		        {
+			        ms.activeEntity->on_button_event(event_id::ROLL_OUT);
+			        need_redisplay=true;
+		        }
 
-					// TODO: have on_button_event return
-					//       wheter the action must trigger
-					//       a redraw.
-					need_redisplay=true;
-				}
-			}
-		}
-	}
-	else if ( ms->m_mouse_button_state_last == mouse_button_state::UP )
-	{
-		// Mouse button was up.
+		        ms.activeEntity = ms.topmostEntity;
 
-		// New active entity is whatever is below the mouse right now.
-		if (topmost_entity != active_entity)
-		{
-			// onRollOut
-			if (active_entity != NULL)
-			{
-				active_entity->on_button_event(event_id::ROLL_OUT);
-				// TODO: have on_button_event return
-				//       wheter the action must trigger
-				//       a redraw.
-				need_redisplay=true;
-			}
+		        // onRollOver
+		        if (ms.activeEntity != NULL)
+		        {
+			        ms.activeEntity->on_button_event(event_id::ROLL_OVER);
+			        need_redisplay=true;
+		        }
 
-			active_entity = topmost_entity;
+		        ms.wasInsideActiveEntity = true;
+	        }
 
-			// onRollOver
-			if (active_entity != NULL)
-			{
-				active_entity->on_button_event(event_id::ROLL_OVER);
-				// TODO: have on_button_event return
-				//       wheter the action must trigger
-				//       a redraw.
-				need_redisplay=true;
-			}
+	        // mouse button press
+	        if (ms.currentButtonState == MouseButtonState::DOWN )
+	        {
+		        // onPress
 
-			ms->m_mouse_inside_entity_last = true;
-		}
+		        // set/kill focus for current root
+		        character* current_active_entity = getFocus();
 
-		// mouse button press
-		if (ms->m_mouse_button_state_current == mouse_button_state::DOWN )
-		{
-			// onPress
+		        // It's another entity ?
+		        if (current_active_entity != ms.activeEntity.get())
+		        {
+			        // First to clean focus
+			        if (current_active_entity != NULL)
+			        {
+				        current_active_entity->on_event(event_id::KILLFOCUS);
+				        need_redisplay=true;
+				        setFocus(NULL);
+			        }
 
-			// set/kill focus for current root
-			movie_root& mroot = VM::get().getRoot();
-			character* current_active_entity = mroot.getFocus();
+			        // Then to set focus
+			        if (ms.activeEntity)
+			        {
+				        if (ms.activeEntity->on_event(event_id::SETFOCUS))
+				        {
+					        setFocus(ms.activeEntity.get());
+				        }
+			        }
+		        }
 
-			// It's another entity ?
-			if (current_active_entity != active_entity.get())
-			{
-				// First to clean focus
-				if (current_active_entity != NULL)
-				{
-					current_active_entity->on_event(event_id::KILLFOCUS);
-					// TODO: have on_button_event return
-					//       wheter the action must trigger
-					//       a redraw.
-					need_redisplay=true;
-					mroot.setFocus(NULL);
-				}
+		        if (ms.activeEntity)
+		        {
+			        ms.activeEntity->on_button_event(event_id::PRESS);
+			        need_redisplay=true;
+		        }
+		        ms.wasInsideActiveEntity = true;
+		        ms.previousButtonState = MouseButtonState::DOWN;
+	        }
+        }
+        default:
+      	    return need_redisplay;
+    }
 
-				// Then to set focus
-				if (active_entity != NULL)
-				{
-					if (active_entity->on_event(event_id::SETFOCUS))
-					{
-						mroot.setFocus(active_entity.get());
-					}
-				}
-			}
-
-			if (active_entity != NULL)
-			{
-				active_entity->on_button_event(event_id::PRESS);
-				// TODO: have on_button_event return
-				//       wheter the action must trigger
-				//       a redraw.
-				need_redisplay=true;
-			}
-			ms->m_mouse_inside_entity_last = true;
-			ms->m_mouse_button_state_last = mouse_button_state::DOWN;
-		}
-	}
-
-	// Write the (possibly modified) boost::intrusive_ptr copies back
-	// into the state struct.
-	ms->m_active_entity = active_entity;
-	ms->m_topmost_entity = topmost_entity;
-
-	//if ( ! need_redisplay ) log_debug("Hurray, an event didn't trigger redisplay!");
-	return need_redisplay;
 }
 
 
@@ -883,8 +845,8 @@ movie_root::fire_mouse_event()
     boost::int32_t y = PIXELS_TO_TWIPS(m_mouse_y);
 
     // Generate a mouse event
-    m_mouse_button_state.m_topmost_entity = getTopmostMouseEntity(x, y);
-    m_mouse_button_state.m_mouse_button_state_current = (m_mouse_buttons & 1);
+    m_mouse_button_state.topmostEntity = getTopmostMouseEntity(x, y);
+    m_mouse_button_state.currentButtonState = (m_mouse_buttons & 1);
 
     // Set _droptarget if dragging a sprite
     sprite_instance* dragging = 0;
@@ -912,8 +874,7 @@ movie_root::fire_mouse_event()
 
     try
     {
-        need_redraw = generate_mouse_button_events(&m_mouse_button_state);
-
+        need_redraw = generate_mouse_button_events();
         processActionQueue();
     }
     catch (ActionLimitException& al)
@@ -1369,7 +1330,7 @@ movie_root::setFocus(character* ch)
 character*
 movie_root::getActiveEntityUnderPointer() const
 {
-	return m_mouse_button_state.m_active_entity.get();
+	return m_mouse_button_state.activeEntity.get();
 }
 
 character*
@@ -1393,7 +1354,7 @@ movie_root::isMouseOverActiveEntity() const
 {
 	assert(testInvariant());
 
-	boost::intrusive_ptr<character> entity ( m_mouse_button_state.m_active_entity );
+	boost::intrusive_ptr<character> entity ( m_mouse_button_state.activeEntity );
 	if ( ! entity.get() ) {
         return false;
     }
@@ -1436,7 +1397,7 @@ void
 movie_root::setStageAlignment(short s)
 {
     _alignMode = s;
-    if (interfaceHandle) (*interfaceHandle)("Stage.align", "");
+    callInterface("Stage.align", "");
 }
 
 /// Returns a pair of enum values giving the actual alignment
@@ -1497,7 +1458,7 @@ movie_root::setStageScaleMode(ScaleMode sm)
     }
 
     _scaleMode = sm;
-    if (interfaceHandle) (*interfaceHandle)("Stage.align", "");    
+    callInterface("Stage.align", "");    
 
     if ( notifyResize )
     {
@@ -1514,15 +1475,15 @@ movie_root::setStageDisplayState(const DisplayState ds)
     boost::intrusive_ptr<Stage> stage = getStageObject();
     if ( stage ) stage->notifyFullScreen( (_displayState == fullScreen) );
 
-	if (!movie_root::interfaceHandle) return; // No registered callback
+	if (!_interfaceHandler) return; // No registered callback
 	
 	if (_displayState == fullScreen)
 	{
-	    (*movie_root::interfaceHandle)("Stage.displayState", "fullScreen");
+	    callInterface("Stage.displayState", "fullScreen");
 	}
 	else if (_displayState == normal)
 	{
-	    (*movie_root::interfaceHandle)("Stage.displayState", "normal");
+	    callInterface("Stage.displayState", "normal");
 	}   
 }
 
@@ -2260,6 +2221,22 @@ movie_root::getMovieInfo(tree<StringPair>& tr, tree<StringPair>::iterator it)
 
 }
 #endif
+
+void
+movie_root::handleFsCommand(const std::string& cmd, const std::string& arg) const
+{
+	if ( _fsCommandHandler ) _fsCommandHandler->notify(cmd, arg);
+}
+
+std::string
+movie_root::callInterface(const std::string& cmd, const std::string& arg) const
+{
+	if ( _interfaceHandler ) return _interfaceHandler->call(cmd, arg);
+
+	log_error("Hosting application registered no callback for events/queries");
+
+	return "<no iface to hosting app>";
+}
 
 } // namespace gnash
 

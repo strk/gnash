@@ -26,7 +26,6 @@
 #include "dsodefs.h"
 #include "smart_ptr.h"
 #include "CharacterProxy.h"
-#include "element.h"
 
 #include <cmath>
 #include <limits>
@@ -40,15 +39,22 @@
 #include "utility.h" // UNUSED
 #include "string_table.h"
 
+// Forward declarations
+namespace gnash {
+	class as_object;
+	class fn_call;
+	class as_function;
+	class sprite_instance;
+	class character;
+	class asNamespace;
+	class asName;
+}
+namespace amf {
+	class Element;
+}
+
 namespace gnash {
 
-class as_object;
-class fn_call;
-class as_function;
-class sprite_instance;
-class character;
-class asNamespace;
-class asName;
 
 // NaN constant for use in as_value implementation
 static const double NaN = std::numeric_limits<double>::quiet_NaN();
@@ -163,8 +169,7 @@ public:
 	as_value(asNamespace &);
 
 	/// Construct a value from an AMF element
-	as_value(amf::Element *el);
-	as_value &operator=(amf::Element *el);
+	as_value(const amf::Element& el);
 	
 	/// Construct a NULL, OBJECT, MOVIECLIP or AS_FUNCTION value
 	//
@@ -303,12 +308,7 @@ public:
 	double	to_number() const;
 
 	/// Get an AMF element representation for this value
-	//
-	/// @param env
-	///	The environment to use for running the valueOf() method
-	///	for object values. If NULL, valueOf() won't be run.
-	///
-	amf::Element *to_element() const;
+	std::auto_ptr<amf::Element> to_element() const;
 
 	/// Conversion to 32bit integer
 	//
