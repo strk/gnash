@@ -251,6 +251,28 @@ private:
 	void saveState();
 	void restoreState();
 
+	Property* find_prop_strict(asName multiname);
+
+	void get_property(string_table::key name,string_table::key ns);
+	
+	void get_property(Property* p);
+
+	as_value get_property_value(asName multiname);
+
+	as_value get_property_value(boost::intrusive_ptr<as_object> obj, asName multiname);
+
+	void print_stack();
+
+	void print_scope_stack();
+
+	std::auto_ptr< std::vector<as_value> > get_args(unsigned int argc);
+	
+	void load_function(CodeStream* stream);
+
+	as_environment::ScopeStack* getScopeStack();
+
+	void executeCodeblock(CodeStream* stream);
+
 	as_value get_register(int index){
 		LOG_DEBUG_AVM("Getting value at a register %d ",index);
 		return mRegisters[index];
@@ -283,117 +305,6 @@ private:
 		LOG_DEBUG_AVM("Geting value from scope stack %u from the top.",depth | 0x0);
 		return as_value(mAsValueScopeStack.top(depth));
 	}
-
-	Property* find_prop_strict(asName multiname){
-		for(int i=0;i<mAsValueScopeStack.size();i++){
-//			LOG_DEBUG_AVM("Looking at object %d",i);
-			Property *p = mAsValueScopeStack.top(i).to_object()->findProperty(multiname.getGlobalName(),multiname.getNamespace()->getURI());
- //			for(int j=0;j<multiname.getGlobalName()+1;j++){
- //				log_debug("Index:%d string: %s",j,mAsValueScopeStack.top(i).to_object()->asPropName(j));
- //			}
-			if(p){
-//				LOG_DEBUG_AVM("Property found.");
-				push_stack(mAsValueScopeStack.top(i));
-				return p;
-			}
-		}
-		print_scope_stack();
-		LOG_DEBUG_AVM("Cannot find property in scope stack.");
-		as_environment env = as_environment(_vm);
-		as_object* obj = env.find_object(mPoolObject->mStringPool[multiname.getNamespace()->getAbcURI()],getScopeStack());
-		push_stack(as_value(obj));
-	}
-	
-	void get_property(string_table::key name,string_table::key ns){
-		as_object* object = pop_stack().to_object().get();
-		push_stack(object->getMember(name,ns));
-	}
-	
-	void get_property(Property* p){
-		LOG_DEBUG_AVM("Getting property's value and pushing it onto the stack");
-		//GET PROPERTY
-		boost::intrusive_ptr<gnash::as_object> object = mStack.pop().to_object();
-//		LOG_DEBUG_AVM("Here are the members in the object the property was resolved in:");
-		as_value value = p->getValue(*object);
-		LOG_DEBUG_AVM("Property's value is %s",value.toDebugString());
-		mStack.push(value);
-	}
-
-	as_value get_property_value(asName multiname){
-		return get_property_value(NULL,multiname);
-	}
-
-	as_value get_property_value(boost::intrusive_ptr<as_object> obj, asName multiname){
-		as_environment::ScopeStack stack;
-		as_environment env = as_environment(_vm);
-		if(obj == NULL){
-			stack = *getScopeStack();
-		}
-		else{
-			stack.push_back(obj);
-		}
-		std::string ns = mPoolObject->mStringPool[multiname.getNamespace()->getAbcURI()];
-		std::string path;
-		if(ns.size() == 0){
-			path = mPoolObject->mStringPool[multiname.getABCName()];
-		}
-		else{
-			path = ns + "." + mPoolObject->mStringPool[multiname.getABCName()];
-		}
-
-		return env.get_variable(path,stack,NULL);
-		
-	}
-
-	void print_stack(){
-		
-		std::stringstream ss;
-		ss << "Stack: size=";
-		ss<< mStack.size()<<" Items: ";
-		for(unsigned int i=0;i<mStack.size();++i){
-			as_value value = mStack.value(i);
-			ss << mStack.top(i).toDebugString();
-		}
-//		printf("\n");
-		LOG_DEBUG_AVM("%s", ss.str());
-	}
-
-	void print_scope_stack(){
-		
-		std::stringstream ss;
-		ss << "ScopeStack: ";
-		for(unsigned int i=0;i<mAsValueScopeStack.size();++i){
-			ss << mAsValueScopeStack.top(i).toDebugString();
-		}
-		LOG_DEBUG_AVM("%s", ss.str());
-	}	
-
-	std::auto_ptr< std::vector<as_value> > get_args(unsigned int argc){
-		LOG_DEBUG_AVM("There are %u args",argc);
-		std::auto_ptr< std::vector<as_value> > args = std::auto_ptr< std::vector<as_value> >(new std::vector<as_value>);
-		for(unsigned int i=0;i<argc;i++){
-			args->push_back(pop_stack());
-		}
-		return args;
-	}
-
-	void load_function(CodeStream* stream){
-		saveState();
-		mStream = stream;
-		mRegisters.clear();
-		//TODO: Parse and use maximum stack size value for methods.
-		mRegisters.resize(16);
-	}
-
-	as_environment::ScopeStack* getScopeStack(){
-		as_environment::ScopeStack *stack = new as_environment::ScopeStack();
-		for(int i=0;i<mAsValueScopeStack.size();i++){
-			stack->push_back(mAsValueScopeStack.top(i).to_object());
-		}
-		return stack;
-	}
-
-	void executeCodeblock(CodeStream* stream);
 
 	SafeStack<as_value> mStack;
 	SafeStack<State> mStateStack;
