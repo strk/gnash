@@ -30,6 +30,8 @@ INCLUDES = \
 AM_LDFLAGS = \
 	$(XPCOM_LIBS)
 
+AM_CXXFLAGS=-fshort-wchar
+
 #GECKO_INCLUDES = -I/usr/include/xulrunner-sdk-1.9/stable -I/usr/include/nspr4 -I/usr/include/xulrunner-sdk-1.9/
 
 #GECKO_LDFLAGS =  -L/usr/lib/xulrunner-sdk-1.9/sdk/lib -lxpcomglue \
