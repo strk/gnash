@@ -1964,8 +1964,8 @@ Machine::execute()
 /// a + b (double if numeric)
 	case SWF::ABC_ACTION_ADD:
 	{
-		as_value a = pop_stack();
 		as_value b = pop_stack();
+		as_value a = pop_stack();
 		a.newAdd(b);
 		push_stack(a);
 		break;
