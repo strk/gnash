@@ -25,7 +25,6 @@
 
 #include "flash/display/BitmapData_as.h"
 #include "Stage.h"
-#include "flash/display/MovieClip_as.h"
 
 namespace gnash {
 
@@ -38,7 +37,7 @@ get_flash_display_package(const fn_call& /*fn*/)
 
 	BitmapData_class_init(*pkg);
 	stage_class_init(*pkg);
-	movie_clip_class_init(*pkg);
+	movieclip_class_init(*pkg);
 
 	return pkg;
 }
