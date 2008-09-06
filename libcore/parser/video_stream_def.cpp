@@ -25,6 +25,7 @@
 #include "MediaParser.h" // for VideoInfo
 #include "VideoDecoder.h"
 #include "SWFStream.h" // for read()
+#include "ContainerUtils.h"
 
 #include <boost/bind.hpp>
 
@@ -41,8 +42,7 @@ video_stream_definition::video_stream_definition(boost::uint16_t char_id)
 
 video_stream_definition::~video_stream_definition()
 {
-	std::for_each(_video_frames.begin(), _video_frames.end(),
-		      boost::checked_deleter<media::EncodedVideoFrame>());
+	delete_ptr_container(_video_frames);
 }
 
 
