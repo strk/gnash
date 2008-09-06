@@ -192,6 +192,7 @@ noinst_HEADERS = \
 	timers.h \
 	types.h	\
 	video_stream_instance.h \
+	ContainerUtils.h \
 	$(NULL)
 
 libgnashcore_la_LIBADD = \
