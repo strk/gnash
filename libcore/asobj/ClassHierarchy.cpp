@@ -30,13 +30,9 @@
 #include "ContextMenu.h"
 #include "CustomActions.h"
 #include "Date.h"
-#include "DisplayObject.h"
-#include "DisplayObjectContainer.h"
-#include "EventDispatcher.h"
 #include "Error_as.h"
 #include "Global.h"
 #include "int_as.h"
-#include "InteractiveObject.h"
 #include "String_as.h"
 #include "Key.h"
 #include "LoadVars.h"
@@ -53,10 +49,8 @@
 #include "Selection.h"
 #include "SharedObject.h"
 #include "Sound.h"
-#include "Sprite_as.h"
 #include "Stage.h"
 #include "System.h"
-#include "TextFieldAutoSize_as.h"
 #include "TextSnapshot.h"
 #include "TextFormat.h"
 #include "video_stream_instance.h"
@@ -296,13 +290,7 @@ static const ClassHierarchy::nativeClass knownClasses[] =
 	{ moviecliploader_class_init, NSV::CLASS_MOVIE_CLIP_LOADER, NSV::CLASS_OBJECT, NS_GLOBAL, 7 },
 	{ Error_class_init, NSV::CLASS_ERROR, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
 	{ Accessibility_class_init, NSV::CLASS_ACCESSIBILITY, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
-	{ event_dispatcher_class_init, NSV::CLASS_EVENTDISPATCHER, NSV::CLASS_OBJECT, 9 },
-	{ display_object_class_init, NSV::CLASS_DISPLAYOBJECT, NSV::CLASS_EVENTDISPATCHER, 9 },
-	{ interactive_object_class_init, NSV::CLASS_INTERACTIVEOBJECT, NSV::CLASS_DISPLAYOBJECT, 9 },
-	{ display_object_container_class_init, NSV::CLASS_DISPLAYOBJECTCONTAINER, NSV::CLASS_INTERACTIVEOBJECT, 9 },
-	{ sprite_as_class_init, NSV::CLASS_SPRITE, NSV::CLASS_DISPLAYOBJECTCONTAINER, 9 },
-	{ int_class_init, NSV::CLASS_INT, NSV::CLASS_OBJECT, 9 },
-	{ text_field_auto_size_class_init, NSV::CLASS_TEXTFIELDAUTOSIZE, NSV::CLASS_OBJECT, 9 }
+	{ int_class_init, NSV::CLASS_INT, NSV::CLASS_OBJECT, 9 }
 
 // These classes are all implicitly constructed; that is, it is not necessary for
 // the class name to be used to construct the class, so they must always be available.

@@ -1,3 +1,4 @@
+// display_pkg.cpp:  ActionScript "flash.display" package, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
@@ -10,35 +11,39 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-// 
-//
 //
 
-// Implementation for ActionScript DisplayObjectContainer object.
+#include "Object.h" // for getObjectInterface
+#include "as_object.h"
 
-#ifndef GNASH_DISPLAYOBJECTCONTAINER_H
-#define GNASH_DISPLAYOBJECTCONTAINER_H
-
-#include <memory> // for auto_ptr
+#include "string_table.h"
+#include "VM.h"
+#include "flash/events/EventDispatcher_as.h"
 
 namespace gnash {
 
-class as_object;
+static as_value
+get_flash_events_package(const fn_call& /*fn*/)
+{
+	log_debug("Loading flash.events package");
 
-/// Initialize the global DisplayObjectContainer class
-void display_object_container_class_init(as_object& global);
+	as_object* pkg = new as_object(getObjectInterface());
 
-/// Return a DisplayObjectContainer instance
-std::auto_ptr<as_object> init_display_object_container_instance();
+	event_dispatcher_class_init(*pkg);
 
-as_object* getDisplayObjectContainerInterface();
-
-
+	return pkg;
 }
 
-#endif // GNASH_DISPLAYOBJECTCONTAINER_H
+void
+flash_events_package_init(as_object& where)
+{
+	string_table& st = where.getVM().getStringTable();
+	where.init_destructive_property(st.find("events"), get_flash_events_package);
+}
+
+
+} // end of gnash namespace

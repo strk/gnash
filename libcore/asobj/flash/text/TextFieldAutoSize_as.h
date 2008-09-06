@@ -1,4 +1,3 @@
-// text_pkg.cpp:  ActionScript "flash.text" package, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
@@ -11,42 +10,35 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-//
+// 
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+// 
+//
 //
 
-#include "Object.h" // for getObjectInterface
-#include "as_object.h"
+// Implementation for ActionScript TextFieldAutoSize object.
 
-#include "string_table.h"
-#include "VM.h"
+#ifndef GNASH_TEXTFIELDAUTOSIZE_H
+#define GNASH_TEXTFIELDAUTOSIZE_H
 
-#include "flash/text/TextRenderer_as.h"
-#include "flash/text/TextFieldAutoSize_as.h"
+#include <memory> // for auto_ptr
 
 namespace gnash {
 
-as_value
-get_flash_text_package(const fn_call& /*fn*/)
-{
-	log_debug("Loading flash.text package");
+class as_object;
 
-	as_object* pkg = new as_object(getObjectInterface());
+/// Initialize the TextFieldAutoSize Class
+void TextFieldAutoSize_class_init(as_object& where);
 
-	TextRenderer_class_init(*pkg);
-	TextFieldAutoSize_class_init(*pkg);
+/// Return a TextFieldAutoSize instance
+std::auto_ptr<as_object> init_text_field_auto_size_instance();
 
-	return pkg;
+as_object* getTextFieldAutoSizeInterface();
+
+
 }
 
-void
-flash_text_package_init(as_object& where)
-{
-	string_table& st = where.getVM().getStringTable();
-	where.init_destructive_property(st.find("text"), get_flash_text_package);
-}
-
-
-} // end of gnash namespace
+#endif // GNASH_INT_AS_H

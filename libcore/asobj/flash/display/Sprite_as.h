@@ -19,10 +19,10 @@
 //
 //
 
-// Implementation for ActionScript EventDispatcher object.
+// Implementation for ActionScript Sprite object.
 
-#ifndef GNASH_EVENTDISPATCHER_H
-#define GNASH_EVENTDISPATCHER_H
+#ifndef GNASH_SPRITEAS_H
+#define GNASH_SPRITEAS_H
 
 #include <memory> // for auto_ptr
 
@@ -30,14 +30,15 @@ namespace gnash {
 
 class as_object;
 
-/// Initialize the global EventDispacther class
-void event_dispatcher_class_init(as_object& global);
+/// Initialize the Sprite class
+void sprite_as_class_init(as_object& where);
 
-/// Return an EventDispacther instance
-std::auto_ptr<as_object> init_event_dispatcher_instance();
+/// Return a Sprite instance
+std::auto_ptr<as_object> init_sprite_as_instance();
 
-as_object* getEventDispatcherInterface();
+as_object* getSpriteAsInterface();
+
 
 }
 
-#endif // GNASH_EVENTDISPATCHER_H
+#endif // GNASH_SPRITEAS_H

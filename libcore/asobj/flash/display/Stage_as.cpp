@@ -1,4 +1,4 @@
-// EventDispatcher.cpp:  Implementation of ActionScript EventDispatcher class, for Gnash.
+// EventDispatcher.cpp:  Implementation of ActionScript Stage class, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
@@ -17,11 +17,11 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#include "Object.h"
 #include "smart_ptr.h"
 #include "fn_call.h"
 #include "as_object.h" // for inheritance
 #include "builtin_function.h" // need builtin_function
+#include "DisplayObjectContainer.h"
 
 #include "log.h"
 
@@ -29,12 +29,12 @@
 #include <sstream>
 
 namespace gnash {
-class event_dispatcher_as_object : public as_object
+class stage_as_object : public as_object
 {
 
 public:
 
-	event_dispatcher_as_object()
+	stage_as_object()
 		:
 		as_object()
 	{
@@ -43,39 +43,41 @@ public:
 };
 
 static as_value
-event_dispatcher_ctor(const fn_call& fn)
+stage_ctor(const fn_call& fn)
 {
-	boost::intrusive_ptr<as_object> obj = new event_dispatcher_as_object();
+	boost::intrusive_ptr<as_object> obj = new stage_as_object();
 	
 	return as_value(obj.get()); // will keep alive
 }
 
 as_object*
-getEventDispatcherInterface()
+getStageInterface()
 {
 	static boost::intrusive_ptr<as_object> o;
 	if ( ! o )
 	{
-		o = new as_object(getObjectInterface());
+		o = new as_object(getDisplayObjectContainerInterface());
 	}
 	return o.get();
 }
 
-// extern (used by Global.cpp)
-void event_dispatcher_class_init(as_object& global)
+// extern
+void stage_class_init9(as_object& global)
 {
+	log_debug("Loading");
     static boost::intrusive_ptr<builtin_function> cl;
 
-	cl=new builtin_function(&event_dispatcher_ctor, getEventDispatcherInterface());
-
-	// Register _global.EventDispatcher
-	global.init_member("EventDispatcher", cl.get());
+	cl=new builtin_function(&stage_ctor, getStageInterface());
+	log_debug("Creating function");
+	// Register _global.Stage
+	global.init_member("Stage", cl.get());
+	log_debug("Done attaching.");
 }
 
 std::auto_ptr<as_object>
-init_event_dispatcher_instance()
+init_stage_instance()
 {
-	return std::auto_ptr<as_object>(new event_dispatcher_as_object);
+	return std::auto_ptr<as_object>(new stage_as_object);
 }
 
 

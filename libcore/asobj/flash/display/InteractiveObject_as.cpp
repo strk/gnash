@@ -1,4 +1,4 @@
-// EventDispatcher.cpp:  Implementation of ActionScript Sprite class, for Gnash.
+// DisplayObject.cpp:  Implementation of ActionScript InteractiveObject class, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
@@ -17,18 +17,11 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#include "Object.h"
 #include "smart_ptr.h"
 #include "fn_call.h"
 #include "as_object.h" // for inheritance
 #include "builtin_function.h" // need builtin_function
-#include "movie_definition.h" // for Object.registerClass (get_exported_resource)
-//#include "character.h" // for Object.registerClass  (get_root_movie)
-#include "sprite_instance.h" // for Object.registerClass  (get_movie_definition)
-#include "sprite_definition.h" // for Object.registerClass  (get_movie_definition)
-#include "VM.h" // for SWF version (attachObjectInterface)
-#include "namedStrings.h" // for NSV::PROP_TO_STRING
-#include "DisplayObjectContainer.h"
+#include "flash/display/DisplayObject_as.h"
 
 #include "log.h"
 
@@ -36,12 +29,12 @@
 #include <sstream>
 
 namespace gnash {
-class sprite_as_object : public as_object
+class interactive_object_as_object : public as_object
 {
 
 public:
 
-	sprite_as_object()
+	interactive_object_as_object()
 		:
 		as_object()
 	{
@@ -50,39 +43,38 @@ public:
 };
 
 static as_value
-sprite_as_ctor(const fn_call& fn)
+interactive_object_ctor(const fn_call& fn)
 {
-	boost::intrusive_ptr<as_object> obj = new sprite_as_object();
+	boost::intrusive_ptr<as_object> obj = new interactive_object_as_object();
 	
 	return as_value(obj.get()); // will keep alive
 }
 
 as_object*
-getSpriteAsInterface()
+getInteractiveObjectInterface()
 {
 	static boost::intrusive_ptr<as_object> o;
 	if ( ! o )
 	{
-		o = new as_object(getDisplayObjectContainerInterface());
+		o = new as_object(getDisplayObjectInterface());
 	}
 	return o.get();
 }
 
-// extern (used by Global.cpp)
-void sprite_as_class_init(as_object& global)
+// extern
+void interactive_object_class_init(as_object& where)
 {
     static boost::intrusive_ptr<builtin_function> cl;
 
-	cl=new builtin_function(&sprite_as_ctor, getSpriteAsInterface());
+	cl=new builtin_function(&interactive_object_ctor, getInteractiveObjectInterface());
 
-	// Register _global.Sprite
-	global.init_member("Sprite", cl.get());
+	where.init_member("InteractiveObject", cl.get());
 }
 
 std::auto_ptr<as_object>
-init_sprite_as_instance()
+init_interactive_object_instance()
 {
-	return std::auto_ptr<as_object>(new sprite_as_object);
+	return std::auto_ptr<as_object>(new interactive_object_as_object);
 }
 
 

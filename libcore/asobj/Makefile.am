@@ -50,13 +50,9 @@ libgnashasobjs_la_SOURCES = \
 	ContextMenu.cpp	\
 	CustomActions.cpp\
 	Date.cpp \
-	DisplayObject.cpp \
-	DisplayObjectContainer.cpp \
 	Error_as.cpp \
-	EventDispatcher.cpp \
 	Global.cpp \
 	int_as.cpp \
-	InteractiveObject.cpp \
 	Key.cpp	\
 	LoadVars.cpp \
 	LocalConnection.cpp\
@@ -70,11 +66,9 @@ libgnashasobjs_la_SOURCES = \
 	Selection.cpp \
 	SharedObject.cpp\
 	Sound.cpp \
-	Sprite_as.cpp \
 	Stage.cpp \
 	System.cpp \
 	TextFormat.cpp \
-	TextFieldAutoSize_as.cpp \
 	TextSnapshot.cpp \
 	MovieClipLoader.cpp\
 	String_as.cpp \
@@ -83,7 +77,13 @@ libgnashasobjs_la_SOURCES = \
 	xmlnode.cpp \
 	XMLSocket_as.cpp \
 	flash/display/BitmapData_as.cpp \
+	flash/display/DisplayObject_as.cpp \
+	flash/display/DisplayObjectContainer_as.cpp \
+	flash/display/InteractiveObject_as.cpp \
+	flash/display/Sprite_as.cpp \
 	flash/display_pkg.cpp \
+	flash/events/EventDispatcher_as.cpp \
+	flash/events_pkg.cpp \
 	flash/external/ExternalInterface_as.cpp \
 	flash/external_pkg.cpp \
         flash/filters/BevelFilter_as.cpp \
@@ -108,6 +108,7 @@ libgnashasobjs_la_SOURCES = \
 	flash/net_pkg.cpp \
 	flash_pkg.cpp \
 	flash/text_pkg.cpp \
+	flash/text/TextFieldAutoSize_as.cpp \
 	flash/text/TextRenderer_as.cpp \
 	flash/utils_pkg.cpp \
 	$(NULL)
@@ -122,14 +123,10 @@ noinst_HEADERS = \
 	ContextMenu.h \
 	CustomActions.h	\
 	Date.h \
-	DisplayObject.h \
-	DisplayObjectContainer.h \
 	Error_as.h	\
-	EventDispatcher.h \
 	Math_as.h	\
 	Global.h\
 	int_as.h \
-	InteractiveObject.h \
 	Key.h \
 	LoadVars.h \
 	LocalConnection.h\
@@ -149,10 +146,8 @@ noinst_HEADERS = \
 	SoundFfmpeg.h \
 	SoundGst.h \
 	SoundMad.h \
-	Sprite_as.h \
 	Stage.h	\
 	System.h \
-	TextFieldAutoSize_as.h \
 	TextFormat.h \
 	TextSnapshot.h \
 	String_as.h \
@@ -161,7 +156,13 @@ noinst_HEADERS = \
 	xmlattrs.h \
 	xmlnode.h \
 	flash/display/BitmapData_as.h \
+	flash/display/DisplayObject_as.h \
+	flash/display/DisplayObjectContainer_as.h \
+	flash/display/InteractiveObject_as.h \
+	flash/display/Sprite_as.h \
 	flash/display_pkg.h \
+	flash/events/EventDispatcher_as.h \
+	flash/events_pkg.h \
 	flash/external/ExternalInterface_as.h \
 	flash/external_pkg.h \
         flash/filters/BevelFilter_as.h \
@@ -186,6 +187,7 @@ noinst_HEADERS = \
 	flash/net_pkg.h \
 	flash_pkg.h \
 	flash/text_pkg.h \
+	flash/text/TextFieldAutoSize_as.h \
 	flash/text/TextRenderer_as.h \
 	flash/utils_pkg.h \
 	$(NULL)

@@ -1,4 +1,4 @@
-// DisplayObject.cpp:  Implementation of ActionScript InteractiveObject class, for Gnash.
+// EventDispatcher.cpp:  Implementation of ActionScript EventDispatcher class, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
@@ -17,11 +17,11 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#include "Object.h"
 #include "smart_ptr.h"
 #include "fn_call.h"
 #include "as_object.h" // for inheritance
 #include "builtin_function.h" // need builtin_function
-#include "DisplayObject.h"
 
 #include "log.h"
 
@@ -29,12 +29,12 @@
 #include <sstream>
 
 namespace gnash {
-class interactive_object_as_object : public as_object
+class event_dispatcher_as_object : public as_object
 {
 
 public:
 
-	interactive_object_as_object()
+	event_dispatcher_as_object()
 		:
 		as_object()
 	{
@@ -43,39 +43,38 @@ public:
 };
 
 static as_value
-interactive_object_ctor(const fn_call& fn)
+event_dispatcher_ctor(const fn_call& fn)
 {
-	boost::intrusive_ptr<as_object> obj = new interactive_object_as_object();
+	boost::intrusive_ptr<as_object> obj = new event_dispatcher_as_object();
 	
 	return as_value(obj.get()); // will keep alive
 }
 
 as_object*
-getInteractiveObjectInterface()
+getEventDispatcherInterface()
 {
 	static boost::intrusive_ptr<as_object> o;
 	if ( ! o )
 	{
-		o = new as_object(getDisplayObjectInterface());
+		o = new as_object(getObjectInterface());
 	}
 	return o.get();
 }
 
-// extern (used by Global.cpp)
-void interactive_object_class_init(as_object& global)
+// extern
+void event_dispatcher_class_init(as_object& where)
 {
     static boost::intrusive_ptr<builtin_function> cl;
 
-	cl=new builtin_function(&interactive_object_ctor, getInteractiveObjectInterface());
+	cl=new builtin_function(&event_dispatcher_ctor, getEventDispatcherInterface());
 
-	// Register _global.InteractiveObject
-	global.init_member("InteractiveObject", cl.get());
+	where.init_member("EventDispatcher", cl.get());
 }
 
 std::auto_ptr<as_object>
-init_interactive_object_instance()
+init_event_dispatcher_instance()
 {
-	return std::auto_ptr<as_object>(new interactive_object_as_object);
+	return std::auto_ptr<as_object>(new event_dispatcher_as_object);
 }
 
 

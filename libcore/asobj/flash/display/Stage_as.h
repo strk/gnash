@@ -19,10 +19,10 @@
 //
 //
 
-// Implementation for ActionScript TextFieldAutoSize object.
+// Implementation for ActionScript Stage object.
 
-#ifndef GNASH_TEXTFIELDAUTOSIZE_H
-#define GNASH_TEXTFIELDAUTOSIZE_H
+#ifndef GNASH_STAGE_H
+#define GNASH_STAGE_H
 
 #include <memory> // for auto_ptr
 
@@ -30,15 +30,15 @@ namespace gnash {
 
 class as_object;
 
-/// Initialize the global int class
-void text_field_auto_size_class_init(as_object& global);
+/// Initialize the Stage class
+void stage_class_init9(as_object& global);
 
-/// Return an int instance
-std::auto_ptr<as_object> init_text_field_auto_size_instance();
+/// Return a Stage instance
+std::auto_ptr<as_object> init_stage_instance();
 
-as_object* getTextFieldAutoSizeInterface();
+as_object* getStageInterface();
 
 
 }
 
-#endif // GNASH_INT_AS_H
+#endif // GNASH_DISPLAYOBJECTCONTAINER_H

@@ -15,30 +15,17 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// 
-//
-//
-
-// Implementation for ActionScript InteractiveObject object.
-
-#ifndef GNASH_INTERACTIVEOBJECT_H
-#define GNASH_INTERACTIVEOBJECT_H
-
-#include <memory> // for auto_ptr
+#ifndef __FLASH_EVENTS_PACKAGE_H__
+#define __FLASH_EVENTS_PACKAGE_H__
 
 namespace gnash {
 
 class as_object;
 
-/// Initialize the global InteractiveObject class
-void interactive_object_class_init(as_object& global);
+void flash_events_package_init(as_object& pkg);
 
-/// Return a InteractiveObject instance
-std::auto_ptr<as_object> init_interactive_object_instance();
+} // end of gnash namespace
 
-as_object* getInteractiveObjectInterface();
+// __EVENTS_PACKAGE_H__
+#endif
 
-
-}
-
-#endif // GNASH_INTERACTIVEOBJECT_H

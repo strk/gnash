@@ -1,4 +1,4 @@
-// EventDispatcher.cpp:  Implementation of ActionScript TextFieldAutoSize class, for Gnash.
+// EventDispatcher.cpp:  Implementation of ActionScript DisplayObjectContainer class, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
@@ -21,7 +21,7 @@
 #include "fn_call.h"
 #include "as_object.h" // for inheritance
 #include "builtin_function.h" // need builtin_function
-#include "Object.h"
+#include "flash/display/InteractiveObject_as.h"
 
 #include "log.h"
 
@@ -29,14 +29,12 @@
 #include <sstream>
 
 namespace gnash {
-void attachTextFieldAutoSizeInterface(as_object& o);
-
-class text_field_auto_size_as_object : public as_object
+class display_object_container_as_object : public as_object
 {
 
 public:
 
-	text_field_auto_size_as_object()
+	display_object_container_as_object()
 		:
 		as_object()
 	{
@@ -45,44 +43,38 @@ public:
 };
 
 static as_value
-text_field_auto_size_ctor(const fn_call& fn)
+display_object_container_ctor(const fn_call& fn)
 {
-	boost::intrusive_ptr<as_object> obj = new text_field_auto_size_as_object();
+	boost::intrusive_ptr<as_object> obj = new display_object_container_as_object();
 	
 	return as_value(obj.get()); // will keep alive
 }
 
 as_object*
-getTextFieldAutoSizeInterface()
+getDisplayObjectContainerInterface()
 {
 	static boost::intrusive_ptr<as_object> o;
 	if ( ! o )
 	{
-		o = new as_object(getObjectInterface());
-		attachTextFieldAutoSizeInterface(*o);
+		o = new as_object(getInteractiveObjectInterface());
 	}
 	return o.get();
 }
 
-// extern (used by Global.cpp)
-void text_field_auto_size_class_init(as_object& global)
+// extern
+void display_object_container_class_init(as_object& where)
 {
-	global.init_member("TextFieldAutoSize", getTextFieldAutoSizeInterface());
+    static boost::intrusive_ptr<builtin_function> cl;
+
+	cl=new builtin_function(&display_object_container_ctor, getDisplayObjectContainerInterface());
+
+	where.init_member("DisplayObjectContainer", cl.get());
 }
 
 std::auto_ptr<as_object>
-init_text_field_auto_size_instance()
+init_display_object_container_instance()
 {
-	return std::auto_ptr<as_object>(new text_field_auto_size_as_object);
-}
-
-void
-attachTextFieldAutoSizeInterface(as_object& o)
-{
-	o.init_member("CENTER", as_value("center"));
-	o.init_member("LEFT", as_value("left"));
-	o.init_member("RIGHT", as_value("right"));
-	o.init_member("NONE", as_value("none"));
+	return std::auto_ptr<as_object>(new display_object_container_as_object);
 }
 
 

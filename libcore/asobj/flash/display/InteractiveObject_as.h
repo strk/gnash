@@ -19,10 +19,10 @@
 //
 //
 
-// Implementation for ActionScript Sprite object.
+// Implementation for ActionScript InteractiveObject object.
 
-#ifndef GNASH_SPRITEAS_H
-#define GNASH_SPRITEAS_H
+#ifndef GNASH_INTERACTIVEOBJECT_H
+#define GNASH_INTERACTIVEOBJECT_H
 
 #include <memory> // for auto_ptr
 
@@ -30,15 +30,15 @@ namespace gnash {
 
 class as_object;
 
-/// Initialize the global Sprite class
-void sprite_as_class_init(as_object& global);
+/// Initialize the InteractiveObject class
+void interactive_object_class_init(as_object& where);
 
-/// Return a Sprite instance
-std::auto_ptr<as_object> init_sprite_as_instance();
+/// Return a InteractiveObject instance
+std::auto_ptr<as_object> init_interactive_object_instance();
 
-as_object* getSpriteAsInterface();
+as_object* getInteractiveObjectInterface();
 
 
 }
 
-#endif // GNASH_SPRITEAS_H
+#endif // GNASH_INTERACTIVEOBJECT_H

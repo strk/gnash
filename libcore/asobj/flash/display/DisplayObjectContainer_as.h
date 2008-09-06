@@ -19,10 +19,10 @@
 //
 //
 
-// Implementation for ActionScript DisplayObject object.
+// Implementation for ActionScript DisplayObjectContainer object.
 
-#ifndef GNASH_DISPLAYOBJECT_H
-#define GNASH_DISPLAYOBJECT_H
+#ifndef GNASH_DISPLAYOBJECTCONTAINER_H
+#define GNASH_DISPLAYOBJECTCONTAINER_H
 
 #include <memory> // for auto_ptr
 
@@ -30,15 +30,15 @@ namespace gnash {
 
 class as_object;
 
-/// Initialize the global DisplayObject class
-void display_object_class_init(as_object& global);
+/// Initialize the DisplayObjectContainer class
+void display_object_container_class_init(as_object& where);
 
-/// Return a DisplayObject instance
-std::auto_ptr<as_object> init_display_object_instance();
+/// Return a DisplayObjectContainer instance
+std::auto_ptr<as_object> init_display_object_container_instance();
 
-as_object* getDisplayObjectInterface();
+as_object* getDisplayObjectContainerInterface();
 
 
 }
 
-#endif // GNASH_DISPLAYOBJECT_H
+#endif // GNASH_DISPLAYOBJECTCONTAINER_H
