@@ -45,6 +45,8 @@
 #include "amf.h"
 #include "element.h"
 
+#include <iostream>
+
 using namespace amf;
 using namespace gnash;
 using namespace std;
@@ -132,7 +134,7 @@ test_el()
 
     Element el2;
     el2.makeString("Hello World");
-    as_value as2(&el2);
+    as_value as2(el2);
     if (as2.to_string() == el2.to_string()) {
         runtest.pass("as_value(Element &string)");
     } else {
@@ -141,7 +143,7 @@ test_el()
     
     Element el3;
     el3.makeBoolean(true);
-    as_value as3(&el3);    
+    as_value as3(el3);    
     if ((as3.is_bool()) && (as3.to_bool() == true)) {
         runtest.pass("as_value(Element &bool)");
     } else {
@@ -150,7 +152,7 @@ test_el()
 
     Element el4;
     el4.makeUndefined();
-    as_value as4(&el4);
+    as_value as4(el4);
     if (as4.is_undefined()) {
         runtest.pass("as_value(Element &undefined)");
     } else {
@@ -159,7 +161,7 @@ test_el()
     
     Element el5;
     el5.makeMovieClip();
-    as_value as5(&el5);
+    as_value as5(el5);
     if (as5.is_sprite()) {
         runtest.pass("as_value(Element &movieclip)");
     } else {
@@ -192,13 +194,13 @@ test_obj()
     VM& vm = VM::get();
     string_table& st = vm.getStringTable();
 
-    as_value as1(&top);
+    as_value as1(top);
     
     if (as1.is_object()) {
-        runtest.pass("as_value(Element &object)");
+        runtest.pass("as_value(Element object)");
     } else {
         notest = true;
-        runtest.fail("as_value(Element &object)");
+        runtest.fail("as_value(Element object)");
     }
 
     as_value fooas, baras;
@@ -244,8 +246,6 @@ test_obj()
     } else {
         runtest.fail("as_value::to_element()");
     }
-    delete foo;
-    delete bar;
 }
 
 void
