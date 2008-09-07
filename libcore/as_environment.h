@@ -425,6 +425,16 @@ public:
 	///
 	as_value get_stack_index(unsigned int index);
 	
+	/// Assign value of the stack on a given index.
+	//
+	/// @param index
+	///	Index of the stack.
+	///
+	/// @param val
+	///	Value to assign to the stack-index.	
+	///
+	void set_stack_index(unsigned int index, as_value val);
+	
 	/// Dump content of the stack to a std::ostream
 	//
 	/// @param out

@@ -535,14 +535,14 @@ Debugger::dumpStackFrame()
 
 // Change the value of a parameter on the stack
 void
-Debugger::changeStackValue(int index, as_value &val)
+Debugger::changeStackValue(unsigned int index, as_value &val)
 {
 //    GNASH_REPORT_FUNCTION;
     changeStackValue(*_env, index, val);
 }
 
 void
-Debugger::changeStackValue(as_environment &env, int index, as_value &val)
+Debugger::changeStackValue(as_environment &env, unsigned int index, as_value &val)
 {
 //    GNASH_REPORT_FUNCTION;
     if (!_env) {
@@ -550,7 +550,7 @@ Debugger::changeStackValue(as_environment &env, int index, as_value &val)
 	return;
     }
     if (env.stack_size()) {
-	env.get_stack_index(index) = val;
+	env.set_stack_index(index, val);
     }
 }
 

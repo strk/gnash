@@ -986,6 +986,12 @@ as_environment::get_stack_index(unsigned int index)
 }
 
 void
+as_environment::set_stack_index(unsigned int index, as_value val)
+{
+	_stack.assign(index, val);
+}
+
+void
 as_environment::dump_stack(std::ostream& out, unsigned int limit) const
 {
 	unsigned int si=0, n=_stack.size();
