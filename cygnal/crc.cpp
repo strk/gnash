@@ -55,13 +55,13 @@ CRcInitFile::getDefaultInstance()
 	return crcfile;
 }
 
-
 CRcInitFile::CRcInitFile() : _port_offset(0)
 {
 //    GNASH_REPORT_FUNCTION;
     loadFiles();
 }
 
+//Never destroy (TODO: add a destroyDefaultInstance)
 CRcInitFile::~CRcInitFile()
 {
 //    GNASH_REPORT_FUNCTION;    

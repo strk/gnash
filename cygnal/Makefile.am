@@ -56,13 +56,10 @@ INCLUDES = -I.. \
         -I$(top_srcdir)/libcore \
         -DLOCALEDIR=\"$(localedir)\" \
         $(LIBXML_CFLAGS) \
-	$(DMALLOC_CFLAGS) \
-	$(CURL_CFLAGS) \
-	$(BOOST_CFLAGS) \
-	$(PTHREAD_CFLAGS)
-
-# noinst_LTLIBRARIES = libcygnal.la
-# libcygnal_la_LIBADD = $(AM_LDFLAGS)
+		$(DMALLOC_CFLAGS) \
+		$(CURL_CFLAGS) \
+		$(BOOST_CFLAGS) \
+		$(PTHREAD_CFLAGS)
 
 noinst_HEADERS = \
 	crc.h
