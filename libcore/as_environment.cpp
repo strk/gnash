@@ -979,6 +979,12 @@ as_environment::CallFrame::CallFrame(as_function* funcPtr)
 {
 }
 
+as_value
+as_environment::get_stack_index(unsigned int index)
+{
+	return static_cast<as_value>(_stack.value(index));
+}
+
 void
 as_environment::dump_stack(std::ostream& out, unsigned int limit) const
 {

@@ -417,7 +417,14 @@ public:
 	/// Case insensitive for SWF up to 6, sensitive from 7 up
 	///
 	as_object* find_object(const std::string& path, const ScopeStack* scopeStack=NULL) const;
-
+	
+	/// Return content of the stack on a given index.
+	//
+	/// @param index
+	///	index of the stack.
+	///
+	as_value get_stack_index(unsigned int index);
+	
 	/// Dump content of the stack to a std::ostream
 	//
 	/// @param out
