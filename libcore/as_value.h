@@ -30,6 +30,7 @@
 #include <cmath>
 #include <limits>
 #include <string>
+#include <vector>
 #include <boost/variant.hpp>
 #include <ostream> // for inlined output operator
 #include <boost/type_traits/is_floating_point.hpp>
@@ -41,6 +42,7 @@
 
 // Forward declarations
 namespace gnash {
+    class VM;
 	class as_object;
 	class fn_call;
 	class as_function;
@@ -48,6 +50,7 @@ namespace gnash {
 	class character;
 	class asNamespace;
 	class asName;
+    class SimpleBuffer;
 }
 namespace amf {
 	class Element;
@@ -203,7 +206,24 @@ public:
 	///
 	/// TODO restore first parameter on parse errors
 	///
-	bool readAMF0(boost::uint8_t *&b, boost::uint8_t *end, int inType = -1);
+	/// @param objRefs
+	///     A vector of already-parsed objects to properly interpret references.
+	///     Pass an empty vector on first call as it will be used internally.
+	///     On return, the vector will be filled with pointers to every complex object
+	///     parsed from the stream.
+	///
+	bool readAMF0(boost::uint8_t *&b, boost::uint8_t *end, int inType, std::vector<as_object*>& objRefs);
+
+    /// Serialize value in AMF0 format.
+    //
+    /// @param buf
+    ///     The buffer to append serialized version of this value to.
+    ///
+    /// @param offsetTable
+    ///     A map of already-parsed objects, pass an empty map on first call as
+    ///     it will be used internally.
+    ///
+    bool writeAMF0(SimpleBuffer& buf, std::map<as_object*, size_t>& offsetTable, VM& vm) const;
 
 	/// Convert numeric value to string value, following ECMA-262 specification
 	//
