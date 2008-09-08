@@ -864,7 +864,6 @@ AC_MSG_CHECKING([For the version of libtool])
 ltver=`${LIBTOOLIZE:-libtoolize} --version | head -1 | cut -d ' ' -f 4`
 ltmajor=`echo $ltver | cut -d '.' -f 1`
 AC_MSG_RESULT([$ltver])
-AC_PROG_LIBTOOL
 if test $ltmajor -eq 1; then
 AC_LIBLTDL_INSTALLABLE
 AC_LIBTOOL_DLOPEN
@@ -873,6 +872,7 @@ else
 LT_INIT([dlopen win32-dll])
 LTDL_INIT([nonrecursive])
 fi
+AC_PROG_LIBTOOL
 AM_CONDITIONAL(LIBLTDL2, [test $ltmajor -eq 2])
 AM_CONDITIONAL(INSTALL_LTDL, test x"${enable_ltdl_install-no}" != xno)
 AM_CONDITIONAL(CONVENIENCE_LTDL, test x"${enable_ltdl_convenience-no}" != xno)
