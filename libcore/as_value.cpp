@@ -2228,27 +2228,29 @@ as_value::writeAMF0(SimpleBuffer& buf, std::map<as_object*, size_t>& offsetTable
             as_object* obj = to_object().get();
             assert(obj);
 
+            size_t idx = offsetTable.size(); // 0 for the first, etc...
             OffsetTable::iterator it = offsetTable.find(obj);
             if ( it == offsetTable.end() )
             {
-                offsetTable[obj] = offsetTable.size(); // 0 for the first, etc...
+                log_debug("serializing object (or function) as reference to %d", idx);
+                offsetTable[obj] = idx;
                 buf.appendByte(amf::Element::OBJECT_AMF0);
                 PropsBufSerializer props(buf, vm, offsetTable);
                 obj->visitPropertyValues(props);
                 if ( ! props.success() ) 
                 {
                     log_error("Could not serialize object");
-                    return 0;
+                    return false;
                 }
             }
             else // object already seen
             {
+                log_debug("serializing object (or function) with index %d", idx);
+                offsetTable[obj] = idx;
                 buf.appendByte(amf::Element::REFERENCE_AMF0);
                 buf.appendNetworkShort(it->second);
-                log_unimpl(" unsupported write of REFERENCE type values");
-                return 0;
             }
-            break;
+            return true;
         }
 
         case STRING:
@@ -2257,7 +2259,7 @@ as_value::writeAMF0(SimpleBuffer& buf, std::map<as_object*, size_t>& offsetTable
             std::string str = to_string();
             buf.appendNetworkShort(str.size());
             buf.append(str.c_str(), str.size());
-            break;
+            return true;
         }
 
         case NUMBER:
@@ -2266,15 +2268,15 @@ as_value::writeAMF0(SimpleBuffer& buf, std::map<as_object*, size_t>& offsetTable
             buf.appendByte(amf::Element::NUMBER_AMF0);
             amf::swapBytes(&d, 8); // this actually only swapps on little-endian machines
             buf.append(&d, 8);
+            return true;
         }
 
         case MOVIECLIP:
         {
             log_unimpl(_(" serialization of MovieClip objects"));
+            return false;
         }
     }
-
-    return false;
 }
 
 } // namespace gnash
