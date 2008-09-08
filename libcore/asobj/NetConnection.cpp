@@ -314,6 +314,8 @@ public:
 			{
 				if ( reply_end > 8)
 				{
+                    std::vector<as_object*> objRefs;
+
 					log_debug("hit eof");
 					boost::int16_t si;
 					boost::uint16_t li;
@@ -342,11 +344,6 @@ public:
 								break;
 							}
 							std::string headerName((char*)b, si); // end-b);
-							//if( !tmp.readAMF0(b, end) )
-							//{
-							//	headers_ok = 0;
-							//	break;
-							//}
 							log_debug("Header name %s", headerName);
 							b += si;
 							if ( b + 5 > end ) {
@@ -354,7 +351,7 @@ public:
 								break;
 							}
 							b += 5; // skip past bool and length long
-							if( !tmp.readAMF0(b, end) )
+							if( !tmp.readAMF0(b, end, -1, objRefs) )
 							{
 								headers_ok = 0;
 								break;
@@ -412,7 +409,7 @@ public:
 								log_debug("about to parse amf value");
 								// this updates b to point to the next unparsed byte
 								as_value reply_as_value;
-								if ( ! reply_as_value.readAMF0(b, end) )
+								if ( ! reply_as_value.readAMF0(b, end, -1, objRefs) )
 								{
 									log_error("parse amf failed");
 									// this will happen if we get

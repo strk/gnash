@@ -627,7 +627,8 @@ FLVParser::MetaTag::execute(as_object* thisPtr, VM& vm)
 	string_table::key funcKey = st.find(funcName);
 
 	as_value arg;
-	if ( ! arg.readAMF0(ptr, endptr) )
+    std::vector<as_object*> objRefs;
+	if ( ! arg.readAMF0(ptr, endptr, -1, objRefs) )
 	{
 		log_error("Could not convert FLV metatag to as_value");
 		return;
