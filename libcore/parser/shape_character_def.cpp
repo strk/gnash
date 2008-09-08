@@ -807,16 +807,21 @@ shape_character_def::read(SWFStream& in, int tag_type, bool with_style,
 
         bool even_odd = true;  // later we will need non-zero for glyphs... (TODO)
 
-	// FIXME: if the shape contains non-scaled strokes
-	//        we can't rely on boundary itself for a quick
-	//        way out. Bounds supposedly already include
-	//        thickness, so we might keep a flag telling us
-	//        whether *non_scaled* strokes are present
-	//        and if not still use the boundary check.
-        //if (m_bound.point_test(x, y) == false)
-        //{
-		//return false;
-        //}
+        // FIXME: if the shape contains non-scaled strokes
+        //        we can't rely on boundary itself for a quick
+        //        way out. Bounds supposedly already include
+        //        thickness, so we might keep a flag telling us
+        //        whether *non_scaled* strokes are present
+        //        and if not still use the boundary check.
+        // NOTE: just skipping this test breaks a corner-case
+        //       in DrawingApiTest (kind of a fill-leakage making
+        //       the collision detection find you inside a self-crossing
+        //       shape).
+        //
+        if (m_bound.point_test(x, y) == false)
+        {
+            return false;
+        }
 
         unsigned npaths = m_paths.size();
         int counter = 0;
