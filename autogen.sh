@@ -112,20 +112,36 @@ esac
 # renamed to gnashconfig,h to be unique. As the files libtoolize copies insist
 # on using config.h, we just edit the name, rather than adding a fixed copy to
 # Gnash.
-if grep "^AC_PROG_LIBTOOL" configure.ac >/dev/null; then
-	if test -z "$NO_LIBTOOLIZE" ; then 
-	  echo "Running libtoolize --force --ltdl --copy ..."
-	  if ${LIBTOOLIZE:-libtoolize} --force --ltdl --copy; then
-	    mv libltdl/ltdl.c libltdl/ltdl.c.orig
-	    sed -e 's/include <config.h>/include <gnashconfig.h>/' libltdl/ltdl.c.orig > libltdl/ltdl.c
-	    #rm libltdl/ltdl.c.orig
-	    chmod a+w libltdl/config-h.in # Darwin needs this
-          else
-            echo
-            echo "**Error**: libtoolize failed, do you have libtool and libltdl3-dev packages installed?"
-            exit 1
-          fi
-	fi
+ltdlver=`${LIBTOOLIZE:-libtoolize} --version | head -1 | cut -d ' ' -f 4`
+ltdlmajor=`echo $ltdlver | cut -d '.' -f 1`
+if test -z "$NO_LIBTOOLIZE" ; then 
+  libtoolflags="--force --ltdl --copy"
+  if test $ltdlmajor -eq 2; then
+    libtoolflags="${libtoolflags} --quiet --nonrecursive"
+    ltdldirs=libltdl/libltdl/*.h
+  fi
+  echo "Running libtoolize $ltdlver ${libtoolflags} ..."
+  if ${LIBTOOLIZE:-libtoolize} ${libtoolflags}; then
+    # libtool insists on including config.h, but we use gnashconfig.h
+    # to avoid any problems, so we have to change this include
+    # so they all reference the right config header file.
+    if test -d libltdl; then
+      for i in libltdl/*.c $ltdldirs; do
+#      echo "Fixing $i..."
+        mv $i $i.orig
+        sed -e 's/include <config.h>/include <gnashconfig.h>/' $i.orig > $i
+      done
+    fi
+#            mv libltdl/ltdl.c libltdl/ltdl.c.orig
+#            sed -e 's/include <config.h>/include <gnashconfig.h>/' libltdl/ltdl.c.orig > libltdl/ltdl.c
+    if test -f libltdl/config-h.in; then
+      chmod a+w libltdl/config-h.in # Darwin needs this
+    fi
+  else
+    echo
+    echo "**Error**: libtoolize failed, do you have libtool and libltdl3-dev packages installed?"
+    exit 1
+  fi
 fi
 
 #for coin in `find $srcdir -name CVS -prune -o -name configure.ac -print`
@@ -142,6 +158,10 @@ do
         aclocalinclude="-I macros $ACLOCAL_FLAGS"
      else
         aclocalinclude="$ACLOCAL_FLAGS"
+     fi
+
+     if test -d libltdl/m4; then
+        aclocalinclude="-I libltdl/m4 -I macros $ACLOCAL_FLAGS"
      fi
 
       if grep "^AM_GLIB_GNU_GETTEXT" configure.ac >/dev/null; then
