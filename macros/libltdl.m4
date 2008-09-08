@@ -6832,3 +6832,10 @@ AC_CHECK_TYPES([error_t],
 
 AC_CHECK_FUNCS([argz_append argz_create_sep argz_insert argz_next argz_stringify])
 ])# AC_LTDL_FUNC_ARGZ
+
+dnl compatibility stubs for libtool 2.x, but when using libtool 1.x.
+AC_DEFUN([LT_INIT],
+])# LT_INIT
+
+AC_DEFUN([LTDL_INIT],
+])# LTDL_INIT
