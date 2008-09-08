@@ -84,35 +84,35 @@ public:
 };
 
 as_value selection_addlistener(const fn_call& /*fn*/) {
-    log_unimpl (__FUNCTION__);
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
 as_value selection_getbeginindex(const fn_call& /*fn*/) {
-    log_unimpl (__FUNCTION__);
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
 as_value selection_getcaretindex(const fn_call& /*fn*/) {
-    log_unimpl (__FUNCTION__);
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
 as_value selection_getendindex(const fn_call& /*fn*/) {
-    log_unimpl (__FUNCTION__);
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
 as_value selection_getfocus(const fn_call& /*fn*/) {
-    log_unimpl (__FUNCTION__);
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
 as_value selection_removelistener(const fn_call& /*fn*/) {
-    log_unimpl (__FUNCTION__);
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
 as_value selection_setfocus(const fn_call& /*fn*/) {
-    log_unimpl (__FUNCTION__);
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
 as_value selection_setselection(const fn_call& /*fn*/) {
-    log_unimpl (__FUNCTION__);
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
 }
 
