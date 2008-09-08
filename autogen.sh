@@ -125,7 +125,7 @@ if test -z "$NO_LIBTOOLIZE" ; then
     # libtool insists on including config.h, but we use gnashconfig.h
     # to avoid any problems, so we have to change this include
     # so they all reference the right config header file.
-    for i in libltdl/Makefile.am libltdl/*.c $ltdldirs; do
+    for i in libltdl/*.c $ltdldirs; do
 #      echo "Fixing $i..."
       mv $i $i.orig
       sed -e 's/include <config.h>/include <gnashconfig.h>/' $i.orig > $i
