@@ -251,11 +251,7 @@ private:
 	void saveState();
 	void restoreState();
 
-	Property* find_prop_strict(asName multiname);
-
-	void get_property(string_table::key name,string_table::key ns);
-	
-	void get_property(Property* p);
+	as_value find_prop_strict(asName multiname);
 
 	as_value get_property_value(asName multiname);
 

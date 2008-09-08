@@ -1474,19 +1474,12 @@ Machine::execute()
 	{
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
 	
-		Property *b = find_prop_strict(a);
+		as_value val = find_prop_strict(a);
 
-		if (!b)
-			throw ASException();
-		
-		as_value val;
+		pop_stack();
 
-//		get_property(a.getGlobalName(),a.getNamespace()->getURI());
-//		mStack.pop().to_object()->get_member(a.getGlobalName(),&val);
-//		mStack.push(val);
-		get_property(b);
-//		mStack.grow(1);
-//		pushGet(owner, mStack.top(0), b);
+		push_stack(val);
+
 		break;
 	}
 /// 0x61 ABC_ACTION_SETPROPERTY
@@ -1575,7 +1568,7 @@ Machine::execute()
 		as_value obj = pop_stack();
 		as_value val = get_property_value(obj.to_object(),a);
 		push_stack(val);
-		//get_property(a.getGlobalName(),0);
+
 		break;
 	}
 /// 0x68 ABC_ACTION_INITPROPERTY
@@ -2665,36 +2658,28 @@ Machine::Machine(VM& vm):mST(),mRegisters(),mExitWithReturn(false),_vm(vm)
 //	mST = ST;
 }
 
-Property* Machine::find_prop_strict(asName multiname){
+as_value Machine::find_prop_strict(asName multiname){
+	
+	as_value val;
 	for(int i=0;i<mAsValueScopeStack.size();i++){
 
-		Property *p = mAsValueScopeStack.top(i).to_object()->findProperty(multiname.getGlobalName(),multiname.getNamespace()->getURI());
+		val = mAsValueScopeStack.top(i).to_object().get()->getMember(multiname.getGlobalName(),multiname.getNamespace()->getURI());
 
-		if(p){
+		if(!val.is_undefined()){
 			push_stack(mAsValueScopeStack.top(i));
-			return p;
+			return val;
 		}
 	}
-	print_scope_stack();
-	LOG_DEBUG_AVM("Cannot find property in scope stack.");
-	as_environment env = as_environment(_vm);
-	as_object* obj = env.find_object(mPoolObject->mStringPool[multiname.getNamespace()->getAbcURI()],getScopeStack());
-	push_stack(as_value(obj));
-}
 
-void Machine::get_property(string_table::key name,string_table::key ns){
-	as_object* object = pop_stack().to_object().get();
-	push_stack(object->getMember(name,ns));
-}
-	
-void Machine::get_property(Property* p){
-	LOG_DEBUG_AVM("Getting property's value and pushing it onto the stack");
-	//GET PROPERTY
-	boost::intrusive_ptr<gnash::as_object> object = mStack.pop().to_object();
-//	LOG_DEBUG_AVM("Here are the members in the object the property was resolved in:");
-	as_value value = p->getValue(*object);
-	LOG_DEBUG_AVM("Property's value is %s",value.toDebugString());
-	mStack.push(value);
+	LOG_DEBUG_AVM("Cannot find property in scope stack.  Trying again using as_environment.");
+	as_object *target;
+	as_environment env = as_environment(_vm);
+	std::string name = mPoolObject->mStringPool[multiname.getABCName()];
+	std::string ns = mPoolObject->mStringPool[multiname.getNamespace()->getAbcURI()];
+	std::string path = ns.size() == 0 ? name : ns + "." + name;
+	val = env.get_variable(path,*getScopeStack(),&target);
+	push_stack(as_value(target));
+	return val;
 }
 
 as_value Machine::get_property_value(asName multiname){
