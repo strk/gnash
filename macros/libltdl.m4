@@ -6835,7 +6835,9 @@ AC_CHECK_FUNCS([argz_append argz_create_sep argz_insert argz_next argz_stringify
 
 dnl compatibility stubs for libtool 2.x, but when using libtool 1.x.
 AC_DEFUN([LT_INIT],
+[AC_MSG_ERROR([You shouldn't be here!])
 ])# LT_INIT
 
 AC_DEFUN([LTDL_INIT],
+[AC_MSG_ERROR([You shouldn't be here!])
 ])# LTDL_INIT
