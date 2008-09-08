@@ -2228,10 +2228,10 @@ as_value::writeAMF0(SimpleBuffer& buf, std::map<as_object*, size_t>& offsetTable
             as_object* obj = to_object().get();
             assert(obj);
 
-            size_t idx = offsetTable.size(); // 0 for the first, etc...
             OffsetTable::iterator it = offsetTable.find(obj);
             if ( it == offsetTable.end() )
             {
+                size_t idx = offsetTable.size(); // 0 for the first, etc...
                 log_debug("serializing object (or function) with index %d", idx);
                 offsetTable[obj] = idx;
                 buf.appendByte(amf::Element::OBJECT_AMF0);
@@ -2245,9 +2245,10 @@ as_value::writeAMF0(SimpleBuffer& buf, std::map<as_object*, size_t>& offsetTable
             }
             else // object already seen
             {
+                size_t idx = it->second;
                 log_debug("serializing object (or function) as reference to %d", idx);
                 buf.appendByte(amf::Element::REFERENCE_AMF0);
-                buf.appendNetworkShort(it->second);
+                buf.appendNetworkShort(idx);
             }
             return true;
         }
