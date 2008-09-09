@@ -139,6 +139,27 @@ xcheck_equals(typeof(so4.data), 'undefined');
 ret = so4.flush();
 xcheck_equals(typeof(ret), 'undefined');
 
-check_totals(38);
+//------------------------------------------
+// Test that if 'data' is a getter-setter,
+// it isn't called on .flush()
+//------------------------------------------
+
+so5 = SharedObject.getLocal("getset");
+check(so5 instanceof SharedObject);
+dataGet = function() { getCalls++; return new Object(); };
+getCalls=0;
+so5.addProperty('data', dataGet, dataGet);
+junk=so5.data;
+check_equals(getCalls, 1); // the getter works
+getCalls=0;
+ret=so5.flush();
+check_equals(ret, true);
+xcheck_equals(getCalls, 0); // flush didn't cal the getter
+
+//------------------------------------------
+// END OF TESTS
+//------------------------------------------
+
+check_totals(42);
 
 #endif // OUTPUT_VERSION >= 6
