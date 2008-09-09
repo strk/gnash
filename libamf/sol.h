@@ -99,11 +99,11 @@ public:
 
 //protected:
 
-    void setFilespec(std::string &x) { _filespec = x; };
-    std::string &getFilespec() { return _filespec; };
+    void setFilespec(const std::string &x) { _filespec = x; };
+    const std::string &getFilespec() const { return _filespec; };
 
-    void setObjectName(std::string &x) { _objname = x; };
-    std::string &getObjectName() { return _objname; };
+    void setObjectName(const std::string &x) { _objname = x; };
+    const std::string &getObjectName() const { return _objname; };
         
  private:
     std::vector<gnash::Network::byte_t> _header;
