@@ -298,8 +298,8 @@ private:
 		return mAsValueScopeStack.pop();
 	}
 	as_value get_scope_stack(boost::uint8_t depth){
-		LOG_DEBUG_AVM("Geting value from scope stack %u from the top.",depth | 0x0);
-		return as_value(mAsValueScopeStack.top(depth));
+		LOG_DEBUG_AVM("Geting value from scope stack %u from the bottom.",depth | 0x0);
+		return as_value(mAsValueScopeStack.value(depth));
 	}
 
 	SafeStack<as_value> mStack;
