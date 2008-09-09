@@ -101,7 +101,7 @@ public:
 	/// value of it.
 	///
 	/// @param visitor
-	///	The visitor function. Must take a const std::string
+	///	The visitor function. Must take a string_table::key 
 	///	reference as first argument and a const as_value reference
 	///	as second argument.
 	///
