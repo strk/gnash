@@ -166,7 +166,7 @@ SDLGui::init(int argc, char **argv[])
 
     if (_xid) {
         char SDL_windowhack[32];
-        sprintf (SDL_windowhack,"SDL_WINDOWID=%ld", _xid);
+        snprintf (SDL_windowhack, sizeof(SDL_windowhack), "SDL_WINDOWID=%ld", _xid);
         putenv (SDL_windowhack);
     }
 
