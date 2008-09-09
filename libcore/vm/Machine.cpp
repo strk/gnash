@@ -1796,13 +1796,14 @@ Machine::execute()
 		as_value value = pop_stack();
 
 		//TODO: Actually coerce the value.
-		if(value.is_null()){
-			as_value new_type = get_property_value(a);
-			push_stack(new_type);
-		}
-		else{
+//		if(value.is_null()){
+//			as_value new_type = get_property_value(a);
+//			value->
+//			push_stack(new_type);
+//		}
+//		else{
 			push_stack(value);
-		}
+//		}
 		break;
 	}
 /// 0x82 ABC_ACTION_COERCE_A
