@@ -162,16 +162,90 @@ getSharedObjectInterface()
 }
 
 
-class SharedObject: public as_object, public amf::SOL
+class SharedObject: public as_object 
 {
 public:
+
     SharedObject()
         :
         as_object(getSharedObjectInterface())
     { 
 		attachProperties(*this);
     }
+
+    bool flush() const;
+
+    const std::string& getFilespec() const {
+        return _sol.getFilespec();
+    }
+
+    void setFilespec(const std::string& s) {
+        _sol.setFilespec(s);
+    }
+
+    const std::string& getObjectName() const {
+        return _sol.getObjectName();
+    }
+
+    void setObjectName(const std::string& s) {
+        _sol.setObjectName(s);
+    }
+
+    size_t size() const { 
+        return _sol.size(); // TODO: fix this, is bogus
+    }
+
+private:
+
+    SOL _sol;
 };
+
+bool
+SharedObject::flush() const
+{
+    const std::string& filespec = _sol.getFilespec();
+
+#ifdef USE_SOL_READONLY
+    log_debug(_("SharedObject %s not flushed (compiled as read-only mode)"), filespec);
+    return false;
+#endif
+
+//    log_debug("Flushing to file %s", filespec);
+
+    VM& vm = getVM();
+
+    if (rcfile.getSOLReadOnly() ) {
+        log_security("Attempting to write object %s when it's SOL Read Only is set! Refusing...",
+                     filespec);
+        return false;
+    }
+    
+    // TODO: cache the dataKey in SharedObject prototype on first use ?
+    //       a SharedObject::getDataKey() might do...
+    string_table::key dataKey = vm.getStringTable().find("data");
+    
+    as_value as = const_cast<SharedObject*>(this)->getMember(dataKey);
+    boost::intrusive_ptr<as_object> ptr = as.to_object();
+    if ( ! ptr ) {
+        log_aserror("'data' member of SharedObject is not an object (%s)",
+                  as);
+        return true;
+    }
+
+    SOL sol;
+    PropsSerializer props(sol, vm);
+    ptr->visitPropertyValues(props);
+    // We only want to access files in this directory
+    bool ret = sol.writeFile(filespec, getObjectName().c_str());
+    if ( ! ret )
+    {
+        log_error("writing SharedObject file to %s", filespec);
+        return false;
+    }
+
+    log_security("SharedObject '%s' written to filesystem.", filespec);
+    return true;
+}
 
 
 as_value
@@ -193,45 +267,16 @@ sharedobject_flush(const fn_call& fn)
     
     boost::intrusive_ptr<SharedObject> obj = ensureType<SharedObject>(fn.this_ptr);
 
-//    log_debug("Flushing to file %s", obj->getFilespec());        
-    VM& vm = obj->getVM();
-
-#ifndef USE_SOL_READONLY
-    if (rcfile.getSOLReadOnly() ) {
-        log_security("Attempting to write object %s when it's SOL Read Only is set! Refusing...",
-                     obj->getFilespec());
-        return as_value(false);
-    }
-    
-    // TODO: cache the dataKey in SharedObject prototype on first use ?
-    //       a SharedObject::getDataKey() might do...
-    string_table::key dataKey = vm.getStringTable().find("data");
-    
-    as_value as = obj->getMember(dataKey);
-    boost::intrusive_ptr<as_object> ptr = as.to_object();
-    if ( ! ptr ) {
-        log_error("'data' member of SharedObject is not an object (%s)",
-                  as);
-        return as_value();
-    }
-    
-    SOL sol;
-    PropsSerializer props(sol, vm);
-    ptr->visitPropertyValues(props);
-    // We only want to access files in this directory
-    std::string newspec; 
-    newspec += obj->getFilespec();
-    bool ret = sol.writeFile(newspec, obj->getObjectName().c_str());
-    if ( ! ret )
+    IF_VERBOSE_ASCODING_ERRORS(
+    if ( fn.nargs )
     {
-        log_error("writing SharedObject file to %s", newspec);
-        return as_value(false);
+        std::stringstream ss;
+        fn.dump_args(ss);
+        log_aserror(_("Arguments to SharedObject.flush(%s) will be ignored"), ss.str());
     }
-    log_security("SharedObject '%s' written to filesystem.", newspec);
-    return as_value(true); // TODO: check expected return type from SharedObject.flush
-#else
-    return as_value(false);
-#endif
+    )
+
+    return as_value(obj->flush());
 }
 
 // Set the file name
