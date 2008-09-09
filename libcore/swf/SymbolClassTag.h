@@ -46,8 +46,8 @@ public:
 	{
 		VM& vm = VM::get();
 		Machine *mach = vm.getMachine();
-
-		mach->instantiateClass(rootClass);
+		
+		mach->instantiateClass(rootClass,vm.getGlobal());
 	}
 
 	// Tell the caller that we are an action tag.

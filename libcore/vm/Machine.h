@@ -209,7 +209,7 @@ public:
 
 	as_value executeFunction(CodeStream* stream,const fn_call& fn);
 
-	void instantiateClass(std::string className);
+	void instantiateClass(std::string className, as_object* global);
 
 	Machine(VM& vm);
 
@@ -268,6 +268,8 @@ private:
 	as_environment::ScopeStack* getScopeStack();
 
 	void executeCodeblock(CodeStream* stream);
+
+	void clearRegisters();
 
 	as_value get_register(int index){
 		LOG_DEBUG_AVM("Getting value at a register %d ",index);

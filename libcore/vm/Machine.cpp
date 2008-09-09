@@ -2642,9 +2642,13 @@ void Machine::executeCodeblock(CodeStream* stream){
 //	restoreState();
 }
 
-void Machine::instantiateClass(std::string className){
+void Machine::instantiateClass(std::string className, as_object* global){
 
 	asClass* theClass = mPoolObject->locateClass(className);
+	clearRegisters();
+	mStack.clear();
+	mAsValueScopeStack.clear();
+	mRegisters[0] = as_value(global);
 	executeCodeblock(theClass->getConstructor()->getBody());
 }
 
@@ -2743,9 +2747,7 @@ std::auto_ptr< std::vector<as_value> > Machine::get_args(unsigned int argc){
 void Machine::load_function(CodeStream* stream){
 	saveState();
 	mStream = stream;
-	mRegisters.clear();
-	//TODO: Parse and use maximum stack size value for methods.
-	mRegisters.resize(16);
+	clearRegisters();
 }
 
 as_environment::ScopeStack* Machine::getScopeStack(){
@@ -2754,6 +2756,13 @@ as_environment::ScopeStack* Machine::getScopeStack(){
 		stack->push_back(mAsValueScopeStack.top(i).to_object());
 	}
 	return stack;
+}
+
+void
+Machine::clearRegisters(){
+	mRegisters.clear();
+	//TODO: Parse and use maximum stack size value for methods.
+	mRegisters.resize(16);
 }
 
 
