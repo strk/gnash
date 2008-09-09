@@ -43,7 +43,7 @@ GC::init(GcRoot& root)
 	char *gcgap = std::getenv("GNASH_GC_TRIGGER_THRESHOLD");
 	if ( gcgap )
 	{
-		unsigned int gap = atoi(gcgap);
+		unsigned int gap = strtoul(gcgap, NULL, 0);
 		_singleton->maxNewCollectablesCount = gap;
 	}
 	return *_singleton;

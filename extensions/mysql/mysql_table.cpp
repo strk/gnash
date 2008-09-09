@@ -61,7 +61,7 @@ namespace mysqldb
 						case MYSQL_TYPE_TINY:
 						case MYSQL_TYPE_SHORT:
 						case MYSQL_TYPE_INT24:
-							val.set_int(atoi(row[j]));
+							val.set_int(stroul(row[j], NULL, 0));
 							break;
 
 						case MYSQL_TYPE_DECIMAL:
@@ -69,7 +69,7 @@ namespace mysqldb
 						case MYSQL_TYPE_FLOAT:
 						case MYSQL_TYPE_DOUBLE:
 						case MYSQL_TYPE_LONGLONG:
-							val.set_double(atof(row[j]));
+							val.set_double(strtod(row[j], NULL));
 							break;
 
 						case MYSQL_TYPE_NULL:
@@ -114,7 +114,7 @@ namespace mysqldb
 		if ( get_member_default(name, val) == false )
 		{
 			// hack
-			int idx = atoi(name.c_str());
+			int idx = strtoul(name.c_str(), NULL, 0);
 			if (idx >=0 && idx < size())
 			{
 				*val = m_data[idx];

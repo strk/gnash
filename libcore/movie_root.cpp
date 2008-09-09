@@ -2072,7 +2072,7 @@ movie_root::processLoadMovieRequest(const LoadMovieRequest& r)
 
     if ( target.compare(0, 6, "_level") == 0 && target.find_first_not_of("0123456789", 7) == std::string::npos )
     {
-        unsigned int levelno = atoi(target.c_str()+6);
+        unsigned int levelno = strtoul(target.c_str()+6, NULL, 0);
         log_debug(_("processLoadMovieRequest: Testing _level loading (level %u)"), levelno);
         loadLevel(levelno, url);
         return;
@@ -2131,7 +2131,7 @@ movie_root::isLevelTarget(const std::string& name, unsigned int& levelno)
   }
 
   if ( name.find_first_not_of("0123456789", 7) != std::string::npos ) return false;
-  levelno = atoi(name.c_str()+6); // getting 0 here for "_level" is intentional
+  levelno = strtoul(name.c_str()+6, NULL, 0); // getting 0 here for "_level" is intentional
   return true;
 
 }
