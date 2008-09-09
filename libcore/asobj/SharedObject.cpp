@@ -66,6 +66,8 @@ as_value sharedobject_ctor(const fn_call& fn);
 
 void sharedobject_iter(SOL &sol, string_table::key key, const as_value &reference);
 
+namespace { 
+
 class PropsSerializer {
     SOL& _sol;
     string_table& _st;
@@ -84,7 +86,7 @@ public:
 
             const std::string& name = _st.string_table::value(key);
 
-//          cerr << "FIXME: yes!!!!! " << name << ": "<< val << std::endl;
+            //log_debug("Serializing SharedObject property %s:%s", name, val);
 
             if (val.is_string()) {
                 std::string str;
@@ -116,12 +118,14 @@ public:
         }
 };
 
+} // anonimous namespace
+
 static void
 attachProperties(as_object& o)
 {
 //    GNASH_REPORT_FUNCTION;
-     as_object *proto = new as_object();
-     o.init_member("data", proto);
+     as_object *proto = new as_object(getObjectInterface());
+     o.init_member("data", proto, as_prop_flags::dontDelete|as_prop_flags::readOnly);
 }
 
 static void
@@ -225,6 +229,7 @@ SharedObject::flush() const
     string_table::key dataKey = vm.getStringTable().find("data");
     
     as_value as = const_cast<SharedObject*>(this)->getMember(dataKey);
+    log_debug("data member of this SharedObject is %s", as);
     boost::intrusive_ptr<as_object> ptr = as.to_object();
     if ( ! ptr ) {
         log_aserror("'data' member of SharedObject is not an object (%s)",

@@ -98,6 +98,8 @@ boost::uint8_t parseHex(char c)
 
 namespace gnash {
 
+namespace { 
+
 // This class is used to iterate through all the properties of an AS object,
 // so we can change them to children of an AMF0 element.
 class PropsSerializer {
@@ -148,6 +150,8 @@ public:
             }
         }
 };
+
+} // anonimous namespace
 
 /// Class used to serialize properties of an object to a buffer
 class PropsBufSerializer {
