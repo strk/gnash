@@ -120,8 +120,8 @@ static void
 attachProperties(as_object& o)
 {
 //    GNASH_REPORT_FUNCTION;
-     as_object *proto = new as_object();
-     o.init_member("data", proto);
+     as_object *proto = new as_object(getObjectInterface());
+     o.init_member("data", proto, as_prop_flags::dontDelete|as_prop_flags::readOnly);
 }
 
 static void

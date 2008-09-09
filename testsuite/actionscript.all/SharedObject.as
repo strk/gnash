@@ -157,9 +157,23 @@ check_equals(ret, true);
 xcheck_equals(getCalls, 0); // flush didn't cal the getter
 
 //------------------------------------------
+// Test that 'data' is enumerable, read-only
+// and protected from deletion
+//------------------------------------------
+
+so6 = SharedObject.getLocal("so6");
+a = new Array;
+for (var i in so6) a.push(i);
+xcheck_equals(a.toString(), 'data');
+delete so6;
+check_equals(typeof(so.data), 'object');
+so6.data = 5;
+check_equals(typeof(so.data), 'object');
+
+//------------------------------------------
 // END OF TESTS
 //------------------------------------------
 
-check_totals(42);
+check_totals(45);
 
 #endif // OUTPUT_VERSION >= 6
