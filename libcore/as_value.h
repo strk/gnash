@@ -212,7 +212,7 @@ public:
 	///     On return, the vector will be filled with pointers to every complex object
 	///     parsed from the stream.
 	///
-	bool readAMF0(boost::uint8_t *&b, boost::uint8_t *end, int inType, std::vector<as_object*>& objRefs);
+	bool readAMF0(boost::uint8_t *&b, boost::uint8_t *end, int inType, std::vector<as_object*>& objRefs, VM& vm);
 
     /// Serialize value in AMF0 format.
     //

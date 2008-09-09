@@ -58,7 +58,10 @@
 //#define GNASH_DEBUG_SOFT_REFERENCES
 
 // Define this macto to make AMF parsing verbose
-//#define GNASH_DEBUG_AMF_PARSING
+//#define GNASH_DEBUG_AMF_DESERIALIZE
+
+// Define this macto to make AMF writing verbose
+//#define GNASH_DEBUG_AMF_SERIALIZE
 
 using namespace std;
 
@@ -169,8 +172,27 @@ public:
     {
         if ( _error ) return;
 
+        // Test conducted with AMFPHP:
+        // '__proto__' and 'constructor' members
+        // of an object don't get back from an 'echo-service'.
+        // Dunno if they are not serialized or just not sent back.
+        // A '__constructor__' member gets back, but only if 
+        // not a function. Actually no function gets back.
+        // 
+        if ( key == NSV::PROP_uuPROTOuu || 
+             key == NSV::PROP_CONSTRUCTOR )
+        {
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+            log_debug(" skip serialization of specially-named property %s", _st.value(key));
+#endif
+            return;
+        }
+
         // write property name
-        const string& name = _st.string_table::value(key);
+        const string& name = _st.value(key);
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+        log_debug(" serializing property %s", name);
+#endif
         boost::uint16_t namelen = name.size();
         _buf.appendNetworkShort(namelen);
         _buf.append(name.c_str(), namelen);
@@ -251,8 +273,8 @@ as_value::to_string() const
 			return b ? "true" : "false";
 		}
 
-		case OBJECT:
 		case AS_FUNCTION:
+		case OBJECT:
 		{
 			//as_object* obj = m_type == OBJECT ? getObj().get() : getFun().get();
 			try
@@ -2020,7 +2042,7 @@ readNetworkLong(const boost::uint8_t* buf) {
 //
 static bool
 amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inType,
-    std::vector<as_object*>& objRefs)
+    std::vector<as_object*>& objRefs, VM& vm)
 {
 	boost::uint16_t si;
 	boost::uint16_t li;
@@ -2044,7 +2066,7 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 		case amf::Element::BOOLEAN_AMF0:
 		{
 			bool val = *b; b += 1;
-#ifdef GNASH_DEBUG_AMF_PARSING
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
 			log_debug("amf0 read bool: %d", val);
 #endif
 			ret.set_bool(val);
@@ -2057,7 +2079,7 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 			}
 			dub = *(reinterpret_cast<double*>(b)); b += 8;
 			amf::swapBytes(&dub, 8);
-#ifdef GNASH_DEBUG_AMF_PARSING
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
 			log_debug("amf0 read double: %e", dub);
 #endif
 			ret.set_double(dub);
@@ -2075,7 +2097,7 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 
 			{
 				std::string str(reinterpret_cast<char *>(b), si); b += si;
-#ifdef GNASH_DEBUG_AMF_PARSING
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
 				log_debug("amf0 read string: %s", str);
 #endif
 				ret.set_string(str);
@@ -2089,13 +2111,13 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
                 objRefs.push_back(array.get());
 
 				li = readNetworkLong(b); b += 4;
-#ifdef GNASH_DEBUG_AMF_PARSING
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
 				log_debug("amf0 starting read of array with %i elements", li);
 #endif
 				as_value arrayElement;
 				for(int i = 0; i < li; ++i)
 				{
-					if ( ! amf0_read_value(b, end, arrayElement, -1, objRefs) )
+					if ( ! amf0_read_value(b, end, arrayElement, -1, objRefs, vm) )
 					{
 						return false;
 					}
@@ -2111,7 +2133,7 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
                 objRefs.push_back(obj.get());
 
 				li = readNetworkLong(b); b += 4;
-#ifdef GNASH_DEBUG_AMF_PARSING
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
 				log_debug("amf0 starting read of object with %i elements", li);
 #endif
 				as_value objectElement;
@@ -2121,11 +2143,11 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 				{
     					boost::uint16_t strlen = readNetworkShort(b); b+=2; 
 					std::string name((char*)b, strlen);
-#ifdef GNASH_DEBUG_AMF_PARSING
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
 					log_debug("amf0 Object prop name is %s", name);
 #endif
 					b += strlen;
-					if ( ! amf0_read_value(b, end, objectElement, -1, objRefs) )
+					if ( ! amf0_read_value(b, end, objectElement, -1, objRefs, vm) )
 					{
 						return false;
 					}
@@ -2137,9 +2159,11 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 			}
 		case amf::Element::OBJECT_AMF0:
 			{
+                string_table& st = vm.getStringTable();
+
 				// TODO: need this? boost::intrusive_ptr<as_object> obj(new as_object(getObjectInterface()));
 				boost::intrusive_ptr<as_object> obj(new as_object());
-#ifdef GNASH_DEBUG_AMF_PARSING
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
 				log_debug("amf0 starting read of object");
 #endif
                 objRefs.push_back(obj.get());
@@ -2148,7 +2172,7 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 				std::string keyString;
 				for(;;)
 				{
-					if ( ! amf0_read_value(b, end, tmp, amf::Element::STRING_AMF0, objRefs) )
+					if ( ! amf0_read_value(b, end, tmp, amf::Element::STRING_AMF0, objRefs, vm) )
 					{
 						return false;
 					}
@@ -2165,11 +2189,11 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 						return true;
 					}
 
-					if ( ! amf0_read_value(b, end, tmp, -1, objRefs) )
+					if ( ! amf0_read_value(b, end, tmp, -1, objRefs, vm) )
 					{
 						return false;
 					}
-					obj->init_member(keyString, tmp);
+					obj->set_member(st.find(keyString), tmp);
 				}
 			}
 		case amf::Element::UNDEFINED_AMF0:
@@ -2185,12 +2209,12 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 		case amf::Element::REFERENCE_AMF0:
             {
 			    si = readNetworkShort(b); b += 2;
-                if ( si >= objRefs.size() )
+                if ( si < 1 || si > objRefs.size() )
                 {
-                    log_error("AMF reference to unparsed object %d", si);
+                    log_error("readAMF0: invalid reference to object %d (%d known objects)", si, objRefs.size());
                     return false;
                 }
-                ret.set_as_object(objRefs[si]);
+                ret.set_as_object(objRefs[si-1]);
                 return true;
             }
 		// TODO define other types (function, sprite, etc)
@@ -2204,9 +2228,9 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 }
 
 bool
-as_value::readAMF0(boost::uint8_t *&b, boost::uint8_t *end, int inType, std::vector<as_object*>& objRefs)
+as_value::readAMF0(boost::uint8_t *&b, boost::uint8_t *end, int inType, std::vector<as_object*>& objRefs, VM& vm)
 {
-	return amf0_read_value(b, end, *this, inType, objRefs);
+	return amf0_read_value(b, end, *this, inType, objRefs, vm);
 }
 
 bool
@@ -2223,32 +2247,66 @@ as_value::writeAMF0(SimpleBuffer& buf, std::map<as_object*, size_t>& offsetTable
             return false;
 
         case AS_FUNCTION:
+            log_unimpl(_("serialization of as_value of type FUNCTION"), m_type);
+            return false;
+
         case OBJECT:
         {
             as_object* obj = to_object().get();
             assert(obj);
-
             OffsetTable::iterator it = offsetTable.find(obj);
             if ( it == offsetTable.end() )
             {
-                size_t idx = offsetTable.size(); // 0 for the first, etc...
-                log_debug("serializing object (or function) with index %d", idx);
+                size_t idx = offsetTable.size()+1; // 1 for the first, etc...
                 offsetTable[obj] = idx;
-                buf.appendByte(amf::Element::OBJECT_AMF0);
-                PropsBufSerializer props(buf, vm, offsetTable);
-                obj->visitPropertyValues(props);
-                if ( ! props.success() ) 
+
+                as_array_object* ary = dynamic_cast<as_array_object*>(obj);
+                if ( ary )
                 {
-                    log_error("Could not serialize object");
-                    return false;
+                    size_t len = ary->size();
+#ifdef GNASH_DEBUG_AMF_SERIALIZE
+                    log_debug(_("writeAMF0: serializing array of %d elements as index %d"), len, idx);
+#endif
+                    buf.appendByte(amf::Element::STRICT_ARRAY_AMF0);
+                    buf.appendNetworkLong(len);
+				    for(size_t i = 0; i < len; ++i)
+                    {
+                        as_value element = ary->at(i);
+                        if ( ! element.writeAMF0(buf, offsetTable, vm) )
+                        {
+                            log_error("Error serializing array element %d (%s)", i, element);
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+                else
+                {
+#ifdef GNASH_DEBUG_AMF_SERIALIZE
+                    log_debug(_("writeAMF0: serializing object (or function) with index %d"), idx);
+#endif
+                    buf.appendByte(amf::Element::OBJECT_AMF0);
+                    PropsBufSerializer props(buf, vm, offsetTable);
+                    obj->visitPropertyValues(props);
+                    if ( ! props.success() ) 
+                    {
+                        log_error("Could not serialize object");
+                        return false;
+                    }
+                    buf.appendNetworkShort(0);
+                    buf.appendByte(amf::Element::OBJECT_END_AMF0);
+                    return true;
                 }
             }
             else // object already seen
             {
                 size_t idx = it->second;
-                log_debug("serializing object (or function) as reference to %d", idx);
+#ifdef GNASH_DEBUG_AMF_SERIALIZE
+                log_debug(_("writeAMF0: serializing object (or function) as reference to %d"), idx);
+#endif
                 buf.appendByte(amf::Element::REFERENCE_AMF0);
                 buf.appendNetworkShort(idx);
+                return true;
             }
             return true;
         }
@@ -2256,7 +2314,10 @@ as_value::writeAMF0(SimpleBuffer& buf, std::map<as_object*, size_t>& offsetTable
         case STRING:
         {
             buf.appendByte(amf::Element::STRING_AMF0);
-            std::string str = to_string();
+            const std::string& str = getStr();
+#ifdef GNASH_DEBUG_AMF_SERIALIZE
+            log_debug(_("writeAMF0: serializing string '%s"), str);
+#endif
             buf.appendNetworkShort(str.size());
             buf.append(str.c_str(), str.size());
             return true;
@@ -2264,7 +2325,10 @@ as_value::writeAMF0(SimpleBuffer& buf, std::map<as_object*, size_t>& offsetTable
 
         case NUMBER:
         {
-            double d = to_number();
+            double d = getNum();
+#ifdef GNASH_DEBUG_AMF_SERIALIZE
+            log_debug(_("writeAMF0: serializing number '%g"), d);
+#endif
             buf.appendByte(amf::Element::NUMBER_AMF0);
             amf::swapBytes(&d, 8); // this actually only swapps on little-endian machines
             buf.append(&d, 8);
@@ -2275,6 +2339,24 @@ as_value::writeAMF0(SimpleBuffer& buf, std::map<as_object*, size_t>& offsetTable
         {
             log_unimpl(_(" serialization of MovieClip objects"));
             return false;
+        }
+
+        case NULLTYPE:
+        {
+#ifdef GNASH_DEBUG_AMF_SERIALIZE
+            log_debug(_("writeAMF0: serializing null"));
+#endif
+            buf.appendByte(amf::Element::NULL_AMF0);
+            return true;
+        }
+
+        case UNDEFINED:
+        {
+#ifdef GNASH_DEBUG_AMF_SERIALIZE
+            log_debug(_("writeAMF0: serializing undefined"));
+#endif
+            buf.appendByte(amf::Element::UNDEFINED_AMF0);
+            return true;
         }
     }
 }

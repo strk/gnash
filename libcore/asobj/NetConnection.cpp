@@ -275,6 +275,9 @@ public:
 		log_debug("tick running");
 		if(connection)
 		{
+
+            VM& vm = _nc.getVM();
+
 			log_debug("have connection");
 			int read = connection->readNonBlocking(reply.data() + reply_end, NCCALLREPLYMAX - reply_end);
 			if(read > 0) {
@@ -351,7 +354,7 @@ public:
 								break;
 							}
 							b += 5; // skip past bool and length long
-							if( !tmp.readAMF0(b, end, -1, objRefs) )
+							if( !tmp.readAMF0(b, end, -1, objRefs, vm) )
 							{
 								headers_ok = 0;
 								break;
@@ -409,7 +412,7 @@ public:
 								log_debug("about to parse amf value");
 								// this updates b to point to the next unparsed byte
 								as_value reply_as_value;
-								if ( ! reply_as_value.readAMF0(b, end, -1, objRefs) )
+								if ( ! reply_as_value.readAMF0(b, end, -1, objRefs, vm) )
 								{
 									log_error("parse amf failed");
 									// this will happen if we get
@@ -604,44 +607,21 @@ NetConnection::call_method(const fn_call& fn)
 	size_t total_size_offset = buf->size();
 	buf->append("\000\000\000\000", 4); // total size to be filled in later
 
+    std::map<as_object*, size_t> offsetTable;
+    VM& vm = ptr->getVM();
 
 	// encode array of arguments to remote method
 	buf->appendByte(amf::Element::STRICT_ARRAY_AMF0);
 	buf->appendNetworkLong(fn.nargs - 2);
-	if (fn.nargs > 2) {
-
+	if (fn.nargs > 2)
+    {
 		for (unsigned int i = 2; i < fn.nargs; ++i)
 		{
 			const as_value& arg = fn.arg(i);
-
-			if (arg.is_string()) {
-				buf->appendByte(amf::Element::STRING_AMF0);
-				std::string str = fn.arg(i).to_string();
-				buf->appendNetworkShort(str.size());
-				buf->append(str.c_str(), str.size());
-			// FIXME implement this
-			//} else if(fn.arg(i).is_function()) {
-			//	as_function f = fn.arg(i).to_function();
-			//	tmp = AMF::encodefunction(f);
-			}
-
-			else if(arg.is_number())
-			{
-				double d = fn.arg(i).to_number();
-				buf->appendByte(amf::Element::NUMBER_AMF0);
-				amf::swapBytes(&d, 8); // this actually only swapps on little-endian machines
-				buf->append(&d, 8);
- 	 	 	// FIXME implement this
-			//} else if(fn.arg(i).is_object()) {
-			//	boost::intrusive_ptr<as_object> o = fn.arg(i).to_object();
-			//	tmp = AMF::encodeObject(o);
-			}
-			
-			else
-			{
-				log_unimpl(_("NetConnection.call(): unsupported argument type %s"), arg);
-				buf->appendByte(amf::Element::UNDEFINED_AMF0);
-			}
+            if ( ! arg.writeAMF0(*buf, offsetTable, vm) )
+            {
+                log_error("Could not serialize NetConnection.call argument %d", i);
+            }
 		}
 	}
 
