@@ -46,7 +46,7 @@ public:
 	{
 		VM& vm = VM::get();
 		Machine *mach = vm.getMachine();
-		
+		log_debug("SymbolClassTag: Creating class %s.",rootClass);
 		mach->instantiateClass(rootClass,vm.getGlobal());
 	}
 
