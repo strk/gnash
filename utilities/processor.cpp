@@ -25,6 +25,7 @@
 
 #include <iostream>
 #include <cstdio>
+#include <cstdlib>
 #include <sys/time.h>
 #include <ctime>
 
@@ -290,7 +291,7 @@ main(int argc, char *argv[])
               allowed_end_hits = strtol(optarg, NULL, 0);
 	      break;
 	  case 'd':
-              delay = atoi(optarg)*1000; // delay is in microseconds
+              delay = strtol(optarg, NULL, 0)*1000; // delay is in microseconds
               // this will be recognized as a request to run at FPS speed
               if ( delay < 0 ) delay = -1;
 	      break;
