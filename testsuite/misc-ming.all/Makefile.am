@@ -18,6 +18,7 @@
 
 AUTOMAKE_OPTIONS = dejagnu -Wno-portability
 
+abs_top_builddir=$(shell cd $(top_builddir); pwd)
 abs_builddir=$(shell cd $(top_builddir)/testsuite/misc-ming.all; pwd)
 abs_mediadir = $(shell cd $(srcdir)/../media; pwd)
 
@@ -35,9 +36,12 @@ EXTRA_DIST = \
 	gotoFrame2Test.as \
 	DrawingApiTest.as \
 	FlashVarsTest.as \
+	SharedObjectTest.as \
 	intervalTest.as \
 	FlashVarsTest.html \
-	StageConfigTest.as
+	StageConfigTest.as \
+	SharedObjectTest.sol/sol1.sol \
+	SharedObjectTest.sol/README 
 
 
 AM_CPPFLAGS = \
@@ -281,7 +285,8 @@ check_SCRIPTS = \
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
 check_SCRIPTS += VarAndCharClashTest-Runner \
 	gotoFrame2Test-Runner \
-	FlashVarsTest-Runner
+	FlashVarsTest-Runner \
+	SharedObjectTestRunner
 endif
 
 if MING_VERSION_0_4
@@ -1564,6 +1569,14 @@ FlashVarsTest.swf: Dejagnu.swf $(srcdir)/FlashVarsTest.as
 FlashVarsTest-Runner: $(srcdir)/../generic-testrunner.sh FlashVarsTest.swf Makefile
 	echo "$(top_builddir)/gui/gnash -1 -r0 -v -P 'FlashVars=?a=a_in_fvars&v=v_in_fvars&MixCaseFvars=mixFvars&dejagnu.nested=chFVars&_root.fqv=fqFVars&complex={a:'1',b:2}' 'FlashVarsTest.swf?a=a_in_qstring&q=q_in_qstring&MixCaseQstr=mixQstr&dejagnu.nested=chQstr&_root.fqv=fqQstr'" > $@
 	chmod 755 $@
+
+# This will only work with Ming-0.4.0beta2 (support for prebuilt clips inclusion)
+SharedObjectTest.swf: Dejagnu.swf $(srcdir)/SharedObjectTest.as 
+	$(MAKESWF) -DOUTPUT_VERSION=6 -v6 -o $@ Dejagnu.swf $(srcdir)/SharedObjectTest.as
+
+SharedObjectTestRunner: SharedObjectTestRunner.sh Makefile SharedObjectTest.swf
+	sed $< -e 's#@@TOP_BUILDDIR@@#${abs_top_builddir}#' -e 's#@@BASEINPUTSOLDIR@@#${srcdir}/SharedObjectTest.sol#' > $@
+	chmod +x $@
 
 StageConfigTest.swf: $(srcdir)/StageConfigTest.as 
 	$(MAKESWF) -o $@ -s 512x512 $(srcdir)/StageConfigTest.as
