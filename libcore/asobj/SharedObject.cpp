@@ -46,7 +46,7 @@
 #include "rc.h" // for use of rcfile
 
 namespace {
-gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
+//gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
 }
 
@@ -199,10 +199,238 @@ public:
         return _sol.size(); // TODO: fix this, is bogus
     }
 
+    bool readSOL(const std::string& filename);
+
 private:
 
     SOL _sol;
 };
+
+SharedObjectLibrary::SharedObjectLibrary(VM& vm)
+    :
+    _vm(vm),
+    _soLib()
+{
+    _solSafeDir = rcfile.getSOLSafeDir();
+    if (_solSafeDir.empty()) {
+        log_debug("Empty SOLSafeDir directive: we'll use '/tmp'");
+        _solSafeDir = "/tmp/";
+    }
+
+    // Check if the base dir exists here
+    struct stat statbuf;
+    if ( -1 == stat(_solSafeDir.c_str(), &statbuf) )
+    {
+       log_error("Invalid SOL safe dir %s: %s. Won't save any SharedObject.", _solSafeDir, std::strerror(errno));
+        _solSafeDir.clear();
+    }
+
+    // Which URL we should use here is under research.
+    // The reference player uses the URL from which definition
+    // of the call to SharedObject.getLocal was parsed.
+    //
+    // There is in Gnash support for tracking action_buffer 
+    // urls but not yet an interface to fetch it from fn_call;
+    // also, it's not clear how good would the model be (think
+    // of movie A loading movie B creating the SharedObject).
+    //
+    // What we'll do for now is use the URL of the initially
+    // loaded SWF, so that in the A loads B scenario above the
+    // domain would be the one of A, not B.
+    //
+    // NOTE: using the base url (get_base_url) would mean
+    // blindly trusting the SWF publisher as base url is changed
+    // by the 'base' attribute of OBJECT or EMBED tags trough
+    // -P base=xxx
+    //
+    const std::string& swfURL = _vm.getSWFUrl();
+
+    // Get the domain part, or take as 'localhost' if none
+    // (loaded from filesystem)
+    URL url(swfURL);
+//  log_debug(_("BASE URL=%s (%s)"), url.str(), url.hostname());
+    _baseDomain = url.hostname();
+    if ( _baseDomain.empty() ) _baseDomain = "localhost";
+
+    // Get the path part
+    _basePath = url.path();
+
+	// TODO: if the original url was a relative one, the pp uses just
+	// the relative portion rather then the resolved absolute path !
+}
+
+void
+SharedObjectLibrary::markReachableResources() const
+{
+    for (SoLib::const_iterator it=_soLib.begin(), itE=_soLib.end(); it!=itE; ++it)
+    {
+        SharedObject* sh = it->second;
+        sh->setReachable();
+    }
+}
+
+static bool createDirForFile(const std::string& filename)
+{
+    if (filename.find("/", 0) != std::string::npos)
+    {
+        typedef boost::tokenizer<boost::char_separator<char> > Tok;
+        boost::char_separator<char> sep("/");
+        Tok t(filename, sep);
+        Tok::iterator tit;
+        std::string newdir = "/";
+        for(tit=t.begin(); tit!=t.end();++tit){
+            //cout << *tit << "\n";
+            newdir += *tit;
+            if (newdir.find("..", 0) != std::string::npos) {
+		log_error("Invalid SharedObject path (contains '..'): %s", filename);
+                return false;
+            }
+            // Don't try to create a directory of the .sol file name!
+            // TODO: don't fail if the movie url has a component ending with .sol (eh...)
+            //
+            if (newdir.rfind(".sol") != (newdir.size()-4)) {
+#ifndef _WIN32
+                int ret = mkdir(newdir.c_str(), S_IRUSR|S_IWUSR|S_IXUSR);
+#else
+                int ret = mkdir(newdir.c_str());
+#endif
+                if ((errno != EEXIST) && (ret != 0)) {
+                    log_error("Couldn't create directory for .sol files: %s\n\t%s",
+                              newdir, std::strerror(errno));
+                    return false;
+                }
+            } // else log_debug("newdir %s ends with .sol", newdir);
+            newdir += "/";
+        }
+    }
+    else log_debug("no slash in filespec %s", filename);
+    return true;
+}
+
+SharedObject*
+SharedObjectLibrary::getLocal(const std::string& objName, const std::string& root)
+{
+    assert ( ! objName.empty() );
+
+    if ( _solSafeDir.empty() ) return 0; // already warned about it at construction time
+
+    // TODO: this check sounds kind of lame, fix it
+    if ( rcfile.getSOLLocalDomain() && _baseDomain != "localhost") 
+    {
+        log_security("Attempting to open SOL file from non localhost-loaded SWF");
+        return 0;
+    }
+
+    // The optional second argument drops the domain and the swf file name
+    std::string key;
+    if ( root.empty() ) key = "/" + _baseDomain + "/" + _basePath + "/" + objName;
+    else key = root + "/" + objName;
+
+    // TODO: normalize key!
+
+    // If the shared object was already opened, use it.
+    SoLib::iterator it = _soLib.find(key);
+    if ( it != _soLib.end() )
+    {
+        log_debug("SharedObject %s already known, returning it", key);
+        return it->second;
+    }
+    log_debug("SharedObject %s not known, creating it", key);
+
+    // Otherwise create a new one and register to the lib
+    SharedObject* obj = new SharedObject();
+    _soLib[key] = obj;
+
+    obj->setObjectName(objName);
+
+    std::string newspec = _solSafeDir;
+    newspec += "/";
+    newspec += key;
+    newspec += ".sol";
+    obj->setFilespec(newspec);
+
+    log_debug("SharedObject path: %s", newspec);
+        
+    if ( ! createDirForFile(newspec) )
+    {
+        log_error("Couldn't create dir for SharedObject %s", newspec);
+        return 0;
+    }
+
+    if ( ! obj->readSOL(newspec) )
+    {
+        log_error("Couldn't read SOL %s, will create on flush/exit", newspec);
+    }
+
+    return obj;
+}
+
+bool
+SharedObject::readSOL(const std::string& newspec)
+{
+    SOL sol;
+    log_security("Opening SharedObject file: %s", newspec);
+    if (sol.readFile(newspec) == false) {
+        log_security("empty or non-existing SOL file \"%s\", will be created on flush/exit", newspec);
+        return false;
+    }
+    
+    std::vector<Element *>::const_iterator it, e;
+    std::vector<Element *> els = sol.getElements();
+    log_debug("Read %d AMF objects from %s", els.size(), newspec);
+
+    string_table& st = _vm.getStringTable();
+    string_table::key dataKey =  st.find("data");
+    as_value as = getMember(dataKey);
+    boost::intrusive_ptr<as_object> ptr = as.to_object();
+    
+    for (it = els.begin(), e = els.end(); it != e; it++) {
+        Element *el = *it;
+
+        switch (el->getType())
+        {
+            case Element::NUMBER_AMF0:
+            {
+                double dub =  *(reinterpret_cast<double*>(el->getData()));
+                ptr->set_member(st.string_table::find(el->getName()), as_value(dub));
+                break;
+            }
+
+            case Element::BOOLEAN_AMF0:
+                ptr->set_member(st.string_table::find(el->getName()),
+                                            as_value(el->to_bool()));
+                break;
+
+            case Element::STRING_AMF0:
+            {
+                if (el->getLength() == 0) {
+                    ptr->set_member(st.string_table::find(el->getName()), as_value(""));
+                    break;
+                }
+                
+                std::string str(reinterpret_cast<const char*>(el->getData()), el->getLength());
+                ptr->set_member(st.string_table::find(el->getName()), as_value(str));
+                break;
+            }
+
+            case Element::OBJECT_AMF0:
+                // TODO: implement!
+                log_unimpl("Reading OBJECT type from SharedObject");
+                //data.convert_to_object();
+                //ptr->set_member(st.string_table::find(el->name), data);
+                return false;
+                break;
+
+            default:
+                // TODO: what about other types?
+                log_unimpl("Reading SOL type %d", el->getType());
+                return false;
+                break;
+        } 
+    }
+
+    return true;
+}
 
 bool
 SharedObject::flush() const
@@ -289,212 +517,35 @@ as_value
 sharedobject_getlocal(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    // This should return a SharedObject, and it's a static function
-    
-    // FIXME:
-    //    We shouldn't have a single SharedObject static, but one for
-    //    each key the user code asks for. These might be maintained
-    //    in a static "library" member of the SharedObject class
-    //    exposing methods to get one element by name, which would be
-    //    either created or reused, taking care about registering
-    //    the static with the VM. There will likely be a need to
-    //    be signaled restarts as unflushed objects should not be
-    //    accessible with their state on restart..
-    //
-    static boost::intrusive_ptr<SharedObject> obj;
-    if ( ! obj )
-    { 
-        obj = new SharedObject();
-        obj->getVM().addStatic(obj.get());
-    }
-    
-    std::string::size_type pos;
-    std::string rootdir;
-    if (fn.nargs > 0) {
-        std::string filespec = fn.arg(0).to_string();
-        // If there is a second argument to getLocal(), it replaces
-        // the default path, which is the swf file name, with this
-        // supplied path.
-        // the object name appears to be the same as the file name, but
-        // minus the suffix. 
-        if ((pos = filespec.find(".sol", 0) == std::string::npos)) {
-            obj->setObjectName(filespec);
-            filespec += ".sol";
-        } else {
-            std::string objname = filespec.substr(0, filespec.size() - 4);
-            obj->setObjectName(objname);
-        }
-        obj->setFilespec(filespec);
-    }
 
-    std::string newspec = rcfile.getSOLSafeDir();
-    if (newspec.size() == 0) {
-        newspec = "/tmp/";
-    }
+    VM& vm = fn.env().getVM();
+    int swfVersion = vm.getSWFVersion();
 
-    // TODO: check if the base dir exists here, or skip the flush
-    struct stat statbuf;
-    if ( -1 == stat(newspec.c_str(), &statbuf) )
+    as_value objNameVal;
+    if (fn.nargs > 0) objNameVal = fn.arg(0);
+    std::string objName = objNameVal.to_string_versioned(swfVersion);
+    if ( objName.empty() )
     {
-       log_error("Invalid SOL safe dir %s: %s", newspec, std::strerror(errno));
-        return as_value(false);
+        IF_VERBOSE_ASCODING_ERRORS(
+        std::stringstream ss; fn.dump_args(ss);
+        log_aserror("SharedObject.getLocal(%s): %s", _("missing object name"));
+        );
+        as_value ret; ret.set_null();
+        return ret;
     }
-    
-    // Which URL we should use here is under research.
-    // The reference player uses the URL from which definition
-    // of the call to SharedObject.getLocal was parsed.
-    //
-    // There is in Gnash support for tracking action_buffer 
-    // urls but not yet an interface to fetch it from fn_call;
-    // also, it's not clear how good would the model be (think
-    // of movie A loading movie B creating the SharedObject).
-    //
-    // What we'll do for now is use the URL of the initially
-    // loaded SWF, so that in the A loads B scenario above the
-    // domain would be the one of A, not B.
-    //
-    // NOTE: using the base url (get_base_url) would mean
-    // blindly trusting the SWF publisher as base url is changed
-    // by the 'base' attribute of OBJECT or EMBED tags trough
-    // -P base=xxx
-    //
-    const std::string& origURL = obj->getVM().getSWFUrl(); 
-    
-    URL url(origURL);
-//  log_debug(_("BASE URL=%s (%s)"), url.str(), url.hostname());
 
-    // Get the domain part, or take as 'localhost' if none
-    // (loaded from filesystem)
-    //
-    std::string domain = url.hostname();
-    if (domain.empty()) domain = "localhost";
-    
-    // Get the path part
-    std::string swfile = url.path();
-	// TODO: if the original url was a relative one, the pp uses just
-	// the relative portion rather then the resolved absolute path !
-    
-    if ( rcfile.getSOLLocalDomain() && domain != "localhost") 
+    std::string root;
+    if (fn.nargs > 1)
     {
-        log_security("Attempting to open non localhost created SOL file!! %s",
-                     obj->getFilespec());
-        return as_value(false);
+        root = fn.arg(1).to_string_versioned(swfVersion);
     }
 
-    // The optional second argument drops the domain and the swf file name
-    //
-    // NOTE: having more then 2 args should still use the second
-    //       (and discard the subsequents).
-    //
-    if (fn.nargs > 1) {
-        rootdir = fn.arg(1).to_string();
-        log_debug("The rootdir is: %s", rootdir);
-        newspec += rootdir;
-    } else {
-        newspec += "/";    
-        newspec += domain;
-        newspec += "/";
-        newspec += swfile;
-        newspec += "/";
-    }
-    
-    //log_debug("newspec before adding obj's filespec: %s", newspec);
-    newspec += obj->getFilespec();
-    obj->setFilespec(newspec);
-        
-    if (newspec.find("/", 0) != std::string::npos) {
-        typedef boost::tokenizer<boost::char_separator<char> > Tok;
-        boost::char_separator<char> sep("/");
-        Tok t(newspec, sep);
-        Tok::iterator tit;
-        std::string newdir = "/";
-        for(tit=t.begin(); tit!=t.end();++tit){
-            //cout << *tit << "\n";
-            newdir += *tit;
-            if (newdir.find("..", 0) != std::string::npos) {
-		log_error("Invalid SharedObject path (contains '..'): %s", newspec);
-                return as_value(false);
-            }
-            // Don't try to create a directory of the .sol file name!
-            // TODO: don't fail if the movie url has a component ending with .sol (eh...)
-            //
-            if (newdir.rfind(".sol") != (newdir.size()-4)) {
-#ifndef _WIN32
-                int ret = mkdir(newdir.c_str(), S_IRUSR|S_IWUSR|S_IXUSR);
-#else
-                int ret = mkdir(newdir.c_str());
-#endif
-                if ((errno != EEXIST) && (ret != 0)) {
-                    log_error("Couldn't create directory for .sol files: %s\n\t%s",
-                              newdir, std::strerror(errno));
-                    return as_value(false);
-                }
-            } // else log_debug("newdir %s ends with .sol", newdir);
-            newdir += "/";
-        }
-    } // else log_debug("no slash in filespec %s", obj->getFilespec());
+    log_debug("SO name:%s, root:%s", objName, root);
 
-    SOL sol;
-    log_security("Opening SharedObject file: %s", newspec);
-    if (sol.readFile(newspec) == false) {
-        log_security("empty or non-existing SOL file \"%s\", will be created on flush/exit", newspec);
-        return as_value(obj.get());
-    }
-    
-    std::vector<Element *>::const_iterator it, e;
-    std::vector<Element *> els = sol.getElements();
-    log_debug("Read %d AMF objects from %s", els.size(), newspec);
-
-    string_table& st = obj->getVM().getStringTable();
-    string_table::key dataKey =  obj->getVM().getStringTable().find("data");
-    as_value as = obj->getMember(dataKey);
-    boost::intrusive_ptr<as_object> ptr = as.to_object();
-    
-    for (it = els.begin(), e = els.end(); it != e; it++) {
-        Element *el = *it;
-
-        switch (el->getType())
-        {
-            case Element::NUMBER_AMF0:
-            {
-                double dub =  *(reinterpret_cast<double*>(el->getData()));
-                ptr->set_member(st.string_table::find(el->getName()), as_value(dub));
-                break;
-            }
-
-            case Element::BOOLEAN_AMF0:
-                ptr->set_member(st.string_table::find(el->getName()),
-                                            as_value(el->to_bool()));
-                break;
-
-            case Element::STRING_AMF0:
-            {
-                if (el->getLength() == 0) {
-                    ptr->set_member(st.string_table::find(el->getName()), as_value(""));
-                    break;
-                }
-                
-                std::string str(reinterpret_cast<const char*>(el->getData()), el->getLength());
-                ptr->set_member(st.string_table::find(el->getName()), as_value(str));
-                break;
-            }
-
-            case Element::OBJECT_AMF0:
-                // TODO: implement!
-                //data.convert_to_object();
-                //ptr->set_member(st.string_table::find(el->name), data);
-                break;
-
-            default:
-                // TODO: what about other types?
-                break;
-        } 
-
-    }
-
-//    ptr->dump_members();        // FIXME: debug crap
-    
-    return as_value(obj.get()); // will keep alive
+    SharedObject* obj = vm.getSharedObjectLibrary().getLocal(objName, root);
+    as_value ret(obj);
+    log_debug("SharedObject.getLocal returning %s", ret);
+    return ret;
 }
 
 as_value

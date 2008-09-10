@@ -37,6 +37,7 @@
 namespace gnash {
 	class movie_definition;
 	class builtin_function;
+    class SharedObjectLibrary;
 	class as_object;
 	class Machine;
 	class VirtualClock;
@@ -158,6 +159,9 @@ private:
 
 	SafeStack<as_value>	_stack;
 
+	/// Library of SharedObjects. Owned by the VM.
+	SharedObjectLibrary* _shLib;
+
 public:
 
 	SafeStack<as_value>& getStack()
@@ -263,6 +267,10 @@ public:
 
 	/// Get a pointer to this VM's Root movie (stage)
 	movie_root& getRoot() const;
+
+    SharedObjectLibrary& getSharedObjectLibrary() const {
+        return *_shLib;
+    }
 
 	/// Get a pointer to this VM's _global Object
 	as_object* getGlobal() const;
