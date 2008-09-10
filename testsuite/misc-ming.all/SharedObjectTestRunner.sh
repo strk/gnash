@@ -22,7 +22,7 @@
 # to the actual runtime sol dir, play a file and then compare saved
 # sol files at the end with input ones.
 #
-# Called w/out arguments will use gprocessor as player, MEDIADIR/sol
+# Called w/out arguments will use gprocessor as player, SharedObjectTest.sol/
 # as input sol dir and testsuite/tmpSharedObject as runtime sol dir.
 #
 # You can pass arguments to change player and runtime sol dir for testing
