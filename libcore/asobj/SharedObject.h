@@ -46,6 +46,9 @@ public:
 
     void markReachableResources() const;
 
+    // Drop all library items
+    void clear() { _soLib.clear(); }
+
 private:
 
     VM& _vm;
