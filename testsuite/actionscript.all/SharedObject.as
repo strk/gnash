@@ -185,10 +185,13 @@ so7 = SharedObject.getLocal();
 so7.data.a = 1;
 so7.flush();
 
+so8 = SharedObject.getLocal('');
+xcheck_equals(typeof(so8), 'null');
+
 //------------------------------------------
 // END OF TESTS
 //------------------------------------------
 
-check_totals(46);
+check_totals(47);
 
 #endif // OUTPUT_VERSION >= 6
