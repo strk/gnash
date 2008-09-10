@@ -82,6 +82,14 @@ so.data.tmp = "custom value";
 so2 = SharedObject.getLocal("level1/level2/settings", "/");
 check_equals(so2.data.tmp, "custom value");
 check_equals(so, so2);
+
+so2bis = SharedObject.getLocal("level1//level2/settings", "/");
+xcheck_equals(typeof(so2bis), 'null'); // invalid path
+
+so2bis = SharedObject.getLocal("level1/./level2/settings", "/");
+check_equals(typeof(so2bis), 'object'); // valid path
+check(so2bis != so2); // but not recognized as the same as level1/./level2/settings
+
 delete so.data.tmp;
 
 // But a getLocal call using a *different* "id" returns
@@ -195,6 +203,6 @@ check_equals(typeof(so9), 'null');
 // END OF TESTS
 //------------------------------------------
 
-check_totals(48);
+check_totals(51);
 
 #endif // OUTPUT_VERSION >= 6
