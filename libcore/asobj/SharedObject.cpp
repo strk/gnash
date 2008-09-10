@@ -170,6 +170,8 @@ class SharedObject: public as_object
 {
 public:
 
+    ~SharedObject();
+
     SharedObject()
         :
         as_object(getSharedObjectInterface())
@@ -351,12 +353,6 @@ SharedObjectLibrary::getLocal(const std::string& objName, const std::string& roo
 
     log_debug("SharedObject path: %s", newspec);
         
-    if ( ! createDirForFile(newspec) )
-    {
-        log_error("Couldn't create dir for SharedObject %s", newspec);
-        return 0;
-    }
-
     if ( ! obj->readSOL(newspec) )
     {
         log_error("Couldn't read SOL %s, will create on flush/exit", newspec);
@@ -432,10 +428,22 @@ SharedObject::readSOL(const std::string& newspec)
     return true;
 }
 
+
+SharedObject::~SharedObject()
+{
+    // flush(); // needs more care, if destroyed after VM we get killed
+}
+
 bool
 SharedObject::flush() const
 {
     const std::string& filespec = _sol.getFilespec();
+
+    if ( ! createDirForFile(filespec) )
+    {
+        log_error("Couldn't create dir for flushing SharedObject %s", filespec);
+        return false;
+    }
 
 #ifdef USE_SOL_READONLY
     log_debug(_("SharedObject %s not flushed (compiled as read-only mode)"), filespec);
