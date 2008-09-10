@@ -171,9 +171,24 @@ so6.data = 5;
 check_equals(typeof(so.data), 'object');
 
 //------------------------------------------
+// Test calling getLocal with no args
+//------------------------------------------
+
+so7 = SharedObject.getLocal();
+#if OUTPUT_VERSION > 6
+ // produces 'undefined.sol'
+ check(so7 instanceof SharedObject);
+#else
+ // returns undefined
+ xcheck_equals(typeof(so7), 'null');
+#endif
+so7.data.a = 1;
+so7.flush();
+
+//------------------------------------------
 // END OF TESTS
 //------------------------------------------
 
-check_totals(45);
+check_totals(46);
 
 #endif // OUTPUT_VERSION >= 6
