@@ -69,7 +69,7 @@ public:
     bool writeFile(const std::string &filespec, const std::string &objname);
     
     // read the .sol file from disk
-    bool readFile(std::string &filespec);
+    bool readFile(const std::string &filespec);
     
     std::vector<gnash::Network::byte_t> getHeader() { return _header; };
 
