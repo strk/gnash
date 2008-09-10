@@ -1890,6 +1890,7 @@ TEST_CASES += VarAndCharClashTest-Runner \
 	PrototypeEventListenersTestRunner \
 	DragDropTestRunner   \
 	FlashVarsTest-Runner \
+	SharedObjectTestRunner \
 	intervalTestRunner \
 	gotoFrame2Test-Runner 
 endif
