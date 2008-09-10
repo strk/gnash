@@ -87,7 +87,7 @@ delete so.data.tmp;
 // But a getLocal call using a *different* "id" returns
 // a different SharedObject...
 so3 = SharedObject.getLocal("level1/level2/settings3", "/");
-xcheck(so3 != so);
+check(so3 != so);
 
 
 // trace(so.getSize());
@@ -134,7 +134,7 @@ if (typeof(newso.data) != 'undefined') {
 }
 
 so4 = SharedObject.getLocal("Another one", "/subdir");
-xcheck(so4 != so3);
+check(so4 != so3);
 xcheck_equals(typeof(so4.data), 'undefined');
 ret = so4.flush();
 xcheck_equals(typeof(ret), 'undefined');
@@ -164,7 +164,7 @@ xcheck_equals(getCalls, 0); // flush didn't cal the getter
 so6 = SharedObject.getLocal("so6");
 a = new Array;
 for (var i in so6) a.push(i);
-xcheck_equals(a.toString(), 'data');
+check_equals(a.toString(), 'data');
 delete so6;
 check_equals(typeof(so.data), 'object');
 so6.data = 5;
@@ -180,16 +180,16 @@ so7 = SharedObject.getLocal();
  check(so7 instanceof SharedObject);
 #else
  // returns undefined
- xcheck_equals(typeof(so7), 'null');
+ check_equals(typeof(so7), 'null');
 #endif
 so7.data.a = 1;
 so7.flush();
 
 so8 = SharedObject.getLocal('');
-xcheck_equals(typeof(so8), 'null');
+check_equals(typeof(so8), 'null');
 
 so9 = SharedObject.getLocal('', 'something');
-xcheck_equals(typeof(so9), 'null');
+check_equals(typeof(so9), 'null');
 
 //------------------------------------------
 // END OF TESTS
