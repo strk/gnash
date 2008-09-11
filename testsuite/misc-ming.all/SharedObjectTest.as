@@ -25,27 +25,22 @@ check_equals(so1.data.tbool, true);
 check_equals(typeof(so1.data.fbool), 'boolean');
 check_equals(so1.data.fbool, false);
 
+// Test reading STRICT_ARRAY
 check_equals(typeof(so1.data.ary), 'object');
-xcheck_equals(so1.data.ary.toString(), '1,true,string,,');
-check_equals(typeof(so1.data.ary[0], 'number');
-check_equals(typeof(so1.data.ary[1], 'boolean');
-check_equals(typeof(so1.data.ary[2], 'string');
-check_equals(typeof(so1.data.ary[3], 'null');
-check_equals(typeof(so1.data.ary[4], 'undefined');
+check_equals(so1.data.ary.toString(), '1,true,string,null,');
+check_equals(typeof(so1.data.ary[0]), 'number');
+check_equals(typeof(so1.data.ary[1]), 'boolean');
+check_equals(typeof(so1.data.ary[2]), 'string');
+check_equals(typeof(so1.data.ary[3]), 'null');
+check_equals(typeof(so1.data.ary[4]), 'undefined');
+check_equals(so1.data.ary.length, 5);
 
-check_equals(typeof(so1.data.aryns), 'object');
+// Test reading ECMA_ARRAY
+check_equals(typeof(so1.data.aryns), 'object', 'aryns was not read from .sol');
 check_equals(so1.data.aryns.toString(), '4,5,6');
+check_equals(so1.data.aryns.length, 3);
 check_equals(so1.data.aryns.custom, 7);
 
-check_equals(typeof(so1.data.ary[0], 'number');
-check_equals(typeof(so1.data.ary[1], 'boolean');
-check_equals(typeof(so1.data.ary[2], 'string');
-check_equals(typeof(so1.data.ary[3], 'null');
-check_equals(typeof(so1.data.ary[4], 'undefined');
-
-check_equals(typeof(so1.data.ary2), 'object');
-xcheck_equals(so1.data.ary2.toString(), '4,5,sei');
-xcheck_equals(so1.data.ary.customArrayMember, 1);
 check_equals(typeof(so1.data.obj), 'object');
 check_equals(typeof(so1.data.obj.a), 'number');
 check_equals(so1.data.obj.a, 10);
@@ -74,8 +69,8 @@ quit = function()
 {
 	loadMovie('fscommand:quit', '');
 };
-note(" Will quit in 1 seconds");
-setInterval(quit, 1000);
+note(" Will quit in 5 seconds");
+setInterval(quit, 5000);
 stop();
 
 totals();

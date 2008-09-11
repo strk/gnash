@@ -61,7 +61,23 @@ echo "SOLDIR=${SOLDIR}"
 sleep 1
 
 export GNASHRC=${TOP_BUILDDIR}/testsuite/gnashrc
+
+#####################################################
+##
+## FIRST STEP: test reading well-known .sol file
+##
+#####################################################
+
 ${PLAYER} ${SWFTEST}
+
+#####################################################
+##
+## SECOND STEP: test writing
+##
+##   test that written sol files
+##   are bytewise equal to input ones
+##
+#####################################################
 
 cd ${SOLDIR}; find . -cnewer ${SOLDIR}/copytime | sed 's@^./@@' > ${SOLDIR}/newfiles; cd -
 
@@ -77,3 +93,12 @@ for f in ${INPUTSOLDIR}/*.sol; do
 	fi
 	echo "XPASSED: SharedObject ${solname} matches input"
 done
+
+#####################################################
+##
+## THIRD STEP: test re-reading just-written sol files
+##
+#####################################################
+
+# ( temporarly disabled )
+#${PLAYER} ${SWFTEST}
