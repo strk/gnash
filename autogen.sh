@@ -112,21 +112,31 @@ esac
 # renamed to gnashconfig,h to be unique. As the files libtoolize copies insist
 # on using config.h, we just edit the name, rather than adding a fixed copy to
 # Gnash.
+#
+# This gets more interesting with libtool 2.x, which heavily changed how everything
+# worked. Where libtool 1.5 installed only a header and had a single source file,
+# libtool 2.x has an entire sub directory tree of headers and source files.
+# So for libtool 1.5.x, we do everything the way this has always worked for Gnash.
+# For libtool 2.x, we install in a subdirectory of libbase, because we have to
+# hack the build directory, and everything configures tottally differernt than 1.5.x
+# used to. For more fun, libtoolize has different command line arguments, but one thing
+# that got fixed is for libtool 2.x there is an #define for the config file name, but
+# for libtool 1.5 it expects config.h always, so we change this to gnashconfig.h.
 ltdlver=`${LIBTOOLIZE:-libtoolize} --version | head -1 | cut -d ' ' -f 4`
 ltdlmajor=`echo $ltdlver | cut -d '.' -f 1`
-if test -z "$NO_LIBTOOLIZE" ; then 
-  libtoolflags="--force --ltdl --copy"
+if test -z "$NO_LIBTOOLIZE" ; then
+  ltbasedir="libbase/libltdl"
+  libtoolflags="--force --copy  --ltdl"
   if test $ltdlmajor -eq 2; then
-    libtoolflags="${libtoolflags} --quiet --nonrecursive"
-    ltdldirs=libltdl/libltdl/*.h
+    libtoolflags="${libtoolflags} ${ltbasedir} --quiet --nonrecursive"
   fi
   echo "Running libtoolize $ltdlver ${libtoolflags} ..."
   if ${LIBTOOLIZE:-libtoolize} ${libtoolflags}; then
     # libtool insists on including config.h, but we use gnashconfig.h
     # to avoid any problems, so we have to change this include
     # so they all reference the right config header file.
-    if test -d libltdl; then
-      for i in libltdl/*.c $ltdldirs; do
+    if test -d  libltdl; then
+      for i in  libltdl/*.c; do
 #      echo "Fixing $i..."
         mv $i $i.orig
         sed -e 's/include <config.h>/include <gnashconfig.h>/' $i.orig > $i
@@ -134,8 +144,8 @@ if test -z "$NO_LIBTOOLIZE" ; then
     fi
 #            mv libltdl/ltdl.c libltdl/ltdl.c.orig
 #            sed -e 's/include <config.h>/include <gnashconfig.h>/' libltdl/ltdl.c.orig > libltdl/ltdl.c
-    if test -f libltdl/config-h.in; then
-      chmod a+w libltdl/config-h.in # Darwin needs this
+    if test -f  ${ltbasedir}/config-h.in; then
+      chmod a+w  ${ltbasedir}/config-h.in # Darwin needs this
     fi
   else
     echo
