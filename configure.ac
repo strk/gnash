@@ -870,12 +870,14 @@ AC_LIBTOOL_DLOPEN
 AC_LIBTOOL_WIN32_DLL
 else
 LT_INIT([dlopen win32-dll])
-LTDL_INIT([nonrecursive])
+LTDL_INSTALLABLE
+lt_ltdl_dir=libbase/libltdl
+LTDL_INIT([installable nonrecursive])
 fi
 AC_PROG_LIBTOOL
 AM_CONDITIONAL(LIBLTDL2, [test $ltmajor -eq 2])
-AM_CONDITIONAL(INSTALL_LTDL, test x"${enable_ltdl_install-no}" = xyes)
-AM_CONDITIONAL(CONVENIENCE_LTDL, test x"${enable_ltdl_convenience-no}" = xyes)
+AM_CONDITIONAL(INSTALL_LTDL, test x"${enable_ltdl_install}" = xyes)
+AM_CONDITIONAL(CONVENIENCE_LTDL, test x"${enable_ltdl_convenience}" = xyes)
 
 AC_C_CONST
 AC_C_INLINE

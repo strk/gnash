@@ -59,12 +59,7 @@ if CYGNAL
 CYGNAL_DIR = cygnal
 endif
 
-# # libtool requires we build in that directory
-# if LIBLTDL2
-# LTDL2_DIR = libltdl
-# endif
-
-SUBDIRS = $(STD_DIRS) $(CYGNAL_DIR) $(LTDL2_DIR)
+SUBDIRS = $(STD_DIRS) $(CYGNAL_DIR)
 
 if TESTSUITE
 SUBDIRS += testsuite
