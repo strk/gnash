@@ -320,6 +320,8 @@ private:
 	as_object* mDefaultThis;
 	as_object* mThis;
 
+	as_object* mGlobalObject;
+
 	as_value mGlobalReturn;
 	as_value mIgnoreReturn; // Throw away returns go here.
 

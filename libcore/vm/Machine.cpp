@@ -2616,6 +2616,7 @@ void Machine::initMachine(abc_block* pool_block,as_object* global)
 	log_debug("Loding code stream.");
 	mStream = method->getBody();
 	mRegisters[0] = as_value(global);
+	mGlobalObject = global;
 }
 
 //This is called by abc_functions to execute their code stream.
