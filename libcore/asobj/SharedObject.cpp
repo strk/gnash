@@ -541,47 +541,9 @@ SharedObject::readSOL(const std::string& filespec)
     
     for (it = els.begin(), e = els.end(); it != e; it++) {
         Element *el = *it;
-
-        switch (el->getType())
-        {
-            case Element::NUMBER_AMF0:
-            {
-                double dub =  *(reinterpret_cast<double*>(el->getData()));
-                ptr->set_member(st.string_table::find(el->getName()), as_value(dub));
-                break;
-            }
-
-            case Element::BOOLEAN_AMF0:
-                ptr->set_member(st.string_table::find(el->getName()),
-                                            as_value(el->to_bool()));
-                break;
-
-            case Element::STRING_AMF0:
-            {
-                if (el->getLength() == 0) {
-                    ptr->set_member(st.string_table::find(el->getName()), as_value(""));
-                    break;
-                }
-                
-                std::string str(reinterpret_cast<const char*>(el->getData()), el->getLength());
-                ptr->set_member(st.string_table::find(el->getName()), as_value(str));
-                break;
-            }
-
-            case Element::OBJECT_AMF0:
-                // TODO: implement!
-                log_unimpl("Reading OBJECT type from SharedObject");
-                //data.convert_to_object();
-                //ptr->set_member(st.string_table::find(el->name), data);
-                return false;
-                break;
-
-            default:
-                // TODO: what about other types?
-                log_unimpl("Reading SOL type %d", el->getType());
-                return false;
-                break;
-        } 
+        std::string name(el->getName());
+        as_value val(*el);
+        ptr->set_member(st.find(name), val);
     }
 
     return true;

@@ -24,17 +24,17 @@ check_equals(typeof(so1.data.tbool), 'boolean');
 check_equals(so1.data.tbool, true);
 check_equals(typeof(so1.data.fbool), 'boolean');
 check_equals(so1.data.fbool, false);
-xcheck_equals(typeof(so1.data.ary), 'object');
+check_equals(typeof(so1.data.ary), 'object');
 xcheck_equals(so1.data.ary.toString(), '1,2,3');
-xcheck_equals(typeof(so1.data.obj), 'object');
-xcheck_equals(typeof(so1.data.obj.a), 'number');
-xcheck_equals(so1.data.obj.a, 10);
-xcheck_equals(typeof(so1.data.obj.b), 'string');
-xcheck_equals(so1.data.obj.b, '20');
-xcheck_equals(typeof(so1.data.obj.c), 'boolean');
-xcheck_equals(so1.data.obj.c, true);
+check_equals(typeof(so1.data.obj), 'object');
+check_equals(typeof(so1.data.obj.a), 'number');
+check_equals(so1.data.obj.a, 10);
+check_equals(typeof(so1.data.obj.b), 'string');
+check_equals(so1.data.obj.b, '20');
+check_equals(typeof(so1.data.obj.c), 'boolean');
+check_equals(so1.data.obj.c, true);
 xcheck_equals(typeof(so1.data.ref), 'object');
-check_equals(so1.data.ref, so1.data.obj);
+xcheck_equals(so1.data.ref, so1.data.obj);
 
 // force writing the sol or the adobe player won't save it
 // again. This will also serve as a kind of reference for
