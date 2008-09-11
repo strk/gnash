@@ -1889,7 +1889,8 @@ Machine::execute()
 ///  num + 1
 	case SWF::ABC_ACTION_INCREMENT:
 	{
-		mStack.top(0) = mStack.top(0).to_number() + 1;
+		as_value val = pop_stack();
+		push_stack(as_value(val.to_number() + 1));
 		break;
 	}
 /// 0x92 ABC_ACTION_INCLOCAL
