@@ -85,7 +85,7 @@ VM::isInitialized()
 
 VM::VM(movie_definition& topmovie, VirtualClock& clock)
 	:
-	_root_movie(new movie_root()),
+	_root_movie(new movie_root(*this)),
 	_swfversion(topmovie.get_version()),
 	_swfurl(topmovie.get_url()),
 	mMachine(0),
