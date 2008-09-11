@@ -136,7 +136,7 @@ public:
     /// Make sure to call setRootMovie() 
     /// before using any of this class methods !
     ///
-    movie_root();
+    movie_root(VM& vm);
 
     ~movie_root();
 
@@ -788,6 +788,8 @@ public:
 
 private:
 
+    VM& _vm;
+
     /// Registered Interface command handler, if any
     AbstractIfaceCallback* _interfaceHandler;
 
@@ -868,10 +870,10 @@ private:
     LiveChars _liveChars;
 
     /// Forbid copy 
-    movie_root(const movie_root& ) { abort(); }
+    movie_root(const movie_root& ); 
 
     /// Forbid assignment
-    movie_root& operator=(const movie_root& ) { abort(); return *this; }
+    movie_root& operator=(const movie_root& );
 
     /// Execute expired timers
     void executeTimers();
