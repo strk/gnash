@@ -2743,8 +2743,9 @@ void Machine::print_scope_stack(){
 std::auto_ptr< std::vector<as_value> > Machine::get_args(unsigned int argc){
 	LOG_DEBUG_AVM("There are %u args",argc);
 	std::auto_ptr< std::vector<as_value> > args = std::auto_ptr< std::vector<as_value> >(new std::vector<as_value>);
-	for(unsigned int i=0;i<argc;i++){
-		args->push_back(pop_stack());
+	args->resize(argc);
+	for(unsigned int i=argc; i>0; --i){
+		args->at(i-1) = pop_stack();
 	}
 	return args;
 }
