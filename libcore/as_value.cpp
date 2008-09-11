@@ -186,7 +186,7 @@ public:
         if ( key == NSV::PROP_uuPROTOuu || 
              key == NSV::PROP_CONSTRUCTOR )
         {
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+#ifdef GNASH_DEBUG_AMF_SERIALIZE
             log_debug(" skip serialization of specially-named property %s", _st.value(key));
 #endif
             return;
@@ -194,7 +194,7 @@ public:
 
         // write property name
         const string& name = _st.value(key);
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+#ifdef GNASH_DEBUG_AMF_SERIALIZE
         log_debug(" serializing property %s", name);
 #endif
         boost::uint16_t namelen = name.size();
@@ -2116,7 +2116,7 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 
 				li = readNetworkLong(b); b += 4;
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
-				log_debug("amf0 starting read of array with %i elements", li);
+				log_debug("amf0 starting read of STRICT_ARRAY with %i elements", li);
 #endif
 				as_value arrayElement;
 				for(int i = 0; i < li; ++i)
@@ -2133,22 +2133,43 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 			}
 		case amf::Element::ECMA_ARRAY_AMF0:
 			{
-				boost::intrusive_ptr<as_object> obj(new as_object(getObjectInterface()));
-                objRefs.push_back(obj.get());
+				as_array_object* obj = new as_array_object(); // GC-managed...
+                objRefs.push_back(obj);
 
 				li = readNetworkLong(b); b += 4;
+
+                // TODO: do boundary checking (if b >= end...)
+
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
-				log_debug("amf0 starting read of object with %i elements", li);
+				log_debug("amf0 starting read of ECMA_ARRAY with %i elements", li);
 #endif
 				as_value objectElement;
-				VM& vm = VM::get(); // TODO: get VM from outside
 				string_table& st = vm.getStringTable();
-				for(int i = 0; i < li; ++i)
+				for (;;)
 				{
-    					boost::uint16_t strlen = readNetworkShort(b); b+=2; 
+                    if ( b+2 >= end )
+                    {
+                        log_error("MALFORMED SOL: premature end of ECMA_ARRAY block");
+                        break;
+                    }
+					boost::uint16_t strlen = readNetworkShort(b); b+=2; 
+
+                    // end of ECMA_ARRAY is signalled by an empty string
+                    // followed by an OBJECT_END_AMF0 (0x09) byte
+                    if ( ! strlen )
+                    {
+                        // expect an object terminator here
+                        if ( *b++ != amf::Element::OBJECT_END_AMF0 )
+                        {
+                            log_error("MALFORMED SOL: empty member name not followed by OBJECT_END_AMF0 byte");
+                        }
+                        break;
+                    }
+
 					std::string name((char*)b, strlen);
+
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
-					log_debug("amf0 Object prop name is %s", name);
+					log_debug("amf0 ECMA_ARRAY prop name is %s", name);
 #endif
 					b += strlen;
 					if ( ! amf0_read_value(b, end, objectElement, -1, objRefs, vm) )
@@ -2157,6 +2178,14 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 					}
 					obj->set_member(st.find(name), objectElement);
 				}
+
+                // consisteny checking
+                if ( obj->size() != li ) {
+                    log_error("MALFORMED SOL: ECMA_ARRAY advertised %d elements but had just %d", obj->size());
+                }
+
+				// ends with a null string and an object terminator (0x09)
+				//b += 3;
 
 				ret.set_as_object(obj);
 				return true;
@@ -2202,17 +2231,26 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 			}
 		case amf::Element::UNDEFINED_AMF0:
 			{
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+				log_debug("readAMF0: undefined value");
+#endif
 				ret.set_undefined();
 				return true;
 			}
 		case amf::Element::NULL_AMF0:
 			{
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+				log_debug("readAMF0: null value");
+#endif
 				ret.set_null();
 				return true;
 			}
 		case amf::Element::REFERENCE_AMF0:
             {
 			    si = readNetworkShort(b); b += 2;
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+				log_debug("readAMF0: reference #%d", si);
+#endif
                 if ( si < 1 || si > objRefs.size() )
                 {
                     log_error("readAMF0: invalid reference to object %d (%d known objects)", si, objRefs.size());
@@ -2360,6 +2398,20 @@ as_value::writeAMF0(SimpleBuffer& buf, std::map<as_object*, size_t>& offsetTable
             log_debug(_("writeAMF0: serializing undefined"));
 #endif
             buf.appendByte(amf::Element::UNDEFINED_AMF0);
+            return true;
+        }
+
+        case BOOLEAN:
+        {
+            bool tf = getBool();
+#ifdef GNASH_DEBUG_AMF_SERIALIZE
+            log_debug(_("writeAMF0: serializing boolean '%s'"), tf);
+#endif
+
+            buf.appendByte(amf::Element::BOOLEAN_AMF0);
+            if(tf) buf.appendByte(1);
+            else buf.appendByte(0);
+
             return true;
         }
     }
