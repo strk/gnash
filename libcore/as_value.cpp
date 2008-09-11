@@ -2116,7 +2116,7 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 
 				li = readNetworkLong(b); b += 4;
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
-				log_debug("amf0 starting read of array with %i elements", li);
+				log_debug("amf0 starting read of STRICT_ARRAY with %i elements", li);
 #endif
 				as_value arrayElement;
 				for(int i = 0; i < li; ++i)
