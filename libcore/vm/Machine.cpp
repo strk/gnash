@@ -2667,12 +2667,14 @@ Machine::Machine(VM& vm):mST(),mRegisters(),mExitWithReturn(false),_vm(vm)
 as_value Machine::find_prop_strict(asName multiname){
 	
 	as_value val;
+	mAsValueScopeStack.push(as_value(mGlobalObject));
 	for(int i=0;i<mAsValueScopeStack.size();i++){
 
 		val = mAsValueScopeStack.top(i).to_object().get()->getMember(multiname.getGlobalName(),multiname.getNamespace()->getURI());
 
 		if(!val.is_undefined()){
 			push_stack(mAsValueScopeStack.top(i));
+			mAsValueScopeStack.pop();
 			return val;
 		}
 	}
@@ -2685,6 +2687,7 @@ as_value Machine::find_prop_strict(asName multiname){
 	std::string path = ns.size() == 0 ? name : ns + "." + name;
 	val = env.get_variable(path,*getScopeStack(),&target);
 	push_stack(as_value(target));
+	mAsValueScopeStack.pop();
 	return val;
 }
 
