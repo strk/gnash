@@ -25,31 +25,40 @@ check_equals(so1.data.tbool, true);
 check_equals(typeof(so1.data.fbool), 'boolean');
 check_equals(so1.data.fbool, false);
 
-// Test reading STRICT_ARRAY
-check_equals(typeof(so1.data.ary), 'object');
-check_equals(so1.data.ary.toString(), '1,true,string,null,');
-check_equals(typeof(so1.data.ary[0]), 'number');
-check_equals(typeof(so1.data.ary[1]), 'boolean');
-check_equals(typeof(so1.data.ary[2]), 'string');
-check_equals(typeof(so1.data.ary[3]), 'null');
+// Test reading STRICT_ARRAY, NULL and UNDEFINED
+xcheck_equals(typeof(so1.data.ary), 'object');
+xcheck_equals(so1.data.ary.toString(), '1,true,string,null,');
+xcheck_equals(typeof(so1.data.ary[0]), 'number');
+xcheck_equals(typeof(so1.data.ary[1]), 'boolean');
+xcheck_equals(typeof(so1.data.ary[2]), 'string');
+xcheck_equals(typeof(so1.data.ary[3]), 'null');
 check_equals(typeof(so1.data.ary[4]), 'undefined');
-check_equals(so1.data.ary.length, 5);
+xcheck_equals(so1.data.ary.length, 5);
 
 // Test reading ECMA_ARRAY
-check_equals(typeof(so1.data.aryns), 'object', 'aryns was not read from .sol');
-check_equals(so1.data.aryns.toString(), '4,5,6');
-check_equals(so1.data.aryns.length, 3);
-check_equals(so1.data.aryns.custom, 7);
+xcheck_equals(typeof(so1.data.aryns), 'object', 'aryns was not read from .sol');
+xcheck_equals(so1.data.aryns.toString(), '4,5,6');
+xcheck_equals(so1.data.aryns.length, 3);
+xcheck_equals(so1.data.aryns.custom, 7);
 
-check_equals(typeof(so1.data.obj), 'object');
-check_equals(typeof(so1.data.obj.a), 'number');
-check_equals(so1.data.obj.a, 10);
-check_equals(typeof(so1.data.obj.b), 'string');
-check_equals(so1.data.obj.b, '20');
-check_equals(typeof(so1.data.obj.c), 'boolean');
-check_equals(so1.data.obj.c, true);
+// Test reading OBJECT
+xcheck_equals(typeof(so1.data.obj), 'object');
+xcheck_equals(typeof(so1.data.obj.a), 'number');
+
+// Test reading NUMBER
+xcheck_equals(so1.data.obj.a, 10);
+
+// Test reading STRING
+xcheck_equals(typeof(so1.data.obj.b), 'string');
+xcheck_equals(so1.data.obj.b, '20');
+
+// Test reading BOOLEAN
+xcheck_equals(typeof(so1.data.obj.c), 'boolean');
+xcheck_equals(so1.data.obj.c, true);
+
+// Test reading REFERENCE
 xcheck_equals(typeof(so1.data.ref), 'object');
-xcheck_equals(so1.data.ref, so1.data.obj);
+check_equals(so1.data.ref, so1.data.obj); 
 
 // force writing the sol or the adobe player won't save it
 // again. This will also serve as a kind of reference for
