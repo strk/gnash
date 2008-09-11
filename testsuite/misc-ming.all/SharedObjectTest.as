@@ -24,8 +24,28 @@ check_equals(typeof(so1.data.tbool), 'boolean');
 check_equals(so1.data.tbool, true);
 check_equals(typeof(so1.data.fbool), 'boolean');
 check_equals(so1.data.fbool, false);
+
 check_equals(typeof(so1.data.ary), 'object');
-xcheck_equals(so1.data.ary.toString(), '1,2,3');
+xcheck_equals(so1.data.ary.toString(), '1,true,string,,');
+check_equals(typeof(so1.data.ary[0], 'number');
+check_equals(typeof(so1.data.ary[1], 'boolean');
+check_equals(typeof(so1.data.ary[2], 'string');
+check_equals(typeof(so1.data.ary[3], 'null');
+check_equals(typeof(so1.data.ary[4], 'undefined');
+
+check_equals(typeof(so1.data.aryns), 'object');
+check_equals(so1.data.aryns.toString(), '4,5,6');
+check_equals(so1.data.aryns.custom, 7);
+
+check_equals(typeof(so1.data.ary[0], 'number');
+check_equals(typeof(so1.data.ary[1], 'boolean');
+check_equals(typeof(so1.data.ary[2], 'string');
+check_equals(typeof(so1.data.ary[3], 'null');
+check_equals(typeof(so1.data.ary[4], 'undefined');
+
+check_equals(typeof(so1.data.ary2), 'object');
+xcheck_equals(so1.data.ary2.toString(), '4,5,sei');
+xcheck_equals(so1.data.ary.customArrayMember, 1);
 check_equals(typeof(so1.data.obj), 'object');
 check_equals(typeof(so1.data.obj.a), 'number');
 check_equals(so1.data.obj.a, 10);
@@ -43,7 +63,8 @@ so1.data.num = 2;
 so1.data.str = 'a string'; 
 so1.data.tbool = true;
 so1.data.fbool = false;
-so1.data.ary = [1,2,3];
+so1.data.ary = [1,true,'string',null, undefined]; // strict array (STRICT_ARRAY)
+so1.data.aryns = [4,5,6]; so1.data.aryns.custom = 7; // non-strict array (ECMA_ARRAY)
 so1.data.obj = {a:10,b:'20',c:true};
 so1.data.ref = so1.data.obj;
 
