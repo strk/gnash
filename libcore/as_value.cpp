@@ -2133,19 +2133,41 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 			}
 		case amf::Element::ECMA_ARRAY_AMF0:
 			{
-				boost::intrusive_ptr<as_object> obj(new as_array_object());
-                objRefs.push_back(obj.get());
+				as_array_object* obj = new as_array_object(); // GC-managed...
+                objRefs.push_back(obj);
 
 				li = readNetworkLong(b); b += 4;
+
+                // TODO: do boundary checking (if b >= end...)
+
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
 				log_debug("amf0 starting read of ECMA_ARRAY with %i elements", li);
 #endif
 				as_value objectElement;
 				string_table& st = vm.getStringTable();
-				for(int i = 0; i < li; ++i)
+				for (;;)
 				{
+                    if ( b+2 >= end )
+                    {
+                        log_error("MALFORMED SOL: premature end of ECMA_ARRAY block");
+                        break;
+                    }
 					boost::uint16_t strlen = readNetworkShort(b); b+=2; 
+
+                    // end of ECMA_ARRAY is signalled by an empty string
+                    // followed by an OBJECT_END_AMF0 (0x09) byte
+                    if ( ! strlen )
+                    {
+                        // expect an object terminator here
+                        if ( *b++ != amf::Element::OBJECT_END_AMF0 )
+                        {
+                            log_error("MALFORMED SOL: empty member name not followed by OBJECT_END_AMF0 byte");
+                        }
+                        break;
+                    }
+
 					std::string name((char*)b, strlen);
+
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
 					log_debug("amf0 ECMA_ARRAY prop name is %s", name);
 #endif
@@ -2157,8 +2179,13 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 					obj->set_member(st.find(name), objectElement);
 				}
 
+                // consisteny checking
+                if ( obj->size() != li ) {
+                    log_error("MALFORMED SOL: ECMA_ARRAY advertised %d elements but had just %d", obj->size());
+                }
+
 				// ends with a null string and an object terminator (0x09)
-				b += 3;
+				//b += 3;
 
 				ret.set_as_object(obj);
 				return true;
