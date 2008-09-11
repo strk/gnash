@@ -60,16 +60,13 @@ abc_Trait::finalize(abc_block *pBlock, asClass *pClass, bool do_static)
 			return false;
 		}
 		// The name has been validated in read.
-		if (mHasValue){
-			LOG_DEBUG_ABC("Adding property=%s with value=%s slot=%u",pBlock->mStringPool[mName],mValue.toDebugString(),mSlotId);
-			pClass->addValue(mGlobalName, mNamespace, mSlotId, pType, 
-				mValue, mKind == KIND_CONST, do_static);
-			}
-		else{
-			LOG_DEBUG_ABC("Adding property=%s slot=%u",pBlock->mStringPool[mName],mSlotId);
-			pClass->addSlot(mGlobalName, mNamespace, mSlotId, pType,
-				do_static);
-			}
+		// TODO: Find a better way to initialize trait values.
+		if (!mHasValue){
+			mValue = as_value(0);
+		}
+		LOG_DEBUG_ABC("Adding property=%s with value=%s slot=%u",pBlock->mStringPool[mName],mValue.toDebugString(),mSlotId);
+		pClass->addValue(mGlobalName, mNamespace, mSlotId, pType, 
+			mValue, mKind == KIND_CONST, do_static);
 		break;
 	}
 	case KIND_METHOD:
@@ -209,6 +206,7 @@ abc_Trait::read(SWFStream* in, abc_block *pBlock)
 		mSlotId = in->read_V32();
 		mTypeIndex = in->read_V32();
 		boost::uint32_t vindex = in->read_V32();
+		LOG_DEBUG_ABC("Slot ID=%u Type=%s Pool index=%u",mSlotId,pBlock->mStringPool[pBlock->mMultinamePool[mTypeIndex].getABCName()],vindex);
 		if (vindex)
 		{
 			if (!pBlock->pool_value(vindex, in->read_u8(), mValue))
@@ -618,6 +616,7 @@ abc_block::pool_value(boost::uint32_t index, boost::uint8_t type, as_value &v)
 	if (!index)
 		return true;
 
+	LOG_DEBUG_ABC("Pool value: index is %u type is 0x%X",index,type | 0x0);
 	switch (type)
 	{
 	case POOL_STRING: 
