@@ -874,8 +874,8 @@ LTDL_INIT([nonrecursive])
 fi
 AC_PROG_LIBTOOL
 AM_CONDITIONAL(LIBLTDL2, [test $ltmajor -eq 2])
-AM_CONDITIONAL(INSTALL_LTDL, test x"${enable_ltdl_install-no}" != xno)
-AM_CONDITIONAL(CONVENIENCE_LTDL, test x"${enable_ltdl_convenience-no}" != xno)
+AM_CONDITIONAL(INSTALL_LTDL, test x"${enable_ltdl_install-no}" = xyes)
+AM_CONDITIONAL(CONVENIENCE_LTDL, test x"${enable_ltdl_convenience-no}" = xyes)
 
 AC_C_CONST
 AC_C_INLINE
