@@ -2133,22 +2133,21 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 			}
 		case amf::Element::ECMA_ARRAY_AMF0:
 			{
-				boost::intrusive_ptr<as_object> obj(new as_object(getObjectInterface()));
+				boost::intrusive_ptr<as_object> obj(new as_array_object());
                 objRefs.push_back(obj.get());
 
 				li = readNetworkLong(b); b += 4;
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
-				log_debug("amf0 starting read of object with %i elements", li);
+				log_debug("amf0 starting read of ECMA_ARRAY with %i elements", li);
 #endif
 				as_value objectElement;
-				VM& vm = VM::get(); // TODO: get VM from outside
 				string_table& st = vm.getStringTable();
 				for(int i = 0; i < li; ++i)
 				{
-    					boost::uint16_t strlen = readNetworkShort(b); b+=2; 
+					boost::uint16_t strlen = readNetworkShort(b); b+=2; 
 					std::string name((char*)b, strlen);
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
-					log_debug("amf0 Object prop name is %s", name);
+					log_debug("amf0 ECMA_ARRAY prop name is %s", name);
 #endif
 					b += strlen;
 					if ( ! amf0_read_value(b, end, objectElement, -1, objRefs, vm) )
@@ -2157,6 +2156,9 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 					}
 					obj->set_member(st.find(name), objectElement);
 				}
+
+				// ends with a null string and an object terminator (0x09)
+				b += 3;
 
 				ret.set_as_object(obj);
 				return true;
