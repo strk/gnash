@@ -186,7 +186,7 @@ public:
         if ( key == NSV::PROP_uuPROTOuu || 
              key == NSV::PROP_CONSTRUCTOR )
         {
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+#ifdef GNASH_DEBUG_AMF_SERIALIZE
             log_debug(" skip serialization of specially-named property %s", _st.value(key));
 #endif
             return;
@@ -194,7 +194,7 @@ public:
 
         // write property name
         const string& name = _st.value(key);
-#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+#ifdef GNASH_DEBUG_AMF_SERIALIZE
         log_debug(" serializing property %s", name);
 #endif
         boost::uint16_t namelen = name.size();
@@ -2202,17 +2202,26 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 			}
 		case amf::Element::UNDEFINED_AMF0:
 			{
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+				log_debug("readAMF0: undefined value");
+#endif
 				ret.set_undefined();
 				return true;
 			}
 		case amf::Element::NULL_AMF0:
 			{
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+				log_debug("readAMF0: null value");
+#endif
 				ret.set_null();
 				return true;
 			}
 		case amf::Element::REFERENCE_AMF0:
             {
 			    si = readNetworkShort(b); b += 2;
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+				log_debug("readAMF0: reference #%d", si);
+#endif
                 if ( si < 1 || si > objRefs.size() )
                 {
                     log_error("readAMF0: invalid reference to object %d (%d known objects)", si, objRefs.size());
@@ -2360,6 +2369,20 @@ as_value::writeAMF0(SimpleBuffer& buf, std::map<as_object*, size_t>& offsetTable
             log_debug(_("writeAMF0: serializing undefined"));
 #endif
             buf.appendByte(amf::Element::UNDEFINED_AMF0);
+            return true;
+        }
+
+        case BOOLEAN:
+        {
+            bool tf = getBool();
+#ifdef GNASH_DEBUG_AMF_SERIALIZE
+            log_debug(_("writeAMF0: serializing boolean '%s'"), tf);
+#endif
+
+            buf.appendByte(amf::Element::BOOLEAN_AMF0);
+            if(tf) buf.appendByte(1);
+            else buf.appendByte(0);
+
             return true;
         }
     }
