@@ -125,18 +125,18 @@ esac
 ltdlver=`${LIBTOOLIZE:-libtoolize} --version | head -1 | cut -d ' ' -f 4`
 ltdlmajor=`echo $ltdlver | cut -d '.' -f 1`
 if test -z "$NO_LIBTOOLIZE" ; then
-  ltbasedir="libbase/libltdl"
+  ltbasedir="libltdl"
   libtoolflags="--force --copy  --ltdl"
   if test $ltdlmajor -eq 2; then
-    libtoolflags="${libtoolflags} ${ltbasedir} --quiet --nonrecursive"
+    libtoolflags="${libtoolflags} ${ltbasedir} --quiet --recursive"
   fi
   echo "Running libtoolize $ltdlver ${libtoolflags} ..."
   if ${LIBTOOLIZE:-libtoolize} ${libtoolflags}; then
     # libtool insists on including config.h, but we use gnashconfig.h
     # to avoid any problems, so we have to change this include
     # so they all reference the right config header file.
-    if test -d  libltdl; then
-      for i in  libltdl/*.c; do
+    if test -d libltdl; then
+      for i in libltdl/*.c; do
 #      echo "Fixing $i..."
         mv $i $i.orig
         sed -e 's/include <config.h>/include <gnashconfig.h>/' $i.orig > $i
@@ -144,6 +144,13 @@ if test -z "$NO_LIBTOOLIZE" ; then
     fi
 #            mv libltdl/ltdl.c libltdl/ltdl.c.orig
 #            sed -e 's/include <config.h>/include <gnashconfig.h>/' libltdl/ltdl.c.orig > libltdl/ltdl.c
+    # for libtool 1.x, we don't build in libltdl, it's built in libbase instead. autoconf doesn't like
+    # conditional output files, so we nuke the original libltdl/Makefile.am and replace it with a zero
+    # sized one to keep autoconf happy.
+    if test $ltdlmajor -eq 1; then
+       mv libltdl/Makefile.am Makefile.am.orig
+       touch libltdl/Makefile.am
+    fi
     if test -f  ${ltbasedir}/config-h.in; then
       chmod a+w  ${ltbasedir}/config-h.in # Darwin needs this
     fi

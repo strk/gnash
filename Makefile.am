@@ -55,11 +55,15 @@ STD_DIRS = \
 	po \
 	$(NULL)
 
+if LIBLTDL2
+LIBLTDLDIR = libltdl
+endif
+
 if CYGNAL
 CYGNAL_DIR = cygnal
 endif
 
-SUBDIRS = $(STD_DIRS) $(CYGNAL_DIR)
+SUBDIRS = $(LIBLTDLDIR) $(STD_DIRS) $(CYGNAL_DIR)
 
 if TESTSUITE
 SUBDIRS += testsuite
@@ -71,7 +75,7 @@ endif
 
 # man_MANS = doc/gnash.1 doc/gprocessor.1 doc/dumpshm.1 soldumper.1
 
-DIST_SUBDIRS = $(STD_DIRS) cygnal extensions testsuite
+DIST_SUBDIRS = $(LIBLTDLDIR) $(STD_DIRS) cygnal extensions testsuite
 
 EXTRA_DIST =  autogen.sh \
 	config.rpath \
