@@ -36,7 +36,7 @@ VPATH+=:$(top_srcdir)/libltdl
 # (not as a sub-package!) using 'nostdinc':
 AM_CPPFLAGS	       = -DLT_CONFIG_H='<$(LT_CONFIG_H)>' \
 			  -DLTDL -I. -I$(srcdir) -Ilibltdl \
-			  -I$(top_srcdir)/libltdl -I$(top_srcdir)/libltdl/libltdl
+			  -I$(srcdir)/libltdl -I$(srcdir)/libltdl/libltdl
 AM_LDFLAGS	       = -no-undefined
 LTDL_VERSION_INFO	= -version-info 9:0:0
 
@@ -44,10 +44,10 @@ noinst_LTLIBRARIES	= $(LT_DLLOADERS)
 
 if INSTALL_LTDL
 ltdlincludedir		= $(includedir)/libltdl
-ltdlinclude_HEADERS	= $(top_srcdir)/libltdl/libltdl/lt_system.h \
-			  $(top_srcdir)/libltdl/libltdl/lt_error.h \
-			  $(top_srcdir)/libltdl/libltdl/lt_dlloader.h
-include_HEADERS	       = $(top_srcdir)/libltdl/ltdl.h
+ltdlinclude_HEADERS	= $(srcdir)/libltdl/libltdl/lt_system.h \
+			  $(srcdir)/libltdl/libltdl/lt_error.h \
+			  $(srcdir)/libltdl/libltdl/lt_dlloader.h
+include_HEADERS	       = $(srcdir)/libltdl/ltdl.h
 lib_LTLIBRARIES	       = libltdl/libltdl.la
 endif
 
@@ -55,25 +55,25 @@ if CONVENIENCE_LTDL
 noinst_LTLIBRARIES     += libltdl/libltdlc.la
 endif
 
-libltdl_libltdl_la_SOURCES = $(top_srcdir)/libltdl/libltdl/lt__alloc.h \
-			  $(top_srcdir)/libltdl/libltdl/lt__dirent.h \
-			  $(top_srcdir)/libltdl/libltdl/lt__glibc.h \
-			  $(top_srcdir)/libltdl/libltdl/lt__private.h \
-			  $(top_srcdir)/libltdl/libltdl/lt__strl.h \
-			  $(top_srcdir)/libltdl/libltdl/lt_dlloader.h \
-			  $(top_srcdir)/libltdl/libltdl/lt_error.h \
-	                  $(top_srcdir)/libltdl/libltdl/lt_system.h \
-			  $(top_srcdir)/libltdl/libltdl/slist.h \
-			  $(top_srcdir)/libltdl/loaders/preopen.c \
-			  $(top_srcdir)/libltdl/lt__alloc.c \
-			  $(top_srcdir)/libltdl/lt_dlloader.c \
-			  $(top_srcdir)/libltdl/lt_error.c \
-			  $(top_srcdir)/libltdl/ltdl.c \
-			  $(top_srcdir)/libltdl/ltdl.h \
-			  $(top_srcdir)/libltdl/slist.c
+libltdl_libltdl_la_SOURCES = $(srcdir)/libltdl/libltdl/lt__alloc.h \
+			  $(srcdir)/libltdl/libltdl/lt__dirent.h \
+			  $(srcdir)/libltdl/libltdl/lt__glibc.h \
+			  $(srcdir)/libltdl/libltdl/lt__private.h \
+			  $(srcdir)/libltdl/libltdl/lt__strl.h \
+			  $(srcdir)/libltdl/libltdl/lt_dlloader.h \
+			  $(srcdir)/libltdl/libltdl/lt_error.h \
+	                  $(srcdir)/libltdl/libltdl/lt_system.h \
+			  $(srcdir)/libltdl/libltdl/slist.h \
+			  $(srcdir)/libltdl/loaders/preopen.c \
+			  $(srcdir)/libltdl/lt__alloc.c \
+			  $(srcdir)/libltdl/lt_dlloader.c \
+			  $(srcdir)/libltdl/lt_error.c \
+			  $(srcdir)/libltdl/ltdl.c \
+			  $(srcdir)/libltdl/ltdl.h \
+			  $(srcdir)/libltdl/slist.c
 
-EXTRA_DIST	       += $(top_srcdir)/libltdl/lt__dirent.c \
-			  $(top_srcdir)/libltdl/lt__strl.c
+EXTRA_DIST	       += $(srcdir)/libltdl/lt__dirent.c \
+			  $(srcdir)/libltdl/lt__strl.c
 
 libltdl_libltdl_la_CPPFLAGS	= -DLTDLOPEN=$(LTDLOPEN) $(AM_CPPFLAGS)
 libltdl_libltdl_la_LDFLAGS	= $(AM_LDFLAGS) $(LTDL_VERSION_INFO) $(LT_DLPREOPEN)
@@ -97,24 +97,24 @@ EXTRA_LTLIBRARIES	        = libltdl/dlopen.la \
 				  libltdl/loadlibrary.la \
 				  libltdl/shl_load.la
 
-libltdl_dlopen_la_SOURCES	= $(top_srcdir)/libltdl/loaders/dlopen.c
+libltdl_dlopen_la_SOURCES	= $(srcdir)/libltdl/loaders/dlopen.c
 libltdl_dlopen_la_LDFLAGS	= -module -avoid-version
 libltdl_dlopen_la_LIBADD 	= $(LIBADD_DLOPEN)
 
-libltdl_dld_link_la_SOURCES	= $(top_srcdir)/libltdl/loaders/dld_link.c
+libltdl_dld_link_la_SOURCES	= $(srcdir)/libltdl/loaders/dld_link.c
 libltdl_dld_link_la_LDFLAGS	= -module -avoid-version
 libltdl_dld_link_la_LIBADD	= -ldld
 
-libltdl_dyld_la_SOURCES		= $(top_srcdir)/libltdl/loaders/dyld.c
+libltdl_dyld_la_SOURCES		= $(srcdir)/libltdl/loaders/dyld.c
 libltdl_dyld_la_LDFLAGS		= -module -avoid-version
 
-libltdl_load_add_on_la_SOURCES	= $(top_srcdir)/libltdl/loaders/load_add_on.c
+libltdl_load_add_on_la_SOURCES	= $(srcdir)/libltdl/loaders/load_add_on.c
 libltdl_load_add_on_la_LDFLAGS	= -module -avoid-version
 
-libltdl_loadlibrary_la_SOURCES	= $(top_srcdir)/libltdl/loaders/loadlibrary.c
+libltdl_loadlibrary_la_SOURCES	= $(srcdir)/libltdl/loaders/loadlibrary.c
 libltdl_loadlibrary_la_LDFLAGS	= -module -avoid-version
 
-libltdl_shl_load_la_SOURCES	= $(top_srcdir)/libltdl/loaders/shl_load.c
+libltdl_shl_load_la_SOURCES	= $(srcdir)/libltdl/loaders/shl_load.c
 libltdl_shl_load_la_LDFLAGS	= -module -avoid-version
 libltdl_shl_load_la_LIBADD	= $(LIBADD_SHL_LOAD)
 
@@ -127,23 +127,23 @@ CLEANFILES		        = libltdl/libltdl.la \
 ## automatically:
 CLEANFILES	       += $(ltdl_LIBOBJS) $(ltdl_LTLIBOBJS)
 
-EXTRA_DIST	       += $(top_srcdir)/libltdl/COPYING.LIB \
-			  $(top_srcdir)/libltdl/README
+EXTRA_DIST	       += $(srcdir)/libltdl/COPYING.LIB \
+			  $(srcdir)/libltdl/README
 
 ## --------------------------- ##
 ## Gnulib Makefile.am snippets ##
 ## --------------------------- ##
 
-BUILT_SOURCES	= $(top_srcdir)/libltdl/$(ARGZ_H)
-EXTRA_DIST	+= $(top_srcdir)/libltdl/argz_.h \
-		   $(top_srcdir)/libltdl/argz.c
+BUILT_SOURCES	= $(srcdir)/libltdl/$(ARGZ_H)
+EXTRA_DIST	+= $(srcdir)/libltdl/argz_.h \
+		   $(srcdir)/libltdl/argz.c
 
 # We need the following in order to create an <argz.h> when the system
 # doesn't have one that works with the given compiler.
-all-local $(lib_OBJECTS): $(top_srcdir)/libltdl/$(ARGZ_H)
+all-local $(lib_OBJECTS): $(srcdir)/libltdl/$(ARGZ_H)
 libltdl/argz.h: libltdl/argz_.h
 	$(mkinstalldirs) . libltdl/
-	cp $(top_srcdir)/libltdl/argz_.h $@-t
+	cp $(srcdir)/libltdl/argz_.h $@-t
 	mv $@-t $@
-MOSTLYCLEANFILES = $(top_srcdir)/libltdl/argz.h \
-		    $(top_srcdir)/libltdl/argz.h-t
+MOSTLYCLEANFILES = $(srcdir)/libltdl/argz.h \
+		    $(srcdir)/libltdl/argz.h-t
