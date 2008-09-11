@@ -72,8 +72,8 @@ for f in ${INPUTSOLDIR}/*.sol; do
 		continue
 	fi
 	if ! cmp ${INPUTSOLDIR}/${solname} ${SOLDIR}/${solname}; then
-		echo "FAILED: ! cmp ${SOLDIR}/${solname} ${INPUTSOLDIR}/${solname}"
+		echo "XFAILED: ! cmp ${SOLDIR}/${solname} ${INPUTSOLDIR}/${solname}"
 		continue
 	fi
-	echo "PASSED: SharedObject ${solname} matches input"
+	echo "XPASSED: SharedObject ${solname} matches input"
 done
