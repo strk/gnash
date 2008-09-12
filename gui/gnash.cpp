@@ -444,12 +444,12 @@ gnash_main(int argc, char *argv[])
     catch (const std::exception& ex)
     {
         cerr << ex.what() << endl;
-        exit(EXIT_FAILURE);
+        return EXIT_FAILURE;
     }
     catch (...)
     {
         cerr << _("Exception thrown during parseCommandLine") << endl;
-        exit(EXIT_FAILURE);
+        return EXIT_FAILURE;
     }
 
     // No file name was supplied

@@ -20,13 +20,20 @@
 
 AUTOMAKE_OPTIONS = dejagnu
 
+noinst_LTLIBRARIES = libcygnal.la
+libcygnal_la_SOURCES = \
+	$(top_builddir)/cygnal/crc.cpp
+
+libcygnal_la_LDFLAGS = \
+	$(top_builddir)/libamf/libgnashamf.la
+
 AM_CPPFLAGS = # -Wall
 
 AM_LDFLAGS = \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libamf/libgnashamf.la \
 	$(top_builddir)/libnet/libgnashnet.la \
-	$(top_builddir)/cygnal/libcygnal.la \
+	libcygnal.la \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS)
 
@@ -39,9 +46,9 @@ INCLUDES = \
         -I$(top_srcdir)/cygnal \
         -I$(top_srcdir)/libcore \
         -DLOCALEDIR=\"$(localedir)\" \
-	$(BOOST_CFLAGS) \
-	$(DEJAGNU_CFLAGS) \
-	$(PTHREAD_CFLAGS)
+		$(BOOST_CFLAGS) \
+		$(DEJAGNU_CFLAGS) \
+		$(PTHREAD_CFLAGS)
 
 check_PROGRAMS = \
 	test_crc

@@ -36,7 +36,7 @@ namespace SWF {
 namespace DefineButtonCxformTag
 {
 
-void loader(SWFStream& in, tag_type tag, movie_definition* m)
+void loader(SWFStream& in, tag_type tag, movie_definition& m)
 {
 
     assert(tag == SWF::DEFINEBUTTONCXFORM);
@@ -48,7 +48,7 @@ void loader(SWFStream& in, tag_type tag, movie_definition* m)
         log_debug("DefineButtonCxformTag: ButtonId=%d", buttonID);
     );
     
-    character_def* chdef = m->get_character_def(buttonID);
+    character_def* chdef = m.get_character_def(buttonID);
     if ( ! chdef )
     {
         IF_VERBOSE_MALFORMED_SWF(

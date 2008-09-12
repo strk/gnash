@@ -97,7 +97,7 @@ public:
 	///
 	/// TODO: take the stream by ref, not pointer
 	///
-	bool	read(SWFStream& in, int tag_type, movie_definition* m, unsigned long endPos);
+	bool	read(SWFStream& in, int tag_type, movie_definition& m, unsigned long endPos);
 
 	/// Return true if the button_record is valid
 	//
@@ -218,7 +218,7 @@ public:
 	struct button_sound_def
 	{
 		// TODO: implement ?
-		//void	read(SWFStream& in, movie_definition* m);
+		//void	read(SWFStream& in, movie_definition& m);
 
 		button_sound_info m_button_sounds[4];
 
@@ -241,7 +241,7 @@ public:
 	/// \brief
 	/// Construct a character definition as read from
 	/// the given movie_definition (SWF)
-	button_character_definition(movie_definition* m);
+	button_character_definition(movie_definition& m);
 
 	virtual ~button_character_definition();
 
@@ -249,19 +249,19 @@ public:
 	character* create_character_instance(character* parent, int id);
 
 	/// Read a SWF::DEFINEBUTTON, SWF::DEFINEBUTTONSOUND or SWF::DEFINEBUTTON2
-	void	read(SWFStream& in, int tag_type, movie_definition* m);
+	void	read(SWFStream& in, int tag_type, movie_definition& m);
 
 	/// Read a SWF::DEFINEBUTTON tag
-	void	readDefineButton(SWFStream& in, movie_definition* m);
+	void	readDefineButton(SWFStream& in, movie_definition& m);
 
 	/// Read a SWF::DEFINEBUTTON2 tag
-	void	readDefineButton2(SWFStream& in, movie_definition* m);
+	void	readDefineButton2(SWFStream& in, movie_definition& m);
 
 	/// Read a SWF::DEFINEBUTTONSOUND tag
-	void	readDefineButtonSound(SWFStream& in, movie_definition* m);
+	void	readDefineButtonSound(SWFStream& in, movie_definition& m);
 	
 	/// Read a SWF::DEFINEBUTTONCXFORM tag
-	void readDefineButtonCxform(SWFStream& in, movie_definition* m);
+	void readDefineButtonCxform(SWFStream& in, movie_definition& m);
 	
 	const rect&	get_bound() const {
 		// It is required that get_bound() is implemented in character definition
@@ -335,7 +335,7 @@ private:
 	bool m_menu;
 
 	/// The movie definition containing definition of this button
-	movie_definition* _movieDef;
+	movie_definition& _movieDef;
 };
 
 }	// end namespace gnash

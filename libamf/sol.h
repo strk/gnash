@@ -69,7 +69,7 @@ public:
     bool writeFile(const std::string &filespec, const std::string &objname);
     
     // read the .sol file from disk
-    bool readFile(std::string &filespec);
+    bool readFile(const std::string &filespec);
     
     std::vector<gnash::Network::byte_t> getHeader() { return _header; };
 
@@ -99,11 +99,11 @@ public:
 
 //protected:
 
-    void setFilespec(std::string &x) { _filespec = x; };
-    std::string &getFilespec() { return _filespec; };
+    void setFilespec(const std::string &x) { _filespec = x; };
+    const std::string &getFilespec() const { return _filespec; };
 
-    void setObjectName(std::string &x) { _objname = x; };
-    std::string &getObjectName() { return _objname; };
+    void setObjectName(const std::string &x) { _objname = x; };
+    const std::string &getObjectName() const { return _objname; };
         
  private:
     std::vector<gnash::Network::byte_t> _header;

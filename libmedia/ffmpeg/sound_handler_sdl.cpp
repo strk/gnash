@@ -730,13 +730,13 @@ void SDL_sound_handler::write_wave_header(std::ofstream& outfile)
   CHUNK_HDR chk;
  
   // setup wav header
-  sprintf(obuff,"RIFF");
+  snprintf(obuff, sizeof(obuff), "RIFF");
   for(i=0;i<4;i++) wav.rID[i] = obuff[i];
  
-  sprintf(obuff,"WAVE");
+  snprintf(obuff, sizeof(obuff), "WAVE");
   for(i=0;i<4;i++) wav.wID[i] = obuff[i];
   
-  sprintf(obuff,"fmt ");
+  snprintf(obuff, sizeof(obuff), "fmt ");
   for(i=0;i<4;i++) wav.fId[i] = obuff[i];
  
   wav.nBitsPerSample = ((audioSpec.format == AUDIO_S16SYS) ? 16 : 0);
@@ -752,7 +752,7 @@ void SDL_sound_handler::write_wave_header(std::ofstream& outfile)
   wav.nBlockAlign = audioSpec.channels * wav.nBitsPerSample / 8;
 
   // setup chunk header
-  sprintf(obuff,"data");
+  snprintf(obuff, sizeof(obuff), "data");
   for(i=0;i<4;i++) chk.dId[i] = obuff[i];
   chk.dLen = 0;
  

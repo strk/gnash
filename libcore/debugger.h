@@ -115,8 +115,8 @@ public:
     void dumpSymbols();
 
     // Change the value of a parameter on the stack
-    void changeStackValue(int index, as_value &val);
-    void changeStackValue(as_environment &env, int index, as_value &val);
+    void changeStackValue(unsigned int index, as_value &val);
+    void changeStackValue(as_environment &env, unsigned int index, as_value &val);
     
     // Change the value of a local variable
     void changeLocalVariable(const std::string &var, as_value &val);

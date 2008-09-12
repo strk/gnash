@@ -88,8 +88,9 @@ movie_root::testInvariant() const
 }
 
 
-movie_root::movie_root()
+movie_root::movie_root(VM& vm)
 	:
+    _vm(vm),
 	_interfaceHandler(0),
 	_fsCommandHandler(0),
 	m_viewport_x0(0),
@@ -181,7 +182,7 @@ movie_root::setRootMovie(movie_instance* movie)
 	float fps = md->get_frame_rate();
 	_movieAdvancementDelay = static_cast<int>(1000/fps);
 
-	_lastMovieAdvancement = VM::get().getTime();
+	_lastMovieAdvancement = _vm.getTime();
 
 	m_viewport_width = static_cast<int>(md->get_width_pixels());
 	m_viewport_height = static_cast<int>(md->get_height_pixels());
@@ -228,9 +229,7 @@ void
 movie_root::cleanupAndCollect()
 {
 	// Cleanup the stack.
-	// TODO: don't access VM as a singleton
-	VM& vm = VM::get();
-	vm.getStack().clear();
+	_vm.getStack().clear();
 
 	cleanupUnloadedListeners();
 	cleanupDisplayList();
@@ -476,9 +475,7 @@ movie_root::clear()
 	m_mouse_listeners.clear();
 
 	// Cleanup the stack.
-	// TODO: don't access VM as a singleton
-	VM& vm = VM::get();
-	vm.getStack().clear();
+	_vm.getStack().clear();
 
 #ifdef GNASH_USE_GC
 	// Run the garbage collector again
@@ -492,8 +489,8 @@ boost::intrusive_ptr<Stage>
 movie_root::getStageObject()
 {
 	as_value v;
-	if ( ! VM::isInitialized() ) return NULL;
-	as_object* global = VM::get().getGlobal();
+	assert ( VM::isInitialized() ); // return NULL;
+	as_object* global = _vm.getGlobal();
 	if ( ! global ) return NULL;
 	if (!global->get_member(NSV::PROP_iSTAGE, &v) ) return NULL;
 	return boost::dynamic_pointer_cast<Stage>(v.to_object());
@@ -534,8 +531,6 @@ movie_root::notify_mouse_moved(int x, int y)
 boost::intrusive_ptr<key_as_object>
 movie_root::getKeyObject()
 {
-	VM& vm = VM::get();
-
 	// TODO: test what happens with the global "Key" object
 	//       is removed or overridden by the user
 
@@ -550,7 +545,7 @@ movie_root::getKeyObject()
 		as_object* global = VM::get().getGlobal();
 
 		std::string objName = PROPNAME("Key");
-		if (global->get_member(vm.getStringTable().find(objName), &kval) )
+		if (global->get_member(_vm.getStringTable().find(objName), &kval) )
 		{
 			//log_debug("Found member 'Key' in _global: %s", kval.to_string());
 			boost::intrusive_ptr<as_object> obj = kval.to_object();
@@ -565,17 +560,15 @@ movie_root::getKeyObject()
 boost::intrusive_ptr<as_object>
 movie_root::getMouseObject()
 {
-	VM& vm = VM::get();
-
 	// TODO: test what happens with the global "Mouse" object
 	//       is removed or overridden by the user
 	if ( ! _mouseobject )
 	{
 		as_value val;
-		as_object* global = VM::get().getGlobal();
+		as_object* global = _vm.getGlobal();
 
 		std::string objName = PROPNAME("Mouse");
-		if (global->get_member(vm.getStringTable().find(objName), &val) )
+		if (global->get_member(_vm.getStringTable().find(objName), &val) )
 		{
 			//log_debug("Found member 'Mouse' in _global: %s", val);
 			_mouseobject = val.to_object();
@@ -589,8 +582,7 @@ movie_root::getMouseObject()
 key_as_object *
 movie_root::notify_global_key(key::code k, bool down)
 {
-	VM& vm = VM::get();
-	if ( vm.getSWFVersion() < 5 )
+	if ( _vm.getSWFVersion() < 5 )
 	{
 		// Key was added in SWF5
 		return NULL; 
@@ -1032,8 +1024,7 @@ movie_root::clear_interval_timer(unsigned int x)
 void
 movie_root::advance()
 {
-	VM& vm = VM::get(); // TODO: cache it !
-	unsigned int now = vm.getTime();
+	unsigned int now = _vm.getTime();
 
     try {
 
@@ -1047,7 +1038,7 @@ movie_root::advance()
 		    // slower. Might add a check here allowing a tolerance
 		    // and printing a warnign when we're later then tolerated...
 		    //
-		    _lastMovieAdvancement = now; // or vm.getTime(); ?
+		    _lastMovieAdvancement = now; // or _vm.getTime(); ?
 	    }
 
 	    // TODO: execute timers ?
@@ -1621,9 +1612,7 @@ movie_root::processActionQueue()
 	}
 
 	// Cleanup the stack.
-	// TODO: don't access VM as a singleton
-	VM& vm = VM::get();
-	vm.getStack().clear();
+	_vm.getStack().clear();
 
 }
 
@@ -2028,8 +2017,7 @@ movie_root::findCharacterByTarget(const std::string& tgtstr_orig) const
 
 	std::string tgtstr = PROPNAME(tgtstr_orig);
 
-	VM& vm = VM::get();
-	string_table& st = vm.getStringTable();
+	string_table& st = _vm.getStringTable();
 
 	// NOTE: getRootMovie() would be problematic in case the original
 	//       root movie is replaced by a load to _level0... 
@@ -2072,7 +2060,7 @@ movie_root::processLoadMovieRequest(const LoadMovieRequest& r)
 
     if ( target.compare(0, 6, "_level") == 0 && target.find_first_not_of("0123456789", 7) == std::string::npos )
     {
-        unsigned int levelno = atoi(target.c_str()+6);
+        unsigned int levelno = strtoul(target.c_str()+6, NULL, 0);
         log_debug(_("processLoadMovieRequest: Testing _level loading (level %u)"), levelno);
         loadLevel(levelno, url);
         return;
@@ -2131,7 +2119,7 @@ movie_root::isLevelTarget(const std::string& name, unsigned int& levelno)
   }
 
   if ( name.find_first_not_of("0123456789", 7) != std::string::npos ) return false;
-  levelno = atoi(name.c_str()+6); // getting 0 here for "_level" is intentional
+  levelno = strtoul(name.c_str()+6, NULL, 0); // getting 0 here for "_level" is intentional
   return true;
 
 }

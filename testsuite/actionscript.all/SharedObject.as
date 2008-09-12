@@ -82,12 +82,20 @@ so.data.tmp = "custom value";
 so2 = SharedObject.getLocal("level1/level2/settings", "/");
 check_equals(so2.data.tmp, "custom value");
 check_equals(so, so2);
+
+so2bis = SharedObject.getLocal("level1//level2/settings", "/");
+xcheck_equals(typeof(so2bis), 'null'); // invalid path
+
+so2bis = SharedObject.getLocal("level1/./level2/settings", "/");
+check_equals(typeof(so2bis), 'object'); // valid path
+check(so2bis != so2); // but not recognized as the same as level1/./level2/settings
+
 delete so.data.tmp;
 
 // But a getLocal call using a *different* "id" returns
 // a different SharedObject...
 so3 = SharedObject.getLocal("level1/level2/settings3", "/");
-xcheck(so3 != so);
+check(so3 != so);
 
 
 // trace(so.getSize());
@@ -134,11 +142,67 @@ if (typeof(newso.data) != 'undefined') {
 }
 
 so4 = SharedObject.getLocal("Another one", "/subdir");
-xcheck(so4 != so3);
+check(so4 != so3);
 xcheck_equals(typeof(so4.data), 'undefined');
 ret = so4.flush();
 xcheck_equals(typeof(ret), 'undefined');
 
-check_totals(38);
+//------------------------------------------
+// Test that if 'data' is a getter-setter,
+// it isn't called on .flush()
+//------------------------------------------
+
+so5 = SharedObject.getLocal("getset");
+check(so5 instanceof SharedObject);
+dataGet = function() { getCalls++; return new Object(); };
+getCalls=0;
+so5.addProperty('data', dataGet, dataGet);
+junk=so5.data;
+check_equals(getCalls, 1); // the getter works
+getCalls=0;
+ret=so5.flush();
+check_equals(ret, true);
+xcheck_equals(getCalls, 0); // flush didn't cal the getter
+
+//------------------------------------------
+// Test that 'data' is enumerable, read-only
+// and protected from deletion
+//------------------------------------------
+
+so6 = SharedObject.getLocal("so6");
+a = new Array;
+for (var i in so6) a.push(i);
+check_equals(a.toString(), 'data');
+delete so6;
+check_equals(typeof(so.data), 'object');
+so6.data = 5;
+check_equals(typeof(so.data), 'object');
+
+//------------------------------------------
+// Test calling getLocal with no args
+//------------------------------------------
+
+so7 = SharedObject.getLocal();
+#if OUTPUT_VERSION > 6
+ // produces 'undefined.sol'
+ check(so7 instanceof SharedObject);
+#else
+ // returns undefined
+ check_equals(typeof(so7), 'null');
+#endif
+so7.data.a = 1;
+so7.flush();
+
+so8 = SharedObject.getLocal('');
+check_equals(typeof(so8), 'null');
+
+so9 = SharedObject.getLocal('', 'something');
+check_equals(typeof(so9), 'null');
+
+//------------------------------------------
+// END OF TESTS
+//------------------------------------------
+
+check_totals(51);
 
 #endif // OUTPUT_VERSION >= 6

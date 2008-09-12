@@ -417,7 +417,7 @@ public:
 	/// Case insensitive for SWF up to 6, sensitive from 7 up
 	///
 	as_object* find_object(const std::string& path, const ScopeStack* scopeStack=NULL) const;
-
+	
 	/// Dump content of the stack to a std::ostream
 	//
 	/// @param out
@@ -579,13 +579,13 @@ private:
 	/// @param func
 	///	The function being called
 	///
-	static void pushCallFrame(as_function* func);
+	static DSOEXPORT void pushCallFrame(as_function* func);
 
 	/// Remove current call frame from the stack
 	//
 	/// This should happen when an ActionScript function returns.
 	///
-	static void popCallFrame();
+	static DSOEXPORT void popCallFrame();
 	
 	/// Return the (possibly UNDEFINED) value of the named variable.
 	//

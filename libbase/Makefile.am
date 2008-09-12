@@ -21,9 +21,11 @@ EXTRA_DIST = gnashrc.in gnashpluginrc.in
 pluginsdir = $(prefix)/lib/gnash/plugins
 
 if INSTALL_LTDL
+if !LIBLTDL2
 include_HEADERS =  $(top_srcdir)/libltdl/ltdl.h
 LIBLTDLLIB = libltdl.la
 LIBLTDLHEAD =  $(top_srcdir)/libltdl/ltdl.h
+endif
 endif
 
 sysconf_DATA = gnashrc gnashpluginrc
@@ -164,12 +166,12 @@ noinst_HEADERS = \
 
 libgnashbase_la_LDFLAGS = -release $(VERSION)
 
-libltdlc_la_CPPFLAGS = $(LTDLINCL)
+if !LIBLTDL2
+libltdlc_la_CPPFLAGS = $(LTDLINCL) -I$(top_srcdir)/libltdl
 if CONVENIENCE_LTDL
 noinst_LTLIBRARIES = libltdlc.la
 libltdlc_la_SOURCES = $(top_srcdir)/libltdl/ltdl.c
 endif
-CLEANFILES = libltdl.la libltdlc.la gnashrc gnashpluginrc
 
 libltdl_la_SOURCES = $(top_srcdir)/libltdl/ltdl.c
 libltdl_la_LDFLAGS = -no-undefined -version-info 4:4:1
@@ -178,6 +180,8 @@ libltdl_la_LIBADD = $(LIBADD_DL)
 if WIN32
   libltdl_la_LDFLAGS += -static
 endif
+endif
+CLEANFILES = libltdl.la libltdlc.la gnashrc gnashpluginrc
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:

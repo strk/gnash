@@ -1279,7 +1279,13 @@ check_equals( r.toString(), "0,3,1,2,4");
 //------------------------------------------------------
 
 b = ["a","b","c"];
-out = {len:0}; for (var i in b) { out[i] = 1; out['len']++; }
+out = {len:0};
+for (var i in b)
+{
+        check_equals(typeof(i), 'string');
+        out[i] = 1;
+        out['len']++;
+}
 check_equals(out['len'], 3);
 check_equals(out[0], 1);
 check_equals(out[1], 1);
@@ -1459,11 +1465,11 @@ check_equals(a[1], 'overridden'); // flag was lost
 
 
 #if OUTPUT_VERSION < 6
- check_totals(493);
+ check_totals(496);
 #else
 # if OUTPUT_VERSION < 7
-  check_totals(554);
+  check_totals(557);
 # else
-  check_totals(564);
+  check_totals(567);
 # endif
 #endif

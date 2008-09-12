@@ -838,6 +838,7 @@ are not honored during the DNS lookup - which you can  work  around  by
 /*public*/
 CurlStreamFile::CurlStreamFile(const std::string& url)
 {
+	log_debug("CurlStreamFile %p created", this);
 	init(url);
 
 	// CURLMcode ret =
@@ -850,6 +851,7 @@ CurlStreamFile::CurlStreamFile(const std::string& url)
 /*public*/
 CurlStreamFile::CurlStreamFile(const std::string& url, const std::string& vars)
 {
+	log_debug("CurlStreamFile %p created", this);
 	init(url);
 
 	_postdata = vars;
@@ -889,6 +891,7 @@ CurlStreamFile::CurlStreamFile(const std::string& url, const std::string& vars)
 /*public*/
 CurlStreamFile::~CurlStreamFile()
 {
+	log_debug("CurlStreamFile %p deleted", this);
 	curl_multi_remove_handle(_mhandle, _handle);
 	curl_easy_cleanup(_handle);
 	curl_multi_cleanup(_mhandle);

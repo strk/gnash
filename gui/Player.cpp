@@ -620,7 +620,7 @@ Player::CallbacksHandler::notify(const std::string& command, const std::string& 
         if (noCaseCompare(args, "true")) _gui->allowScale(true);
         else
 	{
-		if ( atoi(args.c_str()) ) _gui->allowScale(true);
+		if (strtol(args.c_str(), NULL, 0)) _gui->allowScale(true);
 		else _gui->allowScale(false);
 	}
         return;
@@ -682,5 +682,8 @@ Player::getGui()
 
 Player::~Player()
 {
-	log_debug("~Player - _movieDef refcount: %d (1 will be dropped now)", _movieDef->get_ref_count());
+    if (_movieDef.get())
+    {
+    	log_debug("~Player - _movieDef refcount: %d (1 will be dropped now)", _movieDef->get_ref_count());
+    }
 }

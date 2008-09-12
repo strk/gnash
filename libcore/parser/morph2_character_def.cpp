@@ -194,7 +194,7 @@ private:
 	}
 
 
-	void	morph2_character_def::read(SWFStream& in, int tag_type, bool with_style, movie_definition* md)
+	void	morph2_character_def::read(SWFStream& in, int tag_type, bool with_style, movie_definition& md)
 	{
 		assert(tag_type == SWF::DEFINEMORPHSHAPE
 			|| tag_type == SWF::DEFINEMORPHSHAPE2

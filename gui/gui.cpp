@@ -157,7 +157,7 @@ Gui::Gui(unsigned long xid, float scale, bool loop, unsigned int depth)
 
 Gui::~Gui()
 {
-    log_debug("~Gui - _movieDef refcount: %d", _movieDef->get_ref_count());
+    if ( _movieDef.get() ) log_debug("~Gui - _movieDef refcount: %d", _movieDef->get_ref_count());
 
     delete _renderer;
 #ifdef GNASH_FPS_DEBUG

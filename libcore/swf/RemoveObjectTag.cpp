@@ -54,7 +54,7 @@ RemoveObjectTag::execute(sprite_instance* m, DisplayList& dlist) const
 
 /* public static */
 void
-RemoveObjectTag::loader(SWFStream& in, tag_type tag, movie_definition* m)
+RemoveObjectTag::loader(SWFStream& in, tag_type tag, movie_definition& m)
 {
     assert(tag == SWF::REMOVEOBJECT || tag == SWF::REMOVEOBJECT2);
 
@@ -69,7 +69,7 @@ RemoveObjectTag::loader(SWFStream& in, tag_type tag, movie_definition* m)
     );
 
     // Ownership transferred to movie_definition
-    m->addControlTag(t.release());
+    m.addControlTag(t.release());
 }
 
 } // namespace gnash::SWF

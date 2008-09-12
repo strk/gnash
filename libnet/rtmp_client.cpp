@@ -24,6 +24,7 @@
 #include <iostream>
 #include <string>
 #include <map>
+#include <unistd.h> // for sleep()
 
 #if ! (defined(_WIN32) || defined(WIN32))
 #	include <netinet/in.h>

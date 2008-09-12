@@ -20,6 +20,9 @@
 #include "gnashconfig.h"
 #endif
 
+#include <boost/thread/mutex.hpp>
+
+
 #include "utility.h"
 #include "log.h"
 #include "network.h"

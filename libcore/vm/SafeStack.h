@@ -81,6 +81,17 @@ public:
 		return mData[offset >> mChunkShift][offset & mChunkMod];
 	}
 
+	/// Assign a value to given index counting from bottom.
+	void assign(StackSize i, T val)
+	{ 
+		if (i >= size())
+			throw StackException();
+
+		StackSize offset = mDownstop + i + 2;
+		//log_debug("value(%d): mEnd:%d, mDownstop:%d, offset:%d", i, mEnd, mDownstop, offset);
+		mData[offset >> mChunkShift][offset & mChunkMod] = val;
+	}
+
 	/// Shrink the stack by i entries. Does not invalidate any entries
 	/// previously given, it just sets the top for pop, push, and top
 	/// operations.

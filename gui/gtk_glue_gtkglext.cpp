@@ -56,7 +56,7 @@ GtkGlExtGlue::init(int argc, char** argv[])
 #ifdef FIX_I810_LOD_BIAS
     int c = getopt (argc, *argv, "m:");
     if (c == 'm') {
-      _tex_lod_bias = (float) atof(optarg);
+      _tex_lod_bias = (float) strtof(optarg, NULL);
     }
 #endif
 

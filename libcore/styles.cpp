@@ -39,7 +39,7 @@ line_style::line_style()
 }
 
 void
-line_style::read_morph(SWFStream& in, int tag_type, movie_definition *md,
+line_style::read_morph(SWFStream& in, int tag_type, movie_definition& md,
     line_style *pOther)
 {
     if (tag_type == SWF::DEFINEMORPHSHAPE)
@@ -91,7 +91,7 @@ line_style::read_morph(SWFStream& in, int tag_type, movie_definition *md,
 }
 
 void
-line_style::read(SWFStream& in, int tag_type, movie_definition *md)
+line_style::read(SWFStream& in, int tag_type, movie_definition& md)
 {
     if (!(tag_type == SWF::DEFINESHAPE4 || tag_type == SWF::DEFINESHAPE4_))
     {

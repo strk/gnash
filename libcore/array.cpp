@@ -1567,13 +1567,14 @@ array_class_init(as_object& glob)
 void
 as_array_object::enumerateNonProperties(as_environment& env) const
 {
-    // TODO: only actually defined elements should be pushed on the env
-    //       but we currently have no way to distinguish between defined
-    //       and non-defined elements
+    std::stringstream ss; 
     for (ArrayConstIterator it = elements.begin(),
         itEnd = elements.end(); it != itEnd; ++it)
     {
-            env.push(as_value(it.index()));
+        int idx = it.index();
+        // enumerated values need to be strings, not numbers
+        ss.str(""); ss << idx;
+        env.push(as_value(ss.str()));
     }
 }
 
@@ -1667,6 +1668,41 @@ as_array_object::markReachableResources() const
     markAsObjectReachable();
 }
 #endif // GNASH_USE_GC
+
+void
+as_array_object::visitPropertyValues(AbstractPropertyVisitor& visitor) const
+{
+    std::stringstream ss; 
+    string_table& st = getVM().getStringTable();
+    for (ArrayConstIterator i=elements.begin(), ie=elements.end(); i!=ie; ++i)
+    {
+        int idx = i.index();
+        ss.str(""); ss << idx;
+        string_table::key k = st.find(ss.str());
+        visitor.accept(k, *i);
+    }
+
+    // visit proper properties
+    as_object::visitPropertyValues(visitor);
+}
+
+void
+as_array_object::visitNonHiddenPropertyValues(AbstractPropertyVisitor& visitor) const
+{
+    std::stringstream ss; 
+    string_table& st = getVM().getStringTable();
+    for (ArrayConstIterator i=elements.begin(), ie=elements.end(); i!=ie; ++i)
+    {
+        // TODO: skip hidden ones
+        int idx = i.index();
+        ss.str(""); ss << idx;
+        string_table::key k = st.find(ss.str());
+        visitor.accept(k, *i);
+    }
+
+    // visit proper properties
+    as_object::visitNonHiddenPropertyValues(visitor);
+}
 
 } // end of gnash namespace
 

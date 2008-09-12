@@ -88,6 +88,9 @@ public:
     bool showMalformedSWFErrors() const { return _verboseMalformedSWF; }
     void showMalformedSWFErrors(bool value);
 
+    bool showMalformedAMFErrors() const { return _verboseMalformedAMF; }
+    void showMalformedAMFErrors(bool value);
+
     int getMovieLibraryLimit() const { return _movieLibraryLimit; }
     void setMovieLibraryLimit(int value) { _movieLibraryLimit = value; }
 
@@ -290,6 +293,9 @@ private:
 
     /// Enable Malformed SWF verbosity
     bool _verboseMalformedSWF;
+
+    /// Enable Malformed AMF verbosity
+    bool _verboseMalformedAMF;
 
     /// Display a splash screen when loading a movie
     bool _splashScreen;

@@ -46,7 +46,8 @@
 #include "timers.h"
 #include "namedStrings.h"
 
-//using namespace amf;
+
+// #define GNASH_DEBUG_REMOTING
 
 namespace gnash {
 
@@ -272,13 +273,22 @@ public:
 	// callbacks when needed
 	void tick() {
 
+#ifdef GNASH_DEBUG_REMOTING
 		log_debug("tick running");
+#endif
 		if(connection)
 		{
+
+            VM& vm = _nc.getVM();
+
+#ifdef GNASH_DEBUG_REMOTING
 			log_debug("have connection");
+#endif
 			int read = connection->readNonBlocking(reply.data() + reply_end, NCCALLREPLYMAX - reply_end);
 			if(read > 0) {
+#ifdef GNASH_DEBUG_REMOTING
 				log_debug("read '%1%' bytes: %2%", read, hexify(reply.data() + reply_end, read, false));
+#endif
 				reply_end += read;
 			}
 
@@ -300,7 +310,7 @@ public:
 				log_debug("connection is in error condition, calling NetConnection.onStatus");
 				reply_start = 0;
 				reply_end = 0;
-				log_debug("deleting connection");
+				//log_debug("deleting connection");
 				connection.reset(); // reset connection before calling the callback
 
 				// FIXME: should only call NetConnection's onStatus
@@ -314,7 +324,11 @@ public:
 			{
 				if ( reply_end > 8)
 				{
+                    std::vector<as_object*> objRefs;
+
+#ifdef GNASH_DEBUG_REMOTING
 					log_debug("hit eof");
+#endif
 					boost::int16_t si;
 					boost::uint16_t li;
 					boost::uint8_t *b = reply.data() + reply_start;
@@ -328,7 +342,9 @@ public:
 					uint8_t headers_ok = 1;
 					if(si != 0)
 					{
+#ifdef GNASH_DEBUG_REMOTING
 						log_debug("NetConnection::call(): amf headers section parsing");
+#endif
 						as_value tmp;
 						for(int i = si; i > 0; --i)
 						{
@@ -342,31 +358,32 @@ public:
 								break;
 							}
 							std::string headerName((char*)b, si); // end-b);
-							//if( !tmp.readAMF0(b, end) )
-							//{
-							//	headers_ok = 0;
-							//	break;
-							//}
+#ifdef GNASH_DEBUG_REMOTING
 							log_debug("Header name %s", headerName);
+#endif
 							b += si;
 							if ( b + 5 > end ) {
 								headers_ok = 0;
 								break;
 							}
 							b += 5; // skip past bool and length long
-							if( !tmp.readAMF0(b, end) )
+							if( !tmp.readAMF0(b, end, -1, objRefs, vm) )
 							{
 								headers_ok = 0;
 								break;
 							}
+#ifdef GNASH_DEBUG_REMOTING
 							log_debug("Header value %s", tmp);
+#endif
 
 							{ // method call for each header
 							  // FIXME: it seems to me that the call should happen
 								VM& vm = _nc.getVM();
 								string_table& st = vm.getStringTable();
 								string_table::key key = st.find(headerName);
+#ifdef GNASH_DEBUG_REMOTING
 								log_debug("Calling NetConnection.%s(%s)", headerName, tmp);
+#endif
 								_nc.callMethod(key, tmp);
 							}
 						}
@@ -409,10 +426,12 @@ public:
 								if(b + 4 > end) break;
 								li = readNetworkLong(b); b += 4; // reply length
 
+#ifdef GNASH_DEBUG_REMOTING
 								log_debug("about to parse amf value");
+#endif
 								// this updates b to point to the next unparsed byte
 								as_value reply_as_value;
-								if ( ! reply_as_value.readAMF0(b, end) )
+								if ( ! reply_as_value.readAMF0(b, end, -1, objRefs, vm) )
 								{
 									log_error("parse amf failed");
 									// this will happen if we get
@@ -422,7 +441,9 @@ public:
 									// don't know how to parse
 									break;
 								}
+#ifdef GNASH_DEBUG_REMOTING
 								log_debug("parsed amf");
+#endif
 
 								// update variable to show how much we've parsed
 								reply_start = b - reply.data();
@@ -430,12 +451,18 @@ public:
 								// if actionscript specified a callback object, call it
 								boost::intrusive_ptr<as_object> callback = pop_callback(id);
 								if(callback) {
-									log_debug("calling callback");
+#ifdef GNASH_DEBUG_REMOTING
+									log_debug("calling onResult callback");
+#endif
 									// FIXME check if above line can fail and we have to react
 									callback->callMethod(NSV::PROP_ON_RESULT, reply_as_value);
+#ifdef GNASH_DEBUG_REMOTING
 									log_debug("callback called");
+#endif
 								} else {
+#ifdef GNASH_DEBUG_REMOTING
 									log_debug("couldn't find callback object");
+#endif
 								}
 							}
 						}
@@ -446,7 +473,9 @@ public:
 					log_error("Response from remoting service < 8 bytes");
 				}
 
+#ifdef GNASH_DEBUG_REMOTING
 				log_debug("deleting connection");
+#endif
 				connection.reset();
 				reply_start = 0;
 				reply_end = 0;
@@ -454,21 +483,31 @@ public:
 		}
 
 		if(connection == 0 && queued_count > 0) {
+#ifdef GNASH_DEBUG_REMOTING
 			log_debug("creating connection");
+#endif
 			// set the "number of bodies" header
 			(reinterpret_cast<boost::uint16_t*>(postdata.data() + 4))[0] = htons(queued_count);
 			std::string postdata_str(reinterpret_cast<char*>(postdata.data()), postdata.size());
+#ifdef GNASH_DEBUG_REMOTING
 			log_debug("NetConnection.call(): encoded args from %1% calls: %2%", queued_count, hexify(postdata.data(), postdata.size(), false));
+#endif
 			queued_count = 0;
 			connection.reset( StreamProvider::getDefaultInstance().getStream(url, postdata_str) );
 			postdata.resize(6);
+#ifdef GNASH_DEBUG_REMOTING
 			log_debug("connection created");
+#endif
 		}
 
 		if(connection == 0 && queued_count == 0) {
+#ifdef GNASH_DEBUG_REMOTING
 			log_debug("stopping ticking");
+#endif
 			stop_ticking();
+#ifdef GNASH_DEBUG_REMOTING
 			log_debug("ticking stopped");
+#endif
 		}
 	};
 
@@ -564,7 +603,9 @@ NetConnection::call_method(const fn_call& fn)
 	}
 
 	std::stringstream ss; fn.dump_args(ss);
+#ifdef GNASH_DEBUG_REMOTING
         log_debug("NetConnection.call(%s)", ss.str());
+#endif
 
 	// TODO: arg(1) is the response object. let it know when data comes back
 	boost::intrusive_ptr<as_object> asCallback = 0;
@@ -607,44 +648,21 @@ NetConnection::call_method(const fn_call& fn)
 	size_t total_size_offset = buf->size();
 	buf->append("\000\000\000\000", 4); // total size to be filled in later
 
+    std::map<as_object*, size_t> offsetTable;
+    VM& vm = ptr->getVM();
 
 	// encode array of arguments to remote method
 	buf->appendByte(amf::Element::STRICT_ARRAY_AMF0);
 	buf->appendNetworkLong(fn.nargs - 2);
-	if (fn.nargs > 2) {
-
+	if (fn.nargs > 2)
+    {
 		for (unsigned int i = 2; i < fn.nargs; ++i)
 		{
 			const as_value& arg = fn.arg(i);
-
-			if (arg.is_string()) {
-				buf->appendByte(amf::Element::STRING_AMF0);
-				std::string str = fn.arg(i).to_string();
-				buf->appendNetworkShort(str.size());
-				buf->append(str.c_str(), str.size());
-			// FIXME implement this
-			//} else if(fn.arg(i).is_function()) {
-			//	as_function f = fn.arg(i).to_function();
-			//	tmp = AMF::encodefunction(f);
-			}
-
-			else if(arg.is_number())
-			{
-				double d = fn.arg(i).to_number();
-				buf->appendByte(amf::Element::NUMBER_AMF0);
-				amf::swapBytes(&d, 8); // this actually only swapps on little-endian machines
-				buf->append(&d, 8);
- 	 	 	// FIXME implement this
-			//} else if(fn.arg(i).is_object()) {
-			//	boost::intrusive_ptr<as_object> o = fn.arg(i).to_object();
-			//	tmp = AMF::encodeObject(o);
-			}
-			
-			else
-			{
-				log_unimpl(_("NetConnection.call(): unsupported argument type %s"), arg);
-				buf->appendByte(amf::Element::UNDEFINED_AMF0);
-			}
+            if ( ! arg.writeAMF0(*buf, offsetTable, vm) )
+            {
+                log_error("Could not serialize NetConnection.call argument %d", i);
+            }
 		}
 	}
 
@@ -652,7 +670,9 @@ NetConnection::call_method(const fn_call& fn)
 	*(reinterpret_cast<uint32_t*>(buf->data() + total_size_offset)) = htonl(buf->size() - 4 - total_size_offset);
 	
 
+#ifdef GNASH_DEBUG_REMOTING
 	log_debug(_("NetConnection.call(): encoded args: %s"), hexify(buf->data(), buf->size(), false));
+#endif
 
 	// FIXME check that ptr->_prefixURL is valid
 	URL url(ptr->validateURL(std::string()));
@@ -665,16 +685,22 @@ NetConnection::call_method(const fn_call& fn)
 
 	if (asCallback) {
 		//boost::intrusive_ptr<as_object> intrusive_callback(asCallback);
+#ifdef GNASH_DEBUG_REMOTING
 		log_debug("calling enqueue with callback");
+#endif
 		ptr->_callQueue->enqueue(*buf, callNumberString, asCallback);
 		//? delete asCallback;
 	}
 	
 	else {
+#ifdef GNASH_DEBUG_REMOTING
 		log_debug("calling enqueue without callback");
+#endif
 		ptr->_callQueue->enqueue(*buf);
 	}
+#ifdef GNASH_DEBUG_REMOTING
 	log_debug("called enqueue");
+#endif
 
 	return as_value();
 }

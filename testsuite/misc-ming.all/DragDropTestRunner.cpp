@@ -33,6 +33,8 @@
 #include <string>
 #include <cassert>
 #include <sstream>
+#include <unistd.h>
+
 
 using namespace gnash;
 using namespace gnash::geometry;

@@ -49,7 +49,7 @@ public:
 
 	text_character_def() {}
 
-	void read(SWFStream& in, int tag_type, movie_definition* m);
+	void read(SWFStream& in, int tag_type, movie_definition& m);
 
 	/// Draw the string.
 	void display(character* inst);

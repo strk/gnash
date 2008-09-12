@@ -26,14 +26,14 @@
 #include <map>
 #include <iostream>
 #include <sstream>
-#include <signal.h>
+#include <csignal>
 #include <vector>
 #include <sys/mman.h>
 #include <cerrno>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <gettext.h>
+#include "gettext.h"
 
 extern "C"{
 # include <unistd.h>

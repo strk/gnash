@@ -84,11 +84,11 @@ public:
 	/// Throw a ParserException if there's no enough bytes in the
 	/// currently opened tag for reading. See stream::ensureBytes()
 	///
-	void	read(SWFStream& in, int tag_type, movie_definition *md);
+	void	read(SWFStream& in, int tag_type, movie_definition& md);
 	
 	/// Read two lines styles from the SWF stream
 	/// at the same time -- this is used in morphing.
-	void read_morph(SWFStream& in, int tag_type, movie_definition *md,
+	void read_morph(SWFStream& in, int tag_type, movie_definition& md,
 		line_style *pOther);
 
 	/// Return thickness of the line, in TWIPS

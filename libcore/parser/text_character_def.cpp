@@ -15,9 +15,8 @@
 namespace gnash {
 
 void text_character_def::read(SWFStream& in, int tag_type,
-		movie_definition* m)
+		movie_definition& m)
 {
-	assert(m != NULL);
 	assert(tag_type == SWF::DEFINETEXT || tag_type == SWF::DEFINETEXT2);
 
 	m_rect.read(in);
@@ -69,7 +68,7 @@ void text_character_def::read(SWFStream& in, int tag_type,
 			{
 				in.ensureBytes(2);
 				boost::uint16_t	font_id = in.read_u16();
-				if ( ! style.setFont(font_id, *m) )
+				if ( ! style.setFont(font_id, m) )
 				{
 					// setFont would have already printed an swferror on failure
 				}

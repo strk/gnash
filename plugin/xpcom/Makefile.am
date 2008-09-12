@@ -30,6 +30,8 @@ INCLUDES = \
 AM_LDFLAGS = \
 	$(XPCOM_LIBS)
 
+AM_CXXFLAGS=-fshort-wchar
+
 #GECKO_INCLUDES = -I/usr/include/xulrunner-sdk-1.9/stable -I/usr/include/nspr4 -I/usr/include/xulrunner-sdk-1.9/
 
 #GECKO_LDFLAGS =  -L/usr/lib/xulrunner-sdk-1.9/sdk/lib -lxpcomglue \
@@ -57,7 +59,7 @@ SUFFIXES = idl xpt
 .idl.xpt:
 	$(XPIDL) -m typelib -v $(XPCOM_IDL_CFLAGS) $<
 
-EXT_DIR = "`dirname $(FIREFOX_PLUGINS))/extensions/{2b70f2b1-fc72-4734-bb81-4eb2a7713e49}`"
+EXT_DIR = "`dirname $(FIREFOX_PLUGINS)/extensions/{2b70f2b1-fc72-4734-bb81-4eb2a7713e49}`"
 
 install-pkglib: $(pkglib_LTLIBRARIES)
 	@test -d "$(DESTDIR)/$(EXT_DIR)" || $(mkinstalldirs) "$(DESTDIR)/$(EXT_DIR)"

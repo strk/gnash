@@ -535,14 +535,14 @@ Debugger::dumpStackFrame()
 
 // Change the value of a parameter on the stack
 void
-Debugger::changeStackValue(int index, as_value &val)
+Debugger::changeStackValue(unsigned int index, as_value &val)
 {
 //    GNASH_REPORT_FUNCTION;
     changeStackValue(*_env, index, val);
 }
 
 void
-Debugger::changeStackValue(as_environment &env, int index, as_value &val)
+Debugger::changeStackValue(as_environment &env, unsigned int index, as_value &val)
 {
 //    GNASH_REPORT_FUNCTION;
     if (!_env) {
@@ -550,7 +550,7 @@ Debugger::changeStackValue(as_environment &env, int index, as_value &val)
 	return;
     }
     if (env.stack_size()) {
-	env.m_stack[index] = val;
+	env.bottom(index) = val;
     }
 }
 
@@ -567,7 +567,7 @@ Debugger::dumpStackFrame(as_environment &env)
         for (unsigned int i=0, n=env.stack_size(); i<n; i++) {    
 	    // FIXME, shouldn't these go to the log as well as to cerr?
             cerr << "\t" << i << ": ";
-	    as_value val = env.m_stack[i];
+	    as_value val = env.bottom(i);
 // FIXME: we want to print the name of the function
 //  	    if (val.is_as_function()) {
 // //		cerr << val.get_symbol_handle() << endl;
@@ -576,7 +576,8 @@ Debugger::dumpStackFrame(as_environment &env)
 // 		    cerr << name << " ";
 // 		}
 // 	    }
-            cerr << env.m_stack[i];
+        cerr << env.bottom(i);
+
 	    if (val.is_object()) {
 		boost::intrusive_ptr<as_object> o = val.to_object();
 		string name = lookupSymbol(o.get());

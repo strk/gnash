@@ -20,7 +20,7 @@ AC_INIT(gnash, trunk)
 AC_CONFIG_SRCDIR(libcore/gnash.h)
 AM_CONFIG_HEADER(gnashconfig.h)
 
-dnl AC_CANONICAL_TARGET
+dnl AC_CONFIG_SUBDIRS(libltdl)
 AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
 
@@ -860,10 +860,26 @@ AM_CONDITIONAL(BUILD_DBUS_EXT, [ test x$ext_dbus = xyes ])
 AM_CONDITIONAL(BUILD_METOME_EXT, [ test x$ext_metome = xyes ])
 AM_CONDITIONAL(BUILD_EXTENSIONS, [ test -n "$extensions_list"])
 
-AC_LIBLTDL_INSTALLABLE
+AC_MSG_CHECKING([For the version of libtool])
+ltver=`${LIBTOOLIZE:-libtoolize} --version | head -1 | cut -d ' ' -f 4`
+ltmajor=`echo $ltver | cut -d '.' -f 1`
+AC_MSG_RESULT([$ltver])
+if test $ltmajor -eq 1; then
+AC_LIBLTDL_CONVENIENCE
 AC_LIBTOOL_DLOPEN
 AC_LIBTOOL_WIN32_DLL
+AC_DISABLE_STATIC
+else
+LT_INIT([dlopen win32-dll  disable-static])
+dnl lt_ltdl_dir=libbase/libltdlL
+LTDL_INIT([convenience recursive])
+AC_CONFIG_FILES([libltdl/Makefile])
+fi
 AC_PROG_LIBTOOL
+AM_CONDITIONAL(LIBLTDL2, [test $ltmajor -eq 2])
+AM_CONDITIONAL(INSTALL_LTDL, test x"${enable_ltdl_install-no}" != xno)
+AM_CONDITIONAL(CONVENIENCE_LTDL, test x"${enable_ltdl_convenience-no}" != xno)
+
 AC_C_CONST
 AC_C_INLINE
 AC_SUBST([LIBTOOL_DEPS])
@@ -2112,8 +2128,8 @@ AC_CONFIG_LINKS(testsuite/libbase/gnashrc:testsuite/libbase/gnashrc.in)
 AC_CONFIG_LINKS(testsuite/libbase/gnashrc-local:testsuite/libbase/gnashrc-local.in)
 
 AC_OUTPUT(Makefile
-libmedia/Makefile
 po/Makefile
+libmedia/Makefile
 libbase/Makefile
 libcore/Makefile
 libcore/asobj/Makefile

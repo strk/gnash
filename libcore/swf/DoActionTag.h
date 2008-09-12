@@ -63,17 +63,17 @@ public:
 	    return true;
 	}
 
-	static void doActionLoader(SWFStream& in, tag_type tag, movie_definition* m)
+	static void doActionLoader(SWFStream& in, tag_type tag, movie_definition& m)
 	{
-		DoActionTag* da = new DoActionTag(*m);
+		DoActionTag* da = new DoActionTag(m);
 		da->read(in);
 
 		IF_VERBOSE_PARSE (
 		log_parse(_("tag %d: do_action_loader"), tag);
-		log_parse(_("-- actions in frame %d"), m->get_loading_frame());
+		log_parse(_("-- actions in frame %d"), m.get_loading_frame());
 		);
 
-		m->addControlTag(da); // ownership transferred
+		m.addControlTag(da); // ownership transferred
 	}
 
 private:
