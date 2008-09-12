@@ -53,7 +53,7 @@
 // both behavioural and for memory errors.
 // The only failing case in that test is comparison of input
 // and output .sol file. This is because ::writeAMF0 encodes
-// arrays as ECMA_ARRAY rather then STRIC_ARRAY. Should be
+// arrays as STRICT_ARRAY rather then ECMA_ARRAY. Should be
 // checked if this is a common need or only SOL-specific.
 //
 //#define BUFFERED_AMF_SOL
