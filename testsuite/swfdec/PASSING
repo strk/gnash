@@ -44,6 +44,10 @@ array-sort-on-5.swf:3c7eaa57454c8a65971d7765bbf3f495
 array-sort-on-6.swf:158e931ebd968351b6a4d3d8ca30b516
 array-sort-on-7.swf:d2ad844a1b5ebe6c65aae075a8273370
 array-sort-on-8.swf:1bed1adba459d3808c64115664767ed3
+array-splice-5.swf:b97cbb0e3bc00703ebaec5c379cb86e7
+array-splice-6.swf:8dfba74ba51ae2249fe201959e6c820e
+array-splice-7.swf:c00aeda368c996f939f3409bfc5eeef3
+array-splice-8.swf:b99e7abbd16f9755f56a5c736768b4e1
 array.swf:805c6ee758493ac4c677f44caffa6623
 asbroadcaster-broadcastMessage-retval-5.swf:b492c5b704d58a2ba553f68a1c2f5a37
 asbroadcaster-broadcastMessage-retval-6.swf:fc7e7fb99c1fc91272f5600e61bcaafb
@@ -238,6 +242,14 @@ crash-0.7.1-uncompressed-half-samples-6.swf:7ea0fa524a97ac33fa2f76c13ac9c09c
 crash-0.7.1-uncompressed-half-samples-7.swf:bd828f2702ae2d96c31f0ec74e8eb2d9
 crash-0.7.1-uncompressed-half-samples-8.swf:8043058b7c22459d2f8ef3f69884cf04
 crash-0.7.2-TextField-replace-infloop-6.swf:a75b13bb89ab3f2fc673ba2af3fa856f
+crash-0.7.5-draw-on-disposed-bitmap-5.swf:073596b26cce990e4a32088da6c19f4c
+crash-0.7.5-draw-on-disposed-bitmap-6.swf:63105692441eb2330261237f05b02d32
+crash-0.7.5-draw-on-disposed-bitmap-7.swf:b1b51478084d0c203e9c1b19ea1c8552
+crash-0.7.5-draw-on-disposed-bitmap-8.swf:5e8959ddaa60c464548ae35f86b629ee
+crash-0.7.5-duplicate-5.swf:9f5686125627308ea6c4cddfa1897bd5
+crash-0.7.5-duplicate-6.swf:559cd7f51f4c2bb03ad3fb8050aac403
+crash-0.7.5-duplicate-7.swf:87c22c444cf6d4a71bafbd1e357028be
+crash-0.7.5-duplicate-8.swf:90c1a16d3f22dc579abca718da6822dd
 createTextField-returnvalue-6.swf:876f64cb4349313be58d1b9de5ca2ff4
 createTextField-returnvalue-7.swf:397473c78af05cbb9e7e394ec4ce1a07
 createTextField-returnvalue-8.swf:398e15cdabb4c9f9bdb56ee5b07e5126
@@ -619,6 +631,7 @@ onresize-7.swf:f0196f0613e91456e202416d772ab6fb
 onresize-8.swf:92a9647b69fc3c7bebe7f7d0f69446e0
 onUnload-prototype-5.swf:63014a643d2cdec7a93fb115678833f1
 order.swf:cd3c59922bdbe22ce8d32900b82247e2
+oversized-image-5.swf:3e8e9f8ae3ff631721a63613799435e2
 parent-root.swf:29a3c9ce2ca959a1842849024a29639e
 parse-float-5.swf:e97643aebcd473b5bcff9ac978be779a
 parse-float-6.swf:f964f2977ba260d4e82f03eaa7c772a7
@@ -1058,6 +1071,9 @@ transform2.swf:95d19c9ed6592c459d7f6836a0365df2
 transform-color-transform-5.swf:1b03afaa179024037f5d167556b3f7a9
 transform-color-transform-6.swf:8cfd79068cc9d51db8796bb27186bbda
 transform-color-transform-7.swf:bd48f8529157f81c30caca47ce6bb871
+Transform-matrix-5.swf:ae65136f5adbcd6dfec68760f7d1d7b4
+Transform-matrix-6.swf:45c037253c5fbac0a80753a5d194f60c
+Transform-matrix-7.swf:c4110453b8151dd87efff882e5b312ca
 transform-properties-5.swf:9332e41f53db6ec456387efffd9e12a7
 transform-properties-5.swf:b0386824584340e1d0a80f986ce779b9
 transform.swf:5c8533f9168ca3e92d000ce1693ed5ef
