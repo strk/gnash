@@ -72,7 +72,7 @@ so1.data.num = 2;
 so1.data.str = 'a string'; 
 so1.data.tbool = true;
 so1.data.fbool = false;
-so1.data.ary = [1,true,'string',null, undefined]; // strict array (STRICT_ARRAY)
+so1.data.ary = [1,true,'string',null, undefined];  // ECMA_ARRAY
 so1.data.aryns = [4,5,6]; so1.data.aryns.custom = 7; so1.data.aryns.length = 8; // non-strict array (ECMA_ARRAY)
 so1.data.obj = {a:10,b:'20',c:true};
 so1.data.ref = so1.data.obj;
