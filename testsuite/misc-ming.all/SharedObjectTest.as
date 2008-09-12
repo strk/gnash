@@ -15,6 +15,15 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+
+#define pass_check(x) _root.pass(x)
+#define xpass_check(x) _root.xpass(x)
+#define fail_check(x) _root.fail(x)
+#define xfail_check(x) _root.xfail(x)
+
+#define USE_DEJAGNU_MODULE
+#include "../actionscript.all/check.as"
+
 note();
 note("NOTE: for this test to work you should have copied");
 note("      testsuite/misc-ming.all/SharedObjectTest.sol/*.sol");
@@ -45,7 +54,7 @@ a.sort();
 check_equals(a.toString(), '0,1,2,3,4'); // note: no 'length'
 
 // Test reading ECMA_ARRAY
-xcheck_equals(typeof(so1.data.aryns), 'object', 'aryns was not read from .sol');
+xcheck_equals(typeof(so1.data.aryns), 'object');
 xcheck_equals(so1.data.aryns.toString(), '4,5,6,,,,,');
 xcheck_equals(so1.data.aryns.length, 8);
 xcheck_equals(so1.data.aryns.custom, 7);
@@ -55,8 +64,10 @@ a.sort();
 check_equals(a.toString(), '0,1,2,custom'); // note: no 'length'
 
 // Test reading OBJECT
+check(so1.data.obj instanceOf Object);
 xcheck_equals(typeof(so1.data.obj), 'object');
 xcheck_equals(typeof(so1.data.obj.a), 'number');
+check(so1.data.obj.hasOwnProperty('a'));
 check(!so1.data.obj.hasOwnProperty('hidden'));
 
 // Test reading NUMBER
@@ -110,4 +121,4 @@ note();
 setInterval(quit, 5000);
 stop();
 
-totals();
+check_totals(32);
