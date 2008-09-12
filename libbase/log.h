@@ -225,7 +225,7 @@ private:
 /// This is a sequence of different log message types to be used in
 /// the code. Append the name to log_ to call the function, e.g. 
 /// log_error, log_unimpl.
-#define LOG_TYPES (error) (debug) (unimpl) (aserror) (swferror) (security) (action) (parse) (trace)
+#define LOG_TYPES (error) (debug) (unimpl) (aserror) (swferror) (smferror) (security) (action) (parse) (trace)
 
 /// This actually creates the template functions using the TOKENIZE
 /// functions above. The templates look like this:
@@ -287,6 +287,7 @@ DSOEXPORT void processLog_action(const boost::format& fmt);
 DSOEXPORT void processLog_parse(const boost::format& fmt);
 DSOEXPORT void processLog_security(const boost::format& fmt);
 DSOEXPORT void processLog_swferror(const boost::format& fmt);
+DSOEXPORT void processLog_amferror(const boost::format& fmt);
 DSOEXPORT void processLog_aserror(const boost::format& fmt);
 
 /// A fault-tolerant boost::format object for logging
@@ -325,6 +326,11 @@ DSOEXPORT std::string hexify(const unsigned char *bytes, size_t length, bool asc
 #define VERBOSE_MALFORMED_SWF 1
 #endif
 
+// Define to 0 this to remove invalid AMF verbosity at compile-time
+#ifndef VERBOSE_MALFORMED_AMF
+#define VERBOSE_MALFORMED_AMF 1
+#endif
+
 
 #if VERBOSE_PARSE
 #define IF_VERBOSE_PARSE(x) do { if ( LogFile::getDefaultInstance().getParserDump() ) { x; } } while (0);
@@ -350,6 +356,13 @@ DSOEXPORT std::string hexify(const unsigned char *bytes, size_t length, bool asc
 #define IF_VERBOSE_MALFORMED_SWF(x) { if ( gnash::RcInitFile::getDefaultInstance().showMalformedSWFErrors() ) { x; } }
 #else
 #define IF_VERBOSE_MALFORMED_SWF(x)
+#endif
+
+#if VERBOSE_MALFORMED_AMF
+// TODO: check if it's worth to check verbosity level too... 
+#define IF_VERBOSE_MALFORMED_AMF(x) { if ( gnash::RcInitFile::getDefaultInstance().showMalformedAMFErrors() ) { x; } }
+#else
+#define IF_VERBOSE_MALFORMED_AMF(x)
 #endif
 
 class DSOEXPORT __Host_Function_Report__ {

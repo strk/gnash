@@ -81,6 +81,7 @@ RcInitFile::RcInitFile()
     _parserDump(false),
     _verboseASCodingErrors(false),
     _verboseMalformedSWF(false),
+    _verboseMalformedAMF(false),
     _splashScreen(true),
     _localdomainOnly(false),
     _localhostOnly(false),
@@ -491,6 +492,9 @@ RcInitFile::parseFile(const std::string& filespec)
                  extractSetting(_verboseMalformedSWF, "MalformedSWFVerbosity",
                            variable, value)
             ||
+                 extractSetting(_verboseMalformedAMF, "MalformedAMFVerbosity",
+                           variable, value)
+            ||
                  extractSetting(_extensionsEnabled, "EnableExtensions",
                            variable, value)
             ||
@@ -648,6 +652,7 @@ RcInitFile::updateFile(const std::string& filespec)
     cmd << "pluginSound " << _pluginSound << endl <<
     cmd << "ASCodingErrorsVerbosity " << _verboseASCodingErrors << endl <<
     cmd << "malformedSWFVerbosity " << _verboseMalformedSWF << endl <<
+    cmd << "malformedAMFVerbosity " << _verboseMalformedAMF << endl <<
     cmd << "enableExtensions " << _extensionsEnabled << endl <<
     cmd << "startStopped " << _startStopped << endl <<
     cmd << "streamsTimeout " << _streamsTimeout << endl <<
@@ -655,6 +660,7 @@ RcInitFile::updateFile(const std::string& filespec)
     cmd << "delay " << _delay << endl <<
     cmd << "verbosity " << _verbosity << endl <<
     cmd << "solReadOnly " << _solreadonly << endl <<
+    cmd << "SOLSafeDir " << _solsandbox << endl <<
     cmd << "localConnection " << _lcdisabled << endl <<
     cmd << "LCTrace " << _lctrace << endl <<
     cmd << "LCShmkey " << std::hex << (boost::uint32_t) _lcshmkey << endl <<
@@ -675,7 +681,6 @@ RcInitFile::updateFile(const std::string& filespec)
     cmd << "flashVersionString " << _flashVersionString << endl <<
     cmd << "urlOpenerFormat " << _urlOpenerFormat << endl <<
     cmd << "GSTAudioSink "     << _gstaudiosink << endl <<
-    cmd << "SOLSafeDir " << _solsandbox << endl;
 
     // Lists. These can't be handled very well at the moment. The main
     // inconvenience would be that disabling a list makes it an empty
