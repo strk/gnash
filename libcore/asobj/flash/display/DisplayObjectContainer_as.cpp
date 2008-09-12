@@ -22,6 +22,7 @@
 #include "as_object.h" // for inheritance
 #include "builtin_function.h" // need builtin_function
 #include "flash/display/InteractiveObject_as.h"
+#include "flash/display/DisplayObjectContainer_as.h"
 
 #include "log.h"
 
@@ -29,18 +30,35 @@
 #include <sstream>
 
 namespace gnash {
-class display_object_container_as_object : public as_object
+
+static as_value DisplayObjectContainer_addChild(const fn_call& fn);
+
+static void
+attachDisplayObjectContainerInterface(as_object& o)
 {
+	 o.init_member("addChild", new builtin_function(DisplayObjectContainer_addChild));
+}
 
-public:
 
-	display_object_container_as_object()
-		:
-		as_object()
-	{
-	}
+display_object_container_as_object::display_object_container_as_object()
+	:
+	as_object()
+{
+}
 
-};
+as_value
+display_object_container_as_object::addChild(as_value child){
+
+		return child;
+}
+
+static as_value DisplayObjectContainer_addChild(const fn_call& fn){
+	
+	boost::intrusive_ptr<display_object_container_as_object> ptr = ensureType<display_object_container_as_object>(fn.this_ptr);
+
+	return ptr->addChild(fn.arg(0));
+
+}
 
 static as_value
 display_object_container_ctor(const fn_call& fn)
@@ -58,6 +76,8 @@ getDisplayObjectContainerInterface()
 	{
 		o = new as_object(getInteractiveObjectInterface());
 	}
+	attachDisplayObjectContainerInterface(*o);
+	o.get()->dump_members();
 	return o.get();
 }
 

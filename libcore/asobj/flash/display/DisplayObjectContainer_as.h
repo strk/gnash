@@ -25,10 +25,24 @@
 #define GNASH_DISPLAYOBJECTCONTAINER_H
 
 #include <memory> // for auto_ptr
+#include "flash/display/DisplayObject_as.h"
 
 namespace gnash {
 
 class as_object;
+
+class display_object_container_as_object: public as_object
+{
+
+public:
+
+	display_object_container_as_object();
+
+	as_value addChild(as_value child);
+
+private:
+
+};
 
 /// Initialize the DisplayObjectContainer class
 void display_object_container_class_init(as_object& where);

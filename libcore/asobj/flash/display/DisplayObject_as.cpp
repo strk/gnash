@@ -22,6 +22,7 @@
 #include "as_object.h" // for inheritance
 #include "builtin_function.h" // need builtin_function
 #include "flash/events/EventDispatcher_as.h"
+#include "flash/display/DisplayObject_as.h"
 
 #include "log.h"
 
@@ -29,18 +30,6 @@
 #include <sstream>
 
 namespace gnash {
-class display_object_as_object : public as_object
-{
-
-public:
-
-	display_object_as_object()
-		:
-		as_object()
-	{
-	}
-
-};
 
 static as_value
 display_object_ctor(const fn_call& fn)

@@ -30,6 +30,19 @@ namespace gnash {
 
 class as_object;
 
+class display_object_as_object : public as_object
+{
+
+public:
+
+	display_object_as_object()
+		:
+		as_object()
+	{
+	}
+
+};
+
 /// Initialize the DisplayObject class
 void display_object_class_init(as_object& where);
 
