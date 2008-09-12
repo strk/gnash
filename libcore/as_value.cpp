@@ -1813,6 +1813,8 @@ as_value::as_value(asNamespace &)
 
 /// Instantiate this value from an AMF element 
 as_value::as_value(const amf::Element& el)
+	:
+	m_type(UNDEFINED)
 {
     VM& vm = VM::get();
     int swfVersion = vm.getSWFVersion();
@@ -1821,96 +1823,161 @@ as_value::as_value(const amf::Element& el)
     switch (el.getType()) {
       case amf::Element::NULL_AMF0:
       {
-	  m_type = NULLTYPE;
-	  break;
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+            log_debug("as_value(Element&) : AMF type NULL");
+#endif
+            set_null();
+            break;
       }
       case amf::Element::UNDEFINED_AMF0:
       {
-	  m_type = UNDEFINED;
-	  break;
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+            log_debug("as_value(Element&) : AMF type UNDEFINED");
+#endif
+            set_undefined();
+            break;
       }
       case amf::Element::MOVIECLIP_AMF0:
       {
-	  m_type = MOVIECLIP;
-	  _value = el.getData();
-	  break;
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+            log_debug("as_value(Element&) : AMF type MOVIECLIP");
+#endif
+            log_unimpl("MOVIECLIP AMF0 type");
+            set_undefined();
+            //m_type = MOVIECLIP;
+            //_value = el.getData();
+
+            break;
       }
       case amf::Element::NUMBER_AMF0:
       {
-	  m_type = NUMBER;
-	  _value = el.to_number();
-	  break;
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+            log_debug("as_value(Element&) : AMF type NUMBER");
+#endif
+            double num = el.to_number();
+            set_double(num);
+            break;
       }
       case amf::Element::BOOLEAN_AMF0:
       {
-	  m_type = BOOLEAN;
-	  bool flag = el.to_bool();
-	  _value = flag ;
-	  break;
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+            log_debug("as_value(Element&) : AMF type BOOLEAN");
+#endif
+            bool flag = el.to_bool();
+            set_bool(flag);
+            break;
       }
+
       case amf::Element::STRING_AMF0:
-      {
-	  m_type = STRING;
-	  std::string str = el.to_string();
-	  _value = str;
-	  break;
-      }
-      case amf::Element::OBJECT_AMF0:
-      case amf::Element::REFERENCE_AMF0:
-      case amf::Element::ECMA_ARRAY_AMF0:
-      case amf::Element::OBJECT_END_AMF0:
-      case amf::Element::STRICT_ARRAY_AMF0:
-      {
- 	  m_type = OBJECT;
- 	  boost::intrusive_ptr<as_object> obj(new as_object());	
-	  if (el.propertySize()) {
-	      for (size_t i=0; i < el.propertySize(); i++) {
-		  const amf::Element *prop = el.getProperty(i);
-		  if (prop == 0) {
-		      break;
-		  } else {
-		      obj->set_member(st.string_table::find(prop->getName()), as_value(*prop));
-		  }
-	      }
-	  }
-	  _value = obj;
-      }
-      break;
-      case amf::Element::DATE_AMF0:
-      {
-	  if (swfVersion > 5) {
-	      m_type = STRING;
-	  }
-	  break;
-      }
       case amf::Element::LONG_STRING_AMF0:
       {
-	  m_type = STRING;
-	  std::string str = el.to_string();
-	  _value = str;
-	  break;
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+            log_debug("as_value(Element&) : AMF type STRING");
+#endif
+            std::string str = el.to_string();
+            set_string(str);
+            break;
       }
+
+      case amf::Element::OBJECT_AMF0:
+      {
+
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+          log_debug("as_value(Element&) : AMF type OBJECT");
+#endif
+          as_object* obj = new as_object(getObjectInterface());
+          if (el.propertySize()) {
+              for (size_t i=0; i < el.propertySize(); i++) {
+              const amf::Element *prop = el.getProperty(i);
+              if (prop == 0) {
+                  break;
+              } else {
+                  obj->set_member(st.find(prop->getName()), as_value(*prop));
+              }
+              }
+          }
+          set_as_object(obj);
+          break;
+      }
+
+      case amf::Element::ECMA_ARRAY_AMF0:
+      {
+          // TODO: fixme: ECMA_ARRAY has an additional fiedl, dunno
+          //              if accessible trought Element class
+          //              (the theoretic number of elements in it)
+
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+          log_debug("as_value(Element&) : AMF type ECMA_ARRAY");
+#endif
+          as_array_object* obj = new as_array_object();
+          if (el.propertySize()) {
+              for (size_t i=0; i < el.propertySize(); i++) {
+              const amf::Element *prop = el.getProperty(i);
+              if (prop == 0) {
+                  break;
+              } else {
+                  obj->set_member(st.find(prop->getName()), as_value(*prop));
+              }
+              }
+          }
+          set_as_object(obj);
+          break;
+      }
+    
+
+      case amf::Element::STRICT_ARRAY_AMF0:
+      {
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+          log_debug("as_value(Element&) : AMF type STRICT_ARRAY");
+#endif
+          as_array_object* obj = new as_array_object();
+          size_t len = el.propertySize();
+          obj->resize(len);
+
+          for (size_t i=0; i < el.propertySize(); i++) {
+              const amf::Element *prop = el.getProperty(i);
+              if (prop == 0) {
+                  break;
+              } else {
+                  obj->set_member(st.find(prop->getName()), as_value(*prop));
+              }
+          }
+          
+          set_as_object(obj);
+          break;
+      }
+
+      case amf::Element::REFERENCE_AMF0:
+      {
+        log_unimpl("REFERENCE Element to as_value");
+        break;
+      }
+
+      case amf::Element::DATE_AMF0:
+      {
+        log_unimpl("DATE Element to as_value");
+        //if (swfVersion > 5) m_type = STRING;
+        break;
+      }
+
       case amf::Element::UNSUPPORTED_AMF0:
-	  log_unimpl("Unsupported data type is not supported yet");
-	  break;
+          log_unimpl("Unsupported data type is not supported yet");
+          break;
       case amf::Element::RECORD_SET_AMF0:
-	  log_unimpl("Record Set data type is not supported yet");
-	  break;
+          log_unimpl("Record Set data type is not supported yet");
+          break;
       case amf::Element::XML_OBJECT_AMF0:
-	  log_unimpl("XML data type is not supported yet");
-	  break;
+          log_unimpl("XML data type is not supported yet");
+          break;
       case amf::Element::TYPED_OBJECT_AMF0:
-	  log_unimpl("Typed Object data type is not supported yet");
-	  break;
+          log_unimpl("Typed Object data type is not supported yet");
+          break;
       case amf::Element::AMF3_DATA:
-	  log_unimpl("AMF3 data type is not supported yet");
-	  break;
-      case amf::Element::NOTYPE:
-	  throw ParserException("No type set for amf0 element");
-	  break;
+          log_unimpl("AMF3 data type is not supported yet");
+          break;
       default:
-	  throw ParserException("Unsupported value type");
-	  break;
+          log_unimpl("Element to as_value - unsupported Element type %d", el.getType());
+          break;
     }
 }
 
