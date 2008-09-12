@@ -36,7 +36,7 @@
 	DEFAULT_FLASH_MINOR_VERSION" r"DEFAULT_FLASH_REV_NUMBER"."
 
 #define PLUGIN_DESCRIPTION \
-  "Shockwave Flash "FLASH_VERSION" Gnash "VERSION", the GNU Flash Player. \
+  "Shockwave Flash "FLASH_VERSION" Gnash "VERSION", the GNU SWF Player. \
   Copyright &copy; 2006, 2007, 2008 <a href=\"http://www.fsf.org\">Free Software \
   Foundation</a>, Inc. <br> \
   Gnash comes with NO WARRANTY, to the extent permitted by law. \

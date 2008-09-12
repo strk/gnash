@@ -5376,7 +5376,7 @@ msgid "  -1,  --once              Exit when/if movie reaches the last frame"
 msgstr ""
 
 #: ../gui/gnash.cpp:113
-msgid "  -g,  --debugger          Turn on the Flash debugger"
+msgid "  -g,  --debugger          Turn on the SWF debugger"
 msgstr ""
 
 #: ../gui/gnash.cpp:114
@@ -5786,8 +5786,8 @@ msgid "Value"
 msgstr "Arvo"
 
 #: ../gui/gtk.cpp:1461
-msgid "Gnash is the GNU Flash movie player based on GameSWF."
-msgstr "Gnash on GNU Flash -elokuvasoitin, joka perustuu GameSWF:ään."
+msgid "Gnash is the GNU SWF player based on GameSWF."
+msgstr "Gnash on GNU SWF -elokuvasoitin, joka perustuu GameSWF:ään."
 
 #: ../gui/gtk.cpp:1463
 msgid ""
@@ -5823,8 +5823,8 @@ msgid ""
 msgstr ""
 
 #: ../gui/gtk.cpp:1485
-msgid "GNASH flash movie player"
-msgstr "GNASH - Flash-elokuvasoitin"
+msgid "GNASH SWF player"
+msgstr "GNASH - SWF-elokuvasoitin"
 
 #: ../gui/gtk.cpp:1517 ../gui/gtk.cpp:1530
 msgid "Open file"
@@ -6126,14 +6126,14 @@ msgstr "Kentän nimi on: %s: "
 #~ "  -1            Toista kerran, poistu jos/kun elokuva päättyy\n"
 
 #~ msgid ""
-#~ "  -g            Turn on the Flash debugger\n"
+#~ "  -g            Turn on the SWF debugger\n"
 #~ "  -r <0|1|2|3>\n"
 #~ "                0 disables both rendering & sound (good for batch tests)\n"
 #~ "                1 enables rendering & disables sound\n"
 #~ "                2 enables sound & disables rendering\n"
 #~ "                3 enables both rendering & sound (default)\n"
 #~ msgstr ""
-#~ "  -g            Kytke Flash-virheenjäljitin päälle\n"
+#~ "  -g            Kytke SWF-virheenjäljitin päälle\n"
 #~ "  -r <0|1|2|3>\n"
 #~ "                0 piirto ja ääni pois käytöstä (hyvä testierille)\n"
 #~ "                1 piirto käytössä, ääni pois käytöstä\n"

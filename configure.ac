@@ -36,7 +36,7 @@ AM_COMPILER_LIB
 
 dnl Set the default values for Flash Version. These are converted into
 dnl various strings to make JavaScript or ActionScript detectors
-dnl recognize Gnash as a Flash Player.
+dnl recognize Gnash as a SWF Player.
 DEFAULT_FLASH_MAJOR_VERSION="9"
 DEFAULT_FLASH_MINOR_VERSION="0"
 DEFAULT_FLASH_REV_NUMBER="999"

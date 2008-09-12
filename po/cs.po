@@ -7628,5 +7628,5 @@ msgstr " Jméno položky je: %s"
 #~ msgid "Klash"
 #~ msgstr "Klash"
 
-#~ msgid "The Gnash Flash player for KDE.\n"
-#~ msgstr "Přehrávač flashe Gnash pro KDE.\n"
+#~ msgid "The Gnash SWF player for KDE.\n"
+#~ msgstr "Přehrávač SWF Gnash pro KDE.\n"

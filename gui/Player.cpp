@@ -1,4 +1,4 @@
-// Player.cpp:  Top level flash player, for gnash.
+// Player.cpp:  Top level SWF player, for gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 

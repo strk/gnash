@@ -37,12 +37,12 @@ soldumper (options)... (file)...
 </para>
 
 <para>
-  When a Flash player, including the Gnash player, plays a Flash "movie",
+  When a SWF player, including Gnash, plays a SWF "movie",
   the movie can contain
   scripts.  These scripts can call ActionScript classes.  One such class
   is SharedObject.  SharedObject creates shared objects, which end up
-  stored in your computer's file system.  For example, a Flash game might
-  store its score file in a SharedObject; or a privacy-invading Flash
+  stored in your computer's file system.  For example, a SWF game might
+  store its score file in a SharedObject; or a privacy-invading SWF
   movie might store "cookies" in a SharedObject.  Before soldumper was
   written, these bits of stored information were hard for users to 
   notice or investigate.

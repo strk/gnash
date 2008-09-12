@@ -1,4 +1,4 @@
-// gui.cpp:  Top level GUI for flash player, for Gnash.
+// gui.cpp:  Top level GUI for SWF player, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 

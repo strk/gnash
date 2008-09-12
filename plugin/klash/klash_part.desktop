@@ -1,7 +1,7 @@
 [Desktop Entry]
 Encoding=UTF-8
 Name=Klash, embedded Gnash player for KDE
-Comment=Flash player plugin
+Comment=SWF player plugin
 X-KDE-Library=libklashpart
 # Keep in sync with the audio types in kmplayer.desktop
 MimeType=application/x-shockwave-flash;application/futuresplash;

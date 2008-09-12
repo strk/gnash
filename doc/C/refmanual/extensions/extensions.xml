@@ -2,7 +2,7 @@
   <title>Gnash Extensions</title>
   
   <para>
-    Gnash supports extending the Flash specification by creating
+    Gnash supports extending the SWF specification by creating
     custom ActionScript classes that are compiled code, as opposed to
     the existing method of defining custom classes as
     ActionScript. Executing compiled code has many performance
@@ -12,18 +12,18 @@
   
   <para>
     I can already hear people complaining now about the concept of
-    extending Flash, so this in no way affects Gnash's ability to play
-    Flash movies when functioning as a browser plugin.
+    extending SWF, so this in no way affects Gnash's ability to play
+    SWF movies when functioning as a browser plugin.
     Gnash's goal is still to function in a way that is compatible
     with the current proprietary Flash player.
   </para>
 
   <para>
-    But at the same time, we see Flash as the ideal scripting language
+    But at the same time, we see SWF as the ideal scripting language
     for a digital multi-media streaming environment. There are many
-    resources for Flash movie creators for widgets, higher level APIs,
+    resources for SWF movie creators for widgets, higher level APIs,
     all sorts of desirable things. But for those of use committed to
-    using free software tools for Flash, our options are very
+    using free software tools for SWF, our options are very
     limited. 
   </para>
 
@@ -40,9 +40,9 @@
   </para>
 
   <para>
-    This trick works because until Flash player version 9, all the
+    This trick works because until SWF version 9, all the
     ActionScript class names and methods are passed as ASCII strings
-    into the Flash movie. So the Gnash Virtual Machine just loads the
+    into the SWF movie. So the Gnash Virtual Machine just loads the
     extension file if that class name is invoked in the movie. All
     extension files specify the class name and methods it implements
     in an identical style as adding any new ActionScript class. The
@@ -113,7 +113,7 @@
 	function callbacks for all the methods this class
 	supports. The method callbacks are attached to the parent
 	class by using <emphasis>init_member()</emphasis> to set a C
-	function pointer to the string value used in the Flash movie.
+	function pointer to the string value used in the SWF movie.
       </para>
 
       <programlisting>
@@ -285,7 +285,7 @@
     <para>
       Once you have set the breakpoints you want, reset the value of
       the <emphasis>stall</emphasis> variable to break out of the
-      loop, and the Flash movie will then continue playing.
+      loop, and the SWF movie will then continue playing.
     </para>
     <programlisting>
       (gdb) set variable stall = false;

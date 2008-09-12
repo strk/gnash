@@ -32,8 +32,8 @@ dumpshm (options)... (file)...
 
 <refsect1><title>Description</title>
 <para>
-  When any Flash player, including the Gnash player,
-  plays a Flash "movie", the movie can contain
+  When any SWF player, including the Gnash player,
+  plays a SWF "movie", the movie can contain
   scripts.  These scripts can call ActionScript classes.  One such class
   is LocalConnection.  LocalConnection passes objects from one movie to
   another, via your computer's shared memory system.
@@ -42,7 +42,7 @@ dumpshm (options)... (file)...
 <para>
   Dumpshm prints these shared memory segments, which are comprised of
   a header, and a collection of SWF AMF Objects created by the movie.
-  It is used for debugging (or understanding the operation of) a Flash 
+  It is used for debugging (or understanding the operation of) a SWF 
   movie.
 </para>
 

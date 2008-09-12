@@ -45,7 +45,7 @@ namespace gnash
 {
 
 /// This class is an attempt at simplifying the code required
-/// to simply start the flash player. The idea was to use it
+/// to simply start the SWF player. The idea was to use it
 /// from the plugin so we can set callback for getUrl and fs_commands
 /// w/out the need of using FIFOs or sockets or whatever else.
 ///

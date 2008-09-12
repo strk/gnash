@@ -5404,7 +5404,7 @@ msgid "  -1,  --once              Exit when/if movie reaches the last frame"
 msgstr ""
 
 #: ../gui/gnash.cpp:113
-msgid "  -g,  --debugger          Turn on the Flash debugger"
+msgid "  -g,  --debugger          Turn on the SWF debugger"
 msgstr ""
 
 #: ../gui/gnash.cpp:114
@@ -5809,7 +5809,7 @@ msgid "Value"
 msgstr ""
 
 #: ../gui/gtk.cpp:1461
-msgid "Gnash is the GNU Flash movie player based on GameSWF."
+msgid "Gnash is the GNU SWF player based on GameSWF."
 msgstr ""
 
 #: ../gui/gtk.cpp:1463
@@ -5843,7 +5843,7 @@ msgid ""
 msgstr ""
 
 #: ../gui/gtk.cpp:1485
-msgid "GNASH flash movie player"
+msgid "GNASH SWF player"
 msgstr ""
 
 #: ../gui/gtk.cpp:1517 ../gui/gtk.cpp:1530
@@ -6173,14 +6173,14 @@ msgstr "Nome del campo: %s"
 
 #, fuzzy
 #~ msgid ""
-#~ "  -g            Turn on the Flash debugger\n"
+#~ "  -g            Turn on the SWF debugger\n"
 #~ "  -r <0|1|2|3>\n"
 #~ "                0 disables both rendering & sound (good for batch tests)\n"
 #~ "                1 enables rendering & disables sound\n"
 #~ "                2 enables sound & disables rendering\n"
 #~ "                3 enables both rendering & sound (default)\n"
 #~ msgstr ""
-#~ "  -g          Abilita il debugger Flash\n"
+#~ "  -g          Abilita il debugger SWF\n"
 #~ "  -r <0|1|2|3>\n"
 #~ "              0 disabilita sia il rendering che l'audio (utile per i test "
 #~ "non interattivi)\n"
