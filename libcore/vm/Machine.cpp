@@ -2635,6 +2635,7 @@ as_value Machine::executeFunction(CodeStream* stream,const fn_call& fn){
 	}
 	execute();
 	mExitWithReturn = prev_ext;
+	stream->seekTo(0);
 	return mGlobalReturn;
 }
 
