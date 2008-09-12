@@ -77,9 +77,9 @@ public:
 	/// @param in
 	/// 	The stream to read from. Ownership specified by
 	///	second argument.
-	JpegImageInput(boost::shared_ptr<IOChannel> in);
+	DSOEXPORT JpegImageInput(boost::shared_ptr<IOChannel> in);
 
-	void readHeader(unsigned int maxHeaderBytes);
+	void DSOEXPORT readHeader(unsigned int maxHeaderBytes);
 
 	// Destructor.  Clean up our jpeg reader state.
 	~JpegImageInput();
@@ -92,7 +92,7 @@ public:
 	// Discard any data sitting in our input buffer.  Use
 	// this before/after reading headers or partial image
 	// data, to avoid screwing up future reads.
-	void discardPartialBuffer();
+	void DSOEXPORT discardPartialBuffer();
 
 	// This is something you can do with "abbreviated"
 	// streams; i.e. if you constructed this inputter
