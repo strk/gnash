@@ -37,8 +37,8 @@ xcheck_equals(so1.data.ary.length, 5);
 
 // Test reading ECMA_ARRAY
 xcheck_equals(typeof(so1.data.aryns), 'object', 'aryns was not read from .sol');
-xcheck_equals(so1.data.aryns.toString(), '4,5,6');
-xcheck_equals(so1.data.aryns.length, 3);
+xcheck_equals(so1.data.aryns.toString(), '4,5,6,,,,,');
+xcheck_equals(so1.data.aryns.length, 8);
 xcheck_equals(so1.data.aryns.custom, 7);
 
 // Test reading OBJECT
@@ -68,7 +68,7 @@ so1.data.str = 'a string';
 so1.data.tbool = true;
 so1.data.fbool = false;
 so1.data.ary = [1,true,'string',null, undefined]; // strict array (STRICT_ARRAY)
-so1.data.aryns = [4,5,6]; so1.data.aryns.custom = 7; // non-strict array (ECMA_ARRAY)
+so1.data.aryns = [4,5,6]; so1.data.aryns.custom = 7; so1.data.aryns.length = 8; // non-strict array (ECMA_ARRAY)
 so1.data.obj = {a:10,b:'20',c:true};
 so1.data.ref = so1.data.obj;
 
