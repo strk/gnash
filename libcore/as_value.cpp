@@ -2189,8 +2189,7 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 			{
                 string_table& st = vm.getStringTable();
 
-				// TODO: need this? boost::intrusive_ptr<as_object> obj(new as_object(getObjectInterface()));
-				boost::intrusive_ptr<as_object> obj(new as_object());
+				boost::intrusive_ptr<as_object> obj(new as_object(getObjectInterface()));
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
 				log_debug("amf0 starting read of object");
 #endif
@@ -2302,20 +2301,10 @@ as_value::writeAMF0(SimpleBuffer& buf, std::map<as_object*, size_t>& offsetTable
                 {
                     size_t len = ary->size();
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
-                    log_debug(_("writeAMF0: serializing array of %d elements (index %d)"), len, idx);
+                    log_debug(_("writeAMF0: serializing array of %d elements as ECMA_ARRAY (index %d)"), len, idx);
 #endif
-                    buf.appendByte(amf::Element::STRICT_ARRAY_AMF0);
+                    buf.appendByte(amf::Element::ECMA_ARRAY_AMF0);
                     buf.appendNetworkLong(len);
-				    for(size_t i = 0; i < len; ++i)
-                    {
-                        as_value element = ary->at(i);
-                        if ( ! element.writeAMF0(buf, offsetTable, vm) )
-                        {
-                            log_error("Error serializing array element %d (%s)", i, element);
-                            return false;
-                        }
-                    }
-                    return true;
                 }
                 else
                 {
@@ -2323,17 +2312,18 @@ as_value::writeAMF0(SimpleBuffer& buf, std::map<as_object*, size_t>& offsetTable
                     log_debug(_("writeAMF0: serializing object (or function) with index %d"), idx);
 #endif
                     buf.appendByte(amf::Element::OBJECT_AMF0);
-                    PropsBufSerializer props(buf, vm, offsetTable);
-                    obj->visitPropertyValues(props);
-                    if ( ! props.success() ) 
-                    {
-                        log_error("Could not serialize object");
-                        return false;
-                    }
-                    buf.appendNetworkShort(0);
-                    buf.appendByte(amf::Element::OBJECT_END_AMF0);
-                    return true;
                 }
+
+                PropsBufSerializer props(buf, vm, offsetTable);
+                obj->visitNonHiddenPropertyValues(props);
+                if ( ! props.success() ) 
+                {
+                    log_error("Could not serialize object");
+                    return false;
+                }
+                buf.appendNetworkShort(0);
+                buf.appendByte(amf::Element::OBJECT_END_AMF0);
+                return true;
             }
             else // object already seen
             {
