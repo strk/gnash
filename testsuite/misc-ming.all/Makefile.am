@@ -40,6 +40,8 @@ EXTRA_DIST = \
 	intervalTest.as \
 	FlashVarsTest.html \
 	StageConfigTest.as \
+	SharedObjectTest.as \
+	SharedObjectTestRunner.sh \
 	SharedObjectTest.sol/sol1.sol \
 	SharedObjectTest.sol/README 
 

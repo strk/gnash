@@ -215,8 +215,8 @@ as_super::get_super(const char* fname)
 }
 
 
-// A PropertyList visitor copying properties to an object
-class PropsCopier {
+/// A PropertyList visitor copying properties to an object
+class PropsCopier : public AbstractPropertyVisitor {
 
 	as_object& _tgt;
 
@@ -235,7 +235,7 @@ public:
 	/// Use the set_member function to properly set *inherited* properties
 	/// of the given target object
 	///
-	void operator() (string_table::key name, const as_value& val)
+	void accept(string_table::key name, const as_value& val)
 	{
 		if (name == NSV::PROP_uuPROTOuu) return;
 		//log_debug(_("Setting member '%s' to value '%s'"), name, val);
@@ -1542,6 +1542,22 @@ Trigger::call(const as_value& oldval, const as_value& newval, as_object& this_ob
 		_executing = false;
 		throw;
 	}
+}
+
+void
+as_object::visitPropertyValues(AbstractPropertyVisitor& visitor) const
+{
+    _members.visitValues(visitor, 
+        // Need const_cast due to getValue getting non-const ...
+        const_cast<as_object&>(*this));
+}
+
+void
+as_object::visitNonHiddenPropertyValues(AbstractPropertyVisitor& visitor) const
+{
+    _members.visitNonHiddenValues(visitor, 
+        // Need const_cast due to getValue getting non-const ...
+        const_cast<as_object&>(*this));
 }
 
 

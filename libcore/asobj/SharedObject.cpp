@@ -53,7 +53,7 @@
 // both behavioural and for memory errors.
 // The only failing case in that test is comparison of input
 // and output .sol file. This is because ::writeAMF0 encodes
-// arrays as ECMA_ARRAY rather then STRIC_ARRAY. Should be
+// arrays as STRICT_ARRAY rather then ECMA_ARRAY. Should be
 // checked if this is a common need or only SOL-specific.
 //
 //#define BUFFERED_AMF_SOL
@@ -81,7 +81,7 @@ void sharedobject_iter(SOL &sol, string_table::key key, const as_value &referenc
 
 namespace { 
 
-class PropsSerializer {
+class PropsSerializer : public AbstractPropertyVisitor {
     SOL& _sol;
     string_table& _st;
 public:
@@ -91,7 +91,7 @@ public:
         _st(vm.getStringTable())
     {};
 
-    void operator() (string_table::key key, const as_value& val) const
+    void accept(string_table::key key, const as_value& val) 
         {
             //GNASH_REPORT_FUNCTION;
             AMF amf;
@@ -132,12 +132,12 @@ public:
 };
 
 /// Class used to serialize properties of an object to a buffer in SOL format
-class SOLPropsBufSerializer {
+class SOLPropsBufSerializer : public AbstractPropertyVisitor {
     SimpleBuffer& _buf;
     VM& _vm;
     string_table& _st;
     std::map<as_object*, size_t>& _offsetTable;
-    mutable bool _error;
+    bool _error;
 public:
     SOLPropsBufSerializer(SimpleBuffer& buf, VM& vm, std::map<as_object*, size_t>& offsetTable)
         :
@@ -150,7 +150,7 @@ public:
     
     bool success() const { return !_error; }
 
-    void operator() (string_table::key key, const as_value& val) const
+    virtual void accept(string_table::key key, const as_value& val) 
     {
         if ( _error ) return;
 

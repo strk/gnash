@@ -509,7 +509,7 @@ main(int argc, char** argv)
 		" check(_root.startNotified, 'onMetaData should be notified after Play.Start');"
 		" check_equals(arguments.length, 1, 'single argument');"
 		" check(info instanceof Array, 'onMetaData argument sent from square.flv should be instanceof Array');"
-		" xcheck_equals(info.length, 11);" // it's an array so we can check length. gnash fails by discarding the count element of ECMA_ARRAY AMF type
+		" check_equals(info.length, 11);" // it's an array so we can check length. gnash fails by discarding the count element of ECMA_ARRAY AMF type
 
 		// Test enumeration
 		" var enu = new Array;"
