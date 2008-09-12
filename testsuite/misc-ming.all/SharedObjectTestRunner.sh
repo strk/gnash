@@ -101,4 +101,4 @@ done
 #####################################################
 
 # ( temporarly disabled )
-#${PLAYER} ${SWFTEST}
+${PLAYER} ${SWFTEST}

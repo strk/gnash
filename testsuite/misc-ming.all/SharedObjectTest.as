@@ -15,6 +15,11 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+note();
+note("NOTE: for this test to work you should have copied");
+note("      testsuite/misc-ming.all/SharedObjectTest.sol/*.sol");
+note("      to this flash player's appropriate SharedObject dir");
+note();
 
 so1 = SharedObject.getLocal("sol1");
 
@@ -78,7 +83,10 @@ quit = function()
 {
 	loadMovie('fscommand:quit', '');
 };
-note(" Will quit in 5 seconds");
+
+note(" -  Will quit in 5 seconds, feel free to explicitly quit otherwise -");
+note();
+
 setInterval(quit, 5000);
 stop();
 
