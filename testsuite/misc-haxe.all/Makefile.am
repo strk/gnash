@@ -31,10 +31,10 @@ ASTESTS = $(SANE_ASTESTS) $(BOGUS_ASTESTS)
 
 # These will get compiled to SWFs just as above, but will not be executed as a test
 # They are for secondary movies to be loaded by the above tests.
-AUXMOVIES = \
-	    $(NULL)
+AUXMOVIES = Dejagnu.hx  \
+	$(NULL)
 
-EXTRA_DIST = $(ASTESTS) $(AUXMOVIES) 
+EXTRA_DIST = $(ASTESTS) $(AUXMOVIES) check.as
 
 HAXE_FLAGS = -swf-version 9 -cp $(HAXE_CLASSPATH) -cp $(srcdir) 
 # hopefully preprocessor is builtin in this case
@@ -65,7 +65,7 @@ bogustests-runner: $(srcdir)/../generic-testrunner.sh $(BOGUS_ASTESTS_OUT) $(AUX
 
 .hx.swf: 
 	$(HAXE_CPP) $< > $(@:%.swf=PP_%.hx) 
-	$(HAXE) $(HAXE_FLAGS) -swf $@ -main $(@:%.swf=PP_%.hx)
+	$(HAXE) $(HAXE_FLAGS) -swf $@ $(@:%.swf=PP_%.hx)
 
 CLEANFILES =  \
 	gnash-dbg.log \
