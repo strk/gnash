@@ -630,10 +630,11 @@ FLVParser::MetaTag::execute(as_object* thisPtr, VM& vm)
     std::vector<as_object*> objRefs;
 	if ( ! arg.readAMF0(ptr, endptr, -1, objRefs, vm) )
 	{
-		log_error("Could not convert FLV metatag to as_value");
-		return;
+		log_error("Could not convert FLV metatag to as_value, but will try passing it anyway. It's an %s", arg);
+		//return;
 	}
 
+    log_debug("Calling %s(%s)", funcName, arg);
 	thisPtr->callMethod(funcKey, arg);
 }
 
