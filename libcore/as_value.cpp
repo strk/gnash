@@ -2137,6 +2137,9 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
                 objRefs.push_back(obj);
 
 				li = readNetworkLong(b); b += 4;
+                // the count specifies array size, so to have that even if none of the members are indexed
+                // if short, will be incremented everytime an indexed member is found
+                obj->resize(li);
 
                 // TODO: do boundary checking (if b >= end...)
 
@@ -2178,14 +2181,6 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 					}
 					obj->set_member(st.find(name), objectElement);
 				}
-
-                // consisteny checking
-                if ( obj->size() != li ) {
-                    log_error("MALFORMED SOL: ECMA_ARRAY advertised %d elements but had just %d", obj->size());
-                }
-
-				// ends with a null string and an object terminator (0x09)
-				//b += 3;
 
 				ret.set_as_object(obj);
 				return true;
