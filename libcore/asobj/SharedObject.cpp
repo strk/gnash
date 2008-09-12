@@ -71,11 +71,16 @@ namespace gnash {
 #define MAXHOSTNAMELEN 64
 #endif
 
-as_value sharedobject_clear(const fn_call& fn);
-as_value sharedobject_flush(const fn_call& fn);
-as_value sharedobject_getlocal(const fn_call& fn);
-as_value sharedobject_getsize(const fn_call& fn);
-as_value sharedobject_ctor(const fn_call& fn);
+static as_value sharedobject_connect(const fn_call& fn);
+static as_value sharedobject_send(const fn_call& fn);
+static as_value sharedobject_flush(const fn_call& fn);
+static as_value sharedobject_close(const fn_call& fn);
+static as_value sharedobject_getsize(const fn_call& fn);
+static as_value sharedobject_setFps(const fn_call& fn);
+static as_value sharedobject_clear(const fn_call& fn);
+
+static as_value sharedobject_getlocal(const fn_call& fn);
+static as_value sharedobject_ctor(const fn_call& fn);
 
 void sharedobject_iter(SOL &sol, string_table::key key, const as_value &reference);
 
@@ -204,14 +209,28 @@ attachSharedObjectInterface(as_object& o)
 //    GNASH_REPORT_FUNCTION;
 
     VM& vm = o.getVM();
+
+    // ASnative table registration
+	vm.registerNative(sharedobject_connect, 2106, 0);
+	vm.registerNative(sharedobject_send, 2106, 1);
+	vm.registerNative(sharedobject_flush, 2106, 2);
+	vm.registerNative(sharedobject_close, 2106, 3);
+	vm.registerNative(sharedobject_getsize, 2106, 4);
+	vm.registerNative(sharedobject_setFps, 2106, 5);
+	vm.registerNative(sharedobject_clear, 2106, 6);
+
     const int swfVersion = vm.getSWFVersion();
 
     // clear, flush and getSize not in SWF<6 , it seems
     if ( swfVersion < 6 ) return; 
 
-    o.init_member("clear", new builtin_function(sharedobject_clear));
-    o.init_member("flush", new builtin_function(sharedobject_flush));
-    o.init_member("getSize", new builtin_function(sharedobject_getsize));
+    o.init_member("connect", new builtin_function(sharedobject_connect)); // asnative 2106,0
+    o.init_member("send", new builtin_function(sharedobject_send)); // asnative 2106,1
+    o.init_member("flush", new builtin_function(sharedobject_flush)); // asnative 2106,2
+    o.init_member("close", new builtin_function(sharedobject_close)); // asnative 2106,3
+    o.init_member("getSize", new builtin_function(sharedobject_getsize)); // asnative 2106,4
+    o.init_member("setFps", new builtin_function(sharedobject_setFps)); // asnative 2106,5
+    o.init_member("clear", new builtin_function(sharedobject_clear)); // asnative 2106,6
 }
 
 static void
@@ -716,6 +735,46 @@ sharedobject_clear(const fn_call& fn)
     
     LOG_ONCE(log_unimpl (__FUNCTION__));
 
+    return as_value();
+}
+
+as_value
+sharedobject_connect(const fn_call& fn)
+{
+    boost::intrusive_ptr<SharedObject> obj = ensureType<SharedObject>(fn.this_ptr);
+    UNUSED(obj);
+
+    LOG_ONCE(log_unimpl("SharedObject.connect"));
+    return as_value();
+}
+
+as_value
+sharedobject_close(const fn_call& fn)
+{
+    boost::intrusive_ptr<SharedObject> obj = ensureType<SharedObject>(fn.this_ptr);
+    UNUSED(obj);
+
+    LOG_ONCE(log_unimpl("SharedObject.close"));
+    return as_value();
+}
+
+as_value
+sharedobject_setFps(const fn_call& fn)
+{
+    boost::intrusive_ptr<SharedObject> obj = ensureType<SharedObject>(fn.this_ptr);
+    UNUSED(obj);
+
+    LOG_ONCE(log_unimpl("SharedObject.setFps"));
+    return as_value();
+}
+
+as_value
+sharedobject_send(const fn_call& fn)
+{
+    boost::intrusive_ptr<SharedObject> obj = ensureType<SharedObject>(fn.this_ptr);
+    UNUSED(obj);
+
+    LOG_ONCE(log_unimpl("SharedObject.send"));
     return as_value();
 }
 

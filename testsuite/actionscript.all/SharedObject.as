@@ -42,18 +42,31 @@ check_totals(3);
 // test the SharedObject constuctor
 check_equals (typeof(sharedobjectObj), 'object');
 
-// test the SharedObject::clear method
-check_equals (typeof(sharedobjectObj.clear), 'function');
-// test the SharedObject::flush method
-check_equals (typeof(sharedobjectObj.flush), 'function');
 
-// test the SharedObject::getlocal method
+// test the SharedObject.getlocal method
 check_equals (typeof(sharedobjectObj.getLocal), 'undefined');
 check_equals (typeof(SharedObject.getLocal), 'function');
 
-// test the SharedObject::getsize method
+// test the SharedObject.connect method (asnative 2106,0)
+check_equals (typeof(sharedobjectObj.connect), 'function');
+
+// test the SharedObject.send method (asnative 2106,1)
+check_equals (typeof(sharedobjectObj.send), 'function');
+
+// test the SharedObject.flush method (asnative 2106,2)
+check_equals (typeof(sharedobjectObj.flush), 'function');
+
+// test the SharedObject.close method (asnative 2106,3)
+check_equals (typeof(sharedobjectObj.close), 'function');
+
+// test the SharedObject.getsize method (asnative 2106,4)
 check_equals (typeof(sharedobjectObj.getSize), 'function');
 
+// test the SharedObject.setFps method (asnative 2106,5)
+check_equals (typeof(sharedobjectObj.setFps), 'function');
+
+// test the SharedObject.clear method (asnative 2106,6)
+check_equals (typeof(sharedobjectObj.clear), 'function');
 
 // FIXME: Test code that will soon be a formal test case.
 so = SharedObject.getLocal("level1/level2/settings", "/");
@@ -203,6 +216,6 @@ check_equals(typeof(so9), 'null');
 // END OF TESTS
 //------------------------------------------
 
-check_totals(51);
+check_totals(55);
 
 #endif // OUTPUT_VERSION >= 6
