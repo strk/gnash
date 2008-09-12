@@ -740,7 +740,7 @@ std::auto_ptr<amf::Element>
 as_value::to_element() const
 {
     VM& vm = VM::get();
-    int swfVersion = vm.getSWFVersion();
+    //int swfVersion = vm.getSWFVersion();
     std::auto_ptr<amf::Element> el ( new amf::Element );
     boost::intrusive_ptr<as_object> ptr = to_object();
 
@@ -1817,7 +1817,7 @@ as_value::as_value(const amf::Element& el)
 	m_type(UNDEFINED)
 {
     VM& vm = VM::get();
-    int swfVersion = vm.getSWFVersion();
+    //int swfVersion = vm.getSWFVersion();
     string_table& st = vm.getStringTable();
     
     switch (el.getType()) {
