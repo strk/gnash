@@ -30,7 +30,7 @@ check_equals(so1.data.tbool, true);
 check_equals(typeof(so1.data.fbool), 'boolean');
 check_equals(so1.data.fbool, false);
 
-// Test reading STRICT_ARRAY, NULL and UNDEFINED
+// Test reading mixed types in ECMA_ARRAY 
 xcheck_equals(typeof(so1.data.ary), 'object');
 xcheck_equals(so1.data.ary.toString(), '1,true,string,null,');
 xcheck_equals(typeof(so1.data.ary[0]), 'number');
@@ -39,16 +39,25 @@ xcheck_equals(typeof(so1.data.ary[2]), 'string');
 xcheck_equals(typeof(so1.data.ary[3]), 'null');
 check_equals(typeof(so1.data.ary[4]), 'undefined');
 xcheck_equals(so1.data.ary.length, 5);
+// test composition
+a=[]; for (i in so1.data.ary) a.push(i);
+a.sort();
+check_equals(a.toString(), '0,1,2,3,4'); // note: no 'length'
 
 // Test reading ECMA_ARRAY
 xcheck_equals(typeof(so1.data.aryns), 'object', 'aryns was not read from .sol');
 xcheck_equals(so1.data.aryns.toString(), '4,5,6,,,,,');
 xcheck_equals(so1.data.aryns.length, 8);
 xcheck_equals(so1.data.aryns.custom, 7);
+// test composition
+a=[]; for (i in so1.data.aryns) a.push(i);
+a.sort();
+check_equals(a.toString(), '0,1,2,custom'); // note: no 'length'
 
 // Test reading OBJECT
 xcheck_equals(typeof(so1.data.obj), 'object');
 xcheck_equals(typeof(so1.data.obj.a), 'number');
+check(!so1.data.obj.hasOwnProperty('hidden'));
 
 // Test reading NUMBER
 xcheck_equals(so1.data.obj.a, 10);
@@ -72,9 +81,20 @@ so1.data.num = 2;
 so1.data.str = 'a string'; 
 so1.data.tbool = true;
 so1.data.fbool = false;
+
 so1.data.ary = [1,true,'string',null, undefined];  // ECMA_ARRAY
-so1.data.aryns = [4,5,6]; so1.data.aryns.custom = 7; so1.data.aryns.length = 8; // non-strict array (ECMA_ARRAY)
+so1.data.ary.hidden = 6;
+AsSetPropFlags(so1.data.ary, 'hidden', 1); // hide from enumeration, should not end into the sol file
+
+
+so1.data.aryns = [4,5,6];
+so1.data.aryns.custom = 7;
+so1.data.aryns.length = 8; // non-strict array (ECMA_ARRAY)
+
 so1.data.obj = {a:10,b:'20',c:true};
+so1.data.obj.hidden = 7;
+AsSetPropFlags(so1.data.obj, 'hidden', 1); // hide from enumeration, should not end into the sol file
+
 so1.data.ref = so1.data.obj;
 
 so1.flush();
