@@ -54,6 +54,13 @@ namespace gnash {
 class asClass;
 class asName;
 
+/// An abstract property visitor
+class AbstractPropertyVisitor {
+public:
+    virtual void accept(string_table::key key, const as_value& val)=0;
+    virtual ~AbstractPropertyVisitor() {}
+};
+
 /// A trigger that can be associated with a property name
 class Trigger
 {
@@ -966,14 +973,21 @@ public:
 	///	reference as first argument and a const as_value reference
 	///	as second argument.
 	///
-	template <class V>
-	void visitPropertyValues(V& visitor) const
-	{
-		_members.visitValues(visitor, 
-			// Need const_cast due to getValue getting non-const ...
-			const_cast<as_object&>(*this));
-	}
+	virtual void visitPropertyValues(AbstractPropertyVisitor& visitor) const;
 
+	/// Visit non-hidden properties of this object by key/as_value pairs
+	//
+	/// The method will invoke the given visitor method
+	/// passing it two arguments: key of the property and
+	/// value of it.
+	///
+	/// @param visitor
+	///	The visitor function. Will be invoked for each property
+	///	of this object with a string_table::key
+	///	reference as first argument and a const as_value reference
+	///	as second argument.
+	///
+	virtual void visitNonHiddenPropertyValues(AbstractPropertyVisitor& visitor) const;
 
 	/// \brief
 	/// Add a getter/setter property, if no member already has

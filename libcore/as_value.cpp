@@ -102,7 +102,7 @@ namespace {
 
 // This class is used to iterate through all the properties of an AS object,
 // so we can change them to children of an AMF0 element.
-class PropsSerializer {
+class PropsSerializer : public AbstractPropertyVisitor {
     amf::Element& _obj;
     string_table& _st;
 public:
@@ -111,7 +111,7 @@ public:
 	  _st(vm.getStringTable())
 	{};
     
-    void operator() (string_table::key key, const as_value& val) const
+    void accept(string_table::key key, const as_value& val) 
         {
             //GNASH_REPORT_FUNCTION;
             amf::AMF amf;
@@ -154,7 +154,7 @@ public:
 } // anonimous namespace
 
 /// Class used to serialize properties of an object to a buffer
-class PropsBufSerializer {
+class PropsBufSerializer : public AbstractPropertyVisitor {
     SimpleBuffer& _buf;
     VM& _vm;
     string_table& _st;
@@ -172,7 +172,7 @@ public:
     
     bool success() const { return !_error; }
 
-    void operator() (string_table::key key, const as_value& val) const
+    void accept(string_table::key key, const as_value& val) 
     {
         if ( _error ) return;
 
@@ -2302,7 +2302,7 @@ as_value::writeAMF0(SimpleBuffer& buf, std::map<as_object*, size_t>& offsetTable
                 {
                     size_t len = ary->size();
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
-                    log_debug(_("writeAMF0: serializing array of %d elements as index %d"), len, idx);
+                    log_debug(_("writeAMF0: serializing array of %d elements (index %d)"), len, idx);
 #endif
                     buf.appendByte(amf::Element::STRICT_ARRAY_AMF0);
                     buf.appendNetworkLong(len);
