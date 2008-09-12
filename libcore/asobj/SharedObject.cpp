@@ -132,12 +132,12 @@ public:
 };
 
 /// Class used to serialize properties of an object to a buffer in SOL format
-class SOLPropsBufSerializer : AbstractPropertyVisitor {
+class SOLPropsBufSerializer : public AbstractPropertyVisitor {
     SimpleBuffer& _buf;
     VM& _vm;
     string_table& _st;
     std::map<as_object*, size_t>& _offsetTable;
-    mutable bool _error;
+    bool _error;
 public:
     SOLPropsBufSerializer(SimpleBuffer& buf, VM& vm, std::map<as_object*, size_t>& offsetTable)
         :
