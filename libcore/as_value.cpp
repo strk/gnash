@@ -58,7 +58,7 @@
 //#define GNASH_DEBUG_SOFT_REFERENCES
 
 // Define this macto to make AMF parsing verbose
-//#define GNASH_DEBUG_AMF_DESERIALIZE
+#define GNASH_DEBUG_AMF_DESERIALIZE
 
 // Define this macto to make AMF writing verbose
 //#define GNASH_DEBUG_AMF_SERIALIZE
@@ -2133,7 +2133,9 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 		}
 	}
 
-	switch(amf_type) {
+	switch(amf_type)
+    {
+
 		case amf::Element::BOOLEAN_AMF0:
 		{
 			bool val = *b; b += 1;
@@ -2143,7 +2145,9 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 			ret.set_bool(val);
 			return true;
 		}
+
 		case amf::Element::NUMBER_AMF0:
+        {
 			if(b + 8 > end) {
 				log_error(_("AMF0 read: premature end of input reading Number type"));
 				return false;
@@ -2155,7 +2159,10 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 #endif
 			ret.set_double(dub);
 			return true;
+        }
+
 		case amf::Element::STRING_AMF0:
+        {
 			if(b + 2 > end) {
 				log_error(_("AMF0 read: premature end of input reading String type"));
 				return false;
@@ -2176,8 +2183,10 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 
 			}
 			break;
+        }
+
 		case amf::Element::STRICT_ARRAY_AMF0:
-			{
+        {
 				boost::intrusive_ptr<as_array_object> array(new as_array_object());
                 objRefs.push_back(array.get());
 
@@ -2197,11 +2206,16 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 
 				ret.set_as_object(array);
 				return true;
-			}
+        }
+
 		case amf::Element::ECMA_ARRAY_AMF0:
-			{
+        {
 				as_array_object* obj = new as_array_object(); // GC-managed...
                 objRefs.push_back(obj);
+
+                // set the value immediately, so if there's any problem parsing
+                // (like premature end of buffer) we still get something.
+				ret.set_as_object(obj);
 
 				li = readNetworkLong(b); b += 4;
                 // the count specifies array size, so to have that even if none of the members are indexed
@@ -2249,18 +2263,23 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 					obj->set_member(st.find(name), objectElement);
 				}
 
-				ret.set_as_object(obj);
 				return true;
-			}
+        }
+
 		case amf::Element::OBJECT_AMF0:
-			{
+        {
                 string_table& st = vm.getStringTable();
 
-				boost::intrusive_ptr<as_object> obj(new as_object(getObjectInterface()));
+				as_object* obj = new as_object(getObjectInterface()); // GC-managed
+
+                // set the value immediately, so if there's any problem parsing
+                // (like premature end of buffer) we still get something.
+				ret.set_as_object(obj);
+
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
-				log_debug("amf0 starting read of object");
+				log_debug("amf0 starting read of OBJECT");
 #endif
-                objRefs.push_back(obj.get());
+                objRefs.push_back(obj);
 
 				as_value tmp;
 				std::string keyString;
@@ -2279,7 +2298,6 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 						} else {
 							log_error("AMF buffer terminated just before object end byte. continueing anyway.");
 						}
-						ret.set_as_object(obj);
 						return true;
 					}
 
@@ -2289,25 +2307,28 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 					}
 					obj->set_member(st.find(keyString), tmp);
 				}
-			}
+        }
+
 		case amf::Element::UNDEFINED_AMF0:
-			{
+        {
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
 				log_debug("readAMF0: undefined value");
 #endif
 				ret.set_undefined();
 				return true;
-			}
+        }
+
 		case amf::Element::NULL_AMF0:
-			{
+        {
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
 				log_debug("readAMF0: null value");
 #endif
 				ret.set_null();
 				return true;
-			}
+        }
+
 		case amf::Element::REFERENCE_AMF0:
-            {
+        {
 			    si = readNetworkShort(b); b += 2;
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
 				log_debug("readAMF0: reference #%d", si);
@@ -2319,11 +2340,14 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
                 }
                 ret.set_as_object(objRefs[si-1]);
                 return true;
-            }
+        }
+
 		// TODO define other types (function, sprite, etc)
 		default:
+        {
 			log_unimpl("AMF0 to as_value: unsupported type: %i", amf_type);
 			return false;
+        }
 	}
 
 	// this function was called with a zero-length buffer
