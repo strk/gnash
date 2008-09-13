@@ -1289,16 +1289,18 @@ Machine::execute()
 	case SWF::ABC_ACTION_CONSTRUCTPROP:
 	{
 		// TODO
+		as_environment env = as_environment(_vm);
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
 		boost::uint32_t argc = mStream->read_V32();
 		std::auto_ptr< std::vector<as_value> > args = get_args(argc);
 		as_object* object = pop_stack().to_object().get();
-		as_value prop = object->getMember(a.getGlobalName(),a.getNamespace()->getURI());
-		as_object* object_to_construct = prop.to_object().get();
-		as_value property = object_to_construct->getMember(NSV::PROP_CONSTRUCTOR,0);
-		as_environment env = as_environment(_vm);
-		as_value value = call_method(property,&env,object_to_construct,args);
-		push_stack(value);
+		std::string& classname = mPoolObject->mStringPool[a.getABCName()];
+		
+		as_value constructor_val = object->getMember(a.getGlobalName());
+		boost::intrusive_ptr<as_function> constructor = constructor_val.to_as_function();
+		boost::intrusive_ptr<as_object> newobj = constructor->constructInstance(env, args);
+
+		push_stack(as_value(newobj));
 		
 		break;
 	}
