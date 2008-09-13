@@ -1378,6 +1378,8 @@ Machine::execute()
 		
 		as_object* base_class = pop_stack().to_object().get();
 		as_object* new_class = c->getPrototype();
+		
+		new_class->set_prototype(base_class);
 		//Create the class.
 		abc_function* static_constructor = new abc_function(c->getStaticConstructor(),this);
 		abc_function* constructor = new abc_function(c->getConstructor(),this);
