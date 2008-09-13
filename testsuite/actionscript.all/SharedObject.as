@@ -141,7 +141,7 @@ if (typeof(newso.data) != 'undefined') {
     trace("New Shared Object doesn't exist!");
 }
 
-so4 = SharedObject.getLocal("Another one", "/subdir");
+so4 = SharedObject.getLocal("Another-one", "/subdir");
 check(so4 != so3);
 xcheck_equals(typeof(so4.data), 'undefined');
 ret = so4.flush();
