@@ -2700,7 +2700,15 @@ as_value Machine::get_property_value(asName multiname){
 }
 
 as_value Machine::get_property_value(boost::intrusive_ptr<as_object> obj, asName multiname){
-	as_environment::ScopeStack stack;
+
+	std::string ns = mPoolObject->mStringPool[multiname.getNamespace()->getAbcURI()];
+	std::string name = mPoolObject->mStringPool[multiname.getABCName()];
+	return get_property_value(obj,name,ns);
+}
+
+as_value Machine::get_property_value(boost::intrusive_ptr<as_object> obj, std::string name, std::string ns){
+
+as_environment::ScopeStack stack;
 	as_environment env = as_environment(_vm);
 	if(obj == NULL){
 		stack = *getScopeStack();
@@ -2708,17 +2716,15 @@ as_value Machine::get_property_value(boost::intrusive_ptr<as_object> obj, asName
 	else{
 		stack.push_back(obj);
 	}
-	std::string ns = mPoolObject->mStringPool[multiname.getNamespace()->getAbcURI()];
 	std::string path;
 	if(ns.size() == 0){
-		path = mPoolObject->mStringPool[multiname.getABCName()];
+		path = name;
 	}
 	else{
-		path = ns + "." + mPoolObject->mStringPool[multiname.getABCName()];
+		path = ns + "." + name;
 	}
 
 	return env.get_variable(path,stack,NULL);
-		
 }
 
 void Machine::print_stack(){
