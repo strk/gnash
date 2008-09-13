@@ -1594,14 +1594,13 @@ Machine::execute()
 		asName a = pool_name(index, mPoolObject);
 		as_value v = pop_stack();
 		//TODO: If multiname is a runtime mutiname we need to also pop name and namespace values.
-		as_value object = pop_stack();
-		if(object.is_undefined()){
+		as_value object_asval = pop_stack();
+		if(object_asval.is_undefined()){
 			LOG_DEBUG_AVM("Object is undefined will skip trying to initialize property.");
 		}
 		else{
-			LOG_DEBUG_AVM("Initializing property ABC_id=%u name=%s on object %s",a.getABCName(),mPoolObject->mStringPool[a.getABCName()],object.toDebugString());
-
-			object.to_object().get()->init_member(mPoolObject->mStringPool[a.getABCName()],v,0,0);
+			as_object& obj = *object_asval.to_object().get();
+			!obj.set_member(a.getGlobalName(),v,false);
 		}
 		break;
 	}
