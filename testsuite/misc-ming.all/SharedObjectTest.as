@@ -99,10 +99,19 @@ AsSetPropFlags(so1.data.ary, 'hidden', 1); // hide from enumeration, should not 
 
 
 so1.data.aryns = [4,5,6];
+so1.data.aryns.fun = function() {}; // functions in arrays are simply skipped
 so1.data.aryns.custom = 7;
 so1.data.aryns.length = 8; // non-strict array (ECMA_ARRAY)
 
 so1.data.obj = {a:10,b:'20',c:true};
+so1.data.obj.fun = function() {}; // functions in objects are simply skipped
+
+//AsSetPropFlags(so1.data.obj, '__proto__', 0, 1); // if we unhide __proto__ we'll find it in the SharedObject
+
+AsSetPropFlags(so1.data.obj, '__constructor__', 0, 1); // unhide __constructor__ (it's a function so will be skipped anyway)
+AsSetPropFlags(so1.data.obj, 'constructor', 0, 1); // unhide constructor (it's a function so will be skipped anyway)
+// so1.data.obj.constructor = 4; // if we override constructor we'll find it
+
 so1.data.obj.hidden = 7;
 AsSetPropFlags(so1.data.obj, 'hidden', 1); // hide from enumeration, should not end into the sol file
 
