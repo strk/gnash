@@ -58,7 +58,7 @@
 //#define GNASH_DEBUG_SOFT_REFERENCES
 
 // Define this macto to make AMF parsing verbose
-#define GNASH_DEBUG_AMF_DESERIALIZE
+//#define GNASH_DEBUG_AMF_DESERIALIZE
 
 // Define this macto to make AMF writing verbose
 //#define GNASH_DEBUG_AMF_SERIALIZE
@@ -175,6 +175,13 @@ public:
     void accept(string_table::key key, const as_value& val) 
     {
         if ( _error ) return;
+
+        // Tested with SharedObject and AMFPHP
+        if ( val.is_function() )
+        {
+            log_debug("AMF0: skip serialization of FUNCTION property");
+            return;
+        }
 
         // Test conducted with AMFPHP:
         // '__proto__' and 'constructor' members
