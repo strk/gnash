@@ -153,6 +153,12 @@ public:
     {
         if ( _error ) return;
 
+        if ( val.is_function() )
+        {
+            log_debug("SOL: skip serialization of FUNCTION property");
+            return;
+        }
+
         // Test conducted with AMFPHP:
         // '__proto__' and 'constructor' members
         // of an object don't get back from an 'echo-service'.
