@@ -1568,7 +1568,9 @@ Machine::execute()
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
 		//TODO: If multiname is runtime we need to also pop namespace and name values of the stack.
 		as_value obj = pop_stack();
-		as_value val = get_property_value(obj.to_object(),a);
+		as_value val;
+		obj.to_object().get()->get_member(a.getGlobalName(), &val); 
+
 		push_stack(val);
 
 		break;
