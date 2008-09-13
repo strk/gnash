@@ -293,24 +293,23 @@ private:
 
 	void push_scope_stack(as_value object){
 		LOG_DEBUG_AVM("Pushing value onto the scope stack.");
-		mAsValueScopeStack.push(object);
-		LOG_DEBUG_AVM("There are now %u items on the scope stack.",mAsValueScopeStack.size());
+		mScopeStack.push(object.to_object());
+		LOG_DEBUG_AVM("There are now %u items on the scope stack.",mScopeStack.size());
 	}
 
-	as_value pop_scope_stack(){
-		LOG_DEBUG_AVM("Poping value off the scope stack.  There will be %u items left.",mAsValueScopeStack.size()-1);
-		return mAsValueScopeStack.pop();
+	boost::intrusive_ptr<as_object> pop_scope_stack(){
+		LOG_DEBUG_AVM("Poping value off the scope stack.  There will be %u items left.",mScopeStack.size()-1);
+		return mScopeStack.pop();
 	}
-	as_value get_scope_stack(boost::uint8_t depth){
+	boost::intrusive_ptr<as_object> get_scope_stack(boost::uint8_t depth){
 		LOG_DEBUG_AVM("Geting value from scope stack %u from the bottom.",depth | 0x0);
-		return as_value(mAsValueScopeStack.value(depth));
+		return mScopeStack.value(depth);
 	}
 
 	SafeStack<as_value> mStack;
 	SafeStack<State> mStateStack;
-	SafeStack<Scope> mScopeStack;
 	std::vector<as_value> mRegisters;
-	SafeStack<as_value> mAsValueScopeStack;
+	SafeStack<boost::intrusive_ptr<as_object> > mScopeStack;
 	CodeStream *mStream;
 
 	ClassHierarchy *mCH;

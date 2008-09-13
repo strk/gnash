@@ -720,25 +720,25 @@ Machine::execute()
 	case SWF::ABC_ACTION_PUSHWITH:
 	{
 		// A scope object is just a regular object.
-		ENSURE_OBJECT(mStack.top(0));
-		as_object *a = mStack.top(0).to_object().get();
-
-		if (!mScopeStack.empty())
-			a->set_prototype(mScopeStack.top(0).mScope);
-		else
-			a->set_prototype(NULL);
-
-		if (opcode == SWF::ABC_ACTION_PUSHWITH &&
-				mScopeStack.totalSize() == mScopeStack.size())
-		{
-			mScopeStack.push(Scope(0, a));
-		}
-		else
-		{
-			mScopeStack.push(Scope(mScopeStack.size(), a));
-		}
-		mCurrentScope = a;
-		mStack.drop(1);
+// 		ENSURE_OBJECT(mStack.top(0));
+// 		as_object *a = mStack.top(0).to_object().get();
+// 
+// 		if (!mScopeStack.empty())
+// 			a->set_prototype(mScopeStack.top(0).mScope);
+// 		else
+// 			a->set_prototype(NULL);
+// 
+// 		if (opcode == SWF::ABC_ACTION_PUSHWITH &&
+// 				mScopeStack.totalSize() == mScopeStack.size())
+// 		{
+// 			mScopeStack.push(Scope(0, a));
+// 		}
+// 		else
+// 		{
+// 			mScopeStack.push(Scope(mScopeStack.size(), a));
+// 		}
+// 		mCurrentScope = a;
+// 		mStack.drop(1);
 		break;
 	}
 /// 0x1D ABC_ACTION_POPSCOPE
@@ -1539,7 +1539,8 @@ Machine::execute()
 ///  global -- The global scope object
 	case SWF::ABC_ACTION_GETGLOBALSCOPE:
 	{
-		push_stack(mAsValueScopeStack.value(0));
+		//TODO: Use get_scope_stack here.
+		push_stack(as_value(mScopeStack.value(0).get()));
 //		print_stack();
 		break;
 	}
@@ -1569,7 +1570,7 @@ Machine::execute()
 		//TODO: If multiname is runtime we need to also pop namespace and name values of the stack.
 		as_value obj = pop_stack();
 		as_value val;
-		obj.to_object().get()->get_member(a.getGlobalName(), &val); 
+		obj.to_object().get()->get_member(a.getGlobalName(), &val);
 
 		push_stack(val);
 
@@ -2566,7 +2567,7 @@ Machine::restoreState()
 	s.to_debug_string();
 //	mStack.setAllSizes(s.mStackTotalSize, s.mStackDepth);
 //	mScopeStack.setAllSizes(s.mScopeTotalSize, s.mScopeStackDepth);
-	mAsValueScopeStack.setAllSizes(s.mScopeTotalSize, s.mScopeStackDepth);
+	mScopeStack.setAllSizes(s.mScopeTotalSize, s.mScopeStackDepth);
 	mStream = s.mStream;
 	mRegisters = s.mRegisters;
 //	mExitWithReturn = s.mReturn;
@@ -2586,8 +2587,8 @@ Machine::saveState()
 	State &s = mStateStack.top(0);
 	s.mStackDepth = mStack.getDownstop();
 	s.mStackTotalSize = mStack.totalSize();
-	s.mScopeStackDepth = mAsValueScopeStack.getDownstop();
-	s.mScopeTotalSize = mAsValueScopeStack.totalSize();
+	s.mScopeStackDepth = mScopeStack.getDownstop();
+	s.mScopeTotalSize = mScopeStack.totalSize();
 //	s.mScopeStackDepth = mScopeStack.getDownstop();
 //	s.mScopeTotalSize = mScopeStack.totalSize();
 	s.mStream = mStream;
@@ -2655,7 +2656,7 @@ void Machine::instantiateClass(std::string className, as_object* global){
 	asClass* theClass = mPoolObject->locateClass(className);
 	clearRegisters();
 	mStack.clear();
-	mAsValueScopeStack.clear();
+	mScopeStack.clear();
 	mRegisters[0] = as_value(global);
 	executeCodeblock(theClass->getConstructor()->getBody());
 }
@@ -2673,14 +2674,14 @@ Machine::Machine(VM& vm):mST(),mRegisters(),mExitWithReturn(false),_vm(vm)
 as_value Machine::find_prop_strict(asName multiname){
 	
 	as_value val;
-	mAsValueScopeStack.push(as_value(mGlobalObject));
-	for(int i=0;i<mAsValueScopeStack.size();i++){
+	mScopeStack.push(mGlobalObject);
+	for(int i=0;i<mScopeStack.size();i++){
 
-		val = mAsValueScopeStack.top(i).to_object().get()->getMember(multiname.getGlobalName(),multiname.getNamespace()->getURI());
+		val = mScopeStack.top(i).get()->getMember(multiname.getGlobalName(),multiname.getNamespace()->getURI());
 
 		if(!val.is_undefined()){
-			push_stack(mAsValueScopeStack.top(i));
-			mAsValueScopeStack.pop();
+			push_stack(mScopeStack.top(i));
+			mScopeStack.pop();
 			return val;
 		}
 	}
@@ -2693,7 +2694,7 @@ as_value Machine::find_prop_strict(asName multiname){
 	std::string path = ns.size() == 0 ? name : ns + "." + name;
 	val = env.get_variable(path,*getScopeStack(),&target);
 	push_stack(as_value(target));
-	mAsValueScopeStack.pop();
+	mScopeStack.pop();
 	return val;
 }
 
@@ -2746,8 +2747,8 @@ void Machine::print_scope_stack(){
 
 	std::stringstream ss;
 	ss << "ScopeStack: ";
-	for(unsigned int i=0;i<mAsValueScopeStack.size();++i){
-		ss << mAsValueScopeStack.top(i).toDebugString();
+	for(unsigned int i=0;i<mScopeStack.size();++i){
+		ss << as_value(mScopeStack.top(i).get()).toDebugString();
 	}
 	LOG_DEBUG_AVM("%s", ss.str());
 }	
@@ -2770,8 +2771,8 @@ void Machine::load_function(CodeStream* stream){
 
 as_environment::ScopeStack* Machine::getScopeStack(){
 	as_environment::ScopeStack *stack = new as_environment::ScopeStack();
-	for(int i=0;i<mAsValueScopeStack.size();i++){
-		stack->push_back(mAsValueScopeStack.top(i).to_object());
+	for(int i=0;i<mScopeStack.size();i++){
+		stack->push_back(mScopeStack.top(i));
 	}
 	return stack;
 }
