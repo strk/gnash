@@ -2663,7 +2663,7 @@ void Machine::instantiateClass(std::string className, as_object* global){
 	executeCodeblock(theClass->getConstructor()->getBody());
 }
 
-Machine::Machine(VM& vm):mST(),mRegisters(),mExitWithReturn(false),_vm(vm)
+Machine::Machine(VM& vm):mST(vm.getStringTable()),mRegisters(),mExitWithReturn(false),_vm(vm)
 {
 	mCH = vm.getClassHierarchy();
 	//Local registers should be initialized at the beginning of each function call, but
