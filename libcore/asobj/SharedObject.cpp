@@ -48,15 +48,9 @@
 #include "URL.h"
 #include "rc.h" // for use of rcfile
 
-// Define this to use the buffer-based AMF0 decoder/encoder
-// rather then libamf. Fixes misc-ming.all/SharedObjectTestRunner
-// both behavioural and for memory errors.
-// The only failing case in that test is comparison of input
-// and output .sol file. This is because ::writeAMF0 encodes
-// arrays as STRICT_ARRAY rather then ECMA_ARRAY. Should be
-// checked if this is a common need or only SOL-specific.
-//
-//#define BUFFERED_AMF_SOL
+// Undefine this to use the Element-based AMF0 decoder/encoder.
+// May be useful to test libamf.
+#define BUFFERED_AMF_SOL
 
 namespace {
 //gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
