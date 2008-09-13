@@ -16,6 +16,18 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
+//
+//
+// NOTE: to test this with the proprietary player:
+//
+//     $ make SharedObjectTestRunner
+//     $ ./SharedObjectTestRunner flashplayer ~/.macromedia/Flash_Player/#SharedObjects/<key>
+//     
+// take a look at the #SharedObject dir to figure out what <key> should be
+// 
+//
+//
+
 #define pass_check(x) _root.pass(x)
 #define xpass_check(x) _root.xpass(x)
 #define fail_check(x) _root.fail(x)
@@ -116,6 +128,12 @@ so1.data.obj.hidden = 7;
 AsSetPropFlags(so1.data.obj, 'hidden', 1); // hide from enumeration, should not end into the sol file
 
 so1.data.ref = so1.data.obj;
+
+so1.data.fun = function() {}; // functions in data 
+
+//AsSetPropFlags(so1.data, '__proto__', 0, 1); // if we unhide __proto__ we'll find it in the SharedObject
+AsSetPropFlags(so1.data, '__constructor__', 0, 1); // unhide __constructor__ (it's a function so will be skipped anyway)
+AsSetPropFlags(so1.data, 'constructor', 0, 1); // unhide constructor (it's a function so will be skipped anyway)
 
 so1.flush();
 
