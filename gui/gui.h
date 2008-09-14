@@ -122,14 +122,7 @@ public:
     ///
     virtual void quit()  { exit(0); }
 
-    /// Create a menu and attach it to our window.
-    virtual bool createMenu() = 0;
-
-    /// Register event handlers.
-    virtual bool setupEvents() = 0;
-
     /// Render the current buffer.
-
     /// For OpenGL, this means that the front and back buffers are swapped.
     virtual void renderBuffer() = 0;
 
@@ -323,7 +316,6 @@ public:
     void menu_quit();
     void menu_about();
     void menu_play();
-    void menu_refresh_view();
     void menu_pause();
     void menu_stop();
     void menu_step_forward();
