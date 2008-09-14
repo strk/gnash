@@ -58,7 +58,7 @@
 //#define GNASH_DEBUG_SOFT_REFERENCES
 
 // Define this macto to make AMF parsing verbose
-#define GNASH_DEBUG_AMF_DESERIALIZE
+//#define GNASH_DEBUG_AMF_DESERIALIZE
 
 // Define this macto to make AMF writing verbose
 //#define GNASH_DEBUG_AMF_SERIALIZE
@@ -113,11 +113,29 @@ public:
     
     void accept(string_table::key key, const as_value& val) 
         {
+
+            // Test conducted with AMFPHP:
+            // '__proto__' and 'constructor' members
+            // of an object don't get back from an 'echo-service'.
+            // Dunno if they are not serialized or just not sent back.
+            // A '__constructor__' member gets back, but only if 
+            // not a function. Actually no function gets back.
+            // 
+            if ( key == NSV::PROP_uuPROTOuu || 
+                 key == NSV::PROP_CONSTRUCTOR )
+            {
+#ifdef GNASH_DEBUG_AMF_SERIALIZE
+                log_debug(" skip serialization of specially-named property %s", _st.value(key));
+#endif
+                return;
+            }
+
             //GNASH_REPORT_FUNCTION;
             amf::AMF amf;
             amf::Element *el = 0;
 	    
-            const string& name = _st.string_table::value(key);
+            const string& name = _st.value(key);
+
 	    
 //          cerr << "FIXME: yes!!!!! " << name << ": "<< val << std::endl;
 	    
@@ -175,6 +193,13 @@ public:
     void accept(string_table::key key, const as_value& val) 
     {
         if ( _error ) return;
+
+        // Tested with SharedObject and AMFPHP
+        if ( val.is_function() )
+        {
+            log_debug("AMF0: skip serialization of FUNCTION property");
+            return;
+        }
 
         // Test conducted with AMFPHP:
         // '__proto__' and 'constructor' members

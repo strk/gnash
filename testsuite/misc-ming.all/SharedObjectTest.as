@@ -16,6 +16,18 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
+//
+//
+// NOTE: to test this with the proprietary player:
+//
+//     $ make SharedObjectTestRunner
+//     $ ./SharedObjectTestRunner flashplayer ~/.macromedia/Flash_Player/#SharedObjects/<key>
+//     
+// take a look at the #SharedObject dir to figure out what <key> should be
+// 
+//
+//
+
 #define pass_check(x) _root.pass(x)
 #define xpass_check(x) _root.xpass(x)
 #define fail_check(x) _root.fail(x)
@@ -99,14 +111,29 @@ AsSetPropFlags(so1.data.ary, 'hidden', 1); // hide from enumeration, should not 
 
 
 so1.data.aryns = [4,5,6];
+so1.data.aryns.fun = function() {}; // functions in arrays are simply skipped
 so1.data.aryns.custom = 7;
 so1.data.aryns.length = 8; // non-strict array (ECMA_ARRAY)
 
 so1.data.obj = {a:10,b:'20',c:true};
+so1.data.obj.fun = function() {}; // functions in objects are simply skipped
+
+//AsSetPropFlags(so1.data.obj, '__proto__', 0, 1); // if we unhide __proto__ we'll find it in the SharedObject
+
+AsSetPropFlags(so1.data.obj, '__constructor__', 0, 1); // unhide __constructor__ (it's a function so will be skipped anyway)
+AsSetPropFlags(so1.data.obj, 'constructor', 0, 1); // unhide constructor (it's a function so will be skipped anyway)
+// so1.data.obj.constructor = 4; // if we override constructor we'll find it
+
 so1.data.obj.hidden = 7;
 AsSetPropFlags(so1.data.obj, 'hidden', 1); // hide from enumeration, should not end into the sol file
 
 so1.data.ref = so1.data.obj;
+
+so1.data.fun = function() {}; // functions in data 
+
+//AsSetPropFlags(so1.data, '__proto__', 0, 1); // if we unhide __proto__ we'll find it in the SharedObject
+AsSetPropFlags(so1.data, '__constructor__', 0, 1); // unhide __constructor__ (it's a function so will be skipped anyway)
+AsSetPropFlags(so1.data, 'constructor', 0, 1); // unhide constructor (it's a function so will be skipped anyway)
 
 so1.flush();
 
