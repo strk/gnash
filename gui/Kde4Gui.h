@@ -105,7 +105,8 @@ public:
     void popupMenu(const QPoint& point);
 
 private:
- 
+
+    typedef std::vector<geometry::Range2d<int> > DrawBounds; 
     typedef std::map<int, gnash::key::code> KeyMap;
 
     void setupActions();
@@ -114,6 +115,9 @@ private:
 
     /// Set up the map of Qt to Gnash keys.
     void setupKeyMap();
+
+    DrawBounds::value_type _validbounds;
+    DrawBounds _drawbounds;
  
     /// The main application, which should destroy everything
     /// left on closing.

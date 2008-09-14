@@ -79,13 +79,10 @@ Kde4AggGlue::initBuffer(int width, int height)
 
     renderer->init_buffer(_offscreenbuf.get(), bufsize, _width, _height,
       width*((_bpp+7)/8));
-
-
-    _validbounds.setTo(0, 0, _width, _height);
-    _drawbounds.push_back(_validbounds);
     
     _image.reset(new QImage(_offscreenbuf.get(), _width, _height, QImage::Format_RGB32));
 }
+
 
 void
 Kde4AggGlue::render()
@@ -93,6 +90,7 @@ Kde4AggGlue::render()
     QRect r(0, 0, _width, _height);
     render(r);
 }
+
 
 void
 Kde4AggGlue::render(const QRect& updateRect)
@@ -102,16 +100,9 @@ Kde4AggGlue::render(const QRect& updateRect)
 
     QPainter p(_drawing_area);
    
-    p.drawImage(updateRect, *_image);
+    p.drawImage(updateRect, *_image, updateRect);
     p.end();
 
-}
-
-
-void
-Kde4AggGlue::setInvalidatedRegions(const InvalidatedRanges& ranges)
-{
-    _renderer->set_invalidated_regions(ranges);
 }
 
 

@@ -21,7 +21,6 @@
 #include "gnashconfig.h"
 #endif
 
-#include "Kde4.moc"
 
 #include <map>
 #include <boost/assign/list_inserter.hpp>
@@ -46,6 +45,8 @@
 
 #include "gui.h"
 #include "Kde4Gui.h"
+#include "Kde4.moc"
+#include "render_handler.h"
 #include "utility.h" // for PIXELS_TO_TWIPS 
 
 
@@ -126,6 +127,7 @@ Kde4Gui::createWindow(const char* windowtitle, int width, int height)
         return false;
     }
 
+    _validbounds.setTo(0, 0, _width - 1, _height - 1);
     _glue.initBuffer(width, height);
     
     set_render_handler(_renderer);
@@ -148,8 +150,18 @@ Kde4Gui::popupMenu(const QPoint& point)
 void
 Kde4Gui::renderBuffer()
 {
-    // This calls paintEvent(), which calls renderWidget().
-    _drawingWidget->update();
+    
+    for (DrawBounds::const_iterator i = _drawbounds.begin(), e = _drawbounds.end(); i != e; ++i) {
+        
+        // it may happen that a particular range is out of the screen, which 
+        // will lead to bounds==null. 
+        if (i->isNull()) continue;
+        
+        assert(i->isFinite()); 
+
+        _drawingWidget->update(i->getMinX(), i->getMinY(), i->width(), i->height());
+
+    }
 }
 
 
@@ -158,6 +170,7 @@ Kde4Gui::renderWidget(const QRect& updateRect)
 {
     // This call renders onto the widget using a QPainter,
     // which *must only happen inside a paint event*.
+    
     _glue.render(updateRect);
 }
 
@@ -165,7 +178,26 @@ Kde4Gui::renderWidget(const QRect& updateRect)
 void
 Kde4Gui::setInvalidatedRegions(const InvalidatedRanges& ranges)
 {
-    _glue.setInvalidatedRegions(ranges);
+    _renderer->set_invalidated_regions(ranges);
+
+    _drawbounds.clear();
+
+    for (size_t i = 0, e = ranges.size(); i != e; ++i) {
+
+        geometry::Range2d<int> bounds = Intersection(
+        _renderer->world_to_pixel(ranges.getRange(i)),
+        _validbounds);
+
+        // it may happen that a particular range is out of the screen, which 
+        // will lead to bounds==null. 
+        if (bounds.isNull()) continue;
+
+
+        assert(bounds.isFinite());
+
+        _drawbounds.push_back(bounds);
+
+    }
 }
 
 

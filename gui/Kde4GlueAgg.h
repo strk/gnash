@@ -24,6 +24,7 @@
 #include <QImage>
 #include <boost/scoped_array.hpp>
 #include <QPainter>
+#include "snappingrange.h"
 
 class QRect;
 
@@ -43,15 +44,12 @@ class Kde4AggGlue : public Kde4Glue
     void resize(int width, int height);
     void render();
     void render(const QRect& updateRect);
-    void setInvalidatedRegions(const InvalidatedRanges& ranges);
 
   private:
     int _width;
     int _height;
     boost::scoped_array<unsigned char> _offscreenbuf;
     render_handler* _renderer; // We don't own this pointer.
-    geometry::Range2d<int> _validbounds;
-    std::vector< geometry::Range2d<int> > _drawbounds;
     std::auto_ptr<QImage> _image;
     std::auto_ptr<QPainter> _painter;
 };

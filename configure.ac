@@ -478,10 +478,12 @@ esac], sdkinstall=no)
 
 AM_CONDITIONAL(SDKINSTALL, test x$sdkinstall = xyes)
 
+has_kde4=no
 has_kde=no
 has_gtk2=no
 build_fb=no
 build_fltk=no
+build_kde4=no
 build_kde=no
 build_gtk=no
 build_sdl=no
@@ -517,6 +519,9 @@ dnl        AC_DEFINE(USE_GTK, [1], [Use the GTK GUI])
       kde|KDE)
         build_kde=yes
         ;;
+      kde4|KDE4)
+	build_kde4=yes
+	;;
       qtopia|QTOPIA)
         build_qtopia=yes
         build_qt=yes
@@ -547,6 +552,7 @@ dnl        AC_DEFINE(USE_GTK, [1], [Use the GTK GUI])
         build_fb=yes
         build_fltk=yes
         build_kde=yes
+	build_kde4=yes
         build_gtk=yes
         build_sdl=yes
 dnl        build_qtopia=yes
@@ -554,7 +560,7 @@ dnl        build_hildon=yes
 dnl        build_alp=yes
 dnl        build_riscos=yes
         ;;
-      *) AC_MSG_ERROR([invalid gui ${enableval} given (accept: gtk|kde|fltk|sdl|riscos|aqua|fb|hildon|alp|qtopia|dump)])
+      *) AC_MSG_ERROR([invalid gui ${enableval} given (accept: gtk|kde|kde4|fltk|sdl|riscos|aqua|fb|hildon|alp|qtopia|dump)])
          ;;
       esac]
     enableval=`echo ${enableval} | cut -d ' ' -f 2-6`
@@ -1610,6 +1616,12 @@ dnl # Check KDE if kde gui or kparts were requested
 if test x$build_kde = xyes -o x$kparts = xyes; then
   GNASH_PATH_KDE
 fi
+
+if test x$build_kde4 = xyes; then
+  #dnl Do something here
+  echo "building kde4";
+fi
+
 if test x$build_qt = xyes -o x$build_qtopia = xyes -o x$build_kde = xyes; then
   GNASH_PATH_QT
   if test x$build_qtopia = xyes; then
@@ -1618,6 +1630,7 @@ if test x$build_qt = xyes -o x$build_qtopia = xyes -o x$build_kde = xyes; then
 fi
 AM_CONDITIONAL(HAVE_QTOPIA, [test x$has_qtopia = xyes])
 AM_CONDITIONAL(HAVE_KDE, [test x$has_kde = xyes])
+AM_CONDITIONAL(HAVE_KDE4, [test x$has_kde4 = xyes])
 AM_CONDITIONAL(HAVE_QT, [test x$has_qt = xyes])
 
 AM_CONDITIONAL(HAVE_QTOPIA_2, [test x"$gnash_qtopia_version" = x2])
@@ -1666,6 +1679,7 @@ AM_CONDITIONAL(BUILD_QT_GUI, [ test x$build_qt = xyes ])
 AM_CONDITIONAL(BUILD_HILDON_GUI, [ test x$build_hildon = xyes ])
 AM_CONDITIONAL(BUILD_GTK_GUI, [ test x$build_gtk = xyes ])
 AM_CONDITIONAL(BUILD_KDE_GUI, [ test x$build_kde = xyes ])
+AM_CONDITIONAL(BUILD_KDE4_GUI, [ test x$build_kde4 = xyes])
 AM_CONDITIONAL(BUILD_FLTK_GUI, [ test x$build_fltk = xyes ])
 AM_CONDITIONAL(BUILD_SDL_GUI, [ test x$build_sdl = xyes ])
 AM_CONDITIONAL(BUILD_FB_GUI, [ test x$build_fb = xyes ])
@@ -2099,6 +2113,9 @@ if test x$build_fltk = xyes; then
 fi
 if test x$build_kde = xyes; then
   SUPPORTED_GUIS="${SUPPORTED_GUIS},kde"
+fi
+if test x$build_kde4 = xyes; then
+  SUPPORTED_GUIS="${SUPPORTED_GUIS},kde4"
 fi
 if test x$build_gtk = xyes; then
   SUPPORTED_GUIS="${SUPPORTED_GUIS},gtk"
