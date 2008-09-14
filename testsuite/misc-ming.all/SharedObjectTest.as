@@ -51,6 +51,14 @@ check_equals(so1.data.tbool, true);
 check_equals(typeof(so1.data.fbool), 'boolean');
 check_equals(so1.data.fbool, false);
 
+// MovieClip value mc was NOT discarded, but written (or read?) as undefined
+check(so1.data.hasOwnProperty('mc'));
+check_equals(typeof(so1.data.mc), 'undefined');
+
+// Function value was discarded
+check(! so1.data.hasOwnProperty('fun') );
+
+
 // Test reading mixed types in ECMA_ARRAY 
 check_equals(typeof(so1.data.ary), 'object');
 check_equals(so1.data.ary.toString(), '1,true,string,null,');
@@ -81,6 +89,10 @@ check_equals(typeof(so1.data.obj), 'object');
 check_equals(typeof(so1.data.obj.a), 'number');
 check(so1.data.obj.hasOwnProperty('a'));
 check(!so1.data.obj.hasOwnProperty('hidden'));
+check(so1.data.obj.hasOwnProperty('mc'));
+check_equals(typeof(so1.data.obj.mc), 'undefined');
+// Function value was discarded
+check(! so1.data.obj.hasOwnProperty('fun') );
 
 // Test reading NUMBER
 check_equals(so1.data.obj.a, 10);
@@ -117,6 +129,7 @@ so1.data.aryns.length = 8; // non-strict array (ECMA_ARRAY)
 
 so1.data.obj = {a:10,b:'20',c:true};
 so1.data.obj.fun = function() {}; // functions in objects are simply skipped
+so1.data.obj.mc = createEmptyMovieClip("mc1", 1); // movieclip values are skipped
 
 //AsSetPropFlags(so1.data.obj, '__proto__', 0, 1); // if we unhide __proto__ we'll find it in the SharedObject
 
@@ -130,6 +143,7 @@ AsSetPropFlags(so1.data.obj, 'hidden', 1); // hide from enumeration, should not 
 so1.data.ref = so1.data.obj;
 
 so1.data.fun = function() {}; // functions in data 
+so1.data.mc = createEmptyMovieClip("mc2", 2); // movieclip values are skipped
 
 //AsSetPropFlags(so1.data, '__proto__', 0, 1); // if we unhide __proto__ we'll find it in the SharedObject
 AsSetPropFlags(so1.data, '__constructor__', 0, 1); // unhide __constructor__ (it's a function so will be skipped anyway)
@@ -148,4 +162,4 @@ note();
 setInterval(quit, 5000);
 stop();
 
-check_totals(32);
+check_totals(38);
