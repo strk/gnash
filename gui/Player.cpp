@@ -653,6 +653,10 @@ Player::getGui()
     return createKDEGui(_windowID, _scale, _doLoop, _bitDepth);
 #endif
 
+#ifdef GUI_KDE4
+    return createKDE4Gui(_windowID, _scale, _doLoop, _bitDepth);
+#endif
+
 #ifdef GUI_SDL
     return createSDLGui(_windowID, _scale, _doLoop, _bitDepth);
 #endif

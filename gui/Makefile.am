@@ -193,6 +193,12 @@ BUILT_SOURCES += klash.moc
 include $(srcdir)/am-frag/kde.am
 endif
 
+# Build the KDE4 gui
+if BUILD_KDE4_GUI
+BUILT_SOURCES += Kde4.moc
+include $(srcdir)/am-frag/kde4.am
+endif
+
 # Build the SDL gui
 if BUILD_SDL_GUI
 include $(srcdir)/am-frag/sdl.am
