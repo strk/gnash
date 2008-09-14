@@ -25,6 +25,8 @@
 #include <boost/scoped_array.hpp>
 #include <QPainter>
 
+class QRect;
+
 namespace gnash
 {
 
@@ -40,7 +42,7 @@ class Kde4AggGlue : public Kde4Glue
     void initBuffer(int width, int height);
     void resize(int width, int height);
     void render();
-    void render(int minxX, int minY, int maxX, int maxY);
+    void render(const QRect& updateRect);
     void setInvalidatedRegions(const InvalidatedRanges& ranges);
 
   private:

@@ -154,11 +154,11 @@ Kde4Gui::renderBuffer()
 
 
 void
-Kde4Gui::renderWidget()
+Kde4Gui::renderWidget(const QRect& updateRect)
 {
     // This call renders onto the widget using a QPainter,
     // which *must only happen inside a paint event*.
-    _glue.render();
+    _glue.render(updateRect);
 }
 
 
@@ -397,7 +397,7 @@ Kde4Gui::setupKeyMap()
 void 
 DrawingWidget::paintEvent(QPaintEvent *event)
 {
-    _gui.renderWidget();
+    _gui.renderWidget(event->rect());
 }
 
 

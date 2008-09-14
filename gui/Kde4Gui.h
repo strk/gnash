@@ -39,6 +39,7 @@
 class QMainWindow;
 class QMenuBar;
 class QMenu;
+class QRect;
 
 namespace gnash {
     class Kde4Gui;
@@ -99,7 +100,7 @@ public:
     void resize(int width, int height);
     void quit();
 
-    void renderWidget();
+    void renderWidget(const QRect& updateRect);
 
     void popupMenu(const QPoint& point);
 

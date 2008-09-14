@@ -23,7 +23,8 @@
 #include "Kde4GlueAgg.h"
 #include "render_handler.h"
 #include "render_handler_agg.h"
-#include <QtGui/QImage>
+#include <QImage>
+#include <QRect>
 
 namespace gnash
 {
@@ -89,18 +90,19 @@ Kde4AggGlue::initBuffer(int width, int height)
 void
 Kde4AggGlue::render()
 {
-    render(0, 0, _width, _height);
+    QRect r(0, 0, _width, _height);
+    render(r);
 }
 
 void
-Kde4AggGlue::render(int minX, int minY, int maxX, int maxY)
+Kde4AggGlue::render(const QRect& updateRect)
 {
 
-    QRectF rectangle(minX, minY, maxX, maxY);
+    log_debug("Render region: %d, %d, %d, %d", updateRect.topLeft().x(), updateRect.topLeft().y(), updateRect.bottomRight().x(), updateRect.bottomRight().y());
 
     QPainter p(_drawing_area);
    
-    p.drawImage(rectangle, *_image);
+    p.drawImage(updateRect, *_image);
     p.end();
 
 }
@@ -110,24 +112,6 @@ void
 Kde4AggGlue::setInvalidatedRegions(const InvalidatedRanges& ranges)
 {
     _renderer->set_invalidated_regions(ranges);
-
-    _drawbounds.clear();
-
-    for (size_t rno=0; rno<ranges.size(); rno++) {
-
-      geometry::Range2d<int> bounds = Intersection(
-      _renderer->world_to_pixel(ranges.getRange(rno)),
-      _validbounds);
-
-      // it may happen that a particular range is out of the screen, which 
-      // will lead to bounds==null. 
-      if (bounds.isNull()) continue;
-
-      assert(bounds.isFinite());
-
-      _drawbounds.push_back(bounds);
-
-    }
 }
 
 
