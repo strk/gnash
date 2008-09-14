@@ -326,9 +326,7 @@ ActionExec::operator() ()
             // WARNING: if the movie is stopped, the wall clock continues to run !
             if ( timeLimit && timer.elapsed() > timeLimit )
             {
-                char buf[256];
-                snprintf(buf, 255, _("Script exceeded time limit of %u milliseconds."), timeLimit);
-                throw ActionLimitException(buf);
+                throw ActionLimitException("Script exceeded time limit");
             }
 #else
             if ( pc <= oldPc )
