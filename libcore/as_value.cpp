@@ -2480,8 +2480,12 @@ as_value::writeAMF0(SimpleBuffer& buf, std::map<as_object*, size_t>& offsetTable
 
         case MOVIECLIP:
         {
-            log_unimpl(_(" serialization of MovieClip objects"));
-            return false;
+#ifdef GNASH_DEBUG_AMF_SERIALIZE
+            log_debug(_("writeAMF0: serializing MOVIECLIP (as undefined)"));
+#endif
+            // See misc-ming.all/SharedObjectTest.as
+            buf.appendByte(amf::Element::UNDEFINED_AMF0);
+            return true;
         }
 
         case NULLTYPE:
