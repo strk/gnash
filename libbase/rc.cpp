@@ -685,7 +685,7 @@ RcInitFile::updateFile(const std::string& filespec)
     cmd << "flashSystemOS " << _flashSystemOS << endl <<
     cmd << "flashVersionString " << _flashVersionString << endl <<
     cmd << "urlOpenerFormat " << _urlOpenerFormat << endl <<
-    cmd << "GSTAudioSink "     << _gstaudiosink << endl <<
+    cmd << "GSTAudioSink " << _gstaudiosink << endl;
 
     // Lists. These can't be handled very well at the moment. The main
     // inconvenience would be that disabling a list makes it an empty
