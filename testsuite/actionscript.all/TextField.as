@@ -819,9 +819,9 @@ note("After reducing _width: textWidth: "+tf.textWidth+" origTextWidth:"+origTex
 check_equals(tf._width, 10);
 
 #if OUTPUT_VERSION < 8
- check_equals(origTextWidth, tf.textWidth); 
+ xcheck_equals(origTextWidth, tf.textWidth); 
 #else
- xcheck(origTextWidth > tf.textWidth); 
+ check(origTextWidth > tf.textWidth); 
 #endif
 
 // test that adding a newline doesn't change the bounds width
