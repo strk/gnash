@@ -1040,18 +1040,18 @@ sprite_getTextSnapshot(const fn_call& fn)
 static as_value
 sprite_getBounds(const fn_call& fn)
 {
-  boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
+  boost::intrusive_ptr<character> sprite = ensureType<character>(fn.this_ptr);
 
 
   rect bounds  = sprite->getBounds();
 
   if ( fn.nargs > 0 )
   {
-    boost::intrusive_ptr<sprite_instance> target = fn.arg(0).to_sprite();
+    character* target = fn.arg(0).to_character();
     if ( ! target )
     {
       IF_VERBOSE_ASCODING_ERRORS(
-      log_aserror(_("MovieClip.getBounds(%s): invalid call, first arg must be a sprite"),
+      log_aserror(_("MovieClip.getBounds(%s): invalid call, first arg must be a character"),
         fn.arg(0));
       );
       return as_value();
