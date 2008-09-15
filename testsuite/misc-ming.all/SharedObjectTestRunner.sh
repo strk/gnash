@@ -56,7 +56,7 @@ rm ${SOLDIR}/* # clean target soldir out
 cp -v ${INPUTSOLDIR}/*.sol ${SOLDIR}/
 touch ${SOLDIR}/copytime
 echo "SWF=${SWFTEST}"
-echo "INPUT=${SOLDIR}"
+echo "INPUT=${INPUTSOLDIR}"
 echo "SOLDIR=${SOLDIR}"
 sleep 1
 
