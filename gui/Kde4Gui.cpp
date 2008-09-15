@@ -84,8 +84,6 @@ Kde4Gui::init(int argc, char **argv[])
         createMainMenu();
     }
 
-    //createPopupMenu();
-
     // Make sure key events are ready to be passed
     // before the widget can receive them.
     setupKeyMap();
@@ -127,7 +125,7 @@ Kde4Gui::createWindow(const char* windowtitle, int width, int height)
         return false;
     }
 
-    _validbounds.setTo(0, 0, _width - 1, _height - 1);
+    _validbounds.setTo(0, 0, _width, _height);
     _glue.initBuffer(width, height);
     
     set_render_handler(_renderer);
@@ -151,7 +149,8 @@ void
 Kde4Gui::renderBuffer()
 {
     
-    for (DrawBounds::const_iterator i = _drawbounds.begin(), e = _drawbounds.end(); i != e; ++i) {
+    for (DrawBounds::const_iterator i = _drawbounds.begin(),
+                        e = _drawbounds.end(); i != e; ++i) {
         
         // it may happen that a particular range is out of the screen, which 
         // will lead to bounds==null. 
@@ -159,7 +158,8 @@ Kde4Gui::renderBuffer()
         
         assert(i->isFinite()); 
 
-        _drawingWidget->update(i->getMinX(), i->getMinY(), i->width(), i->height());
+        _drawingWidget->update(i->getMinX(), i->getMinY(),
+                               i->width(), i->height());
 
     }
 }
@@ -170,7 +170,6 @@ Kde4Gui::renderWidget(const QRect& updateRect)
 {
     // This call renders onto the widget using a QPainter,
     // which *must only happen inside a paint event*.
-    
     _glue.render(updateRect);
 }
 

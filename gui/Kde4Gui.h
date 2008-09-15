@@ -100,6 +100,8 @@ public:
     void resize(int width, int height);
     void quit();
 
+    bool want_multiple_regions() { return true; }
+
     void renderWidget(const QRect& updateRect);
 
     void popupMenu(const QPoint& point);
