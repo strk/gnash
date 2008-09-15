@@ -325,7 +325,7 @@ JpegImageInput::readHeader(unsigned int maxHeaderBytes)
 void
 JpegImageInput::startImage()
 {
-	assert(_compressorOpened == false);
+	assert(!_compressorOpened);
 
 	if ( setjmp(_jmpBuf) )
 	{
@@ -386,6 +386,13 @@ JpegImageInput::startImage()
 void
 JpegImageInput::finishImage()
 {
+	if ( setjmp(_jmpBuf) )
+	{
+		std::stringstream ss;
+		ss << "Internal jpeg error: " << _errorOccurred;
+		throw gnash::ParserException(ss.str());
+	}
+
 	if (_compressorOpened)
 	{
 		jpeg_finish_decompress(&m_cinfo);
@@ -424,6 +431,7 @@ void
 JpegImageInput::readScanline(unsigned char* rgb_data)
 {
 	assert(_compressorOpened);
+
 	assert(m_cinfo.output_scanline < m_cinfo.output_height);
 	int	lines_read = jpeg_read_scanlines(&m_cinfo, &rgb_data, 1);
 	assert(lines_read == 1);

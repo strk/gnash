@@ -242,19 +242,25 @@ namespace image
         
         const size_t height = inChannel->getHeight();
         const size_t width = inChannel->getWidth();
-        
-        switch (inChannel->imageType())
+
+        try
         {
-            case GNASH_IMAGE_RGB:
-                im.reset(new image::ImageRGB(width, height));
-                break;
-            case GNASH_IMAGE_RGBA:
-                im.reset(new image::ImageRGBA(width, height));
-                break;
-            default:
-                log_error("Invalid image returned");
-                im.reset(NULL);
-                return im;
+            switch (inChannel->imageType())
+            {
+                case GNASH_IMAGE_RGB:
+                    im.reset(new image::ImageRGB(width, height));
+                    break;
+                case GNASH_IMAGE_RGBA:
+                    im.reset(new image::ImageRGBA(width, height));
+                    break;
+                default:
+                    log_error("Invalid image returned");
+                    return im;
+            }
+        }
+        catch (std::bad_alloc& e)
+        {
+            return im;        
         }
         
         for (size_t i = 0; i < height; ++i)
