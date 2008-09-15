@@ -794,12 +794,12 @@ nsPluginInstance::startProc(Window win)
 	*/
 
 	// Prepare width, height and window ID variables
-	std::ostringstream xid, width, height, hostfd;
-
-	xid << win;
-	width << _width;
-	height << _height;
-	hostfd << c2p_pipe[1];
+	const size_t buf_size = 30;
+	char xid[buf_size], width[buf_size], height[buf_size], hostfd[buf_size];
+	snprintf(xid, buf_size, "%ld", win);
+	snprintf(width, buf_size, "%d", _width);
+	snprintf(height, buf_size, "%d", _height);
+	snprintf(hostfd, buf_size, "%d", c2p_pipe[1]);
 
 	// Prepare Actionscript variables (e.g. Flashvars).
 	vector<string> paramvalues;
@@ -839,13 +839,13 @@ nsPluginInstance::startProc(Window win)
 	
 	// X window ID (necessary for gnash to function as a plugin)
 	argv[argc++] = "-x";
-	argv[argc++] = xid.str().c_str();
+	argv[argc++] = xid;
 	
 	// Height and width
 	argv[argc++] = "-j";
-	argv[argc++] = width.str().c_str();
+	argv[argc++] = width;
 	argv[argc++] = "-k";
-	argv[argc++] = height.str().c_str();
+	argv[argc++] = height;
 	
 	// Url of the root movie
 	argv[argc++] = "-u";
@@ -853,7 +853,7 @@ nsPluginInstance::startProc(Window win)
 
 	// Host FD
 	argv[argc++] = "-F";
-	argv[argc++] = hostfd.str().c_str();
+	argv[argc++] = hostfd;
 
 	// Base URL is the page that the SWF is embedded in. It is 
 	// by Gnash for resolving relative URLs in the movie. If the
