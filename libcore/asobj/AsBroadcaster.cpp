@@ -83,13 +83,8 @@ public:
 		if ( method.is_function() )
 		{
 
-#ifndef NDEBUG
-			size_t oldStackSize = _fn.env().stack_size();
-#endif
 			_fn.this_ptr = o.get();
 			method.to_as_function()->call(_fn);
-
-			assert ( _fn.env().stack_size() == oldStackSize );
 
 		}
 
