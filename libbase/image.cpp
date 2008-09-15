@@ -260,7 +260,10 @@ namespace image
         }
         catch (std::bad_alloc& e)
         {
-            return im;        
+            // This should be caught here because ~JpegImageInput can also throw
+            // an exception on stack unwinding and this confuses remote catchers.
+            log_error("Out of memory while trying to create %dx%d image", width, height);
+            return im;
         }
         
         for (size_t i = 0; i < height; ++i)

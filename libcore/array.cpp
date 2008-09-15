@@ -365,18 +365,10 @@ public:
         as_value cmp_method(&_comp);
         as_value ret(0);
 
-#ifndef NDEBUG
-        size_t prevStackSize = _env.stack_size();
-#endif
-
-	std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
-	args->push_back(b);
-	args->push_back(a);
+	    std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
+	    args->push_back(b);
+	    args->push_back(a);
         ret = call_method(cmp_method, &_env, _object, args);
-
-#ifndef NDEBUG
-        assert(prevStackSize == _env.stack_size());
-#endif
 
         return (*_zeroCmp)(ret.to_int());
     }
