@@ -65,7 +65,7 @@ bogustests-runner: $(srcdir)/../generic-testrunner.sh $(BOGUS_ASTESTS_OUT) $(AUX
 
 .hx.swf: 
 	$(HAXE_CPP) $< > $(@:%.swf=PP_%.hx) 
-	$(HAXE) $(HAXE_FLAGS) -swf $@ $(@:%.swf=PP_%.hx)
+	$(HAXE) $(HAXE_FLAGS) -swf $@ -main $(@:%.swf=PP_%.hx)
 
 CLEANFILES =  \
 	gnash-dbg.log \
