@@ -1577,7 +1577,7 @@ SharedObjectTest.swf: Dejagnu.swf $(srcdir)/SharedObjectTest.as
 	$(MAKESWF) -DOUTPUT_VERSION=6 -v6 -o $@ Dejagnu.swf $(srcdir)/SharedObjectTest.as
 
 SharedObjectTestRunner: SharedObjectTestRunner.sh Makefile SharedObjectTest.swf
-	sed $< -e 's#@@TOP_BUILDDIR@@#${abs_top_builddir}#' -e 's#@@BASEINPUTSOLDIR@@#${srcdir}/SharedObjectTest.sol#' > $@
+	sed -e 's#@@TOP_BUILDDIR@@#${abs_top_builddir}#' -e 's#@@BASEINPUTSOLDIR@@#${srcdir}/SharedObjectTest.sol#' $< > $@
 	chmod +x $@
 
 StageConfigTest.swf: $(srcdir)/StageConfigTest.as 
