@@ -3004,7 +3004,7 @@ if test x"${DEJAGNU}" != x""; then
   echo "        DEJAGNU's runtest is $DEJAGNU"
 else
   echo "        WARNING: You need the dejagnu package installed to get a summary" >&4
-  echo "                 report after running ``make check''" >&4
+  echo "                 report after running ''make check''" >&4
   echo "                 Install it from http://www.gnu.org/software/dejagnu/" >&4
   echo "                 or .deb users: apt-get install dejagnu" >&4
   #echo "                or .rpm users: yum install dejagnu" >&4
