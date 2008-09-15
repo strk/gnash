@@ -69,7 +69,8 @@ check_equals(typeof(so1.data.ary[3]), 'null');
 check_equals(typeof(so1.data.ary[4]), 'undefined');
 check_equals(so1.data.ary.length, 5);
 // test composition
-a=[]; for (i in so1.data.ary) a.push(i);
+tmp = so1.data.ary; // work-around to an old Ming bug [ chokes on 'for (in in a.b.c)' ]
+a=[]; for (i in tmp) a.push(i);
 a.sort();
 check_equals(a.toString(), '0,1,2,3,4'); // note: no 'length'
 
@@ -79,7 +80,8 @@ check_equals(so1.data.aryns.toString(), '4,5,6,,,,,');
 check_equals(so1.data.aryns.length, 8);
 check_equals(so1.data.aryns.custom, 7);
 // test composition
-a=[]; for (i in so1.data.aryns) a.push(i);
+tmp = so1.data.aryns; // work-around to an old Ming bug [ chokes on 'for (in in a.b.c)' ]
+a=[]; for (i in tmp) a.push(i);
 a.sort();
 check_equals(a.toString(), '0,1,2,custom'); // note: no 'length'
 
