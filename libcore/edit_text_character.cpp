@@ -1198,23 +1198,27 @@ edit_text_character::format_text()
 	m_text_glyph_records.clear();
 
 	// nothing more to do if text is empty
-	if ( _text.empty() ) return;
+	if ( _text.empty() )
+    {
+        // TODO: should we still reset _bounds if autoSize != autoSizeNone ?
+        //       not sure we should...
+	    reset_bounding_box(0, 0);
+        return;
+    }
 
-	const rect& defBounds = m_def->get_bounds();
+    // See bug #24266
+	const rect& defBounds = _bounds; // m_def->get_bounds();
 
 	AutoSizeValue autoSize = getAutoSize();
 	if ( autoSize != autoSizeNone )
 	{
 		LOG_ONCE( log_debug(_("TextField.autoSize != 'none' TESTING")) );
 
-		_bounds.set_to_rect(0, 0, defBounds.get_x_max(), 0); // this is correct for 'true'
+		_bounds.set_to_rect(0, 0, 0, 0); // this is correct for 'true'
 	}
 
 	// Should get info from autoSize too maybe ?
 	edit_text_character_def::alignment textAlignment = getTextAlignment();
-
-	// nothing more to do if text is empty
-	if ( _text.empty() ) return;
 
 	// FIXME: I don't think we should query the definition
 	// to find the appropriate font to use, as ActionScript
