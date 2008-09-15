@@ -825,11 +825,15 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 		}
 	}
 
+    const SDL_sound_handler::Sounds& soundData = handler->m_sound_data;
+
 	// Run through all the sounds. TODO: don't call .size() at every iteration !
-	for(boost::uint32_t i=0; i < handler->m_sound_data.size(); i++)
+	for (SDL_sound_handler::Sounds::const_iterator i = soundData.begin(),
+	            e = soundData.end(); i != e; ++i)
 	{
-		sound_data* sounddata = handler->m_sound_data[i];
-		handler->mixSoundData(*sounddata, buffer, buffer_length);
+	    // Check whether sound has been deleted first.
+        if (!*i) continue;
+		handler->mixSoundData(**i, buffer, buffer_length);
 	}
 
 	// 
