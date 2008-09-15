@@ -588,8 +588,6 @@ edit_text_character::display()
 
 	registerTextVariable();
 
-	//rect def_bounds = m_def->get_bounds();
-	
 	bool drawBorder = getDrawBorder();
 	bool drawBackground = getDrawBackground();
 
@@ -1202,7 +1200,7 @@ edit_text_character::format_text()
 	// nothing more to do if text is empty
 	if ( _text.empty() ) return;
 
-	rect defBounds = m_def->get_bounds();
+	const rect& defBounds = m_def->get_bounds();
 
 	AutoSizeValue autoSize = getAutoSize();
 	if ( autoSize != autoSizeNone )
