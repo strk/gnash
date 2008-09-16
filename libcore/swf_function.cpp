@@ -63,7 +63,7 @@ swf_function::swf_function(const action_buffer* ab,
 
 /*private static*/
 as_array_object* 
-swf_function::getArguments(swf_function& callee, const fn_call& fn)
+swf_function::getArguments(swf_function& callee, const fn_call& fn, as_object* caller)
 { 
 #ifndef GNASH_USE_GC
 	// We'll be storing the callee as_object into an as_value
@@ -80,9 +80,7 @@ swf_function::getArguments(swf_function& callee, const fn_call& fn)
 	}
 	arguments->init_member(NSV::PROP_CALLEE, &callee);
 
-    // as_object cast is needed to avoid the as_function pointer being
-    // taken as a boolean value...
-	arguments->init_member(NSV::PROP_CALLER, as_value((as_object*)fn.caller));
+	arguments->init_member(NSV::PROP_CALLER, as_value(caller));
 
 	return arguments;
 
@@ -124,6 +122,12 @@ struct TargetGuard {
 as_value
 swf_function::operator()(const fn_call& fn)
 {
+    // Extract caller before pushing ourself on the call stack
+    as_object* caller = 0;
+    VM& vm = getVM(); 
+    CallStack& cs = vm.getCallStack();
+    if ( ! cs.empty() ) caller = cs.back().func;
+
 	// Set up local stack frame, for parameters and locals.
 	as_environment::FrameGuard guard(fn.env(), this);
 
@@ -212,7 +216,7 @@ swf_function::operator()(const fn_call& fn)
 		}
 
 		// Add 'arguments'
-		our_env->set_local("arguments", getArguments(*this, fn));
+		our_env->set_local("arguments", getArguments(*this, fn, caller));
 	}
 	else
 	{
@@ -246,7 +250,7 @@ swf_function::operator()(const fn_call& fn)
 		boost::intrusive_ptr<as_array_object>	arg_array;
 		if ((m_function2_flags & PRELOAD_ARGUMENTS) || ! (m_function2_flags & SUPPRESS_ARGUMENTS))
 		{
-			arg_array = getArguments(*this, fn);
+			arg_array = getArguments(*this, fn, caller);
 		}
 
 		if (m_function2_flags & PRELOAD_ARGUMENTS)
