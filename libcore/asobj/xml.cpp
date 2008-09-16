@@ -847,7 +847,6 @@ as_value xml_parsexml(const fn_call& fn)
 
 /// \brief removes the specified XML object from its parent. Also
 /// deletes all descendants of the node.
-    
 as_value xml_send(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
@@ -881,31 +880,30 @@ xml_sendandload(const fn_call& fn)
     if ( ! targetObj )
     {
         IF_VERBOSE_ASCODING_ERRORS(
-        std::stringstream ss;
+        std::ostringstream ss;
         fn.dump_args(ss);
-        log_aserror(_("XML.sendAndLoad(%s): second argument doesn't cast to an object"),
-		ss.str());
+        log_aserror(_("XML.sendAndLoad(%s): second argument doesn't "
+                "cast to an object"), ss.str());
         );
         return as_value(false);
     }
     XML* target = dynamic_cast<XML*>(targetObj.get());
-    if ( ! target )
+    if (!target)
     {
         IF_VERBOSE_ASCODING_ERRORS(
-        std::stringstream ss;
+        std::ostringstream ss;
         fn.dump_args(ss);
-        log_aserror(_("XML.sendAndLoad(%s): second argument is not an XML object"),
-		ss.str());
+        log_aserror(_("XML.sendAndLoad(%s): second argument is "
+                "not an XML object"), ss.str());
         );
         return as_value(false);
     }
 
     URL url(filespec, get_base_url());
 
-//    return as_value(ptr->getAllocated());
     bool ret = ptr->sendAndLoad(url, *target);
 
-    return ret; // TODO: check expected return values
+    return as_value(ret); // TODO: check expected return values
 }
 
 static as_value
@@ -940,12 +938,6 @@ xml_ondata(const fn_call& fn)
     }
 
     return as_value();
-}
-
-int
-memadjust(int x)
-{
-    return (x + (4 - x % 4));
 }
 
 // extern (used by Global.cpp)
