@@ -152,7 +152,7 @@ o={};
 c=0;
 retCaller = 'custom'; 
 ret = getThis.call(o);
-xcheck_equals(typeof(retCaller), 'null');
+check_equals(typeof(retCaller), 'null');
 check_equals(ret, o);
 check_equals(c, 1);
 ret = getThis.call(null);
@@ -168,8 +168,8 @@ myCaller = function()
     getThis.call(o);
 };
 myCaller();
-xcheck_equals(typeof(retCaller), 'function');
-xcheck_equals(retCaller, myCaller); // note: it is not Function.prototype.call!
+check_equals(typeof(retCaller), 'function');
+check_equals(retCaller, myCaller); // note: it is not Function.prototype.call!
 
 #else // OUTPUT_VERSION < 6
 
@@ -423,7 +423,7 @@ function f()
     // callee: the function being called
     check_equals(arguments.callee, _root.f);
     // caller: the caller function
-    xcheck_equals(typeof(arguments.caller), 'null'); //? typeof return 'null', seems new!
+    check_equals(typeof(arguments.caller), 'null'); 
     check_equals(arguments.caller, null);
     
     var a = arguments;
@@ -444,7 +444,7 @@ function f()
     xcheck_equals(propRecorder.length, 5);
     check_equals(propRecorder[0], '__proto__');
     check_equals(propRecorder[1], 'callee');
-    xcheck_equals(propRecorder[2], 'caller');
+    check_equals(propRecorder[2], 'caller');
     xcheck_equals(propRecorder[3], 'constructor');
     xcheck_equals(propRecorder[4], 'length');
 }
@@ -453,12 +453,7 @@ f();
 // test argument.caller
 function child_func()
 {
-#if OUTPUT_VERSION == 5
     check_equals(arguments.caller, parent_func);
-#else
-    //? passed on swf5, but failed on swf6,7,8
-    xcheck_equals(arguments.caller, parent_func);
-#endif
 }
 function parent_func()
 {
