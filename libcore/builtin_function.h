@@ -83,7 +83,7 @@ public:
 	/// Invoke this function or this Class constructor
 	virtual as_value operator()(const fn_call& fn)
 	{
-		as_environment::FrameGuard guard(fn.env(), this);
+		//as_environment::FrameGuard guard(fn.env(), this);
 		assert(_func);
 		return _func(fn);
 	}
