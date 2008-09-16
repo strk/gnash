@@ -272,6 +272,9 @@ public:
 	/// Is this execution thread a function call ?
 	bool isFunction() const { return _func != 0; }
 
+    /// Get a pointer of the function being executed (if any)
+    const swf_function* getThisFunction() const { return _func; }
+
 	/// Get the current 'this' pointer, for use in function calls
 	as_object* getThisPointer();
 
