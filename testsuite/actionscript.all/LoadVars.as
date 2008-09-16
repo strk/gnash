@@ -120,6 +120,58 @@ check_equals (typeof(loadvarsObj.onLoad), 'function');
 check (!LoadVars.prototype.hasOwnProperty('loaded'));
 check_equals (typeof(loadvarsObj.loaded), 'undefined');
 
+x = new LoadVars;
+
+r = new Object;
+check(!r.hasOwnProperty("loaded"));
+check_equals(x.sendAndLoad("some server name", r), true);
+check(r.hasOwnProperty("loaded"));
+
+r = new XML;
+check(!r.hasOwnProperty("loaded"));
+check_equals(x.sendAndLoad("some server name", r), true);
+check(!r.hasOwnProperty("loaded"));
+check_equals(typeof(r.loaded), "boolean");
+check_equals(r.loaded, false);
+
+r = new LoadVars;
+check(!r.hasOwnProperty("loaded"));
+check_equals(x.sendAndLoad("some server name", r), true);
+check(r.hasOwnProperty("loaded"));
+check_equals(typeof(r.loaded), "boolean");
+check_equals(r.loaded, false);
+
+r = new Date(1);
+check(!r.hasOwnProperty("loaded"));
+check_equals(x.sendAndLoad("some server name", r), true);
+check(r.hasOwnProperty("loaded"));
+check_equals(typeof(r.loaded), "boolean");
+check_equals(r.loaded, false);
+t = new Date(1);
+check_equals(r.toString(), t.toString());
+check(r instanceOf Date);
+
+r = 3;
+check(!r.hasOwnProperty("loaded"));
+check_equals(x.sendAndLoad("some server name", r), false);
+check(!r.hasOwnProperty("loaded"));
+check_equals(typeof(r.loaded), "undefined");
+check_equals(r.loaded, undefined);
+
+r = "string";
+check(!r.hasOwnProperty("loaded"));
+check_equals(x.sendAndLoad("some server name", r), false);
+check(!r.hasOwnProperty("loaded"));
+check_equals(typeof(r.loaded), "undefined");
+check_equals(r.loaded, undefined);
+
+r = {};
+check(!r.hasOwnProperty("loaded"));
+check_equals(x.sendAndLoad("some server name", r), true);
+check(r.hasOwnProperty("loaded"));
+check_equals(typeof(r.loaded), "boolean");
+check_equals(r.loaded, false);
+
 //--------------------------------------------------------------------------
 // Test LoadVars::load()
 //--------------------------------------------------------------------------
@@ -165,7 +217,7 @@ loadvarsObj.onLoad = function(success) {
 		// Gnash insists in looking for an ending & char !!		
 		check_equals(loadvarsObj['var3'], 'val3\n');
 
-		check_totals(72);
+		check_totals(107);
 
 		play();
 	}
@@ -203,7 +255,6 @@ loadvarsObj.var1 = "previous val1";
 // not start with a '?' char.
 // 
 check( loadvarsObj instanceOf LoadVars );
-//check( loadvarsObj.sendAndLoad( 'http://localhost/vars.php', loadvarsObj ) );
 check( loadvarsObj.load( MEDIA(vars.txt) ) );
 check_equals(typeof(this.loaded), 'undefined');
 //loadvarsObj.load( 'vars.cgi' );

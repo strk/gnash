@@ -93,7 +93,7 @@ public:
 	///	If false, variables will be sent using the GET method.
 	///	If true (the default), variables will be sent using POST.
 	///
-	void sendAndLoad(const std::string& urlstr, LoadVars& target, bool post=true);
+	void sendAndLoad(const std::string& urlstr, as_object& target, bool post=true);
 
     void queueLoad(std::auto_ptr<IOChannel> str);
 
@@ -152,15 +152,6 @@ private:
 	/// Check for completed loading threads, fire
 	/// new threads if needed.
 	void checkLoads();
-
-	/// \brief
-	/// Add a load request to the queue, processing it
-	/// if no other loads are in progress.
-	///
-	/// @param postdata
-	///	URL-encoded post data. NULL for no post.
-	///
-	void addLoadVariablesThread(const std::string& urlstr, const char* postdata=NULL);
 
 	static as_value checkLoads_wrapper(const fn_call& fn);
 
@@ -325,37 +316,6 @@ LoadVars::getLoadVarsInterface()
 	return o.get();
 }
 
-void
-LoadVars::addLoadVariablesThread(const std::string& urlstr, const char* postdata)
-{
-	set_member(NSV::PROP_LOADED, false);
-
-	URL url(urlstr, get_base_url());
-
-	std::auto_ptr<IOChannel> str;
-	if ( postdata )
-    {
-        str.reset (StreamProvider::getDefaultInstance().getStream(
-                    url, std::string(postdata)) );
-    }
-	else
-    {
-        str.reset (StreamProvider::getDefaultInstance().getStream(url));
-    }
-
-	if (!str.get()) 
-	{
-		log_error(_("Can't load variables from %s (security?)"), url.str());
-		return;
-		// TODO: check if this is correct
-		//as_value nullValue; nullValue.set_null();
-		//callMethod(VM::get().getStringTable().find(PROPNAME("onData")), nullValue);
-	}
-
-	log_security(_("Loading variables file from url: '%s'"), url.str());
-    queueLoad(str);
-
-}
 
 void
 LoadVars::queueLoad(std::auto_ptr<IOChannel> str)
@@ -395,7 +355,27 @@ LoadVars::queueLoad(std::auto_ptr<IOChannel> str)
 void
 LoadVars::load(const std::string& urlstr)
 {
-	addLoadVariablesThread(urlstr);
+    // Set loaded property to false; will be updated (hopefully)
+    // when loading is complete.
+	set_member(NSV::PROP_LOADED, false);
+
+	URL url(urlstr, get_base_url());
+
+    // Checks whether access is allowed.
+    std::auto_ptr<IOChannel> str(StreamProvider::getDefaultInstance().getStream(url));
+
+	if (!str.get()) 
+	{
+		log_error(_("LoadVars.load(): Can't load variables from %s (security?)"), url.str());
+		return;
+		// TODO: check if this is correct
+		//as_value nullValue; nullValue.set_null();
+		//callMethod(VM::get().getStringTable().find(PROPNAME("onData")), nullValue);
+	}
+
+	log_security(_("Loading variables file from url: '%s'"), url.str());
+    queueLoad(str);
+
 }
 
 std::string
@@ -429,15 +409,39 @@ LoadVars::getURLEncodedProperties()
 }
 
 void
-LoadVars::sendAndLoad(const std::string& urlstr, LoadVars& target, bool post)
+LoadVars::sendAndLoad(const std::string& urlstr, as_object& target, bool post)
 {
+
+    /// All objects get a loaded member, set to false.
+    target.set_member(NSV::PROP_LOADED, false);
+
 	std::string querystring = getURLEncodedProperties();
-	if ( post ) {
-		target.addLoadVariablesThread(urlstr, querystring.c_str());
-	} else {
-		std::string url = urlstr + "?" + querystring;
-		target.addLoadVariablesThread(urlstr);
+
+	URL url(urlstr, get_base_url());
+
+	std::auto_ptr<IOChannel> str;
+	if (post)
+    {
+        str.reset(StreamProvider::getDefaultInstance().getStream(url, querystring));
+    }
+	else
+    {
+    	std::string url = urlstr + "?" + querystring;
+        str.reset(StreamProvider::getDefaultInstance().getStream(url));
+    }
+
+	if (!str.get()) 
+	{
+		log_error(_("Can't load variables from %s (security?)"), url.str());
+		return;
+		// TODO: check if this is correct
+		//as_value nullValue; nullValue.set_null();
+		//callMethod(VM::get().getStringTable().find(PROPNAME("onData")), nullValue);
 	}
+
+	log_security(_("Loading variables file from url: '%s'"), url.str());
+    target.queueLoad(str);
+	
 }
 
 /* private static */
@@ -594,14 +598,16 @@ loadvars_sendandload(const fn_call& fn)
 		return as_value(false);
 	}
 
-	boost::intrusive_ptr<LoadVars> target = boost::dynamic_pointer_cast<LoadVars>(fn.arg(1).to_object());
-	if ( ! target )
+	if (!fn.arg(1).is_object())
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("LoadVars.sendAndLoad(): invalid target (must be a LoadVars object)"));
+		    log_aserror(_("LoadVars.sendAndLoad(): invalid target (must be an object)"));
 		);
 		return as_value(false);
 	}
+
+
+	boost::intrusive_ptr<as_object> target = fn.arg(1).to_object();
 
 	// Post by default, override by ActionScript third argument
 	bool post = true;
