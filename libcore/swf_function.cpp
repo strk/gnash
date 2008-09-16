@@ -80,6 +80,10 @@ swf_function::getArguments(swf_function& callee, const fn_call& fn)
 	}
 	arguments->init_member(NSV::PROP_CALLEE, &callee);
 
+    // as_object cast is needed to avoid the as_function pointer being
+    // taken as a boolean value...
+	arguments->init_member(NSV::PROP_CALLER, as_value((as_object*)fn.caller));
+
 	return arguments;
 
 }
