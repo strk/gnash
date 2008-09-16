@@ -498,10 +498,10 @@ flag_preprocess(boost::uint8_t flgs, bool* douniq, bool* doindex)
 // Convenience function to process and extract flags from an as_value array
 // of flags (as passed to sortOn when sorting on multiple properties)
 std::deque<boost::uint8_t> 
-get_multi_flags(as_array_object::ArrayConstIterator itBegin, 
-    as_array_object::ArrayConstIterator itEnd, bool* uniq, bool* index)
+get_multi_flags(as_array_object::const_iterator itBegin, 
+    as_array_object::const_iterator itEnd, bool* uniq, bool* index)
 {
-    as_array_object::ArrayConstIterator it = itBegin;
+    as_array_object::const_iterator it = itBegin;
     std::deque<boost::uint8_t> flgs;
 
     // extract fUniqueSort and fReturnIndexedArray from first flag
@@ -553,7 +553,7 @@ as_array_object::get_indexed_elements()
     std::deque<indexed_as_value> indexed_elements;
     int i = 0;
 
-    for (ArrayConstIterator it = elements.begin(), e = elements.end();
+    for (as_array_object::const_iterator it = elements.begin(), e = elements.end();
         it != e; ++it)
     {
         indexed_elements.push_back(indexed_as_value(*it, i++));
@@ -561,13 +561,13 @@ as_array_object::get_indexed_elements()
     return indexed_elements;
 }
 
-as_array_object::ArrayConstIterator
+as_array_object::const_iterator
 as_array_object::begin()
 {
     return elements.begin();
 }
 
-as_array_object::ArrayConstIterator
+as_array_object::const_iterator
 as_array_object::end()
 {
     return elements.end();
@@ -591,7 +591,7 @@ as_array_object::index_requested(string_table::key name)
 void
 as_array_object::push(const as_value& val)
 {
-        size_t s=elements.size();
+        const ArrayContainer::size_type s = elements.size();
         elements.resize(s+1);
         elements[s] = val;
 }
@@ -607,9 +607,9 @@ as_value
 as_array_object::pop()
 {
     // If the array is empty, report an error and return undefined!
-    size_t sz = elements.size();
+    const ArrayContainer::size_type s = elements.size();
 
-    if ( ! sz )
+    if ( ! s )
     {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("tried to pop element from back of empty array, returning undef"));
@@ -617,9 +617,8 @@ as_array_object::pop()
         return as_value(); // undefined
     }
 
-    --sz;
-    as_value ret = elements[sz];
-    elements.resize(sz);
+    as_value ret = elements[s - 1];
+    elements.resize(s - 1);
 
     return ret;
 }
@@ -627,10 +626,10 @@ as_array_object::pop()
 as_value
 as_array_object::shift()
 {
-    size_t sz = elements.size();
+    const ArrayContainer::size_type s = elements.size();
 
     // If the array is empty, report an error and return undefined!
-    if ( ! sz )
+    if ( ! s )
     {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("tried to shift element from front of empty array, returning undef"));
@@ -647,15 +646,15 @@ as_array_object::shift()
 void
 as_array_object::reverse()
 {
-    size_t sz = elements.size();
-    if ( sz < 2 ) return; // nothing to do (CHECKME: might be a single hole!)
+    const ArrayContainer::size_type s = elements.size();
+    if ( s < 2 ) return; // nothing to do (CHECKME: might be a single hole!)
 
     // We create another container, as we want to fill the gaps
     // There could likely be an in-place version for this, but
     // filling the gaps would need more care
-    ArrayContainer newelements(sz);
+    ArrayContainer newelements(s);
 
-    for (size_t i=0, n=sz-1; i<sz; ++i, --n)
+    for (size_t i = 0, n = s - 1; i < s; ++i, --n)
     {
         newelements[i] = elements[n];
     }
@@ -675,22 +674,18 @@ as_array_object::join(const std::string& separator, as_environment*) const
 
     std::string temp;
 
-    //std::string temp = "("; // SWF > 7
+    const ArrayContainer::size_type s = elements.size();
 
-    size_t sz = elements.size();
-
-    if ( sz ) 
+    if ( s ) 
     {
         int swfversion = _vm.getSWFVersion();
 
-        for (size_t i=0; i<sz; ++i)
+        for (size_t i = 0; i < s; ++i)
         {
             if ( i ) temp += separator;
             temp += elements[i].to_string_versioned(swfversion);
         }
     }
-
-    // temp += ")"; // SWF > 7
 
     return temp;
 
@@ -699,7 +694,7 @@ as_array_object::join(const std::string& separator, as_environment*) const
 void
 as_array_object::concat(const as_array_object& other)
 {
-    for (size_t i=0, e=other.size(); i<e; i++)
+    for (ArrayContainer::size_type i = 0, e = other.size(); i < e; i++)
     {
         push(other.at(i));
     }
@@ -753,7 +748,7 @@ as_array_object::slice(unsigned int start, unsigned int one_past_end)
 bool
 as_array_object::removeFirst(const as_value& v)
 {
-    for (ArrayIterator it = elements.begin(), e = elements.end(); it != e; ++it)
+    for (iterator it = elements.begin(), e = elements.end(); it != e; ++it)
     {
         if ( v.equals(*it) )
         {
@@ -775,7 +770,7 @@ as_array_object::get_member(string_table::key name, as_value *val,
     if ( index >= 0 ) // a valid index was requested
     {
         size_t i = index;
-        ArrayConstIterator it = elements.find(i);
+        const_iterator it = elements.find(i);
         if ( it != elements.end() && it.index() == i )
         {
             *val = *it;
@@ -795,7 +790,7 @@ as_array_object::hasOwnProperty(string_table::key name, string_table::key nsname
     if ( index >= 0 ) // a valid index was requested
     {
         size_t i = index;
-        ArrayConstIterator it = elements.find(i);
+        const_iterator it = elements.find(i);
         if ( it != elements.end() && it.index() == i )
         {
             return true;
@@ -814,7 +809,7 @@ as_array_object::delProperty(string_table::key name, string_table::key nsname)
     if ( index >= 0 ) // a valid index was requested
     {
         size_t i = index;
-        ArrayConstIterator it = elements.find(i);
+        const_iterator it = elements.find(i);
         if ( it != elements.end() && it.index() == i )
         {
             elements.erase_element(i);
@@ -1070,7 +1065,7 @@ array_sortOn(const fn_call& fn)
         std::deque<as_cmp_fn> cmp;
         std::deque<as_cmp_fn> eq;
 
-        for (as_array_object::ArrayConstIterator it = props->begin();
+        for (as_array_object::const_iterator it = props->begin();
             it != props->end(); ++it)
         {
             string_table::key s = st.find(PROPNAME((*it).to_string_versioned(version)));
@@ -1091,7 +1086,7 @@ array_sortOn(const fn_call& fn)
                 ensureType<as_array_object>(fn.arg(1).to_object());
             if (farray->size() == optnum)
             {
-                as_array_object::ArrayConstIterator 
+                as_array_object::const_iterator 
                     fBegin = farray->begin(),
                     fEnd = farray->end();
 
@@ -1560,7 +1555,7 @@ void
 as_array_object::enumerateNonProperties(as_environment& env) const
 {
     std::stringstream ss; 
-    for (ArrayConstIterator it = elements.begin(),
+    for (const_iterator it = elements.begin(),
         itEnd = elements.end(); it != itEnd; ++it)
     {
         int idx = it.index();
@@ -1584,7 +1579,7 @@ as_array_object::shiftElementsLeft(unsigned int count)
 
     for (unsigned int i=0; i<count; ++i) v.erase_element(i);
 
-    for (ArrayIterator i=v.begin(), e=v.end(); i!=e; ++i)
+    for (iterator i=v.begin(), e=v.end(); i!=e; ++i)
     {
         int currentIndex = i.index();
         int newIndex = currentIndex-count;
@@ -1653,7 +1648,7 @@ as_array_object::splice(unsigned int start, unsigned int count, const std::vecto
 void
 as_array_object::markReachableResources() const
 {
-    for (ArrayConstIterator i=elements.begin(), e=elements.end(); i!=e; ++i)
+    for (const_iterator i=elements.begin(), e=elements.end(); i!=e; ++i)
     {
         (*i).setReachable();
     }
@@ -1666,7 +1661,7 @@ as_array_object::visitPropertyValues(AbstractPropertyVisitor& visitor) const
 {
     std::stringstream ss; 
     string_table& st = getVM().getStringTable();
-    for (ArrayConstIterator i=elements.begin(), ie=elements.end(); i!=ie; ++i)
+    for (const_iterator i=elements.begin(), ie=elements.end(); i!=ie; ++i)
     {
         int idx = i.index();
         ss.str(""); ss << idx;
@@ -1683,7 +1678,7 @@ as_array_object::visitNonHiddenPropertyValues(AbstractPropertyVisitor& visitor) 
 {
     std::stringstream ss; 
     string_table& st = getVM().getStringTable();
-    for (ArrayConstIterator i=elements.begin(), ie=elements.end(); i!=ie; ++i)
+    for (const_iterator i=elements.begin(), ie=elements.end(); i!=ie; ++i)
     {
         // TODO: skip hidden ones
         int idx = i.index();

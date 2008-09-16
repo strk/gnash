@@ -60,12 +60,14 @@ struct blank {};
 class as_array_object : public as_object
 {
 
-public:
-
+    /// Other classes shouldn't care about this, but should rather use
+    /// the public iterator / const_iterator members.
 	typedef boost::numeric::ublas::mapped_vector<as_value> ArrayContainer;
 
-	typedef ArrayContainer::const_iterator ArrayConstIterator;
-	typedef ArrayContainer::iterator ArrayIterator;
+public:
+
+	typedef ArrayContainer::const_iterator const_iterator;
+	typedef ArrayContainer::iterator iterator;
 
 	typedef std::list<as_value> ValueList;
 
@@ -83,7 +85,7 @@ public:
 		ArrayContainer copy = elements;
 
 		// iterating this way will skip holes
-		for (ArrayIterator i=copy.begin(), ie=copy.end(); i!=ie; ++i)
+		for (as_array_object::iterator i=copy.begin(), ie=copy.end(); i!=ie; ++i)
 			v.visit(*i);
 	}
 
@@ -125,9 +127,9 @@ public:
 
 	std::deque<indexed_as_value> get_indexed_elements();
 
-	ArrayConstIterator begin();
+	as_array_object::const_iterator begin();
 
-	ArrayConstIterator end();
+	as_array_object::const_iterator end();
 
 	/// Push an element to the end of the array
 	//
