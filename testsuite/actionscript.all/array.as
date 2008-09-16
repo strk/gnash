@@ -706,6 +706,7 @@ check_equals(count, 1); // the returned array contains an actual value, not an h
 //-------------------------------
 
 var c = new Array(10);
+check_equals(c.constructor, Array);
 check (a instanceOf Array);
 check_equals ( typeof(c), "object" );
 check_equals ( c.length, 10 );
@@ -1465,11 +1466,11 @@ check_equals(a[1], 'overridden'); // flag was lost
 
 
 #if OUTPUT_VERSION < 6
- check_totals(496);
+ check_totals(497);
 #else
 # if OUTPUT_VERSION < 7
-  check_totals(557);
+  check_totals(558);
 # else
-  check_totals(567);
+  check_totals(568);
 # endif
 #endif
