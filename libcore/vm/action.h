@@ -49,7 +49,9 @@ namespace gnash {
 	///
 	DSOEXPORT as_value call_method(const as_value& method, as_environment* env,
 		as_object* this_ptr, // this is ourself
-		std::auto_ptr<std::vector<as_value> > args, as_object* super=NULL);
+		std::auto_ptr<std::vector<as_value> > args,
+        as_object* super=0, // the super object
+        const as_function* caller=0); // the caller function
 
 
 }	// end namespace gnash
