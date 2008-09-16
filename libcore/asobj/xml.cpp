@@ -92,11 +92,10 @@ XML::XML()
     _bytesTotal(-1),
     _bytesLoaded(-1)
 {
-    //GNASH_REPORT_FUNCTION;
 #ifdef DEBUG_MEMORY_ALLOCATION
     log_debug(_("Creating XML data at %p"), this);
 #endif
-    //log_debug("%s: %p", __FUNCTION__, this);
+
     attachXMLProperties(*this);
 }
 
@@ -114,10 +113,10 @@ XML::XML(const std::string& xml_in)
     _bytesTotal(-1),
     _bytesLoaded(-1)
 {
-    //GNASH_REPORT_FUNCTION;
 #ifdef DEBUG_MEMORY_ALLOCATION
     log_debug(_("Creating XML data at %p"), this);
 #endif
+
     parseXML(xml_in);
 }
 
@@ -366,13 +365,6 @@ XML::parseXML(const std::string& xml_in)
 void
 XML::queueLoad(std::auto_ptr<IOChannel> str)
 {
-    //GNASH_REPORT_FUNCTION;
-
-    // Set the "loaded" parameter to false
-    VM& vm = getVM();
-    string_table& st = vm.getStringTable();
-    string_table::key loadedKey = st.find("loaded");
-    set_member(loadedKey, as_value(false));
 
     bool startTimer = _loadThreads.empty();
 
@@ -521,8 +513,9 @@ bool
 XML::load(const URL& url)
 {
     GNASH_REPORT_FUNCTION;
-  
-    //log_debug(_("%s: mem is %d"), __FUNCTION__, mem);
+
+    // Set a loaded property to false before starting the load.
+    set_member(NSV::PROP_LOADED, false);
 
     std::auto_ptr<IOChannel> str ( StreamProvider::getDefaultInstance().getStream(url) );
     if ( ! str.get() ) 
@@ -566,9 +559,10 @@ XML::cleanupStackFrames(XMLNode * /* xml */)
 /// If multiple calls are made to set the same header name, each
 /// successive value replaces the value set in the previous call.
 void
-XML::addRequestHeader(const char * /* name */, const char * /* value */)
+XML::addRequestHeader(const curl_adapter::RequestHeader::value_type& headerPair)
 {
-    log_unimpl (__FUNCTION__);
+    /// Replace existing values.
+    _headers[headerPair.first] = headerPair.second;
 }
 
 
@@ -578,10 +572,12 @@ XML::send()
     log_unimpl (__FUNCTION__);
 }
 
-bool
-XML::sendAndLoad(const URL& url, XML& target)
+void
+XML::sendAndLoad(const URL& url, as_object& target)
 {
-    //GNASH_REPORT_FUNCTION;
+
+    /// All objects get a loaded member, set to false.
+    target.set_member(NSV::PROP_LOADED, false);
 
     std::stringstream ss;
     toString(ss);
@@ -595,23 +591,32 @@ XML::sendAndLoad(const URL& url, XML& target)
     {
        log_unimpl ("Custom ContentType (%s) in XML.sendAndLoad", ctypeVal);
     }
-  
-    //log_debug(_("%s: mem is %d"), __FUNCTION__, mem);
 
-    std::auto_ptr<IOChannel> str ( StreamProvider::getDefaultInstance().getStream(url, data) );
-    if ( ! str.get() ) 
+    std::auto_ptr<IOChannel> stream;
+
+    if (_headers.empty())
+    {
+        stream.reset(StreamProvider::getDefaultInstance().getStream(url, data));
+    }
+    else
+    {
+        log_debug("With headers");
+        stream = StreamProvider::getDefaultInstance().getStream(url, data, _headers);
+        // Clear the headers for next send and load? Probably not.
+    }
+
+    if (!stream.get()) 
     {
         log_error(_("Can't load XML file: %s (security?)"), url.str());
-        return false;
+        return;
         // TODO: this is still not correct.. we should still send onData later...
         //as_value nullValue; nullValue.set_null();
         //callMethod(NSV::PROP_ON_DATA, nullValue);
     }
 
     log_security(_("Loading XML file from url: '%s'"), url.str());
-    target.queueLoad(str);
-
-    return true;
+    target.queueLoad(stream);
+    
 }
 
 
@@ -697,9 +702,6 @@ xml_new(const fn_call& fn)
 {
     as_value      inum;
     boost::intrusive_ptr<XML> xml_obj;
-    //const char    *data;
-  
-    // log_debug(_("%s: nargs=%d"), __FUNCTION__, fn.nargs);
   
     if ( fn.nargs > 0 )
     {
@@ -709,7 +711,7 @@ xml_new(const fn_call& fn)
             xml_obj = boost::dynamic_pointer_cast<XML>(obj);
             if ( xml_obj )
             {
-                log_debug(_("\tCloned the XML object at %p"), (void *)xml_obj.get());
+                log_debug(_("Cloned the XML object at %p"), (void *)xml_obj.get());
                 return as_value(xml_obj->cloneNode(true).get());
             }
         }
@@ -743,13 +745,24 @@ xml_new(const fn_call& fn)
 as_value xml_addrequestheader(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
-    log_debug(_("%s: %d args"), __PRETTY_FUNCTION__, fn.nargs);
+
+    std::ostringstream ss;
+    fn.dump_args(ss);
+    log_debug ("addRequestHeader: %s", ss.str());
+
+	boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);    
+
+    curl_adapter::RequestHeader headers;
     
-//    return as_value(ptr->getAllocated());
-//    ptr->addRequestHeader();
-    log_unimpl (__FUNCTION__);
+    for (size_t i = 0, e = fn.nargs / 2; i != e; ++i)
+    {
+        ptr->addRequestHeader(std::make_pair(fn.arg(i * 2).to_string(),
+                              fn.arg(i * 2 + 1).to_string()));
+    }
+    
     return as_value();
 }
+
 
 /// \brief create a new XML element
 ///
@@ -759,11 +772,9 @@ as_value xml_addrequestheader(const fn_call& fn)
 /// created XML object that represents the element. This method and
 /// the XML.createTextNode() method are the constructor methods for
 /// creating nodes for an XML object. 
-
 static as_value
 xml_createelement(const fn_call& fn)
 {
-//    GNASH_REPORT_FUNCTION;
     
     if (fn.nargs > 0) {
         const std::string& text = fn.arg(0).to_string();
@@ -779,6 +790,7 @@ xml_createelement(const fn_call& fn)
     return as_value();
 }
 
+
 /// \brief Create a new XML node
 /// 
 /// Method; creates a new XML text node with the specified text. The
@@ -787,23 +799,21 @@ xml_createelement(const fn_call& fn)
 /// object that represents the new text node. This method and the
 /// XML.createElement() method are the constructor methods for
 /// creating nodes for an XML object.
-
 as_value
 xml_createtextnode(const fn_call& fn)
 {
-//    GNASH_REPORT_FUNCTION;
 
     XMLNode *xml_obj;
 
     if (fn.nargs > 0) {
-	const std::string& text = fn.arg(0).to_string();
-	xml_obj = new XMLNode;
-	xml_obj->nodeValueSet(text);
-	xml_obj->nodeTypeSet(XMLNode::tText);
-	return as_value(xml_obj);
-//	log_debug(_("%s: xml obj is %p"), __PRETTY_FUNCTION__, xml_obj);
-    } else {
-	log_error(_("no text for text node creation"));
+        const std::string& text = fn.arg(0).to_string();
+        xml_obj = new XMLNode;
+        xml_obj->nodeValueSet(text);
+        xml_obj->nodeTypeSet(XMLNode::tText);
+        return as_value(xml_obj);
+    }
+    else {
+        log_error(_("no text for text node creation"));
     }
     return as_value();
 }
@@ -826,7 +836,7 @@ as_value xml_getbytestotal(const fn_call& fn)
 
 as_value xml_parsexml(const fn_call& fn)
 {
-    //GNASH_REPORT_FUNCTION;
+
     as_value	method;
     as_value	val;    
     boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
@@ -852,11 +862,14 @@ as_value xml_send(const fn_call& fn)
     GNASH_REPORT_FUNCTION;
     boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
     
-//    return as_value(ptr->getAllocated());
     ptr->send();
     return as_value();
 }
 
+/// Returns true if the arguments are valid, otherwise false. The
+/// success of the connection is irrelevant.
+/// The second argument must be an object, but does not have to 
+/// be an XML object.
 static as_value
 xml_sendandload(const fn_call& fn)
 {
@@ -876,34 +889,26 @@ xml_sendandload(const fn_call& fn)
 
     const std::string& filespec = fn.arg(0).to_string();
 
+    if (!fn.arg(1).is_object())
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        std::ostringstream ss;
+        fn.dump_args(ss);
+        log_aserror(_("XML.sendAndLoad(%s): second argument is not "
+                "an object"), ss.str());
+        );
+
+        return as_value(false);
+    }
+
     boost::intrusive_ptr<as_object> targetObj = fn.arg(1).to_object();
-    if ( ! targetObj )
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        std::ostringstream ss;
-        fn.dump_args(ss);
-        log_aserror(_("XML.sendAndLoad(%s): second argument doesn't "
-                "cast to an object"), ss.str());
-        );
-        return as_value(false);
-    }
-    XML* target = dynamic_cast<XML*>(targetObj.get());
-    if (!target)
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        std::ostringstream ss;
-        fn.dump_args(ss);
-        log_aserror(_("XML.sendAndLoad(%s): second argument is "
-                "not an XML object"), ss.str());
-        );
-        return as_value(false);
-    }
+    assert(targetObj);
 
     URL url(filespec, get_base_url());
 
-    bool ret = ptr->sendAndLoad(url, *target);
+    ptr->sendAndLoad(url, *targetObj);
 
-    return as_value(ret); // TODO: check expected return values
+    return as_value(true);
 }
 
 static as_value

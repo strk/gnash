@@ -364,6 +364,9 @@ public:
 	///	The url-encoded post data.
 	///
 	CurlStreamFile(const std::string& url, const std::string& vars);
+	
+	CurlStreamFile(const std::string& url, const std::string& vars,
+	               const curl_adapter::RequestHeader& headers);
 
 	~CurlStreamFile();
 
@@ -889,6 +892,61 @@ CurlStreamFile::CurlStreamFile(const std::string& url, const std::string& vars)
 }
 
 /*public*/
+CurlStreamFile::CurlStreamFile(const std::string& url, const std::string& vars, const curl_adapter::RequestHeader& headers)
+{
+	log_debug("CurlStreamFile %p created", this);
+	init(url);
+	
+    curl_slist *headerList = 0;
+    
+    for (curl_adapter::RequestHeader::const_iterator i = headers.begin(),
+         e = headers.end(); i != e; ++i)
+    {
+        std::ostringstream os;
+        os << i->first << ": " << i->second;
+        headerList = curl_slist_append(headerList, os.str().c_str());
+    }
+
+    curl_easy_setopt(_handle, CURLOPT_HTTPHEADER, headerList);
+
+//    curl_slist_free_all(headerList);
+
+	_postdata = vars;
+
+	CURLcode ccode;
+
+	ccode = curl_easy_setopt(_handle, CURLOPT_POST, 1);
+	if ( ccode != CURLE_OK ) {
+		throw gnash::GnashException(curl_easy_strerror(ccode));
+	}
+
+	// libcurl needs to access the POSTFIELDS during 'perform' operations,
+	// so we must use a string whose lifetime is ensured to be longer then
+	// the multihandle itself.
+	// The _postdata member should meet this requirement
+	ccode = curl_easy_setopt(_handle, CURLOPT_POSTFIELDS, _postdata.c_str());
+	if ( ccode != CURLE_OK ) {
+		throw gnash::GnashException(curl_easy_strerror(ccode));
+	}
+
+	// This is to support binary strings as postdata
+	// NOTE: in version 7.11.1 CURLOPT_POSTFIELDSIZE_LARGE was added
+	//       this one takes a long, that one takes a curl_off_t
+	//
+	ccode = curl_easy_setopt(_handle, CURLOPT_POSTFIELDSIZE, _postdata.size());
+	if ( ccode != CURLE_OK ) {
+		throw gnash::GnashException(curl_easy_strerror(ccode));
+	}
+
+	CURLMcode mcode = curl_multi_add_handle(_mhandle, _handle);
+	if ( mcode != CURLM_OK ) {
+		throw gnash::GnashException(curl_multi_strerror(mcode));
+	}
+
+}
+
+
+/*public*/
 CurlStreamFile::~CurlStreamFile()
 {
 	log_debug("CurlStreamFile %p deleted", this);
@@ -1213,6 +1271,24 @@ make_stream(const char* url, const std::string& postdata)
 
 	return stream;
 }
+
+DSOEXPORT IOChannel* makeStream(const std::string& url, const std::string& postdata,
+                                const RequestHeader& headers)
+{
+
+	std::auto_ptr<CurlStreamFile> stream;
+
+	try {
+		stream.reset(new CurlStreamFile(url, postdata, headers));
+	}
+	catch (const std::exception& ex) {
+		gnash::log_error("curl stream: %s", ex.what());
+	}
+
+    return stream.release();
+
+}
+
 
 } // namespace curl_adapter
 } // namespace gnash

@@ -30,7 +30,6 @@
 #include "URL.h"
 #include "tu_file.h"
 #ifdef USE_CURL
-//# include <curl/curl.h>
 # include "curl_adapter.h"
 #endif
 #include "URLAccessManager.h"
@@ -103,16 +102,43 @@ StreamProvider::getStream(const URL& url)
 		}
 #else
 		log_error(_("Unsupported network connection %s"),
-				 url.str().c_str());
+				 url.str());
 		return NULL;
 #endif
 	}
 }
 
+std::auto_ptr<IOChannel>
+StreamProvider::getStream(const URL& url, const std::string& postdata,
+                          const curl_adapter::RequestHeader& headers)
+{
+    if (url.protocol() == "file")
+    {
+        log_error("Request Headers discarded while getting stream from file: uri");
+        return std::auto_ptr<IOChannel>(getStream(url, postdata));
+    }
+
+    std::auto_ptr<IOChannel> ret;
+
+#ifdef USE_CURL
+
+	std::string url_str = url.str();
+	const char* c_url = url_str.c_str();
+	if ( URLAccessManager::allow(url) ) {
+		ret.reset(curl_adapter::makeStream(c_url, postdata, headers));
+	}
+	return ret;
+
+#else
+    log_error("Unsupported network connection %s", url.str());
+    return ret;
+#endif
+
+}
+
 IOChannel*
 StreamProvider::getStream(const URL& url, const std::string& postdata)
 {
-//    GNASH_REPORT_FUNCTION;
 
 	if (url.protocol() == "file")
 	{
@@ -145,7 +171,7 @@ StreamProvider::getStream(const URL& url, const std::string& postdata)
 		}
 #else
 		log_error(_("Unsupported network connection %s"),
-				url.str().c_str());
+				url.str());
 		return NULL;
 #endif
 	}

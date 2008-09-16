@@ -24,6 +24,7 @@
 #include "xmlnode.h"
 #include "log.h"
 #include "dsodefs.h"
+#include "curl_adapter.h"
 
 #include <vector>
 #include <sstream>
@@ -131,12 +132,11 @@ public:
     
     XMLNode *processNode(xmlTextReaderPtr reader, XMLNode *node);
 
-    void  change_stack_frame(int frame, gnash::as_object *xml, gnash::as_environment *env);
+    void change_stack_frame(int frame, gnash::as_object *xml, gnash::as_environment *env);
 
-    void  cleanupStackFrames( XMLNode *data);
+    void cleanupStackFrames( XMLNode *data);
 
-    // These 6 have to 
-    void addRequestHeader(const char *name, const char *value);
+    void addRequestHeader(const curl_adapter::RequestHeader::value_type&);
 
     XMLNode *createElement(const char *name);
 
@@ -144,7 +144,8 @@ public:
 
     void send();
 
-    bool sendAndLoad(const URL& url, XML& target);
+    /// ActionScript doesn't care about the success of the connection.
+    void sendAndLoad(const URL& url, as_object& target);
 
     /// @return -1 if no loaded was started yet
     long int getBytesLoaded() const;
@@ -222,6 +223,9 @@ private:
 
     long int _bytesTotal;
     long int _bytesLoaded;
+    
+    curl_adapter::RequestHeader _headers;
+    
 };
 
 
