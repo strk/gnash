@@ -755,8 +755,8 @@ myxml.onLoad = function(success)
 
 	topnode = myxml.firstChild;
 #if OUTPUT_VERSION == 5
-	check_equals(topnode.nodeName, null);
-	check_equals(topnode.attributes.attr1, undefined);
+	xcheck_equals(topnode.nodeName, null);
+	xcheck_equals(topnode.attributes.attr1, undefined);
 #else
 	check_equals(topnode.nodeName, 'XML');
 	check_equals(topnode.attributes.attr1, 'attr1 value');
@@ -772,7 +772,7 @@ myxml.onLoad = function(success)
 		check_equals(myxml.childNodes.length, myxml.lastChildNodesCount);
 	}
 #if OUTPUT_VERSION == 5
-	check_equals(myxml.childNodes.length, 4); // gnash fails discarding the comment and the ending blanks
+	xcheck_equals(myxml.childNodes.length, 4); // gnash fails discarding the comment and the ending blanks
 #else
 	check_equals(myxml.childNodes.length, 3); // gnash fails discarding the comment and the ending blanks
 #endif
