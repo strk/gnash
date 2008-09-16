@@ -49,6 +49,7 @@
 #include <vector>
 #include <boost/algorithm/string/case_conv.hpp>
 #include <memory>
+#include <functional> // std::make_pair
 
 namespace gnash {
   
@@ -742,24 +743,36 @@ xml_new(const fn_call& fn)
 as_value
 xml_addrequestheader(const fn_call& fn)
 {
+
     GNASH_REPORT_FUNCTION;
+    
+	boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);   
 
     std::ostringstream ss;
     fn.dump_args(ss);
     log_debug ("addRequestHeader: %s", ss.str());
 
-    if (fn.nargs < 2)
+    if (fn.nargs == 0)
     {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("XML.addRequestHeader requires at least one argument"));
+        );
         return as_value();
     }
-    // TODO: handle array.
+    
+    if (fn.nargs < 2)
+    {
+        // TODO: handle array.
+        log_unimpl(_("Array argument to XML.addRequestHeader"));
+        return as_value();
+    }
 
-	boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);    
-
+    // TODO: should we ignore orphaned arguments like this?
     for (size_t i = 0, e = fn.nargs / 2; i != e; ++i)
     {
-        ptr->addRequestHeader(std::make_pair(fn.arg(i * 2).to_string(),
-                              fn.arg(i * 2 + 1).to_string()));
+        const std::string& name = fn.arg(i * 2).to_string();
+        const std::string& val = fn.arg(i * 2 + 1).to_string();
+        ptr->addRequestHeader(std::make_pair(name, val));
     }
     
     return as_value();
