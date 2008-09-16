@@ -19,6 +19,7 @@
 #define __GNASH_BUILTIN_FUNCTION_H__
 
 #include "as_function.h" // for inheritance
+#include "fn_call.h" // for call operator
 #include "as_environment.h" // for FrameGuard
 #include "namedStrings.h"
 
@@ -82,7 +83,7 @@ public:
 	/// Invoke this function or this Class constructor
 	virtual as_value operator()(const fn_call& fn)
 	{
-		as_environment::FrameGuard guard(this);
+		as_environment::FrameGuard guard(fn.env(), this);
 		assert(_func);
 		return _func(fn);
 	}

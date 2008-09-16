@@ -125,7 +125,7 @@ as_value
 swf_function::operator()(const fn_call& fn)
 {
 	// Set up local stack frame, for parameters and locals.
-	as_environment::FrameGuard guard(this);
+	as_environment::FrameGuard guard(fn.env(), this);
 
 	as_environment*	our_env = m_env;
 	assert(our_env);

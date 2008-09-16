@@ -28,7 +28,8 @@
 #include "Property.h"
 #include "as_object.h"
 #include "namedStrings.h"
-#include "as_function.h" // for as_environment::CallFrame::markReachableResources
+#include "as_function.h" 
+#include "CallStack.h"
 
 #include <cstring> // std::strpbrk
 #include <string>
@@ -44,14 +45,13 @@
 
 namespace gnash {
 
-as_environment::CallStack as_environment::_localFrames = as_environment::CallStack();
-
 as_value as_environment::undefVal;
 
 as_environment::as_environment(VM& vm)
 	:
 	_vm(vm),
 	_stack(_vm.getStack()),
+	_localFrames(_vm.getCallStack()),
 	m_target(0),
 	_original_target(0)
 {
@@ -424,7 +424,7 @@ as_environment::set_local(const std::string& varname, const as_value& val)
 	{
 		// Not in frame; create a new local var.
 		assert( ! varname.empty() ); // null varnames are invalid!
-		LocalVars& locals = _localFrames.back().locals;
+		as_object* locals = _localFrames.back().locals;
 		//locals.push_back(as_environment::frame_slot(varname, val));
 		locals->set_member(varkey, val);
 	}
@@ -440,7 +440,7 @@ as_environment::declare_local(const std::string& varname)
 		// Not in frame; create a new local var.
 		assert( ! _localFrames.empty() );
 		assert( ! varname.empty() );	// null varnames are invalid!
-		LocalVars& locals = _localFrames.back().locals;
+		as_object* locals = _localFrames.back().locals;
 		//locals.push_back(as_environment::frame_slot(varname, as_value()));
 		locals->set_member(_vm.getStringTable().find(varname), as_value());
 	}
@@ -790,11 +790,11 @@ as_environment::dump_local_registers(std::ostream& out) const
 }
 
 static void
-dump(const as_environment::LocalVars& locals, std::ostream& out)
+dump(const as_object* locals, std::ostream& out)
 {
 	typedef std::map<std::string, as_value> PropMap;
 	PropMap props;
-	const_cast<as_object*>(locals.get())->dump_members(props);
+	const_cast<as_object*>(locals)->dump_members(props);
 	
 	//log_debug("FIXME: implement dumper for local variables now that they are simple objects");
 	int count = 0;
@@ -854,26 +854,26 @@ as_environment::findLocal(const std::string& varname, as_value& ret, as_object**
 	if ( _localFrames.empty() ) return false;
 	if ( findLocal(_localFrames.back().locals, varname, ret) )
 	{
-		if ( retTarget ) *retTarget = _localFrames.back().locals.get();
+		if ( retTarget ) *retTarget = _localFrames.back().locals;
 		return true;
 	}
 	return false;
 }
 
-/* static private */
+/* private */
 bool
-as_environment::findLocal(LocalVars& locals, const std::string& name, as_value& ret)
+as_environment::findLocal(as_object* locals, const std::string& name, as_value& ret)
 {
 	// TODO: get VM passed as arg
-	return locals->get_member(VM::get().getStringTable().find(name), &ret);
+	return locals->get_member(_vm.getStringTable().find(name), &ret);
 }
 
-/* static private */
+/* private */
 bool
-as_environment::delLocal(LocalVars& locals, const std::string& varname)
+as_environment::delLocal(as_object* locals, const std::string& varname)
 {
 	// TODO: get VM passed as arg
-	return locals->delProperty(VM::get().getStringTable().find(varname)).second;
+	return locals->delProperty(_vm.getStringTable().find(varname)).second;
 }
 
 /* private */
@@ -892,13 +892,12 @@ as_environment::setLocal(const std::string& varname, const as_value& val)
 	return setLocal(_localFrames.back().locals, varname, val);
 }
 
-/* static private */
+/* private */
 bool
-as_environment::setLocal(LocalVars& locals,
+as_environment::setLocal(as_object* locals,
 		const std::string& varname, const as_value& val)
 {
-	// TODO: get VM passed as arg
-	Property* prop = locals->getOwnProperty(VM::get().getStringTable().find(varname));
+	Property* prop = locals->getOwnProperty(_vm.getStringTable().find(varname));
 	if ( ! prop ) return false;
 	prop->setValue(*locals, val);
 	return true;
@@ -967,16 +966,9 @@ as_environment::add_local(const std::string& varname, const as_value& val)
 {
 	assert( ! varname.empty() );	// null varnames are invalid!
 	assert( ! _localFrames.empty() );
-	LocalVars& locals = _localFrames.back().locals;
+	as_object* locals = _localFrames.back().locals;
 	//locals.push_back(frame_slot(varname, val));
 	locals->set_member(_vm.getStringTable().find(varname), val);
-}
-
-as_environment::CallFrame::CallFrame(as_function* funcPtr)
-	:
-	locals(new as_object()),
-	func(funcPtr)
-{
 }
 
 void
@@ -1002,21 +994,6 @@ as_environment::dump_stack(std::ostream& out, unsigned int limit) const
 }
 
 #ifdef GNASH_USE_GC
-/// Mark all reachable resources
-//
-/// Reachable resources would be registers and
-/// locals (expected to be empty?) and function.
-void
-as_environment::CallFrame::markReachableResources() const
-{
-	if ( func ) func->setReachable();
-	for (Registers::const_iterator i=registers.begin(), e=registers.end(); i!=e; ++i)
-	{
-		i->setReachable();
-	}
-	if (locals)
-		locals->setReachable();
-}
 
 unsigned int
 as_environment::setRegister(unsigned int regnum, const as_value& v)
