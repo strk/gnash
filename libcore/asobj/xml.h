@@ -24,7 +24,7 @@
 #include "xmlnode.h"
 #include "log.h"
 #include "dsodefs.h"
-#include "curl_adapter.h"
+#include "NetworkAdapter.h"
 
 #include <vector>
 #include <sstream>
@@ -136,7 +136,7 @@ public:
 
     void cleanupStackFrames( XMLNode *data);
 
-    void addRequestHeader(const curl_adapter::RequestHeader::value_type&);
+    void addRequestHeader(const NetworkAdapter::RequestHeaders::value_type&);
 
     XMLNode *createElement(const char *name);
 
@@ -224,7 +224,7 @@ private:
     long int _bytesTotal;
     long int _bytesLoaded;
     
-    curl_adapter::RequestHeader _headers;
+    NetworkAdapter::RequestHeaders _headers;
     
 };
 

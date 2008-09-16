@@ -16,8 +16,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-#ifndef CURL_ADAPTER_H
-#define CURL_ADAPTER_H
+#ifndef NETWORK_ADAPTER_H
+#define NETWORK_ADAPTER_H
 
 #include "dsodefs.h"
 
@@ -29,12 +29,12 @@ namespace gnash {
 class IOChannel;
 
 /// Code to use libcurl as an IOChannel stream.
-namespace curl_adapter {
+namespace NetworkAdapter {
 
 /// Custom headers for addRequestHeader. These are case insensitive, and
 /// subsequent addition of a header already there replaces any previous one.
 /// Some values are not allowed.
-typedef std::map<std::string, std::string, StringNoCaseLessThen> RequestHeader;
+typedef std::map<std::string, std::string, StringNoCaseLessThen> RequestHeaders;
 
 /// \brief
 /// Returns a read-only IOChannel that fetches data
@@ -59,9 +59,9 @@ DSOEXPORT IOChannel* make_stream(const char* url);
 DSOEXPORT IOChannel* make_stream(const char* url, const std::string& postdata);
 
 DSOEXPORT IOChannel* makeStream(const std::string& url, const std::string& postdata,
-                                const RequestHeader& headers);
+                                const RequestHeaders& headers);
 
-} // namespace gnash::curl_adaptar
+}
 } // namespace gnash
 
 #endif // CURL_ADAPTER_H

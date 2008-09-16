@@ -20,7 +20,7 @@
 
 #include <map>
 #include <memory>
-#include "curl_adapter.h"
+#include "NetworkAdapter.h"
 
 // Forward declarations
 namespace gnash {
@@ -67,7 +67,7 @@ public:
 	virtual IOChannel* getStream(const URL& url, const std::string& postdata);
 	
 	virtual std::auto_ptr<IOChannel> getStream(const URL& url,
-	                    const std::string& postdata, const curl_adapter::RequestHeader& headers);
+	                    const std::string& postdata, const NetworkAdapter::RequestHeaders& headers);
 	
 };
 

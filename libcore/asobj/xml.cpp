@@ -559,7 +559,7 @@ XML::cleanupStackFrames(XMLNode * /* xml */)
 /// If multiple calls are made to set the same header name, each
 /// successive value replaces the value set in the previous call.
 void
-XML::addRequestHeader(const curl_adapter::RequestHeader::value_type& headerPair)
+XML::addRequestHeader(const NetworkAdapter::RequestHeaders::value_type& headerPair)
 {
     /// Replace existing values.
     _headers[headerPair.first] = headerPair.second;
@@ -737,12 +737,10 @@ xml_new(const fn_call& fn)
     return as_value(xml_obj.get());
 }
 
-//
-// SWF Property of this class. These are "accessors" into the private data
-// of the class.
-//
-
-as_value xml_addrequestheader(const fn_call& fn)
+/// Can take either a list of strings as arguments, alternately header
+/// and value, or an array.
+as_value
+xml_addrequestheader(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -750,10 +748,14 @@ as_value xml_addrequestheader(const fn_call& fn)
     fn.dump_args(ss);
     log_debug ("addRequestHeader: %s", ss.str());
 
+    if (fn.nargs < 2)
+    {
+        return as_value();
+    }
+    // TODO: handle array.
+
 	boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);    
 
-    curl_adapter::RequestHeader headers;
-    
     for (size_t i = 0, e = fn.nargs / 2; i != e; ++i)
     {
         ptr->addRequestHeader(std::make_pair(fn.arg(i * 2).to_string(),
