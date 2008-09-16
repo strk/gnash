@@ -30,12 +30,16 @@
 #include <ostream> // for inlines (dump_args)
 #include <sstream> // for inlines (dump_args)
 
+// Forward declarations
+namespace gnash {
+    class as_environment;
+    class as_function;
+    class as_object;
+    class as_value;
+}
+
 namespace gnash {
 
-// Forward declarations
-class as_environment;
-class as_object;
-class as_value;
 
 /// \brief
 /// Parameters/environment for builtin or user-defined functions
@@ -50,19 +54,22 @@ public:
 	/// The "super" object in this function call context
 	as_object* super;
 
+	/// The "caller" object in this function call context
+	const as_function* caller;
+
 	/// Number of arguments to this ActionScript function call.
 	unsigned int nargs;
 
 public:
 	fn_call(const fn_call& fn) : this_ptr(fn.this_ptr), super(fn.super),
-		nargs(fn.nargs), _env(fn._env)
+		caller(fn.caller), nargs(fn.nargs), _env(fn._env)
 	{
 		if ( fn._args.get() )
 			_args.reset(new std::vector<as_value>(*fn._args));
 	}
 
 	fn_call(const fn_call& fn, as_object* this_in, as_object* sup=NULL)
-		: this_ptr(this_in), super(sup), nargs(fn.nargs),
+		: this_ptr(this_in), super(sup), caller(0), nargs(fn.nargs),
 		_env(fn._env)
 	{
 		if ( fn._args.get() )
@@ -75,6 +82,7 @@ public:
 		:
 		this_ptr(this_in),
 		super(sup),
+		caller(0),
 		nargs(nargs_in),
 		_env(env_in)
 	{
@@ -88,6 +96,7 @@ public:
 		:
 		this_ptr(this_in),
 		super(sup),
+		caller(0),
 		nargs(args->size()),
 		_env(env_in),
 		_args(args)
@@ -99,6 +108,7 @@ public:
 		:
 		this_ptr(this_in),
 		super(0),
+		caller(0),
 		nargs(0),
 		_env(env_in),
 		_args(0)
