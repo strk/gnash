@@ -113,6 +113,7 @@ check_equals(typeof(tfObj.removeTextField), 'function');
 check_equals(typeof(tfObj.replaceSel), 'function');
 // this is a static method, it's available as TextField.getFontList
 check_equals(typeof(tfObj.getFontList), 'undefined');
+check_equals(typeof(tfObj._parent), 'undefined'); // no parent
 
 //--------------------------------------------------
 // Check textfield creation trough createTextField
@@ -923,9 +924,9 @@ _root._xscale = _root._yscale = 100;
 //------------------------------------------------------------
 
 #if OUTPUT_VERSION < 8
- check_totals(420);
-#else
  check_totals(421);
+#else
+ check_totals(422);
 #endif
 
 #else // OUTPUT_VERSION <= 5
