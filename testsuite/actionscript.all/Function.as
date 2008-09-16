@@ -147,10 +147,12 @@ nullcall = getThisName.call(null, 1, 2, 3);
  check_equals ( nullcall, 6 );
 #endif
 
-function getThis () { ++c; return this; }
+function getThis () { retCaller=arguments.caller; ++c; return this; }
 o={};
 c=0;
+retCaller = 'custom'; 
 ret = getThis.call(o);
+check_equals(typeof(retCaller), 'null');
 check_equals(ret, o);
 check_equals(c, 1);
 ret = getThis.call(null);
@@ -159,6 +161,15 @@ xcheck_equals(typeof(ret), 'object');
 xcheck_equals(ret, undefined); // an object type which returns 'undefined' as primitive value ?
 check( ! (ret === undefined) ); // an object type which returns 'undefined' as primitive value ?
 check( ! (ret === null) ); // an object type which returns 'undefined' as primitive value ?
+
+retCaller = 'custom'; 
+myCaller = function()
+{
+    getThis.call(o);
+};
+myCaller();
+check_equals(typeof(retCaller), 'function');
+check_equals(retCaller, myCaller); // note: it is not Function.prototype.call!
 
 #else // OUTPUT_VERSION < 6
 
@@ -412,7 +423,7 @@ function f()
     // callee: the function being called
     check_equals(arguments.callee, _root.f);
     // caller: the caller function
-    xcheck_equals(typeof(arguments.caller), 'null'); //? typeof return 'null', seems new!
+    check_equals(typeof(arguments.caller), 'null'); 
     check_equals(arguments.caller, null);
     
     var a = arguments;
@@ -433,7 +444,7 @@ function f()
     xcheck_equals(propRecorder.length, 5);
     check_equals(propRecorder[0], '__proto__');
     check_equals(propRecorder[1], 'callee');
-    xcheck_equals(propRecorder[2], 'caller');
+    check_equals(propRecorder[2], 'caller');
     xcheck_equals(propRecorder[3], 'constructor');
     xcheck_equals(propRecorder[4], 'length');
 }
@@ -442,12 +453,7 @@ f();
 // test argument.caller
 function child_func()
 {
-#if OUTPUT_VERSION == 5
     check_equals(arguments.caller, parent_func);
-#else
-    //? passed on swf5, but failed on swf6,7,8
-    xcheck_equals(arguments.caller, parent_func);
-#endif
 }
 function parent_func()
 {
@@ -979,8 +985,8 @@ check_equals(b.count, 1); // See bug #22203
  check_totals(150); // SWF5
 #endif
 #if OUTPUT_VERSION == 6
- check_totals(213); // SWF6
+ check_totals(216); // SWF6
 #endif
 #if OUTPUT_VERSION >= 7
- check_totals(214); // SWF7,SWF8
+ check_totals(217); // SWF7,SWF8
 #endif

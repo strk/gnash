@@ -94,7 +94,7 @@ private:
 	///	  a reference on it!
 	///	  
 	///
-	static as_array_object* getArguments(swf_function& callee, const fn_call& fn);
+	static as_array_object* getArguments(swf_function& callee, const fn_call& fn, as_object* caller);
 
 public:
 

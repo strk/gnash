@@ -159,6 +159,8 @@ private:
 
 	SafeStack<as_value>	_stack;
 
+	CallStack _callStack;
+
 	/// Library of SharedObjects. Owned by the VM.
 	SharedObjectLibrary* _shLib;
 
@@ -167,6 +169,11 @@ public:
 	SafeStack<as_value>& getStack()
 	{
 		return _stack;
+	}
+
+	CallStack& getCallStack()
+	{
+		return _callStack;
 	}
 
 	/// \brief
