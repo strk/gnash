@@ -145,7 +145,6 @@ MovieTester::MovieTester(const std::string& url)
         _movie_root->setRootMovie( mi.release() );
 
 	// ... and render it
-	std::cout << "invalidatedBounds1" << _invalidatedBounds <<std::endl;
 	render();
 }
 
@@ -180,14 +179,12 @@ void
 MovieTester::redraw()
 {
 	_forceRedraw=true;
-	std::cout << "invalidatedBounds2" << _invalidatedBounds <<std::endl;
 	render();
 }
 
 void
 MovieTester::render() 
 {
-	std::cout << "invalidatedBounds3" << _invalidatedBounds <<std::endl;
 	// Get invalidated ranges and cache them
 	_invalidatedBounds.setNull();
 
@@ -252,7 +249,6 @@ MovieTester::advance(bool updateClock)
 
 	_movie_root->advance();
 
-	std::cout << "invalidatedBounds4" << _invalidatedBounds <<std::endl;
 	render();
 
 }
@@ -307,10 +303,7 @@ MovieTester::movePointerTo(int x, int y)
 {
 	_x = x;
 	_y = y;
-	if ( _movie_root->notify_mouse_moved(x, y) ) {
-		std::cout << "invalidatedBounds5" << _invalidatedBounds <<std::endl;
-		render();
-	}
+	if ( _movie_root->notify_mouse_moved(x, y) ) render();
 }
 
 void
@@ -384,7 +377,6 @@ MovieTester::pressMouseButton()
 {
 	if ( _movie_root->notify_mouse_clicked(true, 1) )
 	{
-	std::cout << "invalidatedBounds6" << _invalidatedBounds <<std::endl;
 		render();
 	}
 }
@@ -394,7 +386,6 @@ MovieTester::depressMouseButton()
 {
 	if ( _movie_root->notify_mouse_clicked(false, 1) )
 	{
-	std::cout << "invalidatedBounds7" << _invalidatedBounds <<std::endl;
 		render();
 	}
 }
@@ -406,10 +397,7 @@ MovieTester::click()
 	if ( _movie_root->notify_mouse_clicked(true, 1) ) ++wantRedraw;
 	if ( _movie_root->notify_mouse_clicked(false, 1) ) ++wantRedraw;
 
-	if ( wantRedraw ) {
-	std::cout << "invalidatedBounds8" << _invalidatedBounds <<std::endl;
-		render();
-	}
+	if ( wantRedraw ) render();
 }
 
 void
@@ -417,7 +405,6 @@ MovieTester::pressKey(key::code code)
 {
 	if ( _movie_root->notify_key_event(code, true) )
 	{
-	std::cout << "invalidatedBounds9" << _invalidatedBounds <<std::endl;
 		render();
 	}
 }
@@ -427,7 +414,6 @@ MovieTester::releaseKey(key::code code)
 {
 	if ( _movie_root->notify_key_event(code, false) )
 	{
-	std::cout << "invalidatedBounds10" << _invalidatedBounds <<std::endl;
 		render();
 	}
 }
@@ -606,7 +592,6 @@ MovieTester::restart()
 	_movie_root->setRootMovie(_movie);
 
 	// Set _movie before calling ::render
-	std::cout << "invalidatedBounds11" << _invalidatedBounds <<std::endl;
 	render();
 }
 
