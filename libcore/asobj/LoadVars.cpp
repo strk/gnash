@@ -95,6 +95,8 @@ public:
 	///
 	void sendAndLoad(const std::string& urlstr, LoadVars& target, bool post=true);
 
+    void queueLoad(std::auto_ptr<IOChannel> str);
+
 	static as_object* getLoadVarsInterface();
 
 	static void attachLoadVarsInterface(as_object& o);
@@ -351,6 +353,13 @@ LoadVars::addLoadVariablesThread(const std::string& urlstr, const char* postdata
 	}
 
 	log_security(_("Loading variables file from url: '%s'"), url.str());
+    queueLoad(str);
+
+}
+
+void
+LoadVars::queueLoad(std::auto_ptr<IOChannel> str)
+{
 
 	bool startTimer = _loadThreads.empty();
 
@@ -380,8 +389,8 @@ LoadVars::addLoadVariablesThread(const std::string& urlstr, const char* postdata
 		log_debug("Registered LoadVars loads interval %d", _loadCheckerTimer);
 #endif
     }
-
 }
+
 
 void
 LoadVars::load(const std::string& urlstr)
