@@ -95,6 +95,8 @@ public:
 	///
 	void sendAndLoad(const std::string& urlstr, LoadVars& target, bool post=true);
 
+    void queueLoad(std::auto_ptr<IOChannel> str);
+
 	static as_object* getLoadVarsInterface();
 
 	static void attachLoadVarsInterface(as_object& o);
@@ -331,23 +333,37 @@ LoadVars::addLoadVariablesThread(const std::string& urlstr, const char* postdata
 	URL url(urlstr, get_base_url());
 
 	std::auto_ptr<IOChannel> str;
-	if ( postdata ) str.reset ( StreamProvider::getDefaultInstance().getStream(url, std::string(postdata)) );
-	else str.reset ( StreamProvider::getDefaultInstance().getStream(url) );
+	if ( postdata )
+    {
+        str.reset (StreamProvider::getDefaultInstance().getStream(
+                    url, std::string(postdata)) );
+    }
+	else
+    {
+        str.reset (StreamProvider::getDefaultInstance().getStream(url));
+    }
 
-	if ( ! str.get() ) 
+	if (!str.get()) 
 	{
-		log_error(_("Can't load variables from %s (security?)"), url.str().c_str());
+		log_error(_("Can't load variables from %s (security?)"), url.str());
 		return;
 		// TODO: check if this is correct
 		//as_value nullValue; nullValue.set_null();
 		//callMethod(VM::get().getStringTable().find(PROPNAME("onData")), nullValue);
 	}
 
-	log_security(_("Loading variables file from url: '%s'"), url.str().c_str());
+	log_security(_("Loading variables file from url: '%s'"), url.str());
+    queueLoad(str);
+
+}
+
+void
+LoadVars::queueLoad(std::auto_ptr<IOChannel> str)
+{
 
 	bool startTimer = _loadThreads.empty();
 
-	std::auto_ptr<LoadThread> lt ( new LoadThread(str) );
+	std::auto_ptr<LoadThread> lt (new LoadThread(str));
 
 	// we push on the front to avoid invalidating
 	// iterators when queueLoad is called as effect
@@ -355,14 +371,14 @@ LoadVars::addLoadVariablesThread(const std::string& urlstr, const char* postdata
 	// Doing so also avoids processing queued load
 	// request immediately
 	// 
-	_loadThreads.push_front(lt.get());
+	_loadThreads.push_front(lt.release());
 #ifdef DEBUG_LOADS
-	log_debug("Pushed thread %p to _loadThreads, number of LoadVars load threads now: %d", (void*)lt.get(),  _loadThreads.size());
+	log_debug("Pushed thread %p to _loadThreads, number of "
+            "LoadVars load threads now: %d",
+            static_cast<void*>(_loadThreads.front()),  _loadThreads.size());
 #endif
-	lt.release();
 
-
-	if ( startTimer )
+	if (startTimer)
 	{
 		boost::intrusive_ptr<builtin_function> loadsChecker = 
 			new builtin_function(&LoadVars::checkLoads_wrapper);
@@ -373,8 +389,8 @@ LoadVars::addLoadVariablesThread(const std::string& urlstr, const char* postdata
 		log_debug("Registered LoadVars loads interval %d", _loadCheckerTimer);
 #endif
     }
-
 }
+
 
 void
 LoadVars::load(const std::string& urlstr)

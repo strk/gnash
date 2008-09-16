@@ -29,10 +29,7 @@
 #include "StreamProvider.h"
 #include "URL.h"
 #include "tu_file.h"
-#ifdef USE_CURL
-//# include <curl/curl.h>
-# include "curl_adapter.h"
-#endif
+#include "NetworkAdapter.h"
 #include "URLAccessManager.h"
 #include "log.h"
 #include "rc.h" // for rcfile
@@ -63,7 +60,6 @@ StreamProvider::getDefaultInstance()
 IOChannel*
 StreamProvider::getStream(const URL& url)
 {
-//    GNASH_REPORT_FUNCTION;
 
 	if (url.protocol() == "file")
 	{
@@ -93,26 +89,40 @@ StreamProvider::getStream(const URL& url)
 	}
 	else
 	{
-#ifdef USE_CURL
 		std::string url_str = url.str();
 		const char* c_url = url_str.c_str();
 		if ( URLAccessManager::allow(url) ) {
-			return curl_adapter::make_stream(c_url);
+			return NetworkAdapter::make_stream(c_url);
 		} else {
 			return NULL;
 		}
-#else
-		log_error(_("Unsupported network connection %s"),
-				 url.str().c_str());
-		return NULL;
-#endif
 	}
+}
+
+std::auto_ptr<IOChannel>
+StreamProvider::getStream(const URL& url, const std::string& postdata,
+                          const NetworkAdapter::RequestHeaders& headers)
+{
+    if (url.protocol() == "file")
+    {
+        log_error("Request Headers discarded while getting stream from file: uri");
+        return std::auto_ptr<IOChannel>(getStream(url, postdata));
+    }
+
+    std::auto_ptr<IOChannel> ret;
+
+	std::string url_str = url.str();
+	const char* c_url = url_str.c_str();
+	if ( URLAccessManager::allow(url) ) {
+		ret.reset(NetworkAdapter::makeStream(c_url, postdata, headers));
+	}
+	return ret;
+
 }
 
 IOChannel*
 StreamProvider::getStream(const URL& url, const std::string& postdata)
 {
-//    GNASH_REPORT_FUNCTION;
 
 	if (url.protocol() == "file")
 	{
@@ -135,19 +145,13 @@ StreamProvider::getStream(const URL& url, const std::string& postdata)
 	}
 	else
 	{
-#ifdef USE_CURL
 		std::string url_str = url.str();
 		const char* c_url = url_str.c_str();
 		if ( URLAccessManager::allow(url) ) {
-			return curl_adapter::make_stream(c_url, postdata);
+			return NetworkAdapter::make_stream(c_url, postdata);
 		} else {
 			return NULL;
 		}
-#else
-		log_error(_("Unsupported network connection %s"),
-				url.str().c_str());
-		return NULL;
-#endif
 	}
 }
 
