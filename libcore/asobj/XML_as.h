@@ -42,7 +42,7 @@ class URL;
 class LoaderThread;
 
 /// XML class and ActionScript object
-class XML : public XMLNode
+class XML_as : public XMLNode
 {
 public:
 
@@ -81,9 +81,9 @@ public:
     } Status;
 
 
-    XML();
-    XML(const std::string& xml_in);
-    ~XML();
+    XML_as();
+    XML_as(const std::string& xml_in);
+    ~XML_as();
   
     /// This is overridden to provide the 'status' and 'loaded' members,
     /// which are NOT proper properties !
@@ -183,7 +183,7 @@ private:
     //  1 if successfully loaded
     int _loaded;
 
-    Status      _status;	
+    Status _status;	
 
     /// Initialize an XMLNode from an xmlNodePtr
     //
@@ -240,7 +240,7 @@ DSOEXPORT int memadjust(int x);
 
 }	// end namespace gnash
 
-#endif	// __XML_H__
+#endif
 
 
 // Local Variables:

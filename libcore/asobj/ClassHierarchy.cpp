@@ -34,7 +34,7 @@
 #include "Global.h"
 #include "String_as.h"
 #include "Key.h"
-#include "LoadVars.h"
+#include "LoadVars_as.h"
 #include "LocalConnection.h"
 #include "Microphone.h"
 #include "Number.h"
@@ -63,7 +63,7 @@
 #include "ClassHierarchy.h"
 #include "builtin_function.h"
 #include "XMLSocket_as.h"
-#include "xml.h"
+#include "XML_as.h"
 #include "xmlnode.h"
 #include "asClass.h"
 

@@ -29,7 +29,7 @@
 
 #include "xmlattrs.h"
 #include "xmlnode.h"
-#include "xml.h"
+#include "XML_as.h"
 #include "builtin_function.h"
 #include "debugger.h"
 #include "StreamProvider.h"
@@ -67,21 +67,21 @@ static void attachXMLProperties(as_object& o);
 
 DSOEXPORT as_value xml_new(const fn_call& fn);
 static as_value xml_load(const fn_call& fn);
-static as_value xml_addrequestheader(const fn_call& fn);
+static as_value xml_addRequestHeader(const fn_call& fn);
 static as_value xml_createelement(const fn_call& fn);
 static as_value xml_createtextnode(const fn_call& fn);
 static as_value xml_getbytesloaded(const fn_call& fn);
 static as_value xml_getbytestotal(const fn_call& fn);
 static as_value xml_parsexml(const fn_call& fn);
 static as_value xml_send(const fn_call& fn);
-static as_value xml_sendandload(const fn_call& fn);
+static as_value xml_sendAndLoad(const fn_call& fn);
 static as_value xml_ondata(const fn_call& fn);
 
 #ifdef USE_DEBUGGER
 static Debugger& debugger = Debugger::getDefaultInstance();
 #endif
 
-XML::XML() 
+XML_as::XML_as() 
     :
     XMLNode(getXMLInterface()),
     //_doc(0),
@@ -102,7 +102,7 @@ XML::XML()
 
 
 // Parse the ASCII XML string into memory
-XML::XML(const std::string& xml_in)
+XML_as::XML_as(const std::string& xml_in)
     :
     XMLNode(getXMLInterface()),
     //_doc(0),
@@ -122,7 +122,7 @@ XML::XML(const std::string& xml_in)
 }
 
 bool
-XML::get_member(string_table::key name, as_value *val, string_table::key nsname)
+XML_as::get_member(string_table::key name, as_value *val, string_table::key nsname)
 {
         if (name == NSV::PROP_STATUS) 
         {
@@ -140,7 +140,7 @@ XML::get_member(string_table::key name, as_value *val, string_table::key nsname)
 }
 
 bool
-XML::set_member(string_table::key name, const as_value& val, 
+XML_as::set_member(string_table::key name, const as_value& val, 
 	string_table::key nsname, bool ifFound)
 {
         if (name == NSV::PROP_STATUS)
@@ -148,12 +148,12 @@ XML::set_member(string_table::key name, const as_value& val,
 		// TODO: this should really be a proper property (see XML.as)
 		if ( ! val.is_number() )
 		{
-			_status = static_cast<XML::Status>(std::numeric_limits<boost::int32_t>::min());
+			_status = static_cast<XML_as::Status>(std::numeric_limits<boost::int32_t>::min());
 		}
 		else
 		{
 			unsigned int statusNumber = static_cast<int>(val.to_number());
-			_status = XML::Status( static_cast<XML::Status>(statusNumber) );
+			_status = XML_as::Status( static_cast<XML_as::Status>(statusNumber) );
 		}
 		return true;
 	}
@@ -170,7 +170,7 @@ XML::set_member(string_table::key name, const as_value& val,
         return set_member_default(name, val, nsname, ifFound);
 }
 
-XML::~XML()
+XML_as::~XML_as()
 {
     //GNASH_REPORT_FUNCTION;
 
@@ -193,7 +193,7 @@ XML::~XML()
 }
 
 bool
-XML::extractNode(XMLNode& element, xmlNodePtr node, bool mem)
+XML_as::extractNode(XMLNode& element, xmlNodePtr node, bool mem)
 {
     xmlAttrPtr attr;
     xmlChar *ptr = NULL;
@@ -289,7 +289,7 @@ XML::extractNode(XMLNode& element, xmlNodePtr node, bool mem)
 
 /*private*/
 bool
-XML::parseDoc(xmlNodePtr cur, bool mem)
+XML_as::parseDoc(xmlNodePtr cur, bool mem)
 {
     GNASH_REPORT_FUNCTION;  
 
@@ -313,7 +313,7 @@ XML::parseDoc(xmlNodePtr cur, bool mem)
 // This parses an XML string into a
 // tree which can be walked through later.
 bool
-XML::parseXML(const std::string& xml_in)
+XML_as::parseXML(const std::string& xml_in)
 {
     //GNASH_REPORT_FUNCTION;
 
@@ -364,7 +364,7 @@ XML::parseXML(const std::string& xml_in)
 }
 
 void
-XML::queueLoad(std::auto_ptr<IOChannel> str)
+XML_as::queueLoad(std::auto_ptr<IOChannel> str)
 {
 
     bool startTimer = _loadThreads.empty();
@@ -387,7 +387,7 @@ XML::queueLoad(std::auto_ptr<IOChannel> str)
     if ( startTimer )
     {
         boost::intrusive_ptr<builtin_function> loadsChecker = 
-            new builtin_function(&XML::checkLoads_wrapper);
+            new builtin_function(&XML_as::checkLoads_wrapper);
 
         std::auto_ptr<Timer> timer(new Timer);
         timer->setInterval(*loadsChecker, 50, this);
@@ -404,20 +404,20 @@ XML::queueLoad(std::auto_ptr<IOChannel> str)
 }
 
 long int
-XML::getBytesLoaded() const
+XML_as::getBytesLoaded() const
 {
     return _bytesLoaded;
 }
 
 long int
-XML::getBytesTotal() const
+XML_as::getBytesTotal() const
 {
     return _bytesTotal;
 }
 
 /* private */
 void
-XML::checkLoads()
+XML_as::checkLoads()
 {
 #ifdef DEBUG_XML_LOADS
     static int call=0;
@@ -497,13 +497,13 @@ XML::checkLoads()
 
 /* private static */
 as_value
-XML::checkLoads_wrapper(const fn_call& fn)
+XML_as::checkLoads_wrapper(const fn_call& fn)
 {
 #ifdef DEBUG_XML_LOADS
     log_debug("checkLoads_wrapper called");
 #endif
 
-	boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
+	boost::intrusive_ptr<XML_as> ptr = ensureType<XML_as>(fn.this_ptr);
 	ptr->checkLoads();
 	return as_value();
 }
@@ -511,7 +511,7 @@ XML::checkLoads_wrapper(const fn_call& fn)
 // This reads in an XML file from disk and parses into into a memory resident
 // tree which can be walked through later.
 bool
-XML::load(const URL& url)
+XML_as::load(const URL& url)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -536,7 +536,7 @@ XML::load(const URL& url)
 
 
 bool
-XML::onLoad()
+XML_as::onLoad()
 {
     log_debug(_("%s: FIXME: onLoad Default event handler"), __FUNCTION__);
 
@@ -544,7 +544,7 @@ XML::onLoad()
 }
 
 void
-XML::cleanupStackFrames(XMLNode * /* xml */)
+XML_as::cleanupStackFrames(XMLNode * /* xml */)
 {
     GNASH_REPORT_FUNCTION;
 }
@@ -560,7 +560,7 @@ XML::cleanupStackFrames(XMLNode * /* xml */)
 /// If multiple calls are made to set the same header name, each
 /// successive value replaces the value set in the previous call.
 void
-XML::addRequestHeader(const NetworkAdapter::RequestHeaders::value_type& headerPair)
+XML_as::addRequestHeader(const NetworkAdapter::RequestHeaders::value_type& headerPair)
 {
     /// Replace existing values.
     _headers[headerPair.first] = headerPair.second;
@@ -568,13 +568,13 @@ XML::addRequestHeader(const NetworkAdapter::RequestHeaders::value_type& headerPa
 
 
 void
-XML::send()
+XML_as::send()
 {
     log_unimpl (__FUNCTION__);
 }
 
 void
-XML::sendAndLoad(const URL& url, as_object& target)
+XML_as::sendAndLoad(const URL& url, as_object& target)
 {
 
     /// All objects get a loaded member, set to false.
@@ -635,7 +635,7 @@ xml_load(const fn_call& fn)
 
     //GNASH_REPORT_FUNCTION;
   
-    boost::intrusive_ptr<XML> xml_obj = ensureType<XML>(fn.this_ptr);
+    boost::intrusive_ptr<XML_as> xml_obj = ensureType<XML_as>(fn.this_ptr);
   
     if ( ! fn.nargs )
     {
@@ -673,7 +673,7 @@ attachXMLProperties(as_object& /*o*/)
 static void
 attachXMLInterface(as_object& o)
 {
-    o.init_member("addRequestHeader", new builtin_function(xml_addrequestheader));
+    o.init_member("addRequestHeader", new builtin_function(xml_addRequestHeader));
     o.init_member("createElement", new builtin_function(xml_createelement));
     o.init_member("createTextNode", new builtin_function(xml_createtextnode));
     o.init_member("getBytesLoaded", new builtin_function(xml_getbytesloaded));
@@ -681,7 +681,7 @@ attachXMLInterface(as_object& o)
     o.init_member("load", new builtin_function(xml_load));
     o.init_member("parseXML", new builtin_function(xml_parsexml));
     o.init_member("send", new builtin_function(xml_send));
-    o.init_member("sendAndLoad", new builtin_function(xml_sendandload));
+    o.init_member("sendAndLoad", new builtin_function(xml_sendAndLoad));
     o.init_member("onData", new builtin_function(xml_ondata));
 
 }
@@ -702,14 +702,14 @@ as_value
 xml_new(const fn_call& fn)
 {
     as_value      inum;
-    boost::intrusive_ptr<XML> xml_obj;
+    boost::intrusive_ptr<XML_as> xml_obj;
   
     if ( fn.nargs > 0 )
     {
         if ( fn.arg(0).is_object() )
         {
             boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
-            xml_obj = boost::dynamic_pointer_cast<XML>(obj);
+            xml_obj = boost::dynamic_pointer_cast<XML_as>(obj);
             if ( xml_obj )
             {
                 log_debug(_("Cloned the XML object at %p"), (void *)xml_obj.get());
@@ -727,27 +727,26 @@ xml_new(const fn_call& fn)
         }
         else
         {
-            xml_obj = new XML(xml_in);
+            xml_obj = new XML_as(xml_in);
             return as_value(xml_obj.get());
         }
     }
 
-    xml_obj = new XML;
+    xml_obj = new XML_as;
     //log_debug(_("\tCreated New XML object at %p"), xml_obj);
 
     return as_value(xml_obj.get());
 }
 
-/// Can take either a list of strings as arguments, alternately header
-/// and value, or an array.
+/// Can take either a two strings as arguments or an array of strings,
+/// alternately header and value.
 as_value
-xml_addrequestheader(const fn_call& fn)
+xml_addRequestHeader(const fn_call& fn)
 {
-
-    GNASH_REPORT_FUNCTION;
     
-	boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);   
+	boost::intrusive_ptr<XML_as> ptr = ensureType<XML_as>(fn.this_ptr);   
 
+    // Log all the time while not properly tested.
     std::ostringstream ss;
     fn.dump_args(ss);
     log_debug ("addRequestHeader: %s", ss.str());
@@ -760,20 +759,16 @@ xml_addrequestheader(const fn_call& fn)
         return as_value();
     }
     
-    if (fn.nargs < 2)
+    if (fn.nargs == 1)
     {
         // TODO: handle array.
         log_unimpl(_("Array argument to XML.addRequestHeader"));
         return as_value();
     }
 
-    // TODO: should we ignore orphaned arguments like this?
-    for (size_t i = 0, e = fn.nargs / 2; i != e; ++i)
-    {
-        const std::string& name = fn.arg(i * 2).to_string();
-        const std::string& val = fn.arg(i * 2 + 1).to_string();
-        ptr->addRequestHeader(std::make_pair(name, val));
-    }
+    const std::string& name = fn.arg(0).to_string();
+    const std::string& val = fn.arg(1).to_string();
+    ptr->addRequestHeader(std::make_pair(name, val));
     
     return as_value();
 }
@@ -835,7 +830,7 @@ xml_createtextnode(const fn_call& fn)
 
 as_value xml_getbytesloaded(const fn_call& fn)
 {
-	boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
+	boost::intrusive_ptr<XML_as> ptr = ensureType<XML_as>(fn.this_ptr);
 	long int ret = ptr->getBytesLoaded();
 	if ( ret < 0 ) return as_value();
 	else return as_value(ret);
@@ -843,7 +838,7 @@ as_value xml_getbytesloaded(const fn_call& fn)
 
 as_value xml_getbytestotal(const fn_call& fn)
 {
-	boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
+	boost::intrusive_ptr<XML_as> ptr = ensureType<XML_as>(fn.this_ptr);
 	long int ret = ptr->getBytesTotal();
 	if ( ret < 0 ) return as_value();
 	else return as_value(ret);
@@ -854,7 +849,7 @@ as_value xml_parsexml(const fn_call& fn)
 
     as_value	method;
     as_value	val;    
-    boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
+    boost::intrusive_ptr<XML_as> ptr = ensureType<XML_as>(fn.this_ptr);
 
     if (fn.nargs < 1)
     {
@@ -875,7 +870,7 @@ as_value xml_parsexml(const fn_call& fn)
 as_value xml_send(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
-    boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
+    boost::intrusive_ptr<XML_as> ptr = ensureType<XML_as>(fn.this_ptr);
     
     ptr->send();
     return as_value();
@@ -886,10 +881,10 @@ as_value xml_send(const fn_call& fn)
 /// The second argument must be an object, but does not have to 
 /// be an XML object.
 static as_value
-xml_sendandload(const fn_call& fn)
+xml_sendAndLoad(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
-    boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
+    boost::intrusive_ptr<XML_as> ptr = ensureType<XML_as>(fn.this_ptr);
     
     if ( fn.nargs < 2 )
     {
@@ -979,7 +974,7 @@ void xml_class_init(as_object& global)
 
 
 void
-XML::initParser()
+XML_as::initParser()
 {
     static bool initialized = false;
     if ( ! initialized )
@@ -992,7 +987,7 @@ XML::initParser()
 }
 
 void
-XML::clear()
+XML_as::clear()
 {
 	// TODO: should set childs's parent to NULL ?
 	_children.clear();
@@ -1002,18 +997,18 @@ XML::clear()
 
 /*private*/
 bool
-XML::ignoreWhite() const
+XML_as::ignoreWhite() const
 {
 
 	string_table::key propnamekey = VM::get().getStringTable().find("ignoreWhite");
 	as_value val;
-	if (!const_cast<XML*>(this)->get_member(propnamekey, &val) ) return false;
+	if (!const_cast<XML_as*>(this)->get_member(propnamekey, &val) ) return false;
 	return val.to_bool();
 }
 
 /*private*/
 int
-XML::getXMLOptions() const
+XML_as::getXMLOptions() const
 {
     int options = XML_PARSE_NOENT
 		//| XML_PARSE_RECOVER -- don't recover now, we'll call xmlParseBalancedChunkRecover later
