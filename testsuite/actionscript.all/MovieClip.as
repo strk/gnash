@@ -1464,7 +1464,11 @@ check_equals(ret, 0);
 
 Number.prototype.toLowerCase = function() { retCaller=arguments.caller; return "post"; };
 ret = _root.meth(1);
-xcheck_equals(retCaller, _root.meth); // check that arguments.caller is also set for builtin functions
+#if OUTPUT_VERSION < 6
+ check_equals(retCaller, _root.meth); // in gnash works because functions resolve equal to undefined
+#else
+ xcheck_equals(retCaller, _root.meth); // check that arguments.caller is also set for builtin functions
+#endif
 check_equals(typeof(ret), 'number');
 check_equals(ret, 2);
 
