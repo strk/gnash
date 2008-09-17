@@ -421,7 +421,7 @@ LoadVars_as::sendAndLoad(const std::string& urlstr, as_object& target, bool post
 
         NetworkAdapter::RequestHeaders headers;
 
-        if (get_member(st.find("_customHeaders"), &customHeaders))
+        if (get_member(NSV::PROP_uCUSTOM_HEADERS, &customHeaders))
         {
 
             /// Read in our custom headers if they exist and are an
@@ -504,16 +504,16 @@ loadvars_addRequestHeader(const fn_call& fn)
 	boost::intrusive_ptr<LoadVars_as> ptr = ensureType<LoadVars_as>(fn.this_ptr);   
 
     as_value customHeaders;
-    Array_as* array;
+    as_object* array;
 
     if (ptr->get_member(NSV::PROP_uCUSTOM_HEADERS, &customHeaders))
     {
-        array = dynamic_cast<Array_as*>(customHeaders.to_object().get());
+        array = customHeaders.to_object().get();
         if (!array)
         {
             IF_VERBOSE_ASCODING_ERRORS(
-                log_aserror(_("LoadVars.addRequestHeader: LoadVars._customHeaders "
-                              "is not an array"));
+                log_aserror(_("LoadVars.addRequestHeader: "
+                         "LoadVars._customHeaders is not an object"));
             );
             return as_value();
         }

@@ -760,16 +760,16 @@ xml_addRequestHeader(const fn_call& fn)
 	boost::intrusive_ptr<XML_as> ptr = ensureType<XML_as>(fn.this_ptr);   
 
     as_value customHeaders;
-    Array_as* array;
+    as_object* array;
 
     if (ptr->get_member(NSV::PROP_uCUSTOM_HEADERS, &customHeaders))
     {
-        array = dynamic_cast<Array_as*>(customHeaders.to_object().get());
+        array = customHeaders.to_object().get();
         if (!array)
         {
             IF_VERBOSE_ASCODING_ERRORS(
                 log_aserror(_("XML.addRequestHeader: XML._customHeaders "
-                              "is not an array"));
+                              "is not an object"));
             );
             return as_value();
         }
