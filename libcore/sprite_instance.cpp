@@ -832,7 +832,6 @@ static as_value sprite_unload_movie(const fn_call& fn)
 static as_value sprite_hit_test(const fn_call& fn)
 {
   boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
-  UNUSED(sprite);
 
   switch (fn.nargs)
   {
