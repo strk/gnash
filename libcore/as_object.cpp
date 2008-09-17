@@ -1065,7 +1065,7 @@ as_object::setPropFlags(const as_value& props_val, int set_false, int set_true)
 	}
 
 	boost::intrusive_ptr<as_object> props = props_val.to_object();
-	as_array_object* ary = dynamic_cast<as_array_object*>(props.get());
+	Array_as* ary = dynamic_cast<Array_as*>(props.get());
 	if ( ! ary )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(

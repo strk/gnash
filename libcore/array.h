@@ -57,7 +57,7 @@ struct ContainerFiller {
 struct blank {};
 
 /// The Array ActionScript object
-class as_array_object : public as_object
+class Array_as : public as_object
 {
 
     /// Other classes shouldn't care about this, but should rather use
@@ -85,7 +85,7 @@ public:
 		ArrayContainer copy = elements;
 
 		// iterating this way will skip holes
-		for (as_array_object::iterator i=copy.begin(), ie=copy.end(); i!=ie; ++i)
+		for (Array_as::iterator i=copy.begin(), ie=copy.end(); i!=ie; ++i)
 			v.visit(*i);
 	}
 
@@ -119,17 +119,17 @@ public:
 		fNumeric		= (1<<4) // 16
 	};
 
-	as_array_object();
+	Array_as();
 
-	as_array_object(const as_array_object& other);
+	Array_as(const Array_as& other);
 
-	~as_array_object();
+	~Array_as();
 
 	std::deque<indexed_as_value> get_indexed_elements();
 
-	as_array_object::const_iterator begin();
+	Array_as::const_iterator begin();
 
-	as_array_object::const_iterator end();
+	Array_as::const_iterator end();
 
 	/// Push an element to the end of the array
 	//
@@ -146,7 +146,7 @@ public:
 
 	as_value at(unsigned int index) const;
 
-	as_array_object* get_indices(std::deque<indexed_as_value> origElems);
+	Array_as* get_indices(std::deque<indexed_as_value> origElems);
 
 	void reverse();
 
@@ -174,7 +174,7 @@ public:
 
 	void resize(unsigned int);
 
-	void concat(const as_array_object& other);
+	void concat(const Array_as& other);
 
 	/// \brief
 	/// Return a newly created array containing elements
@@ -195,7 +195,7 @@ public:
 	///	index to one-past element to include in result
 	///	0-based index.
 	///
-	boost::intrusive_ptr<as_array_object> slice(
+	boost::intrusive_ptr<Array_as> slice(
 		unsigned int start, unsigned int one_past_end);
 
 	/// Remove first element matching the given value
@@ -231,7 +231,7 @@ public:
 	///
 	void splice(unsigned int start, unsigned int count, 
 			const std::vector<as_value>* replace=NULL,
-			as_array_object* copy=NULL);
+			Array_as* copy=NULL);
 
 	/// \brief
 	/// Sort the array, using given values comparator
@@ -335,7 +335,7 @@ public:
 	///	boolean functor or function comparing two as_value& objects
 	///
 	template <class AVCMP>
-	as_array_object* sort_indexed(AVCMP avc)
+	Array_as* sort_indexed(AVCMP avc)
 	{
 		std::deque<indexed_as_value> ielem = get_indexed_elements();
 		std::sort(ielem.begin(), ielem.end(), avc);

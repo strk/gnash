@@ -762,6 +762,7 @@ xml_addRequestHeader(const fn_call& fn)
     if (fn.nargs == 1)
     {
         // TODO: handle array.
+        
         log_unimpl(_("Array argument to XML.addRequestHeader"));
         return as_value();
     }

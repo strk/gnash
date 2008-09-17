@@ -259,8 +259,8 @@ get_basic_cmp(boost::uint8_t flags, int version)
     as_cmp_fn f;
 
     // fUniqueSort and fReturnIndexedArray must be stripped by caller
-    assert(flags^as_array_object::fUniqueSort);
-    assert(flags^as_array_object::fReturnIndexedArray);
+    assert(flags^Array_as::fUniqueSort);
+    assert(flags^Array_as::fReturnIndexedArray);
 
     switch ( flags )
     {
@@ -268,35 +268,35 @@ get_basic_cmp(boost::uint8_t flags, int version)
             f = as_value_lt(version);
             return f;
 
-        case as_array_object::fDescending:
+        case Array_as::fDescending:
             f = as_value_gt(version);
             return f;
 
-        case as_array_object::fCaseInsensitive: 
+        case Array_as::fCaseInsensitive: 
             f = as_value_nocase_lt(version);
             return f;
 
-        case as_array_object::fCaseInsensitive | 
-                as_array_object::fDescending:
+        case Array_as::fCaseInsensitive | 
+                Array_as::fDescending:
             f = as_value_nocase_gt(version);
             return f;
 
-        case as_array_object::fNumeric: 
+        case Array_as::fNumeric: 
             f = as_value_num_lt(version);
             return f;
 
-        case as_array_object::fNumeric | as_array_object::fDescending:
+        case Array_as::fNumeric | Array_as::fDescending:
             f = as_value_num_gt(version);
             return f;
 
-        case as_array_object::fCaseInsensitive | 
-                as_array_object::fNumeric:
+        case Array_as::fCaseInsensitive | 
+                Array_as::fNumeric:
             f = as_value_num_nocase_lt(version);
             return f;
 
-        case as_array_object::fCaseInsensitive | 
-                as_array_object::fNumeric |
-                as_array_object::fDescending:
+        case Array_as::fCaseInsensitive | 
+                Array_as::fNumeric |
+                Array_as::fDescending:
             f = as_value_num_nocase_gt(version);
             return f;
 
@@ -314,7 +314,7 @@ as_cmp_fn
 get_basic_eq(boost::uint8_t flags, int version)
 {
     as_cmp_fn f;
-    flags &= ~(as_array_object::fDescending);
+    flags &= ~(Array_as::fDescending);
 
     switch ( flags )
     {
@@ -322,16 +322,16 @@ get_basic_eq(boost::uint8_t flags, int version)
             f = as_value_eq(version);
             return f;
 
-        case as_array_object::fCaseInsensitive: 
+        case Array_as::fCaseInsensitive: 
             f = as_value_nocase_eq(version);
             return f;
 
-        case as_array_object::fNumeric: 
+        case Array_as::fNumeric: 
             f = as_value_num_eq(version);
             return f;
 
-        case as_array_object::fCaseInsensitive | 
-                as_array_object::fNumeric:
+        case Array_as::fCaseInsensitive | 
+                Array_as::fNumeric:
             f = as_value_num_nocase_eq(version);
             return f;
 
@@ -488,20 +488,20 @@ public:
 static inline boost::uint8_t
 flag_preprocess(boost::uint8_t flgs, bool* douniq, bool* doindex)
 {
-    *douniq = (flgs & as_array_object::fUniqueSort);
-    *doindex = (flgs & as_array_object::fReturnIndexedArray);
-    flgs &= ~(as_array_object::fReturnIndexedArray);
-    flgs &= ~(as_array_object::fUniqueSort);
+    *douniq = (flgs & Array_as::fUniqueSort);
+    *doindex = (flgs & Array_as::fReturnIndexedArray);
+    flgs &= ~(Array_as::fReturnIndexedArray);
+    flgs &= ~(Array_as::fUniqueSort);
     return flgs;
 }
 
 // Convenience function to process and extract flags from an as_value array
 // of flags (as passed to sortOn when sorting on multiple properties)
 std::deque<boost::uint8_t> 
-get_multi_flags(as_array_object::const_iterator itBegin, 
-    as_array_object::const_iterator itEnd, bool* uniq, bool* index)
+get_multi_flags(Array_as::const_iterator itBegin, 
+    Array_as::const_iterator itEnd, bool* uniq, bool* index)
 {
-    as_array_object::const_iterator it = itBegin;
+    Array_as::const_iterator it = itBegin;
     std::deque<boost::uint8_t> flgs;
 
     // extract fUniqueSort and fReturnIndexedArray from first flag
@@ -515,14 +515,14 @@ get_multi_flags(as_array_object::const_iterator itBegin,
     while (it != itEnd)
     {
         boost::uint8_t flag = static_cast<boost::uint8_t>((*it++).to_number());
-        flag &= ~(as_array_object::fReturnIndexedArray);
-        flag &= ~(as_array_object::fUniqueSort);
+        flag &= ~(Array_as::fReturnIndexedArray);
+        flag &= ~(Array_as::fUniqueSort);
         flgs.push_back(flag);
     }
     return flgs;
 }
 
-as_array_object::as_array_object()
+Array_as::Array_as()
     :
     as_object(getArrayInterface()), // pass Array inheritance
     elements(0)
@@ -533,7 +533,7 @@ as_array_object::as_array_object()
     attachArrayProperties(*this);
 }
 
-as_array_object::as_array_object(const as_array_object& other)
+Array_as::Array_as(const Array_as& other)
     :
     as_object(other),
     elements(other.elements)
@@ -543,17 +543,17 @@ as_array_object::as_array_object(const as_array_object& other)
     //)
 }
 
-as_array_object::~as_array_object() 
+Array_as::~Array_as() 
 {
 }
 
 std::deque<indexed_as_value>
-as_array_object::get_indexed_elements()
+Array_as::get_indexed_elements()
 {
     std::deque<indexed_as_value> indexed_elements;
     int i = 0;
 
-    for (as_array_object::const_iterator it = elements.begin(), e = elements.end();
+    for (Array_as::const_iterator it = elements.begin(), e = elements.end();
         it != e; ++it)
     {
         indexed_elements.push_back(indexed_as_value(*it, i++));
@@ -561,20 +561,20 @@ as_array_object::get_indexed_elements()
     return indexed_elements;
 }
 
-as_array_object::const_iterator
-as_array_object::begin()
+Array_as::const_iterator
+Array_as::begin()
 {
     return elements.begin();
 }
 
-as_array_object::const_iterator
-as_array_object::end()
+Array_as::const_iterator
+Array_as::end()
 {
     return elements.end();
 }
 
 int
-as_array_object::index_requested(string_table::key name)
+Array_as::index_requested(string_table::key name)
 {
     const std::string& nameString = _vm.getStringTable().value(name);
 
@@ -589,7 +589,7 @@ as_array_object::index_requested(string_table::key name)
 }
 
 void
-as_array_object::push(const as_value& val)
+Array_as::push(const as_value& val)
 {
         const ArrayContainer::size_type s = elements.size();
         elements.resize(s+1);
@@ -597,14 +597,14 @@ as_array_object::push(const as_value& val)
 }
 
 void
-as_array_object::unshift(const as_value& val)
+Array_as::unshift(const as_value& val)
 {
         shiftElementsRight(1);
         elements[0] = val;
 }
 
 as_value
-as_array_object::pop()
+Array_as::pop()
 {
     // If the array is empty, report an error and return undefined!
     const ArrayContainer::size_type s = elements.size();
@@ -624,7 +624,7 @@ as_array_object::pop()
 }
 
 as_value
-as_array_object::shift()
+Array_as::shift()
 {
     const ArrayContainer::size_type s = elements.size();
 
@@ -644,7 +644,7 @@ as_array_object::shift()
 }
 
 void
-as_array_object::reverse()
+Array_as::reverse()
 {
     const ArrayContainer::size_type s = elements.size();
     if ( s < 2 ) return; // nothing to do (CHECKME: might be a single hole!)
@@ -663,7 +663,7 @@ as_array_object::reverse()
 }
 
 std::string
-as_array_object::join(const std::string& separator, as_environment*) const
+Array_as::join(const std::string& separator, as_environment*) const
 {
     // TODO - confirm this is the right format!
     // Reportedly, flash version 7 on linux, and Flash 8 on IE look like
@@ -692,7 +692,7 @@ as_array_object::join(const std::string& separator, as_environment*) const
 }
 
 void
-as_array_object::concat(const as_array_object& other)
+Array_as::concat(const Array_as& other)
 {
     for (ArrayContainer::size_type i = 0, e = other.size(); i < e; i++)
     {
@@ -701,32 +701,32 @@ as_array_object::concat(const as_array_object& other)
 }
 
 std::string
-as_array_object::toString(as_environment* env) const
+Array_as::toString(as_environment* env) const
 {
     return join(",", env);
 }
 
 unsigned int
-as_array_object::size() const
+Array_as::size() const
 {
     return elements.size();
 }
 
 as_value
-as_array_object::at(unsigned int index) const
+Array_as::at(unsigned int index) const
 {
     if ( index > elements.size()-1 ) return as_value();
     else return elements[index];
 }
 
-boost::intrusive_ptr<as_array_object>
-as_array_object::slice(unsigned int start, unsigned int one_past_end)
+boost::intrusive_ptr<Array_as>
+Array_as::slice(unsigned int start, unsigned int one_past_end)
 {
     assert(one_past_end >= start);
     assert(one_past_end <= size());
     assert(start <= size());
 
-    boost::intrusive_ptr<as_array_object> newarray(new as_array_object);
+    boost::intrusive_ptr<Array_as> newarray(new Array_as);
 
 #ifdef GNASH_DEBUG
     log_debug(_("Array.slice(%u, %u) called"), start, one_past_end);
@@ -746,7 +746,7 @@ as_array_object::slice(unsigned int start, unsigned int one_past_end)
 }
 
 bool
-as_array_object::removeFirst(const as_value& v)
+Array_as::removeFirst(const as_value& v)
 {
     for (iterator it = elements.begin(), e = elements.end(); it != e; ++it)
     {
@@ -761,7 +761,7 @@ as_array_object::removeFirst(const as_value& v)
 
 /* virtual public, overriding as_object::get_member */
 bool
-as_array_object::get_member(string_table::key name, as_value *val,
+Array_as::get_member(string_table::key name, as_value *val,
     string_table::key nsname)
 {
     // an index has been requested
@@ -782,7 +782,7 @@ as_array_object::get_member(string_table::key name, as_value *val,
 }
 
 bool
-as_array_object::hasOwnProperty(string_table::key name, string_table::key nsname)
+Array_as::hasOwnProperty(string_table::key name, string_table::key nsname)
 {
     // an index has been requested
     int index = index_requested(name);
@@ -801,7 +801,7 @@ as_array_object::hasOwnProperty(string_table::key name, string_table::key nsname
 }
 
 std::pair<bool,bool> 
-as_array_object::delProperty(string_table::key name, string_table::key nsname)
+Array_as::delProperty(string_table::key name, string_table::key nsname)
 {
     // an index has been requested
     int index = index_requested(name);
@@ -821,13 +821,13 @@ as_array_object::delProperty(string_table::key name, string_table::key nsname)
 }
 
 void
-as_array_object::resize(unsigned int newsize)
+Array_as::resize(unsigned int newsize)
 {
     elements.resize(newsize);
 }
 
 void
-as_array_object::set_indexed(unsigned int index,
+Array_as::set_indexed(unsigned int index,
     const as_value& val)
 {
     if (index >= elements.size())
@@ -842,7 +842,7 @@ as_array_object::set_indexed(unsigned int index,
 
 /* virtual public, overriding as_object::set_member */
 bool
-as_array_object::set_member(string_table::key name,
+Array_as::set_member(string_table::key name,
         const as_value& val, string_table::key nsname, bool ifFound)
 {
     int index = index_requested(name);
@@ -866,10 +866,10 @@ as_array_object::set_member(string_table::key name,
     return as_object::set_member_default(name,val, nsname, ifFound);
 }
 
-as_array_object*
-as_array_object::get_indices(std::deque<indexed_as_value> elems)
+Array_as*
+Array_as::get_indices(std::deque<indexed_as_value> elems)
 {
-    as_array_object* intIndexes = new as_array_object();
+    Array_as* intIndexes = new Array_as();
 
     for (std::deque<indexed_as_value>::const_iterator it = elems.begin();
         it != elems.end(); ++it)
@@ -882,7 +882,7 @@ as_array_object::get_indices(std::deque<indexed_as_value> elems)
 static as_value
 array_splice(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_array_object> array = ensureType<as_array_object>(fn.this_ptr);
+    boost::intrusive_ptr<Array_as> array = ensureType<Array_as>(fn.this_ptr);
 
 #ifdef GNASH_DEBUG
     std::stringstream ss;
@@ -939,7 +939,7 @@ array_splice(const fn_call& fn)
         replace.push_back(fn.arg(i));
     }
 
-    as_array_object* ret = new as_array_object();
+    Array_as* ret = new Array_as();
     array->splice(startoffset, len, &replace, ret);
 
     return as_value(ret);
@@ -948,8 +948,8 @@ array_splice(const fn_call& fn)
 static as_value
 array_sort(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_array_object> array = 
-        ensureType<as_array_object>(fn.this_ptr);
+    boost::intrusive_ptr<Array_as> array = 
+        ensureType<Array_as>(fn.this_ptr);
     
     const int version = array->getVM().getSWFVersion();
     
@@ -973,7 +973,7 @@ array_sort(const fn_call& fn)
         if ( fn.nargs == 2 && fn.arg(1).is_number() )
             flags=static_cast<boost::uint8_t>(fn.arg(1).to_number());
         
-        if (flags & as_array_object::fDescending) icmp = &int_lt_or_eq;
+        if (flags & Array_as::fDescending) icmp = &int_lt_or_eq;
         else icmp = &int_gt;
 
         as_environment& env = fn.env();
@@ -981,7 +981,7 @@ array_sort(const fn_call& fn)
         as_value_custom avc = 
             as_value_custom(*as_func, icmp, fn.this_ptr, env);
 
-        if ( (flags & as_array_object::fReturnIndexedArray) )
+        if ( (flags & Array_as::fReturnIndexedArray) )
         {
             return as_value(array->sort_indexed(avc));
         }
@@ -1019,8 +1019,8 @@ array_sort(const fn_call& fn)
 static as_value
 array_sortOn(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_array_object> array = 
-        ensureType<as_array_object>(fn.this_ptr);
+    boost::intrusive_ptr<Array_as> array = 
+        ensureType<Array_as>(fn.this_ptr);
 
     bool do_unique = false, do_index = false;
     boost::uint8_t flags = 0;
@@ -1058,14 +1058,14 @@ array_sortOn(const fn_call& fn)
     // case: sortOn(["prop1", "prop2"] ...)
     if (fn.nargs > 0 && fn.arg(0).is_object() ) 
     {
-        boost::intrusive_ptr<as_array_object> props = 
-            ensureType<as_array_object>(fn.arg(0).to_object());
+        boost::intrusive_ptr<Array_as> props = 
+            ensureType<Array_as>(fn.arg(0).to_object());
         std::deque<string_table::key> prp;
         unsigned int optnum = props->size();
         std::deque<as_cmp_fn> cmp;
         std::deque<as_cmp_fn> eq;
 
-        for (as_array_object::const_iterator it = props->begin();
+        for (Array_as::const_iterator it = props->begin();
             it != props->end(); ++it)
         {
             string_table::key s = st.find(PROPNAME((*it).to_string_versioned(version)));
@@ -1082,11 +1082,11 @@ array_sortOn(const fn_call& fn)
         // case: sortOn(["prop1", "prop2"], [Array.FLAG1, Array.FLAG2])
         else if ( fn.arg(1).is_object() )
         {
-            boost::intrusive_ptr<as_array_object> farray = 
-                ensureType<as_array_object>(fn.arg(1).to_object());
+            boost::intrusive_ptr<Array_as> farray = 
+                ensureType<Array_as>(fn.arg(1).to_object());
             if (farray->size() == optnum)
             {
-                as_array_object::const_iterator 
+                Array_as::const_iterator 
                     fBegin = farray->begin(),
                     fEnd = farray->end();
 
@@ -1160,7 +1160,7 @@ array_sortOn(const fn_call& fn)
 static as_value
 array_push(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_array_object> array = ensureType<as_array_object>(fn.this_ptr);
+    boost::intrusive_ptr<Array_as> array = ensureType<Array_as>(fn.this_ptr);
 
         IF_VERBOSE_ACTION (
     log_action(_("calling array push, pushing %d values onto back of array"),fn.nargs);
@@ -1176,7 +1176,7 @@ array_push(const fn_call& fn)
 static as_value
 array_unshift(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_array_object> array = ensureType<as_array_object>(fn.this_ptr);
+    boost::intrusive_ptr<Array_as> array = ensureType<Array_as>(fn.this_ptr);
 
         IF_VERBOSE_ACTION (
     log_action(_("calling array unshift, pushing %d values onto front of array"), fn.nargs);
@@ -1192,7 +1192,7 @@ array_unshift(const fn_call& fn)
 static as_value
 array_pop(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_array_object> array = ensureType<as_array_object>(fn.this_ptr);
+    boost::intrusive_ptr<Array_as> array = ensureType<Array_as>(fn.this_ptr);
 
     // Get our index, log, then return result
     as_value rv = array->pop();
@@ -1208,7 +1208,7 @@ array_pop(const fn_call& fn)
 static as_value
 array_shift(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_array_object> array = ensureType<as_array_object>(fn.this_ptr);
+    boost::intrusive_ptr<Array_as> array = ensureType<Array_as>(fn.this_ptr);
 
     // Get our index, log, then return result
     as_value rv = array->shift();
@@ -1224,7 +1224,7 @@ array_shift(const fn_call& fn)
 static as_value
 array_reverse(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_array_object> array = ensureType<as_array_object>(fn.this_ptr);
+    boost::intrusive_ptr<Array_as> array = ensureType<Array_as>(fn.this_ptr);
 
     array->reverse();
 
@@ -1241,7 +1241,7 @@ array_reverse(const fn_call& fn)
 static as_value
 array_join(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_array_object> array = ensureType<as_array_object>(fn.this_ptr);
+    boost::intrusive_ptr<Array_as> array = ensureType<Array_as>(fn.this_ptr);
 
     std::string separator = ",";
     int version = array->getVM().getSWFVersion();
@@ -1262,7 +1262,7 @@ array_join(const fn_call& fn)
 static as_value
 array_to_string(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_array_object> array = ensureType<as_array_object>(fn.this_ptr);
+    boost::intrusive_ptr<Array_as> array = ensureType<Array_as>(fn.this_ptr);
 
     std::string ret = array->toString();
 
@@ -1285,10 +1285,10 @@ array_to_string(const fn_call& fn)
 static as_value
 array_concat(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_array_object> array = ensureType<as_array_object>(fn.this_ptr);
+    boost::intrusive_ptr<Array_as> array = ensureType<Array_as>(fn.this_ptr);
 
     // use copy ctor
-    as_array_object* newarray = new as_array_object();
+    Array_as* newarray = new Array_as();
 
     for (size_t i=0, e=array->size(); i<e; i++)
         newarray->push(array->at(i));
@@ -1296,7 +1296,7 @@ array_concat(const fn_call& fn)
     for (unsigned int i=0; i<fn.nargs; i++)
     {
         // Array args get concatenated by elements
-        boost::intrusive_ptr<as_array_object> other = boost::dynamic_pointer_cast<as_array_object>(fn.arg(i).to_object());
+        boost::intrusive_ptr<Array_as> other = boost::dynamic_pointer_cast<Array_as>(fn.arg(i).to_object());
         if ( other )
         {
             newarray->concat(*other);
@@ -1315,7 +1315,7 @@ array_concat(const fn_call& fn)
 static as_value
 array_slice(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_array_object> array = ensureType<as_array_object>(fn.this_ptr);
+    boost::intrusive_ptr<Array_as> array = ensureType<Array_as>(fn.this_ptr);
 
     // start and end index of the part we're slicing
     int startindex, endindex;
@@ -1334,7 +1334,7 @@ array_slice(const fn_call& fn)
     // and return the new one
     if (fn.nargs < 1)
     {
-        as_array_object* newarray = new as_array_object(*array);
+        Array_as* newarray = new Array_as(*array);
         return as_value(newarray);
     }
 
@@ -1367,7 +1367,7 @@ array_slice(const fn_call& fn)
     if ( endindex < startindex ) endindex = startindex;
     else if ( static_cast<size_t>(endindex)  > arraysize ) endindex = arraysize;
 
-    boost::intrusive_ptr<as_array_object> newarray(array->slice(
+    boost::intrusive_ptr<Array_as> newarray(array->slice(
         startindex, endindex));
 
     return as_value(newarray.get());        
@@ -1376,7 +1376,7 @@ array_slice(const fn_call& fn)
 static as_value
 array_length(const fn_call& fn)
 {
-    boost::intrusive_ptr<as_array_object> array = ensureType<as_array_object>(fn.this_ptr);
+    boost::intrusive_ptr<Array_as> array = ensureType<Array_as>(fn.this_ptr);
 
     if ( fn.nargs ) // setter
     {
@@ -1405,7 +1405,7 @@ array_new(const fn_call& fn)
     log_action(_("array_new called, nargs = %d"), fn.nargs);
     );
 
-    boost::intrusive_ptr<as_array_object>    ao = new as_array_object;
+    boost::intrusive_ptr<Array_as>    ao = new Array_as;
 
     if (fn.nargs == 0)
     {
@@ -1449,11 +1449,11 @@ static void
 attachArrayStatics(as_object& proto)
 {
     int flags = 0; // these are not protected
-    proto.init_member("CASEINSENSITIVE", as_array_object::fCaseInsensitive, flags);
-    proto.init_member("DESCENDING", as_array_object::fDescending, flags);
-    proto.init_member("UNIQUESORT", as_array_object::fUniqueSort, flags);
-    proto.init_member("RETURNINDEXEDARRAY", as_array_object::fReturnIndexedArray, flags);
-    proto.init_member("NUMERIC", as_array_object::fNumeric, flags);
+    proto.init_member("CASEINSENSITIVE", Array_as::fCaseInsensitive, flags);
+    proto.init_member("DESCENDING", Array_as::fDescending, flags);
+    proto.init_member("UNIQUESORT", Array_as::fUniqueSort, flags);
+    proto.init_member("RETURNINDEXEDARRAY", Array_as::fReturnIndexedArray, flags);
+    proto.init_member("NUMERIC", Array_as::fNumeric, flags);
 }
 
 static void
@@ -1552,7 +1552,7 @@ array_class_init(as_object& glob)
 }
 
 void
-as_array_object::enumerateNonProperties(as_environment& env) const
+Array_as::enumerateNonProperties(as_environment& env) const
 {
     std::stringstream ss; 
     for (const_iterator it = elements.begin(),
@@ -1566,7 +1566,7 @@ as_array_object::enumerateNonProperties(as_environment& env) const
 }
 
 void
-as_array_object::shiftElementsLeft(unsigned int count)
+Array_as::shiftElementsLeft(unsigned int count)
 {
     ArrayContainer& v = elements;
 
@@ -1589,7 +1589,7 @@ as_array_object::shiftElementsLeft(unsigned int count)
 }
 
 void
-as_array_object::shiftElementsRight(unsigned int count)
+Array_as::shiftElementsRight(unsigned int count)
 {
     ArrayContainer& v = elements;
 
@@ -1604,7 +1604,7 @@ as_array_object::shiftElementsRight(unsigned int count)
 }
 
 void
-as_array_object::splice(unsigned int start, unsigned int count, const std::vector<as_value>* replace, as_array_object* receive)
+Array_as::splice(unsigned int start, unsigned int count, const std::vector<as_value>* replace, Array_as* receive)
 {
     size_t sz = elements.size();
 
@@ -1646,7 +1646,7 @@ as_array_object::splice(unsigned int start, unsigned int count, const std::vecto
 
 #ifdef GNASH_USE_GC
 void
-as_array_object::markReachableResources() const
+Array_as::markReachableResources() const
 {
     for (const_iterator i=elements.begin(), e=elements.end(); i!=e; ++i)
     {
@@ -1657,7 +1657,7 @@ as_array_object::markReachableResources() const
 #endif // GNASH_USE_GC
 
 void
-as_array_object::visitPropertyValues(AbstractPropertyVisitor& visitor) const
+Array_as::visitPropertyValues(AbstractPropertyVisitor& visitor) const
 {
     std::stringstream ss; 
     string_table& st = getVM().getStringTable();
@@ -1674,7 +1674,7 @@ as_array_object::visitPropertyValues(AbstractPropertyVisitor& visitor) const
 }
 
 void
-as_array_object::visitNonHiddenPropertyValues(AbstractPropertyVisitor& visitor) const
+Array_as::visitNonHiddenPropertyValues(AbstractPropertyVisitor& visitor) const
 {
     std::stringstream ss; 
     string_table& st = getVM().getStringTable();
