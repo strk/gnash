@@ -866,7 +866,7 @@ myxml.onLoad = function(success)
 #if OUTPUT_VERSION < 6
 		check_totals(361);
 #else
-		check_totals(389);
+		check_totals(401);
 #endif
 		play();
 	}
