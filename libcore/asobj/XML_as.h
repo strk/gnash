@@ -136,8 +136,6 @@ public:
 
     void cleanupStackFrames( XMLNode *data);
 
-    void addRequestHeader(const NetworkAdapter::RequestHeaders::value_type&);
-
     XMLNode *createElement(const char *name);
 
     XMLNode *createTextNode(const char *name);
@@ -223,8 +221,6 @@ private:
 
     long int _bytesTotal;
     long int _bytesLoaded;
-    
-    NetworkAdapter::RequestHeaders _headers;
     
 };
 

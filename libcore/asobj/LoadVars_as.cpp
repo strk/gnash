@@ -119,8 +119,6 @@ public:
 		return _bytesTotal;
 	}
 
-    void addRequestHeader(const NetworkAdapter::RequestHeaders::value_type&);
-
 protected:
 
 #ifdef GNASH_USE_GC
@@ -184,8 +182,6 @@ private:
 	LoadThreadList _loadThreads; 
 
 	unsigned int _loadCheckerTimer;
-
-    NetworkAdapter::RequestHeaders _headers;
 
 };
 
@@ -421,17 +417,56 @@ LoadVars_as::sendAndLoad(const std::string& urlstr, as_object& target, bool post
 	if (post)
     {
         string_table& st = _vm.getStringTable();
+        as_value customHeaders;
+
+        NetworkAdapter::RequestHeaders headers;
+
+        if (get_member(st.find("_customHeaders"), &customHeaders))
+        {
+
+            /// Read in our custom headers if they exist and are an
+            /// array.
+            Array_as* array = dynamic_cast<Array_as*>(
+                            customHeaders.to_object().get());
+                            
+            if (array)
+            {
+                Array_as::const_iterator e = array->end();
+                --e;
+
+                for (Array_as::const_iterator i = array->begin(); i != e; ++i)
+                {
+                    // Only even indices can be a header.
+                    if (i.index() % 2) continue;
+                    if (! (*i).is_string()) continue;
+                    
+                    // Only the immediately following odd number can be 
+                    // a value.
+                    if (array->at(i.index() + 1).is_string())
+                    {
+                        const std::string& name = (*i).to_string();
+                        const std::string& val =
+                                    array->at(i.index() + 1).to_string();
+                                    
+                        // Values should overwrite existing ones.
+                        headers[name] = val;
+                    }
+                    
+                }
+            }
+        }
+
         as_value contentType;
 
         if ( get_member(st.find("contentType"), &contentType) )
         {
             // This should not overwrite anything set in LoadVars.addRequestHeader();
-            _headers.insert(std::make_pair("Content-Type", contentType.to_string()));
+            headers.insert(std::make_pair("Content-Type", contentType.to_string()));
         }
 
         /// It doesn't matter if there are no request headers.
         str = StreamProvider::getDefaultInstance().getStream(url,
-                                                    querystring, _headers);
+                                                    querystring, headers);
     }
 	else
     {
@@ -468,15 +503,37 @@ loadvars_addRequestHeader(const fn_call& fn)
     
 	boost::intrusive_ptr<LoadVars_as> ptr = ensureType<LoadVars_as>(fn.this_ptr);   
 
-    // Log all the time while not properly tested.
-    std::ostringstream ss;
-    fn.dump_args(ss);
-    log_debug ("addRequestHeader: %s", ss.str());
+    string_table& st = ptr->getVM().getStringTable();
+    as_value customHeaders;
+
+    Array_as* array;
+
+    if (ptr->get_member(st.find("_customHeaders"), &customHeaders))
+    {
+        array = dynamic_cast<Array_as*>(customHeaders.to_object().get());
+        if (!array)
+        {
+            IF_VERBOSE_ASCODING_ERRORS(
+                log_aserror(_("LoadVars.addRequestHeader: LoadVars._customHeaders "
+                              "is not an array"));
+            );
+            return as_value();
+        }
+    }
+    else
+    {
+        array = new Array_as;
+        // This property is always initialized on the first call to
+        // addRequestHeaders.
+        ptr->set_member(st.find("_customHeaders"), array);
+    }
 
     if (fn.nargs == 0)
     {
+        // Return after having initialized the _customHeaders array.
         IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("XML.addRequestHeader requires at least one argument"));
+            log_aserror(_("LoadVars.addRequestHeader requires at least "
+                          "one argument"));
         );
         return as_value();
     }
@@ -484,48 +541,31 @@ loadvars_addRequestHeader(const fn_call& fn)
     if (fn.nargs == 1)
     {
         boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
-        boost::intrusive_ptr<Array_as> array =
+        boost::intrusive_ptr<Array_as> headerArray =
                         dynamic_cast<Array_as*>(obj.get());
-        if (!array)
+        if (!headerArray)
         {
             IF_VERBOSE_ASCODING_ERRORS(
-                log_aserror(_("XML.addRequestHeader: single argument "
+                log_aserror(_("LoadVars.addRequestHeader: single argument "
                                 "is not an array"));
             );
             return as_value();
         }
         
-        // Nothing to do for empty arrays.
-        if (!array->size()) return as_value();
+        // An array with 1 or 0 elements is invalid
+        if (headerArray->size() < 2) return as_value();
         
-        Array_as::const_iterator e = array->end();
-        --e;
-
-        for (Array_as::const_iterator i = array->begin(); i != e; ++i)
-        {
-            // Only even indices can be a header.
-            if (i.index() % 2) continue;
-            if (! (*i).is_string()) continue;
-            
-            // Only the immediately following odd number can be a value.
-            if (array->at(i.index() + 1).is_string())
-            {
-                const std::string& name = (*i).to_string();
-                const std::string& val = array->at(i.index() + 1).to_string();
-                ptr->addRequestHeader(std::make_pair(name, val));
-            }
-            
-        }
-
+        // Add the new array to the existing one.
+        array->concat(*headerArray);
         return as_value();
     }
-
+        
     if (fn.nargs > 2)
     {
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror(_("XML.addRequestHeader(%s): arguments after the"
+            log_aserror(_("LoadVars.addRequestHeader(%s): arguments after the"
                             "second will be discarded"), ss.str());
         );
     }
@@ -536,34 +576,20 @@ loadvars_addRequestHeader(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror(_("XML.addRequestHeader(%s): both arguments "
+            log_aserror(_("LoadVars.addRequestHeader(%s): both arguments "
                         "must be a string"), ss.str());
         );
         return as_value(); 
     }
 
+    // Push both to the _customHeaders array.
     const std::string& name = fn.arg(0).to_string();
     const std::string& val = fn.arg(1).to_string();
-    ptr->addRequestHeader(std::make_pair(name, val));
+
+    array->push(name);
+    array->push(val);
     
     return as_value();
-}
-
-/// \brief add or change the HTTP Request header
-///
-/// Method; adds or changes HTTP request headers (such as Content-Type
-/// or SOAPAction) sent with POST actions. In the first usage, you pass
-/// two strings to the method: headerName and headerValue. In the
-/// second usage, you pass an array of strings, alternating header
-/// names and header values.
-///
-/// If multiple calls are made to set the same header name, each
-/// successive value replaces the value set in the previous call.
-void
-LoadVars_as::addRequestHeader(const NetworkAdapter::RequestHeaders::value_type& headerPair)
-{
-    /// Replace existing values.
-    _headers[headerPair.first] = headerPair.second;
 }
 
 
