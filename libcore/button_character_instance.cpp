@@ -726,7 +726,7 @@ button_character_instance::set_current_state(e_mouse_state new_state)
 				int ch_id = bdef.m_character_id;
 
 				character* ch = bdef.m_character_def->create_character_instance(this, ch_id);
-				ch->set_matrix(mat); 
+				ch->set_matrix(mat, true); // update caches
 				ch->set_cxform(cx); 
 				ch->set_depth(ch_depth); 
 				assert(ch->get_parent() == this);
@@ -883,7 +883,7 @@ button_character_instance::stagePlacementCallback()
 		int ch_id = bdef.m_character_id;
 
 		character* ch = bdef.m_character_def->create_character_instance(this, ch_id);
-		ch->set_matrix(mat); 
+		ch->set_matrix(mat, true);  // update caches
 		ch->set_cxform(cx); // TODO: who cares about color ?
 		ch->set_depth(ch_depth); // TODO: check if we care about depth, and why ...
 		assert(ch->get_parent() == this);
@@ -914,7 +914,7 @@ button_character_instance::stagePlacementCallback()
 		int ch_id = bdef.m_character_id;
 
 		character* ch = bdef.m_character_def->create_character_instance(this, ch_id);
-		ch->set_matrix(mat); 
+		ch->set_matrix(mat, true);  // update caches
 		ch->set_cxform(cx); 
 		ch->set_depth(ch_depth); 
 		assert(ch->get_parent() == this);
