@@ -63,14 +63,14 @@ attachInterface(as_object *obj)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    obj->init_member("connect", &mysql_connect);
-    obj->init_member("qetData", &mysql_qetData);
-    obj->init_member("disconnect", &mysql_disconnect);
-    obj->init_member("query", &mysql_query);
-    obj->init_member("fetch_row", &mysql_fetch);
-    obj->init_member("num_fields", &mysql_fields);
-    obj->init_member("free_result", &mysql_free);
-    obj->init_member("store_results", &mysql_store);
+    obj->init_member("connect", new builtin_function(mysql_connect));
+    obj->init_member("qetData", new builtin_function(mysql_qetData));
+    obj->init_member("disconnect", new builtin_function(mysql_disconnect));
+    obj->init_member("query", new builtin_function(mysql_query));
+    obj->init_member("fetch_row", new builtin_function(mysql_fetch));
+    obj->init_member("num_fields", new builtin_function(mysql_fields));
+    obj->init_member("free_result", new builtin_function(mysql_free));
+    obj->init_member("store_results", new builtin_function(mysql_store));
 }
 
 static as_object*
@@ -86,7 +86,7 @@ getInterface()
 }
 
 static as_value
-mysql_ctor(const fn_call& fn)
+mysql_ctor(const fn_call& /*fn*/)
 {
 //    GNASH_REPORT_FUNCTION;
 
@@ -232,6 +232,7 @@ MySQL::guery(MYSQL *db, const char *sql)
        default:
  	  return true;
     } 
+    return false;
 }
 
 int
@@ -342,9 +343,9 @@ mysql_qetData(const fn_call& fn)
 	    }
 	}
  	return as_value(true);
-//     } else {
-// 	return as_value(false);
     }
+    log_aserror("Mysql.getData(): missing arguments");
+ 	return as_value(false);
 }
 
 as_value
@@ -377,6 +378,8 @@ mysql_fetch(const fn_call& fn)
 	arr->push(aaa);
 	return as_value(arr);
     }
+    log_aserror("Mysql.fetch(): missing arguments");
+    return as_value();
 }
 
 as_value
@@ -396,6 +399,8 @@ mysql_query(const fn_call& fn)
 	string sql = fn.arg(0).to_string();
 	return as_value(ptr->obj.guery(sql.c_str()));
     }
+    log_aserror("Missing arguments to MySQL.query");
+    return as_value();
 }
 
 as_value
