@@ -91,7 +91,17 @@ main(int argc, char** argv)
 	dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
 	SWFMovie_add(mo, (SWFBlock)dejagnuclip);
 
-	add_actions(mo, "printBounds = function(b) { return '' + b.xMin + ','+ b.yMin + ' '+ b.xMax + ',' + b.yMax; };");
+	add_actions(mo, "printBounds = function(b, roundToDecimal) "
+            "{ "
+            "   if ( roundToDecimal != undefined ) {"
+            "       var round = Math.pow(10, roundToDecimal);"
+            //"       trace('rounding to '+round);"
+            "       return '' + Math.round(b.xMin*round)/round + ','+ Math.round(b.yMin*round)/round + ' '+ Math.round(b.xMax*round)/round + ',' + Math.round(b.yMax*round)/round; "
+            "   } else {"
+            "       return '' + b.xMin + ','+ b.yMin + ' '+ b.xMax + ',' + b.yMax; "
+            "   }"
+            "};"
+            );
 
 	SWFMovie_nextFrame(mo); 
 
@@ -739,6 +749,231 @@ main(int argc, char** argv)
 	check(mo, "!staticmc.hitTest(0, 331, false)");  // overdown
 
 
+	//
+	// Now test setting parameters after reading matrix
+	//
+
+	SWFMovie_nextFrame(mo);
+
+	SWFDisplayItem_remove(it);
+	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
+	SWFDisplayItem_setMatrix(it, 1, 0, 2, 1, 200, 200); 
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'109.85,169.95 290.15,230.05'");
+	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
+	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'110,170 290,230'");
+	add_actions(mo, "staticmc._yscale = 0 - staticmc._yscale;"); // swap _yscale sign using ActionScript
+	xcheck_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'110,170 290,230'");
+
+	SWFMovie_nextFrame(mo);
+
+	SWFDisplayItem_remove(it);
+	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
+	SWFDisplayItem_setMatrix(it, 1, 0, -2, 1, 200, 200); 
+    check_equals(mo, "staticmc._xscale", "100");
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'109.85,169.95 290.15,230.05'");
+	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
+    check_equals(mo, "staticmc._xscale", "-100"); // xscale changed, boundaries don't (not much at least)
+	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'110,170 290,230'");
+	add_actions(mo, "staticmc._yscale = 0 - staticmc._yscale;"); // swap _yscale sign using ActionScript
+	xcheck_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'110,170 290,230'");
+
+	SWFMovie_nextFrame(mo);
+
+	SWFDisplayItem_remove(it);
+	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
+	SWFDisplayItem_setMatrix(it, 1, 0, -2, -1, 200, 200); 
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'109.85,169.95 290.15,230.05'");
+	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
+	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'110,170 290,230'");
+	add_actions(mo, "staticmc._yscale = 0 - staticmc._yscale;"); // swap _yscale sign using ActionScript
+	xcheck_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'110,170 290,230'");
+
+	SWFMovie_nextFrame(mo);
+
+	SWFDisplayItem_remove(it);
+	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
+	SWFDisplayItem_setMatrix(it, -1, 0, 2, 1, 200, 200); 
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'109.85,169.95 290.15,230.05'");
+	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
+	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'110,170 290,230'");
+	add_actions(mo, "staticmc._yscale = 0 - staticmc._yscale;"); // swap _yscale sign using ActionScript
+	xcheck_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'110,170 290,230'");
+
+	SWFMovie_nextFrame(mo);
+
+	SWFDisplayItem_remove(it);
+	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
+	SWFDisplayItem_setMatrix(it, -1, 0, -2, 1, 200, 200); 
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'109.85,169.95 290.15,230.05'");
+	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
+	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'110,170 290,230'");
+	add_actions(mo, "staticmc._yscale = 0 - staticmc._yscale;"); // swap _yscale sign using ActionScript
+	xcheck_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'110,170 290,230'");
+
+	SWFMovie_nextFrame(mo);
+
+	SWFDisplayItem_remove(it);
+	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
+	SWFDisplayItem_setMatrix(it, -1, 0, -2, -1, 200, 200); 
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'109.85,169.95 290.15,230.05'");
+	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
+	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'110,170 290,230'");
+	add_actions(mo, "staticmc._yscale = 0 - staticmc._yscale;"); // swap _yscale sign using ActionScript
+	xcheck_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'110,170 290,230'");
+
+	SWFMovie_nextFrame(mo);
+
+	SWFDisplayItem_remove(it);
+	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
+	SWFDisplayItem_setMatrix(it, 1, 2, 0, 1, 200, 200); 
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'169.95,109.85 230.05,290.15'");
+	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
+	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'170,110 230,290'");
+	add_actions(mo, "staticmc._yscale = 0 - staticmc._yscale;"); // swap _yscale sign using ActionScript
+	xcheck_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'170,110 230,290'");
+
+	SWFMovie_nextFrame(mo);
+
+	SWFDisplayItem_remove(it);
+	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
+	SWFDisplayItem_setMatrix(it, 1, -2, 0, 1, 200, 200); 
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'169.95,109.85 230.05,290.15'");
+	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
+	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'170,110 230,290'");
+	add_actions(mo, "staticmc._yscale = 0 - staticmc._yscale;"); // swap _yscale sign using ActionScript
+	xcheck_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'170,110 230,290'");
+
+	SWFMovie_nextFrame(mo);
+
+	SWFDisplayItem_remove(it);
+	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
+	SWFDisplayItem_setMatrix(it, 1, -2, 0, -1, 200, 200); 
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'169.95,109.85 230.05,290.15'");
+	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
+	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'170,110 230,290'");
+	add_actions(mo, "staticmc._yscale = 0 - staticmc._yscale;"); // swap _yscale sign using ActionScript
+	xcheck_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'170,110 230,290'");
+
+	SWFMovie_nextFrame(mo);
+
+	SWFDisplayItem_remove(it);
+	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
+	SWFDisplayItem_setMatrix(it, -1, 2, 0, 1, 200, 200); 
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'169.95,109.85 230.05,290.15'");
+	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
+	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'170,110 230,290'");
+	add_actions(mo, "staticmc._yscale = 0 - staticmc._yscale;"); // swap _yscale sign using ActionScript
+	xcheck_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'170,110 230,290'");
+
+	SWFMovie_nextFrame(mo);
+
+	SWFDisplayItem_remove(it);
+	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
+	SWFDisplayItem_setMatrix(it, -1, -2, 0, 1, 200, 200); 
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'169.95,109.85 230.05,290.15'");
+	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
+	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'170,110 230,290'");
+	add_actions(mo, "staticmc._yscale = 0 - staticmc._yscale;"); // swap _yscale sign using ActionScript
+	xcheck_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'170,110 230,290'");
+
+	SWFMovie_nextFrame(mo);
+
+	SWFDisplayItem_remove(it);
+	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
+	SWFDisplayItem_setMatrix(it, -1, -2, 0, -1, 200, 200); 
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'169.95,109.85 230.05,290.15'");
+	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
+	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'170,110 230,290'");
+	add_actions(mo, "staticmc._yscale = 0 - staticmc._yscale;"); // swap _yscale sign using ActionScript
+	xcheck_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'170,110 230,290'");
+
+	SWFMovie_nextFrame(mo);
+
+	SWFDisplayItem_remove(it);
+	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
+	SWFDisplayItem_setMatrix(it, -1, -2, 2, -1, 200, 200); 
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'109.85,109.85 290.15,290.15'");
+	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
+	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'110,110 290,290'");
+	add_actions(mo, "staticmc._yscale = 0 - staticmc._yscale;"); // swap _yscale sign using ActionScript
+	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'110,110 290,290'");
+
+	SWFMovie_nextFrame(mo);
+
+	SWFDisplayItem_remove(it);
+	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
+	SWFDisplayItem_setMatrix(it, -1, -2, -2, -1, 200, 200); 
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'109.85,109.85 290.15,290.15'");
+	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
+	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'110,110 290,290'");
+	add_actions(mo, "staticmc._yscale = 0 - staticmc._yscale;"); // swap _yscale sign using ActionScript
+	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'110,110 290,290'");
+
+	SWFMovie_nextFrame(mo);
+
+	SWFDisplayItem_remove(it);
+	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
+	SWFDisplayItem_setMatrix(it, -1, 2, -2, -1, 200, 200); 
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'109.85,109.85 290.15,290.15'");
+	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
+	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'110,110 290,290'");
+	add_actions(mo, "staticmc._yscale = 0 - staticmc._yscale;"); // swap _yscale sign using ActionScript
+	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'110,110 290,290'");
+
+	SWFMovie_nextFrame(mo);
+
+	SWFDisplayItem_remove(it);
+	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
+	SWFDisplayItem_setMatrix(it, -1, 2, -2, 1, 200, 200); 
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'109.85,109.85 290.15,290.15'");
+	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
+	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'110,110 290,290'");
+	add_actions(mo, "staticmc._yscale = 0 - staticmc._yscale;"); // swap _yscale sign using ActionScript
+	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'110,110 290,290'");
+
+	SWFMovie_nextFrame(mo);
+
+	SWFDisplayItem_remove(it);
+	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
+	SWFDisplayItem_setMatrix(it, 1, 2, -2, -1, 200, 200); 
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'109.85,109.85 290.15,290.15'");
+	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
+	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'110,110 290,290'");
+	add_actions(mo, "staticmc._yscale = 0 - staticmc._yscale;"); // swap _yscale sign using ActionScript
+	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'110,110 290,290'");
+
+	SWFMovie_nextFrame(mo);
+
+	SWFDisplayItem_remove(it);
+	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
+	SWFDisplayItem_setMatrix(it, -1, -2, 2, -1, 200, 200); 
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'109.85,109.85 290.15,290.15'");
+	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
+	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'110,110 290,290'");
+	add_actions(mo, "staticmc._yscale = 0 - staticmc._yscale;"); // swap _yscale sign using ActionScript
+	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'110,110 290,290'");
+
+	SWFMovie_nextFrame(mo);
+
+	SWFDisplayItem_remove(it);
+	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
+	SWFDisplayItem_setMatrix(it, -1, -2, 2, 1, 200, 200); 
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'109.85,109.85 290.15,290.15'");
+	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
+	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'110,110 290,290'");
+	add_actions(mo, "staticmc._yscale = 0 - staticmc._yscale;"); // swap _yscale sign using ActionScript
+	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'110,110 290,290'");
+
+	SWFMovie_nextFrame(mo);
+
+	SWFDisplayItem_remove(it);
+	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
+	SWFDisplayItem_setMatrix(it, 1, -2, 2, -1, 200, 200); 
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'109.85,109.85 290.15,290.15'");
+	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
+	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'110,110 290,290'");
+	add_actions(mo, "staticmc._yscale = 0 - staticmc._yscale;"); // swap _yscale sign using ActionScript
+	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'110,110 290,290'");
 
 	// TODO:
 	// - test more rotations and scales (corner cases too!)
@@ -746,7 +981,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);
 
-	add_actions(mo, "_root.totals(408); stop();");
+	add_actions(mo, "_root.totals(470); stop();");
 	SWFMovie_nextFrame(mo);        
 
 	//Output movie
