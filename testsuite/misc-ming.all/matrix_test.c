@@ -108,6 +108,25 @@ main(int argc, char** argv)
 	check_equals(mo, "staticmc._width", "60.1");
 	check_equals(mo, "staticmc._height", "60.1");
 
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'19.95,269.95 80.05,330.05'");
+
+	// X:  19.95 ..  80.05
+	// Y: 269.95 .. 330.05
+
+	check(mo, "staticmc.hitTest(30, 300, true)");    // in hittable shape 
+	xcheck(mo, "!staticmc.hitTest(20, 300, true)");  //  rounding makes 20 be too on the left for a shape test
+	check(mo, "staticmc.hitTest(20, 300, false)");   //  but is fine for a boundary test
+
+	check(mo, "staticmc.hitTest(75, 300, true)");   // in hittable shape 
+	xcheck(mo, "!staticmc.hitTest(80, 300, true)");  //   rounding makes 80 be too on the right for a shape test
+	check(mo, "staticmc.hitTest(80, 300, false)");  //   but is fine for a boundary test
+
+	check(mo, "staticmc.hitTest(25, 330, true)");  // in hittable shape 
+	check(mo, "staticmc.hitTest(75, 330, true)");  // in hittable shape 
+
+	check(mo, "staticmc.hitTest(25, 270, true)");  // in hittable shape 
+	check(mo, "staticmc.hitTest(75, 270, true)");  // in hittable shape 
+
 	SWFMovie_nextFrame(mo);        
 
 	SWFDisplayItem_rotateTo(it, -45);
@@ -135,6 +154,26 @@ main(int argc, char** argv)
 	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'-56.25,193.75 156.25,406.25'");
 	check_equals(mo, "staticmc._width", "212.5");
 	check_equals(mo, "staticmc._height", "212.5");
+
+	check(mo, "staticmc.hitTest(-56, 194, false)");  // in boundaries
+	check(mo, "staticmc.hitTest(-56, 406, false)");  // in boundaries
+	check(mo, "staticmc.hitTest(156, 194, false)");  // in boundaries
+	check(mo, "staticmc.hitTest(156, 406, false)");  // in boundaries
+
+    // X: -56.25  156.25
+    // Y: 193.75  406.25
+	//check(mo, "staticmc.hitTest(0, 300, true)");  // in hittable shape (why no hit?)
+	//check(mo, "staticmc.hitTest(0, 0, true)");  // in hittable shape (why no hit?)
+
+	check(mo, "!staticmc.hitTest(-57, 194, true)"); 
+	check(mo, "!staticmc.hitTest(-57, 406, true)"); 
+	check(mo, "!staticmc.hitTest(157, 194, true)"); 
+	check(mo, "!staticmc.hitTest(157, 406, true)"); 
+	check(mo, "!staticmc.hitTest(-56, 193, true)"); 
+	check(mo, "!staticmc.hitTest(-56, 407, true)"); 
+	check(mo, "!staticmc.hitTest(156, 193, true)"); 
+	check(mo, "!staticmc.hitTest(156, 407, true)"); 
+
 
 	SWFMovie_nextFrame(mo);        
 
@@ -259,6 +298,162 @@ main(int argc, char** argv)
 	check_equals(mo, "staticmc._width", "60.1");
 	check_equals(mo, "staticmc._height", "60.1");
 
+	SWFMovie_nextFrame(mo);        
+	SWFDisplayItem_setMatrix(it, -1, -45, 0, 1, 50, 300); // negative x scale and some negative skew
+
+	check_equals(mo, "staticmc._x", "50");
+	check_equals(mo, "staticmc._y", "300");
+	check_equals(mo, "Math.round(staticmc._xscale)", "4501"); // let's tollerate precision for now
+	check_equals(mo, "staticmc._yscale", "100");
+	check_equals(mo, "Math.round(staticmc._rotation)", "-91");  // let's tollerate precision for now
+	check_equals(mo, "printBounds(staticmc.getBounds())", "'-30.05,-30.05 30.05,30.05'");
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'19.95,-1082.3 80.05,1682.3'");
+	check_equals(mo, "staticmc._width", "60.1");
+	check_equals(mo, "staticmc._height", "2764.6");
+
+	SWFMovie_nextFrame(mo);        
+	SWFDisplayItem_setMatrix(it, -1, 45, 0, 1, 50, 300); // negative x scale and some positive skew
+
+	check_equals(mo, "staticmc._x", "50");
+	check_equals(mo, "staticmc._y", "300");
+	check_equals(mo, "Math.round(staticmc._xscale)", "4501"); // let's tollerate precision for now
+	check_equals(mo, "staticmc._yscale", "100");
+	check_equals(mo, "Math.round(staticmc._rotation)", "91");  // let's tollerate precision for now
+	check_equals(mo, "printBounds(staticmc.getBounds())", "'-30.05,-30.05 30.05,30.05'");
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'19.95,-1082.3 80.05,1682.3'");
+	check_equals(mo, "staticmc._width", "60.1");
+	check_equals(mo, "staticmc._height", "2764.6");
+
+	SWFMovie_nextFrame(mo);        
+	SWFDisplayItem_setMatrix(it, 1, -45, 0, -1, 50, 300); // negative x scale and some negative skew
+
+	check_equals(mo, "staticmc._x", "50");
+	check_equals(mo, "staticmc._y", "300");
+	check_equals(mo, "Math.round(staticmc._xscale)", "4501"); // let's tollerate precision for now
+	check_equals(mo, "staticmc._yscale", "100");
+	check_equals(mo, "Math.round(staticmc._rotation)", "-89");  // let's tollerate precision for now
+	check_equals(mo, "printBounds(staticmc.getBounds())", "'-30.05,-30.05 30.05,30.05'");
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'19.95,-1082.3 80.05,1682.3'");
+	check_equals(mo, "staticmc._width", "60.1");
+	check_equals(mo, "staticmc._height", "2764.6");
+
+	SWFMovie_nextFrame(mo);        
+	SWFDisplayItem_setMatrix(it, 1, 45, 0, -1, 50, 300); // negative x scale and some positive skew
+
+	check_equals(mo, "staticmc._x", "50");
+	check_equals(mo, "staticmc._y", "300");
+	check_equals(mo, "Math.round(staticmc._xscale)", "4501"); // let's tollerate precision for now
+	check_equals(mo, "staticmc._yscale", "100");
+	check_equals(mo, "Math.round(staticmc._rotation)", "89");  // let's tollerate precision for now
+	check_equals(mo, "printBounds(staticmc.getBounds())", "'-30.05,-30.05 30.05,30.05'");
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'19.95,-1082.3 80.05,1682.3'");
+	check_equals(mo, "staticmc._width", "60.1");
+	check_equals(mo, "staticmc._height", "2764.6");
+
+	SWFMovie_nextFrame(mo);        
+	SWFDisplayItem_setMatrix(it, -1, 45, 0, -1, 50, 300); // negative x scale and some positive skew
+
+	check_equals(mo, "staticmc._x", "50");
+	check_equals(mo, "staticmc._y", "300");
+	check_equals(mo, "Math.round(staticmc._xscale)", "4501"); // let's tollerate precision for now
+	check_equals(mo, "staticmc._yscale", "100");
+	check_equals(mo, "Math.round(staticmc._rotation)", "91");  // let's tollerate precision for now
+	check_equals(mo, "printBounds(staticmc.getBounds())", "'-30.05,-30.05 30.05,30.05'");
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'19.95,-1082.3 80.05,1682.3'");
+	check_equals(mo, "staticmc._width", "60.1");
+	check_equals(mo, "staticmc._height", "2764.6");
+
+	SWFMovie_nextFrame(mo);        
+	SWFDisplayItem_setMatrix(it, -1, -45, 0, -1, 50, 300); // negative x scale and some positive skew
+
+	check_equals(mo, "staticmc._x", "50");
+	check_equals(mo, "staticmc._y", "300");
+	check_equals(mo, "Math.round(staticmc._xscale)", "4501"); // let's tollerate precision for now
+	check_equals(mo, "staticmc._yscale", "100");
+	check_equals(mo, "Math.round(staticmc._rotation)", "-91");  // let's tollerate precision for now
+	check_equals(mo, "printBounds(staticmc.getBounds())", "'-30.05,-30.05 30.05,30.05'");
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'19.95,-1082.3 80.05,1682.3'");
+	check_equals(mo, "staticmc._width", "60.1");
+	check_equals(mo, "staticmc._height", "2764.6");
+
+	SWFMovie_nextFrame(mo);        
+	SWFDisplayItem_setMatrix(it, -1, 0, -45, 1, 50, 300); // negative x scale and some negative skew
+
+	check_equals(mo, "staticmc._x", "50");
+	check_equals(mo, "staticmc._y", "300");
+	check_equals(mo, "staticmc._xscale", "100");
+	check_equals(mo, "Math.round(staticmc._yscale)", "4501"); // let's tollerate precision for now
+	check_equals(mo, "staticmc._rotation", "180");  
+	check_equals(mo, "printBounds(staticmc.getBounds())", "'-30.05,-30.05 30.05,30.05'");
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'-1332.3,269.95 1432.3,330.05'");
+	check_equals(mo, "staticmc._width", "2764.6");
+	check_equals(mo, "staticmc._height", "60.1");
+
+	SWFMovie_nextFrame(mo);        
+	SWFDisplayItem_setMatrix(it, -1, 0, 45, 1, 50, 300); // negative x scale and some positive skew
+
+	check_equals(mo, "staticmc._x", "50");
+	check_equals(mo, "staticmc._y", "300");
+	check_equals(mo, "staticmc._xscale", "100");
+	check_equals(mo, "Math.round(staticmc._yscale)", "4501"); // let's tollerate precision for now
+	check_equals(mo, "staticmc._rotation", "180");  
+	check_equals(mo, "printBounds(staticmc.getBounds())", "'-30.05,-30.05 30.05,30.05'");
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'-1332.3,269.95 1432.3,330.05'");
+	check_equals(mo, "staticmc._width", "2764.6");
+	check_equals(mo, "staticmc._height", "60.1");
+
+	SWFMovie_nextFrame(mo);        
+	SWFDisplayItem_setMatrix(it, 1, 0, -45, -1, 50, 300); // negative x scale and some negative skew
+
+	check_equals(mo, "staticmc._x", "50");
+	check_equals(mo, "staticmc._y", "300");
+	check_equals(mo, "staticmc._xscale", "100");
+	check_equals(mo, "Math.round(staticmc._yscale)", "4501"); // let's tollerate precision for now
+	check_equals(mo, "staticmc._rotation", "0");  
+	check_equals(mo, "printBounds(staticmc.getBounds())", "'-30.05,-30.05 30.05,30.05'");
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'-1332.3,269.95 1432.3,330.05'");
+	check_equals(mo, "staticmc._width", "2764.6");
+	check_equals(mo, "staticmc._height", "60.1");
+
+	SWFMovie_nextFrame(mo);        
+	SWFDisplayItem_setMatrix(it, 1, 0, 45, -1, 50, 300); // negative x scale and some positive skew
+
+	check_equals(mo, "staticmc._x", "50");
+	check_equals(mo, "staticmc._y", "300");
+	check_equals(mo, "staticmc._xscale", "100");
+	check_equals(mo, "Math.round(staticmc._yscale)", "4501"); // let's tollerate precision for now
+	check_equals(mo, "staticmc._rotation", "0");  
+	check_equals(mo, "printBounds(staticmc.getBounds())", "'-30.05,-30.05 30.05,30.05'");
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'-1332.3,269.95 1432.3,330.05'");
+	check_equals(mo, "staticmc._width", "2764.6");
+	check_equals(mo, "staticmc._height", "60.1");
+
+	SWFMovie_nextFrame(mo);        
+	SWFDisplayItem_setMatrix(it, -1, 0, 45, -1, 50, 300); // negative x scale and some positive skew
+
+	check_equals(mo, "staticmc._x", "50");
+	check_equals(mo, "staticmc._y", "300");
+	check_equals(mo, "staticmc._xscale", "100");
+	check_equals(mo, "Math.round(staticmc._yscale)", "4501"); // let's tollerate precision for now
+	check_equals(mo, "staticmc._rotation", "180");  
+	check_equals(mo, "printBounds(staticmc.getBounds())", "'-30.05,-30.05 30.05,30.05'");
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'-1332.3,269.95 1432.3,330.05'");
+	check_equals(mo, "staticmc._width", "2764.6");
+	check_equals(mo, "staticmc._height", "60.1");
+
+	SWFMovie_nextFrame(mo);        
+	SWFDisplayItem_setMatrix(it, -1, 0, -45, -1, 50, 300); // negative x scale and some positive skew
+
+	check_equals(mo, "staticmc._x", "50");
+	check_equals(mo, "staticmc._y", "300");
+	check_equals(mo, "staticmc._xscale", "100");
+	check_equals(mo, "Math.round(staticmc._yscale)", "4501"); // let's tollerate precision for now
+	check_equals(mo, "staticmc._rotation", "180");  
+	check_equals(mo, "printBounds(staticmc.getBounds())", "'-30.05,-30.05 30.05,30.05'");
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'-1332.3,269.95 1432.3,330.05'");
+	check_equals(mo, "staticmc._width", "2764.6");
+	check_equals(mo, "staticmc._height", "60.1");
+
 
 	// TODO:
 	// - test more rotations and scales (corner cases too!)
@@ -266,7 +461,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);
 
-	add_actions(mo, "_root.totals(107); stop();");
+	add_actions(mo, "_root.totals(238); stop();");
 	SWFMovie_nextFrame(mo);        
 
 	//Output movie
