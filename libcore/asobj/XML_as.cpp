@@ -573,7 +573,7 @@ XML_as::sendAndLoad(const URL& url, as_object& target)
 
     NetworkAdapter::RequestHeaders headers;
 
-    if ( get_member(st.find("_customHeaders"), &customHeaders) )
+    if ( get_member(NSV::PROP_uCUSTOM_HEADERS, &customHeaders) )
     {
 
         /// Read in our custom headers if they exist and are an
