@@ -419,7 +419,9 @@ LoadVars_as::sendAndLoad(const std::string& urlstr, as_object& target, bool post
 	std::auto_ptr<IOChannel> str;
 	if (post)
     {
-        str.reset(StreamProvider::getDefaultInstance().getStream(url, querystring));
+        /// It doesn't matter if there are no request headers.
+        str = StreamProvider::getDefaultInstance().getStream(url,
+                                                    querystring, _headers);
     }
 	else
     {
