@@ -5369,7 +5369,7 @@ msgid "  -1,  --once              Exit when/if movie reaches the last frame"
 msgstr ""
 
 #: ../gui/gnash.cpp:113
-msgid "  -g,  --debugger          Turn on the Flash debugger"
+msgid "  -g,  --debugger          Turn on the SWF debugger"
 msgstr ""
 
 #: ../gui/gnash.cpp:114
@@ -5768,7 +5768,7 @@ msgid "Value"
 msgstr ""
 
 #: ../gui/gtk.cpp:1461
-msgid "Gnash is the GNU Flash movie player based on GameSWF."
+msgid "Gnash is the GNU SWF player based on GameSWF."
 msgstr ""
 
 #: ../gui/gtk.cpp:1463
@@ -5802,7 +5802,7 @@ msgid ""
 msgstr ""
 
 #: ../gui/gtk.cpp:1485
-msgid "GNASH flash movie player"
+msgid "GNASH SWF player"
 msgstr ""
 
 #: ../gui/gtk.cpp:1517 ../gui/gtk.cpp:1530

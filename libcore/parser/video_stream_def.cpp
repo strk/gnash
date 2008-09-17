@@ -47,7 +47,7 @@ video_stream_definition::~video_stream_definition()
 
 
 void
-video_stream_definition::readDefineVideoStream(SWFStream& in, SWF::tag_type tag, movie_definition* /*m*/)
+video_stream_definition::readDefineVideoStream(SWFStream& in, SWF::tag_type tag, movie_definition& /*m*/)
 {
 	// Character ID has been read already, and was loaded in the constructor
 
@@ -87,7 +87,7 @@ video_stream_definition::readDefineVideoStream(SWFStream& in, SWF::tag_type tag,
 }
 
 void
-video_stream_definition::readDefineVideoFrame(SWFStream& in, SWF::tag_type tag, movie_definition* /*m*/)
+video_stream_definition::readDefineVideoFrame(SWFStream& in, SWF::tag_type tag, movie_definition& /*m*/)
 {
 	// Character ID has been read already, and was loaded in the constructor
 

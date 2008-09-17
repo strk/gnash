@@ -56,6 +56,12 @@
 
 namespace gnash {
 
+static void
+cleanQueue(NetStreamFfmpeg::AudioQueue::value_type data)
+{
+    delete data;
+}
+
 // AS-volume adjustment
 void adjust_volume(boost::int16_t* data, int size, int volume)
 {
@@ -111,6 +117,12 @@ void NetStreamFfmpeg::pause( PauseMode mode )
 void NetStreamFfmpeg::close()
 {
 	GNASH_REPORT_FUNCTION;
+
+    // Delete any samples in the audio queue.
+	{
+		boost::mutex::scoped_lock lock(_audioQueueMutex);
+		std::for_each(_audioQueue.begin(), _audioQueue.end(), &cleanQueue);
+    }
 
 	// When closing gnash before playback is finished, the soundhandler 
 	// seems to be removed before netstream is destroyed.
@@ -546,11 +558,7 @@ NetStreamFfmpeg::seek(boost::uint32_t posSeconds)
 
 	{ // cleanup audio queue, so won't be consumed while seeking
 		boost::mutex::scoped_lock lock(_audioQueueMutex);
-		for (AudioQueue::iterator i=_audioQueue.begin(), e=_audioQueue.end();
-				i!=e; ++i)
-		{
-			delete (*i);
-		}
+		std::for_each(_audioQueue.begin(), _audioQueue.end(), &cleanQueue);
 		_audioQueue.clear();
 	}
 	
@@ -995,6 +1003,9 @@ NetStreamFfmpeg::advance()
 	// Refill audio buffer to consume all samples
 	// up to current playhead
 	refreshAudioBuffer();
+
+	// Process media tags
+	m_parser->processTags(_playHead.getPosition(), this, getVM());
 }
 
 boost::int32_t

@@ -2,7 +2,7 @@
 Name:           gnash
 Version:        %{version}
 Release:        1%{?dist}
-Summary:        GNU flash movie player
+Summary:        GNU SWF player
 
 Group:          Applications/Multimedia
 Vendor:		Gnash Project
@@ -40,25 +40,25 @@ Requires(postun): /sbin/ldconfig
 #Requires(preun): /sbin/install-info
 
 %description
-Gnash is a GNU Flash movie player that supports many SWF v7 features, with growing support for swf v8 and v9.
+Gnash is a GNU SWF movie player that supports many SWF v7 features, with growing support for swf v8 and v9.
 
 %package plugin
-Summary:   Web-client flash movie player plugin 
+Summary:   Web-client SWF player plugin 
 Requires:  %{name} = %{version}-%{release}
 Requires: gstreamer >= 0.10 gnash
 Group:     Applications/Internet
 
 %description plugin
-The gnash flash movie player plugin for firefox or mozilla.
+The gnash SWF player plugin for firefox or mozilla.
 
 %package klash
-Summary:   Konqueror flash movie player plugin
+Summary:   Konqueror SWF player plugin
 Requires:  %{name} = %{version}-%{release}
 Requires:  kdelibs kdelibs qt gnash
 Group:     Applications/Multimedia
 
 %description klash
-The gnash flash movie player plugin for Konqueror.
+The gnash SWF player plugin for Konqueror.
 
 %package cygnal
 Summary:   Streaming media server
@@ -186,7 +186,7 @@ rm -rf $RPM_BUILD_ROOT
 /sbin/ldconfig
 %if !%{cross_compile}
 scrollkeeper-update -q -o %{_datadir}/omf/%{name} || :
-/sbin/install-info --entry="* Gnash: (gnash). GNU Flash Player" %{_infodir}/%{name}.info %{_infodir}/dir || :
+/sbin/install-info --entry="* Gnash: (gnash). GNU SWF Player" %{_infodir}/%{name}.info %{_infodir}/dir || :
 %endif
 
 %preun

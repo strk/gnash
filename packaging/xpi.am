@@ -43,24 +43,28 @@ xpi-unpack: Makefile #$(top_builddir)/config.status
 
 xpi-configure: xpi-unpack $(XPI_BUILD)
 	-@rm -f ipkg-configure
-	cd $(XPI_BUILD); ./configure $(CONFIG_OPTS) --disable-shared --enable-static
+	cd $(XPI_BUILD); ./configure $(CONFIG_OPTS) --disable-shared --enable-static --enable-xpcom
 	@touch xpi-configure
 
-xpi-build: #xpi-configure
+xpi-build: xpi-configure
 	-@rm -f xpi-build
 	$(MAKE) -C $(XPI_BUILD) all
 	$(MAKE) -C $(XPI_BUILD) install DESTDIR=$(XPI_TMP)
 	@touch xpi-build
 
 xpi-plugin: 
-	cd $(XPI_BUILD); ./configure $(CONFIG_OPTS) --disable-static --enable-shared
+	-@rm -f xpi-plugin
+	cd $(XPI_BUILD); ./configure $(CONFIG_OPTS) --disable-static --enable-shared --enable-xpcom
 	$(MAKE) -C $(XPI_BUILD)/plugin clean all GNASHBINDIR=
 	$(MAKE) -C $(XPI_BUILD) install-plugin DESTDIR=$(XPI_TMP)
 	$(MAKE) -C $(XPI_BUILD)/plugin/xpcom install-pkglib DESTDIR=$(XPI_TMP)
+	-@touch xpi-plugin
 
-xpi xpi-bundle: #xpi-build xpi-plugin
+xpi xpi-bundle: xpi-build xpi-plugin
 	if ! test -d $(XPI_BUNDLE)/ ; then \
 	  mkdir $(XPI_BUNDLE); \
+        else \
+          rm -rf $(XPI_BUNDLE)/*; \
 	fi
 	topdir=`cd ${top_srcdir}; pwd`; \
 	for i in install.rdf; do \
@@ -69,9 +73,9 @@ xpi xpi-bundle: #xpi-build xpi-plugin
 	cp -fr $(XPI_TMP)$(bindir)/*gnash $(XPI_BUNDLE)/
 	cp -fr $(XPI_TMP)$(localedir) $(XPI_BUNDLE)/
 	cp -fr $(XPI_TMP)/tmp/plugin/libgnashplugin.so $(XPI_BUNDLE)/
-	cp -fr $(XPI_TMP)/tmp/extensions/*/*.xpt $(XPI_BUNDLE)/
-	cp -fr $(XPI_TMP)/tmp/extensions/*/*.so $(XPI_BUNDLE)/
-	(cd $(XPI_BUNDLE) ; $(ZIP) -r /tmp/gnash.xpi *)
+	cp -fr $(XPI_TMP)/tmp/plugin/extensions/*.xpt $(XPI_BUNDLE)/
+	cp -fr $(XPI_TMP)/tmp/plugin/extensions/*.so $(XPI_BUNDLE)/
+	(cd $(XPI_BUNDLE) ; $(ZIP) -r /tmp/gnash-$(VERSION).xpi *)
 
 xpi-clean:
 	rm -fr xpi-* $(XPI_BUILD) $(XPI_TMP) gnash-$(VERSION)*.xpi

@@ -35,7 +35,7 @@ main(int argc, char** argv)
     SWFMovie mo;
 	const char* srcdir = ".";
 
-    char longString[15000];
+    char longString[15001];
 
 	if ( argc>1 ) srcdir=argv[1];
 	else
@@ -126,6 +126,7 @@ main(int argc, char** argv)
     strncpy(longString, "xmlArray[11] = '", 16);
     longString[14998] = '\'';
     longString[14999] = ';';
+    longString[15000] = 0;
 
     add_actions(mo, longString);
 

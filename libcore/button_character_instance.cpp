@@ -237,49 +237,49 @@ attachButtonInterface(as_object& o)
 	//
 
 	gettersetter = &character::x_getset;
-	o.init_property("_x", *gettersetter, *gettersetter);
+	o.init_property(NSV::PROP_uX, *gettersetter, *gettersetter);
 
 	gettersetter = &character::y_getset;
-	o.init_property("_y", *gettersetter, *gettersetter);
+	o.init_property(NSV::PROP_uY, *gettersetter, *gettersetter);
 
 	gettersetter = &character::xscale_getset;
-	o.init_property("_xscale", *gettersetter, *gettersetter);
+	o.init_property(NSV::PROP_uXSCALE, *gettersetter, *gettersetter);
 
 	gettersetter = &character::yscale_getset;
-	o.init_property("_yscale", *gettersetter, *gettersetter);
+	o.init_property(NSV::PROP_uYSCALE, *gettersetter, *gettersetter);
 
 	gettersetter = &character::xmouse_get;
-	o.init_readonly_property("_xmouse", *gettersetter);
+	o.init_readonly_property(NSV::PROP_uXMOUSE, *gettersetter);
 
 	gettersetter = &character::ymouse_get;
-	o.init_readonly_property("_ymouse", *gettersetter);
+	o.init_readonly_property(NSV::PROP_uYMOUSE, *gettersetter);
 
 	gettersetter = &character::alpha_getset;
-	o.init_property("_alpha", *gettersetter, *gettersetter);
+	o.init_property(NSV::PROP_uALPHA, *gettersetter, *gettersetter);
 
 	gettersetter = &character::visible_getset;
-	o.init_property("_visible", *gettersetter, *gettersetter);
+	o.init_property(NSV::PROP_uVISIBLE, *gettersetter, *gettersetter);
 
 	gettersetter = &character::width_getset;
-	o.init_property("_width", *gettersetter, *gettersetter);
+	o.init_property(NSV::PROP_uWIDTH, *gettersetter, *gettersetter);
 
 	gettersetter = &character::height_getset;
-	o.init_property("_height", *gettersetter, *gettersetter);
+	o.init_property(NSV::PROP_uHEIGHT, *gettersetter, *gettersetter);
 
 	gettersetter = &character::rotation_getset;
-	o.init_property("_rotation", *gettersetter, *gettersetter);
+	o.init_property(NSV::PROP_uROTATION, *gettersetter, *gettersetter);
 
 	gettersetter = &character::parent_getset;
-	o.init_property("_parent", *gettersetter, *gettersetter);
+	o.init_property(NSV::PROP_uPARENT, *gettersetter, *gettersetter);
 	
 	gettersetter = &character::target_getset;
-	o.init_property("_target", *gettersetter, *gettersetter);
+	o.init_property(NSV::PROP_uTARGET, *gettersetter, *gettersetter);
 
 	gettersetter = character::name_getset;
-	o.init_property("_name", gettersetter, gettersetter);
+	o.init_property(NSV::PROP_uNAME, gettersetter, gettersetter);
 	
 	gettersetter = &button_character_instance::enabled_getset;
-	o.init_property("enabled", *gettersetter, *gettersetter);
+	o.init_property(NSV::PROP_ENABLED, *gettersetter, *gettersetter);
 
 }
 

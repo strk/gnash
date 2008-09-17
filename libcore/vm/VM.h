@@ -37,6 +37,7 @@
 namespace gnash {
 	class movie_definition;
 	class builtin_function;
+    class SharedObjectLibrary;
 	class as_object;
 	class Machine;
 	class VirtualClock;
@@ -148,8 +149,10 @@ private:
 
 	/// Mutable since it should not affect how the VM runs.
 	mutable string_table mStringTable;
+
 	/// Not mutable since changing this changes behavior of the VM.
-	ClassHierarchy *mClassHierarchy;
+	std::auto_ptr<ClassHierarchy> mClassHierarchy;
+
 	/// A running execution thread.
 	Machine *mMachine;
 
@@ -157,11 +160,21 @@ private:
 
 	SafeStack<as_value>	_stack;
 
+	CallStack _callStack;
+
+	/// Library of SharedObjects. Owned by the VM.
+	SharedObjectLibrary* _shLib;
+
 public:
 
 	SafeStack<as_value>& getStack()
 	{
 		return _stack;
+	}
+
+	CallStack& getCallStack()
+	{
+		return _callStack;
 	}
 
 	/// \brief
@@ -263,11 +276,15 @@ public:
 	/// Get a pointer to this VM's Root movie (stage)
 	movie_root& getRoot() const;
 
+    SharedObjectLibrary& getSharedObjectLibrary() const {
+        return *_shLib;
+    }
+
 	/// Get a pointer to this VM's _global Object
 	as_object* getGlobal() const;
 
 	/// Get a pointer to this VM's global ClassHierarchy object.
-	ClassHierarchy* getClassHierarchy() const { return mClassHierarchy; }
+	ClassHierarchy* getClassHierarchy() const { return mClassHierarchy.get(); }
 	
 	/// Get the SWF locale to use 
 	std::locale& getLocale() const;

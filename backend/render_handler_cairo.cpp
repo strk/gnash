@@ -16,12 +16,9 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 // Known bugs:
-// - Shape filling problems: renderer skips certain fills. See car_smash.swf.
 // - Rotation problem in gradient-tests.swf.
-// - The current coordinate system 
 //
 // TODOs:
-// - Implement unimplemented methods.
 // - Would be nice to have a header/implementation separation.
 // - Document workings of Cairo and this renderer.
 // - Test bitmap implementation correctness.

@@ -31,6 +31,8 @@
 #include <log.h>
 #include <iostream>
 #include <string>
+#include "as_value.h"
+#include "as_object.h"
 
 #include "dejagnu.h"
 #include "as_object.h"

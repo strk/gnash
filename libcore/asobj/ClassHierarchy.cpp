@@ -214,6 +214,10 @@ public:
 
 } // end anonymous namespace
 
+ClassHierarchy::~ClassHierarchy()
+{
+}
+
 bool
 ClassHierarchy::declareClass(extensionClass& c)
 {

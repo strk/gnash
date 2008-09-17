@@ -44,7 +44,8 @@ libgnashvm_la_SOURCES = \
 	Machine.cpp \
 	ActionExec.cpp \
 	VM.cpp		\
-        action.cpp \
+    action.cpp \
+	CallStack.cpp \
 	CodeStream.cpp \
 	$(NULL)
 
@@ -59,6 +60,7 @@ noinst_HEADERS =		\
 	VM.h			\
 	action.h		\
 	fn_call.h		\
+	CallStack.h \
 	with_stack_entry.h 	\
 	$(NULL)
 

@@ -62,7 +62,7 @@ public:
 	///	The stream associated with the sprite. It is assumed
 	///	to be already positioned right before the frame count
 	///
-	sprite_definition(movie_definition* m, SWFStream& in);
+	sprite_definition(movie_definition& m, SWFStream& in);
 
 	/// \brief
 	/// Create an empty sprite
@@ -72,7 +72,7 @@ public:
 	/// @param m
 	///	the Top-Level movie_definition this sprite is read
 	///	from (not a sprite_definition!)
-	sprite_definition(movie_definition* m);
+	sprite_definition(movie_definition& m);
 
 
 	/// Destructor, releases playlist data
@@ -111,7 +111,7 @@ public:
 	///
 	virtual size_t get_bytes_total() const
 	{
-		return m_movie_def->get_bytes_total();
+		return m_movie_def.get_bytes_total();
 	}
 
 	/// \brief
@@ -120,12 +120,12 @@ public:
 	///
 	virtual size_t get_bytes_loaded() const
 	{
-		return m_movie_def->get_bytes_loaded();
+		return m_movie_def.get_bytes_loaded();
 	}
 
 	virtual float	get_frame_rate() const
 	{
-		return m_movie_def->get_frame_rate();
+		return m_movie_def.get_frame_rate();
 	}
 
 	const rect& get_frame_size() const
@@ -140,7 +140,7 @@ public:
 
 	virtual int	get_version() const
 	{
-		return m_movie_def->get_version();
+		return m_movie_def.get_version();
 	}
 
 	/// Overridden just for complaining  about malformed SWF
@@ -154,13 +154,13 @@ public:
 	/// Delegate call to associated root movie
 	virtual font* get_font(int id) const
 	{
-		return m_movie_def->get_font(id);
+		return m_movie_def.get_font(id);
 	}
 
 	/// Delegate call to associated root movie
 	virtual bitmap_character_def* get_bitmap_character_def(int id)
 	{
-		return m_movie_def->get_bitmap_character_def(id);
+		return m_movie_def.get_bitmap_character_def(id);
 	}
 
 	/// Overridden just for complaining  about malformed SWF
@@ -175,7 +175,7 @@ public:
 	/// Delegate call to associated root movie
 	virtual sound_sample* get_sound_sample(int id)
 	{
-		return m_movie_def->get_sound_sample(id);
+		return m_movie_def.get_sound_sample(id);
 	}
 
 	/// Overridden just for complaining  about malformed SWF
@@ -184,7 +184,7 @@ public:
 		// DEFINESOUND tags *are* allowed in a sprite context,
 		// and it is *expected* for them to be registered into
 		// the main dictionary.
-		m_movie_def->add_sound_sample(id,sam);
+		m_movie_def.add_sound_sample(id,sam);
 	}
 
 	// See dox in movie_definition.h
@@ -204,13 +204,13 @@ public:
 	virtual void export_resource(const std::string& sym,
 			resource* res)
 	{
-		m_movie_def->export_resource(sym, res);
+		m_movie_def.export_resource(sym, res);
 	}
 
 	/// Delegate call to associated root movie
 	virtual boost::intrusive_ptr<resource> get_exported_resource(const std::string& sym)
 	{
-		return m_movie_def->get_exported_resource(sym);
+		return m_movie_def.get_exported_resource(sym);
 	}
 
 	/// Overridden just for complaining  about malformed SWF
@@ -227,13 +227,13 @@ public:
 	///
 	virtual character_def*	get_character_def(int id)
 	{
-	    return m_movie_def->get_character_def(id);
+	    return m_movie_def.get_character_def(id);
 	}
 
 	/// Delegate call to associated root movie
 	virtual void add_character(int id, character_def* ch)
 	{
-		m_movie_def->add_character(id, ch);
+		m_movie_def.add_character(id, ch);
 	}
 
 	// Create a (mutable) instance of our definition.  The
@@ -256,7 +256,7 @@ private:
 
 	/// Top-level movie definition
 	/// (the definition read from SWF stream)
-	movie_definition* m_movie_def;
+	movie_definition& m_movie_def;
 
 	typedef std::map<size_t, PlayList> PlayListMap;
 
@@ -299,7 +299,7 @@ private:
 
 	virtual const std::string& get_url() const
 	{
-		return m_movie_def->get_url();
+		return m_movie_def.get_url();
 	}
 
 	/// \brief
@@ -325,12 +325,6 @@ private:
 	{
 		/// We load full sprite definitions at once, so
 		/// this function is a no-op.
-	}
-
-	/// Return the top-level movie definition
-	/// (the definition read from SWF stream)
-	movie_definition* get_movie_definition() {
-		return m_movie_def;
 	}
 
 	const rect&	get_bound() const {

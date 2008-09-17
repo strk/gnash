@@ -55,7 +55,7 @@ public:
 	{
 	    return true;
 	}
-	static void loader(SWFStream& in,tag_type tag, movie_definition* m)
+	static void loader(SWFStream& in,tag_type tag, movie_definition& m)
 	{
 		assert(tag == SYMBOLCLASS); //76
 
@@ -71,7 +71,7 @@ public:
 			log_debug("Symbol %u name=%s tag=%u",i,name,character);
 			if(character == 0){
 				SymbolClassTag *symbolClassTag = new SymbolClassTag(name);
-				m->addControlTag(symbolClassTag);
+				m.addControlTag(symbolClassTag);
 			}
 		}
 	}

@@ -3634,8 +3634,8 @@ File: gnash_ref.info,  Node: AMF Format,  Up: RTMP Protocol
 
 The AMF format is used in the LocalConnection, SharedObject,
 NetConnection, and NetStream ActionScript classes. This is a means of
-binary data interchange between Flash movies, or between a Flash player
-and a Flash server.
+binary data interchange between Flash movies, or between a SWF player
+and a SWF server.
 
    Like the RTMP messages, an AMF packet header can be of a variable
 size. The size is either the same as the initial header of the RTMP

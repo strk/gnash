@@ -216,8 +216,8 @@ as_super::get_super(const char* fname)
 }
 
 
-// A PropertyList visitor copying properties to an object
-class PropsCopier {
+/// A PropertyList visitor copying properties to an object
+class PropsCopier : public AbstractPropertyVisitor {
 
 	as_object& _tgt;
 
@@ -236,7 +236,7 @@ public:
 	/// Use the set_member function to properly set *inherited* properties
 	/// of the given target object
 	///
-	void operator() (string_table::key name, const as_value& val)
+	void accept(string_table::key name, const as_value& val)
 	{
 		if (name == NSV::PROP_uuPROTOuu) return;
 		//log_debug(_("Setting member '%s' to value '%s'"), name, val);
@@ -1314,19 +1314,11 @@ as_object::callMethod(string_table::key methodName,
 
 	as_environment env(_vm);
 
-#ifndef NDEBUG
-	size_t origStackSize = env.stack_size();
-#endif
-
 	std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
 	args->push_back(arg0);
 	args->push_back(arg1);
 
 	ret = call_method(method, &env, this, args);
-
-#ifndef NDEBUG
-	assert(origStackSize == env.stack_size());
-#endif
 
 	return ret;
 }
@@ -1345,20 +1337,12 @@ as_object::callMethod(string_table::key methodName,
 
 	as_environment env(_vm);
 
-#ifndef NDEBUG
-	size_t origStackSize = env.stack_size();
-#endif
-
 	std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
 	args->push_back(arg0);
 	args->push_back(arg1);
 	args->push_back(arg2);
 
 	ret = call_method(method, &env, this, args);
-
-#ifndef NDEBUG
-	assert(origStackSize == env.stack_size());
-#endif
 
 	return ret;
 }
@@ -1378,10 +1362,6 @@ as_object::callMethod(string_table::key methodName,
 
 	as_environment env(_vm);
 
-#ifndef NDEBUG
-	size_t origStackSize = env.stack_size();
-#endif
-
 	std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
 	args->push_back(arg0);
 	args->push_back(arg1);
@@ -1389,10 +1369,6 @@ as_object::callMethod(string_table::key methodName,
 	args->push_back(arg3);
 
 	ret = call_method(method, &env, this, args);
-
-#ifndef NDEBUG
-	assert(origStackSize == env.stack_size());
-#endif
 
 	return ret;
 }
@@ -1515,10 +1491,6 @@ Trigger::call(const as_value& oldval, const as_value& newval, as_object& this_ob
 	try {
 		as_environment env(VM::get()); // TODO: get VM in some other way 
 
-#ifndef NDEBUG
-		size_t origStackSize = env.stack_size();
-#endif
-
 		std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
 		args->push_back(_propname);
 		args->push_back(oldval);
@@ -1528,10 +1500,6 @@ Trigger::call(const as_value& oldval, const as_value& newval, as_object& this_ob
 		fn_call fn(const_cast<as_object*>(&this_obj), &env, args);
 
 		as_value ret = _func->call(fn);
-
-#ifndef NDEBUG
-		assert(origStackSize == env.stack_size());
-#endif
 
 		_executing = false;
 
@@ -1543,6 +1511,22 @@ Trigger::call(const as_value& oldval, const as_value& newval, as_object& this_ob
 		_executing = false;
 		throw;
 	}
+}
+
+void
+as_object::visitPropertyValues(AbstractPropertyVisitor& visitor) const
+{
+    _members.visitValues(visitor, 
+        // Need const_cast due to getValue getting non-const ...
+        const_cast<as_object&>(*this));
+}
+
+void
+as_object::visitNonHiddenPropertyValues(AbstractPropertyVisitor& visitor) const
+{
+    _members.visitNonHiddenValues(visitor, 
+        // Need const_cast due to getValue getting non-const ...
+        const_cast<as_object&>(*this));
 }
 
 

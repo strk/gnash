@@ -344,7 +344,7 @@ public:
     character* add_empty_movieclip(const char* name, int depth);
 
     boost::intrusive_ptr<character> add_textfield(const std::string& name,
-            int depth, float x, float y, float width, float height);
+            int depth, int x, int y, float width, float height);
 
     /// Place a character or mask to the DisplayList.
     //

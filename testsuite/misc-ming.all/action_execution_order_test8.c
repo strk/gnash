@@ -55,18 +55,18 @@
 
 
 int
-main(int argc, char** argv)
+main(int argc, char *argv[])
 {
   SWFMovie mo;
   SWFMovieClip  mc1, mc2, dejagnuclip;
   SWFDisplayItem it1, it2;
   int outputVersion = DEF_OUTPUT_VERSION;
   
-  const char *srcdir=".";
-  if ( argc>1 ) 
+  const char *srcdir = ".";
+  if (argc > 1) 
   {
-    srcdir=argv[1];
-    if ( argc>2 ) outputVersion = atoi(argv[2]);
+    srcdir = argv[1];
+    if (argc > 2) outputVersion = strtol(argv[2], NULL, 0);
   }
   else
   {

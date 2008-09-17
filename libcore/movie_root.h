@@ -136,7 +136,7 @@ public:
     /// Make sure to call setRootMovie() 
     /// before using any of this class methods !
     ///
-    movie_root();
+    movie_root(VM& vm);
 
     ~movie_root();
 
@@ -700,28 +700,12 @@ public:
         return _hostfd;
     }
 
-    /// Signature of interface event callback.
-    typedef std::string (*interfaceEventCallback)(const std::string& event,
-                                              const std::string& arg);
-
-	/// A callback to the GUI (or whatever is listening) for sending
-	/// events and receiving replies. Used for ActionScript interface
-	/// with the gui (Mouse visibility, Stage alignment etc and System
-	/// information, for instance).
-	interfaceEventCallback interfaceHandle;
-
-	DSOEXPORT void registerEventCallback(interfaceEventCallback handler)
-	{
-	   	interfaceHandle = handler;
-	}
-
-    /// Signature of fscommand callback function
-    typedef void (*fsCommandCallback)(sprite_instance* movie,
-                  const std::string& command, const std::string& arg);
-
-    /// Callback to send FsCommands somewhere.
-    fsCommandCallback fsCommandHandle;
-
+    /// Abstract base class for FS handlers
+    class AbstractFsCallback {
+    public:
+        virtual void notify(const std::string& cmd, const std::string& arg)=0;
+        virtual ~AbstractFsCallback() {}
+    };
 
     /// ActionScript embedded in a movie can use the built-in
     /// fscommand() function to send data back to the host
@@ -732,10 +716,39 @@ public:
     /// The handler gets the sprite_instance* that the script is
     /// embedded in, and the two string arguments passed by the
     /// script to fscommand().
-    DSOEXPORT void registerFSCommandCallback(fsCommandCallback handler)
+    ///
+    DSOEXPORT void registerFSCommandCallback(AbstractFsCallback* handler)
     {
-        fsCommandHandle = handler;
+        _fsCommandHandler = handler;
     }
+
+    /// Call this to notify FS commands
+    DSOEXPORT void handleFsCommand(const std::string& cmd, const std::string& arg) const;
+
+    /// Abstract base class for hosting app handler
+    class AbstractIfaceCallback {
+    public:
+        virtual std::string call(const std::string& cmd, const std::string& arg)=0;
+        virtual ~AbstractIfaceCallback() {}
+    };
+
+    /// A callback to the GUI (or whatever is listening) for sending
+    /// events and receiving replies. Used for ActionScript interface
+    /// with the gui (Mouse visibility, Stage alignment etc and System
+    /// information, for instance).
+    ///
+    /// See callInterface method
+    ///
+    DSOEXPORT void registerEventCallback(AbstractIfaceCallback* handler)
+    {
+        _interfaceHandler = handler;
+    }
+
+    /// Call into the hosting application
+    ///
+    /// Will use callback set with registerEventCallback
+    ///
+    DSOEXPORT std::string callInterface(const std::string& cmd, const std::string& arg) const;
 
     /// Called from the ScriptLimits tag parser to set the
     /// global script limits. It is expected behaviour that
@@ -774,6 +787,14 @@ public:
 #endif
 
 private:
+
+    VM& _vm;
+
+    /// Registered Interface command handler, if any
+    AbstractIfaceCallback* _interfaceHandler;
+
+    /// Registered FsCommand handler, if any
+    AbstractFsCallback* _fsCommandHandler;
 
     /// A load movie request
     class LoadMovieRequest {
@@ -849,10 +870,10 @@ private:
     LiveChars _liveChars;
 
     /// Forbid copy 
-    movie_root(const movie_root& ) { abort(); }
+    movie_root(const movie_root& ); 
 
     /// Forbid assignment
-    movie_root& operator=(const movie_root& ) { abort(); return *this; }
+    movie_root& operator=(const movie_root& );
 
     /// Execute expired timers
     void executeTimers();
@@ -905,7 +926,7 @@ private:
     float       m_timer;
     int         m_mouse_x, m_mouse_y, m_mouse_buttons;
 
-    mouse_button_state  m_mouse_button_state;
+    MouseButtonState  m_mouse_button_state;
 
     typedef std::map<int, Timer*> TimerMap;
 
@@ -951,6 +972,8 @@ private:
     /// more info.
     ///
     bool fire_mouse_event();
+
+    bool generate_mouse_button_events();
 
     /// \brief
     /// Return the topmost entity covering the given point

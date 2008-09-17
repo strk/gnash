@@ -4,8 +4,8 @@
   <para>
     The AMF format is used in the LocalConnection, SharedObject,
     NetConnection, and NetStream ActionScript classes. This is a means
-    of binary data interchange between Flash movies, or between a
-    Flash player and a Flash server.
+    of binary data interchange between SWF movies, or between a
+    SWF player and a SWF server.
   </para>
   
   <para>
@@ -59,7 +59,7 @@
 
 <!--
   <para>
-    These data types are used to exchange data between Flash
+    These data types are used to exchange data between SWF
     movies. The data part of a message is one of the ActionScript data
     types.
 

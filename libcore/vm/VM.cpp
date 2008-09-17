@@ -22,6 +22,7 @@
 #endif
 
 #include "VM.h"
+#include "SharedObject.h" // for SharedObjectLibrary
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "builtin_function.h"
 #include "movie_definition.h"
@@ -62,8 +63,8 @@ VM::init(movie_definition& movie, VirtualClock& clock)
 	assert(_singleton.get());
 	NSV::load_strings(&_singleton->mStringTable, _singleton->getSWFVersion());
 
-	_singleton->mClassHierarchy = new ClassHierarchy;
-	_singleton->setGlobal(new Global(*_singleton, _singleton->mClassHierarchy));
+	_singleton->mClassHierarchy.reset(new ClassHierarchy);
+	_singleton->setGlobal(new Global(*_singleton, _singleton->mClassHierarchy.get()));
 /*?Ask someone if this is correct.*/
 	_singleton->mMachine = new Machine(*_singleton);
 	assert(_singleton->getGlobal());
@@ -87,13 +88,13 @@ VM::isInitialized()
 
 VM::VM(movie_definition& topmovie, VirtualClock& clock)
 	:
-	_root_movie(new movie_root()),
+	_root_movie(new movie_root(*this)),
 	_swfversion(topmovie.get_version()),
 	_swfurl(topmovie.get_url()),
-	mClassHierarchy(0),
 	mMachine(0),
 	_clock(clock),
-	_stack()
+	_stack(),
+    _shLib(new SharedObjectLibrary(*this))
 {
 	_clock.restart();
 	assert(!_swfurl.empty());
@@ -101,9 +102,7 @@ VM::VM(movie_definition& topmovie, VirtualClock& clock)
 
 VM::~VM()
 {
-	// nothing to do atm, but we'll likely
-	// have to deregister lots of stuff when
-	// things are setup
+    delete _shLib;
 }
 
 std::locale&
@@ -246,6 +245,8 @@ VM::markReachableResources() const
 	}
 
 	mClassHierarchy->markReachableResources();
+
+    _shLib->markReachableResources();
 #endif
 
 }

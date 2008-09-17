@@ -30,12 +30,16 @@
 #include <ostream> // for inlines (dump_args)
 #include <sstream> // for inlines (dump_args)
 
+// Forward declarations
+namespace gnash {
+    class as_environment;
+    class as_function;
+    class as_object;
+    class as_value;
+}
+
 namespace gnash {
 
-// Forward declarations
-class as_environment;
-class as_object;
-class as_value;
 
 /// \brief
 /// Parameters/environment for builtin or user-defined functions

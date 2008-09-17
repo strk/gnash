@@ -30,6 +30,7 @@
 #include <cmath>
 #include <limits>
 #include <string>
+#include <vector>
 #include <boost/variant.hpp>
 #include <ostream> // for inlined output operator
 #include <boost/type_traits/is_floating_point.hpp>
@@ -39,15 +40,24 @@
 #include "utility.h" // UNUSED
 #include "string_table.h"
 
+// Forward declarations
+namespace gnash {
+    class VM;
+	class as_object;
+	class fn_call;
+	class as_function;
+	class sprite_instance;
+	class character;
+	class asNamespace;
+	class asName;
+    class SimpleBuffer;
+}
+namespace amf {
+	class Element;
+}
+
 namespace gnash {
 
-class as_object;
-class fn_call;
-class as_function;
-class sprite_instance;
-class character;
-class asNamespace;
-class asName;
 
 // NaN constant for use in as_value implementation
 static const double NaN = std::numeric_limits<double>::quiet_NaN();
@@ -161,6 +171,9 @@ public:
 	/// Chad: Document this
 	as_value(asNamespace &);
 
+	/// Construct a value from an AMF element
+	as_value(const amf::Element& el);
+	
 	/// Construct a NULL, OBJECT, MOVIECLIP or AS_FUNCTION value
 	//
 	/// See as_object::to_movie and as_object::to_function
@@ -175,6 +188,42 @@ public:
 
 	/// Construct a NULL or AS_FUNCTION value
 	as_value(as_function* func);
+
+	/// Read AMF0 data from the given buffer
+	//
+	/// Pass pointer to buffer and pointer to end of buffer. Buffer is raw AMF
+	/// encoded data. Must start with a type byte unless third parameter is set.
+	///
+	/// On success, sets the given as_value and returns true.
+	/// On error (premature end of buffer, etc.) returns false and leaves the given
+	/// as_value untouched.
+	///
+	/// IF you pass a fourth parameter, it WILL NOT READ A TYPE BYTE, but use what
+	/// you passed instead.
+	///
+	/// The l-value you pass as the first parameter (buffer start) is updated to
+	/// point just past the last byte parsed
+	///
+	/// TODO restore first parameter on parse errors
+	///
+	/// @param objRefs
+	///     A vector of already-parsed objects to properly interpret references.
+	///     Pass an empty vector on first call as it will be used internally.
+	///     On return, the vector will be filled with pointers to every complex object
+	///     parsed from the stream.
+	///
+	bool readAMF0(boost::uint8_t *&b, boost::uint8_t *end, int inType, std::vector<as_object*>& objRefs, VM& vm);
+
+    /// Serialize value in AMF0 format.
+    //
+    /// @param buf
+    ///     The buffer to append serialized version of this value to.
+    ///
+    /// @param offsetTable
+    ///     A map of already-parsed objects, pass an empty map on first call as
+    ///     it will be used internally.
+    ///
+    bool writeAMF0(SimpleBuffer& buf, std::map<as_object*, size_t>& offsetTable, VM& vm) const;
 
 	/// Convert numeric value to string value, following ECMA-262 specification
 	//
@@ -277,6 +326,9 @@ public:
 	///	for object values. If NULL, valueOf() won't be run.
 	///
 	double	to_number() const;
+
+	/// Get an AMF element representation for this value
+	std::auto_ptr<amf::Element> to_element() const;
 
 	/// Conversion to 32bit integer
 	//
@@ -568,8 +620,6 @@ public:
 	// Equivalent of ActionSubtract
 	as_value& subtract(const as_value& o);
 
-
-
 	/// Set any object value as reachable (for the GC)
 	//
 	/// Object values are values stored by pointer (objects and functions)
@@ -583,13 +633,6 @@ private:
 	/// NOTE: will abort if values are not of the same type!
 	///
 	bool equalsSameType(const as_value& v) const;
-
-	// TODO: make private. The rationale is that callers of this functions
-	//       should use is_WHAT() instead, or changes in the available
-	//       primitive value types will require modifications in all callers.
-	//       This happened when adding MOVIECLIP.
-	//
-	type get_type() const { return m_type; }
 
 	type m_type;
 

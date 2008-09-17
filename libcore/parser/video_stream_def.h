@@ -91,7 +91,7 @@ public:
 	/// This function is allowed to be called only *once* for each
 	/// instance of this class.
 	///
-	void readDefineVideoStream(SWFStream& in, SWF::tag_type tag, movie_definition* m);
+	void readDefineVideoStream(SWFStream& in, SWF::tag_type tag, movie_definition& m);
 
 	/// Read tag SWF::VIDEOFRAME
 	//
@@ -101,7 +101,7 @@ public:
 	/// This function is allowed to be called zero or more times, as long
 	/// as readDefineVideoStream was read before.
 	///
-	void readDefineVideoFrame(SWFStream& in, SWF::tag_type tag, movie_definition* m);
+	void readDefineVideoFrame(SWFStream& in, SWF::tag_type tag, movie_definition& m);
 
 	/// Return local video bounds in twips
 	const rect&	get_bound() const

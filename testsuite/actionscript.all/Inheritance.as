@@ -591,7 +591,7 @@ dangerousStuff = function()
 };
 
 note("");
-note("Now you're flash player will try to answer the egg/chicken question. Kill it if it hangs your machine");
+note("Now your flash player will try to answer the egg/chicken question. Kill it if it hangs your machine");
 setTimeout(dangerousStuff, 0);
 
 

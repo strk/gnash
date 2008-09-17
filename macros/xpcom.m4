@@ -67,7 +67,7 @@ AC_DEFUN([GNASH_PATH_XPCOM],
   if test x"${ac_cv_path_xpcom_incl}" != x; then
     XPCOM_CFLAGS="${ac_cv_path_xpcom_incl}"
     XPCOM_IDL_CFLAGS=`echo $XPCOM_CFLAGS | sed -e 's:include:share/idl:'`
-    XPIDL=`echo ${ac_cv_path_xpidl} | sed -e 's:-L::' -e 's:sdk-::' -e 's:sdk/lib::'`
+    XPIDL=`echo ${ac_cv_path_xpidl} | sed -e 's:-L::' -e 's:sdk-::' -e 's:sdk/lib::' -e 's:-devel::' -e 's:lib$::'`
     XPIDL="${XPIDL}xpidl"
   else
     XPCOM_CFLAGS=""

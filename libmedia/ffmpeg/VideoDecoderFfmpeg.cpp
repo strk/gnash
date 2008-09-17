@@ -246,12 +246,12 @@ VideoDecoderFfmpeg::frameToImage(AVCodecContext* srcCtx,
                 return im;
             }
 
-    boost::uint8_t* buffer = new boost::uint8_t[bufsize];
+    boost::scoped_array<boost::uint8_t> buffer ( new boost::uint8_t[bufsize] );
 
     AVPicture picture;
     picture.data[0] = NULL;
 
-    avpicture_fill(&picture, buffer, pixFmt, width, height);
+    avpicture_fill(&picture, buffer.get(), pixFmt, width, height);
 
 #ifndef HAVE_SWSCALE_H
     img_convert(&picture, PIX_FMT_RGB24, (AVPicture*) &srcFrame,
@@ -267,7 +267,6 @@ VideoDecoderFfmpeg::frameToImage(AVCodecContext* srcCtx,
         picture.linesize);
 
     if (rv == -1) {
-        delete [] buffer;
         im.reset();
         return im;
     }

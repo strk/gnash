@@ -186,6 +186,8 @@ AGG ressources
 
 #define TWIPS_TO_SHIFTED_PIXELS(x) (x*0.05f + 0.5f) 
 
+#include <boost/numeric/conversion/converter.hpp>
+
 using namespace gnash;
 
 
@@ -1797,19 +1799,22 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
     // Note: The coordinates are rounded and 0.5 is added to snap them to the 
     // center of the pixel. This avoids blurring caused by anti-aliasing.
     
+    // The default conversion of the boost converter is truncation.
+    boost::numeric::converter<int,float> truncator;
+
     mat.transform(&origin, 
-      point(trunc(corners[0].x), trunc(corners[0].y)));
-    path.move_to(trunc(origin.x)+0.5, trunc(origin.y)+0.5);
+      point(truncator(corners[0].x), truncator(corners[0].y)));
+    path.move_to(truncator(origin.x)+0.5, truncator(origin.y)+0.5);
     
     for (unsigned int i=1; i<corner_count; ++i) {
     
       mat.transform(&pnt, point(corners[i].x, corners[i].y));
         
-      path.line_to(trunc(pnt.x)+0.5, trunc(pnt.y)+0.5);
+      path.line_to(truncator(pnt.x)+0.5, truncator(pnt.y)+0.5);
     }
     
     // close polygon
-    path.line_to(trunc(origin.x)+0.5, trunc(origin.y)+0.5);
+    path.line_to(truncator(origin.x)+0.5, truncator(origin.y)+0.5);
     
     
     

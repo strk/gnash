@@ -63,7 +63,7 @@ const char *astype_str[] = {
 };
 
 Element::Element()
-    : _name(),
+    : _name(0),
       _buffer(0),
       _type(NOTYPE)
 {
@@ -77,17 +77,20 @@ Element::~Element()
     for (size_t i=0; i< _properties.size(); i++) {
 	delete _properties[i];
     }
-    if (_buffer) {
-	delete _buffer;
-    }
-    if (_name) {
-	delete[] _name;
-    }
+    // FIXME: for some odd reason, on rare occasions deleting this buffer
+    // makes valgrind complain. It looks like memory corruption caused by something
+    // else, but neither valgrind nor GDB can find it. We could always not delete
+    // the buffer to keep valgrind happy, but then we leak memory. As the problem
+    // appears to be that _buffer has a bogus address that doesn't match any allocated
+    // Element, we assume this is a bug in our test case, but add comment here to be
+    // paranoid.
+//    delete _buffer;
+    delete[] _name;
 }
 
 
 Element::Element(Network::byte_t *indata) 
-    : _name(),
+    : _name(0),
       _buffer(0),
       _type(NOTYPE)
 {
@@ -96,7 +99,7 @@ Element::Element(Network::byte_t *indata)
 }
 
 Element::Element(double indata)
-    : _name(),
+    : _name(0),
       _buffer(0),
       _type(NOTYPE)
 {
@@ -111,7 +114,7 @@ Element::Element(double indata)
 // }
 
 Element::Element(const string &indata)
-    : _name(),
+    : _name(0),
       _buffer(0),
       _type(NOTYPE)
 {
@@ -120,7 +123,7 @@ Element::Element(const string &indata)
 }
 
 Element::Element(const string &name, const string &indata)
-    : _name(),
+    : _name(0),
       _buffer(0),
       _type(NOTYPE)
 {
@@ -129,7 +132,7 @@ Element::Element(const string &name, const string &indata)
 }
 
 Element::Element(const string &name, bool indata)
-    : _name(),
+    : _name(0),
       _buffer(0),
       _type(NOTYPE)
 {
@@ -138,7 +141,7 @@ Element::Element(const string &name, bool indata)
 }
 
 Element::Element(bool indata)
-    : _name(),
+    : _name(0),
       _buffer(0),
       _type(NOTYPE)
 {
@@ -149,7 +152,7 @@ Element::Element(bool indata)
 // Create a function block for AMF
 Element::Element(bool flag, double unknown1, double unknown2,
 		 const string &methodname)
-    : _name(),
+    : _name(0),
       _buffer(0),
       _type(NOTYPE)
 {
@@ -267,11 +270,13 @@ Element::clear()
 {
 //    GNASH_REPORT_FUNCTION;
 	delete [] _name;
+	_name = 0;
 	delete _buffer;
+	_buffer = 0;
 }
 
 Network::byte_t *
-Element::getData()
+Element::getData() const
 {
 //    GNASH_REPORT_FUNCTION;
     if (_buffer) {
@@ -281,7 +286,7 @@ Element::getData()
 };
 
 size_t
-Element::getLength()
+Element::getLength() const
 {
 //    GNASH_REPORT_FUNCTION;
     if (_buffer) {
@@ -291,7 +296,7 @@ Element::getLength()
 };
 
 double
-Element::to_number()
+Element::to_number() const
 {
 //    GNASH_REPORT_FUNCTION;
     if (_buffer) {
@@ -302,7 +307,7 @@ Element::to_number()
 }
 
 const char *
-Element::to_string()
+Element::to_string() const
 {
 //    GNASH_REPORT_FUNCTION;
     if (_buffer) {
@@ -315,7 +320,7 @@ Element::to_string()
 };
 
 bool
-Element::to_bool()
+Element::to_bool() const
 {
 //    GNASH_REPORT_FUNCTION;
     if (_buffer) {
@@ -924,35 +929,29 @@ Element::check_buffer(size_t size)
 }
 
 void
-Element::dump()
+Element::dump(std::ostream& os) const
 {
 //    GNASH_REPORT_FUNCTION;
     
     if (_name) {
- 	cerr << "AMF object name: " << _name << ", length is " << getLength() << endl;
+ 	os << "AMF object name: " << _name << ", length is " << getLength() << endl;
     }
 
-    cerr << astype_str[_type] << ": ";
+    os << astype_str[_type] << ": ";
 
     switch (_type) {
       case Element::NUMBER_AMF0:
-	  cerr << to_number() << endl;
+	  os << to_number() << endl;
 	  break;
       case Element::BOOLEAN_AMF0:
-	  cerr << (to_bool() ? "true" : "false") << endl;
+	  os << (to_bool() ? "true" : "false") << endl;
 	  break;
       case Element::STRING_AMF0:
-	  cerr << "(" << getLength() << " bytes): ";
+	  os << "(" << getLength() << " bytes): ";
 	  if (getLength() > 0) {
-#ifdef HAVE_STRNDUP
-		char *term = strndup(to_string(), getLength());
-#else
-		char *term = const_cast<char *>(to_string());
-#endif	      
-	      cerr << "\t\"" << term << "\"" << endl;
-	  } else {
-	      cerr << endl;
+	      cerr << "\t\"" << to_string() << "\"";
 	  }
+	  cerr << endl;
 	  break;
       case Element::OBJECT_AMF0:
 	  break;
@@ -977,7 +976,7 @@ Element::dump()
 	  break;
 //       case Element::VARIABLE:
 //       case Element::FUNCTION:
-//  	  cerr << "# of properties in object: " << properties.size() << endl;
+//  	  os << "# of properties in object: " << properties.size() << endl;
 // 	  for (size_t i=0; i< properties.size(); i++) {
 // 	      properties[i]->dump();
 // 	  }
@@ -992,11 +991,11 @@ Element::dump()
 //     }
 
     if (_properties.size() > 0) {
-	vector<amf::Element *>::iterator ait;
-	cerr << "# of Properties in object: " << _properties.size() << endl;
+	vector<amf::Element *>::const_iterator ait;
+	os << "# of Properties in object: " << _properties.size() << endl;
 	for (ait = _properties.begin(); ait != _properties.end(); ait++) {
-	    amf::Element *el = (*(ait));
-	    el->dump();
+	    const amf::Element *el = (*(ait));
+	    el->dump(os);
 	}
     }
 }

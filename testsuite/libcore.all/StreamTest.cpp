@@ -27,6 +27,8 @@
 #include "check.h"
 #endif
 
+#include <boost/thread/mutex.hpp>
+
 #include "tu_file.h"
 #include "SWFStream.h"
 #include "log.h"
@@ -41,6 +43,7 @@
 #include <fcntl.h>
 #include <string.h>
 #include <sstream>
+
 
 using namespace std;
 using namespace gnash;

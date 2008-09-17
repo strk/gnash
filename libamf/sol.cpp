@@ -30,6 +30,7 @@
 #include <cassert>
 
 #include "network.h"
+#include "element.h"
 #include "amf.h"
 #include "buffer.h"
 #include "sol.h"
@@ -321,7 +322,7 @@ SOL::writeFile(const string &filespec, const string &name)
 
 // read the .sol file from disk
 bool
-SOL::readFile(std::string &filespec)
+SOL::readFile(const std::string &filespec)
 {
 //    GNASH_REPORT_FUNCTION;
     struct stat st;

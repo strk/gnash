@@ -679,7 +679,7 @@ parse_tag:
                 {
 			// call the tag loader.  The tag loader should add
 			// characters or tags to the movie data structure.
-			(*lf)(str, tag_type, this);
+			(*lf)(str, tag_type, *this);
 		}
 		else
 		{

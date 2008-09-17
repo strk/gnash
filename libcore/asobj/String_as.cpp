@@ -155,11 +155,11 @@ getStringInterface()
     return o.get();
 }
 
-class string_as_object : public as_object
+class String_as : public as_object
 {
 
 public:
-    string_as_object(const std::string& s)
+    String_as(const std::string& s)
             :
             as_object(getStringInterface()),
             _string(s)
@@ -196,7 +196,7 @@ private:
 static as_value
 string_concat(const fn_call& fn)
 {
-    boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<String_as> obj = ensureType<String_as>(fn.this_ptr);
 
     // Make a copy of our string.
     std::string str = obj->str();
@@ -740,8 +740,8 @@ string_oldToUpper(const fn_call& fn)
 static as_value
 string_to_string(const fn_call& fn)
 {
-    boost::intrusive_ptr<string_as_object> obj 
-	   = ensureType<string_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<String_as> obj 
+	   = ensureType<String_as>(fn.this_ptr);
     return as_value(obj->str());
 }
 
@@ -761,7 +761,7 @@ string_ctor(const fn_call& fn)
 		return as_value(str);
 	}
 	
-	boost::intrusive_ptr<string_as_object> obj = new string_as_object(str);
+	boost::intrusive_ptr<String_as> obj = new String_as(str);
 
 	return as_value(obj.get());
 }
@@ -842,17 +842,9 @@ init_string_instance(const std::string& val)
 		}
 	}
 
-#ifndef NDEBUG
-	size_t prevStackSize = env.stack_size();
-#endif
-
 	std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
 	args->push_back(val);
 	boost::intrusive_ptr<as_object> ret = cl->constructInstance(env, args);
-
-#ifndef NDEBUG
-	assert( prevStackSize == env.stack_size());
-#endif
 
 	return ret;
 }

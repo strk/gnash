@@ -24,6 +24,7 @@
 #include "StringPredicates.h" // for Variables 
 #include "as_object.h"
 #include "SafeStack.h"
+#include "CallStack.h" // for composition
 
 #include <map> // for composition (Variables)
 #include <string> // for frame_slot name
@@ -48,10 +49,6 @@ public:
 
 	/// The variables container (case-insensitive)
 	typedef std::map<std::string, as_value, StringNoCaseLessThen> Variables;
-
-	/// The locals container 
-	//typedef std::vector<frame_slot>	LocalVars;
-	typedef boost::intrusive_ptr<as_object> LocalVars;
 
 	typedef std::vector<as_value> Registers;
 
@@ -417,7 +414,7 @@ public:
 	/// Case insensitive for SWF up to 6, sensitive from 7 up
 	///
 	as_object* find_object(const std::string& path, const ScopeStack* scopeStack=NULL) const;
-
+	
 	/// Dump content of the stack to a std::ostream
 	//
 	/// @param out
@@ -496,40 +493,24 @@ public:
 	///
 	bool parse_path(const std::string& var_path, as_object** target, as_value& val);
 
-	struct CallFrame
-	{
-		CallFrame(as_function* funcPtr);
-
-		CallFrame(const CallFrame& other) : locals(other.locals),
-			registers(other.registers), func(other.func)
-		{/**/}
-
-		/// function use this 
-		LocalVars locals;
-
-		/// function2 also use this
-		Registers registers;
-
-		as_function* func;
-
-#ifdef GNASH_USE_GC
-		/// Mark all reachable resources
-		//
-		/// Reachable resources would be registers and
-		/// locals (expected to be empty?) and function.
-		void markReachableResources() const;
-#endif // GNASH_USE_GC
-	};
-
 	/// A class to wrap frame access.  Stack allocating a frame guard
 	/// will ensure that all CallFrame pushes have a corresponding
 	/// CallFrame pop, even in the presence of extraordinary returns.
 	class FrameGuard
 	{
+        as_environment& _env;
 	public:
-		FrameGuard(as_function* func)
-		{ as_environment::pushCallFrame(func); }
-		~FrameGuard() { as_environment::popCallFrame(); }
+		FrameGuard(as_environment& env, as_function* func)
+            :
+            _env(env)
+		{
+            _env.pushCallFrame(func);
+        }
+
+		~FrameGuard()
+        {
+            _env.popCallFrame();
+        }
 	};
 
 	/// Get top element of the call stack
@@ -541,7 +522,7 @@ public:
 	}
 
 	/// Return the depth of call stack
-	static size_t callStackDepth()
+	size_t callStackDepth()
 	{
 		return _localFrames.size();
 	}
@@ -556,9 +537,7 @@ private:
 
 	static const short unsigned int numGlobalRegisters = 4;
 
-	typedef std::vector<CallFrame> CallStack;
-
-	static CallStack _localFrames;
+	CallStack& _localFrames;
 
 	as_value m_global_register[numGlobalRegisters];
 
@@ -579,13 +558,13 @@ private:
 	/// @param func
 	///	The function being called
 	///
-	static void pushCallFrame(as_function* func);
+	DSOEXPORT void pushCallFrame(as_function* func);
 
 	/// Remove current call frame from the stack
 	//
 	/// This should happen when an ActionScript function returns.
 	///
-	static void popCallFrame();
+	DSOEXPORT void popCallFrame();
 	
 	/// Return the (possibly UNDEFINED) value of the named variable.
 	//
@@ -633,7 +612,7 @@ private:
 		return const_cast<as_environment*>(this)->findLocal(varname, ret, retTarget);
 	}
 
-	/// Find a variable in the given LocalVars
+	/// Find a variable in the given as_object
 	//
 	/// @param varname
 	///	Name of the local variable
@@ -644,7 +623,7 @@ private:
 	///
 	/// @return true if the variable was found, false otherwise
 	///
-	static bool findLocal(LocalVars& locals, const std::string& name, as_value& ret);
+	bool findLocal(as_object* locals, const std::string& name, as_value& ret);
 
 	/// Delete a local variable
 	//
@@ -655,14 +634,14 @@ private:
 	///
 	bool delLocal(const std::string& varname);
 
-	/// Delete a variable from the given LocalVars
+	/// Delete a variable from the given as_object
 	//
 	/// @param varname
 	///	Name of the local variable
 	///
 	/// @return true if the variable was found, false otherwise
 	///
-	static bool delLocal(LocalVars& locals, const std::string& varname);
+	bool delLocal(as_object* locals, const std::string& varname);
 
 	/// Set a local variable, if it exists.
 	//
@@ -676,7 +655,7 @@ private:
 	///
 	bool setLocal(const std::string& varname, const as_value& val);
 
-	/// Set a variable from the given LocalVars, if it exists.
+	/// Set a variable of the given object, if it exists.
 	//
 	/// @param varname
 	///	Name of the local variable
@@ -686,7 +665,7 @@ private:
 	///
 	/// @return true if the variable was found, false otherwise
 	///
-	static bool setLocal(LocalVars& locals, const std::string& varname, const as_value& val);
+	bool setLocal(as_object* locals, const std::string& varname, const as_value& val);
 
 	static as_value undefVal;
 		

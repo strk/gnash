@@ -36,7 +36,7 @@ class movie_definition;
 
 void
 edit_text_character_def::read(SWFStream& in, int tag_type,
-		movie_definition* m)
+		movie_definition& m)
 {
 	//assert(m != NULL);
 	assert(tag_type == SWF::DEFINEEDITTEXT); // 37
@@ -79,7 +79,7 @@ edit_text_character_def::read(SWFStream& in, int tag_type,
 	{
 		in.ensureBytes(4);
 		m_font_id = in.read_u16();
-		m_font = m->get_font(m_font_id);
+		m_font = m.get_font(m_font_id);
 		if (m_font == NULL)
 		{
 			IF_VERBOSE_MALFORMED_SWF(

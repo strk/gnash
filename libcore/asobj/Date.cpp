@@ -28,23 +28,23 @@
 // large: it is a double, which has a minimum size of 8 bytes
 // in the C++ standard. Methods provided by ctime and sys/time.h
 // generally rely on time_t whose size varies according to platform.
-// It is not big enough to deal with all valid flash timestamps,
+// It is not big enough to deal with all valid SWF timestamps,
 // so this class uses its own methods to convert to and from 
 // a time struct and the time stamp.
 // 
 //
 // FEATURES:
-// Flash Player does not seem to respect TZ or the zoneinfo database;
+// SWF Player does not seem to respect TZ or the zoneinfo database;
 // It changes to/from daylight saving time according to its own rules.
 // We use the operating system's localtime routines.
 //
-// Flash player does bizarre things for some argument combinations,
+// SWF player does bizarre things for some argument combinations,
 // returning datestamps of /6.*e+19  We don't bother doing this...
 //
 // Boost date-time handles a larger range of correct dates than
 // the usual C and system functions. However, it is still limited
 // to POSIX to 1 Jan 1400 - 31 Dec 9999 and will not handle
-// dates at all outside this range. Flash isn't really that
+// dates at all outside this range. SWF isn't really that
 // bothered by correctness; rather, it needs to handle a vast
 // range of dates consistently. See http://www.boost.org/doc/html/date_time.html
 //
@@ -55,7 +55,7 @@
 // Cons:
 //
 // *  It doesn't handle fractions of milliseconds (and who cares?);
-// *  Mapping between boost's coherent date_time methods and Flash's
+// *  Mapping between boost's coherent date_time methods and SWF's
 //    idiosyncratic ones to implement this class' methods is more tricky;
 // *  It brings the need to handle all boundary cases and exceptions
 //    explicitly (e.g. mapping of 38 Nov to 8 Dec, mapping negative
@@ -1237,7 +1237,7 @@ void date_class_init(as_object& global)
 ///
 ///
 
-// Converts a time struct into a flash timestamp. Similar to
+// Converts a time struct into a swf timestamp. Similar to
 // mktime, but not limited by the size of time_t. The mathematical
 // algorithm looks nicer, but does not cope with large dates.
 // Bumping up the int size or using doubles more might help - I 

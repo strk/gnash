@@ -16,8 +16,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-#ifndef _PLAYER_H_
-#define _PLAYER_H_
+#ifndef GNASH_PLAYER_H
+#define GNASH_PLAYER_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -29,6 +29,7 @@
 #include "gui.h"
 #include "movie_definition.h" // for visibility of movie_definition destructor
 #include "smart_ptr.h" // for intrusive_ptr holding of top-level movie
+#include "movie_root.h" // for Abstract callbacks
 
 #include <string>
 #include <map>
@@ -44,7 +45,7 @@ namespace gnash
 {
 
 /// This class is an attempt at simplifying the code required
-/// to simply start the flash player. The idea was to use it
+/// to simply start the SWF player. The idea was to use it
 /// from the plugin so we can set callback for getUrl and fs_commands
 /// w/out the need of using FIFOs or sockets or whatever else.
 ///
@@ -54,7 +55,7 @@ public:
 
 	Player();
 
-	~Player() {}
+	~Player();
 
 	/// Play the movie at the given url/path.
 	//
@@ -142,6 +143,30 @@ public:
 	
 private:
 
+	class CallbacksHandler
+		: public movie_root::AbstractIfaceCallback,
+		  public movie_root::AbstractFsCallback
+	{
+	public:
+		CallbacksHandler(Gui* gui)
+			:
+			_gui(gui)
+		{}
+
+		std::string call(const std::string& event, const std::string& arg);
+
+		// For handling notification callbacks from ActionScript. The callback is
+		// always sent to a hosting application (i.e. if a file descriptor is
+		// supplied). It is never acted on by Gnash when running as a plugin.
+		void notify(const std::string& event, const std::string& arg);
+
+	private:
+
+		Gui* _gui;
+	};
+
+	std::auto_ptr<CallbacksHandler> _callbacksHandler;
+
 	void init();
 
 	/// This aux streamer returns a silent audio stream
@@ -171,12 +196,6 @@ private:
 
 	void setFlashVars(const std::string& varstr);
 
-	static void fs_callback(sprite_instance* movie,
-			const std::string& command, const std::string& args);
-
-	static std::string interfaceEventCallback(const std::string& event,
-							const std::string& arg);
-
 	// Movie parameters (for -P)
 	std::map<std::string, std::string> params;
 
@@ -203,7 +222,7 @@ private:
 
 	std::string _baseurl;
 
-	static std::auto_ptr<Gui> _gui;
+	std::auto_ptr<Gui> _gui;
 
 	std::auto_ptr<media::sound_handler> _soundHandler;
 

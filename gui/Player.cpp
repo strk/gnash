@@ -1,4 +1,4 @@
-// Player.cpp:  Top level flash player, for gnash.
+// Player.cpp:  Top level SWF player, for gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
@@ -61,8 +61,6 @@ using namespace gnash;
 namespace {
 gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 }
-
-std::auto_ptr<Gui> Player::_gui(NULL);
 
 /*static private*/
 void
@@ -193,7 +191,7 @@ void
 Player::init_media()
 {
 #ifdef SOUND_SDL
-	_mediaHandler.reset( new gnash::media::MediaHandlerFfmpeg() );
+        _mediaHandler.reset( new gnash::media::MediaHandlerFfmpeg() );
 #elif defined(SOUND_GST)
         _mediaHandler.reset( new gnash::media::MediaHandlerGst() );
 #else
@@ -400,13 +398,15 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
 
     SystemClock clock; // use system clock here...
     movie_root& root = VM::init(*_movieDef, clock).getRoot();
+
+    _callbacksHandler.reset(new CallbacksHandler(_gui.get())); 
     
     // Register Player to receive events from the core (Mouse, Stage,
     // System etc)
-    root.registerEventCallback(&interfaceEventCallback);
+    root.registerEventCallback(_callbacksHandler.get());
     
     // Register Player to receive FsCommand events from the core.
-    root.registerFSCommandCallback(&fs_callback);
+    root.registerFSCommandCallback(_callbacksHandler.get());
 
     // Set host requests fd (if any)
     if ( _hostfd != -1 ) root.setHostFD(_hostfd);
@@ -449,16 +449,78 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
     return EXIT_SUCCESS;
 }
 
-// static private
-// For handling notification callbacks from ActionScript. The callback is
-// always sent to a hosting application (i.e. if a file descriptor is
-// supplied). It is never acted on by Gnash when running as a plugin.
-//
-// TODO: drop first argument ?
-//
+std::string
+Player::CallbacksHandler::call(const std::string& event, const std::string& arg)
+{
+    if (event == "Mouse.hide")
+    {
+        return _gui->showMouse(false) ? "true" : "false";
+    }
+
+    if (event == "Mouse.show")
+    {
+        return _gui->showMouse(true) ? "true" : "false";
+    }
+    
+    if (event == "Stage.displayState")
+    {
+        if (arg == "fullScreen") _gui->setFullscreen();
+        else if (arg == "normal") _gui->unsetFullscreen();
+        return "";
+    }
+
+    if (event == "Stage.scaleMode" || event == "Stage.align" )
+    {
+        _gui->updateStageMatrix();
+        return "";
+    }
+    
+    if (event == "System.capabilities.screenResolutionX")
+    {
+        std::ostringstream ss;
+        ss << _gui->getScreenResX();
+        return ss.str();
+    }
+
+    if (event == "System.capabilities.screenResolutionY")
+    {
+        std::ostringstream ss;
+        ss << _gui->getScreenResY();
+        return ss.str();
+    }
+
+    if (event == "System.capabilities.pixelAspectRatio")
+    {
+        std::ostringstream ss;
+        // Whether the pp actively limits the precision or simply
+        // gets a slightly different result isn't clear.
+        ss << std::setprecision(7) << _gui->getPixelAspectRatio();
+        return ss.str();
+    }
+
+    if (event == "System.capabilities.screenDPI")
+    {
+        std::ostringstream ss;
+        ss << _gui->getScreenDPI();
+        return ss.str();
+    }
+
+    if (event == "System.capabilities.screenColor")
+    {
+        return _gui->getScreenColor();
+    }
+
+    if (event == "System.capabilities.playerType")
+    {
+        return _gui->isPlugin() ? "PlugIn" : "StandAlone";
+    }
+
+    log_error(_("Unhandled callback %s with arguments %s"), event, arg);
+    return "";
+}
+
 void
-Player::fs_callback(gnash::sprite_instance* /*movie*/, const std::string& command,
-                                const std::string& args)
+Player::CallbacksHandler::notify(const std::string& command, const std::string& args)
 {
     //log_debug(_("fs_callback(%p): %s %s"), (void*)movie, command, args);
 
@@ -554,13 +616,13 @@ Player::fs_callback(gnash::sprite_instance* /*movie*/, const std::string& comman
     // FSCommand allowscale
     if (noCaseCompare(command, "allowscale"))
     {
-	//log_debug("allowscale: %s", args);
+        //log_debug("allowscale: %s", args);
         if (noCaseCompare(args, "true")) _gui->allowScale(true);
         else
-	{
-		if ( atoi(args.c_str()) ) _gui->allowScale(true);
-		else _gui->allowScale(false);
-	}
+        {
+                if (strtol(args.c_str(), NULL, 0)) _gui->allowScale(true);
+                else _gui->allowScale(false);
+        }
         return;
     }
 
@@ -578,75 +640,6 @@ Player::fs_callback(gnash::sprite_instance* /*movie*/, const std::string& comman
 
 }
 
-std::string
-Player::interfaceEventCallback(const std::string& event, const std::string& arg)
-{
-    if (event == "Mouse.hide")
-    {
-        return _gui->showMouse(false) ? "true" : "false";
-    }
-
-    if (event == "Mouse.show")
-    {
-        return _gui->showMouse(true) ? "true" : "false";
-    }
-    
-    if (event == "Stage.displayState")
-    {
-        if (arg == "fullScreen") _gui->setFullscreen();
-        else if (arg == "normal") _gui->unsetFullscreen();
-        return "";
-    }
-
-    if (event == "Stage.scaleMode" || event == "Stage.align" )
-    {
-        _gui->updateStageMatrix();
-        return "";
-    }
-    
-    if (event == "System.capabilities.screenResolutionX")
-    {
-        std::ostringstream ss;
-        ss << _gui->getScreenResX();
-        return ss.str();
-    }
-
-    if (event == "System.capabilities.screenResolutionY")
-    {
-        std::ostringstream ss;
-        ss << _gui->getScreenResY();
-        return ss.str();
-    }
-
-    if (event == "System.capabilities.pixelAspectRatio")
-    {
-        std::ostringstream ss;
-        // Whether the pp actively limits the precision or simply
-        // gets a slightly different result isn't clear.
-        ss << std::setprecision(7) << _gui->getPixelAspectRatio();
-        return ss.str();
-    }
-
-    if (event == "System.capabilities.screenDPI")
-    {
-        std::ostringstream ss;
-        ss << _gui->getScreenDPI();
-        return ss.str();
-    }
-
-    if (event == "System.capabilities.screenColor")
-    {
-        return _gui->getScreenColor();
-    }
-
-    if (event == "System.capabilities.playerType")
-    {
-        return _gui->isPlugin() ? "PlugIn" : "StandAlone";
-    }
-
-    log_error(_("Unhandled callback %s with arguments %s"), event, arg);
-    return "";
-}
 
 // private
 std::auto_ptr<Gui>
@@ -687,3 +680,10 @@ Player::getGui()
     return std::auto_ptr<Gui>(new NullGui(_doLoop));
 }
 
+Player::~Player()
+{
+    if (_movieDef.get())
+    {
+            log_debug("~Player - _movieDef refcount: %d (1 will be dropped now)", _movieDef->get_ref_count());
+    }
+}

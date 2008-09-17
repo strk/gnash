@@ -1,0 +1,5 @@
+This directory is used as input for the misc-ming.all/SharedObjectTestRunner
+script. Files here will be copied to a player's SOLDIR and the SharedObjectTest.swf
+will be played, containing tests for reading the sol files.
+Finally on player exit the script checks if the sol file was written and if it
+matches the input one.

@@ -92,7 +92,7 @@ public:
 
 	}
 	
-	static void doABCLoader(SWFStream& in,tag_type tag, movie_definition* m)
+	static void doABCLoader(SWFStream& in,tag_type tag, movie_definition& m)
 	{
 		if(tag == SWF::DOABCDEFINE){
 			in.ensureBytes(4);
@@ -112,7 +112,7 @@ public:
 		log_parse(_("-- actions in frame %d"), m->get_loading_frame());
 		);*/
 
-		m->addControlTag(ABCtag); // ownership transferred
+		m.addControlTag(ABCtag); // ownership transferred
 	}
 
 private:

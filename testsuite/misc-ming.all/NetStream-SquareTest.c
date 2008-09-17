@@ -506,21 +506,24 @@ main(int argc, char** argv)
 		//      and would succeed in composition checking in second call.
 		" if ( _root.metadataNotified > 1 ) return;"
 
-		" xcheck(_root.startNotified, 'onMetaData should be notified after Play.Start');"
+		" check(_root.startNotified, 'onMetaData should be notified after Play.Start');"
 		" check_equals(arguments.length, 1, 'single argument');"
-		" check(info instanceof Object, 'onMetaData argument should be instanceof Object');"
+		" check(info instanceof Array, 'onMetaData argument sent from square.flv should be instanceof Array');"
+		" check_equals(info.length, 11);" // it's an array so we can check length. gnash fails by discarding the count element of ECMA_ARRAY AMF type
 
 		// Test enumeration
 		" var enu = new Array;"
 		" for (e in info) { "
 		"  enu.push(e);"
 		" }"
-		" xcheck_equals(enu.length, 11);" // gnash contains 2 more 
+		" check_equals(enu.length, 11);" // this is actual (not virtual) composition
 
 		"\n"
 
 
 		// Test composision
+
+		" check(info.hasOwnProperty('length'), 'metadata has length');" // it's an array...
 
 		" check(info.hasOwnProperty('filesize'), 'metadata has filesize');"
 		" check_equals(typeof(info.filesize), 'number', 'filesize is a number');"
@@ -609,10 +612,10 @@ main(int argc, char** argv)
 
   SWFMovie_nextFrame(mo);
 
-  xcheck_equals(mo, "metadataNotified", "1");
+  check_equals(mo, "metadataNotified", "1");
   check_equals(mo, "stopNotified", "2");
   check_equals(mo, "startNotified", "1");
-  SWFMovie_add(mo, (SWFBlock)newSWFAction("totals(119); stop();"));
+  SWFMovie_add(mo, (SWFBlock)newSWFAction("totals(142); stop();"));
 
   SWFMovie_nextFrame(mo);
 

@@ -66,6 +66,9 @@ namespace gnash {
 
 class NetStreamFfmpeg: public NetStream {
 public:
+
+	typedef std::deque<media::raw_mediadata_t*> AudioQueue;
+
 	NetStreamFfmpeg();
 	~NetStreamFfmpeg();
 
@@ -248,8 +251,6 @@ private:
 	/// to MediaParser constructor.
 	///
 	std::auto_ptr<IOChannel> _inputStream;
-
-	typedef std::deque<media::raw_mediadata_t*> AudioQueue;
 
 	/// This is where audio frames are pushed by ::advance
 	/// and consumed by sound_handler callback (audio_streamer)

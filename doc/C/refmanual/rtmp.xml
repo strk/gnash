@@ -8,14 +8,14 @@
     <emphasis>ethereal</emphasis> are your friend. Some additional info that got
     me started was from the <ulink  type="http"
 	url="http://www.osflash.org/red5">Red5</ulink>
-    project. <emphasis>Red5</emphasis> is the only other open source Flash
+    project. <emphasis>Red5</emphasis> is the only other open source SWF
     server. So some details are still vague, but as the implementation
     appears to work, we'll figure out what they are later.
   </para>
 
   <para>
     The Real Time Messaging Protocol was created by MacroMedia (now
-    Adobe) for delivering Flash objects and video over a network
+    Adobe) for delivering SWF objects and video over a network
     connection. Currently the only servers which support this format
     are the MacroMedia Media sever, and the Open Source Red5 project.
   </para>
@@ -75,7 +75,7 @@
 
   <para>
     The second packet is the <emphasis>NetConnection</emphasis> object from
-    the client. This ActionScript class is used by the Flash movie to
+    the client. This ActionScript class is used by the SWF movie to
     create the network connection to the server.
   </para>
 
@@ -107,9 +107,9 @@
     The RTMP header is first, followed by the connect message as an
     ASCII string as the message body. The following AMF packet is the
     <emphasis>NetConnection</emphasis> one, which specifies that this is coming
-    from a Flash application. This also contains the file path the server
+    from a SWF application. This also contains the file path the server
     can use to find the file to stream. This is then followed by the
-    version number, which I assume is the version of the Flash player,
+    version number, which I assume is the version of the SWF player,
     so the server knows what it is talking to.
   </para>
 
@@ -121,7 +121,7 @@
 
   <para>
     For the next level of detail, we'll explain the format of AMF. AMF
-    is used by the RTMP protocol to transfer data. Each Flash object
+    is used by the RTMP protocol to transfer data. Each SWF object
     is encapsulated in an AMF packet, including streaming audio or
     video.
   </para>
@@ -275,7 +275,7 @@
 	<listitem>
 	  <para>
 	    This specifies the content type of the RTMP message is
-	    remote procedure call. This invokes the method of a Flash
+	    remote procedure call. This invokes the method of a SWF
 	    class remotely.
 	  </para>
 	</listitem>
@@ -300,7 +300,7 @@
 	<listitem>
 	  <para>
 	    This specifies the data in the AMF packet is a numeric
-	    value. All numeric values in Flash are 64 bit,
+	    value. All numeric values in SWF are 64 bit,
 	    <emphasis>big-endian</emphasis>.
 	  </para>
 	</listitem>
@@ -330,8 +330,8 @@
 	<term>0x3</term>
 	<listitem>
 	  <para>
-	    This specifies the data in the AMF packet is a Flash
-	    object. The Flash object data type field further along in
+	    This specifies the data in the AMF packet is a SWF
+	    object. The SWF object data type field further along in
 	    the message specifies which type of ActionScript object it
 	    is.
 	  </para>
@@ -342,8 +342,8 @@
 	<term>0x4</term>
 	<listitem>
 	  <para>
-	    This specifies the data in the AMF packet is a Flash
-	    movie, ie. another Flash movie.
+	    This specifies the data in the AMF packet is a SWF
+	    movie, ie. another SWF movie.
 	  </para>
 	</listitem>
       </varlistentry>
@@ -354,7 +354,7 @@
 	  <para>
 	    This specifies the data in the AMF packet is a NULL
 	    value. NULL is often used as the return code from calling
-	    Flash functions.
+	    SWF functions.
 	  </para>
 	</listitem>
       </varlistentry>
@@ -365,7 +365,7 @@
 	  <para>
 	    This specifies the data in the AMF packet is a
 	    undefined. This is also used as the return code from
-	    calling Flash functions.
+	    calling SWF functions.
 	  </para>
 	</listitem>
       </varlistentry>

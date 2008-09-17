@@ -5842,7 +5842,7 @@ msgid ""
 msgstr ""
 
 #: ../gui/gtk.cpp:1485
-msgid "GNASH flash movie player"
+msgid "GNASH SWF player"
 msgstr ""
 
 #: ../gui/gtk.cpp:1517 ../gui/gtk.cpp:1530
@@ -6283,14 +6283,14 @@ msgstr "Fältnamnet är: %s: "
 
 #, fuzzy
 #~ msgid ""
-#~ "  -g            Turn on the Flash debugger\n"
+#~ "  -g            Turn on the SWF debugger\n"
 #~ "  -r <0|1|2|3>\n"
 #~ "                0 disables both rendering & sound (good for batch tests)\n"
 #~ "                1 enables rendering & disables sound\n"
 #~ "                2 enables sound & disables rendering\n"
 #~ "                3 enables both rendering & sound (default)\n"
 #~ msgstr ""
-#~ "  -g          Flash-Debugger einschalten\n"
+#~ "  -g          SWF-Debugger einschalten\n"
 #~ "  -r <0|1|2|3>\n"
 #~ "              0 Rendering und Audio deaktiviert (good for batch tests)\n"
 #~ "              1 Rendering aktiviert, Audio deaktiviert\n"
@@ -6418,8 +6418,8 @@ msgstr "Fältnamnet är: %s: "
 #~ msgid "Klash"
 #~ msgstr "Klash"
 
-#~ msgid "The Gnash Flash player for KDE.\n"
-#~ msgstr "Der Gnash-Flash-Player fÃ¼r KDE.\n"
+#~ msgid "The Gnash SWF player for KDE.\n"
+#~ msgstr "Der Gnash-SWF-Player fÃ¼r KDE.\n"
 
 #~ msgid "Logging to disk enabled."
 #~ msgstr "Logging auf Festplatte aktiviert."

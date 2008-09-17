@@ -20,9 +20,8 @@
 #include "gnashconfig.h"
 #endif
 
-#ifdef HAVE_PTHREADS
-#include <pthread.h>
-#endif
+#include <boost/thread/mutex.hpp>
+
 
 #include "utility.h"
 #include "log.h"
@@ -689,7 +688,7 @@ Network::closeConnection(int fd)
 amf::Buffer *
 Network::readNet()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     amf::Buffer *buffer = new amf::Buffer;
     int nbytes = readNet(buffer);
@@ -705,42 +704,50 @@ Network::readNet()
 int
 Network::readNet(amf::Buffer *buffer)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     return readNet(_sockfd, buffer->reference(), buffer->size(), _timeout);
 }
 
 int
 Network::readNet(amf::Buffer *buffer, int timeout)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     return readNet(_sockfd, buffer->reference(), buffer->size(), timeout);
 }
 
 int
 Network::readNet(byte_t *buffer, int nbytes)
 {
+//    GNASH_REPORT_FUNCTION;
     return readNet(_sockfd, buffer, nbytes, _timeout);
 }
 
 int
 Network::readNet(byte_t *buffer, int nbytes, int timeout)
 {
+//    GNASH_REPORT_FUNCTION;
     return readNet(_sockfd, buffer, nbytes, timeout);
 }
 
 int
 Network::readNet(int fd, byte_t *buffer, int nbytes)
 {
+//    GNASH_REPORT_FUNCTION;
     return readNet(fd, buffer, nbytes, _timeout);
 }
 
 int
 Network::readNet(int fd, byte_t *buffer, int nbytes, int timeout)
 {
+//    GNASH_REPORT_FUNCTION;
+
     fd_set              fdset;
     int                 ret = -1;
     struct timeval      tval;
 
+    if (_debug) {
+	log_debug (_("Trying to read %d bytes from fd #%d"), nbytes, fd);
+    }
 #ifdef NET_TIMING
     if (_timing_debug)
     {

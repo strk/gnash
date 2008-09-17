@@ -60,6 +60,7 @@ typedef enum {
 		PROP_BULLET,
 		PROP_C,
 		PROP_CALLEE,
+		PROP_CALLER,
 		//PROP_COLOR, // clashes with CLASS_COLOR in case-insensitive mode
 		PROP_CONSTRUCTOR,
 		PROP_uuCONSTRUCTORuu,

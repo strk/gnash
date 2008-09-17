@@ -87,6 +87,12 @@ public:
 			v.visit(*i);
 	}
 
+    // see dox in as_object.h
+	virtual void visitPropertyValues(AbstractPropertyVisitor& visitor) const;
+
+    // see dox in as_object.h
+	virtual void visitNonHiddenPropertyValues(AbstractPropertyVisitor& visitor) const;
+
 	/// Sort flags
 	enum SortFlags {
 

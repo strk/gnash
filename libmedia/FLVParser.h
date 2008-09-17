@@ -25,6 +25,7 @@
 
 #include "dsodefs.h"
 #include "MediaParser.h" // for inheritance
+#include "SimpleBuffer.h" // for MetaTag destructor
 
 #include <vector>
 #include <memory>
@@ -32,132 +33,14 @@
 
 #include <boost/thread/mutex.hpp>
 
+// Forward declarations
+namespace gnash {
+	class as_object;
+	class VM;
+}
+
 namespace gnash {
 namespace media {
-
-/// Frame type
-enum FrameType {
-
-	/// Video frame
-	videoFrame,
-
-	/// Audio frame
-	audioFrame
-};
-
-/// \brief
-/// The FLVFrame class contains an encoded
-/// video or audio frame, its size, its
-/// timestamp,
-class FLVFrame
-{
-public:
-	/// Size of the encoded frame
-	boost::uint32_t dataSize;
-
-	/// Encoded data
-	boost::uint8_t* data;
-
-	/// Frame timestamp, in milliseconds
-	boost::uint64_t timestamp;
-
-	/// Frame type (audio/video)
-	FrameType type;
-};
-
-/// \brief
-/// The FLVAudioInfo class contains information about the audiostream
-/// in the FLV being parsed. The information stored is codec-type,
-/// samplerate, samplesize, stereo flag and duration.
-//
-/// TODO: drop
-///
-class FLVAudioInfo
-{
-public:
-	FLVAudioInfo(boost::uint16_t codeci, boost::uint16_t sampleRatei, boost::uint16_t sampleSizei, bool stereoi, boost::uint64_t durationi)
-		: codec(codeci),
-		sampleRate(sampleRatei),
-		sampleSize(sampleSizei),
-		stereo(stereoi),
-		duration(durationi)
-		{
-		}
-
-	boost::uint16_t codec;
-	boost::uint16_t sampleRate;
-	boost::uint16_t sampleSize;
-	bool stereo;
-	boost::uint64_t duration;
-};
-
-/// \brief
-/// The FLVVideoInfo class contains information about the videostream
-/// in the FLV being parsed. The information stored is codec-type,
-/// width, height, framerate and duration.
-//
-/// TODO: drop
-///
-class FLVVideoInfo
-{
-public:
-	FLVVideoInfo(boost::uint16_t codeci, boost::uint16_t widthi, boost::uint16_t heighti, boost::uint16_t frameRatei, boost::uint64_t durationi)
-		:
-		codec(codeci),
-		width(widthi),
-		height(heighti),
-		frameRate(frameRatei),
-		duration(durationi)
-		{
-		}
-
-	boost::uint16_t codec;
-	boost::uint16_t width;
-	boost::uint16_t height;
-	boost::uint16_t frameRate;
-	boost::uint64_t duration;
-};
-
-
-/// Information about an FLV Video Frame
-class FLVVideoFrameInfo
-{
-public:
-
-	/// Type of this frame (should likely be videoFrameType)
-	boost::uint16_t frameType;
-
-	/// Size of the frame in bytes
-	boost::uint32_t dataSize;
-
-	/// Start of frame data in stream
-	boost::uint64_t dataPosition;
-
-	/// Timestamp in milliseconds 
-	boost::uint32_t timestamp;
-
-	/// Return true if this video frame is a key frame
-	bool isKeyFrame() const
-	{
-		return frameType == 1 /*KEY_FRAME*/;
-	}
-
-};
-
-/// Information about an FLV Audio Frame
-class FLVAudioFrameInfo
-{
-public:
-	/// Size of the frame in bytes
-	boost::uint32_t dataSize;
-
-	/// Start of frame data in stream
-	boost::uint64_t dataPosition;
-
-	/// Timestamp in milliseconds 
-	boost::uint32_t timestamp;
-
-};
 
 /// The FLVParser class parses FLV streams
 class DSOEXPORT FLVParser : public MediaParser
@@ -200,6 +83,8 @@ public:
 	{
 		return _indexingCompleted;
 	}
+
+	virtual void processTags(boost::uint64_t ts, as_object* thisPtr, VM& env);
 
 private:
 
@@ -256,6 +141,25 @@ private:
 	CuePointsMap _cuePoints;
 
 	bool _indexingCompleted;
+
+	class MetaTag {
+	public:
+		MetaTag(boost::uint64_t t, std::auto_ptr<SimpleBuffer> b)
+			:
+			_timestamp(t),
+			_buffer(b)
+		{}
+
+		void execute(as_object* thisPtr, VM& env);
+		boost::uint64_t timestamp() const { return _timestamp; }
+	private:
+		boost::uint64_t _timestamp;
+		std::auto_ptr<SimpleBuffer> _buffer;
+	};
+
+	typedef std::deque<MetaTag*> MetaTags;
+	MetaTags _metaTags;
+	boost::mutex _metaTagsMutex;
 };
 
 } // end of gnash::media namespace

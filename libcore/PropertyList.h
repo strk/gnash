@@ -21,6 +21,7 @@
 #include "dsodefs.h" // DSOEXPORT
 
 #include "Property.h" // for templated functions
+#include "as_prop_flags.h" // for templated functions
 #include "as_value.h" // for templated functions
 #include "string_table.h"
 
@@ -94,14 +95,14 @@ public:
 	/// Assignment operator
 	PropertyList& operator=(const PropertyList&);
 
-	/// Visit the list of properties 
+	/// Visit properties 
 	//
 	/// The method will invoke the given visitor method
 	/// passing it two arguments: name of the property and
 	/// value of it.
 	///
 	/// @param visitor
-	///	The visitor function. Must take a const std::string
+	///	The visitor function. Must take a string_table::key 
 	///	reference as first argument and a const as_value reference
 	///	as second argument.
 	///
@@ -115,9 +116,36 @@ public:
 			itEnd = _props.end(); it != itEnd; ++it)
 		{
 			as_value val = it->getValue(this_ptr);
-			visitor(it->mName, val);
+			visitor.accept(it->mName, val);
 		}
 	}
+
+	/// Visit non hidden properties 
+	//
+	/// The method will invoke the given visitor method
+	/// passing it two arguments: name of the property and
+	/// value of it.
+	///
+	/// @param visitor
+	///	The visitor function. Must take a string_table::key 
+	///	reference as first argument and a const as_value reference
+	///	as second argument.
+	///
+	/// @param this_ptr
+	///	The object reference used to extract values from properties.
+	///
+	template <class V>
+	void visitNonHiddenValues(V& visitor, as_object& this_ptr) const
+	{
+		for (container::const_iterator it = _props.begin(),
+			itEnd = _props.end(); it != itEnd; ++it)
+		{
+	        if (it->getFlags().get_dont_enum()) continue;
+			as_value val = it->getValue(this_ptr);
+			visitor.accept(it->mName, val);
+		}
+	}
+
 
 	/// Get the as_value value of a named property
 	//

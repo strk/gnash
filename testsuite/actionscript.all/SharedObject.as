@@ -42,18 +42,31 @@ check_totals(3);
 // test the SharedObject constuctor
 check_equals (typeof(sharedobjectObj), 'object');
 
-// test the SharedObject::clear method
-check_equals (typeof(sharedobjectObj.clear), 'function');
-// test the SharedObject::flush method
-check_equals (typeof(sharedobjectObj.flush), 'function');
 
-// test the SharedObject::getlocal method
+// test the SharedObject.getlocal method
 check_equals (typeof(sharedobjectObj.getLocal), 'undefined');
 check_equals (typeof(SharedObject.getLocal), 'function');
 
-// test the SharedObject::getsize method
+// test the SharedObject.connect method (asnative 2106,0)
+check_equals (typeof(sharedobjectObj.connect), 'function');
+
+// test the SharedObject.send method (asnative 2106,1)
+check_equals (typeof(sharedobjectObj.send), 'function');
+
+// test the SharedObject.flush method (asnative 2106,2)
+check_equals (typeof(sharedobjectObj.flush), 'function');
+
+// test the SharedObject.close method (asnative 2106,3)
+check_equals (typeof(sharedobjectObj.close), 'function');
+
+// test the SharedObject.getsize method (asnative 2106,4)
 check_equals (typeof(sharedobjectObj.getSize), 'function');
 
+// test the SharedObject.setFps method (asnative 2106,5)
+check_equals (typeof(sharedobjectObj.setFps), 'function');
+
+// test the SharedObject.clear method (asnative 2106,6)
+check_equals (typeof(sharedobjectObj.clear), 'function');
 
 // FIXME: Test code that will soon be a formal test case.
 so = SharedObject.getLocal("level1/level2/settings", "/");
@@ -82,12 +95,20 @@ so.data.tmp = "custom value";
 so2 = SharedObject.getLocal("level1/level2/settings", "/");
 check_equals(so2.data.tmp, "custom value");
 check_equals(so, so2);
+
+so2bis = SharedObject.getLocal("level1//level2/settings", "/");
+xcheck_equals(typeof(so2bis), 'null'); // invalid path
+
+so2bis = SharedObject.getLocal("level1/./level2/settings", "/");
+check_equals(typeof(so2bis), 'object'); // valid path
+check(so2bis != so2); // but not recognized as the same as level1/./level2/settings
+
 delete so.data.tmp;
 
 // But a getLocal call using a *different* "id" returns
 // a different SharedObject...
 so3 = SharedObject.getLocal("level1/level2/settings3", "/");
-xcheck(so3 != so);
+check(so3 != so);
 
 
 // trace(so.getSize());
@@ -133,12 +154,68 @@ if (typeof(newso.data) != 'undefined') {
     trace("New Shared Object doesn't exist!");
 }
 
-so4 = SharedObject.getLocal("Another one", "/subdir");
-xcheck(so4 != so3);
+so4 = SharedObject.getLocal("Another-one", "/subdir");
+check(so4 != so3);
 xcheck_equals(typeof(so4.data), 'undefined');
 ret = so4.flush();
 xcheck_equals(typeof(ret), 'undefined');
 
-check_totals(38);
+//------------------------------------------
+// Test that if 'data' is a getter-setter,
+// it isn't called on .flush()
+//------------------------------------------
+
+so5 = SharedObject.getLocal("getset");
+check(so5 instanceof SharedObject);
+dataGet = function() { getCalls++; return new Object(); };
+getCalls=0;
+so5.addProperty('data', dataGet, dataGet);
+junk=so5.data;
+check_equals(getCalls, 1); // the getter works
+getCalls=0;
+ret=so5.flush();
+check_equals(ret, true);
+xcheck_equals(getCalls, 0); // flush didn't cal the getter
+
+//------------------------------------------
+// Test that 'data' is enumerable, read-only
+// and protected from deletion
+//------------------------------------------
+
+so6 = SharedObject.getLocal("so6");
+a = new Array;
+for (var i in so6) a.push(i);
+check_equals(a.toString(), 'data');
+delete so6;
+check_equals(typeof(so.data), 'object');
+so6.data = 5;
+check_equals(typeof(so.data), 'object');
+
+//------------------------------------------
+// Test calling getLocal with no args
+//------------------------------------------
+
+so7 = SharedObject.getLocal();
+#if OUTPUT_VERSION > 6
+ // produces 'undefined.sol'
+ check(so7 instanceof SharedObject);
+#else
+ // returns undefined
+ check_equals(typeof(so7), 'null');
+#endif
+so7.data.a = 1;
+so7.flush();
+
+so8 = SharedObject.getLocal('');
+check_equals(typeof(so8), 'null');
+
+so9 = SharedObject.getLocal('', 'something');
+check_equals(typeof(so9), 'null');
+
+//------------------------------------------
+// END OF TESTS
+//------------------------------------------
+
+check_totals(55);
 
 #endif // OUTPUT_VERSION >= 6

@@ -271,8 +271,8 @@
       <sect4 id="manual_compiled_tests">
 	<title>Movie tests</title>
 	<para>
-	  This creates a Flash movie version of the test case, which
-	  can be run with a standalone Flash player.  For instance,
+	  This creates a SWF movie version of the test case, which
+	  can be run with a standalone SWF player.  For instance,
 	  the target for SWF version 6 could be run with &app;:
 	  <programlisting>
 	    gnash -v XML-v6.swf

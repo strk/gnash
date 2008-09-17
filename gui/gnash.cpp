@@ -1,4 +1,4 @@
-// gnash.cpp:  Main routine for top-level flash player, for Gnash.
+// gnash.cpp:  Main routine for top-level SWF player, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
@@ -111,7 +111,7 @@ cout << _("Usage: gnash [options] movie_file.swf") << endl
     << _("  -j,  --width <width>     Set window width") << endl
     << _("  -k,  --height <height>   Set window height") << endl
     << _("  -1,  --once              Exit when/if movie reaches the last frame") << endl
-    << _("  -g,  --debugger          Turn on the Flash debugger") << endl
+    << _("  -g,  --debugger          Turn on the SWF debugger") << endl
     << _("  -r,  --render-mode <0|1|2|3>") << endl
     << _("                           0 disable rendering and sound") << endl
     << _("                           1 enable rendering, disable sound") << endl
@@ -444,12 +444,12 @@ gnash_main(int argc, char *argv[])
     catch (const std::exception& ex)
     {
         cerr << ex.what() << endl;
-        exit(EXIT_FAILURE);
+        return EXIT_FAILURE;
     }
     catch (...)
     {
         cerr << _("Exception thrown during parseCommandLine") << endl;
-        exit(EXIT_FAILURE);
+        return EXIT_FAILURE;
     }
 
     // No file name was supplied

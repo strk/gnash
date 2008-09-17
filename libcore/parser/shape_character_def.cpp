@@ -50,7 +50,7 @@ namespace gnash
 // Read fill styles, and push them onto the given style array.
 static void
 read_fill_styles(std::vector<fill_style>& styles, SWFStream& in,
-                 int tag_type, movie_definition* m)
+                 int tag_type, movie_definition& m)
 {
     in.ensureBytes(1);
     boost::uint16_t  fill_style_count = in.read_u8();
@@ -80,7 +80,7 @@ read_fill_styles(std::vector<fill_style>& styles, SWFStream& in,
 
 static void
 read_line_styles(std::vector<line_style>& styles, SWFStream& in, int tag_type,
-                 movie_definition *md)
+                 movie_definition& md)
 // Read line styles and push them onto the back of the given array.
 {
     in.ensureBytes(1);
@@ -132,7 +132,7 @@ shape_character_def::~shape_character_def()
 
 void
 shape_character_def::read(SWFStream& in, int tag_type, bool with_style,
-                          movie_definition* m)
+                          movie_definition& m)
 {
     if (with_style)
     {
@@ -150,12 +150,7 @@ shape_character_def::read(SWFStream& in, int tag_type, bool with_style,
             tbound.read(in);
             in.ensureBytes(1);
             static_cast<void>(in.read_u8());
-            static bool warned = false;
-            if ( ! warned )
-            {
-                log_unimpl("DEFINESHAPE4 edge boundaries and scales");
-                warned = true;
-            }
+            LOG_ONCE(log_unimpl("DEFINESHAPE4 edge boundaries and scales"));
         }
     
         read_fill_styles(m_fill_styles, in, tag_type, m);
@@ -510,7 +505,7 @@ shape_character_def::read(SWFStream& in, int tag_type, bool with_style,
     {
         // TODO: performance would be improved by computing
         //       the bounds as edges are parsed.
-        compute_bound(&m_bound, m->get_version());
+        compute_bound(&m_bound, m.get_version());
     }
     #ifdef GNASH_DEBUG_SHAPE_BOUNDS
     else
@@ -812,16 +807,21 @@ shape_character_def::read(SWFStream& in, int tag_type, bool with_style,
 
         bool even_odd = true;  // later we will need non-zero for glyphs... (TODO)
 
-	// FIXME: if the shape contains non-scaled strokes
-	//        we can't rely on boundary itself for a quick
-	//        way out. Bounds supposedly already include
-	//        thickness, so we might keep a flag telling us
-	//        whether *non_scaled* strokes are present
-	//        and if not still use the boundary check.
-        //if (m_bound.point_test(x, y) == false)
-        //{
-		//return false;
-        //}
+        // FIXME: if the shape contains non-scaled strokes
+        //        we can't rely on boundary itself for a quick
+        //        way out. Bounds supposedly already include
+        //        thickness, so we might keep a flag telling us
+        //        whether *non_scaled* strokes are present
+        //        and if not still use the boundary check.
+        // NOTE: just skipping this test breaks a corner-case
+        //       in DrawingApiTest (kind of a fill-leakage making
+        //       the collision detection find you inside a self-crossing
+        //       shape).
+        //
+        if (m_bound.point_test(x, y) == false)
+        {
+            return false;
+        }
 
         unsigned npaths = m_paths.size();
         int counter = 0;

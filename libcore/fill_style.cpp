@@ -60,7 +60,7 @@ fill_style::fill_style()
 
 
 void
-fill_style::read(SWFStream& in, int tag_type, movie_definition* md,
+fill_style::read(SWFStream& in, int tag_type, movie_definition& md,
     fill_style *pOther)
 {
     const bool is_morph = pOther != NULL;
@@ -240,10 +240,10 @@ fill_style::read(SWFStream& in, int tag_type, movie_definition* md,
         {
             pOther->m_gradient_bitmap_info = 
                 pOther->need_gradient_bitmap();
-            md->add_bitmap_info(pOther->m_gradient_bitmap_info.get());
+            md.add_bitmap_info(pOther->m_gradient_bitmap_info.get());
         }
             // Make sure our SWFMovieDefinition knows about this bitmap.
-        md->add_bitmap_info(m_gradient_bitmap_info.get());
+        md.add_bitmap_info(m_gradient_bitmap_info.get());
     }
     else if (m_type == SWF::FILL_TILED_BITMAP
           || m_type == SWF::FILL_CLIPPED_BITMAP
@@ -263,7 +263,7 @@ fill_style::read(SWFStream& in, int tag_type, movie_definition* md,
         );
 
         // Look up the bitmap character.
-        m_bitmap_character = md->get_bitmap_character_def(bitmap_char_id);
+        m_bitmap_character = md.get_bitmap_character_def(bitmap_char_id);
         IF_VERBOSE_MALFORMED_SWF(
             if ( m_bitmap_character == NULL )
             {

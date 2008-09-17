@@ -365,18 +365,10 @@ public:
         as_value cmp_method(&_comp);
         as_value ret(0);
 
-#ifndef NDEBUG
-        size_t prevStackSize = _env.stack_size();
-#endif
-
-	std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
-	args->push_back(b);
-	args->push_back(a);
+	    std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
+	    args->push_back(b);
+	    args->push_back(a);
         ret = call_method(cmp_method, &_env, _object, args);
-
-#ifndef NDEBUG
-        assert(prevStackSize == _env.stack_size());
-#endif
 
         return (*_zeroCmp)(ret.to_int());
     }
@@ -1418,7 +1410,7 @@ array_new(const fn_call& fn)
     log_action(_("array_new called, nargs = %d"), fn.nargs);
     );
 
-    boost::intrusive_ptr<as_array_object>    ao = new as_array_object;
+    boost::intrusive_ptr<as_array_object> ao = new as_array_object;
 
     if (fn.nargs == 0)
     {
@@ -1455,7 +1447,7 @@ attachArrayProperties(as_object& proto)
     as_c_function_ptr gettersetter;
 
     gettersetter = &array_length;
-    proto.init_property("length", *gettersetter, *gettersetter);
+    proto.init_property(NSV::PROP_LENGTH, *gettersetter, *gettersetter);
 }
 
 static void
@@ -1538,6 +1530,25 @@ getArrayInterface()
     return proto.get();
 }
 
+static as_function*
+getArrayConstructor(VM& vm)
+{
+    // This is going to be the global Array "class"/"function"
+    static as_function* ar=0;
+
+    if ( ar == NULL )
+    {
+        vm.registerNative(array_new, 252, 0);
+        ar = new builtin_function(&array_new, getArrayInterface());
+        vm.addStatic(ar);
+
+        // Attach static members
+        attachArrayStatics(*ar);
+    }
+
+    return ar;
+}
+
 // this registers the "Array" member on a "Global"
 // object. "Array" is a constructor, thus an object
 // with .prototype full of exported functions + 
@@ -1546,34 +1557,21 @@ getArrayInterface()
 void
 array_class_init(as_object& glob)
 {
-    // This is going to be the global Array "class"/"function"
-    static boost::intrusive_ptr<as_function> ar=NULL;
-
-    if ( ar == NULL )
-    {
-        VM& vm = glob.getVM();
-        vm.registerNative(array_new, 252, 0);
-        ar = new builtin_function(&array_new, getArrayInterface());
-        vm.addStatic(ar.get());
-
-        // Attach static members
-        attachArrayStatics(*ar);
-    }
-
     // Register _global.Array
-    glob.init_member("Array", ar.get());
+    glob.init_member("Array", getArrayConstructor(glob.getVM()));
 }
 
 void
 as_array_object::enumerateNonProperties(as_environment& env) const
 {
-    // TODO: only actually defined elements should be pushed on the env
-    //       but we currently have no way to distinguish between defined
-    //       and non-defined elements
+    std::stringstream ss; 
     for (ArrayConstIterator it = elements.begin(),
         itEnd = elements.end(); it != itEnd; ++it)
     {
-            env.push(as_value(it.index()));
+        int idx = it.index();
+        // enumerated values need to be strings, not numbers
+        ss.str(""); ss << idx;
+        env.push(as_value(ss.str()));
     }
 }
 
@@ -1667,6 +1665,41 @@ as_array_object::markReachableResources() const
     markAsObjectReachable();
 }
 #endif // GNASH_USE_GC
+
+void
+as_array_object::visitPropertyValues(AbstractPropertyVisitor& visitor) const
+{
+    std::stringstream ss; 
+    string_table& st = getVM().getStringTable();
+    for (ArrayConstIterator i=elements.begin(), ie=elements.end(); i!=ie; ++i)
+    {
+        int idx = i.index();
+        ss.str(""); ss << idx;
+        string_table::key k = st.find(ss.str());
+        visitor.accept(k, *i);
+    }
+
+    // visit proper properties
+    as_object::visitPropertyValues(visitor);
+}
+
+void
+as_array_object::visitNonHiddenPropertyValues(AbstractPropertyVisitor& visitor) const
+{
+    std::stringstream ss; 
+    string_table& st = getVM().getStringTable();
+    for (ArrayConstIterator i=elements.begin(), ie=elements.end(); i!=ie; ++i)
+    {
+        // TODO: skip hidden ones
+        int idx = i.index();
+        ss.str(""); ss << idx;
+        string_table::key k = st.find(ss.str());
+        visitor.accept(k, *i);
+    }
+
+    // visit proper properties
+    as_object::visitNonHiddenPropertyValues(visitor);
+}
 
 } // end of gnash namespace
 

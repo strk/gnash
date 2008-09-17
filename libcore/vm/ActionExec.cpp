@@ -98,7 +98,7 @@ ActionExec::ActionExec(const swf_function& func, as_environment& newEnv, as_valu
         // We assume that the swf_function () operator already initialized its environment
         // so that it's activation object is now in the top element of the CallFrame stack
         //
-        as_environment::CallFrame& topFrame = newEnv.topCallFrame();
+        CallFrame& topFrame = newEnv.topCallFrame();
         assert(topFrame.func == &func);
         _scopeStack.push_back(topFrame.locals);
     }
@@ -326,9 +326,7 @@ ActionExec::operator() ()
             // WARNING: if the movie is stopped, the wall clock continues to run !
             if ( timeLimit && timer.elapsed() > timeLimit )
             {
-                char buf[256];
-                snprintf(buf, 255, _("Script exceeded time limit of %u milliseconds."), timeLimit);
-                throw ActionLimitException(buf);
+                throw ActionLimitException("Script exceeded time limit");
             }
 #else
             if ( pc <= oldPc )
@@ -577,7 +575,7 @@ ActionExec::processExceptions(TryBlock& t)
 
 /*private*/
 void
-ActionExec::cleanupAfterRun(bool expectInconsistencies)
+ActionExec::cleanupAfterRun(bool /*expectInconsistencies*/) // TODO: drop argument...
 {
     //assert(_originalTarget); // this execution context might have been started while target had a null target
     env.set_target(_originalTarget);

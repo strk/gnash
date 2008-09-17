@@ -96,14 +96,13 @@ public:
 	}
 
 	/// Set background color tag loader (SWF::SETBACKGROUNDCOLOR)
-	static void loader(SWFStream& in, tag_type tag, movie_definition* m)
+	static void loader(SWFStream& in, tag_type tag, movie_definition& m)
 	{
 		assert(tag == SWF::SETBACKGROUNDCOLOR); // 9
-		assert(m);
 
 		// this one may throw, we'll let caller catch it
 		SetBackgroundColorTag* t = new SetBackgroundColorTag(in);
-		m->addControlTag(t); // takes ownership
+		m.addControlTag(t); // takes ownership
 	}
 };
 

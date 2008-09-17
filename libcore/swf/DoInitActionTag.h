@@ -63,11 +63,11 @@ public:
         return true;
     }
 
-    static void doInitActionLoader(SWFStream& in, tag_type tag, movie_definition* m)
+    static void doInitActionLoader(SWFStream& in, tag_type tag, movie_definition& m)
     {
         in.ensureBytes(2);
         int cid = in.read_u16();
-        DoInitActionTag* da = new DoInitActionTag(in, *m, cid);
+        DoInitActionTag* da = new DoInitActionTag(in, m, cid);
 
         IF_VERBOSE_PARSE (
         log_parse(_("  tag %d: do_init_action_loader"), tag);
@@ -75,7 +75,7 @@ public:
         );
 
         //m->add_init_action(da, cid); // ownership transferred
-        m->addControlTag(da); // ownership transferred
+        m.addControlTag(da); // ownership transferred
     }
 
 private:

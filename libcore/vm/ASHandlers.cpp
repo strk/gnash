@@ -56,7 +56,6 @@
 #include <string>
 #include <vector>
 #include <locale>
-#include <cerrno>
 #include <cstdlib> // std::mbstowcs
 #include <boost/scoped_array.hpp>
 #include <boost/random.hpp>
@@ -2195,14 +2194,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
     StringNoCaseEqual noCaseCompare;
     if (noCaseCompare(urlTarget.substr(0, 10), "FSCommand:"))
     {
-        if (m.fsCommandHandle)
-        {
-            // Call into the app.
-            // NOTE: the first argument is a movie_instance, but isn't used
-            // anyway, so we avoid attempting to fetch one
-            (*m.fsCommandHandle)(0, urlTarget.substr(10), target_string.c_str());
-        }
-
+        m.handleFsCommand(urlTarget.substr(10), target_string);
         return;
     }
 
@@ -2796,7 +2788,7 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
 
     std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
     args->reserve(nargs);
-    for (int i=0; i<nargs; ++i) args->push_back(env.pop()); 
+    for (size_t i=0; i<nargs; ++i) args->push_back(env.pop()); 
 
     //log_debug("ActionCallFunction calling call_method with %p as this_ptr", this_ptr);
     as_value result = call_method(function, &env, this_ptr,
@@ -3055,10 +3047,6 @@ SWFHandlers::ActionNewAdd(ActionExec& thread)
     //GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
 
-#ifndef NDEBUG
-    size_t stackSize = env.stack_size();
-#endif
-
     as_value v1 = env.top(0);
     as_value v2 = env.top(1);
 
@@ -3075,8 +3063,6 @@ SWFHandlers::ActionNewAdd(ActionExec& thread)
         log_debug("%s.to_primitive() threw an error during ActionNewAdd",
             env.top(1));
     }
-
-    assert( stackSize == env.stack_size() );
 
 #if GNASH_DEBUG
     log_debug(_("ActionNewAdd(%s, %s) [primitive conversion done]"),
@@ -3452,7 +3438,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 
     std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
     args->reserve(nargs);
-    for (int i=0; i<nargs; ++i) args->push_back(env.pop()); 
+    for (size_t i=0; i<nargs; ++i) args->push_back(env.pop()); 
 
     as_value result = call_method(method_val, &env, this_ptr, 
             args, super);

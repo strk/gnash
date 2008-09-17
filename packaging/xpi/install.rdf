@@ -58,7 +58,7 @@
 
 	<!-- Front End MetaData -->
 	<em:name>Gnash</em:name>
-	<em:description>The GNU Flash player</em:description>
+	<em:description>The GNU SWF player</em:description>
 	<em:creator>Gnash Team</em:creator>
 	<em:homepageURL>http://www.gnashdev.org/</em:homepageURL>
 	

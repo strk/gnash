@@ -1,4 +1,4 @@
-// gui.cpp:  Top level GUI for flash player, for Gnash.
+// gui.cpp:  Top level GUI for SWF player, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
@@ -157,6 +157,7 @@ Gui::Gui(unsigned long xid, float scale, bool loop, unsigned int depth)
 
 Gui::~Gui()
 {
+    if ( _movieDef.get() ) log_debug("~Gui - _movieDef refcount: %d", _movieDef->get_ref_count());
 
     delete _renderer;
 #ifdef GNASH_FPS_DEBUG

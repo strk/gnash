@@ -114,7 +114,7 @@ public:
     /// Place/move/whatever our object in the given movie.
     void execute(sprite_instance* m, DisplayList& dlist) const;
 
-    static void loader(SWFStream& in, tag_type tag, movie_definition* m);
+    static void loader(SWFStream& in, tag_type tag, movie_definition& m);
 
     int getPlaceType() const { return m_has_flags2 & (HAS_CHARACTER_MASK | MOVE_MASK); } 
     int getRatio()     const { return m_ratio; }

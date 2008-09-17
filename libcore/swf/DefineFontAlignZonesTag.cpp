@@ -35,13 +35,13 @@ DefineFontAlignZonesTag::DefineFontAlignZonesTag(movie_definition& /* m */,
 
 /* public static */
 void
-DefineFontAlignZonesTag::loader(SWFStream& in, tag_type tag, movie_definition* m)
+DefineFontAlignZonesTag::loader(SWFStream& in, tag_type tag, movie_definition& m)
 {
 	assert(tag == SWF::DEFINEALIGNZONES); // 73
 
     in.ensureBytes(1);
 	unsigned short ref = in.read_u8(); // must reference a valid DEFINEFONT3 tag
-	font* referencedFont = m->get_font(ref);
+	font* referencedFont = m.get_font(ref);
 	if ( ! referencedFont )
 	{
 		IF_VERBOSE_MALFORMED_SWF(

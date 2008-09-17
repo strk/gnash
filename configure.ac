@@ -20,7 +20,7 @@ AC_INIT(gnash, trunk)
 AC_CONFIG_SRCDIR(libcore/gnash.h)
 AM_CONFIG_HEADER(gnashconfig.h)
 
-dnl AC_CANONICAL_TARGET
+dnl AC_CONFIG_SUBDIRS(libltdl)
 AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
 
@@ -36,7 +36,7 @@ AM_COMPILER_LIB
 
 dnl Set the default values for Flash Version. These are converted into
 dnl various strings to make JavaScript or ActionScript detectors
-dnl recognize Gnash as a Flash Player.
+dnl recognize Gnash as a SWF Player.
 DEFAULT_FLASH_MAJOR_VERSION="9"
 DEFAULT_FLASH_MINOR_VERSION="0"
 DEFAULT_FLASH_REV_NUMBER="999"
@@ -860,10 +860,26 @@ AM_CONDITIONAL(BUILD_DBUS_EXT, [ test x$ext_dbus = xyes ])
 AM_CONDITIONAL(BUILD_METOME_EXT, [ test x$ext_metome = xyes ])
 AM_CONDITIONAL(BUILD_EXTENSIONS, [ test -n "$extensions_list"])
 
-AC_LIBLTDL_INSTALLABLE
+AC_MSG_CHECKING([For the version of libtool])
+ltver=`${LIBTOOLIZE:-libtoolize} --version | head -1 | cut -d ' ' -f 4`
+ltmajor=`echo $ltver | cut -d '.' -f 1`
+AC_MSG_RESULT([$ltver])
+if test $ltmajor -eq 1; then
+AC_LIBLTDL_CONVENIENCE
 AC_LIBTOOL_DLOPEN
 AC_LIBTOOL_WIN32_DLL
+AC_DISABLE_STATIC
+else
+LT_INIT([dlopen win32-dll  disable-static])
+dnl lt_ltdl_dir=libbase/libltdlL
+LTDL_INIT([convenience recursive])
+AC_CONFIG_FILES([libltdl/Makefile])
+fi
 AC_PROG_LIBTOOL
+AM_CONDITIONAL(LIBLTDL2, [test $ltmajor -eq 2])
+AM_CONDITIONAL(INSTALL_LTDL, test x"${enable_ltdl_install-no}" != xno)
+AM_CONDITIONAL(CONVENIENCE_LTDL, test x"${enable_ltdl_convenience-no}" != xno)
+
 AC_C_CONST
 AC_C_INLINE
 AC_SUBST([LIBTOOL_DEPS])
@@ -1270,14 +1286,10 @@ GNASH_PATH_FIREFOX
 dnl XPCOM and NSPR can be used in the plugin for better integration
 dnl within Firefox.
 GNASH_PATH_XPCOM
+if test x$has_xpcom = xyes; then nspr4=yes; fi
 GNASH_PATH_NSPR
 dnl If we don't have both XPCOM and NSPR, we can't build either.
-if test x$has_xpcom = xno -o x$has_nspr = xno; then
-  has_xpcom=no
-  has_nspr=no
-fi
-AM_CONDITIONAL(XPCOM, test x$has_xpcom = xyes)
-AM_CONDITIONAL(NSPR, test x$has_nspr = xyes)
+AM_CONDITIONAL(XPCOM, test x$has_xpcom = xyes -a x$has_nspr = xyes)
 
 dnl -----------------------------------------------------------------
 dnl END OF PLUGIN RELATED STUFF
@@ -1305,6 +1317,7 @@ esac
 
 AM_CONDITIONAL(LIRC, [test x$lirc_ext = xyes])
 
+AC_CHECK_HEADERS(endian.h)
 AC_CHECK_HEADERS(malloc.h)
 AC_CHECK_HEADERS(getopt.h)
 AC_CHECK_HEADERS(libgen.h)
@@ -2115,8 +2128,8 @@ AC_CONFIG_LINKS(testsuite/libbase/gnashrc:testsuite/libbase/gnashrc.in)
 AC_CONFIG_LINKS(testsuite/libbase/gnashrc-local:testsuite/libbase/gnashrc-local.in)
 
 AC_OUTPUT(Makefile
-libmedia/Makefile
 po/Makefile
+libmedia/Makefile
 libbase/Makefile
 libcore/Makefile
 libcore/asobj/Makefile
@@ -2391,6 +2404,7 @@ else
   echo "        ERROR: No GIF library development package installed!" >&3
   echo "               Install it from http://sourceforge.net/projects/giflib/" >&3
   echo "               or .deb users: apt-get install libungif-dev" >&3
+  echo "               or maybe     : apt-get install libgif-dev" >&3
   echo "               or .rpm users: yum install libungif-devel" >&3
 fi
 
@@ -2990,7 +3004,7 @@ if test x"${DEJAGNU}" != x""; then
   echo "        DEJAGNU's runtest is $DEJAGNU"
 else
   echo "        WARNING: You need the dejagnu package installed to get a summary" >&4
-  echo "                 report after running ``make check''" >&4
+  echo "                 report after running ''make check''" >&4
   echo "                 Install it from http://www.gnu.org/software/dejagnu/" >&4
   echo "                 or .deb users: apt-get install dejagnu" >&4
   #echo "                or .rpm users: yum install dejagnu" >&4
@@ -3015,6 +3029,8 @@ if test x"$xpcom" = x"yes"; then
     echo "        XPIDL path is: $XPIDL"
   else
     echo "        ERROR: No XPCOM development package is installed." >&3
+    echo "                Install it from http://www.mozilla.org/projects/xpcom/" >&3
+    echo "                or .deb users: apt-get install xulrunner-1.9-dev" >&3
   fi
 fi
 if test x"$nspr4" = x"yes"; then
