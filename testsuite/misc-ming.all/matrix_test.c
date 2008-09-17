@@ -748,6 +748,32 @@ main(int argc, char** argv)
 	check(mo, "!staticmc.hitTest(0, 269, false)");  // overup
 	check(mo, "!staticmc.hitTest(0, 331, false)");  // overdown
 
+	SWFMovie_nextFrame(mo);        
+	SWFDisplayItem_setMatrix(it, -2, 0, -45, -0.5, 50, 300); // negative x scale and some positive skew
+
+	check_equals(mo, "staticmc._x", "50");
+	check_equals(mo, "staticmc._y", "300");
+	check_equals(mo, "staticmc._xscale", "200");
+	check_equals(mo, "Math.round(staticmc._yscale)", "4500"); // let's tollerate precision for now
+	check_equals(mo, "staticmc._rotation", "180");  
+	check_equals(mo, "printBounds(staticmc.getBounds())", "'-30.05,-30.05 30.05,30.05'");
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'-1362.35,285 1462.35,315.05'");
+	check_equals(mo, "staticmc._width", "2824.7");
+	check_equals(mo, "staticmc._height", "30.05");
+
+	// X: -1362.35  1462.35
+	// Y:   285.00  315.05
+
+	check(mo, "staticmc.hitTest(-1362, 286, false)");   // top-left
+	check(mo, "staticmc.hitTest(1462, 286, false)");  // top-right
+	check(mo, "staticmc.hitTest(-1362, 315, false)");   // bottom-left
+	check(mo, "staticmc.hitTest(1462, 315, false)");  // bottom-right
+
+	check(mo, "!staticmc.hitTest(-1363, 300, false)");   // overleft
+	check(mo, "!staticmc.hitTest(1463, 300, false)");  // overright
+	check(mo, "!staticmc.hitTest(0, 284, false)");  // overup
+	check(mo, "!staticmc.hitTest(0, 316, false)");  // overdown
+
 
 	//
 	// Now test setting parameters after reading matrix
@@ -981,7 +1007,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);
 
-	add_actions(mo, "_root.totals(470); stop();");
+	add_actions(mo, "_root.totals(487); stop();");
 	SWFMovie_nextFrame(mo);        
 
 	//Output movie
