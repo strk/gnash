@@ -325,7 +325,7 @@ mysql_qetData(const fn_call& fn)
 
     if (fn.nargs > 0) {
 	string sql = fn.arg(0).to_string();
-	as_array_object *arr = (as_array_object *)fn.arg(1).to_object().get();
+	Array_as *arr = (Array_as *)fn.arg(1).to_object().get();
 //	std::vector< std::vector<const char *> >
 	MySQL::query_t qresult;
 #if 0
@@ -373,7 +373,7 @@ mysql_fetch(const fn_call& fn)
 	assert(ptr);
 	MYSQL_ROW res = ptr->obj.fetch_row();
 	as_value aaa = *res;       
-	as_array_object *arr = new as_array_object;
+	Array_as *arr = new Array_as;
 	arr->push(aaa);
 	return as_value(arr);
     }
