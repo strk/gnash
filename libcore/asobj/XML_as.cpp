@@ -586,13 +586,13 @@ XML_as::sendAndLoad(const URL& url, as_object& target)
     toString(ss);
     const std::string& data = ss.str();
 
-    VM& vm = getVM();
-    string_table& st = vm.getStringTable();
-    string_table::key ctypeKey = st.find("contentType");
-    as_value ctypeVal;
-    if ( get_member(ctypeKey, &ctypeVal) )
+    string_table& st = _vm.getStringTable();
+    as_value contentType;
+
+    if ( get_member(st.find("contentType"), &contentType) )
     {
-       log_unimpl ("Custom ContentType (%s) in XML.sendAndLoad", ctypeVal);
+        // This should not overwrite anything set in XML.addRequestHeader();
+        _headers.insert(std::make_pair("Content-Type", contentType.to_string()));
     }
 
     std::auto_ptr<IOChannel> stream;
