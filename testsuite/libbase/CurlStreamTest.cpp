@@ -19,7 +19,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include "curl_adapter.h"
+#include "NetworkAdapter.h"
 #include "tu_file.h"
 
 #include <memory>               // for auto_ptr
@@ -39,11 +39,11 @@ dump_curl(const char* url, ostream& os)
 	std::auto_ptr<gnash::IOChannel> reader;
 	if ( post )
 	{
-		reader.reset( gnash::curl_adapter::make_stream(url, post) );
+		reader.reset( gnash::NetworkAdapter::make_stream(url, post) );
 	}
 	else
 	{
-		reader.reset( gnash::curl_adapter::make_stream(url) );
+		reader.reset( gnash::NetworkAdapter::make_stream(url) );
 	}
 
 	assert(reader.get());

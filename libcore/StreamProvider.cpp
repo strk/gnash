@@ -57,9 +57,11 @@ StreamProvider::getDefaultInstance()
 	return inst;
 }
 
-IOChannel*
+std::auto_ptr<IOChannel>
 StreamProvider::getStream(const URL& url)
 {
+
+    std::auto_ptr<IOChannel> stream;
 
 	if (url.protocol() == "file")
 	{
@@ -68,23 +70,28 @@ StreamProvider::getStream(const URL& url)
 		{
             // TODO: only allow this as the *very first* call ?
             //       Rationale is a movie might request load of
-            //       standar input, being a security issue.
+            //       standard input, being a security issue.
             //       Note also that the FB gui will use stdin
             //       for key events.
             //
 			FILE *newin = fdopen(dup(0), "rb");
-			return new tu_file(newin, true); // close by dtor
+
+			// Close on destruction.
+			stream.reset(new tu_file(newin, true));
+			return stream;
 		}
 		else
 		{
             // check security here !!
-		    if ( ! URLAccessManager::allow(url) ) return NULL;
+		    if ( ! URLAccessManager::allow(url) ) return stream;
 
-			FILE *newin = fopen(path.c_str(), "rb");
+			FILE *newin = std::fopen(path.c_str(), "rb");
 			if (!newin)  { 
-				return NULL;
+				return stream;
 			}
-			return new tu_file(newin, true); // close by dtor
+			// Close on destruction
+			stream.reset(new tu_file(newin, true));
+			return stream;
 		}
 	}
 	else
@@ -92,10 +99,11 @@ StreamProvider::getStream(const URL& url)
 		std::string url_str = url.str();
 		const char* c_url = url_str.c_str();
 		if ( URLAccessManager::allow(url) ) {
-			return NetworkAdapter::make_stream(c_url);
-		} else {
-			return NULL;
+			stream = NetworkAdapter::makeStream(c_url);
 		}
+
+        // Will return 0 auto_ptr if not allowed.
+		return stream;
 	}
 }
 
@@ -103,26 +111,28 @@ std::auto_ptr<IOChannel>
 StreamProvider::getStream(const URL& url, const std::string& postdata,
                           const NetworkAdapter::RequestHeaders& headers)
 {
+
     if (url.protocol() == "file")
     {
         log_error("Request Headers discarded while getting stream from file: uri");
-        return std::auto_ptr<IOChannel>(getStream(url, postdata));
+        return getStream(url, postdata);
     }
-
-    std::auto_ptr<IOChannel> ret;
 
 	std::string url_str = url.str();
 	const char* c_url = url_str.c_str();
 	if ( URLAccessManager::allow(url) ) {
-		ret.reset(NetworkAdapter::makeStream(c_url, postdata, headers));
+		return NetworkAdapter::makeStream(c_url, postdata, headers);
 	}
-	return ret;
+
+	return std::auto_ptr<IOChannel>();
 
 }
 
-IOChannel*
+std::auto_ptr<IOChannel>
 StreamProvider::getStream(const URL& url, const std::string& postdata)
 {
+
+    std::auto_ptr<IOChannel> stream;
 
 	if (url.protocol() == "file")
 	{
@@ -131,27 +141,32 @@ StreamProvider::getStream(const URL& url, const std::string& postdata)
 		if ( path == "-" )
 		{
 			FILE *newin = fdopen(dup(0), "rb");
-			return new tu_file(newin, false);
+			stream.reset(new tu_file(newin, false));
+			return stream;
 		}
 		else
 		{
-			if ( ! URLAccessManager::allow(url) ) return NULL;
-			FILE *newin = fopen(path.c_str(), "rb");
+			if ( ! URLAccessManager::allow(url) ) return stream;
+
+			FILE *newin = std::fopen(path.c_str(), "rb");
 			if (!newin)  { 
-				return NULL;
+				return stream;
 			}
-			return new tu_file(newin, false);
+			stream.reset(new tu_file(newin, false));
+			return stream;
 		}
 	}
 	else
 	{
 		std::string url_str = url.str();
 		const char* c_url = url_str.c_str();
+
 		if ( URLAccessManager::allow(url) ) {
-			return NetworkAdapter::make_stream(c_url, postdata);
-		} else {
-			return NULL;
+			stream = NetworkAdapter::makeStream(c_url, postdata);
 		}
+        // Will return 0 auto_ptr if not allowed.
+		return stream;		
+
 	}
 }
 

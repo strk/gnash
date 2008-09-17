@@ -48,7 +48,7 @@ public:
 	/// On error NULL is returned
 	/// Derive from this for a CachingStreamProvider
 	///
-	virtual IOChannel* getStream(const URL& url);
+	virtual std::auto_ptr<IOChannel> getStream(const URL& url);
 
 	/// Get a stream from the response of a POST operation
 	//
@@ -64,7 +64,7 @@ public:
 	///	Post data in url-encoded form.
 	///
 	///
-	virtual IOChannel* getStream(const URL& url, const std::string& postdata);
+	virtual std::auto_ptr<IOChannel> getStream(const URL& url, const std::string& postdata);
 	
 	virtual std::auto_ptr<IOChannel> getStream(const URL& url,
 	                    const std::string& postdata, const NetworkAdapter::RequestHeaders& headers);

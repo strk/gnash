@@ -53,7 +53,7 @@ libgnashasobjs_la_SOURCES = \
 	Error_as.cpp \
 	Global.cpp \
 	Key.cpp	\
-	LoadVars.cpp \
+	LoadVars_as.cpp \
 	LocalConnection.cpp\
 	Math_as.cpp \
 	Microphone.cpp	\
@@ -71,7 +71,7 @@ libgnashasobjs_la_SOURCES = \
 	TextSnapshot.cpp \
 	MovieClipLoader.cpp\
 	String_as.cpp \
-	xml.cpp \
+	XML_as.cpp \
 	xmlattrs.cpp \
 	xmlnode.cpp \
 	XMLSocket_as.cpp \
@@ -118,7 +118,7 @@ noinst_HEADERS = \
 	Math_as.h	\
 	Global.h\
 	Key.h \
-	LoadVars.h \
+	LoadVars_as.h \
 	LocalConnection.h\
 	Microphone.h \
 	Mouse.h	\
@@ -141,7 +141,7 @@ noinst_HEADERS = \
 	TextFormat.h \
 	TextSnapshot.h \
 	String_as.h \
-	xml.h \
+	XML_as.h \
 	XMLSocket_as.h \
 	xmlattrs.h \
 	xmlnode.h \

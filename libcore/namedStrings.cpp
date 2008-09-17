@@ -44,9 +44,11 @@ static string_table::svt preload_names[] =
 	string_table::svt( "callee", NSV::PROP_CALLEE ),
 	string_table::svt( "caller", NSV::PROP_CALLER ),
 	//string_table::svt( "color", NSV::PROP_COLOR ), // clashes with CLASS_COLOR in case-insensitive mode
+	string_table::svt( "concat", NSV::PROP_CONCAT ),	
 	string_table::svt( "constructor", NSV::PROP_CONSTRUCTOR ),
 	string_table::svt( "__constructor__", NSV::PROP_uuCONSTRUCTORuu ),
 	string_table::svt( "_currentframe", NSV::PROP_uCURRENTFRAME ),
+	string_table::svt( "_customHeaders", NSV::PROP_uCUSTOM_HEADERS ),
 	string_table::svt( "d", NSV::PROP_D ),
 	string_table::svt( "_droptarget", NSV::PROP_uDROPTARGET ),
 	string_table::svt( "enabled", NSV::PROP_ENABLED ),

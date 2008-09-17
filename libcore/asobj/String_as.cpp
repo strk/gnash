@@ -291,7 +291,7 @@ string_split(const fn_call& fn)
     
     std::wstring wstr = utf8::decodeCanonicalString(str, version);
 
-    boost::intrusive_ptr<as_array_object> array(new as_array_object());
+    boost::intrusive_ptr<Array_as> array(new Array_as());
 
     if (fn.nargs == 0)
     {

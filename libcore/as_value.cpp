@@ -1934,7 +1934,7 @@ as_value::as_value(const amf::Element& el)
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
           log_debug("as_value(Element&) : AMF type ECMA_ARRAY");
 #endif
-          as_array_object* obj = new as_array_object();
+          Array_as* obj = new Array_as();
           if (el.propertySize()) {
               for (size_t i=0; i < el.propertySize(); i++) {
               const amf::Element *prop = el.getProperty(i);
@@ -1955,7 +1955,7 @@ as_value::as_value(const amf::Element& el)
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
           log_debug("as_value(Element&) : AMF type STRICT_ARRAY");
 #endif
-          as_array_object* obj = new as_array_object();
+          Array_as* obj = new Array_as();
           size_t len = el.propertySize();
           obj->resize(len);
 
@@ -2212,7 +2212,7 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 
 		case amf::Element::STRICT_ARRAY_AMF0:
         {
-				boost::intrusive_ptr<as_array_object> array(new as_array_object());
+				boost::intrusive_ptr<Array_as> array(new Array_as());
                 objRefs.push_back(array.get());
 
 				li = readNetworkLong(b); b += 4;
@@ -2235,7 +2235,7 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 
 		case amf::Element::ECMA_ARRAY_AMF0:
         {
-				as_array_object* obj = new as_array_object(); // GC-managed...
+				Array_as* obj = new Array_as(); // GC-managed...
                 objRefs.push_back(obj);
 
                 // set the value immediately, so if there's any problem parsing
@@ -2412,7 +2412,7 @@ as_value::writeAMF0(SimpleBuffer& buf, std::map<as_object*, size_t>& offsetTable
                 size_t idx = offsetTable.size()+1; // 1 for the first, etc...
                 offsetTable[obj] = idx;
 
-                as_array_object* ary = dynamic_cast<as_array_object*>(obj);
+                Array_as* ary = dynamic_cast<Array_as*>(obj);
                 if ( ary )
                 {
                     size_t len = ary->size();

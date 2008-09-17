@@ -176,7 +176,7 @@ NetStreamFfmpeg::play(const std::string& c_url)
 	log_security( _("Connecting to movie: %s"), url );
 
 	StreamProvider& streamProvider = StreamProvider::getDefaultInstance();
-	_inputStream.reset( streamProvider.getStream( url ) );
+	_inputStream = streamProvider.getStream(url);
 
 	if ( ! _inputStream.get() )
 	{

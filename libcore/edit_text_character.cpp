@@ -496,7 +496,7 @@ edit_text_character::edit_text_character(character* parent,
 
 	set_prototype(getTextFieldInterface());
 
-	as_array_object* ar = new as_array_object();
+	Array_as* ar = new Array_as();
 	ar->push(this);
 	set_member(NSV::PROP_uLISTENERS, ar);
 

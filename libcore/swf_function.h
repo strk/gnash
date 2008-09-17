@@ -15,8 +15,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef __GNASH_SWF_FUNCTION_H__
-#define __GNASH_SWF_FUNCTION_H__
+#ifndef GNASH_SWF_FUNCTION_H
+#define GNASH_SWF_FUNCTION_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h" // GNASH_USE_GC
@@ -36,7 +36,7 @@
 namespace gnash {
 	class action_buffer;
 	class as_environmnet;
-	class as_array_object;
+	class Array_as;
 }
 
 namespace gnash {
@@ -94,7 +94,7 @@ private:
 	///	  a reference on it!
 	///	  
 	///
-	static as_array_object* getArguments(swf_function& callee, const fn_call& fn, as_object* caller);
+	static Array_as* getArguments(swf_function& callee, const fn_call& fn, as_object* caller);
 
 public:
 

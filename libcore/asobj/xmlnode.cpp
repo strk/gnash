@@ -781,7 +781,7 @@ as_value
 xmlnode_childNodes(const fn_call& fn)
 {
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
-    boost::intrusive_ptr<as_array_object> ary = new as_array_object();
+    boost::intrusive_ptr<Array_as> ary = new Array_as();
 
     typedef XMLNode::ChildList ChildList;
 
