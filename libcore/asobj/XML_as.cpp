@@ -39,6 +39,7 @@
 #include "VM.h"
 #include "namedStrings.h"
 #include "timers.h" // for setting up timers to check loads
+#include "array.h"
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
@@ -50,6 +51,7 @@
 #include <boost/algorithm/string/case_conv.hpp>
 #include <memory>
 #include <functional> // std::make_pair
+
 
 namespace gnash {
   
@@ -761,10 +763,62 @@ xml_addRequestHeader(const fn_call& fn)
     
     if (fn.nargs == 1)
     {
-        // TODO: handle array.
+        boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
+        boost::intrusive_ptr<Array_as> array =
+                        dynamic_cast<Array_as*>(obj.get());
+        if (!array)
+        {
+            IF_VERBOSE_ASCODING_ERRORS(
+                log_aserror(_("XML.addRequestHeader: single argument "
+                                "is not an array"));
+            );
+        }
         
-        log_unimpl(_("Array argument to XML.addRequestHeader"));
+        // Nothing to do for empty arrays.
+        if (!array->size()) return as_value();
+        
+        Array_as::const_iterator e = array->end();
+        --e;
+
+        for (Array_as::const_iterator i = array->begin(); i != e; ++i)
+        {
+            // Only even indices can be a header.
+            if (i.index() % 2) continue;
+            if (! (*i).is_string()) continue;
+            
+            // Only the immediately following odd number can be a value.
+            if (array->at(i.index() + 1).is_string())
+            {
+                const std::string& name = (*i).to_string();
+                const std::string& val = array->at(i.index() + 1).to_string();
+                ptr->addRequestHeader(std::make_pair(name, val));
+            }
+            
+        }
+
         return as_value();
+    }
+
+    if (fn.nargs > 2)
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::ostringstream ss;
+            fn.dump_args(ss);
+            log_aserror(_("XML.addRequestHeader(%s): arguments after the"
+                            "second will be discarded"), ss.str());
+        );
+    }
+    
+    // Both arguments must be strings.
+    if (!fn.arg(0).is_string() || !fn.arg(1).is_string())
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::ostringstream ss;
+            fn.dump_args(ss);
+            log_aserror(_("XML.addRequestHeader(%s): both arguments "
+                        "must be a string"), ss.str());
+        );
+        return as_value(); 
     }
 
     const std::string& name = fn.arg(0).to_string();

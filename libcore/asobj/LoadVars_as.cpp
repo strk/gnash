@@ -36,6 +36,7 @@
 #include "namedStrings.h"
 #include "utf8.h"
 #include "NetworkAdapter.h"
+#include "array.h"
 
 #include <list>
 #include <boost/algorithm/string/case_conv.hpp>
@@ -176,7 +177,7 @@ private:
 	//
 	/// TODO: 
 	/// Is serialization of loads needed to properly 
-	/// implament getBytesLoaded() and getBytesTotal()
+	/// implement getBytesLoaded() and getBytesTotal()
 	/// methods ?
 	/// (ie: values from *which* load should be reported?)
 	///
@@ -458,10 +459,10 @@ loadvars_addRequestHeader(const fn_call& fn)
     
 	boost::intrusive_ptr<LoadVars_as> ptr = ensureType<LoadVars_as>(fn.this_ptr);   
 
-    // Log all the time while it's not properly tested
+    // Log all the time while not properly tested.
     std::ostringstream ss;
     fn.dump_args(ss);
-    log_debug ("LoadVars.addRequestHeader: %s", ss.str());
+    log_debug ("addRequestHeader: %s", ss.str());
 
     if (fn.nargs == 0)
     {
@@ -473,16 +474,70 @@ loadvars_addRequestHeader(const fn_call& fn)
     
     if (fn.nargs == 1)
     {
-        // TODO: handle array.
-        log_unimpl(_("Array argument to XML.addRequestHeader"));
+        boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
+        boost::intrusive_ptr<Array_as> array =
+                        dynamic_cast<Array_as*>(obj.get());
+        if (!array)
+        {
+            IF_VERBOSE_ASCODING_ERRORS(
+                log_aserror(_("XML.addRequestHeader: single argument "
+                                "is not an array"));
+            );
+        }
+        
+        // Nothing to do for empty arrays.
+        if (!array->size()) return as_value();
+        
+        Array_as::const_iterator e = array->end();
+        --e;
+
+        for (Array_as::const_iterator i = array->begin(); i != e; ++i)
+        {
+            // Only even indices can be a header.
+            if (i.index() % 2) continue;
+            if (! (*i).is_string()) continue;
+            
+            // Only the immediately following odd number can be a value.
+            if (array->at(i.index() + 1).is_string())
+            {
+                const std::string& name = (*i).to_string();
+                const std::string& val = array->at(i.index() + 1).to_string();
+                ptr->addRequestHeader(std::make_pair(name, val));
+            }
+            
+        }
+
         return as_value();
+    }
+
+    if (fn.nargs > 2)
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::ostringstream ss;
+            fn.dump_args(ss);
+            log_aserror(_("XML.addRequestHeader(%s): arguments after the"
+                            "second will be discarded"), ss.str());
+        );
+    }
+    
+    // Both arguments must be strings.
+    if (!fn.arg(0).is_string() || !fn.arg(1).is_string())
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::ostringstream ss;
+            fn.dump_args(ss);
+            log_aserror(_("XML.addRequestHeader(%s): both arguments "
+                        "must be a string"), ss.str());
+        );
+        return as_value(); 
     }
 
     const std::string& name = fn.arg(0).to_string();
     const std::string& val = fn.arg(1).to_string();
     ptr->addRequestHeader(std::make_pair(name, val));
     
-    return as_value();}
+    return as_value();
+}
 
 /// \brief add or change the HTTP Request header
 ///
