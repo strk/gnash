@@ -597,7 +597,7 @@ XML_as::sendAndLoad(const URL& url, as_object& target)
 
     if (_headers.empty())
     {
-        stream.reset(StreamProvider::getDefaultInstance().getStream(url, data));
+        stream = StreamProvider::getDefaultInstance().getStream(url, data);
     }
     else
     {

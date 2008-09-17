@@ -44,19 +44,19 @@ using gnash::log_error;
 
 namespace NetworkAdapter
 {
-	IOChannel* make_stream(const char * /*url */)
+	std::auto_ptr<IOChannel> makeStream(const char * /*url */)
 	{
 		log_error(_("ERROR: libcurl is not available, but "
 		            "Gnash has attempted to use the curl adapter"));
-		return NULL;
+		return std::auto_ptr<IOChannel>();
 	}
 	
-    IOChannel* make_stream(const char* url, const std::string& postdata)
+    std::auto_ptr<IOChannel> makeStream(const char* url, const std::string& postdata)
     {
         return make_stream(url);
     }
 
-    IOChannel* makeStream(const std::string& url, const std::string& postdata,
+    std::auto_ptr<IOChannel> makeStream(const std::string& url, const std::string& postdata,
                                 const RequestHeaders& headers)
     {
         return make_stream(url);
@@ -1241,53 +1241,48 @@ CurlSession::exportCookies()
 // Exported interfaces
 //-------------------------------------------
 
-IOChannel*
-make_stream(const char* url)
+std::auto_ptr<IOChannel>
+makeStream(const char* url)
 {
 #ifdef GNASH_CURL_VERBOSE
 	gnash::log_debug("making curl stream for %s", url);
 #endif
 
-	CurlStreamFile* stream = NULL;
+	std::auto_ptr<IOChannel> stream;
 
 	try {
-		stream = new CurlStreamFile(url);
+		stream.reset(new CurlStreamFile(url));
 	}
 	catch (const std::exception& ex) {
 		gnash::log_error("curl stream: %s", ex.what());
-		delete stream;
-		return NULL;
 	}
-
 	return stream;
 }
 
-IOChannel*
-make_stream(const char* url, const std::string& postdata)
+std::auto_ptr<IOChannel>
+makeStream(const char* url, const std::string& postdata)
 {
 #ifdef GNASH_CURL_VERBOSE
 	gnash::log_debug("making curl stream for %s", url);
 #endif
 
-	CurlStreamFile* stream = NULL;
+	std::auto_ptr<IOChannel> stream;
 
 	try {
-		stream = new CurlStreamFile(url, postdata);
+		stream.reset(new CurlStreamFile(url, postdata));
 	}
 	catch (const std::exception& ex) {
 		gnash::log_error("curl stream: %s", ex.what());
-		delete stream;
-		return NULL;
 	}
-
 	return stream;
 }
 
-DSOEXPORT IOChannel* makeStream(const std::string& url, const std::string& postdata,
+std::auto_ptr<IOChannel>
+makeStream(const std::string& url, const std::string& postdata,
                                 const RequestHeaders& headers)
 {
 
-	std::auto_ptr<CurlStreamFile> stream;
+	std::auto_ptr<IOChannel> stream;
 
 	try {
 		stream.reset(new CurlStreamFile(url, postdata, headers));
@@ -1296,7 +1291,7 @@ DSOEXPORT IOChannel* makeStream(const std::string& url, const std::string& postd
 		gnash::log_error("curl stream: %s", ex.what());
 	}
 
-    return stream.release();
+    return stream;
 
 }
 

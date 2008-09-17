@@ -426,7 +426,7 @@ LoadVars_as::sendAndLoad(const std::string& urlstr, as_object& target, bool post
 	else
     {
     	std::string url = urlstr + "?" + querystring;
-        str.reset(StreamProvider::getDefaultInstance().getStream(url));
+        str = StreamProvider::getDefaultInstance().getStream(url);
     }
 
 	if (!str.get()) 

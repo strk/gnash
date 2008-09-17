@@ -23,6 +23,7 @@
 
 #include <map>
 #include <string>
+#include <memory>
 #include "StringPredicates.h"
 
 namespace gnash {
@@ -42,7 +43,7 @@ typedef std::map<std::string, std::string, StringNoCaseLessThen> RequestHeaders;
 //
 /// The caller owns the returned IOChannel.  
 ///
-DSOEXPORT IOChannel* make_stream(const char* url);
+DSOEXPORT std::auto_ptr<IOChannel> makeStream(const char* url);
 
 /// \brief
 /// Returns a read-only IOChannel that fetches data
@@ -56,9 +57,9 @@ DSOEXPORT IOChannel* make_stream(const char* url);
 /// @param postdata
 ///	The url-encoded post data
 ///
-DSOEXPORT IOChannel* make_stream(const char* url, const std::string& postdata);
+DSOEXPORT std::auto_ptr<IOChannel> makeStream(const char* url, const std::string& postdata);
 
-DSOEXPORT IOChannel* makeStream(const std::string& url, const std::string& postdata,
+DSOEXPORT std::auto_ptr<IOChannel> makeStream(const std::string& url, const std::string& postdata,
                                 const RequestHeaders& headers);
 
 }
