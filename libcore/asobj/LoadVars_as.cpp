@@ -492,6 +492,7 @@ loadvars_addRequestHeader(const fn_call& fn)
                 log_aserror(_("XML.addRequestHeader: single argument "
                                 "is not an array"));
             );
+            return as_value();
         }
         
         // Nothing to do for empty arrays.
