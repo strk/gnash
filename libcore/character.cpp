@@ -762,12 +762,17 @@ character::set_x_scale(double scale_percent)
 {
 	_xscale = scale_percent;
 
+    // As per misc-ming.all/matrix_test.{c,swf}
+    // we don't need to recompute the matrix from the 
+    // caches.
+
 	double xscale = _xscale / 100.0;
-	double yscale = _yscale / 100.0;
-	double rotation = _rotation * PI / 180.0;
+	//double yscale = _yscale / 100.0;
+	//double rotation = _rotation * PI / 180.0;
 
 	matrix m = get_matrix();
-	m.set_scale_rotation(xscale, yscale, rotation);
+	//m.set_scale_rotation(xscale, yscale, rotation);
+	m.set_x_scale(xscale);
 	set_matrix(m); // we updated the cache ourselves
 
 	transformedByScript(); 
