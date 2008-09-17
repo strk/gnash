@@ -348,7 +348,7 @@ Fileio::scandir(const std::string& dir, as_value* result)
 		return;
 	}
 	
-	as_array_object* array = new as_array_object();	
+	Array_as* array = new Array_as();	
 	as_value item;
 	
 	//array->resize(n);
