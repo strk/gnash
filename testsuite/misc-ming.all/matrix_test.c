@@ -739,6 +739,46 @@ main(int argc, char** argv)
 	check(mo, "!staticmc.hitTest(0, 331, false)");  // overdown
 
 
+    //
+    // Now test setting parameters after reading matrix
+    //
+
+	SWFMovie_nextFrame(mo);
+
+    SWFDisplayItem_remove(it);
+	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
+	SWFDisplayItem_setMatrix(it, 1, 0, 2, 1, 200, 200); 
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'109.85,169.95 290.15,230.05'");
+    add_actions(mo, "staticmc._xscale = 0 - staticm._xscale;"); // swap _xscale sign using ActionScript
+	xcheck_equals(mo, "printBounds(staticmc.getBounds(_root))", "'139.95,170 260.05,230'");
+
+	SWFMovie_nextFrame(mo);
+
+    SWFDisplayItem_remove(it);
+	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
+	SWFDisplayItem_setMatrix(it, -1, 0, 2, 1, 200, 200); 
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'109.85,169.95 290.15,230.05'");
+    add_actions(mo, "staticmc._xscale = 0 - staticm._xscale;"); // swap _xscale sign using ActionScript
+	xcheck_equals(mo, "printBounds(staticmc.getBounds(_root))", "'139.95,170 260.05,230'");
+
+	SWFMovie_nextFrame(mo);
+
+    SWFDisplayItem_remove(it);
+	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
+	SWFDisplayItem_setMatrix(it, -1, 0, -2, 1, 200, 200); 
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'109.85,169.95 290.15,230.05'");
+    add_actions(mo, "staticmc._xscale = 0 - staticm._xscale;"); // swap _xscale sign using ActionScript
+	xcheck_equals(mo, "printBounds(staticmc.getBounds(_root))", "'139.95,170 260.05,230'");
+
+	SWFMovie_nextFrame(mo);
+
+    SWFDisplayItem_remove(it);
+	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
+	SWFDisplayItem_setMatrix(it, -1, 0, -2, -1, 200, 200); 
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'109.85,169.95 290.15,230.05'");
+    add_actions(mo, "staticmc._xscale = 0 - staticm._xscale;"); // swap _xscale sign using ActionScript
+	xcheck_equals(mo, "printBounds(staticmc.getBounds(_root))", "'139.95,170 260.05,230'");
+
 
 	// TODO:
 	// - test more rotations and scales (corner cases too!)
@@ -746,7 +786,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);
 
-	add_actions(mo, "_root.totals(408); stop();");
+	add_actions(mo, "_root.totals(416); stop();");
 	SWFMovie_nextFrame(mo);        
 
 	//Output movie
