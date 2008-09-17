@@ -29,10 +29,7 @@
 #include "StreamProvider.h"
 #include "URL.h"
 #include "tu_file.h"
-#ifdef USE_CURL
-//# include <curl/curl.h>
-# include "curl_adapter.h"
-#endif
+#include "NetworkAdapter.h"
 #include "URLAccessManager.h"
 #include "log.h"
 #include "rc.h" // for rcfile
@@ -60,10 +57,11 @@ StreamProvider::getDefaultInstance()
 	return inst;
 }
 
-IOChannel*
+std::auto_ptr<IOChannel>
 StreamProvider::getStream(const URL& url)
 {
-//    GNASH_REPORT_FUNCTION;
+
+    std::auto_ptr<IOChannel> stream;
 
 	if (url.protocol() == "file")
 	{
@@ -72,47 +70,69 @@ StreamProvider::getStream(const URL& url)
 		{
             // TODO: only allow this as the *very first* call ?
             //       Rationale is a movie might request load of
-            //       standar input, being a security issue.
+            //       standard input, being a security issue.
             //       Note also that the FB gui will use stdin
             //       for key events.
             //
 			FILE *newin = fdopen(dup(0), "rb");
-			return new tu_file(newin, true); // close by dtor
+
+			// Close on destruction.
+			stream.reset(new tu_file(newin, true));
+			return stream;
 		}
 		else
 		{
             // check security here !!
-		    if ( ! URLAccessManager::allow(url) ) return NULL;
+		    if ( ! URLAccessManager::allow(url) ) return stream;
 
-			FILE *newin = fopen(path.c_str(), "rb");
+			FILE *newin = std::fopen(path.c_str(), "rb");
 			if (!newin)  { 
-				return NULL;
+				return stream;
 			}
-			return new tu_file(newin, true); // close by dtor
+			// Close on destruction
+			stream.reset(new tu_file(newin, true));
+			return stream;
 		}
 	}
 	else
 	{
-#ifdef USE_CURL
 		std::string url_str = url.str();
 		const char* c_url = url_str.c_str();
 		if ( URLAccessManager::allow(url) ) {
-			return curl_adapter::make_stream(c_url);
-		} else {
-			return NULL;
+			stream = NetworkAdapter::makeStream(c_url);
 		}
-#else
-		log_error(_("Unsupported network connection %s"),
-				 url.str().c_str());
-		return NULL;
-#endif
+
+        // Will return 0 auto_ptr if not allowed.
+		return stream;
 	}
 }
 
-IOChannel*
+std::auto_ptr<IOChannel>
+StreamProvider::getStream(const URL& url, const std::string& postdata,
+                          const NetworkAdapter::RequestHeaders& headers)
+{
+
+    if (url.protocol() == "file")
+    {
+        log_error("Request Headers discarded while getting stream from file: uri");
+        return getStream(url, postdata);
+    }
+
+	std::string url_str = url.str();
+	const char* c_url = url_str.c_str();
+	if ( URLAccessManager::allow(url) ) {
+		return NetworkAdapter::makeStream(c_url, postdata, headers);
+	}
+
+	return std::auto_ptr<IOChannel>();
+
+}
+
+std::auto_ptr<IOChannel>
 StreamProvider::getStream(const URL& url, const std::string& postdata)
 {
-//    GNASH_REPORT_FUNCTION;
+
+    std::auto_ptr<IOChannel> stream;
 
 	if (url.protocol() == "file")
 	{
@@ -121,33 +141,32 @@ StreamProvider::getStream(const URL& url, const std::string& postdata)
 		if ( path == "-" )
 		{
 			FILE *newin = fdopen(dup(0), "rb");
-			return new tu_file(newin, false);
+			stream.reset(new tu_file(newin, false));
+			return stream;
 		}
 		else
 		{
-			if ( ! URLAccessManager::allow(url) ) return NULL;
-			FILE *newin = fopen(path.c_str(), "rb");
+			if ( ! URLAccessManager::allow(url) ) return stream;
+
+			FILE *newin = std::fopen(path.c_str(), "rb");
 			if (!newin)  { 
-				return NULL;
+				return stream;
 			}
-			return new tu_file(newin, false);
+			stream.reset(new tu_file(newin, false));
+			return stream;
 		}
 	}
 	else
 	{
-#ifdef USE_CURL
 		std::string url_str = url.str();
 		const char* c_url = url_str.c_str();
+
 		if ( URLAccessManager::allow(url) ) {
-			return curl_adapter::make_stream(c_url, postdata);
-		} else {
-			return NULL;
+			stream = NetworkAdapter::makeStream(c_url, postdata);
 		}
-#else
-		log_error(_("Unsupported network connection %s"),
-				url.str().c_str());
-		return NULL;
-#endif
+        // Will return 0 auto_ptr if not allowed.
+		return stream;		
+
 	}
 }
 

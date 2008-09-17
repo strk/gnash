@@ -1274,7 +1274,7 @@ Machine::execute()
 	case SWF::ABC_ACTION_NEWARRAY:
 	{
 		boost::uint32_t asize = mStream->read_V32();
-		as_array_object *arr = new as_array_object;
+		Array_as *arr = new Array_as;
 		arr->resize(asize);
 		boost::uint32_t i = asize;
 		while (i--)

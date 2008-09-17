@@ -47,6 +47,7 @@ namespace gnash {
 	class as_environment;
 	class VM;
 	class Machine;
+	class IOChannel;
 }
 
 namespace gnash {
@@ -220,6 +221,10 @@ public:
 	/// a custom toString method, when available, for converting the object
 	/// to a string.
 	virtual bool useCustomToString() const { return true; }
+
+    /// Loads data from an IOChannel. The default implementation
+    /// does nothing.
+    virtual void queueLoad(std::auto_ptr<IOChannel> /*str*/) {};
 
 	/// Return the numeric value of this object
 	//

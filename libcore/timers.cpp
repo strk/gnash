@@ -26,9 +26,9 @@
 #include "log.h"
 #include "sprite_instance.h"
 #include "fn_call.h"
-#include "xml.h"
 #include "VM.h"
 #include "movie_root.h"
+#include "action.h" // call_method
 
 #include <limits> // for numeric_limits
 

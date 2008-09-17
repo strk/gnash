@@ -11,7 +11,7 @@
       <glossdef>
 	<para>
 	  <emphasis>ActionScript</emphasis>, or "AS", is the scripting 
-	  language for <emphasis>Flash</emphasis>
+	  language for <emphasis>SWF</emphasis>
 	  applications. It is compiled to bytecode, which is a subset of
 	  the <emphasis>SWF</emphasis> format.
 	</para>
@@ -39,7 +39,7 @@
       <glossdef>
 	<para>
 	  <emphasis>AMF</emphasis> 
-	  is the object format used by <emphasis>Flash</emphasis> 
+	  is the object format used by <emphasis>SWF</emphasis> 
 	  for shared objects and streaming video.
 	</para>
       </glossdef>
@@ -148,7 +148,7 @@
 	<para>
 	  A &app; <emphasis>extension</emphasis> is a plugin (not a
 	  browser plugin) which implements additional functionality
-	  beyond what is covered by <emphasis>Flash</emphasis>
+	  beyond what is covered by the <emphasis>SWF</emphasis>
 	  specification. These are shared libraries which are loaded
 	  at runtime. 
 	</para>
@@ -181,11 +181,8 @@
 	<para>
 	  The term <emphasis>Flash</emphasis> is used to describe both the 
 	  Adobe IDE for creating <emphasis>SWF</emphasis>
-	  files, and the technology itself. Flash is a registered trademark
-	  belonging to Adobe.   Unfortunately, neither Macromedia nor
-          Adobe have done a good job creating a generic name for all
-          things having to do with Flash.  They risk
-          loss of their trademark.
+	  files, and Adobe's player.  Flash is a registered trademark
+	  belonging to Adobe.
 	</para>
       </glossdef>
     </glossentry>
@@ -365,7 +362,7 @@
       </glossterm>
       <glossdef>
 	<para>
-	  Ming is a C library for generating SWF ("Flash") format
+	  Ming is a C library for generating <emphasis>SWF</emphasis> format
 	  movies, plus a set of wrappers for using the library. It is
 	  used by the Gnash project for generating testcases.  
 	</para>
@@ -609,7 +606,7 @@
       </glossterm>
       <glossdef>
 	<para>
-	  <emphasis>SWF</emphasis> is the file format for 
+	  <emphasis>SWF</emphasis> is the generic name for
 	  <emphasis>Flash</emphasis> movies.
 	</para>
       </glossdef>

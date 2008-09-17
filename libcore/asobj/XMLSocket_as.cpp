@@ -27,7 +27,7 @@
 
 #include "network.h"
 #include "utility.h"
-#include "xml.h"
+#include "XML_as.h"
 #include "XMLSocket_as.h"
 #include "timers.h"
 #include "as_function.h"
@@ -411,7 +411,7 @@ xmlsocket_onData(const fn_call& fn)
             return as_value();
     }
 
-    boost::intrusive_ptr<as_object> xml = new XML(xmlin);
+    boost::intrusive_ptr<as_object> xml = new XML_as(xmlin);
     as_value arg(xml.get());
 
     ptr->callMethod(NSV::PROP_ON_XML, arg);

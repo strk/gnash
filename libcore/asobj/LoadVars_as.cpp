@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#include "LoadVars.h"
+#include "LoadVars_as.h"
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
@@ -35,18 +35,22 @@
 #include "LoadThread.h"
 #include "namedStrings.h"
 #include "utf8.h"
+#include "NetworkAdapter.h"
+#include "array.h"
 
 #include <list>
 #include <boost/algorithm/string/case_conv.hpp>
+#include <boost/noncopyable.hpp>
+#include <functional>
 
 //#define DEBUG_LOADS 1
 
 namespace gnash {
 
-static as_value loadvars_addrequestheader(const fn_call& fn);
+static as_value loadvars_addRequestHeader(const fn_call& fn);
 static as_value loadvars_load(const fn_call& fn);
 static as_value loadvars_send(const fn_call& fn);
-static as_value loadvars_sendandload(const fn_call& fn);
+static as_value loadvars_sendAndLoad(const fn_call& fn);
 static as_value loadvars_tostring(const fn_call& fn);
 static as_value loadvars_ctor(const fn_call& fn);
 
@@ -54,7 +58,7 @@ static as_value loadvars_ctor(const fn_call& fn);
 
 /// LoadVars ActionScript class
 //
-class LoadVars: public as_object
+class LoadVars_as: public as_object, boost::noncopyable
 {
 
 public:
@@ -62,9 +66,9 @@ public:
 	/// @param env
 	/// 	Environment to use for event handlers calls
 	///
-	LoadVars();
+	LoadVars_as();
 
-	~LoadVars();
+	~LoadVars_as();
 
 	/// Load data from given URL
 	//
@@ -93,7 +97,9 @@ public:
 	///	If false, variables will be sent using the GET method.
 	///	If true (the default), variables will be sent using POST.
 	///
-	void sendAndLoad(const std::string& urlstr, LoadVars& target, bool post=true);
+	void sendAndLoad(const std::string& urlstr, as_object& target, bool post=true);
+
+    void queueLoad(std::auto_ptr<IOChannel> str);
 
 	static as_object* getLoadVarsInterface();
 
@@ -131,15 +137,6 @@ protected:
 
 private:
 
-	/// Forbid copy
-	LoadVars(const LoadVars&)
-		:
-		as_object()
-	{ abort(); }
-
-	/// Forbid assignment
-	LoadVars& operator=(const LoadVars&) { abort(); return *this; }
-
 	/// Return enumerable property pairs in url-encoded form
 	//
 	/// TODO: move up to as_object and make public,
@@ -150,15 +147,6 @@ private:
 	/// Check for completed loading threads, fire
 	/// new threads if needed.
 	void checkLoads();
-
-	/// \brief
-	/// Add a load request to the queue, processing it
-	/// if no other loads are in progress.
-	///
-	/// @param postdata
-	///	URL-encoded post data. NULL for no post.
-	///
-	void addLoadVariablesThread(const std::string& urlstr, const char* postdata=NULL);
 
 	static as_value checkLoads_wrapper(const fn_call& fn);
 
@@ -187,7 +175,7 @@ private:
 	//
 	/// TODO: 
 	/// Is serialization of loads needed to properly 
-	/// implament getBytesLoaded() and getBytesTotal()
+	/// implement getBytesLoaded() and getBytesTotal()
 	/// methods ?
 	/// (ie: values from *which* load should be reported?)
 	///
@@ -197,7 +185,7 @@ private:
 
 };
 
-LoadVars::LoadVars()
+LoadVars_as::LoadVars_as()
 		:
 		as_object(getLoadVarsInterface()),
 		_bytesTotal(0),
@@ -205,10 +193,9 @@ LoadVars::LoadVars()
 		_loadThreads(),
 		_loadCheckerTimer(0)
 {
-	//log_debug("LoadVars %p created", this);
 }
 
-LoadVars::~LoadVars()
+LoadVars_as::~LoadVars_as()
 {
 	for (LoadThreadList::iterator it=_loadThreads.begin(); it != _loadThreads.end(); ++it)
 	{
@@ -223,7 +210,7 @@ LoadVars::~LoadVars()
 }
 
 void
-LoadVars::checkLoads()
+LoadVars_as::checkLoads()
 {
 #ifdef DEBUG_LOADS
     static int call=0;
@@ -297,22 +284,22 @@ LoadVars::checkLoads()
 }
 
 void
-LoadVars::attachLoadVarsInterface(as_object& o)
+LoadVars_as::attachLoadVarsInterface(as_object& o)
 {
-	o.init_member("addRequestHeader", new builtin_function(loadvars_addrequestheader));
-	o.init_member("decode", new builtin_function(LoadVars::decode_method));
-	o.init_member("getBytesLoaded", new builtin_function(LoadVars::getBytesLoaded_method));
-	o.init_member("getBytesTotal", new builtin_function(LoadVars::getBytesTotal_method));
+	o.init_member("addRequestHeader", new builtin_function(loadvars_addRequestHeader));
+	o.init_member("decode", new builtin_function(LoadVars_as::decode_method));
+	o.init_member("getBytesLoaded", new builtin_function(LoadVars_as::getBytesLoaded_method));
+	o.init_member("getBytesTotal", new builtin_function(LoadVars_as::getBytesTotal_method));
 	o.init_member("load", new builtin_function(loadvars_load));
 	o.init_member("send", new builtin_function(loadvars_send));
-	o.init_member("sendAndLoad", new builtin_function(loadvars_sendandload));
+	o.init_member("sendAndLoad", new builtin_function(loadvars_sendAndLoad));
 	o.init_member("toString", new builtin_function(loadvars_tostring));
-	o.init_member("onData", new builtin_function(LoadVars::onData_method));
-	o.init_member("onLoad", new builtin_function(LoadVars::onLoad_method));
+	o.init_member("onData", new builtin_function(LoadVars_as::onData_method));
+	o.init_member("onLoad", new builtin_function(LoadVars_as::onLoad_method));
 }
 
 as_object*
-LoadVars::getLoadVarsInterface()
+LoadVars_as::getLoadVarsInterface()
 {
 	static boost::intrusive_ptr<as_object> o;
 	if ( ! o )
@@ -323,31 +310,14 @@ LoadVars::getLoadVarsInterface()
 	return o.get();
 }
 
+
 void
-LoadVars::addLoadVariablesThread(const std::string& urlstr, const char* postdata)
+LoadVars_as::queueLoad(std::auto_ptr<IOChannel> str)
 {
-	set_member(NSV::PROP_LOADED, false);
-
-	URL url(urlstr, get_base_url());
-
-	std::auto_ptr<IOChannel> str;
-	if ( postdata ) str.reset ( StreamProvider::getDefaultInstance().getStream(url, std::string(postdata)) );
-	else str.reset ( StreamProvider::getDefaultInstance().getStream(url) );
-
-	if ( ! str.get() ) 
-	{
-		log_error(_("Can't load variables from %s (security?)"), url.str().c_str());
-		return;
-		// TODO: check if this is correct
-		//as_value nullValue; nullValue.set_null();
-		//callMethod(VM::get().getStringTable().find(PROPNAME("onData")), nullValue);
-	}
-
-	log_security(_("Loading variables file from url: '%s'"), url.str().c_str());
 
 	bool startTimer = _loadThreads.empty();
 
-	std::auto_ptr<LoadThread> lt ( new LoadThread(str) );
+	std::auto_ptr<LoadThread> lt (new LoadThread(str));
 
 	// we push on the front to avoid invalidating
 	// iterators when queueLoad is called as effect
@@ -355,17 +325,17 @@ LoadVars::addLoadVariablesThread(const std::string& urlstr, const char* postdata
 	// Doing so also avoids processing queued load
 	// request immediately
 	// 
-	_loadThreads.push_front(lt.get());
+	_loadThreads.push_front(lt.release());
 #ifdef DEBUG_LOADS
-	log_debug("Pushed thread %p to _loadThreads, number of LoadVars load threads now: %d", (void*)lt.get(),  _loadThreads.size());
+	log_debug("Pushed thread %p to _loadThreads, number of "
+            "LoadVars load threads now: %d",
+            static_cast<void*>(_loadThreads.front()),  _loadThreads.size());
 #endif
-	lt.release();
 
-
-	if ( startTimer )
+	if (startTimer)
 	{
 		boost::intrusive_ptr<builtin_function> loadsChecker = 
-			new builtin_function(&LoadVars::checkLoads_wrapper);
+			new builtin_function(&LoadVars_as::checkLoads_wrapper);
 		std::auto_ptr<Timer> timer(new Timer);
 		timer->setInterval(*loadsChecker, 50, this);
 		_loadCheckerTimer = getVM().getRoot().add_interval_timer(timer, true);
@@ -373,17 +343,37 @@ LoadVars::addLoadVariablesThread(const std::string& urlstr, const char* postdata
 		log_debug("Registered LoadVars loads interval %d", _loadCheckerTimer);
 #endif
     }
-
 }
 
+
 void
-LoadVars::load(const std::string& urlstr)
+LoadVars_as::load(const std::string& urlstr)
 {
-	addLoadVariablesThread(urlstr);
+    // Set loaded property to false; will be updated (hopefully)
+    // when loading is complete.
+	set_member(NSV::PROP_LOADED, false);
+
+	URL url(urlstr, get_base_url());
+
+    // Checks whether access is allowed.
+    std::auto_ptr<IOChannel> str(StreamProvider::getDefaultInstance().getStream(url));
+
+	if (!str.get()) 
+	{
+		log_error(_("LoadVars.load(): Can't load variables from %s (security?)"), url.str());
+		return;
+		// TODO: check if this is correct
+		//as_value nullValue; nullValue.set_null();
+		//callMethod(VM::get().getStringTable().find(PROPNAME("onData")), nullValue);
+	}
+
+	log_security(_("Loading variables file from url: '%s'"), url.str());
+    queueLoad(str);
+
 }
 
 std::string
-LoadVars::getURLEncodedProperties()
+LoadVars_as::getURLEncodedProperties()
 {
 	// TODO: optimize this function... 
 
@@ -413,39 +403,211 @@ LoadVars::getURLEncodedProperties()
 }
 
 void
-LoadVars::sendAndLoad(const std::string& urlstr, LoadVars& target, bool post)
+LoadVars_as::sendAndLoad(const std::string& urlstr, as_object& target, bool post)
 {
+
+    /// All objects get a loaded member, set to false.
+    target.set_member(NSV::PROP_LOADED, false);
+
 	std::string querystring = getURLEncodedProperties();
-	if ( post ) {
-		target.addLoadVariablesThread(urlstr, querystring.c_str());
-	} else {
-		std::string url = urlstr + "?" + querystring;
-		target.addLoadVariablesThread(urlstr);
+
+	URL url(urlstr, get_base_url());
+
+	std::auto_ptr<IOChannel> str;
+	if (post)
+    {
+        string_table& st = _vm.getStringTable();
+        as_value customHeaders;
+
+        NetworkAdapter::RequestHeaders headers;
+
+        if (get_member(NSV::PROP_uCUSTOM_HEADERS, &customHeaders))
+        {
+
+            /// Read in our custom headers if they exist and are an
+            /// array.
+            Array_as* array = dynamic_cast<Array_as*>(
+                            customHeaders.to_object().get());
+                            
+            if (array)
+            {
+                Array_as::const_iterator e = array->end();
+                --e;
+
+                for (Array_as::const_iterator i = array->begin(); i != e; ++i)
+                {
+                    // Only even indices can be a header.
+                    if (i.index() % 2) continue;
+                    if (! (*i).is_string()) continue;
+                    
+                    // Only the immediately following odd number can be 
+                    // a value.
+                    if (array->at(i.index() + 1).is_string())
+                    {
+                        const std::string& name = (*i).to_string();
+                        const std::string& val =
+                                    array->at(i.index() + 1).to_string();
+                                    
+                        // Values should overwrite existing ones.
+                        headers[name] = val;
+                    }
+                    
+                }
+            }
+        }
+
+        as_value contentType;
+
+        if ( get_member(st.find("contentType"), &contentType) )
+        {
+            // This should not overwrite anything set in LoadVars.addRequestHeader();
+            headers.insert(std::make_pair("Content-Type", contentType.to_string()));
+        }
+
+        /// It doesn't matter if there are no request headers.
+        str = StreamProvider::getDefaultInstance().getStream(url,
+                                                    querystring, headers);
+    }
+	else
+    {
+    	std::string url = urlstr + "?" + querystring;
+        str = StreamProvider::getDefaultInstance().getStream(url);
+    }
+
+	if (!str.get()) 
+	{
+		log_error(_("Can't load variables from %s (security?)"), url.str());
+		return;
+		// TODO: check if this is correct
+		//as_value nullValue; nullValue.set_null();
+		//callMethod(VM::get().getStringTable().find(PROPNAME("onData")), nullValue);
 	}
+
+	log_security(_("Loading variables file from url: '%s'"), url.str());
+    target.queueLoad(str);
+	
 }
 
 /* private static */
 as_value
-LoadVars::checkLoads_wrapper(const fn_call& fn)
+LoadVars_as::checkLoads_wrapper(const fn_call& fn)
 {
-	boost::intrusive_ptr<LoadVars> ptr = ensureType<LoadVars>(fn.this_ptr);
+	boost::intrusive_ptr<LoadVars_as> ptr = ensureType<LoadVars_as>(fn.this_ptr);
 	ptr->checkLoads();
 	return as_value();
 }
 
-static as_value
-loadvars_addrequestheader(const fn_call& fn)
+as_value
+loadvars_addRequestHeader(const fn_call& fn)
 {
-	boost::intrusive_ptr<LoadVars> ptr = ensureType<LoadVars>(fn.this_ptr);
-	UNUSED(ptr);
-	log_unimpl (__FUNCTION__);
-	return as_value(); 
+    
+	boost::intrusive_ptr<LoadVars_as> ptr = ensureType<LoadVars_as>(fn.this_ptr);   
+
+    as_value customHeaders;
+    as_object* array;
+
+    if (ptr->get_member(NSV::PROP_uCUSTOM_HEADERS, &customHeaders))
+    {
+        array = customHeaders.to_object().get();
+        if (!array)
+        {
+            IF_VERBOSE_ASCODING_ERRORS(
+                log_aserror(_("LoadVars.addRequestHeader: "
+                         "LoadVars._customHeaders is not an object"));
+            );
+            return as_value();
+        }
+    }
+    else
+    {
+        array = new Array_as;
+        // This property is always initialized on the first call to
+        // addRequestHeaders.
+        ptr->set_member(NSV::PROP_uCUSTOM_HEADERS, array);
+    }
+
+    if (fn.nargs == 0)
+    {
+        // Return after having initialized the _customHeaders array.
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("LoadVars.addRequestHeader requires at least "
+                          "one argument"));
+        );
+        return as_value();
+    }
+    
+    if (fn.nargs == 1)
+    {
+        // This must be an array. Keys / values are pushed in valid
+        // pairs to the _customHeaders array.    
+        boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
+        Array_as* headerArray = dynamic_cast<Array_as*>(obj.get());
+
+        if (!headerArray)
+        {
+            IF_VERBOSE_ASCODING_ERRORS(
+                log_aserror(_("LoadVars.addRequestHeader: single argument "
+                                "is not an array"));
+            );
+            return as_value();
+        }
+
+        Array_as::const_iterator e = headerArray->end();
+        --e;
+
+        for (Array_as::const_iterator i = headerArray->begin(); i != e; ++i)
+        {
+            // Only even indices can be a key, and they must be a string.
+            if (i.index() % 2) continue;
+            if (!(*i).is_string()) continue;
+            
+            // Only the immediately following odd number can be 
+            // a value, and it must also be a string.
+            const as_value& val = headerArray->at(i.index() + 1);
+            if (val.is_string())
+            {
+                array->callMethod(NSV::PROP_PUSH, *i, val);
+            }
+        }
+        return as_value();
+    }
+        
+    if (fn.nargs > 2)
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::ostringstream ss;
+            fn.dump_args(ss);
+            log_aserror(_("LoadVars.addRequestHeader(%s): arguments after the"
+                            "second will be discarded"), ss.str());
+        );
+    }
+    
+    // Push both to the _customHeaders array.
+    const as_value& name = fn.arg(0);
+    const as_value& val = fn.arg(1);
+    
+    // Both arguments must be strings.
+    if (!name.is_string() || !val.is_string())
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::ostringstream ss;
+            fn.dump_args(ss);
+            log_aserror(_("LoadVars.addRequestHeader(%s): both arguments "
+                        "must be a string"), ss.str());
+        );
+        return as_value(); 
+    }
+
+    array->callMethod(NSV::PROP_PUSH, name, val);
+    
+    return as_value();
 }
 
+
 as_value
-LoadVars::decode_method(const fn_call& fn)
+LoadVars_as::decode_method(const fn_call& fn)
 {
-	boost::intrusive_ptr<LoadVars> ptr = ensureType<LoadVars>(fn.this_ptr);
+	boost::intrusive_ptr<LoadVars_as> ptr = ensureType<LoadVars_as>(fn.this_ptr);
 
 	if ( ! fn.nargs ) return as_value(false);
 
@@ -466,21 +628,21 @@ LoadVars::decode_method(const fn_call& fn)
 }
 
 as_value
-LoadVars::getBytesLoaded_method(const fn_call& fn)
+LoadVars_as::getBytesLoaded_method(const fn_call& fn)
 {
-	boost::intrusive_ptr<LoadVars> ptr = ensureType<LoadVars>(fn.this_ptr);
+	boost::intrusive_ptr<LoadVars_as> ptr = ensureType<LoadVars_as>(fn.this_ptr);
 	return as_value(ptr->getBytesLoaded());
 }
 
 as_value
-LoadVars::getBytesTotal_method(const fn_call& fn)
+LoadVars_as::getBytesTotal_method(const fn_call& fn)
 {
-	boost::intrusive_ptr<LoadVars> ptr = ensureType<LoadVars>(fn.this_ptr);
+	boost::intrusive_ptr<LoadVars_as> ptr = ensureType<LoadVars_as>(fn.this_ptr);
 	return as_value(ptr->getBytesTotal());
 }
 
 as_value
-LoadVars::onData_method(const fn_call& fn)
+LoadVars_as::onData_method(const fn_call& fn)
 {
 	//GNASH_REPORT_FUNCTION;
 
@@ -514,7 +676,7 @@ LoadVars::onData_method(const fn_call& fn)
 }
 
 as_value
-LoadVars::onLoad_method(const fn_call& /*fn*/)
+LoadVars_as::onLoad_method(const fn_call& /*fn*/)
 {
 	//GNASH_REPORT_FUNCTION;
 	return as_value();
@@ -523,7 +685,7 @@ LoadVars::onLoad_method(const fn_call& /*fn*/)
 static as_value
 loadvars_load(const fn_call& fn)
 {
-	boost::intrusive_ptr<LoadVars> obj = ensureType<LoadVars>(fn.this_ptr);
+	boost::intrusive_ptr<LoadVars_as> obj = ensureType<LoadVars_as>(fn.this_ptr);
 
 	if ( fn.nargs < 1 )
 	{
@@ -550,16 +712,16 @@ loadvars_load(const fn_call& fn)
 static as_value
 loadvars_send(const fn_call& fn)
 {
-	boost::intrusive_ptr<LoadVars> ptr = ensureType<LoadVars>(fn.this_ptr);
+	boost::intrusive_ptr<LoadVars_as> ptr = ensureType<LoadVars_as>(fn.this_ptr);
 	UNUSED(ptr);
 	log_unimpl (__FUNCTION__);
 	return as_value(); 
 }
 
 static as_value
-loadvars_sendandload(const fn_call& fn)
+loadvars_sendAndLoad(const fn_call& fn)
 {
-	boost::intrusive_ptr<LoadVars> ptr = ensureType<LoadVars>(fn.this_ptr);
+	boost::intrusive_ptr<LoadVars_as> ptr = ensureType<LoadVars_as>(fn.this_ptr);
 
 	if ( fn.nargs < 2 )
 	{
@@ -578,14 +740,16 @@ loadvars_sendandload(const fn_call& fn)
 		return as_value(false);
 	}
 
-	boost::intrusive_ptr<LoadVars> target = boost::dynamic_pointer_cast<LoadVars>(fn.arg(1).to_object());
-	if ( ! target )
+	if (!fn.arg(1).is_object())
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("LoadVars.sendAndLoad(): invalid target (must be a LoadVars object)"));
+		    log_aserror(_("LoadVars.sendAndLoad(): invalid target (must be an object)"));
 		);
 		return as_value(false);
 	}
+
+
+	boost::intrusive_ptr<as_object> target = fn.arg(1).to_object();
 
 	// Post by default, override by ActionScript third argument
 	bool post = true;
@@ -600,7 +764,7 @@ loadvars_sendandload(const fn_call& fn)
 static as_value
 loadvars_tostring(const fn_call& fn)
 {
-	boost::intrusive_ptr<LoadVars> ptr = ensureType<LoadVars>(fn.this_ptr);
+	boost::intrusive_ptr<LoadVars_as> ptr = ensureType<LoadVars_as>(fn.this_ptr);
 	UNUSED(ptr);
 	log_unimpl (__FUNCTION__);
 	return as_value(); 
@@ -609,7 +773,7 @@ loadvars_tostring(const fn_call& fn)
 static as_value
 loadvars_ctor(const fn_call& fn)
 {
-	boost::intrusive_ptr<as_object> obj = new LoadVars();
+	boost::intrusive_ptr<as_object> obj = new LoadVars_as;
 
 	if ( fn.nargs )
 	{
@@ -630,10 +794,10 @@ loadvars_class_init(as_object& global)
 
 	if ( cl == NULL )
 	{
-		cl=new builtin_function(&loadvars_ctor, LoadVars::getLoadVarsInterface());
+		cl=new builtin_function(&loadvars_ctor, LoadVars_as::getLoadVarsInterface());
 		// replicate all interface to class, to be able to access
 		// all methods as static functions
-		LoadVars::attachLoadVarsInterface(*cl);
+		LoadVars_as::attachLoadVarsInterface(*cl);
 		     
 	}
 

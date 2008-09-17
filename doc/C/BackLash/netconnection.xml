@@ -23,14 +23,14 @@
       protocol:[//host][:port]/appname/[instanceName]
     </programlisting>
     For protocol, specify either <emphasis>RTMP</emphasis> or
-    <emphasis>RTMPT</emphasis>. If rtmp is specified, Flash Player will create
-    a client connection. If <emphasis>RTMPT</emphasis> is specified, Flash
+    <emphasis>RTMPT</emphasis>. If rtmp is specified, SWF Player will create
+    a client connection. If <emphasis>RTMPT</emphasis> is specified, SWF
     Player will create an HTTP "tunneling" connection to the server.
   </para>
 
   <para>
-    You can omit the host parameter if the Flash movie is served from
-    localhost. If the instanceName parameter is omitted, Flash Player
+    You can omit the host parameter if the SWF movie is served from
+    localhost. If the instanceName parameter is omitted, SWF Player
     connects to the application's default instance (_definst_).
   </para>
 

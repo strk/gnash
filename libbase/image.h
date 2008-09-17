@@ -59,7 +59,7 @@ namespace image
 	{
 	public:
 
-		ImageBase(const ImageBase& o)
+		ImageBase(const ImageBase& o) throw (std::bad_alloc)
 			:
 			_type(o._type),
 			_size(o.size()),

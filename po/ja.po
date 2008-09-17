@@ -5368,8 +5368,8 @@ msgid "  -1,  --once              Exit when/if movie reaches the last frame"
 msgstr "  -1,  --once              最後まで再生したら終了する"
 
 #: ../gui/gnash.cpp:113
-msgid "  -g,  --debugger          Turn on the Flash debugger"
-msgstr "  -g,  --debugger          Flashデバッガを有効にする"
+msgid "  -g,  --debugger          Turn on the SWF debugger"
+msgstr "  -g,  --debugger          SWFデバッガを有効にする"
 
 #: ../gui/gnash.cpp:114
 msgid "  -r,  --render-mode <0|1|2|3>"
@@ -5773,7 +5773,7 @@ msgid "Value"
 msgstr "値"
 
 #: ../gui/gtk.cpp:1461
-msgid "Gnash is the GNU Flash movie player based on GameSWF."
+msgid "Gnash is the GNU SWF player based on GameSWF."
 msgstr "GnashはGameSWFをベースとしたGNU Flash動画プレーヤです"
 
 #: ../gui/gtk.cpp:1463
@@ -5817,8 +5817,8 @@ msgstr ""
 "ffmpegバージョン: "
 
 #: ../gui/gtk.cpp:1485
-msgid "GNASH flash movie player"
-msgstr "GNASH flash 動画プレーヤー"
+msgid "GNASH SWF player"
+msgstr "GNASH SWF 動画プレーヤー"
 
 #: ../gui/gtk.cpp:1517 ../gui/gtk.cpp:1530
 msgid "Open file"

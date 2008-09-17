@@ -291,7 +291,7 @@ string_split(const fn_call& fn)
     
     std::wstring wstr = utf8::decodeCanonicalString(str, version);
 
-    boost::intrusive_ptr<as_array_object> array(new as_array_object());
+    boost::intrusive_ptr<Array_as> array(new Array_as());
 
     if (fn.nargs == 0)
     {
@@ -842,17 +842,9 @@ init_string_instance(const std::string& val)
 		}
 	}
 
-#ifndef NDEBUG
-	size_t prevStackSize = env.stack_size();
-#endif
-
 	std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
 	args->push_back(val);
 	boost::intrusive_ptr<as_object> ret = cl->constructInstance(env, args);
-
-#ifndef NDEBUG
-	assert( prevStackSize == env.stack_size());
-#endif
 
 	return ret;
 }

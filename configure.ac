@@ -36,7 +36,7 @@ AM_COMPILER_LIB
 
 dnl Set the default values for Flash Version. These are converted into
 dnl various strings to make JavaScript or ActionScript detectors
-dnl recognize Gnash as a Flash Player.
+dnl recognize Gnash as a SWF Player.
 DEFAULT_FLASH_MAJOR_VERSION="9"
 DEFAULT_FLASH_MINOR_VERSION="0"
 DEFAULT_FLASH_REV_NUMBER="999"
@@ -3004,7 +3004,7 @@ if test x"${DEJAGNU}" != x""; then
   echo "        DEJAGNU's runtest is $DEJAGNU"
 else
   echo "        WARNING: You need the dejagnu package installed to get a summary" >&4
-  echo "                 report after running ``make check''" >&4
+  echo "                 report after running ''make check''" >&4
   echo "                 Install it from http://www.gnu.org/software/dejagnu/" >&4
   echo "                 or .deb users: apt-get install dejagnu" >&4
   #echo "                or .rpm users: yum install dejagnu" >&4

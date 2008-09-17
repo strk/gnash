@@ -159,14 +159,17 @@ test_el()
         runtest.fail("as_value(Element &undefined)");
     }
     
-    Element el5;
-    el5.makeMovieClip();
-    as_value as5(el5);
-    if (as5.is_sprite()) {
-        runtest.pass("as_value(Element &movieclip)");
-    } else {
-        runtest.fail("as_value(Element &movieclip)");
-    }
+    // As for misc-ming.all/SharedObjectTest, MOVIECLIP values are serialized
+    // as undefined values.
+    //
+    //Element el5;
+    //el5.makeMovieClip();
+    //as_value as5(el5);
+    //if (as5.is_sprite()) {
+    //   runtest.pass("as_value(Element &movieclip)");
+    //} else {
+    //    runtest.fail("as_value(Element &movieclip)");
+    //}
 
     // There is no equivalent AMF element type to the as_value AS_FUNCTION type
 }

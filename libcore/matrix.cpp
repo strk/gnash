@@ -271,6 +271,7 @@ matrix::invert()
     boost::int64_t det = determinant();
     if(det == 0)
     {
+        log_error("Matrix not invertible, setting to identity on invert request");
         // TODO: check this.
         set_identity();
     }
@@ -327,6 +328,14 @@ boost::int64_t
 matrix::determinant() const
 // Return the 32.32 fixed point determinant of this matrix.
 {
+    // | sx	shy	tx |
+    // | shx	sy	ty |   = T. Using the Leibniz formula:
+    // | 0	0	1  |
+    //
+    // Det(T) = ( (sx * sy * 1 ) + (shy * ty * 0) + (tx * shx *  0) ) -
+    //          ( (0  * sy * tx) + (0  * ty * sx) + (1 * shy * shx) )
+    //        = sx * sy - shx * shy
+
     return (boost::int64_t)sx * sy - (boost::int64_t)shx * shy;
 }
 

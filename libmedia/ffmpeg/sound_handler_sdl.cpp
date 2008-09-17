@@ -721,23 +721,15 @@ do_mixing(Uint8* stream, active_sound& sound, Uint8* data, unsigned int mix_leng
 // write a wave header, using the current audioSpec settings
 void SDL_sound_handler::write_wave_header(std::ofstream& outfile)
 {
-
-  int i;
-  char obuff[80];
  
   // allocate wav header
   WAV_HDR wav;
   CHUNK_HDR chk;
  
   // setup wav header
-  snprintf(obuff, sizeof(obuff), "RIFF");
-  for(i=0;i<4;i++) wav.rID[i] = obuff[i];
- 
-  snprintf(obuff, sizeof(obuff), "WAVE");
-  for(i=0;i<4;i++) wav.wID[i] = obuff[i];
-  
-  snprintf(obuff, sizeof(obuff), "fmt ");
-  for(i=0;i<4;i++) wav.fId[i] = obuff[i];
+  std::strncpy(wav.rID, "RIFF", 4);
+  std::strncpy(wav.wID, "WAVE", 4);
+  std::strncpy(wav.fId, "fmt ", 4);
  
   wav.nBitsPerSample = ((audioSpec.format == AUDIO_S16SYS) ? 16 : 0);
   wav.nSamplesPerSec = audioSpec.freq;
@@ -752,8 +744,7 @@ void SDL_sound_handler::write_wave_header(std::ofstream& outfile)
   wav.nBlockAlign = audioSpec.channels * wav.nBitsPerSample / 8;
 
   // setup chunk header
-  snprintf(obuff, sizeof(obuff), "data");
-  for(i=0;i<4;i++) chk.dId[i] = obuff[i];
+  std::strncpy(chk.dId, "data", 4);
   chk.dLen = 0;
  
   /* write riff/wav header */
@@ -834,11 +825,15 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 		}
 	}
 
+    const SDL_sound_handler::Sounds& soundData = handler->m_sound_data;
+
 	// Run through all the sounds. TODO: don't call .size() at every iteration !
-	for(boost::uint32_t i=0; i < handler->m_sound_data.size(); i++)
+	for (SDL_sound_handler::Sounds::const_iterator i = soundData.begin(),
+	            e = soundData.end(); i != e; ++i)
 	{
-		sound_data* sounddata = handler->m_sound_data[i];
-		handler->mixSoundData(*sounddata, buffer, buffer_length);
+	    // Check whether sound has been deleted first.
+        if (!*i) continue;
+		handler->mixSoundData(**i, buffer, buffer_length);
 	}
 
 	// 

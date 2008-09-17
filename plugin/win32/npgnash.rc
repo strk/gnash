@@ -30,7 +30,7 @@ BEGIN
             VALUE "FileVersion", "9, 0, 82, 0\0"
 // FileDescription needs to include the string "Shockwave Flash X.Y rZ"
 // as JS Flash detect scripts may use it to determine Flash player version.
-            VALUE "FileDescription", "npgnash plugin for <a href=""http://www.gnu.org/software/gnash/"">Gnash</a>, the GNU Flash player. (Shockwave Flash 9.0 r82)\0"
+            VALUE "FileDescription", "npgnash plugin for <a href=""http://www.gnu.org/software/gnash/"">Gnash</a>, the GNU SWF player. (Shockwave Flash 9.0 r82)\0"
             VALUE "LegalCopyright", "Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "MIMEType", "application/x-shockwave-flash\0"

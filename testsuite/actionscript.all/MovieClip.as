@@ -27,19 +27,19 @@ rcsid="$Id: MovieClip.as,v 1.133 2008/05/09 13:21:08 strk Exp $";
 endOfTest = function() 
 {
 #if OUTPUT_VERSION <= 5
-	check_totals(233); // SWF5
+	check_totals(234); // SWF5
 #endif
 
 #if OUTPUT_VERSION == 6
-	check_totals(663); // SWF6
+	check_totals(664); // SWF6
 #endif
 
 #if OUTPUT_VERSION == 7
-	check_totals(680); // SWF7
+	check_totals(681); // SWF7
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(681); // SWF8+
+	check_totals(682); // SWF8+
 #endif
 
 	play();
@@ -1462,8 +1462,13 @@ ret = _root.meth(1);
 check_equals(typeof(ret), 'number');
 check_equals(ret, 0);
 
-Number.prototype.toLowerCase = function() { return "post"; };
+Number.prototype.toLowerCase = function() { retCaller=arguments.caller; return "post"; };
 ret = _root.meth(1);
+#if OUTPUT_VERSION < 6
+ check_equals(retCaller, _root.meth); // in gnash works because functions resolve equal to undefined
+#else
+ xcheck_equals(retCaller, _root.meth); // check that arguments.caller is also set for builtin functions
+#endif
 check_equals(typeof(ret), 'number');
 check_equals(ret, 2);
 

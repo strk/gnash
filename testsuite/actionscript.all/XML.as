@@ -26,11 +26,13 @@ rcsid="$Id: XML.as,v 1.57 2008/04/08 10:09:21 strk Exp $";
 //#include "dejagnu.as"
 #include "utils.as"
 
+#if OUTPUT_VERSION < 6
+Object.prototype.hasOwnProperty = ASnative(101, 5);
+#endif
+
 var existtests = true;
 
 check(XML);
-
-#if OUTPUT_VERSION >= 6 // {
 
 check(! XML.prototype.hasOwnProperty("appendChild") );
 check(! XML.prototype.hasOwnProperty("cloneNode") );
@@ -66,6 +68,7 @@ check(!XML.hasOwnProperty("parseXML") );
 check(!XML.hasOwnProperty("send") );
 check(!XML.hasOwnProperty("sendAndLoad") );
 check(!XML.hasOwnProperty("nodeValue"));
+check(!XML.hasOwnProperty("_customHeaders"));
 // ignoreWhite is undefined by default, but is used when set to true
 check(!XML.prototype.hasOwnProperty("ignoreWhite") );
 
@@ -102,8 +105,6 @@ check(! XMLNode.hasOwnProperty("toString") );
 check(! XMLNode.hasOwnProperty("cloneNode") );
 check(! XMLNode.hasOwnProperty("nodeValue"));
 
-#endif // OUTPUT_VERSION >= 6 }
-
 check(XML.prototype instanceof XMLNode);
 
 var tmp = new XML();
@@ -120,11 +121,7 @@ check(! tmp.hasOwnProperty("length"));
 
 check_equals(typeof(tmp.status), 'number');
 check(! tmp.hasOwnProperty("status"));
-#if OUTPUT_VERSION < 6
- check(! tmp.__proto__.hasOwnProperty('status') );
-#else
- xcheck(tmp.__proto__.hasOwnProperty('status') );
-#endif
+xcheck(tmp.__proto__.hasOwnProperty('status') );
 
 check_equals(tmp.status, 0);
 tmp.status = -1;
@@ -637,6 +634,142 @@ trace(doc.toString());
 // #endif
 
 
+// Test sendAndLoad return;
+// Any object can be passed as second argument.
+
+x = new XML;
+r = new Object;
+check(!r.hasOwnProperty("loaded"));
+check_equals(x.sendAndLoad("some server name", r), true);
+check(r.hasOwnProperty("loaded"));
+
+r = new XML;
+check(!r.hasOwnProperty("loaded"));
+check_equals(x.sendAndLoad("some server name", r), true);
+check(!r.hasOwnProperty("loaded"));
+check_equals(typeof(r.loaded), "boolean");
+check_equals(r.loaded, false);
+
+#if OUTPUT_VERSION > 5
+// No LoadVars in SWF 5.
+r = new LoadVars;
+check(!r.hasOwnProperty("loaded"));
+check_equals(x.sendAndLoad("some server name", r), true);
+check(r.hasOwnProperty("loaded"));
+check_equals(typeof(r.loaded), "boolean");
+check_equals(r.loaded, false);
+#endif
+
+r = new Date(1);
+check(!r.hasOwnProperty("loaded"));
+check_equals(x.sendAndLoad("some server name", r), true);
+check(r.hasOwnProperty("loaded"));
+check_equals(typeof(r.loaded), "boolean");
+check_equals(r.loaded, false);
+t = new Date(1);
+check_equals(r.toString(), t.toString());
+check(r instanceOf Date);
+
+r = 3;
+check(!r.hasOwnProperty("loaded"));
+check_equals(x.sendAndLoad("some server name", r), false);
+check(!r.hasOwnProperty("loaded"));
+check_equals(typeof(r.loaded), "undefined");
+check_equals(r.loaded, undefined);
+
+r = "string";
+check(!r.hasOwnProperty("loaded"));
+check_equals(x.sendAndLoad("some server name", r), false);
+check(!r.hasOwnProperty("loaded"));
+check_equals(typeof(r.loaded), "undefined");
+check_equals(r.loaded, undefined);
+
+r = {};
+check(!r.hasOwnProperty("loaded"));
+check_equals(x.sendAndLoad("some server name", r), true);
+check(r.hasOwnProperty("loaded"));
+check_equals(typeof(r.loaded), "boolean");
+check_equals(r.loaded, false);
+
+
+/// Test addRequestHeaders
+
+#if OUTPUT_VERSION > 5
+
+check(!x.hasOwnProperty("_customHeaders"));
+
+x.addRequestHeader("header1", "value1");
+check(x.hasOwnProperty("_customHeaders"));
+check(x._customHeaders instanceOf Array);
+check_equals(x._customHeaders.toString(), "header1,value1");
+
+x.addRequestHeader("header2", "value2");
+check_equals(x._customHeaders.toString(), "header1,value1,header2,value2");
+
+x.addRequestHeader(["header3", "value3", "header4", "value4"]);
+check_equals(x._customHeaders.toString(), "header1,value1,header2,value2,header3,value3,header4,value4");
+
+x._customHeaders.pop();
+check_equals(x._customHeaders.toString(), "header1,value1,header2,value2,header3,value3,header4");
+
+x._customHeaders[8] = "value4";
+#if OUTPUT_VERSION < 7
+check_equals(x._customHeaders.toString(), "header1,value1,header2,value2,header3,value3,header4,,value4");
+#else
+check_equals(x._customHeaders.toString(), "header1,value1,header2,value2,header3,value3,header4,undefined,value4");
+#endif
+
+x._customHeaders[7] = "shoved in";
+
+x.addRequestHeader("header5", "value5");
+check_equals(x._customHeaders.toString(), "header1,value1,header2,value2,header3,value3,header4,shoved in,value4,header5,value5");
+
+x.addRequestHeader("GET", "should not be sent");
+check_equals(x._customHeaders.toString(), "header1,value1,header2,value2,header3,value3,header4,shoved in,value4,header5,value5,GET,should not be sent");
+
+x.addRequestHeader("Public", "should not be sent");
+check_equals(x._customHeaders.toString(), "header1,value1,header2,value2,header3,value3,header4,shoved in,value4,header5,value5,GET,should not be sent,Public,should not be sent");
+
+/// Shouldn't change _customHeaders
+x.contentType="Odd Content Type";
+check_equals(x._customHeaders.toString(), "header1,value1,header2,value2,header3,value3,header4,shoved in,value4,header5,value5,GET,should not be sent,Public,should not be sent");
+
+x._customHeaders = 3;
+check_equals(x._customHeaders.toString(), "3");
+
+x.addRequestHeader("header0", "value0");
+check_equals(x._customHeaders.toString(), "3");
+
+
+// Only strings work.
+x = new XML;
+check(!x.hasOwnProperty("_customHeaders"));
+x.addRequestHeader(3);
+check(x.hasOwnProperty("_customHeaders"));
+check_equals(x._customHeaders.toString(), "");
+
+x = new XML;
+check(!x.hasOwnProperty("_customHeaders"));
+x.addRequestHeader();
+check(x.hasOwnProperty("_customHeaders"));
+check_equals(x._customHeaders.toString(), "");
+
+
+
+x.addRequestHeader(3, 5);
+check_equals(x._customHeaders.toString(), "");
+
+x.addRequestHeader(new Date, new Object);
+check_equals(x._customHeaders.toString(), "");
+
+x.addRequestHeader("string", 6);
+check_equals(x._customHeaders.toString(), "");
+
+x.addRequestHeader("string", "string");
+check_equals(x._customHeaders.toString(), "string,string");
+
+#endif
+
 //--------------------------------------------------------------------
 // Test loading an XML locally
 //--------------------------------------------------------------------
@@ -702,8 +835,13 @@ myxml.onLoad = function(success)
 	check_equals(myxml.nodeName, null);
 
 	topnode = myxml.firstChild;
+#if OUTPUT_VERSION == 5
+	xcheck_equals(topnode.nodeName, null);
+	xcheck_equals(topnode.attributes.attr1, undefined);
+#else
 	check_equals(topnode.nodeName, 'XML');
 	check_equals(topnode.attributes.attr1, 'attr1 value');
+#endif
 
 	// XML, comment, NULL 
 	if ( typeof(myxml.lastChildNodesCount) == 'undefined' )
@@ -714,7 +852,11 @@ myxml.onLoad = function(success)
 	{
 		check_equals(myxml.childNodes.length, myxml.lastChildNodesCount);
 	}
+#if OUTPUT_VERSION == 5
+	xcheck_equals(myxml.childNodes.length, 4); // gnash fails discarding the comment and the ending blanks
+#else
 	check_equals(myxml.childNodes.length, 3); // gnash fails discarding the comment and the ending blanks
+#endif
 
 	// We're done
 	++this.onLoadCalls;
@@ -722,9 +864,9 @@ myxml.onLoad = function(success)
 	if ( this.onLoadCalls == 2 )
 	{
 #if OUTPUT_VERSION < 6
-		check_totals(265);
+		check_totals(361);
 #else
-		check_totals(341);
+		check_totals(401);
 #endif
 		play();
 	}

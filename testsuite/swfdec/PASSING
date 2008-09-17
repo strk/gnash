@@ -40,6 +40,10 @@ array-new-6.swf:2852d9745de89063970f44e6e7620bc2
 array-new-7.swf:77c4510eed0fd37d8654f761800edcce
 array-new-8.swf:8b26fcd892b0cd7a1cd2832d3844d00d
 array-new-override-5.swf:5016b51c60e30ee262b3cb022ba4c58f
+array-sort-custom-call-5.swf:3bfe136dfda4403b1984aae59fde2144
+array-sort-custom-call-6.swf:d2517fbff896c1586947664ea20befa7
+array-sort-custom-call-7.swf:6293fd0f9a5cc6498ebcbe3d90aeca69
+array-sort-custom-call-8.swf:55f6ed659bdfb624198f5f1b6ccf365e
 array-sort-on-5.swf:3c7eaa57454c8a65971d7765bbf3f495
 array-sort-on-6.swf:158e931ebd968351b6a4d3d8ca30b516
 array-sort-on-7.swf:d2ad844a1b5ebe6c65aae075a8273370
@@ -487,6 +491,9 @@ load-5.swf:e2efd27e8813c647072fe7bbe5fecff3
 loadmovie-case-5.swf:a7d492cb23eef08a115d7a667c9b5089
 loadmovie-case-6.swf:e5bc78b62bb2688bd99a57bfec7e4eb1
 loadmovie-case-7.swf:0ce485bdd81c872df4b7327c1d048936
+loadobject-addrequestheader-6.swf:ca03d99d7d43cdc0bab62d8b97acbcad
+loadobject-addrequestheader-7.swf:08fa4107345b54263b0df3aae95d9d8b
+loadobject-addrequestheader-8.swf:50ab764a31bff4a679a86e48d7000343
 loadvariables-5.swf:a24997be9ca59d8da2216f9527d0279a
 loadvars-5.swf:378a93e3fc7821a72f61332dcfa6cbf7
 local.swf:12135ef5103f1b0dcc428308511b9c07
@@ -632,6 +639,9 @@ onresize-8.swf:92a9647b69fc3c7bebe7f7d0f69446e0
 onUnload-prototype-5.swf:63014a643d2cdec7a93fb115678833f1
 order.swf:cd3c59922bdbe22ce8d32900b82247e2
 oversized-image-5.swf:3e8e9f8ae3ff631721a63613799435e2
+oversized-image-6.swf:2821138bcc3f5a21c8caeea1eb969721
+oversized-image-7.swf:76ba29e492b04e1c561cfb512550ce11
+oversized-image-8.swf:f442cd8b8062f8a14c67c45c04c00ab0
 parent-root.swf:29a3c9ce2ca959a1842849024a29639e
 parse-float-5.swf:e97643aebcd473b5bcff9ac978be779a
 parse-float-6.swf:f964f2977ba260d4e82f03eaa7c772a7

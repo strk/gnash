@@ -75,8 +75,7 @@ xpi xpi-bundle: xpi-build xpi-plugin
 	cp -fr $(XPI_TMP)/tmp/plugin/libgnashplugin.so $(XPI_BUNDLE)/
 	cp -fr $(XPI_TMP)/tmp/plugin/extensions/*.xpt $(XPI_BUNDLE)/
 	cp -fr $(XPI_TMP)/tmp/plugin/extensions/*.so $(XPI_BUNDLE)/
-	(cd $(XPI_BUNDLE) ; $(ZIP) -r /tmp/gnash.xpi *)
-	echo "The bundle is /tmp/gnash.xpi"
+	(cd $(XPI_BUNDLE) ; $(ZIP) -r /tmp/gnash-$(VERSION).xpi *)
 
 xpi-clean:
 	rm -fr xpi-* $(XPI_BUILD) $(XPI_TMP) gnash-$(VERSION)*.xpi

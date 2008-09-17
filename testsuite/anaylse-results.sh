@@ -19,22 +19,16 @@ echo
 echo "[Test Results Summary]"
 echo
 
-# TODO1: always find in top-level dir instead (taking a parameter) ?
-# TODO2: increment -maxdepth in case we add subdirs to our testsuites ?
-
-#for dir in `find . -maxdepth 1 -type d | egrep -v ".libs|.deps" | grep "./" | sort`; do
 suitefail=
 suitexpass=
-for dir in `find . -type d | egrep -v ".libs|.deps" | grep "./" | sort`; do
-    if test ! -f "${dir}/testrun.sum" ; then
-	continue
-    fi
-    nofail=`grep -c "^FAIL: "   ${dir}/testrun.sum`
-    nopass=`grep -c "^PASS: "   ${dir}/testrun.sum`
-    noxfail=`grep -c "^XFAIL: " ${dir}/testrun.sum`
-    noxpass=`grep -c "^XPASS: " ${dir}/testrun.sum`
-    nounresolved=`grep -c "^UNRESOLVED: " ${dir}/testrun.sum`
-    nountested=`grep -c "^UNTESTED: " ${dir}/testrun.sum`
+for fn in `find testsuite extensions -name testrun.sum | sort`; do
+    dir=`dirname $fn`
+    nofail=`grep -c "^FAIL: "   ${fn}`
+    nopass=`grep -c "^PASS: "   ${fn}`
+    noxfail=`grep -c "^XFAIL: " ${fn}`
+    noxpass=`grep -c "^XPASS: " ${fn}`
+    nounresolved=`grep -c "^UNRESOLVED: " ${fn}`
+    nountested=`grep -c "^UNTESTED: " ${fn}`
     echo -n "Test suite $dir: "
     someprint=0
     if test $nofail -gt 0; then

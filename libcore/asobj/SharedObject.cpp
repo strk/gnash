@@ -48,15 +48,9 @@
 #include "URL.h"
 #include "rc.h" // for use of rcfile
 
-// Define this to use the buffer-based AMF0 decoder/encoder
-// rather then libamf. Fixes misc-ming.all/SharedObjectTestRunner
-// both behavioural and for memory errors.
-// The only failing case in that test is comparison of input
-// and output .sol file. This is because ::writeAMF0 encodes
-// arrays as STRICT_ARRAY rather then ECMA_ARRAY. Should be
-// checked if this is a common need or only SOL-specific.
-//
-//#define BUFFERED_AMF_SOL
+// Undefine this to use the Element-based AMF0 decoder/encoder.
+// May be useful to test libamf.
+#define BUFFERED_AMF_SOL
 
 namespace {
 //gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
@@ -71,11 +65,16 @@ namespace gnash {
 #define MAXHOSTNAMELEN 64
 #endif
 
-as_value sharedobject_clear(const fn_call& fn);
-as_value sharedobject_flush(const fn_call& fn);
-as_value sharedobject_getlocal(const fn_call& fn);
-as_value sharedobject_getsize(const fn_call& fn);
-as_value sharedobject_ctor(const fn_call& fn);
+static as_value sharedobject_connect(const fn_call& fn);
+static as_value sharedobject_send(const fn_call& fn);
+static as_value sharedobject_flush(const fn_call& fn);
+static as_value sharedobject_close(const fn_call& fn);
+static as_value sharedobject_getsize(const fn_call& fn);
+static as_value sharedobject_setFps(const fn_call& fn);
+static as_value sharedobject_clear(const fn_call& fn);
+
+static as_value sharedobject_getlocal(const fn_call& fn);
+static as_value sharedobject_ctor(const fn_call& fn);
 
 void sharedobject_iter(SOL &sol, string_table::key key, const as_value &reference);
 
@@ -154,6 +153,12 @@ public:
     {
         if ( _error ) return;
 
+        if ( val.is_function() )
+        {
+            log_debug("SOL: skip serialization of FUNCTION property");
+            return;
+        }
+
         // Test conducted with AMFPHP:
         // '__proto__' and 'constructor' members
         // of an object don't get back from an 'echo-service'.
@@ -204,14 +209,28 @@ attachSharedObjectInterface(as_object& o)
 //    GNASH_REPORT_FUNCTION;
 
     VM& vm = o.getVM();
+
+    // ASnative table registration
+	vm.registerNative(sharedobject_connect, 2106, 0);
+	vm.registerNative(sharedobject_send, 2106, 1);
+	vm.registerNative(sharedobject_flush, 2106, 2);
+	vm.registerNative(sharedobject_close, 2106, 3);
+	vm.registerNative(sharedobject_getsize, 2106, 4);
+	vm.registerNative(sharedobject_setFps, 2106, 5);
+	vm.registerNative(sharedobject_clear, 2106, 6);
+
     const int swfVersion = vm.getSWFVersion();
 
     // clear, flush and getSize not in SWF<6 , it seems
     if ( swfVersion < 6 ) return; 
 
-    o.init_member("clear", new builtin_function(sharedobject_clear));
-    o.init_member("flush", new builtin_function(sharedobject_flush));
-    o.init_member("getSize", new builtin_function(sharedobject_getsize));
+    o.init_member("connect", new builtin_function(sharedobject_connect)); // asnative 2106,0
+    o.init_member("send", new builtin_function(sharedobject_send)); // asnative 2106,1
+    o.init_member("flush", new builtin_function(sharedobject_flush)); // asnative 2106,2
+    o.init_member("close", new builtin_function(sharedobject_close)); // asnative 2106,3
+    o.init_member("getSize", new builtin_function(sharedobject_getsize)); // asnative 2106,4
+    o.init_member("setFps", new builtin_function(sharedobject_setFps)); // asnative 2106,5
+    o.init_member("clear", new builtin_function(sharedobject_clear)); // asnative 2106,6
 }
 
 static void
@@ -716,6 +735,46 @@ sharedobject_clear(const fn_call& fn)
     
     LOG_ONCE(log_unimpl (__FUNCTION__));
 
+    return as_value();
+}
+
+as_value
+sharedobject_connect(const fn_call& fn)
+{
+    boost::intrusive_ptr<SharedObject> obj = ensureType<SharedObject>(fn.this_ptr);
+    UNUSED(obj);
+
+    LOG_ONCE(log_unimpl("SharedObject.connect"));
+    return as_value();
+}
+
+as_value
+sharedobject_close(const fn_call& fn)
+{
+    boost::intrusive_ptr<SharedObject> obj = ensureType<SharedObject>(fn.this_ptr);
+    UNUSED(obj);
+
+    LOG_ONCE(log_unimpl("SharedObject.close"));
+    return as_value();
+}
+
+as_value
+sharedobject_setFps(const fn_call& fn)
+{
+    boost::intrusive_ptr<SharedObject> obj = ensureType<SharedObject>(fn.this_ptr);
+    UNUSED(obj);
+
+    LOG_ONCE(log_unimpl("SharedObject.setFps"));
+    return as_value();
+}
+
+as_value
+sharedobject_send(const fn_call& fn)
+{
+    boost::intrusive_ptr<SharedObject> obj = ensureType<SharedObject>(fn.this_ptr);
+    UNUSED(obj);
+
+    LOG_ONCE(log_unimpl("SharedObject.send"));
     return as_value();
 }
 

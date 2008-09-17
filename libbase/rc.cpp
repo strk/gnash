@@ -183,19 +183,20 @@ RcInitFile::extractSetting(bool &var, const std::string &pattern,
 }
 
 bool
-RcInitFile::extractNumber(boost::uint32_t &num, const std::string &pattern,
-                            const std::string &variable, const std::string &value)
+RcInitFile::extractNumber(boost::uint32_t& num, const std::string& pattern,
+                            const std::string& variable, const std::string& value)
 {      
-//    GNASH_REPORT_FUNCTION;
 
     StringNoCaseEqual noCaseCompare;
 
     if ( noCaseCompare(variable, pattern) ) {
-        num = strtoul(value.c_str(), NULL, 0);
-        if (static_cast<long>(num) == std::numeric_limits<long>::max()) {
-            long long foo = strtoll(value.c_str(), NULL, 0);
-            cerr << "RcInitFile::extractNumber: conversion overflow!: " << foo << endl;
-        }
+        std::istringstream in(value);
+        if (in >> num) return true;
+        
+        // If conversion fails, set value to 0 rather than leaving
+        // it as the default.
+        cerr << _("Conversion overflow in extractNumber: ") << value << endl;
+        num = 0;
         return true;
     }
     
@@ -242,7 +243,11 @@ RcInitFile::extractDouble(double& out, const std::string &pattern,
     StringNoCaseEqual noCaseCompare;
 
     if ( noCaseCompare(variable, pattern) ) {
-        out = strtod(value.c_str(), 0);
+        std::istringstream in(value);
+        if (in >> out) return true;
+        
+        // If the assignment fails, set the double to 0.
+        out = 0;
         return true;
     }
 
@@ -680,7 +685,7 @@ RcInitFile::updateFile(const std::string& filespec)
     cmd << "flashSystemOS " << _flashSystemOS << endl <<
     cmd << "flashVersionString " << _flashVersionString << endl <<
     cmd << "urlOpenerFormat " << _urlOpenerFormat << endl <<
-    cmd << "GSTAudioSink "     << _gstaudiosink << endl <<
+    cmd << "GSTAudioSink " << _gstaudiosink << endl;
 
     // Lists. These can't be handled very well at the moment. The main
     // inconvenience would be that disabling a list makes it an empty

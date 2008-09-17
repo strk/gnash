@@ -89,9 +89,9 @@ Shm::attach(key_t key, bool /* nuke */)
 //    GNASH_REPORT_FUNCTION;
     
 #if (defined(USE_SYSV_SHM) && defined(HAVE_SHMGET)) || defined(_WIN32)
-    // this is the magic size of shared memory segments used by the other flash player;
+    // this is the magic size of shared memory segments used by the Flash player;
     _size = 64528;
-    // this is the magic shared memory key used by the other player.
+    // this is the magic shared memory key used by the Flash player.
     if (key != 0) {
 	_shmkey = key;
     }
@@ -200,9 +200,9 @@ Shm::attach(char const *filespec, bool nuke)
 #ifdef USE_SYSV_SHM
 # ifdef HAVE_SHMGET
     const int shmflg = 0660 | IPC_CREAT;
-    // this is the magic size of shared memory segments used by the other flash player;
+    // this is the magic size of shared memory segments used by the Flash player;
     _size = 64528;
-    // this is the magic shared memory key used by the other player.
+    // this is the magic shared memory key used by the Flash player.
     _shmkey = rcfile.getLCShmKey();
     // If there is no SYSV style shared memory key in the users ~/.gnashrc file, warn them
     // that compatibility will be broken, and then just pick our own key so things still work

@@ -1,5 +1,5 @@
 
-		    Gnash: the GNU Flash Player
+		    Gnash: the GNU SWF Player
 
 Gnash is a player for animated "movies" in the Macromedia Shockwave Flash
 (.swf) format.  It can be run as a graphical application, as a Web browser
@@ -9,28 +9,28 @@ it does not correctly handle every .swf file.
 This is the README file for the Gnash-0.8.3 release (or CVS snapshot).
 
 Gnash is originally based on the code of GameSWF, by Thatcher Ulrich.
-GameSWF was the most advanced among free flash movie players; it
-implemented a fairly broad set of Flash Format v7 features.  In December
-2005, Rob Savoye (then one of the GameSWF developers) forked GameSWF
-to become Gnash.  New improvements added to Gnash are copyrighted by
-the Free Software Foundation under the GNU General Public License.
-After Rob rearranged the GameSWF code into the GNU project style, he
-began development on the browser plugins.  The Free Software
-Foundation made Gnash a priority project, and many volunteers started
-contributing useful improvements.  We thank Thatcher Ulrich for the
-great start, Rob Savoye and John Gilmore for organizing the project, 
-and the Gnash volunteers for making Gnash what it is today.
+GameSWF was the most advanced among free SWF players; it implemented a
+fairly broad set of SWF Format v7 features.  In December 2005, Rob
+Savoye (then one of the GameSWF developers) forked GameSWF to become
+Gnash.  New improvements added to Gnash are copyrighted by the Free
+Software Foundation under the GNU General Public License.  After Rob
+rearranged the GameSWF code into the GNU project style, he began
+development on the browser plugins.  The Free Software Foundation made
+Gnash a priority project, and many volunteers started contributing
+useful improvements.  We thank Thatcher Ulrich for the great start,
+Rob Savoye and John Gilmore for organizing the project, and the Gnash
+volunteers for making Gnash what it is today.
 
 
-Flash Support:
+SWF Support:
 --------------
 
-Many Flash movies play fine in Gnash.  Many others do not.  In particular,
-Flash movies that are used for browser navigation may still have a few
-issues with some URLs left.  Most Flash based navigation of a web site
+Many SWF movies play fine in Gnash.  Many others do not.  In particular,
+SWF movies that are used for browser navigation may still have a few
+issues with some URLs left.  Most SWF based navigation of a web site
 should work.
 
-Gnash supports most Flash opcodes up to SWF version 7, and a wide sampling
+Gnash supports most SWF opcodes up to SWF version 7, and a wide sampling
 of ActionScript classes for SWF version 7.  All the core ones are
 implemented, and many of the newer ones work, but may be missing some of
 their methods.  All unimplemented opcodes and ActionScript classes and
@@ -46,7 +46,7 @@ Plugin:
 -------
 
 The plugin correctly installs itself into Mozilla, Firefox, or Konqueror.
-It can play some Flash files in cooperation with the browser. It
+It can play some SWF files in cooperation with the browser. It
 should work with any browser that supports the of Mozilla's NSPR API and
 plugin SDK. It has been tested with Mozilla 1.7.13 with gtk2 (won't work with
 gtk1 due to the NSAPI used), Firefox 1.0.x, Firefox 1.5.x, and Firefox 2.x.
@@ -108,7 +108,7 @@ See the generic installation instructions in the file called "INSTALL".
 
 Gnash can be configured and built in three main variations.  They
 differ in the graphics and multimedia libraries used to display
-flash files.  The three variants are configured with the options:
+SWF files.  The three variants are configured with the options:
 
    --enable-renderer=opengl
    --enable-renderer=cairo

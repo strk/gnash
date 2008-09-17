@@ -5413,8 +5413,8 @@ msgid "  -1,  --once              Exit when/if movie reaches the last frame"
 msgstr ""
 
 #: ../gui/gnash.cpp:113
-msgid "  -g,  --debugger          Turn on the Flash debugger"
-msgstr "  -g,  --debugger          Flash-Debugger einschalten"
+msgid "  -g,  --debugger          Turn on the SWF debugger"
+msgstr "  -g,  --debugger          SWF-Debugger einschalten"
 
 #: ../gui/gnash.cpp:114
 msgid "  -r,  --render-mode <0|1|2|3>"
@@ -5813,8 +5813,8 @@ msgid "Value"
 msgstr "Wert"
 
 #: ../gui/gtk.cpp:1461
-msgid "Gnash is the GNU Flash movie player based on GameSWF."
-msgstr "Gnash ist der Flash-Player von GNU, der auf GameSWF basiert."
+msgid "Gnash is the GNU SWF player based on GameSWF."
+msgstr "Gnash ist der SWF-Player von GNU, der auf GameSWF basiert."
 
 #: ../gui/gtk.cpp:1463
 msgid ""
@@ -5849,8 +5849,8 @@ msgid ""
 msgstr ""
 
 #: ../gui/gtk.cpp:1485
-msgid "GNASH flash movie player"
-msgstr "Gnash Flash-Player"
+msgid "GNASH SWF player"
+msgstr "Gnash SWF-Player"
 
 #: ../gui/gtk.cpp:1517 ../gui/gtk.cpp:1530
 msgid "Open file"
@@ -6320,14 +6320,14 @@ msgstr "Feldname ist: %s: "
 #~ "  -v          Ausführlicher Modus; d.h. Log-Meldungen nach stdout senden\n"
 
 #~ msgid ""
-#~ "  -g            Turn on the Flash debugger\n"
+#~ "  -g            Turn on the SWF debugger\n"
 #~ "  -r <0|1|2|3>\n"
 #~ "                0 disables both rendering & sound (good for batch tests)\n"
 #~ "                1 enables rendering & disables sound\n"
 #~ "                2 enables sound & disables rendering\n"
 #~ "                3 enables both rendering & sound (default)\n"
 #~ msgstr ""
-#~ "  -g          Flash-Debugger einschalten\n"
+#~ "  -g          SWF-Debugger einschalten\n"
 #~ "  -r <0|1|2|3>\n"
 #~ "              0 Rendering und Audio deaktiviert (gut für Batch-Tests)\n"
 #~ "              1 Rendering aktiviert, Audio deaktiviert\n"

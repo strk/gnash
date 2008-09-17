@@ -1065,7 +1065,7 @@ as_object::setPropFlags(const as_value& props_val, int set_false, int set_true)
 	}
 
 	boost::intrusive_ptr<as_object> props = props_val.to_object();
-	as_array_object* ary = dynamic_cast<as_array_object*>(props.get());
+	Array_as* ary = dynamic_cast<Array_as*>(props.get());
 	if ( ! ary )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -1313,19 +1313,11 @@ as_object::callMethod(string_table::key methodName,
 
 	as_environment env(_vm);
 
-#ifndef NDEBUG
-	size_t origStackSize = env.stack_size();
-#endif
-
 	std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
 	args->push_back(arg0);
 	args->push_back(arg1);
 
 	ret = call_method(method, &env, this, args);
-
-#ifndef NDEBUG
-	assert(origStackSize == env.stack_size());
-#endif
 
 	return ret;
 }
@@ -1344,20 +1336,12 @@ as_object::callMethod(string_table::key methodName,
 
 	as_environment env(_vm);
 
-#ifndef NDEBUG
-	size_t origStackSize = env.stack_size();
-#endif
-
 	std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
 	args->push_back(arg0);
 	args->push_back(arg1);
 	args->push_back(arg2);
 
 	ret = call_method(method, &env, this, args);
-
-#ifndef NDEBUG
-	assert(origStackSize == env.stack_size());
-#endif
 
 	return ret;
 }
@@ -1377,10 +1361,6 @@ as_object::callMethod(string_table::key methodName,
 
 	as_environment env(_vm);
 
-#ifndef NDEBUG
-	size_t origStackSize = env.stack_size();
-#endif
-
 	std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
 	args->push_back(arg0);
 	args->push_back(arg1);
@@ -1388,10 +1368,6 @@ as_object::callMethod(string_table::key methodName,
 	args->push_back(arg3);
 
 	ret = call_method(method, &env, this, args);
-
-#ifndef NDEBUG
-	assert(origStackSize == env.stack_size());
-#endif
 
 	return ret;
 }
@@ -1514,10 +1490,6 @@ Trigger::call(const as_value& oldval, const as_value& newval, as_object& this_ob
 	try {
 		as_environment env(VM::get()); // TODO: get VM in some other way 
 
-#ifndef NDEBUG
-		size_t origStackSize = env.stack_size();
-#endif
-
 		std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
 		args->push_back(_propname);
 		args->push_back(oldval);
@@ -1527,10 +1499,6 @@ Trigger::call(const as_value& oldval, const as_value& newval, as_object& this_ob
 		fn_call fn(const_cast<as_object*>(&this_obj), &env, args);
 
 		as_value ret = _func->call(fn);
-
-#ifndef NDEBUG
-		assert(origStackSize == env.stack_size());
-#endif
 
 		_executing = false;
 

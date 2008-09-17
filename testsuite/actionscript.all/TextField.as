@@ -23,6 +23,18 @@
 rcsid="$Id: TextField.as,v 1.56 2008/06/05 03:26:32 zoulunkai Exp $";
 #include "check.as"
 
+printBounds = function(b)
+{
+    var s = '';
+    s += "xmin:"+b.xMin;
+    s += " ymin:"+b.yMin;
+    s += " xmax:"+b.xMax;
+    s += " ymax:"+b.yMax;
+    return s;
+};
+
+TextField.prototype.getBounds = MovieClip.prototype.getBounds;
+
 #if OUTPUT_VERSION > 5
 
 check_equals(typeof(TextField), 'function');
@@ -101,6 +113,7 @@ check_equals(typeof(tfObj.removeTextField), 'function');
 check_equals(typeof(tfObj.replaceSel), 'function');
 // this is a static method, it's available as TextField.getFontList
 check_equals(typeof(tfObj.getFontList), 'undefined');
+check_equals(typeof(tfObj._parent), 'undefined'); // no parent
 
 //--------------------------------------------------
 // Check textfield creation trough createTextField
@@ -679,6 +692,21 @@ check( ! tf.__proto__.hasOwnProperty('_width') );
 check_equals(tf._width, 500); // as it was set by createTextField, see above
 tf._width = 99999;
 check_equals(tf._width, 99999); 
+b = tf.getBounds(_root); bs = printBounds(b);
+check_equals(bs, 'xmin:10 ymin:10 xmax:100009 ymax:510');
+tf.autoSize = false;
+tf.text = 'small'; // doesn't reset bounds (being autoSize false);
+check_equals(tf._width, 99999); 
+b = tf.getBounds(_root); bs = printBounds(b);
+check_equals(bs, 'xmin:10 ymin:10 xmax:100009 ymax:510');
+
+tf.autoSize = true; // changes width !!
+check(tf._width < 99999); 
+ow = tf._width;
+
+tf.autoSize = false;  // doesn't reset to last manually set one
+check_equals(tf._width, ow);
+
 tf._width = 500;
 
 //-------------------------------------------------------------------------
@@ -792,9 +820,9 @@ note("After reducing _width: textWidth: "+tf.textWidth+" origTextWidth:"+origTex
 check_equals(tf._width, 10);
 
 #if OUTPUT_VERSION < 8
- check_equals(origTextWidth, tf.textWidth); 
+ xcheck_equals(origTextWidth, tf.textWidth); 
 #else
- xcheck(origTextWidth > tf.textWidth); 
+ check(origTextWidth > tf.textWidth); 
 #endif
 
 // test that adding a newline doesn't change the bounds width
@@ -896,9 +924,9 @@ _root._xscale = _root._yscale = 100;
 //------------------------------------------------------------
 
 #if OUTPUT_VERSION < 8
- check_totals(415);
+ check_totals(421);
 #else
- check_totals(416);
+ check_totals(422);
 #endif
 
 #else // OUTPUT_VERSION <= 5

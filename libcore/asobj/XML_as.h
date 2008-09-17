@@ -24,6 +24,7 @@
 #include "xmlnode.h"
 #include "log.h"
 #include "dsodefs.h"
+#include "NetworkAdapter.h"
 
 #include <vector>
 #include <sstream>
@@ -41,7 +42,7 @@ class URL;
 class LoaderThread;
 
 /// XML class and ActionScript object
-class XML : public XMLNode
+class XML_as : public XMLNode
 {
 public:
 
@@ -80,9 +81,9 @@ public:
     } Status;
 
 
-    XML();
-    XML(const std::string& xml_in);
-    ~XML();
+    XML_as();
+    XML_as(const std::string& xml_in);
+    ~XML_as();
   
     /// This is overridden to provide the 'status' and 'loaded' members,
     /// which are NOT proper properties !
@@ -131,12 +132,9 @@ public:
     
     XMLNode *processNode(xmlTextReaderPtr reader, XMLNode *node);
 
-    void  change_stack_frame(int frame, gnash::as_object *xml, gnash::as_environment *env);
+    void change_stack_frame(int frame, gnash::as_object *xml, gnash::as_environment *env);
 
-    void  cleanupStackFrames( XMLNode *data);
-
-    // These 6 have to 
-    void addRequestHeader(const char *name, const char *value);
+    void cleanupStackFrames( XMLNode *data);
 
     XMLNode *createElement(const char *name);
 
@@ -144,7 +142,8 @@ public:
 
     void send();
 
-    bool sendAndLoad(const URL& url, XML& target);
+    /// ActionScript doesn't care about the success of the connection.
+    void sendAndLoad(const URL& url, as_object& target);
 
     /// @return -1 if no loaded was started yet
     long int getBytesLoaded() const;
@@ -182,7 +181,7 @@ private:
     //  1 if successfully loaded
     int _loaded;
 
-    Status      _status;	
+    Status _status;	
 
     /// Initialize an XMLNode from an xmlNodePtr
     //
@@ -222,6 +221,7 @@ private:
 
     long int _bytesTotal;
     long int _bytesLoaded;
+    
 };
 
 
@@ -236,7 +236,7 @@ DSOEXPORT int memadjust(int x);
 
 }	// end namespace gnash
 
-#endif	// __XML_H__
+#endif
 
 
 // Local Variables:

@@ -3047,10 +3047,6 @@ SWFHandlers::ActionNewAdd(ActionExec& thread)
     //GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
 
-#ifndef NDEBUG
-    size_t stackSize = env.stack_size();
-#endif
-
     as_value v1 = env.top(0);
     as_value v2 = env.top(1);
 
@@ -3067,8 +3063,6 @@ SWFHandlers::ActionNewAdd(ActionExec& thread)
         log_debug("%s.to_primitive() threw an error during ActionNewAdd",
             env.top(1));
     }
-
-    assert( stackSize == env.stack_size() );
 
 #if GNASH_DEBUG
     log_debug(_("ActionNewAdd(%s, %s) [primitive conversion done]"),

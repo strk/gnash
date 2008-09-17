@@ -85,7 +85,8 @@ main(int argc, char** argv)
 	Ming_init();
 	mo = newSWFMovieWithVersion(OUTPUT_VERSION);
 	SWFMovie_setDimension(mo, 800, 600);
-	SWFMovie_setRate (mo, 2);
+	//SWFMovie_setRate (mo, 2);
+	SWFMovie_setRate (mo, 12);
 
 	dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
 	SWFMovie_add(mo, (SWFBlock)dejagnuclip);
@@ -108,6 +109,21 @@ main(int argc, char** argv)
 	check_equals(mo, "staticmc._width", "60.1");
 	check_equals(mo, "staticmc._height", "60.1");
 
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'19.95,269.95 80.05,330.05'");
+
+	// X:  19.95 ..  80.05
+	// Y: 269.95 .. 330.05
+
+	check(mo, "staticmc.hitTest(21, 270, false)");  // top-left
+	check(mo, "staticmc.hitTest(79, 270, false)");  // top-right
+	check(mo, "staticmc.hitTest(21, 329, false)");  // bottom-left
+	check(mo, "staticmc.hitTest(79, 329, false)");  // bottom-right
+
+	check(mo, "!staticmc.hitTest(18, 300, false)");  // overleft
+	check(mo, "!staticmc.hitTest(82, 300, false)");  // overright
+	check(mo, "!staticmc.hitTest(50, 260, false)");  // overup
+	check(mo, "!staticmc.hitTest(50, 331, false)");  // overdown
+
 	SWFMovie_nextFrame(mo);        
 
 	SWFDisplayItem_rotateTo(it, -45);
@@ -121,6 +137,20 @@ main(int argc, char** argv)
 	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'7.5,257.5 92.5,342.5'");
 	check_equals(mo, "staticmc._width", "85");
 	check_equals(mo, "staticmc._height", "85");
+
+	// X:   7.5  ..  92.5 
+	// Y: 257.5  .. 342.5
+
+	check(mo, "staticmc.hitTest(8, 258, false)");   // top-left
+	check(mo, "staticmc.hitTest(90, 258, false)");  // top-right
+	check(mo, "staticmc.hitTest(8, 340, false)");   // bottom-left
+	check(mo, "staticmc.hitTest(90, 340, false)");  // bottom-right
+
+	check(mo, "!staticmc.hitTest(6, 300, false)");   // overleft
+	check(mo, "!staticmc.hitTest(95, 300, false)");  // overright
+	check(mo, "!staticmc.hitTest(50, 250, false)");  // overup
+	check(mo, "!staticmc.hitTest(50, 345, false)");  // overdown
+
 
 	SWFMovie_nextFrame(mo);        
 
@@ -136,6 +166,19 @@ main(int argc, char** argv)
 	check_equals(mo, "staticmc._width", "212.5");
 	check_equals(mo, "staticmc._height", "212.5");
 
+	// X: -56.25  156.25
+	// Y: 193.75  406.25
+
+	check(mo, "staticmc.hitTest(-56, 194, false)");   // top-left
+	check(mo, "staticmc.hitTest(156, 194, false)");  // top-right
+	check(mo, "staticmc.hitTest(-56, 406, false)");   // bottom-left
+	check(mo, "staticmc.hitTest(156, 406, false)");  // bottom-right
+
+	check(mo, "!staticmc.hitTest(-57, 300, false)");   // overleft
+	check(mo, "!staticmc.hitTest(157, 300, false)");  // overright
+	check(mo, "!staticmc.hitTest(50, 193, false)");  // overup
+	check(mo, "!staticmc.hitTest(50, 407, false)");  // overdown
+
 	SWFMovie_nextFrame(mo);        
 
 	SWFDisplayItem_skewXTo(it, 2);
@@ -149,6 +192,19 @@ main(int argc, char** argv)
 	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'-141.25,193.75 241.25,406.25'");
 	check_equals(mo, "staticmc._width", "382.5");
 	check_equals(mo, "staticmc._height", "212.5");
+
+	// X: -141.25  241.25
+	// Y:  193.75  406.25
+
+	check(mo, "staticmc.hitTest(-141, 194, false)");   // top-left
+	check(mo, "staticmc.hitTest(241, 194, false)");  // top-right
+	check(mo, "staticmc.hitTest(-141, 406, false)");   // bottom-left
+	check(mo, "staticmc.hitTest(241, 406, false)");  // bottom-right
+
+	check(mo, "!staticmc.hitTest(-142, 300, false)");   // overleft
+	check(mo, "!staticmc.hitTest(242, 300, false)");  // overright
+	check(mo, "!staticmc.hitTest(50, 193, false)");  // overup
+	check(mo, "!staticmc.hitTest(50, 407, false)");  // overdown
 
 	SWFMovie_nextFrame(mo);        
 
@@ -164,6 +220,19 @@ main(int argc, char** argv)
 	check_equals(mo, "staticmc._width", "382.5");
 	check_equals(mo, "staticmc._height", "212.5");
 
+	// X: -141.25  241.25
+	// Y:  193.75  406.25
+
+	check(mo, "staticmc.hitTest(-141, 194, false)");   // top-left
+	check(mo, "staticmc.hitTest(241, 194, false)");  // top-right
+	check(mo, "staticmc.hitTest(-141, 406, false)");   // bottom-left
+	check(mo, "staticmc.hitTest(241, 406, false)");  // bottom-right
+
+	check(mo, "!staticmc.hitTest(-142, 300, false)");   // overleft
+	check(mo, "!staticmc.hitTest(242, 300, false)");  // overright
+	check(mo, "!staticmc.hitTest(50, 193, false)");  // overup
+	check(mo, "!staticmc.hitTest(50, 407, false)");  // overdown
+
 	SWFMovie_nextFrame(mo);        
 
 	SWFDisplayItem_skewXTo(it, 0);
@@ -178,6 +247,20 @@ main(int argc, char** argv)
 	check_equals(mo, "staticmc._width", "212.5");
 	check_equals(mo, "staticmc._height", "212.5");
 
+	// X: -56.25  156.25
+	// Y:  193.75  406.25
+
+	check(mo, "staticmc.hitTest(-56, 194, false)");   // top-left
+	check(mo, "staticmc.hitTest(156, 194, false)");  // top-right
+	check(mo, "staticmc.hitTest(-56, 406, false)");   // bottom-left
+	check(mo, "staticmc.hitTest(156, 406, false)");  // bottom-right
+
+	check(mo, "!staticmc.hitTest(-57, 300, false)");   // overleft
+	check(mo, "!staticmc.hitTest(157, 300, false)");  // overright
+	check(mo, "!staticmc.hitTest(50, 193, false)");  // overup
+	check(mo, "!staticmc.hitTest(50, 407, false)");  // overdown
+
+
 	SWFMovie_nextFrame(mo);        
 
 	SWFDisplayItem_scaleTo(it, -2, 2);
@@ -191,6 +274,19 @@ main(int argc, char** argv)
 	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'-35,215 135,385'");
 	check_equals(mo, "staticmc._width", "170");
 	check_equals(mo, "staticmc._height", "170");
+
+	// X:  -35     135   
+	// Y:  215     385
+
+	check(mo, "staticmc.hitTest(-34, 216, false)");   // top-left
+	check(mo, "staticmc.hitTest(134, 216, false)");  // top-right
+	check(mo, "staticmc.hitTest(-34, 384, false)");   // bottom-left
+	check(mo, "staticmc.hitTest(134, 384, false)");  // bottom-right
+
+	check(mo, "!staticmc.hitTest(-36, 300, false)");   // overleft
+	check(mo, "!staticmc.hitTest(136, 300, false)");  // overright
+	check(mo, "!staticmc.hitTest(50, 214, false)");  // overup
+	check(mo, "!staticmc.hitTest(50, 386, false)");  // overdown
 
 	SWFMovie_nextFrame(mo);        
 
@@ -207,6 +303,19 @@ main(int argc, char** argv)
 	check_equals(mo, "staticmc._width", "170");
 	check_equals(mo, "staticmc._height", "85");
 
+	// X:  -35     135   
+	// Y:  257.5   342.5
+
+	check(mo, "staticmc.hitTest(-34, 258, false)");   // top-left
+	check(mo, "staticmc.hitTest(134, 258, false)");  // top-right
+	check(mo, "staticmc.hitTest(-34, 342, false)");   // bottom-left
+	check(mo, "staticmc.hitTest(134, 342, false)");  // bottom-right
+
+	check(mo, "!staticmc.hitTest(-36, 300, false)");   // overleft
+	check(mo, "!staticmc.hitTest(136, 300, false)");  // overright
+	check(mo, "!staticmc.hitTest(50, 257, false)");  // overup
+	check(mo, "!staticmc.hitTest(50, 343, false)");  // overdown
+
 	SWFMovie_nextFrame(mo);        
 	SWFDisplayItem_setMatrix(it, 1, 0, 0, 1, 50, 300); // reset to near-identity
 
@@ -219,6 +328,19 @@ main(int argc, char** argv)
 	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'19.95,269.95 80.05,330.05'");
 	check_equals(mo, "staticmc._width", "60.1");
 	check_equals(mo, "staticmc._height", "60.1");
+
+	// X:   19.95   80.05
+	// Y:  269.95  330.05
+
+	check(mo, "staticmc.hitTest(20, 270, false)");   // top-left
+	check(mo, "staticmc.hitTest(80, 270, false)");  // top-right
+	check(mo, "staticmc.hitTest(20, 330, false)");   // bottom-left
+	check(mo, "staticmc.hitTest(80, 330, false)");  // bottom-right
+
+	check(mo, "!staticmc.hitTest(19, 300, false)");   // overleft
+	check(mo, "!staticmc.hitTest(81, 300, false)");  // overright
+	check(mo, "!staticmc.hitTest(50, 269, false)");  // overup
+	check(mo, "!staticmc.hitTest(50, 331, false)");  // overdown
 
 	SWFMovie_nextFrame(mo);        
 	SWFDisplayItem_setMatrix(it, -1, 0, 0, 1, 50, 300); // negative x scale gets interpreted as 180 degrees rotation
@@ -233,6 +355,19 @@ main(int argc, char** argv)
 	check_equals(mo, "staticmc._width", "60.1");
 	check_equals(mo, "staticmc._height", "60.1");
 
+	// X:   19.95   80.05
+	// Y:  269.95  330.05
+
+	check(mo, "staticmc.hitTest(20, 270, false)");   // top-left
+	check(mo, "staticmc.hitTest(80, 270, false)");  // top-right
+	check(mo, "staticmc.hitTest(20, 330, false)");   // bottom-left
+	check(mo, "staticmc.hitTest(80, 330, false)");  // bottom-right
+
+	check(mo, "!staticmc.hitTest(19, 300, false)");   // overleft
+	check(mo, "!staticmc.hitTest(81, 300, false)");  // overright
+	check(mo, "!staticmc.hitTest(50, 269, false)");  // overup
+	check(mo, "!staticmc.hitTest(50, 331, false)");  // overdown
+
 	SWFMovie_nextFrame(mo);        
 	SWFDisplayItem_setMatrix(it, 1, 0, 0, -1, 50, 300); // negative y scale (discarded ?)
 
@@ -245,6 +380,19 @@ main(int argc, char** argv)
 	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'19.95,269.95 80.05,330.05'");
 	check_equals(mo, "staticmc._width", "60.1");
 	check_equals(mo, "staticmc._height", "60.1");
+
+	// X:   19.95   80.05
+	// Y:  269.95  330.05
+
+	check(mo, "staticmc.hitTest(20, 270, false)");   // top-left
+	check(mo, "staticmc.hitTest(80, 270, false)");  // top-right
+	check(mo, "staticmc.hitTest(20, 330, false)");   // bottom-left
+	check(mo, "staticmc.hitTest(80, 330, false)");  // bottom-right
+
+	check(mo, "!staticmc.hitTest(19, 300, false)");   // overleft
+	check(mo, "!staticmc.hitTest(81, 300, false)");  // overright
+	check(mo, "!staticmc.hitTest(50, 269, false)");  // overup
+	check(mo, "!staticmc.hitTest(50, 331, false)");  // overdown
 
 	SWFMovie_nextFrame(mo);        
 	SWFDisplayItem_setMatrix(it, -1, 0, 0, -1, 50, 300); // negative x and y scales
@@ -259,6 +407,338 @@ main(int argc, char** argv)
 	check_equals(mo, "staticmc._width", "60.1");
 	check_equals(mo, "staticmc._height", "60.1");
 
+	// X:   19.95   80.05
+	// Y:  269.95  330.05
+
+	check(mo, "staticmc.hitTest(20, 270, false)");   // top-left
+	check(mo, "staticmc.hitTest(80, 270, false)");  // top-right
+	check(mo, "staticmc.hitTest(20, 330, false)");   // bottom-left
+	check(mo, "staticmc.hitTest(80, 330, false)");  // bottom-right
+
+	check(mo, "!staticmc.hitTest(19, 300, false)");   // overleft
+	check(mo, "!staticmc.hitTest(81, 300, false)");  // overright
+	check(mo, "!staticmc.hitTest(50, 269, false)");  // overup
+	check(mo, "!staticmc.hitTest(50, 331, false)");  // overdown
+
+	SWFMovie_nextFrame(mo);        
+	SWFDisplayItem_setMatrix(it, -1, -45, 0, 1, 50, 300); // negative x scale and some negative skew
+
+	check_equals(mo, "staticmc._x", "50");
+	check_equals(mo, "staticmc._y", "300");
+	check_equals(mo, "Math.round(staticmc._xscale)", "4501"); // let's tollerate precision for now
+	check_equals(mo, "staticmc._yscale", "100");
+	check_equals(mo, "Math.round(staticmc._rotation)", "-91");  // let's tollerate precision for now
+	check_equals(mo, "printBounds(staticmc.getBounds())", "'-30.05,-30.05 30.05,30.05'");
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'19.95,-1082.3 80.05,1682.3'");
+	check_equals(mo, "staticmc._width", "60.1");
+	check_equals(mo, "staticmc._height", "2764.6");
+
+	// X:    19.95   80.05
+	// Y: -1082.3  1682.3
+
+	check(mo, "staticmc.hitTest(20, -1082, false)");   // top-left
+	check(mo, "staticmc.hitTest(80, -1082, false)");  // top-right
+	check(mo, "staticmc.hitTest(20, 1682, false)");   // bottom-left
+	check(mo, "staticmc.hitTest(80, 1682, false)");  // bottom-right
+
+	check(mo, "!staticmc.hitTest(19, 0, false)");   // overleft
+	check(mo, "!staticmc.hitTest(81, 0, false)");  // overright
+	check(mo, "!staticmc.hitTest(50, -1083, false)");  // overup
+	check(mo, "!staticmc.hitTest(50, 1683, false)");  // overdown
+
+	SWFMovie_nextFrame(mo);        
+	SWFDisplayItem_setMatrix(it, -1, 45, 0, 1, 50, 300); // negative x scale and some positive skew
+
+	check_equals(mo, "staticmc._x", "50");
+	check_equals(mo, "staticmc._y", "300");
+	check_equals(mo, "Math.round(staticmc._xscale)", "4501"); // let's tollerate precision for now
+	check_equals(mo, "staticmc._yscale", "100");
+	check_equals(mo, "Math.round(staticmc._rotation)", "91");  // let's tollerate precision for now
+	check_equals(mo, "printBounds(staticmc.getBounds())", "'-30.05,-30.05 30.05,30.05'");
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'19.95,-1082.3 80.05,1682.3'");
+	check_equals(mo, "staticmc._width", "60.1");
+	check_equals(mo, "staticmc._height", "2764.6");
+
+	// X:    19.95   80.05
+	// Y: -1082.3  1682.3
+
+	check(mo, "staticmc.hitTest(20, -1082, false)");   // top-left
+	check(mo, "staticmc.hitTest(80, -1082, false)");  // top-right
+	check(mo, "staticmc.hitTest(20, 1682, false)");   // bottom-left
+	check(mo, "staticmc.hitTest(80, 1682, false)");  // bottom-right
+
+	check(mo, "!staticmc.hitTest(19, 0, false)");   // overleft
+	check(mo, "!staticmc.hitTest(81, 0, false)");  // overright
+	check(mo, "!staticmc.hitTest(50, -1083, false)");  // overup
+	check(mo, "!staticmc.hitTest(50, 1683, false)");  // overdown
+
+	SWFMovie_nextFrame(mo);        
+	SWFDisplayItem_setMatrix(it, 1, -45, 0, -1, 50, 300); // negative x scale and some negative skew
+
+	check_equals(mo, "staticmc._x", "50");
+	check_equals(mo, "staticmc._y", "300");
+	check_equals(mo, "Math.round(staticmc._xscale)", "4501"); // let's tollerate precision for now
+	check_equals(mo, "staticmc._yscale", "100");
+	check_equals(mo, "Math.round(staticmc._rotation)", "-89");  // let's tollerate precision for now
+	check_equals(mo, "printBounds(staticmc.getBounds())", "'-30.05,-30.05 30.05,30.05'");
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'19.95,-1082.3 80.05,1682.3'");
+	check_equals(mo, "staticmc._width", "60.1");
+	check_equals(mo, "staticmc._height", "2764.6");
+
+	// X:    19.95   80.05
+	// Y: -1082.3  1682.3
+
+	check(mo, "staticmc.hitTest(20, -1082, false)");   // top-left
+	check(mo, "staticmc.hitTest(80, -1082, false)");  // top-right
+	check(mo, "staticmc.hitTest(20, 1682, false)");   // bottom-left
+	check(mo, "staticmc.hitTest(80, 1682, false)");  // bottom-right
+
+	check(mo, "!staticmc.hitTest(19, 0, false)");   // overleft
+	check(mo, "!staticmc.hitTest(81, 0, false)");  // overright
+	check(mo, "!staticmc.hitTest(50, -1083, false)");  // overup
+	check(mo, "!staticmc.hitTest(50, 1683, false)");  // overdown
+
+	SWFMovie_nextFrame(mo);        
+	SWFDisplayItem_setMatrix(it, 1, 45, 0, -1, 50, 300); // negative x scale and some positive skew
+
+	check_equals(mo, "staticmc._x", "50");
+	check_equals(mo, "staticmc._y", "300");
+	check_equals(mo, "Math.round(staticmc._xscale)", "4501"); // let's tollerate precision for now
+	check_equals(mo, "staticmc._yscale", "100");
+	check_equals(mo, "Math.round(staticmc._rotation)", "89");  // let's tollerate precision for now
+	check_equals(mo, "printBounds(staticmc.getBounds())", "'-30.05,-30.05 30.05,30.05'");
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'19.95,-1082.3 80.05,1682.3'");
+	check_equals(mo, "staticmc._width", "60.1");
+	check_equals(mo, "staticmc._height", "2764.6");
+
+	// X:    19.95   80.05
+	// Y: -1082.3  1682.3
+
+	check(mo, "staticmc.hitTest(20, -1082, false)");   // top-left
+	check(mo, "staticmc.hitTest(80, -1082, false)");  // top-right
+	check(mo, "staticmc.hitTest(20, 1682, false)");   // bottom-left
+	check(mo, "staticmc.hitTest(80, 1682, false)");  // bottom-right
+
+	check(mo, "!staticmc.hitTest(19, 0, false)");   // overleft
+	check(mo, "!staticmc.hitTest(81, 0, false)");  // overright
+	check(mo, "!staticmc.hitTest(50, -1083, false)");  // overup
+	check(mo, "!staticmc.hitTest(50, 1683, false)");  // overdown
+
+	SWFMovie_nextFrame(mo);        
+	SWFDisplayItem_setMatrix(it, -1, 45, 0, -1, 50, 300); // negative x scale and some positive skew
+
+	check_equals(mo, "staticmc._x", "50");
+	check_equals(mo, "staticmc._y", "300");
+	check_equals(mo, "Math.round(staticmc._xscale)", "4501"); // let's tollerate precision for now
+	check_equals(mo, "staticmc._yscale", "100");
+	check_equals(mo, "Math.round(staticmc._rotation)", "91");  // let's tollerate precision for now
+	check_equals(mo, "printBounds(staticmc.getBounds())", "'-30.05,-30.05 30.05,30.05'");
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'19.95,-1082.3 80.05,1682.3'");
+	check_equals(mo, "staticmc._width", "60.1");
+	check_equals(mo, "staticmc._height", "2764.6");
+
+	// X:    19.95   80.05
+	// Y: -1082.3  1682.3
+
+	check(mo, "staticmc.hitTest(20, -1082, false)");   // top-left
+	check(mo, "staticmc.hitTest(80, -1082, false)");  // top-right
+	check(mo, "staticmc.hitTest(20, 1682, false)");   // bottom-left
+	check(mo, "staticmc.hitTest(80, 1682, false)");  // bottom-right
+
+	check(mo, "!staticmc.hitTest(19, 0, false)");   // overleft
+	check(mo, "!staticmc.hitTest(81, 0, false)");  // overright
+	check(mo, "!staticmc.hitTest(50, -1083, false)");  // overup
+	check(mo, "!staticmc.hitTest(50, 1683, false)");  // overdown
+
+	SWFMovie_nextFrame(mo);        
+	SWFDisplayItem_setMatrix(it, -1, -45, 0, -1, 50, 300); // negative x scale and some positive skew
+
+	check_equals(mo, "staticmc._x", "50");
+	check_equals(mo, "staticmc._y", "300");
+	check_equals(mo, "Math.round(staticmc._xscale)", "4501"); // let's tollerate precision for now
+	check_equals(mo, "staticmc._yscale", "100");
+	check_equals(mo, "Math.round(staticmc._rotation)", "-91");  // let's tollerate precision for now
+	check_equals(mo, "printBounds(staticmc.getBounds())", "'-30.05,-30.05 30.05,30.05'");
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'19.95,-1082.3 80.05,1682.3'");
+	check_equals(mo, "staticmc._width", "60.1");
+	check_equals(mo, "staticmc._height", "2764.6");
+
+	// X:    19.95   80.05
+	// Y: -1082.3  1682.3
+
+	check(mo, "staticmc.hitTest(20, -1082, false)");   // top-left
+	check(mo, "staticmc.hitTest(80, -1082, false)");  // top-right
+	check(mo, "staticmc.hitTest(20, 1682, false)");   // bottom-left
+	check(mo, "staticmc.hitTest(80, 1682, false)");  // bottom-right
+
+	check(mo, "!staticmc.hitTest(19, 0, false)");   // overleft
+	check(mo, "!staticmc.hitTest(81, 0, false)");  // overright
+	check(mo, "!staticmc.hitTest(50, -1083, false)");  // overup
+	check(mo, "!staticmc.hitTest(50, 1683, false)");  // overdown
+
+
+	SWFMovie_nextFrame(mo);        
+	SWFDisplayItem_setMatrix(it, -1, 0, -45, 1, 50, 300); // negative x scale and some negative skew
+
+	check_equals(mo, "staticmc._x", "50");
+	check_equals(mo, "staticmc._y", "300");
+	check_equals(mo, "staticmc._xscale", "100");
+	check_equals(mo, "Math.round(staticmc._yscale)", "4501"); // let's tollerate precision for now
+	check_equals(mo, "staticmc._rotation", "180");  
+	check_equals(mo, "printBounds(staticmc.getBounds())", "'-30.05,-30.05 30.05,30.05'");
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'-1332.3,269.95 1432.3,330.05'");
+	check_equals(mo, "staticmc._width", "2764.6");
+	check_equals(mo, "staticmc._height", "60.1");
+
+	// X: -1332.3  1432.3 
+	// Y:   269.95  330.05
+
+	check(mo, "staticmc.hitTest(-1332, 270, false)");   // top-left
+	check(mo, "staticmc.hitTest(1432, 270, false)");  // top-right
+	check(mo, "staticmc.hitTest(-1332, 330, false)");   // bottom-left
+	check(mo, "staticmc.hitTest(1432, 330, false)");  // bottom-right
+
+	check(mo, "!staticmc.hitTest(-1333, 300, false)");   // overleft
+	check(mo, "!staticmc.hitTest(1433, 300, false)");  // overright
+	check(mo, "!staticmc.hitTest(0, 269, false)");  // overup
+	check(mo, "!staticmc.hitTest(0, 331, false)");  // overdown
+
+
+	SWFMovie_nextFrame(mo);        
+	SWFDisplayItem_setMatrix(it, -1, 0, 45, 1, 50, 300); // negative x scale and some positive skew
+
+	check_equals(mo, "staticmc._x", "50");
+	check_equals(mo, "staticmc._y", "300");
+	check_equals(mo, "staticmc._xscale", "100");
+	check_equals(mo, "Math.round(staticmc._yscale)", "4501"); // let's tollerate precision for now
+	check_equals(mo, "staticmc._rotation", "180");  
+	check_equals(mo, "printBounds(staticmc.getBounds())", "'-30.05,-30.05 30.05,30.05'");
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'-1332.3,269.95 1432.3,330.05'");
+	check_equals(mo, "staticmc._width", "2764.6");
+	check_equals(mo, "staticmc._height", "60.1");
+
+	// X: -1332.3  1432.3 
+	// Y:   269.95  330.05
+
+	check(mo, "staticmc.hitTest(-1332, 270, false)");   // top-left
+	check(mo, "staticmc.hitTest(1432, 270, false)");  // top-right
+	check(mo, "staticmc.hitTest(-1332, 330, false)");   // bottom-left
+	check(mo, "staticmc.hitTest(1432, 330, false)");  // bottom-right
+
+	check(mo, "!staticmc.hitTest(-1333, 300, false)");   // overleft
+	check(mo, "!staticmc.hitTest(1433, 300, false)");  // overright
+	check(mo, "!staticmc.hitTest(0, 269, false)");  // overup
+	check(mo, "!staticmc.hitTest(0, 331, false)");  // overdown
+
+
+	SWFMovie_nextFrame(mo);        
+	SWFDisplayItem_setMatrix(it, 1, 0, -45, -1, 50, 300); // negative x scale and some negative skew
+
+	check_equals(mo, "staticmc._x", "50");
+	check_equals(mo, "staticmc._y", "300");
+	check_equals(mo, "staticmc._xscale", "100");
+	check_equals(mo, "Math.round(staticmc._yscale)", "4501"); // let's tollerate precision for now
+	check_equals(mo, "staticmc._rotation", "0");  
+	check_equals(mo, "printBounds(staticmc.getBounds())", "'-30.05,-30.05 30.05,30.05'");
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'-1332.3,269.95 1432.3,330.05'");
+	check_equals(mo, "staticmc._width", "2764.6");
+	check_equals(mo, "staticmc._height", "60.1");
+
+	// X: -1332.3  1432.3 
+	// Y:   269.95  330.05
+
+	check(mo, "staticmc.hitTest(-1332, 270, false)");   // top-left
+	check(mo, "staticmc.hitTest(1432, 270, false)");  // top-right
+	check(mo, "staticmc.hitTest(-1332, 330, false)");   // bottom-left
+	check(mo, "staticmc.hitTest(1432, 330, false)");  // bottom-right
+
+	check(mo, "!staticmc.hitTest(-1333, 300, false)");   // overleft
+	check(mo, "!staticmc.hitTest(1433, 300, false)");  // overright
+	check(mo, "!staticmc.hitTest(0, 269, false)");  // overup
+	check(mo, "!staticmc.hitTest(0, 331, false)");  // overdown
+
+
+	SWFMovie_nextFrame(mo);        
+	SWFDisplayItem_setMatrix(it, 1, 0, 45, -1, 50, 300); // negative x scale and some positive skew
+
+	check_equals(mo, "staticmc._x", "50");
+	check_equals(mo, "staticmc._y", "300");
+	check_equals(mo, "staticmc._xscale", "100");
+	check_equals(mo, "Math.round(staticmc._yscale)", "4501"); // let's tollerate precision for now
+	check_equals(mo, "staticmc._rotation", "0");  
+	check_equals(mo, "printBounds(staticmc.getBounds())", "'-30.05,-30.05 30.05,30.05'");
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'-1332.3,269.95 1432.3,330.05'");
+	check_equals(mo, "staticmc._width", "2764.6");
+	check_equals(mo, "staticmc._height", "60.1");
+
+	// X: -1332.3  1432.3 
+	// Y:   269.95  330.05
+
+	check(mo, "staticmc.hitTest(-1332, 270, false)");   // top-left
+	check(mo, "staticmc.hitTest(1432, 270, false)");  // top-right
+	check(mo, "staticmc.hitTest(-1332, 330, false)");   // bottom-left
+	check(mo, "staticmc.hitTest(1432, 330, false)");  // bottom-right
+
+	check(mo, "!staticmc.hitTest(-1333, 300, false)");   // overleft
+	check(mo, "!staticmc.hitTest(1433, 300, false)");  // overright
+	check(mo, "!staticmc.hitTest(0, 269, false)");  // overup
+	check(mo, "!staticmc.hitTest(0, 331, false)");  // overdown
+
+
+	SWFMovie_nextFrame(mo);        
+	SWFDisplayItem_setMatrix(it, -1, 0, 45, -1, 50, 300); // negative x scale and some positive skew
+
+	check_equals(mo, "staticmc._x", "50");
+	check_equals(mo, "staticmc._y", "300");
+	check_equals(mo, "staticmc._xscale", "100");
+	check_equals(mo, "Math.round(staticmc._yscale)", "4501"); // let's tollerate precision for now
+	check_equals(mo, "staticmc._rotation", "180");  
+	check_equals(mo, "printBounds(staticmc.getBounds())", "'-30.05,-30.05 30.05,30.05'");
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'-1332.3,269.95 1432.3,330.05'");
+	check_equals(mo, "staticmc._width", "2764.6");
+	check_equals(mo, "staticmc._height", "60.1");
+
+	// X: -1332.3  1432.3 
+	// Y:   269.95  330.05
+
+	check(mo, "staticmc.hitTest(-1332, 270, false)");   // top-left
+	check(mo, "staticmc.hitTest(1432, 270, false)");  // top-right
+	check(mo, "staticmc.hitTest(-1332, 330, false)");   // bottom-left
+	check(mo, "staticmc.hitTest(1432, 330, false)");  // bottom-right
+
+	check(mo, "!staticmc.hitTest(-1333, 300, false)");   // overleft
+	check(mo, "!staticmc.hitTest(1433, 300, false)");  // overright
+	check(mo, "!staticmc.hitTest(0, 269, false)");  // overup
+	check(mo, "!staticmc.hitTest(0, 331, false)");  // overdown
+
+
+	SWFMovie_nextFrame(mo);        
+	SWFDisplayItem_setMatrix(it, -1, 0, -45, -1, 50, 300); // negative x scale and some positive skew
+
+	check_equals(mo, "staticmc._x", "50");
+	check_equals(mo, "staticmc._y", "300");
+	check_equals(mo, "staticmc._xscale", "100");
+	check_equals(mo, "Math.round(staticmc._yscale)", "4501"); // let's tollerate precision for now
+	check_equals(mo, "staticmc._rotation", "180");  
+	check_equals(mo, "printBounds(staticmc.getBounds())", "'-30.05,-30.05 30.05,30.05'");
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'-1332.3,269.95 1432.3,330.05'");
+	check_equals(mo, "staticmc._width", "2764.6");
+	check_equals(mo, "staticmc._height", "60.1");
+
+	// X: -1332.3  1432.3 
+	// Y:   269.95  330.05
+
+	check(mo, "staticmc.hitTest(-1332, 270, false)");   // top-left
+	check(mo, "staticmc.hitTest(1432, 270, false)");  // top-right
+	check(mo, "staticmc.hitTest(-1332, 330, false)");   // bottom-left
+	check(mo, "staticmc.hitTest(1432, 330, false)");  // bottom-right
+
+	check(mo, "!staticmc.hitTest(-1333, 300, false)");   // overleft
+	check(mo, "!staticmc.hitTest(1433, 300, false)");  // overright
+	check(mo, "!staticmc.hitTest(0, 269, false)");  // overup
+	check(mo, "!staticmc.hitTest(0, 331, false)");  // overdown
+
+
 
 	// TODO:
 	// - test more rotations and scales (corner cases too!)
@@ -266,7 +746,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);
 
-	add_actions(mo, "_root.totals(107); stop();");
+	add_actions(mo, "_root.totals(408); stop();");
 	SWFMovie_nextFrame(mo);        
 
 	//Output movie

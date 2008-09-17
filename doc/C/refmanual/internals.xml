@@ -10,7 +10,7 @@
       <emphasis>libgnashmedia</emphasis>,
       <emphasis>libgnashamf</emphasis> and
       <emphasis>libgnashbackend</emphasis>. There are several utility programs 
-      included for debug parsing and processing of Flash movie files,
+      included for debug parsing and processing of SWF movie files,
       and other useful utilities for examining local Shared Objects and
       sniffing LocalConnections.
     </para>
@@ -49,7 +49,7 @@
 	<para>
 		Libgnashmedia handles Gnash's audio and video capabilities,
 		dealing with streamed video and sound as well as decoding
-		embedded media frames. Besides the standard Flash formats
+		embedded media frames. Besides the standard SWF formats
 		FLV, MPEG4, Nellymoser, ADPCM, MP3 and RAW, &app; can 
 		decode other formats supports by gstreamer or ffmpeg, 
 		including the free OGG container and free codecs.
@@ -100,7 +100,7 @@
       
       <para>
 	    There are currently a few standalone programs in Gnash,
-        which serve either to assist with Gnash development or to play flash
+        which serve either to assist with Gnash development or to play SWF
         movies.
       </para>
 
@@ -120,7 +120,7 @@
 	
 	<para>
 	  Gprocessor is used to print out the actions (using the -va
-	  option) or the parsing (using the -vp option) of a flash
+	  option) or the parsing (using the -vp option) of a SWF
 	  movie. It is also used to produce the <emphasis>.gsc</emphasis>
 	  files that Gnash uses to cache data, thereby speeding up the
 	  loading of files.
@@ -244,8 +244,8 @@
 
 	<para>
 	  While this is not an optimal solution, it does enable one to
-	  use Gnash as the flash player when browsing. The main issue
-	  appears to be that the Flash movie being played doesn't get
+	  use Gnash as the SWF player when browsing. The main issue
+	  appears to be that the SWF movie being played doesn't get
 	  any mouse or keyboard input. That may be a mozplugger
 	  configuration issue, however.
 	</para>
@@ -496,7 +496,7 @@
 
       <para>
 	Currently Gnash uses three other tools to help with
-	testing. Two of these are free compilers for the Flash
+	testing. Two of these are free compilers for the SWF
 	format. This lets us write simple test cases for Gnash to test
 	specific features, and to see how the features operate.
       </para>
@@ -592,7 +592,7 @@
       <para>
 	Additionally, the check.as file provides a transparent way to send
 	results to a TextField rather then using trace. This is very useful
-	when you use a flash player without tracing support.
+	when you use a SWF player without tracing support.
       </para>
       
       <para>

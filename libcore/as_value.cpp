@@ -58,7 +58,7 @@
 //#define GNASH_DEBUG_SOFT_REFERENCES
 
 // Define this macto to make AMF parsing verbose
-#define GNASH_DEBUG_AMF_DESERIALIZE
+//#define GNASH_DEBUG_AMF_DESERIALIZE
 
 // Define this macto to make AMF writing verbose
 //#define GNASH_DEBUG_AMF_SERIALIZE
@@ -113,11 +113,29 @@ public:
     
     void accept(string_table::key key, const as_value& val) 
         {
+
+            // Test conducted with AMFPHP:
+            // '__proto__' and 'constructor' members
+            // of an object don't get back from an 'echo-service'.
+            // Dunno if they are not serialized or just not sent back.
+            // A '__constructor__' member gets back, but only if 
+            // not a function. Actually no function gets back.
+            // 
+            if ( key == NSV::PROP_uuPROTOuu || 
+                 key == NSV::PROP_CONSTRUCTOR )
+            {
+#ifdef GNASH_DEBUG_AMF_SERIALIZE
+                log_debug(" skip serialization of specially-named property %s", _st.value(key));
+#endif
+                return;
+            }
+
             //GNASH_REPORT_FUNCTION;
             amf::AMF amf;
             amf::Element *el = 0;
 	    
-            const string& name = _st.string_table::value(key);
+            const string& name = _st.value(key);
+
 	    
 //          cerr << "FIXME: yes!!!!! " << name << ": "<< val << std::endl;
 	    
@@ -175,6 +193,13 @@ public:
     void accept(string_table::key key, const as_value& val) 
     {
         if ( _error ) return;
+
+        // Tested with SharedObject and AMFPHP
+        if ( val.is_function() )
+        {
+            log_debug("AMF0: skip serialization of FUNCTION property");
+            return;
+        }
 
         // Test conducted with AMFPHP:
         // '__proto__' and 'constructor' members
@@ -1909,7 +1934,7 @@ as_value::as_value(const amf::Element& el)
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
           log_debug("as_value(Element&) : AMF type ECMA_ARRAY");
 #endif
-          as_array_object* obj = new as_array_object();
+          Array_as* obj = new Array_as();
           if (el.propertySize()) {
               for (size_t i=0; i < el.propertySize(); i++) {
               const amf::Element *prop = el.getProperty(i);
@@ -1930,7 +1955,7 @@ as_value::as_value(const amf::Element& el)
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
           log_debug("as_value(Element&) : AMF type STRICT_ARRAY");
 #endif
-          as_array_object* obj = new as_array_object();
+          Array_as* obj = new Array_as();
           size_t len = el.propertySize();
           obj->resize(len);
 
@@ -2187,7 +2212,7 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 
 		case amf::Element::STRICT_ARRAY_AMF0:
         {
-				boost::intrusive_ptr<as_array_object> array(new as_array_object());
+				boost::intrusive_ptr<Array_as> array(new Array_as());
                 objRefs.push_back(array.get());
 
 				li = readNetworkLong(b); b += 4;
@@ -2210,7 +2235,7 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 
 		case amf::Element::ECMA_ARRAY_AMF0:
         {
-				as_array_object* obj = new as_array_object(); // GC-managed...
+				Array_as* obj = new Array_as(); // GC-managed...
                 objRefs.push_back(obj);
 
                 // set the value immediately, so if there's any problem parsing
@@ -2387,7 +2412,7 @@ as_value::writeAMF0(SimpleBuffer& buf, std::map<as_object*, size_t>& offsetTable
                 size_t idx = offsetTable.size()+1; // 1 for the first, etc...
                 offsetTable[obj] = idx;
 
-                as_array_object* ary = dynamic_cast<as_array_object*>(obj);
+                Array_as* ary = dynamic_cast<Array_as*>(obj);
                 if ( ary )
                 {
                     size_t len = ary->size();
@@ -2455,8 +2480,12 @@ as_value::writeAMF0(SimpleBuffer& buf, std::map<as_object*, size_t>& offsetTable
 
         case MOVIECLIP:
         {
-            log_unimpl(_(" serialization of MovieClip objects"));
-            return false;
+#ifdef GNASH_DEBUG_AMF_SERIALIZE
+            log_debug(_("writeAMF0: serializing MOVIECLIP (as undefined)"));
+#endif
+            // See misc-ming.all/SharedObjectTest.as
+            buf.appendByte(amf::Element::UNDEFINED_AMF0);
+            return true;
         }
 
         case NULLTYPE:
