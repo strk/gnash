@@ -503,12 +503,10 @@ loadvars_addRequestHeader(const fn_call& fn)
     
 	boost::intrusive_ptr<LoadVars_as> ptr = ensureType<LoadVars_as>(fn.this_ptr);   
 
-    string_table& st = ptr->getVM().getStringTable();
     as_value customHeaders;
-
     Array_as* array;
 
-    if (ptr->get_member(st.find("_customHeaders"), &customHeaders))
+    if (ptr->get_member(NSV::PROP_uCUSTOM_HEADERS, &customHeaders))
     {
         array = dynamic_cast<Array_as*>(customHeaders.to_object().get());
         if (!array)
@@ -525,7 +523,7 @@ loadvars_addRequestHeader(const fn_call& fn)
         array = new Array_as;
         // This property is always initialized on the first call to
         // addRequestHeaders.
-        ptr->set_member(st.find("_customHeaders"), array);
+        ptr->set_member(NSV::PROP_uCUSTOM_HEADERS, array);
     }
 
     if (fn.nargs == 0)
@@ -540,9 +538,11 @@ loadvars_addRequestHeader(const fn_call& fn)
     
     if (fn.nargs == 1)
     {
+        // This must be an array. Keys / values are pushed in valid
+        // pairs to the _customHeaders array.    
         boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
-        boost::intrusive_ptr<Array_as> headerArray =
-                        dynamic_cast<Array_as*>(obj.get());
+        Array_as* headerArray = dynamic_cast<Array_as*>(obj.get());
+
         if (!headerArray)
         {
             IF_VERBOSE_ASCODING_ERRORS(
@@ -551,12 +551,24 @@ loadvars_addRequestHeader(const fn_call& fn)
             );
             return as_value();
         }
-        
-        // An array with 1 or 0 elements is invalid
-        if (headerArray->size() < 2) return as_value();
-        
-        // Add the new array to the existing one.
-        array->concat(*headerArray);
+
+        Array_as::const_iterator e = headerArray->end();
+        --e;
+
+        for (Array_as::const_iterator i = headerArray->begin(); i != e; ++i)
+        {
+            // Only even indices can be a key, and they must be a string.
+            if (i.index() % 2) continue;
+            if (!(*i).is_string()) continue;
+            
+            // Only the immediately following odd number can be 
+            // a value, and it must also be a string.
+            const as_value& val = headerArray->at(i.index() + 1);
+            if (val.is_string())
+            {
+                array->callMethod(NSV::PROP_PUSH, *i, val);
+            }
+        }
         return as_value();
     }
         
@@ -570,8 +582,12 @@ loadvars_addRequestHeader(const fn_call& fn)
         );
     }
     
+    // Push both to the _customHeaders array.
+    const as_value& name = fn.arg(0);
+    const as_value& val = fn.arg(1);
+    
     // Both arguments must be strings.
-    if (!fn.arg(0).is_string() || !fn.arg(1).is_string())
+    if (!name.is_string() || !val.is_string())
     {
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
@@ -582,12 +598,7 @@ loadvars_addRequestHeader(const fn_call& fn)
         return as_value(); 
     }
 
-    // Push both to the _customHeaders array.
-    const std::string& name = fn.arg(0).to_string();
-    const std::string& val = fn.arg(1).to_string();
-
-    array->push(name);
-    array->push(val);
+    array->callMethod(NSV::PROP_PUSH, name, val);
     
     return as_value();
 }
