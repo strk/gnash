@@ -24,45 +24,68 @@
 #include <map>
 #include <string>
 #include <memory>
+#include <set>
 #include "StringPredicates.h"
 
 namespace gnash {
 class IOChannel;
 
 /// Code to use libcurl as an IOChannel stream.
-namespace NetworkAdapter {
+class NetworkAdapter {
 
-/// Custom headers for addRequestHeader. These are case insensitive, and
-/// subsequent addition of a header already there replaces any previous one.
-/// Some values are not allowed.
-typedef std::map<std::string, std::string, StringNoCaseLessThen> RequestHeaders;
+public:
 
-/// \brief
-/// Returns a read-only IOChannel that fetches data
-/// from an url.
-//
-/// The caller owns the returned IOChannel.  
-///
-DSOEXPORT std::auto_ptr<IOChannel> makeStream(const char* url);
+    /// Custom headers for addRequestHeader. These are case insensitive, and
+    /// subsequent addition of a header already there replaces any previous one.
+    /// Some values are not allowed.
+    typedef std::map<std::string, std::string, StringNoCaseLessThen> RequestHeaders;
 
-/// \brief
-/// Returns a read-only IOChannel that fetches data
-/// from an url getting posted to.
-//
-/// The caller owns the returned IOChannel.  
-///
-/// @param url
-///	The url to post to.
-///
-/// @param postdata
-///	The url-encoded post data
-///
-DSOEXPORT std::auto_ptr<IOChannel> makeStream(const char* url, const std::string& postdata);
+    /// \brief
+    /// Returns a read-only IOChannel that fetches data
+    /// from an url.
+    //
+    /// @param url      The url to fetch data from.
+    DSOEXPORT static std::auto_ptr<IOChannel> makeStream(const std::string& url);
 
-DSOEXPORT std::auto_ptr<IOChannel> makeStream(const std::string& url, const std::string& postdata,
-                                const RequestHeaders& headers);
+    /// \brief
+    /// Returns a read-only IOChannel that fetches data
+    /// from an url getting posted to.
+    //
+    /// The caller owns the returned IOChannel.  
+    ///
+    /// @param url      The url to post to.
+    /// @param postdata The url-encoded post data
+    DSOEXPORT static std::auto_ptr<IOChannel> makeStream(const std::string& url, const std::string& postdata);
 
-}
+    /// \brief
+    /// Returns a read-only IOChannel that fetches data
+    /// from an url getting posted to.
+    //
+    /// The caller owns the returned IOChannel.  
+    ///
+    /// @param url      The url to post to.
+    /// @param postdata The url-encoded post data
+    /// @param headers  A RequestHeaders map of custom headers to send.
+    DSOEXPORT static std::auto_ptr<IOChannel> makeStream(const std::string& url, const std::string& postdata,
+                                    const RequestHeaders& headers);
+
+
+    /// Check whether a RequestHeader is permitted.
+    //
+    /// @param  headerName is checked against a set of reserved names
+    ///         (case-insensitive).
+    /// @return true if the name is allowed.
+    DSOEXPORT static bool isHeaderAllowed(const std::string& headerName)
+    {
+        return (_reservedNames.find(headerName) == _reservedNames.end());
+    }
+
+private:
+
+    static std::set<std::string, StringNoCaseLessThen> _reservedNames;
+
+};
+
 } // namespace gnash
 
 #endif // CURL_ADAPTER_H

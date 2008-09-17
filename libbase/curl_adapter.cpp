@@ -34,6 +34,7 @@
 #include <iostream> // std::cerr
 #include <boost/thread/mutex.hpp>
 #include <boost/version.hpp>
+#include <boost/assign/list_of.hpp>
 
 using gnash::log_debug;
 using gnash::log_error;
@@ -42,26 +43,25 @@ using gnash::log_error;
 #ifndef USE_CURL
 // Stub for warning about access when no libcurl is defined.
 
-namespace NetworkAdapter
+std::auto_ptr<IOChannel>
+NetworkAdapter::makeStream(const std::string& /*url*/)
 {
-	std::auto_ptr<IOChannel> makeStream(const char * /*url */)
-	{
-		log_error(_("ERROR: libcurl is not available, but "
-		            "Gnash has attempted to use the curl adapter"));
-		return std::auto_ptr<IOChannel>();
-	}
-	
-    std::auto_ptr<IOChannel> makeStream(const char* url, const std::string& postdata)
-    {
-        return make_stream(url);
-    }
+	log_error(_("ERROR: libcurl is not available, but "
+	            "Gnash has attempted to use the curl adapter"));
+	return std::auto_ptr<IOChannel>();
+}
 
-    std::auto_ptr<IOChannel> makeStream(const std::string& url, const std::string& postdata,
-                                const RequestHeaders& headers)
-    {
-        return make_stream(url);
-    }
+std::auto_ptr<IOChannel>
+NetworkAdapter::makeStream(const std::string& url, const std::string& postdata)
+{
+    return makeStream(url);
+}
 
+std::auto_ptr<IOChannel>
+NetworkAdapter::makeStream(const std::string& url, const std::string& postdata,
+                            const RequestHeaders& headers)
+{
+    return makeStream(url);
 }
 
 #else // def USE_CURL
@@ -94,7 +94,8 @@ namespace NetworkAdapter
 
 
 namespace gnash {
-namespace NetworkAdapter {
+
+namespace {
 
 /***********************************************************************
  *
@@ -913,6 +914,8 @@ CurlStreamFile::CurlStreamFile(const std::string& url, const std::string& vars, 
     for (NetworkAdapter::RequestHeaders::const_iterator i = headers.begin(),
          e = headers.end(); i != e; ++i)
     {
+        // Check here to see whether header name is allowed.
+        if (!NetworkAdapter::isHeaderAllowed(i->first)) continue;
         std::ostringstream os;
         os << i->first << ": " << i->second;
         headerList = curl_slist_append(headerList, os.str().c_str());
@@ -1237,12 +1240,15 @@ CurlSession::exportCookies()
 
 }
 
+
+} // anonymous namespace
+
 //-------------------------------------------
 // Exported interfaces
 //-------------------------------------------
 
 std::auto_ptr<IOChannel>
-makeStream(const char* url)
+NetworkAdapter::makeStream(const std::string& url)
 {
 #ifdef GNASH_CURL_VERBOSE
 	gnash::log_debug("making curl stream for %s", url);
@@ -1260,7 +1266,7 @@ makeStream(const char* url)
 }
 
 std::auto_ptr<IOChannel>
-makeStream(const char* url, const std::string& postdata)
+NetworkAdapter::makeStream(const std::string& url, const std::string& postdata)
 {
 #ifdef GNASH_CURL_VERBOSE
 	gnash::log_debug("making curl stream for %s", url);
@@ -1278,7 +1284,7 @@ makeStream(const char* url, const std::string& postdata)
 }
 
 std::auto_ptr<IOChannel>
-makeStream(const std::string& url, const std::string& postdata,
+NetworkAdapter::makeStream(const std::string& url, const std::string& postdata,
                                 const RequestHeaders& headers)
 {
 
@@ -1295,8 +1301,41 @@ makeStream(const std::string& url, const std::string& postdata,
 
 }
 
+/// Define static member.
+std::set<std::string, StringNoCaseLessThen>
+NetworkAdapter::_reservedNames = boost::assign::list_of
+    ("Accept-Ranges")
+    ("Age")
+    ("Allow")
+    ("Allowed")
+    ("Connection")
+    ("Content-Length")
+    ("Content-Location")
+    ("Content-Range")
+    ("ETag")
+    ("GET")
+    ("Host")
+    ("HEAD")
+    ("Last-Modified")
+    ("Locations")
+    ("Max-Forwards")
+    ("POST")
+    ("Proxy-Authenticate")
+    ("Proxy-Authorization")
+    ("Public")
+    ("Range")
+    ("Retry-After")
+    ("Server")
+    ("TE")
+    ("Trailer")
+    ("Transfer-Encoding")
+    ("Upgrade")
+    ("URI")
+    ("Vary")
+    ("Via")
+    ("Warning")
+    ("WWW-Authenticate");
 
-} // namespace NetworkAdapter
 } // namespace gnash
 
 #endif // def USE_CURL
