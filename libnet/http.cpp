@@ -77,7 +77,9 @@ HTTP::HTTP(Handler *hand)
     : _filetype(amf::AMF::FILETYPE_HTML),
       _filesize(0),
       _port(80),
-      _keepalive(false)
+      _keepalive(false),
+      _clientid(0),
+      _index(0)
 {
 //    GNASH_REPORT_FUNCTION;
     _handler = hand;
