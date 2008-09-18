@@ -27,9 +27,7 @@ DIE=0
 #ACLOCAL_FLAGS="-I macros $ACLOCAL_FLAGS"
 
 if test "`uname`" = "Darwin"; then
-darwin=1
-else
-darwin=0
+LIBTOOLIZE=glibtoolize
 fi
 
 (test -f $srcdir/configure.ac) || {
@@ -128,11 +126,7 @@ esac
 # used to. For more fun, libtoolize has different command line arguments, but one thing
 # that got fixed is for libtool 2.x there is an #define for the config file name, but
 # for libtool 1.5 it expects config.h always, so we change this to gnashconfig.h.
-if test $darwin -eq 1; then
-ltdlver=`${LIBTOOLIZE:-glibtoolize} --version | head -1 | cut -d ' ' -f 4`
-else
 ltdlver=`${LIBTOOLIZE:-libtoolize} --version | head -1 | cut -d ' ' -f 4`
-fi
 ltdlmajor=`echo $ltdlver | cut -d '.' -f 1`
 if test -z "$NO_LIBTOOLIZE" ; then
   ltbasedir="libltdl"
@@ -141,10 +135,7 @@ if test -z "$NO_LIBTOOLIZE" ; then
     libtoolflags="${libtoolflags} ${ltbasedir} --quiet --recursive"
   fi
   echo "Running libtoolize $ltdlver ${libtoolflags} ..."
-  if test $darwin -eq 1; then
-  LIBTOOLIZE=glibtoolize
-  fi
-    if ${LIBTOOLIZE:-libtoolize} ${libtoolflags}; then
+  if ${LIBTOOLIZE:-libtoolize} ${libtoolflags}; then
     # libtool insists on including config.h, but we use gnashconfig.h
     # to avoid any problems, so we have to change this include
     # so they all reference the right config header file.
