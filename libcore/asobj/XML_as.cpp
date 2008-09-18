@@ -143,41 +143,40 @@ XML_as::get_member(string_table::key name, as_value *val, string_table::key nsna
 
 bool
 XML_as::set_member(string_table::key name, const as_value& val, 
-	string_table::key nsname, bool ifFound)
+    string_table::key nsname, bool ifFound)
 {
     if (name == NSV::PROP_STATUS)
-	{
-		// TODO: this should really be a proper property (see XML.as)
-		if ( ! val.is_number() )
-		{
-			_status = static_cast<XML_as::Status>(std::numeric_limits<boost::int32_t>::min());
-		}
-		else
-		{
-			unsigned int statusNumber = static_cast<int>(val.to_number());
-			_status = XML_as::Status( static_cast<XML_as::Status>(statusNumber) );
-		}
-		return true;
-	}
-        else if (name == NSV::PROP_LOADED)
+    {
+        // TODO: this should really be a proper property (see XML.as)
+        if ( ! val.is_number() )
         {
-		// TODO: this should really be a proper property
-                bool b = val.to_bool();
-		//log_debug(_("set_member 'loaded' (%s) became boolean %d"), val, b);
-                if ( b ) _loaded = 1;
-                else _loaded = 0;
-                return true;
+            _status = static_cast<ParseStatus>(std::numeric_limits<boost::int32_t>::min());
         }
+        else
+        {
+            unsigned int statusNumber = static_cast<int>(val.to_number());
+            _status = static_cast<ParseStatus>(statusNumber);
+        }
+        return true;
+    }
+    else if (name == NSV::PROP_LOADED)
+    {
+        // TODO: this should really be a proper property
+        bool b = val.to_bool();
+        //log_debug(_("set_member 'loaded' (%s) became boolean %d"), val, b);
+        if ( b ) _loaded = 1;
+        else _loaded = 0;
+        return true;
+    }
 
-        return set_member_default(name, val, nsname, ifFound);
+    return as_object::set_member(name, val, nsname, ifFound);
 }
 
 XML_as::~XML_as()
 {
-    //GNASH_REPORT_FUNCTION;
 
     for (LoadThreadList::iterator it = _loadThreads.begin(),
-		    e = _loadThreads.end(); it != e; ++it)
+            e = _loadThreads.end(); it != e; ++it)
     {
         delete *it; // supposedly joins the thread
     }
@@ -231,10 +230,10 @@ XML_as::extractNode(XMLNode& element, xmlNodePtr node, bool mem)
     }
     if (node->type == XML_COMMENT_NODE)
     {
-    	// Comments apparently not handled until AS3
-    	// Comments in a text node are a *sibling* of the text node
-    	// for libxml2.
-    	return false;
+        // Comments apparently not handled until AS3
+        // Comments in a text node are a *sibling* of the text node
+        // for libxml2.
+        return false;
     }
     else if (node->type == XML_ELEMENT_NODE)
     {
@@ -250,25 +249,25 @@ XML_as::extractNode(XMLNode& element, xmlNodePtr node, bool mem)
 
             ptr = xmlNodeGetContent(node);
             if (ptr == NULL) return false;
-	    if (node->content)
-	    {
-		std::ostringstream in;
-		in << ptr;
-		// XML_PARSE_NOBLANKS seems not to be working, so here's
-		// a custom implementation of it.
-		if ( ignoreWhite() )
-		{
-			if ( in.str().find_first_not_of(" \n\t\r") == std::string::npos )
-			{
+        if (node->content)
+        {
+        std::ostringstream in;
+        in << ptr;
+        // XML_PARSE_NOBLANKS seems not to be working, so here's
+        // a custom implementation of it.
+        if ( ignoreWhite() )
+        {
+            if ( in.str().find_first_not_of(" \n\t\r") == std::string::npos )
+            {
 #ifdef DEBUG_XML_PARSE
-				log_debug("Text node value consists in blanks only, discarding");
+                log_debug("Text node value consists in blanks only, discarding");
 #endif
-				xmlFree(ptr);
-				return false;
-			}
-		}
-		element.nodeValueSet(in.str());
-	    }
+                xmlFree(ptr);
+                return false;
+            }
+        }
+        element.nodeValueSet(in.str());
+        }
             xmlFree(ptr);
     }
 
@@ -280,9 +279,9 @@ XML_as::extractNode(XMLNode& element, xmlNodePtr node, bool mem)
         child = new XMLNode();
         child->setParent(&element);
         if ( extractNode(*child, childnode, mem) )
-	{
-		element._children.push_back(child);
-	}
+        {
+            element._children.push_back(child);
+        }
         childnode = childnode->next;
     }
 
@@ -303,10 +302,10 @@ XML_as::parseDoc(xmlNodePtr cur, bool mem)
         log_debug("\tParsing top-level node %s", cur->name);
 #endif
         if ( extractNode(*child, cur, mem) ) 
-	{
-        	_children.push_back(child);
-	}
-	cur = cur->next;
+        {
+                _children.push_back(child);
+        }
+        cur = cur->next;
     }  
 
     return true;
@@ -317,9 +316,9 @@ XML_as::parseDoc(xmlNodePtr cur, bool mem)
 bool
 XML_as::parseXML(const std::string& xml_in)
 {
-    //GNASH_REPORT_FUNCTION;
 
-    if (xml_in.empty()) {
+    if (xml_in.empty())
+    {
         log_error(_("XML data is empty"));
         return false;
     }
@@ -389,7 +388,6 @@ XML_as::queueLoad(std::auto_ptr<IOChannel> str)
 #endif
     lt.release();
 
-
     if ( startTimer )
     {
         boost::intrusive_ptr<builtin_function> loadsChecker = 
@@ -432,8 +430,6 @@ XML_as::checkLoads()
 
     if ( _loadThreads.empty() ) return; // nothing to do
 
-    string_table::key onDataKey = NSV::PROP_ON_DATA;
-
     for (LoadThreadList::iterator it=_loadThreads.begin();
             it != _loadThreads.end(); )
     {
@@ -441,7 +437,7 @@ XML_as::checkLoads()
 
         // TODO: notify progress 
 
-	_bytesLoaded = lt->getBytesLoaded();
+        _bytesLoaded = lt->getBytesLoaded();
         _bytesTotal = lt->getBytesTotal();
 
 #ifdef DEBUG_XML_LOADS
@@ -454,16 +450,16 @@ XML_as::checkLoads()
             boost::scoped_array<char> buf(new char[xmlsize+1]);
             size_t actuallyRead = lt->read(buf.get(), xmlsize);
             if ( actuallyRead != xmlsize )
-			{
-				// This would be either a bug of LoadThread or an expected
-				// possibility which lacks documentation (thus a bug in documentation)
-				//
+            {
+                // This would be either a bug of LoadThread or an expected
+                // possibility which lacks documentation (thus a bug in documentation)
+                //
 #ifdef DEBUG_XML_LOADS
-				log_debug("LoadThread::getBytesLoaded() returned %d but "
+                log_debug("LoadThread::getBytesLoaded() returned %d but "
                         "::read(%d) returned %d",
-					    xmlsize, xmlsize, actuallyRead);
+                        xmlsize, xmlsize, actuallyRead);
 #endif
-			}
+            }
             buf[actuallyRead] = '\0';
             // Strip BOM, if any.
             // See http://savannah.gnu.org/bugs/?19915
@@ -481,7 +477,7 @@ XML_as::checkLoads()
             delete lt; // supposedly joins the thread...
 
             // might push_front on the list..
-            callMethod(onDataKey, dataVal);
+            callMethod(NSV::PROP_ON_DATA, dataVal);
 
 #ifdef DEBUG_XML_LOADS
             log_debug("Completed load, _loadThreads have now %d elements",
@@ -499,7 +495,7 @@ XML_as::checkLoads()
 #ifdef DEBUG_XML_LOADS
         log_debug("Clearing XML load checker interval timer");
 #endif
-    	VM& vm = getVM();
+        VM& vm = getVM();
         vm.getRoot().clear_interval_timer(_loadCheckerTimer);
         _loadCheckerTimer=0;
     }
@@ -513,9 +509,9 @@ XML_as::checkLoads_wrapper(const fn_call& fn)
     log_debug("checkLoads_wrapper called");
 #endif
 
-	boost::intrusive_ptr<XML_as> ptr = ensureType<XML_as>(fn.this_ptr);
-	ptr->checkLoads();
-	return as_value();
+    boost::intrusive_ptr<XML_as> ptr = ensureType<XML_as>(fn.this_ptr);
+    ptr->checkLoads();
+    return as_value();
 }
 
 // This reads in an XML file from disk and parses into into a memory resident
@@ -554,11 +550,6 @@ XML_as::onLoad()
     return(_loaded);
 }
 
-void
-XML_as::cleanupStackFrames(XMLNode * /* xml */)
-{
-    GNASH_REPORT_FUNCTION;
-}
 
 void
 XML_as::send()
@@ -646,11 +637,6 @@ XML_as::sendAndLoad(const URL& url, as_object& target)
 as_value
 xml_load(const fn_call& fn)
 {
-    as_value	method;
-    as_value	val;
-    as_value	rv = false;
-    bool          ret;
-
     boost::intrusive_ptr<XML_as> xml_obj = ensureType<XML_as>(fn.this_ptr);
   
     if ( ! fn.nargs )
@@ -658,7 +644,7 @@ xml_load(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("XML.load(): missing argument"));
         );
-        return rv;
+        return as_value();
     }
 
     const std::string& filespec = fn.arg(0).to_string();
@@ -667,15 +653,7 @@ xml_load(const fn_call& fn)
 
     // Set the argument to the function event handler based on whether the load
     // was successful or failed.
-    ret = xml_obj->load(url);
-    rv = ret;
-
-    if (ret == false) {
-        return rv;
-    }
-    
-    rv = true;
-    return rv;
+    return as_value(xml_obj->load(url));
 }
 
 static void
@@ -760,7 +738,7 @@ as_value
 xml_addRequestHeader(const fn_call& fn)
 {
     
-	boost::intrusive_ptr<XML_as> ptr = ensureType<XML_as>(fn.this_ptr);   
+    boost::intrusive_ptr<XML_as> ptr = ensureType<XML_as>(fn.this_ptr);   
 
     as_value customHeaders;
     as_object* array;
@@ -875,15 +853,17 @@ static as_value
 xml_createelement(const fn_call& fn)
 {
     
-    if (fn.nargs > 0) {
+    if (fn.nargs > 0)
+    {
         const std::string& text = fn.arg(0).to_string();
-	XMLNode *xml_obj = new XMLNode();
-	xml_obj->nodeNameSet(text);
-	xml_obj->nodeTypeSet(XMLNode::tText);
-	// no return code from this method
-	return as_value(xml_obj);
-	
-    } else {
+        XMLNode *xml_obj = new XMLNode;
+        xml_obj->nodeNameSet(text);
+        xml_obj->nodeTypeSet(XMLNode::tText);
+
+        return as_value(xml_obj);
+        
+    }
+    else {
         log_error(_("no text for element creation"));
     }
     return as_value();
@@ -902,11 +882,9 @@ as_value
 xml_createtextnode(const fn_call& fn)
 {
 
-    XMLNode *xml_obj;
-
     if (fn.nargs > 0) {
         const std::string& text = fn.arg(0).to_string();
-        xml_obj = new XMLNode;
+        XMLNode* xml_obj = new XMLNode;
         xml_obj->nodeValueSet(text);
         xml_obj->nodeTypeSet(XMLNode::tText);
         return as_value(xml_obj);
@@ -917,33 +895,34 @@ xml_createtextnode(const fn_call& fn)
     return as_value();
 }
 
+
 as_value xml_getbytesloaded(const fn_call& fn)
 {
-	boost::intrusive_ptr<XML_as> ptr = ensureType<XML_as>(fn.this_ptr);
-	long int ret = ptr->getBytesLoaded();
-	if ( ret < 0 ) return as_value();
-	else return as_value(ret);
+    boost::intrusive_ptr<XML_as> ptr = ensureType<XML_as>(fn.this_ptr);
+    long int ret = ptr->getBytesLoaded();
+    if ( ret < 0 ) return as_value();
+    else return as_value(ret);
 }
+
 
 as_value xml_getbytestotal(const fn_call& fn)
 {
-	boost::intrusive_ptr<XML_as> ptr = ensureType<XML_as>(fn.this_ptr);
-	long int ret = ptr->getBytesTotal();
-	if ( ret < 0 ) return as_value();
-	else return as_value(ret);
+    boost::intrusive_ptr<XML_as> ptr = ensureType<XML_as>(fn.this_ptr);
+    long int ret = ptr->getBytesTotal();
+    if ( ret < 0 ) return as_value();
+    else return as_value(ret);
 }
+
 
 as_value xml_parsexml(const fn_call& fn)
 {
 
-    as_value	method;
-    as_value	val;    
     boost::intrusive_ptr<XML_as> ptr = ensureType<XML_as>(fn.this_ptr);
 
     if (fn.nargs < 1)
     {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror("XML.parseXML() needs one argument");
+            log_aserror("XML.parseXML() needs one argument");
         );
         return as_value();
     }
@@ -972,7 +951,7 @@ as_value xml_send(const fn_call& fn)
 static as_value
 xml_sendAndLoad(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
+
     boost::intrusive_ptr<XML_as> ptr = ensureType<XML_as>(fn.this_ptr);
     
     if ( fn.nargs < 2 )
@@ -981,7 +960,7 @@ xml_sendAndLoad(const fn_call& fn)
         std::stringstream ss;
         fn.dump_args(ss);
         log_aserror(_("XML.sendAndLoad(%s): missing arguments"),
-		ss.str());
+        ss.str());
         );
         return as_value(false);
     }
@@ -1041,8 +1020,7 @@ xml_ondata(const fn_call& fn)
 // extern (used by Global.cpp)
 void xml_class_init(as_object& global)
 {
-//    GNASH_REPORT_FUNCTION;
-    // This is going to be the global XML "class"/"function"
+
     static boost::intrusive_ptr<builtin_function> cl;
 
     if ( cl == NULL )
@@ -1050,7 +1028,6 @@ void xml_class_init(as_object& global)
         cl=new builtin_function(&xml_new, getXMLInterface());
     }
     
-    // Register _global.String
     global.init_member("XML", cl.get());
 
 }
@@ -1072,10 +1049,10 @@ XML_as::initParser()
 void
 XML_as::clear()
 {
-	// TODO: should set childs's parent to NULL ?
-	_children.clear();
+    // TODO: should set childs's parent to NULL ?
+    _children.clear();
 
-	_attributes.clear();
+    _attributes.clear();
 }
 
 /*private*/
@@ -1083,10 +1060,10 @@ bool
 XML_as::ignoreWhite() const
 {
 
-	string_table::key propnamekey = VM::get().getStringTable().find("ignoreWhite");
-	as_value val;
-	if (!const_cast<XML_as*>(this)->get_member(propnamekey, &val) ) return false;
-	return val.to_bool();
+    string_table::key propnamekey = VM::get().getStringTable().find("ignoreWhite");
+    as_value val;
+    if (!const_cast<XML_as*>(this)->get_member(propnamekey, &val) ) return false;
+    return val.to_bool();
 }
 
 /*private*/
@@ -1094,17 +1071,17 @@ int
 XML_as::getXMLOptions() const
 {
     int options = XML_PARSE_NOENT
-		//| XML_PARSE_RECOVER -- don't recover now, we'll call xmlParseBalancedChunkRecover later
-		//| XML_PARSE_NOWARNING
-    		//| XML_PARSE_NOERROR
-		| XML_PARSE_NOCDATA;
+        //| XML_PARSE_RECOVER -- don't recover now, we'll call xmlParseBalancedChunkRecover later
+        //| XML_PARSE_NOWARNING
+            //| XML_PARSE_NOERROR
+        | XML_PARSE_NOCDATA;
     // Using libxml2 to convert CDATA nodes to text seems to be what is
     // required.
     
     if ( ignoreWhite() )
     {
-	    // This doesn't seem to work, so the blanks skipping
-	    // is actually implemented in XML::extractNode instead.
+        // This doesn't seem to work, so the blanks skipping
+        // is actually implemented in XML::extractNode instead.
             //log_debug("Adding XML_PARSE_NOBLANKS to options");
             options |= XML_PARSE_NOBLANKS;
     }

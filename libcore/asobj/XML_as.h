@@ -46,7 +46,7 @@ class XML_as : public XMLNode
 {
 public:
 
-    typedef enum {
+    enum ParseStatus {
 
             /// Parsing was successful
             sOK = 0,
@@ -78,7 +78,7 @@ public:
             /// Missing start tag (orphaned close tag)
             sECLOSETAG = -10
 
-    } Status;
+    };
 
 
     XML_as();
@@ -134,8 +134,6 @@ public:
 
     void change_stack_frame(int frame, gnash::as_object *xml, gnash::as_environment *env);
 
-    void cleanupStackFrames( XMLNode *data);
-
     XMLNode *createElement(const char *name);
 
     XMLNode *createTextNode(const char *name);
@@ -181,7 +179,7 @@ private:
     //  1 if successfully loaded
     int _loaded;
 
-    Status _status;	
+    ParseStatus _status;	
 
     /// Initialize an XMLNode from an xmlNodePtr
     //
