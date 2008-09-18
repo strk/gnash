@@ -144,13 +144,11 @@ public:
                 if (!val.is_undefined()) {
                     str = val.to_string();
                 }
-                el = new amf::Element;
-                el->init(name, str);
+                el = new amf::Element(name, str);
             }
             if (val.is_bool()) {
                 bool flag = val.to_bool();
-                el = new amf::Element;
-                el->init(name, flag);
+                el = new amf::Element(name, flag);
             }
             if (val.is_number()) { 
                 double dub;
@@ -159,8 +157,7 @@ public:
                 } else {
                     dub = val.to_number();
                 }
-                el = new amf::Element;
-                el->init(name, dub);
+                el = new amf::Element(name, dub);
             }
 	    
             if (el) {

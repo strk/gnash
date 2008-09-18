@@ -88,24 +88,24 @@ Element::~Element()
     delete[] _name;
 }
 
-
-Element::Element(Network::byte_t *indata) 
-    : _name(0),
-      _buffer(0),
-      _type(NOTYPE)
-{
-//    GNASH_REPORT_FUNCTION;
-    init(indata);
-}
-
+// Each Element has two main components, the optional name, and a value. All the properties
+// of an ActionScript class have the name set to a non null value, and without a name, the
+// Element just holds the lowest level AMF types.
 Element::Element(double indata)
     : _name(0),
       _buffer(0),
       _type(NOTYPE)
 {
 //    GNASH_REPORT_FUNCTION;
-    init(indata);
+    makeNumber(indata);
 }
+
+Element::Element(const string &name, double num)
+{
+//    GNASH_REPORT_FUNCTION;
+    makeNumber(name, num);
+}
+
 
 // Element(vector<double> &indata)
 // {
@@ -119,7 +119,16 @@ Element::Element(const string &indata)
       _type(NOTYPE)
 {
 //    GNASH_REPORT_FUNCTION;
-    init(indata);
+    makeString(indata);
+}
+
+Element::Element(const char *indata)
+    : _name(0),
+      _buffer(0),
+      _type(NOTYPE)
+{
+//    GNASH_REPORT_FUNCTION;
+    makeString(indata);
 }
 
 Element::Element(const string &name, const string &indata)
@@ -128,16 +137,7 @@ Element::Element(const string &name, const string &indata)
       _type(NOTYPE)
 {
 //    GNASH_REPORT_FUNCTION;
-    init(name, indata);
-}
-
-Element::Element(const string &name, bool indata)
-    : _name(0),
-      _buffer(0),
-      _type(NOTYPE)
-{
-//    GNASH_REPORT_FUNCTION;
-    init(name, indata);
+    makeString(name, indata);
 }
 
 Element::Element(bool indata)
@@ -146,7 +146,16 @@ Element::Element(bool indata)
       _type(NOTYPE)
 {
 //    GNASH_REPORT_FUNCTION;
-    init(indata);
+    makeBoolean(indata);
+}
+
+Element::Element(const string &name, bool indata)
+    : _name(0),
+      _buffer(0),
+      _type(NOTYPE)
+{
+//    GNASH_REPORT_FUNCTION;
+    makeBoolean(name, indata);
 }
 
 // Create a function block for AMF
@@ -157,9 +166,10 @@ Element::Element(bool flag, double unknown1, double unknown2,
       _type(NOTYPE)
 {
 //    GNASH_REPORT_FUNCTION;
-    init(flag, unknown1, unknown2, methodname);
+    log_unimpl("Can't create remote function calls yet");
 }
 
+#if 0
 Element &
 Element::init(bool flag, double unknown1, double unknown2,
 	      const string &methodname)
@@ -189,87 +199,13 @@ Element::init(bool flag, double unknown1, double unknown2,
 //     memcpy(_data, &indata, _length);
     return *this;
 }
-
-Element &
-Element::init(double indata)
-{
-//    GNASH_REPORT_FUNCTION;
-    return init("", indata);
-}
-
-Element &
-Element::init(const string &name, double num)
-{
-//    GNASH_REPORT_FUNCTION;
-    _type = Element::NUMBER_AMF0;
-    if (name.size()) {
-        setName(name);
-    }
-    if (_buffer == 0) {
-	_buffer = new Buffer(AMF0_NUMBER_SIZE);
-    } else {
-	_buffer->resize(AMF0_NUMBER_SIZE);
-    }
-    _buffer->copy(num);
-    
-    return *this;
-}
-
-Element &
-Element::init(const string &indata)
-{
-//    GNASH_REPORT_FUNCTION;
-    return init("", indata);
-}
-
-Element &
-Element::init(const string &name, const string &str)
-{
-//    GNASH_REPORT_FUNCTION;
-    _type = Element::STRING_AMF0;
-    if (name.size()) {
-        setName(name);
-    }
-    if (_buffer == 0) {
-	_buffer = new Buffer(str.size());
-    } else {
-	_buffer->resize(str.size());
-    }
-    _buffer->copy(str);
-    
-    return *this;
-}
-
-Element &
-Element::init(bool indata)
-{
-//    GNASH_REPORT_FUNCTION;
-    return init("", indata);
-}
-
-Element &
-Element::init(const string &name, bool flag)
-{
-//    GNASH_REPORT_FUNCTION;
-    _type = Element::BOOLEAN_AMF0;
-    if (name.size()) {
-        setName(name);
-    }
-    if (_buffer == 0) {
-	_buffer = new Buffer(sizeof(bool));
-    } else {
-	_buffer->resize(sizeof(bool));
-    }
-    _buffer->append(flag);
-    
-    return *this;
-}
+#endif
 
 void
 Element::clear()
 {
 //    GNASH_REPORT_FUNCTION;
-	delete [] _name;
+	delete[] _name;
 	_name = 0;
 	delete _buffer;
 	_buffer = 0;
@@ -312,7 +248,14 @@ Element::to_string() const
 //    GNASH_REPORT_FUNCTION;
     if (_buffer) {
 	if (_buffer->size() > 0) {
+#if 0
+	    char *foo = new char[_buffer->size() + 1];
+	    memset(foo, 0, _buffer->size() + 1);
+	    memcpy(foo, _buffer->reference(), _buffer->size());
+	    return foo;
+#else
 	    return reinterpret_cast<const char *>(_buffer->reference());
+#endif
 	}
 	return "NULL";
     }
@@ -396,6 +339,7 @@ Element::operator==(bool x)
     return false;
 };
 
+
 Buffer *
 Element::encode()
 {
@@ -477,6 +421,24 @@ Element::operator=(Element *el)
     _buffer = new Buffer(el->getLength());
     _buffer->copy(el->getData(), el->getLength());
     return *this;
+}
+
+Element &
+Element::operator=(double num)
+{
+    return makeNumber(num);
+}
+
+Element &
+Element::operator=(const string &str)
+{
+    return makeString(str);
+}
+
+Element &
+Element::operator=(bool flag)
+{
+    return makeBoolean(flag);
 }
 
 /// \brief Fill an element with data
@@ -582,7 +544,10 @@ Element::makeNumber(const string &name, double num)
     if (name.size()) {
         setName(name);
     }
-    return makeNumber(num);
+    _type = Element::NUMBER_AMF0;
+//    check_buffer(AMF0_NUMBER_SIZE);
+//     _buffer->copy(num);
+    return *this;
 }
 
 Element &
@@ -680,17 +645,56 @@ Element::makeObject(const std::string &name)
     if (name.size()) {
         setName(name);
     }
+    return makeObject();
+}
+
+Element &
+Element::makeObject(const std::string &name, std::vector<Element *> &data)
+{
+//    GNASH_REPORT_FUNCTION;
     _type = OBJECT_AMF0;
+    if (name.size()) {
+        setName(name);
+    }
+    return makeObject(data);
+}
+
+Element &
+Element::makeObject(std::vector<Element *> &data)
+{
+//    GNASH_REPORT_FUNCTION;
+    _type = Element::OBJECT_AMF0;
+    vector<amf::Element *>::const_iterator ait;
+    for (ait = data.begin(); ait != data.end(); ait++) {
+	amf::Element *el = (*(ait));
+	addProperty(el);
+//	el->dump(os);
+    }
+}
+
+Element &
+Element::makeXMLObject()
+{
+//    GNASH_REPORT_FUNCTION;
+    _type = Element::XML_OBJECT_AMF0;
     return *this;
 }
 
 Element &
-Element::makeObject(Network::byte_t *indata, size_t size)
+Element::makeXMLObject(const string &data)
 {
 //    GNASH_REPORT_FUNCTION;
-    _type = Element::OBJECT_AMF0;
-    check_buffer(size);
-    _buffer->copy(indata, size);
+    makeString(data);
+    _type = Element::XML_OBJECT_AMF0;
+    return *this;
+}
+
+Element &
+Element::makeXMLObject(const string &name, const string &data)
+{
+//    GNASH_REPORT_FUNCTION;
+    makeXMLObject(name, data);
+    _type = Element::XML_OBJECT_AMF0;
     return *this;
 }
 
@@ -702,27 +706,6 @@ Element::makeObjectEnd()
     return *this;
 }
 
-Element &
-Element::makeXMLObject(const std::string &name)
-{
-//    GNASH_REPORT_FUNCTION;
-    _type = Element::XML_OBJECT_AMF0;
-    if (name.size()) {
-        setName(name);
-    }
-    return *this;
-}
-
-Element &
-Element::makeXMLObject(Network::byte_t *indata, size_t size)
-{
-//    GNASH_REPORT_FUNCTION;
-    _type = Element::XML_OBJECT_AMF0;
-    check_buffer(size);
-    _buffer->copy(indata, size);
-    
-    return *this;
-}
 
 Element &
 Element::makeTypedObject(const std::string &name)
@@ -790,13 +773,68 @@ Element::makeECMAArray()
 }
 
 Element &
-Element::makeECMAArray(Network::byte_t *indata, size_t size)
+Element::makeECMAArray(const std::string &name)
+{
+//    GNASH_REPORT_FUNCTION;
+    if (name.size()) {
+        setName(name);
+    }
+    return makeECMAArray();
+}
+
+Element &
+Element::makeECMAArray(const std::string &name, std::vector<Element *> &data)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::ECMA_ARRAY_AMF0;
-    check_buffer(size);
-    _buffer->copy(indata, size);
-    return *this;    
+    makeObject(name, data);
+    _type = Element::ECMA_ARRAY_AMF0;
+    return *this;
+}
+
+Element &
+Element::makeECMAArray(std::vector<Element *> &data)
+{
+//    GNASH_REPORT_FUNCTION;
+    makeObject(data);
+    _type = Element::ECMA_ARRAY_AMF0;
+    return *this;
+}
+
+Element &
+Element::makeStrictArray()
+{
+//    GNASH_REPORT_FUNCTION;
+    _type = Element::STRICT_ARRAY_AMF0;
+    return *this;
+}
+
+Element &
+Element::makeStrictArray(const std::string &name)
+{
+//    GNASH_REPORT_FUNCTION;
+    if (name.size()) {
+        setName(name);
+    }
+    return makeStrictArray();
+}
+
+Element &
+Element::makeStrictArray(const std::string &name, std::vector<Element *> &data)
+{
+//    GNASH_REPORT_FUNCTION;
+    makeObject(name, data);
+    _type = Element::STRICT_ARRAY_AMF0;
+    return *this;
+}
+
+Element &
+Element::makeStrictArray(std::vector<Element *> &data)
+{
+//    GNASH_REPORT_FUNCTION;
+    makeObject(data);
+    _type = Element::STRICT_ARRAY_AMF0;
+    return *this;
 }
 
 Element &
@@ -854,23 +892,6 @@ Element::makeDate(Network::byte_t *date)
     return makeNumber(date);
 }
 
-Element &
-Element::makeStrictArray()
-{
-//    GNASH_REPORT_FUNCTION;
-    _type = Element::STRICT_ARRAY_AMF0;
-    return *this;
-}
-
-Element &
-Element::makeStrictArray(Network::byte_t *indata, size_t size)
-{
-//    GNASH_REPORT_FUNCTION;    
-    _type = Element::STRICT_ARRAY_AMF0;
-    check_buffer(size);
-    _buffer->copy(indata, size);
-    return *this;
-}
 
 size_t
 Element::getNameSize()
@@ -882,6 +903,8 @@ Element::getNameSize()
     return 0;
 }
 
+// The name is for properties, which in AMF land is a string, followed by the AMF
+// element.
 void
 Element::setName(const string &str)
 {
@@ -909,7 +932,7 @@ Element::setName(Network::byte_t *name, size_t size)
 	    std::copy(name, name+size, _name);
 	    *(_name + size) = 0;
 	} else {
-	    log_debug("Got unprintable characters for the element name!");
+	    log_error("Got unprintable characters for the element name!");
 	}
     }
 }
