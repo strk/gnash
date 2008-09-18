@@ -1067,7 +1067,7 @@ button_character_instance::get_member(string_table::key name_key, as_value* val,
 
   // TOCHECK : Try object members, BEFORE display list items
   //
-  if (get_member_default(name_key, val, nsname))
+  if (as_object::get_member(name_key, val, nsname))
   {
 
 // ... trying to be useful to Flash coders ...

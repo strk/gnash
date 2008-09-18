@@ -1120,7 +1120,7 @@ edit_text_character::get_member(string_table::key name, as_value* val,
 	}
 	}	// end switch
 
-	return get_member_default(name, val, nsname);
+	return as_object::get_member(name, val, nsname);
 	
 }
 	
