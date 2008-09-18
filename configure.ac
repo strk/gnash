@@ -861,7 +861,7 @@ AM_CONDITIONAL(BUILD_METOME_EXT, [ test x$ext_metome = xyes ])
 AM_CONDITIONAL(BUILD_EXTENSIONS, [ test -n "$extensions_list"])
 
 AC_MSG_CHECKING([For the version of libtool])
-if test -n $darwin; then
+if test "x$darwin" != x; then
 LIBTOOLIZE=glibtoolize
 fi
 ltver=`${LIBTOOLIZE:-libtoolize} --version | head -1 | cut -d ' ' -f 4`
