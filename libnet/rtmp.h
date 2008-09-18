@@ -43,6 +43,7 @@ const int  RTMP_VIDEO_PACKET_SIZE = 128;
 const int  RTMP_AUDIO_PACKET_SIZE = 64;
 const int  RTMP_MAX_HEADER_SIZE = 12;
 const int  PING_MSG_SIZE = 6;
+const int  RTMP_SYSTEM_CHANNEL = 2;
 
 // For terminating sequences, a byte with value 0x09 is used.
 const char TERMINATOR = 0x09;
