@@ -23,23 +23,72 @@
 rcsid="$Id: MovieClip.as,v 1.133 2008/05/09 13:21:08 strk Exp $";
 #include "check.as"
 
+
+#if OUTPUT_VERSION == 5
+Object.prototype.hasOwnProperty = ASnative(101, 5);
+#endif
+
+xcheck(MovieClip.prototype.hasOwnProperty("blendMode"));
+xcheck(MovieClip.prototype.hasOwnProperty("attachBitmap"));
+xcheck(MovieClip.prototype.hasOwnProperty("cacheAsBitmap"));
+check(MovieClip.prototype.hasOwnProperty("enabled"));
+xcheck(MovieClip.prototype.hasOwnProperty("filters"));
+xcheck(MovieClip.prototype.hasOwnProperty("forceSmoothing"));
+xcheck(MovieClip.prototype.hasOwnProperty("opaqueBackground"));
+xcheck(MovieClip.prototype.hasOwnProperty("scale9Grid"));
+xcheck(MovieClip.prototype.hasOwnProperty("scrollRect"));
+xcheck(MovieClip.prototype.hasOwnProperty("tabIndex"));
+xcheck(MovieClip.prototype.hasOwnProperty("transform"));
+check(MovieClip.prototype.hasOwnProperty("useHandCursor"));
+check(MovieClip.prototype.hasOwnProperty("_lockroot"));
+
+check(!MovieClip.prototype.hasOwnProperty("focusEnabled"));
+check(!MovieClip.prototype.hasOwnProperty("hitArea"));
+check(!MovieClip.prototype.hasOwnProperty("menu"));
+check(!MovieClip.prototype.hasOwnProperty("tabChildren"));
+check(!MovieClip.prototype.hasOwnProperty("tabEnabled"));
+check(!MovieClip.prototype.hasOwnProperty("trackAsMenu"));
+check(!MovieClip.prototype.hasOwnProperty("_alpha"));
+check(!MovieClip.prototype.hasOwnProperty("_currentframe"));
+check(!MovieClip.prototype.hasOwnProperty("_droptarget"));
+check(!MovieClip.prototype.hasOwnProperty("_focusrect"));
+check(!MovieClip.prototype.hasOwnProperty("_height"));
+check(!MovieClip.prototype.hasOwnProperty("_highquality"));
+check(!MovieClip.prototype.hasOwnProperty("_name"));
+check(!MovieClip.prototype.hasOwnProperty("_parent"));
+check(!MovieClip.prototype.hasOwnProperty("_quality"));
+check(!MovieClip.prototype.hasOwnProperty("_rotation"));
+check(!MovieClip.prototype.hasOwnProperty("_soundbuftime"));
+check(!MovieClip.prototype.hasOwnProperty("_target"));
+check(!MovieClip.prototype.hasOwnProperty("_totalframes"));
+check(!MovieClip.prototype.hasOwnProperty("_url"));
+check(!MovieClip.prototype.hasOwnProperty("_visible"));
+check(!MovieClip.prototype.hasOwnProperty("_width"));
+check(!MovieClip.prototype.hasOwnProperty("_x"));
+check(!MovieClip.prototype.hasOwnProperty("_xmouse"));
+check(!MovieClip.prototype.hasOwnProperty("_xscale"));
+check(!MovieClip.prototype.hasOwnProperty("_y"));
+check(!MovieClip.prototype.hasOwnProperty("_ymouse"));
+check(!MovieClip.prototype.hasOwnProperty("_yscale"));
+
+
 // To be called at end of test
 endOfTest = function() 
 {
 #if OUTPUT_VERSION <= 5
-	check_totals(234); // SWF5
+	check_totals(275); // SWF5
 #endif
 
 #if OUTPUT_VERSION == 6
-	check_totals(664); // SWF6
+	check_totals(705); // SWF6
 #endif
 
 #if OUTPUT_VERSION == 7
-	check_totals(681); // SWF7
+	check_totals(722); // SWF7
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(682); // SWF8+
+	check_totals(723); // SWF8+
 #endif
 
 	play();
