@@ -1052,7 +1052,7 @@ edit_text_character::set_member(string_table::key name,
 	}	// end switch
 
 
-	return set_member_default(name, val, nsname, ifFound);
+	return as_object::set_member(name, val, nsname, ifFound);
 }
 
 bool

@@ -97,8 +97,10 @@ enum primitive_types
 ///
 class DSOEXPORT as_value
 {
+
 public:
-	enum type
+
+	enum AsType
 	{
 		// Always make the exception type one greater than the normal type.
 		
@@ -459,7 +461,7 @@ public:
 	///
 	/// @throw ActionTypeError if an object can't be converted to a primitive
 	///
-	as_value to_primitive(type hint) const;
+	as_value to_primitive(AsType hint) const;
 
 	/// Convert this value to a primitive type, with a preference
 	//
@@ -471,7 +473,7 @@ public:
 	///
 	/// @throw ActionTypeError if an object can't be converted to a primitive
 	///
-	as_value& convert_to_primitive(type hint);
+	as_value& convert_to_primitive(AsType hint);
 
 	/// Force type to number.
 	//
@@ -479,13 +481,13 @@ public:
 	///	The environment to use for running the valueOf() method
 	///	for object values. If NULL, valueOf() won't be run.
 	///
-	void	convert_to_number();
+	void convert_to_number();
 
 	/// Force type to string.
-	void	convert_to_string();
+	void convert_to_string();
     
 	/// Force type to bool.
-	void	convert_to_boolean();
+	void convert_to_boolean();
     
 	/// Force type to string.
 	//
@@ -497,35 +499,25 @@ public:
 	///
 	/// @see to_string_versionioned
 	///
-	void	convert_to_string_versioned(int version);
+	void convert_to_string_versioned(int version);
 
 	// These set_*()'s are more type-safe; should be used
 	// in preference to generic overloaded set().  You are
 	// more likely to get a warning/error if misused.
 
-	void	set_string(const std::string& str);
+	void set_string(const std::string& str);
 
-	void	set_std_string(const std::string& str)
-	{
-		set_string(str);
-	}
+	void set_double(double val);
 
-	void	set_string(const char* str)
-	{
-		set_string(std::string(str));
-	}
+	void set_bool(bool val);
 
-	void	set_double(double val);
+	void set_sprite(sprite_instance& sp);
 
-	void	set_bool(bool val);
+	void set_character(character& sp);
 
-	void	set_sprite(sprite_instance& sp);
+	void set_int(int val) { set_double(val); }
 
-	void	set_character(character& sp);
-
-	void	set_int(int val) { set_double(val); }
-
-	void	set_nan() { set_double(NaN); }
+	void set_nan() { set_double(NaN); }
 
 	/// Make this value a NULL, OBJECT, MOVIECLIP or AS_FUNCTION value
 	//
@@ -534,14 +526,14 @@ public:
 	/// Internally adds a reference to the ref-counted as_object, 
 	/// if not-null
 	///
-	void	set_as_object(as_object* obj);
+	void set_as_object(as_object* obj);
 
-	void	set_as_object(boost::intrusive_ptr<as_object> obj);
+	void set_as_object(boost::intrusive_ptr<as_object> obj);
 
 	/// Make this a NULL or AS_FUNCTION value
-	void	set_as_function(as_function* func);
+	void set_as_function(as_function* func);
 
-	void	set_undefined();
+	void set_undefined();
 
 	/// Set this value to the NULL value
 	void set_null();
@@ -563,15 +555,15 @@ public:
 		return ! ( *this  == v );
 	}
 
-	void	operator=(const as_value& v);
+	void operator=(const as_value& v);
 
-	bool	is_undefined() const { return (m_type == UNDEFINED); }
+	bool is_undefined() const { return (m_type == UNDEFINED); }
 
-	bool	is_null() const { return (m_type == NULLTYPE); }
+	bool is_null() const { return (m_type == NULLTYPE); }
 
-	bool	is_bool() const { return (m_type == BOOLEAN); }
+	bool is_bool() const { return (m_type == BOOLEAN); }
 
-	bool	is_exception() const
+	bool is_exception() const
 	{ return (m_type == UNDEFINED_EXCEPT || m_type == NULLTYPE_EXCEPT
 		|| m_type == BOOLEAN_EXCEPT || m_type == NUMBER_EXCEPT
 		|| m_type == OBJECT_EXCEPT || m_type == AS_FUNCTION_EXCEPT
@@ -580,10 +572,10 @@ public:
 
 	// Flag or unflag an as_value as an exception -- this gets flagged
 	// when an as_value is 'thrown'.
-	void	flag_exception() 
-	{ if (!is_exception()) m_type = static_cast<type>(static_cast<int>(m_type) + 1); }
-	void	unflag_exception()
-	{ if (is_exception()) m_type = static_cast<type>(static_cast<int>(m_type) - 1); }
+	void flag_exception() 
+	{ if (!is_exception()) m_type = static_cast<AsType>(static_cast<int>(m_type) + 1); }
+	void unflag_exception()
+	{ if (is_exception()) m_type = static_cast<AsType>(static_cast<int>(m_type) - 1); }
 
 	/// Return true if this value is strictly equal to the given one
 	//
@@ -634,22 +626,25 @@ private:
 	///
 	bool equalsSameType(const as_value& v) const;
 
-	type m_type;
+	AsType m_type;
 
 	typedef sprite_instance* SpritePtr;
 	typedef character* CharacterPtr;
 	typedef boost::intrusive_ptr<as_function> AsFunPtr;
 	typedef boost::intrusive_ptr<as_object> AsObjPtr;
-
-        boost::variant<  
-			 boost::blank,  // UNDEFINED or NULL
-                         double,	// NUMBER
-                         bool,		// BOOLEAN
-                         AsObjPtr,	// OBJECT,
-//                        AsFuncPtr,	// AS_FUNCTION
-                         CharacterProxy,	// MOVIECLIP
-			 std::string	// STRING 
-                      > _value;
+	
+	/// AsValueType handles the following AS types:
+	//
+	/// 1. undefined / null
+	/// 2. Number
+	/// 3. Boolean
+	/// 4. Object
+	/// 5. MovieClip
+	/// 6. String
+    typedef boost::variant<boost::blank, double,
+            bool, AsObjPtr, CharacterProxy,	std::string> AsValueType;
+    
+    AsValueType _value;
 
 
 	/// Get the function pointer variant member (we assume m_type == FUNCTION)
