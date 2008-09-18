@@ -608,7 +608,7 @@ XML_as::sendAndLoad(const URL& url, as_object& target)
     }
 
     as_value contentType;
-    if ( get_member(st.find("contentType"), &contentType) )
+    if (get_member(NSV::PROP_CONTENT_TYPE, &contentType))
     {
         // This should not overwrite anything set in XML.addRequestHeader();
         headers.insert(std::make_pair("Content-Type", contentType.to_string()));
