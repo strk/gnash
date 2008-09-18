@@ -93,8 +93,8 @@ main(int argc, char** argv)
 	mo = newSWFMovieWithVersion(OUTPUT_VERSION);
 	SWFMovie_setDimension(mo, 800, 600);
 	//SWFMovie_setRate (mo, 0.2);
-	SWFMovie_setRate (mo, 2);
-	//SWFMovie_setRate (mo, 12);
+	//SWFMovie_setRate (mo, 2);
+	SWFMovie_setRate (mo, 12);
 
 	dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
 	SWFMovie_add(mo, (SWFBlock)dejagnuclip);
@@ -108,6 +108,10 @@ main(int argc, char** argv)
             "   } else {"
             "       return '' + b.xMin + ','+ b.yMin + ' '+ b.xMax + ',' + b.yMax; "
             "   }"
+            "};"
+            "onMouseDown = function() {"
+            " if ( playing ) { playing=false; stop(); }"
+            " else { playing=true; play(); }"
             "};"
             );
 
