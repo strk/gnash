@@ -27,7 +27,8 @@
 #ifdef HAVE_PTHREADS
 #include <pthread.h>
 #endif
-#include <boost/shared_ptr.hpp> 
+#include <boost/shared_ptr.hpp>
+#include <boost/noncopyable.hpp>
 #include "log.h"
 #include "image.h"
 
@@ -36,7 +37,8 @@ namespace gnash { class IOChannel; }
 
 namespace gnash {
 
-class ImageInput {
+class ImageInput : boost::noncopyable
+{
 
 public:
 
@@ -83,7 +85,7 @@ protected:
 
 };
 
-class ImageOutput
+class ImageOutput : boost::noncopyable
 {
 
 public:
