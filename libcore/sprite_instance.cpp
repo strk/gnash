@@ -800,7 +800,6 @@ static as_value sprite_load_variables(const fn_call& fn)
     boost::intrusive_ptr<as_object> methodstr = fn.arg(1).to_object();
     assert(methodstr);
     
-    string_table& st = sprite->getVM().getStringTable();
     as_value lc = methodstr->callMethod(NSV::PROP_TO_LOWER_CASE);
     std::string methodstring = lc.to_string(); 
   
@@ -1012,7 +1011,6 @@ sprite_meth(const fn_call& fn)
     return as_value(0);
   }
 
-  string_table& st = sprite->getVM().getStringTable();
   as_value lc = o->callMethod(NSV::PROP_TO_LOWER_CASE);
 
   log_debug(_("after call to toLowerCase with arg %s we got %s"), v, lc);
@@ -1698,7 +1696,8 @@ sprite_beginGradientFill(const fn_call& fn)
   if ( fn.nargs > 5 )
   {
     std::stringstream ss; fn.dump_args(ss);
-    log_aserror(_("MovieClip.beginGradientFill(%s): args after the first five will be discarded"), ss.str());
+    log_aserror(_("MovieClip.beginGradientFill(%s): args after "
+            "the first five will be discarded"), ss.str());
   }
   );
 
@@ -1735,9 +1734,6 @@ sprite_beginGradientFill(const fn_call& fn)
     );
     return as_value();
   }
-
-  VM& vm = sprite->getVM();
-  string_table& st = vm.getStringTable();
 
   // ----------------------------
   // Parse matrix
@@ -1802,14 +1798,11 @@ sprite_beginGradientFill(const fn_call& fn)
   }
   else
   {
-    // TODO: add to namedStrings.{cpp,h}
-    static const string_table::key keyG = st.find("g");
-
     float valA = matrixArg->getMember(NSV::PROP_A).to_number() ; // xx
     float valB = matrixArg->getMember(NSV::PROP_B).to_number() ; // yx
     float valD = matrixArg->getMember(NSV::PROP_D).to_number() ; // xy
     float valE = matrixArg->getMember(NSV::PROP_E).to_number() ; // yy
-    boost::int32_t valG = PIXELS_TO_TWIPS(matrixArg->getMember(keyG).to_number()); // x0
+    boost::int32_t valG = PIXELS_TO_TWIPS(matrixArg->getMember(NSV::PROP_G).to_number()); // x0
     boost::int32_t valH = PIXELS_TO_TWIPS(matrixArg->getMember(NSV::PROP_H).to_number()); // y0
 
     input_matrix.sx  = valA * 65536; // sx
@@ -1887,6 +1880,9 @@ sprite_beginGradientFill(const fn_call& fn)
       sprite->getTarget(), ss.str(), ngradients); 
     ngradients = 8;
   }
+
+  VM& vm = sprite->getVM();
+  string_table& st = vm.getStringTable();
 
   std::vector<gradient_record> gradients;
   gradients.reserve(ngradients);

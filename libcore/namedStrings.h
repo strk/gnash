@@ -116,6 +116,7 @@ enum NamedStrings {
 		PROP_D,
 		PROP_E,
 		PROP_ENABLED,
+        PROP_G,
 		PROP_H,
 		PROP_HEIGHT,
 		PROP_HTML_TEXT,

@@ -67,7 +67,7 @@ static as_object* getXMLInterface();
 static void attachXMLInterface(as_object& o);
 static void attachXMLProperties(as_object& o);
 
-DSOEXPORT as_value xml_new(const fn_call& fn);
+static as_value xml_new(const fn_call& fn);
 static as_value xml_load(const fn_call& fn);
 static as_value xml_addRequestHeader(const fn_call& fn);
 static as_value xml_createelement(const fn_call& fn);
@@ -339,11 +339,14 @@ XML_as::parseXML(const std::string& xml_in)
     else
     {
         log_debug(_("malformed XML, trying to recover"));
-        int ret = xmlParseBalancedChunkMemoryRecover(NULL, NULL, NULL, 0, (const xmlChar*)xml_in.c_str(), &firstNode, 1);
+        int ret = xmlParseBalancedChunkMemoryRecover(NULL, NULL, NULL, 
+                0, (const xmlChar*)xml_in.c_str(), &firstNode, 1);
         log_debug("xmlParseBalancedChunkMemoryRecover returned %d", ret);
         if ( ! firstNode )
         {
-            log_error(_("unrecoverable malformed XML (xmlParseBalancedChunkMemoryRecover returned %d)."), ret);
+            log_error(_("unrecoverable malformed XML "
+                        "(xmlParseBalancedChunkMemoryRecover returned "
+                        "%d)."), ret);
             return false;
         }
         else
@@ -381,7 +384,8 @@ XML_as::queueLoad(std::auto_ptr<IOChannel> str)
     // 
     _loadThreads.push_front(lt.get());
 #ifdef DEBUG_XML_LOADS
-    log_debug("Pushed thread %p to _loadThreads, number of XML load threads now: %d", (void*)lt.get(),  _loadThreads.size());
+    log_debug("Pushed thread %p to _loadThreads, number of XML load "
+            "threads now: %d", (void*)lt.get(),  _loadThreads.size());
 #endif
     lt.release();
 
@@ -441,7 +445,8 @@ XML_as::checkLoads()
         _bytesTotal = lt->getBytesTotal();
 
 #ifdef DEBUG_XML_LOADS
-        log_debug("XML loads thread %p got %ld/%ld bytes", (void*)lt, lt->getBytesLoaded(), lt->getBytesTotal() );
+        log_debug("XML loads thread %p got %ld/%ld bytes",
+                (void*)lt, lt->getBytesLoaded(), lt->getBytesTotal() );
 #endif
         if ( lt->completed() )
         {
@@ -454,8 +459,9 @@ XML_as::checkLoads()
 				// possibility which lacks documentation (thus a bug in documentation)
 				//
 #ifdef DEBUG_XML_LOADS
-				log_debug("LoadThread::getBytesLoaded() returned %d but ::read(%d) returned %d",
-					xmlsize, xmlsize, actuallyRead);
+				log_debug("LoadThread::getBytesLoaded() returned %d but "
+                        "::read(%d) returned %d",
+					    xmlsize, xmlsize, actuallyRead);
 #endif
 			}
             buf[actuallyRead] = '\0';
@@ -466,7 +472,8 @@ XML_as::checkLoads()
             char* bufptr = utf8::stripBOM(buf.get(), xmlsize, encoding);
             if ( encoding != utf8::encUTF8 && encoding != utf8::encUNSPECIFIED )
             {
-                log_unimpl("%s to utf8 conversion in XML input parsing", utf8::textEncodingName(encoding));
+                log_unimpl("%s to utf8 conversion in XML input parsing",
+                        utf8::textEncodingName(encoding));
             }
             as_value dataVal(bufptr); // memory copy here (optimize?)
 
@@ -477,7 +484,8 @@ XML_as::checkLoads()
             callMethod(onDataKey, dataVal);
 
 #ifdef DEBUG_XML_LOADS
-            log_debug("Completed load, _loadThreads have now %d elements", _loadThreads.size());
+            log_debug("Completed load, _loadThreads have now %d elements",
+                    _loadThreads.size());
 #endif
         }
         else
@@ -520,7 +528,8 @@ XML_as::load(const URL& url)
     // Set a loaded property to false before starting the load.
     set_member(NSV::PROP_LOADED, false);
 
-    std::auto_ptr<IOChannel> str ( StreamProvider::getDefaultInstance().getStream(url) );
+    std::auto_ptr<IOChannel> str =
+            StreamProvider::getDefaultInstance().getStream(url);
     if ( ! str.get() ) 
     {
         log_error(_("Can't load XML file: %s (security?)"), url.str());
@@ -579,7 +588,7 @@ XML_as::sendAndLoad(const URL& url, as_object& target)
         /// Read in our custom headers if they exist and are an
         /// array.
         Array_as* array = dynamic_cast<Array_as*>(
-                        customHeaders.to_object().get());
+                customHeaders.to_object().get());
                         
         if (array)
         {
@@ -623,7 +632,8 @@ XML_as::sendAndLoad(const URL& url, as_object& target)
     {
         log_error(_("Can't load XML file: %s (security?)"), url.str());
         return;
-        // TODO: this is still not correct.. we should still send onData later...
+        // TODO: this is still not correct.. we should still
+        // send onData later...
         //as_value nullValue; nullValue.set_null();
         //callMethod(NSV::PROP_ON_DATA, nullValue);
     }
@@ -634,10 +644,6 @@ XML_as::sendAndLoad(const URL& url, as_object& target)
 }
 
 
-//
-// Callbacks. These are the wrappers for the C++ functions so they'll work as
-// callbacks from within gnash.
-//
 as_value
 xml_load(const fn_call& fn)
 {
@@ -646,8 +652,6 @@ xml_load(const fn_call& fn)
     as_value	rv = false;
     bool          ret;
 
-    //GNASH_REPORT_FUNCTION;
-  
     boost::intrusive_ptr<XML_as> xml_obj = ensureType<XML_as>(fn.this_ptr);
   
     if ( ! fn.nargs )
@@ -714,7 +718,7 @@ getXMLInterface()
 as_value
 xml_new(const fn_call& fn)
 {
-    as_value      inum;
+    as_value inum;
     boost::intrusive_ptr<XML_as> xml_obj;
   
     if ( fn.nargs > 0 )
@@ -725,7 +729,8 @@ xml_new(const fn_call& fn)
             xml_obj = boost::dynamic_pointer_cast<XML_as>(obj);
             if ( xml_obj )
             {
-                log_debug(_("Cloned the XML object at %p"), (void *)xml_obj.get());
+                log_debug(_("Cloned the XML object at %p"),
+                       (void *)xml_obj.get());
                 return as_value(xml_obj->cloneNode(true).get());
             }
         }
@@ -734,8 +739,8 @@ xml_new(const fn_call& fn)
         if ( xml_in.empty() )
         {
             IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("First arg given to XML constructor (%s) evaluates to the empty string"),
-                    fn.arg(0));
+            log_aserror(_("First arg given to XML constructor (%s) "
+                    "evaluates to the empty string"), fn.arg(0));
             );
         }
         else
@@ -746,7 +751,6 @@ xml_new(const fn_call& fn)
     }
 
     xml_obj = new XML_as;
-    //log_debug(_("\tCreated New XML object at %p"), xml_obj);
 
     return as_value(xml_obj.get());
 }
