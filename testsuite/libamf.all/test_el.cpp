@@ -50,7 +50,6 @@ static void usage (void);
 
 // Prototypes for test cases
 static void test_construct();
-static void test_destruct();
 static void test_make();
 static void test_operators();
 static void test_properties();
@@ -114,112 +113,57 @@ main(int argc, char *argv[])
     test_construct();
     test_make();
     test_operators();
-    test_destruct();
     test_properties();
 }
 
 void
 test_properties()
 {
+    std::vector<Element *> data1;
+
+    const char *str1 = "property one";
+    Element *prop1 = new Element(str1);
+    data1.push_back(prop1);
+
+    string str2 = "property two";
+    Element *prop2 = new Element(str2);
+    data1.push_back(prop2);
+
+    Element *prop3 = new Element("property three");
+    data1.push_back(prop3);
+
+    double num = 123.456;
+    Element *prop4 = new Element(num);
+    data1.push_back(prop4);
+    
     Element top;
-    top.makeObject("app");
-
-    Element *prop1 = new Element;
-    prop1->makeString("property one");
-    top.addProperty(prop1);
+    top.makeObject("app", data1);
     
-    Element *prop2 = new Element;
-    prop2->makeString("property two");
-    top.addProperty(prop2);
-
-    if (top.propertySize() == 2) {
-        runtest.pass("Adding property");
+    if ((top.propertySize() == 4)
+        && (top.getType() == Element::OBJECT_AMF0)
+        && (strcmp(top[0]->to_string(), str1) == 0)
+        && (top[1]->to_string() == str2)
+        && (strcmp(top[2]->to_string(), "property three") == 0)
+        && (top[3]->to_number() == num)) {
+        runtest.pass("Made object with properties");
     } else {
-        runtest.fail("Adding property");
+        runtest.fail("Made object with properties");
     }
-    
+
+    data1.clear();
+
 //    top.dump();
 }
 
 void
 test_construct()
 {
-    // First test the init method, which is all the constructor does anyway.. First
-    // we test just making regular elements instead of named elements, ie...
-    // AMF "variables".
-//     Element el1;
-//     if (el1.getType() == Element::NOTYPE) {
-//         runtest.pass("Created empty element");
-//     } else {
-//         runtest.fail("Created empty element");
-//     }
 
-    Element el2;
-    double dub = 54.3;
-    el2.init(dub);
-    if ((el2.getType() == Element::NUMBER_AMF0) &&
-        (el2.to_number() == dub)) {
-        runtest.pass("Initialized as double element");
-    } else {
-        runtest.fail("Initialized as double element");
-    }
-
-    Element el3;
+    // Test creating number elements. An element with a name is a property.
+    double dub = 23.45;
     bool flag = true;
-    el3.init(flag);
-    if ((el3.getType() == Element::BOOLEAN_AMF0) &&
-        (el3.to_bool() == true)) {
-        runtest.pass("Initialized as bool element");
-    } else {
-        runtest.fail("Initialized as bool element");
-    }
+    string str = "Guten Tag";
 
-    Element el4;
-    string str = "Hello World";
-    el4.init(str);
-    if ((el4.getType() == Element::STRING_AMF0) &&
-        (el4.getLength() == str.size())) {
-        runtest.pass("Initialized as string element");
-    } else {
-        runtest.fail("Initialized as string element");
-    }
-
-    // Now test init with the variable name
-    Element el5;
-    dub = 2.456;
-    el5.init("test1", dub);
-    if ((el5.getType() == Element::NUMBER_AMF0) &&
-        (strcmp(el5.getName(), "test1") == 0) &&
-        (el5.to_number() == dub)) {
-        runtest.pass("Initialized as double element with name");
-    } else {
-        runtest.fail("Initialized as double element with name");
-    }
-
-    Element el6;
-    flag = true;
-    el6.init("test2", flag);
-    if ((el6.getType() == Element::BOOLEAN_AMF0) &&
-        (strcmp(el6.getName(), "test2") == 0) &&
-        (el6.to_bool() == true)) {
-        runtest.pass("Initialized as bool element with name");
-    } else {
-        runtest.fail("Initialized as bool element with name");
-    }
-
-    Element el7;
-    str = "Hello World";
-    el7.init("test3", str);
-    if ((el7.getType() == Element::STRING_AMF0) &&
-        (strcmp(el7.getName(), "test3") == 0) &&
-        (el7.getLength() == str.size())) {
-        runtest.pass("Initialized as string element with name");
-    } else {
-        runtest.fail("Initialized as string element with name");
-    }
-
-    // Now test the actual constructor
-    dub = 23.45;
     Element elnum1(dub);
     if ((elnum1.getType() == Element::NUMBER_AMF0) &&
         (elnum1.to_number() == dub)) {
@@ -237,7 +181,6 @@ test_construct()
         runtest.fail("Constructed as bool element");
     }
 
-    str = "Guten Tag";
     Element elstr1(str);
     if ((elstr1.getType() == Element::STRING_AMF0) &&
         (elstr1.getLength() == str.size())) {
@@ -272,11 +215,6 @@ test_construct()
     } else {
         runtest.fail("Constructed as string element with name");
     }
-}
-
-void
-test_destruct()
-{
 }
 
 void
@@ -351,7 +289,7 @@ test_make()
 
     Element el8;
     el8.clear();
-    el8.makeObject("app");
+    el8.makeObject();
     if (el8.getType() == Element::OBJECT_AMF0) {
         runtest.pass("Made Object element");
     } else {
@@ -486,6 +424,33 @@ test_operators()
         runtest.fail("Element::operator=(Element &)");
     } else {
         runtest.pass("Element::operator=(Element &)");
+    }
+    
+    Element el4;
+    string str4 = "Hello World";
+    el4 = str4;
+    if (el4.to_string() == str4) {
+        runtest.pass("Element::operator=(string &)");
+    } else {
+        runtest.fail("Element::operator=(string &)");
+    }
+
+    Element el5;
+    double num5 = 1234.4567;
+    el5 = num5;
+    if (el5.to_number() == num5) {
+        runtest.pass("Element::operator=(double)");
+    } else {
+        runtest.fail("Element::operator=(double)");
+    }
+
+    Element el6;
+    bool flag6 = true;
+    el6 = flag6;
+    if (el6.to_bool() == flag6) {
+        runtest.pass("Element::operator=(bool)");
+    } else {
+        runtest.fail("Element::operator=(bool)");
     }
 }
 

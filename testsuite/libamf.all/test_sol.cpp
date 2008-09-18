@@ -62,7 +62,7 @@ Memory *mem = 0;
 static TestState runtest;
 
 static void test_read(std::string &filespec);
-static void test_write(std::string &filespec);
+//static void test_write(std::string &filespec);
 bool test_sol(std::string &filespec);
 
 LogFile& dbglogfile = LogFile::getDefaultInstance();
@@ -175,8 +175,7 @@ main(int argc, char *argv[])
     filespec += "/testout.sol";    
     // Write a .sol file
     
-    test_write(filespec);
-//    test_read(filespec);
+//    test_write(filespec);
     
 //    test_sol();
 }
@@ -215,6 +214,7 @@ test_read(std::string &filespec)
     delete hex1;
 }
 
+#if 0
 void
 test_write(std::string &filespec)
 {
@@ -229,36 +229,20 @@ test_write(std::string &filespec)
 
     double dub = 50.0;
 
-
 //    amf::Element *el = new amf::Element("gain", dub);
-    amf::Element *el = new amf::Element;
-    el->init("gain", dub);
+    amf::Element *el = new amf::Element("gain", dub);
 //    amf_obj.createElement(&el, "gain", dub);
     sol.addObj(el);
+
     if ((strcmp(el->getName(), "gain") == 0) &&
         (el->getType() == Element::NUMBER_AMF0) &&
-        (memcmp(el->getData(), &dub, AMF0_NUMBER_SIZE) == 0) &&
-        (*((double *)el->getData()) == dub) &&
+        (el->to_number() == dub) &&
         (el->getLength() == AMF0_NUMBER_SIZE)) {
         runtest.pass("gain set");
     } else {
         runtest.fail("gain set");
     }
     
-    //uint8_t *foo;
-    //char *ptr;
-#if 0
-    foo = amf_obj.encodeVariable(el); 
-    ptr = (char *)amf_obj.extractVariable(&newel, foo);
-    if ((el.getName() == newel.getName()) &&
-        (el.getLength() == newel.getLength()) &&
-        (newel.getType() == Element::NUMBER_AMF0) &&
-        (*((double *)newel.getData()) == dub)) {
-        runtest.pass("gain number encoded/extracted");
-    } else {
-        runtest.fail("gain number encoded/extracted");
-    }
-#endif
     el = new amf::Element("echosuppression", false);
     sol.addObj(el);
     if ((strcmp(el->getName(), "echosuppression") == 0) &&
@@ -269,17 +253,6 @@ test_write(std::string &filespec)
     } else {
         runtest.fail("echosupression set");
     }
-    
-//     foo = amf_obj.encodeVariable(el); 
-//     ptr = (char *)amf_obj.extractVariable(&newel, reinterpret_cast<uint8_t *>(foo));
-//     if ((el->getName() == newel.getName()) &&
-//         (el->getType() == Element::BOOLEAN) &&
-//         (el->getLength() == newel.getLength()) &&
-//         (memcmp(el->getData(), newel.getData(), el->getLength()) == 0)) {
-//         runtest.pass("echosupression bool(false) encoded/extracted");
-//     } else {
-//         runtest.fail("echosupression bool(false) encoded/extracted");
-//     }
     
     string name = "defaultmicrophone";
     string data = "/dev/input/mic";
@@ -296,7 +269,6 @@ test_write(std::string &filespec)
 
     data = "";
     el = new amf::Element("defaultcamera", data);
-    el->init("defaultcamera", data);
     sol.addObj(el);
     if ((strcmp(el->getName(), "defaultcamera") == 0) &&
         (el->getType() == Element::STRING_AMF0) &&
@@ -307,25 +279,23 @@ test_write(std::string &filespec)
     }
     
     dub = 100.0;
-    el = new amf::Element;
+    el = new amf::Element("defaultklimit", dub);
 //    el = new amf::Element("defaultklimit", dub);
-    el->init("defaultklimit", dub);
     sol.addObj(el);
     if ((strcmp(el->getName(), "defaultklimit") == 0) &&
         (el->getType() == Element::NUMBER_AMF0) &&
-        (memcmp(el->getData(), &dub, AMF0_NUMBER_SIZE) == 0) &&
-        (*((double *)el->getData()) == dub) &&
+        (el->to_number() == dub) &&
         (el->getLength() == AMF0_NUMBER_SIZE)) {
         runtest.pass("defaultklimit set");
     } else {
         runtest.fail("defaultklimit set");
     }
-
+    
     el = new amf::Element("defaultalways", false);
     sol.addObj(el);
     if ((strcmp(el->getName(), "defaultalways") == 0) &&
         (el->getType() == Element::BOOLEAN_AMF0) &&
-        (*el->getData() == 0) &&
+        (el->to_bool() == false) &&
         (el->getLength() == 1)) {
         runtest.pass("defaultalways set");
     } else {
@@ -336,7 +306,7 @@ test_write(std::string &filespec)
     sol.addObj(el);
     if ((strcmp(el->getName(), "crossdomainAllow") == 0) &&
         (el->getType() == Element::BOOLEAN_AMF0) &&
-        (*el->getData() == 1) &&
+        (el->to_bool() == true) &&
         (el->getLength() == 1)) {
         runtest.pass("crossdomainAllow set");
     } else {
@@ -364,29 +334,8 @@ test_write(std::string &filespec)
     } else {
         runtest.fail("allowThirdPartyLSOAccess set");
     }
-
-#if 0
-    // FIXME: Why does GCC keep linking this to the bool
-    // version instead ?
-    boost::intrusive_ptr<gnash::as_object> as;
-    amf_obj.createElement(&el, "trustedPaths", &as);
-    if ((el->getName() == "trustedPaths") &&
-        (el->getType() == Element::OBJECT_AMF0)) {
-        runtest.xpass("trustedPaths set");
-    } else {
-        runtest.xfail("trustedPaths set");
-        // force the type so the binary output stays correct.
-        // As this builds a null object, we get away with it,
-        // and it helps debugging to have the hexdumps of the
-        // .sol files match the originals.
-        el->getType() = Element::OBJECT_AMF0;  
-        el->getLength() = 0;
-    }
-    sol.addObj(el);
-#endif
     
-    el = new amf::Element;
-    el->init("localSecPath", data);
+    el = new amf::Element("localSecPath", data);
     sol.addObj(el);
     if ((strcmp(el->getName(), "localSecPath") == 0) &&
         (el->getType() == Element::STRING_AMF0) &&
@@ -400,8 +349,7 @@ test_write(std::string &filespec)
     dub = 1.8379389592608646e-304;
     swapBytes(&dub, 8);
     
-    el = new amf::Element;
-    el->init("localSecPathTime", dub);
+    el = new amf::Element("localSecPathTime", dub);
     sol.addObj(el);
     if ((strcmp(el->getName(), "localSecPathTime") ==0) &&
         (el->getType() == Element::NUMBER_AMF0) &&
@@ -412,11 +360,11 @@ test_write(std::string &filespec)
     } else {
         runtest.fail("localSecPathTime set");
     }
-
-//    sol.dump();
+    sol.dump();
     // now write the data to disk
     sol.writeFile(filespec, "settings");
 }
+#endif
 
 static void
 usage (void)

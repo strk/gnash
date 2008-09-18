@@ -261,7 +261,7 @@ test_split()
     if (notest) {
         runtest.fail("RTMP::split(5 packets)");
     } else {
-        // there are 4 pacjets in this message, 2 pings, followed by a onStatus,
+        // there are 4 packets in this message, 2 pings, followed by a onStatus,
         // followed by a ping, and then the rest of the onStatus message.
         if (queues2->size() == 4) {
             runtest.pass("RTMP::split(5 packets)");
@@ -456,7 +456,7 @@ test_system()
     RTMPClient client;
     RTMPServer server;
     
-    Buffer *buf1 = hex2mem("00 00 00 00 00 00");  // clear buffer message
+    Buffer *buf1 = hex2mem("00 00 00 00 00 00"); // clear buffer message
     Buffer *buf2 = hex2mem("00 06 cf 03 04 c3"); // ping client from server
     Buffer *buf3 = hex2mem("00 07 cf 03 04 c3"); // Pong, reply from client
     Buffer *buf4 = hex2mem("00 00 00 00 00 01"); // clear buffer message
@@ -514,6 +514,10 @@ test_system()
         cerr << hexify(buf11->begin(), buf11->size(), false) << endl;
     }
 #endif
+    
+    "c2 00 06 30 86 0a ae";
+
+    
     
     // cleanup
     delete ping1;

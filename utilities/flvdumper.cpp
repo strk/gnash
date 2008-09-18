@@ -216,7 +216,7 @@ main(int argc, char *argv[])
 		 tag  = flv.decodeTagHeader(&buf);
 		 
 		 total -= sizeof(Flv::previous_size_t);
-		 boost::uint32_t bodysize = flv.convert24(tag->bodysize);
+		 size_t bodysize = flv.convert24(tag->bodysize);
 		 if (bodysize == 0) {
 		     cerr << "FLV Tag size is zero, skipping reading packet body " << bodysize << endl;
 		     continue;
