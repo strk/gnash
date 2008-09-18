@@ -60,7 +60,7 @@ VM::init(movie_definition& movie, VirtualClock& clock)
 	_singleton.reset(new VM(movie, clock));
 
 	assert(_singleton.get());
-	NSV::load_strings(&_singleton->mStringTable, _singleton->getSWFVersion());
+	NSV::loadStrings(_singleton->mStringTable, _singleton->getSWFVersion());
 
 	_singleton->mClassHierarchy.reset(new ClassHierarchy);
 	_singleton->setGlobal(new Global(*_singleton, _singleton->mClassHierarchy.get()));

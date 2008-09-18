@@ -800,8 +800,7 @@ static as_value sprite_load_variables(const fn_call& fn)
     boost::intrusive_ptr<as_object> methodstr = fn.arg(1).to_object();
     assert(methodstr);
     
-    string_table& st = sprite->getVM().getStringTable();
-    as_value lc = methodstr->callMethod(st.find(PROPNAME("toLowerCase")));
+    as_value lc = methodstr->callMethod(NSV::PROP_TO_LOWER_CASE);
     std::string methodstring = lc.to_string(); 
   
     if ( methodstring == "get" ) method = 1;
@@ -1012,8 +1011,7 @@ sprite_meth(const fn_call& fn)
     return as_value(0);
   }
 
-  string_table& st = sprite->getVM().getStringTable();
-  as_value lc = o->callMethod(st.find(PROPNAME("toLowerCase")));
+  as_value lc = o->callMethod(NSV::PROP_TO_LOWER_CASE);
 
   log_debug(_("after call to toLowerCase with arg %s we got %s"), v, lc);
 
@@ -1698,7 +1696,8 @@ sprite_beginGradientFill(const fn_call& fn)
   if ( fn.nargs > 5 )
   {
     std::stringstream ss; fn.dump_args(ss);
-    log_aserror(_("MovieClip.beginGradientFill(%s): args after the first five will be discarded"), ss.str());
+    log_aserror(_("MovieClip.beginGradientFill(%s): args after "
+            "the first five will be discarded"), ss.str());
   }
   );
 
@@ -1736,9 +1735,6 @@ sprite_beginGradientFill(const fn_call& fn)
     return as_value();
   }
 
-  VM& vm = sprite->getVM();
-  string_table& st = vm.getStringTable();
-
   // ----------------------------
   // Parse matrix
   // ----------------------------
@@ -1762,22 +1758,14 @@ sprite_beginGradientFill(const fn_call& fn)
   matrix mat;
   matrix input_matrix;
 
-  string_table::key keyT = st.find(PROPNAME("matrixType"));
-  if ( matrixArg->getMember(keyT).to_string() == "box" )
+  if ( matrixArg->getMember(NSV::PROP_MATRIX_TYPE).to_string() == "box" )
   {
     
-    // TODO: add to namedStrings.{cpp,h}
-    static const string_table::key keyX = st.find("x");
-    static const string_table::key keyY = st.find("y");
-    static const string_table::key keyW = st.find("w");
-    static const string_table::key keyH = st.find("h");
-    static const string_table::key keyR = st.find("r");
-
-    boost::int32_t valX = PIXELS_TO_TWIPS(matrixArg->getMember(keyX).to_number()); 
-    boost::int32_t valY = PIXELS_TO_TWIPS(matrixArg->getMember(keyY).to_number()); 
-    boost::int32_t valW = PIXELS_TO_TWIPS(matrixArg->getMember(keyW).to_number()); 
-    boost::int32_t valH = PIXELS_TO_TWIPS(matrixArg->getMember(keyH).to_number()); 
-    float valR = matrixArg->getMember(keyR).to_number(); 
+    boost::int32_t valX = PIXELS_TO_TWIPS(matrixArg->getMember(NSV::PROP_X).to_number()); 
+    boost::int32_t valY = PIXELS_TO_TWIPS(matrixArg->getMember(NSV::PROP_Y).to_number()); 
+    boost::int32_t valW = PIXELS_TO_TWIPS(matrixArg->getMember(NSV::PROP_W).to_number()); 
+    boost::int32_t valH = PIXELS_TO_TWIPS(matrixArg->getMember(NSV::PROP_H).to_number()); 
+    float valR = matrixArg->getMember(NSV::PROP_R).to_number(); 
 
     if ( radial )
     {
@@ -1810,20 +1798,12 @@ sprite_beginGradientFill(const fn_call& fn)
   }
   else
   {
-    // TODO: add to namedStrings.{cpp,h}
-    static const string_table::key keyA = st.find("a");
-    static const string_table::key keyB = st.find("b");
-    static const string_table::key keyD = st.find("d");
-    static const string_table::key keyE = st.find("e");
-    static const string_table::key keyG = st.find("g");
-    static const string_table::key keyH = st.find("h");
-
-    float valA = matrixArg->getMember(keyA).to_number() ; // xx
-    float valB = matrixArg->getMember(keyB).to_number() ; // yx
-    float valD = matrixArg->getMember(keyD).to_number() ; // xy
-    float valE = matrixArg->getMember(keyE).to_number() ; // yy
-    boost::int32_t valG = PIXELS_TO_TWIPS(matrixArg->getMember(keyG).to_number()); // x0
-    boost::int32_t valH = PIXELS_TO_TWIPS(matrixArg->getMember(keyH).to_number()); // y0
+    float valA = matrixArg->getMember(NSV::PROP_A).to_number() ; // xx
+    float valB = matrixArg->getMember(NSV::PROP_B).to_number() ; // yx
+    float valD = matrixArg->getMember(NSV::PROP_D).to_number() ; // xy
+    float valE = matrixArg->getMember(NSV::PROP_E).to_number() ; // yy
+    boost::int32_t valG = PIXELS_TO_TWIPS(matrixArg->getMember(NSV::PROP_G).to_number()); // x0
+    boost::int32_t valH = PIXELS_TO_TWIPS(matrixArg->getMember(NSV::PROP_H).to_number()); // y0
 
     input_matrix.sx  = valA * 65536; // sx
     input_matrix.shx = valB * 65536; // shy
@@ -1900,6 +1880,9 @@ sprite_beginGradientFill(const fn_call& fn)
       sprite->getTarget(), ss.str(), ngradients); 
     ngradients = 8;
   }
+
+  VM& vm = sprite->getVM();
+  string_table& st = vm.getStringTable();
 
   std::vector<gradient_record> gradients;
   gradients.reserve(ngradients);
@@ -2646,7 +2629,7 @@ sprite_instance::get_frame_number(const as_value& frame_spec, size_t& frameno) c
 
   as_value str(fspecStr);
 
-  double num =  str.to_number();
+  double num = str.to_number();
 
   //log_debug("get_frame_number(%s), num: %g", frame_spec, num);
 

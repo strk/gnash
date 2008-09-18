@@ -416,7 +416,6 @@ LoadVars_as::sendAndLoad(const std::string& urlstr, as_object& target, bool post
 	std::auto_ptr<IOChannel> str;
 	if (post)
     {
-        string_table& st = _vm.getStringTable();
         as_value customHeaders;
 
         NetworkAdapter::RequestHeaders headers;
@@ -458,7 +457,7 @@ LoadVars_as::sendAndLoad(const std::string& urlstr, as_object& target, bool post
 
         as_value contentType;
 
-        if ( get_member(st.find("contentType"), &contentType) )
+        if (get_member(NSV::PROP_CONTENT_TYPE, &contentType))
         {
             // This should not overwrite anything set in LoadVars.addRequestHeader();
             headers.insert(std::make_pair("Content-Type", contentType.to_string()));
