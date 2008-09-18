@@ -119,8 +119,6 @@ public:
     Element &operator=(const std::string &str);
     Element &operator=(bool flag);
     
-    // These create the other "special" AMF types.
-
     // A Null String is a string with a length of zero
     Element &makeNullString();
 
@@ -150,7 +148,7 @@ public:
     Element &makeNull();
     Element &makeNull(const std::string &name);
 
-    // Tterminate an object
+    // Terminate an object
     Element &makeObjectEnd();
 
     // Make an AMF Object. This is an AMF type that support having properties.
