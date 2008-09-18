@@ -26,9 +26,12 @@
 #include "builtin_function.h"
 #include "VM.h" // for getPlayerVersion() 
 #include "Object.h" // for getObjectInterface
-#include "URL.h" // for encoding serverString
 
-#define TF(x) (x ? "t" : "f")
+inline std::string
+trueFalse(bool x)
+{
+    return x ? "t" : "f";
+}
 
 namespace gnash {
 
@@ -202,18 +205,18 @@ getSystemCapabilitiesInterface(as_object& o)
 	// This should be the standard order of parameters in the server
 	// string.
 	std::ostringstream serverString;
-	serverString << "A="    << TF(hasAudio)
-			<< "&SA="	<< TF(hasStreamingAudio)
-			<< "&SV="	<< TF(hasStreamingVideo)
-			<< "&EV="	<< TF(hasEmbeddedVideo)
-			<< "&MP3="	<< TF(hasMP3)						
-			<< "&AE="	<< TF(hasAudioEncoder)
-			<< "&VE="	<< TF(hasVideoEncoder)
-			<< "&ACC="	<< TF(hasAccessibility)
-			<< "&PR="	<< TF(hasPrinting)
-			<< "&SP="	<< TF(hasScreenPlayback) 
-			<< "&SB="	<< TF(hasScreenBroadcast) 
-			<< "&DEB="	<< TF(isDebugger)
+	serverString << "A="    << trueFalse(hasAudio)
+			<< "&SA="	<< trueFalse(hasStreamingAudio)
+			<< "&SV="	<< trueFalse(hasStreamingVideo)
+			<< "&EV="	<< trueFalse(hasEmbeddedVideo)
+			<< "&MP3="	<< trueFalse(hasMP3)						
+			<< "&AE="	<< trueFalse(hasAudioEncoder)
+			<< "&VE="	<< trueFalse(hasVideoEncoder)
+			<< "&ACC="	<< trueFalse(hasAccessibility)
+			<< "&PR="	<< trueFalse(hasPrinting)
+			<< "&SP="	<< trueFalse(hasScreenPlayback) 
+			<< "&SB="	<< trueFalse(hasScreenBroadcast) 
+			<< "&DEB="	<< trueFalse(isDebugger)
 			<< "&V="    << URL::encode(version)
 			<< "&M="    << URL::encode(manufacturer)
 			<< "&R="    << screenResolutionX << "x" << screenResolutionY
@@ -223,10 +226,10 @@ getSystemCapabilitiesInterface(as_object& o)
 			<< "&OS="   << URL::encode(os)
 			<< "&L="    << language			
 			<< "&PT="   << playerType
-			<< "&AVD="	<< TF(avHardwareDisable) 
-			<< "&LFD="	<< TF(localFileReadDisable)
-			<< "&WD="   << TF(windowlessDisable)
-			<< "&TLS="	<< TF(hasTLS);
+			<< "&AVD="	<< trueFalse(avHardwareDisable) 
+			<< "&LFD="	<< trueFalse(localFileReadDisable)
+			<< "&WD="   << trueFalse(windowlessDisable)
+			<< "&TLS="	<< trueFalse(hasTLS);
 	
 	static boost::intrusive_ptr<as_object> proto;
 	if ( proto == NULL )
@@ -355,7 +358,7 @@ system_exactsettings(const fn_call& fn)
 
 
 // FIXME: if true, SWF6+ should treat characters as Latin
-// charset variants. If false (default), as UTF-8.
+// charset variants. If false (default), as UtrueFalse-8.
 // Can be set.
 as_value
 system_usecodepage(const fn_call& fn)
