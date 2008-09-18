@@ -665,10 +665,7 @@ public:
 	/// @return true of the named property was found, false otherwise.
 	///
 	virtual bool get_member(string_table::key name, as_value* val,
-		string_table::key nsname = 0)
-	{
-		return get_member_default(name, val, nsname);
-	}
+		string_table::key nsname = 0);
 
 	/// Resolve the given relative path component
 	//
@@ -1064,30 +1061,6 @@ protected:
 	/// The default implementation adds nothing
 	///
 	virtual void enumerateNonProperties(as_environment&) const {}
-
-	/// Get a property value by name
-	//
-	/// This is the default implementation, taking care of
-	/// the inheritance chain and getter/setter functions.
-	///
-        /// The derived class should not override this method,
-        /// but instead implement its own gettersetter properties.
-	///
-	/// NOTE that this method is non-const becase a property
-	///      could also be a getter/setter and we can't promise
-	///      that the 'getter' won't change this object trough
-	///	 use of the 'this' reference.
-	///
-	/// @param name
-	///	Name of the property. Must be all lowercase
-	///	if the current VM is initialized for a  target
-	///	up to SWF6.
-	///
-	/// @param val
-	///     The as_value to store a found variable's value in.
-	///
-	bool get_member_default(string_table::key name, as_value* val, 
-		string_table::key nsname);
 
 	/// Set a member value
 	//

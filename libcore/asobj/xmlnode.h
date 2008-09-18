@@ -45,7 +45,7 @@ namespace gnash {
 //
 /// This is the base class for the XML ActionScript class
 ///
-class XMLNode : public gnash::as_object
+class XMLNode : public as_object
 {
 public:
 

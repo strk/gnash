@@ -138,7 +138,7 @@ XML_as::get_member(string_table::key name, as_value *val, string_table::key nsna
                 return true;
         }
 
-        return get_member_default(name, val, nsname);
+        return as_object::get_member(name, val, nsname);
 }
 
 bool

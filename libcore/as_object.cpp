@@ -300,9 +300,9 @@ as_object::add_property(const std::string& name, as_function& getter,
 	}
 }
 
-/*protected*/
+
 bool
-as_object::get_member_default(string_table::key name, as_value* val,
+as_object::get_member(string_table::key name, as_value* val,
 	string_table::key nsname)
 {
 	assert(val);
@@ -328,6 +328,7 @@ as_object::get_member_default(string_table::key name, as_value* val,
 		return false;
 	}
 }
+
 
 Property*
 as_object::getByIndex(int index)

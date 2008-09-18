@@ -2951,14 +2951,13 @@ sprite_instance::get_path_element(string_table::key key)
 
   // See if it's a member
 
-  // NOTE: direct use of get_member_default avoids
+  // NOTE: direct use of the base class's get_member avoids
   //       triggering a call to sprite_instance::get_member
   //       which would scan the child characters again
   //       w/out a need for it
-  //return as_object::get_path_element(key);
 
   as_value tmp;
-  if ( ! get_member_default(key, &tmp, 0) )
+  if ( !as_object::get_member(key, &tmp, 0) )
   {
     return NULL;
   }
