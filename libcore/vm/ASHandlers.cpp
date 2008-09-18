@@ -2990,7 +2990,7 @@ SWFHandlers::ActionTargetPath(ActionExec& thread)
     boost::intrusive_ptr<sprite_instance> sp = env.top(0).to_sprite();
     if ( sp )
     {
-        env.top(0).set_std_string(sp->getTarget());
+        env.top(0).set_string(sp->getTarget());
     }
     else
     {

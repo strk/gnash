@@ -2991,7 +2991,7 @@ sprite_instance::set_member(string_table::key name,
   // Try textfield variables
   //
   // FIXME: Turn textfield variables into Getter/Setters (Properties)
-  //        so that set_member_default will do this automatically.
+  //        so that as_object::set_member will do this automatically.
   //        The problem is that setting a TextVariable named after
   //        a builtin property will prevent *any* setting for the
   //        property (ie: have a textfield use _x as variable name and
@@ -3018,7 +3018,7 @@ sprite_instance::set_member(string_table::key name,
 #endif
 
   // If that didn't work call the default set_member
-  if (  set_member_default(name, val, nsname, ifFound) ) found=true;
+  if (as_object::set_member(name, val, nsname, ifFound)) found=true;
 
   return found;
 }

@@ -540,7 +540,7 @@ as_object::reserveSlot(string_table::key name, string_table::key nsId,
 
 // Handles read_only and static properties properly.
 bool
-as_object::set_member_default(string_table::key key, const as_value& val,
+as_object::set_member(string_table::key key, const as_value& val,
 	string_table::key nsname, bool ifFound)
 {
 	//log_debug(_("set_member_default(%s)"), key);
