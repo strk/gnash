@@ -40,7 +40,7 @@ SWFDisplayItem
 add_static_mc(SWFMovie mo, const char* name, int depth, int x, int y, int width, int height)
 {
 	SWFShape sh;
-	SWFMovieClip mc, mc2;
+	SWFMovieClip mc, mc2, mc3;
 	SWFDisplayItem it;
 
 	sh = make_fill_square (-(width/2), -(height/2), width, height, 255, 0, 0, 255, 0, 0);
@@ -51,9 +51,16 @@ add_static_mc(SWFMovie mo, const char* name, int depth, int x, int y, int width,
 	mc2 = newSWFMovieClip(); // child
 	SWFMovieClip_add(mc2, (SWFBlock)sh);
 	SWFMovieClip_nextFrame(mc2);
-
 	it = SWFMovieClip_add(mc, (SWFBlock)mc2);
 	SWFDisplayItem_setName(it, "child");
+
+	sh = make_fill_square ((width/4), -(height/8), (width/4), (height/4), 0, 255, 0, 0, 255, 0);
+	mc3 = newSWFMovieClip(); // child
+	SWFMovieClip_add(mc3, (SWFBlock)sh);
+	SWFMovieClip_nextFrame(mc3);
+	it = SWFMovieClip_add(mc, (SWFBlock)mc3);
+	SWFDisplayItem_setName(it, "face");
+
 	SWFMovieClip_nextFrame(mc);
 
 	it = SWFMovie_add(mo, (SWFBlock)mc);
@@ -85,6 +92,7 @@ main(int argc, char** argv)
 	Ming_init();
 	mo = newSWFMovieWithVersion(OUTPUT_VERSION);
 	SWFMovie_setDimension(mo, 800, 600);
+	//SWFMovie_setRate (mo, 0.2);
 	//SWFMovie_setRate (mo, 2);
 	SWFMovie_setRate (mo, 12);
 
@@ -100,6 +108,10 @@ main(int argc, char** argv)
             "   } else {"
             "       return '' + b.xMin + ','+ b.yMin + ' '+ b.xMax + ',' + b.yMax; "
             "   }"
+            "};"
+            "onMouseDown = function() {"
+            " if ( playing ) { playing=false; stop(); }"
+            " else { playing=true; play(); }"
             "};"
             );
 
