@@ -21,7 +21,7 @@
 
 #include "movie_root.h" // interface callback
 #include "log.h"
-#include "System.h"
+#include "System_as.h"
 #include "fn_call.h"
 #include "builtin_function.h"
 #include "VM.h" // for getPlayerVersion() 
