@@ -66,7 +66,7 @@ libgnashasobjs_la_SOURCES = \
 	SharedObject.cpp\
 	Sound.cpp \
 	Stage.cpp \
-	System.cpp \
+	System_as.cpp \
 	TextFormat.cpp \
 	TextSnapshot.cpp \
 	MovieClipLoader.cpp\
@@ -137,7 +137,7 @@ noinst_HEADERS = \
 	SoundGst.h \
 	SoundMad.h \
 	Stage.h	\
-	System.h \
+	System_as.h \
 	TextFormat.h \
 	TextSnapshot.h \
 	String_as.h \
