@@ -173,11 +173,7 @@ if test -z "$NO_LIBTOOLIZE" ; then
     exit 1
   fi
 fi
-if test -z "$NO_LIBTOOLIZE" ; then
-	if test $darwin -eq 1; then
-		(cd libltdl; ./configure)
-	fi
-fi
+
 #for coin in `find $srcdir -name CVS -prune -o -name configure.ac -print`
 for coin in configure.ac
 do 
