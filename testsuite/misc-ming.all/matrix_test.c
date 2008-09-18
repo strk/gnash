@@ -774,6 +774,28 @@ main(int argc, char** argv)
 	check(mo, "!staticmc.hitTest(0, 284, false)");  // overup
 	check(mo, "!staticmc.hitTest(0, 316, false)");  // overdown
 
+	SWFMovie_nextFrame(mo);        
+	SWFDisplayItem_setMatrix(it, 1, 1, 1, 1, 2, 3); // not-invertible matrix (I'd think)
+
+	check_equals(mo, "staticmc._x", "2");
+	check_equals(mo, "staticmc._y", "3");
+	check_equals(mo, "Math.round(staticmc._xscale)", "141");
+	check_equals(mo, "Math.round(staticmc._yscale)", "141");
+	check_equals(mo, "staticmc._rotation", "45");  
+	check_equals(mo, "printBounds(staticmc.getBounds())", "'-30.05,-30.05 30.05,30.05'");
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'-58.1,-57.1 62.1,63.1'");
+    add_actions(mo, "o = {x:1, y:1}; staticmc.localToGlobal(o);");
+	check_equals(mo, "o.x", "4");
+	check_equals(mo, "o.y", "5");
+    add_actions(mo, "o = {x:1, y:1}; staticmc.globalToLocal(o);"); // this triggers matrix inversion 
+	check_equals(mo, "o.x", "1");
+	check_equals(mo, "o.y", "1");
+    add_actions(mo, "o = {x:4, y:5}; staticmc.globalToLocal(o);"); // this triggers matrix inversion 
+	check_equals(mo, "o.x", "4");
+	check_equals(mo, "o.y", "5");
+	check_equals(mo, "Math.round(staticmc._width*10)", "1202");
+	check_equals(mo, "staticmc._height", "120.2");
+
 
 	//
 	// Now test setting parameters after reading matrix
@@ -1474,7 +1496,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);
 
-	add_actions(mo, "_root.totals(825); stop();");
+	add_actions(mo, "_root.totals(840); stop();");
 	SWFMovie_nextFrame(mo);        
 
 	//Output movie
