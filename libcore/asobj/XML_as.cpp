@@ -577,7 +577,6 @@ XML_as::sendAndLoad(const URL& url, as_object& target)
     toString(ss);
     const std::string& data = ss.str();
 
-    string_table& st = _vm.getStringTable();
     as_value customHeaders;
 
     NetworkAdapter::RequestHeaders headers;

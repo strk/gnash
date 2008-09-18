@@ -227,13 +227,6 @@ private:
 
 DSOEXPORT void xml_class_init(as_object& global);
 
-// Exporting this is a temporary hack for not changing xmlsocket.cpp now
-// (xmlsocket_xml_new calls xml_new)
-DSOEXPORT as_value xml_new(const fn_call& fn);
-
-DSOEXPORT int memadjust(int x);
-
-
 }	// end namespace gnash
 
 #endif

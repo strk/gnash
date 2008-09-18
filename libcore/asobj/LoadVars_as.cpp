@@ -416,7 +416,6 @@ LoadVars_as::sendAndLoad(const std::string& urlstr, as_object& target, bool post
 	std::auto_ptr<IOChannel> str;
 	if (post)
     {
-        string_table& st = _vm.getStringTable();
         as_value customHeaders;
 
         NetworkAdapter::RequestHeaders headers;

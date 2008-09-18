@@ -1828,12 +1828,12 @@ textfield_class_init(as_object& global)
 		if ( swfVer > 5 )
 		{
 			assert(iface);
-			assert(cl->getOwnProperty(vm.getStringTable().find("prototype")));
+			assert(cl->getOwnProperty(NSV::PROP_PROTOTYPE));
 		}
 		else
 		{
 			assert(!iface);
-			assert(!cl->getOwnProperty(vm.getStringTable().find("prototype")));
+			assert(!cl->getOwnProperty(NSV::PROP_PROTOTYPE));
 		}
 #endif
 
