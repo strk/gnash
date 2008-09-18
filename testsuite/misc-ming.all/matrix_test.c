@@ -784,17 +784,53 @@ main(int argc, char** argv)
 	check_equals(mo, "staticmc._rotation", "45");  
 	check_equals(mo, "printBounds(staticmc.getBounds())", "'-30.05,-30.05 30.05,30.05'");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'-58.1,-57.1 62.1,63.1'");
-    add_actions(mo, "o = {x:1, y:1}; staticmc.localToGlobal(o);");
+	add_actions(mo, "o = {x:1, y:1}; staticmc.localToGlobal(o);");
 	check_equals(mo, "o.x", "4");
 	check_equals(mo, "o.y", "5");
-    add_actions(mo, "o = {x:1, y:1}; staticmc.globalToLocal(o);"); // this triggers matrix inversion 
+	add_actions(mo, "o = {x:1, y:1}; staticmc.globalToLocal(o);"); // this triggers matrix inversion 
 	check_equals(mo, "o.x", "1");
 	check_equals(mo, "o.y", "1");
-    add_actions(mo, "o = {x:4, y:5}; staticmc.globalToLocal(o);"); // this triggers matrix inversion 
+	add_actions(mo, "o = {x:4, y:5}; staticmc.globalToLocal(o);"); // this triggers matrix inversion 
 	check_equals(mo, "o.x", "4");
 	check_equals(mo, "o.y", "5");
 	check_equals(mo, "Math.round(staticmc._width*10)", "1202");
 	check_equals(mo, "staticmc._height", "120.2");
+
+	// This is a matrix found in the mario.swf movie (bug #24280)
+	//
+	//     Matrix:
+	//      ScaleX 0.000000   ScaleY 0.000000
+	//      RotateSkew0 -1.000000   RotateSkew1 1.167969
+	//      TranslateX    -15   TranslateY   2700
+	//
+	// Actually this ming version omits ScaleX and ScaleY
+	// (hasScale flag clear). I hope it doesn't count!
+	//
+	SWFMovie_nextFrame(mo);        
+	SWFDisplayItem_setMatrix(it, 0, -1, 1.167969, 0, -.75, 135); 
+	check_equals(mo, "staticmc._x", "-0.75");
+	check_equals(mo, "staticmc._y", "135");
+	check_equals(mo, "Math.round(staticmc._xscale)", "141");
+	check_equals(mo, "Math.round(staticmc._yscale)", "154");
+	check_equals(mo, "staticmc._rotation", "-45");  
+
+	// This is a matrix found in the mario.swf movie (bug #24280)
+	//
+	//    Matrix:
+	//     ScaleX 0.000000   ScaleY 0.000000
+	//     RotateSkew0 0.972519   RotateSkew1 -1.000000
+	//     TranslateX    279   TranslateY   4296
+	//
+	// Actually this ming version omits ScaleX and ScaleY
+	// (hasScale flag clear). I hope it doesn't count!
+	//
+	SWFMovie_nextFrame(mo);        
+	SWFDisplayItem_setMatrix(it, 0, 0.972519, -1, 0, 13.950, 214.80); 
+	check_equals(mo, "staticmc._x", "13.950");
+	check_equals(mo, "staticmc._y", "214.80");
+	check_equals(mo, "Math.round(staticmc._xscale)", "139");
+	check_equals(mo, "Math.round(staticmc._yscale)", "141");
+	check_equals(mo, "Math.round(staticmc._rotation)", "44");  
 
 
 	//
@@ -1490,13 +1526,43 @@ main(int argc, char** argv)
 	check_equals(mo, "staticmc._rotation", "-2");
 	xcheck_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'78,159 322,241'");
 
+	SWFMovie_nextFrame(mo);
+
+	// This is a matrix found in the mario.swf movie (bug #24280)
+	//
+	//    Matrix:
+	//     ScaleX 0.000000   ScaleY 0.000000
+	//     RotateSkew0 0.972519   RotateSkew1 -1.000000
+	//     TranslateX    279   TranslateY   4296
+	//
+	// Actually this ming version omits ScaleX and ScaleY
+	// (hasScale flag clear). I hope it doesn't count!
+	//
+	SWFDisplayItem_remove(it);
+	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
+	SWFMovie_nextFrame(mo);        
+	SWFDisplayItem_setMatrix(it, 0, 0.972519, -1, 0, 13.950, 214.80); 
+	check_equals(mo, "staticmc._x", "13.950");
+	check_equals(mo, "staticmc._y", "214.80");
+	check_equals(mo, "Math.round(staticmc._xscale)", "139");
+	check_equals(mo, "Math.round(staticmc._yscale)", "141");
+	check_equals(mo, "Math.round(staticmc._rotation)", "44");  
+	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'-46,156 74,274'");
+	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
+	check_equals(mo, "staticmc._x", "13.950");
+	check_equals(mo, "staticmc._y", "214.80");
+	check_equals(mo, "Math.round(staticmc._xscale)", "-139");
+	check_equals(mo, "Math.round(staticmc._yscale)", "141");
+	check_equals(mo, "Math.round(staticmc._rotation)", "44");  
+	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'-46,156 74,274'");
+
 	// TODO:
 	// - test more rotations and scales (corner cases too!)
 	// - test 'skew' (since Ming supports it)
 
 	SWFMovie_nextFrame(mo);
 
-	add_actions(mo, "_root.totals(840); stop();");
+	add_actions(mo, "_root.totals(862); stop();");
 	SWFMovie_nextFrame(mo);        
 
 	//Output movie
