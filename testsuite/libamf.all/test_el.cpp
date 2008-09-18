@@ -151,6 +151,30 @@ test_properties()
     }
 
     data1.clear();
+    top.makeECMAArray(data1);
+    if ((top.propertySize() == 4)
+        && (top.getType() == Element::ECMA_ARRAY_AMF0)
+        && (strcmp(top[0]->to_string(), str1) == 0)
+        && (top[1]->to_string() == str2)
+        && (strcmp(top[2]->to_string(), "property three") == 0)
+        && (top[3]->to_number() == num)) {
+        runtest.pass("Made ECMA array");
+    } else {
+        runtest.fail("Made ECMA array");
+    }
+
+    data1.clear();
+    top.makeStrictArray(data1);
+    if ((top.propertySize() == 4)
+        && (top.getType() == Element::STRICT_ARRAY_AMF0)
+        && (strcmp(top[0]->to_string(), str1) == 0)
+        && (top[1]->to_string() == str2)
+        && (strcmp(top[2]->to_string(), "property three") == 0)
+        && (top[3]->to_number() == num)) {
+        runtest.pass("Made strict array");
+    } else {
+        runtest.fail("Made strict array");
+    }
 
 //    top.dump();
 }
