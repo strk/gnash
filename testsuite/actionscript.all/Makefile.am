@@ -110,6 +110,7 @@ ASTESTS =			\
 	TextField.as		\
 	TextFormat.as		\
 	TextSnapshot.as		\
+	Transform.as		\
 	Try.as \
 	Video.as		\
 	Matrix.as \
