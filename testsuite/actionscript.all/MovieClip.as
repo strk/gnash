@@ -1397,6 +1397,20 @@ check_equals(_root._y, 20); // changing the AS matrix doesn't change the actual 
 _root._x = _root._y = _root._rotation = 0;
 _root._xscale = _root._yscale = 100;
 
+OldTransform = flash.geom.Transform;
+
+flash.geom.Transform = 1;
+check_equals(_root.transform.toString(), undefined);
+check_equals(_root.transform.matrix.toString(), undefined);
+
+flash.geom.Transform = OldTransform;
+flash.geom.Transform.matrix = 3;
+check_equals(_root.transform.matrix.toString(), "(a=1, b=0, c=0, d=1, tx=0, ty=0)");
+
+flash.geom.Transform = OldTransform;
+check_equals(_root.transform.toString(), "[object Object]");
+
+
 #endif
 
 //----------------------------------------------
