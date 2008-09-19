@@ -88,7 +88,7 @@ endOfTest = function()
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(745); // SWF8+
+	check_totals(748); // SWF8+
 #endif
 
 	play();
@@ -1344,6 +1344,11 @@ check_equals(typeof(_root.transform), 'undefined');
 
 // TODO: test these !!
 xcheck_equals(typeof(_root.transform), 'object'); 
+
+oldTransform = _root.transform;
+check(oldTransform === oldTransform); 
+check(oldTransform != _root.transform); // everytime transform is accessed, it's a new object!
+
 Matrix = flash.geom.Matrix;
 xcheck(_root.transform instanceOf Object);
 check(!_root.transform instanceOf Matrix);
@@ -1363,7 +1368,6 @@ xcheck_equals(typeof(_root.transform.matrix), 'object');
 xcheck(_root.transform.matrix instanceOf Matrix);
 
 note('x:'+_root._x+' y:'+_root._y+' rot:'+_root._rotation+' xs:'+_root._xscale+' yx:'+_root._yscale);
-
 
 xcheck_equals(_root.transform.matrix.a, 1);
 xcheck_equals(_root.transform.matrix.b, 0);
@@ -1386,6 +1390,9 @@ xcheck_equals(_root.transform.matrix.d, 0);
 xcheck_equals(_root.transform.matrix.tx, 30);
 xcheck_equals(_root.transform.matrix.ty, 20);
 // TODO: test concatenatedMatrix
+
+_root.transform.matrix.ty = 300;
+check_equals(_root._y, 20); // changing the AS matrix doesn't change the actual matrix
 
 _root._x = _root._y = _root._rotation = 0;
 _root._xscale = _root._yscale = 100;
