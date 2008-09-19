@@ -50,6 +50,7 @@ xcheck_equals(t, undefined);
 // Only (?) obtainable from MovieClip.transform?
 t = _root.transform;
 xcheck_equals(typeOf(t), "object");
+xcheck(t instanceOf Transform);
 
 xcheck(t.matrix instanceOf Matrix);
 xcheck(t.concatenatedMatrix instanceOf Matrix);
@@ -85,5 +86,5 @@ flash.geom.Rectangle = Rectangle;
 xcheck(t.pixelBounds instanceOf Rectangle);
 
 
-totals(25);
+totals(26);
 #endif

@@ -38,6 +38,7 @@
 #include <boost/algorithm/string/case_conv.hpp>
 #include <algorithm>
 #include <locale>
+#include <stdexcept>
 
 #define ENSURE_FN_ARGS(min, max, rv)                                    \
     if (fn.nargs < min) {                                               \
@@ -685,7 +686,15 @@ string_to_upper_case(const fn_call& fn)
     // If this is the C locale, the conversion will be wrong.
     // Most other locales are correct. FIXME: get this to
     // work regardless of user's current settings.
-    std::locale currentLocale("");
+    std::locale currentLocale;
+    try
+    {
+        currentLocale = std::locale("");
+    }
+    catch (std::runtime_error& e)
+    {
+        currentLocale = std::locale::classic();
+    }
     boost::to_upper(wstr, currentLocale);
 
     return as_value(utf8::encodeCanonicalString(wstr, version));
@@ -703,9 +712,18 @@ string_to_lower_case(const fn_call& fn)
 
     std::wstring wstr = utf8::decodeCanonicalString(val.to_string(), version);
 
-    // If this the C locale, the conversion will be wrong.
-    // Most other locales are correct.
-    std::locale currentLocale("");
+    // If this is the C locale, the conversion will be wrong.
+    // Most other locales are correct. FIXME: get this to
+    // work regardless of user's current settings.
+    std::locale currentLocale;
+    try
+    {
+        currentLocale = std::locale("");
+    }
+    catch (std::runtime_error& e)
+    {
+        currentLocale = std::locale::classic();
+    }
     boost::to_lower(wstr, currentLocale);
 
     return as_value(utf8::encodeCanonicalString(wstr, version));
