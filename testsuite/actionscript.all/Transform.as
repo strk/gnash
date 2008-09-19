@@ -86,5 +86,5 @@ flash.geom.Rectangle = Rectangle;
 xcheck(t.pixelBounds instanceOf Rectangle);
 
 
-totals(25);
+totals(26);
 #endif
