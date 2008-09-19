@@ -71,26 +71,10 @@ static as_value xmlnode_prefix(const fn_call& fn);
 
 as_object* getXMLNodeInterface();
 
-//static LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
-
-
-//std::vector<as_object *> _xmlobjs;    // FIXME: hack alert
 
 XMLNode::XMLNode()
     :
     as_object(getXMLNodeInterface()),
-    _parent(0),
-    _type(tElement)
-{
-    //log_debug("%s: %p", __PRETTY_FUNCTION__, this);
-#ifdef DEBUG_MEMORY_ALLOCATION
-    log_debug(_("\tCreating XMLNode data at %p"), this);
-#endif
-}
-
-XMLNode::XMLNode(as_object* overridden_interface)
-    :
-    as_object(overridden_interface),
     _parent(0),
     _type(tElement)
 {

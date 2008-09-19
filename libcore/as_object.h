@@ -773,7 +773,7 @@ public:
 	///
 	/// @return
 	/// The property associated with the order index.
-	Property *getByIndex(int index);
+	const Property* getByIndex(int index);
 
 	/// Get the next index after the one whose index was used as a parameter.
 	///
@@ -911,7 +911,7 @@ public:
 	/// to avoid loops in prototype chain. 
 	/// NOTE: the MM player just chokes in this case (loop)
 	///
-	void enumerateProperties(std::map<std::string, std::string>& to);
+	void enumerateProperties(std::map<std::string, std::string>& to) const;
 
 	/// Get url-encoded variables
 	//

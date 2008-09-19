@@ -110,7 +110,7 @@ public:
 	///	The object reference used to extract values from properties.
 	///
 	template <class V>
-	void visitValues(V& visitor, as_object& this_ptr) const
+	void visitValues(V& visitor, const as_object& this_ptr) const
 	{
 		for (container::const_iterator it = _props.begin(),
 			itEnd = _props.end(); it != itEnd; ++it)
@@ -135,7 +135,7 @@ public:
 	///	The object reference used to extract values from properties.
 	///
 	template <class V>
-	void visitNonHiddenValues(V& visitor, as_object& this_ptr) const
+	void visitNonHiddenValues(V& visitor, const as_object& this_ptr) const
 	{
 		for (container::const_iterator it = _props.begin(),
 			itEnd = _props.end(); it != itEnd; ++it)
@@ -468,14 +468,7 @@ public:
 	/// 	for calling getter/setter function (GetterSetterProperty);
 	/// 	it will be unused when getting or setting SimpleProperty
 	/// 	properties.
-	///	This parameter is non-const as nothing prevents an
-	///	eventual "Getter" function from actually modifying it,
-	///	so we can't promise constness.
-	///	Note that the PropertyList itself might be changed
-	///	from this call, accessed trough the 'this' pointer,
-	///	so this method too is non-const (this is crazy, should cut it out)
-	/// 
-	void enumerateKeyValue(as_object& this_ptr, std::map<std::string, std::string>& to);
+	void enumerateKeyValue(const as_object& this_ptr, std::map<std::string, std::string>& to) const;
 
 	/// Remove all entries in the container
 	void clear();
