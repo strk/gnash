@@ -1104,10 +1104,11 @@ as_object::enumerateProperties(as_environment& env) const
 
 	// this set will keep track of visited objects,
 	// to avoid infinite loops
-	std::set< as_object* > visited;
+	std::set< const as_object* > visited;
 	PropertyList::propNameSet named;
 
-	boost::intrusive_ptr<as_object> obj = const_cast<as_object*>(this);
+	boost::intrusive_ptr<const as_object> obj(this);
+	
 	while ( obj && visited.insert(obj.get()).second )
 	{
 		obj->_members.enumerateKeys(env, named);
@@ -1120,14 +1121,14 @@ as_object::enumerateProperties(as_environment& env) const
 }
 
 void
-as_object::enumerateProperties(std::map<std::string, std::string>& to)
+as_object::enumerateProperties(std::map<std::string, std::string>& to) const
 {
 
 	// this set will keep track of visited objects,
 	// to avoid infinite loops
-	std::set< as_object* > visited;
+	std::set< const as_object* > visited;
 
-	boost::intrusive_ptr<as_object> obj = this;
+	boost::intrusive_ptr<const as_object> obj(this);
 	while ( obj && visited.insert(obj.get()).second )
 	{
 		obj->_members.enumerateKeyValue(*this, to);

@@ -304,7 +304,7 @@ PropertyList::setFlagsAll(const PropertyList& props,
 void
 PropertyList::enumerateKeys(as_environment& env, propNameSet& donelist) const
 {
-	string_table& st = VM::get().getStringTable();
+	string_table& st = env.getVM().getStringTable();
 	for (container::const_iterator i=_props.begin(), ie=_props.end(); i != ie; ++i)
 	{
 		if (i->getFlags().get_dont_enum())
@@ -321,9 +321,9 @@ PropertyList::enumerateKeys(as_environment& env, propNameSet& donelist) const
 }
 
 void
-PropertyList::enumerateKeyValue(as_object& this_ptr, std::map<std::string, std::string>& to) 
+PropertyList::enumerateKeyValue(const as_object& this_ptr, std::map<std::string, std::string>& to) const
 {
-	string_table& st = VM::get().getStringTable();
+	string_table& st = this_ptr.getVM().getStringTable();
 	for (container::const_iterator i=_props.begin(), ie=_props.end(); i != ie; ++i)
 	{
 		if (i->getFlags().get_dont_enum())

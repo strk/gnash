@@ -911,7 +911,7 @@ public:
 	/// to avoid loops in prototype chain. 
 	/// NOTE: the MM player just chokes in this case (loop)
 	///
-	void enumerateProperties(std::map<std::string, std::string>& to);
+	void enumerateProperties(std::map<std::string, std::string>& to) const;
 
 	/// Get url-encoded variables
 	//

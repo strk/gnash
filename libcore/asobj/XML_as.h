@@ -79,7 +79,12 @@ public:
     XML_as();
     XML_as(const std::string& xml_in);
     ~XML_as() {};
-  
+
+    void toString(std::ostream& o) const
+    {
+        XMLNode::toString(o);
+    }
+
     /// This is overridden to provide the 'status' and 'loaded' members,
     /// which are NOT proper properties !
     /// See actionscript.all/XML.as

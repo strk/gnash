@@ -475,7 +475,7 @@ public:
 	///	from this call, accessed trough the 'this' pointer,
 	///	so this method too is non-const (this is crazy, should cut it out)
 	/// 
-	void enumerateKeyValue(as_object& this_ptr, std::map<std::string, std::string>& to);
+	void enumerateKeyValue(const as_object& this_ptr, std::map<std::string, std::string>& to) const;
 
 	/// Remove all entries in the container
 	void clear();

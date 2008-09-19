@@ -69,6 +69,8 @@ public:
 
 protected:
 
+    void toString(std::ostream& o) const;
+
 #ifdef GNASH_USE_GC
 	/// Mark all reachable resources, for the GC
 	//
@@ -100,6 +102,32 @@ private:
 	boost::intrusive_ptr<as_function> _onLoad;
 
 };
+
+
+void
+LoadVars_as::toString(std::ostream& o) const
+{
+
+	typedef std::map<std::string, std::string> VarMap;
+	VarMap vars;
+
+	// TODO: it seems that calling enumerateProperties(vars) here
+	//       somehow corrupts the stack !
+	enumerateProperties(vars);
+
+    if (!vars.empty()) o << "?";
+
+	for (VarMap::iterator it=vars.begin(), itEnd=vars.end();
+			it != itEnd; ++it)
+	{
+        const std::string& val = it->second;
+        o << URL::encode(it->first) << "="
+                    << URL::encode(val);
+	}
+
+}
+
+
 
 LoadVars_as::LoadVars_as()
 		:

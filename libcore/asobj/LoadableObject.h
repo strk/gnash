@@ -82,6 +82,8 @@ public:
 
 protected:
 
+    virtual void toString(std::ostream& o) const = 0;
+
     typedef std::list<LoadThread*> LoadThreadList;
 
     /// Queue of load requests
@@ -97,13 +99,6 @@ protected:
     /// Scan the LoadThread queue (_loadThreads) to see if any of
     /// them completed. If any did, invoke the onData event
     void checkLoads();
-
-	/// Return enumerable property pairs in url-encoded form
-	//
-	/// TODO: move up to as_object and make public,
-	///       for use by loadVariables ?
-	///
-	std::string getURLEncodedProperties();
 
 private:
 

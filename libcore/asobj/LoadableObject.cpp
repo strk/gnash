@@ -30,6 +30,9 @@
 #include "utf8.h"
 #include "fn_call.h"
 
+#include <sstream>
+#include <map>
+
 namespace gnash {
 
 
@@ -58,32 +61,6 @@ LoadableObject::~LoadableObject()
 
 }
 
-std::string
-LoadableObject::getURLEncodedProperties()
-{
-
-	std::string qstring;
-
-	typedef std::map<std::string, std::string> VarMap;
-	VarMap vars;
-
-	//return qstring;
-
-	// TODO: it seems that calling enumerateProperties(vars) here
-	//       somehow corrupts the stack !
-	enumerateProperties(vars);
-
-	for (VarMap::iterator it=vars.begin(), itEnd=vars.end();
-			it != itEnd; ++it)
-	{
-		std::string var = it->first; URL::encode(var);
-		std::string val = it->second; URL::encode(val);
-		if ( it != vars.begin() ) qstring += "&";
-		qstring += var + "=" + val;
-	}
-
-	return qstring;
-}
 
 void
 LoadableObject::send(const std::string& /*urlstr*/)
@@ -99,7 +76,8 @@ LoadableObject::sendAndLoad(const std::string& urlstr,
     /// All objects get a loaded member, set to false.
     target.set_member(NSV::PROP_LOADED, false);
 
-	std::string querystring = getURLEncodedProperties();
+    std::ostringstream data;
+    toString(data);
 
 	URL url(urlstr, get_base_url());
 
@@ -155,11 +133,11 @@ LoadableObject::sendAndLoad(const std::string& urlstr,
 
         /// It doesn't matter if there are no request headers.
         str = StreamProvider::getDefaultInstance().getStream(url,
-                                                    querystring, headers);
+                                                    data.str(), headers);
     }
 	else
     {
-    	std::string url = urlstr + "?" + querystring;
+    	std::string url = urlstr + "?" + data.str();
         str = StreamProvider::getDefaultInstance().getStream(url);
     }
 
