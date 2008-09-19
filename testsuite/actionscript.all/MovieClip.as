@@ -1347,7 +1347,7 @@ xcheck_equals(typeof(_root.transform), 'object');
 
 oldTransform = _root.transform;
 check(oldTransform === oldTransform); 
-check(oldTransform != _root.transform); // everytime transform is accessed, it's a new object!
+xcheck(oldTransform != _root.transform); // everytime transform is accessed, it's a new object!
 
 Matrix = flash.geom.Matrix;
 xcheck(_root.transform instanceOf Object);
