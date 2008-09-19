@@ -50,6 +50,7 @@ xcheck_equals(t, undefined);
 // Only (?) obtainable from MovieClip.transform?
 t = _root.transform;
 xcheck_equals(typeOf(t), "object");
+xcheck(t instanceOf Transform);
 
 xcheck(t.matrix instanceOf Matrix);
 xcheck(t.concatenatedMatrix instanceOf Matrix);
