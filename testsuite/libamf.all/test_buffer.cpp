@@ -241,18 +241,18 @@ test_copy()
     string str1 = str;
     buf1 = str1;
     if (memcmp(ptr1, str, 9) == 0) {
-         runtest.pass ("Buffer::copy(std::string &)");
+         runtest.pass ("Buffer::operator=(std::string &)");
     } else {
-         runtest.fail ("Buffer::copy(std::string &)");
+         runtest.fail ("Buffer::operator=(std::string &)");
     }
 
     Buffer buf2;
     buf2 = str;
     Network::byte_t *ptr2 = buf2.reference();
     if (memcmp(ptr2, str, 9) == 0) {
-         runtest.pass ("Buffer::copy(const char *)");
+         runtest.pass ("Buffer::operator=(const char *)");
     } else {
-         runtest.fail ("Buffer::copy(const char *)");
+         runtest.fail ("Buffer::operator=(const char *)");
     }
 
     boost::uint16_t length = 12;
@@ -261,24 +261,35 @@ test_copy()
     Network::byte_t *ptr3 = buf3.reference();
     boost::uint16_t newlen = *(reinterpret_cast<boost::uint16_t *>(ptr3));
     if (length == newlen) {
-         runtest.pass ("Buffer::copy(boost::uint16_t)");
+         runtest.pass ("Buffer::operator=(boost::uint16_t)");
     } else {
-         runtest.fail ("Buffer::copy(boost::uint16_t)");
+         runtest.fail ("Buffer::operator=(boost::uint16_t)");
     }
 
-#if 0
     double num = 1.2345;
     Buffer buf4;
-    buf4.clear();
-    buf4.copy(num);
+    buf4 = num;
+
+    // Copy the raw bytes used for the number into the temporary
+    // data pointer, so we can do a comparison
     memcpy(data, &num, amf::AMF0_NUMBER_SIZE);
 
     if (memcmp(data, buf4.reference(), amf::AMF0_NUMBER_SIZE) == 0) {
-         runtest.pass ("Buffer::copy(double)");
+         runtest.pass ("Buffer::operator=(double)");
     } else {
-         runtest.fail ("Buffer::copy(double)");
+         runtest.fail ("Buffer::operator=(double)");
     }   
-#endif
+
+    Network::byte_t byte = 67;
+    Buffer buf5;
+    buf5 = byte;
+    if (*buf5.reference() == 67) {
+         runtest.pass ("Buffer::operator=(Network::byte_t)");
+    } else {
+         runtest.fail ("Buffer::operator=(Network::byte_t)");
+    }
+
+    // cleanup the temporary data
     delete[] data;
 }
 
@@ -358,9 +369,9 @@ test_append()
     memcpy(data3, data1, 10);
     *(data3 + 10) = '@';
     if (memcmp(data3, buf2.reference(), 11) == 0) {
-         runtest.pass ("Buffer::append(Network::byte_t)");
+         runtest.pass ("Buffer::operator+=(Network::byte_t)");
     } else {
-         runtest.fail ("Buffer::append(Network::byte_t)");
+         runtest.fail ("Buffer::operator+=(Network::byte_t)");
     }
 
     // Append a number
@@ -374,22 +385,45 @@ test_append()
     memcpy(data3, data1, 10);
     memcpy(data3 + 10, &num, sizeof(double));
     if (memcmp(data3, buf3.reference(), 10+sizeof(double)) == 0) {
-         runtest.pass ("Buffer::append(double)");
+         runtest.pass ("Buffer::operator+=(double)");
     } else {
-         runtest.fail ("Buffer::append(double)");
+         runtest.fail ("Buffer::operator+=(double)");
     }
 
+    string str1 = "Writing test cases";
+    const char *str2 = "is so tedious";
+    string str3 = str1 + str2;
+    Buffer buf6(50);
+    buf6 = str1;
+    buf6 += str2;
+    if (memcmp(buf6.reference(), str3.c_str(), str3.size()) == 0) {
+        runtest.pass ("Buffer::operator+=(const string &)");
+    } else {
+        runtest.fail ("Buffer::operator+=(const string &)");
+    }
+
+    boost::uint16_t length = 1047;
+    Buffer buf7(70);
+    buf7.copy(data1, 10);
+    buf7 += length;
+    if (memcmp(buf7.reference() + 10, &length, sizeof(boost::uint16_t)) == 0) {
+        runtest.pass ("Buffer::operator+=(boost::uint16_t)");
+    } else {
+        runtest.fail ("Buffer::operator+=(boost::uint16_t)");
+    }
+
+    buf7 += buf6;
+    if (memcmp(buf7.reference() + 10 + sizeof(boost::uint16_t), buf6.reference(), buf6.size()) == 0) {
+        runtest.pass ("Buffer::operator+=(Buffer &)");
+    } else {
+        runtest.fail ("Buffer::operator+=(Buffer &)");
+    }
+
+    
     delete[] data1;
     delete[] data2;
     delete[] data3;
     
-// amf::Buffer::append(amf::Element::amf_type_e)
-// amf::Buffer::append(amf::Buffer*)
-// amf::Buffer::append(std::string const&)
-// amf::Buffer::append(amf::Buffer&)
-// amf::Buffer::append(bool)
-// amf::Buffer::append(unsigned int)
-// amf::Buffer::append(unsigned short)
 }
 
 void
