@@ -544,10 +544,7 @@ Element::makeNumber(const string &name, double num)
     if (name.size()) {
         setName(name);
     }
-    _type = Element::NUMBER_AMF0;
-    check_buffer(AMF0_NUMBER_SIZE);
-    _buffer->copy(num);
-    return *this;
+    return makeNumber(num);
 }
 
 Element &

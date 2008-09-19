@@ -60,7 +60,8 @@ public:
     Buffer &operator=(double num);
     Buffer &operator=(boost::uint16_t length);
     Buffer &operator=(gnash::Network::byte_t byte);
-    Buffer &operator=(gnash::Network::byte_t *data);    
+    Buffer &operator=(gnash::Network::byte_t *data);
+    Buffer &operator=(amf::Element::amf0_type_e type);
     
     Buffer &operator+=(Buffer &buf);
     Buffer &operator+=(const std::string &str);
@@ -111,8 +112,7 @@ public:
 #endif
   private:
     // Initialize a block of memory for this buffer
-    Buffer &init(size_t nbytes);
-    
+    Buffer &init(size_t nbytes);    
     gnash::Network::byte_t hex2digit (gnash::Network::byte_t digit);
 };
 

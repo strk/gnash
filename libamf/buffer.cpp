@@ -160,166 +160,6 @@ Buffer::append(gnash::Network::byte_t *data, size_t nbytes)
     return *this;
 }
 
-#if 0
-void
-Buffer::copy(const string &str)
-{    
-//    GNASH_REPORT_FUNCTION;
-    std::copy(str.begin(), str.end(), _ptr);
-    _seekptr = _ptr + str.size();
-}
-
-void
-Buffer::copy(boost::uint16_t length)
-{
-    Network::byte_t *data = reinterpret_cast<Network::byte_t *>(&length);
-    std::copy(data, data + sizeof(boost::uint16_t), _ptr);
-    _seekptr = _ptr + sizeof(boost::uint16_t);
-}
-
-void
-Buffer::copy(double num)
-{
-//    GNASH_REPORT_FUNCTION;
-    Network::byte_t *ptr = reinterpret_cast<Network::byte_t *>(&num);
-    std::copy(ptr, ptr + amf::AMF0_NUMBER_SIZE, _ptr);
-    _seekptr = _ptr + amf::AMF0_NUMBER_SIZE;
-}
-
-void
-Buffer::copy(Network::byte_t val)
-{
-    GNASH_REPORT_FUNCTION;
-    *_ptr = val;
-    _seekptr = _ptr + sizeof(bool);
-}
-#endif
-
-#if 0
-void
-Buffer::copy(bool val)
-{
-    GNASH_REPORT_FUNCTION;
-    return copy(static_cast<Network::byte_t>(val));
-}
-#endif
-
-#if 0
-Network::byte_t *
-Buffer::append(boost::uint16_t length)
-{
-//    GNASH_REPORT_FUNCTION;
-    
-    if ((_seekptr + sizeof(boost::uint16_t)) <= (_ptr + _nbytes)) {
-	Network::byte_t *data = reinterpret_cast<Network::byte_t *>(&length);
-	std::copy(data, data + sizeof(boost::uint16_t), _seekptr);
-	std::copy(data, data + sizeof(boost::uint16_t), _data.get());
-	_seekptr += sizeof(boost::uint16_t);
-	return _seekptr;
-    }
-    return 0;
-}
-
-Network::byte_t *
-Buffer::append(gnash::Network::byte_t *data, size_t nbytes)
-{
-//    GNASH_REPORT_FUNCTION;
-
-    if ((_seekptr + nbytes) <= (_ptr + _nbytes)) {
-	std::copy(data, data + nbytes, _seekptr);
-	_seekptr += nbytes;
-	return _seekptr;
-    }
-    return 0;
-}
-
-Network::byte_t *
-Buffer::append(double num)
-{
-//    GNASH_REPORT_FUNCTION;
-    if ((_seekptr + sizeof(double)) <= (_ptr + _nbytes)) {
-	Network::byte_t *ptr = reinterpret_cast<Network::byte_t *>(&num);
-	std::copy(ptr, ptr + amf::AMF0_NUMBER_SIZE, _seekptr);
-	_seekptr += amf::AMF0_NUMBER_SIZE;
-	return _seekptr;
-    }
-    return 0;
-}
-
-Network::byte_t *
-Buffer::append(bool val)
-{
-//    GNASH_REPORT_FUNCTION;
-    if ((_seekptr + sizeof(bool)) <= (_ptr + _nbytes)) {
-	*_seekptr = val;
-	_seekptr += sizeof(bool);
-	return _seekptr;
-    }
-    return 0;
-}
-
-Network::byte_t *
-Buffer::append(boost::uint32_t num)
-{
-//    GNASH_REPORT_FUNCTION;
-    Network::byte_t *ptr = reinterpret_cast< Network::byte_t *>(&num);    
-    return append(ptr, sizeof(boost::uint32_t));
-}
-
-Network::byte_t *
-Buffer::append(Network::byte_t byte)
-{
-//    GNASH_REPORT_FUNCTION;
-    if ((_seekptr + sizeof(gnash::Network::byte_t)) <= (_ptr + _nbytes)) {
-	*_seekptr = byte;
-	_seekptr += sizeof(gnash::Network::byte_t);
-	return _seekptr;
-    }
-    return 0;
-}
-
-Network::byte_t *
-Buffer::append(const std::string &str)
-{
-//    GNASH_REPORT_FUNCTION;
-    if ((_seekptr + str.size()) <= (_ptr + _nbytes)) {
-	std::copy(str.begin(), str.end(), _seekptr);    
-	_seekptr += str.size();
-	return _seekptr;
-    }
-    return 0;
-}
-
-Network::byte_t *
-Buffer::append(amf::Element::amf0_type_e type)
-{
-    return append(static_cast<Network::byte_t>(type));
-}
-
-Network::byte_t *
-Buffer::append(Buffer &buf)
-{
-//    GNASH_REPORT_FUNCTION;
-    return append(&buf);
-}
-
-Network::byte_t *
-Buffer::append(Buffer *buf)
-{
-//    GNASH_REPORT_FUNCTION;
-    size_t diff = _seekptr - _ptr;
-    
-    if (buf->size() > (_nbytes - diff)) {
-         resize(buf->size() + diff);
-    }
-    
-    std::copy(buf->begin(), buf->end(), _seekptr);
-    _seekptr += buf->size();
-
-    return _seekptr;
-}
-#endif
-
 // make ourselves be able to appended too. If the source
 // buffer is larger than the current buffer has room for,
 // resize ourselves (which copies the data too) to make
@@ -376,6 +216,7 @@ Buffer::operator+=(boost::uint16_t length)
     return append(ptr, sizeof(boost::uint16_t));
 }
 
+
 Buffer &
 Buffer::operator=(Buffer &buf)
 {
@@ -410,6 +251,13 @@ Buffer::operator=(boost::uint16_t length)
 //    GNASH_REPORT_FUNCTION;
     Network::byte_t *ptr = reinterpret_cast<Network::byte_t *>(&length);
     return copy(ptr, sizeof(boost::uint16_t));
+}
+
+Buffer &
+Buffer::operator=(amf::Element::amf0_type_e type)
+{
+    Network::byte_t nb = static_cast<Network::byte_t>(type);
+    return operator+=(nb);
 }
 
 Buffer &

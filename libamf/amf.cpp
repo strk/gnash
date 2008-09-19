@@ -21,8 +21,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include "GnashException.h"
-
+#include <boost/shared_ptr.hpp>
 #include <string>
 #include <vector>
 
@@ -33,6 +32,7 @@
 #endif
 
 #include "log.h"
+#include "GnashException.h"
 #include "buffer.h"
 #include "amf.h"
 #include "network.h"
@@ -173,17 +173,19 @@ swapBytes(void *word, size_t size)
 /// @return a binary AMF packet in big endian format (header,data) which
 /// needs to be deleted[] after being used.
 ///
-Buffer *
+boost::shared_ptr<Buffer>
 AMF::encodeNumber(double indata)
 {
 //    GNASH_REPORT_FUNCTION;
     double num;
     // Encode the data as a 64 bit, big-endian, numeric value
-    Buffer *buf = new Buffer(AMF0_NUMBER_SIZE + 1); // only one additional byte for the type
-    buf->append(Element::NUMBER_AMF0);
+    // only one additional byte for the type
+    boost::shared_ptr<Buffer> buf(new Buffer(AMF0_NUMBER_SIZE + 1));
+    *buf->reference() = Element::NUMBER_AMF0;
+    buf->operator += (Element::NUMBER_AMF0);
     num = indata;
     swapBytes(&num, AMF0_NUMBER_SIZE);
-    buf->append(num);
+    buf += num;
     
     return buf;
 }
@@ -193,12 +195,12 @@ AMF::encodeNumber(double indata)
 /// @return a binary AMF packet in big endian format (header,data) which
 /// needs to be deleted[] after being used.
 ///
-Buffer *
+boost::shared_ptr<Buffer>
 AMF::encodeBoolean(bool flag)
 {
 //    GNASH_REPORT_FUNCTION;
     // Encode a boolean value. 0 for false, 1 for true
-    Buffer *buf = new Buffer(2);
+    boost::shared_ptr<Buffer>buf = new Buffer(2);
     buf->append(Element::BOOLEAN_AMF0);
     buf->append(flag);
     
@@ -210,11 +212,11 @@ AMF::encodeBoolean(bool flag)
 /// @return a binary AMF packet in big endian format (header,data) which
 /// needs to be deleted[] after being used.
 ///
-Buffer *
+boost::shared_ptr<Buffer>
 AMF::encodeObjectEnd()
 {
 //    GNASH_REPORT_FUNCTION;
-    Buffer *buf = new Buffer(1);
+    boost::shared_ptr<Buffer>buf = new Buffer(1);
     buf->append(TERMINATOR);
 
     return buf;
@@ -226,17 +228,17 @@ AMF::encodeObjectEnd()
 /// @return a binary AMF packet in big endian format (header,data) which
 /// needs to be deleted[] after being used.
 ///
-Buffer *
+boost::shared_ptr<Buffer>
 AMF::encodeObject(Element *el)
 {
     GNASH_REPORT_FUNCTION;
 //    AMF amf_obj;
     
     for (size_t i=0; i< el->propertiesSize(); i++) {
-//	Buffer *var = amf_obj.encodeProperty();
+//	boost::shared_ptr<Buffer>var = amf_obj.encodeProperty();
 //	Element *child = el[i];
 #if 0
-	Buffer *buf = new Buffer(AMF_HEADER_SIZE + size);
+	boost::shared_ptr<Buffer>buf = new Buffer(AMF_HEADER_SIZE + size);
 	buf->append(Element::OBJECT);
 	boost::uint32_t num = size;
 	swapBytes(&num, 4);
@@ -256,11 +258,11 @@ AMF::encodeObject(Element *el)
 /// @return a binary AMF packet in big endian format (header,data) which
 /// needs to be deleted[] after being used.
 ///
-Buffer *
+boost::shared_ptr<Buffer>
 AMF::encodeUndefined()
 {
 //    GNASH_REPORT_FUNCTION;
-    Buffer *buf = new Buffer(AMF_HEADER_SIZE);
+    boost::shared_ptr<Buffer>buf = new Buffer(AMF_HEADER_SIZE);
     buf->append(Element::UNDEFINED_AMF0);
     
     return buf;
@@ -271,11 +273,11 @@ AMF::encodeUndefined()
 /// @return a binary AMF packet in big endian format (header,data) which
 /// needs to be deleted[] after being used.
 ///
-Buffer *
+boost::shared_ptr<Buffer>
 AMF::encodeUnsupported()
 {
 //    GNASH_REPORT_FUNCTION;
-    Buffer *buf = new Buffer(AMF_HEADER_SIZE);
+    boost::shared_ptr<Buffer>buf = new Buffer(AMF_HEADER_SIZE);
     buf->append(Element::UNSUPPORTED_AMF0);
     
     return buf;
@@ -286,11 +288,11 @@ AMF::encodeUnsupported()
 /// @return a binary AMF packet in big endian format (header,data) which
 /// needs to be deleted[] after being used.
 ///
-Buffer *
+boost::shared_ptr<Buffer>
 AMF::encodeDate(Network::byte_t *data)
 {
 //    GNASH_REPORT_FUNCTION;
-    Buffer *buf = new Buffer(AMF_HEADER_SIZE);
+    boost::shared_ptr<Buffer>buf = new Buffer(AMF_HEADER_SIZE);
     buf->append(Element::DATE_AMF0);
     double num = *reinterpret_cast<const double*>(data);
     swapBytes(&num, 8);
@@ -303,12 +305,12 @@ AMF::encodeDate(Network::byte_t *data)
 /// @return a binary AMF packet in big endian format (header,data) which
 /// needs to be deleted[] after being used.
 ///
-Buffer *
+boost::shared_ptr<Buffer>
 AMF::encodeNull()
 {
 //    GNASH_REPORT_FUNCTION;
 
-    Buffer *buf = new Buffer(1);
+    boost::shared_ptr<Buffer>buf = new Buffer(1);
     buf->append(Element::NULL_AMF0);
     
     return buf;
@@ -319,7 +321,7 @@ AMF::encodeNull()
 /// @return a binary AMF packet in big endian format (header,data) which
 /// needs to be deleted[] after being used.
 ///
-Buffer *
+boost::shared_ptr<Buffer>
 AMF::encodeXMLObject(Network::byte_t * /*data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -333,7 +335,7 @@ AMF::encodeXMLObject(Network::byte_t * /*data */, size_t /* size */)
 /// @return a binary AMF packet in big endian format (header,data) which
 /// needs to be deleted[] after being used.
 ///
-Buffer *
+boost::shared_ptr<Buffer>
 AMF::encodeTypedObject(Network::byte_t * /* data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -347,7 +349,7 @@ AMF::encodeTypedObject(Network::byte_t * /* data */, size_t /* size */)
 /// @return a binary AMF packet in big endian format (header,data) which
 /// needs to be deleted[] after being used.
 ///
-Buffer *
+boost::shared_ptr<Buffer>
 AMF::encodeReference(Network::byte_t * /* data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -361,7 +363,7 @@ AMF::encodeReference(Network::byte_t * /* data */, size_t /* size */)
 /// @return a binary AMF packet in big endian format (header,data) which
 /// needs to be deleted[] after being used.
 ///
-Buffer *
+boost::shared_ptr<Buffer>
 AMF::encodeMovieClip(Network::byte_t * /*data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -375,7 +377,7 @@ AMF::encodeMovieClip(Network::byte_t * /*data */, size_t /* size */)
 /// @return a binary AMF packet in big endian format (header,data) which
 /// needs to be deleted[] after being used.
 ///
-Buffer *
+boost::shared_ptr<Buffer>
 AMF::encodeECMAArray(Network::byte_t * /*data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -389,7 +391,7 @@ AMF::encodeECMAArray(Network::byte_t * /*data */, size_t /* size */)
 /// @return a binary AMF packet in big endian format (header,data) which
 /// needs to be deleted[] after being used.
 ///
-Buffer *
+boost::shared_ptr<Buffer>
 AMF::encodeLongString(Network::byte_t * /* data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -403,7 +405,7 @@ AMF::encodeLongString(Network::byte_t * /* data */, size_t /* size */)
 /// @return a binary AMF packet in big endian format (header,data) which
 /// needs to be deleted[] after being used.
 ///
-Buffer *
+boost::shared_ptr<Buffer>
 AMF::encodeRecordSet(Network::byte_t * /* data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -417,7 +419,7 @@ AMF::encodeRecordSet(Network::byte_t * /* data */, size_t /* size */)
 /// @return a binary AMF packet in big endian format (header,data) which
 /// needs to be deleted[] after being used.
 ///
-Buffer *
+boost::shared_ptr<Buffer>
 AMF::encodeStrictArray(Network::byte_t * /* data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -431,20 +433,20 @@ AMF::encodeStrictArray(Network::byte_t * /* data */, size_t /* size */)
 /// @return a binary AMF packet in big endian format (header,data) which
 /// needs to be deleted[] after being used.
 ///
-Buffer *
+boost::shared_ptr<Buffer>
 AMF::encodeString(const string &str)
 {
     Network::byte_t *ptr = const_cast<Network::byte_t *>(reinterpret_cast<const Network::byte_t *>(str.c_str()));
     return encodeString(ptr, str.size());
 }
 
-Buffer *
+boost::shared_ptr<Buffer>
 AMF::encodeString(Network::byte_t *data, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::uint16_t length;
     
-    Buffer *buf = new Buffer(size + AMF_HEADER_SIZE);
+    boost::shared_ptr<Buffer>buf = new Buffer(size + AMF_HEADER_SIZE);
     buf->append(Element::STRING_AMF0);
     // when a string is stored in an element, we add a NULL terminator so
     // it can be printed by to_string() efficiently. The NULL terminator
@@ -464,13 +466,13 @@ AMF::encodeString(Network::byte_t *data, size_t size)
 /// @return a binary AMF packet in big endian format (header,data) which
 /// needs to be deleted[] after being used.
 ///
-Buffer *
+boost::shared_ptr<Buffer>
 AMF::encodeNullString()
 {
 //    GNASH_REPORT_FUNCTION;
     boost::uint16_t length;
     
-    Buffer *buf = new Buffer(AMF_HEADER_SIZE);
+    boost::shared_ptr<Buffer>buf = new Buffer(AMF_HEADER_SIZE);
     buf->append(Element::STRING_AMF0);
     // when a string is stored in an element, we add a NULL terminator so
     // it can be printed by to_string() efficiently. The NULL terminator
@@ -499,12 +501,12 @@ AMF::encodeNullString()
 /// normal ASCII. It may be that these need to be converted to wide
 /// characters, but for now we just leave them as standard multibyte
 /// characters.
-Buffer *
+boost::shared_ptr<Buffer>
 AMF::encodeElement(Element *el)
 {
 //    GNASH_REPORT_FUNCTION;
-    Buffer *buf = 0;
-    Buffer *tmp = 0;
+    boost::shared_ptr<Buffer>buf = 0;
+    boost::shared_ptr<Buffer>tmp = 0;
     
     size_t outsize;
     if (el->getType() == Element::BOOLEAN_AMF0) {
@@ -611,7 +613,7 @@ AMF::encodeElement(Element *el)
     return buf;
 }
 
-Buffer *
+boost::shared_ptr<Buffer>
 AMF::encodeProperty(amf::Element *el)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -619,7 +621,7 @@ AMF::encodeProperty(amf::Element *el)
     
     outsize = el->getNameSize() + el->getLength() + AMF_VAR_HEADER_SIZE;
 
-    Buffer *buf = new Buffer(outsize);
+    boost::shared_ptr<Buffer>buf = new Buffer(outsize);
     _totalsize += outsize;
 
     // Add the length of the string for the name of the variable
@@ -663,7 +665,7 @@ AMF::encodeProperty(amf::Element *el)
 }
 
 Element *
-AMF::extractAMF(Buffer *buf)
+AMF::extractAMF(boost::shared_ptr<Buffer>buf)
 {
 //    GNASH_REPORT_FUNCTION;
     Network::byte_t* start = buf->reference();
@@ -836,7 +838,7 @@ AMF::extractAMF(Network::byte_t *in, Network::byte_t* tooFar)
 }
 
 Element *
-AMF::extractProperty(Buffer *buf)
+AMF::extractProperty(boost::shared_ptr<Buffer> buf)
 {
 //    GNASH_REPORT_FUNCTION;
 
