@@ -40,6 +40,7 @@
 #endif
 #include "buffer.h"
 #include "arg_parser.h"
+#include "GnashException.h"
 
 using namespace std;
 using namespace amf;
@@ -49,6 +50,7 @@ using namespace boost;
 static void usage();
 
 // Prototypes for test cases
+static void test_resize();
 static void test_construct();
 static void test_copy();
 static void test_find();
@@ -130,39 +132,6 @@ main (int argc, char** argv)
     }
 #endif
     
-    Buffer buf;
-#ifdef HAVE_MALLINFO
-    if (memdebug) {
-        mem->addStats(__LINE__);             // take a sample
-    }
-#endif    
-    if (buf.size() == gnash::NETBUFSIZE) {
-         runtest.pass ("Buffer::size()");
-     } else {
-         runtest.fail ("Buffer::size()");
-    }
-
-#ifdef HAVE_MALLINFO
-    if (memdebug) {
-        mem->addStats(__LINE__);             // take a sample
-    }
-#endif
-    buf.resize(112);
-#ifdef HAVE_MALLINFO
-    if (memdebug) {
-        mem->addStats(__LINE__);             // take a sample
-    }
-#endif
-    if (buf.size() == 112) {
-         runtest.pass ("Buffer::resize()");
-     } else {
-         runtest.fail ("Buffer::resize()");
-    }
-#ifdef HAVE_MALLINFO
-    if (memdebug) {
-        mem->addStats(__LINE__);             // take a sample
-    }
-#endif
 // these tests are bogus unless you have both mallinfo()
 // and also have memory statistics gathering turned on.
 #if defined(HAVE_MALLINFO) && defined(USE_STATS_MEMORY)
@@ -171,7 +140,8 @@ main (int argc, char** argv)
     // test destroying Buffers
     test_destruct();
 #endif
-    
+
+    test_resize();
     test_copy();
     test_find();
     test_append();
@@ -199,6 +169,53 @@ main (int argc, char** argv)
 }
 
 void
+test_resize()
+{
+    Buffer buf;
+#ifdef HAVE_MALLINFO
+    if (memdebug) {
+        mem->addStats(__LINE__);             // take a sample
+    }
+#endif    
+    if (buf.size() == gnash::NETBUFSIZE) {
+        runtest.pass ("Buffer::size(NETBUFSIZE)");
+    } else {
+        runtest.fail ("Buffer::size(NETBUFSIZE)");
+    }
+    
+#ifdef HAVE_MALLINFO
+    if (memdebug) {
+        mem->addStats(__LINE__);             // take a sample
+    }
+#endif
+    buf.resize(112);
+#ifdef HAVE_MALLINFO
+    if (memdebug) {
+        mem->addStats(__LINE__);             // take a sample
+    }
+#endif
+    if (buf.size() == 112) {
+         runtest.pass ("Buffer::resize(112)");
+     } else {
+         runtest.fail ("Buffer::resize(112)");
+    }
+#ifdef HAVE_MALLINFO
+    if (memdebug) {
+        mem->addStats(__LINE__);             // take a sample
+    }
+#endif
+
+    string str = "Hello World";
+    buf = str;
+    buf.resize(5);
+    if (memcmp(buf.begin(), str.c_str(), 5) == 0) {
+        runtest.pass ("Buffer resize(5)");
+    } else {
+        runtest.fail ("Buffer resize(5)");
+    }
+}
+
+void
 test_copy()
 {
     // Make some data for the buffers
@@ -222,7 +239,7 @@ test_copy()
 
     const char *str = "I'm bored";
     string str1 = str;
-    buf1.copy(str1);
+    buf1 = str1;
     if (memcmp(ptr1, str, 9) == 0) {
          runtest.pass ("Buffer::copy(std::string &)");
     } else {
@@ -230,7 +247,7 @@ test_copy()
     }
 
     Buffer buf2;
-    buf2.copy(str);
+    buf2 = str;
     Network::byte_t *ptr2 = buf2.reference();
     if (memcmp(ptr2, str, 9) == 0) {
          runtest.pass ("Buffer::copy(const char *)");
@@ -240,7 +257,7 @@ test_copy()
 
     boost::uint16_t length = 12;
     Buffer buf3;
-    buf3.copy(length);
+    buf3 = length;
     Network::byte_t *ptr3 = buf3.reference();
     boost::uint16_t newlen = *(reinterpret_cast<boost::uint16_t *>(ptr3));
     if (length == newlen) {
@@ -336,7 +353,7 @@ test_append()
     buf2.clear();
     buf2.copy(data1, 10);
     Network::byte_t byte = '@';
-    buf2.append(byte);
+    buf2 += byte;
     memset(data3, 0, 20);
     memcpy(data3, data1, 10);
     *(data3 + 10) = '@';
@@ -351,7 +368,7 @@ test_append()
     Buffer buf3;
     buf3.clear();
     buf3.copy(data1, 10);
-    buf3.append(num);
+    buf3 += num;
     
     memset(data3, 0, 20);
     memcpy(data3, data1, 10);
@@ -588,7 +605,7 @@ test_operators()
          runtest.fail ("Buffer::operator+=(char)");
     }
 
-    Buffer buf6(10);
+    Buffer buf6(6);
     buf6.clear();
     buf6 += 'D';
     buf6 += 'E';
@@ -596,12 +613,25 @@ test_operators()
     buf5 += buf6;
     ptr3 = buf5.reference();    // refresh the pointer, as it changes
                                 // on a resize()
-    // The size should now be the default 10, plus the 3 characters
-    // already added.
-    if ((memcmp(ptr3, "abcDEF", 6) == 0) && (buf5.size() == 13)) {
+    if ((memcmp(ptr3, "abcDEF", 6) == 0) && (buf5.size() == 10)) {
          runtest.pass ("Buffer::operator+=(Buffer &)");
     } else {
          runtest.fail ("Buffer::operator+=(Buffer &)");
+    }
+
+    bool caught = false;
+    try {
+        buf5 += buf6;
+    }
+
+    catch (GnashException& ge) {
+        caught = true;
+//        log_debug("Got exeception from operator+=: %s", ge.what());
+    }
+    if (caught) {
+         runtest.pass ("Buffer::operator+=(Buffer &) error");
+    } else {
+         runtest.fail ("Buffer::operator+=(Buffer &) error");
     }
 }
 
