@@ -330,7 +330,7 @@ as_object::get_member(string_table::key name, as_value* val,
 }
 
 
-Property*
+const Property*
 as_object::getByIndex(int index)
 {
 	// The low byte is used to contain the depth of the property.
@@ -344,7 +344,7 @@ as_object::getByIndex(int index)
 			return NULL;
 	}
 
-	return const_cast<Property *>(obj->_members.getPropertyByOrder(index));
+	return obj->_members.getPropertyByOrder(index);
 }
 
 as_object*
@@ -1517,17 +1517,13 @@ Trigger::call(const as_value& oldval, const as_value& newval, as_object& this_ob
 void
 as_object::visitPropertyValues(AbstractPropertyVisitor& visitor) const
 {
-    _members.visitValues(visitor, 
-        // Need const_cast due to getValue getting non-const ...
-        const_cast<as_object&>(*this));
+    _members.visitValues(visitor, *this);
 }
 
 void
 as_object::visitNonHiddenPropertyValues(AbstractPropertyVisitor& visitor) const
 {
-    _members.visitNonHiddenValues(visitor, 
-        // Need const_cast due to getValue getting non-const ...
-        const_cast<as_object&>(*this));
+    _members.visitNonHiddenValues(visitor, *this);
 }
 
 

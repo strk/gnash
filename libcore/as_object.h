@@ -773,7 +773,7 @@ public:
 	///
 	/// @return
 	/// The property associated with the order index.
-	Property *getByIndex(int index);
+	const Property* getByIndex(int index);
 
 	/// Get the next index after the one whose index was used as a parameter.
 	///

@@ -110,7 +110,7 @@ public:
 	///	The object reference used to extract values from properties.
 	///
 	template <class V>
-	void visitValues(V& visitor, as_object& this_ptr) const
+	void visitValues(V& visitor, const as_object& this_ptr) const
 	{
 		for (container::const_iterator it = _props.begin(),
 			itEnd = _props.end(); it != itEnd; ++it)
@@ -135,7 +135,7 @@ public:
 	///	The object reference used to extract values from properties.
 	///
 	template <class V>
-	void visitNonHiddenValues(V& visitor, as_object& this_ptr) const
+	void visitNonHiddenValues(V& visitor, const as_object& this_ptr) const
 	{
 		for (container::const_iterator it = _props.begin(),
 			itEnd = _props.end(); it != itEnd; ++it)

@@ -89,7 +89,7 @@ public:
     XMLNode();
 
     XMLNode(const XMLNode &node, bool deep);
-    ~XMLNode();
+    virtual ~XMLNode();
 
     size_t length() const { return _children.size(); }
 
