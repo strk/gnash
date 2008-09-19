@@ -2225,6 +2225,10 @@ attachMovieClipInterface(as_object& o)
     o.init_property("_lockroot", &sprite_instance::lockroot_getset,
                                 &sprite_instance::lockroot_getset); // see MovieClip.as testcase
 
+    // This is documented to be SWF8+ only, but the pp version9 shows it
+    // for SWF5 too...
+    o.init_member("attachBitmap", new builtin_function(sprite_attachBitmap));
+
     if ( target_version  < 6 ) return;
 
     // SWF6 or higher
@@ -2252,7 +2256,6 @@ attachMovieClipInterface(as_object& o)
     if ( target_version  < 8 ) return;
 
     // SWF8 or higher
-    o.init_member("attachBitmap", new builtin_function(sprite_attachBitmap));
     o.init_member("beginBitmapFill", new builtin_function(sprite_beginBitmapFill));
     o.init_member("getRect", new builtin_function(sprite_getRect));
     o.init_member("lineGradientStyle", new builtin_function(sprite_lineGradientStyle));

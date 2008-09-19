@@ -340,7 +340,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);        
 	SWFDisplayItem_setMatrix(it, 1, 0, 0, 1, 50, 300); // reset to near-identity
-    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=0, c=0, d=1, tx=50, ty=300)'");
+    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=0, c=0, d=1, tx=50, ty=300)'");
 
 	check_equals(mo, "staticmc._x", "50");
 	check_equals(mo, "staticmc._y", "300");
@@ -367,7 +367,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);        
 	SWFDisplayItem_setMatrix(it, -1, 0, 0, 1, 50, 300); // negative x scale gets interpreted as 180 degrees rotation
-    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=0, c=0, d=1, tx=50, ty=300)'");
+    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=0, c=0, d=1, tx=50, ty=300)'");
 
 	check_equals(mo, "staticmc._x", "50");
 	check_equals(mo, "staticmc._y", "300");
@@ -394,7 +394,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);        
 	SWFDisplayItem_setMatrix(it, 1, 0, 0, -1, 50, 300); // negative y scale (discarded ?)
-    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=0, c=0, d=-1, tx=50, ty=300)'");
+    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=0, c=0, d=-1, tx=50, ty=300)'");
 
 	check_equals(mo, "staticmc._x", "50");
 	check_equals(mo, "staticmc._y", "300");
@@ -421,7 +421,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);        
 	SWFDisplayItem_setMatrix(it, -1, 0, 0, -1, 50, 300); // negative x and y scales
-    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=0, c=0, d=-1, tx=50, ty=300)'");
+    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=0, c=0, d=-1, tx=50, ty=300)'");
 
 	check_equals(mo, "staticmc._x", "50");
 	check_equals(mo, "staticmc._y", "300");
@@ -448,7 +448,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);        
 	SWFDisplayItem_setMatrix(it, -1, -45, 0, 1, 50, 300); // negative x scale and some negative skew
-    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=-45, c=0, d=1, tx=50, ty=300)'");
+    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=-45, c=0, d=1, tx=50, ty=300)'");
 
 	check_equals(mo, "staticmc._x", "50");
 	check_equals(mo, "staticmc._y", "300");
@@ -475,7 +475,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);        
 	SWFDisplayItem_setMatrix(it, -1, 45, 0, 1, 50, 300); // negative x scale and some positive skew
-    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=45, c=0, d=1, tx=50, ty=300)'");
+    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=45, c=0, d=1, tx=50, ty=300)'");
 
 	check_equals(mo, "staticmc._x", "50");
 	check_equals(mo, "staticmc._y", "300");
@@ -502,7 +502,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);        
 	SWFDisplayItem_setMatrix(it, 1, -45, 0, -1, 50, 300); // negative x scale and some negative skew
-    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=-45, c=0, d=-1, tx=50, ty=300)'");
+    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=-45, c=0, d=-1, tx=50, ty=300)'");
 
 	check_equals(mo, "staticmc._x", "50");
 	check_equals(mo, "staticmc._y", "300");
@@ -529,7 +529,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);        
 	SWFDisplayItem_setMatrix(it, 1, 45, 0, -1, 50, 300); // negative x scale and some positive skew
-    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=45, c=0, d=-1, tx=50, ty=300)'");
+    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=45, c=0, d=-1, tx=50, ty=300)'");
 
 	check_equals(mo, "staticmc._x", "50");
 	check_equals(mo, "staticmc._y", "300");
@@ -556,7 +556,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);        
 	SWFDisplayItem_setMatrix(it, -1, 45, 0, -1, 50, 300); // negative x scale and some positive skew
-    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=45, c=0, d=-1, tx=50, ty=300)'");
+    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=45, c=0, d=-1, tx=50, ty=300)'");
 
 	check_equals(mo, "staticmc._x", "50");
 	check_equals(mo, "staticmc._y", "300");
@@ -583,7 +583,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);        
 	SWFDisplayItem_setMatrix(it, -1, -45, 0, -1, 50, 300); // negative x scale and some positive skew
-    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=-45, c=0, d=-1, tx=50, ty=300)'");
+    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=-45, c=0, d=-1, tx=50, ty=300)'");
 
 	check_equals(mo, "staticmc._x", "50");
 	check_equals(mo, "staticmc._y", "300");
@@ -611,7 +611,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);        
 	SWFDisplayItem_setMatrix(it, -1, 0, -45, 1, 50, 300); // negative x scale and some negative skew
-    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=0, c=-45, d=1, tx=50, ty=300)'");
+    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=0, c=-45, d=1, tx=50, ty=300)'");
 
 	check_equals(mo, "staticmc._x", "50");
 	check_equals(mo, "staticmc._y", "300");
@@ -639,7 +639,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);        
 	SWFDisplayItem_setMatrix(it, -1, 0, 45, 1, 50, 300); // negative x scale and some positive skew
-    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=0, c=45, d=1, tx=50, ty=300)'");
+    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=0, c=45, d=1, tx=50, ty=300)'");
 
 	check_equals(mo, "staticmc._x", "50");
 	check_equals(mo, "staticmc._y", "300");
@@ -667,7 +667,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);        
 	SWFDisplayItem_setMatrix(it, 1, 0, -45, -1, 50, 300); // negative x scale and some negative skew
-    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=0, c=-45, d=-1, tx=50, ty=300)'");
+    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=0, c=-45, d=-1, tx=50, ty=300)'");
 
 	check_equals(mo, "staticmc._x", "50");
 	check_equals(mo, "staticmc._y", "300");
@@ -695,7 +695,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);        
 	SWFDisplayItem_setMatrix(it, 1, 0, 45, -1, 50, 300); // negative x scale and some positive skew
-    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=0, c=45, d=-1, tx=50, ty=300)'");
+    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=0, c=45, d=-1, tx=50, ty=300)'");
 
 	check_equals(mo, "staticmc._x", "50");
 	check_equals(mo, "staticmc._y", "300");
@@ -723,7 +723,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);        
 	SWFDisplayItem_setMatrix(it, -1, 0, 45, -1, 50, 300); // negative x scale and some positive skew
-    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=0, c=45, d=-1, tx=50, ty=300)'");
+    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=0, c=45, d=-1, tx=50, ty=300)'");
 
 	check_equals(mo, "staticmc._x", "50");
 	check_equals(mo, "staticmc._y", "300");
@@ -751,7 +751,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);        
 	SWFDisplayItem_setMatrix(it, -1, 0, -45, -1, 50, 300); // negative x scale and some positive skew
-    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=0, c=-45, d=-1, tx=50, ty=300)'");
+    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=0, c=-45, d=-1, tx=50, ty=300)'");
 
 	check_equals(mo, "staticmc._x", "50");
 	check_equals(mo, "staticmc._y", "300");
@@ -778,7 +778,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);        
 	SWFDisplayItem_setMatrix(it, -2, 0, -45, -0.5, 50, 300); // negative x scale and some positive skew
-    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-2, b=0, c=-45, d=-0.5, tx=50, ty=300)'");
+    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-2, b=0, c=-45, d=-0.5, tx=50, ty=300)'");
 
 	check_equals(mo, "staticmc._x", "50");
 	check_equals(mo, "staticmc._y", "300");
@@ -805,6 +805,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);        
 	SWFDisplayItem_setMatrix(it, 1, 1, 1, 1, 2, 3); // not-invertible matrix (I'd think)
+    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=1, c=1, d=1, tx=2, ty=3)'");
 
 	check_equals(mo, "staticmc._x", "2");
 	check_equals(mo, "staticmc._y", "3");
@@ -837,6 +838,10 @@ main(int argc, char** argv)
 	//
 	SWFMovie_nextFrame(mo);        
 	SWFDisplayItem_setMatrix(it, 0, -1, 1.167969, 0, -.75, 135); 
+    // Ming omits the scales rather then set them to zero (ops)
+    // NOTE: might change if this is a Ming bug
+    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=-1, c=1.16796875, d=1, tx=-0.75, ty=135)'");
+
 	check_equals(mo, "staticmc._x", "-0.75");
 	check_equals(mo, "staticmc._y", "135");
 	check_equals(mo, "Math.round(staticmc._xscale)", "141");
@@ -855,6 +860,10 @@ main(int argc, char** argv)
 	//
 	SWFMovie_nextFrame(mo);        
 	SWFDisplayItem_setMatrix(it, 0, 0.972519, -1, 0, 13.950, 214.80); 
+    // Ming omits the scales rather then set them to zero (ops)
+    // NOTE: might change if this is a Ming bug
+    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=0.972518920898438, c=-1, d=1, tx=13.95, ty=214.8)'");
+
 	check_equals(mo, "staticmc._x", "13.950");
 	check_equals(mo, "staticmc._y", "214.80");
 	check_equals(mo, "Math.round(staticmc._xscale)", "139");
@@ -1591,7 +1600,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);
 
-	add_actions(mo, "_root.totals(879); stop();");
+	add_actions(mo, "_root.totals(882); stop();");
 	SWFMovie_nextFrame(mo);        
 
 	//Output movie
