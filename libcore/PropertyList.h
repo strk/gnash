@@ -468,13 +468,6 @@ public:
 	/// 	for calling getter/setter function (GetterSetterProperty);
 	/// 	it will be unused when getting or setting SimpleProperty
 	/// 	properties.
-	///	This parameter is non-const as nothing prevents an
-	///	eventual "Getter" function from actually modifying it,
-	///	so we can't promise constness.
-	///	Note that the PropertyList itself might be changed
-	///	from this call, accessed trough the 'this' pointer,
-	///	so this method too is non-const (this is crazy, should cut it out)
-	/// 
 	void enumerateKeyValue(const as_object& this_ptr, std::map<std::string, std::string>& to) const;
 
 	/// Remove all entries in the container
