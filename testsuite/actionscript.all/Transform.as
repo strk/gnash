@@ -131,22 +131,22 @@ check_equals(mat.toString(), "(a=1, b=0, c=0, d=1, tx=0, ty=0)");
 
 trans.matrix = new Matrix(2, 0, 0, 2, 10, 11);
 
-xcheck_equals(trans.matrix.toString(), "(a=2, b=0, c=0, d=2, tx=10, ty=11)");
-xcheck_equals(mc2.transform.matrix.toString(), "(a=2, b=0, c=0, d=2, tx=10, ty=11)");
+check_equals(trans.matrix.toString(), "(a=2, b=0, c=0, d=2, tx=10, ty=11)");
+check_equals(mc2.transform.matrix.toString(), "(a=2, b=0, c=0, d=2, tx=10, ty=11)");
 
 delete mc2;
 
 check_equals(mc2.transform.matrix.toString(), undefined);
-xcheck_equals(trans.matrix.toString(), "(a=2, b=0, c=0, d=2, tx=10, ty=11)");
+check_equals(trans.matrix.toString(), "(a=2, b=0, c=0, d=2, tx=10, ty=11)");
 check_equals(mat.toString(), "(a=1, b=0, c=0, d=1, tx=0, ty=0)");
 
 mc2 = undefined;
 
-xcheck_equals(trans.matrix.toString(), "(a=2, b=0, c=0, d=2, tx=10, ty=11)");
+check_equals(trans.matrix.toString(), "(a=2, b=0, c=0, d=2, tx=10, ty=11)");
 
 // Identity;
 trans.matrix = new Matrix;
-xcheck_equals(trans.matrix.toString(), "(a=1, b=0, c=0, d=1, tx=0, ty=0)");
+check_equals(trans.matrix.toString(), "(a=1, b=0, c=0, d=1, tx=0, ty=0)");
 
 
 mc = _root.createEmptyMovieClip("mc", getNextHighestDepth());
@@ -154,8 +154,8 @@ trans = mc.transform;
 
 mcOld = mc;
 trans.matrix = new Matrix(3, 0.5, 0.5, 2, 0, 1);
-xcheck_equals(mc.transform.matrix.toString(), "(a=3, b=0.5, c=0.5, d=2, tx=0, ty=1)");
-xcheck_equals(mcOld.transform.matrix.toString(), "(a=3, b=0.5, c=0.5, d=2, tx=0, ty=1)");
+check_equals(mc.transform.matrix.toString(), "(a=3, b=0.5, c=0.5, d=2, tx=0, ty=1)");
+check_equals(mcOld.transform.matrix.toString(), "(a=3, b=0.5, c=0.5, d=2, tx=0, ty=1)");
 
 
 mcOld = mc;
