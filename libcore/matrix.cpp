@@ -36,6 +36,10 @@
 #include <cmath>
 #include <iomanip>
 
+// Define this to use new math for matrix operation.
+// This is for testing, zou is still working on it
+//#define NEW_MATRIX_MATH 1
+
 namespace gnash {
 
 matrix::matrix()
@@ -170,21 +174,33 @@ matrix::set_scale_rotation(double x_scale, double y_scale, double angle)
 void
 matrix::set_x_scale(double xscale)
 {
+#ifdef NEW_MATRIX_MATH
+    double rot_x = atan2((double)shx, (double)sx);
+    sx  =  DoubleToFixed16(xscale * cos(rot_x));
+    shx =  DoubleToFixed16(xscale * sin(rot_x)); 
+#else
     double angle = get_rotation();
     double cos_v = cos(angle);
     double sin_v = sin(angle);
     sx  =  DoubleToFixed16(xscale * cos_v);
-    shx =  DoubleToFixed16(xscale * sin_v); 
+    shx =  DoubleToFixed16(xscale * sin_v);
+#endif
 }
 
 void
 matrix::set_y_scale(double yscale)
 {
+#ifdef NEW_MATRIX_MATH
+    double rot_y = atan2((double)(-shy), (double)(sy));
+    shy = -DoubleToFixed16(yscale * sin(rot_y));
+    sy  =  DoubleToFixed16(yscale * cos(rot_y));
+#else
     double angle = get_rotation();
     double cos_v = cos(angle);
     double sin_v = sin(angle);
     shy =  - DoubleToFixed16(yscale * sin_v);
-    sy  =  DoubleToFixed16(yscale * cos_v); 
+    sy  =  DoubleToFixed16(yscale * cos_v);
+#endif
 }
 
 void
@@ -197,9 +213,21 @@ matrix::set_scale(double xscale, double yscale)
 void
 matrix::set_rotation(double rotation)
 {   
+#ifdef NEW_MATRIX_MATH
+    double rot_x = atan2((double)shx,    (double)sx);
+    double rot_y = atan2((double)(-shy), (double)sy);
+    double scale_x = get_x_scale();
+    double scale_y = get_y_scale();
+ 
+    sx  = DoubleToFixed16(scale_x * cos(rotation));
+    shx = DoubleToFixed16(scale_x * sin(rotation)); 
+    shy = -DoubleToFixed16(scale_y * sin(rot_y - rot_x + rotation));
+    sy  =  DoubleToFixed16(scale_y * cos(rot_y - rot_x + rotation));
+#else
     double xscale = get_x_scale();
     double yscale = get_y_scale();
     set_scale_rotation(xscale, yscale, rotation);
+#endif
 }
 
 void
@@ -311,16 +339,6 @@ double
 matrix::get_rotation() const
 {
     return atan2(shx, sx); // more successes in misc-ming.all/matrix_test.c
-
-    if (determinant() < 0)
-    {
-        // TODO: check this.
-        return atan2(shx, -sx);
-    }
-    else
-    {
-        return atan2(shx, sx);
-    }
 }
 
 // private
