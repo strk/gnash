@@ -875,7 +875,7 @@ main(int argc, char** argv)
     // NOTE: might change if this is a Ming bug
     xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=0.972518920898438, c=-1, d=1, tx=13.95, ty=214.8)'");
 
-	check_equals(mo, "staticmc._x", "13.950");
+	check_equals(mo, "Math.round(staticmc._x*100)/100", "13.95"); 
 	check_equals(mo, "staticmc._y", "214.80");
 	check_equals(mo, "Math.round(staticmc._xscale)", "139");
 	check_equals(mo, "Math.round(staticmc._yscale)", "141");
@@ -1693,7 +1693,7 @@ main(int argc, char** argv)
     // Ming omits the scales rather then set them to zero (ops)
     // NOTE: might change if this is a Ming bug
     xcheck_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=1, b=0.97, c=-1, d=1, tx=13.95, ty=214.8)'");
-	check_equals(mo, "staticmc._x", "13.950");
+	check_equals(mo, "Math.round(staticmc._x*100)/100", "13.95"); 
 	check_equals(mo, "staticmc._y", "214.80");
 	check_equals(mo, "Math.round(staticmc._xscale)", "139");
 	check_equals(mo, "Math.round(staticmc._yscale)", "141");
@@ -1701,7 +1701,7 @@ main(int argc, char** argv)
 	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'-46,156 74,274'");
 	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
     xcheck_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=-1, b=-0.97, c=-1, d=1, tx=13.95, ty=214.8)'");
-	check_equals(mo, "staticmc._x", "13.950");
+	check_equals(mo, "Math.round(staticmc._x*100)/100", "13.95"); 
 	check_equals(mo, "staticmc._y", "214.80");
 	check_equals(mo, "Math.round(staticmc._xscale)", "-139");
 	check_equals(mo, "Math.round(staticmc._yscale)", "141");

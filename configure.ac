@@ -1534,6 +1534,11 @@ GNASH_PKG_FIND(z, [zlib.h], [zlib compression library], compress)
 GNASH_PKG_FIND(jpeg, [jpeglib.h], [jpeg images], jpeg_mem_init)
 GNASH_PKG_FIND(libpng, [png.h], [png images], png_info_init)
 GNASH_PKG_FIND(gif, [gif_lib.h], [gif images], DGifOpen)
+if test x"${GIF_LIBS}" = x ; then
+ GNASH_PKG_FIND(ungif, [gif_lib.h], [gif images], DGifOpen)
+ GIF_LIBS=${UNGIF_LIBS}
+ GIF_CFLAGS=${UNGIF_CFLAGS}
+fi
 GNASH_PKG_INCLUDES([dejagnu], [dejagnu.h])
 
 dnl Find freetype and fontconfig
