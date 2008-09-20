@@ -207,7 +207,7 @@ test_construct()
 
     Element elstr1(str);
     if ((elstr1.getType() == Element::STRING_AMF0) &&
-        (elstr1.getLength() == str.size())) {
+        (elstr1.getDataSize() == str.size())) {
         runtest.pass("Constructed as string element");
     } else {
         runtest.fail("Constructed as string element");
@@ -234,7 +234,7 @@ test_construct()
     str = "Aloha";
     Element elstr2(str);
     if ((elstr2.getType() == Element::STRING_AMF0) &&
-        (elstr2.getLength() == str.size())) {
+        (elstr2.getDataSize() == str.size())) {
         runtest.pass("Constructed as string element with name");
     } else {
         runtest.fail("Constructed as string element with name");
@@ -294,7 +294,7 @@ test_make()
     el6.clear();
     el6.makeNullString();
     if ((el6.getType() == Element::STRING_AMF0) &&
-        (el6.getLength() == 1)) {
+        (el6.getDataSize() == 1)) {
         runtest.pass("Made NULL String element");
     } else {
         runtest.fail("Made NULL String element");
@@ -389,7 +389,7 @@ test_make()
     rel1.makeBoolean(true);
     rel1.makeNumber(num);
     if ((rel1.getType() == Element::NUMBER_AMF0) &&
-        (rel1.getLength() == amf::AMF0_NUMBER_SIZE) &&
+        (rel1.getDataSize() == amf::AMF0_NUMBER_SIZE) &&
         (rel1.to_number() == num)) {
         runtest.pass("Remade boolean as a double element");
     } else {
@@ -436,9 +436,9 @@ test_operators()
     
     el2.makeString("Hey Now");
     if (el1 == el2) {
-        runtest.fail("Element::operator==(Element &) neither empty");
-    } else {
         runtest.pass("Element::operator==(Element &) neither empty");
+    } else {
+        runtest.fail("Element::operator==(Element &) neither empty");
     }
 
     // Test copy operator
