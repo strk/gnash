@@ -289,7 +289,17 @@ test_copy()
          runtest.fail ("Buffer::operator=(Network::byte_t)");
     }
 
-    // cleanup the temporary data
+    amf::Element::amf0_type_e type = Element::NUMBER_AMF0;
+    Buffer buf6;
+    buf6 = type;
+    if (*buf6.reference() == type) {
+         runtest.pass ("Buffer::operator=(amf::Element::amf0_type_e)");
+    } else {
+         runtest.fail ("Buffer::operator=(amf::Element::amf0_type_e)");
+    }
+    
+
+        // cleanup the temporary data
     delete[] data;
 }
 
@@ -413,13 +423,15 @@ test_append()
     }
 
     buf7 += buf6;
-    if (memcmp(buf7.reference() + 10 + sizeof(boost::uint16_t), buf6.reference(), buf6.size()) == 0) {
+    Network::byte_t *ptr1 = buf7.reference() + 10 + sizeof(boost::uint16_t);
+    Network::byte_t *ptr2 = buf6.reference();
+    if (memcmp(buf7.reference() + 10 + sizeof(boost::uint16_t), buf6.reference(), 30) == 0) {
         runtest.pass ("Buffer::operator+=(Buffer &)");
     } else {
         runtest.fail ("Buffer::operator+=(Buffer &)");
     }
 
-    
+    // Clean up temporary data
     delete[] data1;
     delete[] data2;
     delete[] data3;
