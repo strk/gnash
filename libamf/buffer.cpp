@@ -88,6 +88,7 @@ Buffer::init(size_t size)
     _seekptr = _data.get();
     _nbytes = size;
 
+    clear();			// FIXME; this is a perforance hitm but aids in debugging
 #ifdef USE_STATS_BUFFERS
     clock_gettime (CLOCK_REALTIME, &_stamp);
 #endif
@@ -173,10 +174,27 @@ Buffer::operator+=(Buffer &buf)
 }
 
 Buffer &
+Buffer::operator+=(amf::Element::amf0_type_e type)
+{
+//    GNASH_REPORT_FUNCTION;
+    Network::byte_t nb = static_cast<Network::byte_t>(type);
+    
+    return operator+=(type);
+}
+
+Buffer &
 Buffer::operator+=(char byte)
 {
 //    GNASH_REPORT_FUNCTION;
     Network::byte_t nb = static_cast<Network::byte_t>(byte);
+    return operator+=(nb);
+}
+
+Buffer &
+Buffer::operator+=(bool flag)
+{
+//    GNASH_REPORT_FUNCTION;
+    Network::byte_t nb = static_cast<Network::byte_t>(flag);
     return operator+=(nb);
 }
 
@@ -189,6 +207,15 @@ Buffer::operator+=(Network::byte_t byte)
 	_seekptr += sizeof(char);
     }
     return *this;
+}
+
+Buffer &
+Buffer::operator+=(const char *str)
+{
+//    GNASH_REPORT_FUNCTION;
+    Network::byte_t *ptr = const_cast<Network::byte_t *>(reinterpret_cast<const Network::byte_t *>(str));
+    return append(ptr, strlen(str));
+    
 }
 
 Buffer &
@@ -238,6 +265,14 @@ Buffer::operator=(const std::string &str)
 }
 
 Buffer &
+Buffer::operator=(const char *str)
+{
+//    GNASH_REPORT_FUNCTION;
+    Network::byte_t *ptr = const_cast<Network::byte_t *>(reinterpret_cast<const Network::byte_t *>(str));
+    return copy(ptr, strlen(str));
+}
+
+Buffer &
 Buffer::operator=(double num)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -261,6 +296,13 @@ Buffer::operator=(amf::Element::amf0_type_e type)
 }
 
 Buffer &
+Buffer::operator=(bool flag)
+{
+    Network::byte_t nb = static_cast<Network::byte_t>(flag);
+    return operator=(nb);
+}
+
+Buffer &
 Buffer::operator=(gnash::Network::byte_t byte)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -281,33 +323,29 @@ Buffer::operator=(gnash::Network::byte_t *data)
 }
 
 // Check to see if two Buffer objects are identical
-bool
-Buffer::operator==(Buffer *buf)
-{ 
-//    GNASH_REPORT_FUNCTION;
-    Network::byte_t *bufptr = buf->reference();
-    if (buf->size() == _nbytes) {
-        if (memcmp(bufptr, _data.get(), _nbytes) == 0)  {
-            return true;
-        }
-    }
-    return false;
-}
+// bool
+// Buffer::operator==(Buffer *buf)
+// { 
+// //    GNASH_REPORT_FUNCTION;
+//     Network::byte_t *bufptr = buf->reference();
+//     if (buf->size() == _nbytes) {
+//         if (memcmp(bufptr, _data.get(), _nbytes) == 0)  {
+//             return true;
+//         }
+//     }
+//     return false;
+// }
 
 bool
 Buffer::operator==(Buffer &buf)
 {
 //    GNASH_REPORT_FUNCTION;
-//     Network::byte_t *bufptr = buf.reference();
-//     size_t max = 0;
-    
-//     if (buf.size() == _nbytes){
-//         if (memcmp(bufptr, _ptr, _nbytes) == 0) {
-//             return true;
-//         }
-//     }
-//     return false;
-    return operator==(&buf);
+     if (buf.size() == _nbytes){
+         if (memcmp(buf.reference(), _data.get(), _nbytes) == 0) {
+             return true;
+         }
+     }
+     return false;
 }
 
 Network::byte_t *

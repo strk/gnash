@@ -57,18 +57,23 @@ public:
 
     Buffer &operator=(Buffer &buf);
     Buffer &operator=(const std::string &str);
+    Buffer &operator=(const char *str);
     Buffer &operator=(double num);
     Buffer &operator=(boost::uint16_t length);
     Buffer &operator=(gnash::Network::byte_t byte);
     Buffer &operator=(gnash::Network::byte_t *data);
     Buffer &operator=(amf::Element::amf0_type_e type);
+    Buffer &operator=(bool);
     
     Buffer &operator+=(Buffer &buf);
     Buffer &operator+=(const std::string &str);
+    Buffer &operator+=(const char *str);
     Buffer &operator+=(double num);
     Buffer &operator+=(boost::uint16_t length);
     Buffer &operator+=(gnash::Network::byte_t byte);
     Buffer &operator+=(char byte);
+    Buffer &operator+=(amf::Element::amf0_type_e type);
+    Buffer &operator+=(bool);
     
     // Find a byte in the buffer
 //    Network::byte_t *find(char c);
@@ -89,7 +94,6 @@ public:
     void setSize(size_t nbytes) { _nbytes = nbytes; };
     
     // Test against other buffers
-    bool operator==(Buffer *buf);
     bool operator==(Buffer &buf);
 
     gnash::Network::byte_t operator[](int x) { return _data[x]; };

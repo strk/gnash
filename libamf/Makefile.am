@@ -22,11 +22,10 @@ pkglib_LTLIBRARIES = libgnashamf.la
 libgnashamf_la_SOURCES = \
 	amf.cpp \
 	buffer.cpp \
-	element.cpp \
-	flv.cpp \
-	lcshm.cpp \
-	sol.cpp
-#	rtmp.cpp
+	element.cpp
+#	lcshm.cpp
+#	sol.cpp
+#	flv.cpp
 
 libgnashamf_la_LIBADD = \
 	$(top_builddir)/libbase/libgnashbase.la

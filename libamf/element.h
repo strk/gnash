@@ -23,8 +23,9 @@
 #include <cstring>
 #include <iostream> // for output operator
 #include <boost/cstdint.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/scoped_ptr.hpp>
 
-//#include "buffer.h"
 #include "network.h"
 #include "dsodefs.h" // DSOEXPORT
 
@@ -111,7 +112,7 @@ public:
     
     // Make ourselves be the same as another Element.
     Element &operator=(Element &);
-    Element &operator=(Element *);
+//    Element &operator=(Element *);
 
     // Make ourselves be the same as other commonly used data types. Note
     // that this can;t be used for properties unless you call setName() later.
@@ -208,9 +209,8 @@ public:
 
     Element *operator[](size_t x);
 
-    gnash::Network::byte_t *getData() const;
-    size_t getLength() const;
-    Buffer *getBuffer() { return _buffer; };
+//    gnash::Network::byte_t *getData();
+    size_t getDataSize() const;
     
     // These are all accessors for the various output formats
     amf0_type_e getType() const { return _type; };
@@ -218,13 +218,13 @@ public:
 //    void setData(Buffer *buf) { _buffer = buf; };
 
     // These accessors convert the raw data to a standard data type we can use.
+    bool to_bool() const;
     double to_number() const;
     const char *to_string() const;
-    bool to_bool() const;
-    void *to_reference();
+    gnash::Network::byte_t *to_reference();
     
-    char *getName() const { return _name; };
     size_t getNameSize();
+    char *getName() const { return _name; };
     void setName(const std::string &name);
     void setName(gnash::Network::byte_t *name, size_t x);
     void setName(const char *name, size_t x);
@@ -237,14 +237,14 @@ public:
     void addProperty(Element *el) { _properties.push_back(el); };
     Element *popProperty()        { return _properties.front(); };
     size_t propertySize() const   { return _properties.size(); };
-    amf::Buffer *encode();
+    boost::shared_ptr<Buffer> encode();
     std::vector<Element *> getProperties() { return _properties; };
     void dump() const { dump(std::cerr); }
     void dump(std::ostream& os) const;
 private:
     void check_buffer(size_t size);
     char		*_name;
-    Buffer		*_buffer;
+    boost::shared_ptr<Buffer> _buffer;
     amf0_type_e		_type;
     std::vector<Element	*> _properties;
 };                              // end of class definition
