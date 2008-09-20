@@ -103,6 +103,7 @@ public:
 
     const matrix& getMatrix() const { return _movieClip.get_matrix(); }
     const cxform& getColorTransform() const { return _movieClip.get_cxform(); }
+    void setMatrix(const matrix& mat) { _movieClip.set_matrix(mat); }
 
 private:
 
@@ -141,6 +142,8 @@ Transform_concatenatedMatrix_getset(const fn_call& fn)
 static as_value
 Transform_matrix_getset(const fn_call& fn)
 {
+
+    const double factor = 65536.0;
 
     // TODO: What happens if you do: "mat = mc.transform.matrix; mat.a = 6;"
     // (where mc is a MovieClip)? Nothing (probable), or does it change mc (how
@@ -207,8 +210,6 @@ Transform_matrix_getset(const fn_call& fn)
         log_debug("Sprite matrix: %d, %d, %d, %d, %d, %d", m.sx, m.shx
             , m.sy, m.shy, m.tx, m.ty);
 
-        const double factor = 65536.0;
-
         args->push_back(m.sx / factor);
         args->push_back(m.shx / factor);
         args->push_back(m.shy / factor);
@@ -223,7 +224,39 @@ Transform_matrix_getset(const fn_call& fn)
     }
 
     // Setter
-	LOG_ONCE(log_unimpl("flash.geom.Transform.matrix setter"));
+    
+    boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
+    if (!obj)
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::ostringstream ss;
+            fn.dump_args(ss);
+            log_aserror("Transform.matrix(%s): argument is not an object", ss.str());
+        );
+        return as_value()
+    }
+    
+    as_value a, b, c, d, tx, ty;
+    obj->get_member(NSV::PROP_A, &a);
+    obj->get_member(NSV::PROP_B, &b);
+    obj->get_member(NSV::PROP_C, &c);
+    obj->get_member(NSV::PROP_D, &d);
+    obj->get_member(NSV::PROP_TX, &tx);
+    obj->get_member(NSV::PROP_TY, &ty);
+
+    matrix m;
+    m.sx = a.to_number() * factor;
+    m.shx = b.to_number() * factor;
+    m.shy = c.to_number() * factor;
+    m.sy = d.to_number() * factor;
+    m.set_x_translation(PIXELS_TO_TWIPS(tx.to_number()));
+    m.set_y_translation(PIXELS_TO_TWIPS(ty.to_number()));
+
+    log_debug("Sprite matrix: %d, %d, %d, %d, %d, %d", m.sx, m.shx
+        , m.sy, m.shy, m.tx, m.ty);
+
+    ptr->setMatrix(m);
+
     return as_value();
 
 }
@@ -248,7 +281,7 @@ Transform_ctor(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror("Transform constructor: needs one argument", ss.str());
+            log_aserror("flash.geom.Transform(%s): needs one argument", ss.str());
         );
         return as_value();
     }
