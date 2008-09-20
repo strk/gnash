@@ -105,6 +105,14 @@ public:
     const cxform& getColorTransform() const { return _movieClip.get_cxform(); }
     void setMatrix(const matrix& mat) { _movieClip.set_matrix(mat); }
 
+protected:
+
+    void markReachableResources()
+    {
+        _movieClip.setReachable();
+        markAsObjectReachable();
+    }
+
 private:
 
     sprite_instance& _movieClip;
@@ -207,9 +215,6 @@ Transform_matrix_getset(const fn_call& fn)
         std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>);
         const matrix& m = ptr->getMatrix();
 
-        log_debug("Sprite matrix: %d, %d, %d, %d, %d, %d", m.sx, m.shx
-            , m.sy, m.shy, m.tx, m.ty);
-
         args->push_back(m.sx / factor);
         args->push_back(m.shx / factor);
         args->push_back(m.shy / factor);
@@ -224,7 +229,17 @@ Transform_matrix_getset(const fn_call& fn)
     }
 
     // Setter
-    
+
+    if (fn.nargs > 1)
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::ostringstream ss;
+            fn.dump_args(ss);
+            log_aserror("Transform.matrix(%s): extra arguments discarded", ss.str());
+        );
+    }
+
+
     boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
     if (!obj)
     {
@@ -233,9 +248,11 @@ Transform_matrix_getset(const fn_call& fn)
             fn.dump_args(ss);
             log_aserror("Transform.matrix(%s): argument is not an object", ss.str());
         );
-        return as_value()
+        return as_value();
     }
     
+    // TODO: does this have to be an AS matrix or can it be any object
+    // (more likely)? 
     as_value a, b, c, d, tx, ty;
     obj->get_member(NSV::PROP_A, &a);
     obj->get_member(NSV::PROP_B, &b);
@@ -251,9 +268,6 @@ Transform_matrix_getset(const fn_call& fn)
     m.sy = d.to_number() * factor;
     m.set_x_translation(PIXELS_TO_TWIPS(tx.to_number()));
     m.set_y_translation(PIXELS_TO_TWIPS(ty.to_number()));
-
-    log_debug("Sprite matrix: %d, %d, %d, %d, %d, %d", m.sx, m.shx
-        , m.sy, m.shy, m.tx, m.ty);
 
     ptr->setMatrix(m);
 
@@ -294,6 +308,7 @@ Transform_ctor(const fn_call& fn)
 		LOG_ONCE( log_unimpl("Transform(%s): %s", ss.str(), _("arguments discarded")) );
 	}
 
+    // TODO: does this have to be a MovieClip or can it be any character?
     boost::intrusive_ptr<sprite_instance> mc = ensureType<sprite_instance>(fn.arg(0).to_object());
 
 	boost::intrusive_ptr<as_object> obj = new Transform_as(*mc);
@@ -334,6 +349,8 @@ void Transform_class_init(as_object& where)
 
 	// Register _global.Transform
     string_table& st = where.getVM().getStringTable();
-    where.init_destructive_property(st.find("Transform"), get_flash_geom_transform_constructor);}
+    where.init_destructive_property(st.find("Transform"), get_flash_geom_transform_constructor);
+
+}
 
 } // end of gnash namespace
