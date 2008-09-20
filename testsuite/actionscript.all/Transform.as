@@ -89,6 +89,84 @@ xcheck_equals(t.colorTransform.toString(), "(redMultiplier=1, greenMultiplier=1,
 flash.geom.Rectangle = Rectangle;
 xcheck(t.pixelBounds instanceOf Rectangle);
 
+mc = _root.createEmptyMovieClip("mc", getNextHighestDepth());
+check(mc.transform instanceOf Transform);
+check(mc.transform.matrix instanceOf Matrix);
+check_equals(mc.transform.matrix.toString(), "(a=1, b=0, c=0, d=1, tx=0, ty=0)");
 
-totals(28);
+// Store Matrix (copy)
+mat = mc.transform.matrix;
+
+// Store Transform (reference)
+trans = mc.transform;
+
+mc._x = "4";
+check_equals(mc.transform.matrix.toString(), "(a=1, b=0, c=0, d=1, tx=4, ty=0)");
+check_equals(trans.matrix.toString(), "(a=1, b=0, c=0, d=1, tx=4, ty=0)");
+check_equals(mat.toString(), "(a=1, b=0, c=0, d=1, tx=0, ty=0)");
+
+
+mc._rotation = 1.5;
+check_equals(mc.transform.matrix.toString(), trans.matrix.toString());
+check_equals(Math.round(trans.matrix.b * 10000), 262);
+check_equals(mat.toString(), "(a=1, b=0, c=0, d=1, tx=0, ty=0)");
+
+mc2 = mc;
+delete mc;
+
+check_equals(mc.transform.matrix.toString(), trans.matrix.toString());
+check_equals(Math.round(trans.matrix.a * 1000), 1000);
+check_equals(mat.toString(), "(a=1, b=0, c=0, d=1, tx=0, ty=0)");
+
+
+_root.removeMovieClip(mc);
+check_equals(Math.round(mc.transform.matrix.b * 10000), 262);
+
+mc = undefined;
+
+check_equals(Math.round(mc2.transform.matrix.b * 10000), 262);
+check_equals(mc.transform.matrix.toString(), undefined);
+check_equals(mc2.transform.matrix.toString(), trans.matrix.toString());
+check_equals(mat.toString(), "(a=1, b=0, c=0, d=1, tx=0, ty=0)");
+
+trans.matrix = new Matrix(2, 0, 0, 2, 10, 11);
+
+check_equals(trans.matrix.toString(), "(a=2, b=0, c=0, d=2, tx=10, ty=11)");
+check_equals(mc2.transform.matrix.toString(), "(a=2, b=0, c=0, d=2, tx=10, ty=11)");
+
+delete mc2;
+
+check_equals(mc2.transform.matrix.toString(), undefined);
+check_equals(trans.matrix.toString(), "(a=2, b=0, c=0, d=2, tx=10, ty=11)");
+check_equals(mat.toString(), "(a=1, b=0, c=0, d=1, tx=0, ty=0)");
+
+mc2 = undefined;
+
+check_equals(trans.matrix.toString(), "(a=2, b=0, c=0, d=2, tx=10, ty=11)");
+
+// Identity;
+trans.matrix = new Matrix;
+check_equals(trans.matrix.toString(), "(a=1, b=0, c=0, d=1, tx=0, ty=0)");
+
+
+mc = _root.createEmptyMovieClip("mc", getNextHighestDepth());
+trans = mc.transform;
+
+mcOld = mc;
+trans.matrix = new Matrix(3, 0.5, 0.5, 2, 0, 1);
+check_equals(mc.transform.matrix.toString(), "(a=3, b=0.5, c=0.5, d=2, tx=0, ty=1)");
+check_equals(mcOld.transform.matrix.toString(), "(a=3, b=0.5, c=0.5, d=2, tx=0, ty=1)");
+
+
+mcOld = mc;
+mc = _root.createEmptyMovieClip("mc", getNextHighestDepth());
+
+trans.matrix = new Matrix(4, 0.3, 0.3, 1, 1, 0);
+check_equals(mc.transform.matrix.toString(), "(a=1, b=0, c=0, d=1, tx=0, ty=0)");
+
+// Can we be this accurate? I think the AS matrix class is accurate enough.
+xcheck_equals(mcOld.transform.matrix.toString(), "(a=4, b=0.300000011920929, c=0.300000011920929, d=1, tx=1, ty=0)");
+
+
+totals(56);
 #endif
