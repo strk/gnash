@@ -581,8 +581,7 @@ BitmapData_ctor(const fn_call& fn)
 	if ( fn.nargs < 2)
 	{
 	    // TODO: should fail if not enough arguments are passed.
-		boost::intrusive_ptr<as_object> obj = new as_object;
-        return as_value(obj.get());
+        return as_value();
 	}
 
     size_t width, height;
