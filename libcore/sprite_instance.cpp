@@ -2232,6 +2232,10 @@ attachMovieClipInterface(as_object& o)
     // for SWF5 too...
     o.init_member("attachBitmap", new builtin_function(sprite_attachBitmap));
 
+    // This is documented to be SWF8+ only, but the pp version9 shows it
+    // for SWF5 too...
+    o.init_property("transform", &movieClip_transform, &movieClip_transform); // see MovieClip.as testcase
+
     if ( target_version  < 6 ) return;
 
     // SWF6 or higher
@@ -2262,8 +2266,6 @@ attachMovieClipInterface(as_object& o)
     o.init_member("beginBitmapFill", new builtin_function(sprite_beginBitmapFill));
     o.init_member("getRect", new builtin_function(sprite_getRect));
     o.init_member("lineGradientStyle", new builtin_function(sprite_lineGradientStyle));
-
-    o.init_property("transform", &movieClip_transform, &movieClip_transform); // see MovieClip.as testcase
 
 }
 

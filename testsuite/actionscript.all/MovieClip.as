@@ -38,7 +38,7 @@ xcheck(MovieClip.prototype.hasOwnProperty("opaqueBackground"));
 xcheck(MovieClip.prototype.hasOwnProperty("scale9Grid"));
 xcheck(MovieClip.prototype.hasOwnProperty("scrollRect"));
 xcheck(MovieClip.prototype.hasOwnProperty("tabIndex"));
-xcheck(MovieClip.prototype.hasOwnProperty("transform"));
+check(MovieClip.prototype.hasOwnProperty("transform"));
 check(MovieClip.prototype.hasOwnProperty("useHandCursor"));
 check(MovieClip.prototype.hasOwnProperty("_lockroot"));
 
@@ -88,7 +88,7 @@ endOfTest = function()
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(748); // SWF8+
+	check_totals(752); // SWF8+
 #endif
 
 	play();
@@ -1343,14 +1343,14 @@ check_equals(typeof(_root.transform), 'undefined');
 #else
 
 // TODO: test these !!
-xcheck_equals(typeof(_root.transform), 'object'); 
+check_equals(typeof(_root.transform), 'object'); 
 
 oldTransform = _root.transform;
 check(oldTransform === oldTransform); 
-xcheck(oldTransform != _root.transform); // everytime transform is accessed, it's a new object!
+check(oldTransform != _root.transform); // everytime transform is accessed, it's a new object!
 
 Matrix = flash.geom.Matrix;
-xcheck(_root.transform instanceOf Object);
+check(_root.transform instanceOf Object);
 check(!_root.transform instanceOf Matrix);
 props = []; for (var i in _root.transform) props.push(i); props.sort();
 xcheck_equals(props.toString(), "colorTransform,concatenatedColorTransform,concatenatedMatrix,matrix,pixelBounds");
@@ -1364,17 +1364,17 @@ xcheck_equals(typeof(_root.transform.concatenatedColorTransform), 'object');
 xcheck_equals(typeof(_root.transform.concatenatedMatrix), 'object');
 xcheck(_root.transform.concatenatedMatrix instanceOf Matrix);
 
-xcheck_equals(typeof(_root.transform.matrix), 'object');
-xcheck(_root.transform.matrix instanceOf Matrix);
+check_equals(typeof(_root.transform.matrix), 'object');
+check(_root.transform.matrix instanceOf Matrix);
 
 note('x:'+_root._x+' y:'+_root._y+' rot:'+_root._rotation+' xs:'+_root._xscale+' yx:'+_root._yscale);
 
-xcheck_equals(_root.transform.matrix.a, 1);
-xcheck_equals(_root.transform.matrix.b, 0);
-xcheck_equals(_root.transform.matrix.c, 0);
-xcheck_equals(_root.transform.matrix.d, 1);
-xcheck_equals(_root.transform.matrix.tx, 0);
-xcheck_equals(_root.transform.matrix.ty, 0);
+check_equals(_root.transform.matrix.a, 1);
+check_equals(_root.transform.matrix.b, 0);
+check_equals(_root.transform.matrix.c, 0);
+check_equals(_root.transform.matrix.d, 1);
+check_equals(_root.transform.matrix.tx, 0);
+check_equals(_root.transform.matrix.ty, 0);
 // TODO: test concatenatedMatrix
 
 _root._x = 30;
@@ -1383,12 +1383,12 @@ _root._y = 20;
 _root._yscale = -200;
 _root._rotation = -90;
 
-xcheck_equals(_root.transform.matrix.a, 0);
-xcheck_equals(_root.transform.matrix.b, -1); // would be 3 if we did set _xscale=-300 above
-xcheck_equals(_root.transform.matrix.c, -2);
-xcheck_equals(_root.transform.matrix.d, 0);
-xcheck_equals(_root.transform.matrix.tx, 30);
-xcheck_equals(_root.transform.matrix.ty, 20);
+check_equals(_root.transform.matrix.a, 0);
+check_equals(_root.transform.matrix.b, -1); // would be 3 if we did set _xscale=-300 above
+check_equals(_root.transform.matrix.c, -2);
+check_equals(_root.transform.matrix.d, 0);
+check_equals(_root.transform.matrix.tx, 30);
+check_equals(_root.transform.matrix.ty, 20);
 // TODO: test concatenatedMatrix
 
 _root.transform.matrix.ty = 300;

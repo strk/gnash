@@ -351,7 +351,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);        
 	SWFDisplayItem_setMatrix(it, 1, 0, 0, 1, 50, 300); // reset to near-identity
-    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=0, c=0, d=1, tx=50, ty=300)'");
+    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=0, c=0, d=1, tx=50, ty=300)'");
 
 	check_equals(mo, "staticmc._x", "50");
 	check_equals(mo, "staticmc._y", "300");
@@ -378,7 +378,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);        
 	SWFDisplayItem_setMatrix(it, -1, 0, 0, 1, 50, 300); // negative x scale gets interpreted as 180 degrees rotation
-    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=0, c=0, d=1, tx=50, ty=300)'");
+    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=0, c=0, d=1, tx=50, ty=300)'");
 
 	check_equals(mo, "staticmc._x", "50");
 	check_equals(mo, "staticmc._y", "300");
@@ -405,7 +405,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);        
 	SWFDisplayItem_setMatrix(it, 1, 0, 0, -1, 50, 300); // negative y scale (discarded ?)
-    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=0, c=0, d=-1, tx=50, ty=300)'");
+    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=0, c=0, d=-1, tx=50, ty=300)'");
 
 	check_equals(mo, "staticmc._x", "50");
 	check_equals(mo, "staticmc._y", "300");
@@ -432,7 +432,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);        
 	SWFDisplayItem_setMatrix(it, -1, 0, 0, -1, 50, 300); // negative x and y scales
-    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=0, c=0, d=-1, tx=50, ty=300)'");
+    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=0, c=0, d=-1, tx=50, ty=300)'");
 
 	check_equals(mo, "staticmc._x", "50");
 	check_equals(mo, "staticmc._y", "300");
@@ -459,7 +459,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);        
 	SWFDisplayItem_setMatrix(it, -1, -45, 0, 1, 50, 300); // negative x scale and some negative skew
-    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=-45, c=0, d=1, tx=50, ty=300)'");
+    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=-45, c=0, d=1, tx=50, ty=300)'");
 
 	check_equals(mo, "staticmc._x", "50");
 	check_equals(mo, "staticmc._y", "300");
@@ -486,7 +486,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);        
 	SWFDisplayItem_setMatrix(it, -1, 45, 0, 1, 50, 300); // negative x scale and some positive skew
-    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=45, c=0, d=1, tx=50, ty=300)'");
+    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=45, c=0, d=1, tx=50, ty=300)'");
 
 	check_equals(mo, "staticmc._x", "50");
 	check_equals(mo, "staticmc._y", "300");
@@ -513,7 +513,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);        
 	SWFDisplayItem_setMatrix(it, 1, -45, 0, -1, 50, 300); // negative x scale and some negative skew
-    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=-45, c=0, d=-1, tx=50, ty=300)'");
+    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=-45, c=0, d=-1, tx=50, ty=300)'");
 
 	check_equals(mo, "staticmc._x", "50");
 	check_equals(mo, "staticmc._y", "300");
@@ -540,7 +540,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);        
 	SWFDisplayItem_setMatrix(it, 1, 45, 0, -1, 50, 300); // negative x scale and some positive skew
-    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=45, c=0, d=-1, tx=50, ty=300)'");
+    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=45, c=0, d=-1, tx=50, ty=300)'");
 
 	check_equals(mo, "staticmc._x", "50");
 	check_equals(mo, "staticmc._y", "300");
@@ -567,7 +567,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);        
 	SWFDisplayItem_setMatrix(it, -1, 45, 0, -1, 50, 300); // negative x scale and some positive skew
-    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=45, c=0, d=-1, tx=50, ty=300)'");
+    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=45, c=0, d=-1, tx=50, ty=300)'");
 
 	check_equals(mo, "staticmc._x", "50");
 	check_equals(mo, "staticmc._y", "300");
@@ -594,7 +594,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);        
 	SWFDisplayItem_setMatrix(it, -1, -45, 0, -1, 50, 300); // negative x scale and some positive skew
-    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=-45, c=0, d=-1, tx=50, ty=300)'");
+    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=-45, c=0, d=-1, tx=50, ty=300)'");
 
 	check_equals(mo, "staticmc._x", "50");
 	check_equals(mo, "staticmc._y", "300");
@@ -622,7 +622,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);        
 	SWFDisplayItem_setMatrix(it, -1, 0, -45, 1, 50, 300); // negative x scale and some negative skew
-    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=0, c=-45, d=1, tx=50, ty=300)'");
+    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=0, c=-45, d=1, tx=50, ty=300)'");
 
 	check_equals(mo, "staticmc._x", "50");
 	check_equals(mo, "staticmc._y", "300");
@@ -650,7 +650,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);        
 	SWFDisplayItem_setMatrix(it, -1, 0, 45, 1, 50, 300); // negative x scale and some positive skew
-    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=0, c=45, d=1, tx=50, ty=300)'");
+    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=0, c=45, d=1, tx=50, ty=300)'");
 
 	check_equals(mo, "staticmc._x", "50");
 	check_equals(mo, "staticmc._y", "300");
@@ -678,7 +678,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);        
 	SWFDisplayItem_setMatrix(it, 1, 0, -45, -1, 50, 300); // negative x scale and some negative skew
-    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=0, c=-45, d=-1, tx=50, ty=300)'");
+    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=0, c=-45, d=-1, tx=50, ty=300)'");
 
 	check_equals(mo, "staticmc._x", "50");
 	check_equals(mo, "staticmc._y", "300");
@@ -706,7 +706,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);        
 	SWFDisplayItem_setMatrix(it, 1, 0, 45, -1, 50, 300); // negative x scale and some positive skew
-    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=0, c=45, d=-1, tx=50, ty=300)'");
+    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=0, c=45, d=-1, tx=50, ty=300)'");
 
 	check_equals(mo, "staticmc._x", "50");
 	check_equals(mo, "staticmc._y", "300");
@@ -734,7 +734,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);        
 	SWFDisplayItem_setMatrix(it, -1, 0, 45, -1, 50, 300); // negative x scale and some positive skew
-    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=0, c=45, d=-1, tx=50, ty=300)'");
+    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=0, c=45, d=-1, tx=50, ty=300)'");
 
 	check_equals(mo, "staticmc._x", "50");
 	check_equals(mo, "staticmc._y", "300");
@@ -762,7 +762,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);        
 	SWFDisplayItem_setMatrix(it, -1, 0, -45, -1, 50, 300); // negative x scale and some positive skew
-    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=0, c=-45, d=-1, tx=50, ty=300)'");
+    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=0, c=-45, d=-1, tx=50, ty=300)'");
 
 	check_equals(mo, "staticmc._x", "50");
 	check_equals(mo, "staticmc._y", "300");
@@ -789,7 +789,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);        
 	SWFDisplayItem_setMatrix(it, -2, 0, -45, -0.5, 50, 300); // negative x scale and some positive skew
-    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-2, b=0, c=-45, d=-0.5, tx=50, ty=300)'");
+    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-2, b=0, c=-45, d=-0.5, tx=50, ty=300)'");
 
 	check_equals(mo, "staticmc._x", "50");
 	check_equals(mo, "staticmc._y", "300");
@@ -816,7 +816,7 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);        
 	SWFDisplayItem_setMatrix(it, 1, 1, 1, 1, 2, 3); // not-invertible matrix (I'd think)
-    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=1, c=1, d=1, tx=2, ty=3)'");
+    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=1, c=1, d=1, tx=2, ty=3)'");
 
 	check_equals(mo, "staticmc._x", "2");
 	check_equals(mo, "staticmc._y", "3");
@@ -851,7 +851,7 @@ main(int argc, char** argv)
 	SWFDisplayItem_setMatrix(it, 0, -1, 1.167969, 0, -.75, 135); 
     // Ming omits the scales rather then set them to zero (ops)
     // NOTE: might change if this is a Ming bug
-    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=-1, c=1.16796875, d=1, tx=-0.75, ty=135)'");
+    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=-1, c=1.16796875, d=1, tx=-0.75, ty=135)'");
 
 	check_equals(mo, "staticmc._x", "-0.75");
 	check_equals(mo, "staticmc._y", "135");
@@ -873,7 +873,7 @@ main(int argc, char** argv)
 	SWFDisplayItem_setMatrix(it, 0, 0.972519, -1, 0, 13.950, 214.80); 
     // Ming omits the scales rather then set them to zero (ops)
     // NOTE: might change if this is a Ming bug
-    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=0.972518920898438, c=-1, d=1, tx=13.95, ty=214.8)'");
+    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=0.972518920898438, c=-1, d=1, tx=13.95, ty=214.8)'");
 
 	check_equals(mo, "Math.round(staticmc._x*100)/100", "13.95"); 
 	check_equals(mo, "staticmc._y", "214.80");
@@ -892,13 +892,13 @@ main(int argc, char** argv)
 	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
 	SWFDisplayItem_setMatrix(it, 1, 0, 2, 1, 200, 200); 
 	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'109.85,169.95 290.15,230.05'");
-    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=0, c=2, d=1, tx=200, ty=200)'");
+    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=0, c=2, d=1, tx=200, ty=200)'");
 
 	check_equals(mo, "staticmc._rotation", "0");
 	check_equals(mo, "Math.round(staticmc._yscale)", "224");
 	check_equals(mo, "staticmc._xscale", "100");
 	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
-    xcheck_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=-1, b=0, c=2, d=1, tx=200, ty=200)'");
+    check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=-1, b=0, c=2, d=1, tx=200, ty=200)'");
 	check_equals(mo, "staticmc._xscale", "-100");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'110,170 290,230'");
 
@@ -931,13 +931,13 @@ main(int argc, char** argv)
 	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
 	SWFDisplayItem_setMatrix(it, 1, 0, -2, 1, 200, 200); 
 	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'109.85,169.95 290.15,230.05'");
-    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=0, c=-2, d=1, tx=200, ty=200)'");
+    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=0, c=-2, d=1, tx=200, ty=200)'");
 
 	check_equals(mo, "staticmc._rotation", "0");
 	check_equals(mo, "Math.round(staticmc._yscale)", "224");
 	check_equals(mo, "staticmc._xscale", "100");
 	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
-    xcheck_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=-1, b=0, c=-2, d=1, tx=200, ty=200)'");
+    check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=-1, b=0, c=-2, d=1, tx=200, ty=200)'");
 	check_equals(mo, "staticmc._xscale", "-100");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'110,170 290,230'");
 
@@ -971,13 +971,13 @@ main(int argc, char** argv)
 	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
 	SWFDisplayItem_setMatrix(it, 1, 0, -2, -1, 200, 200); 
 	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'109.85,169.95 290.15,230.05'");
-    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=0, c=-2, d=-1, tx=200, ty=200)'");
+    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=0, c=-2, d=-1, tx=200, ty=200)'");
 
 	check_equals(mo, "staticmc._rotation", "0");
 	check_equals(mo, "Math.round(staticmc._yscale)", "224");
 	check_equals(mo, "staticmc._xscale", "100");
 	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
-    xcheck_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=-1, b=0, c=-2, d=-1, tx=200, ty=200)'");
+    check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=-1, b=0, c=-2, d=-1, tx=200, ty=200)'");
 	check_equals(mo, "staticmc._xscale", "-100");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'110,170 290,230'");
 
@@ -1011,13 +1011,13 @@ main(int argc, char** argv)
 	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
 	SWFDisplayItem_setMatrix(it, -1, 0, 2, 1, 200, 200); 
 	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'109.85,169.95 290.15,230.05'");
-    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=0, c=2, d=1, tx=200, ty=200)'");
+    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=0, c=2, d=1, tx=200, ty=200)'");
 
 	check_equals(mo, "staticmc._rotation", "180");
 	check_equals(mo, "Math.round(staticmc._yscale)", "224");
 	check_equals(mo, "staticmc._xscale", "100");
 	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
-    xcheck_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=1, b=0, c=2, d=1, tx=200, ty=200)'");
+    check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=1, b=0, c=2, d=1, tx=200, ty=200)'");
 	check_equals(mo, "staticmc._xscale", "-100");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'110,170 290,230'");
 
@@ -1050,18 +1050,18 @@ main(int argc, char** argv)
 	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
 	SWFDisplayItem_setMatrix(it, -1, 0, -2, 1, 200, 200); 
 	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'109.85,169.95 290.15,230.05'");
-    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=0, c=-2, d=1, tx=200, ty=200)'");
+    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=0, c=-2, d=1, tx=200, ty=200)'");
 
 	check_equals(mo, "staticmc._rotation", "180");
 	check_equals(mo, "Math.round(staticmc._yscale)", "224");
 	check_equals(mo, "staticmc._xscale", "100");
 	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
-    xcheck_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=1, b=0, c=-2, d=1, tx=200, ty=200)'");
+    check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=1, b=0, c=-2, d=1, tx=200, ty=200)'");
 	check_equals(mo, "staticmc._xscale", "-100");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'110,170 290,230'");
 
 	check_equals(mo, "staticmc._rotation", "180");
-    xcheck_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=1, b=0, c=-2, d=1, tx=200, ty=200)'");
+    check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=1, b=0, c=-2, d=1, tx=200, ty=200)'");
 	check_equals(mo, "Math.round(staticmc._yscale)", "224");
 	add_actions(mo, "staticmc._yscale = 0 - staticmc._yscale;"); // swap _yscale sign using ActionScript
 	check_equals(mo, "Math.round(staticmc._yscale)", "-224");
@@ -1089,13 +1089,13 @@ main(int argc, char** argv)
 	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
 	SWFDisplayItem_setMatrix(it, -1, 0, -2, -1, 200, 200); 
 	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'109.85,169.95 290.15,230.05'");
-    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=0, c=-2, d=-1, tx=200, ty=200)'");
+    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=0, c=-2, d=-1, tx=200, ty=200)'");
 
 	check_equals(mo, "staticmc._rotation", "180");
 	check_equals(mo, "Math.round(staticmc._yscale)", "224");
 	check_equals(mo, "staticmc._xscale", "100");
 	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
-    xcheck_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=1, b=0, c=-2, d=-1, tx=200, ty=200)'");
+    check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=1, b=0, c=-2, d=-1, tx=200, ty=200)'");
 	check_equals(mo, "staticmc._xscale", "-100");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'110,170 290,230'");
 
@@ -1129,13 +1129,13 @@ main(int argc, char** argv)
 	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
 	SWFDisplayItem_setMatrix(it, 1, 2, 0, 1, 200, 200); 
 	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'169.95,109.85 230.05,290.15'");
-    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=2, c=0, d=1, tx=200, ty=200)'");
+    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=2, c=0, d=1, tx=200, ty=200)'");
 
 	check_equals(mo, "Math.round(staticmc._rotation)", "63");
 	check_equals(mo, "staticmc._yscale", "100");
 	check_equals(mo, "Math.round(staticmc._xscale)", "224");
 	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
-    xcheck_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=-1, b=-2, c=0, d=1, tx=200, ty=200)'");
+    check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=-1, b=-2, c=0, d=1, tx=200, ty=200)'");
 	check_equals(mo, "Math.round(staticmc._xscale)", "-224");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'170,110 230,290'");
 
@@ -1168,13 +1168,13 @@ main(int argc, char** argv)
 	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
 	SWFDisplayItem_setMatrix(it, 1, -2, 0, 1, 200, 200); 
 	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'169.95,109.85 230.05,290.15'");
-    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=-2, c=0, d=1, tx=200, ty=200)'");
+    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=-2, c=0, d=1, tx=200, ty=200)'");
 
 	check_equals(mo, "Math.round(staticmc._rotation)", "-63");
 	check_equals(mo, "staticmc._yscale", "100");
 	check_equals(mo, "Math.round(staticmc._xscale)", "224");
 	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
-    xcheck_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=-1, b=2, c=0, d=1, tx=200, ty=200)'");
+    check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=-1, b=2, c=0, d=1, tx=200, ty=200)'");
 	check_equals(mo, "Math.round(staticmc._xscale)", "-224");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'170,110 230,290'");
 
@@ -1207,13 +1207,13 @@ main(int argc, char** argv)
 	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
 	SWFDisplayItem_setMatrix(it, 1, -2, 0, -1, 200, 200); 
 	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'169.95,109.85 230.05,290.15'");
-    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=-2, c=0, d=-1, tx=200, ty=200)'");
+    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=-2, c=0, d=-1, tx=200, ty=200)'");
 
 	check_equals(mo, "Math.round(staticmc._rotation)", "-63");
 	check_equals(mo, "staticmc._yscale", "100");
 	check_equals(mo, "Math.round(staticmc._xscale)", "224");
 	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
-    xcheck_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=-1, b=2, c=0, d=-1, tx=200, ty=200)'");
+    check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=-1, b=2, c=0, d=-1, tx=200, ty=200)'");
 	check_equals(mo, "Math.round(staticmc._xscale)", "-224");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'170,110 230,290'");
 
@@ -1247,13 +1247,13 @@ main(int argc, char** argv)
 	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
 	SWFDisplayItem_setMatrix(it, -1, 2, 0, 1, 200, 200); 
 	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'169.95,109.85 230.05,290.15'");
-    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=2, c=0, d=1, tx=200, ty=200)'");
+    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=2, c=0, d=1, tx=200, ty=200)'");
 
 	check_equals(mo, "Math.round(staticmc._rotation)", "117");
 	check_equals(mo, "staticmc._yscale", "100");
 	check_equals(mo, "Math.round(staticmc._xscale)", "224");
 	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
-    xcheck_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=1, b=-2, c=0, d=1, tx=200, ty=200)'");
+    check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=1, b=-2, c=0, d=1, tx=200, ty=200)'");
 	check_equals(mo, "Math.round(staticmc._xscale)", "-224");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'170,110 230,290'");
 
@@ -1286,13 +1286,13 @@ main(int argc, char** argv)
 	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
 	SWFDisplayItem_setMatrix(it, -1, -2, 0, 1, 200, 200); 
 	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'169.95,109.85 230.05,290.15'");
-    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=-2, c=0, d=1, tx=200, ty=200)'");
+    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=-2, c=0, d=1, tx=200, ty=200)'");
 
 	check_equals(mo, "Math.round(staticmc._rotation)", "-117");
 	check_equals(mo, "staticmc._yscale", "100");
 	check_equals(mo, "Math.round(staticmc._xscale)", "224");
 	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
-    xcheck_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=1, b=2, c=0, d=1, tx=200, ty=200)'");
+    check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=1, b=2, c=0, d=1, tx=200, ty=200)'");
 	check_equals(mo, "Math.round(staticmc._xscale)", "-224");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'170,110 230,290'");
 
@@ -1326,13 +1326,13 @@ main(int argc, char** argv)
 	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
 	SWFDisplayItem_setMatrix(it, -1, -2, 0, -1, 200, 200); 
 	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'169.95,109.85 230.05,290.15'");
-    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=-2, c=0, d=-1, tx=200, ty=200)'");
+    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=-2, c=0, d=-1, tx=200, ty=200)'");
 
 	check_equals(mo, "Math.round(staticmc._rotation)", "-117");
 	check_equals(mo, "staticmc._yscale", "100");
 	check_equals(mo, "Math.round(staticmc._xscale)", "224");
 	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
-    xcheck_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=1, b=2, c=0, d=-1, tx=200, ty=200)'");
+    check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=1, b=2, c=0, d=-1, tx=200, ty=200)'");
 	check_equals(mo, "Math.round(staticmc._xscale)", "-224");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'170,110 230,290'");
 
@@ -1366,34 +1366,34 @@ main(int argc, char** argv)
 	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
 	SWFDisplayItem_setMatrix(it, -1, -2, 2, -1, 200, 200); 
 	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'109.85,109.85 290.15,290.15'");
-    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=-2, c=2, d=-1, tx=200, ty=200)'");
+    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=-2, c=2, d=-1, tx=200, ty=200)'");
 
 	check_equals(mo, "Math.round(staticmc._rotation)", "-117");
 	check_equals(mo, "Math.round(staticmc._yscale)", "224");
 	check_equals(mo, "Math.round(staticmc._xscale)", "224");
 	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
-    xcheck_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=1, b=2, c=2, d=-1, tx=200, ty=200)'");
+    check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=1, b=2, c=2, d=-1, tx=200, ty=200)'");
 	check_equals(mo, "Math.round(staticmc._xscale)", "-224");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'110,110 290,290'");
 
 	check_equals(mo, "Math.round(staticmc._rotation)", "-117");
 	check_equals(mo, "Math.round(staticmc._yscale)", "224");
 	add_actions(mo, "staticmc._yscale = 0 - staticmc._yscale;"); // swap _yscale sign using ActionScript
-    xcheck_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=1, b=2, c=-2, d=1, tx=200, ty=200)'");
+    check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=1, b=2, c=-2, d=1, tx=200, ty=200)'");
 	check_equals(mo, "Math.round(staticmc._yscale)", "-224");
 	check_equals(mo, "Math.round(staticmc._xscale)", "-224");
 	check_equals(mo, "Math.round(staticmc._rotation)", "-117");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'110,110 290,290'");
 
 	add_actions(mo, "staticmc._rotation = 2;"); // change _rotation using ActionScript
-    xcheck_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=-2.23, b=-0.08, c=0.08, d=-2.23, tx=200, ty=200)'");
+    check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=-2.23, b=-0.08, c=0.08, d=-2.23, tx=200, ty=200)'");
 	check_equals(mo, "Math.round(staticmc._yscale)", "-224");
 	check_equals(mo, "Math.round(staticmc._xscale)", "-224");
 	check_equals(mo, "staticmc._rotation", "2");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'131,131 270,270'");
 
 	add_actions(mo, "staticmc._rotation = -2;"); // change _rotation using ActionScript
-    xcheck_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=-2.23, b=0.08, c=-0.08, d=-2.23, tx=200, ty=200)'");
+    check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=-2.23, b=0.08, c=-0.08, d=-2.23, tx=200, ty=200)'");
 	check_equals(mo, "Math.round(staticmc._yscale)", "-224");
 	check_equals(mo, "Math.round(staticmc._xscale)", "-224");
 	check_equals(mo, "staticmc._rotation", "-2");
@@ -1405,7 +1405,7 @@ main(int argc, char** argv)
 	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
 	SWFDisplayItem_setMatrix(it, -1, -2, -2, -1, 200, 200); 
 	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'109.85,109.85 290.15,290.15'");
-    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=-2, c=-2, d=-1, tx=200, ty=200)'");
+    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=-2, c=-2, d=-1, tx=200, ty=200)'");
 
 	check_equals(mo, "Math.round(staticmc._rotation)", "-117");
 	check_equals(mo, "Math.round(staticmc._yscale)", "224");
@@ -1413,7 +1413,7 @@ main(int argc, char** argv)
 	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
 	check_equals(mo, "Math.round(staticmc._xscale)", "-224");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'110,110 290,290'");
-    xcheck_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=1, b=2, c=-2, d=-1, tx=200, ty=200)'");
+    check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=1, b=2, c=-2, d=-1, tx=200, ty=200)'");
 
 	check_equals(mo, "Math.round(staticmc._rotation)", "-117");
 	check_equals(mo, "Math.round(staticmc._yscale)", "224");
@@ -1444,34 +1444,34 @@ main(int argc, char** argv)
 	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
 	SWFDisplayItem_setMatrix(it, -1, 2, -2, -1, 200, 200); 
 	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'109.85,109.85 290.15,290.15'");
-    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=2, c=-2, d=-1, tx=200, ty=200)'");
+    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=2, c=-2, d=-1, tx=200, ty=200)'");
 
 	check_equals(mo, "Math.round(staticmc._rotation)", "117");
 	check_equals(mo, "Math.round(staticmc._yscale)", "224");
 	check_equals(mo, "Math.round(staticmc._xscale)", "224");
 	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
-    xcheck_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=1, b=-2, c=-2, d=-1, tx=200, ty=200)'");
+    check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=1, b=-2, c=-2, d=-1, tx=200, ty=200)'");
 	check_equals(mo, "Math.round(staticmc._xscale)", "-224");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'110,110 290,290'");
 
 	check_equals(mo, "Math.round(staticmc._rotation)", "117");
 	check_equals(mo, "Math.round(staticmc._yscale)", "224");
 	add_actions(mo, "staticmc._yscale = 0 - staticmc._yscale;"); // swap _yscale sign using ActionScript
-    xcheck_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=1, b=-2, c=2, d=1, tx=200, ty=200)'");
+    check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=1, b=-2, c=2, d=1, tx=200, ty=200)'");
 	check_equals(mo, "Math.round(staticmc._yscale)", "-224");
 	check_equals(mo, "Math.round(staticmc._xscale)", "-224");
 	check_equals(mo, "Math.round(staticmc._rotation)", "117");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'110,110 290,290'");
 
 	add_actions(mo, "staticmc._rotation = 2;"); // change _rotation using ActionScript
-    xcheck_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=-2.23, b=-0.08, c=0.08, d=-2.23, tx=200, ty=200)'");
+    check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=-2.23, b=-0.08, c=0.08, d=-2.23, tx=200, ty=200)'");
 	check_equals(mo, "Math.round(staticmc._yscale)", "-224");
 	check_equals(mo, "Math.round(staticmc._xscale)", "-224");
 	check_equals(mo, "staticmc._rotation", "2");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'131,131 270,270'");
 
 	add_actions(mo, "staticmc._rotation = -2;"); // change _rotation using ActionScript
-    xcheck_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=-2.23, b=0.08, c=-0.08, d=-2.23, tx=200, ty=200)'");
+    check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=-2.23, b=0.08, c=-0.08, d=-2.23, tx=200, ty=200)'");
 	check_equals(mo, "Math.round(staticmc._yscale)", "-224");
 	check_equals(mo, "Math.round(staticmc._xscale)", "-224");
 	check_equals(mo, "staticmc._rotation", "-2");
@@ -1483,13 +1483,13 @@ main(int argc, char** argv)
 	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
 	SWFDisplayItem_setMatrix(it, -1, 2, -2, 1, 200, 200); 
 	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'109.85,109.85 290.15,290.15'");
-    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=2, c=-2, d=1, tx=200, ty=200)'");
+    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=2, c=-2, d=1, tx=200, ty=200)'");
 
 	check_equals(mo, "Math.round(staticmc._rotation)", "117");
 	check_equals(mo, "Math.round(staticmc._yscale)", "224");
 	check_equals(mo, "Math.round(staticmc._xscale)", "224");
 	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
-    xcheck_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=1, b=-2, c=-2, d=1, tx=200, ty=200)'");
+    check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=1, b=-2, c=-2, d=1, tx=200, ty=200)'");
 	check_equals(mo, "Math.round(staticmc._xscale)", "-224");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'110,110 290,290'");
 
@@ -1523,13 +1523,13 @@ main(int argc, char** argv)
 	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
 	SWFDisplayItem_setMatrix(it, 1, 2, -2, -1, 200, 200); 
 	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'109.85,109.85 290.15,290.15'");
-    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=2, c=-2, d=-1, tx=200, ty=200)'");
+    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=2, c=-2, d=-1, tx=200, ty=200)'");
 
 	check_equals(mo, "Math.round(staticmc._rotation)", "63");
 	check_equals(mo, "Math.round(staticmc._yscale)", "224");
 	check_equals(mo, "Math.round(staticmc._xscale)", "224");
 	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
-    xcheck_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=-1, b=-2, c=-2, d=-1, tx=200, ty=200)'");
+    check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=-1, b=-2, c=-2, d=-1, tx=200, ty=200)'");
 	check_equals(mo, "Math.round(staticmc._xscale)", "-224");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'110,110 290,290'");
 
@@ -1562,34 +1562,34 @@ main(int argc, char** argv)
 	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
 	SWFDisplayItem_setMatrix(it, -1, -2, 2, -1, 200, 200); 
 	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'109.85,109.85 290.15,290.15'");
-    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=-2, c=2, d=-1, tx=200, ty=200)'");
+    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=-2, c=2, d=-1, tx=200, ty=200)'");
 
 	check_equals(mo, "Math.round(staticmc._rotation)", "-117");
 	check_equals(mo, "Math.round(staticmc._yscale)", "224");
 	check_equals(mo, "Math.round(staticmc._xscale)", "224");
 	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
-    xcheck_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=1, b=2, c=2, d=-1, tx=200, ty=200)'");
+    check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=1, b=2, c=2, d=-1, tx=200, ty=200)'");
 	check_equals(mo, "Math.round(staticmc._xscale)", "-224");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'110,110 290,290'");
 
 	check_equals(mo, "Math.round(staticmc._rotation)", "-117");
 	check_equals(mo, "Math.round(staticmc._yscale)", "224");
 	add_actions(mo, "staticmc._yscale = 0 - staticmc._yscale;"); // swap _yscale sign using ActionScript
-    xcheck_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=1, b=2, c=-2, d=1, tx=200, ty=200)'");
+    check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=1, b=2, c=-2, d=1, tx=200, ty=200)'");
 	check_equals(mo, "Math.round(staticmc._yscale)", "-224");
 	check_equals(mo, "Math.round(staticmc._xscale)", "-224");
 	check_equals(mo, "Math.round(staticmc._rotation)", "-117");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'110,110 290,290'");
 
 	add_actions(mo, "staticmc._rotation = 2;"); // change _rotation using ActionScript
-    xcheck_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=-2.23, b=-0.08, c=0.08, d=-2.23, tx=200, ty=200)'");
+    check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=-2.23, b=-0.08, c=0.08, d=-2.23, tx=200, ty=200)'");
 	check_equals(mo, "Math.round(staticmc._yscale)", "-224");
 	check_equals(mo, "Math.round(staticmc._xscale)", "-224");
 	check_equals(mo, "staticmc._rotation", "2");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'131,131 270,270'");
 
 	add_actions(mo, "staticmc._rotation = -2;"); // change _rotation using ActionScript
-    xcheck_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=-2.23, b=0.08, c=-0.08, d=-2.23, tx=200, ty=200)'");
+    check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=-2.23, b=0.08, c=-0.08, d=-2.23, tx=200, ty=200)'");
 	check_equals(mo, "Math.round(staticmc._yscale)", "-224");
 	check_equals(mo, "Math.round(staticmc._xscale)", "-224");
 	check_equals(mo, "staticmc._rotation", "-2");
@@ -1602,13 +1602,13 @@ main(int argc, char** argv)
 	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
 	SWFDisplayItem_setMatrix(it, -1, -2, 2, 1, 200, 200); 
 	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'109.85,109.85 290.15,290.15'");
-    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=-2, c=2, d=1, tx=200, ty=200)'");
+    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=-1, b=-2, c=2, d=1, tx=200, ty=200)'");
 
 	check_equals(mo, "Math.round(staticmc._rotation)", "-117");
 	check_equals(mo, "Math.round(staticmc._yscale)", "224");
 	check_equals(mo, "Math.round(staticmc._xscale)", "224");
 	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
-    xcheck_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=1, b=2, c=2, d=1, tx=200, ty=200)'"); // swaps a,b signs
+    check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=1, b=2, c=2, d=1, tx=200, ty=200)'"); // swaps a,b signs
 	check_equals(mo, "Math.round(staticmc._xscale)", "-224");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'110,110 290,290'");
 
@@ -1641,13 +1641,13 @@ main(int argc, char** argv)
 	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
 	SWFDisplayItem_setMatrix(it, 1, -2, 2, -1, 200, 200); 
 	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'109.85,109.85 290.15,290.15'");
-    xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=-2, c=2, d=-1, tx=200, ty=200)'");
+    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=-2, c=2, d=-1, tx=200, ty=200)'");
 
 	check_equals(mo, "Math.round(staticmc._rotation)", "-63");
 	check_equals(mo, "Math.round(staticmc._yscale)", "224");
 	check_equals(mo, "Math.round(staticmc._xscale)", "224");
 	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
-    xcheck_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=-1, b=2, c=2, d=-1, tx=200, ty=200)'");
+    check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=-1, b=2, c=2, d=-1, tx=200, ty=200)'");
 	check_equals(mo, "Math.round(staticmc._xscale)", "-224");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'110,110 290,290'");
 
@@ -1692,7 +1692,7 @@ main(int argc, char** argv)
 	SWFDisplayItem_setMatrix(it, 0, 0.972519, -1, 0, 13.950, 214.80); 
     // Ming omits the scales rather then set them to zero (ops)
     // NOTE: might change if this is a Ming bug
-    xcheck_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=1, b=0.97, c=-1, d=1, tx=13.95, ty=214.8)'");
+    check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=1, b=0.97, c=-1, d=1, tx=13.95, ty=214.8)'");
 	check_equals(mo, "Math.round(staticmc._x*100)/100", "13.95"); 
 	check_equals(mo, "staticmc._y", "214.80");
 	check_equals(mo, "Math.round(staticmc._xscale)", "139");
@@ -1700,7 +1700,7 @@ main(int argc, char** argv)
 	check_equals(mo, "Math.round(staticmc._rotation)", "44");  
 	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'-46,156 74,274'");
 	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
-    xcheck_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=-1, b=-0.97, c=-1, d=1, tx=13.95, ty=214.8)'");
+    check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=-1, b=-0.97, c=-1, d=1, tx=13.95, ty=214.8)'");
 	check_equals(mo, "Math.round(staticmc._x*100)/100", "13.95"); 
 	check_equals(mo, "staticmc._y", "214.80");
 	check_equals(mo, "Math.round(staticmc._xscale)", "-139");
