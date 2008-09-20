@@ -40,14 +40,18 @@ check(Transform.prototype.hasOwnProperty("colorTransform"));
 check(Transform.prototype.hasOwnProperty("concatenatedColorTransform"));
 check(Transform.prototype.hasOwnProperty("pixelBounds"));
 
-// Cannot be instantiated.
+// Cannot be instantiated without MovieClip argument.
 t = new Transform;
 xcheck_equals(t, undefined);
 
 t = Transform();
 xcheck_equals(t, undefined);
 
-// Only (?) obtainable from MovieClip.transform?
+// Hooray!
+t = new Transform(_root);
+check_equals(typeOf(t), "object");
+check(t instanceOf Transform);
+
 t = _root.transform;
 xcheck_equals(typeOf(t), "object");
 xcheck(t instanceOf Transform);
@@ -86,5 +90,5 @@ flash.geom.Rectangle = Rectangle;
 xcheck(t.pixelBounds instanceOf Rectangle);
 
 
-totals(26);
+totals(28);
 #endif
