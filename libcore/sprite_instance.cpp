@@ -57,6 +57,7 @@
 #include "styles.h" // for cap_style_e and join_style_e enums
 #include "PlaceObject2Tag.h" 
 #include "NetStream.h"
+#include "flash/geom/Matrix_as.h"
 
 #ifdef USE_SWFTREE
 # include "tree.hh"
@@ -92,6 +93,8 @@ namespace gnash {
 static as_object* getMovieClipInterface();
 static void attachMovieClipInterface(as_object& o);
 static void attachMovieClipProperties(character& o);
+
+static as_value movieClip_transform(const fn_call& fn);
 
 /// Anonymous namespace for module-private definitions
 namespace
@@ -2260,6 +2263,68 @@ attachMovieClipInterface(as_object& o)
     o.init_member("getRect", new builtin_function(sprite_getRect));
     o.init_member("lineGradientStyle", new builtin_function(sprite_lineGradientStyle));
 
+    o.init_property("transform", &movieClip_transform, &movieClip_transform); // see MovieClip.as testcase
+
+}
+
+as_value
+movieClip_transform(const fn_call& fn)
+{
+    boost::intrusive_ptr<sprite_instance> ptr = ensureType<sprite_instance>(fn.this_ptr);
+    
+    VM& vm = ptr->getVM();
+    string_table& st = ptr->getVM().getStringTable();
+
+    as_value flash;
+    if (!vm.getGlobal()->get_member(st.find("flash"), &flash))
+    {
+        log_error("No flash object found!");
+        return as_value();
+    }
+    boost::intrusive_ptr<as_object> flashObj = flash.to_object();
+
+    if (!flashObj)
+    {
+        log_error("flash isn't an object!");
+        return as_value();
+    }
+    
+    as_value geom;
+    if (!flashObj->get_member(st.find("geom"), &geom))
+    {
+        log_error("No flash.geom object found!");
+        return as_value();
+    }
+    boost::intrusive_ptr<as_object> geomObj = geom.to_object();
+
+    if (!geomObj)
+    {
+        log_error("flash.geom isn't an object!");
+        return as_value();
+    }
+    
+    as_value transform;
+    if (!geomObj->get_member(st.find("Transform"), &transform))
+    {
+        log_error("No flash.geom.Transform object found!");
+        return as_value();
+    }    
+
+    boost::intrusive_ptr<as_function> transformCtor = transform.to_as_function();
+    if (!transformCtor)
+    {
+        log_error("flash.geom.Transform isn't a function!");
+        return as_value();
+    }
+
+    // Construct a flash.geom.Transform object with "this" as argument.
+    std::auto_ptr< std::vector<as_value> > args (new std::vector<as_value>);
+    args->push_back(ptr.get());
+
+    boost::intrusive_ptr<as_object> transformObj =
+                transformCtor->constructInstance(fn.env(), args);
+
+    return as_value(transformObj.get());
 }
 
 /// Properties (and/or methods) attached to every *instance* of a MovieClip 
