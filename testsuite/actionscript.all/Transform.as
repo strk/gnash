@@ -45,7 +45,7 @@ t = new Transform;
 xcheck_equals(t, undefined);
 
 t = Transform();
-xcheck_equals(t, undefined);
+check_equals(t, undefined);
 
 // Hooray!
 t = new Transform(_root);
@@ -53,16 +53,16 @@ check_equals(typeOf(t), "object");
 check(t instanceOf Transform);
 
 t = _root.transform;
-xcheck_equals(typeOf(t), "object");
-xcheck(t instanceOf Transform);
+check_equals(typeOf(t), "object");
+check(t instanceOf Transform);
 
-xcheck(t.matrix instanceOf Matrix);
+check(t.matrix instanceOf Matrix);
 xcheck(t.concatenatedMatrix instanceOf Matrix);
 xcheck(t.colorTransform instanceOf ColorTransform);
 xcheck(t.concatenatedColorTransform instanceOf ColorTransform);
 xcheck(t.pixelBounds instanceOf Rectangle);
 
-xcheck_equals(t.matrix.toString(), "(a=1, b=0, c=0, d=1, tx=0, ty=0)");
+check_equals(t.matrix.toString(), "(a=1, b=0, c=0, d=1, tx=0, ty=0)");
 xcheck_equals(t.colorTransform.toString(), "(redMultiplier=1, greenMultiplier=1, blueMultiplier=1, alphaMultiplier=1, redOffset=0, greenOffset=0, blueOffset=0, alphaOffset=0)");
 xcheck_equals(t.concatenatedColorTransform.toString(), "(redMultiplier=1, greenMultiplier=1, blueMultiplier=1, alphaMultiplier=1, redOffset=0, greenOffset=0, blueOffset=0, alphaOffset=0)");
 // These vary slightly with the pp
@@ -82,7 +82,7 @@ check_equals(t.pixelBounds, undefined);
 
 
 flash.geom.Matrix = Matrix;
-xcheck_equals(t.matrix.toString(), "(a=1, b=0, c=0, d=1, tx=0, ty=0)");
+check_equals(t.matrix.toString(), "(a=1, b=0, c=0, d=1, tx=0, ty=0)");
 check_equals(t.colorTransform, undefined);
 flash.geom.ColorTransform = ColorTransform;
 xcheck_equals(t.colorTransform.toString(), "(redMultiplier=1, greenMultiplier=1, blueMultiplier=1, alphaMultiplier=1, redOffset=0, greenOffset=0, blueOffset=0, alphaOffset=0)");
@@ -131,22 +131,22 @@ check_equals(mat.toString(), "(a=1, b=0, c=0, d=1, tx=0, ty=0)");
 
 trans.matrix = new Matrix(2, 0, 0, 2, 10, 11);
 
-check_equals(trans.matrix.toString(), "(a=2, b=0, c=0, d=2, tx=10, ty=11)");
-check_equals(mc2.transform.matrix.toString(), "(a=2, b=0, c=0, d=2, tx=10, ty=11)");
+xcheck_equals(trans.matrix.toString(), "(a=2, b=0, c=0, d=2, tx=10, ty=11)");
+xcheck_equals(mc2.transform.matrix.toString(), "(a=2, b=0, c=0, d=2, tx=10, ty=11)");
 
 delete mc2;
 
 check_equals(mc2.transform.matrix.toString(), undefined);
-check_equals(trans.matrix.toString(), "(a=2, b=0, c=0, d=2, tx=10, ty=11)");
+xcheck_equals(trans.matrix.toString(), "(a=2, b=0, c=0, d=2, tx=10, ty=11)");
 check_equals(mat.toString(), "(a=1, b=0, c=0, d=1, tx=0, ty=0)");
 
 mc2 = undefined;
 
-check_equals(trans.matrix.toString(), "(a=2, b=0, c=0, d=2, tx=10, ty=11)");
+xcheck_equals(trans.matrix.toString(), "(a=2, b=0, c=0, d=2, tx=10, ty=11)");
 
 // Identity;
 trans.matrix = new Matrix;
-check_equals(trans.matrix.toString(), "(a=1, b=0, c=0, d=1, tx=0, ty=0)");
+xcheck_equals(trans.matrix.toString(), "(a=1, b=0, c=0, d=1, tx=0, ty=0)");
 
 
 mc = _root.createEmptyMovieClip("mc", getNextHighestDepth());
@@ -154,8 +154,8 @@ trans = mc.transform;
 
 mcOld = mc;
 trans.matrix = new Matrix(3, 0.5, 0.5, 2, 0, 1);
-check_equals(mc.transform.matrix.toString(), "(a=3, b=0.5, c=0.5, d=2, tx=0, ty=1)");
-check_equals(mcOld.transform.matrix.toString(), "(a=3, b=0.5, c=0.5, d=2, tx=0, ty=1)");
+xcheck_equals(mc.transform.matrix.toString(), "(a=3, b=0.5, c=0.5, d=2, tx=0, ty=1)");
+xcheck_equals(mcOld.transform.matrix.toString(), "(a=3, b=0.5, c=0.5, d=2, tx=0, ty=1)");
 
 
 mcOld = mc;
