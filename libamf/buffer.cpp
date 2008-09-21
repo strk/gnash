@@ -31,12 +31,11 @@ using namespace gnash;
 namespace amf
 {
 
-#if 0
 // convert an ascii hex digit to a number.
 //      param is hex digit.
 //      returns a decimal digit.
 Network::byte_t
-hex2digit (Network::byte_t digit)
+Buffer::hex2digit (Network::byte_t digit)
 {  
     if (digit == 0)
         return 0;
@@ -53,28 +52,34 @@ hex2digit (Network::byte_t digit)
 }
 
 // Convert the hex array pointed to by buf into binary to be placed in mem
-Buffer *
-Buffer::hex2mem(const char *str)
+Buffer &
+Buffer::hex2mem(const string &str)
 {
-    size_t count = strlen(str);
+//    GNASH_REPORT_FUNCTION;
+    size_t count = str.size();
+    size_t size = (count/3) + 1;
     Network::byte_t ch = 0;
-    _ptr = new Buffer((count/3)+1);
-//    buf->clear();
-
-    Network::byte_t *strdata = const_cast<Network::byte_t *>(reinterpret_cast<const Network::byte_t *>(str));
     
-    for (size_t i=0; i<count; i++) {
-        if (*strdata == ' ') {      // skip spaces.
-            strdata++;
+    Network::byte_t *ptr = const_cast<Network::byte_t *>(reinterpret_cast<const Network::byte_t *>(str.c_str()));
+    Network::byte_t *end = ptr + count;
+
+    init(size);
+    
+    int j = 0;
+    for (size_t i=0; ptr<end; i++) {
+        if (*ptr == ' ') {      // skip spaces.
+            ptr++;
             continue;
         }
-        ch = hex2digit(*strdata++) << 4;
-        ch |= hex2digit(*strdata++);
-        append(ch);
+        ch = hex2digit(*ptr++) << 4;
+        ch |= hex2digit(*ptr++);
+        *this += ch;
+	i++;
     }
-    return _ptr;
+    resize(size);
+    
+    return *this;
 }
-#endif
 
 // Initialize a Buffer's storage to the specified size
 Buffer &
@@ -88,7 +93,7 @@ Buffer::init(size_t size)
     _seekptr = _data.get();
     _nbytes = size;
 
-    clear();			// FIXME; this is a perforance hitm but aids in debugging
+    clear();// FIXME; this is a perforance hit, but aids in debugging
 #ifdef USE_STATS_BUFFERS
     clock_gettime (CLOCK_REALTIME, &_stamp);
 #endif
@@ -111,6 +116,13 @@ Buffer::Buffer(size_t nbytes)
 //    GNASH_REPORT_FUNCTION;
     _nbytes = nbytes;
     init(nbytes);
+}
+
+// Create with a hex string
+Buffer::Buffer(const std::string &str)
+{
+//    GNASH_REPORT_FUNCTION;
+    hex2mem(str);
 }
 
 // Delete the allocate memory
@@ -139,7 +151,7 @@ Buffer::copy(Network::byte_t *data, size_t nbytes)
 	std::copy(data, data + nbytes, _data.get());
 	_seekptr = _data.get() + nbytes;
     } else {
-	throw GnashException("Not enough storage was allocated to hold the data!");
+	throw GnashException("Not enough storage was allocated to hold the copied data!");
     }
     return *this;
 }
@@ -243,6 +255,13 @@ Buffer::operator+=(boost::uint16_t length)
     return append(ptr, sizeof(boost::uint16_t));
 }
 
+Buffer &
+Buffer::operator+=(boost::shared_ptr<Buffer> &buf)
+{
+//    GNASH_REPORT_FUNCTION;
+    append(buf->reference(), buf->size());
+    return *this;
+}
 
 Buffer &
 Buffer::operator=(Buffer &buf)
@@ -305,7 +324,7 @@ Buffer::operator=(bool flag)
 Buffer &
 Buffer::operator=(gnash::Network::byte_t byte)
 {
-//    GNASH_REPORT_FUNCTION;
+//    GNASH__FUNCTION;
     return copy(&byte, 1);
 }
 
@@ -318,7 +337,14 @@ Buffer::operator=(gnash::Network::byte_t *data)
     } else {
 	throw ParserException("Passing invalid pointer!");
     }
-    
+    return *this;
+}
+
+Buffer &
+Buffer::operator=(boost::shared_ptr<Buffer> &buf)
+{
+//    GNASH_REPORT_FUNCTION;
+    copy(buf->reference(), buf->size());
     return *this;
 }
 
@@ -416,7 +442,7 @@ void
 Buffer::clear()
 {
 //    GNASH_REPORT_FUNCTION;
-    if (_data.get()) {
+    if (_data) {
         memset(_data.get(), 0, _nbytes);
     }
     _seekptr = _data.get();
@@ -472,14 +498,14 @@ Buffer::resize(size_t size)
 }
 
 void
-Buffer::dump()
+Buffer::dump(std::ostream& os) const
 {
-    cerr << "Buffer is " << _nbytes << " bytes at " << (void *)_data.get() << endl;
+    os << "Buffer is " << _nbytes << " bytes at " << (void *)_data.get() << endl;
     if (_nbytes < 0xffff) {
-	cerr << gnash::hexify((unsigned char *)_data.get(), _nbytes, false) << endl;
-	cerr << gnash::hexify((unsigned char *)_data.get(), _nbytes, true) << endl;
+	os << gnash::hexify((unsigned char *)_data.get(), _nbytes, false) << endl;
+	os << gnash::hexify((unsigned char *)_data.get(), _nbytes, true) << endl;
     } else {
-	cerr << "ERROR: Buffer size out of range!" << endl;
+	os << "ERROR: Buffer size out of range!" << endl;
 	abort();
     }
 }

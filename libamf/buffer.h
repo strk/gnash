@@ -21,6 +21,8 @@
 
 #include <boost/cstdint.hpp>
 #include <boost/scoped_array.hpp>
+#include <boost/shared_ptr.hpp>
+#include <iostream> // for output operator
 #include <string>
 
 #include "getclocktime.hpp"
@@ -39,9 +41,16 @@ public:
     Buffer();
     // Create with a size other than the default
     Buffer(size_t nbytes);
-    
+
+    // Create with a hex string
+    Buffer(const std::string &str);
+
     // Delete the allocate memory
     ~Buffer();
+
+    // Convert a hex string into a buffer
+    Buffer &hex2mem(const std::string &str);
+    
     // Clear the contents of the buffer by setting to zeros.
     void clear();
     bool empty() { return (_seekptr)?true:false; };
@@ -64,6 +73,7 @@ public:
     Buffer &operator=(gnash::Network::byte_t *data);
     Buffer &operator=(amf::Element::amf0_type_e type);
     Buffer &operator=(bool);
+    Buffer &operator=(boost::shared_ptr<Buffer>& buf);
     
     Buffer &operator+=(Buffer &buf);
     Buffer &operator+=(const std::string &str);
@@ -74,6 +84,7 @@ public:
     Buffer &operator+=(char byte);
     Buffer &operator+=(amf::Element::amf0_type_e type);
     Buffer &operator+=(bool);
+    Buffer &operator+=(boost::shared_ptr<Buffer> &buf);
     
     // Find a byte in the buffer
 //    Network::byte_t *find(char c);
@@ -98,14 +109,14 @@ public:
 
     gnash::Network::byte_t operator[](int x) { return _data[x]; };
     gnash::Network::byte_t *at(int x) { return _data.get() + x; };
-    Buffer *hex2mem(const char *str);
 
     // How much room is left in the buffer past the seek pointer. This is
     // primarily used to see if the buffer is full populated with data.
     size_t spaceLeft() { return (_nbytes - (_seekptr - _data.get())); };
     
     // debug stuff, not need for running Cygnal
-    void dump();
+    void dump() const { dump(std::cerr); }
+    void dump(std::ostream& os) const;
   protected:
     gnash::Network::byte_t *_seekptr;
 //    gnash::Network::byte_t *_ptr;
@@ -120,6 +131,11 @@ public:
     gnash::Network::byte_t hex2digit (gnash::Network::byte_t digit);
 };
 
+inline std::ostream& operator << (std::ostream& os, const Buffer& buf)
+{
+	buf.dump(os);
+	return os;
+}
 
 } // end of amf namespace
 
