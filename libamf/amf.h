@@ -54,11 +54,11 @@ const size_t AMF0_NUMBER_SIZE = 0x08;
 // length field. (short)
 const gnash::Network::byte_t AMF_HEADER_SIZE = 3;
 
-// A variable is a little different. It always assumes the the first field is
-// a string that's the variable name, then the type byte like a regular AMF
-// object and length is used for the data. So a variable object header is
+// A property is a little different. It always assumes the the first field is
+// a string that's the property name, then the type byte like a regular AMF
+// object and length is used for the data. So a property object header is
 // then only 5 bytes instead of the 6 that one assumes would be used.
-const gnash::Network::byte_t AMF_VAR_HEADER_SIZE = 5;
+const gnash::Network::byte_t AMF_PROP_HEADER_SIZE = 5;
 
 // Use a zero version till now till we know what this should be.
 const gnash::Network::byte_t AMF_VERSION = 0;
@@ -267,7 +267,7 @@ public:
     amf::Element *extractAMF(gnash::Network::byte_t *in, gnash::Network::byte_t* tooFar);
 
     /// Extract an AMF object. These have no name like the variables do.
-    amf::Element *extractAMF(boost::shared_ptr<Buffer>buf);
+    amf::Element *extractAMF(boost::shared_ptr<Buffer> buf);
     
     /// \brief
     /// Extract an AMF "variable", which is a standard AMF object preceeded by

@@ -481,29 +481,26 @@ boost::shared_ptr<Buffer>
 AMF::encodeElement(Element *el)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<Buffer> tmp;
-    
     size_t outsize;
     if (el->getType() == Element::BOOLEAN_AMF0) {
 	outsize = el->getNameSize() + 2;
     } else {
-	outsize = el->getNameSize() + AMF_VAR_HEADER_SIZE;
+	outsize = el->getNameSize() + el->getDataSize() + AMF_PROP_HEADER_SIZE;
     }
     // A NULL object is a single byte
     if (el->getType() == Element::NULL_AMF0) {
 	outsize = 1;
     }
     
-    boost::shared_ptr<Buffer> buf(new Buffer(outsize));    
-    buf->clear();		// FIXME: temporary, makes buffers cleaner in gdb.
-    
-    // If the name field is set, it's a "property", followed by the data
+    boost::shared_ptr<Buffer> buf(new Buffer(outsize));
+//    log_debug("AMF::%s: Outsize is: %d", __FUNCTION__, outsize);
+    // If the name field is set, it's a property, followed by the data
     if (el->getName()) {
 	// Add the length of the string for the name of the variable
 	size_t length = el->getNameSize();
 	boost::uint16_t enclength = length;
 	swapBytes(&enclength, 2);
-	*buf += enclength;
+	*buf = enclength;
 	// Now the name itself
 	string name = el->getName();
 	if (name.size() > 0) {
@@ -514,63 +511,75 @@ AMF::encodeElement(Element *el)
     // Encode the element's data
     switch (el->getType()) {
       case Element::NOTYPE:
-	  return tmp;
+	  return buf;
 	  break;
       case Element::NUMBER_AMF0:
-	  tmp = encodeNumber(el->to_number());
+      {
+	  boost::shared_ptr<Buffer> encnum = AMF::encodeNumber(el->to_number());
+	  *buf += encnum;
+//	  *buf += encodeNumber(el->to_number());
           break;
+      }
       case Element::BOOLEAN_AMF0:
-	  tmp = encodeBoolean(el->to_bool());
+      {
+	  boost::shared_ptr<Buffer> encbool = AMF::encodeBoolean(el->to_bool());
+	  *buf += encodeBoolean(el->to_bool());
+	  *buf += encbool;
           break;
+      }
       case Element::STRING_AMF0:
-	  tmp = encodeString(el->to_reference(), el->getDataSize());
+      {
+	  boost::shared_ptr<Buffer> encstr = AMF::encodeString(el->to_string());
+	  *buf += encstr;
+//	  *buf += encodeString(el->to_reference(), el->getDataSize());
 	  break;
+      }
       case Element::OBJECT_AMF0:
 	  // tmp = el->encode();
 	  log_unimpl("FIXME: Element::encode() temporarily disabled.");
           break;
       case Element::MOVIECLIP_AMF0:
-	  tmp = encodeMovieClip(el->to_reference(), el->getDataSize());
+	  *buf += encodeMovieClip(el->to_reference(), el->getDataSize());
           break;
       case Element::NULL_AMF0:
-	  tmp = encodeNull();
+	  *buf += encodeNull();
           break;
       case Element::UNDEFINED_AMF0:
-	  tmp = encodeUndefined();
+	  *buf += encodeUndefined();
 	  break;
       case Element::REFERENCE_AMF0:
-	  tmp = encodeReference(el->to_reference(), el->getDataSize());
+	  *buf += encodeReference(el->to_reference(), el->getDataSize());
           break;
       case Element::ECMA_ARRAY_AMF0:
-	  tmp = encodeECMAArray(el->to_reference(), el->getDataSize());
+	  *buf += encodeECMAArray(el->to_reference(), el->getDataSize());
           break;
 	  // The Object End gets added when creating the object, so we can just ignore it here.
       case Element::OBJECT_END_AMF0:
-	  tmp = encodeObjectEnd();
+	  *buf += encodeObjectEnd();
           break;
       case Element::STRICT_ARRAY_AMF0:
-	  tmp = encodeStrictArray(el->to_reference(), el->getDataSize());
+	  *buf += encodeStrictArray(el->to_reference(), el->getDataSize());
           break;
       case Element::DATE_AMF0:
-	  tmp = encodeDate(el->to_reference());
+	  *buf += encodeDate(el->to_reference());
           break;
       case Element::LONG_STRING_AMF0:
-	  tmp = encodeLongString(el->to_reference(), el->getDataSize());
+	  *buf += encodeLongString(el->to_reference(), el->getDataSize());
           break;
       case Element::UNSUPPORTED_AMF0:
-	  tmp = encodeUnsupported();
+	  *buf += encodeUnsupported();
           break;
       case Element::RECORD_SET_AMF0:
-	  tmp = encodeRecordSet(el->to_reference(), el->getDataSize());
+	  *buf += encodeRecordSet(el->to_reference(), el->getDataSize());
           break;
       case Element::XML_OBJECT_AMF0:
-	  tmp = encodeXMLObject(el->to_reference(), el->getDataSize());
+	  *buf += encodeXMLObject(el->to_reference(), el->getDataSize());
           // Encode an XML object. The data follows a 4 byte length
           // field. (which must be big-endian)
           break;
       case Element::TYPED_OBJECT_AMF0:
 //	  tmp = encodeTypedObject(el->to_reference(), el->getDataSize());
-	  tmp.reset();
+	  buf.reset();
           break;
 // 	  // This is a Gnash specific value
 //       case Element::VARIABLE:
@@ -580,13 +589,13 @@ AMF::encodeElement(Element *el)
 	  log_error("FIXME: got AMF3 data type");
 	  break;
       default:
-	  tmp.reset();
+	  buf.reset();
           break;
     };
 
-    if (tmp) {
-        *buf += *tmp;
-    }
+//     if (tmp) {
+//         *buf += *tmp;
+//     }
     return buf;
 }
 
@@ -596,7 +605,7 @@ AMF::encodeProperty(amf::Element *el)
 //    GNASH_REPORT_FUNCTION;
     size_t outsize;
     
-    outsize = el->getNameSize() + el->getDataSize() + AMF_VAR_HEADER_SIZE;
+    outsize = el->getNameSize() + el->getDataSize() + AMF_PROP_HEADER_SIZE;
 
     boost::shared_ptr<Buffer> buf(new Buffer(outsize));
     _totalsize += outsize;
@@ -642,7 +651,7 @@ AMF::encodeProperty(amf::Element *el)
 }
 
 Element *
-AMF::extractAMF(boost::shared_ptr<Buffer>buf)
+AMF::extractAMF(boost::shared_ptr<Buffer> buf)
 {
 //    GNASH_REPORT_FUNCTION;
     Network::byte_t* start = buf->reference();
