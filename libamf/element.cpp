@@ -77,14 +77,6 @@ Element::~Element()
     for (size_t i=0; i< _properties.size(); i++) {
 	delete _properties[i];
     }
-    // FIXME: for some odd reason, on rare occasions deleting this buffer
-    // makes valgrind complain. It looks like memory corruption caused by something
-    // else, but neither valgrind nor GDB can find it. We could always not delete
-    // the buffer to keep valgrind happy, but then we leak memory. As the problem
-    // appears to be that _buffer has a bogus address that doesn't match any allocated
-    // Element, we assume this is a bug in our test case, but add comment here to be
-    // paranoid.
-//    delete _buffer;
     delete[] _name;
 }
 
@@ -325,13 +317,14 @@ Element::encode()
     size_t size = 0;
     boost::shared_ptr<Buffer> buf;
     if (_type == Element::OBJECT_AMF0) {
-	// FIXME: we probably want a better size, to avoid the other
-	// appends from having to resize and copy the data all the time.
+	// Calculate the total size of the output buffer
+	// needed to hold the encoded properties
 	for (size_t i=0; i<_properties.size(); i++) {
-	    size += _properties[i]->getDataSize() + _properties[i]->getNameSize() + AMF_VAR_HEADER_SIZE;
+	    size += _properties[i]->getDataSize();
+	    size += _properties[i]->getNameSize();
+	    size += AMF_PROP_HEADER_SIZE;
 	}
-	buf.reset(new Buffer(size));
-	buf->clear();		// FIXME: temporary, makes buffers cleaner in gdb.
+	buf.reset(new Buffer(size+1)); // FIXME: why are we one byte off ?
 	*buf = Element::OBJECT_AMF0;
 	if (_name > 0) {
 	    size_t length = getNameSize();
@@ -347,10 +340,11 @@ Element::encode()
 	for (size_t i=0; i<_properties.size(); i++) {
 	    boost::shared_ptr<Buffer> partial = AMF::encodeElement(_properties[i]);
 //	    log_debug("Encoded partial size for is %d", partial->size());
-//	    partial->dump();
+// 	    _properties[i]->dump();
+// 	    partial->dump();
 	    if (partial) {
 		*buf += partial;
-//		delete partial;
+		partial.reset();
 	    } else {
 		break;
 	    }
@@ -360,7 +354,6 @@ Element::encode()
 	*buf += pad;
 	*buf += pad;
 	*buf += TERMINATOR;
-	_buffer = buf;
 	return buf;
     } else {
 	return AMF::encodeElement(this);
@@ -926,7 +919,7 @@ Element::dump(std::ostream& os) const
 //    GNASH_REPORT_FUNCTION;
     
     if (_name) {
- 	os << "AMF object name: " << _name << ", length is " << getDataSize() << endl;
+ 	os << "Element name: " << _name << ", data length is " << getDataSize() << endl;
     }
 
     os << astype_str[_type] << ": ";
@@ -940,8 +933,8 @@ Element::dump(std::ostream& os) const
 	  break;
       case Element::STRING_AMF0:
 	  os << "(" << getDataSize() << " bytes): ";
-	  if (getDataSize() > 0) {
-	      cerr << "\t\"" << to_string() << "\"";
+	  if (getDataSize()) {
+	      os << "\t\"" << to_string() << "\"";
 	  }
 	  cerr << endl;
 	  break;

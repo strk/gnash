@@ -217,12 +217,14 @@ public:
     void setType(amf0_type_e x) { _type = x; };
 //    void setData(Buffer *buf) { _buffer = buf; };
 
-    // These accessors convert the raw data to a standard data type we can use.
+    // These accessors convert the raw data to a standard data type
+    // we can use.
     bool to_bool() const;
     double to_number() const;
     const char *to_string() const;
     gnash::Network::byte_t *to_reference();
-    
+
+    // Manipulate the name of a property
     size_t getNameSize();
     char *getName() const { return _name; };
     void setName(const std::string &name);
