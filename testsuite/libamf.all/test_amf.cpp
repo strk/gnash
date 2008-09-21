@@ -70,51 +70,6 @@ TestState runtest;
 LogFile& dbglogfile = LogFile::getDefaultInstance();
 RcInitFile& rcfile = RcInitFile::getDefaultInstance();
 
-// These next two functions are borrowed from Libgloss, part of the GNU binutils,
-// of which I am the primary author and copyright holder.
-// convert an ascii hex digit to a number.
-//      param is hex digit.
-//      returns a decimal digit.
-Network::byte_t
-hex2digit (Network::byte_t digit)
-{  
-    if (digit == 0)
-        return 0;
-    
-    if (digit >= '0' && digit <= '9')
-        return digit - '0';
-    if (digit >= 'a' && digit <= 'f')
-        return digit - 'a' + 10;
-    if (digit >= 'A' && digit <= 'F')
-        return digit - 'A' + 10;
-    
-    // shouldn't ever get this far
-    return -1;
-}
-
-// Convert the hex array pointed to by buf into binary to be placed in mem
-boost::shared_ptr<Buffer>
-hex2mem(const char *str)
-{
-    size_t count = strlen(str);
-    Network::byte_t ch = 0;
-    boost::shared_ptr<Buffer> buf(new Buffer(count/3) + 1);
-    buf->clear();
-
-    Network::byte_t *ptr = const_cast<Network::byte_t *>(reinterpret_cast<const Network::byte_t *>(str));
-    
-    for (size_t i=0; i<count; i++) {
-        if (*ptr == ' ') {      // skip spaces.
-            ptr++;
-            continue;
-        }
-        ch = hex2digit(*ptr++) << 4;
-        ch |= hex2digit(*ptr++);
-        *buf += ch;
-    }
-    return buf;
-}
-
 int
 main(int argc, char *argv[])
 {
@@ -203,9 +158,8 @@ void
 test_encoding()
 {
     // This is a 8 byte wide double data type in hex
-    const char *x = "40 83 38 00 00 00 00 00";
-    boost::shared_ptr<Buffer> buf1 = hex2mem(x);
-    double num = *(double *)buf1->reference();
+    boost::shared_ptr<Buffer> buf1(new Buffer("40 83 38 00 00 00 00 00"));
+    double num = *(reinterpret_cast<double *>(buf1->reference()));
     swapBytes(&num, amf::AMF0_NUMBER_SIZE); // we alwasy encode in big endian format
 
 #if defined(HAVE_MALLINFO) && defined(USE_STATS_MEMORY)
@@ -230,8 +184,7 @@ test_encoding()
     // Encode a boolean. Although we know a bool is only one character, for AMF,
     // it's actually a two byte short instead.
     bool flag = true;
-    const char *x2 = "01 01";
-    boost::shared_ptr<Buffer> buf2 = hex2mem(x2);
+    boost::shared_ptr<Buffer> buf2(new Buffer("01 01"));
     boost::uint16_t sht = *(boost::uint16_t *)buf2->reference();
     swapBytes(&sht, sizeof(boost::uint16_t)); // we always encode in big endian format
 #if defined(HAVE_MALLINFO) && defined(USE_STATS_MEMORY)
@@ -272,7 +225,7 @@ test_encoding()
         mem->addStats(__LINE__);             // take a sample
     }
 #endif
-    
+
     // A String AMF object has a 3 bytes head, the type, and a two byte length.
     if ((*encstr->reference() == Element::STRING_AMF0) &&
         (encstr->size() == str.size() + AMF_HEADER_SIZE) &&
@@ -328,7 +281,7 @@ test_array()
     AMF amf;
     top.makeObject();
 
-   boost::shared_ptr<Buffer> hex1 = hex2mem("08 00 00 00 0a 00 08 64 75 72 61 74 69 6f 6e 00 40 ad 04 14 7a e1 47 ae 00 05 77 69 64 74 68 00 40 74 00 00 00 00 00 00 00 06 68 65 69 67 68 74 00 40 6e 00 00 00 00 00 00 00 0d 76 69 64 65 6f 64 61 74 61 72 61 74 65 00 40 72 c0 00 00 00 00 00 00 09 66 72 61 6d 65 72 61 74 65 00 40 39 00 00 00 00 00 00 00 0c 76 69 64 65 6f 63 6f 64 65 63 69 64 00 40 10 00 00 00 00 00 00 00 0d 61 75 64 69 6f 64 61 74 61 72 61 74 65 00 40 58 00 00 00 00 00 00 00 0a 61 75 64 69 6f 64 65 6c 61 79 00 3f a3 74 bc 6a 7e f9 db 00 0c 61 75 64 69 6f 63 6f 64 65 63 69 64 00 40 00 00 00 00 00 00 00 00 0c 63 61 6e 53 65 65 6b 54 6f 45 6e 64 01 01 00 00 09");
+    boost::shared_ptr<Buffer> hex1(new Buffer("08 00 00 00 0a 00 08 64 75 72 61 74 69 6f 6e 00 40 ad 04 14 7a e1 47 ae 00 05 77 69 64 74 68 00 40 74 00 00 00 00 00 00 00 06 68 65 69 67 68 74 00 40 6e 00 00 00 00 00 00 00 0d 76 69 64 65 6f 64 61 74 61 72 61 74 65 00 40 72 c0 00 00 00 00 00 00 09 66 72 61 6d 65 72 61 74 65 00 40 39 00 00 00 00 00 00 00 0c 76 69 64 65 6f 63 6f 64 65 63 69 64 00 40 10 00 00 00 00 00 00 00 0d 61 75 64 69 6f 64 61 74 61 72 61 74 65 00 40 58 00 00 00 00 00 00 00 0a 61 75 64 69 6f 64 65 6c 61 79 00 3f a3 74 bc 6a 7e f9 db 00 0c 61 75 64 69 6f 63 6f 64 65 63 69 64 00 40 00 00 00 00 00 00 00 00 0c 63 61 6e 53 65 65 6b 54 6f 45 6e 64 01 01 00 00 09"));
     Element *el1 = amf.extractAMF(hex1);
     if ((el1->getType() == Element::ECMA_ARRAY_AMF0)
         && (el1->propertySize() == 10)) {
@@ -337,10 +290,8 @@ test_array()
         runtest.fail("Extracted ECMA Array");
     }
     delete el1;
-//    delete hex1;
 
-    // 03 00 05 74 69 6d 65 73          "times"
-    boost::shared_ptr<Buffer> hex2 = hex2mem("0a 00 00 00 c8 00 3f a4 7a e1 47 ae 14 7b 00 40 03 d7 0a 3d 70 a3 d7 00 40 13 85 1e b8 51 eb 85 00 40 1d 1e b8 51 eb 85 1f 00 40 23 5c 28 f5 c2 8f 5c 00 40 28 28 f5 c2 8f 5c 29 00 40 2c f5 c2 8f 5c 28 f6 00 40 30 e1 47 ae 14 7a e1 00 40 33 47 ae 14 7a e1 48 00 40 35 ae 14 7a e1 47 ae 00 40 38 14 7a e1 47 ae 14 00 40 3a 7a e1 47 ae 14 7b 00 40 3c e1 47 ae 14 7a e1 00 40 3f 47 ae 14 7a e1 48 00 40 40 d7 0a 3d 70 a3 d7 00 40 42 0a 3d 70 a3 d7 0a 00 40 43 3d 70 a3 d7 0a 3d 00 40 44 70 a3 d7 0a 3d 71 00 40 45 a3 d7 0a 3d 70 a4 00 40 46 d7 0a 3d 70 a3 d7 00 40 48 0a 3d 70 a3 d7 0a 00 40 49 3d 70 a3 d7 0a 3d 00 40 4a 70 a3 d7 0a 3d 71 00 40 4b a3 d7 0a 3d 70 a4 00 40 4c d7 0a 3d 70 a3 d7 00 40 4e 0a 3d 70 a3 d7 0a 00 40 4f 3d 70 a3 d7 0a 3d 00 40 50 38 51 eb 85 1e b8 00 40 50 d1 eb 85 1e b8 52 00 40 51 6b 85 1e b8 51 ec 00 40 52 05 1e b8 51 eb 85 00 40 52 9e b8 51 eb 85 1f 00 40 53 38 51 eb 85 1e b8 00 40 53 d1 eb 85 1e b8 52 00 40 54 6b 85 1e b8 51 ec 00 40 55 05 1e b8 51 eb 85 00 40 55 9e b8 51 eb 85 1f 00 40 56 38 51 eb 85 1e b8 00 40 56 d1 eb 85 1e b8 52 00 40 57 6b 85 1e b8 51 ec 00 40 58 05 1e b8 51 eb 85 00 40 58 9e b8 51 eb 85 1f 00 40 59 38 51 eb 85 1e b8 00 40 59 d1 eb 85 1e b8 52 00 40 5a 6b 85 1e b8 51 ec 00 40 5b 05 1e b8 51 eb 85 00 40 5b 9e b8 51 eb 85 1f 00 40 5c 38 51 eb 85 1e b8 00 40 5c d1 eb 85 1e b8 52 00 40 5d 6b 85 1e b8 51 ec 00 40 5e 05 1e b8 51 eb 85 00 40 5e 9e b8 51 eb 85 1f 00 40 5f 38 51 eb 85 1e b8 00 40 5f d1 eb 85 1e b8 52 00 40 60 35 c2 8f 5c 28 f6 00 40 60 82 8f 5c 28 f5 c3 00 40 60 cf 5c 28 f5 c2 8f 00 40 61 1c 28 f5 c2 8f 5c 00 40 61 68 f5 c2 8f 5c 29 00 40 61 b5 c2 8f 5c 28 f6 00 40 62 02 8f 5c 28 f5 c3 00 40 62 4f 5c 28 f5 c2 8f 00 40 62 9c 28 f5 c2 8f 5c 00 40 62 e8 f5 c2 8f 5c 29 00 40 63 35 c2 8f 5c 28 f6 00 40 63 82 8f 5c 28 f5 c3 00 40 63 cf 5c 28 f5 c2 8f 00 40 64 1c 28 f5 c2 8f 5c 00 40 64 68 f5 c2 8f 5c 29 00 40 64 b5 c2 8f 5c 28 f6 00 40 65 02 8f 5c 28 f5 c3 00 40 65 4f 5c 28 f5 c2 8f 00 40 65 9c 28 f5 c2 8f 5c 00 40 65 e8 f5 c2 8f 5c 29 00 40 66 35 c2 8f 5c 28 f6 00 40 66 82 8f 5c 28 f5 c3 00 40 66 cf 5c 28 f5 c2 8f 00 40 67 1c 28 f5 c2 8f 5c 00 40 67 68 f5 c2 8f 5c 29 00 40 67 b5 c2 8f 5c 28 f6 00 40 68 02 8f 5c 28 f5 c3 00 40 68 4f 5c 28 f5 c2 8f 00 40 68 9c 28 f5 c2 8f 5c 00 40 68 e8 f5 c2 8f 5c 29 00 40 69 35 c2 8f 5c 28 f6 00 40 69 82 8f 5c 28 f5 c3 00 40 69 cf 5c 28 f5 c2 8f 00 40 6a 1c 28 f5 c2 8f 5c 00 40 6a 68 f5 c2 8f 5c 29 00 40 6a b5 c2 8f 5c 28 f6 00 40 6b 02 8f 5c 28 f5 c3 00 40 6b 4f 5c 28 f5 c2 8f 00 40 6b 9c 28 f5 c2 8f 5c 00 40 6b e8 f5 c2 8f 5c 29 00 40 6c 35 c2 8f 5c 28 f6 00 40 6c 82 8f 5c 28 f5 c3 00 40 6c cf 5c 28 f5 c2 8f 00 40 6d 1c 28 f5 c2 8f 5c 00 40 6d 68 f5 c2 8f 5c 29 00 40 6d b5 c2 8f 5c 28 f6 00 40 6e 02 8f 5c 28 f5 c3 00 40 6e 4f 5c 28 f5 c2 8f 00 40 6e 9c 28 f5 c2 8f 5c 00 40 6e e8 f5 c2 8f 5c 29 00 40 6f 35 c2 8f 5c 28 f6 00 40 6f 82 8f 5c 28 f5 c3 00 40 6f cf 5c 28 f5 c2 8f 00 40 70 0e 14 7a e1 47 ae 00 40 70 34 7a e1 47 ae 14 00 40 70 5a e1 47 ae 14 7b 00 40 70 81 47 ae 14 7a e1 00 40 70 a7 ae 14 7a e1 48 00 40 70 ce 14 7a e1 47 ae 00 40 70 f4 7a e1 47 ae 14 00 40 71 1a e1 47 ae 14 7b 00 40 71 41 47 ae 14 7a e1 00 40 71 67 ae 14 7a e1 48 00 40 71 8e 14 7a e1 47 ae 00 40 71 b4 7a e1 47 ae 14 00 40 71 da e1 47 ae 14 7b 00 40 72 01 47 ae 14 7a e1 00 40 72 27 ae 14 7a e1 48 00 40 72 4e 14 7a e1 47 ae 00 40 72 74 7a e1 47 ae 14 00 40 72 9a e1 47 ae 14 7b 00 40 72 c1 47 ae 14 7a e1 00 40 72 e7 ae 14 7a e1 48 00 40 73 0e 14 7a e1 47 ae 00 40 73 34 7a e1 47 ae 14 00 40 73 5a e1 47 ae 14 7b 00 40 73 81 47 ae 14 7a e1 00 40 73 a7 ae 14 7a e1 48 00 40 73 ce 14 7a e1 47 ae 00 40 73 f4 7a e1 47 ae 14 00 40 74 1a e1 47 ae 14 7b 00 40 74 41 47 ae 14 7a e1 00 40 74 67 ae 14 7a e1 48 00 40 74 8e 14 7a e1 47 ae 00 40 74 b4 7a e1 47 ae 14 00 40 74 da e1 47 ae 14 7b 00 40 75 01 47 ae 14 7a e1 00 40 75 27 ae 14 7a e1 48 00 40 75 4e 14 7a e1 47 ae 00 40 75 74 7a e1 47 ae 14 00 40 75 9a e1 47 ae 14 7b 00 40 75 c1 47 ae 14 7a e1 00 40 75 e7 ae 14 7a e1 48 00 40 76 0e 14 7a e1 47 ae 00 40 76 34 7a e1 47 ae 14 00 40 76 5a e1 47 ae 14 7b 00 40 76 81 47 ae 14 7a e1 00 40 76 a7 ae 14 7a e1 48 00 40 76 ce 14 7a e1 47 ae 00 40 76 f4 7a e1 47 ae 14 00 40 77 1a e1 47 ae 14 7b 00 40 77 41 47 ae 14 7a e1 00 40 77 67 ae 14 7a e1 48 00 40 77 8e 14 7a e1 47 ae 00 40 77 b4 7a e1 47 ae 14 00 40 77 da e1 47 ae 14 7b 00 40 78 01 47 ae 14 7a e1 00 40 78 27 ae 14 7a e1 48 00 40 78 4e 14 7a e1 47 ae 00 40 78 74 7a e1 47 ae 14 00 40 78 9a e1 47 ae 14 7b 00 40 78 c1 47 ae 14 7a e1 00 40 78 e7 ae 14 7a e1 48 00 40 79 0e 14 7a e1 47 ae 00 40 79 34 7a e1 47 ae 14 00 40 79 5a e1 47 ae 14 7b 00 40 79 81 47 ae 14 7a e1 00 40 79 a7 ae 14 7a e1 48 00 40 79 ce 14 7a e1 47 ae 00 40 79 f4 7a e1 47 ae 14 00 40 7a 1a e1 47 ae 14 7b 00 40 7a 41 47 ae 14 7a e1 00 40 7a 67 ae 14 7a e1 48 00 40 7a 8e 14 7a e1 47 ae 00 40 7a b4 7a e1 47 ae 14 00 40 7a da e1 47 ae 14 7b 00 40 7b 01 47 ae 14 7a e1 00 40 7b 27 ae 14 7a e1 48 00 40 7b 4e 14 7a e1 47 ae 00 40 7b 74 7a e1 47 ae 14 00 40 7b 9a e1 47 ae 14 7b 00 40 7b c1 47 ae 14 7a e1 00 40 7b e7 ae 14 7a e1 48 00 40 7c 0e 14 7a e1 47 ae 00 40 7c 34 7a e1 47 ae 14 00 40 7c 5a e1 47 ae 14 7b 00 40 7c 81 47 ae 14 7a e1 00 40 7c a7 ae 14 7a e1 48 00 40 7c ce 14 7a e1 47 ae 00 40 7c f4 7a e1 47 ae 14 00 40 7d 1a e1 47 ae 14 7b 00 40 7d 41 47 ae 14 7a e1 00 40 7d 67 ae 14 7a e1 48 00 40 7d 82 8f 5c 28 f5 c3 00 40 7d 83 33 33 33 33 33 00 40 7d a9 99 99 99 99 9a");
+    boost::shared_ptr<Buffer> hex2(new Buffer("0a 00 00 00 c8 00 3f a4 7a e1 47 ae 14 7b 00 40 03 d7 0a 3d 70 a3 d7 00 40 13 85 1e b8 51 eb 85 00 40 1d 1e b8 51 eb 85 1f 00 40 23 5c 28 f5 c2 8f 5c 00 40 28 28 f5 c2 8f 5c 29 00 40 2c f5 c2 8f 5c 28 f6 00 40 30 e1 47 ae 14 7a e1 00 40 33 47 ae 14 7a e1 48 00 40 35 ae 14 7a e1 47 ae 00 40 38 14 7a e1 47 ae 14 00 40 3a 7a e1 47 ae 14 7b 00 40 3c e1 47 ae 14 7a e1 00 40 3f 47 ae 14 7a e1 48 00 40 40 d7 0a 3d 70 a3 d7 00 40 42 0a 3d 70 a3 d7 0a 00 40 43 3d 70 a3 d7 0a 3d 00 40 44 70 a3 d7 0a 3d 71 00 40 45 a3 d7 0a 3d 70 a4 00 40 46 d7 0a 3d 70 a3 d7 00 40 48 0a 3d 70 a3 d7 0a 00 40 49 3d 70 a3 d7 0a 3d 00 40 4a 70 a3 d7 0a 3d 71 00 40 4b a3 d7 0a 3d 70 a4 00 40 4c d7 0a 3d 70 a3 d7 00 40 4e 0a 3d 70 a3 d7 0a 00 40 4f 3d 70 a3 d7 0a 3d 00 40 50 38 51 eb 85 1e b8 00 40 50 d1 eb 85 1e b8 52 00 40 51 6b 85 1e b8 51 ec 00 40 52 05 1e b8 51 eb 85 00 40 52 9e b8 51 eb 85 1f 00 40 53 38 51 eb 85 1e b8 00 40 53 d1 eb 85 1e b8 52 00 40 54 6b 85 1e b8 51 ec 00 40 55 05 1e b8 51 eb 85 00 40 55 9e b8 51 eb 85 1f 00 40 56 38 51 eb 85 1e b8 00 40 56 d1 eb 85 1e b8 52 00 40 57 6b 85 1e b8 51 ec 00 40 58 05 1e b8 51 eb 85 00 40 58 9e b8 51 eb 85 1f 00 40 59 38 51 eb 85 1e b8 00 40 59 d1 eb 85 1e b8 52 00 40 5a 6b 85 1e b8 51 ec 00 40 5b 05 1e b8 51 eb 85 00 40 5b 9e b8 51 eb 85 1f 00 40 5c 38 51 eb 85 1e b8 00 40 5c d1 eb 85 1e b8 52 00 40 5d 6b 85 1e b8 51 ec 00 40 5e 05 1e b8 51 eb 85 00 40 5e 9e b8 51 eb 85 1f 00 40 5f 38 51 eb 85 1e b8 00 40 5f d1 eb 85 1e b8 52 00 40 60 35 c2 8f 5c 28 f6 00 40 60 82 8f 5c 28 f5 c3 00 40 60 cf 5c 28 f5 c2 8f 00 40 61 1c 28 f5 c2 8f 5c 00 40 61 68 f5 c2 8f 5c 29 00 40 61 b5 c2 8f 5c 28 f6 00 40 62 02 8f 5c 28 f5 c3 00 40 62 4f 5c 28 f5 c2 8f 00 40 62 9c 28 f5 c2 8f 5c 00 40 62 e8 f5 c2 8f 5c 29 00 40 63 35 c2 8f 5c 28 f6 00 40 63 82 8f 5c 28 f5 c3 00 40 63 cf 5c 28 f5 c2 8f 00 40 64 1c 28 f5 c2 8f 5c 00 40 64 68 f5 c2 8f 5c 29 00 40 64 b5 c2 8f 5c 28 f6 00 40 65 02 8f 5c 28 f5 c3 00 40 65 4f 5c 28 f5 c2 8f 00 40 65 9c 28 f5 c2 8f 5c 00 40 65 e8 f5 c2 8f 5c 29 00 40 66 35 c2 8f 5c 28 f6 00 40 66 82 8f 5c 28 f5 c3 00 40 66 cf 5c 28 f5 c2 8f 00 40 67 1c 28 f5 c2 8f 5c 00 40 67 68 f5 c2 8f 5c 29 00 40 67 b5 c2 8f 5c 28 f6 00 40 68 02 8f 5c 28 f5 c3 00 40 68 4f 5c 28 f5 c2 8f 00 40 68 9c 28 f5 c2 8f 5c 00 40 68 e8 f5 c2 8f 5c 29 00 40 69 35 c2 8f 5c 28 f6 00 40 69 82 8f 5c 28 f5 c3 00 40 69 cf 5c 28 f5 c2 8f 00 40 6a 1c 28 f5 c2 8f 5c 00 40 6a 68 f5 c2 8f 5c 29 00 40 6a b5 c2 8f 5c 28 f6 00 40 6b 02 8f 5c 28 f5 c3 00 40 6b 4f 5c 28 f5 c2 8f 00 40 6b 9c 28 f5 c2 8f 5c 00 40 6b e8 f5 c2 8f 5c 29 00 40 6c 35 c2 8f 5c 28 f6 00 40 6c 82 8f 5c 28 f5 c3 00 40 6c cf 5c 28 f5 c2 8f 00 40 6d 1c 28 f5 c2 8f 5c 00 40 6d 68 f5 c2 8f 5c 29 00 40 6d b5 c2 8f 5c 28 f6 00 40 6e 02 8f 5c 28 f5 c3 00 40 6e 4f 5c 28 f5 c2 8f 00 40 6e 9c 28 f5 c2 8f 5c 00 40 6e e8 f5 c2 8f 5c 29 00 40 6f 35 c2 8f 5c 28 f6 00 40 6f 82 8f 5c 28 f5 c3 00 40 6f cf 5c 28 f5 c2 8f 00 40 70 0e 14 7a e1 47 ae 00 40 70 34 7a e1 47 ae 14 00 40 70 5a e1 47 ae 14 7b 00 40 70 81 47 ae 14 7a e1 00 40 70 a7 ae 14 7a e1 48 00 40 70 ce 14 7a e1 47 ae 00 40 70 f4 7a e1 47 ae 14 00 40 71 1a e1 47 ae 14 7b 00 40 71 41 47 ae 14 7a e1 00 40 71 67 ae 14 7a e1 48 00 40 71 8e 14 7a e1 47 ae 00 40 71 b4 7a e1 47 ae 14 00 40 71 da e1 47 ae 14 7b 00 40 72 01 47 ae 14 7a e1 00 40 72 27 ae 14 7a e1 48 00 40 72 4e 14 7a e1 47 ae 00 40 72 74 7a e1 47 ae 14 00 40 72 9a e1 47 ae 14 7b 00 40 72 c1 47 ae 14 7a e1 00 40 72 e7 ae 14 7a e1 48 00 40 73 0e 14 7a e1 47 ae 00 40 73 34 7a e1 47 ae 14 00 40 73 5a e1 47 ae 14 7b 00 40 73 81 47 ae 14 7a e1 00 40 73 a7 ae 14 7a e1 48 00 40 73 ce 14 7a e1 47 ae 00 40 73 f4 7a e1 47 ae 14 00 40 74 1a e1 47 ae 14 7b 00 40 74 41 47 ae 14 7a e1 00 40 74 67 ae 14 7a e1 48 00 40 74 8e 14 7a e1 47 ae 00 40 74 b4 7a e1 47 ae 14 00 40 74 da e1 47 ae 14 7b 00 40 75 01 47 ae 14 7a e1 00 40 75 27 ae 14 7a e1 48 00 40 75 4e 14 7a e1 47 ae 00 40 75 74 7a e1 47 ae 14 00 40 75 9a e1 47 ae 14 7b 00 40 75 c1 47 ae 14 7a e1 00 40 75 e7 ae 14 7a e1 48 00 40 76 0e 14 7a e1 47 ae 00 40 76 34 7a e1 47 ae 14 00 40 76 5a e1 47 ae 14 7b 00 40 76 81 47 ae 14 7a e1 00 40 76 a7 ae 14 7a e1 48 00 40 76 ce 14 7a e1 47 ae 00 40 76 f4 7a e1 47 ae 14 00 40 77 1a e1 47 ae 14 7b 00 40 77 41 47 ae 14 7a e1 00 40 77 67 ae 14 7a e1 48 00 40 77 8e 14 7a e1 47 ae 00 40 77 b4 7a e1 47 ae 14 00 40 77 da e1 47 ae 14 7b 00 40 78 01 47 ae 14 7a e1 00 40 78 27 ae 14 7a e1 48 00 40 78 4e 14 7a e1 47 ae 00 40 78 74 7a e1 47 ae 14 00 40 78 9a e1 47 ae 14 7b 00 40 78 c1 47 ae 14 7a e1 00 40 78 e7 ae 14 7a e1 48 00 40 79 0e 14 7a e1 47 ae 00 40 79 34 7a e1 47 ae 14 00 40 79 5a e1 47 ae 14 7b 00 40 79 81 47 ae 14 7a e1 00 40 79 a7 ae 14 7a e1 48 00 40 79 ce 14 7a e1 47 ae 00 40 79 f4 7a e1 47 ae 14 00 40 7a 1a e1 47 ae 14 7b 00 40 7a 41 47 ae 14 7a e1 00 40 7a 67 ae 14 7a e1 48 00 40 7a 8e 14 7a e1 47 ae 00 40 7a b4 7a e1 47 ae 14 00 40 7a da e1 47 ae 14 7b 00 40 7b 01 47 ae 14 7a e1 00 40 7b 27 ae 14 7a e1 48 00 40 7b 4e 14 7a e1 47 ae 00 40 7b 74 7a e1 47 ae 14 00 40 7b 9a e1 47 ae 14 7b 00 40 7b c1 47 ae 14 7a e1 00 40 7b e7 ae 14 7a e1 48 00 40 7c 0e 14 7a e1 47 ae 00 40 7c 34 7a e1 47 ae 14 00 40 7c 5a e1 47 ae 14 7b 00 40 7c 81 47 ae 14 7a e1 00 40 7c a7 ae 14 7a e1 48 00 40 7c ce 14 7a e1 47 ae 00 40 7c f4 7a e1 47 ae 14 00 40 7d 1a e1 47 ae 14 7b 00 40 7d 41 47 ae 14 7a e1 00 40 7d 67 ae 14 7a e1 48 00 40 7d 82 8f 5c 28 f5 c3 00 40 7d 83 33 33 33 33 33 00 40 7d a9 99 99 99 99 9a"));
     Element *el2 = amf.extractAMF(hex2);
     if ((el2->getType() == Element::STRICT_ARRAY_AMF0)
         && (el2->propertySize() == 22)) {
@@ -383,6 +334,7 @@ test_object()
     }
 #endif
     boost::shared_ptr<Buffer> encobj = top.encode();
+//    boost::shared_ptr<Buffer> encobj;
 #if defined(HAVE_MALLINFO) && defined(USE_STATS_MEMORY)
     if (memdebug) {
         mem->addStats(__LINE__);             // take a sample
@@ -393,7 +345,8 @@ test_object()
         return;
     }
 
-    boost::shared_ptr<Buffer> buf1 = hex2mem("03 00 03 61 70 70 02 00 08 6f 66 6c 61 44 65 6d 6f 00 08 66 6c 61 73 68 56 65 72 02 00 0c 4c 4e 58 20 39 2c 30 2c 33 31 2c 30 00 06 73 77 66 55 72 6c 02 00 30 68 74 74 70 3a 2f 2f 77 77 77 2e 72 65 64 35 2e 6e 6c 2f 74 6f 6f 6c 73 2f 70 75 62 6c 69 73 68 65 72 2f 70 75 62 6c 69 73 68 65 72 2e 73 77 66 09");
+//    encobj->dump();
+    boost::shared_ptr<Buffer> buf1(new Buffer("03 00 03 61 70 70 02 00 08 6f 66 6c 61 44 65 6d 6f 00 08 66 6c 61 73 68 56 65 72 02 00 0c 4c 4e 58 20 39 2c 30 2c 33 31 2c 30 00 06 73 77 66 55 72 6c 02 00 30 68 74 74 70 3a 2f 2f 77 77 77 2e 72 65 64 35 2e 6e 6c 2f 74 6f 6f 6c 73 2f 70 75 62 6c 69 73 68 65 72 2f 70 75 62 6c 69 73 68 65 72 2e 73 77 66 09"));
     if ((*encobj->reference() == Element::OBJECT_AMF0) &&
         (memcmp(buf1->reference(), encobj->reference(), 101) == 0)) {
         runtest.pass("Encoded Object");
@@ -401,6 +354,8 @@ test_object()
         runtest.fail("Encoded Object");
     }
 
+//    buf1->dump();
+    
     AMF amf_obj;
 #if defined(HAVE_MALLINFO) && defined(USE_STATS_MEMORY)
     if (memdebug) {
