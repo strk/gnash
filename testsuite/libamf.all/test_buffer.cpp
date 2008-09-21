@@ -298,6 +298,15 @@ test_copy()
          runtest.fail ("Buffer::operator=(amf::Element::amf0_type_e)");
     }
     
+    bool flag = true;
+    Buffer buf7;
+    buf7 = flag;
+    if (*buf7.reference() == flag) {
+         runtest.pass ("Buffer::operator=(bool)");
+    } else {
+         runtest.fail ("Buffer::operator=(bool)");
+    }
+    
 
         // cleanup the temporary data
     delete[] data;
@@ -431,6 +440,16 @@ test_append()
         runtest.fail ("Buffer::operator+=(Buffer &)");
     }
 
+    bool flag = true;
+    Buffer buf8;
+    buf8.copy(data1, 10);
+    buf8 += flag;
+    if (*(buf8.reference() + 10) == 1) {
+        runtest.pass ("Buffer::operator+=(bool)");
+    } else {
+        runtest.fail ("Buffer::operator+=(bool)");
+    }
+    
     // Clean up temporary data
     delete[] data1;
     delete[] data2;
