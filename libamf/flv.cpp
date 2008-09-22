@@ -22,6 +22,7 @@
 #endif
 
 #include <boost/detail/endian.hpp>
+#include <boost/shared_ptr.hpp>
 #include <string>
 #include <vector>
 #include <cmath>
@@ -65,28 +66,28 @@ Flv::~Flv()
 }
 
 // Encode the data into a Buffer
-Buffer *
+boost::shared_ptr<amf::Buffer>
 Flv::encodeHeader(Network::byte_t type)
 {
 //    GNASH_REPORT_FUNCTION;
-    Buffer *buf = new Buffer(sizeof(Flv::flv_header_t));
+    boost::shared_ptr<amf::Buffer> buf(new Buffer(sizeof(Flv::flv_header_t)));
     buf->clear();
     
     Network::byte_t version = 0x1;
-    buf->copy("FLV");
-    buf->append(version);
+    *buf = "FLV";
+    *buf += version;
 
-    buf->append(type);
+    *buf += type;
 
     boost::uint32_t size = htonl(0x9);
-    buf->append(size);
+    buf->append((Network::byte_t *)&size, sizeof(boost::uint32_t));
 
     return buf;
 }
 
 // Decode a Buffer into a header
 Flv::flv_header_t *
-Flv::decodeHeader(amf::Buffer *buf)
+Flv::decodeHeader(boost::shared_ptr<amf::Buffer> buf)
 {
 //    GNASH_REPORT_FUNCTION;
     memcpy(&_header, buf->begin(), sizeof(Flv::flv_header_t));
@@ -129,7 +130,7 @@ Flv::decodeHeader(amf::Buffer *buf)
 
 // Decode a MetaData object, which is after the header, but before all the tags
 amf::Element *
-Flv::decodeMetaData(amf::Buffer *buf)
+Flv::decodeMetaData(boost::shared_ptr<amf::Buffer> buf)
 {
     return decodeMetaData(buf->reference(), buf->size());
 }
@@ -286,7 +287,7 @@ Flv::convert24(boost::uint8_t *num)
 
 // Decode the tag header
 Flv::flv_tag_t *
-Flv::decodeTagHeader(amf::Buffer *buf)
+Flv::decodeTagHeader(boost::shared_ptr<amf::Buffer> buf)
 {
 //    GNASH_REPORT_FUNCTION;
     flv_tag_t *tag = new flv_tag_t;

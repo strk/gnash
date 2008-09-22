@@ -22,6 +22,7 @@
 #ifdef HAVE_DEJAGNU_H
 
 //#include <netinet/in.h>
+#include <boost/shared_ptr.hpp>
 #include <string>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -66,51 +67,6 @@ static void test_read(std::string &filespec);
 bool test_sol(std::string &filespec);
 
 LogFile& dbglogfile = LogFile::getDefaultInstance();
-
-// These next two functions are borrowed from Libgloss, part of the GNU binutils,
-// of which I am the primary author and copyright holder.
-// convert an ascii hex digit to a number.
-//      param is hex digit.
-//      returns a decimal digit.
-Network::byte_t
-hex2digit (Network::byte_t digit)
-{  
-    if (digit == 0)
-        return 0;
-    
-    if (digit >= '0' && digit <= '9')
-        return digit - '0';
-    if (digit >= 'a' && digit <= 'f')
-        return digit - 'a' + 10;
-    if (digit >= 'A' && digit <= 'F')
-        return digit - 'A' + 10;
-    
-    // shouldn't ever get this far
-    return -1;
-}
-
-// Convert the hex array pointed to by buf into binary to be placed in mem
-Buffer *
-hex2mem(const char *str)
-{
-    size_t count = strlen(str);
-    Network::byte_t ch = 0;
-    Buffer *buf = new Buffer(count + 12);
-    buf->clear();
-
-    Network::byte_t *ptr = const_cast<Network::byte_t *>(reinterpret_cast<const Network::byte_t *>(str));
-    
-    for (size_t i=0; i<count; i++) {
-        if (*ptr == ' ') {      // skip spaces.
-            ptr++;
-            continue;
-        }
-        ch = hex2digit(*ptr++) << 4;
-        ch |= hex2digit(*ptr++);
-        buf->append(ch);
-    }
-    return buf;
-}
 
 int
 main(int argc, char *argv[])
@@ -186,7 +142,7 @@ test_read(std::string &filespec)
     GNASH_REPORT_FUNCTION;
     struct stat st;
 
-    Buffer *hex1 = hex2mem("00 bf 00 00 01 28 54 43 53 4f 00 04 00 00 00 00 00 08 73 65 74 74 69 6e 67 73 00 00 00 00 00 04 67 61 69 6e 00 40 49 00 00 00 00 00 00 00 00 0f 65 63 68 6f 73 75 70 70 72 65 73 73 69 6f 6e 01 00 00 00 11 64 65 66 61 75 6c 74 6d 69 63 72 6f 70 68 6f 6e 65 02 00 0e 2f 64 65 76 2f 69 6e 70 75 74 2f 6d 69 63 00 00 0d 64 65 66 61 75 6c 74 63 61 6d 65 72 61 02 00 00 00 00 0d 64 65 66 61 75 6c 74 6b 6c 69 6d 69 74 00 40 59 00 00 00 00 00 00 00 00 0d 64 65 66 61 75 6c 74 61 6c 77 61 79 73 01 00 00 00 10 63 72 6f 73 73 64 6f 6d 61 69 6e 41 6c 6c 6f 77 01 01 00 00 11 63 72 6f 73 73 64 6f 6d 61 69 6e 41 6c 77 61 79 73 01 01 00 00 18 61 6c 6c 6f 77 54 68 69 72 64 50 61 72 74 79 4c 53 4f 41 63 63 65 73 73 01 01 00 00 0c 74 72 75 73 74 65 64 50 61 74 68 73 03 00 00 09 00 00 0c 6c 6f 63 61 6c 53 65 63 50 61 74 68 02 00 00 00 00 10 6c 6f 63 61 6c 53 65 63 50 61 74 68 54 69 6d 65 00 42 71 6d 14 10 22 e0 00 00");
+    boost::shared_ptr<Buffer> hex1(new Buffer("00 bf 00 00 01 28 54 43 53 4f 00 04 00 00 00 00 00 08 73 65 74 74 69 6e 67 73 00 00 00 00 00 04 67 61 69 6e 00 40 49 00 00 00 00 00 00 00 00 0f 65 63 68 6f 73 75 70 70 72 65 73 73 69 6f 6e 01 00 00 00 11 64 65 66 61 75 6c 74 6d 69 63 72 6f 70 68 6f 6e 65 02 00 0e 2f 64 65 76 2f 69 6e 70 75 74 2f 6d 69 63 00 00 0d 64 65 66 61 75 6c 74 63 61 6d 65 72 61 02 00 00 00 00 0d 64 65 66 61 75 6c 74 6b 6c 69 6d 69 74 00 40 59 00 00 00 00 00 00 00 00 0d 64 65 66 61 75 6c 74 61 6c 77 61 79 73 01 00 00 00 10 63 72 6f 73 73 64 6f 6d 61 69 6e 41 6c 6c 6f 77 01 01 00 00 11 63 72 6f 73 73 64 6f 6d 61 69 6e 41 6c 77 61 79 73 01 01 00 00 18 61 6c 6c 6f 77 54 68 69 72 64 50 61 72 74 79 4c 53 4f 41 63 63 65 73 73 01 01 00 00 0c 74 72 75 73 74 65 64 50 61 74 68 73 03 00 00 09 00 00 0c 6c 6f 63 61 6c 53 65 63 50 61 74 68 02 00 00 00 00 10 6c 6f 63 61 6c 53 65 63 50 61 74 68 54 69 6d 65 00 42 71 6d 14 10 22 e0 00 00"));
 
     if (stat(filespec.c_str(), &st) == 0) {
         SOL sol;
@@ -211,7 +167,6 @@ test_read(std::string &filespec)
         }
 //        sol.dump();
     }
-    delete hex1;
 }
 
 #if 0

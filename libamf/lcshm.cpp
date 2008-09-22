@@ -385,11 +385,11 @@ LcShm::formatHeader(const std::string &con, const std::string &host, bool /* dom
     ptr = header + LC_HEADER_SIZE;
 
     // Which is then always followed by 3 AMF objects.
-    Buffer *buf1 = AMF::encodeString(con);
+    boost::shared_ptr<amf::Buffer> buf1 = AMF::encodeString(con);
     memcpy(ptr, buf1->begin(), buf1->size());
     ptr += buf1->size();
 
-    Buffer *buf2 = AMF::encodeString(host);
+    boost::shared_ptr<amf::Buffer> buf2 = AMF::encodeString(host);
     memcpy(ptr, buf2->begin(), buf2->size());
     ptr += buf2->size();
     

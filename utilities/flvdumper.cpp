@@ -19,6 +19,7 @@
 #include "gnashconfig.h"
 #endif
 
+#include <boost/shared_ptr.hpp>
 #include <dirent.h>
 #include <iostream>
 #include <stdarg.h>
@@ -181,13 +182,13 @@ main(int argc, char *argv[])
 	try {
             // Open the binary file
 	    ifstream ifs(filespec.c_str(), ios::binary);
-	    Buffer buf;
+	    boost::shared_ptr<amf::Buffer> buf(new Buffer);
             // Read just the initial 9 byte header
-	    ifs.read(reinterpret_cast<char *>(buf.reference()), sizeof(Flv::flv_header_t));
-	    log_debug("header is: %s",  hexify(buf.reference(), 9, false));
-	    head  = flv.decodeHeader(&buf);
+	    ifs.read(reinterpret_cast<char *>(buf->reference()), sizeof(Flv::flv_header_t));
+	    log_debug("header is: %s",  hexify(buf->reference(), 9, false));
+	    head  = flv.decodeHeader(buf);
 	    if (head == 0) {
-		log_error("Couldn't decode the header! %s",  hexify(buf.reference(), 9, false));
+		log_error("Couldn't decode the header! %s",  hexify(buf->reference(), 9, false));
 		exit(-1);
 	    }
 	    if ((head->type & Flv::FLV_VIDEO) && (head->type & Flv::FLV_AUDIO)) {
@@ -212,8 +213,8 @@ main(int argc, char *argv[])
 		 if (all) {   
 		     cout << "FLV Previous Tag Size was: " << previous << endl;
 		 }
-		 ifs.read(reinterpret_cast<char *>(buf.reference()), sizeof(Flv::flv_tag_t));
-		 tag  = flv.decodeTagHeader(&buf);
+		 ifs.read(reinterpret_cast<char *>(buf->reference()), sizeof(Flv::flv_tag_t));
+		 tag  = flv.decodeTagHeader(buf);
 		 
 		 total -= sizeof(Flv::previous_size_t);
 		 size_t bodysize = flv.convert24(tag->bodysize);
@@ -225,8 +226,8 @@ main(int argc, char *argv[])
 			 cout << "FLV Tag size is: " << bodysize +  sizeof(Flv::previous_size_t) << endl;
 		     }
 		 }
-		 buf.resize(bodysize);
-		 ifs.read(reinterpret_cast<char *>(buf.reference()), bodysize);
+		 buf->resize(bodysize);
+		 ifs.read(reinterpret_cast<char *>(buf->reference()), bodysize);
 		 // Got to the end of the file
 		 if (ifs.eof()) {
 		     cerr << "end of file" << endl;
@@ -238,7 +239,7 @@ main(int argc, char *argv[])
 		   {
 		       if (all) {
 			   cerr << "FLV Tag type is: Audio" << endl;
- 			   Flv::flv_audio_t *data = flv.decodeAudioData(*(buf.reference() + sizeof(Flv::flv_tag_t)));
+ 			   Flv::flv_audio_t *data = flv.decodeAudioData(*(buf->reference() + sizeof(Flv::flv_tag_t)));
  			   cout << "\tSound Type is: "   << type_strs[data->type] << endl;
  			   cout << "\tSound Size is: "   << size_strs[data->size] << endl;
  			   cout << "\tSound Rate is: "   << rate_strs[data->rate] << endl;
@@ -250,7 +251,7 @@ main(int argc, char *argv[])
 		   {
 		       if (all) {
 			   cout << "FLV Tag type is: Video" << endl;
- 			   Flv::flv_video_t *data = flv.decodeVideoData(*(buf.reference() + sizeof(Flv::flv_tag_t)));
+ 			   Flv::flv_video_t *data = flv.decodeVideoData(*(buf->reference() + sizeof(Flv::flv_tag_t)));
  			   cout << "\tCodec ID is: "   << codec_strs[data->codecID] << endl;
  			   cout << "\tFrame Type is: " << frame_strs[data->type] << endl;
 		       }
@@ -260,7 +261,7 @@ main(int argc, char *argv[])
  		       if (meta || all) {
  			   cout << "FLV Tag type is: MetaData" << endl;
  		       }
-		       Element *metadata = flv.decodeMetaData(buf.reference(), bodysize);
+		       Element *metadata = flv.decodeMetaData(buf->reference(), bodysize);
 		       if (meta && metadata) {
 			   metadata->dump();
 		       }
