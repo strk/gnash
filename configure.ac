@@ -2613,9 +2613,14 @@ fi
     if test x"$FFMPEG_LIBS" != x; then
       echo "        MP3 and video support enabled through ffmpeg"
       if test x"${ffmpeg_version_check}" != xok; then
-        echo "        ERROR: You have version ${ffmpeg_version} of ffmpeg installed." >&3
-        echo "               This version of ffmpeg may not work!" >&3
-        echo "               Version 51.27.0 or newer is highly recommended." >&3
+        echo "        ERROR: You have version ${ffmpeg_version} of ffmpeg installed," >&3
+        if test x"${have_ffmpeg_swscale}" = "xno"; then
+          echo "               with no swscale enabled." >&3
+        else
+          echo "               with swscale enabled." >&3
+        fi
+        echo "               This setup isn't supported!" >&3
+        echo "               Version 51.27.0 or newer is required, enabling swscale if >= 52.0.0." >&3
       else
 	if test x"${avformat_h}" = x; then
           echo "        ERROR: FFMPEG's libavcodec header is installed but not libavformat." >&3

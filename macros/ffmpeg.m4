@@ -289,14 +289,23 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
   fi
   AC_MSG_RESULT($avformat_h)
 
+  have_ffmpeg_swscale=no
+
   dnl look for swscale.h, but ignore versions older than 51.40.3
   if test $ffmpeg_num_version -gt 514003; then
     if test -f "${topdir}/ffmpeg/swscale.h"; then
+      have_ffmpeg_swscale=yes
       AC_DEFINE(HAVE_FFMPEG_SWSCALE_H, 1, [Define if swscale.h is found])
     fi
     if test -f "${topdir}/libswscale/swscale.h"; then
+      have_ffmpeg_swscale=yes
       AC_DEFINE(HAVE_LIBSWSCALE_SWSCALE_H, 1, [Define if swscale.h is found])
     fi
+  fi
+
+  if test x"$have_ffmpeg_swscale" = "xno" -a $ffmpeg_num_version -ge 520000; then
+     AC_MSG_WARN([Cannot find swscale.h, required for ffmpeg versions >= 52.0.0 (detected version: $ffmpeg_version)])
+     ffmpeg_version_check=
   fi
 
   dnl Look for the library
