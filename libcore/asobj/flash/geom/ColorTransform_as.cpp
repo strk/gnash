@@ -252,12 +252,36 @@ ColorTransform_toString(const fn_call& fn)
 }
 
 
+// Alpha values are left untouched, RGB multipliers reset to 0.
+// The getter merely bit-shifts the values without checking for
+// validity. We fmod the double values to avoid undefined behaviour
+// on overflow.
 static as_value
 ColorTransform_rgb_getset(const fn_call& fn)
 {
 	boost::intrusive_ptr<ColorTransform_as> ptr = ensureType<ColorTransform_as>(fn.this_ptr);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
+
+    if (!fn.nargs)
+    {
+        // Getter
+        boost::uint32_t r = static_cast<boost::uint32_t>(std::fmod(ptr->getRedOffset(), 4294967296.0));
+        boost::uint32_t g = static_cast<boost::uint32_t>(std::fmod(ptr->getGreenOffset(), 4294967296.0));
+        boost::uint32_t b = static_cast<boost::uint32_t>(std::fmod(ptr->getBlueOffset(), 4294967296.0));
+        boost::uint32_t rgb = (r << 16) + (g << 8) + b;
+
+        return as_value(rgb);
+    }
+
+    // Setter
+
+    boost::uint32_t rgb = fn.arg(0).to_int();
+    ptr->setRedOffset((rgb & 0xFF0000) >> 16);
+    ptr->setGreenOffset((rgb & 0x00FF00) >> 8);
+    ptr->setBlueOffset(rgb & 0x0000FF);
+    ptr->setRedMultiplier(0);
+    ptr->setGreenMultiplier(0);
+    ptr->setBlueMultiplier(0);
+
 	return as_value();
 }
 

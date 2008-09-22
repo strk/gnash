@@ -98,8 +98,44 @@ xcheck_equals (c.toString(), "(redMultiplier=1, greenMultiplier=1, blueMultiplie
 c = new ColorTransform(0, 2, 3, 4, 5, 6, 7, 8);
 xcheck_equals (c.toString(), "(redMultiplier=0, greenMultiplier=2, blueMultiplier=3, alphaMultiplier=4, redOffset=5, greenOffset=6, blueOffset=7, alphaOffset=8)");
 
+c = new ColorTransform(0, 2, 3, 4, 5, 6, -8.334, 9.7);
+xcheck_equals (c.toString(), "(redMultiplier=0, greenMultiplier=2, blueMultiplier=3, alphaMultiplier=4, redOffset=5, greenOffset=6, blueOffset=-8.334, alphaOffset=9.7)");
+
 c = new ColorTransform(0, 2, 3, 4, 5, 6, 7, 8, 9);
 xcheck_equals (c.toString(), "(redMultiplier=0, greenMultiplier=2, blueMultiplier=3, alphaMultiplier=4, redOffset=5, greenOffset=6, blueOffset=7, alphaOffset=8)");
+
+
+// ColorTransform.rgb
+c.rgb = 0xFFFF00;
+xcheck_equals (c.toString(), "(redMultiplier=0, greenMultiplier=0, blueMultiplier=0, alphaMultiplier=4, redOffset=255, greenOffset=255, blueOffset=0, alphaOffset=8)");
+xcheck_equals(c.rgb.toString(), "16776960");
+
+c = new ColorTransform(1, 1, -0.5, 4, 2, 2, 2, 8);
+c.rgb = 0xFF34FF;
+xcheck_equals (c.toString(), "(redMultiplier=0, greenMultiplier=0, blueMultiplier=0, alphaMultiplier=4, redOffset=255, greenOffset=52, blueOffset=255, alphaOffset=8)");
+xcheck_equals(c.rgb.toString(), "16725247");
+
+c.rgb = 0x000000;
+xcheck_equals (c.toString(), "(redMultiplier=0, greenMultiplier=0, blueMultiplier=0, alphaMultiplier=4, redOffset=0, greenOffset=0, blueOffset=0, alphaOffset=8)");
+xcheck_equals(c.rgb.toString(), "0");
+
+c.rgb = -4534;
+xcheck_equals (c.toString(), "(redMultiplier=0, greenMultiplier=0, blueMultiplier=0, alphaMultiplier=4, redOffset=255, greenOffset=238, blueOffset=74, alphaOffset=8)");
+xcheck_equals(c.rgb.toString(), "16772682");
+
+c.rgb = 0xFFFFFFFF;
+xcheck_equals (c.toString(), "(redMultiplier=0, greenMultiplier=0, blueMultiplier=0, alphaMultiplier=4, redOffset=255, greenOffset=255, blueOffset=255, alphaOffset=8)");
+xcheck_equals(c.rgb.toString(), "16777215");
+
+// It's just bitshifting...
+c = new ColorTransform(1, 1, 1, 1, 1000, 1000, 1000, 0);
+xcheck_equals(c.rgb.toString(), "65793000");
+
+c = new ColorTransform(1, 1, 1, 1, 1000000, 1000, 1000, 0);
+xcheck_equals(c.rgb.toString(), "1111747560");
+
+c = new ColorTransform(1, 1, 1, 1, 100000000000000000, 10000, 1000, 0);
+xcheck_equals(c.rgb.toString(), "2561000");
 
 // Check object type strictness.
 
@@ -113,6 +149,6 @@ check_equals(o.toString(), "[object Object]");
 // END OF TEST
 //-------------------------------------------------------------
 
-totals(35);
+totals(49);
 
 #endif // OUTPUT_VERSION >= 8
