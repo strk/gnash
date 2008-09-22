@@ -32,7 +32,9 @@ rcsid="$Id: Matrix.as,v 1.11 2008/06/19 11:49:17 bwy Exp $";
 // A ming bug up to version 0.4 beta 5 makes very large numbers fail.
 #include "check.as"
 
-#if OUTPUT_VERSION < 8
+ASSetPropFlags (_global, "flash", 0, 5248);
+
+#if OUTPUT_VERSION < 6
 
 check_equals(typeof(flash), 'undefined');
 
@@ -151,7 +153,11 @@ check_equals(m.ty.toString(), "-1.53423567131344e+107");
 #endif
 
 m1 = new Matrix(8);
+#if OUTPUT_VERSION > 6
 check_equals(m1.toString(), "(a=8, b=undefined, c=undefined, d=undefined, tx=undefined, ty=undefined)");
+#else
+xcheck_equals(m1.toString(), "(a=8, b=, c=, d=, tx=, ty=)");
+#endif
 
 m1 = new Matrix(1, 2, 3, 4, 5, 6);
 check_equals(m1.toString(), "(a=1, b=2, c=3, d=4, tx=5, ty=6)");
@@ -327,7 +333,11 @@ check_equals(fakematrix.tx.toString(), 44);
 check_equals(fakematrix.a.toString(), 8);
 
 m7 = new Matrix ("A string", undefined, new Object, true, NaN, new Point);
+#if OUTPUT_VERSION > 6
 check_equals("" + m7, "(a=A string, b=undefined, c=[object Object], d=true, tx=NaN, ty=(x=0, y=0))");
+#else
+xcheck_equals("" + m7, "(a=A string, b=, c=[object Object], d=true, tx=NaN, ty=(x=0, y=0))");
+#endif
 
 m7.rotate(2);
 check_equals(m7.toString(), "(a=NaN, b=NaN, c=NaN, d=NaN, tx=NaN, ty=NaN)");
@@ -341,7 +351,11 @@ check_equals(m8.toString(), "(a=8.2022824555003, b=-436.562099487155, c=44.24615
 m8.createBox(4, 3, new Object(), "a string");
 check_equals(m8.toString(), "(a=NaN, b=NaN, c=NaN, d=NaN, tx=a string, ty=0)");
 m8.createBox("a", "b");
+#if OUTPUT_VERSION > 6
 check_equals(m8.toString(), "(a=NaN, b=NaN, c=NaN, d=NaN, tx=0, ty=0)");
+#else
+xcheck_equals(m8.toString(), "(a=NaN, b=0, c=0, d=NaN, tx=0, ty=0)");
+#endif
 
 // A non-matrix with a matrix's createBox method (half works).
 delete fakematrix;
@@ -368,7 +382,11 @@ check(Math.abs(m8.c) < 0.0000000000001);
 
 m8.createGradientBox(40, 49, 0, "string", undefined);
 // Half of the width is added to the translation - they take that quite literally...
+#if OUTPUT_VERSION > 6
 check_equals(m8.toString(), "(a=0.0244140625, b=0, c=0, d=0.0299072265625, tx=string20, ty=NaN)");
+#else
+check_equals(m8.toString(), "(a=0.0244140625, b=0, c=0, d=0.0299072265625, tx=string20, ty=24.5)");
+#endif
 m8.createGradientBox(5, 6, 0, 1, 1);
 check_equals(m8.toString(), "(a=0.0030517578125, b=0, c=0, d=0.003662109375, tx=3.5, ty=4)");
 m8.createGradientBox(5, 6, 2, 1, 1);

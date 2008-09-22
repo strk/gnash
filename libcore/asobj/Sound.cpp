@@ -703,6 +703,7 @@ Sound::markReachableResources() const
 {
 	if ( connection ) connection->setReachable();
 	if ( attachedCharacter ) attachedCharacter->setReachable();
+	markAsObjectReachable();
 }
 #endif // GNASH_USE_GC
 

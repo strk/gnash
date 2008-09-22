@@ -26,6 +26,10 @@ DIE=0
 #Always use our macros
 #ACLOCAL_FLAGS="-I macros $ACLOCAL_FLAGS"
 
+if test "`uname`" = "Darwin"; then
+LIBTOOLIZE=glibtoolize
+fi
+
 (test -f $srcdir/configure.ac) || {
     echo -n "**Error**: Directory "\`$srcdir\'" does not look like the"
     echo " top-level package directory"

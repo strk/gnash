@@ -23,12 +23,8 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "action.h"
 #include "impl.h"
-
 #include "xmlattrs.h"
-
-#ifdef DEBUG_MEMORY_ALLOCATION
-	#include "log.h"
-#endif
+#include "log.h"
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
@@ -43,12 +39,12 @@ namespace gnash {
  
 /// XMLNode  ActionScript class
 //
-/// This is the base class for the XML ActionScript class
-///
-class XMLNode : public gnash::as_object
+/// This is also the base class for the XML actionscript class (see
+/// XML_as.cpp, XML_as.h). Because XML_as also inherits from LoadableObject,
+/// this is a virtual base class.
+class XMLNode : public virtual as_object
 {
 public:
-
 
     typedef enum {
 
@@ -92,11 +88,8 @@ public:
 
     XMLNode();
 
-    // This constructor is used by the XML class
-    XMLNode(as_object* overridden_interface);
-
     XMLNode(const XMLNode &node, bool deep);
-    ~XMLNode();
+    virtual ~XMLNode();
 
     size_t length() const { return _children.size(); }
 
@@ -139,7 +132,7 @@ public:
     AttribList& attributes() { return _attributes; }
     
     XMLNode& operator = (XMLNode &node) {
-        gnash::log_debug("%s: \n", __PRETTY_FUNCTION__);
+        log_debug("%s: \n", __PRETTY_FUNCTION__);
         if (this == &node) return *this;
         _name = node._name;
         _value = node._value;

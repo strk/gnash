@@ -255,7 +255,7 @@ PropertyList::getProperty(string_table::key key, string_table::key nsId)
 	container::iterator found = iterator_find(_props, key, nsId);
 	if (found == _props.end())
 	{
-		//log_error("getProperty(%s): not found", VM::get().getStringTable().value(key).c_str());
+		//log_error("getProperty(%s): not found", VM::get().getStringTable().value(key));
 		return NULL;
 	}
 	return const_cast<Property*>(&(*found));
@@ -304,7 +304,7 @@ PropertyList::setFlagsAll(const PropertyList& props,
 void
 PropertyList::enumerateKeys(as_environment& env, propNameSet& donelist) const
 {
-	string_table& st = VM::get().getStringTable();
+	string_table& st = env.getVM().getStringTable();
 	for (container::const_iterator i=_props.begin(), ie=_props.end(); i != ie; ++i)
 	{
 		if (i->getFlags().get_dont_enum())
@@ -321,9 +321,9 @@ PropertyList::enumerateKeys(as_environment& env, propNameSet& donelist) const
 }
 
 void
-PropertyList::enumerateKeyValue(as_object& this_ptr, std::map<std::string, std::string>& to) 
+PropertyList::enumerateKeyValue(const as_object& this_ptr, std::map<std::string, std::string>& to) const
 {
-	string_table& st = VM::get().getStringTable();
+	string_table& st = this_ptr.getVM().getStringTable();
 	for (container::const_iterator i=_props.begin(), ie=_props.end(); i != ie; ++i)
 	{
 		if (i->getFlags().get_dont_enum())
@@ -350,8 +350,8 @@ PropertyList::dump(as_object& this_ptr)
 	string_table& st = VM::get().getStringTable();
 	for (container::const_iterator it=_props.begin(), itEnd=_props.end(); it != itEnd; ++it )
 	{
-		log_debug("  %s: %s", st.value(it->mName).c_str(),
-			it->getValue(this_ptr).to_string().c_str());
+		log_debug("  %s: %s", st.value(it->mName),
+			it->getValue(this_ptr).to_string());
 	}
 }
 

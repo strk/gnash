@@ -84,7 +84,7 @@ public:
     DSOEXPORT static std::auto_ptr<ImageInput> create(boost::shared_ptr<IOChannel> in)
     {
         std::auto_ptr<ImageInput> ret ( new PngImageInput(in) );
-        if ( ret.get() ) ret->read();
+        if (ret.get()) ret->read();
         return ret;
     }
 
@@ -96,12 +96,11 @@ class PngImageOutput : public ImageOutput
 
 public:
 
-	/// Create an output object bount to a gnash::IOChannel
+	/// Create an output object bound to a gnash::IOChannel
 	//
 	/// @param out     The IOChannel used for output. Must be kept alive throughout
 	///
 	/// @param quality Unused in PNG output
-	
 	PngImageOutput(boost::shared_ptr<IOChannel> out, size_t width, size_t height, int quality);
 	
 	~PngImageOutput();

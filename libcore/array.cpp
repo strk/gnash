@@ -778,7 +778,7 @@ Array_as::get_member(string_table::key name, as_value *val,
         }
     }
 
-    return get_member_default(name, val, nsname);
+    return as_object::get_member(name, val, nsname);
 }
 
 bool
@@ -863,7 +863,7 @@ Array_as::set_member(string_table::key name,
     }
 
 
-    return as_object::set_member_default(name,val, nsname, ifFound);
+    return as_object::as_object::set_member(name,val, nsname, ifFound);
 }
 
 Array_as*

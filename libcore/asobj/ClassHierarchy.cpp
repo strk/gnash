@@ -49,7 +49,7 @@
 #include "SharedObject.h"
 #include "Sound.h"
 #include "Stage.h"
-#include "System.h"
+#include "System_as.h"
 #include "TextSnapshot.h"
 #include "TextFormat.h"
 #include "video_stream_instance.h"

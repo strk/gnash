@@ -20,25 +20,15 @@
 #ifndef __AUDIODECODERFFMPEG_H__
 #define __AUDIODECODERFFMPEG_H__
 
+// TODO: What's this for ?
 #ifndef __STDC_CONSTANT_MACROS
 #define __STDC_CONSTANT_MACROS
-#endif
-
-#ifdef HAVE_FFMPEG_AVCODEC_H
-extern "C" {
-# include "ffmpeg/avcodec.h"
-}
-#endif
-
-#ifdef HAVE_LIBAVCODEC_AVCODEC_H
-extern "C" {
-# include "libavcodec/avcodec.h"
-}
 #endif
 
 #include "log.h"
 #include "AudioDecoder.h"
 #include "ffmpegNetStreamUtil.h"
+#include "ffmpegHeaders.h"
 
 namespace gnash {
 namespace media {

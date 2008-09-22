@@ -18,16 +18,11 @@
 #ifndef GNASH_ASOBJ_XML_H
 #define GNASH_ASOBJ_XML_H
 
-#include "action.h"
-#include "LoadThread.h"
-#include "xmlattrs.h"
+#include "LoadableObject.h"
 #include "xmlnode.h"
 #include "log.h"
 #include "dsodefs.h"
-#include "NetworkAdapter.h"
 
-#include <vector>
-#include <sstream>
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 #include <libxml/xmlreader.h>
@@ -42,11 +37,11 @@ class URL;
 class LoaderThread;
 
 /// XML class and ActionScript object
-class XML_as : public XMLNode
+class XML_as : public XMLNode, public LoadableObject
 {
 public:
 
-    typedef enum {
+    enum ParseStatus {
 
             /// Parsing was successful
             sOK = 0,
@@ -78,13 +73,18 @@ public:
             /// Missing start tag (orphaned close tag)
             sECLOSETAG = -10
 
-    } Status;
+    };
 
 
     XML_as();
     XML_as(const std::string& xml_in);
-    ~XML_as();
-  
+    ~XML_as() {};
+
+    void toString(std::ostream& o) const
+    {
+        XMLNode::toString(o);
+    }
+
     /// This is overridden to provide the 'status' and 'loaded' members,
     /// which are NOT proper properties !
     /// See actionscript.all/XML.as
@@ -110,46 +110,16 @@ public:
     ///
     bool parseXML(const std::string& xml_in);
 
-    // Loads a document (specified by
-    // the XML object) from a URL.
-    //
-    // @param url
-    // 
-    // @param env
-    // 	The environment to use for calling event hadlers
-    //	TODO: what about 'this' pointer?
-    //
-    bool load(const URL& url);
-
     // An event handler that returns a
     bool onLoad();
 
-    // Boolean value indicating whether
-    // the XML object was successfully
-    // loaded with XML.load() or
-    // XML.sendAndLoad().
-    bool loaded()    { return _loaded; }
-    
     XMLNode *processNode(xmlTextReaderPtr reader, XMLNode *node);
 
     void change_stack_frame(int frame, gnash::as_object *xml, gnash::as_environment *env);
 
-    void cleanupStackFrames( XMLNode *data);
-
     XMLNode *createElement(const char *name);
 
     XMLNode *createTextNode(const char *name);
-
-    void send();
-
-    /// ActionScript doesn't care about the success of the connection.
-    void sendAndLoad(const URL& url, as_object& target);
-
-    /// @return -1 if no loaded was started yet
-    long int getBytesLoaded() const;
-
-    /// @return -1 if no loaded was started yet
-    long int getBytesTotal() const;
 
 private:
 
@@ -181,7 +151,7 @@ private:
     //  1 if successfully loaded
     int _loaded;
 
-    Status _status;	
+    ParseStatus _status;	
 
     /// Initialize an XMLNode from an xmlNodePtr
     //
@@ -197,42 +167,11 @@ private:
   
     /// Initialize the libxml2 parser
     void initParser();
-
-    /// Queue a load request from the given stream
-    void queueLoad(std::auto_ptr<IOChannel> str);
-
-    //static void _xmlErrorHandler(void *ctx, const char* fmt, ...);
-
-    typedef std::list<LoadThread*> LoadThreadList;
-
-    /// Queue of load requests
-    LoadThreadList _loadThreads; 
-
-    /// The load checker interval timer used to make loads async
-    unsigned int _loadCheckerTimer;
-
-    /// Wrapper around checkLoads for use as a Timer
-    /// interval for checking loads
-    static as_value checkLoads_wrapper(const fn_call& fn);
-
-    /// Scan the LoadThread queue (_loadThreads) to see if any of
-    /// them completed. If any did, invoke the onData event
-    void checkLoads();
-
-    long int _bytesTotal;
-    long int _bytesLoaded;
     
 };
 
 
 DSOEXPORT void xml_class_init(as_object& global);
-
-// Exporting this is a temporary hack for not changing xmlsocket.cpp now
-// (xmlsocket_xml_new calls xml_new)
-DSOEXPORT as_value xml_new(const fn_call& fn);
-
-DSOEXPORT int memadjust(int x);
-
 
 }	// end namespace gnash
 

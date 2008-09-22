@@ -23,23 +23,72 @@
 rcsid="$Id: MovieClip.as,v 1.133 2008/05/09 13:21:08 strk Exp $";
 #include "check.as"
 
+
+#if OUTPUT_VERSION == 5
+Object.prototype.hasOwnProperty = ASnative(101, 5);
+#endif
+
+xcheck(MovieClip.prototype.hasOwnProperty("blendMode"));
+check(MovieClip.prototype.hasOwnProperty("attachBitmap"));
+xcheck(MovieClip.prototype.hasOwnProperty("cacheAsBitmap"));
+check(MovieClip.prototype.hasOwnProperty("enabled"));
+xcheck(MovieClip.prototype.hasOwnProperty("filters"));
+xcheck(MovieClip.prototype.hasOwnProperty("forceSmoothing"));
+xcheck(MovieClip.prototype.hasOwnProperty("opaqueBackground"));
+xcheck(MovieClip.prototype.hasOwnProperty("scale9Grid"));
+xcheck(MovieClip.prototype.hasOwnProperty("scrollRect"));
+xcheck(MovieClip.prototype.hasOwnProperty("tabIndex"));
+check(MovieClip.prototype.hasOwnProperty("transform"));
+check(MovieClip.prototype.hasOwnProperty("useHandCursor"));
+check(MovieClip.prototype.hasOwnProperty("_lockroot"));
+
+check(!MovieClip.prototype.hasOwnProperty("focusEnabled"));
+check(!MovieClip.prototype.hasOwnProperty("hitArea"));
+check(!MovieClip.prototype.hasOwnProperty("menu"));
+check(!MovieClip.prototype.hasOwnProperty("tabChildren"));
+check(!MovieClip.prototype.hasOwnProperty("tabEnabled"));
+check(!MovieClip.prototype.hasOwnProperty("trackAsMenu"));
+check(!MovieClip.prototype.hasOwnProperty("_alpha"));
+check(!MovieClip.prototype.hasOwnProperty("_currentframe"));
+check(!MovieClip.prototype.hasOwnProperty("_droptarget"));
+check(!MovieClip.prototype.hasOwnProperty("_focusrect"));
+check(!MovieClip.prototype.hasOwnProperty("_height"));
+check(!MovieClip.prototype.hasOwnProperty("_highquality"));
+check(!MovieClip.prototype.hasOwnProperty("_name"));
+check(!MovieClip.prototype.hasOwnProperty("_parent"));
+check(!MovieClip.prototype.hasOwnProperty("_quality"));
+check(!MovieClip.prototype.hasOwnProperty("_rotation"));
+check(!MovieClip.prototype.hasOwnProperty("_soundbuftime"));
+check(!MovieClip.prototype.hasOwnProperty("_target"));
+check(!MovieClip.prototype.hasOwnProperty("_totalframes"));
+check(!MovieClip.prototype.hasOwnProperty("_url"));
+check(!MovieClip.prototype.hasOwnProperty("_visible"));
+check(!MovieClip.prototype.hasOwnProperty("_width"));
+check(!MovieClip.prototype.hasOwnProperty("_x"));
+check(!MovieClip.prototype.hasOwnProperty("_xmouse"));
+check(!MovieClip.prototype.hasOwnProperty("_xscale"));
+check(!MovieClip.prototype.hasOwnProperty("_y"));
+check(!MovieClip.prototype.hasOwnProperty("_ymouse"));
+check(!MovieClip.prototype.hasOwnProperty("_yscale"));
+
+
 // To be called at end of test
 endOfTest = function() 
 {
 #if OUTPUT_VERSION <= 5
-	check_totals(234); // SWF5
+	check_totals(276); // SWF5
 #endif
 
 #if OUTPUT_VERSION == 6
-	check_totals(664); // SWF6
+	check_totals(706); // SWF6
 #endif
 
 #if OUTPUT_VERSION == 7
-	check_totals(681); // SWF7
+	check_totals(723); // SWF7
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(682); // SWF8+
+	check_totals(752); // SWF8+
 #endif
 
 	play();
@@ -1284,6 +1333,85 @@ check_equals(_alpha, 100);
 
 
 _alpha = 100;
+
+//----------------------------------------------
+// Test transform
+//----------------------------------------------
+
+#if OUTPUT_VERSION < 8
+check_equals(typeof(_root.transform), 'undefined'); 
+#else
+
+// TODO: test these !!
+check_equals(typeof(_root.transform), 'object'); 
+
+oldTransform = _root.transform;
+check(oldTransform === oldTransform); 
+check(oldTransform != _root.transform); // everytime transform is accessed, it's a new object!
+
+Matrix = flash.geom.Matrix;
+check(_root.transform instanceOf Object);
+check(!_root.transform instanceOf Matrix);
+props = []; for (var i in _root.transform) props.push(i); props.sort();
+xcheck_equals(props.toString(), "colorTransform,concatenatedColorTransform,concatenatedMatrix,matrix,pixelBounds");
+
+xcheck_equals(typeof(_root.transform.colorTransform), 'object');
+// TODO: test colorTransform
+
+xcheck_equals(typeof(_root.transform.concatenatedColorTransform), 'object');
+// TODO: test concatenatedColorTransform
+
+xcheck_equals(typeof(_root.transform.concatenatedMatrix), 'object');
+xcheck(_root.transform.concatenatedMatrix instanceOf Matrix);
+
+check_equals(typeof(_root.transform.matrix), 'object');
+check(_root.transform.matrix instanceOf Matrix);
+
+note('x:'+_root._x+' y:'+_root._y+' rot:'+_root._rotation+' xs:'+_root._xscale+' yx:'+_root._yscale);
+
+check_equals(_root.transform.matrix.a, 1);
+check_equals(_root.transform.matrix.b, 0);
+check_equals(_root.transform.matrix.c, 0);
+check_equals(_root.transform.matrix.d, 1);
+check_equals(_root.transform.matrix.tx, 0);
+check_equals(_root.transform.matrix.ty, 0);
+// TODO: test concatenatedMatrix
+
+_root._x = 30;
+_root._y = 20;
+//_root._xscale = -300; // NOTE: gnash breaks the _root's matrix if we set _xscale here ! you can tell by failing localToGLobal/globalToLocal tests
+_root._yscale = -200;
+_root._rotation = -90;
+
+check_equals(_root.transform.matrix.a, 0);
+check_equals(_root.transform.matrix.b, -1); // would be 3 if we did set _xscale=-300 above
+check_equals(_root.transform.matrix.c, -2);
+check_equals(_root.transform.matrix.d, 0);
+check_equals(_root.transform.matrix.tx, 30);
+check_equals(_root.transform.matrix.ty, 20);
+// TODO: test concatenatedMatrix
+
+_root.transform.matrix.ty = 300;
+check_equals(_root._y, 20); // changing the AS matrix doesn't change the actual matrix
+
+_root._x = _root._y = _root._rotation = 0;
+_root._xscale = _root._yscale = 100;
+
+OldTransform = flash.geom.Transform;
+
+flash.geom.Transform = 1;
+check_equals(_root.transform.toString(), undefined);
+check_equals(_root.transform.matrix.toString(), undefined);
+
+flash.geom.Transform = OldTransform;
+flash.geom.Transform.matrix = 3;
+check_equals(_root.transform.matrix.toString(), "(a=1, b=0, c=0, d=1, tx=0, ty=0)");
+
+flash.geom.Transform = OldTransform;
+check_equals(_root.transform.toString(), "[object Object]");
+
+
+#endif
 
 //----------------------------------------------
 // Test localToGlobal and globalToLocal

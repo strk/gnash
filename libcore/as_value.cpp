@@ -391,7 +391,7 @@ as_value::to_primitive() const
 	VM& vm = VM::get();
 	int swfVersion = vm.getSWFVersion();
 
-	type hint = NUMBER;
+	AsType hint = NUMBER;
 
 	if ( m_type == OBJECT && swfVersion > 5 && getObj()->isDateObject() )
 	{
@@ -414,7 +414,7 @@ as_value::convert_to_primitive()
 	VM& vm = VM::get();
 	int swfVersion = vm.getSWFVersion();
 
-	type hint = NUMBER;
+	AsType hint = NUMBER;
 
 	if ( m_type == OBJECT && swfVersion > 5 && getObj()->isDateObject() )
 	{
@@ -433,7 +433,7 @@ as_value::convert_to_primitive()
 
 // Conversion to primitive value.
 as_value
-as_value::to_primitive(type hint) const
+as_value::to_primitive(AsType hint) const
 {
 	if ( m_type != OBJECT && m_type != AS_FUNCTION ) return *this; 
 	//if ( ! is_object() ) return *this; // include MOVIECLIP !!
@@ -535,7 +535,7 @@ as_value::to_primitive(type hint) const
 
 // Conversion to primitive value.
 as_value&
-as_value::convert_to_primitive(type hint) 
+as_value::convert_to_primitive(AsType hint) 
 {
 	if ( m_type != OBJECT && m_type != AS_FUNCTION ) return *this; 
 	//if ( ! is_object() ) return *this; // include MOVIECLIP !!

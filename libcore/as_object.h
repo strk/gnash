@@ -258,11 +258,6 @@ public:
 
 	/// Set a member value
 	//
-	/// The default behaviour is to call set_member_default,
-	/// but this function is kept virtual to allow special
-	/// handling of property assignment in derivate class.
-	/// NOTE: This might change in the near future trough use of
-	///       getter/setter properties instead..
 	///
 	/// @param key
 	///	Id of the property. 
@@ -284,36 +279,8 @@ public:
 	///	
 	///
 	virtual bool set_member(string_table::key key, const as_value& val,
-		string_table::key nsname = 0, bool ifFound=false)
-	{
-		return set_member_default(key, val, nsname, ifFound);
-	}
+		string_table::key nsname = 0, bool ifFound=false);
 
-#if 0
-	/// Update an existing member value
-	//
-	/// NOTE that getter-setter in the inheritance chain are
-	/// considered as existing members. See with.as and Object.as
-	/// testcases under actionscript.all.
-	/// Also be aware that 'special' (non-proper) properties
-	/// are considered non-existing, this is surely true for
-	/// childs of MovieClips, also tested in with.as.
-	///
-	/// @param key
-	///	Id of the property. 
-	///
-	/// @param val
-	///	Value to assign to the named property.
-	///
-	/// @param nsname
-	///	Id of the namespace.
-	///
-	/// @return a pair in which first element express wheter the property
-	///         was found and the second wheter it was set (won't set if read-only).
-	///
-	std::pair<bool,bool> update_member(string_table::key key, const as_value& val,
-		string_table::key nsname = 0);
-#endif
 
 	virtual bool on_event(const event_id& id );
 
@@ -638,10 +605,6 @@ public:
 	bool unwatch(string_table::key key, string_table::key ns = 0);
 
 	/// Get a member as_value by name
-	//
-	/// The default behaviour is to call set_member_default,
-	/// but this function is kept virtual to allow special
-	/// handling of property fetching in derivate class.
 	///
 	/// NOTE that this method is non-const becase a property
 	///      could also be a getter/setter and we can't promise
@@ -665,10 +628,7 @@ public:
 	/// @return true of the named property was found, false otherwise.
 	///
 	virtual bool get_member(string_table::key name, as_value* val,
-		string_table::key nsname = 0)
-	{
-		return get_member_default(name, val, nsname);
-	}
+		string_table::key nsname = 0);
 
 	/// Resolve the given relative path component
 	//
@@ -813,7 +773,7 @@ public:
 	///
 	/// @return
 	/// The property associated with the order index.
-	Property *getByIndex(int index);
+	const Property* getByIndex(int index);
 
 	/// Get the next index after the one whose index was used as a parameter.
 	///
@@ -951,7 +911,7 @@ public:
 	/// to avoid loops in prototype chain. 
 	/// NOTE: the MM player just chokes in this case (loop)
 	///
-	void enumerateProperties(std::map<std::string, std::string>& to);
+	void enumerateProperties(std::map<std::string, std::string>& to) const;
 
 	/// Get url-encoded variables
 	//
@@ -1065,57 +1025,6 @@ protected:
 	///
 	virtual void enumerateNonProperties(as_environment&) const {}
 
-	/// Get a property value by name
-	//
-	/// This is the default implementation, taking care of
-	/// the inheritance chain and getter/setter functions.
-	///
-        /// The derived class should not override this method,
-        /// but instead implement its own gettersetter properties.
-	///
-	/// NOTE that this method is non-const becase a property
-	///      could also be a getter/setter and we can't promise
-	///      that the 'getter' won't change this object trough
-	///	 use of the 'this' reference.
-	///
-	/// @param name
-	///	Name of the property. Must be all lowercase
-	///	if the current VM is initialized for a  target
-	///	up to SWF6.
-	///
-	/// @param val
-	///     The as_value to store a found variable's value in.
-	///
-	bool get_member_default(string_table::key name, as_value* val, 
-		string_table::key nsname);
-
-	/// Set a member value
-	//
-	/// This is the default implementation, taking care of
-	/// the inheritance chain and getter/setter functions.
-	///
-        /// The derived class should not override this method,
-        /// but instead implement its own gettersetter properties.
-	///
-	/// @param name
-	///	Name of the property. Must be all lowercase
-	///	if the current VM is initialized for a  target
-	///	up to SWF6.
-	///
-	/// @param val
-	///	Value to assign to the named property.
-	///
-	/// @param ifFound
-	///	If true, don't create a new member, but only update
-	///	an existing one.
-	///
-	/// @return true if the given member existed, false otherwise.
-	///	NOTE: the return doesn't tell if the member exists after
-	///	      the call, as watch triggers might have deleted it
-	///	      after setting.
-	///
-	bool set_member_default(string_table::key name, const as_value& val, 
-		string_table::key nsname, bool ifFound);
 
 #ifdef GNASH_USE_GC
 	/// Mark all reachable resources, override from GcResource.

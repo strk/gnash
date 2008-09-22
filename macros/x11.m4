@@ -46,7 +46,10 @@ AC_DEFUN([GNASH_PATH_X11],
 
   AC_MSG_CHECKING([for X11 headers])
   if test x"${ac_cv_path_x11_incl}" != x ; then
-    X11_CFLAGS="${ac_cv_path_x11_incl}"
+    dnl Don't pass -I/usr/include
+    if test x"${ac_cv_path_x11_incl}" != "x-I/usr/include"; then
+      X11_CFLAGS="${ac_cv_path_x11_incl}"
+    fi
     AC_MSG_RESULT(${ac_cv_path_x11_incl})
   else
     X11_CFLAGS=""

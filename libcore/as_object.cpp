@@ -300,9 +300,9 @@ as_object::add_property(const std::string& name, as_function& getter,
 	}
 }
 
-/*protected*/
+
 bool
-as_object::get_member_default(string_table::key name, as_value* val,
+as_object::get_member(string_table::key name, as_value* val,
 	string_table::key nsname)
 {
 	assert(val);
@@ -329,7 +329,8 @@ as_object::get_member_default(string_table::key name, as_value* val,
 	}
 }
 
-Property*
+
+const Property*
 as_object::getByIndex(int index)
 {
 	// The low byte is used to contain the depth of the property.
@@ -343,7 +344,7 @@ as_object::getByIndex(int index)
 			return NULL;
 	}
 
-	return const_cast<Property *>(obj->_members.getPropertyByOrder(index));
+	return obj->_members.getPropertyByOrder(index);
 }
 
 as_object*
@@ -539,7 +540,7 @@ as_object::reserveSlot(string_table::key name, string_table::key nsId,
 
 // Handles read_only and static properties properly.
 bool
-as_object::set_member_default(string_table::key key, const as_value& val,
+as_object::set_member(string_table::key key, const as_value& val,
 	string_table::key nsname, bool ifFound)
 {
 	//log_debug(_("set_member_default(%s)"), key);
@@ -1103,10 +1104,11 @@ as_object::enumerateProperties(as_environment& env) const
 
 	// this set will keep track of visited objects,
 	// to avoid infinite loops
-	std::set< as_object* > visited;
+	std::set< const as_object* > visited;
 	PropertyList::propNameSet named;
 
-	boost::intrusive_ptr<as_object> obj = const_cast<as_object*>(this);
+	boost::intrusive_ptr<const as_object> obj(this);
+	
 	while ( obj && visited.insert(obj.get()).second )
 	{
 		obj->_members.enumerateKeys(env, named);
@@ -1119,14 +1121,14 @@ as_object::enumerateProperties(as_environment& env) const
 }
 
 void
-as_object::enumerateProperties(std::map<std::string, std::string>& to)
+as_object::enumerateProperties(std::map<std::string, std::string>& to) const
 {
 
 	// this set will keep track of visited objects,
 	// to avoid infinite loops
-	std::set< as_object* > visited;
+	std::set< const as_object* > visited;
 
-	boost::intrusive_ptr<as_object> obj = this;
+	boost::intrusive_ptr<const as_object> obj(this);
 	while ( obj && visited.insert(obj.get()).second )
 	{
 		obj->_members.enumerateKeyValue(*this, to);
@@ -1515,17 +1517,13 @@ Trigger::call(const as_value& oldval, const as_value& newval, as_object& this_ob
 void
 as_object::visitPropertyValues(AbstractPropertyVisitor& visitor) const
 {
-    _members.visitValues(visitor, 
-        // Need const_cast due to getValue getting non-const ...
-        const_cast<as_object&>(*this));
+    _members.visitValues(visitor, *this);
 }
 
 void
 as_object::visitNonHiddenPropertyValues(AbstractPropertyVisitor& visitor) const
 {
-    _members.visitNonHiddenValues(visitor, 
-        // Need const_cast due to getValue getting non-const ...
-        const_cast<as_object&>(*this));
+    _members.visitNonHiddenValues(visitor, *this);
 }
 
 

@@ -1052,7 +1052,7 @@ edit_text_character::set_member(string_table::key name,
 	}	// end switch
 
 
-	return set_member_default(name, val, nsname, ifFound);
+	return as_object::set_member(name, val, nsname, ifFound);
 }
 
 bool
@@ -1120,7 +1120,7 @@ edit_text_character::get_member(string_table::key name, as_value* val,
 	}
 	}	// end switch
 
-	return get_member_default(name, val, nsname);
+	return as_object::get_member(name, val, nsname);
 	
 }
 	
@@ -1828,12 +1828,12 @@ textfield_class_init(as_object& global)
 		if ( swfVer > 5 )
 		{
 			assert(iface);
-			assert(cl->getOwnProperty(vm.getStringTable().find("prototype")));
+			assert(cl->getOwnProperty(NSV::PROP_PROTOTYPE));
 		}
 		else
 		{
 			assert(!iface);
-			assert(!cl->getOwnProperty(vm.getStringTable().find("prototype")));
+			assert(!cl->getOwnProperty(NSV::PROP_PROTOTYPE));
 		}
 #endif
 

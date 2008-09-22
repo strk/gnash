@@ -28,19 +28,9 @@
 #include "log.h"
 
 #ifdef USE_FFMPEG
-#ifdef HAVE_FFMPEG_AVCODEC_H
-extern "C" {
-# include "ffmpeg/avcodec.h"
-}
-#endif
-
-#ifdef HAVE_LIBAVCODEC_AVCODEC_H
-extern "C" {
-# include "libavcodec/avcodec.h"
-}
-#endif
+# include "ffmpegHeaders.h"
 #elif defined(USE_MAD)
-#include <mad.h>
+# include <mad.h>
 #endif
 
 #include <vector>

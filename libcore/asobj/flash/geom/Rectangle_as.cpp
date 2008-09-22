@@ -92,10 +92,6 @@ attachRectangleInterface(as_object& o)
     o.init_property("topLeft", Rectangle_topLeft_getset, Rectangle_topLeft_getset, 0);
 }
 
-static void
-attachRectangleStaticProperties(as_object& /*o*/)
-{
-}
 
 static as_object*
 getRectangleInterface()
@@ -637,7 +633,6 @@ Rectangle_ctor(const fn_call& fn)
 		} while(0);
 	}
 
-	// TODO: use named strings (we have PROP_X and PROP_Y, lack PROP_WIDTH and PROP_HEIGHT)
 	obj->set_member(NSV::PROP_X, x);
 	obj->set_member(NSV::PROP_Y, y);
 	obj->set_member(NSV::PROP_WIDTH, w);
@@ -650,8 +645,8 @@ static as_value get_flash_geom_rectangle_constructor(const fn_call& /*fn*/)
 {
 	log_debug("Loading flash.geom.Rectangle class");
 
-	builtin_function* cl=new builtin_function(&Rectangle_ctor, getRectangleInterface());
-	attachRectangleStaticProperties(*cl);
+	builtin_function* cl =
+	        new builtin_function(&Rectangle_ctor, getRectangleInterface());
 	return cl;
 }
 

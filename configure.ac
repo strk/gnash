@@ -861,6 +861,9 @@ AM_CONDITIONAL(BUILD_METOME_EXT, [ test x$ext_metome = xyes ])
 AM_CONDITIONAL(BUILD_EXTENSIONS, [ test -n "$extensions_list"])
 
 AC_MSG_CHECKING([For the version of libtool])
+if test "x$darwin" != x; then
+LIBTOOLIZE=glibtoolize
+fi
 ltver=`${LIBTOOLIZE:-libtoolize} --version | head -1 | cut -d ' ' -f 4`
 ltmajor=`echo $ltver | cut -d '.' -f 1`
 AC_MSG_RESULT([$ltver])
@@ -1531,6 +1534,11 @@ GNASH_PKG_FIND(z, [zlib.h], [zlib compression library], compress)
 GNASH_PKG_FIND(jpeg, [jpeglib.h], [jpeg images], jpeg_mem_init)
 GNASH_PKG_FIND(libpng, [png.h], [png images], png_info_init)
 GNASH_PKG_FIND(gif, [gif_lib.h], [gif images], DGifOpen)
+if test x"${GIF_LIBS}" = x ; then
+ GNASH_PKG_FIND(ungif, [gif_lib.h], [gif images], DGifOpen)
+ GIF_LIBS=${UNGIF_LIBS}
+ GIF_CFLAGS=${UNGIF_CFLAGS}
+fi
 GNASH_PKG_INCLUDES([dejagnu], [dejagnu.h])
 
 dnl Find freetype and fontconfig
@@ -1767,7 +1775,7 @@ if test x"$media_handler" = x"ffmpeg"; then
   GNASH_PATH_FFMPEG
   if test x"${media_handler_specified}" = xfalse; then
      # If the library is not found, or its version is not ok, we'll try gst
-     if test x"${ac_cv_path_ffmpeg_lib}" = x -o x"${ffmpeg_version}" != xok; then
+     if test x"${ac_cv_path_ffmpeg_lib}" = x -o x"${ffmpeg_version_check}" != xok; then
        AC_MSG_WARN([No appropriate ffmpeg library found, disabling media handling.])
        media_handler=none
      fi
@@ -2604,10 +2612,15 @@ fi
   if test x"$media_handler" = x"ffmpeg"; then
     if test x"$FFMPEG_LIBS" != x; then
       echo "        MP3 and video support enabled through ffmpeg"
-      if test x"${ffmpeg_version}" != xok; then
-        echo "        ERROR: You have version ${ffmpeg_version} of ffmpeg installed." >&3
-        echo "               This version of ffmpeg may not work!" >&3
-        echo "               Version 51.27.0 or newer is highly recommended." >&3
+      if test x"${ffmpeg_version_check}" != xok; then
+        echo "        ERROR: You have version ${ffmpeg_version} of ffmpeg installed," >&3
+        if test x"${have_ffmpeg_swscale}" = "xno"; then
+          echo "               with no swscale enabled." >&3
+        else
+          echo "               with swscale enabled." >&3
+        fi
+        echo "               This setup isn't supported!" >&3
+        echo "               Version 51.11.0 or newer is required, enabling swscale if >= 52.0.0." >&3
       else
 	if test x"${avformat_h}" = x; then
           echo "        ERROR: FFMPEG's libavcodec header is installed but not libavformat." >&3
@@ -2750,6 +2763,10 @@ if test x"$docbook" = x"yes"; then
   else
     echo "        You have version $db2x_version of the DocBook2X tools."
   fi
+else
+  echo "        WARNING: without --enable-docbook we will use the cached" >&4
+  echo "                 documentation files included in the gnash distribution." >&4
+  echo "                 If you change files in doc/C, you should --enable-docbook." >&4
 fi
 
 if test x"$CURL_LIBS" != x; then
@@ -3058,7 +3075,7 @@ fi
 dnl If anything critical is missing, don't bother to continue
 if test -s $cerr; then
   echo ""
-  cat $cerr
+  cat $cerr >&2
   rm $cerr
   AC_MSG_ERROR([Please install required packages])
 fi

@@ -96,6 +96,7 @@
 #include <list>
 #include <set>
 #include <bitset>
+#include <boost/noncopyable.hpp>
 
 // Forward declarations
 namespace gnash {
@@ -126,7 +127,7 @@ struct DepthComparator
 /// There is a *single* instance of this class for each run;
 /// loading external movies will *not* create a new instance of it.
 ///
-class DSOEXPORT movie_root 
+class DSOEXPORT movie_root : boost::noncopyable
 {
 
 public:
@@ -868,12 +869,6 @@ private:
 
     /// The list of advanceable character, in placement order
     LiveChars _liveChars;
-
-    /// Forbid copy 
-    movie_root(const movie_root& ); 
-
-    /// Forbid assignment
-    movie_root& operator=(const movie_root& );
 
     /// Execute expired timers
     void executeTimers();
