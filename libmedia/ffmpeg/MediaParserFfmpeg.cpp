@@ -485,8 +485,11 @@ MediaParserFfmpeg::SampleFormatToSampleSize(SampleFormat fmt)
 		case SAMPLE_FMT_FLT: // float
 			return 2;
 
+#if !defined (LIBAVCODEC_VERSION_MAJOR) || LIBAVCODEC_VERSION_MAJOR < 52
+// Was dropped for version 52.0.0
 		case SAMPLE_FMT_S24: // signed 24 bits
 			return 3;
+#endif
 
 		case SAMPLE_FMT_S32: // signed 32 bits
 			return 4;
