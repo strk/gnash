@@ -173,9 +173,9 @@ main(int argc, char *argv[])
     struct stat st;
     Network::byte_t *buf = 0;
     Network::byte_t *ptr = 0;
-    Flv::flv_header_t *head;
+//    boost::shared_ptr<Flv::flv_header_t> head;
     Flv::previous_size_t   previous = 0;
-    Flv::flv_tag_t     *tag;
+    boost::shared_ptr<Flv::flv_tag_t> tag;
     
     // Make sure it's an SOL file
     if (stat(filespec.c_str(), &st) == 0) {
@@ -186,7 +186,7 @@ main(int argc, char *argv[])
             // Read just the initial 9 byte header
 	    ifs.read(reinterpret_cast<char *>(buf->reference()), sizeof(Flv::flv_header_t));
 	    log_debug("header is: %s",  hexify(buf->reference(), 9, false));
-	    head  = flv.decodeHeader(buf);
+	    boost::shared_ptr<Flv::flv_header_t> head = flv.decodeHeader(buf);
 	    if (head == 0) {
 		log_error("Couldn't decode the header! %s",  hexify(buf->reference(), 9, false));
 		exit(-1);
@@ -239,7 +239,7 @@ main(int argc, char *argv[])
 		   {
 		       if (all) {
 			   cerr << "FLV Tag type is: Audio" << endl;
- 			   Flv::flv_audio_t *data = flv.decodeAudioData(*(buf->reference() + sizeof(Flv::flv_tag_t)));
+ 			   boost::shared_ptr<Flv::flv_audio_t> data = flv.decodeAudioData(*(buf->reference() + sizeof(Flv::flv_tag_t)));
  			   cout << "\tSound Type is: "   << type_strs[data->type] << endl;
  			   cout << "\tSound Size is: "   << size_strs[data->size] << endl;
  			   cout << "\tSound Rate is: "   << rate_strs[data->rate] << endl;
@@ -251,7 +251,7 @@ main(int argc, char *argv[])
 		   {
 		       if (all) {
 			   cout << "FLV Tag type is: Video" << endl;
- 			   Flv::flv_video_t *data = flv.decodeVideoData(*(buf->reference() + sizeof(Flv::flv_tag_t)));
+ 			   boost::shared_ptr<Flv::flv_video_t> data = flv.decodeVideoData(*(buf->reference() + sizeof(Flv::flv_tag_t)));
  			   cout << "\tCodec ID is: "   << codec_strs[data->codecID] << endl;
  			   cout << "\tFrame Type is: " << frame_strs[data->type] << endl;
 		       }
