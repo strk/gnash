@@ -86,37 +86,39 @@ Flv::encodeHeader(Network::byte_t type)
 }
 
 // Decode a Buffer into a header
-Flv::flv_header_t *
+boost::shared_ptr<Flv::flv_header_t>
 Flv::decodeHeader(boost::shared_ptr<amf::Buffer> buf)
 {
 //    GNASH_REPORT_FUNCTION;
-    memcpy(&_header, buf->begin(), sizeof(Flv::flv_header_t));
+    boost::shared_ptr<flv_header_t> header(new flv_header_t);
+    
+    memcpy(header->reference(), buf->begin(), sizeof(Flv::flv_header_t));
 
     // test the magic number
-    if (memcmp(_header.sig, "FLV", 3) != 0) {
+    if (memcmp(header->sig, "FLV", 3) != 0) {
 	log_error("Bad magic number for FLV file!");
 	return 0;
     }
 
     // Make sure the version is legit, it should alwys be 1
-    if (_header.version != 0x1) {
+    if (header->version != 0x1) {
 	log_error("Bad version in FLV header! %d", _header.version);
 		  return 0;
     }
 
     // Make sure the type is set correctly
-    if (((_header.type & Flv::FLV_AUDIO) && (_header.type & Flv::FLV_VIDEO))
-	|| (_header.type & Flv::FLV_AUDIO) || (_header.type & Flv::FLV_VIDEO)) {
+    if (((header->type & Flv::FLV_AUDIO) && (header->type & Flv::FLV_VIDEO))
+	|| (header->type & Flv::FLV_AUDIO) || (header->type & Flv::FLV_VIDEO)) {
     } else {
-	    log_error("Bad FLV file Type: %d", _header.type);
+	    log_error("Bad FLV file Type: %d", header->type);
     }
     
     // Be lazy, as head_size is an array of 4 bytes, and not an integer in the data
     // structure. This is to get around possible padding done to the data structure
     // done by some compilers.
-    boost::uint32_t size = *(reinterpret_cast<boost::uint32_t *>(_header.head_size));
+    boost::uint32_t size = *(reinterpret_cast<boost::uint32_t *>(header->head_size));
     // The header size is big endian
-    swapBytes(_header.head_size, sizeof(boost::uint32_t));
+    swapBytes(header->head_size, sizeof(boost::uint32_t));
     
     // The header size is always 9, guess it could change some day in the far future, so
     // we should use it.
@@ -125,7 +127,7 @@ Flv::decodeHeader(boost::shared_ptr<amf::Buffer> buf)
 		  return 0;
     }
     
-    return &_header;
+    return header;
 }
 
 // Decode a MetaData object, which is after the header, but before all the tags
@@ -169,12 +171,12 @@ Flv::decodeMetaData(gnash::Network::byte_t *buf, size_t size)
     return el;
 }
 
-Flv::flv_audio_t *
+boost::shared_ptr<Flv::flv_audio_t>
 Flv::decodeAudioData(gnash::Network::byte_t byte)
 {
 //    GNASH_REPORT_FUNCTION;
-    flv_audio_t *audio = new flv_audio_t;
-    memset(audio, 0, sizeof(flv_audio_t));
+    boost::shared_ptr<flv_audio_t> audio(new flv_audio_t);
+    memset(audio->reference(), 0, sizeof(flv_audio_t));
 
     // Get the sound type
     if (byte && Flv::AUDIO_STEREO) {
@@ -228,11 +230,11 @@ Flv::decodeAudioData(gnash::Network::byte_t byte)
     return audio;
 }
 
-Flv::flv_video_t *
+boost::shared_ptr<Flv::flv_video_t>
 Flv::decodeVideoData(gnash::Network::byte_t byte)
 {
 //    GNASH_REPORT_FUNCTION;
-    flv_video_t *video = new flv_video_t;
+    boost::shared_ptr<flv_video_t> video(new flv_video_t);
     memset(video, 0, sizeof(flv_video_t));
 
     // Get the codecID codecID
@@ -286,11 +288,11 @@ Flv::convert24(boost::uint8_t *num)
 }
 
 // Decode the tag header
-Flv::flv_tag_t *
+boost::shared_ptr<Flv::flv_tag_t>
 Flv::decodeTagHeader(boost::shared_ptr<amf::Buffer> buf)
 {
 //    GNASH_REPORT_FUNCTION;
-    flv_tag_t *tag = new flv_tag_t;
+    boost::shared_ptr<flv_tag_t> tag(new flv_tag_t);
     memcpy(tag, buf->reference(), sizeof(flv_tag_t));
 
     // These fields are all 24 bit, big endian integers
