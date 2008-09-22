@@ -1775,7 +1775,7 @@ if test x"$media_handler" = x"ffmpeg"; then
   GNASH_PATH_FFMPEG
   if test x"${media_handler_specified}" = xfalse; then
      # If the library is not found, or its version is not ok, we'll try gst
-     if test x"${ac_cv_path_ffmpeg_lib}" = x -o x"${ffmpeg_version}" != xok; then
+     if test x"${ac_cv_path_ffmpeg_lib}" = x -o x"${ffmpeg_version_check}" != xok; then
        AC_MSG_WARN([No appropriate ffmpeg library found, disabling media handling.])
        media_handler=none
      fi
@@ -2612,7 +2612,7 @@ fi
   if test x"$media_handler" = x"ffmpeg"; then
     if test x"$FFMPEG_LIBS" != x; then
       echo "        MP3 and video support enabled through ffmpeg"
-      if test x"${ffmpeg_version}" != xok; then
+      if test x"${ffmpeg_version_check}" != xok; then
         echo "        ERROR: You have version ${ffmpeg_version} of ffmpeg installed." >&3
         echo "               This version of ffmpeg may not work!" >&3
         echo "               Version 51.27.0 or newer is highly recommended." >&3

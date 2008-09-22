@@ -200,53 +200,71 @@ dnl version numbering fail gracefully.
   if test x"${avcodec_h}" != x; then
 
     AC_MSG_CHECKING([ffmpeg version])
-    ffmpeg_version=`$EGREP "define LIBAVCODEC_VERSION_MAJOR " ${avcodec_h} | sed -e "s%[[^0-9]]%%g"``$EGREP "define LIBAVCODEC_VERSION_MINOR " ${avcodec_h} | sed -e "s%[[^0-9]]%%g"``$EGREP "define LIBAVCODEC_VERSION_MICRO " ${avcodec_h} | sed -e "s%[[^0-9]]%%g"`
-    ffmpeg_num_version=$ffmpeg_version
-    if test x"${ffmpeg_version}" = x ; then
+
+    ffmpeg_major_version=`$EGREP "define LIBAVCODEC_VERSION_MAJOR " ${avcodec_h} | sed -e "s%[[^0-9]]%%g"`
+    ffmpeg_minor_version=`$EGREP "define LIBAVCODEC_VERSION_MINOR " ${avcodec_h} | sed -e "s%[[^0-9]]%%g"`
+    ffmpeg_micro_version=`$EGREP "define LIBAVCODEC_VERSION_MICRO " ${avcodec_h} | sed -e "s%[[^0-9]]%%g"`
+
+    if test x"${ffmpeg_major_version}" != x ; then
+
+      ffmpeg_version="${ffmpeg_major_version}.${ffmpeg_minor_version}.${ffmpeg_micro_version}"
+
+    else
 
       dnl NOTE: the [0-9]*d. pattern discards deb-heads rubbish prefix
-      ffmpeg_version=`$EGREP "define LIBAVCODEC_VERSION " ${avcodec_h} | sed -e "s% [[0-9]]*d\.%%" -e "s%[[^0-9]]%%g"`
-      ffmpeg_num_version=$ffmpeg_version
+      ffmpeg_version=`$EGREP "define LIBAVCODEC_VERSION " ${avcodec_h} | awk '{print $'3'}' | sed -e "s%^[[0-9]]d\.%%"` 
 
       if test x"${ffmpeg_version}" = x ; then
-        ffmpeg_version=`$EGREP "define LIBAVCODEC_BUILD " ${avcodec_h} | sed -e "s%[[^0-9.]]%%g"`
-        ffmpeg_num_version=$ffmpeg_version
+        ffmpeg_version=`$EGREP "define LIBAVCODEC_BUILD " ${avcodec_h} | awk '{print $3}'`
+
+        if test x"${ffmpeg_version}" = x ; then
+          ffmpeg_version=`$EGREP "define LIBAVCODEC_VERSION_TRIPLET " ${avcodec_h} | awk '{print $3}'`
+        fi
       fi
-    fi
-    if test x"${ffmpeg_version}" = x ; then
-      ffmpeg_version=`$EGREP "define LIBAVCODEC_VERSION_TRIPLET " ${avcodec_h} | sed -e "s%[[^0-9]]%%g"`
-      ffmpeg_num_version=$ffmpeg_version
+
+      if test x"${ffmpeg_version}" != x ; then
+        ffmpeg_major_version=`echo ${ffmpeg_version} | cut -d. -f1`
+        ffmpeg_minor_version=`echo ${ffmpeg_version} | cut -d. -f2`
+        ffmpeg_micro_version=`echo ${ffmpeg_version} | cut -d. -f3`
+      fi
+
     fi
 
-    AC_MSG_RESULT($ffmpeg_num_version)
+    ffmpeg_num_version=`printf %2.2d%2.2d%2.2d $ffmpeg_major_version $ffmpeg_minor_version $ffmpeg_micro_version`
+
+    AC_MSG_RESULT($ffmpeg_version ($ffmpeg_num_version))
+
 
 dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfound=no])
   
-    if test -z "$ffmpeg_num_version" -o "$ffmpeg_num_version" -lt 51110; then
-      AC_MSG_WARN([Wrong ffmpeg/libavcodec version! 51.11.0 or greater required])
+    if test -z "$ffmpeg_num_version" -o "$ffmpeg_num_version" -lt 511100; then
+      AC_MSG_WARN([Wrong ffmpeg/libavcodec version! 51.11.0 or greater required, $ffmpeg_version detected.])
     else
-      ffmpeg_version=ok
+      ffmpeg_version_check=ok
     fi
 
-    if test ! -z "$ffmpeg_num_version" -a "$ffmpeg_num_version" -gt 51280; then
+    if test ! -z "$ffmpeg_num_version" -a "$ffmpeg_num_version" -gt 512800; then
+      dnl 51.28.0 or higher required
       AC_DEFINE(FFMPEG_AUDIO2, 1, [Define if avcodec_decode_audio2 can be used.])
     fi
 
-    if test -z "$ffmpeg_num_version" -o "$ffmpeg_num_version" -lt 51270; then
-      AC_MSG_WARN([This version of ffmpeg/libavcodec is not able to play VP6 encoded video!])
+    if test -z "$ffmpeg_num_version" -o "$ffmpeg_num_version" -lt 512700; then
+      dnl 51.27.0 or higher required
+      AC_MSG_WARN([This version of ffmpeg/libavcodec ($ffmpeg_version) is not able to play VP6 encoded video: 51.27.0 or higher required!])
     else
       AC_DEFINE(FFMPEG_VP6, 1, [Define if ffmpeg can play VP6.])
     fi
 
-    if test -z "$ffmpeg_num_version" -o "$ffmpeg_num_version" -lt 51490; then
-      AC_MSG_WARN([This version of ffmpeg/libavcodec is not able to play VP6A encoded video!])
+    if test -z "$ffmpeg_num_version" -o "$ffmpeg_num_version" -lt 514900; then
+      dnl 51.49.0 or higher required
+      AC_MSG_WARN([This version of ffmpeg/libavcodec ($ffmpeg_version) is not able to play VP6A encoded video: 51.49.0 or higher required!])
     else
       AC_DEFINE(FFMPEG_VP6A, 1, [Define if ffmpeg can play VP6A.])
     fi
 
   else
     AC_MSG_WARN([Could not check ffmpeg version (dunno where avcodec.h is)])
-    ffmpeg_version=ok # trust the user-specified dir
+    ffmpeg_version_check=ok # trust the user-specified dir
   fi
 
   # Eliminate the pointless -I/usr/include, which can happen
@@ -272,7 +290,7 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
   AC_MSG_RESULT($avformat_h)
 
   dnl look for swscale.h, but ignore versions older than 51.40.3
-  if test $ffmpeg_num_version -gt 51403; then
+  if test $ffmpeg_num_version -gt 514003; then
     if test -f "${topdir}/ffmpeg/swscale.h"; then
       AC_DEFINE(HAVE_FFMPEG_SWSCALE_H, 1, [Define if swscale.h is found])
     fi
