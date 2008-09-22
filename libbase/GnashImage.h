@@ -102,7 +102,7 @@ public:
     
     virtual void writeImageRGBA(unsigned char* /*rgbaData*/)
     {
-        log_error("This image format does not support writing RGBA images");
+        log_error(_("This image format does not support writing RGBA images"));
     }
 
 protected:
