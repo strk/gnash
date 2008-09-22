@@ -145,7 +145,8 @@ if USE_FFMPEG_ENGINE
 		ffmpeg/AudioDecoderFfmpeg.h \
 		ffmpeg/VideoDecoderFfmpeg.h \
 		ffmpeg/sound_handler_sdl.h \
-		ffmpeg/ffmpegNetStreamUtil.h 
+		ffmpeg/ffmpegNetStreamUtil.h \
+		ffmpeg/ffmpegHeaders.h
 
    libgnashmedia_la_LIBADD += \
 		$(FFMPEG_LIBS) \
