@@ -97,7 +97,7 @@ RTMPMsg::checkStatus(amf::Element * /* el */)
 //		    child->dump();
 		    string name = child->getName();
 		    string value;
-		    if (child->getLength()) {
+		    if (child->getDataSize()) {
 			value = child->to_string();
 			if (name == "code") {
 //			    log_debug("Name is: %s, Value is: %s", name.c_str(), value.c_str());

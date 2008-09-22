@@ -25,6 +25,7 @@
 #include <string>
 #include <map>
 #include <boost/cstdint.hpp>
+#include <boost/shared_ptr.hpp>
 #include <boost/detail/endian.hpp>
 
 #if ! (defined(_WIN32) || defined(WIN32))
@@ -116,14 +117,14 @@ RTMPServer::handShakeResponse()
 {
     GNASH_REPORT_FUNCTION;
 
-    amf::Buffer *buf1 = new amf::Buffer(RTMP_BODY_SIZE + 1);
-    *buf1->begin() = RTMP_HANDSHAKE;
-    buf1->append(_handshake);
-    _handler->pushout(buf1);
+    boost::shared_ptr<amf::Buffer> buf1(new amf::Buffer(RTMP_BODY_SIZE + 1));
+    *buf1 = RTMP_HANDSHAKE;
+    *buf1 += _handshake;
+//  _handler->pushout(buf1); FIXME:
 
-    amf::Buffer *buf2 = new amf::Buffer(RTMP_BODY_SIZE);
+    boost::shared_ptr<amf::Buffer> buf2(new amf::Buffer(RTMP_BODY_SIZE));
     buf2->copy(_handshake->begin(), RTMP_BODY_SIZE);
-    _handler->pushout(buf2);
+//    _handler->pushout(buf2); FIXME:
     
 //     std::copy(_handshake->begin(), _handshake->end(), (buf1->begin() + 1));    
 //     amf::Buffer *buf = new amf::Buffer(RTMP_BODY_SIZE + 1);
@@ -342,13 +343,13 @@ RTMPServer::packetRead(amf::Buffer *buf)
     Element *app = getProperty("app");
 
     if (file) {
-	log_debug("SWF file %s", file->getData());
+	log_debug("SWF file %s", file->to_string());
     }
     if (url) {
-	log_debug("is Loading video %s", url->getData());
+	log_debug("is Loading video %s", url->to_string());
     }
     if (app) {
-	log_debug("is file name is %s", app->getData());
+	log_debug("is file name is %s", app->to_string());
     }
     
     return true;
@@ -368,7 +369,7 @@ RTMPServer::packetRead(amf::Buffer *buf)
 //
 // _result(double ClientStream, NULL, double ServerStream)
 // These are handlers for the various types
-amf::Buffer *
+boost::shared_ptr<Buffer>
 RTMPServer::encodeResult(RTMPMsg::rtmp_status_e status)
 {
     GNASH_REPORT_FUNCTION;
@@ -489,22 +490,19 @@ RTMPServer::encodeResult(RTMPMsg::rtmp_status_e status)
 	  break;
     };
     
-    Buffer *strbuf = str->encode();
-    Buffer *numbuf = number->encode();
-    Buffer *topbuf = top.encode();
+    boost::shared_ptr<amf::Buffer> strbuf = str->encode();
+    boost::shared_ptr<amf::Buffer> numbuf = number->encode();
+    boost::shared_ptr<amf::Buffer> topbuf = top.encode();
 
-    Buffer *buf = new Buffer(strbuf->size() + numbuf->size() + topbuf->size());
-    buf->append(strbuf);
-    buf->append(numbuf);
+    boost::shared_ptr<amf::Buffer> buf(new Buffer(strbuf->size() + numbuf->size() + topbuf->size()));
+    *buf += strbuf;
+    *buf += numbuf;
     Network::byte_t byte = static_cast<Network::byte_t>(RTMP::SERVER & 0x000000ff);
-    buf->append(byte);
-    buf->append(topbuf);
+    *buf += byte;
+    *buf += topbuf;
 
     delete str;
     delete number;
-    delete strbuf;
-    delete numbuf;
-//    delete topbuf;//   FIXME: deleting this shouldn't core dump.
     
     return buf;
 }
@@ -613,18 +611,18 @@ rtmp_handler(Handler::thread_params_t *args)
 // A RTMP Ping packet looks like this: "02 00 00 00 00 00 06 04 00 00 00 00 00 00 00 00 00 0",
 // which is the Ping type byte, followed by two shorts that are the parameters. Only the first
 // two paramters are required.
-amf::Buffer *
+boost::shared_ptr<Buffer>
 RTMPServer::encodePing(rtmp_ping_e type)
 {
     GNASH_REPORT_FUNCTION;
     return encodePing(type, 0);
 }
 
-amf::Buffer *
+boost::shared_ptr<Buffer>
 RTMPServer::encodePing(rtmp_ping_e type, boost::uint32_t milliseconds)
 {
     GNASH_REPORT_FUNCTION;
-    Buffer *buf = new Buffer(sizeof(boost::uint16_t) * 3);
+    boost::shared_ptr<amf::Buffer> buf(new Buffer(sizeof(boost::uint16_t) * 3));
     Network::byte_t *ptr = buf->reference();
     buf->clear();	// default everything to zeros, real data gets optionally added.
 
@@ -636,7 +634,7 @@ RTMPServer::encodePing(rtmp_ping_e type, boost::uint32_t milliseconds)
     ptr += sizeof(boost::uint16_t); // go past the first short
 
     boost::uint32_t swapped = 0;
-    buf->copy(typefield);
+    *buf = typefield;
     switch (type) {
         // These two don't appear to have any paramaters
       case PING_CLEAR:
@@ -648,7 +646,7 @@ RTMPServer::encodePing(rtmp_ping_e type, boost::uint32_t milliseconds)
 	  ptr += sizeof(boost::uint16_t); // go past the second short
 	  swapped = milliseconds;
 	  swapBytes(&swapped, sizeof(boost::uint32_t));
-	  buf->append(swapped);
+	  buf->append((Network::byte_t *)&swapped, sizeof(boost::uint32_t));
 	  break;
       }
       // reset doesn't have any parameters
@@ -661,11 +659,10 @@ RTMPServer::encodePing(rtmp_ping_e type, boost::uint32_t milliseconds)
 //	  swapped = htonl(milliseconds);
 	  swapped = milliseconds;
 	  swapBytes(&swapped, sizeof(boost::uint32_t));
-	  buf->append(swapped);
+	  buf->append((Network::byte_t *)&swapped, sizeof(boost::uint32_t));
 	  break;
       }
       default:
-	  return 0;
 	  break;
     };
     
