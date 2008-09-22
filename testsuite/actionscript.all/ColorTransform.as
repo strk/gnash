@@ -85,10 +85,34 @@ c = new ColorTransform(new Object, 3, "string", true, ASnative(100,9), new Error
 
 xcheck_equals (c.toString(), "(redMultiplier=NaN, greenMultiplier=3, blueMultiplier=NaN, alphaMultiplier=1, redOffset=NaN, greenOffset=NaN, blueOffset=NaN, alphaOffset=456)");
 
+// Only 8 or more arguments are valid.
+c = new ColorTransform(0, 2, 3);
+xcheck_equals (c.toString(), "(redMultiplier=1, greenMultiplier=1, blueMultiplier=1, alphaMultiplier=1, redOffset=0, greenOffset=0, blueOffset=0, alphaOffset=0)");
+
+c = new ColorTransform(0, 2, 3, 4);
+xcheck_equals (c.toString(), "(redMultiplier=1, greenMultiplier=1, blueMultiplier=1, alphaMultiplier=1, redOffset=0, greenOffset=0, blueOffset=0, alphaOffset=0)");
+
+c = new ColorTransform(0, 2, 3, 4, 5, 6, 7);
+xcheck_equals (c.toString(), "(redMultiplier=1, greenMultiplier=1, blueMultiplier=1, alphaMultiplier=1, redOffset=0, greenOffset=0, blueOffset=0, alphaOffset=0)");
+
+c = new ColorTransform(0, 2, 3, 4, 5, 6, 7, 8);
+xcheck_equals (c.toString(), "(redMultiplier=0, greenMultiplier=2, blueMultiplier=3, alphaMultiplier=4, redOffset=5, greenOffset=6, blueOffset=7, alphaOffset=8)");
+
+c = new ColorTransform(0, 2, 3, 4, 5, 6, 7, 8, 9);
+xcheck_equals (c.toString(), "(redMultiplier=0, greenMultiplier=2, blueMultiplier=3, alphaMultiplier=4, redOffset=5, greenOffset=6, blueOffset=7, alphaOffset=8)");
+
+// Check object type strictness.
+
+o = { redMultiplier:2, greenMultiplier:3, blueMultiplier:3, alphaMultiplier:0, redOffset:3, greenOffset:4, blueOffset:3, alphaOffset:3 };
+o.toString = ColorTransform.toString;
+check_equals(o.toString(), "[object Object]");
+
+
+
 //-------------------------------------------------------------
 // END OF TEST
 //-------------------------------------------------------------
 
-totals(29);
+totals(35);
 
 #endif // OUTPUT_VERSION >= 8
