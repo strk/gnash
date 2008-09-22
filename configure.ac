@@ -2763,6 +2763,10 @@ if test x"$docbook" = x"yes"; then
   else
     echo "        You have version $db2x_version of the DocBook2X tools."
   fi
+else
+  echo "        WARNING: without --enable-docbook we will use the cached" >&4
+  echo "                 documentation files included in the gnash distribution." >&4
+  echo "                 If you change files in doc/C, you should --enable-docbook." >&4
 fi
 
 if test x"$CURL_LIBS" != x; then
