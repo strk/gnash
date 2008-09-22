@@ -3071,7 +3071,7 @@ fi
 dnl If anything critical is missing, don't bother to continue
 if test -s $cerr; then
   echo ""
-  cat $cerr
+  cat $cerr >&2
   rm $cerr
   AC_MSG_ERROR([Please install required packages])
 fi
