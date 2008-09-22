@@ -112,7 +112,7 @@ public:
     
     // Make ourselves be the same as another Element.
     Element &operator=(Element &);
-//    Element &operator=(Element *);
+//    Element &operator=(boost::shared_ptr<Element>);
 
     // Make ourselves be the same as other commonly used data types. Note
     // that this can;t be used for properties unless you call setName() later.
@@ -131,7 +131,7 @@ public:
 
     // Make a number element
     Element &makeNumber(double num); 
-    Element &makeNumber(amf::Buffer *buf); 
+    Element &makeNumber(boost::shared_ptr<amf::Buffer> buf); 
     Element &makeNumber(gnash::Network::byte_t *data);
     Element &makeNumber(const std::string &name, double num) ;
     Element &makeNumber(const std::string &name, gnash::Network::byte_t *data);
@@ -155,8 +155,8 @@ public:
     // Make an AMF Object. This is an AMF type that support having properties.
     Element &makeObject();
     Element &makeObject(const std::string &name);
-    Element &makeObject(std::vector<Element *> &data);
-    Element &makeObject(const std::string &name, std::vector<Element *> &data);
+    Element &makeObject(std::vector<boost::shared_ptr<amf::Element> > &data);
+    Element &makeObject(const std::string &name, std::vector<boost::shared_ptr<amf::Element> > &data);
     
     // Make an XML Object. This is like a string object, but the type is different.
     Element &makeXMLObject();
@@ -167,15 +167,15 @@ public:
     // the same as an object, but with a different type.
     Element &makeECMAArray();
     Element &makeECMAArray(const std::string &name);
-    Element &makeECMAArray(std::vector<Element *> &data);
-    Element &makeECMAArray(const std::string &name, std::vector<Element *> &data);
+    Element &makeECMAArray(std::vector<boost::shared_ptr<amf::Element> > &data);
+    Element &makeECMAArray(const std::string &name, std::vector<boost::shared_ptr<amf::Element> > &data);
 
     // Make a Strict array. This is an array of a single AMF type. These are stored
     // the same as an object, but with a different type.
     Element &makeStrictArray();
     Element &makeStrictArray(const std::string &name);
-    Element &makeStrictArray(std::vector<Element *> &data);
-    Element &makeStrictArray(const std::string &name, std::vector<Element *> &data);
+    Element &makeStrictArray(std::vector<boost::shared_ptr<amf::Element> > &data);
+    Element &makeStrictArray(const std::string &name, std::vector<boost::shared_ptr<amf::Element> > &data);
 
     Element &makeTypedObject(const std::string &name);
     Element &makeTypedObject(gnash::Network::byte_t *data, size_t size);
@@ -204,10 +204,10 @@ public:
     
     // Test to see if Elements are the same
     bool operator==(Element &);
-    bool operator==(Element *);
+    bool operator==(boost::shared_ptr<amf::Element> );
     bool operator==(bool x);
 
-    Element *operator[](size_t x);
+    boost::shared_ptr<amf::Element> operator[](size_t x);
 
 //    gnash::Network::byte_t *getData();
     size_t getDataSize() const;
@@ -232,15 +232,14 @@ public:
     void setName(const char *name, size_t x);
 
     // Manipulate the children Elements of an object
-    Element *findProperty(const std::string &name);
-    Element *getProperty(size_t x) const { return _properties[x]; };
+    boost::shared_ptr<Element> findProperty(const std::string &name);
+    boost::shared_ptr<Element> getProperty(size_t x) const { return _properties[x]; };
     
-    void addProperty(Element &el) { _properties.push_back(&el); };
-    void addProperty(Element *el) { _properties.push_back(el); };
-    Element *popProperty()        { return _properties.front(); };
+    void addProperty(boost::shared_ptr<Element> el) { _properties.push_back(el); };
+    boost::shared_ptr<Element> popProperty()        { return _properties.front(); };
     size_t propertySize() const   { return _properties.size(); };
     boost::shared_ptr<Buffer> encode();
-    std::vector<Element *> getProperties() { return _properties; };
+    std::vector<boost::shared_ptr<Element> > getProperties() { return _properties; };
     void dump() const { dump(std::cerr); }
     void dump(std::ostream& os) const;
 private:
@@ -248,7 +247,7 @@ private:
     char		*_name;
     boost::shared_ptr<Buffer> _buffer;
     amf0_type_e		_type;
-    std::vector<Element	*> _properties;
+    std::vector<boost::shared_ptr<Element> > _properties;
 };                              // end of class definition
 
 inline std::ostream& operator << (std::ostream& os, const Element& el)

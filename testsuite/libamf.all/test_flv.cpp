@@ -190,8 +190,9 @@ test_tags()
     bool notest = false;
 
     boost::shared_ptr<amf::Buffer> hex1(new Buffer("02 00 0a 6f 6e 4d 65 74 61 44 61 74 61 08 00 00 00 00 00 08 64 75 72 61 74 69 6f 6e 00 40 6d 6e 24 dd 2f 1a a0 00 0c 76 69 64 65 6f 63 6f 64 65 63 69 64 00 40 00 00 00 00 00 00 00 00 0c 61 75 64 69 6f 63 6f 64 65 63 69 64 00 40 00 00 00 00 00 00 00 00 0c 63 61 6e 53 65 65 6b 54 6f 45 6e 64 01 00 00 09 63 72 65 61 74 65 64 62 79 02 00 07 46 4d 53 20 33 2e 30 00 0c 63 72 65 61 74 69 6f 6e 64 61 74 65 02 00 18 54 75 65 20 4a 75 6e 20 32 34 20 30 38 3a 30 33 3a 34 38 20 32 30 30 38 00 00 09"));
-    Element *el1 = flv.decodeMetaData(hex1);
-    if (el1 == 0) {
+    boost::shared_ptr<amf::Element> el1 = flv.decodeMetaData(hex1);
+    el1->dump();
+    if (!el1) {
         notest = true;
     } 
     if (notest) {
@@ -204,7 +205,6 @@ test_tags()
         } else {
             runtest.fail("Decoded FLV MetaData object");
         }
-        delete el1;
     }
 
     // Test decoding Audio tags
@@ -233,8 +233,8 @@ test_tags()
     }
 
     boost::shared_ptr<amf::Buffer> hex4(new Buffer("00 0a 6f 6e 4d 65 74 61 44 61 74 61 08 00 00 00 00 00 08 64 75 72 61 74 69 6f 6e 00 40 6d 6e 24 dd 2f 1a a0 00 0c 76 69 64 65 6f 63 6f 64 65 63 69 64 00 40 00 00 00 00 00 00 00 00 0c 61 75 64 69 6f 63 6f 64 65 63 69 64 00 40 00 00 00 00 00 00 00 00 0c 63 61 6e 53 65 65 6b 54 6f 45 6e 64 01 00 00 09 63 72 65 61 74 65 64 62 79 02 00 07 46 4d 53 20 33 2e 30 00 0c 63 72 65 61 74 69 6f 6e 64 61 74 65 02 00 18 54 75 65 20 4a 75 6e 20 32 34 20 30 38 3a 30 33 3a 34 38 20 32 30 30 38 00 00 09"));
-    Element *el4 = flv.decodeMetaData(hex4);
-    if (el4 == 0) {
+    boost::shared_ptr<amf::Element> el4 = flv.decodeMetaData(hex4);
+    if (!el4) {
         notest = true;
     } 
     if (notest) {
@@ -247,7 +247,6 @@ test_tags()
         } else {
             runtest.fail("Decoded FLV MetaData object without type");
         }
-        delete el4;
     }
 
 #if 0

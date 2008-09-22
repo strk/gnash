@@ -207,34 +207,35 @@ RTMP::~RTMP()
 }
 
 void
-RTMP::addProperty(amf::Element *el)
+RTMP::addProperty(boost::shared_ptr<amf::Element> el)
 {
 //    GNASH_REPORT_FUNCTION;
     _properties[el->getName()] = el;
 }
 
 void
-RTMP::addProperty(char *name, amf::Element *el)
+RTMP::addProperty(char *name, boost::shared_ptr<amf::Element> el)
 { 
 //    GNASH_REPORT_FUNCTION;
     _properties[name] = el;
 }
 
-amf::Element *
+boost::shared_ptr<amf::Element> 
 RTMP::getProperty(const std::string &name)
 {
 //    GNASH_REPORT_FUNCTION;
 //    return _properties[name.c_str()];
-    map<const char *, amf::Element *>::iterator it;
+    map<const char *, boost::shared_ptr<amf::Element> >::iterator it;
     for (it = _properties.begin(); it != _properties.end(); it++) {
 	const char *title = it->first;
-	amf::Element *el = it->second;
+	boost::shared_ptr<amf::Element> el = it->second;
 	if (name == title) {
 // 	    log_debug("found variable in RTMP packet: %s", name);
 	    return el;
 	}
     }
-    return 0;
+    boost::shared_ptr<amf::Element> el;
+    return el;
 }
 
 RTMP::rtmp_head_t *
@@ -452,14 +453,14 @@ RTMP::packetRead(boost::shared_ptr<amf::Buffer> buf)
 //    ptr = decodeHeader(ptr);
 //    ptr += headersize;
     
-    amf::Element *el = amf.extractAMF(ptr, tooFar);
+    boost::shared_ptr<amf::Element> el = amf.extractAMF(ptr, tooFar);
 //    el->dump();
-    el = amf.extractAMF(ptr, tooFar) + 1; // @@strk@@ : what's the +1 for ?
+    el = amf.extractAMF(ptr, tooFar); // @@strk@@ : what's the +1 for ?
 //    el->dump();
     log_debug (_("Reading AMF packets till we're done..."));
 //    buf->dump();
     while (ptr < end) {
-	amf::Element *el = amf.extractProperty(ptr, tooFar);
+	boost::shared_ptr<amf::Element> el = amf.extractProperty(ptr, tooFar);
 	addProperty(el);
 //	el->dump();
     }
@@ -472,16 +473,16 @@ RTMP::packetRead(boost::shared_ptr<amf::Buffer> buf)
 //	buf = _handler->merge(buf); FIXME needs to use shared_ptr
     }
     while ((ptr - buf->begin()) < static_cast<int>(actual_size)) {
-	amf::Element *el = amf.extractProperty(ptr, tooFar);
+	boost::shared_ptr<amf::Element> el = amf.extractProperty(ptr, tooFar);
 	addProperty(el);
 //	el->dump();		// FIXME: dump the AMF objects as they are read in
     }
 
 //    dump();
     
-    amf::Element *url = getProperty("tcUrl");
-    amf::Element *file = getProperty("swfUrl");
-    amf::Element *app = getProperty("app");
+    boost::shared_ptr<amf::Element> url = getProperty("tcUrl");
+    boost::shared_ptr<amf::Element> file = getProperty("swfUrl");
+    boost::shared_ptr<amf::Element> app = getProperty("app");
     
     if (file) {
 	log_debug("SWF file %s", file->to_string());
@@ -500,10 +501,10 @@ void
 RTMP::dump()
 {
     cerr << "RTMP packet contains " << _properties.size() << " variables." << endl;
-    map<const char *, amf::Element *>::iterator it;
+    map<const char *, boost::shared_ptr<amf::Element> >::iterator it;
     for (it = _properties.begin(); it != _properties.end(); it++) {
 //	const char *name = it->first;
-	amf::Element *el = it->second;
+	boost::shared_ptr<amf::Element> el = it->second;
 	el->dump();
     }
 }
@@ -612,7 +613,7 @@ RTMP::decodeMsgBody(Network::byte_t *data, size_t size)
     bool status = false;
 
     // The first data object is the method name of this object.
-    Element *name = amf_obj.extractAMF(ptr, tooFar);
+    boost::shared_ptr<amf::Element> name = amf_obj.extractAMF(ptr, tooFar);
     if (name) {
 	ptr += name->getDataSize() + 3; // skip the length bytes too
     } else {
@@ -622,7 +623,7 @@ RTMP::decodeMsgBody(Network::byte_t *data, size_t size)
 
     // The stream ID is the second data object. All messages have these two objects
     // at the minimum.
-    Element *streamid = amf_obj.extractAMF(ptr, tooFar);
+    boost::shared_ptr<amf::Element> streamid = amf_obj.extractAMF(ptr, tooFar);
     if (streamid) {
 	// Most onStatus messages have the stream ID, but the Data Start onStatus
 	// message is basically just a marker that an FLV file is coming next.
@@ -652,7 +653,7 @@ RTMP::decodeMsgBody(Network::byte_t *data, size_t size)
     // properties attached.
     while (ptr < tooFar) {
 	// These pointers get deleted automatically when the msg object is deleted
-        amf::Element *el = amf_obj.extractAMF(ptr, tooFar);
+        boost::shared_ptr<amf::Element> el = amf_obj.extractAMF(ptr, tooFar);
 	ptr += amf_obj.totalsize();
         if (el == 0) {
 	    break;
@@ -662,11 +663,7 @@ RTMP::decodeMsgBody(Network::byte_t *data, size_t size)
  	if (status) {
 	    msg->checkStatus(el);
 	}
-    };
-    
-    // cleanup after ourselves
-    delete name;
-    delete streamid;
+    };    
     
     return msg;
 }

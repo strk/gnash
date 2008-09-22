@@ -63,15 +63,6 @@ RTMPMsg::RTMPMsg()
 RTMPMsg::~RTMPMsg()
 {
 //    GNASH_REPORT_FUNCTION;
-    vector<amf::Element *>::iterator it;
-    for (it = _amfobjs.begin(); it != _amfobjs.end(); it++) {
-	amf::Element *el = (*(it));
-	if (el) {
-//             el->dump();
-	    delete el;
-	}
-    }
-    
 }
 
 // All the result messages from the server are ASCII text, so they have to be parsed to
@@ -79,21 +70,21 @@ RTMPMsg::~RTMPMsg()
 // error, or onStatus message, the actual data can be obtained from the Element.
 // 
 RTMPMsg::rtmp_status_e
-RTMPMsg::checkStatus(amf::Element * /* el */)
+RTMPMsg::checkStatus(boost::shared_ptr<amf::Element>  /* el */)
 {
 //    GNASH_REPORT_FUNCTION;
     if (_amfobjs.size() > 0) {
-	vector<amf::Element *>::iterator pit;
-	vector<amf::Element *>::iterator cit;
+	vector<boost::shared_ptr<amf::Element> >::iterator pit;
+	vector<boost::shared_ptr<amf::Element> >::iterator cit;
 //	cerr << "# of Properties in object" << _amfobjs.size() << endl;
 	for (pit = _amfobjs.begin(); pit != _amfobjs.end(); pit++) {
-	    amf::Element *el = (*(pit));
-	    std::vector<amf::Element *> props = el->getProperties();
+	    boost::shared_ptr<amf::Element> el = (*(pit));
+	    std::vector<boost::shared_ptr<amf::Element> > props = el->getProperties();
 //  	    printf("FIXME2: %d, %s:%s\n", props.size(),
 //  		   props[2]->getName(), props[2]->to_string());
 	    if (el->getType() == Element::OBJECT_AMF0) {
 		for (cit = props.begin(); cit != props.end(); cit++) {
-		    amf::Element *child = (*(cit));
+		    boost::shared_ptr<amf::Element> child = (*(cit));
 //		    child->dump();
 		    string name = child->getName();
 		    string value;
@@ -259,7 +250,7 @@ RTMPMsg::checkStatus(amf::Element * /* el */)
     return _status;
 }
 
-Element *
+boost::shared_ptr<amf::Element>
 RTMPMsg::operator[](size_t index)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -267,7 +258,8 @@ RTMPMsg::operator[](size_t index)
 	return _amfobjs[index];
     }
     
-    return 0;
+    boost::shared_ptr<amf::Element> el;
+    return el;
 };
 
 void
@@ -282,10 +274,10 @@ RTMPMsg::dump()
 //    cerr << "Stream ID:\t" << hexify((const unsigned char *)&_streamid, 8, false) << endl;
     cerr << "Stream ID:\t" << _streamid << endl;
 
-    vector<amf::Element *>::iterator ait;
+    vector<boost::shared_ptr<amf::Element> >::iterator ait;
     cerr << "# of Elements in file: " << _amfobjs.size() << endl;
     for (ait = _amfobjs.begin(); ait != _amfobjs.end(); ait++) {
-	amf::Element *el = (*(ait));
+	boost::shared_ptr<amf::Element> el = (*(ait));
         el->dump();
     }
 }

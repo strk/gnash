@@ -133,13 +133,13 @@ Flv::decodeHeader(boost::shared_ptr<amf::Buffer> buf)
 }
 
 // Decode a MetaData object, which is after the header, but before all the tags
-amf::Element *
+boost::shared_ptr<amf::Element> 
 Flv::decodeMetaData(boost::shared_ptr<amf::Buffer> buf)
 {
     return decodeMetaData(buf->reference(), buf->size());
 }
 
-amf::Element *
+boost::shared_ptr<amf::Element> 
 Flv::decodeMetaData(gnash::Network::byte_t *buf, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -166,7 +166,7 @@ Flv::decodeMetaData(gnash::Network::byte_t *buf, size_t size)
     ptr += length;
     
     // Extract the properties for this metadata object.
-    Element *el = amf.extractAMF(ptr, tooFar);
+    boost::shared_ptr<amf::Element> el = amf.extractAMF(ptr, tooFar);
     ptr += amf.totalsize();
     el->setName(name.c_str(), length);
 
@@ -306,21 +306,22 @@ Flv::decodeTagHeader(boost::shared_ptr<amf::Buffer> buf)
     return tag;
 }
 
-amf::Element *
+boost::shared_ptr<amf::Element> 
 Flv::findProperty(const std::string &name)
 {
     if (_properties.size() > 0) {
-	vector<amf::Element *>::iterator ait;
+	vector<boost::shared_ptr<amf::Element> >::iterator ait;
 //	cerr << "# of Properties in object: " << _properties.size() << endl;
 	for (ait = _properties.begin(); ait != _properties.end(); ait++) {
-	    amf::Element *el = (*(ait));
+	    boost::shared_ptr<amf::Element> el = (*(ait));
 	    if (el->getName() == name) {
 		return el;
 	    }
 //	    el->dump();
 	}
     }
-    return 0;
+    boost::shared_ptr<amf::Element> el;
+    return el;
 }
 
 void
@@ -328,10 +329,10 @@ Flv::dump()
 {
 //    GNASH_REPORT_FUNCTION;
     if (_properties.size() > 0) {
-	vector<amf::Element *>::iterator ait;
+	vector<boost::shared_ptr<amf::Element> >::iterator ait;
 	cerr << "# of Properties in object: " << _properties.size() << endl;
 	for (ait = _properties.begin(); ait != _properties.end(); ait++) {
-	    amf::Element *el = (*(ait));
+	    boost::shared_ptr<amf::Element> el = (*(ait));
             // an onMetaData packet of an FLV stream only contains number or
             // boolean bydefault
             if (el->getType() == Element::NUMBER_AMF0) {

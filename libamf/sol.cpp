@@ -20,6 +20,7 @@
 #endif
 
 #include <boost/cstdint.hpp>
+#include <boost/shared_ptr.hpp>
 #include <cerrno>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -86,13 +87,6 @@ SOL::SOL()
 SOL::~SOL()
 {
 //    GNASH_REPORT_FUNCTION;
-    vector<amf::Element *>::iterator it;
-    for (it = _amfobjs.begin(); it != _amfobjs.end(); it++) {
-	amf::Element *el = (*(it));
-	if (el) {
-	    delete el;
-	}
-    }
 }
 
 bool
@@ -110,7 +104,7 @@ SOL::extractHeader(const vector<unsigned char> & /*data*/)
 }
 
 void
-SOL::addObj(amf::Element *el)
+SOL::addObj(boost::shared_ptr<amf::Element> el)
 {
 //    GNASH_REPORT_FUNCTION;
     _amfobjs.push_back(el);
@@ -222,7 +216,7 @@ SOL::writeFile(const string &filespec, const string &name)
     }
     
     vector<Network::byte_t>::iterator it;
-    vector<amf::Element *>::iterator ita; 
+    vector<boost::shared_ptr<amf::Element> >::iterator ita; 
     AMF amf_obj;
     char *ptr;
     int size = 0;
@@ -232,7 +226,7 @@ SOL::writeFile(const string &filespec, const string &name)
     }
 
     for (ita = _amfobjs.begin(); ita != _amfobjs.end(); ita++) {
-        amf::Element *el = (*(ita));
+        boost::shared_ptr<amf::Element> el = (*(ita));
 	size += el->getNameSize() + el->getDataSize() + 7;
     }
     _filesize = size;
@@ -243,7 +237,7 @@ SOL::writeFile(const string &filespec, const string &name)
     char* endPtr = ptr+size+20; // that's the amount we allocated..
 
     for (ita = _amfobjs.begin(); ita != _amfobjs.end(); ita++) {
-        amf::Element *el = (*(ita));
+        boost::shared_ptr<Element> el = (*(ita));
         boost::shared_ptr<amf::Buffer> var = amf_obj.encodeProperty(el); 
         //  Network::byte_t *var = amf_obj.encodeProperty(el, outsize); 
         if (!var) {
@@ -394,7 +388,7 @@ SOL::readFile(const std::string &filespec)
 	    ptr += 4;
 	    
 	    AMF amf_obj;
-	    amf::Element *el;
+	    boost::shared_ptr<amf::Element> el;
 	    while ( ptr < tooFar) {
 		if (ptr) {
 		    el = amf_obj.extractProperty(ptr, tooFar);
@@ -426,14 +420,14 @@ SOL::readFile(const std::string &filespec)
 void
 SOL::dump()
 {
-    vector<amf::Element *>::iterator it;
+    vector<boost::shared_ptr<amf::Element> >::iterator it;
 
     cerr << "Dumping SOL file" << endl;
     cerr << "The file name is: " << _filespec << endl;
     cerr << "The size of the file is: " << _filesize << endl;
     cerr << "The name of the object is: " << _objname << endl;
     for (it = _amfobjs.begin(); it != _amfobjs.end(); it++) {
-	amf::Element *el = (*(it));
+	boost::shared_ptr<amf::Element> el = (*(it));
         cerr << el->getName() << ": ";
         if (el->getType() == Element::STRING_AMF0) {
             if (el->getDataSize() != 0) {

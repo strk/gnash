@@ -147,7 +147,7 @@ test_read(std::string &filespec)
     if (stat(filespec.c_str(), &st) == 0) {
         SOL sol;
         sol.readFile(filespec);
-        vector<amf::Element *> els = sol.getElements();
+        vector<boost::shared_ptr<amf::Element> > els = sol.getElements();
 
         if (els.size() > 1) {
             string str = els[2]->to_string();

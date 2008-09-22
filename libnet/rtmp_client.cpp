@@ -30,6 +30,7 @@
 #	include <netinet/in.h>
 #endif
 
+#include <boost/shared_ptr.hpp>
 #include "log.h"
 #include "rc.h"
 #include "amf.h"
@@ -93,7 +94,7 @@ RTMPClient::encodeConnect(const char *app, const char *swfUrl, const char *tcUrl
     Element obj;
     obj.makeObject();
     
-    Element *appnode = new Element;
+    boost::shared_ptr<amf::Element> appnode(new Element);
     appnode->makeString("app", app);
     obj.addProperty(appnode);
 
@@ -104,45 +105,45 @@ RTMPClient::encodeConnect(const char *app, const char *swfUrl, const char *tcUrl
         version = "LNX 9,0,31,0";
     }  
 
-    Element *flashVer = new Element;
+    boost::shared_ptr<amf::Element> flashVer(new Element);
     flashVer->makeString("flashVer", "LNX 9,0,31,0");
     obj.addProperty(flashVer);
     
-    Element *swfUrlnode = new Element;
+    boost::shared_ptr<amf::Element> swfUrlnode(new Element);
 //    swfUrl->makeString("swfUrl", "http://192.168.1.70/software/gnash/tests/ofla_demo.swf");
     swfUrlnode->makeString("swfUrl", swfUrl);
     obj.addProperty(swfUrlnode);
 
 //    filespec = "rtmp://localhost/oflaDemo";
-    Element *tcUrlnode = new Element;
+    boost::shared_ptr<amf::Element> tcUrlnode(new Element);
     tcUrlnode->makeString("tcUrl", tcUrl);
     obj.addProperty(tcUrlnode);
 
-    Element *fpad = new Element;
+    boost::shared_ptr<amf::Element> fpad(new Element);
     fpad->makeBoolean("fpad", false);
     obj.addProperty(fpad);
 
-    Element *audioCodecsnode = new Element;
+    boost::shared_ptr<amf::Element> audioCodecsnode(new Element);
 //    audioCodecsnode->makeNumber("audioCodecs", 615);
     audioCodecsnode->makeNumber("audioCodecs", audioCodecs);
     obj.addProperty(audioCodecsnode);
     
-    Element *videoCodecsnode = new Element;
+    boost::shared_ptr<amf::Element> videoCodecsnode(new Element);
 //    videoCodecsnode->makeNumber("videoCodecs", 124);
     videoCodecsnode->makeNumber("videoCodecs", videoCodecs);
     obj.addProperty(videoCodecsnode);
 
-    Element *videoFunctionnode = new Element;
+    boost::shared_ptr<amf::Element> videoFunctionnode(new Element);
 //    videoFunctionnode->makeNumber("videoFunction", 0x1);
     videoFunctionnode->makeNumber("videoFunction", videoFunction);
     obj.addProperty(videoFunctionnode);
 
-    Element *pageUrlnode = new Element;
+    boost::shared_ptr<amf::Element> pageUrlnode(new Element);
 //    pageUrlnode->makeString("pageUrl", "http://x86-ubuntu/software/gnash/tests/");
     pageUrlnode->makeString("pageUrl", pageUrl);
     obj.addProperty(pageUrlnode);
 
-    Element *objencodingnode = new Element;
+    boost::shared_ptr<amf::Element> objencodingnode(new Element);
     objencodingnode->makeNumber("objectEncoding", 0.0);
     obj.addProperty(objencodingnode);
     
@@ -174,20 +175,20 @@ RTMPClient::encodeStream(double id)
     struct timespec now;
     clock_gettime (CLOCK_REALTIME, &now);
 
-    Element str = new Element;
-    str.makeString("createStream");
-    boost::shared_ptr<Buffer> strobj = str.encode();
+    boost::shared_ptr<amf::Element> str(new Element);
+    str->makeString("createStream");
+    boost::shared_ptr<Buffer> strobj = str->encode();
   
-    Element num = new Element;
-    num.makeNumber(id);
-    boost::shared_ptr<Buffer> numobj = num.encode();
+    boost::shared_ptr<amf::Element>  num(new Element);
+    num->makeNumber(id);
+    boost::shared_ptr<Buffer> numobj = num->encode();
 
     boost::shared_ptr<Buffer> buf(new Buffer(strobj->size() + numobj->size()));
 
     // Set the NULL object element that follows the stream ID
-    Element null;
-    null.makeNull();
-    boost::shared_ptr<Buffer> nullobj = null.encode();    
+    boost::shared_ptr<amf::Element> null;
+    null->makeNull();
+    boost::shared_ptr<Buffer> nullobj = null->encode();    
 
     *buf += strobj;
     *buf += numobj;

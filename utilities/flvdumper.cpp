@@ -261,7 +261,7 @@ main(int argc, char *argv[])
  		       if (meta || all) {
  			   cout << "FLV Tag type is: MetaData" << endl;
  		       }
-		       Element *metadata = flv.decodeMetaData(buf->reference(), bodysize);
+		       boost::shared_ptr<amf::Element> metadata = flv.decodeMetaData(buf->reference(), bodysize);
 		       if (meta && metadata) {
 			   metadata->dump();
 		       }

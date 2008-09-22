@@ -74,9 +74,6 @@ Element::Element()
 Element::~Element()
 {
 //    GNASH_REPORT_FUNCTION;
-    for (size_t i=0; i< _properties.size(); i++) {
-	delete _properties[i];
-    }
     delete[] _name;
 }
 
@@ -147,8 +144,8 @@ Element::Element(const string &name, bool indata)
 }
 
 // Create a function block for AMF
-Element::Element(bool flag, double unknown1, double unknown2,
-		 const string &methodname)
+Element::Element(bool /* flag */, double /* unknown1 */, double /* unknown2 */,
+		 const string &/* methodname */)
     : _name(0),
       _type(NOTYPE)
 {
@@ -168,7 +165,7 @@ Element::init(bool flag, double unknown1, double unknown2,
     }
 
     // Build up the properties for the function block
-    Element *el = new Element(flag);
+    shared_ptr<amf::Element> el = new Element(flag);
     _properties.push_back(el);
     
     el = new Element(unknown1);
@@ -356,13 +353,14 @@ Element::encode()
 	*buf += TERMINATOR;
 	return buf;
     } else {
-	return AMF::encodeElement(this);
+	boost::shared_ptr<amf::Element> el(this);
+	return AMF::encodeElement(el);
     }
     
     return buf;
 }
 
-Element *
+boost::shared_ptr<Element>
 Element::operator[](size_t index)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -370,7 +368,8 @@ Element::operator[](size_t index)
 	return _properties[index];
     }
     
-    return 0;
+    boost::shared_ptr<Element> el; 
+    return el;
 };
 
 Element &
@@ -473,7 +472,7 @@ Element::makeString(const string &name, const string &str)
 }
 
 Element &
-Element::makeNumber(Buffer *buf)
+Element::makeNumber(boost::shared_ptr<amf::Buffer> buf)
 {
 //    GNASH_REPORT_FUNCTION;
     return makeNumber(buf->reference());
@@ -611,7 +610,7 @@ Element::makeObject(const std::string &name)
 }
 
 Element &
-Element::makeObject(const std::string &name, std::vector<Element *> &data)
+Element::makeObject(const std::string &name, std::vector<boost::shared_ptr<Element> > &data)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = OBJECT_AMF0;
@@ -622,13 +621,13 @@ Element::makeObject(const std::string &name, std::vector<Element *> &data)
 }
 
 Element &
-Element::makeObject(std::vector<Element *> &data)
+Element::makeObject(std::vector<boost::shared_ptr<Element> > &data)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::OBJECT_AMF0;
-    vector<amf::Element *>::const_iterator ait;
+    vector<boost::shared_ptr<Element> >::const_iterator ait;
     for (ait = data.begin(); ait != data.end(); ait++) {
-	amf::Element *el = (*(ait));
+	boost::shared_ptr<Element> el = (*(ait));
 	addProperty(el);
 //	el->dump(os);
     }
@@ -745,7 +744,7 @@ Element::makeECMAArray(const std::string &name)
 }
 
 Element &
-Element::makeECMAArray(const std::string &name, std::vector<Element *> &data)
+Element::makeECMAArray(const std::string &name, std::vector<boost::shared_ptr<amf::Element> > &data)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::ECMA_ARRAY_AMF0;
@@ -755,7 +754,7 @@ Element::makeECMAArray(const std::string &name, std::vector<Element *> &data)
 }
 
 Element &
-Element::makeECMAArray(std::vector<Element *> &data)
+Element::makeECMAArray(std::vector<boost::shared_ptr<amf::Element> > &data)
 {
 //    GNASH_REPORT_FUNCTION;
     makeObject(data);
@@ -782,7 +781,7 @@ Element::makeStrictArray(const std::string &name)
 }
 
 Element &
-Element::makeStrictArray(const std::string &name, std::vector<Element *> &data)
+Element::makeStrictArray(const std::string &name, std::vector<boost::shared_ptr<amf::Element> > &data)
 {
 //    GNASH_REPORT_FUNCTION;
     makeObject(name, data);
@@ -791,7 +790,7 @@ Element::makeStrictArray(const std::string &name, std::vector<Element *> &data)
 }
 
 Element &
-Element::makeStrictArray(std::vector<Element *> &data)
+Element::makeStrictArray(std::vector<boost::shared_ptr<amf::Element> > &data)
 {
 //    GNASH_REPORT_FUNCTION;
     makeObject(data);
@@ -976,30 +975,31 @@ Element::dump(std::ostream& os) const
 //     }
 
     if (_properties.size() > 0) {
-	vector<amf::Element *>::const_iterator ait;
+	vector<boost::shared_ptr<Element> >::const_iterator ait;
 	os << "# of Properties in object: " << _properties.size() << endl;
 	for (ait = _properties.begin(); ait != _properties.end(); ait++) {
-	    const amf::Element *el = (*(ait));
+	    const boost::shared_ptr<Element> el = (*(ait));
 	    el->dump(os);
 	}
     }
 }
 
-Element *
+boost::shared_ptr<amf::Element> 
 Element::findProperty(const std::string &name)
 {
     if (_properties.size() > 0) {
-	vector<amf::Element *>::iterator ait;
+	vector<boost::shared_ptr<Element> >::iterator ait;
 //	cerr << "# of Properties in object: " << _properties.size() << endl;
 	for (ait = _properties.begin(); ait != _properties.end(); ait++) {
-	    amf::Element *el = (*(ait));
+	    boost::shared_ptr<Element> el = (*(ait));
 	    if (el->getName() == name) {
 		return el;
 	    }
 //	    el->dump();
 	}
     }
-    return 0;
+    boost::shared_ptr<Element> el;
+    return el;
 }
 
 } // end of amf namespace

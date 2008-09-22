@@ -478,7 +478,7 @@ AMF::encodeNullString()
 /// characters, but for now we just leave them as standard multibyte
 /// characters.
 boost::shared_ptr<Buffer>
-AMF::encodeElement(Element *el)
+AMF::encodeElement(boost::shared_ptr<amf::Element> el)
 {
 //    GNASH_REPORT_FUNCTION;
     size_t outsize;
@@ -600,7 +600,7 @@ AMF::encodeElement(Element *el)
 }
 
 boost::shared_ptr<Buffer>
-AMF::encodeProperty(amf::Element *el)
+AMF::encodeProperty(boost::shared_ptr<amf::Element> el)
 {
 //    GNASH_REPORT_FUNCTION;
     size_t outsize;
@@ -650,7 +650,7 @@ AMF::encodeProperty(amf::Element *el)
     return buf;
 }
 
-Element *
+boost::shared_ptr<amf::Element> 
 AMF::extractAMF(boost::shared_ptr<Buffer> buf)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -660,17 +660,18 @@ AMF::extractAMF(boost::shared_ptr<Buffer> buf)
     return extractAMF(start, tooFar);
 }
 
-Element *
+boost::shared_ptr<amf::Element> 
 AMF::extractAMF(Network::byte_t *in, Network::byte_t* tooFar)
 {
 //    GNASH_REPORT_FUNCTION;
 
     Network::byte_t *tmpptr = in;
     boost::uint16_t length;
+    boost::shared_ptr<amf::Element> el(new Element);
 
     if (in == 0) {
         log_error(_("AMF body input data is NULL"));
-        return 0;
+        return el;
     }
 
     // All elements look like this:
@@ -685,7 +686,6 @@ AMF::extractAMF(Network::byte_t *in, Network::byte_t* tooFar)
     // mostly to make valgrind shut up, as it has a tendency to
     // complain about legit code when it comes to all this byte
     // manipulation stuff.
-    Element *el = new Element;
     AMF amf_obj;
     // Jump through hoops to get the type so valgrind stays happy
 //    char c = *(reinterpret_cast<char *>(tmpptr));
@@ -712,8 +712,8 @@ AMF::extractAMF(Network::byte_t *in, Network::byte_t* tooFar)
 	  if (length >= SANE_STR_SIZE) {
 	      log_error("%d bytes for a string is over the safe limit of %d",
 			length, SANE_STR_SIZE);
-	      delete el;
-	      return 0;
+	      el.reset();
+	      return el;
 	  }
 //	  log_debug(_("AMF String length is: %d"), length);
 	  if (length > 0) {
@@ -734,7 +734,7 @@ AMF::extractAMF(Network::byte_t *in, Network::byte_t* tooFar)
 		  tmpptr++;
 		  break;
 	      }
-	      Element *child = amf_obj.extractProperty(tmpptr, tooFar); 
+	      boost::shared_ptr<amf::Element> child = amf_obj.extractProperty(tmpptr, tooFar); 
 	      if (child == 0) {
 		  // skip past zero length string (2 bytes), null (1 byte) and end object (1 byte)
 		  tmpptr += 4;
@@ -765,7 +765,7 @@ AMF::extractAMF(Network::byte_t *in, Network::byte_t* tooFar)
 		  tmpptr++;
 		  break;
 	      }
-	      Element *child = amf_obj.extractProperty(tmpptr, tooFar); 
+	      boost::shared_ptr<amf::Element> child = amf_obj.extractProperty(tmpptr, tooFar); 
 	      if (child == 0) {
 		  break;
 	      }
@@ -787,12 +787,12 @@ AMF::extractAMF(Network::byte_t *in, Network::byte_t* tooFar)
 	  tmpptr += sizeof(boost::uint32_t) + 1;
 	  // each number is 8 bytes, plus one byte for the type.
 	  tooFar = tmpptr += length * AMF0_NUMBER_SIZE + 1;
-// 	  Element *name = amf_obj.extractAMF(tmpptr, tooFar);
+// 	  boost::shared_ptr<amf::Element> name = amf_obj.extractAMF(tmpptr, tooFar);
 // 	  tmpptr += amf_obj.totalsize();
 // 	  el->setName(name->getName());
 	  length -= 2;
 	  while (length) {
-	      Element *child = amf_obj.extractAMF(tmpptr, tooFar); 
+	      boost::shared_ptr<amf::Element> child = amf_obj.extractAMF(tmpptr, tooFar); 
 	      if (child == 0) {
 		  break;
 	      } else {
@@ -813,8 +813,8 @@ AMF::extractAMF(Network::byte_t *in, Network::byte_t* tooFar)
       case Element::AMF3_DATA:
       default:
 	  log_unimpl("%s: type %d", __PRETTY_FUNCTION__, (int)type);
-	  delete el;
-	  return 0;
+	  el.reset();
+	  return el;
       }
     
     // Calculate the offset for the next read
@@ -823,7 +823,7 @@ AMF::extractAMF(Network::byte_t *in, Network::byte_t* tooFar)
     return el;
 }
 
-Element *
+boost::shared_ptr<amf::Element> 
 AMF::extractProperty(boost::shared_ptr<Buffer> buf)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -833,13 +833,14 @@ AMF::extractProperty(boost::shared_ptr<Buffer> buf)
     return extractProperty(start, tooFar);
 }
 
-Element *
+boost::shared_ptr<amf::Element> 
 AMF::extractProperty(Network::byte_t *in, Network::byte_t* tooFar)
 {
 //    GNASH_REPORT_FUNCTION;
     
     Network::byte_t *tmpptr = in;
     boost::uint16_t length;
+    boost::shared_ptr<amf::Element> el;
 
     length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
     // go past the length bytes, which leaves us pointing at the raw data
@@ -853,7 +854,7 @@ AMF::extractProperty(Network::byte_t *in, Network::byte_t* tooFar)
     // braindamaging code to keep valgrind happy.
     if (length <= 0) {
  	log_debug("No Property name, object done");
- 	return 0;
+ 	return el;
     }
     
     if (length + tmpptr > tooFar) {
@@ -867,14 +868,13 @@ AMF::extractProperty(Network::byte_t *in, Network::byte_t* tooFar)
 //    log_debug(_("AMF property name is: %s"), name);
     tmpptr += length;
 
-    Element *el = 0;
     char c = *(reinterpret_cast<char *>(tmpptr));
     Element::amf0_type_e type = static_cast<Element::amf0_type_e>(c);
     // If we get a NULL object, there is no data. In that case, we only return
     // the name of the property.
     if (type == Element::NULL_AMF0) {
 	log_debug("No data associated with Property \"%s\"", name);
-	el = new Element;
+	el.reset(new Element);
 	el->setName(name.c_str(), length);
 	tmpptr += 1;
 	// Calculate the offset for the next read

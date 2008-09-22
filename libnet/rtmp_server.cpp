@@ -220,12 +220,12 @@ RTMPServer::packetRead(boost::shared_ptr<amf::Buffer> buf)
     Network::byte_t* tooFar = ptr+300+sizeof(int); // FIXME:
     
     AMF amf_obj;
-    amf::Element *el1 = amf_obj.extractAMF(ptr, tooFar);
+    boost::shared_ptr<amf::Element> el1 = amf_obj.extractAMF(ptr, tooFar);
     ptr += amf_obj.totalsize();
-    amf::Element *el2 = amf_obj.extractAMF(ptr, tooFar);
+    boost::shared_ptr<amf::Element> el2 = amf_obj.extractAMF(ptr, tooFar);
 
     int size = 0;
-    amf::Element *el;
+    boost::shared_ptr<amf::Element> el;
     while ( size < static_cast<boost::uint16_t>(_header.bodysize) - 24 ) {
 	if (ptr) {
 	    el = amf_obj.extractProperty(ptr, tooFar);
@@ -241,9 +241,6 @@ RTMPServer::packetRead(boost::shared_ptr<amf::Buffer> buf)
 	    break;
 	}
     }
-
-    delete el1;
-    delete el2;
     
 # if 0
     Element el;
@@ -254,7 +251,7 @@ RTMPServer::packetRead(boost::shared_ptr<amf::Buffer> buf)
     log_debug (_("Reading AMF packets till we're done..."));
     buf->dump();
     while (ptr < end) {
-	amf::Element *el = new amf::Element;
+	boost::shared_ptr<amf::Element> el(new amf::Element);
 	ptr = amf.extractProperty(el, ptr);
 	addProperty(el);
 	el->dump();
@@ -268,7 +265,7 @@ RTMPServer::packetRead(boost::shared_ptr<amf::Buffer> buf)
 	buf = _handler->merge(buf);
     }
     while ((ptr - buf->begin()) < static_cast<int>(actual_size)) {
-	amf::Element *el = new amf::Element;
+	boost::shared_ptr<amf::Element> el(new amf::Element);
 	if (ptr) {
 	    ptr = amf.extractProperty(el, ptr);
 	    addProperty(el);
@@ -335,9 +332,9 @@ RTMPServer::packetRead(boost::shared_ptr<amf::Buffer> buf)
           break;
     };
     
-    Element *url = getProperty("tcUrl");
-    Element *file = getProperty("swfUrl");
-    Element *app = getProperty("app");
+    boost::shared_ptr<amf::Element> url = getProperty("tcUrl");
+    boost::shared_ptr<amf::Element> file = getProperty("swfUrl");
+    boost::shared_ptr<amf::Element> app = getProperty("app");
 
     if (file) {
 	log_debug("SWF file %s", file->to_string());
@@ -406,15 +403,15 @@ RTMPServer::encodeResult(RTMPMsg::rtmp_status_e status)
       {
 // 	  errstr = new Element;
 // 	  errstr->makeString("error");
-	  Element *level = new Element;
+	  boost::shared_ptr<amf::Element> level(new Element);
 	  level->makeString("level", "error");
 	  top.addProperty(level);
 
-	  Element *description = new Element;
+	  boost::shared_ptr<amf::Element> description(new Element);
 	  description->makeString("description", "Connection Failed.");
 	  top.addProperty(description);
 	  
-	  Element *code = new Element;
+	  boost::shared_ptr<amf::Element> code(new Element);
 	  code->makeString("code", "Connection.Connect.Failed");
 	  top.addProperty(code);
       }
@@ -424,29 +421,29 @@ RTMPServer::encodeResult(RTMPMsg::rtmp_status_e status)
 // 	  delete str;
 // 	  str = new Element;
 // 	  str->makeString("error");
-	  Element *level = new Element;
+	  boost::shared_ptr<amf::Element> level(new Element);
 	  level->makeString("level", "error");
 	  top.addProperty(level);
 
-	  Element *description = new Element;
+	  boost::shared_ptr<amf::Element> description(new Element);
 	  description->makeString("description", "Connection Rejected.");
 	  top.addProperty(description);
 	  
-	  Element *code = new Element;
+	  boost::shared_ptr<amf::Element> code(new Element);
 	  code->makeString("code", "NetConnection.Connect.Rejected");
 	  top.addProperty(code);
       }
       case RTMPMsg::NC_CONNECT_SUCCESS:
       {
-	  Element *level = new Element;
+	  boost::shared_ptr<amf::Element> level(new Element);
 	  level->makeString("level", "status");
 	  top.addProperty(level);
 
-	  Element *description = new Element;
+	  boost::shared_ptr<amf::Element> description(new Element);
 	  description->makeString("description", "Connection succeeded.");
 	  top.addProperty(description);
 	  
-	  Element *code = new Element;
+	  boost::shared_ptr<amf::Element> code(new Element);
 	  code->makeString("code", "NetConnection.Connect.Success");
 	  top.addProperty(code);
       }

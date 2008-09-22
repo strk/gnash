@@ -119,21 +119,21 @@ main(int argc, char *argv[])
 void
 test_properties()
 {
-    std::vector<Element *> data1;
+    std::vector<boost::shared_ptr<amf::Element> > data1;
 
     const char *str1 = "property one";
-    Element *prop1 = new Element(str1);
+    boost::shared_ptr<amf::Element> prop1(new Element(str1));
     data1.push_back(prop1);
 
     string str2 = "property two";
-    Element *prop2 = new Element(str2);
+    boost::shared_ptr<amf::Element> prop2(new Element(str2));
     data1.push_back(prop2);
 
-    Element *prop3 = new Element("property three");
+    boost::shared_ptr<amf::Element> prop3(new Element("property three"));
     data1.push_back(prop3);
 
     double num = 123.456;
-    Element *prop4 = new Element(num);
+    boost::shared_ptr<amf::Element> prop4(new Element(num));
     data1.push_back(prop4);
     
     Element top;

@@ -159,7 +159,7 @@ public:
 // 	rtmp_status_e status;
 // 	std::string   method;
 // 	double        streamid;
-// 	std::vector<amf::Element *> objs;
+// 	std::vector<boost::shared_ptr<amf::Element> > objs;
 //     } rtmp_msg_t;
     typedef enum {
         RTMP_ERR_UNDEF=0,
@@ -220,10 +220,10 @@ public:
     bool packetSend(boost::shared_ptr<amf::Buffer> buf);
     bool packetRead(boost::shared_ptr<amf::Buffer> buf);
 
-    void addProperty(amf::Element *el);
-    void addProperty(char *name, amf::Element *el);
-    void addProperty(std::string &name, amf::Element *el);
-    amf::Element *getProperty(const std::string &name);
+    void addProperty(boost::shared_ptr<amf::Element> el);
+    void addProperty(char *name, boost::shared_ptr<amf::Element> el);
+    void addProperty(std::string &name, boost::shared_ptr<amf::Element> el);
+    boost::shared_ptr<amf::Element> getProperty(const std::string &name);
     void setHandler(Handler *hand) { _handler = hand; };
     int headerSize(gnash::Network::byte_t header);
 
@@ -295,7 +295,7 @@ public:
     CQue &operator[] (size_t x) { return _queues[x]; }
     void dump();
   protected:
-    std::map<const char *, amf::Element *> _properties;
+    std::map<const char *, boost::shared_ptr<amf::Element> > _properties;
     amf::Buffer	*_handshake;
     Handler	*_handler;
     rtmp_head_t	_header;

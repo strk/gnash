@@ -205,7 +205,7 @@ public:
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static boost::shared_ptr<Buffer> encodeObject(Element *el);
+    static boost::shared_ptr<Buffer> encodeObject(boost::shared_ptr<amf::Element> el);
 
     /// Encode the end of an object
     ///
@@ -226,7 +226,7 @@ public:
     /// @return a newly allocated byte array.
     /// to be deleted by caller using delete [] operator, or NULL
     ///
-    static boost::shared_ptr<Buffer> encodeElement(amf::Element *el);
+    static boost::shared_ptr<Buffer> encodeElement(boost::shared_ptr<amf::Element> el);
 
     /// Encode a variable. 
     //
@@ -238,7 +238,7 @@ public:
     ///         in form of a newly allocated byte array.
     ///         to be deleted by caller using delete [] operator, or NULL
     ///
-    boost::shared_ptr<Buffer> encodeProperty(amf::Element *el);
+    boost::shared_ptr<Buffer> encodeProperty(boost::shared_ptr<amf::Element> el);
     static boost::shared_ptr<Buffer> encodeVariableHeader(const std::string &name);
     
     //
@@ -246,8 +246,8 @@ public:
     //
     
     // Extract the object type from the first byte of the header.
-    static amf::Element::amf0_type_e extractElementHeader(gnash::Network::byte_t *in)
-                         { return *(reinterpret_cast<amf::Element::amf0_type_e *>(in)); };
+    static Element::amf0_type_e extractElementHeader(gnash::Network::byte_t *in)
+                         { return *(reinterpret_cast<Element::amf0_type_e *>(in)); };
 
     // Unlike when we are encoding, for extracting objects we need
     // to keep track where we are in the memory buffer so these can't
@@ -264,10 +264,10 @@ public:
     ///
     /// May throw a ParserException 
     ///
-    amf::Element *extractAMF(gnash::Network::byte_t *in, gnash::Network::byte_t* tooFar);
+    boost::shared_ptr<amf::Element> extractAMF(gnash::Network::byte_t *in, gnash::Network::byte_t* tooFar);
 
     /// Extract an AMF object. These have no name like the variables do.
-    amf::Element *extractAMF(boost::shared_ptr<Buffer> buf);
+    boost::shared_ptr<amf::Element> extractAMF(boost::shared_ptr<Buffer> buf);
     
     /// \brief
     /// Extract an AMF "variable", which is a standard AMF object preceeded by
@@ -282,12 +282,12 @@ public:
     ///
     /// May throw a ParserException 
     ///
-    amf::Element *extractProperty(gnash::Network::byte_t *in, gnash::Network::byte_t* tooFar);
+    boost::shared_ptr<amf::Element> extractProperty(gnash::Network::byte_t *in, gnash::Network::byte_t* tooFar);
 
     /// \brief
     /// Extract an AMF "variable", which is a standard AMF object preceeded by
     /// just a length and a name field.
-    amf::Element *extractProperty(boost::shared_ptr<Buffer> buf);
+    boost::shared_ptr<amf::Element> extractProperty(boost::shared_ptr<Buffer> buf);
 
     size_t totalsize() { return _totalsize; }
     
