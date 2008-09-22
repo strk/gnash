@@ -1484,30 +1484,31 @@ GtkGui::showAboutDialog()
     GdkPixbuf *logo_pixbuf = createPixbuf("GnashG.png");
 
     gtk_show_about_dialog (
-    		   NULL,
-                   "program-name", _("GNASH flash movie player"), 
-                   "version", VERSION,
-                   "copyright", "Copyright (C) 2005, 2006, 2007, 2008 The Free Software Foundation",
-	           "comments", comments.c_str(),
-                   "authors", authors,
-                   "documenters", documentors,
-		   "artists", artists,
-//                   "translator-credits", "translator-credits",
-                   "logo", logo_pixbuf,
-		   "license", 
-		   "This program is free software; you can redistribute it and/or modify\n"
-		   "it under the terms of the GNU General Public License as published by\n"
-		   "the Free Software Foundation; either version 3 of the License, or\n"
-		   "(at your option) any later version.\n\n"
-		   "This program is distributed in the hope that it will be useful,\n"
-		   "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
-		   "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
-		   "GNU General Public License for more details.\n"
-		   "You should have received a copy of the GNU General Public License\n"
-		   "along with this program; if not, write to the Free Software\n"
-		   "Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA",
-		   "website", "http://www.gnu.org/software/gnash/",
-                   NULL);
+        NULL,
+        "program-name", _("GNASH flash movie player"), 
+        "version", VERSION,
+        "copyright", "Copyright (C) 2005, 2006, 2007, 2008 "
+                     "The Free Software Foundation",
+        "comments", comments.c_str(),
+        "authors", authors,
+        "documenters", documentors,
+        "artists", artists,
+        "translator-credits", _("translator-credits"),
+        "logo", logo_pixbuf,
+        "license", 
+        "This program is free software; you can redistribute it and/or modify\n"
+        "it under the terms of the GNU General Public License as published by\n"
+        "the Free Software Foundation; either version 3 of the License, or\n"
+        "(at your option) any later version.\n\n"
+        "This program is distributed in the hope that it will be useful,\n"
+        "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+        "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+        "GNU General Public License for more details.\n"
+        "You should have received a copy of the GNU General Public License\n"
+        "along with this program; if not, write to the Free Software\n"
+        "Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA",
+        "website", "http://www.gnu.org/software/gnash/",
+        NULL);
 }
 
 void

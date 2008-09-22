@@ -114,7 +114,7 @@ public:
 			// Is the file completely empty?
 			if (src->m_start_of_file) {
 				// Treat this as a fatal error.
-				gnash::log_error("empty jpeg source stream.");
+				log_error(_("JPEG: Empty jpeg source stream."));
 				return false;
 			}
 			// warn("jpeg end-of-stream");
@@ -152,7 +152,7 @@ public:
 	// uninteresting data.
 	static void	skip_input_data(j_decompress_ptr cinfo, long num_bytes)
 	{
-		rw_source_IOChannel*	src = (rw_source_IOChannel*) cinfo->src;
+		rw_source_IOChannel* src = (rw_source_IOChannel*) cinfo->src;
 
 		// According to jpeg docs, large skips are
 		// infrequent.  So let's just do it the simple
@@ -169,19 +169,7 @@ public:
 	}
 
 	static void term_source(j_decompress_ptr /* cinfo */)
-	// Terminate the source.  Make sure we get deleted.
 	{
-		/*rw_source_IOChannel*	src = (rw_source_IOChannel*) cinfo->src;
-		assert(src);
-
-		// @@ it's kind of bogus to be deleting here
-		// -- term_source happens at the end of
-		// reading an image, but we're probably going
-		// to want to init a source and use it to read
-		// many images, without reallocating our
-		// buffer.
-		delete src;
-		cinfo->src = NULL;*/
 	}
 
 
@@ -196,12 +184,8 @@ public:
 	/// stream.
 	///
 	/// @param instream
-	/// 	Stream to read from. Ownership decided by last arg.
+	/// 	Stream to read from. Ownership always shared with caller.
 	///
-	/// @param takeOwnership
-	///	If false, ownership of the stream 
-	///	is left to caller, otherwise we take it.
-	//
 	static void setup(jpeg_decompress_struct* cinfo, boost::shared_ptr<IOChannel> instream)
 	{
 		// assert(cinfo->src == NULL);
@@ -282,8 +266,8 @@ JpegImageInput::readHeader(unsigned int maxHeaderBytes)
 	if ( setjmp(_jmpBuf) )
 	{
 		std::stringstream ss;
-		ss << "Internal jpeg error: " << _errorOccurred;
-		throw gnash::ParserException(ss.str());
+		ss << _("Internal jpeg error: ") << _errorOccurred;
+		throw ParserException(ss.str());
 	}
 
 	if ( maxHeaderBytes )
@@ -294,25 +278,23 @@ JpegImageInput::readHeader(unsigned int maxHeaderBytes)
 		switch (ret)
 		{
 			case JPEG_SUSPENDED: // suspended due to lack of data
-				throw gnash::ParserException("lack of data during JPEG header parsing");
-				//log_debug("jpeg_read_header returned JPEG_SUSPENDED");
+				throw ParserException(_("Lack of data during JPEG header parsing"));
 				break;
 			case JPEG_HEADER_OK: // Found valid image datastream
-				//gnash::log_debug("unexpected: jpeg_read_header returned JPEG_HEADER_OK [%s:%d]", __FILE__, __LINE__);
 				break;
 			case JPEG_HEADER_TABLES_ONLY: // Found valid table-specs-only datastream
-				//log_debug("jpeg_read_header returned JPEG_HEADER_TABLES_ONLY");
 				break;
 			default:
-				gnash::log_debug("unexpected: jpeg_read_header returned %d [%s:%d]", ret, __FILE__, __LINE__);
+				log_debug(_("unexpected: jpeg_read_header returned %d [%s:%d]"),
+				            ret, __FILE__, __LINE__);
 				break;
 		}
 
-		if ( _errorOccurred )
+		if (_errorOccurred)
 		{
 			std::stringstream ss;
-			ss << "Internal jpeg error: " << _errorOccurred;
-			throw gnash::ParserException(ss.str());
+			ss << _("Internal jpeg error: ") << _errorOccurred;
+			throw ParserException(ss.str());
 		}
 
 	}
@@ -330,8 +312,8 @@ JpegImageInput::startImage()
 	if ( setjmp(_jmpBuf) )
 	{
 		std::stringstream ss;
-		ss << "Internal jpeg error: " << _errorOccurred;
-		throw gnash::ParserException(ss.str());
+		ss << _("Internal jpeg error: ") << _errorOccurred;
+		throw ParserException(ss.str());
 	}
 
 
@@ -343,35 +325,33 @@ JpegImageInput::startImage()
 		switch (ret)
 		{
 			case JPEG_SUSPENDED: // suspended due to lack of data
-				throw gnash::ParserException("lack of data during JPEG header parsing");
-				//log_debug("jpeg_read_header returned JPEG_SUSPENDED");
+				throw ParserException(_("lack of data during JPEG header parsing"));
 				break;
 			case JPEG_HEADER_OK: // Found valid image datastream
-				//log_debug("jpeg_read_header returned JPEG_HEADER_OK");
 				break;
 			case JPEG_HEADER_TABLES_ONLY: // Found valid table-specs-only datastream
-				//gnash::log_debug("unexpected: jpeg_read_header returned JPEG_HEADER_TABLES_ONLY [%s:%d]", __FILE__, __LINE__);
 				break;
 			default:
-				gnash::log_debug("unexpected: jpeg_read_header returned %d [%s:%d]", ret, __FILE__, __LINE__);
+				log_debug(_("unexpected: jpeg_read_header returned %d [%s:%d]"),
+				        ret, __FILE__, __LINE__);
 				break;
 		}
 	}
 
-	if ( _errorOccurred )
+	if (_errorOccurred)
 	{
 		std::stringstream ss;
-		ss << "Internal jpeg error during header parsing: " << _errorOccurred;
-		throw gnash::ParserException(ss.str());
+		ss << _("Internal jpeg error during header parsing: ") << _errorOccurred;
+		throw ParserException(ss.str());
 	}
 
 	jpeg_start_decompress(&m_cinfo);
 
-	if ( _errorOccurred )
+	if (_errorOccurred)
 	{
 		std::stringstream ss;
-		ss << "Internal jpeg error during decompression: " << _errorOccurred;
-		throw gnash::ParserException(ss.str());
+		ss << _("Internal jpeg error during decompression: ") << _errorOccurred;
+		throw ParserException(ss.str());
 	}
 
 	_compressorOpened = true;
@@ -389,8 +369,8 @@ JpegImageInput::finishImage()
 	if ( setjmp(_jmpBuf) )
 	{
 		std::stringstream ss;
-		ss << "Internal jpeg error: " << _errorOccurred;
-		throw gnash::ParserException(ss.str());
+		ss << _("Internal jpeg error: ") << _errorOccurred;
+		throw ParserException(ss.str());
 	}
 
 	if (_compressorOpened)
@@ -455,13 +435,13 @@ JpegImageInput::readScanline(unsigned char* rgb_data)
 void
 JpegImageInput::errorOccurred(const char* msg)
 {
-	gnash::log_debug("Long jump: banzaaaaaai!");
+	log_debug("Long jump: banzaaaaaai!");
 	_errorOccurred = msg;
 	std::longjmp(_jmpBuf, 1);
 }
 
 
-// A jpeglib destination manager that writes to a gnash::IOChannel.
+// A jpeglib destination manager that writes to a IOChannel.
 // Paraphrased from IJG jpeglib jdatadst.c.
 class rw_dest_IOChannel
 {
@@ -476,7 +456,7 @@ public:
 	/// @param out
 	///	The output stream, externally owned.
 	///
-	rw_dest_IOChannel(gnash::IOChannel& out)
+	rw_dest_IOChannel(IOChannel& out)
 		:
 		m_out_stream(out)
 	{
@@ -500,7 +480,7 @@ public:
 
 	// Set up the given compress object to write to the given
 	// output stream.
-	static void setup(j_compress_ptr cinfo, gnash::IOChannel& outstream)
+	static void setup(j_compress_ptr cinfo, IOChannel& outstream)
 	{
 		cinfo->dest = (jpeg_destination_mgr*) (new rw_dest_IOChannel(outstream));
 	}
@@ -515,7 +495,7 @@ public:
 		{
 			// Error.
 			// @@ bah, exceptions suck.  TODO consider alternatives.
-			gnash::log_error("jpeg::rw_dest_IOChannel couldn't write data.");
+			log_error(_("jpeg::rw_dest_IOChannel couldn't write data."));
 			return false;
 		}
 
@@ -531,7 +511,7 @@ public:
 	///
 	static void term_destination(j_compress_ptr cinfo)
 	{
-		rw_dest_IOChannel*	dest = (rw_dest_IOChannel*) cinfo->dest;
+		rw_dest_IOChannel* dest = (rw_dest_IOChannel*) cinfo->dest;
 		assert(dest);
 
 		// Write any remaining data.
@@ -540,7 +520,8 @@ public:
 			if (dest->m_out_stream.write(dest->m_buffer, datacount) != datacount)
 			{
 				// Error.
-				gnash::log_error("jpeg::rw_dest_IOChannel::term_destination couldn't write data.");
+				log_error(_("jpeg::rw_dest_IOChannel::term_destination "
+				            "couldn't write data."));
 			}
 		}
 
@@ -551,10 +532,10 @@ public:
 
 private:	
 
-	// source stream, externally owned
-	gnash::IOChannel&	m_out_stream;	
+	// Source stream, owned in this context by JpegImageInput
+	IOChannel& m_out_stream;	
 
-	JOCTET	m_buffer[IO_BUF_SIZE];		/* start of buffer */
+	JOCTET m_buffer[IO_BUF_SIZE];		/* start of buffer */
 
 };
 
