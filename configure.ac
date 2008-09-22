@@ -2620,7 +2620,7 @@ fi
           echo "               with swscale enabled." >&3
         fi
         echo "               This setup isn't supported!" >&3
-        echo "               Version 51.27.0 or newer is required, enabling swscale if >= 52.0.0." >&3
+        echo "               Version 51.11.0 or newer is required, enabling swscale if >= 52.0.0." >&3
       else
 	if test x"${avformat_h}" = x; then
           echo "        ERROR: FFMPEG's libavcodec header is installed but not libavformat." >&3
