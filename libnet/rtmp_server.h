@@ -40,8 +40,8 @@ public:
     bool handShakeWait();
     bool handShakeResponse();
     bool serverFinish();
-    bool packetSend(amf::Buffer *buf);
-    bool packetRead(amf::Buffer *buf);
+    bool packetSend(boost::shared_ptr<amf::Buffer> buf);
+    bool packetRead(boost::shared_ptr<amf::Buffer> buf);
     
     // These are handlers for the various types
     boost::shared_ptr<amf::Buffer> encodeResult(RTMPMsg::rtmp_status_e status);

@@ -35,7 +35,7 @@ namespace gnash
 
 class CQue {
 public:
-    typedef std::deque<amf::Buffer *> que_t;
+    typedef std::deque<boost::shared_ptr<amf::Buffer> > que_t;
 #ifdef USE_STATS_QUEUE
     typedef struct {
 	struct timespec start;
@@ -49,11 +49,11 @@ public:
     ~CQue();
     // Push data onto the que
     bool push(gnash::Network::byte_t *data, int nbytes);
-    bool push(amf::Buffer *data);
+    bool push(boost::shared_ptr<amf::Buffer> data);
     // Pop the first date element off the que
-    amf::Buffer *pop();
+    boost::shared_ptr<amf::Buffer> pop();
     // Peek at the first date element witjhout removing it from the que
-    amf::Buffer *peek();
+    boost::shared_ptr<amf::Buffer> peek();
     // Get the number of elements in the que
     size_t DSOEXPORT size();
     // Wait for a condition variable to trigger
@@ -63,13 +63,13 @@ public:
     // Empty the que of all data. 
     void clear();
     // Remove a range of elements
-    void remove(amf::Buffer *begin, amf::Buffer *end);
+    void remove(boost::shared_ptr<amf::Buffer> begin, boost::shared_ptr<amf::Buffer> end);
 //     // Remove an element
-//    void remove(amf::Buffer *it);
-    void remove(amf::Buffer *it);
+//    void remove(boost::shared_ptr<amf::Buffer> it);
+    void remove(boost::shared_ptr<amf::Buffer> it);
     // Merge sucessive buffers into one single larger buffer. This is for some
     // protocols, than have very long headers.
-    amf::Buffer *merge(amf::Buffer *begin);
+    boost::shared_ptr<amf::Buffer> merge(boost::shared_ptr<amf::Buffer> begin);
     
     // Dump the data to the terminal
     void dump();
@@ -80,9 +80,9 @@ public:
     const std::string &getName() { return _name; }
 private:
     // an optional name for the queue, only used for debugging messages to make them unique
-    std::string _name;
+    std::string		_name;
     // The queue itself
-    que_t _que;
+    que_t		_que;
 
     // A condition variable used to signal the other thread when the que has data
     boost::condition	_cond;

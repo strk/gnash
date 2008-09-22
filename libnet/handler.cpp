@@ -64,7 +64,7 @@ Handler::~Handler()
 }
 
 bool
-Handler::push(amf::Buffer *data, fifo_e direction)
+Handler::push(boost::shared_ptr<amf::Buffer> data, fifo_e direction)
 {
 //    GNASH_REPORT_FUNCTION;
     if (direction == Handler::OUTGOING) {
@@ -84,17 +84,17 @@ bool
 Handler::push(gnash::Network::byte_t *data, int nbytes, fifo_e direction)
 {
 //    GNASH_REPORT_FUNCTION;
-    amf::Buffer *ptr = new amf::Buffer;
+    boost::shared_ptr<amf::Buffer> ptr(new amf::Buffer);
     ptr->copy(data, nbytes);
     return push(ptr, direction);
 }
 
 // Pop the first date element off the FIFO
-amf::Buffer *
+boost::shared_ptr<amf::Buffer> 
 Handler::pop(fifo_e direction)
 {
 //    GNASH_REPORT_FUNCTION;
-    amf::Buffer *buf = NULL;
+    boost::shared_ptr<amf::Buffer> buf;
     
     if (direction == Handler::OUTGOING) {
 	if (_outgoing.size()) {
@@ -113,7 +113,7 @@ Handler::pop(fifo_e direction)
 }
 
 // Peek at the first data element without removing it
-amf::Buffer *
+boost::shared_ptr<amf::Buffer> 
 Handler::peek(fifo_e direction)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -127,7 +127,7 @@ Handler::peek(fifo_e direction)
 	    return _incoming.peek();
 	}
     }    
-    return 0;
+//    FIXME: return ;
 }
 
 // Return the size of the queues
@@ -167,6 +167,43 @@ Handler::dump()
     _outgoing.dump();    
 }
 
+size_t
+Handler::readPacket(int fd)
+{
+    GNASH_REPORT_FUNCTION;
+    boost::shared_ptr<amf::Buffer> buf(new amf::Buffer);
+    if (fd <= 2) {
+	log_error("File discriptor out of range, %d", fd);
+	return -1;
+    }
+    
+    log_debug(_("Waiting for data on fd #%d..."), fd);
+    size_t ret = readNet(fd, buf->reference(), buf->size(), 1);
+    // the read timed out as there was no data, but the socket is still open.
+    if (ret == 0) {
+	log_debug("no data yet for fd #%d, continuing...", fd);
+	return 0;
+    }
+    // ret is "no position" when the socket is closed from the other end of the connection,
+    // so we're done.
+    if ((ret == string::npos) || (ret == 0xffffffff)) {
+	log_debug("socket for fd #%d was closed...", fd);
+	return -1;
+    }
+    // We got data. Resize the buffer if necessary.
+    if (ret > 0) {
+	if (ret < NETBUFSIZE) {
+	    buf->resize(ret);
+	    _incoming.push(buf);
+	}
+    } else {
+	log_debug("no more data for fd #%d, exiting...", fd);
+	die();
+	return -1;
+    }
+    return ret;
+}
+
 // start the two thread handlers for the queues
 bool
 Handler::start(thread_params_t *args)
@@ -187,8 +224,9 @@ Handler::start(thread_params_t *args)
 	boost::thread handler(boost::bind(&rtmp_handler, args));
     }
     
-    boost::thread outport(boost::bind(&netout_handler, args));
-    boost::thread inport(boost::bind(&netin_handler, args));
+//     boost::thread outport(boost::bind(&netout_handler, args));
+//     boost::thread inport(boost::bind(&netin_handler, args));
+
 // We don't want to wait for the threads to complete, we
 // want to return to the main program so it can spawn another
 // thread for the next incoming connection.    
@@ -200,7 +238,8 @@ Handler::start(thread_params_t *args)
 //     }
     return true;
 }
-    
+
+#if 0
 extern "C" {
 void
 netin_handler(Handler::thread_params_t *args)
@@ -212,7 +251,7 @@ netin_handler(Handler::thread_params_t *args)
     log_debug("Starting to wait for data in net for fd #%d", args->netfd);
     
     do {
-	amf::Buffer *buf = new amf::Buffer;
+	boost::shared_ptr<amf::Buffer> buf = new amf::Buffer;
 	size_t ret = hand->readNet(args->netfd, buf->reference(), buf->size(), 1);
 	// the read timed out as there was no data, but the socket is still open.
  	if (ret == 0) {
@@ -261,7 +300,7 @@ netout_handler(Handler::thread_params_t *args)
 	}
 	hand->waitout();
 	while (hand->outsize()) {
-	    amf::Buffer *buf = hand->popout();
+	    boost::shared_ptr<amf::Buffer> buf = hand->popout();
 //	    log_debug("FIXME: got data in Outgoing que");
 //	    buf->dump();
 //	    ret = hand->writeNet(buf->reference(), buf->size(), 15);
@@ -286,8 +325,9 @@ netout_handler(Handler::thread_params_t *args)
     delete hand;
 #endif
 }
-    
+
 } // end of extern C
+#endif
 
 } // end of gnash namespace
 

@@ -77,7 +77,7 @@ RTMPServer::handShakeWait()
 
 //     char buffer[RTMP_BODY_SIZE+16];
 //     memset(buffer, 0, RTMP_BODY_SIZE+16);
-    amf::Buffer *buf = _handler->pop();
+    boost::shared_ptr<amf::Buffer> buf = _handler->pop();
 
     if (buf == 0) {
 	log_debug("Que empty, net connection dropped for fd #%d", _handler->getFileFd());
@@ -99,10 +99,8 @@ RTMPServer::handShakeWait()
 	_handshake = new amf::Buffer(RTMP_BODY_SIZE);
 	_handshake->copy(buf->reference() + 1, RTMP_BODY_SIZE);
 	log_debug (_("Handshake Data matched"));
-	delete buf;			// we're done with the buffer
 //	return true;
     } else {
-	delete buf;			// we're done with the buffer
  	log_error (_("Handshake Data didn't match"));
 // 	return false;
     }
@@ -127,7 +125,7 @@ RTMPServer::handShakeResponse()
 //    _handler->pushout(buf2); FIXME:
     
 //     std::copy(_handshake->begin(), _handshake->end(), (buf1->begin() + 1));    
-//     amf::Buffer *buf = new amf::Buffer(RTMP_BODY_SIZE + 1);
+//     boost::shared_ptr<amf::Buffer> buf = new amf::Buffer(RTMP_BODY_SIZE + 1);
 //     std::copy(_handshake->begin(), _handshake->end(), buf->begin() + 1 + RTMP_BODY_SIZE);
     _handler->notifyout();
 
@@ -141,8 +139,8 @@ RTMPServer::serverFinish()
 {
     GNASH_REPORT_FUNCTION;
 
-    amf::Buffer *buf = _handler->pop();
-    amf::Buffer *obj = buf;
+    boost::shared_ptr<amf::Buffer> buf = _handler->pop();
+    boost::shared_ptr<amf::Buffer> obj = buf;
     
     if (buf == 0) {
 	log_debug("Que empty, net connection dropped for fd #%d", _handler->getFileFd());
@@ -154,7 +152,7 @@ RTMPServer::serverFinish()
     // the remainder for processing.
     if (buf->size() >= static_cast<size_t>(RTMP_BODY_SIZE)) {
 	size_t size = buf->size() - RTMP_BODY_SIZE;  
-	obj = new amf::Buffer[size];
+	obj.reset(new amf::Buffer[size]);
 	obj->copy(buf->begin()+RTMP_BODY_SIZE, size);
     } else {
 	_handler->wait();
@@ -162,7 +160,6 @@ RTMPServer::serverFinish()
     }
     
     int diff = std::memcmp(buf->begin(), _handshake->begin(), RTMP_BODY_SIZE);
-    delete buf;			// we're done with the buffer
     if (diff == 0) {
 	log_debug (_("Handshake Finish Data matched"));
     } else {
@@ -176,14 +173,14 @@ RTMPServer::serverFinish()
 }
 
 bool
-RTMPServer::packetSend(amf::Buffer * /* buf */)
+RTMPServer::packetSend(boost::shared_ptr<amf::Buffer>  /* buf */)
 {
     GNASH_REPORT_FUNCTION;
     return false;
 }
 
 bool
-RTMPServer::packetRead(amf::Buffer *buf)
+RTMPServer::packetRead(boost::shared_ptr<amf::Buffer> buf)
 {
     GNASH_REPORT_FUNCTION;
 

@@ -133,7 +133,7 @@ HTTP::waitForGetRequest()
 //     memset(buffer, 0, readsize+1);
     
 //    _handler->wait();
-    amf::Buffer *buf = _handler->pop();
+    boost::shared_ptr<amf::Buffer> buf = _handler->pop();
 
     if (buf == 0) {
 	log_debug("Que empty, net connection dropped for fd #%d", _handler->getFileFd());
@@ -155,8 +155,6 @@ HTTP::waitForGetRequest()
     extractTE(buf);
 //    dump();
 
-    delete buf;			// we're done with the buffer
-    
     _filespec = _url;
     if (!_url.empty()) {
 	return true;
@@ -490,7 +488,7 @@ HTTP::sendPostReply(rtmpt_cmd_e /* code */)
 
 #if 0
     formatHeader(_filesize, code);
-    amf::Buffer *buf = new amf::Buffer;
+    boost::shared_ptr<amf::Buffer> buf = new amf::Buffer;
     if (_header.str().size()) {
 	buf->resize(_header.str().size());
 	string str = _header.str();
@@ -1279,10 +1277,9 @@ httphandler(Handler::thread_params_t *args)
 		log_debug (_("File \"%s\" is %lld bytes in size, disk fd #%d"), filespec,
 			   st.st_size, filefd);
 		do {
-		    amf::Buffer *buf = new amf::Buffer;
+		    boost::shared_ptr<amf::Buffer> buf(new amf::Buffer);
 		    ret = read(filefd, buf->reference(), buf->size());
 		    if (ret == 0) { // the file is done
-			delete buf;
 			break;
 		    }
 		    if (ret != buf->size()) {

@@ -65,38 +65,38 @@ main (int /*argc*/, char** /*argv*/) {
 
     Handler que;
 
-    Buffer buf;
+    boost::shared_ptr<amf::Buffer> buf;
 //     boost::uint8_t *test = new uint8_t[6];
 //     memcpy(test, "hell", 4);
 
     // Push one buffer on the fifo. The default is the incoming fifo,
     // which is the one where data flows from the network to the queue.
-    que.push(&buf);
+    que.push(buf);
     if ((que.size() == 1) && (que.outsize() == 0)) {
-        runtest.pass ("Handler::push(Buffer *)");
+        runtest.pass ("Handler::push(boost::shared_ptr<amf::Buffer> )");
     } else {
-        runtest.fail ("Handler::push(Buffer *)");
+        runtest.fail ("Handler::push(boost::shared_ptr<amf::Buffer> )");
     }
     
     // Push one buffer on the outgoing fifo. The default is the incoming fifo,
     // The outgoing fifo is where data flows from the queu to the network. As
     // we can explicitly specufy which queue we write to, we test that here.
-    que.pushout(&buf);
+    que.pushout(buf);
     if ((que.size() == 1) && (que.outsize() == 1)) {
-        runtest.pass ("Handler::pushout(Buffer *)");
+        runtest.pass ("Handler::pushout(boost::shared_ptr<amf::Buffer> )");
     } else {
-        runtest.fail ("Handler::pushout(Buffer *)");
+        runtest.fail ("Handler::pushout(boost::shared_ptr<amf::Buffer> )");
     }
 
     // Test pushin. When dumpimg, the second address should be different than the first,
     // as well as the size. The outgoing queue should be uneffected.
-    Buffer buf1;
-    buf1.resize(112);
-    que.pushin(&buf1);
+     boost::shared_ptr<amf::Buffer> buf1;
+    buf1->resize(112);
+    que.pushin(buf1);
     if ((que.size() == 2) && (que.outsize() == 1)) {
-        runtest.pass ("Handler::pushin(Buffer *)");
+        runtest.pass ("Handler::pushin(boost::shared_ptr<amf::Buffer> )");
     } else {
-        runtest.fail ("Handler::pushin(Buffer *)");
+        runtest.fail ("Handler::pushin(boost::shared_ptr<amf::Buffer> )");
     }
 
     // Nuke the array
@@ -108,21 +108,21 @@ main (int /*argc*/, char** /*argv*/) {
     }
 
     // populate the buffer
-    boost::uint8_t *ptr = buf.reference();
-    for (size_t i=1; i< buf.size(); i++) {
+    boost::uint8_t *ptr = buf->reference();
+    for (size_t i=1; i< buf->size(); i++) {
         ptr[i] = i;
     }
 
-    que.push(&buf);
-    Buffer *buf2 = que.peek();
-    if ((buf2 == &buf) && (que.size() == 1)) {
+    que.push(buf);
+    boost::shared_ptr<amf::Buffer> buf2 = que.peek();
+    if ((buf2 == buf) && (que.size() == 1)) {
         runtest.pass ("Handler::peek()");
     } else {
         runtest.fail ("Handler::peek()");
     }
 
-    Buffer *buf3 = que.peek();
-     if ((buf3 == &buf) && (que.size() == 1)) {
+    boost::shared_ptr<amf::Buffer> buf3 = que.peek();
+     if ((buf3 == buf) && (que.size() == 1)) {
          runtest.pass ("Handler::pop()");
      } else {
          runtest.fail ("Handler::pop()");
