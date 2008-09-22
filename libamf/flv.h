@@ -126,7 +126,7 @@ class DSOEXPORT Flv {
     // Encode the data into a Buffer
     boost::shared_ptr<amf::Buffer> encodeHeader(gnash::Network::byte_t type);
     // Decode a Buffer into a header
-    flv_header_t *decodeHeader(boost::shared_ptr<amf::Buffer> buf);
+    boost::shared_ptr<flv_header_t> decodeHeader(boost::shared_ptr<amf::Buffer> buf);
 
     // Decode a MetaData object, which is after the header, but before all the tags
     amf::Element *decodeMetaData(boost::shared_ptr<amf::Buffer> buf);
@@ -145,7 +145,7 @@ class DSOEXPORT Flv {
     
     void dump();
   private:
-//    flv_header_t                _header;
+    flv_header_t                _header;
 //    boost::uint32_t             _previous_tag_size;
     flv_tag_t                   _tag;
     std::vector<amf::Element *> _properties;

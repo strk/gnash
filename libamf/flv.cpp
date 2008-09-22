@@ -91,19 +91,21 @@ Flv::decodeHeader(boost::shared_ptr<amf::Buffer> buf)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::shared_ptr<flv_header_t> header(new flv_header_t);
-    
-    memcpy(header->reference(), buf->begin(), sizeof(Flv::flv_header_t));
+    memcpy(header.get(), buf->reference(), sizeof(flv_header_t));
+//    std::copy(buf->begin(), buf->begin() + sizeof(flv_header_t), header.get());
 
     // test the magic number
     if (memcmp(header->sig, "FLV", 3) != 0) {
 	log_error("Bad magic number for FLV file!");
-	return 0;
+	header.reset();
+	return header;
     }
 
     // Make sure the version is legit, it should alwys be 1
     if (header->version != 0x1) {
 	log_error("Bad version in FLV header! %d", _header.version);
-		  return 0;
+	header.reset();
+	return header;
     }
 
     // Make sure the type is set correctly
@@ -124,7 +126,7 @@ Flv::decodeHeader(boost::shared_ptr<amf::Buffer> buf)
     // we should use it.
     if (ntohl(size) != 0x9) {
 	log_error("Bad header size in FLV header! %d", size);
-		  return 0;
+	header.reset();
     }
     
     return header;
@@ -176,7 +178,7 @@ Flv::decodeAudioData(gnash::Network::byte_t byte)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::shared_ptr<flv_audio_t> audio(new flv_audio_t);
-    memset(audio->reference(), 0, sizeof(flv_audio_t));
+//    memset(audio->reference(), 0, sizeof(flv_audio_t));
 
     // Get the sound type
     if (byte && Flv::AUDIO_STEREO) {
@@ -235,7 +237,7 @@ Flv::decodeVideoData(gnash::Network::byte_t byte)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::shared_ptr<flv_video_t> video(new flv_video_t);
-    memset(video, 0, sizeof(flv_video_t));
+//    memset(video, 0, sizeof(flv_video_t));
 
     // Get the codecID codecID
     if (byte && Flv::VIDEO_H263) {
@@ -293,7 +295,8 @@ Flv::decodeTagHeader(boost::shared_ptr<amf::Buffer> buf)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::shared_ptr<flv_tag_t> tag(new flv_tag_t);
-    memcpy(tag, buf->reference(), sizeof(flv_tag_t));
+    memcpy(tag.get(), buf->reference(), sizeof(flv_tag_t));
+//    std::copy(buf->begin(), buf->end(), tag);
 
     // These fields are all 24 bit, big endian integers
     swapBytes(tag->bodysize, 3);
