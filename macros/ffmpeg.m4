@@ -48,7 +48,7 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
   ])
 
   if test x${cross_compiling} = xno; then
-    AC_MSG_CHECKING([location of avcodec.h using pkgconfig])
+    AC_MSG_CHECKING([location of avcodec.h])
     if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_ffmpeg_incl}" = x; then
       if $PKG_CONFIG --exists libavcodec; then
 	# Some systems return /usr/include/ffmpeg, others /usr/include.
@@ -117,7 +117,7 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
   if test x"${ac_cv_path_ffmpeg_incl}" = x; then
      AC_MSG_ERROR([Cannot find ffmpeg/avcodec.h.  Use --with-ffmpeg-incl= to specify the location of the *directory* holding avcodec.h])
   else
-    if echo $avcodec_h | grep -q ffmpeg; then
+    if echo $avcodec_h | grep -q ffmpeg/avcodec.h; then
       AC_DEFINE(HAVE_FFMPEG_AVCODEC_H, 1, [Define if you have avcodec.h installed.])
     else
       AC_DEFINE(HAVE_LIBAVCODEC_AVCODEC_H, 1, [Define if you have avcodec.h installed.])
