@@ -69,6 +69,32 @@ xcheck_equals(t.concatenatedColorTransform.toString(), "(redMultiplier=1, greenM
 //check_equals(t.concatenatedMatrix.toString(), "(a=1, b=0, c=0, d=1, tx=0, ty=0)");
 //check_equals(t.pixelBounds.toString(), "(x=-2, y=48, w=804, h=804)");
 
+/// transform.colorTransform
+
+mcx = _root.createEmptyMovieClip("mcx", getNextHighestDepth());
+xcheck_equals(mcx.transform.colorTransform.toString(), "(redMultiplier=1, greenMultiplier=1, blueMultiplier=1, alphaMultiplier=1, redOffset=0, greenOffset=0, blueOffset=0, alphaOffset=0)");
+
+mcx._alpha = 23;
+xcheck_equals(mcx.transform.colorTransform.toString(), "(redMultiplier=1, greenMultiplier=1, blueMultiplier=1, alphaMultiplier=0.2265625, redOffset=0, greenOffset=0, blueOffset=0, alphaOffset=0)");
+
+mcx._alpha = -203;
+xcheck_equals(mcx.transform.colorTransform.toString(), "(redMultiplier=1, greenMultiplier=1, blueMultiplier=1, alphaMultiplier=-2.02734375, redOffset=0, greenOffset=0, blueOffset=0, alphaOffset=0)");
+
+mcx._alpha = -99;
+xcheck_equals(mcx.transform.colorTransform.toString(), "(redMultiplier=1, greenMultiplier=1, blueMultiplier=1, alphaMultiplier=-0.98828125, redOffset=0, greenOffset=0, blueOffset=0, alphaOffset=0)");
+
+mcx._alpha = 13000;
+xcheck_equals(mcx.transform.colorTransform.toString(), "(redMultiplier=1, greenMultiplier=1, blueMultiplier=1, alphaMultiplier=-128, redOffset=0, greenOffset=0, blueOffset=0, alphaOffset=0)");
+
+r = new ColorTransform(2, 3, 4, 5, 5, -5, 5, -5);
+mcx.transform.colorTransform = r;
+xcheck_equals(mcx.transform.colorTransform.toString(), "(redMultiplier=2, greenMultiplier=3, blueMultiplier=4, alphaMultiplier=5, redOffset=5, greenOffset=-5, blueOffset=5, alphaOffset=-5)");
+
+r = new ColorTransform(0, 1, 1, 1, 0, 0, 255, 0);
+mcx.transform.colorTransform = r;
+xcheck_equals(mcx.transform.colorTransform.toString(), "(redMultiplier=0, greenMultiplier=1, blueMultiplier=1, alphaMultiplier=1, redOffset=0, greenOffset=0, blueOffset=255, alphaOffset=0)");
+
+
 
 // Tricks with the flash package:
 flash.geom.Matrix = undefined;
@@ -168,5 +194,5 @@ check_equals(mc.transform.matrix.toString(), "(a=1, b=0, c=0, d=1, tx=0, ty=0)")
 xcheck_equals(mcOld.transform.matrix.toString(), "(a=4, b=0.300000011920929, c=0.300000011920929, d=1, tx=1, ty=0)");
 
 
-totals(56);
+totals(63);
 #endif
