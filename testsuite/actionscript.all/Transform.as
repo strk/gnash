@@ -24,6 +24,8 @@ rcsid="$Id: Transform.as,v 1.3 2008/06/20 13:28:56 bwy Exp $";
 
 #include "check.as"
 
+ASSetPropFlags (_global, "flash", 0, 5248);
+
 #if OUTPUT_VERSION < 8
 check_equals(flash.geom.Transform, undefined);
 totals(1);
