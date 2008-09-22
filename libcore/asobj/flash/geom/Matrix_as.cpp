@@ -105,11 +105,6 @@ attachMatrixInterface(as_object& o)
     o.init_member("translate", new builtin_function(Matrix_translate), fl);
 }
 
-static void
-attachMatrixStaticProperties(as_object& /*o*/)
-{
-   
-}
 
 static as_object*
 getMatrixInterface()
@@ -142,6 +137,7 @@ public:
 
 };
 
+
 as_function* getFlashGeomMatrixConstructor()
 {
     static builtin_function* cl = NULL;
@@ -149,10 +145,10 @@ as_function* getFlashGeomMatrixConstructor()
     {
         cl=new builtin_function(&Matrix_ctor, getMatrixInterface());
         VM::get().addStatic(cl);
-        attachMatrixStaticProperties(*cl);
     }
     return cl;
 }
+
 
 /// Return an exact copy of the matrix.
 static as_value
@@ -839,6 +835,12 @@ static void fillMatrix(MatrixType& matrix,
 
 }
 
+
+// Any arguments can be passed, not just valid ones.
+// If no arguments are passed, an identity matrix is created.
+// TODO: check:
+// If at least one argument is passed, any missing arguments are undefined.
+// Extra arguments are discarded
 as_value
 Matrix_ctor(const fn_call& fn)
 {
@@ -860,7 +862,11 @@ Matrix_ctor(const fn_call& fn)
         switch (fn.nargs)
         {
             default:
-                // Log as coding error?
+                IF_VERBOSE_ASCODING_ERRORS(
+                    std::ostringstream ss;
+                    fn.dump_args(ss);
+                    log_aserror("Matrix(%s): discarding extra arguments", ss.str());
+                );
             case 6:
                 ty = fn.arg(5);
             case 5:

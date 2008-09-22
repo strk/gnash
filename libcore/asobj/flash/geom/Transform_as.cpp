@@ -31,6 +31,7 @@
 #include "Object.h" // for AS inheritance
 #include "VM.h" // for addStatics
 #include "sprite_instance.h" // For MovieClip
+#include "ColorTransform_as.h"
 
 #include <sstream>
 
@@ -104,6 +105,7 @@ public:
     const matrix& getMatrix() const { return _movieClip.get_matrix(); }
     const cxform& getColorTransform() const { return _movieClip.get_cxform(); }
     void setMatrix(const matrix& mat) { _movieClip.set_matrix(mat); }
+    void setColorTransform(const cxform& cx) { _movieClip.set_cxform(cx); }
 
 protected:
 
@@ -123,10 +125,136 @@ private:
 static as_value
 Transform_colorTransform_getset(const fn_call& fn)
 {
+
+    const double factor = 256.0;
+
+    // TODO: What happens if you do: "mat = mc.transform.matrix; mat.a = 6;"
+    // (where mc is a MovieClip)? Nothing (probable), or does it change mc (how
+    // would that work?)?
+    // This should work by passing a new matrix, in which case we should just
+    // set our _movieClip's matrix from the AS matrix.
 	boost::intrusive_ptr<Transform_as> ptr = ensureType<Transform_as>(fn.this_ptr);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
-	return as_value();
+
+    VM& vm = ptr->getVM();
+    string_table& st = vm.getStringTable();
+
+    if (!fn.nargs)
+    {
+
+        // This is silly. Should be easier to do, even if it's necessary
+        // somewhere in the chain to go through all the objects.
+
+        // Getter
+        as_value flash;
+        if (!vm.getGlobal()->get_member(st.find("flash"), &flash))
+        {
+            log_error("No flash object found!");
+            return as_value();
+        }
+        boost::intrusive_ptr<as_object> flashObj = flash.to_object();
+
+        if (!flashObj)
+        {
+            log_error("flash isn't an object!");
+            return as_value();
+        }
+        
+        as_value geom;
+        if (!flashObj->get_member(st.find("geom"), &geom))
+        {
+            log_error("No flash.geom object found!");
+            return as_value();
+        }
+        boost::intrusive_ptr<as_object> geomObj = geom.to_object();
+
+        if (!geomObj)
+        {
+            log_error("flash.geom isn't an object!");
+            return as_value();
+        }
+       
+        as_value colorTransform;
+        if (!geomObj->get_member(st.find("ColorTransform"), &colorTransform))
+        {
+            log_error("No flash.geom.ColorTransform object found!");
+            return as_value();
+        }
+
+        boost::intrusive_ptr<as_function> colorTransformCtor = colorTransform.to_as_function();
+        if (!colorTransformCtor)
+        {
+            log_error("flash.geom.ColorTransform isn't a function!");
+            return as_value();
+        }
+
+        // Construct a ColorTransform from the sprite cxform.
+        std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>);
+        const cxform& c = ptr->getColorTransform();
+
+        args->push_back(c.ra / factor);
+        args->push_back(c.ga / factor);
+        args->push_back(c.ba / factor);
+        args->push_back(c.aa / factor);
+        args->push_back(c.rb);
+        args->push_back(c.gb);
+        args->push_back(c.bb);
+        args->push_back(c.ab);
+
+        boost::intrusive_ptr<as_object> colorTransformObj =
+            colorTransformCtor->constructInstance(fn.env(), args);
+
+        return as_value(colorTransformObj.get());
+    }
+
+    // Setter
+
+    if (fn.nargs > 1)
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::ostringstream ss;
+            fn.dump_args(ss);
+            log_aserror("Transform.colorTransform(%s): extra arguments discarded", ss.str());
+        );
+    }
+
+    boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
+    if (!obj)
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::ostringstream ss;
+            fn.dump_args(ss);
+            log_aserror("Transform.colorTransform(%s): argument is not an object", ss.str());
+        );
+        return as_value();
+    }
+    
+    // TODO: check whether this is necessary (probable), or whether it can be any object.
+    boost::intrusive_ptr<ColorTransform_as> transform = dynamic_cast<ColorTransform_as*>(obj.get());
+    if (!transform)
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::ostringstream ss;
+            fn.dump_args(ss);
+            log_aserror("Transform.colorTransform(%s): argument is not a ColorTransform", ss.str());
+        );
+        return as_value();
+    }
+    
+    cxform c;
+    c.ra = transform->getRedMultiplier() * factor;
+    c.ga = transform->getGreenMultiplier() * factor;
+    c.ba = transform->getBlueMultiplier() * factor;
+    c.aa = transform->getAlphaMultiplier() * factor;
+    c.rb = transform->getRedOffset();
+    c.gb = transform->getGreenOffset();
+    c.bb = transform->getBlueOffset();
+    c.ab = transform->getAlphaOffset();
+  
+    log_debug("Setting MovieClip cxform to: %s", c);
+    
+    ptr->setColorTransform(c);
+    
+    return as_value();
 }
 
 static as_value
@@ -198,14 +326,14 @@ Transform_matrix_getset(const fn_call& fn)
             return as_value();
         }
        
-        as_value matrixVal1;
-        if (!geomObj->get_member(st.find("Matrix"), &matrixVal1))
+        as_value matrixVal;
+        if (!geomObj->get_member(st.find("Matrix"), &matrixVal))
         {
             log_error("No flash.geom.Matrix object found!");
             return as_value();
         }
 
-        boost::intrusive_ptr<as_function> matrixCtor = matrixVal1.to_as_function();
+        boost::intrusive_ptr<as_function> matrixCtor = matrixVal.to_as_function();
         if (!matrixCtor)
         {
             log_error("flash.geom.Matrix isn't a function!");
