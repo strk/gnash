@@ -82,6 +82,7 @@ ASTESTS =			\
 	Boolean.as		\
 	Camera.as		\
 	Color.as		\
+    ColorTransform.as \
 	ContextMenu.as		\
 	CustomActions.as	\
 	Date.as			\
