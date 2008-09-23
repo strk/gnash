@@ -34,10 +34,6 @@
 #include "AudioDecoderFfmpeg.h"
 #endif
 
-#ifdef USE_MAD
-#include "AudioDecoderMad.h"
-#endif
-
 #include "log.h"
 #include <cmath>
 #include <vector>
@@ -179,12 +175,6 @@ int	SDL_sound_handler::create_sound(
 	switch (sounddata->soundinfo->getFormat())
 	{
 	case AUDIO_CODEC_MP3:
-#ifndef USE_FFMPEG
-#ifndef USE_MAD
-		log_error(_("gnash has not been compiled to handle mp3 audio"));
-		return -1;
-#endif
-#endif
 		sounddata->append(reinterpret_cast<boost::uint8_t*>(data), data_bytes);
 		break;
 
@@ -297,17 +287,6 @@ void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset,
 
 		break;
 	case AUDIO_CODEC_MP3:
-#ifdef USE_MAD
-		sound->decoder = new AudioDecoderMad();
-
-		if (!sound->decoder->setup(sounddata->soundinfo.get())) {
-			log_error("The audio decoder can't decode the audio");
-			delete sound->decoder;
-			sound->decoder = NULL;
-		}
-
-		break;
-#endif
 #ifdef USE_FFMPEG
 		sound->decoder = new AudioDecoderFfmpeg();
 

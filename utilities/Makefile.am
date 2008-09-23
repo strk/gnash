@@ -72,11 +72,6 @@ if USE_FFMPEG_ENGINE
  GNASH_LIBS += $(FFMPEG_LIBS)
 endif
 
-if USE_MAD_ENGINE
- AM_CPPFLAGS += $(MAD_INCLS) 
- GNASH_LIBS += $(MAD_LIBS)
-endif
-
 #if USE_SOUND_GST
  AM_CPPFLAGS += $(GSTREAMER_CFLAGS) \
 		-I$(top_srcdir)/libmedia/gst

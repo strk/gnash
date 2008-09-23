@@ -136,7 +136,6 @@ noinst_HEADERS = \
 	Sound.h \
 	SoundFfmpeg.h \
 	SoundGst.h \
-	SoundMad.h \
 	Stage.h	\
 	System_as.h \
 	TextFormat.h \
@@ -196,12 +195,6 @@ libgnashasobjs_la_SOURCES += NetStreamGst.cpp SoundGst.cpp
 AM_CPPFLAGS += $(GSTREAMER_CFLAGS) \
 		-I$(top_srcdir)/libmedia/gst
 libgnashasobjs_la_LIBADD += $(GSTREAMER_LIBS)
-endif
-
-if USE_MAD_ENGINE
-libgnashasobjs_la_SOURCES += SoundMad.cpp
-AM_CPPFLAGS += $(MAD_CFLAGS)
-libgnashasobjs_la_LIBADD += $(MAD_LIBS)
 endif
 
 #libgnashasobjs_la_LDFLAGS = -release $(VERSION) -no-undefined -export-dynamic

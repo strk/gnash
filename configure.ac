@@ -1596,7 +1596,7 @@ AM_CONDITIONAL(ENABLE_DOXYGEN, [ test x"$DOXYGEN" != x ])
 dnl currently unused
 dnl GNASH_PKG_FIND(ogg, [ogg.h], [decode ogg streams], ogg_stream_init)
 
-if test x$build_sdl = xyes -o x"$media_handler" = xffmpeg -o x"$media_handler" = xmad; then
+if test x$build_sdl = xyes -o x"$media_handler" = xffmpeg; then
   GNASH_PATH_SDL
 fi
 
@@ -1763,7 +1763,6 @@ if test "$media_handler" = "gst"; then
   fi
   GNASH_PKG_FIND(gstreamer, [gst/gst.h], [gstreamer library], gst_init, [0.10])
   if test x"${media_handler_specified}" = xfalse; then
-    # If the library is not found, or its version is not ok, we'll try mad
     if test x"$GSTREAMER_LIBS" = x; then
        AC_MSG_WARN([No appropriate gstreamer library found, will try using ffmpeg.])
        media_handler=ffmpeg
@@ -1781,19 +1780,6 @@ if test x"$media_handler" = x"ffmpeg"; then
      fi
   fi
 fi
-
-#if test x"$media_handler" = x"mad"; then
-#  dnl Will set MAD_LIBS and MAD_CFLAGS.
-#  dnl Handles --with-mad-incl and --with-mad-lib
-#  GNASH_PKG_FIND(mad, [mad.h], [mad library], mad_copyright)
-#  if test x"${media_handler_specified}" = xfalse; then
-#    # If the library is not found, we'll disable media handling
-#    if test x"${ac_cv_path_mad_lib}" = x ; then
-#      AC_MSG_WARN([No libmad found, disabling media handling.])
-#      media_handler=none
-#    fi
-#  fi
-#fi
 
 if test x"$media_handler" = x"gst"; then
   AC_MSG_CHECKING([for modern pbutils])
@@ -1842,16 +1828,10 @@ fi
 
 AM_CONDITIONAL(HAVE_CAIRO, [test x"${CAIRO_LIBS}" != x])
 
-dnl I'm kinda lazy, get rid of this later... //Markus
-AM_CONDITIONAL(HAVE_MAD, test x"$media_handler" = xmad)
-
 AM_CONDITIONAL(USE_SOUND_GST, test x$media_handler = xgst)
-AM_CONDITIONAL(USE_SOUND_SDL, test x"$media_handler" = xmad -o x"$media_handler" = xffmpeg)
+AM_CONDITIONAL(USE_SOUND_SDL, test x"$media_handler" = xffmpeg)
 AM_CONDITIONAL(USE_FFMPEG_ENGINE, test x"$media_handler" = xffmpeg)
-AM_CONDITIONAL(USE_MAD_ENGINE, test x"$media_handler" = xmad)
 AM_CONDITIONAL(HAVE_OPENGL, test x"${OPENGL_LIBS}" != x)
-
-dnl AM_CONDITIONAL(HAVE_FFMPEG, [test x"${FFMPEG_LIBS}" != x])
 
 case "${media_handler}" in
   gst) AC_DEFINE([SOUND_GST],  [1], [Use GSTREAMER for media handling]) ;;
@@ -2299,7 +2279,7 @@ fi
 echo "        GUI toolkits supported: ${SUPPORTED_GUIS}"
 echo "        Renderers supported: ${add_renderer}"
 echo "        Media handler: "$media_handler
-if test x"$media_handler" = xffmpeg -o x"$media_handler" = xmad; then
+if test x"$media_handler" = xffmpeg; then
 echo "        Using SDL for sound handling"
 fi
 echo "        Using $with_shm mode for shared memory"
@@ -2591,24 +2571,6 @@ if test "$media_handler" = "gst"; then
   fi
 fi
 
-  if test x"$media_handler" = x"mad"; then
-    echo "        MP3 support enabled through libmad"
-    if test x"$MAD_LIBS" != x; then
-      if test x"$MAD_CFLAGS" != x; then
-        echo "        MAD flags are: $MAD_CFLAGS"
-      else
-        echo "        MAD flags are: default include path"
-      fi
-      echo "        MAD libs are: $MAD_LIBS"
-    else
-      echo "        ERROR: No libmad development package installed!" >&3
-      echo "               You can install it from http://mad.sourceforge.net" >&3
-      echo "               or .deb users: apt-get install libmad0-dev" >&3
-      echo "               or .rpm users: yum install libmad" >&3
-      echo "               or reconfigure using --enable-media=ffmpeg" >&3
-    fi
-  fi
-
   if test x"$media_handler" = x"ffmpeg"; then
     if test x"$FFMPEG_LIBS" != x; then
       echo "        MP3 and video support enabled through ffmpeg"
@@ -2703,7 +2665,6 @@ fi
 need_sdl=false
 test x$build_sdl = xyes			&& need_sdl=true
 test x"$media_handler" = x"ffmpeg"	&& need_sdl=true
-test x"$media_handler" = x"mad"		&& need_sdl=true
 
 if $need_sdl; then
   if test x"$SDL_LIBS" != x; then
@@ -2716,7 +2677,7 @@ if $need_sdl; then
     echo "               or .rpm users: yum install SDL-devel" >&3
     test x$build_sdl = xyes &&
 	echo "               or select a different GUI with --enable-gui= " >&3
-    test x"$media_handler" = x"ffmpeg" -o x"$media_handler" = x"mad" &&
+    test x"$media_handler" = x"ffmpeg" &&
 	echo "               or use --enable-media=gst" >&3
   fi
 fi
