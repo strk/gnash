@@ -222,10 +222,6 @@ if BUILD_MYSQL_EXT
 	@echo "MYSQL_CFLAGS is $(MYSQL_CFLAGS)"
 	@echo "MYSQL_LIBS is $(MYSQL_LIBS)"
 endif
-if USE_MAD_ENGINE
-	@echo "	MAD_CFLAGS is $(MAD_CFLAGS)"
-	@echo "	MAD_LIBS is $(MAD_LIBS)"
-endif
 	@echo "	PTHREAD_CFLAGS is $(PTHREAD_CFLAGS)"
 	@echo "	PTHREAD_LIBS is $(PTHREAD_LIBS)"
 	@echo "	CURL_CFLAGS is $(CURL_CFLAGS)"
