@@ -274,43 +274,29 @@ void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset,
 
 	sound->decoder = NULL;
 
-	switch (sounddata->soundinfo->getFormat()) {
-	case AUDIO_CODEC_NELLYMOSER:
-	case AUDIO_CODEC_NELLYMOSER_8HZ_MONO:
-		sound->decoder = new AudioDecoderNellymoser();
+    try {
 
-		if (!sound->decoder->setup(sounddata->soundinfo.get())) {
-			log_error("The audio decoder can't decode the audio");
-			delete sound->decoder;
-			sound->decoder = NULL;
-		}
-
-		break;
-	case AUDIO_CODEC_MP3:
+	    switch (sounddata->soundinfo->getFormat()) {
+	        case AUDIO_CODEC_NELLYMOSER:
+	        case AUDIO_CODEC_NELLYMOSER_8HZ_MONO:
+		        sound->decoder = new AudioDecoderNellymoser(*(sounddata->soundinfo));
+		        break;
+	        case AUDIO_CODEC_MP3:
 #ifdef USE_FFMPEG
-		sound->decoder = new AudioDecoderFfmpeg();
-
-		if (!sound->decoder->setup(sounddata->soundinfo.get())) {
-			log_error("The audio decoder can't decode the audio");
-			delete sound->decoder;
-			sound->decoder = NULL;
-		}
-
-		break;
+		        sound->decoder = new AudioDecoderFfmpeg(*(sounddata->soundinfo));
+		        break;
 #endif
-	case AUDIO_CODEC_ADPCM:
-	default:
-
-		sound->decoder = new AudioDecoderSimple();
-
-		if (!sound->decoder->setup(sounddata->soundinfo.get())) {
-			log_error("The audio decoder can't decode the audio");
-			delete sound->decoder;
-			sound->decoder = NULL;
-		}
-
+	        case AUDIO_CODEC_ADPCM:
+	        default:
+                sound->decoder = new AudioDecoderSimple(*(sounddata->soundinfo));
+                break;
+	    }
 	}
-		
+	catch (MediaException& e)
+	{
+	    log_error("AudioDecoder initialization failed");
+	}
+
 	if (!soundOpened) {
 		if (SDL_OpenAudio(&audioSpec, NULL) < 0 ) {
 			log_error(_("Unable to start SDL sound: %s"), SDL_GetError());

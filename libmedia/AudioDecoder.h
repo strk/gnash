@@ -37,32 +37,11 @@ namespace media {
 class AudioDecoder {
 	
 public:
+
 	AudioDecoder() {}
 
 	// virtual classes need a virtual destructor !
 	virtual ~AudioDecoder() {}
-
-	/// Sets up the decoder.
-	//
-	/// @param info
-	/// 	AudioInfo class with all the info needed to decode
-	///     the sound correctly.
-	///
-	/// @return true if succesfull else false
-	///
-	/// TODO: take AudioInfo by ref, not pointer
-	///
-	virtual bool setup(AudioInfo* /*info*/) { return false; }
-
-	/// Sets up the decoder.
-	//
-	/// @param info
-	/// 	SoundInfo class with all the info needed to decode
-	///     the audio correctly.
-	///
-	/// @return true if succesfull else false
-	///
-	virtual bool setup(SoundInfo* /*info*/) { return false; }
 
 	/// Decodes a frame and returns a pointer to the data
 	//

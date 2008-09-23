@@ -17,8 +17,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-#ifndef __AUDIODECODERFFMPEG_H__
-#define __AUDIODECODERFFMPEG_H__
+#ifndef GNASH_AUDIODECODERFFMPEG_H
+#define GNASH_AUDIODECODERFFMPEG_H
 
 // TODO: What's this for ?
 #ifndef __STDC_CONSTANT_MACROS
@@ -36,17 +36,27 @@ namespace media {
 class AudioDecoderFfmpeg : public AudioDecoder {
 	
 public:
-	AudioDecoderFfmpeg();
-	~AudioDecoderFfmpeg();
+	/// @param info
+	/// 	AudioInfo class with all the info needed to decode
+	///     the sound correctly. Throws a MediaException on fatal
+	///     error.
+	AudioDecoderFfmpeg(AudioInfo& info);
 
-	bool setup(AudioInfo* info);
-	bool setup(SoundInfo* info);
+	/// @param info
+	/// 	SoundInfo class with all the info needed to decode
+	///     the sound correctly. Throws a MediaException on fatal
+	///     error.
+	AudioDecoderFfmpeg(SoundInfo& info);
+	~AudioDecoderFfmpeg();
 
 	boost::uint8_t* decode(boost::uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize, boost::uint32_t& decodedBytes, bool parse);
 
 	boost::uint8_t* decode(const EncodedAudioFrame& af, boost::uint32_t& outputSize);
 
 private:
+
+	void setup(AudioInfo& info);
+	void setup(SoundInfo& info);
 
 	boost::uint8_t* decodeFrame(boost::uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize);
 

@@ -28,7 +28,7 @@
 namespace gnash {
 namespace media {
 
-AudioDecoderGst::AudioDecoderGst() :
+AudioDecoderGst::AudioDecoderGst(AudioInfo& info) :
 	_pipeline(NULL),
 	_input(NULL),
 	_inputcaps(NULL),
@@ -43,6 +43,7 @@ AudioDecoderGst::AudioDecoderGst() :
 	_decodedDataSize(0),
 	_decodedData(0)
 {
+    setup(info);
 }
 
 AudioDecoderGst::~AudioDecoderGst()
@@ -56,9 +57,12 @@ AudioDecoderGst::~AudioDecoderGst()
 	}
 }
 
-bool AudioDecoderGst::setup(AudioInfo* info)
+void AudioDecoderGst::setup(AudioInfo& info)
 {
-	if (info->type != FLASH || info->codec != AUDIO_CODEC_MP3) return false;
+	if (info.type != FLASH || info.codec != AUDIO_CODEC_MP3)
+	{
+	    throw MediaException("AudioDecoderGst: cannot handle this codec!");
+	}
 
 	// init GStreamer
 	gst_init (NULL, NULL);
@@ -91,8 +95,9 @@ bool AudioDecoderGst::setup(AudioInfo* info)
 	}
 	// Check if the element was correctly created
 	if (!_decoder) {
-		log_error(_("A gstreamer mp3-decoder element could not be created.  You probably need to install a mp3-decoder plugin like gstreamer0.10-mad or gstreamer0.10-fluendo-mp3."));
-		return false;
+		throw MediaException (_("A gstreamer mp3-decoder element could not "
+				"be created. You probably need to install a mp3-decoder plugin"
+				" like gstreamer0.10-mad or gstreamer0.10-fluendo-mp3."));
 	}
 
 	GstCaps *caps = NULL;
@@ -139,8 +144,6 @@ bool AudioDecoderGst::setup(AudioInfo* info)
 
 	// Start "playing"
 	gst_element_set_state (GST_ELEMENT (_pipeline), GST_STATE_PLAYING);
-
-	return true;
 
 }
 

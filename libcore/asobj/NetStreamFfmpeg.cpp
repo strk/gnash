@@ -215,7 +215,7 @@ NetStreamFfmpeg::initVideoDecoder(media::MediaParser& parser)
 	    _videoDecoder = _mediaHandler->createVideoDecoder(*videoInfo);
 	}
 	catch (MediaException& e) {
-	    log_error("Could not create Video decoder: %s", e.what());
+	    log_error("NetStream: Could not create Video decoder: %s", e.what());
 	}
 
 }
@@ -234,9 +234,13 @@ NetStreamFfmpeg::initAudioDecoder(media::MediaParser& parser)
 
 	assert ( _mediaHandler ); // caller should check this
 
-	_audioDecoder = _mediaHandler->createAudioDecoder(*audioInfo);
-	if ( ! _audioDecoder.get() )
-		log_error(_("Could not create audio decoder for codec %d"), audioInfo->codec);
+    try {
+	    _audioDecoder = _mediaHandler->createAudioDecoder(*audioInfo);
+	}
+	catch (MediaException& e) {
+	    log_error("Could not create Audio decoder: %s", e.what());
+	}
+
 }
 
 
