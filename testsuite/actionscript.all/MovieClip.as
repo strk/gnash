@@ -23,6 +23,21 @@
 rcsid="$Id: MovieClip.as,v 1.133 2008/05/09 13:21:08 strk Exp $";
 #include "check.as"
 
+// Utility function to print a Matrix with optional rounding
+printMatrix = function(m, roundToDecimal)
+{
+    if ( roundToDecimal != undefined )
+    {
+        var round = Math.pow(10, roundToDecimal);
+//      trace('rounding to '+round);
+        return '(a=' + Math.round(m.a*round)/round + ', b='+ Math.round(m.b*round)/round + ', c='+ Math.round(m.c*round)/round + ', d=' + Math.round(m.d*round)/round + ', tx='+Math.round(m.tx*round)/round+', ty='+Math.round(m.ty*round)/round+')';
+    }
+    else
+    {
+        return m.toString();
+    }
+};
+
 
 #if OUTPUT_VERSION == 5
 Object.prototype.hasOwnProperty = ASnative(101, 5);
@@ -88,7 +103,7 @@ endOfTest = function()
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(752); // SWF8+
+	check_totals(754); // SWF8+
 #endif
 
 	play();
@@ -1074,6 +1089,12 @@ draw._x -= 20;
 container._x += 20;
 
 draw._rotation = 90;
+
+#if OUTPUT_VERSION >= 8
+check_equals(printMatrix(draw.transform.matrix, 0), "(a=0, b=1, c=-1, d=0, tx=0, ty=0)");
+check_equals(printMatrix(container.transform.matrix, 0), "(a=1, b=0, c=0, d=1, tx=0, ty=0)");
+#endif
+
 check_equals(draw._width, 20); 
 check_equals(draw._height, 10); 
 b = draw.getBounds(); // these are local, untransformed
