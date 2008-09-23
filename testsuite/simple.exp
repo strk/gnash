@@ -29,7 +29,9 @@ foreach file $testcases {
 
     # this version of the call allows use of 'wait' to check return code
     # -open [open "|cmd" "r"] doesn't work for that
-    spawn -noecho ./$file 
+  
+    # Ignore SIGHUP or we'd get a lot of them on Debian stable
+    spawn -noecho -ignore SIGHUP ./$file 
 
     expect {
 	-re "^\[^\n]*NOTE:\[^\n]*\n" {
@@ -100,8 +102,10 @@ foreach file $testcases {
 	# debugging
 	#set i 0; foreach j $retcode { print "${file} wait($i) $j"; incr i }
 
-	# This snippet catches segfaults and aborts
-	# but is unreliable on debian stable :/
+	# This snippet catches segfaults and aborts.
+	# Would also catch SIGHUP, but we're ignoring them
+	# as on Debian Stable we unexpectedly get them for no apparent reason
+	#
 	if { [ llength $retcode ] > 5 } {
 		fail "${file} died prematurely ([lindex $retcode 6])"
 	}
