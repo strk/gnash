@@ -48,7 +48,8 @@ MediaHandlerFfmpeg::createMediaParser(std::auto_ptr<IOChannel> stream)
 		}
 		catch (GnashException& ex)
 		{
-			log_error("Could not create FFMPEG based media parser for input stream: %s", ex.what());
+			log_error("Could not create FFMPEG based media parser for "
+                    "input stream: %s", ex.what());
 			assert(!parser.get());
 		}
 	}
@@ -59,15 +60,14 @@ MediaHandlerFfmpeg::createMediaParser(std::auto_ptr<IOChannel> stream)
 std::auto_ptr<VideoDecoder>
 MediaHandlerFfmpeg::createVideoDecoder(VideoInfo& info)
 {
-	std::auto_ptr<VideoDecoder> ret( new VideoDecoderFfmpeg(info) );
+	std::auto_ptr<VideoDecoder> ret(new VideoDecoderFfmpeg(info));
 	return ret;
 }
 
 std::auto_ptr<AudioDecoder>
 MediaHandlerFfmpeg::createAudioDecoder(AudioInfo& info)
 {
-	std::auto_ptr<AudioDecoder> ret( new AudioDecoderFfmpeg() );
-	ret->setup(&info);
+	std::auto_ptr<AudioDecoder> ret(new AudioDecoderFfmpeg(info));
 	return ret;
 }
 

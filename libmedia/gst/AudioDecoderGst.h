@@ -17,8 +17,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-#ifndef __AUDIODECODERGST_H__
-#define __AUDIODECODERGST_H__
+#ifndef GNASH_AUDIODECODERGST_H
+#define GNASH_AUDIODECODERGST_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -40,16 +40,17 @@ namespace media {
 class AudioDecoderGst : public AudioDecoder {
 	
 public:
-	AudioDecoderGst();
-	~AudioDecoderGst();
+	AudioDecoderGst(AudioInfo& info);
 
-	bool setup(AudioInfo* info);
+	~AudioDecoderGst();
 
 	boost::uint8_t* decode(boost::uint8_t* /*input*/, boost::uint32_t /*inputSize*/, boost::uint32_t& /*outputSize*/, boost::uint32_t& /*decodedData*/, bool /*parse*/);
 
 	static void callback_handoff (GstElement * /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data);
 	static void callback_output (GstElement * /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data);
 private:
+
+	void setup(AudioInfo& info);
 
 	// gstreamer pipeline objects
 

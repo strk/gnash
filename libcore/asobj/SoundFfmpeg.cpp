@@ -180,10 +180,12 @@ SoundFfmpeg::loadSound(const std::string& file, bool streaming)
 		return;
 	}
 
-	_audioDecoder.reset( _mediaHandler->createAudioDecoder(*audioInfo).release() );
-	if ( ! _audioDecoder.get() )
-	{
-		log_error(_("Could not create audio decoder for codec %d"), audioInfo->codec);
+    try {
+	    _audioDecoder.reset(_mediaHandler->createAudioDecoder(*audioInfo).release());
+	}
+	catch (MediaException& e) {
+        assert(!_audioDecoder.get());
+		log_error(_("Could not create audio decoder: %s"), e.what());
 	}
 
 	// start playing ASAP, a call to ::start will just change _startTime
