@@ -372,7 +372,7 @@
 	for soundstreams. 
 	The SDL sound backend supports both event-sounds and soundstreams,
 	using Gnash's internal ADPCM, and optionally MP3 support, using
-	either FFMPEG or LIBMAD.
+	FFMPEG.
 	When it receives sound data it is stored without being decoded, unless
 	it is ADPCM, which is decoded in the parser. When playing, backend
 	relies on a function callback for retrieving output sound, which is 
