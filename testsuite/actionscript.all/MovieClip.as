@@ -1355,7 +1355,7 @@ check(!_root.transform instanceOf Matrix);
 props = []; for (var i in _root.transform) props.push(i); props.sort();
 xcheck_equals(props.toString(), "colorTransform,concatenatedColorTransform,concatenatedMatrix,matrix,pixelBounds");
 
-xcheck_equals(typeof(_root.transform.colorTransform), 'object');
+check_equals(typeof(_root.transform.colorTransform), 'object');
 // TODO: test colorTransform
 
 xcheck_equals(typeof(_root.transform.concatenatedColorTransform), 'object');
