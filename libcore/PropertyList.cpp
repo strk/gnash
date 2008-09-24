@@ -161,7 +161,7 @@ PropertyList::getValue(const string_table::key key, as_value& val,
 }
 
 bool
-PropertyList::setValue(string_table::key key, as_value val,
+PropertyList::setValue(string_table::key key, const as_value& val,
 		as_object& this_ptr, string_table::key nsId,
 		const as_prop_flags& flagsIfMissing)
 {
