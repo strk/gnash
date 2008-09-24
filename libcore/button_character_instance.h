@@ -45,7 +45,6 @@ namespace gnash {
 class Button : public character
 {
 public:
-	button_character_definition*	m_def;
 
 	typedef std::vector< character* > CharsVect;
 	typedef std::set<int> RecSet;
@@ -75,7 +74,7 @@ public:
 
 	MouseState m_mouse_state;
 
-	Button(button_character_definition* def,
+	Button(button_character_definition& def,
 			character* parent, int id);
 
 	~Button();
@@ -164,6 +163,8 @@ protected:
 
 private:
 
+	button_character_definition& _def;
+
 	CharsVect _stateCharacters;
 
 	CharsVect _hitCharacters;
@@ -212,7 +213,7 @@ private:
 	/// \brief
 	/// Return version of the SWF containing
 	/// the button definition this is an instance of.
-        int getSWFVersion() const;
+    int getSWFVersion() const;
 
 	bool m_enabled;
 

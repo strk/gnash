@@ -291,22 +291,21 @@ attachButtonInterface(as_object& o)
 }
 
 Button::Button(
-		button_character_definition* def,
+		button_character_definition& def,
 		character* parent, int id)
 	:
 	character(parent, id),
-	m_def(def),
 	m_last_mouse_flags(IDLE),
 	m_mouse_flags(IDLE),
 	m_mouse_state(UP),
+	_def(def),
 	m_enabled(true)
 {
-	assert(m_def);
 
 	set_prototype(getButtonInterface());
 
 	// check up presence Key events
-	if ( m_def->hasKeyPressHandler() )
+	if ( _def.hasKeyPressHandler() )
 	{
 		_vm.getRoot().add_key_listener(this);
 	}
@@ -378,7 +377,7 @@ Button::on_event(const event_id& id)
 	if ( id.keyCode == key::INVALID ) return false;
 
 	ButtonActionPusher xec(getVM().getRoot(), this); 
-	m_def->forEachTrigger(id, xec);
+	_def.forEachTrigger(id, xec);
 
 	return xec.called;
 }
@@ -516,7 +515,7 @@ Button::on_button_event(const event_id& event)
 	set_current_state(new_state);
     
 	// Button transition sounds.
-	if (m_def->m_sound != NULL)
+	if (_def.m_sound != NULL)
 	{
 		int bi; // button sound array index [0..3]
 		media::sound_handler* s = get_sound_handler();
@@ -543,11 +542,11 @@ Button::on_button_event(const event_id& event)
 			}
 			if (bi >= 0)
 			{
-				button_character_definition::button_sound_info& bs = m_def->m_sound->m_button_sounds[bi];
+				button_character_definition::button_sound_info& bs = _def.m_sound->m_button_sounds[bi];
 				// character zero is considered as null character
 				if (bs.m_sound_id > 0)
 				{
-					if (m_def->m_sound->m_button_sounds[bi].m_sam != NULL)
+					if (_def.m_sound->m_button_sounds[bi].m_sam != NULL)
 					{
 						if (bs.m_sound_style.m_stop_playback)
 						{
@@ -576,7 +575,7 @@ Button::on_button_event(const event_id& event)
 	movie_root& mr = getVM().getRoot();
 
 	ButtonActionPusher xec(mr, this); 
-	m_def->forEachTrigger(event, xec);
+	_def.forEachTrigger(event, xec);
 
 	// check for built-in event handler.
 	std::auto_ptr<ExecutableCode> code ( get_event_handler(event) );
@@ -605,6 +604,7 @@ Button::getActiveCharacters(
         std::vector<const character*>& list) const
 {
     list.clear();
+    log_debug("getActiveChars const");
 
     // Copy all the characters to the new list, skipping NULL
     // characters.
@@ -620,6 +620,8 @@ Button::getActiveCharacters(
         std::vector<character*>& list, bool includeUnloaded)
 {
 	list.clear();
+    log_debug("getActiveChars non-const");
+
     std::remove_copy_if(_stateCharacters.begin(),
             _stateCharacters.end(),
             std::back_inserter(list),
@@ -632,12 +634,12 @@ Button::get_active_records(RecSet& list, MouseState state)
 {
 	list.clear();
 	
-	size_t nrecs = m_def->m_button_records.size();
+	size_t nrecs = _def.m_button_records.size();
 
-	//log_debug("%s.get_active_records(%s) - def has %d records", getTarget(), mouseStateName(state), m_def->m_button_records.size());
+	//log_debug("%s.get_active_records(%s) - def has %d records", getTarget(), mouseStateName(state), _def.m_button_records.size());
 	for (size_t i=0; i<nrecs; ++i)
 	{
-		button_record&	rec = m_def->m_button_records[i];
+		button_record& rec = _def.m_button_records[i];
 		//log_debug(" rec %d has hit:%d down:%d over:%d up:%d", i, rec.m_hit_test, rec.m_down, rec.m_over, rec.m_up);
 
 		if ((state == UP && rec.m_up)
@@ -738,7 +740,7 @@ Button::set_current_state(MouseState new_state)
 			if ( ! oldch )
 			{
 				// Not there, instantiate
-				button_record& bdef = m_def->m_button_records[i];
+				button_record& bdef = _def.m_button_records[i];
 
 				const matrix&	mat = bdef.m_button_matrix;
 				const cxform&	cx = bdef.m_button_cxform;
@@ -891,7 +893,7 @@ Button::stagePlacementCallback()
 	get_active_records(hitChars, HIT);
 	for (RecSet::iterator i=hitChars.begin(),e=hitChars.end(); i!=e; ++i)
 	{
-		button_record& bdef = m_def->m_button_records[*i];
+		button_record& bdef = _def.m_button_records[*i];
 
 		const matrix& mat = bdef.m_button_matrix;
 		const cxform& cx = bdef.m_button_cxform;
@@ -913,7 +915,7 @@ Button::stagePlacementCallback()
 	// Some slots will probably be never used (consider HIT-only records)
 	// but for now this direct corrispondence between record number
 	// and active character will be handy.
-	_stateCharacters.resize(m_def->m_button_records.size());
+	_stateCharacters.resize(_def.m_button_records.size());
 
 	// Instantiate the default state characters 
 	RecSet upChars;
@@ -922,7 +924,7 @@ Button::stagePlacementCallback()
 	for (RecSet::iterator i=upChars.begin(),e=upChars.end(); i!=e; ++i)
 	{
 		int rno = *i;
-		button_record& bdef = m_def->m_button_records[rno];
+		button_record& bdef = _def.m_button_records[rno];
 
 		const matrix&	mat = bdef.m_button_matrix;
 		const cxform&	cx = bdef.m_button_cxform;
@@ -955,7 +957,7 @@ Button::markReachableResources() const
 {
 	assert(isReachable());
 
-	m_def->setReachable();
+	_def.setReachable();
 
 	// Mark state characters as reachable
 	for (CharsVect::const_iterator i=_stateCharacters.begin(), e=_stateCharacters.end();
@@ -1137,7 +1139,7 @@ Button::get_member(string_table::key name_key, as_value* val,
 int
 Button::getSWFVersion() const
 {
-	return m_def->getSWFVersion();
+	return _def.getSWFVersion();
 }
 
 static as_object*

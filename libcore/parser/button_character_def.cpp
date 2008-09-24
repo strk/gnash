@@ -510,7 +510,7 @@ character*
 button_character_definition::create_character_instance(
 		character* parent, int id)
 {
-	character* ch = new Button(this, parent, id);
+	character* ch = new Button(*this, parent, id);
 	return ch;
 }
 
