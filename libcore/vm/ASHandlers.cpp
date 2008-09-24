@@ -3331,7 +3331,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
     {
         // SWF integrity check
         IF_VERBOSE_ASCODING_ERRORS(
-        log_error(_("ActionCallMethod invoked with "
+        log_aserror(_("ActionCallMethod invoked with "
             "non-object object/func (%s)"), obj_value);
         );
         env.drop(nargs);
