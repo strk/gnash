@@ -302,24 +302,26 @@ public:
     
     /// Whether gnash is is running as a plugin
     bool isPlugin() const { return (( _xid )); }
-    
-    void setMaxAdvances(unsigned long ul) { if (ul > 0) _maxAdvances = ul; }
+
+    /// Set the maximum number of frame advances before Gnash exits.
+    void setMaxAdvances(unsigned long ul) { if (ul) _maxAdvances = ul; }
     
     void showUpdatedRegions(bool x) { _showUpdatedRegions = x; }
     bool showUpdatedRegions() { return _showUpdatedRegions; }
 
-    /** @name Menu callbacks
-     *  These callbacks will be called when a menu item is clicked.
-     *  @{
-     */
+    /// Instruct the core to restart the movie and
+    /// set state to play(). This does not change pause
+    /// state.
     void restart();
-    void menu_about();
+
     void menu_step_forward();
     void menu_step_backward();
     void menu_jump_forward();
     void menu_jump_backward();
+
+    /// Toggle sound state between muted and unmuted. If
+    /// there is no active sound handler this does nothing.
     void toggleSound();
-    /// @}
 
 #ifdef GNASH_FPS_DEBUG
     /// Set the interval between FPS debugging prints
