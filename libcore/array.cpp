@@ -1439,10 +1439,7 @@ array_new(const fn_call& fn)
 static void
 attachArrayProperties(as_object& proto)
 {
-    as_c_function_ptr gettersetter;
-
-    gettersetter = &array_length;
-    proto.init_property(NSV::PROP_LENGTH, *gettersetter, *gettersetter);
+    proto.init_property(NSV::PROP_LENGTH, &array_length, &array_length);
 }
 
 static void
