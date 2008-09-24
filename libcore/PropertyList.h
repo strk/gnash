@@ -231,7 +231,7 @@ public:
 	/// @return true if the value was successfully set, false
 	///         otherwise (found a read-only property, most likely).
 	///
-	bool setValue(string_table::key key, as_value value,
+	bool setValue(string_table::key key, const as_value& value,
 			as_object& this_ptr, string_table::key namespaceId = 0,
 			const as_prop_flags& flagsIfMissing=0);
 
