@@ -368,9 +368,7 @@ public:
 		return get_indices(ielem);
 	}
 
-	/// Overridden to provide 'length' member
-	//
-	/// TODO: use a property for handling 'length'
+    /// Why is this overridden?
 	virtual bool get_member(string_table::key name, as_value* val,
 		string_table::key nsname = 0);
 

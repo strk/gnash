@@ -341,29 +341,37 @@ void
 attachXMLNodeInterface(as_object& o)
 {
     // These need to be full-featured AS functions (builtin_function)
-    o.init_member("appendChild", new builtin_function(xmlnode_appendchild));
-    o.init_member("cloneNode", new builtin_function(xmlnode_clonenode));
-    o.init_member("hasChildNodes", new builtin_function(xmlnode_haschildnodes));
-    o.init_member("insertBefore", new builtin_function(xmlnode_insertbefore));
-    o.init_member("removeNode", new builtin_function(xmlnode_removenode));
-    o.init_member("toString", new builtin_function(xmlnode_tostring));
-    o.init_member("getPrefixForNamespace", new builtin_function(xmlnode_getPrefixForNamespace));
-    o.init_member("getNamespaceForPrefix", new builtin_function(xmlnode_getNamespaceForPrefix));
+    
+    const int noFlags = 0;
+    
+    // No prop flags:
+    o.init_member("appendChild", new builtin_function(xmlnode_appendchild), noFlags);
+    o.init_member("cloneNode", new builtin_function(xmlnode_clonenode), noFlags);
+    o.init_member("hasChildNodes", new builtin_function(xmlnode_haschildnodes), noFlags);
+    o.init_member("insertBefore", new builtin_function(xmlnode_insertbefore), noFlags);
+    o.init_member("removeNode", new builtin_function(xmlnode_removenode), noFlags);
+    o.init_member("toString", new builtin_function(xmlnode_tostring), noFlags);
+    o.init_member("getPrefixForNamespace", new builtin_function(xmlnode_getPrefixForNamespace), noFlags);
+    o.init_member("getNamespaceForPrefix", new builtin_function(xmlnode_getNamespaceForPrefix), noFlags);
 
-    o.init_property("nodeValue", &xmlnode_nodevalue, &xmlnode_nodevalue);
-    o.init_property("nodeName", &xmlnode_nodename, &xmlnode_nodename);
 
-    o.init_readonly_property("namespaceURI", &xmlnode_namespaceURI);
-    o.init_readonly_property("localName", &xmlnode_localName);
-    o.init_readonly_property("prefix", &xmlnode_prefix);
-    o.init_readonly_property("nodeType", &xmlnode_nodetype);
-    o.init_readonly_property("attributes", &xmlnode_attributes);
-    o.init_readonly_property("childNodes", &xmlnode_childNodes);
-    o.init_readonly_property("firstChild", &xmlnode_firstchild);
-    o.init_readonly_property("lastChild", &xmlnode_lastchild);
-    o.init_readonly_property("nextSibling", &xmlnode_nextsibling);
-    o.init_readonly_property("previousSibling", &xmlnode_previoussibling);
-    o.init_readonly_property("parentNode", &xmlnode_parentNode);
+    const int protectedFlags = as_prop_flags::isProtected;
+
+    // Just the protected flag:
+    o.init_property("nodeValue", &xmlnode_nodevalue, &xmlnode_nodevalue, protectedFlags);
+    o.init_property("nodeName", &xmlnode_nodename, &xmlnode_nodename, protectedFlags);
+
+    o.init_readonly_property("firstChild", &xmlnode_firstchild, protectedFlags);
+    o.init_readonly_property("lastChild", &xmlnode_lastchild, protectedFlags);
+    o.init_readonly_property("localName", &xmlnode_localName, protectedFlags);
+    o.init_readonly_property("namespaceURI", &xmlnode_namespaceURI, protectedFlags);
+    o.init_readonly_property("nextSibling", &xmlnode_nextsibling, protectedFlags);
+    o.init_readonly_property("prefix", &xmlnode_prefix, protectedFlags);
+    o.init_readonly_property("previousSibling", &xmlnode_previoussibling, protectedFlags);
+    o.init_readonly_property("nodeType", &xmlnode_nodetype, protectedFlags);
+    o.init_readonly_property("attributes", &xmlnode_attributes, protectedFlags);
+    o.init_readonly_property("childNodes", &xmlnode_childNodes, protectedFlags);
+    o.init_readonly_property("parentNode", &xmlnode_parentNode, protectedFlags);
 
 }
 
