@@ -844,20 +844,24 @@ main(int argc, char** argv)
 	//      RotateSkew0 -1.000000   RotateSkew1 1.167969
 	//      TranslateX    -15   TranslateY   2700
 	//
-	// Actually this ming version omits ScaleX and ScaleY
-	// (hasScale flag clear). I hope it doesn't count!
-	//
 	SWFMovie_nextFrame(mo);        
 	SWFDisplayItem_setMatrix(it, 0, -1, 1.167969, 0, -.75, 135); 
-    // Ming omits the scales rather then set them to zero (ops)
-    // NOTE: might change if this is a Ming bug
-    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=-1, c=1.16796875, d=1, tx=-0.75, ty=135)'");
-
 	check_equals(mo, "staticmc._x", "-0.75");
 	check_equals(mo, "staticmc._y", "135");
+
+// Ming 0.4.0.beta2 omits the scales rather then set them
+// to zero (ops)
+#if MING_VERSION_CODE < 00040100
+	check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=-1, c=1.16796875, d=1, tx=-0.75, ty=135)'");
 	check_equals(mo, "Math.round(staticmc._xscale)", "141");
 	check_equals(mo, "Math.round(staticmc._yscale)", "154");
 	check_equals(mo, "staticmc._rotation", "-45");  
+#else
+	check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=0, b=-1, c=1.16796875, d=0, tx=-0.75, ty=135)'");
+	check_equals(mo, "Math.round(staticmc._xscale)", "100");
+	check_equals(mo, "Math.round(staticmc._yscale)", "117");
+	check_equals(mo, "staticmc._rotation", "-90");  
+#endif
 
 	// This is a matrix found in the mario.swf movie (bug #24280)
 	//
@@ -866,20 +870,24 @@ main(int argc, char** argv)
 	//     RotateSkew0 0.972519   RotateSkew1 -1.000000
 	//     TranslateX    279   TranslateY   4296
 	//
-	// Actually this ming version omits ScaleX and ScaleY
-	// (hasScale flag clear). I hope it doesn't count!
-	//
 	SWFMovie_nextFrame(mo);        
 	SWFDisplayItem_setMatrix(it, 0, 0.972519, -1, 0, 13.950, 214.80); 
-    // Ming omits the scales rather then set them to zero (ops)
-    // NOTE: might change if this is a Ming bug
-    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=0.972518920898438, c=-1, d=1, tx=13.95, ty=214.8)'");
-
 	check_equals(mo, "Math.round(staticmc._x*100)/100", "13.95"); 
 	check_equals(mo, "staticmc._y", "214.80");
+
+// Ming up to 0.4.0.beta2 omits the scales
+// rather then set them to zero 
+#if MING_VERSION_CODE < 00040100
+	check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=0.972518920898438, c=-1, d=1, tx=13.95, ty=214.8)'");
 	check_equals(mo, "Math.round(staticmc._xscale)", "139");
 	check_equals(mo, "Math.round(staticmc._yscale)", "141");
 	check_equals(mo, "Math.round(staticmc._rotation)", "44");  
+#else
+	check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=0, b=0.972518920898438, c=-1, d=0, tx=13.95, ty=214.8)'");
+	check_equals(mo, "Math.round(staticmc._xscale)", "97");
+	check_equals(mo, "Math.round(staticmc._yscale)", "100");
+	check_equals(mo, "Math.round(staticmc._rotation)", "90");  
+#endif
 
 
 	//
@@ -1690,23 +1698,45 @@ main(int argc, char** argv)
 	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
 	SWFMovie_nextFrame(mo);        
 	SWFDisplayItem_setMatrix(it, 0, 0.972519, -1, 0, 13.950, 214.80); 
-    // Ming omits the scales rather then set them to zero (ops)
-    // NOTE: might change if this is a Ming bug
-    check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=1, b=0.97, c=-1, d=1, tx=13.95, ty=214.8)'");
 	check_equals(mo, "Math.round(staticmc._x*100)/100", "13.95"); 
 	check_equals(mo, "staticmc._y", "214.80");
+
+// Ming up to 0.4.0.beta2 omits the scales rather
+// then set them to zero 
+#if MING_VERSION_CODE < 00040100
+	check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=1, b=0.97, c=-1, d=1, tx=13.95, ty=214.8)'");
 	check_equals(mo, "Math.round(staticmc._xscale)", "139");
 	check_equals(mo, "Math.round(staticmc._yscale)", "141");
 	check_equals(mo, "Math.round(staticmc._rotation)", "44");  
 	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'-46,156 74,274'");
-	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
-    check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=-1, b=-0.97, c=-1, d=1, tx=13.95, ty=214.8)'");
+#else
+	check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=0, b=0.97, c=-1, d=0, tx=13.95, ty=214.8)'");
+	check_equals(mo, "Math.round(staticmc._xscale)", "97");
+	check_equals(mo, "Math.round(staticmc._yscale)", "100");
+	check_equals(mo, "Math.round(staticmc._rotation)", "90");  
+	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'-16,186 44,244'");
+#endif
+
+	// swap _xscale sign using ActionScript
+	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;");
 	check_equals(mo, "Math.round(staticmc._x*100)/100", "13.95"); 
 	check_equals(mo, "staticmc._y", "214.80");
+
+// Ming up to 0.4.0.beta2 omits the scales rather
+// then set them to zero 
+#if MING_VERSION_CODE < 00040100
+	check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=-1, b=-0.97, c=-1, d=1, tx=13.95, ty=214.8)'");
 	check_equals(mo, "Math.round(staticmc._xscale)", "-139");
 	check_equals(mo, "Math.round(staticmc._yscale)", "141");
 	check_equals(mo, "Math.round(staticmc._rotation)", "44");  
 	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'-46,156 74,274'");
+#else
+	check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=0, b=-0.97, c=-1, d=0, tx=13.95, ty=214.8)'");
+	check_equals(mo, "Math.round(staticmc._xscale)", "-97");
+	check_equals(mo, "Math.round(staticmc._yscale)", "100");
+	check_equals(mo, "Math.round(staticmc._rotation)", "90");  
+	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'-16,186 44,244'");
+#endif
 
 	SWFMovie_nextFrame(mo);
 
