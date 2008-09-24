@@ -1606,7 +1606,7 @@ GtkGui::menuitem_sound_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 {
 //    GNASH_REPORT_FUNCTION;
     Gui* gui = static_cast<Gui*>(data);
-    gui->menu_toggle_sound();
+    gui->toggleSound();
 }
 
 void
@@ -1624,7 +1624,7 @@ GtkGui::menuitem_restart_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 {
     //GNASH_REPORT_FUNCTION;
     Gui* gui = static_cast<Gui*>(data);
-    gui->menu_restart();
+    gui->restart();
 }
 
 /// \brief quit complete, and close the application
@@ -1642,7 +1642,7 @@ GtkGui::menuitem_play_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 {
 //    GNASH_REPORT_FUNCTION;
     Gui* gui = static_cast<Gui*>(data);
-    gui->menu_play();
+    gui->play();
 }
 
 /// \brief toggle between playing or paused.
@@ -1651,7 +1651,7 @@ GtkGui::menuitem_pause_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 {
 //    GNASH_REPORT_FUNCTION;
     Gui* gui = static_cast<Gui*>(data);
-    gui->menu_pause();
+    gui->pause();
 }
 
 /// \brief stop the movie that's playing.
@@ -1660,7 +1660,7 @@ GtkGui::menuitem_stop_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 {
     GNASH_REPORT_FUNCTION;
     Gui* gui = static_cast<Gui*>(data);
-    gui->menu_stop();
+    gui->stop();
 }
 
 /// \brief step forward 1 frame

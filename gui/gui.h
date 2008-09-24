@@ -312,17 +312,13 @@ public:
      *  These callbacks will be called when a menu item is clicked.
      *  @{
      */
-    void menu_restart();
-    void menu_quit();
+    void restart();
     void menu_about();
-    void menu_play();
-    void menu_pause();
-    void menu_stop();
     void menu_step_forward();
     void menu_step_backward();
     void menu_jump_forward();
     void menu_jump_backward();
-    void menu_toggle_sound();
+    void toggleSound();
     /// @}
 
 #ifdef GNASH_FPS_DEBUG
