@@ -107,8 +107,12 @@ bitwise-5.swf:98475055aae4796a066e7728d5a7a944
 bitwise-6.swf:ef818f643cc14a4cc57248473e05a48c
 bitwise-7.swf:c18505cd0d075c512d15b6d96ab221d0
 bitwise-8.swf:a99b312eddd076f8b9df649bc4b33964
+BlurFilter-construct-6.swf:9f183e7e0a35fbe488aa7c447dced20c
+BlurFilter-construct-7.swf:c38a6f916e3bc1a0141c9c78d23e0aa0
 blur-filter-properties-5.swf:4c29ecc04df379ced45039fdbb79eb9c
 blur-filter-properties-5.swf:f2e1d9ccc47765bd6c88095b19974c7b
+boolean-7.swf:4124413f55f405ad865a05403bc24662
+boolean-8.swf:c3c872988d25c8e49c11e5e337ea1e69
 boolean-properties-5.swf:d955b32271cf8a073de42566eb13a5d8
 boolean-properties-6.swf:606b0b8883de19dce98bbeb9c91e0215
 boolean-properties-7.swf:f01da3f46a6a70f22682ad6655e1be6a
@@ -150,6 +154,8 @@ color-setTransform-empty.swf:2a72a5273ab8713ee289ff1726b0959c
 color-setTransform-full.swf:7a8e59cef9592c4546f07fb9f391c61a
 color-setTransform-negative.swf:0bc0510c35fc5c82de31b0db887fe535
 color-transform-concat-5.swf:92f467ed0cee02fbc9618a17c382ef3b
+color-transform-construct-8.swf:d68ee06d60eb6612648365ab75f6b794
+color-transform-multipliers-offsets-8.swf:6e4558a870ddbf941365171accb8cf18
 color-transform-properties-5.swf:74bd1e74d40fd8741000366645b7c776
 color-transform-properties-5.swf:7e620e53cb1e19d5793e3198e9f08993
 comparisons-4.swf:e0bb89e492f3f35e51b1beb190935a14
@@ -994,6 +1000,9 @@ string-properties-8.swf:b5d56ec26bad2fa2c7833f44e5148fd8
 string-slice-5.swf:a98bdbd8ce5ff3cfd5406d3a9d04de33
 string-slice-6.swf:cfe7fde1085617b6673fda9895162e32
 string-slice-7.swf:eaed0b05db4e5a01579a94f283f8a068
+String-split-count-values-6.swf:6eccd6c628bf489d48935de4bfa6ef5a
+String-split-count-values-7.swf:1b1b8fe98fa48ed7c15455cd990d1ad7
+String-split-count-values-8.swf:390b83821fbfb9497d0660d1f57da85a
 string-split-empty-5.swf:0cdbe0cfc78b49bdf37c1e71bfc5743f
 string-split-empty-5.swf:5e9ed1cad7e80dddeed72f6674a034a3
 string-split-empty-6.swf:3a676ec5e92c371427ca38d629943c90
