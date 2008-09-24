@@ -31,6 +31,7 @@
 #include "tree.hh" // for tree
 #endif
 
+#include <cstdlib> // exit
 #include <string>
 #include <map>
 
@@ -120,7 +121,7 @@ public:
     /// The default implementation calls exit(0), which isn't nice.
     /// Please implement the proper main loop quitter in the subclasses.
     ///
-    virtual void quit()  { exit(0); }
+    virtual void quit()  { std::exit(0); }
 
     /// Render the current buffer.
     /// For OpenGL, this means that the front and back buffers are swapped.
