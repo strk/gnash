@@ -604,9 +604,8 @@ Button::getActiveCharacters(
         std::vector<const character*>& list) const
 {
     list.clear();
-    log_debug("getActiveChars const");
 
-    // Copy all the characters to the new list, skipping NULL
+    // Copy all the characters to the new list, skipping NULL and unloaded
     // characters.
     std::remove_copy_if(_stateCharacters.begin(), _stateCharacters.end(),
             std::back_inserter(list),
@@ -620,8 +619,9 @@ Button::getActiveCharacters(
         std::vector<character*>& list, bool includeUnloaded)
 {
 	list.clear();
-    log_debug("getActiveChars non-const");
 
+    // Copy all the characters to the new list, skipping NULL
+    // characters, optionally including unloaded characters.
     std::remove_copy_if(_stateCharacters.begin(),
             _stateCharacters.end(),
             std::back_inserter(list),
@@ -984,7 +984,6 @@ Button::markReachableResources() const
 bool
 Button::unload()
 {
-	//log_debug("Button %s being unloaded", getTarget());
 
 	bool childsHaveUnload = false;
 
