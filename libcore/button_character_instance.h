@@ -19,8 +19,8 @@
 // SWF buttons.  Mouse-sensitive update/display, actions, etc.
 
 
-#ifndef GNASH_BUTTON_CHARACTER_INSTANCE_H
-#define GNASH_BUTTON_CHARACTER_INSTANCE_H
+#ifndef GNASH_BUTTON_H
+#define GNASH_BUTTON_H
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "character.h" // for inheritance
@@ -39,10 +39,10 @@ namespace gnash {
 //
 
 //
-// button_character_instance
+// Button
 //
 
-class button_character_instance : public character
+class Button : public character
 {
 public:
 	button_character_definition*	m_def;
@@ -63,7 +63,7 @@ public:
 	};
 	int	m_last_mouse_flags, m_mouse_flags;
 
-	enum e_mouse_state
+	enum MouseState
 	{
 		UP = 0,
 		DOWN,
@@ -71,14 +71,14 @@ public:
 		HIT
 	};
 
-	static const char* mouseStateName(e_mouse_state s);
+	static const char* mouseStateName(MouseState s);
 
-	e_mouse_state m_mouse_state;
+	MouseState m_mouse_state;
 
-	button_character_instance(button_character_definition* def,
+	Button(button_character_definition* def,
 			character* parent, int id);
 
-	~button_character_instance();
+	~Button();
 
 	// See dox in as_object.h
 	bool get_member(string_table::key name, as_value* val, 
@@ -89,19 +89,11 @@ public:
 	// called from keypress listener only
 	bool on_event(const event_id& id);
 
-	void	restart();
+	void restart();
 
-	void	display();
+	void display();
 	
-	void set_current_state(e_mouse_state new_state);
-
-	/// Combine the flags to avoid a conditional.
-	//  It would be faster with a macro.
-	inline int	transition(int a, int b) const
-	{
-		return (a << 2) | b;
-	}
-
+	void set_current_state(MouseState new_state);
 
 	/// \brief
 	/// Return the topmost entity that the given point covers. 
@@ -119,7 +111,7 @@ public:
 	/// Overridden to look in button records for a match
 	virtual as_object* get_path_element(string_table::key key);
 
-	virtual void	on_button_event(const event_id& event);
+	virtual void on_button_event(const event_id& event);
 
 	//
 	// ActionScript overrides
@@ -164,15 +156,15 @@ protected:
 	//
 	/// These are:
 	///	- this char's definition (m_def)
-	///	- the vector of state characters (m_record_character)
-	///	- the vector of hit characters (m_record_character)
+	///	- the vector of state characters (_stateCharacters)
+	///	- the vector of hit characters (_hitCharacters)
 	///
 	void markReachableResources() const;
 #endif // GNASH_USE_GC
 
 private:
 
-	CharsVect m_record_character;
+	CharsVect _stateCharacters;
 
 	CharsVect _hitCharacters;
 
@@ -181,12 +173,21 @@ private:
 	/// The "_visible" property does not matter here. 
 	///
 	/// @param list
-	///	The vector to push active characters into
+	///	The container to push active characters into
 	///
 	/// @param includeUnloaded
 	///	If true, include unloaded but still reachable chars in the records slot.
 	///
-	void get_active_characters(std::vector<character*>& list, bool includeUnloaded=false);
+	void getActiveCharacters(std::vector<character*>& list,
+			bool includeUnloaded=false);
+
+    /// Returns all characters that are active based on the current state.
+    //
+    /// This is a const method because the returned characters cannot be
+    /// modified.
+    ///
+    /// @param list     The container to push unmodifiable characters into.
+	void getActiveCharacters(std::vector<const character*>& list) const;
 
 	/// Returns all characters (record nums) that should be active on the given state.
 	//
@@ -196,13 +197,7 @@ private:
 	/// @param state
 	///	The state we're interested in
 	///
-	void get_active_records(RecSet& list, e_mouse_state state);
-
-	const CharsVect& getHitCharacters() const
-	{
-		return _hitCharacters;
-	}
-
+	void get_active_records(RecSet& list, MouseState state);
 
 	/// Return any state character whose name matches the given string
 	//
@@ -212,7 +207,7 @@ private:
 	///	Name to match, search is case sensitive for SWF7 and higher,
 	///     case insensitive up to SWF6.
 	///
-	character * getChildByName(const std::string& name) const;
+	character * getChildByName(const std::string& name);
 
 	/// \brief
 	/// Return version of the SWF containing
@@ -229,7 +224,7 @@ void button_class_init(as_object& global);
 }	// end namespace gnash
 
 
-#endif // GNASH_BUTTON_CHARACTER_INSTANCE_H
+#endif // GNASH_Button_H
 
 
 // Local Variables:
