@@ -53,7 +53,7 @@ It can play some SWF files in cooperation with the browser. It
 should work with any browser that supports Mozilla's NSPR API and
 plugin SDK. It has been tested with Mozilla 1.7.13 with gtk2 (won't work with
 gtk1 due to the NSAPI used), Firefox 1.0.x, Firefox 1.5.x, Firefox 2.x,
-Firefox 3.x, and Epiphany.
+Firefox 3.x, Iceweasel 2.0.0.6 and Epiphany.
 
 Gnash runs equally well in 32-bit and 64-bit environments, so works without
 any issues as a 64-bit plugin.
