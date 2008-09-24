@@ -127,8 +127,10 @@ LoadableObject::sendAndLoad(const std::string& urlstr,
 
         if (get_member(NSV::PROP_CONTENT_TYPE, &contentType))
         {
-            // This should not overwrite anything set in LoadVars.addRequestHeader();
-            headers.insert(std::make_pair("Content-Type", contentType.to_string()));
+            // This should not overwrite anything set in 
+            // LoadVars.addRequestHeader();
+            headers.insert(std::make_pair("Content-Type", 
+                        contentType.to_string()));
         }
 
         /// It doesn't matter if there are no request headers.

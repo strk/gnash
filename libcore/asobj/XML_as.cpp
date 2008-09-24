@@ -364,16 +364,19 @@ attachXMLProperties(as_object& /*o*/)
 static void
 attachXMLInterface(as_object& o)
 {
-    o.init_member("addRequestHeader", new builtin_function(xml_addRequestHeader));
-    o.init_member("createElement", new builtin_function(xml_createelement));
-    o.init_member("createTextNode", new builtin_function(xml_createtextnode));
-    o.init_member("getBytesLoaded", new builtin_function(xml_getbytesloaded));
-    o.init_member("getBytesTotal", new builtin_function(xml_getbytestotal));
-    o.init_member("load", new builtin_function(xml_load));
-    o.init_member("parseXML", new builtin_function(xml_parsexml));
-    o.init_member("send", new builtin_function(xml_send));
-    o.init_member("sendAndLoad", new builtin_function(xml_sendAndLoad));
-    o.init_member("onData", new builtin_function(xml_ondata));
+    const int flags = 0;
+
+    // No flags:
+    o.init_member("addRequestHeader", new builtin_function(xml_addRequestHeader), flags);
+    o.init_member("createElement", new builtin_function(xml_createelement), flags);
+    o.init_member("createTextNode", new builtin_function(xml_createtextnode), flags);
+    o.init_member("getBytesLoaded", new builtin_function(xml_getbytesloaded), flags);
+    o.init_member("getBytesTotal", new builtin_function(xml_getbytestotal), flags);
+    o.init_member("load", new builtin_function(xml_load), flags);
+    o.init_member("parseXML", new builtin_function(xml_parsexml), flags);
+    o.init_member("send", new builtin_function(xml_send), flags);
+    o.init_member("sendAndLoad", new builtin_function(xml_sendAndLoad), flags);
+    o.init_member("onData", new builtin_function(xml_ondata), flags);
 
 }
 
