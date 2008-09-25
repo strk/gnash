@@ -27,7 +27,11 @@ rcsid="$Id: Transform.as,v 1.3 2008/06/20 13:28:56 bwy Exp $";
 ASSetPropFlags (_global, "flash", 0, 5248);
 
 #if OUTPUT_VERSION < 8
-xcheck_equals(typeOf(flash.geom.Transform), "function");
+# if OUTPUT_VERSION < 6 
+check_equals(typeOf(flash.geom.Transform), "undefined");
+# else
+check_equals(typeOf(flash.geom.Transform), "function");
+# endif
 totals(1);
 #else
 
