@@ -695,6 +695,15 @@ string_to_upper_case(const fn_call& fn)
     {
         currentLocale = std::locale::classic();
     }
+
+    if (currentLocale == std::locale::classic())
+    {
+        LOG_ONCE(
+            log_error(_("Your locale probably can't convert non-ascii "
+            "characters to upper case. Using a UTF8 locale may fix this."));
+        );
+    }
+
     boost::to_upper(wstr, currentLocale);
 
     return as_value(utf8::encodeCanonicalString(wstr, version));
@@ -724,6 +733,15 @@ string_to_lower_case(const fn_call& fn)
     {
         currentLocale = std::locale::classic();
     }
+
+    if (currentLocale == std::locale::classic())
+    {
+        LOG_ONCE( 
+            log_error(_("Your locale probably can't convert non-ascii "
+                "characters to lower case. Using a UTF8 locale may fix this"));
+        );
+    }
+
     boost::to_lower(wstr, currentLocale);
 
     return as_value(utf8::encodeCanonicalString(wstr, version));
