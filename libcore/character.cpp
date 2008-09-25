@@ -404,22 +404,37 @@ character::alpha_getset(const fn_call& fn)
 	else // setter
 	{
 		const as_value& inval = fn.arg(0);
-		const double input = inval.to_number();
-		if ( inval.is_undefined() || inval.is_null() || ! utility::isFinite(input) )
+
+        // The new internal alpha value is input / 100.0 * 256.
+        // We test for finiteness later, but the multiplication
+        // won't make any difference.
+		const double newAlpha = inval.to_number() * 2.56;
+
+        if ( inval.is_undefined() || inval.is_null() ||
+                !utility::isFinite(newAlpha) )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror(_("Ignored attempt to set %s.%s=%s"),
-				ptr->getTarget(),
-				_("_alpha"), // trying to reuse translations
-				fn.arg(0));
+			log_aserror(_("Ignored attempt to set %s._alpha=%s"),
+				ptr->getTarget(), fn.arg(0));
 			);
 			return rv;
 		}
-		// set alpha = input / 100.0 * 256 = input * 2.56;
-		cxform	cx = ptr->get_cxform();
-		cx.aa = (boost::int16_t)(input * 2.56); 
+
+        cxform cx = ptr->get_cxform();
+
+        // Overflows are *not* truncated, but set to -32768.
+        if (newAlpha > std::numeric_limits<boost::int16_t>::max() ||
+            newAlpha < std::numeric_limits<boost::int16_t>::min())
+        {
+            cx.aa = std::numeric_limits<boost::int16_t>::min();
+        }
+        else
+        {
+            cx.aa = static_cast<boost::int16_t>(newAlpha);
+        }
+
         ptr->set_cxform(cx);
-		ptr->transformedByScript(); // m_accept_anim_moves = false; 
+		ptr->transformedByScript();  
 	}
 	return rv;
 
