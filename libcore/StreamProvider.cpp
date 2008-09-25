@@ -114,7 +114,11 @@ StreamProvider::getStream(const URL& url, const std::string& postdata,
 
     if (url.protocol() == "file")
     {
-        log_error("Request Headers discarded while getting stream from file: uri");
+        if (!headers.empty())
+        {
+            log_error("Request Headers discarded while getting stream "
+                    "from file: uri");
+        }
         return getStream(url, postdata);
     }
 
@@ -136,7 +140,11 @@ StreamProvider::getStream(const URL& url, const std::string& postdata)
 
 	if (url.protocol() == "file")
 	{
-		log_error(_("POST data discarded while getting a stream from file: uri"));
+        if (!postdata.empty())
+        {    
+		    log_error(_("POST data discarded while getting a stream "
+                        "from file: uri"));
+        }
 		std::string path = url.path();
 		if ( path == "-" )
 		{
