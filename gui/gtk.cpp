@@ -819,7 +819,7 @@ GtkGui::createWindow(int width, int height)
     _width = width;
     _height = height;
     
-    _validbounds.setTo(0, 0, _width-1, _height-1);
+    _validbounds.setTo(0, 0, _width, _height);
     _glue->setRenderHandlerSize(_width, _height);
     
     return true;
