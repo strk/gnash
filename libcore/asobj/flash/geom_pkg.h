@@ -15,8 +15,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef __FLASH_GEOM_PACKAGE_H__
-#define __FLASH_GEOM_PACKAGE_H__
+#ifndef GNASH_FLASH_GEOM_PACKAGE_H
+#define GNASH_FLASH_GEOM_PACKAGE_H
 
 namespace gnash {
 
