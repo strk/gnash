@@ -41,6 +41,19 @@ using namespace std;
 #define PADDING_BYTES 64
 #define READ_CHUNKS 64
 
+// The amount of bytes to scan an FLV for
+// figuring availability of audio/video tags.
+// This is needed because we can't trust the FLV
+// header (youtube advertises audio w/out having it;
+// strk tested that FLV with bogus flags are still
+// supposed to show video).
+//
+// MediaParserFfmpeg.cpp uses 2048.
+//
+// TODO: let user tweak this ?
+//
+#define PROBE_BYTES 1024
+
 // Define the following macro the have seek() operations printed
 //#define GNASH_DEBUG_SEEK 1
 
@@ -297,7 +310,8 @@ bool FLVParser::parseNextTag()
 	if (tag[0] == FLV_AUDIO_TAG)
 	{
 		if ( ! _audio ) {
-			log_error(" Unexpected audio tag found in FLV stream");
+			log_error(_("Unexpected audio tag found at offset %d FLV stream advertising no audio in header. We'll warn only once for each FLV, expecting any further audio tag."), thisTagPos);
+			_audio = true; // TOCHECK: is this safe ?
 		}
 		
 		if ( doIndex && ! _video ) // if we have video we let that drive cue points
@@ -307,7 +321,7 @@ bool FLVParser::parseNextTag()
 			CuePointsMap::iterator it = _cuePoints.lower_bound(timestamp);
 			if ( it == _cuePoints.end() || it->first - timestamp >= 5000)
 			{
-				//log_debug("Added cue point at timestamp %d and position %d (audio frame)", timestamp, thisTagPos);
+				log_debug("Added cue point at timestamp %d and position %d (audio frame)", timestamp, thisTagPos);
 				_cuePoints[timestamp] = thisTagPos; 
 			}
 		}
@@ -346,7 +360,8 @@ bool FLVParser::parseNextTag()
 	else if (tag[0] == FLV_VIDEO_TAG)
 	{
 		if ( ! _video ) {
-			log_error(" Unexpected video tag found in FLV stream");
+			log_error(_("Unexpected video tag found at offset %d of FLV stream advertising no video in header. We'll warn only once per FLV, expecting any further video tag."), thisTagPos);
+			_video = true; // TOCHECK: is this safe ?
 		}
 		// 1:keyframe, 2:interlacedFrame, 3:disposableInterlacedFrame
 		int frameType = (tag[11] & 0xf0) >> 4;
@@ -510,35 +525,36 @@ bool FLVParser::parseHeader()
 	_audio = header[4]&(1<<2);
 	_video = header[4]&(1<<0);
 
-	log_debug("Parsing FLV version %d, audio:%d, video:%d", version, _audio, _video);
+	log_debug("Parsing FLV version %d, audio:%d, video:%d",
+			version, _audio, _video);
 
-	// Make sure we initialize audio/video info (if any advertised)
-	if ( _audio || _video ) while ( !_parsingComplete )
+	// Initialize audio/video info if any audio/video
+	// tag was found within the first 'probeBytes' bytes
+	// 
+	const size_t probeBytes = PROBE_BYTES;
+	while ( !_parsingComplete && _lastParsedPosition < probeBytes )
 	{
 		parseNextTag();
- 	 
-		// continue if we're still looking for the video info
-		if (_video && !_videoInfo.get()) continue;
 
-		// continue if we're still looking for the audio info
-		if (_audio && !_audioInfo.get()) continue;
-		
-		// all tags advertised in the audio+video bitmask
-		// have been found.
-		break;
+		// Early-out if we found both video and audio tags
+		if ( _videoInfo.get() && _audioInfo.get() ) break;
 	}
 
-	// the audio+video bitmask advertised video and there wasn't any
+	// The audio+video bitmask advertised video but we 
+	// found no video tag in the probe segment
 	if ( _video && !_videoInfo.get() ) {
-		_video = 0;
-		log_error("Couldn't find any video frame in an FLV advertising video in header");
+		log_error(_("Couldn't find any video frame in the first %d bytes "
+			"of FLV advertising video in header"), probeBytes);
+		_video = false;
 	}
 
-	// the audio+video bitmask advertised audio and there wasn't any.
+	// The audio+video bitmask advertised audio but we 
+	// found no audio tag in the probe segment
 	// (Youtube does this on some (maybe all) of their soundless clips.)
 	if ( _audio && !_audioInfo.get() ) {
-		_audio = 0;
-		log_error("Couldn't find any audio frame in an FLV advertising audio in header");
+		log_error(_("Couldn't find any audio frame in the first %d bytes "
+			"of FLV advertising audio in header"), probeBytes);
+		_audio = false;
 	}
 
 	return true;
