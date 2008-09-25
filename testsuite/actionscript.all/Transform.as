@@ -27,7 +27,11 @@ rcsid="$Id: Transform.as,v 1.3 2008/06/20 13:28:56 bwy Exp $";
 ASSetPropFlags (_global, "flash", 0, 5248);
 
 #if OUTPUT_VERSION < 8
-check_equals(flash.geom.Transform, undefined);
+# if OUTPUT_VERSION < 6 
+check_equals(typeOf(flash.geom.Transform), "undefined");
+# else
+check_equals(typeOf(flash.geom.Transform), "function");
+# endif
 totals(1);
 #else
 
@@ -96,6 +100,9 @@ r = new ColorTransform(0, 1, 1, 1, 0, 0, 255, 0);
 mcx.transform.colorTransform = r;
 check_equals(mcx.transform.colorTransform.toString(), "(redMultiplier=0, greenMultiplier=1, blueMultiplier=1, alphaMultiplier=1, redOffset=0, greenOffset=0, blueOffset=255, alphaOffset=0)");
 
+r = new ColorTransform(5e-67, 2342341, 11234112, -287394874978, 1222222, 2342343434, 255, 4e+5);
+mcx.transform.colorTransform = r;
+check_equals(mcx.transform.colorTransform.toString(), "(redMultiplier=0, greenMultiplier=-128, blueMultiplier=-128, alphaMultiplier=-128, redOffset=-32768, greenOffset=-32768, blueOffset=255, alphaOffset=-32768)");
 
 
 // Tricks with the flash package:
@@ -196,5 +203,5 @@ check_equals(mc.transform.matrix.toString(), "(a=1, b=0, c=0, d=1, tx=0, ty=0)")
 xcheck_equals(mcOld.transform.matrix.toString(), "(a=4, b=0.300000011920929, c=0.300000011920929, d=1, tx=1, ty=0)");
 
 
-totals(63);
+totals(64);
 #endif

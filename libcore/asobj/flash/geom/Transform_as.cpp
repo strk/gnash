@@ -34,6 +34,7 @@
 #include "ColorTransform_as.h"
 
 #include <sstream>
+#include <limits>
 
 namespace gnash {
 
@@ -123,6 +124,20 @@ private:
 
 };
 
+// Handle overflows from AS ColorTransform double. Doubtful
+// whether it will really be inlined, but that's the compiler's
+// business.
+static inline boost::int16_t
+truncateDouble(double d)
+{
+
+    if (d > std::numeric_limits<boost::int16_t>::max() ||
+        d < std::numeric_limits<boost::int16_t>::min())
+    {
+       return std::numeric_limits<boost::int16_t>::min();
+    }
+    return static_cast<boost::int16_t>(d);
+}
 
 static as_value
 Transform_colorTransform_getset(const fn_call& fn)
@@ -130,12 +145,8 @@ Transform_colorTransform_getset(const fn_call& fn)
 
     const double factor = 256.0;
 
-    // TODO: What happens if you do: "mat = mc.transform.matrix; mat.a = 6;"
-    // (where mc is a MovieClip)? Nothing (probable), or does it change mc (how
-    // would that work?)?
-    // This should work by passing a new matrix, in which case we should just
-    // set our _movieClip's matrix from the AS matrix.
-	boost::intrusive_ptr<Transform_as> ptr = ensureType<Transform_as>(fn.this_ptr);
+	boost::intrusive_ptr<Transform_as> ptr = 
+        ensureType<Transform_as>(fn.this_ptr);
 
     VM& vm = ptr->getVM();
     string_table& st = vm.getStringTable();
@@ -215,7 +226,8 @@ Transform_colorTransform_getset(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror("Transform.colorTransform(%s): extra arguments discarded", ss.str());
+            log_aserror("Transform.colorTransform(%s): extra arguments "
+                "discarded", ss.str());
         );
     }
 
@@ -225,35 +237,36 @@ Transform_colorTransform_getset(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror("Transform.colorTransform(%s): argument is not an object", ss.str());
+            log_aserror("Transform.colorTransform(%s): argument is not an "
+                "object", ss.str());
         );
         return as_value();
     }
     
-    // TODO: check whether this is necessary (probable), or whether it can be any object.
+    // TODO: check whether this is necessary (probable), 
+    // or whether it can be any object.
     boost::intrusive_ptr<ColorTransform_as> transform = dynamic_cast<ColorTransform_as*>(obj.get());
     if (!transform)
     {
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror("Transform.colorTransform(%s): argument is not a ColorTransform", ss.str());
+            log_aserror("Transform.colorTransform(%s): argument is not a "
+                "ColorTransform", ss.str());
         );
         return as_value();
     }
     
     cxform c;
-    c.ra = transform->getRedMultiplier() * factor;
-    c.ga = transform->getGreenMultiplier() * factor;
-    c.ba = transform->getBlueMultiplier() * factor;
-    c.aa = transform->getAlphaMultiplier() * factor;
-    c.rb = transform->getRedOffset();
-    c.gb = transform->getGreenOffset();
-    c.bb = transform->getBlueOffset();
-    c.ab = transform->getAlphaOffset();
+    c.ra = truncateDouble(transform->getRedMultiplier() * factor);
+    c.ga = truncateDouble(transform->getGreenMultiplier() * factor);
+    c.ba = truncateDouble(transform->getBlueMultiplier() * factor);
+    c.aa = truncateDouble(transform->getAlphaMultiplier() * factor);
+    c.rb = truncateDouble(transform->getRedOffset());
+    c.gb = truncateDouble(transform->getGreenOffset());
+    c.bb = truncateDouble(transform->getBlueOffset());
+    c.ab = truncateDouble(transform->getAlphaOffset());
   
-    log_debug("Setting MovieClip cxform to: %s", c);
-    
     ptr->setColorTransform(c);
     
     return as_value();
@@ -262,7 +275,8 @@ Transform_colorTransform_getset(const fn_call& fn)
 static as_value
 Transform_concatenatedColorTransform_getset(const fn_call& fn)
 {
-	boost::intrusive_ptr<Transform_as> ptr = ensureType<Transform_as>(fn.this_ptr);
+	boost::intrusive_ptr<Transform_as> ptr = 
+        ensureType<Transform_as>(fn.this_ptr);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -271,7 +285,8 @@ Transform_concatenatedColorTransform_getset(const fn_call& fn)
 static as_value
 Transform_concatenatedMatrix_getset(const fn_call& fn)
 {
-	boost::intrusive_ptr<Transform_as> ptr = ensureType<Transform_as>(fn.this_ptr);
+	boost::intrusive_ptr<Transform_as> ptr = 
+        ensureType<Transform_as>(fn.this_ptr);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -288,7 +303,8 @@ Transform_matrix_getset(const fn_call& fn)
     // would that work?)?
     // This should work by passing a new matrix, in which case we should just
     // set our _movieClip's matrix from the AS matrix.
-	boost::intrusive_ptr<Transform_as> ptr = ensureType<Transform_as>(fn.this_ptr);
+	boost::intrusive_ptr<Transform_as> ptr = 
+        ensureType<Transform_as>(fn.this_ptr);
 
     VM& vm = ptr->getVM();
     string_table& st = vm.getStringTable();
@@ -479,7 +495,8 @@ void Transform_class_init(as_object& where)
 
 	// Register _global.Transform
     string_table& st = where.getVM().getStringTable();
-    where.init_destructive_property(st.find("Transform"), get_flash_geom_transform_constructor);
+    where.init_destructive_property(st.find("Transform"), 
+		    get_flash_geom_transform_constructor);
 
 }
 
