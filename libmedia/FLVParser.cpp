@@ -296,6 +296,10 @@ bool FLVParser::parseNextTag()
 
 	if (tag[0] == FLV_AUDIO_TAG)
 	{
+		if ( ! _audio ) {
+			log_error(" Unexpected audio tag found in FLV stream");
+		}
+		
 		if ( doIndex && ! _video ) // if we have video we let that drive cue points
 		{
 			// we can theoretically seek anywhere, but
@@ -341,6 +345,9 @@ bool FLVParser::parseNextTag()
 	}
 	else if (tag[0] == FLV_VIDEO_TAG)
 	{
+		if ( ! _video ) {
+			log_error(" Unexpected video tag found in FLV stream");
+		}
 		// 1:keyframe, 2:interlacedFrame, 3:disposableInterlacedFrame
 		int frameType = (tag[11] & 0xf0) >> 4;
 
@@ -505,17 +512,34 @@ bool FLVParser::parseHeader()
 
 	log_debug("Parsing FLV version %d, audio:%d, video:%d", version, _audio, _video);
 
-	// Make sure we initialize audio/video info (if any)
-	while ( !_parsingComplete && (_video && !_videoInfo.get()) || (_audio && !_audioInfo.get()) )
+	// Make sure we initialize audio/video info (if any advertised)
+	if ( _audio || _video ) while ( !_parsingComplete )
 	{
 		parseNextTag();
+ 	 
+		// continue if we're still looking for the video info
+		if (_video && !_videoInfo.get()) continue;
+
+		// continue if we're still looking for the audio info
+		if (_audio && !_audioInfo.get()) continue;
+		
+		// all tags advertised in the audio+video bitmask
+		// have been found.
+		break;
 	}
 
-	if ( _video && !_videoInfo.get() )
-		log_error(" couldn't find any video frame in an FLV advertising video in header");
+	// the audio+video bitmask advertised video and there wasn't any
+	if ( _video && !_videoInfo.get() ) {
+		_video = 0;
+		log_error("Couldn't find any video frame in an FLV advertising video in header");
+	}
 
-	if ( _audio && !_audioInfo.get() )
-		log_error(" couldn't find any audio frame in an FLV advertising audio in header");
+	// the audio+video bitmask advertised audio and there wasn't any.
+	// (Youtube does this on some (maybe all) of their soundless clips.)
+	if ( _audio && !_audioInfo.get() ) {
+		_audio = 0;
+		log_error("Couldn't find any audio frame in an FLV advertising audio in header");
+	}
 
 	return true;
 }
