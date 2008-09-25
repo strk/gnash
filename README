@@ -111,31 +111,43 @@ Building Gnash:
 ---------------
 
 See the generic installation instructions in the file called "INSTALL".
-(If you are building from a fresh CVS checkout, first see the file
-"README_CVS" for additional instructions.)
+(If you are building from a fresh bzr checkout, first see the file
+"README_bzr" for additional instructions.)
 
-Gnash can be configured and built in three main variations.  They
-differ in the graphics and multimedia libraries used to display
-SWF files.  The three variants are configured with the options:
+Gnash has three main options: choice of renderer (graphics library used
+to render the SWF movie), choice(s) of GUI toolkit (gtk, kde, etc), and choice
+of multimedia backend (audio and video decoder).
+
+The choices of renderer (pick one only):
 
    --enable-renderer=opengl
    --enable-renderer=cairo
 or --enable-renderer=agg (default)
 
-Only one can be specified.  In addition, Gnash can use different multimedia
-back-ends for sound and/or video:
+Gnash can use different multimedia back-ends for sound and/or video:
 
    --enable-media=GST			Gstreamer (default)
 or --enable-media=ffmpeg		Ffmpeg/SDL
 
-The "media" setting is independent of the "renderer" setting.
+In some countries, the codecs needed to display audio and video are patented.
+The ffmpeg library implements these codecs.  If you link them directly into
+Gnash, you will create an executable which contains patented software and
+requires a license for redistribution in those countries.  If, instead,
+you build using gstreamer, the user installs the codecs of their choice.
 
-You will need the following development packages installed to
-build the player with GTK support: glib, atk, pango, cairo, gtk2,
-gtkglext.
+Gnash supports multiple graphics toolkits, and will build multiple
+executables:
 
-You can build the player without GTK support, and these are the
-dependent packages: OpenGL(libMesa), SDL.
+   --enable-gui=gtk
+   --enable-gui=kde
+or --enable-gui=gtk,kde (default)
+
+Other guis: dump, fb, fltk, kde, gtk, sdl, qtopia, hildon, alp, riscos, aqua.
+Some guis are very specialized (dump writes out raw frames to a disk file).
+Other guis are not very well supported and may not even compile (aqua).
+
+Different options will cause gnash to require different libraries.  The
+configure script does a good job of telling you how to get these libraries.
 
 The GTK support is more developed and featureful, while the SDL
 support has fewer dependencies on other packages. The AGG backend
@@ -151,10 +163,10 @@ gnash will support translation of its messages into other
 languages. Boost is also required, as Gnash uses it for portable
 mutexes and threading.
 
-Gstreamer version 0.10 is required because earlier versions wouldn't
-let you insert clips into an existing sound stream, as Gnash needs to
-do. If you use Gstreamer, you still need the ffmeg decoders, and the
-ffmpeg plugin for Gstreamer.
+If you select gstreamer as the media backend, gnash requires version 0.10
+because earlier versions wouldn't let you insert clips into an existing
+sound stream, as Gnash needs to do. If you use Gstreamer, you still need
+the ffmeg decoders, and the ffmpeg plugin for Gstreamer.
 
 You no longer need the Mozilla or Firefox development packages to
 build Gnash. All the required files are now included in Gnash, so the
@@ -162,7 +174,7 @@ plugin can be built whenever the main gnash program can be built.
 
 To build Klash, the Konqueror plugin, you need to have the KDE
 development packages installed. This now installs a KDE executable
-called "klash" that is used by this plugin.
+called "kde-gnash" that is used by this plugin.
 
 The Gnash Community:
 --------------------
@@ -181,7 +193,7 @@ lists are stored at http://mail.gnu.org/pipermail/:
       http://mail.gnu.org/mailman/listinfo/gnash. Volume is typically
       low.
     * gnash-commit@gnu.org is where summaries of changes commited to
-      the CVS repository are automatically posted. If you wish to see
+      the bzr repository are automatically posted. If you wish to see
       these changes as they happen,
       http://mail.gnu.org/mailman/listinfo/gnash-commit Volume is
       sporadic, but typically low.
