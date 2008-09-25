@@ -90,7 +90,7 @@ mcx._alpha = -99;
 check_equals(mcx.transform.colorTransform.toString(), "(redMultiplier=1, greenMultiplier=1, blueMultiplier=1, alphaMultiplier=-0.98828125, redOffset=0, greenOffset=0, blueOffset=0, alphaOffset=0)");
 
 mcx._alpha = 13000;
-xcheck_equals(mcx.transform.colorTransform.toString(), "(redMultiplier=1, greenMultiplier=1, blueMultiplier=1, alphaMultiplier=-128, redOffset=0, greenOffset=0, blueOffset=0, alphaOffset=0)");
+check_equals(mcx.transform.colorTransform.toString(), "(redMultiplier=1, greenMultiplier=1, blueMultiplier=1, alphaMultiplier=-128, redOffset=0, greenOffset=0, blueOffset=0, alphaOffset=0)");
 
 r = new ColorTransform(2, 3, 4, 5, 5, -5, 5, -5);
 mcx.transform.colorTransform = r;
