@@ -1051,8 +1051,13 @@ movie_root::advance()
 
         // The PP does not disable scripts when the stack limit is reached,
         // but rather struggles on. 
-	    log_error(_("Action limit hit during advance: %s."), al.what());
+	    log_error(_("Action limit hit during advance: %s"), al.what());
 	    clearActionQueue();
+    }
+    catch (ActionParserException& e)
+    {
+        log_error(_("Buffer overread during advance: %s"), e.what());
+        clearActionQueue();
     }
 }
 	
