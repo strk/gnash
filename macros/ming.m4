@@ -61,7 +61,9 @@ AC_DEFUN([AC_PATH_MING], [
     dnl numbers so tc1 comes after beta 5. ie.. this looks like beta 6.
     if test -z $beta; then
       beta=`echo $MING_VERSION | sed -ne 's/.*rc\([[0-9]]*\).*/\1/p'`
-      beta=`eval expr $beta + 5`
+      if test x"$beta" != x; then
+        beta=`eval expr $beta + 5`
+      fi
     fi
     MING_VERSION_CODE=`printf %2.2d%2.2d%2.2d%2.2d $major $minor $micro $beta`
     MING_CFLAGS=`$MING_CONFIG --cflags`
