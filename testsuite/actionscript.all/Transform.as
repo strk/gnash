@@ -98,7 +98,7 @@ check_equals(mcx.transform.colorTransform.toString(), "(redMultiplier=0, greenMu
 
 r = new ColorTransform(5e-67, 2342341, 11234112, -287394874978, 1222222, 2342343434, 255, 4e+5);
 mcx.transform.colorTransform = r;
-xcheck_equals(mcx.transform.colorTransform.toString(), "(redMultiplier=0, greenMultiplier=-128, blueMultiplier=-128, alphaMultiplier=-128, redOffset=-32768, greenOffset=-32768, blueOffset=255, alphaOffset=-32768)");
+check_equals(mcx.transform.colorTransform.toString(), "(redMultiplier=0, greenMultiplier=-128, blueMultiplier=-128, alphaMultiplier=-128, redOffset=-32768, greenOffset=-32768, blueOffset=255, alphaOffset=-32768)");
 
 
 // Tricks with the flash package:
