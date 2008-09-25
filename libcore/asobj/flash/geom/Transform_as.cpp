@@ -49,21 +49,23 @@ as_value Transform_ctor(const fn_call& fn);
 static void
 attachTransformInterface(as_object& o)
 {
+    const int protectedFlags = as_prop_flags::isProtected;
+
     o.init_property("colorTransform",
             Transform_colorTransform_getset,
-            Transform_colorTransform_getset);
+            Transform_colorTransform_getset, protectedFlags);
     o.init_property("concatenatedColorTransform",
             Transform_concatenatedColorTransform_getset,
-            Transform_concatenatedColorTransform_getset);
+            Transform_concatenatedColorTransform_getset, protectedFlags);
     o.init_property("concatenatedMatrix",
             Transform_concatenatedMatrix_getset,
-            Transform_concatenatedMatrix_getset);
+            Transform_concatenatedMatrix_getset, protectedFlags);
     o.init_property("matrix",
             Transform_matrix_getset,
-            Transform_matrix_getset);
+            Transform_matrix_getset, protectedFlags);
     o.init_property("pixelBounds",
             Transform_pixelBounds_getset,
-            Transform_pixelBounds_getset);
+            Transform_pixelBounds_getset, protectedFlags);
 }
 
 static void
