@@ -1415,7 +1415,8 @@ check(oldTransform != _root.transform); // everytime transform is accessed, it's
 Matrix = flash.geom.Matrix;
 check(_root.transform instanceOf Object);
 check(!_root.transform instanceOf Matrix);
-props = []; for (var i in _root.transform) props.push(i); props.sort();
+temp = _root.transform;
+props = []; for (var i in temp) props.push(i); props.sort();
 check_equals(props.toString(), "colorTransform,concatenatedColorTransform,concatenatedMatrix,matrix,pixelBounds");
 
 check_equals(typeof(_root.transform.colorTransform), 'object');
