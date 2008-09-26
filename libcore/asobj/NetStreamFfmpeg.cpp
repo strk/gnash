@@ -28,7 +28,6 @@
 #include "log.h"
 #include "fn_call.h"
 #include "NetStream.h"
-#include "render.h"	
 #include "movie_root.h"
 #include "sound_handler.h"
 

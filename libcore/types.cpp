@@ -7,10 +7,9 @@
 
 #include "types.h"
 
+#include "utility.h"
 #include "log.h"
 #include "SWFStream.h"
-#include "render.h"
-
 #include <sstream> // for ::print and ::toString
 
 namespace gnash {
