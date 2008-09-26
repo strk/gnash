@@ -141,8 +141,12 @@ SDL_sound_handler::delete_all_sounds()
         if (!sounddata) continue;
 
 		size_t nActiveSounds = sounddata->m_active_sounds.size();
+
+		// Decrement callback clients count 
 		soundsPlaying -= nActiveSounds;
+
 		_soundsStopped += nActiveSounds;
+
 		delete sounddata;
 	}
 	m_sound_data.clear();
@@ -308,8 +312,11 @@ void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset,
 
 	}
 
+	// Increment callback clients count 
 	++soundsPlaying;
+
 	++_soundsStarted;
+
 	sounddata->m_active_sounds.push_back(sound.release());
 
 	if (soundsPlaying == 1) {
@@ -338,7 +345,9 @@ void	SDL_sound_handler::stop_sound(int sound_handle)
 
 	size_t nActiveSounds = sounddata->m_active_sounds.size();
 
+	// Decrement callback clients count 
 	soundsPlaying -= nActiveSounds;
+
 	_soundsStopped += nActiveSounds;
 
 	sounddata->clearActiveSounds();
@@ -377,7 +386,9 @@ void	SDL_sound_handler::stop_all_sounds()
 		if (!sounddata) continue;
 		size_t nActiveSounds = sounddata->m_active_sounds.size();
 
+		// Decrement callback clients count 
 		soundsPlaying -= nActiveSounds;
+
 		_soundsStopped += nActiveSounds;
 
 		sounddata->clearActiveSounds();
@@ -472,8 +483,6 @@ void	SDL_sound_handler::attach_aux_streamer(aux_streamer_ptr ptr, void* owner)
 		return;
 	}
 
-	++soundsPlaying;
-
 	if (!soundOpened) {
 		if (SDL_OpenAudio(&audioSpec, NULL) < 0 ) {
         		boost::format fmt = boost::format(
@@ -483,6 +492,10 @@ void	SDL_sound_handler::attach_aux_streamer(aux_streamer_ptr ptr, void* owner)
 		}
 		soundOpened = true;
 	}
+
+	// Increment callback clients count 
+	++soundsPlaying;
+
 #ifdef GNASH_DEBUG_SDL_AUDIO_PAUSING
 	log_debug("Unpausing SDL Audio...");
 #endif
@@ -494,10 +507,11 @@ void	SDL_sound_handler::detach_aux_streamer(void* owner)
 {
 	boost::mutex::scoped_lock lock(_mutex);
 
+	// WARNING: erasing would break any iteration in the map
 	CallbacksMap::iterator it2=m_aux_streamer.find(owner);
 	if ( it2 != m_aux_streamer.end() )
 	{
-		// WARNING: erasing would break any iteration in the map
+		// Decrement callback clients count 
 		--soundsPlaying;
 		m_aux_streamer.erase(it2);
 	}
@@ -786,6 +800,7 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 				++it2; // before we erase it
 				handler->m_aux_streamer.erase(it); // FIXME: isn't this terribly wrong ?
 				it = it2;
+				// Decrement callback clients count 
 				handler->soundsPlaying--;
 			} else {
 				++it;
@@ -986,7 +1001,10 @@ SDL_sound_handler::mixSoundData(sound_data& sounddata, Uint8* buffer, unsigned i
 		if (sound->position == sound->dataSize() && sound->raw_position == sound->rawDataSize() && sound->loop_count == 0)
 		{
 			i = sounddata.eraseActiveSound(i);
+
+			// Decrement callback clients count 
 			soundsPlaying--;
+
 			_soundsStopped++;
 		} 
 		else
