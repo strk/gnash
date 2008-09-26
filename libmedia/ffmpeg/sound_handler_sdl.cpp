@@ -145,6 +145,7 @@ SDL_sound_handler::delete_all_sounds()
 		// Decrement callback clients count 
 		soundsPlaying -= nActiveSounds;
 
+        // Increment number of sound stop request for the testing framework
 		_soundsStopped += nActiveSounds;
 
 		delete sounddata;
@@ -232,10 +233,14 @@ long	SDL_sound_handler::fill_stream_data(unsigned char* data, unsigned int data_
 }
 
 
-void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset, long start_position, const std::vector<sound_envelope>* envelopes)
 // Play the index'd sample.
+void
+SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset, long start_position, const std::vector<sound_envelope>* envelopes)
 {
 	boost::mutex::scoped_lock lock(_mutex);
+
+    // Increment number of sound start request for the testing framework
+	++_soundsStarted;
 
 	// Check if the sound exists, or if audio is muted
 	if (sound_handle < 0 || static_cast<unsigned int>(sound_handle) >= m_sound_data.size() || muted)
@@ -315,8 +320,6 @@ void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset,
 	// Increment callback clients count 
 	++soundsPlaying;
 
-	++_soundsStarted;
-
 	sounddata->m_active_sounds.push_back(sound.release());
 
 	if (soundsPlaying == 1) {
@@ -348,6 +351,7 @@ void	SDL_sound_handler::stop_sound(int sound_handle)
 	// Decrement callback clients count 
 	soundsPlaying -= nActiveSounds;
 
+    // Increment number of sound stop request for the testing framework
 	_soundsStopped += nActiveSounds;
 
 	sounddata->clearActiveSounds();
@@ -389,6 +393,7 @@ void	SDL_sound_handler::stop_all_sounds()
 		// Decrement callback clients count 
 		soundsPlaying -= nActiveSounds;
 
+        // Increment number of sound stop request for the testing framework
 		_soundsStopped += nActiveSounds;
 
 		sounddata->clearActiveSounds();
@@ -1005,6 +1010,7 @@ SDL_sound_handler::mixSoundData(sound_data& sounddata, Uint8* buffer, unsigned i
 			// Decrement callback clients count 
 			soundsPlaying--;
 
+            // Increment number of sound stop request for the testing framework
 			_soundsStopped++;
 		} 
 		else
