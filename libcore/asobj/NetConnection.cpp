@@ -200,7 +200,7 @@ readNetworkShort(const boost::uint8_t* buf) {
 	return s;
 }
 
-static boost::uint16_t
+static boost::uint32_t
 readNetworkLong(const boost::uint8_t* buf) {
 	boost::uint32_t s = buf[0] << 24 | buf[1] << 16 | buf[2] << 8 | buf[3];
 	return s;
