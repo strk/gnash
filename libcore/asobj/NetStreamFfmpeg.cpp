@@ -126,10 +126,7 @@ void NetStreamFfmpeg::close()
 
 	// When closing gnash before playback is finished, the soundhandler 
 	// seems to be removed before netstream is destroyed.
-	if (_soundHandler)
-	{
-		_soundHandler->detach_aux_streamer(this);
-	}
+	detachAuxStreamer();
 
 	m_imageframe.reset();
 
@@ -193,8 +190,7 @@ NetStreamFfmpeg::play(const std::string& c_url)
 	}
 
 	// We need to restart the audio
-	if (_soundHandler)
-		_soundHandler->attach_aux_streamer(audio_streamer, this);
+	attachAuxStreamer();
 
 	return;
 }
@@ -785,7 +781,7 @@ NetStreamFfmpeg::pushDecodedAudioFrames(boost::uint32_t ts)
 		log_debug("pushDecodedAudioFrames(%d) pushing %dth frame with timestamp %d", ts, _audioQueue.size()+1, nextTimestamp); 
 #endif
 
-		if ( _soundHandler )
+		if ( _auxStreamerAttached )
 		{
 			_audioQueue.push_back(audio);
 			_audioQueueSize += audio->m_size;
@@ -1025,9 +1021,9 @@ void NetStreamFfmpeg::pausePlayback()
 	PlayHead::PlaybackStatus oldStatus = _playHead.setState(PlayHead::PLAY_PAUSED);
 
 	// Disconnect the soundhandler if we were playing before
-	if ( oldStatus == PlayHead::PLAY_PLAYING && _soundHandler )
+	if ( oldStatus == PlayHead::PLAY_PLAYING )
 	{
-		_soundHandler->detach_aux_streamer((void*)this);
+		detachAuxStreamer();
 	}
 }
 
@@ -1038,9 +1034,9 @@ void NetStreamFfmpeg::unpausePlayback()
 	PlayHead::PlaybackStatus oldStatus = _playHead.setState(PlayHead::PLAY_PLAYING);
 
 	// Re-connect to the soundhandler if we were paused before
-	if ( oldStatus == PlayHead::PLAY_PAUSED && _soundHandler )
+	if ( oldStatus == PlayHead::PLAY_PAUSED )
 	{
-		_soundHandler->attach_aux_streamer(audio_streamer, (void*) this);
+		attachAuxStreamer();
 	}
 }
 
@@ -1079,6 +1075,39 @@ NetStreamFfmpeg::decodingStatus(DecodingState newstate)
 	}
 
 	return _decoding_state;
+}
+
+void
+NetStreamFfmpeg::attachAuxStreamer()
+{
+	if ( ! _soundHandler ) return;
+	if ( _auxStreamerAttached )
+	{
+		log_debug("attachAuxStreamer called while already attached");
+		// we do nonetheless, isn't specified by SoundHandler.h
+		// whether or not this is legal...
+	}
+
+	try {
+		_soundHandler->attach_aux_streamer(audio_streamer, (void*) this);
+		_auxStreamerAttached = true;
+	} catch (SoundException& e) {
+		log_error("Could not attach NetStream aux streamer to sound handler: %s", e.what());
+	}
+}
+
+void
+NetStreamFfmpeg::detachAuxStreamer()
+{
+	if ( ! _soundHandler ) return;
+	if ( !_auxStreamerAttached )
+	{
+		log_debug("detachAuxStreamer called while not attached");
+		// we do nonetheless, isn't specified by SoundHandler.h
+		// whether or not this is legal...
+	}
+	_soundHandler->detach_aux_streamer(this);
+	_auxStreamerAttached = false;
 }
 
 } // gnash namespcae

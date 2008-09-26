@@ -34,7 +34,9 @@
 #include "AudioDecoderFfmpeg.h"
 #endif
 
-#include "log.h"
+#include "log.h" // will import boost::format too
+#include "GnashException.h" // for SoundException
+
 #include <cmath>
 #include <vector>
 #include <boost/scoped_array.hpp>
@@ -466,6 +468,7 @@ void	SDL_sound_handler::attach_aux_streamer(aux_streamer_ptr ptr, void* owner)
 	if ( ! m_aux_streamer.insert(std::make_pair(owner, ptr)).second )
 	{
 		// Already in the hash.
+		// TODO: throw SoundException ?
 		return;
 	}
 
@@ -473,8 +476,10 @@ void	SDL_sound_handler::attach_aux_streamer(aux_streamer_ptr ptr, void* owner)
 
 	if (!soundOpened) {
 		if (SDL_OpenAudio(&audioSpec, NULL) < 0 ) {
-			log_error(_("Unable to start aux SDL sound: %s"), SDL_GetError());
-			return;
+        		boost::format fmt = boost::format(
+				_("Unable to start aux SDL sound: %s"))
+				% SDL_GetError();
+			throw SoundException(fmt.str());
 		}
 		soundOpened = true;
 	}
