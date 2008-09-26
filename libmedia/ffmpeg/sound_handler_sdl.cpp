@@ -308,6 +308,12 @@ SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset, long
 	    log_error("AudioDecoder initialization failed");
 	}
 
+    // Push the sound onto the playing sounds container.
+    // We want to do this even on audio failures so count
+    // of started and stopped sound reflects expectances
+    // for testing framework.
+	sounddata->m_active_sounds.push_back(sound.release());
+
 	if (!soundOpened) {
 		if (SDL_OpenAudio(&audioSpec, NULL) < 0 ) {
 			log_error(_("Unable to start SDL sound: %s"), SDL_GetError());
@@ -319,8 +325,6 @@ SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset, long
 
 	// Increment callback clients count 
 	++soundsPlaying;
-
-	sounddata->m_active_sounds.push_back(sound.release());
 
 	if (soundsPlaying == 1) {
 #ifdef GNASH_DEBUG_SDL_AUDIO_PAUSING
