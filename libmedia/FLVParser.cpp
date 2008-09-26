@@ -477,10 +477,16 @@ bool FLVParser::parseNextTag()
 	}
 	else if (tag[0] == FLV_META_TAG)
 	{
+		if ( tag[11] != 2 )
+		{
+			// ::processTags relies on the first AMF0 value being a string...
+			log_unimpl(_("First byte of FLV_META_TAG is %d, expected 0x02 (STRING AMF0 type)"),
+				(int)tag[11]);
+		}
 		// Extract information from the meta tag
-		std::auto_ptr<SimpleBuffer> metaTag(new SimpleBuffer(bodyLength));
-		size_t actuallyRead = _stream->read(metaTag->data(), bodyLength);
-		if ( actuallyRead < bodyLength )
+		std::auto_ptr<SimpleBuffer> metaTag(new SimpleBuffer(bodyLength-1));
+		size_t actuallyRead = _stream->read(metaTag->data(), bodyLength-1);
+		if ( actuallyRead < bodyLength-1 )
 		{
 			log_error("FLVParser::parseNextTag: can't read metaTag (%d) body (needed %d bytes, only got %d)",
 				FLV_META_TAG, bodyLength, actuallyRead);
