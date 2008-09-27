@@ -27,11 +27,7 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "log.h"
-#ifdef SOUND_GST
-# include "NetStreamGst.h"
-#elif defined(USE_FFMPEG)
-# include "NetStream.h"
-#endif
+
 #include "fn_call.h"
 #include "builtin_function.h"
 #include "timers.h" // for registering the advance timer
