@@ -26,7 +26,7 @@
 #include "CodeStream.h"
 #include "Property.h"
 #include "as_function.h"
-
+#include "abc_function.h"
 #include "abc_block.h"
 
 
@@ -46,6 +46,7 @@ class asBoundAccessor;
 class ClassHierarchy;
 class Property;
 class asName;
+class Machine;
 
 namespace abc_parsing{
 class abc_Trait;
@@ -329,7 +330,7 @@ private:
 class asMethod
 {
 private:
-	as_function* mPrototype;
+	abc_function* mPrototype;
 
 	typedef enum
 	{
@@ -355,6 +356,8 @@ private:
 	bool addBinding(string_table::key name, asBinding b);
 
 public:
+
+	void initPrototype(Machine* machine){ mPrototype = new abc_function(this,machine);}
 
 	boost::uint32_t getMaxRegisters(){ return mMaxRegisters;}
 

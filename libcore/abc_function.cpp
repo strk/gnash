@@ -19,6 +19,7 @@
 #include "abc_function.h"
 #include "asClass.h"
 #include "fn_call.h"
+#include "Machine.h"
 
 namespace gnash{
 

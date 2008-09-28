@@ -24,11 +24,12 @@
 
 #include "as_function.h"
 #include "as_value.h"
-#include "asClass.h"
 #include "CodeStream.h"
-#include "Machine.h"
 
 namespace gnash {
+
+class asMethod;
+class Machine;
 
 /// ABC-defined Function 
 class abc_function : public as_function

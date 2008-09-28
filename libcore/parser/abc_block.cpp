@@ -114,8 +114,7 @@ abc_Trait::finalize(abc_block *pBlock, asClass *pClass, bool do_static)
 bool
 abc_Trait::finalize_mbody(abc_block *pBlock, asMethod *pMethod)
 {
-	LOG_DEBUG_ABC("Finalize_mbody doesn't work. Returning.");
-	return true;
+	LOG_DEBUG_ABC("Finalizing method");
 	switch (mKind)
 	{
 	case KIND_SLOT:
@@ -133,36 +132,48 @@ abc_Trait::finalize_mbody(abc_block *pBlock, asMethod *pMethod)
 			return false;
 		}
 		// The name has been validated in read.
-		if (mHasValue)
-			pMethod->addValue(mName, mNamespace, mSlotId, pType, 
-				mValue, mKind == KIND_CONST);
-		else
-			pMethod->addSlot(mName, mNamespace, mSlotId, pType);
+		// TODO: Find a better way to initialize trait values.
+		if (!mHasValue){
+			mValue = as_value(0);
+		}
+		LOG_DEBUG_ABC("Adding property=%s with value=%s slot=%u",pBlock->mStringPool[mName],mValue.toDebugString(),mSlotId);
+		pMethod->addValue(mGlobalName, mNamespace, mSlotId, pType, 
+			mValue, mKind == KIND_CONST);
 		break;
 	}
 	case KIND_METHOD:
 	{
+		LOG_DEBUG_ABC("Finalize method trait not implemented.  Returning");
+		break;
 		pMethod->addMethod(mName, mNamespace, mMethod);
 		break;
 	}
 	case KIND_GETTER:
 	{
+		LOG_DEBUG_ABC("Finalize getter trait not implemented.  Returning");
+		break;
 		pMethod->addGetter(mName, mNamespace, mMethod);
 		break;
 	}
 	case KIND_SETTER:
 	{
+		LOG_DEBUG_ABC("Finalize setter trait not implemented.  Returning");
+		break;
 		pMethod->addSetter(mName, mNamespace, mMethod);
 		break;
 	}
 	case KIND_CLASS:
 	{
+		LOG_DEBUG_ABC("Finalize class trait not implemented.  Returning");
+		break;
 		pMethod->addMemberClass(mName, mNamespace, mSlotId,
 			pBlock->mClasses[mClassInfoIndex]);
 		break;
 	}
 	case KIND_FUNCTION:
 	{
+		LOG_DEBUG_ABC("Finalize function trait not implemented.  Returning");
+		break;
 		pMethod->addSlotFunction(mName, mNamespace, mSlotId, mMethod);
 		break;
 	}

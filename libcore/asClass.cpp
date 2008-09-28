@@ -69,7 +69,13 @@ asMethod::addValue(string_table::key name, asNamespace *ns, boost::uint32_t slot
 	if (isconst)
 		flags |= as_prop_flags::readOnly;
 
-	mPrototype->init_member(name, val, flags, nsname, slotId);
+
+	if(slotId == 0){
+		mPrototype->init_member(name, val, flags, nsname);
+	}
+	else{
+		mPrototype->init_member(name, val, flags, nsname, slotId);
+	}
 	return true;
 }
 

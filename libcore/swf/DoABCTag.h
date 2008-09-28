@@ -55,10 +55,21 @@ public:
 
 	virtual void execute(sprite_instance* m, DisplayList& /* dlist */) const
 	{
+		VM& vm = VM::get();
+		log_debug("getting machine.");
+		Machine *mach = vm.getMachine();
+		as_object* global = vm.getGlobal();
+		
 		std::vector<asClass*>::iterator ci = mABC->mClasses.begin();
 		for(; ci != mABC->mClasses.end(); ++ci){
 			(*ci)->initPrototype();
 		}
+
+		std::vector<asMethod*>::iterator mi = mABC->mMethods.begin();
+		for(; mi != mABC->mMethods.end(); ++mi){
+			(*mi)->initPrototype(mach);
+		}
+
 		std::vector<abc_Trait*>::iterator i = mABC->mTraits.begin();
 		
 		for ( ; i != mABC->mTraits.end(); ++i)
@@ -67,10 +78,6 @@ public:
 		}
 		mABC->mTraits.clear();
 		log_debug("Begin execute abc_block.");
-		VM& vm = VM::get();
-		log_debug("getting machine.");
-		Machine *mach = vm.getMachine();
-		as_object* global = vm.getGlobal();
 //		log_debug("Getting entry script.");
 //		asClass* start_script = a.mScripts.back();
 //		log_debug("Getting constructor.");
