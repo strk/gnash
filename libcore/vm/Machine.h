@@ -207,7 +207,7 @@ public:
 
 	void initMachine(abc_block* pool_block,as_object* global);
 
-	as_value executeFunction(CodeStream* stream,const fn_call& fn);
+	as_value executeFunction(CodeStream* stream, boost::uint32_t maxRegisters, const fn_call& fn);
 
 	void instantiateClass(std::string className, as_object* global);
 
@@ -265,13 +265,13 @@ private:
 
 	std::auto_ptr< std::vector<as_value> > get_args(unsigned int argc);
 	
-	void load_function(CodeStream* stream);
+	void load_function(CodeStream* stream, boost::uint32_t maxRegisters);
 
 	as_environment::ScopeStack* getScopeStack();
 
 	void executeCodeblock(CodeStream* stream);
 
-	void clearRegisters();
+	void clearRegisters(boost::uint32_t maxRegsiters);
 
 	as_value get_register(int index){
 		LOG_DEBUG_AVM("Getting value at a register %d ",index);

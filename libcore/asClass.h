@@ -351,10 +351,14 @@ private:
 	as_function *mImplementation;
 	unsigned char mFlags;
 	CodeStream *mBody;
-
+	boost::uint32_t mMaxRegisters;
 	bool addBinding(string_table::key name, asBinding b);
 
 public:
+
+	boost::uint32_t getMaxRegisters(){ return mMaxRegisters;}
+
+	void setMaxRegisters(boost::uint32_t maxRegisters){ mMaxRegisters = maxRegisters;}
 
 	boost::uint32_t mMethodID;
 

@@ -2609,7 +2609,7 @@ void Machine::initMachine(abc_block* pool_block,as_object* global)
 	asClass* start_script = pool_block->mScripts.back();
 	log_debug("Getting constructor.");
 	asMethod* method = start_script->getConstructor();
-
+	clearRegisters(method->getMaxRegisters());
 //	mRegisters.push(global);
  	int i;
  	for(i=0;i<start_script->mTraits.size();i++){
@@ -2629,11 +2629,11 @@ void Machine::initMachine(abc_block* pool_block,as_object* global)
 //This is called by abc_functions to execute their code stream.
 //TODO: There is probably a better way to do this, once we understand what the VM is supposed
 //todo, this should be fixed.
-as_value Machine::executeFunction(CodeStream* stream,const fn_call& fn){
+as_value Machine::executeFunction(CodeStream* stream, boost::uint32_t maxRegisters, const fn_call& fn){
 	
 //TODO: Figure out a good way to use the State object to handle returning values.
 	bool prev_ext = mExitWithReturn;
-	load_function(stream);
+	load_function(stream, maxRegisters);
 	mExitWithReturn = true;
 	mRegisters[0] = as_value(fn.this_ptr);
 	for(unsigned int i=0;i<fn.nargs;i++){
@@ -2655,7 +2655,7 @@ void Machine::executeCodeblock(CodeStream* stream){
 void Machine::instantiateClass(std::string className, as_object* global){
 
 	asClass* theClass = mPoolObject->locateClass(className);
-	clearRegisters();
+	clearRegisters(theClass->getConstructor()->getMaxRegisters());
 	mStack.clear();
 	mScopeStack.clear();
 	mRegisters[0] = as_value(global);
@@ -2667,7 +2667,7 @@ Machine::Machine(VM& vm):mST(vm.getStringTable()),mRegisters(),mExitWithReturn(f
 	mCH = vm.getClassHierarchy();
 	//Local registers should be initialized at the beginning of each function call, but
 	//we don't currently parse the number of local registers for each function.
-	mRegisters.resize(16);
+//	mRegisters.resize(16);
 //	mST = new string_table();
 //	mST = ST;
 }
@@ -2764,10 +2764,10 @@ std::auto_ptr< std::vector<as_value> > Machine::get_args(unsigned int argc){
 	return args;
 }
 
-void Machine::load_function(CodeStream* stream){
+void Machine::load_function(CodeStream* stream,boost::uint32_t maxRegisters){
 	saveState();
 	mStream = stream;
-	clearRegisters();
+	clearRegisters(maxRegisters);
 }
 
 as_environment::ScopeStack* Machine::getScopeStack(){
@@ -2779,10 +2779,10 @@ as_environment::ScopeStack* Machine::getScopeStack(){
 }
 
 void
-Machine::clearRegisters(){
+Machine::clearRegisters(boost::uint32_t maxRegisters){
 	mRegisters.clear();
-	//TODO: Parse and use maximum stack size value for methods.
-	mRegisters.resize(16);
+
+	mRegisters.resize(maxRegisters);
 }
 
 

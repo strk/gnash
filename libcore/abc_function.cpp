@@ -32,7 +32,7 @@ as_value
 abc_function::operator()(const fn_call& fn)
 {
 	log_debug("Calling an abc_function id=%u.",mMethodInfo->mMethodID);
-	as_value val = mMachine->executeFunction(mMethodInfo->getBody(),fn);
+	as_value val = mMachine->executeFunction(mMethodInfo->getBody(),mMethodInfo->getMaxRegisters(),fn);
 	log_debug("Done calling abc_function id=%u value=%s",mMethodInfo->mMethodID,val.toDebugString());
 	return val;
 

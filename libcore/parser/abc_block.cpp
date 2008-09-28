@@ -1093,7 +1093,7 @@ abc_block::read_method_bodies()
 		// Maximum stack size.
 		mS->skip_V32();
 		// Maximum register size.
-		mS->skip_V32();
+		mMethods[moffset]->setMaxRegisters(mS->read_V32());
 		// Scope depth.
 		mS->skip_V32();
 		// Max scope depth.
