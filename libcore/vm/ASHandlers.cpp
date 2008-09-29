@@ -2063,7 +2063,7 @@ SWFHandlers::ActionPushData(ActionExec& thread)
             {
                 id = code[3 + i];
                 i++;
-                if ( id < static_cast<int>(code.dictionary_size()) )
+                if (static_cast<size_t>(id) < code.dictionary_size())
                 {
                     env.push( code.dictionary_get(id) );
                 }
@@ -2082,7 +2082,7 @@ SWFHandlers::ActionPushData(ActionExec& thread)
             {
                 id = code.read_int16(i+3);
                 i += 2;
-                if ( id < static_cast<int>(code.dictionary_size()) )
+                if ( static_cast<size_t>(id) < code.dictionary_size())
                 {
                     env.push( code.dictionary_get(id) );
                 }
