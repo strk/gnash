@@ -69,7 +69,13 @@ public:
 
 protected:
 
-    void toString(std::ostream& o) const;
+    /// Convert the LoadVars Object to a string.
+    //
+    /// @param o        The ostream to write the string to.
+    /// @param encode   Whether URL encoding is necessary. This is
+    ///                 ignored because LoadVars objects are always
+    ///                 URL encoded.
+    void toString(std::ostream& o, bool encode) const;
 
 #ifdef GNASH_USE_GC
 	/// Mark all reachable resources, for the GC
@@ -105,21 +111,18 @@ private:
 
 
 void
-LoadVars_as::toString(std::ostream& o) const
+LoadVars_as::toString(std::ostream& o, bool /*post*/) const
 {
 
 	typedef std::map<std::string, std::string> VarMap;
 	VarMap vars;
 
-	// TODO: it seems that calling enumerateProperties(vars) here
-	//       somehow corrupts the stack !
 	enumerateProperties(vars);
-
-    if (!vars.empty()) o << "?";
 
 	for (VarMap::iterator it=vars.begin(), itEnd=vars.end();
 			it != itEnd; ++it)
 	{
+	    if (it != vars.begin()) o << "&";
         const std::string& val = it->second;
         o << URL::encode(it->first) << "="
                     << URL::encode(val);
@@ -420,8 +423,6 @@ loadvars_sendAndLoad(const fn_call& fn)
 	// Post by default, override by ActionScript third argument
 	bool post = true;
 	if ( fn.nargs > 2 && fn.arg(2).to_string() == "GET" ) post = false;
-
-	//log_debug("LoadVars.sendAndLoad(%s, %p) called, and returning TRUE", urlstr.c_str(), target.get());
 
 	ptr->sendAndLoad(urlstr, *target, post);
 	return as_value(true);
