@@ -74,7 +74,8 @@ public:
 	boost::uint8_t operator[] (size_t off) const
 	{
 		if (off >= m_buffer.size()) {
-		    throw ActionParserException (_("Attempt to read outside action buffer"));
+		    throw ActionParserException (_("Attempt to read outside "
+		    		    "action buffer"));
 		}
 		return m_buffer[off];
 	}
@@ -88,7 +89,12 @@ public:
 	///
 	const char* read_string(size_t pc) const
 	{
-		assert(pc < m_buffer.size() );
+		assert(pc <= m_buffer.size() );
+        if (pc == m_buffer.size())
+        {
+            throw ActionParserException(_("Asked to read string when only "
+                "1 byte remains in the buffer"));
+        }
 		return reinterpret_cast<const char*>(&m_buffer[pc]);
 	}
 
