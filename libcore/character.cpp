@@ -483,16 +483,7 @@ character::width_getset(const fn_call& fn)
 			return rv;
 		}
 
-		const double oldwidth = bounds.width();
-		if ( oldwidth <= 0 )
-		{
-			log_unimpl(_("FIXME: can't set _width on character %s (%s) with width %d"),
-				ptr->getTarget(), typeName(*ptr), oldwidth);
-			return rv;
-		}
-
 		const double newwidth = PIXELS_TO_TWIPS(fn.arg(0).to_number());
-
 		if ( newwidth <= 0 )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
@@ -501,9 +492,22 @@ character::width_getset(const fn_call& fn)
 			);
 		}
 
-		ptr->set_x_scale( 100 * (newwidth / oldwidth) );
+		ptr->set_width(newwidth);
 	}
 	return rv;
+}
+
+void
+character::set_width(double newwidth)
+{
+	rect bounds = getBounds();
+	const double oldwidth = bounds.width();
+	assert(oldwidth >= 0); // can't be negative can it?
+
+	double newscale = 100*(newwidth/oldwidth);
+	//if ( _xscale < 0 ) newscale = -newscale;
+	log_debug("setting xscale from %g to %g", _xscale, newscale);
+	set_x_scale( newscale );
 }
 
 as_value
@@ -530,14 +534,6 @@ character::height_getset(const fn_call& fn)
 			return rv;
 		}
 
-		const double oldheight = bounds.height();
-		if ( oldheight <= 0 )
-		{
-			log_unimpl(_("FIXME: can't set _height on character %s (%s) with height %d"),
-				ptr->getTarget(), typeName(*ptr), oldheight);
-			return rv;
-		}
-
 		const double newheight = PIXELS_TO_TWIPS(fn.arg(0).to_number());
 		if ( newheight <= 0 )
 		{
@@ -547,10 +543,23 @@ character::height_getset(const fn_call& fn)
 			);
 		}
 
-		ptr->set_y_scale( 100 * (newheight / oldheight) );
+		ptr->set_height(newheight);
 	}
 
 	return rv;
+}
+
+void
+character::set_height(double newheight)
+{
+	const rect bounds = getBounds();
+	const double oldheight = bounds.height();
+	assert(oldheight >= 0); // can't be negative can it?
+
+	double newscale = 100 * (newheight / oldheight);
+	//if ( _yscale < 0 ) newscale = -newscale;
+	log_debug("setting yscale from %g to %g", _yscale, newscale);
+	set_y_scale( newscale );
 }
 
 as_value
@@ -664,6 +673,7 @@ character::set_matrix(const matrix& m, bool updateCache)
 		}
 #endif
         }
+	else log_debug("set_matrix of character %s: matrix not changed..", getTarget());
 	
 }
 
@@ -839,7 +849,12 @@ character::set_rotation(double rot)
 	double rotation = _rotation * PI / 180.0;
 
 	matrix m = get_matrix();
+#if 1
 	m.set_scale_rotation(xscale, yscale, rotation);
+#else
+	if ( _xscale < 0 && _yscale < 0 ) rotation += PI;
+	m.set_rotation(rotation);
+#endif
 	set_matrix(m); // we updated the cache ourselves
 #else
     double rotation = rot * PI / 180.0;
@@ -863,6 +878,7 @@ character::set_y_scale(double scale_percent)
 
 	matrix m = get_matrix();
 	m.set_scale_rotation(xscale, yscale, rotation);
+	//m.set_y_scale(yscale);
 	set_matrix(m); // we updated the cache ourselves
 #else
 	matrix m = get_matrix();
