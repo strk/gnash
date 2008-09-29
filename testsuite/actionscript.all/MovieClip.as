@@ -103,7 +103,7 @@ endOfTest = function()
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(779); // SWF8+
+	check_totals(783); // SWF8+
 #endif
 
 	play();
@@ -1461,8 +1461,19 @@ check_equals(_root.transform.matrix.ty, 20);
 _root.transform.matrix.ty = 300;
 check_equals(_root._y, 20); // changing the AS matrix doesn't change the actual matrix
 
+check_equals(_root.transform.matrix.toString(), "(a=0, b=-1, c=-2, d=0, tx=30, ty=20)");
+
 _root._x = _root._y = _root._rotation = 0;
-_root._xscale = _root._yscale = 100;
+
+check_equals(_root.transform.matrix.toString(), "(a=1, b=0, c=0, d=-2, tx=0, ty=0)");
+
+_root._xscale = 100;
+
+check_equals(_root.transform.matrix.toString(), "(a=1, b=0, c=0, d=-2, tx=0, ty=0)");
+
+_root._yscale = 100;
+
+check_equals(_root.transform.matrix.toString(), "(a=1, b=0, c=0, d=1, tx=0, ty=0)");
 
 OldTransform = flash.geom.Transform;
 
