@@ -52,7 +52,7 @@ using namespace std;
 //
 // TODO: let user tweak this ?
 //
-#define PROBE_BYTES 1024
+#define PROBE_BYTES 8192
 
 // Define the following macro the have seek() operations printed
 //#define GNASH_DEBUG_SEEK 1

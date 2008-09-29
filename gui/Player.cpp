@@ -43,9 +43,9 @@
 #include "VM.h"
 #include "SystemClock.h"
 
-#ifdef SOUND_SDL
+#ifdef USE_FFMPEG
 # include "MediaHandlerFfmpeg.h"
-#elif defined(SOUND_GST)
+#elif defined(USE_GST)
 # include "MediaHandlerGst.h"
 #endif
 
@@ -190,9 +190,9 @@ Player::init_sound()
 void
 Player::init_media()
 {
-#ifdef SOUND_SDL
+#ifdef USE_FFMPEG
         _mediaHandler.reset( new gnash::media::MediaHandlerFfmpeg() );
-#elif defined(SOUND_GST)
+#elif defined(USE_GST)
         _mediaHandler.reset( new gnash::media::MediaHandlerGst() );
 #else
         log_error(_("No media support compiled in"));

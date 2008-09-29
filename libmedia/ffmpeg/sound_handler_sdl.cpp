@@ -32,6 +32,8 @@
 
 #ifdef USE_FFMPEG
 #include "AudioDecoderFfmpeg.h"
+#elif defined(USE_GST)
+#include "AudioDecoderGst.h"
 #endif
 
 #include "log.h" // will import boost::format too
@@ -295,6 +297,9 @@ SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset, long
 	        case AUDIO_CODEC_MP3:
 #ifdef USE_FFMPEG
 		        sound->decoder = new AudioDecoderFfmpeg(*(sounddata->soundinfo));
+		        break;
+#elif defined(USE_GST)
+		        sound->decoder = new AudioDecoderGst(*(sounddata->soundinfo));
 		        break;
 #endif
 	        case AUDIO_CODEC_ADPCM:

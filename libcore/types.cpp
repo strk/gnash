@@ -4,6 +4,8 @@
 // whatever you want with it.
 
 // Some basic types for gnash.
+#include <pthread.h>
+#include <boost/thread.hpp>
 
 #include "types.h"
 
