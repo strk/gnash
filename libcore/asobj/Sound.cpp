@@ -33,7 +33,7 @@
 #include "Object.h" // for getObjectInterface
 #include "VM.h"
 
-#ifdef SOUND_GST
+#ifdef USE_GST
 # include "SoundGst.h"
 #elif defined(USE_FFMPEG)
 # include "SoundFfmpeg.h"
@@ -277,8 +277,7 @@ as_value
 sound_new(const fn_call& fn)
 {
 	Sound* sound_obj;
-
-#ifdef SOUND_GST
+#ifdef USE_GST
 	sound_obj = new SoundGst();
 #elif defined(USE_FFMPEG)
 	sound_obj = new SoundFfmpeg();

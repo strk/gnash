@@ -22,8 +22,6 @@
 #include "gnashconfig.h"
 #endif
 
-#ifdef SOUND_GST
-
 #include "GstUtil.h"
 #include "log.h"
 
@@ -113,8 +111,6 @@ GstUtil::ensure_plugin_registered(const char* name, GType type)
 
 } // gnash.media namespace 
 } // namespace gnash
-
-#endif // GST_UTIL
 
 // Local Variables:
 // mode: C++

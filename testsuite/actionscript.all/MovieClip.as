@@ -95,15 +95,15 @@ endOfTest = function()
 #endif
 
 #if OUTPUT_VERSION == 6
-	check_totals(722); // SWF6
+	check_totals(725); // SWF6
 #endif
 
 #if OUTPUT_VERSION == 7
-	check_totals(739); // SWF7
+	check_totals(742); // SWF7
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(776); // SWF8+
+	check_totals(779); // SWF8+
 #endif
 
 	play();
@@ -1172,6 +1172,7 @@ check_equals(b.yMax, -5);
 
 draw._xscale = -50;
 check_equals(draw._xscale, -50);
+check_equals(draw._yscale, -50); // setting _xscale didn't change _yscale 
 check_equals(draw._width, 5);
 
 #if OUTPUT_VERSION >= 8
@@ -1184,7 +1185,9 @@ check_equals(b.yMin, -15);
 check_equals(b.yMax, -5);
 
 draw._width = 10;
+check_equals(draw._width, 10);
 check_equals(draw._xscale, 100); // reset to positive on setting _width
+xcheck_equals(draw._yscale, 50); // reset to positive on setting _width !
 
 #if OUTPUT_VERSION >= 8
 xcheck_equals(printMatrix(draw.transform.matrix, 2), "(a=1, b=0, c=0, d=0.5, tx=0, ty=0)");
@@ -1195,8 +1198,8 @@ xcheck_equals(b.xMax, 20);
 xcheck_equals(b.yMin, 5);
 xcheck_equals(b.yMax, 15);
 
-draw._height = 10;
-check_equals(draw._yscale, 50); // reset to positive on setting _height
+draw._height = 10; // TODO: dumb check, it's 10 already !!
+check_equals(draw._yscale, 50); // was already positive
 
 #if OUTPUT_VERSION >= 8
 check_equals(printMatrix(draw.transform.matrix, 2), "(a=1, b=0, c=0, d=0.5, tx=0, ty=0)");

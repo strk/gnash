@@ -21,7 +21,6 @@
 #include "gnashconfig.h"
 #endif
 
-#ifdef SOUND_GST
 
 #include "AudioDecoderGst.h"
 #include "MediaParser.h"
@@ -152,5 +151,4 @@ AudioDecoderGst::decode(const EncodedAudioFrame& ef, boost::uint32_t& outputSize
 } // end of media namespace
 } // end of gnash namespace
 
-#endif // SOUND_GST
 

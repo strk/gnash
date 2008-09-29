@@ -2887,6 +2887,7 @@ if test x$cross_compiling = xno; then
     echo "        WARNING: You need to have the 'swfmill' tool installed" >&4
     echo "                 to run some of the tests in Gnash testsuite." >&4
     echo "                 You can install it from http://swfmill.org/" >&4
+    echo "                 or .deb users: apt-get install swfmill" >&4
   fi
 
   if test x"$SWFC" != x; then

@@ -38,7 +38,7 @@
 
 // Define this to use new math for matrix operation.
 // This is for testing, zou is still working on it
-//#define NEW_MATRIX_MATH 1
+#define NEW_MATRIX_MATH 1
 
 namespace gnash {
 

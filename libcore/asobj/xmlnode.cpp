@@ -265,23 +265,21 @@ XMLNode::nextSibling()
 }
 
 void
-XMLNode::toString(std::ostream& xmlout) const
+XMLNode::toString(std::ostream& xmlout, bool encode) const
 {
-//    GNASH_REPORT_FUNCTION;
-    stringify(*this, xmlout);
+    log_debug("XMLNode toString: encode %d");
+    stringify(*this, xmlout, encode);
 }
 
 /* static private */
 void
-XMLNode::stringify(const XMLNode& xml, std::ostream& xmlout) 
+XMLNode::stringify(const XMLNode& xml, std::ostream& xmlout, bool encode) 
 {
-//    GNASH_REPORT_FUNCTION;
+
     const std::string& nodevalue = xml.nodeValue();
     const std::string& nodename = xml.nodeName();
     NodeType type = xml.nodeType();
 
-
-//    log_debug("%s: processing for object %s <%p>", __PRETTY_FUNCTION__, nodename, xml);
 
 #ifdef GNASH_DEBUG
     log_debug(_("Stringifying node %p with name %s, value %s, %u attributes and %u children"),
@@ -298,7 +296,6 @@ XMLNode::stringify(const XMLNode& xml, std::ostream& xmlout)
         for (ita = xml._attributes.begin(); ita != xml._attributes.end(); ita++)
         {
             const XMLAttr& xa = *ita;
-            // TODO: replace with XMLAttr::operator<<
             xmlout << " " << xa.name() << "=\"" << xa.value() << "\"";
         }
 
@@ -319,16 +316,14 @@ XMLNode::stringify(const XMLNode& xml, std::ostream& xmlout)
     // Node value first, then children
     if ( type == tText )
     {
-	    xmlout << nodevalue;
+	    encode ? xmlout << URL::encode(nodevalue) : xmlout << nodevalue;
     }
 
     // Childs, after node value.
     ChildList::const_iterator itx;
     for (itx = xml._children.begin(); itx != xml._children.end(); itx++)
     {
-//      log_debug(_("Found One XMLNode child.  %s <%p>"), (*itx)->nodeName().c_str(), (void*)*itx);
-//      cerr << "<" << (*it)->nodeName() << ">" << endl;
-        (*itx)->toString(xmlout);
+        (*itx)->toString(xmlout, encode);
     }
 
     if ( nodename.size() )

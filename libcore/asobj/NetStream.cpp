@@ -43,10 +43,9 @@
 
 #include "MediaHandler.h"
 #include "StreamProvider.h"
+#include "sound_handler.h"
 
 #include <boost/algorithm/string/case_conv.hpp> // for PROPNAME
-
-#include "sound_handler_gst.h"
 
 // Define the following macro to have status notification handling debugged
 //#define GNASH_DEBUG_STATUS
@@ -1010,11 +1009,11 @@ bool NetStream::audio_streamer(void *owner, boost::uint8_t *stream, int len)
 
 	boost::mutex::scoped_lock lock(ns->_audioQueueMutex);
 
-
+#if 0
 	log_debug("audio_streamer called, audioQueue size: %d, "
 		"requested %d bytes of fill-up",
 		ns->_audioQueue.size(), len);
-
+#endif
 
 
 	while (len > 0)
@@ -1216,13 +1215,13 @@ NetStream::decodeNextAudioFrame()
 		}
 	}
 
-//#ifdef GNASH_DEBUG_DECODING
+#ifdef GNASH_DEBUG_DECODING
 	log_debug("NetStream::decodeNextAudioFrame: "
 		"%d bytes of encoded audio "
 		"decoded to %d bytes",
 		frame->dataSize,
 		raw->m_size);
-//#endif // GNASH_DEBUG_DECODING
+#endif // GNASH_DEBUG_DECODING
 
 	raw->m_ptr = raw->m_data; // no idea what this is needed for
 	raw->m_pts = frame->timestamp;

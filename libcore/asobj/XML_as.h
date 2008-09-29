@@ -80,9 +80,14 @@ public:
     XML_as(const std::string& xml_in);
     ~XML_as() {};
 
-    void toString(std::ostream& o) const
+    /// Convert the XML object to a string
+    //
+    /// This calls XMLNode::toString.
+    /// @param o        The ostream to write the string to.
+    /// @param encode   Whether to URL encode the node values.
+    void toString(std::ostream& o, bool encode) const
     {
-        XMLNode::toString(o);
+        XMLNode::toString(o, encode);
     }
 
     /// This is overridden to provide the 'status' and 'loaded' members,

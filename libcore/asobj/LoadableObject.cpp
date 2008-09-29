@@ -76,9 +76,6 @@ LoadableObject::sendAndLoad(const std::string& urlstr,
     /// All objects get a loaded member, set to false.
     target.set_member(NSV::PROP_LOADED, false);
 
-    std::ostringstream data;
-    toString(data);
-
 	URL url(urlstr, get_base_url());
 
 	std::auto_ptr<IOChannel> str;
@@ -133,14 +130,26 @@ LoadableObject::sendAndLoad(const std::string& urlstr,
                         contentType.to_string()));
         }
 
+        // Convert the object to a string to send. XML should
+        // not be URL encoded for the POST method, LoadVars
+        // is always URL encoded.
+        std::ostringstream data;
+        toString(data, false);
+
         /// It doesn't matter if there are no request headers.
         str = StreamProvider::getDefaultInstance().getStream(url,
                                                     data.str(), headers);
     }
 	else
     {
-    	std::string url = urlstr + "?" + data.str();
-        str = StreamProvider::getDefaultInstance().getStream(url);
+        // Convert the object to a string to send. XML should
+        // not be URL encoded for the GET method.
+        std::ostringstream data;
+        toString(data, true);
+
+    	std::string getURL = urlstr + "?" + data.str();
+        log_debug("Using GET method for sendAndLoad: %s", getURL);
+        str = StreamProvider::getDefaultInstance().getStream(getURL);
     }
 
 	if (!str.get()) 
