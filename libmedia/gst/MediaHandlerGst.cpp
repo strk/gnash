@@ -54,8 +54,7 @@ MediaHandlerGst::createVideoDecoder(VideoInfo& info)
 std::auto_ptr<AudioDecoder>
 MediaHandlerGst::createAudioDecoder(AudioInfo& info)
 {
-	std::auto_ptr<AudioDecoder> ret( new AudioDecoderGst() );
-	ret->setup(&info);
+	std::auto_ptr<AudioDecoder> ret( new AudioDecoderGst(info) );
 	return ret;
 }
 

@@ -28,13 +28,7 @@ BOGUS_ASTESTS = \
 
 ASTESTS = $(SANE_ASTESTS) $(BOGUS_ASTESTS)
 
-
-# These will get compiled to SWFs just as above, but will not be executed as a test
-# They are for secondary movies to be loaded by the above tests.
-AUXMOVIES = Dejagnu.hx  \
-	$(NULL)
-
-EXTRA_DIST = $(ASTESTS) $(AUXMOVIES) check.as
+EXTRA_DIST = $(ASTESTS) Dejagnu.hx check.as
 
 HAXE_FLAGS = -swf-version 9 -cp $(HAXE_CLASSPATH) -cp $(srcdir) 
 # hopefully preprocessor is builtin in this case
@@ -44,9 +38,7 @@ SANE_ASTESTS_OUT = $(SANE_ASTESTS:.hx=.swf)
 BOGUS_ASTESTS_OUT = $(BOGUS_ASTESTS:.hx=.swf)
 ASTESTS_OUT = $(SANE_ASTESTS_OUT) $(BOGUS_ASTESTS_OUT)
 
-AUXMOVIES_OUT = $(AUXMOVIES:.hx=.swf)
-
-$(ASTESTS_OUT) $(AUXMOVIES_OUT): Dejagnu.hx check.as
+$(ASTESTS_OUT) : Dejagnu.hx check.as
 
 
 TEST_DRIVERS = ../simple.exp
@@ -55,17 +47,17 @@ TEST_CASES = \
 	bogustests-runner \
 	$(NULL)
 
-sanetests-runner: $(srcdir)/../generic-testrunner.sh $(SANE_ASTESTS_OUT) $(AUXMOVIES_OUT) Makefile
+sanetests-runner: $(srcdir)/../generic-testrunner.sh $(SANE_ASTESTS_OUT) Makefile
 	sh $< -c __END_OF_TEST__ -r 50 $(top_builddir) $(SANE_ASTESTS_OUT) > $@
 	chmod 755 $@
 
-bogustests-runner: $(srcdir)/../generic-testrunner.sh $(BOGUS_ASTESTS_OUT) $(AUXMOVIES_OUT) Makefile
+bogustests-runner: $(srcdir)/../generic-testrunner.sh $(BOGUS_ASTESTS_OUT) Makefile
 	sh $< -C __END_OF_TEST__ -r 50 $(top_builddir) $(BOGUS_ASTESTS_OUT) > $@
 	chmod 755 $@
 
 .hx.swf: 
 	$(HAXE_CPP) $< > $(@:%.swf=PP_%.hx) 
-	$(HAXE) $(HAXE_FLAGS) -swf $@ $(@:%.swf=PP_%.hx)
+	$(HAXE) $(HAXE_FLAGS) -swf $@ -main $(@:%.swf=PP_%.hx)
 
 CLEANFILES =  \
 	gnash-dbg.log \

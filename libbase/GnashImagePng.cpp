@@ -41,7 +41,7 @@ static void
 error(png_struct*, const char* msg)
 {
     std::ostringstream ss;
-    ss << "PNG error: " << msg;
+    ss << _("PNG error: ") << msg;
     throw ParserException(ss.str());
 }
 
@@ -88,7 +88,8 @@ PngImageInput::PngImageInput(boost::shared_ptr<IOChannel> in) :
 
 PngImageInput::~PngImageInput()
 {
-    png_destroy_read_struct(&_pngPtr, &_infoPtr, (png_infopp)NULL);
+    png_destroy_read_struct(&_pngPtr, &_infoPtr,
+                    static_cast<png_infopp>(NULL));
 }
 
 size_t
@@ -118,7 +119,8 @@ PngImageInput::readScanline(unsigned char* imageData)
     assert (_rowPtrs);
 
     // Data packed as RGB / RGBA
-    std::memcpy(imageData, _rowPtrs[_currentRow], getWidth() * getComponents());
+    std::memcpy(imageData, _rowPtrs[_currentRow],
+                getWidth() * getComponents());
     
     ++_currentRow;
 }
@@ -136,7 +138,9 @@ PngImageInput::init()
 
     if (!_infoPtr)
     {
-        png_destroy_read_struct(&_pngPtr, (png_infopp)NULL, (png_infopp)NULL);
+        png_destroy_read_struct(&_pngPtr,
+                    static_cast<png_infopp>(NULL),
+                    static_cast<png_infopp>(NULL));
         return;
     }
 }
@@ -261,7 +265,7 @@ PngImageOutput::init()
 
     if (!_infoPtr)
     {
-        png_destroy_write_struct(&_pngPtr, (png_infopp)NULL);
+        png_destroy_write_struct(&_pngPtr, static_cast<png_infopp>(NULL));
         return;
     }
 }
@@ -317,9 +321,11 @@ PngImageOutput::writeImageRGB(unsigned char* rgbData)
 
 
 std::auto_ptr<ImageOutput>
-PngImageOutput::create(boost::shared_ptr<IOChannel> out, size_t width, size_t height, int quality)
+PngImageOutput::create(boost::shared_ptr<IOChannel> out, size_t width,
+                       size_t height, int quality)
 {
-    std::auto_ptr<ImageOutput> outChannel(new PngImageOutput(out, width, height, quality));
+    std::auto_ptr<ImageOutput> outChannel(
+                new PngImageOutput(out, width, height, quality));
     return outChannel;
 }
 

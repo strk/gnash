@@ -23,6 +23,18 @@
 rcsid="$Id: TextField.as,v 1.56 2008/06/05 03:26:32 zoulunkai Exp $";
 #include "check.as"
 
+printBounds = function(b)
+{
+    var s = '';
+    s += "xmin:"+b.xMin;
+    s += " ymin:"+b.yMin;
+    s += " xmax:"+b.xMax;
+    s += " ymax:"+b.yMax;
+    return s;
+};
+
+TextField.prototype.getBounds = MovieClip.prototype.getBounds;
+
 #if OUTPUT_VERSION > 5
 
 check_equals(typeof(TextField), 'function');
@@ -101,6 +113,7 @@ check_equals(typeof(tfObj.removeTextField), 'function');
 check_equals(typeof(tfObj.replaceSel), 'function');
 // this is a static method, it's available as TextField.getFontList
 check_equals(typeof(tfObj.getFontList), 'undefined');
+check_equals(typeof(tfObj._parent), 'undefined'); // no parent
 
 //--------------------------------------------------
 // Check textfield creation trough createTextField
@@ -679,6 +692,21 @@ check( ! tf.__proto__.hasOwnProperty('_width') );
 check_equals(tf._width, 500); // as it was set by createTextField, see above
 tf._width = 99999;
 check_equals(tf._width, 99999); 
+b = tf.getBounds(_root); bs = printBounds(b);
+check_equals(bs, 'xmin:10 ymin:10 xmax:100009 ymax:510');
+tf.autoSize = false;
+tf.text = 'small'; // doesn't reset bounds (being autoSize false);
+check_equals(tf._width, 99999); 
+b = tf.getBounds(_root); bs = printBounds(b);
+check_equals(bs, 'xmin:10 ymin:10 xmax:100009 ymax:510');
+
+tf.autoSize = true; // changes width !!
+check(tf._width < 99999); 
+ow = tf._width;
+
+tf.autoSize = false;  // doesn't reset to last manually set one
+check_equals(tf._width, ow);
+
 tf._width = 500;
 
 //-------------------------------------------------------------------------
@@ -771,7 +799,7 @@ xcheck_equals(tf._height, currHeight*2);
 tf._yscale = 100;
 
 //-------------------------------------------------------------------------
-// Check interaction between autoSize and _width
+// Check interaction between autoSize and _width and wordWrap
 //-------------------------------------------------------------------------
 
 tf._width = 10; // "hello world" text should overflow this
@@ -792,9 +820,9 @@ note("After reducing _width: textWidth: "+tf.textWidth+" origTextWidth:"+origTex
 check_equals(tf._width, 10);
 
 #if OUTPUT_VERSION < 8
- check_equals(origTextWidth, tf.textWidth); 
+ xcheck_equals(origTextWidth, tf.textWidth); 
 #else
- xcheck(origTextWidth > tf.textWidth); 
+ check(origTextWidth > tf.textWidth); 
 #endif
 
 // test that adding a newline doesn't change the bounds width
@@ -804,6 +832,31 @@ tf.text = "single line";
 linewidth = tf._width;
 tf.text = "single line\n";
 check_equals(tf._width, linewidth); 
+
+// Test that setting autoSize = none
+// doesn't reset the bounding box.
+// See bug #24266
+//
+oldwidth = tf._width;
+note("width: "+oldwidth);
+check(oldwidth>0); // or the test is invalid
+tf.autoSize = 'none'; // tf was created with bounds 0,0
+check_equals(tf._width, oldwidth); // but _width didn't change to that
+
+// Test that when autoSize != none,
+// and wordWrap is true, text box isn't
+// reset. See #24348
+//
+tf.wordWrap = false;
+check_equals(tf._width, oldwidth); // text takes more width with wordWrap false
+note("width on wordWrap="+tf.wordWrap+" autoSize="+tf.autoSize+": "+tf._width);
+tf.autoSize = 'center'; 
+note("width on wordWrap="+tf.wordWrap+" autoSize="+tf.autoSize+": "+tf._width);
+check(tf._width > oldwidth); 
+oldwidth = tf._width;
+tf.wordWrap = true;
+note("width on wordWrap="+tf.wordWrap+" autoSize="+tf.autoSize+": "+tf._width);
+check_equals(tf._width, oldwidth);  // wordWrap change didn't reset the bbox
 
 
 //------------------------------------------------------------
@@ -896,9 +949,9 @@ _root._xscale = _root._yscale = 100;
 //------------------------------------------------------------
 
 #if OUTPUT_VERSION < 8
- check_totals(415);
+ check_totals(426);
 #else
- check_totals(416);
+ check_totals(427);
 #endif
 
 #else // OUTPUT_VERSION <= 5

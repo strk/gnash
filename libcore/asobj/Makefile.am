@@ -53,7 +53,7 @@ libgnashasobjs_la_SOURCES = \
 	Error_as.cpp \
 	Global.cpp \
 	Key.cpp	\
-	LoadVars.cpp \
+	LoadVars_as.cpp \
 	LocalConnection.cpp\
 	Math_as.cpp \
 	Microphone.cpp	\
@@ -66,12 +66,12 @@ libgnashasobjs_la_SOURCES = \
 	SharedObject.cpp\
 	Sound.cpp \
 	Stage.cpp \
-	System.cpp \
+	System_as.cpp \
 	TextFormat.cpp \
 	TextSnapshot.cpp \
 	MovieClipLoader.cpp\
 	String_as.cpp \
-	xml.cpp \
+	XML_as.cpp \
 	xmlattrs.cpp \
 	xmlnode.cpp \
 	XMLSocket_as.cpp \
@@ -102,6 +102,7 @@ libgnashasobjs_la_SOURCES = \
 	flash_pkg.cpp \
 	flash/text_pkg.cpp \
 	flash/text/TextRenderer_as.cpp \
+	LoadableObject.cpp \
 	$(NULL)
 
 noinst_HEADERS = \
@@ -118,7 +119,7 @@ noinst_HEADERS = \
 	Math_as.h	\
 	Global.h\
 	Key.h \
-	LoadVars.h \
+	LoadVars_as.h \
 	LocalConnection.h\
 	Microphone.h \
 	Mouse.h	\
@@ -135,13 +136,12 @@ noinst_HEADERS = \
 	Sound.h \
 	SoundFfmpeg.h \
 	SoundGst.h \
-	SoundMad.h \
 	Stage.h	\
-	System.h \
+	System_as.h \
 	TextFormat.h \
 	TextSnapshot.h \
 	String_as.h \
-	xml.h \
+	XML_as.h \
 	XMLSocket_as.h \
 	xmlattrs.h \
 	xmlnode.h \
@@ -172,6 +172,7 @@ noinst_HEADERS = \
 	flash_pkg.h \
 	flash/text_pkg.h \
 	flash/text/TextRenderer_as.h \
+	LoadableObject.h \
 	$(NULL)
 
 libgnashasobjs_la_LIBADD = \
@@ -194,12 +195,6 @@ libgnashasobjs_la_SOURCES += NetStreamGst.cpp SoundGst.cpp
 AM_CPPFLAGS += $(GSTREAMER_CFLAGS) \
 		-I$(top_srcdir)/libmedia/gst
 libgnashasobjs_la_LIBADD += $(GSTREAMER_LIBS)
-endif
-
-if USE_MAD_ENGINE
-libgnashasobjs_la_SOURCES += SoundMad.cpp
-AM_CPPFLAGS += $(MAD_CFLAGS)
-libgnashasobjs_la_LIBADD += $(MAD_LIBS)
 endif
 
 #libgnashasobjs_la_LDFLAGS = -release $(VERSION) -no-undefined -export-dynamic

@@ -70,11 +70,12 @@ xpi xpi-bundle: xpi-build xpi-plugin
 	for i in install.rdf; do \
 	  cp -fr $${topdir}/packaging/xpi/$$i $(XPI_BUNDLE)/; \
 	done;
-	cp -fr $(XPI_TMP)$(bindir)/*gnash $(XPI_BUNDLE)/
+	mkdir -p $(XPI_BUNDLE)/plugins
+	cp -fr $(XPI_TMP)$(bindir)/*gnash $(XPI_BUNDLE)/plugins
 	cp -fr $(XPI_TMP)$(localedir) $(XPI_BUNDLE)/
-	cp -fr $(XPI_TMP)/tmp/plugin/libgnashplugin.so $(XPI_BUNDLE)/
-	cp -fr $(XPI_TMP)/tmp/plugin/extensions/*.xpt $(XPI_BUNDLE)/
-	cp -fr $(XPI_TMP)/tmp/plugin/extensions/*.so $(XPI_BUNDLE)/
+	cp -fr $(XPI_TMP)/tmp/plugin/libgnashplugin.so $(XPI_BUNDLE)/plugins
+	cp -fr $(XPI_TMP)/tmp/plugin/extensions/*.xpt $(XPI_BUNDLE)/plugins
+	cp -fr $(XPI_TMP)/tmp/plugin/extensions/*.so $(XPI_BUNDLE)/plugins
 	(cd $(XPI_BUNDLE) ; $(ZIP) -r /tmp/gnash-$(VERSION).xpi *)
 
 xpi-clean:

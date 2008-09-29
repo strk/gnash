@@ -34,11 +34,9 @@
 #include "AudioDecoderFfmpeg.h"
 #endif
 
-#ifdef USE_MAD
-#include "AudioDecoderMad.h"
-#endif
+#include "log.h" // will import boost::format too
+#include "GnashException.h" // for SoundException
 
-#include "log.h"
 #include <cmath>
 #include <vector>
 #include <boost/scoped_array.hpp>
@@ -143,8 +141,13 @@ SDL_sound_handler::delete_all_sounds()
         if (!sounddata) continue;
 
 		size_t nActiveSounds = sounddata->m_active_sounds.size();
+
+		// Decrement callback clients count 
 		soundsPlaying -= nActiveSounds;
+
+        // Increment number of sound stop request for the testing framework
 		_soundsStopped += nActiveSounds;
+
 		delete sounddata;
 	}
 	m_sound_data.clear();
@@ -179,12 +182,6 @@ int	SDL_sound_handler::create_sound(
 	switch (sounddata->soundinfo->getFormat())
 	{
 	case AUDIO_CODEC_MP3:
-#ifndef USE_FFMPEG
-#ifndef USE_MAD
-		log_error(_("gnash has not been compiled to handle mp3 audio"));
-		return -1;
-#endif
-#endif
 		sounddata->append(reinterpret_cast<boost::uint8_t*>(data), data_bytes);
 		break;
 
@@ -236,10 +233,14 @@ long	SDL_sound_handler::fill_stream_data(unsigned char* data, unsigned int data_
 }
 
 
-void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset, long start_position, const std::vector<sound_envelope>* envelopes)
 // Play the index'd sample.
+void
+SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset, long start_position, const std::vector<sound_envelope>* envelopes)
 {
 	boost::mutex::scoped_lock lock(_mutex);
+
+    // Increment number of sound start request for the testing framework
+	++_soundsStarted;
 
 	// Check if the sound exists, or if audio is muted
 	if (sound_handle < 0 || static_cast<unsigned int>(sound_handle) >= m_sound_data.size() || muted)
@@ -284,54 +285,35 @@ void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset,
 
 	sound->decoder = NULL;
 
-	switch (sounddata->soundinfo->getFormat()) {
-	case AUDIO_CODEC_NELLYMOSER:
-	case AUDIO_CODEC_NELLYMOSER_8HZ_MONO:
-		sound->decoder = new AudioDecoderNellymoser();
+    try {
 
-		if (!sound->decoder->setup(sounddata->soundinfo.get())) {
-			log_error("The audio decoder can't decode the audio");
-			delete sound->decoder;
-			sound->decoder = NULL;
-		}
-
-		break;
-	case AUDIO_CODEC_MP3:
-#ifdef USE_MAD
-		sound->decoder = new AudioDecoderMad();
-
-		if (!sound->decoder->setup(sounddata->soundinfo.get())) {
-			log_error("The audio decoder can't decode the audio");
-			delete sound->decoder;
-			sound->decoder = NULL;
-		}
-
-		break;
-#endif
+	    switch (sounddata->soundinfo->getFormat()) {
+	        case AUDIO_CODEC_NELLYMOSER:
+	        case AUDIO_CODEC_NELLYMOSER_8HZ_MONO:
+		        sound->decoder = new AudioDecoderNellymoser(*(sounddata->soundinfo));
+		        break;
+	        case AUDIO_CODEC_MP3:
 #ifdef USE_FFMPEG
-		sound->decoder = new AudioDecoderFfmpeg();
-
-		if (!sound->decoder->setup(sounddata->soundinfo.get())) {
-			log_error("The audio decoder can't decode the audio");
-			delete sound->decoder;
-			sound->decoder = NULL;
-		}
-
-		break;
+		        sound->decoder = new AudioDecoderFfmpeg(*(sounddata->soundinfo));
+		        break;
 #endif
-	case AUDIO_CODEC_ADPCM:
-	default:
-
-		sound->decoder = new AudioDecoderSimple();
-
-		if (!sound->decoder->setup(sounddata->soundinfo.get())) {
-			log_error("The audio decoder can't decode the audio");
-			delete sound->decoder;
-			sound->decoder = NULL;
-		}
-
+	        case AUDIO_CODEC_ADPCM:
+	        default:
+                sound->decoder = new AudioDecoderSimple(*(sounddata->soundinfo));
+                break;
+	    }
 	}
-		
+	catch (MediaException& e)
+	{
+	    log_error("AudioDecoder initialization failed");
+	}
+
+    // Push the sound onto the playing sounds container.
+    // We want to do this even on audio failures so count
+    // of started and stopped sound reflects expectances
+    // for testing framework.
+	sounddata->m_active_sounds.push_back(sound.release());
+
 	if (!soundOpened) {
 		if (SDL_OpenAudio(&audioSpec, NULL) < 0 ) {
 			log_error(_("Unable to start SDL sound: %s"), SDL_GetError());
@@ -341,9 +323,8 @@ void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset,
 
 	}
 
+	// Increment callback clients count 
 	++soundsPlaying;
-	++_soundsStarted;
-	sounddata->m_active_sounds.push_back(sound.release());
 
 	if (soundsPlaying == 1) {
 #ifdef GNASH_DEBUG_SDL_AUDIO_PAUSING
@@ -371,7 +352,10 @@ void	SDL_sound_handler::stop_sound(int sound_handle)
 
 	size_t nActiveSounds = sounddata->m_active_sounds.size();
 
+	// Decrement callback clients count 
 	soundsPlaying -= nActiveSounds;
+
+    // Increment number of sound stop request for the testing framework
 	_soundsStopped += nActiveSounds;
 
 	sounddata->clearActiveSounds();
@@ -410,7 +394,10 @@ void	SDL_sound_handler::stop_all_sounds()
 		if (!sounddata) continue;
 		size_t nActiveSounds = sounddata->m_active_sounds.size();
 
+		// Decrement callback clients count 
 		soundsPlaying -= nActiveSounds;
+
+        // Increment number of sound stop request for the testing framework
 		_soundsStopped += nActiveSounds;
 
 		sounddata->clearActiveSounds();
@@ -501,18 +488,23 @@ void	SDL_sound_handler::attach_aux_streamer(aux_streamer_ptr ptr, void* owner)
 	if ( ! m_aux_streamer.insert(std::make_pair(owner, ptr)).second )
 	{
 		// Already in the hash.
+		// TODO: throw SoundException ?
 		return;
 	}
 
-	++soundsPlaying;
-
 	if (!soundOpened) {
 		if (SDL_OpenAudio(&audioSpec, NULL) < 0 ) {
-			log_error(_("Unable to start aux SDL sound: %s"), SDL_GetError());
-			return;
+        		boost::format fmt = boost::format(
+				_("Unable to start aux SDL sound: %s"))
+				% SDL_GetError();
+			throw SoundException(fmt.str());
 		}
 		soundOpened = true;
 	}
+
+	// Increment callback clients count 
+	++soundsPlaying;
+
 #ifdef GNASH_DEBUG_SDL_AUDIO_PAUSING
 	log_debug("Unpausing SDL Audio...");
 #endif
@@ -524,10 +516,11 @@ void	SDL_sound_handler::detach_aux_streamer(void* owner)
 {
 	boost::mutex::scoped_lock lock(_mutex);
 
+	// WARNING: erasing would break any iteration in the map
 	CallbacksMap::iterator it2=m_aux_streamer.find(owner);
 	if ( it2 != m_aux_streamer.end() )
 	{
-		// WARNING: erasing would break any iteration in the map
+		// Decrement callback clients count 
 		--soundsPlaying;
 		m_aux_streamer.erase(it2);
 	}
@@ -816,6 +809,7 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 				++it2; // before we erase it
 				handler->m_aux_streamer.erase(it); // FIXME: isn't this terribly wrong ?
 				it = it2;
+				// Decrement callback clients count 
 				handler->soundsPlaying--;
 			} else {
 				++it;
@@ -825,11 +819,15 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 		}
 	}
 
+    const SDL_sound_handler::Sounds& soundData = handler->m_sound_data;
+
 	// Run through all the sounds. TODO: don't call .size() at every iteration !
-	for(boost::uint32_t i=0; i < handler->m_sound_data.size(); i++)
+	for (SDL_sound_handler::Sounds::const_iterator i = soundData.begin(),
+	            e = soundData.end(); i != e; ++i)
 	{
-		sound_data* sounddata = handler->m_sound_data[i];
-		handler->mixSoundData(*sounddata, buffer, buffer_length);
+	    // Check whether sound has been deleted first.
+        if (!*i) continue;
+		handler->mixSoundData(**i, buffer, buffer_length);
 	}
 
 	// 
@@ -1012,7 +1010,11 @@ SDL_sound_handler::mixSoundData(sound_data& sounddata, Uint8* buffer, unsigned i
 		if (sound->position == sound->dataSize() && sound->raw_position == sound->rawDataSize() && sound->loop_count == 0)
 		{
 			i = sounddata.eraseActiveSound(i);
+
+			// Decrement callback clients count 
 			soundsPlaying--;
+
+            // Increment number of sound stop request for the testing framework
 			_soundsStopped++;
 		} 
 		else

@@ -27,7 +27,8 @@
 #ifdef HAVE_PTHREADS
 #include <pthread.h>
 #endif
-#include <boost/shared_ptr.hpp> 
+#include <boost/shared_ptr.hpp>
+#include <boost/noncopyable.hpp>
 #include "log.h"
 #include "image.h"
 
@@ -36,7 +37,8 @@ namespace gnash { class IOChannel; }
 
 namespace gnash {
 
-class ImageInput {
+class ImageInput : boost::noncopyable
+{
 
 public:
 
@@ -83,7 +85,7 @@ protected:
 
 };
 
-class ImageOutput
+class ImageOutput : boost::noncopyable
 {
 
 public:
@@ -100,7 +102,7 @@ public:
     
     virtual void writeImageRGBA(unsigned char* /*rgbaData*/)
     {
-        log_error("This image format does not support writing RGBA images");
+        log_error(_("This image format does not support writing RGBA images"));
     }
 
 protected:

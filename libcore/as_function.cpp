@@ -249,8 +249,8 @@ function_apply(const fn_call& fn)
 				goto call_it;
 			}
 
-			boost::intrusive_ptr<as_array_object> arg_array = \
-					boost::dynamic_pointer_cast<as_array_object>(arg1);
+			boost::intrusive_ptr<Array_as> arg_array = \
+					boost::dynamic_pointer_cast<Array_as>(arg1);
 
 			if ( ! arg_array )
 			{

@@ -34,13 +34,10 @@
 #include "VM.h"
 
 #ifdef SOUND_GST
-#include "SoundGst.h"
+# include "SoundGst.h"
 #elif defined(USE_FFMPEG)
-#include "SoundFfmpeg.h"
-#elif defined(USE_MAD)
-#include "SoundMad.h"
+# include "SoundFfmpeg.h"
 #endif
-
 #include <string>
 
 namespace gnash {
@@ -285,8 +282,6 @@ sound_new(const fn_call& fn)
 	sound_obj = new SoundGst();
 #elif defined(USE_FFMPEG)
 	sound_obj = new SoundFfmpeg();
-#elif defined(USE_MAD)
-	sound_obj = new SoundMad();
 #else
 	sound_obj = new Sound();
 #endif
@@ -703,6 +698,7 @@ Sound::markReachableResources() const
 {
 	if ( connection ) connection->setReachable();
 	if ( attachedCharacter ) attachedCharacter->setReachable();
+	markAsObjectReachable();
 }
 #endif // GNASH_USE_GC
 

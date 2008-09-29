@@ -1859,7 +1859,7 @@ SWFHandlers::ActionMbChr(ActionExec& thread)
     
     if (env.get_version() == 5)
     {
-        log_unimpl("Not properly implemented for SWF5");
+        log_unimpl(_("Not properly implemented for SWF5"));
         // No need to return.
     }
 
@@ -1926,7 +1926,6 @@ SWFHandlers::ActionWaitForFrameExpression(ActionExec& thread)
         thread.skip_actions(skip);
     }
 
-    //log_debug(_("%s: testing"), __PRETTY_FUNCTION__);
 }
 
 void
@@ -1967,12 +1966,6 @@ SWFHandlers::ActionPushData(ActionExec& thread)
     size_t pc = thread.getCurrentPC();
     boost::int16_t length = code.read_int16(pc+1);
     assert( length >= 0 ); // TODO: trigger this with a testcase !
-
-#if 0 // is this really useful ?
-        IF_VERBOSE_ACTION (
-            log_action(_("[push length=%d]"), length);
-            );
-#endif
 
     //---------------
     size_t i = pc;
@@ -2246,7 +2239,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
         character* curtgt = env.get_target();
         if ( ! curtgt )
         {
-            log_error("CommonGetUrl: current target is undefined");
+            log_error(_("CommonGetUrl: current target is undefined"));
             return;
         }
         curtgt->getURLEncodedVars(varsToSend);
@@ -2340,7 +2333,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
         std::string s = target_movie->getTarget(); // or getOrigTarget ?
         if ( s != target_movie->getOrigTarget() )
         {
-            log_debug("TESTME: target of a loadMovie changed its target path");
+            log_debug(_("TESTME: target of a loadMovie changed its target path"));
         }
         movie_root& mr = VM::get().getRoot();
         assert( mr.findCharacterByTarget(s) == target_movie ); // TODO: try to trigger this !
@@ -2373,7 +2366,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 
     if ( usePost )
     {
-        log_unimpl (_("POST with host-provided uri grabber"));
+        log_unimpl(_("POST with host-provided uri grabber"));
     }
 
     int hostfd = VM::get().getRoot().getHostFD();
@@ -2435,19 +2428,22 @@ SWFHandlers::CommonGetUrl(as_environment& env,
         size_t len = requestString.length();
         // TODO: should mutex-protect this ?
         // NOTE: we assuming the hostfd is set in blocking mode here..
-        log_debug("Attempt to write geturl requests fd %d", hostfd);
+        log_debug(_("Attempt to write geturl requests fd %d"), hostfd);
         int ret = write(hostfd, cmd, len);
         if ( ret == -1 )
         {
-            log_error("Could not write to user-provided host requests fd %d: %s", hostfd, std::strerror(errno));
+            log_error(_("Could not write to user-provided host requests "
+                        "fd %d: %s"), hostfd, std::strerror(errno));
         }
         if ( (size_t)ret < len )
         {
-            log_error("Could only write %d bytes over %d required to user-provided host requests fd %d",
-                ret, len, hostfd);
+            log_error(_("Could only write %d bytes over %d required to "
+                        "user-provided host requests fd %d"),
+                        ret, len, hostfd);
         }
-        //log_debug("Wrote %d bytes of geturl requests (all needed)", ret);
-        requestString.resize(requestString.size()-1); // for sake of clean logging, should always end with newline
+
+        // for sake of clean logging, should always end with newline
+        requestString.resize(requestString.size()-1);
         log_debug(_("Sent request '%s' to host fd %d"), requestString, hostfd);
     }
 
@@ -2473,10 +2469,8 @@ SWFHandlers::CommonSetTarget(ActionExec& thread, const std::string& target_name)
     if (new_target == NULL)
     {
         IF_VERBOSE_ASCODING_ERRORS (
-        log_aserror(
-            _("Couldn't find movie \"%s\" to set target to!"
-            " Setting target to NULL..."),
-            target_name);
+        log_aserror(_("Couldn't find movie \"%s\" to set target to!"
+            " Setting target to NULL..."), target_name);
         );
         //return;
     }
@@ -2576,10 +2570,8 @@ SWFHandlers::ActionCallFrame(ActionExec& thread)
     else
     {
         IF_VERBOSE_ASCODING_ERRORS (
-        log_aserror(_(
-            "Couldn't find target_sprite \"%s\" in ActionCallFrame!"
-            " target frame actions will not be called..."),
-            target_path);
+        log_aserror(_("Couldn't find target_sprite \"%s\" in ActionCallFrame!"
+            " target frame actions will not be called..."), target_path);
         )
     }
 
@@ -2649,10 +2641,9 @@ SWFHandlers::ActionGotoExpression(ActionExec& thread)
     else
     {
         IF_VERBOSE_ASCODING_ERRORS (
-        log_aserror(_(
-            "Couldn't find target sprite \"%s\" in ActionGotoExpression. "
-            " Will not go to target frame..."),
-            target_frame);
+        log_aserror(_("Couldn't find target sprite \"%s\" in "
+                "ActionGotoExpression. Will not go to target frame..."),
+                target_frame);
         )
     }
 }
@@ -2675,9 +2666,8 @@ SWFHandlers::ActionDelete(ActionExec& thread)
     if ( ! obj )
     {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror("delete %s.%s : first element is not an object",
-            env.top(1),
-            env.top(0));
+            log_aserror(_("delete %s.%s : first element is not an object"),
+                        env.top(1), env.top(0));
         );
         env.top(1).set_bool(false);
         env.drop(1);
@@ -2746,7 +2736,8 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
     }
     else if ( ! function.is_function() )
     {
-        log_error("ActionCallFunction: function name %s evaluated to non-function value %s", funcname, function);
+        log_error(_("ActionCallFunction: function name %s evaluated to "
+                "non-function value %s"), funcname, function);
         // Calling super ? 
         boost::intrusive_ptr<as_object> obj = function.to_object();
         this_ptr = thread.getThisPointer();
@@ -2779,8 +2770,6 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
         nargs = available_args;
     }
 
-    //log_debug(_("Function's nargs: %d"), nargs);
-
 #ifdef USE_DEBUGGER
     debugger.callStackPush(function_name);
     debugger.matchBreakPoint(function_name, true);
@@ -2794,8 +2783,6 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
     as_value result = call_method(function, &env, this_ptr,
                   args, super);
 
-    //log_debug(_("Function's result: %s"), result.to_string();
-
     env.push(result);
 
     // If the function threw an exception, do so here.
@@ -2804,13 +2791,12 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
         thread.skipRemainingBuffer();
     }
 
-    //env.dump_stack();
 }
 
 void
 SWFHandlers::ActionReturn(ActionExec& thread)
 {
-//        GNASH_REPORT_FUNCTION;
+
     as_environment& env = thread.env;
 
     // Put top of stack in the provided return slot, if
@@ -2821,9 +2807,6 @@ SWFHandlers::ActionReturn(ActionExec& thread)
 #ifdef USE_DEBUGGER
         debugger.callStackPop();
 #endif
-
-    //log_debug(_("After top/drop"));
-    //env.dump_stack();
 
     // Skip the rest of this buffer (return from this action_buffer).
     thread.skipRemainingBuffer();
@@ -2839,8 +2822,8 @@ SWFHandlers::ActionModulo(ActionExec& thread)
     as_value    result;
     const double y = env.pop().to_number();
     const double x = env.pop().to_number();
-//  Don't need to check for y being 0 here - if it's zero, fmod returns NaN
-//  which is what flash would do too
+    // Don't need to check for y being 0 here - if it's zero,
+    // fmod returns NaN, which is what flash would do too
     result = std::fmod(x, y);
 
     env.push(result);
@@ -2990,7 +2973,7 @@ SWFHandlers::ActionTargetPath(ActionExec& thread)
     boost::intrusive_ptr<sprite_instance> sp = env.top(0).to_sprite();
     if ( sp )
     {
-        env.top(0).set_std_string(sp->getTarget());
+        env.top(0).set_string(sp->getTarget());
     }
     else
     {
@@ -3047,28 +3030,22 @@ SWFHandlers::ActionNewAdd(ActionExec& thread)
     //GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
 
-#ifndef NDEBUG
-    size_t stackSize = env.stack_size();
-#endif
-
     as_value v1 = env.top(0);
     as_value v2 = env.top(1);
 
     try { v1 = v1.to_primitive(); }
     catch (ActionTypeError& e)
     {
-        log_debug("%s.to_primitive() threw an error during ActionNewAdd",
+        log_debug(_("%s.to_primitive() threw an error during ActionNewAdd"),
             env.top(0));
     }
 
     try { v2 = v2.to_primitive(); }
     catch (ActionTypeError& e)
     {
-        log_debug("%s.to_primitive() threw an error during ActionNewAdd",
+        log_debug(_("%s.to_primitive() threw an error during ActionNewAdd"),
             env.top(1));
     }
-
-    assert( stackSize == env.stack_size() );
 
 #if GNASH_DEBUG
     log_debug(_("ActionNewAdd(%s, %s) [primitive conversion done]"),
@@ -3086,9 +3063,7 @@ SWFHandlers::ActionNewAdd(ActionExec& thread)
     {
         // use numeric semantic
         const double v2num = v2.to_number();
-        //log_debug(_("v2 num = %g"), v2num);
         const double v1num = v1.to_number();
-        //log_debug(_("v1 num = %g"), v1num);
 
         v2.set_double(v2num + v1num); 
 
@@ -3100,7 +3075,6 @@ SWFHandlers::ActionNewAdd(ActionExec& thread)
 void
 SWFHandlers::ActionNewLessThan(ActionExec& thread)
 {
-    //GNASH_REPORT_FUNCTION;
 
     as_environment& env = thread.env;
 
@@ -3113,15 +3087,15 @@ SWFHandlers::ActionNewLessThan(ActionExec& thread)
     try { operand1 = op1_in.to_primitive(); }
     catch (ActionTypeError& e)
     {
-        log_debug("%s.to_primitive() threw an error during ActionNewLessThen",
-            op1_in);
+        log_debug(_("%s.to_primitive() threw an error during "
+                "ActionNewLessThen"), op1_in);
     }
 
     try { operand2 = op2_in.to_primitive(); }
     catch (ActionTypeError& e)
     {
-        log_debug("%s.to_primitive() threw an error during ActionNewLessThen",
-            op2_in);
+        log_debug(_("%s.to_primitive() threw an error during "
+                "ActionNewLessThen"), op2_in);
     }
 
     if ( operand1.is_string() && operand2.is_string() )
@@ -3148,7 +3122,6 @@ SWFHandlers::ActionNewLessThan(ActionExec& thread)
 void
 SWFHandlers::ActionNewEquals(ActionExec& thread)
 {
-    //GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
 
 #if GNASH_PARANOIA_LEVEL > 1
@@ -3162,16 +3135,16 @@ SWFHandlers::ActionNewEquals(ActionExec& thread)
     try { op1 = op1.to_primitive(); }
     catch (ActionTypeError& e)
     {
-                log_debug(_("to_primitive(%s) threw an ActionTypeError %s"),
-                        op1, e.what());
+        log_debug(_("to_primitive(%s) threw an ActionTypeError %s"),
+                op1, e.what());
     }
 
         as_value op2 = env.top(1);
     try { op2 = op2.to_primitive(); }
     catch (ActionTypeError& e)
     {
-                log_debug(_("to_primitive(%s) threw an ActionTypeError %s"),
-                        op2, e.what());
+        log_debug(_("to_primitive(%s) threw an ActionTypeError %s"),
+                op2, e.what());
     }
 
         env.top(1).set_bool(op1.equals(op2));
@@ -3358,7 +3331,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
     {
         // SWF integrity check
         IF_VERBOSE_ASCODING_ERRORS(
-        log_error(_("ActionCallMethod invoked with "
+        log_aserror(_("ActionCallMethod invoked with "
             "non-object object/func (%s)"), obj_value);
         );
         env.drop(nargs);
@@ -3536,10 +3509,6 @@ SWFHandlers::ActionNewMethod(ActionExec& thread)
     // Construct the object
     boost::intrusive_ptr<as_object> new_obj = construct_object(method.get(),
             env, nargs);
-
-    //log_debug(_("%s( [%d args] ) returned %s"), method_val.to_string(),
-    //    nargs, new_obj.to_string();
-
 
     env.push(as_value(new_obj));
 
@@ -3773,7 +3742,6 @@ SWFHandlers::ActionExtends(ActionExec& thread)
 
     sub->extends(*super);
 
-    //log_debug(_("%s: testing"), __PRETTY_FUNCTION__);
 }
 
 void
@@ -3829,8 +3797,6 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
         // @@ security: watch out for possible missing terminator here!
         const char* arg = code.read_string(i);
 
-        //log_debug(_("Setting register %d/%d to %s"), arg_register, nargs, arg);
-
         func->add_arg(arg_register, arg);
         i += strlen(arg)+1;
     }
@@ -3866,7 +3832,8 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
     if (!name.empty())
     {
         IF_VERBOSE_ACTION(
-        log_action("DefineFunction2: named function '%s' starts at PC %d", name, func->getStartPC());
+            log_action(_("DefineFunction2: named function '%s' "
+                        "starts at PC %d"), name, func->getStartPC());
         );
 
         //env.set_member(name, function_value);
@@ -3877,7 +3844,8 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
     else
     {
         IF_VERBOSE_ACTION(
-        log_action("DefineFunction2: anonymous function starts at PC %d", func->getStartPC());
+            log_action(_("DefineFunction2: anonymous function starts at "
+                        "PC %d"), func->getStartPC());
         );
         env.push(function_value);
     }
@@ -3889,7 +3857,7 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
     boost::intrusive_ptr<as_object> o = function_value.to_object();
 #ifndef GNASH_USE_GC
     o->add_ref(); // this will leak, but at least debugger won't end up
-                  // with a dandling reference...
+                  // with a dangling reference...
 #endif //ndef GNASH_USE_GC
         debugger.addSymbol(o.get(), name);
 #endif
@@ -4076,7 +4044,8 @@ SWFHandlers::ActionDefineFunction(ActionExec& thread)
     if (!name.empty())
     {
         IF_VERBOSE_ACTION(
-        log_action("DefineFunction: named function '%s' starts at PC %d", name, func->getStartPC());
+            log_action("DefineFunction: named function '%s' starts at "
+                        "PC %d", name, func->getStartPC());
         );
 
         //env.set_member(name, function_value);
@@ -4099,7 +4068,8 @@ SWFHandlers::ActionDefineFunction(ActionExec& thread)
     else
     {
         IF_VERBOSE_ACTION(
-        log_action("DefineFunction: anonymous function starts at PC %d", func->getStartPC());
+        log_action("DefineFunction: anonymous function starts at "
+                    "PC %d", func->getStartPC());
         );
 
         env.push(function_value);

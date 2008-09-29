@@ -27,7 +27,7 @@
 
 #include "network.h"
 #include "utility.h"
-#include "xml.h"
+#include "XML_as.h"
 #include "XMLSocket_as.h"
 #include "timers.h"
 #include "as_function.h"
@@ -90,7 +90,7 @@ public:
 
 private:
 
-    bool fillMessageList(MessageList& msgs);
+    void fillMessageList(MessageList& msgs);
 
 	/// Return the as_function with given name, converting case if needed
 	boost::intrusive_ptr<as_function> getEventHandler(const std::string& name);
@@ -148,7 +148,7 @@ XMLSocket_as::close()
 }
 
 
-bool
+void
 XMLSocket_as::fillMessageList(MessageList& msgs)
 {
 
@@ -157,7 +157,7 @@ XMLSocket_as::fillMessageList(MessageList& msgs)
     if (fd <= 0) {
 	log_error(_("%s: fd <= 0, returning false (timer not unregistered "
 		"while socket disconnected?"), __FUNCTION__);
-        return false;
+        return;
     }
 
     fd_set                fdset;
@@ -174,45 +174,43 @@ XMLSocket_as::fillMessageList(MessageList& msgs)
         tval.tv_sec = 0;
         tval.tv_usec = 103;
         
-        int ret = select(fd + 1, &fdset, NULL, NULL, &tval);
+        const int ret = select(fd + 1, &fdset, NULL, NULL, &tval);
         
         // If interupted by a system call, try again
         if (ret == -1 && errno == EINTR) {
-            log_debug(_("The socket for fd #%d was interupted by a system call"),
-                    fd);
+            log_debug(_("The socket for fd #%d was interupted by a "
+                        "system call"), fd);
             continue;
         }
         if (ret == -1) {
             log_error(_("%s: The socket for fd #%d never was available"),
                 __FUNCTION__, fd);
-            return false;
+            return;
         }
-        if (ret == 0) {
-            //log_debug(_("%s: There is no data in the socket for fd #%d"),
-            //   __FUNCTION__, fd);
-            return false;
-        }
-        if (ret > 0) {
-            //log_debug(_("%s: There is data in the socket for fd #%d"),
-            //    __FUNCTION__, fd);
-        }
+ 
+        // Return if timed out.
+        if (ret == 0) return;
 
-        ret = read(_sockfd, buf.get(), bufSize - 1);
-        
-        if (buf[ret - 1] != 0)
+        const size_t bytesRead = read(_sockfd, buf.get(), bufSize - 1);
+
+	// Return if there's no data.
+        if (!bytesRead) return;
+
+        if (buf[bytesRead - 1] != 0)
         {
             // We received a partial message, so bung
             // a null-terminator on the end.
-            buf[ret] = 0;
+            buf[bytesRead] = 0;
         }
 
         char* ptr = buf.get();
-        while (ptr - buf.get() < ret - 1)
+        while (ptr - buf.get() < bytesRead - 1)
         {
-            log_debug ("read: %d, this string ends: %d", ret, ptr + std::strlen(ptr) - buf.get());
+            log_debug ("read: %d, this string ends: %d",
+			    bytesRead, ptr + std::strlen(ptr) - buf.get());
             // If the string reaches to the final byte read, it's
             // incomplete. Store it and continue. 
-            if (ptr + std::strlen(ptr) - buf.get() == ret)
+            if (ptr + std::strlen(ptr) - buf.get() == bytesRead)
             {
                 log_debug ("Setting remainder");
                 _remainder += std::string(ptr);
@@ -231,11 +229,8 @@ XMLSocket_as::fillMessageList(MessageList& msgs)
             ptr += std::strlen(ptr) + 1;
         }
         
-        return true;
-        
     }
     
-    return true;
 }
 
 
@@ -411,7 +406,7 @@ xmlsocket_onData(const fn_call& fn)
             return as_value();
     }
 
-    boost::intrusive_ptr<as_object> xml = new XML(xmlin);
+    boost::intrusive_ptr<as_object> xml = new XML_as(xmlin);
     as_value arg(xml.get());
 
     ptr->callMethod(NSV::PROP_ON_XML, arg);

@@ -178,7 +178,7 @@ MovieClipLoader::MovieClipLoader()
 	as_object(getMovieClipLoaderInterface())
 {
 
-	as_array_object* ar = new as_array_object();
+	Array_as* ar = new Array_as();
 	ar->push(this);
 	set_member(NSV::PROP_uLISTENERS, ar);
 }

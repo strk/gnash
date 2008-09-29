@@ -215,7 +215,7 @@ Gui::toggleFullscreen()
 }
 
 void
-Gui::menu_restart()
+Gui::restart()
 {
 	_stage->reset();
 	_started = false;
@@ -404,36 +404,13 @@ Gui::resize_view(int width, int height)
 
 	_width = width;
 	_height = height;
-	_validbounds.setTo(0, 0, _width-1, _height-1);
+	_validbounds.setTo(0, 0, _width, _height);
 
 	updateStageMatrix();
 
 	if ( _stage && _started ) display(_stage);
 }
 
-void
-Gui::menu_quit()
-{
-    quit();
-}
-
-void
-Gui::menu_play()
-{
-    play();
-}
-
-void
-Gui::menu_pause()
-{
-    pause();
-}
-
-void
-Gui::menu_stop()
-{
-    stop();
-}
 
 void
 Gui::menu_step_forward()
@@ -464,7 +441,7 @@ Gui::menu_jump_backward()
 }
 
 void
-Gui::menu_toggle_sound()
+Gui::toggleSound()
 {
 
     media::sound_handler* s = get_sound_handler();
@@ -588,11 +565,11 @@ Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed)
 			{
 				case gnash::key::r:
 				case gnash::key::R:
-					menu_restart();
+					restart();
 					break;
 				case gnash::key::p:
 				case gnash::key::P:
-					menu_pause();
+					pause();
 					break;
 				case gnash::key::l:
 				case gnash::key::L:
@@ -602,7 +579,7 @@ Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed)
 				case gnash::key::Q:
 				case gnash::key::w:
 				case gnash::key::W:
-					menu_quit();
+					quit();
 					break;
 				case gnash::key::f:
 				case gnash::key::F:

@@ -263,6 +263,22 @@ private:
 	/// is invoked by a separate thread (dunno if it makes sense actually)
 	boost::mutex _audioQueueMutex;
 
+	// Whether or not the aux streamer is attached
+	bool _auxStreamerAttached;
+
+	/// Attach the aux streamer.
+	//
+	/// On success, _auxStreamerAttached will be set to true.
+	/// Won't attach again if already attached.
+	///
+	void attachAuxStreamer();
+
+	/// Detach the aux streamer
+	//
+	/// _auxStreamerAttached will be set to true.
+	/// Won't detach if not attached.
+	///
+	void detachAuxStreamer();
 };
 
 

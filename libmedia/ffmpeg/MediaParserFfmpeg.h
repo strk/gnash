@@ -25,22 +25,11 @@
 #endif
 
 #include "MediaParser.h" // for inheritance
+#include "ffmpegHeaders.h"
 
 #include <vector>
 #include <boost/scoped_array.hpp>
 #include <memory>
-
-#ifdef HAVE_FFMPEG_AVFORMAT_H
-extern "C" {
-#include <ffmpeg/avformat.h>
-}
-#endif
-
-#ifdef HAVE_LIBAVFORMAT_AVFORMAT_H
-extern "C" {
-#include <libavformat/avformat.h>
-}
-#endif
 
 // Forward declaration
 namespace gnash {

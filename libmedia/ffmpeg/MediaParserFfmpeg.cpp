@@ -389,8 +389,13 @@ MediaParserFfmpeg::initializeParser()
 		boost::uint64_t duration = _videoStream->duration;
 #endif
 		_videoInfo.reset( new VideoInfo(codec, width, height, frameRate, duration, FFMPEG /*codec type*/) );
+		
+		_videoInfo->extra.reset(new ExtraVideoInfoFfmpeg(
+			// NOTE: AVCodecContext.extradata : void* for 51.11.0, uint8_t* for 51.38.0
+			(uint8_t*)_videoStream->codec->extradata,
+			_videoStream->codec->extradata_size));
+
 		//log_debug("EXTRA: %d bytes of video extra data", _videoStream->codec->extradata_size);
-		_videoInfo->extra.reset(new ExtraVideoInfoFfmpeg(_videoStream->codec->extradata, _videoStream->codec->extradata_size));
 	}
 
 	// Create AudioInfo
@@ -406,8 +411,13 @@ MediaParserFfmpeg::initializeParser()
 		boost::uint64_t duration = _audioStream->duration;
 #endif
 		_audioInfo.reset( new AudioInfo(codec, sampleRate, sampleSize, stereo, duration, FFMPEG /*codec type*/) );
+
+		_audioInfo->extra.reset(new ExtraAudioInfoFfmpeg(
+			// NOTE: AVCodecContext.extradata : void* for 51.11.0, uint8_t* for 51.38.0
+			(uint8_t*)_audioStream->codec->extradata,
+			_audioStream->codec->extradata_size));
+
 		//log_debug("EXTRA: %d bytes of audio extra data", _videoStream->codec->extradata_size);
-		_audioInfo->extra.reset(new ExtraAudioInfoFfmpeg(_audioStream->codec->extradata, _audioStream->codec->extradata_size));
 	}
 
 
@@ -485,8 +495,11 @@ MediaParserFfmpeg::SampleFormatToSampleSize(SampleFormat fmt)
 		case SAMPLE_FMT_FLT: // float
 			return 2;
 
+#if !defined (LIBAVCODEC_VERSION_MAJOR) || LIBAVCODEC_VERSION_MAJOR < 52
+// Was dropped for version 52.0.0
 		case SAMPLE_FMT_S24: // signed 24 bits
 			return 3;
+#endif
 
 		case SAMPLE_FMT_S32: // signed 32 bits
 			return 4;

@@ -31,6 +31,5 @@ void loadvars_class_init(as_object& global);
   
 } // end of gnash namespace
 
-// __GNASH_ASOBJ_LOADVARS_H__
 #endif
 

@@ -38,12 +38,14 @@
 #include "Global.h"
 #include "String_as.h"
 #include "Key.h"
-#include "LoadVars.h"
+#include "LoadVars_as.h"
 #include "LocalConnection.h"
 #include "Microphone.h"
 #include "Number.h"
 #include "Object.h"
 #include "Math_as.h"
+#include "XML_as.h"
+#include "XMLSocket_as.h"
 #include "Mouse.h"
 #include "MovieClipLoader.h"
 #include "movie_definition.h"
@@ -53,7 +55,7 @@
 #include "SharedObject.h"
 #include "Sound.h"
 #include "Stage.h"
-#include "System.h"
+#include "System_as.h"
 #include "TextFormat.h"
 #include "TextSnapshot.h"
 #include "video_stream_instance.h"
@@ -71,9 +73,6 @@
 
 #include "fn_call.h"
 #include "sprite_instance.h"
-
-#include "xml.h"
-#include "XMLSocket_as.h"
 
 #include <limits> // for numeric_limits<double>::infinity
 #include <sstream>

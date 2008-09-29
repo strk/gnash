@@ -14,51 +14,34 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-
-#ifndef CURL_ADAPTER_H
-#define CURL_ADAPTER_H
-
-#include "dsodefs.h"
-
-#include <string>
-
+//
+#include "CallStack.h"
+#include "as_object.h"
+#include "as_function.h" // for as_environment::CallFrame::markReachableResources
 
 namespace gnash {
-class IOChannel;
 
+CallFrame::CallFrame(as_function* funcPtr)
+	:
+	locals(new as_object()),
+	func(funcPtr)
+{
+}
 
-/// Code to use libcurl as an IOChannel stream.
-namespace curl_adapter {
-
-/// \brief
-/// Returns a read-only IOChannel that fetches data
-/// from an url.
+/// Mark all reachable resources
 //
-/// The caller owns the returned IOChannel.  
-///
-DSOEXPORT IOChannel* make_stream(const char* url);
+/// Reachable resources would be registers and
+/// locals (expected to be empty?) and function.
+void
+CallFrame::markReachableResources() const
+{
+	if ( func ) func->setReachable();
+	for (Registers::const_iterator i=registers.begin(), e=registers.end(); i!=e; ++i)
+	{
+		i->setReachable();
+	}
+	if (locals)
+		locals->setReachable();
+}
 
-/// \brief
-/// Returns a read-only IOChannel that fetches data
-/// from an url getting posted to.
-//
-/// The caller owns the returned IOChannel.  
-///
-/// @param url
-///	The url to post to.
-///
-/// @param postdata
-///	The url-encoded post data
-///
-DSOEXPORT IOChannel* make_stream(const char* url, const std::string& postdata);
-
-} // namespace gnash::curl_adaptar
 } // namespace gnash
-
-#endif // CURL_ADAPTER_H
-
-// Local Variables:
-// mode: C++
-// indent-tabs-mode: t
-// End:

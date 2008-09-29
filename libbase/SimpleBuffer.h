@@ -28,6 +28,8 @@
 #include <cassert> // for assert
 #include <boost/cstdint.hpp> // for boost::uint8_t
 #include <algorithm> // for std::copy
+#include <boost/scoped_array.hpp>
+
 
 namespace gnash {
 
@@ -51,16 +53,13 @@ public:
 	///
 	SimpleBuffer(size_t capacity=0)
 		:
-		_data(0),
 		_size(0),
 		_capacity(capacity)
 	{
-		if ( _capacity ) _data = new boost::uint8_t[_capacity];
-	}
-
-	~SimpleBuffer()
-	{
-		delete [] _data;
+		if ( _capacity )
+		{
+			_data.reset(new boost::uint8_t[_capacity]);
+		}
 	}
 
 	/// Copy constructor
@@ -71,14 +70,13 @@ public:
 	///
 	SimpleBuffer(const SimpleBuffer& b)
 		:
-		_data(0),
 		_size(b._size),
 		_capacity(b._size)
 	{
 		if ( _size )
 		{
-			_data = new boost::uint8_t[_size];
-			std::copy(b._data, b._data+b._size, _data);
+			_data.reset(new boost::uint8_t[_size]);
+			std::copy(b.data(), b.data()+b.size(), _data.get());
 		}
 	}
 
@@ -106,10 +104,10 @@ public:
 	size_t capacity() const { return _capacity; }
 
 	/// Get a pointer to start of data. May be NULL if size==0.
-	boost::uint8_t* data() { return _data; }
+	boost::uint8_t* data() { return _data.get(); }
 
 	/// Get a pointer to start of data. May be NULL if size==0.
-	const boost::uint8_t* data() const { return _data; }
+	const boost::uint8_t* data() const { return _data.get(); }
 
 	/// Resize the buffer
 	void resize(size_t newSize)
@@ -126,12 +124,14 @@ public:
 		// TODO: use smalles power of 2 bigger then newCapacity
 		_capacity = std::max(newCapacity, _capacity*2);
 
-		boost::uint8_t* tmp = _data;
-		_data = new boost::uint8_t[_capacity];
-		if ( tmp )
+		boost::scoped_array<boost::uint8_t> tmp;
+		tmp.swap(_data);
+		
+		_data.reset(new boost::uint8_t[_capacity]);
+
+		if ( tmp.get() )
 		{
-			if ( _size ) std::copy(tmp, tmp+_size, _data);
-			delete [] tmp;
+			if ( _size ) std::copy(tmp.get(), tmp.get()+_size, _data.get());
 		}
 	}
 
@@ -151,7 +151,7 @@ public:
 		const boost::uint8_t* newData = reinterpret_cast<const uint8_t*>(inData);
 		size_t curSize = _size;
 		resize(curSize+size);
-		std::copy(newData, newData+size, _data+curSize);
+		std::copy(newData, newData+size, _data.get()+curSize);
 		assert(_size == curSize+size);
 	}
 
@@ -216,12 +216,10 @@ public:
 	}
 
 private:
-
-	boost::uint8_t* _data;
-
 	size_t _size;
 	size_t _capacity;
 
+	boost::scoped_array<boost::uint8_t> _data;
 };
 
 

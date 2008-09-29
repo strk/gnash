@@ -52,11 +52,12 @@ fi
 
 mkdir -p ${SOLDIR} # just in case..
 
-rm ${SOLDIR}/* # clean target soldir out
+rm -f ${SOLDIR}/* # clean target soldir out
 cp -v ${INPUTSOLDIR}/*.sol ${SOLDIR}/
+chmod 600 ${SOLDIR}/*.sol
 touch ${SOLDIR}/copytime
 echo "SWF=${SWFTEST}"
-echo "INPUT=${SOLDIR}"
+echo "INPUT=${INPUTSOLDIR}"
 echo "SOLDIR=${SOLDIR}"
 sleep 1
 

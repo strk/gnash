@@ -145,7 +145,8 @@ if USE_FFMPEG_ENGINE
 		ffmpeg/AudioDecoderFfmpeg.h \
 		ffmpeg/VideoDecoderFfmpeg.h \
 		ffmpeg/sound_handler_sdl.h \
-		ffmpeg/ffmpegNetStreamUtil.h 
+		ffmpeg/ffmpegNetStreamUtil.h \
+		ffmpeg/ffmpegHeaders.h
 
    libgnashmedia_la_LIBADD += \
 		$(FFMPEG_LIBS) \
@@ -155,24 +156,6 @@ if USE_FFMPEG_ENGINE
 		$(FFMPEG_CFLAGS) \
 		$(SDL_CFLAGS)
 endif
-
-# if USE_MAD_ENGINE
-#    libgnashmedia_la_SOURCES += \
-# 		ffmpeg/MediaDecoderSdl.cpp \
-# 		ffmpeg/AudioDecoderMad.cpp \
-# 		ffmpeg/sound_handler_sdl.cpp
-# 
-#    noinst_HEADERS += \
-# 		ffmpeg/MediaDecoderSdl.h \
-# 		ffmpeg/AudioDecoderMad.h \
-# 		ffmpeg/sound_handler_sdl.h
-# 
-#    libgnashmedia_la_LIBADD += \
-# 		$(MAD_LIBS) 
-# 
-#    libgnashmedia_la_CPPFLAGS += \
-# 		$(MAD_CFLAGS)
-# endif
 
 libgnashmedia_la_LDFLAGS = -release $(VERSION)
 

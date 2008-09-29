@@ -28,18 +28,8 @@
 #include "log.h"
 #include "dsodefs.h" //For DSOEXPORT
 
-#ifdef USE_FFMPEG
-#ifdef HAVE_FFMPEG_AVCODEC_H
-extern "C" {
-#include <ffmpeg/avcodec.h>
-}
-#endif
-  
-#ifdef HAVE_LIBAVCODEC_AVCODEC_H
-extern "C" {
-#include <libavcodec/avcodec.h>
-}
-#endif
+#ifdef USE_FFMPEG // does this make any sense ?
+# include "ffmpegHeaders.h"
 #endif
 
 #include <queue>

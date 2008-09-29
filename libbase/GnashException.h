@@ -49,6 +49,7 @@ private:
 	std::string _msg;
 };
 
+/// An exception from MediaHandler subsystem
 class MediaException : public GnashException
 {
 
@@ -65,6 +66,26 @@ public:
 	{}
 
 	virtual ~MediaException() throw() {}
+
+};
+
+/// An exception from SoundHandler subsystem
+class SoundException : public GnashException
+{
+
+public:
+
+	SoundException(const std::string& s)
+		:
+		GnashException(s)
+	{}
+
+	SoundException()
+		:
+		GnashException("Audio error")
+	{}
+
+	virtual ~SoundException() throw() {}
 
 };
 

@@ -66,6 +66,9 @@
 // textfield bounds and HTML tags:
 //#define GNASH_DEBUG_TEXTFIELDS 1
 
+// Define this to get debugging info about text formatting
+//#define GNASH_DEBUG_TEXT_FORMATTING 1
+
 namespace gnash {
 
 // Forward declarations
@@ -496,7 +499,7 @@ edit_text_character::edit_text_character(character* parent,
 
 	set_prototype(getTextFieldInterface());
 
-	as_array_object* ar = new as_array_object();
+	Array_as* ar = new Array_as();
 	ar->push(this);
 	set_member(NSV::PROP_uLISTENERS, ar);
 
@@ -588,8 +591,6 @@ edit_text_character::display()
 
 	registerTextVariable();
 
-	//rect def_bounds = m_def->get_bounds();
-	
 	bool drawBorder = getDrawBorder();
 	bool drawBackground = getDrawBackground();
 
@@ -1054,7 +1055,7 @@ edit_text_character::set_member(string_table::key name,
 	}	// end switch
 
 
-	return set_member_default(name, val, nsname, ifFound);
+	return as_object::set_member(name, val, nsname, ifFound);
 }
 
 bool
@@ -1122,7 +1123,7 @@ edit_text_character::get_member(string_table::key name, as_value* val,
 	}
 	}	// end switch
 
-	return get_member_default(name, val, nsname);
+	return as_object::get_member(name, val, nsname);
 	
 }
 	
@@ -1200,23 +1201,33 @@ edit_text_character::format_text()
 	m_text_glyph_records.clear();
 
 	// nothing more to do if text is empty
-	if ( _text.empty() ) return;
+	if ( _text.empty() )
+    {
+        // TODO: should we still reset _bounds if autoSize != autoSizeNone ?
+        //       not sure we should...
+	    reset_bounding_box(0, 0);
+        return;
+    }
 
-	rect defBounds = m_def->get_bounds();
+	// See bug #24266
+	const rect& defBounds = _bounds; // m_def->get_bounds();
 
 	AutoSizeValue autoSize = getAutoSize();
 	if ( autoSize != autoSizeNone )
 	{
-		LOG_ONCE( log_debug(_("TextField.autoSize != 'none' TESTING")) );
+		// define GNASH_DEBUG_TEXT_FORMATTING on top to get useful info
+		//LOG_ONCE( log_debug(_("TextField.autoSize != 'none' TESTING")) );
 
-		_bounds.set_to_rect(0, 0, defBounds.get_x_max(), 0); // this is correct for 'true'
+		// When doing WordWrap we don't want to change
+		// the boundaries. See bug #24348
+		if (!  doWordWrap() )
+		{
+		    _bounds.set_to_rect(0, 0, 0, 0); // this is correct for 'true'
+		}
 	}
 
 	// Should get info from autoSize too maybe ?
 	edit_text_character_def::alignment textAlignment = getTextAlignment();
-
-	// nothing more to do if text is empty
-	if ( _text.empty() ) return;
 
 	// FIXME: I don't think we should query the definition
 	// to find the appropriate font to use, as ActionScript
@@ -1826,12 +1837,12 @@ textfield_class_init(as_object& global)
 		if ( swfVer > 5 )
 		{
 			assert(iface);
-			assert(cl->getOwnProperty(vm.getStringTable().find("prototype")));
+			assert(cl->getOwnProperty(NSV::PROP_PROTOTYPE));
 		}
 		else
 		{
 			assert(!iface);
-			assert(!cl->getOwnProperty(vm.getStringTable().find("prototype")));
+			assert(!cl->getOwnProperty(NSV::PROP_PROTOTYPE));
 		}
 #endif
 

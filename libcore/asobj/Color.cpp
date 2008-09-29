@@ -59,14 +59,18 @@ attachColorInterface(as_object& o)
 {
 	VM& vm = o.getVM();
 
+    const int flags = as_prop_flags::dontEnum |
+                      as_prop_flags::dontDelete |
+                      as_prop_flags::readOnly;
+
 	// Color.setRGB
-	o.init_member("setRGB", vm.getNative(700, 0));
+	o.init_member("setRGB", vm.getNative(700, 0), flags);
 	// Color.setTransform
-	o.init_member("setTransform", vm.getNative(700, 1));
+	o.init_member("setTransform", vm.getNative(700, 1), flags);
 	// Color.getRGB
-	o.init_member("getRGB", vm.getNative(700, 2));
+	o.init_member("getRGB", vm.getNative(700, 2), flags);
 	// Color.getTransform
-	o.init_member("getTransform", vm.getNative(700, 3));
+	o.init_member("getTransform", vm.getNative(700, 3), flags);
 
 }
 

@@ -300,9 +300,9 @@ as_object::add_property(const std::string& name, as_function& getter,
 	}
 }
 
-/*protected*/
+
 bool
-as_object::get_member_default(string_table::key name, as_value* val,
+as_object::get_member(string_table::key name, as_value* val,
 	string_table::key nsname)
 {
 	assert(val);
@@ -329,7 +329,8 @@ as_object::get_member_default(string_table::key name, as_value* val,
 	}
 }
 
-Property*
+
+const Property*
 as_object::getByIndex(int index)
 {
 	// The low byte is used to contain the depth of the property.
@@ -343,7 +344,7 @@ as_object::getByIndex(int index)
 			return NULL;
 	}
 
-	return const_cast<Property *>(obj->_members.getPropertyByOrder(index));
+	return obj->_members.getPropertyByOrder(index);
 }
 
 as_object*
@@ -539,7 +540,7 @@ as_object::reserveSlot(string_table::key name, string_table::key nsId,
 
 // Handles read_only and static properties properly.
 bool
-as_object::set_member_default(string_table::key key, const as_value& val,
+as_object::set_member(string_table::key key, const as_value& val,
 	string_table::key nsname, bool ifFound)
 {
 	//log_debug(_("set_member_default(%s)"), key);
@@ -605,7 +606,7 @@ as_object::set_member_default(string_table::key key, const as_value& val,
 	if ( ifFound ) return false;
 
 	// Property does not exist, so it won't be read-only. Set it.
-	if (!_members.setValue(key, const_cast<as_value&>(val), *this, nsname))
+	if (!_members.setValue(key, val, *this, nsname))
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 			log_aserror(_("Unknown failure in setting property '%s' on "
@@ -729,7 +730,7 @@ as_object::init_member(string_table::key key, const as_value& val, int flags,
 	}
 		
 	// Set (or create) a SimpleProperty 
-	if (! _members.setValue(key, const_cast<as_value&>(val), *this, nsname, flags) )
+	if (! _members.setValue(key, val, *this, nsname, flags) )
 	{
 		log_error(_("Attempt to initialize read-only property ``%s''"
 			" on object ``%p'' twice"),
@@ -1065,7 +1066,7 @@ as_object::setPropFlags(const as_value& props_val, int set_false, int set_true)
 	}
 
 	boost::intrusive_ptr<as_object> props = props_val.to_object();
-	as_array_object* ary = dynamic_cast<as_array_object*>(props.get());
+	Array_as* ary = dynamic_cast<Array_as*>(props.get());
 	if ( ! ary )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -1103,10 +1104,11 @@ as_object::enumerateProperties(as_environment& env) const
 
 	// this set will keep track of visited objects,
 	// to avoid infinite loops
-	std::set< as_object* > visited;
+	std::set< const as_object* > visited;
 	PropertyList::propNameSet named;
 
-	boost::intrusive_ptr<as_object> obj = const_cast<as_object*>(this);
+	boost::intrusive_ptr<const as_object> obj(this);
+	
 	while ( obj && visited.insert(obj.get()).second )
 	{
 		obj->_members.enumerateKeys(env, named);
@@ -1119,14 +1121,14 @@ as_object::enumerateProperties(as_environment& env) const
 }
 
 void
-as_object::enumerateProperties(std::map<std::string, std::string>& to)
+as_object::enumerateProperties(std::map<std::string, std::string>& to) const
 {
 
 	// this set will keep track of visited objects,
 	// to avoid infinite loops
-	std::set< as_object* > visited;
+	std::set< const as_object* > visited;
 
-	boost::intrusive_ptr<as_object> obj = this;
+	boost::intrusive_ptr<const as_object> obj(this);
 	while ( obj && visited.insert(obj.get()).second )
 	{
 		obj->_members.enumerateKeyValue(*this, to);
@@ -1313,19 +1315,11 @@ as_object::callMethod(string_table::key methodName,
 
 	as_environment env(_vm);
 
-#ifndef NDEBUG
-	size_t origStackSize = env.stack_size();
-#endif
-
 	std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
 	args->push_back(arg0);
 	args->push_back(arg1);
 
 	ret = call_method(method, &env, this, args);
-
-#ifndef NDEBUG
-	assert(origStackSize == env.stack_size());
-#endif
 
 	return ret;
 }
@@ -1344,20 +1338,12 @@ as_object::callMethod(string_table::key methodName,
 
 	as_environment env(_vm);
 
-#ifndef NDEBUG
-	size_t origStackSize = env.stack_size();
-#endif
-
 	std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
 	args->push_back(arg0);
 	args->push_back(arg1);
 	args->push_back(arg2);
 
 	ret = call_method(method, &env, this, args);
-
-#ifndef NDEBUG
-	assert(origStackSize == env.stack_size());
-#endif
 
 	return ret;
 }
@@ -1377,10 +1363,6 @@ as_object::callMethod(string_table::key methodName,
 
 	as_environment env(_vm);
 
-#ifndef NDEBUG
-	size_t origStackSize = env.stack_size();
-#endif
-
 	std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
 	args->push_back(arg0);
 	args->push_back(arg1);
@@ -1388,10 +1370,6 @@ as_object::callMethod(string_table::key methodName,
 	args->push_back(arg3);
 
 	ret = call_method(method, &env, this, args);
-
-#ifndef NDEBUG
-	assert(origStackSize == env.stack_size());
-#endif
 
 	return ret;
 }
@@ -1514,23 +1492,15 @@ Trigger::call(const as_value& oldval, const as_value& newval, as_object& this_ob
 	try {
 		as_environment env(VM::get()); // TODO: get VM in some other way 
 
-#ifndef NDEBUG
-		size_t origStackSize = env.stack_size();
-#endif
-
 		std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
 		args->push_back(_propname);
 		args->push_back(oldval);
 		args->push_back(newval);
 		args->push_back(_customArg);
 
-		fn_call fn(const_cast<as_object*>(&this_obj), &env, args);
+		fn_call fn(&this_obj, &env, args);
 
 		as_value ret = _func->call(fn);
-
-#ifndef NDEBUG
-		assert(origStackSize == env.stack_size());
-#endif
 
 		_executing = false;
 
@@ -1547,17 +1517,13 @@ Trigger::call(const as_value& oldval, const as_value& newval, as_object& this_ob
 void
 as_object::visitPropertyValues(AbstractPropertyVisitor& visitor) const
 {
-    _members.visitValues(visitor, 
-        // Need const_cast due to getValue getting non-const ...
-        const_cast<as_object&>(*this));
+    _members.visitValues(visitor, *this);
 }
 
 void
 as_object::visitNonHiddenPropertyValues(AbstractPropertyVisitor& visitor) const
 {
-    _members.visitNonHiddenValues(visitor, 
-        // Need const_cast due to getValue getting non-const ...
-        const_cast<as_object&>(*this));
+    _members.visitNonHiddenValues(visitor, *this);
 }
 
 

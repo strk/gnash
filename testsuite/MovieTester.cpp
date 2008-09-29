@@ -539,11 +539,6 @@ MovieTester::canTestVideo() const
 {
 	if ( ! canTestSound() ) return false;
 
-#ifdef USE_MAD
-	// mad doesn't support video !
-	return false;
-#endif
-
 	return true;
 }
 

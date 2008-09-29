@@ -1,4 +1,4 @@
-// curl_adapter.cpp:  Interface to libcurl to read HTTP streams, for Gnash.
+// NetworkAdapter.cpp:  Interface to libcurl to read HTTP streams, for Gnash.
 //
 //   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 //
@@ -25,15 +25,16 @@
 #include <pthread.h>
 #endif
 
+#include "NetworkAdapter.h"
 #include "utility.h" // UNUSED macro
 #include "IOChannel.h"
-#include "curl_adapter.h"
 #include "log.h"
 #include "WallClockTimer.h"
 
 #include <iostream> // std::cerr
 #include <boost/thread/mutex.hpp>
 #include <boost/version.hpp>
+#include <boost/assign/list_of.hpp>
 
 using gnash::log_debug;
 using gnash::log_error;
@@ -42,15 +43,25 @@ using gnash::log_error;
 #ifndef USE_CURL
 // Stub for warning about access when no libcurl is defined.
 
-namespace curl_adapter
+std::auto_ptr<IOChannel>
+NetworkAdapter::makeStream(const std::string& /*url*/)
 {
-	IOChannel* make_stream(const char * /*url */)
-	{
-		log_error(_("ERROR: libcurl is not available, but "
-		            "Gnash has attempted to use the curl adapter"));
-		// Should abort instead?
-		return NULL;
-	}
+	log_error(_("ERROR: libcurl is not available, but "
+	            "Gnash has attempted to use the curl adapter"));
+	return std::auto_ptr<IOChannel>();
+}
+
+std::auto_ptr<IOChannel>
+NetworkAdapter::makeStream(const std::string& url, const std::string& postdata)
+{
+    return makeStream(url);
+}
+
+std::auto_ptr<IOChannel>
+NetworkAdapter::makeStream(const std::string& url, const std::string& postdata,
+                            const RequestHeaders& headers)
+{
+    return makeStream(url);
 }
 
 #else // def USE_CURL
@@ -83,7 +94,8 @@ namespace curl_adapter
 
 
 namespace gnash {
-namespace curl_adapter {
+
+namespace {
 
 /***********************************************************************
  *
@@ -364,6 +376,9 @@ public:
 	///	The url-encoded post data.
 	///
 	CurlStreamFile(const std::string& url, const std::string& vars);
+	
+	CurlStreamFile(const std::string& url, const std::string& vars,
+	               const NetworkAdapter::RequestHeaders& headers);
 
 	~CurlStreamFile();
 
@@ -889,6 +904,63 @@ CurlStreamFile::CurlStreamFile(const std::string& url, const std::string& vars)
 }
 
 /*public*/
+CurlStreamFile::CurlStreamFile(const std::string& url, const std::string& vars, const NetworkAdapter::RequestHeaders& headers)
+{
+	log_debug("CurlStreamFile %p created", this);
+	init(url);
+	
+    curl_slist *headerList = 0;
+    
+    for (NetworkAdapter::RequestHeaders::const_iterator i = headers.begin(),
+         e = headers.end(); i != e; ++i)
+    {
+        // Check here to see whether header name is allowed.
+        if (!NetworkAdapter::isHeaderAllowed(i->first)) continue;
+        std::ostringstream os;
+        os << i->first << ": " << i->second;
+        headerList = curl_slist_append(headerList, os.str().c_str());
+    }
+
+    curl_easy_setopt(_handle, CURLOPT_HTTPHEADER, headerList);
+
+//    curl_slist_free_all(headerList);
+
+	_postdata = vars;
+
+	CURLcode ccode;
+
+	ccode = curl_easy_setopt(_handle, CURLOPT_POST, 1);
+	if ( ccode != CURLE_OK ) {
+		throw gnash::GnashException(curl_easy_strerror(ccode));
+	}
+
+	// libcurl needs to access the POSTFIELDS during 'perform' operations,
+	// so we must use a string whose lifetime is ensured to be longer then
+	// the multihandle itself.
+	// The _postdata member should meet this requirement
+	ccode = curl_easy_setopt(_handle, CURLOPT_POSTFIELDS, _postdata.c_str());
+	if ( ccode != CURLE_OK ) {
+		throw gnash::GnashException(curl_easy_strerror(ccode));
+	}
+
+	// This is to support binary strings as postdata
+	// NOTE: in version 7.11.1 CURLOPT_POSTFIELDSIZE_LARGE was added
+	//       this one takes a long, that one takes a curl_off_t
+	//
+	ccode = curl_easy_setopt(_handle, CURLOPT_POSTFIELDSIZE, _postdata.size());
+	if ( ccode != CURLE_OK ) {
+		throw gnash::GnashException(curl_easy_strerror(ccode));
+	}
+
+	CURLMcode mcode = curl_multi_add_handle(_mhandle, _handle);
+	if ( mcode != CURLM_OK ) {
+		throw gnash::GnashException(curl_multi_strerror(mcode));
+	}
+
+}
+
+
+/*public*/
 CurlStreamFile::~CurlStreamFile()
 {
 	log_debug("CurlStreamFile %p deleted", this);
@@ -1040,7 +1112,7 @@ CurlStreamFile::go_to_end()
 	}
 
 	if (std::fseek(_cache, 0, SEEK_END) == -1) {
-		throw gnash::IOException("curl_adapter: fseek to end failed");
+		throw gnash::IOException("NetworkAdapter: fseek to end failed");
 		//gnash::log_error("Warning: fseek to end failed");
 		//return -1;
 	} 
@@ -1168,53 +1240,102 @@ CurlSession::exportCookies()
 
 }
 
+
+} // anonymous namespace
+
 //-------------------------------------------
 // Exported interfaces
 //-------------------------------------------
 
-IOChannel*
-make_stream(const char* url)
+std::auto_ptr<IOChannel>
+NetworkAdapter::makeStream(const std::string& url)
 {
 #ifdef GNASH_CURL_VERBOSE
 	gnash::log_debug("making curl stream for %s", url);
 #endif
 
-	CurlStreamFile* stream = NULL;
+	std::auto_ptr<IOChannel> stream;
 
 	try {
-		stream = new CurlStreamFile(url);
+		stream.reset(new CurlStreamFile(url));
 	}
 	catch (const std::exception& ex) {
 		gnash::log_error("curl stream: %s", ex.what());
-		delete stream;
-		return NULL;
 	}
-
 	return stream;
 }
 
-IOChannel*
-make_stream(const char* url, const std::string& postdata)
+std::auto_ptr<IOChannel>
+NetworkAdapter::makeStream(const std::string& url, const std::string& postdata)
 {
 #ifdef GNASH_CURL_VERBOSE
 	gnash::log_debug("making curl stream for %s", url);
 #endif
 
-	CurlStreamFile* stream = NULL;
+	std::auto_ptr<IOChannel> stream;
 
 	try {
-		stream = new CurlStreamFile(url, postdata);
+		stream.reset(new CurlStreamFile(url, postdata));
 	}
 	catch (const std::exception& ex) {
 		gnash::log_error("curl stream: %s", ex.what());
-		delete stream;
-		return NULL;
 	}
-
 	return stream;
 }
 
-} // namespace curl_adapter
+std::auto_ptr<IOChannel>
+NetworkAdapter::makeStream(const std::string& url, const std::string& postdata,
+                                const RequestHeaders& headers)
+{
+
+	std::auto_ptr<IOChannel> stream;
+
+	try {
+		stream.reset(new CurlStreamFile(url, postdata, headers));
+	}
+	catch (const std::exception& ex) {
+		gnash::log_error("curl stream: %s", ex.what());
+	}
+
+    return stream;
+
+}
+
+/// Define static member.
+std::set<std::string, StringNoCaseLessThen>
+NetworkAdapter::_reservedNames = boost::assign::list_of
+    ("Accept-Ranges")
+    ("Age")
+    ("Allow")
+    ("Allowed")
+    ("Connection")
+    ("Content-Length")
+    ("Content-Location")
+    ("Content-Range")
+    ("ETag")
+    ("GET")
+    ("Host")
+    ("HEAD")
+    ("Last-Modified")
+    ("Locations")
+    ("Max-Forwards")
+    ("POST")
+    ("Proxy-Authenticate")
+    ("Proxy-Authorization")
+    ("Public")
+    ("Range")
+    ("Retry-After")
+    ("Server")
+    ("TE")
+    ("Trailer")
+    ("Transfer-Encoding")
+    ("Upgrade")
+    ("URI")
+    ("Vary")
+    ("Via")
+    ("Warning")
+    ("WWW-Authenticate");
+
 } // namespace gnash
 
 #endif // def USE_CURL

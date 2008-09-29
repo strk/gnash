@@ -819,7 +819,7 @@ GtkGui::createWindow(int width, int height)
     _width = width;
     _height = height;
     
-    _validbounds.setTo(0, 0, _width-1, _height-1);
+    _validbounds.setTo(0, 0, _width, _height);
     _glue->setRenderHandlerSize(_width, _height);
     
     return true;
@@ -1484,30 +1484,31 @@ GtkGui::showAboutDialog()
     GdkPixbuf *logo_pixbuf = createPixbuf("GnashG.png");
 
     gtk_show_about_dialog (
-    		   NULL,
-                   "program-name", _("GNASH flash movie player"), 
-                   "version", VERSION,
-                   "copyright", "Copyright (C) 2005, 2006, 2007, 2008 The Free Software Foundation",
-	           "comments", comments.c_str(),
-                   "authors", authors,
-                   "documenters", documentors,
-		   "artists", artists,
-//                   "translator-credits", "translator-credits",
-                   "logo", logo_pixbuf,
-		   "license", 
-		   "This program is free software; you can redistribute it and/or modify\n"
-		   "it under the terms of the GNU General Public License as published by\n"
-		   "the Free Software Foundation; either version 3 of the License, or\n"
-		   "(at your option) any later version.\n\n"
-		   "This program is distributed in the hope that it will be useful,\n"
-		   "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
-		   "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
-		   "GNU General Public License for more details.\n"
-		   "You should have received a copy of the GNU General Public License\n"
-		   "along with this program; if not, write to the Free Software\n"
-		   "Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA",
-		   "website", "http://www.gnu.org/software/gnash/",
-                   NULL);
+        NULL,
+        "program-name", _("GNASH flash movie player"), 
+        "version", VERSION,
+        "copyright", "Copyright (C) 2005, 2006, 2007, 2008 "
+                     "The Free Software Foundation",
+        "comments", comments.c_str(),
+        "authors", authors,
+        "documenters", documentors,
+        "artists", artists,
+        "translator-credits", _("translator-credits"),
+        "logo", logo_pixbuf,
+        "license", 
+        "This program is free software; you can redistribute it and/or modify\n"
+        "it under the terms of the GNU General Public License as published by\n"
+        "the Free Software Foundation; either version 3 of the License, or\n"
+        "(at your option) any later version.\n\n"
+        "This program is distributed in the hope that it will be useful,\n"
+        "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+        "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+        "GNU General Public License for more details.\n"
+        "You should have received a copy of the GNU General Public License\n"
+        "along with this program; if not, write to the Free Software\n"
+        "Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA",
+        "website", "http://www.gnu.org/software/gnash/",
+        NULL);
 }
 
 void
@@ -1605,7 +1606,7 @@ GtkGui::menuitem_sound_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 {
 //    GNASH_REPORT_FUNCTION;
     Gui* gui = static_cast<Gui*>(data);
-    gui->menu_toggle_sound();
+    gui->toggleSound();
 }
 
 void
@@ -1623,7 +1624,7 @@ GtkGui::menuitem_restart_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 {
     //GNASH_REPORT_FUNCTION;
     Gui* gui = static_cast<Gui*>(data);
-    gui->menu_restart();
+    gui->restart();
 }
 
 /// \brief quit complete, and close the application
@@ -1641,7 +1642,7 @@ GtkGui::menuitem_play_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 {
 //    GNASH_REPORT_FUNCTION;
     Gui* gui = static_cast<Gui*>(data);
-    gui->menu_play();
+    gui->play();
 }
 
 /// \brief toggle between playing or paused.
@@ -1650,7 +1651,7 @@ GtkGui::menuitem_pause_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 {
 //    GNASH_REPORT_FUNCTION;
     Gui* gui = static_cast<Gui*>(data);
-    gui->menu_pause();
+    gui->pause();
 }
 
 /// \brief stop the movie that's playing.
@@ -1659,7 +1660,7 @@ GtkGui::menuitem_stop_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 {
     GNASH_REPORT_FUNCTION;
     Gui* gui = static_cast<Gui*>(data);
-    gui->menu_stop();
+    gui->stop();
 }
 
 /// \brief step forward 1 frame

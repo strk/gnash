@@ -15,10 +15,12 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef _GNASH_STREAMPROVIDER_H
-#define _GNASH_STREAMPROVIDER_H
+#ifndef GNASH_STREAMPROVIDER_H
+#define GNASH_STREAMPROVIDER_H
 
-#include <string>
+#include <map>
+#include <memory>
+#include "NetworkAdapter.h"
 
 // Forward declarations
 namespace gnash {
@@ -46,7 +48,7 @@ public:
 	/// On error NULL is returned
 	/// Derive from this for a CachingStreamProvider
 	///
-	virtual IOChannel* getStream(const URL& url);
+	virtual std::auto_ptr<IOChannel> getStream(const URL& url);
 
 	/// Get a stream from the response of a POST operation
 	//
@@ -62,7 +64,10 @@ public:
 	///	Post data in url-encoded form.
 	///
 	///
-	virtual IOChannel* getStream(const URL& url, const std::string& postdata);
+	virtual std::auto_ptr<IOChannel> getStream(const URL& url, const std::string& postdata);
+	
+	virtual std::auto_ptr<IOChannel> getStream(const URL& url,
+	                    const std::string& postdata, const NetworkAdapter::RequestHeaders& headers);
 	
 };
 

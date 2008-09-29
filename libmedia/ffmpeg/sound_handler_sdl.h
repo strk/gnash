@@ -28,19 +28,9 @@
 #include "log.h"
 
 #ifdef USE_FFMPEG
-#ifdef HAVE_FFMPEG_AVCODEC_H
-extern "C" {
-# include "ffmpeg/avcodec.h"
-}
-#endif
-
-#ifdef HAVE_LIBAVCODEC_AVCODEC_H
-extern "C" {
-# include "libavcodec/avcodec.h"
-}
-#endif
+# include "ffmpegHeaders.h"
 #elif defined(USE_MAD)
-#include <mad.h>
+# include <mad.h>
 #endif
 
 #include <vector>
@@ -303,6 +293,10 @@ sound_data::~sound_data()
 // Use SDL and ffmpeg/mad/nothing to handle sounds.
 class SDL_sound_handler : public sound_handler
 {
+public:
+
+	typedef std::vector<sound_data*> Sounds;
+
 private:
 	/// AS classes (NetStream, Sound) audio callbacks
 	typedef std::map< void* /* owner */, aux_streamer_ptr /* callback */> CallbacksMap;
@@ -312,7 +306,7 @@ private:
 	//
 	/// Elemenst of the vector are owned by this class
 	///
-	typedef std::vector<sound_data*> Sounds;
+
 	Sounds	m_sound_data;
 
 	/// Is sound device opened?

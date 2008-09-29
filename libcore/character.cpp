@@ -41,6 +41,9 @@
 
 #undef set_invalidated
 
+/// Undefine this to not use caches for matrix parameters
+#define USE_MATRIX_CACHES
+
 namespace gnash
 {
 
@@ -295,7 +298,11 @@ character::xscale_getset(const fn_call& fn)
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
 	{
+#ifdef USE_MATRIX_CACHES
 		return as_value(ptr->_xscale);
+#else
+        return as_value(ptr->m_matrix.get_x_scale()*100);
+#endif
 	}
 	else // setter
 	{
@@ -326,7 +333,11 @@ character::yscale_getset(const fn_call& fn)
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
 	{
+#ifdef USE_MATRIX_CACHES
 		return ptr->_yscale;
+#else
+		return ptr->m_matrix.get_y_scale() * 100;
+#endif
 	}
 	else // setter
 	{
@@ -393,22 +404,37 @@ character::alpha_getset(const fn_call& fn)
 	else // setter
 	{
 		const as_value& inval = fn.arg(0);
-		const double input = inval.to_number();
-		if ( inval.is_undefined() || inval.is_null() || ! utility::isFinite(input) )
+
+        // The new internal alpha value is input / 100.0 * 256.
+        // We test for finiteness later, but the multiplication
+        // won't make any difference.
+		const double newAlpha = inval.to_number() * 2.56;
+
+        if ( inval.is_undefined() || inval.is_null() ||
+                !utility::isFinite(newAlpha) )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror(_("Ignored attempt to set %s.%s=%s"),
-				ptr->getTarget(),
-				_("_alpha"), // trying to reuse translations
-				fn.arg(0));
+			log_aserror(_("Ignored attempt to set %s._alpha=%s"),
+				ptr->getTarget(), fn.arg(0));
 			);
 			return rv;
 		}
-		// set alpha = input / 100.0 * 256 = input * 2.56;
-		cxform	cx = ptr->get_cxform();
-		cx.aa = (boost::int16_t)(input * 2.56); 
+
+        cxform cx = ptr->get_cxform();
+
+        // Overflows are *not* truncated, but set to -32768.
+        if (newAlpha > std::numeric_limits<boost::int16_t>::max() ||
+            newAlpha < std::numeric_limits<boost::int16_t>::min())
+        {
+            cx.aa = std::numeric_limits<boost::int16_t>::min();
+        }
+        else
+        {
+            cx.aa = static_cast<boost::int16_t>(newAlpha);
+        }
+
         ptr->set_cxform(cx);
-		ptr->transformedByScript(); // m_accept_anim_moves = false; 
+		ptr->transformedByScript();  
 	}
 	return rv;
 
@@ -535,7 +561,11 @@ character::rotation_getset(const fn_call& fn)
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
 	{
+#ifdef USE_MATRIX_CACHES
 		return ptr->_rotation;
+#else
+		return ptr->m_matrix.get_rotation() * 180 / PI;
+#endif
 	}
 	else // setter
 	{
@@ -609,9 +639,11 @@ void
 character::copyMatrix(const character& c)
 {
 	m_matrix = c.m_matrix;
+#ifdef USE_MATRIX_CACHES
 	_xscale = c._xscale;
 	_yscale = c._yscale;
 	_rotation = c._rotation;
+#endif
 }
 
 void
@@ -623,12 +655,14 @@ character::set_matrix(const matrix& m, bool updateCache)
 		set_invalidated(__FILE__, __LINE__);
 		m_matrix = m;
 
+#ifdef USE_MATRIX_CACHES
 		if ( updateCache ) // don't update caches if matrix wasn't updated too
 		{
 			_xscale = m_matrix.get_x_scale() * 100.0;
 			_yscale = m_matrix.get_y_scale() * 100.0;
 			_rotation = m_matrix.get_rotation() * 180.0 / PI;
 		}
+#endif
         }
 	
 }
@@ -760,15 +794,27 @@ character::getUserDefinedEventHandler(string_table::key key) const
 void
 character::set_x_scale(double scale_percent)
 {
+#ifdef USE_MATRIX_CACHES
 	_xscale = scale_percent;
 
+    // As per misc-ming.all/matrix_test.{c,swf}
+    // we don't need to recompute the matrix from the 
+    // caches.
+
 	double xscale = _xscale / 100.0;
-	double yscale = _yscale / 100.0;
-	double rotation = _rotation * PI / 180.0;
+	//double yscale = _yscale / 100.0;
+	//double rotation = _rotation * PI / 180.0;
 
 	matrix m = get_matrix();
-	m.set_scale_rotation(xscale, yscale, rotation);
+	//m.set_scale_rotation(xscale, yscale, rotation);
+	m.set_x_scale(xscale);
 	set_matrix(m); // we updated the cache ourselves
+#else
+    double xscale = scale_percent / 100.0;
+	matrix m = get_matrix();
+    m.set_x_scale(xscale);
+	set_matrix(m); // we updated the cache ourselves
+#endif
 
 	transformedByScript(); 
 }
@@ -784,6 +830,8 @@ character::set_rotation(double rot)
 		rot += 360.0;
 
 	//log_debug("_rotation: %d", rot);
+
+#ifdef USE_MATRIX_CACHES
 	_rotation = rot;
 
 	double xscale = _xscale / 100.0;
@@ -793,6 +841,12 @@ character::set_rotation(double rot)
 	matrix m = get_matrix();
 	m.set_scale_rotation(xscale, yscale, rotation);
 	set_matrix(m); // we updated the cache ourselves
+#else
+    double rotation = rot * PI / 180.0;
+	matrix m = get_matrix();
+	m.set_rotation(rotation);
+	set_matrix(m); // we updated the cache ourselves
+#endif
 
 	transformedByScript(); 
 }
@@ -800,6 +854,7 @@ character::set_rotation(double rot)
 void
 character::set_y_scale(double scale_percent)
 {
+#ifdef USE_MATRIX_CACHES
 	_yscale = scale_percent;
 
 	double xscale = _xscale / 100.0;
@@ -809,6 +864,11 @@ character::set_y_scale(double scale_percent)
 	matrix m = get_matrix();
 	m.set_scale_rotation(xscale, yscale, rotation);
 	set_matrix(m); // we updated the cache ourselves
+#else
+	matrix m = get_matrix();
+    m_matrix.set_y_scale(scale_percent / 100.0);
+	set_matrix(m); // we updated the cache ourselves
+#endif
 
 	transformedByScript(); 
 }

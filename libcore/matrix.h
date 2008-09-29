@@ -53,12 +53,23 @@ class DSOEXPORT matrix
 {
 public:
 
-    int sx;  // Xscale, 16.16 fixed point. xx in swfdec.
-    int shx; // Xshear, 16.16 fixed point. yx in swfdec.
-    int tx;  // Xtranslation, TWIPS. x0 in swfdec.
-    int sy;  // Yscale, 16.16 fixed point. yy in swfdec.
-    int shy; // Yshear, 16.16 fixed point. xy in swfdec.
-    int ty;  // Ytranslation, TWIPS. y0 in swfdec.
+    /// Xscale, 16.16 fixed point. xx in swfdec. 'a' in AS Matrix.
+    int sx; 
+
+    /// Xshear, 16.16 fixed point. yx in swfdec. 'b' in AS Matrix.
+    int shx;
+
+    /// Xtranslation, TWIPS. x0 in swfdec. 'tx' in AS Matrix.
+    int tx; 
+
+    /// Yscale, 16.16 fixed point. yy in swfdec. 'd' in AS Matrix.
+    int sy; 
+
+    /// Yshear, 16.16 fixed point. xy in swfdec. 'c' in AS Matrix.
+    int shy;
+
+    /// Ytranslation, TWIPS. y0 in swfdec. 'ty' in AS Matrix.
+    int ty; 
              
     friend bool operator== (const matrix&, const matrix&);
     friend std::ostream& operator<< (std::ostream&, const matrix&);

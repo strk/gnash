@@ -150,7 +150,7 @@ noinst_HEADERS = \
 	WallClockTimer.h \
 	utf8.h \
 	utility.h \
-	curl_adapter.h \
+	NetworkAdapter.h \
 	noseek_fd_adapter.h \
 	zlib_adapter.h \
 	URL.h \

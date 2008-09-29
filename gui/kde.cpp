@@ -336,7 +336,7 @@ void
 qwidget::menuitem_restart_callback()
 {
 //    GNASH_REPORT_FUNCTION;
-    _godfather->menu_restart();
+    _godfather->restart();
 }
 
 /// \brief force redraw of current frame
@@ -360,7 +360,7 @@ void
 qwidget::menuitem_play_callback()
 {
 //    GNASH_REPORT_FUNCTION;
-    _godfather->menu_play();
+    _godfather->play();
 }
 
 /// \brief toggle that's playing or paused.
@@ -368,7 +368,7 @@ void
 qwidget::menuitem_pause_callback()
 {
 //    GNASH_REPORT_FUNCTION;
-    _godfather->menu_pause();
+    _godfather->pause();
 }
 
 /// \brief stop the movie that's playing.
@@ -376,7 +376,7 @@ void
 qwidget::menuitem_stop_callback()
 {
 //    GNASH_REPORT_FUNCTION;
-    _godfather->menu_stop();
+    _godfather->stop();
 }
 
 /// \brief step forward 1 frame

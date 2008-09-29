@@ -38,6 +38,7 @@
 #include <boost/algorithm/string/case_conv.hpp>
 #include <algorithm>
 #include <locale>
+#include <stdexcept>
 
 #define ENSURE_FN_ARGS(min, max, rv)                                    \
     if (fn.nargs < min) {                                               \
@@ -291,7 +292,7 @@ string_split(const fn_call& fn)
     
     std::wstring wstr = utf8::decodeCanonicalString(str, version);
 
-    boost::intrusive_ptr<as_array_object> array(new as_array_object());
+    boost::intrusive_ptr<Array_as> array(new Array_as());
 
     if (fn.nargs == 0)
     {
@@ -685,7 +686,24 @@ string_to_upper_case(const fn_call& fn)
     // If this is the C locale, the conversion will be wrong.
     // Most other locales are correct. FIXME: get this to
     // work regardless of user's current settings.
-    std::locale currentLocale("");
+    std::locale currentLocale;
+    try
+    {
+        currentLocale = std::locale("");
+    }
+    catch (std::runtime_error& e)
+    {
+        currentLocale = std::locale::classic();
+    }
+
+    if (currentLocale == std::locale::classic())
+    {
+        LOG_ONCE(
+            log_error(_("Your locale probably can't convert non-ascii "
+            "characters to upper case. Using a UTF8 locale may fix this."));
+        );
+    }
+
     boost::to_upper(wstr, currentLocale);
 
     return as_value(utf8::encodeCanonicalString(wstr, version));
@@ -703,9 +721,27 @@ string_to_lower_case(const fn_call& fn)
 
     std::wstring wstr = utf8::decodeCanonicalString(val.to_string(), version);
 
-    // If this the C locale, the conversion will be wrong.
-    // Most other locales are correct.
-    std::locale currentLocale("");
+    // If this is the C locale, the conversion will be wrong.
+    // Most other locales are correct. FIXME: get this to
+    // work regardless of user's current settings.
+    std::locale currentLocale;
+    try
+    {
+        currentLocale = std::locale("");
+    }
+    catch (std::runtime_error& e)
+    {
+        currentLocale = std::locale::classic();
+    }
+
+    if (currentLocale == std::locale::classic())
+    {
+        LOG_ONCE( 
+            log_error(_("Your locale probably can't convert non-ascii "
+                "characters to lower case. Using a UTF8 locale may fix this"));
+        );
+    }
+
     boost::to_lower(wstr, currentLocale);
 
     return as_value(utf8::encodeCanonicalString(wstr, version));
@@ -842,17 +878,9 @@ init_string_instance(const std::string& val)
 		}
 	}
 
-#ifndef NDEBUG
-	size_t prevStackSize = env.stack_size();
-#endif
-
 	std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
 	args->push_back(val);
 	boost::intrusive_ptr<as_object> ret = cl->constructInstance(env, args);
-
-#ifndef NDEBUG
-	assert( prevStackSize == env.stack_size());
-#endif
 
 	return ret;
 }

@@ -352,10 +352,6 @@ public:
 	/// 	for calling getter function (GetterSetterProperty);
 	/// 	it will be unused when getting or setting SimpleProperty
 	/// 	properties.
-	///	This parameter is non-const as nothing prevents an
-	///	eventual "Setter" function from actually modifying it,
-	///	so we can't promise constness.
-	///
 	/// @return the value of this property
 	///
 	as_value getValue(const as_object& this_ptr) const;
