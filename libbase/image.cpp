@@ -182,7 +182,8 @@ namespace image
 	//
 
 	// Write the given image to the given out stream, in jpeg format.
-	void writeImageData(FileType type, boost::shared_ptr<IOChannel> out, image::ImageBase* image, int quality)
+	void writeImageData(FileType type, boost::shared_ptr<IOChannel> out,
+            image::ImageBase* image, int quality)
 	{
 		
 		const size_t width = image->width();
@@ -193,10 +194,12 @@ namespace image
         switch (type)
         {
             case GNASH_FILETYPE_PNG:
-                outChannel = PngImageOutput::create(out, width, height, quality);
+                outChannel = PngImageOutput::create(out, width,
+                        height, quality);
                 break;
             case GNASH_FILETYPE_JPEG:
-                outChannel = JpegImageOutput::create(out, width, height, quality);
+                outChannel = JpegImageOutput::create(out, width,
+                        height, quality);
                 break;
             default:
                 log_error("Requested to write image as unsupported filetype");
@@ -218,7 +221,8 @@ namespace image
 	}
 
     // See gnash.h for file types.
-    std::auto_ptr<ImageBase> readImageData(boost::shared_ptr<IOChannel> in, FileType type)
+    std::auto_ptr<ImageBase> readImageData(
+            boost::shared_ptr<IOChannel> in, FileType type)
     {
         std::auto_ptr<ImageBase> im (NULL);
         std::auto_ptr<ImageInput> inChannel;
