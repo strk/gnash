@@ -38,10 +38,6 @@
 using std::string;
 using std::endl;
 
-namespace {
-//gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
-}
-
 namespace gnash {
 
 // Forward declarations
@@ -53,8 +49,6 @@ action_buffer::action_buffer(const movie_definition& md)
     m_decl_dict_processed_at(-1),
     _src(md)
 {
-//    static int count=0;
-//    printf("Action buffer %d created\n", ++count);
 }
 
 void
@@ -117,23 +111,19 @@ action_buffer::process_decl_dict(size_t start_pc, size_t stop_pc) const
 {
     assert(stop_pc <= m_buffer.size());
     
+
+    // Skip if we've already processed this decl_dict, but make sure
+    // the size is the same.
     if (static_cast<size_t>(m_decl_dict_processed_at) == start_pc) {
-    // We've already processed this decl_dict. 
-#ifndef NDEBUG
-    int count = read_int16(start_pc+3);
-    assert((int) m_dictionary.size() == count);
-#endif
-    return;
+        const int dictSize = read_int16(start_pc + 3);
+        if (static_cast<int>(m_dictionary.size()) != dictSize)
+        {
+            /// TODO: is it possible to continue?
+            throw ActionParserException(_("Constant pool size "
+                        "mismatch. This is probably a very malformed SWF"));
+        }
+        return;
     }
-    
-#if 0 // debugging
-    if (m_decl_dict_processed_at != -1)    {
-    log_debug(_("process_decl_dict(%d, %d): decl_dict was already processed at %d. "
-        "Overriding."),
-          start_pc, stop_pc, m_decl_dict_processed_at);
-    //return;
-    }
-#endif
     
     m_decl_dict_processed_at = start_pc;
     
@@ -143,74 +133,32 @@ action_buffer::process_decl_dict(size_t start_pc, size_t stop_pc) const
     boost::uint16_t count = boost::uint16_t(read_int16(i+3)); 
     i += 2;
     
-//log_debug(_("Start at %d, stop at %d, length read was %d, count read was %d"), start_pc, stop_pc, length, count);
-
     assert(start_pc + 3 + length == stop_pc);
     
     m_dictionary.resize(count);
     
     // Index the strings.
     for (int ct = 0; ct < count; ct++) {
-    // Point into the current action buffer.
-    m_dictionary[ct] = (const char*) &m_buffer[3 + i];
-    
-    while (m_buffer[3 + i]) {
-        // safety check.
-        if (i >= stop_pc) {
-        log_error(_("action buffer dict length exceeded"));
-        
-        // Jam something into the remaining (invalid) entries.
-        while (ct < count) {
-            m_dictionary[ct] = "<invalid>";
-            ct++;
-        }
-        return;
+        // Point into the current action buffer.
+        m_dictionary[ct] = (const char*) &m_buffer[3 + i];
+
+        while (m_buffer[3 + i]) {
+            // safety check.
+            if (i >= stop_pc) {
+                log_error(_("action buffer dict length exceeded"));
+                // Jam something into the remaining (invalid) entries.
+                while (ct < count) {
+                    m_dictionary[ct] = "<invalid>";
+                    ct++;
+                }
+            return;
+            }
+            i++;
         }
         i++;
     }
-    i++;
-    }
 }
 
-#if 0
-// Interpret the actions in this action buffer, and evaluate
-// them in the given environment.  Execute our whole buffer,
-// without any arguments passed in.
-void
-action_buffer::execute(as_environment* env) const
-{
-    assert(env);
-
-    int local_stack_top = env->get_local_frame_top();
-    env->add_frame_barrier();
-
-    ActionExec exec(*this, *env);
-    exec();
-    
-    env->set_local_frame_top(local_stack_top);
-}
-
-// Interpret the specified subset of the actions in our
-// buffer.  Caller is responsible for cleaning up our local
-// stack frame (it may have passed its arguments in via the
-// local stack frame).
-// 
-// The is_function2 flag determines whether to use global or local registers.
-void
-action_buffer::execute(
-    as_environment* env,
-    size_t start_pc,
-    size_t exec_bytes, // used when invoked as a function call
-    as_value* retval, // used when invoked as a function call
-    const std::vector<with_stack_entry>& initial_with_stack,
-    bool is_function2) const
-{
-    assert(env);
-    ActionExec exec(*this, *env, start_pc, exec_bytes, retval,
-        initial_with_stack, is_function2);
-    exec();
-}
-#endif
 
 // Disassemble one instruction to the log. The maxBufferLength
 // argument is the number of bytes remaining in the action_buffer
@@ -220,9 +168,9 @@ static std::string
 disasm_instruction(const unsigned char* instruction_data, size_t maxBufferLength)
 {
 
-    using namespace gnash::SWF;
+    using namespace SWF;
 
-    const gnash::SWF::SWFHandlers& ash = gnash::SWF::SWFHandlers::instance();
+    const SWF::SWFHandlers& ash = SWF::SWFHandlers::instance();
 
     assert (maxBufferLength > 0);
 
