@@ -46,6 +46,8 @@
 
 #include <boost/algorithm/string/case_conv.hpp> // for PROPNAME
 
+#include "sound_handler_gst.h"
+
 // Define the following macro to have status notification handling debugged
 //#define GNASH_DEBUG_STATUS
 
@@ -1008,11 +1010,11 @@ bool NetStream::audio_streamer(void *owner, boost::uint8_t *stream, int len)
 
 	boost::mutex::scoped_lock lock(ns->_audioQueueMutex);
 
-#if 0
+
 	log_debug("audio_streamer called, audioQueue size: %d, "
 		"requested %d bytes of fill-up",
 		ns->_audioQueue.size(), len);
-#endif
+
 
 
 	while (len > 0)
@@ -1193,7 +1195,10 @@ NetStream::decodeNextAudioFrame()
 	}
 
     	raw_mediadata_t* raw = new raw_mediadata_t();
-	raw->m_data = _audioDecoder->decode(*frame, raw->m_size); 
+	raw->m_data = _audioDecoder->decode(*frame, raw->m_size);
+ 	if (!raw->m_data || !raw->m_size) {
+		return 0;
+	}
 
 	if ( _audioController ) // TODO: let the sound_handler do this .. sounds cleaner
 	{
@@ -1211,13 +1216,13 @@ NetStream::decodeNextAudioFrame()
 		}
 	}
 
-#ifdef GNASH_DEBUG_DECODING
+//#ifdef GNASH_DEBUG_DECODING
 	log_debug("NetStream::decodeNextAudioFrame: "
 		"%d bytes of encoded audio "
 		"decoded to %d bytes",
 		frame->dataSize,
 		raw->m_size);
-#endif // GNASH_DEBUG_DECODING
+//#endif // GNASH_DEBUG_DECODING
 
 	raw->m_ptr = raw->m_data; // no idea what this is needed for
 	raw->m_pts = frame->timestamp;
@@ -1800,10 +1805,8 @@ NetStream::attachAuxStreamer()
 	}
 
 	try {
-#if 0
-// FIXME FIXME FIXME 
 		_soundHandler->attach_aux_streamer(audio_streamer, (void*) this);
-#endif
+
 		_auxStreamerAttached = true;
 	} catch (SoundException& e) {
 		log_error("Could not attach NetStream aux streamer to sound handler: %s", e.what());
@@ -1820,10 +1823,8 @@ NetStream::detachAuxStreamer()
 		// we do nonetheless, isn't specified by SoundHandler.h
 		// whether or not this is legal...
 	}
-#if 0
-// FIXME FIXME FIXME
 	_soundHandler->detach_aux_streamer(this);
-#endif
+
 	_auxStreamerAttached = false;
 }
 

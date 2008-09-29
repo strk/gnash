@@ -187,11 +187,12 @@ libgnashasobjs_la_LIBADD += $(FFMPEG_LIBS) \
 				$(SDL_LIBS)
 endif
 
-if USE_SOUND_GST
+if USE_GST_ENGINE
 libgnashasobjs_la_SOURCES += SoundGst.cpp
 AM_CPPFLAGS += $(GSTREAMER_CFLAGS) \
 		-I$(top_srcdir)/libmedia/gst
-libgnashasobjs_la_LIBADD += $(GSTREAMER_LIBS)
+libgnashasobjs_la_LIBADD += $(GSTREAMER_LIBS) \
+				$(SDL_LIBS)
 endif
 
 #libgnashasobjs_la_LDFLAGS = -release $(VERSION) -no-undefined -export-dynamic

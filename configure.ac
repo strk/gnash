@@ -1596,7 +1596,7 @@ AM_CONDITIONAL(ENABLE_DOXYGEN, [ test x"$DOXYGEN" != x ])
 dnl currently unused
 dnl GNASH_PKG_FIND(ogg, [ogg.h], [decode ogg streams], ogg_stream_init)
 
-if test x$build_sdl = xyes -o x"$media_handler" = xffmpeg; then
+if test x$build_sdl = xyes -o x"$media_handler" = xffmpeg -o x"$media_handler" = xgst; then
   GNASH_PATH_SDL
 fi
 
@@ -1637,7 +1637,7 @@ AM_CONDITIONAL(HAVE_QT_3, [test x"${gnash_qt_version}" != x && test "${gnash_qt_
 AM_CONDITIONAL(HAVE_QT_4, [test x"${gnash_qt_version}" != x && test "${gnash_qt_version}" -eq 4])
 
 dnl Need GLIB for both GTK and GST
-if test x$build_gtk = xyes -o x${media_handler} = "xgst"; then
+if test x$build_gtk = xyes -o x${Media_handler} = "xgst"; then
   GNASH_PATH_GLIB
 fi
 
@@ -1828,19 +1828,19 @@ fi
 
 AM_CONDITIONAL(HAVE_CAIRO, [test x"${CAIRO_LIBS}" != x])
 
-AM_CONDITIONAL(USE_SOUND_GST, test x$media_handler = xgst)
-AM_CONDITIONAL(USE_SOUND_SDL, test x"$media_handler" = xffmpeg)
+AM_CONDITIONAL(USE_SOUND_SDL, test x"$media_handler" = xffmpeg -o x"$media_handler" = xgst)
 AM_CONDITIONAL(USE_FFMPEG_ENGINE, test x"$media_handler" = xffmpeg)
+AM_CONDITIONAL(USE_GST_ENGINE, test x"$media_handler" = xgst)
 AM_CONDITIONAL(HAVE_OPENGL, test x"${OPENGL_LIBS}" != x)
 
 case "${media_handler}" in
-  gst) AC_DEFINE([SOUND_GST],  [1], [Use GSTREAMER for media handling]) ;;
-  ffmpeg) AC_DEFINE([SOUND_SDL],  [1], [Use SDL for sound handling]) ;;
+  ffmpeg|gst) AC_DEFINE([SOUND_SDL],  [1], [Use SDL for sound handling]) ;;
   *)
 esac
 
 case "${media_handler}" in
   ffmpeg)  AC_DEFINE([USE_FFMPEG],  [1], [Use FFMPEG for media decoding]) ;;
+  gst)  AC_DEFINE([USE_GST],  [1], [Use FFMPEG for media decoding]) ;;
   *)
 esac
 dnl I'm kinda lazy, get rid of this later... //Markus

@@ -24,37 +24,32 @@
 #ifdef SOUND_GST
 
 #include "AudioDecoderGst.h"
+#include "MediaParser.h"
 
 namespace gnash {
 namespace media {
 
-AudioDecoderGst::AudioDecoderGst(AudioInfo& info) :
-	_pipeline(NULL),
-	_input(NULL),
-	_inputcaps(NULL),
-	_outputcaps(NULL),
-	_output(NULL),
-	_decoder(NULL),
-	_resampler(NULL),
-	_converter(NULL),
-	_stop(false),
-	_undecodedDataSize(0),
-	_undecodedData(NULL),
-	_decodedDataSize(0),
-	_decodedData(0)
+AudioDecoderGst::AudioDecoderGst(SoundInfo& info)
+    :
+        _samplerate(info.getSampleRate()),
+        _stereo(info.isStereo())
 {
     setup(info);
 }
 
+AudioDecoderGst::AudioDecoderGst(AudioInfo& info)
+    :
+        _samplerate(info.sampleRate),
+        _stereo(info.stereo)
+{
+    setup(info);
+}
+
+
 AudioDecoderGst::~AudioDecoderGst()
 {
-
-	if (_pipeline) {
-		_stop = true;
-		delete input_lock;
-		gst_element_set_state (GST_ELEMENT (_pipeline), GST_STATE_NULL);
-		gst_object_unref (GST_OBJECT (_pipeline));
-	}
+    swfdec_gst_decoder_push_eos(&_decoder);
+    swfdec_gst_decoder_finish(&_decoder);
 }
 
 void AudioDecoderGst::setup(AudioInfo& info)
@@ -64,142 +59,95 @@ void AudioDecoderGst::setup(AudioInfo& info)
 	    throw MediaException("AudioDecoderGst: cannot handle this codec!");
 	}
 
-	// init GStreamer
-	gst_init (NULL, NULL);
+	setup();
+}
 
-	// setup the pipeline
-	_pipeline = gst_pipeline_new (NULL);
+void AudioDecoderGst::setup(SoundInfo& info)
+{
+	setup();
+}
 
-	// Setup the pipeline elements
 
-	// setup fake source
-	_input = gst_element_factory_make ("fakesrc", NULL);
-	g_object_set (G_OBJECT (_input),	"sizetype", 3, /*"can-activate-pull", FALSE,*/ "signal-handoffs", TRUE, NULL);
+void AudioDecoderGst::setup()
+{
+    // init GStreamer
+    gst_init (NULL, NULL);
 
-	// Setup the callback
-	g_signal_connect (_input, "handoff", G_CALLBACK (AudioDecoderGst::callback_handoff), this);
-
-	_decoder = gst_element_factory_make ("mad", NULL);
-	if (_decoder == NULL) {
-		_decoder = gst_element_factory_make ("flump3dec", NULL);
-		if (_decoder != NULL && !gst_default_registry_check_feature_version("flump3dec", 0, 10, 4))
-		{
-			static bool warned=false;
-			if ( ! warned ) 
-			{
-				// I keep getting these messages even if I hear sound... too much paranoia ?
-				log_debug(_("This version of fluendos mp3 plugin does not support flash streaming sounds, please upgrade to version 0.10.4 or higher"));
-				warned=true;
-			}
-		}
-	}
-	// Check if the element was correctly created
-	if (!_decoder) {
-		throw MediaException (_("A gstreamer mp3-decoder element could not "
-				"be created. You probably need to install a mp3-decoder plugin"
-				" like gstreamer0.10-mad or gstreamer0.10-fluendo-mp3."));
-	}
-
-	GstCaps *caps = NULL;
-
-	// Set the info about the stream so that gstreamer knows what it is.
-	_inputcaps = gst_element_factory_make ("capsfilter", NULL);
-	caps = gst_caps_new_simple ("audio/mpeg",
+    GstCaps* sinkcaps;
+ 
+    GstCaps* srccaps = gst_caps_new_simple ("audio/mpeg",
 		"mpegversion", G_TYPE_INT, 1,
 		"layer", G_TYPE_INT, 3,
-		"rate", G_TYPE_INT, _sampleRate,
+		"rate", G_TYPE_INT, _samplerate,
 		"channels", G_TYPE_INT, _stereo ? 2 : 1, NULL);
-	g_object_set (G_OBJECT (_inputcaps), "caps", caps, NULL);
-	gst_caps_unref (caps);
+    if (!srccaps) {
+        throw MediaException(_("AudioDecoderGst: internal error (caps creation failed)"));      
+    }
 
-	// Set the info about the stream so that gstreamer knows what the output should be.
-	_outputcaps = gst_element_factory_make ("capsfilter", NULL);
-	caps = gst_caps_new_simple ("audio/x-raw-int",
-		"rate", G_TYPE_INT, 44100,
-		"channels", G_TYPE_INT, 2,
-		"width", G_TYPE_INT, 16,
-		//"depth", G_TYPE_INT, 16,
-		//"signed", G_TYPE_INT, ?,
-		NULL);
-	g_object_set (G_OBJECT (_outputcaps), "caps", caps, NULL);
-	gst_caps_unref (caps);
+    sinkcaps = gst_caps_from_string ("audio/x-raw-int, endianness=byte_order, signed=(boolean)true, width=16, depth=16, rate=44100, channels=2");
+    if (!sinkcaps) {
+        throw MediaException(_("AudioDecoderGst: internal error (caps creation failed)"));      
+    }
 
-	// setup the audiosink with callback
-	_output = gst_element_factory_make ("fakesink", NULL);
-	g_object_set (G_OBJECT (_output), "signal-handoffs", TRUE, NULL);
-	g_signal_connect (_output, "handoff", G_CALLBACK (AudioDecoderGst::callback_output), this);
+    bool rv = swfdec_gst_decoder_init (&_decoder, srccaps, sinkcaps, "audioconvert", "ffaudioresample", NULL);
+    if (!rv) {
+        throw MediaException(_("AudioDecoderGst: initialisation failed."));      
+    }
 
-
-	// Put the elemets in the pipeline and link them
-	gst_bin_add_many (GST_BIN (_pipeline), _input, _inputcaps, _decoder, _resampler, _converter, _outputcaps, _output, NULL);
-
-	// link the elements
-	gst_element_link_many(_input, _inputcaps, _decoder, _resampler, _converter, _outputcaps, _output, NULL);
-
-	// This make callback_handoff wait for data
-	input_lock = new boost::mutex::scoped_lock(input_mutex);
-
-	// This make decodeFrame wait for data
-	output_lock = new boost::mutex::scoped_lock(output_mutex);
-
-	// Start "playing"
-	gst_element_set_state (GST_ELEMENT (_pipeline), GST_STATE_PLAYING);
-
+    gst_caps_unref (srccaps);
+    gst_caps_unref (sinkcaps);
 }
 
-boost::uint8_t* AudioDecoderGst::decode(boost::uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize, boost::uint32_t& decodedData, bool /*parse*/)
+boost::uint8_t*
+AudioDecoderGst::decode(boost::uint8_t* input, boost::uint32_t inputSize,
+                        boost::uint32_t& outputSize,
+                        boost::uint32_t& decodedData, bool /*parse*/)
 {
-	// If there is nothing to decode in the new data we return NULL
-	if (input == NULL || inputSize == 0 || !_decoder)
-	{
-		outputSize = 0;
-		decodedData = 0;
-		return NULL;
-	}
+    outputSize = decodedData = 0;
 
-	_undecodedData = input;
-	_undecodedDataSize = inputSize;
+    GstBuffer* gstbuf = gst_buffer_new_and_alloc(inputSize);
+    memcpy (GST_BUFFER_DATA (gstbuf), input, inputSize);
 
-	delete input_lock;
-printf("waiting for decoded data\n");
-	output_lock = new boost::mutex::scoped_lock(output_mutex);
-printf("decoded data arrived\n");
+    bool success = swfdec_gst_decoder_push(&_decoder, gstbuf);
+    if (!success) {
+        log_error(_("AudioDecoderGst: buffer push failed."));
+        return 0;
+    }
 
-	decodedData = inputSize;
-	outputSize = _decodedDataSize;
-	return _decodedData;
+    decodedData = inputSize;
+
+    GstBuffer * decodedbuf = swfdec_gst_decoder_pull (&_decoder);
+
+    if (!decodedbuf) {
+        outputSize = 0;
+        return 0;
+    }
+
+    outputSize = GST_BUFFER_SIZE(decodedbuf);
+    decodedData = inputSize;
+
+    boost::uint8_t* rbuf = new boost::uint8_t[outputSize];
+    memcpy(rbuf, GST_BUFFER_DATA(decodedbuf), outputSize);
+    gst_buffer_unref(decodedbuf);
+
+    return rbuf;
 }
 
-// The callback function which refills the buffer with data
-void
-AudioDecoderGst::callback_handoff (GstElement * /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data)
+boost::uint8_t*
+AudioDecoderGst::decode(const EncodedAudioFrame& ef, boost::uint32_t& outputSize)
 {
-	AudioDecoderGst* decoder = static_cast<AudioDecoderGst*>(user_data);
+    // Docs are not very helpful as to what the difference between these two is.
+    boost::uint32_t output_size = 0;    
+    boost::uint32_t decoded_data_size = 0;
 
-	if (decoder->_stop) return;
+    uint8_t* rv = decode(ef.data.get(), ef.dataSize, output_size, decoded_data_size, false);
 
-	decoder->input_lock = new boost::mutex::scoped_lock(decoder->input_mutex);
+    // my best guess is that outputSize in one method means outputSize in the other...
+    outputSize = output_size;
 
-	GST_BUFFER_SIZE(buffer) = decoder->_undecodedDataSize;
-
-	GST_BUFFER_DATA(buffer) = decoder->_undecodedData;
+    return rv;
 }
 
-// The callback function which passes the decoded audio data
-void
-AudioDecoderGst::callback_output (GstElement * /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data)
-{
-	AudioDecoderGst* decoder = static_cast<AudioDecoderGst*>(user_data);
-
-	if (decoder->_stop) return;
-
-	decoder->_decodedDataSize = GST_BUFFER_SIZE(buffer);
-
-	decoder->_decodedData = GST_BUFFER_DATA(buffer);
-
-	delete decoder->output_lock;
-
-}
 
 } // end of media namespace
 } // end of gnash namespace

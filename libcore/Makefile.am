@@ -209,7 +209,7 @@ libgnashcore_la_LIBADD = \
 	$(FONTCONFIG_LIBS) \
 	$(NULL)
 
-if USE_SOUND_GST
+if USE_GST_ENGINE
 AM_CPPFLAGS += $(GSTREAMER_CFLAGS) \
 		-I$(top_srcdir)/libmedia/gst
 libgnashcore_la_LIBADD += $(GSTREAMER_LIBS)

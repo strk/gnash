@@ -150,7 +150,7 @@ dumpconfig:
 	@echo "	PNG_CFLAGS is $(LIBPNG_CFLAGS)"
 	@echo "	PNG_LIBS is $(LIBPNG_LIBS)"
 	@echo "Audio decoding support..."
-if USE_SOUND_GST
+if USE_GST_ENGINE
 	@echo "	GSTREAMER_CFLAGS is $(GSTREAMER_CFLAGS)"
 	@echo "	GSTREAMER_LIBS is $(GSTREAMER_LIBS)"
 endif
