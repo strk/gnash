@@ -1187,16 +1187,16 @@ check_equals(b.yMax, -5);
 draw._width = 10;
 check_equals(draw._width, 10);
 check_equals(draw._xscale, 100); // reset to positive on setting _width
-xcheck_equals(draw._yscale, 50); // reset to positive on setting _width !
+check_equals(draw._yscale, 50); // reset to positive on setting _width !
 
 #if OUTPUT_VERSION >= 8
-xcheck_equals(printMatrix(draw.transform.matrix, 2), "(a=1, b=0, c=0, d=0.5, tx=0, ty=0)");
+check_equals(printMatrix(draw.transform.matrix, 2), "(a=1, b=0, c=0, d=0.5, tx=0, ty=0)");
 #endif
 b = draw.getBounds(container); // these are transformed by container draw matrix
-xcheck_equals(b.xMin, 10);
-xcheck_equals(b.xMax, 20);
-xcheck_equals(b.yMin, 5);
-xcheck_equals(b.yMax, 15);
+check_equals(b.xMin, 10);
+check_equals(b.xMax, 20);
+check_equals(b.yMin, 5);
+check_equals(b.yMax, 15);
 
 draw._height = 10; // TODO: dumb check, it's 10 already !!
 check_equals(draw._yscale, 50); // was already positive

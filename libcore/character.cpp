@@ -504,10 +504,15 @@ character::set_width(double newwidth)
 	const double oldwidth = bounds.width();
 	assert(oldwidth >= 0); // can't be negative can it?
 
-	double newscale = 100*(newwidth/oldwidth);
-	//if ( _xscale < 0 ) newscale = -newscale;
-	log_debug("setting xscale from %g to %g", _xscale, newscale);
-	set_x_scale( newscale );
+        double yscale = fabs(_yscale / 100.0); // see MovieClip.as. TODO: this is likely same as m.get_y_scale..
+        double xscale = (newwidth / oldwidth);
+        double rotation = _rotation * PI / 180.0;
+
+        log_debug("setting xscale from %g to %g", _xscale, xscale*100);
+
+        matrix m = get_matrix();
+        m.set_scale_rotation(xscale, yscale, rotation);
+        set_matrix(m, true); // let caches be updated
 }
 
 as_value
@@ -556,10 +561,15 @@ character::set_height(double newheight)
 	const double oldheight = bounds.height();
 	assert(oldheight >= 0); // can't be negative can it?
 
-	double newscale = 100 * (newheight / oldheight);
-	//if ( _yscale < 0 ) newscale = -newscale;
-	log_debug("setting yscale from %g to %g", _yscale, newscale);
-	set_y_scale( newscale );
+        double yscale = (newheight / oldheight);
+        double xscale = _xscale / 100.0;
+        double rotation = _rotation * PI / 180.0;
+
+        log_debug("setting yscale from %g to %g", _yscale, yscale*100);
+
+        matrix m = get_matrix();
+        m.set_scale_rotation(xscale, yscale, rotation);
+        set_matrix(m, true); // let caches be updated
 }
 
 as_value
