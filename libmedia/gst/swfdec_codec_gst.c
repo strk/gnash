@@ -22,7 +22,6 @@
 #endif
 
 #include <string.h>
-#include <gst/pbutils/pbutils.h>
 
 #include "swfdec_codec_gst.h"
 
