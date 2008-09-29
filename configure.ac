@@ -1840,7 +1840,7 @@ esac
 
 case "${media_handler}" in
   ffmpeg)  AC_DEFINE([USE_FFMPEG],  [1], [Use FFMPEG for media decoding]) ;;
-  gst)  AC_DEFINE([USE_GST],  [1], [Use FFMPEG for media decoding]) ;;
+  gst)  AC_DEFINE([USE_GST],  [1], [Use gstreamer for media decoding]) ;;
   *)
 esac
 dnl I'm kinda lazy, get rid of this later... //Markus

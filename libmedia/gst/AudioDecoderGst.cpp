@@ -88,7 +88,9 @@ void AudioDecoderGst::setup()
         throw MediaException(_("AudioDecoderGst: internal error (caps creation failed)"));      
     }
 
-    bool rv = swfdec_gst_decoder_init (&_decoder, srccaps, sinkcaps, "audioconvert", "ffaudioresample", NULL);
+    // TODO: we may want to prefer other modules over audioresample, like ffaudioresample, if they are
+    // available.
+    bool rv = swfdec_gst_decoder_init (&_decoder, srccaps, sinkcaps, "audioconvert", "audioresample", NULL);
     if (!rv) {
         throw MediaException(_("AudioDecoderGst: initialisation failed."));      
     }
