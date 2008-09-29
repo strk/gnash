@@ -493,28 +493,28 @@ DrawingWidget::resizeEvent(QResizeEvent *event)
 void
 DrawingWidget::play()
 {
-    _gui.menu_play();
+    _gui.play();
 }
 
 
 void
 DrawingWidget::pause()
 {
-    _gui.menu_pause();
+    _gui.pause();
 }
 
 
 void
 DrawingWidget::restart()
 {
-    _gui.menu_restart();
+    _gui.restart();
 }
 
 
 void
 DrawingWidget::stop()
 {
-    _gui.menu_stop();
+    _gui.stop();
 }
 
 
