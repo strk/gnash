@@ -55,9 +55,8 @@ public:
     ///                 This function checks for permission to load the URL.
     /// @param target   An as_object to load the data into using queueLoad,
     ///                 which only LoadableObjects should have.
-    /// @param post     If true (default), POSTs data, otherwise GET.
-    void sendAndLoad(const std::string& urlstr,
-                     as_object& target, bool post = true);
+    /// @param post     If true, POSTs data, otherwise GET.
+    void sendAndLoad(const std::string& urlstr, as_object& target, bool post);
 
     /// Carry out the AS load operation
     //
@@ -82,7 +81,12 @@ public:
 
 protected:
 
-    virtual void toString(std::ostream& o) const = 0;
+    /// Convert the Loadable Object to a string.
+    //
+    /// @param o        The ostream to write the string to.
+    /// @param encode   Whether URL encoding is necessary. How this
+    ///                 is done depends on the type of object.
+    virtual void toString(std::ostream& o, bool encode) const = 0;
 
     typedef std::list<LoadThread*> LoadThreadList;
 

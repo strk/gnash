@@ -648,6 +648,8 @@ as_value xml_send(const fn_call& fn)
 /// success of the connection is irrelevant.
 /// The second argument must be an object, but does not have to 
 /// be an XML object.
+/// An optional third argument specifies the method ("GET", or by default
+/// "POST"). The XML node values are partly URL encoded if using GET.
 static as_value
 xml_sendAndLoad(const fn_call& fn)
 {
@@ -682,7 +684,13 @@ xml_sendAndLoad(const fn_call& fn)
     boost::intrusive_ptr<as_object> targetObj = fn.arg(1).to_object();
     assert(targetObj);
 
-    ptr->sendAndLoad(filespec, *targetObj);
+	// Post by default, override by ActionScript third argument. This isn't
+	// documented, but it is possible to send XML objects by the GET method,
+	// exactly like LoadVars.
+	bool post = true;
+	if ( fn.nargs > 2 && fn.arg(2).to_string() == "GET" ) post = false;
+
+    ptr->sendAndLoad(filespec, *targetObj, post);
 
     return as_value(true);
 }
