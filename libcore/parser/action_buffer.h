@@ -18,8 +18,7 @@
 #ifndef GNASH_ACTION_BUFFER_H
 #define GNASH_ACTION_BUFFER_H
 
-#include "types.h"
-
+#include <boost/noncopyable.hpp>
 #include <boost/cstdint.hpp> // for boost::uint8_t
 #include <vector> // for composition
 
@@ -47,7 +46,8 @@ class ActionExec;
 /// so to eventually use a gnash::stream directly and
 /// avoid full loads. (not before profiling!).
 //
-class action_buffer
+/// Good, would make jumping to other tags possible.
+class action_buffer : boost::noncopyable
 {
 public:
 	friend class ActionExec;
@@ -145,18 +145,6 @@ public:
 		return reinterpret_cast<const unsigned char*>(&m_buffer.at(pc));
 	}
 
-    /// Get the base pointer of the code buffer.
-    const unsigned char* getCodeStart()
-	{
-		return reinterpret_cast<const unsigned char*>(&m_buffer);
-	}
-
-	const unsigned char* get_buffer(size_t pc) const
-	{
-		assert(pc < m_buffer.size() );
-		return reinterpret_cast<const unsigned char*>(&m_buffer[pc]);
-	}
-
 	/// Get a signed integer value from given offset
 	//
 	/// Useful to hide complexity of underlying buffer access.
@@ -247,12 +235,6 @@ public:
 	const std::string& getDefinitionURL() const;
 
 private:
-
-	// Don't put these as values in std::vector<>!  They contain
-	// internal pointers and cannot be moved or copied.
-	// If you need to keep an array of them, keep pointers
-	// to new'd instances.
-	action_buffer(const action_buffer& a);
 
 	/// the code itself, as read from the SWF
 	std::vector<boost::uint8_t> m_buffer;
