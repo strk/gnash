@@ -859,12 +859,15 @@ character::set_rotation(double rot)
 	double rotation = _rotation * PI / 180.0;
 
 	matrix m = get_matrix();
-#if 1
-	m.set_scale_rotation(xscale, yscale, rotation);
-#else
-	if ( _xscale < 0 && _yscale < 0 ) rotation += PI;
-	m.set_rotation(rotation);
-#endif
+
+	if ( ! get_parent() ) {
+		// doesn't have an original matrix, so always rebuild
+		m.set_scale_rotation(xscale, yscale, rotation);
+	} else {
+		if ( _xscale < 0 && _yscale < 0 ) rotation += PI;
+		m.set_rotation(rotation);
+	}
+
 	set_matrix(m); // we updated the cache ourselves
 #else
     double rotation = rot * PI / 180.0;
@@ -887,8 +890,12 @@ character::set_y_scale(double scale_percent)
 	double rotation = _rotation * PI / 180.0;
 
 	matrix m = get_matrix();
-	m.set_scale_rotation(xscale, yscale, rotation);
-	//m.set_y_scale(yscale);
+	if ( ! get_parent() ) {
+		// doesn't have an original matrix, so always rebuild
+		m.set_scale_rotation(xscale, yscale, rotation);
+	} else {
+		m.set_y_scale(yscale);
+	}
 	set_matrix(m); // we updated the cache ourselves
 #else
 	matrix m = get_matrix();
