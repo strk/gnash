@@ -868,8 +868,8 @@ character::set_rotation(double rot)
 
 #ifdef USE_MATRIX_CACHES
 
-	double xscale = _xscale / 100.0;
-	double yscale = _yscale / 100.0;
+	//double xscale = _xscale / 100.0;
+	//double yscale = _yscale / 100.0;
 	double rotation = rot * PI / 180.0;
 
 	//log_debug("xscale cached: %d, yscale cached: %d", _xscale, _yscale);
