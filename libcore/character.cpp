@@ -668,8 +668,9 @@ character::copyMatrix(const character& c)
 void
 character::set_matrix(const matrix& m, bool updateCache)
 {
-        assert(m.is_valid());
-        if (!(m == m_matrix))
+    log_debug("setting matrix to: %s", m);
+
+    if (!(m == m_matrix))
         {
 		set_invalidated(__FILE__, __LINE__);
 		m_matrix = m;
@@ -815,20 +816,28 @@ void
 character::set_x_scale(double scale_percent)
 {
 #ifdef USE_MATRIX_CACHES
-	_xscale = scale_percent;
+    double xscale = scale_percent / 100.0;
+
+    if (scale_percent * _xscale < 0)
+    {
+        log_debug("Flipping x scale");
+        xscale = -std::abs(xscale);
+    }
+    else xscale = std::abs(xscale);
+
+
+    _xscale = scale_percent;
 
     // As per misc-ming.all/matrix_test.{c,swf}
     // we don't need to recompute the matrix from the 
     // caches.
 
-	double xscale = _xscale / 100.0;
-	//double yscale = _yscale / 100.0;
-	//double rotation = _rotation * PI / 180.0;
 
 	matrix m = get_matrix();
-	//m.set_scale_rotation(xscale, yscale, rotation);
-	m.set_x_scale(xscale);
-	set_matrix(m); // we updated the cache ourselves
+
+    m.set_x_scale(xscale);
+
+    set_matrix(m); // we updated the cache ourselves
 #else
     double xscale = scale_percent / 100.0;
 	matrix m = get_matrix();
@@ -843,7 +852,7 @@ void
 character::set_rotation(double rot)
 {
 	// Translate to the -180 .. 180 range
-	rot = fmod (rot, 360.0);
+	rot = std::fmod (rot, 360.0);
 	if (rot > 180.0)
 		rot -= 360.0;
 	else if (rot < -180.0)
@@ -860,13 +869,8 @@ character::set_rotation(double rot)
 
 	matrix m = get_matrix();
 
-	if ( ! get_parent() ) {
-		// doesn't have an original matrix, so always rebuild
-		m.set_scale_rotation(xscale, yscale, rotation);
-	} else {
-		if ( _xscale < 0 && _yscale < 0 ) rotation += PI;
-		m.set_rotation(rotation);
-	}
+    // doesn't have an original matrix, so always rebuild
+	m.set_scale_rotation(xscale, yscale, rotation);
 
 	set_matrix(m); // we updated the cache ourselves
 #else
@@ -882,26 +886,21 @@ character::set_rotation(double rot)
 void
 character::set_y_scale(double scale_percent)
 {
-#ifdef USE_MATRIX_CACHES
+    double yscale = scale_percent / 100.0;
+    if (scale_percent * _yscale < 0)
+    {
+        log_debug("Flipping scale");    
+        yscale = -std::abs(yscale);
+    }
+    else yscale = std::abs(yscale);
+    
+    log_debug("yscale factor: %d", yscale);
+
 	_yscale = scale_percent;
 
-	double xscale = _xscale / 100.0;
-	double yscale = _yscale / 100.0;
-	double rotation = _rotation * PI / 180.0;
-
 	matrix m = get_matrix();
-	if ( ! get_parent() ) {
-		// doesn't have an original matrix, so always rebuild
-		m.set_scale_rotation(xscale, yscale, rotation);
-	} else {
-		m.set_y_scale(yscale);
-	}
+    m.set_y_scale(yscale);
 	set_matrix(m); // we updated the cache ourselves
-#else
-	matrix m = get_matrix();
-    m_matrix.set_y_scale(scale_percent / 100.0);
-	set_matrix(m); // we updated the cache ourselves
-#endif
 
 	transformedByScript(); 
 }
