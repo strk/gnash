@@ -1020,7 +1020,11 @@ Machine::execute()
 		boost::int32_t method_index = mStream->read_V32();
 		LOG_DEBUG_AVM("Creating new abc_function: method index=%u",method_index);
 		asMethod *m = pool_method(method_index, mPoolObject);
-		push_stack(as_value(m->getPrototype()));
+		abc_function* new_function = m->getPrototype();
+		//TODO: SafeStack contains all the scope objects in for all functions in the call stack.
+		//We should only copy the relevent scope objects to the function's scope stacks.
+		new_function->mScopeStack = mScopeStack;
+		push_stack(as_value(new_function));
 		break;
 	}
 /// 0x41 ABC_ACTION_CALL
@@ -2638,6 +2642,13 @@ as_value Machine::executeFunction(asMethod* function, const fn_call& fn){
 	execute();
 	mExitWithReturn = prev_ext;
 	stream->seekTo(0);
+	
+//TODO:  There is probably a better way to do this.  Maybe we should remove the mScopeStack property
+//		of Machine and always have functions reference their own scope stack.
+	for(unsigned int i=0;i<mCurrentFunction->mScopeStack.size();++i){
+		push_scope_stack(mCurrentFunction->mScopeStack.top(i));
+	}
+
 	return mGlobalReturn;
 }
 

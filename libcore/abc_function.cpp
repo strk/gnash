@@ -23,7 +23,7 @@
 
 namespace gnash{
 
-abc_function::abc_function(asMethod *methodInfo, Machine* machine):as_function(){
+abc_function::abc_function(asMethod *methodInfo, Machine* machine):mScopeStack(),as_function(){
 		mMethodInfo = methodInfo;
 		mMachine = machine;
 }

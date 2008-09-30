@@ -26,6 +26,8 @@
 #include "as_value.h"
 #include "CodeStream.h"
 #include "asClass.h"
+#include "SafeStack.h"
+#include "as_object.h"
 
 namespace gnash {
 
@@ -48,6 +50,9 @@ public:
 	CodeStream* getCodeStream(){ return mMethodInfo->getBody();}
 
 	boost::uint32_t getMaxRegisters(){ return mMethodInfo->getMaxRegisters(); }
+
+	SafeStack<boost::intrusive_ptr<as_object> > mScopeStack;
+
 };
 
 
