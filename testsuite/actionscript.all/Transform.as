@@ -164,10 +164,17 @@ check_equals(mc.transform.matrix.toString(), undefined);
 check_equals(mc2.transform.matrix.toString(), trans.matrix.toString());
 check_equals(mat.toString(), "(a=1, b=0, c=0, d=1, tx=0, ty=0)");
 
+check_equals(mc2._xscale, 100);
+check_equals(mc2._yscale, 100);
+check_equals(mc2._rotation, 1.5);
 trans.matrix = new Matrix(2, 0, 0, 2, 10, 11);
 
 check_equals(trans.matrix.toString(), "(a=2, b=0, c=0, d=2, tx=10, ty=11)");
 check_equals(mc2.transform.matrix.toString(), "(a=2, b=0, c=0, d=2, tx=10, ty=11)");
+
+check_equals(mc2._xscale, 100);
+check_equals(mc2._yscale, 100);
+check_equals(mc2._rotation, 1.5);
 
 delete mc2;
 
@@ -203,5 +210,5 @@ check_equals(mc.transform.matrix.toString(), "(a=1, b=0, c=0, d=1, tx=0, ty=0)")
 xcheck_equals(mcOld.transform.matrix.toString(), "(a=4, b=0.300000011920929, c=0.300000011920929, d=1, tx=1, ty=0)");
 
 
-totals(64);
+totals(70);
 #endif
