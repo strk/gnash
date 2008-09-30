@@ -191,15 +191,13 @@ void
 matrix::set_y_scale(double yscale)
 {
 #ifdef NEW_MATRIX_MATH
-    double rot_y = atan2((double)(-shy), (double)(sy));
+    double rot_y = std::atan2((double)(-shy), (double)(sy));
 
-    log_debug ("yscale: %d, rot_y: %d, pre sy: %d, cos rot: %d",
-            yscale, rot_y, sy, std::cos(rot_y));
+    shy = -DoubleToFixed16(yscale * std::sin(rot_y));
+    sy  =  DoubleToFixed16(yscale * std::cos(rot_y));
 
-    shy = -DoubleToFixed16(yscale * sin(rot_y));
-    sy  =  DoubleToFixed16(yscale * cos(rot_y));
+    log_debug("yscale %d, shy: %d, sy: %d", yscale, shy, sy);
 
-    log_debug("post sy: %d", sy);
 
 #else
     double angle = get_rotation();

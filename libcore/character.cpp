@@ -504,7 +504,7 @@ character::set_width(double newwidth)
 	const double oldwidth = bounds.width();
 	assert(oldwidth >= 0); // can't be negative can it?
 
-        double yscale = fabs(_yscale / 100.0); // see MovieClip.as. TODO: this is likely same as m.get_y_scale..
+        double yscale = std::abs(_yscale / 100.0); // see MovieClip.as. TODO: this is likely same as m.get_y_scale..
         double xscale = (newwidth / oldwidth);
         double rotation = _rotation * PI / 180.0;
 
@@ -668,10 +668,10 @@ character::copyMatrix(const character& c)
 void
 character::set_matrix(const matrix& m, bool updateCache)
 {
-    log_debug("setting matrix to: %s", m);
 
     if (!(m == m_matrix))
         {
+        //log_debug("setting matrix to: %s", m);
 		set_invalidated(__FILE__, __LINE__);
 		m_matrix = m;
 
@@ -684,7 +684,6 @@ character::set_matrix(const matrix& m, bool updateCache)
 		}
 #endif
         }
-	else log_debug("set_matrix of character %s: matrix not changed..", getTarget());
 	
 }
 
@@ -818,13 +817,15 @@ character::set_x_scale(double scale_percent)
 #ifdef USE_MATRIX_CACHES
     double xscale = scale_percent / 100.0;
 
-    if (scale_percent * _xscale < 0)
+    if (xscale != 0.0 && _xscale != 0.0)
     {
-        log_debug("Flipping x scale");
-        xscale = -std::abs(xscale);
+        if (scale_percent * _xscale < 0.0)
+        {
+            log_debug("Flipping x scale (%d, %d)", scale_percent, _xscale);
+            xscale = -std::abs(xscale);
+         }
+        else xscale = std::abs(xscale);
     }
-    else xscale = std::abs(xscale);
-
 
     _xscale = scale_percent;
 
@@ -896,14 +897,17 @@ void
 character::set_y_scale(double scale_percent)
 {
     double yscale = scale_percent / 100.0;
-    if (scale_percent * _yscale < 0)
-    {
-        log_debug("Flipping scale");    
-        yscale = -std::abs(yscale);
-    }
-    else yscale = std::abs(yscale);
     
-    log_debug("yscale factor: %d", yscale);
+    if (yscale != 0.0 && _yscale != 0.0)
+    {
+        if (scale_percent * _yscale < 0.0)
+        {
+            log_debug("Flipping y scale (%d, %d)", scale_percent, _yscale);
+            yscale = -std::abs(yscale);
+        }
+        else yscale = std::abs(yscale);
+    }
+    log_debug("yscale factor: %d, old percent: %d", yscale, _yscale);
 
 	_yscale = scale_percent;
 
