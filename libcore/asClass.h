@@ -26,7 +26,6 @@
 #include "CodeStream.h"
 #include "Property.h"
 #include "as_function.h"
-#include "abc_function.h"
 #include "abc_block.h"
 
 
@@ -47,6 +46,7 @@ class ClassHierarchy;
 class Property;
 class asName;
 class Machine;
+class abc_function;
 
 namespace abc_parsing{
 class abc_Trait;
@@ -357,7 +357,7 @@ private:
 
 public:
 
-	void initPrototype(Machine* machine){ mPrototype = new abc_function(this,machine);}
+	void initPrototype(Machine* machine);
 
 	boost::uint32_t getMaxRegisters(){ return mMaxRegisters;}
 
@@ -369,7 +369,7 @@ public:
 
 	void setBodyLength(boost::uint32_t length){ mBodyLength = length;}
 
-	as_function* getPrototype() { return mPrototype; }
+	abc_function* getPrototype() { return mPrototype; }
 
 	asBinding* getBinding(string_table::key name);
 

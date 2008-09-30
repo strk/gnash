@@ -139,6 +139,12 @@ asMethod::addSlotFunction(string_table::key name, asNamespace *ns,
 	return addValue(name, ns, slotId, &a, b, false);
 }
 
+void
+asMethod::initPrototype(Machine* machine)
+{
+	mPrototype = new abc_function(this,machine);
+}
+
 bool
 asClass::addSlotFunction(string_table::key name, asNamespace *ns,
 	boost::uint32_t slotId, asMethod *method, bool isstatic)
