@@ -1800,7 +1800,6 @@ main(int argc, char** argv)
 #endif
 
 	SWFMovie_nextFrame(mo);
-
 	SWFDisplayItem_remove(it);
 	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
 	SWFDisplayItem_setMatrix(it, 1, 0, 0, 1, 0, 0); 
@@ -1831,10 +1830,33 @@ main(int argc, char** argv)
 	check_equals(mo, "staticmc._xscale", "100");
 	check_equals(mo, "staticmc._yscale", "-200");
 
+	SWFMovie_nextFrame(mo);
+	SWFDisplayItem_remove(it);
+	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
+	SWFDisplayItem_setMatrix(it, 1, 0, 0, -2, 0, 0); 
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'-30.05,-60.1 30.05,60.1'");
+	check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=0, c=0, d=-2, tx=0, ty=0)'");
+	check_equals(mo, "staticmc._rotation", "0");
+	check_equals(mo, "staticmc._xscale", "100");
+	check_equals(mo, "staticmc._yscale", "200");
+
+	add_actions(mo, "staticmc._rotation = -90;"); // change _rotation using ActionScript
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'-60.1,-30.05 60.1,30.05'");
+	check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=0, b=-1, c=-2, d=0, tx=0, ty=0)'");
+	check_equals(mo, "staticmc._rotation", "-90");
+	check_equals(mo, "staticmc._xscale", "100");
+	check_equals(mo, "staticmc._yscale", "200");
+
+	add_actions(mo, "staticmc._rotation = 90;"); // change _rotation using ActionScript
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'-60.1,-30.05 60.1,30.05'");
+	check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=0, b=1, c=2, d=0, tx=0, ty=0)'");
+	check_equals(mo, "staticmc._rotation", "90");
+	check_equals(mo, "staticmc._xscale", "100");
+	check_equals(mo, "staticmc._yscale", "200");
 
 	SWFMovie_nextFrame(mo);
 
-	add_actions(mo, "_root.totals(1048); stop();");
+	add_actions(mo, "_root.totals(1063); stop();");
 	SWFMovie_nextFrame(mo);        
 
 	//Output movie
