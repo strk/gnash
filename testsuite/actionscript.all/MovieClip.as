@@ -103,7 +103,7 @@ endOfTest = function()
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(797); // SWF8+
+	check_totals(799); // SWF8+
 #endif
 
 	play();
@@ -1481,8 +1481,14 @@ check_equals(_root.transform.matrix.ty, 0);
 
 _root._x = 30;
 _root._y = 20;
+
+check_equals(_root.transform.matrix.toString(), "(a=1, b=0, c=0, d=1, tx=30, ty=20)");
+
 //_root._xscale = -300; // NOTE: gnash breaks the _root's matrix if we set _xscale here ! you can tell by failing localToGLobal/globalToLocal tests
 _root._yscale = -200;
+
+check_equals(_root.transform.matrix.toString(), "(a=1, b=0, c=0, d=-2, tx=30, ty=20)");
+
 _root._rotation = -90;
 
 check_equals(_root.transform.matrix.a, 0);

@@ -897,42 +897,65 @@ main(int argc, char** argv)
 	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
 	SWFDisplayItem_setMatrix(it, 1, 0, 0, -2, 200, 200); 
 	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'169.95,139.9 230.05,260.1'");
-    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=0, c=0, d=-2, tx=200, ty=200)'");
-
+	check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=0, c=0, d=-2, tx=200, ty=200)'");
 	check_equals(mo, "staticmc._xscale", "100");
 	check_equals(mo, "staticmc._rotation", "0");
 	check_equals(mo, "staticmc._yscale", "200");
+
 	add_actions(mo, "staticmc._yscale = 100;"); // swap _yscale sign using ActionScript
-    check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=1, b=0, c=0, d=-1, tx=200, ty=200)'");
+	check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=1, b=0, c=0, d=-1, tx=200, ty=200)'");
 	check_equals(mo, "staticmc._yscale", "100");
 	check_equals(mo, "staticmc._rotation", "0");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'170,170 230,230'");
-	add_actions(mo, "staticmc._yscale = 0 - staticmc._yscale;"); // swap _yscale sign using ActionScript
-	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'169.95,169.95 230.05,230.05'");
-    check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=0, c=0, d=1, tx=200, ty=200)'");
-	add_actions(mo, "staticmc._yscale = 0 - staticmc._yscale;"); // swap _yscale sign using ActionScript
-    check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=1, b=0, c=0, d=-1, tx=200, ty=200)'");
-	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'169.95,169.95 230.05,230.05'");
 
+	add_actions(mo, "staticmc._yscale = 0 - staticmc._yscale;"); // swap _yscale sign using ActionScript
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'169.95,169.95 230.05,230.05'");
+	check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=0, c=0, d=1, tx=200, ty=200)'");
+	check_equals(mo, "staticmc._yscale", "-100");
 	check_equals(mo, "staticmc._xscale", "100");
+	check_equals(mo, "staticmc._rotation", "0");
+
+	add_actions(mo, "staticmc._yscale = 0 - staticmc._yscale;"); // swap _yscale sign using ActionScript
+	check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=1, b=0, c=0, d=-1, tx=200, ty=200)'");
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'169.95,169.95 230.05,230.05'");
+	check_equals(mo, "staticmc._yscale", "100");
+	check_equals(mo, "staticmc._xscale", "100");
+	check_equals(mo, "staticmc._rotation", "0");
+
 	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
-    check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=-1, b=0, c=0, d=-1, tx=200, ty=200)'");
+	check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=-1, b=0, c=0, d=-1, tx=200, ty=200)'");
 	check_equals(mo, "staticmc._xscale", "-100");
+	check_equals(mo, "staticmc._yscale", "100");
+	check_equals(mo, "staticmc._rotation", "0");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'170,170 230,230'");
 
 	add_actions(mo, "staticmc._rotation = 2;"); // change _rotation using ActionScript
-    check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=-1, b=-0.03, c=0.03, d=-1, tx=200, ty=200)'");
+	check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=-1, b=-0.03, c=0.03, d=-1, tx=200, ty=200)'");
 	check_equals(mo, "staticmc._yscale", "100");
 	check_equals(mo, "staticmc._xscale", "-100");
 	check_equals(mo, "staticmc._rotation", "2");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'169,169 231,231'");
 
 	add_actions(mo, "staticmc._rotation = -2;"); // change _rotation using ActionScript
-    check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=-1, b=0.03, c=-0.03, d=-1, tx=200, ty=200)'");
+	check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=-1, b=0.03, c=-0.03, d=-1, tx=200, ty=200)'");
 	check_equals(mo, "staticmc._yscale", "100");
 	check_equals(mo, "staticmc._xscale", "-100");
 	check_equals(mo, "staticmc._rotation", "-2");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'169,169 231,231'");
+
+	add_actions(mo, "staticmc._rotation = -90;"); // change _rotation using ActionScript
+	check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=0, b=1, c=-1, d=0, tx=200, ty=200)'");
+	check_equals(mo, "staticmc._yscale", "100");
+	check_equals(mo, "staticmc._xscale", "-100");
+	check_equals(mo, "staticmc._rotation", "-90");
+	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'170,170 230,230'");
+
+	add_actions(mo, "staticmc._yscale = -100;"); // change _rotation using ActionScript
+	check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=0, b=1, c=1, d=0, tx=200, ty=200)'");
+	check_equals(mo, "staticmc._yscale", "-100");
+	check_equals(mo, "staticmc._xscale", "-100");
+	check_equals(mo, "staticmc._rotation", "-90");
+	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'170,170 230,230'");
 
 	SWFMovie_nextFrame(mo);
 
@@ -1778,7 +1801,40 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);
 
-	add_actions(mo, "_root.totals(1011); stop();");
+	SWFDisplayItem_remove(it);
+	it = add_static_mc(mo, "staticmc", 4, 0, 0, 60, 60);
+	SWFDisplayItem_setMatrix(it, 1, 0, 0, 1, 0, 0); 
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'-30.05,-30.05 30.05,30.05'");
+	check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=0, c=0, d=1, tx=0, ty=0)'");
+	check_equals(mo, "staticmc._rotation", "0");
+	check_equals(mo, "staticmc._xscale", "100");
+	check_equals(mo, "staticmc._yscale", "100");
+
+	add_actions(mo, "staticmc._yscale = -200;"); // change _yscale using ActionScript
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'-30.05,-60.1 30.05,60.1'");
+	check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=0, c=0, d=-2, tx=0, ty=0)'");
+	check_equals(mo, "staticmc._rotation", "0");
+	check_equals(mo, "staticmc._xscale", "100");
+	check_equals(mo, "staticmc._yscale", "-200");
+
+	add_actions(mo, "staticmc._rotation = -90;"); // change _rotation using ActionScript
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'-60.1,-30.05 60.1,30.05'");
+	xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=0, b=-1, c=-2, d=0, tx=0, ty=0)'");
+	check_equals(mo, "staticmc._rotation", "-90");
+	check_equals(mo, "staticmc._xscale", "100");
+	check_equals(mo, "staticmc._yscale", "-200");
+
+	add_actions(mo, "staticmc._rotation = 90;"); // change _rotation using ActionScript
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'-60.1,-30.05 60.1,30.05'");
+	xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=0, b=1, c=2, d=0, tx=0, ty=0)'");
+	check_equals(mo, "staticmc._rotation", "90");
+	check_equals(mo, "staticmc._xscale", "100");
+	check_equals(mo, "staticmc._yscale", "-200");
+
+
+	SWFMovie_nextFrame(mo);
+
+	add_actions(mo, "_root.totals(1048); stop();");
 	SWFMovie_nextFrame(mo);        
 
 	//Output movie
