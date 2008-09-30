@@ -25,6 +25,7 @@
 #include "as_function.h"
 #include "as_value.h"
 #include "CodeStream.h"
+#include "asClass.h"
 
 namespace gnash {
 
@@ -44,6 +45,9 @@ public:
 
 	as_value operator()(const fn_call& fn);
 
+	CodeStream* getCodeStream(){ return mMethodInfo->getBody();}
+
+	boost::uint32_t getMaxRegisters(){ return mMethodInfo->getMaxRegisters(); }
 };
 
 

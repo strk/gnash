@@ -207,7 +207,7 @@ public:
 
 	void initMachine(abc_block* pool_block,as_object* global);
 
-	as_value executeFunction(CodeStream* stream, boost::uint32_t maxRegisters, const fn_call& fn);
+	as_value executeFunction(asMethod* function, const fn_call& fn);
 
 	void instantiateClass(std::string className, as_object* global);
 
@@ -229,7 +229,7 @@ private:
 		as_value *mGlobalReturn;
 		as_object *mThis;
 		std::vector<as_value> mRegisters;
-
+		abc_function* mFunction;
 	void to_debug_string(){
 		LOG_DEBUG_AVM("StackDepth=%u StackTotalSize=%u ScopeStackDepth=%u ScopeTotalSize=%u",mStackDepth,mStackTotalSize,mScopeStackDepth,mScopeTotalSize);
 
@@ -329,6 +329,8 @@ private:
 	bool mIsAS3; // Is the stream an AS3 stream.
 	bool mExitWithReturn;
 	abc_block* mPoolObject; // Where all of the pools are stored.
+
+	abc_function* mCurrentFunction;
 
 	VM& _vm;
 };

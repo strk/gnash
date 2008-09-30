@@ -1479,7 +1479,7 @@ Machine::execute()
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
 	
 		as_value val = find_prop_strict(a);
-
+		LOG_DEBUG_AVM("VALUE FOUND.");
 		pop_stack();
 
 		push_stack(val);
@@ -2571,6 +2571,7 @@ Machine::restoreState()
 	mScopeStack.setAllSizes(s.mScopeTotalSize, s.mScopeStackDepth);
 	mStream = s.mStream;
 	mRegisters = s.mRegisters;
+	mCurrentFunction = s.mFunction;
 //	mExitWithReturn = s.mReturn;
 //	mDefaultXMLNamespace = s.mDefaultXMLNamespace;
 //	mCurrentScope = s.mCurrentScope;
@@ -2595,6 +2596,7 @@ Machine::saveState()
 	s.mStream = mStream;
 	s.to_debug_string();
 	s.mRegisters = mRegisters;
+	s.mFunction = mCurrentFunction;
 //	s.mReturn = mExitWithReturn;
 //	s.mDefaultXMLNamespace = mDefaultXMLNamespace;
 //	s.mCurrentScope = mCurrentScope;
@@ -2608,20 +2610,11 @@ void Machine::initMachine(abc_block* pool_block,as_object* global)
 	log_debug("Getting entry script.");
 	asClass* start_script = pool_block->mScripts.back();
 	log_debug("Getting constructor.");
-	asMethod* method = start_script->getConstructor();
-	clearRegisters(method->getMaxRegisters());
-//	mRegisters.push(global);
- 	int i;
- 	for(i=0;i<start_script->mTraits.size();i++){
- 		abc_Trait trait = start_script->mTraits[i];
-		asMethod* constructor = pool_block->mClasses[trait.mClassInfoIndex]->getStaticConstructor();
- 		boost::uint8_t opcode;
- 		log_debug("AVM2: TraitConstructor flags: 0x%X, class index=%u Code:",trait.mKind | 0x0,trait.mClassInfoIndex);
-		constructor->print_body();
-		//executeCodeblock(stream);		
-	}
+	asMethod* constructor = start_script->getConstructor();
+	clearRegisters(constructor->getMaxRegisters());
 	log_debug("Loding code stream.");
-	mStream = method->getBody();
+	mStream = constructor->getBody();
+	mCurrentFunction = constructor->getPrototype();
 	mRegisters[0] = as_value(global);
 	mGlobalObject = global;
 }
@@ -2629,11 +2622,13 @@ void Machine::initMachine(abc_block* pool_block,as_object* global)
 //This is called by abc_functions to execute their code stream.
 //TODO: There is probably a better way to do this, once we understand what the VM is supposed
 //todo, this should be fixed.
-as_value Machine::executeFunction(CodeStream* stream, boost::uint32_t maxRegisters, const fn_call& fn){
+as_value Machine::executeFunction(asMethod* function, const fn_call& fn){
 	
 //TODO: Figure out a good way to use the State object to handle returning values.
+	mCurrentFunction = function->getPrototype();
 	bool prev_ext = mExitWithReturn;
-	load_function(stream, maxRegisters);
+	CodeStream *stream = function->getBody();
+	load_function(stream, function->getMaxRegisters());
 	mExitWithReturn = true;
 	mRegisters[0] = as_value(fn.this_ptr);
 	for(unsigned int i=0;i<fn.nargs;i++){
@@ -2656,6 +2651,7 @@ void Machine::instantiateClass(std::string className, as_object* global){
 
 	asClass* theClass = mPoolObject->locateClass(className);
 	clearRegisters(theClass->getConstructor()->getMaxRegisters());
+	mCurrentFunction = theClass->getConstructor()->getPrototype();
 	mStack.clear();
 	mScopeStack.clear();
 	mRegisters[0] = as_value(global);
@@ -2688,13 +2684,14 @@ as_value Machine::find_prop_strict(asName multiname){
 	}
 
 	LOG_DEBUG_AVM("Cannot find property in scope stack.  Trying again using as_environment.");
-	as_object *target;
+	as_object *target = NULL;
 	as_environment env = as_environment(_vm);
 	std::string name = mPoolObject->mStringPool[multiname.getABCName()];
 	std::string ns = mPoolObject->mStringPool[multiname.getNamespace()->getAbcURI()];
 	std::string path = ns.size() == 0 ? name : ns + "." + name;
 	val = env.get_variable(path,*getScopeStack(),&target);
-	push_stack(as_value(target));
+	LOG_DEBUG_AVM("Got value.");
+	push_stack(as_value(target));	
 	mScopeStack.pop();
 	return val;
 }
