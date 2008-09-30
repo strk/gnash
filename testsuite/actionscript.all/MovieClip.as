@@ -103,7 +103,7 @@ endOfTest = function()
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(783); // SWF8+
+	check_totals(797); // SWF8+
 #endif
 
 	play();
@@ -1403,6 +1403,41 @@ _alpha = 100;
 //----------------------------------------------
 // Test transform
 //----------------------------------------------
+
+#if OUTPUT_VERSION >=8
+tmp = _root.createEmptyMovieClip("tmp", getNextHighestDepth());
+tmptr = tmp.transform;
+
+check_equals(printMatrix(tmp.transform.matrix, 2), "(a=1, b=0, c=0, d=1, tx=0, ty=0)");
+tmp._yscale = 200;
+check_equals(printMatrix(tmp.transform.matrix, 2), "(a=1, b=0, c=0, d=2, tx=0, ty=0)");
+tmp._rotation = Math.PI / 4;
+check_equals(printMatrix(tmp.transform.matrix, 2), "(a=1, b=0.01, c=-0.03, d=2, tx=0, ty=0)");
+tmp._yscale = -100;
+check_equals(printMatrix(tmp.transform.matrix, 2), "(a=1, b=0.01, c=0.01, d=-1, tx=0, ty=0)");
+tmp._yscale = -100;
+xcheck_equals(printMatrix(tmp.transform.matrix, 2), "(a=1, b=0.01, c=0.01, d=-1, tx=0, ty=0)");
+tmp._yscale = 100;
+check_equals(printMatrix(tmp.transform.matrix, 2), "(a=1, b=0.01, c=-0.01, d=1, tx=0, ty=0)");
+tmp._xscale = -100;
+check_equals(printMatrix(tmp.transform.matrix, 2), "(a=-1, b=-0.01, c=-0.01, d=1, tx=0, ty=0)");
+tmp._rotation = Math.PI / 2;
+xcheck_equals(printMatrix(tmp.transform.matrix, 2), "(a=-1, b=-0.03, c=-0.03, d=1, tx=0, ty=0)");
+tmp._xscale = 100;
+xcheck_equals(printMatrix(tmp.transform.matrix, 2), "(a=1, b=0.03, c=-0.03, d=1, tx=0, ty=0)");
+tmp._yscale = -100;
+xcheck_equals(printMatrix(tmp.transform.matrix, 2), "(a=1, b=0.03, c=0.03, d=-1, tx=0, ty=0)");
+tmp._x = 3;
+tmp._y = 6;
+xcheck_equals(printMatrix(tmp.transform.matrix, 2), "(a=1, b=0.03, c=0.03, d=-1, tx=3, ty=6)");
+tmp._yscale = 100;
+check_equals(printMatrix(tmp.transform.matrix, 2), "(a=1, b=0.03, c=-0.03, d=1, tx=3, ty=6)");
+tmp._yscale = -0;
+check_equals(printMatrix(tmp.transform.matrix, 2), "(a=1, b=0.03, c=0, d=0, tx=3, ty=6)");
+tmp._yscale = 0;
+check_equals(printMatrix(tmp.transform.matrix, 2), "(a=1, b=0.03, c=0, d=0, tx=3, ty=6)");
+#endif
+
 
 #if OUTPUT_VERSION < 8
 check_equals(typeof(_root.transform), 'undefined'); 
