@@ -1359,9 +1359,10 @@ Machine::execute()
 ///  vtable -- A new virtual table, which has the previous one as a parent.
 	case SWF::ABC_ACTION_NEWACTIVATION:
 	{
-		// TODO: I think this is supposed to create an object to store environment information.
-		//to be used with functions.
-		push_stack(as_value(new as_object));
+		// TODO:  The function contains traits that need to be included in the activation object.
+		//For now we are using the function object as the activation object.  There is probably
+		//a better way.
+		push_stack(as_value(mCurrentFunction));
 		break;
 	}
 /// 0x58 ABC_ACTION_NEWCLASS
