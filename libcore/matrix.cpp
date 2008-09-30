@@ -304,8 +304,8 @@ matrix::invert()
     boost::int64_t det = determinant();
     if(det == 0)
     {
-        log_error("Matrix not invertible, setting to identity on invert request");
-        // TODO: check this.
+        //log_debug("Matrix not invertible, setting to identity on invert request");
+        // tested in misc-ming.all/matrix_test.c (seek "matrix inversion")
         set_identity();
     }
     else
