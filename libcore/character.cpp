@@ -867,27 +867,24 @@ character::set_rotation(double rot)
 	//log_debug("_rotation: %d", rot);
 
 #ifdef USE_MATRIX_CACHES
-	_rotation = rot;
 
 	double xscale = _xscale / 100.0;
 	double yscale = _yscale / 100.0;
-	double rotation = _rotation * PI / 180.0;
+	double rotation = rot * PI / 180.0;
+
+	//log_debug("xscale cached: %d, yscale cached: %d", _xscale, _yscale);
+
+        if (_xscale < 0 ) // TODO: check if there's any case we should use _yscale here
+	{
+		rotation += PI;
+	}
 
 	matrix m = get_matrix();
-
-    //log_debug("xscale cached: %d, yscale cached: %d", _xscale, _yscale);
-
-    if (get_parent())
-    {
-        if (_xscale < 0 || _yscale < 0) rotation += PI;
         m.set_rotation(rotation);
-    }
-    else
-    {
-        m.set_scale_rotation(xscale, yscale, rotation);
-    }
+	set_matrix(m); // we update the cache ourselves
 
-	set_matrix(m); // we updated the cache ourselves
+	_rotation = rot;
+
 #else
     double rotation = rot * PI / 180.0;
 	matrix m = get_matrix();

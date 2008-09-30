@@ -1818,14 +1818,14 @@ main(int argc, char** argv)
 
 	add_actions(mo, "staticmc._rotation = -90;"); // change _rotation using ActionScript
 	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'-60.1,-30.05 60.1,30.05'");
-	xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=0, b=-1, c=-2, d=0, tx=0, ty=0)'");
+	check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=0, b=-1, c=-2, d=0, tx=0, ty=0)'");
 	check_equals(mo, "staticmc._rotation", "-90");
 	check_equals(mo, "staticmc._xscale", "100");
 	check_equals(mo, "staticmc._yscale", "-200");
 
 	add_actions(mo, "staticmc._rotation = 90;"); // change _rotation using ActionScript
 	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'-60.1,-30.05 60.1,30.05'");
-	xcheck_equals(mo, "staticmc.transform.matrix.toString()", "'(a=0, b=1, c=2, d=0, tx=0, ty=0)'");
+	check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=0, b=1, c=2, d=0, tx=0, ty=0)'");
 	check_equals(mo, "staticmc._rotation", "90");
 	check_equals(mo, "staticmc._xscale", "100");
 	check_equals(mo, "staticmc._yscale", "-200");
