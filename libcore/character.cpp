@@ -869,8 +869,17 @@ character::set_rotation(double rot)
 
 	matrix m = get_matrix();
 
-    // doesn't have an original matrix, so always rebuild
-	m.set_scale_rotation(xscale, yscale, rotation);
+    log_debug("xscale cached: %d, yscale cached: %d", _xscale, _yscale);
+
+    if (get_parent())
+    {
+        if (_xscale < 0 || _yscale < 0) rotation += PI;
+        m.set_rotation(rotation);
+    }
+    else
+    {
+        m.set_scale_rotation(xscale, yscale, rotation);
+    }
 
 	set_matrix(m); // we updated the cache ourselves
 #else
