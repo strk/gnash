@@ -52,6 +52,8 @@ using namespace std;
 //
 // TODO: let user tweak this ?
 //
+// See bug #24371 for pointers to FLV files needing so much.
+//
 #define PROBE_BYTES 8192
 
 // Define the following macro the have seek() operations printed
