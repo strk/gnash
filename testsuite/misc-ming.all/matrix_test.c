@@ -911,24 +911,24 @@ main(int argc, char** argv)
 	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'169.95,169.95 230.05,230.05'");
     check_equals(mo, "staticmc.transform.matrix.toString()", "'(a=1, b=0, c=0, d=1, tx=200, ty=200)'");
 	add_actions(mo, "staticmc._yscale = 0 - staticmc._yscale;"); // swap _yscale sign using ActionScript
-    xcheck_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=1, b=0, c=0, d=-1, tx=200, ty=200)'");
+    check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=1, b=0, c=0, d=-1, tx=200, ty=200)'");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'169.95,169.95 230.05,230.05'");
 
 	check_equals(mo, "staticmc._xscale", "100");
 	add_actions(mo, "staticmc._xscale = 0 - staticmc._xscale;"); // swap _xscale sign using ActionScript
-    xcheck_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=-1, b=0, c=0, d=-1, tx=200, ty=200)'");
+    check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=-1, b=0, c=0, d=-1, tx=200, ty=200)'");
 	check_equals(mo, "staticmc._xscale", "-100");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'170,170 230,230'");
 
 	add_actions(mo, "staticmc._rotation = 2;"); // change _rotation using ActionScript
-    xcheck_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=-1, b=-0.03, c=0.03, d=-1, tx=200, ty=200)'");
+    check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=-1, b=-0.03, c=0.03, d=-1, tx=200, ty=200)'");
 	check_equals(mo, "staticmc._yscale", "100");
 	check_equals(mo, "staticmc._xscale", "-100");
 	check_equals(mo, "staticmc._rotation", "2");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root), 0)", "'169,169 231,231'");
 
 	add_actions(mo, "staticmc._rotation = -2;"); // change _rotation using ActionScript
-    xcheck_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=-1, b=0.03, c=-0.03, d=-1, tx=200, ty=200)'");
+    check_equals(mo, "printMatrix(staticmc.transform.matrix, 2)", "'(a=-1, b=0.03, c=-0.03, d=-1, tx=200, ty=200)'");
 	check_equals(mo, "staticmc._yscale", "100");
 	check_equals(mo, "staticmc._xscale", "-100");
 	check_equals(mo, "staticmc._rotation", "-2");
