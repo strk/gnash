@@ -196,9 +196,6 @@ matrix::set_y_scale(double yscale)
     shy = -DoubleToFixed16(yscale * std::sin(rot_y));
     sy  =  DoubleToFixed16(yscale * std::cos(rot_y));
 
-    log_debug("yscale %d, shy: %d, sy: %d", yscale, shy, sy);
-
-
 #else
     double angle = get_rotation();
     double cos_v = cos(angle);
