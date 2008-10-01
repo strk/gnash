@@ -18,7 +18,7 @@ while(<STDIN>){
 				print $_;
 			}
 			else{
-				print "class String_hx{ static function main(){";
+				print "class $ARGV[0]_as{ static function main(){";
 				last;
 			}
 		}
