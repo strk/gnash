@@ -344,7 +344,9 @@ VideoDecoderFfmpeg::flashToFfmpegCodec(videoCodecType format)
         // Find the decoder and init the parser
         switch(format) {
                 case VIDEO_CODEC_H263:
-                         return CODEC_ID_FLV1; // why not CODEC_ID_H263I ?
+			 // CODEC_ID_H263I didn't work with Lavc51.50.0
+			 // and NetStream-SquareTest.swf
+                         return CODEC_ID_FLV1;
 #ifdef FFMPEG_VP6
                 case VIDEO_CODEC_VP6:
                         return CODEC_ID_VP6F;
