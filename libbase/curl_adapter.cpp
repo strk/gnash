@@ -36,10 +36,11 @@
 #include <boost/version.hpp>
 #include <boost/assign/list_of.hpp>
 
-namespace gnash {
-
 
 #ifndef USE_CURL
+
+namespace gnash {
+
 // Stub for warning about access when no libcurl is defined.
 
 std::auto_ptr<IOChannel>
@@ -62,6 +63,8 @@ NetworkAdapter::makeStream(const std::string& url, const std::string& postdata,
 {
     return makeStream(url);
 }
+
+} // namespace gnash
 
 #else // def USE_CURL
 
@@ -91,6 +94,8 @@ NetworkAdapter::makeStream(const std::string& url, const std::string& postdata,
 // define this if you want seeks back to be reported
 //#define GNASH_CURL_WARN_SEEKSBACK 1
 
+
+namespace gnash {
 
 namespace {
 
@@ -1333,9 +1338,9 @@ NetworkAdapter::_reservedNames = boost::assign::list_of
     ("Warning")
     ("WWW-Authenticate");
 
-#endif // def USE_CURL
-
 } // namespace gnash
+
+#endif // def USE_CURL
 
 
 // Local Variables:
