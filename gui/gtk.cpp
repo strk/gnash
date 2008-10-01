@@ -1461,7 +1461,7 @@ GtkGui::showAboutDialog()
         NULL 
     };
 
-    std::string comments = _("Gnash is the GNU Flash movie player based on GameSWF.");
+    std::string comments = _("Gnash is the GNU SWF Player based on GameSWF.");
 
     comments.append(_("\nRenderer: "));
     comments.append(RENDERER_CONFIG);
@@ -1491,7 +1491,7 @@ GtkGui::showAboutDialog()
     GtkWidget* aboutWidget = gtk_about_dialog_new();
     GtkAboutDialog* about = GTK_ABOUT_DIALOG(aboutWidget);
 
-    gtk_about_dialog_set_name (about, _("GNASH flash movie player"));
+    gtk_about_dialog_set_name (about, "Gnash");
     gtk_about_dialog_set_version(about, VERSION);
     gtk_about_dialog_set_copyright(about, "Copyright (C) 2005, 2006, 2007, 2008 "
                      	"The Free Software Foundation");
@@ -1524,7 +1524,7 @@ GtkGui::showAboutDialog()
 
     gtk_show_about_dialog (
         NULL,
-        "program-name", _("GNASH flash movie player"), 
+        "program-name", _("Gnash"), 
         "version", VERSION,
         "copyright", "Copyright (C) 2005, 2006, 2007, 2008 "
                      "The Free Software Foundation",
