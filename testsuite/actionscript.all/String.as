@@ -18,7 +18,31 @@
 
 
 rcsid="$Id: String.as,v 1.56 2008/04/25 11:11:08 bwy Exp $";
+
+#ifdef HAXE
+#include "haxe-swf9/check.as"
+#else
 #include "check.as"
+#endif
+
+#ifdef HAXE
+var c;
+var p = ""; //This is temporary until we don't have to comment out some of the tests.
+var str;
+var ar;
+var st;
+var g:Dynamic;
+var e;
+var s;
+var r;
+var o;
+var ret:Dynamic;
+var b = ""; //This is temporary until we don't have to comment out some of the tests.;
+var numberObject= ""; //This is temporary until we don't have to comment out some of the tests.;
+var stringObject;
+var primitiveString;
+var prevToStringFunc;
+#endif
 
 check_equals(typeof(String), 'function');
 check_equals(typeof(String.prototype), 'object');
@@ -84,8 +108,11 @@ check(!String.prototype.hasOwnProperty('length'));
 #endif
 
 check_equals(typeof(String()), 'string');
-
+#ifdef HAXE
+var a:Dynamic;
+#else
 var a;
+#endif
 a = new String("wallawallawashinGTON");
 check_equals(a.length, 20);
 #if OUTPUT_VERSION > 5
@@ -109,13 +136,19 @@ isNaN (a.charAt(21) );
 check_equals ( a.lastIndexOf("lawa"), 8);
 
 // Applied to object.
+
 o = new Object;
+
+#ifndef HAXE
 o.charCodeAt = String.prototype.charCodeAt;
 o.charAt = String.prototype.charAt;
+
 c = o.charAt(4);
 check_equals(c, "e");
 c = o.charCodeAt(4);
 check_equals(c, "101");
+
+#endif
 //----------------------------------------
 // Check String.indexOf
 // TODO: test with ASnative(251,8)
@@ -331,11 +364,12 @@ ar = o.split("b");
 check_equals(ar.length, 3);
 check_equals(ar.toString(), "[o,ject O,ject]");
 
+#ifndef HAXE
 o = new Date(0);
 o.split = String.prototype.split;
 ar = o.split(":");
 check_equals(ar.length, 3);
-
+#endif
 
 #else
 // SWF5:
@@ -803,8 +837,11 @@ check_equals (typeof(c), "string");
 //-------------------------------------------
 
 // These tests are only correct with SWF6 and above.
-
+#ifdef HAXE
+var a:Dynamic = new String("Längere Wörter");
+#else
 var a = new String("Längere Wörter");
+#endif
 
 #if OUTPUT_VERSION > 5
 check_equals (a.length, 14);
