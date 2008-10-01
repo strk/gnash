@@ -104,7 +104,7 @@ SoundFfmpeg::getAudio(boost::uint8_t* stream, int len)
 	}
 
 	// drop any queued video frame
-	while (_mediaParser->nextVideoFrame().get());
+	while (_mediaParser->nextVideoFrame().get()) {};
 
 	return true;
 }
