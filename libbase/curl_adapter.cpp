@@ -36,8 +36,7 @@
 #include <boost/version.hpp>
 #include <boost/assign/list_of.hpp>
 
-using gnash::log_debug;
-using gnash::log_error;
+namespace gnash {
 
 
 #ifndef USE_CURL
@@ -92,8 +91,6 @@ NetworkAdapter::makeStream(const std::string& url, const std::string& postdata,
 // define this if you want seeks back to be reported
 //#define GNASH_CURL_WARN_SEEKSBACK 1
 
-
-namespace gnash {
 
 namespace {
 
@@ -1336,9 +1333,10 @@ NetworkAdapter::_reservedNames = boost::assign::list_of
     ("Warning")
     ("WWW-Authenticate");
 
+#endif // def USE_CURL
+
 } // namespace gnash
 
-#endif // def USE_CURL
 
 // Local Variables:
 // mode: C++
