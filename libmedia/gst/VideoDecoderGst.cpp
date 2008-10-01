@@ -76,16 +76,16 @@ VideoDecoderGst::VideoDecoderGst(videoCodecType codec_type, int width, int heigh
       _pipeline = NULL;
       break;
     default:
-      log_error("No support for this video codec. %d", codec_type);
+      log_error("No support for video codec %d (%s).", (int)codec_type, codec_type);
       gst_object_unref (GST_OBJECT (_pipeline));
       _pipeline = NULL;
       return;
   }
   
   if (!decoder) {
-    log_error(_("failed to initialize the video decoder. Embedded video "
+    log_error(_("Failed to initialize the video decoder for codec %d (%s). Embedded video "
                 "playback will not be available; consider installing "
-                "gstreamer-ffmpeg."));
+                "gstreamer-ffmpeg."), (int)codec_type, codec_type);
     gst_object_unref (GST_OBJECT (_pipeline));
     _pipeline = NULL;
     return;

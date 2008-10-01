@@ -92,6 +92,8 @@ enum videoCodecType
 	VIDEO_CODEC_SCREENVIDEO2 = 6
 };
 
+std::ostream& operator<< (std::ostream& os, const videoCodecType& t);
+
 /// Audio codec ids as defined in flash
 enum audioCodecType
 {
@@ -113,6 +115,8 @@ enum audioCodecType
 	/// Proprietary simple format
 	AUDIO_CODEC_NELLYMOSER = 6
 };
+
+std::ostream& operator<< (std::ostream& os, const audioCodecType& t);
 
 /// \brief
 /// The AudioInfo class contains information about the audiostream

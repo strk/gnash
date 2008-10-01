@@ -374,6 +374,62 @@ std::ostream& operator << (std::ostream& os, const VideoInfo& vi)
 	return os;
 }
 
+std::ostream&
+operator<< (std::ostream& os, const videoCodecType& t)
+{
+        switch (t)
+        {
+                case VIDEO_CODEC_H263:
+                        os << "H263";
+                        break;
+                case VIDEO_CODEC_SCREENVIDEO:
+                        os << "Screenvideo";
+                        break;
+                case VIDEO_CODEC_VP6:
+                        os << "VP6";
+                        break;
+                case VIDEO_CODEC_VP6A:
+                        os << "VP6A";
+                        break;
+                case VIDEO_CODEC_SCREENVIDEO2:
+                        os << "Screenvideo2";
+                        break;
+                default:
+                        os << "unknown/invalid";
+                        break;
+        }
+        return os;
+}
+
+std::ostream&
+operator<< (std::ostream& os, const audioCodecType& t)
+{
+        switch (t)
+        {
+                case AUDIO_CODEC_RAW:
+                        os << "Raw";
+                        break;
+                case AUDIO_CODEC_ADPCM:
+                        os << "ADPCM";
+                        break;
+                case AUDIO_CODEC_MP3:
+                        os << "MP3";
+                        break;
+                case AUDIO_CODEC_UNCOMPRESSED:
+                        os << "Uncompressed";
+                        break;
+                case AUDIO_CODEC_NELLYMOSER_8HZ_MONO:
+                        os << "Nellymoser 8Hz mono";
+                        break;
+                case AUDIO_CODEC_NELLYMOSER:
+                        os << "Nellymoser";
+                        break;
+                default:
+                        os << "unknown/invalid";
+                        break;
+        }
+        return os;
+}
 
 } // end of gnash::media namespace
 } // end of gnash namespace
