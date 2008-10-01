@@ -1130,6 +1130,9 @@ PKG_PROG_PKG_CONFIG
 AC_PATH_PROG(PYTHON, python, ,[${pathlist}])
 AM_CONDITIONAL([ENABLE_GNASH_PYTHON_MODULE], false)
 
+AC_PATH_PROG(PERL, perl)
+AM_CONDITIONAL(HAVE_PERL, test x"$PERL" != x)
+
 dnl Look for scratchbox
 sbox=no
 if test x"${SBOX_REDIRECT_FROM_DIRS}" != x; then
