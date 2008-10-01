@@ -1483,6 +1483,45 @@ GtkGui::showAboutDialog()
     gtk_about_dialog_set_url_hook(NULL, NULL, NULL);
     GdkPixbuf *logo_pixbuf = createPixbuf("GnashG.png");
 
+#if 1
+    // gtk-2.8.20 (Debian 4.0) doesn't work fine with 
+    // the gtk_show_about_dialog() call [ omits info ].
+    // See bug #24426.
+
+    GtkWidget* aboutWidget = gtk_about_dialog_new();
+    GtkAboutDialog* about = GTK_ABOUT_DIALOG(aboutWidget);
+
+    gtk_about_dialog_set_name (about, _("GNASH flash movie player"));
+    gtk_about_dialog_set_version(about, VERSION);
+    gtk_about_dialog_set_copyright(about, "Copyright (C) 2005, 2006, 2007, 2008 "
+                     	"The Free Software Foundation");
+    gtk_about_dialog_set_comments (about, comments.c_str());
+    gtk_about_dialog_set_authors(about, authors);
+    gtk_about_dialog_set_documenters(about, documentors);
+    gtk_about_dialog_set_artists(about, artists);
+    gtk_about_dialog_set_translator_credits(about, _("translator-credits"));
+    gtk_about_dialog_set_logo(about, logo_pixbuf);
+    gtk_about_dialog_set_license(about, 
+        "This program is free software; you can redistribute it and/or modify\n"
+        "it under the terms of the GNU General Public License as published by\n"
+        "the Free Software Foundation; either version 3 of the License, or\n"
+        "(at your option) any later version.\n\n"
+        "This program is distributed in the hope that it will be useful,\n"
+        "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+        "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+        "GNU General Public License for more details.\n"
+        "You should have received a copy of the GNU General Public License\n"
+        "along with this program; if not, write to the Free Software\n"
+        "Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA"
+	);
+    gtk_about_dialog_set_website(about, "http://www.gnu.org/software/gnash/");
+
+
+    gtk_widget_show (aboutWidget);
+
+#else
+
+
     gtk_show_about_dialog (
         NULL,
         "program-name", _("GNASH flash movie player"), 
@@ -1509,6 +1548,7 @@ GtkGui::showAboutDialog()
         "Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA",
         "website", "http://www.gnu.org/software/gnash/",
         NULL);
+#endif
 }
 
 void
