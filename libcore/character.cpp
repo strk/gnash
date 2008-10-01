@@ -565,7 +565,7 @@ character::set_height(double newheight)
         double xscale = _xscale / 100.0;
         double rotation = _rotation * PI / 180.0;
 
-        log_debug("setting yscale from %g to %g", _yscale, yscale*100);
+        //log_debug("setting yscale from %g to %g", _yscale, yscale*100);
 
         matrix m = get_matrix();
         m.set_scale_rotation(xscale, yscale, rotation);
@@ -826,9 +826,8 @@ character::set_x_scale(double scale_percent)
     {
         if (scale_percent * _xscale < 0.0)
         {
-            log_debug("Flipping x scale (%d, %d)", scale_percent, _xscale);
             xscale = -std::abs(xscale);
-         }
+        }
         else xscale = std::abs(xscale);
     }
 
@@ -904,12 +903,10 @@ character::set_y_scale(double scale_percent)
     {
         if (scale_percent * _yscale < 0.0)
         {
-            log_debug("Flipping y scale (%d, %d)", scale_percent, _yscale);
             yscale = -std::abs(yscale);
         }
         else yscale = std::abs(yscale);
     }
-    //log_debug("yscale factor: %d, old percent: %d", yscale, _yscale);
 
 	_yscale = scale_percent;
 
