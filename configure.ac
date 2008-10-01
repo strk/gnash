@@ -2279,9 +2279,7 @@ fi
 echo "        GUI toolkits supported: ${SUPPORTED_GUIS}"
 echo "        Renderers supported: ${add_renderer}"
 echo "        Media handler: "$media_handler
-if test x"$media_handler" = xffmpeg; then
 echo "        Using SDL for sound handling"
-fi
 echo "        Using $with_shm mode for shared memory"
 echo ""
 echo "Configured paths for ${build} are:"
@@ -2665,6 +2663,7 @@ fi
 need_sdl=false
 test x$build_sdl = xyes			&& need_sdl=true
 test x"$media_handler" = x"ffmpeg"	&& need_sdl=true
+test x"$media_handler" = x"gst"		&& need_sdl=true
 
 if $need_sdl; then
   if test x"$SDL_LIBS" != x; then
