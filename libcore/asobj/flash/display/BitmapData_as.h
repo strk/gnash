@@ -45,9 +45,9 @@ public:
 	BitmapData_as(size_t width, size_t height,
 	              bool transparent, boost::uint32_t fillColor);
 
-    const size_t getWidth() const { return _width; }
-    const size_t getHeight() const { return _height; }
-    const bool isTransparent() const { return _transparent; }
+    size_t getWidth() const { return _width; }
+    size_t getHeight() const { return _height; }
+    bool isTransparent() const { return _transparent; }
     
     const BitmapArray& getBitmapData() const
     {
