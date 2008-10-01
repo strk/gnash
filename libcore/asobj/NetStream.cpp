@@ -80,7 +80,6 @@ NetStream::NetStream()
 	m_isFLV(false),
 	inputPos(0),
 	_invalidatedVideoCharacter(0),
-	_lastStatus(invalidStatus),
 	_decoding_state(DEC_NONE),
 
 	// TODO: if audio is available, use _audioClock instead of SystemClock
@@ -91,6 +90,8 @@ NetStream::NetStream()
 	_soundHandler(get_sound_handler()),
 	_mediaHandler(media::MediaHandler::get()),
 	_audioQueueSize(0),
+	_auxStreamerAttached(false),
+	_lastStatus(invalidStatus),
 	_advanceTimer(0)
 {
 }
