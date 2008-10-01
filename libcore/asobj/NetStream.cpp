@@ -1171,7 +1171,7 @@ NetStream::decodeNextVideoFrame()
 	if ( ! video.get() )
 	{
 		// TODO: tell more about the failure
-		log_error("Error decoding encoded video frame in NetSTream input");
+		log_error(_("Error decoding encoded video frame in NetStream input"));
 	}
 
 	return video;

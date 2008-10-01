@@ -83,9 +83,9 @@ VideoDecoderGst::VideoDecoderGst(videoCodecType codec_type, int width, int heigh
   }
   
   if (!decoder) {
-    log_error(_("Failed to initialize the video decoder for codec %d (%s). Embedded video "
-                "playback will not be available; consider installing "
-                "gstreamer-ffmpeg."), (int)codec_type, codec_type);
+    log_error(_("Failed to initialize the video decoder for codec %d (%s). "
+                "Consider installing gstreamer-ffmpeg."),
+		(int)codec_type, codec_type);
     gst_object_unref (GST_OBJECT (_pipeline));
     _pipeline = NULL;
     return;
@@ -223,7 +223,7 @@ VideoDecoderGst::handleMessage (GstMessage *message)
       gchar *debug;
       gst_message_parse_error (message, &err, &debug);
       
-      log_error(_("Embedded video playback halted; module %s reported: %s\n"),
+      log_error(_("VideoDecoderGst::handleMessage: module %s reported: %s"),
                 gst_element_get_name(GST_MESSAGE_SRC (message)), err->message);
       
       g_error_free (err);
