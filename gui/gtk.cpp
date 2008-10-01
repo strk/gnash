@@ -1493,8 +1493,8 @@ GtkGui::showAboutDialog()
 
     gtk_about_dialog_set_name (about, "Gnash");
     gtk_about_dialog_set_version(about, VERSION);
-    gtk_about_dialog_set_copyright(about, "Copyright (C) 2005, 2006, 2007, 2008 "
-                     	"The Free Software Foundation");
+    gtk_about_dialog_set_copyright(about, "Copyright (C) 2005, 2006, 2007, "
+            "2008 The Free Software Foundation");
     gtk_about_dialog_set_comments (about, comments.c_str());
     gtk_about_dialog_set_authors(about, authors);
     gtk_about_dialog_set_documenters(about, documentors);
@@ -1512,10 +1512,14 @@ GtkGui::showAboutDialog()
         "GNU General Public License for more details.\n"
         "You should have received a copy of the GNU General Public License\n"
         "along with this program; if not, write to the Free Software\n"
-        "Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA"
+        "Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 "
+        "USA"
 	);
     gtk_about_dialog_set_website(about, "http://www.gnu.org/software/gnash/");
 
+    // Destroy the dialogue box when 'close' is clicked.
+    g_signal_connect(G_OBJECT(aboutWidget),
+            "response",  G_CALLBACK(gtk_widget_destroy), aboutWidget);
 
     gtk_widget_show (aboutWidget);
 
