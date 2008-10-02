@@ -79,6 +79,13 @@ public:
     ///                 we're finished with it.
     void queueLoad(std::auto_ptr<IOChannel> str);
 
+    /// Shared AS methods for XML and LoadVars, which can be used
+    /// interchangeably with each object in ActionScript.
+    static as_value loadableobject_addRequestHeader(const fn_call& fn);
+    static as_value loadableobject_sendAndLoad(const fn_call& fn);
+    static as_value loadableobject_load(const fn_call& fn);
+    static as_value loadableobject_send(const fn_call& fn);
+
 protected:
 
     /// Convert the Loadable Object to a string.
