@@ -947,7 +947,8 @@ SDL_sound_handler::mixActiveSound(active_sound& sound, sound_data& sounddata, Ui
 			decoded_size += tmp_raw_buffer_size;
 
 			// no more to decode from this sound, so we break the loop
-			if (sound.dataSize() <= sound.position && sound.loop_count == 0 || tmp_raw_buffer_size == 0 && decodedBytes == 0) {
+			if ((sound.dataSize() <= sound.position && sound.loop_count == 0)
+                    || (tmp_raw_buffer_size == 0 && decodedBytes == 0)) {
 				sound.position = sound.dataSize();
 				break;
 			}

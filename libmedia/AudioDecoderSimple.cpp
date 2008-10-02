@@ -389,7 +389,7 @@ boost::uint8_t* AudioDecoderSimple::decode(boost::uint8_t* input, boost::uint32_
 					break;
 				case 0x00:  // Big-endian host
 					// Swap sample bytes to get big-endian format.
-					assert(inputSize & 1 == 0);
+					assert((inputSize & 1) == 0);
 					for (unsigned i = 0; i < inputSize; i+=2)
 					{
 						std::swap(decodedData[i], decodedData[i+1]);
