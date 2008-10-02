@@ -617,6 +617,20 @@ SWFStream::close_tag()
     m_unused_bits = 0;
 }
 
+void
+SWFStream::consumeInput()
+{
+	// IOChannel::go_to_end is documented
+	// to possibly throw an exception (!)
+	try {
+		m_input->go_to_end();
+	} catch (IOException& ex) {
+		log_error("SWFStream::consumeInput: underlying stream couldn't go_to_end: %s",
+			ex.what());
+		// eh.. and now ?!
+	}
+}
+
 } // end namespace gnash
 
     

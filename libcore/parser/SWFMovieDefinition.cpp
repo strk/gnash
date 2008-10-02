@@ -707,6 +707,10 @@ parse_tag:
 		log_error(_("Parsing exception: %s"), e.what());
 	}
 
+	// Make sure we won't leave any pending writers
+	// on any eventual fd-based IOChannel.
+	str.consumeInput();
+
 	size_t floaded = get_loading_frame();
 	if ( ! m_playlist[floaded].empty() )
 	{
