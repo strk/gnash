@@ -172,6 +172,11 @@ check(r.hasOwnProperty("loaded"));
 check_equals(typeof(r.loaded), "boolean");
 check_equals(r.loaded, false);
 
+// The two objects are also interchangeable for these functions.
+x.sendAndLoad = XML.prototype.sendAndLoad;
+xcheck_equals(x.sendAndLoad("some server name", r), true);
+
+
 //--------------------------------------------------------------------------
 // Test LoadVars::load()
 //--------------------------------------------------------------------------
