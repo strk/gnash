@@ -155,8 +155,8 @@ XMLSocket_as::fillMessageList(MessageList& msgs)
     const int fd = _sockfd;
    
     if (fd <= 0) {
-	log_error(_("%s: fd <= 0, returning false (timer not unregistered "
-		"while socket disconnected?"), __FUNCTION__);
+	log_error(_("XMLSocket: fd <= 0, returning false (timer not unregistered "
+		"while socket disconnected?"));
         return;
     }
 
@@ -183,8 +183,8 @@ XMLSocket_as::fillMessageList(MessageList& msgs)
             continue;
         }
         if (ret == -1) {
-            log_error(_("%s: The socket for fd #%d never was available"),
-                __FUNCTION__, fd);
+            log_error(_("XMLSocket: The socket for fd #%d was never "
+                        "available"), fd);
             return;
         }
  
