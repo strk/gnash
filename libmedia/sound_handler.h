@@ -286,7 +286,8 @@ public:
 	///	removal, see detach_aux_streamer. TODO: stop using the data pointer for 
 	///	identification purposes and use the callback pointer directly instead.
 	///
-	virtual void	attach_aux_streamer(aux_streamer_ptr ptr, void* owner){} // FIXME
+	virtual void	attach_aux_streamer(aux_streamer_ptr /*ptr*/,
+            void* /*owner*/){} // FIXME
 
 	/// This is called by AS classes NetStream or Sound to dettach callback, so
 	/// that audio from the classes no longer will be played through the 
@@ -297,7 +298,7 @@ public:
 	/// 	WARNING: this need currently be the 'udata' pointer passed to attach_aux_streamer.
 	///	TODO: get the aux_streamer_ptr as key !!
 	///
-	virtual void	detach_aux_streamer(void* udata) {} // FIXME
+	virtual void	detach_aux_streamer(void* /*udata*/) {} // FIXME
 
 	virtual ~sound_handler() {};
 	
