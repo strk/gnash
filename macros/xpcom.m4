@@ -57,7 +57,12 @@ AC_DEFUN([GNASH_PATH_XPCOM],
   if test x$xpcom = xyes; then
     if test x$cross_compiling = xno; then
       if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_xpcom_incl}" = x; then
-        $PKG_CONFIG --exists libxul && ac_cv_path_xpcom_incl="`$PKG_CONFIG --cflags-only-I libxul`"
+        # prefer libxul-unstable for cflags.
+        if $PKG_CONFIG --exists libxul-unstable; then
+          ac_cv_path_xpcom_incl="`$PKG_CONFIG --cflags-only-I libxul-unstable`"
+        else
+          $PKG_CONFIG --exists libxul && ac_cv_path_xpcom_incl="`$PKG_CONFIG --cflags-only-I libxul`"
+        fi
         $PKG_CONFIG --exists libxul && ac_cv_path_xpcom_lib="`$PKG_CONFIG --libs libxul`"
         $PKG_CONFIG --exists libxul && ac_cv_path_xpidl="`$PKG_CONFIG --libs-only-L libxul`"
       fi
@@ -69,6 +74,7 @@ AC_DEFUN([GNASH_PATH_XPCOM],
     XPCOM_IDL_CFLAGS=`echo $XPCOM_CFLAGS | sed -e 's:include:share/idl:'`
     XPIDL=`echo ${ac_cv_path_xpidl} | sed -e 's:-L::' -e 's:sdk-::' -e 's:sdk/lib::' -e 's:-devel::' -e 's:lib$::'`
     XPIDL="${XPIDL}xpidl"
+    AC_DEFINE([HAVE_XPCOM], [1], [Use XPCOM in the NPAPI plugin])
   else
     XPCOM_CFLAGS=""
     XPIDL=""

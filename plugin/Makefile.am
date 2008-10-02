@@ -28,6 +28,11 @@ if NPAPI
 SUBDIRS += mozilla-sdk
 
 if XPCOM
+AM_CXXFLAGS=-fshort-wchar
+INCLUDES = \
+        $(XPCOM_CFLAGS)
+AM_LDFLAGS = \
+        $(XPCOM_LIBS)
 SUBDIRS += xpcom
 endif
 if WIN32

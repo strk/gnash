@@ -72,6 +72,15 @@
 #include "prerror.h"
 #include "prthread.h"
 
+#if HAVE_XPCOM
+#include "nscore.h"
+#include "nsISupports.h"
+#include "nsIServiceManager.h"
+#include "nsIExtensionManager.h"
+#include "nsIFile.h"
+#include "nsStringAPI.h"
+#endif
+
 using namespace std;
 
 extern NPNetscapeFuncs NPNFuncs;
@@ -742,11 +751,70 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
 	}
 }
 
+#if HAVE_XPCOM
+int
+getHome(string& gnashpath)
+{
+	nsresult rv;
+
+	// this is probably a good place to get the service manager
+	// note that Mozilla will add reference, so do not forget to release
+	nsISupports * sm = NULL;
+
+	// Get service manager
+	//cerr << "Getting Path" << NPN_GetValue(NULL, NPNVserviceManager, &sm) << "\n";
+
+	// Mozilla returns nsIServiceManager so we can use it directly;
+	// doing QI on nsISupports here can still be more appropriate in
+	// case something is changed in the future so we don't need to 
+	// do casting of any sort.
+
+	// valid service manager
+	if(!sm) return -1;
+
+	nsIServiceManager * gServiceManager = NULL;
+	rv = sm->QueryInterface(NS_GET_IID(nsIServiceManager), (void**)&gServiceManager);
+
+	nsIFile *file = NULL;
+	nsIInstallLocation * installLocation = NULL;
+	nsIExtensionManager * nsExtensionService = NULL;
+
+	// Gets extension service
+	rv = gServiceManager->GetServiceByContractID("@mozilla.org/extensions/manager;1", NS_GET_IID(nsIExtensionManager), (void **)&nsExtensionService);
+	//cerr << "gSM" << rv << " " << (nsExtensionService == NULL) << "\n";
+	if (!nsExtensionService) return -2;
+	
+	// Gets install location object
+	rv = nsExtensionService->GetInstallLocation(NS_LITERAL_STRING("{2b70f2b1-fc72-4734-bb81-4eb2a7713e49}"), (nsIInstallLocation**)&installLocation);
+	//cerr << "nES" << rv << " " << (installLocation == NULL) << "\n";
+	if (!installLocation) return -3;
+
+	// Gets information on file in the extension - here, "PetsCity@PetsCity.com" is the ID of the plugin. install.rdf is a file stored in the plugin
+	rv = installLocation->GetItemFile(NS_LITERAL_STRING("{2b70f2b1-fc72-4734-bb81-4eb2a7713e49}"), NS_LITERAL_STRING("plugins/gnash"), (nsIFile**)&file);
+	//cerr << "iL" << rv << " " << (file == NULL) << "\n";
+	if (!file) return -4;
+
+	// We get the path (stored as unicode in nsName)
+	nsString sName;
+	file->GetPath(sName);
+
+       	//const NPString& propValue = NS_LossyConvertUTF16toASCII(sName);
+	gnashpath = ToNewCString(NS_LossyConvertUTF16toASCII(sName));
+	//cerr << "Path" << gnashpath << "\n";
+	return 0;
+}
+#endif
+
 void
 nsPluginInstance::startProc(Window win)
 {
 	string procname;
 	char *gnash_env = std::getenv("GNASH_PLAYER");
+#if HAVE_XPCOM
+	if (getHome(procname) >= 0)
+		;
+	else
+#endif
 	if (gnash_env == NULL) {
 		procname = GNASHBINDIR;
 		procname += "/gtk-gnash";
