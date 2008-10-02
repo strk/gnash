@@ -222,7 +222,7 @@ loadvarsObj.onLoad = function(success) {
 		// Gnash insists in looking for an ending & char !!		
 		check_equals(loadvarsObj['var3'], 'val3\n');
 
-		check_totals(107);
+		check_totals(108);
 
 		play();
 	}
