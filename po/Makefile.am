@@ -20,12 +20,6 @@ AUTOMAKE_OPTIONS = -Wno-portability
 POFILES = AUTO
 
 
-MAINTAINERCLEANFILES = \
-	*.gmo \
-	gnash.pot \
-	POTFILES \
-	update-po
-
 translations = cs de es fi fr it ja sv
 
 # This is GNU make specific, so if you are building Gnash on a BSD
@@ -33,6 +27,13 @@ translations = cs de es fi fr it ja sv
 # BSD make.
 pofiles := $(patsubst %,%.po,$(translations))
 gmofiles := $(patsubst %,%.gmo,$(translations))
+
+MAINTAINERCLEANFILES = \
+	gnash.pot 
+
+CLEANFILES = \
+	$(gmofiles) \
+	POTFILES 
 
 dirs =  $(top_srcdir)/libbase \
 	$(top_srcdir)/backend \
@@ -59,11 +60,9 @@ dirs =  $(top_srcdir)/libbase \
 	
 srcfiles := $(foreach dir,$(dirs),$(wildcard $(dir)/*.cpp))
 
-EXTRA_DIST = $(gmofiles) $(pofiles) gnash.pot POTFILES update-po
+EXTRA_DIST = $(pofiles) gnash.pot 
 
 all: $(gmofiles)
-
-if HAS_GETTEXT
 
 POTFILES: $(srcfiles)
 	@echo "Building POTFILES..."
@@ -72,8 +71,10 @@ POTFILES: $(srcfiles)
 	  echo "$$i" >> POTFILES;\
 	done
 
+if HAS_GETTEXT
+
 gnash.pot: POTFILES
-	$(XGETTEXT) --language=C++ --files-from=POTFILES -o gnash.pot \
+	$(XGETTEXT) --language=C++ --files-from=POTFILES -o $(srcdir)/gnash.pot \
 	  --default-domain=gnash --force \
 	  --flag=_:1:pass-c-format --keyword=_ \
 	  --copyright-holder='Free Software Foundation, Inc.'
@@ -81,9 +82,8 @@ gnash.pot: POTFILES
 update-po: gnash.pot
 	@for i in $(pofiles); do \
 	  echo "Merging $$i..." ; \
-	  $(MSGMERGE) --update $(srcdir)/$$i gnash.pot; \
+	  $(MSGMERGE) --update $(srcdir)/$$i $(srcdir)/gnash.pot; \
 	done
-	touch update-po
 
 $(gmofiles): #update-po
 
@@ -94,17 +94,10 @@ SUFFIXES = .po .gmo
 else # not HAS_GETTEXT
 
 $(gmofiles): force
-	@for i in $(gmofiles); do \
-	  ln -fs $(srcdir)/$$i $$i; \
-	done
+	@echo "WARNING: can't compile $@ translations w/out gettext"
 
-$(pofiles): force
-	@for i in $(pofiles); do \
-	  ln -fs $(srcdir)/$$i $$i; \
-	done
-
-POTFILES gnash.pot update-po: force
-	ln -fs $(srcdir)/$@ $@
+update-po: force
+	@echo "WARNING: can't update translation files (.po) w/out gettext"
 
 endif # not HAS_GETTEXT
 
