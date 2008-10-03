@@ -124,14 +124,22 @@ static double rogue_date_args(const fn_call& fn, unsigned maxargs);
 // to get the actual number
 #define COUNT_LEAP_YEARS(n)   ( (n - 70) / 4 - (n - 70) / 100 + (n - 70) / 400 )
 
+class Date : public as_object
+{
+public:
+    void setTimeValue(const double& value) { _value = value; }
+    double getTimeValue() const { return _value; }
 
-// FIND_YEAR_ALGORITHM:
-//      default: ("brute force"):   up to 400 iterations to find the correct
-//                                  year. Accurate.
-//      MATHEMATIC_ALGORITHM        small number of iterations, fairly accurate.
-//      APPROXIMATE_ALGORITHM       no iterations, not all that accurate.
-//#define USE_MATHEMATIC_ALGORITHM
-//#define USE_APPROXIMATE_ALGORITHM
+    Date(double value = clocktime::getTicks());
+
+    as_value toString() const;
+
+    bool isDateObject() { return true; }
+
+private:
+    double _value;
+};
+
 
 static void
 getLocalTime(const double& time, GnashTime& gt)
@@ -320,21 +328,11 @@ getDateInterface()
 }
 
 
-Date::Date()
-    :
-    as_object(getDateInterface()),
-    _value(clocktime::getTicks())
-{
-
-}
-
-
 Date::Date(double value)
     :
     as_object(getDateInterface()),
     _value(value)
 {
-
 }
 
 
@@ -1248,8 +1246,6 @@ static double
 makeTimeValue(GnashTime& t)
 {
 
-#if 1
-
     // First, adjust years to deal with strange month
     // values.
     
@@ -1294,102 +1290,9 @@ makeTimeValue(GnashTime& t)
     ret += t.second * 1000.0;
     ret += t.millisecond;
     return ret;
-#else
-
-  boost::int32_t d = t.monthday;
-  boost::int32_t m = t.month + 1;
-  boost::int32_t ya = t.year;  /* Years since 1900 */
-  boost::int32_t k;  /* day number since 1 Jan 1900 */
-
-  // For calculation, convert to a year starting on 1 March
-  if (m > 2) m -= 3;
-  else {
-    m += 9;
-    ya--;
-  }
-
-  k = (1461 * ya) / 4 + (153 * m + 2) / 5 + d + 58;
-
-  /* K is now the day number since 1 Jan 1900.
-   * Convert to minutes since 1 Jan 1970 */
-  /* 25567 is the number of days from 1 Jan 1900 to 1 Jan 1970 */
-  k = ((k - 25567) * 24 + t.hour) * 60 + t.minute;
-  
-  // Converting to double after minutes allows for +/- 4082 years with
-  // 32-bit signed integers.
-  return  (k * 60.0 + t.second) * 1000.0 + t.millisecond;
-#endif
 }
 
 
-#ifdef USE_MATHEMATICAL_ALGORITHM
-/// Helper function for getYearMathematical
-static double
-daysSinceUTCForYear(double year)
-{
-    return (
-        365 * (year - 1970) +
-        std::floor ((year - 1969) / 4.0f) -
-        std::floor ((year - 1901) / 100.0f) +
-        std::floor ((year - 1601) / 400.0f)
-    );
-}
-
-// The algorithm used by swfdec. It iterates only a small number of
-// times and is reliable to within a few milliseconds in 
-// +- 100000 years. However, it appears to get the year wrong for
-// midnight on January 1 of some years (as well as a few milliseconds
-// before the end of other years, though that seems less serious).
-static boost::int32_t
-getYearMathematical(double days)
-{
-
-    boost::int32_t low = std::floor ((days >= 0 ? days / 366.0 : days / 365.0)) + 1970;
-    boost::int32_t high = std::ceil ((days >= 0 ? days / 365.0 : days / 366.0)) + 1970;
-
-    while (low < high) {
-        boost::int32_t pivot = (low + high) / 2;
-
-        if (daysSinceUTCForYear (pivot) <= days) {
-            if (daysSinceUTCForYear (pivot + 1) > days) {
-                return pivot;
-            }
-            else {
-                low = pivot + 1;
-            }
-        }
-        else {
-        high = pivot - 1;
-        }
-    }
-
-    return low;
-}
-
-#elif defined (USE_APPROXIMATE_ALGORITHM) // approximate algorithm
-// Another mathematical way of working out the year, which
-// appears to be less reliable than swfdec's way. Adjusts
-// days as well as returning the year.
-static boost::int32_t
-getYearApproximate(boost::int32_t& days)
-{
-    boost::int32_t year = ((days - 16) - COUNT_LEAP_YEARS((days - 16) / 365)) / 365 + 70;
-    if (time < 0) year--;
-
-    days -= (year - 70) * 365;
-    if (year < 70) {
-        days -= COUNT_LEAP_YEARS(year - 2);
-        if (year <= 0) days--;
-    }
-    else {
-        days -= COUNT_LEAP_YEARS(year + 1);
-    }
-    
-    return year;
-}
-
-
-#else
 // The brute force way of converting days into years since the epoch.
 // This also reduces the number of days accurately. Its disadvantage is,
 // of course, that it iterates; its advantage that it's always correct.
@@ -1424,7 +1327,6 @@ getYearBruteForce(boost::int32_t& days)
     }
     return year - 1900;
 }
-#endif // brute force algorithm
 
 
 void fillGnashTime(const double& t, GnashTime& gt)
@@ -1461,18 +1363,8 @@ void fillGnashTime(const double& t, GnashTime& gt)
     if (days >= -4) gt.weekday = (days + 4) % 7;
     else gt.weekday = 6 - (((-5) - days ) % 7);
 
-#ifdef USE_MATHEMATICAL_ALGORITHM
-    // approximate way:
-    gt.year = getYearApproximate(days);
-#elif defined(USE_APPROXIMATE_ALGORITHM) // approximate algorithm
-    /// swfdec way:
-    gt.year = getYearMathematical(static_cast<double>(days));
-    days -= 365 * (gt.year - 1970) + COUNT_LEAP_YEARS(gt.year - 1900);
-    gt.year -= 1900;
-#else
     // default, brute force:
     gt.year = getYearBruteForce(days);
-#endif
             
     gt.month = 0;
     for (int i = 0; i < 12; ++i)

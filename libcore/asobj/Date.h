@@ -15,30 +15,13 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef __DATE_H__
-#define __DATE_H__
+#ifndef GNASH_ASOBJ_DATE_H
+#define GNASH_ASOBJ_DATE_H
 
 #include "as_object.h" // for inheritance
 #include "fn_call.h" // for inheritance
 
 namespace gnash {
-
-class Date : public as_object
-{
-public:
-    void setTimeValue(const double& value) { _value = value; }
-    double getTimeValue() const { return _value; }
-
-    Date();
-    Date(double value);
-    
-    as_value toString() const;
-    
-    bool isDateObject() { return true; }
-    
-private:
-    double _value;
-};
 
 void registerDateNative(as_object& global);
 
