@@ -24,7 +24,6 @@
 #include <iostream>
 #include <string>
 #include <map>
-#include <unistd.h> // for sleep()
 
 #if ! (defined(_WIN32) || defined(WIN32))
 #	include <netinet/in.h>
@@ -40,6 +39,7 @@
 #include "handler.h"
 #include "utility.h"
 #include "buffer.h"
+#include "GnashSleep.h"
 
 using namespace gnash;
 using namespace std;
@@ -399,7 +399,7 @@ RTMPClient::clientFinish()
     int ret = 0;
     _handshake->clear();
     
-    sleep(1);			// FIXME: why do we still need a delay here, when readNet() does a select ?
+    gnashSleep(1000000); // FIXME: why do we still need a delay here, when readNet() does a select ?
     ret = readNet(_handshake->reference(), RTMP_BODY_SIZE);
     if (ret == RTMP_BODY_SIZE) {
         log_debug (_("Read first data block in handshake"));
