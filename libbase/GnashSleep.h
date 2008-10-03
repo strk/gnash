@@ -32,6 +32,9 @@
 
 namespace gnash {
 
+/// Sleep compatibly for the specified number of microseconds
+//
+/// @param useconds     microseconds to sleep.
 inline void gnashSleep(size_t useconds)
 {
 #if defined(_WIN32) || defined(WIN32)
