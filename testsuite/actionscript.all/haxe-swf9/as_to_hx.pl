@@ -34,10 +34,15 @@ while(<STDIN>){
 	
 	#CHECK 2
 	#Check for a variable definition.
-	if($_ =~ /var\s+(\w+).*[\:\;]/){
-		if(!$vars{$1}){
-			$vars{$1} = 1;
-			$important_string = declare_variable($1);	
+	if($_ =~ /(var\s+)(\w+)(.*)([\;\:])/){
+		if(!$vars{$2}){
+			$vars{$2} = 1;
+			#Make sure the variable still gets declared even if this line is commented out latter.
+			$important_string = declare_variable($2);
+		}
+#		If the type of the variable is not delcared, make it Dynamic.
+		if($4 eq ';'){
+			$_ = "$1$2:Dynamic $3$4\n";	
 		}
 	}
 

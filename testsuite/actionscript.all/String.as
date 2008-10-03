@@ -117,7 +117,6 @@ check_equals ( a.lastIndexOf("lawa"), 8);
 
 o = new Object;
 
-#ifndef HAXE
 o.charCodeAt = String.prototype.charCodeAt;
 o.charAt = String.prototype.charAt;
 
@@ -126,7 +125,6 @@ check_equals(c, "e");
 c = o.charCodeAt(4);
 check_equals(c, "101");
 
-#endif
 //----------------------------------------
 // Check String.indexOf
 // TODO: test with ASnative(251,8)
@@ -342,12 +340,10 @@ ar = o.split("b");
 check_equals(ar.length, 3);
 check_equals(ar.toString(), "[o,ject O,ject]");
 
-#ifndef HAXE
 o = new Date(0);
 o.split = String.prototype.split;
 ar = o.split(":");
 check_equals(ar.length, 3);
-#endif
 
 #else
 // SWF5:
@@ -815,11 +811,6 @@ check_equals (typeof(c), "string");
 //-------------------------------------------
 
 // These tests are only correct with SWF6 and above.
-#ifdef HAXE
-var a:Dynamic = new String("Längere Wörter");
-#else
-var a = new String("Längere Wörter");
-#endif
 
 #if OUTPUT_VERSION > 5
 check_equals (a.length, 14);
