@@ -21,13 +21,8 @@
 #include "MediaParser.h"
 #include "log.h"
 
-#include <unistd.h>             // for usleep()
 #include <boost/bind.hpp>
-
-#ifdef _WIN32
-#include <windows.h>
-#define usleep(usec) ((void) Sleep((usec) / 1000))
-#endif
+#include "GnashSleep.h" // for usleep.
 
 namespace gnash {
 namespace media {
@@ -355,7 +350,7 @@ MediaParser::parserLoop()
 	while (!parserThreadKillRequested())
 	{
 		parseNextChunk();
-		usleep(100); // no rush....
+        gnashSleep(100); // no rush....
 	}
 }
 
