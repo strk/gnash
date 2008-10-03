@@ -254,27 +254,33 @@ MediaParser::pushEncodedAudioFrame(std::auto_ptr<EncodedAudioFrame> frame)
 #ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
 	boost::mutex::scoped_lock lock(_qMutex);
 #endif
-
-	// If last frame on queue has a timestamp > then this one, that's either due
-	// to seek-back (most commonly) or a wierdly encoded media file.
-	// In any case, we'll flush the queue and restart from the new timestamp
-	if ( ! _audioFrames.empty() && _audioFrames.back()->timestamp > frame->timestamp )
-	{
-		log_debug("Timestamp of last audio frame in queue (%d) "
-			"greater then timestamp in the frame being "
-			"pushed to it (%d). Flushing %d queue elements.",
-			_audioFrames.back()->timestamp, frame->timestamp,
-			_audioFrames.size());
-		for (AudioFrames::iterator i=_audioFrames.begin(),
-			e=_audioFrames.end(); i!=e; ++i)
-		{
-			delete (*i);
-		}
-		_audioFrames.clear();
-	}
 	
-	//log_debug("Pushing audio frame with timestamp %d", frame->timestamp);
-	_audioFrames.push_back(frame.release());
+    // Find location to insert this new frame to, so that
+    // timestamps are sorted
+    //
+    AudioFrames::iterator loc = _audioFrames.end();
+    if ( ! _audioFrames.empty() ) {
+        size_t gap=0;
+        AudioFrames::reverse_iterator i=_audioFrames.rbegin();
+        for (AudioFrames::reverse_iterator e=_audioFrames.rend(); i!=e; ++i)
+        {
+            if ( (*i)->timestamp <= frame->timestamp ) break;
+            //log_debug("%d-to-last element has timestamp %d > %d", gap, (*i)->timestamp, frame->timestamp);
+            ++gap;
+        }
+
+        loc = i.base();
+
+        if ( gap ) {
+            log_debug("Timestamp of last %d/%d audio frames in queue "
+                "greater then timestamp in the frame being "
+                "inserted to it (%d).", gap, _audioFrames.size(), frame->timestamp);
+        }
+    }
+
+	//log_debug("Inserting audio frame with timestamp %d", frame->timestamp);
+	_audioFrames.insert(loc, frame.release());
+
 #ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
 	waitIfNeeded(lock); // if the push reaches a "buffer full" condition, wait to be waken up
 #endif
@@ -287,26 +293,32 @@ MediaParser::pushEncodedVideoFrame(std::auto_ptr<EncodedVideoFrame> frame)
 	boost::mutex::scoped_lock lock(_qMutex);
 #endif
 
-	// If last frame on queue has a timestamp > then this one, that's either due
-	// to seek-back (most commonly) or a wierdly encoded media file.
-	// In any case, we'll flush the queue and restart from the new timestamp
-	if ( ! _videoFrames.empty() && _videoFrames.back()->timestamp() > frame->timestamp() )
-	{
-		log_debug("Timestamp of last video frame in queue (%d) "
-			"greater then timestamp in the frame being "
-			"pushed to it (%d). Flushing %d queue elements.",
-			_videoFrames.back()->timestamp(), frame->timestamp(),
-			_videoFrames.size());
-		for (VideoFrames::iterator i=_videoFrames.begin(),
-			e=_videoFrames.end(); i!=e; ++i)
-		{
-			delete (*i);
-		}
-		_videoFrames.clear();
-	}
+    // Find location to insert this new frame to, so that
+    // timestamps are sorted
+    //
+    VideoFrames::iterator loc = _videoFrames.end();
+    if ( ! _videoFrames.empty() ) {
+        size_t gap=0;
+        VideoFrames::reverse_iterator i=_videoFrames.rbegin();
+        for (VideoFrames::reverse_iterator e=_videoFrames.rend(); i!=e; ++i)
+        {
+            if ( (*i)->timestamp() <= frame->timestamp() ) break;
+            //log_debug("%d-to-last element has timestamp() %d > %d", gap, (*i)->timestamp(), frame->timestamp());
+            ++gap;
+        }
+
+        loc = i.base();
+
+        if ( gap ) {
+            log_debug("Timestamp of last %d/%d video frames in queue "
+                "greater then timestamp() in the frame being "
+                "inserted to it (%d).", gap, _videoFrames.size(), frame->timestamp());
+        }
+    }
 
 	//log_debug("Pushing video frame with timestamp %d", frame->timestamp());
-	_videoFrames.push_back(frame.release());
+	_videoFrames.insert(loc, frame.release());
+
 #ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
 	waitIfNeeded(lock); // if the push reaches a "buffer full" condition, wait to be waken up
 #endif
