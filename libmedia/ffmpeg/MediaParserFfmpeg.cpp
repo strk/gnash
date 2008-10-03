@@ -227,10 +227,12 @@ MediaParserFfmpeg::parseNextFrame()
 	//log_debug("av_read_frame returned %d", rc);
 	if ( rc < 0 )
 	{
-		log_error(_("MediaParserFfmpeg::parseNextChunk: Problems parsing next frame"));
-		// Should we set parsingComplete here ?
-		_parsingComplete=true;
-		return false;
+        log_error(_("MediaParserFfmpeg::parseNextFrame: "
+            "Problems parsing next frame "
+            "(av_read_frame returned %d)."
+            " We'll consider the stream fully parsed."), rc);
+        _parsingComplete=true; // No point in parsing over
+        return false;
 	}
 
 	bool ret=false;
