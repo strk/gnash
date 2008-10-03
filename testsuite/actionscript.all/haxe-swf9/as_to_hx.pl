@@ -1,15 +1,23 @@
 
 use strict;
 
+my $important_string;
 my $skipped = 0;
+my %vars;
 
 while(<STDIN>){
 
+	#Make sure important_string is clear.
+	$important_string = 0;	
+
+	#CHECK 0
 	#Remove rcsid, I think makeSWF uses this, but I am not sure.
 	if(index($_,"rcsid=") != $[-1){
-		print "//".$_;
+		skip_line();
 		next;
 	}
+
+	#CHECK 1
 	#Insert class definition and main() after imports.
 	if(index($_,"import") != $[-1){
 		print $_;
@@ -23,6 +31,25 @@ while(<STDIN>){
 			}
 		}
 	}
+	
+	#CHECK 2
+	#Check for a variable definition.
+	if($_ =~ /var\s+(\w+).*[\:\;]/){
+		if(!$vars{$1}){
+			$vars{$1} = 1;
+			$important_string = declare_variable($1);	
+		}
+	}
+
+	#CHECK 3 - Must run after CHECK 2
+	#Detect the first time a variable is used, and insert var varName; on the line above.
+	if($_ =~ /^(\s*)(\w+?)(\s*=\s*.+)/){
+		if(!$vars{$2}){
+			print declare_variable($2) . "//FIRST OCCURENCE OF VAR $2\n";
+			$vars{$2} = 1;
+		}
+	}
+
 	if(index($_,"new") != $[-1){
 		#Replace things like: new String; with new String();
 		$_ =~ s/(new \w+)(;)/$1\(\)$2/g;
@@ -58,8 +85,7 @@ while(<STDIN>){
 	#BROKEN: 
 	#Dejagnu.check(! "literal string" instanceof String, "! \"literal string\" instanceof String"+' '+' ['+"String.as"+':'+1056 +']');
 	if(index($_,"instanceof") != $[-1){
-		$skipped++;
-		print "//".$_;
+		skip_line();
 #		print instance_of($_);	
 		next;
 	}
@@ -69,15 +95,13 @@ while(<STDIN>){
 	#HAXE: Reflect.deleteField(Object.prototype,toString)
 	#TODO: Implement
 	if(index($_,"delete") != $[-1){
-		$skipped++;
-		print "//".$_;
+		skip_line();
 		next;
 	}
 	#Replace instanceof:
 	#TODO: Implement
 	if(index($_,"typeof") != $[-1){
-		$skipped++;
-		print "//".$_;
+		skip_line();
 		next;
 	}
 	if(index($_,"String") != $[-1){
@@ -94,20 +118,20 @@ while(<STDIN>){
 		}
 	}
 	if(index($_,"substring") != $[-1){
-		print "//".$_;
+		skip_line();
 		next;
 	}
 	if(index($_,"__proto__") != $[-1){
-		print "//".$_;
+		skip_line();
 		next;
 	}
 	if(index($_,"prototype") != $[-1){
-		print "//".$_;
+		skip_line();
 		next
 	}
 	if(index($_,"isNaN") != $[-1){
 #		$_ =~ s/(isNaN)/Math\.$1/g;
-		print "//".$_;
+		skip_line();
 		next;
 	}
 	if(index($_,"split") != $[-1){
@@ -117,7 +141,7 @@ while(<STDIN>){
 		
 		#Remove calls to split that have more than one argument.
 		if($_ =~ /\.split\(.+,.+\)/){
-			print "//".$_;
+			skip_line();
 			next;
 		}
 		#Replace calls to split that have no arguments with an array whose only member is the caller.
@@ -128,48 +152,48 @@ while(<STDIN>){
 	if(index($_,"length") != $[-1){
 		#Remove attemps to set strings length property.  Haxe compliler does not allow this.
 		if($_ =~ /\w+\.length.*=.+;/){
-			print "//".$_;
+			skip_line();
 			next;	
 		}
 	}
 	#Ignore calls to concat, I cannot find the equivilent haxe function.
 	if(index($_,"concat") != $[-1){
-		print "//".$_;
+		skip_line();
 		next;
 	}
 	#Remove lines that contain things like this:
 	# o = {}
 	#I am not sure what this means.
 	if($_ =~ /=.+\{\}/){
-		print "//".$_;
+		skip_line();
 		next; 
 	}
 	#Remove return calls(TEMP).
 	if(index($_,"return") != $[-1){
-		print "//".$_;
+		skip_line();
 		next;
 	}
 	if($_ =~ /Number/){
-		print "//".$_;
+		skip_line();
 		next;
 	}
 	#Remove calls to hasOwnProperty.  I can't find a Haxe equivilent for this.
 	if($_=~ /hasOwnProperty/){
-		print "//".$_;
+		skip_line();
 		next;
 	}
 	if($_ =~ /indexOf/){
-		print "//".$_;
+		skip_line();
 		next;
 	}
 	#Remove references to the undefined value. I can't find a Haxe equivilent for this.
 	if($_ =~ /undefined/){
-		print "//".$_;
+		skip_line();
 		next;
 	}
 	#Remove calls to fromCharCode.  Haxe only alows one argument to this function.
 	if($_ =~ /String.fromCharCode\(.+\)/){
-		print "//".$_;
+		skip_line();
 		next;
 	}
 	#Replace calls to slice with substr.
@@ -177,13 +201,13 @@ while(<STDIN>){
 	
 	#Remove calls to call function.  I haven't found a Haxe equivilent for this.
 	if($_ =~ /\.call\(.+\)/){
-		print "//".$_;
+		skip_line();
 		next;
 	}
 	
 	#Remove calls to chr and ord.  I think these have been depreciated since SWF v5.
 	if($_ =~ /ord\(.+\)/ || $_ =~ /chr\(.+\)/){
-		print "//".$_;
+		skip_line();
 		next;
 	}
 	#Replace String in "for .. in" loops that iterator over String's properties with Reflect.fields(String).
@@ -191,14 +215,33 @@ while(<STDIN>){
 
 	#Remove calls to String.gotcha.  I cannot find a Haxe equivilent for this.
 	if($_ =~ /String.gotcha/){
-		print "//".$_;
+		skip_line();
 		next;	
 	}
-	#Nothing special found.
+
+	#Print the converted line of code.
 	print $_;
 }
 
-print "}}";
+#Close the Class and main function definitons.
+print "}}\n";
+
+print stderr "$skipped lines were skipped.\n";
+
+sub skip_line{
+	$skipped++;
+	if($important_string){
+		print $important_string;
+	}
+	print "//$_";
+
+}
+
+sub declare_variable{
+	
+	my $var_name = $_[0];
+	return "var $var_name:Dynamic='';\n"
+}
 
 sub instance_of{
 	

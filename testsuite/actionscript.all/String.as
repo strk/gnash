@@ -25,25 +25,6 @@ rcsid="$Id: String.as,v 1.56 2008/04/25 11:11:08 bwy Exp $";
 #include "check.as"
 #endif
 
-#ifdef HAXE
-var c;
-var p = ""; //This is temporary until we don't have to comment out some of the tests.
-var str;
-var ar;
-var st;
-var g:Dynamic;
-var e;
-var s;
-var r;
-var o;
-var ret:Dynamic;
-var b = ""; //This is temporary until we don't have to comment out some of the tests.;
-var numberObject= ""; //This is temporary until we don't have to comment out some of the tests.;
-var stringObject;
-var primitiveString;
-var prevToStringFunc;
-#endif
-
 check_equals(typeof(String), 'function');
 check_equals(typeof(String.prototype), 'object');
 check_equals(String.__proto__, Function.prototype); // both undefined in swf5
@@ -108,11 +89,8 @@ check(!String.prototype.hasOwnProperty('length'));
 #endif
 
 check_equals(typeof(String()), 'string');
-#ifdef HAXE
-var a:Dynamic;
-#else
+
 var a;
-#endif
 a = new String("wallawallawashinGTON");
 check_equals(a.length, 20);
 #if OUTPUT_VERSION > 5
