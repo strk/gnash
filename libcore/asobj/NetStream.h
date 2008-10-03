@@ -365,11 +365,11 @@ typedef std::deque<raw_mediadata_t*> AudioQueue;
 
 	NetStream();
 
-	virtual ~NetStream();
+	~NetStream();
 
 	/// Closes the video session and frees all ressources used for decoding
 	/// except the FLV-parser (this might not be correct).
-	virtual void close();
+	void close();
 
 	/// Make audio controlled by given character
 	void setAudioController(character* controller);
@@ -378,14 +378,14 @@ typedef std::deque<raw_mediadata_t*> AudioQueue;
 	//
 	/// @param mode
 	///	Defines what mode to put the instance in.
-	virtual void pause(PauseMode mode);
+	void pause(PauseMode mode);
 
 	/// Starts the playback of the media
 	//
 	/// @param source
 	///	Defines what file to play
 	///
-	virtual void play(const std::string& source);
+	void play(const std::string& source);
 
 	/// Seek in the media played by the current instance
 	//
@@ -393,21 +393,21 @@ typedef std::deque<raw_mediadata_t*> AudioQueue;
 	///	Defines in seconds where to seek to
 	///	TODO: take milliseconds !!
 	///
-	virtual void seek(boost::uint32_t pos);
+	void seek(boost::uint32_t pos);
 
 	/// Tells where the playhead currently is
 	//
 	/// @return The time in milliseconds of the current playhead position
 	///
-	virtual boost::int32_t time();
+	boost::int32_t time();
 
 	/// Called at the SWF framerate. Used to process queued status messages
 	/// and (re)start after a buffering pause. In NetStreamFfmpeg it is also
 	/// used to find the next video frame to be shown, though this might change.
-	virtual void advance();
+	void advance();
 	
 	/// Returns the current framerate in frames per second.
-	virtual double getCurrentFPS()  { return 0; }
+	double getCurrentFPS()  { return 0; }
 	
 
 	/// Sets the NetConnection needed to access external files
@@ -436,13 +436,13 @@ typedef std::deque<raw_mediadata_t*> AudioQueue;
 	boost::uint32_t bufferTime() { return m_bufferTime; }
 
 	/// Returns the number of bytes of the media file that have been buffered.
-	virtual long bytesLoaded();
+	long bytesLoaded();
 
 	/// Returns the total number of bytes (size) of the media file
 	//
 	/// @return the total number of bytes (size) of the media file
 	///
-	virtual long bytesTotal();
+	long bytesTotal();
 
 	/// Returns the number of millisecond of the media file that is buffered and 
 	/// yet to be played
