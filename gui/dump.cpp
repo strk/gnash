@@ -34,6 +34,7 @@
 #include "gnash.h" // for get_sound_handler
 #include "render_handler.h"
 #include "VM.h"
+#include "GnashSleep.h"
 
 #include <iostream>
 #include <string>
@@ -189,7 +190,7 @@ DumpGui::run()
         while (timer_current < timer_nextframe) {
             // sleep for 95% of remaining usecs, floored at 50
             sleep_usecs = (int)((timer_nextframe - timer_current) * 950000.0);
-            usleep((sleep_usecs < 50) ? 50 : sleep_usecs);
+            gnashSleep((sleep_usecs < 50) ? 50 : sleep_usecs);
             if (gettimeofday(&tv, NULL) == 0) {
                 timer_current = (double)tv.tv_sec + (double)tv.tv_usec / 1000000.0;
             } else {

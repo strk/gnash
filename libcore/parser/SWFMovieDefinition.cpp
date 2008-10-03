@@ -41,6 +41,7 @@
 #include "GnashException.h" // for parser exception
 #include "ControlTag.h"
 #include "sound_definition.h" // for sound_sample
+#include "GnashSleep.h"
 #include <boost/bind.hpp>
 #include <boost/version.hpp>
 
@@ -67,11 +68,6 @@
 
 // Debug threads locking
 #undef DEBUG_THREADS_LOCKING
-
-#if defined(_WIN32) || defined(WIN32)
-#	include <windows.h>
-# define usleep(x) Sleep(x/1000)
-#endif
 
 namespace gnash
 {
@@ -846,7 +842,7 @@ SWFMovieDefinition::get_exported_resource(const std::string& symbol)
 		}
 
 		// take a breath to give other threads more time to advance
-		usleep(naptime);
+		gnashSleep(naptime);
 
 	}
 

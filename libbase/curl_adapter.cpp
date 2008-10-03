@@ -30,6 +30,7 @@
 #include "IOChannel.h"
 #include "log.h"
 #include "WallClockTimer.h"
+#include "GnashSleep.h"
 
 #include <iostream> // std::cerr
 #include <boost/thread/mutex.hpp>
@@ -210,7 +211,7 @@ CurlSession::~CurlSession()
 	while ( (code=curl_share_cleanup(_shandle)) != CURLSHE_OK )
 	{
 		log_error("Failed cleaning up share handle: %s. Will try again in a second.", curl_share_strerror(code));
-		sleep(1);
+		gnashSleep(1000000);
 	}
 	_shandle = 0;
 	curl_global_cleanup();

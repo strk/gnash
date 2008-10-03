@@ -132,6 +132,7 @@ noinst_HEADERS = \
 	GnashImagePng.h \
 	GnashImageGif.h \
 	GnashImageJpeg.h \
+	GnashSleep.h \
 	gmemory.h \
 	log.h \
 	ogl.h \
