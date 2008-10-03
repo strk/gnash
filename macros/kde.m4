@@ -14,9 +14,9 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-
 AC_DEFUN([GNASH_PATH_KDE],
 [
+  kde_version=0
   dnl Lool for the header
   AC_ARG_WITH(kde_incl, AC_HELP_STRING([--with-kde-incl], [directory where kde headers are]), with_kde_incl=${withval})
   AC_CACHE_VAL(ac_cv_path_kde_incl,[
@@ -52,15 +52,16 @@ AC_DEFUN([GNASH_PATH_KDE],
     if test "x$KDE_CONFIG" != "x" ; then
       if test "x$KDE_CFLAGS" = "x" ; then
         kde_prefix=`$KDE_CONFIG --prefix`
-
-        if test -f ${kde_prefix}/include/kapp.h ; then
-          ac_cv_path_kde_incl="-I${kde_prefix}/include -I${kde_prefix}/include/kio"
-        else
-	  if test -f ${kde_prefix}/include/kde/kapp.h; then
-            ac_cv_path_kde_incl="-I${kde_prefix}/include/kde -I${kde_prefix}/include/kde/kio"
-	  fi
+        dnl KDE4
+        if test -f ${kde_prefix}/include/kde4/kapplication.h; then
+          ac_cv_path_kde_incl="-I${kde_prefix}/include/kde4 -I${kde_prefix}/include/kde4/kio"
+          kde_version=4
         fi
-
+        dnl KDE3. If both exist, we prefer KDE3 over KDE4 for now.
+        if test -f ${kde_prefix}/include/kde/kapp.h; then
+          ac_cv_path_kde_incl="-I${kde_prefix}/include/kde -I${kde_prefix}/include/kde/kio"
+          kde_version=3
+        fi
       fi
     else
       AC_MSG_RESULT(no)
@@ -71,9 +72,18 @@ AC_DEFUN([GNASH_PATH_KDE],
   dnl incllist is inherited from configure.ac.
   if test x"${ac_cv_path_kde_incl}" = x ; then
     for i in $incllist; do
+      dnl KDE4
+      if test -f $i/kde4/kapplication.h; then
+        ac_cv_path_kde_incl="-I$i/kde4"
+        kde_prefix=`dirname $i`
+        kde_version=4
+        break
+      fi
+      dnl KDE3. If both exist, we prefer KDE3 over KDE4 for now.
       if test -f $i/kde/kapp.h; then
         ac_cv_path_kde_incl="-I$i/kde"
         kde_prefix=`dirname $i`
+        kde_version=3
         break
       fi
     done
@@ -82,7 +92,12 @@ AC_DEFUN([GNASH_PATH_KDE],
   if test x"${ac_cv_path_kde_incl}" = x; then
     AC_MSG_RESULT(no)
     if test x${cross_compiling} = xno; then
-      AC_CHECK_HEADERS(kde/kapp.h, [ac_cv_path_kde_incl=""])
+      if test $kde_version -eq 4; then
+        AC_CHECK_HEADERS(kde/kapplication.h, [ac_cv_path_kde_incl=""])
+      fi
+      if test $kde_version -eq 3; then
+        AC_CHECK_HEADERS(kde/kapp.h, [ac_cv_path_kde_incl=""])
+      fi
     fi
   else
     AC_MSG_RESULT(${ac_cv_path_kde_incl})
@@ -111,7 +126,7 @@ AC_DEFUN([GNASH_PATH_KDE],
     topdir=""
     newlist="${kde_prefix}/lib ${libslist}"
     for i in $newlist ; do
-      if test -f $i/libkdeui.a -o -f $i/libkdeui.${shlibext} ; then
+      if test -f $i/libkdeui.${shlibext} -o -f $i/libkdeui.la; then
         topdir=$i
         AC_MSG_RESULT(${topdir}/libkdeui)
 	      if test ! x"$i" = x"/usr/lib" -a ! x"$i" = x"/usr/lib64"; then
@@ -128,17 +143,19 @@ AC_DEFUN([GNASH_PATH_KDE],
   dnl Look for the kdecore library, which is required
   if test x"${ac_cv_path_kde_lib}" != x; then
     AC_MSG_CHECKING([for kdecore library])
-    if test `ls -C1 ${topdir}/libkdecore.* | wc -l` -gt 0; then
-      ac_cv_path_kde_lib="${ac_cv_path_kde_lib} -lkdecore"
-      AC_MSG_RESULT(${topdir}/libkdecore)
-    else
-      AC_MSG_RESULT(no)
+    if test $kde_version -eq 3; then
+      if test `ls -C1 ${topdir}/libkdecore.* | wc -l` -gt 0; then
+        ac_cv_path_kde_lib="${ac_cv_path_kde_lib} -lkdecore"
+        AC_MSG_RESULT(${topdir}/libkdecore)
+      else
+        AC_MSG_RESULT(no)
+      fi
     fi
 
     dnl Look for the kdeprint library, which is required
     AC_MSG_CHECKING([for kdeprint library])
     if test x"${libkdeprint}" = x; then
-      if test -f ${topdir}/libkdeprint.a -o -f ${topdir}/libkdeprint.${shlibext}; then
+      if test -f ${topdir}/libkdeprint.la -o -f ${topdir}/libkdeprint.${shlibext}; then
         ac_cv_path_kde_lib="${ac_cv_path_kde_lib} -lkdeprint"
         AC_MSG_RESULT(${topdir}/libkdeprint)
       else

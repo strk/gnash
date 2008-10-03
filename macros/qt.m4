@@ -57,7 +57,7 @@ AC_DEFUN([GNASH_PATH_QT],
       fi
     else
       dnl Look for qt4 first, if qt3 exists, we prefer that, so override this
-      if test -f /usr/include/qt4/qobject.h; then
+      if test -f /usr/include/qt4/qobject.h -o -f /usr/include/Qt/qobject.h; then
         qt_pkg="QtCore"
         gnash_qt_version=4
       fi
