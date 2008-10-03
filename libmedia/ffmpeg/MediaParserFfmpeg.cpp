@@ -228,6 +228,8 @@ MediaParserFfmpeg::parseNextFrame()
 	if ( rc < 0 )
 	{
 		log_error(_("MediaParserFfmpeg::parseNextChunk: Problems parsing next frame"));
+		// Should we set parsingComplete here ?
+		_parsingComplete=true;
 		return false;
 	}
 
