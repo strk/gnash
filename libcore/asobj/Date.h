@@ -29,6 +29,5 @@ void date_class_init(as_object& global);
 
 } // end of gnash namespace
 
-// __DATE_H__
 #endif
 
