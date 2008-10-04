@@ -116,36 +116,36 @@ static void attachDateInterface(as_object& o);
 static void attachDateStaticInterface(as_object& o);
 
 static as_value date_new(const fn_call& fn);
-static as_value date_gettime(const fn_call& fn); 
-static as_value date_settime(const fn_call& fn);
-static as_value date_gettimezoneoffset(const fn_call& fn);
-static as_value date_getyear(const fn_call& fn);
-static as_value date_getfullyear(const fn_call& fn);
-static as_value date_getmonth(const fn_call& fn);
-static as_value date_getdate(const fn_call& fn);
-static as_value date_getday(const fn_call& fn);
-static as_value date_gethours(const fn_call& fn);
-static as_value date_getminutes(const fn_call& fn);
-static as_value date_getseconds(const fn_call& fn);
-static as_value date_getmilliseconds(const fn_call& fn);
-static as_value date_getutcfullyear(const fn_call& fn);
-static as_value date_getutcyear(const fn_call& fn);
-static as_value date_getutcmonth(const fn_call& fn);
+static as_value date_getTime(const fn_call& fn); 
+static as_value date_setTime(const fn_call& fn);
+static as_value date_getTimezoneOffset(const fn_call& fn);
+static as_value date_getYear(const fn_call& fn);
+static as_value date_getFullYear(const fn_call& fn);
+static as_value date_getMonth(const fn_call& fn);
+static as_value date_getDate(const fn_call& fn);
+static as_value date_getDay(const fn_call& fn);
+static as_value date_getHours(const fn_call& fn);
+static as_value date_getMinutes(const fn_call& fn);
+static as_value date_getSeconds(const fn_call& fn);
+static as_value date_getMilliseconds(const fn_call& fn);
+static as_value date_getUTCFullYear(const fn_call& fn);
+static as_value date_getUTCYear(const fn_call& fn);
+static as_value date_getUTCMonth(const fn_call& fn);
 static as_value date_getutcdate(const fn_call& fn);
-static as_value date_getutcday(const fn_call& fn);
-static as_value date_getutchours(const fn_call& fn);
-static as_value date_getutcminutes(const fn_call& fn);
-template<bool utc> as_value date_setdate(const fn_call& fn);
+static as_value date_getUTCDay(const fn_call& fn);
+static as_value date_getUTCHours(const fn_call& fn);
+static as_value date_getUTCMinutes(const fn_call& fn);
+template<bool utc> as_value date_setDate(const fn_call& fn);
 template<bool utc> as_value date_setfullyear(const fn_call& fn);
-template<bool utc> as_value date_sethours(const fn_call& fn);
-template<bool utc> as_value date_setmilliseconds(const fn_call& fn);
-template<bool utc> as_value date_setminutes(const fn_call& fn);
+template<bool utc> as_value date_setHours(const fn_call& fn);
+template<bool utc> as_value date_setMilliseconds(const fn_call& fn);
+template<bool utc> as_value date_setMinutes(const fn_call& fn);
 template<bool utc> as_value date_setmonth(const fn_call& fn);
-template<bool utc> as_value date_setseconds(const fn_call& fn);
-static as_value date_setyear(const fn_call& fn);
+template<bool utc> as_value date_setSeconds(const fn_call& fn);
+static as_value date_setYear(const fn_call& fn);
 static as_value date_tostring(const fn_call& fn);
 static as_value date_valueof(const fn_call& fn);
-static as_value date_utc(const fn_call& fn);
+static as_value date_UTC(const fn_call& fn);
 
 static void fillGnashTime(const double& time, GnashTime& gt);
 static double makeTimeValue(GnashTime& gt);
@@ -177,7 +177,12 @@ public:
     void setTimeValue(const double& value) { _value = value; }
     double getTimeValue() const { return _value; }
 
-    Date(double value = clocktime::getTicks());
+    Date(double value = clocktime::getTicks())
+        :
+        as_object(getDateInterface()),
+        _value(value)
+    {
+    }
 
     as_value toString() const;
 
@@ -225,51 +230,51 @@ void registerDateNative(as_object& global)
 {
     VM& vm = global.getVM();
 
-    vm.registerNative(date_getfullyear, 103, 0); 
-    vm.registerNative(date_getyear, 103, 1);
-    vm.registerNative(date_getmonth, 103, 2);    
-    vm.registerNative(date_getdate, 103, 3);
-    vm.registerNative(date_getday, 103, 4);
-    vm.registerNative(date_gethours, 103, 5); 
-    vm.registerNative(date_getminutes, 103, 6);
-    vm.registerNative(date_getseconds, 103, 7);        
-    vm.registerNative(date_getmilliseconds, 103, 8);
+    vm.registerNative(date_getFullYear, 103, 0); 
+    vm.registerNative(date_getYear, 103, 1);
+    vm.registerNative(date_getMonth, 103, 2);    
+    vm.registerNative(date_getDate, 103, 3);
+    vm.registerNative(date_getDay, 103, 4);
+    vm.registerNative(date_getHours, 103, 5); 
+    vm.registerNative(date_getMinutes, 103, 6);
+    vm.registerNative(date_getSeconds, 103, 7);        
+    vm.registerNative(date_getMilliseconds, 103, 8);
     vm.registerNative(date_setfullyear<false>, 103, 9);
     vm.registerNative(date_setmonth<false>, 103, 10);
-    vm.registerNative(date_setdate<false>, 103, 11);
-    vm.registerNative(date_sethours<false>, 103, 12);
-    vm.registerNative(date_setminutes<false>, 103, 13);
-    vm.registerNative(date_setseconds<false>, 103, 14);
-    vm.registerNative(date_setmilliseconds<false>, 103, 15);
-    vm.registerNative(date_gettime, 103, 16);     
-    vm.registerNative(date_settime, 103, 17);
-    vm.registerNative(date_gettimezoneoffset, 103, 18);  
+    vm.registerNative(date_setDate<false>, 103, 11);
+    vm.registerNative(date_setHours<false>, 103, 12);
+    vm.registerNative(date_setMinutes<false>, 103, 13);
+    vm.registerNative(date_setSeconds<false>, 103, 14);
+    vm.registerNative(date_setMilliseconds<false>, 103, 15);
+    vm.registerNative(date_getTime, 103, 16);     
+    vm.registerNative(date_setTime, 103, 17);
+    vm.registerNative(date_getTimezoneOffset, 103, 18);  
     vm.registerNative(date_tostring, 103, 19);
-    vm.registerNative(date_setyear, 103, 20);
-    vm.registerNative(date_getutcfullyear, 103, 128);
-    vm.registerNative(date_getutcyear, 103, 129);    
-    vm.registerNative(date_getutcmonth, 103, 130);
+    vm.registerNative(date_setYear, 103, 20);
+    vm.registerNative(date_getUTCFullYear, 103, 128);
+    vm.registerNative(date_getUTCYear, 103, 129);    
+    vm.registerNative(date_getUTCMonth, 103, 130);
     vm.registerNative(date_getutcdate, 103, 131);      
-    vm.registerNative(date_getutcday, 103, 132);
-    vm.registerNative(date_getutchours, 103, 133);
-    vm.registerNative(date_getutcminutes, 103, 134);
+    vm.registerNative(date_getUTCDay, 103, 132);
+    vm.registerNative(date_getUTCHours, 103, 133);
+    vm.registerNative(date_getUTCMinutes, 103, 134);
     
     // These two are deliberately the same as non-UTC methods
     // as there should be no difference:
-    vm.registerNative(date_getseconds, 103, 135);
-    vm.registerNative(date_getmilliseconds, 103, 136);
+    vm.registerNative(date_getSeconds, 103, 135);
+    vm.registerNative(date_getMilliseconds, 103, 136);
 
     vm.registerNative(date_setfullyear<true>, 103, 137);
     vm.registerNative(date_setmonth<true>, 103, 138);
-    vm.registerNative(date_setdate<true>, 103, 139);
-    vm.registerNative(date_sethours<true>, 103, 140);
-    vm.registerNative(date_setminutes<true>, 103, 141);
-    vm.registerNative(date_setseconds<true>, 103, 142);
-    vm.registerNative(date_setmilliseconds<true>, 103, 143);
+    vm.registerNative(date_setDate<true>, 103, 139);
+    vm.registerNative(date_setHours<true>, 103, 140);
+    vm.registerNative(date_setMinutes<true>, 103, 141);
+    vm.registerNative(date_setSeconds<true>, 103, 142);
+    vm.registerNative(date_setMilliseconds<true>, 103, 143);
     
     //vm.registerNative(date_new, 103, 256);
 
-    vm.registerNative(date_utc, 103, 257);
+    vm.registerNative(date_UTC, 103, 257);
 
 }
 
@@ -340,14 +345,6 @@ getDateInterface()
         attachDateInterface(*o);
     }
     return o.get();
-}
-
-
-Date::Date(double value)
-    :
-    as_object(getDateInterface()),
-    _value(value)
-{
 }
 
 
@@ -522,7 +519,7 @@ inline as_value timeElement(T dateFunc, boost::int32_t GnashTime::* element,
 //
 /// Returns a Date's Gregorian year minus 1900 according to local time.
 static as_value
-date_getyear(const fn_call& fn)
+date_getYear(const fn_call& fn)
 {
     boost::intrusive_ptr<Date> date = ensureType<Date>(fn.this_ptr);
     return timeElement(localTime, &GnashTime::year, date->getTimeValue());
@@ -531,7 +528,7 @@ date_getyear(const fn_call& fn)
 /// \brief Date.getFullYear
 /// returns a Date's Gregorian year according to local time.
 static as_value
-date_getfullyear(const fn_call& fn)
+date_getFullYear(const fn_call& fn)
 {
     boost::intrusive_ptr<Date> date = ensureType<Date>(fn.this_ptr);
     return timeElement(localTime, &GnashTime::year, date->getTimeValue(), 1900);
@@ -540,7 +537,7 @@ date_getfullyear(const fn_call& fn)
 /// \brief Date.getMonth
 /// returns a Date's month in the range 0 to 11.
 static as_value
-date_getmonth(const fn_call& fn)
+date_getMonth(const fn_call& fn)
 {
     boost::intrusive_ptr<Date> date = ensureType<Date>(fn.this_ptr);
     return timeElement(localTime, &GnashTime::month, date->getTimeValue());
@@ -549,7 +546,7 @@ date_getmonth(const fn_call& fn)
 /// \brief Date.getDate
 /// returns a Date's day-of-month, from 1 to 31 according to local time.
 static as_value
-date_getdate(const fn_call& fn)
+date_getDate(const fn_call& fn)
 {
     boost::intrusive_ptr<Date> date = ensureType<Date>(fn.this_ptr);
     return timeElement(localTime, &GnashTime::monthday, date->getTimeValue());
@@ -559,7 +556,7 @@ date_getdate(const fn_call& fn)
 /// returns the day of the week for a Date according to local time,
 /// where 0 is Sunday and 6 is Saturday.
 static as_value
-date_getday(const fn_call& fn)
+date_getDay(const fn_call& fn)
 {
     boost::intrusive_ptr<Date> date = ensureType<Date>(fn.this_ptr);
     return timeElement(localTime, &GnashTime::weekday, date->getTimeValue());
@@ -569,7 +566,7 @@ date_getday(const fn_call& fn)
 /// \brief Date.getHours
 /// Returns the hour number for a Date, from 0 to 23, according to local time.
 static as_value
-date_gethours(const fn_call& fn)
+date_getHours(const fn_call& fn)
 {
     boost::intrusive_ptr<Date> date = ensureType<Date>(fn.this_ptr);
     return timeElement(localTime, &GnashTime::hour, date->getTimeValue());
@@ -580,7 +577,7 @@ date_gethours(const fn_call& fn)
 /// (Yes, some places do have a fractions of an hour's timezone offset
 /// or daylight saving time!)
 static as_value
-date_getminutes(const fn_call& fn)
+date_getMinutes(const fn_call& fn)
 {
     boost::intrusive_ptr<Date> date = ensureType<Date>(fn.this_ptr);
     return timeElement(localTime, &GnashTime::minute, date->getTimeValue());
@@ -590,7 +587,7 @@ date_getminutes(const fn_call& fn)
 /// returns a Date's seconds, from 0-59.
 /// Localtime should be irrelevant.
 static as_value
-date_getseconds(const fn_call& fn)
+date_getSeconds(const fn_call& fn)
 {
     boost::intrusive_ptr<Date> date = ensureType<Date>(fn.this_ptr);
     return timeElement(localTime, &GnashTime::second, date->getTimeValue());
@@ -602,7 +599,7 @@ date_getseconds(const fn_call& fn)
 //
 // Also implements Date.getUTCMilliseconds
 static as_value
-date_getmilliseconds(const fn_call& fn)
+date_getMilliseconds(const fn_call& fn)
 {
     boost::intrusive_ptr<Date> date = ensureType<Date>(fn.this_ptr);
     return timeElement(
@@ -613,7 +610,7 @@ date_getmilliseconds(const fn_call& fn)
 // The same functions for universal time.
 //
 static as_value
-date_getutcfullyear(const fn_call& fn)
+date_getUTCFullYear(const fn_call& fn)
 {
     boost::intrusive_ptr<Date> date = ensureType<Date>(fn.this_ptr);
     return timeElement(universalTime, &GnashTime::year,
@@ -621,14 +618,14 @@ date_getutcfullyear(const fn_call& fn)
 }
 
 static as_value
-date_getutcyear(const fn_call& fn)
+date_getUTCYear(const fn_call& fn)
 {
     boost::intrusive_ptr<Date> date = ensureType<Date>(fn.this_ptr);
     return timeElement(universalTime, &GnashTime::year, date->getTimeValue());
 }
 
 static as_value
-date_getutcmonth(const fn_call& fn)
+date_getUTCMonth(const fn_call& fn)
 {
     boost::intrusive_ptr<Date> date = ensureType<Date>(fn.this_ptr);
     return timeElement(universalTime, &GnashTime::month, date->getTimeValue());
@@ -644,7 +641,7 @@ date_getutcdate(const fn_call& fn)
 
     
 static as_value
-date_getutcday(const fn_call& fn)
+date_getUTCDay(const fn_call& fn)
 {
     boost::intrusive_ptr<Date> date = ensureType<Date>(fn.this_ptr);
     return timeElement(
@@ -652,7 +649,7 @@ date_getutcday(const fn_call& fn)
 }
 
 static as_value
-date_getutchours(const fn_call& fn)
+date_getUTCHours(const fn_call& fn)
 {
     boost::intrusive_ptr<Date> date = ensureType<Date>(fn.this_ptr);
     return timeElement(
@@ -660,7 +657,7 @@ date_getutchours(const fn_call& fn)
 }
 
 static as_value
-date_getutcminutes(const fn_call& fn)
+date_getUTCMinutes(const fn_call& fn)
 {
     boost::intrusive_ptr<Date> date = ensureType<Date>(fn.this_ptr);
     return timeElement(universalTime, &GnashTime::minute, date->getTimeValue());
@@ -668,7 +665,8 @@ date_getutcminutes(const fn_call& fn)
 
 
 // Return the difference between UTC and localtime in minutes.
-inline int localTimeZoneOffset(const double& time)
+inline int
+localTimeZoneOffset(const double& time)
 {
     // This simply has to return the difference in minutes
     // between UTC (Greenwich Mean Time, GMT) and the localtime.
@@ -682,7 +680,7 @@ inline int localTimeZoneOffset(const double& time)
 /// time specified by a Date object, according to local timezone and DST.
 /// For example, if you are in GMT+0100, the offset is -60
 static as_value
-date_gettimezoneoffset(const fn_call& fn)
+date_getTimezoneOffset(const fn_call& fn)
 {
     boost::intrusive_ptr<Date> date = ensureType<Date>(fn.this_ptr);
     return as_value(-localTimeZoneOffset(date->getTimeValue()));
@@ -697,7 +695,7 @@ date_gettimezoneoffset(const fn_call& fn)
 /// sets a Date in milliseconds after January 1, 1970 00:00 UTC.
 /// The return value is the same as the parameter.
 static as_value
-date_settime(const fn_call& fn)
+date_setTime(const fn_call& fn)
 {
     boost::intrusive_ptr<Date> date = ensureType<Date>(fn.this_ptr);
 
@@ -821,7 +819,8 @@ date_setfullyear(const fn_call& fn)
         gt.monthday = fn.arg(2).to_int();
       if (fn.nargs > 3) {
         IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("Date.setFullYear was called with more than three arguments"));
+            log_aserror(_("Date.set%sFullYear was called with "
+                        "more than three arguments"), utc ? "UTC" : "");
         )
       }
       gnashTimeToDate(gt, *date, utc);
@@ -844,7 +843,7 @@ date_setfullyear(const fn_call& fn)
 //
 // There is no setUTCYear() function.
 static as_value
-date_setyear(const fn_call& fn)
+date_setYear(const fn_call& fn)
 {
     boost::intrusive_ptr<Date> date = ensureType<Date>(fn.this_ptr);
 
@@ -902,7 +901,8 @@ date_setmonth(const fn_call& fn)
     // assert(fn.nargs >= 1 && fn.nargs <= 2);
     if (fn.nargs < 1) {
         IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("Date.setMonth needs one argument"));
+            log_aserror(_("Date.set%sMonth needs one argument"),
+                utc ? "UTC" : "");
         )
         date->setTimeValue(NaN);
     }
@@ -934,8 +934,8 @@ date_setmonth(const fn_call& fn)
         }
         if (fn.nargs > 2) {
             IF_VERBOSE_ASCODING_ERRORS(
-                log_aserror(_("Date.setMonth was called with more than three "
-                        "arguments"));
+                log_aserror(_("Date.set%sMonth was called with more than three "
+                        "arguments"), utc ? "UTC" : "");
             )
         }
         gnashTimeToDate(gt, *date, utc);
@@ -950,13 +950,13 @@ date_setmonth(const fn_call& fn)
 /// day > 31. Example: setting the 35th in January results in Feb 4th.
 template<bool utc>
 as_value
-date_setdate(const fn_call& fn)
+date_setDate(const fn_call& fn)
 {
   boost::intrusive_ptr<Date> date = ensureType<Date>(fn.this_ptr);
 
   if (fn.nargs < 1) {
       IF_VERBOSE_ASCODING_ERRORS(
-    log_aserror(_("Date.setDate needs one argument"));
+    log_aserror(_("Date.set%sDate needs one argument"), utc ? "UTC" : "");
       )
       date->setTimeValue(NaN);  // Is what FlashPlayer sets
   } else if (rogue_date_args(fn, 1) != 0.0) {
@@ -970,7 +970,8 @@ date_setdate(const fn_call& fn)
   }
   if (fn.nargs > 1) {
       IF_VERBOSE_ASCODING_ERRORS(
-    log_aserror(_("Date.setDate was called with more than one argument"));
+        log_aserror(_("Date.set%sDate was called with more than one argument"),
+                utc ? "UTC" : "");
       )
   }
   return as_value(date->getTimeValue());
@@ -989,14 +990,15 @@ date_setdate(const fn_call& fn)
 /// setTime(n) or call the constructor with one argument.
 template<bool utc>
 as_value
-date_sethours(const fn_call& fn)
+date_setHours(const fn_call& fn)
 {
     boost::intrusive_ptr<Date> date = ensureType<Date>(fn.this_ptr);
 
     // assert(fn.nargs >= 1 && fn.nargs <= 4);
     if (fn.nargs < 1) {
         IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("Date.setHours needs one argument"));
+            log_aserror(_("Date.set%sHours needs one argument"),
+            utc ? "UTC" : "");
         )
         date->setTimeValue(NaN);  // Is what FlashPlayer sets
     }
@@ -1014,7 +1016,8 @@ date_sethours(const fn_call& fn)
         if (fn.nargs >= 4) gt.millisecond = fn.arg(3).to_int();
         if (fn.nargs > 4) {
             IF_VERBOSE_ASCODING_ERRORS(
-                log_aserror(_("Date.setHours was called with more than four arguments"));
+                log_aserror(_("Date.set%sHours was called with more than "
+                              "four arguments"), utc ? "UTC" : "");
             )
         }
         
@@ -1032,14 +1035,15 @@ date_sethours(const fn_call& fn)
 /// Similarly, negative values carry you back into the previous minute/hour/day.
 template<bool utc>
 as_value
-date_setminutes(const fn_call& fn)
+date_setMinutes(const fn_call& fn)
 {
     boost::intrusive_ptr<Date> date = ensureType<Date>(fn.this_ptr);
 
     //assert(fn.nargs >= 1 && fn.nargs <= 3);
     if (fn.nargs < 1) {
         IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("Date.setMinutes needs one argument"));
+            log_aserror(_("Date.set%sMinutes needs one argument"),
+                utc ? "UTC" : "");
         )
         date->setTimeValue(NaN);  // FlashPlayer instead leaves the date set to
         // a random value such as 9th December 2077 BC
@@ -1056,7 +1060,8 @@ date_setminutes(const fn_call& fn)
         if (fn.nargs >= 3) gt.millisecond = fn.arg(2).to_int();
         if (fn.nargs > 3) {
             IF_VERBOSE_ASCODING_ERRORS(
-                log_aserror(_("Date.setMinutes was called with more than three arguments"));
+                log_aserror(_("Date.set%sMinutes was called with more than "
+                    "three arguments"), utc ? "UTC" : "");
             )
         }
         gnashTimeToDate(gt, *date, utc);
@@ -1071,14 +1076,15 @@ date_setminutes(const fn_call& fn)
 /// previous minute (or hour or calendar day) or on to the following ones.
 template<bool utc>
 as_value
-date_setseconds(const fn_call& fn)
+date_setSeconds(const fn_call& fn)
 {
     boost::intrusive_ptr<Date> date = ensureType<Date>(fn.this_ptr);
 
     // assert(fn.nargs >= 1 && fn.nargs <= 2);
     if (fn.nargs < 1) {
         IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("Date.setSeconds needs one argument"));
+            log_aserror(_("Date.set%sSeconds needs one argument"),
+                utc ? "UTC" : "");
         )
         date->setTimeValue(NaN);  // Same as commercial player
     }
@@ -1097,12 +1103,11 @@ date_setseconds(const fn_call& fn)
         if (fn.nargs >= 2) gt.millisecond = fn.arg(1).to_int();
         if (fn.nargs > 2) {
             IF_VERBOSE_ASCODING_ERRORS(
-                log_aserror(_("Date.setMinutes was called with more than three arguments"));
+                log_aserror(_("Date.set%sMinutes was called with more than "
+                      "three arguments"), utc ? "UTC" : "");
             )
         }
 
-        // This is both setSeconds and setUTCSeconds.
-        // Use utc to avoid needless worrying about timezones.
         gnashTimeToDate(gt, *date, utc);
     }
     return as_value(date->getTimeValue());
@@ -1110,14 +1115,14 @@ date_setseconds(const fn_call& fn)
 
 template<bool utc>
 as_value
-date_setmilliseconds(const fn_call& fn)
+date_setMilliseconds(const fn_call& fn)
 {
     boost::intrusive_ptr<Date> date = ensureType<Date>(fn.this_ptr);
 
-    // assert(fn.nargs == 1);
     if (fn.nargs < 1) {
         IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("Date.setMilliseconds needs one argument"));
+            log_aserror(_("Date.set%sMilliseconds needs one argument"),
+                utc ? "UTC" : "");
         )
         date->setTimeValue(NaN);
     }
@@ -1133,7 +1138,8 @@ date_setmilliseconds(const fn_call& fn)
 
         if (fn.nargs > 1) {
             IF_VERBOSE_ASCODING_ERRORS(
-                log_aserror(_("Date.setMilliseconds was called with more than one argument"));
+                log_aserror(_("Date.setMilliseconds was called with more "
+                             "than one argument"), utc ? "UTC" : "");
             )
         }
 
@@ -1187,10 +1193,8 @@ date_tostring(const fn_call& fn)
 //
 // We test for < 2 parameters and return undefined, but given any other
 // non-numeric arguments we give NaN.
-
-
 static as_value
-date_utc(const fn_call& fn) {
+date_UTC(const fn_call& fn) {
 
     GnashTime gt; // Date structure for values down to milliseconds
 
@@ -1304,7 +1308,7 @@ date_valueof(const fn_call& fn)
 }
 
 
-static as_value date_gettime(const fn_call& fn)
+static as_value date_getTime(const fn_call& fn)
 {
     boost::intrusive_ptr<Date> date = ensureType<Date>(fn.this_ptr);
     return as_value(date->getTimeValue());
@@ -1458,10 +1462,10 @@ void fillGnashTime(const double& t, GnashTime& gt)
  
     if (time < 0)
     {
-        if (gt.millisecond < 0) { gt.millisecond += 1000; gt.second--; }
-        if (gt.second < 0) { gt.second += 60; gt.minute--; }
-        if (gt.minute < 0) { gt.minute += 60; gt.hour--; }
-        if (gt.hour < 0) { gt.hour += 24; days--; }
+        if (gt.millisecond < 0) { gt.millisecond += 1000; --gt.second; }
+        if (gt.second < 0) { gt.second += 60; --gt.minute; }
+        if (gt.minute < 0) { gt.minute += 60; --gt.hour; }
+        if (gt.hour < 0) { gt.hour += 24; --days; }
     }
 
     if (days >= -4) gt.weekday = (days + 4) % 7;
