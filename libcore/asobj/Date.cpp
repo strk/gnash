@@ -376,7 +376,7 @@ Date::toString() const
     // If timezone is negative, both hours and minutes will be negative
     // but for the purpose of printing a string, only the hour needs to
     // produce a minus sign.
-    if (offsetMinutes < 0) offsetMinutes = - offsetMinutes;
+    if (offsetMinutes < 0) offsetMinutes = -offsetMinutes;
   
     boost::format dateFormat("%s %s %d %02d:%02d:%02d GMT%+03d%02d %d");
     dateFormat % dayweekname[gt.weekday] % monthname[gt.month]
@@ -531,7 +531,8 @@ static as_value
 date_getFullYear(const fn_call& fn)
 {
     boost::intrusive_ptr<Date> date = ensureType<Date>(fn.this_ptr);
-    return timeElement(localTime, &GnashTime::year, date->getTimeValue(), 1900);
+    return timeElement(
+            localTime, &GnashTime::year, date->getTimeValue(), 1900);
 }
 
 /// \brief Date.getMonth
