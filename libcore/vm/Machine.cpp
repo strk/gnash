@@ -1524,7 +1524,8 @@ Machine::execute()
 ///  value
 	case SWF::ABC_ACTION_GETLOCAL:
 	{
-		push_stack(mRegisters[mStream->read_V32()]);
+		boost::uint32_t index = mStream->read_V32();
+		push_stack(get_register(index));
 		break;
 	}
 /// 0x63 ABC_ACTION_SETLOCAL
@@ -1577,8 +1578,9 @@ Machine::execute()
 		//TODO: If multiname is runtime we need to also pop namespace and name values of the stack.
 		as_value obj = pop_stack();
 		as_value val;
-		obj.to_object().get()->get_member(a.getGlobalName(), &val);
-
+		if(!obj.is_undefined()){
+			obj.to_object().get()->get_member(a.getGlobalName(), &val);
+		}
 		push_stack(val);
 
 		break;
