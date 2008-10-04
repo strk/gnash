@@ -111,9 +111,9 @@ static const int daysInMonth[2][12] = {
 // forward declarations
 static void fillGnashTime(const double& time, GnashTime& gt);
 static double makeTimeValue(GnashTime& gt);
-static void getLocalTime(const double& time, GnashTime& gt);
-static void getUniversalTime(const double& time, GnashTime& gt);
-static int getLocalTimeZoneOffset(const double& time);
+static void localTime(const double& time, GnashTime& gt);
+static void universalTime(const double& time, GnashTime& gt);
+static int localTimeZoneOffset(const double& time);
 
 static double rogue_date_args(const fn_call& fn, unsigned maxargs);
 
@@ -140,17 +140,18 @@ private:
     double _value;
 };
 
-
-static void
-getLocalTime(const double& time, GnashTime& gt)
+/// Return the broken-down time as a local time.
+inline void
+localTime(const double& time, GnashTime& gt)
 {
     // find local timezone offset for the desired time.
-    gt.timeZoneOffset = getLocalTimeZoneOffset(time);
+    gt.timeZoneOffset = localTimeZoneOffset(time);
     fillGnashTime(time, gt);
 }
 
-static void
-getUniversalTime(const double& time, GnashTime& gt)
+/// Return the broken-down time as UTC
+inline void
+universalTime(const double& time, GnashTime& gt)
 {
     // No time zone needed.
     gt.timeZoneOffset = 0;
@@ -356,7 +357,7 @@ Date::toString() const
     GnashTime gt;
     // Time zone offset (including DST) as hours and minutes east of GMT
 
-    getLocalTime(_value, gt);
+    localTime(_value, gt);
 
     int offsetHours = gt.timeZoneOffset / 60;
     int offsetMinutes = gt.timeZoneOffset % 60;    
@@ -389,7 +390,6 @@ Date::toString() const
 /// and negative values are years prior to 1900. Thus the only way to
 /// specify the year 50AD is as -1850.
 /// Defaults are 0 except for date (day of month) whose default it 1.
-
 as_value
 date_new(const fn_call& fn)
 {
@@ -439,7 +439,8 @@ date_new(const fn_call& fn)
         switch (fn.nargs) {
             default:
                 IF_VERBOSE_ASCODING_ERRORS(
-                log_aserror(_("Date constructor called with more than 7 arguments"));
+                log_aserror(_("Date constructor called with more than 7 "
+                        "arguments"));
                 )
             case 7:
                 // fractions of milliseconds are ignored
@@ -474,93 +475,190 @@ date_new(const fn_call& fn)
 
 // Date.getTime() is implemented by Date.valueOf()
 
-// Functions to return broken-out elements of the date and time.
+/// Return true if the date is invalid.
+inline
+bool invalidDate(double timeValue)
+{
+    return (isNaN(timeValue) || isinf(timeValue));
+}
 
-// We use a prototype macro to generate the function bodies because the many
-// individual functions are small and almost identical.
+/// Returns an element of the Date object as an as_value
+//
+/// An invalid date value is returned as NaN (this is probably not correct,
+/// as the pp returns something weird in this case).
+//
+/// @param dateFunc     The date function (either localTime or universalTime)
+///                     to use to break the time value into elements.
+/// @param element      A pointer-to-data-member of the GnashTime struct, 
+///                     specifying which element to return.
+/// @param timeValue    The time value to break into elements.
+/// @param adjustment   Adjust the result by this amount (used for full year).
+template<typename T>
+inline as_value timeElement(T dateFunc, boost::int32_t GnashTime::* element,
+        double timeValue, int adjustment = 0)
+{
+    if (invalidDate(timeValue)) return as_value();
+    GnashTime gt;
+    dateFunc(timeValue, gt);
+    return as_value(gt.*element + adjustment);
+}
 
-// This calls _gmtime_r and _localtime_r, which are defined above into
-// gmtime_r and localtime_r or our own local equivalents.
 
-#define date_get_proto(function, timefn, element) \
-  static as_value function(const fn_call& fn) { \
-    boost::intrusive_ptr<Date> date = ensureType<Date>(fn.this_ptr); \
-    if (isNaN(date->getTimeValue()) || isinf(date->getTimeValue())) { as_value rv; rv.set_nan(); return rv; } \
-    GnashTime gt; \
-    timefn(date->getTimeValue(), gt); \
-    return as_value(gt.element); \
-  }
-
-/// \brief Date.getYear
-/// returns a Date's Gregorian year minus 1900 according to local time.
-
-date_get_proto(date_getyear, getLocalTime, year)
+/// Date.getYear()
+//
+/// Returns a Date's Gregorian year minus 1900 according to local time.
+static as_value
+date_getyear(const fn_call& fn)
+{
+    boost::intrusive_ptr<Date> date = ensureType<Date>(fn.this_ptr);
+    return timeElement(localTime, &GnashTime::year, date->getTimeValue());
+}
 
 /// \brief Date.getFullYear
 /// returns a Date's Gregorian year according to local time.
-
-date_get_proto(date_getfullyear, getLocalTime, year + 1900)
+static as_value
+date_getfullyear(const fn_call& fn)
+{
+    boost::intrusive_ptr<Date> date = ensureType<Date>(fn.this_ptr);
+    return timeElement(localTime, &GnashTime::year, date->getTimeValue(), 1900);
+}
 
 /// \brief Date.getMonth
 /// returns a Date's month in the range 0 to 11.
-
-date_get_proto(date_getmonth, getLocalTime, month)
+static as_value
+date_getmonth(const fn_call& fn)
+{
+    boost::intrusive_ptr<Date> date = ensureType<Date>(fn.this_ptr);
+    return timeElement(localTime, &GnashTime::month, date->getTimeValue());
+}
 
 /// \brief Date.getDate
 /// returns a Date's day-of-month, from 1 to 31 according to local time.
-
-date_get_proto(date_getdate, getLocalTime, monthday)
+static as_value
+date_getdate(const fn_call& fn)
+{
+    boost::intrusive_ptr<Date> date = ensureType<Date>(fn.this_ptr);
+    return timeElement(localTime, &GnashTime::monthday, date->getTimeValue());
+}
 
 /// \brief Date.getDay
 /// returns the day of the week for a Date according to local time,
 /// where 0 is Sunday and 6 is Saturday.
+static as_value
+date_getday(const fn_call& fn)
+{
+    boost::intrusive_ptr<Date> date = ensureType<Date>(fn.this_ptr);
+    return timeElement(localTime, &GnashTime::weekday, date->getTimeValue());
+}
 
-date_get_proto(date_getday, getLocalTime, weekday)
 
 /// \brief Date.getHours
 /// Returns the hour number for a Date, from 0 to 23, according to local time.
-
-date_get_proto(date_gethours, getLocalTime, hour)
+static as_value
+date_gethours(const fn_call& fn)
+{
+    boost::intrusive_ptr<Date> date = ensureType<Date>(fn.this_ptr);
+    return timeElement(localTime, &GnashTime::hour, date->getTimeValue());
+}
 
 /// \brief Date.getMinutes
 /// returns a Date's minutes, from 0-59, according to localtime.
-// (Yes, some places do have a fractions of an hour's timezone offset
-// or daylight saving time!)
-
-date_get_proto(date_getminutes, getLocalTime, minute)
+/// (Yes, some places do have a fractions of an hour's timezone offset
+/// or daylight saving time!)
+static as_value
+date_getminutes(const fn_call& fn)
+{
+    boost::intrusive_ptr<Date> date = ensureType<Date>(fn.this_ptr);
+    return timeElement(localTime, &GnashTime::minute, date->getTimeValue());
+}
 
 /// \brief Date.getSeconds
 /// returns a Date's seconds, from 0-59.
 /// Localtime should be irrelevant.
-
-date_get_proto(date_getseconds, getLocalTime, second)
+static as_value
+date_getseconds(const fn_call& fn)
+{
+    boost::intrusive_ptr<Date> date = ensureType<Date>(fn.this_ptr);
+    return timeElement(localTime, &GnashTime::second, date->getTimeValue());
+}
 
 /// \brief Date.getMilliseconds
 /// returns a Date's millisecond component as an integer from 0 to 999.
 /// Localtime is irrelevant!
 //
 // Also implements Date.getUTCMilliseconds
-date_get_proto(date_getmilliseconds, getLocalTime, millisecond)
+static as_value
+date_getmilliseconds(const fn_call& fn)
+{
+    boost::intrusive_ptr<Date> date = ensureType<Date>(fn.this_ptr);
+    return timeElement(
+            localTime, &GnashTime::millisecond, date->getTimeValue());
+}
 
 
 // The same functions for universal time.
 //
-date_get_proto(date_getutcfullyear, getUniversalTime, year + 1900)
-date_get_proto(date_getutcyear,     getUniversalTime, year)
-date_get_proto(date_getutcmonth,    getUniversalTime, month)
-date_get_proto(date_getutcdate,     getUniversalTime, monthday)
-date_get_proto(date_getutcday,      getUniversalTime, weekday)
-date_get_proto(date_getutchours,    getUniversalTime, hour)
-date_get_proto(date_getutcminutes,  getUniversalTime, minute)
+static as_value
+date_getutcfullyear(const fn_call& fn)
+{
+    boost::intrusive_ptr<Date> date = ensureType<Date>(fn.this_ptr);
+    return timeElement(universalTime, &GnashTime::year,
+           date->getTimeValue(), 1900);
+}
+
+static as_value
+date_getutcyear(const fn_call& fn)
+{
+    boost::intrusive_ptr<Date> date = ensureType<Date>(fn.this_ptr);
+    return timeElement(universalTime, &GnashTime::year, date->getTimeValue());
+}
+
+static as_value
+date_getutcmonth(const fn_call& fn)
+{
+    boost::intrusive_ptr<Date> date = ensureType<Date>(fn.this_ptr);
+    return timeElement(universalTime, &GnashTime::month, date->getTimeValue());
+}
+
+static as_value
+date_getutcdate(const fn_call& fn)
+{
+    boost::intrusive_ptr<Date> date = ensureType<Date>(fn.this_ptr);
+    return timeElement(
+            universalTime, &GnashTime::monthday, date->getTimeValue());
+}
+
+    
+static as_value
+date_getutcday(const fn_call& fn)
+{
+    boost::intrusive_ptr<Date> date = ensureType<Date>(fn.this_ptr);
+    return timeElement(
+                universalTime, &GnashTime::weekday, date->getTimeValue());
+}
+
+static as_value
+date_getutchours(const fn_call& fn)
+{
+    boost::intrusive_ptr<Date> date = ensureType<Date>(fn.this_ptr);
+    return timeElement(
+                universalTime, &GnashTime::hour, date->getTimeValue());
+}
+
+static as_value
+date_getutcminutes(const fn_call& fn)
+{
+    boost::intrusive_ptr<Date> date = ensureType<Date>(fn.this_ptr);
+    return timeElement(universalTime, &GnashTime::minute, date->getTimeValue());
+}
 
 
 // Return the difference between UTC and localtime in minutes.
-static int getLocalTimeZoneOffset(const double& time)
+inline int localTimeZoneOffset(const double& time)
 {
     // This simply has to return the difference in minutes
     // between UTC (Greenwich Mean Time, GMT) and the localtime.
     // Obviously, this includes Daylight Saving Time if it applies.
-
     return clocktime::getTimeZoneOffset(time);
 }
 
@@ -573,7 +671,7 @@ static as_value
 date_gettimezoneoffset(const fn_call& fn)
 {
     boost::intrusive_ptr<Date> date = ensureType<Date>(fn.this_ptr);
-    return as_value( -getLocalTimeZoneOffset(date->getTimeValue()) );
+    return as_value(-localTimeZoneOffset(date->getTimeValue()));
 }
 
 
@@ -601,7 +699,8 @@ date_settime(const fn_call& fn)
 
     if (fn.nargs > 1) {
         IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("Date.setTime was called with more than one argument"));
+            log_aserror(_("Date.setTime was called with more than one "
+                    "argument"));
         )
     }
 
@@ -633,7 +732,8 @@ gnashTimeToDate(GnashTime& gt, Date& date, bool utc)
 
     else {
         double localTime = makeTimeValue(gt);
-        date.setTimeValue(localTime - clocktime::getTimeZoneOffset(localTime) * 60000);
+        date.setTimeValue(localTime - 
+                clocktime::getTimeZoneOffset(localTime) * 60000);
     }
 }
 
@@ -641,8 +741,8 @@ static void
 dateToGnashTime(Date& date, GnashTime& gt, bool utc)
 {
     // Needs timezone.
-    if (utc) getUniversalTime(date.getTimeValue(), gt);
-    else getLocalTime(date.getTimeValue(), gt);
+    if (utc) universalTime(date.getTimeValue(), gt);
+    else localTime(date.getTimeValue(), gt);
 }
 
 //
@@ -812,7 +912,8 @@ _date_setmonth(const fn_call& fn, bool utc)
         }
         if (fn.nargs > 2) {
             IF_VERBOSE_ASCODING_ERRORS(
-                log_aserror(_("Date.setMonth was called with more than three arguments"));
+                log_aserror(_("Date.setMonth was called with more than three "
+                        "arguments"));
             )
         }
         gnashTimeToDate(gt, *date, utc);
