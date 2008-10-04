@@ -28,64 +28,56 @@ translations = cs de es fi fr it ja sv
 pofiles := $(patsubst %,%.po,$(translations))
 gmofiles := $(patsubst %,%.gmo,$(translations))
 
-MAINTAINERCLEANFILES = \
-	gnash.pot 
-
 CLEANFILES = \
-	$(gmofiles) \
-	POTFILES 
+	$(gmofiles) 
 
-dirs =  $(top_srcdir)/libbase \
-	$(top_srcdir)/backend \
-	$(top_srcdir)/libamf \
-	$(top_srcdir)/libmedia \
-	$(top_srcdir)/libmedia/ffmpeg \
-	$(top_srcdir)/libmedia/gst \
-	$(top_srcdir)/libcore \
-	$(top_srcdir)/libcore/vm \
-	$(top_srcdir)/libcore/swf \
-	$(top_srcdir)/libcore/parser \
-	$(top_srcdir)/libcore/asobj \
-	$(top_srcdir)/utilities \
-	$(top_srcdir)/plugin \
-	$(top_srcdir)/gui \
-	$(top_srcdir)/extensions \
-	$(top_srcdir)/extensions/dbus \
-	$(top_srcdir)/extensions/dejagnu \
-	$(top_srcdir)/extensions/fileio \
-	$(top_srcdir)/extensions/lirc \
-	$(top_srcdir)/extensions/gtk2 \
-	$(top_srcdir)/extensions/metome \
-	$(top_srcdir)/extensions/mysql
+dirs =  libbase \
+	backend \
+	libamf \
+	libmedia \
+	libmedia/ffmpeg \
+	libmedia/gst \
+	libcore \
+	libcore/vm \
+	libcore/swf \
+	libcore/parser \
+	libcore/asobj \
+	utilities \
+	plugin \
+	gui \
+	extensions \
+	extensions/dbus \
+	extensions/dejagnu \
+	extensions/fileio \
+	extensions/lirc \
+	extensions/gtk2 \
+	extensions/metome \
+	extensions/mysql
 	
-srcfiles := $(foreach dir,$(dirs),$(wildcard $(dir)/*.cpp))
-
 EXTRA_DIST = $(pofiles) gnash.pot 
 
 all: $(gmofiles)
 
-POTFILES: $(srcfiles)
-	@echo "Building POTFILES..."
-	@rm -f POTFILES
-	@for i in $(srcfiles) ; do \
-	  echo "$$i" >> POTFILES;\
-	done
-
 if HAS_GETTEXT
 
-gnash.pot: POTFILES
-	$(XGETTEXT) --language=C++ --files-from=POTFILES -o $(srcdir)/gnash.pot \
+gnash.pot: force
+	cd $(top_srcdir); \
+	pwd; \
+	rm -f po/POTFILES; \
+	for i in `find $(dirs) -name '*.cpp'`; do \
+	  echo "$$i" >> po/POTFILES;\
+	done; \
+	$(XGETTEXT) --language=C++ --files-from=po/POTFILES -o po/gnash.pot \
 	  --default-domain=gnash --force \
 	  --flag=_:1:pass-c-format --keyword=_ \
-	  --copyright-holder='Free Software Foundation, Inc.'
+	  --copyright-holder='Free Software Foundation, Inc.';  \
+	rm -f po/POTFILES
 
 update-po: gnash.pot
 	@for i in $(pofiles); do \
 	  echo "Merging $$i..." ; \
 	  $(MSGMERGE) --update $(srcdir)/$$i $(srcdir)/gnash.pot; \
 	done
-
-$(gmofiles): #update-po
 
 SUFFIXES = .po .gmo
 .po.gmo:
