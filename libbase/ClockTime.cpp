@@ -264,11 +264,9 @@ clocktime::getTimeZoneOffset(double time)
     else {
         // tm_isdst is negative: cannot get TZ info.
         // Convert and print in UTC instead.
-        static bool warned = false;
-        if (!warned) {
+        LOG_ONCE(
             gnash::log_error(_("Cannot get requested timezone information"));
-            warned = true;
-        }
+        );
         offset = 0;
     }
 
