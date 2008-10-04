@@ -79,7 +79,6 @@
 #include "ClockTime.h"
 #include "VM.h"
 
-#include <ctime>
 #include <cmath>
 #include <boost/format.hpp>
 
@@ -157,6 +156,24 @@ universalTime(const double& time, GnashTime& gt)
     gt.timeZoneOffset = 0;
     fillGnashTime(time, gt);
 }
+
+
+/// Safely truncate a double to an integer, doing it quickly if it's
+/// safe and using std::fmod if it's not.
+template <typename T>
+inline void truncateDouble(T& target, double value)
+{
+    if (value < std::numeric_limits<T>::min() ||
+            value > std::numeric_limits<T>::max())
+    {
+        target = std::fmod(value,
+                static_cast<double>(std::numeric_limits<T>::max()) + 1);
+        return;
+    }
+    target = static_cast<T>(value);
+
+}
+
 
 // Seconds and milliseconds should be exactly the same whether in UTC
 // or in localtime, so we always use localtime.
@@ -845,13 +862,17 @@ date_setyear(const fn_call& fn)
         GnashTime gt;
 
         dateToGnashTime(*date, gt, false);
-        gt.year = static_cast<int>(fn.arg(0).to_number()) - 1900;
+
+        // TODO: Should truncation be done before or after subtracting 1900?
+        truncateDouble(gt.year, fn.arg(0).to_number());
+        gt.year -= 1900;
 
         if (fn.nargs >= 2) gt.month = fn.arg(1).to_int();
         if (fn.nargs >= 3) gt.monthday = fn.arg(2).to_int();
         if (fn.nargs > 3) {
             IF_VERBOSE_ASCODING_ERRORS(
-                log_aserror(_("Date.setYear was called with more than three arguments"));
+                log_aserror(_("Date.setYear was called with more than three "
+                        "arguments"));
             )
         }
         gnashTimeToDate(gt, *date, false); // utc=false: use localtime
@@ -897,7 +918,7 @@ _date_setmonth(const fn_call& fn, bool utc)
         // January
         double monthvalue =  fn.arg(0).to_number();
         if (isNaN(monthvalue) || isinf(monthvalue)) monthvalue = 0.0;
-        gt.month = static_cast<int>(monthvalue);
+        truncateDouble(gt.month, monthvalue);
 
         // If the day-of-month value is invalid instead, the result is NaN.
         if (fn.nargs >= 2) {
@@ -907,7 +928,7 @@ _date_setmonth(const fn_call& fn, bool utc)
                 return as_value(date->getTimeValue());
             }
             else {
-                gt.monthday = static_cast<int>(mdayvalue);
+                truncateDouble(gt.monthday, mdayvalue);
             }
         }
         if (fn.nargs > 2) {
@@ -1102,7 +1123,7 @@ _date_setmilliseconds(const fn_call& fn, bool utc)
         GnashTime gt;
 
         dateToGnashTime(*date, gt, utc);
-        gt.millisecond = static_cast<int>(fn.arg(0).to_number());
+        truncateDouble(gt.millisecond, fn.arg(0).to_number());
 
         if (fn.nargs > 1) {
             IF_VERBOSE_ASCODING_ERRORS(
@@ -1239,7 +1260,8 @@ date_utc(const fn_call& fn) {
         case 2:   // these last two are always performed
             gt.month = fn.arg(1).to_int();
             {
-                int year = static_cast<int>(fn.arg(0).to_number());
+                boost::int32_t year = 0;
+                truncateDouble(year, fn.arg(0).to_number());
                 if (year < 100) gt.year = year;
                 else gt.year = year - 1900;
             }
