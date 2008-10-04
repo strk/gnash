@@ -1023,7 +1023,7 @@ Machine::execute()
 		abc_function* new_function = m->getPrototype();
 		//TODO: SafeStack contains all the scope objects in for all functions in the call stack.
 		//We should only copy the relevent scope objects to the function's scope stacks.
-		new_function->mScopeStack = mScopeStack;
+		new_function->mScopeStack = getScopeStack();
 		push_stack(as_value(new_function));
 		break;
 	}
@@ -2639,15 +2639,15 @@ as_value Machine::executeFunction(asMethod* function, const fn_call& fn){
 	for(unsigned int i=0;i<fn.nargs;i++){
 		mRegisters[i+1] = fn.arg(i);
 	}
+	//TODO:  There is probably a better way to do this.
+	if(mCurrentFunction->mScopeStack){
+		for(unsigned int i=0;i<mCurrentFunction->mScopeStack->size();++i){
+			push_scope_stack(as_value(mCurrentFunction->mScopeStack->at(i)));
+		}
+	}
 	execute();
 	mExitWithReturn = prev_ext;
 	stream->seekTo(0);
-	
-//TODO:  There is probably a better way to do this.  Maybe we should remove the mScopeStack property
-//		of Machine and always have functions reference their own scope stack.
-	for(unsigned int i=0;i<mCurrentFunction->mScopeStack.size();++i){
-		push_scope_stack(mCurrentFunction->mScopeStack.top(i));
-	}
 
 	return mGlobalReturn;
 }

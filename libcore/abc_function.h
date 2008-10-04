@@ -28,6 +28,7 @@
 #include "asClass.h"
 #include "SafeStack.h"
 #include "as_object.h"
+#include "as_environment.h"
 
 namespace gnash {
 
@@ -51,7 +52,7 @@ public:
 
 	boost::uint32_t getMaxRegisters(){ return mMethodInfo->getMaxRegisters(); }
 
-	SafeStack<boost::intrusive_ptr<as_object> > mScopeStack;
+	as_environment::ScopeStack* mScopeStack;
 
 };
 
