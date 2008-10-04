@@ -17,42 +17,42 @@ msgstr ""
 #: libbase/noseek_fd_adapter.cpp:227
 #, c-format
 msgid "Error reading %d bytes from input stream"
-msgstr ""
+msgstr "Errore durante la lettura di %d byte dall'input stream"
 
 #: libbase/GnashImageGif.cpp:120
 msgid "GIF: Error retrieving record type"
-msgstr ""
+msgstr "GIF: errore nell'estrazione del tipo di record"
 
 #: libbase/GnashImageGif.cpp:130
 msgid "GIF: Error retrieving image description"
-msgstr ""
+msgstr "GIF: errore nell'estrazione della descrizione immagine"
 
 #: libbase/GnashImageGif.cpp:159
 msgid "GIF: invalid image data (bounds outside GIF screen)"
-msgstr ""
+msgstr "GIF: dati immagine invalidi (bordi al di fuori dello schermo GIF)"
 
 #: libbase/GnashImageGif.cpp:165
 #, c-format
 msgid "Found interlaced GIF (%d x %d)"
-msgstr ""
+msgstr "Trovata GIF interlacciata (%d x %d)"
 
 #: libbase/GnashImageGif.cpp:181 libbase/GnashImageGif.cpp:195
 msgid "GIF: failed reading pixel data"
-msgstr ""
+msgstr "GIF: non riesco a leggere i pixel"
 
 #: libbase/GnashImageGif.cpp:189
 #, c-format
 msgid "Found non-interlaced GIF (%d x %d)"
-msgstr ""
+msgstr "Trovate GIF non-interlacciata (%d x %d)"
 
 #: libbase/GnashImageJpeg.cpp:117
 msgid "JPEG: Empty jpeg source stream."
-msgstr ""
+msgstr "JPEG: la jpeg e' vuota"
 
 #: libbase/GnashImageJpeg.cpp:269 libbase/GnashImageJpeg.cpp:296
 #: libbase/GnashImageJpeg.cpp:315 libbase/GnashImageJpeg.cpp:372
 msgid "Internal jpeg error: "
-msgstr ""
+msgstr "Errore jpeg interno: "
 
 #: libbase/GnashImageJpeg.cpp:281
 msgid "Lack of data during JPEG header parsing"
@@ -139,7 +139,7 @@ msgstr ""
 
 #: libbase/ClockTime.cpp:269
 msgid "Cannot get requested timezone information"
-msgstr ""
+msgstr "Non posso ottenere le informazioni sul fuso orario"
 
 #: libbase/GC.cpp:70
 #, fuzzy, c-format
