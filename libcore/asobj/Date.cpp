@@ -158,16 +158,15 @@ universalTime(const double& time, GnashTime& gt)
 }
 
 
-/// Safely truncate a double to an integer, doing it quickly if it's
-/// safe and using std::fmod if it's not.
+/// Safely truncate a double to an integer, returning the min()
+/// limit on overflow.
 template <typename T>
 inline void truncateDouble(T& target, double value)
 {
     if (value < std::numeric_limits<T>::min() ||
             value > std::numeric_limits<T>::max())
     {
-        target = std::fmod(value,
-                static_cast<double>(std::numeric_limits<T>::max()) + 1);
+        target = std::numeric_limits<T>::min();
         return;
     }
     target = static_cast<T>(value);
@@ -1464,8 +1463,13 @@ void fillGnashTime(const double& t, GnashTime& gt)
     
     // Get the sub-day part of the time, if any and reduce time
     // to number of complete days.
-    boost::int32_t remainder = static_cast<boost::int32_t>(std::fmod(time, 86400.0));
-    boost::int32_t days = static_cast<boost::int32_t>(time / 86400.0); // complete days
+    // This is a safe cast.
+    boost::int32_t remainder = 
+        static_cast<boost::int32_t>(std::fmod(time, 86400.0));
+
+    // This could overflow.
+    boost::int32_t days;
+    truncateDouble(days, time / 86400.0); // complete days
    
     gt.second = remainder % 60;
     remainder /= 60;
