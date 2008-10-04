@@ -60,7 +60,7 @@ all: $(gmofiles)
 
 if HAS_GETTEXT
 
-gnash.pot: force
+gnash.pot: 
 	cd $(top_srcdir); \
 	pwd; \
 	rm -f po/POTFILES; \
@@ -73,8 +73,10 @@ gnash.pot: force
 	  --copyright-holder='Free Software Foundation, Inc.';  \
 	rm -f po/POTFILES
 
-update-po: gnash.pot
-	@for i in $(pofiles); do \
+update-po: 
+	rm -f $(srcdir)/gnash.pot # force rebuild of this
+	$(MAKE) gnash.pot
+	for i in $(pofiles); do \
 	  echo "Merging $$i..." ; \
 	  $(MSGMERGE) --update $(srcdir)/$$i $(srcdir)/gnash.pot; \
 	done
