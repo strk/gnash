@@ -177,7 +177,7 @@ class GtkGui : public Gui
     
     void add_pixmap_directory(const gchar *directory);
 
-    gchar* find_pixmap_file(const gchar *filename);
+    static gchar* find_pixmap_file(const gchar *filename);
     
     void expose(const GdkRegion* region);
 
@@ -190,6 +190,9 @@ class GtkGui : public Gui
     virtual bool showMouse(bool show);
 
     virtual void showMenu(bool show);
+
+    // Adds the gnash icon to a window.
+    static void addGnashIcon(GtkWindow* window);
 
  private:
 #ifdef GUI_HILDON
@@ -208,9 +211,6 @@ class GtkGui : public Gui
     GtkWidget   *_menubar;
     GtkWidget   *_vbox;
 
-    // Adds the gnash icon to a window.
-    void addGnashIcon(GtkWindow* window);
-
     /// Add key press events to the toplevel window.
     //
     /// The plugin fullscreen creates a new top level
@@ -218,7 +218,7 @@ class GtkGui : public Gui
     /// the drawing area is reparented.
     void setupWindowEvents();
     
-    GdkPixbuf* createPixbuf(const gchar *filename);
+    static GdkPixbuf* createPixbuf(const gchar *filename);
 
 #ifdef USE_SWFTREE
     // Create a tree model for displaying movie info
@@ -230,36 +230,6 @@ class GtkGui : public Gui
     static gnash::key::code gdk_to_gnash_key(guint key);
     static int gdk_to_gnash_modifier(int state);
 
-    // A struct containing pointers to widgets for passing preference 
-    // data from the dialogue   
-    struct prefData {
-        GtkWidget *soundToggle;
-        GtkWidget *actionDumpToggle;
-        GtkWidget *parserDumpToggle;
-        GtkWidget *malformedSWFToggle;
-        GtkWidget *ASCodingErrorToggle;
-        GtkWidget *logfileName;
-        GtkWidget *writeLogToggle;
-        GtkWidget *verbosityScale;
-        GtkWidget *localDomainToggle;
-        GtkWidget *localHostToggle;
-        GtkWidget *solReadOnlyToggle;
-        GtkWidget *solLocalDomainToggle;
-        GtkWidget *localConnectionToggle;
-        GtkWidget *insecureSSLToggle; 
-        GtkWidget *lcTraceToggle;
-        GtkWidget *solSandbox;
-        GtkWidget *osText;
-        GtkWidget *versionText;
-        GtkWidget *urlOpenerText;
-        GtkWidget *librarySize;
-        GtkWidget *startStoppedToggle;
-#ifdef USE_DEBUGGER
-        GtkWidget *DebuggerToggle;
-#endif
-    };
-    
-    static void handlePrefs(GtkWidget* widget, gint response, gpointer data);
     static void openFile(GtkWidget* dialog, gpointer data);
 
     void stopHook();
