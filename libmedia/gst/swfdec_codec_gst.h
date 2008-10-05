@@ -46,6 +46,14 @@ void		swfdec_gst_decoder_finish	(SwfdecGstDecoder *	dec);
 GstElementFactory *
 		swfdec_gst_get_element_factory	(GstCaps *		caps);
 
+GstElementFactory *
+		swfdec_gst_get_demuxer_factory	(GstCaps *		caps);
+GstElementFactory *
+		swfdec_gst_get_parser_factory	(GstCaps *		caps);
+
+GstPad *	swfdec_gst_connect_srcpad (GstElement *element, GstCaps *caps);
+
+GstPad *	swfdec_gst_connect_sinkpad (GstElement *element, GstCaps *caps);
 
 G_END_DECLS
 #endif

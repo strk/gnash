@@ -99,11 +99,10 @@ if USE_GST_ENGINE
 		gst/MediaHandlerGst.cpp \
 		gst/VideoDecoderGst.cpp \
 		gst/AudioDecoderGst.cpp \
+		gst/MediaParserGst.cpp \
 		gst/gstappsink.c \
 		gst/gstappsrc.c \
-		gst/SoundHandlerGst.cpp \
 		gst/GstUtil.cpp \
-		gst/SoundGst.cpp \
 		gst/gstflvdemux.c \
 		gst/gstflvparse.c \
 		gst/gstbuffersrc.c \
@@ -114,11 +113,10 @@ if USE_GST_ENGINE
 		gst/MediaHandlerGst.h \
 		gst/AudioDecoderGst.h \
 		gst/VideoDecoderGst.h \
+		gst/MediaParserGst.h \
 		gst/gstappsink.h \
 		gst/gstappsrc.h \
-		gst/SoundHandlerGst.h \
 		gst/GstUtil.h \
-		gst/SoundGst.h \
 		gst/gstflvdemux.h \
 		gst/gstflvparse.h \
 		gst/gstbuffersrc.h \

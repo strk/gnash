@@ -34,6 +34,9 @@
 #include <gst/gst.h>
 
 
+#include "swfdec_codec_gst.h"
+
+
 namespace gnash {
 namespace media {
 
@@ -69,26 +72,23 @@ private:
 class DSOEXPORT VideoDecoderGst : public VideoDecoder
 {
 public:
-  VideoDecoderGst(videoCodecType codec_type, int width, int height);
-  ~VideoDecoderGst();
+    VideoDecoderGst(videoCodecType codec_type, int width, int height);
+    VideoDecoderGst(GstCaps* caps);
+    ~VideoDecoderGst();
 
-  void push(const EncodedVideoFrame& buffer);
+    void push(const EncodedVideoFrame& buffer);
 
-  std::auto_ptr<image::ImageBase> pop();
+    std::auto_ptr<image::ImageBase> pop();
   
-  bool peek();
+    bool peek();
 
-private:  
-  void checkMessages();
-  void handleMessage(GstMessage* message);
+private:
+    void setup(GstCaps* caps);
 
-  VideoDecoderGst();
-  VideoDecoderGst(const gnash::media::VideoDecoderGst&);
+    VideoDecoderGst();
+    VideoDecoderGst(const gnash::media::VideoDecoderGst&);
 
-  GstElement* _pipeline;
-  GstElement* _appsrc;
-  GstElement* _appsink;
-  GstElement* _colorspace;
+    SwfdecGstDecoder _decoder;
 };
 
 

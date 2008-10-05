@@ -202,13 +202,20 @@ MediaParser::peekNextAudioFrame() const
 	return _audioFrames.front();
 }
 
-MediaParser::~MediaParser()
+void
+MediaParser::join()
 {
 	if ( _parserThread.get() )
 	{
 		requestParserThreadKill();
 		_parserThread->join();
+		_parserThread.reset();
 	}
+}
+
+MediaParser::~MediaParser()
+{
+	assert (! _parserThread.get() );
 
 	for (VideoFrames::iterator i=_videoFrames.begin(),
 		e=_videoFrames.end(); i!=e; ++i)
@@ -331,7 +338,7 @@ MediaParser::waitIfNeeded(boost::mutex::scoped_lock& lock)
 	bool pc=parsingCompleted();
 	bool ic=indexingCompleted();
 	bool bf=bufferFull();
-	if ( pc || (bf && ic) ) // TODO: or seekRequested ?
+	if (( pc || (bf && ic)) && !parserThreadKillRequested()) // TODO: or seekRequested ?
 	{
 #ifdef GNASH_DEBUG_MEDIAPARSER
 		log_debug("Parser thread waiting on wakeup lock, parsingComplete=%d, bufferFull=%d", pc, bf);

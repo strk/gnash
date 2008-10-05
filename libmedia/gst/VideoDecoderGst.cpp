@@ -22,8 +22,7 @@
 #endif
 
 #include "VideoDecoderGst.h"
-#include "gstappsink.h"
-#include "gstappsrc.h"
+#include "MediaParserGst.h"
 
 
 namespace gnash {
@@ -33,22 +32,19 @@ namespace media {
 
 // TODO: implement proper seeking.
 
+VideoDecoderGst::VideoDecoderGst(GstCaps* caps)
+{
+    setup(caps);
+}
+
+
 VideoDecoderGst::VideoDecoderGst(videoCodecType codec_type, int width, int height)
- : _appsink(NULL),
-   _colorspace(NULL)
 {
   gst_init (NULL, NULL);
-  
-  _pipeline = gst_pipeline_new (NULL);
 
-  _appsrc = gst_element_factory_make ("appsrc", NULL);
-  
-  GstElement* decoder = NULL;
-  
   GstCaps* caps;  
   switch (codec_type) {
     case VIDEO_CODEC_H263:
-      decoder = gst_element_factory_make ("ffdec_flv", NULL);
       caps = gst_caps_new_simple ("video/x-flash-video",
                                       "width", G_TYPE_INT, width,
                                       "height", G_TYPE_INT, height,   
@@ -56,7 +52,6 @@ VideoDecoderGst::VideoDecoderGst(videoCodecType codec_type, int width, int heigh
       break;
     case VIDEO_CODEC_VP6:
     case VIDEO_CODEC_VP6A:
-      decoder = gst_element_factory_make ("ffdec_vp6f", NULL);
       caps = gst_caps_new_simple ("video/x-vp6-flash",
                                       "width", G_TYPE_INT, width,
                                       "height", G_TYPE_INT, height,     
@@ -64,189 +59,119 @@ VideoDecoderGst::VideoDecoderGst(videoCodecType codec_type, int width, int heigh
       break;      
     case VIDEO_CODEC_SCREENVIDEO:
     case VIDEO_CODEC_SCREENVIDEO2:
-      decoder = gst_element_factory_make ("ffdec_flashsv", NULL);
       caps = gst_caps_new_simple ("video/x-flash-screen",
                                       "width", G_TYPE_INT, width,
                                       "height", G_TYPE_INT, height,
                                       NULL);
       break;
     case 0:
-      log_debug("Video codec is zero.  Streaming video expected later.");
-      gst_object_unref (GST_OBJECT (_pipeline));
-      _pipeline = NULL;
+      throw MediaException(_("Video codec is zero.  Streaming video expected later."));
       break;
     default:
-      log_error("No support for video codec %d (%s).", (int)codec_type, codec_type);
-      gst_object_unref (GST_OBJECT (_pipeline));
-      _pipeline = NULL;
+      boost::format msg = boost::format(_("No support for video codec %d.")) % (int)codec_type;
+      throw MediaException(msg.str());
+
       return;
   }
   
-  if (!decoder) {
-    log_error(_("Failed to initialize the video decoder for codec %d (%s). "
-                "Consider installing gstreamer-ffmpeg."),
-		(int)codec_type, codec_type);
-    gst_object_unref (GST_OBJECT (_pipeline));
-    _pipeline = NULL;
-    return;
-  }
+  setup(caps);
   
-  gst_app_src_set_caps (GST_APP_SRC(_appsrc), caps);
-  gst_caps_unref(caps);
-
-  _colorspace = gst_element_factory_make ("ffmpegcolorspace", NULL);
-
-  _appsink = gst_element_factory_make ("appsink", NULL);
-
-
-  caps = gst_caps_new_simple ("video/x-raw-rgb", "bpp", G_TYPE_INT, 24,
-                                                 "depth", G_TYPE_INT, 24, NULL);
-
-  gst_app_sink_set_caps(GST_APP_SINK(_appsink), caps);
-
-  gst_caps_unref (caps);
-
-
-  gst_bin_add_many (GST_BIN (_pipeline), _appsrc, decoder, _colorspace, _appsink, NULL);
-
-  gst_element_link_many(_appsrc, decoder, _colorspace, _appsink, NULL);
-  
-  gst_base_src_set_live(GST_BASE_SRC(_appsrc), TRUE);
-
-  gst_element_set_state (GST_ELEMENT (_pipeline), GST_STATE_PLAYING);
 }
+
 
 VideoDecoderGst::~VideoDecoderGst()
 {
-  if (_pipeline) {
-    gst_element_set_state (GST_ELEMENT (_pipeline), GST_STATE_NULL);
-    gst_object_unref (GST_OBJECT (_pipeline));
-  }
+    swfdec_gst_decoder_push_eos(&_decoder);
+    swfdec_gst_decoder_finish(&_decoder);
+}
+
+void
+VideoDecoderGst::setup(GstCaps* srccaps)
+{
+    gst_init (NULL, NULL);
+
+    GstCaps* sinkcaps;
+ 
+
+    if (!srccaps) {
+        throw MediaException(_("VideoDecoderGst: internal error (caps creation failed)"));      
+    }
+
+    sinkcaps = gst_caps_new_simple ("video/x-raw-rgb", "bpp", G_TYPE_INT, 24,
+                                                       "depth", G_TYPE_INT, 24,
+                                                       NULL);
+    if (!sinkcaps) {
+        throw MediaException(_("VideoDecoderGst: internal error (caps creation failed)"));      
+    }
+
+    bool rv = swfdec_gst_decoder_init (&_decoder, srccaps, sinkcaps, "ffmpegcolorspace", NULL);
+    if (!rv) {
+        throw MediaException(_("VideoDecoderGst: initialisation failed."));      
+    }
+
+    gst_caps_unref (srccaps);
+    gst_caps_unref (sinkcaps);
 }
 
 void
 VideoDecoderGst::push(const EncodedVideoFrame& frame)
 {
-  if (!_pipeline) {
-    return;
-  }
+    GstBuffer* buffer;
+    
+    EncodedExtraGstData* extradata = dynamic_cast<EncodedExtraGstData*>(frame.extradata.get());
+    
+    if (extradata) {
+        buffer = extradata->buffer;
+    } else {
+        buffer = gst_buffer_new();
+
+        GST_BUFFER_DATA(buffer) = const_cast<uint8_t*>(frame.data());
+        GST_BUFFER_SIZE(buffer) = frame.dataSize();	
+        GST_BUFFER_OFFSET(buffer) = frame.frameNum();
+        GST_BUFFER_TIMESTAMP(buffer) = GST_CLOCK_TIME_NONE;
+        GST_BUFFER_DURATION(buffer) = GST_CLOCK_TIME_NONE;
+    }
   
-  GstBuffer* buffer = gst_buffer_new();
-  
-  // dunno why gst needs non-const here
-  GST_BUFFER_DATA(buffer) = const_cast<uint8_t*>(frame.data());
-  GST_BUFFER_SIZE(buffer) = frame.dataSize();	
-  GST_BUFFER_OFFSET(buffer) = frame.frameNum();
-  GST_BUFFER_TIMESTAMP(buffer) = GST_CLOCK_TIME_NONE;
-  GST_BUFFER_DURATION(buffer) = GST_CLOCK_TIME_NONE;
-  
-  gst_app_src_push_buffer (GST_APP_SRC(_appsrc), buffer);
-  
-  checkMessages();
+    bool success = swfdec_gst_decoder_push(&_decoder, buffer);
+    if (!success) {
+        log_error(_("VideoDecoderGst: buffer push failed."));
+        gst_buffer_unref(buffer);
+    }
 }
   
 
 std::auto_ptr<image::ImageBase>
 VideoDecoderGst::pop()
 {
-  if (!_pipeline) {
-    return std::auto_ptr<image::ImageBase>();
-  }
+    GstBuffer * buffer = swfdec_gst_decoder_pull (&_decoder);
 
-  checkMessages();
+    if (!buffer) {
+        return std::auto_ptr<image::ImageBase>();
+    }
   
-  GstBuffer* buffer = gst_app_sink_pull_buffer_timed (GST_APP_SINK(_appsink));
-  
-  if (!buffer) {
-    return std::auto_ptr<image::ImageBase>();
-  }
-  
-  GstCaps* caps = gst_buffer_get_caps(buffer);
+    GstCaps* caps = gst_buffer_get_caps(buffer);
 
-  assert(gst_caps_get_size(caps) == 1);
+    assert(gst_caps_get_size(caps) == 1);
   
-  GstStructure* structure = gst_caps_get_structure (caps, 0);
+    GstStructure* structure = gst_caps_get_structure (caps, 0);
 
-  gint height, width;
+    gint height, width;
 
-  gst_structure_get_int (structure, "width", &width);
-  gst_structure_get_int (structure, "height", &height);
+    gst_structure_get_int (structure, "width", &width);
+    gst_structure_get_int (structure, "height", &height);
   
-  gst_caps_unref(caps);
+    gst_caps_unref(caps);
   
-  std::auto_ptr<image::ImageBase> ret(new gnashGstBuffer(buffer, width, height));
+    std::auto_ptr<image::ImageBase> ret(new gnashGstBuffer(buffer, width, height));
   
-  return ret;
+    return ret;
 }
   
 
 bool
 VideoDecoderGst::peek()
 {
-  if (!_pipeline) {
-    return false;
-  }
-
-  return gst_app_sink_peek_buffer (GST_APP_SINK(_appsink));
-}
-
-void
-VideoDecoderGst::checkMessages() // any messages for me?
-{
-  if (!_pipeline) {
-    return;
-  }
-
-  GstBus* bus = gst_element_get_bus(_pipeline);
-
-  while (gst_bus_have_pending(bus)) {
-    GstMessage* msg = gst_bus_pop(bus);
-    handleMessage(msg);
-
-    gst_message_unref(msg);
-  }
-
-  gst_object_unref(GST_OBJECT(bus));
-}
-
-void
-VideoDecoderGst::handleMessage (GstMessage *message)
-{
-#if 0
-  g_print ("Got %s message\n", GST_MESSAGE_TYPE_NAME (message));
-#endif
-
-  switch (GST_MESSAGE_TYPE (message)) {
-    case GST_MESSAGE_ERROR:
-    {
-      GError *err;
-      gchar *debug;
-      gst_message_parse_error (message, &err, &debug);
-      
-      log_error(_("VideoDecoderGst::handleMessage: module %s reported: %s"),
-                gst_element_get_name(GST_MESSAGE_SRC (message)), err->message);
-      
-      g_error_free (err);
-      g_free (debug);
-      
-      // Clear any buffers.
-      gst_element_set_state (_pipeline, GST_STATE_NULL);
-
-      break;
-    }
-    case GST_MESSAGE_EOS:
-      log_debug(_("NetStream has reached the end of the stream."));
-
-      break;
-    
-    default:
-    {
-#if 0
-      g_print("unhandled message\n");
-#endif
-    }
-  }
-
+  return !g_queue_is_empty (_decoder.queue);
 }
 
 

@@ -192,6 +192,14 @@ public:
 
 DSOEXPORT std::ostream& operator << (std::ostream& os, const VideoInfo& vi);
 
+
+class EncodedExtraData {
+
+public:
+	virtual ~EncodedExtraData() {}
+
+};
+
 /// An encoded video frame
 class EncodedVideoFrame
 {
@@ -236,6 +244,8 @@ public:
 	/// Return video frame number
 	unsigned frameNum() const { return _frameNum; }
 
+	// FIXME: should have better encapsulation for this sort of stuff.
+	std::auto_ptr<EncodedExtraData> extradata;
 private:
 
 	boost::uint32_t _size;
@@ -251,6 +261,9 @@ public:
 	boost::uint32_t dataSize;
 	boost::scoped_array<boost::uint8_t> data;
 	boost::uint64_t timestamp;
+
+	// FIXME: should have better encapsulation for this sort of stuff.
+	std::auto_ptr<EncodedExtraData> extradata;
 };
 
 /// The MediaParser class provides cursor-based access to encoded media frames 
@@ -273,6 +286,8 @@ public:
 	// in memory leaks..
 	//
 	virtual ~MediaParser();
+
+	void join();
 
 	/// \brief
 	/// Seeks to the closest possible position the given position,
@@ -404,6 +419,22 @@ public:
 
 protected:
 
+	/// Subclasses *must* set the following variables: @{ 
+
+	/// Info about the video stream (if any)
+	std::auto_ptr<VideoInfo> _videoInfo;
+
+	/// Info about the audio stream (if any)
+	std::auto_ptr<AudioInfo> _audioInfo;
+
+	/// Whether the parsing is complete or not
+	bool _parsingComplete;
+
+	/// Number of bytes loaded
+	boost::uint64_t _bytesLoaded;
+
+	/// }@
+
 	/// Start the parser thread
 	void startParserThread();
 
@@ -428,18 +459,9 @@ protected:
 	///
 	const EncodedAudioFrame* peekNextAudioFrame() const;
 
-	/// Info about the video stream (if any)
-	std::auto_ptr<VideoInfo> _videoInfo;
-
-	/// Info about the audio stream (if any)
-	std::auto_ptr<AudioInfo> _audioInfo;
-
 	/// The stream used to access the file
 	std::auto_ptr<IOChannel> _stream;
 	mutable boost::mutex _streamMutex;
-
-	/// Whether the parsing is complete or not
-	bool _parsingComplete;
 
 	static void parserLoopStarter(MediaParser* mp)
 	{
@@ -471,11 +493,6 @@ protected:
 	bool _parserThreadKillRequested;
 	boost::condition _parserThreadWakeup;
 
-	/// On seek, this flag will be set, while holding a lock on _streamMutex.
-	/// The parser, when obtained a lock on _streamMutex, will check this
-	/// flag, if found to be true will clear the buffers and reset to false.
-	bool _seekRequest;
-
 	/// Wait on the _parserThreadWakeup condition if buffer is full
 	/// or parsing was completed.
 	/// 
@@ -488,8 +505,6 @@ protected:
 	/// mutex protecting access to the a/v encoded frames queues
 	mutable boost::mutex _qMutex;
 
-	/// Number of bytes loaded
-	boost::uint64_t _bytesLoaded;
 
 	/// Mutex protecting _bytesLoaded (read by main, set by parser)
 	mutable boost::mutex _bytesLoadedMutex;
@@ -503,6 +518,10 @@ protected:
 	///
 	bool bufferFull() const;
 
+	/// On seek, this flag will be set, while holding a lock on _streamMutex.
+	/// The parser, when obtained a lock on _streamMutex, will check this
+	/// flag, if found to be true will clear the buffers and reset to false.
+	bool _seekRequest;
 private:
 
 	typedef std::deque<EncodedVideoFrame*> VideoFrames;
