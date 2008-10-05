@@ -1653,7 +1653,11 @@ Machine::execute()
 		boost::uint32_t sindex = mStream->read_V32();
 		as_value value = pop_stack();
 		as_value object = pop_stack();
-		LOG_DEBUG_AVM("We should be setting the property at slot %u",sindex);
+		//We use sindex + 1, because currently as_object sets a property at a slot index
+		//1 higher than the index the abc_block thinks the property is at.
+		if(!object.to_object().get()->set_member_slot(sindex+1,value)){
+			LOG_DEBUG_AVM("Failed to set property at real_slot=%u abc_slot=%u",sindex+1,sindex);
+		}
 		//TODO: Actually set the object's value.
 		break;
 	}
