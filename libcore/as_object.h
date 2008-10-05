@@ -1091,6 +1091,27 @@ protected:
 	bool get_member_default(string_table::key name, as_value* val, 
 		string_table::key nsname);
 
+	///Set a member value at a given slot.
+	//
+	///This is a wrapper around set_member_default.
+	/// @param order
+	///
+	/// The slot index of the property.
+	/// @param val
+	///	Value to assign to the named property.
+	///
+	/// @param ifFound
+	///	If true, don't create a new member, but only update
+	///	an existing one.
+	///
+	/// @return true if the member exists at the given slot, 
+	/// false otherwise.
+	///	NOTE: the return doesn't tell if the member exists after
+	///	      the call, as watch triggers might have deleted it
+	///	      after setting.
+	///
+	bool set_member_slot(int order, const as_value& val, bool ifFound = false);
+
 	/// Set a member value
 	//
 	/// This is the default implementation, taking care of

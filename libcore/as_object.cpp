@@ -538,6 +538,18 @@ as_object::reserveSlot(string_table::key name, string_table::key nsId,
 	_members.reserveSlot(name, nsId, slotId);
 }
 
+bool
+as_object::set_member_slot(int order, const as_value& val, bool ifFound)
+{
+	const Property* prop = _members.getPropertyByOrder(order);
+	if(prop){
+		return set_member_default(prop->getName(), val, prop->getNamespace(), ifFound);
+	}
+	else{
+		return false;
+	}
+}
+
 // Handles read_only and static properties properly.
 bool
 as_object::set_member_default(string_table::key key, const as_value& val,
