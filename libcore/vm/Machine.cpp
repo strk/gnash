@@ -1484,7 +1484,7 @@ Machine::execute()
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
 	
 		as_value val = find_prop_strict(a);
-		LOG_DEBUG_AVM("VALUE FOUND.");
+
 		pop_stack();
 
 		push_stack(val);

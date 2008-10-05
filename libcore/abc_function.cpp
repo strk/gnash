@@ -32,9 +32,9 @@ abc_function::abc_function(asMethod *methodInfo, Machine* machine):mScopeStack()
 as_value
 abc_function::operator()(const fn_call& fn)
 {
-	log_debug("Calling an abc_function id=%u.",mMethodInfo->mMethodID);
+	LOG_DEBUG_AVM("Calling an abc_function id=%u.",mMethodInfo->mMethodID);
 	as_value val = mMachine->executeFunction(mMethodInfo,fn);
-	log_debug("Done calling abc_function id=%u value=%s",mMethodInfo->mMethodID,val.toDebugString());
+	LOG_DEBUG_AVM("Done calling abc_function id=%u value=%s",mMethodInfo->mMethodID,val.toDebugString());
 	return val;
 
 }
