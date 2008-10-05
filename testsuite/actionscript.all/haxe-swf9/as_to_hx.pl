@@ -13,7 +13,6 @@ while(<STDIN>){
 	#CHECK 0
 	#Remove rcsid, I think makeSWF uses this, but I am not sure.
 	if(index($_,"rcsid=") != $[-1){
-		skip_line();
 		next;
 	}
 
@@ -107,9 +106,9 @@ while(<STDIN>){
 		skip_line();
 		next;
 	}
-	#Replace instanceof:
-	#TODO: Implement
-	if(index($_,"typeof") != $[-1){
+	#Replace typeof:
+	#TODO: Figure out the difference between typeof and typeOf
+	if($_ =~ /type[Oo]f/ ){
 		skip_line();
 		next;
 	}
@@ -135,8 +134,9 @@ while(<STDIN>){
 		next;
 	}
 	if(index($_,"prototype") != $[-1){
-		skip_line();
-		next
+		$_ =~ s/(\w+)\.(prototype)/Reflect.field($1,\'$2\')/g;
+#		skip_line();
+#		next
 	}
 	if(index($_,"isNaN") != $[-1){
 #		$_ =~ s/(isNaN)/Math\.$1/g;
@@ -234,6 +234,17 @@ while(<STDIN>){
 		next;	
 	}
 
+	#Object is not a valid type in Haxe.
+	if($_ =~ /Object/){
+		skip_line();
+		next;
+	}
+
+	#Remove calls to ASSetPropFlags.  I can't find a Haxe equivilent.
+	if($_ =~ /ASSetPropFlags/){
+		skip_line();
+		next;
+	}
 	#Print the converted line of code.
 	print $_;
 }
