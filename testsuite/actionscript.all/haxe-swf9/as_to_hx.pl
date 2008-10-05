@@ -54,6 +54,10 @@ while(<STDIN>){
 			$vars{$2} = 1;
 		}
 	}
+	
+	#CHECK 4 - Must run before CHECK 5.3
+	#Replace calls to slice with substr.
+	$_ =~ s/(\.)slice(\(.+\))/$1substr$2/g;
 
 	if(index($_,"new") != $[-1){
 		#Replace things like: new String; with new String();
@@ -139,20 +143,28 @@ while(<STDIN>){
 		skip_line();
 		next;
 	}
+	#CHECK 5
 	if(index($_,"split") != $[-1){
 		
-		#Replace calls to split whose second argument is 0 with an empty array.
-		$_ =~ s/\w+\.split\(.+, +0\)/[]/g;
+		#CHECK 5.1
+		#Replace calls to split that have no arguments with an array whose only member is the caller.
+		$_ =~ s/(\w+)\.split\(\)/\[$1\]/g;
+
+		#CHECK 5.2
+		#Ignore the second argument if delimiter is undefined.
+		$_ =~ s/(\w+\.split\(\s*undefined\s*),.+(\))/$1$2/g;
+
+		#CHECK 5.3
+		#Replace calls to split(a,b) with split(a).slice(0,a)
+		$_ =~ s/(\w+\.split\(.+),\s*(\w+)\s*(\))/$1$3.slice(0,$2)/g;
 		
+		#CHECK 5.4 - Must run after CHECK 4
 		#Remove calls to split that have more than one argument.
-		if($_ =~ /\.split\(.+,.+\)/){
+		if($_ =~ /\.split\(\s*\w+\s*,\s*\w+\s*\)/){
 			skip_line();
 			next;
 		}
-		#Replace calls to split that have no arguments with an array whose only member is the caller.
-		$_ =~ s/(\w+)\.split\(\)/\[$1\]/g;
-#		print $_;
-#		next;
+
 	}
 	if(index($_,"length") != $[-1){
 		#Remove attemps to set strings length property.  Haxe compliler does not allow this.
@@ -201,8 +213,6 @@ while(<STDIN>){
 		skip_line();
 		next;
 	}
-	#Replace calls to slice with substr.
-	$_ =~ s/(\.)slice(\(.+\))/$1substr$2/g;
 	
 	#Remove calls to call function.  I haven't found a Haxe equivilent for this.
 	if($_ =~ /\.call\(.+\)/){
