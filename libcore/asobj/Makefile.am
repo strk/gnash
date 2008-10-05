@@ -132,8 +132,6 @@ noinst_HEADERS = \
 	Selection.h \
 	SharedObject.h \
 	Sound.h \
-	SoundFfmpeg.h \
-	SoundGst.h \
 	Stage.h	\
 	System_as.h \
 	TextFormat.h \
@@ -179,7 +177,6 @@ libgnashasobjs_la_LIBADD = \
 	$(LIBXML_LIBS)
 
 if USE_FFMPEG_ENGINE
-libgnashasobjs_la_SOURCES += SoundFfmpeg.cpp
 AM_CPPFLAGS += $(FFMPEG_CFLAGS) \
 		$(SDL_CFLAGS) \
 		-I$(top_srcdir)/libmedia/ffmpeg
@@ -188,7 +185,6 @@ libgnashasobjs_la_LIBADD += $(FFMPEG_LIBS) \
 endif
 
 if USE_GST_ENGINE
-libgnashasobjs_la_SOURCES += SoundGst.cpp
 AM_CPPFLAGS += $(GSTREAMER_CFLAGS) \
 		-I$(top_srcdir)/libmedia/gst
 libgnashasobjs_la_LIBADD += $(GSTREAMER_LIBS) \

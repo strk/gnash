@@ -50,7 +50,7 @@ swfdec_gst_buffer_new (SwfdecBuffer *buffer)
 
 /* NB: try to mirror decodebin behavior */
 static gboolean
-swfdec_gst_feature_filter (GstPluginFeature *feature, gpointer caps)
+swfdec_gst_feature_filter (GstPluginFeature *feature, gpointer caps, const gchar* klassname, gboolean autoplugonly)
 {
   const GList *walk;
   const gchar *klass;
@@ -59,13 +59,15 @@ swfdec_gst_feature_filter (GstPluginFeature *feature, gpointer caps)
   if (!GST_IS_ELEMENT_FACTORY (feature))
     return FALSE;
 
+
   /* only decoders are interesting */
   klass = gst_element_factory_get_klass (GST_ELEMENT_FACTORY (feature));
-  if (strstr (klass, "Decoder") == NULL)
+  if (strstr (klass, klassname) == NULL)
     return FALSE;
 
+
   /* only select elements with autoplugging rank */
-  if (gst_plugin_feature_get_rank (feature) < GST_RANK_MARGINAL)
+  if (autoplugonly && gst_plugin_feature_get_rank (feature) < GST_RANK_MARGINAL)
     return FALSE;
 
   /* only care about the right sink caps */
@@ -92,6 +94,26 @@ swfdec_gst_feature_filter (GstPluginFeature *feature, gpointer caps)
   return FALSE;
 }
 
+static gboolean
+swfdec_gst_feature_filter_decoder (GstPluginFeature *feature, gpointer caps)
+{
+    return swfdec_gst_feature_filter (feature, caps, "Decoder", TRUE);
+}
+
+static gboolean
+swfdec_gst_feature_filter_demuxer (GstPluginFeature *feature, gpointer caps)
+{
+    return swfdec_gst_feature_filter (feature, caps, "Demuxer", TRUE);
+}
+
+static gboolean
+swfdec_gst_feature_filter_parser (GstPluginFeature *feature, gpointer caps)
+{
+    return swfdec_gst_feature_filter (feature, caps, "Parser", FALSE);
+}
+
+
+
 static int
 swfdec_gst_compare_features (gconstpointer a_, gconstpointer b_)
 {
@@ -106,14 +128,14 @@ swfdec_gst_compare_features (gconstpointer a_, gconstpointer b_)
   return strcmp (gst_plugin_feature_get_name (a), gst_plugin_feature_get_name (b));
 }
 
-GstElementFactory *
-swfdec_gst_get_element_factory (GstCaps *caps)
+static GstElementFactory *
+_swfdec_gst_get_factory (GstCaps *caps, GstPluginFeatureFilter filter)
 {
   GstElementFactory *ret;
   GList *list;
 
   list = gst_registry_feature_filter (gst_registry_get_default (), 
-      swfdec_gst_feature_filter, FALSE, caps);
+      filter, FALSE, caps);
   if (list == NULL)
     return NULL;
 
@@ -124,9 +146,28 @@ swfdec_gst_get_element_factory (GstCaps *caps)
   return ret;
 }
 
+GstElementFactory *
+swfdec_gst_get_element_factory (GstCaps *caps)
+{
+  return _swfdec_gst_get_factory (caps, swfdec_gst_feature_filter_decoder);
+}
+
+GstElementFactory *
+swfdec_gst_get_demuxer_factory (GstCaps *caps)
+{
+  return  _swfdec_gst_get_factory (caps, swfdec_gst_feature_filter_demuxer);
+}
+
+GstElementFactory *
+swfdec_gst_get_parser_factory (GstCaps *caps)
+{
+  return  _swfdec_gst_get_factory (caps, swfdec_gst_feature_filter_parser);
+}
+
+
 /*** PADS ***/
 
-static GstPad *
+/* static */ GstPad *
 swfdec_gst_connect_srcpad (GstElement *element, GstCaps *caps)
 {
   GstPadTemplate *tmpl;
@@ -153,7 +194,7 @@ error:
   return NULL;
 }
 
-static GstPad *
+/*static*/ GstPad *
 swfdec_gst_connect_sinkpad (GstElement *element, GstCaps *caps)
 {
   GstPadTemplate *tmpl;

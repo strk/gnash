@@ -51,13 +51,11 @@ public:
 
 private:
 
-    void setup(AudioInfo& info);
-    void setup(SoundInfo& info);
-    void setup();
+    boost::uint8_t* pullBuffers(boost::uint32_t&  outputSize);
+
+    void setup(GstCaps* caps);
 
     SwfdecGstDecoder _decoder;
-    boost::uint32_t _samplerate;
-    bool _stereo;
 
 };
 

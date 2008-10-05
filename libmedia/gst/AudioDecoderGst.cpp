@@ -24,72 +24,89 @@
 
 #include "AudioDecoderGst.h"
 #include "MediaParser.h"
+#include "MediaParserGst.h"
 
 namespace gnash {
 namespace media {
 
+
+
 AudioDecoderGst::AudioDecoderGst(SoundInfo& info)
-    :
-        _samplerate(info.getSampleRate()),
-        _stereo(info.isStereo())
 {
-    setup(info);
+    GstCaps* srccaps = gst_caps_new_simple ("audio/mpeg",
+		"mpegversion", G_TYPE_INT, 1,
+		"layer", G_TYPE_INT, 3,
+		"rate", G_TYPE_INT, info.getSampleRate(),
+		"channels", G_TYPE_INT, info.isStereo() ? 2 : 1, NULL);
+
+    setup(srccaps);
+
+    // FIXME: should we handle other types?
 }
 
 AudioDecoderGst::AudioDecoderGst(AudioInfo& info)
-    :
-        _samplerate(info.sampleRate),
-        _stereo(info.stereo)
 {
-    setup(info);
-}
+    GstCaps* srccaps;
 
+    if (info.type == FLASH && info.codec == AUDIO_CODEC_MP3)
+    {
+        srccaps = gst_caps_new_simple ("audio/mpeg",
+		"mpegversion", G_TYPE_INT, 1,
+		"layer", G_TYPE_INT, 3,
+		"rate", G_TYPE_INT, info.sampleRate,
+		"channels", G_TYPE_INT, info.stereo ? 2 : 1, NULL);
+        setup(srccaps);
+        return;
+    }
+    
+    if (info.type == FLASH && info.codec == AUDIO_CODEC_NELLYMOSER)
+    {
+        srccaps = gst_caps_new_simple ("audio/x-nellymoser",
+		"rate", G_TYPE_INT, info.sampleRate,
+		"channels", G_TYPE_INT, info.stereo ? 2 : 1, NULL);
+        setup(srccaps);
+        return;
+    }
+
+    if (info.type == FLASH) {
+        throw MediaException("AudioDecoderGst: cannot handle this codec!");
+    }
+
+    ExtraInfoGst* extraaudioinfo = dynamic_cast<ExtraInfoGst*>(info.extra.get());
+
+    if (!extraaudioinfo) {
+        throw MediaException("AudioDecoderGst: cannot handle this codec!");
+    }
+
+    setup(extraaudioinfo->caps);
+}
 
 AudioDecoderGst::~AudioDecoderGst()
 {
+    assert(g_queue_is_empty (_decoder.queue));
     swfdec_gst_decoder_push_eos(&_decoder);
     swfdec_gst_decoder_finish(&_decoder);
 }
 
-void AudioDecoderGst::setup(AudioInfo& info)
-{
-	if (info.type != FLASH || info.codec != AUDIO_CODEC_MP3)
-	{
-	    throw MediaException("AudioDecoderGst: cannot handle this codec!");
-	}
-
-	setup();
-}
-
-void AudioDecoderGst::setup(SoundInfo& info)
-{
-	setup();
-}
 
 
-void AudioDecoderGst::setup()
+void AudioDecoderGst::setup(GstCaps* srccaps)
 {
     // init GStreamer
     gst_init (NULL, NULL);
 
-    GstCaps* sinkcaps;
- 
-    GstCaps* srccaps = gst_caps_new_simple ("audio/mpeg",
-		"mpegversion", G_TYPE_INT, 1,
-		"layer", G_TYPE_INT, 3,
-		"rate", G_TYPE_INT, _samplerate,
-		"channels", G_TYPE_INT, _stereo ? 2 : 1, NULL);
     if (!srccaps) {
         throw MediaException(_("AudioDecoderGst: internal error (caps creation failed)"));      
     }
 
-    sinkcaps = gst_caps_from_string ("audio/x-raw-int, endianness=byte_order, signed=(boolean)true, width=16, depth=16, rate=44100, channels=2");
+    GstCaps* sinkcaps = gst_caps_from_string ("audio/x-raw-int, endianness=byte_order, signed=(boolean)true, width=16, depth=16, rate=44100, channels=2");
     if (!sinkcaps) {
         throw MediaException(_("AudioDecoderGst: internal error (caps creation failed)"));      
     }
 
     // TODO: we may want to prefer other modules over audioresample, like ffaudioresample, if they are
     // available.
+
     bool rv = swfdec_gst_decoder_init (&_decoder, srccaps, sinkcaps, "audioconvert", "audioresample", NULL);
     if (!rv) {
         throw MediaException(_("AudioDecoderGst: initialisation failed."));      
@@ -97,6 +114,48 @@ void AudioDecoderGst::setup()
 
     gst_caps_unref (srccaps);
     gst_caps_unref (sinkcaps);
+}
+
+void
+buf_add(gpointer buf, gpointer data)
+{
+    boost::uint32_t* total = (boost::uint32_t*) data;
+
+    GstBuffer* buffer = (GstBuffer*) buf;
+    *total += GST_BUFFER_SIZE(buffer);
+}
+
+
+boost::uint8_t* 
+AudioDecoderGst::pullBuffers(boost::uint32_t&  outputSize)
+{
+    outputSize = 0;
+    
+    g_queue_foreach(_decoder.queue, buf_add, &outputSize);
+  
+    if (!outputSize) {
+        log_debug(_("Pushed data, but there's nothing to pull (yet)"));
+        return 0;   
+    }
+    
+    boost::uint8_t* rbuf = new boost::uint8_t[outputSize];
+    
+    boost::uint8_t* ptr = rbuf;
+    
+    while (true) {
+    
+        GstBuffer* buffer = swfdec_gst_decoder_pull (&_decoder);
+        if (!buffer) {
+            break;
+        }
+    
+        memcpy(ptr, GST_BUFFER_DATA(buffer), GST_BUFFER_SIZE(buffer));
+        ptr += GST_BUFFER_SIZE(buffer);
+      
+        gst_buffer_unref (buffer);
+    }
+
+    return rbuf;    
 }
 
 boost::uint8_t*
@@ -112,41 +171,39 @@ AudioDecoderGst::decode(boost::uint8_t* input, boost::uint32_t inputSize,
     bool success = swfdec_gst_decoder_push(&_decoder, gstbuf);
     if (!success) {
         log_error(_("AudioDecoderGst: buffer push failed."));
+        gst_buffer_unref(gstbuf);
         return 0;
     }
 
     decodedData = inputSize;
 
-    GstBuffer * decodedbuf = swfdec_gst_decoder_pull (&_decoder);
-
-    if (!decodedbuf) {
-        outputSize = 0;
-        return 0;
-    }
-
-    outputSize = GST_BUFFER_SIZE(decodedbuf);
-    decodedData = inputSize;
-
-    boost::uint8_t* rbuf = new boost::uint8_t[outputSize];
-    memcpy(rbuf, GST_BUFFER_DATA(decodedbuf), outputSize);
-    gst_buffer_unref(decodedbuf);
-
-    return rbuf;
+    return pullBuffers(outputSize);
 }
 
 boost::uint8_t*
 AudioDecoderGst::decode(const EncodedAudioFrame& ef, boost::uint32_t& outputSize)
 {
-    // Docs are not very helpful as to what the difference between these two is.
-    boost::uint32_t output_size = 0;    
-    boost::uint32_t decoded_data_size = 0;
+    outputSize = 0;
+    
+    GstBuffer* gstbuf;
+    
+    EncodedExtraGstData* extradata = dynamic_cast<EncodedExtraGstData*>(ef.extradata.get());
+    
+    if (extradata) {
+        gstbuf = extradata->buffer;
+    } else {
 
-    uint8_t* rv = decode(ef.data.get(), ef.dataSize, output_size, decoded_data_size, false);
+        gstbuf = gst_buffer_new_and_alloc(ef.dataSize);
+        memcpy (GST_BUFFER_DATA (gstbuf), ef.data.get(), ef.dataSize);
+    }
 
-    // my best guess is that outputSize in one method means outputSize in the other...
-    outputSize = output_size;
+    bool success = swfdec_gst_decoder_push(&_decoder, gstbuf);
+    if (!success) {
+        log_error(_("AudioDecoderGst: buffer push failed."));
+        return 0;
+    }
 
-    return rv;
+    return pullBuffers(outputSize);
 }
 
 

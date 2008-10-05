@@ -21,9 +21,14 @@
 #include "MediaHandlerGst.h"
 #include "VideoDecoderGst.h"
 #include "AudioDecoderGst.h"
+#include "MediaParserGst.h"
+#include "FLVParser.h"
 
 #include "IOChannel.h" // for visibility of destructor
 #include "MediaParser.h" // for visibility of destructor
+
+#include "MediaParserGst.h"
+
 
 namespace gnash { 
 namespace media {
@@ -31,8 +36,27 @@ namespace media {
 std::auto_ptr<MediaParser>
 MediaHandlerGst::createMediaParser(std::auto_ptr<IOChannel> stream)
 {
-	// TODO: support more then just FLV...
-	return MediaHandler::createMediaParser(stream);
+	std::auto_ptr<MediaParser> parser;
+
+	if ( isFLV(*stream) )
+	{
+		parser.reset( new FLVParser(stream) );
+	}
+	else
+	{
+		try
+		{
+			parser.reset(new MediaParserGst(stream));
+		}
+		catch (GnashException& ex)
+		{
+			log_error("Could not create Gstreamer based media parser for "
+                    "input stream: %s", ex.what());
+			assert(!parser.get());
+		}
+	}
+
+	return parser;
 }
 
 std::auto_ptr<VideoDecoder>
@@ -40,8 +64,12 @@ MediaHandlerGst::createVideoDecoder(VideoInfo& info)
 {
 	if ( info.type != FLASH )
 	{
-		log_error("Non-flash video encoding not supported yet by GST VideoDecoder");
-		return std::auto_ptr<VideoDecoder>(0);
+		ExtraInfoGst* extrainfo = dynamic_cast<ExtraInfoGst*>(info.extra.get());
+		if (!extrainfo) {
+			log_error(_("Wrong arguments given to GST VideoDecoder"));
+			return std::auto_ptr<VideoDecoder>(0);
+		}
+		return std::auto_ptr<VideoDecoder>(new VideoDecoderGst(extrainfo->caps));
 	}
 	videoCodecType format = static_cast<videoCodecType>(info.codec);
 	int width = info.width;
