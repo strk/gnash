@@ -30,13 +30,13 @@ namespace media {
 MediaParser::MediaParser(std::auto_ptr<IOChannel> stream)
 	:
 	_parsingComplete(false),
+	_bytesLoaded(0),
 	_stream(stream),
 	_bufferTime(100), // 100 ms 
 	_parserThread(0),
 	_parserThreadStartBarrier(2),
 	_parserThreadKillRequested(false),
-	_seekRequest(false),
-	_bytesLoaded(0)
+	_seekRequest(false)
 {
 }
 
