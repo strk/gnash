@@ -164,7 +164,7 @@ boost::uint64_t
 MediaParserGst::getBytesLoaded() const
 {
     boost::mutex::scoped_lock lock(_bytesLoadedMutex);
-    _bytesLoaded = _stream->tell();
+    return _bytesLoaded;
 }
 
 bool
