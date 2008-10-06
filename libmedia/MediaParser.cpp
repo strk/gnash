@@ -24,6 +24,9 @@
 #include <boost/bind.hpp>
 #include "GnashSleep.h" // for usleep.
 
+// Define this to get debugging output from MediaParser
+//#define GNASH_DEBUG_MEDIAPARSER
+
 namespace gnash {
 namespace media {
 
@@ -357,7 +360,7 @@ MediaParser::bufferFull() const
 	int bl = getBufferLengthNoLock();
 	int bt = getBufferTime();
 #ifdef GNASH_DEBUG_MEDIAPARSER
-	log_debug("bufferFull: %d/%d", bl, bt);
+	log_debug("MediaParser::bufferFull: %d/%d", bl, bt);
 #endif // GNASH_DEBUG_MEDIAPARSER
 	return bl > bt;
 }
