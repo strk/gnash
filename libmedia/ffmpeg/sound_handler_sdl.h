@@ -29,8 +29,6 @@
 
 #ifdef USE_FFMPEG
 # include "ffmpegHeaders.h"
-#elif defined(USE_MAD)
-# include <mad.h>
 #endif
 
 #include <vector>
