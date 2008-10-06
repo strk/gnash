@@ -62,6 +62,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <fstream>
 #include <sstream>
 
 // Mozilla SDK headers
@@ -72,14 +73,20 @@
 #include "prerror.h"
 #include "prthread.h"
 
-#if HAVE_XPCOM
-#include "nscore.h"
-#include "nsISupports.h"
-#include "nsIServiceManager.h"
-#include "nsIExtensionManager.h"
-#include "nsIFile.h"
-#include "nsStringAPI.h"
-#endif
+#ifdef HAVE_XPCOM
+# include <nscore.h>
+# include <nsISupports.h>
+# include <nsIExtensionManager.h>
+# include <nsIFile.h>
+# include <nsXPCOM.h>
+# include <nsIServiceManager.h>
+# include <nsICookie.h>
+# include <nsICookieManager.h>
+# include <nsISimpleEnumerator.h>
+# include <nsNetCID.h>
+# include <nsCOMPtr.h>
+# include <nsStringAPI.h>
+#endif // HAVE_XPCOM
 
 using namespace std;
 
@@ -90,6 +97,14 @@ NPBool plugInitialized = FALSE;
 static bool waitforgdb = false;
 
 static const char* getPluginDescription();
+
+#ifdef HAVE_XPCOM
+static nsICookieManager *cookieManager = NULL;
+// I belive the XPI define should be only set by xpi build scripts
+# define GNASH_XPI_PLUGIN 
+#endif // HAVE_XPCOM
+
+
 
 void
 PR_CALLBACK Destructor(void * /* data */)
@@ -132,6 +147,30 @@ NS_PluginInitialize()
 
 	cout << "NS_PluginInitialize call ---------------------------------------------------" << endl;
 
+#ifdef HAVE_XPCOM
+	if(!cookieManager) {
+		nsIServiceManager *serviceManager = nsnull;
+		NPError err;
+		err = CallNPN_GetValueProc (NPNFuncs.getvalue,
+                	       		     NULL, NPNVserviceManager,
+                		             reinterpret_cast<void *>
+               					(reinterpret_cast<void **>(&serviceManager)));
+
+	        if (err != NPERR_NO_ERROR || !serviceManager) {
+			cout << "Failed to get the service manager" << endl;
+			return NPERR_GENERIC_ERROR;
+		}
+		nsresult rv;
+		rv = serviceManager->GetServiceByContractID (NS_COOKIEMANAGER_CONTRACTID,
+								NS_GET_IID (nsICookieManager),
+								reinterpret_cast<void **>(&cookieManager));
+		if (NS_FAILED (rv) || !cookieManager) {
+			cout << "Failed to get CookieManager" << endl;
+			return NPERR_GENERIC_ERROR;
+		}
+		cout << "[XPCOM] - CookieManager retrieved." << endl;
+	}
+#endif // HAVE_XPCOM
 
 	/* Browser Functionality Checks */
 
@@ -751,8 +790,8 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
 	}
 }
 
-#if HAVE_XPCOM
-int
+#ifdef GNASH_XPI_PLUGIN
+static int
 getHome(string& gnashpath)
 {
 	nsresult rv;
@@ -803,18 +842,18 @@ getHome(string& gnashpath)
 	//cerr << "Path" << gnashpath << "\n";
 	return 0;
 }
-#endif
+#endif // GNASH_XPI_PLUGIN
 
 void
 nsPluginInstance::startProc(Window win)
 {
 	string procname;
 	char *gnash_env = std::getenv("GNASH_PLAYER");
-#if HAVE_XPCOM
+#ifdef GNASH_XPI_PLUGIN
 	if (getHome(procname) >= 0)
 		;
 	else
-#endif
+#endif // def GNASH_XPI_PLUGIN
 	if (gnash_env == NULL) {
 		procname = GNASHBINDIR;
 		procname += "/gtk-gnash";
@@ -838,6 +877,111 @@ nsPluginInstance::startProc(Window win)
 		cout << "Invalid path to standalone executable: " << procname << endl;
 		return;
 	}
+
+//Disabled till we get the file removed on plugin instance exit
+//#ifdef HAVE_XPCOM 
+#if 0 // {
+
+	cout << "[XPCOM] trying to dump cookies" << endl;
+
+	nsCOMPtr<nsISimpleEnumerator> cookie_e;
+	nsresult rv =  cookieManager->GetEnumerator(getter_AddRefs(cookie_e));
+
+	char *cookiefile = NULL;
+
+	if(NS_SUCCEEDED(rv)) {
+		PRBool res = FALSE;
+		ofstream fout;
+		mode_t oldmask = umask(0077);
+		while(!res) {
+			char *tmpname = tmpnam(NULL);
+			fout.open(tmpname, ios::out | ios::trunc);
+			if(!fout.is_open()) {
+				cout << "not opened!!" << endl;
+				g_free(tmpname);
+				continue;
+			} else {
+				cout << "opened cookie store: " << tmpname << endl;
+			}
+			res = TRUE;
+			cookiefile = tmpname;
+		}
+		umask(oldmask);
+
+		res = TRUE;
+		int c = 0;
+		while(NS_SUCCEEDED(cookie_e->HasMoreElements(&res)) && res ) {
+			nsCOMPtr<nsICookie> cookie;
+			cookie_e->GetNext(getter_AddRefs(cookie));
+			if(!cookie)
+			  continue;
+
+			nsCString host;
+			if(NS_FAILED(cookie->GetHost(host))) {
+			  cout << "[XPCOM] cookie without host ... ommitting" << endl;
+			  continue;
+			}
+			nsCString path;
+			if(NS_FAILED(cookie->GetPath(path))) {
+			  cout << "[XPCOM] cookie without path ... ommitting" << endl;
+			  continue;
+			}
+			PRBool isSecure;
+			if(NS_FAILED(cookie->GetIsSecure(&isSecure))) {
+			  cout << "[XPCOM] cookie without isSecure ... ommitting" << endl;
+			  continue;
+			}
+			PRUint64 expires;
+			if(NS_FAILED(cookie->GetExpires(&expires))) {
+			  cout << "[XPCOM] cookie without expires ... ommitting" << endl;
+			  continue;
+			}	
+			nsCString name;
+			if(NS_FAILED(cookie->GetName(name))) {
+			  cout << "[XPCOM] cookie without name ... ommitting" << endl;
+			  continue;
+			}
+			nsCString value;
+			if(NS_FAILED(cookie->GetValue(value))) {
+			  cout << "[XPCOM] cookie without value ... ommitting" << endl;
+			  continue;
+			}
+
+			char *hostChar = ToNewCString (host);
+			char *pathChar = ToNewCString (path);
+			char *nameChar = ToNewCString (name);
+			char *valueChar = ToNewCString (value);
+
+			/*
+			cout << "[XPCOM] have cookie line:" << endl
+			     << "  "
+			     << hostChar << "\t"
+			     << pathChar << "\t"
+			     << isSecure << "\t"
+			     << expires << "\t"
+			     << nameChar << "\t"
+			     << valueChar << endl;
+			*/
+
+			fout << hostChar << "\t"
+			     << pathChar << "\t"
+			     << isSecure << "\t"
+			     << expires << "\t"
+			     << nameChar << "\t"
+			     << valueChar << endl;
+
+			g_free(hostChar);
+			g_free(pathChar);
+			g_free(nameChar);
+			g_free(valueChar);
+			c++;
+		}
+		fout.close();
+		cout << "[XPCOM] dump finished (" << c << " cookies in total)" << endl;
+	} else {
+		cout << "[XPCOM] WARNING: Cookie feature disabled" << endl;
+	}
+#endif // HAVE_XPCOM }
 
 	// 0 For reading, 1 for writing.
 	int p2c_pipe[2];
