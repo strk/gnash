@@ -23,8 +23,7 @@
 #include "log.h"
 #include "IOChannel.h"
 
-
-
+#include "GstUtil.h" // for GST_TIME_AS_MSECONDS
 #include "swfdec_codec_gst.h"
 #include <iostream>
 #include <fstream>
