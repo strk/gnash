@@ -33,6 +33,9 @@ namespace media {
 
 AudioDecoderGst::AudioDecoderGst(SoundInfo& info)
 {
+    // init GStreamer. TODO: what about doing this in MediaHandlerGst ctor?
+    gst_init (NULL, NULL);
+
     GstCaps* srccaps = gst_caps_new_simple ("audio/mpeg",
 		"mpegversion", G_TYPE_INT, 1,
 		"layer", G_TYPE_INT, 3,
@@ -46,7 +49,10 @@ AudioDecoderGst::AudioDecoderGst(SoundInfo& info)
 
 AudioDecoderGst::AudioDecoderGst(AudioInfo& info)
 {
-    GstCaps* srccaps;
+    // init GStreamer. TODO: what about doing this in MediaHandlerGst ctor?
+    gst_init (NULL, NULL);
+
+    GstCaps* srccaps=0;
 
     if (info.type == FLASH && info.codec == AUDIO_CODEC_MP3)
     {
@@ -92,9 +98,6 @@ AudioDecoderGst::~AudioDecoderGst()
 
 void AudioDecoderGst::setup(GstCaps* srccaps)
 {
-    // init GStreamer
-    gst_init (NULL, NULL);
-
     if (!srccaps) {
         throw MediaException(_("AudioDecoderGst: internal error (caps creation failed)"));      
     }

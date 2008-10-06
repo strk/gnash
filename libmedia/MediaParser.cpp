@@ -24,19 +24,22 @@
 #include <boost/bind.hpp>
 #include "GnashSleep.h" // for usleep.
 
+// Define this to get debugging output from MediaParser
+//#define GNASH_DEBUG_MEDIAPARSER
+
 namespace gnash {
 namespace media {
 
 MediaParser::MediaParser(std::auto_ptr<IOChannel> stream)
 	:
-	_stream(stream),
 	_parsingComplete(false),
+	_bytesLoaded(0),
+	_stream(stream),
 	_bufferTime(100), // 100 ms 
 	_parserThread(0),
 	_parserThreadStartBarrier(2),
 	_parserThreadKillRequested(false),
-	_seekRequest(false),
-	_bytesLoaded(0)
+	_seekRequest(false)
 {
 }
 
@@ -357,7 +360,7 @@ MediaParser::bufferFull() const
 	int bl = getBufferLengthNoLock();
 	int bt = getBufferTime();
 #ifdef GNASH_DEBUG_MEDIAPARSER
-	log_debug("bufferFull: %d/%d", bl, bt);
+	log_debug("MediaParser::bufferFull: %d/%d", bl, bt);
 #endif // GNASH_DEBUG_MEDIAPARSER
 	return bl > bt;
 }

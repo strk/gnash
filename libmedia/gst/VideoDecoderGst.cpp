@@ -34,13 +34,17 @@ namespace media {
 
 VideoDecoderGst::VideoDecoderGst(GstCaps* caps)
 {
+    // init GStreamer. TODO: what about doing this in MediaHandlerGst ctor?
+    gst_init (NULL, NULL);
+
     setup(caps);
 }
 
 
 VideoDecoderGst::VideoDecoderGst(videoCodecType codec_type, int width, int height)
 {
-  gst_init (NULL, NULL);
+    // init GStreamer. TODO: what about doing this in MediaHandlerGst ctor?
+    gst_init (NULL, NULL);
 
   GstCaps* caps;  
   switch (codec_type) {
@@ -88,8 +92,6 @@ VideoDecoderGst::~VideoDecoderGst()
 void
 VideoDecoderGst::setup(GstCaps* srccaps)
 {
-    gst_init (NULL, NULL);
-
     GstCaps* sinkcaps;
  
 
