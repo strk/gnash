@@ -57,14 +57,15 @@ AC_DEFUN([GNASH_PATH_XPCOM],
   if test x$xpcom = xyes; then
     if test x$cross_compiling = xno; then
       if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_xpcom_incl}" = x; then
+        if $PKG_CONFIG --exists libxul; then
+          ac_cv_path_xpcom_lib="`$PKG_CONFIG --libs libxul`"
+          ac_cv_path_xpidl="`$PKG_CONFIG --libs-only-L libxul`"
+          ac_cv_path_xpcom_incl="`$PKG_CONFIG --cflags-only-I libxul`"
+        fi
         # prefer libxul-unstable for cflags.
         if $PKG_CONFIG --exists libxul-unstable; then
           ac_cv_path_xpcom_incl="`$PKG_CONFIG --cflags-only-I libxul-unstable`"
-        else
-          $PKG_CONFIG --exists libxul && ac_cv_path_xpcom_incl="`$PKG_CONFIG --cflags-only-I libxul`"
         fi
-        $PKG_CONFIG --exists libxul && ac_cv_path_xpcom_lib="`$PKG_CONFIG --libs libxul`"
-        $PKG_CONFIG --exists libxul && ac_cv_path_xpidl="`$PKG_CONFIG --libs-only-L libxul`"
       fi
     fi
   fi
