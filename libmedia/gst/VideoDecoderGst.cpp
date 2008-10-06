@@ -48,27 +48,19 @@ VideoDecoderGst::VideoDecoderGst(videoCodecType codec_type, int width, int heigh
   switch (codec_type) {
     case VIDEO_CODEC_H263:
       caps = gst_caps_new_simple ("video/x-flash-video",
-                                      "width", G_TYPE_INT, width,
-                                      "height", G_TYPE_INT, height,   
                                       NULL);
       break;
     case VIDEO_CODEC_VP6:
       caps = gst_caps_new_simple ("video/x-vp6-flash",
-                                      "width", G_TYPE_INT, width,
-                                      "height", G_TYPE_INT, height,     
                                       NULL);
       break;
     case VIDEO_CODEC_VP6A:
       caps = gst_caps_new_simple ("video/x-vp6-alpha",
-                                      "width", G_TYPE_INT, width,
-                                      "height", G_TYPE_INT, height,     
                                       NULL);
       break;      
     case VIDEO_CODEC_SCREENVIDEO:
     case VIDEO_CODEC_SCREENVIDEO2:
       caps = gst_caps_new_simple ("video/x-flash-screen",
-                                      "width", G_TYPE_INT, width,
-                                      "height", G_TYPE_INT, height,
                                       NULL);
       break;
     case 0:
