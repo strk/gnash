@@ -67,7 +67,10 @@
 #define LOAD_MOVIES_IN_A_SEPARATE_THREAD 1
 
 // Debug threads locking
-#undef DEBUG_THREADS_LOCKING
+//#undef DEBUG_THREADS_LOCKING
+
+// Define this to get debugging output for symbol library use
+#define DEBUG_EXPORTS
 
 namespace gnash
 {
@@ -817,6 +820,12 @@ SWFMovieDefinition::get_exported_resource(const std::string& symbol)
 
 	for(;;)
 	{
+
+        // we query the loaded frame count before looking
+        // up the exported resources map because while
+        // we query the loader keeps parsing more frames.
+        // and we don't want to giveup w/out having queried
+        // up to the last frame.
 		size_t new_loading_frame = get_loading_frame();
 
 		// _exportedResources access is thread-safe
@@ -826,6 +835,29 @@ SWFMovieDefinition::get_exported_resource(const std::string& symbol)
 			if ( it != _exportedResources.end() ) return it->second;
 		}
 
+        // We checked last (or past-last) advertised frame. 
+        // TODO: this check should really be for a parser
+        //       process being active or not, as SWF
+        //       might advertise less frames then actually
+        //       found in it...
+        //
+        if ( new_loading_frame >= m_frame_count )
+        {
+            // Update of loading_frame is
+            // really just for the latter debugging output
+            loading_frame = new_loading_frame;
+            break;
+        }
+
+        // There's more frames to parse, go ahead
+        // TODO: this is still based on *advertised*
+        //       number of frames, if SWF advertises
+        //       more then actually found we'd be
+        //       keep trying till timeout, see the
+        //       other TODO above.
+
+        // We made frame progress since last iteration
+        // so sleep some and try again
 		if ( new_loading_frame != loading_frame )
 		{
 #ifdef DEBUG_EXPORTS
@@ -836,8 +868,10 @@ SWFMovieDefinition::get_exported_resource(const std::string& symbol)
 			loading_frame = new_loading_frame;
 			timeout = def_timeout+1;
 		}
-		else if ( ! --timeout || loading_frame >= m_frame_count )
+		else if ( ! --timeout ) 
 		{
+            // no progress since last run, and 
+            // timeout reached: give up
 			break;
 		}
 
