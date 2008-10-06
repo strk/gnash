@@ -28,8 +28,6 @@
 namespace gnash {
 namespace media {
 
-// gstappsrc -> decodebin -> (decoder) -> ffmpegcolorspace -> gstappsink (with rgb caps)
-
 // TODO: implement proper seeking.
 
 VideoDecoderGst::VideoDecoderGst(GstCaps* caps)
