@@ -49,8 +49,8 @@ MediaParserFfmpeg::readPacketWrapper(void* opaque, boost::uint8_t* buf, int buf_
 	return p->readPacket(buf, buf_size);
 }
 
-offset_t
-MediaParserFfmpeg::seekMediaWrapper(void *opaque, offset_t offset, int whence)
+boost::int64_t
+MediaParserFfmpeg::seekMediaWrapper(void *opaque, boost::int64_t offset, int whence)
 {
 	MediaParserFfmpeg* p = static_cast<MediaParserFfmpeg*>(opaque);
 	return p->seekMedia(offset, whence);
@@ -458,8 +458,8 @@ MediaParserFfmpeg::readPacket(boost::uint8_t* buf, int buf_size)
 
 }
 
-offset_t 
-MediaParserFfmpeg::seekMedia(offset_t offset, int whence)
+boost::int64_t 
+MediaParserFfmpeg::seekMedia(boost::int64_t offset, int whence)
 {
 	GNASH_REPORT_FUNCTION;
 
