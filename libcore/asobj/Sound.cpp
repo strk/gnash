@@ -151,7 +151,7 @@ Sound::getVolume(int& volume)
         volume = ch->getVolume();
         return true;
     }
-    else log_debug("Sound has NO attached character, _soundHandler is %p, soundId is %d", _soundHandler, soundId);
+    //else log_debug("Sound has NO attached character, _soundHandler is %p, soundId is %d", _soundHandler, soundId);
 
     // If we're not attached to a character we'll need to query
     // sound_handler for volume. If we have no sound handler, we
