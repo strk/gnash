@@ -386,7 +386,7 @@ static bool createDirForFile(const std::string& filename)
                 int ret = mkdir(newdir.c_str());
 #endif
                 if ((errno != EEXIST) && (ret != 0)) {
-                    log_error("Couldn't create directory for .sol files: %s\n\t%s",
+                    log_error(_("Couldn't create SOL files directory %s: %s"),
                               newdir, std::strerror(errno));
                     return false;
                 }
