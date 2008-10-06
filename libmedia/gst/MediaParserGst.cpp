@@ -149,6 +149,11 @@ MediaParserGst::parseNextChunk()
 
     pushGstBuffer();
 
+    {
+        boost::mutex::scoped_lock lock(_bytesLoadedMutex);
+        _bytesLoaded = _stream->tell();
+    }
+
     emitEncodedFrames();
 
     return true;
@@ -158,9 +163,8 @@ MediaParserGst::parseNextChunk()
 boost::uint64_t
 MediaParserGst::getBytesLoaded() const
 {
-    boost::mutex::scoped_lock streamLock(_streamMutex);
-
-    return _stream->tell();
+    boost::mutex::scoped_lock lock(_bytesLoadedMutex);
+    return _bytesLoaded;
 }
 
 bool

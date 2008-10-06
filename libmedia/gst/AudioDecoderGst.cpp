@@ -94,6 +94,31 @@ AudioDecoderGst::~AudioDecoderGst()
     swfdec_gst_decoder_finish(&_decoder);
 }
 
+std::string 
+findResampler()
+{
+    std::string resampler = "ffaudioresample";
+
+    GstElementFactory* factory = gst_element_factory_find(resampler.c_str());
+     
+    if (!factory) {
+        resampler = "speexresample";
+        factory = gst_element_factory_find(resampler.c_str());
+        if (!factory) {
+            log_error(_("The best available resampler is 'audioresample'."
+                      " Please install gstreamer-ffmpeg 0.10.4 or newer, or you"
+                      " may experience long delays in audio playback!"));
+            resampler = "audioresample";
+        }
+    }
+
+    if (factory) {
+        gst_object_unref(factory);
+    }
+
+    return resampler;
+}
+
 
 
 void AudioDecoderGst::setup(GstCaps* srccaps)
@@ -107,10 +132,9 @@ void AudioDecoderGst::setup(GstCaps* srccaps)
         throw MediaException(_("AudioDecoderGst: internal error (caps creation failed)"));      
     }
 
-    // TODO: we may want to prefer other modules over audioresample, like ffaudioresample, if they are
-    // available.
+    std::string resampler = findResampler();
 
-    bool rv = swfdec_gst_decoder_init (&_decoder, srccaps, sinkcaps, "audioconvert", "audioresample", NULL);
+    bool rv = swfdec_gst_decoder_init (&_decoder, srccaps, sinkcaps, "audioconvert", resampler.c_str(), NULL);
     if (!rv) {
         throw MediaException(_("AudioDecoderGst: initialisation failed."));      
     }
