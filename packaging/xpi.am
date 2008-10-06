@@ -29,21 +29,25 @@ XPI_BUNDLE=/tmp/gnash-$(BUILDDATE)-bundle
 # this is where the gnash gets compiled
 XPI_BUILD=gnash-${VERSION}
 
-CONFIG_OPTS = $(DISTCHECK_CONFIGURE_FLAGS) \
+# These are the options we want to use to build the standalone
+# gnash player to ship within the .xpi
+CONFIG_OPTS = \
 	--disable-kparts \
+    --disable-testsuite \
 	--enable-gui=gtk \
+    --enable-xpcom \
 	--with-npapi-plugindir=/tmp/plugin
 
 xpi xpi-bundle:
 	rm -rf $(XPI_BUILD) # extract the tarball.
 	tar jxf $(XPI_BUILD).tar.bz2
 
-	(cd $(XPI_BUILD); ./configure $(CONFIG_OPTS) --disable-shared --enable-static --enable-xpcom) # configure for speed.
+	(cd $(XPI_BUILD); ./configure $(CONFIG_OPTS) --disable-shared --enable-static) # configure for standalone player.
 
 	$(MAKE) -C $(XPI_BUILD) all # build and install in temp
 	$(MAKE) -C $(XPI_BUILD) install DESTDIR=$(XPI_TMP)
 
-	(cd $(XPI_BUILD); ./configure $(CONFIG_OPTS) --disable-static --enable-shared --enable-xpcom) # configure for the plugin.
+	(cd $(XPI_BUILD); ./configure $(CONFIG_OPTS) --disable-static --enable-shared) # configure for plugin.
 	$(MAKE) -C $(XPI_BUILD)/plugin clean all GNASHBINDIR= # build and get the plugin
 	$(MAKE) -C $(XPI_BUILD) install-plugin DESTDIR=$(XPI_TMP)
 	$(MAKE) -C $(XPI_BUILD)/plugin/xpcom install-pkglib DESTDIR=$(XPI_TMP)
