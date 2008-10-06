@@ -100,12 +100,7 @@ if USE_GST_ENGINE
 		gst/VideoDecoderGst.cpp \
 		gst/AudioDecoderGst.cpp \
 		gst/MediaParserGst.cpp \
-		gst/gstappsink.c \
-		gst/gstappsrc.c \
 		gst/GstUtil.cpp \
-		gst/gstflvdemux.c \
-		gst/gstflvparse.c \
-		gst/gstbuffersrc.c \
 		gst/swfdec_codec_gst.c \
 		ffmpeg/sound_handler_sdl.cpp
 	
@@ -114,12 +109,7 @@ if USE_GST_ENGINE
 		gst/AudioDecoderGst.h \
 		gst/VideoDecoderGst.h \
 		gst/MediaParserGst.h \
-		gst/gstappsink.h \
-		gst/gstappsrc.h \
 		gst/GstUtil.h \
-		gst/gstflvdemux.h \
-		gst/gstflvparse.h \
-		gst/gstbuffersrc.h \
 		gst/swfdec_codec_gst.h \
 		ffmpeg/sound_handler_sdl.h \
 		gst/gnash_gst_version.h
