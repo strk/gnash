@@ -57,6 +57,7 @@ VideoDecoderGst::VideoDecoderGst(videoCodecType codec_type, int width, int heigh
                                       "width", G_TYPE_INT, width,
                                       "height", G_TYPE_INT, height,     
                                       NULL);
+      break;
     case VIDEO_CODEC_VP6A:
       caps = gst_caps_new_simple ("video/x-vp6-alpha",
                                       "width", G_TYPE_INT, width,
