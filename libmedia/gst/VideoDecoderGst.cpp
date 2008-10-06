@@ -28,8 +28,6 @@
 namespace gnash {
 namespace media {
 
-// gstappsrc -> decodebin -> (decoder) -> ffmpegcolorspace -> gstappsink (with rgb caps)
-
 // TODO: implement proper seeking.
 
 VideoDecoderGst::VideoDecoderGst(GstCaps* caps)
@@ -55,8 +53,12 @@ VideoDecoderGst::VideoDecoderGst(videoCodecType codec_type, int width, int heigh
                                       NULL);
       break;
     case VIDEO_CODEC_VP6:
-    case VIDEO_CODEC_VP6A:
       caps = gst_caps_new_simple ("video/x-vp6-flash",
+                                      "width", G_TYPE_INT, width,
+                                      "height", G_TYPE_INT, height,     
+                                      NULL);
+    case VIDEO_CODEC_VP6A:
+      caps = gst_caps_new_simple ("video/x-vp6-alpha",
                                       "width", G_TYPE_INT, width,
                                       "height", G_TYPE_INT, height,     
                                       NULL);
@@ -92,16 +94,13 @@ VideoDecoderGst::~VideoDecoderGst()
 void
 VideoDecoderGst::setup(GstCaps* srccaps)
 {
-    GstCaps* sinkcaps;
- 
-
     if (!srccaps) {
         throw MediaException(_("VideoDecoderGst: internal error (caps creation failed)"));      
     }
 
-    sinkcaps = gst_caps_new_simple ("video/x-raw-rgb", "bpp", G_TYPE_INT, 24,
-                                                       "depth", G_TYPE_INT, 24,
-                                                       NULL);
+    GstCaps* sinkcaps = gst_caps_new_simple ("video/x-raw-rgb", "bpp", G_TYPE_INT, 24,
+                                             "depth", G_TYPE_INT, 24,
+                                             NULL);
     if (!sinkcaps) {
         throw MediaException(_("VideoDecoderGst: internal error (caps creation failed)"));      
     }
@@ -128,7 +127,7 @@ VideoDecoderGst::push(const EncodedVideoFrame& frame)
         buffer = gst_buffer_new();
 
         GST_BUFFER_DATA(buffer) = const_cast<uint8_t*>(frame.data());
-        GST_BUFFER_SIZE(buffer) = frame.dataSize();	
+        GST_BUFFER_SIZE(buffer) = frame.dataSize();
         GST_BUFFER_OFFSET(buffer) = frame.frameNum();
         GST_BUFFER_TIMESTAMP(buffer) = GST_CLOCK_TIME_NONE;
         GST_BUFFER_DURATION(buffer) = GST_CLOCK_TIME_NONE;
@@ -137,7 +136,6 @@ VideoDecoderGst::push(const EncodedVideoFrame& frame)
     bool success = swfdec_gst_decoder_push(&_decoder, buffer);
     if (!success) {
         log_error(_("VideoDecoderGst: buffer push failed."));
-        gst_buffer_unref(buffer);
     }
 }
   

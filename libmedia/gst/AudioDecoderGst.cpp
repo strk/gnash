@@ -198,7 +198,6 @@ AudioDecoderGst::decode(boost::uint8_t* input, boost::uint32_t inputSize,
     bool success = swfdec_gst_decoder_push(&_decoder, gstbuf);
     if (!success) {
         log_error(_("AudioDecoderGst: buffer push failed."));
-        gst_buffer_unref(gstbuf);
         return 0;
     }
 
