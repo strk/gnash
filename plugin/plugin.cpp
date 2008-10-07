@@ -100,8 +100,6 @@ static const char* getPluginDescription();
 
 #ifdef HAVE_XPCOM
 static nsICookieManager *cookieManager = NULL;
-// I belive the XPI define should be only set by xpi build scripts
-# define GNASH_XPI_PLUGIN 
 #endif // HAVE_XPCOM
 
 
@@ -427,6 +425,8 @@ nsPluginInstance::~nsPluginInstance()
 	{
 		g_source_remove(_ichanWatchId);
 	}
+
+    // TODO: unlink the cookie jar
 }
 
 /// \brief Initialize an instance of the plugin object
