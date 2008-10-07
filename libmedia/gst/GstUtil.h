@@ -65,8 +65,6 @@ public:
  */
     static GstElement* get_audiosink_element();
   
-    static void ensure_plugin_registered(const char* name, GType type);
-
     static bool check_missing_plugins(GstCaps* caps);
         
 private:

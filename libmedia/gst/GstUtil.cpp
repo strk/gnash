@@ -95,27 +95,6 @@ GstElement* GstUtil::get_audiosink_element()
     return element;
 }
 
-
-// FIXME: decide on a single style for this file...
-void
-GstUtil::ensure_plugin_registered(const char* name, GType type)
-{
-  GstElementFactory* factory = gst_element_factory_find (name);
-
-  if (!factory) {
-    if (!gst_element_register (NULL, name, GST_RANK_PRIMARY,
-          type)) {
-      log_error("Failed to register our plugin %s. This may inhibit media "
-                "playback.", name);
-    }
-  } else {
-    gst_object_unref(GST_OBJECT(factory));
-  }
-
-  log_debug("element %s should now be registered", name);
-}
-
-
 // static
 bool
 GstUtil::check_missing_plugins(GstCaps* caps)
