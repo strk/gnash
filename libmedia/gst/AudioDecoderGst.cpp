@@ -25,6 +25,7 @@
 #include "AudioDecoderGst.h"
 #include "MediaParser.h"
 #include "MediaParserGst.h"
+#include "GstUtil.h"
 
 namespace gnash {
 namespace media {
@@ -127,6 +128,13 @@ void AudioDecoderGst::setup(GstCaps* srccaps)
         throw MediaException(_("AudioDecoderGst: internal error (caps creation failed)"));      
     }
 
+    bool success = GstUtil::check_missing_plugins(srccaps);
+    if (!success) {
+        gst_caps_unref(srccaps);
+        throw MediaException(_("Couldn't find a plugin for video type ..."));
+    }
+
+
     GstCaps* sinkcaps = gst_caps_from_string ("audio/x-raw-int, endianness=byte_order, signed=(boolean)true, width=16, depth=16, rate=44100, channels=2");
     if (!sinkcaps) {
         throw MediaException(_("AudioDecoderGst: internal error (caps creation failed)"));      
@@ -134,8 +142,8 @@ void AudioDecoderGst::setup(GstCaps* srccaps)
 
     std::string resampler = findResampler();
 
-    bool rv = swfdec_gst_decoder_init (&_decoder, srccaps, sinkcaps, "audioconvert", resampler.c_str(), NULL);
-    if (!rv) {
+    success = swfdec_gst_decoder_init (&_decoder, srccaps, sinkcaps, "audioconvert", resampler.c_str(), NULL);
+    if (!success) {
         throw MediaException(_("AudioDecoderGst: initialisation failed."));      
     }
 

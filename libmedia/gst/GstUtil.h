@@ -64,7 +64,16 @@ public:
  *    far.
  */
     static GstElement* get_audiosink_element();
-  
+
+
+    /// Check for missing plugins and try to install them if necessary.
+    //
+    /// The installation, if applicable, will happen synchronously!
+    ///
+    /// @param caps Indicates the type of media to search for.
+    /// @return if there is a decoder available to decode the passed type,
+    ///         or if we succeeded in installing one, returns true. Otherwise,
+    ///         returns false.
     static bool check_missing_plugins(GstCaps* caps);
         
 private:
