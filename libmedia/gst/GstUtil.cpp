@@ -108,6 +108,7 @@ GstUtil::check_missing_plugins(GstCaps* caps)
 
 #ifdef GST_HAS_MODERN_PBUTILS
     if (!gst_install_plugins_supported()) {
+        log_error(_("Missing plugin, but plugin installing not supported."));
         return false;
     }
 
@@ -127,6 +128,8 @@ GstUtil::check_missing_plugins(GstCaps* caps)
         // I think a partial success is still a failure...
         return true;
     }
+#else
+    log_error(_("Missing plugin, but plugin installing not supported."));
 #endif
 
     return false;

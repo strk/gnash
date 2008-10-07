@@ -23,7 +23,7 @@
 
 #include "VideoDecoderGst.h"
 #include "MediaParserGst.h"
-
+#include "GstUtil.h"
 
 namespace gnash {
 namespace media {
@@ -89,6 +89,11 @@ VideoDecoderGst::setup(GstCaps* srccaps)
 {
     if (!srccaps) {
         throw MediaException(_("VideoDecoderGst: internal error (caps creation failed)"));      
+    }
+
+    bool success = GstUtil::check_missing_plugins(srccaps);
+    if (!success) {
+        throw MediaException(_("Couldn't find a plugin for video type ..."));
     }
 
     GstCaps* sinkcaps = gst_caps_new_simple ("video/x-raw-rgb", "bpp", G_TYPE_INT, 24,
