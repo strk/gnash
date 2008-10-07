@@ -869,12 +869,12 @@ nsPluginInstance::dumpCookies()
 		PRBool res = FALSE;
 		ofstream fout;
 		mode_t oldmask = umask(0077);
+		char tmpnamebuf[L_tmpnam];
 		while(!res) {
-			char *tmpname = tmpnam("gnash-cookies");
+			const char *tmpname = tmpnam(tmpnamebuf); 
 			fout.open(tmpname, ios::out | ios::trunc);
 			if(!fout.is_open()) {
 				cout << "not opened!!" << endl;
-				g_free(tmpname);
 				continue;
 			} else {
 				cout << "opened cookie store: " << tmpname << endl;
