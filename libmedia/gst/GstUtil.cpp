@@ -22,11 +22,18 @@
 #include "gnashconfig.h"
 #endif
 
+#include <sstream>
+
 #include "GstUtil.h"
 #include "log.h"
 
-#include <gst/gst.h>
-#include <sstream>
+#include "swfdec_codec_gst.h"
+
+#ifdef GST_HAS_MODERN_PBUTILS
+#include <gst/pbutils/pbutils.h>
+#include <gst/pbutils/missing-plugins.h>
+#include <gst/pbutils/install-plugins.h>
+#endif // GST_HAS_MODERN_PBUTILS
 
 
 namespace gnash {
@@ -106,6 +113,44 @@ GstUtil::ensure_plugin_registered(const char* name, GType type)
   }
 
   log_debug("element %s should now be registered", name);
+}
+
+
+// static
+bool
+GstUtil::check_missing_plugins(GstCaps* caps)
+{
+    GstElementFactory * factory = swfdec_gst_get_element_factory (caps);
+
+    if (factory) {
+        gst_object_unref(factory);
+        return true;
+    }
+
+#ifdef GST_HAS_MODERN_PBUTILS
+    if (!gst_install_plugins_supported()) {
+        return false;
+    }
+
+    char* detail = gst_missing_decoder_installer_detail_new (caps);
+    if (!detail) {
+        log_error(_("Missing plugin, but failed to convert it to gst"
+                    " missing plugin detail."));
+        return false;
+    }
+
+    char* details[] =  { detail, 0 };
+
+    GstInstallPluginsReturn ret = gst_install_plugins_sync(details, NULL);
+    g_free(details[0]);
+
+    if (ret == GST_INSTALL_PLUGINS_SUCCESS) {
+        // I think a partial success is still a failure...
+        return true;
+    }
+#endif
+
+    return false;
 }
 
 
