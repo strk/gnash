@@ -294,7 +294,7 @@ SDL_sound_handler::play_sound(int sound_handle, int loopCount, int offset, long 
 	}
 	catch (MediaException& e)
 	{
-	    log_error("AudioDecoder initialization failed");
+	    log_error("AudioDecoder initialization failed: %s", e.what());
 	}
 
     // Push the sound onto the playing sounds container.
