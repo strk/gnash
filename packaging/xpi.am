@@ -48,7 +48,7 @@ xpi xpi-bundle:
 	$(MAKE) -C $(XPI_BUILD) install DESTDIR=$(XPI_TMP)
 
 	(cd $(XPI_BUILD); ./configure $(CONFIG_OPTS) --disable-static --enable-shared) # configure for plugin.
-	$(MAKE) -C $(XPI_BUILD)/plugin clean all GNASHBINDIR= # build and get the plugin
+	$(MAKE) -C $(XPI_BUILD)/plugin clean all CXXFLAGS=-DGNASH_XPI_PLUGIN # build and get the plugin
 	$(MAKE) -C $(XPI_BUILD) install-plugin DESTDIR=$(XPI_TMP)
 	$(MAKE) -C $(XPI_BUILD)/plugin/xpcom install-pkglib DESTDIR=$(XPI_TMP)
 

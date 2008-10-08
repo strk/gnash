@@ -100,8 +100,6 @@ static const char* getPluginDescription();
 
 #ifdef HAVE_XPCOM
 static nsICookieManager *cookieManager = NULL;
-// I belive the XPI define should be only set by xpi build scripts
-# define GNASH_XPI_PLUGIN 
 #endif // HAVE_XPCOM
 
 
@@ -427,6 +425,11 @@ nsPluginInstance::~nsPluginInstance()
 	{
 		g_source_remove(_ichanWatchId);
 	}
+
+    // TODO: unlink the cookie jar
+    if ( ! _cookieFile.empty() ) {
+	    cout << " ~nsPluginInstance: file " << _cookieFile << " should be unlinked!" << endl;
+    }
 }
 
 /// \brief Initialize an instance of the plugin object
@@ -845,66 +848,39 @@ getHome(string& gnashpath)
 #endif // GNASH_XPI_PLUGIN
 
 void
-nsPluginInstance::startProc(Window win)
+nsPluginInstance::dumpCookies()
 {
-	string procname;
-	char *gnash_env = std::getenv("GNASH_PLAYER");
-#ifdef GNASH_XPI_PLUGIN
-	if (getHome(procname) >= 0)
-		;
-	else
-#endif // def GNASH_XPI_PLUGIN
-	if (gnash_env == NULL) {
-		procname = GNASHBINDIR;
-		procname += "/gtk-gnash";
-	}
-	else
-	{
-		procname = gnash_env;
-	}
+    if ( ! _cookieFile.empty() ) {
+	    cout << " dumpCookies: file " << _cookieFile << " should be unlinked!" << endl;
+    }
+    _cookieFile.clear();
 
-	const char* pageurl = getCurrentPageURL();
-	if (!pageurl)
-	{
-		cout << "Could not get current page URL!" << endl;
-	}
-
-	struct stat procstats;
-
-	// See if the file actually exists, otherwise we can't spawn it
-	if (stat(procname.c_str(), &procstats) == -1)
-	{
-		cout << "Invalid path to standalone executable: " << procname << endl;
-		return;
-	}
-
-//Disabled till we get the file removed on plugin instance exit
+// Linking problems...
 //#ifdef HAVE_XPCOM 
-#if 0 // {
-
+#if 0
 	cout << "[XPCOM] trying to dump cookies" << endl;
 
 	nsCOMPtr<nsISimpleEnumerator> cookie_e;
 	nsresult rv =  cookieManager->GetEnumerator(getter_AddRefs(cookie_e));
 
-	char *cookiefile = NULL;
+	//char *cookiefile = NULL;
 
 	if(NS_SUCCEEDED(rv)) {
 		PRBool res = FALSE;
 		ofstream fout;
 		mode_t oldmask = umask(0077);
+		char tmpnamebuf[L_tmpnam];
 		while(!res) {
-			char *tmpname = tmpnam(NULL);
+			const char *tmpname = tmpnam(tmpnamebuf); 
 			fout.open(tmpname, ios::out | ios::trunc);
 			if(!fout.is_open()) {
 				cout << "not opened!!" << endl;
-				g_free(tmpname);
 				continue;
 			} else {
 				cout << "opened cookie store: " << tmpname << endl;
 			}
 			res = TRUE;
-			cookiefile = tmpname;
+			_cookieFile = tmpname; // assign ? 
 		}
 		umask(oldmask);
 
@@ -981,7 +957,45 @@ nsPluginInstance::startProc(Window win)
 	} else {
 		cout << "[XPCOM] WARNING: Cookie feature disabled" << endl;
 	}
-#endif // HAVE_XPCOM }
+#endif // HAVE_XPCOM
+
+}
+
+void
+nsPluginInstance::startProc(Window win)
+{
+	string procname;
+	char *gnash_env = std::getenv("GNASH_PLAYER");
+#ifdef GNASH_XPI_PLUGIN
+	if (getHome(procname) >= 0)
+		;
+	else
+#endif // def GNASH_XPI_PLUGIN
+	if (gnash_env == NULL) {
+		procname = GNASHBINDIR;
+		procname += "/gtk-gnash";
+	}
+	else
+	{
+		procname = gnash_env;
+	}
+
+	const char* pageurl = getCurrentPageURL();
+	if (!pageurl)
+	{
+		cout << "Could not get current page URL!" << endl;
+	}
+
+	struct stat procstats;
+
+	// See if the file actually exists, otherwise we can't spawn it
+	if (stat(procname.c_str(), &procstats) == -1)
+	{
+		cout << "Invalid path to standalone executable: " << procname << endl;
+		return;
+	}
+
+    dumpCookies();
 
 	// 0 For reading, 1 for writing.
 	int p2c_pipe[2];
