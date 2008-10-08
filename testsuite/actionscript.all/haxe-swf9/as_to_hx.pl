@@ -155,16 +155,10 @@ while(<STDIN>){
 		$_ =~ s/(\w+\.split\(\s*undefined\s*),.+(\))/$1$2/g;
 
 		#CHECK 5.3
-		#Replace calls to split(a,b) with split(a).slice(0,a)
-		$_ =~ s/(\w+\.split\(.+),\s*(\w+)\s*(\))/$1$3.slice(0,$2)/g;
+		#Replace calls to str.split(a,b) with a==""?[]:str==""?[""]:str.split(a).slice(0,b)
+		#		 str			a		b
+		$_ =~ s/(\w+)\.split\((.+),\s*(\w+)\s*\)/$2==""?[]:$1==""?[""]:$1.split($2).slice(0,$3)/g;
 		
-		#CHECK 5.4 - Must run after CHECK 4
-		#Remove calls to split that have more than one argument.
-		if($_ =~ /\.split\(\s*\w+\s*,\s*\w+\s*\)/){
-			skip_line();
-			next;
-		}
-
 	}
 	if(index($_,"length") != $[-1){
 		#Remove attemps to set strings length property.  Haxe compliler does not allow this.
@@ -193,7 +187,8 @@ while(<STDIN>){
 		skip_line();
 		next;
 	}
-	if($_ =~ /indexOf/){
+	#Remove calls to String.indexOf that have more than one argument
+	if($_ =~ /indexOf\(\s*[\"\w]\w*[\"\w],.+\)/){
 		skip_line();
 		next;
 	}
