@@ -549,9 +549,10 @@ unsigned int SDL_sound_handler::get_duration(int sound_handle)
 
 	// Return the sound duration in milliseconds
 	if (sampleCount > 0 && sampleRate > 0) {
+        // TODO: should we cache this in the sound_data object ?
 		unsigned int ret = sampleCount / sampleRate * 1000;
 		ret += ((sampleCount % sampleRate) * 1000) / sampleRate;
-		if (sounddata->soundinfo->isStereo()) ret = ret / 2;
+		//if (sounddata->soundinfo->isStereo()) ret = ret / 2;
 		return ret;
 	} else {
 		return 0;
