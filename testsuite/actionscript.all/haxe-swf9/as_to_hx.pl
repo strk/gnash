@@ -144,20 +144,25 @@ while(<STDIN>){
 		next;
 	}
 	#CHECK 5
+	#Calls to split()
 	if(index($_,"split") != $[-1){
 		
 		#CHECK 5.1
 		#Replace calls to split that have no arguments with an array whose only member is the caller.
-		$_ =~ s/(\w+)\.split\(\)/\[$1\]/g;
+		$_ =~ s/(\w+)\.split\(\)/[$1]/g;
 
 		#CHECK 5.2
-		#Ignore the second argument if delimiter is undefined.
-		$_ =~ s/(\w+\.split\(\s*undefined\s*),.+(\))/$1$2/g;
+		#If the delimiter is undefined, replace with an array whose only member is the caller
+		$_ =~ s/(\w+)\.split\(\s*undefined\s*,.+\)/[$1]/g;
+
+		#CHECK 5.4
+		#If the limit is undefined, ignore it.
+		$_ =~ s/(\w+)\.split\(\s*(\S+)\s*,\s*undefined\s*\)/$1.split($2)/g;
 
 		#CHECK 5.3
-		#Replace calls to str.split(a,b) with a==""?[]:str==""?[""]:str.split(a).slice(0,b)
+		#Replace calls to str.split(a,b) with a==""?[]:str==""||a==null?[str]:str.split(a).slice(0,b)
 		#		 str			a		b
-		$_ =~ s/(\w+)\.split\((.+),\s*(\w+)\s*\)/$2==""?[]:$1==""?[""]:$1.split($2).slice(0,$3)/g;
+		$_ =~ s/(\w+)\.split\((.+),\s*(\w+)\s*\)/$2==""?[]:$1==""||$2==null?[$1]:$1.split($2).slice(0,$3)/g;
 		
 	}
 	if(index($_,"length") != $[-1){
@@ -192,11 +197,10 @@ while(<STDIN>){
 		skip_line();
 		next;
 	}
-	#Remove references to the undefined value. I can't find a Haxe equivilent for this.
-	if($_ =~ /undefined/){
-		skip_line();
-		next;
-	}
+
+	#Replace undefined with null.
+	$_ =~ s/undefined/null/g;
+
 	#Remove calls to fromCharCode.  Haxe only alows one argument to this function.
 	if($_ =~ /String.fromCharCode\(.+\)/){
 		skip_line();
