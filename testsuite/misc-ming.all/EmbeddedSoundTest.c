@@ -123,6 +123,8 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);  /* end of frame1 */
 
+    add_actions(mo, "c_soundComplete = 0;");
+
     add_actions(mo, "a = new Sound(); a.attachSound('mono22_mp2');");
     add_actions(mo, "b = new Sound(); b.attachSound('mono22_mp2b');");
     add_actions(mo, "c = new Sound(); c.attachSound('stereo8_mp3');");
@@ -143,22 +145,32 @@ main(int argc, char** argv)
 
     check_equals(mo, "c.duration", "5224");
     check_equals(mo, "c.position", "0");
-    add_actions(mo, "c.start();");
+    add_actions(mo, "c.start(0, 2);");
     check_equals(mo, "c.position", "0");
 
     check_equals(mo, "d.duration", "5224");
     check_equals(mo, "d.position", "0");
     add_actions(mo, "d.start();");
+    add_actions(mo, "d.start(4);");
     check_equals(mo, "d.position", "0");
     
     SWFMovie_nextFrame(mo);
 
-    add_actions(mo, "stop();");
+    add_actions(mo, "stop();"
+            "note('will wait for onSoundComplete to finish the test (about "
+            "13 seconds).');");
 
     add_actions(mo, "a.onSoundComplete = function() {"
             "check_equals(a.position, 13740);"
-            "totals(13); "
+            "check_equals(c_soundComplete, 1);"
+            "totals(18); "
             "finished = true;"
+            "};");
+
+    add_actions(mo, "c.onSoundComplete = function() {"
+            "check_equals(b.position, 10472);"
+            "c_soundComplete++;"
+            "note('c.onSoundComplete() called '+c_soundComplete+' time(s).');"
             "};");
 
 	/*****************************************************
