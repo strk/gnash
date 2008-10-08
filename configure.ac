@@ -1566,6 +1566,8 @@ AM_CONDITIONAL(MING_SUPPORTS_STREAMING_SOUND,
         [ test x"$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040006 ])
 AM_CONDITIONAL(MING_SUPPORTS_SWFBUTTON_SET_DEPTH,
         [ test x"$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040006 ])
+AM_CONDITIONAL(MING_VERSION_0_4_3,
+        [ test x"$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040300 ])
 
 if test x$cross_compiling = xno; then
   AC_ARG_WITH([swfdec_testsuite],
