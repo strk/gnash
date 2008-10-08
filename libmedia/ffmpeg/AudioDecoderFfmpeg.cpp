@@ -24,7 +24,7 @@
 #include <cmath> // for std::ceil
 #include <algorithm> // for std::copy, std::max
 
-#define GNASH_DEBUG_AUDIO_DECODING
+//#define GNASH_DEBUG_AUDIO_DECODING
 
 #ifdef FFMPEG_AUDIO2
 # define AVCODEC_DECODE_AUDIO avcodec_decode_audio2
@@ -392,17 +392,19 @@ AudioDecoderFfmpeg::decodeFrame(boost::uint8_t* input, boost::uint32_t inputSize
 		bool stereo = _audioCodecCtx->channels > 1 ? true : false;
 		int samples = stereo ? outSize >> 2 : outSize >> 1;
 
-		int resampledFrameSize = int(std::ceil(outSize*resampleFactor));
-        // Make it an even number as it's going to be considered an array of int16..
-        if ( resampledFrameSize&0x01 ) ++resampledFrameSize;
+        int expectedMaxOutSamples = std::ceil(samples*resampleFactor);
+
+        // *channels *sampleSize 
+		int resampledFrameSize = expectedMaxOutSamples*2*2;
 
 		// Allocate just the required amount of bytes
 		boost::uint8_t* resampledOutput = new boost::uint8_t[resampledFrameSize]; 
 
 #ifdef GNASH_DEBUG_AUDIO_DECODING
-		log_debug("Calling the resampler; "
+		log_debug("Calling the resampler; resampleFactor:%d; "
 			"ouput to 44100hz, 2channels, %dbytes; "
 			"input is %dhz, %dchannels, %dbytes, %dsamples",
+            resampleFactor,
 			resampledFrameSize, _audioCodecCtx->sample_rate,
             _audioCodecCtx->channels, outSize, samples);
 #endif
@@ -419,10 +421,10 @@ AudioDecoderFfmpeg::decodeFrame(boost::uint8_t* input, boost::uint32_t inputSize
         	outPtr = reinterpret_cast<boost::int16_t*>(resampledOutput);
 		delete [] output;
 
-		if (resampledFrameSize < samples*2*2)
+		if (expectedMaxOutSamples < samples)
 		{
-			log_error(" --- Computation of resampled frame size (%d) < then the one based on samples (%d)",
-				resampledFrameSize, samples*2*2);
+			log_error(" --- Computation of resampled samples (%d) < then the actual returned samples (%d)",
+				expectedMaxOutSamples, samples);
 
 			log_debug(" input frame size: %d", outSize);
 			log_debug(" input sample rate: %d", _audioCodecCtx->sample_rate);
@@ -434,7 +436,7 @@ AudioDecoderFfmpeg::decodeFrame(boost::uint8_t* input, boost::uint32_t inputSize
 			log_debug(" output samples: %d", samples);
 
             /// Memory errors...
-			//abort();
+			abort();
 		}
 
 		// we let the consistency check run before we override outSize
