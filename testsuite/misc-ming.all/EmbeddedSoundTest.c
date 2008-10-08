@@ -23,7 +23,7 @@
 
 #include "ming_utils.h"
 
-#define OUTPUT_VERSION 6
+#define OUTPUT_VERSION 8
 #define OUTPUT_FILENAME "EmbeddedSoundTest.swf"
 
 void addSoundExport(SWFMovie mo);
@@ -129,9 +129,12 @@ main(int argc, char** argv)
     add_actions(mo, "d = new Sound(); d.attachSound('stereo8_mp3b');");
 
     check_equals(mo, "a.duration", "13740");
+    add_actions(mo, "check_equals(a.getBytesTotal(), undefined);");
+    add_actions(mo, "check_equals(a.getBytesLoaded(), undefined);");
+    add_actions(mo, "check_equals(a.id3, undefined);");
     check_equals(mo, "a.position", "0");
     add_actions(mo, "a.start();");
-    check_equals(mo, "a.position", "0");
+    xcheck_equals(mo, "a.position", "0");
 
     check_equals(mo, "b.duration", "13740");
     check_equals(mo, "b.position", "0");

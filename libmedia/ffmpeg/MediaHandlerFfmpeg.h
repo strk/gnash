@@ -41,7 +41,7 @@ public:
 
 	virtual std::auto_ptr<AudioDecoder> createAudioDecoder(AudioInfo& info);
 
-    size_t getInputPaddingSize() const;
+    virtual size_t getInputPaddingSize() const;
 
 };
 
