@@ -107,9 +107,12 @@ GstUtil::check_missing_plugins(GstCaps* caps)
     }
 
 #ifdef GST_HAS_MODERN_PBUTILS
+    gst_pb_utils_init();
+
+
     if (!gst_install_plugins_supported()) {
-        log_error(_("Missing plugin, but plugin installing not supported."));
-        return false;
+        log_error(_("Missing plugin, but plugin installing not supported."
+                    " Will try anyway, but expect failure."));
     }
 
     char* detail = gst_missing_decoder_installer_detail_new (caps);
@@ -124,12 +127,17 @@ GstUtil::check_missing_plugins(GstCaps* caps)
     GstInstallPluginsReturn ret = gst_install_plugins_sync(details, NULL);
     g_free(details[0]);
 
+    // FIXME: what about partial success?
     if (ret == GST_INSTALL_PLUGINS_SUCCESS) {
-        // I think a partial success is still a failure...
+        if (! gst_update_registry()) {
+            log_error(_("gst_update_registry failed. You'll need to "
+                        "restart Gnash to use the new plugins."));
+        }
+
         return true;
     }
 #else
-    log_error(_("Missing plugin, but plugin installing not supported."));
+    log_error(_("Missing plugin, but plugin installation not available."));
 #endif
 
     return false;
