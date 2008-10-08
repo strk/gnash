@@ -201,10 +201,12 @@ while(<STDIN>){
 	#Replace undefined with null.
 	$_ =~ s/undefined/null/g;
 
-	#Remove calls to fromCharCode.  Haxe only alows one argument to this function.
+	#Haxe only allows one argument to String.fromCharCode(), so replace
+	#String.fromCharCode(1,2) with String.fromCharCode(1) + String.fromCharCode(2)
 	if($_ =~ /String.fromCharCode\(.+\)/){
-		skip_line();
-		next;
+		
+		#TODO: Can this be combined with regex above?
+		$_ =~ s/,\s*(\w+)\s*/) + String.fromCharCode($1/g;
 	}
 	
 	#Remove calls to call function.  I haven't found a Haxe equivilent for this.
