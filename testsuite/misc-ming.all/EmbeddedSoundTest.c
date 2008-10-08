@@ -1,5 +1,5 @@
 /* 
- *   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+ *   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -149,7 +149,7 @@ main(int argc, char** argv)
     add_actions(mo, "d.playSound();");
     check_equals(mo, "d.position", "0");
     
-    add_actions(mo, "totals(); stop();");
+    add_actions(mo, "totals(12); stop();");
 
 	/*****************************************************
 	 *
