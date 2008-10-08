@@ -150,13 +150,13 @@ public:
 	active_sound()
 		:
 		decoder(0),
-		position(0),
-		raw_position(0),
-		loop_count(0),
+		decodingPosition(0),
+		playbackPosition(0),
+		loopCount(0),
 		offset(0),
 		current_env(0),
 		samples_played(0),
-		_undecodedData(0)
+		_encodedData(0)
 	{}
 
 	~active_sound()
@@ -168,15 +168,15 @@ public:
 	/// The decoder object used to convert the data into the playable format
 	AudioDecoder* decoder;
 
-	/// Current decoding position in the stream
-	unsigned long position;
+	/// Current decoding position in the encoded stream
+	unsigned long decodingPosition;
 
-	/// Current playing position in the decoded stream
-	unsigned long raw_position;
+	/// Current playback position in the decoded stream
+	unsigned long playbackPosition;
 
 	/// Numbers of loops: -1 means loop forever, 0 means play once.
 	/// For every loop completed, it is decremented.
-	long loop_count;
+	long loopCount;
 
 	/// Offset to make playback start in-sync, only used with mp3 streams.
 	unsigned int offset;
@@ -199,13 +199,13 @@ public:
 	///
 	void set_data(sound_data* newUndecodedData);
 
-	/// Returns the data pointer in the undecoded datastream
+	/// Returns the data pointer in the encoded datastream
 	/// for the given position. Boundaries are checked.
-	boost::uint8_t* get_data_ptr(unsigned long int pos);
+	boost::uint8_t* getEncodedData(unsigned long int pos);
 
 	/// Returns the data pointer in the decoded datastream
 	/// for the given position. Boundaries are checked.
-	boost::uint8_t* get_raw_data_ptr(unsigned long int pos);
+	boost::uint8_t* getDecodedData(unsigned long int pos);
 
 	/// Release resources associated with decoded data, if any.
 	//
@@ -254,7 +254,7 @@ public:
 		delete [] data; // ownership transferred...
 	}
 
-	size_t rawDataSize() const
+	size_t decodedDataSize() const
 	{
 		if ( _decodedData.get() )
 		{
@@ -263,19 +263,19 @@ public:
 		else return 0;
 	}
   
-	size_t dataSize() const
+	size_t encodedDataSize() const
 	{
-		return _undecodedData ? _undecodedData->size() : 0;
+		return _encodedData ? _encodedData->size() : 0;
 	}
   
 private:
 
-	/// The undecoded data
-	sound_data* _undecodedData;
+	/// The encoded data
+	sound_data* _encodedData;
 
 	/// The decoded buffer
 	//
-	/// If NULL, the _undecodedData will be considered
+	/// If NULL, the _encodedData will be considered
 	/// decoded instead
 	///
 	std::auto_ptr<SimpleBuffer> _decodedData;
@@ -350,7 +350,7 @@ public:
 					 unsigned int sample_count, int handle_id);
 
 	/// Play the index'd sample.
-	virtual void	play_sound(int sound_handle, int loop_count, int offset,
+	virtual void	play_sound(int sound_handle, int loopCount, int offset,
 				   long start_position, const std::vector<sound_envelope>* envelopes);
 
 	/// Stop the index'd sample.
