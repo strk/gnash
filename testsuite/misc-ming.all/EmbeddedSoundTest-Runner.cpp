@@ -25,6 +25,8 @@
 #include "character.h"
 #include "DisplayList.h"
 #include "log.h"
+#include "GnashSleep.h"
+#include "VM.h"
 
 #include "check.h"
 #include <string>
@@ -45,14 +47,25 @@ main(int /*argc*/, char** /*argv*/)
 	sprite_instance* root = tester.getRootMovie();
 	assert(root);
 
+    VM& vm = root->getVM();
+    string_table& st = vm.getStringTable();
+
     const size_t framecount = root->get_frame_count();
 
-	while (true)
-	{
-        if (root->get_current_frame() + 1 == framecount) break;
-
-		tester.advance();
-	}
+    // 20 x 0.75 seconds = 15 in total. The sound should last
+    // 13.74 seconds.
+    for (size_t i = 0; i < 20; ++i)
+    {
+        while (true)
+        {
+            if (root->get_current_frame() + 1 == framecount) break;
+            tester.advance();
+	
+        }
+        gnashSleep(750000);
+    }
+    as_value eot;
+    check(root->get_member(st.find("finished"), &eot));
 
 }
 

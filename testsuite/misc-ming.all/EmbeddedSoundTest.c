@@ -72,10 +72,10 @@ addSoundExport(SWFMovie mo)
             SWF_SOUND_16BITS |
             SWF_SOUND_STEREO);
 
-    SWFMovie_addExport(mo, (SWFSound)soundMP3a, "somp3a");
-    SWFMovie_addExport(mo, (SWFSound)soundMP3b, "somp3b");
-    SWFMovie_addExport(mo, (SWFSound)soundMP3c, "somp3c");
-    SWFMovie_addExport(mo, (SWFSound)soundMP3d, "somp3d");
+    SWFMovie_addExport(mo, (SWFSound)soundMP3a, "mono22_mp2");
+    SWFMovie_addExport(mo, (SWFSound)soundMP3b, "mono22_mp2b");
+    SWFMovie_addExport(mo, (SWFSound)soundMP3c, "stereo8_mp3");
+    SWFMovie_addExport(mo, (SWFSound)soundMP3d, "stereo8_mp3b");
 
     SWFMovie_writeExports(mo);
 }
@@ -108,7 +108,7 @@ main(int argc, char** argv)
 	Ming_setScale(20.0); /* let's talk pixels */
  
 	mo = newSWFMovie();
-	SWFMovie_setRate(mo, 12);
+	SWFMovie_setRate(mo, 1.33);
 	SWFMovie_setDimension(mo, 640, 400);
 
 	/*********************************************
@@ -123,33 +123,40 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);  /* end of frame1 */
 
-
-    add_actions(mo, "a = new Sound(); a.attachSound('somp3a');");
-    add_actions(mo, "b = new Sound(); b.attachSound('somp3b');");
-    add_actions(mo, "c = new Sound(); c.attachSound('somp3c');");
-    add_actions(mo, "d = new Sound(); d.attachSound('somp3d');");
+    add_actions(mo, "a = new Sound(); a.attachSound('mono22_mp2');");
+    add_actions(mo, "b = new Sound(); b.attachSound('mono22_mp2b');");
+    add_actions(mo, "c = new Sound(); c.attachSound('stereo8_mp3');");
+    add_actions(mo, "d = new Sound(); d.attachSound('stereo8_mp3b');");
 
     check_equals(mo, "a.duration", "13740");
     check_equals(mo, "a.position", "0");
-    add_actions(mo, "a.playSound();");
+    add_actions(mo, "a.start();");
     check_equals(mo, "a.position", "0");
 
     check_equals(mo, "b.duration", "13740");
     check_equals(mo, "b.position", "0");
-    add_actions(mo, "b.play();");
+    add_actions(mo, "b.start();");
     check_equals(mo, "b.position", "0");
 
     check_equals(mo, "c.duration", "5224");
     check_equals(mo, "c.position", "0");
-    add_actions(mo, "c.playSound();");
+    add_actions(mo, "c.start();");
     check_equals(mo, "c.position", "0");
 
     check_equals(mo, "d.duration", "5224");
     check_equals(mo, "d.position", "0");
-    add_actions(mo, "d.playSound();");
+    add_actions(mo, "d.start();");
     check_equals(mo, "d.position", "0");
     
-    add_actions(mo, "totals(12); stop();");
+    SWFMovie_nextFrame(mo);
+
+    add_actions(mo, "stop();");
+
+    add_actions(mo, "a.onSoundComplete = function() {"
+            "check_equals(a.position, 13740);"
+            "totals(13); "
+            "finished = true;"
+            "};");
 
 	/*****************************************************
 	 *
