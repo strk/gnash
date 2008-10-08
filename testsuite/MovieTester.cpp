@@ -111,11 +111,11 @@ MovieTester::MovieTester(const std::string& url)
 		throw GnashException("Could not load movie from "+url);
 	}
 
-	// Initialize the sound handler(s)
-	initTestingSoundHandlers();
-
 	// Initialize the testing media handlers
 	initTestingMediaHandlers();
+
+	// Initialize the sound handler(s)
+	initTestingSoundHandlers();
 
 	_movie_root = &(VM::init(*_movie_def, _clock).getRoot());
 
