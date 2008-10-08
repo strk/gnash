@@ -45,22 +45,49 @@ AC_DEFUN([GNASH_PATH_XPCOM],
   ])
 
     dnl Look for the library
-    AC_ARG_WITH(xpcom_lib, AC_HELP_STRING([--with-xpcom-lib], [directory where XPCOM libraries are]), with_xpcom_lib=${withval})
-    AC_CACHE_VAL(ac_cv_path_xpcom_lib, [
-      if test x"${with_xpcom_lib}" != x ; then
-        if test -f ${with_xpcom_libs}/libxpcomglue.a; then
-          ac_cv_path_xpcom_lib="-L`(cd ${with_xpcom_lib}; pwd)` -lxpcomglue -lnspr4 -lplds4"
+  AC_ARG_WITH(xpcom-sdk-dir, AC_HELP_STRING([--with-xpcom-sdk-dir], [directory where XPCOM SDK is]), with_xpcom_sdk_dir=${withval})
+    AC_CACHE_VAL(ac_cv_path_xpcom_sdk_dir, [
+      if test x"${with_xpcom_sdk_dir}" != x ; then
+        if test -f ${with_xpcom_sdk_dir}/libxpcomglue_s.a; then
+          ac_cv_path_xpcom_sdk_dir="-L`(cd ${with_xpcom_sdk_dir}; pwd)` -lxpcomglue_s -lnspr4 -lplds4"
+        else
+          AC_MSG_ERROR([${with_xpcom_sdk_dir} directory doesn't contain libxpcomglue_s.a!])
         fi
       fi
     ])
 
   if test x$xpcom = xyes; then
     if test x$cross_compiling = xno; then
-      if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_xpcom_incl}" = x; then
-        $PKG_CONFIG --exists libxul && ac_cv_path_xpcom_incl="`$PKG_CONFIG --cflags-only-I libxul`"
-        $PKG_CONFIG --exists libxul && ac_cv_path_xpcom_lib="`$PKG_CONFIG --libs libxul`"
-        $PKG_CONFIG --exists libxul && ac_cv_path_xpidl="`$PKG_CONFIG --libs-only-L libxul`"
+
+      # Look for libxpcomglue_s.a (version 1.8 !!) if not explicitly given
+      if test x$ac_cv_path_xpcom_sdk_dir = x; then
+        for i in /usr/lib/iceape; do
+          # TODO: check version ! we do NOT want to use 1.9 here !!!
+          # TODO: check availability of nspr4 and plds4 (may be in /usr/lib too)
+          if test -e "${i}/libxpcomglue_s.a"; then
+            ac_cv_path_xpcom_sdk_dir="-L${i} -lxpcomglue_s -lnspr4 -lplds4"
+            break
+          fi
+        done
       fi
+
+      # Look for xpcom headers (version 1.8 !!) if not explicitly given
+      if test x$ac_cv_path_xpcom_incl = x; then
+        # Prefer libxul-unstable for cflags.
+        if $PKG_CONFIG --exists libxul-unstable; then
+              ac_cv_path_xpcom_incl="`$PKG_CONFIG --cflags-only-I libxul-unstable`"
+        else
+              if $PKG_CONFIG --exists libxul; then
+                ac_cv_path_xpcom_incl="`$PKG_CONFIG --cflags-only-I libxul`"
+              fi
+        fi
+      fi
+
+      # Look for libxul. TODO: needed at all ?
+      if $PKG_CONFIG --exists libxul; then
+        ac_cv_path_xpidl="`$PKG_CONFIG --libs-only-L libxul`"
+      fi
+
     fi
   fi
 
@@ -69,13 +96,14 @@ AC_DEFUN([GNASH_PATH_XPCOM],
     XPCOM_IDL_CFLAGS=`echo $XPCOM_CFLAGS | sed -e 's:include:share/idl:'`
     XPIDL=`echo ${ac_cv_path_xpidl} | sed -e 's:-L::' -e 's:sdk-::' -e 's:sdk/lib::' -e 's:-devel::' -e 's:lib$::'`
     XPIDL="${XPIDL}xpidl"
+    AC_DEFINE([HAVE_XPCOM], [1], [Use XPCOM in the NPAPI plugin])
   else
     XPCOM_CFLAGS=""
     XPIDL=""
   fi
 
-  if test x"${ac_cv_path_xpcom_lib}" != x ; then
-    XPCOM_LIBS="${ac_cv_path_xpcom_lib}"
+  if test x"${ac_cv_path_xpcom_sdk_dir}" != x ; then
+    XPCOM_LIBS="${ac_cv_path_xpcom_sdk_dir}"
     has_xpcom=yes
   else
     XPCOM_LIBS=""

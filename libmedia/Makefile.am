@@ -94,39 +94,34 @@ noinst_HEADERS = \
 	$(NULL)
 
 
-if USE_SOUND_GST
+if USE_GST_ENGINE
    libgnashmedia_la_SOURCES += \
 		gst/MediaHandlerGst.cpp \
 		gst/VideoDecoderGst.cpp \
 		gst/AudioDecoderGst.cpp \
-		gst/gstappsink.c \
-		gst/gstappsrc.c \
-		gst/SoundHandlerGst.cpp \
+		gst/MediaParserGst.cpp \
 		gst/GstUtil.cpp \
-		gst/SoundGst.cpp \
-		gst/gstflvdemux.c \
-		gst/gstflvparse.c \
-		gst/gstbuffersrc.c
+		gst/swfdec_codec_gst.c \
+		ffmpeg/sound_handler_sdl.cpp
 	
    noinst_HEADERS += \
 		gst/MediaHandlerGst.h \
 		gst/AudioDecoderGst.h \
 		gst/VideoDecoderGst.h \
-		gst/gstappsink.h \
-		gst/gstappsrc.h \
-		gst/SoundHandlerGst.h \
+		gst/MediaParserGst.h \
 		gst/GstUtil.h \
-		gst/SoundGst.h \
-		gst/gstflvdemux.h \
-		gst/gstflvparse.h \
-		gst/gstbuffersrc.h \
+		gst/swfdec_codec_gst.h \
+		ffmpeg/sound_handler_sdl.h \
 		gst/gnash_gst_version.h
 
    libgnashmedia_la_CPPFLAGS += \
-		$(GSTREAMER_CFLAGS)
+		-I$(top_srcdir)/libmedia/gst \
+		$(GSTREAMER_CFLAGS) \
+		$(SDL_CFLAGS)
 
    libgnashmedia_la_LIBADD += \
-		$(GSTREAMER_LIBS) -lgstbase-0.10
+		$(GSTREAMER_LIBS) -lgstbase-0.10 \
+		$(SDL_LIBS)
 
 endif
 

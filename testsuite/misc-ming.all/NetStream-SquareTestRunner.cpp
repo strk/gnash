@@ -71,8 +71,10 @@ main(int /*argc*/, char** /*argv*/)
 	{
 		tester.advance();
 
-		// sleep to give the NetStream a chance to load data and trigger notifications
+		// sleep to give the NetStream a chance to load
+        // data and trigger notifications
 		// needs more analisys to find a good way for doing this..
+        // TODO: sleep less ! GnashSleep !
 		sleep(1);
 	}
 
@@ -80,14 +82,20 @@ main(int /*argc*/, char** /*argv*/)
 	tester.pressKey(key::SPACE);
 	tester.releaseKey(key::SPACE);
 
-        while (root->get_current_frame() < 2)
+    while (root->get_current_frame() < 2)
 	{
 		tester.advance();
 
 		// sleep to give the NetStream a chance to load data and trigger notifications
 		// needs more analisys to find a good way for doing this..
+        // TODO: sleep less !!
 		sleep(1);
 	}
+
+	// Consistency check 
+	as_value eot;
+	bool endOfTestFound = root->get_member(st.find("end_of_test"), &eot);
+	check(endOfTestFound);
 
 }
 

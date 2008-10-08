@@ -38,7 +38,6 @@ namespace media {
 
 /// Forward declarations
 class CodecContextWrapper;
-class image::ImageBase;
 #ifdef HAVE_SWSCALE_H
 class SwsContextWrapper;
 #endif

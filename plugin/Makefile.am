@@ -28,6 +28,11 @@ if NPAPI
 SUBDIRS += mozilla-sdk
 
 if XPCOM
+AM_CXXFLAGS=-fshort-wchar
+INCLUDES = $(XPCOM_CFLAGS)
+# Adding XPCOM_LIBS here breaks loading of plugin under iceapi from lenny.
+# See bug #24469
+AM_LDFLAGS = $(XPCOM_LIBS)
 SUBDIRS += xpcom
 endif
 if WIN32

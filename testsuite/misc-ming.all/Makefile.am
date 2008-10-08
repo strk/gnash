@@ -179,6 +179,12 @@ check_PROGRAMS = \
 	instanceNameTest \
 	$(NULL)
 
+if MING_VERSION_0_4_3
+check_PROGRAMS += \
+	EmbeddedSoundTest \
+	$(NULL)
+endif
+
 if MING_VERSION_0_4
 check_PROGRAMS += \
 	opcode_guard_test \
@@ -218,6 +224,10 @@ if MING_SUPPORTS_SWFBUTTON_SET_DEPTH
 check_PROGRAMS += \
 	ButtonEventsTest \
 	ButtonEventsTest-Runner 
+endif
+
+if MING_VERSION_0_4_3
+check_PROGRAMS += EmbeddedSoundTest-Runner
 endif
 
 check_SCRIPTS = \
@@ -1417,6 +1427,37 @@ XMLSocketTest_LDADD = libgnashmingutils.la
 XMLSocketTest.swf: XMLSocketTest
 	./XMLSocketTest $(top_srcdir)/testsuite/media
 
+EmbeddedSoundTest_SOURCES = \
+	EmbeddedSoundTest.c
+	$(NULL)
+
+EmbeddedSoundTest_CFLAGS = \
+	-DMEDIADIR='"$(abs_mediadir)"' \
+	$(NULL)
+
+EmbeddedSoundTest_LDADD = libgnashmingutils.la
+
+EmbeddedSoundTest.swf: EmbeddedSoundTest
+	./EmbeddedSoundTest $(top_srcdir)/testsuite/media
+
+EmbeddedSoundTest_Runner_SOURCES = \
+	EmbeddedSoundTest-Runner.cpp \
+	$(NULL)
+
+EmbeddedSoundTest_Runner_CXXFLAGS = \
+	-DSRCDIR='"$(srcdir)"' \
+	-DTGTDIR='"$(abs_builddir)"' \
+	$(NULL)
+
+EmbeddedSoundTest_Runner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
+
+EmbeddedSoundTest_Runner_DEPENDENCIES = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	EmbeddedSoundTest.swf	\
+	$(NULL)
+
 registerClassTest_SOURCES =	\
 	registerClassTest.c	\
 	$(NULL)
@@ -1880,6 +1921,10 @@ TEST_CASES = \
 	runtime_vm_stack_testrunner \
 	instanceNameTestRunner \
 	$(NULL)
+
+if MING_VERSION_0_4_3
+TEST_CASES += EmbeddedSoundTest-Runner
+endif
 
 if MING_VERSION_0_4
 TEST_CASES += \

@@ -1572,6 +1572,8 @@ AM_CONDITIONAL(MING_SUPPORTS_STREAMING_SOUND,
         [ test x"$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040006 ])
 AM_CONDITIONAL(MING_SUPPORTS_SWFBUTTON_SET_DEPTH,
         [ test x"$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040006 ])
+AM_CONDITIONAL(MING_VERSION_0_4_3,
+        [ test x"$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040300 ])
 
 if test x$cross_compiling = xno; then
   AC_ARG_WITH([swfdec_testsuite],
@@ -1602,7 +1604,7 @@ AM_CONDITIONAL(ENABLE_DOXYGEN, [ test x"$DOXYGEN" != x ])
 dnl currently unused
 dnl GNASH_PKG_FIND(ogg, [ogg.h], [decode ogg streams], ogg_stream_init)
 
-if test x$build_sdl = xyes -o x"$media_handler" = xffmpeg; then
+if test x$build_sdl = xyes -o x"$media_handler" = xffmpeg -o x"$media_handler" = xgst; then
   GNASH_PATH_SDL
 fi
 
@@ -1650,7 +1652,7 @@ AM_CONDITIONAL(HAVE_QT_3, [test x"${gnash_qt_version}" != x && test "${gnash_qt_
 AM_CONDITIONAL(HAVE_QT_4, [test x"${gnash_qt_version}" != x && test "${gnash_qt_version}" -eq 4])
 
 dnl Need GLIB for both GTK and GST
-if test x$build_gtk = xyes -o x${media_handler} = "xgst"; then
+if test x$build_gtk = xyes -o x${Media_handler} = "xgst"; then
   GNASH_PATH_GLIB
 fi
 
@@ -1823,38 +1825,38 @@ dnl      CAIRO_CFLAGS=`echo ${CAIRO_CFLAGS} | sed -e 's/ *//'`
 dnl      CAIRO_CFLAGS="${CAIRO_CFLAGS} ${CAIRO_CFLAGS}/cairo"
 dnl   fi
   if test x$build_fb = xyes; then
-    AC_MSG_ERROR([Cairo renderer is not supported by FB gui. Use --enable-renderer=AGG or --enable-gui=gtk,sdl]);
+    AC_MSG_ERROR([Cairo renderer is not supported by FB gui. Use --enable-renderer=AGG or --enable-gui=gtk]);
   fi
   if test x$build_sdl = xyes; then
-    AC_MSG_ERROR([Cairo renderer is not supported by SDL gui. Use --enable-renderer=AGG or --enable-gui=gtk,sdl]);
+    AC_MSG_ERROR([Cairo renderer is not supported by SDL gui. Use --enable-renderer=AGG or --enable-gui=gtk]);
   fi
   if test x$build_fltk = xyes; then
-    AC_MSG_ERROR([Cairo renderer is not supported by FLTK gui. Use --enable-renderer=AGG or --enable-gui=gtk,sdl]);
+    AC_MSG_ERROR([Cairo renderer is not supported by FLTK gui. Use --enable-renderer=AGG or --enable-gui=gtk]);
   fi
   if test x$build_kde = xyes; then
-    AC_MSG_ERROR([Cairo renderer is not supported by KDE gui. Use --enable-renderer=AGG or --enable-gui=gtk,sdl]);
+    AC_MSG_ERROR([Cairo renderer is not supported by KDE gui. Use --enable-renderer=AGG or --enable-gui=gtk]);
   fi
   if test x$build_dump = xyes; then
-    AC_MSG_ERROR([Cairo renderer is not supported by Dump gui. Use --enable-renderer=AGG or --enable-gui=gtk,sdl]);
+    AC_MSG_ERROR([Cairo renderer is not supported by Dump gui. Use --enable-renderer=AGG or --enable-gui=gtk]);
   fi
   AC_DEFINE([RENDERER_CAIRO], [], [Use cairo renderer])
 fi
 
 AM_CONDITIONAL(HAVE_CAIRO, [test x"${CAIRO_LIBS}" != x])
 
-AM_CONDITIONAL(USE_SOUND_GST, test x$media_handler = xgst)
-AM_CONDITIONAL(USE_SOUND_SDL, test x"$media_handler" = xffmpeg)
+AM_CONDITIONAL(USE_SOUND_SDL, test x"$media_handler" = xffmpeg -o x"$media_handler" = xgst)
 AM_CONDITIONAL(USE_FFMPEG_ENGINE, test x"$media_handler" = xffmpeg)
+AM_CONDITIONAL(USE_GST_ENGINE, test x"$media_handler" = xgst)
 AM_CONDITIONAL(HAVE_OPENGL, test x"${OPENGL_LIBS}" != x)
 
 case "${media_handler}" in
-  gst) AC_DEFINE([SOUND_GST],  [1], [Use GSTREAMER for media handling]) ;;
-  ffmpeg) AC_DEFINE([SOUND_SDL],  [1], [Use SDL for sound handling]) ;;
+  ffmpeg|gst) AC_DEFINE([SOUND_SDL],  [1], [Use SDL for sound handling]) ;;
   *)
 esac
 
 case "${media_handler}" in
   ffmpeg)  AC_DEFINE([USE_FFMPEG],  [1], [Use FFMPEG for media decoding]) ;;
+  gst)  AC_DEFINE([USE_GST],  [1], [Use gstreamer for media decoding]) ;;
   *)
 esac
 dnl I'm kinda lazy, get rid of this later... //Markus
@@ -2296,9 +2298,7 @@ fi
 echo "        GUI toolkits supported: ${SUPPORTED_GUIS}"
 echo "        Renderers supported: ${add_renderer}"
 echo "        Media handler: "$media_handler
-if test x"$media_handler" = xffmpeg; then
 echo "        Using SDL for sound handling"
-fi
 echo "        Using $with_shm mode for shared memory"
 echo ""
 echo "Configured paths for ${build} are:"
@@ -2682,6 +2682,7 @@ fi
 need_sdl=false
 test x$build_sdl = xyes			&& need_sdl=true
 test x"$media_handler" = x"ffmpeg"	&& need_sdl=true
+test x"$media_handler" = x"gst"		&& need_sdl=true
 
 if $need_sdl; then
   if test x"$SDL_LIBS" != x; then

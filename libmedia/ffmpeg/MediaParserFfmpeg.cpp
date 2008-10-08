@@ -49,8 +49,8 @@ MediaParserFfmpeg::readPacketWrapper(void* opaque, boost::uint8_t* buf, int buf_
 	return p->readPacket(buf, buf_size);
 }
 
-offset_t
-MediaParserFfmpeg::seekMediaWrapper(void *opaque, offset_t offset, int whence)
+boost::int64_t
+MediaParserFfmpeg::seekMediaWrapper(void *opaque, boost::int64_t offset, int whence)
 {
 	MediaParserFfmpeg* p = static_cast<MediaParserFfmpeg*>(opaque);
 	return p->seekMedia(offset, whence);
@@ -227,8 +227,12 @@ MediaParserFfmpeg::parseNextFrame()
 	//log_debug("av_read_frame returned %d", rc);
 	if ( rc < 0 )
 	{
-		log_error(_("MediaParserFfmpeg::parseNextChunk: Problems parsing next frame"));
-		return false;
+        log_error(_("MediaParserFfmpeg::parseNextFrame: "
+            "Problems parsing next frame "
+            "(av_read_frame returned %d)."
+            " We'll consider the stream fully parsed."), rc);
+        _parsingComplete=true; // No point in parsing over
+        return false;
 	}
 
 	bool ret=false;
@@ -454,8 +458,8 @@ MediaParserFfmpeg::readPacket(boost::uint8_t* buf, int buf_size)
 
 }
 
-offset_t 
-MediaParserFfmpeg::seekMedia(offset_t offset, int whence)
+boost::int64_t 
+MediaParserFfmpeg::seekMedia(boost::int64_t offset, int whence)
 {
 	GNASH_REPORT_FUNCTION;
 

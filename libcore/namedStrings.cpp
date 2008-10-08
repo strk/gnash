@@ -78,6 +78,7 @@ static string_table::svt preload_names[] =
 	string_table::svt( "onLoadError", NSV::PROP_ON_LOAD_ERROR ),
 	string_table::svt( "onLoadProgress", NSV::PROP_ON_LOAD_PROGRESS ),
 	string_table::svt( "onLoadInit", NSV::PROP_ON_LOAD_INIT ),
+    string_table::svt( "onSoundComplete", NSV::PROP_ON_SOUND_COMPLETE ),
 	string_table::svt( "onUnload", NSV::PROP_ON_UNLOAD ),
 	string_table::svt( "onEnterFrame", NSV::PROP_ON_ENTER_FRAME ),
 	string_table::svt( "onConstruct", NSV::PROP_ON_CONSTRUCT ),

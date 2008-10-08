@@ -168,6 +168,18 @@ because earlier versions wouldn't let you insert clips into an existing
 sound stream, as Gnash needs to do. If you use Gstreamer, you still need
 the ffmeg decoders, and the ffmpeg plugin for Gstreamer.
 
+Building the Gnash plugin for browsers:
+--------------------------------------
+
+The plugin is automatically built, but is installed only when you
+say "make install-plugins". Installation target is controlled
+by a configure switch: --with-plugins-install=system|user|prefix.
+
+By default, the policy is 'user', which means the plugins will
+be installed for the sole user running 'make install-plugins'.
+Keep this in mind as you likely don't want to install plugins
+only for the root user...
+
 You no longer need the Mozilla or Firefox development packages to
 build Gnash. All the required files are now included in Gnash, so the
 plugin can be built whenever the main gnash program can be built.

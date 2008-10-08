@@ -32,11 +32,9 @@
 namespace gnash {
 
 as_value
-get_flash_geom_package(const fn_call& fn)
+get_flash_geom_package(const fn_call& /*fn*/)
 {
 	log_debug("Loading flash.geom package");
-
-	const int version = fn.env().getVM().getSWFVersion();
 
 	as_object* pkg = new as_object(getObjectInterface());
 

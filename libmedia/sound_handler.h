@@ -30,6 +30,7 @@
 
 #include "dsodefs.h" // for DSOEXPORT
 #include "SoundInfo.h"
+#include "SimpleBuffer.h"
 
 #include <vector>
 #include <memory>
@@ -87,28 +88,22 @@ public:
 
 	// If stereo is true, samples are interleaved w/ left sample first.
 	
-	/// Create a sound buffer slot, for playing on-demand.
+	/// Create a sound buffer slot, for on-demand playback.
 	//
 	/// @param data
 	/// 	The data to be stored. For soundstream this is NULL.
-	/// 	If not NULL, ownership of the data is transferred.
-	///	The data is assumed to have been allocated using new[].
-	///	The data is in encoded format, with format specified
-	///	with the sinfo parameter, this is to allow on-demand
-	///	decoding (if the sound is never played, it's never decoded).
-	///
-	/// @param data_bytes
-	///	The size of the data to be stored. For soundstream this is 0.
+	///	    The data is in encoded format, with format specified
+	///	    with the sinfo parameter, this is to allow on-demand
+	///	    decoding (if the sound is never played, it's never decoded).
 	///
 	/// @param sinfo
 	/// 	A SoundInfo object contained in an auto_ptr, which contains info about samplerate,
 	/// 	samplecount, stereo and more. The SoundObject must be not-NULL!
 	///
 	/// @return the id given by the soundhandler for later identification.
-	///
+    ///
 	virtual int	create_sound(
-		void*		data,
-		unsigned int	data_bytes,
+		std::auto_ptr<SimpleBuffer> data,
 		std::auto_ptr<SoundInfo> sinfo
 		) = 0;
 
@@ -265,7 +260,6 @@ public:
 	/// gnash calls this to unpause audio
 	bool isPaused() const { return _paused; }
 
-#ifdef USE_FFMPEG
 	/// This is called by AS classes NetStream or Sound to attach callback, so
 	/// that audio from the classes will be played through the soundhandler.
 	//
@@ -287,7 +281,8 @@ public:
 	///	removal, see detach_aux_streamer. TODO: stop using the data pointer for 
 	///	identification purposes and use the callback pointer directly instead.
 	///
-	virtual void	attach_aux_streamer(aux_streamer_ptr ptr, void* owner) = 0;
+	virtual void	attach_aux_streamer(aux_streamer_ptr /*ptr*/,
+            void* /*owner*/){} // FIXME
 
 	/// This is called by AS classes NetStream or Sound to dettach callback, so
 	/// that audio from the classes no longer will be played through the 
@@ -298,8 +293,7 @@ public:
 	/// 	WARNING: this need currently be the 'udata' pointer passed to attach_aux_streamer.
 	///	TODO: get the aux_streamer_ptr as key !!
 	///
-	virtual void	detach_aux_streamer(void* udata) = 0;
-#endif
+	virtual void	detach_aux_streamer(void* /*udata*/) {} // FIXME
 
 	virtual ~sound_handler() {};
 	

@@ -170,8 +170,8 @@ main(int argc, char *argv[])
 
     Flv flv; 
     struct stat st;
-    Network::byte_t *buf = 0;
-    Network::byte_t *ptr = 0;
+    //Network::byte_t *buf = 0;
+    //Network::byte_t *ptr = 0;
     Flv::flv_header_t *head;
     Flv::previous_size_t   previous = 0;
     Flv::flv_tag_t     *tag;

@@ -19,13 +19,7 @@
 
 #include "LoadThread.h"
 #include "log.h"
-
-#if defined(_WIN32) || defined(WIN32)
-# include <windows.h>	// for sleep()
-# define usleep(x) Sleep(x/1000)
-#else
-# include "unistd.h" // for usleep()
-#endif
+#include "GnashSleep.h"
 
 namespace gnash {
 
@@ -121,7 +115,7 @@ LoadThread::seek(size_t pos)
 
 	while ( (!_completed) && (!cancelRequested()) && _loadPosition < static_cast<long>(pos) )
 	{
-		usleep(100000); // 1/10 second WATCH FOR TIMEOUTS !
+		gnashSleep(100000); // 1/10 second WATCH FOR TIMEOUTS !
 	}
 
 	if (_loadPosition >= static_cast<long>(pos))
@@ -329,7 +323,7 @@ void LoadThread::downloadThread(LoadThread* lt)
 
 		// If the read() fuction needs to get access to the stream we take a break. 
 		if (lt->_needAccess) {
-			usleep(100000); // 1/10 second
+			gnashSleep(100000); // 1/10 second
 		}
 	}
 }

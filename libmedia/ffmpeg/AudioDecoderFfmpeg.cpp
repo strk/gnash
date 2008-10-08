@@ -392,30 +392,39 @@ AudioDecoderFfmpeg::decodeFrame(boost::uint8_t* input, boost::uint32_t inputSize
 		bool stereo = _audioCodecCtx->channels > 1 ? true : false;
 		int samples = stereo ? outSize >> 2 : outSize >> 1;
 
-		int resampledFrameSize = int(std::ceil(outSize*resampleFactor));
+        int expectedMaxOutSamples = std::ceil(samples*resampleFactor);
+
+        // *channels *sampleSize 
+		int resampledFrameSize = expectedMaxOutSamples*2*2;
 
 		// Allocate just the required amount of bytes
 		boost::uint8_t* resampledOutput = new boost::uint8_t[resampledFrameSize]; 
 
 #ifdef GNASH_DEBUG_AUDIO_DECODING
-		log_debug("Calling the resampler; "
-			"ouput to 44100hz, 2channels; "
-			"input is %dhz, %dchannels",
-			_audioCodecCtx->sample_rate, _audioCodecCtx->channels);
+		log_debug("Calling the resampler; resampleFactor:%d; "
+			"ouput to 44100hz, 2channels, %dbytes; "
+			"input is %dhz, %dchannels, %dbytes, %dsamples",
+            resampleFactor,
+			resampledFrameSize, _audioCodecCtx->sample_rate,
+            _audioCodecCtx->channels, outSize, samples);
 #endif
 
 		samples = _resampler.resample(outPtr, // input
 			reinterpret_cast<boost::int16_t*>(resampledOutput), // output
 			samples); // input..
 
+#ifdef GNASH_DEBUG_AUDIO_DECODING
+		log_debug("resampler returned %d samples ", samples);
+#endif
+
 		// make sure to set outPtr *after* we use it as input to the resampler
         	outPtr = reinterpret_cast<boost::int16_t*>(resampledOutput);
 		delete [] output;
 
-		if (resampledFrameSize < samples*2*2)
+		if (expectedMaxOutSamples < samples)
 		{
-			log_error(" --- Computation of resampled frame size (%d) < then the one based on samples (%d)",
-				resampledFrameSize, samples*2*2);
+			log_error(" --- Computation of resampled samples (%d) < then the actual returned samples (%d)",
+				expectedMaxOutSamples, samples);
 
 			log_debug(" input frame size: %d", outSize);
 			log_debug(" input sample rate: %d", _audioCodecCtx->sample_rate);

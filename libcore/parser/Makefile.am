@@ -86,7 +86,7 @@ libgnashparser_la_LIBADD = \
 
 libgnashparser_la_LDFLAGS = $(BOOST_LIBS) -export-dynamic # -release $(VERSION) -no-undefined 
 
-if USE_SOUND_GST
+if USE_GST_ENGINE
 AM_CPPFLAGS += $(GSTREAMER_CFLAGS) \
 		-I$(top_srcdir)/libmedia/gst
 endif

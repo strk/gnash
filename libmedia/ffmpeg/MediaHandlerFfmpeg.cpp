@@ -71,5 +71,11 @@ MediaHandlerFfmpeg::createAudioDecoder(AudioInfo& info)
 	return ret;
 }
 
+size_t
+MediaHandlerFfmpeg::getInputPaddingSize() const
+{
+    return FF_INPUT_BUFFER_PADDING_SIZE;
+}
+
 } // gnash.media namespace 
 } // gnash namespace

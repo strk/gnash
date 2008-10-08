@@ -32,6 +32,10 @@
 #include "as_object.h" // for inheritance
 #include "NetConnection.h"
 
+#include "MediaHandler.h"
+#include "MediaParser.h"
+#include "AudioDecoder.h"
+
 #include <boost/scoped_ptr.hpp>
 
 /// Forward declarations
@@ -58,20 +62,20 @@ public:
 	///
 	void attachCharacter(character* attachedChar);
 
-	virtual ~Sound() {}
-	virtual void attachSound(int si, const std::string& name);
+	~Sound();
+	void attachSound(int si, const std::string& name);
 
 	/// Get number of bytes loaded from the external sound (if any)
-	virtual long getBytesLoaded();
+	long getBytesLoaded();
 
 	/// Get total number of bytes in the external sound being loaded
 	//
 	/// @return -1 if unknown
 	///
-	virtual long getBytesTotal();
+	long getBytesTotal();
 
-	virtual void getPan();
-	virtual void getTransform();
+	void getPan();
+	void getTransform();
 
 	/// Get volume from associated resource
 	//
@@ -82,17 +86,17 @@ public:
 	bool getVolume(int& volume);
 	void setVolume(int volume);
 
-	virtual void loadSound(const std::string& file, bool streaming);
-	virtual void setPan();
-	virtual void setTransform();
-	virtual void start(int offset, int loops);
-	virtual void stop(int si);
-	virtual unsigned int getDuration();
-	virtual unsigned int getPosition();
+	void loadSound(const std::string& file, bool streaming);
+	void setPan();
+	void setTransform();
+	void start(int offset, int loops);
+	void stop(int si);
+	unsigned int getDuration();
+	unsigned int getPosition();
 
-	std::string soundName;
+	std::string soundName;	
 
-protected:
+private:
 
 #ifdef GNASH_USE_GC
 	/// Mark all reachable resources of a Sound, for the GC
@@ -120,6 +124,27 @@ protected:
 	bool isStreaming;
 
 	media::sound_handler* _soundHandler;
+	media::MediaHandler* _mediaHandler;
+	boost::scoped_ptr<media::MediaParser> _mediaParser;
+	boost::scoped_ptr<media::AudioDecoder> _audioDecoder;
+
+	/// Number of milliseconds into the sound to start it
+	//
+	/// This is set by start()
+	boost::uint64_t _startTime;
+
+	boost::scoped_array<boost::uint8_t> _leftOverData;
+	boost::uint8_t* _leftOverPtr;
+	boost::uint32_t _leftOverSize;
+
+	static bool getAudioWrapper(void *owner, boost::uint8_t *stream, int len);
+
+	bool getAudio(boost::uint8_t *stream, int len);
+
+	// Are this sound attached to the soundhandler?
+	bool isAttached;
+
+	int remainingLoops;
 
 };
 

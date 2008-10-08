@@ -155,13 +155,13 @@ XMLSocket_as::fillMessageList(MessageList& msgs)
     const int fd = _sockfd;
    
     if (fd <= 0) {
-	log_error(_("%s: fd <= 0, returning false (timer not unregistered "
-		"while socket disconnected?"), __FUNCTION__);
+	log_error(_("XMLSocket: fd <= 0, returning false (timer not unregistered "
+		"while socket disconnected?"));
         return;
     }
 
-    fd_set                fdset;
-    struct timeval        tval;
+    fd_set fdset;
+    struct timeval tval;
     size_t retries = 10;
 
     const int bufSize = 10000;
@@ -183,8 +183,8 @@ XMLSocket_as::fillMessageList(MessageList& msgs)
             continue;
         }
         if (ret == -1) {
-            log_error(_("%s: The socket for fd #%d never was available"),
-                __FUNCTION__, fd);
+            log_error(_("XMLSocket: The socket for fd #%d was never "
+                        "available"), fd);
             return;
         }
  
@@ -193,7 +193,7 @@ XMLSocket_as::fillMessageList(MessageList& msgs)
 
         const size_t bytesRead = read(_sockfd, buf.get(), bufSize - 1);
 
-	// Return if there's no data.
+        // Return if there's no data.
         if (!bytesRead) return;
 
         if (buf[bytesRead - 1] != 0)
@@ -204,13 +204,15 @@ XMLSocket_as::fillMessageList(MessageList& msgs)
         }
 
         char* ptr = buf.get();
-        while (ptr - buf.get() < bytesRead - 1)
+        while (static_cast<size_t>(ptr - buf.get()) < bytesRead - 1)
         {
             log_debug ("read: %d, this string ends: %d",
 			    bytesRead, ptr + std::strlen(ptr) - buf.get());
             // If the string reaches to the final byte read, it's
-            // incomplete. Store it and continue. 
-            if (ptr + std::strlen(ptr) - buf.get() == bytesRead)
+            // incomplete. Store it and continue. The buffer is 
+            // NULL-terminated, so this cannot read past the end.
+            if (static_cast<size_t>(
+                ptr + std::strlen(ptr) - buf.get()) == bytesRead)
             {
                 log_debug ("Setting remainder");
                 _remainder += std::string(ptr);

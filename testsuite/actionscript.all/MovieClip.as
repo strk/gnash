@@ -95,15 +95,15 @@ endOfTest = function()
 #endif
 
 #if OUTPUT_VERSION == 6
-	check_totals(722); // SWF6
+	check_totals(725); // SWF6
 #endif
 
 #if OUTPUT_VERSION == 7
-	check_totals(739); // SWF7
+	check_totals(742); // SWF7
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(776); // SWF8+
+	check_totals(800); // SWF8+
 #endif
 
 	play();
@@ -1172,6 +1172,7 @@ check_equals(b.yMax, -5);
 
 draw._xscale = -50;
 check_equals(draw._xscale, -50);
+check_equals(draw._yscale, -50); // setting _xscale didn't change _yscale 
 check_equals(draw._width, 5);
 
 #if OUTPUT_VERSION >= 8
@@ -1184,19 +1185,21 @@ check_equals(b.yMin, -15);
 check_equals(b.yMax, -5);
 
 draw._width = 10;
+check_equals(draw._width, 10);
 check_equals(draw._xscale, 100); // reset to positive on setting _width
+check_equals(draw._yscale, 50); // reset to positive on setting _width !
 
 #if OUTPUT_VERSION >= 8
-xcheck_equals(printMatrix(draw.transform.matrix, 2), "(a=1, b=0, c=0, d=0.5, tx=0, ty=0)");
+check_equals(printMatrix(draw.transform.matrix, 2), "(a=1, b=0, c=0, d=0.5, tx=0, ty=0)");
 #endif
 b = draw.getBounds(container); // these are transformed by container draw matrix
-xcheck_equals(b.xMin, 10);
-xcheck_equals(b.xMax, 20);
-xcheck_equals(b.yMin, 5);
-xcheck_equals(b.yMax, 15);
+check_equals(b.xMin, 10);
+check_equals(b.xMax, 20);
+check_equals(b.yMin, 5);
+check_equals(b.yMax, 15);
 
-draw._height = 10;
-check_equals(draw._yscale, 50); // reset to positive on setting _height
+draw._height = 10; // TODO: dumb check, it's 10 already !!
+check_equals(draw._yscale, 50); // was already positive
 
 #if OUTPUT_VERSION >= 8
 check_equals(printMatrix(draw.transform.matrix, 2), "(a=1, b=0, c=0, d=0.5, tx=0, ty=0)");
@@ -1401,6 +1404,41 @@ _alpha = 100;
 // Test transform
 //----------------------------------------------
 
+#if OUTPUT_VERSION >=8
+tmp = _root.createEmptyMovieClip("tmp", getNextHighestDepth());
+tmptr = tmp.transform;
+
+check_equals(printMatrix(tmp.transform.matrix, 2), "(a=1, b=0, c=0, d=1, tx=0, ty=0)");
+tmp._yscale = 200;
+check_equals(printMatrix(tmp.transform.matrix, 2), "(a=1, b=0, c=0, d=2, tx=0, ty=0)");
+tmp._rotation = Math.PI / 4;
+check_equals(printMatrix(tmp.transform.matrix, 2), "(a=1, b=0.01, c=-0.03, d=2, tx=0, ty=0)");
+tmp._yscale = -100;
+check_equals(printMatrix(tmp.transform.matrix, 2), "(a=1, b=0.01, c=0.01, d=-1, tx=0, ty=0)");
+tmp._yscale = -100;
+check_equals(printMatrix(tmp.transform.matrix, 2), "(a=1, b=0.01, c=0.01, d=-1, tx=0, ty=0)");
+tmp._yscale = 100;
+check_equals(printMatrix(tmp.transform.matrix, 2), "(a=1, b=0.01, c=-0.01, d=1, tx=0, ty=0)");
+tmp._xscale = -100;
+check_equals(printMatrix(tmp.transform.matrix, 2), "(a=-1, b=-0.01, c=-0.01, d=1, tx=0, ty=0)");
+tmp._rotation = Math.PI / 2;
+check_equals(printMatrix(tmp.transform.matrix, 2), "(a=-1, b=-0.03, c=-0.03, d=1, tx=0, ty=0)");
+tmp._xscale = 100;
+check_equals(printMatrix(tmp.transform.matrix, 2), "(a=1, b=0.03, c=-0.03, d=1, tx=0, ty=0)");
+tmp._yscale = -100;
+check_equals(printMatrix(tmp.transform.matrix, 2), "(a=1, b=0.03, c=0.03, d=-1, tx=0, ty=0)");
+tmp._x = 3;
+tmp._y = 6;
+check_equals(printMatrix(tmp.transform.matrix, 2), "(a=1, b=0.03, c=0.03, d=-1, tx=3, ty=6)");
+tmp._yscale = 100;
+check_equals(printMatrix(tmp.transform.matrix, 2), "(a=1, b=0.03, c=-0.03, d=1, tx=3, ty=6)");
+tmp._yscale = -0;
+check_equals(printMatrix(tmp.transform.matrix, 2), "(a=1, b=0.03, c=0, d=0, tx=3, ty=6)");
+tmp._yscale = 0;
+check_equals(printMatrix(tmp.transform.matrix, 2), "(a=1, b=0.03, c=0, d=0, tx=3, ty=6)");
+#endif
+
+
 #if OUTPUT_VERSION < 8
 check_equals(typeof(_root.transform), 'undefined'); 
 #else
@@ -1443,12 +1481,21 @@ check_equals(_root.transform.matrix.ty, 0);
 
 _root._x = 30;
 _root._y = 20;
-//_root._xscale = -300; // NOTE: gnash breaks the _root's matrix if we set _xscale here ! you can tell by failing localToGLobal/globalToLocal tests
+
+check_equals(_root.transform.matrix.toString(), "(a=1, b=0, c=0, d=1, tx=30, ty=20)");
+
+_root._xscale = -300; 
+
+check_equals(_root.transform.matrix.toString(), "(a=-3, b=0, c=0, d=1, tx=30, ty=20)");
+
 _root._yscale = -200;
+
+check_equals(_root.transform.matrix.toString(), "(a=-3, b=0, c=0, d=-2, tx=30, ty=20)");
+
 _root._rotation = -90;
 
 check_equals(_root.transform.matrix.a, 0);
-check_equals(_root.transform.matrix.b, -1); // would be 3 if we did set _xscale=-300 above
+check_equals(_root.transform.matrix.b, 3); 
 check_equals(_root.transform.matrix.c, -2);
 check_equals(_root.transform.matrix.d, 0);
 check_equals(_root.transform.matrix.tx, 30);
@@ -1458,8 +1505,19 @@ check_equals(_root.transform.matrix.ty, 20);
 _root.transform.matrix.ty = 300;
 check_equals(_root._y, 20); // changing the AS matrix doesn't change the actual matrix
 
+check_equals(_root.transform.matrix.toString(), "(a=0, b=3, c=-2, d=0, tx=30, ty=20)");
+
 _root._x = _root._y = _root._rotation = 0;
-_root._xscale = _root._yscale = 100;
+
+check_equals(_root.transform.matrix.toString(), "(a=-3, b=0, c=0, d=-2, tx=0, ty=0)");
+
+_root._xscale = 100;
+
+check_equals(_root.transform.matrix.toString(), "(a=1, b=0, c=0, d=-2, tx=0, ty=0)");
+
+_root._yscale = 100;
+
+check_equals(_root.transform.matrix.toString(), "(a=1, b=0, c=0, d=1, tx=0, ty=0)");
 
 OldTransform = flash.geom.Transform;
 

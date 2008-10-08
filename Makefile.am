@@ -150,7 +150,7 @@ dumpconfig:
 	@echo "	PNG_CFLAGS is $(LIBPNG_CFLAGS)"
 	@echo "	PNG_LIBS is $(LIBPNG_LIBS)"
 	@echo "Audio decoding support..."
-if USE_SOUND_GST
+if USE_GST_ENGINE
 	@echo "	GSTREAMER_CFLAGS is $(GSTREAMER_CFLAGS)"
 	@echo "	GSTREAMER_LIBS is $(GSTREAMER_LIBS)"
 endif
@@ -212,8 +212,7 @@ endif
 	@echo "	FREETYPE_LIBS is $(FREETYPE2_LIBS)"
 	@echo "	FONTCONFIG_CFLAGS is $(FONTCONFIG_CFLAGS)"
 	@echo "	FONTCONFIG_LIBS is $(FONTCONFIG_LIBS)"
-	@echo " INTLLIBS is $(INTLLIBS)"
-	@echo " LIBINTL is $(LIBINTL)"
+	@echo "	LIBINTL is $(LIBINTL)"
 if HAVE_DMALLOC
 	@echo "	DMALLOC_CFLAGS is $(DMALLOC_CFLAGS)"
 	@echo "	DMALLOC_LIBS is $(DMALLOC_LIBS)"
@@ -317,6 +316,9 @@ if BUILD_FB_GUI
 endif
 if XPCOM
 	@echo "	XPCOM support for Mozilla/Firefox"
+endif
+if JEMALLOC
+	@echo "	Using jemalloc memory manager"
 endif
 
 	@if test -n "$(EXTENSIONS_LIST)" ; then \

@@ -36,9 +36,9 @@ namespace gnash {
 namespace gnash {
 
 /// \brief
-/// Rectangle class, see swf defined rectangel record.
+/// Rectangle class, see swf defined rectangle record.
 ///
-class DSOLOCAL rect
+class rect
 {
 private:
 

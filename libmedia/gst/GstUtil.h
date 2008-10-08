@@ -31,6 +31,12 @@
 #include "image.h"
 #include "dsodefs.h" // DSOEXPORT
 
+// GST_TIME_AS_MSECONDS not defined as of gst 0.10.9
+// is defined as of gst 0.10.19
+#ifndef GST_TIME_AS_MSECONDS
+# define GST_TIME_AS_MSECONDS(time) ((time) / G_GINT64_CONSTANT (1000000))
+#endif
+
 namespace gnash {
 namespace media {
 

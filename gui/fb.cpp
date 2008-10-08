@@ -90,6 +90,7 @@
 
 #include "render_handler.h"
 #include "render_handler_agg.h"
+#include "GnashSleep.h" // for gnashSleep
 
 #include <linux/input.h>    // for /dev/input/event*
 
@@ -377,7 +378,7 @@ bool FBGui::run()
     
     while ((timer-prevtimer)*1000 < _interval) {
     
-      usleep(1); // task switch
+      gnashSleep(1); // task switch
       
       check_mouse(); // TODO: Exit delay loop on mouse events! 
       check_keyboard(); // TODO: Exit delay loop on keyboard events!
@@ -763,7 +764,7 @@ bool FBGui::mouse_command(unsigned char cmd, unsigned char *buf, int count) {
   
   // read response (if any)
   while (count>0) {
-    usleep(250*1000); // 250 ms inter-char timeout (simple method)
+    gnashSleep(250*1000); // 250 ms inter-char timeout (simple method)
     // TODO: use select() instead
     
     n = read(input_fd, buf, count);

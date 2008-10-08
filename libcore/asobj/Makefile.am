@@ -126,16 +126,12 @@ noinst_HEADERS = \
 	MovieClipLoader.h \
 	NetConnection.h	\
 	NetStream.h \
-	NetStreamFfmpeg.h \
-	NetStreamGst.h \
 	Number.h \
 	Object.h \
 	prophelper.h \
 	Selection.h \
 	SharedObject.h \
 	Sound.h \
-	SoundFfmpeg.h \
-	SoundGst.h \
 	Stage.h	\
 	System_as.h \
 	TextFormat.h \
@@ -181,8 +177,6 @@ libgnashasobjs_la_LIBADD = \
 	$(LIBXML_LIBS)
 
 if USE_FFMPEG_ENGINE
-libgnashasobjs_la_SOURCES += NetStreamFfmpeg.cpp \
-				SoundFfmpeg.cpp
 AM_CPPFLAGS += $(FFMPEG_CFLAGS) \
 		$(SDL_CFLAGS) \
 		-I$(top_srcdir)/libmedia/ffmpeg
@@ -190,11 +184,11 @@ libgnashasobjs_la_LIBADD += $(FFMPEG_LIBS) \
 				$(SDL_LIBS)
 endif
 
-if USE_SOUND_GST
-libgnashasobjs_la_SOURCES += NetStreamGst.cpp SoundGst.cpp
+if USE_GST_ENGINE
 AM_CPPFLAGS += $(GSTREAMER_CFLAGS) \
 		-I$(top_srcdir)/libmedia/gst
-libgnashasobjs_la_LIBADD += $(GSTREAMER_LIBS)
+libgnashasobjs_la_LIBADD += $(GSTREAMER_LIBS) \
+				$(SDL_LIBS)
 endif
 
 #libgnashasobjs_la_LDFLAGS = -release $(VERSION) -no-undefined -export-dynamic
