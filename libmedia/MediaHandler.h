@@ -72,7 +72,8 @@ public:
 	/// NOTE: the default implementation returns an FLVParser for FLV input
 	///       or 0 for others.
 	///
-	virtual std::auto_ptr<MediaParser> createMediaParser(std::auto_ptr<IOChannel> stream);
+	virtual std::auto_ptr<MediaParser> createMediaParser(
+            std::auto_ptr<IOChannel> stream);
 
 	/// Create a VideoDecoder for decoding what's specified in the VideoInfo
 	//
@@ -89,6 +90,12 @@ public:
     /// @return     Will always return a valid AudioDecoder or throw a
     ///             gnash::MediaException if a fatal error occurs.
 	virtual std::auto_ptr<AudioDecoder> createAudioDecoder(AudioInfo& info)=0;
+
+    /// Return the number of bytes padding needed for input buffers
+    //
+    /// Bitstream readers are optimized to read several bytes at a time,
+    /// and this should be used to allocate a large enough input buffer.
+    virtual size_t getInputPaddingSize() const { return 0; }
 
 protected:
 

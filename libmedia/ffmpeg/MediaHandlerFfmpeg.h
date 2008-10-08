@@ -40,6 +40,9 @@ public:
 	virtual std::auto_ptr<VideoDecoder> createVideoDecoder(VideoInfo& info);
 
 	virtual std::auto_ptr<AudioDecoder> createAudioDecoder(AudioInfo& info);
+
+    size_t getInputPaddingSize() const;
+
 };
 
 
