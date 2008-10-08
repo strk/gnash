@@ -62,8 +62,8 @@ while(<STDIN>){
 		#Replace things like: new String; with new String();
 		$_ =~ s/(new \w+)(;)/$1\(\)$2/g;
 		$_ =~ s/(new \w+)(\))/$1\(\)$2/g;
-		#Replace things like o = new Object; with o = "";
-		$_ =~ s/new Object\(\)/""/g;
+		#Replace things like o = new Object(); with o = {};
+		$_ =~ s/\s*(\w+)\s*=\s*new Object\(\)/$1={}/g;
 		#Add extra arguments when Date() is called with less than 6 args.
 		if($_ =~ /new Date\(.+\)/){
 			my $num_args = length(split(/,/,$_));
@@ -178,13 +178,7 @@ while(<STDIN>){
 		skip_line();
 		next;
 	}
-	#Remove lines that contain things like this:
-	# o = {}
-	#I am not sure what this means.
-	if($_ =~ /=.+\{\}/){
-		skip_line();
-		next; 
-	}
+
 	#Remove return calls(TEMP).
 	if(index($_,"return") != $[-1){
 		skip_line();
