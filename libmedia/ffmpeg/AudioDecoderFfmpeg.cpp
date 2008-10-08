@@ -24,7 +24,7 @@
 #include <cmath> // for std::ceil
 #include <algorithm> // for std::copy, std::max
 
-//#define GNASH_DEBUG_AUDIO_DECODING
+#define GNASH_DEBUG_AUDIO_DECODING
 
 #ifdef FFMPEG_AUDIO2
 # define AVCODEC_DECODE_AUDIO avcodec_decode_audio2
@@ -222,7 +222,7 @@ void AudioDecoderFfmpeg::setup(AudioInfo& info)
 boost::uint8_t*
 AudioDecoderFfmpeg::decode(boost::uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize, boost::uint32_t& decodedBytes, bool parse)
 {
-	//GNASH_REPORT_FUNCTION;
+	GNASH_REPORT_FUNCTION;
 
 	if ( ! parse )
 	{
@@ -344,7 +344,7 @@ AudioDecoderFfmpeg::decode(const EncodedAudioFrame& ef, boost::uint32_t& outputS
 boost::uint8_t*
 AudioDecoderFfmpeg::decodeFrame(boost::uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize)
 {
-	//GNASH_REPORT_FUNCTION;
+	GNASH_REPORT_FUNCTION;
 
         //static const unsigned int bufsize = (AVCODEC_MAX_AUDIO_FRAME_SIZE * 3) / 2;
         static const unsigned int bufsize = AVCODEC_MAX_AUDIO_FRAME_SIZE;

@@ -43,8 +43,7 @@ public:
 
 	// See dox in sound_handler.h 
 	virtual int	create_sound(
-		void*		/*data*/,
-		unsigned int	/*data_bytes*/,
+		std::auto_ptr<SimpleBuffer> /*data*/,
 		std::auto_ptr<SoundInfo> /*sinfo*/
 		)
 	{

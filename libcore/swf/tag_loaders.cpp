@@ -58,6 +58,7 @@
 #include "abc_block.h"
 #include "SoundInfo.h"
 #include "gnash.h" // FileType enum
+#include "MediaHandler.h"
 
 #ifdef HAVE_ZLIB_H
 #include <zlib.h>
@@ -1241,12 +1242,18 @@ define_sound_loader(SWFStream& in, tag_type tag, movie_definition& m)
         // First it is the amount of data from file,
         // then the amount allocated at *data (it may grow)
         const unsigned dataLength = in.get_tag_end_position() - in.tell();
-        unsigned char *data = new unsigned char[dataLength];
+
+        // Allocate MediaHandler::getInputPadding() bytes more for the SimpleBuffer 
+        size_t allocSize = dataLength;
+        media::MediaHandler* mh = media::MediaHandler::get(); // TODO: don't use this static !
+        if ( mh ) allocSize += mh->getInputPaddingSize();
+
+        std::auto_ptr<SimpleBuffer> data( new SimpleBuffer(allocSize) );
 
         // dataLength is already calculated from the end of the tag, which
-        // should be inside the end of the file. TODO: check that this is tha case.
-        const unsigned int bytesRead = in.read(reinterpret_cast<char*>(data), dataLength);
-
+        // should be inside the end of the file. TODO: check that this is the case.
+        const unsigned int bytesRead = in.read(reinterpret_cast<char*>(data->data()), dataLength);
+        data->resize(bytesRead); // in case it's shorter...
         if (bytesRead < dataLength)
         {
             throw ParserException(_("Tag boundary reported past end of SWFStream!"));
@@ -1258,8 +1265,7 @@ define_sound_loader(SWFStream& in, tag_type tag, movie_definition& m)
 
         // Stores the sounddata in the soundhandler, and the ID returned
         // can be used to starting, stopping and deleting that sound
-        // NOTE: ownership of 'data' is transferred to the sound hanlder 
-        int    handler_id = handler->create_sound(data, dataLength, sinfo);
+        int    handler_id = handler->create_sound(data, sinfo);
 
         if (handler_id >= 0)
         {
@@ -1405,7 +1411,7 @@ sound_stream_head_loader(SWFStream& in, tag_type tag, movie_definition& m)
 
     // Stores the sounddata in the soundhandler, and the ID returned
     // can be used to starting, stopping and deleting that sound
-    int handler_id = handler->create_sound(NULL, 0, sinfo);
+    int handler_id = handler->create_sound(std::auto_ptr<SimpleBuffer>(0), sinfo);
 
     m.set_loading_sound_stream_id(handler_id);
 }

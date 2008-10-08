@@ -30,6 +30,9 @@
 #include "AudioDecoderSimple.h"
 #include "AudioDecoderNellymoser.h"
 
+#include "MediaHandler.h"
+
+// TODO: drop FFMPEG/GST specific stuff, use MediaHandler instead !
 #ifdef USE_FFMPEG
 #include "AudioDecoderFfmpeg.h"
 #elif defined(USE_GST)
@@ -165,42 +168,22 @@ SDL_sound_handler::~SDL_sound_handler()
 
 
 int	SDL_sound_handler::create_sound(
-	void* data,
-	unsigned int data_bytes,
+	std::auto_ptr<SimpleBuffer> data,
 	std::auto_ptr<SoundInfo> sinfo)
-// Called to create a sample.  We'll return a sample ID that
-// can be use for playing it.
 {
 
+    log_debug("create_sound: sound format %d", sinfo->getFormat());
+
 	assert(sinfo.get());
-	std::auto_ptr<sound_data> sounddata ( new sound_data );
 
-	//sounddata->data_size = data_bytes;
-	sounddata->volume = 100;
-	sounddata->soundinfo = sinfo;
+	std::auto_ptr<sound_data> sounddata ( new sound_data(data, sinfo) );
 
+    // Make sure we're the only thread accessing m_sound_data here
 	boost::mutex::scoped_lock lock(_mutex);
 
-	switch (sounddata->soundinfo->getFormat())
-	{
-	case AUDIO_CODEC_MP3:
-		sounddata->append(reinterpret_cast<boost::uint8_t*>(data), data_bytes);
-		break;
+    // the vector takes ownership
+	m_sound_data.push_back(sounddata.release());
 
-	case AUDIO_CODEC_RAW:
-	case AUDIO_CODEC_ADPCM:
-	case AUDIO_CODEC_UNCOMPRESSED:
-	case AUDIO_CODEC_NELLYMOSER:
-		sounddata->append(reinterpret_cast<boost::uint8_t*>(data), data_bytes);
-		break;
-
-	default:
-		// Unhandled format.
-		log_error(_("unknown sound format %d requested; gnash does not handle it"), (int)sounddata->soundinfo->getFormat());
-		return -1; // Unhandled format, set to NULL.
-	}
-
-	m_sound_data.push_back(sounddata.release()); // the vector takes ownership
 	int sound_id = m_sound_data.size()-1;
 
 	return sound_id;
@@ -855,6 +838,42 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 
 
 
+}
+
+void
+sound_data::append(boost::uint8_t* data, unsigned int size)
+{
+    // Make sure we're always appropriately padded...
+    media::MediaHandler* mh = media::MediaHandler::get(); // TODO: don't use this static !
+    const size_t paddingBytes = mh ? mh->getInputPaddingSize() : 0;
+    _buf->reserve(_buf->size()+size+paddingBytes);
+	_buf->append(data, size);
+
+    // since ownership was transferred...
+	delete [] data;
+}
+
+sound_data::sound_data(std::auto_ptr<SimpleBuffer> data, std::auto_ptr<SoundInfo> info, int nVolume)
+    :
+    _buf(data),
+    soundinfo(info),
+    volume(nVolume)
+{
+    if ( _buf.get() )
+    {
+        // Make sure we're appropriately padded (this is an event sound)
+        media::MediaHandler* mh = media::MediaHandler::get(); // TODO: don't use this static !
+        const size_t paddingBytes = mh ? mh->getInputPaddingSize() : 0;
+        if ( _buf->capacity() - _buf->size() < paddingBytes ) {
+            log_error("sound_data creator didn't appropriately pad sound data. "
+                "We'll do now, but will cost memory copies.");
+            _buf->reserve(_buf->size()+paddingBytes);
+        }
+    }
+    else
+    {
+        _buf.reset(new SimpleBuffer());
+    }
 }
 
 void

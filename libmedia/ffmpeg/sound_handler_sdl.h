@@ -50,12 +50,22 @@ class active_sound;
 class sound_data
 {
 	/// The undecoded data
-	SimpleBuffer _buf;
+	std::auto_ptr<SimpleBuffer> _buf;
+
+    void ensureBufferPadding();
 
 public:
 
-	sound_data()
-	{}
+    /// Construct a sound with given data, info and volume.
+    //
+    /// @param data The encoded sound data. May be the NULL pointer for streaming sounds,
+    ///     in which case data will be appended later using ::append()
+    ///
+    /// @param info encoding info
+    ///
+    /// @pararm nVolume initial volume (0..100). Optional, defaults to 100.
+    ///
+	sound_data(std::auto_ptr<SimpleBuffer> data, std::auto_ptr<SoundInfo> info, int nVolume=100);
 
 	~sound_data();
 
@@ -72,26 +82,22 @@ public:
 	/// @param size
 	///	Size of the 'data' buffer.
 	///
-	void append(boost::uint8_t* data, unsigned int size)
-	{
-		_buf.append(data, size);
-		delete [] data; // since ownership was transferred...
-	}
+	void append(boost::uint8_t* data, unsigned int size);
 
 	/// Return size of the data buffer
 	size_t size() const 
 	{
-		return _buf.size();
+		return _buf->size();
 	}
 
 	/// Return a pointer to the underlying buffer
 	const boost::uint8_t* data() const {
-		return _buf.data();
+		return _buf->data();
 	}
 
 	/// Return a pointer to the underlying buffer
 	boost::uint8_t* data() {
-		return _buf.data();
+		return _buf->data();
 	}
 
 	/// Return a pointer to an offset in the underlying buffer
@@ -100,8 +106,8 @@ public:
 	/// 	An assertion will fail if pos > size()
 	///
 	const boost::uint8_t* data(size_t pos) const {
-		assert(pos < _buf.size());
-		return _buf.data()+pos;
+		assert(pos < _buf->size());
+		return _buf->data()+pos;
 	}
 
 	/// Return a pointer to an offset in the underlying buffer
@@ -110,8 +116,8 @@ public:
 	/// 	An assertion will fail if pos > size()
 	///
 	boost::uint8_t* data(size_t pos) {
-		assert(pos < _buf.size());
-		return _buf.data()+pos;
+		assert(pos < _buf->size());
+		return _buf->data()+pos;
 	}
 
 	/// Volume for AS-sounds, range: 0-100.
@@ -342,8 +348,8 @@ public:
 	SDL_sound_handler(const std::string& wave_file);
 	~SDL_sound_handler();
 
-	/// Called to create a sound.
-	virtual int	create_sound(void* data, unsigned int data_bytes, std::auto_ptr<SoundInfo> sinfo);
+	// see dox in sound_handler.h
+	virtual int	create_sound(std::auto_ptr<SimpleBuffer> data, std::auto_ptr<SoundInfo> sinfo);
 
 	/// this gets called when a stream gets more data
 	virtual long	fill_stream_data(unsigned char* data, unsigned int data_bytes,
