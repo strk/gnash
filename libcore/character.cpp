@@ -41,9 +41,6 @@
 
 #undef set_invalidated
 
-/// Undefine this to not use caches for matrix parameters
-#define USE_MATRIX_CACHES
-
 namespace gnash
 {
 
@@ -298,11 +295,7 @@ character::xscale_getset(const fn_call& fn)
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
 	{
-#ifdef USE_MATRIX_CACHES
 		return as_value(ptr->_xscale);
-#else
-        return as_value(ptr->m_matrix.get_x_scale()*100);
-#endif
 	}
 	else // setter
 	{
@@ -333,11 +326,7 @@ character::yscale_getset(const fn_call& fn)
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
 	{
-#ifdef USE_MATRIX_CACHES
 		return ptr->_yscale;
-#else
-		return ptr->m_matrix.get_y_scale() * 100;
-#endif
 	}
 	else // setter
 	{
@@ -580,11 +569,7 @@ character::rotation_getset(const fn_call& fn)
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
 	{
-#ifdef USE_MATRIX_CACHES
 		return ptr->_rotation;
-#else
-		return ptr->m_matrix.get_rotation() * 180 / PI;
-#endif
 	}
 	else // setter
 	{
@@ -658,11 +643,9 @@ void
 character::copyMatrix(const character& c)
 {
 	m_matrix = c.m_matrix;
-#ifdef USE_MATRIX_CACHES
 	_xscale = c._xscale;
 	_yscale = c._yscale;
 	_rotation = c._rotation;
-#endif
 }
 
 void
@@ -675,14 +658,12 @@ character::set_matrix(const matrix& m, bool updateCache)
 		set_invalidated(__FILE__, __LINE__);
 		m_matrix = m;
 
-#ifdef USE_MATRIX_CACHES
 		if ( updateCache ) // don't update caches if matrix wasn't updated too
 		{
 			_xscale = m_matrix.get_x_scale() * 100.0;
 			_yscale = m_matrix.get_y_scale() * 100.0;
 			_rotation = m_matrix.get_rotation() * 180.0 / PI;
 		}
-#endif
     }
     else
     {
@@ -819,7 +800,6 @@ character::getUserDefinedEventHandler(string_table::key key) const
 void
 character::set_x_scale(double scale_percent)
 {
-#ifdef USE_MATRIX_CACHES
     double xscale = scale_percent / 100.0;
 
     if (xscale != 0.0 && _xscale != 0.0)
@@ -843,12 +823,6 @@ character::set_x_scale(double scale_percent)
     m.set_x_scale(xscale);
 
     set_matrix(m); // we updated the cache ourselves
-#else
-    double xscale = scale_percent / 100.0;
-	matrix m = get_matrix();
-    m.set_x_scale(xscale);
-	set_matrix(m); // we updated the cache ourselves
-#endif
 
 	transformedByScript(); 
 }
@@ -865,10 +839,6 @@ character::set_rotation(double rot)
 
 	//log_debug("_rotation: %d", rot);
 
-#ifdef USE_MATRIX_CACHES
-
-	//double xscale = _xscale / 100.0;
-	//double yscale = _yscale / 100.0;
 	double rotation = rot * PI / 180.0;
 
 	//log_debug("xscale cached: %d, yscale cached: %d", _xscale, _yscale);
@@ -883,13 +853,6 @@ character::set_rotation(double rot)
 	set_matrix(m); // we update the cache ourselves
 
 	_rotation = rot;
-
-#else
-    double rotation = rot * PI / 180.0;
-	matrix m = get_matrix();
-	m.set_rotation(rotation);
-	set_matrix(m); // we updated the cache ourselves
-#endif
 
 	transformedByScript(); 
 }
