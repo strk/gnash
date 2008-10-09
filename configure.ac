@@ -516,12 +516,12 @@ dnl        AC_DEFINE(USE_ALP, [1], [Use the ALP framework])
 dnl        AC_DEFINE(USE_GTK, [1], [Use the GTK GUI])
         build_gtk=yes
         ;;
-      kde|KDE)
+      kde|KDE|kde3|KDE3)
         build_kde=yes
         ;;
       kde4|KDE4)
-	build_kde4=yes
-	;;
+        build_kde4=yes
+        ;;
       qtopia|QTOPIA)
         build_qtopia=yes
         build_qt=yes
@@ -552,7 +552,7 @@ dnl        AC_DEFINE(USE_GTK, [1], [Use the GTK GUI])
         build_fb=yes
         build_fltk=yes
         build_kde=yes
-	build_kde4=yes
+        build_kde4=yes
         build_gtk=yes
         build_sdl=yes
 dnl        build_qtopia=yes
@@ -1242,8 +1242,20 @@ AC_ARG_ENABLE(kparts,
 [case "${enableval}" in
   yes) kparts=yes ;;
   no)  kparts=no ;;
-  *)   AC_MSG_ERROR([bad value ${enableval} for --disable-kpart option]) ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for --disable-kparts option]) ;;
 esac],kparts=$build_kde)
+
+dnl --------------------------------------------------------
+dnl Add KPARTS 4.x support, if specified or KDE gui is built
+dnl --------------------------------------------------------
+
+AC_ARG_ENABLE(kparts4,
+  AC_HELP_STRING([--disable-kparts4], [Disble support for Konqueror 4.x plugin (default: enabled if kde4 gui is)]),
+[case "${enableval}" in
+  yes) kparts4=yes ;;
+  no)  kparts4=no ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for --disable-kparts4 option]) ;;
+esac],kparts4=$build_kde4)
 
 dnl ----------------------------------------------------
 dnl Add NPAPI support, if specified or GTK gui is built
@@ -1275,6 +1287,7 @@ AC_ARG_ENABLE(plugins,
 if test x$plugins = xno; then
   npapi=no
   kparts=no
+  kparts4=no
 fi
 
 dnl
@@ -1626,12 +1639,13 @@ dnl # Check KDE if kde gui or kparts were requested
 if test x$build_kde = xyes -o x$kparts = xyes; then
   GNASH_PATH_KDE
 fi
-
-if test x$build_kde4 = xyes; then
-  #dnl Do something here
-  echo "building kde4";
+if test x$build_kde4 = xyes -o x$kparts4 = xyes; then
+  GNASH_QT4_GUI
+  GNASH_PATH_KDE4
+  if test "x$gnash_cv_lib_kde_dir" != xno; then
+    has_kde4=yes
+  fi
 fi
-
 if test x$build_qt = xyes -o x$build_qtopia = xyes -o x$build_kde = xyes; then
   GNASH_PATH_QT
   if test x$build_qtopia = xyes; then
@@ -1682,6 +1696,15 @@ fi
 if test x$build_kde = xno -a x$kparts = xyes; then
   AC_MSG_WARN(["Enabled KPARTS plugin, but you aren't building a KDE based GUI!"])
 fi
+if test x$has_kde4 = xno -a x$kparts4 = xyes; then
+  kparts4=no
+dnl  build_kde4=no
+  AC_MSG_WARN(["Disabling KPARTS 4.x plugin, no KDE 4.x development found"])
+fi
+
+if test x$build_kde4 = xno -a x$kparts4 = xyes; then
+  AC_MSG_WARN(["Enabled KPARTS 4.x plugin, but you aren't building a KDE 4.x based GUI!"])
+fi
 
 AM_CONDITIONAL(BUILD_QTOPIA_GUI, [ test x$build_qtopia = xyes ])
 AM_CONDITIONAL(BUILD_ALP_GUI, [ test x$build_alp = xyes ])
@@ -1689,7 +1712,7 @@ AM_CONDITIONAL(BUILD_QT_GUI, [ test x$build_qt = xyes ])
 AM_CONDITIONAL(BUILD_HILDON_GUI, [ test x$build_hildon = xyes ])
 AM_CONDITIONAL(BUILD_GTK_GUI, [ test x$build_gtk = xyes ])
 AM_CONDITIONAL(BUILD_KDE_GUI, [ test x$build_kde = xyes ])
-AM_CONDITIONAL(BUILD_KDE4_GUI, [ test x$build_kde4 = xyes])
+AM_CONDITIONAL(BUILD_KDE4_GUI, [ test x$build_kde4 = xyes ])
 AM_CONDITIONAL(BUILD_FLTK_GUI, [ test x$build_fltk = xyes ])
 AM_CONDITIONAL(BUILD_SDL_GUI, [ test x$build_sdl = xyes ])
 AM_CONDITIONAL(BUILD_FB_GUI, [ test x$build_fb = xyes ])
@@ -1700,6 +1723,7 @@ AM_CONDITIONAL(BUILD_DUMP_GUI, [ test x$build_dump = xyes ])
 # plugin building flags
 AM_CONDITIONAL(NPAPI, [test x$npapi = xyes])
 AM_CONDITIONAL(KPARTS, [test x$kparts = xyes])
+AM_CONDITIONAL(KPARTS4, [test x$kparts4 = xyes])
 
 AC_SUBST(KDE_CFLAGS)
 AC_SUBST(KDE_LIBS)
@@ -2177,6 +2201,7 @@ extensions/metome/Makefile
 plugin/Makefile
 plugin/xpcom/Makefile
 plugin/klash/Makefile
+plugin/klash4/Makefile
 plugin/mozilla-sdk/Makefile
 plugin/win32/Makefile
 cygnal/Makefile
@@ -2231,13 +2256,23 @@ else
 fi
 
 if test x"$kparts" = x"yes"; then
-  echo "        KPARTS plugin enabled (default). Use --disable-kparts to disable"
-  echo "            KPARTS plugin will be installed in ${KDE_PLUGINDIR}"
-  echo "            KPARTS service will be installed in ${KDE_SERVICESDIR}"
-  echo "            KPARTS config dir will be in ${KDE_CONFIGDIR}"
-  echo "            KPARTS appsdata will be installed in ${KDE_APPSDATADIR}"
+  echo "        KPARTS 3.x plugin enabled (default). Use --disable-kparts to disable"
+  echo "            KPARTS 3.x plugin will be installed in ${KDE_PLUGINDIR}"
+  echo "            KPARTS 3.x service will be installed in ${KDE_SERVICESDIR}"
+  echo "            KPARTS 3.x config dir will be in ${KDE_CONFIGDIR}"
+  echo "            KPARTS 3.x appsdata will be installed in ${KDE_APPSDATADIR}"
 else
-  echo "        KPARTS plugin disabled."
+  echo "        KPARTS 3.x plugin disabled."
+fi
+
+if test x"$kparts4" = x"yes"; then
+  echo "        KPARTS 4.x plugin enabled (default). Use --disable-kparts4 to disable"
+  echo "            KPARTS 4.x plugin will be installed in ${KDE4_PLUGINDIR}"
+  echo "            KPARTS 4.x service will be installed in ${KDE4_SERVICESDIR}"
+  echo "            KPARTS 4.x config dir will be in ${KDE4_CONFIGDIR}"
+  echo "            KPARTS 4.x appsdata will be installed in ${KDE4_APPSDATADIR}"
+else
+  echo "        KPARTS 4.x plugin disabled."
 fi
 
 dnl -- if test x"${dynamic_gui}" = x"yes"; then
@@ -2330,17 +2365,17 @@ fi
 
 if test x$build_kde = xyes -o x$kparts = xyes; then
   if test x"$has_kde" = xyes; then
-    echo "        KDE flags are: $KDE_CFLAGS"
-    echo "        KDE libs are: $KDE_LIBS"
+    echo "        KDE 3.x flags are: $KDE_CFLAGS"
+    echo "        KDE 3.x libs are: $KDE_LIBS"
   else
-      echo "        ERROR: No KDE development package installed!" >&3
-      echo "               To disable the KDE gui," >&3
+      echo "        ERROR: No KDE 3.x development package installed!" >&3
+      echo "               To disable the KDE 3.x gui," >&3
       echo "               reconfigure using --enable-gui=<list-of-guis>" >&3
       echo "               and omit "kde" from the list." >&3
       echo "               When the option --enable-gui=... is omitted," >&3
       echo "               the default is the same of --enable-gui=kde,gtk" >&3
-      echo "               To be able to build the kde gui," >&3
-      echo "               install the KDE development environment from http://kde.org" >&3
+      echo "               To be able to build the kde 3.x gui," >&3
+      echo "               install version 3.x of the KDE development environment from http://kde.org" >&3
       echo "               or .deb users: apt-get install kdelibs-dev" >&3
       echo "               or .rpm users: yum install <something-else>." >&3
   fi

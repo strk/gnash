@@ -27,7 +27,7 @@
 
 #!/bin/sh
 
-GUIS="gtk kde sdl fltk aqua riscos fb alp hildon"
+GUIS="gtk kde kde4 sdl fltk aqua riscos fb alp hildon"
 THIS_DIR="`dirname $0`"
 
 if test "$1" = "-G"; then

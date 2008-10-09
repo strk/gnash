@@ -24,6 +24,10 @@ if KPARTS
 SUBDIRS += klash
 endif
 
+if KPARTS4
+SUBDIRS += klash4
+endif
+
 if NPAPI
 SUBDIRS += mozilla-sdk
 
@@ -41,7 +45,7 @@ endif
 endif # NPAPI
 
 # make sure these files make it into the distribution tarball.
-DIST_SUBDIRS = klash mozilla-sdk xpcom win32
+DIST_SUBDIRS = klash klash4 mozilla-sdk xpcom win32
 
 # This is a hard coded path to where the plugin gets installed.
 GNASHBINDIR = $(bindir)
@@ -132,6 +136,7 @@ install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
 	@echo "Use \"make install-plugin\" to install the Firefox plugin to $(DESTDIR)$(plugindir)."
 
 if !WIN32
+if NPAPI
 install-plugin: $(plugin_LTLIBRARIES)
 	@test -d "$(DESTDIR)$(plugindir)" || $(mkinstalldirs) "$(DESTDIR)$(plugindir)"
 	@echo "Installing plugin to $(DESTDIR)$(plugindir)"
@@ -140,6 +145,10 @@ install-plugin: $(plugin_LTLIBRARIES)
 	else \
 	  cp -f libgnashplugin.so* $(DESTDIR)$(plugindir)/libgnashplugin.so; \
 	fi
+else # NPAPI
+install-plugin:
+	: # do nothing
+endif
 else
 install-plugin: 
 	: # do nothing
@@ -147,6 +156,7 @@ endif # WIN32
 
 install-plugins: install-plugin
 	$(MAKE) -C klash install-plugins
+	$(MAKE) -C klash4 install-plugins
 	$(MAKE) -C win32 install-plugins
 
 uninstall-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)

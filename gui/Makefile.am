@@ -192,6 +192,9 @@ endif
 if BUILD_KDE4_GUI
 BUILT_SOURCES += Kde4.moc
 include $(srcdir)/am-frag/kde4.am
+
+Kde4.moc: $(srcdir)/Kde4Gui.h
+	@MOC4@ -o $@ $<
 endif
 
 # Build the SDL gui
