@@ -181,11 +181,6 @@ while(<STDIN>){
 		next;
 	}
 
-	#Remove return calls(TEMP).
-	if(index($_,"return") != $[-1){
-		skip_line();
-		next;
-	}
 	if($_ =~ /Number/){
 		skip_line();
 		next;
@@ -232,11 +227,8 @@ while(<STDIN>){
 		next;	
 	}
 
-	#Object is not a valid type in Haxe.
-	if($_ =~ /Object/){
-		skip_line();
-		next;
-	}
+	#Replace refrences to Object type with Dynamic.
+	$_  =~ s/(\W)Object(\W)/$1Dynamic$2/g;	
 
 	#Remove calls to ASSetPropFlags.  I can't find a Haxe equivilent.
 	if($_ =~ /ASSetPropFlags/){
