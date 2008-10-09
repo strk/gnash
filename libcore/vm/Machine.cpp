@@ -1574,12 +1574,23 @@ Machine::execute()
 /// NB: See 0x61 (ABC_ACTION_SETPROPETY) for the decision of ns/key.
 	case SWF::ABC_ACTION_GETPROPERTY:
 	{
+		as_value val;
+		string_table::key ns = 0;
+		string_table::key name = 0;
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
 		//TODO: If multiname is runtime we need to also pop namespace and name values of the stack.
+		if(a.mFlags == asName::KIND_MultinameL){
+			as_value nameValue = pop_stack();
+			name = mST.find(nameValue.to_string());
+		}
+		else{
+			name = a.getGlobalName();
+		}
+
 		as_value obj = pop_stack();
-		as_value val;
+
 		if(!obj.is_undefined()){
-			obj.to_object().get()->get_member(a.getGlobalName(), &val);
+			obj.to_object().get()->get_member(name, &val, ns);
 		}
 		push_stack(val);
 
