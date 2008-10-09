@@ -114,17 +114,13 @@ isNaN (a.charAt(21) );
 check_equals ( a.lastIndexOf("lawa"), 8);
 
 // Applied to object.
-
 o = new Object;
-
 o.charCodeAt = String.prototype.charCodeAt;
 o.charAt = String.prototype.charAt;
-
 c = o.charAt(4);
 check_equals(c, "e");
 c = o.charCodeAt(4);
 check_equals(c, "101");
-
 //----------------------------------------
 // Check String.indexOf
 // TODO: test with ASnative(251,8)
@@ -344,6 +340,7 @@ o = new Date(0);
 o.split = String.prototype.split;
 ar = o.split(":");
 check_equals(ar.length, 3);
+
 
 #else
 // SWF5:
@@ -811,6 +808,8 @@ check_equals (typeof(c), "string");
 //-------------------------------------------
 
 // These tests are only correct with SWF6 and above.
+
+var a = new String("Längere Wörter");
 
 #if OUTPUT_VERSION > 5
 check_equals (a.length, 14);
