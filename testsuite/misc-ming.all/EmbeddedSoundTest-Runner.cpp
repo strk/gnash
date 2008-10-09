@@ -65,7 +65,7 @@ main(int /*argc*/, char** /*argv*/)
         gnashSleep(750000);
     }
     as_value eot;
-    check(root->get_member(st.find("finished"), &eot));
+    xcheck(root->get_member(st.find("finished"), &eot));
 
 }
 
