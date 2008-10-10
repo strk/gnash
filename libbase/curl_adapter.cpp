@@ -47,7 +47,7 @@ namespace gnash {
 std::auto_ptr<IOChannel>
 NetworkAdapter::makeStream(const std::string& /*url*/)
 {
-	log_error(_("ERROR: libcurl is not available, but "
+	log_error(_("libcurl is not available, but "
 	            "Gnash has attempted to use the curl adapter"));
 	return std::auto_ptr<IOChannel>();
 }
