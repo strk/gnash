@@ -227,8 +227,16 @@ while(<STDIN>){
 		next;	
 	}
 
+	#CHECK 6 - Must run before CHECK 7
 	#Replace refrences to Object type with Dynamic.
-	$_  =~ s/(\W)Object(\W)/$1Dynamic$2/g;	
+	$_  =~ s/(\W)Object(\W)/$1Dynamic$2/g;
+
+	#CHECK 7 - Must run after CHECK 6
+	#Replace [object Dynamic] with [object Object]
+	#This undoes some of the changes made by CHECK 6.  We need to do this because
+	#even though there is no Object class in Haxe, when variables of type Dynamic are
+	#compiled int byte code, they become an Object.
+	$_ =~ s/\[object Dynamic\]/[object Object]/g;
 
 	#Remove calls to ASSetPropFlags.  I can't find a Haxe equivilent.
 	if($_ =~ /ASSetPropFlags/){
