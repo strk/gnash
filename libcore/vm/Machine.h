@@ -292,9 +292,9 @@ private:
 	}
 
 	void push_scope_stack(as_value object){
-		LOG_DEBUG_AVM("Pushing value onto the scope stack.");
+		LOG_DEBUG_AVM("Pushing value %s onto scope stack.",object.toDebugString());
 		mScopeStack.push(object.to_object());
-		LOG_DEBUG_AVM("There are now %u items on the scope stack.",mScopeStack.size());
+		print_scope_stack();
 	}
 
 	boost::intrusive_ptr<as_object> pop_scope_stack(){
