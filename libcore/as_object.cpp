@@ -539,6 +539,19 @@ as_object::reserveSlot(string_table::key name, string_table::key nsId,
 }
 
 bool
+as_object::get_member_slot(int order, as_value* val){
+	
+	const Property* prop = _members.getPropertyByOrder(order);
+	if(prop){
+		return get_member_default(prop->getName(), val, prop->getNamespace());
+	}
+	else{
+		return false;
+	}
+}
+
+
+bool
 as_object::set_member_slot(int order, const as_value& val, bool ifFound)
 {
 	const Property* prop = _members.getPropertyByOrder(order);

@@ -1091,6 +1091,21 @@ protected:
 	bool get_member_default(string_table::key name, as_value* val, 
 		string_table::key nsname);
 
+	
+	///Get a member value at a given slot.
+	//
+	///This is a wrapper around get_member_default.
+	/// @param order
+	/// The slot index of the property.
+	///
+	/// @param val
+	/// The as_value to store a found variable's value in.
+	///
+	/// @return true if a member exists at the given slot, 
+	/// and the member's value is successfully retrieved,
+	/// false otherwise.
+	bool get_member_slot(int order, as_value* val);
+
 	///Set a member value at a given slot.
 	//
 	///This is a wrapper around set_member_default.
