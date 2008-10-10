@@ -87,6 +87,9 @@ while(<STDIN>){
 		}
 		#Replace calls to new String() with new String("").
 		$_ =~ s/(new String\()\)/$1""\)/;
+
+		#TODO: We can probably figure out when to use parseFloat and when to use parseInt.
+		$_ =~ s/new Number\(\s*(\w+)\s*\)/Std.parseInt("$1")/g;
 		
 #		print $_;
 #		next;
@@ -181,10 +184,6 @@ while(<STDIN>){
 		next;
 	}
 
-	if($_ =~ /Number/){
-		skip_line();
-		next;
-	}
 	#Remove calls to hasOwnProperty.  I can't find a Haxe equivilent for this.
 	if($_=~ /hasOwnProperty/){
 		skip_line();
