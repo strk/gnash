@@ -2810,6 +2810,8 @@ std::auto_ptr< std::vector<as_value> > Machine::get_args(unsigned int argc){
 
 void Machine::load_function(CodeStream* stream,boost::uint32_t maxRegisters){
 	saveState();
+	//TODO: Maybe this call should be part of saveState(), it returns the old downstop.
+	mScopeStack.fixDownstop();
 	mStream = stream;
 	clearRegisters(maxRegisters);
 }
