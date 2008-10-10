@@ -22,6 +22,7 @@ use strict;
 
 my $important_string;
 my $skipped = 0;
+my $skipped_tests = 0;
 my %vars;
 
 while(<STDIN>){
@@ -256,6 +257,10 @@ while(<STDIN>){
 		skip_line();
 		next;
 	}
+	
+	#Subtract the number of skipped tests from the total passed to Dejagnu.totals().
+	$_ =~ s/Dejagnu.totals\(\s*(\w+)\s*,(.+)/Dejagnu.totals($1-$skipped_tests,$2/g;
+
 	#Print the converted line of code.
 	print $_;
 }
@@ -264,11 +269,17 @@ while(<STDIN>){
 print "}}\n";
 
 print stderr "$skipped lines were skipped.\n";
+print stderr "$skipped_tests tests were skipped\n";
 
 sub skip_line{
 	$skipped++;
 	if($important_string){
 		print $important_string;
+	}
+	#Keep track of the number of tests we skip.
+	if($_ =~ /Dejagnu.+check/){
+		$_ = "TEST DETECTED: $_";
+		$skipped_tests++;
 	}
 	print "//$_";
 
