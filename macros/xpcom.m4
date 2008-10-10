@@ -85,6 +85,9 @@ AC_DEFUN([GNASH_PATH_XPCOM],
 
       # Look for libxul. TODO: needed at all ?
       if $PKG_CONFIG --exists libxul; then
+        if test x$ac_cv_path_xpcom_sdk_dir = x; then
+          ac_cv_path_xpcom_sdk_dir="`$PKG_CONFIG --libs libxul`"
+        fi
         ac_cv_path_xpidl="`$PKG_CONFIG --libs-only-L libxul`"
       fi
 

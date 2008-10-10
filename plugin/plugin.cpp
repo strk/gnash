@@ -804,7 +804,7 @@ getHome(string& gnashpath)
 	nsISupports * sm = NULL;
 
 	// Get service manager
-	//cerr << "Getting Path" << NPN_GetValue(NULL, NPNVserviceManager, &sm) << "\n";
+	cerr << "Getting Path" << NPN_GetValue(NULL, NPNVserviceManager, &sm) << "\n";
 
 	// Mozilla returns nsIServiceManager so we can use it directly;
 	// doing QI on nsISupports here can still be more appropriate in
@@ -823,17 +823,17 @@ getHome(string& gnashpath)
 
 	// Gets extension service
 	rv = gServiceManager->GetServiceByContractID("@mozilla.org/extensions/manager;1", NS_GET_IID(nsIExtensionManager), (void **)&nsExtensionService);
-	//cerr << "gSM" << rv << " " << (nsExtensionService == NULL) << "\n";
+	cerr << "gSM" << rv << " " << (nsExtensionService == NULL) << "\n";
 	if (!nsExtensionService) return -2;
 	
 	// Gets install location object
 	rv = nsExtensionService->GetInstallLocation(NS_LITERAL_STRING("{2b70f2b1-fc72-4734-bb81-4eb2a7713e49}"), (nsIInstallLocation**)&installLocation);
-	//cerr << "nES" << rv << " " << (installLocation == NULL) << "\n";
+	cerr << "nES" << rv << " " << (installLocation == NULL) << "\n";
 	if (!installLocation) return -3;
 
 	// Gets information on file in the extension - here, "PetsCity@PetsCity.com" is the ID of the plugin. install.rdf is a file stored in the plugin
 	rv = installLocation->GetItemFile(NS_LITERAL_STRING("{2b70f2b1-fc72-4734-bb81-4eb2a7713e49}"), NS_LITERAL_STRING("plugins/gnash"), (nsIFile**)&file);
-	//cerr << "iL" << rv << " " << (file == NULL) << "\n";
+	cerr << "iL" << rv << " " << (file == NULL) << "\n";
 	if (!file) return -4;
 
 	// We get the path (stored as unicode in nsName)
@@ -842,7 +842,7 @@ getHome(string& gnashpath)
 
        	//const NPString& propValue = NS_LossyConvertUTF16toASCII(sName);
 	gnashpath = ToNewCString(NS_LossyConvertUTF16toASCII(sName));
-	//cerr << "Path" << gnashpath << "\n";
+	cerr << "Path" << gnashpath << "\n";
 	return 0;
 }
 #endif // GNASH_XPI_PLUGIN
