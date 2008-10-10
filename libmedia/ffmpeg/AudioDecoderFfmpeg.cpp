@@ -439,9 +439,10 @@ AudioDecoderFfmpeg::decodeFrame(boost::uint8_t* input, boost::uint32_t inputSize
 			abort();
 		}
 
-		// we let the consistency check run before we override outSize
-		// to make debugging values correct
-		outSize = resampledFrameSize;
+        // Use the actual number of samples returned, multiplied
+        // to get size in bytes (not two-byte samples) and for 
+        // stereo?
+		outSize = samples * 2 * 2;
 
 	}
 
