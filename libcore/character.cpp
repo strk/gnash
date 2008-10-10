@@ -497,8 +497,6 @@ character::set_width(double newwidth)
         double xscale = (newwidth / oldwidth);
         double rotation = _rotation * PI / 180.0;
 
-        log_debug("setting xscale from %g to %g", _xscale, xscale*100);
-
         matrix m = get_matrix();
         m.set_scale_rotation(xscale, yscale, rotation);
         set_matrix(m, true); // let caches be updated
@@ -553,8 +551,6 @@ character::set_height(double newheight)
         double yscale = (newheight / oldheight);
         double xscale = _xscale / 100.0;
         double rotation = _rotation * PI / 180.0;
-
-        //log_debug("setting yscale from %g to %g", _yscale, yscale*100);
 
         matrix m = get_matrix();
         m.set_scale_rotation(xscale, yscale, rotation);
