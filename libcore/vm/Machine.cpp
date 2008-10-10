@@ -1653,11 +1653,15 @@ Machine::execute()
 ///  slot -- obj.slots[slot_index]
 	case SWF::ABC_ACTION_GETSLOT:
 	{
+		as_value val;
 		boost::uint32_t sindex = mStream->read_V32();
-		if (!sindex)
-			throw ASException();
-		--sindex;
-		//TODO: mStack.top(0) = mStack.top(0).getSlot(sindex);
+		as_object* object = pop_stack().to_object().get();
+
+		object->get_member_slot(sindex + 1, &val);
+
+		LOG_DEBUG_AVM("object has value %s at real_slot=%u abc_slot=%u",val.toDebugString(),sindex + 1, sindex);
+		push_stack(val);
+		
 		break;
 	}
 /// 0x6D ABC_ACTION_SETSLOT
