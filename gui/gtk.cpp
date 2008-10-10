@@ -1244,16 +1244,17 @@ PreferencesDialog::addNetworkTab()
     gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
 
     // Streams timeout
-    label = gtk_label_new (_("Streams timeout (in seconds -- 0 to never timeout):"));
-    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
+    GtkWidget *timeoutbox = gtk_hbox_new (FALSE, 2);
+    gtk_box_pack_start(GTK_BOX(vbox), timeoutbox, FALSE, FALSE, 0);
+    
+    label = gtk_label_new (_("Network timeout in seconds (0 for no timeout):"));
+    gtk_box_pack_start(GTK_BOX(timeoutbox), label, FALSE, FALSE, 0);
     gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
 
-    GtkWidget* scale = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (_rcfile.getStreamsTimeout(), 0, 10, 1, 0, 0)));
-    gtk_scale_set_digits (GTK_SCALE (scale), 0);
-    gtk_range_set_update_policy (GTK_RANGE (scale), GTK_UPDATE_DISCONTINUOUS);
-    gtk_box_pack_start(GTK_BOX(vbox), scale, FALSE, FALSE, 0);
-
-    _prefs->streamsTimeoutScale = scale;
+    _prefs->streamsTimeoutScale = gtk_spin_button_new_with_range(0, 300, 1);
+    gtk_box_pack_start(GTK_BOX(timeoutbox), _prefs->streamsTimeoutScale, FALSE, FALSE, 0);
+    // Align to _rcfile value:
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(_prefs->streamsTimeoutScale), _rcfile.getStreamsTimeout());
 
 }
 
