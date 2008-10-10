@@ -299,8 +299,8 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
     // a cache of setting some parameter before calling us...
     // (example: setDoSound(), setWindowId() etc.. ) 
     init_logfile();
-    init_sound();
     init_media();
+    init_sound();
     init_gui();
    
     // gnash.cpp should check that a filename is supplied.

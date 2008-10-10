@@ -701,14 +701,14 @@ dnl  Toggle support for MIT-SHM extension to the X server
 dnl --------------------------------------------------------
 
 AC_ARG_ENABLE(mit-shm,
-  AC_HELP_STRING([--disable-mit-shm], [Disable support for the MIT-SHM X extension]),
+  AC_HELP_STRING([--enable-mit-shm], [Enable support for the MIT-SHM X extension]),
 [case "${enableval}" in
   yes) xmitshm=yes ;;
   no)  xmitshm=no ;;
   *)   AC_MSG_ERROR([bad value ${enableval} for --enable-mit-shm option]) ;;
-esac],xmitshm=yes)
+esac],xmitshm=no)
 dnl as windows doesn't run X11, don't enable this extension there.
-if test "x${xmitshm}" = "xyes" -a "x${windows}" = "xno"; then
+if test "x${xmitshm}" = "xyes" -a "x${windows}" != "xyes"; then
 	AC_DEFINE(ENABLE_MIT_SHM, [1], [Use MIT-SHM X extension if available])
 fi
 
@@ -1566,6 +1566,8 @@ AM_CONDITIONAL(MING_SUPPORTS_STREAMING_SOUND,
         [ test x"$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040006 ])
 AM_CONDITIONAL(MING_SUPPORTS_SWFBUTTON_SET_DEPTH,
         [ test x"$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040006 ])
+AM_CONDITIONAL(MING_VERSION_0_4_3,
+        [ test x"$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040300 ])
 
 if test x$cross_compiling = xno; then
   AC_ARG_WITH([swfdec_testsuite],

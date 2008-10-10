@@ -50,12 +50,22 @@ class active_sound;
 class sound_data
 {
 	/// The undecoded data
-	SimpleBuffer _buf;
+	std::auto_ptr<SimpleBuffer> _buf;
+
+    void ensureBufferPadding();
 
 public:
 
-	sound_data()
-	{}
+    /// Construct a sound with given data, info and volume.
+    //
+    /// @param data The encoded sound data. May be the NULL pointer for streaming sounds,
+    ///     in which case data will be appended later using ::append()
+    ///
+    /// @param info encoding info
+    ///
+    /// @pararm nVolume initial volume (0..100). Optional, defaults to 100.
+    ///
+	sound_data(std::auto_ptr<SimpleBuffer> data, std::auto_ptr<SoundInfo> info, int nVolume=100);
 
 	~sound_data();
 
@@ -72,26 +82,22 @@ public:
 	/// @param size
 	///	Size of the 'data' buffer.
 	///
-	void append(boost::uint8_t* data, unsigned int size)
-	{
-		_buf.append(data, size);
-		delete [] data; // since ownership was transferred...
-	}
+	void append(boost::uint8_t* data, unsigned int size);
 
 	/// Return size of the data buffer
 	size_t size() const 
 	{
-		return _buf.size();
+		return _buf->size();
 	}
 
 	/// Return a pointer to the underlying buffer
 	const boost::uint8_t* data() const {
-		return _buf.data();
+		return _buf->data();
 	}
 
 	/// Return a pointer to the underlying buffer
 	boost::uint8_t* data() {
-		return _buf.data();
+		return _buf->data();
 	}
 
 	/// Return a pointer to an offset in the underlying buffer
@@ -100,8 +106,8 @@ public:
 	/// 	An assertion will fail if pos > size()
 	///
 	const boost::uint8_t* data(size_t pos) const {
-		assert(pos < _buf.size());
-		return _buf.data()+pos;
+		assert(pos < _buf->size());
+		return _buf->data()+pos;
 	}
 
 	/// Return a pointer to an offset in the underlying buffer
@@ -110,8 +116,8 @@ public:
 	/// 	An assertion will fail if pos > size()
 	///
 	boost::uint8_t* data(size_t pos) {
-		assert(pos < _buf.size());
-		return _buf.data()+pos;
+		assert(pos < _buf->size());
+		return _buf->data()+pos;
 	}
 
 	/// Volume for AS-sounds, range: 0-100.
@@ -150,13 +156,13 @@ public:
 	active_sound()
 		:
 		decoder(0),
-		position(0),
-		raw_position(0),
-		loop_count(0),
+		decodingPosition(0),
+		playbackPosition(0),
+		loopCount(0),
 		offset(0),
 		current_env(0),
 		samples_played(0),
-		_undecodedData(0)
+		_encodedData(0)
 	{}
 
 	~active_sound()
@@ -168,15 +174,15 @@ public:
 	/// The decoder object used to convert the data into the playable format
 	AudioDecoder* decoder;
 
-	/// Current decoding position in the stream
-	unsigned long position;
+	/// Current decoding position in the encoded stream
+	unsigned long decodingPosition;
 
-	/// Current playing position in the decoded stream
-	unsigned long raw_position;
+	/// Current playback position in the decoded stream
+	unsigned long playbackPosition;
 
 	/// Numbers of loops: -1 means loop forever, 0 means play once.
 	/// For every loop completed, it is decremented.
-	long loop_count;
+	long loopCount;
 
 	/// Offset to make playback start in-sync, only used with mp3 streams.
 	unsigned int offset;
@@ -199,13 +205,13 @@ public:
 	///
 	void set_data(sound_data* newUndecodedData);
 
-	/// Returns the data pointer in the undecoded datastream
+	/// Returns the data pointer in the encoded datastream
 	/// for the given position. Boundaries are checked.
-	boost::uint8_t* get_data_ptr(unsigned long int pos);
+	boost::uint8_t* getEncodedData(unsigned long int pos);
 
 	/// Returns the data pointer in the decoded datastream
 	/// for the given position. Boundaries are checked.
-	boost::uint8_t* get_raw_data_ptr(unsigned long int pos);
+	boost::uint8_t* getDecodedData(unsigned long int pos);
 
 	/// Release resources associated with decoded data, if any.
 	//
@@ -254,7 +260,7 @@ public:
 		delete [] data; // ownership transferred...
 	}
 
-	size_t rawDataSize() const
+	size_t decodedDataSize() const
 	{
 		if ( _decodedData.get() )
 		{
@@ -263,19 +269,19 @@ public:
 		else return 0;
 	}
   
-	size_t dataSize() const
+	size_t encodedDataSize() const
 	{
-		return _undecodedData ? _undecodedData->size() : 0;
+		return _encodedData ? _encodedData->size() : 0;
 	}
   
 private:
 
-	/// The undecoded data
-	sound_data* _undecodedData;
+	/// The encoded data
+	sound_data* _encodedData;
 
 	/// The decoded buffer
 	//
-	/// If NULL, the _undecodedData will be considered
+	/// If NULL, the _encodedData will be considered
 	/// decoded instead
 	///
 	std::auto_ptr<SimpleBuffer> _decodedData;
@@ -342,15 +348,15 @@ public:
 	SDL_sound_handler(const std::string& wave_file);
 	~SDL_sound_handler();
 
-	/// Called to create a sound.
-	virtual int	create_sound(void* data, unsigned int data_bytes, std::auto_ptr<SoundInfo> sinfo);
+	// see dox in sound_handler.h
+	virtual int	create_sound(std::auto_ptr<SimpleBuffer> data, std::auto_ptr<SoundInfo> sinfo);
 
 	/// this gets called when a stream gets more data
 	virtual long	fill_stream_data(unsigned char* data, unsigned int data_bytes,
 					 unsigned int sample_count, int handle_id);
 
 	/// Play the index'd sample.
-	virtual void	play_sound(int sound_handle, int loop_count, int offset,
+	virtual void	play_sound(int sound_handle, int loopCount, int offset,
 				   long start_position, const std::vector<sound_envelope>* envelopes);
 
 	/// Stop the index'd sample.

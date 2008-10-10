@@ -30,6 +30,7 @@
 
 #include "dsodefs.h" // for DSOEXPORT
 #include "SoundInfo.h"
+#include "SimpleBuffer.h"
 
 #include <vector>
 #include <memory>
@@ -87,28 +88,22 @@ public:
 
 	// If stereo is true, samples are interleaved w/ left sample first.
 	
-	/// Create a sound buffer slot, for playing on-demand.
+	/// Create a sound buffer slot, for on-demand playback.
 	//
 	/// @param data
 	/// 	The data to be stored. For soundstream this is NULL.
-	/// 	If not NULL, ownership of the data is transferred.
-	///	The data is assumed to have been allocated using new[].
-	///	The data is in encoded format, with format specified
-	///	with the sinfo parameter, this is to allow on-demand
-	///	decoding (if the sound is never played, it's never decoded).
-	///
-	/// @param data_bytes
-	///	The size of the data to be stored. For soundstream this is 0.
+	///	    The data is in encoded format, with format specified
+	///	    with the sinfo parameter, this is to allow on-demand
+	///	    decoding (if the sound is never played, it's never decoded).
 	///
 	/// @param sinfo
 	/// 	A SoundInfo object contained in an auto_ptr, which contains info about samplerate,
 	/// 	samplecount, stereo and more. The SoundObject must be not-NULL!
 	///
 	/// @return the id given by the soundhandler for later identification.
-	///
+    ///
 	virtual int	create_sound(
-		void*		data,
-		unsigned int	data_bytes,
+		std::auto_ptr<SimpleBuffer> data,
 		std::auto_ptr<SoundInfo> sinfo
 		) = 0;
 
