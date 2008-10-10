@@ -1175,9 +1175,10 @@ Machine::execute()
 		boost::uint32_t argc = mStream->read_V32();
 		std::auto_ptr< std::vector<as_value> > args = get_args(argc);
 		//TODO: If multiname is runtime also pop namespace and/or name values.
-		as_object *object = pop_stack().to_object().get();
+		as_value object_val = pop_stack();
+		as_object *object = object_val.to_object().get();
 		as_value property = object->getMember(a.getGlobalName(),0);
-		LOG_DEBUG_AVM("Calling method %s on object %s",property.toDebugString(),object->get_text_value());
+		LOG_DEBUG_AVM("Calling method %s on object %s",property.toDebugString(),object_val.toDebugString());
 		as_environment env = as_environment(_vm);
 		as_value result = call_method(property,&env,object,args);
 
@@ -1569,6 +1570,7 @@ Machine::execute()
 	{
 		boost::uint8_t depth = mStream->read_u8();
 		push_stack(get_scope_stack(depth));
+		print_scope_stack();
 		break;
 	}
 /// 0x66 ABC_ACTION_GETPROPERTY
