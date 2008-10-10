@@ -171,13 +171,7 @@ while(<STDIN>){
 		$_ =~ s/(\w+)\.split\((.+),\s*(\w+)\s*\)/$2==""?[]:$1==""||$2==null?[$1]:$1.split($2).slice(0,$3)/g;
 		
 	}
-	if(index($_,"length") != $[-1){
-		#Remove attemps to set strings length property.  Haxe compliler does not allow this.
-		if($_ =~ /\w+\.length.*=.+;/){
-			skip_line();
-			next;	
-		}
-	}
+
 	#Ignore calls to concat, I cannot find the equivilent haxe function.
 	if(index($_,"concat") != $[-1){
 		skip_line();
