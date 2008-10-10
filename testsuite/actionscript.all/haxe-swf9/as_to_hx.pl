@@ -237,6 +237,7 @@ while(<STDIN>){
 	#even though there is no Object class in Haxe, when variables of type Dynamic are
 	#compiled int byte code, they become an Object.
 	$_ =~ s/\[object Dynamic\]/[object Object]/g;
+	$_ =~ s/\[type Dynamic\]/[type Object]/g;
 
 	#Remove calls to ASSetPropFlags.  I can't find a Haxe equivilent.
 	if($_ =~ /ASSetPropFlags/){
