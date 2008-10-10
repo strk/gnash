@@ -1491,7 +1491,7 @@ Machine::execute()
 
 		break;
 	}
-/// 0x61 ABC_ACTION_SETPROPERTY
+///  ABC_ACTION_SETPROPERTY
 /// Stream: V32 'name_id'
 /// Stack In:
 ///  value -- The value to be used
@@ -1508,13 +1508,22 @@ Machine::execute()
 /// key/value is set in the dictionary obj instead.
 	case SWF::ABC_ACTION_SETPROPERTY:
 	{
-		asName a = pool_name(mStream->read_V32(), mPoolObject);
 		as_value value = pop_stack();
-		//TODO: Get Namespace and name value off of the stack if it is a runtime multiname.
-		as_object *object = pop_stack().to_object().get();
-		if(!object->set_member_default(a.getGlobalName(),value,0,true)){
-			object->init_member(mPoolObject->mStringPool[a.getABCName()],value,0,0);
+		string_table::key ns = 0;
+		string_table::key name = 0;
+
+		asName a = pool_name(mStream->read_V32(), mPoolObject);
+		//TODO: If multiname is runtime we need to also pop namespace and name values of the stack.
+		if(a.mFlags == asName::KIND_MultinameL){
+			as_value nameValue = pop_stack();
+			name = mST.find(nameValue.to_string());
 		}
+		else{
+			name = a.getGlobalName();
+		}
+		as_object *object = pop_stack().to_object().get();
+		object->set_member(name,value,ns,false);
+
 		break;
 	}
 /// 0x62 ABC_ACTION_GETLOCAL
@@ -1668,6 +1677,9 @@ Machine::execute()
 		//1 higher than the index the abc_block thinks the property is at.
 		if(!object.to_object().get()->set_member_slot(sindex+1,value)){
 			LOG_DEBUG_AVM("Failed to set property at real_slot=%u abc_slot=%u",sindex+1,sindex);
+		}
+		else{
+			LOG_DEBUG_AVM("Set property at real_slot=%u abc_slot=%u",sindex+1,sindex);
 		}
 		//TODO: Actually set the object's value.
 		break;
