@@ -867,8 +867,7 @@ Machine::execute()
 	case SWF::ABC_ACTION_PUSHSHORT:
 	{
 		signed short s = static_cast<signed short>(mStream->read_V32());
-		mStack.grow(1);
-		mStack.top(0) = s;
+		push_stack(as_value(s));
 		break;
 	}
 /// 0x26 ABC_ACTION_PUSHTRUE
@@ -1320,9 +1319,17 @@ Machine::execute()
 		
 		as_value constructor_val = object->getMember(a.getGlobalName());
 		boost::intrusive_ptr<as_function> constructor = constructor_val.to_as_function();
-		boost::intrusive_ptr<as_object> newobj = constructor->constructInstance(env, args);
-
-		push_stack(as_value(newobj));
+		if(constructor){
+			boost::intrusive_ptr<as_object> newobj = constructor->constructInstance(env, args);
+			push_stack(as_value(newobj));
+		}
+		else{
+ 			LOG_DEBUG_AVM("Object %s is not a constructor",constructor_val.toDebugString());
+			constructor_val = constructor_val.to_object().get()->getMember(NSV::PROP_CONSTRUCTOR,0);
+			boost::intrusive_ptr<as_function> constructor = constructor_val.to_as_function();
+			boost::intrusive_ptr<as_object> newobj = constructor->constructInstance(env, args);
+			push_stack(newobj);
+		}
 		
 		break;
 	}
