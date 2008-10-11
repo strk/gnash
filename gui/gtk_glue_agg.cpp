@@ -461,6 +461,10 @@ GtkAggGlue::beforeRendering()
 void
 GtkAggGlue::render()
 {
+    if (!_drawing_area) {
+        return;
+    }
+
 
 #ifdef ENABLE_MIT_SHM
     if (_shm_image) {
@@ -503,6 +507,14 @@ GtkAggGlue::render()
 void
 GtkAggGlue::render(int minx, int miny, int maxx, int maxy)
 {
+    if (!_drawing_area) {
+        return;
+    }
+
+    size_t copy_width = std::min(_width * (_bpp/8), maxx - minx);
+    size_t copy_height = std::min(_height, maxy - miny);
+    size_t stride = _width*((_bpp+7)/8);
+
 #ifdef ENABLE_MIT_SHM
     if (_shm_image) {
   
@@ -513,7 +525,7 @@ GtkAggGlue::render(int minx, int miny, int maxx, int maxy)
         _shm_image,
         minx, miny,
         minx, miny,
-        maxx-minx+1, maxy-miny+1,
+        copy_width, copy_height,
         False);
       
     // NOTE: Data will be copied in background, see beforeRendering()
@@ -521,10 +533,6 @@ GtkAggGlue::render(int minx, int miny, int maxx, int maxy)
     }
     else {
 #endif
-        size_t copy_width = std::min(_width * (_bpp/8), maxx - minx);
-        size_t copy_height = std::min(_height, maxy - miny);
-        size_t stride = _width*((_bpp+7)/8);
-
 //    log_debug("minx: %d, miny: %d, copy width: %d, copy height: %d, stride: %d",
 //                            minx, miny, copy_width, copy_height, stride);
 //    log_debug("offscreenbuf size: %d", _offscreenbuf_size);
