@@ -580,10 +580,18 @@ Machine::execute()
 /// Do: If a < b move by jump in stream, as ABC_ACTION_JUMP does.
 	case SWF::ABC_ACTION_IFLT:
 	{
+		as_value b = pop_stack();
+		as_value a = pop_stack();
+		boost::int32_t bytes = mStream->read_S24();
 		bool truth;
-		ABSTRACT_COMPARE(truth, mStack.top(1), mStack.top(0), false);
-		mStack.drop(2);
-		JUMPIF(truth); // truth is: a < b
+		ABSTRACT_COMPARE(truth, a, b, false);
+		if(truth){
+			LOG_DEBUG_AVM("Jumping... %d bytes.",bytes);
+			mStream->seekBy(bytes);
+		}
+		else{
+			LOG_DEBUG_AVM("Would have jumped %d bytes",bytes);
+		}
 		break;
 	}
 /// 0x16 ABC_ACTION_IFLE
