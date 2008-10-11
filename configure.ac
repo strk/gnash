@@ -2561,7 +2561,13 @@ if test "$media_handler" = "gst"; then
     else
       echo "        Gstreamer flags are: default include path"
     fi
-      echo "        Gstreamer libs are: $GSTREAMER_LIBS"
+    echo "        Gstreamer libs are: $GSTREAMER_LIBS"
+    if test x"$has_modern_gstpbutils" = "xno"; then
+      echo "        RECOMMENDED: If the user has not installed the necessary Gstreamer plugins," >&4
+      echo "                     Gstreamer can pop up a message prompting them to." >&4
+      echo "                     Install gstpbutils from http://www.gstreamer.net for that to be enabled" >&4
+      echo "                     or .deb users: apt-get install libgstreamer-plugins-base0.10-dev" >&4
+    fi
   else
     echo "        ERROR: GST media handling requested but gstreamer-0.10+ not found" >&3
     echo "               Install it from http://www.gstreamer.net" >&3
@@ -2739,11 +2745,11 @@ if test x"$CURL_LIBS" != x; then
   fi
     echo "        CURL libs are: $CURL_LIBS"
 else
-  echo "        WARNING: CURL library not found." >&4
-  echo "                 Gnash will be built without support for streaming from URLs." >&4
-  echo "                 Why not install libcurl from http://curl.haxx.se/libcurl" >&4
-  echo "                 or .deb users: apt-get install libcurl3-dev" >&4
-  echo "                 or .rpm users: yum install curl-devel" >&4
+  echo "        RECOMMENDED: If you install the CURL library, Gnash will be able to" >&4
+  echo "                     display remote content (streaming from URLs) using CURL." >&4
+  echo "                     Install libcurl from http://curl.haxx.se/libcurl" >&4
+  echo "                     or .deb users: apt-get install libcurl3-dev" >&4
+  echo "                     or .rpm users: yum install curl-devel" >&4
 fi
 
 if test x"$ext_dbus" = xyes; then
@@ -2806,10 +2812,10 @@ if test x"$BOOST_LIBS" != x; then
     fi
     if test x"${extra_missing_libs}" != x; then
       for i in ${extra_missing_libs}; do
-	      echo "        WARNING: The BOOST $i library is recommended!" >&4
-        echo "               Install it from http://www.boost.org" >&4
-        echo "               or .deb users: apt-get install libboost-"`echo ${i} | sed 's/_/-/g'`"-dev" >&4
-        echo "               Gnash will compile anyway, but not all tests will work." >&4
+	echo "        WARNING: The BOOST $i library is recommended!" >&4
+        echo "                 Install it from http://www.boost.org" >&4
+        echo "                 or .deb users: apt-get install libboost-"`echo ${i} | sed 's/_/-/g'`"-dev" >&4
+        echo "                 Gnash will compile anyway, but not all tests will work." >&4
       done
     fi
     if test x"${missing_libs}" != x; then
