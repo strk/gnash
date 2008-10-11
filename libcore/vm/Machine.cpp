@@ -985,16 +985,20 @@ Machine::execute()
 		boost::int32_t iindex = mStream->read_V32();
 		as_value &objv = mRegisters[oindex];
 		as_value &indexv = mRegisters[iindex];
-		ENSURE_OBJECT(objv);
-		ENSURE_NUMBER(indexv);
+		LOG_DEBUG_AVM("Index is %u",indexv.to_number());
+//		ENSURE_OBJECT(objv);
+//		ENSURE_NUMBER(indexv);
 		as_object *obj = objv.to_object().get();
 		boost::uint32_t index = indexv.to_number<boost::uint32_t>();
+		LOG_DEBUG_AVM("Object is %s index is %u",objv.toDebugString(),index);
 		as_object *owner = NULL;
 		int next = obj->nextIndex(index, &owner);
-		mStack.grow(1);
+		LOG_DEBUG_AVM("Next index is %d",next);
+//		mStack.grow(1);
 		if (next)
 		{
-			mStack.top(0).set_bool(true);
+//			mStack.top(0).set_bool(true);
+			push_stack(as_value(true));
 			if (owner)
 				mRegisters[oindex] = owner;
 			else
@@ -1003,7 +1007,7 @@ Machine::execute()
 		}
 		else
 		{
-			mStack.top(0).set_bool(false);
+			push_stack(as_value(false));
 			mRegisters[oindex].set_null();
 			mRegisters[iindex] = 0;
 		}
