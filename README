@@ -78,7 +78,8 @@ GtkGlExt is not installed, or if --disable-glext is passed to configure.
 
 Configure with --with-plugindir= to set the directory that "make
 install" will install the plugin in. By default it will be installed
-in the user's .mozilla/plugins directory.
+in the user's .mozilla/plugins directory, even if you install using
+sudo.
 
 Platforms Supported:
 --------------------
