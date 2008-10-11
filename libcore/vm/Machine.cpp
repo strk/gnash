@@ -498,9 +498,14 @@ Machine::execute()
 /// Equivalent: ACTION_BRANCHIFTRUE
 	case SWF::ABC_ACTION_IFTRUE:
 	{
-		bool truth = mStack.top(0).to_bool();
-		mStack.drop(1);
-		JUMPIF(truth);
+		boost::int32_t bytes = mStream->read_S24();
+		if(pop_stack().to_bool()){
+			LOG_DEBUG_AVM("Jumping %d bytes.",bytes);
+			mStream->seekBy(bytes);
+		}
+		else{
+			LOG_DEBUG_AVM("Would have jumpied %d bytes.", bytes);
+		}
 		break;
 	}
 /// 0x12 ABC_ACTION_IFFALSE

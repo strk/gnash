@@ -1273,8 +1273,19 @@ check(!String.prototype.hasOwnProperty('length'));
 
 #endif
 
-#if OUTPUT_VERSION < 6
- check_totals(324);
-#else
- check_totals(340);
+var mingTests = 23;
+var lt6Tests = 301;
+var ge6Tests = 317;
+var totalTests = 0;
+
+#ifdef MING_SUPPORTS_ASM
+totalTests += mingTests;
 #endif
+
+#if OUTPUT_VERSION < 6
+totalTests += lt6Tests;
+#else
+totalTests += ge6Tests;
+#endif
+
+check_totals(totalTests);
