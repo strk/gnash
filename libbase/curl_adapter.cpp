@@ -360,6 +360,7 @@ CurlSession::unlockSharedHandle(CURL* handle, curl_lock_data data)
  *
  **********************************************************************/
 
+/// libcurl based IOChannel, for network uri accesses
 class CurlStreamFile : public IOChannel
 {
 
