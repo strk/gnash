@@ -1325,10 +1325,12 @@ Machine::execute()
 		}
 		else{
  			LOG_DEBUG_AVM("Object %s is not a constructor",constructor_val.toDebugString());
-			constructor_val = constructor_val.to_object().get()->getMember(NSV::PROP_CONSTRUCTOR,0);
-			boost::intrusive_ptr<as_function> constructor = constructor_val.to_as_function();
-			boost::intrusive_ptr<as_object> newobj = constructor->constructInstance(env, args);
-			push_stack(newobj);
+			as_value val = constructor_val.to_object().get()->getMember(NSV::PROP_CONSTRUCTOR,0);
+			as_value result = call_method(val,&env,constructor_val.to_object().get(),args);
+			push_stack(result);
+//			boost::intrusive_ptr<as_function> constructor = constructor_val.to_as_function();
+//			boost::intrusive_ptr<as_object> newobj = constructor->constructInstance(env, args);
+//			push_stack(newobj);
 		}
 		
 		break;
