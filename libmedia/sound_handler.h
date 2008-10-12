@@ -153,8 +153,9 @@ public:
 	/// 	loop_count == 0 means play the sound once (1 means play it twice, etc)
 	///
 	/// @param secondOffset
-	/// 	When starting soundstreams there sometimes is a offset to make the sound
-	/// 	start at the exact right moment.
+	/// 	When starting event sounds there sometimes is a offset to make the sound
+	/// 	start at the exact right moment. Gnash supports this troough 'Sound' AS
+	///	class only, not from the actual control tag (StartSound).
 	///
 	/// @param start
 	/// 	When starting a soundstream from a random frame, this tells where in the
@@ -164,7 +165,10 @@ public:
 	/// 	Some eventsounds have some volume control mechanism called envelopes.
 	/// 	They basically tells that from sample X the volume should be Y.
 	///
-	virtual void	play_sound(int sound_handle, int loop_count, int secondOffset, long start, const std::vector<sound_envelope>* envelopes) = 0;
+	/// TODO: add out_point parameter (when to stop playing the sound)
+	///
+	virtual void	play_sound(int sound_handle, int loop_count, int secondOffset,
+					long start, const std::vector<sound_envelope>* envelopes) = 0;
 
 	/// Remove all scheduled request for playback of sound buffer slots
 	virtual void	stop_all_sounds() = 0;
