@@ -97,8 +97,6 @@ libgnashbase_la_SOURCES = \
 	image.cpp \
 	$(MALLOC) \
 	GnashImageJpeg.cpp \
-	GnashImagePng.cpp \
-	GnashImageGif.cpp \
 	log.cpp	\
 	memory.cpp \
 	rc.cpp \
@@ -120,6 +118,13 @@ libgnashbase_la_SOURCES = \
 	arg_parser.cpp \
 	$(NULL)
 
+if USE_PNG
+libgnashbase_la_SOURCES += GnashImagePng.cpp
+endif
+if USE_GIF
+libgnashbase_la_SOURCES += GnashImageGif.cpp
+endif
+
 noinst_HEADERS = \
 	$(LIBLTDLHEAD) \
 	SimpleBuffer.h \
@@ -129,8 +134,6 @@ noinst_HEADERS = \
 	image.h	\
 	jemtree.h \
 	GnashImage.h \
-	GnashImagePng.h \
-	GnashImageGif.h \
 	GnashImageJpeg.h \
 	GnashSleep.h \
 	gmemory.h \
@@ -164,6 +167,14 @@ noinst_HEADERS = \
 	Range2d.h \
 	snappingrange.h \
 	$(NULL)
+
+if USE_PNG
+noinst_HEADERS += GnashImagePng.h
+endif
+if USE_GIF
+noinst_HEADERS += GnashImageGif.h
+endif
+
 
 libgnashbase_la_LDFLAGS = -release $(VERSION)
 
