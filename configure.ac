@@ -861,10 +861,11 @@ AM_CONDITIONAL(BUILD_METOME_EXT, [ test x$ext_metome = xyes ])
 AM_CONDITIONAL(BUILD_EXTENSIONS, [ test -n "$extensions_list"])
 
 AC_MSG_CHECKING([For the version of libtool])
-if test "x$darwin" != x; then
-LIBTOOLIZE=glibtoolize
+if test -d libltdl/libltdl; then
+ltver=2.x
+else
+ltver=1.x
 fi
-ltver=`${LIBTOOLIZE:-libtoolize} --version | head -1 | cut -d ' ' -f 4`
 ltmajor=`echo $ltver | cut -d '.' -f 1`
 AC_MSG_RESULT([$ltver])
 if test $ltmajor -eq 1; then
