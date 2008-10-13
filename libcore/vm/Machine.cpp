@@ -1186,21 +1186,36 @@ Machine::execute()
 	case SWF::ABC_ACTION_CALLPROPLEX:
 	case SWF::ABC_ACTION_CALLPROPVOID:
 	{
-
+		as_value result;
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
 		boost::uint32_t argc = mStream->read_V32();
 		std::auto_ptr< std::vector<as_value> > args = get_args(argc);
 		//TODO: If multiname is runtime also pop namespace and/or name values.
 		as_value object_val = pop_stack();
-		as_object *object = object_val.to_object().get();
-		as_value property = object->getMember(a.getGlobalName(),0);
-		LOG_DEBUG_AVM("Calling method %s on object %s",property.toDebugString(),object_val.toDebugString());
-		as_environment env = as_environment(_vm);
-		as_value result = call_method(property,&env,object,args);
 
-		if(opcode == SWF::ABC_ACTION_CALLPROPERTY){
-			push_stack(result);
+		if(object_val.is_undefined()){
+			LOG_DEBUG_AVM("Can't call a method on an undefined object.");
 		}
+		else{
+
+			as_object *object = object_val.to_object().get();
+			as_value property = object->getMember(a.getGlobalName(),0);
+		
+			if(!property.is_undefined()){
+				LOG_DEBUG_AVM("Calling method %s on object %s",property.toDebugString(),object_val.toDebugString());
+				as_environment env = as_environment(_vm);
+				result = call_method(property,&env,object,args);
+
+			}
+			else{
+				LOG_DEBUG_AVM("Method is undefined cannot call method on object %s",object_val.toDebugString());
+			}
+
+		}
+			if(opcode == SWF::ABC_ACTION_CALLPROPERTY){
+				push_stack(result);
+			}
+
 /*		int shift = completeName(a, argc);
 		ENSURE_OBJECT(mStack.top(shift + argc));
 		as_object *obj = mStack.top(argc + shift).to_object().get();
