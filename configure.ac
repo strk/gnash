@@ -861,7 +861,7 @@ AM_CONDITIONAL(BUILD_METOME_EXT, [ test x$ext_metome = xyes ])
 AM_CONDITIONAL(BUILD_EXTENSIONS, [ test -n "$extensions_list"])
 
 AC_MSG_CHECKING([For the version of libtool])
-if test -d libltdl/libltdl; then
+if test -d ${srcdir}/libltdl/libltdl; then
 ltver=2.x
 else
 ltver=1.x
