@@ -2054,14 +2054,16 @@ Machine::execute()
 	}
 /// 0xA1 ABC_ACTION_SUBTRACT
 /// Stack In:
-///  a
 ///  b
+///  a
 /// Stack Out:
 ///  a - b (double)
 	case SWF::ABC_ACTION_SUBTRACT:
 	{
-		mStack.top(1) = mStack.top(1).to_number() - mStack.top(1).to_number();
-		mStack.drop(1);
+		as_value b = pop_stack();
+		as_value a = pop_stack();
+		a.subtract(b);
+		push_stack(a);
 		break;
 	}
 /// 0xA2 ABC_ACTION_MULTIPLY
