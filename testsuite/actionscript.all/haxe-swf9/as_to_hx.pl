@@ -231,8 +231,9 @@ while(<STDIN>){
 		skip_line();
 		next;
 	}
-	#Replace String in "for .. in" loops that iterator over String's properties with Reflect.fields(String).
-	$_ =~ s/(for\s*\(\s*\w+\s*in\s*)String\s*\)/$1Reflect\.fields\(String\)\)/g;
+	#Replace String in "for .. in" loops that iterator over String's properties with 
+	#Type.getInstanceFields(String).
+	$_ =~ s/(for\s*\(\s*\w+\s*in\s*)String\s*\)/$1Type\.getInstanceFields\(String\)\)/g;
 
 	#Remove calls to String.gotcha.  I cannot find a Haxe equivilent for this.
 	if($_ =~ /String.gotcha/){
