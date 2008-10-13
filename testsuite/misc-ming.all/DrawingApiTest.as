@@ -620,8 +620,9 @@ with(cursor)
 	onEnterFrame = function()
 	{
 		hd = _root.hitdetector;
-
-#if 0 // don't move the controls for now...
+		
+// don't move the controls for now...
+#if 0
 		with(hd)
 		{
 			if ( typeof(xshift) == 'undefined' )
