@@ -40,10 +40,7 @@
 
 namespace gnash {
 
-static as_value loadvars_addRequestHeader(const fn_call& fn);
-static as_value loadvars_load(const fn_call& fn);
 static as_value loadvars_send(const fn_call& fn);
-static as_value loadvars_sendAndLoad(const fn_call& fn);
 static as_value loadvars_tostring(const fn_call& fn);
 static as_value loadvars_ctor(const fn_call& fn);
 
@@ -142,13 +139,18 @@ LoadVars_as::LoadVars_as()
 void
 LoadVars_as::attachLoadVarsInterface(as_object& o)
 {
-	o.init_member("addRequestHeader", new builtin_function(loadvars_addRequestHeader));
+	o.init_member("addRequestHeader", new builtin_function(
+	            LoadableObject::loadableobject_addRequestHeader));
 	o.init_member("decode", new builtin_function(LoadVars_as::decode_method));
-	o.init_member("getBytesLoaded", new builtin_function(LoadVars_as::getBytesLoaded_method));
-	o.init_member("getBytesTotal", new builtin_function(LoadVars_as::getBytesTotal_method));
-	o.init_member("load", new builtin_function(loadvars_load));
+	o.init_member("getBytesLoaded", new builtin_function(
+	            LoadVars_as::getBytesLoaded_method));
+	o.init_member("getBytesTotal", new builtin_function(
+	            LoadVars_as::getBytesTotal_method));
+	o.init_member("load", new builtin_function(
+	            LoadableObject::loadableobject_load));
 	o.init_member("send", new builtin_function(loadvars_send));
-	o.init_member("sendAndLoad", new builtin_function(loadvars_sendAndLoad));
+	o.init_member("sendAndLoad", new builtin_function(
+	            LoadableObject::loadableobject_sendAndLoad));
 	o.init_member("toString", new builtin_function(loadvars_tostring));
 	o.init_member("onData", new builtin_function(LoadVars_as::onData_method));
 	o.init_member("onLoad", new builtin_function(LoadVars_as::onLoad_method));
@@ -164,113 +166,6 @@ LoadVars_as::getLoadVarsInterface()
 		attachLoadVarsInterface(*o);
 	}
 	return o.get();
-}
-
-
-as_value
-loadvars_addRequestHeader(const fn_call& fn)
-{
-    
-	boost::intrusive_ptr<LoadVars_as> ptr = ensureType<LoadVars_as>(fn.this_ptr);   
-
-    as_value customHeaders;
-    as_object* array;
-
-    if (ptr->get_member(NSV::PROP_uCUSTOM_HEADERS, &customHeaders))
-    {
-        array = customHeaders.to_object().get();
-        if (!array)
-        {
-            IF_VERBOSE_ASCODING_ERRORS(
-                log_aserror(_("LoadVars.addRequestHeader: "
-                         "LoadVars._customHeaders is not an object"));
-            );
-            return as_value();
-        }
-    }
-    else
-    {
-        array = new Array_as;
-        // This property is always initialized on the first call to
-        // addRequestHeaders.
-        ptr->set_member(NSV::PROP_uCUSTOM_HEADERS, array);
-    }
-
-    if (fn.nargs == 0)
-    {
-        // Return after having initialized the _customHeaders array.
-        IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("LoadVars.addRequestHeader requires at least "
-                          "one argument"));
-        );
-        return as_value();
-    }
-    
-    if (fn.nargs == 1)
-    {
-        // This must be an array. Keys / values are pushed in valid
-        // pairs to the _customHeaders array.    
-        boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
-        Array_as* headerArray = dynamic_cast<Array_as*>(obj.get());
-
-        if (!headerArray)
-        {
-            IF_VERBOSE_ASCODING_ERRORS(
-                log_aserror(_("LoadVars.addRequestHeader: single argument "
-                                "is not an array"));
-            );
-            return as_value();
-        }
-
-        Array_as::const_iterator e = headerArray->end();
-        --e;
-
-        for (Array_as::const_iterator i = headerArray->begin(); i != e; ++i)
-        {
-            // Only even indices can be a key, and they must be a string.
-            if (i.index() % 2) continue;
-            if (!(*i).is_string()) continue;
-            
-            // Only the immediately following odd number can be 
-            // a value, and it must also be a string.
-            const as_value& val = headerArray->at(i.index() + 1);
-            if (val.is_string())
-            {
-                array->callMethod(NSV::PROP_PUSH, *i, val);
-            }
-        }
-        return as_value();
-    }
-        
-    if (fn.nargs > 2)
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-            std::ostringstream ss;
-            fn.dump_args(ss);
-            log_aserror(_("LoadVars.addRequestHeader(%s): arguments after the"
-                            "second will be discarded"), ss.str());
-        );
-    }
-    
-    // Push both to the _customHeaders array.
-    const as_value& name = fn.arg(0);
-    const as_value& val = fn.arg(1);
-    
-    // Both arguments must be strings.
-    if (!name.is_string() || !val.is_string())
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-            std::ostringstream ss;
-            fn.dump_args(ss);
-            log_aserror(_("LoadVars.addRequestHeader(%s): both arguments "
-                        "must be a string"), ss.str());
-        );
-        return as_value(); 
-    }
-
-    array->callMethod(NSV::PROP_PUSH, name, val);
-    
-    return as_value();
 }
 
 
@@ -352,32 +247,6 @@ LoadVars_as::onLoad_method(const fn_call& /*fn*/)
 	return as_value();
 }
 
-static as_value
-loadvars_load(const fn_call& fn)
-{
-	boost::intrusive_ptr<LoadVars_as> obj = ensureType<LoadVars_as>(fn.this_ptr);
-
-	if ( fn.nargs < 1 )
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("LoadVars.load() requires at least one argument"));
-		);
-		return as_value(false);
-	}
-
-	const std::string& urlstr = fn.arg(0).to_string();
-	if ( urlstr.empty() )
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("LoadVars.load(): invalid empty url"));
-		);
-		return as_value(false);
-	}
-
-	obj->load(urlstr);
-	return as_value(true);
-	
-}
 
 static as_value
 loadvars_send(const fn_call& fn)
@@ -387,46 +256,6 @@ loadvars_send(const fn_call& fn)
 	return as_value(); 
 }
 
-static as_value
-loadvars_sendAndLoad(const fn_call& fn)
-{
-	boost::intrusive_ptr<LoadVars_as> ptr = ensureType<LoadVars_as>(fn.this_ptr);
-
-	if ( fn.nargs < 2 )
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("LoadVars.sendAndLoad() requires at least two arguments"));
-		);
-		return as_value(false);
-	}
-
-	const std::string& urlstr = fn.arg(0).to_string();
-	if ( urlstr.empty() )
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("LoadVars.sendAndLoad(): invalid empty url"));
-		);
-		return as_value(false);
-	}
-
-	if (!fn.arg(1).is_object())
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		    log_aserror(_("LoadVars.sendAndLoad(): invalid target (must be an object)"));
-		);
-		return as_value(false);
-	}
-
-
-	boost::intrusive_ptr<as_object> target = fn.arg(1).to_object();
-
-	// Post by default, override by ActionScript third argument
-	bool post = true;
-	if ( fn.nargs > 2 && fn.arg(2).to_string() == "GET" ) post = false;
-
-	ptr->sendAndLoad(urlstr, *target, post);
-	return as_value(true);
-}
 
 static as_value
 loadvars_tostring(const fn_call& fn)

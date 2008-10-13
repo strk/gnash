@@ -1208,6 +1208,11 @@ if test x"$gcc_cv_ld_as_needed" = xyes; then
 fi
 AC_MSG_RESULT($gcc_cv_ld_as_needed)
 
+AC_DEFINE(USE_GIF, [1], [Use the GIF library])
+AC_DEFINE(USE_PNG, [1], [Use the PNG library])
+AM_CONDITIONAL(USE_GIF, true)
+AM_CONDITIONAL(USE_PNG, true)
+
 dnl GNASH_PKG_FIND(dmalloc, [dmalloc.h], [dmalloc], mallinfo)
 AM_CONDITIONAL(HAVE_DMALLOC, [ test x$has_dmalloc = xyes ])
 

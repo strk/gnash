@@ -796,7 +796,7 @@ GtkGui::addGnashIcon(GtkWindow* window)
     GdkPixbuf *window_icon_pixbuf = createPixbuf ("GnashG.png");
     if (window_icon_pixbuf) {
         gtk_window_set_icon (GTK_WINDOW (window), window_icon_pixbuf);
-	gdk_pixbuf_unref (window_icon_pixbuf);
+		gdk_pixbuf_unref (window_icon_pixbuf);
     }
 }
 
@@ -1644,30 +1644,30 @@ void
 GtkGui::showAboutDialog()
 {
     const gchar *documentors[] = { 
-        "Rob Savoye", 
-        "Sandro Santilli",
+	"Rob Savoye", 
+	"Sandro Santilli",
 	"Ann Barcomb",
-        NULL 
+	NULL 
     };
 
     const gchar *artists[] = { 
 	"Jason Savoye",
-        NULL 
+	NULL
     };
 
     const gchar *authors[] = { 
-        "Rob Savoye", 
-        "Sandro Santilli", 
-        "Bastiaan Jacques", 
-        "Tomas Groth", 
-        "Udo Giacomozzi", 
-        "Hannes Mayr", 
-        "Markus Gothe", 
-        "Vitaly Alexeev",
+	"Rob Savoye", 
+	"Sandro Santilli", 
+	"Bastiaan Jacques", 
+	"Tomas Groth", 
+	"Udo Giacomozzi", 
+	"Hannes Mayr", 
+	"Markus Gothe", 
+	"Vitaly Alexeev",
 	"John Gilmore",
 	"Zou Lunkai",
 	"Benjamin Wolsey",
-        NULL 
+	NULL
     };
 
     std::string comments = _("Gnash is the GNU SWF Player based on GameSWF.");
@@ -1762,6 +1762,8 @@ GtkGui::showAboutDialog()
         "website", "http://www.gnu.org/software/gnash/",
         NULL);
 #endif
+	if (logo_pixbuf)
+		gdk_pixbuf_unref(logo_pixbuf);
 }
 
 void

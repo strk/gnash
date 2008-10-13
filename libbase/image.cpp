@@ -27,8 +27,12 @@
 #include "gnash.h" // for image file types
 #include "image.h"
 #include "GnashImage.h"
-#include "GnashImagePng.h"
-#include "GnashImageGif.h"
+#ifdef USE_PNG
+# include "GnashImagePng.h"
+#endif
+#ifdef USE_GIF
+# include "GnashImageGif.h"
+#endif
 #include "GnashImageJpeg.h"
 #include "IOChannel.h"
 #include "log.h"
@@ -193,10 +197,12 @@ namespace image
 
         switch (type)
         {
+#ifdef USE_PNG
             case GNASH_FILETYPE_PNG:
                 outChannel = PngImageOutput::create(out, width,
                         height, quality);
                 break;
+#endif
             case GNASH_FILETYPE_JPEG:
                 outChannel = JpegImageOutput::create(out, width,
                         height, quality);
@@ -229,12 +235,16 @@ namespace image
 
         switch (type)
         {
+#ifdef USE_PNG
             case GNASH_FILETYPE_PNG:
                 inChannel = PngImageInput::create(in);
                 break;
+#endif
+#ifdef USE_GIF                
             case GNASH_FILETYPE_GIF:
                 inChannel = GifImageInput::create(in);
                 break;
+#endif
             case GNASH_FILETYPE_JPEG:
                 inChannel = JpegImageInput::create(in);
                 break;
