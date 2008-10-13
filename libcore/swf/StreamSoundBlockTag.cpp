@@ -25,7 +25,6 @@
 #include "SoundInfo.h" // for loader
 #include "SWFStream.h"
 #include "log.h" 
-//#include "sound_definition.h" // for sound_sample
 
 namespace gnash {
 namespace SWF {
@@ -33,7 +32,6 @@ namespace SWF {
 void
 StreamSoundBlockTag::execute(sprite_instance* m, DisplayList& /*dlist*/) const
 {
-	// Make static ?
 	media::sound_handler* handler = get_sound_handler();
 	if (handler)
 	{
@@ -54,7 +52,7 @@ StreamSoundBlockTag::loader(SWFStream& in, tag_type tag, movie_definition& m)
     // If we don't have a sound_handler registered stop here
     if (!handler)
     {
-	// log_debug ?
+	    // log_debug ?
         return;
     }
 
@@ -69,7 +67,8 @@ StreamSoundBlockTag::loader(SWFStream& in, tag_type tag, movie_definition& m)
     if (!sinfo)
     {
         IF_VERBOSE_MALFORMED_SWF(
-        log_swferror(_("Found SOUNDSTREAMBLOCK tag w/out preceeding SOUNDSTREAMHEAD"));
+            log_swferror(_("Found SOUNDSTREAMBLOCK tag w/out preceding "
+                "SOUNDSTREAMHEAD"));
         );
         return;
     }
@@ -81,23 +80,25 @@ StreamSoundBlockTag::loader(SWFStream& in, tag_type tag, movie_definition& m)
     if (format == media::AUDIO_CODEC_MP3)
     {
         in.ensureBytes(4);
-	// FIXME: use these values !
+	    // FIXME: use these values !
         unsigned int samplesCount = in.read_u16(); UNUSED(samplesCount);
         unsigned int seekSamples = in.read_u16();
-	LOG_ONCE ( if ( seekSamples ) log_unimpl("MP3 soundblock seek samples") );
+	    if (seekSamples) LOG_ONCE(log_unimpl(_("MP3 soundblock seek samples")));
     }
 
     const unsigned int dataLength = in.get_tag_end_position() - in.tell();
     if ( ! dataLength )
     {
         IF_VERBOSE_MALFORMED_SWF(
-        LOG_ONCE( log_swferror("Empty SOUNDSTREAMBLOCK tag, seems common waste of space") );
+            LOG_ONCE(log_swferror("Empty SOUNDSTREAMBLOCK tag, seems common "
+                    "waste of space"));
         );
         return;
     }
 
     unsigned char *data = new unsigned char[dataLength];
-    const unsigned int bytesRead = in.read(reinterpret_cast<char*>(data), dataLength);
+    const unsigned int bytesRead = in.read(reinterpret_cast<char*>(data),
+            dataLength);
     
     if (bytesRead < dataLength)
     {
@@ -109,7 +110,8 @@ StreamSoundBlockTag::loader(SWFStream& in, tag_type tag, movie_definition& m)
     //
     // ownership of 'data' is transferred here
     //
-    long start = handler->fill_stream_data(data, dataLength, sample_count, handle_id);
+    long start = handler->fill_stream_data(data, dataLength, sample_count,
+            handle_id);
 
     // TODO: log_parse ?
 
