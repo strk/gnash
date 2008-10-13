@@ -174,15 +174,15 @@ check_equals(r.loaded, false);
 
 // For checking that the data were loaded with XML.prototype.load.
 x.onLoad = function(success) {
-    xcheck_equals(x['var2'], 'val2');
+    check_equals(x['var2'], 'val2');
     play();
 };
 
 // The two objects are also interchangeable for these functions.
 x.sendAndLoad = XML.prototype.sendAndLoad;
-xcheck_equals(x.sendAndLoad("some server name", r), true);
+check_equals(x.sendAndLoad("some server name", r), true);
 x.load = XML.prototype.load;
-xcheck_equals(x.load( MEDIA(vars.txt) ), true);
+check_equals(x.load( MEDIA(vars.txt) ), true);
 stop();
 
 //--------------------------------------------------------------------------
