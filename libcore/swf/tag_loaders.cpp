@@ -1224,7 +1224,7 @@ define_sound_loader(SWFStream& in, tag_type tag, movie_definition& m)
         // quoted from
         // http://www-lehre.informatik.uni-osnabrueck.de/~fbstark/diplom/docs/swf/Sounds.htm
         //
-        LOG_ONCE ( if ( delay_seek ) log_unimpl("MP3 delay seek") );
+        if ( delay_seek ) { LOG_ONCE( log_unimpl("MP3 delay seek") ); }
     }
 
     IF_VERBOSE_PARSE
