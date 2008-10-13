@@ -59,6 +59,10 @@ public:
     return GST_BUFFER_DATA(_buffer);
   }
 
+  const boost::uint8_t* data() const
+  {
+    return GST_BUFFER_DATA(_buffer);
+  }
   std::auto_ptr<image::ImageBase> clone() const
   {
     return std::auto_ptr<ImageBase>(new ImageRGB(*this));

@@ -72,7 +72,7 @@ namespace image
 
 	void ImageBase::update(boost::uint8_t* data)
 	{
-		std::memcpy(_data.get(), data, _size);
+		std::memcpy(this->data(), data, _size);
 	}
 
 	void ImageBase::update(const ImageBase& from)
@@ -80,24 +80,24 @@ namespace image
 		assert(from._pitch == _pitch);
 		assert(_size <= from._size);
 		assert(_type == from._type);
-		std::memcpy(_data.get(), from._data.get(), _size);
+		std::memcpy(data(), from.data(), _size);
 	}
 
     void ImageBase::clear(const boost::uint8_t byteValue)
     {
-        std::memset(_data.get(), byteValue, _size);
+        std::memset(data(), byteValue, _size);
     }
 
 	boost::uint8_t* ImageBase::scanline(size_t y)
 	{
 		assert(y < _height);
-		return _data.get() + _pitch * y;
+		return data() + _pitch * y;
 	}
 
 	const boost::uint8_t* ImageBase::scanlinePointer(size_t y) const
 	{
 		assert(y < _height);
-		return _data.get() + _pitch * y;
+		return data() + _pitch * y;
 	}
 
 
@@ -159,7 +159,7 @@ namespace image
         assert (bufferLength * 4 <= _size);
 
         for (size_t i = 0; i < bufferLength; i++) {
-            _data[4 * i + 3] = alphaData[i];
+            data()[4 * i + 3] = alphaData[i];
         }
     }
 

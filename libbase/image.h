@@ -119,6 +119,7 @@ namespace image
 
 		/// Return a pointer to the underlying data
 		virtual boost::uint8_t* data() { return _data.get(); }
+		virtual const boost::uint8_t* data() const { return _data.get(); }
 
 		/// Return a pointer to first byte of given line
 		DSOEXPORT boost::uint8_t* scanline(size_t y);
