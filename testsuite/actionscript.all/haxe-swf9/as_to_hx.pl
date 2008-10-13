@@ -73,13 +73,6 @@ while(<STDIN>){
 			$vars{$2} = 1;
 		}
 	}
-	
-	#CHECK 4 - Must run before CHECK 5.3
-	#Skip calls to slice there isn't an exact Haxe equivalent to this.
-	if($_ =~ /\.slice\(.+\)/){
-		skip_line();
-		next;
-	}
 
 	if(index($_,"new") != $[-1){
 		#Replace things like: new String; with new String();
