@@ -125,9 +125,16 @@ while(<STDIN>){
 		skip_line();
 		next;
 	}
+	
+	#Replace things like String.charCodeAt with Reflect.field(String,'charCodeAt').
+	$_ =~ s/(\w+)\.(\w+)\s*([\.\)])/Reflect.field($1,'$2')$3/g;
+
 	#Replace typeof:
-	#TODO: Figure out the difference between typeof and typeOf
-	if($_ =~ /type[Oo]f/ ){
+	#TODO: Handle typeof and typeOf differently?
+	$_ =~ s/type[Oo]f\(\s*(\S+)\s*\)/Type.typeof($1)/g;
+
+	#Skip String()
+	if($_ =~ /String\(\)/){
 		skip_line();
 		next;
 	}
