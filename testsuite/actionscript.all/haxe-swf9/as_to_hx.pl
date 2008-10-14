@@ -226,11 +226,11 @@ while(<STDIN>){
 		next;
 	}
 	
-	#Remove calls to chr and ord.  I think these have been depreciated since SWF v5.
-	if($_ =~ /ord\(.+\)/ || $_ =~ /chr\(.+\)/){
-		skip_line();
-		next;
-	}
+	#Convert calls to chr and ord.  I think these have been depreciated since SWF v5.
+	$_ =~ s/chr\(\s*(\w+)\s*\)/String.fromCharCode($1)/g;
+	$_ =~ s/ord\(\s*(\S+)\s*\)/$1.charCodeAt(0)/g;
+
+
 	#Replace String in "for .. in" loops that iterator over String's properties with 
 	#Type.getInstanceFields(String).
 	$_ =~ s/(for\s*\(\s*\w+\s*in\s*)String\s*\)/$1Type\.getInstanceFields\(String\)\)/g;
