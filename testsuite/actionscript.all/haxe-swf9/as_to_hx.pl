@@ -127,7 +127,7 @@ while(<STDIN>){
 	}
 	
 	#Replace things like String.charCodeAt with Reflect.field(String,'charCodeAt').
-	$_ =~ s/(\w+)\.(\w+)\s*([\.\)])/Reflect.field($1,'$2')$3/g;
+	$_ =~ s/([a-zA-Z]+)\.([a-zA-Z]+)\s*([\.\)])/Reflect.field($1,'$2')$3/g;
 
 	#Replace typeof:
 	#TODO: Handle typeof and typeOf differently?
