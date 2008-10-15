@@ -95,7 +95,7 @@ namespace utf8
 	//
 	/// Allows storage of Latin1 (ISO-8859-1) characters. This
 	/// is the format of SWF5 and below.
-	std::string encodeLatin1Character(boost::uint32_t ucsCharacter);
+	DSOEXPORT std::string encodeLatin1Character(boost::uint32_t ucsCharacter);
 
 	enum TextEncoding {
 		encUNSPECIFIED,

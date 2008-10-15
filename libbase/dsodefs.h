@@ -22,8 +22,9 @@
 #include "gnashconfig.h"
 #endif
 
-#ifdef _MSC_VER
-	#ifdef BUILDING_DLL
+#if defined(_MSC_VER) || defined(WIN32) || defined(_WIN32)
+	// #ifdef BUILDING_DLL
+	#ifdef DLL_EXPORT
 		#define DSOEXPORT __declspec(dllexport)
 	#else
 		// Temporarily commented because of VC++ compiler problems 

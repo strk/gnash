@@ -193,6 +193,10 @@ endif
 
 #libgnashasobjs_la_LDFLAGS = -release $(VERSION) -no-undefined -export-dynamic
 
+if WIN32
+  libgnashasobjs_la_LDFLAGS = -no-undefined
+endif
+
 # Rebuild with GCC 4.x Mudflap support
 mudflap:
 	@echo "Rebuilding with GCC Mudflap support"

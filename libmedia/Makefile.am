@@ -46,6 +46,7 @@ libgnashmedia_la_CPPFLAGS = \
 	$(CURL_CFLAGS) \
 	$(Z_CFLAGS) \
 	$(JPEG_CFLAGS) \
+	$(GIF_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(INCLTDL) \
 	$(NULL)
@@ -59,7 +60,9 @@ DMALLOC_FILE = dlmalloc.c
 endif
 
 libgnashmedia_la_LIBADD = \
+	$(PNG_LIBS) \
 	$(JPEG_LIBS) \
+	$(GIF_LIBS) \
 	$(Z_LIBS) \
 	$(CURL_LIBS) \
 	$(OPENGL_LIBS) \
@@ -153,6 +156,14 @@ if USE_FFMPEG_ENGINE
 endif
 
 libgnashmedia_la_LDFLAGS = -release $(VERSION)
+
+if WIN32
+  libgnashmedia_la_LDFLAGS += -no-undefined
+  libgnashmedia_la_LIBADD += \
+	$(top_builddir)/libbase/libgnashbase.la \
+	$(top_builddir)/libcore/libgnashcore.la \
+	-lintl
+endif
 
 #libltdlc_la_CPPFLAGS = $(LTDLINCL)
 #if CONVENIENCE_LTDL

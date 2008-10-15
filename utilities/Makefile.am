@@ -63,7 +63,7 @@ AM_CPPFLAGS = \
 	$(NULL)
 
 if WIN32
- GNASH_LIBS += -lintl -lz -lws2_32
+  GNASH_LIBS += -lintl -lz -lws2_32
 endif
 
 if USE_FFMPEG_ENGINE
@@ -82,11 +82,9 @@ bin_PROGRAMS = gprocessor soldumper dumpshm flvdumper # rtmpget
 #check_PROGRAMS = gdebug.swf
 
 gprocessor_SOURCES = processor.cpp
-gprocessor_CPPFLAGS = $(AM_CPPFLAGS)
 # export our symbols so they can be used by Gnash plugins
-gprocessor_LDFLAGS = -export-dynamic $(AM_LDFLAGS)
+gprocessor_LDFLAGS = -export-dynamic
 gprocessor_LDADD = $(GNASH_LIBS) 
-#gprocessor_DEPENDENCIES = 
 
 dumpshm_SOURCES = dumpshm.cpp
 dumpshm_LDADD = $(GNASH_LIBS)

@@ -82,6 +82,10 @@ libgnashbase_la_LIBADD = \
 	$(PTHREAD_LIBS) \
 	$(NULL)
 
+if WIN32
+  libgnashbase_la_LIBADD += -lws2_32 -lwinmm
+endif
+
 # Maybe use jemalloc, which handles memory fragmentation for
 # ECAMscript languages better than the regular system malloc.
 # This is controlled by the --enable-jemalloc (disabled by default)
@@ -177,6 +181,11 @@ endif
 
 
 libgnashbase_la_LDFLAGS = -release $(VERSION)
+
+if WIN32
+  libgnashbase_la_LDFLAGS += -no-undefined
+  libgnashbase_la_LIBADD += -lws2_32 -lwinmm
+endif
 
 if !LIBLTDL2
 libltdlc_la_CPPFLAGS = $(LTDLINCL) -I$(top_srcdir)/libltdl

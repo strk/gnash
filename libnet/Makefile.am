@@ -71,6 +71,10 @@ libgnashnet_la_SOURCES = \
 	rtmp_server.cpp \
 	statistics.cpp
 
+if WIN32
+  AM_LDFLAGS += -no-undefined
+endif
+
 # Rebuild with GCC 4.x Mudflap support
 mudflap:
 	@echo "Rebuilding with GCC Mudflap support"
