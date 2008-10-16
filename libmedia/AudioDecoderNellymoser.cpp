@@ -52,11 +52,6 @@
 #include <cmath>
 #include "VM.h"
 
-#ifdef _WIN32
-#define random rand
-#define srandom srand
-#endif
-
 namespace gnash {
 namespace media {
 
@@ -744,8 +739,9 @@ static void nelly_free_handle(nelly_handle *nh)
 {
 	delete nh;
 }
-	
-AudioDecoderNellymoser::AudioDecoderNellymoser ()
+
+
+AudioDecoderNellymoser::AudioDecoderNellymoser()
 	:
 	_sampleRate(0),
 	_stereo(false)
@@ -753,31 +749,56 @@ AudioDecoderNellymoser::AudioDecoderNellymoser ()
 	_nh = nelly_get_handle();
 }
 
+	
+AudioDecoderNellymoser::AudioDecoderNellymoser(AudioInfo& info)
+	:
+	_sampleRate(0),
+	_stereo(false)
+{
+    setup(info);
+	_nh = nelly_get_handle();
+}
+
+
+AudioDecoderNellymoser::AudioDecoderNellymoser(SoundInfo& info)
+	:
+	_sampleRate(0),
+	_stereo(false)
+{
+    setup(info);
+	_nh = nelly_get_handle();
+}
+
+
 AudioDecoderNellymoser::~AudioDecoderNellymoser()
 {
 	nelly_free_handle(_nh);
 }
 
-bool AudioDecoderNellymoser::setup(SoundInfo* info)
+void AudioDecoderNellymoser::setup(SoundInfo& info)
 {
-	if (info->getFormat() == AUDIO_CODEC_NELLYMOSER || info->getFormat() == AUDIO_CODEC_NELLYMOSER_8HZ_MONO) {
-		_sampleRate = info->getSampleRate();
-		_stereo = info->isStereo();
-		return true;
-	} else {
-		return false;
-	}
+
+	if (info.getFormat() == AUDIO_CODEC_NELLYMOSER ||
+	    info.getFormat() == AUDIO_CODEC_NELLYMOSER_8HZ_MONO) {
+		_sampleRate = info.getSampleRate();
+		_stereo = info.isStereo();
+		return;
+	} 
+	throw MediaException("AudioDecoderNellymoser: attempt to use with "
+		                "non-nellymoser codec");
 }
 
-bool AudioDecoderNellymoser::setup(AudioInfo* info)
+void AudioDecoderNellymoser::setup(AudioInfo& info)
 {
-	if (info->type == FLASH && (info->codec == AUDIO_CODEC_NELLYMOSER || info->codec == AUDIO_CODEC_NELLYMOSER_8HZ_MONO)) {
-		_sampleRate = info->sampleRate;
-		_stereo = info->stereo;
-		return true;
-	} else {
-		return false;
+	if (info.type == FLASH && (info.codec == AUDIO_CODEC_NELLYMOSER ||
+	        info.codec == AUDIO_CODEC_NELLYMOSER_8HZ_MONO)) {
+		_sampleRate = info.sampleRate;
+		_stereo = info.stereo;
+		return;
 	}
+
+	throw MediaException("AudioDecoderNellymoser: attempt to use with "
+		                "non-nellymoser codec");
 }
 
 float* AudioDecoderNellymoser::decode(boost::uint8_t* in_buf, boost::uint32_t inputSize, boost::uint32_t* outputSize)

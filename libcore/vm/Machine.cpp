@@ -782,7 +782,7 @@ Machine::execute()
 		as_object *obj = mStack.top(1).to_object().get();
 		boost::uint32_t index = mStack.top(0).to_number<boost::uint32_t>();
 		mStack.drop(1);
-		Property *b = obj->getByIndex(index);
+		const Property *b = obj->getByIndex(index);
 		if (b)
 			mStack.top(0) = mST.value(b->getName());
 		else
@@ -1097,7 +1097,7 @@ Machine::execute()
 		boost::uint32_t argc = mStream->read_V32();
 		ENSURE_OBJECT(mStack.top(argc));
 		as_object *obj = mStack.top(argc).to_object().get();
-		Property *f = obj->getByIndex(dispatch_id);
+		const Property *f = obj->getByIndex(dispatch_id);
 		as_function* func;
 #if 0
 		if (f->isGetterSetter())
@@ -1391,7 +1391,7 @@ Machine::execute()
 	{
 		boost::uint32_t asize = mStream->read_V32();
 		LOG_DEBUG_AVM("Creating array of size %u",asize);
-		as_array_object *arr = new as_array_object;
+		Array_as *arr = new Array_as;
 		arr->resize(asize);
 		boost::uint32_t i = asize;
 		while (i--){

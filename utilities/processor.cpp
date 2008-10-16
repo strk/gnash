@@ -50,13 +50,9 @@
 #include "StringPredicates.h"
 #include "smart_ptr.h"
 #include "IOChannel.h" // for proper dtor call
+#include "GnashSleep.h" // for usleep comptibility.
 
 extern "C"{
-	#include <unistd.h>
-#ifdef _WIN32
-#include <windows.h>
-#define usleep(t) Sleep((t) / 1000)
-#endif
 #ifdef HAVE_GETOPT_H
 	#include <getopt.h>
 #endif
@@ -417,8 +413,8 @@ play_movie(const char* filename)
     long clockAdvance = fpsDelay/1000;
     long localDelay = delay == -1 ? fpsDelay : delay; // microseconds
 
-    log_debug("Will sleep %ld microseconds between iterations - fps is %g, clockAdvance is %lu", 
-                        localDelay, fps, clockAdvance);
+    log_debug("Will sleep %ld microseconds between iterations - "
+            "fps is %g, clockAdvance is %lu", localDelay, fps, clockAdvance);
 
     // Use a clock advanced at every iteration to match exact FPS speed.
     ManualClock cl;
@@ -440,8 +436,9 @@ play_movie(const char* filename)
         return md;
     }
 
-    log_debug("iteration, timer: %lu, localDelay: %ld\n", cl.elapsed(), localDelay);
-    usleep(localDelay);
+    log_debug("iteration, timer: %lu, localDelay: %ld\n",
+            cl.elapsed(), localDelay);
+    gnashSleep(localDelay);
     
     resetLastAdvanceTimer();
     int	kick_count = 0;
@@ -543,8 +540,9 @@ play_movie(const char* filename)
 	    resetLastAdvanceTimer();
 	}
 
-	log_debug("iteration, timer: %lu, localDelay: %ld\n", cl.elapsed(), localDelay);
-	usleep(localDelay);
+	log_debug("iteration, timer: %lu, localDelay: %ld\n",
+            cl.elapsed(), localDelay);
+    gnashSleep(localDelay);
     }
     
     return md;

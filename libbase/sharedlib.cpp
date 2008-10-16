@@ -32,6 +32,9 @@
 #include <iostream>
 #include <cstdlib>
 
+#if defined(WIN32) || defined(_WIN32)
+#define LIBLTDL_DLL_IMPORT 1
+#endif
 #include <ltdl.h>
 #ifdef HAVE_DLFCN_H
 	#include <dlfcn.h>

@@ -44,8 +44,8 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef __AUDIODECODERNELLYMOSER_H__
-#define __AUDIODECODERNELLYMOSER_H__
+#ifndef GNASH_AUDIODECODERNELLYMOSER_H
+#define GNASH_AUDIODECODERNELLYMOSER_H
 
 #include "log.h"
 #include "AudioDecoder.h"
@@ -75,14 +75,29 @@ namespace gnash {
 namespace media {
 
 /// Audio decoding using internal Nellymoser decoder.
+/// TODO: as ffmpeg now has Nellymoser support (maintained
+/// by people who know what they're doing, I hope), do
+/// we need this?
 class AudioDecoderNellymoser : public AudioDecoder {
 
 public:
-	AudioDecoderNellymoser();
-	~AudioDecoderNellymoser();
 
-	bool setup(AudioInfo* info);
-	bool setup(SoundInfo* info);
+    /// This is needed by gstreamer still. TODO: drop.
+    AudioDecoderNellymoser();
+
+	/// @param info
+	/// 	AudioInfo class with all the info needed to decode
+	///     the sound correctly. Throws a MediaException on fatal
+	///     error.
+	AudioDecoderNellymoser(AudioInfo& info);
+
+	/// @param info
+	/// 	SoundInfo class with all the info needed to decode
+	///     the sound correctly. Throws a MediaException on fatal
+	///      error.
+	AudioDecoderNellymoser(SoundInfo& info);
+
+    ~AudioDecoderNellymoser();
 
 	boost::uint8_t* decode(boost::uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize, boost::uint32_t& decodedBytes, bool parse);
 	
@@ -90,6 +105,9 @@ public:
 	float* decode(boost::uint8_t* in_buf, boost::uint32_t inputSize, boost::uint32_t* outputSize);
 
 private:
+
+	void setup(AudioInfo& info);
+	void setup(SoundInfo& info);
 
 	// The handle used by the decoder
 	nelly_handle* _nh;

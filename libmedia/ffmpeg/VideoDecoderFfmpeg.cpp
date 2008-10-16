@@ -197,22 +197,21 @@ VideoDecoderFfmpeg::frameToImage(AVCodecContext* srcCtx,
     std::auto_ptr<image::ImageBase> im;
 
 #ifdef FFMPEG_VP6A
-    if (srcCtx->codec->id == CODEC_ID_VP6A)
-#else
-    if (0)
-#endif // def FFMPEG_VP6A
-    {
+    if (srcCtx->codec->id == CODEC_ID_VP6A) {
         // Expect RGBA data
         //log_debug("alpha image");
         pixFmt = PIX_FMT_RGBA;
         im.reset(new image::ImageRGBA(width, height));        
-    }
-    else
-    {
+    } else {
         // Expect RGB data
         pixFmt = PIX_FMT_RGB24;
         im.reset(new image::ImageRGB(width, height));
     }
+#else // ndef FFMPEG_VPA6
+    // Expect RGB data
+    pixFmt = PIX_FMT_RGB24;
+    im.reset(new image::ImageRGB(width, height));
+#endif // def FFMPEG_VP6A
 
 #ifdef HAVE_SWSCALE_H
     // Check whether the context wrapper exists
@@ -345,7 +344,9 @@ VideoDecoderFfmpeg::flashToFfmpegCodec(videoCodecType format)
         // Find the decoder and init the parser
         switch(format) {
                 case VIDEO_CODEC_H263:
-                         return CODEC_ID_FLV1; // why not CODEC_ID_H263I ?
+			 // CODEC_ID_H263I didn't work with Lavc51.50.0
+			 // and NetStream-SquareTest.swf
+                         return CODEC_ID_FLV1;
 #ifdef FFMPEG_VP6
                 case VIDEO_CODEC_VP6:
                         return CODEC_ID_VP6F;

@@ -57,6 +57,7 @@
 #include "styles.h" // for cap_style_e and join_style_e enums
 #include "PlaceObject2Tag.h" 
 #include "NetStream.h"
+#include "flash/geom/Matrix_as.h"
 
 #ifdef USE_SWFTREE
 # include "tree.hh"
@@ -92,6 +93,8 @@ namespace gnash {
 static as_object* getMovieClipInterface();
 static void attachMovieClipInterface(as_object& o);
 static void attachMovieClipProperties(character& o);
+
+static as_value movieClip_transform(const fn_call& fn);
 
 /// Anonymous namespace for module-private definitions
 namespace
@@ -800,8 +803,7 @@ static as_value sprite_load_variables(const fn_call& fn)
     boost::intrusive_ptr<as_object> methodstr = fn.arg(1).to_object();
     assert(methodstr);
     
-    string_table& st = sprite->getVM().getStringTable();
-    as_value lc = methodstr->callMethod(st.find(PROPNAME("toLowerCase")));
+    as_value lc = methodstr->callMethod(NSV::PROP_TO_LOWER_CASE);
     std::string methodstring = lc.to_string(); 
   
     if ( methodstring == "get" ) method = 1;
@@ -832,7 +834,6 @@ static as_value sprite_unload_movie(const fn_call& fn)
 static as_value sprite_hit_test(const fn_call& fn)
 {
   boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
-  UNUSED(sprite);
 
   switch (fn.nargs)
   {
@@ -1013,8 +1014,7 @@ sprite_meth(const fn_call& fn)
     return as_value(0);
   }
 
-  string_table& st = sprite->getVM().getStringTable();
-  as_value lc = o->callMethod(st.find(PROPNAME("toLowerCase")));
+  as_value lc = o->callMethod(NSV::PROP_TO_LOWER_CASE);
 
   log_debug(_("after call to toLowerCase with arg %s we got %s"), v, lc);
 
@@ -1699,7 +1699,8 @@ sprite_beginGradientFill(const fn_call& fn)
   if ( fn.nargs > 5 )
   {
     std::stringstream ss; fn.dump_args(ss);
-    log_aserror(_("MovieClip.beginGradientFill(%s): args after the first five will be discarded"), ss.str());
+    log_aserror(_("MovieClip.beginGradientFill(%s): args after "
+            "the first five will be discarded"), ss.str());
   }
   );
 
@@ -1737,9 +1738,6 @@ sprite_beginGradientFill(const fn_call& fn)
     return as_value();
   }
 
-  VM& vm = sprite->getVM();
-  string_table& st = vm.getStringTable();
-
   // ----------------------------
   // Parse matrix
   // ----------------------------
@@ -1763,22 +1761,14 @@ sprite_beginGradientFill(const fn_call& fn)
   matrix mat;
   matrix input_matrix;
 
-  string_table::key keyT = st.find(PROPNAME("matrixType"));
-  if ( matrixArg->getMember(keyT).to_string() == "box" )
+  if ( matrixArg->getMember(NSV::PROP_MATRIX_TYPE).to_string() == "box" )
   {
     
-    // TODO: add to namedStrings.{cpp,h}
-    static const string_table::key keyX = st.find("x");
-    static const string_table::key keyY = st.find("y");
-    static const string_table::key keyW = st.find("w");
-    static const string_table::key keyH = st.find("h");
-    static const string_table::key keyR = st.find("r");
-
-    boost::int32_t valX = PIXELS_TO_TWIPS(matrixArg->getMember(keyX).to_number()); 
-    boost::int32_t valY = PIXELS_TO_TWIPS(matrixArg->getMember(keyY).to_number()); 
-    boost::int32_t valW = PIXELS_TO_TWIPS(matrixArg->getMember(keyW).to_number()); 
-    boost::int32_t valH = PIXELS_TO_TWIPS(matrixArg->getMember(keyH).to_number()); 
-    float valR = matrixArg->getMember(keyR).to_number(); 
+    boost::int32_t valX = PIXELS_TO_TWIPS(matrixArg->getMember(NSV::PROP_X).to_number()); 
+    boost::int32_t valY = PIXELS_TO_TWIPS(matrixArg->getMember(NSV::PROP_Y).to_number()); 
+    boost::int32_t valW = PIXELS_TO_TWIPS(matrixArg->getMember(NSV::PROP_W).to_number()); 
+    boost::int32_t valH = PIXELS_TO_TWIPS(matrixArg->getMember(NSV::PROP_H).to_number()); 
+    float valR = matrixArg->getMember(NSV::PROP_R).to_number(); 
 
     if ( radial )
     {
@@ -1811,20 +1801,12 @@ sprite_beginGradientFill(const fn_call& fn)
   }
   else
   {
-    // TODO: add to namedStrings.{cpp,h}
-    static const string_table::key keyA = st.find("a");
-    static const string_table::key keyB = st.find("b");
-    static const string_table::key keyD = st.find("d");
-    static const string_table::key keyE = st.find("e");
-    static const string_table::key keyG = st.find("g");
-    static const string_table::key keyH = st.find("h");
-
-    float valA = matrixArg->getMember(keyA).to_number() ; // xx
-    float valB = matrixArg->getMember(keyB).to_number() ; // yx
-    float valD = matrixArg->getMember(keyD).to_number() ; // xy
-    float valE = matrixArg->getMember(keyE).to_number() ; // yy
-    boost::int32_t valG = PIXELS_TO_TWIPS(matrixArg->getMember(keyG).to_number()); // x0
-    boost::int32_t valH = PIXELS_TO_TWIPS(matrixArg->getMember(keyH).to_number()); // y0
+    float valA = matrixArg->getMember(NSV::PROP_A).to_number() ; // xx
+    float valB = matrixArg->getMember(NSV::PROP_B).to_number() ; // yx
+    float valD = matrixArg->getMember(NSV::PROP_D).to_number() ; // xy
+    float valE = matrixArg->getMember(NSV::PROP_E).to_number() ; // yy
+    boost::int32_t valG = PIXELS_TO_TWIPS(matrixArg->getMember(NSV::PROP_G).to_number()); // x0
+    boost::int32_t valH = PIXELS_TO_TWIPS(matrixArg->getMember(NSV::PROP_H).to_number()); // y0
 
     input_matrix.sx  = valA * 65536; // sx
     input_matrix.shx = valB * 65536; // shy
@@ -1901,6 +1883,9 @@ sprite_beginGradientFill(const fn_call& fn)
       sprite->getTarget(), ss.str(), ngradients); 
     ngradients = 8;
   }
+
+  VM& vm = sprite->getVM();
+  string_table& st = vm.getStringTable();
 
   std::vector<gradient_record> gradients;
   gradients.reserve(ngradients);
@@ -2243,6 +2228,14 @@ attachMovieClipInterface(as_object& o)
     o.init_property("_lockroot", &sprite_instance::lockroot_getset,
                                 &sprite_instance::lockroot_getset); // see MovieClip.as testcase
 
+    // This is documented to be SWF8+ only, but the pp version9 shows it
+    // for SWF5 too...
+    o.init_member("attachBitmap", new builtin_function(sprite_attachBitmap));
+
+    // This is documented to be SWF8+ only, but the pp version9 shows it
+    // for SWF5 too...
+    o.init_property("transform", &movieClip_transform, &movieClip_transform); // see MovieClip.as testcase
+
     if ( target_version  < 6 ) return;
 
     // SWF6 or higher
@@ -2270,11 +2263,70 @@ attachMovieClipInterface(as_object& o)
     if ( target_version  < 8 ) return;
 
     // SWF8 or higher
-    o.init_member("attachBitmap", new builtin_function(sprite_attachBitmap));
     o.init_member("beginBitmapFill", new builtin_function(sprite_beginBitmapFill));
     o.init_member("getRect", new builtin_function(sprite_getRect));
     o.init_member("lineGradientStyle", new builtin_function(sprite_lineGradientStyle));
 
+}
+
+as_value
+movieClip_transform(const fn_call& fn)
+{
+    boost::intrusive_ptr<sprite_instance> ptr = ensureType<sprite_instance>(fn.this_ptr);
+    
+    VM& vm = ptr->getVM();
+    string_table& st = ptr->getVM().getStringTable();
+
+    as_value flash;
+    if (!vm.getGlobal()->get_member(st.find("flash"), &flash))
+    {
+        log_error("No flash object found!");
+        return as_value();
+    }
+    boost::intrusive_ptr<as_object> flashObj = flash.to_object();
+
+    if (!flashObj)
+    {
+        log_error("flash isn't an object!");
+        return as_value();
+    }
+    
+    as_value geom;
+    if (!flashObj->get_member(st.find("geom"), &geom))
+    {
+        log_error("No flash.geom object found!");
+        return as_value();
+    }
+    boost::intrusive_ptr<as_object> geomObj = geom.to_object();
+
+    if (!geomObj)
+    {
+        log_error("flash.geom isn't an object!");
+        return as_value();
+    }
+    
+    as_value transform;
+    if (!geomObj->get_member(st.find("Transform"), &transform))
+    {
+        log_error("No flash.geom.Transform object found!");
+        return as_value();
+    }    
+
+    boost::intrusive_ptr<as_function> transformCtor = transform.to_as_function();
+    if (!transformCtor)
+    {
+        log_error("flash.geom.Transform isn't a function!");
+        return as_value();
+    }
+
+    // Construct a flash.geom.Transform object with "this" as argument.
+    std::auto_ptr< std::vector<as_value> > args (new std::vector<as_value>);
+    args->push_back(ptr.get());
+
+    boost::intrusive_ptr<as_object> transformObj =
+                transformCtor->constructInstance(fn.env(), args);
+
+    return as_value(transformObj.get());
 }
 
 /// Properties (and/or methods) attached to every *instance* of a MovieClip 
@@ -2647,7 +2699,7 @@ sprite_instance::get_frame_number(const as_value& frame_spec, size_t& frameno) c
 
   as_value str(fspecStr);
 
-  double num =  str.to_number();
+  double num = str.to_number();
 
   //log_debug("get_frame_number(%s), num: %g", frame_spec, num);
 
@@ -2969,14 +3021,13 @@ sprite_instance::get_path_element(string_table::key key)
 
   // See if it's a member
 
-  // NOTE: direct use of get_member_default avoids
+  // NOTE: direct use of the base class's get_member avoids
   //       triggering a call to sprite_instance::get_member
   //       which would scan the child characters again
   //       w/out a need for it
-  //return as_object::get_path_element(key);
 
   as_value tmp;
-  if ( ! get_member_default(key, &tmp, 0) )
+  if ( !as_object::get_member(key, &tmp, 0) )
   {
     return NULL;
   }
@@ -3010,7 +3061,7 @@ sprite_instance::set_member(string_table::key name,
   // Try textfield variables
   //
   // FIXME: Turn textfield variables into Getter/Setters (Properties)
-  //        so that set_member_default will do this automatically.
+  //        so that as_object::set_member will do this automatically.
   //        The problem is that setting a TextVariable named after
   //        a builtin property will prevent *any* setting for the
   //        property (ie: have a textfield use _x as variable name and
@@ -3037,7 +3088,7 @@ sprite_instance::set_member(string_table::key name,
 #endif
 
   // If that didn't work call the default set_member
-  if (  set_member_default(name, val, nsname, ifFound) ) found=true;
+  if (as_object::set_member(name, val, nsname, ifFound)) found=true;
 
   return found;
 }

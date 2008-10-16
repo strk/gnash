@@ -75,7 +75,7 @@ private:
 	action_buffer& m_action_buffer;
 
 	/// Can't assign to an swf_event
-	void	operator=(const swf_event& /*s*/) { abort(); }
+	void operator=(const swf_event& /*s*/);
 };
 
 

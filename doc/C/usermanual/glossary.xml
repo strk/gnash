@@ -323,23 +323,6 @@
     
   </glossdiv>
   
-  <glossdiv id="L">
-    <title>L</title>
-  
-    <glossentry>
-      <glossterm>
-	libmad
-      </glossterm>
-      <glossdef>
-	<para>
-	  libmad is a mp3-decoding library, which used to be an option for Gnash
-	  handling of sound (dropped since 0.8.2).
-	</para>
-      </glossdef>
-    </glossentry>
-    
-  </glossdiv>
-  
   <glossdiv id="M">
     <title>M</title>
     

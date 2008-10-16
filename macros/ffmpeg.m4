@@ -48,7 +48,7 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
   ])
 
   if test x${cross_compiling} = xno; then
-    AC_MSG_CHECKING([location of avcodec.h using pkgconfig])
+    AC_MSG_CHECKING([location of avcodec.h])
     if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_ffmpeg_incl}" = x; then
       if $PKG_CONFIG --exists libavcodec; then
 	# Some systems return /usr/include/ffmpeg, others /usr/include.
@@ -117,7 +117,7 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
   if test x"${ac_cv_path_ffmpeg_incl}" = x; then
      AC_MSG_ERROR([Cannot find ffmpeg/avcodec.h.  Use --with-ffmpeg-incl= to specify the location of the *directory* holding avcodec.h])
   else
-    if echo $avcodec_h | grep -q ffmpeg; then
+    if echo $avcodec_h | grep -q ffmpeg/avcodec.h; then
       AC_DEFINE(HAVE_FFMPEG_AVCODEC_H, 1, [Define if you have avcodec.h installed.])
     else
       AC_DEFINE(HAVE_LIBAVCODEC_AVCODEC_H, 1, [Define if you have avcodec.h installed.])
@@ -200,53 +200,73 @@ dnl version numbering fail gracefully.
   if test x"${avcodec_h}" != x; then
 
     AC_MSG_CHECKING([ffmpeg version])
-    ffmpeg_version=`$EGREP "define LIBAVCODEC_VERSION_MAJOR " ${avcodec_h} | sed -e "s%[[^0-9]]%%g"``$EGREP "define LIBAVCODEC_VERSION_MINOR " ${avcodec_h} | sed -e "s%[[^0-9]]%%g"``$EGREP "define LIBAVCODEC_VERSION_MICRO " ${avcodec_h} | sed -e "s%[[^0-9]]%%g"`
-    ffmpeg_num_version=$ffmpeg_version
-    if test x"${ffmpeg_version}" = x ; then
 
-      dnl NOTE: the [0-9]*d. pattern discards deb-heads rubbish prefix
-      ffmpeg_version=`$EGREP "define LIBAVCODEC_VERSION " ${avcodec_h} | sed -e "s% [[0-9]]*d\.%%" -e "s%[[^0-9]]%%g"`
-      ffmpeg_num_version=$ffmpeg_version
+    ffmpeg_major_version=`$EGREP "define LIBAVCODEC_VERSION_MAJOR " ${avcodec_h} | sed -e "s%[[^0-9]]%%g"`
+    ffmpeg_minor_version=`$EGREP "define LIBAVCODEC_VERSION_MINOR " ${avcodec_h} | sed -e "s%[[^0-9]]%%g"`
+    ffmpeg_micro_version=`$EGREP "define LIBAVCODEC_VERSION_MICRO " ${avcodec_h} | sed -e "s%[[^0-9]]%%g"`
+
+    if test x"${ffmpeg_major_version}" != x ; then
+
+      ffmpeg_version="${ffmpeg_major_version}.${ffmpeg_minor_version}.${ffmpeg_micro_version}"
+
+    else
+
+      dnl #define LIBAVCODEC_VERSION_TRIPLET 51,50,1
+      ffmpeg_version=`$EGREP "define LIBAVCODEC_VERSION_TRIPLET " ${avcodec_h} | awk '{print $'3'}' | sed -e "s%,%.%g"`
 
       if test x"${ffmpeg_version}" = x ; then
-        ffmpeg_version=`$EGREP "define LIBAVCODEC_BUILD " ${avcodec_h} | sed -e "s%[[^0-9.]]%%g"`
-        ffmpeg_num_version=$ffmpeg_version
+
+        dnl NOTE: the [0-9]*d. pattern discards deb-heads rubbish prefix
+        ffmpeg_version=`$EGREP "define LIBAVCODEC_VERSION " ${avcodec_h} | awk '{print $'3'}' | sed -e "s%^[[0-9]]d\.%%"` 
+
+        if test x"${ffmpeg_version}" = x ; then
+          ffmpeg_version=`$EGREP "define LIBAVCODEC_BUILD " ${avcodec_h} | awk '{print $'3'}'`
+        fi
       fi
-    fi
-    if test x"${ffmpeg_version}" = x ; then
-      ffmpeg_version=`$EGREP "define LIBAVCODEC_VERSION_TRIPLET " ${avcodec_h} | sed -e "s%[[^0-9]]%%g"`
-      ffmpeg_num_version=$ffmpeg_version
+
+      if test x"${ffmpeg_version}" != x ; then
+        ffmpeg_major_version=`echo ${ffmpeg_version} | cut -d. -f1`
+        ffmpeg_minor_version=`echo ${ffmpeg_version} | cut -d. -f2`
+        ffmpeg_micro_version=`echo ${ffmpeg_version} | cut -d. -f3`
+      fi
+
     fi
 
-    AC_MSG_RESULT($ffmpeg_num_version)
+    ffmpeg_num_version=`printf %2.2d%2.2d%2.2d $ffmpeg_major_version $ffmpeg_minor_version $ffmpeg_micro_version`
+
+    AC_MSG_RESULT($ffmpeg_version ($ffmpeg_num_version))
+
 
 dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfound=no])
   
-    if test -z "$ffmpeg_num_version" -o "$ffmpeg_num_version" -lt 51110; then
-      AC_MSG_WARN([Wrong ffmpeg/libavcodec version! 51.11.0 or greater required])
+    if test -z "$ffmpeg_num_version" -o "$ffmpeg_num_version" -lt 511100; then
+      AC_MSG_WARN([Wrong ffmpeg/libavcodec version! 51.11.0 or greater required, $ffmpeg_version detected.])
     else
-      ffmpeg_version=ok
+      ffmpeg_version_check=ok
     fi
 
-    if test ! -z "$ffmpeg_num_version" -a "$ffmpeg_num_version" -gt 51280; then
+    if test ! -z "$ffmpeg_num_version" -a "$ffmpeg_num_version" -gt 512800; then
+      dnl 51.28.0 or higher required
       AC_DEFINE(FFMPEG_AUDIO2, 1, [Define if avcodec_decode_audio2 can be used.])
     fi
 
-    if test -z "$ffmpeg_num_version" -o "$ffmpeg_num_version" -lt 51270; then
-      AC_MSG_WARN([This version of ffmpeg/libavcodec is not able to play VP6 encoded video!])
+    if test -z "$ffmpeg_num_version" -o "$ffmpeg_num_version" -lt 512700; then
+      dnl 51.27.0 or higher required
+      AC_MSG_WARN([This version of ffmpeg/libavcodec ($ffmpeg_version) is not able to play VP6 encoded video: 51.27.0 or higher required!])
     else
       AC_DEFINE(FFMPEG_VP6, 1, [Define if ffmpeg can play VP6.])
     fi
 
-    if test -z "$ffmpeg_num_version" -o "$ffmpeg_num_version" -lt 51490; then
-      AC_MSG_WARN([This version of ffmpeg/libavcodec is not able to play VP6A encoded video!])
+    if test -z "$ffmpeg_num_version" -o "$ffmpeg_num_version" -lt 514900; then
+      dnl 51.49.0 or higher required
+      AC_MSG_WARN([This version of ffmpeg/libavcodec ($ffmpeg_version) is not able to play VP6A encoded video: 51.49.0 or higher required!])
     else
       AC_DEFINE(FFMPEG_VP6A, 1, [Define if ffmpeg can play VP6A.])
     fi
 
   else
     AC_MSG_WARN([Could not check ffmpeg version (dunno where avcodec.h is)])
-    ffmpeg_version=ok # trust the user-specified dir
+    ffmpeg_version_check=ok # trust the user-specified dir
   fi
 
   # Eliminate the pointless -I/usr/include, which can happen
@@ -271,14 +291,23 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
   fi
   AC_MSG_RESULT($avformat_h)
 
+  have_ffmpeg_swscale=no
+
   dnl look for swscale.h, but ignore versions older than 51.40.3
-  if test $ffmpeg_num_version -gt 51403; then
+  if test $ffmpeg_num_version -gt 514003; then
     if test -f "${topdir}/ffmpeg/swscale.h"; then
+      have_ffmpeg_swscale=yes
       AC_DEFINE(HAVE_FFMPEG_SWSCALE_H, 1, [Define if swscale.h is found])
     fi
     if test -f "${topdir}/libswscale/swscale.h"; then
+      have_ffmpeg_swscale=yes
       AC_DEFINE(HAVE_LIBSWSCALE_SWSCALE_H, 1, [Define if swscale.h is found])
     fi
+  fi
+
+  if test x"$have_ffmpeg_swscale" = "xno" -a $ffmpeg_num_version -ge 520000; then
+     AC_MSG_WARN([Cannot find swscale.h, required for ffmpeg versions >= 52.0.0 (detected version: $ffmpeg_version)])
+     ffmpeg_version_check=
   fi
 
   dnl Look for the library

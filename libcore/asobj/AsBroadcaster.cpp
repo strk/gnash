@@ -118,7 +118,7 @@ AsBroadcaster::initialize(as_object& o)
 	}
 	
 	o.set_member(NSV::PROP_BROADCAST_MESSAGE, new builtin_function(AsBroadcaster::broadcastMessage_method));
-	o.set_member(NSV::PROP_uLISTENERS, new as_array_object());
+	o.set_member(NSV::PROP_uLISTENERS, new Array_as());
 
 #ifndef NDEBUG
 	assert(o.get_member(NSV::PROP_uLISTENERS, &tmp));
@@ -210,7 +210,7 @@ AsBroadcaster::addListener_method(const fn_call& fn)
 	boost::intrusive_ptr<as_object> listenersObj = listenersValue.to_object();
 	assert(listenersObj);
 
-	boost::intrusive_ptr<as_array_object> listeners = boost::dynamic_pointer_cast<as_array_object>(listenersObj);
+	boost::intrusive_ptr<Array_as> listeners = boost::dynamic_pointer_cast<Array_as>(listenersObj);
 	if ( ! listeners )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -270,7 +270,7 @@ AsBroadcaster::removeListener_method(const fn_call& fn)
 	as_value listenerToRemove; assert(listenerToRemove.is_undefined());
 	if ( fn.nargs ) listenerToRemove = fn.arg(0);
 
-	boost::intrusive_ptr<as_array_object> listeners = boost::dynamic_pointer_cast<as_array_object>(listenersObj);
+	boost::intrusive_ptr<Array_as> listeners = boost::dynamic_pointer_cast<Array_as>(listenersObj);
 	if ( ! listeners )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -338,7 +338,7 @@ AsBroadcaster::broadcastMessage_method(const fn_call& fn)
 		return as_value(); // TODO: check this
 	}
 
-	boost::intrusive_ptr<as_array_object> listeners = boost::dynamic_pointer_cast<as_array_object>(listenersValue.to_object());
+	boost::intrusive_ptr<Array_as> listeners = boost::dynamic_pointer_cast<Array_as>(listenersValue.to_object());
 	if ( ! listeners )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(

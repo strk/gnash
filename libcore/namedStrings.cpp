@@ -44,16 +44,22 @@ static string_table::svt preload_names[] =
 	string_table::svt( "callee", NSV::PROP_CALLEE ),
 	string_table::svt( "caller", NSV::PROP_CALLER ),
 	//string_table::svt( "color", NSV::PROP_COLOR ), // clashes with CLASS_COLOR in case-insensitive mode
+	string_table::svt( "concat", NSV::PROP_CONCAT ),	
 	string_table::svt( "constructor", NSV::PROP_CONSTRUCTOR ),
 	string_table::svt( "__constructor__", NSV::PROP_uuCONSTRUCTORuu ),
+	string_table::svt( "contentType", NSV::PROP_CONTENT_TYPE),
 	string_table::svt( "_currentframe", NSV::PROP_uCURRENTFRAME ),
+	string_table::svt( "_customHeaders", NSV::PROP_uCUSTOM_HEADERS ),
 	string_table::svt( "d", NSV::PROP_D ),
+	string_table::svt( "e", NSV::PROP_E ),	
 	string_table::svt( "_droptarget", NSV::PROP_uDROPTARGET ),
 	string_table::svt( "enabled", NSV::PROP_ENABLED ),
 	string_table::svt( "useHandCursor", NSV::PROP_USEHANDCURSOR ),
 	string_table::svt( "_focusrect", NSV::PROP_uFOCUSRECT ),
 	string_table::svt( "_framesloaded", NSV::PROP_uFRAMESLOADED ),
 	string_table::svt( "_height", NSV::PROP_uHEIGHT ),
+    string_table::svt( "g", NSV::PROP_G ),
+    string_table::svt( "h", NSV::PROP_H ),
 	string_table::svt( "height", NSV::PROP_HEIGHT ),
 	string_table::svt( "_highquality", NSV::PROP_uHIGHQUALITY ),
 	string_table::svt( "htmlText", NSV::PROP_HTML_TEXT ),
@@ -64,6 +70,7 @@ static string_table::svt preload_names[] =
 	string_table::svt( "length", NSV::PROP_LENGTH ),
 	string_table::svt( "_listeners", NSV::PROP_uLISTENERS ),
 	string_table::svt( "loaded", NSV::PROP_LOADED ),
+	string_table::svt( "matrixType", NSV::PROP_MATRIX_TYPE),
 	string_table::svt( "_name", NSV::PROP_uNAME ),
 	string_table::svt( "onLoad", NSV::PROP_ON_LOAD ),
 	string_table::svt( "onClose", NSV::PROP_ON_CLOSE ),
@@ -71,6 +78,7 @@ static string_table::svt preload_names[] =
 	string_table::svt( "onLoadError", NSV::PROP_ON_LOAD_ERROR ),
 	string_table::svt( "onLoadProgress", NSV::PROP_ON_LOAD_PROGRESS ),
 	string_table::svt( "onLoadInit", NSV::PROP_ON_LOAD_INIT ),
+    string_table::svt( "onSoundComplete", NSV::PROP_ON_SOUND_COMPLETE ),
 	string_table::svt( "onUnload", NSV::PROP_ON_UNLOAD ),
 	string_table::svt( "onEnterFrame", NSV::PROP_ON_ENTER_FRAME ),
 	string_table::svt( "onConstruct", NSV::PROP_ON_CONSTRUCT ),
@@ -107,6 +115,7 @@ static string_table::svt preload_names[] =
 	string_table::svt( "__proto__", NSV::PROP_uuPROTOuu ),
 	string_table::svt( "prototype", NSV::PROP_PROTOTYPE ),
 	string_table::svt( "push", NSV::PROP_PUSH ),
+	string_table::svt( "r", NSV::PROP_R ),
 	string_table::svt( "removeListener", NSV::PROP_REMOVE_LISTENER ),
 	string_table::svt( "rightMargin", NSV::PROP_RIGHT_MARGIN ),
 	string_table::svt( "_rotation", NSV::PROP_uROTATION ),
@@ -123,6 +132,7 @@ static string_table::svt preload_names[] =
 	string_table::svt( "textWidth", NSV::PROP_TEXT_WIDTH ),
 	string_table::svt( "textHeight", NSV::PROP_TEXT_HEIGHT ),
 	string_table::svt( "toString", NSV::PROP_TO_STRING ),
+	string_table::svt( "toLowerCase", NSV::PROP_TO_LOWER_CASE ),
 	string_table::svt( "_totalframes", NSV::PROP_uTOTALFRAMES ),
 	string_table::svt( "tx", NSV::PROP_TX ),
 	string_table::svt( "ty", NSV::PROP_TY ),
@@ -130,6 +140,7 @@ static string_table::svt preload_names[] =
 	string_table::svt( "_url", NSV::PROP_uURL ),
 	string_table::svt( "valueOf", NSV::PROP_VALUE_OF ),
 	string_table::svt( "_visible", NSV::PROP_uVISIBLE ),
+	string_table::svt( "w", NSV::PROP_W ),
 	string_table::svt( "_width", NSV::PROP_uWIDTH ),
 	string_table::svt( "width", NSV::PROP_WIDTH ),
 	string_table::svt( "x", NSV::PROP_X ),
@@ -200,15 +211,14 @@ static string_table::svt preload_names[] =
 	string_table::svt( "", NSV::INTERNAL_INTERFACES )
 };
 
-void load_strings(string_table *table, int version)
+void loadStrings(string_table &table, int version)
 {
 	if (version < 7)
 	{
-		//table->lower_next_group();
-		table->set_insensitive();
+		table.set_insensitive();
 	}
 
-	table->insert_group(preload_names,
+	table.insert_group(preload_names,
 		sizeof (preload_names) / sizeof (string_table::svt));
 }
 

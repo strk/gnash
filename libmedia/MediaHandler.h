@@ -72,30 +72,30 @@ public:
 	/// NOTE: the default implementation returns an FLVParser for FLV input
 	///       or 0 for others.
 	///
-	virtual std::auto_ptr<MediaParser> createMediaParser(std::auto_ptr<IOChannel> stream);
+	virtual std::auto_ptr<MediaParser> createMediaParser(
+            std::auto_ptr<IOChannel> stream);
 
-	/// Create a VideoDecoder for the specified codec_type
+	/// Create a VideoDecoder for decoding what's specified in the VideoInfo
 	//
-	/// @param format
-	///	Video encoding.
-	///
-	/// @param width
-	///	Video frame width
-	///
-	/// @param height
-	///	Video frame height
-	///
-	/// @return 0 if no decoder could be created for the specified encoding
-	///
+	/// @param info VideoInfo class with all the info needed to decode
+	///             the sound correctly.
+    /// @return     Will always return a valid VideoDecoder or throw a
+    ///             gnash::MediaException if a fatal error occurs.
 	virtual std::auto_ptr<VideoDecoder> createVideoDecoder(VideoInfo& info)=0;
 
 	/// Create an AudioDecoder for decoding what's specified in the AudioInfo
 	//
-	/// @param info
-	///     AudioInfo class with all the info needed to decode
-	///     the sound correctly.
-	///
+	/// @param info AudioInfo class with all the info needed to decode
+	///             the sound correctly.
+    /// @return     Will always return a valid AudioDecoder or throw a
+    ///             gnash::MediaException if a fatal error occurs.
 	virtual std::auto_ptr<AudioDecoder> createAudioDecoder(AudioInfo& info)=0;
+
+    /// Return the number of bytes padding needed for input buffers
+    //
+    /// Bitstream readers are optimized to read several bytes at a time,
+    /// and this should be used to allocate a large enough input buffer.
+    virtual size_t getInputPaddingSize() const { return 0; }
 
 protected:
 

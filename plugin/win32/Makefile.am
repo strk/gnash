@@ -43,7 +43,9 @@ AM_LDFLAGS = \
 	$(top_builddir)/libamf/libgnashamf.la \
 	$(top_builddir)/backend/libgnashagg.la \
 	$(top_builddir)/libcore/libgnashcore.la \
-	$(top_builddir)/plugin/mozilla-sdk/libmozsdk.la \
+	$(top_builddir)/plugin/mozilla-sdk/np_entry.lo \
+	$(top_builddir)/plugin/mozilla-sdk/npn_gate.lo \
+	$(top_builddir)/plugin/mozilla-sdk/npp_gate.lo \
 	$(AGG_LIBS) \
 	$(BOOST_LIBS) \
 	$(CURL_LIBS) \
@@ -60,14 +62,13 @@ plugindir = $(bindir)
 
 plugin_LTLIBRARIES = npgnash.la
 
-npgnash.la: $(npgnash_la_OBJECTS) $(npgnash_la_DEPENDENCIES)
-	$(CXXLINK) $(am_npgnash_la_rpath) $(npgnash_la_LDFLAGS) $(npgnash_la_OBJECTS) $(npgnash_la_LIBADD) $(LIBS) && touch $@
+##npgnash.la: $(npgnash_la_OBJECTS) $(npgnash_la_DEPENDENCIES)
+##	$(CXXLINK) $(am_npgnash_la_rpath) $(npgnash_la_LDFLAGS) $(npgnash_la_OBJECTS) $(npgnash_la_LIBADD) $(LIBS) && touch $@
 
 npgnash_la_SOURCES = npgnash.c plugin.cpp
 EXTRA_npgnash_la_SOURCES = npgnash.rc
 npgnash_la_LDFLAGS = -module -shared -no-undefined -version-info 0:0:0 \
-	-o npgnash.dll -Wl,--enable-stdcall-fixup npgnash.def \
-	$(AM_LDFLAGS)
+	-o npgnash.dll -Wl,--enable-stdcall-fixup npgnash.def
 npgnash_la_LIBADD = npgnashrc.o
 
 npgnashrc.o: npgnash.rc

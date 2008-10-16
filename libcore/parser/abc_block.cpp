@@ -1161,7 +1161,7 @@ abc_block::read_method_bodies()
 
 			// A variable name for the catch type.
 			// In version 46.15, no names.
-			if (mVersion != (46 << 16) | 15)
+			if (mVersion != ((46 << 16) | 15))
 			{
 				boost::uint32_t cvn = mS->read_V32();
 				if (cvn >= mMultinamePool.size())

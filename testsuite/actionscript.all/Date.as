@@ -339,6 +339,7 @@ check (Date.utc);
 // The commercial player for these first three cases gives
 // -6.77681005679712e+19  Tue Jan -719527 00:00:00 GMT+0000
 // but that doesn't seem worth emulating...
+note("The pp is known to fail the next three tests");
     delete d; var d = new Date(notanumber,0);
 	check_equals(d.valueOf().toString(), "NaN");
     delete d; var d = new Date(plusinfinity,0);
@@ -546,6 +547,9 @@ check (Date.utc);
 	check_equals(wierddate.getFullYear(), -100000);	   
 
     h = new Date(3.0935415006117e+23);
+    check_equals(h.valueOf().toString(), "3.0935415006117e+23");
+    check_equals(h.getMilliseconds(), 584);
+    check_equals(h.getSeconds(), 0);
 	check_equals(h.getUTCMilliseconds(), 584);
 	check_equals(h.getUTCSeconds(), 0);
 	check_equals(h.getUTCMinutes(), 4);
@@ -666,7 +670,7 @@ check_equals(typeof(foo), 'string');
 #endif
 
 #if OUTPUT_VERSION == 5
-totals(282);
+totals(285);
 #else
-totals (324);
+totals (327);
 #endif

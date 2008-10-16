@@ -19,12 +19,12 @@
 #define GNASH_VM_CALL_STACK_H
 
 #include <vector>
+#include "as_value.h"
 
 // Forward declarations
 namespace gnash {
     class as_object;
     class as_function;
-    class as_value;
 }
 
 namespace gnash {

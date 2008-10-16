@@ -1,0 +1,60 @@
+// ffmpegHeaders.h - hide braindamage required to support ffmpeg includes in a single file
+// 
+//   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
+// 
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+#ifndef GNASH_MEDIA_FFMPEG_HEADERS_H
+#define GNASH_MEDIA_FFMPEG_HEADERS_H
+
+// This is for compatibility with braindamaged versions of ffmpeg
+#if !defined INT64_C
+#if defined __WORDSIZE && __WORDSIZE == 64
+#define INT64_C(c) c ## L
+#else
+#define INT64_C(c) c ## LL
+#endif
+#endif
+
+#ifdef HAVE_FFMPEG_AVCODEC_H
+extern "C" {
+# include <ffmpeg/avcodec.h>
+}
+#endif
+
+#ifdef HAVE_LIBAVCODEC_AVCODEC_H
+extern "C" {
+# include <libavcodec/avcodec.h>
+}
+#endif
+
+#ifdef HAVE_FFMPEG_AVFORMAT_H
+extern "C" {
+#include <ffmpeg/avformat.h>
+}
+#endif
+
+#ifdef HAVE_LIBAVFORMAT_AVFORMAT_H
+extern "C" {
+#include <libavformat/avformat.h>
+}
+#endif
+
+
+#if defined(HAVE_LIBSWSCALE_SWSCALE_H) || defined(HAVE_FFMPEG_SWSCALE_H)
+# define HAVE_SWSCALE_H 1
+#endif
+
+#endif // GNASH_MEDIA_FFMPEG_HEADERS_H

@@ -22,14 +22,8 @@
 
 #include "NullGui.h"
 
-#if defined(_WIN32) || defined(WIN32)
-# include <windows.h>
-# define usleep(x) Sleep(x/1000)
-#else
-# include <unistd.h> // for usleep
-#endif
-
 #include "SystemClock.h"
+#include "GnashSleep.h"
 
 //#include <iostream>
 
@@ -53,8 +47,7 @@ NullGui::run()
     long rem = _interval-spent;
     if ( rem > 0 )
     {
-      //std::cout << "spent: " << spent << " - rem: " << rem << std::endl;
-      usleep( rem * 1000 );
+      gnashSleep( rem * 1000 );
     }
 
     if ( _timeout && now > _timeout)

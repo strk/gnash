@@ -33,6 +33,9 @@
 //   static lightweight_mutex lib_mutex;
 // #endif
 
+#if defined(WIN32) || defined(_WIN32)
+#define LIBLTDL_DLL_IMPORT 1
+#endif
 #include <ltdl.h>
 #include <cstring>
 #include <iostream>

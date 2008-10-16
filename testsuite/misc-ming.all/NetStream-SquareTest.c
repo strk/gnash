@@ -615,7 +615,7 @@ main(int argc, char** argv)
   check_equals(mo, "metadataNotified", "1");
   check_equals(mo, "stopNotified", "2");
   check_equals(mo, "startNotified", "1");
-  SWFMovie_add(mo, (SWFBlock)newSWFAction("totals(142); stop();"));
+  SWFMovie_add(mo, (SWFBlock)newSWFAction("totals(142); stop(); end_of_test=true;"));
 
   SWFMovie_nextFrame(mo);
 

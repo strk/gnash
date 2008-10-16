@@ -22,8 +22,8 @@
 // Wrapper for jpeg file operations.  The actual work is done by the
 // IJG jpeg lib.
 
-#ifndef JPEG_H
-#define JPEG_H
+#ifndef GNASH_IMAGE_JPEG_H
+#define GNASH_IMAGE_JPEG_H
 
 #include "dsodefs.h"
 #include <csetjmp> // for jmp_buf
@@ -35,6 +35,7 @@ namespace jpeg {
 extern "C" {
 // jpeglib.h redefines HAVE_STDLIB_H. This silences
 // the warnings, but it's not good.
+#undef HAVE_STDLIB_H
 #include <jpeglib.h>
 #undef HAVE_STDLIB_H
 }
@@ -122,9 +123,9 @@ public:
 	//
 	void readScanline(unsigned char* rgb_data);
 
-    static std::auto_ptr<gnash::ImageInput> create(boost::shared_ptr<IOChannel> in)
+    static std::auto_ptr<ImageInput> create(boost::shared_ptr<IOChannel> in)
     {
-        std::auto_ptr<gnash::ImageInput> ret ( new JpegImageInput(in) );
+        std::auto_ptr<ImageInput> ret ( new JpegImageInput(in) );
         if ( ret.get() ) ret->read(); // might throw an exception (I guess)
         return ret;
     }
@@ -147,7 +148,7 @@ class JpegImageOutput : public ImageOutput
 
 public:
 
-	/// Create an output object bount to a gnash::IOChannel
+	/// Create an output object bount to a IOChannel
 	//
 	/// @param quality
 	///	Quality goes from 1-100.

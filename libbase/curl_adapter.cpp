@@ -30,39 +30,42 @@
 #include "IOChannel.h"
 #include "log.h"
 #include "WallClockTimer.h"
+#include "GnashSleep.h"
 
 #include <iostream> // std::cerr
 #include <boost/thread/mutex.hpp>
 #include <boost/version.hpp>
-
-using gnash::log_debug;
-using gnash::log_error;
+#include <boost/assign/list_of.hpp>
 
 
 #ifndef USE_CURL
+
+namespace gnash {
+
 // Stub for warning about access when no libcurl is defined.
 
-namespace NetworkAdapter
+std::auto_ptr<IOChannel>
+NetworkAdapter::makeStream(const std::string& /*url*/)
 {
-	IOChannel* make_stream(const char * /*url */)
-	{
-		log_error(_("ERROR: libcurl is not available, but "
-		            "Gnash has attempted to use the curl adapter"));
-		return NULL;
-	}
-	
-    IOChannel* make_stream(const char* url, const std::string& postdata)
-    {
-        return make_stream(url);
-    }
-
-    IOChannel* makeStream(const std::string& url, const std::string& postdata,
-                                const RequestHeaders& headers)
-    {
-        return make_stream(url);
-    }
-
+	log_error(_("libcurl is not available, but "
+	            "Gnash has attempted to use the curl adapter"));
+	return std::auto_ptr<IOChannel>();
 }
+
+std::auto_ptr<IOChannel>
+NetworkAdapter::makeStream(const std::string& url, const std::string& postdata)
+{
+    return makeStream(url);
+}
+
+std::auto_ptr<IOChannel>
+NetworkAdapter::makeStream(const std::string& url, const std::string& postdata,
+                            const RequestHeaders& headers)
+{
+    return makeStream(url);
+}
+
+} // namespace gnash
 
 #else // def USE_CURL
 
@@ -94,7 +97,8 @@ namespace NetworkAdapter
 
 
 namespace gnash {
-namespace NetworkAdapter {
+
+namespace {
 
 /***********************************************************************
  *
@@ -207,7 +211,7 @@ CurlSession::~CurlSession()
 	while ( (code=curl_share_cleanup(_shandle)) != CURLSHE_OK )
 	{
 		log_error("Failed cleaning up share handle: %s. Will try again in a second.", curl_share_strerror(code));
-		sleep(1);
+		gnashSleep(1000000);
 	}
 	_shandle = 0;
 	curl_global_cleanup();
@@ -356,6 +360,7 @@ CurlSession::unlockSharedHandle(CURL* handle, curl_lock_data data)
  *
  **********************************************************************/
 
+/// libcurl based IOChannel, for network uri accesses
 class CurlStreamFile : public IOChannel
 {
 
@@ -913,6 +918,8 @@ CurlStreamFile::CurlStreamFile(const std::string& url, const std::string& vars, 
     for (NetworkAdapter::RequestHeaders::const_iterator i = headers.begin(),
          e = headers.end(); i != e; ++i)
     {
+        // Check here to see whether header name is allowed.
+        if (!NetworkAdapter::isHeaderAllowed(i->first)) continue;
         std::ostringstream os;
         os << i->first << ": " << i->second;
         headerList = curl_slist_append(headerList, os.str().c_str());
@@ -1237,57 +1244,55 @@ CurlSession::exportCookies()
 
 }
 
+
+} // anonymous namespace
+
 //-------------------------------------------
 // Exported interfaces
 //-------------------------------------------
 
-IOChannel*
-make_stream(const char* url)
+std::auto_ptr<IOChannel>
+NetworkAdapter::makeStream(const std::string& url)
 {
 #ifdef GNASH_CURL_VERBOSE
 	gnash::log_debug("making curl stream for %s", url);
 #endif
 
-	CurlStreamFile* stream = NULL;
+	std::auto_ptr<IOChannel> stream;
 
 	try {
-		stream = new CurlStreamFile(url);
+		stream.reset(new CurlStreamFile(url));
 	}
 	catch (const std::exception& ex) {
 		gnash::log_error("curl stream: %s", ex.what());
-		delete stream;
-		return NULL;
 	}
-
 	return stream;
 }
 
-IOChannel*
-make_stream(const char* url, const std::string& postdata)
+std::auto_ptr<IOChannel>
+NetworkAdapter::makeStream(const std::string& url, const std::string& postdata)
 {
 #ifdef GNASH_CURL_VERBOSE
 	gnash::log_debug("making curl stream for %s", url);
 #endif
 
-	CurlStreamFile* stream = NULL;
+	std::auto_ptr<IOChannel> stream;
 
 	try {
-		stream = new CurlStreamFile(url, postdata);
+		stream.reset(new CurlStreamFile(url, postdata));
 	}
 	catch (const std::exception& ex) {
 		gnash::log_error("curl stream: %s", ex.what());
-		delete stream;
-		return NULL;
 	}
-
 	return stream;
 }
 
-DSOEXPORT IOChannel* makeStream(const std::string& url, const std::string& postdata,
+std::auto_ptr<IOChannel>
+NetworkAdapter::makeStream(const std::string& url, const std::string& postdata,
                                 const RequestHeaders& headers)
 {
 
-	std::auto_ptr<CurlStreamFile> stream;
+	std::auto_ptr<IOChannel> stream;
 
 	try {
 		stream.reset(new CurlStreamFile(url, postdata, headers));
@@ -1296,15 +1301,49 @@ DSOEXPORT IOChannel* makeStream(const std::string& url, const std::string& postd
 		gnash::log_error("curl stream: %s", ex.what());
 	}
 
-    return stream.release();
+    return stream;
 
 }
 
+/// Define static member.
+std::set<std::string, StringNoCaseLessThen>
+NetworkAdapter::_reservedNames = boost::assign::list_of
+    ("Accept-Ranges")
+    ("Age")
+    ("Allow")
+    ("Allowed")
+    ("Connection")
+    ("Content-Length")
+    ("Content-Location")
+    ("Content-Range")
+    ("ETag")
+    ("GET")
+    ("Host")
+    ("HEAD")
+    ("Last-Modified")
+    ("Locations")
+    ("Max-Forwards")
+    ("POST")
+    ("Proxy-Authenticate")
+    ("Proxy-Authorization")
+    ("Public")
+    ("Range")
+    ("Retry-After")
+    ("Server")
+    ("TE")
+    ("Trailer")
+    ("Transfer-Encoding")
+    ("Upgrade")
+    ("URI")
+    ("Vary")
+    ("Via")
+    ("Warning")
+    ("WWW-Authenticate");
 
-} // namespace NetworkAdapter
 } // namespace gnash
 
 #endif // def USE_CURL
+
 
 // Local Variables:
 // mode: C++

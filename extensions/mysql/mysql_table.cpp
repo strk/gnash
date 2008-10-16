@@ -111,7 +111,7 @@ namespace mysqldb
 	bool	table::get_member(const std::string& name, as_value* val)
 	{
 		// check table methods
-		if ( get_member_default(name, val) == false )
+		if ( as_object::get_member(name, val) == false )
 		{
 			// hack
 			int idx = strtoul(name.c_str(), NULL, 0);

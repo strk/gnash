@@ -42,9 +42,9 @@
 #endif
 
 #include "MediaHandler.h"
-#ifdef SOUND_SDL
+#ifdef USE_FFMPEG
 # include "ffmpeg/MediaHandlerFfmpeg.h"
-#elif defined(SOUND_GST)
+#elif defined(USE_GST)
 # include "gst/MediaHandlerGst.h"
 #endif
 
@@ -111,11 +111,11 @@ MovieTester::MovieTester(const std::string& url)
 		throw GnashException("Could not load movie from "+url);
 	}
 
-	// Initialize the sound handler(s)
-	initTestingSoundHandlers();
-
 	// Initialize the testing media handlers
 	initTestingMediaHandlers();
+
+	// Initialize the sound handler(s)
+	initTestingSoundHandlers();
 
 	_movie_root = &(VM::init(*_movie_def, _clock).getRoot());
 
@@ -539,11 +539,6 @@ MovieTester::canTestVideo() const
 {
 	if ( ! canTestSound() ) return false;
 
-#ifdef USE_MAD
-	// mad doesn't support video !
-	return false;
-#endif
-
 	return true;
 }
 
@@ -572,9 +567,9 @@ MovieTester::initTestingMediaHandlers()
 
 	std::auto_ptr<media::MediaHandler> handler;
 
-#ifdef SOUND_SDL
+#ifdef USE_FFMPEG
 	handler.reset( new gnash::media::MediaHandlerFfmpeg() );
-#elif defined(SOUND_GST)
+#elif defined(USE_GST)
         handler.reset( new gnash::media::MediaHandlerGst() );
 #else
 	std::cerr << "Neigher SOUND_SDL nor SOUND_GST defined" << std::endl;

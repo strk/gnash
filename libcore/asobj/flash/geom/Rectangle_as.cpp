@@ -84,18 +84,20 @@ attachRectangleInterface(as_object& o)
     o.init_member("toString", new builtin_function(Rectangle_toString), 0);
     o.init_member("union", new builtin_function(Rectangle_union), 0);
     o.init_property("bottom", Rectangle_bottom_getset, Rectangle_bottom_getset, 0);
-    o.init_property("bottomRight", Rectangle_bottomRight_getset, Rectangle_bottomRight_getset, 0);
-    o.init_property("left", Rectangle_left_getset, Rectangle_left_getset, 0);
-    o.init_property("right", Rectangle_right_getset, Rectangle_right_getset, 0);
-    o.init_property("size", Rectangle_size_getset, Rectangle_size_getset, 0);
-    o.init_property("top", Rectangle_top_getset, Rectangle_top_getset, 0);
-    o.init_property("topLeft", Rectangle_topLeft_getset, Rectangle_topLeft_getset, 0);
+    o.init_property("bottomRight", Rectangle_bottomRight_getset,
+            Rectangle_bottomRight_getset, 0);
+    o.init_property("left", Rectangle_left_getset,
+            Rectangle_left_getset, 0);
+    o.init_property("right", Rectangle_right_getset,
+            Rectangle_right_getset, 0);
+    o.init_property("size", Rectangle_size_getset,
+            Rectangle_size_getset, 0);
+    o.init_property("top", Rectangle_top_getset,
+            Rectangle_top_getset, 0);
+    o.init_property("topLeft", Rectangle_topLeft_getset,
+            Rectangle_topLeft_getset, 0);
 }
 
-static void
-attachRectangleStaticProperties(as_object& /*o*/)
-{
-}
 
 static as_object*
 getRectangleInterface()
@@ -637,7 +639,6 @@ Rectangle_ctor(const fn_call& fn)
 		} while(0);
 	}
 
-	// TODO: use named strings (we have PROP_X and PROP_Y, lack PROP_WIDTH and PROP_HEIGHT)
 	obj->set_member(NSV::PROP_X, x);
 	obj->set_member(NSV::PROP_Y, y);
 	obj->set_member(NSV::PROP_WIDTH, w);
@@ -650,8 +651,8 @@ static as_value get_flash_geom_rectangle_constructor(const fn_call& /*fn*/)
 {
 	log_debug("Loading flash.geom.Rectangle class");
 
-	builtin_function* cl=new builtin_function(&Rectangle_ctor, getRectangleInterface());
-	attachRectangleStaticProperties(*cl);
+	builtin_function* cl =
+	        new builtin_function(&Rectangle_ctor, getRectangleInterface());
 	return cl;
 }
 

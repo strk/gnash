@@ -25,7 +25,13 @@
 #include <iostream>
 #include <string>
 #include <boost/scoped_ptr.hpp>
+
+// FIXME: Get rid of this crap.
+#if defined(HAVE_WINSOCK_H) && !defined(__OS2__)
+# include <winsock.h>
+#else
 #include <arpa/inet.h> // for htons
+#endif
 
 #include "NetConnection.h"
 #include "log.h"
@@ -200,7 +206,7 @@ readNetworkShort(const boost::uint8_t* buf) {
 	return s;
 }
 
-static boost::uint16_t
+static boost::uint32_t
 readNetworkLong(const boost::uint8_t* buf) {
 	boost::uint32_t s = buf[0] << 24 | buf[1] << 16 | buf[2] << 8 | buf[3];
 	return s;
@@ -229,7 +235,7 @@ private:
 
 	SimpleBuffer postdata;
 	URL url;
-	boost::scoped_ptr<IOChannel> connection;
+	boost::scoped_ptr<IOChannel> _connection;
 	SimpleBuffer reply;
 	int reply_start;
 	int reply_end;
@@ -242,7 +248,7 @@ public:
 		_nc(nc),
 		postdata(),
 		url(url),
-		connection(0),
+		_connection(0),
 		reply(NCCALLREPLYMAX),
 		reply_start(0),
 		reply_end(0),
@@ -276,7 +282,7 @@ public:
 #ifdef GNASH_DEBUG_REMOTING
 		log_debug("tick running");
 #endif
-		if(connection)
+		if(_connection)
 		{
 
             VM& vm = _nc.getVM();
@@ -284,7 +290,7 @@ public:
 #ifdef GNASH_DEBUG_REMOTING
 			log_debug("have connection");
 #endif
-			int read = connection->readNonBlocking(reply.data() + reply_end, NCCALLREPLYMAX - reply_end);
+			int read = _connection->readNonBlocking(reply.data() + reply_end, NCCALLREPLYMAX - reply_end);
 			if(read > 0) {
 #ifdef GNASH_DEBUG_REMOTING
 				log_debug("read '%1%' bytes: %2%", read, hexify(reply.data() + reply_end, read, false));
@@ -305,13 +311,13 @@ public:
 			// the buffer is full, 2) when we have a "length in bytes" value
 			// thas is satisfied
 
-			if(connection->get_error())
+			if(_connection->get_error())
 			{
 				log_debug("connection is in error condition, calling NetConnection.onStatus");
 				reply_start = 0;
 				reply_end = 0;
 				//log_debug("deleting connection");
-				connection.reset(); // reset connection before calling the callback
+				_connection.reset(); // reset connection before calling the callback
 
 				// FIXME: should only call NetConnection's onStatus
 				//        if the IOChannel is in error condition.
@@ -320,7 +326,7 @@ public:
 				_nc.callMethod(NSV::PROP_ON_STATUS, as_value());
 
 			}
-			else if(connection->eof() )
+			else if(_connection->eof() )
 			{
 				if ( reply_end > 8)
 				{
@@ -476,13 +482,13 @@ public:
 #ifdef GNASH_DEBUG_REMOTING
 				log_debug("deleting connection");
 #endif
-				connection.reset();
+				_connection.reset();
 				reply_start = 0;
 				reply_end = 0;
 			}
 		}
 
-		if(connection == 0 && queued_count > 0) {
+		if(!_connection && queued_count > 0) {
 #ifdef GNASH_DEBUG_REMOTING
 			log_debug("creating connection");
 #endif
@@ -493,14 +499,14 @@ public:
 			log_debug("NetConnection.call(): encoded args from %1% calls: %2%", queued_count, hexify(postdata.data(), postdata.size(), false));
 #endif
 			queued_count = 0;
-			connection.reset( StreamProvider::getDefaultInstance().getStream(url, postdata_str) );
+			_connection.reset(StreamProvider::getDefaultInstance().getStream(url, postdata_str).release());
 			postdata.resize(6);
 #ifdef GNASH_DEBUG_REMOTING
 			log_debug("connection created");
 #endif
 		}
 
-		if(connection == 0 && queued_count == 0) {
+		if(_connection == 0 && queued_count == 0) {
 #ifdef GNASH_DEBUG_REMOTING
 			log_debug("stopping ticking");
 #endif

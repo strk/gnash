@@ -1,26 +1,26 @@
 
-		Building Gnash from its CVS repository
+		Building Gnash from its bzr repository
 
-The source code of Gnash is checked into a CVS repository.  (See the main
+The source code of Gnash is checked into a bzr repository.  (See the main
 web page for Gnash for the current details on where that repository is.)
 The instructions for building Gnash in README and INSTALL assume that
 you are starting from a released "tarball" (e.g. gnash-VERSION.tar.gz).
 The tarball contains some files that are not in the original source code
-in CVS.  They are generated using tools that not everyone is expected
+in bzr.  They are generated using tools that not everyone is expected
 to have.  This simplifies the process of building Gnash releases, for
 ordinary people.
 
 People who are actively working on maintaining Gnash need to have these
 extra tools.  They are used to build configuration files, international
 message translation catalogs, and such.  After you check out the source
-code of Gnash from CVS, you'll have to run a single script that rebuilds
+code of Gnash from bzr, you'll have to run a single script that rebuilds
 all these files.  This script is called "./autogen.sh", and it lives
 in the top-level directory of gnash.  You run it without any arguments.
 When it finishes, you can run "./configure", with or without arguments,
 as instructed in the README and INSTALL files.
 
 A variety of GNU programs are required when checking out the
-CVS tree and building the auto-generated files.  If anything is
+bzr tree and building the auto-generated files.  If anything is
 missing, ./autogen.sh will (probably) tell you, or produce a relatively
 understandable error message.  When in doubt, look at the *first*
 error message.  Here are the programs required:
@@ -30,7 +30,7 @@ Package		Version  Debian		Ubuntu		Fedora		Gentoo
 -------         -------  -----------    ------------    ---------	----------
 automake	1.9.6	automake1.9	automake1.9	automake
 autoconf	2.59			autoconf	autoconf
-cvs		1.11.22			cvs		cvs
+bzr		1.3			bzr		bzr
 gettext		0.14.6			gettext		gettext
 libtool		1.5.22			libtool		libtool
 		1.5.22			libltdl3-dev	libtool
@@ -49,7 +49,7 @@ or seek a compatible set of tools, perhaps the set that comes by default
 in your operating system (if any).
 
 If you are unable to run ./autogen.sh successfully on your system, consider
-building Gnash from a tarball release.  Or, move the CVS tree to a system
+building Gnash from a tarball release.  Or, move the bzr tree to a system
 on which you can run ./autogen.sh successfully, then move it back to the
 system you are trying to build on.
 

@@ -21,27 +21,25 @@
 #include "MediaParser.h"
 #include "log.h"
 
-#include <unistd.h>             // for usleep()
 #include <boost/bind.hpp>
+#include "GnashSleep.h" // for usleep.
 
-#ifdef _WIN32
-#include <windows.h>
-#define usleep(usec) ((void) Sleep((usec) / 1000))
-#endif
+// Define this to get debugging output from MediaParser
+//#define GNASH_DEBUG_MEDIAPARSER
 
 namespace gnash {
 namespace media {
 
 MediaParser::MediaParser(std::auto_ptr<IOChannel> stream)
 	:
-	_stream(stream),
 	_parsingComplete(false),
+	_bytesLoaded(0),
+	_stream(stream),
 	_bufferTime(100), // 100 ms 
 	_parserThread(0),
 	_parserThreadStartBarrier(2),
 	_parserThreadKillRequested(false),
-	_seekRequest(false),
-	_bytesLoaded(0)
+	_seekRequest(false)
 {
 }
 
@@ -207,13 +205,20 @@ MediaParser::peekNextAudioFrame() const
 	return _audioFrames.front();
 }
 
-MediaParser::~MediaParser()
+void
+MediaParser::join()
 {
 	if ( _parserThread.get() )
 	{
 		requestParserThreadKill();
 		_parserThread->join();
+		_parserThread.reset();
 	}
+}
+
+MediaParser::~MediaParser()
+{
+	assert (! _parserThread.get() );
 
 	for (VideoFrames::iterator i=_videoFrames.begin(),
 		e=_videoFrames.end(); i!=e; ++i)
@@ -259,27 +264,33 @@ MediaParser::pushEncodedAudioFrame(std::auto_ptr<EncodedAudioFrame> frame)
 #ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
 	boost::mutex::scoped_lock lock(_qMutex);
 #endif
-
-	// If last frame on queue has a timestamp > then this one, that's either due
-	// to seek-back (most commonly) or a wierdly encoded media file.
-	// In any case, we'll flush the queue and restart from the new timestamp
-	if ( ! _audioFrames.empty() && _audioFrames.back()->timestamp > frame->timestamp )
-	{
-		log_debug("Timestamp of last audio frame in queue (%d) "
-			"greater then timestamp in the frame being "
-			"pushed to it (%d). Flushing %d queue elements.",
-			_audioFrames.back()->timestamp, frame->timestamp,
-			_audioFrames.size());
-		for (AudioFrames::iterator i=_audioFrames.begin(),
-			e=_audioFrames.end(); i!=e; ++i)
-		{
-			delete (*i);
-		}
-		_audioFrames.clear();
-	}
 	
-	//log_debug("Pushing audio frame with timestamp %d", frame->timestamp);
-	_audioFrames.push_back(frame.release());
+    // Find location to insert this new frame to, so that
+    // timestamps are sorted
+    //
+    AudioFrames::iterator loc = _audioFrames.end();
+    if ( ! _audioFrames.empty() ) {
+        size_t gap=0;
+        AudioFrames::reverse_iterator i=_audioFrames.rbegin();
+        for (AudioFrames::reverse_iterator e=_audioFrames.rend(); i!=e; ++i)
+        {
+            if ( (*i)->timestamp <= frame->timestamp ) break;
+            //log_debug("%d-to-last element has timestamp %d > %d", gap, (*i)->timestamp, frame->timestamp);
+            ++gap;
+        }
+
+        loc = i.base();
+
+        if ( gap ) {
+            log_debug("Timestamp of last %d/%d audio frames in queue "
+                "greater then timestamp in the frame being "
+                "inserted to it (%d).", gap, _audioFrames.size(), frame->timestamp);
+        }
+    }
+
+	//log_debug("Inserting audio frame with timestamp %d", frame->timestamp);
+	_audioFrames.insert(loc, frame.release());
+
 #ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
 	waitIfNeeded(lock); // if the push reaches a "buffer full" condition, wait to be waken up
 #endif
@@ -292,26 +303,32 @@ MediaParser::pushEncodedVideoFrame(std::auto_ptr<EncodedVideoFrame> frame)
 	boost::mutex::scoped_lock lock(_qMutex);
 #endif
 
-	// If last frame on queue has a timestamp > then this one, that's either due
-	// to seek-back (most commonly) or a wierdly encoded media file.
-	// In any case, we'll flush the queue and restart from the new timestamp
-	if ( ! _videoFrames.empty() && _videoFrames.back()->timestamp() > frame->timestamp() )
-	{
-		log_debug("Timestamp of last video frame in queue (%d) "
-			"greater then timestamp in the frame being "
-			"pushed to it (%d). Flushing %d queue elements.",
-			_videoFrames.back()->timestamp(), frame->timestamp(),
-			_videoFrames.size());
-		for (VideoFrames::iterator i=_videoFrames.begin(),
-			e=_videoFrames.end(); i!=e; ++i)
-		{
-			delete (*i);
-		}
-		_videoFrames.clear();
-	}
+    // Find location to insert this new frame to, so that
+    // timestamps are sorted
+    //
+    VideoFrames::iterator loc = _videoFrames.end();
+    if ( ! _videoFrames.empty() ) {
+        size_t gap=0;
+        VideoFrames::reverse_iterator i=_videoFrames.rbegin();
+        for (VideoFrames::reverse_iterator e=_videoFrames.rend(); i!=e; ++i)
+        {
+            if ( (*i)->timestamp() <= frame->timestamp() ) break;
+            //log_debug("%d-to-last element has timestamp() %d > %d", gap, (*i)->timestamp(), frame->timestamp());
+            ++gap;
+        }
+
+        loc = i.base();
+
+        if ( gap ) {
+            log_debug("Timestamp of last %d/%d video frames in queue "
+                "greater then timestamp() in the frame being "
+                "inserted to it (%d).", gap, _videoFrames.size(), frame->timestamp());
+        }
+    }
 
 	//log_debug("Pushing video frame with timestamp %d", frame->timestamp());
-	_videoFrames.push_back(frame.release());
+	_videoFrames.insert(loc, frame.release());
+
 #ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
 	waitIfNeeded(lock); // if the push reaches a "buffer full" condition, wait to be waken up
 #endif
@@ -324,7 +341,7 @@ MediaParser::waitIfNeeded(boost::mutex::scoped_lock& lock)
 	bool pc=parsingCompleted();
 	bool ic=indexingCompleted();
 	bool bf=bufferFull();
-	if ( pc || (bf && ic) ) // TODO: or seekRequested ?
+	if (( pc || (bf && ic)) && !parserThreadKillRequested()) // TODO: or seekRequested ?
 	{
 #ifdef GNASH_DEBUG_MEDIAPARSER
 		log_debug("Parser thread waiting on wakeup lock, parsingComplete=%d, bufferFull=%d", pc, bf);
@@ -343,7 +360,7 @@ MediaParser::bufferFull() const
 	int bl = getBufferLengthNoLock();
 	int bt = getBufferTime();
 #ifdef GNASH_DEBUG_MEDIAPARSER
-	log_debug("bufferFull: %d/%d", bl, bt);
+	log_debug("MediaParser::bufferFull: %d/%d", bl, bt);
 #endif // GNASH_DEBUG_MEDIAPARSER
 	return bl > bt;
 }
@@ -355,7 +372,7 @@ MediaParser::parserLoop()
 	while (!parserThreadKillRequested())
 	{
 		parseNextChunk();
-		usleep(100); // no rush....
+        gnashSleep(100); // no rush....
 	}
 }
 
@@ -374,6 +391,62 @@ std::ostream& operator << (std::ostream& os, const VideoInfo& vi)
 	return os;
 }
 
+std::ostream&
+operator<< (std::ostream& os, const videoCodecType& t)
+{
+        switch (t)
+        {
+                case VIDEO_CODEC_H263:
+                        os << "H263";
+                        break;
+                case VIDEO_CODEC_SCREENVIDEO:
+                        os << "Screenvideo";
+                        break;
+                case VIDEO_CODEC_VP6:
+                        os << "VP6";
+                        break;
+                case VIDEO_CODEC_VP6A:
+                        os << "VP6A";
+                        break;
+                case VIDEO_CODEC_SCREENVIDEO2:
+                        os << "Screenvideo2";
+                        break;
+                default:
+                        os << "unknown/invalid";
+                        break;
+        }
+        return os;
+}
+
+std::ostream&
+operator<< (std::ostream& os, const audioCodecType& t)
+{
+        switch (t)
+        {
+                case AUDIO_CODEC_RAW:
+                        os << "Raw";
+                        break;
+                case AUDIO_CODEC_ADPCM:
+                        os << "ADPCM";
+                        break;
+                case AUDIO_CODEC_MP3:
+                        os << "MP3";
+                        break;
+                case AUDIO_CODEC_UNCOMPRESSED:
+                        os << "Uncompressed";
+                        break;
+                case AUDIO_CODEC_NELLYMOSER_8HZ_MONO:
+                        os << "Nellymoser 8Hz mono";
+                        break;
+                case AUDIO_CODEC_NELLYMOSER:
+                        os << "Nellymoser";
+                        break;
+                default:
+                        os << "unknown/invalid";
+                        break;
+        }
+        return os;
+}
 
 } // end of gnash::media namespace
 } // end of gnash namespace

@@ -34,14 +34,25 @@
 #include "MediaParser.h"
 #include "as_function.h" // for visibility of destructor by intrusive_ptr
 
+#include "VideoDecoder.h" // for visibility of dtor
+#include "AudioDecoder.h" // for visibility of dtor
+
+#include "VirtualClock.h"
+
+
+
+
 #include <deque>
 #include <boost/scoped_ptr.hpp>
 
 // Forward declarations
 namespace gnash {
-	//class NetConnection;
-	class VirtualClock;
 	class CharacterProxy;
+	class IOChannel;
+	namespace media {
+		class sound_handler;
+		class MediaHandler;
+	}
 }
 
 namespace gnash {
@@ -181,7 +192,38 @@ private:
 
 };
 
-  
+
+
+
+
+class raw_mediadata_t
+{
+public:
+        DSOEXPORT raw_mediadata_t()
+		:
+	        m_stream_index(-1),
+        	m_size(0),
+        	m_data(NULL),
+        	m_ptr(NULL),
+        	m_pts(0)
+	{}
+
+        DSOEXPORT ~raw_mediadata_t()
+	{
+		delete [] m_data;
+	}
+	
+
+        int m_stream_index;
+        boost::uint32_t m_size;
+        boost::uint8_t* m_data;
+        boost::uint8_t* m_ptr;
+        boost::uint32_t m_pts;  // presentation timestamp in millisec
+};
+
+
+
+
 
 /// NetStream ActionScript class
 //
@@ -312,6 +354,9 @@ protected:
 
 public:
 
+
+typedef std::deque<raw_mediadata_t*> AudioQueue;
+
 	enum PauseMode {
 	  pauseModeToggle = -1,
 	  pauseModePause = 0,
@@ -320,12 +365,11 @@ public:
 
 	NetStream();
 
-#if !defined(sgi) || defined(__GNUC__)
-	virtual ~NetStream(){}
-#endif
+	~NetStream();
+
 	/// Closes the video session and frees all ressources used for decoding
 	/// except the FLV-parser (this might not be correct).
-	virtual void close(){}
+	void close();
 
 	/// Make audio controlled by given character
 	void setAudioController(character* controller);
@@ -334,14 +378,14 @@ public:
 	//
 	/// @param mode
 	///	Defines what mode to put the instance in.
-	virtual void pause(PauseMode /*mode*/){}
+	void pause(PauseMode mode);
 
 	/// Starts the playback of the media
 	//
 	/// @param source
 	///	Defines what file to play
 	///
-	virtual void play(const std::string& /*source*/){ log_error(_("FFMPEG or Gstreamer is needed to play video")); }
+	void play(const std::string& source);
 
 	/// Seek in the media played by the current instance
 	//
@@ -349,21 +393,21 @@ public:
 	///	Defines in seconds where to seek to
 	///	TODO: take milliseconds !!
 	///
-	virtual void seek(boost::uint32_t /*pos*/){}
+	void seek(boost::uint32_t pos);
 
 	/// Tells where the playhead currently is
 	//
 	/// @return The time in milliseconds of the current playhead position
 	///
-	virtual boost::int32_t time() { return 0; }
+	boost::int32_t time();
 
 	/// Called at the SWF framerate. Used to process queued status messages
 	/// and (re)start after a buffering pause. In NetStreamFfmpeg it is also
 	/// used to find the next video frame to be shown, though this might change.
-	virtual void advance(){}
+	void advance();
 	
 	/// Returns the current framerate in frames per second.
-	virtual double getCurrentFPS() { return 0; }
+	double getCurrentFPS()  { return 0; }
 	
 
 	/// Sets the NetConnection needed to access external files
@@ -392,13 +436,13 @@ public:
 	boost::uint32_t bufferTime() { return m_bufferTime; }
 
 	/// Returns the number of bytes of the media file that have been buffered.
-	virtual long bytesLoaded() { return 0; }
+	long bytesLoaded();
 
 	/// Returns the total number of bytes (size) of the media file
 	//
 	/// @return the total number of bytes (size) of the media file
 	///
-	virtual long bytesTotal() { return 0;}
+	long bytesTotal();
 
 	/// Returns the number of millisecond of the media file that is buffered and 
 	/// yet to be played
@@ -425,7 +469,190 @@ public:
 		_invalidatedVideoCharacter = ch;
 	}
 
+
+
+	/// Callback used by sound_handler to get audio data
+	//
+	/// This is a sound_handler::aux_streamer_ptr type.
+	///
+	/// It will be invoked by a separate thread (neither main, nor decoder thread).
+	///
+	static bool audio_streamer(void *udata, boost::uint8_t *stream, int len);
+
+
+
+
+
 private:
+
+
+
+	enum PlaybackState {
+		PLAY_NONE,
+		PLAY_STOPPED,
+		PLAY_PLAYING,
+		PLAY_PAUSED
+	};
+
+	enum DecodingState {
+		DEC_NONE,
+		DEC_STOPPED,
+		DEC_DECODING,
+		DEC_BUFFERING
+	};
+
+	/// Gets video info from the parser and initializes _videoDecoder
+	//
+	/// @param parser the parser to use to get video information.
+	///
+	void initVideoDecoder(media::MediaParser& parser);
+
+	/// Gets audio info from the parser and initializes _audioDecoder
+	//
+	/// @param parser the parser to use to get audio information.
+	///
+	void initAudioDecoder(media::MediaParser& parser);
+
+	DecodingState _decoding_state;
+
+	// Mutex protecting _playback_state and _decoding_state
+	// (not sure a single one is appropriate)
+	boost::mutex _state_mutex;
+
+	// Setups the playback
+	bool startPlayback();
+
+	// Pauses the playhead 
+	//
+	// Users:
+	// 	- ::decodeFLVFrame() 
+	// 	- ::pause() 
+	// 	- ::play() 
+	//
+	void pausePlayback();
+
+	// Resumes the playback 
+	//
+	// Users:
+	// 	- ::av_streamer() 
+	// 	- ::play() 
+	// 	- ::startPlayback() 
+	// 	- ::advance() 
+	//
+	void unpausePlayback();
+
+	/// Update the image/videoframe to be returned by next get_video() call.
+	//
+	/// Uses by ::advance().
+	///
+	/// Note that get_video will be called by video_stream_instance::display, which
+	/// is usually called right after video_stream_instance::advance, so  the result
+	/// is that  refreshVideoFrame() is called right before get_video(). This is important
+	/// to ensure timing is correct..
+	///
+	/// @param alsoIfPaused
+	///	If true, video is consumed/refreshed even if playhead is paused.
+	///	By default this is false, but will be used on ::seek (user-reguested)
+	///
+	void refreshVideoFrame(bool alsoIfPaused=false);
+
+	/// Refill audio buffers, so to contain new frames since last run
+	/// and up to current timestamp
+	void refreshAudioBuffer();
+
+	// Used to decode and push the next available (non-FLV) frame to the audio or video queue
+	bool decodeMediaFrame();
+
+	/// Decode next video frame fetching it MediaParser cursor
+	//
+	/// @return 0 on EOF or error, a decoded video otherwise
+	///
+	std::auto_ptr<image::ImageBase> decodeNextVideoFrame();
+
+	/// Decode next audio frame fetching it MediaParser cursor
+	//
+	/// @return 0 on EOF or error, a decoded audio frame otherwise
+	///
+	raw_mediadata_t* decodeNextAudioFrame();
+
+	/// \brief
+	/// Decode input audio frames with timestamp <= ts
+	/// and push them to the output audio queue
+	void pushDecodedAudioFrames(boost::uint32_t ts);
+
+	/// Decode input frames up to the one with timestamp <= ts.
+	//
+	/// Decoding starts from "next" element in the parser cursor.
+	///
+	/// Return 0 if:
+	///	1. there's no parser active.
+	///	2. parser cursor is already on last frame.
+	///	3. next element in cursor has timestamp > tx
+	///	4. there was an error decoding
+	///
+	std::auto_ptr<image::ImageBase> getDecodedVideoFrame(boost::uint32_t ts);
+
+	DecodingState decodingStatus(DecodingState newstate = DEC_NONE);
+
+	/// Video decoder
+	std::auto_ptr<media::VideoDecoder> _videoDecoder;
+
+	/// Audio decoder
+	std::auto_ptr<media::AudioDecoder> _audioDecoder;
+
+	/// Virtual clock used as playback clock source
+	std::auto_ptr<InterruptableVirtualClock> _playbackClock;
+
+	/// Playback control device 
+	PlayHead _playHead;
+
+	// Current sound handler
+	media::sound_handler* _soundHandler;
+
+	// Current media handler
+	media::MediaHandler* _mediaHandler;
+
+	/// Parse a chunk of input
+	/// Currently blocks, ideally should parse as much
+	/// as possible w/out blocking
+	void parseNextChunk();
+
+	/// Input stream
+	//
+	/// This should just be a temporary variable, transferred
+	/// to MediaParser constructor.
+	///
+	std::auto_ptr<IOChannel> _inputStream;
+
+	/// This is where audio frames are pushed by ::advance
+	/// and consumed by sound_handler callback (audio_streamer)
+	AudioQueue _audioQueue;
+
+	/// Number of bytes in the audio queue, protected by _audioQueueMutex
+	size_t _audioQueueSize;
+
+	/// The queue needs to be protected as sound_handler callback
+	/// is invoked by a separate thread (dunno if it makes sense actually)
+	boost::mutex _audioQueueMutex;
+
+	// Whether or not the aux streamer is attached
+	bool _auxStreamerAttached;
+
+	/// Attach the aux streamer.
+	//
+	/// On success, _auxStreamerAttached will be set to true.
+	/// Won't attach again if already attached.
+	///
+	void attachAuxStreamer();
+
+	/// Detach the aux streamer
+	//
+	/// _auxStreamerAttached will be set to true.
+	/// Won't detach if not attached.
+	///
+	void detachAuxStreamer();
+
+
 
 	/// Pop next queued status notification from the queue
 	//

@@ -24,12 +24,14 @@
 #include "gnashconfig.h"
 #endif
 
-#include "log.h"
-#include <rc.h>
-
 #include <gst/gst.h>
-#include "image.h"
 #include "dsodefs.h" // DSOEXPORT
+
+// GST_TIME_AS_MSECONDS not defined as of gst 0.10.9
+// is defined as of gst 0.10.19
+#ifndef GST_TIME_AS_MSECONDS
+# define GST_TIME_AS_MSECONDS(time) ((time) / G_GINT64_CONSTANT (1000000))
+#endif
 
 namespace gnash {
 namespace media {
@@ -61,9 +63,18 @@ public:
  *    a number based on the number of gnashrcsinks that have been allocated so
  *    far.
  */
-  static GstElement* get_audiosink_element();
-  
-  static void ensure_plugin_registered(const char* name, GType type);
+    static GstElement* get_audiosink_element();
+
+
+    /// Check for missing plugins and try to install them if necessary.
+    //
+    /// The installation, if applicable, will happen synchronously!
+    ///
+    /// @param caps Indicates the type of media to search for.
+    /// @return if there is a decoder available to decode the passed type,
+    ///         or if we succeeded in installing one, returns true. Otherwise,
+    ///         returns false.
+    static bool check_missing_plugins(GstCaps* caps);
         
 private:
 

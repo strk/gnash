@@ -17,8 +17,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-#ifndef __MEDIAHANDLERFFMPEG_H__
-#define __MEDIAHANDLERFFMPEG_H__
+#ifndef GNASH_MEDIAHANDLERFFMPEG_H
+#define GNASH_MEDIAHANDLERFFMPEG_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -40,10 +40,13 @@ public:
 	virtual std::auto_ptr<VideoDecoder> createVideoDecoder(VideoInfo& info);
 
 	virtual std::auto_ptr<AudioDecoder> createAudioDecoder(AudioInfo& info);
+
+    virtual size_t getInputPaddingSize() const;
+
 };
 
 
 } // gnash.media namespace 
 } // namespace gnash
 
-#endif // __MEDIAHANDLERFFMPEG_H__
+#endif 

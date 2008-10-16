@@ -29,23 +29,7 @@
 #include "log.h"
 #include "VideoDecoder.h"
 #include "MediaParser.h" // for videoCodecType enum
-
-#ifdef HAVE_FFMPEG_AVCODEC_H
-extern "C" {
-# include "ffmpeg/avcodec.h"
-}
-#endif
-
-#ifdef HAVE_LIBAVCODEC_AVCODEC_H
-extern "C" {
-# include "libavcodec/avcodec.h"
-}
-#endif
-
-
-#if defined(HAVE_LIBSWSCALE_SWSCALE_H) || defined(HAVE_FFMPEG_SWSCALE_H)
-# define HAVE_SWSCALE_H 1
-#endif
+#include "ffmpegHeaders.h"
 
 
 namespace gnash {
@@ -54,7 +38,6 @@ namespace media {
 
 /// Forward declarations
 class CodecContextWrapper;
-class image::ImageBase;
 #ifdef HAVE_SWSCALE_H
 class SwsContextWrapper;
 #endif

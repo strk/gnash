@@ -31,6 +31,7 @@
 #include "tree.hh" // for tree
 #endif
 
+#include <cstdlib> // exit
 #include <string>
 #include <map>
 
@@ -120,7 +121,7 @@ public:
     /// The default implementation calls exit(0), which isn't nice.
     /// Please implement the proper main loop quitter in the subclasses.
     ///
-    virtual void quit()  { exit(0); }
+    virtual void quit()  { std::exit(0); }
 
     /// Render the current buffer.
     /// For OpenGL, this means that the front and back buffers are swapped.
@@ -302,28 +303,26 @@ public:
     
     /// Whether gnash is is running as a plugin
     bool isPlugin() const { return (( _xid )); }
-    
-    void setMaxAdvances(unsigned long ul) { if (ul > 0) _maxAdvances = ul; }
+
+    /// Set the maximum number of frame advances before Gnash exits.
+    void setMaxAdvances(unsigned long ul) { if (ul) _maxAdvances = ul; }
     
     void showUpdatedRegions(bool x) { _showUpdatedRegions = x; }
     bool showUpdatedRegions() { return _showUpdatedRegions; }
 
-    /** @name Menu callbacks
-     *  These callbacks will be called when a menu item is clicked.
-     *  @{
-     */
-    void menu_restart();
-    void menu_quit();
-    void menu_about();
-    void menu_play();
-    void menu_pause();
-    void menu_stop();
+    /// Instruct the core to restart the movie and
+    /// set state to play(). This does not change pause
+    /// state.
+    void restart();
+
     void menu_step_forward();
     void menu_step_backward();
     void menu_jump_forward();
     void menu_jump_backward();
-    void menu_toggle_sound();
-    /// @}
+
+    /// Toggle sound state between muted and unmuted. If
+    /// there is no active sound handler this does nothing.
+    void toggleSound();
 
 #ifdef GNASH_FPS_DEBUG
     /// Set the interval between FPS debugging prints

@@ -17,7 +17,7 @@ set ASCodingErrorsVerbosity false
 # Use a verbosity of 0 by default, -v will change it
 set verbosity 0
 
-# Don't NOT write to the logfile
+# Do NOT write to the logfile
 set writeLog false
 
 # Enable sound (for testcases using it..)
@@ -30,5 +30,8 @@ set GstAudioSink fakesink
 
 # Open a can of worms by raising likelyhood of movie definition destruction
 set movieLibraryLimit 1
+
+# No sense in starting stopped.
+set startStopped false
 
 # TODO: enable extensions ?

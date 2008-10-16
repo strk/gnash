@@ -224,14 +224,6 @@ public:
         return m_has_looped;
     }
 
-    /// Combine the flags to avoid a conditional.
-    /// It would be faster with a macro.
-    inline int transition(int a, int b) const
-    {
-        return (a << 2) | b;
-    }
-
-
     /// Return true if we have any mouse event handlers.
     //
     /// NOTE: this function currently does not consider

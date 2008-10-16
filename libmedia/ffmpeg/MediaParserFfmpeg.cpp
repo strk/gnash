@@ -49,8 +49,8 @@ MediaParserFfmpeg::readPacketWrapper(void* opaque, boost::uint8_t* buf, int buf_
 	return p->readPacket(buf, buf_size);
 }
 
-offset_t
-MediaParserFfmpeg::seekMediaWrapper(void *opaque, offset_t offset, int whence)
+boost::int64_t
+MediaParserFfmpeg::seekMediaWrapper(void *opaque, boost::int64_t offset, int whence)
 {
 	MediaParserFfmpeg* p = static_cast<MediaParserFfmpeg*>(opaque);
 	return p->seekMedia(offset, whence);
@@ -227,8 +227,12 @@ MediaParserFfmpeg::parseNextFrame()
 	//log_debug("av_read_frame returned %d", rc);
 	if ( rc < 0 )
 	{
-		log_error(_("MediaParserFfmpeg::parseNextChunk: Problems parsing next frame"));
-		return false;
+        log_error(_("MediaParserFfmpeg::parseNextFrame: "
+            "Problems parsing next frame "
+            "(av_read_frame returned %d)."
+            " We'll consider the stream fully parsed."), rc);
+        _parsingComplete=true; // No point in parsing over
+        return false;
 	}
 
 	bool ret=false;
@@ -389,8 +393,13 @@ MediaParserFfmpeg::initializeParser()
 		boost::uint64_t duration = _videoStream->duration;
 #endif
 		_videoInfo.reset( new VideoInfo(codec, width, height, frameRate, duration, FFMPEG /*codec type*/) );
+		
+		_videoInfo->extra.reset(new ExtraVideoInfoFfmpeg(
+			// NOTE: AVCodecContext.extradata : void* for 51.11.0, uint8_t* for 51.38.0
+			(uint8_t*)_videoStream->codec->extradata,
+			_videoStream->codec->extradata_size));
+
 		//log_debug("EXTRA: %d bytes of video extra data", _videoStream->codec->extradata_size);
-		_videoInfo->extra.reset(new ExtraVideoInfoFfmpeg(_videoStream->codec->extradata, _videoStream->codec->extradata_size));
 	}
 
 	// Create AudioInfo
@@ -406,8 +415,13 @@ MediaParserFfmpeg::initializeParser()
 		boost::uint64_t duration = _audioStream->duration;
 #endif
 		_audioInfo.reset( new AudioInfo(codec, sampleRate, sampleSize, stereo, duration, FFMPEG /*codec type*/) );
+
+		_audioInfo->extra.reset(new ExtraAudioInfoFfmpeg(
+			// NOTE: AVCodecContext.extradata : void* for 51.11.0, uint8_t* for 51.38.0
+			(uint8_t*)_audioStream->codec->extradata,
+			_audioStream->codec->extradata_size));
+
 		//log_debug("EXTRA: %d bytes of audio extra data", _videoStream->codec->extradata_size);
-		_audioInfo->extra.reset(new ExtraAudioInfoFfmpeg(_audioStream->codec->extradata, _audioStream->codec->extradata_size));
 	}
 
 
@@ -444,8 +458,8 @@ MediaParserFfmpeg::readPacket(boost::uint8_t* buf, int buf_size)
 
 }
 
-offset_t 
-MediaParserFfmpeg::seekMedia(offset_t offset, int whence)
+boost::int64_t 
+MediaParserFfmpeg::seekMedia(boost::int64_t offset, int whence)
 {
 	GNASH_REPORT_FUNCTION;
 
@@ -485,8 +499,11 @@ MediaParserFfmpeg::SampleFormatToSampleSize(SampleFormat fmt)
 		case SAMPLE_FMT_FLT: // float
 			return 2;
 
+#if !defined (LIBAVCODEC_VERSION_MAJOR) || LIBAVCODEC_VERSION_MAJOR < 52
+// Was dropped for version 52.0.0
 		case SAMPLE_FMT_S24: // signed 24 bits
 			return 3;
+#endif
 
 		case SAMPLE_FMT_S32: // signed 32 bits
 			return 4;

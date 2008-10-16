@@ -432,8 +432,8 @@ create_movie(const URL& url, const char* reset_url, bool startLoaderThread, cons
   const std::string swfurl = url.str();
 
   std::auto_ptr<IOChannel> in;
-  if ( postdata ) in.reset( globals::streamProvider.getStream(url, *postdata) );
-  else in.reset( globals::streamProvider.getStream(url) );
+  if ( postdata ) in = globals::streamProvider.getStream(url, *postdata);
+  else in = globals::streamProvider.getStream(url);
   if ( ! in.get() )
   {
       log_error(_("failed to open '%s'; can't create movie"), swfurl);

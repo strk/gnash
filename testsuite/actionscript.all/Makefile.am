@@ -84,6 +84,7 @@ ASTESTS =			\
 	Boolean.as		\
 	Camera.as		\
 	Color.as		\
+    ColorTransform.as \
 	ContextMenu.as		\
 	CustomActions.as	\
 	Date.as			\
@@ -112,6 +113,7 @@ ASTESTS =			\
 	TextField.as		\
 	TextFormat.as		\
 	TextSnapshot.as		\
+	Transform.as		\
 	Try.as \
 	Video.as		\
 	Matrix.as \

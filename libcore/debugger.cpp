@@ -164,25 +164,25 @@ Debugger::console(as_environment &env)
 		        // change a parameter on the stack
 		    case 's':
 			cin >> index >> val;
-			asval.set_std_string(val);
+			asval.set_string(val);
 			this->changeStackValue(index, asval);
 			break;
 			// change a local variable
 		    case 'v':
 			cin >> var >> val;
-			asval.set_std_string(val);
+			asval.set_string(val);
 			this->changeLocalVariable(var, asval);
 			break;
 			// change a local register
 		    case 'r':
 			cin >> index >> val;
-			asval.set_std_string(val);
+			asval.set_string(val);
 			this->changeLocalRegister(index, asval);
 			break;
 			// change a global register
 		    case 'g':
 			cin >> index >> val;
-			asval.set_std_string(val);
+			asval.set_string(val);
 			this->changeGlobalRegister(index, asval);
 			break;
 		    default:

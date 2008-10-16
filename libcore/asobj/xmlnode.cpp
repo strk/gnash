@@ -71,26 +71,10 @@ static as_value xmlnode_prefix(const fn_call& fn);
 
 as_object* getXMLNodeInterface();
 
-//static LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
-
-
-//std::vector<as_object *> _xmlobjs;    // FIXME: hack alert
 
 XMLNode::XMLNode()
     :
     as_object(getXMLNodeInterface()),
-    _parent(0),
-    _type(tElement)
-{
-    //log_debug("%s: %p", __PRETTY_FUNCTION__, this);
-#ifdef DEBUG_MEMORY_ALLOCATION
-    log_debug(_("\tCreating XMLNode data at %p"), this);
-#endif
-}
-
-XMLNode::XMLNode(as_object* overridden_interface)
-    :
-    as_object(overridden_interface),
     _parent(0),
     _type(tElement)
 {
@@ -281,23 +265,21 @@ XMLNode::nextSibling()
 }
 
 void
-XMLNode::toString(std::ostream& xmlout) const
+XMLNode::toString(std::ostream& xmlout, bool encode) const
 {
-//    GNASH_REPORT_FUNCTION;
-    stringify(*this, xmlout);
+    log_debug("XMLNode toString: encode %d");
+    stringify(*this, xmlout, encode);
 }
 
 /* static private */
 void
-XMLNode::stringify(const XMLNode& xml, std::ostream& xmlout) 
+XMLNode::stringify(const XMLNode& xml, std::ostream& xmlout, bool encode) 
 {
-//    GNASH_REPORT_FUNCTION;
+
     const std::string& nodevalue = xml.nodeValue();
     const std::string& nodename = xml.nodeName();
     NodeType type = xml.nodeType();
 
-
-//    log_debug("%s: processing for object %s <%p>", __PRETTY_FUNCTION__, nodename, xml);
 
 #ifdef GNASH_DEBUG
     log_debug(_("Stringifying node %p with name %s, value %s, %u attributes and %u children"),
@@ -314,7 +296,6 @@ XMLNode::stringify(const XMLNode& xml, std::ostream& xmlout)
         for (ita = xml._attributes.begin(); ita != xml._attributes.end(); ita++)
         {
             const XMLAttr& xa = *ita;
-            // TODO: replace with XMLAttr::operator<<
             xmlout << " " << xa.name() << "=\"" << xa.value() << "\"";
         }
 
@@ -335,16 +316,14 @@ XMLNode::stringify(const XMLNode& xml, std::ostream& xmlout)
     // Node value first, then children
     if ( type == tText )
     {
-	    xmlout << nodevalue;
+	    encode ? xmlout << URL::encode(nodevalue) : xmlout << nodevalue;
     }
 
     // Childs, after node value.
     ChildList::const_iterator itx;
     for (itx = xml._children.begin(); itx != xml._children.end(); itx++)
     {
-//      log_debug(_("Found One XMLNode child.  %s <%p>"), (*itx)->nodeName().c_str(), (void*)*itx);
-//      cerr << "<" << (*it)->nodeName() << ">" << endl;
-        (*itx)->toString(xmlout);
+        (*itx)->toString(xmlout, encode);
     }
 
     if ( nodename.size() )
@@ -357,29 +336,37 @@ void
 attachXMLNodeInterface(as_object& o)
 {
     // These need to be full-featured AS functions (builtin_function)
-    o.init_member("appendChild", new builtin_function(xmlnode_appendchild));
-    o.init_member("cloneNode", new builtin_function(xmlnode_clonenode));
-    o.init_member("hasChildNodes", new builtin_function(xmlnode_haschildnodes));
-    o.init_member("insertBefore", new builtin_function(xmlnode_insertbefore));
-    o.init_member("removeNode", new builtin_function(xmlnode_removenode));
-    o.init_member("toString", new builtin_function(xmlnode_tostring));
-    o.init_member("getPrefixForNamespace", new builtin_function(xmlnode_getPrefixForNamespace));
-    o.init_member("getNamespaceForPrefix", new builtin_function(xmlnode_getNamespaceForPrefix));
+    
+    const int noFlags = 0;
+    
+    // No prop flags:
+    o.init_member("appendChild", new builtin_function(xmlnode_appendchild), noFlags);
+    o.init_member("cloneNode", new builtin_function(xmlnode_clonenode), noFlags);
+    o.init_member("hasChildNodes", new builtin_function(xmlnode_haschildnodes), noFlags);
+    o.init_member("insertBefore", new builtin_function(xmlnode_insertbefore), noFlags);
+    o.init_member("removeNode", new builtin_function(xmlnode_removenode), noFlags);
+    o.init_member("toString", new builtin_function(xmlnode_tostring), noFlags);
+    o.init_member("getPrefixForNamespace", new builtin_function(xmlnode_getPrefixForNamespace), noFlags);
+    o.init_member("getNamespaceForPrefix", new builtin_function(xmlnode_getNamespaceForPrefix), noFlags);
 
-    o.init_property("nodeValue", &xmlnode_nodevalue, &xmlnode_nodevalue);
-    o.init_property("nodeName", &xmlnode_nodename, &xmlnode_nodename);
 
-    o.init_readonly_property("namespaceURI", &xmlnode_namespaceURI);
-    o.init_readonly_property("localName", &xmlnode_localName);
-    o.init_readonly_property("prefix", &xmlnode_prefix);
-    o.init_readonly_property("nodeType", &xmlnode_nodetype);
-    o.init_readonly_property("attributes", &xmlnode_attributes);
-    o.init_readonly_property("childNodes", &xmlnode_childNodes);
-    o.init_readonly_property("firstChild", &xmlnode_firstchild);
-    o.init_readonly_property("lastChild", &xmlnode_lastchild);
-    o.init_readonly_property("nextSibling", &xmlnode_nextsibling);
-    o.init_readonly_property("previousSibling", &xmlnode_previoussibling);
-    o.init_readonly_property("parentNode", &xmlnode_parentNode);
+    const int protectedFlags = as_prop_flags::isProtected;
+
+    // Just the protected flag:
+    o.init_property("nodeValue", &xmlnode_nodevalue, &xmlnode_nodevalue, protectedFlags);
+    o.init_property("nodeName", &xmlnode_nodename, &xmlnode_nodename, protectedFlags);
+
+    o.init_readonly_property("firstChild", &xmlnode_firstchild, protectedFlags);
+    o.init_readonly_property("lastChild", &xmlnode_lastchild, protectedFlags);
+    o.init_readonly_property("localName", &xmlnode_localName, protectedFlags);
+    o.init_readonly_property("namespaceURI", &xmlnode_namespaceURI, protectedFlags);
+    o.init_readonly_property("nextSibling", &xmlnode_nextsibling, protectedFlags);
+    o.init_readonly_property("prefix", &xmlnode_prefix, protectedFlags);
+    o.init_readonly_property("previousSibling", &xmlnode_previoussibling, protectedFlags);
+    o.init_readonly_property("nodeType", &xmlnode_nodetype, protectedFlags);
+    o.init_readonly_property("attributes", &xmlnode_attributes, protectedFlags);
+    o.init_readonly_property("childNodes", &xmlnode_childNodes, protectedFlags);
+    o.init_readonly_property("parentNode", &xmlnode_parentNode, protectedFlags);
 
 }
 
@@ -781,7 +768,7 @@ as_value
 xmlnode_childNodes(const fn_call& fn)
 {
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
-    boost::intrusive_ptr<as_array_object> ary = new as_array_object();
+    boost::intrusive_ptr<Array_as> ary = new Array_as();
 
     typedef XMLNode::ChildList ChildList;
 

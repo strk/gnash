@@ -23,23 +23,87 @@
 rcsid="$Id: MovieClip.as,v 1.133 2008/05/09 13:21:08 strk Exp $";
 #include "check.as"
 
+// Utility function to print a Matrix with optional rounding
+printMatrix = function(m, roundToDecimal)
+{
+    if ( roundToDecimal != undefined )
+    {
+        var round = Math.pow(10, roundToDecimal);
+//      trace('rounding to '+round);
+        return '(a=' + Math.round(m.a*round)/round + ', b='+ Math.round(m.b*round)/round + ', c='+ Math.round(m.c*round)/round + ', d=' + Math.round(m.d*round)/round + ', tx='+Math.round(m.tx*round)/round+', ty='+Math.round(m.ty*round)/round+')';
+    }
+    else
+    {
+        return m.toString();
+    }
+};
+
+
+#if OUTPUT_VERSION == 5
+Object.prototype.hasOwnProperty = ASnative(101, 5);
+#endif
+
+xcheck(MovieClip.prototype.hasOwnProperty("blendMode"));
+check(MovieClip.prototype.hasOwnProperty("attachBitmap"));
+xcheck(MovieClip.prototype.hasOwnProperty("cacheAsBitmap"));
+check(MovieClip.prototype.hasOwnProperty("enabled"));
+xcheck(MovieClip.prototype.hasOwnProperty("filters"));
+xcheck(MovieClip.prototype.hasOwnProperty("forceSmoothing"));
+xcheck(MovieClip.prototype.hasOwnProperty("opaqueBackground"));
+xcheck(MovieClip.prototype.hasOwnProperty("scale9Grid"));
+xcheck(MovieClip.prototype.hasOwnProperty("scrollRect"));
+xcheck(MovieClip.prototype.hasOwnProperty("tabIndex"));
+check(MovieClip.prototype.hasOwnProperty("transform"));
+check(MovieClip.prototype.hasOwnProperty("useHandCursor"));
+check(MovieClip.prototype.hasOwnProperty("_lockroot"));
+
+check(!MovieClip.prototype.hasOwnProperty("focusEnabled"));
+check(!MovieClip.prototype.hasOwnProperty("hitArea"));
+check(!MovieClip.prototype.hasOwnProperty("menu"));
+check(!MovieClip.prototype.hasOwnProperty("tabChildren"));
+check(!MovieClip.prototype.hasOwnProperty("tabEnabled"));
+check(!MovieClip.prototype.hasOwnProperty("trackAsMenu"));
+check(!MovieClip.prototype.hasOwnProperty("_alpha"));
+check(!MovieClip.prototype.hasOwnProperty("_currentframe"));
+check(!MovieClip.prototype.hasOwnProperty("_droptarget"));
+check(!MovieClip.prototype.hasOwnProperty("_focusrect"));
+check(!MovieClip.prototype.hasOwnProperty("_height"));
+check(!MovieClip.prototype.hasOwnProperty("_highquality"));
+check(!MovieClip.prototype.hasOwnProperty("_name"));
+check(!MovieClip.prototype.hasOwnProperty("_parent"));
+check(!MovieClip.prototype.hasOwnProperty("_quality"));
+check(!MovieClip.prototype.hasOwnProperty("_rotation"));
+check(!MovieClip.prototype.hasOwnProperty("_soundbuftime"));
+check(!MovieClip.prototype.hasOwnProperty("_target"));
+check(!MovieClip.prototype.hasOwnProperty("_totalframes"));
+check(!MovieClip.prototype.hasOwnProperty("_url"));
+check(!MovieClip.prototype.hasOwnProperty("_visible"));
+check(!MovieClip.prototype.hasOwnProperty("_width"));
+check(!MovieClip.prototype.hasOwnProperty("_x"));
+check(!MovieClip.prototype.hasOwnProperty("_xmouse"));
+check(!MovieClip.prototype.hasOwnProperty("_xscale"));
+check(!MovieClip.prototype.hasOwnProperty("_y"));
+check(!MovieClip.prototype.hasOwnProperty("_ymouse"));
+check(!MovieClip.prototype.hasOwnProperty("_yscale"));
+
+
 // To be called at end of test
 endOfTest = function() 
 {
 #if OUTPUT_VERSION <= 5
-	check_totals(234); // SWF5
+	check_totals(276); // SWF5
 #endif
 
 #if OUTPUT_VERSION == 6
-	check_totals(664); // SWF6
+	check_totals(725); // SWF6
 #endif
 
 #if OUTPUT_VERSION == 7
-	check_totals(681); // SWF7
+	check_totals(742); // SWF7
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(682); // SWF8+
+	check_totals(800); // SWF8+
 #endif
 
 	play();
@@ -1025,6 +1089,12 @@ draw._x -= 20;
 container._x += 20;
 
 draw._rotation = 90;
+
+#if OUTPUT_VERSION >= 8
+check_equals(printMatrix(draw.transform.matrix, 2), "(a=0, b=1, c=-1, d=0, tx=0, ty=0)");
+check_equals(printMatrix(container.transform.matrix, 2), "(a=1, b=0, c=0, d=1, tx=0, ty=0)");
+#endif
+
 check_equals(draw._width, 20); 
 check_equals(draw._height, 10); 
 b = draw.getBounds(); // these are local, untransformed
@@ -1091,20 +1161,65 @@ draw._yscale = -50;
 check_equals(draw._yscale, -50);
 check_equals(draw._height, 10);
 
+#if OUTPUT_VERSION >= 8
+check_equals(printMatrix(draw.transform.matrix, 2), "(a=1, b=0, c=0, d=-0.5, tx=0, ty=0)");
+#endif
+b = draw.getBounds(container); // these are transformed by container draw matrix
+check_equals(b.xMin, 10);
+check_equals(b.xMax, 20);
+check_equals(b.yMin, -15);
+check_equals(b.yMax, -5);
+
 draw._xscale = -50;
 check_equals(draw._xscale, -50);
+check_equals(draw._yscale, -50); // setting _xscale didn't change _yscale 
 check_equals(draw._width, 5);
 
-draw._width = 10;
-check_equals(draw._xscale, 100); // reset to positive on setting _width
+#if OUTPUT_VERSION >= 8
+check_equals(printMatrix(draw.transform.matrix, 2), "(a=-0.5, b=0, c=0, d=-0.5, tx=0, ty=0)");
+#endif
+b = draw.getBounds(container); // these are transformed by container draw matrix
+check_equals(b.xMin, -10);
+check_equals(b.xMax, -5);
+check_equals(b.yMin, -15);
+check_equals(b.yMax, -5);
 
-draw._height = 10;
-check_equals(draw._yscale, 50); // reset to positive on setting _height
+draw._width = 10;
+check_equals(draw._width, 10);
+check_equals(draw._xscale, 100); // reset to positive on setting _width
+check_equals(draw._yscale, 50); // reset to positive on setting _width !
+
+#if OUTPUT_VERSION >= 8
+check_equals(printMatrix(draw.transform.matrix, 2), "(a=1, b=0, c=0, d=0.5, tx=0, ty=0)");
+#endif
+b = draw.getBounds(container); // these are transformed by container draw matrix
+check_equals(b.xMin, 10);
+check_equals(b.xMax, 20);
+check_equals(b.yMin, 5);
+check_equals(b.yMax, 15);
+
+draw._height = 10; // TODO: dumb check, it's 10 already !!
+check_equals(draw._yscale, 50); // was already positive
+
+#if OUTPUT_VERSION >= 8
+check_equals(printMatrix(draw.transform.matrix, 2), "(a=1, b=0, c=0, d=0.5, tx=0, ty=0)");
+#endif
+b = draw.getBounds(container); // these are transformed by container draw matrix
+check_equals(b.xMin, 10);
+check_equals(b.xMax, 20);
+check_equals(b.yMin, 5);
+check_equals(b.yMax, 15);
 
 container._xscale = 100;
 container._yscale = 100;
 draw._yscale = 100;
 draw._xscale = 100;
+
+#if OUTPUT_VERSION >= 8
+check_equals(printMatrix(draw.transform.matrix, 2), "(a=1, b=0, c=0, d=1, tx=0, ty=0)");
+check_equals(printMatrix(container.transform.matrix, 0), "(a=1, b=0, c=0, d=1, tx=0, ty=0)");
+#endif
+
 b = draw.getBounds(container); // these are transformed by container draw matrix
 check_equals(b.xMin, 10);
 check_equals(b.xMax, 20);
@@ -1284,6 +1399,141 @@ check_equals(_alpha, 100);
 
 
 _alpha = 100;
+
+//----------------------------------------------
+// Test transform
+//----------------------------------------------
+
+#if OUTPUT_VERSION >=8
+tmp = _root.createEmptyMovieClip("tmp", getNextHighestDepth());
+tmptr = tmp.transform;
+
+check_equals(printMatrix(tmp.transform.matrix, 2), "(a=1, b=0, c=0, d=1, tx=0, ty=0)");
+tmp._yscale = 200;
+check_equals(printMatrix(tmp.transform.matrix, 2), "(a=1, b=0, c=0, d=2, tx=0, ty=0)");
+tmp._rotation = Math.PI / 4;
+check_equals(printMatrix(tmp.transform.matrix, 2), "(a=1, b=0.01, c=-0.03, d=2, tx=0, ty=0)");
+tmp._yscale = -100;
+check_equals(printMatrix(tmp.transform.matrix, 2), "(a=1, b=0.01, c=0.01, d=-1, tx=0, ty=0)");
+tmp._yscale = -100;
+check_equals(printMatrix(tmp.transform.matrix, 2), "(a=1, b=0.01, c=0.01, d=-1, tx=0, ty=0)");
+tmp._yscale = 100;
+check_equals(printMatrix(tmp.transform.matrix, 2), "(a=1, b=0.01, c=-0.01, d=1, tx=0, ty=0)");
+tmp._xscale = -100;
+check_equals(printMatrix(tmp.transform.matrix, 2), "(a=-1, b=-0.01, c=-0.01, d=1, tx=0, ty=0)");
+tmp._rotation = Math.PI / 2;
+check_equals(printMatrix(tmp.transform.matrix, 2), "(a=-1, b=-0.03, c=-0.03, d=1, tx=0, ty=0)");
+tmp._xscale = 100;
+check_equals(printMatrix(tmp.transform.matrix, 2), "(a=1, b=0.03, c=-0.03, d=1, tx=0, ty=0)");
+tmp._yscale = -100;
+check_equals(printMatrix(tmp.transform.matrix, 2), "(a=1, b=0.03, c=0.03, d=-1, tx=0, ty=0)");
+tmp._x = 3;
+tmp._y = 6;
+check_equals(printMatrix(tmp.transform.matrix, 2), "(a=1, b=0.03, c=0.03, d=-1, tx=3, ty=6)");
+tmp._yscale = 100;
+check_equals(printMatrix(tmp.transform.matrix, 2), "(a=1, b=0.03, c=-0.03, d=1, tx=3, ty=6)");
+tmp._yscale = -0;
+check_equals(printMatrix(tmp.transform.matrix, 2), "(a=1, b=0.03, c=0, d=0, tx=3, ty=6)");
+tmp._yscale = 0;
+check_equals(printMatrix(tmp.transform.matrix, 2), "(a=1, b=0.03, c=0, d=0, tx=3, ty=6)");
+#endif
+
+
+#if OUTPUT_VERSION < 8
+check_equals(typeof(_root.transform), 'undefined'); 
+#else
+
+// TODO: test these !!
+check_equals(typeof(_root.transform), 'object'); 
+
+oldTransform = _root.transform;
+check(oldTransform === oldTransform); 
+check(oldTransform != _root.transform); // everytime transform is accessed, it's a new object!
+
+Matrix = flash.geom.Matrix;
+check(_root.transform instanceOf Object);
+check(!_root.transform instanceOf Matrix);
+temp = _root.transform;
+props = []; for (var i in temp) props.push(i); props.sort();
+check_equals(props.toString(), "colorTransform,concatenatedColorTransform,concatenatedMatrix,matrix,pixelBounds");
+
+check_equals(typeof(_root.transform.colorTransform), 'object');
+// TODO: test colorTransform
+
+xcheck_equals(typeof(_root.transform.concatenatedColorTransform), 'object');
+// TODO: test concatenatedColorTransform
+
+xcheck_equals(typeof(_root.transform.concatenatedMatrix), 'object');
+xcheck(_root.transform.concatenatedMatrix instanceOf Matrix);
+
+check_equals(typeof(_root.transform.matrix), 'object');
+check(_root.transform.matrix instanceOf Matrix);
+
+note('x:'+_root._x+' y:'+_root._y+' rot:'+_root._rotation+' xs:'+_root._xscale+' yx:'+_root._yscale);
+
+check_equals(_root.transform.matrix.a, 1);
+check_equals(_root.transform.matrix.b, 0);
+check_equals(_root.transform.matrix.c, 0);
+check_equals(_root.transform.matrix.d, 1);
+check_equals(_root.transform.matrix.tx, 0);
+check_equals(_root.transform.matrix.ty, 0);
+// TODO: test concatenatedMatrix
+
+_root._x = 30;
+_root._y = 20;
+
+check_equals(_root.transform.matrix.toString(), "(a=1, b=0, c=0, d=1, tx=30, ty=20)");
+
+_root._xscale = -300; 
+
+check_equals(_root.transform.matrix.toString(), "(a=-3, b=0, c=0, d=1, tx=30, ty=20)");
+
+_root._yscale = -200;
+
+check_equals(_root.transform.matrix.toString(), "(a=-3, b=0, c=0, d=-2, tx=30, ty=20)");
+
+_root._rotation = -90;
+
+check_equals(_root.transform.matrix.a, 0);
+check_equals(_root.transform.matrix.b, 3); 
+check_equals(_root.transform.matrix.c, -2);
+check_equals(_root.transform.matrix.d, 0);
+check_equals(_root.transform.matrix.tx, 30);
+check_equals(_root.transform.matrix.ty, 20);
+// TODO: test concatenatedMatrix
+
+_root.transform.matrix.ty = 300;
+check_equals(_root._y, 20); // changing the AS matrix doesn't change the actual matrix
+
+check_equals(_root.transform.matrix.toString(), "(a=0, b=3, c=-2, d=0, tx=30, ty=20)");
+
+_root._x = _root._y = _root._rotation = 0;
+
+check_equals(_root.transform.matrix.toString(), "(a=-3, b=0, c=0, d=-2, tx=0, ty=0)");
+
+_root._xscale = 100;
+
+check_equals(_root.transform.matrix.toString(), "(a=1, b=0, c=0, d=-2, tx=0, ty=0)");
+
+_root._yscale = 100;
+
+check_equals(_root.transform.matrix.toString(), "(a=1, b=0, c=0, d=1, tx=0, ty=0)");
+
+OldTransform = flash.geom.Transform;
+
+flash.geom.Transform = 1;
+check_equals(_root.transform.toString(), undefined);
+check_equals(_root.transform.matrix.toString(), undefined);
+
+flash.geom.Transform = OldTransform;
+flash.geom.Transform.matrix = 3;
+check_equals(_root.transform.matrix.toString(), "(a=1, b=0, c=0, d=1, tx=0, ty=0)");
+
+flash.geom.Transform = OldTransform;
+check_equals(_root.transform.toString(), "[object Object]");
+
+
+#endif
 
 //----------------------------------------------
 // Test localToGlobal and globalToLocal

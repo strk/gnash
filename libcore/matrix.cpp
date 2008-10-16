@@ -170,21 +170,18 @@ matrix::set_scale_rotation(double x_scale, double y_scale, double angle)
 void
 matrix::set_x_scale(double xscale)
 {
-    double angle = get_rotation();
-    double cos_v = cos(angle);
-    double sin_v = sin(angle);
-    sx  =  DoubleToFixed16(xscale * cos_v);
-    shx =  DoubleToFixed16(xscale * sin_v); 
+    double rot_x = atan2((double)shx, (double)sx);
+    sx  =  DoubleToFixed16(xscale * cos(rot_x));
+    shx =  DoubleToFixed16(xscale * sin(rot_x)); 
 }
 
 void
 matrix::set_y_scale(double yscale)
 {
-    double angle = get_rotation();
-    double cos_v = cos(angle);
-    double sin_v = sin(angle);
-    shy =  - DoubleToFixed16(yscale * sin_v);
-    sy  =  DoubleToFixed16(yscale * cos_v); 
+    double rot_y = std::atan2((double)(-shy), (double)(sy));
+
+    shy = -DoubleToFixed16(yscale * std::sin(rot_y));
+    sy  =  DoubleToFixed16(yscale * std::cos(rot_y));
 }
 
 void
@@ -197,9 +194,15 @@ matrix::set_scale(double xscale, double yscale)
 void
 matrix::set_rotation(double rotation)
 {   
-    double xscale = get_x_scale();
-    double yscale = get_y_scale();
-    set_scale_rotation(xscale, yscale, rotation);
+    double rot_x = atan2((double)shx,    (double)sx);
+    double rot_y = atan2((double)(-shy), (double)sy);
+    double scale_x = get_x_scale();
+    double scale_y = get_y_scale();
+ 
+    sx  = DoubleToFixed16(scale_x * cos(rotation));
+    shx = DoubleToFixed16(scale_x * sin(rotation)); 
+    shy = -DoubleToFixed16(scale_y * sin(rot_y - rot_x + rotation));
+    sy  =  DoubleToFixed16(scale_y * cos(rot_y - rot_x + rotation));
 }
 
 void
@@ -271,7 +274,8 @@ matrix::invert()
     boost::int64_t det = determinant();
     if(det == 0)
     {
-        // TODO: check this.
+        //log_debug("Matrix not invertible, setting to identity on invert request");
+        // tested in misc-ming.all/matrix_test.c (seek "matrix inversion")
         set_identity();
     }
     else
@@ -310,16 +314,6 @@ double
 matrix::get_rotation() const
 {
     return atan2(shx, sx); // more successes in misc-ming.all/matrix_test.c
-
-    if (determinant() < 0)
-    {
-        // TODO: check this.
-        return atan2(shx, -sx);
-    }
-    else
-    {
-        return atan2(shx, sx);
-    }
 }
 
 // private
@@ -327,6 +321,14 @@ boost::int64_t
 matrix::determinant() const
 // Return the 32.32 fixed point determinant of this matrix.
 {
+    // | sx	shy	tx |
+    // | shx	sy	ty |   = T. Using the Leibniz formula:
+    // | 0	0	1  |
+    //
+    // Det(T) = ( (sx * sy * 1 ) + (shy * ty * 0) + (tx * shx *  0) ) -
+    //          ( (0  * sy * tx) + (0  * ty * sx) + (1 * shy * shx) )
+    //        = sx * sy - shx * shy
+
     return (boost::int64_t)sx * sy - (boost::int64_t)shx * shy;
 }
 
