@@ -2977,7 +2977,7 @@ if test x$ext_mysql = xyes; then
       echo "        MYSQL libs are: $MYSQL_LIBS"
     else
       echo "        ERROR: No MySQL development package is installed." >&3
-      echo "               Either reconfigure without --with-extensions=mysql" >&3
+      echo "               Either reconfigure without --enable-extensions=mysql" >&3
       echo "               or install MySQL header files from http://www.mysql.org" >&3
       echo "               or .deb users: apt-get install libmysqlclient-dev" >&3
     fi
