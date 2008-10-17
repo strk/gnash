@@ -1659,11 +1659,16 @@ GtkGui::showAboutDialog()
 	"Rob Savoye", 
 	"Sandro Santilli", 
 	"Bastiaan Jacques", 
+	"Tomas Groth", 
+	"Udo Giacomozzi", 
+	"Hannes Mayr", 
 	"Markus Gothe", 
+	"Vitaly Alexeev",
 	"John Gilmore",
+	"Zou Lunkai",
 	"Benjamin Wolsey",
 	"Russ Nelson",
-	"Zou Lunkai",
+	"Dossy Shiobara",
 	NULL
     };
 
