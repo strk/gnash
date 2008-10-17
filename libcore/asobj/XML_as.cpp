@@ -60,15 +60,12 @@ static void attachXMLInterface(as_object& o);
 static void attachXMLProperties(as_object& o);
 
 static as_value xml_new(const fn_call& fn);
-static as_value xml_load(const fn_call& fn);
-static as_value xml_addRequestHeader(const fn_call& fn);
 static as_value xml_createelement(const fn_call& fn);
 static as_value xml_createtextnode(const fn_call& fn);
 static as_value xml_getbytesloaded(const fn_call& fn);
 static as_value xml_getbytestotal(const fn_call& fn);
 static as_value xml_parsexml(const fn_call& fn);
 static as_value xml_send(const fn_call& fn);
-static as_value xml_sendAndLoad(const fn_call& fn);
 static as_value xml_ondata(const fn_call& fn);
 
 
@@ -333,25 +330,6 @@ XML_as::onLoad()
 }
 
 
-as_value
-xml_load(const fn_call& fn)
-{
-    boost::intrusive_ptr<XML_as> obj = ensureType<XML_as>(fn.this_ptr);
-  
-    if ( ! fn.nargs )
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("XML.load(): missing argument"));
-        );
-        return as_value(false);
-    }
-
-    const std::string& filespec = fn.arg(0).to_string();
-
-    obj->load(filespec);
-    
-    return as_value(true);
-}
 
 static void
 attachXMLProperties(as_object& /*o*/)
@@ -364,16 +342,22 @@ attachXMLProperties(as_object& /*o*/)
 static void
 attachXMLInterface(as_object& o)
 {
-    o.init_member("addRequestHeader", new builtin_function(xml_addRequestHeader));
-    o.init_member("createElement", new builtin_function(xml_createelement));
-    o.init_member("createTextNode", new builtin_function(xml_createtextnode));
-    o.init_member("getBytesLoaded", new builtin_function(xml_getbytesloaded));
-    o.init_member("getBytesTotal", new builtin_function(xml_getbytestotal));
-    o.init_member("load", new builtin_function(xml_load));
-    o.init_member("parseXML", new builtin_function(xml_parsexml));
-    o.init_member("send", new builtin_function(xml_send));
-    o.init_member("sendAndLoad", new builtin_function(xml_sendAndLoad));
-    o.init_member("onData", new builtin_function(xml_ondata));
+    const int flags = 0;
+
+    // No flags:
+    o.init_member("addRequestHeader", new builtin_function(
+                LoadableObject::loadableobject_addRequestHeader), flags);
+    o.init_member("createElement", new builtin_function(xml_createelement), flags);
+    o.init_member("createTextNode", new builtin_function(xml_createtextnode), flags);
+    o.init_member("getBytesLoaded", new builtin_function(xml_getbytesloaded), flags);
+    o.init_member("getBytesTotal", new builtin_function(xml_getbytestotal), flags);
+    o.init_member("load", new builtin_function(
+                LoadableObject::loadableobject_load), flags);
+    o.init_member("parseXML", new builtin_function(xml_parsexml), flags);
+    o.init_member("send", new builtin_function(xml_send), flags);
+    o.init_member("sendAndLoad", new builtin_function(
+                LoadableObject::loadableobject_sendAndLoad), flags);
+    o.init_member("onData", new builtin_function(xml_ondata), flags);
 
 }
 
@@ -427,114 +411,6 @@ xml_new(const fn_call& fn)
     xml_obj = new XML_as;
 
     return as_value(xml_obj.get());
-}
-
-/// Can take either a two strings as arguments or an array of strings,
-/// alternately header and value.
-as_value
-xml_addRequestHeader(const fn_call& fn)
-{
-    
-    boost::intrusive_ptr<XML_as> ptr = ensureType<XML_as>(fn.this_ptr);   
-
-    as_value customHeaders;
-    as_object* array;
-
-    if (ptr->get_member(NSV::PROP_uCUSTOM_HEADERS, &customHeaders))
-    {
-        array = customHeaders.to_object().get();
-        if (!array)
-        {
-            IF_VERBOSE_ASCODING_ERRORS(
-                log_aserror(_("XML.addRequestHeader: XML._customHeaders "
-                              "is not an object"));
-            );
-            return as_value();
-        }
-    }
-    else
-    {
-        array = new Array_as;
-        // This property is always initialized on the first call to
-        // addRequestHeaders.
-        ptr->set_member(NSV::PROP_uCUSTOM_HEADERS, array);
-    }
-
-    if (fn.nargs == 0)
-    {
-        // Return after having initialized the _customHeaders array.
-        IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("XML.addRequestHeader requires at least "
-                          "one argument"));
-        );
-        return as_value();
-    }
-    
-    if (fn.nargs == 1)
-    {
-        // This must be an array. Keys / values are pushed in valid
-        // pairs to the _customHeaders array.    
-        boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
-        Array_as* headerArray = dynamic_cast<Array_as*>(obj.get());
-
-        if (!headerArray)
-        {
-            IF_VERBOSE_ASCODING_ERRORS(
-                log_aserror(_("XML.addRequestHeader: single argument "
-                                "is not an array"));
-            );
-            return as_value();
-        }
-
-        Array_as::const_iterator e = headerArray->end();
-        --e;
-
-        for (Array_as::const_iterator i = headerArray->begin(); i != e; ++i)
-        {
-            // Only even indices can be a key, and they must be a string.
-            if (i.index() % 2) continue;
-            if (!(*i).is_string()) continue;
-            
-            // Only the immediately following odd number can be 
-            // a value, and it must also be a string.
-            const as_value& val = headerArray->at(i.index() + 1);
-            if (val.is_string())
-            {
-                array->callMethod(NSV::PROP_PUSH, *i, val);
-            }
-        }
-        return as_value();
-    }
-        
-    if (fn.nargs > 2)
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-            std::ostringstream ss;
-            fn.dump_args(ss);
-            log_aserror(_("XML.addRequestHeader(%s): arguments after the"
-                            "second will be discarded"), ss.str());
-        );
-    }
-    
-    // Push both to the _customHeaders array.
-    const as_value& name = fn.arg(0);
-    const as_value& val = fn.arg(1);
-    
-    // Both arguments must be strings.
-    if (!name.is_string() || !val.is_string())
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-            std::ostringstream ss;
-            fn.dump_args(ss);
-            log_aserror(_("XML.addRequestHeader(%s): both arguments "
-                        "must be a string"), ss.str());
-        );
-        return as_value(); 
-    }
-
-    array->callMethod(NSV::PROP_PUSH, name, val);
-    
-    return as_value();
 }
 
 
@@ -641,48 +517,6 @@ as_value xml_send(const fn_call& fn)
     return as_value();
 }
 
-/// Returns true if the arguments are valid, otherwise false. The
-/// success of the connection is irrelevant.
-/// The second argument must be an object, but does not have to 
-/// be an XML object.
-static as_value
-xml_sendAndLoad(const fn_call& fn)
-{
-
-    boost::intrusive_ptr<XML_as> ptr = ensureType<XML_as>(fn.this_ptr);
-    
-    if ( fn.nargs < 2 )
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        std::stringstream ss;
-        fn.dump_args(ss);
-        log_aserror(_("XML.sendAndLoad(%s): missing arguments"),
-        ss.str());
-        );
-        return as_value(false);
-    }
-
-    const std::string& filespec = fn.arg(0).to_string();
-
-    if (!fn.arg(1).is_object())
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        std::ostringstream ss;
-        fn.dump_args(ss);
-        log_aserror(_("XML.sendAndLoad(%s): second argument is not "
-                "an object"), ss.str());
-        );
-
-        return as_value(false);
-    }
-
-    boost::intrusive_ptr<as_object> targetObj = fn.arg(1).to_object();
-    assert(targetObj);
-
-    ptr->sendAndLoad(filespec, *targetObj);
-
-    return as_value(true);
-}
 
 static as_value
 xml_ondata(const fn_call& fn)

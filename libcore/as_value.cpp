@@ -661,7 +661,7 @@ as_value::to_number() const
 			
 		}
             }
-            else if(swfversion <= 4)
+            else if (swfversion <= 4)
             {
                 // For SWF4, any valid number before non-numerical
                 // characters is returned, including exponent, positive
@@ -1583,15 +1583,15 @@ as_value::doubleToString(double val, int radix)
 	// but that may just be a better compiler.
 
 	// Handle non-numeric values.
-	if(isNaN(val))
+	if (isNaN(val))
 	{
 		return "NaN";
 	}
-	else if(isinf(val))
+	else if (isinf(val))
 	{
 		return val < 0 ? "-Infinity" : "Infinity";
 	}
-	else if(val == 0.0 || val == -0.0)
+	else if (val == 0.0 || val == -0.0)
 	{
 		return "0";
 	}
@@ -1839,7 +1839,6 @@ as_value::as_value(const amf::Element& el)
 	m_type(UNDEFINED)
 {
     VM& vm = VM::get();
-    //int swfVersion = vm.getSWFVersion();
     string_table& st = vm.getStringTable();
     
     switch (el.getType()) {
@@ -1931,7 +1930,7 @@ as_value::as_value(const amf::Element& el)
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
           log_debug("as_value(Element&) : AMF type ECMA_ARRAY");
 #endif
-          Array_as* obj = new Array_as();
+          Array_as* obj = new Array_as;
           if (el.propertySize()) {
               for (size_t i=0; i < el.propertySize(); i++) {
               const boost::shared_ptr<amf::Element> prop = el.getProperty(i);
@@ -1952,7 +1951,7 @@ as_value::as_value(const amf::Element& el)
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
           log_debug("as_value(Element&) : AMF type STRICT_ARRAY");
 #endif
-          Array_as* obj = new Array_as();
+          Array_as* obj = new Array_as;
           size_t len = el.propertySize();
           obj->resize(len);
 
@@ -2112,7 +2111,7 @@ readNetworkShort(const boost::uint8_t* buf) {
 	return s;
 }
 
-static boost::uint16_t
+static boost::uint32_t
 readNetworkLong(const boost::uint8_t* buf) {
 	boost::uint32_t s = buf[0] << 24 | buf[1] << 16 | buf[2] << 8 | buf[3];
 	return s;
@@ -2137,25 +2136,24 @@ static bool
 amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inType,
     std::vector<as_object*>& objRefs, VM& vm)
 {
-	boost::uint16_t si;
-	boost::uint16_t li;
-	double dub;
 	int amf_type;
 
-	if(b > end) {
+	if (b > end) {
 		return false;
 	}
-	if(inType != -1) {
+	
+	if (inType != -1) {
 		amf_type = inType;
-	} else {
-		if(b < end) {
+	}
+	else {
+		if (b < end) {
 			amf_type = *b; b += 1;
 		} else {
 			return false;
 		}
 	}
 
-	switch(amf_type)
+	switch (amf_type)
     {
 
 		case amf::Element::BOOLEAN_AMF0:
@@ -2170,11 +2168,11 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 
 		case amf::Element::NUMBER_AMF0:
         {
-			if(b + 8 > end) {
+			if (b + 8 > end) {
 				log_error(_("AMF0 read: premature end of input reading Number type"));
 				return false;
 			}
-			dub = *(reinterpret_cast<double*>(b)); b += 8;
+			double dub = *(reinterpret_cast<double*>(b)); b += 8;
 			amf::swapBytes(&dub, 8);
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
 			log_debug("amf0 read double: %e", dub);
@@ -2185,13 +2183,15 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 
 		case amf::Element::STRING_AMF0:
         {
-			if(b + 2 > end) {
-				log_error(_("AMF0 read: premature end of input reading String type"));
+			if (b + 2 > end) {
+				log_error(_("AMF0 read: premature end of input reading String "
+                            " type"));
 				return false;
 			}
-			si = readNetworkShort(b); b += 2;
-			if(b + si > end) {
-				log_error(_("AMF0 read: premature end of input reading String type"));
+            boost::uint16_t si = readNetworkShort(b); b += 2;
+			if (b + si > end) {
+				log_error(_("AMF0 read: premature end of input reading String "
+                            "type"));
 				return false;
 			}
 
@@ -2212,14 +2212,15 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 				boost::intrusive_ptr<Array_as> array(new Array_as());
                 objRefs.push_back(array.get());
 
-				li = readNetworkLong(b); b += 4;
+                boost::uint32_t li = readNetworkLong(b); b += 4;
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
 				log_debug("amf0 starting read of STRICT_ARRAY with %i elements", li);
 #endif
 				as_value arrayElement;
-				for(int i = 0; i < li; ++i)
+				for(size_t i = 0; i < li; ++i)
 				{
-					if ( ! amf0_read_value(b, end, arrayElement, -1, objRefs, vm) )
+					if ( ! amf0_read_value(b, end, arrayElement, -1,
+                                objRefs, vm) )
 					{
 						return false;
 					}
@@ -2239,7 +2240,10 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
                 // (like premature end of buffer) we still get something.
 				ret.set_as_object(obj);
 
-				li = readNetworkLong(b); b += 4;
+                boost::uint32_t li = readNetworkLong(b); b += 4;
+                
+                log_debug("array size: %d", li);
+                
                 // the count specifies array size, so to have that even if none of the members are indexed
                 // if short, will be incremented everytime an indexed member is found
                 obj->resize(li);
@@ -2255,7 +2259,8 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 				{
                     if ( b+2 >= end )
                     {
-                        log_error("MALFORMED SOL: premature end of ECMA_ARRAY block");
+                        log_error("MALFORMED SOL: premature end of ECMA_ARRAY "
+                                "block");
                         break;
                     }
 					boost::uint16_t strlen = readNetworkShort(b); b+=2; 
@@ -2267,12 +2272,13 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
                         // expect an object terminator here
                         if ( *b++ != amf::Element::OBJECT_END_AMF0 )
                         {
-                            log_error("MALFORMED SOL: empty member name not followed by OBJECT_END_AMF0 byte");
+                            log_error("MALFORMED SOL: empty member name not "
+                                    "followed by OBJECT_END_AMF0 byte");
                         }
                         break;
                     }
 
-					std::string name((char*)b, strlen);
+					std::string name(reinterpret_cast<char*>(b), strlen);
 
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
 					log_debug("amf0 ECMA_ARRAY prop name is %s", name);
@@ -2307,7 +2313,8 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 				std::string keyString;
 				for(;;)
 				{
-					if ( ! amf0_read_value(b, end, tmp, amf::Element::STRING_AMF0, objRefs, vm) )
+					if ( ! amf0_read_value(b, end, tmp, 
+                                amf::Element::STRING_AMF0, objRefs, vm) )
 					{
 						return false;
 					}
@@ -2315,10 +2322,11 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 
 					if ( keyString.empty() )
 					{
-						if(b < end) {
+						if (b < end) {
 							b += 1; // AMF0 has a redundant "object end" byte
 						} else {
-							log_error("AMF buffer terminated just before object end byte. continueing anyway.");
+							log_error("AMF buffer terminated just before "
+                                    "object end byte. continuing anyway.");
 						}
 						return true;
 					}
@@ -2351,7 +2359,7 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 
 		case amf::Element::REFERENCE_AMF0:
         {
-			    si = readNetworkShort(b); b += 2;
+            boost::uint16_t si = readNetworkShort(b); b += 2;
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
 				log_debug("readAMF0: reference #%d", si);
 #endif
@@ -2383,11 +2391,12 @@ as_value::readAMF0(boost::uint8_t *&b, boost::uint8_t *end, int inType, std::vec
 }
 
 bool
-as_value::writeAMF0(SimpleBuffer& buf, std::map<as_object*, size_t>& offsetTable, VM& vm) const
+as_value::writeAMF0(SimpleBuffer& buf, 
+        std::map<as_object*, size_t>& offsetTable, VM& vm) const
 {
     typedef std::map<as_object*, size_t> OffsetTable;
 
-    assert ( ! is_exception() );
+    assert (!is_exception());
 
     switch (m_type)
     {
@@ -2511,7 +2520,7 @@ as_value::writeAMF0(SimpleBuffer& buf, std::map<as_object*, size_t>& offsetTable
 #endif
 
             buf.appendByte(amf::Element::BOOLEAN_AMF0);
-            if(tf) buf.appendByte(1);
+            if (tf) buf.appendByte(1);
             else buf.appendByte(0);
 
             return true;

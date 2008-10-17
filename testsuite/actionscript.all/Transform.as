@@ -27,7 +27,11 @@ rcsid="$Id: Transform.as,v 1.3 2008/06/20 13:28:56 bwy Exp $";
 ASSetPropFlags (_global, "flash", 0, 5248);
 
 #if OUTPUT_VERSION < 8
-check_equals(flash.geom.Transform, undefined);
+# if OUTPUT_VERSION < 6 
+check_equals(typeOf(flash.geom.Transform), "undefined");
+# else
+check_equals(typeOf(flash.geom.Transform), "function");
+# endif
 totals(1);
 #else
 
@@ -86,7 +90,7 @@ mcx._alpha = -99;
 check_equals(mcx.transform.colorTransform.toString(), "(redMultiplier=1, greenMultiplier=1, blueMultiplier=1, alphaMultiplier=-0.98828125, redOffset=0, greenOffset=0, blueOffset=0, alphaOffset=0)");
 
 mcx._alpha = 13000;
-xcheck_equals(mcx.transform.colorTransform.toString(), "(redMultiplier=1, greenMultiplier=1, blueMultiplier=1, alphaMultiplier=-128, redOffset=0, greenOffset=0, blueOffset=0, alphaOffset=0)");
+check_equals(mcx.transform.colorTransform.toString(), "(redMultiplier=1, greenMultiplier=1, blueMultiplier=1, alphaMultiplier=-128, redOffset=0, greenOffset=0, blueOffset=0, alphaOffset=0)");
 
 r = new ColorTransform(2, 3, 4, 5, 5, -5, 5, -5);
 mcx.transform.colorTransform = r;
@@ -96,6 +100,9 @@ r = new ColorTransform(0, 1, 1, 1, 0, 0, 255, 0);
 mcx.transform.colorTransform = r;
 check_equals(mcx.transform.colorTransform.toString(), "(redMultiplier=0, greenMultiplier=1, blueMultiplier=1, alphaMultiplier=1, redOffset=0, greenOffset=0, blueOffset=255, alphaOffset=0)");
 
+r = new ColorTransform(5e-67, 2342341, 11234112, -287394874978, 1222222, 2342343434, 255, 4e+5);
+mcx.transform.colorTransform = r;
+check_equals(mcx.transform.colorTransform.toString(), "(redMultiplier=0, greenMultiplier=-128, blueMultiplier=-128, alphaMultiplier=-128, redOffset=-32768, greenOffset=-32768, blueOffset=255, alphaOffset=-32768)");
 
 
 // Tricks with the flash package:
@@ -157,10 +164,17 @@ check_equals(mc.transform.matrix.toString(), undefined);
 check_equals(mc2.transform.matrix.toString(), trans.matrix.toString());
 check_equals(mat.toString(), "(a=1, b=0, c=0, d=1, tx=0, ty=0)");
 
+check_equals(mc2._xscale, 100);
+check_equals(mc2._yscale, 100);
+check_equals(mc2._rotation, 1.5);
 trans.matrix = new Matrix(2, 0, 0, 2, 10, 11);
 
 check_equals(trans.matrix.toString(), "(a=2, b=0, c=0, d=2, tx=10, ty=11)");
 check_equals(mc2.transform.matrix.toString(), "(a=2, b=0, c=0, d=2, tx=10, ty=11)");
+
+check_equals(mc2._xscale, 100);
+check_equals(mc2._yscale, 100);
+check_equals(mc2._rotation, 1.5);
 
 delete mc2;
 
@@ -196,5 +210,5 @@ check_equals(mc.transform.matrix.toString(), "(a=1, b=0, c=0, d=1, tx=0, ty=0)")
 xcheck_equals(mcOld.transform.matrix.toString(), "(a=4, b=0.300000011920929, c=0.300000011920929, d=1, tx=1, ty=0)");
 
 
-totals(63);
+totals(70);
 #endif

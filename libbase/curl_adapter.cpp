@@ -30,23 +30,24 @@
 #include "IOChannel.h"
 #include "log.h"
 #include "WallClockTimer.h"
+#include "GnashSleep.h"
 
 #include <iostream> // std::cerr
 #include <boost/thread/mutex.hpp>
 #include <boost/version.hpp>
 #include <boost/assign/list_of.hpp>
 
-using gnash::log_debug;
-using gnash::log_error;
-
 
 #ifndef USE_CURL
+
+namespace gnash {
+
 // Stub for warning about access when no libcurl is defined.
 
 std::auto_ptr<IOChannel>
 NetworkAdapter::makeStream(const std::string& /*url*/)
 {
-	log_error(_("ERROR: libcurl is not available, but "
+	log_error(_("libcurl is not available, but "
 	            "Gnash has attempted to use the curl adapter"));
 	return std::auto_ptr<IOChannel>();
 }
@@ -63,6 +64,8 @@ NetworkAdapter::makeStream(const std::string& url, const std::string& postdata,
 {
     return makeStream(url);
 }
+
+} // namespace gnash
 
 #else // def USE_CURL
 
@@ -208,7 +211,7 @@ CurlSession::~CurlSession()
 	while ( (code=curl_share_cleanup(_shandle)) != CURLSHE_OK )
 	{
 		log_error("Failed cleaning up share handle: %s. Will try again in a second.", curl_share_strerror(code));
-		sleep(1);
+		gnashSleep(1000000);
 	}
 	_shandle = 0;
 	curl_global_cleanup();
@@ -357,6 +360,7 @@ CurlSession::unlockSharedHandle(CURL* handle, curl_lock_data data)
  *
  **********************************************************************/
 
+/// libcurl based IOChannel, for network uri accesses
 class CurlStreamFile : public IOChannel
 {
 
@@ -1339,6 +1343,7 @@ NetworkAdapter::_reservedNames = boost::assign::list_of
 } // namespace gnash
 
 #endif // def USE_CURL
+
 
 // Local Variables:
 // mode: C++

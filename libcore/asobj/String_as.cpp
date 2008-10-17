@@ -655,21 +655,30 @@ string_char_at(const fn_call& fn)
 
     const int version = obj->getVM().getSWFVersion();
 
-    const std::wstring& wstr = utf8::decodeCanonicalString(str, version);
-
     ENSURE_FN_ARGS(1, 1, "");
 
-    size_t index = static_cast<size_t>(fn.arg(0).to_number());
+    // to_int() makes this safe from overflows.
+    const size_t index = static_cast<size_t>(fn.arg(0).to_int());
 
-    if (index >= wstr.length()) {
-        return as_value("");
+    size_t currentIndex = 0;
+
+    std::string::const_iterator it = str.begin(), e = str.end();
+
+    while (boost::uint32_t code = utf8::decodeNextUnicodeCharacter(it, e))
+    {
+        if (currentIndex == index)
+        {
+            if (version == 5)
+            {
+                return as_value(utf8::encodeLatin1Character(code));
+            }
+            return as_value(utf8::encodeUnicodeCharacter(code));
+        }
+        ++currentIndex;
     }
 
-    std::string rv;
-
-    rv.append(utf8::encodeCanonicalString(wstr.substr(index, 1), version));
-
-    return as_value(rv);
+    // We've reached the end without finding the index
+    return as_value("");
 }
 
 static as_value
@@ -695,6 +704,15 @@ string_to_upper_case(const fn_call& fn)
     {
         currentLocale = std::locale::classic();
     }
+
+    if (currentLocale == std::locale::classic())
+    {
+        LOG_ONCE(
+            log_error(_("Your locale probably can't convert non-ascii "
+            "characters to upper case. Using a UTF8 locale may fix this."));
+        );
+    }
+
     boost::to_upper(wstr, currentLocale);
 
     return as_value(utf8::encodeCanonicalString(wstr, version));
@@ -724,6 +742,15 @@ string_to_lower_case(const fn_call& fn)
     {
         currentLocale = std::locale::classic();
     }
+
+    if (currentLocale == std::locale::classic())
+    {
+        LOG_ONCE( 
+            log_error(_("Your locale probably can't convert non-ascii "
+                "characters to lower case. Using a UTF8 locale may fix this"));
+        );
+    }
+
     boost::to_lower(wstr, currentLocale);
 
     return as_value(utf8::encodeCanonicalString(wstr, version));

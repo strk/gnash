@@ -17,8 +17,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-#ifndef __AUDIODECODERSIMPLE_H__
-#define __AUDIODECODERSIMPLE_H__
+#ifndef GNASH_AUDIODECODERSIMPLE_H
+#define GNASH_AUDIODECODERSIMPLE_H
 
 #include "log.h"
 #include "AudioDecoder.h"
@@ -34,16 +34,28 @@ namespace media {
 class AudioDecoderSimple : public AudioDecoder {
 
 public:
-	AudioDecoderSimple();
+
+	/// @param info
+	/// 	AudioInfo class with all the info needed to decode
+	///     the sound correctly. Throws a MediaException on fatal
+	///     error.
+	AudioDecoderSimple(AudioInfo& info);
+	
+	/// @param info
+	/// 	SoundInfo class with all the info needed to decode
+	///     the sound correctly. Throws a MediaException on fatal
+	///     error.	
+	AudioDecoderSimple(SoundInfo& info);
+
 	~AudioDecoderSimple();
-
-	bool setup(AudioInfo* info);
-
-	bool setup(SoundInfo* info);
 
 	boost::uint8_t* decode(boost::uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize, boost::uint32_t& decodedBytes, bool parse);
 
 private:
+
+	bool setup(AudioInfo& info);
+
+	bool setup(SoundInfo& info);
 
 	// codec
 	audioCodecType _codec;

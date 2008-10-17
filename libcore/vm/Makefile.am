@@ -70,7 +70,11 @@ if USE_FFMPEG_ENGINE
 	libgnashvm_la_CPPFLAGS += $(FFMPEG_CFLAGS)
 endif
 
-libgnashvm_la_LDFLAGS = -export-dynamic # -release $(VERSION) -no-undefined 
+libgnashvm_la_LDFLAGS = -export-dynamic # -release $(VERSION)
+
+if WIN32
+  libgnashvm_la_LDFLAGS += -no-undefined
+endif
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:

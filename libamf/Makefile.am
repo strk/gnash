@@ -31,6 +31,12 @@ libgnashamf_la_LIBADD = \
 	$(top_builddir)/libbase/libgnashbase.la
 
 libgnashamf_la_LDFLAGS =  -release $(VERSION) ${AM_LDFLAGS} 
+
+if WIN32
+  libgnashamf_la_LDFLAGS += -no-undefined
+  libgnashamf_la_LIBADD += -lws2_32 -lintl
+endif
+
 # noinst_HEADERS = amf.h amfutf8.h
 
 AM_CPPFLAGS = \

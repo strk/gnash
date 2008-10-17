@@ -29,38 +29,29 @@ XPI_BUNDLE=/tmp/gnash-$(BUILDDATE)-bundle
 # this is where the gnash gets compiled
 XPI_BUILD=gnash-${VERSION}
 
-CONFIG_OPTS = $(DISTCHECK_CONFIGURE_FLAGS) \
+# These are the options we want to use to build the standalone
+# gnash player to ship within the .xpi
+CONFIG_OPTS = \
 	--disable-kparts \
+    --disable-testsuite \
 	--enable-gui=gtk \
+    --enable-xpcom \
 	--with-npapi-plugindir=/tmp/plugin
 
-xpi-unpack: Makefile #$(top_builddir)/config.status
-	-@rm -f xpi-*		# nuke everything, we're starting over
-	-@rm -f xpi-unpack
-	rm -rf $(XPI_BUILD)
+xpi xpi-bundle:
+	rm -rf $(XPI_BUILD) # extract the tarball.
 	tar jxf $(XPI_BUILD).tar.bz2
-	@touch xpi-unpack
 
-xpi-configure: xpi-unpack $(XPI_BUILD)
-	-@rm -f ipkg-configure
-	cd $(XPI_BUILD); ./configure $(CONFIG_OPTS) --disable-shared --enable-static --enable-xpcom
-	@touch xpi-configure
+	(cd $(XPI_BUILD); ./configure $(CONFIG_OPTS) --disable-shared --enable-static) # configure for standalone player.
 
-xpi-build: xpi-configure
-	-@rm -f xpi-build
-	$(MAKE) -C $(XPI_BUILD) all
+	$(MAKE) -C $(XPI_BUILD) all # build and install in temp
 	$(MAKE) -C $(XPI_BUILD) install DESTDIR=$(XPI_TMP)
-	@touch xpi-build
 
-xpi-plugin: 
-	-@rm -f xpi-plugin
-	cd $(XPI_BUILD); ./configure $(CONFIG_OPTS) --disable-static --enable-shared --enable-xpcom
-	$(MAKE) -C $(XPI_BUILD)/plugin clean all GNASHBINDIR=
+	(cd $(XPI_BUILD); ./configure $(CONFIG_OPTS) --disable-static --enable-shared) # configure for plugin.
+	$(MAKE) -C $(XPI_BUILD)/plugin clean all CXXFLAGS=-DGNASH_XPI_PLUGIN # build and get the plugin
 	$(MAKE) -C $(XPI_BUILD) install-plugin DESTDIR=$(XPI_TMP)
 	$(MAKE) -C $(XPI_BUILD)/plugin/xpcom install-pkglib DESTDIR=$(XPI_TMP)
-	-@touch xpi-plugin
 
-xpi xpi-bundle: xpi-build xpi-plugin
 	if ! test -d $(XPI_BUNDLE)/ ; then \
 	  mkdir $(XPI_BUNDLE); \
         else \
@@ -72,6 +63,7 @@ xpi xpi-bundle: xpi-build xpi-plugin
 	done;
 	mkdir -p $(XPI_BUNDLE)/plugins
 	cp -fr $(XPI_TMP)$(bindir)/*gnash $(XPI_BUNDLE)/plugins
+	strip $(XPI_BUNDLE)/plugins/gtk-gnash
 	cp -fr $(XPI_TMP)$(localedir) $(XPI_BUNDLE)/
 	cp -fr $(XPI_TMP)/tmp/plugin/libgnashplugin.so $(XPI_BUNDLE)/plugins
 	cp -fr $(XPI_TMP)/tmp/plugin/extensions/*.xpt $(XPI_BUNDLE)/plugins

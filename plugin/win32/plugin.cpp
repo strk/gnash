@@ -468,7 +468,10 @@ nsPluginInstance::threadMain(void)
     
     // Register this plugin as listener for FsCommands from the core
     // (movie_root)
+#if 0
+    /* Commenting out for now as registerFSCommandCallback() has changed. */
     root.registerFSCommandCallback(FSCommand_callback);
+#endif
     
     // Register a static function to handle ActionScript events such
     // as Mouse.hide, Stage.align etc.

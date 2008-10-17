@@ -606,7 +606,7 @@ as_object::set_member(string_table::key key, const as_value& val,
 	if ( ifFound ) return false;
 
 	// Property does not exist, so it won't be read-only. Set it.
-	if (!_members.setValue(key, const_cast<as_value&>(val), *this, nsname))
+	if (!_members.setValue(key, val, *this, nsname))
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 			log_aserror(_("Unknown failure in setting property '%s' on "
@@ -730,7 +730,7 @@ as_object::init_member(string_table::key key, const as_value& val, int flags,
 	}
 		
 	// Set (or create) a SimpleProperty 
-	if (! _members.setValue(key, const_cast<as_value&>(val), *this, nsname, flags) )
+	if (! _members.setValue(key, val, *this, nsname, flags) )
 	{
 		log_error(_("Attempt to initialize read-only property ``%s''"
 			" on object ``%p'' twice"),
@@ -1498,7 +1498,7 @@ Trigger::call(const as_value& oldval, const as_value& newval, as_object& this_ob
 		args->push_back(newval);
 		args->push_back(_customArg);
 
-		fn_call fn(const_cast<as_object*>(&this_obj), &env, args);
+		fn_call fn(&this_obj, &env, args);
 
 		as_value ret = _func->call(fn);
 

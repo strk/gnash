@@ -110,7 +110,7 @@ AC_DEFINE_UNQUOTED([DEFAULT_FLASH_SYSTEM_OS], ["${DEFAULT_FLASH_SYSTEM_OS}"], [D
 AC_SUBST(DEFAULT_FLASH_PLATFORM_ID)
 AC_SUBST(DEFAULT_FLASH_SYSTEM_OS)
 
-DEFAULT_STREAMS_TIMEOUT=10
+DEFAULT_STREAMS_TIMEOUT=60
 AC_SUBST(DEFAULT_STREAMS_TIMEOUT)
 AC_DEFINE_UNQUOTED([DEFAULT_STREAMS_TIMEOUT], [${DEFAULT_STREAMS_TIMEOUT}], [Default streams timeout in seconds])
 
@@ -701,14 +701,14 @@ dnl  Toggle support for MIT-SHM extension to the X server
 dnl --------------------------------------------------------
 
 AC_ARG_ENABLE(mit-shm,
-  AC_HELP_STRING([--disable-mit-shm], [Disable support for the MIT-SHM X extension]),
+  AC_HELP_STRING([--enable-mit-shm], [Enable support for the MIT-SHM X extension]),
 [case "${enableval}" in
   yes) xmitshm=yes ;;
   no)  xmitshm=no ;;
   *)   AC_MSG_ERROR([bad value ${enableval} for --enable-mit-shm option]) ;;
-esac],xmitshm=yes)
+esac],xmitshm=no)
 dnl as windows doesn't run X11, don't enable this extension there.
-if test "x${xmitshm}" = "xyes" -a "x${windows}" = "xno"; then
+if test "x${xmitshm}" = "xyes" -a "x${windows}" != "xyes"; then
 	AC_DEFINE(ENABLE_MIT_SHM, [1], [Use MIT-SHM X extension if available])
 fi
 
@@ -861,10 +861,11 @@ AM_CONDITIONAL(BUILD_METOME_EXT, [ test x$ext_metome = xyes ])
 AM_CONDITIONAL(BUILD_EXTENSIONS, [ test -n "$extensions_list"])
 
 AC_MSG_CHECKING([For the version of libtool])
-if test "x$darwin" != x; then
-LIBTOOLIZE=glibtoolize
+if test -d ${srcdir}/libltdl/libltdl; then
+ltver=2.x
+else
+ltver=1.x
 fi
-ltver=`${LIBTOOLIZE:-libtoolize} --version | head -1 | cut -d ' ' -f 4`
 ltmajor=`echo $ltver | cut -d '.' -f 1`
 AC_MSG_RESULT([$ltver])
 if test $ltmajor -eq 1; then
@@ -1207,6 +1208,11 @@ if test x"$gcc_cv_ld_as_needed" = xyes; then
 	LDFLAGS="${LDFLAGS} -Wl,--as-needed"
 fi
 AC_MSG_RESULT($gcc_cv_ld_as_needed)
+
+AC_DEFINE(USE_GIF, [1], [Use the GIF library])
+AC_DEFINE(USE_PNG, [1], [Use the PNG library])
+AM_CONDITIONAL(USE_GIF, true)
+AM_CONDITIONAL(USE_PNG, true)
 
 dnl GNASH_PKG_FIND(dmalloc, [dmalloc.h], [dmalloc], mallinfo)
 AM_CONDITIONAL(HAVE_DMALLOC, [ test x$has_dmalloc = xyes ])
@@ -1566,6 +1572,8 @@ AM_CONDITIONAL(MING_SUPPORTS_STREAMING_SOUND,
         [ test x"$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040006 ])
 AM_CONDITIONAL(MING_SUPPORTS_SWFBUTTON_SET_DEPTH,
         [ test x"$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040006 ])
+AM_CONDITIONAL(MING_VERSION_0_4_3,
+        [ test x"$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040300 ])
 
 if test x$cross_compiling = xno; then
   AC_ARG_WITH([swfdec_testsuite],
@@ -1596,7 +1604,7 @@ AM_CONDITIONAL(ENABLE_DOXYGEN, [ test x"$DOXYGEN" != x ])
 dnl currently unused
 dnl GNASH_PKG_FIND(ogg, [ogg.h], [decode ogg streams], ogg_stream_init)
 
-if test x$build_sdl = xyes -o x"$media_handler" = xffmpeg -o x"$media_handler" = xmad; then
+if test x$build_sdl = xyes -o x"$media_handler" = xffmpeg -o x"$media_handler" = xgst; then
   GNASH_PATH_SDL
 fi
 
@@ -1637,7 +1645,7 @@ AM_CONDITIONAL(HAVE_QT_3, [test x"${gnash_qt_version}" != x && test "${gnash_qt_
 AM_CONDITIONAL(HAVE_QT_4, [test x"${gnash_qt_version}" != x && test "${gnash_qt_version}" -eq 4])
 
 dnl Need GLIB for both GTK and GST
-if test x$build_gtk = xyes -o x${media_handler} = "xgst"; then
+if test x$build_gtk = xyes -o x${Media_handler} = "xgst"; then
   GNASH_PATH_GLIB
 fi
 
@@ -1763,7 +1771,6 @@ if test "$media_handler" = "gst"; then
   fi
   GNASH_PKG_FIND(gstreamer, [gst/gst.h], [gstreamer library], gst_init, [0.10])
   if test x"${media_handler_specified}" = xfalse; then
-    # If the library is not found, or its version is not ok, we'll try mad
     if test x"$GSTREAMER_LIBS" = x; then
        AC_MSG_WARN([No appropriate gstreamer library found, will try using ffmpeg.])
        media_handler=ffmpeg
@@ -1781,19 +1788,6 @@ if test x"$media_handler" = x"ffmpeg"; then
      fi
   fi
 fi
-
-#if test x"$media_handler" = x"mad"; then
-#  dnl Will set MAD_LIBS and MAD_CFLAGS.
-#  dnl Handles --with-mad-incl and --with-mad-lib
-#  GNASH_PKG_FIND(mad, [mad.h], [mad library], mad_copyright)
-#  if test x"${media_handler_specified}" = xfalse; then
-#    # If the library is not found, we'll disable media handling
-#    if test x"${ac_cv_path_mad_lib}" = x ; then
-#      AC_MSG_WARN([No libmad found, disabling media handling.])
-#      media_handler=none
-#    fi
-#  fi
-#fi
 
 if test x"$media_handler" = x"gst"; then
   AC_MSG_CHECKING([for modern pbutils])
@@ -1823,44 +1817,38 @@ dnl      CAIRO_CFLAGS=`echo ${CAIRO_CFLAGS} | sed -e 's/ *//'`
 dnl      CAIRO_CFLAGS="${CAIRO_CFLAGS} ${CAIRO_CFLAGS}/cairo"
 dnl   fi
   if test x$build_fb = xyes; then
-    AC_MSG_ERROR([Cairo renderer is not supported by FB gui. Use --enable-renderer=AGG or --enable-gui=gtk,sdl]);
+    AC_MSG_ERROR([Cairo renderer is not supported by FB gui. Use --enable-renderer=AGG or --enable-gui=gtk]);
   fi
   if test x$build_sdl = xyes; then
-    AC_MSG_ERROR([Cairo renderer is not supported by SDL gui. Use --enable-renderer=AGG or --enable-gui=gtk,sdl]);
+    AC_MSG_ERROR([Cairo renderer is not supported by SDL gui. Use --enable-renderer=AGG or --enable-gui=gtk]);
   fi
   if test x$build_fltk = xyes; then
-    AC_MSG_ERROR([Cairo renderer is not supported by FLTK gui. Use --enable-renderer=AGG or --enable-gui=gtk,sdl]);
+    AC_MSG_ERROR([Cairo renderer is not supported by FLTK gui. Use --enable-renderer=AGG or --enable-gui=gtk]);
   fi
   if test x$build_kde = xyes; then
-    AC_MSG_ERROR([Cairo renderer is not supported by KDE gui. Use --enable-renderer=AGG or --enable-gui=gtk,sdl]);
+    AC_MSG_ERROR([Cairo renderer is not supported by KDE gui. Use --enable-renderer=AGG or --enable-gui=gtk]);
   fi
   if test x$build_dump = xyes; then
-    AC_MSG_ERROR([Cairo renderer is not supported by Dump gui. Use --enable-renderer=AGG or --enable-gui=gtk,sdl]);
+    AC_MSG_ERROR([Cairo renderer is not supported by Dump gui. Use --enable-renderer=AGG or --enable-gui=gtk]);
   fi
   AC_DEFINE([RENDERER_CAIRO], [], [Use cairo renderer])
 fi
 
 AM_CONDITIONAL(HAVE_CAIRO, [test x"${CAIRO_LIBS}" != x])
 
-dnl I'm kinda lazy, get rid of this later... //Markus
-AM_CONDITIONAL(HAVE_MAD, test x"$media_handler" = xmad)
-
-AM_CONDITIONAL(USE_SOUND_GST, test x$media_handler = xgst)
-AM_CONDITIONAL(USE_SOUND_SDL, test x"$media_handler" = xmad -o x"$media_handler" = xffmpeg)
+AM_CONDITIONAL(USE_SOUND_SDL, test x"$media_handler" = xffmpeg -o x"$media_handler" = xgst)
 AM_CONDITIONAL(USE_FFMPEG_ENGINE, test x"$media_handler" = xffmpeg)
-AM_CONDITIONAL(USE_MAD_ENGINE, test x"$media_handler" = xmad)
+AM_CONDITIONAL(USE_GST_ENGINE, test x"$media_handler" = xgst)
 AM_CONDITIONAL(HAVE_OPENGL, test x"${OPENGL_LIBS}" != x)
 
-dnl AM_CONDITIONAL(HAVE_FFMPEG, [test x"${FFMPEG_LIBS}" != x])
-
 case "${media_handler}" in
-  gst) AC_DEFINE([SOUND_GST],  [1], [Use GSTREAMER for media handling]) ;;
-  ffmpeg) AC_DEFINE([SOUND_SDL],  [1], [Use SDL for sound handling]) ;;
+  ffmpeg|gst) AC_DEFINE([SOUND_SDL],  [1], [Use SDL for sound handling]) ;;
   *)
 esac
 
 case "${media_handler}" in
   ffmpeg)  AC_DEFINE([USE_FFMPEG],  [1], [Use FFMPEG for media decoding]) ;;
+  gst)  AC_DEFINE([USE_GST],  [1], [Use gstreamer for media decoding]) ;;
   *)
 esac
 dnl I'm kinda lazy, get rid of this later... //Markus
@@ -2299,9 +2287,7 @@ fi
 echo "        GUI toolkits supported: ${SUPPORTED_GUIS}"
 echo "        Renderers supported: ${add_renderer}"
 echo "        Media handler: "$media_handler
-if test x"$media_handler" = xffmpeg -o x"$media_handler" = xmad; then
 echo "        Using SDL for sound handling"
-fi
 echo "        Using $with_shm mode for shared memory"
 echo ""
 echo "Configured paths for ${build} are:"
@@ -2581,7 +2567,13 @@ if test "$media_handler" = "gst"; then
     else
       echo "        Gstreamer flags are: default include path"
     fi
-      echo "        Gstreamer libs are: $GSTREAMER_LIBS"
+    echo "        Gstreamer libs are: $GSTREAMER_LIBS"
+    if test x"$has_modern_gstpbutils" = "xno"; then
+      echo "        RECOMMENDED: If the user has not installed the necessary Gstreamer plugins," >&4
+      echo "                     Gstreamer can pop up a message prompting them to." >&4
+      echo "                     Install gstpbutils from http://www.gstreamer.net for that to be enabled" >&4
+      echo "                     or .deb users: apt-get install libgstreamer-plugins-base0.10-dev" >&4
+    fi
   else
     echo "        ERROR: GST media handling requested but gstreamer-0.10+ not found" >&3
     echo "               Install it from http://www.gstreamer.net" >&3
@@ -2590,24 +2582,6 @@ if test "$media_handler" = "gst"; then
     echo "               or             yast install gstreamer010-devel" >&3
   fi
 fi
-
-  if test x"$media_handler" = x"mad"; then
-    echo "        MP3 support enabled through libmad"
-    if test x"$MAD_LIBS" != x; then
-      if test x"$MAD_CFLAGS" != x; then
-        echo "        MAD flags are: $MAD_CFLAGS"
-      else
-        echo "        MAD flags are: default include path"
-      fi
-      echo "        MAD libs are: $MAD_LIBS"
-    else
-      echo "        ERROR: No libmad development package installed!" >&3
-      echo "               You can install it from http://mad.sourceforge.net" >&3
-      echo "               or .deb users: apt-get install libmad0-dev" >&3
-      echo "               or .rpm users: yum install libmad" >&3
-      echo "               or reconfigure using --enable-media=ffmpeg" >&3
-    fi
-  fi
 
   if test x"$media_handler" = x"ffmpeg"; then
     if test x"$FFMPEG_LIBS" != x; then
@@ -2703,7 +2677,7 @@ fi
 need_sdl=false
 test x$build_sdl = xyes			&& need_sdl=true
 test x"$media_handler" = x"ffmpeg"	&& need_sdl=true
-test x"$media_handler" = x"mad"		&& need_sdl=true
+test x"$media_handler" = x"gst"		&& need_sdl=true
 
 if $need_sdl; then
   if test x"$SDL_LIBS" != x; then
@@ -2716,7 +2690,7 @@ if $need_sdl; then
     echo "               or .rpm users: yum install SDL-devel" >&3
     test x$build_sdl = xyes &&
 	echo "               or select a different GUI with --enable-gui= " >&3
-    test x"$media_handler" = x"ffmpeg" -o x"$media_handler" = x"mad" &&
+    test x"$media_handler" = x"ffmpeg" &&
 	echo "               or use --enable-media=gst" >&3
   fi
 fi
@@ -2777,11 +2751,11 @@ if test x"$CURL_LIBS" != x; then
   fi
     echo "        CURL libs are: $CURL_LIBS"
 else
-  echo "        WARNING: CURL library not found." >&4
-  echo "                 Gnash will be built without support for streaming from URLs." >&4
-  echo "                 Why not install libcurl from http://curl.haxx.se/libcurl" >&4
-  echo "                 or .deb users: apt-get install libcurl3-dev" >&4
-  echo "                 or .rpm users: yum install curl-devel" >&4
+  echo "        RECOMMENDED: If you install the CURL library, Gnash will be able to" >&4
+  echo "                     display remote content (streaming from URLs) using CURL." >&4
+  echo "                     Install libcurl from http://curl.haxx.se/libcurl" >&4
+  echo "                     or .deb users: apt-get install libcurl3-dev" >&4
+  echo "                     or .rpm users: yum install curl-devel" >&4
 fi
 
 if test x"$ext_dbus" = xyes; then
@@ -2844,10 +2818,10 @@ if test x"$BOOST_LIBS" != x; then
     fi
     if test x"${extra_missing_libs}" != x; then
       for i in ${extra_missing_libs}; do
-	      echo "        WARNING: The BOOST $i library is recommended!" >&4
-        echo "               Install it from http://www.boost.org" >&4
-        echo "               or .deb users: apt-get install libboost-"`echo ${i} | sed 's/_/-/g'`"-dev" >&4
-        echo "               Gnash will compile anyway, but not all tests will work." >&4
+	echo "        WARNING: The BOOST $i library is recommended!" >&4
+        echo "                 Install it from http://www.boost.org" >&4
+        echo "                 or .deb users: apt-get install libboost-"`echo ${i} | sed 's/_/-/g'`"-dev" >&4
+        echo "                 Gnash will compile anyway, but not all tests will work." >&4
       done
     fi
     if test x"${missing_libs}" != x; then
@@ -2926,6 +2900,7 @@ if test x$cross_compiling = xno; then
     echo "        WARNING: You need to have the 'swfmill' tool installed" >&4
     echo "                 to run some of the tests in Gnash testsuite." >&4
     echo "                 You can install it from http://swfmill.org/" >&4
+    echo "                 or .deb users: apt-get install swfmill" >&4
   fi
 
   if test x"$SWFC" != x; then
@@ -3002,7 +2977,7 @@ if test x$ext_mysql = xyes; then
       echo "        MYSQL libs are: $MYSQL_LIBS"
     else
       echo "        ERROR: No MySQL development package is installed." >&3
-      echo "               Either reconfigure without --with-extensions=mysql" >&3
+      echo "               Either reconfigure without --enable-extensions=mysql" >&3
       echo "               or install MySQL header files from http://www.mysql.org" >&3
       echo "               or .deb users: apt-get install libmysqlclient-dev" >&3
     fi

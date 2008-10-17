@@ -17,8 +17,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-#ifndef __MEDIAPARSER_FFMPEG_H__
-#define __MEDIAPARSER_FFMPEG_H__
+#ifndef GNASH_MEDIAPARSER_FFMPEG_H
+#define GNASH_MEDIAPARSER_FFMPEG_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -125,10 +125,10 @@ private:
 	static int readPacketWrapper(void* opaque, boost::uint8_t* buf, int buf_size);
 
 	/// Input stream seeker, to be called by ffmpeg parser
-	offset_t seekMedia(offset_t offset, int whence);
+	boost::int64_t seekMedia(boost::int64_t offset, int whence);
 
 	/// ffmpeg callback function
-	static offset_t seekMediaWrapper(void *opaque, offset_t offset, int whence);
+	static boost::int64_t seekMediaWrapper(void *opaque, boost::int64_t offset, int whence);
 
 	/// Read some of the input to figure an AVInputFormat
 	AVInputFormat* probeStream();

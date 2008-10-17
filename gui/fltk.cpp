@@ -312,35 +312,35 @@ static void
 fltk_menu_quit(Widget*, void* ptr)
 {
     FltkGui* gui = static_cast<FltkGui*>(ptr);
-    gui->menu_quit();
+    gui->quit();
 }
 
 static void
 fltk_menu_play(Widget*, void* ptr)
 {
     FltkGui* gui = static_cast<FltkGui*>(ptr);
-    gui->menu_play();
+    gui->play();
 }
 
 static void
 fltk_menu_pause(Widget*, void* ptr)
 {
     FltkGui* gui = static_cast<FltkGui*>(ptr);
-    gui->menu_pause();
+    gui->pause();
 }
 
 static void
 fltk_menu_stop(Widget*, void* ptr)
 {
     FltkGui* gui = static_cast<FltkGui*>(ptr);
-    gui->menu_stop();
+    gui->stop();
 }
 
 static void
 fltk_menu_restart(Widget*, void* ptr)
 {
     FltkGui* gui = static_cast<FltkGui*>(ptr);
-    gui->menu_restart();
+    gui->restart();
 }
 
 static void
@@ -376,7 +376,7 @@ static void
 fltk_menu_toggle_sound(Widget*, void* ptr)
 {
     FltkGui* gui = static_cast<FltkGui*>(ptr);
-    gui->menu_toggle_sound();
+    gui->toggleSound();
 }
 
 void

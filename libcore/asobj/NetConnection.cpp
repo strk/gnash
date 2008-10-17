@@ -25,7 +25,13 @@
 #include <iostream>
 #include <string>
 #include <boost/scoped_ptr.hpp>
+
+// FIXME: Get rid of this crap.
+#if defined(HAVE_WINSOCK_H) && !defined(__OS2__)
+# include <winsock.h>
+#else
 #include <arpa/inet.h> // for htons
+#endif
 
 #include "NetConnection.h"
 #include "log.h"
@@ -200,7 +206,7 @@ readNetworkShort(const boost::uint8_t* buf) {
 	return s;
 }
 
-static boost::uint16_t
+static boost::uint32_t
 readNetworkLong(const boost::uint8_t* buf) {
 	boost::uint32_t s = buf[0] << 24 | buf[1] << 16 | buf[2] << 8 | buf[3];
 	return s;

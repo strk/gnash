@@ -66,6 +66,9 @@
 // textfield bounds and HTML tags:
 //#define GNASH_DEBUG_TEXTFIELDS 1
 
+// Define this to get debugging info about text formatting
+//#define GNASH_DEBUG_TEXT_FORMATTING 1
+
 namespace gnash {
 
 // Forward declarations
@@ -1206,15 +1209,21 @@ edit_text_character::format_text()
         return;
     }
 
-    // See bug #24266
+	// See bug #24266
 	const rect& defBounds = _bounds; // m_def->get_bounds();
 
 	AutoSizeValue autoSize = getAutoSize();
 	if ( autoSize != autoSizeNone )
 	{
-		LOG_ONCE( log_debug(_("TextField.autoSize != 'none' TESTING")) );
+		// define GNASH_DEBUG_TEXT_FORMATTING on top to get useful info
+		//LOG_ONCE( log_debug(_("TextField.autoSize != 'none' TESTING")) );
 
-		_bounds.set_to_rect(0, 0, 0, 0); // this is correct for 'true'
+		// When doing WordWrap we don't want to change
+		// the boundaries. See bug #24348
+		if (!  doWordWrap() )
+		{
+		    _bounds.set_to_rect(0, 0, 0, 0); // this is correct for 'true'
+		}
 	}
 
 	// Should get info from autoSize too maybe ?

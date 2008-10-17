@@ -24,6 +24,9 @@ fltk_gnash_CPPFLAGS = -DGUI_FLTK -DGUI_CONFIG=\"FLTK\" \
 	$(AM_CPPFLAGS) $(FLTK2_CFLAGS)
 fltk_gnash_SOURCES = $(GUI_SRCS) gui_fltk.cpp
 fltk_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic 
+if WIN32
+  fltk_gnash_LDFLAGS += -no-undefined
+endif
 #fltk_gnash_DEPENDENCIES = .configline
 fltk_gnash_LDADD = \
 	$(MYSQL_LIBS) \
@@ -38,12 +41,16 @@ fltk_gnash_LDADD = \
 # endif
 if BUILD_AGG_RENDERER
 fltk_gnash_CPPFLAGS += $(AGG_CFLAGS)
-fltk_gnash_LDADD += $(top_builddir)/backend/libgnashagg.la \
+fltk_gnash_LDADD += \
+	$(top_builddir)/backend/libgnashagg.la \
 	$(FLTK2_LIBS) $(AGG_LIBS) $(XFT_LIBS) $(X11_LIBS)
+if WIN32
+  fltk_gnash_LDADD += $(top_builddir)/libcore/libgnashcore.la
+endif
 fltk_gnash_SOURCES += fltk_glue_agg.cpp fltk_glue_agg.h \
 	 	fltk.cpp fltksup.h 
 endif
 if WIN32
-fltk_gnash_LDADD += -lgdi32 -lole32 -luuid -lws2_32 -lmsimg32
+  fltk_gnash_LDADD += -lgdi32 -lole32 -luuid -lws2_32 -lmsimg32
 endif
 endif

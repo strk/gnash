@@ -76,9 +76,6 @@ LoadableObject::sendAndLoad(const std::string& urlstr,
     /// All objects get a loaded member, set to false.
     target.set_member(NSV::PROP_LOADED, false);
 
-    std::ostringstream data;
-    toString(data);
-
 	URL url(urlstr, get_base_url());
 
 	std::auto_ptr<IOChannel> str;
@@ -127,9 +124,17 @@ LoadableObject::sendAndLoad(const std::string& urlstr,
 
         if (get_member(NSV::PROP_CONTENT_TYPE, &contentType))
         {
-            // This should not overwrite anything set in LoadVars.addRequestHeader();
-            headers.insert(std::make_pair("Content-Type", contentType.to_string()));
+            // This should not overwrite anything set in 
+            // LoadVars.addRequestHeader();
+            headers.insert(std::make_pair("Content-Type", 
+                        contentType.to_string()));
         }
+
+        // Convert the object to a string to send. XML should
+        // not be URL encoded for the POST method, LoadVars
+        // is always URL encoded.
+        std::ostringstream data;
+        toString(data, false);
 
         /// It doesn't matter if there are no request headers.
         str = StreamProvider::getDefaultInstance().getStream(url,
@@ -137,8 +142,14 @@ LoadableObject::sendAndLoad(const std::string& urlstr,
     }
 	else
     {
-    	std::string url = urlstr + "?" + data.str();
-        str = StreamProvider::getDefaultInstance().getStream(url);
+        // Convert the object to a string to send. XML should
+        // not be URL encoded for the GET method.
+        std::ostringstream data;
+        toString(data, true);
+
+    	std::string getURL = urlstr + "?" + data.str();
+        log_debug("Using GET method for sendAndLoad: %s", getURL);
+        str = StreamProvider::getDefaultInstance().getStream(getURL);
     }
 
 	if (!str.get()) 
@@ -195,8 +206,7 @@ LoadableObject::queueLoad(std::auto_ptr<IOChannel> str)
     // Doing so also avoids processing queued load
     // request immediately
     // 
-    _loadThreads.push_front(lt.get());
-    lt.release();
+    _loadThreads.push_front(lt.release());
 
     if ( startTimer )
     {
@@ -217,7 +227,8 @@ LoadableObject::queueLoad(std::auto_ptr<IOChannel> str)
 as_value
 LoadableObject::checkLoads_wrapper(const fn_call& fn)
 {
-	boost::intrusive_ptr<LoadableObject> ptr = ensureType<LoadableObject>(fn.this_ptr);
+	boost::intrusive_ptr<LoadableObject> ptr =
+        ensureType<LoadableObject>(fn.this_ptr);
 	ptr->checkLoads();
 	return as_value();
 }
@@ -236,13 +247,15 @@ LoadableObject::checkLoads()
 
         if ( lt->completed() )
         {
-            size_t xmlsize = _bytesTotal = _bytesLoaded = lt->getBytesTotal();
-            boost::scoped_array<char> buf(new char[xmlsize+1]);
-            size_t actuallyRead = lt->read(buf.get(), xmlsize);
-            if ( actuallyRead != xmlsize )
+            size_t dataSize = _bytesTotal = _bytesLoaded = lt->getBytesTotal();
+
+            boost::scoped_array<char> buf(new char[dataSize + 1]);
+            size_t actuallyRead = lt->read(buf.get(), dataSize);
+            if ( actuallyRead != dataSize )
 			{
 				// This would be either a bug of LoadThread or an expected
-				// possibility which lacks documentation (thus a bug in documentation)
+				// possibility which lacks documentation (thus a bug in
+                // documentation)
 				//
 			}
             buf[actuallyRead] = '\0';
@@ -251,10 +264,11 @@ LoadableObject::checkLoads()
             // See http://savannah.gnu.org/bugs/?19915
             utf8::TextEncoding encoding;
             // NOTE: the call below will possibly change 'xmlsize' parameter
-            char* bufptr = utf8::stripBOM(buf.get(), xmlsize, encoding);
+            char* bufptr = utf8::stripBOM(buf.get(), dataSize, encoding);
             if ( encoding != utf8::encUTF8 && encoding != utf8::encUNSPECIFIED )
             {
-                log_unimpl("%s to utf8 conversion in LoadVars input parsing", utf8::textEncodingName(encoding));
+                log_unimpl("%s to utf8 conversion in LoadVars input parsing", 
+                        utf8::textEncodingName(encoding));
             }
             as_value dataVal(bufptr); // memory copy here (optimize?)
 
@@ -280,5 +294,189 @@ LoadableObject::checkLoads()
 }
 
 
+/// Can take either a two strings as arguments or an array of strings,
+/// alternately header and value.
+as_value
+LoadableObject::loadableobject_addRequestHeader(const fn_call& fn)
+{
+    
+    boost::intrusive_ptr<LoadableObject> ptr = ensureType<LoadableObject>(fn.this_ptr);   
+
+    as_value customHeaders;
+    as_object* array;
+
+    if (ptr->get_member(NSV::PROP_uCUSTOM_HEADERS, &customHeaders))
+    {
+        array = customHeaders.to_object().get();
+        if (!array)
+        {
+            IF_VERBOSE_ASCODING_ERRORS(
+                log_aserror(_("XML.addRequestHeader: XML._customHeaders "
+                              "is not an object"));
+            );
+            return as_value();
+        }
+    }
+    else
+    {
+        array = new Array_as;
+        // This property is always initialized on the first call to
+        // addRequestHeaders.
+        ptr->set_member(NSV::PROP_uCUSTOM_HEADERS, array);
+    }
+
+    if (fn.nargs == 0)
+    {
+        // Return after having initialized the _customHeaders array.
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("XML.addRequestHeader requires at least "
+                          "one argument"));
+        );
+        return as_value();
+    }
+    
+    if (fn.nargs == 1)
+    {
+        // This must be an array. Keys / values are pushed in valid
+        // pairs to the _customHeaders array.    
+        boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
+        Array_as* headerArray = dynamic_cast<Array_as*>(obj.get());
+
+        if (!headerArray)
+        {
+            IF_VERBOSE_ASCODING_ERRORS(
+                log_aserror(_("XML.addRequestHeader: single argument "
+                                "is not an array"));
+            );
+            return as_value();
+        }
+
+        Array_as::const_iterator e = headerArray->end();
+        --e;
+
+        for (Array_as::const_iterator i = headerArray->begin(); i != e; ++i)
+        {
+            // Only even indices can be a key, and they must be a string.
+            if (i.index() % 2) continue;
+            if (!(*i).is_string()) continue;
+            
+            // Only the immediately following odd number can be 
+            // a value, and it must also be a string.
+            const as_value& val = headerArray->at(i.index() + 1);
+            if (val.is_string())
+            {
+                array->callMethod(NSV::PROP_PUSH, *i, val);
+            }
+        }
+        return as_value();
+    }
+        
+    if (fn.nargs > 2)
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::ostringstream ss;
+            fn.dump_args(ss);
+            log_aserror(_("XML.addRequestHeader(%s): arguments after the"
+                            "second will be discarded"), ss.str());
+        );
+    }
+    
+    // Push both to the _customHeaders array.
+    const as_value& name = fn.arg(0);
+    const as_value& val = fn.arg(1);
+    
+    // Both arguments must be strings.
+    if (!name.is_string() || !val.is_string())
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::ostringstream ss;
+            fn.dump_args(ss);
+            log_aserror(_("XML.addRequestHeader(%s): both arguments "
+                        "must be a string"), ss.str());
+        );
+        return as_value(); 
+    }
+
+    array->callMethod(NSV::PROP_PUSH, name, val);
+    
+    return as_value();
+}
+
+
+/// Returns true if the arguments are valid, otherwise false. The
+/// success of the connection is irrelevant.
+/// The second argument must be a loadable object (XML or LoadVars).
+/// An optional third argument specifies the method ("GET", or by default
+/// "POST"). The values are partly URL encoded if using GET.
+as_value
+LoadableObject::loadableobject_sendAndLoad(const fn_call& fn)
+{
+	boost::intrusive_ptr<LoadableObject> ptr =
+	                ensureType<LoadableObject>(fn.this_ptr);
+
+	if ( fn.nargs < 2 )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("sendAndLoad() requires at least two arguments"));
+		);
+		return as_value(false);
+	}
+
+	const std::string& urlstr = fn.arg(0).to_string();
+	if ( urlstr.empty() )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("sendAndLoad(): invalid empty url"));
+		);
+		return as_value(false);
+	}
+
+	if (!fn.arg(1).is_object())
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		    log_aserror(_("sendAndLoad(): invalid target (must be an "
+		    		    "XML or LoadVars object)"));
+		);
+		return as_value(false);
+	}
+
+
+	boost::intrusive_ptr<as_object> target = fn.arg(1).to_object();
+
+	// Post by default, override by ActionScript third argument
+	bool post = true;
+	if ( fn.nargs > 2 && fn.arg(2).to_string() == "GET" ) post = false;
+
+	ptr->sendAndLoad(urlstr, *target, post);
+	return as_value(true);
+}
+
+
+as_value
+LoadableObject::loadableobject_load(const fn_call& fn)
+{
+	boost::intrusive_ptr<LoadableObject> obj = ensureType<LoadableObject>(fn.this_ptr);
+
+	if ( fn.nargs < 1 )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("load() requires at least one argument"));
+		);
+		return as_value(false);
+	}
+
+	const std::string& urlstr = fn.arg(0).to_string();
+	if ( urlstr.empty() )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("load(): invalid empty url"));
+		);
+		return as_value(false);
+	}
+
+	obj->load(urlstr);
+	return as_value(true);
+
+}
 
 }

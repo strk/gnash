@@ -15,8 +15,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef __XML_ATTRS_H__
-#define __XML_ATTRS_H__
+#ifndef GNASH_XML_ATTRS_H
+#define GNASH_XML_ATTRS_H
 
 //#define DEBUG_MEMORY_ALLOCATION 1
 #include "as_object.h" // for inheritance
@@ -36,7 +36,8 @@
 namespace gnash {
   
 /// XML Attribute class
-class DSOLOCAL XMLAttr {
+class XMLAttr
+{
 public:
 
     XMLAttr()
@@ -51,16 +52,6 @@ public:
     ~XMLAttr()
     {}
   
-#if 0
-    XMLAttr& operator = (const XMLAttr& node)
-    {
-        _name = node._name;
-        _value = node._value;
-
-        return *this;
-    }
-#endif
-
     const std::string& name() const { return _name; }
 
     const std::string& value() const { return _value; }
@@ -74,7 +65,7 @@ private:
 };
 
 /// XML Attribute ActionScript Object
-class DSOLOCAL xmlattr_as_object : public as_object
+class xmlattr_as_object : public as_object
 {
 public:
     //XMLAttr obj;

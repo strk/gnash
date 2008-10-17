@@ -91,6 +91,9 @@ StartSoundTag::read(SWFStream& in)
     boost::uint32_t in_point = 0;
     boost::uint32_t out_point = 0;
 
+    if ( in_point ) log_unimpl(_("StartSoundTag with in point"));
+    if ( out_point ) log_unimpl(_("StartSoundTag with out point"));
+
     in.ensureBytes(has_in_point*4 + has_out_point*4 + has_loops*2);
 
     if (has_in_point)

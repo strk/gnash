@@ -171,6 +171,7 @@ main(int argc, char *argv[])
 
     Flv flv; 
     struct stat st;
+
     Network::byte_t *buf = 0;
     Network::byte_t *ptr = 0;
 //    boost::shared_ptr<Flv::flv_header_t> head;

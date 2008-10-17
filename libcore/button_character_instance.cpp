@@ -1,4 +1,4 @@
-// button_character_instance.cpp:  Mouse-sensitive buttons, for Gnash.
+// Button.cpp:  Mouse-sensitive buttons, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
@@ -24,7 +24,6 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "button_character_instance.h"
 #include "button_character_def.h"
-#include "action.h" // for as_standard_member enum
 #include "as_value.h"
 
 #include "ActionExec.h"
@@ -216,19 +215,27 @@ private:
 // Forward declarations
 static as_object* getButtonInterface();
 
-/// A couple of typedefs to make code neater
-typedef button_character_instance Button;
-typedef boost::intrusive_ptr<Button> ButtonPtr;
+/// Predicates for standard algorithms.
 
+/// Depth comparator for characters.
 static bool charDepthLessThen(const character* ch1, const character* ch2) 
 {
 	return ch1->get_depth() < ch2->get_depth();
 }
 
+/// Predicate for finding active characters.
+//
+/// Returns true if the character should be skipped:
+/// 1) if it is NULL, or 
+/// 2) if we don't want unloaded characters and the character is unloaded.
+static bool isCharacterNull(character* ch, bool includeUnloaded)
+{
+    return (!ch || (!includeUnloaded && ch->isUnloaded()));
+}
+
 static void
 attachButtonInterface(as_object& o)
 {
-	//int target_version = o.getVM().getSWFVersion();
 
 	as_c_function_ptr gettersetter;
 
@@ -278,48 +285,47 @@ attachButtonInterface(as_object& o)
 	gettersetter = character::name_getset;
 	o.init_property(NSV::PROP_uNAME, gettersetter, gettersetter);
 	
-	gettersetter = &button_character_instance::enabled_getset;
+	gettersetter = &Button::enabled_getset;
 	o.init_property(NSV::PROP_ENABLED, *gettersetter, *gettersetter);
 
 }
 
-button_character_instance::button_character_instance(
-		button_character_definition* def,
+Button::Button(
+		button_character_definition& def,
 		character* parent, int id)
 	:
 	character(parent, id),
-	m_def(def),
 	m_last_mouse_flags(IDLE),
 	m_mouse_flags(IDLE),
 	m_mouse_state(UP),
+	_def(def),
 	m_enabled(true)
 {
-	assert(m_def);
 
 	set_prototype(getButtonInterface());
 
 	// check up presence Key events
-	if ( m_def->hasKeyPressHandler() )
+	if ( _def.hasKeyPressHandler() )
 	{
 		_vm.getRoot().add_key_listener(this);
 	}
 
 }
 
-button_character_instance::~button_character_instance()
+Button::~Button()
 {
 	_vm.getRoot().remove_key_listener(this);
 }
 
 
 bool 
-button_character_instance::get_enabled()
+Button::get_enabled()
 {
 	return m_enabled;
 }
 
 void 
-button_character_instance::set_enabled(bool value)
+Button::set_enabled(bool value)
 {
 	if (value == m_enabled) return;
 	m_enabled = value; 
@@ -329,9 +335,9 @@ button_character_instance::set_enabled(bool value)
 
 
 as_value
-button_character_instance::enabled_getset(const fn_call& fn)
+Button::enabled_getset(const fn_call& fn)
 {
-	ButtonPtr ptr = ensureType<Button>(fn.this_ptr);
+	boost::intrusive_ptr<Button> ptr = ensureType<Button>(fn.this_ptr);
 
 	as_value rv;
 
@@ -351,7 +357,7 @@ button_character_instance::enabled_getset(const fn_call& fn)
 // called from Key listener only
 // (the above line is wrong, it's also called with onConstruct, for instance)
 bool
-button_character_instance::on_event(const event_id& id)
+Button::on_event(const event_id& id)
 {
 	if ( isUnloaded() )
 	{
@@ -371,38 +377,36 @@ button_character_instance::on_event(const event_id& id)
 	if ( id.keyCode == key::INVALID ) return false;
 
 	ButtonActionPusher xec(getVM().getRoot(), this); 
-	m_def->forEachTrigger(id, xec);
+	_def.forEachTrigger(id, xec);
 
 	return xec.called;
 }
 
 void
-button_character_instance::restart()
+Button::restart()
 {
-	log_error("button_character_instance::restart called, from whom??");
+	log_error("Button::restart called, from whom??");
 }
 
 void
-button_character_instance::display()
+Button::display()
 {
-//	GNASH_REPORT_FUNCTION;
 
 	std::vector<character*> actChars;
-	get_active_characters(actChars);
-
-	//log_debug("At display time, button %s got %d currently active chars", getTarget(), actChars.size());
+	getActiveCharacters(actChars);
 
 	// TODO: by keeping chars sorted by depth we'd avoid the sort on display
 	std::sort(actChars.begin(), actChars.end(), charDepthLessThen);
 
-	std::for_each(actChars.begin(), actChars.end(), std::mem_fun(&character::display)); 
+	std::for_each(actChars.begin(), actChars.end(),
+            std::mem_fun(&character::display)); 
 
 	clear_invalidated();
 }
 
 
 character*
-button_character_instance::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y)
+Button::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y)
 // Return the topmost entity that the given point covers.  NULL if none.
 // I.e. check against ourself.
 {
@@ -412,12 +416,12 @@ button_character_instance::get_topmost_mouse_entity(boost::int32_t x, boost::int
 	}
 
 	//-------------------------------------------------
-	// Check our active and visible childrens first
+	// Check our active and visible children first
 	//-------------------------------------------------
 
 	typedef std::vector<character*> Chars;
 	Chars actChars;
-	get_active_characters(actChars);
+	getActiveCharacters(actChars);
 
 	if ( ! actChars.empty() )
 	{
@@ -441,8 +445,7 @@ button_character_instance::get_topmost_mouse_entity(boost::int32_t x, boost::int
 	//-------------------------------------------------
 
 	// Find hit characters
-	const CharsVect& hitChars = getHitCharacters();
-	if ( hitChars.empty() ) return 0;
+	if ( _hitCharacters.empty() ) return 0;
 
 	// point is in parent's space,
 	// we need to convert it in world space
@@ -453,11 +456,10 @@ button_character_instance::get_topmost_mouse_entity(boost::int32_t x, boost::int
 		parent->get_world_matrix().transform(wp);
 	}
 
-	for (size_t i=0, e=hitChars.size(); i<e; ++i)
+	for (CharsVect::const_iterator i = _hitCharacters.begin(),
+	     e = _hitCharacters.end(); i !=e; ++i)
 	{
-		const character* ch = hitChars[i];
-
-		if ( ch->pointInVisibleShape(wp.x, wp.y) )
+		if ((*i)->pointInVisibleShape(wp.x, wp.y))
 		{
 			// The mouse is inside the shape.
 			return this;
@@ -469,7 +471,7 @@ button_character_instance::get_topmost_mouse_entity(boost::int32_t x, boost::int
 
 
 void
-button_character_instance::on_button_event(const event_id& event)
+Button::on_button_event(const event_id& event)
 {
 	if ( isUnloaded() )
 	{
@@ -480,7 +482,7 @@ button_character_instance::on_button_event(const event_id& event)
 		return;
 	}
 
-	e_mouse_state new_state = m_mouse_state;
+	MouseState new_state = m_mouse_state;
   
 	// Set our mouse state (so we know how to render).
 	switch (event.m_id)
@@ -513,7 +515,7 @@ button_character_instance::on_button_event(const event_id& event)
 	set_current_state(new_state);
     
 	// Button transition sounds.
-	if (m_def->m_sound != NULL)
+	if (_def.m_sound != NULL)
 	{
 		int bi; // button sound array index [0..3]
 		media::sound_handler* s = get_sound_handler();
@@ -540,11 +542,11 @@ button_character_instance::on_button_event(const event_id& event)
 			}
 			if (bi >= 0)
 			{
-				button_character_definition::button_sound_info& bs = m_def->m_sound->m_button_sounds[bi];
+				button_character_definition::button_sound_info& bs = _def.m_sound->m_button_sounds[bi];
 				// character zero is considered as null character
 				if (bs.m_sound_id > 0)
 				{
-					if (m_def->m_sound->m_button_sounds[bi].m_sam != NULL)
+					if (_def.m_sound->m_button_sounds[bi].m_sam != NULL)
 					{
 						if (bs.m_sound_style.m_stop_playback)
 						{
@@ -573,7 +575,7 @@ button_character_instance::on_button_event(const event_id& event)
 	movie_root& mr = getVM().getRoot();
 
 	ButtonActionPusher xec(mr, this); 
-	m_def->forEachTrigger(event, xec);
+	_def.forEachTrigger(event, xec);
 
 	// check for built-in event handler.
 	std::auto_ptr<ExecutableCode> code ( get_event_handler(event) );
@@ -596,31 +598,48 @@ button_character_instance::on_button_event(const event_id& event)
 	//else log_debug(_("No statically-defined handler for event: %s"), event);
 }
 
+
+void
+Button::getActiveCharacters(
+        std::vector<const character*>& list) const
+{
+    list.clear();
+
+    // Copy all the characters to the new list, skipping NULL and unloaded
+    // characters.
+    std::remove_copy_if(_stateCharacters.begin(), _stateCharacters.end(),
+            std::back_inserter(list),
+            boost::bind(&isCharacterNull, _1, false));
+
+}
+
+
 void 
-button_character_instance::get_active_characters(std::vector<character*>& list, bool includeUnloaded)
+Button::getActiveCharacters(
+        std::vector<character*>& list, bool includeUnloaded)
 {
 	list.clear();
+
+    // Copy all the characters to the new list, skipping NULL
+    // characters, optionally including unloaded characters.
+    std::remove_copy_if(_stateCharacters.begin(),
+            _stateCharacters.end(),
+            std::back_inserter(list),
+            boost::bind(&isCharacterNull, _1, includeUnloaded));
 	
-	for (size_t i=0,e=m_record_character.size(); i<e; ++i)
-	{
-		character* ch = m_record_character[i];
-		if (ch == NULL) continue;
-		if ( ! includeUnloaded && ch->isUnloaded() ) continue;
-		list.push_back(ch);
-	} 
 }
 
 void 
-button_character_instance::get_active_records(RecSet& list, e_mouse_state state)
+Button::get_active_records(RecSet& list, MouseState state)
 {
 	list.clear();
 	
-	size_t nrecs = m_def->m_button_records.size();
+	size_t nrecs = _def.m_button_records.size();
 
-	//log_debug("%s.get_active_records(%s) - def has %d records", getTarget(), mouseStateName(state), m_def->m_button_records.size());
+	//log_debug("%s.get_active_records(%s) - def has %d records", getTarget(), mouseStateName(state), _def.m_button_records.size());
 	for (size_t i=0; i<nrecs; ++i)
 	{
-		button_record&	rec = m_def->m_button_records[i];
+		button_record& rec = _def.m_button_records[i];
 		//log_debug(" rec %d has hit:%d down:%d over:%d up:%d", i, rec.m_hit_test, rec.m_down, rec.m_over, rec.m_up);
 
 		if ((state == UP && rec.m_up)
@@ -643,7 +662,10 @@ static void dump(std::vector< character* >& chars, std::stringstream& ss)
 		if ( ! ch ) ss << "NULL.";
 		else
 		{
-			ss << ch->getTarget() << " (depth:" << ch->get_depth()-character::staticDepthOffset-1 << " unloaded:" << ch->isUnloaded() << " destroyed:" << ch->isDestroyed() << ")";
+			ss << ch->getTarget() << " (depth:" << 
+                ch->get_depth()-character::staticDepthOffset-1
+                << " unloaded:" << ch->isUnloaded() <<
+                " destroyed:" << ch->isDestroyed() << ")";
 		}
 		ss << std::endl;
 	}
@@ -651,7 +673,7 @@ static void dump(std::vector< character* >& chars, std::stringstream& ss)
 #endif
 
 void
-button_character_instance::set_current_state(e_mouse_state new_state)
+Button::set_current_state(MouseState new_state)
 {
 	if (new_state == m_mouse_state)
 		return;
@@ -659,7 +681,7 @@ button_character_instance::set_current_state(e_mouse_state new_state)
 #ifdef GNASH_DEBUG_BUTTON_DISPLAYLIST
 	std::stringstream ss;
 	ss << "at set_current_state enter: " << std::endl;
-	dump(m_record_character, ss);
+	dump(_stateCharacters, ss);
 	log_debug("%s", ss.str());
 #endif
 
@@ -668,9 +690,9 @@ button_character_instance::set_current_state(e_mouse_state new_state)
 	get_active_records(newChars, new_state);
 
 	// For each possible record, check if it should still be there
-	for (size_t i=0, e=m_record_character.size(); i<e; ++i)
+	for (size_t i=0, e=_stateCharacters.size(); i<e; ++i)
 	{
-		character* oldch = m_record_character[i];
+		character* oldch = _stateCharacters[i];
 		bool shouldBeThere = ( newChars.find(i) != newChars.end() );
 
 		if ( ! shouldBeThere )
@@ -679,7 +701,7 @@ button_character_instance::set_current_state(e_mouse_state new_state)
 			if ( oldch && oldch->isUnloaded() )
 			{
 				if ( ! oldch->isDestroyed() ) oldch->destroy();
-				m_record_character[i] = NULL;
+				_stateCharacters[i] = NULL;
 				oldch = NULL;
 			}
 
@@ -691,7 +713,7 @@ button_character_instance::set_current_state(e_mouse_state new_state)
 				{
 					// No onUnload handler: destroy and clear slot
 					if ( ! oldch->isDestroyed() ) oldch->destroy();
-					m_record_character[i] = NULL;
+					_stateCharacters[i] = NULL;
 				}
 				else
 				{
@@ -711,14 +733,14 @@ button_character_instance::set_current_state(e_mouse_state new_state)
 			if ( oldch && oldch->isUnloaded() )
 			{
 				if ( ! oldch->isDestroyed() ) oldch->destroy();
-				m_record_character[i] = NULL;
+				_stateCharacters[i] = NULL;
 				oldch = NULL;
 			}
 
 			if ( ! oldch )
 			{
 				// Not there, instantiate
-				button_record& bdef = m_def->m_button_records[i];
+				button_record& bdef = _def.m_button_records[i];
 
 				const matrix&	mat = bdef.m_button_matrix;
 				const cxform&	cx = bdef.m_button_cxform;
@@ -740,7 +762,7 @@ button_character_instance::set_current_state(e_mouse_state new_state)
 
 				set_invalidated();
 
-				m_record_character[i] = ch;
+				_stateCharacters[i] = ch;
 				ch->stagePlacementCallback(); // give this character a life
 
 			}
@@ -750,7 +772,7 @@ button_character_instance::set_current_state(e_mouse_state new_state)
 #ifdef GNASH_DEBUG_BUTTON_DISPLAYLIST
 	ss.str("");
 	ss << "at set_current_state end: " << std::endl;
-	dump(m_record_character, ss);
+	dump(_stateCharacters, ss);
 	log_debug("%s", ss.str());
 #endif
 
@@ -766,35 +788,32 @@ button_character_instance::set_current_state(e_mouse_state new_state)
 
 
 void 
-button_character_instance::add_invalidated_bounds(InvalidatedRanges& ranges, 
+Button::add_invalidated_bounds(InvalidatedRanges& ranges, 
 	bool force)
 {
-	if (!m_visible)
-	{
-		//log_debug("button %s not visible on add_invalidated_bounds", getTarget());
-		return; // not visible anyway
-	}
-	//log_debug("button %s add_invalidated_bounds called", getTarget());
+
+    // Not visible anyway
+	if (!m_visible) return;
 
 	ranges.add(m_old_invalidated_ranges);  
 
 	std::vector<character*> actChars;
-	get_active_characters(actChars);
+	getActiveCharacters(actChars);
 	std::for_each(actChars.begin(), actChars.end(),
-		boost::bind(&character::add_invalidated_bounds, _1,
-			    boost::ref(ranges), force||m_invalidated)
+            boost::bind(&character::add_invalidated_bounds, _1,
+                boost::ref(ranges), force||m_invalidated)
 	);
 }
 
 rect
-button_character_instance::getBounds() const
+Button::getBounds() const
 {
 	rect allBounds;
 
-	typedef std::vector<character*> CharVect;
+	typedef std::vector<const character*> CharVect;
 	CharVect actChars;
-	const_cast<button_character_instance*>(this)->get_active_characters(actChars);
-	for(CharVect::iterator i=actChars.begin(),e=actChars.end(); i!=e; ++i)
+	getActiveCharacters(actChars);
+	for(CharVect::const_iterator i=actChars.begin(),e=actChars.end(); i!=e; ++i)
 	{
 		const character* ch = *i;
 		// Child bounds need be transformed in our coordinate space
@@ -807,12 +826,12 @@ button_character_instance::getBounds() const
 }
 
 bool
-button_character_instance::pointInShape(boost::int32_t x, boost::int32_t y) const
+Button::pointInShape(boost::int32_t x, boost::int32_t y) const
 {
-	typedef std::vector<character*> CharVect;
+	typedef std::vector<const character*> CharVect;
 	CharVect actChars;
-	const_cast<button_character_instance*>(this)->get_active_characters(actChars);
-	for(CharVect::iterator i=actChars.begin(),e=actChars.end(); i!=e; ++i)
+	getActiveCharacters(actChars);
+	for(CharVect::const_iterator i=actChars.begin(),e=actChars.end(); i!=e; ++i)
 	{
 		const character* ch = *i;
 		if ( ch->pointInShape(x,y) ) return true;
@@ -821,7 +840,7 @@ button_character_instance::pointInShape(boost::int32_t x, boost::int32_t y) cons
 }
 
 as_object*
-button_character_instance::get_path_element(string_table::key key)
+Button::get_path_element(string_table::key key)
 {
 	as_object* ch = get_path_element_character(key);
 	if ( ch ) return ch;
@@ -831,12 +850,11 @@ button_character_instance::get_path_element(string_table::key key)
 }
 
 character *
-button_character_instance::getChildByName(const std::string& name) const
+Button::getChildByName(const std::string& name)
 {
 	// Get all currently active characters, including unloaded
 	CharsVect actChars;
-	// TODO: fix the const_cast
-	const_cast<button_character_instance*>(this)->get_active_characters(actChars, true);
+	getActiveCharacters(actChars, true);
 
 	// Lower depth first for duplicated names, so we sort
 	std::sort(actChars.begin(), actChars.end(), charDepthLessThen);
@@ -862,7 +880,7 @@ button_character_instance::getChildByName(const std::string& name) const
 }
 
 void
-button_character_instance::stagePlacementCallback()
+Button::stagePlacementCallback()
 {
 	saveOriginalTarget(); // for soft refs
 
@@ -875,7 +893,7 @@ button_character_instance::stagePlacementCallback()
 	get_active_records(hitChars, HIT);
 	for (RecSet::iterator i=hitChars.begin(),e=hitChars.end(); i!=e; ++i)
 	{
-		button_record& bdef = m_def->m_button_records[*i];
+		button_record& bdef = _def.m_button_records[*i];
 
 		const matrix& mat = bdef.m_button_matrix;
 		const cxform& cx = bdef.m_button_cxform;
@@ -897,7 +915,7 @@ button_character_instance::stagePlacementCallback()
 	// Some slots will probably be never used (consider HIT-only records)
 	// but for now this direct corrispondence between record number
 	// and active character will be handy.
-	m_record_character.resize(m_def->m_button_records.size());
+	_stateCharacters.resize(_def.m_button_records.size());
 
 	// Instantiate the default state characters 
 	RecSet upChars;
@@ -906,7 +924,7 @@ button_character_instance::stagePlacementCallback()
 	for (RecSet::iterator i=upChars.begin(),e=upChars.end(); i!=e; ++i)
 	{
 		int rno = *i;
-		button_record& bdef = m_def->m_button_records[rno];
+		button_record& bdef = _def.m_button_records[rno];
 
 		const matrix&	mat = bdef.m_button_matrix;
 		const cxform&	cx = bdef.m_button_cxform;
@@ -926,7 +944,7 @@ button_character_instance::stagePlacementCallback()
 			ch->set_name(getNextUnnamedInstanceName());
 		}
 
-		m_record_character[rno] = ch;
+		_stateCharacters[rno] = ch;
 		ch->stagePlacementCallback(); // give this character a life
 	}
 
@@ -935,14 +953,14 @@ button_character_instance::stagePlacementCallback()
 
 #ifdef GNASH_USE_GC
 void
-button_character_instance::markReachableResources() const
+Button::markReachableResources() const
 {
 	assert(isReachable());
 
-	m_def->setReachable();
+	_def.setReachable();
 
 	// Mark state characters as reachable
-	for (CharsVect::const_iterator i=m_record_character.begin(), e=m_record_character.end();
+	for (CharsVect::const_iterator i=_stateCharacters.begin(), e=_stateCharacters.end();
 			i!=e; ++i)
 	{
 		character* ch = *i;
@@ -964,15 +982,14 @@ button_character_instance::markReachableResources() const
 #endif // GNASH_USE_GC
 
 bool
-button_character_instance::unload()
+Button::unload()
 {
-	//log_debug("Button %s being unloaded", getTarget());
 
 	bool childsHaveUnload = false;
 
 	// We need to unload all childs, or the global instance list will keep growing forever !
-	//std::for_each(m_record_character.begin(), m_record_character.end(), boost::bind(&character::unload, _1));
-	for (CharsVect::iterator i=m_record_character.begin(), e=m_record_character.end(); i!=e; ++i)
+	//std::for_each(_stateCharacters.begin(), _stateCharacters.end(), boost::bind(&character::unload, _1));
+	for (CharsVect::iterator i=_stateCharacters.begin(), e=_stateCharacters.end(); i!=e; ++i)
 	{
 		character* ch = *i;
 		if ( ! ch ) continue;
@@ -995,11 +1012,11 @@ button_character_instance::unload()
 }
 
 void
-button_character_instance::destroy()
+Button::destroy()
 {
 	//log_debug("Button %s being destroyed", getTarget());
 
-	for (CharsVect::iterator i=m_record_character.begin(), e=m_record_character.end(); i!=e; ++i)
+	for (CharsVect::iterator i=_stateCharacters.begin(), e=_stateCharacters.end(); i!=e; ++i)
 	{
 		character* ch = *i;
 		if ( ! ch ) continue;
@@ -1020,7 +1037,7 @@ button_character_instance::destroy()
 }
 
 bool
-button_character_instance::get_member(string_table::key name_key, as_value* val,
+Button::get_member(string_table::key name_key, as_value* val,
   string_table::key nsname)
 {
   // FIXME: use addProperty interface for these !!
@@ -1119,9 +1136,9 @@ button_character_instance::get_member(string_table::key name_key, as_value* val,
 }
 
 int
-button_character_instance::getSWFVersion() const
+Button::getSWFVersion() const
 {
-	return m_def->getSWFVersion();
+	return _def.getSWFVersion();
 }
 
 static as_object*
@@ -1163,13 +1180,13 @@ button_class_init(as_object& global)
 
 #ifdef USE_SWFTREE
 character::InfoTree::iterator 
-button_character_instance::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
+Button::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
 {
 	InfoTree::iterator selfIt = character::getMovieInfo(tr, it);
 	std::ostringstream os;
 
 	std::vector<character*> actChars;
-	get_active_characters(actChars, true);
+	getActiveCharacters(actChars, true);
 	std::sort(actChars.begin(), actChars.end(), charDepthLessThen);
 
 	os << actChars.size() << " active characters for state " << mouseStateName(m_mouse_state);
@@ -1182,7 +1199,7 @@ button_character_instance::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
 #endif
 
 const char*
-button_character_instance::mouseStateName(e_mouse_state s)
+Button::mouseStateName(MouseState s)
 {
 	switch (s)
 	{

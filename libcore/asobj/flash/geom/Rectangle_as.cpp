@@ -84,12 +84,18 @@ attachRectangleInterface(as_object& o)
     o.init_member("toString", new builtin_function(Rectangle_toString), 0);
     o.init_member("union", new builtin_function(Rectangle_union), 0);
     o.init_property("bottom", Rectangle_bottom_getset, Rectangle_bottom_getset, 0);
-    o.init_property("bottomRight", Rectangle_bottomRight_getset, Rectangle_bottomRight_getset, 0);
-    o.init_property("left", Rectangle_left_getset, Rectangle_left_getset, 0);
-    o.init_property("right", Rectangle_right_getset, Rectangle_right_getset, 0);
-    o.init_property("size", Rectangle_size_getset, Rectangle_size_getset, 0);
-    o.init_property("top", Rectangle_top_getset, Rectangle_top_getset, 0);
-    o.init_property("topLeft", Rectangle_topLeft_getset, Rectangle_topLeft_getset, 0);
+    o.init_property("bottomRight", Rectangle_bottomRight_getset,
+            Rectangle_bottomRight_getset, 0);
+    o.init_property("left", Rectangle_left_getset,
+            Rectangle_left_getset, 0);
+    o.init_property("right", Rectangle_right_getset,
+            Rectangle_right_getset, 0);
+    o.init_property("size", Rectangle_size_getset,
+            Rectangle_size_getset, 0);
+    o.init_property("top", Rectangle_top_getset,
+            Rectangle_top_getset, 0);
+    o.init_property("topLeft", Rectangle_topLeft_getset,
+            Rectangle_topLeft_getset, 0);
 }
 
 

@@ -393,6 +393,24 @@ public:
 #endif
 	}
 
+	/// Consume any pending input
+	//
+	/// This method is useful to force full consumption
+	/// of the SWFStream's underlying IOChannel for the 
+	/// cases in which it is a pipe and a writer would
+	/// hang on it unless someone is reading.
+	///
+	/// This method will NOT be called automatically
+	/// on SWFStream destruction as in the current 
+	/// design SWFStream does NOT own the underlying 
+	/// IOChannel. TODO: rethink about ownership.
+	///
+	/// NOTE: the stream position will be updated by
+	///       this call, so that ::tell will basically
+	///       return the full input size.
+	///
+	void consumeInput();
+
 private:
 
 	IOChannel*	m_input;

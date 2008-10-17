@@ -483,8 +483,8 @@ public:
 
     /// Set the xscale value of current matrix
     //
-    /// This is used when setting either _xscale or _width.
-    /// See xscale_getset and width_getset
+    /// This is used when setting _xscale.
+    /// See xscale_getset.
     ///
     /// @param factor scale factor, in percent
     ///
@@ -495,8 +495,8 @@ public:
 
     /// Set the yscale value of current matrix
     //
-    /// This is used when setting either _yscale or _height
-    /// See xscale_getset and width_getset
+    /// This is used when setting _yscale 
+    /// See yscale_getset. 
     ///
     /// @param factor scale factor, in percent
     ///
@@ -512,6 +512,24 @@ public:
     ///        the -180 .. 180 range, can be passed outside it.
     ///
     void set_rotation(double rot);
+
+    /// Set the width of this character, modifying its matrix
+    //
+    /// This is used when setting _width
+    /// See width_getset
+    ///
+    /// @param w new width, in TWIPS. TODO: should this be an integer ?
+    ///
+    void set_width(double width);
+
+    /// Set the height of this character, modifying its matrix
+    //
+    /// This is used when setting _height
+    /// See height_getset
+    ///
+    /// @param h new height, in TWIPS. TODO: should this be an integer ?
+    ///
+    void set_height(double height);
 
     const cxform& get_cxform() const { return m_color_transform; }
 

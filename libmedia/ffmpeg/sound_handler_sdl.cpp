@@ -30,15 +30,18 @@
 #include "AudioDecoderSimple.h"
 #include "AudioDecoderNellymoser.h"
 
+#include "MediaHandler.h"
+
+// TODO: drop FFMPEG/GST specific stuff, use MediaHandler instead !
 #ifdef USE_FFMPEG
 #include "AudioDecoderFfmpeg.h"
+#elif defined(USE_GST)
+#include "AudioDecoderGst.h"
 #endif
 
-#ifdef USE_MAD
-#include "AudioDecoderMad.h"
-#endif
+#include "log.h" // will import boost::format too
+#include "GnashException.h" // for SoundException
 
-#include "log.h"
 #include <cmath>
 #include <vector>
 #include <boost/scoped_array.hpp>
@@ -143,8 +146,13 @@ SDL_sound_handler::delete_all_sounds()
         if (!sounddata) continue;
 
 		size_t nActiveSounds = sounddata->m_active_sounds.size();
+
+		// Decrement callback clients count 
 		soundsPlaying -= nActiveSounds;
+
+        // Increment number of sound stop request for the testing framework
 		_soundsStopped += nActiveSounds;
+
 		delete sounddata;
 	}
 	m_sound_data.clear();
@@ -160,48 +168,22 @@ SDL_sound_handler::~SDL_sound_handler()
 
 
 int	SDL_sound_handler::create_sound(
-	void* data,
-	unsigned int data_bytes,
+	std::auto_ptr<SimpleBuffer> data,
 	std::auto_ptr<SoundInfo> sinfo)
-// Called to create a sample.  We'll return a sample ID that
-// can be use for playing it.
 {
 
+    log_debug("create_sound: sound format %d", sinfo->getFormat());
+
 	assert(sinfo.get());
-	std::auto_ptr<sound_data> sounddata ( new sound_data );
 
-	//sounddata->data_size = data_bytes;
-	sounddata->volume = 100;
-	sounddata->soundinfo = sinfo;
+	std::auto_ptr<sound_data> sounddata ( new sound_data(data, sinfo) );
 
+    // Make sure we're the only thread accessing m_sound_data here
 	boost::mutex::scoped_lock lock(_mutex);
 
-	switch (sounddata->soundinfo->getFormat())
-	{
-	case AUDIO_CODEC_MP3:
-#ifndef USE_FFMPEG
-#ifndef USE_MAD
-		log_error(_("gnash has not been compiled to handle mp3 audio"));
-		return -1;
-#endif
-#endif
-		sounddata->append(reinterpret_cast<boost::uint8_t*>(data), data_bytes);
-		break;
+    // the vector takes ownership
+	m_sound_data.push_back(sounddata.release());
 
-	case AUDIO_CODEC_RAW:
-	case AUDIO_CODEC_ADPCM:
-	case AUDIO_CODEC_UNCOMPRESSED:
-	case AUDIO_CODEC_NELLYMOSER:
-		sounddata->append(reinterpret_cast<boost::uint8_t*>(data), data_bytes);
-		break;
-
-	default:
-		// Unhandled format.
-		log_error(_("unknown sound format %d requested; gnash does not handle it"), (int)sounddata->soundinfo->getFormat());
-		return -1; // Unhandled format, set to NULL.
-	}
-
-	m_sound_data.push_back(sounddata.release()); // the vector takes ownership
 	int sound_id = m_sound_data.size()-1;
 
 	return sound_id;
@@ -236,10 +218,14 @@ long	SDL_sound_handler::fill_stream_data(unsigned char* data, unsigned int data_
 }
 
 
-void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset, long start_position, const std::vector<sound_envelope>* envelopes)
 // Play the index'd sample.
+void
+SDL_sound_handler::play_sound(int sound_handle, int loopCount, int offset, long start_position, const std::vector<sound_envelope>* envelopes)
 {
 	boost::mutex::scoped_lock lock(_mutex);
+
+    // Increment number of sound start request for the testing framework
+	++_soundsStarted;
 
 	// Check if the sound exists, or if audio is muted
 	if (sound_handle < 0 || static_cast<unsigned int>(sound_handle) >= m_sound_data.size() || muted)
@@ -264,15 +250,16 @@ void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset,
 		return;
 	}
 
-	// Make a "active_sound" for this sound which is later placed on the vector of instances of this sound being played
+	// Make a "active_sound" for this sound which is later placed
+    // on the vector of instances of this sound being played
 	std::auto_ptr<active_sound> sound ( new active_sound() );
 
 	// Set source data to the active_sound
 	sound->set_data(sounddata);
 
 	// Set the given options of the sound
-	if (start_position < 0) sound->position = 0;
-	else sound->position = start_position;
+	if (start_position < 0) sound->decodingPosition = 0;
+	else sound->decodingPosition = start_position;
 
 	if (offset < 0) sound->offset = 0;
 	else sound->offset = (sounddata->soundinfo->isStereo() ? offset : offset*2); // offset is stored as stereo
@@ -280,58 +267,42 @@ void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset,
 	sound->envelopes = envelopes;
 
 	// Set number of loop we should do. -1 is infinte loop, 0 plays it once, 1 twice etc.
-	sound->loop_count = loop_count;
+	sound->loopCount = loopCount;
 
 	sound->decoder = NULL;
 
-	switch (sounddata->soundinfo->getFormat()) {
-	case AUDIO_CODEC_NELLYMOSER:
-	case AUDIO_CODEC_NELLYMOSER_8HZ_MONO:
-		sound->decoder = new AudioDecoderNellymoser();
+    try {
 
-		if (!sound->decoder->setup(sounddata->soundinfo.get())) {
-			log_error("The audio decoder can't decode the audio");
-			delete sound->decoder;
-			sound->decoder = NULL;
-		}
-
-		break;
-	case AUDIO_CODEC_MP3:
-#ifdef USE_MAD
-		sound->decoder = new AudioDecoderMad();
-
-		if (!sound->decoder->setup(sounddata->soundinfo.get())) {
-			log_error("The audio decoder can't decode the audio");
-			delete sound->decoder;
-			sound->decoder = NULL;
-		}
-
-		break;
-#endif
+	    switch (sounddata->soundinfo->getFormat()) {
+	        case AUDIO_CODEC_NELLYMOSER:
+	        case AUDIO_CODEC_NELLYMOSER_8HZ_MONO:
+		        sound->decoder = new AudioDecoderNellymoser(*(sounddata->soundinfo));
+		        break;
+	        case AUDIO_CODEC_MP3:
 #ifdef USE_FFMPEG
-		sound->decoder = new AudioDecoderFfmpeg();
-
-		if (!sound->decoder->setup(sounddata->soundinfo.get())) {
-			log_error("The audio decoder can't decode the audio");
-			delete sound->decoder;
-			sound->decoder = NULL;
-		}
-
-		break;
+		        sound->decoder = new AudioDecoderFfmpeg(*(sounddata->soundinfo));
+		        break;
+#elif defined(USE_GST)
+		        sound->decoder = new AudioDecoderGst(*(sounddata->soundinfo));
+		        break;
 #endif
-	case AUDIO_CODEC_ADPCM:
-	default:
-
-		sound->decoder = new AudioDecoderSimple();
-
-		if (!sound->decoder->setup(sounddata->soundinfo.get())) {
-			log_error("The audio decoder can't decode the audio");
-			delete sound->decoder;
-			sound->decoder = NULL;
-		}
-
+	        case AUDIO_CODEC_ADPCM:
+	        default:
+                sound->decoder = new AudioDecoderSimple(*(sounddata->soundinfo));
+                break;
+	    }
 	}
-		
+	catch (MediaException& e)
+	{
+	    log_error("AudioDecoder initialization failed: %s", e.what());
+	}
+
+    // Push the sound onto the playing sounds container.
+    // We want to do this even on audio failures so count
+    // of started and stopped sound reflects expectances
+    // for testing framework.
+	sounddata->m_active_sounds.push_back(sound.release());
+
 	if (!soundOpened) {
 		if (SDL_OpenAudio(&audioSpec, NULL) < 0 ) {
 			log_error(_("Unable to start SDL sound: %s"), SDL_GetError());
@@ -341,9 +312,8 @@ void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset,
 
 	}
 
+	// Increment callback clients count 
 	++soundsPlaying;
-	++_soundsStarted;
-	sounddata->m_active_sounds.push_back(sound.release());
 
 	if (soundsPlaying == 1) {
 #ifdef GNASH_DEBUG_SDL_AUDIO_PAUSING
@@ -371,7 +341,10 @@ void	SDL_sound_handler::stop_sound(int sound_handle)
 
 	size_t nActiveSounds = sounddata->m_active_sounds.size();
 
+	// Decrement callback clients count 
 	soundsPlaying -= nActiveSounds;
+
+    // Increment number of sound stop request for the testing framework
 	_soundsStopped += nActiveSounds;
 
 	sounddata->clearActiveSounds();
@@ -410,7 +383,10 @@ void	SDL_sound_handler::stop_all_sounds()
 		if (!sounddata) continue;
 		size_t nActiveSounds = sounddata->m_active_sounds.size();
 
+		// Decrement callback clients count 
 		soundsPlaying -= nActiveSounds;
+
+        // Increment number of sound stop request for the testing framework
 		_soundsStopped += nActiveSounds;
 
 		sounddata->clearActiveSounds();
@@ -501,18 +477,23 @@ void	SDL_sound_handler::attach_aux_streamer(aux_streamer_ptr ptr, void* owner)
 	if ( ! m_aux_streamer.insert(std::make_pair(owner, ptr)).second )
 	{
 		// Already in the hash.
+		// TODO: throw SoundException ?
 		return;
 	}
 
-	++soundsPlaying;
-
 	if (!soundOpened) {
 		if (SDL_OpenAudio(&audioSpec, NULL) < 0 ) {
-			log_error(_("Unable to start aux SDL sound: %s"), SDL_GetError());
-			return;
+        		boost::format fmt = boost::format(
+				_("Unable to start aux SDL sound: %s"))
+				% SDL_GetError();
+			throw SoundException(fmt.str());
 		}
 		soundOpened = true;
 	}
+
+	// Increment callback clients count 
+	++soundsPlaying;
+
 #ifdef GNASH_DEBUG_SDL_AUDIO_PAUSING
 	log_debug("Unpausing SDL Audio...");
 #endif
@@ -524,10 +505,11 @@ void	SDL_sound_handler::detach_aux_streamer(void* owner)
 {
 	boost::mutex::scoped_lock lock(_mutex);
 
+	// WARNING: erasing would break any iteration in the map
 	CallbacksMap::iterator it2=m_aux_streamer.find(owner);
 	if ( it2 != m_aux_streamer.end() )
 	{
-		// WARNING: erasing would break any iteration in the map
+		// Decrement callback clients count 
 		--soundsPlaying;
 		m_aux_streamer.erase(it2);
 	}
@@ -551,9 +533,10 @@ unsigned int SDL_sound_handler::get_duration(int sound_handle)
 
 	// Return the sound duration in milliseconds
 	if (sampleCount > 0 && sampleRate > 0) {
+        // TODO: should we cache this in the sound_data object ?
 		unsigned int ret = sampleCount / sampleRate * 1000;
 		ret += ((sampleCount % sampleRate) * 1000) / sampleRate;
-		if (sounddata->soundinfo->isStereo()) ret = ret / 2;
+		//if (sounddata->soundinfo->isStereo()) ret = ret / 2;
 		return ret;
 	} else {
 		return 0;
@@ -602,7 +585,7 @@ create_sound_handler_sdl(const std::string& wave_file)
 
 // Pointer handling and checking functions
 boost::uint8_t*
-active_sound::get_raw_data_ptr(unsigned long int pos)
+active_sound::getDecodedData(unsigned long int pos)
 {
 	if ( _decodedData.get() )
 	{
@@ -613,15 +596,15 @@ active_sound::get_raw_data_ptr(unsigned long int pos)
 }
 
 boost::uint8_t*
-active_sound::get_data_ptr(unsigned long int pos)
+active_sound::getEncodedData(unsigned long int pos)
 {
-	assert(_undecodedData);
-	return _undecodedData->data(pos);
+	assert(_encodedData);
+	return _encodedData->data(pos);
 }
 
 void active_sound::set_data(sound_data* idata)
 {
-	_undecodedData = idata;
+	_encodedData = idata;
 }
 
 void active_sound::deleteDecodedData()
@@ -668,12 +651,12 @@ use_envelopes(active_sound& sound, unsigned int length)
 	unsigned int startpos = 0;
 	// Make sure we start adjusting at the right sample
 	if (sound.current_env == 0 && (*sound.envelopes)[sound.current_env].m_mark44 > sound.samples_played) {
-		startpos = sound.raw_position + ((*sound.envelopes)[sound.current_env].m_mark44 - sound.samples_played)*2;
+		startpos = sound.playbackPosition + ((*sound.envelopes)[sound.current_env].m_mark44 - sound.samples_played)*2;
 	} else {
-		startpos = sound.raw_position;
+		startpos = sound.playbackPosition;
 	}
 
-	boost::int16_t* data = reinterpret_cast<boost::int16_t*>(sound.get_raw_data_ptr(startpos));
+	boost::int16_t* data = reinterpret_cast<boost::int16_t*>(sound.getDecodedData(startpos));
 
 	for (unsigned int i=0; i < length/2; i+=2) {
 		float left = static_cast<float>((*sound.envelopes)[sound.current_env].m_level0 / 32768.0);
@@ -711,7 +694,7 @@ do_mixing(Uint8* stream, active_sound& sound, Uint8* data, unsigned int mix_leng
 	SDL_MixAudio(static_cast<Uint8*>(stream),static_cast<const Uint8*>(data), mix_length, SDL_MIX_MAXVOLUME);
 
 	// Update sound info
-	sound.raw_position += mix_length;
+	sound.playbackPosition += mix_length;
 
 	// Sample size is always 2
 	sound.samples_played += mix_length / 2;
@@ -816,6 +799,7 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 				++it2; // before we erase it
 				handler->m_aux_streamer.erase(it); // FIXME: isn't this terribly wrong ?
 				it = it2;
+				// Decrement callback clients count 
 				handler->soundsPlaying--;
 			} else {
 				++it;
@@ -857,6 +841,42 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 }
 
 void
+sound_data::append(boost::uint8_t* data, unsigned int size)
+{
+    // Make sure we're always appropriately padded...
+    media::MediaHandler* mh = media::MediaHandler::get(); // TODO: don't use this static !
+    const size_t paddingBytes = mh ? mh->getInputPaddingSize() : 0;
+    _buf->reserve(_buf->size()+size+paddingBytes);
+	_buf->append(data, size);
+
+    // since ownership was transferred...
+	delete [] data;
+}
+
+sound_data::sound_data(std::auto_ptr<SimpleBuffer> data, std::auto_ptr<SoundInfo> info, int nVolume)
+    :
+    _buf(data),
+    soundinfo(info),
+    volume(nVolume)
+{
+    if ( _buf.get() )
+    {
+        // Make sure we're appropriately padded (this is an event sound)
+        media::MediaHandler* mh = media::MediaHandler::get(); // TODO: don't use this static !
+        const size_t paddingBytes = mh ? mh->getInputPaddingSize() : 0;
+        if ( _buf->capacity() - _buf->size() < paddingBytes ) {
+            log_error("sound_data creator didn't appropriately pad sound data. "
+                "We'll do now, but will cost memory copies.");
+            _buf->reserve(_buf->size()+paddingBytes);
+        }
+    }
+    else
+    {
+        _buf.reset(new SimpleBuffer());
+    }
+}
+
+void
 sound_data::clearActiveSounds()
 {
 	for (ActiveSounds::iterator i=m_active_sounds.begin(), e=m_active_sounds.end(); i!=e; ++i)
@@ -875,28 +895,30 @@ sound_data::eraseActiveSound(ActiveSounds::iterator i)
 
 /*private*/
 void
-SDL_sound_handler::mixActiveSound(active_sound& sound, sound_data& sounddata, Uint8* buffer, unsigned int buffer_length)
+SDL_sound_handler::mixActiveSound(active_sound& sound, sound_data& sounddata,
+        Uint8* buffer, unsigned int buffer_length)
 {
 	// If there exist no decoder, then we can't decode!
 	if (sound.decoder == NULL) return;
 
-	int volume = int(sounddata.volume*getFinalVolume()/100.0); // concatenate global volume
+    // concatenate global volume
+	int volume = int(sounddata.volume*getFinalVolume()/100.0);
 
 	// When the current sound don't have enough decoded data to fill the buffer, 
 	// we first mix what is already decoded, then decode some more data, and
 	// mix some more until the buffer is full. If a sound loops the magic
 	// happens here ;)
 	//
-	if (sound.rawDataSize() - sound.raw_position < buffer_length 
-		&& (sound.position < sound.dataSize() || sound.loop_count != 0))
+	if (sound.decodedDataSize() - sound.playbackPosition < buffer_length 
+		&& (sound.decodingPosition < sound.encodedDataSize() || sound.loopCount != 0))
 	{
 		// First we mix what is decoded
 		unsigned int index = 0;
-		if (sound.rawDataSize() - sound.raw_position > 0)
+		if (sound.decodedDataSize() - sound.playbackPosition > 0)
 		{
-			index = sound.rawDataSize() - sound.raw_position;
+			index = sound.decodedDataSize() - sound.playbackPosition;
 
-			do_mixing(buffer, sound, sound.get_raw_data_ptr(sound.raw_position),
+			do_mixing(buffer, sound, sound.getDecodedData(sound.playbackPosition),
 				index, volume);
 
 		}
@@ -913,14 +935,14 @@ SDL_sound_handler::mixActiveSound(active_sound& sound, sound_data& sounddata, Ui
 		{
 
 			// If we need to loop, we reset the data pointer
-			if (sound.dataSize() == sound.position && sound.loop_count != 0) {
-				sound.loop_count--;
-				sound.position = 0;
+			if (sound.encodedDataSize() == sound.decodingPosition && sound.loopCount != 0) {
+				sound.loopCount--;
+				sound.decodingPosition = 0;
 				sound.samples_played = 0;
 			}
 
 			// Test if we will get problems... Should not happen...
-			assert(sound.dataSize() > sound.position);
+			assert(sound.encodedDataSize() > sound.decodingPosition);
 			
 			// temp raw buffer
 			Uint8* tmp_raw_buffer=0;
@@ -931,16 +953,20 @@ SDL_sound_handler::mixActiveSound(active_sound& sound, sound_data& sounddata, Ui
 			bool parse = true;
 			if (sounddata.soundinfo->getFormat() == AUDIO_CODEC_ADPCM) {
 				parse = false;
-				if (sounddata.m_frames_size.size() > 0) inputSize = sounddata.m_frames_size[sound.position];
-				else inputSize = sound.dataSize() - sound.position;
+				if (sounddata.m_frames_size.size() > 0) {
+                    inputSize = sounddata.m_frames_size[sound.decodingPosition];
+                }
+				else {
+                    inputSize = sound.encodedDataSize() - sound.decodingPosition;
+                }
 			} else {
-				inputSize = sound.dataSize() - sound.position;
+				inputSize = sound.encodedDataSize() - sound.decodingPosition;
 			}
 
-			tmp_raw_buffer = sound.decoder->decode(sound.get_data_ptr(sound.position), 
+			tmp_raw_buffer = sound.decoder->decode(sound.getEncodedData(sound.decodingPosition), 
 					inputSize, tmp_raw_buffer_size, decodedBytes, parse);
 
-			sound.position += decodedBytes;
+			sound.decodingPosition += decodedBytes;
 
 			// tmp_raw_buffer ownership transferred here
 			sound.appendDecodedData(tmp_raw_buffer, tmp_raw_buffer_size);
@@ -948,14 +974,15 @@ SDL_sound_handler::mixActiveSound(active_sound& sound, sound_data& sounddata, Ui
 			decoded_size += tmp_raw_buffer_size;
 
 			// no more to decode from this sound, so we break the loop
-			if (sound.dataSize() <= sound.position && sound.loop_count == 0 || tmp_raw_buffer_size == 0 && decodedBytes == 0) {
-				sound.position = sound.dataSize();
+			if ((sound.encodedDataSize() <= sound.decodingPosition && sound.loopCount == 0)
+                    || (tmp_raw_buffer_size == 0 && decodedBytes == 0)) {
+				sound.decodingPosition = sound.encodedDataSize();
 				break;
 			}
 
 		} // end of "decode min. bufferlength data" while loop
 
-		sound.raw_position = 0;
+		sound.playbackPosition = 0;
 
 		// Determine how much should be mixed
 		unsigned int mix_length = 0;
@@ -964,21 +991,21 @@ SDL_sound_handler::mixActiveSound(active_sound& sound, sound_data& sounddata, Ui
 		} else { 
 			mix_length = decoded_size;
 		}
-		if (sound.rawDataSize() < 2)
+		if (sound.decodedDataSize() < 2)
 		{
 			log_error("Something went terribly wrong during mixing of an active sound");
 			return; // something went terrible wrong
 		}
-		do_mixing(buffer+index, sound, sound.get_raw_data_ptr(0), mix_length, volume);
+		do_mixing(buffer+index, sound, sound.getDecodedData(0), mix_length, volume);
 
 	}
 
 	// When the current sound has enough decoded data to fill 
 	// the buffer, we do just that.
-	else if (sound.rawDataSize() > sound.raw_position && sound.rawDataSize() - sound.raw_position > buffer_length )
+	else if (sound.decodedDataSize() > sound.playbackPosition && sound.decodedDataSize() - sound.playbackPosition > buffer_length )
 	{
 
-		do_mixing(buffer, sound, sound.get_raw_data_ptr(sound.raw_position), 
+		do_mixing(buffer, sound, sound.getDecodedData(sound.playbackPosition), 
 			buffer_length, volume);
 
 	}
@@ -986,14 +1013,14 @@ SDL_sound_handler::mixActiveSound(active_sound& sound, sound_data& sounddata, Ui
 	// When the current sound doesn't have anymore data to decode,
 	// and doesn't loop (anymore), but still got unplayed data,
 	// we put the last data on the stream
-	else if (sound.rawDataSize() - sound.raw_position <= buffer_length && sound.rawDataSize() > sound.raw_position+1)
+	else if (sound.decodedDataSize() - sound.playbackPosition <= buffer_length && sound.decodedDataSize() > sound.playbackPosition+1)
 	{
 	
 
-		do_mixing(buffer, sound, sound.get_raw_data_ptr(sound.raw_position), 
-			sound.rawDataSize() - sound.raw_position, volume);
+		do_mixing(buffer, sound, sound.getDecodedData(sound.playbackPosition), 
+			sound.decodedDataSize() - sound.playbackPosition, volume);
 
-		sound.raw_position = sound.rawDataSize();
+		sound.playbackPosition = sound.decodedDataSize();
 	} 
 }
 
@@ -1013,10 +1040,14 @@ SDL_sound_handler::mixSoundData(sound_data& sounddata, Uint8* buffer, unsigned i
 		mixActiveSound(*sound, sounddata, buffer, buffer_length);
 
 		// Sound is done, remove it from the active list
-		if (sound->position == sound->dataSize() && sound->raw_position == sound->rawDataSize() && sound->loop_count == 0)
+		if (sound->decodingPosition == sound->encodedDataSize() && sound->playbackPosition == sound->decodedDataSize() && sound->loopCount == 0)
 		{
 			i = sounddata.eraseActiveSound(i);
+
+			// Decrement callback clients count 
 			soundsPlaying--;
+
+            // Increment number of sound stop request for the testing framework
 			_soundsStopped++;
 		} 
 		else

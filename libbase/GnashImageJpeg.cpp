@@ -437,6 +437,11 @@ JpegImageInput::errorOccurred(const char* msg)
 {
 	log_debug("Long jump: banzaaaaaai!");
 	_errorOccurred = msg;
+
+    // Mark the compressor as closed so we can open another image
+    // with this instance. We should throw on any errors, so there
+    // should be no further activity on the current image.
+    if (_compressorOpened) _compressorOpened = false;
 	std::longjmp(_jmpBuf, 1);
 }
 

@@ -1,73 +1,41 @@
 
 		TODO: (not really in order of priorities)
 
-  1. Add support for sound and audio using MP3 and FLV at first, but
-     also supporting free formats like Ogg, Flac, and Theora.
-  2. SWF 8 and greater support. This appears to be mostly adding a few
-     opcodes.
-  3. Performance improvements, and reducing the footprint.
-  4. Custom ActionScript plugins (think MySQL support in Flash).
-  5. Implement all the missing functionality.
-  6. Flesh out the testsuite to be a decent Flash conformance test suites.
-  7. Add support for external loading of media.
-  8. SVG support ?
-  9. Keep improving the plugin (+ add GTK1 support).
+  - SWF 8 support. This is mostly adding support
+    for blend modes and bitmap filters.
+  - SWF 9 / AVM2 support.
+  - RTMP support.
+  - Performance improvements, and reducing the footprint.
+  - Custom ActionScript plugins (think MySQL support in Flash).
+  - Implement all the missing player classes/methods.
+  - SVG support ?
+  - Keep improving the plugin (+ add GTK1 support).
 
 Unimplemented opcodes:
 ----------------------
 
-case 0x08:	// toggle quality
-case 0x2A:      // throw
-case 0x2B:      // cast_object (actually implemented, but untested)
-case 0x2C:      // implements
-case 0x31:      // mb length
-case 0x35:      // mb substring
-case 0x37:      // mb chr
-case 0x43:      // declare object
-case 0x45:      // get target
-case 0x69:      // extends
-case 0x8F:      // try
+0x08:	// toggle quality
 
 Partially implemented classes are:
 ----------------------------------
 
-MovieClipLoader
-NetConnection,
+NetConnection
 LocalConnection
-MovieClip
-TextField
-TextFormat
-Object (generalied and exported valueOf, toString)
+...
 
 Unimplemented classes are:
 --------------------------
 Accessibility
 Error
-Function
-LoadVars,
 Microphone
-NetStream
 Selection
-SharedObject
-Stage
-System
-Button,
 Camera
-Color
 ContextMenu
 CustomActions
-Video
-
-Partially implemented functions are:
-------------------------------------
-
-ASSetPropFlags (doesn't accept properties as comma-separated list string)
+...
 
 Others
 ------
-
-There is currently no FLV video, only minimal AMF data support,
-and no loading of external jpegs.
 
 If you would like to contribute to Gnash's development, please
 subscribe to the developers list at

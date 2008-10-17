@@ -53,17 +53,34 @@ as_value ColorTransform_ctor(const fn_call& fn);
 static void
 attachColorTransformInterface(as_object& o)
 {
-    o.init_member("concat", new builtin_function(ColorTransform_concat));
-    o.init_member("toString", new builtin_function(ColorTransform_toString));
-    o.init_property("alphaMultiplier", ColorTransform_alphaMultiplier_getset, ColorTransform_alphaMultiplier_getset);
-    o.init_property("alphaOffset", ColorTransform_alphaOffset_getset, ColorTransform_alphaOffset_getset);
-    o.init_property("blueMultiplier", ColorTransform_blueMultiplier_getset, ColorTransform_blueMultiplier_getset);
-    o.init_property("blueOffset", ColorTransform_blueOffset_getset, ColorTransform_blueOffset_getset);
-    o.init_property("greenMultiplier", ColorTransform_greenMultiplier_getset, ColorTransform_greenMultiplier_getset);
-    o.init_property("greenOffset", ColorTransform_greenOffset_getset, ColorTransform_greenOffset_getset);
-    o.init_property("redMultiplier", ColorTransform_redMultiplier_getset, ColorTransform_redMultiplier_getset);
-    o.init_property("redOffset", ColorTransform_redOffset_getset, ColorTransform_redOffset_getset);
-    o.init_property("rgb", ColorTransform_rgb_getset, ColorTransform_rgb_getset);
+    int flags = 0;
+    /// This has no flags:
+    o.init_member("concat", new builtin_function(ColorTransform_concat), flags);
+
+    flags = as_prop_flags::isProtected;
+
+    /// These are all protected:
+    o.init_member("toString", new builtin_function(ColorTransform_toString),
+            flags);
+
+    o.init_property("alphaMultiplier", ColorTransform_alphaMultiplier_getset,
+            ColorTransform_alphaMultiplier_getset, flags);
+    o.init_property("alphaOffset", ColorTransform_alphaOffset_getset,
+            ColorTransform_alphaOffset_getset, flags);
+    o.init_property("blueMultiplier", ColorTransform_blueMultiplier_getset,
+            ColorTransform_blueMultiplier_getset, flags);
+    o.init_property("blueOffset", ColorTransform_blueOffset_getset,
+            ColorTransform_blueOffset_getset, flags);
+    o.init_property("greenMultiplier", ColorTransform_greenMultiplier_getset,
+            ColorTransform_greenMultiplier_getset, flags);
+    o.init_property("greenOffset", ColorTransform_greenOffset_getset,
+            ColorTransform_greenOffset_getset, flags);
+    o.init_property("redMultiplier", ColorTransform_redMultiplier_getset,
+            ColorTransform_redMultiplier_getset, flags);
+    o.init_property("redOffset", ColorTransform_redOffset_getset,
+            ColorTransform_redOffset_getset, flags);
+    o.init_property("rgb", ColorTransform_rgb_getset,
+            ColorTransform_rgb_getset, flags);
 }
 
 

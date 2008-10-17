@@ -799,7 +799,7 @@ xcheck_equals(tf._height, currHeight*2);
 tf._yscale = 100;
 
 //-------------------------------------------------------------------------
-// Check interaction between autoSize and _width
+// Check interaction between autoSize and _width and wordWrap
 //-------------------------------------------------------------------------
 
 tf._width = 10; // "hello world" text should overflow this
@@ -832,6 +832,31 @@ tf.text = "single line";
 linewidth = tf._width;
 tf.text = "single line\n";
 check_equals(tf._width, linewidth); 
+
+// Test that setting autoSize = none
+// doesn't reset the bounding box.
+// See bug #24266
+//
+oldwidth = tf._width;
+note("width: "+oldwidth);
+check(oldwidth>0); // or the test is invalid
+tf.autoSize = 'none'; // tf was created with bounds 0,0
+check_equals(tf._width, oldwidth); // but _width didn't change to that
+
+// Test that when autoSize != none,
+// and wordWrap is true, text box isn't
+// reset. See #24348
+//
+tf.wordWrap = false;
+check_equals(tf._width, oldwidth); // text takes more width with wordWrap false
+note("width on wordWrap="+tf.wordWrap+" autoSize="+tf.autoSize+": "+tf._width);
+tf.autoSize = 'center'; 
+note("width on wordWrap="+tf.wordWrap+" autoSize="+tf.autoSize+": "+tf._width);
+check(tf._width > oldwidth); 
+oldwidth = tf._width;
+tf.wordWrap = true;
+note("width on wordWrap="+tf.wordWrap+" autoSize="+tf.autoSize+": "+tf._width);
+check_equals(tf._width, oldwidth);  // wordWrap change didn't reset the bbox
 
 
 //------------------------------------------------------------
@@ -924,9 +949,9 @@ _root._xscale = _root._yscale = 100;
 //------------------------------------------------------------
 
 #if OUTPUT_VERSION < 8
- check_totals(421);
+ check_totals(426);
 #else
- check_totals(422);
+ check_totals(427);
 #endif
 
 #else // OUTPUT_VERSION <= 5

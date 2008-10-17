@@ -4,13 +4,17 @@
 // whatever you want with it.
 
 // Some basic types for gnash.
+#ifdef HAVE_PTHREADS
+#include <pthread.h>
+#endif
+
+#include <boost/thread.hpp>
 
 #include "types.h"
 
+#include "utility.h"
 #include "log.h"
 #include "SWFStream.h"
-#include "render.h"
-
 #include <sstream> // for ::print and ::toString
 
 namespace gnash {

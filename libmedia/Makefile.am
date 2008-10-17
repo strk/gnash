@@ -46,6 +46,7 @@ libgnashmedia_la_CPPFLAGS = \
 	$(CURL_CFLAGS) \
 	$(Z_CFLAGS) \
 	$(JPEG_CFLAGS) \
+	$(GIF_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(INCLTDL) \
 	$(NULL)
@@ -59,7 +60,9 @@ DMALLOC_FILE = dlmalloc.c
 endif
 
 libgnashmedia_la_LIBADD = \
+	$(PNG_LIBS) \
 	$(JPEG_LIBS) \
+	$(GIF_LIBS) \
 	$(Z_LIBS) \
 	$(CURL_LIBS) \
 	$(OPENGL_LIBS) \
@@ -94,39 +97,34 @@ noinst_HEADERS = \
 	$(NULL)
 
 
-if USE_SOUND_GST
+if USE_GST_ENGINE
    libgnashmedia_la_SOURCES += \
 		gst/MediaHandlerGst.cpp \
 		gst/VideoDecoderGst.cpp \
 		gst/AudioDecoderGst.cpp \
-		gst/gstappsink.c \
-		gst/gstappsrc.c \
-		gst/SoundHandlerGst.cpp \
+		gst/MediaParserGst.cpp \
 		gst/GstUtil.cpp \
-		gst/SoundGst.cpp \
-		gst/gstflvdemux.c \
-		gst/gstflvparse.c \
-		gst/gstbuffersrc.c
+		gst/swfdec_codec_gst.c \
+		ffmpeg/sound_handler_sdl.cpp
 	
    noinst_HEADERS += \
 		gst/MediaHandlerGst.h \
 		gst/AudioDecoderGst.h \
 		gst/VideoDecoderGst.h \
-		gst/gstappsink.h \
-		gst/gstappsrc.h \
-		gst/SoundHandlerGst.h \
+		gst/MediaParserGst.h \
 		gst/GstUtil.h \
-		gst/SoundGst.h \
-		gst/gstflvdemux.h \
-		gst/gstflvparse.h \
-		gst/gstbuffersrc.h \
+		gst/swfdec_codec_gst.h \
+		ffmpeg/sound_handler_sdl.h \
 		gst/gnash_gst_version.h
 
    libgnashmedia_la_CPPFLAGS += \
-		$(GSTREAMER_CFLAGS)
+		-I$(top_srcdir)/libmedia/gst \
+		$(GSTREAMER_CFLAGS) \
+		$(SDL_CFLAGS)
 
    libgnashmedia_la_LIBADD += \
-		$(GSTREAMER_LIBS) -lgstbase-0.10
+		$(GSTREAMER_LIBS) -lgstbase-0.10 \
+		$(SDL_LIBS)
 
 endif
 
@@ -157,25 +155,15 @@ if USE_FFMPEG_ENGINE
 		$(SDL_CFLAGS)
 endif
 
-# if USE_MAD_ENGINE
-#    libgnashmedia_la_SOURCES += \
-# 		ffmpeg/MediaDecoderSdl.cpp \
-# 		ffmpeg/AudioDecoderMad.cpp \
-# 		ffmpeg/sound_handler_sdl.cpp
-# 
-#    noinst_HEADERS += \
-# 		ffmpeg/MediaDecoderSdl.h \
-# 		ffmpeg/AudioDecoderMad.h \
-# 		ffmpeg/sound_handler_sdl.h
-# 
-#    libgnashmedia_la_LIBADD += \
-# 		$(MAD_LIBS) 
-# 
-#    libgnashmedia_la_CPPFLAGS += \
-# 		$(MAD_CFLAGS)
-# endif
-
 libgnashmedia_la_LDFLAGS = -release $(VERSION)
+
+if WIN32
+  libgnashmedia_la_LDFLAGS += -no-undefined
+  libgnashmedia_la_LIBADD += \
+	$(top_builddir)/libbase/libgnashbase.la \
+	$(top_builddir)/libcore/libgnashcore.la \
+	-lintl
+endif
 
 #libltdlc_la_CPPFLAGS = $(LTDLINCL)
 #if CONVENIENCE_LTDL

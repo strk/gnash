@@ -112,12 +112,24 @@ key_as_object::get_last_key() const
     return _lastKeyEvent;
 }
 
+static as_value
+key_is_accessible(const fn_call& fn)
+{
+
+    boost::intrusive_ptr<key_as_object> ko = 
+        ensureType<key_as_object>(fn.this_ptr);
+
+    log_unimpl("Key.isAccessible");
+    return as_value();
+}
+
 
 /// Return the ascii number of the last key pressed.
 static as_value   
 key_get_ascii(const fn_call& fn)
 {
-    boost::intrusive_ptr<key_as_object> ko = ensureType<key_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<key_as_object> ko = 
+        ensureType<key_as_object>(fn.this_ptr);
 
     int code = ko->get_last_key();
 
@@ -128,7 +140,8 @@ key_get_ascii(const fn_call& fn)
 static as_value   
 key_get_code(const fn_call& fn)
 {
-    boost::intrusive_ptr<key_as_object> ko = ensureType<key_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<key_as_object> ko = 
+        ensureType<key_as_object>(fn.this_ptr);
 
     int code = ko->get_last_key();
 
@@ -139,7 +152,8 @@ key_get_code(const fn_call& fn)
 static as_value   
 key_is_down(const fn_call& fn)
 {
-    boost::intrusive_ptr<key_as_object> ko = ensureType<key_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<key_as_object> ko = 
+        ensureType<key_as_object>(fn.this_ptr);
 
     if (fn.nargs < 1)
     {
@@ -176,8 +190,12 @@ void key_class_init(as_object& global)
     // NOTE: _global.Key *is* an object, not a constructor
     as_object*  key_obj = new key_as_object;
 
+    const int flags = as_prop_flags::readOnly |
+                      as_prop_flags::dontDelete |
+                      as_prop_flags::dontEnum;
+
     // constants
-#define KEY_CONST(k) key_obj->init_member(#k, key::codeMap[key::k][key::KEY])
+#define KEY_CONST(k) key_obj->init_member(#k, key::codeMap[key::k][key::KEY], flags)
     KEY_CONST(BACKSPACE);
     KEY_CONST(CAPSLOCK);
     KEY_CONST(CONTROL);
@@ -196,22 +214,26 @@ void key_class_init(as_object& global)
     KEY_CONST(SPACE);
     KEY_CONST(TAB);
     KEY_CONST(UP);
+    KEY_CONST(ALT);
 
     // methods
 
     VM& vm = global.getVM();
 
     vm.registerNative(key_get_ascii, 800, 0);
-    key_obj->init_member("getAscii", vm.getNative(800, 0));
+    key_obj->init_member("getAscii", vm.getNative(800, 0), flags);
 
     vm.registerNative(key_get_code, 800, 1);
-    key_obj->init_member("getCode", vm.getNative(800, 1));
+    key_obj->init_member("getCode", vm.getNative(800, 1), flags);
 
     vm.registerNative(key_is_down, 800, 2);
-    key_obj->init_member("isDown", vm.getNative(800, 2));
+    key_obj->init_member("isDown", vm.getNative(800, 2), flags);
 
     vm.registerNative(key_is_toggled, 800, 3);
-    key_obj->init_member("isToggled", vm.getNative(800, 3));
+    key_obj->init_member("isToggled", vm.getNative(800, 3), flags);
+
+    key_obj->init_member("isAccessible", 
+            new builtin_function(key_is_accessible), flags);
 
     global.init_member("Key", key_obj);
 }

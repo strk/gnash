@@ -198,7 +198,6 @@ libgnashcore_la_LIBADD = \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libamf/libgnashamf.la \
 	$(top_builddir)/libnet/libgnashnet.la \
-	$(top_builddir)/libmedia/libgnashmedia.la \
 	$(top_builddir)/libcore/asobj/libgnashasobjs.la \
 	$(top_builddir)/libcore/parser/libgnashparser.la \
 	$(top_builddir)/libcore/vm/libgnashvm.la \
@@ -209,7 +208,7 @@ libgnashcore_la_LIBADD = \
 	$(FONTCONFIG_LIBS) \
 	$(NULL)
 
-if USE_SOUND_GST
+if USE_GST_ENGINE
 AM_CPPFLAGS += $(GSTREAMER_CFLAGS) \
 		-I$(top_srcdir)/libmedia/gst
 libgnashcore_la_LIBADD += $(GSTREAMER_LIBS)
@@ -226,7 +225,17 @@ libgnashcore_la_SOURCES += debugger.cpp
 endif
 
 #libserver_la_LIBDADD =  #@DL_LIB@  # $(LIBLTDL)
-libgnashcore_la_LDFLAGS = -release $(VERSION) -export-dynamic #-no-undefined 
+libgnashcore_la_LDFLAGS = -release $(VERSION) -export-dynamic
+
+if WIN32
+  libgnashcore_la_LDFLAGS += -no-undefined
+  libgnashcore_la_LIBADD += \
+	$(top_builddir)/libmedia/libgnashmedia_la-MediaParser.lo \
+	$(top_builddir)/libmedia/libgnashmedia_la-MediaHandler.lo \
+	$(top_builddir)/libmedia/libgnashmedia_la-FLVParser.lo
+else
+  libgnashcore_la_LIBADD += $(top_builddir)/libmedia/libgnashmedia.la
+endif
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:

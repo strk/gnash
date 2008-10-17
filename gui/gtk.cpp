@@ -796,7 +796,7 @@ GtkGui::addGnashIcon(GtkWindow* window)
     GdkPixbuf *window_icon_pixbuf = createPixbuf ("GnashG.png");
     if (window_icon_pixbuf) {
         gtk_window_set_icon (GTK_WINDOW (window), window_icon_pixbuf);
-	gdk_pixbuf_unref (window_icon_pixbuf);
+		gdk_pixbuf_unref (window_icon_pixbuf);
     }
 }
 
@@ -819,7 +819,7 @@ GtkGui::createWindow(int width, int height)
     _width = width;
     _height = height;
     
-    _validbounds.setTo(0, 0, _width-1, _height-1);
+    _validbounds.setTo(0, 0, _width, _height);
     _glue->setRenderHandlerSize(_width, _height);
     
     return true;
@@ -936,88 +936,240 @@ void GtkGui::openFile (GtkWidget *widget, gpointer /* user_data */)
 }
 
 
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///                                                                         ///
+///                             Dialogues                                   ///
+///                                                                         ///
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+namespace { // anonimous
+
+class PreferencesDialog {
+
+public:
+
+	PreferencesDialog(GtkWidget* window);
+
+    void show();
+
+private:
+
+    // A struct containing pointers to widgets for passing preference 
+    // data from the dialogue   
+    struct PrefWidgets {
+        GtkWidget *soundToggle;
+        GtkWidget *actionDumpToggle;
+        GtkWidget *parserDumpToggle;
+        GtkWidget *malformedSWFToggle;
+        GtkWidget *ASCodingErrorToggle;
+        GtkWidget *logfileName;
+        GtkWidget *writeLogToggle;
+        GtkWidget *verbosityScale;
+        GtkWidget *streamsTimeoutScale;
+        GtkWidget *localDomainToggle;
+        GtkWidget *localHostToggle;
+        GtkWidget *solReadOnlyToggle;
+        GtkWidget *solLocalDomainToggle;
+        GtkWidget *localConnectionToggle;
+        GtkWidget *insecureSSLToggle; 
+        GtkWidget *lcTraceToggle;
+        GtkWidget *solSandbox;
+        GtkWidget *osText;
+        GtkWidget *versionText;
+        GtkWidget *urlOpenerText;
+        GtkWidget *librarySize;
+        GtkWidget *startStoppedToggle;
+#ifdef USE_DEBUGGER
+        GtkWidget *DebuggerToggle;
+#endif
+
+    	PrefWidgets()
+		:
+        	soundToggle(0),
+        	actionDumpToggle(0),
+        	parserDumpToggle(0),
+        	malformedSWFToggle(0),
+        	ASCodingErrorToggle(0),
+        	logfileName(0),
+        	writeLogToggle(0),
+        	verbosityScale(0),
+        	streamsTimeoutScale(0),
+        	localDomainToggle(0),
+        	localHostToggle(0),
+        	solReadOnlyToggle(0),
+        	solLocalDomainToggle(0),
+        	localConnectionToggle(0),
+        	insecureSSLToggle(0), 
+        	lcTraceToggle(0),
+        	solSandbox(0),
+        	osText(0),
+        	versionText(0),
+        	urlOpenerText(0),
+        	librarySize(0),
+        	startStoppedToggle(0)
+#ifdef USE_DEBUGGER
+        	,DebuggerToggle(0)
+#endif
+	{}
+    };
+    
+
+    static void handlePrefs(GtkWidget* widget, gint response, gpointer data);
+
+    /// Network Tab
+    void addNetworkTab();
+
+    /// Logging Tab
+    void addLoggingTab();
+
+    void addSecurityTab();
+
+    void addMediaTab();
+
+    void addPlayerTab();
+
+    GtkWidget* _window;
+
+    PrefWidgets* _prefs;
+
+    RcInitFile& _rcfile;
+
+    GtkWidget* _prefsDialog;
+
+    GtkWidget* _notebook;
+
+
+};
+
 // Callback to read values from the preferences dialogue and set rcfile
 // values accordingly.
 void
-GtkGui::handlePrefs (GtkWidget* dialog, gint response, gpointer data)
+PreferencesDialog::handlePrefs (GtkWidget* dialog, gint response, gpointer data)
 {
 
-    prefData *prefs = static_cast<prefData*>(data);
+    PrefWidgets *prefs = static_cast<PrefWidgets*>(data);
 
     if (response == GTK_RESPONSE_OK) {
 
-        // If 'Save' was clicked, set all the values in rcfile
-        RcInitFile& rcfile = RcInitFile::getDefaultInstance();
+        // If 'Save' was clicked, set all the values in _rcfile
+        RcInitFile& _rcfile = RcInitFile::getDefaultInstance();
         // For getting from const gchar* to std::string&
         std::string tmp;
     
-        rcfile.useSound(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->soundToggle)));
+        if ( prefs->soundToggle )
+            _rcfile.useSound(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->soundToggle)));
     
-        rcfile.useActionDump(
-    		gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->actionDumpToggle)));
-        rcfile.useParserDump(
-    		gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->parserDumpToggle)));
+        if ( prefs->actionDumpToggle )
+            _rcfile.useActionDump(
+    		    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->actionDumpToggle)));
+
+        if ( prefs->parserDumpToggle )
+            _rcfile.useParserDump(
+    		    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->parserDumpToggle)));
     	
-    	tmp = gtk_entry_get_text(GTK_ENTRY(prefs->logfileName));
-        rcfile.setDebugLog(tmp);
+        if ( prefs->logfileName ) {
+    	    tmp = gtk_entry_get_text(GTK_ENTRY(prefs->logfileName));
+            _rcfile.setDebugLog(tmp);
+        }
         
-        rcfile.useWriteLog(
-        	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->writeLogToggle)));
+        if ( prefs->writeLogToggle ) {
+            _rcfile.useWriteLog(
+        	    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->writeLogToggle)));
+        }
         	
-        rcfile.verbosityLevel(static_cast<int>(
-        	gtk_range_get_value(GTK_RANGE(prefs->verbosityScale))));
+        if ( prefs->verbosityScale ) {
+            _rcfile.verbosityLevel(static_cast<int>(
+        	    gtk_range_get_value(GTK_RANGE(prefs->verbosityScale))));
+        }
 
-        rcfile.showASCodingErrors(
-        	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->ASCodingErrorToggle)));
+        if ( prefs->streamsTimeoutScale ) {
+            _rcfile.setStreamsTimeout(
+        	    gtk_range_get_value(GTK_RANGE(prefs->streamsTimeoutScale)));
+        }
 
-        rcfile.showMalformedSWFErrors(
-        	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->malformedSWFToggle)));
+        if ( prefs->ASCodingErrorToggle ) {
+            _rcfile.showASCodingErrors(
+                gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->ASCodingErrorToggle)));
+        }
 
-        rcfile.useLocalHost(
-        	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->localHostToggle)));
+        if ( prefs->malformedSWFToggle ) {
+            _rcfile.showMalformedSWFErrors(
+                gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->malformedSWFToggle)));
+        }
 
-        rcfile.useLocalDomain(
-        	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->localDomainToggle)));
+        if ( prefs->localHostToggle ) {
+            _rcfile.useLocalHost(
+                gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->localHostToggle)));
+        }
 
-        rcfile.setSOLLocalDomain(
-    		gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->solLocalDomainToggle)));
+        if ( prefs->localDomainToggle ) {
+            _rcfile.useLocalDomain(
+                gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->localDomainToggle)));
+        }
 
-        rcfile.setSOLReadOnly(
-    		gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->solReadOnlyToggle)));
+        if ( prefs->solLocalDomainToggle ) {
+            _rcfile.setSOLLocalDomain(
+                gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->solLocalDomainToggle)));
+        }
 
-        rcfile.setLocalConnection(
-    		gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->localConnectionToggle)));
+        if ( prefs->solReadOnlyToggle ) {
+            _rcfile.setSOLReadOnly(
+                gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->solReadOnlyToggle)));
+        }
 
-        rcfile.insecureSSL(
-    		gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->insecureSSLToggle)));
+        if ( prefs->localConnectionToggle ) {
+            _rcfile.setLocalConnection(
+                gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->localConnectionToggle)));
+        }
 
-        rcfile.setLCTrace(
-    		gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->lcTraceToggle)));
+        if ( prefs->insecureSSLToggle ) {
+            _rcfile.insecureSSL(
+                gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->insecureSSLToggle)));
+        }
+
+        if ( prefs->lcTraceToggle ) {
+            _rcfile.setLCTrace(
+                gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->lcTraceToggle)));
+        }
     		
-        tmp = gtk_entry_get_text(GTK_ENTRY(prefs->solSandbox));
-    	rcfile.setSOLSafeDir(tmp);
+        if ( prefs->solSandbox ) {
+            tmp = gtk_entry_get_text(GTK_ENTRY(prefs->solSandbox));
+            _rcfile.setSOLSafeDir(tmp);
+        }
 
-        tmp = gtk_entry_get_text(GTK_ENTRY(prefs->osText));
-    	rcfile.setFlashSystemOS(tmp);
+        if ( prefs->osText ) {
+            tmp = gtk_entry_get_text(GTK_ENTRY(prefs->osText));
+            _rcfile.setFlashSystemOS(tmp);
+        }
     	
-        tmp = gtk_entry_get_text(GTK_ENTRY(prefs->versionText));
-    	rcfile.setFlashVersionString(tmp);    	
+        if ( prefs->versionText ) {
+            tmp = gtk_entry_get_text(GTK_ENTRY(prefs->versionText));
+            _rcfile.setFlashVersionString(tmp);    	
+        }
 
-        rcfile.setMovieLibraryLimit(
-        	gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(prefs->librarySize)));
+        if ( prefs->librarySize ) {
+            _rcfile.setMovieLibraryLimit(
+                gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(prefs->librarySize)));
+        }
 
-        rcfile.startStopped(
-        	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->startStoppedToggle)));
+        if ( prefs->startStoppedToggle ) {
+            _rcfile.startStopped(
+                gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->startStoppedToggle)));
+        }
 
-        tmp = gtk_entry_get_text(GTK_ENTRY(prefs->urlOpenerText));        	
-        rcfile.setURLOpenerFormat(tmp);
+        if ( prefs->urlOpenerText ) {
+            tmp = gtk_entry_get_text(GTK_ENTRY(prefs->urlOpenerText));        	
+            _rcfile.setURLOpenerFormat(tmp);
+        }
     	
-    	// Let rcfile decide which file to update: generally the file being used if
+    	// Let _rcfile decide which file to update: generally the file being used if
     	// specified in GNASHRC environment variable, or in the user's home directory
     	// if that can be found.
     	// TODO: We can also specify here which file should be written by passing
     	// that instead. How might that best be done?
-    	rcfile.updateFile();
+    	_rcfile.updateFile();
 
         // Close the window when 'ok' is clicked
         gtk_widget_destroy(dialog);
@@ -1033,24 +1185,21 @@ GtkGui::handlePrefs (GtkWidget* dialog, gint response, gpointer data)
     if (prefs) delete prefs;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-///                                                                         ///
-///                             Dialogues                                   ///
-///                                                                         ///
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
 
 void
-GtkGui::showPreferencesDialog()
+PreferencesDialog::show()
 {
-    
-    prefData *prefs = new prefData;
+    gtk_widget_show_all (_prefsDialog);    
+}
 
-    RcInitFile& rcfile = RcInitFile::getDefaultInstance();
-
+PreferencesDialog::PreferencesDialog(GtkWidget* window)
+    :
+    _window(window),
+    _prefs(new PrefWidgets),
+    _rcfile(RcInitFile::getDefaultInstance())
+{
     // Create top-level window
-    GtkWidget *prefsDialog = gtk_dialog_new_with_buttons(
+    _prefsDialog = gtk_dialog_new_with_buttons(
     				_("Gnash preferences"),
     				GTK_WINDOW(_window),
     				// Needs an explicit cast in C++
@@ -1062,23 +1211,61 @@ GtkGui::showPreferencesDialog()
     				GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
     				NULL);
     // Add Gnash icon
-    addGnashIcon(GTK_WINDOW(prefsDialog));
+    GtkGui::addGnashIcon(GTK_WINDOW(_prefsDialog));
 
     // Add notebook (tabs) to dialogue's vbox
-    GtkWidget *notebook1 = gtk_notebook_new ();
+    _notebook = gtk_notebook_new ();
     gtk_container_add (
-    		GTK_CONTAINER(GTK_DIALOG(prefsDialog)->vbox), notebook1);
+    		GTK_CONTAINER(GTK_DIALOG(_prefsDialog)->vbox), _notebook);
 
     // Pass the widgets containing settings to the callback function
     // when any button is clicked or when the dialogue is destroyed.
-    g_signal_connect (prefsDialog, "response", G_CALLBACK(&handlePrefs), prefs);
+    g_signal_connect (_prefsDialog, "response", G_CALLBACK(&handlePrefs), _prefs);
 
-    // Logging Tab
+    addLoggingTab();
+    addSecurityTab();
+    addNetworkTab();
+    addMediaTab();
+    addPlayerTab();
+}
+
+void
+PreferencesDialog::addNetworkTab()
+{
+    GtkWidget *vbox = gtk_vbox_new (FALSE, 10);
+
+    // Tab label
+    GtkWidget *label = gtk_label_new_with_mnemonic (_("_Network"));
+    gtk_notebook_append_page(GTK_NOTEBOOK(_notebook), GTK_WIDGET(vbox), label); 
+
+    // Network preferences 
+    label = gtk_label_new (_("<b>Network preferences</b>"));
+    gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
+    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
+
+    // Streams timeout
+    GtkWidget *timeoutbox = gtk_hbox_new (FALSE, 2);
+    gtk_box_pack_start(GTK_BOX(vbox), timeoutbox, FALSE, FALSE, 0);
+    
+    label = gtk_label_new (_("Network timeout in seconds (0 for no timeout):"));
+    gtk_box_pack_start(GTK_BOX(timeoutbox), label, FALSE, FALSE, 0);
+    gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
+
+    _prefs->streamsTimeoutScale = gtk_spin_button_new_with_range(0, 300, 1);
+    gtk_box_pack_start(GTK_BOX(timeoutbox), _prefs->streamsTimeoutScale, FALSE, FALSE, 0);
+    // Align to _rcfile value:
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(_prefs->streamsTimeoutScale), _rcfile.getStreamsTimeout());
+
+}
+
+void
+PreferencesDialog::addLoggingTab()
+{
     GtkWidget *loggingvbox = gtk_vbox_new (FALSE, 10);
    
     // Tab label
     GtkWidget *loggingtablabel = gtk_label_new_with_mnemonic (_("_Logging"));
-    gtk_notebook_append_page(GTK_NOTEBOOK(notebook1), GTK_WIDGET(loggingvbox), loggingtablabel); 
+    gtk_notebook_append_page(GTK_NOTEBOOK(_notebook), GTK_WIDGET(loggingvbox), loggingtablabel); 
 
     // Logging options
     GtkWidget *logginglabel = gtk_label_new (_("<b>Logging options</b>"));
@@ -1089,91 +1276,96 @@ GtkGui::showPreferencesDialog()
     gtk_box_pack_start(GTK_BOX(loggingvbox), verbositylabel, FALSE, FALSE, 0);
     gtk_misc_set_alignment (GTK_MISC (verbositylabel), 0, 0.5);
 
-    prefs->verbosityScale = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (rcfile.verbosityLevel(), 0, 10, 1, 0, 0)));
-    gtk_scale_set_digits (GTK_SCALE (prefs->verbosityScale), 0);
-    gtk_range_set_update_policy (GTK_RANGE (prefs->verbosityScale), GTK_UPDATE_DISCONTINUOUS);
-    gtk_box_pack_start(GTK_BOX(loggingvbox), prefs->verbosityScale, FALSE, FALSE, 0);
+    _prefs->verbosityScale = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (_rcfile.verbosityLevel(), 0, 10, 1, 0, 0)));
+    gtk_scale_set_digits (GTK_SCALE (_prefs->verbosityScale), 0);
+    gtk_range_set_update_policy (GTK_RANGE (_prefs->verbosityScale), GTK_UPDATE_DISCONTINUOUS);
+    gtk_box_pack_start(GTK_BOX(loggingvbox), _prefs->verbosityScale, FALSE, FALSE, 0);
     
-    prefs->writeLogToggle = gtk_check_button_new_with_mnemonic (_("Log to _file"));
-    gtk_box_pack_start(GTK_BOX(loggingvbox), prefs->writeLogToggle, FALSE, FALSE, 0);
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (prefs->writeLogToggle), rcfile.useWriteLog());
+    _prefs->writeLogToggle = gtk_check_button_new_with_mnemonic (_("Log to _file"));
+    gtk_box_pack_start(GTK_BOX(loggingvbox), _prefs->writeLogToggle, FALSE, FALSE, 0);
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (_prefs->writeLogToggle), _rcfile.useWriteLog());
     
     GtkWidget *logfilelabel = gtk_label_new (_("Logfile name:"));
     gtk_box_pack_start(GTK_BOX(loggingvbox), logfilelabel, FALSE, FALSE, 0);
     gtk_misc_set_alignment (GTK_MISC (logfilelabel), 0, 0.5);
     
-    prefs->logfileName = gtk_entry_new ();
-    gtk_box_pack_start(GTK_BOX(loggingvbox), prefs->logfileName, FALSE, FALSE, 0);
+    _prefs->logfileName = gtk_entry_new ();
+    gtk_box_pack_start(GTK_BOX(loggingvbox), _prefs->logfileName, FALSE, FALSE, 0);
     // Put debug filename in the entry box      
-    gtk_entry_set_text(GTK_ENTRY(prefs->logfileName), rcfile.getDebugLog().c_str());
+    gtk_entry_set_text(GTK_ENTRY(_prefs->logfileName), _rcfile.getDebugLog().c_str());
     
-    prefs->parserDumpToggle = gtk_check_button_new_with_mnemonic (_("Log _parser output"));
-    gtk_box_pack_start(GTK_BOX(loggingvbox), prefs->parserDumpToggle, FALSE, FALSE, 0);
-    // Align button state with rcfile
+    _prefs->parserDumpToggle = gtk_check_button_new_with_mnemonic (_("Log _parser output"));
+    gtk_box_pack_start(GTK_BOX(loggingvbox), _prefs->parserDumpToggle, FALSE, FALSE, 0);
+    // Align button state with _rcfile
     gtk_toggle_button_set_active (
-    		GTK_TOGGLE_BUTTON (prefs->parserDumpToggle),
-    		rcfile.useParserDump());
+    		GTK_TOGGLE_BUTTON (_prefs->parserDumpToggle),
+    		_rcfile.useParserDump());
 
-    prefs->actionDumpToggle = gtk_check_button_new_with_mnemonic (_("Log SWF _actions"));
-    gtk_box_pack_start(GTK_BOX(loggingvbox), prefs->actionDumpToggle, FALSE, FALSE, 0);
-    // Align button state with rcfile
+    _prefs->actionDumpToggle = gtk_check_button_new_with_mnemonic (_("Log SWF _actions"));
+    gtk_box_pack_start(GTK_BOX(loggingvbox), _prefs->actionDumpToggle, FALSE, FALSE, 0);
+    // Align button state with _rcfile
     gtk_toggle_button_set_active (
-    		GTK_TOGGLE_BUTTON (prefs->actionDumpToggle),
-    		rcfile.useActionDump());
+    		GTK_TOGGLE_BUTTON (_prefs->actionDumpToggle),
+    		_rcfile.useActionDump());
 
-    prefs->malformedSWFToggle = gtk_check_button_new_with_mnemonic (_("Log malformed SWF _errors"));
-    gtk_box_pack_start(GTK_BOX(loggingvbox), prefs->malformedSWFToggle, FALSE, FALSE, 0);
-    // Align button state with rcfile
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (prefs->malformedSWFToggle),
-    			rcfile.showMalformedSWFErrors());
+    _prefs->malformedSWFToggle = gtk_check_button_new_with_mnemonic (_("Log malformed SWF _errors"));
+    gtk_box_pack_start(GTK_BOX(loggingvbox), _prefs->malformedSWFToggle, FALSE, FALSE, 0);
+    // Align button state with _rcfile
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (_prefs->malformedSWFToggle),
+    			_rcfile.showMalformedSWFErrors());
 
-    prefs->ASCodingErrorToggle = gtk_check_button_new_with_mnemonic (_("Log ActionScript _coding errors"));
-    gtk_box_pack_start(GTK_BOX(loggingvbox), prefs->ASCodingErrorToggle, FALSE, FALSE, 0);
-    // Align button state with rcfile
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (prefs->ASCodingErrorToggle),
-    			rcfile.showASCodingErrors());
+    _prefs->ASCodingErrorToggle = gtk_check_button_new_with_mnemonic (_("Log ActionScript _coding errors"));
+    gtk_box_pack_start(GTK_BOX(loggingvbox), _prefs->ASCodingErrorToggle, FALSE, FALSE, 0);
+    // Align button state with _rcfile
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (_prefs->ASCodingErrorToggle),
+    			_rcfile.showASCodingErrors());
 
-    prefs->lcTraceToggle = gtk_check_button_new_with_mnemonic (
+    _prefs->lcTraceToggle = gtk_check_button_new_with_mnemonic (
     				_("Log _Local Connection activity"));
-    gtk_box_pack_start (GTK_BOX(loggingvbox), prefs->lcTraceToggle, FALSE, FALSE, 0);
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (prefs->lcTraceToggle),
-    			rcfile.getLCTrace()); 
+    gtk_box_pack_start (GTK_BOX(loggingvbox), _prefs->lcTraceToggle, FALSE, FALSE, 0);
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (_prefs->lcTraceToggle),
+    			_rcfile.getLCTrace()); 
 
 #ifdef USE_DEBUGGER
 
-    prefs->DebuggerToggle = gtk_check_button_new_with_mnemonic (_("Enable _debugger"));
-    gtk_box_pack_start(GTK_BOX(loggingvbox), prefs->DebuggerToggle, FALSE, FALSE, 0);
-    // Align button state with rcfile
+    _prefs->DebuggerToggle = gtk_check_button_new_with_mnemonic (_("Enable _debugger"));
+    gtk_box_pack_start(GTK_BOX(loggingvbox), _prefs->DebuggerToggle, FALSE, FALSE, 0);
+    // Align button state with _rcfile
     gtk_toggle_button_set_active (
-    			GTK_TOGGLE_BUTTON (prefs->DebuggerToggle),
-    			rcfile.useDebugger());
+    			GTK_TOGGLE_BUTTON (_prefs->DebuggerToggle),
+    			_rcfile.useDebugger());
 
 #endif
 
+}
+
+void
+PreferencesDialog::addSecurityTab()
+{
     // Security Tab
     GtkWidget *securityvbox = gtk_vbox_new (FALSE, 14);
 
     // Security tab title
     GtkWidget *securitytablabel = gtk_label_new_with_mnemonic (_("_Security"));
     
-    gtk_notebook_append_page(GTK_NOTEBOOK(notebook1), GTK_WIDGET(securityvbox), securitytablabel); 
+    gtk_notebook_append_page(GTK_NOTEBOOK(_notebook), GTK_WIDGET(securityvbox), securitytablabel); 
     
     // Network connection
     GtkWidget *netconnectionslabel = gtk_label_new (_("<b>Network connections</b>"));
     gtk_label_set_use_markup (GTK_LABEL (netconnectionslabel), TRUE);
     gtk_box_pack_start(GTK_BOX(securityvbox), netconnectionslabel, FALSE, FALSE, 0);
  
-    prefs->localHostToggle = gtk_check_button_new_with_mnemonic (_("Connect only to local _host"));
-    gtk_box_pack_start (GTK_BOX(securityvbox), prefs->localHostToggle, FALSE, FALSE, 0);
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (prefs->localHostToggle), rcfile.useLocalHost());
+    _prefs->localHostToggle = gtk_check_button_new_with_mnemonic (_("Connect only to local _host"));
+    gtk_box_pack_start (GTK_BOX(securityvbox), _prefs->localHostToggle, FALSE, FALSE, 0);
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (_prefs->localHostToggle), _rcfile.useLocalHost());
     
-    prefs->localDomainToggle = gtk_check_button_new_with_mnemonic (_("Connect only to local _domain"));
-    gtk_box_pack_start (GTK_BOX(securityvbox), prefs->localDomainToggle, FALSE, FALSE, 0);
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (prefs->localDomainToggle), rcfile.useLocalDomain());
+    _prefs->localDomainToggle = gtk_check_button_new_with_mnemonic (_("Connect only to local _domain"));
+    gtk_box_pack_start (GTK_BOX(securityvbox), _prefs->localDomainToggle, FALSE, FALSE, 0);
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (_prefs->localDomainToggle), _rcfile.useLocalDomain());
 
-    prefs->insecureSSLToggle = gtk_check_button_new_with_mnemonic (_("Disable SSL _verification"));
-    gtk_box_pack_start (GTK_BOX(securityvbox), prefs->insecureSSLToggle, FALSE, FALSE, 0);
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (prefs->insecureSSLToggle), rcfile.insecureSSL());
+    _prefs->insecureSSLToggle = gtk_check_button_new_with_mnemonic (_("Disable SSL _verification"));
+    gtk_box_pack_start (GTK_BOX(securityvbox), _prefs->insecureSSLToggle, FALSE, FALSE, 0);
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (_prefs->insecureSSLToggle), _rcfile.insecureSSL());
     
     GtkWidget *whitelistexpander = gtk_expander_new_with_mnemonic (_("_Whitelist"));
     gtk_box_pack_start (GTK_BOX (securityvbox), whitelistexpander, FALSE, FALSE, 0);
@@ -1196,55 +1388,61 @@ GtkGui::showPreferencesDialog()
     gtk_box_pack_start (GTK_BOX(securityvbox), solsandboxlabel, FALSE, FALSE, 0);
     gtk_misc_set_alignment (GTK_MISC (solsandboxlabel), 0, 0.5);
 
-    prefs->solSandbox = gtk_entry_new();
-    gtk_entry_set_text(GTK_ENTRY(prefs->solSandbox), rcfile.getSOLSafeDir().c_str());
-    gtk_box_pack_start (GTK_BOX(securityvbox), prefs->solSandbox, FALSE, FALSE, 0);
+    _prefs->solSandbox = gtk_entry_new();
+    gtk_entry_set_text(GTK_ENTRY(_prefs->solSandbox), _rcfile.getSOLSafeDir().c_str());
+    gtk_box_pack_start (GTK_BOX(securityvbox), _prefs->solSandbox, FALSE, FALSE, 0);
 
-    prefs->solReadOnlyToggle = gtk_check_button_new_with_mnemonic ( 
+    _prefs->solReadOnlyToggle = gtk_check_button_new_with_mnemonic ( 
     				_("Do _not write Shared Object files"));
-    gtk_box_pack_start (GTK_BOX(securityvbox), prefs->solReadOnlyToggle, FALSE, FALSE, 0);
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (prefs->solReadOnlyToggle),
-    			rcfile.getSOLReadOnly());
+    gtk_box_pack_start (GTK_BOX(securityvbox), _prefs->solReadOnlyToggle, FALSE, FALSE, 0);
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (_prefs->solReadOnlyToggle),
+    			_rcfile.getSOLReadOnly());
 
-    prefs->solLocalDomainToggle = gtk_check_button_new_with_mnemonic (
+    _prefs->solLocalDomainToggle = gtk_check_button_new_with_mnemonic (
     				_("Only _access local Shared Object files"));
-    gtk_box_pack_start (GTK_BOX(securityvbox), prefs->solLocalDomainToggle, FALSE, FALSE, 0);
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (prefs->solLocalDomainToggle),
-    			rcfile.getSOLLocalDomain());
+    gtk_box_pack_start (GTK_BOX(securityvbox), _prefs->solLocalDomainToggle, FALSE, FALSE, 0);
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (_prefs->solLocalDomainToggle),
+    			_rcfile.getSOLLocalDomain());
 
-    prefs->localConnectionToggle = gtk_check_button_new_with_mnemonic (
+    _prefs->localConnectionToggle = gtk_check_button_new_with_mnemonic (
     				_("Disable Local _Connection object"));
-    gtk_box_pack_start (GTK_BOX(securityvbox), prefs->localConnectionToggle, FALSE, FALSE, 0);
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (prefs->localConnectionToggle),
-    			rcfile.getLocalConnection()); 
-    
-    // Sound Tab
+    gtk_box_pack_start (GTK_BOX(securityvbox), _prefs->localConnectionToggle, FALSE, FALSE, 0);
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (_prefs->localConnectionToggle),
+    			_rcfile.getLocalConnection()); 
+}
 
+void
+PreferencesDialog::addMediaTab()
+{
     // Media Tab
     GtkWidget *mediavbox = gtk_vbox_new (FALSE, 2);
 
     // Media tab title
     GtkWidget *mediatablabel = gtk_label_new_with_mnemonic (_("_Media"));
     
-    gtk_notebook_append_page(GTK_NOTEBOOK(notebook1), GTK_WIDGET(mediavbox), mediatablabel); 
+    gtk_notebook_append_page(GTK_NOTEBOOK(_notebook), GTK_WIDGET(mediavbox), mediatablabel); 
     
     // Sound
     GtkWidget *soundlabel = gtk_label_new (_("<b>Sound</b>"));
     gtk_label_set_use_markup (GTK_LABEL (soundlabel), TRUE);
     gtk_box_pack_start(GTK_BOX(mediavbox), soundlabel, FALSE, FALSE, 0);
    
-    prefs->soundToggle = gtk_check_button_new_with_mnemonic (_("Use sound _handler"));
-    gtk_box_pack_start (GTK_BOX(mediavbox), prefs->soundToggle, FALSE, FALSE, 0);
+    _prefs->soundToggle = gtk_check_button_new_with_mnemonic (_("Use sound _handler"));
+    gtk_box_pack_start (GTK_BOX(mediavbox), _prefs->soundToggle, FALSE, FALSE, 0);
     // Align button state with rcfile
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (prefs->soundToggle), rcfile.useSound());
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (_prefs->soundToggle), _rcfile.useSound());
+}
 
+void
+PreferencesDialog::addPlayerTab()
+{
     // Player Tab
     GtkWidget *playervbox = gtk_vbox_new (FALSE, 14);
 
     // Player tab title
     GtkWidget *playertablabel = gtk_label_new_with_mnemonic (_("_Player"));
     
-    gtk_notebook_append_page(GTK_NOTEBOOK(notebook1), GTK_WIDGET(playervbox), playertablabel); 
+    gtk_notebook_append_page(GTK_NOTEBOOK(_notebook), GTK_WIDGET(playervbox), playertablabel); 
 
     // Player description
     GtkWidget *descriptionlabel = gtk_label_new (_("<b>Player description</b>"));
@@ -1259,10 +1457,10 @@ GtkGui::showPreferencesDialog()
     gtk_misc_set_alignment (GTK_MISC (versionlabel), 0, 0.5);
     gtk_box_pack_start(GTK_BOX(versionhbox), versionlabel, FALSE, FALSE, 0);
 
-    prefs->versionText = gtk_entry_new ();
-    gtk_box_pack_start(GTK_BOX(versionhbox), prefs->versionText, FALSE, FALSE, 0);
+    _prefs->versionText = gtk_entry_new ();
+    gtk_box_pack_start(GTK_BOX(versionhbox), _prefs->versionText, FALSE, FALSE, 0);
     // Put text in the entry box      
-    gtk_entry_set_text(GTK_ENTRY(prefs->versionText), rcfile.getFlashVersionString().c_str());
+    gtk_entry_set_text(GTK_ENTRY(_prefs->versionText), _rcfile.getFlashVersionString().c_str());
 
     // OS label
     GtkWidget *oshbox = gtk_hbox_new (FALSE, 2);
@@ -1272,10 +1470,10 @@ GtkGui::showPreferencesDialog()
     gtk_misc_set_alignment (GTK_MISC (OSlabel), 0, 0.5);
     gtk_box_pack_start(GTK_BOX(oshbox), OSlabel, FALSE, FALSE, 0);
     
-    prefs->osText = gtk_entry_new ();
-    gtk_box_pack_start(GTK_BOX(oshbox), prefs->osText, FALSE, FALSE, 0);
+    _prefs->osText = gtk_entry_new ();
+    gtk_box_pack_start(GTK_BOX(oshbox), _prefs->osText, FALSE, FALSE, 0);
     // Put text in the entry box      
-    gtk_entry_set_text(GTK_ENTRY(prefs->osText), rcfile.getFlashSystemOS().c_str());
+    gtk_entry_set_text(GTK_ENTRY(_prefs->osText), _rcfile.getFlashSystemOS().c_str());
     
     GtkWidget *OSadvicelabel = gtk_label_new (_("<i>If blank, Gnash will "
     					   "detect your OS</i>"));
@@ -1291,10 +1489,10 @@ GtkGui::showPreferencesDialog()
     gtk_misc_set_alignment (GTK_MISC (urlopenerlabel), 0, 0.5);
     gtk_box_pack_start(GTK_BOX(urlopenerbox), urlopenerlabel, FALSE, FALSE, 0);
     
-    prefs->urlOpenerText = gtk_entry_new ();
-    gtk_box_pack_start(GTK_BOX(urlopenerbox), prefs->urlOpenerText, FALSE, FALSE, 0);
+    _prefs->urlOpenerText = gtk_entry_new ();
+    gtk_box_pack_start(GTK_BOX(urlopenerbox), _prefs->urlOpenerText, FALSE, FALSE, 0);
     // Put text in the entry box      
-    gtk_entry_set_text(GTK_ENTRY(prefs->urlOpenerText), rcfile.getURLOpenerFormat().c_str());
+    gtk_entry_set_text(GTK_ENTRY(_prefs->urlOpenerText), _rcfile.getURLOpenerFormat().c_str());
 
     // Performance
     GtkWidget *performancelabel = gtk_label_new (_("<b>Performance</b>"));
@@ -1309,18 +1507,29 @@ GtkGui::showPreferencesDialog()
     gtk_misc_set_alignment (GTK_MISC (librarylabel), 0, 0.5);
     gtk_box_pack_start(GTK_BOX(libraryhbox), librarylabel, FALSE, FALSE, 0);
 
-    prefs->librarySize = gtk_spin_button_new_with_range(0, 100, 1);
-    gtk_box_pack_start(GTK_BOX(libraryhbox), prefs->librarySize, FALSE, FALSE, 0);
-    // Align to rcfile value:
-    gtk_spin_button_set_value(GTK_SPIN_BUTTON(prefs->librarySize), rcfile.getMovieLibraryLimit());
+    _prefs->librarySize = gtk_spin_button_new_with_range(0, 100, 1);
+    gtk_box_pack_start(GTK_BOX(libraryhbox), _prefs->librarySize, FALSE, FALSE, 0);
+    // Align to _rcfile value:
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(_prefs->librarySize), _rcfile.getMovieLibraryLimit());
 
-    prefs->startStoppedToggle = gtk_check_button_new_with_mnemonic (
+    _prefs->startStoppedToggle = gtk_check_button_new_with_mnemonic (
     				_("Start _Gnash in pause mode"));
-    gtk_box_pack_start (GTK_BOX(playervbox), prefs->startStoppedToggle, FALSE, FALSE, 0);
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (prefs->startStoppedToggle),
-    			rcfile.startStopped());
+    gtk_box_pack_start (GTK_BOX(playervbox), _prefs->startStoppedToggle, FALSE, FALSE, 0);
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (_prefs->startStoppedToggle),
+    			_rcfile.startStopped());
+} // end of ::addPlayerTab
 
-    gtk_widget_show_all (prefsDialog);    
+
+
+} // end of anonimous namespace
+
+
+void
+GtkGui::showPreferencesDialog()
+{
+    
+    PreferencesDialog preferencesDialog(_window);
+    preferencesDialog.show();
 }
 
 void
@@ -1435,33 +1644,30 @@ void
 GtkGui::showAboutDialog()
 {
     const gchar *documentors[] = { 
-        "Rob Savoye", 
-        "Sandro Santilli",
+	"Rob Savoye", 
+	"Sandro Santilli",
 	"Ann Barcomb",
-        NULL 
+	NULL 
     };
 
     const gchar *artists[] = { 
 	"Jason Savoye",
-        NULL 
+	NULL
     };
 
     const gchar *authors[] = { 
-        "Rob Savoye", 
-        "Sandro Santilli", 
-        "Bastiaan Jacques", 
-        "Tomas Groth", 
-        "Udo Giacomozzi", 
-        "Hannes Mayr", 
-        "Markus Gothe", 
-        "Vitaly Alexeev",
+	"Rob Savoye", 
+	"Sandro Santilli", 
+	"Bastiaan Jacques", 
+	"Markus Gothe", 
 	"John Gilmore",
-	"Zou Lunkai",
 	"Benjamin Wolsey",
-        NULL 
+	"Russ Nelson",
+	"Zou Lunkai",
+	NULL
     };
 
-    std::string comments = _("Gnash is the GNU Flash movie player based on GameSWF.");
+    std::string comments = _("Gnash is the GNU SWF Player based on GameSWF.");
 
     comments.append(_("\nRenderer: "));
     comments.append(RENDERER_CONFIG);
@@ -1483,9 +1689,52 @@ GtkGui::showAboutDialog()
     gtk_about_dialog_set_url_hook(NULL, NULL, NULL);
     GdkPixbuf *logo_pixbuf = createPixbuf("GnashG.png");
 
+#if 1
+    // gtk-2.8.20 (Debian 4.0) doesn't work fine with 
+    // the gtk_show_about_dialog() call [ omits info ].
+    // See bug #24426.
+
+    GtkWidget* aboutWidget = gtk_about_dialog_new();
+    GtkAboutDialog* about = GTK_ABOUT_DIALOG(aboutWidget);
+
+    gtk_about_dialog_set_name (about, "Gnash");
+    gtk_about_dialog_set_version(about, VERSION);
+    gtk_about_dialog_set_copyright(about, "Copyright (C) 2005, 2006, 2007, "
+            "2008 The Free Software Foundation");
+    gtk_about_dialog_set_comments (about, comments.c_str());
+    gtk_about_dialog_set_authors(about, authors);
+    gtk_about_dialog_set_documenters(about, documentors);
+    gtk_about_dialog_set_artists(about, artists);
+    gtk_about_dialog_set_translator_credits(about, _("translator-credits"));
+    gtk_about_dialog_set_logo(about, logo_pixbuf);
+    gtk_about_dialog_set_license(about, 
+        "This program is free software; you can redistribute it and/or modify\n"
+        "it under the terms of the GNU General Public License as published by\n"
+        "the Free Software Foundation; either version 3 of the License, or\n"
+        "(at your option) any later version.\n\n"
+        "This program is distributed in the hope that it will be useful,\n"
+        "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+        "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+        "GNU General Public License for more details.\n"
+        "You should have received a copy of the GNU General Public License\n"
+        "along with this program; if not, write to the Free Software\n"
+        "Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 "
+        "USA"
+	);
+    gtk_about_dialog_set_website(about, "http://www.gnu.org/software/gnash/");
+
+    // Destroy the dialogue box when 'close' is clicked.
+    g_signal_connect(G_OBJECT(aboutWidget),
+            "response",  G_CALLBACK(gtk_widget_destroy), aboutWidget);
+
+    gtk_widget_show (aboutWidget);
+
+#else
+
+
     gtk_show_about_dialog (
         NULL,
-        "program-name", _("GNASH flash movie player"), 
+        "program-name", _("Gnash"), 
         "version", VERSION,
         "copyright", "Copyright (C) 2005, 2006, 2007, 2008 "
                      "The Free Software Foundation",
@@ -1509,6 +1758,9 @@ GtkGui::showAboutDialog()
         "Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA",
         "website", "http://www.gnu.org/software/gnash/",
         NULL);
+#endif
+	if (logo_pixbuf)
+		gdk_pixbuf_unref(logo_pixbuf);
 }
 
 void
@@ -1606,7 +1858,7 @@ GtkGui::menuitem_sound_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 {
 //    GNASH_REPORT_FUNCTION;
     Gui* gui = static_cast<Gui*>(data);
-    gui->menu_toggle_sound();
+    gui->toggleSound();
 }
 
 void
@@ -1624,7 +1876,7 @@ GtkGui::menuitem_restart_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 {
     //GNASH_REPORT_FUNCTION;
     Gui* gui = static_cast<Gui*>(data);
-    gui->menu_restart();
+    gui->restart();
 }
 
 /// \brief quit complete, and close the application
@@ -1642,7 +1894,7 @@ GtkGui::menuitem_play_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 {
 //    GNASH_REPORT_FUNCTION;
     Gui* gui = static_cast<Gui*>(data);
-    gui->menu_play();
+    gui->play();
 }
 
 /// \brief toggle between playing or paused.
@@ -1651,7 +1903,7 @@ GtkGui::menuitem_pause_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 {
 //    GNASH_REPORT_FUNCTION;
     Gui* gui = static_cast<Gui*>(data);
-    gui->menu_pause();
+    gui->pause();
 }
 
 /// \brief stop the movie that's playing.
@@ -1660,7 +1912,7 @@ GtkGui::menuitem_stop_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 {
     GNASH_REPORT_FUNCTION;
     Gui* gui = static_cast<Gui*>(data);
-    gui->menu_stop();
+    gui->stop();
 }
 
 /// \brief step forward 1 frame

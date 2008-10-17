@@ -211,14 +211,16 @@ dnl version numbering fail gracefully.
 
     else
 
-      dnl NOTE: the [0-9]*d. pattern discards deb-heads rubbish prefix
-      ffmpeg_version=`$EGREP "define LIBAVCODEC_VERSION " ${avcodec_h} | awk '{print $'3'}' | sed -e "s%^[[0-9]]d\.%%"` 
+      dnl #define LIBAVCODEC_VERSION_TRIPLET 51,50,1
+      ffmpeg_version=`$EGREP "define LIBAVCODEC_VERSION_TRIPLET " ${avcodec_h} | awk '{print $'3'}' | sed -e "s%,%.%g"`
 
       if test x"${ffmpeg_version}" = x ; then
-        ffmpeg_version=`$EGREP "define LIBAVCODEC_BUILD " ${avcodec_h} | awk '{print $3}'`
+
+        dnl NOTE: the [0-9]*d. pattern discards deb-heads rubbish prefix
+        ffmpeg_version=`$EGREP "define LIBAVCODEC_VERSION " ${avcodec_h} | awk '{print $'3'}' | sed -e "s%^[[0-9]]d\.%%"` 
 
         if test x"${ffmpeg_version}" = x ; then
-          ffmpeg_version=`$EGREP "define LIBAVCODEC_VERSION_TRIPLET " ${avcodec_h} | awk '{print $3}'`
+          ffmpeg_version=`$EGREP "define LIBAVCODEC_BUILD " ${avcodec_h} | awk '{print $'3'}'`
         fi
       fi
 

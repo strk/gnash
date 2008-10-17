@@ -145,7 +145,7 @@
 #
 # Default: @DEFAULT_STREAMS_TIMEOUT@
 #
-set streamsTimeout 1.5
+set streamsTimeout 3
 
 # A space-separated list of directories you want movies
 # to have access to.

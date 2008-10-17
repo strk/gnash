@@ -27,8 +27,12 @@
 #include "gnash.h" // for image file types
 #include "image.h"
 #include "GnashImage.h"
-#include "GnashImagePng.h"
-#include "GnashImageGif.h"
+#ifdef USE_PNG
+# include "GnashImagePng.h"
+#endif
+#ifdef USE_GIF
+# include "GnashImageGif.h"
+#endif
 #include "GnashImageJpeg.h"
 #include "IOChannel.h"
 #include "log.h"
@@ -68,7 +72,7 @@ namespace image
 
 	void ImageBase::update(boost::uint8_t* data)
 	{
-		std::memcpy(_data.get(), data, _size);
+		std::memcpy(this->data(), data, _size);
 	}
 
 	void ImageBase::update(const ImageBase& from)
@@ -76,24 +80,24 @@ namespace image
 		assert(from._pitch == _pitch);
 		assert(_size <= from._size);
 		assert(_type == from._type);
-		std::memcpy(_data.get(), from._data.get(), _size);
+		std::memcpy(data(), from.data(), _size);
 	}
 
     void ImageBase::clear(const boost::uint8_t byteValue)
     {
-        std::memset(_data.get(), byteValue, _size);
+        std::memset(data(), byteValue, _size);
     }
 
 	boost::uint8_t* ImageBase::scanline(size_t y)
 	{
 		assert(y < _height);
-		return _data.get() + _pitch * y;
+		return data() + _pitch * y;
 	}
 
 	const boost::uint8_t* ImageBase::scanlinePointer(size_t y) const
 	{
 		assert(y < _height);
-		return _data.get() + _pitch * y;
+		return data() + _pitch * y;
 	}
 
 
@@ -155,7 +159,7 @@ namespace image
         assert (bufferLength * 4 <= _size);
 
         for (size_t i = 0; i < bufferLength; i++) {
-            _data[4 * i + 3] = alphaData[i];
+            data()[4 * i + 3] = alphaData[i];
         }
     }
 
@@ -182,7 +186,8 @@ namespace image
 	//
 
 	// Write the given image to the given out stream, in jpeg format.
-	void writeImageData(FileType type, boost::shared_ptr<IOChannel> out, image::ImageBase* image, int quality)
+	void writeImageData(FileType type, boost::shared_ptr<IOChannel> out,
+            image::ImageBase* image, int quality)
 	{
 		
 		const size_t width = image->width();
@@ -192,11 +197,15 @@ namespace image
 
         switch (type)
         {
+#ifdef USE_PNG
             case GNASH_FILETYPE_PNG:
-                outChannel = PngImageOutput::create(out, width, height, quality);
+                outChannel = PngImageOutput::create(out, width,
+                        height, quality);
                 break;
+#endif
             case GNASH_FILETYPE_JPEG:
-                outChannel = JpegImageOutput::create(out, width, height, quality);
+                outChannel = JpegImageOutput::create(out, width,
+                        height, quality);
                 break;
             default:
                 log_error("Requested to write image as unsupported filetype");
@@ -218,19 +227,24 @@ namespace image
 	}
 
     // See gnash.h for file types.
-    std::auto_ptr<ImageBase> readImageData(boost::shared_ptr<IOChannel> in, FileType type)
+    std::auto_ptr<ImageBase> readImageData(
+            boost::shared_ptr<IOChannel> in, FileType type)
     {
         std::auto_ptr<ImageBase> im (NULL);
         std::auto_ptr<ImageInput> inChannel;
 
         switch (type)
         {
+#ifdef USE_PNG
             case GNASH_FILETYPE_PNG:
                 inChannel = PngImageInput::create(in);
                 break;
+#endif
+#ifdef USE_GIF                
             case GNASH_FILETYPE_GIF:
                 inChannel = GifImageInput::create(in);
                 break;
+#endif
             case GNASH_FILETYPE_JPEG:
                 inChannel = JpegImageInput::create(in);
                 break;
@@ -260,9 +274,11 @@ namespace image
         }
         catch (std::bad_alloc& e)
         {
-            // This should be caught here because ~JpegImageInput can also throw
-            // an exception on stack unwinding and this confuses remote catchers.
-            log_error("Out of memory while trying to create %dx%d image", width, height);
+            // This should be caught here because ~JpegImageInput can also
+            // throw an exception on stack unwinding and this confuses
+            // remote catchers.
+            log_error("Out of memory while trying to create %dx%d image",
+                    width, height);
             return im;
         }
         
@@ -281,8 +297,8 @@ namespace image
 
 		loader.startImage();
 
-		std::auto_ptr<ImageBase> im(new image::ImageRGB(loader.getWidth(), loader.getHeight()));
-
+		std::auto_ptr<ImageBase> im(
+                new image::ImageRGB(loader.getWidth(), loader.getHeight()));
 
 		for (size_t y = 0, height = loader.getHeight(); y < height; y++) {
 			loader.readScanline(im->scanline(y));
@@ -296,20 +312,25 @@ namespace image
 
 	// For reading SWF JPEG3-style image data, like ordinary JPEG, 
 	// but stores the data in ImageRGBA format.
-	std::auto_ptr<ImageRGBA> readSWFJpeg3(boost::shared_ptr<gnash::IOChannel> in)
+	std::auto_ptr<ImageRGBA> readSWFJpeg3(
+            boost::shared_ptr<gnash::IOChannel> in)
 	{
 	
 	    std::auto_ptr<ImageRGBA> im(NULL);
 
         // Calling with headerBytes as 0 has a special effect...
-		std::auto_ptr<JpegImageInput> j_in ( JpegImageInput::createSWFJpeg2HeaderOnly(in, 0) );
-		if ( ! j_in.get() ) return im;
-		
+        std::auto_ptr<JpegImageInput> j_in(
+                JpegImageInput::createSWFJpeg2HeaderOnly(in, 0));
+
+        // If this isn't true, we should have thrown.
+        assert(j_in.get());
+
 		j_in->startImage();
 
 		im.reset(new image::ImageRGBA(j_in->getWidth(), j_in->getHeight()));
 
-		boost::scoped_array<boost::uint8_t> line ( new boost::uint8_t[3*j_in->getWidth()] );
+		boost::scoped_array<boost::uint8_t> line (
+                new boost::uint8_t[3 * j_in->getWidth()]);
 
 		for (size_t y = 0; y < j_in->getHeight(); y++) 
 		{
@@ -324,8 +345,6 @@ namespace image
 				data[4*x+3] = 255;
 			}
 		}
-
-		j_in->finishImage();
 
 		return im;
 	}

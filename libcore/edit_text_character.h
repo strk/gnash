@@ -15,8 +15,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef _GNASH_EDIT_TEXT_CHARACTER_H_
-#define _GNASH_EDIT_TEXT_CHARACTER_H_
+#ifndef GNASH_EDIT_TEXT_CHARACTER_H
+#define GNASH_EDIT_TEXT_CHARACTER_H
 
 #include "character.h" // for inheritance
 #include "edit_text_character_def.h" // for inlines and typedefs

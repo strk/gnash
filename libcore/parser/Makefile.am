@@ -81,12 +81,17 @@ noinst_HEADERS = \
 
 libgnashparser_la_LIBADD = \
 	$(top_builddir)/libamf/libgnashamf.la \
-	$(top_builddir)/libbase/libgnashbase.la \
-	$(top_builddir)/libmedia/libgnashmedia.la
+	$(top_builddir)/libbase/libgnashbase.la
 
-libgnashparser_la_LDFLAGS = $(BOOST_LIBS) -export-dynamic # -release $(VERSION) -no-undefined 
+## $(top_builddir)/libmedia/libgnashmedia.la
 
-if USE_SOUND_GST
+libgnashparser_la_LDFLAGS = $(BOOST_LIBS) -export-dynamic # -release $(VERSION)
+
+if WIN32
+  libgnashparser_la_LDFLAGS += -no-undefined 
+endif
+
+if USE_GST_ENGINE
 AM_CPPFLAGS += $(GSTREAMER_CFLAGS) \
 		-I$(top_srcdir)/libmedia/gst
 endif

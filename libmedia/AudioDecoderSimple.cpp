@@ -276,40 +276,51 @@ static void u8_expand(
 }
 
 
-AudioDecoderSimple::AudioDecoderSimple ()
+AudioDecoderSimple::AudioDecoderSimple(AudioInfo& info)
 	:
 	_sampleRate(0),
 	_sampleCount(0),
 	_stereo(false),
 	_is16bit(true)
 {
+    if (!setup(info)) throw MediaException("Failed to setup decoder");
 }
+
+AudioDecoderSimple::AudioDecoderSimple(SoundInfo& info)
+	:
+	_sampleRate(0),
+	_sampleCount(0),
+	_stereo(false),
+	_is16bit(true)
+{
+    if (!setup(info)) throw MediaException("Failed to setup decoder");
+}
+
 
 AudioDecoderSimple::~AudioDecoderSimple()
 {
-
 }
 
-bool AudioDecoderSimple::setup(SoundInfo* info)
+bool AudioDecoderSimple::setup(SoundInfo& info)
 {
 
-	if (info->getFormat() == AUDIO_CODEC_ADPCM || info->getFormat() == AUDIO_CODEC_RAW || info->getFormat() == AUDIO_CODEC_UNCOMPRESSED) {
-		_codec = info->getFormat();
-		_sampleRate = info->getSampleRate();
-		_sampleCount = info->getSampleCount();
-		_stereo = info->isStereo();
-		_is16bit = info->is16bit();
+	if (info.getFormat() == AUDIO_CODEC_ADPCM || info.getFormat() == AUDIO_CODEC_RAW || info.getFormat() == AUDIO_CODEC_UNCOMPRESSED) {
+		_codec = info.getFormat();
+		_sampleRate = info.getSampleRate();
+		_sampleCount = info.getSampleCount();
+		_stereo = info.isStereo();
+		_is16bit = info.is16bit();
 		return true;
 	}
 	return false;
 }
 
-bool AudioDecoderSimple::setup(AudioInfo* info)
+bool AudioDecoderSimple::setup(AudioInfo& info)
 {
-	if (info->type == FLASH && (info->codec == AUDIO_CODEC_ADPCM || info->codec == AUDIO_CODEC_RAW || info->codec == AUDIO_CODEC_UNCOMPRESSED)) {
-		_codec = static_cast<audioCodecType>(info->codec);
-		_sampleRate = info->sampleRate;
-		_stereo = info->stereo;
+	if (info.type == FLASH && (info.codec == AUDIO_CODEC_ADPCM || info.codec == AUDIO_CODEC_RAW || info.codec == AUDIO_CODEC_UNCOMPRESSED)) {
+		_codec = static_cast<audioCodecType>(info.codec);
+		_sampleRate = info.sampleRate;
+		_stereo = info.stereo;
 		_is16bit = true; // Fix this?
 		return true;
 	} else {
@@ -378,7 +389,7 @@ boost::uint8_t* AudioDecoderSimple::decode(boost::uint8_t* input, boost::uint32_
 					break;
 				case 0x00:  // Big-endian host
 					// Swap sample bytes to get big-endian format.
-					assert(inputSize & 1 == 0);
+					assert((inputSize & 1) == 0);
 					for (unsigned i = 0; i < inputSize; i+=2)
 					{
 						std::swap(decodedData[i], decodedData[i+1]);

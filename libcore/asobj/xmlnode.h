@@ -208,9 +208,13 @@ public:
     ///
     void removeNode();
 
-    void toString(std::ostream& str) const;
-
-    //void  change_stack_frame(int frame, gnash::as_object *xml, gnash::as_environment *env);
+    /// Convert the XMLNode to a string
+    //
+    /// @param o        The ostream to write the string to.
+    /// @param encode   Whether to URL encode the node values. This
+    ///                 is false by default, as it is only necessary
+    ///                 for XML.sendAndLoad.
+    void toString(std::ostream& str, bool encode = false) const;
 
     // We might turn this back to a dumb pointer, as long
     // as we'll make sure in the XMLNode destructor and
@@ -244,7 +248,7 @@ private:
 
     NodeType     _type;
 
-    static void stringify(const XMLNode& xml, std::ostream& xmlout);
+    static void stringify(const XMLNode& xml, std::ostream& xmlout, bool encode);
 
 };
 
