@@ -1,5 +1,85 @@
 2008-05-10 Russ Nelson <nelson@crynwr.com>
 
+Sixth alpha release of Gnash (0.8.4).
+Improvements since 0.8.3 release are:
+
+More visible to users:
+
+    * The -d switch won't behave the same as in 0.8.3. This is a
+      temporary thing, we'll likely bring it back to its original
+      behaviour for next releases. If you're curious, -d will now
+      change heart beating rate.
+    * Support for MIT SHM X extention is disabled by default `cause
+      it broke (*grin*). We'll get it back on next release. Let us
+      know if you really notice a performance degradation on the
+      rendering side please <gnash-dev@gnu.org>. 
+    * Keep Adobe happy with our users and our users happy with us by
+      changing "Flash player" into "SWF player" everywhere.  Adobe
+      claims "Flash" as a trademark and had asked a Linux distributor
+      to fix it.
+    * The popular SWF Twitter badge now renders correctly.
+    * Fix parsing of urls containing multiple question marks 
+    * Fix support for movies embedding multiple sound streams 
+    * Support for loading PNG and GIF images added.
+    * Improved rendering of SWF movies because of the less visible
+      changes listed below.
+    * Support for writing RGB/RGBA PNG images and JPEG images.
+    * Works with Potlatch OpenStreetMap editor
+    * New 'flvdumper' utility for analyzing FLV video files.
+    * XPI packaging support for Mozilla & Firefox. 
+
+Less visible to users:
+
+    * Improved SWF version 8 support:
+      o flash.geom.Point, flash.geom.Rect, flash.geom.Matrix classes
+        implemented.
+      o flash.geom.ColorTransform almost fully implemented.
+      o flash.display.BitmapData partially implemented.
+      o flash.geom.Transform.matrix and flash.geom.Transform.ColorTransform
+        implemented.
+      o MovieClip.transform implemented, with ability to find and apply
+        MovieClip transformations.
+      o Playback of VP6F video (SWF version 8 FLV) with Ffmpeg. 
+    * Fixes and implementation of ActionScript 2 classes:
+      o NetConnection.call() implemented: initial support for flash Remoting
+      o toString() method of objects called correctly, String.split
+        implementation fixed.
+      o XMLSocket onData method implemented properly, other methods fixed.
+      o Error class implemented.
+      o XML and LoadVars sendAndLoad() now derive from a common base object
+        (loadable AS object); fixes the popular SWF Twitter badge.
+      o addRequestHeaders and contentType implemented for LoadVars and XML. 
+    * VM bugfixes and improvements:
+      o Heart beating model, allowing for fine-grained interval timers and
+        threading reduction.
+      o Frame label fix (case sensitivity).
+      o Fixes and improvements to Color and cxform.
+      o SWF matrix made faster and more compatible (golf.swf works now!)
+      o try/catch/finally ActionScript expression handled more correctly.
+      o Parse and partially use ScriptLimits tag. Handle stack limit more
+        correctly.
+      o Fixed scoping issues for SWF <= 5
+      o Bitmap characters now support alpha.
+    * Media handling improvements:
+      o Pluggable architecture for MediaHandlers (ffmpeg/gst available)
+      o Media-handler agnostic Sound and NetStream classes
+      o Numerous bug fixes in ffmpeg and gstreamer media handling
+    * SWF version 2-specific fixes:
+      o PlaceObject tag display fixed (also applies to SWFs generated with
+        some free tools)
+      o DefineButtonCxform tag implemented). 
+    * Codebase improvements:
+      o Renamed the 'server' directory to be a more accurate 'libcore'.
+        Merge 'libgeometry' into 'libbase'
+      o Keep Adobe happy with our users and our users happy with us by
+        changing "Flash player" into "SWF player" everywhere (a Linux
+        distributor received a demand letter).
+      o Numerous cleanups and changes to improve portability. 
+
+--
+
+2008-05-10 Russ Nelson <nelson@crynwr.com>
+
 Sixth alpha release of Gnash (0.8.3).
 Improvements since 0.8.2 release are:
 
@@ -46,6 +126,8 @@ Less visible to users:
     * SWF8 line styles support (both from tag and drawing api) 
 
 
+--
+
 2008-02-21  Sandro Santilli <strk@keybit.net>
 
 Fifth alpha release of Gnash (0.8.2).
@@ -81,6 +163,8 @@ Improvements since 0.8.1 release are:
     * Improved stability and robustness with malformed SWFs.
     * Many other bugfixes. 
 
+--
+
 2007-08-29  Sandro Santilli <strk@keybit.net>
 
 Fourth alpha release of Gnash (0.8.1).
@@ -100,6 +184,8 @@ Improvements since 0.8.0 release are:
     * More robust parser 
     * Better support for flash player detection
     * Fix for 'debugLog' directive in gnashrc
+
+--
 
 2007-06-01  Rob Savoye  <rob@welcomehome.org>
 
@@ -123,6 +209,8 @@ are:
       mtasc compilers.
     * New drawing API for MovieClips..
     
+--
+
 2006-09-10  Rob Savoye  <rob@welcomehome.org>
 
 The second alpha release of Gnash is coming soon. Improvements since
@@ -140,10 +228,14 @@ the 0.7.1 alpha release are:
     * Supports cross configuration and cross compiling for embedded targets.
     * A whole slew of minor bugs that kept various movies from playing.
 
+--
+
 2006-04-20  Rob Savoye  <rob@welcomehome.org>
 
     * The first alpha release of Gnash! Version 0.7.1 is released with a
       working browser plugin.
+
+--
 
 2005-12-10  Rob Savoye  <rob@bertha.welcomehome.org>
 
