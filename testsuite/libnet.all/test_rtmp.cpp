@@ -581,8 +581,8 @@ test_results()
 
     RTMPMsg *msg1 = rtmp.decodeMsgBody(hex2);
     if (msg1) {
-        std::vector<amf::Element *> hell = msg1->getElements();
-        std::vector<amf::Element *> props = hell[0]->getProperties();        
+        std::vector<amf::Element> hell = msg1->getElements();
+        std::vector<amf::Element> props = hell[0]->getProperties();        
 //         printf("FIXME: %d, %d, %s:%s\n", props.size(), msg1->getStatus(),
 //                props[3]->getName(), props[3]->to_string());
 //         msg1->dump();

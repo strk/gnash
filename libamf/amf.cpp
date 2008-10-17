@@ -866,8 +866,11 @@ AMF::extractProperty(Network::byte_t *in, Network::byte_t* tooFar)
 //    log_debug(_("AMF property name length is: %d"), length);
     std::string name(reinterpret_cast<const char *>(tmpptr), length);
 //    log_debug(_("AMF property name is: %s"), name);
-    tmpptr += length;
-
+    // Don't read past the end
+    if (tmpptr + length < tooFar) {
+	tmpptr += length;
+    }
+    
     char c = *(reinterpret_cast<char *>(tmpptr));
     Element::amf0_type_e type = static_cast<Element::amf0_type_e>(c);
     // If we get a NULL object, there is no data. In that case, we only return
