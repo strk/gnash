@@ -583,9 +583,8 @@ Machine::execute()
 		as_value b = pop_stack();
 		as_value a = pop_stack();
 		boost::int32_t bytes = mStream->read_S24();
-		bool truth;
-		ABSTRACT_COMPARE(truth, a, b, false);
-		if(truth){
+		bool jump = a.newLessThan(b).to_bool();
+		if(jump){
 			LOG_DEBUG_AVM("Jumping... %d bytes.",bytes);
 			mStream->seekBy(bytes);
 		}
