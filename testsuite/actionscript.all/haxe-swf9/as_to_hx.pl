@@ -179,12 +179,6 @@ while(<STDIN>){
 		$_ =~ s/,\s*(\w+)\s*/) + String.fromCharCode($1/g;
 	}
 	
-	#Remove calls to call function.  I haven't found a Haxe equivilent for this.
-	if($_ =~ /\.call\(.+\)/){
-		skip_line();
-		next;
-	}
-	
 	#Convert calls to chr and ord.  I think these have been depreciated since SWF v5.
 	$_ =~ s/chr\(\s*(\w+)\s*\)/String.fromCharCode($1)/g;
 	$_ =~ s/ord\(\s*(\S+)\s*\)/$1.charCodeAt(0)/g;
