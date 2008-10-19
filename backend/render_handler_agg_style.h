@@ -103,7 +103,7 @@ bitmap format is most probably only used for rectangular bitmaps anyway.
 
 /// AGG bitmap fill style. There are quite a few combinations possible and so
 /// the class types are defined outside. The bitmap can be tiled or clipped.
-/// It can have any transformation matrix and color transform. Any pixel format
+/// It can have any transformation SWFMatrix and color transform. Any pixel format
 /// can be used, too. 
 template <class PixelFormat, class span_allocator_type, class img_source_type,
   class interpolator_type, class sg_type>
@@ -114,7 +114,7 @@ public:
   bool m_force_premultiply;
     
   agg_style_bitmap(int width, int height, int rowlen, boost::uint8_t* data, 
-    gnash::matrix mat, gnash::cxform cx) :
+    gnash::SWFMatrix mat, gnash::cxform cx) :
     
     m_force_premultiply(false),
     m_rbuf(data, width, height, rowlen),  
@@ -127,8 +127,8 @@ public:
   
     m_is_solid = false;
     
-    // Convert the transformation matrix to AGG's class. It's basically the
-    // same and we could even use gnash::matrix since AGG does not require
+    // Convert the transformation SWFMatrix to AGG's class. It's basically the
+    // same and we could even use gnash::SWFMatrix since AGG does not require
     // a real AGG descendant (templates!). However, it's better to use AGG's
     // class as this should be faster (avoid type conversion).
     m_tr=agg::trans_affine(
@@ -202,7 +202,7 @@ template <class color_type, class span_allocator_type, class interpolator_type,
 class agg_style_gradient : public agg_style_base {
 public:
 
-  agg_style_gradient(const gnash::fill_style& fs, gnash::matrix mat, gnash::cxform cx, int norm_size) :
+  agg_style_gradient(const gnash::fill_style& fs, gnash::SWFMatrix mat, gnash::cxform cx, int norm_size) :
     m_tr(),
     m_span_interpolator(m_tr),
     m_gradient_func(),
@@ -333,7 +333,7 @@ public:
     }
     
     /// Adds a new bitmap fill style
-    void add_bitmap(agg_bitmap_info_base* bi, gnash::matrix mat, gnash::cxform cx, 
+    void add_bitmap(agg_bitmap_info_base* bi, gnash::SWFMatrix mat, gnash::cxform cx, 
       bool repeat, bool smooth) {
 
       if (bi==NULL) {
@@ -405,7 +405,7 @@ public:
     // === RGB24 ===
     
 
-    void add_bitmap_repeat_nn_rgb24(agg_bitmap_info_base* bi, gnash::matrix mat, gnash::cxform cx) {
+    void add_bitmap_repeat_nn_rgb24(agg_bitmap_info_base* bi, gnash::SWFMatrix mat, gnash::cxform cx) {
 
       // tiled, nearest neighbor method (faster)   
 
@@ -428,7 +428,7 @@ public:
         
     
     
-    void add_bitmap_clip_nn_rgb24(agg_bitmap_info_base* bi, gnash::matrix mat, gnash::cxform cx) {
+    void add_bitmap_clip_nn_rgb24(agg_bitmap_info_base* bi, gnash::SWFMatrix mat, gnash::cxform cx) {
 
       // clipped, nearest neighbor method (faster)   
 
@@ -449,7 +449,7 @@ public:
     
     
     
-    void add_bitmap_repeat_aa_rgb24(agg_bitmap_info_base* bi, gnash::matrix mat, gnash::cxform cx) {  
+    void add_bitmap_repeat_aa_rgb24(agg_bitmap_info_base* bi, gnash::SWFMatrix mat, gnash::cxform cx) {  
 
       // tiled, bilinear method (better quality)   
 
@@ -470,7 +470,7 @@ public:
     }
         
     
-    void add_bitmap_clip_aa_rgb24(agg_bitmap_info_base* bi, gnash::matrix mat, gnash::cxform cx) {
+    void add_bitmap_clip_aa_rgb24(agg_bitmap_info_base* bi, gnash::SWFMatrix mat, gnash::cxform cx) {
 
       // clipped, bilinear method (better quality)   
 
@@ -493,7 +493,7 @@ public:
     
     // === RGBA32 ===    
 
-    void add_bitmap_repeat_nn_rgba32(agg_bitmap_info_base* bi, gnash::matrix mat, gnash::cxform cx) {
+    void add_bitmap_repeat_nn_rgba32(agg_bitmap_info_base* bi, gnash::SWFMatrix mat, gnash::cxform cx) {
     
       // tiled, nearest neighbor method (faster)   
 
@@ -516,7 +516,7 @@ public:
         
     
     
-    void add_bitmap_clip_nn_rgba32(agg_bitmap_info_base* bi, gnash::matrix mat, gnash::cxform cx) {
+    void add_bitmap_clip_nn_rgba32(agg_bitmap_info_base* bi, gnash::SWFMatrix mat, gnash::cxform cx) {
 
       // clipped, nearest neighbor method (faster)   
 
@@ -537,7 +537,7 @@ public:
     
     
     
-    void add_bitmap_repeat_aa_rgba32(agg_bitmap_info_base* bi, gnash::matrix mat, gnash::cxform cx) {  
+    void add_bitmap_repeat_aa_rgba32(agg_bitmap_info_base* bi, gnash::SWFMatrix mat, gnash::cxform cx) {  
 
       // tiled, bilinear method (better quality)   
 
@@ -558,7 +558,7 @@ public:
     }
         
     
-    void add_bitmap_clip_aa_rgba32(agg_bitmap_info_base* bi, gnash::matrix mat, gnash::cxform cx) {
+    void add_bitmap_clip_aa_rgba32(agg_bitmap_info_base* bi, gnash::SWFMatrix mat, gnash::cxform cx) {
 
       // clipped, bilinear method (better quality)   
 
@@ -580,7 +580,7 @@ public:
     
     // === GRADIENT ===
 
-    void add_gradient_linear(const gnash::fill_style& fs, gnash::matrix mat, gnash::cxform cx) {
+    void add_gradient_linear(const gnash::fill_style& fs, gnash::SWFMatrix mat, gnash::cxform cx) {
     
       typedef agg::rgba8 color_type;            
       typedef agg::span_allocator<color_type> span_allocator_type;
@@ -607,7 +607,7 @@ public:
     }
     
 
-    void add_gradient_radial(const gnash::fill_style& fs, gnash::matrix mat, gnash::cxform cx) {
+    void add_gradient_radial(const gnash::fill_style& fs, gnash::SWFMatrix mat, gnash::cxform cx) {
     
       typedef agg::rgba8 color_type;            
       typedef agg::span_allocator<color_type> span_allocator_type;
@@ -625,7 +625,7 @@ public:
         color_func_type, sg_type> st_type;
       
       // move the center of the radial fill to where it should be
-      gnash::matrix transl;
+      gnash::SWFMatrix transl;
       transl.set_translation(-32, -32);
       transl.concatenate(mat);    
       
@@ -637,7 +637,7 @@ public:
       m_styles.push_back(st);
     }
 
-    void add_gradient_focal(const gnash::fill_style& fs, gnash::matrix mat, gnash::cxform cx)
+    void add_gradient_focal(const gnash::fill_style& fs, gnash::SWFMatrix mat, gnash::cxform cx)
     {
       typedef agg::rgba8 color_type;
       typedef agg::span_allocator<color_type> span_allocator_type;
@@ -654,7 +654,7 @@ public:
             
       // move the center of the focal fill (not it's focal point) to where it 
       // should be.
-      gnash::matrix transl;      
+      gnash::SWFMatrix transl;      
       transl.set_translation(-32, -32);
       transl.concatenate(mat);
       

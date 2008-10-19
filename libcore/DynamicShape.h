@@ -55,10 +55,10 @@ public:
 	void beginFill(const rgba& color);
 
 	/// Start drawing with a linear gradient fill
-	void beginLinearGradientFill(const std::vector<gradient_record>& grad, const matrix& mat);
+	void beginLinearGradientFill(const std::vector<gradient_record>& grad, const SWFMatrix& mat);
 
 	/// Start drawing with a radial gradient fill
-	void beginRadialGradientFill(const std::vector<gradient_record>& grad, const matrix& mat);
+	void beginRadialGradientFill(const std::vector<gradient_record>& grad, const SWFMatrix& mat);
 
 	/// Close an existing filled path, if any.
 	void endFill();
@@ -134,7 +134,7 @@ public:
 	//       would result in a triangle and a stroke, which should fail the last hitTest(2,8).
 	//
 	//
-	bool point_test_local(boost::int32_t x, boost::int32_t y, matrix& wm)
+	bool point_test_local(boost::int32_t x, boost::int32_t y, SWFMatrix& wm)
 	{
 		finalize();
 		return shape_character_def::point_test_local(x, y, wm);

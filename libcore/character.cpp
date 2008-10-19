@@ -65,15 +65,15 @@ character::getNextUnnamedInstanceName()
 }
 
 
-matrix
-character::get_world_matrix() const
+SWFMatrix
+character::getWorldMatrix() const
 {
-	matrix m;
+	SWFMatrix m;
 	if (m_parent != NULL)
 	{
-	    m = m_parent->get_world_matrix();
+	    m = m_parent->getWorldMatrix();
 	}
-	m.concatenate(get_matrix());
+	m.concatenate(getMatrix());
 
 	return m;
 }
@@ -249,15 +249,15 @@ character::x_getset(const fn_call& fn)
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
 	{
-		matrix m = ptr->get_matrix();
+		SWFMatrix m = ptr->getMatrix();
 		rv = as_value(TWIPS_TO_PIXELS(m.get_x_translation()));
 	}
 	else // setter
 	{
 		const double newx = fn.arg(0).to_number();
-		matrix m = ptr->get_matrix();
+		SWFMatrix m = ptr->getMatrix();
 		m.set_x_translation(PIXELS_TO_TWIPS(utility::infinite_to_zero(newx)));
-		ptr->set_matrix(m); // no need to update caches when only changing translation
+		ptr->setMatrix(m); // no need to update caches when only changing translation
 		ptr->transformedByScript(); // m_accept_anim_moves = false; 
 	}
 	return rv;
@@ -272,15 +272,15 @@ character::y_getset(const fn_call& fn)
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
 	{
-		matrix m = ptr->get_matrix();
+		SWFMatrix m = ptr->getMatrix();
 		rv = as_value(TWIPS_TO_PIXELS(m.get_y_translation()));
 	}
 	else // setter
 	{
 		const double newy = fn.arg(0).to_number();
-		matrix m = ptr->get_matrix();
+		SWFMatrix m = ptr->getMatrix();
 		m.set_y_translation(PIXELS_TO_TWIPS(utility::infinite_to_zero(newy)));
-		ptr->set_matrix(m); // no need to update caches when only changing translation
+		ptr->setMatrix(m); // no need to update caches when only changing translation
 		ptr->transformedByScript(); // m_accept_anim_moves = false; 
 	}
 	return rv;
@@ -358,7 +358,7 @@ character::xmouse_get(const fn_call& fn)
 	int x, y, buttons;
 	VM::get().getRoot().get_mouse_state(x, y, buttons);
 
-	matrix m = ptr->get_world_matrix();
+	SWFMatrix m = ptr->getWorldMatrix();
     point a(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
     
     m.invert().transform(a);
@@ -374,7 +374,7 @@ character::ymouse_get(const fn_call& fn)
 	int x, y, buttons;
 	VM::get().getRoot().get_mouse_state(x, y, buttons);
 
-	matrix m = ptr->get_world_matrix();
+	SWFMatrix m = ptr->getWorldMatrix();
     point a(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
     m.invert().transform(a);
     return as_value(TWIPS_TO_PIXELS(a.y));
@@ -458,7 +458,7 @@ character::width_getset(const fn_call& fn)
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
 	{ 
-		matrix m = ptr->get_matrix();
+		SWFMatrix m = ptr->getMatrix();
 		m.transform(bounds);
 		double w = TWIPS_TO_PIXELS( bounds.width() );
 		rv = as_value(w);
@@ -497,9 +497,9 @@ character::set_width(double newwidth)
         double xscale = (newwidth / oldwidth);
         double rotation = _rotation * PI / 180.0;
 
-        matrix m = get_matrix();
+        SWFMatrix m = getMatrix();
         m.set_scale_rotation(xscale, yscale, rotation);
-        set_matrix(m, true); // let caches be updated
+        setMatrix(m, true); // let caches be updated
 }
 
 as_value
@@ -512,7 +512,7 @@ character::height_getset(const fn_call& fn)
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
 	{
-		matrix m = ptr->get_matrix();
+		SWFMatrix m = ptr->getMatrix();
 		m.transform(bounds);
 		double h = TWIPS_TO_PIXELS( bounds.height() );      
 		rv = as_value(h);
@@ -552,9 +552,9 @@ character::set_height(double newheight)
         double xscale = _xscale / 100.0;
         double rotation = _rotation * PI / 180.0;
 
-        matrix m = get_matrix();
+        SWFMatrix m = getMatrix();
         m.set_scale_rotation(xscale, yscale, rotation);
-        set_matrix(m, true); // let caches be updated
+        setMatrix(m, true); // let caches be updated
 }
 
 as_value
@@ -638,32 +638,32 @@ character::name_getset(const fn_call& fn)
 void
 character::copyMatrix(const character& c)
 {
-	m_matrix = c.m_matrix;
+	m_SWFMatrix = c.m_SWFMatrix;
 	_xscale = c._xscale;
 	_yscale = c._yscale;
 	_rotation = c._rotation;
 }
 
 void
-character::set_matrix(const matrix& m, bool updateCache)
+character::setMatrix(const SWFMatrix& m, bool updateCache)
 {
 
-    if (!(m == m_matrix))
+    if (!(m == m_SWFMatrix))
     {
-        //log_debug("setting matrix to: %s", m);
+        //log_debug("setting SWFMatrix to: %s", m);
 		set_invalidated(__FILE__, __LINE__);
-		m_matrix = m;
+		m_SWFMatrix = m;
 
-		if ( updateCache ) // don't update caches if matrix wasn't updated too
+		if ( updateCache ) // don't update caches if SWFMatrix wasn't updated too
 		{
-			_xscale = m_matrix.get_x_scale() * 100.0;
-			_yscale = m_matrix.get_y_scale() * 100.0;
-			_rotation = m_matrix.get_rotation() * 180.0 / PI;
+			_xscale = m_SWFMatrix.get_x_scale() * 100.0;
+			_yscale = m_SWFMatrix.get_y_scale() * 100.0;
+			_rotation = m_SWFMatrix.get_rotation() * 180.0 / PI;
 		}
     }
     else
     {
-        //log_debug("set_matrix of character %s: matrix "
+        //log_debug("setMatrix of character %s: SWFMatrix "
         //"not changed", getTarget());
     }
 
@@ -809,16 +809,16 @@ character::set_x_scale(double scale_percent)
 
     _xscale = scale_percent;
 
-    // As per misc-ming.all/matrix_test.{c,swf}
-    // we don't need to recompute the matrix from the 
+    // As per misc-ming.all/SWFMatrix_test.{c,swf}
+    // we don't need to recompute the SWFMatrix from the 
     // caches.
 
 
-	matrix m = get_matrix();
+	SWFMatrix m = getMatrix();
 
     m.set_x_scale(xscale);
 
-    set_matrix(m); // we updated the cache ourselves
+    setMatrix(m); // we updated the cache ourselves
 
 	transformedByScript(); 
 }
@@ -844,9 +844,9 @@ character::set_rotation(double rot)
 		rotation += PI;
 	}
 
-	matrix m = get_matrix();
+	SWFMatrix m = getMatrix();
         m.set_rotation(rotation);
-	set_matrix(m); // we update the cache ourselves
+	setMatrix(m); // we update the cache ourselves
 
 	_rotation = rot;
 
@@ -869,9 +869,9 @@ character::set_y_scale(double scale_percent)
 
 	_yscale = scale_percent;
 
-	matrix m = get_matrix();
+	SWFMatrix m = getMatrix();
     m.set_y_scale(yscale);
-	set_matrix(m); // we updated the cache ourselves
+	setMatrix(m); // we updated the cache ourselves
 
 	transformedByScript(); 
 }
@@ -1139,7 +1139,7 @@ bool
 character::boundsInClippingArea() const 
 {
   rect mybounds = getBounds();
-  get_world_matrix().transform(mybounds);
+  getWorldMatrix().transform(mybounds);
   
   return gnash::render::bounds_in_clipping_area( mybounds.getRange() );  
 }

@@ -25,7 +25,7 @@
 
 #include "DisplayListTag.h" // for inheritance
 #include "swf.h" // for tag_type definition
-#include "matrix.h" // for composition
+#include "SWFMatrix.h" // for composition
 #include "cxform.h" // for composition 
 
 #include <vector>
@@ -75,8 +75,8 @@ namespace SWF {
 /// m_color_transform:
 /// The color transform to apply to the newly created instance.
 ///
-/// m_matrix:
-/// The matrix transform to apply to the newly created instance.
+/// m_SWFMatrix:
+/// The SWFMatrix transform to apply to the newly created instance.
 ///
 /// m_ratio
 ///
@@ -121,7 +121,7 @@ public:
     int getClipDepth() const { return m_clip_depth; }
     int getID()        const { return m_character_id; }
     const std::string& getName() const { return m_name; }
-    const matrix& getMatrix()    const { return m_matrix; }
+    const SWFMatrix& getMatrix()    const { return m_SWFMatrix; }
     const cxform& getCxform()    const { return m_color_transform; }
     const EventHandlers& getEventHandlers() const { return _eventHandlers; }
     
@@ -145,7 +145,7 @@ private:
     boost::uint8_t m_has_flags3;
     boost::uint16_t m_character_id;
     cxform  m_color_transform;
-    matrix  m_matrix;
+    SWFMatrix  m_SWFMatrix;
     int     m_ratio;
     std::string m_name;
     int     m_clip_depth;

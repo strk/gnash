@@ -26,7 +26,7 @@
 #include "character_def.h"
 #include "sound_definition.h"
 #include "rect.h" // for get_bound
-#include "matrix.h" // for composition
+#include "SWFMatrix.h" // for composition
 #include "cxform.h" // for composition
 #include "action_buffer.h" // for composition of button_action
 #include "filter_factory.h" // for Filters (composition of button_record)
@@ -76,7 +76,7 @@ public:
 	character_def* m_character_def;
 
 	int	m_button_layer;
-	matrix	m_button_matrix;
+	SWFMatrix	m_button_SWFMatrix;
 	cxform	m_button_cxform;
 
 

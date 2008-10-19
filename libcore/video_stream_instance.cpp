@@ -222,7 +222,7 @@ video_stream_instance::display()
 	// case I think display() would never be invoked on us...
 	assert(m_def);
 
-	matrix m = get_world_matrix();
+	SWFMatrix m = getWorldMatrix();
 	const rect& bounds = m_def->get_bound();
 
 	image::ImageBase* img = getVideoFrame();
@@ -356,7 +356,7 @@ video_stream_instance::add_invalidated_bounds(InvalidatedRanges& ranges,
 	assert ( m_def );
 
 	rect bounds;	
-	bounds.expand_to_transformed_rect(get_world_matrix(), m_def->get_bound());
+	bounds.expand_to_transformed_rect(getWorldMatrix(), m_def->get_bound());
 	
 	ranges.add(bounds.getRange());            
 }

@@ -44,7 +44,7 @@ class text_character_def : public character_def
 {
 public:
 	rect	m_rect;
-	matrix	m_matrix;
+	SWFMatrix	m_SWFMatrix;
 	std::vector<text_glyph_record>	m_text_glyph_records;
 
 	text_character_def() {}
@@ -55,7 +55,7 @@ public:
 	void display(character* inst);
 	
 	const rect&	get_bound() const {
-    // TODO: There is a m_matrix field in the definition(!) that's currently 
+    // TODO: There is a m_SWFMatrix field in the definition(!) that's currently 
     // ignored. Don't know if it needs to be transformed... 
     return m_rect; 
   }

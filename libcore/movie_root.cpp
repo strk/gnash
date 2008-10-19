@@ -915,7 +915,7 @@ movie_root::set_drag_state(const drag_state& st)
 	{
 		// Get coordinates of the character's origin
 		point origin(0, 0);
-		matrix chmat = ch->get_world_matrix();
+		SWFMatrix chmat = ch->getWorldMatrix();
 		point world_origin;
 		chmat.transform(&world_origin, origin);
 
@@ -950,11 +950,11 @@ movie_root::doMouseDrag()
 
 	point world_mouse(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
 
-	matrix	parent_world_mat;
+	SWFMatrix	parent_world_mat;
 	character* parent = dragChar->get_parent();
 	if (parent != NULL)
 	{
-	    parent_world_mat = parent->get_world_matrix();
+	    parent_world_mat = parent->getWorldMatrix();
 	}
 
 	if (! m_drag_state.isLockCentered())
@@ -976,9 +976,9 @@ movie_root::doMouseDrag()
 	// Place our origin so that it coincides with the mouse coords
 	// in our parent frame.
 	// TODO: add a character::set_translation ?
-	matrix	local = dragChar->get_matrix();
+	SWFMatrix	local = dragChar->getMatrix();
 	local.set_translation(world_mouse.x, world_mouse.y);
-	dragChar->set_matrix(local); //no need to update caches when only changing translation
+	dragChar->setMatrix(local); //no need to update caches when only changing translation
 }
 
 

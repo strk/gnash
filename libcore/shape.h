@@ -20,7 +20,7 @@
 #define GNASH_SHAPE_H
 
 #include "dsodefs.h"
-#include "matrix.h" 
+#include "SWFMatrix.h" 
 
 #include <vector> // for path composition
 #include <cmath> // sqrt
@@ -74,8 +74,8 @@ namespace gnash {
     // TODO: drop this!
     bool is_straight() const { return isStraight(); }
     
-    /// Transform the edge according to the given matrix.
-    void  transform(const matrix& mat)
+    /// Transform the edge according to the given SWFMatrix.
+    void  transform(const SWFMatrix& mat)
     {
         mat.transform(ap);
         mat.transform(cp);
@@ -465,8 +465,8 @@ namespace gnash {
       return false;
     }
 
-    /// Transform all path coordinates according to the given matrix.
-    void  transform(const matrix& mat)
+    /// Transform all path coordinates according to the given SWFMatrix.
+    void  transform(const SWFMatrix& mat)
     {
 		mat.transform(ap);
 		std::vector<Edge>::iterator it = m_edges.begin(), ie = m_edges.end();

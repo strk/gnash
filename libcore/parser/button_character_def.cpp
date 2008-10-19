@@ -184,8 +184,8 @@ button_record::read(SWFStream& in, int tag_type,
 	in.ensureBytes(2);
 	m_button_layer = in.read_u16();
 
-    // matrix::read() checks the length of the stream
-	m_button_matrix.read(in);
+    // SWFMatrix::read() checks the length of the stream
+	m_button_SWFMatrix.read(in);
 
 	if (tag_type == SWF::DEFINEBUTTON2)
 	{

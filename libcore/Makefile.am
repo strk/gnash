@@ -75,7 +75,7 @@ libgnashcore_la_SOURCES = \
         GradientBevelFilter.cpp \
         parser/filter_factory.cpp \
 	generic_character.cpp \
-	matrix.cpp \
+	SWFMatrix.cpp \
 	movie_instance.cpp \
 	movie_root.cpp \
 	namedStrings.cpp \
@@ -158,7 +158,7 @@ noinst_HEADERS = \
 	GnashKey.h \
 	impl.h \
 	LoadVariablesThread.h \
-	matrix.h \
+	SWFMatrix.h \
 	mouse_button_state.h \
 	movie_instance.h \
 	movie_root.h \

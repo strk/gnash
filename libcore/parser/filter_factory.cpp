@@ -285,12 +285,12 @@ bool ConvolutionFilter::read(SWFStream& in)
     m_divisor = in.read_long_float(); // 4 bytes
     m_bias = in.read_long_float(); // 4 bytes
 
-    size_t matrixCount = m_matrixX * m_matrixY;
+    size_t SWFMatrixCount = m_matrixX * m_matrixY;
 
-    in.ensureBytes(matrixCount*4 + 4 + 1);
+    in.ensureBytes(SWFMatrixCount*4 + 4 + 1);
 
-    m_matrix.reserve(matrixCount);
-    for (size_t i = 0; i < matrixCount; ++i)
+    m_matrix.reserve(SWFMatrixCount);
+    for (size_t i = 0; i < SWFMatrixCount; ++i)
     {
         m_matrix.push_back(in.read_long_float());
     }

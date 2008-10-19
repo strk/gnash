@@ -105,9 +105,9 @@ public:
 		_movieClip(movieClip)
 	{}
 
-    const matrix& getMatrix() const { return _movieClip.get_matrix(); }
+    const SWFMatrix& getMatrix() const { return _movieClip.getMatrix(); }
     const cxform& getColorTransform() const { return _movieClip.get_cxform(); }
-    void setMatrix(const matrix& mat) { _movieClip.set_matrix(mat); }
+    void setMatrix(const SWFMatrix& mat) { _movieClip.setMatrix(mat); }
     void setColorTransform(const cxform& cx) { _movieClip.set_cxform(cx); }
 
 protected:
@@ -359,7 +359,7 @@ Transform_matrix_getset(const fn_call& fn)
         }
 
         std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>);
-        const matrix& m = ptr->getMatrix();
+        const SWFMatrix& m = ptr->getMatrix();
 
         args->push_back(m.sx / factor);
         args->push_back(m.shx / factor);
@@ -407,7 +407,7 @@ Transform_matrix_getset(const fn_call& fn)
     obj->get_member(NSV::PROP_TX, &tx);
     obj->get_member(NSV::PROP_TY, &ty);
 
-    matrix m;
+    SWFMatrix m;
     m.sx = a.to_number() * factor;
     m.shx = b.to_number() * factor;
     m.shy = c.to_number() * factor;

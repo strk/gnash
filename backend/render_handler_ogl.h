@@ -152,7 +152,7 @@ class bitmap_info_ogl : public bitmap_info
                     bool ogl_accessible);
     ~bitmap_info_ogl();
 
-    void apply(const gnash::matrix& bitmap_matrix,
+    void apply(const gnash::SWFMatrix& bitmap_SWFMatrix,
                render_handler::bitmap_wrap_mode wrap_mode);
   private:
     inline bool ogl_accessible() const;

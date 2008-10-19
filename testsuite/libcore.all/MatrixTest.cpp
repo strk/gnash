@@ -19,7 +19,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include "matrix.h"
+#include "SWFMatrix.h"
 #include <iostream>
 #include <sstream>
 #include <cassert>
@@ -59,7 +59,7 @@ int
 main(int /*argc*/, char** /*argv*/)
 {
     // 
-    // Test boost types, matrix design is rely on this.
+    // Test boost types, SWFMatrix design is rely on this.
     // 
     // Note: If any of the following tests fails, your boost library
     // is bogus or hasn't been installed properly.
@@ -74,9 +74,9 @@ main(int /*argc*/, char** /*argv*/)
     check_equals(sizeof(boost::uint64_t), 8);
 
     // 
-    //  Test identity matrix.
+    //  Test identity SWFMatrix.
     // 
-    matrix identity; 
+    SWFMatrix identity; 
     check(identity.is_valid());
     check_equals(identity.get_x_scale(), 1);
     check_equals(identity.get_y_scale(), 1);
@@ -89,7 +89,7 @@ main(int /*argc*/, char** /*argv*/)
     //
     // Test parameter setting and getting, interfaces for AS.
     //
-    matrix m1;
+    SWFMatrix m1;
     m1.set_scale_rotation(1, 3, 0);
     check_equals(m1.get_x_scale(), 1);
     check_equals(m1.get_y_scale(), 3);
@@ -153,7 +153,7 @@ main(int /*argc*/, char** /*argv*/)
     check_equals(m1.get_x_translation(), 5);
     check_equals(m1.get_y_translation(), 6);
 
-    matrix m2;
+    SWFMatrix m2;
     check_equals(D(m2.get_rotation()), 0);
     m2.set_x_scale(16);
     check_equals(D(m2.get_x_scale()), 16);
@@ -179,7 +179,7 @@ main(int /*argc*/, char** /*argv*/)
     check_equals(D(m2.get_rotation()), 0);
 
     //
-    // Test matrix concatenation
+    // Test SWFMatrix concatenation
     //
     m1.concatenate_scale(2, 2);
     check_equals(D(m1.get_x_scale()), 2);
@@ -203,7 +203,7 @@ main(int /*argc*/, char** /*argv*/)
     check_equals(m1.get_y_translation(), 6);
 
     //
-    // Test matrix transformations
+    // Test SWFMatrix transformations
     //
     point p1(0, 0);
     point p2(64, 64);
@@ -222,7 +222,7 @@ main(int /*argc*/, char** /*argv*/)
     check_equals(r.y, 20);
 
     // Translate points to have the origin at 32,32
-    // (coordinates expressed in prior-to-scaling matrix)
+    // (coordinates expressed in prior-to-scaling SWFMatrix)
     m1.concatenate_translation(-32, -32);
 
     m1.transform(&r, p1);
@@ -235,7 +235,7 @@ main(int /*argc*/, char** /*argv*/)
 
     //  Apply a final scaling by 10 keeping the current origin 
     // (reached after translation)
-    matrix final;
+    SWFMatrix final;
     final.set_scale(10, 10);
     final.concatenate(m1);
     m1 = final;
@@ -249,18 +249,18 @@ main(int /*argc*/, char** /*argv*/)
     check_equals(r.y, 100);
 
     //
-    // Test matrix invertion
+    // Test SWFMatrix invertion
     // 
     m1.set_identity();
     m1.set_translation(50*20, -30*20);
     m1.set_scale(0.5, 2);
     m1.set_rotation(90*3.141593/180);
     
-    matrix m1_inverse = m1;
+    SWFMatrix m1_inverse = m1;
     m1_inverse.invert();
-    // concatenate the inverse matrix and orignial matrix.
+    // concatenate the inverse SWFMatrix and orignial SWFMatrix.
     m1_inverse.concatenate(m1); 
-    // the result is expected to be an identity matrix. 
+    // the result is expected to be an identity SWFMatrix. 
     check_equals(m1_inverse, identity);
 
     m1.sx  = 4;   // 1/16384
@@ -280,9 +280,9 @@ main(int /*argc*/, char** /*argv*/)
     check_equals(m1_inverse.sy, 16384 * 65536);
     check_equals(m1_inverse.ty, -16384 * 20);
     
-    // concatenate the inverse matrix and orignial matrix.
+    // concatenate the inverse SWFMatrix and orignial SWFMatrix.
     m1_inverse.concatenate(m1);
-    // the result is expected to be an identity matrix. 
+    // the result is expected to be an identity SWFMatrix. 
     check_equals(m1_inverse, identity);
 }
 

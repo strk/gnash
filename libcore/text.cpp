@@ -86,7 +86,7 @@ namespace gnash {
 
 	// Render the given glyph records.
 	void	display_glyph_records(
-		const matrix& this_mat,
+		const SWFMatrix& this_mat,
 		character* inst,
 		const std::vector<text_glyph_record>& records,
 		bool useEmbeddedGlyphs)
@@ -97,11 +97,11 @@ namespace gnash {
 		static std::vector<line_style>	s_dummy_line_style;
 		s_dummy_style.resize(1);
 
-		matrix	mat = inst->get_world_matrix();
+		SWFMatrix	mat = inst->getWorldMatrix();
 		mat.concatenate(this_mat);
 
 		cxform	cx = inst->get_world_cxform();
-		matrix	base_matrix = mat;
+		SWFMatrix	base_SWFMatrix = mat;
 
 		float x = 0.0f;
 		float y = 0.0f;
@@ -147,7 +147,7 @@ namespace gnash {
 
 				int	index = ge.m_glyph_index;
 					
-				mat = base_matrix;
+				mat = base_SWFMatrix;
 				mat.concatenate_translation(x, y);
 				mat.concatenate_scale(scale, scale);
 
@@ -220,7 +220,7 @@ log_debug(_("render shape glyph using filled outline (render::draw_glyph)"));
 					startX,   posY,
 					  endX,   posY,
 				};
-				render::draw_line_strip(underline, 2, transformed_color, base_matrix);
+				render::draw_line_strip(underline, 2, transformed_color, base_SWFMatrix);
 			}
 		}
 	}
