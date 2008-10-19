@@ -126,6 +126,10 @@ while(<STDIN>){
 		next;
 	}
 	
+	#Replace Class.hasOwnProperty(prop) with Reflect.hasField(Class,prop)
+	#TODO: Make this work for other classes, if necessary
+	$_ =~ s/String.hasOwnProperty\(\s*[\'\"](\w+)[\'\"]\s*\)/Reflect.hasField(String,'$1')/g;
+
 	#Replace things like String.charCodeAt with Reflect.field(String,'charCodeAt').
 	$_ =~ s/([a-zA-Z]+)\.([a-zA-Z]+)\s*([\.\)])/Reflect.field($1,'$2')$3/g;
 
@@ -191,12 +195,6 @@ while(<STDIN>){
 
 	#Ignore calls to concat, I cannot find the equivilent haxe function.
 	if(index($_,"concat") != $[-1){
-		skip_line();
-		next;
-	}
-
-	#Remove calls to hasOwnProperty.  I can't find a Haxe equivilent for this.
-	if($_=~ /hasOwnProperty/){
 		skip_line();
 		next;
 	}
