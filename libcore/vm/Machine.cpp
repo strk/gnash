@@ -1193,7 +1193,7 @@ Machine::execute()
 		//TODO: If multiname is runtime also pop namespace and/or name values.
 		as_value object_val = pop_stack();
 
-		if(object_val.is_undefined()){
+		if(object_val.is_undefined() || object_val.is_null()){
 			LOG_DEBUG_AVM("Can't call a method on an undefined object.");
 		}
 		else{
@@ -1201,7 +1201,7 @@ Machine::execute()
 			as_object *object = object_val.to_object().get();
 			as_value property = object->getMember(a.getGlobalName(),0);
 		
-			if(!property.is_undefined()){
+			if(!property.is_undefined() && !property.is_null()){
 				LOG_DEBUG_AVM("Calling method %s on object %s",property.toDebugString(),object_val.toDebugString());
 				as_environment env = as_environment(_vm);
 				result = call_method(property,&env,object,args);
@@ -1641,7 +1641,7 @@ Machine::execute()
 
 		as_value obj = pop_stack();
 
-		if(!obj.is_undefined()){
+		if(!obj.is_undefined() && !obj.is_null()){
 			obj.to_object().get()->get_member(name, &val, ns);
 		}
 		push_stack(val);
@@ -1665,7 +1665,7 @@ Machine::execute()
 		as_value v = pop_stack();
 		//TODO: If multiname is a runtime mutiname we need to also pop name and namespace values.
 		as_value object_asval = pop_stack();
-		if(object_asval.is_undefined()){
+		if(object_asval.is_undefined() || object_asval.is_null()){
 			LOG_DEBUG_AVM("Object is undefined will skip trying to initialize property.");
 		}
 		else{
