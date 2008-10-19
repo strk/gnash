@@ -137,24 +137,8 @@ while(<STDIN>){
 	#TODO: Handle typeof and typeOf differently?
 	$_ =~ s/type[Oo]f\(\s*(\S+)\s*\)/Type.typeof($1)/g;
 
-	#Skip String()
-	if($_ =~ /\WString\(\)/){
-		skip_line();
-		next;
-	}
-	if(index($_,"String") != $[-1){
-#		$_ =~ s/new +String/Std\.string/g;
-#		$_ =~ s/String/Std\.string/g;
-		#Don't ignore new String()
-		#Fix this.
-		if($_ =~ /new String\(.+\)/){
-			
-		}
-		else{
-#			print "//".$_;
-#			next;
-		}
-	}
+	#Replace String() with new String("")
+	$_ =~ s/(\W)String\(\)/$1new String("")/g;
 	
 	#Replace Class.prototype with Reflect.field(Class,'prototype')
 	$_ =~ s/(\w+)\.(prototype|__proto__)/Reflect.field($1,'$2')/g;
