@@ -203,11 +203,6 @@ while(<STDIN>){
 		skip_line();
 		next;
 	}
-	#Remove calls to String.indexOf that have more than one argument
-	if($_ =~ /indexOf\(\s*[\"\w]\w*[\"\w],.+\)/){
-		skip_line();
-		next;
-	}
 
 	#Replace undefined with null.
 	$_ =~ s/undefined/null/g;
