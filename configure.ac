@@ -2650,7 +2650,8 @@ if test x$build_fltk = xyes; then
   else
     echo "        ERROR: No FLTK2 development package installed!" >&3
     echo "               There are currently no Debian or RPM packages for FLTK2;" >&3
-    echo "		 see http://www.fltk.org to install it from source." >&3
+    echo "               see http://www.fltk.org to install it from source." >&3
+    echo "               or change to a different gui with --enable-gui=..." >&3
 dnl What it was for FLTK 1:
 dnl    echo "               or .deb users: apt-get install fltk-1.1-dev"
 dnl    echo "               or .rpm users: yum install fltk-devel"
