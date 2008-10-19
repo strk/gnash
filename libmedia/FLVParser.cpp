@@ -328,17 +328,19 @@ bool FLVParser::parseNextTag()
 			}
 		}
 
+		boost::uint8_t codec = (tag[11] & 0xf0) >> 4;
+
+		bool header = false;
+
+		if (codec == AUDIO_CODEC_AAC) {
+			boost::uint8_t packettype = _stream->read_byte();
+			header = (packettype == 0);
+		}
+
 		std::auto_ptr<EncodedAudioFrame> frame = readAudioFrame(bodyLength-1, timestamp);
-		if ( ! frame.get() ) { log_error("could not read audio frame?"); }
-		else
-		{
-			// Release the stream lock 
-			// *before* pushing the frame as that 
-			// might block us waiting for buffers flush
-			// the _qMutex...
-			// We've done using the stream for this tag parsing anyway
-			streamLock.unlock();
-			pushEncodedAudioFrame(frame);
+		if ( ! frame.get() ) {
+			log_error("could not read audio frame?");
+			return true;
 		}
 
 		// If this is the first audioframe no info about the
@@ -355,9 +357,28 @@ bool FLVParser::parseNextTag()
 			if (samplesize == 0) samplesize = 1;
 			else samplesize = 2;
 
-			_audioInfo.reset( new AudioInfo((tag[11] & 0xf0) >> 4, samplerate, samplesize, (tag[11] & 0x01) >> 0, 0, FLASH) );
+			_audioInfo.reset( new AudioInfo(codec, samplerate, samplesize, (tag[11] & 0x01) >> 0, 0, FLASH) );
+			if (header) {
+				boost::uint8_t* newbuf = new boost::uint8_t[frame->dataSize];
+				memcpy(newbuf, frame->data.get(), frame->dataSize);
+
+				_audioInfo->extra.reset( 
+					new ExtraAudioInfoFlv(newbuf, frame->dataSize)
+				);
+
+				// The FAAD decoder will reject us if we pass the header buffer.
+				// It will receive the header via the extra audio info anyway.
+				return true;
+			}
 		}
 
+		// Release the stream lock 
+		// *before* pushing the frame as that 
+		// might block us waiting for buffers flush
+		// the _qMutex...
+		// We've done using the stream for this tag parsing anyway
+		streamLock.unlock();
+		pushEncodedAudioFrame(frame);
 	}
 	else if (tag[0] == FLV_VIDEO_TAG)
 	{
@@ -423,9 +444,9 @@ bool FLVParser::parseNextTag()
 				_videoInfo->extra.reset( 
 					new ExtraVideoInfoFlv(newbuf, frame->dataSize())
 				);
+				// Don't bother emitting the header buffer.
+				return true;
 			}
-
-			// Create the videoinfo
 		}
 
 		// Release the stream lock 

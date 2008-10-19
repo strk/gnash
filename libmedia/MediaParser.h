@@ -99,7 +99,7 @@ std::ostream& operator<< (std::ostream& os, const videoCodecType& t);
 /// Audio codec ids as defined in flash
 enum audioCodecType
 {
-	/// Raw format.  Useful for 8-bit sounds???
+	/// "Raw" format: linear PCM.
 	AUDIO_CODEC_RAW = 0,	
 
 	/// ADPCM format, flash's ADPCM is a bit different for normal ADPCM
@@ -115,7 +115,9 @@ enum audioCodecType
 	AUDIO_CODEC_NELLYMOSER_8HZ_MONO = 5,
 
 	/// Proprietary simple format
-	AUDIO_CODEC_NELLYMOSER = 6
+	AUDIO_CODEC_NELLYMOSER = 6,
+
+	AUDIO_CODEC_AAC = 10
 };
 
 std::ostream& operator<< (std::ostream& os, const audioCodecType& t);

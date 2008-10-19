@@ -20,6 +20,7 @@
 
 #include "AudioDecoderFfmpeg.h"
 #include "MediaParserFfmpeg.h" // for ExtraAudioInfoFfmpeg
+#include "FLVParser.h"
 
 #include <cmath> // for std::ceil
 #include <algorithm> // for std::copy, std::max
@@ -150,6 +151,9 @@ void AudioDecoderFfmpeg::setup(AudioInfo& info)
 			case AUDIO_CODEC_MP3:
 				codec_id = CODEC_ID_MP3;
 				break;
+			case AUDIO_CODEC_AAC:
+				codec_id = CODEC_ID_AAC;
+				break;
 #if 0
             // Enable this to use ffmpeg for nellymoser
             // decoding (fails in decodeFrame, but probably not Ffmpeg's
@@ -191,10 +195,15 @@ void AudioDecoderFfmpeg::setup(AudioInfo& info)
 
 	if ( info.extra.get() )
 	{
-		assert(dynamic_cast<ExtraAudioInfoFfmpeg*>(info.extra.get()));
-		const ExtraAudioInfoFfmpeg& ei = static_cast<ExtraAudioInfoFfmpeg&>(*info.extra);
-		_audioCodecCtx->extradata = ei.data;
-		_audioCodecCtx->extradata_size = ei.dataSize;
+		if (dynamic_cast<ExtraAudioInfoFfmpeg*>(info.extra.get())) {
+			const ExtraAudioInfoFfmpeg& ei = static_cast<ExtraAudioInfoFfmpeg&>(*info.extra);
+			_audioCodecCtx->extradata = ei.data;
+			_audioCodecCtx->extradata_size = ei.dataSize;
+		} else if (dynamic_cast<ExtraAudioInfoFlv*>(info.extra.get())) {
+			ExtraAudioInfoFlv* extra = static_cast<ExtraAudioInfoFlv*>(info.extra.get());
+			_audioCodecCtx->extradata = extra->data.get();
+			_audioCodecCtx->extradata_size = extra->size;
+		}
 	}
 
 	int ret = avcodec_open(_audioCodecCtx, _audioCodec);
