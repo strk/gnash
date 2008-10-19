@@ -155,17 +155,14 @@ while(<STDIN>){
 #			next;
 		}
 	}
-
-	if(index($_,"__proto__") != $[-1){
-		skip_line();
-		next;
-	}
-	if(index($_,"prototype") != $[-1){
-		$_ =~ s/(\w+)\.(prototype)/Reflect.field($1,\'$2\')/g;
-#		skip_line();
-#		next
-	}
 	
+	#Replace Class.prototype with Reflect.field(Class,'prototype')
+	$_ =~ s/(\w+)\.(prototype|__proto__)/Reflect.field($1,'$2')/g;
+
+	#There is no Function class in haxe, so we if we are trying access a property of Function
+	#Like this: Function.prototype we need to replace Function with Type.getClass(function(){})
+	$_ =~ s/Function/Type.getClass(function(){})/g;
+
 	#Replace isNan(number) with Math.isNan(number)
 	$_ =~ s/isNaN/Math.isNaN/g;
 
