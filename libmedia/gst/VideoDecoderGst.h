@@ -76,7 +76,8 @@ private:
 class DSOEXPORT VideoDecoderGst : public VideoDecoder
 {
 public:
-    VideoDecoderGst(videoCodecType codec_type, int width, int height);
+    VideoDecoderGst(videoCodecType codec_type, int width, int height,
+                    const boost::uint8_t* extradata, size_t extradatasize);
     VideoDecoderGst(GstCaps* caps);
     ~VideoDecoderGst();
 

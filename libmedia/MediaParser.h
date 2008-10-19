@@ -89,7 +89,9 @@ enum videoCodecType
 	VIDEO_CODEC_VP6A = 5,
 
 	/// Screenvideo2 codec
-	VIDEO_CODEC_SCREENVIDEO2 = 6
+	VIDEO_CODEC_SCREENVIDEO2 = 6,
+
+	VIDEO_CODEC_H264 = 7
 };
 
 std::ostream& operator<< (std::ostream& os, const videoCodecType& t);
