@@ -134,7 +134,7 @@ while(<STDIN>){
 	$_ =~ s/type[Oo]f\(\s*(\S+)\s*\)/Type.typeof($1)/g;
 
 	#Skip String()
-	if($_ =~ /String\(\)/){
+	if($_ =~ /\WString\(\)/){
 		skip_line();
 		next;
 	}
