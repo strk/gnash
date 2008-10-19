@@ -22,7 +22,7 @@
 #endif
 
 #include "smart_ptr.h" // GNASH_USE_GC
-#include "button_character_instance.h"
+#include "Button.h"
 #include "button_character_def.h"
 #include "as_value.h"
 

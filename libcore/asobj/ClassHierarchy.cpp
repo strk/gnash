@@ -20,7 +20,7 @@
 #include "as_prop_flags.h"
 #include "as_value.h"
 #include "as_function.h" // for function_class_init
-#include "button_character_instance.h"
+#include "Button.h"
 #include "array.h"
 #include "AsBroadcaster.h"
 #include "Accessibility_as.h"
@@ -33,7 +33,7 @@
 #include "Error_as.h"
 #include "Global.h"
 #include "String_as.h"
-#include "Key.h"
+#include "Key_as.h"
 #include "LoadVars_as.h"
 #include "LocalConnection.h"
 #include "Microphone.h"

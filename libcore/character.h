@@ -849,8 +849,8 @@ public:
   /// This is only meaningful for sprite instances, but default
   /// it's a no-op.
   ///
-  /// It is needed by button_character_instance
-  /// TODO: have button_character_instance cast to_movie()
+  /// It is needed by Button
+  /// TODO: have Button cast to_movie()
   ///       and drop this one
   virtual void  restart() { }
 

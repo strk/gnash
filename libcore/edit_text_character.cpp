@@ -27,7 +27,7 @@
 #include "movie_definition.h" // to extract version info
 #include "sprite_instance.h"
 #include "edit_text_character.h"
-#include "Key.h" // for keyboard events
+#include "Key_as.h" // for keyboard events
 #include "movie_root.h"	 // for killing focus
 #include "as_environment.h" // for parse_path
 #include "action.h" // for as_standard_member enum

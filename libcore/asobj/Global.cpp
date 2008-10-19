@@ -37,7 +37,7 @@
 #include "Error_as.h"
 #include "Global.h"
 #include "String_as.h"
-#include "Key.h"
+#include "Key_as.h"
 #include "LoadVars_as.h"
 #include "LocalConnection.h"
 #include "Microphone.h"

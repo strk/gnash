@@ -32,7 +32,7 @@
 #include "edit_text_character_def.h" // @@ temp hack for createTextField exp.
 #include "ControlTag.h"
 #include "fn_call.h"
-#include "Key.h"
+#include "Key_as.h"
 #include "movie_root.h"
 #include "movie_instance.h"
 #include "swf_event.h"

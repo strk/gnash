@@ -22,7 +22,7 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "button_character_def.h"
-#include "button_character_instance.h" // for create_character_instance()
+#include "Button.h" // for create_character_instance()
 
 #include "SWFStream.h" // for read()
 #include "movie_definition.h"

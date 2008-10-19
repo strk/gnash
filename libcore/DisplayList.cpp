@@ -329,7 +329,7 @@ DisplayList::replace_character(
     // WARNING: when a new Button character is added,
     //          the invalidated bounds computation will likely
     //          be bogus, as the actual character shown is not instantiated
-    //          until ::stagePlacementCallback for buttons (I'd say this is a bug in button_character_instance)
+    //          until ::stagePlacementCallback for buttons (I'd say this is a bug in Button)
     //          UdoG, following ? 
     //
     ch->extend_invalidated_bounds(old_ranges);        
