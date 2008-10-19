@@ -165,11 +165,10 @@ while(<STDIN>){
 #		skip_line();
 #		next
 	}
-	if(index($_,"isNaN") != $[-1){
-#		$_ =~ s/(isNaN)/Math\.$1/g;
-		skip_line();
-		next;
-	}
+	
+	#Replace isNan(number) with Math.isNan(number)
+	$_ =~ s/isNaN/Math.isNaN/g;
+
 	#CHECK 5
 	#Calls to split()
 	if(index($_,"split") != $[-1){
