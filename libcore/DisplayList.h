@@ -121,13 +121,13 @@ public:
 	/// true:  set the new character's cxform to the old one.
 	/// false: keep the new character's cxform.
 	///
-	/// @param use_old_SWFMatrix
+	/// @param use_old_matrix
 	/// true:  set the new character's transformation SWFMatrix to the old one.
 	/// false: keep the new character's transformation SWFMatrix.
 	///
 	void replace_character(character* ch, int depth, 
 		bool use_old_cxform,
-		bool use_old_SWFMatrix);
+		bool use_old_matrix);
 
 	/// \brief
 	/// Change depth of the given characters in the list,

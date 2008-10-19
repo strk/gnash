@@ -65,15 +65,15 @@ libgnashasobjs_la_SOURCES = \
 	Selection.cpp \
 	SharedObject.cpp\
 	Sound.cpp \
-	Stage.cpp \
+	Stage_as.cpp \
 	System_as.cpp \
 	TextFormat.cpp \
-	TextSnapshot.cpp \
+	TextSnapshot_as.cpp \
 	MovieClipLoader.cpp\
 	String_as.cpp \
 	XML_as.cpp \
 	xmlattrs.cpp \
-	xmlnode.cpp \
+	XMLNode_as.cpp \
 	XMLSocket_as.cpp \
 	flash/display/BitmapData_as.cpp \
 	flash/display_pkg.cpp \
@@ -132,15 +132,15 @@ noinst_HEADERS = \
 	Selection.h \
 	SharedObject.h \
 	Sound.h \
-	Stage.h	\
+	Stage_as.h	\
 	System_as.h \
 	TextFormat.h \
-	TextSnapshot.h \
+	TextSnapshot_as.h \
 	String_as.h \
 	XML_as.h \
 	XMLSocket_as.h \
 	xmlattrs.h \
-	xmlnode.h \
+	XMLNode_as.h \
 	flash/display/BitmapData_as.h \
 	flash/display_pkg.h \
 	flash/external/ExternalInterface_as.h \

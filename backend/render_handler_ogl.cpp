@@ -505,7 +505,7 @@ bitmap_info_ogl::upload(boost::uint8_t* data, size_t width, size_t height)
 }
 
 void
-bitmap_info_ogl::apply(const gnash::SWFMatrix& bitmap_SWFMatrix,
+bitmap_info_ogl::apply(const gnash::SWFMatrix& bitmap_matrix,
                        render_handler::bitmap_wrap_mode wrap_mode)
 {
   glEnable(_ogl_img_type);
@@ -540,7 +540,7 @@ bitmap_info_ogl::apply(const gnash::SWFMatrix& bitmap_SWFMatrix,
   float inv_width = 1.0f / _orig_width;
   float inv_height = 1.0f / _orig_height;
     
-  const gnash::SWFMatrix& m = bitmap_SWFMatrix;
+  const gnash::SWFMatrix& m = bitmap_matrix;
   glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
   float p[4] = { 0, 0, 0, 0 };
   p[0] = m.sx / 65536.0f * inv_width;
@@ -1495,7 +1495,7 @@ public:
   
   /// Takes a path and translates it using the given SWFMatrix.
   void
-  apply_SWFMatrix_to_paths(std::vector<path>& paths, const SWFMatrix& mat)
+  apply_matrix_to_paths(std::vector<path>& paths, const SWFMatrix& mat)
   {  
     std::for_each(paths.begin(), paths.end(),
                   boost::bind(&path::transform, _1, boost::ref(mat)));
@@ -1596,7 +1596,7 @@ public:
     if (_drawing_mask) {
       PathVec scaled_path_vec = path_vec;
       
-      apply_SWFMatrix_to_paths(scaled_path_vec, mat);
+      apply_matrix_to_paths(scaled_path_vec, mat);
       draw_mask(scaled_path_vec); 
       return;
     }    

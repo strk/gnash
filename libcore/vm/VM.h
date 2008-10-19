@@ -115,7 +115,7 @@ private:
 	friend class std::auto_ptr<VM>;
 	static std::auto_ptr<VM> _singleton;
 
-	/// Stage associated with this VM
+	/// Stage_as associated with this VM
 	std::auto_ptr<movie_root> _root_movie;
 
 	/// The _global ActionScript object

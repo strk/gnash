@@ -1759,7 +1759,7 @@ sprite_beginGradientFill(const fn_call& fn)
   //
 
   SWFMatrix mat;
-  SWFMatrix input_SWFMatrix;
+  SWFMatrix input_matrix;
 
   if ( SWFMatrixArg->getMember(NSV::PROP_MATRIX_TYPE).to_string() == "box" )
   {
@@ -1773,10 +1773,10 @@ sprite_beginGradientFill(const fn_call& fn)
     if ( radial )
     {
       // Radial gradient is 64x64 twips.
-      input_SWFMatrix.set_scale(64.0/valW, 64.0/valH);
+      input_matrix.set_scale(64.0/valW, 64.0/valH);
 
       // For radial gradients, dunno why translation must be negative...
-      input_SWFMatrix.concatenate_translation( -valX, -valY );
+      input_matrix.concatenate_translation( -valX, -valY );
 
       // NOTE: rotation is intentionally discarded as it would
       //       have no effect (theoretically origin of the radial
@@ -1791,13 +1791,13 @@ sprite_beginGradientFill(const fn_call& fn)
       // seems to give closer results. Note that it only influences rotation,
       // which is still not correct... TODO: fix it !
       //
-      input_SWFMatrix.set_scale_rotation(256.0/valW, 256.0/valH, -valR);
+      input_matrix.set_scale_rotation(256.0/valW, 256.0/valH, -valR);
 
       // For linear gradients, dunno why translation must be negative...
-      input_SWFMatrix.concatenate_translation( -valX, -valY );
+      input_matrix.concatenate_translation( -valX, -valY );
     }
 
-    mat.concatenate(input_SWFMatrix);
+    mat.concatenate(input_matrix);
   }
   else
   {
@@ -1808,12 +1808,12 @@ sprite_beginGradientFill(const fn_call& fn)
     boost::int32_t valG = PIXELS_TO_TWIPS(SWFMatrixArg->getMember(NSV::PROP_G).to_number()); // x0
     boost::int32_t valH = PIXELS_TO_TWIPS(SWFMatrixArg->getMember(NSV::PROP_H).to_number()); // y0
 
-    input_SWFMatrix.sx  = valA * 65536; // sx
-    input_SWFMatrix.shx = valB * 65536; // shy
-    input_SWFMatrix.shy = valD * 65536; // shx
-    input_SWFMatrix.sy  = valE * 65536; // sy
-    input_SWFMatrix.tx = valG; // x0
-    input_SWFMatrix.ty = valH; // y0
+    input_matrix.sx  = valA * 65536; // sx
+    input_matrix.shx = valB * 65536; // shy
+    input_matrix.shy = valD * 65536; // shx
+    input_matrix.sy  = valE * 65536; // sy
+    input_matrix.tx = valG; // x0
+    input_matrix.ty = valH; // y0
 
     // This is the SWFMatrix that would transform the gnash
     // gradient to the expected flash gradient.
@@ -1847,12 +1847,12 @@ sprite_beginGradientFill(const fn_call& fn)
     }
 
     // Apply gnash to flash SWFMatrix before user-defined one
-    input_SWFMatrix.concatenate(gnashToFlash);
+    input_matrix.concatenate(gnashToFlash);
 
     // Finally, and don't know why, take
     // the inverse of the resulting SWFMatrix as
     // the one which would be used.
-    mat = input_SWFMatrix;
+    mat = input_matrix;
     mat.invert();
   }
 
@@ -2805,9 +2805,9 @@ sprite_instance::add_textfield(const std::string& name, int depth, int x, int y,
   txt_char->setDynamic();
 
   // Set _x and _y
-  SWFMatrix txt_SWFMatrix;
-  txt_SWFMatrix.set_translation(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
-  txt_char->setMatrix(txt_SWFMatrix, true); // update caches (altought shouldn't be needed as we only set translation)
+  SWFMatrix txt_matrix;
+  txt_matrix.set_translation(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
+  txt_char->setMatrix(txt_matrix, true); // update caches (altought shouldn't be needed as we only set translation)
 
   // Here we add the character to the displayList.  
   m_display_list.place_character(txt_char.get(), depth); 
@@ -3628,11 +3628,11 @@ void sprite_instance::replace_display_object(
         character* ch,  
         int depth, 
         bool use_old_cxform, 
-        bool use_old_SWFMatrix)
+        bool use_old_matrix)
 {
     assert(ch != NULL);
 
-    m_display_list.replace_character(ch, depth, use_old_cxform, use_old_SWFMatrix);
+    m_display_list.replace_character(ch, depth, use_old_cxform, use_old_matrix);
 }
 
 int sprite_instance::get_id_at_depth(int depth)
@@ -3971,7 +3971,7 @@ sprite_instance::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y)
   character* parent = get_parent();
   if ( parent ) 
   {
-    // WARNING: if we have NO parent, our parent it the Stage (movie_root)
+    // WARNING: if we have NO parent, our parent it the Stage_as (movie_root)
     //          so, in case we'll add a "stage" SWFMatrix, we'll need to take
     //          it into account here.
     // TODO: actually, why are we insisting in using parent's coordinates for

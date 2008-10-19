@@ -837,7 +837,7 @@ public:
       const SWFMatrix& mat, const rgba& color) 
   {
     std::vector<path> paths;
-    apply_SWFMatrix_to_path(def->get_paths(), paths, mat);
+    apply_matrix_to_path(def->get_paths(), paths, mat);
     // convert gnash paths to agg paths.
     std::vector<agg::path_storage> agg_paths;    
     build_agg_paths(agg_paths, paths);
@@ -951,7 +951,7 @@ public:
     std::vector< agg::path_storage > agg_paths;  
     std::vector< agg::path_storage > agg_paths_rounded;  
 
-    apply_SWFMatrix_to_path(def->get_paths(), paths, mat);
+    apply_matrix_to_path(def->get_paths(), paths, mat);
 
     // Flash only aligns outlines. Probably this is done at rendering
     // level.
@@ -1041,7 +1041,7 @@ public:
 /// Takes a path and translates it using the given SWFMatrix. The new path
 /// is stored in paths_out. Both paths_in and paths_out are expected to
 /// be in TWIPS.
-void apply_SWFMatrix_to_path(const std::vector<path> &paths_in, 
+void apply_matrix_to_path(const std::vector<path> &paths_in, 
       std::vector<path>& paths_out, const SWFMatrix &source_mat) 
 {
 
@@ -1060,7 +1060,7 @@ void apply_SWFMatrix_to_path(const std::vector<path> &paths_in,
         p.transform(mat);
         paths_out.push_back( p );
     }
-} // apply_SWFMatrix
+} // apply_matrix
 
 
   /// A shape can have sub-shapes. This can happen when there are multiple
@@ -1277,7 +1277,7 @@ void apply_SWFMatrix_to_path(const std::vector<path> &paths_in,
   // Initializes the internal styles class for AGG renderer
   void build_agg_styles(agg_style_handler& sh, 
     const std::vector<fill_style>& fill_styles,
-    const SWFMatrix& fillstyle_SWFMatrix,
+    const SWFMatrix& fillstyle_matrix,
     const cxform& cx) {
     
     SWFMatrix inv_stage_matrix = stage_matrix;
@@ -1294,7 +1294,7 @@ void apply_SWFMatrix_to_path(const std::vector<path> &paths_in,
         case SWF::FILL_LINEAR_GRADIENT:
         {    
           SWFMatrix m = fill_styles[fno].getGradientMatrix();
-          SWFMatrix cm = fillstyle_SWFMatrix;
+          SWFMatrix cm = fillstyle_matrix;
           cm.invert();
           
           m.concatenate(cm);
@@ -1307,7 +1307,7 @@ void apply_SWFMatrix_to_path(const std::vector<path> &paths_in,
         case SWF::FILL_RADIAL_GRADIENT:
         {
           SWFMatrix m = fill_styles[fno].getGradientMatrix();
-          SWFMatrix cm = fillstyle_SWFMatrix;
+          SWFMatrix cm = fillstyle_matrix;
           cm.invert();
           
           m.concatenate(cm);
@@ -1320,7 +1320,7 @@ void apply_SWFMatrix_to_path(const std::vector<path> &paths_in,
         case SWF::FILL_FOCAL_GRADIENT:
         {
           SWFMatrix m = fill_styles[fno].getGradientMatrix();
-          SWFMatrix cm = fillstyle_SWFMatrix;
+          SWFMatrix cm = fillstyle_matrix;
           cm.invert();
           
           m.concatenate(cm);
@@ -1338,7 +1338,7 @@ void apply_SWFMatrix_to_path(const std::vector<path> &paths_in,
         case SWF::FILL_CLIPPED_BITMAP_HARD:
         {    
           SWFMatrix m = fill_styles[fno].getBitmapMatrix();
-          SWFMatrix cm = fillstyle_SWFMatrix;
+          SWFMatrix cm = fillstyle_matrix;
           cm.invert();
           
           m.concatenate(cm);
@@ -1623,7 +1623,7 @@ void apply_SWFMatrix_to_path(const std::vector<path> &paths_in,
   void draw_outlines(int subshape_id, const std::vector<path> &paths,
     const std::vector<agg::path_storage>& agg_paths,
     const std::vector<line_style> &line_styles, const cxform& cx,
-    const SWFMatrix& linestyle_SWFMatrix) {
+    const SWFMatrix& linestyle_matrix) {
     
     if (m_alpha_mask.empty()) {
     
@@ -1634,7 +1634,7 @@ void apply_SWFMatrix_to_path(const std::vector<path> &paths_in,
       scanline_type sl;
       
       draw_outlines_impl<scanline_type> (subshape_id, paths, agg_paths, 
-        line_styles, cx, linestyle_SWFMatrix, sl);
+        line_styles, cx, linestyle_matrix, sl);
         
     } else {
     
@@ -1645,7 +1645,7 @@ void apply_SWFMatrix_to_path(const std::vector<path> &paths_in,
       scanline_type sl(m_alpha_mask.back()->get_amask());
       
       draw_outlines_impl<scanline_type> (subshape_id, paths, agg_paths,
-        line_styles, cx, linestyle_SWFMatrix, sl);
+        line_styles, cx, linestyle_matrix, sl);
         
     }
     
@@ -1657,7 +1657,7 @@ void apply_SWFMatrix_to_path(const std::vector<path> &paths_in,
   void draw_outlines_impl(int subshape_id, const std::vector<path> &paths,
     const std::vector<agg::path_storage>& agg_paths,
     const std::vector<line_style> &line_styles, const cxform& cx, 
-    const SWFMatrix& linestyle_SWFMatrix, scanline_type& sl) {
+    const SWFMatrix& linestyle_matrix, scanline_type& sl) {
     
     assert(m_pixf.get());
     
@@ -1672,8 +1672,8 @@ void apply_SWFMatrix_to_path(const std::vector<path> &paths_in,
     
     // use avg between x and y scale
     const float stroke_scale =
-      (fabsf(linestyle_SWFMatrix.get_x_scale()) + 
-       fabsf(linestyle_SWFMatrix.get_y_scale())) 
+      (fabsf(linestyle_matrix.get_x_scale()) + 
+       fabsf(linestyle_matrix.get_y_scale())) 
       / 2.0f
       * get_stroke_scale();
     

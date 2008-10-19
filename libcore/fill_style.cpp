@@ -105,37 +105,37 @@ fill_style::read(SWFStream& in, int tag_type, movie_definition& md,
         // 0x12: radial gradient fill
         // 0x13: focal gradient fill
 
-        SWFMatrix  input_SWFMatrix;
-        input_SWFMatrix.read(in);
+        SWFMatrix  input_matrix;
+        input_matrix.read(in);
 
         // shouldn't this be in initializer's list ?
-        m_gradient_SWFMatrix.set_identity();
+        m_gradient_matrix.set_identity();
         if (m_type == SWF::FILL_LINEAR_GRADIENT)
         {
-            m_gradient_SWFMatrix.set_translation(128, 0);
-            m_gradient_SWFMatrix.set_scale(1.0/128, 1.0/128);
+            m_gradient_matrix.set_translation(128, 0);
+            m_gradient_matrix.set_scale(1.0/128, 1.0/128);
         }
         else // FILL_RADIAL_GRADIENT or FILL_FOCAL_GRADIENT
         {
-            m_gradient_SWFMatrix.set_translation(32, 32);
-            m_gradient_SWFMatrix.set_scale(1.0/512, 1.0/512);
+            m_gradient_matrix.set_translation(32, 32);
+            m_gradient_matrix.set_scale(1.0/512, 1.0/512);
         }
 
-        SWFMatrix m = input_SWFMatrix;
+        SWFMatrix m = input_matrix;
         m.invert();
 
         if (is_morph)
         {
-            pOther->m_gradient_SWFMatrix = m_gradient_SWFMatrix;
+            pOther->m_gradient_matrix = m_gradient_matrix;
         }
-        m_gradient_SWFMatrix.concatenate(m);
+        m_gradient_matrix.concatenate(m);
         
         if (is_morph)
         {
-            input_SWFMatrix.read(in);
-            m = input_SWFMatrix;
+            input_matrix.read(in);
+            m = input_matrix;
             m.invert();
-            pOther->m_gradient_SWFMatrix.concatenate(m);
+            pOther->m_gradient_matrix.concatenate(m);
         }
         
         // GRADIENT
@@ -287,16 +287,16 @@ fill_style::read(SWFStream& in, int tag_type, movie_definition& md,
 
         // For some reason, it looks like they store the inverse of the
         // TWIPS-to-texcoords SWFMatrix.
-        m_bitmap_SWFMatrix = m.invert();
+        m_bitmap_matrix = m.invert();
 
         if (is_morph)
         {
             pOther->m_bitmap_character = m_bitmap_character;
             m.read(in);
-            pOther->m_bitmap_SWFMatrix = m.invert();
+            pOther->m_bitmap_matrix = m.invert();
         }
         IF_VERBOSE_PARSE(
-           log_parse("SWFMatrix: %s", m_bitmap_SWFMatrix);
+           log_parse("SWFMatrix: %s", m_bitmap_matrix);
         );
     }
     else
@@ -341,14 +341,14 @@ SWFMatrix
 fill_style::getBitmapMatrix() const 
 {
   assert(m_type != SWF::FILL_SOLID);
-  return m_bitmap_SWFMatrix;
+  return m_bitmap_matrix;
 }
 
 SWFMatrix
 fill_style::getGradientMatrix() const 
 {
   // TODO: Why do we separate bitmap and gradient matrices? 
-  return m_gradient_SWFMatrix;
+  return m_gradient_matrix;
 }
 
 rgba
@@ -524,7 +524,7 @@ fill_style::set_lerp(const fill_style& a, const fill_style& b, float t)
     // @@ TODO morphed gradients don't come out exactly
     // right; they shift around some.  Not sure where the
     // problem is.
-    m_gradient_SWFMatrix.set_lerp(a.m_gradient_SWFMatrix, b.m_gradient_SWFMatrix, t);
+    m_gradient_matrix.set_lerp(a.m_gradient_matrix, b.m_gradient_matrix, t);
 
     // fill style gradients
     assert(m_gradients.size() == a.m_gradients.size());
@@ -544,7 +544,7 @@ fill_style::set_lerp(const fill_style& a, const fill_style& b, float t)
     assert(m_bitmap_character == b.m_bitmap_character);
 
     // fill style bitmap SWFMatrix
-    m_bitmap_SWFMatrix.set_lerp(a.m_bitmap_SWFMatrix, b.m_bitmap_SWFMatrix, t);
+    m_bitmap_matrix.set_lerp(a.m_bitmap_matrix, b.m_bitmap_matrix, t);
 }
 
 
@@ -564,7 +564,7 @@ fill_style::fill_style(bitmap_character_def* bitmap, const SWFMatrix& mat)
     :
     m_type(SWF::FILL_CLIPPED_BITMAP),
     m_bitmap_character(bitmap),
-    m_bitmap_SWFMatrix(mat)
+    m_bitmap_matrix(mat)
 {
 }
 
@@ -580,7 +580,7 @@ fill_style::setLinearGradient(const std::vector<gradient_record>& gradients, con
 {
     m_type = SWF::FILL_LINEAR_GRADIENT;
     m_gradients = gradients;
-    m_gradient_SWFMatrix = mat;
+    m_gradient_matrix = mat;
     m_gradient_bitmap_info = 0;
 }
 
@@ -589,7 +589,7 @@ fill_style::setRadialGradient(const std::vector<gradient_record>& gradients, con
 {
     m_type = SWF::FILL_RADIAL_GRADIENT;
     m_gradients = gradients;
-    m_gradient_SWFMatrix = mat;
+    m_gradient_matrix = mat;
     m_gradient_bitmap_info = 0;
 }
 

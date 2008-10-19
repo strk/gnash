@@ -372,13 +372,13 @@ public:
     /// if true, the cxform of the new character will be set to the old one.
     /// if false, the cxform of the new character will be untouched.
     ///
-    /// @use_old_SWFMatrix
+    /// @use_old_matrix
     /// if true, the transformation SWFMatrix of the new character will be set to the old one.
     /// if false, the transformation SWFMatrix of the new character will be untouched.
     ///
     void replace_display_object(character* ch,  int depth,
         bool use_old_cxform,
-        bool use_old_SWFMatrix);
+        bool use_old_matrix);
 
 
     /// \brief

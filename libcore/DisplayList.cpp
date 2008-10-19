@@ -264,7 +264,7 @@ DisplayList::replace_character(
 	character* ch, 
 	int depth, 
 	bool use_old_cxform,
-	bool use_old_SWFMatrix)
+	bool use_old_matrix)
 {
   testInvariant();
 
@@ -302,7 +302,7 @@ DisplayList::replace_character(
       ch->set_cxform(oldch->get_cxform());
     }
 
-    if (use_old_SWFMatrix)
+    if (use_old_matrix)
     {
       // Use the SWFMatrix from the old character.
       ch->copyMatrix(*oldch); // copy SWFMatrix and caches

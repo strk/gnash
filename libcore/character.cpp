@@ -638,7 +638,7 @@ character::name_getset(const fn_call& fn)
 void
 character::copyMatrix(const character& c)
 {
-	m_SWFMatrix = c.m_SWFMatrix;
+	m_matrix = c.m_matrix;
 	_xscale = c._xscale;
 	_yscale = c._yscale;
 	_rotation = c._rotation;
@@ -648,17 +648,17 @@ void
 character::setMatrix(const SWFMatrix& m, bool updateCache)
 {
 
-    if (!(m == m_SWFMatrix))
+    if (!(m == m_matrix))
     {
         //log_debug("setting SWFMatrix to: %s", m);
 		set_invalidated(__FILE__, __LINE__);
-		m_SWFMatrix = m;
+		m_matrix = m;
 
 		if ( updateCache ) // don't update caches if SWFMatrix wasn't updated too
 		{
-			_xscale = m_SWFMatrix.get_x_scale() * 100.0;
-			_yscale = m_SWFMatrix.get_y_scale() * 100.0;
-			_rotation = m_SWFMatrix.get_rotation() * 180.0 / PI;
+			_xscale = m_matrix.get_x_scale() * 100.0;
+			_yscale = m_matrix.get_y_scale() * 100.0;
+			_rotation = m_matrix.get_rotation() * 180.0 / PI;
 		}
     }
     else

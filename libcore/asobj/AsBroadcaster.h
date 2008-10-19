@@ -37,7 +37,7 @@ public:
 	/// This method set the addListener,removeListener and broadcastMessage
 	/// AS methods with the object, and set the _listners array member.
 	///
-	/// It is exposed so that Stage,TextField,Key,Mouse and Selection
+	/// It is exposed so that Stage_as,TextField,Key,Mouse and Selection
 	/// can call this internally.
 	///
 	/// The AsBroadcaster_init will take care of registering

@@ -20,7 +20,7 @@ void text_character_def::read(SWFStream& in, int tag_type,
 	assert(tag_type == SWF::DEFINETEXT || tag_type == SWF::DEFINETEXT2);
 
 	m_rect.read(in);
-	m_SWFMatrix.read(in);
+	m_matrix.read(in);
 
 	in.ensureBytes(2); // glyph_bits + advance_bits
 	int glyph_bits = in.read_u8();
@@ -167,7 +167,7 @@ void text_character_def::display(character* inst)
 
 	bool useEmbeddedGlyphs = true;
 
-	display_glyph_records(m_SWFMatrix, inst,
+	display_glyph_records(m_matrix, inst,
 		m_text_glyph_records, useEmbeddedGlyphs); 
 }
 

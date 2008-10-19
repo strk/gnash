@@ -75,7 +75,7 @@ namespace SWF {
 /// m_color_transform:
 /// The color transform to apply to the newly created instance.
 ///
-/// m_SWFMatrix:
+/// m_matrix:
 /// The SWFMatrix transform to apply to the newly created instance.
 ///
 /// m_ratio
@@ -121,7 +121,7 @@ public:
     int getClipDepth() const { return m_clip_depth; }
     int getID()        const { return m_character_id; }
     const std::string& getName() const { return m_name; }
-    const SWFMatrix& getMatrix()    const { return m_SWFMatrix; }
+    const SWFMatrix& getMatrix()    const { return m_matrix; }
     const cxform& getCxform()    const { return m_color_transform; }
     const EventHandlers& getEventHandlers() const { return _eventHandlers; }
     
@@ -145,7 +145,7 @@ private:
     boost::uint8_t m_has_flags3;
     boost::uint16_t m_character_id;
     cxform  m_color_transform;
-    SWFMatrix  m_SWFMatrix;
+    SWFMatrix  m_matrix;
     int     m_ratio;
     std::string m_name;
     int     m_clip_depth;

@@ -1,4 +1,4 @@
-// TextSnapshot.cpp:  ActionScript "TextSnapshot" class, for Gnash.
+// TextSnapshot_as.cpp:  ActionScript "TextSnapshot" class, for Gnash.
 //
 //   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 //
@@ -21,7 +21,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include "TextSnapshot.h"
+#include "TextSnapshot_as.h"
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"

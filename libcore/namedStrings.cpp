@@ -152,7 +152,7 @@ static string_table::svt preload_names[] =
 	string_table::svt( "_ymouse", NSV::PROP_uYMOUSE ),
 	string_table::svt( "_yscale", NSV::PROP_uYSCALE ),
 	string_table::svt( "System", NSV::CLASS_SYSTEM ),
-//	string_table::svt( "Stage", NSV::CLASS_STAGE ), // Identical to PROP_iSTAGE
+//	string_table::svt( "Stage_as", NSV::CLASS_STAGE ), // Identical to PROP_iSTAGE
 	string_table::svt( "MovieClip", NSV::CLASS_MOVIE_CLIP ),
 	string_table::svt( "TextField", NSV::CLASS_TEXT_FIELD ),
 	string_table::svt( "Button", NSV::CLASS_BUTTON ),

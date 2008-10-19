@@ -80,7 +80,7 @@ private:
 
   int m_depth;
   cxform  m_color_transform;
-  SWFMatrix  m_SWFMatrix;
+  SWFMatrix  m_matrix;
 
   /// Cache values for ActionScript access.
   /// NOTE: not all characters need this, just the
@@ -395,7 +395,7 @@ public:
         m_id(id),
         m_depth(0),
         m_color_transform(),
-        m_SWFMatrix(),
+        m_matrix(),
 	_xscale(100),
 	_yscale(100),
 	_rotation(0),
@@ -470,7 +470,7 @@ public:
     int getWorldVolume() const;
 
     /// Get local transform SWFMatrix for this character
-    const SWFMatrix& getMatrix() const { return m_SWFMatrix; }
+    const SWFMatrix& getMatrix() const { return m_matrix; }
 
     /// Set local transform SWFMatrix for this character
     //
@@ -543,7 +543,7 @@ public:
 
     void  concatenate_cxform(const cxform& cx) { m_color_transform.concatenate(cx); }
 
-    void  concatenate_SWFMatrix(const SWFMatrix& m) { m_SWFMatrix.concatenate(m); }
+    void  concatenateMatrix(const SWFMatrix& m) { m_matrix.concatenate(m); }
 
     int   get_ratio() const { return m_ratio; }
 

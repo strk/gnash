@@ -216,12 +216,12 @@ private:
 	/// Fill type, see SWF::fill_style_type
 	int	m_type;
 	rgba	m_color;
-	SWFMatrix	m_gradient_SWFMatrix;
+	SWFMatrix	m_gradient_matrix;
     float m_focal_point; // For focal fill gradients.
 	std::vector<gradient_record>	m_gradients;
 	boost::intrusive_ptr<gnash::bitmap_info>	m_gradient_bitmap_info;
 	boost::intrusive_ptr<bitmap_character_def>	m_bitmap_character;
-	SWFMatrix	m_bitmap_SWFMatrix;
+	SWFMatrix	m_bitmap_matrix;
 
 	SWF::gradient_spread_mode m_spread_mode;
 	SWF::gradient_interpolation_mode m_interpolation;

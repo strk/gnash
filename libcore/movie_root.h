@@ -101,7 +101,7 @@
 // Forward declarations
 namespace gnash {
     class ExecutableCode; // for ActionQueue
-    class Stage;
+    class Stage_as;
     class URL;
     class Timer;
     class Gui;
@@ -505,7 +505,7 @@ public:
         STAGE_H_ALIGN_R,
     };
 
-    /// enum for vertical position of the Stage
+    /// enum for vertical position of the Stages
     enum StageVerticalAlign {
         STAGE_V_ALIGN_C,
         STAGE_V_ALIGN_T,       
@@ -900,7 +900,7 @@ private:
     /// Can return NULL if it's been deleted or not
     /// yet initialized.
     ///
-    boost::intrusive_ptr<Stage> getStageObject();
+    boost::intrusive_ptr<Stage_as> getStageObject();
 
     typedef std::list<ExecutableCode*> ActionQueue;
 

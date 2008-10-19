@@ -101,7 +101,7 @@ namespace gnash {
 		mat.concatenate(this_mat);
 
 		cxform	cx = inst->get_world_cxform();
-		SWFMatrix	base_SWFMatrix = mat;
+		SWFMatrix	base_matrix = mat;
 
 		float x = 0.0f;
 		float y = 0.0f;
@@ -147,7 +147,7 @@ namespace gnash {
 
 				int	index = ge.m_glyph_index;
 					
-				mat = base_SWFMatrix;
+				mat = base_matrix;
 				mat.concatenate_translation(x, y);
 				mat.concatenate_scale(scale, scale);
 
@@ -220,7 +220,7 @@ log_debug(_("render shape glyph using filled outline (render::draw_glyph)"));
 					startX,   posY,
 					  endX,   posY,
 				};
-				render::draw_line_strip(underline, 2, transformed_color, base_SWFMatrix);
+				render::draw_line_strip(underline, 2, transformed_color, base_matrix);
 			}
 		}
 	}

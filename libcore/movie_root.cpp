@@ -25,7 +25,7 @@
 #include "render.h"
 #include "VM.h"
 #include "ExecutableCode.h"
-#include "Stage.h"
+#include "Stage_as.h"
 #include "utility.h"
 #include "URL.h"
 #include "namedStrings.h"
@@ -485,7 +485,7 @@ movie_root::clear()
 	setInvalidated();
 }
 
-boost::intrusive_ptr<Stage>
+boost::intrusive_ptr<Stage_as>
 movie_root::getStageObject()
 {
 	as_value v;
@@ -493,7 +493,7 @@ movie_root::getStageObject()
 	as_object* global = _vm.getGlobal();
 	if ( ! global ) return NULL;
 	if (!global->get_member(NSV::PROP_iSTAGE, &v) ) return NULL;
-	return boost::dynamic_pointer_cast<Stage>(v.to_object());
+	return boost::dynamic_pointer_cast<Stage_as>(v.to_object());
 }
 		
 void
@@ -509,7 +509,7 @@ movie_root::set_display_viewport(int x0, int y0, int w, int h)
 	if ( _scaleMode == noScale ) // rescale not allowed, notify Stage (if any)
 	{
 		//log_debug("Rescaling disabled");
-		boost::intrusive_ptr<Stage> stage = getStageObject();
+		boost::intrusive_ptr<Stage_as> stage = getStageObject();
 		if ( stage ) stage->notifyResize();
 	}
 
@@ -1458,7 +1458,7 @@ movie_root::setStageScaleMode(ScaleMode sm)
 
     if ( notifyResize )
     {
-        boost::intrusive_ptr<Stage> stage = getStageObject();
+        boost::intrusive_ptr<Stage_as> stage = getStageObject();
         if ( stage ) stage->notifyResize();
     }
 }
@@ -1468,7 +1468,7 @@ movie_root::setStageDisplayState(const DisplayState ds)
 {
     _displayState = ds;
 
-    boost::intrusive_ptr<Stage> stage = getStageObject();
+    boost::intrusive_ptr<Stage_as> stage = getStageObject();
     if ( stage ) stage->notifyFullScreen( (_displayState == fullScreen) );
 
 	if (!_interfaceHandler) return; // No registered callback

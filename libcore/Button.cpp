@@ -742,7 +742,7 @@ Button::set_current_state(MouseState new_state)
 				// Not there, instantiate
 				button_record& bdef = _def.m_button_records[i];
 
-				const SWFMatrix&	mat = bdef.m_button_SWFMatrix;
+				const SWFMatrix&	mat = bdef.m_button_matrix;
 				const cxform&	cx = bdef.m_button_cxform;
 				int ch_depth = bdef.m_button_layer+character::staticDepthOffset+1;
 				int ch_id = bdef.m_character_id;
@@ -895,7 +895,7 @@ Button::stagePlacementCallback()
 	{
 		button_record& bdef = _def.m_button_records[*i];
 
-		const SWFMatrix& mat = bdef.m_button_SWFMatrix;
+		const SWFMatrix& mat = bdef.m_button_matrix;
 		const cxform& cx = bdef.m_button_cxform;
 		int ch_depth = bdef.m_button_layer+character::staticDepthOffset+1;
 		int ch_id = bdef.m_character_id;
@@ -920,13 +920,13 @@ Button::stagePlacementCallback()
 	// Instantiate the default state characters 
 	RecSet upChars;
 	get_active_records(upChars, UP);
-	//log_debug("At StagePlacementCallback, button %s got %d active chars for state UP", getTarget(), upChars.size());
+	//log_debug("At Stage_asPlacementCallback, button %s got %d active chars for state UP", getTarget(), upChars.size());
 	for (RecSet::iterator i=upChars.begin(),e=upChars.end(); i!=e; ++i)
 	{
 		int rno = *i;
 		button_record& bdef = _def.m_button_records[rno];
 
-		const SWFMatrix&	mat = bdef.m_button_SWFMatrix;
+		const SWFMatrix&	mat = bdef.m_button_matrix;
 		const cxform&	cx = bdef.m_button_cxform;
 		int ch_depth = bdef.m_button_layer+character::staticDepthOffset+1;
 		int ch_id = bdef.m_character_id;

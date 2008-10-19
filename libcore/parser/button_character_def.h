@@ -76,7 +76,7 @@ public:
 	character_def* m_character_def;
 
 	int	m_button_layer;
-	SWFMatrix	m_button_SWFMatrix;
+	SWFMatrix	m_button_matrix;
 	cxform	m_button_cxform;
 
 

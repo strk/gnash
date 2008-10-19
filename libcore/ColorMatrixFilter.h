@@ -37,8 +37,8 @@ public:
         m_matrix()
     { return; }
 
-    ColorMatrixFilter(std::vector<float> a_SWFMatrix) :
-        m_matrix(a_SWFMatrix)
+    ColorMatrixFilter(std::vector<float> a_matrix) :
+        m_matrix(a_matrix)
     { return; }
 
 protected:
