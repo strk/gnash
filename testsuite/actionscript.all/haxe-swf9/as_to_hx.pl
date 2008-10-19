@@ -107,16 +107,7 @@ while(<STDIN>){
 #		print $_;
 #		next;
 	}
-	#Convert instance of expressions.
-	#TODO: This only works some of the time.  Skipping these for now.
-	#BROKEN: 
-	#Dejagnu.check(! "literal string" instanceof String, "! \"literal string\" instanceof String"+' '+' ['+"String.as"+':'+1056 +']');
-	if(index($_,"instanceof") != $[-1){
-		skip_line();
-#		print instance_of($_);	
-		next;
-	}
-	
+
 	#Replace deletes:
 	#ACTIONSCRIPT: delete Object.prototype.toString
 	#HAXE: Reflect.deleteField(Object.prototype,toString)
@@ -154,7 +145,7 @@ while(<STDIN>){
 	#Calls to split()
 	if(index($_,"split") != $[-1){
 		
-		#CHECK 5.1
+		#CHECK 5.1 - Must run before CHECK 8
 		#Replace calls to split that have no arguments with an array whose only member is the caller.
 		$_ =~ s/(\w+)\.split\(\)/[$1]/g;
 
@@ -172,6 +163,10 @@ while(<STDIN>){
 		$_ =~ s/(\w+)\.split\((.+),\s*(\w+)\s*\)/$2==""?[]:$1==""||$2==null?[$1]:$1.split($2).slice(0,$3)/g;
 		
 	}
+
+	#CHECK 8 - Must run after CHECK 5.1
+	#Convert instance instanceof Class to Std.is(instance,Class)
+	$_ =~ s/(\w+|\"[\w\s]+\"|\[\w+\])\s*instanceof\s*(\w+)/Std.is($1,$2)/g;
 
 	#Replace undefined with null.
 	$_ =~ s/undefined/null/g;
