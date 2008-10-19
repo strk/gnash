@@ -1939,11 +1939,10 @@ Machine::execute()
 ///  cobj -- obj if type of obj conforms to valid, otherwise Null
 	case SWF::ABC_ACTION_ASTYPELATE:
 	{
-		bool truth;
-		ABSTRACT_TYPELATE(truth, mStack.top(1), mStack.top(0));
-		if (!truth)
-			mStack.top(1).set_null();
-		mStack.drop(1);
+		as_value type = pop_stack();
+		as_value value = pop_stack();
+		//TODO: If value is not the type defined by type, then push null.
+		push_stack(value);
 		break;
 	}
 /// 0x89 ABC_ACTION_COERCE_O
