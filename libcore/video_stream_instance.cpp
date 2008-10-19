@@ -23,7 +23,7 @@
 #include "video_stream_def.h"
 #include "fn_call.h"
 #include "as_value.h"
-#include "NetStream.h"
+#include "NetStream_as.h"
 #include "render.h"
 #include "Range2d.h"
 #include "builtin_function.h" // for getter/setter properties
@@ -124,7 +124,7 @@ video_attach(const fn_call& fn)
 		return as_value();
 	}
 
-	boost::intrusive_ptr<NetStream> ns = boost::dynamic_pointer_cast<NetStream>(fn.arg(0).to_object());
+	boost::intrusive_ptr<NetStream_as> ns = boost::dynamic_pointer_cast<NetStream_as>(fn.arg(0).to_object());
 	if (ns)
 	{
 		video->setStream(ns);
@@ -132,7 +132,7 @@ video_attach(const fn_call& fn)
 	else
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("attachVideo(%s) first arg is not a NetStream instance"),
+		log_aserror(_("attachVideo(%s) first arg is not a NetStream_as instance"),
 			fn.arg(0));
 		);
 	}
@@ -239,7 +239,7 @@ video_stream_instance::getVideoFrame()
 {
 
 
-	// If this is a video from a NetStream object, retrieve a video frame from there.
+	// If this is a video from a NetStream_as object, retrieve a video frame from there.
 	if (_ns)
 	{
 		std::auto_ptr<image::ImageBase> tmp = _ns->get_video();
@@ -362,7 +362,7 @@ video_stream_instance::add_invalidated_bounds(InvalidatedRanges& ranges,
 }
 
 void
-video_stream_instance::setStream(boost::intrusive_ptr<NetStream> ns)
+video_stream_instance::setStream(boost::intrusive_ptr<NetStream_as> ns)
 {
 	_ns = ns;
 	_ns->setInvalidatedVideo(this);

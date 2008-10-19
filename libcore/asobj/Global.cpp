@@ -50,7 +50,7 @@
 #include "MovieClipLoader.h"
 #include "movie_definition.h"
 #include "NetConnection.h"
-#include "NetStream.h"
+#include "NetStream_as.h"
 #include "Selection.h"
 #include "SharedObject.h"
 #include "Sound.h"

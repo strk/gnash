@@ -59,7 +59,7 @@ libgnashasobjs_la_SOURCES = \
 	Microphone.cpp	\
 	Mouse.cpp \
 	NetConnection.cpp \
-	NetStream.cpp \
+	NetStream_as.cpp \
 	Number.cpp \
 	Object.cpp \
 	Selection.cpp \
@@ -125,7 +125,7 @@ noinst_HEADERS = \
 	Mouse.h	\
 	MovieClipLoader.h \
 	NetConnection.h	\
-	NetStream.h \
+	NetStream_as.h \
 	Number.h \
 	Object.h \
 	prophelper.h \

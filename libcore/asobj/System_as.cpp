@@ -101,7 +101,7 @@ getSystemCapabilitiesInterface(as_object& o)
     const std::string language = systemLanguage(o);
 
     // FIXME: these need to be implemented properly 
-    // Does the NetStream object natively support SSL?
+    // Does the NetStream_as object natively support SSL?
 	const bool hasTLS = false;
 
     // Microphone and camera access disabled

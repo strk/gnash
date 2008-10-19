@@ -56,7 +56,7 @@
 #include "fill_style.h" // for beginGradientFill
 #include "styles.h" // for cap_style_e and join_style_e enums
 #include "PlaceObject2Tag.h" 
-#include "NetStream.h"
+#include "NetStream_as.h"
 #include "flash/geom/Matrix_as.h"
 
 #ifdef USE_SWFTREE
@@ -320,12 +320,12 @@ static as_value sprite_attach_audio(const fn_call& fn)
     return as_value();
   }
 
-  NetStream* ns = dynamic_cast<NetStream*>(obj);
+  NetStream_as* ns = dynamic_cast<NetStream_as*>(obj);
   if ( ! ns )
   { 
     std::stringstream ss; fn.dump_args(ss);
     // TODO: find out what to do here
-    log_error("MovieClip.attachAudio(%s): first arg doesn't cast to a NetStream", ss.str());
+    log_error("MovieClip.attachAudio(%s): first arg doesn't cast to a NetStream_as", ss.str());
     return as_value();
   }
 

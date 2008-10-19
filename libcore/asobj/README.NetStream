@@ -1,7 +1,7 @@
-Design info for NetStream based media playing
+Design info for NetStream_as based media playing
 
 ===============================================================================
- Data flow diagram for Gnash implementation of NetStream playback using FFMPEG
+ Data flow diagram for Gnash implementation of NetStream_as playback using FFMPEG
 ===============================================================================
 
 Notation: process, [dataStore], <externalEvent>
@@ -32,7 +32,7 @@ Notation: process, [dataStore], <externalEvent>
      videoFrameUpdater : refreshVideoFrame  
               renderer : render_handler    
            soundPlayer : sound_streamer   
-                  seek : NetStream::seek
+                  seek : NetStream_as::seek
 
 
 
@@ -57,7 +57,7 @@ Notation: process, [dataStore], <externalEvent>
   thread3 (playsound)         : soundPlayer
 
 ===============================================================================
- Data flow diagram for Gnash implementation of NetStream playback using GST
+ Data flow diagram for Gnash implementation of NetStream_as playback using GST
 ===============================================================================
 
 

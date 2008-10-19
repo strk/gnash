@@ -225,12 +225,12 @@ public:
 
 
 
-/// NetStream ActionScript class
+/// NetStream_as ActionScript class
 //
 /// This class is responsible for handlign external
 /// media files. Provides interfaces for playback control.
 ///
-class NetStream : public as_object {
+class NetStream_as : public as_object {
 
 protected:
 	
@@ -333,7 +333,7 @@ protected:
 	long inputPos;
 
 #ifdef GNASH_USE_GC
-	/// Mark all reachable resources of a NetStream, for the GC
+	/// Mark all reachable resources of a NetStream_as, for the GC
 	//
 	/// Reachable resources are:
 	///	- associated NetConnection object (_netCon)
@@ -363,9 +363,9 @@ typedef std::deque<raw_mediadata_t*> AudioQueue;
 	  pauseModeUnPause = 1	
 	};
 
-	NetStream();
+	NetStream_as();
 
-	~NetStream();
+	~NetStream_as();
 
 	/// Closes the video session and frees all ressources used for decoding
 	/// except the FLV-parser (this might not be correct).
@@ -402,7 +402,7 @@ typedef std::deque<raw_mediadata_t*> AudioQueue;
 	boost::int32_t time();
 
 	/// Called at the SWF framerate. Used to process queued status messages
-	/// and (re)start after a buffering pause. In NetStreamFfmpeg it is also
+	/// and (re)start after a buffering pause. In NetStream_asFfmpeg it is also
 	/// used to find the next video frame to be shown, though this might change.
 	void advance();
 	
@@ -419,7 +419,7 @@ typedef std::deque<raw_mediadata_t*> AudioQueue;
 		_netCon = nc;
 	}
 
-	/// Return true if the NetStream has an associated NetConnection
+	/// Return true if the NetStream_as has an associated NetConnection
 	bool isConnected() const { return _netCon != 0; }
 
 	/// Specifies the number of milliseconds to buffer before starting to display the stream.
@@ -701,7 +701,7 @@ private:
 };
 
 
-// Initialize the global NetStream class
+// Initialize the global NetStream_as class
 void netstream_class_init(as_object& global);
 
 } // end of gnash namespace
