@@ -151,10 +151,7 @@ while(<STDIN>){
 #			next;
 		}
 	}
-	if(index($_,"substring") != $[-1){
-		skip_line();
-		next;
-	}
+
 	if(index($_,"__proto__") != $[-1){
 		skip_line();
 		next;
