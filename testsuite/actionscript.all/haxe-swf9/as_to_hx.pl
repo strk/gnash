@@ -79,7 +79,7 @@ while(<STDIN>){
 		$_ =~ s/(new \w+)(;)/$1\(\)$2/g;
 		$_ =~ s/(new \w+)(\))/$1\(\)$2/g;
 		#Replace things like o = new Object(); with o = {};
-		$_ =~ s/\s*(\w+)\s*=\s*new Object\(\)/$1={}/g;
+		$_ =~ s/new Object\(\)/{}/g;
 		#Add extra arguments when Date() is called with less than 6 args.
 		if($_ =~ /new Date\(.+\)/){
 			my $num_args = length(split(/,/,$_));
@@ -191,12 +191,6 @@ while(<STDIN>){
 		#		 str			a		b
 		$_ =~ s/(\w+)\.split\((.+),\s*(\w+)\s*\)/$2==""?[]:$1==""||$2==null?[$1]:$1.split($2).slice(0,$3)/g;
 		
-	}
-
-	#Ignore calls to concat, I cannot find the equivilent haxe function.
-	if(index($_,"concat") != $[-1){
-		skip_line();
-		next;
 	}
 
 	#Replace undefined with null.
