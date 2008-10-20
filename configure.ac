@@ -1134,6 +1134,12 @@ PKG_PROG_PKG_CONFIG
 AC_PATH_PROG(PYTHON, python, ,[${pathlist}])
 AM_CONDITIONAL([ENABLE_GNASH_PYTHON_MODULE], false)
 
+AC_PATH_PROG(PERL, perl)
+AM_CONDITIONAL(HAVE_PERL, test x"$PERL" != x)
+
+AC_PATH_PROG(CSOUND, csound)
+AM_CONDITIONAL(HAVE_CSOUND, test x"$CSOUND" != x)
+
 dnl Look for scratchbox
 sbox=no
 if test x"${SBOX_REDIRECT_FROM_DIRS}" != x; then
@@ -2918,6 +2924,20 @@ if test x$cross_compiling = xno; then
   else
     echo "        WARNING: You need to have python installed" >&4
     echo "                 to run some of the tests in Gnash testsuite." >&4
+  fi
+
+  if test x"$PERL" != x; then
+    echo "        PERL is $PERL"
+  else
+    echo "        WARNING: You need to have perl installed" >&4
+    echo "                 to run some of the tests in Gnash testsuite." >&4
+  fi
+
+  if test x"$CSOUND" != x; then
+    echo "        CSOUND is $CSOUND"
+  else
+    echo "        WARNING: You need to have csound installed" >&4
+    echo "                 to have real fun." >&4
   fi
 
 fi
