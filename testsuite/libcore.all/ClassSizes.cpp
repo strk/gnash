@@ -25,7 +25,7 @@
 #include "PropertyList.h"
 #include "sprite_instance.h"
 #include "character.h"
-#include "types.h"
+#include "RGBA.h"
 
 #include <iostream>
 #include <sstream>

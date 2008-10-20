@@ -31,7 +31,7 @@
 #include "VM.h" // for initialization
 #include "sound_handler.h" // for creating the "test" sound handlers
 #include "render.h" // for get_render_handler
-#include "types.h" // for rgba class
+#include "RGBA.h" // for rgba class
 #include "FuzzyPixel.h"
 #include "render.h"
 #include "render_handler.h"

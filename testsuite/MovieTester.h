@@ -28,7 +28,6 @@
 #include "Range2d.h"
 #include "GnashKey.h"
 #include "sound_handler.h" // for creating the "test" sound handlers
-#include "types.h" // for rgba class
 #include "render_handler.h" // for dtor visibility by auto_ptr
 #include "movie_instance.h" 
 #include "ManualClock.h" // for composition
@@ -60,6 +59,7 @@ namespace gnash {
 	class character;
 	class FuzzyPixel;
 	class VirtualClock;
+	class rgba;
 }
 
 namespace gnash {

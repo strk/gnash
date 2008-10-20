@@ -19,7 +19,7 @@
  */ 
 
 #include "FuzzyPixel.h"
-#include "types.h" // for rgba class
+#include "RGBA.h" // for rgba class
 
 namespace gnash {
 
