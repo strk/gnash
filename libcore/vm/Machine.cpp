@@ -199,40 +199,35 @@ static inline asName pool_name(boost::uint32_t index, abc_block* pool)
 	} 																		\
 }												/* end of ABSTRACT_COMPARE */
 
-#define ABSTRACT_EQUALITY(st, ev1, ev2, strictness_on)						\
-{																			\
-	bool *store = &st;														\
-	as_value &a = ev1; /* Don't call ev1 multiple times */					\
-	as_value &b = ev2; /* Don't call ev2 multiple times */					\
-	if (a.is_object() && b.is_object())										\
-		*store = a.to_object() == b.to_object();							\
-	else if (a.is_object() || b.is_object())								\
-		*store = false;														\
-	else if (a.ptype() != b.ptype())										\
-	{																		\
-		if (!strictness_on && (a.is_undefined() || b.is_undefined()) && 	\
-			(a.is_null() || b.is_null()))									\
-			*store = true;													\
-		else																\
-			*store = false;													\
-	}																		\
-	else if (a.is_number())													\
-	{																		\
-		double ad = a.to_number(); double bd = b.to_number();				\
-		if (isNaN(ad) || isNaN(bd))											\
-			*store = false;													\
-		else if (isinf(ad) && ad > 0)										\
-			*store = (isinf(bd) && bd > 0);									\
-		else if (isinf(ad) && ad < 0)										\
-			*store = (isinf(bd) && bd < 0);									\
-		else																\
-			*store = (ad == bd);											\
-	}																		\
-	else if (a.is_bool() && b.is_bool())									\
-		*store = a.to_bool() == b.to_bool();								\
-	else																	\
-		*store = false;														\
-}											   /* end of ABSTRACT_EQUALITY */
+inline bool abstractEquality(const as_value& a, const as_value& b,
+       bool strictness_on)
+{
+	if (a.is_object() && b.is_object())	{
+        return (a.to_object() == b.to_object());
+    }
+	if (a.is_object() || b.is_object())	return false;
+
+    if (a.ptype() != b.ptype())	{
+		if (!strictness_on && (a.is_undefined() || b.is_undefined()) &&
+			(a.is_null() || b.is_null())) {
+			return true;
+        }            
+		return false;		
+	}
+
+	if (a.is_number())						
+	{										
+		double ad = a.to_number(); double bd = b.to_number();
+		if (isNaN(ad) || isNaN(bd)) return false;								
+		if (isinf(ad) && ad > 0) return (isinf(bd) && bd > 0);		
+		if (isinf(ad) && ad < 0) return (isinf(bd) && bd < 0);
+		return (ad == bd);	
+	}							
+
+    if (a.is_bool() && b.is_bool()) return (a.to_bool() == b.to_bool());
+	
+    return false;				
+}								
 
 #define ABSTRACT_TYPELATE(st, checkval, matchval)							\
 {																			\
@@ -659,8 +654,7 @@ Machine::execute()
 /// Do: If a == b (strictly), move by jump in stream, as ABC_ACTION_JUMP
 	case SWF::ABC_ACTION_IFSTRICTEQ:
 	{
-		bool truth;
-		ABSTRACT_EQUALITY(truth, mStack.top(1), mStack.top(0), true);
+		bool truth = abstractEquality(mStack.top(1), mStack.top(0), true);
 		mStack.drop(2);
 		JUMPIF(truth);
 		break;
@@ -675,8 +669,7 @@ Machine::execute()
 /// Do: If a != b (strongly), move by jump in stream, as ABC_ACTION_JUMP
 	case SWF::ABC_ACTION_IFSTRICTNE:
 	{
-		bool truth;
-		ABSTRACT_EQUALITY(truth, mStack.top(1), mStack.top(0), true);
+		bool truth = abstractEquality(mStack.top(1), mStack.top(0), true);
 		mStack.drop(2);
 		JUMPIF(!truth);
 		break;
@@ -2183,8 +2176,7 @@ Machine::execute()
 ///  truth -- Truth of (a == b) (weakly)
 	case SWF::ABC_ACTION_EQUALS:
 	{
-		bool truth;
-		ABSTRACT_EQUALITY(truth, mStack.top(1), mStack.top(0), false);
+		bool truth = abstractEquality(mStack.top(1), mStack.top(0), false);
 		pop_stack();
 		pop_stack();
 		as_value result = as_value();
@@ -2201,8 +2193,7 @@ Machine::execute()
 ///   0x19 (ABC_ACTION_IFSTRICTEQ))
 	case SWF::ABC_ACTION_STRICTEQUALS:
 	{
-		bool truth;
-		ABSTRACT_EQUALITY(truth, mStack.top(1), mStack.top(0), true);
+		bool truth = abstractEquality(mStack.top(1), mStack.top(0), true);
 		mStack.drop(1);
 		mStack.top(0).set_bool(truth);
 		break;
@@ -2738,6 +2729,9 @@ void Machine::executeCodeblock(CodeStream* stream){
 void Machine::instantiateClass(std::string className, as_object* global){
 
 	asClass* theClass = mPoolObject->locateClass(className);
+	
+	// TODO: what happens when it's not located?
+	assert (theClass);
 	clearRegisters(theClass->getConstructor()->getMaxRegisters());
 	mCurrentFunction = theClass->getConstructor()->getPrototype();
 	mStack.clear();

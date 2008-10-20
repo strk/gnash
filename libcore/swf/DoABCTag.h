@@ -22,7 +22,7 @@
 #include "swf.h" // for tag_type definition
 #include "action_buffer.h" // for composition
 #include "sprite_instance.h" // for inlines
-#include "stream.h" // for inlines
+#include "SWFStream.h" // for inlines
 #include "abc_block.h"
 #include "Machine.h"
 
