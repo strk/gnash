@@ -362,7 +362,9 @@ endif
 	mudflap \
 	mudflap-check \
 	install-plugins \
+	uninstall-plugins \
 	install-plugin
 
-install-plugins install-plugin:
+install-plugins install-plugin uninstall-plugins:
 	$(MAKE) -C plugin $@
+
