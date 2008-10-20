@@ -95,15 +95,15 @@ endOfTest = function()
 #endif
 
 #if OUTPUT_VERSION == 6
-	check_totals(725); // SWF6
+	check_totals(747); // SWF6
 #endif
 
 #if OUTPUT_VERSION == 7
-	check_totals(742); // SWF7
+	check_totals(764); // SWF7
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(800); // SWF8+
+	check_totals(822); // SWF8+
 #endif
 
 	play();
@@ -1338,6 +1338,44 @@ with (draw)
  check_equals(draw._width, 20);
  check_equals(draw._height, 30);
 #endif
+
+// Test effects of setting _width of a 0-size character
+createEmptyMovieClip("draw4", 14);
+check_equals(draw4._width, 0);
+check_equals(draw4._xscale, 100);
+check_equals(draw4._yscale, 100);
+draw4._width = 10; // setting _width affects _yscale too !!
+check_equals(draw4._width, 0);
+check(!isNaN(draw4._xscale));
+check_equals(typeof(draw4._xscale), 'number');
+xcheck_equals(draw4._xscale, 0); 
+check(!isNaN(draw4._yscale));
+check_equals(typeof(draw4._yscale), 'number');
+xcheck_equals(draw4._yscale, 0); 
+with (draw4)
+{
+    lineStyle(0, 0x000000);
+    moveTo(10, 10);
+    lineTo(10, 30);
+    lineTo(20, 30);
+    lineTo(20, 10);
+    lineTo(10, 10);
+}
+xcheck_equals(draw4._width, 0); 
+xcheck_equals(draw4._height, 0);
+xcheck_equals(draw4._xscale, 0);
+xcheck_equals(draw4._yscale, 0);
+draw4._width = 10;
+check_equals(draw4._width, 10);
+xcheck_equals(draw4._height, 0);
+check_equals(draw4._xscale, 100);
+xcheck_equals(draw4._yscale, 0);
+draw4._yscale = 100;
+check_equals(draw4._width, 10);
+check_equals(draw4._height, 20);
+check_equals(draw4._xscale, 100);
+check_equals(draw4._yscale, 100);
+
 
 // TODO: check bounds of non-scaled strokes 
 //       relative to a container which is scaled
