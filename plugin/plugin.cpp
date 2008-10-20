@@ -1080,7 +1080,7 @@ nsPluginInstance::startProc(Window win)
 
 	if ( saLauncher )
 	{
-		saLauncher << "#/bin/sh" << endl
+		saLauncher << "#!/bin/sh" << endl
 		     << procname << " ";
 	}
 #endif // CREATE_STANDALONE_GNASH_LAUNCHER
