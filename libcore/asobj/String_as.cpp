@@ -40,22 +40,35 @@
 #include <locale>
 #include <stdexcept>
 
-#define ENSURE_FN_ARGS(min, max, rv)                                    \
-    if (fn.nargs < min) {                                               \
-        IF_VERBOSE_ASCODING_ERRORS(                                     \
-            log_aserror(_("%s needs one argument"), __FUNCTION__);         \
-            )                                                           \
-         return as_value(rv);                                           \
-    }                                                                   \
-    IF_VERBOSE_ASCODING_ERRORS(                                         \
-        if (fn.nargs > max)                                             \
-            log_aserror(_("%s has more than one argument"), __FUNCTION__); \
-    )
+namespace gnash {
 
-
-
-namespace gnash
+/// Check the number of arguments, returning false if there
+/// aren't enough, or true if there are either enough or too many.
+/// Logs an error if the number isn't between min and max.
+inline bool checkArgs(const fn_call& fn, size_t min, size_t max,
+        const std::string& function)
 {
+
+    if (fn.nargs < min) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::ostringstream os;
+            fn.dump_args(os);
+                log_aserror(_("%1%(%2%) needs %3% argument(s)"),
+                    function, os.str(), min);
+            )
+         return false;
+    }                          
+    IF_VERBOSE_ASCODING_ERRORS(
+        if (fn.nargs > max)
+        {
+            std::ostringstream os;
+            fn.dump_args(os);
+            log_aserror(_("%1%(%2%) has more than %3% argument(s)"),
+                function, os.str(), max);
+        }
+    );
+    return true;
+}
 
 // Forward declarations
 
@@ -236,7 +249,7 @@ string_slice(const fn_call& fn)
 
     std::wstring wstr = utf8::decodeCanonicalString(str, version);
 
-    ENSURE_FN_ARGS(1, 2, as_value());
+    if (!checkArgs(fn, 1, 2, "String.slice()")) return as_value();
 
     size_t start = validIndex(wstr, fn.arg(0).to_int());
 
@@ -389,6 +402,10 @@ string_split(const fn_call& fn)
     return as_value(array.get());
 }
 
+/// String.lastIndexOf[string[, pos]]
+//
+/// Performs a reverse search for the complete search string, optionally
+/// starting from pos. Returns -1 if not found.
 static as_value
 string_last_index_of(const fn_call& fn)
 {
@@ -397,7 +414,7 @@ string_last_index_of(const fn_call& fn)
     
     const std::string& str = val.to_string();
 
-    ENSURE_FN_ARGS(1, 2, -1);
+    if (!checkArgs(fn, 1, 2, "String.lastIndexOf()")) return as_value(-1);
 
     const std::string& toFind = fn.arg(0).to_string();
 
@@ -411,13 +428,13 @@ string_last_index_of(const fn_call& fn)
         return as_value(-1);
     }
 
-    size_t found = str.find_last_of(toFind, start);
+    size_t found = str.rfind(toFind, start);
 
     if (found == std::string::npos) {
         return as_value(-1);
     }
 
-    return as_value(found - toFind.size() + 1);
+    return as_value(found);
 }
 
 // String.substr(start[, length]).
@@ -437,8 +454,8 @@ string_sub_str(const fn_call& fn)
 
     std::wstring wstr = utf8::decodeCanonicalString(str, version);
 
-    ENSURE_FN_ARGS(1, 2, str);
-
+    if (!checkArgs(fn, 1, 2, "String.substr()")) return as_value(str);
+    
     int start = validIndex(wstr, fn.arg(0).to_int());
 
     int num = wstr.length();
@@ -477,7 +494,7 @@ string_sub_string(const fn_call& fn)
 
     const std::wstring& wstr = utf8::decodeCanonicalString(str, version);
 
-    ENSURE_FN_ARGS(1, 2, str);
+    if (!checkArgs(fn, 1, 2, "String.substring()")) return as_value(str);
 
     int start = fn.arg(0).to_int();
     int end = wstr.size();
@@ -522,14 +539,16 @@ string_index_of(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
     as_value val(fn.this_ptr);
-    
+ 
+    /// Do not return before this, because the toString method should always
+    /// be called. (TODO: test).   
     const std::string& str = val.to_string();
+
+    if (!checkArgs(fn, 1, 2, "String.indexOf")) return as_value(-1);
 
     int version = obj->getVM().getSWFVersion();
 
     const std::wstring& wstr = utf8::decodeCanonicalString(str, version);
-
-    ENSURE_FN_ARGS(1, 2, -1);
 
     const as_value& tfarg = fn.arg(0); // to find arg
     const std::wstring& toFind = utf8::decodeCanonicalString(tfarg.to_string(), version);
@@ -655,7 +674,7 @@ string_char_at(const fn_call& fn)
 
     const int version = obj->getVM().getSWFVersion();
 
-    ENSURE_FN_ARGS(1, 1, "");
+    if (!checkArgs(fn, 1, 1, "String.charAt()")) return as_value("");
 
     // to_int() makes this safe from overflows.
     const size_t index = static_cast<size_t>(fn.arg(0).to_int());
