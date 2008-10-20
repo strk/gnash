@@ -185,19 +185,24 @@ LogFile::log(const std::string& msg)
 
 	boost::mutex::scoped_lock lock(_ioMutex);
 
-	if (_stamp == true )
+	if ( !_verbose ) return; // nothing to do if not verbose
+
+	if (openLogIfNeeded())
 	{
-    	std::string ts = timestamp();
-    	if (_verbose) cout << ts << " " << msg << endl;
-		if (openLogIfNeeded()) {
+		if (_stamp) {
+			std::string ts = timestamp();
 			_outstream << ts << ": " << msg << endl;
+		} else {
+			_outstream << msg << endl;
 		}
 	}
-	else
+	else // log to stdout
 	{
-		if (_verbose) cout << msg << endl;
-		if (openLogIfNeeded()) {
-			_outstream << msg << endl;
+		if (_stamp) {
+			std::string ts = timestamp();
+			cout << ts << " " << msg << endl;
+		} else {
+			cout << msg << endl;
 		}
 	}
 	
