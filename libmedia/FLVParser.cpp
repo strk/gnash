@@ -335,6 +335,7 @@ bool FLVParser::parseNextTag()
 		if (codec == AUDIO_CODEC_AAC) {
 			boost::uint8_t packettype = _stream->read_byte();
 			header = (packettype == 0);
+			--bodyLength;
 		}
 
 		std::auto_ptr<EncodedAudioFrame> frame = readAudioFrame(bodyLength-1, timestamp);
@@ -494,7 +495,8 @@ bool FLVParser::parseHeader()
 	// seek to the begining of the file
 	_stream->seek(0); // seek back ? really ?
 
-	// Read the header
+	// We only use 5 bytes of the header, because the last 4 bytes represent
+        // an integer which is always 1.
 	boost::uint8_t header[9];
 	if ( _stream->read(header, 9) != 9 )
 	{
@@ -504,17 +506,18 @@ bool FLVParser::parseHeader()
 
 	_lastParsedPosition = _bytesLoaded = _nextPosToIndex = 9;
 
-	// Check if this is really a FLV file
-	if (header[0] != 'F' || header[1] != 'L' || header[2] != 'V') return false;
+	if (!std::equal(header, header+3, "FLV")) {
+		return false;
+	}
 
-	int version = header[3];
+	const boost::uint8_t& version = header[3];
 
 	// Parse the audio+video bitmask
 	_audio = header[4]&(1<<2);
 	_video = header[4]&(1<<0);
 
 	log_debug("Parsing FLV version %d, audio:%d, video:%d",
-			version, _audio, _video);
+			(int)version, _audio, _video);
 
 	// Initialize audio/video info if any audio/video
 	// tag was found within the first 'probeBytes' bytes
@@ -656,14 +659,14 @@ FLVParser::MetaTag::execute(as_object* thisPtr, VM& vm)
 	string_table::key funcKey = st.find(funcName);
 
 	as_value arg;
-    std::vector<as_object*> objRefs;
+	std::vector<as_object*> objRefs;
 	if ( ! arg.readAMF0(ptr, endptr, -1, objRefs, vm) )
 	{
 		log_error("Could not convert FLV metatag to as_value, but will try passing it anyway. It's an %s", arg);
 		//return;
 	}
 
-    log_debug("Calling %s(%s)", funcName, arg);
+	log_debug("Calling %s(%s)", funcName, arg);
 	thisPtr->callMethod(funcKey, arg);
 }
 
