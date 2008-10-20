@@ -448,6 +448,19 @@ if test x"$write" = x"yes"; then
   AC_DEFINE([WRITE_FILE], [], [Write files while streaming])
 fi
 
+dnl Write a standalone gnash launcher to disk from the plugin, if specified.
+AC_ARG_ENABLE(sa-launcher,
+  AC_HELP_STRING([--disable-sa-launcher], [Drops support for the NPAPI plugin writing of standalone executable launcher scripts for the currently playing SWF movie to /tmp.]),
+[case "${enableval}" in
+  yes) sa_launcher=yes ;;
+  no)  sa_launcher=no ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for --enable-sa-launcher option]) ;;
+esac],sa_launcher=yes)
+
+if test x"$sa_launcher" = x"yes"; then
+  AC_DEFINE([CREATE_STANDALONE_GNASH_LAUNCHER], [], [Add support for writing a standalone executable launcher for movies embedded in web pages])
+fi
+
 dnl Build the cygnal server if specified.
 AC_ARG_ENABLE(cygnal,
   AC_HELP_STRING([--enable-cygnal], [Enable building of the Cygnal server]),

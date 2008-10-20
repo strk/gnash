@@ -95,6 +95,7 @@ extern NPNetscapeFuncs NPNFuncs;
 NPBool plugInitialized = FALSE;
 
 static bool waitforgdb = false;
+static bool createSaLauncher = false;
 
 static const char* getPluginDescription();
 
@@ -230,6 +231,13 @@ NS_PluginInitialize()
 		if ( strstr(opts, "waitforgdb") )
 		{
 			waitforgdb = true;
+		}
+
+		// Should the plugin write a script to invoke
+		// the standalone player for debugging ?
+		if ( strstr(opts, "writelauncher") )
+		{
+			createSaLauncher = true;
 		}
 
 	}
@@ -1057,6 +1065,26 @@ nsPluginInstance::startProc(Window win)
 	const size_t maxargc = 18 + paramvalues.size() * 2;
 	const char **argv = new const char *[maxargc];
 
+#ifdef CREATE_STANDALONE_GNASH_LAUNCHER
+
+	ofstream saLauncher;
+
+	if ( createSaLauncher )
+	{
+		std::stringstream ss;
+		static int debugno = 0;
+		debugno = (debugno + 1) % 10;
+		ss << "/tmp/gnash-debug-" << debugno << ".sh";
+		saLauncher.open(ss.str().c_str(), ios::out | ios::trunc);
+	}
+
+	if ( saLauncher )
+	{
+		saLauncher << "#/bin/sh" << endl
+		     << procname << " ";
+	}
+#endif // CREATE_STANDALONE_GNASH_LAUNCHER
+
 	size_t argc = 0;
 	argv[argc++] = procname.c_str();
 	
@@ -1072,6 +1100,11 @@ nsPluginInstance::startProc(Window win)
 	argv[argc++] = width;
 	argv[argc++] = "-k";
 	argv[argc++] = height;
+
+#ifdef CREATE_STANDALONE_GNASH_LAUNCHER
+	// we don't need this, do we ?
+	if ( saLauncher ) saLauncher << "-j " << width << " -k " << height << " ";
+#endif // CREATE_STANDALONE_GNASH_LAUNCHER
 	
 	// Url of the root movie
 	argv[argc++] = "-u";
@@ -1089,6 +1122,9 @@ nsPluginInstance::startProc(Window win)
 	{
 		argv[argc++] = "-U";
 		argv[argc++] = pageurl;
+#ifdef CREATE_STANDALONE_GNASH_LAUNCHER
+		if ( saLauncher ) saLauncher << "-U '" << pageurl << "' ";
+#endif // CREATE_STANDALONE_GNASH_LAUNCHER
 	}
 
 	// Variables for use by Actionscript.
@@ -1096,12 +1132,28 @@ nsPluginInstance::startProc(Window win)
 	{
 		argv[argc++] = "-P";
 		argv[argc++] = paramvalues[i].c_str();
+#ifdef CREATE_STANDALONE_GNASH_LAUNCHER
+		if ( saLauncher ) saLauncher << "-P '" << paramvalues[i] << "' ";
+#endif // CREATE_STANDALONE_GNASH_LAUNCHER
 	}
 
 	argv[argc++] = "-";
 	argv[argc++] = 0;
+#ifdef CREATE_STANDALONE_GNASH_LAUNCHER
+	if ( saLauncher ) saLauncher << _swf_url << " ";
+#endif // CREATE_STANDALONE_GNASH_LAUNCHER
 
 	assert(argc <= maxargc);
+
+#ifdef CREATE_STANDALONE_GNASH_LAUNCHER
+	if ( saLauncher )
+	{
+		// allow caller to pass any additional argument
+		saLauncher << "$@"
+		           << endl;
+		saLauncher.close();
+	}
+#endif // CREATE_STANDALONE_GNASH_LAUNCHER
 
 	/*
 	  Argument List prepared, now fork(), close file descriptors and execv()
