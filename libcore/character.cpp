@@ -465,13 +465,6 @@ character::width_getset(const fn_call& fn)
 	}
 	else // setter
 	{
-		if ( bounds.is_null() )
-		{
-			log_unimpl(_("FIXME: can't set _width on character %s (%s) with null bounds"),
-				ptr->getTarget(), typeName(*ptr));
-			return rv;
-		}
-
 		const double newwidth = PIXELS_TO_TWIPS(fn.arg(0).to_number());
 		if ( newwidth <= 0 )
 		{
@@ -490,11 +483,16 @@ void
 character::set_width(double newwidth)
 {
 	rect bounds = getBounds();
+#if 0
+	if ( bounds.is_null() ) {
+		log_unimpl("FIXME: when setting _width of null-bounds character it seems we're supposed to change _yscale too (see MovieClip.as)");
+	}
+#endif
 	const double oldwidth = bounds.width();
 	assert(oldwidth >= 0); // can't be negative can it?
 
         double yscale = std::abs(_yscale / 100.0); // see MovieClip.as. TODO: this is likely same as m.get_y_scale..
-        double xscale = (newwidth / oldwidth);
+        double xscale = oldwidth ? (newwidth / oldwidth) : 0; // avoid division by zero
         double rotation = _rotation * PI / 180.0;
 
         SWFMatrix m = getMatrix();
@@ -519,12 +517,6 @@ character::height_getset(const fn_call& fn)
 	}
 	else // setter
 	{
-		if ( bounds.is_null() )
-		{
-			log_unimpl(_("FIXME: can't set _height on character %s (%s) with null bounds"),
-				ptr->getTarget(), typeName(*ptr));
-			return rv;
-		}
 
 		const double newheight = PIXELS_TO_TWIPS(fn.arg(0).to_number());
 		if ( newheight <= 0 )
@@ -545,10 +537,15 @@ void
 character::set_height(double newheight)
 {
 	const rect bounds = getBounds();
+#if 0
+	if ( bounds.is_null() ) {
+		log_unimpl("FIXME: when setting _height of null-bounds character it seems we're supposed to change _xscale too (see MovieClip.as)");
+	}
+#endif
 	const double oldheight = bounds.height();
 	assert(oldheight >= 0); // can't be negative can it?
 
-        double yscale = (newheight / oldheight);
+        double yscale = oldheight ? (newheight / oldheight) : 0; // avoid division by zero
         double xscale = _xscale / 100.0;
         double rotation = _rotation * PI / 180.0;
 

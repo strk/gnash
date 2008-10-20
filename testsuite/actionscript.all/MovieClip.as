@@ -1348,7 +1348,7 @@ draw4._width = 10; // setting _width affects _yscale too !!
 check_equals(draw4._width, 0);
 check(!isNaN(draw4._xscale));
 check_equals(typeof(draw4._xscale), 'number');
-xcheck_equals(draw4._xscale, 0); 
+check_equals(draw4._xscale, 0); 
 check(!isNaN(draw4._yscale));
 check_equals(typeof(draw4._yscale), 'number');
 xcheck_equals(draw4._yscale, 0); 
@@ -1361,9 +1361,9 @@ with (draw4)
     lineTo(20, 10);
     lineTo(10, 10);
 }
-xcheck_equals(draw4._width, 0); 
+check_equals(draw4._width, 0); 
 xcheck_equals(draw4._height, 0);
-xcheck_equals(draw4._xscale, 0);
+check_equals(draw4._xscale, 0);
 xcheck_equals(draw4._yscale, 0);
 draw4._width = 10;
 check_equals(draw4._width, 10);
