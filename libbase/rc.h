@@ -383,7 +383,7 @@ protected:
     /// according to POSIX standard.
     ///
     /// @param path the path to expand.
-    void expandPath(std::string& path);
+    static void expandPath(std::string& path);
 
     /// \brief
     /// If variable matches pattern (case-insensitive)

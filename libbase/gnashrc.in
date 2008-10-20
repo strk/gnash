@@ -177,9 +177,9 @@
 #
 # If the directory doens't exist SharedObject won't work.
 # 
-# Default: /tmp/
+# Default: @DEFAULT_SOL_SAFEDIR@
 #
-set SOLSafeDir /dev/null
+#set SOLSafeDir /dev/null
 
 # Never write SharedObject (kind of cookies), only read them
 #

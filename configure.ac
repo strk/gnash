@@ -114,6 +114,10 @@ DEFAULT_STREAMS_TIMEOUT=60
 AC_SUBST(DEFAULT_STREAMS_TIMEOUT)
 AC_DEFINE_UNQUOTED([DEFAULT_STREAMS_TIMEOUT], [${DEFAULT_STREAMS_TIMEOUT}], [Default streams timeout in seconds])
 
+DEFAULT_SOL_SAFEDIR="~/.gnash/SharedObjects"
+AC_SUBST(DEFAULT_SOL_SAFEDIR)
+AC_DEFINE_UNQUOTED([DEFAULT_SOL_SAFEDIR], ["${DEFAULT_SOL_SAFEDIR}"], [Default SharedObject base directory])
+
 
 dnl Some things you can only do by looking at the platform name.
 case "${host}" in
