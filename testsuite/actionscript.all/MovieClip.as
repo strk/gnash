@@ -95,15 +95,15 @@ endOfTest = function()
 #endif
 
 #if OUTPUT_VERSION == 6
-	check_totals(747); // SWF6
+	check_totals(749); // SWF6
 #endif
 
 #if OUTPUT_VERSION == 7
-	check_totals(764); // SWF7
+	check_totals(766); // SWF7
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(822); // SWF8+
+	check_totals(824); // SWF8+
 #endif
 
 	play();
@@ -1374,6 +1374,9 @@ draw4._yscale = 100;
 check_equals(draw4._width, 10);
 check_equals(draw4._height, 20);
 check_equals(draw4._xscale, 100);
+check_equals(draw4._yscale, 100);
+draw4._width = 20; // setting _width does NOT affect _yscale here
+check_equals(draw4._xscale, 200);
 check_equals(draw4._yscale, 100);
 
 
