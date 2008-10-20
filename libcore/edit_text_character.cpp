@@ -510,7 +510,7 @@ edit_text_character::edit_text_character(character* parent,
 	// (if the textvariable already exist and has a value
 	//  the text will be replaced with it)
 
-	int version = VM::get().getSWFVersion();
+	int version = parent->getVM().getSWFVersion();
 	
 	if ( _textDefined ) 
 	{
@@ -809,7 +809,7 @@ edit_text_character::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y
 void
 edit_text_character::updateText(const std::string& str)
 {
-	int version = VM::get().getSWFVersion();
+	int version = _vm.getSWFVersion();
 	const std::wstring& wstr = utf8::decodeCanonicalString(str, version);
 	updateText(wstr);
 }
@@ -850,7 +850,7 @@ edit_text_character::setTextValue(const std::wstring& wstr)
 		as_object* tgt = ref.first;
 		if ( tgt )
 		{
-			int version = VM::get().getSWFVersion();
+			int version = _vm.getSWFVersion();
 			// we shouldn't truncate, right?
 			tgt->set_member(ref.second, utf8::encodeCanonicalString(wstr, version)); 
 		}
@@ -873,7 +873,7 @@ edit_text_character::get_text_value() const
 	// with a pre-existing value.
 	const_cast<edit_text_character*>(this)->registerTextVariable();
 
-	int version = VM::get().getSWFVersion();
+	int version = _vm.getSWFVersion();
 
 	return utf8::encodeCanonicalString(_text, version);
 }
@@ -1722,7 +1722,7 @@ edit_text_character::registerTextVariable()
 	// in that case update text value
 	as_value val;
 	
-	int version = VM::get().getSWFVersion();
+	int version = _vm.getSWFVersion();
 	
 	if (target->get_member(key, &val) )
 	{
@@ -2487,17 +2487,13 @@ edit_text_character::onChanged()
 void
 edit_text_character::onSetFocus()
 {
-	string_table& st = _vm.getStringTable();
-	string_table::key key = st.find(PROPNAME("onSetFocus"));
-	callMethod(key);
+	callMethod(NSV::PROP_ON_SET_FOCUS);
 }
 
 void
 edit_text_character::onKillFocus()
 {
-	string_table& st = _vm.getStringTable();
-	string_table::key key = st.find(PROPNAME("onKillFocus"));
-	callMethod(key);
+	callMethod(NSV::PROP_ON_KILL_FOCUS);
 }
 
 void

@@ -356,7 +356,7 @@ character::xmouse_get(const fn_call& fn)
 
 	// Local coord of mouse IN PIXELS.
 	int x, y, buttons;
-	VM::get().getRoot().get_mouse_state(x, y, buttons);
+	ptr->getVM().getRoot().get_mouse_state(x, y, buttons);
 
 	SWFMatrix m = ptr->getWorldMatrix();
     point a(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
@@ -372,7 +372,7 @@ character::ymouse_get(const fn_call& fn)
 
 	// Local coord of mouse IN PIXELS.
 	int x, y, buttons;
-	VM::get().getRoot().get_mouse_state(x, y, buttons);
+	ptr->getVM().getRoot().get_mouse_state(x, y, buttons);
 
 	SWFMatrix m = ptr->getWorldMatrix();
     point a(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
@@ -616,7 +616,7 @@ character::name_getset(const fn_call& fn)
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		const VM& vm = VM::get(); // TODO: fetch VM from ptr 
+		const VM& vm = ptr->getVM(); 
 		const std::string& name = ptr->get_name();
 		if ( vm.getSWFVersion() < 6 && name.empty() )
 		{
