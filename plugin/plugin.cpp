@@ -412,7 +412,7 @@ nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
 			_name = val;
 		}
 
-		cerr << "PARAM: " << name << " = " << val << endl;
+		//cerr << "PARAM: " << name << " = " << val << endl;
 		_params[name] = val;
 	}
 
