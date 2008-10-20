@@ -19,7 +19,6 @@
 #include "log.h"
 #include "SWFStream.h"
 #include "SWFMatrix.h"
-#include "types.h" // for TWIPS_TO_PIXELS
 #include "utility.h" // for flerp, clamp...
 
 #include <sstream> // for ::print and ::toString

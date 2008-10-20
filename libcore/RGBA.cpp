@@ -10,7 +10,7 @@
 
 #include <boost/thread.hpp>
 
-#include "types.h"
+#include "RGBA.h"
 
 #include "utility.h"
 #include "log.h"

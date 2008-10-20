@@ -33,7 +33,8 @@ namespace gnash {
 		/// @param b Blue
 		/// @param a Alpha (transparency)
 		///
-		rgba(boost::uint8_t r, boost::uint8_t g, boost::uint8_t b, boost::uint8_t a)
+		rgba(boost::uint8_t r, boost::uint8_t g, 
+                boost::uint8_t b, boost::uint8_t a)
 			:
 			m_r(r), m_g(g), m_b(b), m_a(a)
 		{
@@ -84,20 +85,21 @@ namespace gnash {
 		/// Throw a ParserException if there's no enough bytes in the
 		/// currently opened tag for reading. See stream::ensureBytes()
 		///
-		void	read(SWFStream& in, int tag_type);
+		void read(SWFStream& in, int tag_type);
 
 		/// Initialize from intput stream (reads RGBA)
 		//
 		/// Throw a ParserException if there's no enough bytes in the
 		/// currently opened tag for reading. See stream::ensureBytes()
 		///
-		void	read_rgba(SWFStream& in);
+		void read_rgba(SWFStream& in);
 
 		/// Initialize from intput stream (reads RGB)
-		void	read_rgb(SWFStream& in);
+		void read_rgb(SWFStream& in);
 
 		/// Set r,g,b.a values
-		void	set(boost::uint8_t r, boost::uint8_t g, boost::uint8_t b, boost::uint8_t a)
+		void set(boost::uint8_t r, boost::uint8_t g,
+                boost::uint8_t b, boost::uint8_t a)
 		{
 			m_r = r;
 			m_g = g;
@@ -105,10 +107,10 @@ namespace gnash {
 			m_a = a;
 		}
 
-		void	set_lerp(const rgba& a, const rgba& b, float f);
+		void set_lerp(const rgba& a, const rgba& b, float f);
 
 		/// Debug log.
-		void	print() const;
+		void print() const;
 
 		/// Debug print.
 		std::string toString() const;
@@ -118,7 +120,10 @@ namespace gnash {
 
 		bool operator== (const rgba& o) const
 		{
-			return m_r == o.m_r && m_g == o.m_g && m_b == o.m_b && m_a == o.m_a;
+			return m_r == o.m_r && 
+				m_g == o.m_g && 
+				m_b == o.m_b && 
+				m_a == o.m_a;
 		}
 
 		bool operator!= (const rgba& o) const

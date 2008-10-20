@@ -25,6 +25,7 @@
 #include "SWFMatrix.h"
 #include "bitmap_character_def.h"
 #include "swf.h"
+#include "RGBA.h" // for rgba type
 
 #include <vector> // for composition
 

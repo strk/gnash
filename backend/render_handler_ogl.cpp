@@ -26,12 +26,11 @@
 #include "render_handler.h"
 
 #include "gnash.h"
-#include "types.h"
+#include "RGBA.h"
 #include "image.h"
 #include "utility.h"
 #include "log.h"
 
-#include "types.h"
 #include "image.h"
 #include "utility.h"
 #include "Range2d.h"
