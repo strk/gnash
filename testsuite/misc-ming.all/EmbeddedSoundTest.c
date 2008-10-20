@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <ming.h>
+#include <errno.h>
 
 #include "ming_utils.h"
 
@@ -43,6 +44,7 @@ addSoundExport(SWFMovie mo)
 
     if (!f)
     {
+	perror(MEDIADIR"/mono44.mp2");
         exit(EXIT_FAILURE);
     }
     soundMP3a = newSWFSound(f, SWF_SOUND_MP3_COMPRESSED |
@@ -59,6 +61,7 @@ addSoundExport(SWFMovie mo)
     f2 = fopen(MEDIADIR"/stereo8.mp3", "r");
     if (f2 == NULL)
     {
+	perror(MEDIADIR"/stereo8.mp3");
         exit(EXIT_FAILURE);
     }
 
