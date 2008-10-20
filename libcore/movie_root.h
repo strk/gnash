@@ -74,7 +74,7 @@
 #include "mouse_button_state.h" // for composition
 #include "drag_state.h" // for composition
 #include "movie_instance.h" // for inlines
-#include "asobj/Key.h"
+#include "asobj/Key_as.h"
 #include "smart_ptr.h" // for memory management
 #include "URL.h" // for loadMovie
 #include "GnashKey.h" // key::code
@@ -101,7 +101,7 @@
 // Forward declarations
 namespace gnash {
     class ExecutableCode; // for ActionQueue
-    class Stage;
+    class Stage_as;
     class URL;
     class Timer;
     class Gui;
@@ -505,7 +505,7 @@ public:
         STAGE_H_ALIGN_R,
     };
 
-    /// enum for vertical position of the Stage
+    /// enum for vertical position of the Stages
     enum StageVerticalAlign {
         STAGE_V_ALIGN_C,
         STAGE_V_ALIGN_T,       
@@ -874,7 +874,7 @@ private:
     void executeTimers();
 
     /// Notify the global Key ActionScript object about a key status change
-    key_as_object * notify_global_key(key::code k, bool down);
+    Key_as * notify_global_key(key::code k, bool down);
 
     /// Remove unloaded key and mouselisteners.
     void cleanupUnloadedListeners()
@@ -900,7 +900,7 @@ private:
     /// Can return NULL if it's been deleted or not
     /// yet initialized.
     ///
-    boost::intrusive_ptr<Stage> getStageObject();
+    boost::intrusive_ptr<Stage_as> getStageObject();
 
     typedef std::list<ExecutableCode*> ActionQueue;
 
@@ -931,7 +931,7 @@ private:
     /// Characters for listening key events
     KeyListeners m_key_listeners;
 
-    boost::intrusive_ptr<key_as_object> _keyobject;
+    boost::intrusive_ptr<Key_as> _keyobject;
 
     boost::intrusive_ptr<as_object> _mouseobject;
 
@@ -1015,7 +1015,7 @@ private:
     //
     /// @@ might be worth making public
     ///
-    boost::intrusive_ptr<key_as_object> getKeyObject();
+    boost::intrusive_ptr<Key_as> getKeyObject();
 
     /// Return the global Mouse object 
     //

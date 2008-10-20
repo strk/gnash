@@ -225,7 +225,7 @@ void button_class_init(as_object& global);
 }	// end namespace gnash
 
 
-#endif // GNASH_Button_H
+#endif // GNASH_BUTTON_H
 
 
 // Local Variables:

@@ -225,12 +225,12 @@ public:
 
 
 
-/// NetStream ActionScript class
+/// NetStream_as ActionScript class
 //
 /// This class is responsible for handlign external
 /// media files. Provides interfaces for playback control.
 ///
-class NetStream : public as_object {
+class NetStream_as : public as_object {
 
 protected:
 	
@@ -333,7 +333,7 @@ protected:
 	long inputPos;
 
 #ifdef GNASH_USE_GC
-	/// Mark all reachable resources of a NetStream, for the GC
+	/// Mark all reachable resources of a NetStream_as, for the GC
 	//
 	/// Reachable resources are:
 	///	- associated NetConnection object (_netCon)
@@ -363,9 +363,9 @@ typedef std::deque<raw_mediadata_t*> AudioQueue;
 	  pauseModeUnPause = 1	
 	};
 
-	NetStream();
+	NetStream_as();
 
-	~NetStream();
+	~NetStream_as();
 
 	/// Closes the video session and frees all ressources used for decoding
 	/// except the FLV-parser (this might not be correct).

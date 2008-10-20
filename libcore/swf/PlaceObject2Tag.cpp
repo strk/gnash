@@ -67,7 +67,7 @@ PlaceObject2Tag::readPlaceObject(SWFStream& in)
             log_parse(_("  PLACEOBJECT: depth=%d(%d) char=%d"),
             	m_depth, m_depth - character::staticDepthOffset,
             	m_character_id);
-            if (hasMatrix()) log_parse("  matrix: %s", m_matrix);
+            if (hasMatrix()) log_parse("  SWFMatrix: %s", m_matrix);
             if (hasCxform()) log_parse(_("  cxform: %s"), m_color_transform);
     );
 
@@ -301,7 +301,7 @@ PlaceObject2Tag::readPlaceObject2(SWFStream& in)
         if ( hasCharacter() ) log_parse(_("  char id = %d"), m_character_id);
         if ( hasMatrix() )
         {
-            log_parse(_("  matrix: %s"), m_matrix);
+            log_parse(_("  SWFMatrix: %s"), m_matrix);
         }
         if ( hasCxform() )
         {
@@ -327,7 +327,7 @@ PlaceObject2Tag::readPlaceObject3(SWFStream& in)
     // PlaceObject2 specific flags
     m_has_flags2 = in.read_u8();
 
-    // PlaceObject3 specific flags, first 3 bits are unused
+    // PlaceObject3 speckfic flags, first 3 bits are unused
     m_has_flags3 = in.read_u8();
     
     boost::uint8_t blend_mode = 0;
@@ -393,7 +393,7 @@ PlaceObject2Tag::readPlaceObject3(SWFStream& in)
     IF_VERBOSE_PARSE
     (
         if ( hasMatrix() ) {
-            log_parse("   matrix: %s", m_matrix);
+            log_parse("   SWFMatrix: %s", m_matrix);
     }
         if ( hasCxform() ) {
             log_parse("   cxform: %s", m_color_transform);
@@ -459,7 +459,7 @@ PlaceObject2Tag::readPlaceObject3(SWFStream& in)
         if ( hasCharacter() ) log_parse(_("  char id = %d"), m_character_id);
         if ( hasMatrix() )
         {
-            log_parse(_("  matrix: %s"), m_matrix);
+            log_parse(_("  SWFMatrix: %s"), m_matrix);
         }
         if ( hasCxform() )
         {

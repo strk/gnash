@@ -41,15 +41,15 @@ namespace gnash {
 
 namespace gnash {
 
-/// The SWF matrix record.
+/// The SWF SWFMatrix record.
 /// 
-/// Conceptually, it represents a 3*3 linear transformation matrix like this:
+/// Conceptually, it represents a 3*3 linear transformation SWFMatrix like this:
 /// 
 ///   | scale_x       rotateSkew_y  translate_x |
 ///   | rotateSkey_x  scale_y       traslate_y  |
 ///   | 0             0             1           |
 /// 
-class DSOEXPORT matrix
+class DSOEXPORT SWFMatrix
 {
 public:
 
@@ -71,16 +71,16 @@ public:
     /// Ytranslation, TWIPS. y0 in swfdec. 'ty' in AS Matrix.
     int ty; 
              
-    friend bool operator== (const matrix&, const matrix&);
-    friend std::ostream& operator<< (std::ostream&, const matrix&);
+    friend bool operator== (const SWFMatrix&, const SWFMatrix&);
+    friend std::ostream& operator<< (std::ostream&, const SWFMatrix&);
     
     /// Defaults to identity
-    matrix();
+    SWFMatrix();
 
-    /// Check validity of the matrix values
+    /// Check validity of the SWFMatrix values
     bool    is_valid() const;
 
-    /// Set the matrix to identity.
+    /// Set the SWFMatrix to identity.
     void    set_identity();
 
     /// Concatenate m's transform onto ours. 
@@ -88,26 +88,26 @@ public:
     /// When transforming points, m happens first,
     /// then our original xform.
     ///
-    void    concatenate(const matrix& m);
+    void    concatenate(const SWFMatrix& m);
 
-    /// Concatenate a translation onto the front of our matrix.
+    /// Concatenate a translation onto the front of our SWFMatrix.
     //
     /// When transforming points, the translation
     /// happens first, then our original xform.
     ///
     void    concatenate_translation(int tx, int ty);
 
-    /// Concatenate scale x and y to the front of our matrix 
+    /// Concatenate scale x and y to the front of our SWFMatrix 
     //
     /// When transforming points, these scales happen first, then
-    /// our original matrix. 
+    /// our original SWFMatrix. 
     /// 
     void    concatenate_scale(double x, double y);
 
-    /// Set this matrix to a blend of m1 and m2, parameterized by t.
-    void    set_lerp(const matrix& m1, const matrix& m2, float t);
+    /// Set this SWFMatrix to a blend of m1 and m2, parameterized by t.
+    void    set_lerp(const SWFMatrix& m1, const SWFMatrix& m2, float t);
 
-    /// Set the scale & rotation part of the matrix. angle in radians.
+    /// Set the scale & rotation part of the SWFMatrix. angle in radians.
     void    set_scale_rotation(double x_scale, double y_scale, double rotation);
 
     /// Set x and y scales, rotation is unchanged.
@@ -144,7 +144,7 @@ public:
     /// Initialize from the SWF input stream.
     void    read(SWFStream& in);
 
-    /// Transform a given point by our matrix
+    /// Transform a given point by our SWFMatrix
     void    transform(geometry::Point2d& p) const
     {
         boost::int32_t t0 = Fixed16Mul(sx, p.x) + Fixed16Mul(shy, p.y) + tx;
@@ -153,7 +153,7 @@ public:
         p.y = t1;
     }
 
-    /// Transform the given point by our matrix.
+    /// Transform the given point by our SWFMatrix.
     void    transform(boost::int32_t& x, boost::int32_t& y) const
     {
         boost::int32_t  t0 = Fixed16Mul(sx, x) + Fixed16Mul(shy, y) + tx;
@@ -162,13 +162,13 @@ public:
         y = t1;
     }
     
-    /// Transform point 'p' by our matrix. 
+    /// Transform point 'p' by our SWFMatrix. 
     //
     /// Put the result in *result.
     ///
     void    transform(point* result, const point& p) const;
 
-    /// Transform Range2d<float> 'r' by our matrix. 
+    /// Transform Range2d<float> 'r' by our SWFMatrix. 
     //
     /// NULL and WORLD ranges are untouched.
     ///
@@ -176,8 +176,8 @@ public:
 
     void    transform(rect& r) const;
     
-    /// Invert this matrix and return the result.
-    const matrix& invert();
+    /// Invert this SWFMatrix and return the result.
+    const SWFMatrix& invert();
     
     /// return the magnitude scale of our x coord output
     double   get_x_scale() const;
@@ -201,7 +201,7 @@ public:
     }
 
 private: 
-    /// Return the determinant of this matrix in 32.32 fixed point format.
+    /// Return the determinant of this SWFMatrix in 32.32 fixed point format.
     boost::int64_t  determinant() const;
 
     inline boost::int32_t FloatToFixed16(float a)
@@ -242,9 +242,9 @@ private:
 #endif
     }
 
-}; //end of matrix
+}; //end of SWFMatrix
 
-inline bool operator== (const matrix& a, const matrix& b)
+inline bool operator== (const SWFMatrix& a, const SWFMatrix& b)
 {
     return  
         a.sx  == b.sx  &&

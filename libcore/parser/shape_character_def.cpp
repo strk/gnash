@@ -583,7 +583,7 @@ shape_character_def::read(SWFStream& in, int tag_type, bool with_style,
     }
 
     static void debug_display_shape_paths(
-        const matrix& mat,
+        const SWFMatrix& mat,
         float /* object_space_max_error */,
         const std::vector<path>& paths,
         const std::vector<fill_style>& /* fill_styles */,
@@ -598,7 +598,7 @@ shape_character_def::read(SWFStream& in, int tag_type, bool with_style,
                 continue;
             }
 
-            gnash::render::set_matrix(mat);
+            gnash::render::setMatrix(mat);
 
             // Color the line according to which side has
             // fills.
@@ -677,7 +677,7 @@ shape_character_def::read(SWFStream& in, int tag_type, bool with_style,
 #endif  // DEBUG_DISPLAY_SHAPE_PATHS
 
     void  shape_character_def::display(
-        const matrix& mat,
+        const SWFMatrix& mat,
         const cxform& cx,
         const std::vector<fill_style>& fill_styles,
         const std::vector<line_style>& line_styles) const
@@ -785,7 +785,7 @@ shape_character_def::read(SWFStream& in, int tag_type, bool with_style,
         return count;
     }
 
-    bool  shape_character_def::point_test_local(boost::int32_t x, boost::int32_t y, matrix& wm)
+    bool  shape_character_def::point_test_local(boost::int32_t x, boost::int32_t y, SWFMatrix& wm)
     {
         /*
         Principle:
@@ -862,7 +862,7 @@ shape_character_def::read(SWFStream& in, int tag_type, bool with_style,
                 }
                 else if ( (!ls.scaleThicknessVertically()) && (!ls.scaleThicknessHorizontally()) )
                 {
-                    // TODO: pass the matrix to withinSquareDistance instead ?
+                    // TODO: pass the SWFMatrix to withinSquareDistance instead ?
                     double xScale = wm.get_x_scale();
                     double yScale = wm.get_y_scale();
 			//log_debug("thickness:%d, xScale:%g, yScale:%g", thickness, xScale, yScale);

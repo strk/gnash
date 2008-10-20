@@ -52,28 +52,28 @@ libgnashasobjs_la_SOURCES = \
 	Date.cpp \
 	Error_as.cpp \
 	Global.cpp \
-	Key.cpp	\
+	Key_as.cpp	\
 	LoadVars_as.cpp \
 	LocalConnection.cpp\
 	Math_as.cpp \
 	Microphone.cpp	\
 	Mouse.cpp \
 	NetConnection.cpp \
-	NetStream.cpp \
+	NetStream_as.cpp \
 	Number.cpp \
 	Object.cpp \
 	Selection.cpp \
 	SharedObject.cpp\
 	Sound.cpp \
-	Stage.cpp \
+	Stage_as.cpp \
 	System_as.cpp \
 	TextFormat.cpp \
-	TextSnapshot.cpp \
+	TextSnapshot_as.cpp \
 	MovieClipLoader.cpp\
 	String_as.cpp \
 	XML_as.cpp \
 	xmlattrs.cpp \
-	xmlnode.cpp \
+	XMLNode_as.cpp \
 	XMLSocket_as.cpp \
 	flash/display/BitmapData_as.cpp \
 	flash/display_pkg.cpp \
@@ -118,29 +118,29 @@ noinst_HEADERS = \
 	Error_as.h	\
 	Math_as.h	\
 	Global.h\
-	Key.h \
+	Key_as.h \
 	LoadVars_as.h \
 	LocalConnection.h\
 	Microphone.h \
 	Mouse.h	\
 	MovieClipLoader.h \
 	NetConnection.h	\
-	NetStream.h \
+	NetStream_as.h \
 	Number.h \
 	Object.h \
 	prophelper.h \
 	Selection.h \
 	SharedObject.h \
 	Sound.h \
-	Stage.h	\
+	Stage_as.h	\
 	System_as.h \
 	TextFormat.h \
-	TextSnapshot.h \
+	TextSnapshot_as.h \
 	String_as.h \
 	XML_as.h \
 	XMLSocket_as.h \
 	xmlattrs.h \
-	xmlnode.h \
+	XMLNode_as.h \
 	flash/display/BitmapData_as.h \
 	flash/display_pkg.h \
 	flash/external/ExternalInterface_as.h \

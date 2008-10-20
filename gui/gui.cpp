@@ -366,7 +366,8 @@ Gui::updateStageMatrix()
 		}
 	}
 
-	//log_debug("updateStageMatrix: scaleMode:%d, valign:%d, halign:%d", scaleMode, valign, halign);
+	//log_debug("updateStageMatrix: scaleMode:%d, valign:%d, halign:%d",
+	//scaleMode, valign, halign);
 
 	// TODO: have a generic set_matrix ?
 	if ( _renderer ) {
@@ -375,7 +376,8 @@ Gui::updateStageMatrix()
 	}
 	else
 	{
-		//log_debug("updateStageMatrix: could not signal updated stage matrix to renderer (no renderer registered)");
+		//log_debug("updateStageMatrix: could not signal updated stage
+		//matrix to renderer (no renderer registered)");
 	}
 
 	// trigger redraw
@@ -810,7 +812,7 @@ Gui::display(movie_root* m)
 				corners[2].y = ymax;
 				corners[3].x = xmin;
 				corners[3].y = ymax;
-				matrix no_transform;
+				SWFMatrix no_transform;
 				gnash::render::draw_poly(corners, 4,
 					rgba(0,0,0,0), rgba(255,0,0,255), no_transform, false);
 					

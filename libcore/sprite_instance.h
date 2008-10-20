@@ -373,8 +373,8 @@ public:
     /// if false, the cxform of the new character will be untouched.
     ///
     /// @use_old_matrix
-    /// if true, the transformation matrix of the new character will be set to the old one.
-    /// if false, the transformation matrix of the new character will be untouched.
+    /// if true, the transformation SWFMatrix of the new character will be set to the old one.
+    /// if false, the transformation SWFMatrix of the new character will be untouched.
     ///
     void replace_display_object(character* ch,  int depth,
         bool use_old_cxform,
@@ -666,12 +666,12 @@ public:
         _drawable->beginFill(color);
     }
 
-    void beginLinearGradientFill(const std::vector<gradient_record>& grad, const matrix& mat)
+    void beginLinearGradientFill(const std::vector<gradient_record>& grad, const SWFMatrix& mat)
     {
         _drawable->beginLinearGradientFill(grad, mat);
     }
 
-    void beginRadialGradientFill(const std::vector<gradient_record>& grad, const matrix& mat)
+    void beginRadialGradientFill(const std::vector<gradient_record>& grad, const SWFMatrix& mat)
     {
         _drawable->beginRadialGradientFill(grad, mat);
     }

@@ -1,4 +1,4 @@
-// xmlnode.cpp:  ActionScript "XMLNode" class, for Gnash.
+// XMLNode_as.cpp:  ActionScript "XMLNode" class, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
@@ -21,7 +21,7 @@
 #include "fn_call.h"
 #include "builtin_function.h"
 #include "array.h" // for childNodes
-#include "xmlnode.h"
+#include "XMLNode_as.h"
 #include "log.h"
 #include "Object.h" // for getObjectInterface
 #include "VM.h" // for getting the string_table..
@@ -46,28 +46,28 @@
 
 namespace gnash {
 
-static as_value xmlnode_new(const fn_call& fn);
-static as_value xmlnode_nodename(const fn_call& fn);
-static as_value xmlnode_nodevalue(const fn_call& fn);
-static as_value xmlnode_nodetype(const fn_call& fn);
-static as_value xmlnode_attributes(const fn_call& fn);
-static as_value xmlnode_appendchild(const fn_call& fn);
-static as_value xmlnode_clonenode(const fn_call& fn);
-static as_value xmlnode_haschildnodes(const fn_call& fn);
-static as_value xmlnode_insertbefore(const fn_call& fn);
-static as_value xmlnode_removenode(const fn_call& fn);
-static as_value xmlnode_tostring(const fn_call& fn);
-static as_value xmlnode_firstchild(const fn_call& fn);
-static as_value xmlnode_lastchild(const fn_call& fn);
-static as_value xmlnode_nextsibling(const fn_call& fn);
-static as_value xmlnode_previoussibling(const fn_call& fn);
-static as_value xmlnode_childNodes(const fn_call& fn);
-static as_value xmlnode_parentNode(const fn_call& fn);
-static as_value xmlnode_getPrefixForNamespace(const fn_call& fn);
-static as_value xmlnode_getNamespaceForPrefix(const fn_call& fn);
-static as_value xmlnode_namespaceURI(const fn_call& fn);
-static as_value xmlnode_localName(const fn_call& fn);
-static as_value xmlnode_prefix(const fn_call& fn);
+static as_value XMLNode_new(const fn_call& fn);
+static as_value XMLNode_nodename(const fn_call& fn);
+static as_value XMLNode_node_value(const fn_call& fn);
+static as_value XMLNode_nodetype(const fn_call& fn);
+static as_value XMLNode_attributes(const fn_call& fn);
+static as_value XMLNode_appendchild(const fn_call& fn);
+static as_value XMLNode_clonenode(const fn_call& fn);
+static as_value XMLNode_haschildnodes(const fn_call& fn);
+static as_value XMLNode_insertbefore(const fn_call& fn);
+static as_value XMLNode_removenode(const fn_call& fn);
+static as_value XMLNode_tostring(const fn_call& fn);
+static as_value XMLNode_firstchild(const fn_call& fn);
+static as_value XMLNode_lastchild(const fn_call& fn);
+static as_value XMLNode_nextsibling(const fn_call& fn);
+static as_value XMLNode_previoussibling(const fn_call& fn);
+static as_value XMLNode_childNodes(const fn_call& fn);
+static as_value XMLNode_parentNode(const fn_call& fn);
+static as_value XMLNode_getPrefixForNamespace(const fn_call& fn);
+static as_value XMLNode_getNamespaceForPrefix(const fn_call& fn);
+static as_value XMLNode_namespaceURI(const fn_call& fn);
+static as_value XMLNode_localName(const fn_call& fn);
+static as_value XMLNode_prefix(const fn_call& fn);
 
 as_object* getXMLNodeInterface();
 
@@ -108,7 +108,7 @@ XMLNode::~XMLNode()
 {
     //log_debug("%s: %p", __PRETTY_FUNCTION__, this);
 #ifdef DEBUG_MEMORY_ALLOCATION
-    log_debug(_("\tDeleting XMLNode data %s with value %s at %p"), this->_name.c_str(), this->_value.c_str(), this);
+    log_debug(_("\tDeleting XMLNode data %s with as_value %s at %p"), this->_name.c_str(), this->as_value.c_str(), this);
 #endif
 }
 
@@ -276,14 +276,14 @@ void
 XMLNode::stringify(const XMLNode& xml, std::ostream& xmlout, bool encode) 
 {
 
-    const std::string& nodevalue = xml.nodeValue();
+    const std::string& node_value = xml.nodeValue();
     const std::string& nodename = xml.nodeName();
     NodeType type = xml.nodeType();
 
 
 #ifdef GNASH_DEBUG
-    log_debug(_("Stringifying node %p with name %s, value %s, %u attributes and %u children"),
-                    (void*)&xml, nodename, nodevalue, xml._attributes.size(), xml._children.size());
+    log_debug(_("Stringifying node %p with name %s, as_value %s, %u attributes and %u children"),
+                    (void*)&xml, nodename, node_value, xml._attributes.size(), xml._children.size());
 #endif
 
     // Create the beginning of the tag
@@ -300,7 +300,7 @@ XMLNode::stringify(const XMLNode& xml, std::ostream& xmlout, bool encode)
         }
 
     	// If the node has no content, just close the tag now
-    	if ( nodevalue.empty() && xml._children.empty() )
+    	if ( node_value.empty() && xml._children.empty() )
     	{
     		xmlout << " />";
 		return;
@@ -313,13 +313,13 @@ XMLNode::stringify(const XMLNode& xml, std::ostream& xmlout, bool encode)
 
     }
 
-    // Node value first, then children
+    // Node as_value first, then children
     if ( type == tText )
     {
-	    encode ? xmlout << URL::encode(nodevalue) : xmlout << nodevalue;
+	    encode ? xmlout << URL::encode(node_value) : xmlout << node_value;
     }
 
-    // Childs, after node value.
+    // Childs, after node as_value.
     ChildList::const_iterator itx;
     for (itx = xml._children.begin(); itx != xml._children.end(); itx++)
     {
@@ -340,33 +340,33 @@ attachXMLNodeInterface(as_object& o)
     const int noFlags = 0;
     
     // No prop flags:
-    o.init_member("appendChild", new builtin_function(xmlnode_appendchild), noFlags);
-    o.init_member("cloneNode", new builtin_function(xmlnode_clonenode), noFlags);
-    o.init_member("hasChildNodes", new builtin_function(xmlnode_haschildnodes), noFlags);
-    o.init_member("insertBefore", new builtin_function(xmlnode_insertbefore), noFlags);
-    o.init_member("removeNode", new builtin_function(xmlnode_removenode), noFlags);
-    o.init_member("toString", new builtin_function(xmlnode_tostring), noFlags);
-    o.init_member("getPrefixForNamespace", new builtin_function(xmlnode_getPrefixForNamespace), noFlags);
-    o.init_member("getNamespaceForPrefix", new builtin_function(xmlnode_getNamespaceForPrefix), noFlags);
+    o.init_member("appendChild", new builtin_function(XMLNode_appendchild), noFlags);
+    o.init_member("cloneNode", new builtin_function(XMLNode_clonenode), noFlags);
+    o.init_member("hasChildNodes", new builtin_function(XMLNode_haschildnodes), noFlags);
+    o.init_member("insertBefore", new builtin_function(XMLNode_insertbefore), noFlags);
+    o.init_member("removeNode", new builtin_function(XMLNode_removenode), noFlags);
+    o.init_member("toString", new builtin_function(XMLNode_tostring), noFlags);
+    o.init_member("getPrefixForNamespace", new builtin_function(XMLNode_getPrefixForNamespace), noFlags);
+    o.init_member("getNamespaceForPrefix", new builtin_function(XMLNode_getNamespaceForPrefix), noFlags);
 
 
     const int protectedFlags = as_prop_flags::isProtected;
 
     // Just the protected flag:
-    o.init_property("nodeValue", &xmlnode_nodevalue, &xmlnode_nodevalue, protectedFlags);
-    o.init_property("nodeName", &xmlnode_nodename, &xmlnode_nodename, protectedFlags);
+    o.init_property("nodeValue", &XMLNode_node_value, &XMLNode_node_value, protectedFlags);
+    o.init_property("nodeName", &XMLNode_nodename, &XMLNode_nodename, protectedFlags);
 
-    o.init_readonly_property("firstChild", &xmlnode_firstchild, protectedFlags);
-    o.init_readonly_property("lastChild", &xmlnode_lastchild, protectedFlags);
-    o.init_readonly_property("localName", &xmlnode_localName, protectedFlags);
-    o.init_readonly_property("namespaceURI", &xmlnode_namespaceURI, protectedFlags);
-    o.init_readonly_property("nextSibling", &xmlnode_nextsibling, protectedFlags);
-    o.init_readonly_property("prefix", &xmlnode_prefix, protectedFlags);
-    o.init_readonly_property("previousSibling", &xmlnode_previoussibling, protectedFlags);
-    o.init_readonly_property("nodeType", &xmlnode_nodetype, protectedFlags);
-    o.init_readonly_property("attributes", &xmlnode_attributes, protectedFlags);
-    o.init_readonly_property("childNodes", &xmlnode_childNodes, protectedFlags);
-    o.init_readonly_property("parentNode", &xmlnode_parentNode, protectedFlags);
+    o.init_readonly_property("firstChild", &XMLNode_firstchild, protectedFlags);
+    o.init_readonly_property("lastChild", &XMLNode_lastchild, protectedFlags);
+    o.init_readonly_property("localName", &XMLNode_localName, protectedFlags);
+    o.init_readonly_property("namespaceURI", &XMLNode_namespaceURI, protectedFlags);
+    o.init_readonly_property("nextSibling", &XMLNode_nextsibling, protectedFlags);
+    o.init_readonly_property("prefix", &XMLNode_prefix, protectedFlags);
+    o.init_readonly_property("previousSibling", &XMLNode_previoussibling, protectedFlags);
+    o.init_readonly_property("nodeType", &XMLNode_nodetype, protectedFlags);
+    o.init_readonly_property("attributes", &XMLNode_attributes, protectedFlags);
+    o.init_readonly_property("childNodes", &XMLNode_childNodes, protectedFlags);
+    o.init_readonly_property("parentNode", &XMLNode_parentNode, protectedFlags);
 
 }
 
@@ -383,7 +383,7 @@ getXMLNodeInterface()
 }
 
 static as_value
-xmlnode_new(const fn_call& fn)
+XMLNode_new(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     
@@ -401,7 +401,7 @@ xmlnode_new(const fn_call& fn)
 }
 
 static as_value
-xmlnode_appendchild(const fn_call& fn)
+XMLNode_appendchild(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
 
@@ -430,7 +430,7 @@ xmlnode_appendchild(const fn_call& fn)
 }
 
 static as_value
-xmlnode_clonenode(const fn_call& fn)
+XMLNode_clonenode(const fn_call& fn)
 {
     //GNASH_REPORT_FUNCTION;
 //    log_debug("%s: %d args", __PRETTY_FUNCTION__, fn.nargs);
@@ -444,7 +444,7 @@ xmlnode_clonenode(const fn_call& fn)
 }
 
 static as_value
-xmlnode_insertbefore(const fn_call& fn)
+XMLNode_insertbefore(const fn_call& fn)
 {
 	//GNASH_REPORT_FUNCTION;
 	boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
@@ -491,7 +491,7 @@ xmlnode_insertbefore(const fn_call& fn)
 
 
 as_value
-xmlnode_getNamespaceForPrefix(const fn_call& fn)
+XMLNode_getNamespaceForPrefix(const fn_call& fn)
 {
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
     log_unimpl("XMLNode.getNamespaceForPrefix");
@@ -500,7 +500,7 @@ xmlnode_getNamespaceForPrefix(const fn_call& fn)
 
 
 as_value
-xmlnode_getPrefixForNamespace(const fn_call& fn)
+XMLNode_getPrefixForNamespace(const fn_call& fn)
 {
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
     log_unimpl("XMLNode.getPrefixForNamespace");
@@ -509,7 +509,7 @@ xmlnode_getPrefixForNamespace(const fn_call& fn)
 
 
 as_value
-xmlnode_namespaceURI(const fn_call& fn)
+XMLNode_namespaceURI(const fn_call& fn)
 {
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
 
@@ -530,7 +530,7 @@ xmlnode_namespaceURI(const fn_call& fn)
 
 
 as_value
-xmlnode_prefix(const fn_call& fn)
+XMLNode_prefix(const fn_call& fn)
 {
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
 
@@ -551,7 +551,7 @@ xmlnode_prefix(const fn_call& fn)
 
 
 as_value
-xmlnode_localName(const fn_call& fn)
+XMLNode_localName(const fn_call& fn)
 {
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
 
@@ -572,7 +572,7 @@ xmlnode_localName(const fn_call& fn)
 
 
 as_value
-xmlnode_removenode(const fn_call& fn)
+XMLNode_removenode(const fn_call& fn)
 {
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
     
@@ -583,7 +583,7 @@ xmlnode_removenode(const fn_call& fn)
 
 // TODO: shouldn't overriding get_text_value() be fine ?
 as_value
-xmlnode_tostring(const fn_call& fn)
+XMLNode_tostring(const fn_call& fn)
 {
     //GNASH_REPORT_FUNCTION;
     
@@ -591,26 +591,25 @@ xmlnode_tostring(const fn_call& fn)
     
     std::stringstream ss;
     ptr->toString(ss);
-    //log_debug("Stringstream: %s", ss.str().c_str());
 
     return as_value(ss.str());
 }
 
 as_value
-xmlnode_haschildnodes(const fn_call& fn)
+XMLNode_haschildnodes(const fn_call& fn)
 {
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
     return as_value(ptr->hasChildNodes());
 }
 
 as_value
-xmlnode_nodevalue(const fn_call& fn)
+XMLNode_node_value(const fn_call& fn)
 {
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
     as_value rv;
     rv.set_null();
     
-    //log_debug("xmlnode_nodevalue called with %d args against 'this' = %p", fn.nargs, ptr);
+    //log_debug("XMLNode_node_value called with %d args against 'this' = %p", fn.nargs, ptr);
     if ( fn.nargs == 0 )
     {
 	    //log_debug("  nodeValue() returns '%s'", ptr->nodeValue().c_str());
@@ -625,7 +624,7 @@ xmlnode_nodevalue(const fn_call& fn)
 }
 
 as_value
-xmlnode_nodename(const fn_call& fn)
+XMLNode_nodename(const fn_call& fn)
 {
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
     as_value rv;
@@ -643,7 +642,7 @@ xmlnode_nodename(const fn_call& fn)
 }
 
 as_value
-xmlnode_nodetype(const fn_call& fn)
+XMLNode_nodetype(const fn_call& fn)
 {
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
     return as_value(ptr->nodeType());
@@ -651,7 +650,7 @@ xmlnode_nodetype(const fn_call& fn)
 
 
 as_value
-xmlnode_attributes(const fn_call& fn)
+XMLNode_attributes(const fn_call& fn)
 {
     
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
@@ -687,7 +686,7 @@ xmlnode_attributes(const fn_call& fn)
 /// and removeNode() methods to manipulate child nodes. 
 ///
 as_value
-xmlnode_firstchild(const fn_call& fn)
+XMLNode_firstchild(const fn_call& fn)
 {
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
     as_value rv;
@@ -701,14 +700,14 @@ xmlnode_firstchild(const fn_call& fn)
     return rv;
 }
 
-/// Read-only property; an XMLNode value that references the last
+/// Read-only property; an XMLNode as_value that references the last
 /// child in the node's child list. The XML.lastChild property
 /// is null if the node does not have children. This property cannot
 /// be used to manipulate child nodes; use the appendChild(),
 /// insertBefore(), and removeNode() methods to manipulate child
 /// nodes.
 as_value
-xmlnode_lastchild(const fn_call& fn)
+XMLNode_lastchild(const fn_call& fn)
 {
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
     as_value rv;
@@ -722,7 +721,7 @@ xmlnode_lastchild(const fn_call& fn)
 
 
 as_value
-xmlnode_nextsibling(const fn_call& fn)
+XMLNode_nextsibling(const fn_call& fn)
 {
     as_value rv;
     rv.set_null();
@@ -736,7 +735,7 @@ xmlnode_nextsibling(const fn_call& fn)
 }
 
 as_value
-xmlnode_previoussibling(const fn_call& fn)
+XMLNode_previoussibling(const fn_call& fn)
 {
     as_value rv;
     rv.set_null();
@@ -750,7 +749,7 @@ xmlnode_previoussibling(const fn_call& fn)
 }
 
 as_value
-xmlnode_parentNode(const fn_call& fn)
+XMLNode_parentNode(const fn_call& fn)
 {
     as_value rv;
     rv.set_null();
@@ -765,7 +764,7 @@ xmlnode_parentNode(const fn_call& fn)
 
 
 as_value
-xmlnode_childNodes(const fn_call& fn)
+XMLNode_childNodes(const fn_call& fn)
 {
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
     boost::intrusive_ptr<Array_as> ary = new Array_as();
@@ -783,14 +782,14 @@ xmlnode_childNodes(const fn_call& fn)
     return as_value(ary.get());
 }
 
-void xmlnode_class_init(as_object& global)
+void XMLNode_class_init(as_object& global)
 {
     // This is the global XMLNode "class"
     static boost::intrusive_ptr<builtin_function> cl;
 
     if ( cl == NULL )
     {
-        cl=new builtin_function(&xmlnode_new, getXMLNodeInterface());
+        cl=new builtin_function(&XMLNode_new, getXMLNodeInterface());
     }
 
     global.init_member("XMLNode", cl.get());

@@ -50,8 +50,8 @@ BitmapMovieDefinition::getShapeDef()
 
 	// Add the bitmap fill style (fill style 0)
 
-	matrix mat;
-	mat.set_scale(1.0/20, 1.0/20); // bitmap fills get matrix reversed
+	SWFMatrix mat;
+	mat.set_scale(1.0/20, 1.0/20); // bitmap fills get SWFMatrix reversed
 	fill_style bmFill(_bitmap.get(), mat);
 	const size_t fillLeft = _shapedef->add_fill_style(bmFill);
 

@@ -44,7 +44,7 @@ class text_character_def : public character_def
 {
 public:
 	rect	m_rect;
-	matrix	m_matrix;
+	SWFMatrix	m_matrix;
 	std::vector<text_glyph_record>	m_text_glyph_records;
 
 	text_character_def() {}

@@ -44,7 +44,7 @@ PathParser::PathParser(const std::vector<path>& paths, size_t numstyles)
 {}
 
 void
-PathParser::run(const cxform& cx, const matrix& mat)
+PathParser::run(const cxform& cx, const SWFMatrix& mat)
 {
   // Since we frequently remove an element from the front or the back, we use
   // a double ended queue here.
