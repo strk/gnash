@@ -20,7 +20,6 @@
 #include "SWFStream.h"
 
 #include "log.h"
-#include "types.h"
 #include "IOChannel.h"
 #include "swf.h"
 #include "Property.h"

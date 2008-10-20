@@ -10,7 +10,7 @@
 #define GNASH_STYLES_H
 
 #include "impl.h"
-#include "types.h"
+#include "RGBA.h"
 #include "bitmap_character_def.h"
 #include "fill_style.h"
 

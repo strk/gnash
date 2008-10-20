@@ -106,7 +106,7 @@ libgnashcore_la_SOURCES = \
 	styles.cpp \
 	text.cpp \
 	timers.cpp \
-	types.cpp 	\
+	RGBA.cpp 	\
 	$(FREETYPE_SOURCES) \
 	$(NULL)
 
@@ -190,7 +190,7 @@ noinst_HEADERS = \
 	swf_function.h \
 	text.h \
 	timers.h \
-	types.h	\
+	RGBA.h	\
 	video_stream_instance.h \
 	$(NULL)
 

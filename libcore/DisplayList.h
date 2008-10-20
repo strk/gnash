@@ -20,7 +20,6 @@
 #ifndef GNASH_DLIST_H
 #define GNASH_DLIST_H
 
-#include "types.h"
 #include "impl.h"
 #include "snappingrange.h"
 #include "character.h"

@@ -27,7 +27,7 @@
 #include "sprite_instance.h" // for inlines (execute)
 #include "movie_definition.h" // for inlines (loader)
 #include "log.h" // for log_parse
-#include "types.h" // for rgba class
+#include "RGBA.h" // for rgba class
 #include "utility.h" // for frnd
 
 // Forward declarations
