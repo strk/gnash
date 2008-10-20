@@ -542,10 +542,9 @@ movie_root::getKeyObject()
 		// TODO: use a named string...
 
 		as_value kval;
-		as_object* global = VM::get().getGlobal();
+		as_object* global = _vm.getGlobal();
 
-		std::string objName = PROPNAME("Key");
-		if (global->get_member(_vm.getStringTable().find(objName), &kval) )
+		if (global->get_member(NSV::CLASS_KEY, &kval) )
 		{
 			//log_debug("Found member 'Key' in _global: %s", kval.to_string());
 			boost::intrusive_ptr<as_object> obj = kval.to_object();
@@ -567,8 +566,7 @@ movie_root::getMouseObject()
 		as_value val;
 		as_object* global = _vm.getGlobal();
 
-		std::string objName = PROPNAME("Mouse");
-		if (global->get_member(_vm.getStringTable().find(objName), &val) )
+		if (global->get_member(NSV::CLASS_MOUSE, &val) )
 		{
 			//log_debug("Found member 'Mouse' in _global: %s", val);
 			_mouseobject = val.to_object();
@@ -596,7 +594,8 @@ movie_root::notify_global_key(key::code k, bool down)
 	}
 	else
 	{
-		log_error("gnash::notify_key_event(): _global.Key doesn't exist, or isn't the expected built-in");
+		log_error("gnash::notify_key_event(): _global.Key doesn't "
+				"exist, or isn't the expected built-in");
 	}
 
 	return _keyobject.get();
@@ -1697,7 +1696,7 @@ movie_root::executeTimers()
         log_debug("Checking %d timers for expiration", _intervalTimers.size());
 #endif
 
-	unsigned long now = VM::get().getTime();
+	unsigned long now = _vm.getTime();
 
 	typedef std::multimap<unsigned int, Timer*> ExpiredTimers;
 	ExpiredTimers expiredTimers;
@@ -2113,7 +2112,7 @@ movie_root::processLoadMovieRequests()
 bool
 movie_root::isLevelTarget(const std::string& name, unsigned int& levelno)
 {
-  if ( VM::get().getSWFVersion() > 6 )
+  if ( _vm.getSWFVersion() > 6 )
   {
     if ( name.compare(0, 6, "_level") ) return false;
   }

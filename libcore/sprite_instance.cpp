@@ -392,7 +392,8 @@ static as_value sprite_get_depth(const fn_call& fn)
 }
 
 //swapDepths(target:Object|target:Number) : Void
-static as_value sprite_swap_depths(const fn_call& fn)
+static as_value
+sprite_swap_depths(const fn_call& fn)
 {
   typedef boost::intrusive_ptr<sprite_instance> SpritePtr;
   typedef boost::intrusive_ptr<character> CharPtr;
@@ -511,7 +512,7 @@ static as_value sprite_swap_depths(const fn_call& fn)
   }
   else
   {
-    movie_root& root = VM::get().getRoot();
+    movie_root& root = sprite->getVM().getRoot();
     root.swapLevels(sprite, target_depth);
     return rv;
   }
@@ -941,7 +942,7 @@ sprite_create_text_field(const fn_call& fn)
       txt_depth, txt_x, txt_y, txt_width, txt_height);
 
   // createTextField returns void, it seems
-  if ( VM::get().getSWFVersion() > 7 ) return as_value(txt.get());
+  if ( sprite->getVM().getSWFVersion() > 7 ) return as_value(txt.get());
   else return as_value(); 
 }
 
@@ -1983,7 +1984,7 @@ sprite_startDrag(const fn_call& fn)
         }
     }
 
-    VM::get().getRoot().set_drag_state(st);
+    sprite->getVM().getRoot().set_drag_state(st);
 
     log_debug("MovieClip.startDrag() TESTING");
     return as_value();
@@ -1996,7 +1997,7 @@ sprite_stopDrag(const fn_call& fn)
   boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
   UNUSED(sprite);
 
-  VM::get().getRoot().stop_drag();
+  sprite->getVM().getRoot().stop_drag();
 
   log_debug("MovieClip.stopDrag() TESTING");
   return as_value();
@@ -3067,7 +3068,7 @@ sprite_instance::set_member(string_table::key name,
   //        property (ie: have a textfield use _x as variable name and
   //        be scared)
   //
-  TextFieldPtrVect* etc = get_textfield_variable(VM::get().getStringTable().value(name));
+  TextFieldPtrVect* etc = get_textfield_variable(_vm.getStringTable().value(name));
   if ( etc )
   {
 #ifdef DEBUG_DYNTEXT_VARIABLES
