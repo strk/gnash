@@ -43,7 +43,6 @@ namespace gnash {
 namespace media {
 
 
-
 class ExtraVideoInfoFlv : public VideoInfo::ExtraInfo
 {
 public:
@@ -82,6 +81,60 @@ public:
 		FLV_VIDEO_TAG = 0x09,
 		FLV_META_TAG = 0x12
 	};
+
+	struct FLVTag : public boost::noncopyable
+	{
+		FLVTag(boost::uint8_t* stream)
+		: type(stream[0]),
+		  body_size(getUInt24(stream+1)),
+		  timestamp(getUInt24(stream+4) | (stream[7] << 24) )
+		{}
+
+		/// Equals tagType
+		boost::uint8_t type;
+		boost::uint32_t body_size;
+		boost::uint32_t timestamp;
+	};
+
+	struct FLVAudioTag : public boost::noncopyable
+	{
+		FLVAudioTag(const boost::uint8_t& byte)
+		: codec( (byte & 0xf0) >> 4 ),
+		  samplerate( flv_audio_rates[(byte & 0x0C) >> 2] ),
+		  samplesize( 1 + ((byte & 0x02) >> 1)),
+		  stereo( (byte & 0x01) )
+		{
+		}
+
+		/// Equals audioCodecType
+		boost::uint8_t codec;
+		boost::uint16_t samplerate;
+		boost::uint8_t samplesize;
+		bool stereo;
+	private:
+		static const boost::uint16_t flv_audio_rates[];
+	};
+
+	enum frameType
+	{
+		FLV_VIDEO_KEYFRAME = 1,
+		FLV_VIDEO_INTERLACED = 2,
+		FLV_VIDEO_DISPOSABLE = 3
+	};
+
+	struct FLVVideoTag : public boost::noncopyable
+	{
+		FLVVideoTag(const boost::uint8_t& byte)
+		: frametype( (byte & 0xf0) >> 4 ),
+		  codec( byte & 0x0f )
+		{}
+
+		/// Equals frameType
+		boost::uint8_t frametype;
+		/// Equals videoCodecType
+		boost::uint8_t codec;
+	};
+
 
 
 	/// \brief
@@ -123,12 +176,11 @@ private:
 	///
 	bool parseNextTag(bool index_only);
 
-	std::auto_ptr<EncodedAudioFrame> parseAudioTag(boost::uint32_t bodyLength, boost::uint32_t timestamp, boost::uint32_t thisTagPos,
-		const boost::uint8_t* tag);
-	std::auto_ptr<EncodedVideoFrame> parseVideoTag(boost::uint32_t bodyLength, boost::uint32_t timestamp, boost::uint32_t thisTagPos,
-		const boost::uint8_t* tag);
+	std::auto_ptr<EncodedAudioFrame> parseAudioTag(const FLVTag& flvtag, const FLVAudioTag& audiotag, boost::uint32_t thisTagPos);
+	std::auto_ptr<EncodedVideoFrame> parseVideoTag(const FLVTag& flvtag, const FLVVideoTag& videotag, boost::uint32_t thisTagPos);
 
-	bool indexTag(const boost::uint8_t* tag, boost::uint32_t timestamp, boost::uint32_t thisTagPos);
+	void indexAudioTag(const FLVTag& tag, boost::uint32_t thisTagPos);
+	void indexVideoTag(const FLVTag& tag, const FLVVideoTag& videotag, boost::uint32_t thisTagPos);
 
 	/// Parses the header of the file
 	bool parseHeader();
@@ -136,7 +188,7 @@ private:
 	/// Reads three bytes in FLV (big endian) byte order.
 	/// @param in Pointer to read 3 bytes from.
 	/// @return 24-bit integer.
-	inline boost::uint32_t getUInt24(boost::uint8_t* in);
+	static boost::uint32_t getUInt24(boost::uint8_t* in);
 
 	/// The position where the parsing should continue from.
 	/// Will be reset on seek, and will be protected by the _streamMutex
