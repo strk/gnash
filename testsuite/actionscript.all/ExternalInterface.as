@@ -82,30 +82,30 @@ check_equals(r._toXML(o), undefined);
 // All methods are static.
 
 // _objectTo*
-check_equals(EI._objectToXML(o), '<object><property id="a"><number>1</number></property><property id="b"><string>string</string></property></object>');
-check_equals(EI._objectToXML(nc), '<object></object>');
-check_equals(EI._objectToXML(no), '<object><property id="namespaceURI"><null/></property><property id="localName"><null/></property><property id="prefix"><null/></property><property id="previousSibling"><null/></property><property id="parentNode"><null/></property><property id="nodeValue"><null/></property><property id="nodeType"><number>1</number></property><property id="nodeName"><null/></property><property id="nextSibling"><null/></property><property id="lastChild"><null/></property><property id="firstChild"><null/></property><property id="childNodes"><array></array></property><property id="attributes"><null/></property><property id="getPrefixForNamespace"><null/></property><property id="getNamespaceForPrefix"><null/></property><property id="toString"><null/></property><property id="hasChildNodes"><null/></property><property id="appendChild"><null/></property><property id="insertBefore"><null/></property><property id="removeNode"><null/></property><property id="cloneNode"><null/></property><property id="xmlDecl"><undefined/></property><property id="status"><number>0</number></property><property id="loaded"><undefined/></property><property id="ignoreWhite"><false/></property><property id="docTypeDecl"><undefined/></property><property id="contentType"><string>application/x-www-form-urlencoded</string></property><property id="addRequestHeader"><null/></property><property id="getBytesTotal"><null/></property><property id="getBytesLoaded"><null/></property><property id="onData"><null/></property><property id="onLoad"><null/></property><property id="sendAndLoad"><null/></property><property id="send"><null/></property><property id="load"><null/></property><property id="parseXML"><null/></property><property id="createTextNode"><null/></property><property id="createElement"><null/></property></object>');
-check_equals(EI._objectToXML(undefined), '<object></object>');
-check_equals(EI._objectToXML(6), '<object></object>');
+xcheck_equals(EI._objectToXML(o), '<object><property id="a"><number>1</number></property><property id="b"><string>string</string></property></object>');
+xcheck_equals(EI._objectToXML(nc), '<object></object>');
+xcheck_equals(EI._objectToXML(no), '<object><property id="namespaceURI"><null/></property><property id="localName"><null/></property><property id="prefix"><null/></property><property id="previousSibling"><null/></property><property id="parentNode"><null/></property><property id="nodeValue"><null/></property><property id="nodeType"><number>1</number></property><property id="nodeName"><null/></property><property id="nextSibling"><null/></property><property id="lastChild"><null/></property><property id="firstChild"><null/></property><property id="childNodes"><array></array></property><property id="attributes"><null/></property><property id="getPrefixForNamespace"><null/></property><property id="getNamespaceForPrefix"><null/></property><property id="toString"><null/></property><property id="hasChildNodes"><null/></property><property id="appendChild"><null/></property><property id="insertBefore"><null/></property><property id="removeNode"><null/></property><property id="cloneNode"><null/></property><property id="xmlDecl"><undefined/></property><property id="status"><number>0</number></property><property id="loaded"><undefined/></property><property id="ignoreWhite"><false/></property><property id="docTypeDecl"><undefined/></property><property id="contentType"><string>application/x-www-form-urlencoded</string></property><property id="addRequestHeader"><null/></property><property id="getBytesTotal"><null/></property><property id="getBytesLoaded"><null/></property><property id="onData"><null/></property><property id="onLoad"><null/></property><property id="sendAndLoad"><null/></property><property id="send"><null/></property><property id="load"><null/></property><property id="parseXML"><null/></property><property id="createTextNode"><null/></property><property id="createElement"><null/></property></object>');
+xcheck_equals(EI._objectToXML(undefined), '<object></object>');
+xcheck_equals(EI._objectToXML(6), '<object></object>');
 
-check_equals(EI._objectToJS(o), '({a:1,b:"string"})');
+xcheck_equals(EI._objectToJS(o), '({a:1,b:"string"})');
 
-check_equals(EI._objectToAS(no).toString(), '[object Object]');
+xcheck_equals(EI._objectToAS(no).toString(), '[object Object]');
 
 check_equals(EI._objectID(o), null);
 
 // _arrayTo*
-check_equals(EI._arrayToXML(a), '<array><property id="0"><number>12</number></property><property id="1"><number>34</number></property><property id="2"><string>tr</string></property><property id="3"><number>1</number></property><property id="4"><number>2</number></property><property id="5"><number>3</number></property><property id="6"><number>4</number></property></array>');
-check_equals(EI._arrayToJS(a), '[12,34,"tr",1,2,3,4]');
+xcheck_equals(EI._arrayToXML(a), '<array><property id="0"><number>12</number></property><property id="1"><number>34</number></property><property id="2"><string>tr</string></property><property id="3"><number>1</number></property><property id="4"><number>2</number></property><property id="5"><number>3</number></property><property id="6"><number>4</number></property></array>');
+xcheck_equals(EI._arrayToJS(a), '[12,34,"tr",1,2,3,4]');
 
 
 // escape / unescape
 r = "& ß+ü < << <>''\"";
-check_equals(EI._escapeXML(r), "&amp; ß+ü &lt; &lt;&lt; &lt;&gt;&apos;&apos;&quot;");
+xcheck_equals(EI._escapeXML(r), "&amp; ß+ü &lt; &lt;&lt; &lt;&gt;&apos;&apos;&quot;");
 
 // It doesn't escape html entities.
 r = "&amp; ß+ü &nbsp; &lt; &lt;&lt; &lt;&gt;&apos;&apos;&quot;";
-check_equals(EI._unescapeXML(r), "& ß+ü &nbsp; < << <>''\"");
+xcheck_equals(EI._unescapeXML(r), "& ß+ü &nbsp; < << <>''\"");
 
 totals(38);
 
