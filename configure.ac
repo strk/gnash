@@ -1889,6 +1889,10 @@ fi
 # We want warnings, lots of warnings  :-)
 # It should be possible to build with -ansi, not with
 # -pedantic because of agg.
+#
+# -ansi was actually dropped because it hides 'fileno', which
+# is used in a few places
+#
 if test x"$GCC" = x"yes"; then
   CXXFLAGS="$CXXFLAGS \
     -W \
@@ -1899,7 +1903,6 @@ if test x"$GCC" = x"yes"; then
     -Wreturn-type \
     -Wnon-virtual-dtor \
     -Wunused \
-    #-ansi \
     "
   CFLAGS="$CFLAGS \
     -W \
