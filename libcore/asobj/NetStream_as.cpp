@@ -1098,9 +1098,9 @@ NetStream_as::getDecodedVideoFrame(boost::uint32_t ts)
     		video = decodeNextVideoFrame();
 		if ( ! video.get() )
 		{
-			log_error("nextVideoFrameTimestamp returned true, "
+			log_error("nextVideoFrameTimestamp returned true (%d), "
 				"but decodeNextVideoFrame returned null, "
-				"I don't think this should ever happen");
+				"I don't think this should ever happen", nextTimestamp);
 			break;
 		}
 
@@ -1482,9 +1482,9 @@ NetStream_as::pushDecodedAudioFrames(boost::uint32_t ts)
 		raw_mediadata_t* audio = decodeNextAudioFrame();
 		if ( ! audio )
 		{
-			log_error("nextAudioFrameTimestamp returned true, "
+			log_error("nextAudioFrameTimestamp returned true (%d), "
 				"but decodeNextAudioFrame returned null, "
-				"I don't think this should ever happen");
+				"I don't think this should ever happen", nextTimestamp);
 			break;
 		}
 
