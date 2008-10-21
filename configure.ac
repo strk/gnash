@@ -2875,6 +2875,8 @@ if test x$cross_compiling = xno; then
   else
     echo "        WARNING: You need to have csound installed" >&4
     echo "                 to have real fun." >&4
+    echo "                 Install it from http://www.csounds.com/" >&4
+    echo "                 or .deb users: apt-get install csound" >&4
   fi
 
 fi
