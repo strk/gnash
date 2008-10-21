@@ -210,5 +210,19 @@ check_equals(mc.transform.matrix.toString(), "(a=1, b=0, c=0, d=1, tx=0, ty=0)")
 xcheck_equals(mcOld.transform.matrix.toString(), "(a=4, b=0.300000011920929, c=0.300000011920929, d=1, tx=1, ty=0)");
 
 
-totals(70);
+// Concatenated transform. Does this make any sense?
+
+conc1 = _root.createEmptyMovieClip("conc1", getNextHighestDepth());
+conc2 = conc1.createEmptyMovieClip("conc2", getNextHighestDepth());
+
+conc1._x = 1.5;
+conc2._x = 0.3;
+xcheck_equals(conc1.transform.concatenatedMatrix.toString(), "(a=0.993750035762787, b=0, c=0, d=0.993750035762787, tx=1.5, ty=2)");
+xcheck_equals(conc2.transform.concatenatedMatrix.toString(), "(a=0.993750035762787, b=0, c=0, d=0.993750035762787, tx=1.75, ty=2)");
+conc2._width = 3;
+conc1._height = 0.6;
+xcheck_equals(conc1.transform.concatenatedMatrix.toString(), "(a=0, b=0, c=0, d=0, tx=1.5, ty=2)");
+xcheck_equals(conc2.transform.concatenatedMatrix.toString(), "(a=0, b=0, c=0, d=0, tx=1.5, ty=2)");
+
+totals(74);
 #endif

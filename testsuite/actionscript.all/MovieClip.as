@@ -95,15 +95,15 @@ endOfTest = function()
 #endif
 
 #if OUTPUT_VERSION == 6
-	check_totals(749); // SWF6
+	check_totals(757); // SWF6
 #endif
 
 #if OUTPUT_VERSION == 7
-	check_totals(766); // SWF7
+	check_totals(774); // SWF7
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(824); // SWF8+
+	check_totals(840); // SWF8+
 #endif
 
 	play();
@@ -1053,16 +1053,32 @@ with (draw)
 }
 check_equals(draw._width, 10);
 check_equals(draw._height, 20);
+
+// getRect and getBounds are the same in this case.
+
+c = draw.getRect();
+xcheck_equals(c.xMin, 10);
+xcheck_equals(c.xMax, 20);
+xcheck_equals(c.yMin, 10);
+xcheck_equals(c.yMax, 30);
+
 b = draw.getBounds();
 check_equals(b.xMin, 10);
 check_equals(b.xMax, 20);
 check_equals(b.yMin, 10);
 check_equals(b.yMax, 30);
+
 b = draw.getBounds(container);
 check_equals(b.xMin, 10);
 check_equals(b.xMax, 20);
 check_equals(b.yMin, 10);
 check_equals(b.yMax, 30);
+
+c = draw.getRect(container);
+xcheck_equals(c.xMin, 10);
+xcheck_equals(c.xMax, 20);
+xcheck_equals(c.yMin, 10);
+xcheck_equals(c.yMax, 30);
 
 draw._x += 20;
 b = draw.getBounds();
@@ -1524,14 +1540,17 @@ _root._x = 30;
 _root._y = 20;
 
 check_equals(_root.transform.matrix.toString(), "(a=1, b=0, c=0, d=1, tx=30, ty=20)");
+xcheck_equals(_root.transform.pixelBounds.toString(), "(x=27, y=27, w=799, h=842)");
 
 _root._xscale = -300; 
 
 check_equals(_root.transform.matrix.toString(), "(a=-3, b=0, c=0, d=1, tx=30, ty=20)");
+xcheck_equals(_root.transform.pixelBounds.toString(), "(x=-2361, y=27, w=2397, h=842)");
 
 _root._yscale = -200;
 
 check_equals(_root.transform.matrix.toString(), "(a=-3, b=0, c=0, d=-2, tx=30, ty=20)");
+xcheck_equals(_root.transform.pixelBounds.toString(), "(x=-2361, y=-1671, w=2397, h=1684)");
 
 _root._rotation = -90;
 
@@ -1541,24 +1560,28 @@ check_equals(_root.transform.matrix.c, -2);
 check_equals(_root.transform.matrix.d, 0);
 check_equals(_root.transform.matrix.tx, 30);
 check_equals(_root.transform.matrix.ty, 20);
+xcheck_equals(_root.transform.pixelBounds.toString(), "(x=-1663, y=16, w=1684, h=2397)");
 // TODO: test concatenatedMatrix
 
 _root.transform.matrix.ty = 300;
 check_equals(_root._y, 20); // changing the AS matrix doesn't change the actual matrix
 
 check_equals(_root.transform.matrix.toString(), "(a=0, b=3, c=-2, d=0, tx=30, ty=20)");
-
+xcheck_equals(_root.transform.pixelBounds.toString(), "(x=-1663, y=16, w=1684, h=2397)");
 _root._x = _root._y = _root._rotation = 0;
 
 check_equals(_root.transform.matrix.toString(), "(a=-3, b=0, c=0, d=-2, tx=0, ty=0)");
+xcheck_equals(_root.transform.pixelBounds.toString(), "(x=-2391, y=-1691, w=2397, h=1684)");
 
 _root._xscale = 100;
 
 check_equals(_root.transform.matrix.toString(), "(a=1, b=0, c=0, d=-2, tx=0, ty=0)");
+xcheck_equals(_root.transform.pixelBounds.toString(), "(x=-2, y=-1691, w=799, h=1684)");
 
 _root._yscale = 100;
 
 check_equals(_root.transform.matrix.toString(), "(a=1, b=0, c=0, d=1, tx=0, ty=0)");
+xcheck_equals(_root.transform.pixelBounds.toString(), "(x=-2, y=7, w=799, h=842)");
 
 OldTransform = flash.geom.Transform;
 
@@ -1572,7 +1595,6 @@ check_equals(_root.transform.matrix.toString(), "(a=1, b=0, c=0, d=1, tx=0, ty=0
 
 flash.geom.Transform = OldTransform;
 check_equals(_root.transform.toString(), "[object Object]");
-
 
 #endif
 
