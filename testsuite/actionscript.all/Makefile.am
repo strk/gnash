@@ -82,11 +82,12 @@ ASTESTS =			\
 	Boolean.as		\
 	Camera.as		\
 	Color.as		\
-    ColorTransform.as \
+	ColorTransform.as 	\
 	ContextMenu.as		\
 	CustomActions.as	\
 	Date.as			\
 	Error.as		\
+	ExternalInterface.as	\
 	Function.as		\
 	Global.as		\
 	Inheritance.as		\
