@@ -108,13 +108,27 @@ while(<STDIN>){
 #		next;
 	}
 
-	#Replace deletes:
-	#ACTIONSCRIPT: delete Object.prototype.toString
-	#HAXE: Reflect.deleteField(Object.prototype,toString)
-	#TODO: Implement
-	if(index($_,"delete") != $[-1){
-		skip_line();
-		next;
+	#Replace delete object.prop or delete object["prop"] with Reflect.deleteField(object,'prop')
+	if($_ =~ /delete\s*([\w\[\]\"\\.]+)/){
+		my $prop = $1;
+		#Check if we have this case: delete a["Prop"];
+		if(index($prop,'.') == $[-1){
+			$prop =~ s/(\w+)\[['"](\w+)['"]\]/$1.$2/g;
+		}
+
+		#Seperate the object from its property.
+		my @temp = split(/\./,$prop);	
+		my $field = $temp[-1];
+
+		my $object;
+		#Don't join the object with itself.
+		if($#temp == 1){
+			$object = $temp[0];
+		}
+		else{
+			$object = join(".",@temp[0,-2]);
+		}
+		$_ =~ s/delete\s*([\w\[\]\"\\.]+)/Reflect.deleteField($object,'$field')/;
 	}
 	
 	#Replace Class.hasOwnProperty(prop) with Reflect.hasField(Class,prop)
@@ -177,12 +191,6 @@ while(<STDIN>){
 		
 		#TODO: Can this be combined with regex above?
 		$_ =~ s/,\s*(\w+)\s*/) + String.fromCharCode($1/g;
-	}
-	
-	#Remove calls to call function.  I haven't found a Haxe equivilent for this.
-	if($_ =~ /\.call\(.+\)/){
-		skip_line();
-		next;
 	}
 	
 	#Convert calls to chr and ord.  I think these have been depreciated since SWF v5.
@@ -250,49 +258,3 @@ sub declare_variable{
 	my $var_name = $_[0];
 	return "var $var_name:Dynamic='';\n"
 }
-
-sub instance_of{
-	
-	print stderr "INSTANCE_OF:\n";
-	print stderr "ORIG=" . $_[0]."\n";
-	#Convert non-alphanumeric characters to " ".
-#		$working =~ s/\W/ /g;
-#		print stderr $working."\n";
-		my @blocks = split(/ /,$_[0],);
-		my $instance_index == $[;
-		foreach(@blocks){
-			if($_ eq "instanceof"){
-				last;
-			}
-			$instance_index++;
-		}
-		my $object = $blocks[$instance_index-1];
-		my $type = $blocks[$instance_index+1];
-		my $index = rindex($object,"(");
-		while($index > $[-1){
-			if(substr($object,$index+1,1) ne ")"){
-				$object =~ s/.+\(${1}//g;
-			}
-			else{
-				my $prev_index = rindex($object,"(",$index-1);
-				$object = substr($object,$prev_index+1,1 + $index - $prev_index);
-				last;
-			}		
-			$index = rindex($object,"(",$index-1);
-		}
-# = substr(0,$index+1)
-		#TODO: How do I delete the characters instead of replacing it with " "
-#		$object =~ s/.+\(/ /g;
-		#Remove left over non-alphanumeric characters from type.
-		$type =~ s/\W//g;
-		my $haxe = "Std.is(" . $object . ", " . $type . ")";
-		my $str_to_replace = $object." instanceof ".$type;
-
-		print stderr "HAXE=".$haxe."\n";
-		print stderr "REP=".$str_to_replace."_\n";
-		print stderr "ORIG=" . $_[0] ."\n";
-		print stderr "REP_INDEX=" . index($_[0],$str_to_replace) . "\n";
-		$_[0] =~ s/\Q$str_to_replace\E/$haxe/g;
-		print stderr "FINAL=" . $_[0] . "\n";
-		return $_[0];
-	}
