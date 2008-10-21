@@ -1074,10 +1074,10 @@ sprite_getBounds(const fn_call& fn)
   if ( !bounds.is_null() )
   {
     // Round to the twip
-    xMin = bounds.get_x_min() / 20.0;
-    yMin = bounds.get_y_min() / 20.0;
-    xMax = bounds.get_x_max() / 20.0;
-    yMax = bounds.get_y_max() / 20.0;
+    xMin = TWIPS_TO_PIXELS(bounds.get_x_min());
+    yMin = TWIPS_TO_PIXELS(bounds.get_y_min());
+    xMax = TWIPS_TO_PIXELS(bounds.get_x_max());
+    yMax = TWIPS_TO_PIXELS(bounds.get_y_max());
   }
 
   boost::intrusive_ptr<as_object> bounds_obj(new as_object());
@@ -1726,9 +1726,9 @@ sprite_beginGradientFill(const fn_call& fn)
   ObjPtr colors = fn.arg(1).to_object();
   ObjPtr alphas = fn.arg(2).to_object();
   ObjPtr ratios = fn.arg(3).to_object();
-  ObjPtr SWFMatrixArg = fn.arg(4).to_object();
+  ObjPtr matrixArg = fn.arg(4).to_object();
 
-  if ( ! colors || ! alphas || ! ratios || ! SWFMatrixArg )
+  if ( ! colors || ! alphas || ! ratios || ! matrixArg )
   {
     IF_VERBOSE_ASCODING_ERRORS(
     std::stringstream ss; fn.dump_args(ss);
@@ -1762,14 +1762,14 @@ sprite_beginGradientFill(const fn_call& fn)
   SWFMatrix mat;
   SWFMatrix input_matrix;
 
-  if ( SWFMatrixArg->getMember(NSV::PROP_MATRIX_TYPE).to_string() == "box" )
+  if ( matrixArg->getMember(NSV::PROP_MATRIX_TYPE).to_string() == "box" )
   {
     
-    boost::int32_t valX = PIXELS_TO_TWIPS(SWFMatrixArg->getMember(NSV::PROP_X).to_number()); 
-    boost::int32_t valY = PIXELS_TO_TWIPS(SWFMatrixArg->getMember(NSV::PROP_Y).to_number()); 
-    boost::int32_t valW = PIXELS_TO_TWIPS(SWFMatrixArg->getMember(NSV::PROP_W).to_number()); 
-    boost::int32_t valH = PIXELS_TO_TWIPS(SWFMatrixArg->getMember(NSV::PROP_H).to_number()); 
-    float valR = SWFMatrixArg->getMember(NSV::PROP_R).to_number(); 
+    boost::int32_t valX = PIXELS_TO_TWIPS(matrixArg->getMember(NSV::PROP_X).to_number()); 
+    boost::int32_t valY = PIXELS_TO_TWIPS(matrixArg->getMember(NSV::PROP_Y).to_number()); 
+    boost::int32_t valW = PIXELS_TO_TWIPS(matrixArg->getMember(NSV::PROP_W).to_number()); 
+    boost::int32_t valH = PIXELS_TO_TWIPS(matrixArg->getMember(NSV::PROP_H).to_number()); 
+    float valR = matrixArg->getMember(NSV::PROP_R).to_number(); 
 
     if ( radial )
     {
@@ -1802,12 +1802,12 @@ sprite_beginGradientFill(const fn_call& fn)
   }
   else
   {
-    float valA = SWFMatrixArg->getMember(NSV::PROP_A).to_number() ; // xx
-    float valB = SWFMatrixArg->getMember(NSV::PROP_B).to_number() ; // yx
-    float valD = SWFMatrixArg->getMember(NSV::PROP_D).to_number() ; // xy
-    float valE = SWFMatrixArg->getMember(NSV::PROP_E).to_number() ; // yy
-    boost::int32_t valG = PIXELS_TO_TWIPS(SWFMatrixArg->getMember(NSV::PROP_G).to_number()); // x0
-    boost::int32_t valH = PIXELS_TO_TWIPS(SWFMatrixArg->getMember(NSV::PROP_H).to_number()); // y0
+    float valA = matrixArg->getMember(NSV::PROP_A).to_number() ; // xx
+    float valB = matrixArg->getMember(NSV::PROP_B).to_number() ; // yx
+    float valD = matrixArg->getMember(NSV::PROP_D).to_number() ; // xy
+    float valE = matrixArg->getMember(NSV::PROP_E).to_number() ; // yy
+    boost::int32_t valG = PIXELS_TO_TWIPS(matrixArg->getMember(NSV::PROP_G).to_number()); // x0
+    boost::int32_t valH = PIXELS_TO_TWIPS(matrixArg->getMember(NSV::PROP_H).to_number()); // y0
 
     input_matrix.sx  = valA * 65536; // sx
     input_matrix.shx = valB * 65536; // shy
@@ -2229,12 +2229,9 @@ attachMovieClipInterface(as_object& o)
     o.init_property("_lockroot", &sprite_instance::lockroot_getset,
                                 &sprite_instance::lockroot_getset); // see MovieClip.as testcase
 
-    // This is documented to be SWF8+ only, but the pp version9 shows it
+    // These are documented to be SWF8+ only, but the pp version9 shows them
     // for SWF5 too...
     o.init_member("attachBitmap", new builtin_function(sprite_attachBitmap));
-
-    // This is documented to be SWF8+ only, but the pp version9 shows it
-    // for SWF5 too...
     o.init_property("transform", &movieClip_transform, &movieClip_transform); // see MovieClip.as testcase
 
     if ( target_version  < 6 ) return;
