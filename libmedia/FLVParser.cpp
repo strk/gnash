@@ -149,69 +149,13 @@ bool
 FLVParser::parseNextChunk()
 {
 	bool indexOnly = bufferFull(); // won't lock, but our caller locked...
-	if ( indexOnly ) return indexNextTag();
-	else return parseNextTag();
+	return parseNextTag(indexOnly);
 }
 
 // would be called by parser thread
 bool
-FLVParser::indexNextTag()
+FLVParser::indexTag(const boost::uint8_t* tag, boost::uint32_t timestamp, boost::uint32_t thisTagPos)
 {
-	//GNASH_REPORT_FUNCTION;
-
-	// lock the stream while reading from it, so actionscript
-	// won't mess with the parser on seek  or on getBytesLoaded
-	boost::mutex::scoped_lock streamLock(_streamMutex);
-
-	if ( _indexingCompleted ) return false;
-
-	unsigned long thisTagPos = _nextPosToIndex;
-
-	if ( _stream->seek(thisTagPos+4) )
-	{
-		log_debug("FLVParser::indexNextTag failed seeking to %d: %s", thisTagPos+4);
-		_indexingCompleted=true;
-		//_parsingComplete=true; // better let ::parseNextTag set this
-		return false;
-	}
-
-	// Read the tag info - NOTE: will block... (should we avoid the block here ?)
-	boost::uint8_t tag[12];
-	int actuallyRead = _stream->read(tag, 12);
-	if ( actuallyRead < 12 )
-	{
-		if ( actuallyRead )
-			log_error("FLVParser::indexNextTag: can't read tag info (needed 12 bytes, only got %d)", actuallyRead);
-		// else { assert(_stream->eof(); } ?
-		//log_debug("%d bytes read from input stream, when %d were requested", actuallyRead, 12);
-		_indexingCompleted=true;
-		//_parsingComplete=true; // better let ::parseNextTag set this
-
-		// update bytes loaded
-		boost::mutex::scoped_lock lock(_bytesLoadedMutex);
-		_bytesLoaded = _stream->tell();
-
-		return false;
-	}
-
-	// Extract length and timestamp
-	boost::uint32_t bodyLength = getUInt24(&tag[1]);
-	boost::uint32_t timestamp = getUInt24(&tag[4]);
-
-	_nextPosToIndex += 15 + bodyLength;
-	
-	if ( _nextPosToIndex > _bytesLoaded ) {
-		boost::mutex::scoped_lock lock(_bytesLoadedMutex);
-		_bytesLoaded = _nextPosToIndex;
-	}
-
-	// check for empty tag
-	if (bodyLength == 0)
-	{
-		log_debug("Empty tag, no index");
-		return false;
-	}
-
 	if (tag[0] == FLV_AUDIO_TAG)
 	{
 		if ( ! _video) // if we have video we let that drive cue points
@@ -246,8 +190,130 @@ FLVParser::indexNextTag()
 	return true;
 }
 
+std::auto_ptr<EncodedAudioFrame>
+FLVParser::parseAudioTag(boost::uint32_t bodyLength, boost::uint32_t timestamp, boost::uint32_t thisTagPos, const boost::uint8_t* tag)
+{
+	std::auto_ptr<EncodedAudioFrame> frame;
+
+	if ( ! _audio ) {
+		log_error(_("Unexpected audio tag found at offset %d FLV stream advertising no audio in header. We'll warn only once for each FLV, expecting any further audio tag."), thisTagPos);
+		_audio = true; // TOCHECK: is this safe ?
+	}
+
+	boost::uint8_t codec = (tag[11] & 0xf0) >> 4;
+
+	bool header = false;
+
+	if (codec == AUDIO_CODEC_AAC) {
+		boost::uint8_t packettype = _stream->read_byte();
+		header = (packettype == 0);
+		--bodyLength;
+	}
+
+	frame = readAudioFrame(bodyLength-1, timestamp);
+	if ( ! frame.get() ) {
+		log_error("could not read audio frame?");
+	}
+
+	// If this is the first audioframe no info about the
+	// audio format has been noted, so we do that now
+	if ( !_audioInfo.get() )
+	{
+		int samplerate = (tag[11] & 0x0C) >> 2;
+		if (samplerate == 0) samplerate = 5500;
+		else if (samplerate == 1) samplerate = 11000;
+		else if (samplerate == 2) samplerate = 22050;
+		else if (samplerate == 3) samplerate = 44100;
+
+		int samplesize = (tag[11] & 0x02) >> 1;
+		if (samplesize == 0) samplesize = 1;
+		else samplesize = 2;
+
+		_audioInfo.reset( new AudioInfo(codec, samplerate, samplesize, (tag[11] & 0x01) >> 0, 0, FLASH) );
+		if (header) {
+			boost::uint8_t* newbuf = new boost::uint8_t[frame->dataSize];
+			memcpy(newbuf, frame->data.get(), frame->dataSize);
+
+			_audioInfo->extra.reset( 
+				new ExtraAudioInfoFlv(newbuf, frame->dataSize)
+			);
+
+			// The FAAD decoder will reject us if we pass the header buffer.
+			// It will receive the header via the extra audio info anyway.
+			frame.reset();
+		}
+	}
+
+	return frame;
+}
+
+std::auto_ptr<EncodedVideoFrame>
+FLVParser::parseVideoTag(boost::uint32_t bodyLength, boost::uint32_t timestamp, boost::uint32_t thisTagPos, const boost::uint8_t* tag)
+{
+	if ( ! _video ) {
+		log_error(_("Unexpected video tag found at offset %d of FLV stream advertising no video in header. We'll warn only once per FLV, expecting any further video tag."), thisTagPos);
+		_video = true; // TOCHECK: is this safe ?
+	}
+	// 1:keyframe, 2:interlacedFrame, 3:disposableInterlacedFrame
+	int frameType = (tag[11] & 0xf0) >> 4;
+
+	boost::uint16_t codec = (tag[11] & 0x0f) >> 0;
+
+	if (codec == VIDEO_CODEC_VP6 || codec == VIDEO_CODEC_VP6A)
+	{
+		_stream->read_byte();
+		--bodyLength;
+	}
+
+	bool header = false;
+
+	if (codec == VIDEO_CODEC_H264) {
+		boost::uint8_t packettype = _stream->read_byte();
+		IF_VERBOSE_PARSE( log_debug(_("AVC packet type: %d"), (unsigned)packettype) );
+
+		header = (packettype == 0);
+
+		// 24-bits value for composition time offset ignored for now.
+		boost::uint8_t tmp[3];
+		_stream->read(tmp, 3);
+
+		bodyLength -= 4;
+	}
+
+	size_t dataPosition = _stream->tell();
+
+	std::auto_ptr<EncodedVideoFrame> frame = readVideoFrame(bodyLength-1, timestamp);
+	if ( ! frame.get() )
+	{
+		log_error("could not read video frame?");
+	}
+
+	// If this is the first videoframe no info about the
+	// video format has been noted, so we do that now
+	if ( ! _videoInfo.get() )
+	{
+		_videoInfo.reset( new VideoInfo(codec, 0 /* width */, 0 /* height */, 0 /*frameRate*/, 0 /*duration*/, FLASH /*codec type*/) );
+
+		if (header) {
+			boost::uint8_t* newbuf = new boost::uint8_t[frame->dataSize()];
+			memcpy(newbuf, frame->data(), frame->dataSize());
+
+			_videoInfo->extra.reset( 
+				new ExtraVideoInfoFlv(newbuf, frame->dataSize())
+			);
+			// Don't bother emitting the header buffer.
+			frame.reset();
+		}
+	}
+	return frame;
+}
+
+
+
+
+
 // would be called by parser thread
-bool FLVParser::parseNextTag()
+bool FLVParser::parseNextTag(bool index_only)
 {
 	//GNASH_REPORT_FUNCTION;
 
@@ -293,7 +359,7 @@ bool FLVParser::parseNextTag()
 
 	_lastParsedPosition += 15 + bodyLength;
 
-	bool doIndex = _lastParsedPosition+4 > _nextPosToIndex;
+	bool doIndex = (_lastParsedPosition+4 > _nextPosToIndex) || index_only;
 	if ( doIndex )
 	{
 		//log_debug("::parseNextTag setting _nextPosToIndex=%d", _lastParsedPosition+4);
@@ -309,70 +375,19 @@ bool FLVParser::parseNextTag()
 	// check for empty tag
 	if (bodyLength == 0) return true;
 
-	if (tag[0] == FLV_AUDIO_TAG)
-	{
-		if ( ! _audio ) {
-			log_error(_("Unexpected audio tag found at offset %d FLV stream advertising no audio in header. We'll warn only once for each FLV, expecting any further audio tag."), thisTagPos);
-			_audio = true; // TOCHECK: is this safe ?
-		}
-		
-		if ( doIndex && ! _video ) // if we have video we let that drive cue points
-		{
-			// we can theoretically seek anywhere, but
-			// let's just keep 5 seconds of distance
-			CuePointsMap::iterator it = _cuePoints.lower_bound(timestamp);
-			if ( it == _cuePoints.end() || it->first - timestamp >= 5000)
-			{
-				log_debug("Added cue point at timestamp %d and position %d (audio frame)", timestamp, thisTagPos);
-				_cuePoints[timestamp] = thisTagPos; 
-			}
-		}
-
-		boost::uint8_t codec = (tag[11] & 0xf0) >> 4;
-
-		bool header = false;
-
-		if (codec == AUDIO_CODEC_AAC) {
-			boost::uint8_t packettype = _stream->read_byte();
-			header = (packettype == 0);
-			--bodyLength;
-		}
-
-		std::auto_ptr<EncodedAudioFrame> frame = readAudioFrame(bodyLength-1, timestamp);
-		if ( ! frame.get() ) {
-			log_error("could not read audio frame?");
+	if (doIndex) {
+		indexTag(tag, timestamp, thisTagPos);
+		if (index_only) {
 			return true;
 		}
+	}
 
-		// If this is the first audioframe no info about the
-		// audio format has been noted, so we do that now
-		if ( !_audioInfo.get() )
-		{
-			int samplerate = (tag[11] & 0x0C) >> 2;
-			if (samplerate == 0) samplerate = 5500;
-			else if (samplerate == 1) samplerate = 11000;
-			else if (samplerate == 2) samplerate = 22050;
-			else if (samplerate == 3) samplerate = 44100;
-
-			int samplesize = (tag[11] & 0x02) >> 1;
-			if (samplesize == 0) samplesize = 1;
-			else samplesize = 2;
-
-			_audioInfo.reset( new AudioInfo(codec, samplerate, samplesize, (tag[11] & 0x01) >> 0, 0, FLASH) );
-			if (header) {
-				boost::uint8_t* newbuf = new boost::uint8_t[frame->dataSize];
-				memcpy(newbuf, frame->data.get(), frame->dataSize);
-
-				_audioInfo->extra.reset( 
-					new ExtraAudioInfoFlv(newbuf, frame->dataSize)
-				);
-
-				// The FAAD decoder will reject us if we pass the header buffer.
-				// It will receive the header via the extra audio info anyway.
-				return true;
-			}
+	if (tag[0] == FLV_AUDIO_TAG)
+	{
+		std::auto_ptr<EncodedAudioFrame> frame = parseAudioTag(bodyLength, timestamp, thisTagPos, tag);
+		if (!frame.get()) {
+			return false;
 		}
-
 		// Release the stream lock 
 		// *before* pushing the frame as that 
 		// might block us waiting for buffers flush
@@ -383,71 +398,9 @@ bool FLVParser::parseNextTag()
 	}
 	else if (tag[0] == FLV_VIDEO_TAG)
 	{
-		if ( ! _video ) {
-			log_error(_("Unexpected video tag found at offset %d of FLV stream advertising no video in header. We'll warn only once per FLV, expecting any further video tag."), thisTagPos);
-			_video = true; // TOCHECK: is this safe ?
-		}
-		// 1:keyframe, 2:interlacedFrame, 3:disposableInterlacedFrame
-		int frameType = (tag[11] & 0xf0) >> 4;
-
-		boost::uint16_t codec = (tag[11] & 0x0f) >> 0;
-
-		if (codec == VIDEO_CODEC_VP6 || codec == VIDEO_CODEC_VP6A)
-		{
-			_stream->read_byte();
-			--bodyLength;
-		}
-
-		bool header = false;
-
-		if (codec == VIDEO_CODEC_H264) {
-			boost::uint8_t packettype = _stream->read_byte();
-			IF_VERBOSE_PARSE( log_debug(_("AVC packet type: %d"), (unsigned)packettype) );
-
-			header = (packettype == 0);
-
-			// 24-bits value for composition time offset ignored for now.
-			boost::uint8_t tmp[3];
-			_stream->read(tmp, 3);
-
-			bodyLength -= 4;
-		}
-		
-		if ( doIndex )
-		{
-			bool isKeyFrame = (frameType == 1);
-			if ( isKeyFrame )
-			{
-				log_debug("Added cue point at timestamp %d and position %d (key video frame)", timestamp, thisTagPos);
-				_cuePoints[timestamp] = thisTagPos;
-			}
-		}
-
-		size_t dataPosition = _stream->tell();
-
-		std::auto_ptr<EncodedVideoFrame> frame = readVideoFrame(bodyLength-1, timestamp);
-		if ( ! frame.get() )
-		{
-			log_error("could not read video frame?");
-			return true;
-		}
-
-		// If this is the first videoframe no info about the
-		// video format has been noted, so we do that now
-		if ( ! _videoInfo.get() )
-		{
-			_videoInfo.reset( new VideoInfo(codec, 0 /* width */, 0 /* height */, 0 /*frameRate*/, 0 /*duration*/, FLASH /*codec type*/) );
-
-			if (header) {
-				boost::uint8_t* newbuf = new boost::uint8_t[frame->dataSize()];
-				memcpy(newbuf, frame->data(), frame->dataSize());
-
-				_videoInfo->extra.reset( 
-					new ExtraVideoInfoFlv(newbuf, frame->dataSize())
-				);
-				// Don't bother emitting the header buffer.
-				return true;
-			}
+		std::auto_ptr<EncodedVideoFrame> frame = parseVideoTag(bodyLength, timestamp, thisTagPos, tag);
+		if (!frame.get()) {
+			return false;
 		}
 
 		// Release the stream lock 
@@ -525,7 +478,7 @@ bool FLVParser::parseHeader()
 	const size_t probeBytes = PROBE_BYTES;
 	while ( !_parsingComplete && _lastParsedPosition < probeBytes )
 	{
-		parseNextTag();
+		parseNextTag(false);
 
 		// Early-out if we found both video and audio tags
 		if ( _videoInfo.get() && _audioInfo.get() ) break;

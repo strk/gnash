@@ -121,14 +121,21 @@ private:
 	/// Returns true if something was parsed, false otherwise.
 	/// Sets _parsingComplete=true on end of file.
 	///
-	bool parseNextTag();
+	bool parseNextTag(bool index_only);
 
-	bool indexNextTag();
+	std::auto_ptr<EncodedAudioFrame> parseAudioTag(boost::uint32_t bodyLength, boost::uint32_t timestamp, boost::uint32_t thisTagPos,
+		const boost::uint8_t* tag);
+	std::auto_ptr<EncodedVideoFrame> parseVideoTag(boost::uint32_t bodyLength, boost::uint32_t timestamp, boost::uint32_t thisTagPos,
+		const boost::uint8_t* tag);
+
+	bool indexTag(const boost::uint8_t* tag, boost::uint32_t timestamp, boost::uint32_t thisTagPos);
 
 	/// Parses the header of the file
 	bool parseHeader();
 
-	// Functions used to extract numbers from the file
+	/// Reads three bytes in FLV (big endian) byte order.
+	/// @param in Pointer to read 3 bytes from.
+	/// @return 24-bit integer.
 	inline boost::uint32_t getUInt24(boost::uint8_t* in);
 
 	/// The position where the parsing should continue from.
