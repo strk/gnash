@@ -133,15 +133,15 @@ ASTESTS =			\
 	$(NULL)
 
 if HAVE_PERL
+if ENABLE_HAXE
 HAXETESTS = \
 	String.as \
 	$(NULL)
 endif
+endif
 
 HAXE_DIR = $(srcdir)/haxe-swf9
-
 HAXE_CPP = $(CPP) -DHAXE -DOUTPUT_VERSION=9 -x c -P -I$(HAXE_DIR)
-
 HAXE_FLAGS = -cp $(HAXE_DIR) -cp $(HAXE_CLASSPATH)
 
 
