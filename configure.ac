@@ -184,53 +184,6 @@ AM_GNU_GETTEXT([external])
 AM_CONDITIONAL(HAS_GETTEXT, test x$ac_cv_path_XGETTEXT != x)
 dnl AM_GNU_GETTEXT_VERSION(0.15)
 
-dnl We shouldn't need SIZET_FMT anywhere anymore, so all of this
-dnl is useless.
-
-dnl AC_CHECK_SIZEOF([size_t], 4, AC_INCLUDES_DEFAULT)
-
-dnl AC_DEFINE(SIZET_FMT, ["%z"], [size_t printf modifier is z])
-
-dnl NOTE: Using AC_TRY_COMPILE is bogus when cross-compiling !
-dnl       We need to know the size of size_t in the *target* host, 
-dnl       not the build host (right?)
-dnl
-dnl AC_LANG_PUSH(C++)
-dnl if test "$GXX" = yes; then
-dnl save_CXXFLAGS="$CXXFLAGS"
-dnl CXXFLAGS="$CXXFLAGS -Werror -Wformat"
-dnl fi
-
-dnl AC_TRY_COMPILE([#include <sys/types.h>
-dnl   #include <stdio.h>], [
-dnl   size_t num = 0;
-dnl   printf("%d", num); ],
-dnl   AC_DEFINE(SIZET_FMT, ["%d"], [size_t printf modifier is d]), [
-
-dnl AC_TRY_COMPILE([#include <sys/types.h>
-dnl   #include <stdio.h>], [
-dnl   size_t num = 0;
-dnl   printf("%u", num); ],
-dnl   AC_DEFINE(SIZET_FMT, ["%u"], [size_t printf modifier is u]), [
-
-dnl AC_TRY_COMPILE([#include <sys/types.h>
-dnl   #include <stdio.h>], [
-dnl   size_t num = 0;
-dnl   printf("%lu", num); ],
-dnl   AC_DEFINE(SIZET_FMT, ["%lu"], [size_t printf modifier is lu]), [
-
-dnl AC_TRY_COMPILE([#include <sys/types.h> 
-dnl   #include <stdio.h>], [
-dnl   size_t num = 0;
-dnl   printf("%ld", num); ],
-dnl   AC_DEFINE(SIZET_FMT, ["%ld"], [size_t printf modifier is ld])
-dnl )])])])
-
-dnl if test "$GXX" = yes; then
-dnl CXXFLAGS="$save_CXXFLAGS"
-dnl fi
-dnl AC_LANG_POP(C++)
-
 dnl This is primarily used when compiling for a similar architecture,
 dnl like pentium->geode, which can use the same compiler, but have
 dnl different development libraries.
@@ -278,7 +231,7 @@ AC_ARG_ENABLE(jemalloc,
   *)   AC_MSG_ERROR([bad value ${enableval} for --enable-jemalloc option]) ;;
 esac],jemalloc=no)
 
-dnl There is some weird stuff going on with NetBSD and jemalloc, so don't built it for now.
+dnl There is some weird stuff going on with NetBSD and jemalloc, so don't build it for now.
 if test x"${netbsd}" = x"yes"; then
   jemalloc=no
 fi
@@ -587,12 +540,6 @@ build_agg=no
 build_cairo=no
 AC_ARG_ENABLE(renderer,
   AC_HELP_STRING([--enable-renderer=], [Use the specified GUI toolkit (default=ogl,agg)]),
-dnl  if test -n ${enableval}; then
-dnl    add_renderer="${enableval}"
-dnl    enableval=`echo ${enableval} | tr '\054' ' ' `
-dnl  fi
-dnl  while test -n "${enableval}" ; do
-dnl    val=`echo ${enableval} | cut -d ' ' -f 1`
     [case "${enableval}" in
       ogl|OGL|gl|GL|opengl|OPENGL|OpenGL)
         build_ogl=yes
@@ -617,18 +564,7 @@ dnl         ;;
       esac],
 	build_agg=yes
 	add_renderer=agg
-dnl    enableval=`echo ${enableval} | cut -d ' ' -f 2-6`
-dnl    if test x$val = x$enableval; then
-dnl      break;
-dnl    fi
-dnl  done
 )
-
-dnl if test x$add_renderer = x; then
-dnl    build_ogl=yes
-dnl    build_agg=yes
-dnl    add_renderer="ogl,agg"
-dnl fi
 
 if test x$build_ogl = xyes; then
   if test x$build_fb = xyes; then
@@ -1359,12 +1295,7 @@ AC_CHECK_HEADERS(signal.h)
 AC_CHECK_HEADERS(unistd.h)
 AC_CHECK_HEADERS(sys/time.h)
 AC_CHECK_LIB(lber, ber_free)
-dnl AC_CHECK_LIB(m, sqrt)
 AC_CHECK_LIB(c, getpwnam, AC_DEFINE(HAVE_GETPWNAM, 1, [Has getpwnam] ))
-
-dnl AC_CHECK_LIB(m, exp2, AC_DEFINE(HAVE_EXP2, 1, [Has exp2()]))
-dnl AC_CHECK_LIB(m, log2, AC_DEFINE(HAVE_LOG2, 1, [Has log2()]))
-dnl AC_CHECK_LIB(m, trunc, AC_DEFINE(HAVE_TRUNC, 1, [Has trunc()]))
 
 dnl X11 is needed for fltk (at least),
 dnl and probably for many other guis too ...
@@ -1526,30 +1457,15 @@ fi
 AC_CHECK_FUNCS(sysconf)
 AC_CHECK_FUNCS(shmget shmat shmdt mmap)
 AC_CHECK_FUNCS(memmove)
-AC_CHECK_FUNC(strndup, AC_DEFINE(HAVE_STRNDUP, 1, [Has strndup()] ))
+dnl AC_CHECK_FUNC(strndup, AC_DEFINE(HAVE_STRNDUP, 1, [Has strndup()] ))
 AC_CHECK_FUNC(clock_gettime, AC_DEFINE(HAVE_CLOCK_GETTIME, 1, [Has clock_gettime()] ))
-AC_CHECK_FUNCS(strlcpy, AC_DEFINE(HAVE_STRLCPY_PROTO, [1],[Define if you have the strlcpy prototype]))
-AC_CHECK_FUNCS(strlcat, AC_DEFINE(HAVE_STRLCAT_PROTO, [1],[Define if you have the strlcat prototype]))
+dnl AC_CHECK_FUNCS(strlcpy, AC_DEFINE(HAVE_STRLCPY_PROTO, [1],[Define if you have the strlcpy prototype]))
+dnl AC_CHECK_FUNCS(strlcat, AC_DEFINE(HAVE_STRLCAT_PROTO, [1],[Define if you have the strlcat prototype]))
 dnl Look for Win32 networking stuff
 AC_CHECK_HEADERS(winsock.h)
 AC_CHECK_HEADERS(winsock2.h)
 AC_CHECK_FUNCS(socket)
 AC_CHECK_FUNCS(CreateFileMappingA)
-
-dnl GNASH_HASHMAP
-dnl Let's get rid of this small file and inline the function.
-
-dnl AC_LANG_PUSH(C++)
-dnl 	AC_CHECK_HEADER(ext/hash_map, [
-dnl 		AC_DEFINE([GNU_HASH_MAP], [1], [Using GNU ext/hash_map.h])
-dnl 		AC_DEFINE([HASH_MAP_NS], [__gnu_cxx], [Using GNU __gnu_cxx::])
-dnl 	], [
-dnl 		AC_CHECK_HEADER(hash_map, [
-dnl 			AC_DEFINE([WIN32_HASH_MAP], [1], [Using Win32 hash_map.h])
-dnl 			AC_DEFINE([HASH_MAP_NS], [stdext], [Using win32 stdext::])
-dnl 		])
-dnl 	])
-dnl AC_LANG_POP(C++)
 
 dnl Shm::resize() uses this if it exists
 AC_CHECK_LIB(c, mremap)
@@ -2033,7 +1949,7 @@ fi
 dnl /* http://gcc.gnu.org/bugzilla/show_bug.cgi?id=19664 */
 AC_DEFUN([CHECK_VISIBILITY_GCC_BUG],
   [
-    AC_CACHE_CHECK([if -fvisibility-inlines-hidden is broken], gcc_visibility_bug, [
+    AC_CACHE_CHECK([if -fvisibility-inlines-hidden is broken], ac_cv_gcc_visibility_bug, [
         AC_LANG_PUSH(C++)
         save_CXXFLAGS=$CXXFLAGS
         save_LDFLAGS=$LDFLAGS
@@ -2058,14 +1974,14 @@ AC_DEFUN([CHECK_VISIBILITY_GCC_BUG],
             return 0;
           }
         ], [],
-        gcc_visibility_bug=no, gcc_visibility_bug=yes)
+        ac_cv_gcc_visibility_bug=no, ac_cv_gcc_visibility_bug=yes)
 
         CXXFLAGS=$save_CXXFLAGS
         LDFLAGS=$save_LDFLAGS
         AC_LANG_POP(C++)
       ]
     )
-    if test x$gcc_visibility_bug = xno; then
+    if test x$ac_cv_gcc_visibility_bug = xno; then
       CXXFLAGS="$CXXFLAGS -fvisibility-inlines-hidden"
       if test x"$enable_visibility" != x"no"; then
         CXXFLAGS="$CXXFLAGS -fvisibility=hidden"
