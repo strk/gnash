@@ -42,7 +42,6 @@
 #include "Object.h"
 #include "String_as.h" // for automatic as_value::STRING => String as object
 #include "Number.h" // for automatic as_value::NUMBER => Number as object
-#include "types.h" // for PIXELS_TO_TWIPS
 #include "drag_state.h"
 #include "VM.h" // for getting the root
 #include "movie_root.h" // for set_drag_state (ActionStartDragMovie)
@@ -1302,7 +1301,8 @@ SWFHandlers::ActionStartDragMovie(ActionExec& thread)
 
     if (tgt)
     {
-        VM::get().getRoot().set_drag_state(st);
+        VM& vm = env.getVM();
+        vm.getRoot().set_drag_state(st);
     }
 
 }
@@ -1528,12 +1528,13 @@ SWFHandlers::ActionRandom(ActionExec& thread)
 
     if (max < 1) max = 1;
 
-      // Get pointer to static random generator in VM
-      VM::RNG& rnd = VM::get().randomNumberGenerator();
+    // Get pointer to static random generator in VM
+    VM::RNG& rnd = env.getVM().randomNumberGenerator();
 
-      // Produces int (0 <= n <= max - 1)
-      boost::uniform_int<> uni_dist(0, max - 1);
-      boost::variate_generator<VM::RNG&, boost::uniform_int<> > uni(rnd, uni_dist);
+    // Produces int (0 <= n <= max - 1)
+    boost::uniform_int<> uni_dist(0, max - 1);
+    boost::variate_generator<VM::RNG&,
+        boost::uniform_int<> > uni(rnd, uni_dist);
 
     env.top(0).set_int(uni());
 }
@@ -1728,7 +1729,9 @@ SWFHandlers::ActionGetTimer(ActionExec& thread)
     
     
     as_environment& env = thread.env;
-    env.push(VM::get().getTime());
+
+    const VM& vm = env.getVM();
+    env.push(vm.getTime());
 }
 
 void
@@ -2179,8 +2182,8 @@ SWFHandlers::CommonGetUrl(as_environment& env,
         target_string = target.to_string();
     }
 
-
-    movie_root& m = VM::get().getRoot();
+    VM& vm = env.getVM();
+    movie_root& m = vm.getRoot();
  
     // If the url starts with "FSCommand:", then this is
     // a message for the host app.
@@ -2285,9 +2288,6 @@ SWFHandlers::CommonGetUrl(as_environment& env,
         return;
     }
 
-
-    movie_root& mr = VM::get().getRoot();
-
     if ( loadTargetFlag )
     {
         log_debug(_("getURL2 target load"));
@@ -2295,16 +2295,16 @@ SWFHandlers::CommonGetUrl(as_environment& env,
         if ( ! target_ch )
         {
             unsigned int levelno;
-            if ( mr.isLevelTarget(target_string, levelno) )
+            if ( m.isLevelTarget(target_string, levelno) )
             {
                 log_debug(_("Testing _level loading (level %u)"), levelno);
                 if ( usePost )
                 {
-                    mr.loadMovie(url, target_string, &varsToSend);
+                    m.loadMovie(url, target_string, &varsToSend);
                 }
                 else
                 {
-                    mr.loadMovie(url, target_string); // using GET
+                    m.loadMovie(url, target_string); // using GET
                 }
                 return;
             }
@@ -2335,31 +2335,31 @@ SWFHandlers::CommonGetUrl(as_environment& env,
         {
             log_debug(_("TESTME: target of a loadMovie changed its target path"));
         }
-        movie_root& mr = VM::get().getRoot();
-        assert( mr.findCharacterByTarget(s) == target_movie ); // TODO: try to trigger this !
+
+        assert( m.findCharacterByTarget(s) == target_movie ); // TODO: try to trigger this !
 
         if ( usePost )
         {
-            mr.loadMovie(url, s, &varsToSend); 
+            m.loadMovie(url, s, &varsToSend); 
         }
         else
         {
-            mr.loadMovie(url, s); 
+            m.loadMovie(url, s); 
         }
         return;
     }
 
     unsigned int levelno;
-    if ( mr.isLevelTarget(target_string, levelno) )
+    if ( m.isLevelTarget(target_string, levelno) )
     {
         log_debug(_("Testing _level loading (level %u)"), levelno);
         if ( usePost )
         {
-            mr.loadMovie(url, target_string, &varsToSend);
+            m.loadMovie(url, target_string, &varsToSend);
         }
         else
         {
-            mr.loadMovie(url, target_string); 
+            m.loadMovie(url, target_string); 
         }
         return;
     }
@@ -2369,7 +2369,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
         log_unimpl(_("POST with host-provided uri grabber"));
     }
 
-    int hostfd = VM::get().getRoot().getHostFD();
+    int hostfd = vm.getRoot().getHostFD();
     if ( hostfd == -1 )
     {
         gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
@@ -3128,7 +3128,9 @@ SWFHandlers::ActionNewEquals(ActionExec& thread)
     assert(thread.atActionTag(SWF::ACTION_NEWEQUALS));
 #endif
 
-    int swfVersion = VM::get().getSWFVersion();
+    const VM& vm = env.getVM();
+
+    int swfVersion = vm.getSWFVersion();
     if ( swfVersion <= 5 )
     {
         as_value op1 = env.top(0);

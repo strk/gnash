@@ -32,7 +32,7 @@
 #include "edit_text_character_def.h" // @@ temp hack for createTextField exp.
 #include "ControlTag.h"
 #include "fn_call.h"
-#include "Key.h"
+#include "Key_as.h"
 #include "movie_root.h"
 #include "movie_instance.h"
 #include "swf_event.h"
@@ -56,7 +56,7 @@
 #include "fill_style.h" // for beginGradientFill
 #include "styles.h" // for cap_style_e and join_style_e enums
 #include "PlaceObject2Tag.h" 
-#include "NetStream.h"
+#include "NetStream_as.h"
 #include "flash/geom/Matrix_as.h"
 
 #ifdef USE_SWFTREE
@@ -276,7 +276,7 @@ sprite_attach_movie(const fn_call& fn)
   }
 
   /// Properties must be copied *after* the call to attachCharacter
-  /// because attachCharacter() will reset matrix !!
+  /// because attachCharacter() will reset SWFMatrix !!
   if (fn.nargs > 3 ) {
     boost::intrusive_ptr<as_object> initObject = fn.arg(3).to_object();
     if ( initObject ) {
@@ -320,7 +320,7 @@ static as_value sprite_attach_audio(const fn_call& fn)
     return as_value();
   }
 
-  NetStream* ns = dynamic_cast<NetStream*>(obj);
+  NetStream_as* ns = dynamic_cast<NetStream_as*>(obj);
   if ( ! ns )
   { 
     std::stringstream ss; fn.dump_args(ss);
@@ -392,7 +392,8 @@ static as_value sprite_get_depth(const fn_call& fn)
 }
 
 //swapDepths(target:Object|target:Number) : Void
-static as_value sprite_swap_depths(const fn_call& fn)
+static as_value
+sprite_swap_depths(const fn_call& fn)
 {
   typedef boost::intrusive_ptr<sprite_instance> SpritePtr;
   typedef boost::intrusive_ptr<character> CharPtr;
@@ -511,7 +512,7 @@ static as_value sprite_swap_depths(const fn_call& fn)
   }
   else
   {
-    movie_root& root = VM::get().getRoot();
+    movie_root& root = sprite->getVM().getRoot();
     root.swapLevels(sprite, target_depth);
     return rv;
   }
@@ -851,11 +852,11 @@ static as_value sprite_hit_test(const fn_call& fn)
       }
 
       rect thisbounds = sprite->getBounds();
-      matrix thismat = sprite->get_world_matrix();
+      SWFMatrix thismat = sprite->getWorldMatrix();
       thismat.transform(thisbounds);
 
       rect tgtbounds = target->getBounds();
-      matrix tgtmat = target->get_world_matrix();
+      SWFMatrix tgtmat = target->getWorldMatrix();
       tgtmat.transform(tgtbounds);
 
       return thisbounds.getRange().intersects(tgtbounds.getRange());
@@ -941,7 +942,7 @@ sprite_create_text_field(const fn_call& fn)
       txt_depth, txt_x, txt_y, txt_width, txt_height);
 
   // createTextField returns void, it seems
-  if ( VM::get().getSWFVersion() > 7 ) return as_value(txt.get());
+  if ( sprite->getVM().getSWFVersion() > 7 ) return as_value(txt.get());
   else return as_value(); 
 }
 
@@ -1057,8 +1058,8 @@ sprite_getBounds(const fn_call& fn)
       return as_value();
     }
 
-    matrix tgtwmat = target->get_world_matrix();
-    matrix srcwmat = sprite->get_world_matrix();
+    SWFMatrix tgtwmat = target->getWorldMatrix();
+    SWFMatrix srcwmat = sprite->getWorldMatrix();
 
     srcwmat.transform(bounds);
     tgtwmat.invert().transform(bounds);
@@ -1141,7 +1142,7 @@ sprite_globalToLocal(const fn_call& fn)
   y = PIXELS_TO_TWIPS(tmp.to_number());
 
   point  pt(x, y);
-  matrix world_mat = sprite->get_world_matrix();
+  SWFMatrix world_mat = sprite->getWorldMatrix();
   world_mat.invert().transform(pt);
 
   obj->set_member(NSV::PROP_X, TWIPS_TO_PIXELS(pt.x));
@@ -1203,7 +1204,7 @@ sprite_localToGlobal(const fn_call& fn)
   y = PIXELS_TO_TWIPS(tmp.to_number());
 
   point  pt(x, y);
-  matrix world_mat = sprite->get_world_matrix();
+  SWFMatrix world_mat = sprite->getWorldMatrix();
   world_mat.transform(pt);
 
   obj->set_member(NSV::PROP_X, TWIPS_TO_PIXELS(pt.x));
@@ -1725,9 +1726,9 @@ sprite_beginGradientFill(const fn_call& fn)
   ObjPtr colors = fn.arg(1).to_object();
   ObjPtr alphas = fn.arg(2).to_object();
   ObjPtr ratios = fn.arg(3).to_object();
-  ObjPtr matrixArg = fn.arg(4).to_object();
+  ObjPtr SWFMatrixArg = fn.arg(4).to_object();
 
-  if ( ! colors || ! alphas || ! ratios || ! matrixArg )
+  if ( ! colors || ! alphas || ! ratios || ! SWFMatrixArg )
   {
     IF_VERBOSE_ASCODING_ERRORS(
     std::stringstream ss; fn.dump_args(ss);
@@ -1739,36 +1740,36 @@ sprite_beginGradientFill(const fn_call& fn)
   }
 
   // ----------------------------
-  // Parse matrix
+  // Parse SWFMatrix
   // ----------------------------
   
   //
-  // TODO: fix the matrix build-up, it is NOT correct for
+  // TODO: fix the SWFMatrix build-up, it is NOT correct for
   //       rotation.
-  //       For the "boxed" matrixType and radial fills this
+  //       For the "boxed" SWFMatrixType and radial fills this
   //       is not a problem as this code just discards the
   //       rotation (which doesn't make sense), but for
-  //       the explicit matrix type (a..i) it is a problem.
+  //       the explicit SWFMatrix type (a..i) it is a problem.
   //       The whole code can likely be simplified by 
   //       always transforming the gnash gradients to the
   //       expected gradients and subsequently applying
-  //       user-specified matrix; for 'boxed' matrixType
+  //       user-specified SWFMatrix; for 'boxed' SWFMatrixType
   //       this simplification would increas cost, but
   //       it's too early to apply optimizations to the
   //       code (correctness first!!).
   //
 
-  matrix mat;
-  matrix input_matrix;
+  SWFMatrix mat;
+  SWFMatrix input_matrix;
 
-  if ( matrixArg->getMember(NSV::PROP_MATRIX_TYPE).to_string() == "box" )
+  if ( SWFMatrixArg->getMember(NSV::PROP_MATRIX_TYPE).to_string() == "box" )
   {
     
-    boost::int32_t valX = PIXELS_TO_TWIPS(matrixArg->getMember(NSV::PROP_X).to_number()); 
-    boost::int32_t valY = PIXELS_TO_TWIPS(matrixArg->getMember(NSV::PROP_Y).to_number()); 
-    boost::int32_t valW = PIXELS_TO_TWIPS(matrixArg->getMember(NSV::PROP_W).to_number()); 
-    boost::int32_t valH = PIXELS_TO_TWIPS(matrixArg->getMember(NSV::PROP_H).to_number()); 
-    float valR = matrixArg->getMember(NSV::PROP_R).to_number(); 
+    boost::int32_t valX = PIXELS_TO_TWIPS(SWFMatrixArg->getMember(NSV::PROP_X).to_number()); 
+    boost::int32_t valY = PIXELS_TO_TWIPS(SWFMatrixArg->getMember(NSV::PROP_Y).to_number()); 
+    boost::int32_t valW = PIXELS_TO_TWIPS(SWFMatrixArg->getMember(NSV::PROP_W).to_number()); 
+    boost::int32_t valH = PIXELS_TO_TWIPS(SWFMatrixArg->getMember(NSV::PROP_H).to_number()); 
+    float valR = SWFMatrixArg->getMember(NSV::PROP_R).to_number(); 
 
     if ( radial )
     {
@@ -1801,12 +1802,12 @@ sprite_beginGradientFill(const fn_call& fn)
   }
   else
   {
-    float valA = matrixArg->getMember(NSV::PROP_A).to_number() ; // xx
-    float valB = matrixArg->getMember(NSV::PROP_B).to_number() ; // yx
-    float valD = matrixArg->getMember(NSV::PROP_D).to_number() ; // xy
-    float valE = matrixArg->getMember(NSV::PROP_E).to_number() ; // yy
-    boost::int32_t valG = PIXELS_TO_TWIPS(matrixArg->getMember(NSV::PROP_G).to_number()); // x0
-    boost::int32_t valH = PIXELS_TO_TWIPS(matrixArg->getMember(NSV::PROP_H).to_number()); // y0
+    float valA = SWFMatrixArg->getMember(NSV::PROP_A).to_number() ; // xx
+    float valB = SWFMatrixArg->getMember(NSV::PROP_B).to_number() ; // yx
+    float valD = SWFMatrixArg->getMember(NSV::PROP_D).to_number() ; // xy
+    float valE = SWFMatrixArg->getMember(NSV::PROP_E).to_number() ; // yy
+    boost::int32_t valG = PIXELS_TO_TWIPS(SWFMatrixArg->getMember(NSV::PROP_G).to_number()); // x0
+    boost::int32_t valH = PIXELS_TO_TWIPS(SWFMatrixArg->getMember(NSV::PROP_H).to_number()); // y0
 
     input_matrix.sx  = valA * 65536; // sx
     input_matrix.shx = valB * 65536; // shy
@@ -1815,11 +1816,11 @@ sprite_beginGradientFill(const fn_call& fn)
     input_matrix.tx = valG; // x0
     input_matrix.ty = valH; // y0
 
-    // This is the matrix that would transform the gnash
+    // This is the SWFMatrix that would transform the gnash
     // gradient to the expected flash gradient.
     // Transformation is different for linear and radial
     // gradient for Gnash (in flash they should be the same)
-    matrix gnashToFlash;
+    SWFMatrix gnashToFlash;
 
     if ( radial )
     {
@@ -1833,7 +1834,7 @@ sprite_beginGradientFill(const fn_call& fn)
     }
     else
     {
-      // First define a matrix that would transform
+      // First define a SWFMatrix that would transform
       // the gnash gradient to the expected flash gradient:
       // this means translating our gradient to put the
       // center of gradient at 0,0 and then scale it to
@@ -1846,11 +1847,11 @@ sprite_beginGradientFill(const fn_call& fn)
 
     }
 
-    // Apply gnash to flash matrix before user-defined one
+    // Apply gnash to flash SWFMatrix before user-defined one
     input_matrix.concatenate(gnashToFlash);
 
     // Finally, and don't know why, take
-    // the inverse of the resulting matrix as
+    // the inverse of the resulting SWFMatrix as
     // the one which would be used.
     mat = input_matrix;
     mat.invert();
@@ -1983,7 +1984,7 @@ sprite_startDrag(const fn_call& fn)
         }
     }
 
-    VM::get().getRoot().set_drag_state(st);
+    sprite->getVM().getRoot().set_drag_state(st);
 
     log_debug("MovieClip.startDrag() TESTING");
     return as_value();
@@ -1996,7 +1997,7 @@ sprite_stopDrag(const fn_call& fn)
   boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
   UNUSED(sprite);
 
-  VM::get().getRoot().stop_drag();
+  sprite->getVM().getRoot().stop_drag();
 
   log_debug("MovieClip.stopDrag() TESTING");
   return as_value();
@@ -2470,7 +2471,7 @@ public:
     // don't include bounds of unloaded characters
     if ( ch->isUnloaded() ) return;
     rect  chb = ch->getBounds();
-    matrix m = ch->get_matrix();
+    SWFMatrix m = ch->getMatrix();
     _bounds.expand_to_transformed_rect(m, chb);
   }
 };
@@ -2805,9 +2806,9 @@ sprite_instance::add_textfield(const std::string& name, int depth, int x, int y,
   txt_char->setDynamic();
 
   // Set _x and _y
-  matrix txt_matrix;
+  SWFMatrix txt_matrix;
   txt_matrix.set_translation(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
-  txt_char->set_matrix(txt_matrix, true); // update caches (altought shouldn't be needed as we only set translation)
+  txt_char->setMatrix(txt_matrix, true); // update caches (altought shouldn't be needed as we only set translation)
 
   // Here we add the character to the displayList.  
   m_display_list.place_character(txt_char.get(), depth); 
@@ -2849,7 +2850,7 @@ sprite_instance::duplicateMovieClip(const std::string& newname, int depth,
   newsprite->_drawable = new DynamicShape(*_drawable);
   
   newsprite->set_cxform(get_cxform());  
-  newsprite->copyMatrix(*this); // copy matrix and caches
+  newsprite->copyMatrix(*this); // copy SWFMatrix and caches
   newsprite->set_ratio(get_ratio());  
   newsprite->set_clip_depth(get_clip_depth());  
   
@@ -3067,7 +3068,7 @@ sprite_instance::set_member(string_table::key name,
   //        property (ie: have a textfield use _x as variable name and
   //        be scared)
   //
-  TextFieldPtrVect* etc = get_textfield_variable(VM::get().getStringTable().value(name));
+  TextFieldPtrVect* etc = get_textfield_variable(_vm.getStringTable().value(name));
   if ( etc )
   {
 #ifdef DEBUG_DYNTEXT_VARIABLES
@@ -3533,7 +3534,7 @@ sprite_instance::add_display_object(const SWF::PlaceObject2Tag* tag, DisplayList
 
         // TODO: check if we should check those has_xxx flags first.
         ch->set_cxform(tag->getCxform());
-        ch->set_matrix(tag->getMatrix(), true); // update caches
+        ch->setMatrix(tag->getMatrix(), true); // update caches
         ch->set_ratio(tag->getRatio());
         ch->set_clip_depth(tag->getClipDepth());
         
@@ -3604,10 +3605,10 @@ void sprite_instance::replace_display_object(const SWF::PlaceObject2Tag* tag, Di
             }
             if(tag->hasMatrix())
             {
-                ch->set_matrix(tag->getMatrix(), true); // update caches
+                ch->setMatrix(tag->getMatrix(), true); // update caches
             }
 			dlist.replace_character(ch.get(), tag->getDepth(), 
-				!tag->hasCxform(), // use matrix from the old character if tag doesn't provide one.
+				!tag->hasCxform(), // use SWFMatrix from the old character if tag doesn't provide one.
 				!tag->hasMatrix());
         }
     }
@@ -3971,13 +3972,13 @@ sprite_instance::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y)
   character* parent = get_parent();
   if ( parent ) 
   {
-    // WARNING: if we have NO parent, our parent it the Stage (movie_root)
+    // WARNING: if we have NO parent, our parent is the Stage (movie_root)
     //          so, in case we'll add a "stage" matrix, we'll need to take
     //          it into account here.
     // TODO: actually, why are we insisting in using parent's coordinates for
     //       this method at all ?
     //
-     parent->get_world_matrix().transform(wp);
+     parent->getWorldMatrix().transform(wp);
   }
 
 
@@ -3988,7 +3989,7 @@ sprite_instance::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y)
   }
 
 
-  matrix  m = get_matrix();
+  SWFMatrix  m = getMatrix();
   point  pp(x, y);
   m.invert().transform(pp);
 

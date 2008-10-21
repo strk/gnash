@@ -76,7 +76,7 @@ libgnashcore_la_SOURCES = \
         GradientBevelFilter.cpp \
         parser/filter_factory.cpp \
 	generic_character.cpp \
-	matrix.cpp \
+	SWFMatrix.cpp \
 	movie_instance.cpp \
 	movie_root.cpp \
 	namedStrings.cpp \
@@ -94,7 +94,7 @@ libgnashcore_la_SOURCES = \
 	video_stream_instance.cpp \
 	StreamProvider.cpp \
 	array.cpp \
-	button_character_instance.cpp \
+	Button.cpp \
 	DisplayList.cpp \
 	fill_style.cpp \
 	font.cpp \
@@ -107,7 +107,7 @@ libgnashcore_la_SOURCES = \
 	styles.cpp \
 	text.cpp \
 	timers.cpp \
-	types.cpp 	\
+	RGBA.cpp 	\
 	$(FREETYPE_SOURCES) \
 	$(NULL)
 
@@ -132,7 +132,7 @@ noinst_HEADERS = \
 	bitmap_info.h \
 	BitmapMovieInstance.h \
 	builtin_function.h \
-	button_character_instance.h \
+	Button.h \
 	character.h \
 	CharacterProxy.h \
 	cxform.h \
@@ -160,7 +160,7 @@ noinst_HEADERS = \
 	GnashKey.h \
 	impl.h \
 	LoadVariablesThread.h \
-	matrix.h \
+	SWFMatrix.h \
 	mouse_button_state.h \
 	movie_instance.h \
 	movie_root.h \
@@ -193,7 +193,7 @@ noinst_HEADERS = \
 	swf_function.h \
 	text.h \
 	timers.h \
-	types.h	\
+	RGBA.h	\
 	video_stream_instance.h \
 	$(NULL)
 

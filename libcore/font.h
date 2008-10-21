@@ -25,7 +25,6 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 
-#include "types.h"
 #include "resource.h" // for inheritance of font
 #include "swf.h" // for tag_type definition
 #include "bitmap_info.h" // for dtor visibility by smart pointer

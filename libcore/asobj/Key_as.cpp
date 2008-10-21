@@ -19,7 +19,7 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "log.h"
-#include "Key.h"
+#include "Key_as.h"
 #include "fn_call.h"
 #include "movie_root.h"
 #include "action.h" // for call_method
@@ -39,7 +39,7 @@ namespace gnash {
 *
 ************************************************************************/
 
-key_as_object::key_as_object()
+Key_as::Key_as()
     :
     as_object(getObjectInterface()),
     _unreleasedKeys(0),
@@ -54,7 +54,7 @@ key_as_object::key_as_object()
 }
 
 bool
-key_as_object::is_key_down(int keycode)
+Key_as::is_key_down(int keycode)
 {
     if (keycode < 0 || keycode >= key::KEYCOUNT) return false;
     if (_unreleasedKeys.test(keycode)) return true;
@@ -62,7 +62,7 @@ key_as_object::is_key_down(int keycode)
 }
 
 void
-key_as_object::set_key_down(key::code code)
+Key_as::set_key_down(key::code code)
 {
     if (code >= key::KEYCOUNT) return;
 
@@ -78,7 +78,7 @@ key_as_object::set_key_down(key::code code)
 }
 
 void
-key_as_object::set_key_up(key::code code)
+Key_as::set_key_up(key::code code)
 {
     if (code >= key::KEYCOUNT) return;
 
@@ -95,7 +95,7 @@ key_as_object::set_key_up(key::code code)
 
 
 void 
-key_as_object::notify_listeners(const event_id& key_event)
+Key_as::notify_listeners(const event_id& key_event)
 {  
     // There is no user defined "onKeyPress" event handler
     if( (key_event.m_id != event_id::KEY_DOWN) && (key_event.m_id != event_id::KEY_UP) ) return;
@@ -107,7 +107,7 @@ key_as_object::notify_listeners(const event_id& key_event)
 }
 
 int
-key_as_object::get_last_key() const
+Key_as::get_last_key() const
 {
     return _lastKeyEvent;
 }
@@ -116,8 +116,8 @@ static as_value
 key_is_accessible(const fn_call& fn)
 {
 
-    boost::intrusive_ptr<key_as_object> ko = 
-        ensureType<key_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<Key_as> ko = 
+        ensureType<Key_as>(fn.this_ptr);
 
     log_unimpl("Key.isAccessible");
     return as_value();
@@ -128,8 +128,8 @@ key_is_accessible(const fn_call& fn)
 static as_value   
 key_get_ascii(const fn_call& fn)
 {
-    boost::intrusive_ptr<key_as_object> ko = 
-        ensureType<key_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<Key_as> ko = 
+        ensureType<Key_as>(fn.this_ptr);
 
     int code = ko->get_last_key();
 
@@ -140,8 +140,8 @@ key_get_ascii(const fn_call& fn)
 static as_value   
 key_get_code(const fn_call& fn)
 {
-    boost::intrusive_ptr<key_as_object> ko = 
-        ensureType<key_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<Key_as> ko = 
+        ensureType<Key_as>(fn.this_ptr);
 
     int code = ko->get_last_key();
 
@@ -152,8 +152,8 @@ key_get_code(const fn_call& fn)
 static as_value   
 key_is_down(const fn_call& fn)
 {
-    boost::intrusive_ptr<key_as_object> ko = 
-        ensureType<key_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<Key_as> ko = 
+        ensureType<Key_as>(fn.this_ptr);
 
     if (fn.nargs < 1)
     {
@@ -188,7 +188,7 @@ void key_class_init(as_object& global)
 
     // Create built-in key object.
     // NOTE: _global.Key *is* an object, not a constructor
-    as_object*  key_obj = new key_as_object;
+    as_object*  key_obj = new Key_as;
 
     const int flags = as_prop_flags::readOnly |
                       as_prop_flags::dontDelete |
@@ -240,7 +240,7 @@ void key_class_init(as_object& global)
 
 #ifdef GNASH_USE_GC
 void
-key_as_object::markReachableResources() const
+Key_as::markReachableResources() const
 {
     markAsObjectReachable();
     for (Listeners::const_iterator i=_listeners.begin(), e=_listeners.end();

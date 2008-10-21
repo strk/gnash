@@ -328,17 +328,20 @@ bool FLVParser::parseNextTag()
 			}
 		}
 
+		boost::uint8_t codec = (tag[11] & 0xf0) >> 4;
+
+		bool header = false;
+
+		if (codec == AUDIO_CODEC_AAC) {
+			boost::uint8_t packettype = _stream->read_byte();
+			header = (packettype == 0);
+			--bodyLength;
+		}
+
 		std::auto_ptr<EncodedAudioFrame> frame = readAudioFrame(bodyLength-1, timestamp);
-		if ( ! frame.get() ) { log_error("could not read audio frame?"); }
-		else
-		{
-			// Release the stream lock 
-			// *before* pushing the frame as that 
-			// might block us waiting for buffers flush
-			// the _qMutex...
-			// We've done using the stream for this tag parsing anyway
-			streamLock.unlock();
-			pushEncodedAudioFrame(frame);
+		if ( ! frame.get() ) {
+			log_error("could not read audio frame?");
+			return true;
 		}
 
 		// If this is the first audioframe no info about the
@@ -355,9 +358,28 @@ bool FLVParser::parseNextTag()
 			if (samplesize == 0) samplesize = 1;
 			else samplesize = 2;
 
-			_audioInfo.reset( new AudioInfo((tag[11] & 0xf0) >> 4, samplerate, samplesize, (tag[11] & 0x01) >> 0, 0, FLASH) );
+			_audioInfo.reset( new AudioInfo(codec, samplerate, samplesize, (tag[11] & 0x01) >> 0, 0, FLASH) );
+			if (header) {
+				boost::uint8_t* newbuf = new boost::uint8_t[frame->dataSize];
+				memcpy(newbuf, frame->data.get(), frame->dataSize);
+
+				_audioInfo->extra.reset( 
+					new ExtraAudioInfoFlv(newbuf, frame->dataSize)
+				);
+
+				// The FAAD decoder will reject us if we pass the header buffer.
+				// It will receive the header via the extra audio info anyway.
+				return true;
+			}
 		}
 
+		// Release the stream lock 
+		// *before* pushing the frame as that 
+		// might block us waiting for buffers flush
+		// the _qMutex...
+		// We've done using the stream for this tag parsing anyway
+		streamLock.unlock();
+		pushEncodedAudioFrame(frame);
 	}
 	else if (tag[0] == FLV_VIDEO_TAG)
 	{
@@ -370,11 +392,26 @@ bool FLVParser::parseNextTag()
 
 		boost::uint16_t codec = (tag[11] & 0x0f) >> 0;
 
-        if (codec == VIDEO_CODEC_VP6 || codec == VIDEO_CODEC_VP6A)
-        {
-            _stream->read_byte();
-            --bodyLength;
-        }
+		if (codec == VIDEO_CODEC_VP6 || codec == VIDEO_CODEC_VP6A)
+		{
+			_stream->read_byte();
+			--bodyLength;
+		}
+
+		bool header = false;
+
+		if (codec == VIDEO_CODEC_H264) {
+			boost::uint8_t packettype = _stream->read_byte();
+			IF_VERBOSE_PARSE( log_debug(_("AVC packet type: %d"), (unsigned)packettype) );
+
+			header = (packettype == 0);
+
+			// 24-bits value for composition time offset ignored for now.
+			boost::uint8_t tmp[3];
+			_stream->read(tmp, 3);
+
+			bodyLength -= 4;
+		}
 		
 		if ( doIndex )
 		{
@@ -399,74 +436,18 @@ bool FLVParser::parseNextTag()
 		// video format has been noted, so we do that now
 		if ( ! _videoInfo.get() )
 		{
-			// Set standard guessed size...
-			boost::uint16_t width = 320;
-			boost::uint16_t height = 240;
+			_videoInfo.reset( new VideoInfo(codec, 0 /* width */, 0 /* height */, 0 /*frameRate*/, 0 /*duration*/, FLASH /*codec type*/) );
 
-			// Extract the video size from the videodata header
-			if (codec == VIDEO_CODEC_H263) {
+			if (header) {
+				boost::uint8_t* newbuf = new boost::uint8_t[frame->dataSize()];
+				memcpy(newbuf, frame->data(), frame->dataSize());
 
-				// We're going to re-read some data here
-				// (can likely avoid with a better cleanup)
-
-				size_t bkpos = _stream->tell();
-				if ( _stream->seek(dataPosition) ) {
-					log_error(" Couldn't seek to VideoTag data position -- should never happen, as we just read that!");
-					_parsingComplete=true;
-					_indexingCompleted=true;
-					return false;
-				}
-				boost::uint8_t videohead[12];
-
-				int actuallyRead = _stream->read(videohead, 12);
-				_stream->seek(bkpos); // rewind
-
-				if ( actuallyRead < 12 )
-				{
-		log_error("FLVParser::parseNextTag: can't read H263 video header (needed 12 bytes, only got %d)", actuallyRead);
-		_parsingComplete=true;
-		_indexingCompleted=true;
-		return false;
-				}
-
-				bool sizebit1 = (videohead[3] & 0x02);
-				bool sizebit2 = (videohead[3] & 0x01);
-				bool sizebit3 = (videohead[4] & 0x80);
-
-				// First some predefined sizes
-				if (!sizebit1 && sizebit2 && !sizebit3 ) {
-					width = 352;
-					height = 288;
-				} else if (!sizebit1 && sizebit2 && sizebit3 ) {
-					width = 176;
-					height = 144;
-				} else if (sizebit1 && !sizebit2 && !sizebit3 ) {
-					width = 128;
-					height = 96;
-				} else if (sizebit1 && !sizebit2 && sizebit3 ) {
-					width = 320;
-					height = 240;
-				} else if (sizebit1 && sizebit2 && !sizebit3 ) {
-					width = 160;
-					height = 120;
-
-				// Then the custom sizes (1 byte - untested and ugly)
-				} else if (!sizebit1 && !sizebit2 && !sizebit3 ) {
-					width = (videohead[4] & 0x40) | (videohead[4] & 0x20) | (videohead[4] & 0x20) | (videohead[4] & 0x08) | (videohead[4] & 0x04) | (videohead[4] & 0x02) | (videohead[4] & 0x01) | (videohead[5] & 0x80);
-
-					height = (videohead[5] & 0x40) | (videohead[5] & 0x20) | (videohead[5] & 0x20) | (videohead[5] & 0x08) | (videohead[5] & 0x04) | (videohead[5] & 0x02) | (videohead[5] & 0x01) | (videohead[6] & 0x80);
-
-				// Then the custom sizes (2 byte - untested and ugly)
-				} else if (!sizebit1 && !sizebit2 && sizebit3 ) {
-					width = (videohead[4] & 0x40) | (videohead[4] & 0x20) | (videohead[4] & 0x20) | (videohead[4] & 0x08) | (videohead[4] & 0x04) | (videohead[4] & 0x02) | (videohead[4] & 0x01) | (videohead[5] & 0x80) | (videohead[5] & 0x40) | (videohead[5] & 0x20) | (videohead[5] & 0x20) | (videohead[5] & 0x08) | (videohead[5] & 0x04) | (videohead[5] & 0x02) | (videohead[5] & 0x01) | (videohead[6] & 0x80);
-
-					height = (videohead[6] & 0x40) | (videohead[6] & 0x20) | (videohead[6] & 0x20) | (videohead[6] & 0x08) | (videohead[6] & 0x04) | (videohead[6] & 0x02) | (videohead[6] & 0x01) | (videohead[7] & 0x80) | (videohead[7] & 0x40) | (videohead[7] & 0x20) | (videohead[7] & 0x20) | (videohead[7] & 0x08) | (videohead[7] & 0x04) | (videohead[7] & 0x02) | (videohead[7] & 0x01) | (videohead[8] & 0x80);
-				}
-
+				_videoInfo->extra.reset( 
+					new ExtraVideoInfoFlv(newbuf, frame->dataSize())
+				);
+				// Don't bother emitting the header buffer.
+				return true;
 			}
-
-			// Create the videoinfo
-			_videoInfo.reset( new VideoInfo(codec, width, height, 0 /*frameRate*/, 0 /*duration*/, FLASH /*codec type*/) );
 		}
 
 		// Release the stream lock 
@@ -514,7 +495,8 @@ bool FLVParser::parseHeader()
 	// seek to the begining of the file
 	_stream->seek(0); // seek back ? really ?
 
-	// Read the header
+	// We only use 5 bytes of the header, because the last 4 bytes represent
+        // an integer which is always 1.
 	boost::uint8_t header[9];
 	if ( _stream->read(header, 9) != 9 )
 	{
@@ -524,17 +506,18 @@ bool FLVParser::parseHeader()
 
 	_lastParsedPosition = _bytesLoaded = _nextPosToIndex = 9;
 
-	// Check if this is really a FLV file
-	if (header[0] != 'F' || header[1] != 'L' || header[2] != 'V') return false;
+	if (!std::equal(header, header+3, "FLV")) {
+		return false;
+	}
 
-	int version = header[3];
+	const boost::uint8_t& version = header[3];
 
 	// Parse the audio+video bitmask
 	_audio = header[4]&(1<<2);
 	_video = header[4]&(1<<0);
 
 	log_debug("Parsing FLV version %d, audio:%d, video:%d",
-			version, _audio, _video);
+			(int)version, _audio, _video);
 
 	// Initialize audio/video info if any audio/video
 	// tag was found within the first 'probeBytes' bytes
@@ -627,6 +610,7 @@ FLVParser::readVideoFrame(boost::uint32_t dataSize, boost::uint32_t timestamp)
 	// We won't need frameNum, so will set to zero...
 	// TODO: fix this ?
 	// NOTE: ownership of 'data' is transferred here
+
 	frame.reset( new EncodedVideoFrame(data, dataSize, 0, timestamp) );
 	return frame;
 }
@@ -675,14 +659,14 @@ FLVParser::MetaTag::execute(as_object* thisPtr, VM& vm)
 	string_table::key funcKey = st.find(funcName);
 
 	as_value arg;
-    std::vector<as_object*> objRefs;
+	std::vector<as_object*> objRefs;
 	if ( ! arg.readAMF0(ptr, endptr, -1, objRefs, vm) )
 	{
 		log_error("Could not convert FLV metatag to as_value, but will try passing it anyway. It's an %s", arg);
 		//return;
 	}
 
-    log_debug("Calling %s(%s)", funcName, arg);
+	log_debug("Calling %s(%s)", funcName, arg);
 	thisPtr->callMethod(funcKey, arg);
 }
 

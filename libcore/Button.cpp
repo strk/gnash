@@ -22,7 +22,7 @@
 #endif
 
 #include "smart_ptr.h" // GNASH_USE_GC
-#include "button_character_instance.h"
+#include "Button.h"
 #include "button_character_def.h"
 #include "as_value.h"
 
@@ -427,7 +427,7 @@ Button::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y)
 	{
 		std::sort(actChars.begin(), actChars.end(), charDepthLessThen);
 
-		matrix  m = get_matrix();
+		SWFMatrix  m = getMatrix();
         point  p(x, y);
         m.invert().transform(p);
 
@@ -453,7 +453,7 @@ Button::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y)
 	character* parent = get_parent();
 	if ( parent )
 	{
-		parent->get_world_matrix().transform(wp);
+		parent->getWorldMatrix().transform(wp);
 	}
 
 	for (CharsVect::const_iterator i = _hitCharacters.begin(),
@@ -742,13 +742,13 @@ Button::set_current_state(MouseState new_state)
 				// Not there, instantiate
 				button_record& bdef = _def.m_button_records[i];
 
-				const matrix&	mat = bdef.m_button_matrix;
+				const SWFMatrix&	mat = bdef.m_button_matrix;
 				const cxform&	cx = bdef.m_button_cxform;
 				int ch_depth = bdef.m_button_layer+character::staticDepthOffset+1;
 				int ch_id = bdef.m_character_id;
 
 				character* ch = bdef.m_character_def->create_character_instance(this, ch_id);
-				ch->set_matrix(mat, true); // update caches
+				ch->setMatrix(mat, true); // update caches
 				ch->set_cxform(cx); 
 				ch->set_depth(ch_depth); 
 				assert(ch->get_parent() == this);
@@ -818,7 +818,7 @@ Button::getBounds() const
 		const character* ch = *i;
 		// Child bounds need be transformed in our coordinate space
 		rect lclBounds = ch->getBounds();
-		matrix m = ch->get_matrix();
+		SWFMatrix m = ch->getMatrix();
 		allBounds.expand_to_transformed_rect(m, lclBounds);
 	}
 
@@ -895,13 +895,13 @@ Button::stagePlacementCallback()
 	{
 		button_record& bdef = _def.m_button_records[*i];
 
-		const matrix& mat = bdef.m_button_matrix;
+		const SWFMatrix& mat = bdef.m_button_matrix;
 		const cxform& cx = bdef.m_button_cxform;
 		int ch_depth = bdef.m_button_layer+character::staticDepthOffset+1;
 		int ch_id = bdef.m_character_id;
 
 		character* ch = bdef.m_character_def->create_character_instance(this, ch_id);
-		ch->set_matrix(mat, true);  // update caches
+		ch->setMatrix(mat, true);  // update caches
 		ch->set_cxform(cx); // TODO: who cares about color ?
 		ch->set_depth(ch_depth); // TODO: check if we care about depth, and why ...
 		assert(ch->get_parent() == this);
@@ -926,13 +926,13 @@ Button::stagePlacementCallback()
 		int rno = *i;
 		button_record& bdef = _def.m_button_records[rno];
 
-		const matrix&	mat = bdef.m_button_matrix;
+		const SWFMatrix&	mat = bdef.m_button_matrix;
 		const cxform&	cx = bdef.m_button_cxform;
 		int ch_depth = bdef.m_button_layer+character::staticDepthOffset+1;
 		int ch_id = bdef.m_character_id;
 
 		character* ch = bdef.m_character_def->create_character_instance(this, ch_id);
-		ch->set_matrix(mat, true);  // update caches
+		ch->setMatrix(mat, true);  // update caches
 		ch->set_cxform(cx); 
 		ch->set_depth(ch_depth); 
 		assert(ch->get_parent() == this);
@@ -1002,7 +1002,7 @@ Button::unload()
 	//       as the _hitCharacters are never placed on stage.
 	//       As an optimization we might not even instantiate
 	//       them, and only use the definition and the 
-	//       associated transform matrix... (would take
+	//       associated transform SWFMatrix... (would take
 	//       hit instance off the GC).
 	_hitCharacters.clear();
 
@@ -1029,7 +1029,7 @@ Button::destroy()
 	//       as the _hitCharacters are never placed on stage.
 	//       As an optimization we might not even instantiate
 	//       them, and only use the definition and the 
-	//       associated transform matrix... (would take
+	//       associated transform SWFMatrix... (would take
 	//       hit instance off the GC).
 	_hitCharacters.clear();
 

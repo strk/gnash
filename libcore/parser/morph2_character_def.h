@@ -46,7 +46,7 @@ namespace gnash {
 		void	read(SWFStream& in, int tag_type, bool with_style, movie_definition& m);
 
 		virtual void	display(character* inst);
-		void lerp_matrix(matrix& t, const matrix& m1, const matrix& m2, const float ratio);
+		void lerp_matrix(SWFMatrix& t, const SWFMatrix& m1, const SWFMatrix& m2, const float ratio);
 
 		// Question: What is the bound of a morph? Is this conceptually correct?
 		/// TODO: optimize this by take ratio into consideration, to decrease some

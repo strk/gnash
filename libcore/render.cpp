@@ -97,7 +97,7 @@ namespace render
 	}
 
 	// Draws the video frames
-	void drawVideoFrame(image::ImageBase* frame, const matrix* mat, const rect* bounds){
+	void drawVideoFrame(image::ImageBase* frame, const SWFMatrix* mat, const rect* bounds){
 		if (s_render_handler) return s_render_handler->drawVideoFrame(frame, mat, bounds);
 	}
 
@@ -137,7 +137,7 @@ namespace render
 	}
 
 
-	void	draw_line_strip(const boost::int16_t coords[], int vertex_count, const rgba& color, const matrix& mat)
+	void	draw_line_strip(const boost::int16_t coords[], int vertex_count, const rgba& color, const SWFMatrix& mat)
 	{
 #ifdef DEBUG_RENDER_CALLS
 		GNASH_REPORT_FUNCTION;
@@ -147,7 +147,7 @@ namespace render
 
 
 void  draw_poly(const point* corners, int corner_count, const rgba& fill, 
-  const rgba& outline, const matrix& mat, bool masked) 
+  const rgba& outline, const SWFMatrix& mat, bool masked) 
 	{
 #ifdef DEBUG_RENDER_CALLS
 		GNASH_REPORT_FUNCTION;
@@ -167,7 +167,7 @@ void draw_shape_character(shape_character_def *def,
 }
 
 void draw_glyph(shape_character_def *def,
-  const matrix& mat,
+  const SWFMatrix& mat,
   const rgba& color)
 {
 #ifdef DEBUG_RENDER_CALLS

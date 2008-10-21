@@ -22,7 +22,7 @@
 namespace gnash {
 	class SWFStream;
 	class cxform;
-	class matrix;
+	class SWFMatrix;
 }
 
 namespace gnash {
@@ -47,9 +47,9 @@ namespace gnash {
 		/// Return true if the specified point is on the interior of our shape.
 		//
 		/// Incoming coords are local coords (twips).
-		/// The matrix will be used for lines with non-scalable strokes.
+		/// The SWFMatrix will be used for lines with non-scalable strokes.
 		///
-		virtual bool point_test_local(boost::int32_t x, boost::int32_t y, matrix& wm);
+		virtual bool point_test_local(boost::int32_t x, boost::int32_t y, SWFMatrix& wm);
 
 		float	get_height_local() const;
 		float	get_width_local() const;
@@ -80,7 +80,7 @@ namespace gnash {
 		void read(SWFStream& in, int tag_type, bool with_style, movie_definition& m);
 
 		void	display(
-			const matrix& mat,
+			const SWFMatrix& mat,
 			const cxform& cx,
 			const std::vector<fill_style>& fill_styles,
 			const std::vector<line_style>& line_styles) const;

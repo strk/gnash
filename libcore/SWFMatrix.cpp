@@ -29,7 +29,7 @@
 #include <pthread.h>
 #endif
 
-#include "matrix.h"
+#include "SWFMatrix.h"
 #include "SWFStream.h" // for reading from SWF
 #include "log.h"
 
@@ -38,7 +38,7 @@
 
 namespace gnash {
 
-matrix::matrix()
+SWFMatrix::SWFMatrix()
 {
     // Default to identity.
     sx = sy = 65536;
@@ -46,7 +46,7 @@ matrix::matrix()
 }
 
 void
-matrix::read(SWFStream& in)
+SWFMatrix::read(SWFStream& in)
 // Initialize from the stream.
 {
     in.align();
@@ -88,28 +88,28 @@ matrix::read(SWFStream& in)
 }
 
 bool
-matrix::is_valid() const
+SWFMatrix::is_valid() const
 {
-    // The integer matrix is always valid now from outside.
+    // The integer SWFMatrix is always valid now from outside.
     // swallow it if anything wrong inside this class.
     return true;
 }
 
 void
-matrix::set_identity()
-// Set the matrix to identity.
+SWFMatrix::set_identity()
+// Set the SWFMatrix to identity.
 {
     sx = sy = 65536;
     shx = shy = tx = ty = 0;
 }
 
 void
-matrix::concatenate(const matrix& m)
+SWFMatrix::concatenate(const SWFMatrix& m)
 // Concatenate m's transform onto ours.  When
 // transforming points, m happens first, then our
-// original matrix.
+// original SWFMatrix.
 {
-    matrix  t;
+    SWFMatrix  t;
     t.sx =  Fixed16Mul(sx, m.sx)  + Fixed16Mul(shy, m.shx);
     t.shx = Fixed16Mul(shx, m.sx) + Fixed16Mul(sy, m.shx);
     t.shy = Fixed16Mul(sx, m.shy) + Fixed16Mul(shy, m.sy);
@@ -121,9 +121,9 @@ matrix::concatenate(const matrix& m)
 }
 
 void
-matrix::concatenate_translation(int xoffset, int yoffset)
+SWFMatrix::concatenate_translation(int xoffset, int yoffset)
 // Concatenate a translation onto the front of our
-// matrix.  When transforming points, the translation
+// SWFMatrix.  When transforming points, the translation
 // happens first, then our original xform.
 {
     tx += Fixed16Mul(sx,  xoffset) + Fixed16Mul(shy, yoffset);
@@ -131,8 +131,8 @@ matrix::concatenate_translation(int xoffset, int yoffset)
 }
 
 void
-matrix::concatenate_scale(double xscale, double yscale)
-// Concatenate scales to our matrix. When transforming points, these 
+SWFMatrix::concatenate_scale(double xscale, double yscale)
+// Concatenate scales to our SWFMatrix. When transforming points, these 
 // scales happen first, then our matirx.
 {
     sx  = Fixed16Mul(sx, DoubleToFixed16(xscale));
@@ -142,8 +142,8 @@ matrix::concatenate_scale(double xscale, double yscale)
 }
 
 void
-matrix::set_lerp(const matrix& m1, const matrix& m2, float t)
-// Set this matrix to a blend of m1 and m2, parameterized by t.
+SWFMatrix::set_lerp(const SWFMatrix& m1, const SWFMatrix& m2, float t)
+// Set this SWFMatrix to a blend of m1 and m2, parameterized by t.
 {
     using utility::flerp;
     sx = flerp(m1.sx, m2.sx, t);
@@ -155,8 +155,8 @@ matrix::set_lerp(const matrix& m1, const matrix& m2, float t)
 }
 
 void
-matrix::set_scale_rotation(double x_scale, double y_scale, double angle)
-// Set the scale & rotation part of the matrix.
+SWFMatrix::set_scale_rotation(double x_scale, double y_scale, double angle)
+// Set the scale & rotation part of the SWFMatrix.
 // angle in radians.
 {
     double   cos_angle = cos(angle);
@@ -168,7 +168,7 @@ matrix::set_scale_rotation(double x_scale, double y_scale, double angle)
 }
 
 void
-matrix::set_x_scale(double xscale)
+SWFMatrix::set_x_scale(double xscale)
 {
     double rot_x = atan2((double)shx, (double)sx);
     sx  =  DoubleToFixed16(xscale * cos(rot_x));
@@ -176,7 +176,7 @@ matrix::set_x_scale(double xscale)
 }
 
 void
-matrix::set_y_scale(double yscale)
+SWFMatrix::set_y_scale(double yscale)
 {
     double rot_y = std::atan2((double)(-shy), (double)(sy));
 
@@ -185,14 +185,14 @@ matrix::set_y_scale(double yscale)
 }
 
 void
-matrix::set_scale(double xscale, double yscale)
+SWFMatrix::set_scale(double xscale, double yscale)
 {
     double rotation = get_rotation();
     set_scale_rotation(xscale, yscale, rotation); 
 }
 
 void
-matrix::set_rotation(double rotation)
+SWFMatrix::set_rotation(double rotation)
 {   
     double rot_x = atan2((double)shx,    (double)sx);
     double rot_y = atan2((double)(-shy), (double)sy);
@@ -206,8 +206,8 @@ matrix::set_rotation(double rotation)
 }
 
 void
-matrix::transform(point* result, const point& p) const
-// Transform point 'p' by our matrix.  Put the result in *result.
+SWFMatrix::transform(point* result, const point& p) const
+// Transform point 'p' by our SWFMatrix.  Put the result in *result.
 {
     assert(result);
 
@@ -216,7 +216,7 @@ matrix::transform(point* result, const point& p) const
 }
 
 void
-matrix::transform(geometry::Range2d<float>& r) const
+SWFMatrix::transform(geometry::Range2d<float>& r) const
 {
     if ( ! r.isFinite() ) return;
 
@@ -242,7 +242,7 @@ matrix::transform(geometry::Range2d<float>& r) const
 }
 
 void 
-matrix::transform(rect& r) const
+SWFMatrix::transform(rect& r) const
 {
     if ( r.is_null() ) return;
 
@@ -267,15 +267,15 @@ matrix::transform(rect& r) const
     r.expand_to_point(p3.x, p3.y);
 }
 
-const matrix&
-matrix::invert()
-// invert this matrix and return the result.
+const SWFMatrix&
+SWFMatrix::invert()
+// invert this SWFMatrix and return the result.
 {
     boost::int64_t det = determinant();
     if(det == 0)
     {
         //log_debug("Matrix not invertible, setting to identity on invert request");
-        // tested in misc-ming.all/matrix_test.c (seek "matrix inversion")
+        // tested in misc-ming.all/SWFMatrix_test.c (seek "SWFMatrix inversion")
         set_identity();
     }
     else
@@ -299,27 +299,27 @@ matrix::invert()
 }
 
 double
-matrix::get_x_scale() const
+SWFMatrix::get_x_scale() const
 {
     return sqrt(((double)sx * sx + (double)shx * shx)) / 65536.0;
 }
 
 double
-matrix::get_y_scale() const
+SWFMatrix::get_y_scale() const
 {
     return sqrt(((double)sy * sy + (double)shy * shy)) / 65536.0;
 }
 
 double
-matrix::get_rotation() const
+SWFMatrix::get_rotation() const
 {
-    return atan2(shx, sx); // more successes in misc-ming.all/matrix_test.c
+    return atan2(shx, sx); // more successes in misc-ming.all/SWFMatrix_test.c
 }
 
 // private
 boost::int64_t
-matrix::determinant() const
-// Return the 32.32 fixed point determinant of this matrix.
+SWFMatrix::determinant() const
+// Return the 32.32 fixed point determinant of this SWFMatrix.
 {
     // | sx	shy	tx |
     // | shx	sy	ty |   = T. Using the Leibniz formula:
@@ -332,7 +332,7 @@ matrix::determinant() const
     return (boost::int64_t)sx * sy - (boost::int64_t)shx * shy;
 }
 
-std::ostream& operator<< (std::ostream& o, const matrix& m)
+std::ostream& operator<< (std::ostream& o, const SWFMatrix& m)
 {
     // 8 digits and a decimal point.
     const short fieldWidth = 9;

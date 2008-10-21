@@ -25,7 +25,7 @@
 #include "render.h"
 #include "VM.h"
 #include "ExecutableCode.h"
-#include "Stage.h"
+#include "Stage_as.h"
 #include "utility.h"
 #include "URL.h"
 #include "namedStrings.h"
@@ -485,7 +485,7 @@ movie_root::clear()
 	setInvalidated();
 }
 
-boost::intrusive_ptr<Stage>
+boost::intrusive_ptr<Stage_as>
 movie_root::getStageObject()
 {
 	as_value v;
@@ -493,7 +493,7 @@ movie_root::getStageObject()
 	as_object* global = _vm.getGlobal();
 	if ( ! global ) return NULL;
 	if (!global->get_member(NSV::PROP_iSTAGE, &v) ) return NULL;
-	return boost::dynamic_pointer_cast<Stage>(v.to_object());
+	return boost::dynamic_pointer_cast<Stage_as>(v.to_object());
 }
 		
 void
@@ -509,7 +509,7 @@ movie_root::set_display_viewport(int x0, int y0, int w, int h)
 	if ( _scaleMode == noScale ) // rescale not allowed, notify Stage (if any)
 	{
 		//log_debug("Rescaling disabled");
-		boost::intrusive_ptr<Stage> stage = getStageObject();
+		boost::intrusive_ptr<Stage_as> stage = getStageObject();
 		if ( stage ) stage->notifyResize();
 	}
 
@@ -528,7 +528,7 @@ movie_root::notify_mouse_moved(int x, int y)
 
 }
 
-boost::intrusive_ptr<key_as_object>
+boost::intrusive_ptr<Key_as>
 movie_root::getKeyObject()
 {
 	// TODO: test what happens with the global "Key" object
@@ -542,15 +542,14 @@ movie_root::getKeyObject()
 		// TODO: use a named string...
 
 		as_value kval;
-		as_object* global = VM::get().getGlobal();
+		as_object* global = _vm.getGlobal();
 
-		std::string objName = PROPNAME("Key");
-		if (global->get_member(_vm.getStringTable().find(objName), &kval) )
+		if (global->get_member(NSV::CLASS_KEY, &kval) )
 		{
 			//log_debug("Found member 'Key' in _global: %s", kval.to_string());
 			boost::intrusive_ptr<as_object> obj = kval.to_object();
 			//log_debug("_global.Key to_object() : %s @ %p", typeid(*obj).name(), obj);
-			_keyobject = boost::dynamic_pointer_cast<key_as_object>( obj );
+			_keyobject = boost::dynamic_pointer_cast<Key_as>( obj );
 		}
 	}
 
@@ -567,8 +566,7 @@ movie_root::getMouseObject()
 		as_value val;
 		as_object* global = _vm.getGlobal();
 
-		std::string objName = PROPNAME("Mouse");
-		if (global->get_member(_vm.getStringTable().find(objName), &val) )
+		if (global->get_member(NSV::CLASS_MOUSE, &val) )
 		{
 			//log_debug("Found member 'Mouse' in _global: %s", val);
 			_mouseobject = val.to_object();
@@ -579,7 +577,7 @@ movie_root::getMouseObject()
 }
 
 
-key_as_object *
+Key_as *
 movie_root::notify_global_key(key::code k, bool down)
 {
 	if ( _vm.getSWFVersion() < 5 )
@@ -588,7 +586,7 @@ movie_root::notify_global_key(key::code k, bool down)
 		return NULL; 
 	}
 
-	boost::intrusive_ptr<key_as_object> keyobject = getKeyObject();
+	boost::intrusive_ptr<Key_as> keyobject = getKeyObject();
 	if ( keyobject )
 	{
 		if (down) _keyobject->set_key_down(k);
@@ -596,7 +594,8 @@ movie_root::notify_global_key(key::code k, bool down)
 	}
 	else
 	{
-		log_error("gnash::notify_key_event(): _global.Key doesn't exist, or isn't the expected built-in");
+		log_error("gnash::notify_key_event(): _global.Key doesn't "
+				"exist, or isn't the expected built-in");
 	}
 
 	return _keyobject.get();
@@ -608,7 +607,7 @@ movie_root::notify_key_event(key::code k, bool down)
 	//
 	// First of all, notify the _global.Key object about key event
 	//
-	key_as_object * global_key = notify_global_key(k, down);
+	Key_as * global_key = notify_global_key(k, down);
 
 	// Notify character key listeners for clip key events
 	notify_key_listeners(k, down);
@@ -915,7 +914,7 @@ movie_root::set_drag_state(const drag_state& st)
 	{
 		// Get coordinates of the character's origin
 		point origin(0, 0);
-		matrix chmat = ch->get_world_matrix();
+		SWFMatrix chmat = ch->getWorldMatrix();
 		point world_origin;
 		chmat.transform(&world_origin, origin);
 
@@ -950,11 +949,11 @@ movie_root::doMouseDrag()
 
 	point world_mouse(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
 
-	matrix	parent_world_mat;
+	SWFMatrix	parent_world_mat;
 	character* parent = dragChar->get_parent();
 	if (parent != NULL)
 	{
-	    parent_world_mat = parent->get_world_matrix();
+	    parent_world_mat = parent->getWorldMatrix();
 	}
 
 	if (! m_drag_state.isLockCentered())
@@ -976,9 +975,9 @@ movie_root::doMouseDrag()
 	// Place our origin so that it coincides with the mouse coords
 	// in our parent frame.
 	// TODO: add a character::set_translation ?
-	matrix	local = dragChar->get_matrix();
+	SWFMatrix	local = dragChar->getMatrix();
 	local.set_translation(world_mouse.x, world_mouse.y);
-	dragChar->set_matrix(local); //no need to update caches when only changing translation
+	dragChar->setMatrix(local); //no need to update caches when only changing translation
 }
 
 
@@ -1458,7 +1457,7 @@ movie_root::setStageScaleMode(ScaleMode sm)
 
     if ( notifyResize )
     {
-        boost::intrusive_ptr<Stage> stage = getStageObject();
+        boost::intrusive_ptr<Stage_as> stage = getStageObject();
         if ( stage ) stage->notifyResize();
     }
 }
@@ -1468,7 +1467,7 @@ movie_root::setStageDisplayState(const DisplayState ds)
 {
     _displayState = ds;
 
-    boost::intrusive_ptr<Stage> stage = getStageObject();
+    boost::intrusive_ptr<Stage_as> stage = getStageObject();
     if ( stage ) stage->notifyFullScreen( (_displayState == fullScreen) );
 
 	if (!_interfaceHandler) return; // No registered callback
@@ -1697,7 +1696,7 @@ movie_root::executeTimers()
         log_debug("Checking %d timers for expiration", _intervalTimers.size());
 #endif
 
-	unsigned long now = VM::get().getTime();
+	unsigned long now = _vm.getTime();
 
 	typedef std::multimap<unsigned int, Timer*> ExpiredTimers;
 	ExpiredTimers expiredTimers;
@@ -2113,7 +2112,7 @@ movie_root::processLoadMovieRequests()
 bool
 movie_root::isLevelTarget(const std::string& name, unsigned int& levelno)
 {
-  if ( VM::get().getSWFVersion() > 6 )
+  if ( _vm.getSWFVersion() > 6 )
   {
     if ( name.compare(0, 6, "_level") ) return false;
   }

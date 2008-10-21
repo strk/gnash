@@ -124,7 +124,7 @@ AGG ressources
 #include <cmath>
 
 #include "gnash.h"
-#include "types.h"
+#include "RGBA.h"
 #include "image.h"
 #include "utility.h"
 #include "log.h"
@@ -202,8 +202,8 @@ namespace gnash {
 class agg_transformed_path 
 {
 public:
-  /// Original transformation matrix 
-  matrix m_mat;  
+  /// Original transformation SWFMatrix 
+  SWFMatrix m_mat;  
   
   /// Normal or rounded coordinates?
   bool m_rounded;
@@ -222,7 +222,7 @@ class agg_cache_manager : private render_cache_manager
 
   /// Looks for a matching pre-computed path in the cache list
   /// Returns NULL if no cache item matches 
-  std::vector <agg::path_storage>* search(const matrix& mat, bool rounded) {
+  std::vector <agg::path_storage>* search(const SWFMatrix& mat, bool rounded) {
   
     const size_t ccount = m_items.size();
     
@@ -366,7 +366,7 @@ private:
   int yres;
   int bpp;  // bits per pixel
   // double xscale, yscale;  <-- deprecated, to be removed
-  gnash::matrix stage_matrix;  // conversion from TWIPS to pixels
+  gnash::SWFMatrix stage_matrix;  // conversion from TWIPS to pixels
   bool scale_set;
   
   
@@ -431,7 +431,7 @@ public:
     return new agg_bitmap_info<agg::pixfmt_rgb24_pre> (0, 0, 0, &dummy, 24);
   }
 
-  void drawVideoFrame(image::ImageBase* frame, const matrix* source_mat, 
+  void drawVideoFrame(image::ImageBase* frame, const SWFMatrix* source_mat, 
     const rect* bounds) {
   
     // NOTE: Assuming that the source image is RGB 8:8:8
@@ -456,14 +456,14 @@ public:
 
     assert(frame->type() == GNASH_IMAGE_RGB);
     
-    matrix mat = stage_matrix;
+    SWFMatrix mat = stage_matrix;
     mat.concatenate(*source_mat);
     
     // compute video scaling relative to video obejct size
     double vscaleX = TWIPS_TO_PIXELS(bounds->width())  / frame->width();
     double vscaleY = TWIPS_TO_PIXELS(bounds->height()) / frame->height();
     
-    // convert Gnash matrix to AGG matrix and scale down to pixel coordinates
+    // convert Gnash SWFMatrix to AGG SWFMatrix and scale down to pixel coordinates
     // while we're at it
     agg::trans_affine img_mtx(
       mat.sx  / 65536.0, mat.shx / 65536.0, 
@@ -471,13 +471,13 @@ public:
       mat.tx, mat.ty
     );    
     
-    // invert matrix since this is used for the image source
+    // invert SWFMatrix since this is used for the image source
     img_mtx.invert();
     
     // convert TWIPS to pixels and apply video scale
     img_mtx *= agg::trans_affine_scaling(1.0/(20.0*vscaleX), 1.0/(20.0*vscaleY));
     
-    // span allocator is used to apply the matrix
+    // span allocator is used to apply the SWFMatrix
     agg::span_allocator<agg::rgba8> sa;
         
     typedef agg::span_interpolator_linear<> interpolator_type;
@@ -715,12 +715,12 @@ public:
 
   
   void  draw_line_strip(const boost::int16_t* coords, int vertex_count, const rgba& color,
-                  const matrix& line_mat)
+                  const SWFMatrix& line_mat)
   // Draw the line strip formed by the sequence of points.
   {
     assert(m_pixf.get());
 
-    matrix mat = stage_matrix;
+    SWFMatrix mat = stage_matrix;
     mat.concatenate(line_mat);    
 
     if ( _clipbounds.empty() ) return;
@@ -834,7 +834,7 @@ public:
   
 
   void draw_glyph(shape_character_def *def,
-      const matrix& mat, const rgba& color) 
+      const SWFMatrix& mat, const rgba& color) 
   {
     std::vector<path> paths;
     apply_matrix_to_path(def->get_paths(), paths, mat);
@@ -877,9 +877,9 @@ public:
   /// "_clipbounds_selected" is used by draw_shape() and draw_outline() and
   /// *must* be initialized prior to using those function.
   void select_clipbounds(const shape_character_def *def, 
-    const matrix& source_mat) {
+    const SWFMatrix& source_mat) {
     
-    matrix mat = stage_matrix;
+    SWFMatrix mat = stage_matrix;
     mat.concatenate(source_mat);
   
     _clipbounds_selected.clear();
@@ -933,7 +933,7 @@ public:
   }
 
   void draw_shape_character(shape_character_def *def, 
-    const matrix& mat,
+    const SWFMatrix& mat,
     const cxform& cx,
     const std::vector<fill_style>& fill_styles,
     const std::vector<line_style>& line_styles) {
@@ -1038,14 +1038,14 @@ public:
     
   }
 
-/// Takes a path and translates it using the given matrix. The new path
+/// Takes a path and translates it using the given SWFMatrix. The new path
 /// is stored in paths_out. Both paths_in and paths_out are expected to
 /// be in TWIPS.
 void apply_matrix_to_path(const std::vector<path> &paths_in, 
-      std::vector<path>& paths_out, const matrix &source_mat) 
+      std::vector<path>& paths_out, const SWFMatrix &source_mat) 
 {
 
-    matrix mat;
+    SWFMatrix mat;
     // make sure paths_out is also in TWIPS to keep accuracy.
     mat.concatenate_scale(20.0,  20.0);
     mat.concatenate(stage_matrix);
@@ -1277,10 +1277,10 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
   // Initializes the internal styles class for AGG renderer
   void build_agg_styles(agg_style_handler& sh, 
     const std::vector<fill_style>& fill_styles,
-    const matrix& fillstyle_matrix,
+    const SWFMatrix& fillstyle_matrix,
     const cxform& cx) {
     
-    matrix inv_stage_matrix = stage_matrix;
+    SWFMatrix inv_stage_matrix = stage_matrix;
     inv_stage_matrix.invert();
     
     const size_t fcount = fill_styles.size();
@@ -1293,8 +1293,8 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
 
         case SWF::FILL_LINEAR_GRADIENT:
         {    
-          matrix m = fill_styles[fno].get_gradient_matrix();
-          matrix cm = fillstyle_matrix;
+          SWFMatrix m = fill_styles[fno].getGradientMatrix();
+          SWFMatrix cm = fillstyle_matrix;
           cm.invert();
           
           m.concatenate(cm);
@@ -1306,8 +1306,8 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
 
         case SWF::FILL_RADIAL_GRADIENT:
         {
-          matrix m = fill_styles[fno].get_gradient_matrix();
-          matrix cm = fillstyle_matrix;
+          SWFMatrix m = fill_styles[fno].getGradientMatrix();
+          SWFMatrix cm = fillstyle_matrix;
           cm.invert();
           
           m.concatenate(cm);
@@ -1319,8 +1319,8 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
 
         case SWF::FILL_FOCAL_GRADIENT:
         {
-          matrix m = fill_styles[fno].get_gradient_matrix();
-          matrix cm = fillstyle_matrix;
+          SWFMatrix m = fill_styles[fno].getGradientMatrix();
+          SWFMatrix cm = fillstyle_matrix;
           cm.invert();
           
           m.concatenate(cm);
@@ -1337,8 +1337,8 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
         case SWF::FILL_TILED_BITMAP_HARD:
         case SWF::FILL_CLIPPED_BITMAP_HARD:
         {    
-          matrix m = fill_styles[fno].get_bitmap_matrix();
-          matrix cm = fillstyle_matrix;
+          SWFMatrix m = fill_styles[fno].getBitmapMatrix();
+          SWFMatrix cm = fillstyle_matrix;
           cm.invert();
           
           m.concatenate(cm);
@@ -1371,7 +1371,7 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
   //
   /// Normally, Flash shapes are drawn using even-odd filling rule. However,
   /// for glyphs non-zero filling rule should be used (even_odd=0).
-  /// Note the paths have already been transformed by the matrix and 
+  /// Note the paths have already been transformed by the SWFMatrix and 
   /// 'subshape_id' defines which sub-shape should be drawn (-1 means all 
   /// subshapes).
   ///
@@ -1623,7 +1623,7 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
   void draw_outlines(int subshape_id, const std::vector<path> &paths,
     const std::vector<agg::path_storage>& agg_paths,
     const std::vector<line_style> &line_styles, const cxform& cx,
-    const matrix& linestyle_matrix) {
+    const SWFMatrix& linestyle_matrix) {
     
     if (m_alpha_mask.empty()) {
     
@@ -1657,7 +1657,7 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
   void draw_outlines_impl(int subshape_id, const std::vector<path> &paths,
     const std::vector<agg::path_storage>& agg_paths,
     const std::vector<line_style> &line_styles, const cxform& cx, 
-    const matrix& linestyle_matrix, scanline_type& sl) {
+    const SWFMatrix& linestyle_matrix, scanline_type& sl) {
     
     assert(m_pixf.get());
     
@@ -1774,7 +1774,7 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
   /// Draws the given polygon.
   template <class scanline_type>
   void draw_poly_impl(const point* corners, size_t corner_count, const rgba& fill, 
-    const rgba& outline, scanline_type& sl, const matrix& poly_mat) {
+    const rgba& outline, scanline_type& sl, const SWFMatrix& poly_mat) {
     
     assert(m_pixf.get());
 
@@ -1782,7 +1782,7 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
     
     if ( _clipbounds.empty() ) return;
     
-    matrix mat = stage_matrix;
+    SWFMatrix mat = stage_matrix;
     mat.concatenate(poly_mat);
     
     typedef agg::rasterizer_scanline_aa<> ras_type;
@@ -1853,7 +1853,7 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
   
   
   void draw_poly(const point* corners, size_t corner_count, const rgba& fill, 
-    const rgba& outline, const matrix& mat, bool masked) {
+    const rgba& outline, const SWFMatrix& mat, bool masked) {
     
     if (masked && !m_alpha_mask.empty()) {
     
@@ -1927,7 +1927,7 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
   pixel_to_world(int x, int y)
   {
     point p(x, y);
-    matrix mat = stage_matrix;
+    SWFMatrix mat = stage_matrix;
     mat.invert().transform(p);
     return p;    
   };

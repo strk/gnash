@@ -75,14 +75,14 @@ EXTRA_DIST = \
 	$(COMMON) \
 	$(XML_MAIN) \
 	$(MANSRC)  \
-	preformatted/gnashuser.html.in preformatted/gprocessor.1.in preformatted/cygnal.1.in preformatted/gnash.1.in preformatted/gnash_ref.info.in preformatted/soldumper.1.in preformatted/dumpshm.1.in preformatted/gnashref.html.in preformatted/gnash_user.info.in
+	preformatted/gnashuser.html.in preformatted/gprocessor.1.in preformatted/cygnal.1.in preformatted/gnash.1.in preformatted/gnash_ref.info.in preformatted/soldumper.1.in preformatted/flvdumper.1.in preformatted/dumpshm.1.in preformatted/gnashref.html.in preformatted/gnash_user.info.in
 
 #noinst_SCRIPT = gen-doc.sh
 # We list the texi and info pages twice, as differing versions of the 
 # docbook-utils transform the name at different steps in the process.
 # This is an easy way to handle it either way, since we only need it as
 # dependency anyway.
-dist_man_MANS = gnash.1 gprocessor.1 dumpshm.1 soldumper.1 cygnal.1
+dist_man_MANS = gnash.1 gprocessor.1 dumpshm.1 soldumper.1 flvdumper.1 cygnal.1
 MANSRC = $(dist_man_MANS:.1=.man-xml)
 INFOS  = gnash_user.info gnash_ref.info
 HTMLS  = $(XML_MAIN:.xml=.html)

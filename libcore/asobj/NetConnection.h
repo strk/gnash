@@ -29,7 +29,7 @@
 
 // Forward declarations
 namespace gnash {
-	//class NetStream;
+	//class NetStream_as;
 	class AMFQueue;
 }
 

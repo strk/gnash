@@ -141,11 +141,12 @@
 # Timeout in seconds for stream download
 #
 # The download will timeout after the given seconds
-# of inactivity. Every activity resets the timer
+# of inactivity. Every activity resets the timer.
+# 0 means never timeout.
 #
 # Default: @DEFAULT_STREAMS_TIMEOUT@
 #
-set streamsTimeout 3
+#set streamsTimeout 0
 
 # A space-separated list of directories you want movies
 # to have access to.
@@ -176,9 +177,9 @@ set streamsTimeout 3
 #
 # If the directory doens't exist SharedObject won't work.
 # 
-# Default: /tmp/
+# Default: @DEFAULT_SOL_SAFEDIR@
 #
-set SOLSafeDir /dev/null
+#set SOLSafeDir /dev/null
 
 # Never write SharedObject (kind of cookies), only read them
 #

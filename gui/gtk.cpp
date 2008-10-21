@@ -1667,6 +1667,8 @@ GtkGui::showAboutDialog()
 	"John Gilmore",
 	"Zou Lunkai",
 	"Benjamin Wolsey",
+	"Russ Nelson",
+	"Dossy Shiobara",
 	NULL
     };
 

@@ -280,10 +280,10 @@ usage ()
 {
     cerr << _("This program dumps the internal data of an FLV video file")
          << endl;
-    cerr << _("Usage: flvdumper [h] filename") << endl;
+    cerr << _("Usage: flvdumper [-h] [-m] [-a] filename") << endl;
     cerr << _("-h\tHelp") << endl;
-    cerr << _("-m\tPrint any Meta tags only (default)") << endl;
-    cerr << _("-a\tPrint al the tags too.") << endl;
+    cerr << _("-m\tPrint only Meta tags (default)") << endl;
+    cerr << _("-a\tPrint all tags.") << endl;
     exit (-1);
 }
 

@@ -304,8 +304,8 @@ DisplayList::replace_character(
 
     if (use_old_matrix)
     {
-      // Use the matrix from the old character.
-      ch->copyMatrix(*oldch); // copy matrix and caches
+      // Use the SWFMatrix from the old character.
+      ch->copyMatrix(*oldch); // copy SWFMatrix and caches
     }
     
     // remember bounds of old char
@@ -329,7 +329,7 @@ DisplayList::replace_character(
     // WARNING: when a new Button character is added,
     //          the invalidated bounds computation will likely
     //          be bogus, as the actual character shown is not instantiated
-    //          until ::stagePlacementCallback for buttons (I'd say this is a bug in button_character_instance)
+    //          until ::stagePlacementCallback for buttons (I'd say this is a bug in Button)
     //          UdoG, following ? 
     //
     ch->extend_invalidated_bounds(old_ranges);        
@@ -349,7 +349,7 @@ void
 DisplayList::move_character(
   int depth,
   const cxform* color_xform,
-  const matrix* mat,
+  const SWFMatrix* mat,
   int* ratio,
   int* /* clip_depth */)
 {
@@ -390,7 +390,7 @@ DisplayList::move_character(
   }
   if (mat)
   {
-    ch->set_matrix(*mat, true); // update matrix caches
+    ch->setMatrix(*mat, true); // update SWFMatrix caches
   }
   if(ratio)
   {
@@ -977,11 +977,11 @@ DisplayList::mergeDisplayList(DisplayList & newList)
                 {
                     newList._charsByDepth.erase(itNewBackup);
 
-                    // replace the transformation matrix if the old character accepts 
+                    // replace the transformation SWFMatrix if the old character accepts 
 					// static transformation.
                     if( chOld->get_accept_anim_moves() )
                     {
-                        chOld->copyMatrix(*chNew); // copy matrix and caches 
+                        chOld->copyMatrix(*chNew); // copy SWFMatrix and caches 
                         chOld->set_cxform(chNew->get_cxform());
                     }
                     chNew->unload();

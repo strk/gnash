@@ -15,8 +15,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef _GNASH_AS_FUNCTION_H_
-#define _GNASH_AS_FUNCTION_H_
+#ifndef GNASH_AS_FUNCTION_H
+#define GNASH_AS_FUNCTION_H
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "as_object.h" // for inheritance

@@ -218,7 +218,7 @@ namespace gnash {
 	///	Otherwise, the font will be queried for device fonts.
 	///
 	void display_glyph_records(
-		const matrix& this_mat,
+		const SWFMatrix& this_mat,
 		character* inst,
 		const std::vector<text_glyph_record>& records,
 		bool useEmbeddedGlyphs);

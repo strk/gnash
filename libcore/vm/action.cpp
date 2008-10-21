@@ -22,7 +22,6 @@
 #include "as_object.h"
 #include "log.h"
 #include "as_function.h"
-#include "types.h"
 #include "swf.h"
 #include "GnashException.h"
 #include "as_environment.h"

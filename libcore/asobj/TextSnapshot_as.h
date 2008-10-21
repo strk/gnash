@@ -25,10 +25,10 @@ namespace gnash {
 
 class as_object;
 
-/// Initialize the global TextSnapshot class
+/// Initialize the global TextSnapshot_as class
 void textsnapshot_class_init(as_object& global);
 
-/// Return a TextSnapshot instance (in case the core lib needs it)
+/// Return a TextSnapshot_as instance (in case the core lib needs it)
 //std::auto_ptr<as_object> init_textsnapshot_instance();
 
 } // end of gnash namespace

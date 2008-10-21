@@ -113,6 +113,31 @@ isNaN ( a.charAt(-1) );
 isNaN (a.charAt(21) );
 check_equals ( a.lastIndexOf("lawa"), 8);
 
+// lastIndexOf properly tested.
+r = "abcdefghik7abedc";
+check_equals(r.lastIndexOf("dc"), 14);
+check_equals(r.lastIndexOf("abcde"), 0);
+check_equals(r.lastIndexOf("ab"), 11);
+check_equals(r.lastIndexOf("df"), -1);
+check_equals(r.lastIndexOf("ik"), 8);
+check_equals(r.lastIndexOf("cd"), 2);
+
+check_equals(r.lastIndexOf("edc", 15), 13);
+check_equals(r.lastIndexOf("edc", 14), 13);
+check_equals(r.lastIndexOf("edc", 13), 13);
+check_equals(r.lastIndexOf("edc", 12), -1);
+check_equals(r.lastIndexOf("edc", 11), -1);
+
+check_equals(r.lastIndexOf("ghi", "rt"), -1);
+check_equals(r.lastIndexOf("ghi", 15, 8), 6);
+check_equals(r.lastIndexOf("ghi", 15, 8, 9), 6);
+check_equals(r.lastIndexOf("ghi", -1), -1);
+check_equals(r.lastIndexOf("ghi", 17287638764), 6);
+
+check_equals(r.lastIndexOf(""), 16);
+check_equals(r.lastIndexOf(7), 10);
+
+
 // Applied to object.
 o = new Object;
 o.charCodeAt = String.prototype.charCodeAt;
@@ -1273,19 +1298,19 @@ check(!String.prototype.hasOwnProperty('length'));
 
 #endif
 
-var mingTests = 23;
-var lt6Tests = 301;
-var ge6Tests = 317;
-var totalTests = 0;
+//----- END OF TESTS
 
+var baseTests = 319;
+var asmTests = 23;
+var ge6Tests = 16;
+
+var totalTests = baseTests;
 #ifdef MING_SUPPORTS_ASM
-totalTests += mingTests;
+ totalTests += asmTests;
 #endif
 
-#if OUTPUT_VERSION < 6
-totalTests += lt6Tests;
-#else
-totalTests += ge6Tests;
+#if OUTPUT_VERSION >= 6
+ totalTests += ge6Tests;
 #endif
 
 check_totals(totalTests);

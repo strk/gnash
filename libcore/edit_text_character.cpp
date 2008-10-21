@@ -27,7 +27,7 @@
 #include "movie_definition.h" // to extract version info
 #include "sprite_instance.h"
 #include "edit_text_character.h"
-#include "Key.h" // for keyboard events
+#include "Key_as.h" // for keyboard events
 #include "movie_root.h"	 // for killing focus
 #include "as_environment.h" // for parse_path
 #include "action.h" // for as_standard_member enum
@@ -510,7 +510,7 @@ edit_text_character::edit_text_character(character* parent,
 	// (if the textvariable already exist and has a value
 	//  the text will be replaced with it)
 
-	int version = VM::get().getSWFVersion();
+	int version = parent->getVM().getSWFVersion();
 	
 	if ( _textDefined ) 
 	{
@@ -569,7 +569,7 @@ edit_text_character::removeTextField()
 }
 
 void
-edit_text_character::show_cursor(const matrix& mat)
+edit_text_character::show_cursor(const SWFMatrix& mat)
 {
 	boost::uint16_t x = static_cast<boost::uint16_t>(m_xcursor);
 	boost::uint16_t y = static_cast<boost::uint16_t>(m_ycursor);
@@ -594,7 +594,7 @@ edit_text_character::display()
 	bool drawBorder = getDrawBorder();
 	bool drawBackground = getDrawBackground();
 
-	matrix	wmat = get_world_matrix();
+	SWFMatrix	wmat = getWorldMatrix();
 
 	if ( (drawBorder || drawBackground) && !_bounds.is_null() )
 	{
@@ -631,11 +631,11 @@ edit_text_character::display()
 	}
 
 	// Draw our actual text.
-	// Using a matrix to translate to def bounds seems an hack to me.
+	// Using a SWFMatrix to translate to def bounds seems an hack to me.
 	// A cleaner implementation is likely correctly setting the
 	// m_x_offset and m_y_offset memebers in glyph records.
 	// Anyway, see bug #17954 for a testcase.
-	matrix m;
+	SWFMatrix m;
 
 	if ( !_bounds.is_null() ) // ! def_bounds.is_null() && ! def_bounds.is_world() 
 	{
@@ -663,7 +663,7 @@ edit_text_character::add_invalidated_bounds(InvalidatedRanges& ranges,
     
 	ranges.add(m_old_invalidated_ranges);
 
-	matrix wm = get_world_matrix();
+	SWFMatrix wm = getWorldMatrix();
 
 	rect bounds = getBounds();
 	bounds.expand_to_rect(m_text_bounding_box); 
@@ -795,7 +795,7 @@ edit_text_character::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y
 		return NULL;
 	}
 
-	matrix	m = get_matrix();
+	SWFMatrix	m = getMatrix();
     point  p(x, y);
     m.invert().transform(p);
 
@@ -809,7 +809,7 @@ edit_text_character::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y
 void
 edit_text_character::updateText(const std::string& str)
 {
-	int version = VM::get().getSWFVersion();
+	int version = _vm.getSWFVersion();
 	const std::wstring& wstr = utf8::decodeCanonicalString(str, version);
 	updateText(wstr);
 }
@@ -850,7 +850,7 @@ edit_text_character::setTextValue(const std::wstring& wstr)
 		as_object* tgt = ref.first;
 		if ( tgt )
 		{
-			int version = VM::get().getSWFVersion();
+			int version = _vm.getSWFVersion();
 			// we shouldn't truncate, right?
 			tgt->set_member(ref.second, utf8::encodeCanonicalString(wstr, version)); 
 		}
@@ -873,7 +873,7 @@ edit_text_character::get_text_value() const
 	// with a pre-existing value.
 	const_cast<edit_text_character*>(this)->registerTextVariable();
 
-	int version = VM::get().getSWFVersion();
+	int version = _vm.getSWFVersion();
 
 	return utf8::encodeCanonicalString(_text, version);
 }
@@ -907,20 +907,20 @@ edit_text_character::set_member(string_table::key name,
 	}
 	case NSV::PROP_uX:
 	{
-		matrix	m = get_matrix();
+		SWFMatrix	m = getMatrix();
         double x =  utility::infinite_to_zero( val.to_number() );
 		m.tx = PIXELS_TO_TWIPS(x);	
-		set_matrix(m); // no need to update caches when only changing translation
+		setMatrix(m); // no need to update caches when only changing translation
 
 		// m_accept_anim_moves = false;
 		return true;
 	}
 	case NSV::PROP_uY:
 	{
-		matrix	m = get_matrix();
+		SWFMatrix	m = getMatrix();
         double y =  utility::infinite_to_zero( val.to_number() );
 		m.ty = PIXELS_TO_TWIPS(y);
-		set_matrix(m); // no need to update caches when only changing translation
+		setMatrix(m); // no need to update caches when only changing translation
 
 		// m_accept_anim_moves = false; 
 		return true;
@@ -1095,13 +1095,13 @@ edit_text_character::get_member(string_table::key name, as_value* val,
 	}
 	case NSV::PROP_uX:
 	{
-		matrix	m = get_matrix();	
+		SWFMatrix	m = getMatrix();	
 		val->set_double(TWIPS_TO_PIXELS(m.tx));
 		return true;
 	}
 	case NSV::PROP_uY:
 	{
-		matrix	m = get_matrix();	
+		SWFMatrix	m = getMatrix();	
 		val->set_double(TWIPS_TO_PIXELS(m.ty));
 		return true;
 	}
@@ -1722,7 +1722,7 @@ edit_text_character::registerTextVariable()
 	// in that case update text value
 	as_value val;
 	
-	int version = VM::get().getSWFVersion();
+	int version = _vm.getSWFVersion();
 	
 	if (target->get_member(key, &val) )
 	{
@@ -1861,7 +1861,7 @@ textfield_class_init(as_object& global)
 bool
 edit_text_character::pointInShape(boost::int32_t x, boost::int32_t y) const
 {
-	matrix wm = get_world_matrix();
+	SWFMatrix wm = getWorldMatrix();
 	point lp(x, y);
     wm.invert().transform(lp);
 	return _bounds.point_test(lp.x, lp.y);
@@ -2487,17 +2487,13 @@ edit_text_character::onChanged()
 void
 edit_text_character::onSetFocus()
 {
-	string_table& st = _vm.getStringTable();
-	string_table::key key = st.find(PROPNAME("onSetFocus"));
-	callMethod(key);
+	callMethod(NSV::PROP_ON_SET_FOCUS);
 }
 
 void
 edit_text_character::onKillFocus()
 {
-	string_table& st = _vm.getStringTable();
-	string_table::key key = st.find(PROPNAME("onKillFocus"));
-	callMethod(key);
+	callMethod(NSV::PROP_ON_KILL_FOCUS);
 }
 
 void

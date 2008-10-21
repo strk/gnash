@@ -42,6 +42,34 @@ namespace gnash {
 namespace gnash {
 namespace media {
 
+
+
+class ExtraVideoInfoFlv : public VideoInfo::ExtraInfo
+{
+public:
+        ExtraVideoInfoFlv(boost::uint8_t* extradata, size_t datasize)
+                :
+                data(extradata),
+                size(datasize)
+        {
+        }
+        boost::scoped_array<boost::uint8_t> data;
+        size_t size;
+};
+
+class ExtraAudioInfoFlv : public AudioInfo::ExtraInfo
+{
+public:
+        ExtraAudioInfoFlv(boost::uint8_t* extradata, size_t datasize)
+                :
+                data(extradata),
+                size(datasize)
+        {
+        }
+        boost::scoped_array<boost::uint8_t> data;
+        size_t size;
+};
+
 /// The FLVParser class parses FLV streams
 class DSOEXPORT FLVParser : public MediaParser
 {

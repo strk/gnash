@@ -28,7 +28,7 @@
 
 #include "LoadableObject.h"
 #include "xmlattrs.h"
-#include "xmlnode.h"
+#include "XMLNode_as.h"
 #include "XML_as.h"
 #include "builtin_function.h"
 #include "VM.h"

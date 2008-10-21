@@ -24,11 +24,10 @@
 #endif
 
 #include "smart_ptr.h" // GNASH_USE_GC
-#include "types.h"
 #include "event_id.h" // for inlines
 #include "as_object.h" // for inheritance
 #include "rect.h" // for composition (invalidated bounds)
-#include "matrix.h" // for composition
+#include "SWFMatrix.h" // for composition
 #include "cxform.h" // for composition
 #include "log.h"
 #include "snappingrange.h"
@@ -80,7 +79,7 @@ private:
 
   int m_depth;
   cxform  m_color_transform;
-  matrix  m_matrix;
+  SWFMatrix  m_matrix;
 
   /// Cache values for ActionScript access.
   /// NOTE: not all characters need this, just the
@@ -469,19 +468,19 @@ public:
     ///
     int getWorldVolume() const;
 
-    /// Get local transform matrix for this character
-    const matrix& get_matrix() const { return m_matrix; }
+    /// Get local transform SWFMatrix for this character
+    const SWFMatrix& getMatrix() const { return m_matrix; }
 
-    /// Set local transform matrix for this character
+    /// Set local transform SWFMatrix for this character
     //
-    /// @param m the new matrix to assign to this character
+    /// @param m the new SWFMatrix to assign to this character
     ///
     /// @param updateCache if true, updates the cache values
-    ///        from the matrix (only if matrix != current matrix)
+    ///        from the SWFMatrix (only if SWFMatrix != current SWFMatrix)
     ///
-    void  set_matrix(const matrix& m, bool updateCache=false);
+    void  setMatrix(const SWFMatrix& m, bool updateCache=false);
 
-    /// Set the xscale value of current matrix
+    /// Set the xscale value of current SWFMatrix
     //
     /// This is used when setting _xscale.
     /// See xscale_getset.
@@ -490,10 +489,10 @@ public:
     ///
     void set_x_scale(double factor);
 
-    /// Copy matrix and caches from given character
+    /// Copy SWFMatrix and caches from given character
     void copyMatrix(const character& ch);
 
-    /// Set the yscale value of current matrix
+    /// Set the yscale value of current SWFMatrix
     //
     /// This is used when setting _yscale 
     /// See yscale_getset. 
@@ -502,7 +501,7 @@ public:
     ///
     void set_y_scale(double factor);
 
-    /// Set the rotation value of current matrix
+    /// Set the rotation value of current SWFMatrix
     //
     ///
     /// This is used when setting _rotation
@@ -513,7 +512,7 @@ public:
     ///
     void set_rotation(double rot);
 
-    /// Set the width of this character, modifying its matrix
+    /// Set the width of this character, modifying its SWFMatrix
     //
     /// This is used when setting _width
     /// See width_getset
@@ -522,7 +521,7 @@ public:
     ///
     void set_width(double width);
 
-    /// Set the height of this character, modifying its matrix
+    /// Set the height of this character, modifying its SWFMatrix
     //
     /// This is used when setting _height
     /// See height_getset
@@ -543,7 +542,7 @@ public:
 
     void  concatenate_cxform(const cxform& cx) { m_color_transform.concatenate(cx); }
 
-    void  concatenate_matrix(const matrix& m) { m_matrix.concatenate(m); }
+    void  concatenateMatrix(const SWFMatrix& m) { m_matrix.concatenate(m); }
 
     int   get_ratio() const { return m_ratio; }
 
@@ -651,12 +650,12 @@ public:
     virtual void set_text_value(const char* /*new_text*/) { }
 
   /// \brief
-  /// Get our concatenated matrix (all our ancestor transforms,
-  /// times our matrix). 
+  /// Get our concatenated SWFMatrix (all our ancestor transforms,
+  /// times our SWFMatrix). 
   ///
   /// Maps from our local space into "world" space
   /// (i.e. root movie space).
-  virtual matrix  get_world_matrix() const;
+  virtual SWFMatrix  getWorldMatrix() const;
 
   /// \brief
   /// Get our concatenated color transform (all our ancestor transforms,
@@ -747,7 +746,7 @@ public:
   ///
   /// Container characters (sprite and buttons) return the composite
   /// bounds of all their childrens, appropriaterly transformed with
-  /// their local matrix.
+  /// their local SWFMatrix.
   ///
   virtual rect getBounds() const
   {
@@ -763,7 +762,7 @@ public:
   bool pointInBounds(boost::int32_t x, boost::int32_t y) const
   {
     rect bounds = getBounds();
-    matrix wm = get_world_matrix();
+    SWFMatrix wm = getWorldMatrix();
     wm.transform(bounds);
     return bounds.point_test(x, y);
   }
@@ -849,8 +848,8 @@ public:
   /// This is only meaningful for sprite instances, but default
   /// it's a no-op.
   ///
-  /// It is needed by button_character_instance
-  /// TODO: have button_character_instance cast to_movie()
+  /// It is needed by Button
+  /// TODO: have Button cast to_movie()
   ///       and drop this one
   virtual void  restart() { }
 
@@ -995,10 +994,10 @@ public:
   /// Coordinates of the point are given in parent's coordinate space.
   /// This means that in order to convert the point to the local coordinate
   /// space you need to apply an inverse transformation using this
-  /// character matrix. Example:
+  /// character SWFMatrix. Example:
   ///
   /// point p(x,y);
-  /// get_matrix().transform_by_inverse(p);
+  /// getMatrix().transform_by_inverse(p);
   /// -- p is now in local coordinates
   ///
   /// Don't blame me for this mess, I'm just trying to document the existing

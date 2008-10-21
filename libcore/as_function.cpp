@@ -364,7 +364,7 @@ as_function::constructInstance( as_environment& env,
 	assert(get_ref_count() > 0);
 #endif // GNASH_USE_GC
 
-	int swfversion = VM::get().getSWFVersion();
+	int swfversion = env.getVM().getSWFVersion();
 
 	boost::intrusive_ptr<as_object> newobj;
 

@@ -23,7 +23,7 @@
 
 #include "as_object.h" // for inheritance of TextFormat
 #include "edit_text_character_def.h" // for edit_text_character_def::alignment enum
-#include "types.h" // for rgba
+#include "RGBA.h" // for rgba
 #include <boost/cstdint.hpp> // for boost::uint32_t
 #include <string>
 

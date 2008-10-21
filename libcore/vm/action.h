@@ -24,7 +24,6 @@
 #include "dsodefs.h" // for DSOEXPORT
 
 #include "as_object.h"
-#include "types.h"
 #include "smart_ptr.h"
 
 #include <vector>

@@ -1,0 +1,34 @@
+'\" -*- coding: us-ascii -*-
+.if \n(.g .ds T< \\FC
+.if \n(.g .ds T> \\F[\n[.fam]]
+.de URL
+\\$2 \(la\\$1\(ra\\$3
+..
+.if \n(.g .mso www.tmac
+.TH flvdumper 1 "17 October 2008" "" ""
+.SH NAME
+flvdumper \- Gnash FLash Video File Dumper
+.SH Synopsis
+.nf
+
+flvdumper (options)... (file)...
+.fi
+.SH DESCRIPTION
+Dump information about .flv files.
+.PP
+When a SWF player, including Gnash, plays a SWF "movie",
+the movie can contain video files.
+Flvdumper prints these files,
+which are comprised of an H.263 variant or H.254 video bit stream.
+.PP
+More information about Flash Video is available at the Wikipedia Flash
+Video article: http://en.wikipedia.org/wiki/Flash_Video
+.TP 
+-h
+Print usage info.
+.TP 
+-m
+Print only meta tags (default).
+.TP 
+-a
+Print all the tags.

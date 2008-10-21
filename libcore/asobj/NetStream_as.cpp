@@ -22,7 +22,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include "NetStream.h"
+#include "NetStream_as.h"
 #include "CharacterProxy.h"
 
 #include "smart_ptr.h" // GNASH_USE_GC
@@ -69,7 +69,7 @@ static as_value netstream_send(const fn_call& fn);
 
 static as_object* getNetStreamInterface();
 
-NetStream::NetStream()
+NetStream_as::NetStream_as()
 	:
 	as_object(getNetStreamInterface()),
 	_netCon(NULL),
@@ -100,9 +100,9 @@ static as_value
 netstream_new(const fn_call& fn)
 {
 
-	boost::intrusive_ptr<NetStream> netstream_obj;
+	boost::intrusive_ptr<NetStream_as> netstream_obj;
        
-	netstream_obj = new NetStream();
+	netstream_obj = new NetStream_as();
 
 	if (fn.nargs > 0)
 	{
@@ -127,21 +127,21 @@ netstream_new(const fn_call& fn)
 
 static as_value netstream_close(const fn_call& fn)
 {
-	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
+	boost::intrusive_ptr<NetStream_as> ns = ensureType<NetStream_as>(fn.this_ptr);
 	ns->close();
 	return as_value();
 }
 
 static as_value netstream_pause(const fn_call& fn)
 {
-	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
+	boost::intrusive_ptr<NetStream_as> ns = ensureType<NetStream_as>(fn.this_ptr);
 	
 	// mode: -1 ==> toogle, 0==> pause, 1==> play
-	NetStream::PauseMode mode = NetStream::pauseModeToggle;
+	NetStream_as::PauseMode mode = NetStream_as::pauseModeToggle;
 	if (fn.nargs > 0)
 	{
-		mode = fn.arg(0).to_bool() ? NetStream::pauseModePause :
-		                             NetStream::pauseModeUnPause;
+		mode = fn.arg(0).to_bool() ? NetStream_as::pauseModePause :
+		                             NetStream_as::pauseModeUnPause;
 	}
 	ns->pause(mode);	// toggle mode
 	return as_value();
@@ -149,12 +149,12 @@ static as_value netstream_pause(const fn_call& fn)
 
 static as_value netstream_play(const fn_call& fn)
 {
-	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
+	boost::intrusive_ptr<NetStream_as> ns = ensureType<NetStream_as>(fn.this_ptr);
 
 	if (fn.nargs < 1)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("NetStream play needs args"));
+		log_aserror(_("NetStream_as play needs args"));
 		);
 		return as_value();
 	}
@@ -173,7 +173,7 @@ static as_value netstream_play(const fn_call& fn)
 }
 
 static as_value netstream_seek(const fn_call& fn) {
-	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
+	boost::intrusive_ptr<NetStream_as> ns = ensureType<NetStream_as>(fn.this_ptr);
 
 	boost::uint32_t time = 0;
 	if (fn.nargs > 0)
@@ -190,7 +190,7 @@ static as_value netstream_setbuffertime(const fn_call& fn)
 
 	//GNASH_REPORT_FUNCTION;
 
-	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
+	boost::intrusive_ptr<NetStream_as> ns = ensureType<NetStream_as>(fn.this_ptr);
 
 	// TODO: should we do anything if given no args ?
 	//       are we sure setting bufferTime to 0 is what we have to do ?
@@ -209,7 +209,7 @@ static as_value netstream_setbuffertime(const fn_call& fn)
 
 static as_value netstream_attachAudio(const fn_call& fn)
 {
-	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
+	boost::intrusive_ptr<NetStream_as> ns = ensureType<NetStream_as>(fn.this_ptr);
 	UNUSED(ns);
 
 	bool warned = false;
@@ -223,7 +223,7 @@ static as_value netstream_attachAudio(const fn_call& fn)
 
 static as_value netstream_attachVideo(const fn_call& fn)
 {
-	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
+	boost::intrusive_ptr<NetStream_as> ns = ensureType<NetStream_as>(fn.this_ptr);
 	UNUSED(ns);
 
 	bool warned = false;
@@ -237,7 +237,7 @@ static as_value netstream_attachVideo(const fn_call& fn)
 
 static as_value netstream_publish(const fn_call& fn)
 {
-	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
+	boost::intrusive_ptr<NetStream_as> ns = ensureType<NetStream_as>(fn.this_ptr);
 	UNUSED(ns);
 
 	bool warned = false;
@@ -251,7 +251,7 @@ static as_value netstream_publish(const fn_call& fn)
 
 static as_value netstream_receiveAudio(const fn_call& fn)
 {
-	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
+	boost::intrusive_ptr<NetStream_as> ns = ensureType<NetStream_as>(fn.this_ptr);
 	UNUSED(ns);
 
 	bool warned = false;
@@ -265,7 +265,7 @@ static as_value netstream_receiveAudio(const fn_call& fn)
 
 static as_value netstream_receiveVideo(const fn_call& fn)
 {
-	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
+	boost::intrusive_ptr<NetStream_as> ns = ensureType<NetStream_as>(fn.this_ptr);
 	UNUSED(ns);
 
 	bool warned = false;
@@ -279,7 +279,7 @@ static as_value netstream_receiveVideo(const fn_call& fn)
 
 static as_value netstream_send(const fn_call& fn)
 {
-	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
+	boost::intrusive_ptr<NetStream_as> ns = ensureType<NetStream_as>(fn.this_ptr);
 	UNUSED(ns);
 
 	bool warned = false;
@@ -297,7 +297,7 @@ netstream_time(const fn_call& fn)
 {
 	//GNASH_REPORT_FUNCTION;
 
-	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
+	boost::intrusive_ptr<NetStream_as> ns = ensureType<NetStream_as>(fn.this_ptr);
 
 	assert(fn.nargs == 0); // we're a getter
 	return as_value(double(ns->time()/1000.0));
@@ -307,7 +307,7 @@ netstream_time(const fn_call& fn)
 static as_value
 netstream_bytesloaded(const fn_call& fn)
 {
-	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
+	boost::intrusive_ptr<NetStream_as> ns = ensureType<NetStream_as>(fn.this_ptr);
 
 	if ( ! ns->isConnected() )
 	{
@@ -321,7 +321,7 @@ netstream_bytesloaded(const fn_call& fn)
 static as_value
 netstream_bytestotal(const fn_call& fn)
 {
-	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
+	boost::intrusive_ptr<NetStream_as> ns = ensureType<NetStream_as>(fn.this_ptr);
 
 	if ( ! ns->isConnected() )
 	{
@@ -335,7 +335,7 @@ netstream_bytestotal(const fn_call& fn)
 static as_value
 netstream_currentFPS(const fn_call& fn)
 {
-	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
+	boost::intrusive_ptr<NetStream_as> ns = ensureType<NetStream_as>(fn.this_ptr);
 
 	if ( ! ns->isConnected() )
 	{
@@ -357,9 +357,9 @@ netstream_currentFPS(const fn_call& fn)
 static as_value
 netstream_bufferLength(const fn_call& fn)
 {
-	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
+	boost::intrusive_ptr<NetStream_as> ns = ensureType<NetStream_as>(fn.this_ptr);
 
-	// NetStream::bufferLength returns milliseconds, we want
+	// NetStream_as::bufferLength returns milliseconds, we want
 	// to return *fractional* seconds.
 	double ret = ns->bufferLength()/1000.0;
 	return as_value(ret);
@@ -369,7 +369,7 @@ netstream_bufferLength(const fn_call& fn)
 static as_value
 netstream_bufferTime(const fn_call& fn)
 {
-	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
+	boost::intrusive_ptr<NetStream_as> ns = ensureType<NetStream_as>(fn.this_ptr);
 
 	// We return bufferTime in seconds
 	double ret = ns->bufferTime()/1000.0;
@@ -380,7 +380,7 @@ netstream_bufferTime(const fn_call& fn)
 static as_value
 netstream_liveDelay(const fn_call& fn)
 {
-	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
+	boost::intrusive_ptr<NetStream_as> ns = ensureType<NetStream_as>(fn.this_ptr);
 
 	bool warned = false;
 	if ( ! warned ) {
@@ -465,7 +465,7 @@ void netstream_class_init(as_object& global)
 
 
 void
-NetStream::processNotify(const std::string& funcname, as_object* info_obj)
+NetStream_as::processNotify(const std::string& funcname, as_object* info_obj)
 {
 	// TODO: check for System.onStatus too ! use a private getStatusHandler() method for this.
 
@@ -480,7 +480,7 @@ NetStream::processNotify(const std::string& funcname, as_object* info_obj)
 
 
 void
-NetStream::processStatusNotifications()
+NetStream_as::processStatusNotifications()
 {
 	// TODO: check for System.onStatus too ! use a private getStatusHandler() method for this.
 
@@ -502,7 +502,7 @@ NetStream::processStatusNotifications()
 }
 
 void
-NetStream::setStatus(StatusCode status)
+NetStream_as::setStatus(StatusCode status)
 {
 	// Get a lock to avoid messing with statuses while processing them
 	boost::mutex::scoped_lock lock(statusMutex);
@@ -515,7 +515,7 @@ NetStream::setStatus(StatusCode status)
 }
 
 void
-NetStream::setBufferTime(boost::uint32_t time)
+NetStream_as::setBufferTime(boost::uint32_t time)
 {
 	// The argument is in milliseconds,
 	m_bufferTime = time;
@@ -523,14 +523,14 @@ NetStream::setBufferTime(boost::uint32_t time)
 }
 
 long
-NetStream::bufferLength()
+NetStream_as::bufferLength()
 {
 	if (m_parser.get() == NULL) return 0;
 	return m_parser->getBufferLength();
 }
 
 bool
-NetStream::newFrameReady()
+NetStream_as::newFrameReady()
 {
 	if (m_newFrameReady) {
 		m_newFrameReady = false;
@@ -541,7 +541,7 @@ NetStream::newFrameReady()
 }
 
 std::auto_ptr<image::ImageBase>
-NetStream::get_video()
+NetStream_as::get_video()
 {
 	boost::mutex::scoped_lock lock(image_mutex);
 
@@ -552,7 +552,7 @@ NetStream::get_video()
 }
 
 std::pair<const char*, const char*>
-NetStream::getStatusCodeInfo(StatusCode code)
+NetStream_as::getStatusCodeInfo(StatusCode code)
 {
 	switch (code)
 	{
@@ -587,7 +587,7 @@ NetStream::getStatusCodeInfo(StatusCode code)
 }
 
 boost::intrusive_ptr<as_object>
-NetStream::getStatusObject(StatusCode code)
+NetStream_as::getStatusObject(StatusCode code)
 {
 	// code, level
 	std::pair<const char*, const char*> info = getStatusCodeInfo(code);
@@ -599,8 +599,8 @@ NetStream::getStatusObject(StatusCode code)
 	return o;
 }
 
-NetStream::StatusCode
-NetStream::popNextPendingStatusNotification()
+NetStream_as::StatusCode
+NetStream_as::popNextPendingStatusNotification()
 {
 	// Get an exclusive lock on the queue
 	boost::mutex::scoped_lock lock(statusMutex);
@@ -614,7 +614,7 @@ NetStream::popNextPendingStatusNotification()
 }
 
 void
-NetStream::clearStatusQueue()
+NetStream_as::clearStatusQueue()
 {
 	// Get an exclusive lock on the queue
 	boost::mutex::scoped_lock lock(statusMutex);
@@ -623,14 +623,14 @@ NetStream::clearStatusQueue()
 }
 
 void
-NetStream::setAudioController(character* ch)
+NetStream_as::setAudioController(character* ch)
 {
 	_audioController.reset(new CharacterProxy(ch));
 }
 
 #ifdef GNASH_USE_GC
 void
-NetStream::markReachableResources() const
+NetStream_as::markReachableResources() const
 {
 
 	if ( _netCon ) _netCon->setReachable();
@@ -749,15 +749,15 @@ PlayHead::seekTo(boost::uint64_t position)
 
 /*private static*/
 as_value
-NetStream::advanceWrapper(const fn_call& fn)
+NetStream_as::advanceWrapper(const fn_call& fn)
 {
-        boost::intrusive_ptr<NetStream> ptr = ensureType<NetStream>(fn.this_ptr);
+        boost::intrusive_ptr<NetStream_as> ptr = ensureType<NetStream_as>(fn.this_ptr);
         ptr->advance();
         return as_value();
 }
 
 void
-NetStream::stopAdvanceTimer()
+NetStream_as::stopAdvanceTimer()
 {
 	if ( _advanceTimer )
 	{
@@ -768,10 +768,10 @@ NetStream::stopAdvanceTimer()
 }
 
 void
-NetStream::startAdvanceTimer()
+NetStream_as::startAdvanceTimer()
 {
 	boost::intrusive_ptr<builtin_function> advanceCallback = \
-		new builtin_function(&NetStream::advanceWrapper);
+		new builtin_function(&NetStream_as::advanceWrapper);
 	std::auto_ptr<Timer> timer(new Timer);
 	unsigned long delayMS = 50; // TODO: base on media file FPS !!!
 	timer->setInterval(*advanceCallback, delayMS, this);
@@ -785,7 +785,7 @@ NetStream::startAdvanceTimer()
 
 
 static void
-cleanQueue(NetStream::AudioQueue::value_type data)
+cleanQueue(NetStream_as::AudioQueue::value_type data)
 {
     delete data;
 }
@@ -799,7 +799,7 @@ void adjust_volume(boost::int16_t* data, int size, int volume)
 }
 
 
-NetStream::~NetStream()
+NetStream_as::~NetStream_as()
 {
 	close(); // close will also detach from sound handler
 	if (m_parser.get()) {
@@ -808,7 +808,7 @@ NetStream::~NetStream()
 }
 
 
-void NetStream::pause( PauseMode mode )
+void NetStream_as::pause( PauseMode mode )
 {
 	log_debug("::pause(%d) called ", mode);
 	switch ( mode )
@@ -829,7 +829,7 @@ void NetStream::pause( PauseMode mode )
 
 }
 
-void NetStream::close()
+void NetStream_as::close()
 {
 	GNASH_REPORT_FUNCTION;
 
@@ -850,7 +850,7 @@ void NetStream::close()
 }
 
 void
-NetStream::play(const std::string& c_url)
+NetStream_as::play(const std::string& c_url)
 {
 	// Is it already playing ?
 	if ( m_parser.get() )
@@ -911,7 +911,7 @@ NetStream::play(const std::string& c_url)
 }
 
 void
-NetStream::initVideoDecoder(media::MediaParser& parser)
+NetStream_as::initVideoDecoder(media::MediaParser& parser)
 {
 	// Get video info from the parser
 	media::VideoInfo* videoInfo = parser.getVideoInfo();
@@ -934,7 +934,7 @@ NetStream::initVideoDecoder(media::MediaParser& parser)
 
 /* private */
 void
-NetStream::initAudioDecoder(media::MediaParser& parser)
+NetStream_as::initAudioDecoder(media::MediaParser& parser)
 {
 	// Get audio info from the parser
 	media::AudioInfo* audioInfo =  parser.getAudioInfo();
@@ -956,7 +956,7 @@ NetStream::initAudioDecoder(media::MediaParser& parser)
 
 
 bool
-NetStream::startPlayback()
+NetStream_as::startPlayback()
 {
 	assert(_inputStream.get());
 	assert(_inputStream->tell() == 0);
@@ -1004,11 +1004,11 @@ NetStream::startPlayback()
 
 
 // audio callback is running in sound handler thread
-bool NetStream::audio_streamer(void *owner, boost::uint8_t *stream, int len)
+bool NetStream_as::audio_streamer(void *owner, boost::uint8_t *stream, int len)
 {
 	//GNASH_REPORT_FUNCTION;
 
-	NetStream* ns = static_cast<NetStream*>(owner);
+	NetStream_as* ns = static_cast<NetStream_as*>(owner);
 
 	boost::mutex::scoped_lock lock(ns->_audioQueueMutex);
 
@@ -1050,7 +1050,7 @@ bool NetStream::audio_streamer(void *owner, boost::uint8_t *stream, int len)
 }
 
 std::auto_ptr<image::ImageBase> 
-NetStream::getDecodedVideoFrame(boost::uint32_t ts)
+NetStream_as::getDecodedVideoFrame(boost::uint32_t ts)
 {
 	assert(_videoDecoder.get()); // caller should check this
 
@@ -1133,7 +1133,7 @@ NetStream::getDecodedVideoFrame(boost::uint32_t ts)
 }
 
 std::auto_ptr<image::ImageBase> 
-NetStream::decodeNextVideoFrame()
+NetStream_as::decodeNextVideoFrame()
 {
 	std::auto_ptr<image::ImageBase> video;
 
@@ -1181,7 +1181,7 @@ NetStream::decodeNextVideoFrame()
 }
 
 raw_mediadata_t*
-NetStream::decodeNextAudioFrame()
+NetStream_as::decodeNextAudioFrame()
 {
 	assert ( m_parser.get() );
 
@@ -1219,7 +1219,7 @@ NetStream::decodeNextAudioFrame()
 	}
 
 #ifdef GNASH_DEBUG_DECODING
-	log_debug("NetStream::decodeNextAudioFrame: "
+	log_debug("NetStream_as::decodeNextAudioFrame: "
 		"%d bytes of encoded audio "
 		"decoded to %d bytes",
 		frame->dataSize,
@@ -1232,24 +1232,24 @@ NetStream::decodeNextAudioFrame()
 	return raw;
 }
 
-bool NetStream::decodeMediaFrame()
+bool NetStream_as::decodeMediaFrame()
 {
 	return false;
 }
 
 void
-NetStream::seek(boost::uint32_t posSeconds)
+NetStream_as::seek(boost::uint32_t posSeconds)
 {
 	GNASH_REPORT_FUNCTION;
 
 	// We'll mess with the input here
 	if ( ! m_parser.get() )
 	{
-		log_debug("NetStream::seek(%d): no parser, no party", posSeconds);
+		log_debug("NetStream_as::seek(%d): no parser, no party", posSeconds);
 		return;
 	}
 
-	// Don't ask me why, but NetStream::seek() takes seconds...
+	// Don't ask me why, but NetStream_as::seek() takes seconds...
 	boost::uint32_t pos = posSeconds*1000;
 
 	// We'll pause the clock source and mark decoders as buffering.
@@ -1288,7 +1288,7 @@ NetStream::seek(boost::uint32_t posSeconds)
 }
 
 void
-NetStream::parseNextChunk()
+NetStream_as::parseNextChunk()
 {
 	// If we parse too much we might block
 	// the main thread, if we parse too few
@@ -1300,7 +1300,7 @@ NetStream::parseNextChunk()
 }
 
 void
-NetStream::refreshAudioBuffer()
+NetStream_as::refreshAudioBuffer()
 {
 	assert ( m_parser.get() );
 
@@ -1347,7 +1347,7 @@ NetStream::refreshAudioBuffer()
 }
 
 void
-NetStream::pushDecodedAudioFrames(boost::uint32_t ts)
+NetStream_as::pushDecodedAudioFrames(boost::uint32_t ts)
 {
 	assert(m_parser.get());
 
@@ -1532,7 +1532,7 @@ NetStream::pushDecodedAudioFrames(boost::uint32_t ts)
 
 
 void
-NetStream::refreshVideoFrame(bool alsoIfPaused)
+NetStream_as::refreshVideoFrame(bool alsoIfPaused)
 {
 	assert ( m_parser.get() );
 
@@ -1632,7 +1632,7 @@ NetStream::refreshVideoFrame(bool alsoIfPaused)
 
 
 void
-NetStream::advance()
+NetStream_as::advance()
 {
 	// Check if there are any new status messages, and if we should
 	// pass them to a event handler
@@ -1643,7 +1643,7 @@ NetStream::advance()
 
 	if ( decodingStatus() == DEC_STOPPED )
 	{
-		//log_debug("NetStream::advance: dec stopped...");
+		//log_debug("NetStream_as::advance: dec stopped...");
 		// nothing to do if we're stopped...
 		return;
 	}
@@ -1727,12 +1727,12 @@ NetStream::advance()
 }
 
 boost::int32_t
-NetStream::time()
+NetStream_as::time()
 {
 	return _playHead.getPosition();
 }
 
-void NetStream::pausePlayback()
+void NetStream_as::pausePlayback()
 {
 	GNASH_REPORT_FUNCTION;
 
@@ -1745,7 +1745,7 @@ void NetStream::pausePlayback()
 	}
 }
 
-void NetStream::unpausePlayback()
+void NetStream_as::unpausePlayback()
 {
 	GNASH_REPORT_FUNCTION;
 
@@ -1760,7 +1760,7 @@ void NetStream::unpausePlayback()
 
 
 long
-NetStream::bytesLoaded ()
+NetStream_as::bytesLoaded ()
 {
   	if ( ! m_parser.get() )
 	{
@@ -1772,7 +1772,7 @@ NetStream::bytesLoaded ()
 }
 
 long
-NetStream::bytesTotal ()
+NetStream_as::bytesTotal ()
 {
   	if ( ! m_parser.get() )
 	{
@@ -1783,8 +1783,8 @@ NetStream::bytesTotal ()
 	return m_parser->getBytesTotal();
 }
 
-NetStream::DecodingState
-NetStream::decodingStatus(DecodingState newstate)
+NetStream_as::DecodingState
+NetStream_as::decodingStatus(DecodingState newstate)
 {
 	boost::mutex::scoped_lock lock(_state_mutex);
 
@@ -1796,7 +1796,7 @@ NetStream::decodingStatus(DecodingState newstate)
 }
 
 void
-NetStream::attachAuxStreamer()
+NetStream_as::attachAuxStreamer()
 {
 	if ( ! _soundHandler ) return;
 	if ( _auxStreamerAttached )
@@ -1816,7 +1816,7 @@ NetStream::attachAuxStreamer()
 }
 
 void
-NetStream::detachAuxStreamer()
+NetStream_as::detachAuxStreamer()
 {
 	if ( ! _soundHandler ) return;
 	if ( !_auxStreamerAttached )
