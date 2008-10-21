@@ -1,4 +1,4 @@
-// MediaParser.h: Base class for media parsers
+// MediaParser.h: Base class for media parsers
 // 
 //   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
 // 
@@ -291,8 +291,6 @@ public:
 	//
 	virtual ~MediaParser();
 
-	void join();
-
 	/// \brief
 	/// Seeks to the closest possible position the given position,
 	/// and returns the new position.
@@ -441,6 +439,9 @@ protected:
 
 	/// Start the parser thread
 	void startParserThread();
+
+	/// Stop the parser thread
+	void stopParserThread();
 
 	/// Clear the a/v buffers
 	void clearBuffers();

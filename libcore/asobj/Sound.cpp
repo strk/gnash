@@ -87,10 +87,6 @@ Sound::~Sound()
 		_soundHandler->detach_aux_streamer(this);
 	}
 
-	if (_mediaParser)
-	{
-		_mediaParser->join();
-	}
 }
 
 void
@@ -196,10 +192,6 @@ Sound::loadSound(const std::string& file, bool streaming)
 	}
 
 	/// Delete any media parser being used (make sure we have detached!)
-	if (_mediaParser)
-	{
-		_mediaParser->join();
-	}
 	_mediaParser.reset();
 
 	/// Start at offset 0, in case a previous ::start() call

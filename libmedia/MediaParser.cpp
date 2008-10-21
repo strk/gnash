@@ -206,7 +206,7 @@ MediaParser::peekNextAudioFrame() const
 }
 
 void
-MediaParser::join()
+MediaParser::stopParserThread()
 {
 	if ( _parserThread.get() )
 	{
@@ -218,7 +218,7 @@ MediaParser::join()
 
 MediaParser::~MediaParser()
 {
-	assert (! _parserThread.get() );
+	stopParserThread();
 
 	for (VideoFrames::iterator i=_videoFrames.begin(),
 		e=_videoFrames.end(); i!=e; ++i)
@@ -372,7 +372,7 @@ MediaParser::parserLoop()
 	while (!parserThreadKillRequested())
 	{
 		parseNextChunk();
-        gnashSleep(100); // no rush....
+        	gnashSleep(100); // no rush....
 	}
 }
 

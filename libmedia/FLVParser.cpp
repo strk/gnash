@@ -81,6 +81,8 @@ FLVParser::FLVParser(std::auto_ptr<IOChannel> lt)
 
 FLVParser::~FLVParser()
 {
+	stopParserThread();
+
 	for (MetaTags::iterator i=_metaTags.begin(), e=_metaTags.end(); i!=e; ++i)
 	{
 		delete *i;

@@ -802,9 +802,6 @@ void adjust_volume(boost::int16_t* data, int size, int volume)
 NetStream_as::~NetStream_as()
 {
 	close(); // close will also detach from sound handler
-	if (m_parser.get()) {
-		m_parser->join();
-	}
 }
 
 

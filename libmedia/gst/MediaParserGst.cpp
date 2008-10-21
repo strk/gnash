@@ -102,6 +102,8 @@ MediaParserGst::MediaParserGst(std::auto_ptr<IOChannel> stream)
 
 MediaParserGst::~MediaParserGst()
 {
+    stopParserThread();
+
     if (_bin) {
         gst_element_set_state (_bin, GST_STATE_NULL);
         g_object_unref (_bin);

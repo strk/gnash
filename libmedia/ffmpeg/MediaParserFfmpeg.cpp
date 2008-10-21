@@ -430,6 +430,7 @@ MediaParserFfmpeg::initializeParser()
 
 MediaParserFfmpeg::~MediaParserFfmpeg()
 {
+	stopParserThread();
 
 	if ( _formatCtx )
 	{
