@@ -1316,7 +1316,6 @@ Machine::execute()
 ///   'name_offset'(arg1, ..., argN)
 	case SWF::ABC_ACTION_CONSTRUCTPROP:
 	{
-		// TODO
 		as_environment env = as_environment(_vm);
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
 		boost::uint32_t argc = mStream->read_V32();
@@ -1330,14 +1329,20 @@ Machine::execute()
 			boost::intrusive_ptr<as_object> newobj = constructor->constructInstance(env, args);
 			push_stack(as_value(newobj));
 		}
+		//TODO: This else clause is needed to construct classes that aren't builtin into gnash.
+		// I don't think this is correct, and I think the problem might be how AVM2 adds
+		// new objects to the Global object.
 		else{
  			LOG_DEBUG_AVM("Object %s is not a constructor",constructor_val.toDebugString());
-			as_value val = constructor_val.to_object().get()->getMember(NSV::PROP_CONSTRUCTOR,0);
-			as_value result = call_method(val,&env,constructor_val.to_object().get(),args);
-			push_stack(result);
-//			boost::intrusive_ptr<as_function> constructor = constructor_val.to_as_function();
-//			boost::intrusive_ptr<as_object> newobj = constructor->constructInstance(env, args);
-//			push_stack(newobj);
+			if(constructor_val.is_null() || constructor_val.is_undefined()){
+				LOG_DEBUG_AVM("Constructor is undefined, will not construct property.");
+				push_stack(as_value());
+			}
+			else{
+				as_value val = constructor_val.to_object().get()->getMember(NSV::PROP_CONSTRUCTOR,0);
+				as_value result = call_method(val,&env,constructor_val.to_object().get(),args);
+				push_stack(result);
+			}
 		}
 		
 		break;
