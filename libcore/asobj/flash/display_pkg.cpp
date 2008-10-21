@@ -24,7 +24,7 @@
 #include "VM.h"
 
 #include "flash/display/BitmapData_as.h"
-#include "Stage.h"
+#include "Stage_as.h"
 #include "flash/display/DisplayObject_as.h"
 #include "flash/display/InteractiveObject_as.h"
 #include "flash/display/DisplayObjectContainer_as.h"

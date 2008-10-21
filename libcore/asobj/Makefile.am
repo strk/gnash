@@ -53,7 +53,7 @@ libgnashasobjs_la_SOURCES = \
 	Error_as.cpp \
 	Global.cpp \
 	int_as.cpp \
-	Key.cpp	\
+	Key_as.cpp	\
 	LoadVars_as.cpp \
 	LocalConnection.cpp\
 	Math_as.cpp \
@@ -127,12 +127,8 @@ noinst_HEADERS = \
 	Error_as.h	\
 	Math_as.h	\
 	Global.h\
-<<<<<<< TREE
 	int_as.h \
-	Key.h \
-=======
 	Key_as.h \
->>>>>>> MERGE-SOURCE
 	LoadVars_as.h \
 	LocalConnection.h\
 	Microphone.h \
