@@ -361,7 +361,6 @@ bool FLVParser::parseNextTag(bool index_only)
 		_nextPosToIndex = _lastParsedPosition;
 	}
 
-
 	if ( position > _bytesLoaded ) {
 		boost::mutex::scoped_lock lock(_bytesLoadedMutex);
 		_bytesLoaded = _lastParsedPosition;
@@ -446,14 +445,20 @@ bool FLVParser::parseNextTag(bool index_only)
 		return false;
 	}
 
+	_stream->read(chunk, 4);
+	boost::uint32_t prevtagsize = chunk[0] << 24 | chunk[1] << 16 | chunk[2] << 8 | chunk[3];
+	if (prevtagsize != flvtag.body_size + 11) {
+		log_error(_("Corrupt FLV: previous tag record (%1%) unexpected (actual size: %2%)"), 
+			  prevtagsize, flvtag.body_size + 11);
+	}
+
 	return true;
 }
 
 // would be called by MAIN thread
 bool FLVParser::parseHeader()
 {
-	// seek to the begining of the file
-	_stream->seek(0); // seek back ? really ?
+	assert(_stream->tell() == 0);
 
 	// We only use 5 bytes of the header, because the last 4 bytes represent
         // an integer which is always 1.

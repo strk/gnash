@@ -73,7 +73,7 @@ public:
 class DSOEXPORT FLVParser : public MediaParser
 {
 
-public:
+private:
 
 	enum tagType
 	{
@@ -135,7 +135,7 @@ public:
 		boost::uint8_t codec;
 	};
 
-
+public:
 
 	/// \brief
 	/// Create an FLV parser reading input from
