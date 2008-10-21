@@ -292,7 +292,9 @@ MediaParser::pushEncodedAudioFrame(std::auto_ptr<EncodedAudioFrame> frame)
 	_audioFrames.insert(loc, frame.release());
 
 #ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
-	waitIfNeeded(lock); // if the push reaches a "buffer full" condition, wait to be waken up
+	// if the push reaches a "buffer full" condition, or if we find the parsing
+	// to be completed, wait to be waken up
+	waitIfNeeded(lock);
 #endif
 }
 

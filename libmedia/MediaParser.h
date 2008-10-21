@@ -1,4 +1,4 @@
-// MediaParser.h: Base class for media parsers
+// MediaParser.h: Base class for media parsers
 // 
 //   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
 // 
@@ -452,10 +452,16 @@ protected:
 	/// Clear the a/v buffers
 	void clearBuffers();
 
-	/// Push an encoded audio frame to buffer, will wait on a condition if buffer is full
+	/// Push an encoded audio frame to buffer.
+	//
+	/// Will wait on a condition if buffer is full or parsing was completed
+	///
 	void pushEncodedAudioFrame(std::auto_ptr<EncodedAudioFrame> frame);
 
-	/// Push an encoded video frame to buffer, will wait on a condition if buffer is full
+	/// Push an encoded video frame to buffer.
+	//
+	/// Will wait on a condition if buffer is full or parsing was completed
+	///
 	void pushEncodedVideoFrame(std::auto_ptr<EncodedVideoFrame> frame);
 
 	/// Return pointer to next encoded video frame in buffer
