@@ -169,7 +169,7 @@ Buffer::copy(Network::byte_t val)
 {
     GNASH_REPORT_FUNCTION;
     *_ptr = val;
-    _seekptr = _ptr + sizeof(bool);
+    _seekptr = _ptr + sizeof(Network::byte_t);
 }
 
 #if 0

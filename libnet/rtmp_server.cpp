@@ -628,11 +628,7 @@ RTMPServer::encodePing(rtmp_ping_e type, boost::uint32_t milliseconds)
     Network::byte_t *ptr = buf->reference();
     buf->clear();	// default everything to zeros, real data gets optionally added.
 
-    boost::uint32_t field = htonl(*reinterpret_cast<boost::uint32_t *>(&type));
-#ifdef BOOST_LITTLE_ENDIAN
-    field = field >> 16;
-#endif
-    boost::uint16_t typefield = static_cast<boost::uint16_t>(field);
+    boost::uint16_t typefield = htons(type);
     ptr += sizeof(boost::uint16_t); // go past the first short
 
     boost::uint32_t swapped = 0;
