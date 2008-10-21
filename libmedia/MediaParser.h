@@ -441,6 +441,12 @@ protected:
 	void startParserThread();
 
 	/// Stop the parser thread
+	//
+	/// This method should be always called
+	/// by destructors of subclasses to ensure
+	/// the parser thread won't attempt to access
+	/// destroyed structures.
+	///
 	void stopParserThread();
 
 	/// Clear the a/v buffers
