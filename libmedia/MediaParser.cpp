@@ -446,7 +446,7 @@ operator<< (std::ostream& os, const audioCodecType& t)
                 case AUDIO_CODEC_NELLYMOSER:
                         os << "Nellymoser";
                         break;
-                case AUDIO_CODEC_ACC:
+                case AUDIO_CODEC_AAC:
                         os << "Advanced Audio Coding";
                         break;
                 default:
