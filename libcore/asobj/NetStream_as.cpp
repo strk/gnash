@@ -919,7 +919,7 @@ NetStream_as::initVideoDecoder(media::MediaParser& parser)
 
 	assert ( _mediaHandler ); // caller should check this
 
-    try {
+	try {
 	    _videoDecoder = _mediaHandler->createVideoDecoder(*videoInfo);
 	}
 	catch (MediaException& e) {
@@ -942,7 +942,7 @@ NetStream_as::initAudioDecoder(media::MediaParser& parser)
 
 	assert ( _mediaHandler ); // caller should check this
 
-    try {
+	try {
 	    _audioDecoder = _mediaHandler->createAudioDecoder(*audioInfo);
 	}
 	catch (MediaException& e) {
@@ -978,6 +978,14 @@ NetStream_as::startPlayback()
 	}
 
 	m_parser->setBufferTime(m_bufferTime);
+
+	// TODO:
+	// We do NOT want to initialize decoders right after construction
+	// of the MediaParser, but rather construct them when needed, which
+	// is when we have something to decode.
+	// Postponing this will allow us NOT to block while probing
+	// for stream contents.
+	//
 
 	initVideoDecoder(*m_parser); 
 	initAudioDecoder(*m_parser); 
@@ -1349,7 +1357,36 @@ NetStream_as::pushDecodedAudioFrames(boost::uint32_t ts)
 	assert(m_parser.get());
 
 	// nothing to do if we don't have an audio decoder
-	if ( ! _audioDecoder.get() ) return;
+	//
+	// TODO: shouldn't we still flush any existing Audio frame
+	//       in the encoded queue ?
+	// ALSO: can it be we have no audio decoder just because we
+	//       haven't had a chance to get any information about
+	//	 the audio yet ?
+	//
+	if ( ! _audioDecoder.get() )
+	{
+		// There are 3 possible reasons for _audioDecoder to not be here:
+		//
+		// 1: The stream does contain audio but we were unable to find
+		//    an appropriate decoder for it
+		//
+		// 2: The stream does contain audio but we didn't try to construct
+		//    a decoder for it yet.
+		//
+		// 3: The stream does NOT contain audio yet
+		//
+		//
+		// if ( m_parser->getAudioInfo().get() ) {
+		//	... can be cases 1 and 2  ...
+		// } else {
+		//	... it is case 3 ...
+		// }
+		//
+
+		//log_debug("pushDecodedAudioFrames: no audio decoder, nothing to do");
+		return;
+	}
 
 	bool consumed = false;
 
@@ -1534,8 +1571,33 @@ NetStream_as::refreshVideoFrame(bool alsoIfPaused)
 	assert ( m_parser.get() );
 
 	// nothing to do if we don't have a video decoder
+	//
+	// TODO: shouldn't we still flush any existing Video frame
+	//       in the encoded queue ?
+	// ALSO: can it be we have no video decoder just because we
+	//       haven't had a chance to get any information about
+	//	 the video yet ?
+	//
 	if ( ! _videoDecoder.get() )
 	{
+		// There are 3 possible reasons for _videoDecoder to not be here:
+		//
+		// 1: The stream does contain video but we were unable to find
+		//    an appropriate decoder for it
+		//
+		// 2: The stream does contain video but we didn't try to construct
+		//    a decoder for it yet.
+		//
+		// 3: The stream does NOT contain video yet
+		//
+		//
+		// if ( m_parser->getVideoInfo().get() ) {
+		//	... can be cases 1 and 2  ...
+		// } else {
+		//	... it is case 3 ...
+		// }
+		//
+
 		//log_debug("refreshVideoFrame: no video decoder, nothing to do");
 		return;
 	}
@@ -1636,6 +1698,7 @@ NetStream_as::advance()
 	processStatusNotifications();
 
 	// Nothing to do if we don't have a parser
+	// TODO: should we stopAdvanceTimer() ?
 	if ( ! m_parser.get() ) return;
 
 	if ( decodingStatus() == DEC_STOPPED )
