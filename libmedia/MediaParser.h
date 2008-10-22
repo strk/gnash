@@ -91,7 +91,11 @@ enum videoCodecType
 	/// Screenvideo2 codec
 	VIDEO_CODEC_SCREENVIDEO2 = 6,
 
+	/// MPEG-4 Part 10, or Advanced Video Coding
 	VIDEO_CODEC_H264 = 7
+
+	// NOTE: if you add more elements here remember to
+	//       also add them to the output operator!
 };
 
 std::ostream& operator<< (std::ostream& os, const videoCodecType& t);
@@ -117,7 +121,11 @@ enum audioCodecType
 	/// Proprietary simple format
 	AUDIO_CODEC_NELLYMOSER = 6,
 
+	/// Advanced Audio Coding
 	AUDIO_CODEC_AAC = 10
+
+	// NOTE: if you add more elements here remember to
+	//       also add them to the output operator!
 };
 
 std::ostream& operator<< (std::ostream& os, const audioCodecType& t);
@@ -367,14 +375,14 @@ public:
 	/// Returns a VideoInfo class about the videostream
 	//
 	/// @return a VideoInfo class about the videostream,
-	///         or zero if stream contains no video
+	///         or zero if unknown (no video or not enough data parsed yet).
 	///
 	VideoInfo* getVideoInfo() { return _videoInfo.get(); }
 
 	/// Returns a AudioInfo class about the audiostream
 	//
 	/// @return a AudioInfo class about the audiostream,
-	///         or zero if stream contains no audio
+	///         or zero if unknown (no audio or not enough data parsed yet).
 	///
 	AudioInfo* getAudioInfo() { return _audioInfo.get(); }
 

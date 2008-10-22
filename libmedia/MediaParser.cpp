@@ -413,6 +413,9 @@ operator<< (std::ostream& os, const videoCodecType& t)
                 case VIDEO_CODEC_SCREENVIDEO2:
                         os << "Screenvideo2";
                         break;
+                case VIDEO_CODEC_H264:
+                        os << "H264";
+                        break;
                 default:
                         os << "unknown/invalid";
                         break;
@@ -442,6 +445,9 @@ operator<< (std::ostream& os, const audioCodecType& t)
                         break;
                 case AUDIO_CODEC_NELLYMOSER:
                         os << "Nellymoser";
+                        break;
+                case AUDIO_CODEC_ACC:
+                        os << "Advanced Audio Coding";
                         break;
                 default:
                         os << "unknown/invalid";
