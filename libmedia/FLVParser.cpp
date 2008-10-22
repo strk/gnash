@@ -436,12 +436,17 @@ bool FLVParser::parseNextTag(bool index_only)
 		}
 		metaTag->resize(actuallyRead);
 
+		boost::uint32_t terminus = getUInt24(metaTag->data() + actuallyRead - 3);
+		if (terminus != 9) {
+			log_error(_("Corrupt FLV: Meta tag unterminated!"));
+		}
+
 		boost::mutex::scoped_lock lock(_metaTagsMutex);
 		_metaTags.push_back(new MetaTag(flvtag.timestamp, metaTag));
 	}
 	else
 	{
-		log_error("FLVParser::parseNextTag: unknown FLV tag type %d", (int)chunk[0]);
+		log_error(_("FLVParser::parseNextTag: unknown FLV tag type %d"), (int)chunk[0]);
 		return false;
 	}
 

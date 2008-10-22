@@ -449,6 +449,9 @@ operator<< (std::ostream& os, const audioCodecType& t)
                 case AUDIO_CODEC_AAC:
                         os << "Advanced Audio Coding";
                         break;
+		case AUDIO_CODEC_SPEEX:
+			os << "Speex";
+			break;
                 default:
                         os << "unknown/invalid";
                         break;

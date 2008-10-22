@@ -122,7 +122,10 @@ enum audioCodecType
 	AUDIO_CODEC_NELLYMOSER = 6,
 
 	/// Advanced Audio Coding
-	AUDIO_CODEC_AAC = 10
+	AUDIO_CODEC_AAC = 10,
+
+	/// Always 16kHz mono
+	AUDIO_CODEC_SPEEX = 11
 
 	// NOTE: if you add more elements here remember to
 	//       also add them to the output operator!
