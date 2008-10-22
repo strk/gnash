@@ -344,7 +344,7 @@ RcInitFile::parseFile(const std::string& filespec)
     StringNoCaseEqual noCaseCompare;
     
     if (filespec.empty()) {
-        cout << "RcInitFile::parseFile: empty filespec" << endl;
+        cerr << "RcInitFile::parseFile: empty filespec" << endl;
         return false;
     }
     
@@ -361,7 +361,7 @@ RcInitFile::parseFile(const std::string& filespec)
             return false;
     }
 
-    cout << _("RcInitFile: parsing ") << filespec << endl;
+    //cout << _("RcInitFile: parsing ") << filespec << endl;
         
     // Read in each line and parse it
     size_t lineno = 0;

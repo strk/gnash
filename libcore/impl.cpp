@@ -471,7 +471,7 @@ void  clear()
     //
     // See task task #6959 and depending items
     //
-    std::cerr << "Any segfault past this message is likely due to improper threads cleanup." << std::endl;
+    log_debug("Any segfault past this message is likely due to improper threads cleanup.");
     //exit(EXIT_SUCCESS);
 
     clear_library();

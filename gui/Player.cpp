@@ -441,7 +441,7 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
     }
     _gui->run();
 
-    std::cerr << "Main loop ended, cleaning up" << std::endl;
+    log_debug("Main loop ended, cleaning up");
 
     // Clean up as much as possible, so valgrind will help find actual leaks.
     gnash::clear();
