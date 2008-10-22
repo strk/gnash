@@ -519,11 +519,19 @@ MediaParserGst::cb_chain_func_audio (GstPad *pad, GstBuffer *buffer)
     assert(parser);
 
     EncodedAudioFrame* frame = new EncodedAudioFrame;
-    frame->dataSize = GST_BUFFER_SIZE(buffer);
+
+    // 'dataSize' should reflect size of 'data'.
+    // Since we're not allocating any 'data' there's no point
+    // in setting dataSize.
+    //frame->dataSize = GST_BUFFER_SIZE(buffer);
 
     if (GST_BUFFER_TIMESTAMP_IS_VALID(buffer)) {
         frame->timestamp = GST_TIME_AS_MSECONDS(GST_BUFFER_TIMESTAMP(buffer));
     } else {
+        // What if a frame with invalid timestamp is found
+        // in the middle of the stream ? Using 0 here, might
+        // mean that the computed "bufferTime" is huge (0 to last valid timestamp)
+        // Not necessarely a big deal, but a conceptual glitch.
         frame->timestamp = 0;
     }
     
