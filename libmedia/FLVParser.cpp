@@ -448,7 +448,7 @@ bool FLVParser::parseNextTag(bool index_only)
 	_stream->read(chunk, 4);
 	boost::uint32_t prevtagsize = chunk[0] << 24 | chunk[1] << 16 | chunk[2] << 8 | chunk[3];
 	if (prevtagsize != flvtag.body_size + 11) {
-		log_error(_("Corrupt FLV: previous tag record (%1%) unexpected (actual size: %2%)"), 
+		log_error(_("Corrupt FLV: previous tag size record (%1%) unexpected (actual size: %2%)"), 
 			  prevtagsize, flvtag.body_size + 11);
 	}
 
