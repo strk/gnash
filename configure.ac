@@ -1486,6 +1486,8 @@ if test x"${GIF_LIBS}" = x ; then
 fi
 GNASH_PKG_INCLUDES([dejagnu], [dejagnu.h])
 
+GNASH_PKG_FIND(speex, [speex.h], [speex audio codec], speex_decode_int)
+
 dnl Find freetype and fontconfig
 dnl GNASH_PKG_FIND(freetype2, [freetype/freetype.h], [freetype2 font library], FT_Load_Char)
 dnl rob might be working on this or not ;)
@@ -2700,6 +2702,21 @@ else
   echo "                     Install libcurl from http://curl.haxx.se/libcurl" >&4
   echo "                     or .deb users: apt-get install libcurl3-dev" >&4
   echo "                     or .rpm users: yum install curl-devel" >&4
+fi
+
+if test x"$SPEEX_LIBS" != x; then
+  if test x"$SPEEX_CFLAGS" != x; then
+    echo "        Speex flags are: $SPEEX_CFLAGS"
+  else
+    echo "        Speex flags are: default include path"
+  fi
+    echo "        Speex libs are: $SPEEX_LIBS"
+else
+  echo "        RECOMMENDED: If you install the Speex library, Gnash will be able to" >&4
+  echo "                     decoded Speex encoded audio in FLV files." >&4
+  echo "                     Install libspeex from http://speex.org" >&4
+  echo "                     or .deb users: apt-get install libspeex-dev" >&4
+  echo "                     or .rpm users: yum install speex-devel" >&4
 fi
 
 if test x"$ext_dbus" = xyes; then
