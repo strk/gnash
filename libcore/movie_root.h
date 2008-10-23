@@ -696,7 +696,7 @@ public:
     /// (for browser communication mostly)
     ///
     /// @return -1 if no filedescriptor is provided by host app.
-    int getHostFD()
+    int getHostFD() const
     {
         return _hostfd;
     }

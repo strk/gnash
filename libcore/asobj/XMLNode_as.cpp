@@ -255,7 +255,6 @@ XMLNode::nextSibling()
     {
         if (itx->get() == this)
         {
-            //log_debug("Found the next XMLNode child !!!! %s <%p>", (*itx)->nodeName().c_str(), (void*)itx->get());
 		    return previous_node;
 		}
 		previous_node = itx->get();
@@ -267,7 +266,6 @@ XMLNode::nextSibling()
 void
 XMLNode::toString(std::ostream& xmlout, bool encode) const
 {
-    log_debug("XMLNode toString: encode %d");
     stringify(*this, xmlout, encode);
 }
 

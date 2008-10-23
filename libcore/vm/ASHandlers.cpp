@@ -2160,9 +2160,6 @@ SWFHandlers::CommonGetUrl(as_environment& env,
         return;
     }
 
-#define GETURL2_LOADTARGET_FLAG   1<<7
-#define GETURL2_LOADVARIABLE_FLAG 1<<8
-
     // Parse the method bitfield
     short sendVarsMethod = method & 3;
     bool loadTargetFlag    = method & 64;
@@ -2221,8 +2218,10 @@ SWFHandlers::CommonGetUrl(as_environment& env,
     const URL& baseurl = get_base_url();
     URL url(urlTarget, baseurl);
 
-    log_debug(_("get url: target=%s, url=%s (%s), method=%x (sendVars:%X, loadTarget:%d, loadVariable:%d)"), target_string,
-        url.str(), urlTarget, static_cast<int>(method), sendVarsMethod, loadTargetFlag, loadVariableFlag);
+    log_debug(_("get url: target=%s, url=%s (%s), method=%x "
+                "(sendVars:%X, loadTarget:%d, loadVariable:%d)"),
+            target_string, url.str(), urlTarget, static_cast<int>(method),
+            sendVarsMethod, loadTargetFlag, loadVariableFlag);
 
     if ( ! URLAccessManager::allow(url) )
     {
@@ -2335,8 +2334,8 @@ SWFHandlers::CommonGetUrl(as_environment& env,
         {
             log_debug(_("TESTME: target of a loadMovie changed its target path"));
         }
-
-        assert( m.findCharacterByTarget(s) == target_movie ); // TODO: try to trigger this !
+        // TODO: try to trigger this !
+        assert(m.findCharacterByTarget(s) == target_movie );
 
         if ( usePost )
         {
@@ -2419,8 +2418,8 @@ SWFHandlers::CommonGetUrl(as_environment& env,
         //log_debug("user-provided host requests fd is %d", hostfd);
         std::ostringstream request;
 
-        // use the original url, non parsed (the browser will know better how to resolve
-        // relative urls and handle hactionscript)
+        // use the original url, non parsed (the browser will know better
+        // how to resolve relative urls and handle actionscript)
         request << "GET " << target_string << ":" << urlTarget << std::endl;
 
         std::string requestString = request.str();

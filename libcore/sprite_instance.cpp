@@ -976,15 +976,111 @@ sprite_getInstanceAtDepth(const fn_call& fn)
   return as_value(ch.get());
 }
 
-// getURL(url:String, [window:String], [method:String]) : Void
+/// MovieClip.getURL(url:String[, window:String[, method:String]])
+//
+/// TODO: test this properly.
+/// Returns void.
 static as_value
 sprite_getURL(const fn_call& fn)
 {
-  boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
-  UNUSED(sprite);
+    boost::intrusive_ptr<sprite_instance> sprite = 
+        ensureType<sprite_instance>(fn.this_ptr);
 
-  LOG_ONCE( log_unimpl("MovieClip.getURL()") );
-  return as_value();
+    std::string url;
+    std::string target;
+    std::string method;
+
+    switch (fn.nargs)
+    {
+        case 0:
+        {
+            IF_VERBOSE_ASCODING_ERRORS(
+                log_aserror(_("No arguments passed to MovieClip.getURL()"));
+            );
+            return as_value();
+        }
+        default:
+        {
+            IF_VERBOSE_ASCODING_ERRORS(
+                std::ostringstream os;
+                fn.dump_args(os);
+                log_aserror(_("MovieClip.getURL(%s): extra arguments "
+                        "dropped"), os.str());
+            );
+        }
+        case 3:
+            method = fn.arg(2).to_string();
+        case 2:
+            target = fn.arg(1).to_string();
+        case 1:
+            url = fn.arg(0).to_string();
+            if (url.empty())
+            {
+                log_error(_("Asked  to get empty URL in MovieClip.getURL"));
+                return as_value();
+            }
+            break;
+    }
+
+    // Get encoded vars.
+    std::string vars;
+    sprite->getURLEncodedVars(vars);
+
+    const int hostfd = sprite->getVM().getRoot().getHostFD();
+    if (hostfd == -1)
+    {
+        // This should only work with a browser.
+        log_debug("MovieClip.getURL() called with no hosting application");
+        return as_value();
+    }
+    
+    // Default to GET. 
+    bool post = false;
+
+    if (fn.nargs > 2)
+    {
+        // There is a "method" string, so we want to send the MovieClip
+        // variables.
+        if (!method.empty())
+        {
+            StringNoCaseEqual noCaseCompare;
+            if (noCaseCompare(method, "POST"))
+            {
+                post = true;
+                log_unimpl("MovieClip.getURL()) with POST method");
+            }
+            else
+            {
+                // Default to GET, so encode and append the MovieClip
+                // variables as a query string.
+                url.append("?");
+                url.append(vars);
+            }
+
+        }
+    }
+
+    std::ostringstream os;
+    os << "GET " << target << ":" << url << std::endl;
+
+    const std::string& request = os.str();
+    const std::string::size_type len = request.length();
+
+    int ret = write(hostfd, request.c_str(), len);
+    if ( ret == -1 )
+    {
+        log_error(_("Could not write to user-provided host requests "
+                       "fd %d: %s"), hostfd, std::strerror(errno));
+    }
+
+    if (static_cast<size_t>(ret) < len)
+    {
+        log_error(_("Could only write %d bytes over %d required to "
+                       "user-provided host requests fd %d"),
+                       ret, len, hostfd);
+    }
+
+    return as_value();
 }
 
 // getSWFVersion() : Number
