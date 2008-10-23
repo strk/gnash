@@ -50,6 +50,9 @@
 // Define the following macro to have status notification handling debugged
 //#define GNASH_DEBUG_STATUS
 
+// Define the following macro to enable decoding debugging
+//#define GNASH_DEBUG_DECODING
+
 namespace gnash {
  
 static as_value netstream_new(const fn_call& fn);
@@ -81,6 +84,12 @@ NetStream_as::NetStream_as()
 	inputPos(0),
 	_invalidatedVideoCharacter(0),
 	_decoding_state(DEC_NONE),
+
+	_videoDecoder(0),
+	_videoInfoKnown(false),
+
+	_audioDecoder(0),
+	_audioInfoKnown(false),
 
 	// TODO: if audio is available, use _audioClock instead of SystemClock
 	// as additional source
@@ -992,6 +1001,10 @@ NetStream_as::startPlayback()
 	// for stream contents.
 	//
 
+	// The following sleep is a silly device for debugging
+	// http://savannah.gnu.org/bugs/index.php?24628
+	//sleep(2);
+
 	initVideoDecoder(*m_parser); 
 	initAudioDecoder(*m_parser); 
 
@@ -1358,14 +1371,6 @@ NetStream_as::pushDecodedAudioFrames(boost::uint32_t ts)
 {
 	assert(m_parser.get());
 
-	// nothing to do if we don't have an audio decoder
-	//
-	// TODO: shouldn't we still flush any existing Audio frame
-	//       in the encoded queue ?
-	// ALSO: can it be we have no audio decoder just because we
-	//       haven't had a chance to get any information about
-	//	 the audio yet ?
-	//
 	if ( ! _audioDecoder.get() )
 	{
 		// There are 3 possible reasons for _audioDecoder to not be here:
@@ -1377,16 +1382,40 @@ NetStream_as::pushDecodedAudioFrames(boost::uint32_t ts)
 		//    a decoder for it yet.
 		//
 		// 3: The stream does NOT contain audio yet
-		//
-		//
-		// if ( m_parser->getAudioInfo().get() ) {
-		//	... can be cases 1 and 2  ...
-		// } else {
-		//	... it is case 3 ...
-		// }
-		//
 
-		//log_debug("pushDecodedAudioFrames: no audio decoder, nothing to do");
+		if ( _audioInfoKnown )
+		{
+			// case 1: we saw the audio info already,
+			//         but couldn't construct a decoder
+
+			// TODO: shouldn't we still flush any existing Audio frame
+			//       in the encoded queue ?
+
+			// log_debug("pushDecodedAudioFrames: no decoder for audio in stream, nothing to do");
+			return;
+		}
+
+		media::AudioInfo* audioInfo = m_parser->getAudioInfo();
+		if ( ! audioInfo )
+		{
+			// case 3: no audio found yet
+
+			// assert(!parser.nextAudioFrameTimestamp); // if it was threadless...
+
+			// log_debug("pushDecodedAudioFrames: no audio in stream (yet), nothing to do");
+			return;
+		}
+
+		// case 2: here comes the audio !
+		_audioInfoKnown = true;
+
+		// TODO: try to create an AudioDecoder!
+
+		log_unimpl("NetStream_as::pushDecodedAudioFrames: just found new audio, "
+			"should try to create an audio decoder "
+			"and plug an audio consumer to PlayHead here."
+			" See http://savannah.gnu.org/bugs/index.php?24540");
+
 		return;
 	}
 
@@ -1582,14 +1611,6 @@ NetStream_as::refreshVideoFrame(bool alsoIfPaused)
 {
 	assert ( m_parser.get() );
 
-	// nothing to do if we don't have a video decoder
-	//
-	// TODO: shouldn't we still flush any existing Video frame
-	//       in the encoded queue ?
-	// ALSO: can it be we have no video decoder just because we
-	//       haven't had a chance to get any information about
-	//	 the video yet ?
-	//
 	if ( ! _videoDecoder.get() )
 	{
 		// There are 3 possible reasons for _videoDecoder to not be here:
@@ -1602,23 +1623,44 @@ NetStream_as::refreshVideoFrame(bool alsoIfPaused)
 		//
 		// 3: The stream does NOT contain video yet
 		//
-		//
-		// if ( m_parser->getVideoInfo().get() ) {
-		//	... can be cases 1 and 2  ...
-		// } else {
-		//	... it is case 3 ...
-		// }
-		//
 
-		//log_debug("refreshVideoFrame: no video decoder, nothing to do");
+		if ( _videoInfoKnown )
+		{
+			// case 1: we saw the video info already,
+			//         but couldn't construct a decoder
+
+			// TODO: shouldn't we still flush any existing Video frame
+			//       in the encoded queue ?
+
+			// log_debug("refreshVideoFrame: no decoder for video in stream, nothing to do");
+			return;
+		}
+
+		media::VideoInfo* videoInfo = m_parser->getVideoInfo();
+		if ( ! videoInfo )
+		{
+			// case 3: no video found yet
+
+			// assert(!parser.nextVideoFrameTimestamp); // if it was threadless...
+
+			// log_debug("refreshVideoFrame: no video in stream (yet), nothing to do");
+			return;
+		}
+
+		// case 2: here comes the video !
+		_videoInfoKnown = true;
+
+		// TODO: try to create a videoDecoder!
+
+		log_unimpl("NetStream_as::refreshVideoFrame: just found new video, "
+			"should try to create a video decoder "
+			"and plug a video consumer to PlayHead here."
+			" See http://savannah.gnu.org/bugs/index.php?24540");
 		return;
+
 	}
 
 #ifdef GNASH_DEBUG_DECODING
-	// bufferLength() would lock the mutex (which we already hold),
-	// so this is to avoid that.
-	boost::uint32_t parserTime = m_parser->getBufferLength();
-	boost::uint32_t playHeadTime = time();
 	boost::uint32_t bufferLen = bufferLength();
 #endif
 

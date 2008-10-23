@@ -597,8 +597,14 @@ private:
 	/// Video decoder
 	std::auto_ptr<media::VideoDecoder> _videoDecoder;
 
+	/// True if video info are known
+	bool _videoInfoKnown;
+
 	/// Audio decoder
 	std::auto_ptr<media::AudioDecoder> _audioDecoder;
+
+	/// True if an audio info are known
+	bool _audioInfoKnown;
 
 	/// Virtual clock used as playback clock source
 	std::auto_ptr<InterruptableVirtualClock> _playbackClock;
