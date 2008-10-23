@@ -49,6 +49,7 @@ libgnashmedia_la_CPPFLAGS = \
 	$(GIF_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(INCLTDL) \
+	$(SPEEX_CFLAGS) \
 	$(NULL)
 
 # These headers get installed
@@ -70,6 +71,7 @@ libgnashmedia_la_LIBADD = \
 	$(LIBLTDLHEAD) \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
+	$(SPEEX_LIBS) \
 	$(NULL)
 
 libgnashmedia_la_SOURCES = \
