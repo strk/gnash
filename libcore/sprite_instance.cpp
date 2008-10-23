@@ -395,7 +395,7 @@ sprite_create_empty_movieclip(const fn_call& fn)
     // can be any number. All numbers are converted to an int32_t, and are valid
     // depths even when outside the usual bounds.
     character* ch = sprite->add_empty_movieclip(fn.arg(0).to_string().c_str(),
-                                                                                            fn.arg(1).to_int());
+            fn.arg(1).to_int());
     return as_value(ch);
 }
 
@@ -710,13 +710,21 @@ sprite_get_bytes_total(const fn_call& fn)
     return as_value(sprite->get_bytes_total());
 }
 
-// my_mc.loadMovie(url:String [,variables:String]) : Void
+// my_mc.loadMovie(url:String [,variables:String]).
+//
+// This *always* calls MovieClip.meth.
 static as_value
-sprite_load_movie(const fn_call& fn)
+sprite_loadMovie(const fn_call& fn)
 {
     boost::intrusive_ptr<sprite_instance> sprite = 
         ensureType<sprite_instance>(fn.this_ptr);
-    UNUSED(sprite);
+
+    as_value val;
+    if (fn.nargs > 1)
+    {
+        val = sprite->callMethod(NSV::PROP_METH, fn.arg(1));
+    }
+    else val = sprite->callMethod(NSV::PROP_METH);
 
     if (fn.nargs < 1) // url
     {
@@ -748,40 +756,11 @@ sprite_load_movie(const fn_call& fn)
 
     // TODO: if GET/POST should send variables of *this* movie,
     // no matter if the target will be replaced by another movie !!
-    bool usePost = false;
-    bool sendVars = false;
-    if (fn.nargs > 1)
-    {
-        boost::intrusive_ptr<as_object> methodstr = fn.arg(1).to_object();
-        assert(methodstr);
-        
-        as_value lc = methodstr->callMethod(NSV::PROP_TO_LOWER_CASE);
-        std::string method = lc.to_string(); 
-            
-        if (method == "post") 
-        {
-            usePost = true;
-            sendVars = true;
-        }
-        else if (method == "get") 
-        {
-            sendVars = true;
-        }
-        else
-        {
-            IF_VERBOSE_ASCODING_ERRORS(
-                std::stringstream ss;
-                fn.dump_args(ss);
-                log_aserror(_("MovieClip.loadMovie(%s): second argument "
-                    "(if any) must be 'post' or 'get' [got %s]"),
-                    ss.str(), method);
-            );
-        }
-    }
+    const sprite_instance::MovieClipMethod method =
+        static_cast<sprite_instance::MovieClipMethod>(val.to_int());
 
-    if (!sendVars)
+    if (method == sprite_instance::METHOD_NONE)
     {
-        //log_debug("Not sending vars");
         mr.loadMovie(url, target); 
     }
     else
@@ -789,17 +768,18 @@ sprite_load_movie(const fn_call& fn)
         std::string data;
         sprite->getURLEncodedVars(data);
  
-        if ( usePost )
+        if (method == sprite_instance::METHOD_POST)
         {
             log_debug(_("POSTING: %s"), data);
             mr.loadMovie(url, target, &data);
         }
         else
         {
+            // GET method
             std::string qs = url.querystring();
             if ( qs.empty() ) data.insert(0, 1, '?');
             else data.insert(0, 1, '&');
-            url.set_querystring(qs+data);
+            url.set_querystring(qs + data);
             log_debug(_("GETTING: %s"), url.str());
             mr.loadMovie(url, target); 
         }
@@ -814,7 +794,15 @@ sprite_load_variables(const fn_call& fn)
 {
     boost::intrusive_ptr<sprite_instance> sprite = 
         ensureType<sprite_instance>(fn.this_ptr);
-    UNUSED(sprite);
+
+    // This always calls MovieClip.meth, even when there are no
+    // arguments.
+    as_value val;
+    if (fn.nargs > 1)
+    {
+        val = sprite->callMethod(NSV::PROP_METH, fn.arg(1));
+    }
+    else val = sprite->callMethod(NSV::PROP_METH);
 
     if (fn.nargs < 1) // url
     {
@@ -841,31 +829,17 @@ sprite_load_variables(const fn_call& fn)
     const URL& baseurl = get_base_url();
     URL url(urlstr, baseurl);
 
-    short method = 0;
-
-    if (fn.nargs > 1)
-    {    
-        boost::intrusive_ptr<as_object> methodstr = fn.arg(1).to_object();
-        assert(methodstr);
-        
-        as_value lc = methodstr->callMethod(NSV::PROP_TO_LOWER_CASE);
-        std::string methodstring = lc.to_string(); 
-    
-        if ( methodstring == "get" ) method = 1;
-        else if ( methodstring == "post" ) method = 2;
-    }
+    const sprite_instance::MovieClipMethod method =
+        static_cast<sprite_instance::MovieClipMethod>(val.to_int());
 
     sprite->loadVariables(url, method);
     log_debug("MovieClip.loadVariables(%s) - TESTING ", url.str());
 
-
-    //log_unimpl(__PRETTY_FUNCTION__);
-    //moviecliploader_loadclip(fn);
     return as_value();
 }
 
 // my_mc.unloadMovie() : Void
-static as_value sprite_unload_movie(const fn_call& fn)
+static as_value sprite_unloadMovie(const fn_call& fn)
 {
     boost::intrusive_ptr<sprite_instance> sprite = 
         ensureType<sprite_instance>(fn.this_ptr);
@@ -1035,9 +1009,15 @@ sprite_getURL(const fn_call& fn)
     boost::intrusive_ptr<sprite_instance> sprite = 
             ensureType<sprite_instance>(fn.this_ptr);
 
-    std::string url;
+    std::string urlstring;
     std::string target;
-    std::string method;
+
+    as_value val;
+    if (fn.nargs > 2)
+    {
+        val = sprite->callMethod(NSV::PROP_METH, fn.arg(2));
+    }
+    else val = sprite->callMethod(NSV::PROP_METH);
 
     switch (fn.nargs)
     {
@@ -1058,80 +1038,44 @@ sprite_getURL(const fn_call& fn)
             );
         }
         case 3:
-        {
-            // This calls toLowerCase
-            boost::intrusive_ptr<as_object> methodstr = fn.arg(1).to_object();
-            assert(methodstr);
-        
-            as_value lc = methodstr->callMethod(NSV::PROP_TO_LOWER_CASE);
-            method = lc.to_string();
-        }
+            // This argument has already been handled.
         case 2:
              target = fn.arg(1).to_string();
         case 1:
-             url = fn.arg(0).to_string();
-             if (url.empty())
-             {
-                  log_error(_("Asked to get empty URL in MovieClip.getURL"));
-                  return as_value();
-             }
+             urlstring = fn.arg(0).to_string();
              break;
     }
-    // Get encoded vars.
+
+
+    sprite_instance::MovieClipMethod method =
+        static_cast<sprite_instance::MovieClipMethod>(val.to_int());
+
     std::string vars;
-    sprite->getURLEncodedVars(vars);
 
-    const int hostfd = sprite->getVM().getRoot().getHostFD();
-    if (hostfd == -1)
+    if (method != sprite_instance::METHOD_NONE)
     {
-        // This should only work with a browser.
-        log_debug("MovieClip.getURL() called with no hosting application");
-        return as_value();
+        // Get encoded vars.
+        sprite->getURLEncodedVars(vars);
     }
-        
-    // Default to GET. 
-    bool post = false;
 
-    if (fn.nargs > 2)
+    movie_root& m = sprite->getVM().getRoot();
+    
+    URL url(urlstring);
+
+    switch (method)
     {
-        // There is a "method" string, so we want to send the MovieClip
-        // variables.
-        if (!method.empty())
+        case sprite_instance::METHOD_POST:
+            m.getURL(url, target, &vars);
+            break;
+        case sprite_instance::METHOD_GET:
         {
-            if (method == "post")
-            {
-                 post = true;
-                 log_unimpl("MovieClip.getURL() with POST method");
-            }
-            else
-            {
-                // Default to GET, so encode and append the MovieClip
-                // variables as a query string.
-                url.append("?");
-                url.append(vars);
-            }
-
+            std::string qs = url.querystring();
+            if ( qs.empty() ) vars.insert(0, 1, '?');
+            else vars.insert(0, 1, '&');
+            url.set_querystring(qs + vars);
         }
-    }
-
-    std::ostringstream os;
-    os << "GET " << target << ":" << url << std::endl;
-
-    const std::string& request = os.str();
-    const std::string::size_type len = request.length();
-
-    int ret = write(hostfd, request.c_str(), len);
-    if ( ret == -1 )
-    {
-        log_error(_("Could not write to user-provided host requests "
-            "fd %d: %s"), hostfd, std::strerror(errno));
-    }
-
-    if (static_cast<size_t>(ret) < len)
-    {
-        log_error(_("Could only write %d bytes over %d required to "
-                    "user-provided host requests fd %d"),
-                    ret, len, hostfd);
+        case sprite_instance::METHOD_NONE:
+            m.getURL(url, target);
     }
 
     return as_value();
@@ -1157,23 +1101,23 @@ sprite_meth(const fn_call& fn)
     boost::intrusive_ptr<sprite_instance> sprite =
             ensureType<sprite_instance>(fn.this_ptr);
 
-    if (!fn.nargs) return as_value(0); 
+    if (!fn.nargs) return as_value(sprite_instance::METHOD_NONE); 
 
     const as_value& v = fn.arg(0);
     boost::intrusive_ptr<as_object> o = v.to_object();
     if ( ! o )
     {
         log_debug(_("meth(%s): first argument doesn't cast to object"), v);
-        return as_value(0);
+        return as_value(sprite_instance::METHOD_NONE);
     }
 
     as_value lc = o->callMethod(NSV::PROP_TO_LOWER_CASE);
 
     std::string s = lc.to_string();
 
-    if (s == "get") return as_value(1);
-    if (s == "post") return as_value(2);
-    return as_value(0);
+    if (s == "get") return as_value(sprite_instance::METHOD_GET);
+    if (s == "post") return as_value(sprite_instance::METHOD_POST);
+    return as_value(sprite_instance::METHOD_NONE);
 }
 
 // getTextSnapshot() : TextSnapshot
@@ -1552,141 +1496,136 @@ sprite_lineStyle(const fn_call& fn)
     boost::intrusive_ptr<sprite_instance> sprite =
             ensureType<sprite_instance>(fn.this_ptr);
 
-        if ( ! fn.nargs )
-        {
-                sprite->resetLineStyle();
-                return as_value();
-        }
+    if ( ! fn.nargs )
+    {
+        sprite->resetLineStyle();
+        return as_value();
+    }
 
-        boost::uint8_t r = 0;
-        boost::uint8_t g = 0;
-        boost::uint8_t b = 0;
-        boost::uint8_t a = 255;
-        boost::uint16_t thickness = 0;
-        bool scaleThicknessVertically = true;
-        bool scaleThicknessHorizontally = true;
-        bool pixelHinting = false;
-        bool noClose = false;
-        cap_style_e capStyle = CAP_ROUND;
-        join_style_e joinStyle = JOIN_ROUND;
-        float miterLimitFactor = 1.0f;
+    boost::uint8_t r = 0;
+    boost::uint8_t g = 0;
+    boost::uint8_t b = 0;
+    boost::uint8_t a = 255;
+    boost::uint16_t thickness = 0;
+    bool scaleThicknessVertically = true;
+    bool scaleThicknessHorizontally = true;
+    bool pixelHinting = false;
+    bool noClose = false;
+    cap_style_e capStyle = CAP_ROUND;
+    join_style_e joinStyle = JOIN_ROUND;
+    float miterLimitFactor = 1.0f;
 
-        int arguments = fn.nargs;
+    int arguments = fn.nargs;
 
-        const int swfVersion = sprite->getVM().getSWFVersion();
-        if (swfVersion < 8 && fn.nargs > 3)
-        {
-                IF_VERBOSE_ASCODING_ERRORS(
-                        std::ostringstream ss;
-                        fn.dump_args(ss);
-                        log_aserror(_("MovieClip.lineStyle(%s): args after the "
-                                                 "first three will be discarded"), ss.str());
+    const int swfVersion = sprite->getVM().getSWFVersion();
+    if (swfVersion < 8 && fn.nargs > 3)
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::ostringstream ss;
+            fn.dump_args(ss);
+            log_aserror(_("MovieClip.lineStyle(%s): args after the "
+                          "first three will be discarded"), ss.str());
+            );
+        arguments = 3;
+    }
+
+    switch (arguments)
+    {
+        default:
+            IF_VERBOSE_ASCODING_ERRORS(
+                std::ostringstream ss;
+                fn.dump_args(ss);
+                log_aserror(_("MovieClip.lineStyle(%s): args after the "
+                              "first eight will be discarded"), ss.str());
                 );
-                arguments = 3;
-        }
-
-        switch (arguments)
+        case 8:
+            miterLimitFactor = utility::clamp<int>(fn.arg(7).to_int(), 1, 255);
+        case 7:
         {
-                default:
-                        IF_VERBOSE_ASCODING_ERRORS(
-                                std::ostringstream ss;
-                                fn.dump_args(ss);
-                                log_aserror(_("MovieClip.lineStyle(%s): args after the "
-                                                            "first eight will be discarded"), ss.str());
-                        );
-                case 8:
-                        miterLimitFactor = utility::clamp<int>(fn.arg(7).to_int(), 1, 255);
-                case 7:
-                {
-                        std::string joinStyleStr = fn.arg(6).to_string();
-                        if (joinStyleStr == "miter") joinStyle = JOIN_MITER;
-                        else if (joinStyleStr == "round") joinStyle = JOIN_ROUND;
-                        else if (joinStyleStr == "bevel") joinStyle = JOIN_BEVEL;
-                        else
-                        {
-                            IF_VERBOSE_ASCODING_ERRORS(
-                                    std::ostringstream ss;
-                                    fn.dump_args(ss);
-                                    log_aserror(_("MovieClip.lineStyle(%s): invalid joinStyle"
-                                                                "value '%s' (valid values: %s|%s|%s)"), ss.str(),
-                                        joinStyleStr, "miter", "round", "bevel");
-                            );
-                        }
-                }
-                case 6:
-                {
-
-                        const std::string capStyleStr = fn.arg(5).to_string();
-
-                        if (capStyleStr == "none") capStyle = CAP_NONE;
-                        else if (capStyleStr == "round") capStyle = CAP_ROUND;
-                        else if (capStyleStr == "square") capStyle = CAP_SQUARE;
-                        else
-                        {
-                                IF_VERBOSE_ASCODING_ERRORS(
-                                        std::ostringstream ss;
-                                        fn.dump_args(ss);
-                                        log_aserror(_("MovieClip.lineStyle(%s): invalid capStyle "
-                                                "value '%s' (valid values: none|round|square)"),
-                                                ss.str(), capStyleStr);
-                                );
-                        }
-                }
-                case 5:
-                {
-                        // Both values to be set here are true, so just set the
-                        // appropriate values to false.
-                        const std::string noScaleString = fn.arg(4).to_string();
-                        if (noScaleString == "none")
-                        {
-                                scaleThicknessVertically = false;
-                                scaleThicknessHorizontally = false;
-                        }
-                        else if (noScaleString == "vertical")
-                        {
-                                scaleThicknessVertically = false;
-                        }
-                        else if (noScaleString == "horizontal")
-                        {
-                                scaleThicknessHorizontally = false;
-                        }
-                        else if (noScaleString != "normal")
-                        {
-                                IF_VERBOSE_ASCODING_ERRORS(
-                                        std::ostringstream ss;
-                                        fn.dump_args(ss);
-                                        log_aserror(_("MovieClip.lineStyle(%s): invalid "
-                                                                    "noScale value '%s' (valid values: "
-                                                                    "%s|%s|%s|%s)"),
-                                                                    ss.str(), noScaleString, "none",
-                                                                    "vertical", "horizontal", "normal");
-                                );
-                        }
-                }
-                case 4:
-                        pixelHinting = fn.arg(3).to_bool();
-                case 3:
-                {
-                        const float alphaval = utility::clamp<float>(fn.arg(2).to_number(),
-                                     0, 100);
-                        a = boost::uint8_t(255 * (alphaval / 100));
-                }
-                case 2:
-                {
-                        boost::uint32_t rgbval = boost::uint32_t(
-                                        utility::clamp<float>(fn.arg(1).to_number(), 0, 16777216));
-                        r = boost::uint8_t((rgbval & 0xFF0000) >> 16);
-                        g = boost::uint8_t((rgbval & 0x00FF00) >> 8);
-                        b = boost::uint8_t((rgbval & 0x0000FF) );
-                }
-                case 1:
-                        thickness = boost::uint16_t(
-                                        PIXELS_TO_TWIPS(
-                                                boost::uint16_t(
-                                                utility::clamp<float>(fn.arg(0).to_number(), 0, 255)
-                                                )));
-                break;
+            std::string joinStyleStr = fn.arg(6).to_string();
+            if (joinStyleStr == "miter") joinStyle = JOIN_MITER;
+            else if (joinStyleStr == "round") joinStyle = JOIN_ROUND;
+            else if (joinStyleStr == "bevel") joinStyle = JOIN_BEVEL;
+            else
+            {
+                IF_VERBOSE_ASCODING_ERRORS(
+                    std::ostringstream ss;
+                    fn.dump_args(ss);
+                    log_aserror(_("MovieClip.lineStyle(%s): invalid joinStyle"
+                                "value '%s' (valid values: %s|%s|%s)"),
+                        ss.str(), joinStyleStr, "miter", "round", "bevel");
+                );
+            }
         }
+        case 6:
+        {
+            const std::string capStyleStr = fn.arg(5).to_string();
+            if (capStyleStr == "none") capStyle = CAP_NONE;
+            else if (capStyleStr == "round") capStyle = CAP_ROUND;
+            else if (capStyleStr == "square") capStyle = CAP_SQUARE;
+            else
+            {
+                IF_VERBOSE_ASCODING_ERRORS(
+                    std::ostringstream ss;
+                    fn.dump_args(ss);
+                    log_aserror(_("MovieClip.lineStyle(%s): invalid capStyle "
+                               "value '%s' (valid values: none|round|square)"),
+                               ss.str(), capStyleStr);
+                );
+            }
+        }
+        case 5:
+        {
+            // Both values to be set here are true, so just set the
+            // appropriate values to false.
+            const std::string noScaleString = fn.arg(4).to_string();
+            if (noScaleString == "none")
+            {
+                scaleThicknessVertically = false;
+                scaleThicknessHorizontally = false;
+            }
+            else if (noScaleString == "vertical")
+            {
+                scaleThicknessVertically = false;
+            }
+            else if (noScaleString == "horizontal")
+            {
+                scaleThicknessHorizontally = false;
+            }
+            else if (noScaleString != "normal")
+            {
+                IF_VERBOSE_ASCODING_ERRORS(
+                    std::ostringstream ss;
+                    fn.dump_args(ss);
+                    log_aserror(_("MovieClip.lineStyle(%s): invalid "
+                                    "noScale value '%s' (valid values: "
+                                    "%s|%s|%s|%s)"),
+                                    ss.str(), noScaleString, "none",
+                                    "vertical", "horizontal", "normal");
+                );
+            }
+        }
+        case 4:
+            pixelHinting = fn.arg(3).to_bool();
+        case 3:
+        {
+            const float alphaval = utility::clamp<float>(fn.arg(2).to_number(),
+                                     0, 100);
+            a = boost::uint8_t(255 * (alphaval / 100));
+        }
+        case 2:
+        {
+            boost::uint32_t rgbval = boost::uint32_t(
+            utility::clamp<float>(fn.arg(1).to_number(), 0, 16777216));
+            r = boost::uint8_t((rgbval & 0xFF0000) >> 16);
+            g = boost::uint8_t((rgbval & 0x00FF00) >> 8);
+            b = boost::uint8_t((rgbval & 0x0000FF) );
+        }
+        case 1:
+            thickness = boost::uint16_t(PIXELS_TO_TWIPS(utility::clamp<float>(
+                            fn.arg(0).to_number(), 0, 255)));
+            break;
+    }
 
     rgba color(r, g, b, a);
 
@@ -2395,9 +2334,9 @@ attachMovieClipInterface(as_object& o)
         o.init_member("removeMovieClip", vm.getNative(900, 19));
         o.init_member("startDrag", vm.getNative(900, 20));
         o.init_member("stopDrag", vm.getNative(900, 21));
-        o.init_member("loadMovie", new builtin_function(sprite_load_movie));
+        o.init_member("loadMovie", new builtin_function(sprite_loadMovie));
         o.init_member("loadVariables", new builtin_function(sprite_load_variables));
-        o.init_member("unloadMovie", new builtin_function(sprite_unload_movie));
+        o.init_member("unloadMovie", new builtin_function(sprite_unloadMovie));
         o.init_member("getURL", new builtin_function(sprite_getURL));
         o.init_member("getSWFVersion", new builtin_function(sprite_getSWFVersion));
         o.init_member("meth", new builtin_function(sprite_meth));
@@ -3125,24 +3064,37 @@ sprite_instance::on_event(const event_id& id)
     {
         // TODO: we're likely making too much noise for nothing here,
         // there must be some action-execution-order related problem instead....
-        // See testsuite/misc-ming.all/registerClassTest2.swf for an onLoad execution
-        // order related problem ...
+        // See testsuite/misc-ming.all/registerClassTest2.swf for an onLoad 
+        // execution order related problem ...
         do
         {
-                if ( ! get_parent() ) break; // we don't skip calling user-defined onLoad for top-level movies
-                if ( ! get_event_handlers().empty() ) break; // nor if there are clip-defined handler
-                if ( isDynamic() ) break; // nor if it's dynamic
-                sprite_definition* def = dynamic_cast<sprite_definition*>(m_def.get());
-                if ( ! def ) break; // must be a loaded movie (loadMovie doesn't mark it as "dynamic" - should it? no, or getBytesLoaded will always return 0)
-                if ( def->getRegisteredClass() ) break; // if it has a registered class it can have an onLoad in prototype...
+            // we don't skip calling user-defined onLoad for top-level movies 
+            if ( ! get_parent() ) break;
+            // nor if there are clip-defined handler
+            if ( ! get_event_handlers().empty() ) break; 
+            // nor if it's dynamic  
+            if ( isDynamic() ) break;
+
+            sprite_definition* def =
+                dynamic_cast<sprite_definition*>(m_def.get());
+
+            // must be a loaded movie (loadMovie doesn't mark it as 
+            // "dynamic" - should it? no, or getBytesLoaded will always
+            // return 0)  
+            if ( ! def ) break;
+
+            // if it has a registered class it can have an onLoad 
+            // in prototype...
+            if ( def->getRegisteredClass() ) break;
 
 #ifdef GNASH_DEBUG
-                log_debug(_("Sprite %s (depth %d) won't check for user-defined LOAD event (is not dynamic, has a parent, "
-        "no registered class and no clip events defined)"),
-        getTarget(), get_depth());
-                testInvariant();
+            log_debug(_("Sprite %s (depth %d) won't check for user-defined "
+                        "LOAD event (is not dynamic, has a parent, "
+                        "no registered class and no clip events defined)"),
+                        getTarget(), get_depth());
+            testInvariant();
 #endif
-                return called;
+            return called;
         } while (0);
             
     }
@@ -4644,6 +4596,7 @@ sprite_instance::constructAsScriptObject()
     bool eventHandlersInvoked = false;
 
     do {
+
         if ( _name.empty() )
         {
             // instance name will be needed for properly setting up
@@ -4661,7 +4614,8 @@ sprite_instance::constructAsScriptObject()
 
         as_function* ctor = def->getRegisteredClass();
 #ifdef GNASH_DEBUG
-        log_debug(_("Attached sprites %s registered class is %p"), getTarget(), (void*)ctor); 
+        log_debug(_("Attached sprites %s registered class is %p"),
+                getTarget(), (void*)ctor); 
 #endif
 
         // TODO: builtin constructors are different from user-defined ones
@@ -4679,17 +4633,15 @@ sprite_instance::constructAsScriptObject()
 
             int swfversion = _vm.getSWFVersion();
 
-            // Set the '__constructor__' and 'constructor' members, as well as call
-            // the actual constructor.
+            // Set the '__constructor__' and 'constructor' members, as well
+            // as calling the actual constructor.
             //
-            // TODO: this would be best done by an as_function::constructInstance()
-            //             method. We have one but it returns a new object rather then
-            //             initializing a given object, we just need to add another one...
-            //
+            // TODO: this would be best done by an
+            // as_function::constructInstance() method. We have one but it
+            // returns a new object rather then initializing a given object.
+            // We just need to add another one...
             if ( swfversion > 5 )
             {
-                //log_debug(_("Calling the user-defined constructor against this sprite_instance"));
-
 
                 set_member(NSV::PROP_uuCONSTRUCTORuu, ctor);
                 if ( swfversion == 6 )
@@ -4697,20 +4649,18 @@ sprite_instance::constructAsScriptObject()
                     set_member(NSV::PROP_CONSTRUCTOR, ctor);
                 }
 
-    // Provide a 'super' reference..
-    // Super is computed from the object we're constructing,
-    // It will work as long as we did set it's __proto__ and __constructor__
-    // properties already.
-    as_object* super = get_super();
+                // Provide a 'super' reference..
+                // Super is computed from the object we're constructing,
+                // It will work as long as we did set its __proto__ 
+                // and __constructor__ properties already.
+                as_object* super = get_super();
 
-    as_environment& env = get_environment();
+                as_environment& env = get_environment();
                 fn_call call(this, &env);
-    call.super = super;
+                call.super = super;
 
                 // we don't use the constructor return (should we?)
                 (*ctor)(call);
-
-
             }
         }
 
@@ -4745,7 +4695,7 @@ sprite_instance::unload()
 
     bool selfHaveUnloadHandler = character::unload();
 
-    bool shouldKeepAlive =    ( selfHaveUnloadHandler || childHaveUnloadHandler );
+    bool shouldKeepAlive = (selfHaveUnloadHandler || childHaveUnloadHandler);
 
     return shouldKeepAlive;
 }
@@ -4757,9 +4707,15 @@ sprite_instance::loadMovie(const URL& url, const std::string* postdata)
     character* parent = get_parent();
     if ( parent )
     {
-    if ( postdata ) log_debug(_("Posting data '%s' to url '%s'"), postdata, url.str());
-        boost::intrusive_ptr<movie_definition> md ( create_library_movie(url, NULL, true, postdata) );
-        if (md == NULL)
+        if (postdata)
+        {
+            log_debug(_("Posting data '%s' to url '%s'"), postdata, url.str());
+        }
+        
+        boost::intrusive_ptr<movie_definition> md (
+                create_library_movie(url, NULL, true, postdata) );
+
+        if (!md)
         {
             log_error(_("can't create movie_definition for %s"),
                 url.str());
@@ -4781,32 +4737,30 @@ sprite_instance::loadMovie(const URL& url, const std::string* postdata)
         extern_movie->setVariables(vars);
 
         // Set lockroot to our value of it
-        extern_movie->setLockRoot( getLockRoot() );
+        extern_movie->setLockRoot(getLockRoot());
 
         // Copy event handlers
         // see testsuite/misc-ming.all/loadMovieTest.swf
         const Events& clipEvs = get_event_handlers();
         // top-level movies can't have clip events, right ?
-        assert ( extern_movie->get_event_handlers().empty() );
+        assert (extern_movie->get_event_handlers().empty());
         extern_movie->set_event_handlers(clipEvs);
 
         const std::string& name = get_name();
-        assert ( parent == extern_movie->get_parent() );
+        assert (parent == extern_movie->get_parent());
 
         sprite_instance* parent_sp = parent->to_movie();
         assert(parent_sp);
-    if( !name.empty() )
-    {
-        // TODO: check empty != none...
-        extern_movie->set_name(name);
-    }
-    extern_movie->set_clip_depth(get_clip_depth());
+       
+        if( !name.empty() )
+        {
+            // TODO: check empty != none...
+            extern_movie->set_name(name);
+        }
+        extern_movie->set_clip_depth(get_clip_depth());
     
-        parent_sp->replace_display_object(
-                     extern_movie.get(),
-                     get_depth(),
-                     true, 
-                     true);
+        parent_sp->replace_display_object(extern_movie.get(), get_depth(),
+                     true, true);
     }
     else
     {
@@ -4826,7 +4780,7 @@ sprite_instance::loadMovie(const URL& url, const std::string* postdata)
 }
 
 void 
-sprite_instance::loadVariables(URL url, short sendVarsMethod)
+sprite_instance::loadVariables(URL url, MovieClipMethod sendVarsMethod)
 {
     // Check host security
     // will be done by LoadVariablesThread (down by getStream, that is)
@@ -4834,28 +4788,29 @@ sprite_instance::loadVariables(URL url, short sendVarsMethod)
     
     std::string postdata;
     
-    if ( sendVarsMethod )        // 1=GET, 2=POST
+    if ( sendVarsMethod != METHOD_NONE)
     {
-    getURLEncodedVars(postdata);
+        getURLEncodedVars(postdata);
     }
 
     try 
     {
-        if ( sendVarsMethod == 2 )
+        if (sendVarsMethod == METHOD_POST)
         {
-                // use POST method
-                _loadVariableRequests.push_back(new LoadVariablesThread(url, postdata));
+            // use POST method
+            _loadVariableRequests.push_back(
+                    new LoadVariablesThread(url, postdata));
         }
         else
         {
-                // use GET method
-                if ( sendVarsMethod == 1 )
-    {
-        // Append variables
-        std::string qs = url.querystring();
-        if ( qs.empty() ) url.set_querystring(postdata);
-        else url.set_querystring(qs + std::string("&") + postdata);
-    }
+            // use GET method
+            if (sendVarsMethod == METHOD_GET)
+            {
+                // Append variables
+                std::string qs = url.querystring();
+                if ( qs.empty() ) url.set_querystring(postdata);
+                else url.set_querystring(qs + std::string("&") + postdata);
+            }
             _loadVariableRequests.push_back(new LoadVariablesThread(url));
         }
         _loadVariableRequests.back()->process();
@@ -4864,8 +4819,6 @@ sprite_instance::loadVariables(URL url, short sendVarsMethod)
     {
         log_error(_("Could not load variables from %s"), url.str());
     }
-
-    //log_debug(_(%d loadVariables requests pending"), _loadVariableRequests.size());
 
 }
 

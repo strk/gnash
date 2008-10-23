@@ -91,19 +91,19 @@ check(!MovieClip.prototype.hasOwnProperty("_yscale"));
 endOfTest = function() 
 {
 #if OUTPUT_VERSION <= 5
-	check_totals(280); // SWF5
+	check_totals(284); // SWF5
 #endif
 
 #if OUTPUT_VERSION == 6
-	check_totals(757); // SWF6
+	check_totals(763); // SWF6
 #endif
 
 #if OUTPUT_VERSION == 7
-	check_totals(774); // SWF7
+	check_totals(780); // SWF7
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(846); // SWF8+
+	check_totals(852); // SWF8+
 #endif
 
 	play();
@@ -1943,51 +1943,61 @@ check_equals(typeof(ret), 'undefined');
 #endif
 
 
-/// loadVariables calls toLowerCase() and toString() only on the 
-/// "method" argument.
-ts = 0;
-tlc = 0;
-o = {};
-o.toString = function() { ts++; };
-o.toLowerCase = function() { tlc++; };
+/// loadVariables always calls MovieClip.meth
+backup = _root.meth;
 
-_root.loadVariables(o, o);
-check_equals(tlc, 1);
-check_equals(ts, 1);
+mcm = 0;
+_root.meth = function() { mcm++; };
+_root.loadVariables("", "", "post");
+check_equals(mcm, 1);
+_root.loadVariables("", "");
+check_equals(mcm, 2);
+_root.loadVariables("");
+check_equals(mcm, 3);
+_root.loadVariables();
+check_equals(mcm, 4);
+
+_root.meth = backup;
 
 //----------------------------------------------------------
 // Test getURL a bit
 //----------------------------------------------------------
 
-/// getURL calls toLowerCase() and toString() only on the 
-/// "method" argument.
-ts = 0;
-tlc = 0;
-o = {};
-o.toString = function() { ts++; };
-o.toLowerCase = function() { tlc++; };
+/// getURL calls MovieClip.meth.
+backup = _root.meth;
 
-_root.loadVariables(o, o, o);
-check_equals(tlc, 1);
-check_equals(ts, 1);
+mcm = 0;
+_root.meth = function() { mcm++; };
+_root.getURL("", "", "post");
+check_equals(mcm, 1);
+_root.getURL("", "");
+check_equals(mcm, 2);
+_root.getURL("");
+check_equals(mcm, 3);
+_root.getURL();
+check_equals(mcm, 4);
+
+_root.meth = backup;
 
 //----------------------------------------------------------
 // Test loadMovie a bit
 //----------------------------------------------------------
 
 #if OUTPUT_VERSION > 5
-/// toString() and toLowerCase() are called on the method argument.
-/// "method" argument.
-ts = 0;
-tlc = 0;
-o = {};
-o.toString = function() { ts++; };
-o.toLowerCase = function() { tlc++; };
 
 mcdump = _root.createEmptyMovieClip("mcdump", getNextHighestDepth());
+
+mcm = 0;
+mcdump.meth = function() { mcm++; };
+
 mcdump.loadMovie(o, o, o);
-check_equals(tlc, 1);
-check_equals(ts, 1);
+check_equals(mcm, 1);
+mcdump.loadMovie(o, o);
+check_equals(mcm, 2);
+mcdump.loadMovie(o);
+check_equals(mcm, 3);
+mcdump.loadMovie();
+check_equals(mcm, 4);
 
 #endif
 

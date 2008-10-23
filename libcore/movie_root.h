@@ -670,7 +670,24 @@ public:
     ///     target variables posted, not the new ones !
     ///	    See http://savannah.gnu.org/bugs/index.php?22257
     ///
-    void loadMovie(const URL& url, const std::string& target, const std::string* postdata=NULL);
+    void loadMovie(const URL& url, const std::string& target,
+            const std::string* postdata = NULL);
+
+
+    /// Send a request to the hosting application (e.g. browser).
+    //
+    /// @param url
+    ///		The url to request.
+    ///
+    /// @param target
+    ///	    Target for request.
+    ///
+    /// @param postdata
+    ///     If not null, the data to POST in an HTTP request.
+    ///
+    void getURL(const URL& url, const std::string& target,
+            const std::string* postdata = NULL);
+
 
     /// Return true if the given string can be interpreted as a _level name
     //

@@ -111,6 +111,13 @@ public:
         TAG_DLIST  = 1<<1
     };
 
+    enum MovieClipMethod
+    {
+        METHOD_NONE = 0,
+        METHOD_GET,
+        METHOD_POST
+    };
+
     // Overridden to use the m_root member
     virtual movie_instance* get_root() const;
 
@@ -517,7 +524,7 @@ public:
     /// If 1, GET will be used.
     /// If 2, POST will be used.
     ///
-    void loadVariables(URL url, short sendVarsMethod=0);
+    void loadVariables(URL url, MovieClipMethod sendVarsMethod);
 
     //
     // ActionScript support

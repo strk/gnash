@@ -2048,6 +2048,96 @@ movie_root::findCharacterByTarget(const std::string& tgtstr_orig) const
 }
 
 void
+movie_root::getURL(const URL& url, const std::string& target,
+        const std::string* postdata)
+{
+
+    if (_hostfd == -1)
+    {
+        gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
+        std::string command = rcfile.getURLOpenerFormat();
+
+        /// Try to avoid letting flash movies execute
+        /// arbitrary commands (sic)
+        ///
+        /// Maybe we should exec here, but if we do we might have problems
+        /// with complex urlOpenerFormats like:
+        ///    firefox -remote 'openurl(%u)'
+        ///
+        ///
+        /// NOTE: this escaping implementation is far from optimal, but
+        ///       I felt pretty in rush to fix the arbitrary command
+        ///      execution... we'll optimize if needed
+        ///
+        std::string safeurl = url.str(); 
+        boost::replace_all(safeurl, "\\", "\\\\");    // escape backslashes first
+        boost::replace_all(safeurl, "'", "\\'");    // then single quotes
+        boost::replace_all(safeurl, "\"", "\\\"");    // double quotes
+        boost::replace_all(safeurl, ";", "\\;");    // colons
+        boost::replace_all(safeurl, " ", "\\ ");    // spaces
+        boost::replace_all(safeurl, ">", "\\>");    // output redirection
+        boost::replace_all(safeurl, "<", "\\<");    // input redirection
+        boost::replace_all(safeurl, "&", "\\&");    // background (sic)
+        boost::replace_all(safeurl, "\n", "\\n");    // newline
+        boost::replace_all(safeurl, "\r", "\\r");    // return
+        boost::replace_all(safeurl, "\t", "\\t");    // tab
+        boost::replace_all(safeurl, "|", "\\|");    // pipe
+        boost::replace_all(safeurl, "`", "\\`");    // backtick
+
+        boost::replace_all(safeurl, "(", "\\(");    // subshell :'(
+        boost::replace_all(safeurl, ")", "\\)");    // 
+        boost::replace_all(safeurl, "}", "\\}");    // 
+        boost::replace_all(safeurl, "{", "\\{");    // 
+
+        boost::replace_all(safeurl, "$", "\\$");    // variable expansions
+
+        boost::replace_all(command, "%u", safeurl);
+
+        log_debug (_("Launching URL: %s"), command);
+        std::system(command.c_str());
+    }
+    else
+    {
+        std::ostringstream request;
+        if (postdata)
+        {
+            request << "POST " << target << ":" << 
+                *postdata << "$" << url << std::endl;
+        }
+        else
+        {
+            // use the original url, non parsed (the browser will know better
+            // how to resolve relative urls and handle actionscript)
+            request << "GET " << target << ":" << url << std::endl;
+        }
+
+        std::string requestString = request.str();
+        size_t len = requestString.length();
+        // TODO: should mutex-protect this ?
+        // NOTE: we are assuming the hostfd is set in blocking mode here..
+        log_debug(_("Attempt to write geturl requests fd %d"), _hostfd);
+
+        int ret = write(_hostfd, requestString.c_str(), len);
+        if (ret == -1)
+        {
+            log_error(_("Could not write to user-provided host requests "
+                        "fd %d: %s"), _hostfd, std::strerror(errno));
+        }
+        if (static_cast<size_t>(ret) < len)
+        {
+            log_error(_("Could only write %d bytes over %d required to "
+                        "user-provided host requests fd %d"),
+                        ret, len, _hostfd);
+        }
+
+        // The request string ends with newline, and we don't want to log that
+        requestString.resize(requestString.size() - 1);
+        log_debug(_("Sent request '%s' to host fd %d"), requestString, _hostfd);
+    }
+
+}
+
+void
 movie_root::loadMovie(const URL& url, const std::string& target, const std::string* postdata)
 {
     log_debug("movie_root::loadMovie(%s, %s)", url.str(), target);
@@ -2062,23 +2152,26 @@ movie_root::processLoadMovieRequest(const LoadMovieRequest& r)
     bool usePost = r.usePost();
     const std::string& postData = r.getPostData();
 
-    if ( target.compare(0, 6, "_level") == 0 && target.find_first_not_of("0123456789", 7) == std::string::npos )
+    if (target.compare(0, 6, "_level") == 0 &&
+            target.find_first_not_of("0123456789", 7) == std::string::npos)
     {
-        unsigned int levelno = strtoul(target.c_str()+6, NULL, 0);
-        log_debug(_("processLoadMovieRequest: Testing _level loading (level %u)"), levelno);
+        unsigned int levelno = std::strtoul(target.c_str() + 6, NULL, 0);
+        log_debug(_("processLoadMovieRequest: Testing _level loading "
+                    "(level %u)"), levelno);
         loadLevel(levelno, url);
         return;
     }
 
     character* ch = findCharacterByTarget(target);
-    if ( ! ch )
+    if (!ch)
     {
-        log_debug("Target %s of a loadMovie request doesn't exist at processing time", target);
+        log_debug("Target %s of a loadMovie request doesn't exist at "
+                "processing time", target);
         return;
     }
 
     sprite_instance* sp = ch->to_movie();
-    if ( ! sp )
+    if (!sp)
     {
         log_unimpl("loadMovie against a %s character", typeName(*ch));
         return;

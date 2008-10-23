@@ -71,6 +71,7 @@ static string_table::svt preload_names[] =
 	string_table::svt( "_listeners", NSV::PROP_uLISTENERS ),
 	string_table::svt( "loaded", NSV::PROP_LOADED ),
 	string_table::svt( "matrixType", NSV::PROP_MATRIX_TYPE),
+	string_table::svt( "meth", NSV::PROP_METH),
 	string_table::svt( "_name", NSV::PROP_uNAME ),
 	string_table::svt( "onLoad", NSV::PROP_ON_LOAD ),
 	string_table::svt( "onClose", NSV::PROP_ON_CLOSE ),

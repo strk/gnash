@@ -808,7 +808,7 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
 
 	if ( ! strncmp(buf, "GET ", 4) )
 	{
-		char* target = buf+4;
+		char* target = buf + 4;
 		if ( ! *target )
 		{
 #ifdef GNASH_PLUGIN_DEBUG
@@ -840,7 +840,7 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
 	}
 	else if ( ! strncmp(buf, "INVOKE ", 7) )
 	{
-		char* command = buf+7;
+		char* command = buf + 7;
 		if ( ! *command ) {
 #ifdef GNASH_PLUGIN_DEBUG
 			cout << "No command found after INVOKE request" << endl;
@@ -873,6 +873,47 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
 		NPN_GetURL(_instance, jsurl.str().c_str(), tgt);
 		return true;
 	}
+    else if ( ! strncmp(buf, "POST ", 5))
+    {
+        char* target = buf + 5;
+        if (! *target) return false;
+		
+        char* postdata = target;
+        while (*postdata && *postdata != ':') ++postdata;
+		if ( *postdata )
+		{
+			*postdata='\0';
+			++postdata;
+		}
+		else
+		{
+#ifdef GNASH_PLUGIN_DEBUG
+			cout << "No colon found after getURL postdata string" << endl;
+#endif
+			return false;
+		}
+		
+        char* url = postdata;
+        while (*url && *url != '$') ++url;
+		if (*url)
+		{
+			*url='\0';
+			++url;
+		}
+		else
+		{
+#ifdef GNASH_PLUGIN_DEBUG
+			cout << "No $ character found after getURL target string" << endl;
+#endif
+			return false;
+		}
+        
+
+        NPN_PostURL(_instance, url, target, std::strlen(postdata),
+                postdata, false);
+
+        return true;
+    }
 	else
 	{
 #ifdef GNASH_PLUGIN_DEBUG

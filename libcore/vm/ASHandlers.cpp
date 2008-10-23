@@ -2161,17 +2161,20 @@ SWFHandlers::CommonGetUrl(as_environment& env,
     }
 
     // Parse the method bitfield
-    short sendVarsMethod = method & 3;
     bool loadTargetFlag    = method & 64;
     bool loadVariableFlag  = method & 128;
 
+    sprite_instance::MovieClipMethod sendVarsMethod;
+
     // handle malformed sendVarsMethod
-    if ( sendVarsMethod == 3 )
+    if ((method & 3) == 3)
     {
         log_error(_("Bogus GetUrl2 send vars method "
             " in SWF file (both GET and POST requested), use GET"));
-        sendVarsMethod = 1;
+        sendVarsMethod = sprite_instance::METHOD_GET;
     }
+    else sendVarsMethod =
+        static_cast<sprite_instance::MovieClipMethod>(method & 3);
 
     std::string target_string;
     if ( ! target.is_undefined() && ! target.is_null() )
@@ -2230,9 +2233,9 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 
     bool usePost = false;
     std::string varsToSend;
-    if ( sendVarsMethod )
+    if ( sendVarsMethod != sprite_instance::METHOD_NONE)
     {
-        if ( sendVarsMethod == 2 ) usePost = true;
+        if ( sendVarsMethod == sprite_instance::METHOD_POST ) usePost = true;
 
         // TESTED: variables sent are those in current target,
         //         no matter the target found on stack (which
@@ -2264,7 +2267,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 
         if ( ! target_ch )
         {
-            log_error(_("get url: target %s not found"),
+            log_error(_("getURL: target %s not found"),
                 target_string);
             // might want to invoke the external url opener here...
             return;
@@ -2272,7 +2275,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 
         if ( ! target_movie )
         {
-            log_error(_("get url: target %s is not a sprite"),
+            log_error(_("getURL: target %s is not a sprite"),
                 target_string);
             // might want to invoke the external url opener here...
             return;
@@ -2282,7 +2285,8 @@ SWFHandlers::CommonGetUrl(as_environment& env,
         {
             log_unimpl(_("POST with loadVariables ignored"));
         }
-        target_movie->loadVariables(url, sendVarsMethod);
+        target_movie->loadVariables(url,
+                static_cast<sprite_instance::MovieClipMethod>(sendVarsMethod));
 
         return;
     }
@@ -2322,7 +2326,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
             return;
         }
 
-        if ( ! target_movie )
+        if (!target_movie)
         {
             log_error(_("get url: target %s is not a sprite"),
                 target_string);
@@ -2332,7 +2336,8 @@ SWFHandlers::CommonGetUrl(as_environment& env,
         std::string s = target_movie->getTarget(); // or getOrigTarget ?
         if ( s != target_movie->getOrigTarget() )
         {
-            log_debug(_("TESTME: target of a loadMovie changed its target path"));
+            log_debug(_("TESTME: target of a loadMovie changed its target "
+                        "path"));
         }
         // TODO: try to trigger this !
         assert(m.findCharacterByTarget(s) == target_movie );
@@ -2363,88 +2368,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
         return;
     }
 
-    if ( usePost )
-    {
-        log_unimpl(_("POST with host-provided uri grabber"));
-    }
-
-    int hostfd = vm.getRoot().getHostFD();
-    if ( hostfd == -1 )
-    {
-        gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
-        std::string command  = rcfile.getURLOpenerFormat();
-
-        /// Try to avoid letting flash movies execute
-        /// arbitrary commands (sic)
-        ///
-        /// Maybe we should exec here, but if we do we might have problems
-        /// with complex urlOpenerFormats like:
-        ///    firefox -remote 'openurl(%u)'
-        ///
-        ///
-        /// NOTE: this escaping implementation is far from optimal, but
-        ///       I felt pretty in rush to fix the arbitrary command
-        ///      execution... we'll optimize if needed
-        ///
-        std::string safeurl = url.str(); 
-        boost::replace_all(safeurl, "\\", "\\\\");    // escape backslashes first
-        boost::replace_all(safeurl, "'", "\\'");    // then single quotes
-        boost::replace_all(safeurl, "\"", "\\\"");    // double quotes
-        boost::replace_all(safeurl, ";", "\\;");    // colons
-        boost::replace_all(safeurl, " ", "\\ ");    // spaces
-        boost::replace_all(safeurl, ">", "\\>");    // output redirection
-        boost::replace_all(safeurl, "<", "\\<");    // input redirection
-        boost::replace_all(safeurl, "&", "\\&");    // background (sic)
-        boost::replace_all(safeurl, "\n", "\\n");    // newline
-        boost::replace_all(safeurl, "\r", "\\r");    // return
-        boost::replace_all(safeurl, "\t", "\\t");    // tab
-        boost::replace_all(safeurl, "|", "\\|");    // pipe
-        boost::replace_all(safeurl, "`", "\\`");    // backtick
-
-        boost::replace_all(safeurl, "(", "\\(");    // subshell :'(
-        boost::replace_all(safeurl, ")", "\\)");    // 
-        boost::replace_all(safeurl, "}", "\\}");    // 
-        boost::replace_all(safeurl, "{", "\\{");    // 
-
-        boost::replace_all(safeurl, "$", "\\$");    // variable expansions
-
-        boost::replace_all(command, "%u", safeurl);
-
-        log_debug (_("Launching URL... %s"), command);
-        system(command.c_str());
-    }
-    else
-    {
-        //log_debug("user-provided host requests fd is %d", hostfd);
-        std::ostringstream request;
-
-        // use the original url, non parsed (the browser will know better
-        // how to resolve relative urls and handle actionscript)
-        request << "GET " << target_string << ":" << urlTarget << std::endl;
-
-        std::string requestString = request.str();
-        const char* cmd = requestString.c_str();
-        size_t len = requestString.length();
-        // TODO: should mutex-protect this ?
-        // NOTE: we assuming the hostfd is set in blocking mode here..
-        log_debug(_("Attempt to write geturl requests fd %d"), hostfd);
-        int ret = write(hostfd, cmd, len);
-        if ( ret == -1 )
-        {
-            log_error(_("Could not write to user-provided host requests "
-                        "fd %d: %s"), hostfd, std::strerror(errno));
-        }
-        if ( (size_t)ret < len )
-        {
-            log_error(_("Could only write %d bytes over %d required to "
-                        "user-provided host requests fd %d"),
-                        ret, len, hostfd);
-        }
-
-        // for sake of clean logging, should always end with newline
-        requestString.resize(requestString.size()-1);
-        log_debug(_("Sent request '%s' to host fd %d"), requestString, hostfd);
-    }
+    m.getURL(url, target_string, &varsToSend);
 
 }
 
