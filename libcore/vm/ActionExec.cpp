@@ -332,8 +332,9 @@ ActionExec::operator() ()
             {
                 if ( ++branchCount > maxBranchCount )
                 {
-                    boost::format fmt(_("Loop iterations count exceeded limit of "
-                                        "%d. Last branch was from pc %d to %d."));
+                    boost::format fmt(_("Loop iterations count exceeded "
+                                "limit of %d. Last branch was from pc %d "
+                                "to %d"));
                     fmt % maxBranchCount % oldPc % pc;
                     throw ActionLimitException(fmt.str());
                 }

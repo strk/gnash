@@ -200,7 +200,7 @@ movie_root::setRootMovie(movie_instance* movie)
 	}
 	catch (ActionLimitException& al)
 	{
-		boost::format fmt = boost::format(_("ActionLimits hit during setRootMovie: %s. Disable scripts ?")) % al.what();
+		boost::format fmt = boost::format(_("ActionLimits hit during setRootMovie: %s. Disable scripts?")) % al.what();
 		handleActionLimitHit(fmt.str());
 	}
     catch (ActionParserException& e)
@@ -216,8 +216,9 @@ void
 movie_root::handleActionLimitHit(const std::string& msg)
 {
 	bool disable = true;
-	if ( _gui ) disable = _gui->yesno(msg);
-	else log_error("No gui registered, assuming 'Yes' answer to question: %s", msg);
+	if ( _interfaceHandler ) disable = _interfaceHandler->yesNo(msg);
+	else log_error("No gui registered, assuming 'Yes' answer to "
+            "question: %s", msg);
 	if ( disable )
 	{
 		disableScripts();

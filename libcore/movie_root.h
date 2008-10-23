@@ -741,12 +741,24 @@ public:
     }
 
     /// Call this to notify FS commands
-    DSOEXPORT void handleFsCommand(const std::string& cmd, const std::string& arg) const;
+    DSOEXPORT void handleFsCommand(const std::string& cmd,
+            const std::string& arg) const;
 
     /// Abstract base class for hosting app handler
     class AbstractIfaceCallback {
     public:
-        virtual std::string call(const std::string& cmd, const std::string& arg)=0;
+
+        /// Get Gui-related information for the core.
+        //
+        /// This should be used for occasional AS calls, such as for
+        /// Mouse.hide, System.capabilities etc. The return can be
+        /// various types, so it is passed as a string.
+        virtual std::string call(const std::string& cmd,
+                const std::string& arg) = 0;
+
+        /// Ask the hosting application for a yes / no answer to
+        /// a question.
+        virtual bool yesNo(const std::string& cmd) = 0;
         virtual ~AbstractIfaceCallback() {}
     };
 

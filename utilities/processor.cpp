@@ -191,6 +191,11 @@ public:
 	    return "";
 
 	}
+
+    bool yesNo(const std::string& /*query*/)
+    {
+        return true;
+    }
 };
 
 EventCallback eventCallback;

@@ -449,6 +449,14 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
     return EXIT_SUCCESS;
 }
 
+bool
+Player::CallbacksHandler::yesNo(const std::string& query)
+{
+    log_debug(_("Received query from core: '%d'. Answering yes until "
+               "this is implemented properly"), query);
+    return true;
+}
+
 std::string
 Player::CallbacksHandler::call(const std::string& event, const std::string& arg)
 {
