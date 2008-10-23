@@ -33,8 +33,8 @@
 #include "sound_handler.h"
 #include "timers.h" // for Timer use
 #include "GnashKey.h" // key::code
-#include "../gui/gui.h"
 
+#include <boost/algorithm/string/replace.hpp>
 #include <utility>
 #include <iostream>
 #include <string>

@@ -58,7 +58,6 @@
 #include <cstdlib> // std::mbstowcs
 #include <boost/scoped_array.hpp>
 #include <boost/random.hpp>
-#include <boost/algorithm/string/replace.hpp>
 #include <boost/lexical_cast.hpp>
 #include <algorithm> // std::swap
 
