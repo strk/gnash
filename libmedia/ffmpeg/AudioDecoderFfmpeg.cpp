@@ -90,15 +90,19 @@ void AudioDecoderFfmpeg::setup(SoundInfo& info)
 			}
 			break;
 		default:
-		    boost::format err = boost::format(
-		        _("Unsupported audio codec %d")) %
-		        static_cast<int>(info.getFormat());
+			boost::format err = boost::format(
+				_("Unsupported audio codec %d")) %
+				static_cast<int>(info.getFormat());
 			throw MediaException(err.str());
 	}
 	_audioCodec = avcodec_find_decoder(codec_id);
 
 	if (!_audioCodec) {
-		throw MediaException(_("libavcodec can't decode the current audio format"));
+		audioCodecType codec = info.getFormat();
+		boost::format err = boost::format(
+			_("libavcodec could not find a decoder for codec %d (%s)")) %
+			static_cast<int>(codec) % codec;
+		throw MediaException(err.str());
 	}
 
 	_audioCodecCtx = avcodec_alloc_context();
@@ -171,17 +175,26 @@ void AudioDecoderFfmpeg::setup(AudioInfo& info)
 	}
 	else
 	{
-        boost::format err = boost::format(
-            _("AudioDecoderFfmpeg: unknown codec type %d "
-            "(should never happen)")) % info.type;
-        throw MediaException(err.str());
+		boost::format err = boost::format(
+		    _("AudioDecoderFfmpeg: unknown codec type %d "
+		    "(should never happen)")) % info.type;
+		throw MediaException(err.str());
 	}
 
 	_audioCodec = avcodec_find_decoder(codec_id);
 	if (!_audioCodec)
 	{
-		throw MediaException(_("libavcodec can't decode this "
-				"audio format"));
+		if (info.type == FLASH) {
+			boost::format err = boost::format(
+				_("libavcodec could not find a decoder for codec %d (%s)")) %
+				info.codec % static_cast<audioCodecType>(info.codec);
+			throw MediaException(err.str());
+		} else {
+			boost::format err = boost::format(
+				_("libavcodec could not find a decoder for ffmpeg codec id %s")) %
+				codec_id;
+			throw MediaException(err.str());
+		}
 	}
 
 	// Init the parser
