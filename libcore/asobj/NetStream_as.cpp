@@ -1208,9 +1208,6 @@ NetStream_as::decodeNextAudioFrame()
 
     	raw_mediadata_t* raw = new raw_mediadata_t();
 	raw->m_data = _audioDecoder->decode(*frame, raw->m_size);
- 	if (!raw->m_data || !raw->m_size) {
-		return 0;
-	}
 
 	if ( _audioController ) // TODO: let the sound_handler do this .. sounds cleaner
 	{
@@ -1524,10 +1521,20 @@ NetStream_as::pushDecodedAudioFrames(boost::uint32_t ts)
 		raw_mediadata_t* audio = decodeNextAudioFrame();
 		if ( ! audio )
 		{
+			// Well, it *could* happen, why not ?
 			log_error("nextAudioFrameTimestamp returned true (%d), "
 				"but decodeNextAudioFrame returned null, "
 				"I don't think this should ever happen", nextTimestamp);
 			break;
+		}
+
+		if ( ! audio->m_size )
+		{
+			// Don't bother pushing an empty frame
+			// to the audio queue...
+			log_debug("pushDecodedAudioFrames(%d): Decoded audio frame contains no samples");
+			delete audio;
+			continue;
 		}
 
 		lock.lock(); // now needs locking
