@@ -91,7 +91,7 @@ check(!MovieClip.prototype.hasOwnProperty("_yscale"));
 endOfTest = function() 
 {
 #if OUTPUT_VERSION <= 5
-	check_totals(276); // SWF5
+	check_totals(280); // SWF5
 #endif
 
 #if OUTPUT_VERSION == 6
@@ -103,7 +103,7 @@ endOfTest = function()
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(840); // SWF8+
+	check_totals(846); // SWF8+
 #endif
 
 	play();
@@ -1057,10 +1057,15 @@ check_equals(draw._height, 20);
 // getRect and getBounds are the same in this case.
 
 c = draw.getRect();
+
+#if OUTPUT_VERSION < 8
+check_equals(c.xMin, undefined);
+#else
 xcheck_equals(c.xMin, 10);
 xcheck_equals(c.xMax, 20);
 xcheck_equals(c.yMin, 10);
 xcheck_equals(c.yMax, 30);
+#endif
 
 b = draw.getBounds();
 check_equals(b.xMin, 10);
@@ -1075,10 +1080,14 @@ check_equals(b.yMin, 10);
 check_equals(b.yMax, 30);
 
 c = draw.getRect(container);
+#if OUTPUT_VERSION < 8
+check_equals(c.xMin, undefined);
+#else
 xcheck_equals(c.xMin, 10);
 xcheck_equals(c.xMax, 20);
 xcheck_equals(c.yMin, 10);
 xcheck_equals(c.yMax, 30);
+#endif
 
 draw._x += 20;
 b = draw.getBounds();
@@ -1931,6 +1940,55 @@ check_equals(typeof(ret), 'undefined');
 	};
 	//dataLoadInterval = setInterval(onData, 1000);
 	dataLoadInterval = setInterval(onDataCheck, 1000);
+#endif
+
+
+/// loadVariables calls toLowerCase() and toString() only on the 
+/// "method" argument.
+ts = 0;
+tlc = 0;
+o = {};
+o.toString = function() { ts++; };
+o.toLowerCase = function() { tlc++; };
+
+_root.loadVariables(o, o);
+check_equals(tlc, 1);
+check_equals(ts, 1);
+
+//----------------------------------------------------------
+// Test getURL a bit
+//----------------------------------------------------------
+
+/// getURL calls toLowerCase() and toString() only on the 
+/// "method" argument.
+ts = 0;
+tlc = 0;
+o = {};
+o.toString = function() { ts++; };
+o.toLowerCase = function() { tlc++; };
+
+_root.loadVariables(o, o, o);
+check_equals(tlc, 1);
+check_equals(ts, 1);
+
+//----------------------------------------------------------
+// Test loadMovie a bit
+//----------------------------------------------------------
+
+#if OUTPUT_VERSION > 5
+/// toString() and toLowerCase() are called on the method argument.
+/// "method" argument.
+ts = 0;
+tlc = 0;
+o = {};
+o.toString = function() { ts++; };
+o.toLowerCase = function() { tlc++; };
+
+mcdump = _root.createEmptyMovieClip("mcdump", getNextHighestDepth());
+mcdump.loadMovie(o, o, o);
+check_equals(tlc, 1);
+check_equals(ts, 1);
+
 #endif
 
 /// Depth tests for createEmptyMovieClip, which was introduced
