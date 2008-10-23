@@ -49,7 +49,7 @@ public:
 
     DSOEXPORT VideoDecoderFfmpeg(videoCodecType format, int width, int height);
 
-    DSOEXPORT VideoDecoderFfmpeg(VideoInfo& info);
+    DSOEXPORT VideoDecoderFfmpeg(const VideoInfo& info);
 
     DSOEXPORT ~VideoDecoderFfmpeg();
     

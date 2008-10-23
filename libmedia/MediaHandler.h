@@ -81,7 +81,7 @@ public:
 	///             the sound correctly.
     /// @return     Will always return a valid VideoDecoder or throw a
     ///             gnash::MediaException if a fatal error occurs.
-	virtual std::auto_ptr<VideoDecoder> createVideoDecoder(VideoInfo& info)=0;
+	virtual std::auto_ptr<VideoDecoder> createVideoDecoder(const VideoInfo& info)=0;
 
 	/// Create an AudioDecoder for decoding what's specified in the AudioInfo
 	//
@@ -89,7 +89,7 @@ public:
 	///             the sound correctly.
     /// @return     Will always return a valid AudioDecoder or throw a
     ///             gnash::MediaException if a fatal error occurs.
-	virtual std::auto_ptr<AudioDecoder> createAudioDecoder(AudioInfo& info)=0;
+	virtual std::auto_ptr<AudioDecoder> createAudioDecoder(const AudioInfo& info)=0;
 
     /// Return the number of bytes padding needed for input buffers
     //

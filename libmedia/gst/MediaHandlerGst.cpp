@@ -60,7 +60,7 @@ MediaHandlerGst::createMediaParser(std::auto_ptr<IOChannel> stream)
 }
 
 std::auto_ptr<VideoDecoder>
-MediaHandlerGst::createVideoDecoder(VideoInfo& info)
+MediaHandlerGst::createVideoDecoder(const VideoInfo& info)
 {
 	if ( info.type != FLASH )
 	{
@@ -89,7 +89,7 @@ MediaHandlerGst::createVideoDecoder(VideoInfo& info)
 }
 
 std::auto_ptr<AudioDecoder>
-MediaHandlerGst::createAudioDecoder(AudioInfo& info)
+MediaHandlerGst::createAudioDecoder(const AudioInfo& info)
 {
 	std::auto_ptr<AudioDecoder> ret( new AudioDecoderGst(info) );
 	return ret;

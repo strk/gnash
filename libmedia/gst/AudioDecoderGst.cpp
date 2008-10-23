@@ -49,7 +49,7 @@ AudioDecoderGst::AudioDecoderGst(SoundInfo& info)
     // FIXME: should we handle other types?
 }
 
-AudioDecoderGst::AudioDecoderGst(AudioInfo& info)
+AudioDecoderGst::AudioDecoderGst(const AudioInfo& info)
 {
     // init GStreamer. TODO: what about doing this in MediaHandlerGst ctor?
     gst_init (NULL, NULL);

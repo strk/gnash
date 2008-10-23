@@ -39,7 +39,7 @@ namespace media {
 class DSOEXPORT AudioDecoderGst : public AudioDecoder {
 	
 public:
-    AudioDecoderGst(AudioInfo& info);
+    AudioDecoderGst(const AudioInfo& info);
     AudioDecoderGst(SoundInfo& info);
 
     ~AudioDecoderGst();

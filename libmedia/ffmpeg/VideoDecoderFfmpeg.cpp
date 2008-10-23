@@ -106,7 +106,7 @@ VideoDecoderFfmpeg::VideoDecoderFfmpeg(videoCodecType format, int width, int hei
 
 }
 
-VideoDecoderFfmpeg::VideoDecoderFfmpeg(VideoInfo& info)
+VideoDecoderFfmpeg::VideoDecoderFfmpeg(const VideoInfo& info)
     :
     _videoCodec(NULL)
 {

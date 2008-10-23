@@ -36,7 +36,7 @@
 namespace gnash {
 namespace media {
 	
-AudioDecoderFfmpeg::AudioDecoderFfmpeg(AudioInfo& info)
+AudioDecoderFfmpeg::AudioDecoderFfmpeg(const AudioInfo& info)
 	:
 	_audioCodec(NULL),
 	_audioCodecCtx(NULL),
@@ -129,7 +129,7 @@ void AudioDecoderFfmpeg::setup(SoundInfo& info)
 
 }
 
-void AudioDecoderFfmpeg::setup(AudioInfo& info)
+void AudioDecoderFfmpeg::setup(const AudioInfo& info)
 {
 	// Init the avdecoder-decoder
 	avcodec_init();
