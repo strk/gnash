@@ -72,7 +72,7 @@ public:
 	/// Initialize playhead given a VirtualCock to use
 	/// as clock source.
 	//
-	/// The PlayHead will have initial state set to PLAYING
+	/// The PlayHead will have initial state set to PAUSED
 	///
 	/// @param clockSource
 	///	The VirtualClock to use as time source.

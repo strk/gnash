@@ -647,12 +647,16 @@ NetStream_as::markReachableResources() const
 PlayHead::PlayHead(VirtualClock* clockSource)
 	:
 	_position(0),
-	_state(PLAY_PLAYING),
+	_state(PLAY_PAUSED),
 	_availableConsumers(0),
 	_positionConsumers(0),
 	_clockSource(clockSource)
 {
-	_clockOffset = _clockSource->elapsed();
+	// NOTE: we construct in PAUSE mode so do not
+	// really *need* to query _clockSource here.
+	// We initialize it to an arbitrary value just
+	// to be polite.
+	_clockOffset = 0; // _clockSource->elapsed();
 }
 
 void
@@ -683,15 +687,19 @@ PlayHead::setState(PlaybackStatus newState)
 		// when querying clock source *now*
 		boost::uint64_t now = _clockSource->elapsed();
 		_clockOffset = ( now - _position );
-		assert( now-_clockOffset == _position ); // check if we did the right thing
+
+		// check if we did the right thing
+		// TODO: wrap this in PARANOIA_LEVEL > 1
+		assert( now-_clockOffset == _position );
 
 		return PLAY_PAUSED;
 	}
 	else
 	{
+		// TODO: wrap these in PARANOIA_LEVEL > 1 (or > 2)
 		assert(_state == PLAY_PLAYING);
-
 		assert(newState == PLAY_PAUSED);
+
 		_state = PLAY_PAUSED;
 
 		// When going from PLAYING to PAUSED
