@@ -4808,8 +4808,8 @@ sprite_instance::loadVariables(URL url, MovieClipMethod sendVarsMethod)
             {
                 // Append variables
                 std::string qs = url.querystring();
-                if ( qs.empty() ) url.set_querystring(postdata);
-                else url.set_querystring(qs + std::string("&") + postdata);
+                if (qs.empty()) url.set_querystring(postdata);
+                else url.set_querystring(qs + "&" + postdata);
             }
             _loadVariableRequests.push_back(new LoadVariablesThread(url));
         }

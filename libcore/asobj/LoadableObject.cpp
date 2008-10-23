@@ -63,10 +63,35 @@ LoadableObject::~LoadableObject()
 
 
 void
-LoadableObject::send(const std::string& /*urlstr*/)
+LoadableObject::send(const std::string& urlstr, const std::string& target,
+        bool post)
 {
-    log_unimpl (__FUNCTION__);
+    movie_root& m = _vm.getRoot();
+    URL url(urlstr);
+
+    // Encode the object for HTTP. If post is true,
+    // XML should not be encoded. LoadVars is always
+    // encoded.
+    // TODO: test properly.
+    std::ostringstream data;
+    toString(data, !post);
+
+    const std::string& datastring = data.str();
+
+    if (post)
+    {
+        m.getURL(url, target, &datastring);
+        return;
+    }
+
+    // GET
+    std::string qs = url.querystring();
+    if (qs.empty()) url.set_querystring(datastring);
+    else url.set_querystring(qs + "&" + datastring);
+    m.getURL(url, target);
+
 }
+
 
 void
 LoadableObject::sendAndLoad(const std::string& urlstr,
@@ -478,5 +503,47 @@ LoadableObject::loadableobject_load(const fn_call& fn)
 	return as_value(true);
 
 }
+
+    
+as_value
+LoadableObject::loadableobject_send(const fn_call& fn)
+{
+    boost::intrusive_ptr<LoadableObject> ptr =
+        ensureType<LoadableObject>(fn.this_ptr);
+ 
+    std::ostringstream os;
+    fn.dump_args(os);
+    log_debug("XML.send(%s) / LoadVars.send() TESTING", os.str());
+
+    std::string target;
+    std::string url;
+    std::string method;
+
+    switch (fn.nargs)
+    {
+        case 0:
+            return as_value(false);
+        case 3:
+            method = fn.arg(2).to_string();
+        case 2:
+            target = fn.arg(1).to_string();
+        case 1:
+            url = fn.arg(0).to_string();
+            break;
+    }
+
+    StringNoCaseEqual noCaseCompare;
+    
+    // POST is the default in a browser, GET supposedly default
+    // in a Flash test environment (whatever that is).
+    bool post = !noCaseCompare(method, "get");
+
+    // Encode the data in the default way for the type.
+    std::ostringstream data;
+
+    ptr->send(url, target, post);
+    return as_value(true);
+}
+
 
 }

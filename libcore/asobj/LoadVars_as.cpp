@@ -40,7 +40,6 @@
 
 namespace gnash {
 
-static as_value loadvars_send(const fn_call& fn);
 static as_value loadvars_tostring(const fn_call& fn);
 static as_value loadvars_ctor(const fn_call& fn);
 
@@ -148,7 +147,8 @@ LoadVars_as::attachLoadVarsInterface(as_object& o)
 	            LoadVars_as::getBytesTotal_method));
 	o.init_member("load", new builtin_function(
 	            LoadableObject::loadableobject_load));
-	o.init_member("send", new builtin_function(loadvars_send));
+	o.init_member("send", new builtin_function(
+                LoadableObject::loadableobject_send));
 	o.init_member("sendAndLoad", new builtin_function(
 	            LoadableObject::loadableobject_sendAndLoad));
 	o.init_member("toString", new builtin_function(loadvars_tostring));
@@ -245,15 +245,6 @@ LoadVars_as::onLoad_method(const fn_call& /*fn*/)
 {
 	//GNASH_REPORT_FUNCTION;
 	return as_value();
-}
-
-
-static as_value
-loadvars_send(const fn_call& fn)
-{
-	boost::intrusive_ptr<LoadVars_as> ptr = ensureType<LoadVars_as>(fn.this_ptr);
-    ptr->send("");
-	return as_value(); 
 }
 
 
