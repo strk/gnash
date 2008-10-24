@@ -2175,7 +2175,10 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 				log_error(_("AMF0 read: premature end of input reading Number type"));
 				return false;
 			}
-			double dub = *(reinterpret_cast<double*>(b)); b += 8;
+			double dub;
+            // TODO: may we avoid a copy and swapBytes call
+            //       by bitshifting b[0] trough b[7] ?
+            std::copy(b, b+8, (char*)&dub); b+=8; 
 			amf::swapBytes(&dub, 8);
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
 			log_debug("amf0 read double: %e", dub);
