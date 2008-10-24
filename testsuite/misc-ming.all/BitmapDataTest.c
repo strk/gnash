@@ -88,26 +88,26 @@ main(int argc, char** argv)
 		  "Rectangle = flash.geom.Rectangle;"
 		  "bmp = new BitmapData(150, 150, false);"
 		  "rect = new Rectangle(10, 10, 100, 100);"
-		  "bmp.fillRect(rect, 0x223322);"
+		  "bmp.fillRect(rect, 0x00ff00);"
 		  "mc = _root.createEmptyMovieClip('mc', getNextHighestDepth());"
           "d = mc.getNextHighestDepth();"
           "mc.attachBitmap(bmp, d);"
           "bmp2 = new BitmapData(20, 20, true);"
           "rect2 = new Rectangle (10, 10, 20, 20);"
-          "bmp2.fillRect(rect2, 0xffffff22);"
+          "bmp2.fillRect(rect2, 0xffffff00);"
           "d2 = mc.getNextHighestDepth();"
           "mc.attachBitmap(bmp2, d2);"
           "note('1. You should see a small yellow square in the top left\n"
-                "corner of a larger green square. Press a key.');"
+                "corner of a larger green square. Click to proceed.');"
           "stop();"
           );
 
     SWFMovie_nextFrame(mo);
 
     add_actions(mo, "rect = new Rectangle (90, 90, 120, 120);"
-		    "bmp.fillRect(rect, 0xffee66);"
-            "note('2. You should see a new pale yellow square covering the \n"
-                "bottom right corner of the large green square. Press a key.');"
+		    "bmp.fillRect(rect, 0x0000FF);"
+            "note('2. You should see a new blue square covering the \n"
+                "bottom right corner of the large green square. Click to proceed.');"
             "stop();"
             );
 
@@ -115,7 +115,7 @@ main(int argc, char** argv)
 
     add_actions(mo, "mc.createEmptyMovieClip('d', d);"
             "note('3. You should see just the small yellow square in the top\n"
-                "left corner. Press a key.');");
+                "left corner. Click to proceed.');");
 
     add_actions(mo, "stop();");
 
@@ -127,7 +127,7 @@ main(int argc, char** argv)
 
     // Place a static character at depth 3
     staticSquare = newSWFMovieClip();
-    shape = make_fill_square (300, 0, 60, 60, 0, 255, 0, 255, 0, 255);
+    shape = make_fill_square (300, 0, 60, 60, 255, 0, 255, 255, 0, 255);
     SWFMovieClip_add(staticSquare, (SWFBlock)shape);  
     SWFMovieClip_nextFrame(staticSquare);
     
@@ -136,44 +136,44 @@ main(int argc, char** argv)
     SWFDisplayItem_setName(it, "staticSquare");
 
     add_actions(mo, 
-            "note('4. You should see a red square in the top right and a\n"
-            "purple square in the top centre. Press a key.');");
+            "note('4. You should see a red square in the top left and a\n"
+            "purple square in the top right. Click to proceed.');");
     add_actions(mo, "stop();");
 
     SWFMovie_nextFrame(mo);
 
     add_actions(mo, "staticSquare.swapDepths(20);"
-            "note('5. There should have been no change. Press a key.');"
+            "note('5. There should have been no change. Click to proceed.');"
             "stop();"
             );
 
     SWFMovie_nextFrame(mo);
 
     add_actions(mo, "_root.attachBitmap(bmp, 2);"
-            "note('6. You should see the green square and pale yellow square\n"
+            "note('6. You should see the green square and the blue square\n"
             "under the red square. The purple square should still be there.\n"
-            "Press a key');"
+            "Click to proceed');"
             "stop();"
             );
 
     SWFMovie_nextFrame(mo);
 
     add_actions(mo, "_root.attachBitmap(bmp, 3);"
-            "note('7. There should have been no change. Press a key');"
+            "note('7. There should have been no change. Click to proceed');"
             "stop();"
             );
 
     SWFMovie_nextFrame(mo);
     
     add_actions(mo, "_root.attachBitmap(bmp2, 20);"
-            "note('8. The purple square should have gone. The small yellow\n"
-            "square should have replaced the top left corner of the red\n"
-            "square.');"
+            "note('8. The purple square should have gone. The small yellow square\n"
+            "should have replaced the top left corner of the red square.');"
             "stop();"
             );
 
     add_actions(mo, "_root.onKeyDown = _root.onMouseUp = undefined;"
-            "note('END OF TEST - thanks for flying with us');"
+            "_root.eof = true;" // hook for test runner...
+            "note('\n - END OF TEST - thanks for flying with us ! ');"
             //"totals(6);" // no AS based tests...
             );
 
