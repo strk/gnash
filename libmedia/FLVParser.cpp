@@ -171,7 +171,7 @@ FLVParser::indexAudioTag(const FLVTag& tag, boost::uint32_t thisTagPos)
 	CuePointsMap::iterator it = _cuePoints.lower_bound(tag.timestamp);
 	if ( it == _cuePoints.end() || it->first - tag.timestamp >= 5000)
 	{
-		//log_debug("Added cue point at timestamp %d and position %d (audio frame)", timestamp, thisTagPos);
+		log_debug("Added cue point at timestamp %d and position %d (audio frame)", tag.timestamp, thisTagPos);
 		_cuePoints[tag.timestamp] = thisTagPos; 
 	}
 }
@@ -183,7 +183,7 @@ FLVParser::indexVideoTag(const FLVTag& tag, const FLVVideoTag& videotag, boost::
 		return;
 	}
 
-	//log_debug("Added cue point at timestamp %d and position %d (key video frame)", timestamp, thisTagPos);
+	log_debug("Added cue point at timestamp %d and position %d (key video frame)", tag.timestamp, thisTagPos);
 	_cuePoints[tag.timestamp] = thisTagPos;
 }
 
@@ -320,6 +320,8 @@ bool FLVParser::parseNextTag(bool index_only)
 	uint64_t& position = index_only ? _nextPosToIndex : _lastParsedPosition;
 	bool& completed = index_only ? _indexingCompleted : _parsingComplete;
 
+	//log_debug("parseNextTag: _lastParsedPosition:%d, _nextPosToIndex:%d, index_only:%d", _lastParsedPosition, _nextPosToIndex, index_only);
+
 	unsigned long thisTagPos = position;
 
 	// Seek to next frame and skip the tag size 
@@ -352,10 +354,10 @@ bool FLVParser::parseNextTag(bool index_only)
 
 	FLVTag flvtag(chunk);
 
-        position += 15 + flvtag.body_size;
+        position += 15 + flvtag.body_size; // may be _lastParsedPosition OR _nextPosToIndex
 
 	bool doIndex = (_lastParsedPosition+4 > _nextPosToIndex) || index_only;
-	if ( doIndex )
+	if ( _lastParsedPosition > _nextPosToIndex )
 	{
 		//log_debug("::parseNextTag setting _nextPosToIndex=%d", _lastParsedPosition+4);
 		_nextPosToIndex = _lastParsedPosition;
@@ -363,7 +365,7 @@ bool FLVParser::parseNextTag(bool index_only)
 
 	if ( position > _bytesLoaded ) {
 		boost::mutex::scoped_lock lock(_bytesLoadedMutex);
-		_bytesLoaded = _lastParsedPosition;
+		_bytesLoaded = position;
 	}
 
 	// check for empty tag
