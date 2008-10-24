@@ -1060,7 +1060,7 @@ sprite_getURL(const fn_call& fn)
 
     movie_root& m = sprite->getVM().getRoot();
     
-    URL url(urlstring);
+    URL url(urlstring, get_base_url());
 
     switch (method)
     {
