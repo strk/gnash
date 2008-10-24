@@ -2276,7 +2276,7 @@ if test x$build_kde = xyes -o x$kparts = xyes; then
       echo "               To be able to build the kde gui," >&3
       echo "               install the KDE development environment from http://kde.org" >&3
       echo "               or .deb users: apt-get install kdelibs-dev" >&3
-      echo "               or .rpm users: yum install <something-else>." >&3
+      echo "               or .rpm users: yum install kdelibs-devel." >&3
   fi
   if test x"$has_qt" = xyes; then
     echo "        QT flags are: $QT_CFLAGS"
