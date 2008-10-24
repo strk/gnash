@@ -183,7 +183,7 @@ main(int argc, char** argv)
     SWFMovie_nextFrame(mo);    
 
     add_actions(mo, "bmp = new BitmapData(100, 100, false, 0x0000ff);"
-            "note('10. There should have been no change. Click to proceeed.');"
+            "note('10. There should have been no change. Click to proceed.');"
             "stop();"
             );
 
