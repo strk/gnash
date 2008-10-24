@@ -112,7 +112,7 @@ public:
 
 protected:
 
-    void markReachableResources()
+    void markReachableResources() const
     {
         _movieClip.setReachable();
         markAsObjectReachable();

@@ -244,7 +244,6 @@ main(int argc, char** argv)
             "squares were. Click to proceed.');"
             "stop();"
             );
-    SWFMovie_nextFrame(mo);
 
     add_actions(mo, "_root.onKeyDown = _root.onMouseUp = undefined;"
             "_root.eof = true;" // hook for test runner...
