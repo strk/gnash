@@ -17,6 +17,10 @@
 #include "AudioDecoder.h"
 
 #include <speex/speex.h> 
+#if SPEEX_LIB_GET_MAJOR_VERSION > 0 && SPEEX_LIB_GET_MINOR_VERSION > 1
+# define GNASH_SPEEX_RESAMPLING 1
+# include <speex/speex_resampler.h>
+#endif
 
 #ifndef GNASH_MEDIA_DECODER_SPEEX
 #define GNASH_MEDIA_DECODER_SPEEX
@@ -38,6 +42,11 @@ private:
     SpeexBits _speex_bits;
     void* _speex_dec_state;
     int _speex_framesize;
+
+#ifdef GNASH_SPEEX_RESAMPLING 
+    SpeexResamplerState* _resampler;
+    boost::uint32_t _target_frame_size;
+#endif
 };
 
 } // namespace media
