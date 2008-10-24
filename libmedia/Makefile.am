@@ -49,7 +49,6 @@ libgnashmedia_la_CPPFLAGS = \
 	$(GIF_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(INCLTDL) \
-	$(SPEEX_CFLAGS) \
 	$(NULL)
 
 # These headers get installed
@@ -71,14 +70,12 @@ libgnashmedia_la_LIBADD = \
 	$(LIBLTDLHEAD) \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
-	$(SPEEX_LIBS) \
 	$(NULL)
 
 libgnashmedia_la_SOURCES = \
 	MediaHandler.cpp \
 	AudioDecoderNellymoser.cpp \
 	AudioDecoderSimple.cpp \
-	AudioDecoderSpeex.cpp \
 	MediaParser.cpp \
 	FLVParser.cpp \
 	Util.cpp \
@@ -93,7 +90,6 @@ noinst_HEADERS = \
 	FLVParser.h \
 	AudioDecoderNellymoser.h \
 	AudioDecoderSimple.h \
-	AudioDecoderSpeex.h \
 	sound_handler.h \
 	NullSoundHandler.h \
 	SoundInfo.h \
@@ -157,6 +153,19 @@ if USE_FFMPEG_ENGINE
    libgnashmedia_la_CPPFLAGS += \
 		$(FFMPEG_CFLAGS) \
 		$(SDL_CFLAGS)
+endif
+
+if HAVE_SPEEX
+   libgnashmedia_la_LIBADD += \
+	$(SPEEX_LIBS) \
+	$(SPEEXDSP_LIBS) \
+	$(NULL)
+   libgnashmedia_la_CPPFLAGS += \
+	$(SPEEX_CFLAGS) \
+	$(SPEEXDSP_CFLAGS) \
+	$(NULL)
+   libgnashmedia_la_SOURCES += AudioDecoderSpeex.cpp
+   noinst_HEADERS += AudioDecoderSpeex.h
 endif
 
 libgnashmedia_la_LDFLAGS = -release $(VERSION)

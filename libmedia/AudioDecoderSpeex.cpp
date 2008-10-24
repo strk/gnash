@@ -20,7 +20,7 @@
 #include <boost/bind.hpp>
 #include <boost/checked_delete.hpp>
 
-#ifdef GNASH_SPEEX_RESAMPLING
+#ifdef RESAMPLING_SPEEX
 # include <boost/rational.hpp>
 #endif
 
@@ -37,7 +37,9 @@ AudioDecoderSpeex::AudioDecoderSpeex()
 
     speex_bits_init(&_speex_bits);
 
-#ifdef GNASH_SPEEX_RESAMPLING
+    speex_decoder_ctl(_speex_dec_state, SPEEX_GET_FRAME_SIZE, &_speex_framesize);
+
+#ifdef RESAMPLING_SPEEX
     int err = 0;
     _resampler = speex_resampler_init(1, 16000, 44100,
         SPEEX_RESAMPLER_QUALITY_DEFAULT, &err);
@@ -46,9 +48,10 @@ AudioDecoderSpeex::AudioDecoderSpeex()
         throw MediaException(_("AudioDecoderSpeex: initialization failed."));
     }
 
-    boost::uint32_t num, den;
+    boost::uint32_t num = 0, den = 0;
 
     speex_resampler_get_ratio (_resampler, &num, &den);
+    assert(num && den);
 
     boost::rational<boost::uint32_t> numsamples(den, num);
 
@@ -56,9 +59,6 @@ AudioDecoderSpeex::AudioDecoderSpeex()
 
     _target_frame_size = boost::rational_cast<boost::uint32_t>(numsamples);
 #endif
-
-    speex_decoder_ctl(_speex_dec_state, SPEEX_GET_FRAME_SIZE, &_speex_framesize);
-
 }
 AudioDecoderSpeex::~AudioDecoderSpeex()
 {
@@ -108,8 +108,9 @@ AudioDecoderSpeex::decode(const EncodedAudioFrame& input,
         boost::uint32_t conv_size = 0;
         boost::int16_t* conv_data = 0;
 
-#ifdef GNASH_SPEEX_RESAMPLING
-        conv_data = new boost::int16_t[_converted_frame_size];
+#ifdef RESAMPLING_SPEEX
+        conv_data = new boost::int16_t[_target_frame_size];
+        memset(conv_data, 0, _target_frame_size * 2);
 
         boost::uint32_t in_size = _speex_framesize;
 
@@ -117,6 +118,7 @@ AudioDecoderSpeex::decode(const EncodedAudioFrame& input,
         // won't do this for us, but we can ask it to skip a sample after
         // writing one, so all we have to do is duplicate the samples.
         speex_resampler_set_output_stride(_resampler, 2);
+        conv_size = _target_frame_size; // Assuming this hould be samples.
 
         int err = speex_resampler_process_int(_resampler, 0 /* mono */, output.get(), &in_size, conv_data, &conv_size);
         if (err != RESAMPLER_ERR_SUCCESS) {

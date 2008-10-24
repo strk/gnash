@@ -160,6 +160,12 @@ if USE_FFMPEG_ENGINE
 	@echo "	OGG_CFLAGS is $(OGG_CFLAGS)"
 	@echo "	OGG_LIBS is $(OGG_LIBS)"
 endif
+if HAVE_SPEEX
+	@echo " SPEEX_CFLAGS is $(SPEEX_CFLAGS)"
+	@echo " SPEEXDSP_CFLAGS is $(SPEEXDSP_CFLAGS)"
+	@echo " SPEEX_LIBS is $(SPEEX_LIBS)"
+	@echo " SPEEXDSP_LIBS is $(SPEEXDSP_LIBS)"
+endif
 	@echo "GUI Toolkit decoding support..."	
 	@echo "	SDL_CFLAGS is $(SDL_CFLAGS)"
 	@echo "	SDL_LIBS is $(SDL_LIBS)"

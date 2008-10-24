@@ -17,8 +17,8 @@
 #include "AudioDecoder.h"
 
 #include <speex/speex.h> 
-#if SPEEX_LIB_GET_MAJOR_VERSION > 0 && SPEEX_LIB_GET_MINOR_VERSION > 1
-# define GNASH_SPEEX_RESAMPLING 1
+
+#ifdef RESAMPLING_SPEEX
 # include <speex/speex_resampler.h>
 #endif
 
@@ -43,8 +43,9 @@ private:
     void* _speex_dec_state;
     int _speex_framesize;
 
-#ifdef GNASH_SPEEX_RESAMPLING 
+#ifdef RESAMPLING_SPEEX
     SpeexResamplerState* _resampler;
+    /// Number of samples in a resampled 44kHz stereo frame.
     boost::uint32_t _target_frame_size;
 #endif
 };
