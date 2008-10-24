@@ -18,6 +18,10 @@
 
 #include <speex/speex.h> 
 
+#ifdef RESAMPLING_SPEEX
+# include <speex/speex_resampler.h>
+#endif
+
 #ifndef GNASH_MEDIA_DECODER_SPEEX
 #define GNASH_MEDIA_DECODER_SPEEX
 
@@ -38,6 +42,12 @@ private:
     SpeexBits _speex_bits;
     void* _speex_dec_state;
     int _speex_framesize;
+
+#ifdef RESAMPLING_SPEEX
+    SpeexResamplerState* _resampler;
+    /// Number of samples in a resampled 44kHz stereo frame.
+    boost::uint32_t _target_frame_size;
+#endif
 };
 
 } // namespace media

@@ -1487,6 +1487,15 @@ fi
 GNASH_PKG_INCLUDES([dejagnu], [dejagnu.h])
 
 GNASH_PKG_FIND(speex, [speex.h], [speex audio codec], speex_decode_int)
+AM_CONDITIONAL(HAVE_SPEEX, [ test x$has_speex = xyes ])
+if test x$has_speex = xyes ; then
+  AC_DEFINE([DECODING_SPEEX], [1], [Speex codec available])
+fi
+
+GNASH_PKG_FIND(speexdsp, [speex_resampler.h], [speex DSP utilities], speex_resampler_process_int)
+if test x$has_speexdsp = xyes ; then
+  AC_DEFINE([RESAMPLING_SPEEX], [1], [Speex resampler available])
+fi
 
 dnl Find freetype and fontconfig
 dnl GNASH_PKG_FIND(freetype2, [freetype/freetype.h], [freetype2 font library], FT_Load_Char)
