@@ -80,15 +80,25 @@ public:
 	///
 	PlayHead(VirtualClock* clockSource);
 
-	/// Initialize playhead 
-	//
-	/// @param hasVideo
-	/// 	Whether video consumer is available
-	///
-	/// @param hasAudio
-	/// 	Whether video consumer is available
-	///
-	void init(bool hasVideo, bool hasAudio);
+    /// Set a video consumer as available
+    //
+    /// This should be completely fine to do during
+    /// PlayHead lifetime.
+    ///
+    void setVideoConsumerAvailable()
+    {
+        _availableConsumers |= CONSUMER_VIDEO;
+    }
+
+    /// Set an audio consumer as available
+    //
+    /// This should be completely fine to do during
+    /// PlayHead lifetime.
+    ///
+    void setAudioConsumerAvailable()
+    {
+        _availableConsumers |= CONSUMER_AUDIO;
+    }
 
 	/// Get current playhead position (milliseconds)
 	boost::uint64_t getPosition() { return _position; }
@@ -108,13 +118,10 @@ public:
 		return (_positionConsumers & CONSUMER_VIDEO);
 	}
 
-	/// \brief
-	/// Mark current position as being consumed by video consumer,
-	/// advancing if needed
+	/// Mark current position as being consumed by video consumer
 	void setVideoConsumed()
 	{
 		_positionConsumers |= CONSUMER_VIDEO;
-		advanceIfConsumed();
 	}
 
 	/// Return true if audio of current position have been consumed
@@ -123,13 +130,10 @@ public:
 		return (_positionConsumers & CONSUMER_AUDIO);
 	}
 
-	/// \brief
-	/// Mark current position as being consumed by audio consumer,
-	/// advancing if needed.
+	/// Mark current position as being consumed by audio consumer
 	void setAudioConsumed()
 	{
 		_positionConsumers |= CONSUMER_AUDIO;
-		advanceIfConsumed();
 	}
 
 	/// Change current position to the given time.
@@ -146,9 +150,7 @@ public:
 	///
 	void seekTo(boost::uint64_t position);
 
-private:
-
-	/// Advance position if all consumers consumed the current one
+	/// Advance position if all available consumers consumed the current one
 	//
 	/// Clock source will be used to determine the amount
 	/// of milliseconds to advance position to.
@@ -161,6 +163,9 @@ private:
 	///
 	void advanceIfConsumed();
 		
+
+private:
+
 	/// Flags for consumers state
 	enum ConsumerFlag {
 		CONSUMER_VIDEO = 1,
@@ -501,17 +506,17 @@ private:
 		DEC_BUFFERING
 	};
 
-	/// Gets video info from the parser and initializes _videoDecoder
+	/// Initialize video decoder and (if successful) PlayHead consumer 
 	//
-	/// @param parser the parser to use to get video information.
+	/// @param info Video codec information
 	///
-	void initVideoDecoder(media::MediaParser& parser);
+	void initVideoDecoder(const media::VideoInfo& info);
 
-	/// Gets audio info from the parser and initializes _audioDecoder
+	/// Initialize audio decoder and (if successful) a PlayHead consumer 
 	//
-	/// @param parser the parser to use to get audio information.
+	/// @param info Audio codec information
 	///
-	void initAudioDecoder(media::MediaParser& parser);
+	void initAudioDecoder(const media::AudioInfo& parser);
 
 	DecodingState _decoding_state;
 

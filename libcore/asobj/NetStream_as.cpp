@@ -668,19 +668,6 @@ PlayHead::PlayHead(VirtualClock* clockSource)
 	_clockOffset = 0; // _clockSource->elapsed();
 }
 
-void
-PlayHead::init(bool hasVideo, bool hasAudio)
-{
-	boost::uint64_t now = _clockSource->elapsed();
-	if ( hasVideo ) _availableConsumers |= CONSUMER_VIDEO;
-	if ( hasAudio ) _availableConsumers |= CONSUMER_AUDIO;
-	_positionConsumers = 0;
-
-	_position = 0;
-	_clockOffset = now;
-	assert(now-_clockOffset == _position);
-}
-
 PlayHead::PlaybackStatus
 PlayHead::setState(PlaybackStatus newState)
 {
@@ -922,47 +909,47 @@ NetStream_as::play(const std::string& c_url)
 }
 
 void
-NetStream_as::initVideoDecoder(media::MediaParser& parser)
+NetStream_as::initVideoDecoder(const media::VideoInfo& info)
 {
-	// Get video info from the parser
-	media::VideoInfo* videoInfo = parser.getVideoInfo();
-	if (!videoInfo) {
-		log_debug("No video in NetStream stream");
-		return;
-	}
-
 	assert ( _mediaHandler ); // caller should check this
+	assert ( !_videoInfoKnown ); // caller should check this
+	assert ( !_videoDecoder.get() ); // caller should check this
+
+	_videoInfoKnown = true; 
 
 	try {
-	    _videoDecoder = _mediaHandler->createVideoDecoder(*videoInfo);
+	    _videoDecoder = _mediaHandler->createVideoDecoder(info);
+            assert ( _videoDecoder.get() ); // PARANOIA_LEVEL ?
 	}
 	catch (MediaException& e) {
 	    log_error("NetStream: Could not create Video decoder: %s", e.what());
 	}
 
+    log_debug("NetStream_as::initVideoDecoder: hot-plugging video consumer");
+    _playHead.setVideoConsumerAvailable();
 }
 
 
 /* private */
 void
-NetStream_as::initAudioDecoder(media::MediaParser& parser)
+NetStream_as::initAudioDecoder(const media::AudioInfo& info)
 {
-	// Get audio info from the parser
-	media::AudioInfo* audioInfo =  parser.getAudioInfo();
-	if (!audioInfo) {
-		log_debug("No audio in NetStream input");
-		return;
-	}
-
 	assert ( _mediaHandler ); // caller should check this
+	assert ( !_audioInfoKnown ); // caller should check this
+	assert ( !_audioDecoder.get() ); // caller should check this
+
+	_audioInfoKnown = true; 
 
 	try {
-	    _audioDecoder = _mediaHandler->createAudioDecoder(*audioInfo);
+	    _audioDecoder = _mediaHandler->createAudioDecoder(info);
+            assert ( _audioDecoder.get() ); // PARANOIA_LEVE ?
 	}
 	catch (MediaException& e) {
 	    log_error("Could not create Audio decoder: %s", e.what());
 	}
 
+    log_debug("NetStream_as::initAudioDecoder: hot-plugging audio consumer");
+    _playHead.setAudioConsumerAvailable();
 }
 
 
@@ -1001,18 +988,10 @@ NetStream_as::startPlayback()
 	// for stream contents.
 	//
 
-	// The following sleep is a silly device for debugging
-	// http://savannah.gnu.org/bugs/index.php?24628
-	//sleep(2);
-
-	initVideoDecoder(*m_parser); 
-	initAudioDecoder(*m_parser); 
-
-	_playHead.init(_videoDecoder.get(), _audioDecoder.get());
-	_playHead.setState(PlayHead::PLAY_PLAYING);
-
 	decodingStatus(DEC_BUFFERING);
 	_playbackClock->pause(); // NOTE: should be paused already
+
+	_playHead.setState(PlayHead::PLAY_PLAYING);
 
 	// Register ::advance callback
 	startAdvanceTimer();
@@ -1407,16 +1386,19 @@ NetStream_as::pushDecodedAudioFrames(boost::uint32_t ts)
 		}
 
 		// case 2: here comes the audio !
-		_audioInfoKnown = true;
 
-		// TODO: try to create an AudioDecoder!
+		// try to create an AudioDecoder!
+		initAudioDecoder(*audioInfo);
 
-		log_unimpl("NetStream_as::pushDecodedAudioFrames: just found new audio, "
-			"should try to create an audio decoder "
-			"and plug an audio consumer to PlayHead here."
-			" See http://savannah.gnu.org/bugs/index.php?24540");
+		// Don't go ahead if audio decoder construction failed
+		if ( ! _audioDecoder.get() )
+		{
+			// TODO: we should still flush any existing Audio frame
+			//       in the encoded queue...
+			//       (or rely on next call)
 
-		return;
+			return; 
+		}
 	}
 
 	bool consumed = false;
@@ -1648,15 +1630,19 @@ NetStream_as::refreshVideoFrame(bool alsoIfPaused)
 		}
 
 		// case 2: here comes the video !
-		_videoInfoKnown = true;
 
-		// TODO: try to create a videoDecoder!
+		// Try to initialize the video decoder 
+		initVideoDecoder(*videoInfo);
 
-		log_unimpl("NetStream_as::refreshVideoFrame: just found new video, "
-			"should try to create a video decoder "
-			"and plug a video consumer to PlayHead here."
-			" See http://savannah.gnu.org/bugs/index.php?24540");
-		return;
+		// Don't go ahead if video decoder construction failed
+		if ( ! _videoDecoder.get() )
+		{
+			// TODO: we should still flush any existing Video frame
+			//       in the encoded queue...
+			//       (or rely on next call)
+
+			return; 
+		}
 
 	}
 
@@ -1811,6 +1797,7 @@ NetStream_as::advance()
 			// reguardless bufferLength...
 			if ( ! m_imageframe.get() && _playHead.getState() != PlayHead::PLAY_PAUSED )
 			{
+                log_debug("refreshing video frame for the first time");
 				refreshVideoFrame(true);
 			}
 
@@ -1835,6 +1822,10 @@ NetStream_as::advance()
 	// Refill audio buffer to consume all samples
 	// up to current playhead
 	refreshAudioBuffer();
+
+    // Advance PlayeHead position if current one was consumed
+    // by all available consumers
+    _playHead.advanceIfConsumed();
 
 	// Process media tags
 	m_parser->processTags(_playHead.getPosition(), this, getVM());
