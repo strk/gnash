@@ -104,7 +104,6 @@ namespace gnash {
     class Stage_as;
     class URL;
     class Timer;
-    class Gui;
 }
 
 namespace gnash
@@ -140,11 +139,6 @@ public:
     movie_root(VM& vm);
 
     ~movie_root();
-
-    void setGui(Gui* g)
-    {
-        _gui=g;
-    }
 
     /// Set the root movie, replacing the current one if any.
     //
@@ -1119,9 +1113,6 @@ private:
     // The timeout in seconds for script execution, in the
     // ScriptLimits tag.    
     boost::uint16_t _timeoutLimit;
-
-    /// Hosting app gui, externally owned
-    Gui* _gui;
 
     void handleActionLimitHit(const std::string& ref);
 

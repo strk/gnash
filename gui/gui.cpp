@@ -1221,7 +1221,6 @@ Gui::setStage(movie_root* stage)
     assert(stage);
     assert(!_stage);
     _stage = stage;
-    _stage->setGui(this);
 }
 
 bool

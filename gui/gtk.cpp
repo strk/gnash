@@ -1086,7 +1086,8 @@ PreferencesDialog::handlePrefs (GtkWidget* dialog, gint response, gpointer data)
 
         if ( prefs->streamsTimeoutScale ) {
             _rcfile.setStreamsTimeout(
-        	    gtk_range_get_value(GTK_RANGE(prefs->streamsTimeoutScale)));
+                gtk_spin_button_get_value_as_int(
+                    GTK_SPIN_BUTTON(prefs->streamsTimeoutScale)));
         }
 
         if ( prefs->ASCodingErrorToggle ) {
@@ -1151,7 +1152,8 @@ PreferencesDialog::handlePrefs (GtkWidget* dialog, gint response, gpointer data)
 
         if ( prefs->librarySize ) {
             _rcfile.setMovieLibraryLimit(
-                gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(prefs->librarySize)));
+                gtk_spin_button_get_value_as_int(
+                    GTK_SPIN_BUTTON(prefs->librarySize)));
         }
 
         if ( prefs->startStoppedToggle ) {

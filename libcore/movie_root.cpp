@@ -119,7 +119,6 @@ movie_root::movie_root(VM& vm)
 	_displayState(normal),
 	_recursionLimit(256),
 	_timeoutLimit(15),
-	_gui(0),
 	_movieAdvancementDelay(83), // ~12 fps by default
 	_lastMovieAdvancement(0)
 {
@@ -218,7 +217,7 @@ movie_root::handleActionLimitHit(const std::string& msg)
 {
 	bool disable = true;
 	if ( _interfaceHandler ) disable = _interfaceHandler->yesNo(msg);
-	else log_error("No gui registered, assuming 'Yes' answer to "
+	else log_error("No user interface registered, assuming 'Yes' answer to "
             "question: %s", msg);
 	if ( disable )
 	{
