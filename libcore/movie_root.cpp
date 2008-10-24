@@ -44,6 +44,7 @@
 #include <functional> // std::bind2nd, std::equal_to
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/bind.hpp>
+#include <unistd.h>
 
 #ifdef USE_SWFTREE
 # include "tree.hh"
