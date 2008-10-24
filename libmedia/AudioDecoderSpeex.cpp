@@ -66,8 +66,9 @@ AudioDecoderSpeex::~AudioDecoderSpeex()
 
     speex_decoder_destroy(_speex_dec_state);
 
-
+#ifdef RESAMPLING_SPEEX
     speex_resampler_destroy(_resampler);
+#endif
 }
 
 struct DecodedFrame : boost::noncopyable
