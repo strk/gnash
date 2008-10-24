@@ -39,8 +39,6 @@ addRedSquareExport(SWFMovie mo)
 	SWFMovieClip_add(mc, (SWFBlock)sh);
 	/* This is here just to turn the clip into an active one */
 	add_clip_actions(mc, "onRollOver = function() {};");
-	add_clip_actions(mc, "onMouseDown = function() { _root.mouseDown++; _root.note(_name+' mouseDown '+_root.mouseDown); };");
-	add_clip_actions(mc, "onMouseUp = function() { _root.mouseUp++; _root.note(_name+' mouseUp '+_root.mouseUp); };");
 	SWFMovieClip_nextFrame(mc);
 
 	SWFMovie_addExport(mo, (SWFBlock)mc, "redsquare");
@@ -75,13 +73,13 @@ main(int argc, char** argv)
 
   addRedSquareExport(mo);
 
-  add_actions(mo, "_root.onKeyDown = function() {"
+  add_actions(mo, "_root.onKeyDown = _root.onMouseUp = function() {"
 	                "play(); }; "
                     "Key.addListener(_root);");
 
   SWFMovie_setRate(mo, 2);
     dejagnuclip = get_dejagnu_clip(
-            (SWFBlock)get_default_font(mediadir), 10, 10, 200, 800, 600);
+            (SWFBlock)get_default_font(mediadir), 10, 10, 150, 800, 600);
     SWFMovie_add(mo, (SWFBlock)dejagnuclip);
  
   SWFMovie_nextFrame(mo);
@@ -170,9 +168,16 @@ main(int argc, char** argv)
     add_actions(mo, "_root.attachBitmap(bmp2, 20);"
             "note('8. The purple square should have gone. The small yellow\n"
             "square should have replaced the top left corner of the red\n"
-            "square. Press a key.');"
+            "square.');"
             "stop();"
             );
+
+    add_actions(mo, "_root.onKeyDown = _root.onMouseUp = undefined;"
+            "note('END OF TEST - thanks for flying with us');"
+            //"totals(6);" // no AS based tests...
+            );
+
+    SWFMovie_nextFrame(mo);
 
   //Output movie
   puts("Saving " OUTPUT_FILENAME );
