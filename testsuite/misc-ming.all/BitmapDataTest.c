@@ -195,8 +195,8 @@ main(int argc, char** argv)
     add_actions(mo, "bmp3 = new BitmapData(100, 100, false);"
             "rect3 = new Rectangle(20, 20, 90, 90);"
             "bmp3.fillRect(rect3, 0x0000ff);"
-            "_root.createEmptyMovieClip('original', 40);"
-            "ch = original.attachBitmap(bmp3, getNextHighestDepth());"
+            "ch = _root.createEmptyMovieClip('original', 40);"
+            "original.attachBitmap(bmp3, getNextHighestDepth());"
             "ch._name = 'duplicate';"
             "newch = _root.createEmptyMovieClip('original', "
                     "getNextHighestDepth());"
@@ -208,7 +208,7 @@ main(int argc, char** argv)
     SWFMovie_nextFrame(mo);    
     
     add_actions(mo, 
-            "duplicate.removeMovieClip();"
+            "original.removeMovieClip();"
             "note('12. There should have been no change. Click to proceed.');"
             "stop();"
             );
@@ -216,7 +216,7 @@ main(int argc, char** argv)
     SWFMovie_nextFrame(mo);    
     
     add_actions(mo, 
-            "original.removeMovieClip();"
+            "duplicate.removeMovieClip();"
             "note('13. You should see the red square again. Click to "
             "proceed.');"
             "stop();"
