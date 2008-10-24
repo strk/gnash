@@ -27,12 +27,36 @@
 
 const char* mediadir=".";
 
+void
+addRedSquareExport(SWFMovie mo)
+{
+	SWFShape sh;
+	SWFMovieClip mc;
+
+	sh = make_fill_square (0, 0, 60, 60, 255, 0, 0, 255, 0, 0);
+	mc = newSWFMovieClip();
+
+	SWFMovieClip_add(mc, (SWFBlock)sh);
+	/* This is here just to turn the clip into an active one */
+	add_clip_actions(mc, "onRollOver = function() {};");
+	add_clip_actions(mc, "onMouseDown = function() { _root.mouseDown++; _root.note(_name+' mouseDown '+_root.mouseDown); };");
+	add_clip_actions(mc, "onMouseUp = function() { _root.mouseUp++; _root.note(_name+' mouseUp '+_root.mouseUp); };");
+	SWFMovieClip_nextFrame(mc);
+
+	SWFMovie_addExport(mo, (SWFBlock)mc, "redsquare");
+
+	SWFMovie_writeExports(mo);
+}
+
+
 int
 main(int argc, char** argv)
 {
   SWFMovie mo;
   SWFMovieClip mc;
-  SWFMovieClip dejagnuclip;
+  SWFMovieClip dejagnuclip, staticSquare;
+  SWFShape shape;
+  SWFDisplayItem it;
 
   if ( argc>1 ) mediadir=argv[1];
   else
@@ -43,12 +67,13 @@ main(int argc, char** argv)
 	
   Ming_init();
   Ming_useSWFVersion (OUTPUT_VERSION);
-
 	
   mo = newSWFMovie();
   SWFMovie_setDimension(mo, 640, 480);
 
   if (mo == NULL) return -1;
+
+  addRedSquareExport(mo);
 
   add_actions(mo, "_root.onKeyDown = function() {"
 	                "play(); }; "
@@ -98,6 +123,57 @@ main(int argc, char** argv)
 
     SWFMovie_nextFrame(mo);
     
+    // Place a dynamic character at depth 4
+    add_actions(mo, "mc.removeMovieClip();"
+            "_root.attachMovie('redsquare', 'rs', 4);");
+
+    // Place a static character at depth 3
+    staticSquare = newSWFMovieClip();
+    shape = make_fill_square (300, 0, 60, 60, 0, 255, 0, 255, 0, 255);
+    SWFMovieClip_add(staticSquare, (SWFBlock)shape);  
+    SWFMovieClip_nextFrame(staticSquare);
+    
+    it = SWFMovie_add(mo, (SWFBlock)staticSquare);  
+    SWFDisplayItem_setDepth(it, 3); 
+    SWFDisplayItem_setName(it, "staticSquare");
+
+    add_actions(mo, 
+            "note('4. You should see a red square in the top right and a\n"
+            "purple square in the top centre. Press a key.');");
+    add_actions(mo, "stop();");
+
+    SWFMovie_nextFrame(mo);
+
+    add_actions(mo, "staticSquare.swapDepths(20);"
+            "note('5. There should have been no change. Press a key.');"
+            "stop();"
+            );
+
+    SWFMovie_nextFrame(mo);
+
+    add_actions(mo, "_root.attachBitmap(bmp, 2);"
+            "note('6. You should see the green square and pale yellow square\n"
+            "under the red square. The purple square should still be there.\n"
+            "Press a key');"
+            "stop();"
+            );
+
+    SWFMovie_nextFrame(mo);
+
+    add_actions(mo, "_root.attachBitmap(bmp, 3);"
+            "note('7. There should have been no change. Press a key');"
+            "stop();"
+            );
+
+    SWFMovie_nextFrame(mo);
+    
+    add_actions(mo, "_root.attachBitmap(bmp2, 20);"
+            "note('8. The purple square should have gone. The small yellow\n"
+            "square should have replaced the top left corner of the red\n"
+            "square. Press a key.');"
+            "stop();"
+            );
+
   //Output movie
   puts("Saving " OUTPUT_FILENAME );
   SWFMovie_save(mo, OUTPUT_FILENAME);
