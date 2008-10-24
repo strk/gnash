@@ -151,7 +151,7 @@ main(int argc, char** argv)
     SWFMovie_nextFrame(mo);
 
     add_actions(mo, "_root.attachBitmap(bmp, 2);"
-            "note('6. You should see the green square and the blue square "
+            "note('6. You should see the green and blue squares "
             "under the red square. The purple square should still be there. "
             "Click to proceed.');"
             "stop();"
@@ -165,11 +165,14 @@ main(int argc, char** argv)
             );
 
     SWFMovie_nextFrame(mo);
+
+    SWFDisplayItem_remove(it);
     
     add_actions(mo, "_root.attachBitmap(bmp2, 20);"
             "note('8. The purple square should have gone. The small yellow "
             "square should have replaced the top left corner of the red "
-            "square. Click to proceed.');"
+            "square. The green and blue squares should still be there. "
+            "Click to proceed.');"
             "stop();"
             );
 
