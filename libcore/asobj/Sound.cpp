@@ -32,6 +32,7 @@
 #include "builtin_function.h"
 #include "Object.h" // for getObjectInterface
 #include "VM.h"
+#include "timers.h" // for registering the probe timer
 
 #include "StreamProvider.h"
 
@@ -74,7 +75,8 @@ Sound::Sound()
 	_leftOverPtr(0),
 	_leftOverSize(0),
 	isAttached(false),
-	remainingLoops(0)	
+	remainingLoops(0),
+    _probeTimer(0)
 {
 }
 
@@ -199,10 +201,9 @@ Sound::loadSound(const std::string& file, bool streaming)
 	_startTime=0;
 
 	URL url(file, get_base_url());
-	externalURL = url.str(); // what for ? bah!
 
 	StreamProvider& streamProvider = StreamProvider::getDefaultInstance();
-	std::auto_ptr<IOChannel> inputStream( streamProvider.getStream( externalURL ) );
+	std::auto_ptr<IOChannel> inputStream( streamProvider.getStream( url ) );
 	if ( ! inputStream.get() )
 	{
 		log_error( _("Gnash could not open this url: %s"), url );
@@ -215,31 +216,32 @@ Sound::loadSound(const std::string& file, bool streaming)
 	_mediaParser.reset( _mediaHandler->createMediaParser(inputStream).release() );
 	if ( ! _mediaParser )
 	{
-		log_error(_("Unable to create parser for Sound input"));
+		log_error(_("Unable to create parser for Sound at %s"), url);
 		// not necessarely correct, the stream might have been found...
 		return;
 	}
 	_mediaParser->setBufferTime(60000); // one minute buffer... should be fine
 
-	media::AudioInfo* audioInfo =  _mediaParser->getAudioInfo();
-	if (!audioInfo) {
-		log_debug("No audio in Sound input");
-		return;
-	}
+	if ( isStreaming )
+	{
+		startProbeTimer();
+	} // if not streaming, we'll probe on .start()
+}
 
-    try {
-	    _audioDecoder.reset(_mediaHandler->createAudioDecoder(*audioInfo).release());
-	}
-	catch (MediaException& e) {
-        assert(!_audioDecoder.get());
-		log_error(_("Could not create audio decoder: %s"), e.what());
-	}
+int
+Sound::attachAuxStreamerIfNeeded()
+{
+	media::AudioInfo* audioInfo =  _mediaParser->getAudioInfo();
+	if (!audioInfo) return 0;
+
+    // the following may throw an exception
+	_audioDecoder.reset(_mediaHandler->createAudioDecoder(*audioInfo).release());
 
 	// start playing ASAP, a call to ::start will just change _startTime
-	//log_debug("Attaching the aux streamer");
+	log_debug("Attaching the aux streamer");
 	_soundHandler->attach_aux_streamer(getAudioWrapper, (void*) this);
 	isAttached = true;
-
+    return 1;
 }
 
 void
@@ -311,11 +313,6 @@ Sound::start(int offset, int loops)
 			log_error("No MediaParser initialized, can't start an external sound");
 			return;
 		}
-		if ( ! _audioDecoder )
-		{
-			log_error("No AudioDecoder initialized, can't start an external sound");
-			return;
-		}
 
 		if (offset > 0)
 		{
@@ -325,17 +322,28 @@ Sound::start(int offset, int loops)
 			_mediaParser->seek(seekms); // well, we try...
 		}
 
+		if (isStreaming)
+		{
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror(_("Sound.start() has no effect on a streaming Sound"));
+			);
+			return;
+		}
+
 		// Save how many loops to do (not when streaming)
-		if (! isStreaming && loops > 0)
+		if (loops > 0)
 		{
 			remainingLoops = loops;
 		}
 
-		if ( ! isAttached ) 
-		{
-			_soundHandler->attach_aux_streamer(getAudioWrapper, (void*) this);
-			isAttached = true;
-		}
+		// TODO: we should really be waiting for the sound to be fully
+		//       loaded before starting to play it (!isStreaming case)
+		startProbeTimer();
+
+		//if ( ! isAttached ) {
+		//	_soundHandler->attach_aux_streamer(getAudioWrapper, (void*) this);
+		//	isAttached = true;
+		//}
 	}
 	else
 	{
@@ -455,15 +463,18 @@ Sound::getAudio(boost::uint8_t* stream, int len)
 				}
 
 				// or detach and stop here...
-				// (should really honour loopings if any)
-				//if ( remainingLoops.. )
+				// (should really honour loopings if any, but that should be only done for non-streaming sound!)
 				//log_debug("Parsing complete and no more audio frames in input, detaching");
 				return false; // will detach us (we should change isAttached, but need thread safety!)
 			}
 
 			// if we've been asked to start at a specific time, skip
 			// any frame with earlier timestamp
-			if ( frame->timestamp < _startTime ) continue;
+			if ( frame->timestamp < _startTime )
+			{
+				//log_debug("This audio frame timestamp (%d) < requested start time (%d)", frame->timestamp, _startTime);
+				continue;
+			}
 
 			_leftOverData.reset( _audioDecoder->decode(*frame, _leftOverSize) );
 			_leftOverPtr = _leftOverData.get();
@@ -472,9 +483,13 @@ Sound::getAudio(boost::uint8_t* stream, int len)
 				log_error("No samples decoded from input of %d bytes", frame->dataSize);
 				continue;
 			}
+
+			//log_debug(" decoded %d bytes of audio", _leftOverSize);
 		}
 
 		int n = std::min<int>(_leftOverSize, len);
+		//log_debug(" consuming %d bytes of decoded audio", n);
+
 		memcpy(stream, _leftOverPtr, n);
 		stream += n;
 		_leftOverPtr += n;
@@ -919,6 +934,81 @@ void sound_class_init(as_object& global)
 	// Register _global.String
 	global.init_member("Sound", cl.get());
 
+}
+
+/*private*/
+void
+Sound::startProbeTimer()
+{
+	boost::intrusive_ptr<builtin_function> cb = \
+		new builtin_function(&Sound::probeAudioWrapper);
+	std::auto_ptr<Timer> timer(new Timer);
+	unsigned long delayMS = 83; // 12 times each second...
+	timer->setInterval(*cb, delayMS, this);
+	_probeTimer = getVM().getRoot().add_interval_timer(timer, true);
+}
+
+/*private static*/
+as_value
+Sound::probeAudioWrapper(const fn_call& fn)
+{
+    GNASH_REPORT_FUNCTION;
+
+    boost::intrusive_ptr<Sound> ptr = ensureType<Sound>(fn.this_ptr);
+    ptr->probeAudio();
+    return as_value();
+}
+
+/*private*/
+void
+Sound::stopProbeTimer()
+{
+    log_debug("stopProbeTimer called");
+	if ( _probeTimer )
+	{
+		VM& vm = getVM();
+		vm.getRoot().clear_interval_timer(_probeTimer);
+        log_debug(" clear_interval_timer(%d) called", _probeTimer);
+		_probeTimer = 0;
+	}
+}
+
+/*private*/
+void
+Sound::probeAudio()
+{
+    log_debug("Probing audio");
+    bool parsingCompleted = _mediaParser->parsingCompleted();
+    try
+    {
+        if ( ! attachAuxStreamerIfNeeded() )
+        {
+            if ( parsingCompleted )
+            {
+                log_debug("No audio in Sound input.");
+                stopProbeTimer();
+                _mediaParser.reset(); // no use for this anymore...
+            }
+            else
+            {
+                log_unimpl("No info about audio in Sound input yet, hot-plugging decoder not supported.");
+                // keep probing
+            }
+        }
+        else
+        {
+            // TODO: reuse the probe timer to detect
+            //       end of sound for running onSoundCompleted()
+            stopProbeTimer();
+        }
+    }
+    catch (MediaException& e)
+    {
+        assert(!_audioDecoder.get());
+		log_error(_("Could not create audio decoder: %s"), e.what());
+        _mediaParser.reset(); // no use for this anymore...
+        stopProbeTimer();
+    }
 }
 
 #ifdef GNASH_USE_GC
