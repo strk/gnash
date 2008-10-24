@@ -161,7 +161,7 @@ FLVParser::parseNextChunk()
 void
 FLVParser::indexAudioTag(const FLVTag& tag, boost::uint32_t thisTagPos)
 {
-	if ( _video) {
+	if ( _videoInfo.get()) {
 		// if we have video we let that drive cue points
 		return;
 	}
@@ -488,35 +488,6 @@ bool FLVParser::parseHeader()
 
 	log_debug("Parsing FLV version %d, audio:%d, video:%d",
 			(int)version, _audio, _video);
-
-	// Initialize audio/video info if any audio/video
-	// tag was found within the first 'probeBytes' bytes
-	// 
-	const size_t probeBytes = PROBE_BYTES;
-	while ( !_parsingComplete && _lastParsedPosition < probeBytes )
-	{
-		parseNextTag(false);
-
-		// Early-out if we found both video and audio tags
-		if ( _videoInfo.get() && _audioInfo.get() ) break;
-	}
-
-	// The audio+video bitmask advertised video but we 
-	// found no video tag in the probe segment
-	if ( _video && !_videoInfo.get() ) {
-		log_error(_("Couldn't find any video frame in the first %d bytes "
-			"of FLV advertising video in header"), probeBytes);
-		_video = false;
-	}
-
-	// The audio+video bitmask advertised audio but we 
-	// found no audio tag in the probe segment
-	// (Youtube does this on some (maybe all) of their soundless clips.)
-	if ( _audio && !_audioInfo.get() ) {
-		log_error(_("Couldn't find any audio frame in the first %d bytes "
-			"of FLV advertising audio in header"), probeBytes);
-		_audio = false;
-	}
 
 	return true;
 }
