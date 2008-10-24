@@ -22,11 +22,22 @@
 # 	rpmbuild -rcfile=$(srcdir)/packaging/redhat/rpmrc:/usr/lib/rpm/rpmrc \
 # 	         -ba --target=geode-olpc /usr/src/redhat/SPECS/gnash.spec
 
+RPMBUILD_FLAGS = --clean --rmsource --rmspec
+
+spec: $(srcdir)/packaging/redhat/gnash.spec
+	@echo "Editing the version in the spec file ..."
+	-@now=`date "+%Y%m%d"`; \
+	pkgname="gnash-trunk_$${now}"; \
+	snapshot_tar="$${pkgname}.tar.gz"; \
+	sed -e "s/Version.*/Version:	$${now}/" $(srcdir)/packaging/redhat/gnash.spec > gnash.spec;
+
 # Build an Redhat/Fedora .rpm package
-rpm redhat: dist-gzip $(srcdir)/packaging/redhat/gnash.spec
-	cp -f $(srcdir)/packaging/redhat/gnash.spec /usr/src/redhat/SPECS/
-	cp -f gnash-$(VERSION).tar.gz /usr/src/redhat/SOURCES/
-	rpmbuild -ba /usr/src/redhat/SPECS/gnash.spec
+rpm redhat: snapshot spec
+	-@now=`date "+%Y%m%d"`; \
+	pkgname="gnash-trunk_$${now}"; \
+	snapshot_tar="$${pkgname}.tar.gz"; \
+	cp $${snapshot_tar} /usr/src/redhat/SOURCES/gnash_20081024.tar.gz
+	rpmbuild -ba $(RPMBUILD_FLAGS) gnash.spec
 
 .PHONY : rpm redhat
 
