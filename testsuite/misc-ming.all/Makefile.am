@@ -177,6 +177,7 @@ check_PROGRAMS = \
 	runtime_vm_stack_test \
 	new_child_in_unload_test \
 	instanceNameTest \
+	BitmapDataTest \
 	$(NULL)
 
 if MING_VERSION_0_4_3
@@ -1427,8 +1428,21 @@ XMLSocketTest_LDADD = libgnashmingutils.la
 XMLSocketTest.swf: XMLSocketTest
 	./XMLSocketTest $(top_srcdir)/testsuite/media
 
+BitmapDataTest_SOURCES = \
+	BitmapDataTest.c \
+	$(NULL)
+
+BitmapDataTest_CFLAGS = \
+	-DMEDIADIR='"$(abs_mediadir)"' \
+	$(NULL)
+
+BitmapDataTest_LDADD = libgnashmingutils.la
+
+BitmapDataTest.swf: BitmapDataTest
+	./BitmapDataTest $(top_srcdir)/testsuite/media
+
 EmbeddedSoundTest_SOURCES = \
-	EmbeddedSoundTest.c
+	EmbeddedSoundTest.c \
 	$(NULL)
 
 EmbeddedSoundTest_CFLAGS = \
