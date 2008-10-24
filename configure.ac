@@ -3029,8 +3029,8 @@ if test -s $cwarn; then
   cat $cwarn
   rm $cwarn
   echo ""
-  echo "Gnash should still compile even with these warnings.  If it doesn't,"
-  echo "report the warnings as a bug."
+  echo "Gnash should still compile even with these warnings."
+  echo "If it doesn't, report the warnings as a bug."
 fi
 
 dnl If anything critical is missing, don't bother to continue
