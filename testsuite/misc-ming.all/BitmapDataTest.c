@@ -67,7 +67,7 @@ main(int argc, char** argv)
   Ming_useSWFVersion (OUTPUT_VERSION);
 	
   mo = newSWFMovie();
-  SWFMovie_setDimension(mo, 640, 480);
+  SWFMovie_setDimension(mo, 800, 600);
 
   if (mo == NULL) return -1;
 
@@ -77,7 +77,7 @@ main(int argc, char** argv)
 	                "play(); }; "
                     "Key.addListener(_root);");
 
-  SWFMovie_setRate(mo, 2);
+  SWFMovie_setRate(mo, 12);
     dejagnuclip = get_dejagnu_clip(
             (SWFBlock)get_default_font(mediadir), 10, 10, 150, 800, 600);
     SWFMovie_add(mo, (SWFBlock)dejagnuclip);
@@ -97,7 +97,7 @@ main(int argc, char** argv)
           "bmp2.fillRect(rect2, 0xffffff00);"
           "d2 = mc.getNextHighestDepth();"
           "mc.attachBitmap(bmp2, d2);"
-          "note('1. You should see a small yellow square in the top left\n"
+          "note('1. You should see a small yellow square in the top left "
                 "corner of a larger green square. Click to proceed.');"
           "stop();"
           );
@@ -106,15 +106,16 @@ main(int argc, char** argv)
 
     add_actions(mo, "rect = new Rectangle (90, 90, 120, 120);"
 		    "bmp.fillRect(rect, 0x0000FF);"
-            "note('2. You should see a new blue square covering the \n"
-                "bottom right corner of the large green square. Click to proceed.');"
+            "note('2. You should see a new blue square covering the "
+                "bottom right corner of the large green square. Click"
+                " to proceed.');"
             "stop();"
             );
 
     SWFMovie_nextFrame(mo);
 
     add_actions(mo, "mc.createEmptyMovieClip('d', d);"
-            "note('3. You should see just the small yellow square in the top\n"
+            "note('3. You should see just the small yellow square in the top "
                 "left corner. Click to proceed.');");
 
     add_actions(mo, "stop();");
@@ -136,7 +137,7 @@ main(int argc, char** argv)
     SWFDisplayItem_setName(it, "staticSquare");
 
     add_actions(mo, 
-            "note('4. You should see a red square in the top left and a\n"
+            "note('4. You should see a red square in the top left and a "
             "purple square in the top right. Click to proceed.');");
     add_actions(mo, "stop();");
 
@@ -150,30 +151,101 @@ main(int argc, char** argv)
     SWFMovie_nextFrame(mo);
 
     add_actions(mo, "_root.attachBitmap(bmp, 2);"
-            "note('6. You should see the green square and the blue square\n"
-            "under the red square. The purple square should still be there.\n"
-            "Click to proceed');"
+            "note('6. You should see the green square and the blue square "
+            "under the red square. The purple square should still be there. "
+            "Click to proceed.');"
             "stop();"
             );
 
     SWFMovie_nextFrame(mo);
 
     add_actions(mo, "_root.attachBitmap(bmp, 3);"
-            "note('7. There should have been no change. Click to proceed');"
+            "note('7. There should have been no change. Click to proceed.');"
             "stop();"
             );
 
     SWFMovie_nextFrame(mo);
     
     add_actions(mo, "_root.attachBitmap(bmp2, 20);"
-            "note('8. The purple square should have gone. The small yellow square\n"
-            "should have replaced the top left corner of the red square.');"
+            "note('8. The purple square should have gone. The small yellow "
+            "square should have replaced the top left corner of the red "
+            "square. Click to proceed.');"
             "stop();"
             );
 
+    SWFMovie_nextFrame(mo);    
+
+    add_actions(mo, "bmp.dispose(); bmp2.dispose();"
+            "note('9. You should see just the red square. Click to proceed.');"
+            "stop();"
+            );
+
+    SWFMovie_nextFrame(mo);    
+
+    add_actions(mo, "bmp = new BitmapData(100, 100, false, 0x0000ff);"
+            "note('10. There should have been no change. Click to proceed.');"
+            "stop();"
+            );
+
+    SWFMovie_nextFrame(mo);    
+    
+    add_actions(mo, "bmp3 = new BitmapData(100, 100, false);"
+            "rect3 = new Rectangle(20, 20, 90, 90);"
+            "bmp3.fillRect(rect3, 0x0000ff);"
+            "_root.createEmptyMovieClip('original', 40);"
+            "ch = original.attachBitmap(bmp3, getNextHighestDepth());"
+            "ch._name = 'duplicate';"
+            "newch = _root.createEmptyMovieClip('original', "
+                    "getNextHighestDepth());"
+            "note('11. You should see a large blue square only. "
+            "Click to proceed.');"
+            "stop();"
+            );
+
+    SWFMovie_nextFrame(mo);    
+    
+    add_actions(mo, 
+            "duplicate.removeMovieClip();"
+            "note('12. There should have been no change. Click to proceed.');"
+            "stop();"
+            );
+
+    SWFMovie_nextFrame(mo);    
+    
+    add_actions(mo, 
+            "original.removeMovieClip();"
+            "note('13. You should see the red square again. Click to "
+            "proceed.');"
+            "stop();"
+            );
+
+    SWFMovie_nextFrame(mo);
+
+    add_actions(mo,
+            "_root.createEmptyMovieClip('mcLeft', getNextHighestDepth());"
+            "mcLeft.duplicateMovieClip('mcMiddle', getNextHighestDepth(),"
+                        " { _x: 300, _y: 0 } );"
+            "mcLeft.attachBitmap(bmp3, getNextHighestDepth());"
+            "mcMiddle.attachBitmap(bmp3, getNextHighestDepth());"
+            "mcMiddle.duplicateMovieClip('mcRight', getNextHighestDepth(),"
+                        " { _x: 600, _y: 0 } );"
+            "note('14. You should see two blue squares. Click to proceed.');"
+            "stop();"
+            );
+
+    SWFMovie_nextFrame(mo);
+
+    add_actions(mo,
+            "bmp3.noise(293);"
+            "note('15. You should see two noise patterns where the two "
+            "squares were. Click to proceed.');"
+            "stop();"
+            );
+    SWFMovie_nextFrame(mo);
+
     add_actions(mo, "_root.onKeyDown = _root.onMouseUp = undefined;"
             "_root.eof = true;" // hook for test runner...
-            "note('\n - END OF TEST - thanks for flying with us ! ');"
+            "note(' - END OF TEST - thanks for flying with us ! ');"
             //"totals(6);" // no AS based tests...
             );
 
