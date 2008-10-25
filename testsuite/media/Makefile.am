@@ -19,9 +19,7 @@ EXTRA_DIST = \
 	README \
 	Bitstream-Vera-Sans.fdb \
 	Bitstream-Vera-Sans.COPYRIGHT \
-	default.orc \
 	gnash.xml \
-	majorscale.sco \
 	offspring.swf \
 	offspring.jpg \
 	green.jpg \
@@ -35,7 +33,12 @@ EXTRA_DIST = \
 	square.flv \
 	square.ogg \
 	vars.txt \
-	vars2.txt 
+	vars2.txt \
+	default.orc \
+	brokenchord.sco \
+	majorscale.sco \
+	brokenchord.wav \
+	$(NULL)
 
 .sco.wav:
 	$(CSOUND) --nodisplays --wave -o $(srcdir)/$@ $(srcdir)/default.orc $<
