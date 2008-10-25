@@ -26,7 +26,6 @@
 #include "sound_handler.h"
 #include "sound_definition.h" // for sound_sample
 #include "movie_definition.h"
-#include "MovieClip.h"
 #include "fn_call.h"
 #include "GnashException.h"
 #include "builtin_function.h"
@@ -434,12 +433,6 @@ Sound::getPosition()
 	return 0;
 
 }
-
-
-
-
-
-
 
 
 bool

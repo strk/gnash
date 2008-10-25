@@ -264,9 +264,12 @@ loadvars_ctor(const fn_call& fn)
 
 	if ( fn.nargs )
 	{
-		std::stringstream ss;
-		fn.dump_args(ss);
-		log_unimpl("new LoadVars(%s) - arguments discarded", ss.str().c_str()); // or ASERROR ?
+        IF_VERBOSE_ASCODING_ERRORS(
+		    std::ostringstream ss;
+		    fn.dump_args(ss);
+		    log_aserror("new LoadVars(%s) - arguments discarded",
+                ss.str());
+        );
 	}
 	
 	return as_value(obj.get()); // will keep alive

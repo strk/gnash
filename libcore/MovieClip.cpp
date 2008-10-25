@@ -2489,7 +2489,8 @@ attachMovieClipInterface(as_object& o)
                 &movieclip_opaqueBackground);
         o.init_property("scale9Grid", &movieclip_scale9Grid,
                 movieclip_scale9Grid);
-        o.init_property("scrollRect", &movieclip_scrollRect, &movieclip_scrollRect);
+        o.init_property("scrollRect", &movieclip_scrollRect,
+			&movieclip_scrollRect);
         o.init_property("tabIndex", &movieclip_tabIndex, &movieclip_tabIndex);
         o.init_property("transform", &movieClip_transform, 
                 &movieClip_transform);

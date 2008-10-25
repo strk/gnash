@@ -155,14 +155,16 @@ GtkGui::init(int argc, char **argv[])
     g_object_ref(G_OBJECT(_drawingArea));
 
     _resumeButton = gtk_button_new();
-    gtk_container_add(GTK_CONTAINER(_resumeButton), gtk_label_new(_("Click to play")));
+    gtk_container_add(GTK_CONTAINER(_resumeButton),
+            gtk_label_new(_("Click to play")));
     gtk_widget_show_all(_resumeButton);
 
     // Same here.
     g_object_ref(G_OBJECT(_resumeButton));
 
     // This callback indirectly results in playHook() being called.
-    g_signal_connect(G_OBJECT(_resumeButton), "clicked", G_CALLBACK (menuitem_play_callback), this);
+    g_signal_connect(G_OBJECT(_resumeButton), "clicked",
+            G_CALLBACK(menuitem_play_callback), this);
 
     // If we don't set this flag we won't be able to grab focus
     // ( grabFocus() would be a no-op )
@@ -2543,7 +2545,8 @@ void
 GtkGui::stopHook()
 {
 
-    // FIXME: this can't work for the stand-alone player, because _drawingArea is
+    // FIXME: this can't work for the stand-alone player, because
+    // _drawingArea is
     // packed into a vbox.
     if (! _xid) return;
 
