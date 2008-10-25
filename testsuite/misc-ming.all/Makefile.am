@@ -454,7 +454,8 @@ eventSoundTest1_SOURCES = eventSoundTest1.c
 eventSoundTest1_LDADD = libgnashmingutils.la
 
 eventSoundTest1.swf: eventSoundTest1
-	./eventSoundTest1 $(srcdir)/../media/sound1.mp3
+	./eventSoundTest1 $(srcdir)/../media/brokenchord.wav \
+	$(srcdir)/../media/
 
 eventSoundTest1_Runner_SOURCES = \
 	eventSoundTest1-Runner.cpp \

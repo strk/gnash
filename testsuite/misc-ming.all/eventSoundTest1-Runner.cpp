@@ -26,6 +26,8 @@
 #include "DisplayList.h"
 #include "log.h"
 #include "GnashException.h"
+#include "GnashSleep.h"
+#include "VM.h"
 
 #include "check.h"
 
@@ -58,13 +60,15 @@ main(int /*argc*/, char** /*argv*/)
 	tester.advance();
 
 	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
-	dbglogfile.setVerbosity(1);
-	dbglogfile.setActionDump(1);
+	//dbglogfile.setActionDump(1);
 
 	sprite_instance* root = tester.getRootMovie();
 	assert(root);
 
-	check_equals(root->get_frame_count(), 20);
+	VM& vm = root->getVM();
+	string_table& st = vm.getStringTable();
+
+	//check_equals(root->get_frame_count(), 20);
 
 	if ( ! tester.canTestSound() )
 	{
@@ -72,23 +76,50 @@ main(int /*argc*/, char** /*argv*/)
 		return EXIT_SUCCESS; // so testing doesn't abort
 	} 
 
+	const int totalFrames = root->get_frame_count();
+
+	// Make sure you adjust this with the test!
+	cerr << "Total frames: " <<  totalFrames;
+	assert (totalFrames == 14);
+
+	int numSoundsStarted[] = {
+		0,
+		4,
+		6
+	};
+
+	bool testPasses[] = {
+		true,
+		true,
+		false
+	};
+
 	// Advance and check...
-	int frame = root->get_current_frame(); // 1
-	int sounds = 1;
-	while (frame < 21) {
-//		check_equals(root->get_current_frame(), frame);
-		check_equals(tester.soundsStarted(), sounds);
-		tester.advance();
-		frame++;
+	int frame = root->get_current_frame();
+	int test = 0;
+	while (frame <= totalFrames) {
+		as_value testReady;
+		if (root->get_member(st.find("testReady"), &testReady))
+		{
+			root->delProperty(st.find("testReady"));
+			
+			// When a test is ready, check the result of the previous test.
+			if (testPasses[test]) {
+				check_equals(tester.soundsStarted(), numSoundsStarted[test]);
+			}
+			else {
+				xcheck_equals(tester.soundsStarted(), numSoundsStarted[test]);
+			}
+			check_equals(tester.soundsStopped(), tester.soundsStarted());
+			++test;
+			tester.click();
 
-//		check_equals(root->get_current_frame(), frame);
-		check_equals(tester.soundsStopped(), sounds);
+		}
 		tester.advance();
 		frame++;
-		sounds++;		
+		// Frame length should be 2 seconds.
+		gnashSleep(2000000);
 	}
-
-	check_equals(tester.soundsStopped(), tester.soundsStarted());
 
 }
 
