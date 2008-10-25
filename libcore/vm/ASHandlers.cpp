@@ -1474,6 +1474,9 @@ SWFHandlers::ActionImplementsOp(ActionExec& thread)
     }
 }
 
+/// FsCommand2 is not part of the Flash spec. It belongs to
+/// Flash Lite (from 1.1 onwards) and is used to control
+/// devices (backlight, vibrate etc).
 void
 SWFHandlers::ActionFscommand2(ActionExec& thread)
 {
@@ -1486,7 +1489,6 @@ SWFHandlers::ActionFscommand2(ActionExec& thread)
     as_environment& env = thread.env;
 
     unsigned int off=0;
-
     
     const unsigned int nargs = env.top(off++).to_int();
 
@@ -1520,8 +1522,6 @@ SWFHandlers::ActionRandom(ActionExec& thread)
     // Math.random() in SWF5.
     
     as_environment& env = thread.env;
-
-    
 
     int max = env.top(0).to_int();
 
@@ -1837,8 +1837,6 @@ SWFHandlers::ActionMbOrd(ActionExec& thread)
         // No need to return - it works a bit.
     }
 
-    
-
     const std::string s = env.top(0).to_string();
     
     std::string::const_iterator it = s.begin(), e = s.end();
@@ -1864,8 +1862,6 @@ SWFHandlers::ActionMbChr(ActionExec& thread)
         log_unimpl(_("Not properly implemented for SWF5"));
         // No need to return.
     }
-
-    
 
     // Cut to uint16, as characters above 65535 'wrap around'
     const boost::uint16_t i = static_cast<boost::uint16_t> (env.top(0).to_int());
