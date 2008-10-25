@@ -22,7 +22,7 @@
 #include "log.h"
 #include "render.h"
 #include "StringPredicates.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 
 #include <typeinfo>
 #include <iostream>

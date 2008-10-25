@@ -30,7 +30,7 @@
 namespace gnash {
 	class text_character_def; 
 	class text_glyph_record; 
-	//class sprite_instance;
+	//class MovieClip;
 }
 
 namespace gnash {
@@ -106,7 +106,7 @@ public:
 	/// Set our text to the given string by effect of an update of a registered variable name
 	//
 	/// This cal only updates the text and is only meant to be called by ourselves
-	/// or by sprite_instance when a registered TextVariable is updated.
+	/// or by MovieClip when a registered TextVariable is updated.
 	void updateText(const std::string& s);
 
  	/// Return value of our text.
@@ -321,7 +321,7 @@ public:
 	//
 	/// This is to implement TextField.removeTextField, will
 	/// basically forward the request to its parent.
-	/// Eventually this and sprite_instance::removeMovieClip
+	/// Eventually this and MovieClip::removeMovieClip
 	/// will be merged in a single function to be later used
 	/// also for AS3 removeChild().
 	///
@@ -408,7 +408,7 @@ private:
 	/// Set our text to the given string by effect of an update of a registered variable name
 	//
 	/// This cal only updates the text and is only meant to be called by ourselves
-	/// or by sprite_instance when a registered TextVariable is updated.
+	/// or by MovieClip when a registered TextVariable is updated.
 	///
 	void updateText(const std::wstring& s);
 

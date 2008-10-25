@@ -127,7 +127,7 @@ StartSoundTag::read(SWFStream& in)
 }
 
 void
-StartSoundTag::execute(sprite_instance* /* m */, DisplayList& /* dlist */) const
+StartSoundTag::execute(MovieClip* /* m */, DisplayList& /* dlist */) const
 {
     //GNASH_REPORT_FUNCTION;
 

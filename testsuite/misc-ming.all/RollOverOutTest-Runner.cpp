@@ -21,7 +21,7 @@
 #define INPUT_FILENAME "RollOverOutTest.swf"
 
 #include "MovieTester.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "character.h"
 #include "DisplayList.h"
 #include "log.h"
@@ -42,11 +42,11 @@ main(int /*argc*/, char** /*argv*/)
 	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 	dbglogfile.setVerbosity(1);
 
-	sprite_instance* root = tester.getRootMovie();
+	MovieClip* root = tester.getRootMovie();
 	assert(root);
 
 	check_equals(root->get_frame_count(), 4);
-	check_equals(root->get_play_state(), sprite_instance::PLAY);
+	check_equals(root->get_play_state(), MovieClip::PLAY);
 	check_equals(root->get_current_frame(), 0);
 
 	tester.advance();  // advance to the second frame.
@@ -58,7 +58,7 @@ main(int /*argc*/, char** /*argv*/)
 
 	check_equals(mc1->get_visible(), true);
 	check_equals(mc2->get_visible(), false);
-	check_equals(root->get_play_state(), sprite_instance::STOP);
+	check_equals(root->get_play_state(), MovieClip::STOP);
 	check_equals(root->get_current_frame(), 1);
 
 	// we're in stop mode, so advance should not advance anything
@@ -73,7 +73,7 @@ main(int /*argc*/, char** /*argv*/)
 	tester.movePointerTo(60, 60);
 	tester.advance();
 	check_equals(root->get_current_frame(), 2);
-	check_equals(root->get_play_state(), sprite_instance::STOP);
+	check_equals(root->get_play_state(), MovieClip::STOP);
 	tester.advance();
 	check_equals(root->get_current_frame(), 2);
 

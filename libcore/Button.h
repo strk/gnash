@@ -31,7 +31,7 @@
 namespace gnash {
 
 // Forward declarations
-	class sprite_instance;
+	class MovieClip;
 	class button_character_definition;
 
 //

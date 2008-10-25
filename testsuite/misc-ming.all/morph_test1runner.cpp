@@ -21,7 +21,7 @@
 #define INPUT_FILENAME "morph_test1.swf"
 
 #include "MovieTester.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "character.h"
 #include "DisplayList.h"
 #include "log.h"
@@ -52,7 +52,7 @@ main(int /*argc*/, char** /*argv*/)
   int end_x = 700;  //end coordinates of LU point
   int end_y = 500;
 
-  sprite_instance* root = tester.getRootMovie();
+  MovieClip* root = tester.getRootMovie();
   assert(root);
   check_equals(root->get_frame_count(), 7);
   

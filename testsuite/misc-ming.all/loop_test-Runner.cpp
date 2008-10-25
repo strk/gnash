@@ -21,7 +21,7 @@
 #define INPUT_FILENAME "loop_test.swf"
 
 #include "MovieTester.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "character.h"
 #include "DisplayList.h"
 #include "log.h"
@@ -63,7 +63,7 @@ main(int /*argc*/, char** /*argv*/)
 	dbglogfile.setVerbosity(1);
 	//dbglogfile.setActionDump(1);
 
-	sprite_instance* root = tester.getRootMovie();
+	MovieClip* root = tester.getRootMovie();
 	assert(root);
 
 	size_t framecount = root->get_frame_count();
@@ -104,7 +104,7 @@ main(int /*argc*/, char** /*argv*/)
 
 		// Let's break if we stopped, as we'll print totals() thus
 		// enlarging invalidated bounds too ...
-		if (root->get_play_state() == sprite_instance::STOP) break;
+		if (root->get_play_state() == MovieClip::STOP) break;
 
 		// Compute 1-based currentFrame
 		size_t currentFrame = root->get_current_frame()+1;

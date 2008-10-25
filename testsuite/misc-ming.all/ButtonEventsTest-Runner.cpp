@@ -21,7 +21,7 @@
 #define INPUT_FILENAME "ButtonEventsTest.swf"
 
 #include "MovieTester.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "character.h"
 #include "DisplayList.h"
 #include "log.h"
@@ -230,7 +230,7 @@ main(int /*argc*/, char** /*argv*/)
 
 	std::string idleString = "Idle";
 
-	sprite_instance* root = tester.getRootMovie();
+	MovieClip* root = tester.getRootMovie();
 	assert(root);
 
 	check_equals(root->get_frame_count(), 7);
@@ -306,7 +306,7 @@ main(int /*argc*/, char** /*argv*/)
 	}
 
 	// last advance should not restart the loop (it's in STOP mode)
-        check_equals(root->get_play_state(), sprite_instance::STOP);
+        check_equals(root->get_play_state(), MovieClip::STOP);
 	check_equals(root->get_current_frame(), 6);
 
 }

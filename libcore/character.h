@@ -45,7 +45,7 @@
 
 // Forward declarations
 namespace gnash {
-  class sprite_instance;
+  class MovieClip;
   class movie_instance;
   class ExecutableCode;
   class action_buffer;
@@ -424,7 +424,7 @@ public:
   /// TODO: make const/return const& ?
   ///
   virtual as_environment& get_environment() {
-    // sprite_instance must override this
+    // MovieClip must override this
     // and any other character will have
     // a parent!
     assert(m_parent != NULL);
@@ -817,7 +817,7 @@ public:
   //
   /// By default calls get_root().
   ///
-  virtual const sprite_instance* getAsRoot() const;
+  virtual const MovieClip* getAsRoot() const;
 
   /// Find the object which is one degree removed from us,
   /// given the relative pathname.
@@ -938,7 +938,7 @@ public:
   /// notify_mouse_state().  Coordinates are in PIXELS, NOT TWIPS.
   ///
   /// The default implementation calls get_mouse_state against
-  /// the character's parent. The final parent (a sprite_instance)
+  /// the character's parent. The final parent (a MovieClip)
   /// will delegate the call to it's associated movie_root, which
   /// does all the work.
   ///

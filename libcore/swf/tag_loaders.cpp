@@ -42,7 +42,7 @@
 #include "image.h"
 #include "zlib_adapter.h"
 #include "sprite_definition.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "swf_function.h"
 #include "swf_event.h"
 #include "as_function.h"

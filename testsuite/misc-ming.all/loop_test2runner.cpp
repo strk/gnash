@@ -21,7 +21,7 @@
 #define INPUT_FILENAME "loop_test2.swf"
 
 #include "MovieTester.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "character.h"
 #include "DisplayList.h"
 #include "log.h"
@@ -64,13 +64,13 @@ main(int /*argc*/, char** /*argv*/)
 	int y = 330;
 
 	Ranges invalidated;
-	sprite_instance* root = tester.getRootMovie();
+	MovieClip* root = tester.getRootMovie();
 	assert(root);
 
 	// FRAME 1 (start)
 
 	check_equals(root->get_frame_count(), 4);
-	check_equals(root->get_play_state(), sprite_instance::PLAY);
+	check_equals(root->get_play_state(), MovieClip::PLAY);
 	check_equals(root->get_current_frame(), 0);
 	check_equals(root->getDisplayList().size(), 1);  // dejagnu clip
 	invalidated = tester.getInvalidatedRanges();
@@ -79,7 +79,7 @@ main(int /*argc*/, char** /*argv*/)
 	tester.advance(); // FRAME 2, place characters (black on top)
 	invalidated = tester.getInvalidatedRanges();
 	
-	check_equals(root->get_play_state(), sprite_instance::PLAY);
+	check_equals(root->get_play_state(), MovieClip::PLAY);
 	check_equals(root->get_current_frame(), 1);
 	check_equals(root->getDisplayList().size(), 3); // dejagnu + red square + black square
 
@@ -97,7 +97,7 @@ main(int /*argc*/, char** /*argv*/)
 	tester.advance(); // FRAME 3, depth-swap the two characters
 	invalidated = tester.getInvalidatedRanges();
 	
-	check_equals(root->get_play_state(), sprite_instance::PLAY);
+	check_equals(root->get_play_state(), MovieClip::PLAY);
 	check_equals(root->get_current_frame(), 2);
 	check_equals(root->getDisplayList().size(), 3); // dejagnu + red square + black square
 
@@ -116,7 +116,7 @@ main(int /*argc*/, char** /*argv*/)
 	tester.advance(); // FRAME 4, jump to frame 2 and stop
 	invalidated = tester.getInvalidatedRanges();
 
-	check_equals(root->get_play_state(), sprite_instance::STOP);
+	check_equals(root->get_play_state(), MovieClip::STOP);
 	check_equals(root->get_current_frame(), 1);
 	check_equals(root->getDisplayList().size(), 3); // dejagnu + red square + black square
 

@@ -21,7 +21,7 @@
 #include "StreamSoundBlockTag.h"
 #include "sound_handler.h" 
 #include "movie_definition.h" // for addControlTag
-#include "sprite_instance.h" // for execute
+#include "MovieClip.h" // for execute
 #include "SoundInfo.h" // for loader
 #include "SWFStream.h"
 #include "log.h" 
@@ -30,7 +30,7 @@ namespace gnash {
 namespace SWF {
 
 void
-StreamSoundBlockTag::execute(sprite_instance* m, DisplayList& /*dlist*/) const
+StreamSoundBlockTag::execute(MovieClip* m, DisplayList& /*dlist*/) const
 {
 	media::sound_handler* handler = get_sound_handler();
 	if (handler)

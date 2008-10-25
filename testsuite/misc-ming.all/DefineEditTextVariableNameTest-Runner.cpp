@@ -21,7 +21,7 @@
 #define INPUT_FILENAME "DefineEditTextVariableNameTest.swf"
 
 #include "MovieTester.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "character.h"
 #include "DisplayList.h"
 #include "log.h"
@@ -39,11 +39,11 @@ main(int /*argc*/, char** /*argv*/)
 	string filename = INPUT_FILENAME;
 	MovieTester tester(filename);
 
-	sprite_instance* root = tester.getRootMovie();
+	MovieClip* root = tester.getRootMovie();
 	assert(root);
 
 	check_equals(root->get_frame_count(), 14);
-	check_equals(root->get_play_state(), sprite_instance::PLAY);
+	check_equals(root->get_play_state(), MovieClip::PLAY);
 	check_equals(root->get_current_frame(), 0);
 
 	const character* mc1 = tester.findDisplayItemByName(*root, "mc1");
@@ -59,12 +59,12 @@ main(int /*argc*/, char** /*argv*/)
 	for (unsigned f=root->get_current_frame(); f<root->get_frame_count()-1; ++f)
 	{
 		check_equals(root->get_current_frame(), f);
-		check_equals(root->get_play_state(), sprite_instance::PLAY);
+		check_equals(root->get_play_state(), MovieClip::PLAY);
 		tester.advance();
 	}
 
 	// does stop() on last frame
-	check_equals(root->get_play_state(), sprite_instance::STOP);
+	check_equals(root->get_play_state(), MovieClip::STOP);
 	check_equals(root->get_current_frame(), root->get_frame_count()-1);
 
 }

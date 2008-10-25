@@ -33,7 +33,7 @@
 #include "as_function.h"
 #include "fn_call.h"
 #include "ActionExec.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "as_environment.h"
 #include "URL.h"
 #include "URLAccessManager.h" // for GetUrl actions
@@ -465,7 +465,7 @@ SWFHandlers::ActionNextFrame(ActionExec& thread)
 #endif
 
     character* tgtch = env.get_target();
-    sprite_instance* tgt = tgtch ? tgtch->to_movie() : 0;
+    MovieClip* tgt = tgtch ? tgtch->to_movie() : 0;
     if ( tgt ) tgt->goto_frame(tgt->get_current_frame() + 1);
     else log_debug(_("ActionNextFrame: as_environment target is null or not a sprite"));
 }
@@ -481,7 +481,7 @@ SWFHandlers::ActionPrevFrame(ActionExec& thread)
 #endif
 
     character* tgtch = env.get_target();
-    sprite_instance* tgt = tgtch ? tgtch->to_movie() : 0;
+    MovieClip* tgt = tgtch ? tgtch->to_movie() : 0;
     if ( tgt ) tgt->goto_frame(tgt->get_current_frame() - 1);
     else log_debug(_("ActionPrevFrame: as_environment target is null or not a sprite"));
 }
@@ -497,8 +497,8 @@ SWFHandlers::ActionPlay(ActionExec& thread)
 #endif
 
     character* tgtch = env.get_target();
-    sprite_instance* tgt = tgtch ? tgtch->to_movie() : 0;
-    if ( tgt ) tgt->set_play_state(sprite_instance::PLAY);
+    MovieClip* tgt = tgtch ? tgtch->to_movie() : 0;
+    if ( tgt ) tgt->set_play_state(MovieClip::PLAY);
     else log_debug(_("ActionPlay: as_environment target is null or not a sprite"));
 }
 
@@ -513,8 +513,8 @@ SWFHandlers::ActionStop(ActionExec& thread)
 #endif
 
     character* tgtch = env.get_target();
-    sprite_instance* tgt = tgtch ? tgtch->to_movie() : 0;
-    if ( tgt ) tgt->set_play_state(sprite_instance::STOP);
+    MovieClip* tgt = tgtch ? tgtch->to_movie() : 0;
+    if ( tgt ) tgt->set_play_state(MovieClip::STOP);
     else log_debug(_("ActionStop: as_environment target is null or not a sprite"));
 }
 
@@ -558,7 +558,7 @@ SWFHandlers::ActionGotoFrame(ActionExec& thread)
     size_t frame = code.read_int16(thread.getCurrentPC()+3);
 
     character* tgtch = env.get_target();
-    sprite_instance* tgt = tgtch ? tgtch->to_movie() : 0;
+    MovieClip* tgt = tgtch ? tgtch->to_movie() : 0;
 
     // frame number within this tag is hard-coded and 0-based
     if ( tgt ) tgt->goto_frame(frame);
@@ -629,10 +629,10 @@ SWFHandlers::ActionWaitForFrame(ActionExec& thread)
     boost::uint8_t skip = code[thread.getCurrentPC()+5];
 
     character* target = env.get_target();
-    sprite_instance* target_sprite = target ? target->to_movie() : 0;
+    MovieClip* target_sprite = target ? target->to_movie() : 0;
     if ( ! target_sprite )
     {
-        log_error(_("%s: environment target is null or not a sprite_instance"),
+        log_error(_("%s: environment target is null or not a MovieClip"),
                 __FUNCTION__);
         return;
     }
@@ -679,10 +679,10 @@ SWFHandlers::ActionGotoLabel(ActionExec& thread)
 
     const char* frame_label = code.read_string(thread.getCurrentPC()+3);
     character *target = env.get_target();
-    sprite_instance *target_sprite = target ? target->to_movie() : 0;
+    MovieClip *target_sprite = target ? target->to_movie() : 0;
     if ( ! target_sprite )
     {
-        log_error(_("%s: environment target is null or not a sprite_instance"),
+        log_error(_("%s: environment target is null or not a MovieClip"),
             __FUNCTION__);
     }
     else
@@ -1170,7 +1170,7 @@ SWFHandlers::ActionDuplicateClip(ActionExec& thread)
         return;
     }
 
-    boost::intrusive_ptr<sprite_instance> sprite = ch->to_movie();
+    boost::intrusive_ptr<MovieClip> sprite = ch->to_movie();
     if ( ! sprite )
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -1203,7 +1203,7 @@ SWFHandlers::ActionRemoveClip(ActionExec& thread)
         return;
     }
 
-    sprite_instance* sprite = ch->to_movie();
+    MovieClip* sprite = ch->to_movie();
     if ( ! sprite )
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -1312,7 +1312,7 @@ SWFHandlers::ActionStopDragMovie(ActionExec& thread)
     
     as_environment& env = thread.env;
     character* tgtch = env.get_target();
-    sprite_instance *root_movie = tgtch ? tgtch->get_root() : 0;
+    MovieClip *root_movie = tgtch ? tgtch->get_root() : 0;
     if ( root_movie ) root_movie->stop_drag();
     else log_debug(_("ActionStopDragMovie: as_environment target is null or not a sprite"));
 }
@@ -1895,10 +1895,10 @@ SWFHandlers::ActionWaitForFrameExpression(ActionExec& thread)
     as_value framespec = env.pop();
 
     character* tgtch = env.get_target();
-    sprite_instance* target_sprite = tgtch ? tgtch->to_movie() : 0;
+    MovieClip* target_sprite = tgtch ? tgtch->to_movie() : 0;
     if ( ! target_sprite )
     {
-        log_error(_("%s: environment target is null or not a sprite_instance"),
+        log_error(_("%s: environment target is null or not a MovieClip"),
             __FUNCTION__);
         return;
     }
@@ -2163,17 +2163,17 @@ SWFHandlers::CommonGetUrl(as_environment& env,
     bool loadTargetFlag    = method & 64;
     bool loadVariableFlag  = method & 128;
 
-    sprite_instance::MovieClipMethod sendVarsMethod;
+    MovieClip::MovieClipMethod sendVarsMethod;
 
     // handle malformed sendVarsMethod
     if ((method & 3) == 3)
     {
         log_error(_("Bogus GetUrl2 send vars method "
             " in SWF file (both GET and POST requested), use GET"));
-        sendVarsMethod = sprite_instance::METHOD_GET;
+        sendVarsMethod = MovieClip::METHOD_GET;
     }
     else sendVarsMethod =
-        static_cast<sprite_instance::MovieClipMethod>(method & 3);
+        static_cast<MovieClip::MovieClipMethod>(method & 3);
 
     std::string target_string;
     if ( ! target.is_undefined() && ! target.is_null() )
@@ -2230,10 +2230,10 @@ SWFHandlers::CommonGetUrl(as_environment& env,
         return;
     }
 
-    bool post = (sendVarsMethod == sprite_instance::METHOD_POST);
+    bool post = (sendVarsMethod == MovieClip::METHOD_POST);
 
     std::string varsToSend;
-    if (sendVarsMethod != sprite_instance::METHOD_NONE)
+    if (sendVarsMethod != MovieClip::METHOD_NONE)
     {
 
         // TESTED: variables sent are those in current target,
@@ -2258,7 +2258,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
     }
 
     character* target_ch = env.find_target(target.to_string());
-    sprite_instance* target_movie = target_ch ? target_ch->to_movie() : 0;
+    MovieClip* target_movie = target_ch ? target_ch->to_movie() : 0;
 
     if (loadVariableFlag)
     {
@@ -2285,7 +2285,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
             log_unimpl(_("POST with loadVariables ignored"));
         }
         target_movie->loadVariables(url,
-                static_cast<sprite_instance::MovieClipMethod>(sendVarsMethod));
+                static_cast<MovieClip::MovieClipMethod>(sendVarsMethod));
 
         return;
     }
@@ -2470,7 +2470,7 @@ SWFHandlers::ActionCallFrame(ActionExec& thread)
         target = env.get_target();
     }
 
-    sprite_instance *target_sprite = target ? target->to_movie() : NULL;
+    MovieClip *target_sprite = target ? target->to_movie() : NULL;
     if(target_sprite)
     {
         target_sprite->call_frame_actions(frame_var);
@@ -2509,7 +2509,7 @@ SWFHandlers::ActionGotoExpression(ActionExec& thread)
     // frame is shown in stop mode.
 
     unsigned char play_flag = code[pc + 3];
-    sprite_instance::play_state state = play_flag ? sprite_instance::PLAY : sprite_instance::STOP;
+    MovieClip::play_state state = play_flag ? MovieClip::PLAY : MovieClip::STOP;
 
     std::string target_frame = env.pop().to_string();
     std::string target_path;
@@ -2529,7 +2529,7 @@ SWFHandlers::ActionGotoExpression(ActionExec& thread)
         frame_var = target_frame;
     }
 
-    sprite_instance *target_sprite = target ? target->to_movie() : NULL;
+    MovieClip *target_sprite = target ? target->to_movie() : NULL;
     if(target_sprite)
     {
         size_t frame_number;
@@ -2878,7 +2878,7 @@ SWFHandlers::ActionTargetPath(ActionExec& thread)
 
     as_environment& env = thread.env;
 
-    boost::intrusive_ptr<sprite_instance> sp = env.top(0).to_sprite();
+    boost::intrusive_ptr<MovieClip> sp = env.top(0).to_sprite();
     if ( sp )
     {
         env.top(0).set_string(sp->getTarget());

@@ -42,7 +42,7 @@
 // Forward declarations
 namespace gnash {
 	class as_function;
-	class sprite_instance;
+	class MovieClip;
 	class character;
 	class as_environment;
 	class VM;
@@ -815,9 +815,9 @@ public:
 			int setTrue, int setFalse=0, string_table::key nsname = 0);
 
 	/// Cast to a sprite, or return NULL
-	virtual sprite_instance* to_movie() { return NULL; }
+	virtual MovieClip* to_movie() { return NULL; }
 
-	const sprite_instance* to_movie() const { return const_cast<as_object*>(this)->to_movie(); }
+	const MovieClip* to_movie() const { return const_cast<as_object*>(this)->to_movie(); }
 
 	/// Cast to a as_function, or return NULL
 	virtual as_function* to_function() { return NULL; }

@@ -21,7 +21,7 @@
 #define INPUT_FILENAME "loadMovieTest.swf"
 
 #include "MovieTester.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "character.h"
 #include "DisplayList.h"
 #include "log.h"
@@ -38,13 +38,13 @@ using namespace gnash;
 using namespace std;
 
 std::auto_ptr<MovieTester> tester;
-boost::intrusive_ptr<sprite_instance> root;
+boost::intrusive_ptr<MovieClip> root;
 
-sprite_instance*
+MovieClip*
 getCoverArt()
 {
 	character* coverartch = const_cast<character*>(tester->findDisplayItemByName(*root, "coverart"));
-	sprite_instance* coverart = coverartch->to_movie();
+	MovieClip* coverart = coverartch->to_movie();
 
 	//log_debug("Coverart is %p, displaylist is:", coverart);
 	//coverart->getDisplayList().dump();
@@ -55,7 +55,7 @@ getCoverArt()
 void
 checkScribbling()
 {
-	sprite_instance* coverart = getCoverArt();
+	MovieClip* coverart = getCoverArt();
 
 	size_t initial_child_count = coverart->getDisplayList().size();
 
@@ -104,7 +104,7 @@ main(int /*argc*/, char** /*argv*/)
 
 	// Verify that 'coverart' exists and is empty
 	character* coverartch = const_cast<character*>(tester->findDisplayItemByName(*root, "coverart"));
-	sprite_instance* coverart = coverartch->to_movie();
+	MovieClip* coverart = coverartch->to_movie();
 	check(coverart);
 	url = coverart->get_movie_definition()->get_url();
 	check_equals(coverart->get_movie_definition()->get_url(), baseURL.str());

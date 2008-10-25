@@ -21,7 +21,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "gui.h"
 #include "render.h"  // debug
 #include "render_handler.h"
@@ -930,7 +930,7 @@ Gui::advanceMovie()
 	m->advance();
 	m->get_movie_definition()->ensure_frame_loaded(tot_frames);
 	m->goto_frame(cur_frame+1);
-    	m->set_play_state(gnash::sprite_instance::PLAY);
+    	m->set_play_state(gnash::MovieClip::PLAY);
 	log_debug(_("Frame %d"), m->get_current_frame());
 #endif
 
@@ -979,7 +979,7 @@ Gui::advanceMovie()
 	if ( ! loops() )
 	{
 		size_t curframe = m->get_current_frame(); // can be 0 on malformed SWF
-		gnash::sprite_instance* si = m->getRootMovie();
+		gnash::MovieClip* si = m->getRootMovie();
 		if (curframe + 1 >= si->get_frame_count())
 		{
 			quit(); 

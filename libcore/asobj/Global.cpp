@@ -72,7 +72,7 @@
 #include "flash_pkg.h"
 
 #include "fn_call.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 
 #include <limits> // for numeric_limits<double>::infinity
 #include <sstream>

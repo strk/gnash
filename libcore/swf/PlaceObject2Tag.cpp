@@ -27,7 +27,7 @@
 
 #include "PlaceObject2Tag.h"
 #include "character.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "swf_event.h"
 #include "log.h"
 #include "SWFStream.h"
@@ -498,7 +498,7 @@ PlaceObject2Tag::read(SWFStream& in, tag_type tag)
 
 /// Place/move/whatever our object in the given movie.
 void
-PlaceObject2Tag::execute(sprite_instance* m, DisplayList& dlist) const
+PlaceObject2Tag::execute(MovieClip* m, DisplayList& dlist) const
 {
     switch ( getPlaceType() ) 
     {

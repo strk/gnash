@@ -25,7 +25,7 @@
 #include "log.h"
 #include "render.h" // for display()
 #include "movie_definition.h" // to extract version info
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "edit_text_character.h"
 #include "Key_as.h" // for keyboard events
 #include "movie_root.h"	 // for killing focus
@@ -555,7 +555,7 @@ edit_text_character::removeTextField()
 	character* parent = get_parent();
 	assert(parent); // every TextField must have a parent, right ?
 
-	sprite_instance* parentSprite = parent->to_movie();
+	MovieClip* parentSprite = parent->to_movie();
 
 	if ( ! parentSprite )
 	{
@@ -564,7 +564,7 @@ edit_text_character::removeTextField()
 	}
 
 	// second argument is arbitrary, see comments above
-	// the function declaration in sprite_instance.h
+	// the function declaration in MovieClip.h
 	parentSprite->remove_display_object(depth, 0);
 }
 
@@ -845,7 +845,7 @@ edit_text_character::setTextValue(const std::wstring& wstr)
 
 	if ( ! _variable_name.empty() && _text_variable_registered )
 	{
-		// TODO: notify sprite_instance if we have a variable name !
+		// TODO: notify MovieClip if we have a variable name !
 		VariableRef ref = parseTextVariableRef(_variable_name);
 		as_object* tgt = ref.first;
 		if ( tgt )
@@ -1752,7 +1752,7 @@ edit_text_character::registerTextVariable()
 #endif
 	}
 
-	sprite_instance* sprite = target->to_movie();
+	MovieClip* sprite = target->to_movie();
 
 	if ( sprite )
 	{

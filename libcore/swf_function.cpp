@@ -19,7 +19,7 @@
 #include "swf_function.h"
 #include "array.h"
 #include "fn_call.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "action_buffer.h"
 #include "ActionExec.h" // for operator()
 #include "VM.h" // for storing _global in a local register
@@ -300,7 +300,7 @@ swf_function::operator()(const fn_call& fn)
 			if ( tgtch )
 			{
 				// NOTE: _lockroot will be hanlded by getAsRoot()
-				as_object* r = const_cast<sprite_instance*>(tgtch->getAsRoot());
+				as_object* r = const_cast<MovieClip*>(tgtch->getAsRoot());
 				our_env->setRegister(current_reg, as_value(r));
 				current_reg++;
 			}

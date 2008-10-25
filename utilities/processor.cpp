@@ -37,7 +37,7 @@
 #include "ClockTime.h"
 #include "gnash.h"
 #include "movie_definition.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "movie_root.h"
 #include "log.h"
 #include "rc.h"
@@ -513,7 +513,7 @@ play_movie(const char* filename)
 			fprintf(stderr, "Kicking movie after %g seconds in STOP mode, kick ct = %d\n", waitforadvance, kick_count);
 			fflush(stderr);
 			m.goto_frame(last_frame + 1);
-			m.set_play_state(gnash::sprite_instance::PLAY);
+			m.set_play_state(gnash::MovieClip::PLAY);
 			kick_count++;
 
 			if (kick_count > 10) {

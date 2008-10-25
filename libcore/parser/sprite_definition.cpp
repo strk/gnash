@@ -21,7 +21,7 @@
 #endif
 
 #include "smart_ptr.h" // GNASH_USE_GC
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "sprite_definition.h"
 #include "ControlTag.h" // for dtor visibility
 #include "as_function.h" // for dtor visibility
@@ -45,7 +45,7 @@ sprite_definition::create_character_instance(character* parent,
 #ifdef DEBUG_REGISTER_CLASS
 	log_debug(_("Instantiating sprite_def %p"), (void*)this);
 #endif
-	sprite_instance* si = new sprite_instance(this,
+	MovieClip* si = new MovieClip(this,
 	parent->get_root(), parent, id);
 	return si;
 }

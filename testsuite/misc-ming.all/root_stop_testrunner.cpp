@@ -23,7 +23,7 @@
 #define HAVE_CONFIG_H  1
 
 #include "MovieTester.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "character.h"
 #include "DisplayList.h"
 #include "log.h"
@@ -41,61 +41,61 @@ main(int /*argc*/, char** /*argv*/)
 	string filename = string(TGTDIR) + string("/") + string(INPUT_FILENAME);
 	MovieTester tester(filename);
 
-	sprite_instance* root = tester.getRootMovie();
+	MovieClip* root = tester.getRootMovie();
 	assert(root);
 
 	check_equals(root->get_frame_count(), 2);
 	check_equals(root->get_current_frame(), 0);
-	check_equals(root->get_play_state(), sprite_instance::STOP);
+	check_equals(root->get_play_state(), MovieClip::STOP);
 
 	const character* ch = tester.findDisplayItemByName(*root, "mc_in_root");
 	check(ch);
-	const sprite_instance* mc = dynamic_cast<const sprite_instance*>(ch);
+	const MovieClip* mc = dynamic_cast<const MovieClip*>(ch);
 	check(mc);
 	check_equals(mc->get_current_frame(), 0);
-	check_equals(mc->get_play_state(), sprite_instance::PLAY);
+	check_equals(mc->get_play_state(), MovieClip::PLAY);
 
 	tester.advance();
 	check_equals(root->get_current_frame(), 0);  // we were in stop mode
 	check_equals(mc->get_current_frame(), 1); 
-	check_equals(root->get_play_state(), sprite_instance::STOP);
-	check_equals(mc->get_play_state(), sprite_instance::PLAY);
+	check_equals(root->get_play_state(), MovieClip::STOP);
+	check_equals(mc->get_play_state(), MovieClip::PLAY);
 
 	tester.advance();
 	check_equals(root->get_current_frame(), 0); // we were in stop mode
 	check_equals(mc->get_current_frame(), 2);  
-	check_equals(root->get_play_state(), sprite_instance::STOP);
-	check_equals(mc->get_play_state(), sprite_instance::PLAY);
+	check_equals(root->get_play_state(), MovieClip::STOP);
+	check_equals(mc->get_play_state(), MovieClip::PLAY);
 
 	tester.advance();
 	check_equals(root->get_current_frame(), 0); // we were in stop mode
 	check_equals(mc->get_current_frame(), 0); 
-	check_equals(root->get_play_state(), sprite_instance::PLAY);
-	check_equals(mc->get_play_state(), sprite_instance::PLAY);
+	check_equals(root->get_play_state(), MovieClip::PLAY);
+	check_equals(mc->get_play_state(), MovieClip::PLAY);
 
 	tester.advance();
 	check_equals(root->get_current_frame(), 1); 
 	check_equals(mc->get_current_frame(), 1); 
-	check_equals(root->get_play_state(), sprite_instance::PLAY);
-	check_equals(mc->get_play_state(), sprite_instance::PLAY);
+	check_equals(root->get_play_state(), MovieClip::PLAY);
+	check_equals(mc->get_play_state(), MovieClip::PLAY);
 
 	tester.advance();
 	check_equals(root->get_current_frame(), 0);  // looped
 	check_equals(mc->get_current_frame(), 2); 
-	check_equals(root->get_play_state(), sprite_instance::PLAY);
-	check_equals(mc->get_play_state(), sprite_instance::PLAY);
+	check_equals(root->get_play_state(), MovieClip::PLAY);
+	check_equals(mc->get_play_state(), MovieClip::PLAY);
 
 	tester.advance();
 	check_equals(root->get_current_frame(), 1); 
 	check_equals(mc->get_current_frame(), 0); 
-	check_equals(root->get_play_state(), sprite_instance::PLAY);
-	check_equals(mc->get_play_state(), sprite_instance::PLAY);
+	check_equals(root->get_play_state(), MovieClip::PLAY);
+	check_equals(mc->get_play_state(), MovieClip::PLAY);
 
 	tester.advance();
 	check_equals(root->get_current_frame(), 0); // looped again
 	check_equals(mc->get_current_frame(), 1); 
-	check_equals(root->get_play_state(), sprite_instance::PLAY);
-	check_equals(mc->get_play_state(), sprite_instance::PLAY);
+	check_equals(root->get_play_state(), MovieClip::PLAY);
+	check_equals(mc->get_play_state(), MovieClip::PLAY);
   	
 	return 0;
 }

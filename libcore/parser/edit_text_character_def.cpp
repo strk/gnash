@@ -207,7 +207,7 @@ edit_text_character_def::edit_text_character_def()
 			       // use device fonts by default (so not use outline ones)
 	m_font_id(-1),
 	m_font(),
-	m_text_height(1), // TODO: initialize to a meaningful value (see sprite_instance::add_textfield)
+	m_text_height(1), // TODO: initialize to a meaningful value (see MovieClip::add_textfield)
 			  //       and make sure get_font_height is not called for rendering purposes
 			  //       (instead call a method of edit_text_character_def)
 	m_max_length(0),
