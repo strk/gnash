@@ -36,7 +36,7 @@ rpm redhat: snapshot spec
 	-@now=`date "+%Y%m%d"`; \
 	pkgname="gnash-trunk_$${now}"; \
 	snapshot_tar="$${pkgname}.tar.gz"; \
-	cp $${snapshot_tar} /usr/src/redhat/SOURCES/gnash_$${npw}.tar.gz
+	cp $${snapshot_tar} /usr/src/redhat/SOURCES/gnash_$${now}.tar.gz
 	rpmbuild -ba $(RPMBUILD_FLAGS) gnash.spec
 
 .PHONY : rpm redhat
