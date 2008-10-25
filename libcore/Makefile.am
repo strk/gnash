@@ -79,7 +79,7 @@ libgnashcore_la_SOURCES = \
 	movie_root.cpp \
 	namedStrings.cpp \
 	rect.cpp \
-	sprite_instance.cpp \
+	MovieClip.cpp \
 	swf/TagLoadersTable.cpp	\
 	swf/tag_loaders.cpp \
 	swf/DefineFontAlignZonesTag.cpp \
@@ -166,7 +166,7 @@ noinst_HEADERS = \
 	render.h \
 	resource.h \
 	shape.h	\
-	sprite_instance.h \
+	MovieClip.h \
 	SWFStream.h \
 	styles.h \
 	swf.h \

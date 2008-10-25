@@ -46,7 +46,7 @@ namespace gnash {
 	class as_object;
 	class fn_call;
 	class as_function;
-	class sprite_instance;
+	class MovieClip;
 	class character;
 	class asNamespace;
 	class asName;
@@ -405,7 +405,7 @@ public:
 	/// This is just a wrapper around to_character() performing 
 	/// an additional final cast.
 	///
-	sprite_instance* to_sprite(bool skipRebinding=false) const;
+	MovieClip* to_sprite(bool skipRebinding=false) const;
 
 	/// Return value as a character or NULL if this is not possible.
 	//
@@ -511,7 +511,7 @@ public:
 
 	void set_bool(bool val);
 
-	void set_sprite(sprite_instance& sp);
+	void set_sprite(MovieClip& sp);
 
 	void set_character(character& sp);
 
@@ -628,7 +628,7 @@ private:
 
 	AsType m_type;
 
-	typedef sprite_instance* SpritePtr;
+	typedef MovieClip* SpritePtr;
 	typedef character* CharacterPtr;
 	typedef boost::intrusive_ptr<as_function> AsFunPtr;
 	typedef boost::intrusive_ptr<as_object> AsObjPtr;

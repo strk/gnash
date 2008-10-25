@@ -18,7 +18,7 @@
 // 
 
 
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "video_stream_instance.h"
 #include "video_stream_def.h"
 #include "fn_call.h"

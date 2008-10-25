@@ -24,7 +24,7 @@
 
 #include "ControlTag.h" // for inheritance
 #include "swf.h" // for tag_type definition
-#include "sprite_instance.h" // for inlines (execute)
+#include "MovieClip.h" // for inlines (execute)
 #include "movie_definition.h" // for inlines (loader)
 #include "log.h" // for log_parse
 #include "RGBA.h" // for rgba class
@@ -82,7 +82,7 @@ public:
 		read(in);
 	}
 
-	void execute(sprite_instance* m, DisplayList& /*dlist*/) const
+	void execute(MovieClip* m, DisplayList& /*dlist*/) const
 	{
 		float	current_alpha = m->get_background_alpha();
 		rgba newcolor = m_color; // to avoid making m_color mutable
@@ -90,7 +90,7 @@ public:
 		m->set_background_color(newcolor);
 	}
 
-	void execute_state(sprite_instance* m, DisplayList& dlist) const
+	void execute_state(MovieClip* m, DisplayList& dlist) const
 	{
 		execute(m, dlist);
 	}

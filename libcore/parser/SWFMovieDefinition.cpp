@@ -24,7 +24,7 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "SWFMovieDefinition.h"
 #include "movie_definition.h" // for inheritance
-#include "sprite_instance.h" // for ??
+#include "MovieClip.h" // for ??
 #include "zlib_adapter.h"
 #include "IOChannel.h" // for use
 #include "SWFStream.h"
@@ -32,7 +32,7 @@
 //#include "fontlib.h"
 #include "font.h"
 #include "log.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "movie_instance.h"
 #include "bitmap_character_def.h"
 #include "swf/TagLoadersTable.h"

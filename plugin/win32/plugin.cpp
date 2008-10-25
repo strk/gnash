@@ -510,7 +510,7 @@ nsPluginInstance::threadMain(void)
         // DBG("Ensuring frame is loaded.\n");
         root.get_movie_definition()->ensure_frame_loaded(tot_frames);
         // DBG("Setting play state to PLAY.\n");
-        root.set_play_state(gnash::sprite_instance::PLAY);
+        root.set_play_state(gnash::MovieClip::PLAY);
 
         if (old_mouse_x != mouse_x || old_mouse_y != mouse_y) {
             old_mouse_x = mouse_x;
@@ -578,7 +578,7 @@ nsPluginInstance::getVersion()
 }
 
 void
-nsPluginInstance::FSCommand_callback(gnash::sprite_instance* movie, const std::string& command, const std::string& args)
+nsPluginInstance::FSCommand_callback(gnash::MovieClip* movie, const std::string& command, const std::string& args)
 // For handling notification callbacks from ActionScript.
 {
     gnash::log_debug(_("FSCommand_callback(%p): %s %s"), (void*) movie, command, args);

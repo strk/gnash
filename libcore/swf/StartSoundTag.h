@@ -107,7 +107,7 @@ class StartSoundTag : public ControlTag
 
 public:
 
-	void	execute(sprite_instance* /* m */, DisplayList& /* dlist */) const;
+	void	execute(MovieClip* /* m */, DisplayList& /* dlist */) const;
 
 	/// Load a SWF::STARTSOUND tag.
 	static void loader(SWFStream& in, tag_type tag, movie_definition& m);

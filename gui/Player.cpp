@@ -31,7 +31,7 @@
 #include "gnash.h" // still needed ?
 #include "movie_definition.h"
 #include "sound_handler.h" // for set_sound_handler and create_sound_handler_*
-#include "sprite_instance.h" // for setting FlashVars
+#include "MovieClip.h" // for setting FlashVars
 #include "movie_root.h" 
 #include "Player.h"
 

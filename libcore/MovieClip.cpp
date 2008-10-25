@@ -1,4 +1,4 @@
-// sprite_instance.cpp:  Stateful live Sprite instance, for Gnash.
+// MovieClip.cpp:  Stateful live Sprite instance, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
@@ -23,7 +23,7 @@
 
 #include "log.h" 
 #include "action.h" // for call_method_parsed (call_method_args)
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "movie_definition.h"
 #include "MovieClipLoader.h" // @@ temp hack for loading tests
 #include "as_value.h"
@@ -103,13 +103,13 @@ namespace
     /// ConstructEvent, used for queuing construction
     //
     /// It's execution will call constructAsScriptObject() 
-    /// on the target sprite
+    /// on the target movieclip
     ///
     class ConstructEvent: public ExecutableCode {
 
     public:
 
-        ConstructEvent(sprite_instance* nTarget)
+        ConstructEvent(MovieClip* nTarget)
             :
             _target(nTarget)
         {}
@@ -139,7 +139,7 @@ namespace
 
     private:
 
-        sprite_instance* _target;
+        MovieClip* _target;
 
     };
 
@@ -155,7 +155,7 @@ namespace
 // starting from the first element. When the function returns
 // the list should be empty.
 void
-sprite_instance::execute_actions(sprite_instance::ActionList& action_list)
+MovieClip::execute_actions(MovieClip::ActionList& action_list)
 {
     // action_list may be changed due to actions (appended-to)
     // This loop is probably quicker than using an iterator
@@ -171,41 +171,134 @@ sprite_instance::execute_actions(sprite_instance::ActionList& action_list)
     }
 }
 
-static as_value sprite_play(const fn_call& fn)
+static as_value
+movieclip_play(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> sprite =
-        ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> movieclip =
+        ensureType<MovieClip>(fn.this_ptr);
 
-    sprite->set_play_state(sprite_instance::PLAY);
+    movieclip->set_play_state(MovieClip::PLAY);
     return as_value();
 }
 
-static as_value sprite_stop(const fn_call& fn)
+static as_value
+movieclip_stop(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> sprite =
-        ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> movieclip =
+        ensureType<MovieClip>(fn.this_ptr);
 
-    sprite->set_play_state(sprite_instance::STOP);
+    movieclip->set_play_state(MovieClip::STOP);
 
     return as_value();
 }
+
 
 //removeMovieClip() : Void
-static as_value sprite_remove_movieclip(const fn_call& fn)
+static as_value
+movieclip_remove_movieclip(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> sprite = 
-        ensureType<sprite_instance>(fn.this_ptr);
-    sprite->removeMovieClip();
+    boost::intrusive_ptr<MovieClip> movieclip = 
+        ensureType<MovieClip>(fn.this_ptr);
+    movieclip->removeMovieClip();
     return as_value();
 }
+
+
+static as_value
+movieclip_blendMode(const fn_call& fn)
+{
+    boost::intrusive_ptr<MovieClip> movieclip =
+        ensureType<MovieClip>(fn.this_ptr);
+    UNUSED(movieclip);
+    log_unimpl(_("MovieClip.blendMode()"));
+    return as_value();
+}
+
+
+static as_value
+movieclip_cacheAsBitmap(const fn_call& fn)
+{
+    boost::intrusive_ptr<MovieClip> movieclip =
+        ensureType<MovieClip>(fn.this_ptr);
+    UNUSED(movieclip);
+    log_unimpl(_("MovieClip.cacheAsBitmap()"));
+    return as_value();
+}
+
+
+static as_value
+movieclip_filters(const fn_call& fn)
+{
+    boost::intrusive_ptr<MovieClip> movieclip =
+        ensureType<MovieClip>(fn.this_ptr);
+    UNUSED(movieclip);
+    log_unimpl(_("MovieClip.filters()"));
+    return as_value();
+}
+
+
+static as_value
+movieclip_forceSmoothing(const fn_call& fn)
+{
+    boost::intrusive_ptr<MovieClip> movieclip =
+        ensureType<MovieClip>(fn.this_ptr);
+    UNUSED(movieclip);
+    log_unimpl(_("MovieClip.forceSmoothing()"));
+    return as_value();
+}
+
+
+static as_value
+movieclip_opaqueBackground(const fn_call& fn)
+{
+    boost::intrusive_ptr<MovieClip> movieclip =
+        ensureType<MovieClip>(fn.this_ptr);
+    UNUSED(movieclip);
+    log_unimpl(_("MovieClip.opaqueBackground()"));
+    return as_value();
+}
+
+    
+static as_value
+movieclip_scale9Grid(const fn_call& fn)
+{
+    boost::intrusive_ptr<MovieClip> movieclip =
+        ensureType<MovieClip>(fn.this_ptr);
+    UNUSED(movieclip);
+    log_unimpl(_("MovieClip.scale9Grid()"));
+    return as_value();
+}
+
+
+static as_value
+movieclip_scrollRect(const fn_call& fn)
+{
+    boost::intrusive_ptr<MovieClip> movieclip =
+        ensureType<MovieClip>(fn.this_ptr);
+    UNUSED(movieclip);
+    log_unimpl(_("MovieClip.scrollRect()"));
+    return as_value();
+}
+
+
+static as_value
+movieclip_tabIndex(const fn_call& fn)
+{
+    boost::intrusive_ptr<MovieClip> movieclip =
+        ensureType<MovieClip>(fn.this_ptr);
+    UNUSED(movieclip);
+    log_unimpl(_("MovieClip.tabIndex()"));
+    return as_value();
+}
+
 
 // attachMovie(idName:String, newName:String,
 //                         depth:Number [, initObject:Object]) : MovieClip
 static as_value
-sprite_attach_movie(const fn_call& fn)
+movieclip_attach_movie(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> sprite = 
-        ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> movieclip = 
+        ensureType<MovieClip>(fn.this_ptr);
 
     if (fn.nargs < 3 || fn.nargs > 4)
     {
@@ -220,7 +313,7 @@ sprite_attach_movie(const fn_call& fn)
     const std::string& id_name = fn.arg(0).to_string();
 
     boost::intrusive_ptr<resource> exported = 
-        sprite->get_movie_definition()->get_exported_resource(id_name);
+        movieclip->get_movie_definition()->get_exported_resource(id_name);
 
     if (!exported)
     {
@@ -268,7 +361,7 @@ sprite_attach_movie(const fn_call& fn)
     boost::int32_t depthValue = static_cast<boost::int32_t>(depth);
 
     boost::intrusive_ptr<character> newch =
-        exported_movie->create_character_instance(sprite.get(), 0);
+        exported_movie->create_character_instance(movieclip.get(), 0);
 
     assert(newch.get() > reinterpret_cast<void*>(0xFFFF) );
 #ifndef GNASH_USE_GC
@@ -279,7 +372,7 @@ sprite_attach_movie(const fn_call& fn)
     newch->setDynamic();
 
     // place_character() will set depth on newch
-    if ( ! sprite->attachCharacter(*newch, depthValue) )
+    if ( ! movieclip->attachCharacter(*newch, depthValue) )
     {
         log_error(_("Could not attach character at depth %d"), depthValue);
         return as_value();
@@ -308,12 +401,13 @@ sprite_attach_movie(const fn_call& fn)
     return as_value(newch.get());
 }
 
+
 // attachAudio(id:Object) : Void
 static as_value
-sprite_attach_audio(const fn_call& fn)
+movieclip_attach_audio(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> sprite =
-        ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> movieclip =
+        ensureType<MovieClip>(fn.this_ptr);
 
     if (!fn.nargs)
     {
@@ -343,30 +437,32 @@ sprite_attach_audio(const fn_call& fn)
         return as_value();
     }
 
-    ns->setAudioController(sprite.get());
+    ns->setAudioController(movieclip.get());
 
     LOG_ONCE( log_unimpl("MovieClip.attachAudio() - TESTING") );
     return as_value();
 }
 
+
 // MovieClip.attachVideo
 static as_value
-sprite_attach_video(const fn_call& fn)
+movieclip_attach_video(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> sprite =
-        ensureType<sprite_instance>(fn.this_ptr);
-    UNUSED(sprite);
+    boost::intrusive_ptr<MovieClip> movieclip =
+        ensureType<MovieClip>(fn.this_ptr);
+    UNUSED(movieclip);
 
     LOG_ONCE( log_unimpl("MovieClip.attachVideo()") );
     return as_value();
 }
 
+
 //createEmptyMovieClip(name:String, depth:Number) : MovieClip
 static as_value
-sprite_create_empty_movieclip(const fn_call& fn)
+movieclip_create_empty_movieclip(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> sprite = 
-        ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> movieclip = 
+        ensureType<MovieClip>(fn.this_ptr);
 
     if (fn.nargs != 2)
     {
@@ -394,19 +490,19 @@ sprite_create_empty_movieclip(const fn_call& fn)
     // Unlike other MovieClip methods, the depth argument of an empty movie clip
     // can be any number. All numbers are converted to an int32_t, and are valid
     // depths even when outside the usual bounds.
-    character* ch = sprite->add_empty_movieclip(fn.arg(0).to_string().c_str(),
+    character* ch = movieclip->add_empty_movieclip(fn.arg(0).to_string().c_str(),
             fn.arg(1).to_int());
     return as_value(ch);
 }
 
 static as_value
-sprite_get_depth(const fn_call& fn)
+movieclip_get_depth(const fn_call& fn)
 {
     // TODO: make this a character::getDepth_method function...
-    boost::intrusive_ptr<sprite_instance> sprite = 
-        ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> movieclip = 
+        ensureType<MovieClip>(fn.this_ptr);
 
-    const int n = sprite->get_depth();
+    const int n = movieclip->get_depth();
 
     return as_value(n);
 }
@@ -415,18 +511,18 @@ sprite_get_depth(const fn_call& fn)
 //
 // Returns void.
 static as_value
-sprite_swap_depths(const fn_call& fn)
+movieclip_swap_depths(const fn_call& fn)
 {
 
-    boost::intrusive_ptr<sprite_instance> sprite =
-        ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> movieclip =
+        ensureType<MovieClip>(fn.this_ptr);
 
-    const int this_depth = sprite->get_depth();
+    const int this_depth = movieclip->get_depth();
 
     if (fn.nargs < 1)
     {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("%s.swapDepths() needs one arg"), sprite->getTarget());
+        log_aserror(_("%s.swapDepths() needs one arg"), movieclip->getTarget());
         );
         return as_value();
     }
@@ -440,64 +536,64 @@ sprite_swap_depths(const fn_call& fn)
             fn.dump_args(ss);
             log_aserror(_("%s.swapDepths(%s): won't swap a clip below "
                     "depth %d (%d)"),
-            sprite->getTarget(), ss.str(), character::lowerAccessibleBound,
+            movieclip->getTarget(), ss.str(), character::lowerAccessibleBound,
                 this_depth);
         );
         return as_value();
     }
 
     typedef boost::intrusive_ptr<character> CharPtr;
-    typedef boost::intrusive_ptr<sprite_instance> SpritePtr;
+    typedef boost::intrusive_ptr<MovieClip> SpritePtr;
 
-    SpritePtr this_parent = dynamic_cast<sprite_instance*>(
-            sprite->get_parent());
+    SpritePtr this_parent = dynamic_cast<MovieClip*>(
+            movieclip->get_parent());
 
     //CharPtr target = NULL;
     int target_depth = 0;
 
-    // sprite.swapDepth(sprite)
-    if ( SpritePtr target_sprite = fn.arg(0).to_sprite() )
+    // movieclip.swapDepth(movieclip)
+    if ( SpritePtr target_movieclip = fn.arg(0).to_sprite() )
     {
-        if ( sprite == target_sprite )
+        if ( movieclip == target_movieclip )
         {
             IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("%s.swapDepths(%s): invalid call, swapping to self?"),
-                sprite->getTarget(), target_sprite->getTarget());
+                movieclip->getTarget(), target_movieclip->getTarget());
             );
             return as_value();
         }
 
         SpritePtr target_parent =
-            dynamic_cast<sprite_instance*>(sprite->get_parent());
+            dynamic_cast<MovieClip*>(movieclip->get_parent());
         if ( this_parent != target_parent )
         {
             IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("%s.swapDepths(%s): invalid call, the two "
                     "characters don't have the same parent"),
-                sprite->getTarget(), target_sprite->getTarget());
+                movieclip->getTarget(), target_movieclip->getTarget());
             );
             return as_value();
         }
 
-        target_depth = target_sprite->get_depth();
+        target_depth = target_movieclip->get_depth();
 
         // Check we're not swapping the our own depth so
         // to avoid unecessary bounds invalidation and immunizing
         // the instance from subsequent PlaceObjec tags attempting
         // to transform it.
-        if ( sprite->get_depth() == target_depth )
+        if ( movieclip->get_depth() == target_depth )
         {
             IF_VERBOSE_ASCODING_ERRORS(
                 std::stringstream ss; fn.dump_args(ss);
                 log_aserror(_("%s.swapDepths(%s): ignored, source and "
                     "target characters have the same depth %d"),
-                    sprite->getTarget(), ss.str(), target_depth);
+                    movieclip->getTarget(), ss.str(), target_depth);
             );
             return as_value();
         }
     }
 
-    // sprite.swapDepth(depth)
+    // movieclip.swapDepth(depth)
     else
     {
         double td = fn.arg(0).to_number();
@@ -506,8 +602,8 @@ sprite_swap_depths(const fn_call& fn)
             IF_VERBOSE_ASCODING_ERRORS(
             std::stringstream ss; fn.dump_args(ss);
             log_aserror(_("%s.swapDepths(%s): first argument invalid "
-                "(neither a sprite nor a number)"),
-                sprite->getTarget(), ss.str());
+                "(neither a movieclip nor a number)"),
+                movieclip->getTarget(), ss.str());
             );
             return as_value();
         }
@@ -518,13 +614,13 @@ sprite_swap_depths(const fn_call& fn)
         // to avoid unecessary bounds invalidation and immunizing
         // the instance from subsequent PlaceObjec tags attempting
         // to transform it.
-        if ( sprite->get_depth() == target_depth )
+        if ( movieclip->get_depth() == target_depth )
         {
             IF_VERBOSE_ASCODING_ERRORS(
             std::stringstream ss; fn.dump_args(ss);
             log_aserror(_("%s.swapDepths(%s): ignored, character already "
                     "at depth %d"),
-                sprite->getTarget(), ss.str(), target_depth);
+                movieclip->getTarget(), ss.str(), target_depth);
             );
             return as_value();
         }
@@ -537,12 +633,12 @@ sprite_swap_depths(const fn_call& fn)
 
     if ( this_parent )
     {
-        this_parent->swapDepths(sprite.get(), target_depth);
+        this_parent->swapDepths(movieclip.get(), target_depth);
     }
     else
     {
-        movie_root& root = sprite->getVM().getRoot();
-        root.swapLevels(sprite, target_depth);
+        movie_root& root = movieclip->getVM().getRoot();
+        root.swapLevels(movieclip, target_depth);
         return as_value();
     }
 
@@ -550,15 +646,15 @@ sprite_swap_depths(const fn_call& fn)
 
 }
 
-// TODO: wrap the functionality in a sprite_instance method
+// TODO: wrap the functionality in a MovieClip method
 //             and invoke it from here, this should only be a wrapper
 //
 //duplicateMovieClip(name:String, depth:Number, [initObject:Object]) : MovieClip
 static as_value
-sprite_duplicate_movieclip(const fn_call& fn)
+movieclip_duplicate_movieclip(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> sprite = 
-        ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> movieclip = 
+        ensureType<MovieClip>(fn.this_ptr);
     
     if (fn.nargs < 2)
     {
@@ -586,145 +682,145 @@ sprite_duplicate_movieclip(const fn_call& fn)
     
     boost::int32_t depthValue = static_cast<boost::int32_t>(depth);
 
-    boost::intrusive_ptr<sprite_instance> ch;
+    boost::intrusive_ptr<MovieClip> ch;
 
     // Copy members from initObject
     if (fn.nargs == 3)
     {
         boost::intrusive_ptr<as_object> initObject = fn.arg(2).to_object();
-        ch = sprite->duplicateMovieClip(newname, depthValue, initObject.get());
+        ch = movieclip->duplicateMovieClip(newname, depthValue, initObject.get());
     }
     else
     {
-        ch = sprite->duplicateMovieClip(newname, depthValue);
+        ch = movieclip->duplicateMovieClip(newname, depthValue);
     }
 
     return as_value(ch.get());
 }
 
-static as_value sprite_goto_and_play(const fn_call& fn)
+static as_value movieclip_goto_and_play(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> sprite = 
-        ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> movieclip = 
+        ensureType<MovieClip>(fn.this_ptr);
 
     if (fn.nargs < 1)
     {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("sprite_goto_and_play needs one arg"));
+        log_aserror(_("movieclip_goto_and_play needs one arg"));
         );
         return as_value();
     }
 
     size_t frame_number;
-    if ( ! sprite->get_frame_number(fn.arg(0), frame_number) )
+    if ( ! movieclip->get_frame_number(fn.arg(0), frame_number) )
     {
         // No dice.
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("sprite_goto_and_play('%s') -- invalid frame"),
+        log_aserror(_("movieclip_goto_and_play('%s') -- invalid frame"),
                     fn.arg(0));
         );
         return as_value();
     }
 
     // Convert to 0-based
-    sprite->goto_frame(frame_number);
-    sprite->set_play_state(sprite_instance::PLAY);
+    movieclip->goto_frame(frame_number);
+    movieclip->set_play_state(MovieClip::PLAY);
     return as_value();
 }
 
-static as_value sprite_goto_and_stop(const fn_call& fn)
+static as_value movieclip_goto_and_stop(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> sprite = 
-        ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> movieclip = 
+        ensureType<MovieClip>(fn.this_ptr);
 
     if (fn.nargs < 1)
     {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("sprite_goto_and_stop needs one arg"));
+        log_aserror(_("movieclip_goto_and_stop needs one arg"));
         );
         return as_value();
     }
 
     size_t frame_number;
-    if ( ! sprite->get_frame_number(fn.arg(0), frame_number) )
+    if ( ! movieclip->get_frame_number(fn.arg(0), frame_number) )
     {
         // No dice.
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("sprite_goto_and_stop('%s') -- invalid frame"),
+        log_aserror(_("movieclip_goto_and_stop('%s') -- invalid frame"),
                     fn.arg(0));
         );
         return as_value();
     }
 
     // Convert to 0-based
-    sprite->goto_frame(frame_number);
-    sprite->set_play_state(sprite_instance::STOP);
+    movieclip->goto_frame(frame_number);
+    movieclip->set_play_state(MovieClip::STOP);
     return as_value();
 }
 
-static as_value sprite_next_frame(const fn_call& fn)
+static as_value movieclip_next_frame(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> sprite = 
-        ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> movieclip = 
+        ensureType<MovieClip>(fn.this_ptr);
 
-    const size_t frame_count = sprite->get_frame_count();
-    const size_t current_frame = sprite->get_current_frame();
+    const size_t frame_count = movieclip->get_frame_count();
+    const size_t current_frame = movieclip->get_current_frame();
     if (current_frame < frame_count)
     {
-        sprite->goto_frame(current_frame + 1);
+        movieclip->goto_frame(current_frame + 1);
     }
-    sprite->set_play_state(sprite_instance::STOP);
+    movieclip->set_play_state(MovieClip::STOP);
     return as_value();
 }
 
-static as_value sprite_prev_frame(const fn_call& fn)
+static as_value movieclip_prev_frame(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> sprite = 
-        ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> movieclip = 
+        ensureType<MovieClip>(fn.this_ptr);
 
-    const size_t current_frame = sprite->get_current_frame();
+    const size_t current_frame = movieclip->get_current_frame();
     if (current_frame > 0)
     {
-        sprite->goto_frame(current_frame - 1);
+        movieclip->goto_frame(current_frame - 1);
     }
-    sprite->set_play_state(sprite_instance::STOP);
+    movieclip->set_play_state(MovieClip::STOP);
     return as_value();
 }
 
 static as_value
-sprite_get_bytes_loaded(const fn_call& fn)
+movieclip_get_bytes_loaded(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> sprite = 
-        ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> movieclip = 
+        ensureType<MovieClip>(fn.this_ptr);
 
-    return as_value(sprite->get_bytes_loaded());
+    return as_value(movieclip->get_bytes_loaded());
 }
 
 static as_value
-sprite_get_bytes_total(const fn_call& fn)
+movieclip_get_bytes_total(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> sprite = 
-        ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> movieclip = 
+        ensureType<MovieClip>(fn.this_ptr);
 
     // @@ horrible uh ?
-    return as_value(sprite->get_bytes_total());
+    return as_value(movieclip->get_bytes_total());
 }
 
 // my_mc.loadMovie(url:String [,variables:String]).
 //
 // This *always* calls MovieClip.meth.
 static as_value
-sprite_loadMovie(const fn_call& fn)
+movieclip_loadMovie(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> sprite = 
-        ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> movieclip = 
+        ensureType<MovieClip>(fn.this_ptr);
 
     as_value val;
     if (fn.nargs > 1)
     {
-        val = sprite->callMethod(NSV::PROP_METH, fn.arg(1));
+        val = movieclip->callMethod(NSV::PROP_METH, fn.arg(1));
     }
-    else val = sprite->callMethod(NSV::PROP_METH);
+    else val = movieclip->callMethod(NSV::PROP_METH);
 
     if (fn.nargs < 1) // url
     {
@@ -751,24 +847,24 @@ sprite_loadMovie(const fn_call& fn)
     const URL& baseurl = get_base_url();
     URL url(urlstr, baseurl);
 
-    movie_root& mr = sprite->getVM().getRoot();
-    std::string target = sprite->getTarget();
+    movie_root& mr = movieclip->getVM().getRoot();
+    std::string target = movieclip->getTarget();
 
     // TODO: if GET/POST should send variables of *this* movie,
     // no matter if the target will be replaced by another movie !!
-    const sprite_instance::MovieClipMethod method =
-        static_cast<sprite_instance::MovieClipMethod>(val.to_int());
+    const MovieClip::MovieClipMethod method =
+        static_cast<MovieClip::MovieClipMethod>(val.to_int());
 
-    if (method == sprite_instance::METHOD_NONE)
+    if (method == MovieClip::METHOD_NONE)
     {
         mr.loadMovie(url, target); 
     }
     else
     {
         std::string data;
-        sprite->getURLEncodedVars(data);
+        movieclip->getURLEncodedVars(data);
  
-        if (method == sprite_instance::METHOD_POST)
+        if (method == MovieClip::METHOD_POST)
         {
             log_debug(_("POSTING: %s"), data);
             mr.loadMovie(url, target, &data);
@@ -790,19 +886,19 @@ sprite_loadMovie(const fn_call& fn)
 
 // my_mc.loadVariables(url:String [, variables:String]) : Void
 static as_value
-sprite_load_variables(const fn_call& fn)
+movieclip_load_variables(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> sprite = 
-        ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> movieclip = 
+        ensureType<MovieClip>(fn.this_ptr);
 
     // This always calls MovieClip.meth, even when there are no
     // arguments.
     as_value val;
     if (fn.nargs > 1)
     {
-        val = sprite->callMethod(NSV::PROP_METH, fn.arg(1));
+        val = movieclip->callMethod(NSV::PROP_METH, fn.arg(1));
     }
-    else val = sprite->callMethod(NSV::PROP_METH);
+    else val = movieclip->callMethod(NSV::PROP_METH);
 
     if (fn.nargs < 1) // url
     {
@@ -829,21 +925,22 @@ sprite_load_variables(const fn_call& fn)
     const URL& baseurl = get_base_url();
     URL url(urlstr, baseurl);
 
-    const sprite_instance::MovieClipMethod method =
-        static_cast<sprite_instance::MovieClipMethod>(val.to_int());
+    const MovieClip::MovieClipMethod method =
+        static_cast<MovieClip::MovieClipMethod>(val.to_int());
 
-    sprite->loadVariables(url, method);
+    movieclip->loadVariables(url, method);
     log_debug("MovieClip.loadVariables(%s) - TESTING ", url.str());
 
     return as_value();
 }
 
 // my_mc.unloadMovie() : Void
-static as_value sprite_unloadMovie(const fn_call& fn)
+static as_value
+movieclip_unloadMovie(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> sprite = 
-        ensureType<sprite_instance>(fn.this_ptr);
-    UNUSED(sprite);
+    boost::intrusive_ptr<MovieClip> movieclip = 
+        ensureType<MovieClip>(fn.this_ptr);
+    UNUSED(movieclip);
 
     // See http://sephiroth.it/reference.php?id=429
 
@@ -851,10 +948,11 @@ static as_value sprite_unloadMovie(const fn_call& fn)
     return as_value();
 }
 
-static as_value sprite_hit_test(const fn_call& fn)
+static as_value
+movieclip_hit_test(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> sprite = 
-        ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> movieclip = 
+        ensureType<MovieClip>(fn.this_ptr);
 
     switch (fn.nargs)
     {
@@ -871,8 +969,8 @@ static as_value sprite_hit_test(const fn_call& fn)
                 return as_value();
             }
 
-            rect thisbounds = sprite->getBounds();
-            SWFMatrix thismat = sprite->getWorldMatrix();
+            rect thisbounds = movieclip->getBounds();
+            SWFMatrix thismat = movieclip->getWorldMatrix();
             thismat.transform(thisbounds);
 
             rect tgtbounds = target->getBounds();
@@ -889,7 +987,7 @@ static as_value sprite_hit_test(const fn_call& fn)
             boost::int32_t x = PIXELS_TO_TWIPS(fn.arg(0).to_number());
             boost::int32_t y = PIXELS_TO_TWIPS(fn.arg(1).to_number());
 
-            return sprite->pointInBounds(x, y);
+            return movieclip->pointInBounds(x, y);
         }
 
         case 3: // x, y, shapeFlag
@@ -898,8 +996,8 @@ static as_value sprite_hit_test(const fn_call& fn)
              boost::int32_t y = PIXELS_TO_TWIPS(fn.arg(1).to_number());
              bool shapeFlag = fn.arg(2).to_bool();
 
-             if ( ! shapeFlag ) return sprite->pointInBounds(x, y);
-             else return sprite->pointInHitableShape(x, y);
+             if ( ! shapeFlag ) return movieclip->pointInBounds(x, y);
+             else return movieclip->pointInHitableShape(x, y);
         }
 
         default:
@@ -917,10 +1015,10 @@ static as_value sprite_hit_test(const fn_call& fn)
 }
 
 static as_value
-sprite_create_text_field(const fn_call& fn)
+movieclip_create_text_field(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> sprite = 
-        ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> movieclip = 
+        ensureType<MovieClip>(fn.this_ptr);
 
     if (fn.nargs < 6) // name, depth, x, y, width, height
     {
@@ -959,31 +1057,31 @@ sprite_create_text_field(const fn_call& fn)
         txt_height = -txt_height;
     }
 
-    boost::intrusive_ptr<character> txt = sprite->add_textfield(txt_name,
+    boost::intrusive_ptr<character> txt = movieclip->add_textfield(txt_name,
             txt_depth, txt_x, txt_y, txt_width, txt_height);
 
     // createTextField returns void, it seems
-    if ( sprite->getVM().getSWFVersion() > 7 ) return as_value(txt.get());
+    if ( movieclip->getVM().getSWFVersion() > 7 ) return as_value(txt.get());
     else return as_value(); 
 }
 
 //getNextHighestDepth() : Number
 static as_value
-sprite_getNextHighestDepth(const fn_call& fn)
+movieclip_getNextHighestDepth(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> sprite = 
-        ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> movieclip = 
+        ensureType<MovieClip>(fn.this_ptr);
 
-    int nextdepth = sprite->getNextHighestDepth();
+    int nextdepth = movieclip->getNextHighestDepth();
     return as_value(static_cast<double>(nextdepth));
 }
 
 //getInstanceAtDepth(depth:Number) : MovieClip
 static as_value
-sprite_getInstanceAtDepth(const fn_call& fn)
+movieclip_getInstanceAtDepth(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> sprite = 
-        ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> movieclip = 
+        ensureType<MovieClip>(fn.this_ptr);
 
     if ( fn.nargs < 1 )
     {
@@ -994,7 +1092,7 @@ sprite_getInstanceAtDepth(const fn_call& fn)
     }
 
     int depth = fn.arg(0).to_int();
-    boost::intrusive_ptr<character> ch = sprite->get_character_at_depth(depth);
+    boost::intrusive_ptr<character> ch = movieclip->get_character_at_depth(depth);
     if ( ! ch ) return as_value(); // we want 'undefined', not 'null'
     return as_value(ch.get());
 }
@@ -1004,10 +1102,10 @@ sprite_getInstanceAtDepth(const fn_call& fn)
 /// TODO: test this properly.
 /// Returns void.
 static as_value
-sprite_getURL(const fn_call& fn)
+movieclip_getURL(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> sprite = 
-            ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> movieclip = 
+            ensureType<MovieClip>(fn.this_ptr);
 
     std::string urlstring;
     std::string target;
@@ -1015,9 +1113,9 @@ sprite_getURL(const fn_call& fn)
     as_value val;
     if (fn.nargs > 2)
     {
-        val = sprite->callMethod(NSV::PROP_METH, fn.arg(2));
+        val = movieclip->callMethod(NSV::PROP_METH, fn.arg(2));
     }
-    else val = sprite->callMethod(NSV::PROP_METH);
+    else val = movieclip->callMethod(NSV::PROP_METH);
 
     switch (fn.nargs)
     {
@@ -1047,34 +1145,34 @@ sprite_getURL(const fn_call& fn)
     }
 
 
-    sprite_instance::MovieClipMethod method =
-        static_cast<sprite_instance::MovieClipMethod>(val.to_int());
+    MovieClip::MovieClipMethod method =
+        static_cast<MovieClip::MovieClipMethod>(val.to_int());
 
     std::string vars;
 
-    if (method != sprite_instance::METHOD_NONE)
+    if (method != MovieClip::METHOD_NONE)
     {
         // Get encoded vars.
-        sprite->getURLEncodedVars(vars);
+        movieclip->getURLEncodedVars(vars);
     }
 
-    movie_root& m = sprite->getVM().getRoot();
+    movie_root& m = movieclip->getVM().getRoot();
     
     URL url(urlstring, get_base_url());
 
     switch (method)
     {
-        case sprite_instance::METHOD_POST:
+        case MovieClip::METHOD_POST:
             m.getURL(url, target, &vars);
             break;
-        case sprite_instance::METHOD_GET:
+        case MovieClip::METHOD_GET:
         {
             std::string qs = url.querystring();
             if ( qs.empty() ) vars.insert(0, 1, '?');
             else vars.insert(0, 1, '&');
             url.set_querystring(qs + vars);
         }
-        case sprite_instance::METHOD_NONE:
+        case MovieClip::METHOD_NONE:
             m.getURL(url, target);
     }
 
@@ -1083,12 +1181,12 @@ sprite_getURL(const fn_call& fn)
 
 // getSWFVersion() : Number
 static as_value
-sprite_getSWFVersion(const fn_call& fn)
+movieclip_getSWFVersion(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> sprite =
-            ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> movieclip =
+            ensureType<MovieClip>(fn.this_ptr);
 
-    return as_value(sprite->getSWFVersion());
+    return as_value(movieclip->getSWFVersion());
 }
 
 // MovieClip.meth(<string>) : Number
@@ -1096,48 +1194,51 @@ sprite_getSWFVersion(const fn_call& fn)
 // Parses case-insensitive "get" and "post" into 1 and 2, 0 anything else
 // 
 static as_value
-sprite_meth(const fn_call& fn)
+movieclip_meth(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> sprite =
-            ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> movieclip =
+            ensureType<MovieClip>(fn.this_ptr);
 
-    if (!fn.nargs) return as_value(sprite_instance::METHOD_NONE); 
+    if (!fn.nargs) return as_value(MovieClip::METHOD_NONE); 
 
     const as_value& v = fn.arg(0);
     boost::intrusive_ptr<as_object> o = v.to_object();
     if ( ! o )
     {
         log_debug(_("meth(%s): first argument doesn't cast to object"), v);
-        return as_value(sprite_instance::METHOD_NONE);
+        return as_value(MovieClip::METHOD_NONE);
     }
 
     as_value lc = o->callMethod(NSV::PROP_TO_LOWER_CASE);
 
     std::string s = lc.to_string();
 
-    if (s == "get") return as_value(sprite_instance::METHOD_GET);
-    if (s == "post") return as_value(sprite_instance::METHOD_POST);
-    return as_value(sprite_instance::METHOD_NONE);
+    if (s == "get") return as_value(MovieClip::METHOD_GET);
+    if (s == "post") return as_value(MovieClip::METHOD_POST);
+    return as_value(MovieClip::METHOD_NONE);
 }
+
 
 // getTextSnapshot() : TextSnapshot
 static as_value
-sprite_getTextSnapshot(const fn_call& fn)
+movieclip_getTextSnapshot(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> sprite =
-            ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> movieclip =
+            ensureType<MovieClip>(fn.this_ptr);
 
     LOG_ONCE( log_unimpl("MovieClip.getTextSnapshot()") );
     return as_value();
 }
 
+
 // getBounds(targetCoordinateSpace:Object) : Object
 static as_value
-sprite_getBounds(const fn_call& fn)
+movieclip_getBounds(const fn_call& fn)
 {
-    boost::intrusive_ptr<character> sprite = ensureType<character>(fn.this_ptr);
+    boost::intrusive_ptr<character> movieclip =
+        ensureType<character>(fn.this_ptr);
 
-    rect bounds    = sprite->getBounds();
+    rect bounds = movieclip->getBounds();
 
     if ( fn.nargs > 0 )
     {
@@ -1145,14 +1246,15 @@ sprite_getBounds(const fn_call& fn)
         if ( ! target )
         {
             IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("MovieClip.getBounds(%s): invalid call, first arg must be a character"),
+            log_aserror(_("MovieClip.getBounds(%s): invalid call, first "
+                    "arg must be a character"),
                 fn.arg(0));
             );
             return as_value();
         }
 
         SWFMatrix tgtwmat = target->getWorldMatrix();
-        SWFMatrix srcwmat = sprite->getWorldMatrix();
+        SWFMatrix srcwmat = movieclip->getWorldMatrix();
 
         srcwmat.transform(bounds);
         tgtwmat.invert().transform(bounds);
@@ -1183,10 +1285,10 @@ sprite_getBounds(const fn_call& fn)
 }
 
 static as_value
-sprite_globalToLocal(const fn_call& fn)
+movieclip_globalToLocal(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> sprite =
-            ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> movieclip =
+            ensureType<MovieClip>(fn.this_ptr);
 
     as_value ret;
 
@@ -1236,7 +1338,7 @@ sprite_globalToLocal(const fn_call& fn)
     y = PIXELS_TO_TWIPS(tmp.to_number());
 
     point    pt(x, y);
-    SWFMatrix world_mat = sprite->getWorldMatrix();
+    SWFMatrix world_mat = movieclip->getWorldMatrix();
     world_mat.invert().transform(pt);
 
     obj->set_member(NSV::PROP_X, TWIPS_TO_PIXELS(pt.x));
@@ -1246,10 +1348,10 @@ sprite_globalToLocal(const fn_call& fn)
 }
 
 static as_value
-sprite_localToGlobal(const fn_call& fn)
+movieclip_localToGlobal(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> sprite =
-            ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> movieclip =
+            ensureType<MovieClip>(fn.this_ptr);
 
     as_value ret;
 
@@ -1299,7 +1401,7 @@ sprite_localToGlobal(const fn_call& fn)
     y = PIXELS_TO_TWIPS(tmp.to_number());
 
     point    pt(x, y);
-    SWFMatrix world_mat = sprite->getWorldMatrix();
+    SWFMatrix world_mat = movieclip->getWorldMatrix();
     world_mat.transform(pt);
 
     obj->set_member(NSV::PROP_X, TWIPS_TO_PIXELS(pt.x));
@@ -1309,7 +1411,7 @@ sprite_localToGlobal(const fn_call& fn)
 }
 
 static as_value
-sprite_setMask(const fn_call& fn)
+movieclip_setMask(const fn_call& fn)
 {
     // swfdec/test/image/mask-textfield-6.swf shows that setMask should also
     // work against TextFields, we have no tests for other character types so
@@ -1355,30 +1457,31 @@ sprite_setMask(const fn_call& fn)
 }
 
 static as_value
-sprite_endFill(const fn_call& fn)
+movieclip_endFill(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> sprite =
-            ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> movieclip =
+            ensureType<MovieClip>(fn.this_ptr);
 
     IF_VERBOSE_ASCODING_ERRORS(
     if ( fn.nargs )
     {
         std::stringstream ss; fn.dump_args(ss);
-        log_aserror(_("MovieClip.endFill(%s): args will be discarded"), ss.str());
+        log_aserror(_("MovieClip.endFill(%s): args will be discarded"),
+            ss.str());
     }
     );
 #ifdef DEBUG_DRAWING_API
-    log_debug("%s.endFill();", sprite->getTarget());
+    log_debug("%s.endFill();", movieclip->getTarget());
 #endif
-    sprite->endFill();
+    movieclip->endFill();
     return as_value();
 }
 
 static as_value
-sprite_lineTo(const fn_call& fn)
+movieclip_lineTo(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> sprite =
-            ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> movieclip =
+            ensureType<MovieClip>(fn.this_ptr);
 
     if ( fn.nargs < 2 )
     {
@@ -1405,7 +1508,7 @@ sprite_lineTo(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
         log_aserror(_("%s.lineTo(%s) : non-finite first argument (%s), "
-            "converted to zero"), sprite->getTarget(),
+            "converted to zero"), movieclip->getTarget(),
             ss.str(), fn.arg(0));
         );
         x = 0;
@@ -1416,24 +1519,24 @@ sprite_lineTo(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
         log_aserror(_("%s.lineTo(%s) : non-finite second argument (%s), "
-            "converted to zero"), sprite->getTarget(),
+            "converted to zero"), movieclip->getTarget(),
             ss.str(), fn.arg(1));
         );
         y = 0;
     }
 
 #ifdef DEBUG_DRAWING_API
-    log_debug("%s.lineTo(%g,%g);", sprite->getTarget(), x, y);
+    log_debug("%s.lineTo(%g,%g);", movieclip->getTarget(), x, y);
 #endif
-    sprite->lineTo(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
+    movieclip->lineTo(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
     return as_value();
 }
 
 static as_value
-sprite_moveTo(const fn_call& fn)
+movieclip_moveTo(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> sprite = 
-        ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> movieclip = 
+        ensureType<MovieClip>(fn.this_ptr);
 
     if ( fn.nargs < 2 )
     {
@@ -1460,7 +1563,7 @@ sprite_moveTo(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
         log_aserror(_("%s.moveTo(%s) : non-finite first argument (%s), "
-            "converted to zero"), sprite->getTarget(),
+            "converted to zero"), movieclip->getTarget(),
             ss.str(), fn.arg(0));
         );
         x = 0;
@@ -1471,16 +1574,16 @@ sprite_moveTo(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
         log_aserror(_("%s.moveTo(%s) : non-finite second argument (%s), "
-            "converted to zero"), sprite->getTarget(),
+            "converted to zero"), movieclip->getTarget(),
             ss.str(), fn.arg(1));
         );
         y = 0;
     }
 
 #ifdef DEBUG_DRAWING_API
-    log_debug(_("%s.moveTo(%g,%g);"), sprite->getTarget(), x, y);
+    log_debug(_("%s.moveTo(%g,%g);"), movieclip->getTarget(), x, y);
 #endif
-    sprite->moveTo(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
+    movieclip->moveTo(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
     return as_value();
 }
 
@@ -1491,14 +1594,14 @@ sprite_moveTo(const fn_call& fn)
 //                                     capsStyle:String, jointStyle:String,
 //                                     miterLimit:Number) : Void
 static as_value
-sprite_lineStyle(const fn_call& fn)
+movieclip_lineStyle(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> sprite =
-            ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> movieclip =
+            ensureType<MovieClip>(fn.this_ptr);
 
     if ( ! fn.nargs )
     {
-        sprite->resetLineStyle();
+        movieclip->resetLineStyle();
         return as_value();
     }
 
@@ -1517,7 +1620,7 @@ sprite_lineStyle(const fn_call& fn)
 
     int arguments = fn.nargs;
 
-    const int swfVersion = sprite->getVM().getSWFVersion();
+    const int swfVersion = movieclip->getVM().getSWFVersion();
     if (swfVersion < 8 && fn.nargs > 3)
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -1630,9 +1733,9 @@ sprite_lineStyle(const fn_call& fn)
     rgba color(r, g, b, a);
 
 #ifdef DEBUG_DRAWING_API
-    log_debug("%s.lineStyle(%d,%d,%d,%d);", sprite->getTarget(), thickness, r, g, b);
+    log_debug("%s.lineStyle(%d,%d,%d,%d);", movieclip->getTarget(), thickness, r, g, b);
 #endif
-    sprite->lineStyle(thickness, color,
+    movieclip->lineStyle(thickness, color,
     scaleThicknessVertically, scaleThicknessHorizontally,
     pixelHinting, noClose, capStyle, capStyle, joinStyle, miterLimitFactor);
 
@@ -1640,10 +1743,10 @@ sprite_lineStyle(const fn_call& fn)
 }
 
 static as_value
-sprite_curveTo(const fn_call& fn)
+movieclip_curveTo(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> sprite =
-            ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> movieclip =
+            ensureType<MovieClip>(fn.this_ptr);
 
     if ( fn.nargs < 4 )
     {
@@ -1657,7 +1760,8 @@ sprite_curveTo(const fn_call& fn)
     if ( fn.nargs > 4 )
     {
         std::stringstream ss; fn.dump_args(ss);
-        log_aserror(_("MovieClip.curveTo(%s): args after the first four will be discarded"), ss.str());
+        log_aserror(_("MovieClip.curveTo(%s): args after the first four "
+                "will be discarded"), ss.str());
     }
     );
 
@@ -1671,7 +1775,7 @@ sprite_curveTo(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
         log_aserror(_("%s.curveTo(%s) : non-finite first argument (%s), "
-            "converted to zero"), sprite->getTarget(),
+            "converted to zero"), movieclip->getTarget(),
             ss.str(), fn.arg(0));
         );
         cx = 0;
@@ -1682,7 +1786,7 @@ sprite_curveTo(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
         log_aserror(_("%s.curveTo(%s) : non-finite second argument (%s), "
-            "converted to zero"), sprite->getTarget(),
+            "converted to zero"), movieclip->getTarget(),
             ss.str(), fn.arg(1));
         );
         cy = 0;
@@ -1693,7 +1797,7 @@ sprite_curveTo(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
         log_aserror(_("%s.curveTo(%s) : non-finite third argument (%s), "
-            "converted to zero"), sprite->getTarget(),
+            "converted to zero"), movieclip->getTarget(),
             ss.str(), fn.arg(0));
         );
         ax = 0;
@@ -1704,47 +1808,50 @@ sprite_curveTo(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
         log_aserror(_("%s.curveTo(%s) : non-finite fourth argument (%s), "
-            "converted to zero"), sprite->getTarget(),
+            "converted to zero"), movieclip->getTarget(),
             ss.str(), fn.arg(1));
         );
         ay = 0;
     }
 
 #ifdef DEBUG_DRAWING_API
-    log_debug(_("%s.curveTo(%g,%g,%g,%g);"), sprite->getTarget(), cx, cy, ax, ay);
+    log_debug(_("%s.curveTo(%g,%g,%g,%g);"), movieclip->getTarget(),
+            cx, cy, ax, ay);
 #endif
-    sprite->curveTo(PIXELS_TO_TWIPS(cx), PIXELS_TO_TWIPS(cy), PIXELS_TO_TWIPS(ax), PIXELS_TO_TWIPS(ay));
+    movieclip->curveTo(PIXELS_TO_TWIPS(cx), PIXELS_TO_TWIPS(cy),
+            PIXELS_TO_TWIPS(ax), PIXELS_TO_TWIPS(ay));
 
     return as_value();
 }
 
 static as_value
-sprite_clear(const fn_call& fn)
+movieclip_clear(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> sprite = 
-        ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> movieclip = 
+        ensureType<MovieClip>(fn.this_ptr);
 
     IF_VERBOSE_ASCODING_ERRORS(
     if ( fn.nargs )
     {
         std::stringstream ss; fn.dump_args(ss);
-        log_aserror(_("MovieClip.clear(%s): args will be discarded"), ss.str());
+        log_aserror(_("MovieClip.clear(%s): args will be discarded"),
+            ss.str());
     }
     );
 
 #ifdef DEBUG_DRAWING_API
-    log_debug(_("%s.clear();"), sprite->getTarget());
+    log_debug(_("%s.clear();"), movieclip->getTarget());
 #endif
-    sprite->clear();
+    movieclip->clear();
 
     return as_value();
 }
 
 static as_value
-sprite_beginFill(const fn_call& fn)
+movieclip_beginFill(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> sprite = 
-        ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> movieclip = 
+        ensureType<MovieClip>(fn.this_ptr);
 
     boost::uint8_t r = 0;
     boost::uint8_t g = 0;
@@ -1754,7 +1861,8 @@ sprite_beginFill(const fn_call& fn)
     if ( fn.nargs > 0 )
     {
         // 2^24 is the max here
-        boost::uint32_t rgbval = boost::uint32_t(utility::clamp<float>(fn.arg(0).to_number(), 0, 16777216));
+        boost::uint32_t rgbval = boost::uint32_t(
+                utility::clamp<float>(fn.arg(0).to_number(), 0, 16777216));
         r = boost::uint8_t( (rgbval&0xFF0000) >> 16);
         g = boost::uint8_t( (rgbval&0x00FF00) >> 8);
         b = boost::uint8_t( (rgbval&0x0000FF) );
@@ -1766,7 +1874,8 @@ sprite_beginFill(const fn_call& fn)
             if ( fn.nargs > 2 )
             {
                 std::stringstream ss; fn.dump_args(ss);
-                log_aserror(_("MovieClip.beginFill(%s): args after the first will be discarded"), ss.str());
+                log_aserror(_("MovieClip.beginFill(%s): args after the "
+                        "first will be discarded"), ss.str());
             }
             );
         }
@@ -1776,25 +1885,26 @@ sprite_beginFill(const fn_call& fn)
     rgba color(r, g, b, a);
 
 #ifdef DEBUG_DRAWING_API
-    log_debug(_("%s.beginFill(%d,%d,%d);"), sprite->getTarget(), r, g, b);
+    log_debug(_("%s.beginFill(%d,%d,%d);"), movieclip->getTarget(), r, g, b);
 #endif
-    sprite->beginFill(color);
+    movieclip->beginFill(color);
 
     return as_value();
 }
 
 static as_value
-sprite_beginGradientFill(const fn_call& fn)
+movieclip_beginGradientFill(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> sprite = 
-        ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> movieclip = 
+        ensureType<MovieClip>(fn.this_ptr);
 
     if ( fn.nargs < 5 )
     {
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
-        log_aserror(_("%s.beginGradientFill(%s): invalid call: 5 arguments needed"),
-            sprite->getTarget(), ss.str());
+        log_aserror(_("%s.beginGradientFill(%s): invalid call: 5 arguments "
+                "needed"),
+            movieclip->getTarget(), ss.str());
         );
         return as_value();
     }
@@ -1819,7 +1929,7 @@ sprite_beginGradientFill(const fn_call& fn)
         std::stringstream ss; fn.dump_args(ss);
         log_aserror(_("%s.beginGradientFill(%s): first arg must be "
             "'radial' or 'linear'"),
-            sprite->getTarget(), ss.str());
+            movieclip->getTarget(), ss.str());
         );
         return as_value();
     }
@@ -1837,7 +1947,7 @@ sprite_beginGradientFill(const fn_call& fn)
         std::stringstream ss; fn.dump_args(ss);
         log_aserror(_("%s.beginGradientFill(%s): one or more of the "
             " args from 2nd to 5th don't cast to objects"),
-            sprite->getTarget(), ss.str());
+            movieclip->getTarget(), ss.str());
         );
         return as_value();
     }
@@ -1868,10 +1978,14 @@ sprite_beginGradientFill(const fn_call& fn)
     if ( matrixArg->getMember(NSV::PROP_MATRIX_TYPE).to_string() == "box" )
     {
         
-        boost::int32_t valX = PIXELS_TO_TWIPS(matrixArg->getMember(NSV::PROP_X).to_number()); 
-        boost::int32_t valY = PIXELS_TO_TWIPS(matrixArg->getMember(NSV::PROP_Y).to_number()); 
-        boost::int32_t valW = PIXELS_TO_TWIPS(matrixArg->getMember(NSV::PROP_W).to_number()); 
-        boost::int32_t valH = PIXELS_TO_TWIPS(matrixArg->getMember(NSV::PROP_H).to_number()); 
+        boost::int32_t valX = PIXELS_TO_TWIPS(
+                matrixArg->getMember(NSV::PROP_X).to_number()); 
+        boost::int32_t valY = PIXELS_TO_TWIPS(
+                matrixArg->getMember(NSV::PROP_Y).to_number()); 
+        boost::int32_t valW = PIXELS_TO_TWIPS(
+                matrixArg->getMember(NSV::PROP_W).to_number()); 
+        boost::int32_t valH = PIXELS_TO_TWIPS(
+                matrixArg->getMember(NSV::PROP_H).to_number()); 
         float valR = matrixArg->getMember(NSV::PROP_R).to_number(); 
 
         if ( radial )
@@ -1891,10 +2005,10 @@ sprite_beginGradientFill(const fn_call& fn)
         {
             // Linear gradient is 256x1 twips.
             //
-            // No idea why we should use the 256 value for Y scale, but empirically
-            // seems to give closer results. Note that it only influences rotation,
-            // which is still not correct... TODO: fix it !
-            //
+            // No idea why we should use the 256 value for Y scale, but 
+            // empirically seems to give closer results. Note that it only
+            // influences rotation, which is still not correct...
+            // TODO: fix it !
             input_matrix.set_scale_rotation(256.0/valW, 256.0/valH, -valR);
 
             // For linear gradients, dunno why translation must be negative...
@@ -1909,8 +2023,10 @@ sprite_beginGradientFill(const fn_call& fn)
         float valB = matrixArg->getMember(NSV::PROP_B).to_number() ; // yx
         float valD = matrixArg->getMember(NSV::PROP_D).to_number() ; // xy
         float valE = matrixArg->getMember(NSV::PROP_E).to_number() ; // yy
-        boost::int32_t valG = PIXELS_TO_TWIPS(matrixArg->getMember(NSV::PROP_G).to_number()); // x0
-        boost::int32_t valH = PIXELS_TO_TWIPS(matrixArg->getMember(NSV::PROP_H).to_number()); // y0
+        boost::int32_t valG = PIXELS_TO_TWIPS(
+                matrixArg->getMember(NSV::PROP_G).to_number()); // x0
+        boost::int32_t valH = PIXELS_TO_TWIPS(
+                matrixArg->getMember(NSV::PROP_H).to_number()); // y0
 
         input_matrix.sx    = valA * 65536; // sx
         input_matrix.shx = valB * 65536; // shy
@@ -1973,7 +2089,7 @@ sprite_beginGradientFill(const fn_call& fn)
         std::stringstream ss; fn.dump_args(ss);
         log_aserror(_("%s.beginGradientFill(%s): colors, alphas and "
             "ratios args don't have same length"),
-            sprite->getTarget(), ss.str());
+            movieclip->getTarget(), ss.str());
         );
         return as_value();
     }
@@ -1984,11 +2100,11 @@ sprite_beginGradientFill(const fn_call& fn)
         std::stringstream ss; fn.dump_args(ss);
         log_debug(_("%s.beginGradientFill(%s) : too many array elements"
             " for colors and ratios (%d), will trim to 8"), 
-            sprite->getTarget(), ss.str(), ngradients); 
+            movieclip->getTarget(), ss.str(), ngradients); 
         ngradients = 8;
     }
 
-    VM& vm = sprite->getVM();
+    VM& vm = movieclip->getVM();
     string_table& st = vm.getStringTable();
 
     std::vector<gradient_record> gradients;
@@ -2002,10 +2118,12 @@ sprite_beginGradientFill(const fn_call& fn)
         boost::uint32_t col = colVal.is_number() ? colVal.to_int() : 0;
 
         as_value alpVal = alphas->getMember(key);
-        boost::uint8_t alp = alpVal.is_number() ? utility::clamp<int>(alpVal.to_int(), 0, 255) : 0;
+        boost::uint8_t alp = alpVal.is_number() ? 
+            utility::clamp<int>(alpVal.to_int(), 0, 255) : 0;
 
         as_value ratVal = ratios->getMember(key);
-        boost::uint8_t rat = ratVal.is_number() ? utility::clamp<int>(ratVal.to_int(), 0, 255) : 0;
+        boost::uint8_t rat = ratVal.is_number() ? 
+            utility::clamp<int>(ratVal.to_int(), 0, 255) : 0;
 
         rgba color;
         color.parseRGB(col);
@@ -2016,11 +2134,11 @@ sprite_beginGradientFill(const fn_call& fn)
 
     if ( radial )
     {
-        sprite->beginRadialGradientFill(gradients, mat);
+        movieclip->beginRadialGradientFill(gradients, mat);
     }
     else
     {
-        sprite->beginLinearGradientFill(gradients, mat);
+        movieclip->beginLinearGradientFill(gradients, mat);
     }
 
     LOG_ONCE( log_debug("MovieClip.beginGradientFill() TESTING") );
@@ -2030,79 +2148,86 @@ sprite_beginGradientFill(const fn_call& fn)
 // startDrag([lockCenter:Boolean], [left:Number], [top:Number],
 //    [right:Number], [bottom:Number]) : Void`
 static as_value
-sprite_startDrag(const fn_call& fn)
+movieclip_startDrag(const fn_call& fn)
 {
-        boost::intrusive_ptr<sprite_instance> sprite = 
-            ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> movieclip = 
+        ensureType<MovieClip>(fn.this_ptr);
 
-        drag_state st;
-        st.setCharacter( sprite.get() );
+    drag_state st;
+    st.setCharacter( movieclip.get() );
 
-        // mark this character is transformed.
-        sprite->transformedByScript();
+    // mark this character is transformed.
+    movieclip->transformedByScript();
 
-        if ( fn.nargs )
+    if ( fn.nargs )
+    {
+        st.setLockCentered( fn.arg(0).to_bool() );
+
+        if ( fn.nargs >= 5)
         {
-                st.setLockCentered( fn.arg(0).to_bool() );
+            double x0 = fn.arg(1).to_number();
+            double y0 = fn.arg(2).to_number();
+            double x1 = fn.arg(3).to_number();
+            double y1 = fn.arg(4).to_number();
 
-                if ( fn.nargs >= 5)
-                {
-                        double x0 = fn.arg(1).to_number();
-                        double y0 = fn.arg(2).to_number();
-                        double x1 = fn.arg(3).to_number();
-                        double y1 = fn.arg(4).to_number();
+            // check for infinite values
+            bool gotinf = false;
+            if ( ! utility::isFinite(x0) ) { x0=0; gotinf=true; }
+            if ( ! utility::isFinite(y0) ) { y0=0; gotinf=true; }
+            if ( ! utility::isFinite(x1) ) { x1=0; gotinf=true; }
+            if ( ! utility::isFinite(y1) ) { y1=0; gotinf=true; }
 
-                        // check for infinite values
-                        bool gotinf = false;
-                        if ( ! utility::isFinite(x0) ) { x0=0; gotinf=true; }
-                        if ( ! utility::isFinite(y0) ) { y0=0; gotinf=true; }
-                        if ( ! utility::isFinite(x1) ) { x1=0; gotinf=true; }
-                        if ( ! utility::isFinite(y1) ) { y1=0; gotinf=true; }
+            // check for swapped values
+            bool swapped = false;
+            if ( y1 < y0 )
+            {
+                std::swap(y1, y0);
+                swapped = true;
+            }
 
-                        // check for swapped values
-                        bool swapped = false;
-                        if ( y1 < y0 )
-                        {
-                                std::swap(y1, y0);
-                                swapped = true;
-                        }
+            if ( x1 < x0 )
+            {
+                std::swap(x1, x0);
+                swapped = true;
+            }
 
-                        if ( x1 < x0 )
-                        {
-                                std::swap(x1, x0);
-                                swapped = true;
-                        }
-
-                        IF_VERBOSE_ASCODING_ERRORS(
-                        if ( gotinf || swapped ) {
-                                std::stringstream ss; fn.dump_args(ss);
-                        if ( swapped ) 
-                                log_aserror(_("min/max bbox values in MovieClip.startDrag(%s) swapped, fixing"), ss.str());
-                        if ( gotinf )
-                                        log_aserror(_("non-finite bbox values in MovieClip.startDrag(%s), took as zero"), ss.str());
-                                }
-                        );
-
-                        rect bounds(PIXELS_TO_TWIPS(x0), PIXELS_TO_TWIPS(y0), PIXELS_TO_TWIPS(x1), PIXELS_TO_TWIPS(y1));
-                        st.setBounds(bounds);
+            IF_VERBOSE_ASCODING_ERRORS(
+                if ( gotinf || swapped ) {
+                    std::stringstream ss; fn.dump_args(ss);
+                    if ( swapped ) { 
+                        log_aserror(_("min/max bbox values in "
+                            "MovieClip.startDrag(%s) swapped, fixing"),
+                            ss.str());
+                    }
+                    if ( gotinf ) {
+                        log_aserror(_("non-finite bbox values in "
+                            "MovieClip.startDrag(%s), took as zero"),
+                            ss.str());
+                    }
                 }
+            );
+
+            rect bounds(PIXELS_TO_TWIPS(x0), PIXELS_TO_TWIPS(y0),
+                    PIXELS_TO_TWIPS(x1), PIXELS_TO_TWIPS(y1));
+            st.setBounds(bounds);
         }
+    }
 
-        sprite->getVM().getRoot().set_drag_state(st);
+    movieclip->getVM().getRoot().set_drag_state(st);
 
-        log_debug("MovieClip.startDrag() TESTING");
-        return as_value();
+    log_debug("MovieClip.startDrag() TESTING");
+    return as_value();
 }
 
 // stopDrag() : Void
 static as_value
-sprite_stopDrag(const fn_call& fn)
+movieclip_stopDrag(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> sprite = 
-        ensureType<sprite_instance>(fn.this_ptr);
-    UNUSED(sprite);
+    boost::intrusive_ptr<MovieClip> movieclip = 
+        ensureType<MovieClip>(fn.this_ptr);
+    UNUSED(movieclip);
 
-    sprite->getVM().getRoot().stop_drag();
+    movieclip->getVM().getRoot().stop_drag();
 
     log_debug("MovieClip.stopDrag() TESTING");
     return as_value();
@@ -2110,10 +2235,10 @@ sprite_stopDrag(const fn_call& fn)
 
 
 static as_value
-sprite_beginBitmapFill(const fn_call& fn)
+movieclip_beginBitmapFill(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> ptr = 
-        ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> ptr = 
+        ensureType<MovieClip>(fn.this_ptr);
     UNUSED(ptr);
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
@@ -2121,10 +2246,10 @@ sprite_beginBitmapFill(const fn_call& fn)
 
 
 static as_value
-sprite_getRect(const fn_call& fn)
+movieclip_getRect(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> ptr = 
-        ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> ptr = 
+        ensureType<MovieClip>(fn.this_ptr);
     UNUSED(ptr);
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
@@ -2132,10 +2257,10 @@ sprite_getRect(const fn_call& fn)
 
 
 static as_value
-sprite_lineGradientStyle(const fn_call& fn)
+movieclip_lineGradientStyle(const fn_call& fn)
 {
-        boost::intrusive_ptr<sprite_instance> ptr = 
-            ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> ptr = 
+        ensureType<MovieClip>(fn.this_ptr);
     UNUSED(ptr);
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
@@ -2143,10 +2268,10 @@ sprite_lineGradientStyle(const fn_call& fn)
 
 
 static as_value
-sprite_attachBitmap(const fn_call& fn)
+movieclip_attachBitmap(const fn_call& fn)
 {
-        boost::intrusive_ptr<sprite_instance> ptr = 
-            ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> ptr = 
+        ensureType<MovieClip>(fn.this_ptr);
     UNUSED(ptr);
     LOG_ONCE( log_unimpl (__FUNCTION__) );
     return as_value();
@@ -2156,62 +2281,64 @@ sprite_attachBitmap(const fn_call& fn)
 static as_value
 movieclip_ctor(const fn_call& /* fn */)
 {
-    boost::intrusive_ptr<as_object> clip = new as_object(getMovieClipInterface());
+    boost::intrusive_ptr<as_object> clip = 
+        new as_object(getMovieClipInterface());
     //attachMovieClipProperties(*clip);
     return as_value(clip.get());
 }
 
 
 static as_value
-sprite_currentframe_get(const fn_call& fn)
+movieclip_currentframe_get(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> ptr = 
-        ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> ptr = 
+        ensureType<MovieClip>(fn.this_ptr);
 
-    return as_value(std::min(ptr->get_loaded_frames(), ptr->get_current_frame() + 1));
+    return as_value(std::min(ptr->get_loaded_frames(),
+                ptr->get_current_frame() + 1));
 }
 
 static as_value
-sprite_totalframes_get(const fn_call& fn)
+movieclip_totalframes_get(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> ptr = 
-        ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> ptr = 
+        ensureType<MovieClip>(fn.this_ptr);
 
     return as_value(ptr->get_frame_count());
 }
 
 static as_value
-sprite_framesloaded_get(const fn_call& fn)
+movieclip_framesloaded_get(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> ptr = 
-        ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> ptr = 
+        ensureType<MovieClip>(fn.this_ptr);
 
     return as_value(ptr->get_loaded_frames());
 }
 
 static as_value
-sprite_droptarget_getset(const fn_call& fn)
+movieclip_droptarget_getset(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> ptr = 
-        ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> ptr = 
+        ensureType<MovieClip>(fn.this_ptr);
 
     return ptr->getDropTarget();
 }
 
 static as_value
-sprite_url_getset(const fn_call& fn)
+movieclip_url_getset(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> ptr = 
-        ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> ptr = 
+        ensureType<MovieClip>(fn.this_ptr);
 
     return as_value(ptr->get_movie_definition()->get_url());
 }
 
 static as_value
-sprite_highquality_getset(const fn_call& fn)
+movieclip_highquality_getset(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> ptr = 
-        ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> ptr = 
+        ensureType<MovieClip>(fn.this_ptr);
     UNUSED(ptr);
 
     if ( fn.nargs == 0 ) // getter
@@ -2228,10 +2355,10 @@ sprite_highquality_getset(const fn_call& fn)
 
 // TODO: move this to character class, _focusrect seems a generic property
 static as_value
-sprite_focusrect_getset(const fn_call& fn)
+movieclip_focusrect_getset(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> ptr = 
-        ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> ptr = 
+        ensureType<MovieClip>(fn.this_ptr);
     UNUSED(ptr);
 
     if ( fn.nargs == 0 ) // getter
@@ -2248,10 +2375,10 @@ sprite_focusrect_getset(const fn_call& fn)
 }
 
 static as_value
-sprite_soundbuftime_getset(const fn_call& fn)
+movieclip_soundbuftime_getset(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> ptr = 
-        ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> ptr = 
+        ensureType<MovieClip>(fn.this_ptr);
     UNUSED(ptr);
 
     if ( fn.nargs == 0 ) // getter
@@ -2269,42 +2396,41 @@ sprite_soundbuftime_getset(const fn_call& fn)
 static void registerNatives(VM& vm)
 {
     // Natives are always here    (at least in swf5 I guess)
-    vm.registerNative(sprite_attach_movie, 900, 0); 
-    vm.registerNative(sprite_swap_depths, 900, 1); // TODO: generalize to character::swapDepths_method ?
-    vm.registerNative(sprite_localToGlobal, 900, 2);
-    vm.registerNative(sprite_globalToLocal, 900, 3);
-    vm.registerNative(sprite_hit_test, 900, 4);
-    vm.registerNative(sprite_getBounds, 900, 5);
-    vm.registerNative(sprite_get_bytes_total, 900, 6);
-    vm.registerNative(sprite_get_bytes_loaded, 900, 7);
-    vm.registerNative(sprite_attach_audio, 900, 8);
-    vm.registerNative(sprite_attach_video, 900, 9);
-    vm.registerNative(sprite_get_depth, 900, 10); // TODO: generalize to character::getDepth_method ?
-    vm.registerNative(sprite_setMask, 900, 11); 
-    vm.registerNative(sprite_play, 900, 12); 
-    vm.registerNative(sprite_stop, 900, 13);
-    vm.registerNative(sprite_next_frame, 900, 14);
-    vm.registerNative(sprite_prev_frame, 900, 15);
-    vm.registerNative(sprite_goto_and_play, 900, 16);
-    vm.registerNative(sprite_goto_and_stop, 900, 17);
-    vm.registerNative(sprite_duplicate_movieclip, 900, 18);
-    vm.registerNative(sprite_remove_movieclip, 900, 19);
-    vm.registerNative(sprite_startDrag, 900, 20);
-    vm.registerNative(sprite_stopDrag, 900, 21);
+    vm.registerNative(movieclip_attach_movie, 900, 0); 
+    // TODO: generalize to character::swapDepths_method ?
+    vm.registerNative(movieclip_swap_depths, 900, 1); 
+    vm.registerNative(movieclip_localToGlobal, 900, 2);
+    vm.registerNative(movieclip_globalToLocal, 900, 3);
+    vm.registerNative(movieclip_hit_test, 900, 4);
+    vm.registerNative(movieclip_getBounds, 900, 5);
+    vm.registerNative(movieclip_get_bytes_total, 900, 6);
+    vm.registerNative(movieclip_get_bytes_loaded, 900, 7);
+    vm.registerNative(movieclip_attach_audio, 900, 8);
+    vm.registerNative(movieclip_attach_video, 900, 9);
+    // TODO: generalize to character::getDepth_method ?
+    vm.registerNative(movieclip_get_depth, 900, 10);
+    vm.registerNative(movieclip_setMask, 900, 11); 
+    vm.registerNative(movieclip_play, 900, 12); 
+    vm.registerNative(movieclip_stop, 900, 13);
+    vm.registerNative(movieclip_next_frame, 900, 14);
+    vm.registerNative(movieclip_prev_frame, 900, 15);
+    vm.registerNative(movieclip_goto_and_play, 900, 16);
+    vm.registerNative(movieclip_goto_and_stop, 900, 17);
+    vm.registerNative(movieclip_duplicate_movieclip, 900, 18);
+    vm.registerNative(movieclip_remove_movieclip, 900, 19);
+    vm.registerNative(movieclip_startDrag, 900, 20);
+    vm.registerNative(movieclip_stopDrag, 900, 21);
+    vm.registerNative(movieclip_create_empty_movieclip, 901, 0);
+    vm.registerNative(movieclip_beginFill, 901, 1);
+    vm.registerNative(movieclip_beginGradientFill, 901, 2);
+    vm.registerNative(movieclip_moveTo, 901, 3);
+    vm.registerNative(movieclip_lineTo, 901, 4);
+    vm.registerNative(movieclip_curveTo, 901, 5);
+    vm.registerNative(movieclip_lineStyle, 901, 6);
+    vm.registerNative(movieclip_endFill, 901, 7);
+    vm.registerNative(movieclip_clear, 901, 8);
 
-    // TODO: tabIndex getter-setter
-
-    vm.registerNative(sprite_create_empty_movieclip, 901, 0);
-    vm.registerNative(sprite_beginFill, 901, 1);
-    vm.registerNative(sprite_beginGradientFill, 901, 2);
-    vm.registerNative(sprite_moveTo, 901, 3);
-    vm.registerNative(sprite_lineTo, 901, 4);
-    vm.registerNative(sprite_curveTo, 901, 5);
-    vm.registerNative(sprite_lineStyle, 901, 6);
-    vm.registerNative(sprite_endFill, 901, 7);
-    vm.registerNative(sprite_clear, 901, 8);
-
-    vm.registerNative(sprite_create_text_field, 104, 200);
+    vm.registerNative(movieclip_create_text_field, 104, 200);
 
 }
 
@@ -2313,9 +2439,7 @@ static void
 attachMovieClipInterface(as_object& o)
 {
         VM& vm = o.getVM();
-        const int target_version = vm.getSWFVersion();
 
-        // SWF5 or higher
         o.init_member("attachMovie", vm.getNative(900, 0)); 
         o.init_member("swapDepths", vm.getNative(900, 1));
         o.init_member("localToGlobal", vm.getNative(900, 2));
@@ -2334,115 +2458,135 @@ attachMovieClipInterface(as_object& o)
         o.init_member("removeMovieClip", vm.getNative(900, 19));
         o.init_member("startDrag", vm.getNative(900, 20));
         o.init_member("stopDrag", vm.getNative(900, 21));
-        o.init_member("loadMovie", new builtin_function(sprite_loadMovie));
-        o.init_member("loadVariables", new builtin_function(sprite_load_variables));
-        o.init_member("unloadMovie", new builtin_function(sprite_unloadMovie));
-        o.init_member("getURL", new builtin_function(sprite_getURL));
-        o.init_member("getSWFVersion", new builtin_function(sprite_getSWFVersion));
-        o.init_member("meth", new builtin_function(sprite_meth));
-        o.init_member("enabled", true); // see MovieClip.as testcase
-        o.init_member("useHandCursor", true); // see MovieClip.as testcase
+        o.init_member("loadMovie", new builtin_function(movieclip_loadMovie));
+        o.init_member("loadVariables", new builtin_function(
+                    movieclip_load_variables));
+        o.init_member("unloadMovie", new builtin_function(
+                    movieclip_unloadMovie));
+        o.init_member("getURL", new builtin_function(movieclip_getURL));
+        o.init_member("getSWFVersion", new builtin_function(
+                    movieclip_getSWFVersion));
+        o.init_member("meth", new builtin_function(movieclip_meth));
+        o.init_member("enabled", true);
+        o.init_member("useHandCursor", true);
+        o.init_property("_lockroot", &MovieClip::lockroot_getset,
+              &MovieClip::lockroot_getset);
+        o.init_member("beginBitmapFill", new builtin_function(
+                    movieclip_beginBitmapFill));
+        o.init_member("getRect", new builtin_function(
+                    movieclip_getRect));
+        o.init_member("lineGradientStyle", new builtin_function(
+                    movieclip_lineGradientStyle));
+        o.init_member("attachBitmap", new builtin_function(
+                    movieclip_attachBitmap));
+        o.init_property("blendMode", &movieclip_blendMode, &movieclip_blendMode);
+        o.init_property("cacheAsBitmap", &movieclip_cacheAsBitmap, 
+                &movieclip_cacheAsBitmap);
+        o.init_property("filters", &movieclip_filters, &movieclip_filters);
+        o.init_property("forceSmoothing", &movieclip_forceSmoothing,
+                &movieclip_forceSmoothing);
+        o.init_property("opaqueBackground", &movieclip_opaqueBackground,
+                &movieclip_opaqueBackground);
+        o.init_property("scale9Grid", &movieclip_scale9Grid,
+                movieclip_scale9Grid);
+        o.init_property("scrollRect", &movieclip_scrollRect, &movieclip_scrollRect);
+        o.init_property("tabIndex", &movieclip_tabIndex, &movieclip_tabIndex);
+        o.init_property("transform", &movieClip_transform, 
+                &movieClip_transform);
 
-        o.init_property("_lockroot", &sprite_instance::lockroot_getset,
-                                                                &sprite_instance::lockroot_getset); // see MovieClip.as testcase
+        const int swf6Flags = as_prop_flags::dontDelete |
+                    as_prop_flags::dontEnum |
+                    as_prop_flags::onlySWF6Up;
 
-        // These are documented to be SWF8+ only, but the pp version9 shows them
-        // for SWF5 too...
-        o.init_member("attachBitmap", new builtin_function(sprite_attachBitmap));
-        o.init_property("transform", &movieClip_transform, &movieClip_transform); // see MovieClip.as testcase
+        o.init_member("attachAudio", vm.getNative(900, 8), swf6Flags);
+        o.init_member("attachVideo", vm.getNative(900, 9), swf6Flags);
+        o.init_member("getDepth", vm.getNative(900, 10), swf6Flags);
+        o.init_member("setMask", vm.getNative(900, 11), swf6Flags);
+        o.init_member("createEmptyMovieClip", vm.getNative(901, 0), swf6Flags);
+        o.init_member("beginFill", vm.getNative(901, 1), swf6Flags);
+        o.init_member("beginGradientFill", vm.getNative(901, 2), swf6Flags);
+        o.init_member("moveTo", vm.getNative(901, 3), swf6Flags);
+        o.init_member("lineTo", vm.getNative(901, 4), swf6Flags);
+        o.init_member("curveTo", vm.getNative(901, 5), swf6Flags);
+        o.init_member("lineStyle", vm.getNative(901, 6), swf6Flags);
+        o.init_member("endFill", vm.getNative(901, 7), swf6Flags);
+        o.init_member("clear", vm.getNative(901, 8), swf6Flags);
+        o.init_member("createTextField", vm.getNative(104, 200), swf6Flags);
+        o.init_member("getTextSnapshot", 
+                new builtin_function(movieclip_getTextSnapshot), swf6Flags);
 
-        if ( target_version    < 6 ) return;
+        const int swf7Flags = as_prop_flags::dontDelete |
+                    as_prop_flags::dontEnum |
+                    as_prop_flags::onlySWF7Up;
 
-        // SWF6 or higher
-        o.init_member("attachAudio", vm.getNative(900, 8));
-        o.init_member("attachVideo", vm.getNative(900, 9));
-        o.init_member("getDepth", vm.getNative(900, 10));
-        o.init_member("setMask", vm.getNative(900, 11));
-        o.init_member("createEmptyMovieClip", vm.getNative(901, 0));
-        o.init_member("beginFill", vm.getNative(901, 1));
-        o.init_member("beginGradientFill", vm.getNative(901, 2));
-        o.init_member("moveTo", vm.getNative(901, 3));
-        o.init_member("lineTo", vm.getNative(901, 4));
-        o.init_member("curveTo", vm.getNative(901, 5));
-        o.init_member("lineStyle", vm.getNative(901, 6));
-        o.init_member("endFill", vm.getNative(901, 7));
-        o.init_member("clear", vm.getNative(901, 8));
-
-        o.init_member("createTextField", vm.getNative(104, 200));
-        o.init_member("getTextSnapshot", new builtin_function(sprite_getTextSnapshot)); // unknown native
-        if ( target_version    < 7 ) return;
-
-        // SWF7 or higher
-        o.init_member("getNextHighestDepth", new builtin_function(sprite_getNextHighestDepth));
-        o.init_member("getInstanceAtDepth", new builtin_function(sprite_getInstanceAtDepth));
-        if ( target_version    < 8 ) return;
-
-        // SWF8 or higher
-        o.init_member("beginBitmapFill", new builtin_function(sprite_beginBitmapFill));
-        o.init_member("getRect", new builtin_function(sprite_getRect));
-        o.init_member("lineGradientStyle", new builtin_function(sprite_lineGradientStyle));
+        o.init_member("getNextHighestDepth", new builtin_function(
+                    movieclip_getNextHighestDepth), swf7Flags);
+        o.init_member("getInstanceAtDepth", new builtin_function(
+                    movieclip_getInstanceAtDepth), swf7Flags);
 
 }
 
 as_value
 movieClip_transform(const fn_call& fn)
 {
-        boost::intrusive_ptr<sprite_instance> ptr = 
-            ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> ptr = 
+        ensureType<MovieClip>(fn.this_ptr);
         
-        VM& vm = ptr->getVM();
-        string_table& st = ptr->getVM().getStringTable();
+    VM& vm = ptr->getVM();
+    string_table& st = ptr->getVM().getStringTable();
 
-        as_value flash;
-        if (!vm.getGlobal()->get_member(st.find("flash"), &flash))
-        {
-                log_error("No flash object found!");
-                return as_value();
-        }
-        boost::intrusive_ptr<as_object> flashObj = flash.to_object();
+    as_value flash;
+    if (!vm.getGlobal()->get_member(st.find("flash"), &flash))
+    {
+        log_error("No flash object found!");
+        return as_value();
+    }
+    boost::intrusive_ptr<as_object> flashObj = flash.to_object();
 
-        if (!flashObj)
-        {
-                log_error("flash isn't an object!");
-                return as_value();
-        }
+    if (!flashObj)
+    {
+        log_error("flash isn't an object!");
+        return as_value();
+    }
         
-        as_value geom;
-        if (!flashObj->get_member(st.find("geom"), &geom))
-        {
-                log_error("No flash.geom object found!");
-                return as_value();
-        }
-        boost::intrusive_ptr<as_object> geomObj = geom.to_object();
+    as_value geom;
+    if (!flashObj->get_member(st.find("geom"), &geom))
+    {
+        log_error("No flash.geom object found!");
+        return as_value();
+    }
+    boost::intrusive_ptr<as_object> geomObj = geom.to_object();
 
-        if (!geomObj)
-        {
-                log_error("flash.geom isn't an object!");
-                return as_value();
-        }
+    if (!geomObj)
+    {
+        log_error("flash.geom isn't an object!");
+        return as_value();
+    }
         
-        as_value transform;
-        if (!geomObj->get_member(st.find("Transform"), &transform))
-        {
-                log_error("No flash.geom.Transform object found!");
-                return as_value();
-        }        
+    as_value transform;
+    if (!geomObj->get_member(st.find("Transform"), &transform))
+    {
+        log_error("No flash.geom.Transform object found!");
+        return as_value();
+    }        
 
-        boost::intrusive_ptr<as_function> transformCtor = transform.to_as_function();
-        if (!transformCtor)
-        {
-                log_error("flash.geom.Transform isn't a function!");
-                return as_value();
-        }
+    boost::intrusive_ptr<as_function> transformCtor =
+        transform.to_as_function();
 
-        // Construct a flash.geom.Transform object with "this" as argument.
-        std::auto_ptr< std::vector<as_value> > args (new std::vector<as_value>);
-        args->push_back(ptr.get());
+    if (!transformCtor)
+    {
+        log_error("flash.geom.Transform isn't a function!");
+        return as_value();
+    }
 
-        boost::intrusive_ptr<as_object> transformObj =
-                                transformCtor->constructInstance(fn.env(), args);
+    // Construct a flash.geom.Transform object with "this" as argument.
+    std::auto_ptr< std::vector<as_value> > args (new std::vector<as_value>);
+    args->push_back(ptr.get());
 
-        return as_value(transformObj.get());
+    boost::intrusive_ptr<as_object> transformObj =
+        transformCtor->constructInstance(fn.env(), args);
+
+    return as_value(transformObj.get());
 }
 
 /// Properties (and/or methods) attached to every *instance* of a MovieClip 
@@ -2498,13 +2642,13 @@ attachMovieClipProperties(character& o)
     gettersetter = character::parent_getset;
     o.init_property(NSV::PROP_uPARENT, gettersetter, gettersetter);
 
-    gettersetter = sprite_currentframe_get;
+    gettersetter = movieclip_currentframe_get;
     o.init_property(NSV::PROP_uCURRENTFRAME, gettersetter, gettersetter);
 
-    gettersetter = sprite_totalframes_get;
+    gettersetter = movieclip_totalframes_get;
     o.init_property(NSV::PROP_uTOTALFRAMES, gettersetter, gettersetter);
 
-    gettersetter = sprite_framesloaded_get;
+    gettersetter = movieclip_framesloaded_get;
     o.init_property(NSV::PROP_uFRAMESLOADED, gettersetter, gettersetter);
 
     gettersetter = character::target_getset;
@@ -2513,19 +2657,19 @@ attachMovieClipProperties(character& o)
     gettersetter = character::name_getset;
     o.init_property(NSV::PROP_uNAME, gettersetter, gettersetter);
 
-    gettersetter = sprite_droptarget_getset;
+    gettersetter = movieclip_droptarget_getset;
     o.init_property(NSV::PROP_uDROPTARGET, gettersetter, gettersetter);
 
-    gettersetter = sprite_url_getset;
+    gettersetter = movieclip_url_getset;
     o.init_property(NSV::PROP_uURL, gettersetter, gettersetter);
 
-    gettersetter = sprite_highquality_getset;
+    gettersetter = movieclip_highquality_getset;
     o.init_property(NSV::PROP_uHIGHQUALITY, gettersetter, gettersetter);
 
-    gettersetter = sprite_focusrect_getset;
+    gettersetter = movieclip_focusrect_getset;
     o.init_property(NSV::PROP_uFOCUSRECT, gettersetter, gettersetter);
 
-    gettersetter = sprite_soundbuftime_getset;
+    gettersetter = movieclip_soundbuftime_getset;
     o.init_property(NSV::PROP_uSOUNDBUFTIME, gettersetter, gettersetter);
 
 }
@@ -2569,7 +2713,7 @@ movieclip_class_init(as_object& global)
 
 
 //------------------------------------------------
-// sprite_instance helper classes
+// MovieClip helper classes
 //------------------------------------------------
 
 /// A DisplayList visitor used to compute its overall bounds.
@@ -2629,10 +2773,10 @@ public:
 };
 
 //------------------------------------------------
-// sprite_instance
+// MovieClip
 //------------------------------------------------
 
-sprite_instance::sprite_instance(
+MovieClip::MovieClip(
         movie_definition* def, movie_instance* r,
         character* parent, int id)
     :
@@ -2667,7 +2811,7 @@ sprite_instance::sprite_instance(
 
 }
 
-sprite_instance::~sprite_instance()
+MovieClip::~MovieClip()
 {
     stopStreamSound();
 
@@ -2684,7 +2828,7 @@ sprite_instance::~sprite_instance()
     }
 }
 
-character* sprite_instance::get_character_at_depth(int depth)
+character* MovieClip::get_character_at_depth(int depth)
 {
     return m_display_list.get_character_at_depth(depth);
 }
@@ -2692,7 +2836,7 @@ character* sprite_instance::get_character_at_depth(int depth)
 // Set *val to the value of the named member and
 // return true, if we have the named member.
 // Otherwise leave *val alone and return false.
-bool sprite_instance::get_member(string_table::key name_key, as_value* val,
+bool MovieClip::get_member(string_table::key name_key, as_value* val,
     string_table::key nsname)
 {
     // FIXME: use addProperty interface for these !!
@@ -2704,7 +2848,7 @@ bool sprite_instance::get_member(string_table::key name_key, as_value* val,
     {
 
         // getAsRoot() will take care of _lockroot
-        val->set_as_object( const_cast<sprite_instance*>( getAsRoot() )    );
+        val->set_as_object( const_cast<MovieClip*>( getAsRoot() )    );
         return true;
     }
 
@@ -2807,7 +2951,7 @@ bool sprite_instance::get_member(string_table::key name_key, as_value* val,
 }
 
 bool
-sprite_instance::get_frame_number(const as_value& frame_spec, size_t& frameno) const
+MovieClip::get_frame_number(const as_value& frame_spec, size_t& frameno) const
 {
     //GNASH_REPORT_FUNCTION;
 
@@ -2839,7 +2983,7 @@ sprite_instance::get_frame_number(const as_value& frame_spec, size_t& frameno) c
 //
 /// The frame_spec could be an integer or a string.
 ///
-void sprite_instance::call_frame_actions(const as_value& frame_spec)
+void MovieClip::call_frame_actions(const as_value& frame_spec)
 {
     size_t frame_number;
     if ( ! get_frame_number(frame_spec, frame_number) )
@@ -2881,26 +3025,27 @@ void sprite_instance::call_frame_actions(const as_value& frame_spec)
 
 }
 
-character* sprite_instance::add_empty_movieclip(const char* name, int depth)
+character* MovieClip::add_empty_movieclip(const char* name, int depth)
 {
-    // empty_sprite_def will be deleted during deleting sprite
-    sprite_definition* empty_sprite_def = new sprite_definition(*get_movie_definition());
+    // empty_movieclip_def will be deleted during deleting movieclip
+    sprite_definition* empty_sprite_def =
+        new sprite_definition(*get_movie_definition());
 
-    sprite_instance* sprite = new sprite_instance(empty_sprite_def, m_root, this, 0);
-    sprite->set_name(name);
-    sprite->setDynamic();
+    MovieClip* movieclip = new MovieClip(empty_sprite_def, m_root, this, 0);
+    movieclip->set_name(name);
+    movieclip->setDynamic();
 
     // TODO: only call set_invalidated if this character actually overrides
     //             an existing one !
     set_invalidated(); 
 
-    m_display_list.place_character(sprite, depth);     
+    m_display_list.place_character(movieclip, depth);     
 
-    return sprite;
+    return movieclip;
 }
 
 boost::intrusive_ptr<character>
-sprite_instance::add_textfield(const std::string& name, int depth, int x, int y, float width, float height)
+MovieClip::add_textfield(const std::string& name, int depth, int x, int y, float width, float height)
 {
     // Create a definition (TODO: cleanup this thing, definitions should be immutable!)
     boost::intrusive_ptr<edit_text_character_def> txt = new edit_text_character_def();
@@ -2931,8 +3076,8 @@ sprite_instance::add_textfield(const std::string& name, int depth, int x, int y,
     return txt_char;
 }
 
-boost::intrusive_ptr<sprite_instance> 
-sprite_instance::duplicateMovieClip(const std::string& newname, int depth,
+boost::intrusive_ptr<MovieClip> 
+MovieClip::duplicateMovieClip(const std::string& newname, int depth,
         as_object* initObject)
 {
     character* parent_ch = get_parent();
@@ -2941,50 +3086,50 @@ sprite_instance::duplicateMovieClip(const std::string& newname, int depth,
         log_error(_("Can't clone root of the movie"));
         return NULL;
     }
-    sprite_instance* parent = parent_ch->to_movie();
+    MovieClip* parent = parent_ch->to_movie();
     if ( ! parent )
     {
-        log_error(_("%s parent is not a sprite, can't clone"), getTarget());
+        log_error(_("%s parent is not a movieclip, can't clone"), getTarget());
         return NULL;
     }
 
-    boost::intrusive_ptr<sprite_instance> newsprite = new sprite_instance(m_def.get(),
+    boost::intrusive_ptr<MovieClip> newmovieclip = new MovieClip(m_def.get(),
             m_root, parent, get_id());
-    newsprite->set_name(newname);
+    newmovieclip->set_name(newname);
 
-    newsprite->setDynamic();
+    newmovieclip->setDynamic();
 
-    if ( initObject ) newsprite->copyProperties(*initObject);
-    //else newsprite->copyProperties(*this);
+    if ( initObject ) newmovieclip->copyProperties(*initObject);
+    //else newmovieclip->copyProperties(*this);
 
-    // Copy event handlers from sprite
+    // Copy event handlers from movieclip
     // We should not copy 'm_action_buffer' since the 'm_method' already contains it
-    newsprite->set_event_handlers(get_event_handlers());
+    newmovieclip->set_event_handlers(get_event_handlers());
 
     // Copy drawable
-    newsprite->_drawable = new DynamicShape(*_drawable);
+    newmovieclip->_drawable = new DynamicShape(*_drawable);
     
-    newsprite->set_cxform(get_cxform());    
-    newsprite->copyMatrix(*this); // copy SWFMatrix and caches
-    newsprite->set_ratio(get_ratio());    
-    newsprite->set_clip_depth(get_clip_depth());    
+    newmovieclip->set_cxform(get_cxform());    
+    newmovieclip->copyMatrix(*this); // copy SWFMatrix and caches
+    newmovieclip->set_ratio(get_ratio());    
+    newmovieclip->set_clip_depth(get_clip_depth());    
     
-    parent->m_display_list.place_character(newsprite.get(), depth);
+    parent->m_display_list.place_character(newmovieclip.get(), depth);
     
-    return newsprite; 
+    return newmovieclip; 
 }
 
 /* public */
 void
-sprite_instance::queueAction(const action_buffer& action)
+MovieClip::queueAction(const action_buffer& action)
 {
     movie_root& root = _vm.getRoot();
-    root.pushAction(action, boost::intrusive_ptr<sprite_instance>(this));
+    root.pushAction(action, boost::intrusive_ptr<MovieClip>(this));
 }
 
 /* private */
 void
-sprite_instance::queueActions(ActionList& actions)
+MovieClip::queueActions(ActionList& actions)
 {
     for(ActionList::const_iterator it=actions.begin(), itEnd=actions.end();
                      it != itEnd; ++it)
@@ -2995,12 +3140,12 @@ sprite_instance::queueActions(ActionList& actions)
 }
 
 bool
-sprite_instance::on_event(const event_id& id)
+MovieClip::on_event(const event_id& id)
 {
     testInvariant();
 
 #ifdef GNASH_DEBUG
-    log_debug(_("Event %s invoked for sprite %s"), id, getTarget());
+    log_debug(_("Event %s invoked for movieclip %s"), id, getTarget());
 #endif
 
     // We do not execute ENTER_FRAME if unloaded
@@ -3050,11 +3195,11 @@ sprite_instance::on_event(const event_id& id)
     //             clips on which no clip-events are defined.
     //             see testsuite/misc-ming.all/action_execution_order_extend_test.swf
     //
-    //     Note that this can't be true for sprites
+    //     Note that this can't be true for movieclips
     //     not placed by PlaceObject, see
     //     testsuite/misc-ming.all/registerClassTest.swf
     //
-    //     Note that this is also not true for sprites which have
+    //     Note that this is also not true for movieclips which have
     //     a registered class on them, see
     //     testsuite/misc-ming.all/registerClassTest2.swf
     //
@@ -3123,7 +3268,7 @@ sprite_instance::on_event(const event_id& id)
 }
 
 as_object*
-sprite_instance::get_path_element(string_table::key key)
+MovieClip::get_path_element(string_table::key key)
 {
     //log_debug("%s.get_path_element(%s) called", getTarget(), _vm.getStringTable().value(key));
     as_object* obj = get_path_element_character(key);
@@ -3151,7 +3296,7 @@ sprite_instance::get_path_element(string_table::key key)
     // See if it's a member
 
     // NOTE: direct use of the base class's get_member avoids
-    //             triggering a call to sprite_instance::get_member
+    //             triggering a call to MovieClip::get_member
     //             which would scan the child characters again
     //             w/out a need for it
 
@@ -3173,11 +3318,11 @@ sprite_instance::get_path_element(string_table::key key)
 }
 
 bool
-sprite_instance::set_member(string_table::key name,
+MovieClip::set_member(string_table::key name,
         const as_value& val, string_table::key nsname, bool ifFound)
 {
 #ifdef DEBUG_DYNTEXT_VARIABLES
-    //log_debug(_("sprite[%p]::set_member(%s, %s)"), (void*)this, VM::get().getStringTable().value(name), val);
+    //log_debug(_("movieclip[%p]::set_member(%s, %s)"), (void*)this, VM::get().getStringTable().value(name), val);
 #endif
 
     //if ( val.is_function() )
@@ -3222,18 +3367,20 @@ sprite_instance::set_member(string_table::key name,
     return found;
 }
 
-void sprite_instance::advance_sprite()
+void
+MovieClip::advance_sprite()
 {
     //GNASH_REPORT_FUNCTION;
 
     assert(!isUnloaded());
-    assert(!_callingFrameActions); // call_frame shoudl never trigger advance_sprite
+    // call_frame shoudl never trigger advance_movieclip
+    assert(!_callingFrameActions);
 
     // We might have loaded NO frames !
     if ( get_loaded_frames() == 0 )
     {
         IF_VERBOSE_MALFORMED_SWF(
-        LOG_ONCE( log_swferror(_("advance_sprite: no frames loaded for sprite/movie %s"), getTarget()) );
+        LOG_ONCE( log_swferror(_("advance_movieclip: no frames loaded for movieclip/movie %s"), getTarget()) );
         );
         return;
     }
@@ -3245,7 +3392,7 @@ void sprite_instance::advance_sprite()
 #ifdef GNASH_DEBUG
     size_t frame_count = m_def->get_frame_count();
 
-    log_debug(_("Advance_sprite for sprite '%s' - frame %u/%u "),
+    log_debug(_("Advance_movieclip for movieclip '%s' - frame %u/%u "),
         getTarget(), m_current_frame,
         frame_count);
 #endif
@@ -3258,7 +3405,7 @@ void sprite_instance::advance_sprite()
     if (m_play_state == PLAY)
     {
 #ifdef GNASH_DEBUG
-        log_debug(_("sprite_instance::advance_sprite we're in PLAY mode"));
+        log_debug(_("MovieClip::advance_movieclip we're in PLAY mode"));
 #endif
 
         int prev_frame = m_current_frame;
@@ -3278,24 +3425,27 @@ void sprite_instance::advance_sprite()
             if ( m_current_frame == 0 && has_looped() )
             {
 #ifdef GNASH_DEBUG
-                log_debug(_("Jumping back to frame 0 of sprite %s"), getTarget());
+                log_debug(_("Jumping back to frame 0 of movieclip %s"),
+                        getTarget());
 #endif
                 restoreDisplayList(0); // seems OK to me.
             }
             else
             {
 #ifdef GNASH_DEBUG
-                log_debug(_("Executing frame%d (0-based) tags of sprite %s"), m_current_frame, getTarget());
+                log_debug(_("Executing frame%d (0-based) tags of movieclip "
+                            "%s"), m_current_frame, getTarget());
 #endif
                 // Make sure m_current_frame is 0-based during execution of DLIST tags
-                execute_frame_tags(m_current_frame, m_display_list, TAG_DLIST|TAG_ACTION);
+                execute_frame_tags(m_current_frame, m_display_list,
+                        TAG_DLIST|TAG_ACTION);
             }
         }
     }
 #ifdef GNASH_DEBUG
     else
     {
-        log_debug(_("sprite_instance::advance_sprite we're in STOP mode"));
+        log_debug(_("MovieClip::advance_movieclip we're in STOP mode"));
         // shouldn't we execute frame tags anyway when in STOP mode ?
         //execute_frame_tags(m_current_frame);
     }
@@ -3303,12 +3453,13 @@ void sprite_instance::advance_sprite()
 }
 
 // child movieclip advance
-void sprite_instance::advance()
+void
+MovieClip::advance()
 {
 //    GNASH_REPORT_FUNCTION;
 
 #ifdef GNASH_DEBUG
-    log_debug(_("Advance sprite '%s' at frame %u/%u"),
+    log_debug(_("Advance movieclip '%s' at frame %u/%u"),
         getTargetPath(), m_current_frame,
         get_frame_count());
 #endif
@@ -3321,28 +3472,21 @@ void sprite_instance::advance()
 }
 
 void
-sprite_instance::execute_init_action_buffer(const action_buffer& a, int cid)
+MovieClip::execute_init_action_buffer(const action_buffer& a, int cid)
 {
-    movie_instance* mi = m_root; // get_root(); // WARNING! get_root() would depend on _lockroot !!
+    // WARNING! get_root() would depend on _lockroot !!
+    movie_instance* mi = m_root; 
     if ( mi->setCharacterInitialized(cid) )
     {
 #ifdef GNASH_DEBUG
-        log_debug(_("Queuing init actions in frame %d of sprite %s"), m_current_frame, getTarget());
+        log_debug(_("Queuing init actions in frame %d of movieclip %s"),
+                m_current_frame, getTarget());
 #endif
-        std::auto_ptr<ExecutableCode> code ( new GlobalCode(a, boost::intrusive_ptr<sprite_instance>(this)) );
+        std::auto_ptr<ExecutableCode> code ( 
+                new GlobalCode(a, boost::intrusive_ptr<MovieClip>(this)) );
 
-        // NOTE: we should really push these actions, but I still don't understand
-        //             why doing so breaks youtube :/
-        //             Undefining the YOUTUBE_TAKES_PRECEDENCE you'll get many XPASS
-        //             in our testsuite, and no failures, but youtube would break.
-        //
-//#define YOUTUBE_TAKES_PRECEDENCE 1
-#ifdef YOUTUBE_TAKES_PRECEDENCE
-        code->execute();
-#else
         movie_root& root = _vm.getRoot();
         root.pushAction(code, movie_root::apINIT);
-#endif
     }
     else
     {
@@ -3353,7 +3497,7 @@ sprite_instance::execute_init_action_buffer(const action_buffer& a, int cid)
 }
 
 void
-sprite_instance::execute_action(const action_buffer& ab)
+MovieClip::execute_action(const action_buffer& ab)
 {
     as_environment& env = m_as_environment; // just type less
 
@@ -3363,7 +3507,7 @@ sprite_instance::execute_action(const action_buffer& ab)
 
 /*private*/
 void
-sprite_instance::restoreDisplayList(size_t tgtFrame)
+MovieClip::restoreDisplayList(size_t tgtFrame)
 {
     // This is not tested as usable for jump-forwards (yet)...
     // TODO: I guess just moving here the code currently in goto_frame
@@ -3391,7 +3535,7 @@ sprite_instance::restoreDisplayList(size_t tgtFrame)
 
 // 0-based frame number !
 void
-sprite_instance::execute_frame_tags(size_t frame, DisplayList& dlist, int typeflags)
+MovieClip::execute_frame_tags(size_t frame, DisplayList& dlist, int typeflags)
 {
     testInvariant();
 
@@ -3401,36 +3545,36 @@ sprite_instance::execute_frame_tags(size_t frame, DisplayList& dlist, int typefl
     if ( playlist )
     {
         PlayList::const_iterator it = playlist->begin();
-    PlayList::const_iterator e = playlist->end();
+        PlayList::const_iterator e = playlist->end();
     
         IF_VERBOSE_ACTION(
             // Use 1-based frame numbers
-            log_action(_("Executing %d tags in frame %d/%d of sprite %s"),
+            log_action(_("Executing %d tags in frame %d/%d of movieclip %s"),
                 playlist->size(), frame + 1, get_frame_count(),
                 getTargetPath());
         );
 
         if ( (typeflags&TAG_DLIST) && (typeflags&TAG_ACTION) )
         {
-                for(; it != e; it++)
-                {
-                        (*it)->execute(this, dlist);
-                }
+            for( ; it != e; it++)
+            {
+                (*it)->execute(this, dlist);
+            }
         }
         else if ( typeflags & TAG_DLIST )
         {
-                for(; it != e; it++)
-                {
-                        (*it)->execute_state(this, dlist);
-                }
+            for( ; it != e; it++)
+            {
+                (*it)->execute_state(this, dlist);
+            }
         }
         else
         {
-                assert(typeflags & TAG_ACTION);
-                for(; it != e; it++)
-                {
-                        (*it)->execute_action(this, dlist);
-                }
+            assert(typeflags & TAG_ACTION);
+            for( ; it != e; it++)
+            {
+                (*it)->execute_action(this, dlist);
+            }
         }
     }
 
@@ -3438,10 +3582,10 @@ sprite_instance::execute_frame_tags(size_t frame, DisplayList& dlist, int typefl
 }
 
 void
-sprite_instance::goto_frame(size_t target_frame_number)
+MovieClip::goto_frame(size_t target_frame_number)
 {
 #if defined(DEBUG_GOTOFRAME) || defined(GNASH_DEBUG_TIMELINE)
-    log_debug(_("sprite %s ::goto_frame(%d) - current frame is %d"),
+    log_debug(_("movieclip %s ::goto_frame(%d) - current frame is %d"),
         getTargetPath(), target_frame_number, m_current_frame);
 #endif
 
@@ -3457,8 +3601,9 @@ sprite_instance::goto_frame(size_t target_frame_number)
         if ( ! m_def->ensure_frame_loaded(target_frame_number+1) )
         {
             log_error(_("Target frame of a gotoFrame(%d) was never loaded,"
-                                    "although frame count in header (%d) said we should have found it"),
-                target_frame_number+1, m_def->get_frame_count());
+                        "although frame count in header (%d) said we "
+                        "should have found it"),
+                        target_frame_number+1, m_def->get_frame_count());
             return; // ... I guess, or not ?
         }
 
@@ -3469,7 +3614,7 @@ sprite_instance::goto_frame(size_t target_frame_number)
         return;
     }
 
-    if(target_frame_number == m_current_frame)
+    if (target_frame_number == m_current_frame)
     {
         // don't push actions
         return;
@@ -3478,7 +3623,7 @@ sprite_instance::goto_frame(size_t target_frame_number)
     // Unless the target frame is the next one, stop playback of soundstream
     if (target_frame_number != m_current_frame+1 )
     {
-    stopStreamSound();
+        stopStreamSound();
     }
 
     size_t loaded_frames = get_loaded_frames();
@@ -3500,8 +3645,9 @@ sprite_instance::goto_frame(size_t target_frame_number)
         if ( ! m_def->ensure_frame_loaded(target_frame_number+1) )
         {
             log_error(_("Target frame of a gotoFrame(%d) was never loaded, "
-                                "although frame count in header (%d) said we should have found it"),
-                target_frame_number+1, m_def->get_frame_count());
+                        "although frame count in header (%d) said we should"
+                        " have found it"),
+                        target_frame_number+1, m_def->get_frame_count());
             return; // ... I guess, or not ?
         }
     }
@@ -3512,13 +3658,15 @@ sprite_instance::goto_frame(size_t target_frame_number)
     //
 
     if (target_frame_number < m_current_frame)
-    // Go backward to a previous frame
     {
+        // Go backward to a previous frame
         // NOTE: just in case we're being called by code in a called frame
-        //             we'll backup and resume the _callingFrameActions flag
+        // we'll backup and resume the _callingFrameActions flag
         bool callingFrameActionsBackup = _callingFrameActions;
         _callingFrameActions = false;
-        // restoreDisplayList takes care of properly setting the m_current_frame variable
+
+        // restoreDisplayList takes care of properly setting the 
+        // m_current_frame variable
         restoreDisplayList(target_frame_number);
         assert(m_current_frame == target_frame_number);
         _callingFrameActions = callingFrameActionsBackup;
@@ -3544,14 +3692,15 @@ sprite_instance::goto_frame(size_t target_frame_number)
         //             we'll backup and resume the _callingFrameActions flag
         bool callingFrameActionsBackup = _callingFrameActions;
         _callingFrameActions = false;
-        execute_frame_tags(target_frame_number, m_display_list, TAG_DLIST|TAG_ACTION);
+        execute_frame_tags(target_frame_number, m_display_list,
+                TAG_DLIST|TAG_ACTION);
         _callingFrameActions = callingFrameActionsBackup;
     }
 
     assert(m_current_frame == target_frame_number);
 }
 
-bool sprite_instance::goto_labeled_frame(const std::string& label)
+bool MovieClip::goto_labeled_frame(const std::string& label)
 {
     size_t target_frame;
     if (m_def->get_labeled_frame(label, target_frame))
@@ -3561,13 +3710,13 @@ bool sprite_instance::goto_labeled_frame(const std::string& label)
     }
 
         IF_VERBOSE_MALFORMED_SWF(
-        log_swferror(_("sprite_instance::goto_labeled_frame('%s') "
+        log_swferror(_("MovieClip::goto_labeled_frame('%s') "
             "unknown label"), label);
         );
         return false;
 }
 
-void sprite_instance::display()
+void MovieClip::display()
 {
     //GNASH_REPORT_FUNCTION;
 
@@ -3600,7 +3749,7 @@ void sprite_instance::display()
     clear_invalidated();
 }
 
-void sprite_instance::omit_display()
+void MovieClip::omit_display()
 {
     if (m_child_invalidated)
         m_display_list.omit_display();
@@ -3609,7 +3758,7 @@ void sprite_instance::omit_display()
 }
 
 bool
-sprite_instance::attachCharacter(character& newch, int depth)
+MovieClip::attachCharacter(character& newch, int depth)
 { 
     m_display_list.place_character(&newch, depth);    
 
@@ -3617,165 +3766,156 @@ sprite_instance::attachCharacter(character& newch, int depth)
 }
 
 character*
-sprite_instance::add_display_object(const SWF::PlaceObject2Tag* tag, DisplayList& dlist)
+MovieClip::add_display_object(const SWF::PlaceObject2Tag* tag,
+        DisplayList& dlist)
 {
-        assert(m_def != NULL);
-        assert(tag != NULL);
+    assert(m_def);
+    assert(tag);
 
-        character_def*    cdef = m_def->get_character_def(tag->getID());
-        if (cdef == NULL)
-        {
-                IF_VERBOSE_MALFORMED_SWF(
-                        log_swferror(_("sprite_instance::add_display_object(): "
-                                "unknown cid = %d"), tag->getID());
-                );
-                return NULL;
-        }
-    
-        character* existing_char = dlist.get_character_at_depth(tag->getDepth());
-        
-        if(existing_char)
-        {
-                return NULL;
-        }
-        else
-        {
-                boost::intrusive_ptr<character> ch = cdef->create_character_instance(this, tag->getID());
-        
-                if(tag->hasName())
-                {
-                        ch->set_name(tag->getName());
-                }
-                else if(ch->wantsInstanceName())
-                {
-                        std::string instance_name = getNextUnnamedInstanceName();
-                        ch->set_name(instance_name);
-                }
-            
-                // Attach event handlers (if any).
-                const std::vector<swf_event*>& event_handlers = tag->getEventHandlers();
-                for (size_t i = 0, n = event_handlers.size(); i < n; i++)
-                {
-                        swf_event* ev = event_handlers[i];
-                        ch->add_event_handler(ev->event(), ev->action());
-                }
-
-                // TODO: check if we should check those has_xxx flags first.
-                ch->set_cxform(tag->getCxform());
-                ch->setMatrix(tag->getMatrix(), true); // update caches
-                ch->set_ratio(tag->getRatio());
-                ch->set_clip_depth(tag->getClipDepth());
-                
-                dlist.place_character(ch.get(), tag->getDepth());
-
-                return ch.get();
+    character_def* cdef = m_def->get_character_def(tag->getID());
+    if (!cdef)
+    {
+        IF_VERBOSE_MALFORMED_SWF(
+            log_swferror(_("MovieClip::add_display_object(): "
+                    "unknown cid = %d"), tag->getID());
+        );
+        return NULL;
     }
+    
+    character* existing_char = dlist.get_character_at_depth(tag->getDepth());
+    
+    if (existing_char) return NULL;
+
+    boost::intrusive_ptr<character> ch =
+        cdef->create_character_instance(this, tag->getID());
+
+    if (tag->hasName()) ch->set_name(tag->getName());
+    else if (ch->wantsInstanceName())
+    {
+        std::string instance_name = getNextUnnamedInstanceName();
+        ch->set_name(instance_name);
+    }
+
+    // Attach event handlers (if any).
+    const std::vector<swf_event*>& event_handlers = tag->getEventHandlers();
+    for (size_t i = 0, n = event_handlers.size(); i < n; i++)
+    {
+        swf_event* ev = event_handlers[i];
+        ch->add_event_handler(ev->event(), ev->action());
+    }
+
+    // TODO: check if we should check those has_xxx flags first.
+    ch->set_cxform(tag->getCxform());
+    ch->setMatrix(tag->getMatrix(), true); // update caches
+    ch->set_ratio(tag->getRatio());
+    ch->set_clip_depth(tag->getClipDepth());
+    
+    dlist.place_character(ch.get(), tag->getDepth());
+    return ch.get();
 }
 
 void 
-sprite_instance::move_display_object(const SWF::PlaceObject2Tag* tag, DisplayList& dlist)
+MovieClip::move_display_object(const SWF::PlaceObject2Tag* tag, DisplayList& dlist)
 {    
     int ratio = tag->getRatio();
-        dlist.move_character(
-                tag->getDepth(), 
-                tag->hasCxform() ? &tag->getCxform() : NULL,
-                tag->hasMatrix() ? &tag->getMatrix() : NULL,
-                tag->hasRatio()    ? &ratio    : NULL,
-                NULL); // clip_depth is not used in MOVE tag(at least no related tests). 
+    // clip_depth is not used in MOVE tag(at least no related tests). 
+    dlist.move_character(
+        tag->getDepth(), 
+        tag->hasCxform() ? &tag->getCxform() : NULL,
+        tag->hasMatrix() ? &tag->getMatrix() : NULL,
+        tag->hasRatio()    ? &ratio    : NULL,
+        NULL);
 }
 
-void sprite_instance::replace_display_object(const SWF::PlaceObject2Tag* tag, DisplayList& dlist)
+void MovieClip::replace_display_object(const SWF::PlaceObject2Tag* tag, DisplayList& dlist)
 {
-        assert(m_def != NULL);
-        assert(tag != NULL);
+    assert(m_def != NULL);
+    assert(tag != NULL);
 
-        character_def*    cdef = m_def->get_character_def(tag->getID());
-        if (cdef == NULL)
+    character_def*    cdef = m_def->get_character_def(tag->getID());
+    if (cdef == NULL)
+    {
+        log_error(_("movieclip::replace_display_object(): "
+            "unknown cid = %d"), tag->getID());
+        return;
+    }
+    assert(cdef);
+
+    character* existing_char = dlist.get_character_at_depth(tag->getDepth());
+
+    if (existing_char)
+    {
+        // if the existing character is not a shape, move it instead of replace
+        if ( existing_char->isActionScriptReferenceable() )
         {
-                log_error(_("sprite::replace_display_object(): "
-                        "unknown cid = %d"), tag->getID());
-                return;
+            move_display_object(tag, dlist);
+            return;
         }
-        assert(cdef);
-
-        character* existing_char = dlist.get_character_at_depth(tag->getDepth());
-
-        if (existing_char)
+        else
         {
-                // if the existing character is not a shape, move it instead of replace
-                if ( existing_char->isActionScriptReferenceable() )
-                {
-                        move_display_object(tag, dlist);
-                        return;
-                }
-                else
-                {
-                        boost::intrusive_ptr<character> ch = cdef->create_character_instance(this, tag->getID());
+            boost::intrusive_ptr<character> ch = 
+                cdef->create_character_instance(this, tag->getID());
 
-                        // TODO: check if we can drop this for REPLACE!
-                        // should we rename the character when it's REPLACE tag?
-                        if(tag->hasName())
-                        {
-                                ch->set_name(tag->getName());
-                        }
-                        else if(ch->wantsInstanceName())
-                        {
-                                std::string instance_name = getNextUnnamedInstanceName();
-                                ch->set_name(instance_name);
-                        }
-                        if(tag->hasRatio())
-                        {
-                                ch->set_ratio(tag->getRatio());
-                        }
-                        if(tag->hasCxform())
-                        {
-                                ch->set_cxform(tag->getCxform());
-                        }
-                        if(tag->hasMatrix())
-                        {
-                                ch->setMatrix(tag->getMatrix(), true); // update caches
-                        }
+            // TODO: check if we can drop this for REPLACE!
+            // should we rename the character when it's REPLACE tag?
+            if(tag->hasName())
+            {
+                ch->set_name(tag->getName());
+            }
+            else if(ch->wantsInstanceName())
+            {
+                std::string instance_name = getNextUnnamedInstanceName();
+                ch->set_name(instance_name);
+            }
+            if(tag->hasRatio())
+            {
+                ch->set_ratio(tag->getRatio());
+            }
+            if(tag->hasCxform())
+            {
+                ch->set_cxform(tag->getCxform());
+            }
+            if(tag->hasMatrix())
+            {
+                ch->setMatrix(tag->getMatrix(), true); // update caches
+            }
+
+            // use SWFMatrix from the old character if tag doesn't provide one.
             dlist.replace_character(ch.get(), tag->getDepth(), 
-                !tag->hasCxform(), // use SWFMatrix from the old character if tag doesn't provide one.
+                !tag->hasCxform(), 
                 !tag->hasMatrix());
-                }
         }
-        else // non-existing character
-        {
-                log_error(_("sprite_instance::replace_display_object: could not "
-                                "find any character at depth %d"), tag->getDepth());
-        } 
+    }
+    else // non-existing character
+    {
+        log_error(_("MovieClip::replace_display_object: could not "
+                "find any character at depth %d"), tag->getDepth());
+    } 
 }
 
-void sprite_instance::remove_display_object(const SWF::PlaceObject2Tag* tag, DisplayList& dlist)
+void MovieClip::remove_display_object(const SWF::PlaceObject2Tag* tag, DisplayList& dlist)
 {
     set_invalidated();
     dlist.remove_character(tag->getDepth());
 }
 
-void sprite_instance::replace_display_object(
-                character* ch,    
-                int depth, 
-                bool use_old_cxform, 
-                bool use_old_matrix)
+void MovieClip::replace_display_object(character* ch, int depth, 
+        bool use_old_cxform, bool use_old_matrix)
 {
-        assert(ch != NULL);
-
-        m_display_list.replace_character(ch, depth, use_old_cxform, use_old_matrix);
+    assert(ch);
+    m_display_list.replace_character(ch, depth,
+            use_old_cxform, use_old_matrix);
 }
 
-int sprite_instance::get_id_at_depth(int depth)
+int MovieClip::get_id_at_depth(int depth)
 {
-        character*    ch = m_display_list.get_character_at_depth(depth);
-        if ( ! ch ) return -1;
-        else return ch->get_id();
+    character* ch = m_display_list.get_character_at_depth(depth);
+    if ( ! ch ) return -1;
+    return ch->get_id();
 }
 
-void sprite_instance::increment_frame_and_check_for_loop()
+void MovieClip::increment_frame_and_check_for_loop()
 {
-    //GNASH_REPORT_FUNCTION;
-
-    //size_t frame_count = m_def->get_frame_count();
     size_t frame_count = get_loaded_frames(); 
     if ( ++m_current_frame >= frame_count )
     {
@@ -3849,9 +3989,11 @@ public:
         {
             if ( ch->isMaskLayer() )
             {
-                log_debug(_("CHECKME: nested mask in MouseEntityFinder. This mask "
-                                "is %s at depth %d outer mask masked up to depth %d."),
-                    ch->getTarget(), ch->get_depth(), _highestHiddenDepth);
+                log_debug(_("CHECKME: nested mask in MouseEntityFinder. "
+                            "This mask is %s at depth %d outer mask masked "
+                            "up to depth %d."),
+                            ch->getTarget(), ch->get_depth(),
+                            _highestHiddenDepth);
                 // Hiding mask still in effect...
             }
             return;
@@ -3859,22 +4001,26 @@ public:
 
         if ( ch->isMaskLayer() )
         {
-            //if ( ! ch->get_visible() ) log_debug("invisible mask in MouseEntityFinder.");
+            //if ( ! ch->get_visible() ) {
+            //    log_debug("invisible mask in MouseEntityFinder.");
+            //}
             if ( ! ch->pointInShape(_wp.x, _wp.y) )
             {
 #ifdef DEBUG_MOUSE_ENTITY_FINDING
-                log_debug(_("Character %s at depth %d is a mask not hitting the "
-                                "query point %g,%g and masking up to depth %d"),
-                    ch->getTarget(), ch->get_depth(), _wp.x, _wp.y, ch->get_clip_depth());
-#endif // DEBUG_MOUSE_ENTITY_FINDING
+                log_debug(_("Character %s at depth %d is a mask not hitting "
+                        "the query point %g,%g and masking up to "
+                        "depth %d"), ch->getTarget(), ch->get_depth(), 
+                        _wp.x, _wp.y, ch->get_clip_depth());
+#endif
                 _highestHiddenDepth = ch->get_clip_depth();
             }
             else
             {
 #ifdef DEBUG_MOUSE_ENTITY_FINDING
-                log_debug(_("Character %s at depth %d is a mask hitting the query point %g,%g"),
-                    ch->getTarget(), ch->get_depth(), _wp.x, _wp.y);
-#endif // DEBUG_MOUSE_ENTITY_FINDING
+                log_debug(_("Character %s at depth %d is a mask hitting the "
+                        "query point %g,%g"),
+                        ch->getTarget(), ch->get_depth(), _wp.x, _wp.y);
+#endif 
             }
 
             return;
@@ -3909,8 +4055,9 @@ public:
 #ifdef DEBUG_MOUSE_ENTITY_FINDING
         if ( _m ) 
         {
-            log_debug(_("MouseEntityFinder found character %s (depth %d) hitting point %g,%g"),
-                _m->getTarget(), _m->get_depth(), _wp.x, _wp.y);
+            log_debug(_("MouseEntityFinder found character %s (depth %d) "
+                    "hitting point %g,%g"),
+                    _m->getTarget(), _m->get_depth(), _wp.x, _wp.y);
         }
 #endif // DEBUG_MOUSE_ENTITY_FINDING
         return _m;
@@ -3989,104 +4136,105 @@ public:
 /// Point coordinates in world TWIPS 
 /// 
 class HitableShapeContainerFinder { 
-        bool _found; 
-        boost::int32_t    _x; // TWIPS
-        boost::int32_t    _y; // TWIPS
+    bool _found; 
+    boost::int32_t    _x; // TWIPS
+    boost::int32_t    _y; // TWIPS
         
 public: 
-        HitableShapeContainerFinder(boost::int32_t x, boost::int32_t y) 
-                : 
-        _found(false), 
-        _x(x), 
-        _y(y) 
-        {} 
+    HitableShapeContainerFinder(boost::int32_t x, boost::int32_t y) 
+            : 
+    _found(false), 
+    _x(x), 
+    _y(y) 
+    {} 
 
-        bool operator() (character* ch) 
+    bool operator() (character* ch) 
+    { 
+        if( ch->isDynamicMask() ) 
         { 
-                if( ch->isDynamicMask() ) 
-                { 
-                        return true; 
-                } 
-                else if ( ch->pointInShape(_x, _y) ) 
-                {
-                        _found = true; 
-                        return false; 
-                } 
-                else 
-                { 
-                        return true; 
-                }
+            return true; 
         } 
+        else if ( ch->pointInShape(_x, _y) ) 
+        {
+            _found = true; 
+            return false; 
+        } 
+        else 
+        { 
+            return true; 
+        }
+    } 
 
-        bool hitFound() { return _found; } 
+    bool hitFound() { return _found; } 
 }; 
 
 bool
-sprite_instance::pointInShape(boost::int32_t x, boost::int32_t y) const
+MovieClip::pointInShape(boost::int32_t x, boost::int32_t y) const
 {
-        ShapeContainerFinder finder(x, y);
-        const_cast<DisplayList&>(m_display_list).visitBackward(finder);
-        if ( finder.hitFound() ) return true;
+    ShapeContainerFinder finder(x, y);
+    const_cast<DisplayList&>(m_display_list).visitBackward(finder);
+    if ( finder.hitFound() ) return true;
+    return _drawable_inst->pointInShape(x, y); 
+}
+
+bool
+MovieClip::pointInVisibleShape(boost::int32_t x, boost::int32_t y) const
+{
+    if ( ! get_visible() ) return false;
+    if ( isDynamicMask() && ! can_handle_mouse_event() )
+    {
+        // see testsuite/misc-ming.all/masks_test.swf
+#ifdef GNASH_DEBUG_HITTEST
+        log_debug(_("%s is a dynamic mask and can't handle mouse "
+                    "events, no point will hit it"), getTarget());
+#endif
+        return false;
+    }
+    character* mask = getMask(); // dynamic one
+    if ( mask && mask->get_visible() && ! mask->pointInShape(x, y) )
+    {
+#ifdef GNASH_DEBUG_HITTEST
+        log_debug(_("%s is dynamically masked by %s, which "
+                "doesn't hit point %g,%g"), getTarget(),
+                mask->getTarget(), x, y);
+#endif
+        return false;
+    }
+    VisibleShapeContainerFinder finder(x, y);
+    const_cast<DisplayList&>(m_display_list).visitBackward(finder);
+    if ( finder.hitFound() ) return true;
+    return _drawable_inst->pointInVisibleShape(x, y); 
+}
+
+bool
+MovieClip::pointInHitableShape(boost::int32_t x, boost::int32_t y) const
+{
+    if ( isDynamicMask() && !can_handle_mouse_event() )
+    {
+        return false;
+    }
+
+    character* mask = getMask(); 
+    if ( mask && ! mask->pointInShape(x, y) )
+    {
+        return false;
+    }
+            
+    HitableShapeContainerFinder finder(x, y);
+    m_display_list.visitBackward(finder);
+
+    if ( finder.hitFound() )
+    {
+        return true;
+    } 
+    else
+    {
         return _drawable_inst->pointInShape(x, y); 
-}
-
-bool
-sprite_instance::pointInVisibleShape(boost::int32_t x, boost::int32_t y) const
-{
-        if ( ! get_visible() ) return false;
-        if ( isDynamicMask() && ! can_handle_mouse_event() )
-        {
-                // see testsuite/misc-ming.all/masks_test.swf
-#ifdef GNASH_DEBUG_HITTEST
-                log_debug(_("%s is a dynamic mask and can't handle mouse "
-                                        "events, no point will hit it"), getTarget());
-#endif
-                return false;
-        }
-        character* mask = getMask(); // dynamic one
-        if ( mask && mask->get_visible() && ! mask->pointInShape(x, y) )
-        {
-#ifdef GNASH_DEBUG_HITTEST
-                log_debug(_("%s is dynamically masked by %s, which "
-                                        "doesn't hit point %g,%g"), getTarget(), mask->getTarget(), x, y);
-#endif
-                return false;
-        }
-        VisibleShapeContainerFinder finder(x, y);
-        const_cast<DisplayList&>(m_display_list).visitBackward(finder);
-        if ( finder.hitFound() ) return true;
-        return _drawable_inst->pointInVisibleShape(x, y); 
-}
-
-bool
-sprite_instance::pointInHitableShape(boost::int32_t x, boost::int32_t y) const
-{
-        if ( isDynamicMask() && !can_handle_mouse_event() )
-        {
-                return false;
-        }
-
-        character* mask = getMask(); 
-        if ( mask && ! mask->pointInShape(x, y) )
-        {
-                return false;
-        }
-                
-        HitableShapeContainerFinder finder(x, y);
-        m_display_list.visitBackward(finder);
-
-        if ( finder.hitFound() )
-        {
-                return true;
-        } 
-        else
-        {
-                return _drawable_inst->pointInShape(x, y); 
-        }
+    }
 }
 
 character*
-sprite_instance::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y)
+MovieClip::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y)
 {
     //GNASH_REPORT_FUNCTION;
 
@@ -4101,21 +4249,18 @@ sprite_instance::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y)
     if ( parent ) 
     {
         // WARNING: if we have NO parent, our parent is the Stage (movie_root)
-        //                    so, in case we'll add a "stage" matrix, we'll need to take
-        //                    it into account here.
-        // TODO: actually, why are we insisting in using parent's coordinates for
-        //             this method at all ?
-        //
-         parent->getWorldMatrix().transform(wp);
+        //          so, in case we'll add a "stage" matrix, we'll need to take
+        //          it into account here.
+        // TODO: actually, why are we insisting in using parent's
+        //          coordinates for this method at all ?
+        parent->getWorldMatrix().transform(wp);
     }
-
 
     if ( can_handle_mouse_event() )
     {
         if ( pointInVisibleShape(wp.x, wp.y) ) return this;
         else return NULL;
     }
-
 
     SWFMatrix    m = getMatrix();
     point    pp(x, y);
@@ -4179,8 +4324,9 @@ public:
             if ( ch->isMaskLayer() )
             {
                 log_debug(_("CHECKME: nested mask in DropTargetFinder. "
-                                "This mask is %s at depth %d outer mask masked up to depth %d."),
-                    ch->getTarget(), ch->get_depth(), _highestHiddenDepth);
+                        "This mask is %s at depth %d outer mask masked "
+                        "up to depth %d."),
+                        ch->getTarget(), ch->get_depth(), _highestHiddenDepth);
                 // Hiding mask still in effect...
             }
             return;
@@ -4196,17 +4342,19 @@ public:
             {
 #ifdef DEBUG_MOUSE_ENTITY_FINDING
                 log_debug(_("Character %s at depth %d is a mask not hitting "
-                                "the query point %g,%g and masking up to depth %d"),
-                    ch->getTarget(), ch->get_depth(), _x, _y, ch->get_clip_depth());
-#endif // DEBUG_MOUSE_ENTITY_FINDING
+                        "the query point %g,%g and masking up to depth %d"),
+                    ch->getTarget(), ch->get_depth(), _x, _y,
+                    ch->get_clip_depth());
+#endif 
                 _highestHiddenDepth = ch->get_clip_depth();
             }
             else
             {
 #ifdef DEBUG_MOUSE_ENTITY_FINDING
-                log_debug(_("Character %s at depth %d is a mask hitting the query point %g,%g"),
-                    ch->getTarget(), ch->get_depth(), _x, _y);
-#endif // DEBUG_MOUSE_ENTITY_FINDING
+                log_debug(_("Character %s at depth %d is a mask "
+                            "hitting the query point %g,%g"),
+                            ch->getTarget(), ch->get_depth(), _x, _y);
+#endif
             }
 
             return;
@@ -4225,7 +4373,7 @@ public:
             const character* ch = *i;
             const character* dropChar = ch->findDropTarget(_x, _y, _dragging);
             if ( dropChar )
-        {
+            {
                 _dropch = dropChar;
                 break;
             }
@@ -4233,15 +4381,16 @@ public:
         _checked = true;
     }
 
-        const character* getDropChar() const
-        {
-                checkCandidates();
-                return _dropch;
-        }
+    const character* getDropChar() const
+    {
+        checkCandidates();
+        return _dropch;
+    }
 };
 
 const character*
-sprite_instance::findDropTarget(boost::int32_t x, boost::int32_t y, character* dragging) const
+MovieClip::findDropTarget(boost::int32_t x, boost::int32_t y,
+        character* dragging) const
 {
     if ( this == dragging ) return 0; // not here...
 
@@ -4269,7 +4418,7 @@ sprite_instance::findDropTarget(boost::int32_t x, boost::int32_t y, character* d
 }
 
 bool
-sprite_instance::can_handle_mouse_event() const
+MovieClip::can_handle_mouse_event() const
 {
     if ( ! isEnabled() ) return false;
 
@@ -4307,7 +4456,7 @@ sprite_instance::can_handle_mouse_event() const
     return false;
 }
         
-void sprite_instance::restart()
+void MovieClip::restart()
 {
 // see Whack-a-doc.swf, we tried to restart an unloaded character.
 // It shouldn't happen anyway.
@@ -4325,7 +4474,7 @@ void sprite_instance::restart()
 }
 
 character*
-sprite_instance::get_character(int /* character_id */)
+MovieClip::get_character(int /* character_id */)
 {
     //return m_def->get_character_def(character_id);
     // @@ TODO -- look through our dlist for a match
@@ -4334,30 +4483,23 @@ sprite_instance::get_character(int /* character_id */)
     return NULL;
 }
 
-#if 0
-void
-sprite_instance::get_mouse_state(int& x, int& y, int& buttons)
-{
-    _vm.getRoot().get_mouse_state(x, y, buttons);
-}
-#endif
 
 void
-sprite_instance::stop_drag()
+MovieClip::stop_drag()
 {
     //assert(m_parent == NULL); // why should we care ?
     _vm.getRoot().stop_drag();
 }
 
 float
-sprite_instance::get_background_alpha() const
+MovieClip::get_background_alpha() const
 {
-        // @@ this doesn't seem right...
-        return _vm.getRoot().get_background_alpha();
+    // @@ this doesn't seem right...
+    return _vm.getRoot().get_background_alpha();
 }
 
 void
-sprite_instance::set_background_color(const rgba& color)
+MovieClip::set_background_color(const rgba& color)
 {
     _vm.getRoot().set_background_color(color);
 }
@@ -4369,7 +4511,7 @@ static bool isTextFieldUnloaded(boost::intrusive_ptr< edit_text_character >& p)
 
 /*private*/
 void
-sprite_instance::cleanup_textfield_variables()
+MovieClip::cleanup_textfield_variables()
 {
     // nothing to do
     if ( ! _text_variables.get() ) return;
@@ -4379,7 +4521,9 @@ sprite_instance::cleanup_textfield_variables()
     for (TextFieldMap::iterator i=m.begin(), ie=m.end(); i!=ie; ++i)
     {
         TextFieldPtrVect& v=i->second;
-        TextFieldPtrVect::iterator lastValid = std::remove_if(v.begin(), v.end(), boost::bind(isTextFieldUnloaded, _1));
+        TextFieldPtrVect::iterator lastValid = 
+            std::remove_if(v.begin(), v.end(),
+                    boost::bind(isTextFieldUnloaded, _1));
         v.erase(lastValid, v.end());
         // TODO: remove the map element if vector is empty
         //if ( v.empty() )
@@ -4391,7 +4535,7 @@ sprite_instance::cleanup_textfield_variables()
 
 /* public */
 void
-sprite_instance::set_textfield_variable(const std::string& name,
+MovieClip::set_textfield_variable(const std::string& name,
         edit_text_character* ch)
 {
     assert(ch);
@@ -4406,8 +4550,8 @@ sprite_instance::set_textfield_variable(const std::string& name,
 }
 
 /* private */
-sprite_instance::TextFieldPtrVect*
-sprite_instance::get_textfield_variable(const std::string& name)
+MovieClip::TextFieldPtrVect*
+MovieClip::get_textfield_variable(const std::string& name)
 {
     // nothing allocated yet...
     if ( ! _text_variables.get() ) return NULL;
@@ -4426,11 +4570,11 @@ sprite_instance::get_textfield_variable(const std::string& name)
 
 
 void 
-sprite_instance::add_invalidated_bounds(InvalidatedRanges& ranges, 
+MovieClip::add_invalidated_bounds(InvalidatedRanges& ranges, 
     bool force)
 {
 
-    // nothing to do if this sprite is not visible
+    // nothing to do if this movieclip is not visible
     if (!m_visible || get_cxform().is_invisible() )
     {
         ranges.add(m_old_invalidated_ranges); // (in case we just hided)
@@ -4458,7 +4602,7 @@ sprite_instance::add_invalidated_bounds(InvalidatedRanges& ranges,
 }
 
 void 
-sprite_instance::dump_character_tree(const std::string prefix) const
+MovieClip::dump_character_tree(const std::string prefix) const
 {
     character::dump_character_tree(prefix);
     m_display_list.dump_character_tree(prefix+" ");
@@ -4468,20 +4612,20 @@ sprite_instance::dump_character_tree(const std::string prefix) const
 /// register characters as key listeners if they have clip key events defined.
 /// Don't call twice for the same chracter.
 void
-sprite_instance::registerAsListener()
+MovieClip::registerAsListener()
 {
-        _vm.getRoot().add_key_listener(this);
-        _vm.getRoot().add_mouse_listener(this);
+    _vm.getRoot().add_key_listener(this);
+    _vm.getRoot().add_mouse_listener(this);
 }
     
 
 
 // WARNING: THIS SNIPPET NEEDS THE CHARACTER TO BE "INSTANTIATED", which is
-//                    it's target path needs to exist, or any as_value for it will be
-//                    a dangling reference to an unexistent sprite !
-//                    NOTE: this is just due to the wrong steps, see comment in header
+//          it's target path needs to exist, or any as_value for it will be
+//          a dangling reference to an unexistent movieclip !
+//          NOTE: this is just due to the wrong steps, see comment in header
 void
-sprite_instance::stagePlacementCallback()
+MovieClip::stagePlacementCallback()
 {
     assert(!isUnloaded());
 
@@ -4491,14 +4635,14 @@ sprite_instance::stagePlacementCallback()
     log_debug(_("Sprite '%s' placed on stage"), getTarget());
 #endif
 
-    // Register this sprite as a live one
+    // Register this movieclip as a live one
     _vm.getRoot().addLiveChar(this);
 
-    // Register this sprite as a core broadcasters listener
+    // Register this movieclip as a core broadcasters listener
     registerAsListener();
 
-    // It seems it's legal to place 0-framed sprites on stage.
-    // See testsuite/misc-swfmill.all/zeroframe_definesprite.swf
+    // It seems it's legal to place 0-framed movieclips on stage.
+    // See testsuite/misc-swfmill.all/zeroframe_definemovieclip.swf
     //m_def->ensure_frame_loaded(0);
 
 #if 0
@@ -4507,21 +4651,21 @@ sprite_instance::stagePlacementCallback()
     if ( ! hasFrames )
     {
         IF_VERBOSE_MALFORMED_SWF(
-        LOG_ONCE( log_swferror(_("stagePlacementCallback: no frames loaded for sprite/movie %s"), getTarget()) );
+        LOG_ONCE( log_swferror(_("stagePlacementCallback: no frames loaded for movieclip/movie %s"), getTarget()) );
         );
     }
 #endif
 
-    // We execute events immediately when the stage-placed character is dynamic.
-    // This is becase we assume that this means that the character is placed during
-    // processing of actions (opposed that during advancement iteration).
+    // We execute events immediately when the stage-placed character 
+    // is dynamic, This is becase we assume that this means that 
+    // the character is placed during processing of actions (opposed 
+    // that during advancement iteration).
     //
     // A more general implementation might ask movie_root about it's state
     // (iterating or processing actions?)
     // Another possibility to inspect could be letting movie_root decide
     // when to really queue and when rather to execute immediately the 
     // events with priority INITIALIZE or CONSTRUCT ...
-    //
     if ( isDynamic() )
     {
 #ifdef GNASH_DEBUG
@@ -4534,12 +4678,12 @@ sprite_instance::stagePlacementCallback()
     else
     {
 #ifdef GNASH_DEBUG
-        log_debug(_("Queuing INITIALIZE event for sprite %s"), getTarget());
+        log_debug(_("Queuing INITIALIZE event for movieclip %s"), getTarget());
 #endif
         queueEvent(event_id::INITIALIZE, movie_root::apINIT);
 
 #ifdef GNASH_DEBUG
-        log_debug(_("Queuing CONSTRUCT event for sprite %s"), getTarget());
+        log_debug(_("Queuing CONSTRUCT event for movieclip %s"), getTarget());
 #endif
         std::auto_ptr<ExecutableCode> code ( new ConstructEvent(this) );
         _vm.getRoot().pushAction(code, movie_root::apCONSTRUCT);
@@ -4556,14 +4700,14 @@ sprite_instance::stagePlacementCallback()
     if ( get_parent() == 0 )
     {
 #ifdef GNASH_DEBUG
-            log_debug(_("Executing tags of frame0 in sprite %s"), getTarget());
+        log_debug(_("Executing tags of frame0 in movieclip %s"), getTarget());
 #endif
-            execute_frame_tags(0, m_display_list, TAG_DLIST|TAG_ACTION);
+        execute_frame_tags(0, m_display_list, TAG_DLIST|TAG_ACTION);
 
         if ( _vm.getSWFVersion() > 5 )
         {
 #ifdef GNASH_DEBUG
-            log_debug(_("Queuing ONLOAD event for sprite %s"), getTarget());
+            log_debug(_("Queuing ONLOAD event for movieclip %s"), getTarget());
 #endif
             queueEvent(event_id::LOAD, movie_root::apDOACTION);
         }
@@ -4573,24 +4717,25 @@ sprite_instance::stagePlacementCallback()
     {
 
 #ifdef GNASH_DEBUG
-        log_debug(_("Queuing ONLOAD event for sprite %s"), getTarget());
+        log_debug(_("Queuing ONLOAD event for movieclip %s"), getTarget());
 #endif
         queueEvent(event_id::LOAD, movie_root::apDOACTION);
 
 #ifdef GNASH_DEBUG
-            log_debug(_("Executing tags of frame0 in sprite %s"), getTarget());
+        log_debug(_("Executing tags of frame0 in movieclip %s"), getTarget());
 #endif
-            execute_frame_tags(0, m_display_list, TAG_DLIST|TAG_ACTION);
+        execute_frame_tags(0, m_display_list, TAG_DLIST|TAG_ACTION);
     }
 
 }
 
 /*private*/
 void
-sprite_instance::constructAsScriptObject()
+MovieClip::constructAsScriptObject()
 {
 #ifdef GNASH_DEBUG
-    log_debug(_("constructAsScriptObject called for sprite %s"), getTarget());
+    log_debug(_("constructAsScriptObject called for movieclip %s"), 
+            getTarget());
 #endif
 
     bool eventHandlersInvoked = false;
@@ -4614,12 +4759,13 @@ sprite_instance::constructAsScriptObject()
 
         as_function* ctor = def->getRegisteredClass();
 #ifdef GNASH_DEBUG
-        log_debug(_("Attached sprites %s registered class is %p"),
+        log_debug(_("Attached movieclips %s registered class is %p"),
                 getTarget(), (void*)ctor); 
 #endif
 
         // TODO: builtin constructors are different from user-defined ones
-        // we should likely change that. See also vm/ASHandlers.cpp (construct_object)
+        // we should likely change that. See also vm/ASHandlers.cpp 
+        // (construct_object)
         if ( ctor && ! ctor->isBuiltin() )
         {
             // Set the new prototype *after* the constructor was called
@@ -4674,10 +4820,10 @@ sprite_instance::constructAsScriptObject()
 }
 
 bool
-sprite_instance::unload()
+MovieClip::unload()
 {
 #ifdef GNASH_DEBUG
-    log_debug(_("Unloading sprite '%s'"), getTargetPath());
+    log_debug(_("Unloading movieclip '%s'"), getTargetPath());
 #endif
 
     // stop any pending streaming sounds
@@ -4701,7 +4847,7 @@ sprite_instance::unload()
 }
 
 bool
-sprite_instance::loadMovie(const URL& url, const std::string* postdata)
+MovieClip::loadMovie(const URL& url, const std::string* postdata)
 {
     // Get a pointer to our own parent 
     character* parent = get_parent();
@@ -4749,7 +4895,7 @@ sprite_instance::loadMovie(const URL& url, const std::string* postdata)
         const std::string& name = get_name();
         assert (parent == extern_movie->get_parent());
 
-        sprite_instance* parent_sp = parent->to_movie();
+        MovieClip* parent_sp = parent->to_movie();
         assert(parent_sp);
        
         if( !name.empty() )
@@ -4780,7 +4926,7 @@ sprite_instance::loadMovie(const URL& url, const std::string* postdata)
 }
 
 void 
-sprite_instance::loadVariables(URL url, MovieClipMethod sendVarsMethod)
+MovieClip::loadVariables(URL url, MovieClipMethod sendVarsMethod)
 {
     // Check host security
     // will be done by LoadVariablesThread (down by getStream, that is)
@@ -4824,7 +4970,7 @@ sprite_instance::loadVariables(URL url, MovieClipMethod sendVarsMethod)
 
 /*private*/
 void
-sprite_instance::processCompletedLoadVariableRequest(LoadVariablesThread& request)
+MovieClip::processCompletedLoadVariableRequest(LoadVariablesThread& request)
 {
     assert(request.completed());
 
@@ -4851,7 +4997,7 @@ sprite_instance::processCompletedLoadVariableRequest(LoadVariablesThread& reques
 
 /*private*/
 void
-sprite_instance::processCompletedLoadVariableRequests()
+MovieClip::processCompletedLoadVariableRequests()
 {
     // Nothing to do (just for clarity)
     if ( _loadVariableRequests.empty() ) return;
@@ -4865,15 +5011,12 @@ sprite_instance::processCompletedLoadVariableRequests()
             processCompletedLoadVariableRequest(request);
             it = _loadVariableRequests.erase(it);
         }
-        else
-        {
-            ++it;
-        }
+        else ++it;
     }
 }
 
 void
-sprite_instance::setVariables(VariableMap& vars)
+MovieClip::setVariables(VariableMap& vars)
 {
     string_table& st = _vm.getStringTable();
     for (VariableMap::const_iterator it=vars.begin(), itEnd=vars.end();
@@ -4886,38 +5029,40 @@ sprite_instance::setVariables(VariableMap& vars)
 }
 
 void
-sprite_instance::removeMovieClip()
+MovieClip::removeMovieClip()
 {
     int depth = get_depth();
     if ( depth < 0 || depth > 1048575 )
     {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("removeMovieClip(%s): sprite depth (%d) out of the "
+        log_aserror(_("removeMovieClip(%s): movieclip depth (%d) out of the "
             "'dynamic' zone [0..1048575], won't remove"),
             getTarget(), depth);
         );
         return;
     }
 
-    sprite_instance* parent = dynamic_cast<sprite_instance*>(get_parent());
+    MovieClip* parent = dynamic_cast<MovieClip*>(get_parent());
     if (parent)
     {
         // second argument is arbitrary, see comments above
-        // the function declaration in sprite_instance.h
+        // the function declaration in MovieClip.h
         parent->remove_display_object(depth, 0);
     }
     else
     {
         // removing _level#
         _vm.getRoot().dropLevel(depth);
-        // I guess this can only happen if someone uses _root.swapDepth([0..1048575])
-        //log_error(_("Can't remove sprite %s as it has no parent"), getTarget());
+        // I guess this can only happen if someone uses 
+        // _root.swapDepth([0..1048575])
+        //log_error(_("Can't remove movieclip %s as it has no parent"),
+        //getTarget());
     }
 
 }
 
 rect
-sprite_instance::getBounds() const
+MovieClip::getBounds() const
 {
     rect bounds;
     BoundsFinder f(bounds);
@@ -4929,12 +5074,12 @@ sprite_instance::getBounds() const
 }
 
 bool
-sprite_instance::isEnabled() const
+MovieClip::isEnabled() const
 {
     as_value enabled;
     // const_cast needed due to get_member being non-const due to the 
     // possibility that a getter-setter would actually modify us ...
-    if ( ! const_cast<sprite_instance*>(this)->get_member(NSV::PROP_ENABLED, &enabled) )
+    if (!const_cast<MovieClip*>(this)->get_member(NSV::PROP_ENABLED, &enabled))
     {
          // We're enabled if there's no 'enabled' member...
          return true;
@@ -4943,12 +5088,13 @@ sprite_instance::isEnabled() const
 }
 
 bool
-sprite_instance::allowHandCursor() const
+MovieClip::allowHandCursor() const
 {
     as_value val;
     // const_cast needed due to get_member being non-const due to the 
     // possibility that a getter-setter would actually modify us ...
-    if ( ! const_cast<sprite_instance*>(this)->get_member(NSV::PROP_USEHANDCURSOR, &val) )
+    if (!const_cast<MovieClip*>(this)->get_member(
+                NSV::PROP_USEHANDCURSOR, &val))
     {
          // true if not found..
          return true;
@@ -4976,19 +5122,20 @@ public:
 };
 
 void
-sprite_instance::enumerateNonProperties(as_environment& env) const
+MovieClip::enumerateNonProperties(as_environment& env) const
 {
     EnumerateVisitor visitor(env);
     m_display_list.visitAll(visitor);
 }
 
 void
-sprite_instance::cleanupDisplayList()
+MovieClip::cleanupDisplayList()
 {
-                //log_debug("%s.cleanDisplayList() called, current dlist is %p", getTarget(), (void*)&m_display_list);
+    //log_debug("%s.cleanDisplayList() called, current dlist is %p", 
+    //getTarget(), (void*)&m_display_list);
     m_display_list.removeUnloaded();
 
-                cleanup_textfield_variables();
+    cleanup_textfield_variables();
 }
 
 #ifdef GNASH_USE_GC
@@ -4999,7 +5146,7 @@ struct ReachableMarker {
     }
 };
 void
-sprite_instance::markReachableResources() const
+MovieClip::markReachableResources() const
 {
     ReachableMarker marker;
 
@@ -5025,18 +5172,22 @@ sprite_instance::markReachableResources() const
             for (TextFieldPtrVect::const_iterator j=tfs.begin(), je=tfs.end(); j!=je; ++j)
             {
                 if ( (*j)->isUnloaded() )
-    {
-                    // NOTE: cleanup_display_list should have cleared these up on ::cleanupDisplayList.
-                    //             I guess if we get more might be due to ::destroy calls happening after
-                    //             our own ::cleanupDisplayList call. Should be ok to postpone cleanup
-                    //             on next ::advance, or we should cleanup here (locally) altought we're
-                    //             a 'const' method...
-                    //             Yet another approach would be for TextField::unload to unregister
-                    //             self from our map, but TextField (edit_text_character) doesn't really
-                    //             store a pointer to the sprite it's registered against.
+                {
+                    // NOTE: cleanup_display_list should have cleared 
+                    // these up on ::cleanupDisplayList.
+                    // I guess if we get more might be due to ::destroy 
+                    // calls happening after our own ::cleanupDisplayList
+                    // call. Should be ok to postpone cleanup on next 
+                    // ::advance, or we should cleanup here (locally) 
+                    // although we're a 'const' method...
+                    // Yet another approach would be for TextField::unload
+                    // to unregister self from our map, but TextField 
+                    // (edit_text_character) doesn't really store a pointer
+                    // to the movieclip it's registered against.
                     //
-                    //log_debug("Unloaded TextField in registered textfield variables container on ::markReachableResources");
-    }
+                    //log_debug("Unloaded TextField in registered textfield "
+                    //"variables container on ::markReachableResources");
+                }
                 (*j)->setReachable();
             }
         }
@@ -5052,7 +5203,7 @@ sprite_instance::markReachableResources() const
 #endif // GNASH_USE_GC
 
 void
-sprite_instance::destroy()
+MovieClip::destroy()
 {
     stopStreamSound();
 
@@ -5065,7 +5216,7 @@ sprite_instance::destroy()
 }
 
 cxform
-sprite_instance::get_world_cxform() const
+MovieClip::get_world_cxform() const
 {
     cxform cf = character::get_world_cxform();
     cf.concatenate(_userCxform); 
@@ -5073,19 +5224,20 @@ sprite_instance::get_world_cxform() const
 }
 
 movie_instance*
-sprite_instance::get_root() const
+MovieClip::get_root() const
 {
     return m_root;
 }
 
-const sprite_instance*
-sprite_instance::getAsRoot() const
+const MovieClip*
+MovieClip::getAsRoot() const
 {
-    //log_debug("getAsRoot called for sprite %s, with _lockroot %d and version %d", getTarget(), getLockRoot(), getSWFVersion());
+    //log_debug("getAsRoot called for movieclip %s, with _lockroot "
+    //"%d and version %d", getTarget(), getLockRoot(), getSWFVersion());
 
     // TODO1: as an optimization, if swf version < 7 
     //                we might as well just return m_root, 
-    //                the whole chain from this sprite to it's
+    //                the whole chain from this movieclip to it's
     //                m_root should have the same version...
     //
     // TODO2: implement this with iteration rather
@@ -5111,10 +5263,10 @@ sprite_instance::getAsRoot() const
 }
 
 as_value
-sprite_instance::lockroot_getset(const fn_call& fn)
+MovieClip::lockroot_getset(const fn_call& fn)
 {
-    boost::intrusive_ptr<sprite_instance> ptr = 
-        ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> ptr = 
+        ensureType<MovieClip>(fn.this_ptr);
 
     as_value rv;
     if ( fn.nargs == 0 ) // getter
@@ -5130,18 +5282,19 @@ sprite_instance::lockroot_getset(const fn_call& fn)
 }
 
 void
-sprite_instance::setStreamSoundId(int id)
+MovieClip::setStreamSoundId(int id)
 {
     if ( id != m_sound_stream_id )
     {
-        log_debug(_("Stream sound id from %d to %d, stopping old"), m_sound_stream_id, id);
+        log_debug(_("Stream sound id from %d to %d, stopping old"),
+                m_sound_stream_id, id);
         stopStreamSound();
     }
     m_sound_stream_id = id;
 }
 
 void
-sprite_instance::stopStreamSound()
+MovieClip::stopStreamSound()
 {
     if ( m_sound_stream_id == -1 ) return; // nothing to do
 
@@ -5155,10 +5308,10 @@ sprite_instance::stopStreamSound()
 }
 
 void
-sprite_instance::set_play_state(play_state s)
+MovieClip::set_play_state(play_state s)
 {
     if ( s == m_play_state ) return; // nothing to do
-    if ( s == sprite_instance::STOP ) stopStreamSound();
+    if ( s == MovieClip::STOP ) stopStreamSound();
     m_play_state = s;
 }
 
@@ -5186,7 +5339,7 @@ public:
 };
 
 character::InfoTree::iterator 
-sprite_instance::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
+MovieClip::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
 {
     InfoTree::iterator selfIt = character::getMovieInfo(tr, it);
     std::ostringstream os;

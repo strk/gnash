@@ -21,7 +21,7 @@
 #define INPUT_FILENAME "key_event_test.swf"
 
 #include "MovieTester.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "character.h"
 #include "DisplayList.h"
 #include "log.h"
@@ -43,7 +43,7 @@ main(int /*argc*/, char** /*argv*/)
   gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
   dbglogfile.setVerbosity(1);
 
-  sprite_instance* root = tester.getRootMovie();
+  MovieClip* root = tester.getRootMovie();
   assert(root);
 
   check_equals(root->get_frame_count(), 23);

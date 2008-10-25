@@ -24,7 +24,7 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "character.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "drag_state.h" // for do_mouse_drag (to be moved in movie_root)
 #include "VM.h" // for do_mouse_drag (to be moved in movie_root)
 #include "fn_call.h" // for shared ActionScript getter-setters
@@ -121,7 +121,7 @@ character::get_path_element_character(string_table::key key)
 	if (key == NSV::PROP_uROOT)
 	{
 		// getAsRoot() will handle _lockroot 
-		return const_cast<sprite_instance*>(getAsRoot());
+		return const_cast<MovieClip*>(getAsRoot());
 	}
 
 	const std::string& name = _vm.getStringTable().value(key);
@@ -1185,7 +1185,7 @@ character::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
 }
 #endif
 
-const sprite_instance*
+const MovieClip*
 character::getAsRoot() const
 {
     return get_root();

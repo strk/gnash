@@ -32,7 +32,7 @@
 #include "swf/TagLoadersTable.h"
 #include "URL.h"
 #include "StreamProvider.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "VM.h"
 #include "ScriptLimitsTag.h"
 #include "BitmapMovieDefinition.h"

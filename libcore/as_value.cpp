@@ -21,7 +21,7 @@
 #include "as_value.h"
 #include "as_object.h"
 #include "as_function.h" // for as_function
-#include "sprite_instance.h" // for MOVIECLIP values
+#include "MovieClip.h" // for MOVIECLIP values
 #include "character.h" // for MOVIECLIP values
 #include "as_environment.h" // for MOVIECLIP values
 #include "VM.h" // for MOVIECLIP values
@@ -961,7 +961,7 @@ as_value::to_object() const
 	}
 }
 
-sprite_instance*
+MovieClip*
 as_value::to_sprite(bool allowUnloaded) const
 {
 	if ( m_type != MOVIECLIP ) return 0;
@@ -980,7 +980,7 @@ as_value::to_character(bool allowUnloaded) const
 }
 
 void
-as_value::set_sprite(sprite_instance& sprite)
+as_value::set_sprite(MovieClip& sprite)
 {
 	set_character(sprite);
 }

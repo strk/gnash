@@ -55,7 +55,7 @@
 namespace gnash {
 	class movie_definition;
 	class movie_root;
-	class sprite_instance;
+	class MovieClip;
 	class character;
 	class FuzzyPixel;
 	class VirtualClock;
@@ -142,7 +142,7 @@ public:
 	/// Return NULL if there's no character with that name in
 	/// the sprite's display list.
 	///
-	const character* findDisplayItemByName(const sprite_instance& mc,
+	const character* findDisplayItemByName(const MovieClip& mc,
 			const std::string& name);
 
 	/// Find a character in the display list of a sprite by depth.
@@ -150,11 +150,11 @@ public:
 	/// Return NULL if there's no character at that depth in
 	/// the sprite's display list.
 	///
-	const character* findDisplayItemByDepth(const sprite_instance& mc,
+	const character* findDisplayItemByDepth(const MovieClip& mc,
 			int depth);
 
 	/// Get the topmost sprite instance of this movie
-	gnash::sprite_instance* getRootMovie() {
+	gnash::MovieClip* getRootMovie() {
 		return _movie;
 	}
 

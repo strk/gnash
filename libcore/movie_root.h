@@ -111,7 +111,7 @@ namespace gnash
 
 struct DepthComparator
 {
-    typedef boost::intrusive_ptr<sprite_instance> LevelMovie;
+    typedef boost::intrusive_ptr<MovieClip> LevelMovie;
 
     bool operator() (const LevelMovie& d1, const LevelMovie& d2)
     {
@@ -203,7 +203,7 @@ public:
     ///		the target depth the latter is moved in place of the former, with
     ///		its depth also updated.
     ///
-    void swapLevels(boost::intrusive_ptr<sprite_instance> sp, int depth);
+    void swapLevels(boost::intrusive_ptr<MovieClip> sp, int depth);
 
     /// Drop level at given depth.
     //
@@ -396,7 +396,7 @@ public:
     //
     /// TODO: drop ?
     ///
-    void set_play_state(sprite_instance::play_state s)
+    void set_play_state(MovieClip::play_state s)
     {
 	getRootMovie()->set_play_state(s);
     }
@@ -725,7 +725,7 @@ public:
     /// a handler, which will be called when the embedded scripts
     /// call fscommand().
     ///
-    /// The handler gets the sprite_instance* that the script is
+    /// The handler gets the MovieClip* that the script is
     /// embedded in, and the two string arguments passed by the
     /// script to fscommand().
     ///
@@ -969,7 +969,7 @@ private:
 
     /// The movie instance wrapped by this movie_root
     //
-    /// We keep a pointer to the base sprite_instance class
+    /// We keep a pointer to the base MovieClip class
     /// to avoid having to replicate all of the base class
     /// interface to the movie_instance class definition
     ///
@@ -977,7 +977,7 @@ private:
     ///       to exist while just taking 2 elements in the container.
     ///       Appropriate container could be list, set or map (order is important)
     ///
-    typedef boost::intrusive_ptr<sprite_instance> LevelMovie;
+    typedef boost::intrusive_ptr<MovieClip> LevelMovie;
     typedef std::map<int, LevelMovie> Levels;
     Levels _movies;
 

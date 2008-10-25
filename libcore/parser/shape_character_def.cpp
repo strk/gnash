@@ -29,7 +29,7 @@
 #include "log.h"
 #include "render.h"
 #include "SWFStream.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 
 #include <cfloat>
 #include <algorithm>

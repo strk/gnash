@@ -43,19 +43,39 @@ printMatrix = function(m, roundToDecimal)
 Object.prototype.hasOwnProperty = ASnative(101, 5);
 #endif
 
-xcheck(MovieClip.prototype.hasOwnProperty("blendMode"));
+check(MovieClip.prototype.hasOwnProperty("attachAudio"));
+check(MovieClip.prototype.hasOwnProperty("attachVideo"));
+check(MovieClip.prototype.hasOwnProperty("getDepth"));
+check(MovieClip.prototype.hasOwnProperty("setMask"));
+check(MovieClip.prototype.hasOwnProperty("createEmptyMovieClip"));
+check(MovieClip.prototype.hasOwnProperty("beginFill"));
+check(MovieClip.prototype.hasOwnProperty("beginGradientFill"));
+check(MovieClip.prototype.hasOwnProperty("moveTo"));
+check(MovieClip.prototype.hasOwnProperty("lineTo"));
+check(MovieClip.prototype.hasOwnProperty("curveTo"));
+check(MovieClip.prototype.hasOwnProperty("lineStyle"));
+check(MovieClip.prototype.hasOwnProperty("endFill"));
+check(MovieClip.prototype.hasOwnProperty("clear"));
+check(MovieClip.prototype.hasOwnProperty("createTextField"));
+check(MovieClip.prototype.hasOwnProperty("getTextSnapshot")); 
+check(MovieClip.prototype.hasOwnProperty("blendMode"));
 check(MovieClip.prototype.hasOwnProperty("attachBitmap"));
-xcheck(MovieClip.prototype.hasOwnProperty("cacheAsBitmap"));
+check(MovieClip.prototype.hasOwnProperty("cacheAsBitmap"));
 check(MovieClip.prototype.hasOwnProperty("enabled"));
-xcheck(MovieClip.prototype.hasOwnProperty("filters"));
-xcheck(MovieClip.prototype.hasOwnProperty("forceSmoothing"));
-xcheck(MovieClip.prototype.hasOwnProperty("opaqueBackground"));
-xcheck(MovieClip.prototype.hasOwnProperty("scale9Grid"));
-xcheck(MovieClip.prototype.hasOwnProperty("scrollRect"));
-xcheck(MovieClip.prototype.hasOwnProperty("tabIndex"));
+check(MovieClip.prototype.hasOwnProperty("filters"));
+check(MovieClip.prototype.hasOwnProperty("forceSmoothing"));
+check(MovieClip.prototype.hasOwnProperty("opaqueBackground"));
+check(MovieClip.prototype.hasOwnProperty("scale9Grid"));
+check(MovieClip.prototype.hasOwnProperty("scrollRect"));
+check(MovieClip.prototype.hasOwnProperty("tabIndex"));
 check(MovieClip.prototype.hasOwnProperty("transform"));
 check(MovieClip.prototype.hasOwnProperty("useHandCursor"));
 check(MovieClip.prototype.hasOwnProperty("_lockroot"));
+check(MovieClip.prototype.hasOwnProperty("beginBitmapFill"));
+check(MovieClip.prototype.hasOwnProperty("getRect"));
+check(MovieClip.prototype.hasOwnProperty("lineGradientStyle"));
+check(MovieClip.prototype.hasOwnProperty("getInstanceAtDepth"));
+check(MovieClip.prototype.hasOwnProperty("getNextHighestDepth"));
 
 check(!MovieClip.prototype.hasOwnProperty("focusEnabled"));
 check(!MovieClip.prototype.hasOwnProperty("hitArea"));
@@ -91,19 +111,19 @@ check(!MovieClip.prototype.hasOwnProperty("_yscale"));
 endOfTest = function() 
 {
 #if OUTPUT_VERSION <= 5
-	check_totals(284); // SWF5
+	check_totals(304); // SWF5
 #endif
 
 #if OUTPUT_VERSION == 6
-	check_totals(763); // SWF6
+	check_totals(783); // SWF6
 #endif
 
 #if OUTPUT_VERSION == 7
-	check_totals(780); // SWF7
+	check_totals(800); // SWF7
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(852); // SWF8+
+	check_totals(872); // SWF8+
 #endif
 
 	play();

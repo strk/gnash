@@ -20,8 +20,8 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "movie_root.h"
 #include "log.h"
-#include "sprite_instance.h"
-#include "movie_instance.h" // for implicit upcast to sprite_instance
+#include "MovieClip.h"
+#include "movie_instance.h" // for implicit upcast to MovieClip
 #include "render.h"
 #include "VM.h"
 #include "ExecutableCode.h"
@@ -296,7 +296,7 @@ movie_root::setLevel(unsigned int num, boost::intrusive_ptr<movie_instance> movi
 }
 
 void
-movie_root::swapLevels(boost::intrusive_ptr<sprite_instance> movie, int depth)
+movie_root::swapLevels(boost::intrusive_ptr<MovieClip> movie, int depth)
 {
 	assert(movie);
 
@@ -349,7 +349,7 @@ movie_root::swapLevels(boost::intrusive_ptr<sprite_instance> movie, int depth)
 	}
 	else
 	{
-		boost::intrusive_ptr<sprite_instance> otherMovie = targetIt->second;
+		boost::intrusive_ptr<MovieClip> otherMovie = targetIt->second;
 		otherMovie->set_depth(oldDepth);
 		oldIt->second = otherMovie;
 		targetIt->second = movie;
@@ -382,7 +382,7 @@ movie_root::dropLevel(int depth)
 		return;
 	}
 
-	sprite_instance* mo = it->second.get();
+	MovieClip* mo = it->second.get();
 	if ( mo == getRootMovie() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -420,7 +420,7 @@ movie_root::loadLevel(unsigned int num, const URL& url)
 	}
 
 	// Parse query string
-	sprite_instance::VariableMap vars;
+	MovieClip::VariableMap vars;
 	url.parse_querystring(url.querystring(), vars);
 	extern_movie->setVariables(vars);
 
@@ -841,7 +841,7 @@ movie_root::fire_mouse_event()
     m_mouse_button_state.currentButtonState = (m_mouse_buttons & 1);
 
     // Set _droptarget if dragging a sprite
-    sprite_instance* dragging = 0;
+    MovieClip* dragging = 0;
     character* draggingChar = getDraggingCharacter();
     if ( draggingChar ) dragging = draggingChar->to_movie();
     if ( dragging )
@@ -1122,7 +1122,7 @@ movie_root::display()
 
 	for (Levels::iterator i=_movies.begin(), e=_movies.end(); i!=e; ++i)
 	{
-		boost::intrusive_ptr<sprite_instance> movie = i->second;
+		boost::intrusive_ptr<MovieClip> movie = i->second;
 
 		movie->clear_invalidated();
 
@@ -1871,7 +1871,7 @@ movie_root::cleanupDisplayList()
         //       method of each sprite, but that will introduce 
         //       problems when we'll implement skipping ::display()
         //       when late on FPS. Alternatively we may have the
-        //       sprite_instance::markReachableResources take care
+        //       MovieClip::markReachableResources take care
         //       of cleaning up unloaded... but that will likely
         //       introduce problems when allowing the GC to run
         //       at arbitrary times.
@@ -2171,7 +2171,7 @@ movie_root::processLoadMovieRequest(const LoadMovieRequest& r)
         return;
     }
 
-    sprite_instance* sp = ch->to_movie();
+    MovieClip* sp = ch->to_movie();
     if (!sp)
     {
         log_unimpl("loadMovie against a %s character", typeName(*ch));

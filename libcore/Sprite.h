@@ -31,7 +31,7 @@
 /// @@ are we sure it doesn't define its own chars ?
 ///
 /// The sprite implementation is divided into 
-/// gnash::sprite_definition and gnash::sprite_instance.
+/// gnash::sprite_definition and gnash::MovieClip.
 ///
 /// The _definition holds the immutable data for a sprite (as read
 /// from an SWF stream), while the _instance contains the state for

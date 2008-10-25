@@ -1,4 +1,4 @@
-// sprite_instance.h:  Stateful live Sprite instance, for Gnash.
+// MovieClip.h:  Stateful live Sprite instance, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
@@ -65,7 +65,7 @@ namespace gnash
 /// This means that they define a variable scope (see
 /// the as_environment member) and are divided into "frames"
 ///
-class sprite_instance : public character
+class MovieClip : public character
 {
 
 public:
@@ -87,10 +87,10 @@ public:
     /// was defined in an externally loaded movie.
     ///
     ///
-    sprite_instance(movie_definition* def,
+    MovieClip(movie_definition* def,
         movie_instance* root, character* parent, int id);
 
-    virtual ~sprite_instance();
+    virtual ~MovieClip();
 
     enum play_state
     {
@@ -127,11 +127,11 @@ public:
     /// the _lockroot property, see getLockRoot
     /// and setLockRoot.
     ///
-    virtual const sprite_instance* getAsRoot() const;
+    virtual const MovieClip* getAsRoot() const;
 
     /// \brief
     /// Return the sprite_definition (or movie_definition)
-    /// from which this sprite_instance has been created
+    /// from which this MovieClip has been created
         movie_definition* get_movie_definition() {
                 return m_def.get();
         }
@@ -489,7 +489,7 @@ public:
     /// Return -1 if nobody's home.
     int get_id_at_depth(int depth);
 
-    sprite_instance* to_movie () { return this; }
+    MovieClip* to_movie () { return this; }
 
     /// Load a movie in this sprite, replacing it
     //
@@ -563,7 +563,7 @@ public:
     /// @param init_object
     /// If not null, will be used to copy properties over.
     ///
-    boost::intrusive_ptr<sprite_instance> duplicateMovieClip(
+    boost::intrusive_ptr<MovieClip> duplicateMovieClip(
         const std::string& newname,
         int newdepth, as_object* init_object=NULL);
         
@@ -791,10 +791,10 @@ private:
     bool allowHandCursor() const;
 
     /// Forbid copy
-    sprite_instance(const sprite_instance&);
+    MovieClip(const MovieClip&);
 
     /// Forbid assignment
-    sprite_instance& operator=(const sprite_instance&);
+    MovieClip& operator=(const MovieClip&);
 
     /// Advance to a previous frame.
     //

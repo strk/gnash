@@ -25,7 +25,7 @@
 #include "movie_definition.h"
 #include "movie_instance.h"
 #include "movie_root.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "as_environment.h"
 #include "gnash.h" // for create_movie and create_library_movie and for gnash::key namespace
 #include "VM.h" // for initialization
@@ -283,7 +283,7 @@ MovieTester::resizeStage(int x, int y)
 }
 
 const character*
-MovieTester::findDisplayItemByName(const sprite_instance& mc,
+MovieTester::findDisplayItemByName(const MovieClip& mc,
 		const std::string& name) 
 {
 	const DisplayList& dlist = mc.getDisplayList();
@@ -291,7 +291,7 @@ MovieTester::findDisplayItemByName(const sprite_instance& mc,
 }
 
 const character*
-MovieTester::findDisplayItemByDepth(const sprite_instance& mc,
+MovieTester::findDisplayItemByDepth(const MovieClip& mc,
 		int depth)
 {
 	const DisplayList& dlist = mc.getDisplayList();

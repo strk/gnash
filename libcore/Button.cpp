@@ -27,7 +27,7 @@
 #include "as_value.h"
 
 #include "ActionExec.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "movie_root.h"
 #include "VM.h"
 #include "builtin_function.h"
@@ -1048,7 +1048,7 @@ Button::get_member(string_table::key name_key, as_value* val,
   if (name_key == NSV::PROP_uROOT)
   {
     // getAsRoot() will take care of _lockroot
-    val->set_as_object( const_cast<sprite_instance*>( getAsRoot() )  );
+    val->set_as_object( const_cast<MovieClip*>( getAsRoot() )  );
     return true;
   }
 

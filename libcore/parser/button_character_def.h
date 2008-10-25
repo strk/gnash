@@ -36,7 +36,7 @@
 
 // Forward declarations
 namespace gnash {
-	class sprite_instance;
+	class MovieClip;
 	class movie_definition;
 	class event_id;
 	class SWFStream; // for read signatures

@@ -19,7 +19,7 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "as_environment.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "shape_character_def.h"
 #include "as_value.h"
 #include "with_stack_entry.h"
@@ -111,7 +111,7 @@ as_environment::get_variable(const std::string& varname,
 		if ( target ) 
 		{
 			// ... but only if it resolves to a sprite
-			sprite_instance* m = target->to_movie();
+			MovieClip* m = target->to_movie();
 			if ( m ) return as_value(m);
 		}
 	}
@@ -569,13 +569,13 @@ as_environment::find_object(const std::string& path_in, const ScopeStack* scopeS
     if (*p == '/')
     {
 	// Absolute path.  Start at the (AS) root (handle _lockroot)
-	sprite_instance* root = 0;
-        if ( m_target ) root = const_cast<sprite_instance*>(m_target->getAsRoot());
+	MovieClip* root = 0;
+        if ( m_target ) root = const_cast<MovieClip*>(m_target->getAsRoot());
         else {
             if ( _original_target )
             {
                 log_debug("current target is undefined on as_environment::find_object, we'll use original");
-                root = const_cast<sprite_instance*>(_original_target->getAsRoot());
+                root = const_cast<MovieClip*>(_original_target->getAsRoot());
             }
             else
             {
