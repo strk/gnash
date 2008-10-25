@@ -50,7 +50,7 @@ main(int argc, char** argv)
 	}
 
 
-	sprintf(loadvars, "e = l.load('%svars.txt');", srcdir);
+	sprintf(loadvars, "e = l.load('%s/vars2.txt');", srcdir);
 	puts("Setting things up");
 
 	Ming_init();
@@ -73,9 +73,9 @@ main(int argc, char** argv)
 
 	/// Construct LoadVars and backup methods.
 	add_actions(mo, "l = new LoadVars;"
-			"odatB = l.onData;"
-			"olB = l.onLoad;"
-			"odecB = l.decode;"
+			"odatB = LoadVars.prototype.onData;"
+			"olB = LoadVars.prototype.onLoad;"
+			"odecB = LoadVars.prototype.decode;"
 			"loadString = '';"
 			"decodeString = '';"
 			"dataString = '';");
@@ -95,15 +95,16 @@ main(int argc, char** argv)
 	
 	add_actions(mo, "decodeCalled = 0;");
 	add_actions(mo, "ourDecode = function(arg) {"
-			"decodeString += 'onDecode called with ' + typeof(arg)"
+			"decodeString += 'decode called with ' + typeof(arg)"
 			"+ ' argument ' + arg;"
 			"decodeCalled++;"
 			"};");
 
-	/// The onDecode method is stays overwritten to see where it gets
+	/// The decode method is stays overwritten to see where it gets
 	/// called from. We don't call it ourselves. Don't forget to 
 	/// overwrite it again when the LoadVars object is construct again.
-	add_actions(mo, "l.onDecode = ourDecode;");
+	add_actions(mo, "l.decode = ourDecode;");
+
 
 	/// What happens when load fails?
 	//
@@ -146,63 +147,46 @@ main(int argc, char** argv)
 
 	// onData
 	add_actions(mo, "l = new LoadVars; l.onData = ourData;"
+            "l.decode = ourDecode;"
 			"dataString = '';");
 	add_actions(mo, loadvars);
 	check_equals(mo, "e", "true");
 	add_actions(mo, "stop();");
 
 	SWFMovie_nextFrame(mo);
-	xcheck_equals(mo, "dataString",
-			"'onData called with undefined argument undefined'");
-	add_actions(mo, "l.data = odatB;");
+    // check_equals is too braindead to do this without escaping.
+	xcheck_equals(mo, "escape(dataString)",
+			"'onData%20called%20with%20string%20argument%20v2%5Fvar1%3D"
+            "val1%26v2%5Fvar2%3Dval2%26%0A'");
+	add_actions(mo, "l.onData = odatB;");
+
+    check_equals(mo, "decodeCalled", "0");
+    check_equals(mo, "decodeString", "''");
 
 	// onLoad
 	add_actions(mo, "l = new LoadVars; l.onLoad = ourLoad;"
+            "l.decode = ourDecode;"
 			"loadString = '';");
 	add_actions(mo, loadvars);
 	check_equals(mo, "e", "true");
 	add_actions(mo, "stop();");
 
 	SWFMovie_nextFrame(mo);
-	xcheck_equals(mo, "loadString",
-			"'onLoad called with boolean argument false'");
-	add_actions(mo, "l.load = olB;");
-
-	/// What happens when we try loading into a LoadVars that has already
-	/// loaded?
-	//
-	/// No call to onData or onLoad. It's hard to test this, as we
-	/// don't know when to advance to the next frame, so don't wait on
-	/// this test. That means you can't be sure the results aren't
-	/// due to timing issues.
-
-	// onLoad
-	add_actions(mo, "l.onLoad = ourLoad;"
-			"loadString = '';");
-	add_actions(mo, loadvars);
-	check_equals(mo, "e", "undefined");
-
-	SWFMovie_nextFrame(mo);
 	check_equals(mo, "loadString",
-			"''");
-	add_actions(mo, "l.load = olB;");
+			"'onLoad called with boolean argument true'");
+	add_actions(mo, "l.onLoad = olB;");
 
-	/// onData
-	add_actions(mo, "l.onData = ourData;"
-			"dataString = '';");
-	add_actions(mo, loadvars);
-	check_equals(mo, "e", "undefined");
-
-	SWFMovie_nextFrame(mo);
-	check_equals(mo, "dataString",
-			"''");
-	add_actions(mo, "l.load = odatB;");
-
-	check_equals(mo, "decodeCalled", "0");
+    /// decode is called from onData (i.e. it's called when we overwrite
+    /// onLoad, not onData).
+    check_equals(mo, "decodeCalled", "1");
+    // check_equals is too braindead to do this without escaping.
+	xcheck_equals(mo, "escape(decodeString)",
+			"'decode%20called%20with%20string%20argument%20v2%5Fvar1%3D"
+            "val1%26v2%5Fvar2%3Dval2%26%0A'");
 
 	/// End of tests.
 
-	add_actions(mo, "totals();");
+	add_actions(mo, "totals(12);");
 	add_actions(mo, "stop();");
 
 	/*****************************************************
