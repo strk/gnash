@@ -171,7 +171,8 @@ sprite_instance::execute_actions(sprite_instance::ActionList& action_list)
     }
 }
 
-static as_value sprite_play(const fn_call& fn)
+static as_value
+sprite_play(const fn_call& fn)
 {
     boost::intrusive_ptr<sprite_instance> sprite =
         ensureType<sprite_instance>(fn.this_ptr);
@@ -180,7 +181,8 @@ static as_value sprite_play(const fn_call& fn)
     return as_value();
 }
 
-static as_value sprite_stop(const fn_call& fn)
+static as_value
+sprite_stop(const fn_call& fn)
 {
     boost::intrusive_ptr<sprite_instance> sprite =
         ensureType<sprite_instance>(fn.this_ptr);
@@ -190,14 +192,105 @@ static as_value sprite_stop(const fn_call& fn)
     return as_value();
 }
 
+
 //removeMovieClip() : Void
-static as_value sprite_remove_movieclip(const fn_call& fn)
+static as_value
+sprite_remove_movieclip(const fn_call& fn)
 {
     boost::intrusive_ptr<sprite_instance> sprite = 
         ensureType<sprite_instance>(fn.this_ptr);
     sprite->removeMovieClip();
     return as_value();
 }
+
+
+static as_value
+sprite_blendMode(const fn_call& fn)
+{
+    boost::intrusive_ptr<sprite_instance> sprite =
+        ensureType<sprite_instance>(fn.this_ptr);
+    UNUSED(sprite);
+    log_unimpl(_("MovieClip.blendMode()"));
+    return as_value();
+}
+
+
+static as_value
+sprite_cacheAsBitmap(const fn_call& fn)
+{
+    boost::intrusive_ptr<sprite_instance> sprite =
+        ensureType<sprite_instance>(fn.this_ptr);
+    UNUSED(sprite);
+    log_unimpl(_("MovieClip.cacheAsBitmap()"));
+    return as_value();
+}
+
+
+static as_value
+sprite_filters(const fn_call& fn)
+{
+    boost::intrusive_ptr<sprite_instance> sprite =
+        ensureType<sprite_instance>(fn.this_ptr);
+    UNUSED(sprite);
+    log_unimpl(_("MovieClip.filters()"));
+    return as_value();
+}
+
+
+static as_value
+sprite_forceSmoothing(const fn_call& fn)
+{
+    boost::intrusive_ptr<sprite_instance> sprite =
+        ensureType<sprite_instance>(fn.this_ptr);
+    UNUSED(sprite);
+    log_unimpl(_("MovieClip.forceSmoothing()"));
+    return as_value();
+}
+
+
+static as_value
+sprite_opaqueBackground(const fn_call& fn)
+{
+    boost::intrusive_ptr<sprite_instance> sprite =
+        ensureType<sprite_instance>(fn.this_ptr);
+    UNUSED(sprite);
+    log_unimpl(_("MovieClip.opaqueBackground()"));
+    return as_value();
+}
+
+    
+static as_value
+sprite_scale9Grid(const fn_call& fn)
+{
+    boost::intrusive_ptr<sprite_instance> sprite =
+        ensureType<sprite_instance>(fn.this_ptr);
+    UNUSED(sprite);
+    log_unimpl(_("MovieClip.scale9Grid()"));
+    return as_value();
+}
+
+
+static as_value
+sprite_scrollRect(const fn_call& fn)
+{
+    boost::intrusive_ptr<sprite_instance> sprite =
+        ensureType<sprite_instance>(fn.this_ptr);
+    UNUSED(sprite);
+    log_unimpl(_("MovieClip.scrollRect()"));
+    return as_value();
+}
+
+
+static as_value
+sprite_tabIndex(const fn_call& fn)
+{
+    boost::intrusive_ptr<sprite_instance> sprite =
+        ensureType<sprite_instance>(fn.this_ptr);
+    UNUSED(sprite);
+    log_unimpl(_("MovieClip.tabIndex()"));
+    return as_value();
+}
+
 
 // attachMovie(idName:String, newName:String,
 //                         depth:Number [, initObject:Object]) : MovieClip
@@ -308,6 +401,7 @@ sprite_attach_movie(const fn_call& fn)
     return as_value(newch.get());
 }
 
+
 // attachAudio(id:Object) : Void
 static as_value
 sprite_attach_audio(const fn_call& fn)
@@ -349,6 +443,7 @@ sprite_attach_audio(const fn_call& fn)
     return as_value();
 }
 
+
 // MovieClip.attachVideo
 static as_value
 sprite_attach_video(const fn_call& fn)
@@ -360,6 +455,7 @@ sprite_attach_video(const fn_call& fn)
     LOG_ONCE( log_unimpl("MovieClip.attachVideo()") );
     return as_value();
 }
+
 
 //createEmptyMovieClip(name:String, depth:Number) : MovieClip
 static as_value
@@ -2313,9 +2409,7 @@ static void
 attachMovieClipInterface(as_object& o)
 {
         VM& vm = o.getVM();
-        const int target_version = vm.getSWFVersion();
 
-        // SWF5 or higher
         o.init_member("attachMovie", vm.getNative(900, 0)); 
         o.init_member("swapDepths", vm.getNative(900, 1));
         o.init_member("localToGlobal", vm.getNative(900, 2));
@@ -2335,114 +2429,134 @@ attachMovieClipInterface(as_object& o)
         o.init_member("startDrag", vm.getNative(900, 20));
         o.init_member("stopDrag", vm.getNative(900, 21));
         o.init_member("loadMovie", new builtin_function(sprite_loadMovie));
-        o.init_member("loadVariables", new builtin_function(sprite_load_variables));
-        o.init_member("unloadMovie", new builtin_function(sprite_unloadMovie));
+        o.init_member("loadVariables", new builtin_function(
+                    sprite_load_variables));
+        o.init_member("unloadMovie", new builtin_function(
+                    sprite_unloadMovie));
         o.init_member("getURL", new builtin_function(sprite_getURL));
-        o.init_member("getSWFVersion", new builtin_function(sprite_getSWFVersion));
+        o.init_member("getSWFVersion", new builtin_function(
+                    sprite_getSWFVersion));
         o.init_member("meth", new builtin_function(sprite_meth));
-        o.init_member("enabled", true); // see MovieClip.as testcase
-        o.init_member("useHandCursor", true); // see MovieClip.as testcase
-
+        o.init_member("enabled", true);
+        o.init_member("useHandCursor", true);
         o.init_property("_lockroot", &sprite_instance::lockroot_getset,
-                                                                &sprite_instance::lockroot_getset); // see MovieClip.as testcase
+              &sprite_instance::lockroot_getset);
+        o.init_member("beginBitmapFill", new builtin_function(
+                    sprite_beginBitmapFill));
+        o.init_member("getRect", new builtin_function(
+                    sprite_getRect));
+        o.init_member("lineGradientStyle", new builtin_function(
+                    sprite_lineGradientStyle));
+        o.init_member("attachBitmap", new builtin_function(
+                    sprite_attachBitmap));
+        o.init_property("blendMode", &sprite_blendMode, &sprite_blendMode);
+        o.init_property("cacheAsBitmap", &sprite_cacheAsBitmap, 
+                &sprite_cacheAsBitmap);
+        o.init_property("filters", &sprite_filters, &sprite_filters);
+        o.init_property("forceSmoothing", &sprite_forceSmoothing,
+                &sprite_forceSmoothing);
+        o.init_property("opaqueBackground", &sprite_opaqueBackground,
+                &sprite_opaqueBackground);
+        o.init_property("scale9Grid", &sprite_scale9Grid,
+                sprite_scale9Grid);
+        o.init_property("scrollRect", &sprite_scrollRect, &sprite_scrollRect);
+        o.init_property("tabIndex", &sprite_tabIndex, &sprite_tabIndex);
+        o.init_property("transform", &movieClip_transform, 
+                &movieClip_transform);
 
-        // These are documented to be SWF8+ only, but the pp version9 shows them
-        // for SWF5 too...
-        o.init_member("attachBitmap", new builtin_function(sprite_attachBitmap));
-        o.init_property("transform", &movieClip_transform, &movieClip_transform); // see MovieClip.as testcase
+        const int swf6Flags = as_prop_flags::dontDelete |
+                    as_prop_flags::dontEnum |
+                    as_prop_flags::onlySWF6Up;
 
-        if ( target_version    < 6 ) return;
+        o.init_member("attachAudio", vm.getNative(900, 8), swf6Flags);
+        o.init_member("attachVideo", vm.getNative(900, 9), swf6Flags);
+        o.init_member("getDepth", vm.getNative(900, 10), swf6Flags);
+        o.init_member("setMask", vm.getNative(900, 11), swf6Flags);
+        o.init_member("createEmptyMovieClip", vm.getNative(901, 0), swf6Flags);
+        o.init_member("beginFill", vm.getNative(901, 1), swf6Flags);
+        o.init_member("beginGradientFill", vm.getNative(901, 2), swf6Flags);
+        o.init_member("moveTo", vm.getNative(901, 3), swf6Flags);
+        o.init_member("lineTo", vm.getNative(901, 4), swf6Flags);
+        o.init_member("curveTo", vm.getNative(901, 5), swf6Flags);
+        o.init_member("lineStyle", vm.getNative(901, 6), swf6Flags);
+        o.init_member("endFill", vm.getNative(901, 7), swf6Flags);
+        o.init_member("clear", vm.getNative(901, 8), swf6Flags);
+        o.init_member("createTextField", vm.getNative(104, 200), swf6Flags);
+        o.init_member("getTextSnapshot", 
+                new builtin_function(sprite_getTextSnapshot), swf6Flags);
 
-        // SWF6 or higher
-        o.init_member("attachAudio", vm.getNative(900, 8));
-        o.init_member("attachVideo", vm.getNative(900, 9));
-        o.init_member("getDepth", vm.getNative(900, 10));
-        o.init_member("setMask", vm.getNative(900, 11));
-        o.init_member("createEmptyMovieClip", vm.getNative(901, 0));
-        o.init_member("beginFill", vm.getNative(901, 1));
-        o.init_member("beginGradientFill", vm.getNative(901, 2));
-        o.init_member("moveTo", vm.getNative(901, 3));
-        o.init_member("lineTo", vm.getNative(901, 4));
-        o.init_member("curveTo", vm.getNative(901, 5));
-        o.init_member("lineStyle", vm.getNative(901, 6));
-        o.init_member("endFill", vm.getNative(901, 7));
-        o.init_member("clear", vm.getNative(901, 8));
+        const int swf7Flags = as_prop_flags::dontDelete |
+                    as_prop_flags::dontEnum |
+                    as_prop_flags::onlySWF7Up;
 
-        o.init_member("createTextField", vm.getNative(104, 200));
-        o.init_member("getTextSnapshot", new builtin_function(sprite_getTextSnapshot)); // unknown native
-        if ( target_version    < 7 ) return;
-
-        // SWF7 or higher
-        o.init_member("getNextHighestDepth", new builtin_function(sprite_getNextHighestDepth));
-        o.init_member("getInstanceAtDepth", new builtin_function(sprite_getInstanceAtDepth));
-        if ( target_version    < 8 ) return;
-
-        // SWF8 or higher
-        o.init_member("beginBitmapFill", new builtin_function(sprite_beginBitmapFill));
-        o.init_member("getRect", new builtin_function(sprite_getRect));
-        o.init_member("lineGradientStyle", new builtin_function(sprite_lineGradientStyle));
+        o.init_member("getNextHighestDepth", new builtin_function(
+                    sprite_getNextHighestDepth), swf7Flags);
+        o.init_member("getInstanceAtDepth", new builtin_function(
+                    sprite_getInstanceAtDepth), swf7Flags);
 
 }
 
 as_value
 movieClip_transform(const fn_call& fn)
 {
-        boost::intrusive_ptr<sprite_instance> ptr = 
-            ensureType<sprite_instance>(fn.this_ptr);
+    boost::intrusive_ptr<sprite_instance> ptr = 
+        ensureType<sprite_instance>(fn.this_ptr);
         
-        VM& vm = ptr->getVM();
-        string_table& st = ptr->getVM().getStringTable();
+    VM& vm = ptr->getVM();
+    string_table& st = ptr->getVM().getStringTable();
 
-        as_value flash;
-        if (!vm.getGlobal()->get_member(st.find("flash"), &flash))
-        {
-                log_error("No flash object found!");
-                return as_value();
-        }
-        boost::intrusive_ptr<as_object> flashObj = flash.to_object();
+    as_value flash;
+    if (!vm.getGlobal()->get_member(st.find("flash"), &flash))
+    {
+        log_error("No flash object found!");
+        return as_value();
+    }
+    boost::intrusive_ptr<as_object> flashObj = flash.to_object();
 
-        if (!flashObj)
-        {
-                log_error("flash isn't an object!");
-                return as_value();
-        }
+    if (!flashObj)
+    {
+        log_error("flash isn't an object!");
+        return as_value();
+    }
         
-        as_value geom;
-        if (!flashObj->get_member(st.find("geom"), &geom))
-        {
-                log_error("No flash.geom object found!");
-                return as_value();
-        }
-        boost::intrusive_ptr<as_object> geomObj = geom.to_object();
+    as_value geom;
+    if (!flashObj->get_member(st.find("geom"), &geom))
+    {
+        log_error("No flash.geom object found!");
+        return as_value();
+    }
+    boost::intrusive_ptr<as_object> geomObj = geom.to_object();
 
-        if (!geomObj)
-        {
-                log_error("flash.geom isn't an object!");
-                return as_value();
-        }
+    if (!geomObj)
+    {
+        log_error("flash.geom isn't an object!");
+        return as_value();
+    }
         
-        as_value transform;
-        if (!geomObj->get_member(st.find("Transform"), &transform))
-        {
-                log_error("No flash.geom.Transform object found!");
-                return as_value();
-        }        
+    as_value transform;
+    if (!geomObj->get_member(st.find("Transform"), &transform))
+    {
+        log_error("No flash.geom.Transform object found!");
+        return as_value();
+    }        
 
-        boost::intrusive_ptr<as_function> transformCtor = transform.to_as_function();
-        if (!transformCtor)
-        {
-                log_error("flash.geom.Transform isn't a function!");
-                return as_value();
-        }
+    boost::intrusive_ptr<as_function> transformCtor =
+        transform.to_as_function();
 
-        // Construct a flash.geom.Transform object with "this" as argument.
-        std::auto_ptr< std::vector<as_value> > args (new std::vector<as_value>);
-        args->push_back(ptr.get());
+    if (!transformCtor)
+    {
+        log_error("flash.geom.Transform isn't a function!");
+        return as_value();
+    }
 
-        boost::intrusive_ptr<as_object> transformObj =
-                                transformCtor->constructInstance(fn.env(), args);
+    // Construct a flash.geom.Transform object with "this" as argument.
+    std::auto_ptr< std::vector<as_value> > args (new std::vector<as_value>);
+    args->push_back(ptr.get());
 
-        return as_value(transformObj.get());
+    boost::intrusive_ptr<as_object> transformObj =
+        transformCtor->constructInstance(fn.env(), args);
+
+    return as_value(transformObj.get());
 }
 
 /// Properties (and/or methods) attached to every *instance* of a MovieClip 
@@ -3619,57 +3733,49 @@ sprite_instance::attachCharacter(character& newch, int depth)
 character*
 sprite_instance::add_display_object(const SWF::PlaceObject2Tag* tag, DisplayList& dlist)
 {
-        assert(m_def != NULL);
-        assert(tag != NULL);
+    assert(m_def);
+    assert(tag);
 
-        character_def*    cdef = m_def->get_character_def(tag->getID());
-        if (cdef == NULL)
-        {
-                IF_VERBOSE_MALFORMED_SWF(
-                        log_swferror(_("sprite_instance::add_display_object(): "
-                                "unknown cid = %d"), tag->getID());
-                );
-                return NULL;
-        }
-    
-        character* existing_char = dlist.get_character_at_depth(tag->getDepth());
-        
-        if(existing_char)
-        {
-                return NULL;
-        }
-        else
-        {
-                boost::intrusive_ptr<character> ch = cdef->create_character_instance(this, tag->getID());
-        
-                if(tag->hasName())
-                {
-                        ch->set_name(tag->getName());
-                }
-                else if(ch->wantsInstanceName())
-                {
-                        std::string instance_name = getNextUnnamedInstanceName();
-                        ch->set_name(instance_name);
-                }
-            
-                // Attach event handlers (if any).
-                const std::vector<swf_event*>& event_handlers = tag->getEventHandlers();
-                for (size_t i = 0, n = event_handlers.size(); i < n; i++)
-                {
-                        swf_event* ev = event_handlers[i];
-                        ch->add_event_handler(ev->event(), ev->action());
-                }
-
-                // TODO: check if we should check those has_xxx flags first.
-                ch->set_cxform(tag->getCxform());
-                ch->setMatrix(tag->getMatrix(), true); // update caches
-                ch->set_ratio(tag->getRatio());
-                ch->set_clip_depth(tag->getClipDepth());
-                
-                dlist.place_character(ch.get(), tag->getDepth());
-
-                return ch.get();
+    character_def* cdef = m_def->get_character_def(tag->getID());
+    if (!cdef)
+    {
+        IF_VERBOSE_MALFORMED_SWF(
+            log_swferror(_("sprite_instance::add_display_object(): "
+                    "unknown cid = %d"), tag->getID());
+        );
+        return NULL;
     }
+    
+    character* existing_char = dlist.get_character_at_depth(tag->getDepth());
+    
+    if (existing_char) return NULL;
+
+    boost::intrusive_ptr<character> ch =
+        cdef->create_character_instance(this, tag->getID());
+
+    if (tag->hasName()) ch->set_name(tag->getName());
+    else if (ch->wantsInstanceName())
+    {
+        std::string instance_name = getNextUnnamedInstanceName();
+        ch->set_name(instance_name);
+    }
+
+    // Attach event handlers (if any).
+    const std::vector<swf_event*>& event_handlers = tag->getEventHandlers();
+    for (size_t i = 0, n = event_handlers.size(); i < n; i++)
+    {
+        swf_event* ev = event_handlers[i];
+        ch->add_event_handler(ev->event(), ev->action());
+    }
+
+    // TODO: check if we should check those has_xxx flags first.
+    ch->set_cxform(tag->getCxform());
+    ch->setMatrix(tag->getMatrix(), true); // update caches
+    ch->set_ratio(tag->getRatio());
+    ch->set_clip_depth(tag->getClipDepth());
+    
+    dlist.place_character(ch.get(), tag->getDepth());
+    return ch.get();
 }
 
 void 
