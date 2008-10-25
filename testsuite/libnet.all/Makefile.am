@@ -47,16 +47,16 @@ INCLUDES = \
 check_PROGRAMS = \
 	test_cque \
 	test_handler \
-	test_http \
-	test_rtmp 
+	test_http
+#	test_rtmp 
 
 test_http_SOURCES = test_http.cpp
 test_http_LDADD = $(AM_LDFLAGS) 
 test_http_DEPENDENCIES = site-update
 
-test_rtmp_SOURCES = test_rtmp.cpp
-test_rtmp_LDADD = $(AM_LDFLAGS) 
-test_rtmp_DEPENDENCIES = site-update
+#test_rtmp_SOURCES = test_rtmp.cpp
+#test_rtmp_LDADD = $(AM_LDFLAGS) 
+#test_rtmp_DEPENDENCIES = site-update
 
 test_cque_SOURCES = test_cque.cpp
 test_cque_LDADD = $(AM_LDFLAGS) 

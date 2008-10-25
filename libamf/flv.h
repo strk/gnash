@@ -22,6 +22,7 @@
 #include <string>
 #include <cstring>
 #include <boost/cstdint.hpp>    // for boost::?int??_t
+#include <boost/shared_ptr.hpp>
 
 //#include "buffer.h"
 #include "element.h"
@@ -123,21 +124,21 @@ class DSOEXPORT Flv {
     ~Flv();
 
     // Encode the data into a Buffer
-    amf::Buffer *encodeHeader(gnash::Network::byte_t type);
+    boost::shared_ptr<amf::Buffer> encodeHeader(gnash::Network::byte_t type);
     // Decode a Buffer into a header
-    flv_header_t *decodeHeader(amf::Buffer *buf);
+    boost::shared_ptr<flv_header_t> decodeHeader(boost::shared_ptr<amf::Buffer> buf);
 
     // Decode a MetaData object, which is after the header, but before all the tags
-    amf::Element *decodeMetaData(amf::Buffer *buf);
-    amf::Element *decodeMetaData(gnash::Network::byte_t *buf, size_t size);
-    flv_audio_t *decodeAudioData(gnash::Network::byte_t flags);
-    flv_video_t *decodeVideoData(gnash::Network::byte_t flags);
+    boost::shared_ptr<amf::Element> decodeMetaData(boost::shared_ptr<amf::Buffer> buf);
+    boost::shared_ptr<amf::Element> decodeMetaData(gnash::Network::byte_t *buf, size_t size);
+    boost::shared_ptr<flv_audio_t> decodeAudioData(gnash::Network::byte_t flags);
+    boost::shared_ptr<flv_video_t> decodeVideoData(gnash::Network::byte_t flags);
     
     // Decode the tag header
-    flv_tag_t *decodeTagHeader(amf::Buffer *buf);
+    boost::shared_ptr<flv_tag_t> decodeTagHeader(boost::shared_ptr<amf::Buffer> buf);
     
-    amf::Element *findProperty(const std::string &name);
-    void setProperties(std::vector<amf::Element *> x) { _properties = x; };
+    boost::shared_ptr<amf::Element> findProperty(const std::string &name);
+    void setProperties(std::vector<boost::shared_ptr<amf::Element> > x) { _properties = x; };
 
     // Convert a 24 bit integer to a 32 bit one so we can use it.
     boost::uint32_t convert24(boost::uint8_t *);
@@ -147,7 +148,7 @@ class DSOEXPORT Flv {
     flv_header_t                _header;
 //    boost::uint32_t             _previous_tag_size;
     flv_tag_t                   _tag;
-    std::vector<amf::Element *> _properties;
+    std::vector<boost::shared_ptr<amf::Element> > _properties;
 }; // end of class definition
 
 

@@ -89,9 +89,9 @@ public:
     RTMPMsg();
     ~RTMPMsg();
     
-    void addObject(amf::Element *el) { _amfobjs.push_back(el); };
+    void addObject(boost::shared_ptr<amf::Element> el) { _amfobjs.push_back(el); };
     size_t size() { return _amfobjs.size(); };
-    std::vector<amf::Element *> getElements() { return _amfobjs; };
+    std::vector<boost::shared_ptr<amf::Element> > getElements() { return _amfobjs; };
 
     void setMethodName(const std::string &name) { _method = name; } ;
     std::string &getMethodName()         { return _method; };
@@ -99,14 +99,14 @@ public:
     void setStreamID(double num)         { _streamid = num; };
     double getStreamID()	         { return _streamid; };
 
-    rtmp_status_e checkStatus(amf::Element *el);
+    rtmp_status_e checkStatus(boost::shared_ptr<amf::Element> el);
     void setStatus(rtmp_status_e st)     { _status = st; };
     rtmp_status_e getStatus()	         { return _status; };
 
     void setChannel(Network::byte_t num) { _channel = num; };
     Network::byte_t getChannel()         { return _channel; } ;
 
-    amf::Element *operator[](size_t x);
+    boost::shared_ptr<amf::Element> operator[](size_t x);
 
     // Dump internal status to the terminal
     void dump();
@@ -116,7 +116,7 @@ public:
     rtmp_status_e	  _status;
     std::string           _method;
     double                _streamid;
-    std::vector<amf::Element *> _amfobjs;
+    std::vector<boost::shared_ptr<amf::Element> > _amfobjs;
     Network::byte_t       _channel;
 };
 

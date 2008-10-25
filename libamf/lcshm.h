@@ -23,6 +23,7 @@
 #endif
 
 #include <boost/cstdint.hpp>
+#include <boost/shared_ptr.hpp>
 #include <string>
 #include <vector>
 
@@ -66,7 +67,7 @@ public:
         std::string connection_name;
         std::string protocol;
         std::string method_name;
-        std::vector<amf::Element *> data; // this can be any AMF data type
+        std::vector<boost::shared_ptr<amf::Element> > data; // this can be any AMF data type
     } lc_message_t;
     typedef struct {
 	std::string connection_name;
@@ -83,9 +84,9 @@ public:
     bool connect(key_t key);
     void close(void);
     void send(const std::string &name, const std::string &dataname,
-	      std::vector<amf::Element *> &data);
-    void recv(std::string &name, std::string &dataname, amf::Element *data);
-    std::vector<amf::Element *> parseBody(gnash::Network::byte_t *data);
+	      std::vector<boost::shared_ptr<amf::Element> > &data);
+    void recv(std::string &name, std::string &dataname, boost::shared_ptr<amf::Element> data);
+    std::vector<boost::shared_ptr<amf::Element> > parseBody(gnash::Network::byte_t *data);
 
     /// @param in
     ///    Pointer to start parsing from
@@ -101,9 +102,9 @@ public:
     gnash::Network::byte_t *formatHeader(const std::string &con, const std::string &host, bool domain);
     void addConnectionName(std::string &name);
     void addHostname(std::string &name);
-    void addObject(amf::Element *el) { _amfobjs.push_back(el); };
+    void addObject(boost::shared_ptr<amf::Element> el) { _amfobjs.push_back(el); };
     size_t size() { return _amfobjs.size(); };
-    std::vector<amf::Element *> getElements() { return _amfobjs; };
+    std::vector<boost::shared_ptr<amf::Element> > getElements() { return _amfobjs; };
 
     void setBaseAddr(gnash::Network::byte_t *x) { _baseaddr = x; };
     void dump();
@@ -111,7 +112,7 @@ private:
     gnash::Network::byte_t *_baseaddr;
     lc_header_t _header;
     lc_object_t _object;
-    std::vector<amf::Element *> _amfobjs;
+    std::vector<boost::shared_ptr<amf::Element> > _amfobjs;
 };
 
 } // end of gnash namespace

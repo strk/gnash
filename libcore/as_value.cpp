@@ -132,7 +132,7 @@ public:
 
             //GNASH_REPORT_FUNCTION;
             amf::AMF amf;
-            amf::Element *el = 0;
+            boost::shared_ptr<amf::Element> el;
 	    
             const string& name = _st.value(key);
 
@@ -144,13 +144,11 @@ public:
                 if (!val.is_undefined()) {
                     str = val.to_string();
                 }
-                el = new amf::Element;
-                el->init(name, str);
+                el.reset(new amf::Element(name, str));
             }
             if (val.is_bool()) {
                 bool flag = val.to_bool();
-                el = new amf::Element;
-                el->init(name, flag);
+                el.reset(new amf::Element(name, flag));
             }
             if (val.is_number()) { 
                 double dub;
@@ -159,8 +157,7 @@ public:
                 } else {
                     dub = val.to_number();
                 }
-                el = new amf::Element;
-                el->init(name, dub);
+                el.reset(new amf::Element(name, dub));
             }
 	    
             if (el) {
@@ -1911,8 +1908,8 @@ as_value::as_value(const amf::Element& el)
 #endif
           as_object* obj = new as_object(getObjectInterface());
           if (el.propertySize()) {
-              for (size_t i = 0, e = el.propertySize(); i != e; ++i) {
-              const amf::Element *prop = el.getProperty(i);
+              for (size_t i=0; i < el.propertySize(); i++) {
+              const boost::shared_ptr<amf::Element> prop = el.getProperty(i);
               if (prop == 0) {
                   break;
               } else {
@@ -1935,8 +1932,8 @@ as_value::as_value(const amf::Element& el)
 #endif
           Array_as* obj = new Array_as;
           if (el.propertySize()) {
-              for (size_t i = 0, e = el.propertySize(); i != e; ++i) {
-              const amf::Element *prop = el.getProperty(i);
+              for (size_t i=0; i < el.propertySize(); i++) {
+              const boost::shared_ptr<amf::Element> prop = el.getProperty(i);
               if (prop == 0) {
                   break;
               } else {
@@ -1958,8 +1955,8 @@ as_value::as_value(const amf::Element& el)
           size_t len = el.propertySize();
           obj->resize(len);
 
-          for (size_t i = 0, e = el.propertySize(); i != e; ++i) {
-              const amf::Element *prop = el.getProperty(i);
+          for (size_t i=0; i < el.propertySize(); i++) {
+              const boost::shared_ptr<amf::Element> prop = el.getProperty(i);
               if (prop == 0) {
                   break;
               } else {

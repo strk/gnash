@@ -77,7 +77,9 @@ HTTP::HTTP(Handler *hand)
     : _filetype(amf::AMF::FILETYPE_HTML),
       _filesize(0),
       _port(80),
-      _keepalive(false)
+      _keepalive(false),
+      _clientid(0),
+      _index(0)
 {
 //    GNASH_REPORT_FUNCTION;
     _handler = hand;
@@ -131,7 +133,7 @@ HTTP::waitForGetRequest()
 //     memset(buffer, 0, readsize+1);
     
 //    _handler->wait();
-    amf::Buffer *buf = _handler->pop();
+    boost::shared_ptr<amf::Buffer> buf = _handler->pop();
 
     if (buf == 0) {
 	log_debug("Que empty, net connection dropped for fd #%d", _handler->getFileFd());
@@ -153,8 +155,6 @@ HTTP::waitForGetRequest()
     extractTE(buf);
 //    dump();
 
-    delete buf;			// we're done with the buffer
-    
     _filespec = _url;
     if (!_url.empty()) {
 	return true;
@@ -453,15 +453,15 @@ HTTP::sendGetReply(http_status_e code)
     
     formatHeader(_filesize, code);
 //    int ret = Network::writeNet(_header.str());
-    amf::Buffer *buf = new amf::Buffer;
+    boost::scoped_ptr<amf::Buffer> buf(new amf::Buffer);
 //    Network::byte_t *ptr = (Network::byte_t *)_body.str().c_str();
 //     buf->copy(ptr, _body.str().size());
 //    _handler->dump();
     if (_header.str().size()) {
 	buf->resize(_header.str().size());
 	string str = _header.str();
-	buf->copy(str);
-	_handler->pushout(buf);
+	*buf = str;
+//	_handler->pushout(buf); FIXME:
 	_handler->notifyout();
         log_debug (_("Sent GET Reply"));
 	return true; // Default to true
@@ -488,7 +488,7 @@ HTTP::sendPostReply(rtmpt_cmd_e /* code */)
 
 #if 0
     formatHeader(_filesize, code);
-    amf::Buffer *buf = new amf::Buffer;
+    boost::shared_ptr<amf::Buffer> buf = new amf::Buffer;
     if (_header.str().size()) {
 	buf->resize(_header.str().size());
 	string str = _header.str();
@@ -1203,15 +1203,13 @@ httphandler(Handler::thread_params_t *args)
     
     string docroot = args->filespec;
     
-    while (!hand->timetodie()) {	
- 	log_debug(_("Waiting for HTTP GET request on fd #%d..."), args->netfd);
+    log_debug("Starting to wait for data in net for fd #%d", args->netfd);
+
+    // Wait for data, and when we get it, process it.
+    do {
+	hand->readPacket(args->netfd);
+#if 0
 	hand->wait();
-	// This thread is the last to wake up when the browser
-	// closes the network connection. When browsers do this
-	// varies, elinks and lynx are very forgiving to a more
-	// flexible HTTP protocol, which Firefox/Mozilla & Opera
-	// are much pickier, and will hang or fail to load if
-	// you aren't careful.
 	if (hand->timetodie()) {
 	    log_debug("Not waiting no more, no more for more HTTP data for fd #%d...", args->netfd);
 	    map<int, Handler *>::iterator hit = handlers.find(args->netfd);
@@ -1223,6 +1221,7 @@ httphandler(Handler::thread_params_t *args)
 	    }
 	    return;
 	}
+#endif
 #ifdef USE_STATISTICS
 	struct timespec start;
 	clock_gettime (CLOCK_REALTIME, &start);
@@ -1278,10 +1277,9 @@ httphandler(Handler::thread_params_t *args)
 		log_debug (_("File \"%s\" is %lld bytes in size, disk fd #%d"), filespec,
 			   st.st_size, filefd);
 		do {
-		    amf::Buffer *buf = new amf::Buffer;
+		    boost::shared_ptr<amf::Buffer> buf(new amf::Buffer);
 		    ret = read(filefd, buf->reference(), buf->size());
 		    if (ret == 0) { // the file is done
-			delete buf;
 			break;
 		    }
 		    if (ret != buf->size()) {
@@ -1330,7 +1328,7 @@ httphandler(Handler::thread_params_t *args)
 #endif
 //	conndata->statistics->dump();
 //    }
-    } // end of while retries
+    } while(!hand->timetodie());
     
     log_debug("httphandler all done now finally...");
     

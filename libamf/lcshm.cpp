@@ -26,6 +26,7 @@
 #include <string>
 #include <cstring>
 #include <boost/cstdint.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include "log.h"
 #include "buffer.h"
@@ -89,16 +90,7 @@ LcShm::LcShm(key_t key)
 
 LcShm::~LcShm()
 {
-//    GNASH_REPORT_FUNCTION;
-    
-    vector<amf::Element *>::iterator it;
-    for (it = _amfobjs.begin(); it != _amfobjs.end(); it++) {
-	amf::Element *el = (*(it));
-         if (el) {
-//             el->dump();
-             delete el;
-         }
-    }
+//    GNASH_REPORT_FUNCTION;    
 }
 
 Listener::Listener()
@@ -235,7 +227,7 @@ LcShm::close()
 
 #if 0
 Network::byte_t *
-LcShm::parseElement(amf::Element *el, Network::byte_t *data)
+LcShm::parseElement(boost::shared_ptr<Element> el, Network::byte_t *data)
 {
     GNASH_REPORT_FUNCTION;
     Network::byte_t *ptr = reinterpret_cast<uint8_t *>(data);
@@ -253,7 +245,7 @@ LcShm::parseElement(amf::Element *el, Network::byte_t *data)
     };
 }
 
-vector<amf::Element *> 
+vector<boost::shared_ptr<Element> > 
 LcShm::parseBody(Network::byte_t *data)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -261,7 +253,7 @@ LcShm::parseBody(Network::byte_t *data)
     AMF amf;
 
     while (ptr) {
-        amf::Element *el = amf.extractAMF(ptr);
+        boost::shared_ptr<Element> el = amf.extractAMF(ptr);
         if (el) {
             if (el->getType() == Element::NUMBER) {
                 if (el->to_number() == 0.0) {
@@ -324,20 +316,18 @@ LcShm::parseHeader(Network::byte_t *data, Network::byte_t* tooFar)
 
     
     AMF amf;
-    Element *el = amf.extractAMF(ptr, tooFar);
+    boost::shared_ptr<Element> el = amf.extractAMF(ptr, tooFar);
     if (el == 0) {
         log_debug("Didn't extract an element from the byte stream!");
         return 0;
     }
     
     _object.connection_name = el->to_string();
-    delete el;
     
     el = amf.extractAMF(ptr, tooFar);
     if (ptr != 0) {
         _object.hostname = el->to_string();
     }
-    delete el;
     
 //     el = new amf::Element;
 //     ptr = amf.extractElement(el, ptr);
@@ -385,11 +375,11 @@ LcShm::formatHeader(const std::string &con, const std::string &host, bool /* dom
     ptr = header + LC_HEADER_SIZE;
 
     // Which is then always followed by 3 AMF objects.
-    Buffer *buf1 = AMF::encodeString(con);
+    boost::shared_ptr<amf::Buffer> buf1 = AMF::encodeString(con);
     memcpy(ptr, buf1->begin(), buf1->size());
     ptr += buf1->size();
 
-    Buffer *buf2 = AMF::encodeString(host);
+    boost::shared_ptr<amf::Buffer> buf2 = AMF::encodeString(host);
     memcpy(ptr, buf2->begin(), buf2->size());
     ptr += buf2->size();
     
@@ -427,7 +417,7 @@ LcShm::connect(const string &name)
     Listener::setBaseAddress(baseAddress);
     _baseaddr = baseAddress;
     parseHeader(baseAddress, tooFar);
-//    vector<amf::Element *> ellist = parseBody(ptr);
+//    vector<boost::shared_ptr<Element> > ellist = parseBody(ptr);
 //     log_debug("Base address is: 0x%x, 0x%x",
 //               (unsigned int)Listener::getBaseAddress(), (unsigned int)_baseaddr);
 
@@ -455,7 +445,7 @@ LcShm::connect(key_t key)
     Listener::setBaseAddress(baseAddress);
     _baseaddr = baseAddress;
     parseHeader(baseAddress, tooFar);
-//    vector<amf::Element *> ellist = parseBody(ptr);
+//    vector<boost::shared_ptr<Element> > ellist = parseBody(ptr);
 //     log_debug("Base address is: 0x%x, 0x%x",
 //               (unsigned int)Listener::getBaseAddress(), (unsigned int)_baseaddr);
     
@@ -465,7 +455,7 @@ LcShm::connect(key_t key)
 /// \brief Invokes a method on a specified LcShm object.
 void
 LcShm::send(const string & /* name */, const string & /* domainname */,
-            vector<amf::Element *> &/* data */)
+            vector<boost::shared_ptr<Element> > &/* data */)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -555,10 +545,10 @@ LcShm::dump()
     cerr << "Connection Name:\t" << _object.connection_name << endl;
     cerr << "Hostname Name:\t\t" << _object.hostname << endl;
     cerr << "Domain Allowed:\t\t" << ((_object.domain) ? "true" : "false") << endl;
-    vector<amf::Element *>::iterator ait;
+    vector<boost::shared_ptr<Element> >::iterator ait;
     cerr << "# of Elements in file: " << _amfobjs.size() << endl;
     for (ait = _amfobjs.begin(); ait != _amfobjs.end(); ait++) {
-	amf::Element *el = (*(ait));
+	boost::shared_ptr<Element> el = (*(ait));
         el->dump();
     }
 

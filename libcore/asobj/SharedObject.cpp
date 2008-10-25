@@ -26,6 +26,7 @@
 #include <sys/types.h>
 #include <boost/tokenizer.hpp>
 #include <boost/scoped_array.hpp>
+#include <boost/shared_ptr.hpp>
 #include <cerrno>
 
 #include "SimpleBuffer.h"
@@ -94,8 +95,8 @@ public:
         {
             //GNASH_REPORT_FUNCTION;
             AMF amf;
-            Element *el = 0;
-
+            boost::shared_ptr<amf::Element> el;
+            
             const std::string& name = _st.string_table::value(key);
 
             //log_debug("Serializing SharedObject property %s:%s", name, val);
@@ -105,13 +106,11 @@ public:
                 if (!val.is_undefined()) {
                     str = val.to_string();
                 }
-                el = new amf::Element;
-                el->init(name, str);
+                el.reset(new amf::Element(name, str));
             }
             if (val.is_bool()) {
                 bool flag = val.to_bool();
-                el = new amf::Element;
-                el->init(name, flag);
+                el.reset(new amf::Element(name, flag));
             }
             if (val.is_number()) { 
                 double dub;
@@ -120,8 +119,7 @@ public:
                 } else {
                     dub = val.to_number();
                 }
-                el = new amf::Element;
-                el->init(name, dub);
+                el.reset(new amf::Element(name, dub));
             }
 
             if (el) {
@@ -549,8 +547,8 @@ SharedObject::readSOL(const std::string& filespec)
         return false;
     }
     
-    std::vector<Element *>::const_iterator it, e;
-    std::vector<Element *> els = sol.getElements();
+    std::vector<boost::shared_ptr<amf::Element> >::const_iterator it, e;
+    std::vector<boost::shared_ptr<amf::Element> > els = sol.getElements();
     log_debug("Read %d AMF objects from %s", els.size(), filespec);
 
     string_table& st = _vm.getStringTable();
@@ -559,7 +557,7 @@ SharedObject::readSOL(const std::string& filespec)
     boost::intrusive_ptr<as_object> ptr = as.to_object();
     
     for (it = els.begin(), e = els.end(); it != e; it++) {
-        Element *el = *it;
+        boost::shared_ptr<amf::Element> el = *it;
 
 #if 0 // this would be using as_value::as_value(const Element&)
 

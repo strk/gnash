@@ -22,6 +22,7 @@
 #ifdef HAVE_DEJAGNU_H
 
 //#include <netinet/in.h>
+#include <boost/shared_ptr.hpp>
 #include <string>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -62,55 +63,10 @@ Memory *mem = 0;
 static TestState runtest;
 
 static void test_read(std::string &filespec);
-static void test_write(std::string &filespec);
+//static void test_write(std::string &filespec);
 bool test_sol(std::string &filespec);
 
 LogFile& dbglogfile = LogFile::getDefaultInstance();
-
-// These next two functions are borrowed from Libgloss, part of the GNU binutils,
-// of which I am the primary author and copyright holder.
-// convert an ascii hex digit to a number.
-//      param is hex digit.
-//      returns a decimal digit.
-Network::byte_t
-hex2digit (Network::byte_t digit)
-{  
-    if (digit == 0)
-        return 0;
-    
-    if (digit >= '0' && digit <= '9')
-        return digit - '0';
-    if (digit >= 'a' && digit <= 'f')
-        return digit - 'a' + 10;
-    if (digit >= 'A' && digit <= 'F')
-        return digit - 'A' + 10;
-    
-    // shouldn't ever get this far
-    return -1;
-}
-
-// Convert the hex array pointed to by buf into binary to be placed in mem
-Buffer *
-hex2mem(const char *str)
-{
-    size_t count = strlen(str);
-    Network::byte_t ch = 0;
-    Buffer *buf = new Buffer(count + 12);
-    buf->clear();
-
-    Network::byte_t *ptr = const_cast<Network::byte_t *>(reinterpret_cast<const Network::byte_t *>(str));
-    
-    for (size_t i=0; i<count; i++) {
-        if (*ptr == ' ') {      // skip spaces.
-            ptr++;
-            continue;
-        }
-        ch = hex2digit(*ptr++) << 4;
-        ch |= hex2digit(*ptr++);
-        buf->append(ch);
-    }
-    return buf;
-}
 
 int
 main(int argc, char *argv[])
@@ -175,8 +131,7 @@ main(int argc, char *argv[])
     filespec += "/testout.sol";    
     // Write a .sol file
     
-    test_write(filespec);
-//    test_read(filespec);
+//    test_write(filespec);
     
 //    test_sol();
 }
@@ -187,12 +142,12 @@ test_read(std::string &filespec)
     GNASH_REPORT_FUNCTION;
     struct stat st;
 
-    Buffer *hex1 = hex2mem("00 bf 00 00 01 28 54 43 53 4f 00 04 00 00 00 00 00 08 73 65 74 74 69 6e 67 73 00 00 00 00 00 04 67 61 69 6e 00 40 49 00 00 00 00 00 00 00 00 0f 65 63 68 6f 73 75 70 70 72 65 73 73 69 6f 6e 01 00 00 00 11 64 65 66 61 75 6c 74 6d 69 63 72 6f 70 68 6f 6e 65 02 00 0e 2f 64 65 76 2f 69 6e 70 75 74 2f 6d 69 63 00 00 0d 64 65 66 61 75 6c 74 63 61 6d 65 72 61 02 00 00 00 00 0d 64 65 66 61 75 6c 74 6b 6c 69 6d 69 74 00 40 59 00 00 00 00 00 00 00 00 0d 64 65 66 61 75 6c 74 61 6c 77 61 79 73 01 00 00 00 10 63 72 6f 73 73 64 6f 6d 61 69 6e 41 6c 6c 6f 77 01 01 00 00 11 63 72 6f 73 73 64 6f 6d 61 69 6e 41 6c 77 61 79 73 01 01 00 00 18 61 6c 6c 6f 77 54 68 69 72 64 50 61 72 74 79 4c 53 4f 41 63 63 65 73 73 01 01 00 00 0c 74 72 75 73 74 65 64 50 61 74 68 73 03 00 00 09 00 00 0c 6c 6f 63 61 6c 53 65 63 50 61 74 68 02 00 00 00 00 10 6c 6f 63 61 6c 53 65 63 50 61 74 68 54 69 6d 65 00 42 71 6d 14 10 22 e0 00 00");
+    boost::shared_ptr<Buffer> hex1(new Buffer("00 bf 00 00 01 28 54 43 53 4f 00 04 00 00 00 00 00 08 73 65 74 74 69 6e 67 73 00 00 00 00 00 04 67 61 69 6e 00 40 49 00 00 00 00 00 00 00 00 0f 65 63 68 6f 73 75 70 70 72 65 73 73 69 6f 6e 01 00 00 00 11 64 65 66 61 75 6c 74 6d 69 63 72 6f 70 68 6f 6e 65 02 00 0e 2f 64 65 76 2f 69 6e 70 75 74 2f 6d 69 63 00 00 0d 64 65 66 61 75 6c 74 63 61 6d 65 72 61 02 00 00 00 00 0d 64 65 66 61 75 6c 74 6b 6c 69 6d 69 74 00 40 59 00 00 00 00 00 00 00 00 0d 64 65 66 61 75 6c 74 61 6c 77 61 79 73 01 00 00 00 10 63 72 6f 73 73 64 6f 6d 61 69 6e 41 6c 6c 6f 77 01 01 00 00 11 63 72 6f 73 73 64 6f 6d 61 69 6e 41 6c 77 61 79 73 01 01 00 00 18 61 6c 6c 6f 77 54 68 69 72 64 50 61 72 74 79 4c 53 4f 41 63 63 65 73 73 01 01 00 00 0c 74 72 75 73 74 65 64 50 61 74 68 73 03 00 00 09 00 00 0c 6c 6f 63 61 6c 53 65 63 50 61 74 68 02 00 00 00 00 10 6c 6f 63 61 6c 53 65 63 50 61 74 68 54 69 6d 65 00 42 71 6d 14 10 22 e0 00 00"));
 
     if (stat(filespec.c_str(), &st) == 0) {
         SOL sol;
         sol.readFile(filespec);
-        vector<amf::Element *> els = sol.getElements();
+        vector<boost::shared_ptr<amf::Element> > els = sol.getElements();
 
         if (els.size() > 1) {
             string str = els[2]->to_string();
@@ -212,9 +167,9 @@ test_read(std::string &filespec)
         }
 //        sol.dump();
     }
-    delete hex1;
 }
 
+#if 0
 void
 test_write(std::string &filespec)
 {
@@ -229,36 +184,20 @@ test_write(std::string &filespec)
 
     double dub = 50.0;
 
-
 //    amf::Element *el = new amf::Element("gain", dub);
-    amf::Element *el = new amf::Element;
-    el->init("gain", dub);
+    amf::Element *el = new amf::Element("gain", dub);
 //    amf_obj.createElement(&el, "gain", dub);
     sol.addObj(el);
+
     if ((strcmp(el->getName(), "gain") == 0) &&
         (el->getType() == Element::NUMBER_AMF0) &&
-        (memcmp(el->getData(), &dub, AMF0_NUMBER_SIZE) == 0) &&
-        (*((double *)el->getData()) == dub) &&
+        (el->to_number() == dub) &&
         (el->getLength() == AMF0_NUMBER_SIZE)) {
         runtest.pass("gain set");
     } else {
         runtest.fail("gain set");
     }
     
-    //uint8_t *foo;
-    //char *ptr;
-#if 0
-    foo = amf_obj.encodeVariable(el); 
-    ptr = (char *)amf_obj.extractVariable(&newel, foo);
-    if ((el.getName() == newel.getName()) &&
-        (el.getLength() == newel.getLength()) &&
-        (newel.getType() == Element::NUMBER_AMF0) &&
-        (*((double *)newel.getData()) == dub)) {
-        runtest.pass("gain number encoded/extracted");
-    } else {
-        runtest.fail("gain number encoded/extracted");
-    }
-#endif
     el = new amf::Element("echosuppression", false);
     sol.addObj(el);
     if ((strcmp(el->getName(), "echosuppression") == 0) &&
@@ -269,17 +208,6 @@ test_write(std::string &filespec)
     } else {
         runtest.fail("echosupression set");
     }
-    
-//     foo = amf_obj.encodeVariable(el); 
-//     ptr = (char *)amf_obj.extractVariable(&newel, reinterpret_cast<uint8_t *>(foo));
-//     if ((el->getName() == newel.getName()) &&
-//         (el->getType() == Element::BOOLEAN) &&
-//         (el->getLength() == newel.getLength()) &&
-//         (memcmp(el->getData(), newel.getData(), el->getLength()) == 0)) {
-//         runtest.pass("echosupression bool(false) encoded/extracted");
-//     } else {
-//         runtest.fail("echosupression bool(false) encoded/extracted");
-//     }
     
     string name = "defaultmicrophone";
     string data = "/dev/input/mic";
@@ -296,7 +224,6 @@ test_write(std::string &filespec)
 
     data = "";
     el = new amf::Element("defaultcamera", data);
-    el->init("defaultcamera", data);
     sol.addObj(el);
     if ((strcmp(el->getName(), "defaultcamera") == 0) &&
         (el->getType() == Element::STRING_AMF0) &&
@@ -307,25 +234,23 @@ test_write(std::string &filespec)
     }
     
     dub = 100.0;
-    el = new amf::Element;
+    el = new amf::Element("defaultklimit", dub);
 //    el = new amf::Element("defaultklimit", dub);
-    el->init("defaultklimit", dub);
     sol.addObj(el);
     if ((strcmp(el->getName(), "defaultklimit") == 0) &&
         (el->getType() == Element::NUMBER_AMF0) &&
-        (memcmp(el->getData(), &dub, AMF0_NUMBER_SIZE) == 0) &&
-        (*((double *)el->getData()) == dub) &&
+        (el->to_number() == dub) &&
         (el->getLength() == AMF0_NUMBER_SIZE)) {
         runtest.pass("defaultklimit set");
     } else {
         runtest.fail("defaultklimit set");
     }
-
+    
     el = new amf::Element("defaultalways", false);
     sol.addObj(el);
     if ((strcmp(el->getName(), "defaultalways") == 0) &&
         (el->getType() == Element::BOOLEAN_AMF0) &&
-        (*el->getData() == 0) &&
+        (el->to_bool() == false) &&
         (el->getLength() == 1)) {
         runtest.pass("defaultalways set");
     } else {
@@ -336,7 +261,7 @@ test_write(std::string &filespec)
     sol.addObj(el);
     if ((strcmp(el->getName(), "crossdomainAllow") == 0) &&
         (el->getType() == Element::BOOLEAN_AMF0) &&
-        (*el->getData() == 1) &&
+        (el->to_bool() == true) &&
         (el->getLength() == 1)) {
         runtest.pass("crossdomainAllow set");
     } else {
@@ -364,29 +289,8 @@ test_write(std::string &filespec)
     } else {
         runtest.fail("allowThirdPartyLSOAccess set");
     }
-
-#if 0
-    // FIXME: Why does GCC keep linking this to the bool
-    // version instead ?
-    boost::intrusive_ptr<gnash::as_object> as;
-    amf_obj.createElement(&el, "trustedPaths", &as);
-    if ((el->getName() == "trustedPaths") &&
-        (el->getType() == Element::OBJECT_AMF0)) {
-        runtest.xpass("trustedPaths set");
-    } else {
-        runtest.xfail("trustedPaths set");
-        // force the type so the binary output stays correct.
-        // As this builds a null object, we get away with it,
-        // and it helps debugging to have the hexdumps of the
-        // .sol files match the originals.
-        el->getType() = Element::OBJECT_AMF0;  
-        el->getLength() = 0;
-    }
-    sol.addObj(el);
-#endif
     
-    el = new amf::Element;
-    el->init("localSecPath", data);
+    el = new amf::Element("localSecPath", data);
     sol.addObj(el);
     if ((strcmp(el->getName(), "localSecPath") == 0) &&
         (el->getType() == Element::STRING_AMF0) &&
@@ -400,8 +304,7 @@ test_write(std::string &filespec)
     dub = 1.8379389592608646e-304;
     swapBytes(&dub, 8);
     
-    el = new amf::Element;
-    el->init("localSecPathTime", dub);
+    el = new amf::Element("localSecPathTime", dub);
     sol.addObj(el);
     if ((strcmp(el->getName(), "localSecPathTime") ==0) &&
         (el->getType() == Element::NUMBER_AMF0) &&
@@ -412,11 +315,11 @@ test_write(std::string &filespec)
     } else {
         runtest.fail("localSecPathTime set");
     }
-
-//    sol.dump();
+    sol.dump();
     // now write the data to disk
     sol.writeFile(filespec, "settings");
 }
+#endif
 
 static void
 usage (void)

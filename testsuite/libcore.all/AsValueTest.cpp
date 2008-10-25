@@ -24,6 +24,8 @@
 #include <string>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <iostream>
+#include <boost/shared_ptr.hpp>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -44,8 +46,6 @@
 #include "network.h"
 #include "amf.h"
 #include "element.h"
-
-#include <iostream>
 
 using namespace amf;
 using namespace gnash;
@@ -182,11 +182,11 @@ test_obj()
     Element top;
     top.makeObject("toplevel");
 
-    Element *foo = new Element;
+    boost::shared_ptr<amf::Element> foo(new Element);
     foo->makeString("foo", "bar");
     top.addProperty(foo);
 
-    Element *bar = new Element;
+    boost::shared_ptr<amf::Element> bar(new Element);
     bar->makeNumber("bar", 1.234);
     top.addProperty(bar);
 
@@ -235,9 +235,9 @@ test_obj()
     }
 
     std::auto_ptr<Element> el1 = as1.to_element();
-    Element *fooel = el1->getProperty(0);
-    Element *barel = el1->getProperty(1);
-    if ((el1->getType() == Element::OBJECT_AMF0)
+    boost::shared_ptr<amf::Element> fooel = el1->getProperty(0);
+    boost::shared_ptr<amf::Element> barel = el1->getProperty(1);
+    if ((el1.get()->getType() == Element::OBJECT_AMF0)
         && (fooel->getType() == Element::STRING_AMF0)
         && (strcmp(fooel->getName(), "foo") == 0)
         && (strcmp(fooel->to_string(), "bar") == 0)

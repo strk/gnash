@@ -26,6 +26,7 @@
 #include <map>
 #include <vector>
 #include <boost/detail/endian.hpp>
+#include <boost/shared_ptr.hpp>
 
 #if ! (defined(_WIN32) || defined(WIN32))
 #	include <netinet/in.h>
@@ -149,6 +150,8 @@ RTMP::headerSize(Network::byte_t header)
 //    GNASH_REPORT_FUNCTION;
     
     int headersize = -1;
+
+    cerr << "Header size value: " << (void *)header << endl;
     
     switch (header & RTMP_HEADSIZE_MASK) {
       case HEADER_12:
@@ -204,38 +207,39 @@ RTMP::~RTMP()
 }
 
 void
-RTMP::addProperty(amf::Element *el)
+RTMP::addProperty(boost::shared_ptr<amf::Element> el)
 {
 //    GNASH_REPORT_FUNCTION;
     _properties[el->getName()] = el;
 }
 
 void
-RTMP::addProperty(char *name, amf::Element *el)
+RTMP::addProperty(char *name, boost::shared_ptr<amf::Element> el)
 { 
 //    GNASH_REPORT_FUNCTION;
     _properties[name] = el;
 }
 
-amf::Element *
+boost::shared_ptr<amf::Element> 
 RTMP::getProperty(const std::string &name)
 {
 //    GNASH_REPORT_FUNCTION;
 //    return _properties[name.c_str()];
-    map<const char *, amf::Element *>::iterator it;
+    map<const char *, boost::shared_ptr<amf::Element> >::iterator it;
     for (it = _properties.begin(); it != _properties.end(); it++) {
 	const char *title = it->first;
-	amf::Element *el = it->second;
+	boost::shared_ptr<amf::Element> el = it->second;
 	if (name == title) {
 // 	    log_debug("found variable in RTMP packet: %s", name);
 	    return el;
 	}
     }
-    return 0;
+    boost::shared_ptr<amf::Element> el;
+    return el;
 }
 
 RTMP::rtmp_head_t *
-RTMP::decodeHeader(Buffer *buf)
+RTMP::decodeHeader(boost::shared_ptr<amf::Buffer> buf)
 {
 //    GNASH_REPORT_FUNCTION;
     return decodeHeader(buf->reference());
@@ -254,10 +258,6 @@ RTMP::decodeHeader(Network::byte_t *in)
     _header.head_size = headerSize(*tmpptr++);
     log_debug (_("The header size is %d"), _header.head_size);
 
-    if (_header.head_size == 1) {
-        _header.bodysize = sizeof(boost::uint16_t) * 2;
-    }
-    
     if (_header.head_size >= 4) {
         _mystery_word = *tmpptr++;
         _mystery_word = (_mystery_word << 8) + *tmpptr++;
@@ -285,6 +285,16 @@ RTMP::decodeHeader(Network::byte_t *in)
 	}
     }
 
+    if (_header.head_size == 1) {
+	if (_header.channel == RTMP_SYSTEM_CHANNEL) {
+	    _header.bodysize = sizeof(boost::uint16_t) * 3;
+	    log_debug("Got a one byte header system message: %s", hexify(in, _header.bodysize, false));
+	} else {
+	    log_debug("Got a continuation packet for channel #%d", _header.channel);
+	    _header.bodysize = 0;
+	}
+    }
+    
 //     switch(_header.type) {
 //       case CHUNK_SIZE:
 //       case BYTES_READ:
@@ -322,11 +332,11 @@ RTMP::decodeHeader(Network::byte_t *in)
 /// * Routing - The source/destination of the message
 //
 
-amf::Buffer *
+boost::shared_ptr<amf::Buffer> 
 RTMP::encodeHeader(int amf_index, rtmp_headersize_e head_size)
 {
 //    GNASH_REPORT_FUNCTION;
-    amf::Buffer *buf = new Buffer(1);
+    boost::shared_ptr<amf::Buffer> buf(new Buffer(1));
     Network::byte_t *ptr = buf->reference();
     
     // Make the channel index & header size byte
@@ -337,26 +347,26 @@ RTMP::encodeHeader(int amf_index, rtmp_headersize_e head_size)
 }
 
 // There are 3 size of RTMP headers, 1, 4, 8, and 12.
-amf::Buffer *
+boost::shared_ptr<amf::Buffer> 
 RTMP::encodeHeader(int amf_index, rtmp_headersize_e head_size,
 		       size_t total_size, content_types_e type,
 		       RTMPMsg::rtmp_source_e routing)
 {
     GNASH_REPORT_FUNCTION;
 
-    amf::Buffer *buf = 0;
+    boost::shared_ptr<amf::Buffer> buf;
     switch(head_size) {
       case HEADER_1:
-	  buf = new Buffer(1);
+	  buf.reset(new Buffer(1));
 	  break;
       case HEADER_4:
-	  buf = new Buffer(4);
+	  buf.reset(new Buffer(4));
 	  break;
       case HEADER_8:
-	  buf = new Buffer(8);
+	  buf.reset(new Buffer(8));
 	  break;
       case HEADER_12:
-	  buf = new Buffer(12);
+	  buf.reset(new Buffer(12));
 	  break;
     }
     
@@ -400,7 +410,7 @@ RTMP::encodeHeader(int amf_index, rtmp_headersize_e head_size,
 }
 
 bool
-RTMP::packetRead(amf::Buffer *buf)
+RTMP::packetRead(boost::shared_ptr<amf::Buffer> buf)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -436,14 +446,14 @@ RTMP::packetRead(amf::Buffer *buf)
 //    ptr = decodeHeader(ptr);
 //    ptr += headersize;
     
-    amf::Element *el = amf.extractAMF(ptr, tooFar);
+    boost::shared_ptr<amf::Element> el = amf.extractAMF(ptr, tooFar);
 //    el->dump();
-    el = amf.extractAMF(ptr, tooFar) + 1; // @@strk@@ : what's the +1 for ?
+    el = amf.extractAMF(ptr, tooFar); // @@strk@@ : what's the +1 for ?
 //    el->dump();
     log_debug (_("Reading AMF packets till we're done..."));
 //    buf->dump();
     while (ptr < end) {
-	amf::Element *el = amf.extractProperty(ptr, tooFar);
+	boost::shared_ptr<amf::Element> el = amf.extractProperty(ptr, tooFar);
 	addProperty(el);
 //	el->dump();
     }
@@ -453,28 +463,28 @@ RTMP::packetRead(amf::Buffer *buf)
 //    buf->dump();
     if (buf->size() < actual_size) {
 	log_debug("FIXME: MERGING");
-	buf = _handler->merge(buf);
+//	buf = _handler->merge(buf); FIXME needs to use shared_ptr
     }
     while ((ptr - buf->begin()) < static_cast<int>(actual_size)) {
-	amf::Element *el = amf.extractProperty(ptr, tooFar);
+	boost::shared_ptr<amf::Element> el = amf.extractProperty(ptr, tooFar);
 	addProperty(el);
 //	el->dump();		// FIXME: dump the AMF objects as they are read in
     }
 
 //    dump();
     
-    amf::Element *url = getProperty("tcUrl");
-    amf::Element *file = getProperty("swfUrl");
-    amf::Element *app = getProperty("app");
+    boost::shared_ptr<amf::Element> url = getProperty("tcUrl");
+    boost::shared_ptr<amf::Element> file = getProperty("swfUrl");
+    boost::shared_ptr<amf::Element> app = getProperty("app");
     
     if (file) {
-	log_debug("SWF file %s", file->getData());
+	log_debug("SWF file %s", file->to_string());
     }
     if (url) {
-	log_debug("is Loading video %s", url->getData());
+	log_debug("is Loading video %s", url->to_string());
     }
     if (app) {
-	log_debug("is file name is %s", app->getData());
+	log_debug("is file name is %s", app->to_string());
     }
     
     return true;
@@ -484,10 +494,10 @@ void
 RTMP::dump()
 {
     cerr << "RTMP packet contains " << _properties.size() << " variables." << endl;
-    map<const char *, amf::Element *>::iterator it;
+    map<const char *, boost::shared_ptr<amf::Element> >::iterator it;
     for (it = _properties.begin(); it != _properties.end(); it++) {
 //	const char *name = it->first;
-	amf::Element *el = it->second;
+	boost::shared_ptr<amf::Element> el = it->second;
 	el->dump();
     }
 }
@@ -543,7 +553,7 @@ RTMP::decodePing(Network::byte_t *data)
     return ping;    
 }
 RTMP::rtmp_ping_t *
-RTMP::decodePing(amf::Buffer *buf)
+RTMP::decodePing(boost::shared_ptr<amf::Buffer> buf)
 {
     GNASH_REPORT_FUNCTION;
     return decodePing(buf->reference());
@@ -596,9 +606,9 @@ RTMP::decodeMsgBody(Network::byte_t *data, size_t size)
     bool status = false;
 
     // The first data object is the method name of this object.
-    Element *name = amf_obj.extractAMF(ptr, tooFar);
+    boost::shared_ptr<amf::Element> name = amf_obj.extractAMF(ptr, tooFar);
     if (name) {
-	ptr += name->getLength() + 3; // skip the length bytes too
+	ptr += name->getDataSize() + 3; // skip the length bytes too
     } else {
 	log_error("Name field of RTMP Message corrupted!");
 	return 0;
@@ -606,12 +616,12 @@ RTMP::decodeMsgBody(Network::byte_t *data, size_t size)
 
     // The stream ID is the second data object. All messages have these two objects
     // at the minimum.
-    Element *streamid = amf_obj.extractAMF(ptr, tooFar);
+    boost::shared_ptr<amf::Element> streamid = amf_obj.extractAMF(ptr, tooFar);
     if (streamid) {
 	// Most onStatus messages have the stream ID, but the Data Start onStatus
 	// message is basically just a marker that an FLV file is coming next.
 	if (streamid->getType() == Element::NUMBER_AMF0) {
-	    ptr += streamid->getLength() + 2;
+	    ptr += streamid->getDataSize() + 2;
 	}
     } else {
 	log_error("Stream ID field of RTMP Message corrupted!");
@@ -636,7 +646,7 @@ RTMP::decodeMsgBody(Network::byte_t *data, size_t size)
     // properties attached.
     while (ptr < tooFar) {
 	// These pointers get deleted automatically when the msg object is deleted
-        amf::Element *el = amf_obj.extractAMF(ptr, tooFar);
+        boost::shared_ptr<amf::Element> el = amf_obj.extractAMF(ptr, tooFar);
 	ptr += amf_obj.totalsize();
         if (el == 0) {
 	    break;
@@ -646,28 +656,23 @@ RTMP::decodeMsgBody(Network::byte_t *data, size_t size)
  	if (status) {
 	    msg->checkStatus(el);
 	}
-    };
-    
-    // cleanup after ourselves
-    delete name;
-    delete streamid;
+    };    
     
     return msg;
 }
 
 RTMPMsg *
-RTMP::decodeMsgBody(amf::Buffer *buf)
+RTMP::decodeMsgBody(boost::shared_ptr<amf::Buffer> buf)
 {
 //    GNASH_REPORT_FUNCTION;
     return decodeMsgBody(buf->reference(), buf->size());
 }
 
-amf::Buffer *
+boost::shared_ptr<amf::Buffer> 
 RTMP::encodeChunkSize()
 {
     GNASH_REPORT_FUNCTION;
     log_unimpl(__PRETTY_FUNCTION__);
-    return 0;
 }
 
 void
@@ -677,12 +682,11 @@ RTMP::decodeChunkSize()
     log_unimpl(__PRETTY_FUNCTION__);
 }
     
-amf::Buffer *
+boost::shared_ptr<amf::Buffer> 
 RTMP::encodeBytesRead()
 {
     GNASH_REPORT_FUNCTION;
     log_unimpl(__PRETTY_FUNCTION__);
-    return 0;
 }
 
 void
@@ -692,12 +696,11 @@ RTMP::decodeBytesRead()
     log_unimpl(__PRETTY_FUNCTION__);
 }
 
-amf::Buffer *
+boost::shared_ptr<amf::Buffer> 
 RTMP::encodeServer()
 {
     GNASH_REPORT_FUNCTION;
     log_unimpl(__PRETTY_FUNCTION__);
-    return 0;
 }
 
 void 
@@ -707,12 +710,11 @@ RTMP::decodeServer()
     log_unimpl(__PRETTY_FUNCTION__);
 }
     
-amf::Buffer *
+boost::shared_ptr<amf::Buffer> 
 RTMP::encodeClient()
 {
     GNASH_REPORT_FUNCTION;
     log_unimpl(__PRETTY_FUNCTION__);
-    return 0;
 }
 
 void 
@@ -722,12 +724,11 @@ RTMP::decodeClient()
     log_unimpl(__PRETTY_FUNCTION__);
 }
     
-amf::Buffer *
+boost::shared_ptr<amf::Buffer> 
 RTMP::encodeAudioData()
 {
     GNASH_REPORT_FUNCTION;
     log_unimpl(__PRETTY_FUNCTION__);
-    return 0;
 }
 
 void 
@@ -737,12 +738,11 @@ RTMP::decodeAudioData()
     log_unimpl(__PRETTY_FUNCTION__);
 }
     
-amf::Buffer *
+boost::shared_ptr<amf::Buffer> 
 RTMP::encodeVideoData()
 {
     GNASH_REPORT_FUNCTION;
     log_unimpl(__PRETTY_FUNCTION__);
-    return 0;
 }
 
 void 
@@ -752,12 +752,11 @@ RTMP::decodeVideoData()
     log_unimpl(__PRETTY_FUNCTION__);
 }
     
-amf::Buffer *
+boost::shared_ptr<amf::Buffer> 
 RTMP::encodeNotify()
 {
     GNASH_REPORT_FUNCTION;
     log_unimpl(__PRETTY_FUNCTION__);
-    return 0;
 }
 
 void 
@@ -767,12 +766,11 @@ RTMP::decodeNotify()
     log_unimpl(__PRETTY_FUNCTION__);
 }
     
-amf::Buffer *
+boost::shared_ptr<amf::Buffer> 
 RTMP::encodeSharedObj()
 {
     GNASH_REPORT_FUNCTION;
     log_unimpl(__PRETTY_FUNCTION__);
-    return 0;
 }
 
 void 
@@ -782,12 +780,11 @@ RTMP::decodeSharedObj()
     log_unimpl(__PRETTY_FUNCTION__);
 }
     
-amf::Buffer *
+boost::shared_ptr<amf::Buffer> 
 RTMP::encodeInvoke()
 {
     GNASH_REPORT_FUNCTION;
     log_unimpl(__PRETTY_FUNCTION__);
-    return 0;
 }
 void 
 RTMP::decodeInvoke()
@@ -801,7 +798,7 @@ RTMP::decodeInvoke()
 // interval. (128 bytes for video data). Each message main contain
 // multiple packets.
 bool
-RTMP::sendMsg(amf::Buffer *data)
+RTMP::sendMsg(boost::shared_ptr<amf::Buffer> data)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -826,24 +823,23 @@ RTMP::sendMsg(amf::Buffer *data)
 RTMPMsg *
 RTMP::sendRecvMsg(int amf_index, rtmp_headersize_e head_size,
 		  size_t total_size, content_types_e type,
-		  RTMPMsg::rtmp_source_e routing, amf::Buffer *bufin)
+		  RTMPMsg::rtmp_source_e routing, boost::shared_ptr<amf::Buffer> bufin)
 {
     GNASH_REPORT_FUNCTION;
 //    size_t total_size = buf2->size() - 6; // FIXME: why drop 6 bytes ?
-    Buffer *head = encodeHeader(amf_index, head_size, total_size,
+    boost::shared_ptr<amf::Buffer> head = encodeHeader(amf_index, head_size, total_size,
 				type, routing);
 //    int ret = 0;
-    int ret = writeNet(head);
+    int ret = writeNet(head->reference(), head->size());
 //     if (netDebug()) {
 // 	head->dump();
 // 	bufin->dump();
 //     }
-    delete head;
     ret = sendMsg(bufin);
 
     RTMP::rtmp_head_t *rthead = 0;
     RTMPMsg *msg = 0;
-    Buffer *buf = 0;
+    boost::shared_ptr<amf::Buffer> buf;
     Network::byte_t *ptr = 0;
 
 
@@ -923,7 +919,7 @@ RTMP::sendRecvMsg(int amf_index, rtmp_headersize_e head_size,
 	      case VIDEO_DATA:
 	      {
 		  log_debug("Got VIDEO packets!!!");
-		  Buffer *frame = 0;
+		  boost::shared_ptr<amf::Buffer> frame;
 		  do {
 		      frame = recvMsg(1);	// use a 1 second timeout
 		      if (frame) {
@@ -952,7 +948,6 @@ RTMP::sendRecvMsg(int amf_index, rtmp_headersize_e head_size,
 			  log_debug("Got onBWDone packet!!!");
 			  continue;
 		      }
-		      delete buf;
 		      return msg;
 		  } else {
 		      log_error("Couldn't decode message body for type %s!",
@@ -979,7 +974,7 @@ RTMP::sendRecvMsg(int amf_index, rtmp_headersize_e head_size,
 // Receive a message, which is a series of AMF elements, seperated
 // by a one byte header at regular byte intervals. (128 bytes for
 // video data by default). Each message main contain multiple packets.
-amf::Buffer *
+boost::shared_ptr<amf::Buffer> 
 RTMP::recvMsg()
 {
     GNASH_REPORT_FUNCTION;
@@ -990,7 +985,7 @@ RTMP::recvMsg()
 // more efficient. As these reads may cross packet boundaries, and they may
 // also include the RTMP header every _chunksize bytes, this raw data will
 // need to be processed later on.
-amf::Buffer *
+boost::shared_ptr<amf::Buffer> 
 RTMP::recvMsg(int timeout)
 {
     GNASH_REPORT_FUNCTION;
@@ -998,14 +993,12 @@ RTMP::recvMsg(int timeout)
     int ret = 0;
     bool nopacket = true;
 
-    Buffer *buf = 0;
-    buf = new Buffer;
+    boost::shared_ptr<amf::Buffer> buf(new Buffer);
     while (nopacket) {
-	ret = readNet(buf, timeout);
+	ret = readNet(buf->reference(), timeout);
 	if (ret <= 0) {
 	    log_error("Never got any data at line %d", __LINE__);
-	    delete buf;
-	    return 0;
+	    return buf;
 	}
 	if ((ret == 1) && (*(buf->reference()) == 0xff)) {
 	    log_debug("Got an empty packet from the server at line %d", __LINE__);
@@ -1028,7 +1021,7 @@ RTMP::recvMsg(int timeout)
 // bytes another 1 byte RTMP header. The header itself is not part of the byte
 // count.
 RTMP::queues_t *
-RTMP::split(Buffer *buf)
+RTMP::split(boost::shared_ptr<Buffer> buf)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -1043,25 +1036,37 @@ RTMP::split(Buffer *buf)
     size_t nbytes = 0;
     
     ptr = buf->reference();
-    Buffer *chunk = 0;
+    boost::shared_ptr<amf::Buffer> chunk;
     while ((ptr - buf->reference()) < buf->size()) {
 	rthead = decodeHeader(ptr);
+	if (rthead->channel == RTMP_SYSTEM_CHANNEL) {
+	    log_debug("Got a message on the system channel");
+	    ptr += rthead->head_size + rthead->bodysize;
+	    continue;
+	}
 	// Make sure the header size is in range
 	if (rthead->head_size <= RTMP_MAX_HEADER_SIZE) {
 	    // Any packet with a size greater than 1 is a new header, so create
 	    // a new Buffer to hold all the data.
 	    if ((rthead->head_size > 1)) {
-		// This is a queue of channels with active messages
-		_channels.push_back(&_queues[rthead->channel]);
-// 		cerr << "New packet for channel #" << rthead->channel << " of size "
-// 		     << (rthead->head_size + rthead->bodysize) << endl;
-		chunk = new Buffer(rthead->bodysize + rthead->head_size);
+ 		cerr << "New packet for channel #" << rthead->channel << " of size "
+ 		     << (rthead->head_size + rthead->bodysize) << endl;
+		chunk.reset(new Buffer(rthead->bodysize + rthead->head_size));
 		chunk->clear();	// FIXME: temporary debug only, should be unnecessary
 		_queues[rthead->channel].push(chunk);
 	    } else {
 		// Use the existing Buffer for this pkt
 		chunk = _queues[rthead->channel].peek();
 	    }
+	    // Red5 version 5 sends out PING messages with a 1 byte header. I think this
+	    // may be a bug in Red5, but we should handle it anyway.
+	    if (chunk == 0) {
+		cerr << "Chunk wasn't allocated! " << (rthead->bodysize + rthead->head_size) << endl;
+		chunk.reset(new Buffer(rthead->bodysize + rthead->head_size));
+		chunk->clear();	// FIXME: temporary debug only, should be unnecessary
+		_queues[rthead->channel].push(chunk);
+	    }
+	    
 	    // Many RTMP messages are smaller than the chunksize
 	    if (chunk->size() <= _chunksize[rthead->channel]) {
 		// a single byte header has no length field. As these are often
@@ -1076,7 +1081,11 @@ RTMP::split(Buffer *buf)
 		if (rthead->head_size > 1) {
 		    pktsize = rthead->head_size + _chunksize[rthead->channel];
 		} else {
-		    pktsize = rthead->head_size + (chunk->size() - _chunksize[rthead->channel]);
+		    if ((rthead->head_size + chunk->size()) < _chunksize[rthead->channel]) {
+			pktsize = rthead->head_size + chunk->size();
+		    } else {
+			pktsize = rthead->head_size + (chunk->size() - _chunksize[rthead->channel]);
+		    }
 		}
 	    }
 	    
@@ -1087,21 +1096,27 @@ RTMP::split(Buffer *buf)
 		// complete all the data up to the body size from the header.
 // 		cerr << _queues[rthead->channel].size() << " messages in queue for channel "
 // 		     << rthead->channel << endl;
-		if ((rthead->head_size == 1)){
-// 		    cerr << "FOLLOWING PACKET!" << " for channel " << rthead->channel << endl;
-// 		    cerr << "Space Left in buffer for channel " << rthead->channel << " is: "
-// 			 << chunk->spaceLeft() << endl;
+		if (rthead->head_size == 1){
+ 		    cerr << "FOLLOWING PACKET!" << " for channel " << rthead->channel << endl;
+ 		    cerr << "Space Left in buffer for channel " << rthead->channel << " is: "
+ 			 << chunk->spaceLeft() << endl;
 		    ptr += rthead->head_size;
 		    pktsize -= rthead->head_size;
 // 		} else {
 // 		    cerr << "FIRST PACKET!" << " for channel " << rthead->channel << endl;
 		}
-		chunk->append(ptr, pktsize);
-// 		cerr << "Adding data to existing packet for channel #" << rthead->channel
-// 		     << ", read " << nbytes << " bytes." << endl;
-		ptr += pktsize;
+		// This is a queue of channels with active messages
+		_channels.push_back(&_queues[rthead->channel]);
+		if (pktsize < 0xffffff) {
+		    chunk->append(ptr, pktsize);
+		    cerr << "Adding data to existing packet for channel #" << rthead->channel
+			 << ", read " << pktsize << " bytes." << endl;
+		    ptr += pktsize;
+		} else {
+		    log_error("Packet size out of range! %d, %d", rthead->bodysize, pktsize);
+		}
 	    } else {
-		log_error("RTMP packet size is out of range! %d", pktsize);
+		log_error("RTMP packet size is out of range! %d, %d", rthead->bodysize, pktsize);
 		break;
 	    }
 	} else {

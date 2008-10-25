@@ -19,6 +19,7 @@
 #define _RTMP_SERVER_H_ 1
 
 #include <boost/cstdint.hpp>
+#include <boost/shared_ptr.hpp>
 #include <string>
 #include <map>
 
@@ -39,13 +40,13 @@ public:
     bool handShakeWait();
     bool handShakeResponse();
     bool serverFinish();
-    bool packetSend(amf::Buffer *buf);
-    bool packetRead(amf::Buffer *buf);
+    bool packetSend(boost::shared_ptr<amf::Buffer> buf);
+    bool packetRead(boost::shared_ptr<amf::Buffer> buf);
     
     // These are handlers for the various types
-    amf::Buffer *encodeResult(RTMPMsg::rtmp_status_e status);
-    amf::Buffer *encodePing(rtmp_ping_e type, boost::uint32_t milliseconds);
-    amf::Buffer *encodePing(rtmp_ping_e type);
+    boost::shared_ptr<amf::Buffer> encodeResult(RTMPMsg::rtmp_status_e status);
+    boost::shared_ptr<amf::Buffer> encodePing(rtmp_ping_e type, boost::uint32_t milliseconds);
+    boost::shared_ptr<amf::Buffer> encodePing(rtmp_ping_e type);
     
     void dump();
   private:

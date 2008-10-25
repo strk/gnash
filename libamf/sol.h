@@ -79,17 +79,17 @@ public:
     ///  The element to add, ownership transferred
     ///  TODO: take an auto_ptr
     ///
-    void addObj(amf::Element *x);
+    void addObj(boost::shared_ptr<Element>x);
 
     /// Return a reference to the elements in this object
-    std::vector<amf::Element *>& getElements() { return _amfobjs; }
+    std::vector<boost::shared_ptr<amf::Element> > &getElements() { return _amfobjs; }
 
     /// Get an element by index
     //
     /// @return the element, or abort if index is wrong (eh..)
     ///         ownership of the element is retained by this object.
     ///
-    Element *getElement(size_t x)
+    boost::shared_ptr<Element> getElement(size_t x)
     {
         assert(x<_amfobjs.size());
         return _amfobjs[x];
@@ -112,7 +112,7 @@ public:
     std::string      _filespec;
 
     /// The elements in this SharedObject, owned by it
-    std::vector<amf::Element *> _amfobjs;
+    std::vector<boost::shared_ptr<Element> > _amfobjs;
 
     int              _filesize;
   };

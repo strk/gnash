@@ -23,8 +23,9 @@
 #include <cstring>
 #include <iostream> // for output operator
 #include <boost/cstdint.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/scoped_ptr.hpp>
 
-//#include "buffer.h"
 #include "network.h"
 #include "dsodefs.h" // DSOEXPORT
 
@@ -80,59 +81,102 @@ public:
         BYTES_AMF3=0x0c,
     } amf3_type_e;
     Element();
-    Element(gnash::Network::byte_t *data);
+//    Element(gnash::Network::byte_t *data);
+    // Construct a Number
     Element(double data);
-    Element(std::vector<double> &data);
+    Element(const std::string &name, double data);
+    // Construct a String
+    Element(const char *data);
     Element(const std::string &data);
     Element(const std::string &name, const std::string &data);
+    // Construct a Boolean
     Element(bool data);
     Element(const std::string &name, bool data);
+
+    //.Construct a strict array, where each item is the same type
+    Element(std::vector<double> &data);
+    Element(std::vector<std::string> &data);
+
+    // Construct an ECMA array, which can contain any type
+    Element(std::vector<Element > &data);
+    
     // Create a function block for AMF
     Element(bool, double, double, const std::string &str);
+    
     ~Element();
     void clear();
-    Element &init(const std::string &name, double data);
-    Element &init(double data);
-    Element &init(std::vector<double> &data);
-    Element &init(const std::string &name, const std::string &data);
-    Element &init(const std::string &data);
-    Element &init(const std::string &name, bool data);
-    Element &init(bool data);
+#if 0
     // Create a function block for AMF
     Element &init(bool, double, double, const std::string &str);
+#endif
+    
+    // Make ourselves be the same as another Element.
+    Element &operator=(Element &);
+//    Element &operator=(boost::shared_ptr<Element>);
 
-    // These create the other "special" AMF types.
-    Element &makeNullString(); 
-    Element &makeString(const char *str, size_t size); 
-    Element &makeString(gnash::Network::byte_t *data, size_t size); 
-    Element &makeString(const std::string &data); 
+    // Make ourselves be the same as other commonly used data types. Note
+    // that this can;t be used for properties unless you call setName() later.
+    Element &operator=(double num);
+    Element &operator=(const std::string &str);
+    Element &operator=(bool flag);
+    
+    // A Null String is a string with a length of zero
+    Element &makeNullString();
+
+    // Make a string element
+    Element &makeString(const char *str, size_t size);
+    Element &makeString(gnash::Network::byte_t *data, size_t size);
+    Element &makeString(const std::string &data);
     Element &makeString(const std::string &name, const std::string &data);
-    
+
+    // Make a number element
     Element &makeNumber(double num); 
-    Element &makeNumber(amf::Buffer *buf); 
-    Element &makeNumber(gnash::Network::byte_t *data); 
-    Element &makeNumber(const std::string &name, double num);
-    Element &makeNumber(const std::string &name, gnash::Network::byte_t *data); 
-    
-    Element &makeBoolean(gnash::Network::byte_t *data); 
-    Element &makeBoolean(bool data); 
+    Element &makeNumber(boost::shared_ptr<amf::Buffer> buf); 
+    Element &makeNumber(gnash::Network::byte_t *data);
+    Element &makeNumber(const std::string &name, double num) ;
+    Element &makeNumber(const std::string &name, gnash::Network::byte_t *data);
+
+    // Make a boolean element
+    Element &makeBoolean(gnash::Network::byte_t *data);
+    Element &makeBoolean(bool data);
     Element &makeBoolean(const std::string &name, bool data);
-    
+
+    // Make an undefined element
     Element &makeUndefined();
     Element &makeUndefined(const std::string &name);
-    
+
+    // Make a Null element, which is often used as a placeholder
     Element &makeNull();
     Element &makeNull(const std::string &name);
 
+    // Terminate an object
     Element &makeObjectEnd();
 
+    // Make an AMF Object. This is an AMF type that support having properties.
     Element &makeObject();
     Element &makeObject(const std::string &name);
-    Element &makeObject(gnash::Network::byte_t *data, size_t size);
+    Element &makeObject(std::vector<boost::shared_ptr<amf::Element> > &data);
+    Element &makeObject(const std::string &name, std::vector<boost::shared_ptr<amf::Element> > &data);
     
+    // Make an XML Object. This is like a string object, but the type is different.
+    Element &makeXMLObject();
     Element &makeXMLObject(const std::string &name);
-    Element &makeXMLObject(gnash::Network::byte_t *data, size_t size);
-    
+    Element &makeXMLObject(const std::string &name, const std::string &data);
+
+    // Make an ECMA array. This is a mixed array of any AMF types. These are stored
+    // the same as an object, but with a different type.
+    Element &makeECMAArray();
+    Element &makeECMAArray(const std::string &name);
+    Element &makeECMAArray(std::vector<boost::shared_ptr<amf::Element> > &data);
+    Element &makeECMAArray(const std::string &name, std::vector<boost::shared_ptr<amf::Element> > &data);
+
+    // Make a Strict array. This is an array of a single AMF type. These are stored
+    // the same as an object, but with a different type.
+    Element &makeStrictArray();
+    Element &makeStrictArray(const std::string &name);
+    Element &makeStrictArray(std::vector<boost::shared_ptr<amf::Element> > &data);
+    Element &makeStrictArray(const std::string &name, std::vector<boost::shared_ptr<amf::Element> > &data);
+
     Element &makeTypedObject(const std::string &name);
     Element &makeTypedObject(gnash::Network::byte_t *data, size_t size);
     
@@ -142,9 +186,6 @@ public:
     Element &makeMovieClip();
     Element &makeMovieClip(gnash::Network::byte_t *data, size_t size);
 
-    Element &makeECMAArray();
-    Element &makeECMAArray(gnash::Network::byte_t *data, size_t size);
-    
     Element &makeLongString();
     Element &makeLongString(gnash::Network::byte_t *data, size_t size);
     
@@ -157,62 +198,56 @@ public:
     Element &makeUnsupported();
     Element &makeUnsupported(gnash::Network::byte_t *data, size_t size);
     
-    Element &makeStrictArray();
-    Element &makeStrictArray(gnash::Network::byte_t *data, size_t size);
 //    Element &makeArray();
 
 //    Element &makeConnect();
     
     // Test to see if Elements are the same
     bool operator==(Element &);
-    bool operator==(Element *);
+    bool operator==(boost::shared_ptr<amf::Element> );
     bool operator==(bool x);
 
-    // Make ourselves be the same as another Element.
-    Element &operator=(Element &);
-    Element &operator=(Element *);
-    
-    Element *operator[](size_t x);
+    boost::shared_ptr<amf::Element> operator[](size_t x);
 
-    gnash::Network::byte_t *getData() const;
-    size_t getLength() const;
-    Buffer *getBuffer() { return _buffer; };
+//    gnash::Network::byte_t *getData();
+    size_t getDataSize() const;
     
     // These are all accessors for the various output formats
     amf0_type_e getType() const { return _type; };
     void setType(amf0_type_e x) { _type = x; };
 //    void setData(Buffer *buf) { _buffer = buf; };
 
-    // These accessors convert the raw data to a standard data type we can use.
+    // These accessors convert the raw data to a standard data type
+    // we can use.
+    bool to_bool() const;
     double to_number() const;
     const char *to_string() const;
-    bool to_bool() const;
-    void *to_reference();
-    
-    char *getName() const { return _name; };
+    gnash::Network::byte_t *to_reference();
+
+    // Manipulate the name of a property
     size_t getNameSize();
+    char *getName() const { return _name; };
     void setName(const std::string &name);
     void setName(gnash::Network::byte_t *name, size_t x);
     void setName(const char *name, size_t x);
 
     // Manipulate the children Elements of an object
-    Element *findProperty(const std::string &name);
-    Element *getProperty(size_t x) const { return _properties[x]; };
+    boost::shared_ptr<Element> findProperty(const std::string &name);
+    boost::shared_ptr<Element> getProperty(size_t x) const { return _properties[x]; };
     
-    void addProperty(Element &el) { _properties.push_back(&el); };
-    void addProperty(Element *el) { _properties.push_back(el); };
-    Element *popProperty()        { return _properties.front(); };
+    void addProperty(boost::shared_ptr<Element> el) { _properties.push_back(el); };
+    boost::shared_ptr<Element> popProperty()        { return _properties.front(); };
     size_t propertySize() const   { return _properties.size(); };
-    amf::Buffer *encode();
-    std::vector<Element *> getProperties() { return _properties; };
+    boost::shared_ptr<Buffer> encode();
+    std::vector<boost::shared_ptr<Element> > getProperties() { return _properties; };
     void dump() const { dump(std::cerr); }
     void dump(std::ostream& os) const;
 private:
     void check_buffer(size_t size);
     char		*_name;
-    Buffer		*_buffer;
+    boost::shared_ptr<Buffer> _buffer;
     amf0_type_e		_type;
-    std::vector<Element	*> _properties;
+    std::vector<boost::shared_ptr<Element> > _properties;
 };                              // end of class definition
 
 inline std::ostream& operator << (std::ostream& os, const Element& el)

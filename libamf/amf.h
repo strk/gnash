@@ -35,6 +35,7 @@
 #include <cstring>
 #include <map>
 #include <boost/cstdint.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include "network.h"
 #include "element.h"
@@ -53,11 +54,11 @@ const size_t AMF0_NUMBER_SIZE = 0x08;
 // length field. (short)
 const gnash::Network::byte_t AMF_HEADER_SIZE = 3;
 
-// A variable is a little different. It always assumes the the first field is
-// a string that's the variable name, then the type byte like a regular AMF
-// object and length is used for the data. So a variable object header is
+// A property is a little different. It always assumes the the first field is
+// a string that's the property name, then the type byte like a regular AMF
+// object and length is used for the data. So a property object header is
 // then only 5 bytes instead of the 6 that one assumes would be used.
-const gnash::Network::byte_t AMF_VAR_HEADER_SIZE = 5;
+const gnash::Network::byte_t AMF_PROP_HEADER_SIZE = 5;
 
 // Use a zero version till now till we know what this should be.
 const gnash::Network::byte_t AMF_VERSION = 0;
@@ -115,108 +116,108 @@ public:
 
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static Buffer *encodeString(const std::string &str);
-    static Buffer *encodeString(gnash::Network::byte_t *data, size_t size);
+    static boost::shared_ptr<Buffer> encodeString(const std::string &str);
+    static boost::shared_ptr<Buffer> encodeString(gnash::Network::byte_t *data, size_t size);
 
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static Buffer *encodeNullString();
+    static boost::shared_ptr<Buffer> encodeNullString();
 
     /// Encode a Boolean object
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static Buffer *encodeBoolean(bool flag);
+    static boost::shared_ptr<Buffer> encodeBoolean(bool flag);
 
     /// Encode an "Undefined" object
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static Buffer *encodeUndefined();
+    static boost::shared_ptr<Buffer> encodeUndefined();
 
     /// Encode a "NULL" object
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static Buffer *encodeNull();
+    static boost::shared_ptr<Buffer> encodeNull();
 
     /// Encode a "Unsupported" object
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static  Buffer *encodeUnsupported();
+    static  boost::shared_ptr<Buffer> encodeUnsupported();
 
     /// Encode an XML object
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static Buffer *encodeXMLObject(gnash::Network::byte_t *data, size_t size);
+    static boost::shared_ptr<Buffer> encodeXMLObject(gnash::Network::byte_t *data, size_t size);
 
     /// Encode a Typed Object
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static Buffer *encodeTypedObject(gnash::Network::byte_t *data, size_t size);
+    static boost::shared_ptr<Buffer> encodeTypedObject(gnash::Network::byte_t *data, size_t size);
 
     /// Encode a Reference to an object
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static Buffer *encodeReference(gnash::Network::byte_t *data, size_t size);
+    static boost::shared_ptr<Buffer> encodeReference(gnash::Network::byte_t *data, size_t size);
 
     /// Encode a Movie Clip
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static Buffer *encodeMovieClip(gnash::Network::byte_t *data, size_t size);
+    static boost::shared_ptr<Buffer> encodeMovieClip(gnash::Network::byte_t *data, size_t size);
 
     /// Encode an ECMA Array
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static Buffer *encodeECMAArray(gnash::Network::byte_t *data, size_t size);
+    static boost::shared_ptr<Buffer> encodeECMAArray(gnash::Network::byte_t *data, size_t size);
 
     /// Encode a long string
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static Buffer *encodeLongString(gnash::Network::byte_t *data, size_t size);
+    static boost::shared_ptr<Buffer> encodeLongString(gnash::Network::byte_t *data, size_t size);
 
     /// Encode a Record Set
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static Buffer *encodeRecordSet(gnash::Network::byte_t *data, size_t size);
+    static boost::shared_ptr<Buffer> encodeRecordSet(gnash::Network::byte_t *data, size_t size);
 
     /// Encode a Date
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static Buffer *encodeDate(gnash::Network::byte_t *data);
+    static boost::shared_ptr<Buffer> encodeDate(gnash::Network::byte_t *data);
 
     /// Encode a Strict Array
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static Buffer *encodeStrictArray(gnash::Network::byte_t *data, size_t size);
+    static boost::shared_ptr<Buffer> encodeStrictArray(gnash::Network::byte_t *data, size_t size);
     
     /// Encode an object
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static Buffer *encodeObject(Element *el);
+    static boost::shared_ptr<Buffer> encodeObject(boost::shared_ptr<amf::Element> el);
 
     /// Encode the end of an object
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static Buffer *encodeObjectEnd();
+    static boost::shared_ptr<Buffer> encodeObjectEnd();
 
     /// Encode a 64 bit number
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static Buffer *encodeNumber(double num);
+    static boost::shared_ptr<Buffer> encodeNumber(double num);
 
     /// Encode a element. 
     ///
@@ -225,7 +226,7 @@ public:
     /// @return a newly allocated byte array.
     /// to be deleted by caller using delete [] operator, or NULL
     ///
-    static Buffer *encodeElement(amf::Element *el);
+    static boost::shared_ptr<Buffer> encodeElement(boost::shared_ptr<amf::Element> el);
 
     /// Encode a variable. 
     //
@@ -237,16 +238,16 @@ public:
     ///         in form of a newly allocated byte array.
     ///         to be deleted by caller using delete [] operator, or NULL
     ///
-    Buffer *encodeProperty(amf::Element *el);
-    static Buffer *encodeVariableHeader(const std::string &name);
+    boost::shared_ptr<Buffer> encodeProperty(boost::shared_ptr<amf::Element> el);
+    static boost::shared_ptr<Buffer> encodeVariableHeader(const std::string &name);
     
     //
     // Methods for extracting data from big endian formatted raw AMF data.
     //
     
     // Extract the object type from the first byte of the header.
-    static amf::Element::amf0_type_e extractElementHeader(gnash::Network::byte_t *in)
-                         { return *(reinterpret_cast<amf::Element::amf0_type_e *>(in)); };
+    static Element::amf0_type_e extractElementHeader(gnash::Network::byte_t *in)
+                         { return *(reinterpret_cast<Element::amf0_type_e *>(in)); };
 
     // Unlike when we are encoding, for extracting objects we need
     // to keep track where we are in the memory buffer so these can't
@@ -263,10 +264,10 @@ public:
     ///
     /// May throw a ParserException 
     ///
-    amf::Element *extractAMF(gnash::Network::byte_t *in, gnash::Network::byte_t* tooFar);
+    boost::shared_ptr<amf::Element> extractAMF(gnash::Network::byte_t *in, gnash::Network::byte_t* tooFar);
 
     /// Extract an AMF object. These have no name like the variables do.
-    amf::Element *extractAMF(Buffer *buf);
+    boost::shared_ptr<amf::Element> extractAMF(boost::shared_ptr<Buffer> buf);
     
     /// \brief
     /// Extract an AMF "variable", which is a standard AMF object preceeded by
@@ -281,12 +282,12 @@ public:
     ///
     /// May throw a ParserException 
     ///
-    amf::Element *extractProperty(gnash::Network::byte_t *in, gnash::Network::byte_t* tooFar);
+    boost::shared_ptr<amf::Element> extractProperty(gnash::Network::byte_t *in, gnash::Network::byte_t* tooFar);
 
     /// \brief
     /// Extract an AMF "variable", which is a standard AMF object preceeded by
     /// just a length and a name field.
-    amf::Element *extractProperty(Buffer *buf);
+    boost::shared_ptr<amf::Element> extractProperty(boost::shared_ptr<Buffer> buf);
 
     size_t totalsize() { return _totalsize; }
     
