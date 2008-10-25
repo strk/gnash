@@ -197,36 +197,36 @@ checkXMLAndLoadVarsInterchangeable = function() {
 
 lv = new LoadVars();
 lv.a = 3;
-xcheck_equals(lv.toString(), "a=3");
+check_equals(lv.toString(), "a=3");
 
 lv.b = "string";
-xcheck_equals(lv.toString(), "b=string&a=3");
+check_equals(lv.toString(), "b=string&a=3");
 
 lv.c = Mouse.hide;
-xcheck_equals(lv.toString(), "c=%5Btype%20Function%5D&b=string&a=3");
+check_equals(lv.toString(), "c=%5Btype%20Function%5D&b=string&a=3");
 
 lv["3"] = 6;
-xcheck_equals(lv.toString(), "3=6&c=%5Btype%20Function%5D&b=string&a=3");
+check_equals(lv.toString(), "3=6&c=%5Btype%20Function%5D&b=string&a=3");
 
 o = { a:5, b:6 };
 lv["f"] = o;
-xcheck_equals(lv.toString(), "f=%5Bobject%20Object%5D&3=6&c=%5Btype%20Function%5D&b=string&a=3");
+check_equals(lv.toString(), "f=%5Bobject%20Object%5D&3=6&c=%5Btype%20Function%5D&b=string&a=3");
 
 lv[4] = "string";
-xcheck_equals(lv.toString(), "4=string&f=%5Bobject%20Object%5D&3=6&c=%5Btype%20Function%5D&b=string&a=3");
+check_equals(lv.toString(), "4=string&f=%5Bobject%20Object%5D&3=6&c=%5Btype%20Function%5D&b=string&a=3");
 
 delete lv[3];
 delete lv["f"];
-xcheck_equals(lv.toString(), "4=string&c=%5Btype%20Function%5D&b=string&a=3");
+check_equals(lv.toString(), "4=string&c=%5Btype%20Function%5D&b=string&a=3");
 
 lv[o] = o;
-xcheck_equals(lv.toString(), "%5Bobject%20Object%5D=%5Bobject%20Object%5D&4=string&c=%5Btype%20Function%5D&b=string&a=3");
+check_equals(lv.toString(), "%5Bobject%20Object%5D=%5Bobject%20Object%5D&4=string&c=%5Btype%20Function%5D&b=string&a=3");
 
 lv.b = undefined;
 #if OUTPUT_VERSION > 6
-xcheck_equals(lv.toString(), "%5Bobject%20Object%5D=%5Bobject%20Object%5D&4=string&c=%5Btype%20Function%5D&b=undefined&a=3");
+check_equals(lv.toString(), "%5Bobject%20Object%5D=%5Bobject%20Object%5D&4=string&c=%5Btype%20Function%5D&b=undefined&a=3");
 #else
-xcheck_equals(lv.toString(), "%5Bobject%20Object%5D=%5Bobject%20Object%5D&4=string&c=%5Btype%20Function%5D&b=&a=3");
+check_equals(lv.toString(), "%5Bobject%20Object%5D=%5Bobject%20Object%5D&4=string&c=%5Btype%20Function%5D&b=&a=3");
 #endif
 
 tsc = 0;
@@ -242,14 +242,15 @@ lv2.a = o;
 check_equals(tsc, 0);
 check_equals(voc, 0);
 
-xcheck_equals(lv2.toString(), "a=fake%20toString");
-xcheck_equals(tsc, 1);
+check_equals(lv2.toString(), "a=fake%20toString");
+check_equals(tsc, 1);
 check_equals(voc, 0);
 
+// This should *not* call valueOf.
 o.toString = undefined;
 xcheck_equals(lv2.toString(), "a=%5Btype%20Object%5D");
-xcheck_equals(tsc, 1);
-check_equals(voc, 0);
+check_equals(tsc, 1);
+xcheck_equals(voc, 0);
 
 
 //--------------------------------------------------------------------------

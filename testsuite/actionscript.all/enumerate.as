@@ -130,24 +130,29 @@ enumerateObj = function(object) {
     check_equals(enumerateObj(o), "8,el,a,");
 
     o.b = "string again";
-    xcheck_equals(enumerateObj(o), "b,8,el,a,");
+    check_equals(enumerateObj(o), "b,8,el,a,");
 
     r = o.u;
-    xcheck_equals(enumerateObj(o), "b,8,el,a,");
+    check_equals(enumerateObj(o), "b,8,el,a,");
 
     t = {};
     o[t] = 9;
-    xcheck_equals(enumerateObj(o), "[object Object],b,8,el,a,");
+    check_equals(enumerateObj(o), "[object Object],b,8,el,a,");
 
     delete o["8"];
-    xcheck_equals(enumerateObj(o), "[object Object],b,el,a,");
+    check_equals(enumerateObj(o), "[object Object],b,el,a,");
 
     o.c = Object.prototype.toString;
-    xcheck_equals(enumerateObj(o), "c,[object Object],b,el,a,");
+    check_equals(enumerateObj(o), "c,[object Object],b,el,a,");
+
+    o[9] = 7;
+    check_equals(enumerateObj(o), "9,c,[object Object],b,el,a,");
     
+    o["6"] = 8;
+    check_equals(enumerateObj(o), "6,9,c,[object Object],b,el,a,");
 
 }
-totals(29);
+totals(31);
 #else
 totals(0);
 #endif  // OUTPUT_VERSION > 5

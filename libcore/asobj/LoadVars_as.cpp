@@ -63,8 +63,6 @@ public:
 
 	static void attachLoadVarsInterface(as_object& o);
 
-protected:
-
     /// Convert the LoadVars Object to a string.
     //
     /// @param o        The ostream to write the string to.
@@ -72,6 +70,8 @@ protected:
     ///                 ignored because LoadVars objects are always
     ///                 URL encoded.
     void toString(std::ostream& o, bool encode) const;
+
+protected:
 
 #ifdef GNASH_USE_GC
 	/// Mark all reachable resources, for the GC
@@ -110,15 +110,15 @@ void
 LoadVars_as::toString(std::ostream& o, bool /*post*/) const
 {
 
-	typedef std::map<std::string, std::string> VarMap;
+	typedef PropertyList::SortedPropertyList VarMap;
 	VarMap vars;
 
 	enumerateProperties(vars);
 
-	for (VarMap::iterator it=vars.begin(), itEnd=vars.end();
+	for (VarMap::const_iterator it=vars.begin(), itEnd=vars.end();
 			it != itEnd; ++it)
 	{
-	    if (it != vars.begin()) o << "&";
+        if (it != vars.begin()) o << "&";
         const std::string& val = it->second;
         o << URL::encode(it->first) << "="
                     << URL::encode(val);
@@ -251,10 +251,12 @@ LoadVars_as::onLoad_method(const fn_call& /*fn*/)
 static as_value
 loadvars_tostring(const fn_call& fn)
 {
-	boost::intrusive_ptr<LoadVars_as> ptr = ensureType<LoadVars_as>(fn.this_ptr);
-	UNUSED(ptr);
-	log_unimpl (__FUNCTION__);
-	return as_value(); 
+	boost::intrusive_ptr<LoadVars_as> ptr =
+        ensureType<LoadVars_as>(fn.this_ptr);
+
+    std::ostringstream data;
+    ptr->toString(data, true);
+    return as_value(data.str()); 
 }
 
 static as_value

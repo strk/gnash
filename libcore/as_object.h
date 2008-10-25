@@ -129,7 +129,11 @@ class DSOEXPORT as_object
 	friend class asClass;
 	friend class Machine;
 
-	typedef std::set<std::pair<string_table::key, string_table::key> > propNameSet;
+	typedef std::set<std::pair<string_table::key, string_table::key> >
+        propNameSet;
+
+    typedef PropertyList::SortedPropertyList SortedPropertyList;
+
 private:
 	/// Properties of this objects 
 	PropertyList _members;
@@ -188,7 +192,7 @@ public:
 	///
 	void dump_members();
 
-	/// Dump all properties into the given map
+	/// Dump all properties into the given container
 	//
 	/// Note that this method is non-const
 	/// as some properties might be getter/setter
@@ -911,7 +915,7 @@ public:
 	/// to avoid loops in prototype chain. 
 	/// NOTE: the MM player just chokes in this case (loop)
 	///
-	void enumerateProperties(std::map<std::string, std::string>& to) const;
+	void enumerateProperties(SortedPropertyList& to) const;
 
 	/// Get url-encoded variables
 	//
