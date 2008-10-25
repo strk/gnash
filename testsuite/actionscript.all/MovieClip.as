@@ -1540,8 +1540,8 @@ Matrix = flash.geom.Matrix;
 check(_root.transform instanceOf Object);
 check(!_root.transform instanceOf Matrix);
 temp = _root.transform;
-props = []; for (var i in temp) props.push(i); props.sort();
-check_equals(props.toString(), "colorTransform,concatenatedColorTransform,concatenatedMatrix,matrix,pixelBounds");
+props = []; for (var i in temp) props.push(i);
+check_equals(props.toString(), "pixelBounds,concatenatedColorTransform,colorTransform,concatenatedMatrix,matrix");
 
 check_equals(typeof(_root.transform.colorTransform), 'object');
 // TODO: test colorTransform
