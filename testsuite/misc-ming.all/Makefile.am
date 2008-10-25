@@ -168,6 +168,7 @@ check_PROGRAMS = \
 	static_vs_dynamic2 \
 	getTimer_test \
 	Video-EmbedSquareTest \
+	LoadVarsTest \
 	Video-EmbedSquareTestRunner \
 	NetStream-SquareTest \
 	NetStream-SquareTestRunner \
@@ -293,6 +294,7 @@ check_SCRIPTS = \
 	runtime_vm_stack_testrunner \
 	new_child_in_unload_testrunner \
 	instanceNameTestRunner \
+	LoadVarsTestRunner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
@@ -1440,6 +1442,23 @@ BitmapDataTest_LDADD = libgnashmingutils.la
 
 BitmapDataTest.swf: BitmapDataTest
 	./BitmapDataTest $(top_srcdir)/testsuite/media
+
+LoadVarsTest_SOURCES = \
+	LoadVarsTest.c \
+	$(NULL)
+
+LoadVarsTest_CFLAGS = \
+	-DMEDIADIR='"$(abs_mediadir)"' \
+	$(NULL)
+
+LoadVarsTest_LDADD = libgnashmingutils.la
+
+LoadVarsTest.swf: LoadVarsTest
+	./LoadVarsTest $(top_srcdir)/testsuite/media
+
+LoadVarsTestRunner: $(srcdir)/../generic-testrunner.sh LoadVarsTest.swf
+	sh $< $(top_builddir) LoadVarsTest.swf > $@
+	chmod 755 $@
 
 EmbeddedSoundTest_SOURCES = \
 	EmbeddedSoundTest.c \

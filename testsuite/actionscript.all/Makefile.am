@@ -94,6 +94,7 @@ ASTESTS =			\
 	Instance.as \
 	Key.as			\
 	LoadVars.as		\
+	LoadVars2.as		\
 	Math.as			\
 	Microphone.as		\
 	Mouse.as		\
