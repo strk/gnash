@@ -108,8 +108,7 @@ main(int argc, char** argv)
 
 	/// What happens when load fails?
 	//
-	/// Both onData and onLoad are called *independently*. That is,
-	/// neither is called from the default implementation of the other.
+	/// The onLoad method is called from the default implementation of onData.
 	
 	SWFMovie_nextFrame(mo);
 
@@ -140,6 +139,24 @@ main(int argc, char** argv)
 	xcheck_equals(mo, "loadString",
 			"'onLoad called with boolean argument false'");
 	add_actions(mo, "l.onLoad = olB;");
+
+    /// Both onData and onLoad
+	add_actions(mo, "l.onLoad = ourLoad;"
+            "l.onData = ourData;"
+			"loadString = '';"
+            "dataString = '';"
+			"e = l.load('fail');");
+	check_equals(mo, "e", "true");
+	add_actions(mo, "stop();");
+
+	SWFMovie_nextFrame(mo);
+		
+	check_equals(mo, "loadString",
+			"''");
+	xcheck_equals(mo, "dataString",
+			"'onData called with undefined argument undefined'");
+	add_actions(mo, "l.onLoad = olB;");
+    add_actions(mo, "l.onData = odatB;");
 
 	/// What happens when load succeeds?
 	//
@@ -178,7 +195,7 @@ main(int argc, char** argv)
 
     /// decode is called from onData (i.e. it's called when we overwrite
     /// onLoad, not onData).
-    check_equals(mo, "decodeCalled", "1");
+    xcheck_equals(mo, "decodeCalled", "1");
     // check_equals is too braindead to do this without escaping.
 	xcheck_equals(mo, "escape(decodeString)",
 			"'decode%20called%20with%20string%20argument%20v2%5Fvar1%3D"
@@ -186,7 +203,7 @@ main(int argc, char** argv)
 
 	/// End of tests.
 
-	add_actions(mo, "totals(12);");
+	add_actions(mo, "totals(15);");
 	add_actions(mo, "stop();");
 
 	/*****************************************************
