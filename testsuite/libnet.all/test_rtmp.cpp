@@ -170,7 +170,7 @@ test_split()
     
 //     boost::shared_ptr<amf::Buffer> tmpbuf = que1.front();
 //     que1.pop_front();
-    boost::shared_ptr<amf::Buffer> tmpbuf;
+    boost::shared_ptr<amf::Buffer> tmpbuf(new Buffer);
     if (notest) {
         runtest.untested("RTMP::split(1st packet header) of 2");
     } else {
@@ -581,8 +581,8 @@ test_results()
 
     RTMPMsg *msg1 = rtmp.decodeMsgBody(hex2);
     if (msg1) {
-        std::vector<amf::Element> hell = msg1->getElements();
-        std::vector<amf::Element> props = hell[0]->getProperties();        
+        std::vector<boost::shared_ptr<amf::Element> > hell = msg1->getElements();
+        std::vector<boost::shared_ptr<amf::Element> > props = hell[0]->getProperties();        
 //         printf("FIXME: %d, %d, %s:%s\n", props.size(), msg1->getStatus(),
 //                props[3]->getName(), props[3]->to_string());
 //         msg1->dump();
@@ -614,8 +614,8 @@ test_results()
     
     boost::shared_ptr<amf::Buffer> hex3(new Buffer("02 00 07 5f 72 65 73 75 6c 74 00 3f f0 00 00 00 00 00 00 05 03 00 0b 61 70 70 6c 69 63 61 74 69 6f 6e 05 00 05 6c 65 76 65 6c 02 00 05 65 72 72 6f 72 00 0b 64 65 73 63 72 69 70 74 69 6f 6e 02 00 00 00 04 63 6f 64 65 02 00 1c 4e 65 74 43 6f 6e 6e 65 63 74 69 6f 6e 2e 43 6f 6e 6e 65 63 74 2e 46 61 69 6c 65 64 00 00 09"));
     RTMPMsg *msg2 = rtmp.decodeMsgBody(hex3);
-    std::vector<amf::Element *> hell = msg2->getElements();
-    std::vector<amf::Element *> props = hell[0]->getProperties();        
+    std::vector<boost::shared_ptr<amf::Element> > hell = msg2->getElements();
+    std::vector<boost::shared_ptr<amf::Element> > props = hell[0]->getProperties();        
 //     printf("FIXME: %d, %d, %s:%s\n", props.size(), msg1->getStatus(),
 //            props[3]->getName(), props[3]->to_string());
     if (msg2) {
