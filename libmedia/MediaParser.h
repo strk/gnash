@@ -137,7 +137,6 @@ std::ostream& operator<< (std::ostream& os, const audioCodecType& t);
 /// The AudioInfo class contains information about the audiostream
 /// in the file being parsed. The information stored is codec-id,
 /// samplerate, samplesize, stereo, duration and codec-type.
-/// timestamp,
 class AudioInfo
 {
 public:

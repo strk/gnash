@@ -36,7 +36,6 @@
 #include <cmath>
 #include <vector>
 #include <boost/scoped_array.hpp>
-#include <SDL.h>
 
 namespace gnash {
 namespace media {

@@ -22,7 +22,7 @@
 #ifndef __SOUNDINFO_H__
 #define __SOUNDINFO_H__
 
-#include "MediaParser.h" // for audioCodecType enum
+#include "MediaParser.h" // for audioCodecType enum and AudioInfo
 
 namespace gnash {
 namespace media {

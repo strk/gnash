@@ -32,13 +32,6 @@
 
 #include "MediaHandler.h"
 
-// TODO: drop FFMPEG/GST specific stuff, use MediaHandler instead !
-#ifdef USE_FFMPEG
-#include "AudioDecoderFfmpeg.h"
-#elif defined(USE_GST)
-#include "AudioDecoderGst.h"
-#endif
-
 #include "log.h" // will import boost::format too
 #include "GnashException.h" // for SoundException
 
@@ -95,10 +88,12 @@ SDL_sound_handler::initAudioSpec()
 
 
 SDL_sound_handler::SDL_sound_handler(const std::string& wavefile)
-	: soundOpened(false),
-	  soundsPlaying(0),
-	  muted(false)
+	:
+    soundOpened(false),
+    soundsPlaying(0),
+    muted(false)
 {
+
 	initAudioSpec();
 
 	if (! wavefile.empty() ) {
@@ -269,9 +264,21 @@ SDL_sound_handler::play_sound(int sound_handle, int loopCount, int offset, long 
 	// Set number of loop we should do. -1 is infinte loop, 0 plays it once, 1 twice etc.
 	sound->loopCount = loopCount;
 
-	sound->decoder = NULL;
+    SoundInfo& si = *(sounddata->soundinfo);
+    AudioInfo info(
+        (int)si.getFormat(),
+        si.getSampleRate(),
+        si.is16bit() ? 16 : 8,
+        si.isStereo(),
+        0, // duration unknown, does it matter ?
+        FLASH);
 
     try {
+        sound->decoder = _mediaHandler->createAudioDecoder(info);
+
+#ifdef MEDIA_HANDLERS_DO_NOT_SUPPORT_CORNER_CASES
+        // It should be the MediaHandler's duty to check
+        // for nellymoser, ADPCM, etc
 
 	    switch (sounddata->soundinfo->getFormat()) {
 	        case AUDIO_CODEC_NELLYMOSER:
@@ -279,18 +286,21 @@ SDL_sound_handler::play_sound(int sound_handle, int loopCount, int offset, long 
 		        sound->decoder = new AudioDecoderNellymoser(*(sounddata->soundinfo));
 		        break;
 	        case AUDIO_CODEC_MP3:
+                SoundInfo* si=sounddata->soundinfo;
 #ifdef USE_FFMPEG
-		        sound->decoder = new AudioDecoderFfmpeg(*(sounddata->soundinfo));
+		        sound->decoder = new AudioDecoderFfmpeg(*(si));
 		        break;
 #elif defined(USE_GST)
-		        sound->decoder = new AudioDecoderGst(*(sounddata->soundinfo));
+		        sound->decoder = new AudioDecoderGst(*(si));
 		        break;
 #endif
+
 	        case AUDIO_CODEC_ADPCM:
 	        default:
                 sound->decoder = new AudioDecoderSimple(*(sounddata->soundinfo));
                 break;
 	    }
+#endif // MEDIA_HANDLERS_DO_NOT_SUPPORT_CORNER_CASES
 	}
 	catch (MediaException& e)
 	{
@@ -899,7 +909,7 @@ SDL_sound_handler::mixActiveSound(active_sound& sound, sound_data& sounddata,
         Uint8* buffer, unsigned int buffer_length)
 {
 	// If there exist no decoder, then we can't decode!
-	if (sound.decoder == NULL) return;
+	if (!sound.decoder.get()) return;
 
     // concatenate global volume
 	int volume = int(sounddata.volume*getFinalVolume()/100.0);

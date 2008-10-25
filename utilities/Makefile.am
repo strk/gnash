@@ -29,6 +29,8 @@ GNASH_LIBS = \
 	$(top_builddir)/libnet/libgnashnet.la \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libmedia/libgnashmedia.la
+	$(top_builddir)/libmedia/libgnashsound.la \
+	$(NULL)
 
 ## WARNING: make sure GLIB_LIBS appears first
 ## See: http://lists.gnu.org/archive/html/gnash-dev/2006-07/msg00076.html
@@ -55,6 +57,7 @@ AM_CPPFLAGS = \
         -I$(top_srcdir)/libcore/parser \
         -I$(top_srcdir)/libcore/vm \
         -I$(top_srcdir)/libmedia \
+        -I$(top_srcdir)/libsound \
         -DLOCALEDIR=\"$(localedir)\" \
 	$(PTHREAD_CFLAGS) \
 	$(BOOST_CFLAGS) \

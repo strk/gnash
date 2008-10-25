@@ -31,6 +31,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libamf \
 	-I$(top_srcdir)/libltdl \
 	-I$(top_srcdir)/libmedia \
+	-I$(top_srcdir)/libsound \
 	$(PTHREAD_CFLAGS) \
 	$(DMALLOC_CFLAGS) \
 	$(GLIB_CFLAGS) \
