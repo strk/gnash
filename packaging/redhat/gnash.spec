@@ -1,7 +1,7 @@
-%define version 0.8.3
 Name:           gnash
-Version:        %{version}
-Release:        1%{?dist}
+Version:        20081024
+Release:        1
+Distribution:	fc9
 Summary:        GNU SWF player
 
 Group:          Applications/Multimedia
@@ -9,8 +9,9 @@ Vendor:		Gnash Project
 Packager:	Rob Savoye <rob@welcomehome.org>
 License:        GPLv3
 URL:            http://www.gnu.org/software/gnash/
-Source0:        http://www.gnu.org/software/gnash/releases/%{name}-%{version}.tar.gz
+Source0:        http://www.getgnash.org/packages/snapshots/fedora/%{name}_%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-%{_target_cpu}
+
 
 #AutoReqProv: no
 
@@ -18,17 +19,17 @@ BuildRequires:  libpng-devel libjpeg-devel libogg-devel
 BuildRequires:  gtk2-devel libX11-devel libXt-devel glib2-devel
 BuildRequires:  cairo-devel atk-devel pango-devel
 BuildRequires:  agg-devel libxml2-devel boost-devel curl-devel libXt-devel
-# the opengl devel packages are required by monolithic Xorg
-BuildRequires:  xorg-x11-proto-devel gtkglext-devel
-BuildRequires:  libGLU-devel libGL-devel
-BuildRequires:  SDL-devel
-BuildRequires:  kdelibs-devel kdebase-devel qt-devel
+BuildRequires:  xorg-x11-proto-devel SDL-devel
+BuildRequires:  kdelibs3-devel kdebase3-devel qt3-devel
 BuildRequires:  gstreamer >= 0.10, gstreamer-ffmpeg
 
 # Installation requirements
-Requires: gstreamer >= 0.10
-Requires: gstreamer-plugins-base, gstreamer-plugins-ugly, gstreamer-plugins-bad
-Requires: gtk2 libX11 libpng libjpeg cairo atk pango Xt
+Requires: libpng libjpeg libogg
+Requires: gtk2 libX11 libXt glib2 cairo atk pango
+Requires: agg libxml2 boost libcurl libXt SDL
+Requires: gstreamer >= 0.10  gstreamer-ffmpeg
+Requires: gstreamer-plugins-base
+#Requires: xorg-x11-proto kdelibs3 kdebase3 qt3
 
 # BuildRequires:  scrollkeeper
 
@@ -142,7 +143,7 @@ RPM_TARGET=%{_target}
 	--disable-rpath \
 	--with-plugindir=%{_libdir}/mozilla/plugins
 
-make %{?_smp_mflags} dumpconfig all
+make %{?_smp_mflags} $(MAKEFLAGS) dumpconfig all
 %else
 ./configure \
 	$CROSS_OPTS \
@@ -151,20 +152,19 @@ make %{?_smp_mflags} dumpconfig all
 	--disable-dependency-tracking \
 	--disable-rpath \
 	--disable-cygnal \
-        --prefix=/usr \
-	--mandir=/usr/share/man \
-	--infodir=/usr/share/info \
- 	--disable-static \
 	--enable-shared \
 	--disable-testsuite \
-	--with-plugindir=%{_libdir}/mozilla/plugins \
+        --prefix=/usr \
+	--mandir=%{_prefix}/share/man \
+	--infodir=%{_prefix}/share/info \
+	--with-npapi-plugindir=%{_libdir}/mozilla/plugins \
         --with-kde-plugindir=%{_libdir}/kde3 \
-        --with-kde-servicesdir=${datadir}/services \
-        --with-kde-configdir=${datadir}/config \
-        --with-kde-appsdatadir=${datadir}/apps \
-        --with-kde-pluginprefix=/usr
+        --with-kde-pluginprefix=%{_prefix} \
+        --with-kde-servicesdir=%{_prefix}/share/services \
+        --with-kde-appsdatadir=%{_prefix}/share/apps/klash \
+        --with-kde-configdir=${_datadir}/config
 
-make dumpconfig all
+make $(MAKEFLAGS) dumpconfig all
 %endif
 
 %install
@@ -208,10 +208,10 @@ scrollkeeper-update -q || :
 %{_bindir}/gtk-gnash
 %{_bindir}/gprocessor
 %{_bindir}/soldumper
+%{_bindir}/flvdumper
 %{_bindir}/dumpshm
 %{_libdir}/gnash/*.so*
 %{_libdir}/mozilla/plugins/*.so
-%{_prefix}/include/ltdl.h
 %{_prefix}/share/gnash/GnashG.png
 %{_prefix}/share/gnash/gnash_128_96.ico
 %{_datadir}/man/man1/*.1*
@@ -239,9 +239,9 @@ scrollkeeper-update -q || :
 %if !%{cross_compile}
 %{_bindir}/kde-gnash
 %{_libdir}/kde3/libklashpart.*
-%{_datadir}/apps/klash/klashpartui.rc
-%{_datadir}/apps/klash/pluginsinfo
-%{_datadir}/services/klash_part.desktop
+%{_prefix}/share/apps/klash/klashpartui.rc
+%{_prefix}/share/apps/klash/pluginsinfo
+%{_prefix}/share/services/klash_part.desktop
 %endif
 
 # %files cygnal
@@ -249,6 +249,9 @@ scrollkeeper-update -q || :
 # %{_bindir}/cygnal
 
 %changelog
+* Sat Oct 24 2008 Rob Savoye <rob@welcomehome.org> - trunk
+- Adjust dependencies for current bzr trunk
+
 * Sat Feb  16 2008 Rob Savoye <rob@welcomehome.org> - %{version}-%{release}
 - Adjust dependencies for current cvs HEAD
 
