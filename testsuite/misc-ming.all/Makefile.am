@@ -168,6 +168,7 @@ check_PROGRAMS = \
 	static_vs_dynamic2 \
 	getTimer_test \
 	Video-EmbedSquareTest \
+	LoadVarsTest \
 	Video-EmbedSquareTestRunner \
 	NetStream-SquareTest \
 	NetStream-SquareTestRunner \
@@ -288,6 +289,7 @@ check_SCRIPTS = \
 	DepthLimitsTestrunner \
 	loop_test10runner \
 	shape_testrunner \
+	LoadVarsTestRunner \
 	DefineEditTextVariableNameTest-Runner \
 	DefineEditTextVariableNameTest2-Runner \
 	runtime_vm_stack_testrunner \
@@ -1830,6 +1832,20 @@ Video_EmbedSquareTestRunner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	Video-EmbedSquareTest.swf	\
 	$(NULL)
+
+LoadVarsTest_SOURCES = \
+	LoadVarsTest.c \
+	$(NULL)
+
+LoadVarsTest_LDADD = libgnashmingutils.la
+
+LoadVarsTest.swf: LoadVarsTest
+	./LoadVarsTest $(top_srcdir)/testsuite/media
+
+LoadVarsTestRunner: $(srcdir)/../generic-testrunner.sh LoadVarsTest.swf
+	sh $< $(top_builddir) LoadVarsTest.swf > $@
+	chmod 755 $@
+
 
 instanceNameTest_SOURCES =	\
 	instanceNameTest.c	\
