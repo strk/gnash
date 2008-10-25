@@ -2230,11 +2230,11 @@ SWFHandlers::CommonGetUrl(as_environment& env,
         return;
     }
 
-    bool usePost = false;
+    bool post = (sendVarsMethod == sprite_instance::METHOD_POST);
+
     std::string varsToSend;
-    if ( sendVarsMethod != sprite_instance::METHOD_NONE)
+    if (sendVarsMethod != sprite_instance::METHOD_NONE)
     {
-        if ( sendVarsMethod == sprite_instance::METHOD_POST ) usePost = true;
 
         // TESTED: variables sent are those in current target,
         //         no matter the target found on stack (which
@@ -2247,7 +2247,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
             return;
         }
         curtgt->getURLEncodedVars(varsToSend);
-        if ( ! usePost )
+        if (!post)
         {
             // we're using GET
             std::string qs = url.querystring();
@@ -2260,7 +2260,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
     character* target_ch = env.find_target(target.to_string());
     sprite_instance* target_movie = target_ch ? target_ch->to_movie() : 0;
 
-    if ( loadVariableFlag )
+    if (loadVariableFlag)
     {
         log_debug(_("getURL2 loadVariable"));
 
@@ -2280,7 +2280,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
             return;
         }
 
-        if ( usePost )
+        if (post)
         {
             log_unimpl(_("POST with loadVariables ignored"));
         }
@@ -2300,14 +2300,9 @@ SWFHandlers::CommonGetUrl(as_environment& env,
             if ( m.isLevelTarget(target_string, levelno) )
             {
                 log_debug(_("Testing _level loading (level %u)"), levelno);
-                if ( usePost )
-                {
-                    m.loadMovie(url, target_string, &varsToSend);
-                }
-                else
-                {
-                    m.loadMovie(url, target_string); // using GET
-                }
+ 
+                if (post) m.loadMovie(url, target_string, &varsToSend);
+                else m.loadMovie(url, target_string); // using GET
                 return;
             }
 
@@ -2341,14 +2336,8 @@ SWFHandlers::CommonGetUrl(as_environment& env,
         // TODO: try to trigger this !
         assert(m.findCharacterByTarget(s) == target_movie );
 
-        if ( usePost )
-        {
-            m.loadMovie(url, s, &varsToSend); 
-        }
-        else
-        {
-            m.loadMovie(url, s); 
-        }
+        if (post) m.loadMovie(url, s, &varsToSend); 
+        else m.loadMovie(url, s);
         return;
     }
 
@@ -2356,18 +2345,15 @@ SWFHandlers::CommonGetUrl(as_environment& env,
     if ( m.isLevelTarget(target_string, levelno) )
     {
         log_debug(_("Testing _level loading (level %u)"), levelno);
-        if ( usePost )
-        {
-            m.loadMovie(url, target_string, &varsToSend);
-        }
-        else
-        {
-            m.loadMovie(url, target_string); 
-        }
+
+        if (post) m.loadMovie(url, target_string, &varsToSend);
+        else m.loadMovie(url, target_string); 
         return;
     }
 
-    m.getURL(url, target_string, &varsToSend);
+    // Just plain getURL
+    if (post) m.getURL(url, target_string, &varsToSend);
+    else m.getURL(url, target_string);
 
 }
 
