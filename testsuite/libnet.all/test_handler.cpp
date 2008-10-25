@@ -65,7 +65,7 @@ main (int /*argc*/, char** /*argv*/) {
 
     Handler que;
 
-    boost::shared_ptr<amf::Buffer> buf;
+    boost::shared_ptr<amf::Buffer> buf(new Buffer);
 //     boost::uint8_t *test = new uint8_t[6];
 //     memcpy(test, "hell", 4);
 
@@ -90,7 +90,7 @@ main (int /*argc*/, char** /*argv*/) {
 
     // Test pushin. When dumpimg, the second address should be different than the first,
     // as well as the size. The outgoing queue should be uneffected.
-     boost::shared_ptr<amf::Buffer> buf1;
+    boost::shared_ptr<amf::Buffer> buf1(new Buffer);
     buf1->resize(112);
     que.pushin(buf1);
     if ((que.size() == 2) && (que.outsize() == 1)) {
