@@ -971,35 +971,40 @@ void
 Sound::probeAudio()
 {
     log_debug("Probing audio");
+
     bool parsingCompleted = _mediaParser->parsingCompleted();
-    try
-    {
-        if ( ! attachAuxStreamerIfNeeded() )
-        {
-            if ( parsingCompleted )
-            {
-                log_debug("No audio in Sound input.");
-                stopProbeTimer();
-                _mediaParser.reset(); // no use for this anymore...
-            }
-            else
-            {
-                log_unimpl("No info about audio in Sound input yet, hot-plugging decoder not supported.");
-                // keep probing
-            }
-        }
-        else
-        {
-            // TODO: reuse the probe timer to detect
-            //       end of sound for running onSoundCompleted()
-            stopProbeTimer();
-        }
-    }
-    catch (MediaException& e)
-    {
+    int attached=0;
+
+    try {
+        attached = attachAuxStreamerIfNeeded();
+    } catch (MediaException& e) {
         assert(!_audioDecoder.get());
 		log_error(_("Could not create audio decoder: %s"), e.what());
         _mediaParser.reset(); // no use for this anymore...
+        stopProbeTimer();
+        return;
+    }
+
+    if ( ! attached )
+    {
+        if ( parsingCompleted )
+        {
+            log_debug("No audio in Sound input.");
+            stopProbeTimer();
+            _mediaParser.reset(); // no use for this anymore...
+        }
+        else
+        {
+            // keep probing
+        }
+    }
+    else
+    {
+        // An audio decoder was constructed, good!
+        assert(_audioDecoder.get());
+
+        // TODO: reuse the probe timer to detect
+        //       end of sound for running onSoundCompleted()
         stopProbeTimer();
     }
 }
