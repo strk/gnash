@@ -70,11 +70,23 @@ const short SOL_MAGIC = 0x00bf;	// is in big-endian format, this is the first
 //char *SOL_FILETYPE = "TCSO";
 const short SOL_BLOCK_MARK = 0x0004;
 
+/// \define ENSUREBYTES
+///
+/// @param from The base address to check.
+///
+/// @param tooFar The ending address that is one byte too many.
+///
+/// @param size The number of bytes to check for: from to tooFar.
+///
+/// @remarks May throw an Exception
 #define ENSUREBYTES(from, toofar, size) { \
 	if ( from+size >= toofar ) \
 		throw ParserException("Premature end of AMF stream"); \
 }
 
+/// \namespace amf
+///
+/// This namespace is for all the AMF specific classes in libamf.
 namespace amf
 {
 
@@ -89,6 +101,11 @@ SOL::~SOL()
 //    GNASH_REPORT_FUNCTION;
 }
 
+/// \brief Extract the header from the file.
+///
+/// @param filespec The name and path of the .sol file to parse.
+///
+/// @return true if this succeeded. false if it doesn't.
 bool
 SOL::extractHeader(const std::string & /*filespec*/)
 {
@@ -96,6 +113,12 @@ SOL::extractHeader(const std::string & /*filespec*/)
       return false;
 }
 
+/// \brief Extract the header from the file.
+///
+/// @param data a reference to a vector of bytes that contains the
+///	.sol file data.
+///
+/// @return true if this succeeded. false if it doesn't.
 bool
 SOL::extractHeader(const vector<unsigned char> & /*data*/)
 {
@@ -103,6 +126,11 @@ SOL::extractHeader(const vector<unsigned char> & /*data*/)
       return false;
 }
 
+/// \brief Add the AMF objects that are the data of the file
+//
+/// @param el A smart pointer to the Element to add to the .sol file.
+///
+/// @return nothing.
 void
 SOL::addObj(boost::shared_ptr<amf::Element> el)
 {
@@ -111,6 +139,12 @@ SOL::addObj(boost::shared_ptr<amf::Element> el)
 //    _filesize += el->getName().size() + el->getDataSize() + 5;
 }
 
+/// \brief Create the file header.
+///
+/// @param data a reference to a vector of bytes that contains the
+///		.sol file data.
+///
+/// @return true if this succeeded. false if it doesn't.
 bool
 SOL::formatHeader(const vector<unsigned char> & /*data*/)
 {
@@ -118,13 +152,24 @@ SOL::formatHeader(const vector<unsigned char> & /*data*/)
       return false;
 }
 
-// name is the object name
+/// \brief Create the file header.
+///
+/// @param name The name of the SharedObject for this file.
+///
+/// @return true if this succeeded. false if it doesn't.
 bool
 SOL::formatHeader(const std::string &name)
 {
     return formatHeader(name, _filesize);
 }
 
+/// \brief Create the file header.
+///
+/// @param name The name of the SharedObject for this file.
+///
+/// @param filesize The size of the file.
+///
+/// @return true if this succeeded. false if it doesn't.
 bool
 SOL::formatHeader(const std::string &name, int filesize)
 {
@@ -203,8 +248,13 @@ SOL::formatHeader(const std::string &name, int filesize)
     return true;
 }    
 
-// write the data to disk as a .sol file
-
+/// \brief Write the data to disk as a .sol file
+///
+/// @param filespec The name and path of the .sol file to parse.
+///
+/// @param name The name of the SharedObject for this file.
+///
+/// @return true if this succeeded. false if it doesn't.
 bool
 SOL::writeFile(const string &filespec, const string &name)
 {
@@ -313,7 +363,11 @@ SOL::writeFile(const string &filespec, const string &name)
     return true;
 }
 
-// read the .sol file from disk
+/// \brief Read a .sol file from disk
+///
+/// @param filespec The name and path of the .sol file to parse.
+///
+/// @return true if this succeeded. false if it doesn't.
 bool
 SOL::readFile(const std::string &filespec)
 {
@@ -417,6 +471,9 @@ SOL::readFile(const std::string &filespec)
     return false;
 }
 
+///  \brief Dump the internal data of this class in a human readable form.
+///
+/// @remarks This should only be used for debugging purposes.
 void
 SOL::dump()
 {

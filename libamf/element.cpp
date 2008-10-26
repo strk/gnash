@@ -38,10 +38,13 @@
 using namespace std;
 using namespace gnash;
 
+/// \namespace amf
+///
+/// This namespace is for all the AMF specific classes in libamf.
 namespace amf 
 {
 
-// These are used to print more intelligent debug messages
+/// \brief This is used to print more intelligent debug messages
 const char *astype_str[] = {
     "Number",
     "Boolean",
@@ -63,6 +66,7 @@ const char *astype_str[] = {
     "AMF3 Data"
 };
 
+/// \brief Create a new Element with no data type.
 Element::Element()
     : _name(0),
       _type(NOTYPE)
@@ -70,16 +74,17 @@ Element::Element()
 //    GNASH_REPORT_FUNCTION;
 }
 
-
+/// \brief Delete this Element
+///		This deallocates all the memory used to hold the data.
 Element::~Element()
 {
 //    GNASH_REPORT_FUNCTION;
     delete[] _name;
 }
 
-// Each Element has two main components, the optional name, and a value. All the properties
-// of an ActionScript class have the name set to a non null value, and without a name, the
-// Element just holds the lowest level AMF types.
+/// \brief Construct an AMF Element from a double..
+///
+/// @param data The double to use as the value for this Element.
 Element::Element(double indata)
     : _name(0),
       _type(NOTYPE)
@@ -88,6 +93,11 @@ Element::Element(double indata)
     makeNumber(indata);
 }
 
+/// \brief Contruct a Property from a double.
+///
+/// @param name The name of the Property
+///
+/// @param num The double to use as the value of the property.
 Element::Element(const string &name, double num)
     : _name(0),
       _type(NOTYPE)
@@ -96,13 +106,11 @@ Element::Element(const string &name, double num)
     makeNumber(name, num);
 }
 
-
-// Element(vector<double> &indata)
-// {
-//     GNASH_REPORT_FUNCTION;
-//     init(indata);
-// }
-
+/// \brief Contruct an AMF Element from an ASCII string.
+///
+/// @param data The ASCII string to use as the value of the property.
+///
+/// @remarks This assume the data string is already NULL terminated.
 Element::Element(const string &indata)
     : _name(0),
       _type(NOTYPE)
@@ -111,6 +119,7 @@ Element::Element(const string &indata)
     makeString(indata);
 }
 
+/// \overload Element(const std::string &data)
 Element::Element(const char *indata)
     : _name(0),
       _type(NOTYPE)
@@ -119,22 +128,35 @@ Element::Element(const char *indata)
     makeString(indata);
 }
 
-Element::Element(const string &name, const string &indata)
+/// \brief Contruct a Property from an ASCII string.
+///
+/// @param name The name of the Property
+///
+/// @param data The ASCII string to use as the value of the property.
+Element::Element(const string &name, const string &data)
     : _name(0),
       _type(NOTYPE)
 {
 //    GNASH_REPORT_FUNCTION;
-    makeString(name, indata);
+    makeString(name, data);
 }
 
-Element::Element(bool indata)
+/// \brief Contruct an AMF Element from a Boolean
+///
+/// @param data The boolean to use as the value for this Element.
+Element::Element(bool data)
     : _name(0),
       _type(NOTYPE)
 {
 //    GNASH_REPORT_FUNCTION;
-    makeBoolean(indata);
+    makeBoolean(data);
 }
 
+/// \brief Contruct a Property from a Boolean
+///
+/// @param name The name of the Property
+///
+/// @param data The boolean to use as the value of the property.
 Element::Element(const string &name, bool indata)
     : _name(0),
       _type(NOTYPE)
@@ -143,6 +165,7 @@ Element::Element(const string &name, bool indata)
     makeBoolean(name, indata);
 }
 
+#if 0
 // Create a function block for AMF
 Element::Element(bool /* flag */, double /* unknown1 */, double /* unknown2 */,
 		 const string &/* methodname */)
@@ -153,7 +176,6 @@ Element::Element(bool /* flag */, double /* unknown1 */, double /* unknown2 */,
     log_unimpl("Can't create remote function calls yet");
 }
 
-#if 0
 Element &
 Element::init(bool flag, double unknown1, double unknown2,
 	      const string &methodname)
@@ -185,6 +207,10 @@ Element::init(bool flag, double unknown1, double unknown2,
 }
 #endif
 
+/// \brief Clear the contents of the buffer by setting all the bytes to
+///		zeros.
+///
+/// @return nothing
 void
 Element::clear()
 {
@@ -194,6 +220,10 @@ Element::clear()
 	_buffer.reset();
 }
 
+/// \brief Get the size in bytes of the Element's data.
+///	All data in an Element is stored in a Buffer class.
+///
+/// @return the size in bytes.
 size_t
 Element::getDataSize() const
 {
@@ -204,6 +234,9 @@ Element::getDataSize() const
     return 0;
 };
 
+/// \brief Cast the data in this Element to a double value.
+///
+/// @return double value.
 double
 Element::to_number() const
 {
@@ -215,6 +248,9 @@ Element::to_number() const
     return -1.0;
 }
 
+/// \brief Cast the data in this Element to an ASCII string value.
+///
+/// @return A NULL terminated ASCII string.
 const char *
 Element::to_string() const
 {
@@ -235,6 +271,9 @@ Element::to_string() const
     return 0;
 };
 
+/// \brief Cast the data in this Element to a boolean value.
+///
+/// @return boolean value.
 bool
 Element::to_bool() const
 {
@@ -245,6 +284,9 @@ Element::to_bool() const
     return false;
 };
 
+/// \brief Cast the data in this Element to an real pointer to data.
+///
+/// @return A real pointer to the base address of the raw data in memory.
 gnash::Network::byte_t *
 Element::to_reference()
 {
@@ -255,7 +297,15 @@ Element::to_reference()
     return 0;
 };
 
-// Test to see if Elements are the same
+/// \brief Test equivalance against another Element.
+///	This compares all the data and the data type in the
+///	current Element with the supplied one, so it can be a
+///	performance hit. This is primarily only used for
+///	testing purposes.
+///
+/// @param buf A reference to an Element.
+///
+/// @return A boolean true if the Elements are indentical.
 bool
 Element::operator==(Element &el)
 {
@@ -297,6 +347,15 @@ Element::operator==(Element &el)
     return false;;
 }
 
+/// \brief Test equivalance against a boolean value
+///	This compares all the data and the data type in the
+///	current Element to see if it is a Boolean and if the
+///	values ard the same. This is primarily only used for
+///	testing purposes.
+///
+/// @param buf A boolean value
+///
+/// @return A boolean true if the Elements are indentical.
 bool
 Element::operator==(bool x)
 {
@@ -307,6 +366,11 @@ Element::operator==(bool x)
     return false;
 };
 
+/// \brief Encode this Element (data type object).
+///	This encodes this Element and all of it's associated
+///	properties into raw binary data in big endoan format.
+///
+/// @return a smart pointer to a Buffer class.
 boost::shared_ptr<Buffer>
 Element::encode()
 {
@@ -360,6 +424,12 @@ Element::encode()
     return buf;
 }
 
+/// \brief Get the Element or Property at a specified location.
+///
+/// @param index The location as a numerical value of the item in
+///		the array to get.
+///
+/// @return A smart pointer to the Element or property.
 boost::shared_ptr<Element>
 Element::operator[](size_t index)
 {
@@ -372,6 +442,11 @@ Element::operator[](size_t index)
     return el;
 };
 
+/// \brief Make this Element be the same as another Element.
+///
+/// @param el A reference to an Element class.
+///
+/// @return A reference to this Element.
 Element &
 Element::operator=(Element &el)
 {
@@ -387,32 +462,55 @@ Element::operator=(Element &el)
     return *this;
 }
 
+/// \brief Make this Element be the same as a double.
+///		This sets both the data type and the value.
+///
+/// @param el A double value.
+///
+/// @return A reference to this Element.
 Element &
 Element::operator=(double num)
 {
     return makeNumber(num);
 }
 
+/// \brief Make this Element be the same as an ASCII string.
+///		This sets both the data type and the value.
+///
+/// @param el An ASCII string value.
+///
+/// @return A reference to this Element.
 Element &
 Element::operator=(const string &str)
 {
     return makeString(str);
 }
 
+/// \brief Make this Element be the same as a boolean value.
+///		This sets both the data type and the value.
+///
+/// @param el A boolean value.
+///
+/// @return A reference to this Element.
 Element &
 Element::operator=(bool flag)
 {
     return makeBoolean(flag);
 }
 
-/// \brief Fill an element with data
+/// \note All Numbers are 64 bit, big-endian (network byte order)
+///	entities. All strings are in multibyte format, which is to
+///	say, probably normal ASCII. It may be that these need to be
+///	converted to wide characters, but for now we just leave them
+///	as standard multibyte characters.
+
+/// \brief Make this Element with an ASCII string value.
 ///
-/// All Numbers are 64 bit, big-endian (network byte order) entities.
+/// @param data The ASCII string to use as the value.
 ///
-/// All strings are in multibyte format, which is to say, probably
-/// normal ASCII. It may be that these need to be converted to wide
-/// characters, but for now we just leave them as standard multibyte
-/// characters.
+/// @param size The number of bytes in the ASCII string.
+///
+/// @return A reference to this Element.
 Element &
 Element::makeString(Network::byte_t *data, size_t size)
 {
@@ -433,8 +531,12 @@ Element::makeString(Network::byte_t *data, size_t size)
     return *this;
 }
 
-// A Null string is a string with no length. The data is only one byte, which
-// always has the value of zero of course.
+/// \brief Make this Element be a NULL String type.
+///	A Null String is a string with a length of zero. The
+///	data is only one byte, which always has the value of
+///	zero of course.
+///
+/// @return A reference to this Element.
 Element &
 Element::makeNullString()
 {
@@ -445,6 +547,13 @@ Element::makeNullString()
     return *this;
 }
 
+/// \brief Make this Element with an ASCII string value.
+///
+/// @param str The ASCII string to use as the value.
+///
+/// @param size The number of bytes in the ASCII string.
+///
+/// @return A reference to this Element.
 Element &
 Element::makeString(const char *str, size_t size)
 {
@@ -454,6 +563,11 @@ Element::makeString(const char *str, size_t size)
     return makeString(ptr, size);
 }
 
+/// \brief Make this Element with an ASCII string value.
+///
+/// @param str The ASCII string to use as the value.
+///
+/// @return A reference to this Element.
 Element &
 Element::makeString(const string &str)
 {
@@ -461,6 +575,13 @@ Element::makeString(const string &str)
     return makeString(str.c_str(), str.size());
 }
 
+/// \brief Make this Element a Property with an ASCII String value.
+///
+/// @param name The name of the Property
+///
+/// @param str The ASCII string to use as the value of the property.
+///
+/// @return A reference to this Element.
 Element &
 Element::makeString(const string &name, const string &str)
 {
@@ -471,6 +592,11 @@ Element::makeString(const string &name, const string &str)
     return makeString(str.c_str(), str.size());
 }
 
+/// \brief Make this Element with a double value.
+///
+/// @param buf A smart pointer to a Buffer class.
+///
+/// @return A reference to this Element.
 Element &
 Element::makeNumber(boost::shared_ptr<amf::Buffer> buf)
 {
@@ -478,6 +604,12 @@ Element::makeNumber(boost::shared_ptr<amf::Buffer> buf)
     return makeNumber(buf->reference());
 }
 
+/// \brief Make this Element with a double value.
+///		The size isn't needed as a double is always the same size.
+///
+/// @param str The double to use as the value.
+///
+/// @return A reference to this Element.
 Element &
 Element::makeNumber(Network::byte_t *data)
 {
@@ -490,6 +622,11 @@ Element::makeNumber(Network::byte_t *data)
     return *this;
 }
 
+/// \brief Make this Element with a double value.
+///
+/// @param str The double to use as the value.
+///
+/// @return A reference to this Element.
 Element &
 Element::makeNumber(double num)
 {
@@ -501,6 +638,11 @@ Element::makeNumber(double num)
     return *this;
 }
 
+/// \brief Make this Element a Property with a double value
+///
+/// @param name The name of the Property
+///
+/// @param num The double to use as the value of the property.
 Element &
 Element::makeNumber(const string &name, double num)
 {
@@ -511,6 +653,8 @@ Element::makeNumber(const string &name, double num)
     return makeNumber(num);
 }
 
+/// \overload Element::makeNumber(const std::string &name, gnash::Network::byte_t *data);
+///		The size isn't needed as a double is always the same size.
 Element &
 Element::makeNumber(const std::string &name, gnash::Network::byte_t *data)
 {
@@ -524,6 +668,11 @@ Element::makeNumber(const std::string &name, gnash::Network::byte_t *data)
     return *this;
 }
 
+/// \brief Make this Element with a boolean value.
+///
+/// @param data A boolean to use as the value.
+///
+/// @return A reference to this Element.
 Element &
 Element::makeBoolean(bool flag)
 {
@@ -535,6 +684,13 @@ Element::makeBoolean(bool flag)
     return *this;
 }
 
+/// \brief Make this Element a Property with a boolean value
+///
+/// @param name The name of the Property
+///
+/// @param data The boolean to use as the value of the property.
+///
+/// @return A reference to this Element.
 Element &
 Element::makeBoolean(const string &name, bool flag)
 {
@@ -545,6 +701,12 @@ Element::makeBoolean(const string &name, bool flag)
     return makeBoolean(flag);
 }
 
+/// \brief Make this Element with a boolean value.
+///	The size isn't needed as a boolean is always the same size.
+///
+/// @param data A real pointer to the boolean use as the value.
+///
+/// @return A reference to this Element.
 Element &
 Element::makeBoolean(Network::byte_t *data)
 {
@@ -554,6 +716,9 @@ Element::makeBoolean(Network::byte_t *data)
     return makeBoolean(flag);
 }
 
+/// \brief Make this Element an Undefined data type
+///
+/// @return A reference to this Element.
 Element &
 Element::makeUndefined()
 {
@@ -562,6 +727,11 @@ Element::makeUndefined()
     return *this;
 }
 
+/// \brief Make this Element a Property with an Undefined data type.
+///
+/// @param name The name of the Property
+///
+/// @return A reference to this Element.
 Element &
 Element::makeUndefined(const std::string &name)
 {
@@ -572,7 +742,10 @@ Element::makeUndefined(const std::string &name)
     return makeUndefined();
 }
 
-// a NULL amf Object consists of a single byte, which is the type
+/// \brief Make this Element an NULL Object data type
+///	A NULL AMF0 Object consists of a single byte, which is the type
+///
+/// @return A reference to this Element.
 Element &
 Element::makeNull()
 {
@@ -581,6 +754,11 @@ Element::makeNull()
     return *this;
 }
 
+/// \brief Make this Element a Property with an NULL Object data type.
+///
+/// @param name The name of the Property
+///
+/// @return A reference to this Element.
 Element &
 Element::makeNull(const std::string &name)
 {
@@ -591,6 +769,14 @@ Element::makeNull(const std::string &name)
     return makeNull();
 }
 
+/// \brief Make this Element as a Object data type.
+///	This is AMF data type that supports complex objects
+///	with properties. A Reference refers to a previously
+///	sent ActionScript object to save on bandwidth.
+///
+/// @param data A smart pointer to an Element to use as the value.
+///
+/// @return A reference to this Element.
 Element &
 Element::makeObject()
 {
@@ -599,6 +785,12 @@ Element::makeObject()
     return *this;
 }
 
+/// \brief Make this Element as an Object data type.
+///
+/// @param name The name of this object. This is not the same as
+///		the name of a property.
+///
+/// @return A reference to this Element.
 Element &
 Element::makeObject(const std::string &name)
 {
@@ -609,6 +801,13 @@ Element::makeObject(const std::string &name)
     return makeObject();
 }
 
+/// \brief Make this Element a Property with an Object as the value.
+///
+/// @param name The name of the Property
+///
+/// @param data A smart pointer to an Element to use as the value.
+///
+/// @return A reference to this Element.
 Element &
 Element::makeObject(const std::string &name, std::vector<boost::shared_ptr<Element> > &data)
 {
@@ -620,6 +819,11 @@ Element::makeObject(const std::string &name, std::vector<boost::shared_ptr<Eleme
     return makeObject(data);
 }
 
+/// \brief Make this Element as an Object data type.
+///
+/// @param data A smart pointer to an Element to use as the value.
+///
+/// @return A reference to this Element.
 Element &
 Element::makeObject(std::vector<boost::shared_ptr<Element> > &data)
 {
@@ -633,6 +837,10 @@ Element::makeObject(std::vector<boost::shared_ptr<Element> > &data)
     }
 }
 
+/// \brief Make this Element as an XML Object data type.
+///	This is like a string object, but the type is different.
+///
+/// @return A reference to this Element.
 Element &
 Element::makeXMLObject()
 {
@@ -641,6 +849,13 @@ Element::makeXMLObject()
     return *this;
 }
 
+/// \brief Make this Element a Property with an XML Object as the value.
+///
+/// @param name The name of the Property
+///
+/// @param data The boolean to use as the value of the property.
+///
+/// @return A reference to this Element.
 Element &
 Element::makeXMLObject(const string &data)
 {
@@ -650,6 +865,13 @@ Element::makeXMLObject(const string &data)
     return *this;
 }
 
+/// \brief Make this Element a Property with an XML Object as the value.
+///
+/// @param name The name of the Property
+///
+/// @param data A smart pointer to an Element to use as the value.
+///
+/// @return A reference to this Element.
 Element &
 Element::makeXMLObject(const string &name, const string &data)
 {
@@ -659,6 +881,9 @@ Element::makeXMLObject(const string &name, const string &data)
     return *this;
 }
 
+/// \brief Make this Element an Object End data type
+///
+/// @return A reference to this Element.
 Element &
 Element::makeObjectEnd()
 {
@@ -667,7 +892,11 @@ Element::makeObjectEnd()
     return *this;
 }
 
-
+/// \brief Make this Element a Property with an Typed Object as the value.
+///
+/// @param name The name of the Property
+///
+/// @return A reference to this Element.    
 Element &
 Element::makeTypedObject(const std::string &name)
 {
@@ -679,16 +908,26 @@ Element::makeTypedObject(const std::string &name)
     return *this;
 }
 
+/// \brief Make this Element a Property with an Typed Object as the value.
+///
+/// @param data A real pointer to the raw data to use as the value.
+///
+/// @param size The number of bytes to use as the value.
+///
+/// @return A reference to this Element.
 Element &
-Element::makeTypedObject(Network::byte_t *indata, size_t size)
+Element::makeTypedObject(Network::byte_t *data, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::TYPED_OBJECT_AMF0;
     check_buffer(size);
-    _buffer->copy(indata, size);
+    _buffer->copy(data, size);
     return *this;
 }
 
+/// \brief Make this Element a Property with an Object Reference as the value.
+///
+/// @return A reference to this Element.
 Element &
 Element::makeReference()
 {
@@ -697,6 +936,13 @@ Element::makeReference()
     return *this;
 }
 
+/// \brief Make this Element a Property with an Object Reference as the value.
+///
+/// @param data A real pointer to the raw data to use as the value.
+///
+/// @param size The number of bytes to use as the value.
+///
+/// @return A reference to this Element.
 Element &
 Element::makeReference(Network::byte_t *indata, size_t size)
 {
@@ -707,6 +953,9 @@ Element::makeReference(Network::byte_t *indata, size_t size)
     return *this;
 }
 
+/// \brief Make this Element a Property with a Movie Clip (SWF data) as the value.
+///
+/// @return A reference to this Element.
 Element &
 Element::makeMovieClip()
 {
@@ -715,6 +964,13 @@ Element::makeMovieClip()
     return *this;
 }
 
+/// \brief Make this Element a Property with a Movie Clip (SWF data) as the value.
+///
+/// @param data A real pointer to the raw data to use as the value.
+///
+/// @param size The number of bytes to use as the value.
+///
+/// @return A reference to this Element.
 Element &
 Element::makeMovieClip(Network::byte_t *indata, size_t size)
 {
@@ -725,6 +981,11 @@ Element::makeMovieClip(Network::byte_t *indata, size_t size)
     return *this;    
 }
 
+/// \brief Make this Element a Property with an ECMA Array as the value.
+///		This is a mixed array of any AMF types. These are stored
+///		the same as an object, but with a different type.
+///
+/// @return A reference to this Element.
 Element &
 Element::makeECMAArray()
 {
@@ -733,6 +994,11 @@ Element::makeECMAArray()
     return *this;
 }
 
+/// \brief Make this Element a Property with an ECMA Array as the value.
+///
+/// @param name The name of the Property
+///
+/// @return A reference to this Element.
 Element &
 Element::makeECMAArray(const std::string &name)
 {
@@ -743,6 +1009,13 @@ Element::makeECMAArray(const std::string &name)
     return makeECMAArray();
 }
 
+/// \brief Make this Element a Property with an ECMA Array as the value.
+///
+/// @param name The name of the Property
+///
+/// @param data A smart pointer to a vector of Elements to use as the vaule.
+///
+/// @return A reference to this Element.
 Element &
 Element::makeECMAArray(const std::string &name, std::vector<boost::shared_ptr<amf::Element> > &data)
 {
@@ -753,6 +1026,13 @@ Element::makeECMAArray(const std::string &name, std::vector<boost::shared_ptr<am
     return *this;
 }
 
+/// \brief Make this Element a Property with an ECMA Array as the value.
+///	This is a mixed array of any AMF types. These are stored
+///	the same as an object, but with a different type.
+///
+/// @param data A smart pointer to a vector of Elements to use as the vaule.
+///
+/// @return A reference to this Element.
 Element &
 Element::makeECMAArray(std::vector<boost::shared_ptr<amf::Element> > &data)
 {
@@ -762,6 +1042,11 @@ Element::makeECMAArray(std::vector<boost::shared_ptr<amf::Element> > &data)
     return *this;
 }
 
+/// \brief Make this Element a Property with an Strict Array as the value.
+///	This is an array of a single AMF type. These are stored
+///	the same as an object, but with a different type.
+///
+/// @return A reference to this Element.
 Element &
 Element::makeStrictArray()
 {
@@ -770,6 +1055,13 @@ Element::makeStrictArray()
     return *this;
 }
 
+/// \brief Make this Element a Property with an Strict Array as the value.
+///		This is an array of a single AMF type. These are stored
+///		the same as an object, but with a different type.
+///
+/// @param name The name of the Property
+///
+/// @return A reference to this Element.
 Element &
 Element::makeStrictArray(const std::string &name)
 {
@@ -780,6 +1072,13 @@ Element::makeStrictArray(const std::string &name)
     return makeStrictArray();
 }
 
+/// \brief Make this Element a Property with an Strict Array as the value.
+///
+/// @param name The name of the Property
+///
+/// @param data A smart pointer to a vector of Elements to use as the vaule.
+///
+/// @return A reference to this Element.
 Element &
 Element::makeStrictArray(const std::string &name, std::vector<boost::shared_ptr<amf::Element> > &data)
 {
@@ -789,6 +1088,13 @@ Element::makeStrictArray(const std::string &name, std::vector<boost::shared_ptr<
     return *this;
 }
 
+/// \brief Make this Element a Property with an ECMA Array as the value.
+///	This is an array of a single AMF type. These are stored
+///	the same as an object, but with a different type.
+///
+/// @param data A smart pointer to a vector of Elements to use as the vaule.
+///
+/// @return A reference to this Element.
 Element &
 Element::makeStrictArray(std::vector<boost::shared_ptr<amf::Element> > &data)
 {
@@ -798,6 +1104,9 @@ Element::makeStrictArray(std::vector<boost::shared_ptr<amf::Element> > &data)
     return *this;
 }
 
+/// \brief Make this Element a Property with an Unsupported value.
+///
+/// @return A reference to this Element.
 Element &
 Element::makeUnsupported()
 {
@@ -806,16 +1115,26 @@ Element::makeUnsupported()
     return *this;
 }
 
+/// \brief Make this Element a Property with an Unsupported value.
+///
+/// @param data A real pointer to the raw data to use as the value.
+///
+/// @param size The number of bytes to use as the value.
+///
+/// @return A reference to this Element.
 Element &
-Element::makeUnsupported(Network::byte_t *indata, size_t size)
+Element::makeUnsupported(Network::byte_t *data, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;    
     _type = Element::UNSUPPORTED_AMF0;
     check_buffer(size);
-    _buffer->copy(indata, size);
+    _buffer->copy(data, size);
     return *this;
 }
 
+/// \brief Make this Element a Property with a UTF8 String as the value.
+///
+/// @return A reference to this Element.
 Element &
 Element::makeLongString()
 {
@@ -824,6 +1143,13 @@ Element::makeLongString()
     return *this;
 }
 
+/// \brief Make this Element a Property with a UTF8 String as the value.
+///
+/// @param data A real pointer to the raw data to use as the value.
+///
+/// @param size The number of bytes to use as the value.
+///
+/// @return A reference to this Element.
 Element &
 Element::makeLongString(Network::byte_t *indata, size_t size)
 {
@@ -834,6 +1160,9 @@ Element::makeLongString(Network::byte_t *indata, size_t size)
     return *this;
 }
 
+/// \brief Make this Element a Property with a Record Set as the value.
+///
+/// @return A reference to this Element.
 Element &
 Element::makeRecordSet()
 {
@@ -842,6 +1171,11 @@ Element::makeRecordSet()
     return *this;
 }
 
+/// \brief Make this Element a Property with a Date as the value.
+///
+/// @param data A real pointer to the raw data to use as the value.
+///
+/// @return A reference to this Element.
 Element &
 Element::makeDate(Network::byte_t *date)
 {
@@ -853,7 +1187,10 @@ Element::makeDate(Network::byte_t *date)
     return makeNumber(date);
 }
 
-
+/// \brief Get the number of bytes in the name of this Element.
+///	Only top level Objects or properties have a name.
+///
+/// @return The size of the name string.
 size_t
 Element::getNameSize()
 {
@@ -864,8 +1201,12 @@ Element::getNameSize()
     return 0;
 }
 
-// The name is for properties, which in AMF land is a string, followed by the AMF
-// element.
+/// \brief Set the name of this Element or property.
+///		Only top level Objects or properties have a name.
+///
+/// @param str the name to use for this Element.
+/// 
+/// @return nothing.
 void
 Element::setName(const string &str)
 {
@@ -875,6 +1216,16 @@ Element::setName(const string &str)
     *(_name + str.size()) = 0;
 }
 
+/// \brief Set the name of this Element or property.
+///		Only top level Objects or properties have a name.
+///
+/// @param name A real pointer to the raw bytes to use as the name for this Element.
+///
+/// @param size The number of bytes to use for the name.
+///
+/// @return nothing.
+///
+/// @remarks This add a NULL string terminator so the name can be printed.
 void
 Element::setName(const char *name, size_t size)
 {
@@ -883,6 +1234,16 @@ Element::setName(const char *name, size_t size)
     return setName(ptr, size);
 }
 
+/// \brief Set the name of this Element or property.
+///		Only top level Objects or properties have a name.
+///
+/// @param name A real pointer to the raw bytes to use as the name for this Element.
+///
+/// @param size The number of bytes to use for the name.
+///
+/// @return nothing.
+///
+/// @remarks This add a NULL string terminator so the name can be printed.
 void
 Element::setName(Network::byte_t *name, size_t size)
 {
@@ -898,7 +1259,14 @@ Element::setName(Network::byte_t *name, size_t size)
     }
 }
 
-// check the Buffer to make sure it's had memory allocated.
+/// \brief Make sure the Buffer used for storing data is big enough.
+///		This will force a Buffer::resize() is the existing
+///		Buffer used to store the data isn't big enough to hold
+///		the new size.
+///
+/// @param size The minimum size the buffer needs to be.
+///
+/// @return nothing
 void
 Element::check_buffer(size_t size)
 {
@@ -912,6 +1280,8 @@ Element::check_buffer(size_t size)
     }
 }
 
+///  \brief Dump the internal data of this class in a human readable form.
+/// @remarks This should only be used for debugging purposes.
 void
 Element::dump(std::ostream& os) const
 {
@@ -984,6 +1354,12 @@ Element::dump(std::ostream& os) const
     }
 }
 
+/// \brief Find the named property for this Object.
+///
+/// @param name An ASCII string that is the name of the property to
+///	search for.
+///
+/// @return A smart pointer to the Element for this property.
 boost::shared_ptr<amf::Element> 
 Element::findProperty(const std::string &name)
 {
