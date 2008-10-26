@@ -22,6 +22,11 @@
 #endif
 
 #include "NullSoundHandler.h"
+#ifdef USE_FFMPEG
+# include "ffmpeg/MediaHandlerFfmpeg.h"
+#elif defined(USE_GST)
+# include "gst/MediaHandlerGst.h"
+#endif
 
 #include <iostream>
 #include <cstdio>
@@ -37,7 +42,7 @@
 #include "ClockTime.h"
 #include "gnash.h"
 #include "movie_definition.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "movie_root.h"
 #include "log.h"
 #include "rc.h"
@@ -191,6 +196,11 @@ public:
 	    return "";
 
 	}
+
+    bool yesNo(const std::string& /*query*/)
+    {
+        return true;
+    }
 };
 
 EventCallback eventCallback;
@@ -318,6 +328,16 @@ main(int argc, char *argv[])
         dbglogfile.removeLog();
 	exit(1);
     }
+
+#ifdef USE_FFMPEG
+    std::auto_ptr<media::MediaHandler> handler( new gnash::media::MediaHandlerFfmpeg() );
+#elif defined(USE_GST)
+    std::auto_ptr<media::MediaHandler> handler( new gnash::media::MediaHandlerGst() );
+#else
+    std::cerr << "Neigher SOUND_SDL nor SOUND_GST defined" << std::endl;
+    exit(1);
+#endif
+    gnash::media::MediaHandler::set(handler);
 
     std::auto_ptr<media::sound_handler> soundHandler(new media::NullSoundHandler());
     gnash::set_sound_handler(soundHandler.get());
@@ -508,7 +528,7 @@ play_movie(const char* filename)
 			fprintf(stderr, "Kicking movie after %g seconds in STOP mode, kick ct = %d\n", waitforadvance, kick_count);
 			fflush(stderr);
 			m.goto_frame(last_frame + 1);
-			m.set_play_state(gnash::sprite_instance::PLAY);
+			m.set_play_state(gnash::MovieClip::PLAY);
 			kick_count++;
 
 			if (kick_count > 10) {

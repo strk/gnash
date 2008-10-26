@@ -30,7 +30,7 @@
 
 // Forward declarations
 namespace gnash {
-	class sprite_instance;
+	class MovieClip;
 }
 
 namespace gnash {
@@ -54,9 +54,9 @@ public:
 
 	virtual ~DisplayListTag() {}
 
-	virtual void execute(sprite_instance* m, DisplayList& dlist) const=0;
+	virtual void execute(MovieClip* m, DisplayList& dlist) const=0;
 
-	void execute_state(sprite_instance* m, DisplayList& dlist) const
+	void execute_state(MovieClip* m, DisplayList& dlist) const
 	{
 		execute(m, dlist);
 	}

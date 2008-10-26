@@ -22,7 +22,7 @@
 
 #include "MovieTester.h"
 #include "GnashException.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "character.h"
 #include "DisplayList.h"
 #include "log.h"
@@ -63,7 +63,7 @@ main(int /*argc*/, char** /*argv*/)
 	//       I wouldn't want the first advance to be needed
 	tester.advance();
 
-	sprite_instance* root = tester.getRootMovie();
+	MovieClip* root = tester.getRootMovie();
 	VM& vm = root->getVM();
 	string_table& st = vm.getStringTable();
 

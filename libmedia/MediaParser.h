@@ -89,7 +89,13 @@ enum videoCodecType
 	VIDEO_CODEC_VP6A = 5,
 
 	/// Screenvideo2 codec
-	VIDEO_CODEC_SCREENVIDEO2 = 6
+	VIDEO_CODEC_SCREENVIDEO2 = 6,
+
+	/// MPEG-4 Part 10, or Advanced Video Coding
+	VIDEO_CODEC_H264 = 7
+
+	// NOTE: if you add more elements here remember to
+	//       also add them to the output operator!
 };
 
 std::ostream& operator<< (std::ostream& os, const videoCodecType& t);
@@ -97,7 +103,7 @@ std::ostream& operator<< (std::ostream& os, const videoCodecType& t);
 /// Audio codec ids as defined in flash
 enum audioCodecType
 {
-	/// Raw format.  Useful for 8-bit sounds???
+	/// "Raw" format: linear PCM.
 	AUDIO_CODEC_RAW = 0,	
 
 	/// ADPCM format, flash's ADPCM is a bit different for normal ADPCM
@@ -113,7 +119,16 @@ enum audioCodecType
 	AUDIO_CODEC_NELLYMOSER_8HZ_MONO = 5,
 
 	/// Proprietary simple format
-	AUDIO_CODEC_NELLYMOSER = 6
+	AUDIO_CODEC_NELLYMOSER = 6,
+
+	/// Advanced Audio Coding
+	AUDIO_CODEC_AAC = 10,
+
+	/// Always 16kHz mono
+	AUDIO_CODEC_SPEEX = 11
+
+	// NOTE: if you add more elements here remember to
+	//       also add them to the output operator!
 };
 
 std::ostream& operator<< (std::ostream& os, const audioCodecType& t);
@@ -122,7 +137,6 @@ std::ostream& operator<< (std::ostream& os, const audioCodecType& t);
 /// The AudioInfo class contains information about the audiostream
 /// in the file being parsed. The information stored is codec-id,
 /// samplerate, samplesize, stereo, duration and codec-type.
-/// timestamp,
 class AudioInfo
 {
 public:
@@ -136,11 +150,23 @@ public:
 		{
 		}
 
+	/// Codec identifier
+	//
+	/// This has to be interpreted as audioCodecType if codecType type is FLASH
+	/// or interpretation is opaque and we rely on the assumption that the AudioInfo
+	/// creator and the AudioInfo user have a way to get a shared interpretation
+	///
 	int codec;
+
 	boost::uint16_t sampleRate;
+
+	/// Size of each sample, in bytes
 	boost::uint16_t sampleSize;
+
 	bool stereo;
+
 	boost::uint64_t duration;
+
 	codecType type;
 
 	/// An abstract class to hold any additional info
@@ -287,8 +313,6 @@ public:
 	//
 	virtual ~MediaParser();
 
-	void join();
-
 	/// \brief
 	/// Seeks to the closest possible position the given position,
 	/// and returns the new position.
@@ -365,14 +389,14 @@ public:
 	/// Returns a VideoInfo class about the videostream
 	//
 	/// @return a VideoInfo class about the videostream,
-	///         or zero if stream contains no video
+	///         or zero if unknown (no video or not enough data parsed yet).
 	///
 	VideoInfo* getVideoInfo() { return _videoInfo.get(); }
 
 	/// Returns a AudioInfo class about the audiostream
 	//
 	/// @return a AudioInfo class about the audiostream,
-	///         or zero if stream contains no audio
+	///         or zero if unknown (no audio or not enough data parsed yet).
 	///
 	AudioInfo* getAudioInfo() { return _audioInfo.get(); }
 
@@ -438,13 +462,28 @@ protected:
 	/// Start the parser thread
 	void startParserThread();
 
+	/// Stop the parser thread
+	//
+	/// This method should be always called
+	/// by destructors of subclasses to ensure
+	/// the parser thread won't attempt to access
+	/// destroyed structures.
+	///
+	void stopParserThread();
+
 	/// Clear the a/v buffers
 	void clearBuffers();
 
-	/// Push an encoded audio frame to buffer, will wait on a condition if buffer is full
+	/// Push an encoded audio frame to buffer.
+	//
+	/// Will wait on a condition if buffer is full or parsing was completed
+	///
 	void pushEncodedAudioFrame(std::auto_ptr<EncodedAudioFrame> frame);
 
-	/// Push an encoded video frame to buffer, will wait on a condition if buffer is full
+	/// Push an encoded video frame to buffer.
+	//
+	/// Will wait on a condition if buffer is full or parsing was completed
+	///
 	void pushEncodedVideoFrame(std::auto_ptr<EncodedVideoFrame> frame);
 
 	/// Return pointer to next encoded video frame in buffer

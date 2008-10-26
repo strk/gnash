@@ -33,13 +33,9 @@
 #endif
 
 #include <queue>
-  
-#include <iconv.h>
-
 #include <deque>
 
 #include <iconv.h>
-#include <SDL_audio.h>
 #include <boost/cstdint.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/bind.hpp>

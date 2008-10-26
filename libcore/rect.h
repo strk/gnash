@@ -29,7 +29,7 @@
 
 // Forward decl
 namespace gnash {
-    class matrix;
+    class SWFMatrix;
     class SWFStream;
 }
 
@@ -232,7 +232,7 @@ public:
     /// Set ourself to bound a rectangle that has been transformed by m.  
     /// This is an axial bound of an oriented (and/or
     /// sheared, scaled, etc) box.
-    void    enclose_transformed_rect(const matrix& m, const rect& r);
+    void    enclose_transformed_rect(const SWFMatrix& m, const rect& r);
     
     /// Expand this rectangle to enclose the given circle.
     void    expand_to_circle(boost::int32_t x, boost::int32_t y, boost::int32_t radius)
@@ -255,7 +255,7 @@ public:
       
     /// Same as enclose_transformed_rect but expanding the current rect instead
     /// of replacing it.
-    DSOEXPORT void  expand_to_transformed_rect(const matrix& m, const rect& r);
+    DSOEXPORT void  expand_to_transformed_rect(const SWFMatrix& m, const rect& r);
     
     /// Makes union of the given and the current rect
     DSOEXPORT void  expand_to_rect(const rect& r);

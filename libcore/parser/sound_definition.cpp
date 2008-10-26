@@ -11,7 +11,7 @@
 #include "impl.h"
 //#include "ControlTag.h" // for start_sound_tag inheritance
 #include "movie_definition.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 
 namespace gnash {
 

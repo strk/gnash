@@ -24,7 +24,7 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "SWFMovieDefinition.h"
 #include "movie_definition.h" // for inheritance
-#include "sprite_instance.h" // for ??
+#include "MovieClip.h" // for ??
 #include "zlib_adapter.h"
 #include "IOChannel.h" // for use
 #include "SWFStream.h"
@@ -32,7 +32,7 @@
 //#include "fontlib.h"
 #include "font.h"
 #include "log.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "movie_instance.h"
 #include "bitmap_character_def.h"
 #include "swf/TagLoadersTable.h"
@@ -70,7 +70,7 @@
 //#undef DEBUG_THREADS_LOCKING
 
 // Define this to get debugging output for symbol library use
-#define DEBUG_EXPORTS
+//#define DEBUG_EXPORTS
 
 namespace gnash
 {
@@ -790,7 +790,7 @@ boost::intrusive_ptr<resource>
 SWFMovieDefinition::get_exported_resource(const std::string& symbol)
 {
 #ifdef DEBUG_EXPORTS
-	log_debug(_("get_exported_resource called, frame count=%u"), m_frame_count);
+	log_debug("get_exported_resource(%s) called, loading frame:%u", symbol, m_frame_count);
 #endif
 
 	// Don't call get_exported_resource() from this movie loader
@@ -832,7 +832,13 @@ SWFMovieDefinition::get_exported_resource(const std::string& symbol)
 		{
 			boost::mutex::scoped_lock lock(_exportedResourcesMutex);
 			ExportMap::iterator it = _exportedResources.find(symbol);
-			if ( it != _exportedResources.end() ) return it->second;
+			if ( it != _exportedResources.end() )
+            {
+#ifdef DEBUG_EXPORTS
+	            log_debug(" resource found, loading frame:%u", new_loading_frame);
+#endif
+                return it->second;
+            }
 		}
 
         // We checked last (or past-last) advertised frame. 

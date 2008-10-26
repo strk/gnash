@@ -208,8 +208,14 @@ CurlSession::~CurlSession()
 	exportCookies();
 
 	CURLSHcode code;
+	int retries=0;
 	while ( (code=curl_share_cleanup(_shandle)) != CURLSHE_OK )
 	{
+		if ( ++retries > 10 )
+		{
+			log_error("Failed cleaning up share handle: %s. Giving up after %d retries.", curl_share_strerror(code), retries);
+			break;
+		}
 		log_error("Failed cleaning up share handle: %s. Will try again in a second.", curl_share_strerror(code));
 		gnashSleep(1000000);
 	}

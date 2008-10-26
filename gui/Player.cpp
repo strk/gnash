@@ -31,7 +31,7 @@
 #include "gnash.h" // still needed ?
 #include "movie_definition.h"
 #include "sound_handler.h" // for set_sound_handler and create_sound_handler_*
-#include "sprite_instance.h" // for setting FlashVars
+#include "MovieClip.h" // for setting FlashVars
 #include "movie_root.h" 
 #include "Player.h"
 
@@ -441,12 +441,18 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
     }
     _gui->run();
 
-    std::cerr << "Main loop ended, cleaning up" << std::endl;
+    log_debug("Main loop ended, cleaning up");
 
     // Clean up as much as possible, so valgrind will help find actual leaks.
     gnash::clear();
 
     return EXIT_SUCCESS;
+}
+
+bool
+Player::CallbacksHandler::yesNo(const std::string& query)
+{
+    return _gui->yesno(query);
 }
 
 std::string

@@ -24,7 +24,7 @@
 
 namespace gnash {
 	class character;
-	class matrix;
+	class SWFMatrix;
 	class rect;
 }
 
@@ -67,10 +67,10 @@ public:
 	/// Point coordinates are local coords (TWIPS)
 	///
 	/// @param wm
-	///	Current world matrix of the instance we want to check.
+	///	Current world SWFMatrix of the instance we want to check.
 	///	This is needed to properly scale non-scalable strokes.
 	///
-	virtual bool point_test_local(boost::int32_t /*x*/, boost::int32_t /*y*/, matrix& /*wm*/)
+	virtual bool point_test_local(boost::int32_t /*x*/, boost::int32_t /*y*/, SWFMatrix& /*wm*/)
 	{
 		return false;
 	}

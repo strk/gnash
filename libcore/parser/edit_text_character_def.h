@@ -15,11 +15,11 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef _GNASH_EDIT_TEXT_CHARACTER_DEF_H_
-#define _GNASH_EDIT_TEXT_CHARACTER_DEF_H_
+#ifndef GNASH_EDIT_TEXT_CHARACTER_DEF_H
+#define GNASH_EDIT_TEXT_CHARACTER_DEF_H
 
 #include "smart_ptr.h" // GNASH_USE_GC
-#include "types.h" // what for ?
+#include "RGBA.h" // for rgba type
 #include "character_def.h" // for inheritance
 #include "rect.h" // for composition
 

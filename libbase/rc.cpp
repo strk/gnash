@@ -93,7 +93,7 @@ RcInitFile::RcInitFile()
     _startStopped(false),
     _insecureSSL(false),
     _streamsTimeout(DEFAULT_STREAMS_TIMEOUT),
-    _solsandbox("/tmp/"),
+    _solsandbox(DEFAULT_SOL_SAFEDIR),
     _solreadonly(false),
     _sollocaldomain(false),
     _lcdisabled(false),
@@ -102,6 +102,7 @@ RcInitFile::RcInitFile()
     _lcshmkey(0),
     _ignoreFSCommand(true)
 {
+    expandPath(_solsandbox);
 
     loadFiles();
 
@@ -254,6 +255,7 @@ RcInitFile::extractDouble(double& out, const std::string &pattern,
     return false;
 }
 
+/* static protected */
 void
 RcInitFile::expandPath (std::string& path)
 {
@@ -342,7 +344,7 @@ RcInitFile::parseFile(const std::string& filespec)
     StringNoCaseEqual noCaseCompare;
     
     if (filespec.empty()) {
-        cout << "RcInitFile::parseFile: empty filespec" << endl;
+        cerr << "RcInitFile::parseFile: empty filespec" << endl;
         return false;
     }
     
@@ -359,7 +361,7 @@ RcInitFile::parseFile(const std::string& filespec)
             return false;
     }
 
-    cout << _("RcInitFile: parsing ") << filespec << endl;
+    //cout << _("RcInitFile: parsing ") << filespec << endl;
         
     // Read in each line and parse it
     size_t lineno = 0;

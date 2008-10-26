@@ -37,7 +37,7 @@
 // Forward declarations
 namespace gnash
 {
-	class sprite_instance;
+	class MovieClip;
 }
 
 
@@ -153,11 +153,14 @@ private:
 			_gui(gui)
 		{}
 
-		std::string call(const std::string& event, const std::string& arg);
+		std::string call(const std::string& event,
+				const std::string& arg);
+		bool yesNo(const std::string& query);
 
-		// For handling notification callbacks from ActionScript. The callback is
-		// always sent to a hosting application (i.e. if a file descriptor is
-		// supplied). It is never acted on by Gnash when running as a plugin.
+		// For handling notification callbacks from ActionScript.
+		// The callback is always sent to a hosting application
+		// (i.e. if a file descriptor is supplied). It is never
+		// acted on by Gnash when running as a plugin.
 		void notify(const std::string& event, const std::string& arg);
 
 	private:

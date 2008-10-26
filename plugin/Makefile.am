@@ -149,7 +149,11 @@ install-plugins: install-plugin
 	$(MAKE) -C klash install-plugins
 	$(MAKE) -C win32 install-plugins
 
-uninstall-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
+uninstall-plugins: uninstall-plugin
+	$(MAKE) -C klash uninstall-plugins
+	$(MAKE) -C win32 uninstall-plugins
+
+uninstall-plugin: 
 	$(RM) -f $(DESTDIR)$(plugindir)/libgnashplugin.so
 
 .PHONY : install-plugins install-plugin test_perms

@@ -31,32 +31,34 @@ public:
 /// output format.
 //
 /// @param adjusted_data
-/// Where the converted data is placed.
+/// Where the converted data is placed (output). WARNING: even though
+/// the type of the output data is int16, the adjusted_size output
+/// parameter is in bytes.
 ///
 /// @param adjusted_size
-/// The size of the converted data.
+/// The size of the converted data (output) in bytes.
 ///
 /// @param data
-/// Data that needs to be converted.
+/// Data that needs to be converted (input).
 ///
 /// @param sample_count
-/// The datas current sample count.
+/// The datas current sample count (input).
 /// 
 /// @param sample_size
-/// The datas current sample size.
+/// The datas current sample size (input) in bytes.
 ///
 /// @param sample_rate
-/// The datas current sample rate.
+/// The datas current sample rate (input).
 ///
 /// @param stereo
-/// Whether the current data is in stereo
+/// Whether the current data is in stereo (input).
 ///
 /// @param m_sample_rate
-/// The samplerate we which to convert to.
+/// The samplerate we which to convert to (output).
 ///
 /// @param m_stereo
-/// Do we want the output data to be in stereo?
-///
+/// Do we want the output data to be in stereo (output)?
+
 	static void convert_raw_data(boost::int16_t** adjusted_data,
 		  int* adjusted_size, void* data, int sample_count,
 		  int sample_size, int sample_rate, bool stereo,

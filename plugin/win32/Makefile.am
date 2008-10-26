@@ -40,6 +40,7 @@ AM_CPPFLAGS = \
 AM_LDFLAGS = \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libmedia/libgnashmedia.la \
+	$(top_builddir)/libsound/libgnashsound.la \
 	$(top_builddir)/libamf/libgnashamf.la \
 	$(top_builddir)/backend/libgnashagg.la \
 	$(top_builddir)/libcore/libgnashcore.la \
@@ -82,7 +83,7 @@ install-plugin install-plugins: $(plugin_LTLIBRARIES)
 	test -d $(bindir) || $(mkinstalldirs) $(bindir)
 	$(INSTALL_PROGRAM) npgnash.dll $(bindir)
 
-uninstall-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
+uninstall-plugin uninstall-plugins: 
 	$(RM) -f $(bindir)/npgnash.dll
 
 endif # WIN32
@@ -90,4 +91,4 @@ endif # NPAPI
 
 force:
 
-.PHONY : install-plugins install-plugin uninstall-plugin
+.PHONY : install-plugins install-plugin uninstall-plugin uninstall-plugins

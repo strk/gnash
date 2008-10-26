@@ -1,4 +1,4 @@
-// sprite_instance.h:  Stateful live Sprite instance, for Gnash.
+// MovieClip.h:  Stateful live Sprite instance, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
@@ -65,7 +65,7 @@ namespace gnash
 /// This means that they define a variable scope (see
 /// the as_environment member) and are divided into "frames"
 ///
-class sprite_instance : public character
+class MovieClip : public character
 {
 
 public:
@@ -87,10 +87,10 @@ public:
     /// was defined in an externally loaded movie.
     ///
     ///
-    sprite_instance(movie_definition* def,
+    MovieClip(movie_definition* def,
         movie_instance* root, character* parent, int id);
 
-    virtual ~sprite_instance();
+    virtual ~MovieClip();
 
     enum play_state
     {
@@ -111,6 +111,13 @@ public:
         TAG_DLIST  = 1<<1
     };
 
+    enum MovieClipMethod
+    {
+        METHOD_NONE = 0,
+        METHOD_GET,
+        METHOD_POST
+    };
+
     // Overridden to use the m_root member
     virtual movie_instance* get_root() const;
 
@@ -120,11 +127,11 @@ public:
     /// the _lockroot property, see getLockRoot
     /// and setLockRoot.
     ///
-    virtual const sprite_instance* getAsRoot() const;
+    virtual const MovieClip* getAsRoot() const;
 
     /// \brief
     /// Return the sprite_definition (or movie_definition)
-    /// from which this sprite_instance has been created
+    /// from which this MovieClip has been created
         movie_definition* get_movie_definition() {
                 return m_def.get();
         }
@@ -373,8 +380,8 @@ public:
     /// if false, the cxform of the new character will be untouched.
     ///
     /// @use_old_matrix
-    /// if true, the transformation matrix of the new character will be set to the old one.
-    /// if false, the transformation matrix of the new character will be untouched.
+    /// if true, the transformation SWFMatrix of the new character will be set to the old one.
+    /// if false, the transformation SWFMatrix of the new character will be untouched.
     ///
     void replace_display_object(character* ch,  int depth,
         bool use_old_cxform,
@@ -482,7 +489,7 @@ public:
     /// Return -1 if nobody's home.
     int get_id_at_depth(int depth);
 
-    sprite_instance* to_movie () { return this; }
+    MovieClip* to_movie () { return this; }
 
     /// Load a movie in this sprite, replacing it
     //
@@ -517,7 +524,7 @@ public:
     /// If 1, GET will be used.
     /// If 2, POST will be used.
     ///
-    void loadVariables(URL url, short sendVarsMethod=0);
+    void loadVariables(URL url, MovieClipMethod sendVarsMethod);
 
     //
     // ActionScript support
@@ -556,7 +563,7 @@ public:
     /// @param init_object
     /// If not null, will be used to copy properties over.
     ///
-    boost::intrusive_ptr<sprite_instance> duplicateMovieClip(
+    boost::intrusive_ptr<MovieClip> duplicateMovieClip(
         const std::string& newname,
         int newdepth, as_object* init_object=NULL);
         
@@ -666,12 +673,12 @@ public:
         _drawable->beginFill(color);
     }
 
-    void beginLinearGradientFill(const std::vector<gradient_record>& grad, const matrix& mat)
+    void beginLinearGradientFill(const std::vector<gradient_record>& grad, const SWFMatrix& mat)
     {
         _drawable->beginLinearGradientFill(grad, mat);
     }
 
-    void beginRadialGradientFill(const std::vector<gradient_record>& grad, const matrix& mat)
+    void beginRadialGradientFill(const std::vector<gradient_record>& grad, const SWFMatrix& mat)
     {
         _drawable->beginRadialGradientFill(grad, mat);
     }
@@ -784,10 +791,10 @@ private:
     bool allowHandCursor() const;
 
     /// Forbid copy
-    sprite_instance(const sprite_instance&);
+    MovieClip(const MovieClip&);
 
     /// Forbid assignment
-    sprite_instance& operator=(const sprite_instance&);
+    MovieClip& operator=(const MovieClip&);
 
     /// Advance to a previous frame.
     //

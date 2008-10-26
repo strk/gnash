@@ -16,8 +16,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef __GNASH_ASOBJ_STAGE_H__
-#define __GNASH_ASOBJ_STAGE_H__
+#ifndef GNASH_ASOBJ_STAGE_H
+#define GNASH_ASOBJ_STAGE_H
 
 #include "as_object.h" // for inheritance
 #include "movie_root.h" // for access to scaleMode
@@ -43,12 +43,12 @@ namespace gnash {
 /// appear to need this (not ASnative). The ASnative functions
 /// are available from SWF5
 
-class Stage: public as_object
+class Stage_as: public as_object
 {
 
 public:
     
-	Stage();
+	Stage_as();
 	
 	/// Notify all listeners about a resize event
 	void notifyResize();

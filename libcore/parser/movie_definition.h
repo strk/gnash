@@ -38,7 +38,7 @@
 /// SWFMovieDefinition class, being the top-level definition of
 /// a movie (the one with a CharacterDictionary in it).
 ///
-/// Also note that gnash::movie_instance is a subclass of gnash::sprite_instance,
+/// Also note that gnash::movie_instance is a subclass of gnash::MovieClip,
 /// being the instance of a gnash::sprite_definition.
 ///
 ///
@@ -65,7 +65,7 @@ namespace gnash {
 	class bitmap_character_def;
 	class bitmap_info;
 	class movie_instance;
-	class sprite_instance;
+	class MovieClip;
 	class ControlTag;
 }
 
@@ -121,7 +121,7 @@ public:
 	//
 	/// Not all movie definitions allow creation of
 	/// movie_instance. In particular, sprite_definition
-	/// can only create sprite_instance, so will return NULL
+	/// can only create MovieClip, so will return NULL
 	/// from this method.
 	///
 	/// The default implementation returns NULL.

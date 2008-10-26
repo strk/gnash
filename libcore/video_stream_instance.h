@@ -26,7 +26,7 @@
 
 // Forward declarations
 namespace gnash {
-	class NetStream;
+	class NetStream_as;
 }
 
 namespace gnash {
@@ -74,7 +74,7 @@ public:
 	void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
 
 	/// Set the input stream for this video
-	void setStream(boost::intrusive_ptr<NetStream> ns);
+	void setStream(boost::intrusive_ptr<NetStream_as> ns);
 
 protected:
 
@@ -105,7 +105,7 @@ private:
 	//as_object* m_video_source;
 
 	// Who owns this ? Should it be an intrusive ptr ?
-	boost::intrusive_ptr<NetStream> _ns;
+	boost::intrusive_ptr<NetStream_as> _ns;
 
 	/// Playing an embbeded video stream ?
 	bool _embeddedStream;

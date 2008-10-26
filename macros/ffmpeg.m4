@@ -115,7 +115,8 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
   fi
 
   if test x"${ac_cv_path_ffmpeg_incl}" = x; then
-     AC_MSG_ERROR([Cannot find ffmpeg/avcodec.h.  Use --with-ffmpeg-incl= to specify the location of the *directory* holding avcodec.h])
+     dnl We want to bail out all at the end, so it comes with tips about how to fix etc.etc.
+     AC_MSG_WARN([Cannot find ffmpeg/avcodec.h.  Use --with-ffmpeg-incl= to specify the location of the *directory* holding avcodec.h])
   else
     if echo $avcodec_h | grep -q ffmpeg/avcodec.h; then
       AC_DEFINE(HAVE_FFMPEG_AVCODEC_H, 1, [Define if you have avcodec.h installed.])

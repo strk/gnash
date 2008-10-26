@@ -23,7 +23,7 @@
 namespace gnash {
 
 // Forward declarations
-class sprite_instance;
+class MovieClip;
 class DisplayList;
 
 /// Control tags are swf tags that control the operation of the movie. 
@@ -39,7 +39,7 @@ public:
 	}
 
 	/// Execute this tag, whatever it is.
-	virtual void execute(sprite_instance* /*m*/, DisplayList& /*dlist*/) const
+	virtual void execute(MovieClip* /*m*/, DisplayList& /*dlist*/) const
 	{
 	}
 
@@ -47,12 +47,12 @@ public:
 	//
 	/// State tags include all tags except action tags.
 	///
-	virtual void execute_state(sprite_instance* /*m*/,  DisplayList& /*dlist*/) const
+	virtual void execute_state(MovieClip* /*m*/,  DisplayList& /*dlist*/) const
 	{
 	}
 
 	/// Execute this tag but only if it is an action tag
-	void execute_action(sprite_instance* m, DisplayList& dlist) const
+	void execute_action(MovieClip* m, DisplayList& dlist) const
 	{
 		if ( is_action_tag() ) execute(m, dlist);
 	}

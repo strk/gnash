@@ -26,12 +26,11 @@
 #include "render_handler.h"
 
 #include "gnash.h"
-#include "types.h"
+#include "RGBA.h"
 #include "image.h"
 #include "utility.h"
 #include "log.h"
 
-#include "types.h"
 #include "image.h"
 #include "utility.h"
 #include "Range2d.h"
@@ -193,11 +192,11 @@ private:
 class oglScopeMatrix : public boost::noncopyable
 {
 public:
-  oglScopeMatrix(const matrix& m)
+  oglScopeMatrix(const SWFMatrix& m)
   {
     glPushMatrix();
 
-    // Multiply (AKA "append") the new matrix with the current OpenGL one.
+    // Multiply (AKA "append") the new SWFMatrix with the current OpenGL one.
     float mat[16];
     memset(&mat[0], 0, sizeof(mat));
     mat[0] = m.sx / 65536.0f;
@@ -505,7 +504,7 @@ bitmap_info_ogl::upload(boost::uint8_t* data, size_t width, size_t height)
 }
 
 void
-bitmap_info_ogl::apply(const gnash::matrix& bitmap_matrix,
+bitmap_info_ogl::apply(const gnash::SWFMatrix& bitmap_matrix,
                        render_handler::bitmap_wrap_mode wrap_mode)
 {
   glEnable(_ogl_img_type);
@@ -535,12 +534,12 @@ bitmap_info_ogl::apply(const gnash::matrix& bitmap_matrix,
     glTexParameteri(_ogl_img_type, GL_TEXTURE_WRAP_T, GL_REPEAT);
   }
     
-  // Set up the bitmap matrix for texgen.
+  // Set up the bitmap SWFMatrix for texgen.
     
   float inv_width = 1.0f / _orig_width;
   float inv_height = 1.0f / _orig_height;
     
-  const gnash::matrix& m = bitmap_matrix;
+  const gnash::SWFMatrix& m = bitmap_matrix;
   glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
   float p[4] = { 0, 0, 0, 0 };
   p[0] = m.sx / 65536.0f * inv_width;
@@ -598,7 +597,7 @@ public:
 
     // Flip the image, since (0,0) by default in OpenGL is the bottom left.
     gluOrtho2D(-oversize, oversize, oversize, -oversize);
-    // Restore the matrix mode to the default.
+    // Restore the SWFMatrix mode to the default.
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
@@ -657,7 +656,7 @@ public:
   // anti-aliased with the rest of the drawing. Since display lists cannot be
   // concatenated this means we'll add up with several display lists for normal
   // drawing operations.
-  virtual void drawVideoFrame(image::ImageBase* frame, const matrix* m, const rect* bounds)
+  virtual void drawVideoFrame(image::ImageBase* frame, const SWFMatrix* m, const rect* bounds)
   {
     GLint index;
 
@@ -688,7 +687,7 @@ public:
     _render_indices.push_back(index);
   }
   
-  virtual void reallyDrawVideoFrame(image::ImageBase* frame, const matrix* m, const rect* bounds)
+  virtual void reallyDrawVideoFrame(image::ImageBase* frame, const SWFMatrix* m, const rect* bounds)
   {
   
     if (frame->type() == GNASH_IMAGE_RGBA)
@@ -735,7 +734,7 @@ public:
 
     glPopAttrib();
 
-    // Restore the default matrix mode.
+    // Restore the default SWFMatrix mode.
     glMatrixMode(GL_MODELVIEW); 
     
   }
@@ -869,7 +868,7 @@ public:
   /// Can be used to draw empty boxes and cursors.
   virtual void
   draw_line_strip(const boost::int16_t* coords, int vertex_count, const rgba& color,
-                  const matrix& mat)
+                  const SWFMatrix& mat)
   {
     oglScopeMatrix scope_mat(mat);
 
@@ -894,7 +893,7 @@ public:
   // NOTE: this implementation can't handle complex polygons (such as concave
   // polygons.
   virtual void  draw_poly(const point* corners, size_t corner_count, 
-    const rgba& fill, const rgba& outline, const matrix& mat, bool masked)
+    const rgba& fill, const rgba& outline, const SWFMatrix& mat, bool masked)
   {
     if (corner_count < 1) {
       return;
@@ -989,7 +988,7 @@ public:
     
     std::vector<line_style> dummy_ls;
     
-    draw_subshape(path_vec, matrix(), dummy_cx, dummy_fs, dummy_ls);
+    draw_subshape(path_vec, SWFMatrix(), dummy_cx, dummy_fs, dummy_ls);
   }
   
   virtual void disable_mask()
@@ -1185,7 +1184,7 @@ public:
     }    
   }
 
-  void apply_fill_style(const fill_style& style, const matrix& mat, const cxform& cx)
+  void apply_fill_style(const fill_style& style, const SWFMatrix& mat, const cxform& cx)
   {
       int fill_type = style.get_type();
       
@@ -1202,7 +1201,7 @@ public:
         {
                     
           bitmap_info_ogl* binfo = static_cast<bitmap_info_ogl*>(style.need_gradient_bitmap());       
-          matrix m = style.get_gradient_matrix();
+          SWFMatrix m = style.getGradientMatrix();
           
           binfo->apply(m, render_handler::WRAP_CLAMP); 
           
@@ -1213,7 +1212,7 @@ public:
         {
           bitmap_info_ogl* binfo = static_cast<bitmap_info_ogl*>(style.get_bitmap_info());
 
-          binfo->apply(style.get_bitmap_matrix(), render_handler::WRAP_REPEAT);
+          binfo->apply(style.getBitmapMatrix(), render_handler::WRAP_REPEAT);
           break;
         }
                 
@@ -1225,7 +1224,7 @@ public:
           
           assert(binfo);
 
-          binfo->apply(style.get_bitmap_matrix(), render_handler::WRAP_CLAMP);
+          binfo->apply(style.getBitmapMatrix(), render_handler::WRAP_CLAMP);
           
           break;
         } 
@@ -1242,7 +1241,7 @@ public:
   
   
   
-  bool apply_line_style(const line_style& style, const cxform& cx, const matrix& mat)
+  bool apply_line_style(const line_style& style, const cxform& cx, const SWFMatrix& mat)
   {
   //  GNASH_REPORT_FUNCTION;
      
@@ -1342,7 +1341,7 @@ public:
   }
     
   void
-  draw_outlines(const PathVec& path_vec, const PathPointMap& pathpoints, const matrix& mat,
+  draw_outlines(const PathVec& path_vec, const PathPointMap& pathpoints, const SWFMatrix& mat,
                 const cxform& cx, const std::vector<fill_style>& fill_styles,
                 const std::vector<line_style>& line_styles)
   {
@@ -1493,9 +1492,9 @@ public:
     return subshapes;
   }
   
-  /// Takes a path and translates it using the given matrix.
+  /// Takes a path and translates it using the given SWFMatrix.
   void
-  apply_matrix_to_paths(std::vector<path>& paths, const matrix& mat)
+  apply_matrix_to_paths(std::vector<path>& paths, const SWFMatrix& mat)
   {  
     std::for_each(paths.begin(), paths.end(),
                   boost::bind(&path::transform, _1, boost::ref(mat)));
@@ -1505,7 +1504,7 @@ public:
 
   void
   draw_subshape(const PathVec& path_vec,
-    const matrix& mat,
+    const SWFMatrix& mat,
     const cxform& cx,
     const std::vector<fill_style>& fill_styles,
     const std::vector<line_style>& line_styles)
@@ -1580,7 +1579,7 @@ public:
 
   virtual void
   draw_shape_character(shape_character_def *def, 
-    const matrix& mat,
+    const SWFMatrix& mat,
     const cxform& cx,
     const std::vector<fill_style>& fill_styles,
     const std::vector<line_style>& line_styles)
@@ -1627,7 +1626,7 @@ public:
     }
   }
 
-  virtual void draw_glyph(shape_character_def *def, const matrix& mat,
+  virtual void draw_glyph(shape_character_def *def, const SWFMatrix& mat,
     const rgba& c)
   {
     if (_drawing_mask) abort();

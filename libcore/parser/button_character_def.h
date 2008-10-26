@@ -26,7 +26,7 @@
 #include "character_def.h"
 #include "sound_definition.h"
 #include "rect.h" // for get_bound
-#include "matrix.h" // for composition
+#include "SWFMatrix.h" // for composition
 #include "cxform.h" // for composition
 #include "action_buffer.h" // for composition of button_action
 #include "filter_factory.h" // for Filters (composition of button_record)
@@ -36,7 +36,7 @@
 
 // Forward declarations
 namespace gnash {
-	class sprite_instance;
+	class MovieClip;
 	class movie_definition;
 	class event_id;
 	class SWFStream; // for read signatures
@@ -76,7 +76,7 @@ public:
 	character_def* m_character_def;
 
 	int	m_button_layer;
-	matrix	m_button_matrix;
+	SWFMatrix	m_button_matrix;
 	cxform	m_button_cxform;
 
 

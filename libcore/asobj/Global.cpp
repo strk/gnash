@@ -37,7 +37,7 @@
 #include "Error_as.h"
 #include "Global.h"
 #include "String_as.h"
-#include "Key.h"
+#include "Key_as.h"
 #include "LoadVars_as.h"
 #include "LocalConnection.h"
 #include "Microphone.h"
@@ -50,14 +50,14 @@
 #include "MovieClipLoader.h"
 #include "movie_definition.h"
 #include "NetConnection.h"
-#include "NetStream.h"
+#include "NetStream_as.h"
 #include "Selection.h"
 #include "SharedObject.h"
 #include "Sound.h"
-#include "Stage.h"
+#include "Stage_as.h"
 #include "System_as.h"
 #include "TextFormat.h"
-#include "TextSnapshot.h"
+#include "TextSnapshot_as.h"
 #include "video_stream_instance.h"
 #include "extension.h"
 #include "VM.h"
@@ -72,7 +72,7 @@
 #include "flash_pkg.h"
 
 #include "fn_call.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 
 #include <limits> // for numeric_limits<double>::infinity
 #include <sstream>

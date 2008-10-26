@@ -28,7 +28,6 @@
 #include "Range2d.h"
 #include "GnashKey.h"
 #include "sound_handler.h" // for creating the "test" sound handlers
-#include "types.h" // for rgba class
 #include "render_handler.h" // for dtor visibility by auto_ptr
 #include "movie_instance.h" 
 #include "ManualClock.h" // for composition
@@ -56,10 +55,11 @@
 namespace gnash {
 	class movie_definition;
 	class movie_root;
-	class sprite_instance;
+	class MovieClip;
 	class character;
 	class FuzzyPixel;
 	class VirtualClock;
+	class rgba;
 }
 
 namespace gnash {
@@ -142,7 +142,7 @@ public:
 	/// Return NULL if there's no character with that name in
 	/// the sprite's display list.
 	///
-	const character* findDisplayItemByName(const sprite_instance& mc,
+	const character* findDisplayItemByName(const MovieClip& mc,
 			const std::string& name);
 
 	/// Find a character in the display list of a sprite by depth.
@@ -150,11 +150,11 @@ public:
 	/// Return NULL if there's no character at that depth in
 	/// the sprite's display list.
 	///
-	const character* findDisplayItemByDepth(const sprite_instance& mc,
+	const character* findDisplayItemByDepth(const MovieClip& mc,
 			int depth);
 
 	/// Get the topmost sprite instance of this movie
-	gnash::sprite_instance* getRootMovie() {
+	gnash::MovieClip* getRootMovie() {
 		return _movie;
 	}
 

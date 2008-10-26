@@ -21,7 +21,7 @@
 #define INPUT_FILENAME "masks_test2.swf"
 
 #include "MovieTester.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "character.h"
 #include "DisplayList.h"
 #include "log.h"
@@ -47,7 +47,7 @@ main(int /*argc*/, char** /*argv*/)
   rgba red(255,0,0,255);  
   rgba white(255, 255, 255, 255);
 
-  sprite_instance* root = tester.getRootMovie();
+  MovieClip* root = tester.getRootMovie();
   assert(root);
   check_equals(root->get_frame_count(), 3);
 

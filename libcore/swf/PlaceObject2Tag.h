@@ -25,7 +25,7 @@
 
 #include "DisplayListTag.h" // for inheritance
 #include "swf.h" // for tag_type definition
-#include "matrix.h" // for composition
+#include "SWFMatrix.h" // for composition
 #include "cxform.h" // for composition 
 
 #include <vector>
@@ -33,7 +33,7 @@
 // Forward declarations
 namespace gnash {
     class SWFStream;
-    class sprite_instance;
+    class MovieClip;
     class swf_event;
     class action_buffer;
     class movie_definition;
@@ -76,7 +76,7 @@ namespace SWF {
 /// The color transform to apply to the newly created instance.
 ///
 /// m_matrix:
-/// The matrix transform to apply to the newly created instance.
+/// The SWFMatrix transform to apply to the newly created instance.
 ///
 /// m_ratio
 ///
@@ -112,7 +112,7 @@ public:
     void read(SWFStream& in, tag_type tag);
 
     /// Place/move/whatever our object in the given movie.
-    void execute(sprite_instance* m, DisplayList& dlist) const;
+    void execute(MovieClip* m, DisplayList& dlist) const;
 
     static void loader(SWFStream& in, tag_type tag, movie_definition& m);
 
@@ -121,7 +121,7 @@ public:
     int getClipDepth() const { return m_clip_depth; }
     int getID()        const { return m_character_id; }
     const std::string& getName() const { return m_name; }
-    const matrix& getMatrix()    const { return m_matrix; }
+    const SWFMatrix& getMatrix()    const { return m_matrix; }
     const cxform& getCxform()    const { return m_color_transform; }
     const EventHandlers& getEventHandlers() const { return _eventHandlers; }
     
@@ -145,7 +145,7 @@ private:
     boost::uint8_t m_has_flags3;
     boost::uint16_t m_character_id;
     cxform  m_color_transform;
-    matrix  m_matrix;
+    SWFMatrix  m_matrix;
     int     m_ratio;
     std::string m_name;
     int     m_clip_depth;

@@ -225,7 +225,7 @@ private:
 /// This is a sequence of different log message types to be used in
 /// the code. Append the name to log_ to call the function, e.g. 
 /// log_error, log_unimpl.
-#define LOG_TYPES (error) (debug) (unimpl) (aserror) (swferror) (smferror) (security) (action) (parse) (trace)
+#define LOG_TYPES (error) (debug) (unimpl) (aserror) (swferror) (amferror) (security) (action) (parse) (trace)
 
 /// This actually creates the template functions using the TOKENIZE
 /// functions above. The templates look like this:

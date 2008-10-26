@@ -40,6 +40,8 @@ extern "C" {
 #include <boost/format.hpp>
 #include <algorithm>
 
+#include "FLVParser.h"
+
 namespace gnash {
 namespace media {
 
@@ -104,7 +106,7 @@ VideoDecoderFfmpeg::VideoDecoderFfmpeg(videoCodecType format, int width, int hei
 
 }
 
-VideoDecoderFfmpeg::VideoDecoderFfmpeg(VideoInfo& info)
+VideoDecoderFfmpeg::VideoDecoderFfmpeg(const VideoInfo& info)
     :
     _videoCodec(NULL)
 {
@@ -129,10 +131,15 @@ VideoDecoderFfmpeg::VideoDecoderFfmpeg(VideoInfo& info)
     int extradataSize=0;
     if ( info.extra.get() )
     {
-        assert(dynamic_cast<ExtraVideoInfoFfmpeg*>(info.extra.get()));
-        const ExtraVideoInfoFfmpeg& ei = static_cast<ExtraVideoInfoFfmpeg&>(*info.extra);
-        extradata = ei.data;
-        extradataSize = ei.dataSize;
+        if (dynamic_cast<ExtraVideoInfoFfmpeg*>(info.extra.get())) {
+            const ExtraVideoInfoFfmpeg& ei = static_cast<ExtraVideoInfoFfmpeg&>(*info.extra);
+            extradata = ei.data;
+            extradataSize = ei.dataSize;
+        } else if (dynamic_cast<ExtraVideoInfoFlv*>(info.extra.get())) {
+            const ExtraVideoInfoFlv& ei = static_cast<ExtraVideoInfoFlv&>(*info.extra);
+            extradata = ei.data.get();
+            extradataSize = ei.size;
+        } else assert(0);
     }
     init(codec_id, info.width, info.height, extradata, extradataSize);
 }
@@ -170,14 +177,9 @@ VideoDecoderFfmpeg::init(enum CodecID codecId, int width, int height, boost::uin
         throw MediaException(msg.str());
     }
     
-    ctx->width = width;
-    ctx->height = height;
-
     log_debug(_("VideoDecoder: initialized FFMPEG codec %s (%d)"), 
 		_videoCodec->name, (int)codecId);
 
-    assert(ctx->width > 0);
-    assert(ctx->height > 0);
 }
 
 VideoDecoderFfmpeg::~VideoDecoderFfmpeg()
@@ -279,7 +281,6 @@ VideoDecoderFfmpeg::frameToImage(AVCodecContext* srcCtx,
 std::auto_ptr<image::ImageBase>
 VideoDecoderFfmpeg::decode(const boost::uint8_t* input, boost::uint32_t input_size)
 {
-
     // This object shouldn't exist if there's no codec, as it can'
     // do anything anyway.
     assert(_videoCodecCtx.get());
@@ -343,6 +344,8 @@ VideoDecoderFfmpeg::flashToFfmpegCodec(videoCodecType format)
 {
         // Find the decoder and init the parser
         switch(format) {
+                case VIDEO_CODEC_H264:
+                         return CODEC_ID_H264;
                 case VIDEO_CODEC_H263:
 			 // CODEC_ID_H263I didn't work with Lavc51.50.0
 			 // and NetStream-SquareTest.swf

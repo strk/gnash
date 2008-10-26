@@ -26,6 +26,7 @@
 #include "MediaParser.h"
 #include "MediaParserGst.h"
 #include "GstUtil.h"
+#include "FLVParser.h"
 
 namespace gnash {
 namespace media {
@@ -48,7 +49,7 @@ AudioDecoderGst::AudioDecoderGst(SoundInfo& info)
     // FIXME: should we handle other types?
 }
 
-AudioDecoderGst::AudioDecoderGst(AudioInfo& info)
+AudioDecoderGst::AudioDecoderGst(const AudioInfo& info)
 {
     // init GStreamer. TODO: what about doing this in MediaHandlerGst ctor?
     gst_init (NULL, NULL);
@@ -74,6 +75,29 @@ AudioDecoderGst::AudioDecoderGst(AudioInfo& info)
         setup(srccaps);
         return;
     }
+
+    if (info.type == FLASH && info.codec == AUDIO_CODEC_AAC)
+    {
+        srccaps = gst_caps_new_simple ("audio/mpeg",
+            "mpegversion", G_TYPE_INT, 4,
+            "rate", G_TYPE_INT, 44100,
+            "channels", G_TYPE_INT, 2, 
+            NULL);
+
+        ExtraAudioInfoFlv* extra = dynamic_cast<ExtraAudioInfoFlv*>(info.extra.get());
+        if (extra) {
+            GstBuffer* buf = gst_buffer_new_and_alloc(extra->size);
+            memcpy(GST_BUFFER_DATA(buf), extra->data.get(), extra->size);
+            gst_caps_set_simple (srccaps, "codec_data", GST_TYPE_BUFFER, buf, NULL);
+
+        } else {
+            log_error(_("Creating AAC decoder without extra data. This will probably fail!"));
+        }
+
+        setup(srccaps);
+        return;
+    }
+
 
     if (info.type == FLASH) {
         throw MediaException("AudioDecoderGst: cannot handle this codec!");

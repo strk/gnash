@@ -295,7 +295,11 @@ allow(const URL& url)
 	// in a directory listed as local sandbox
 	if (host.size() == 0)
 	{
-		assert(url.protocol() == "file");
+		if (url.protocol() != "file")
+        {
+            log_error(_("Network connection without hostname requested"));
+            return false;
+        }
 		return local_check(url.path());
 	}
 	return host_check(host);

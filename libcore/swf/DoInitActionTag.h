@@ -21,7 +21,7 @@
 #include "ControlTag.h" // for inheritance
 #include "swf.h" // for tag_type definition
 #include "action_buffer.h" // for composition
-#include "sprite_instance.h" // for inlines
+#include "MovieClip.h" // for inlines
 #include "SWFStream.h" // for inlines
 
 // Forward declarations
@@ -48,12 +48,12 @@ public:
         read(in);
     }
 
-    virtual void execute_state(sprite_instance* m, DisplayList& /*dlist*/) const
+    virtual void execute_state(MovieClip* m, DisplayList& /*dlist*/) const
     {
         m->execute_init_action_buffer(_buf, _cid);
     }
 
-    virtual void execute(sprite_instance* m, DisplayList& /*dlist*/) const
+    virtual void execute(MovieClip* m, DisplayList& /*dlist*/) const
     {
         m->execute_init_action_buffer(_buf, _cid);
     }

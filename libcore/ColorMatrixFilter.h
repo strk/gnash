@@ -24,7 +24,7 @@
 
 namespace gnash {
 
-// A color matrix effect filter.
+// A color SWFMatrix effect filter.
 class ColorMatrixFilter : public BitmapFilter
 {
 public:
@@ -42,7 +42,7 @@ public:
     { return; }
 
 protected:
-    std::vector<float> m_matrix; // The color matrix
+    std::vector<float> m_matrix; // The color SWFMatrix
 };
 
 } // Namespace gnash

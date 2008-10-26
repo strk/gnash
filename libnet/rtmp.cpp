@@ -260,7 +260,7 @@ RTMP::decodeHeader(Network::byte_t *in)
 
     if (_header.head_size >= 4) {
         _mystery_word = *tmpptr++;
-        _mystery_word = (_mystery_word << 12) + *tmpptr++;
+        _mystery_word = (_mystery_word << 8) + *tmpptr++;
         _mystery_word = (_mystery_word << 8) + *tmpptr++;
 
         log_debug(_("The mystery word is: %d"), _mystery_word);
@@ -268,7 +268,7 @@ RTMP::decodeHeader(Network::byte_t *in)
 
     if (_header.head_size >= 8) {
         _header.bodysize = *tmpptr++;
-        _header.bodysize = (_header.bodysize << 12) + *tmpptr++;
+        _header.bodysize = (_header.bodysize << 8) + *tmpptr++;
         _header.bodysize = (_header.bodysize << 8) + *tmpptr++;
         _header.bodysize = _header.bodysize & 0xffffff;
         log_debug(_("The body size is: %d"), _header.bodysize);
@@ -391,17 +391,9 @@ RTMP::encodeHeader(int amf_index, rtmp_headersize_e head_size,
     // and add the type of the object if the header size is 8 or more.
     // length is a 3 byte field
     if ((head_size == HEADER_8) || (head_size == HEADER_12)) {
-#ifdef BOOST_BIG_ENDIAN
-	boost::uint32_t length = total_size << 8;
-#else
-	boost::uint32_t length = (htonl(*reinterpret_cast<boost::uint32_t *>(&total_size))) >> 8;
-#endif
- 	memcpy(ptr, &length, 3);
-// #else
-// #error "No Endianess specified!"
-// #endif
-//#endif
-        ptr += 3;
+	*ptr++ = (total_size >> 16) & 0xff;
+	*ptr++ = (total_size >> 8) & 0xff;
+	*ptr++ = total_size & 0xff;
 	// The type is a one byte field
 	*ptr = type;
 	ptr++;
@@ -409,7 +401,8 @@ RTMP::encodeHeader(int amf_index, rtmp_headersize_e head_size,
     
     // Add the routing of the message if the header size is 12, the maximum.
     if (head_size == HEADER_12) {
-        memcpy(ptr, &routing, 4);
+        boost::uint32_t swapped = htonl(routing);
+        memcpy(ptr, &swapped, 4);
         ptr += 4;
     }
     

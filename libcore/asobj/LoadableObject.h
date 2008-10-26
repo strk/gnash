@@ -47,7 +47,12 @@ public:
     /// Carry out the AS send() operation
     //
     /// @param urlstr   The URI to send the data to
-    void send(const std::string& urlstr);
+    /// @param target   The target for the data (e.g. _self, _blank)
+    /// @param post     Whether the data should be posted or not.
+    //
+    /// The success of the operation is irrelevant to AS.
+    void send(const std::string& urlstr, const std::string& target,
+            bool post);
 
     /// Carry out the AS sendAndLoad operation
     //

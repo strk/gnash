@@ -22,7 +22,7 @@
 #ifndef __SOUNDINFO_H__
 #define __SOUNDINFO_H__
 
-#include "MediaParser.h" // for audioCodecType enum
+#include "MediaParser.h" // for audioCodecType enum and AudioInfo
 
 namespace gnash {
 namespace media {
@@ -50,7 +50,6 @@ public:
 	/// The sample count in the sound. In soundstreams this is an average for each frame.
 	///
 	/// @param is16bit
-	/// Defines whether the sound is in stereo.
 	/// Defines whether the sound is in 16bit format (samplesize == 2)? else it 
 	/// is 8bit (samplesize == 1). Used for streams when decoding adpcm.
 	///

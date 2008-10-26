@@ -253,7 +253,7 @@ private:
 };
 
 // Initialize the global XMLNode class
-void xmlnode_class_init(as_object& global);
+void XMLNode_class_init(as_object& global);
 
 // External, used by getXMLInterface() !
 as_object* getXMLNodeInterface();

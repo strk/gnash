@@ -155,14 +155,16 @@ GtkGui::init(int argc, char **argv[])
     g_object_ref(G_OBJECT(_drawingArea));
 
     _resumeButton = gtk_button_new();
-    gtk_container_add(GTK_CONTAINER(_resumeButton), gtk_label_new(_("Click to play")));
+    gtk_container_add(GTK_CONTAINER(_resumeButton),
+            gtk_label_new(_("Click to play")));
     gtk_widget_show_all(_resumeButton);
 
     // Same here.
     g_object_ref(G_OBJECT(_resumeButton));
 
     // This callback indirectly results in playHook() being called.
-    g_signal_connect(G_OBJECT(_resumeButton), "clicked", G_CALLBACK (menuitem_play_callback), this);
+    g_signal_connect(G_OBJECT(_resumeButton), "clicked",
+            G_CALLBACK(menuitem_play_callback), this);
 
     // If we don't set this flag we won't be able to grab focus
     // ( grabFocus() would be a no-op )
@@ -1086,7 +1088,8 @@ PreferencesDialog::handlePrefs (GtkWidget* dialog, gint response, gpointer data)
 
         if ( prefs->streamsTimeoutScale ) {
             _rcfile.setStreamsTimeout(
-        	    gtk_range_get_value(GTK_RANGE(prefs->streamsTimeoutScale)));
+                gtk_spin_button_get_value_as_int(
+                    GTK_SPIN_BUTTON(prefs->streamsTimeoutScale)));
         }
 
         if ( prefs->ASCodingErrorToggle ) {
@@ -1151,7 +1154,8 @@ PreferencesDialog::handlePrefs (GtkWidget* dialog, gint response, gpointer data)
 
         if ( prefs->librarySize ) {
             _rcfile.setMovieLibraryLimit(
-                gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(prefs->librarySize)));
+                gtk_spin_button_get_value_as_int(
+                    GTK_SPIN_BUTTON(prefs->librarySize)));
         }
 
         if ( prefs->startStoppedToggle ) {
@@ -1659,11 +1663,16 @@ GtkGui::showAboutDialog()
 	"Rob Savoye", 
 	"Sandro Santilli", 
 	"Bastiaan Jacques", 
+	"Tomas Groth", 
+	"Udo Giacomozzi", 
+	"Hannes Mayr", 
 	"Markus Gothe", 
+	"Vitaly Alexeev",
 	"John Gilmore",
+	"Zou Lunkai",
 	"Benjamin Wolsey",
 	"Russ Nelson",
-	"Zou Lunkai",
+	"Dossy Shiobara",
 	NULL
     };
 
@@ -2083,7 +2092,11 @@ GtkGui::button_press_event(GtkWidget *const /*widget*/,
                            GdkEventButton *const event,
                            const gpointer data)
 {
-    //GNASH_REPORT_FUNCTION;
+
+    /// Double- and triple-clicks should not send an extra event!
+    /// Flash has no built-in double click.
+    if (event->type != GDK_BUTTON_PRESS) return false;
+
     GtkGui *obj = static_cast<GtkGui *>(data);
 
     obj->grabFocus();
@@ -2536,7 +2549,8 @@ void
 GtkGui::stopHook()
 {
 
-    // FIXME: this can't work for the stand-alone player, because _drawingArea is
+    // FIXME: this can't work for the stand-alone player, because
+    // _drawingArea is
     // packed into a vbox.
     if (! _xid) return;
 

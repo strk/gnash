@@ -20,6 +20,7 @@
 
 #include "AudioDecoderFfmpeg.h"
 #include "MediaParserFfmpeg.h" // for ExtraAudioInfoFfmpeg
+#include "FLVParser.h"
 
 #include <cmath> // for std::ceil
 #include <algorithm> // for std::copy, std::max
@@ -35,7 +36,7 @@
 namespace gnash {
 namespace media {
 	
-AudioDecoderFfmpeg::AudioDecoderFfmpeg(AudioInfo& info)
+AudioDecoderFfmpeg::AudioDecoderFfmpeg(const AudioInfo& info)
 	:
 	_audioCodec(NULL),
 	_audioCodecCtx(NULL),
@@ -82,22 +83,24 @@ void AudioDecoderFfmpeg::setup(SoundInfo& info)
 			codec_id = CODEC_ID_MP3;
 			// Init the parser
 			_parser = av_parser_init(codec_id);
-
 			if (!_parser) {	
-				throw MediaException(_("libavcodec can't parse "
-				                       "the current audio format"));
+				throw MediaException(_("AudioDecoderFfmpeg can't initialize MP3 parser"));
 			}
 			break;
 		default:
-		    boost::format err = boost::format(
-		        _("Unsupported audio codec %d")) %
-		        static_cast<int>(info.getFormat());
+			boost::format err = boost::format(
+				_("Unsupported audio codec %d")) %
+				static_cast<int>(info.getFormat());
 			throw MediaException(err.str());
 	}
 	_audioCodec = avcodec_find_decoder(codec_id);
 
 	if (!_audioCodec) {
-		throw MediaException(_("libavcodec can't decode the current audio format"));
+		audioCodecType codec = info.getFormat();
+		boost::format err = boost::format(
+			_("libavcodec could not find a decoder for codec %d (%s)")) %
+			static_cast<int>(codec) % codec;
+		throw MediaException(err.str());
 	}
 
 	_audioCodecCtx = avcodec_alloc_context();
@@ -124,7 +127,7 @@ void AudioDecoderFfmpeg::setup(SoundInfo& info)
 
 }
 
-void AudioDecoderFfmpeg::setup(AudioInfo& info)
+void AudioDecoderFfmpeg::setup(const AudioInfo& info)
 {
 	// Init the avdecoder-decoder
 	avcodec_init();
@@ -150,6 +153,9 @@ void AudioDecoderFfmpeg::setup(AudioInfo& info)
 			case AUDIO_CODEC_MP3:
 				codec_id = CODEC_ID_MP3;
 				break;
+			case AUDIO_CODEC_AAC:
+				codec_id = CODEC_ID_AAC;
+				break;
 #if 0
             // Enable this to use ffmpeg for nellymoser
             // decoding (fails in decodeFrame, but probably not Ffmpeg's
@@ -167,34 +173,54 @@ void AudioDecoderFfmpeg::setup(AudioInfo& info)
 	}
 	else
 	{
-        boost::format err = boost::format(
-            _("AudioDecoderFfmpeg: unknown codec type %d "
-            "(should never happen)")) % info.type;
-        throw MediaException(err.str());
+		boost::format err = boost::format(
+		    _("AudioDecoderFfmpeg: unknown codec type %d "
+		    "(should never happen)")) % info.type;
+		throw MediaException(err.str());
 	}
 
 	_audioCodec = avcodec_find_decoder(codec_id);
 	if (!_audioCodec)
 	{
-		throw MediaException(_("libavcodec can't decode this "
-				"audio format"));
+		if (info.type == FLASH) {
+			boost::format err = boost::format(
+				_("AudioDecoderFfmpeg: libavcodec could not find a decoder for codec %d (%s)")) %
+				info.codec % static_cast<audioCodecType>(info.codec);
+			throw MediaException(err.str());
+		} else {
+			boost::format err = boost::format(
+				_("AudioDecoderFfmpeg: libavcodec could not find a decoder for ffmpeg codec id %s")) %
+				codec_id;
+			throw MediaException(err.str());
+		}
 	}
 
 	// Init the parser
-	_parser = av_parser_init(static_cast<CodecID>(info.codec));
+	_parser = av_parser_init(codec_id);
+	if (!_parser) {	
+		boost::format err = boost::format(
+			_("AudioDecoderFfmpeg: could not initialize a parser for ffmpeg codec id %s")) %
+				codec_id;
+		throw MediaException(err.str());
+	}
 
 	// Create an audioCodecCtx from the ffmpeg parser if exists/possible
 	_audioCodecCtx = avcodec_alloc_context();
 	if (!_audioCodecCtx) {
-		throw MediaException(_("libavcodec couldn't allocate context"));
+		throw MediaException(_("AudioDecoderFfmpeg: libavcodec couldn't allocate context"));
 	}
 
 	if ( info.extra.get() )
 	{
-		assert(dynamic_cast<ExtraAudioInfoFfmpeg*>(info.extra.get()));
-		const ExtraAudioInfoFfmpeg& ei = static_cast<ExtraAudioInfoFfmpeg&>(*info.extra);
-		_audioCodecCtx->extradata = ei.data;
-		_audioCodecCtx->extradata_size = ei.dataSize;
+		if (dynamic_cast<ExtraAudioInfoFfmpeg*>(info.extra.get())) {
+			const ExtraAudioInfoFfmpeg& ei = static_cast<ExtraAudioInfoFfmpeg&>(*info.extra);
+			_audioCodecCtx->extradata = ei.data;
+			_audioCodecCtx->extradata_size = ei.dataSize;
+		} else if (dynamic_cast<ExtraAudioInfoFlv*>(info.extra.get())) {
+			ExtraAudioInfoFlv* extra = static_cast<ExtraAudioInfoFlv*>(info.extra.get());
+			_audioCodecCtx->extradata = extra->data.get();
+			_audioCodecCtx->extradata_size = extra->size;
+		}
 	}
 
 	int ret = avcodec_open(_audioCodecCtx, _audioCodec);
@@ -203,10 +229,10 @@ void AudioDecoderFfmpeg::setup(AudioInfo& info)
 		av_free(_audioCodecCtx);
 		_audioCodecCtx = 0;
 
-        boost::format err = boost::format(
-            _("AudioDecoderFfmpeg: avcodec_open failed to initialize "
-            "FFMPEG codec %s (%d)")) % _audioCodec->name % (int)codec_id;
-    	throw MediaException(err.str());
+		boost::format err = boost::format(
+			_("AudioDecoderFfmpeg: avcodec_open failed to initialize "
+			"FFMPEG codec %s (%d)")) % _audioCodec->name % (int)codec_id;
+		throw MediaException(err.str());
 	}
 
 	if (_audioCodecCtx->codec->id != CODEC_ID_MP3) {
@@ -390,11 +416,11 @@ AudioDecoderFfmpeg::decodeFrame(boost::uint8_t* input, boost::uint32_t inputSize
 		// resampling configuration
 		double resampleFactor = (44100.0/_audioCodecCtx->sample_rate) * (2.0/_audioCodecCtx->channels);
 		bool stereo = _audioCodecCtx->channels > 1 ? true : false;
-		int samples = stereo ? outSize >> 2 : outSize >> 1;
+		int inSamples = stereo ? outSize >> 2 : outSize >> 1;
 
-        int expectedMaxOutSamples = std::ceil(samples*resampleFactor);
+		int expectedMaxOutSamples = std::ceil(inSamples*resampleFactor);
 
-        // *channels *sampleSize 
+		// *channels *sampleSize 
 		int resampledFrameSize = expectedMaxOutSamples*2*2;
 
 		// Allocate just the required amount of bytes
@@ -404,45 +430,45 @@ AudioDecoderFfmpeg::decodeFrame(boost::uint8_t* input, boost::uint32_t inputSize
 		log_debug("Calling the resampler; resampleFactor:%d; "
 			"ouput to 44100hz, 2channels, %dbytes; "
 			"input is %dhz, %dchannels, %dbytes, %dsamples",
-            resampleFactor,
+			resampleFactor,
 			resampledFrameSize, _audioCodecCtx->sample_rate,
-            _audioCodecCtx->channels, outSize, samples);
+			_audioCodecCtx->channels, outSize, inSamples);
 #endif
 
-		samples = _resampler.resample(outPtr, // input
+		int outSamples = _resampler.resample(outPtr, // input
 			reinterpret_cast<boost::int16_t*>(resampledOutput), // output
-			samples); // input..
+			inSamples); // input..
 
 #ifdef GNASH_DEBUG_AUDIO_DECODING
-		log_debug("resampler returned %d samples ", samples);
+		log_debug("resampler returned %d samples ", outSamples);
 #endif
 
 		// make sure to set outPtr *after* we use it as input to the resampler
         	outPtr = reinterpret_cast<boost::int16_t*>(resampledOutput);
 		delete [] output;
 
-		if (expectedMaxOutSamples < samples)
+		if (expectedMaxOutSamples < outSamples)
 		{
 			log_error(" --- Computation of resampled samples (%d) < then the actual returned samples (%d)",
-				expectedMaxOutSamples, samples);
+				expectedMaxOutSamples, outSamples);
 
 			log_debug(" input frame size: %d", outSize);
 			log_debug(" input sample rate: %d", _audioCodecCtx->sample_rate);
 			log_debug(" input channels: %d", _audioCodecCtx->channels);
-			log_debug(" input samples: %d", samples);
+			log_debug(" input samples: %d", inSamples);
 
 			log_debug(" output sample rate (assuming): %d", 44100);
 			log_debug(" output channels (assuming): %d", 2);
-			log_debug(" output samples: %d", samples);
+			log_debug(" output samples: %d", outSamples);
 
-            /// Memory errors...
+			/// Memory errors...
 			abort();
 		}
 
-        // Use the actual number of samples returned, multiplied
-        // to get size in bytes (not two-byte samples) and for 
-        // stereo?
-		outSize = samples * 2 * 2;
+		// Use the actual number of samples returned, multiplied
+		// to get size in bytes (not two-byte samples) and for 
+		// stereo?
+		outSize = outSamples * 2 * 2;
 
 	}
 

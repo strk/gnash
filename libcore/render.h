@@ -59,7 +59,7 @@ namespace gnash {
 		bitmap_info* createBitmapInfo(std::auto_ptr<image::ImageBase> im);
 
 		/// See render_handler::drawVideoFrame (in backend/render_handler.h)
-		void drawVideoFrame(image::ImageBase* frame, const matrix* mat, const rect* bounds);
+		void drawVideoFrame(image::ImageBase* frame, const SWFMatrix* mat, const rect* bounds);
 
 		/// See render_handler::begin_display (in backend/render_handler.h)
 		void	begin_display(
@@ -73,11 +73,11 @@ namespace gnash {
 
 		/// See render_handler::draw_line_strip (in backend/render_handler.h)
 		void	draw_line_strip(const boost::int16_t coords[],
-				int vertex_count, const rgba& color, const matrix& mat);
+				int vertex_count, const rgba& color, const SWFMatrix& mat);
 
 		/// See render_handler::draw_poly (in backend/render_handler.h)
 		DSOEXPORT void  draw_poly(const point* corners, int corner_count,
-				const rgba& fill, const rgba& outline, const matrix& mat,
+				const rgba& fill, const rgba& outline, const SWFMatrix& mat,
 				bool masked);
       
 		/// See render_handler::draw_shape_character (in backend/render_handler.h)
@@ -85,7 +85,7 @@ namespace gnash {
 				character *inst);
       
 		/// See render_handler::draw_glyph (in backend/render_handler.h)
-		void draw_glyph(shape_character_def *def, const matrix& mat,
+		void draw_glyph(shape_character_def *def, const SWFMatrix& mat,
 				const rgba& color);
 
 		/// See render_handler::bounds_in_clipping_area (in backend/render_handler.h)

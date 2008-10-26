@@ -24,7 +24,7 @@
 #include "as_function.h" // for class as_function
 #include "as_object.h" // for inheritance
 #include "log.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "fn_call.h"
 #include "VM.h"
 #include "movie_root.h"

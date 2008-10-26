@@ -58,14 +58,14 @@ MediaHandlerFfmpeg::createMediaParser(std::auto_ptr<IOChannel> stream)
 }
 
 std::auto_ptr<VideoDecoder>
-MediaHandlerFfmpeg::createVideoDecoder(VideoInfo& info)
+MediaHandlerFfmpeg::createVideoDecoder(const VideoInfo& info)
 {
 	std::auto_ptr<VideoDecoder> ret(new VideoDecoderFfmpeg(info));
 	return ret;
 }
 
 std::auto_ptr<AudioDecoder>
-MediaHandlerFfmpeg::createAudioDecoder(AudioInfo& info)
+MediaHandlerFfmpeg::createAudioDecoder(const AudioInfo& info)
 {
 	std::auto_ptr<AudioDecoder> ret(new AudioDecoderFfmpeg(info));
 	return ret;

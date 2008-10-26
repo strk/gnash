@@ -32,7 +32,7 @@
 #include "swf/TagLoadersTable.h"
 #include "URL.h"
 #include "StreamProvider.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "VM.h"
 #include "ScriptLimitsTag.h"
 #include "BitmapMovieDefinition.h"
@@ -278,59 +278,57 @@ createBitmapMovie(std::auto_ptr<IOChannel> in, const std::string& url, FileType 
 
 }
 
-// Get type of file looking at first bytes
-// return "jpeg", "png", "swf" or "unknown"
-//
+/// Get type of file looking at first bytes
 FileType
 getFileType(IOChannel* in)
 {
   in->seek(0);
 
-  unsigned char buf[3];
+  char buf[3];
   
-  if ( 3 < in->read(buf, 3) )
+  if (3 < in->read(buf, 3))
   {
     log_error(_("Can't read file header"));
     in->seek(0);
     return GNASH_FILETYPE_UNKNOWN;
   }
   
-  // This is the magic number for any JPEG format file
-  if ((buf[0] == 0xff) && (buf[1] == 0xd8) && (buf[2] == 0xff))
+  // This is the magic number {0xff, 0xd8, 0xff} for JPEG format files
+  if (std::equal(buf, buf + 3, "\xff\xd8\xff"))
   {
     in->seek(0);
     return GNASH_FILETYPE_JPEG;
   }
 
   // This is the magic number for any PNG format file
-  if ((buf[0] == 137) && (buf[1] == 'P') && (buf[2] == 'N')) // buf[3] == 'G' (we didn't read so far)
+  // buf[3] == 'G' (we didn't read so far)
+  if (std::equal(buf, buf + 3, "\x89PN")) 
   {
     in->seek(0);
     return GNASH_FILETYPE_PNG;
   }
 
   // This is the magic number for any GIF format file
-  if ((buf[0] == 'G') && (buf[1] == 'I') && (buf[2] == 'F'))
+  if (std::equal(buf, buf + 3, "GIF"))
   {
     in->seek(0);
     return GNASH_FILETYPE_GIF;
   }
 
   // This is for SWF (FWS or CWS)
-  if (  (buf[0] == 'F' || buf[0] == 'C') &&
-    (buf[1] == 'W') &&
-    (buf[2] == 'S') )
+  if (std::equal(buf, buf + 3, "FWS") || std::equal(buf, buf + 3, "CWS"))
   {
     in->seek(0);
     return GNASH_FILETYPE_SWF;
   }
 
-  if ((buf[0] == 'F') && (buf[1] == 'L') && (buf[2] == 'V') ) {
+  // Take one guess at what this is. (It's an FLV-format file).
+  if (std::equal(buf, buf + 3, "FLV")) {
     return GNASH_FILETYPE_FLV;
   }
   
   // Check if it is an swf embedded in a player (.exe-file)
-  if ((buf[0] == 'M') && (buf[1] == 'Z')) {
+  if (std::equal(buf, buf + 2, "MZ")) {
 
     if ( 3 < in->read(buf, 3) )
     {
@@ -473,7 +471,7 @@ void  clear()
     //
     // See task task #6959 and depending items
     //
-    std::cerr << "Any segfault past this message is likely due to improper threads cleanup." << std::endl;
+    log_debug("Any segfault past this message is likely due to improper threads cleanup.");
     //exit(EXIT_SUCCESS);
 
     clear_library();

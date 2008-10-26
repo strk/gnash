@@ -74,7 +74,7 @@
 #include "mouse_button_state.h" // for composition
 #include "drag_state.h" // for composition
 #include "movie_instance.h" // for inlines
-#include "asobj/Key.h"
+#include "asobj/Key_as.h"
 #include "smart_ptr.h" // for memory management
 #include "URL.h" // for loadMovie
 #include "GnashKey.h" // key::code
@@ -101,10 +101,9 @@
 // Forward declarations
 namespace gnash {
     class ExecutableCode; // for ActionQueue
-    class Stage;
+    class Stage_as;
     class URL;
     class Timer;
-    class Gui;
 }
 
 namespace gnash
@@ -112,7 +111,7 @@ namespace gnash
 
 struct DepthComparator
 {
-    typedef boost::intrusive_ptr<sprite_instance> LevelMovie;
+    typedef boost::intrusive_ptr<MovieClip> LevelMovie;
 
     bool operator() (const LevelMovie& d1, const LevelMovie& d2)
     {
@@ -140,11 +139,6 @@ public:
     movie_root(VM& vm);
 
     ~movie_root();
-
-    void setGui(Gui* g)
-    {
-        _gui=g;
-    }
 
     /// Set the root movie, replacing the current one if any.
     //
@@ -209,7 +203,7 @@ public:
     ///		the target depth the latter is moved in place of the former, with
     ///		its depth also updated.
     ///
-    void swapLevels(boost::intrusive_ptr<sprite_instance> sp, int depth);
+    void swapLevels(boost::intrusive_ptr<MovieClip> sp, int depth);
 
     /// Drop level at given depth.
     //
@@ -402,7 +396,7 @@ public:
     //
     /// TODO: drop ?
     ///
-    void set_play_state(sprite_instance::play_state s)
+    void set_play_state(MovieClip::play_state s)
     {
 	getRootMovie()->set_play_state(s);
     }
@@ -505,7 +499,7 @@ public:
         STAGE_H_ALIGN_R,
     };
 
-    /// enum for vertical position of the Stage
+    /// enum for vertical position of the Stages
     enum StageVerticalAlign {
         STAGE_V_ALIGN_C,
         STAGE_V_ALIGN_T,       
@@ -670,7 +664,24 @@ public:
     ///     target variables posted, not the new ones !
     ///	    See http://savannah.gnu.org/bugs/index.php?22257
     ///
-    void loadMovie(const URL& url, const std::string& target, const std::string* postdata=NULL);
+    void loadMovie(const URL& url, const std::string& target,
+            const std::string* postdata = NULL);
+
+
+    /// Send a request to the hosting application (e.g. browser).
+    //
+    /// @param url
+    ///		The url to request.
+    ///
+    /// @param target
+    ///	    Target for request.
+    ///
+    /// @param postdata
+    ///     If not null, the data to POST in an HTTP request.
+    ///
+    void getURL(const URL& url, const std::string& target,
+            const std::string* postdata = NULL);
+
 
     /// Return true if the given string can be interpreted as a _level name
     //
@@ -696,7 +707,7 @@ public:
     /// (for browser communication mostly)
     ///
     /// @return -1 if no filedescriptor is provided by host app.
-    int getHostFD()
+    int getHostFD() const
     {
         return _hostfd;
     }
@@ -714,7 +725,7 @@ public:
     /// a handler, which will be called when the embedded scripts
     /// call fscommand().
     ///
-    /// The handler gets the sprite_instance* that the script is
+    /// The handler gets the MovieClip* that the script is
     /// embedded in, and the two string arguments passed by the
     /// script to fscommand().
     ///
@@ -724,12 +735,24 @@ public:
     }
 
     /// Call this to notify FS commands
-    DSOEXPORT void handleFsCommand(const std::string& cmd, const std::string& arg) const;
+    DSOEXPORT void handleFsCommand(const std::string& cmd,
+            const std::string& arg) const;
 
     /// Abstract base class for hosting app handler
     class AbstractIfaceCallback {
     public:
-        virtual std::string call(const std::string& cmd, const std::string& arg)=0;
+
+        /// Get Gui-related information for the core.
+        //
+        /// This should be used for occasional AS calls, such as for
+        /// Mouse.hide, System.capabilities etc. The return can be
+        /// various types, so it is passed as a string.
+        virtual std::string call(const std::string& cmd,
+                const std::string& arg) = 0;
+
+        /// Ask the hosting application for a yes / no answer to
+        /// a question.
+        virtual bool yesNo(const std::string& cmd) = 0;
         virtual ~AbstractIfaceCallback() {}
     };
 
@@ -874,7 +897,7 @@ private:
     void executeTimers();
 
     /// Notify the global Key ActionScript object about a key status change
-    key_as_object * notify_global_key(key::code k, bool down);
+    Key_as * notify_global_key(key::code k, bool down);
 
     /// Remove unloaded key and mouselisteners.
     void cleanupUnloadedListeners()
@@ -900,7 +923,7 @@ private:
     /// Can return NULL if it's been deleted or not
     /// yet initialized.
     ///
-    boost::intrusive_ptr<Stage> getStageObject();
+    boost::intrusive_ptr<Stage_as> getStageObject();
 
     typedef std::list<ExecutableCode*> ActionQueue;
 
@@ -931,7 +954,7 @@ private:
     /// Characters for listening key events
     KeyListeners m_key_listeners;
 
-    boost::intrusive_ptr<key_as_object> _keyobject;
+    boost::intrusive_ptr<Key_as> _keyobject;
 
     boost::intrusive_ptr<as_object> _mouseobject;
 
@@ -946,7 +969,7 @@ private:
 
     /// The movie instance wrapped by this movie_root
     //
-    /// We keep a pointer to the base sprite_instance class
+    /// We keep a pointer to the base MovieClip class
     /// to avoid having to replicate all of the base class
     /// interface to the movie_instance class definition
     ///
@@ -954,7 +977,7 @@ private:
     ///       to exist while just taking 2 elements in the container.
     ///       Appropriate container could be list, set or map (order is important)
     ///
-    typedef boost::intrusive_ptr<sprite_instance> LevelMovie;
+    typedef boost::intrusive_ptr<MovieClip> LevelMovie;
     typedef std::map<int, LevelMovie> Levels;
     Levels _movies;
 
@@ -1015,7 +1038,7 @@ private:
     //
     /// @@ might be worth making public
     ///
-    boost::intrusive_ptr<key_as_object> getKeyObject();
+    boost::intrusive_ptr<Key_as> getKeyObject();
 
     /// Return the global Mouse object 
     //
@@ -1090,9 +1113,6 @@ private:
     // The timeout in seconds for script execution, in the
     // ScriptLimits tag.    
     boost::uint16_t _timeoutLimit;
-
-    /// Hosting app gui, externally owned
-    Gui* _gui;
 
     void handleActionLimitHit(const std::string& ref);
 

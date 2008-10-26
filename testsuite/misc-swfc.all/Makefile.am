@@ -55,6 +55,7 @@ AM_CPPFLAGS = -I.. \
         -I$(top_srcdir)		\
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/libmedia \
+        -I$(top_srcdir)/libsound \
         -I$(top_srcdir)/backend \
         -I$(top_srcdir)/libcore  \
         -I$(top_srcdir)/libcore/vm  \

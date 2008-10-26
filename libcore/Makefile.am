@@ -28,7 +28,6 @@ FREETYPE_SOURCES = FreetypeGlyphsProvider.h FreetypeGlyphsProvider.cpp
 
 # Only enable if we're configured with --enable-mp3
 AM_CPPFLAGS = \
-	-I$(top_srcdir)/gui \
 	-I$(top_srcdir)/libamf \
 	-I$(top_srcdir)/libnet \
 	-I$(top_srcdir)/backend \
@@ -39,6 +38,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libcore/vm \
 	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/libmedia \
+	-I$(top_srcdir)/libsound \
 	-I$(top_srcdir)/libamf \
 	$(PTHREAD_CFLAGS) \
 	$(DMALLOC_CFLAGS) \
@@ -75,12 +75,12 @@ libgnashcore_la_SOURCES = \
         GradientBevelFilter.cpp \
         parser/filter_factory.cpp \
 	generic_character.cpp \
-	matrix.cpp \
+	SWFMatrix.cpp \
 	movie_instance.cpp \
 	movie_root.cpp \
 	namedStrings.cpp \
 	rect.cpp \
-	sprite_instance.cpp \
+	MovieClip.cpp \
 	swf/TagLoadersTable.cpp	\
 	swf/tag_loaders.cpp \
 	swf/DefineFontAlignZonesTag.cpp \
@@ -93,7 +93,7 @@ libgnashcore_la_SOURCES = \
 	video_stream_instance.cpp \
 	StreamProvider.cpp \
 	array.cpp \
-	button_character_instance.cpp \
+	Button.cpp \
 	DisplayList.cpp \
 	fill_style.cpp \
 	font.cpp \
@@ -106,7 +106,7 @@ libgnashcore_la_SOURCES = \
 	styles.cpp \
 	text.cpp \
 	timers.cpp \
-	types.cpp 	\
+	RGBA.cpp 	\
 	$(FREETYPE_SOURCES) \
 	$(NULL)
 
@@ -130,7 +130,7 @@ noinst_HEADERS = \
 	bitmap_info.h \
 	BitmapMovieInstance.h \
 	builtin_function.h \
-	button_character_instance.h \
+	Button.h \
 	character.h \
 	CharacterProxy.h \
 	cxform.h \
@@ -158,7 +158,7 @@ noinst_HEADERS = \
 	GnashKey.h \
 	impl.h \
 	LoadVariablesThread.h \
-	matrix.h \
+	SWFMatrix.h \
 	mouse_button_state.h \
 	movie_instance.h \
 	movie_root.h \
@@ -167,7 +167,7 @@ noinst_HEADERS = \
 	render.h \
 	resource.h \
 	shape.h	\
-	sprite_instance.h \
+	MovieClip.h \
 	SWFStream.h \
 	styles.h \
 	swf.h \
@@ -190,7 +190,7 @@ noinst_HEADERS = \
 	swf_function.h \
 	text.h \
 	timers.h \
-	types.h	\
+	RGBA.h	\
 	video_stream_instance.h \
 	$(NULL)
 
@@ -234,7 +234,8 @@ if WIN32
 	$(top_builddir)/libmedia/libgnashmedia_la-MediaHandler.lo \
 	$(top_builddir)/libmedia/libgnashmedia_la-FLVParser.lo
 else
-  libgnashcore_la_LIBADD += $(top_builddir)/libmedia/libgnashmedia.la
+  libgnashcore_la_LIBADD += $(top_builddir)/libmedia/libgnashmedia.la \
+  	$(top_builddir)/libsound/libgnashsound.la
 endif
 
 # Rebuild with GCC 4.x Mudflap support

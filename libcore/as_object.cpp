@@ -1121,7 +1121,7 @@ as_object::enumerateProperties(as_environment& env) const
 }
 
 void
-as_object::enumerateProperties(std::map<std::string, std::string>& to) const
+as_object::enumerateProperties(SortedPropertyList& to) const
 {
 
 	// this set will keep track of visited objects,
@@ -1403,14 +1403,14 @@ as_object::get_path_element(string_table::key key)
 void
 as_object::getURLEncodedVars(std::string& data)
 {
-    typedef std::map<std::string, std::string> PropMap;
-    PropMap props;
+    SortedPropertyList props;
     enumerateProperties(props);
 
     std::string del;
     data.clear();
     
-    for (PropMap::const_iterator i=props.begin(), e=props.end(); i!=e; ++i)
+    for (SortedPropertyList::const_iterator i=props.begin(),
+            e=props.end(); i!=e; ++i)
     {
       std::string name = i->first;
       std::string value = i->second;

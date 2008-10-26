@@ -20,7 +20,6 @@
 #ifndef GNASH_DLIST_H
 #define GNASH_DLIST_H
 
-#include "types.h"
 #include "impl.h"
 #include "snappingrange.h"
 #include "character.h"
@@ -52,7 +51,7 @@ typedef boost::intrusive_ptr<character> DisplayItem;
 
 /// A list of on-stage characters, ordered by depth
 //
-/// Any sprite_instance has an associated DisplayList
+/// Any MovieClip has an associated DisplayList
 /// that may change from frame to frame due to control
 /// tags instructing when to add or remove characters
 /// from the stage.
@@ -122,8 +121,8 @@ public:
 	/// false: keep the new character's cxform.
 	///
 	/// @param use_old_matrix
-	/// true:  set the new character's transformation matrix to the old one.
-	/// false: keep the new character's transformation matrix.
+	/// true:  set the new character's transformation SWFMatrix to the old one.
+	/// false: keep the new character's transformation SWFMatrix.
 	///
 	void replace_character(character* ch, int depth, 
 		bool use_old_cxform,
@@ -165,8 +164,8 @@ public:
 	///	If NULL the orignial color transform will be kept.
 	//
 	/// @param mat
-	///	The matrix tranform to assign to the character at the given depth.
-	///	If NULL the orignial matrix will be kept.
+	///	The SWFMatrix tranform to assign to the character at the given depth.
+	///	If NULL the orignial SWFMatrix will be kept.
 	///
 	/// @param ratio
 	/// The new ratio value to assign to the character at the given depth.
@@ -178,7 +177,7 @@ public:
 	void	move_character(
 		int depth,
 		const cxform* color_xform,
-		const matrix* mat,
+		const SWFMatrix* mat,
 		int* ratio,
 		int* clip_depth);
 

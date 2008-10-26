@@ -310,8 +310,8 @@ SharedObjectLibrary::SharedObjectLibrary(VM& vm)
     struct stat statbuf;
     if ( -1 == stat(_solSafeDir.c_str(), &statbuf) )
     {
-       log_error("Invalid SOL safe dir %s: %s. Won't save any SharedObject.", _solSafeDir, std::strerror(errno));
-        _solSafeDir.clear();
+       log_debug("Invalid SOL safe dir %s: %s. Will try to create on flush/exit.", _solSafeDir, std::strerror(errno));
+        //_solSafeDir.clear();
     }
 
     // Which URL we should use here is under research.
@@ -442,7 +442,7 @@ SharedObjectLibrary::getLocal(const std::string& objName, const std::string& roo
         
     if ( ! obj->readSOL(newspec) )
     {
-        log_error("Couldn't read SOL %s, will create on flush/exit", newspec);
+        log_debug("Couldn't read SOL %s, will create on flush/exit.", newspec);
     }
 
     return obj;

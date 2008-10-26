@@ -42,7 +42,7 @@
 // Forward declarations
 namespace gnash {
 	class as_function;
-	class sprite_instance;
+	class MovieClip;
 	class character;
 	class as_environment;
 	class VM;
@@ -129,7 +129,11 @@ class DSOEXPORT as_object
 	friend class asClass;
 	friend class Machine;
 
-	typedef std::set<std::pair<string_table::key, string_table::key> > propNameSet;
+	typedef std::set<std::pair<string_table::key, string_table::key> >
+        propNameSet;
+
+    typedef PropertyList::SortedPropertyList SortedPropertyList;
+
 private:
 	/// Properties of this objects 
 	PropertyList _members;
@@ -188,7 +192,7 @@ public:
 	///
 	void dump_members();
 
-	/// Dump all properties into the given map
+	/// Dump all properties into the given container
 	//
 	/// Note that this method is non-const
 	/// as some properties might be getter/setter
@@ -815,9 +819,9 @@ public:
 			int setTrue, int setFalse=0, string_table::key nsname = 0);
 
 	/// Cast to a sprite, or return NULL
-	virtual sprite_instance* to_movie() { return NULL; }
+	virtual MovieClip* to_movie() { return NULL; }
 
-	const sprite_instance* to_movie() const { return const_cast<as_object*>(this)->to_movie(); }
+	const MovieClip* to_movie() const { return const_cast<as_object*>(this)->to_movie(); }
 
 	/// Cast to a as_function, or return NULL
 	virtual as_function* to_function() { return NULL; }
@@ -911,7 +915,7 @@ public:
 	/// to avoid loops in prototype chain. 
 	/// NOTE: the MM player just chokes in this case (loop)
 	///
-	void enumerateProperties(std::map<std::string, std::string>& to) const;
+	void enumerateProperties(SortedPropertyList& to) const;
 
 	/// Get url-encoded variables
 	//

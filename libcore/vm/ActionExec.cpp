@@ -136,7 +136,7 @@ ActionExec::operator() ()
 {
 
     // Do not execute if scripts are disabled
-    if ( VM::get().getRoot().scriptsDisabled() ) return;
+    if ( env.getVM().getRoot().scriptsDisabled() ) return;
 
     static const SWF::SWFHandlers& ash = SWF::SWFHandlers::instance();
         
@@ -279,7 +279,6 @@ ActionExec::operator() ()
 
             if ( _abortOnUnload && guardedChar && guardedChar->isUnloaded() )
             // action_execution_order_test8.c shows that the opcode guard is not SWF version based (TODO: automate it!)
-            // && VM::get().getSWFVersion() > 5 
             {
                 std::stringstream ss;
                 ss << "Target of action_buffer (" << guardedChar->getTarget() 
@@ -333,8 +332,9 @@ ActionExec::operator() ()
             {
                 if ( ++branchCount > maxBranchCount )
                 {
-                    boost::format fmt(_("Loop iterations count exceeded limit of "
-                                        "%d. Last branch was from pc %d to %d."));
+                    boost::format fmt(_("Loop iterations count exceeded "
+                                "limit of %d. Last branch was from pc %d "
+                                "to %d"));
                     fmt % maxBranchCount % oldPc % pc;
                     throw ActionLimitException(fmt.str());
                 }
@@ -597,7 +597,7 @@ ActionExec::cleanupAfterRun(bool /*expectInconsistencies*/) // TODO: drop argume
     );
 
     // Have movie_root flush any newly pushed actions in higher priority queues
-    VM::get().getRoot().flushHigherPriorityActionQueues();
+    env.getVM().getRoot().flushHigherPriorityActionQueues();
 
 //    log_debug("After cleanup of ActionExec %p, env %p has "
 //        "stack size of %d and callStackDepth of %d",
@@ -677,7 +677,7 @@ ActionExec::delVariable(const std::string& name)
 bool
 ActionExec::delObjectMember(as_object& obj, const std::string& name)
 {
-    string_table& st = VM::get().getStringTable();
+    string_table& st = env.getVM().getStringTable();
     std::pair<bool,bool> ret = obj.delProperty(st.find(PROPNAME(name)));
     return ret.second;
 }
@@ -716,14 +716,14 @@ ActionExec::setLocalVariable(const std::string& name, const as_value& val)
 void
 ActionExec::setObjectMember(as_object& obj, const std::string& var, const as_value& val)
 {
-    string_table& st = VM::get().getStringTable();
+    string_table& st = env.getVM().getStringTable();
     obj.set_member(st.find(PROPNAME(var)), val);
 }
 
 bool
 ActionExec::getObjectMember(as_object& obj, const std::string& var, as_value& val)
 {
-    string_table& st = VM::get().getStringTable();
+    string_table& st = env.getVM().getStringTable();
     return obj.get_member(st.find(PROPNAME(var)), &val);
 }
 

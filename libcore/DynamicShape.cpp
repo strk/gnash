@@ -91,7 +91,7 @@ DynamicShape::beginFill(const rgba& color)
 }
 
 void
-DynamicShape::beginLinearGradientFill(const std::vector<gradient_record>& grad, const matrix& mat)
+DynamicShape::beginLinearGradientFill(const std::vector<gradient_record>& grad, const SWFMatrix& mat)
 {
 	// Add the new fill style and set as current
 	fill_style style; style.setLinearGradient(grad, mat);
@@ -107,7 +107,7 @@ DynamicShape::beginLinearGradientFill(const std::vector<gradient_record>& grad, 
 }
 
 void
-DynamicShape::beginRadialGradientFill(const std::vector<gradient_record>& grad, const matrix& mat)
+DynamicShape::beginRadialGradientFill(const std::vector<gradient_record>& grad, const SWFMatrix& mat)
 {
 	// Add the new fill style and set as current
 	fill_style style; style.setRadialGradient(grad, mat);

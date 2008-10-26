@@ -23,8 +23,6 @@
 #include "as_object.h" // for inheritance
 #include "builtin_function.h" // need builtin_function
 #include "movie_definition.h" // for Object.registerClass (get_exported_resource)
-//#include "character.h" // for Object.registerClass  (get_root_movie)
-#include "sprite_instance.h" // for Object.registerClass  (get_movie_definition)
 #include "sprite_definition.h" // for Object.registerClass  (get_movie_definition)
 #include "VM.h" // for SWF version (attachObjectInterface)
 #include "namedStrings.h" // for NSV::PROP_TO_STRING

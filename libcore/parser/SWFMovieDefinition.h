@@ -52,7 +52,7 @@
 namespace gnash {
 	class SWFMovieDefinition;
 	class movie_root;
-	class sprite_instance;
+	class MovieClip;
 	class movie_instance;
 	namespace SWF {
 		class TagLoadersTable;

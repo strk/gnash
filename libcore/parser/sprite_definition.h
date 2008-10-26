@@ -28,6 +28,7 @@
 #include "log.h"
 #include "rect.h"
 #include "StringPredicates.h" // StringNoCaseLessThen
+#include "TagLoadersTable.h"
 
 // Forward declarations
 namespace gnash {

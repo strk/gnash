@@ -1,4 +1,4 @@
-// Stage.cpp:  All the world is one, for Gnash.
+// Stage_as.cpp:  All the world is one, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 //
@@ -21,7 +21,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include "Stage.h"
+#include "Stage_as.h"
 #include "movie_root.h"
 #include "as_object.h" // for inheritance
 #include "log.h"
@@ -80,7 +80,7 @@ attachStageInterface(as_object& o)
 }
 
 
-Stage::Stage()
+Stage_as::Stage_as()
 	:
 	as_object(getObjectInterface())
 {
@@ -95,7 +95,7 @@ Stage::Stage()
 
 
 void
-Stage::notifyFullScreen(bool fs)
+Stage_as::notifyFullScreen(bool fs)
 {
     // Should we notify resize here, or does movie_root do it anyway
     // when the gui changes size?
@@ -105,7 +105,7 @@ Stage::notifyFullScreen(bool fs)
 
 
 void
-Stage::notifyResize()
+Stage_as::notifyResize()
 {
 	log_debug("notifying Stage listeners about a resize");
 	callMethod(NSV::PROP_BROADCAST_MESSAGE, "onResize");
@@ -252,7 +252,7 @@ stage_align_getset(const fn_call& fn)
 as_value
 stage_showMenu_getset(const fn_call& fn)
 {
-	boost::intrusive_ptr<Stage> stage = ensureType<Stage>(fn.this_ptr);
+	boost::intrusive_ptr<Stage_as> stage = ensureType<Stage_as>(fn.this_ptr);
 
 	if ( fn.nargs == 0 ) // getter
 	{
@@ -300,7 +300,7 @@ stage_displaystate_getset(const fn_call& fn)
 // extern (used by Global.cpp)
 void stage_class_init(as_object& global)
 {
-	static boost::intrusive_ptr<as_object> obj = new Stage();
+	static boost::intrusive_ptr<as_object> obj = new Stage_as();
 	global.init_member("Stage", obj.get());
 }
 

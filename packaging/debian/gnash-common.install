@@ -1,7 +1,8 @@
 usr/lib/gnash/libgnashamf-*.so
 usr/lib/gnash/libgnashbase-*.so
+usr/lib/gnash/libgnashcore-*.so
 usr/lib/gnash/libgnashmedia-*.so
-usr/lib/gnash/libgnashserver-*.so
+usr/lib/gnash/libgnashnet-*.so
 
 usr/bin/gnash
 usr/share/man/man1/gnash.1

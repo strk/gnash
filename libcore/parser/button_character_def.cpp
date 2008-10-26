@@ -22,7 +22,7 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "button_character_def.h"
-#include "button_character_instance.h" // for create_character_instance()
+#include "Button.h" // for create_character_instance()
 
 #include "SWFStream.h" // for read()
 #include "movie_definition.h"
@@ -184,7 +184,7 @@ button_record::read(SWFStream& in, int tag_type,
 	in.ensureBytes(2);
 	m_button_layer = in.read_u16();
 
-    // matrix::read() checks the length of the stream
+    // SWFMatrix::read() checks the length of the stream
 	m_button_matrix.read(in);
 
 	if (tag_type == SWF::DEFINEBUTTON2)

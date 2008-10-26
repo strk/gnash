@@ -21,7 +21,7 @@
 #define INPUT_FILENAME "Video-EmbedSquareTest.swf"
 
 #include "MovieTester.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "character.h"
 #include "DisplayList.h"
 #include "log.h"
@@ -42,7 +42,7 @@ main(int /*argc*/, char** /*argv*/)
 	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 	dbglogfile.setVerbosity(1);
 
-	sprite_instance* root = tester.getRootMovie();
+	MovieClip* root = tester.getRootMovie();
 	assert(root);
 
 	if ( ! tester.canTestRendering() )
@@ -111,7 +111,7 @@ main(int /*argc*/, char** /*argv*/)
 			if ( framenum == framecount-1 )
 			{
 				// check we're playing, or we'll never get to next loop...
-				check_equals(root->get_play_state(), sprite_instance::PLAY);
+				check_equals(root->get_play_state(), MovieClip::PLAY);
 				break;
 			}
 

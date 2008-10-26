@@ -124,8 +124,11 @@ private:
 	bool isStreaming;
 
 	media::sound_handler* _soundHandler;
+
 	media::MediaHandler* _mediaHandler;
+
 	boost::scoped_ptr<media::MediaParser> _mediaParser;
+
 	boost::scoped_ptr<media::AudioDecoder> _audioDecoder;
 
 	/// Number of milliseconds into the sound to start it
@@ -146,6 +149,29 @@ private:
 
 	int remainingLoops;
 
+    /// Query media parser for audio info, create decoder and attach aux streamer
+    /// if found.
+    ///
+    /// @return  1: audio found, aux streamer attached
+    ///          0: no audio found
+    ///
+    /// May throw a MediaException if audio was found but
+    /// audio decoder could not be created
+    /// 
+    int attachAuxStreamerIfNeeded();
+
+    /// Register a timer for audio info probing
+    void startProbeTimer();
+
+    /// Unregister the probe timer
+    void stopProbeTimer();
+
+    /// Probe audio
+    void probeAudio();
+
+    static as_value probeAudioWrapper(const fn_call&);
+
+    int _probeTimer;
 };
 
 void sound_class_init(as_object& global);

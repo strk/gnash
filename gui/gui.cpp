@@ -21,7 +21,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "gui.h"
 #include "render.h"  // debug
 #include "render_handler.h"
@@ -366,7 +366,8 @@ Gui::updateStageMatrix()
 		}
 	}
 
-	//log_debug("updateStageMatrix: scaleMode:%d, valign:%d, halign:%d", scaleMode, valign, halign);
+	//log_debug("updateStageMatrix: scaleMode:%d, valign:%d, halign:%d",
+	//scaleMode, valign, halign);
 
 	// TODO: have a generic set_matrix ?
 	if ( _renderer ) {
@@ -375,7 +376,8 @@ Gui::updateStageMatrix()
 	}
 	else
 	{
-		//log_debug("updateStageMatrix: could not signal updated stage matrix to renderer (no renderer registered)");
+		//log_debug("updateStageMatrix: could not signal updated stage
+		//matrix to renderer (no renderer registered)");
 	}
 
 	// trigger redraw
@@ -810,7 +812,7 @@ Gui::display(movie_root* m)
 				corners[2].y = ymax;
 				corners[3].x = xmin;
 				corners[3].y = ymax;
-				matrix no_transform;
+				SWFMatrix no_transform;
 				gnash::render::draw_poly(corners, 4,
 					rgba(0,0,0,0), rgba(255,0,0,255), no_transform, false);
 					
@@ -928,7 +930,7 @@ Gui::advanceMovie()
 	m->advance();
 	m->get_movie_definition()->ensure_frame_loaded(tot_frames);
 	m->goto_frame(cur_frame+1);
-    	m->set_play_state(gnash::sprite_instance::PLAY);
+    	m->set_play_state(gnash::MovieClip::PLAY);
 	log_debug(_("Frame %d"), m->get_current_frame());
 #endif
 
@@ -977,7 +979,7 @@ Gui::advanceMovie()
 	if ( ! loops() )
 	{
 		size_t curframe = m->get_current_frame(); // can be 0 on malformed SWF
-		gnash::sprite_instance* si = m->getRootMovie();
+		gnash::MovieClip* si = m->getRootMovie();
 		if (curframe + 1 >= si->get_frame_count())
 		{
 			quit(); 
@@ -1219,7 +1221,6 @@ Gui::setStage(movie_root* stage)
     assert(stage);
     assert(!_stage);
     _stage = stage;
-    _stage->setGui(this);
 }
 
 bool

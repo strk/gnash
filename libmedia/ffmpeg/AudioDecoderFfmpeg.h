@@ -40,7 +40,7 @@ public:
 	/// 	AudioInfo class with all the info needed to decode
 	///     the sound correctly. Throws a MediaException on fatal
 	///     error.
-	AudioDecoderFfmpeg(AudioInfo& info);
+	AudioDecoderFfmpeg(const AudioInfo& info);
 
 	/// @param info
 	/// 	SoundInfo class with all the info needed to decode
@@ -55,7 +55,7 @@ public:
 
 private:
 
-	void setup(AudioInfo& info);
+	void setup(const AudioInfo& info);
 	void setup(SoundInfo& info);
 
 	boost::uint8_t* decodeFrame(boost::uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize);

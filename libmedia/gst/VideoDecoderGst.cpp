@@ -39,13 +39,27 @@ VideoDecoderGst::VideoDecoderGst(GstCaps* caps)
 }
 
 
-VideoDecoderGst::VideoDecoderGst(videoCodecType codec_type, int width, int height)
+VideoDecoderGst::VideoDecoderGst(videoCodecType codec_type, int width, int height,
+                                 const boost::uint8_t* extradata, size_t extradatasize)
 {
     // init GStreamer. TODO: what about doing this in MediaHandlerGst ctor?
     gst_init (NULL, NULL);
 
   GstCaps* caps;  
   switch (codec_type) {
+    case VIDEO_CODEC_H264:
+    {
+      caps = gst_caps_new_simple ("video/x-h264",
+                                      NULL);
+
+      if (extradata && extradatasize) {
+
+          GstBuffer* buf = gst_buffer_new_and_alloc(extradatasize);
+          memcpy(GST_BUFFER_DATA(buf), extradata, extradatasize);
+          gst_caps_set_simple (caps, "codec_data", GST_TYPE_BUFFER, buf, NULL);
+      }
+      break;
+    } 
     case VIDEO_CODEC_H263:
       caps = gst_caps_new_simple ("video/x-flash-video",
                                       NULL);

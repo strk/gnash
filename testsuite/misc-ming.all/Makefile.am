@@ -49,6 +49,7 @@ EXTRA_DIST = \
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/libmedia \
+	-I$(top_srcdir)/libsound \
 	-I$(top_srcdir)/backend \
 	-I$(top_srcdir)/libcore  \
 	-I$(top_srcdir)/libcore/parser  \
@@ -168,6 +169,7 @@ check_PROGRAMS = \
 	static_vs_dynamic2 \
 	getTimer_test \
 	Video-EmbedSquareTest \
+	LoadVarsTest \
 	Video-EmbedSquareTestRunner \
 	NetStream-SquareTest \
 	NetStream-SquareTestRunner \
@@ -177,6 +179,7 @@ check_PROGRAMS = \
 	runtime_vm_stack_test \
 	new_child_in_unload_test \
 	instanceNameTest \
+	BitmapDataTest \
 	$(NULL)
 
 if MING_VERSION_0_4_3
@@ -287,6 +290,7 @@ check_SCRIPTS = \
 	DepthLimitsTestrunner \
 	loop_test10runner \
 	shape_testrunner \
+	LoadVarsTestRunner \
 	DefineEditTextVariableNameTest-Runner \
 	DefineEditTextVariableNameTest2-Runner \
 	runtime_vm_stack_testrunner \
@@ -453,7 +457,8 @@ eventSoundTest1_SOURCES = eventSoundTest1.c
 eventSoundTest1_LDADD = libgnashmingutils.la
 
 eventSoundTest1.swf: eventSoundTest1
-	./eventSoundTest1 $(srcdir)/../media/sound1.mp3
+	./eventSoundTest1 $(srcdir)/../media/brokenchord.wav \
+	$(srcdir)/../media/
 
 eventSoundTest1_Runner_SOURCES = \
 	eventSoundTest1-Runner.cpp \
@@ -1427,8 +1432,21 @@ XMLSocketTest_LDADD = libgnashmingutils.la
 XMLSocketTest.swf: XMLSocketTest
 	./XMLSocketTest $(top_srcdir)/testsuite/media
 
+BitmapDataTest_SOURCES = \
+	BitmapDataTest.c \
+	$(NULL)
+
+BitmapDataTest_CFLAGS = \
+	-DMEDIADIR='"$(abs_mediadir)"' \
+	$(NULL)
+
+BitmapDataTest_LDADD = libgnashmingutils.la
+
+BitmapDataTest.swf: BitmapDataTest
+	./BitmapDataTest $(top_srcdir)/testsuite/media
+
 EmbeddedSoundTest_SOURCES = \
-	EmbeddedSoundTest.c
+	EmbeddedSoundTest.c \
 	$(NULL)
 
 EmbeddedSoundTest_CFLAGS = \
@@ -1816,6 +1834,20 @@ Video_EmbedSquareTestRunner_DEPENDENCIES = \
 	Video-EmbedSquareTest.swf	\
 	$(NULL)
 
+LoadVarsTest_SOURCES = \
+	LoadVarsTest.c \
+	$(NULL)
+
+LoadVarsTest_LDADD = libgnashmingutils.la
+
+LoadVarsTest.swf: LoadVarsTest
+	./LoadVarsTest $(top_srcdir)/testsuite/media
+
+LoadVarsTestRunner: $(srcdir)/../generic-testrunner.sh LoadVarsTest.swf
+	sh $< $(top_builddir) LoadVarsTest.swf > $@
+	chmod 755 $@
+
+
 instanceNameTest_SOURCES =	\
 	instanceNameTest.c	\
 	$(NULL)
@@ -1841,6 +1873,7 @@ clean-local:
 
 TEST_DRIVERS = ../simple.exp
 TEST_CASES = \
+	LoadVarsTestRunner \
 	DefineEditTextVariableNameTest-Runner \
 	DefineEditTextVariableNameTest2-Runner \
 	DefineTextTest-Runner \

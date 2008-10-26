@@ -105,7 +105,7 @@ fill_style::read(SWFStream& in, int tag_type, movie_definition& md,
         // 0x12: radial gradient fill
         // 0x13: focal gradient fill
 
-        matrix  input_matrix;
+        SWFMatrix  input_matrix;
         input_matrix.read(in);
 
         // shouldn't this be in initializer's list ?
@@ -121,7 +121,7 @@ fill_style::read(SWFStream& in, int tag_type, movie_definition& md,
             m_gradient_matrix.set_scale(1.0/512, 1.0/512);
         }
 
-        matrix m = input_matrix;
+        SWFMatrix m = input_matrix;
         m.invert();
 
         if (is_morph)
@@ -282,11 +282,11 @@ fill_style::read(SWFStream& in, int tag_type, movie_definition& md,
             }
         );
 
-        matrix  m;
+        SWFMatrix  m;
         m.read(in);
 
         // For some reason, it looks like they store the inverse of the
-        // TWIPS-to-texcoords matrix.
+        // TWIPS-to-texcoords SWFMatrix.
         m_bitmap_matrix = m.invert();
 
         if (is_morph)
@@ -296,7 +296,7 @@ fill_style::read(SWFStream& in, int tag_type, movie_definition& md,
             pOther->m_bitmap_matrix = m.invert();
         }
         IF_VERBOSE_PARSE(
-           log_parse("matrix: %s", m_bitmap_matrix);
+           log_parse("SWFMatrix: %s", m_bitmap_matrix);
         );
     }
     else
@@ -337,15 +337,15 @@ fill_style::get_bitmap_info() const
   }  
 }
 
-matrix
-fill_style::get_bitmap_matrix() const 
+SWFMatrix
+fill_style::getBitmapMatrix() const 
 {
   assert(m_type != SWF::FILL_SOLID);
   return m_bitmap_matrix;
 }
 
-matrix
-fill_style::get_gradient_matrix() const 
+SWFMatrix
+fill_style::getGradientMatrix() const 
 {
   // TODO: Why do we separate bitmap and gradient matrices? 
   return m_gradient_matrix;
@@ -519,7 +519,7 @@ fill_style::set_lerp(const fill_style& a, const fill_style& b, float t)
     // fill style color
     m_color.set_lerp(a.get_color(), b.get_color(), t);
 
-    // fill style gradient matrix
+    // fill style gradient SWFMatrix
     //
     // @@ TODO morphed gradients don't come out exactly
     // right; they shift around some.  Not sure where the
@@ -543,7 +543,7 @@ fill_style::set_lerp(const fill_style& a, const fill_style& b, float t)
     m_bitmap_character = a.m_bitmap_character;
     assert(m_bitmap_character == b.m_bitmap_character);
 
-    // fill style bitmap matrix
+    // fill style bitmap SWFMatrix
     m_bitmap_matrix.set_lerp(a.m_bitmap_matrix, b.m_bitmap_matrix, t);
 }
 
@@ -560,7 +560,7 @@ fill_style::get_color_stop(int index) const
   return m_gradients[index];
 }
 
-fill_style::fill_style(bitmap_character_def* bitmap, const matrix& mat)
+fill_style::fill_style(bitmap_character_def* bitmap, const SWFMatrix& mat)
     :
     m_type(SWF::FILL_CLIPPED_BITMAP),
     m_bitmap_character(bitmap),
@@ -576,7 +576,7 @@ fill_style::setSolid(const rgba& color)
 }
 
 void
-fill_style::setLinearGradient(const std::vector<gradient_record>& gradients, const matrix& mat)
+fill_style::setLinearGradient(const std::vector<gradient_record>& gradients, const SWFMatrix& mat)
 {
     m_type = SWF::FILL_LINEAR_GRADIENT;
     m_gradients = gradients;
@@ -585,7 +585,7 @@ fill_style::setLinearGradient(const std::vector<gradient_record>& gradients, con
 }
 
 void
-fill_style::setRadialGradient(const std::vector<gradient_record>& gradients, const matrix& mat)
+fill_style::setRadialGradient(const std::vector<gradient_record>& gradients, const SWFMatrix& mat)
 {
     m_type = SWF::FILL_RADIAL_GRADIENT;
     m_gradients = gradients;

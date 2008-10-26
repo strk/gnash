@@ -37,7 +37,7 @@ namespace gnash {
  *
  ************************************************************************/
 
-class DSOEXPORT key_as_object : public as_object
+class DSOEXPORT Key_as : public as_object
 {
 
 protected:
@@ -49,7 +49,7 @@ protected:
 
 public:
 
-    key_as_object();
+    Key_as();
 
     // Pass SWF keycode, returns true if currently pressed.
     bool is_key_down(int keycode);
