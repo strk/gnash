@@ -78,17 +78,21 @@ main(int argc, char** argv)
                  "odecB = LoadVars.prototype.decode;"
                  "loadString = '';"
                  "decodeString = '';"
-                 "dataString = '';");
+                 "dataString = '';"
+                 "callCount = 0;");
 
     add_actions(mo, "ourLoad = function(arg) {"
-                 "loadString += 'onLoad called with ' + typeof(arg)" 
-                 "+ ' argument ' + arg;"
+                 "loadString += callCount + ': onLoad called with ' + "
+                 "typeof(arg) + ' argument ' + arg;"
+                 "callCount++;"
                  "play();"
                  "};");
 
     add_actions(mo, "ourData = function(arg) {"
-                 "dataString += 'onData called with ' + typeof(arg) "
-                 "+ ' argument ' + arg;"
+                 "trace('onData called');"
+                 "dataString += callCount + ': onData called with ' + "
+                 "typeof(arg) + ' argument ' + arg;"
+                 "callCount++;"
                  "play();"
                  "};");
 
@@ -127,8 +131,8 @@ main(int argc, char** argv)
     SWFMovie_nextFrame(mo);
    
     // Check result, restore state.
-    xcheck_equals(mo, "dataString",
-                 "'onData called with undefined argument undefined'");
+    check_equals(mo, "dataString",
+                 "'0: onData called with undefined argument undefined'");
     check_equals(mo, "l.loaded", "false");
     add_actions(mo, "l.onData = odatB;");
 
@@ -145,8 +149,8 @@ main(int argc, char** argv)
 
     SWFMovie_nextFrame(mo);
           
-    xcheck_equals(mo, "loadString",
-                 "'onLoad called with boolean argument false'");
+    check_equals(mo, "loadString",
+                 "'1: onLoad called with boolean argument false'");
     check_equals(mo, "l.loaded", "false");
     add_actions(mo, "l.onLoad = olB;");
 
@@ -166,8 +170,8 @@ main(int argc, char** argv)
     SWFMovie_nextFrame(mo);
           
     check_equals(mo, "loadString", "''");
-    xcheck_equals(mo, "dataString",
-                 "'onData called with undefined argument undefined'");
+    check_equals(mo, "dataString",
+                 "'2: onData called with undefined argument undefined'");
     check_equals(mo, "l.loaded", "false");
     add_actions(mo, "l.onLoad = olB;"
                     "l.onData = odatB;");
@@ -191,7 +195,7 @@ main(int argc, char** argv)
     SWFMovie_nextFrame(mo);
     // check_equals is too braindead to do this without escaping.
     xcheck_equals(mo, "escape(dataString)",
-           "'onData%20called%20with%20string%20argument%20v2%5Fvar1%3D"
+           "'3%3A%20onData%20called%20with%20string%20argument%20v2%5Fvar1%3D"
         "val1%26v2%5Fvar2%3Dval2%26%0A'");
     check_equals(mo, "l.loaded", "false");
     add_actions(mo, "l.onData = odatB;");
@@ -211,8 +215,8 @@ main(int argc, char** argv)
     add_actions(mo, "stop();");
 
     SWFMovie_nextFrame(mo);
-    check_equals(mo, "loadString",
-                 "'onLoad called with boolean argument true'");
+    xcheck_equals(mo, "loadString",
+                 "'4: onLoad called with boolean argument true'");
     add_actions(mo, "l.onLoad = olB;");
 
     /// decode is called from onData (i.e. it's called when we overwrite
@@ -242,12 +246,13 @@ main(int argc, char** argv)
     SWFMovie_nextFrame(mo);
     // check_equals is too braindead to do this without escaping.
     xcheck_equals(mo, "escape(dataString)",
-           "'onData%20called%20with%20undefined%20argument%20undefined'");
+           "'5%3A%20onData%20called%20with%20undefined%20"
+           "argument%20undefined'");
     check_equals(mo, "l.loaded", "false");
     add_actions(mo, "l.onData = odatB;");
 
     // No more calls to decode.
-    check_equals(mo, "decodeCalled", "1");
+    xcheck_equals(mo, "decodeCalled", "1");
 
 
     /// End of tests.
