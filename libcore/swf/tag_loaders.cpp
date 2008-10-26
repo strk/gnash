@@ -1399,7 +1399,7 @@ sound_stream_head_loader(SWFStream& in, tag_type tag, movie_definition& m)
     }
 
     IF_VERBOSE_PARSE(
-        log_parse(_("sound SWFStream head: format=%d, rate=%d, 16=%d, stereo=%d, ct=%d, latency=%d"),
+        log_parse(_("sound stream head: format=%d, rate=%d, 16=%d, stereo=%d, ct=%d, latency=%d"),
           int(format), streamSoundRate, int(streamSound16bit), int(streamSoundStereo), sampleCount, latency);
     );
 
