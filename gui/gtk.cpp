@@ -2092,7 +2092,11 @@ GtkGui::button_press_event(GtkWidget *const /*widget*/,
                            GdkEventButton *const event,
                            const gpointer data)
 {
-    //GNASH_REPORT_FUNCTION;
+
+    /// Double- and triple-clicks should not send an extra event!
+    /// Flash has no built-in double click.
+    if (event->type != GDK_BUTTON_PRESS) return false;
+
     GtkGui *obj = static_cast<GtkGui *>(data);
 
     obj->grabFocus();
