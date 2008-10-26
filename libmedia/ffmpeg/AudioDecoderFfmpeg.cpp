@@ -84,8 +84,7 @@ void AudioDecoderFfmpeg::setup(SoundInfo& info)
 			// Init the parser
 			_parser = av_parser_init(codec_id);
 			if (!_parser) {	
-				throw MediaException(_("libavcodec can't parse "
-				                       "the current audio format"));
+				throw MediaException(_("AudioDecoderFfmpeg can't initialize MP3 parser"));
 			}
 			break;
 		default:
@@ -185,12 +184,12 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
 	{
 		if (info.type == FLASH) {
 			boost::format err = boost::format(
-				_("libavcodec could not find a decoder for codec %d (%s)")) %
+				_("AudioDecoderFfmpeg: libavcodec could not find a decoder for codec %d (%s)")) %
 				info.codec % static_cast<audioCodecType>(info.codec);
 			throw MediaException(err.str());
 		} else {
 			boost::format err = boost::format(
-				_("libavcodec could not find a decoder for ffmpeg codec id %s")) %
+				_("AudioDecoderFfmpeg: libavcodec could not find a decoder for ffmpeg codec id %s")) %
 				codec_id;
 			throw MediaException(err.str());
 		}
@@ -208,7 +207,7 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
 	// Create an audioCodecCtx from the ffmpeg parser if exists/possible
 	_audioCodecCtx = avcodec_alloc_context();
 	if (!_audioCodecCtx) {
-		throw MediaException(_("libavcodec couldn't allocate context"));
+		throw MediaException(_("AudioDecoderFfmpeg: libavcodec couldn't allocate context"));
 	}
 
 	if ( info.extra.get() )
@@ -230,10 +229,10 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
 		av_free(_audioCodecCtx);
 		_audioCodecCtx = 0;
 
-        boost::format err = boost::format(
-            _("AudioDecoderFfmpeg: avcodec_open failed to initialize "
-            "FFMPEG codec %s (%d)")) % _audioCodec->name % (int)codec_id;
-    	throw MediaException(err.str());
+		boost::format err = boost::format(
+			_("AudioDecoderFfmpeg: avcodec_open failed to initialize "
+			"FFMPEG codec %s (%d)")) % _audioCodec->name % (int)codec_id;
+		throw MediaException(err.str());
 	}
 
 	if (_audioCodecCtx->codec->id != CODEC_ID_MP3) {
@@ -463,7 +462,7 @@ AudioDecoderFfmpeg::decodeFrame(boost::uint8_t* input, boost::uint32_t inputSize
 			log_debug(" output samples: %d", outSamples);
 
 			/// Memory errors...
-			//abort();
+			abort();
 		}
 
 		// Use the actual number of samples returned, multiplied

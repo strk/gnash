@@ -108,8 +108,12 @@ private:
 
 		/// Equals audioCodecType
 		boost::uint8_t codec;
+
 		boost::uint16_t samplerate;
+
+		/// Size of each sample, in bytes
 		boost::uint8_t samplesize;
+
 		bool stereo;
 	private:
 		static const boost::uint16_t flv_audio_rates[];

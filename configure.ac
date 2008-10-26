@@ -2079,6 +2079,7 @@ AC_CONFIG_LINKS(testsuite/libbase/gnashrc-local:testsuite/libbase/gnashrc-local.
 AC_OUTPUT(Makefile
 po/Makefile
 libmedia/Makefile
+libsound/Makefile
 libbase/Makefile
 libcore/Makefile
 libcore/asobj/Makefile

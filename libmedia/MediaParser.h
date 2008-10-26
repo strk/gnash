@@ -137,7 +137,6 @@ std::ostream& operator<< (std::ostream& os, const audioCodecType& t);
 /// The AudioInfo class contains information about the audiostream
 /// in the file being parsed. The information stored is codec-id,
 /// samplerate, samplesize, stereo, duration and codec-type.
-/// timestamp,
 class AudioInfo
 {
 public:
@@ -151,11 +150,23 @@ public:
 		{
 		}
 
+	/// Codec identifier
+	//
+	/// This has to be interpreted as audioCodecType if codecType type is FLASH
+	/// or interpretation is opaque and we rely on the assumption that the AudioInfo
+	/// creator and the AudioInfo user have a way to get a shared interpretation
+	///
 	int codec;
+
 	boost::uint16_t sampleRate;
+
+	/// Size of each sample, in bytes
 	boost::uint16_t sampleSize;
+
 	bool stereo;
+
 	boost::uint64_t duration;
+
 	codecType type;
 
 	/// An abstract class to hold any additional info

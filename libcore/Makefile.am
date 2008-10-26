@@ -38,6 +38,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libcore/vm \
 	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/libmedia \
+	-I$(top_srcdir)/libsound \
 	-I$(top_srcdir)/libamf \
 	$(PTHREAD_CFLAGS) \
 	$(DMALLOC_CFLAGS) \
@@ -233,7 +234,8 @@ if WIN32
 	$(top_builddir)/libmedia/libgnashmedia_la-MediaHandler.lo \
 	$(top_builddir)/libmedia/libgnashmedia_la-FLVParser.lo
 else
-  libgnashcore_la_LIBADD += $(top_builddir)/libmedia/libgnashmedia.la
+  libgnashcore_la_LIBADD += $(top_builddir)/libmedia/libgnashmedia.la \
+  	$(top_builddir)/libsound/libgnashsound.la
 endif
 
 # Rebuild with GCC 4.x Mudflap support

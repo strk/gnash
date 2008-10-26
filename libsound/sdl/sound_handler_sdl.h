@@ -27,10 +27,6 @@
 
 #include "log.h"
 
-#ifdef USE_FFMPEG
-# include "ffmpegHeaders.h"
-#endif
-
 #include <vector>
 #include <map> // for composition
 
@@ -168,11 +164,10 @@ public:
 	~active_sound()
 	{
 		deleteDecodedData();
-		delete decoder;
 	}
 
 	/// The decoder object used to convert the data into the playable format
-	AudioDecoder* decoder;
+	std::auto_ptr<AudioDecoder> decoder;
 
 	/// Current decoding position in the encoded stream
 	unsigned long decodingPosition;

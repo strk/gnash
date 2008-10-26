@@ -31,6 +31,7 @@
 #include "dsodefs.h" // for DSOEXPORT
 #include "SoundInfo.h"
 #include "SimpleBuffer.h"
+#include "MediaHandler.h" // for inlined ctor
 
 #include <vector>
 #include <memory>
@@ -101,7 +102,7 @@ public:
 	/// 	samplecount, stereo and more. The SoundObject must be not-NULL!
 	///
 	/// @return the id given by the soundhandler for later identification.
-    ///
+	///
 	virtual int	create_sound(
 		std::auto_ptr<SimpleBuffer> data,
 		std::auto_ptr<SoundInfo> sinfo
@@ -335,8 +336,11 @@ protected:
 		_soundsStarted(0),
 		_soundsStopped(0),
 		_paused(false),
+		_mediaHandler(MediaHandler::get()),
 		_volume(100)
-	{}
+	{
+		assert(_mediaHandler); // for now, we rely on this being always available
+	}
 
 	/// Special test-member. Stores count of started sounds.
 	size_t _soundsStarted;
@@ -346,6 +350,9 @@ protected:
 
 	/// True if sound is paused
 	bool _paused;
+
+	/// The registered MediaHandler at construction time
+	MediaHandler* _mediaHandler;
 
 private:
 
