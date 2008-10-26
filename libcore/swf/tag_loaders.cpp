@@ -1229,9 +1229,9 @@ define_sound_loader(SWFStream& in, tag_type tag, movie_definition& m)
 
     IF_VERBOSE_PARSE
     (
-        log_parse(_("define sound: ch=%d, format=%d, "
+        log_parse(_("define sound: ch=%d, format=%s, "
             "rate=%d, 16=%d, stereo=%d, ct=%d"),
-              character_id, int(format), sample_rate,
+              character_id, format, sample_rate,
               int(sample_16bit), int(stereo), sample_count);
     );
 
@@ -1327,7 +1327,7 @@ sound_stream_head_loader(SWFStream& in, tag_type tag, movie_definition& m)
     if ( stSoundRate >= s_sample_rate_table_len )
     {
         IF_VERBOSE_MALFORMED_SWF(
-        log_swferror(_("SOUNDSTREAMHEAD: SWFStream sample rate %d (expected 0 to %u)"),
+        log_swferror(_("SOUNDSTREAMHEAD: stream sample rate %d (expected 0 to %u)"),
             stSoundRate, s_sample_rate_table_len);
         );
         stSoundRate=0;
@@ -1375,7 +1375,7 @@ sound_stream_head_loader(SWFStream& in, tag_type tag, movie_definition& m)
     // this seems common too, we'd need to reproduce with a custom
     // testcase to really tell if it's a problem or not...
     IF_VERBOSE_MALFORMED_SWF(
-        LOG_ONCE( log_swferror(_("No samples advertised for sound SWFStream, pretty common so will warn only once")) );
+        LOG_ONCE( log_swferror(_("No samples advertised for sound stream, pretty common so will warn only once")) );
     );
     }
 
@@ -1386,24 +1386,29 @@ sound_stream_head_loader(SWFStream& in, tag_type tag, movie_definition& m)
         {
             in.ensureBytes(2);
             latency = in.read_s16(); // UNUSED !!
-            LOG_ONCE ( if ( latency ) log_unimpl("MP3 SWFStream latency seek") );
+            LOG_ONCE ( if ( latency ) log_unimpl("MP3 stream latency seek") );
         }
         catch (ParserException& ex)
         {
             // See https://savannah.gnu.org/bugs/?21729 for an example 
             // triggering this.
             IF_VERBOSE_MALFORMED_SWF(
-                log_swferror("MP3 sound SWFStream lacks a 'latency' field");
+                log_swferror("MP3 sound stream lacks a 'latency' field");
             );
         }
     }
 
-    IF_VERBOSE_PARSE(
-        log_parse(_("sound stream head: format=%d, rate=%d, 16=%d, stereo=%d, ct=%d, latency=%d"),
-          int(format), streamSoundRate, int(streamSound16bit), int(streamSoundStereo), sampleCount, latency);
-    );
+    // Check if we did read everything in this tag...
+    unsigned long curPos=in.tell(), endTag=in.get_tag_end_position();
+    if ( curPos < endTag ) {
+        log_unimpl("SOUNDSTREAMHEAD contains %d unparsed bytes", endTag-curPos);
+    }
 
-    // Wot about reading the sample_count samples?
+
+    IF_VERBOSE_PARSE(
+        log_parse(_("sound stream head: format=%s, rate=%d, 16=%d, stereo=%d, ct=%d, latency=%d"),
+          format, streamSoundRate, int(streamSound16bit), int(streamSoundStereo), sampleCount, latency);
+    );
 
     // Store all the data in a SoundInfo object
     std::auto_ptr<media::SoundInfo> sinfo;
@@ -1443,7 +1448,7 @@ video_loader(SWFStream& in, tag_type tag, movie_definition& m)
     if (!chdef)
     {
         IF_VERBOSE_MALFORMED_SWF(
-        log_swferror(_("VideoFrame tag refers to unknown video SWFStream id %d"), character_id);
+        log_swferror(_("VideoFrame tag refers to unknown video stream id %d"), character_id);
         );
         return;
     }
