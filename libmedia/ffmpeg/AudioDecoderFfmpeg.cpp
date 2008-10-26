@@ -83,7 +83,6 @@ void AudioDecoderFfmpeg::setup(SoundInfo& info)
 			codec_id = CODEC_ID_MP3;
 			// Init the parser
 			_parser = av_parser_init(codec_id);
-
 			if (!_parser) {	
 				throw MediaException(_("libavcodec can't parse "
 				                       "the current audio format"));
@@ -199,6 +198,12 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
 
 	// Init the parser
 	_parser = av_parser_init(codec_id);
+	if (!_parser) {	
+		boost::format err = boost::format(
+			_("AudioDecoderFfmpeg: could not initialize a parser for ffmpeg codec id %s")) %
+				codec_id;
+		throw MediaException(err.str());
+	}
 
 	// Create an audioCodecCtx from the ffmpeg parser if exists/possible
 	_audioCodecCtx = avcodec_alloc_context();
