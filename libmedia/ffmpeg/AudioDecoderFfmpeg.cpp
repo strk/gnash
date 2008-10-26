@@ -198,7 +198,7 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
 	}
 
 	// Init the parser
-	_parser = av_parser_init(static_cast<CodecID>(info.codec));
+	_parser = av_parser_init(codec_id);
 
 	// Create an audioCodecCtx from the ffmpeg parser if exists/possible
 	_audioCodecCtx = avcodec_alloc_context();
