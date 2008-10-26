@@ -412,11 +412,11 @@ AudioDecoderFfmpeg::decodeFrame(boost::uint8_t* input, boost::uint32_t inputSize
 		// resampling configuration
 		double resampleFactor = (44100.0/_audioCodecCtx->sample_rate) * (2.0/_audioCodecCtx->channels);
 		bool stereo = _audioCodecCtx->channels > 1 ? true : false;
-		int samples = stereo ? outSize >> 2 : outSize >> 1;
+		int inSamples = stereo ? outSize >> 2 : outSize >> 1;
 
-        int expectedMaxOutSamples = std::ceil(samples*resampleFactor);
+		int expectedMaxOutSamples = std::ceil(inSamples*resampleFactor);
 
-        // *channels *sampleSize 
+		// *channels *sampleSize 
 		int resampledFrameSize = expectedMaxOutSamples*2*2;
 
 		// Allocate just the required amount of bytes
@@ -426,45 +426,45 @@ AudioDecoderFfmpeg::decodeFrame(boost::uint8_t* input, boost::uint32_t inputSize
 		log_debug("Calling the resampler; resampleFactor:%d; "
 			"ouput to 44100hz, 2channels, %dbytes; "
 			"input is %dhz, %dchannels, %dbytes, %dsamples",
-            resampleFactor,
+			resampleFactor,
 			resampledFrameSize, _audioCodecCtx->sample_rate,
-            _audioCodecCtx->channels, outSize, samples);
+			_audioCodecCtx->channels, outSize, inSamples);
 #endif
 
-		samples = _resampler.resample(outPtr, // input
+		int outSamples = _resampler.resample(outPtr, // input
 			reinterpret_cast<boost::int16_t*>(resampledOutput), // output
-			samples); // input..
+			inSamples); // input..
 
 #ifdef GNASH_DEBUG_AUDIO_DECODING
-		log_debug("resampler returned %d samples ", samples);
+		log_debug("resampler returned %d samples ", outSamples);
 #endif
 
 		// make sure to set outPtr *after* we use it as input to the resampler
         	outPtr = reinterpret_cast<boost::int16_t*>(resampledOutput);
 		delete [] output;
 
-		if (expectedMaxOutSamples < samples)
+		if (expectedMaxOutSamples < outSamples)
 		{
 			log_error(" --- Computation of resampled samples (%d) < then the actual returned samples (%d)",
-				expectedMaxOutSamples, samples);
+				expectedMaxOutSamples, outSamples);
 
 			log_debug(" input frame size: %d", outSize);
 			log_debug(" input sample rate: %d", _audioCodecCtx->sample_rate);
 			log_debug(" input channels: %d", _audioCodecCtx->channels);
-			log_debug(" input samples: %d", samples);
+			log_debug(" input samples: %d", inSamples);
 
 			log_debug(" output sample rate (assuming): %d", 44100);
 			log_debug(" output channels (assuming): %d", 2);
-			log_debug(" output samples: %d", samples);
+			log_debug(" output samples: %d", outSamples);
 
-            /// Memory errors...
-			abort();
+			/// Memory errors...
+			//abort();
 		}
 
-        // Use the actual number of samples returned, multiplied
-        // to get size in bytes (not two-byte samples) and for 
-        // stereo?
-		outSize = samples * 2 * 2;
+		// Use the actual number of samples returned, multiplied
+		// to get size in bytes (not two-byte samples) and for 
+		// stereo?
+		outSize = outSamples * 2 * 2;
 
 	}
 
