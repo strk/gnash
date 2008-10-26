@@ -114,6 +114,7 @@ enum NamedStrings {
 		PROP_CONSTRUCTOR,
 		PROP_CONTENT_TYPE,
 		PROP_D,
+        PROP_DECODE,
 		PROP_E,
 		PROP_ENABLED,
         PROP_G,
