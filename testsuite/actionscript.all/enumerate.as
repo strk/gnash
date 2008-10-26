@@ -100,7 +100,7 @@ rcsid="$Id: enumerate.as,v 1.10 2008/03/11 19:31:48 strk Exp $";
 
 enumerateObj = function(object) {
    list = ""; 
-    for (el in o) {
+    for (el in object) {
         list += el + ",";
     }
     return list;
