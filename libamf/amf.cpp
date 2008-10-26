@@ -46,13 +46,24 @@ using namespace gnash;
 namespace amf 
 {
 
+/// \define ENSUREBYTES
+///
+/// @param from The base address to check.
+///
+/// @param tooFar The ending address that is one byte too many.
+///
+/// @param size The number of bytes to check for: from to tooFar.
+///
+/// @remarks May throw an Exception
 #define ENSUREBYTES(from, toofar, size) { \
 	if ( from+size >= toofar ) \
 		throw ParserException("Premature end of AMF stream"); \
 }
 
 
-// These are used to print more intelligent debug messages
+/// \brief String representations of AMF0 data types.
+///
+///	These are used to print more intelligent debug messages.
 const char *amftype_str[] = {
     "Number",
     "Boolean",
@@ -74,46 +85,30 @@ const char *amftype_str[] = {
     "AMF3 Data"
 };
 
+/// \brief Create a new AMF class.
+///	As most of the methods in the AMF class a static, this
+///	is primarily only used when encoding complex objects
+///	where the byte count is accumulated.
 AMF::AMF() 
     : _totalsize(0)
 {
 //    GNASH_REPORT_FUNCTION;
 }
 
-// AMF::AMF(int size) 
-//     : _type(NONE),
-// #if 0
-//       _amf_index(0),
-//       _header_size(0),
-//       _total_size(0),
-//       _packet_size(0),
-//       _amf_data(0),
-// #endif
-//       _mystery_word(0)
-// {
-// //    GNASH_REPORT_FUNCTION;
-// #if 0
-//     if (!_amf_data) {
-//         _amf_data = new uint8_t(size+1);
-//         memset(_amf_data, 0, size+1);
-//     }
-//     _seekptr = _amf_data;
-// #endif
-// }
-
+/// Delete the alloczted AMF class
 AMF::~AMF()
 {
 //    GNASH_REPORT_FUNCTION;
 }
 
-
-/// \brief Swap bytes from big to little endian.
+/// \brief Swap bytes in raw data.
+///	This only swaps bytes if the host byte order is little endian.
 ///
-/// All Numeric values for AMF files are big endian, so we have
-/// to swap the bytes to be little endian for most machines. Don't do
-/// anything if we happen to be on a big-endian machine.
+/// @param word The address of the data to byte swap.
 ///
-/// Returns its first parameter, pointing to the (maybe-byte-swapped) data.
+/// @param size The number of bytes in the data.
+///
+/// @return A pointer to the raw data.
 void *
 swapBytes(void *word, size_t size)
 {
@@ -136,31 +131,9 @@ swapBytes(void *word, size_t size)
     // A conveniently-typed pointer to the source data
     Network::byte_t *x = static_cast<Network::byte_t *>(word);
 
-    switch (size) {
-    case 2: // 16-bit integer
-      {
-	Network::byte_t c;
-	c=x[0]; x[0]=x[1]; x[1]=c;
-	break;
-      }
-    case 4: // 32-bit integer
-      {
-	Network::byte_t c;
-	c=x[0]; x[0]=x[3]; x[3]=c;
-	c=x[1]; x[1]=x[2]; x[2]=c;
-	break;
-      }
-    case 8: // 64-bit integer
-      {
-	Network::byte_t c;
-	c=x[0]; x[0]=x[7]; x[7]=c;
-	c=x[1]; x[1]=x[6]; x[6]=c;
-	c=x[2]; x[2]=x[5]; x[5]=c;
-	c=x[3]; x[3]=x[4]; x[4]=c;
-	break;
-      }
-    }
-
+    /// Handle odd as well as even counts of bytes
+    std::reverse(x, x+size);
+    
     return word;
 }
 
@@ -168,11 +141,11 @@ swapBytes(void *word, size_t size)
 // Methods for encoding data into big endian formatted raw AMF data.
 //
 
-/// Encode a 64 bit number
+/// \brief Encode a 64 bit number to it's serialized representation.
 ///
-/// @return a binary AMF packet in big endian format (header,data) which
-/// needs to be deleted[] after being used.
+/// @param num A double value to serialize.
 ///
+/// @return a binary AMF packet in big endian format
 boost::shared_ptr<Buffer>
 AMF::encodeNumber(double indata)
 {
@@ -189,11 +162,11 @@ AMF::encodeNumber(double indata)
     return buf;
 }
 
-/// Encode a Boolean object
+/// \brief Encode a Boolean object to it's serialized representation.
 ///
-/// @return a binary AMF packet in big endian format (header,data) which
-/// needs to be deleted[] after being used.
+/// @param flag The boolean value to serialize.
 ///
+/// @return a binary AMF packet in big endian format
 boost::shared_ptr<Buffer>
 AMF::encodeBoolean(bool flag)
 {
@@ -206,11 +179,9 @@ AMF::encodeBoolean(bool flag)
     return buf;
 }
 
-/// Encode the end of an object
+/// \brief Encode the end of an object to it's serialized representation.
 ///
-/// @return a binary AMF packet in big endian format (header,data) which
-/// needs to be deleted[] after being used.
-///
+/// @return a binary AMF packet in big endian format
 boost::shared_ptr<Buffer>
 AMF::encodeObjectEnd()
 {
@@ -221,11 +192,9 @@ AMF::encodeObjectEnd()
     return buf;
 }
 
-/// Encode an "Undefined" object
+/// \brief Encode an "Undefined" object to it's serialized representation.
 ///
-/// @return a binary AMF packet in big endian format (header,data) which
-/// needs to be deleted[] after being used.
-///
+/// @return a binary AMF packet in big endian format
 boost::shared_ptr<Buffer>
 AMF::encodeUndefined()
 {
@@ -236,11 +205,9 @@ AMF::encodeUndefined()
     return buf;
 }
 
-/// Encode an "Undefined" object
+/// \brief Encode a "Unsupported" object to it's serialized representation.
 ///
-/// @return a binary AMF packet in big endian format (header,data) which
-/// needs to be deleted[] after being used.
-///
+/// @return a binary AMF packet in big endian format
 boost::shared_ptr<Buffer>
 AMF::encodeUnsupported()
 {
@@ -251,11 +218,11 @@ AMF::encodeUnsupported()
     return buf;
 }
 
-/// Encode a Date
+/// \brief Encode a Date to it's serialized representation.
 ///
-/// @return a binary AMF packet in big endian format (header,data) which
-/// needs to be deleted[] after being used.
-///
+/// @param data A pointer to the raw bytes that becomes the data.
+/// 
+/// @return a binary AMF packet in big endian format
 boost::shared_ptr<Buffer>
 AMF::encodeDate(Network::byte_t *data)
 {
@@ -268,11 +235,11 @@ AMF::encodeDate(Network::byte_t *data)
     
     return buf;
 }
-/// Encode a "NULL" object
+
+/// \brief Encode a NULL object to it's serialized representation.
+///		A NULL object is often used as a placeholder in RTMP.
 ///
-/// @return a binary AMF packet in big endian format (header,data) which
-/// needs to be deleted[] after being used.
-///
+/// @return a binary AMF packet in big endian format
 boost::shared_ptr<Buffer>
 AMF::encodeNull()
 {
@@ -284,11 +251,13 @@ AMF::encodeNull()
     return buf;
 }
 
-/// Encode an XML object
+/// \brief Encode an XML object to it's serialized representation.
 ///
-/// @return a binary AMF packet in big endian format (header,data) which
-/// needs to be deleted[] after being used.
+/// @param data A pointer to the raw bytes that becomes the XML data.
+/// 
+/// @param nbytes The number of bytes to serialize.
 ///
+/// @return a binary AMF packet in big endian format
 boost::shared_ptr<Buffer>
 AMF::encodeXMLObject(Network::byte_t * /*data */, size_t /* size */)
 {
@@ -299,11 +268,13 @@ AMF::encodeXMLObject(Network::byte_t * /*data */, size_t /* size */)
     return buf;
 }
 
-/// Encode a Typed Object
+/// \brief Encode a Typed Object to it's serialized representation.
 ///
-/// @return a binary AMF packet in big endian format (header,data) which
-/// needs to be deleted[] after being used.
+/// @param data A pointer to the raw bytes that becomes the data.
+/// 
+/// @param size The number of bytes to serialize.
 ///
+/// @return a binary AMF packet in big endian format
 boost::shared_ptr<Buffer>
 AMF::encodeTypedObject(Network::byte_t * /* data */, size_t /* size */)
 {
@@ -314,11 +285,13 @@ AMF::encodeTypedObject(Network::byte_t * /* data */, size_t /* size */)
     return buf;
 }
 
-/// Encode a Reference to an object
+/// \brief Encode a Reference to an object to it's serialized representation.
 ///
-/// @return a binary AMF packet in big endian format (header,data) which
-/// needs to be deleted[] after being used.
+/// @param data A pointer to the raw bytes that becomes the data.
+/// 
+/// @param size The number of bytes to serialize.
 ///
+/// @return a binary AMF packet in big endian format (header,data)
 boost::shared_ptr<Buffer>
 AMF::encodeReference(Network::byte_t * /* data */, size_t /* size */)
 {
@@ -329,11 +302,13 @@ AMF::encodeReference(Network::byte_t * /* data */, size_t /* size */)
     return buf;
 }
 
-/// Encode a Movie Clip
+/// \brief Encode a Movie Clip (swf data) to it's serialized representation.
 ///
-/// @return a binary AMF packet in big endian format (header,data) which
-/// needs to be deleted[] after being used.
+/// @param data A pointer to the raw bytes that becomes the data.
+/// 
+/// @param size The number of bytes to serialize.
 ///
+/// @return a binary AMF packet in big endian format (header,data)
 boost::shared_ptr<Buffer>
 AMF::encodeMovieClip(Network::byte_t * /*data */, size_t /* size */)
 {
@@ -344,11 +319,15 @@ AMF::encodeMovieClip(Network::byte_t * /*data */, size_t /* size */)
     return buf;
 }
 
-/// Encode an ECMA Array
+/// \brief Encode an ECMA Array to it's serialized representation.
+///		An ECMA Array, also called a Mixed Array, contains any
+///		AMF data type as an item in the array.
 ///
-/// @return a binary AMF packet in big endian format (header,data) which
-/// needs to be deleted[] after being used.
+/// @param data A pointer to the raw bytes that becomes the data.
+/// 
+/// @param size The number of bytes to serialize.
 ///
+/// @return a binary AMF packet in big endian format
 boost::shared_ptr<Buffer>
 AMF::encodeECMAArray(Network::byte_t * /*data */, size_t /* size */)
 {
@@ -359,11 +338,13 @@ AMF::encodeECMAArray(Network::byte_t * /*data */, size_t /* size */)
     return buf;
 }
 
-/// Encode a long string
+/// \brief Encode a Long String to it's serialized representation.
 ///
-/// @return a binary AMF packet in big endian format (header,data) which
-/// needs to be deleted[] after being used.
+/// @param data A pointer to the raw bytes that becomes the data.
+/// 
+/// @param size The number of bytes to serialize.
 ///
+/// @return a binary AMF packet in big endian format
 boost::shared_ptr<Buffer>
 AMF::encodeLongString(Network::byte_t * /* data */, size_t /* size */)
 {
@@ -374,11 +355,13 @@ AMF::encodeLongString(Network::byte_t * /* data */, size_t /* size */)
     return buf;
 }
 
-/// Encode a Record Set
+/// \brief Encode a Record Set to it's serialized representation.
 ///
-/// @return a binary AMF packet in big endian format (header,data) which
-/// needs to be deleted[] after being used.
+/// @param data A pointer to the raw bytes that becomes the data.
+/// 
+/// @param size The number of bytes to serialize.
 ///
+/// @return a binary AMF packet in big endian format
 boost::shared_ptr<Buffer>
 AMF::encodeRecordSet(Network::byte_t * /* data */, size_t /* size */)
 {
@@ -389,11 +372,15 @@ AMF::encodeRecordSet(Network::byte_t * /* data */, size_t /* size */)
     return buf;
 }
 
-/// Encode a Strict Array
+/// \brief Encode a Strict Array to it's serialized representation.
+///	A Strict Array is one where all the items are the same
+///	data type, commonly either a number or a string.
 ///
-/// @return a binary AMF packet in big endian format (header,data) which
-/// needs to be deleted[] after being used.
+/// @param data A pointer to the raw bytes that becomes the data.
+/// 
+/// @param size The number of bytes to serialize.
 ///
+/// @return a binary AMF packet in big endian format (header,data)
 boost::shared_ptr<Buffer>
 AMF::encodeStrictArray(Network::byte_t * /* data */, size_t /* size */)
 {
@@ -404,11 +391,11 @@ AMF::encodeStrictArray(Network::byte_t * /* data */, size_t /* size */)
     return buf;
 }
 
-/// Encode a string object
+/// \brief Encode a string to it's serialized representation.
+/// 
+/// @param str a string value
 ///
-/// @return a binary AMF packet in big endian format (header,data) which
-/// needs to be deleted[] after being used.
-///
+/// @return a binary AMF packet in big endian format
 boost::shared_ptr<Buffer>
 AMF::encodeString(const string &str)
 {
@@ -416,6 +403,13 @@ AMF::encodeString(const string &str)
     return encodeString(ptr, str.size());
 }
 
+/// \brief Encode a string to it's serialized representation.
+/// 
+/// @param data The data to serialize into big endian format
+/// 
+/// @param size The size of the data in bytes
+///
+/// @return a binary AMF packet in big endian format
 boost::shared_ptr<Buffer>
 AMF::encodeString(Network::byte_t *data, size_t size)
 {
@@ -437,11 +431,10 @@ AMF::encodeString(Network::byte_t *data, size_t size)
     return buf;
 }
 
-/// Encode a NULL string object, which is a string with no data.
+/// \brief Encode a String object to it's serialized representation.
+///	A NULL String is a string with no associated data.
 ///
-/// @return a binary AMF packet in big endian format (header,data) which
-/// needs to be deleted[] after being used.
-///
+/// @return a binary AMF packet in big endian format
 boost::shared_ptr<Buffer>
 AMF::encodeNullString()
 {
@@ -477,6 +470,12 @@ AMF::encodeNullString()
 /// normal ASCII. It may be that these need to be converted to wide
 /// characters, but for now we just leave them as standard multibyte
 /// characters.
+
+/// \brief Encode an Element to it's serialized representation.
+///
+/// @param el A smart pointer to the Element to encode.
+///
+/// @return a binary AMF packet in big endian format
 boost::shared_ptr<Buffer>
 AMF::encodeElement(boost::shared_ptr<amf::Element> el)
 {
@@ -599,6 +598,11 @@ AMF::encodeElement(boost::shared_ptr<amf::Element> el)
     return buf;
 }
 
+/// Encode a variable to it's serialized representation.
+///
+/// @param el A smart pointer to the Element to encode.
+///
+/// @return a binary AMF packet in big endian format
 boost::shared_ptr<Buffer>
 AMF::encodeProperty(boost::shared_ptr<amf::Element> el)
 {
@@ -650,6 +654,13 @@ AMF::encodeProperty(boost::shared_ptr<amf::Element> el)
     return buf;
 }
 
+/// \brief Extract an AMF object from an array of raw bytes.
+///
+/// @param buf A smart pointer to a Buffer to parse the data from.
+///
+/// @return A smart ptr to an Element.
+///
+/// @remarks May throw a ParserException
 boost::shared_ptr<amf::Element> 
 AMF::extractAMF(boost::shared_ptr<Buffer> buf)
 {
@@ -660,6 +671,17 @@ AMF::extractAMF(boost::shared_ptr<Buffer> buf)
     return extractAMF(start, tooFar);
 }
 
+/// \brief Extract an AMF object from an array of raw bytes.
+///	An AMF object is one of the support data types.
+///
+/// @param in A real pointer to the raw data to start parsing from.
+///
+/// @param tooFar A pointer to one-byte-past the last valid memory
+///	address within the buffer.
+///
+/// @return A smart ptr to an Element.
+///
+/// @remarks May throw a ParserException
 boost::shared_ptr<amf::Element> 
 AMF::extractAMF(Network::byte_t *in, Network::byte_t* tooFar)
 {
@@ -823,6 +845,16 @@ AMF::extractAMF(Network::byte_t *in, Network::byte_t* tooFar)
     return el;
 }
 
+/// \brief Extract a Property.
+///	A Property is a standard AMF object preceeded by a
+///	length and an ASCII name field. These are only used
+///	with higher level ActionScript objects.
+///
+/// @param buf A smart pointer to an Buffer to parse the data from.
+///
+/// @return A smart ptr to an Element.
+///
+/// @remarks May throw a ParserException
 boost::shared_ptr<amf::Element> 
 AMF::extractProperty(boost::shared_ptr<Buffer> buf)
 {
@@ -833,6 +865,19 @@ AMF::extractProperty(boost::shared_ptr<Buffer> buf)
     return extractProperty(start, tooFar);
 }
 
+/// \brief Extract a Property.
+///	A Property is a standard AMF object preceeded by a
+///	length and an ASCII name field. These are only used
+///	with higher level ActionScript objects.
+///
+/// @param in A real pointer to the raw data to start parsing from.
+///
+/// @param tooFar A pointer to one-byte-past the last valid memory
+///	address within the buffer.
+///
+/// @return A smart ptr to an Element.
+///
+/// @remarks May throw a ParserException
 boost::shared_ptr<amf::Element> 
 AMF::extractProperty(Network::byte_t *in, Network::byte_t* tooFar)
 {

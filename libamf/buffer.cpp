@@ -28,12 +28,17 @@
 using namespace std;
 using namespace gnash;
 
+/// \namespace amf
+///
+/// This namespace is for all the AMF specific classes in libamf.
 namespace amf
 {
 
-// convert an ascii hex digit to a number.
-//      param is hex digit.
-//      returns a decimal digit.
+/// \brief Convert a Hex digit into it's decimal value.
+///
+/// @param digit The digit as a hex value
+///
+/// @return The byte as a decimal value.
 Network::byte_t
 Buffer::hex2digit (Network::byte_t digit)
 {  
@@ -51,7 +56,13 @@ Buffer::hex2digit (Network::byte_t digit)
     return -1;
 }
 
-// Convert the hex array pointed to by buf into binary to be placed in mem
+/// \brief Encode a Buffer from a hex string.
+///
+/// @param str A hex string, ex... "00 03 05 0a"
+///
+/// @return A reference to a Buffer in host endian format. This is
+///		primary used only for testing to create binary data
+///		from an easy to read and edit format.
 Buffer &
 Buffer::hex2mem(const string &str)
 {
@@ -81,7 +92,13 @@ Buffer::hex2mem(const string &str)
     return *this;
 }
 
-// Initialize a Buffer's storage to the specified size
+/// \brief Initialize a block of memory for this buffer.
+///		This should only be used internally by the Buffer
+///		class.
+///
+/// @param nbytes The total size to allocate memory for.
+///
+/// @return A reference to the initialized Buffer.
 Buffer &
 Buffer::init(size_t size)
 {
@@ -101,6 +118,7 @@ Buffer::init(size_t size)
     return *this;
 }
 
+/// \brief Create a new Buffer with the default size
 Buffer::Buffer() 
     : _seekptr(0)
 {
@@ -109,7 +127,7 @@ Buffer::Buffer()
     init(gnash::NETBUFSIZE);
 }
     
-// Create with a size other than the default
+/// \brief Create a new Buffer with a size other than the default
 Buffer::Buffer(size_t nbytes)
     : _seekptr(0)
 {
@@ -118,14 +136,17 @@ Buffer::Buffer(size_t nbytes)
     init(nbytes);
 }
 
-// Create with a hex string
+/// \brief Create a new Buffer with a hex string.
+///		This is primary used only for testing to create binary
+///		data from an easy to read and edit format.
+/// @param str A hex string, ex... "00 03 05 0a"
 Buffer::Buffer(const std::string &str)
 {
 //    GNASH_REPORT_FUNCTION;
     hex2mem(str);
 }
 
-// Delete the allocate memory
+/// Delete the memory allocated for this Buffer
 Buffer::~Buffer()
 {
 //    GNASH_REPORT_FUNCTION;
@@ -142,7 +163,15 @@ Buffer::~Buffer()
     }
 }
 
-// Put data into the buffer
+/// \brief Copy data into the buffer.
+///		This overwrites all data, and resets the seek ptr.
+///
+/// @param data A pointer to the raw bytes to copy into the
+///		buffer.
+/// 
+/// @param nbytes The number of bytes to copy.
+///		
+/// @return A reference to a Buffer.
 Buffer &
 Buffer::copy(Network::byte_t *data, size_t nbytes)
 {    
@@ -156,7 +185,14 @@ Buffer::copy(Network::byte_t *data, size_t nbytes)
     return *this;
 }
 
-
+/// \brief Append data to existing data in the buffer.
+///
+/// @param data A pointer to the raw bytes to append to the
+///		buffer.
+/// 
+/// @param nbytes The number of bytes to append.
+///		
+/// @return A reference to a Buffer.
 Buffer &
 Buffer::append(gnash::Network::byte_t *data, size_t nbytes)
 {
@@ -173,10 +209,11 @@ Buffer::append(gnash::Network::byte_t *data, size_t nbytes)
     return *this;
 }
 
-// make ourselves be able to appended too. If the source
-// buffer is larger than the current buffer has room for,
-// resize ourselves (which copies the data too) to make
-// enough room.
+/// \brief Append a Buffer class to existing data in the buffer.
+///
+/// @param buf A Buffer class containing the data to append.
+/// 
+/// @return A reference to a Buffer.
 Buffer &
 Buffer::operator+=(Buffer &buf)
 {
@@ -185,6 +222,12 @@ Buffer::operator+=(Buffer &buf)
     return *this;
 }
 
+/// \brief Copy a AMF0 type into the buffer.
+///		This overwrites all data, and resets the seek ptr.
+///
+/// @param type An AMF0 type. 
+/// 
+/// @return A reference to a Buffer.
 Buffer &
 Buffer::operator+=(amf::Element::amf0_type_e type)
 {
@@ -194,6 +237,11 @@ Buffer::operator+=(amf::Element::amf0_type_e type)
     return operator+=(type);
 }
 
+/// \brief Append a byte to existing data in the buffer.
+///
+/// @param byte A single byte.
+/// 
+/// @return A reference to a Buffer.
 Buffer &
 Buffer::operator+=(char byte)
 {
@@ -202,6 +250,11 @@ Buffer::operator+=(char byte)
     return operator+=(nb);
 }
 
+/// \brief Append a boolean to existing data in the buffer.
+///
+/// @param type A boolean. 
+/// 
+/// @return A reference to a Buffer.
 Buffer &
 Buffer::operator+=(bool flag)
 {
@@ -210,6 +263,11 @@ Buffer::operator+=(bool flag)
     return operator+=(nb);
 }
 
+/// \brief Append a byte to existing data in the buffer.
+///
+/// @param byte A single byte.
+/// 
+/// @return A reference to a Buffer.
 Buffer &
 Buffer::operator+=(Network::byte_t byte)
 {
@@ -221,6 +279,12 @@ Buffer::operator+=(Network::byte_t byte)
     return *this;
 }
 
+/// \brief Append a string to existing data in the buffer.
+///
+/// @param str A string containing ASCII data to copy into the
+///		buffer.
+/// 
+/// @return A reference to a Buffer.
 Buffer &
 Buffer::operator+=(const char *str)
 {
@@ -230,6 +294,12 @@ Buffer::operator+=(const char *str)
     
 }
 
+/// \brief Append a string to existing data in the buffer.
+///
+/// @param str A string containing ASCII data to copy into the
+///		buffer.
+/// 
+/// @return A reference to a Buffer.
 Buffer &
 Buffer::operator+=(const std::string &str)
 {
@@ -239,6 +309,11 @@ Buffer::operator+=(const std::string &str)
     
 }
 
+/// \brief Append a double to existing data in the buffer.
+///
+/// @param num A numeric double value.
+/// 
+/// @return A reference to a Buffer.
 Buffer &
 Buffer::operator+=(double num)
 {
@@ -247,6 +322,11 @@ Buffer::operator+=(double num)
     return append(ptr, AMF0_NUMBER_SIZE);
 }
 
+/// \brief Append a short to existing data in the buffer.
+/// 
+/// @param num A numeric short value.
+/// 
+/// @return A reference to a Buffer.
 Buffer &
 Buffer::operator+=(boost::uint16_t length)
 {
@@ -255,6 +335,11 @@ Buffer::operator+=(boost::uint16_t length)
     return append(ptr, sizeof(boost::uint16_t));
 }
 
+/// \brief Append a Buffer class to existing data in the buffer.
+///
+/// @param buf A Buffer class containing the data to append.
+/// 
+/// @return A reference to a Buffer.
 Buffer &
 Buffer::operator+=(boost::shared_ptr<Buffer> &buf)
 {
@@ -263,6 +348,11 @@ Buffer::operator+=(boost::shared_ptr<Buffer> &buf)
     return *this;
 }
 
+/// \brief Append a Buffer class to existing data in the buffer.
+///
+/// @param buf A Buffer class containing the data to append.
+/// 
+/// @return A reference to a Buffer.
 Buffer &
 Buffer::operator=(Buffer &buf)
 {
@@ -275,6 +365,13 @@ Buffer::operator=(Buffer &buf)
     return *this;
 }
 
+/// \brief Copy a string into the buffer.
+///		This overwrites all data, and resets the seek ptr.
+///
+/// @param str A string containing ASCII data to copy into the
+///		buffer.
+/// 
+/// @return A reference to a Buffer.
 Buffer &
 Buffer::operator=(const std::string &str)
 {
@@ -291,6 +388,12 @@ Buffer::operator=(const char *str)
     return copy(ptr, strlen(str));
 }
 
+/// \brief Copy a double into the buffer.
+///		This overwrites all data, and resets the seek ptr.
+///
+/// @param num A numeric double value.
+/// 
+/// @return A reference to a Buffer.
 Buffer &
 Buffer::operator=(double num)
 {
@@ -299,6 +402,12 @@ Buffer::operator=(double num)
     return copy(ptr, AMF0_NUMBER_SIZE);
 }
 
+/// \brief Copy a short into the buffer.
+///		This overwrites all data, and resets the seek ptr.
+///
+/// @param num A numeric short value.
+/// 
+/// @return A reference to a Buffer.
 Buffer &
 Buffer::operator=(boost::uint16_t length)
 {
@@ -307,6 +416,12 @@ Buffer::operator=(boost::uint16_t length)
     return copy(ptr, sizeof(boost::uint16_t));
 }
 
+/// \brief Copy a AMF0 type into the buffer.
+///		This overwrites all data, and resets the seek ptr.
+///
+/// @param type An AMF0 type. 
+/// 
+/// @return A reference to a Buffer.
 Buffer &
 Buffer::operator=(amf::Element::amf0_type_e type)
 {
@@ -314,6 +429,12 @@ Buffer::operator=(amf::Element::amf0_type_e type)
     return operator+=(nb);
 }
 
+/// Copy a boolean into the buffer. This overwrites all data, and
+///		resets the seek ptr.
+///
+/// @param flag A boolean. 
+/// 
+/// @return A reference to a Buffer.
 Buffer &
 Buffer::operator=(bool flag)
 {
@@ -321,6 +442,12 @@ Buffer::operator=(bool flag)
     return operator=(nb);
 }
 
+/// \brief Copy a byte into the buffer.
+///		This overwrites all data, and resets the seek ptr.
+///
+/// @param byte A single byte.
+/// 
+/// @return A reference to a Buffer.
 Buffer &
 Buffer::operator=(gnash::Network::byte_t byte)
 {
@@ -328,6 +455,12 @@ Buffer::operator=(gnash::Network::byte_t byte)
     return copy(&byte, 1);
 }
 
+/// \brief Copy a byte into the buffer.
+///		This overwrites all data, and resets the seek ptr.
+///
+/// @param byte A pointer to a single byte.
+/// 
+/// @return A reference to a Buffer.
 Buffer &
 Buffer::operator=(gnash::Network::byte_t *data)
 {
@@ -340,6 +473,12 @@ Buffer::operator=(gnash::Network::byte_t *data)
     return *this;
 }
 
+/// \brief Copy a Buffer class into the buffer.
+///		This overwrites all data, and resets the seek ptr.
+///
+/// @param buf A Buffer class containing the data to copy.
+/// 
+/// @return A reference to a Buffer.
 Buffer &
 Buffer::operator=(boost::shared_ptr<Buffer> &buf)
 {
@@ -348,20 +487,14 @@ Buffer::operator=(boost::shared_ptr<Buffer> &buf)
     return *this;
 }
 
-// Check to see if two Buffer objects are identical
-// bool
-// Buffer::operator==(Buffer *buf)
-// { 
-// //    GNASH_REPORT_FUNCTION;
-//     Network::byte_t *bufptr = buf->reference();
-//     if (buf->size() == _nbytes) {
-//         if (memcmp(bufptr, _data.get(), _nbytes) == 0)  {
-//             return true;
-//         }
-//     }
-//     return false;
-// }
-
+/// \brief Test equivalance against another Buffer.
+///		This compares all the data on the current Buffer with
+///		the supplied one, so it can be a performance hit. This
+///		is primarily only used for testing purposes.
+///
+/// @param buf A reference to a Buffer.
+///
+/// @return A boolean true if the Buffers are indentical.
 bool
 Buffer::operator==(Buffer &buf)
 {
@@ -374,6 +507,13 @@ Buffer::operator==(Buffer &buf)
      return false;
 }
 
+/// \brief Find a byte in the buffer
+///
+/// @param byte The bytes to find in the buffer.
+///
+/// @param size The size of the bytes being searched for.
+///
+/// @return A real pointer to the address of the byte in the buffer.
 Network::byte_t *
 Buffer::find(Network::byte_t *b, size_t size)
 {
@@ -386,6 +526,11 @@ Buffer::find(Network::byte_t *b, size_t size)
     return 0;
 }
 
+/// \brief Find a byte in the buffer
+///
+/// @param byte The byte to find in the buffer.
+///
+/// @return A pointer to the address of the byte in the buffer.
 Network::byte_t *
 Buffer::find(Network::byte_t c)
 {
@@ -398,6 +543,14 @@ Buffer::find(Network::byte_t c)
     return 0;
 }
 
+/// \brief Drop a byte without resizing.
+///		This will remove the byte from the Buffer, and then
+///		move the remaining data to be in the correct
+///		location. This resets the seek pointer.
+///
+/// @param byte The byte to remove from the buffer.
+///
+/// @return A real pointer to the base address of the buffer.
 Network::byte_t *
 Buffer::remove(Network::byte_t c)
 {
@@ -417,6 +570,15 @@ Buffer::remove(Network::byte_t c)
     return _data.get();
 }
 
+/// \brief Drop a byte without resizing.
+///		This will remove the byte from the Buffer, and then
+///		move the remaining data to be in the correct
+///		location. This resets the seek pointer.
+///
+/// @param start The location of the byte to remove from the
+///		Buffer
+///
+/// @return A real pointer to the base address of the Buffer.
 Network::byte_t *
 Buffer::remove(int start)
 {
@@ -427,17 +589,34 @@ Buffer::remove(int start)
     return _data.get();
 }
 
+/// \brief Drop bytes without resizing.
+///		This will remove the bytes from the Buffer, and then
+///		move the remaining data to be in the correct
+///		location. This resets the seek pointer.
+///
+/// @param index The location of the byte to start removing data
+///		from the Buffer. This is an numerical value, not a
+///		pointer.
+///
+/// @param start The location of the byte to remove from the
+///		Buffer
+/// @param range The amoiunt of bytes to remove from the Buffer.
+///
+/// @return A real pointer to the base address of the Buffer.
 Network::byte_t *
-Buffer::remove(int start, int stop)
+Buffer::remove(int start, int range)
 {
 //    GNASH_REPORT_FUNCTION;
-    std::copy((_data.get() + stop + 1), end(), (_data.get() + start)),
+    std::copy((_data.get() + range + 1), end(), (_data.get() + start)),
 //    *end() = 0;
-    _nbytes -= stop-start;
+	_nbytes -= (range - start);
     return _data.get();
 }
 
-// Just reset to having no data, but still having storage
+/// \brief Clear the contents of the buffer by setting all the bytes to
+///		zeros.
+///
+/// @return nothing
 void
 Buffer::clear()
 {
@@ -448,7 +627,15 @@ Buffer::clear()
     _seekptr = _data.get();
 }
 
-// Resize the buffer that holds the data.
+/// \brief Resize the buffer that holds the data.
+///		The new size of the current data is based on the
+///		current amount of data within the allocated memory.
+///		This is used to make a Buffer the same size as
+///		the existing data, and to truncate the unsed portion
+///		of the Buffer when copying to the new memory
+///		location.
+/// 
+/// @return A reference to a Buffer.
 Buffer &
 Buffer::resize()
 {
@@ -456,7 +643,15 @@ Buffer::resize()
     return resize(_seekptr - _data.get());
 }
 
-// Resize the block of memory used for this Buffer.
+/// \brief Resize the buffer that holds the data.
+///		If the size is larger than the existing data, the data
+///		is copied into the new region. If the size is smaller
+///		than the existing data, the remaining data is
+///		truncated when copying to the new memory location.
+///
+/// @param nbyte The size to resize the Buffer to.
+///
+/// @return A reference to a Buffer.
 Buffer &
 Buffer::resize(size_t size)
 {
@@ -497,6 +692,8 @@ Buffer::resize(size_t size)
     return *this;
 }
 
+///  \brief Dump the internal data of this class in a human readable form.
+///		This should only be used for debugging purposes.
 void
 Buffer::dump(std::ostream& os) const
 {
