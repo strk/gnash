@@ -281,13 +281,11 @@ private:
 	void push_stack(as_value object){
 		LOG_DEBUG_AVM("Pushing value %s onto stack.",object.toDebugString());
 		mStack.push(object);
-		print_stack();
 	}
 
 	as_value pop_stack(){
 		as_value value = mStack.pop();
 		LOG_DEBUG_AVM("Poping value %s off the stack.",value.toDebugString());
-		print_stack();
 		return value;
 	}
 

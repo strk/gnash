@@ -2450,6 +2450,7 @@ Machine::execute()
 	}
 	} // end of switch statement
 		LOG_DEBUG_AVM("* DONE *");
+		IF_VERBOSE_ACTION(print_stack());
 	} // end of AS3 conditional
 	else // beginning of !AS3 (this code is AS2)
 	{
@@ -2818,13 +2819,11 @@ as_environment::ScopeStack stack;
 void Machine::print_stack(){
 
 	std::stringstream ss;
-	ss << "Stack: size=";
-	ss<< mStack.size()<<" Items: ";
+	ss << "Stack: ";
 	for(unsigned int i=0;i<mStack.size();++i){
-		as_value value = mStack.value(i);
-		ss << mStack.top(i).toDebugString();
+		if (i!=0) ss << " | ";
+		ss << mStack.value(i).toDebugString();
 	}
-//	printf("\n");
 	LOG_DEBUG_AVM("%s", ss.str());
 }
 
