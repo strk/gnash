@@ -38,10 +38,7 @@
 
 namespace gnash {
 namespace media {
-
-
-
-
+namespace gst {
 
 
 MediaParserGst::MediaParserGst(std::auto_ptr<IOChannel> stream)
@@ -260,7 +257,8 @@ bool MediaParserGst::probingConditionsMet(const SimpleTimer& timer)
     return foundAllStreams() || (timer.expired() && getBytesLoaded() > MIN_PROBE_SIZE);
 }
 
-void print_caps(GstCaps* caps)
+static void
+print_caps(GstCaps* caps)
 {
     if (!caps) {
         return;
@@ -547,5 +545,6 @@ MediaParserGst::cb_chain_func_audio (GstPad *pad, GstBuffer *buffer)
     return GST_FLOW_OK;
 }
 
+} // gnash.media.gst namespace
 } // namespace media
 } // namespace gnash

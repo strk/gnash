@@ -27,34 +27,41 @@
 namespace gnash {
 namespace media {
 
-///
-/// Class containing information about a sound. Is created by the parser while
+/// Class containing information about a sound.
+//
+/// Is created by the parser while
 /// parsing, and ownership is then transfered to sound_data. When the parser is
 /// parsing streams, it will ask the soundhandler for this to know what properties
 /// the stream has.
+///
+/// @deprecated AudioInfo should replace this
 ///
 class SoundInfo {
 public:
 	/// Constructor
 	//
 	/// @param format
-	/// The format of the sound. Can be MP3, ADPCM, uncompressed or Nellymoser
+	///     The encoding/format of this sound. 
 	///
-	/// @param stero
-	/// Defines whether the sound is in stereo.
+	/// @param stereo
+	///     Defines whether the sound is in stereo.
 	///
 	/// @param sampleRate
-	/// The sample rate of the sound.
+	///     The sample rate of the sound.
 	///
 	/// @param sampleCount
-	/// The sample count in the sound. In soundstreams this is an average for each frame.
+	///     The sample count in the sound.
+    ///     In soundstreams this is an average for each frame.
 	///
 	/// @param is16bit
-	/// Defines whether the sound is in 16bit format (samplesize == 2)? else it 
-	/// is 8bit (samplesize == 1). Used for streams when decoding adpcm.
+	///     If true, the sound is in 16bit format (samplesize == 2)
+    ///     else it is 8bit (samplesize == 1).
+    ///     Used for streams when decoding adpcm.
 	///
-	SoundInfo(audioCodecType format, bool stereo, boost::uint32_t sampleRate, boost::uint32_t sampleCount, bool is16bit)
-	:	_format(format),
+	SoundInfo(audioCodecType format, bool stereo, boost::uint32_t sampleRate,
+            boost::uint32_t sampleCount, bool is16bit)
+	    :
+        _format(format),
 		_stereo(stereo),
 		_sampleRate(sampleRate),
 		_sampleCount(sampleCount),

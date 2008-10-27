@@ -30,6 +30,7 @@ using namespace std;
 
 namespace gnash {
 namespace media {
+namespace ffmpeg {
 
 namespace { // anonymous namespace
 
@@ -516,6 +517,7 @@ MediaParserFfmpeg::SampleFormatToSampleSize(SampleFormat fmt)
 }
 
 
+} // gnash.media.ffmpeg namespace 
 } // end of gnash::media namespace
 } // end of gnash namespace
 

@@ -82,7 +82,6 @@ libgnashmedia_la_SOURCES = \
 	$(NULL)
 
 noinst_HEADERS = \
-	MediaBuffer.h \
 	AudioDecoder.h \
 	VideoDecoder.h \
 	MediaParser.h \

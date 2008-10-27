@@ -30,6 +30,7 @@
 
 namespace gnash { 
 namespace media {
+namespace ffmpeg {
 
 std::auto_ptr<MediaParser>
 MediaHandlerFfmpeg::createMediaParser(std::auto_ptr<IOChannel> stream)
@@ -77,5 +78,6 @@ MediaHandlerFfmpeg::getInputPaddingSize() const
     return FF_INPUT_BUFFER_PADDING_SIZE;
 }
 
+} // gnash.media.ffmpeg namespace 
 } // gnash.media namespace 
 } // gnash namespace

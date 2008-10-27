@@ -30,7 +30,7 @@
 
 namespace gnash {
 namespace media {
-
+namespace gst {
 
 
 AudioDecoderGst::AudioDecoderGst(SoundInfo& info)
@@ -119,7 +119,8 @@ AudioDecoderGst::~AudioDecoderGst()
     swfdec_gst_decoder_finish(&_decoder);
 }
 
-std::string 
+/// Find the best available audio resampler on the system
+static std::string 
 findResampler()
 {
     std::string resampler = "ffaudioresample";
@@ -175,7 +176,7 @@ void AudioDecoderGst::setup(GstCaps* srccaps)
     gst_caps_unref (sinkcaps);
 }
 
-void
+static void
 buf_add(gpointer buf, gpointer data)
 {
     boost::uint32_t* total = (boost::uint32_t*) data;
@@ -265,6 +266,7 @@ AudioDecoderGst::decode(const EncodedAudioFrame& ef, boost::uint32_t& outputSize
 }
 
 
+} // gnash.media.gst namespace
 } // end of media namespace
 } // end of gnash namespace
 

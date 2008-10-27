@@ -51,7 +51,7 @@ public:
   
   /// Push an encoded video frame into the decoder
   //
-  /// @param the video frame to decode
+  /// @param buffer the video frame to decode
   ///
   virtual void push(const EncodedVideoFrame& buffer) = 0;
   

@@ -31,6 +31,19 @@
 namespace gnash {
 namespace media {
 
+/// FFMPEG-based media handler module
+//
+/// The module implements the MediaHandler factory as required
+/// by Gnash core for a loadable media handler module.
+///
+/// It uses libavformat and libavcodec:
+/// http://www.irisa.fr/texmex/people/dufouil/ffmpegdoxy/index.html
+///
+/// Starting point is MediaHandlerFfmpeg.
+/// 
+namespace ffmpeg {
+
+/// FFMPEG based MediaHandler
 class DSOEXPORT MediaHandlerFfmpeg : public MediaHandler
 {
 public:
@@ -46,6 +59,7 @@ public:
 };
 
 
+} // gnash.media.ffmpeg namespace 
 } // gnash.media namespace 
 } // namespace gnash
 

@@ -34,8 +34,9 @@
 
 namespace gnash {
 namespace media {
+namespace gst {
 
-/// Video decoding using Gstreamer.
+/// GST based AudioDecoder
 class DSOEXPORT AudioDecoderGst : public AudioDecoder {
 	
 public:
@@ -59,6 +60,7 @@ private:
 
 };
 
+} // gnash.media.gst namespace
 } // media namespace
 } // gnash namespace
 

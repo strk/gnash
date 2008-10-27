@@ -38,9 +38,12 @@ namespace gnash {
 
 namespace gnash {
 namespace media {
+namespace ffmpeg {
 
-/// Class to hold extra info found in audio stream by the parser.
+/// Extra info found in audio stream by the parser.
+//
 /// The info will be needed for proper initialization of decoder.
+///
 class ExtraAudioInfoFfmpeg : public AudioInfo::ExtraInfo
 {
 public:
@@ -54,8 +57,10 @@ public:
 	size_t dataSize;
 };
 
-/// Class to hold extra info found in video stream by the parser.
+/// Extra info found in video stream by the parser.
+//
 /// The info will be needed for proper initialization of decoder.
+///
 class ExtraVideoInfoFfmpeg : public VideoInfo::ExtraInfo
 {
 public:
@@ -70,7 +75,6 @@ public:
 };
 
 /// FFMPEG based MediaParser
-///
 class MediaParserFfmpeg: public MediaParser
 {
 public:
@@ -180,6 +184,7 @@ private:
 };
 
 
+} // gnash.media.ffmpeg namespace 
 } // gnash.media namespace 
 } // namespace gnash
 

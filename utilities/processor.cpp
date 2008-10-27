@@ -330,9 +330,9 @@ main(int argc, char *argv[])
     }
 
 #ifdef USE_FFMPEG
-    std::auto_ptr<media::MediaHandler> handler( new gnash::media::MediaHandlerFfmpeg() );
+    std::auto_ptr<media::MediaHandler> handler( new gnash::media::ffmpeg::MediaHandlerFfmpeg() );
 #elif defined(USE_GST)
-    std::auto_ptr<media::MediaHandler> handler( new gnash::media::MediaHandlerGst() );
+    std::auto_ptr<media::MediaHandler> handler( new gnash::media::gst::MediaHandlerGst() );
 #else
     std::cerr << "Neigher SOUND_SDL nor SOUND_GST defined" << std::endl;
     exit(1);

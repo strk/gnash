@@ -31,6 +31,7 @@
 
 namespace gnash {
 namespace media {
+namespace ffmpeg {
 
 AudioResamplerFfmpeg::AudioResamplerFfmpeg()
 	:_context(NULL)
@@ -71,6 +72,7 @@ AudioResamplerFfmpeg::resample(
 }
 
 
+} // gnash.media.ffmpeg namespace 
 } // gnash.media namespace 
 } // namespace gnash
 

@@ -33,6 +33,7 @@
 
 namespace gnash {
 namespace media {
+namespace ffmpeg {
 
 /// FFMPEG based AudioDecoder
 class AudioDecoderFfmpeg : public AudioDecoder {
@@ -70,6 +71,7 @@ private:
 	AudioResamplerFfmpeg _resampler;
 };
 	
+} // gnash.media.ffmpeg namespace 
 } // gnash.media namespace 
 } // gnash namespace
 

@@ -39,8 +39,9 @@
 
 namespace gnash {
 namespace media {
+namespace gst {
 
-// Convenience wrapper for GstBuffer. Intended to be wrapped in an auto_ptr.
+/// Convenience wrapper for GstBuffer. Intended to be wrapped in an auto_ptr.
 class gnashGstBuffer : public image::ImageRGB
 {
 public:
@@ -73,6 +74,7 @@ private:
 };
 
 
+/// GST based VideoDecoder
 class DSOEXPORT VideoDecoderGst : public VideoDecoder
 {
 public:
@@ -91,12 +93,13 @@ private:
     void setup(GstCaps* caps);
 
     VideoDecoderGst();
-    VideoDecoderGst(const gnash::media::VideoDecoderGst&);
+    VideoDecoderGst(const VideoDecoderGst&);
 
     SwfdecGstDecoder _decoder;
 };
 
 
+} // gnash.media.gst namespace
 } // namespace media
 } // namespace gnash
 #endif // __VIDEODECODERGST_H__

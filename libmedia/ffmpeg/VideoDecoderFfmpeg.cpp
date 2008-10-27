@@ -44,6 +44,7 @@ extern "C" {
 
 namespace gnash {
 namespace media {
+namespace ffmpeg {
 
 #ifdef HAVE_SWSCALE_H
 /// A wrapper round an SwsContext that ensures it's
@@ -145,7 +146,8 @@ VideoDecoderFfmpeg::VideoDecoderFfmpeg(const VideoInfo& info)
 }
 
 void
-VideoDecoderFfmpeg::init(enum CodecID codecId, int width, int height, boost::uint8_t* extradata, int extradataSize)
+VideoDecoderFfmpeg::init(enum CodecID codecId, int /*width*/, int /*height*/,
+        boost::uint8_t* extradata, int extradataSize)
 {
     // Init the avdecoder-decoder
     avcodec_init();
@@ -368,5 +370,6 @@ VideoDecoderFfmpeg::flashToFfmpegCodec(videoCodecType format)
 }
 
 
+} // gnash.media.ffmpeg namespace 
 } // gnash.media namespace 
 } // gnash namespace

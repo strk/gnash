@@ -191,9 +191,9 @@ void
 Player::init_media()
 {
 #ifdef USE_FFMPEG
-        _mediaHandler.reset( new gnash::media::MediaHandlerFfmpeg() );
+        _mediaHandler.reset( new gnash::media::ffmpeg::MediaHandlerFfmpeg() );
 #elif defined(USE_GST)
-        _mediaHandler.reset( new gnash::media::MediaHandlerGst() );
+        _mediaHandler.reset( new gnash::media::gst::MediaHandlerGst() );
 #else
         log_error(_("No media support compiled in"));
         return;

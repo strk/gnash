@@ -41,6 +41,21 @@ namespace gnash {
 }
 
 namespace gnash {
+
+/// Gnash %media handling subsystem (libmedia)
+//
+/// The core Gnash lib will delegate any parsing decoding and encoding
+/// of %media files to the %media subsystem.
+///
+/// The subsystem's entry point is a MediaHandler instance, which acts
+/// as a factory for parsers, decoders and encoders.
+///
+/// Theoretically, it should be possible for actual MediaHandler
+/// implementations to be loaded at runtime, altought this is not yet
+/// implemented at time of writing (2008/10/27).
+///
+/// @todo fix http://wiki.gnashdev.org/wiki/index.php/Libmedia, is obsoleted
+///
 namespace media {
 
 /// The MediaHandler class acts as a factory to provide parser and decoders

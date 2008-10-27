@@ -27,6 +27,7 @@
 
 namespace gnash {
 namespace media {
+namespace gst {
 
 // TODO: implement proper seeking.
 
@@ -39,8 +40,9 @@ VideoDecoderGst::VideoDecoderGst(GstCaps* caps)
 }
 
 
-VideoDecoderGst::VideoDecoderGst(videoCodecType codec_type, int width, int height,
-                                 const boost::uint8_t* extradata, size_t extradatasize)
+VideoDecoderGst::VideoDecoderGst(videoCodecType codec_type,
+        int /*width*/, int /*height*/,
+        const boost::uint8_t* extradata, size_t extradatasize)
 {
     // init GStreamer. TODO: what about doing this in MediaHandlerGst ctor?
     gst_init (NULL, NULL);
@@ -187,5 +189,6 @@ VideoDecoderGst::peek()
 }
 
 
+} // namespace gnash::media::gst
 } // namespace gnash::media
 } // namespace gnash

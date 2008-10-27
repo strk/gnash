@@ -35,6 +35,7 @@
 
 namespace gnash {
 namespace media {
+namespace ffmpeg {
 	
 AudioDecoderFfmpeg::AudioDecoderFfmpeg(const AudioInfo& info)
 	:
@@ -477,5 +478,6 @@ AudioDecoderFfmpeg::decodeFrame(boost::uint8_t* input, boost::uint32_t inputSize
 }
 
 
+} // gnash.media.ffmpeg namespace 
 } // gnash.media namespace 
 } // gnash namespace

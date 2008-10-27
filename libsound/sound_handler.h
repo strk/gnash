@@ -43,11 +43,6 @@ namespace gnash {
 }
 
 namespace gnash {
-
-/// Gnash media subsystem (libmedia)
-//
-/// See http://wiki.gnashdev.org/wiki/index.php/Libmedia
-///
 namespace media {
 
 /// Sound handler.

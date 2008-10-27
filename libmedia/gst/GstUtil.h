@@ -35,9 +35,12 @@
 
 namespace gnash {
 namespace media {
+namespace gst {
 
-/// \brief Generalized Gstreamer utilities for pipeline configuration.
-///        WARNING: This class is not guaranteed to be thread-safe.
+/// Generalized Gstreamer utilities for pipeline configuration.
+//
+/// @warning This class is not guaranteed to be thread-safe.
+///
 class DSOEXPORT GstUtil {
 	
 public: 
@@ -82,6 +85,7 @@ private:
   ~GstUtil();
 };
 
+} // gnash.media.gst namespace
 } // media namespace
 } // gnash namespace
 

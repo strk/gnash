@@ -568,9 +568,9 @@ MovieTester::initTestingMediaHandlers()
 	std::auto_ptr<media::MediaHandler> handler;
 
 #ifdef USE_FFMPEG
-	handler.reset( new gnash::media::MediaHandlerFfmpeg() );
+	handler.reset( new gnash::media::ffmpeg::MediaHandlerFfmpeg() );
 #elif defined(USE_GST)
-        handler.reset( new gnash::media::MediaHandlerGst() );
+        handler.reset( new gnash::media::gst::MediaHandlerGst() );
 #else
 	std::cerr << "Neigher SOUND_SDL nor SOUND_GST defined" << std::endl;
 	return;

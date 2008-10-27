@@ -33,6 +33,7 @@
 
 namespace gnash {
 namespace media {
+namespace ffmpeg {
 
 /// FFMPEG based AudioResampler
 //
@@ -76,6 +77,7 @@ private:
 	ReSampleContext* _context;
 };
 
+} // gnash.media.ffmpeg namespace 
 } // gnash.media namespace 
 } // namespace gnash
 

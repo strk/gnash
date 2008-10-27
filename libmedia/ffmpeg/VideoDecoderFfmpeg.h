@@ -34,6 +34,7 @@
 
 namespace gnash {
 namespace media {
+namespace ffmpeg {
 
 
 /// Forward declarations
@@ -43,6 +44,7 @@ class SwsContextWrapper;
 #endif
 
 
+/// FFMPEG based VideoDecoder
 class VideoDecoderFfmpeg : public VideoDecoder {
     
 public:
@@ -104,6 +106,7 @@ private:
     std::vector<const EncodedVideoFrame*> _video_frames;
 };
     
+} // gnash.media.ffmpeg namespace 
 } // gnash.media namespace 
 } // gnash namespace
 

@@ -234,19 +234,16 @@ public:
 	/// Create an encoded video frame
 	//
 	/// @param data
-	///	Data buffer, ownership transferred
+	///     Data buffer, ownership transferred
 	///
 	/// @param size
-	///	Size of the data buffer
+	///     Size of the data buffer
 	///
 	/// @param frameNum
-	///	Frame number.
-	///
-	/// @param type
-	/// 	Video frame type
+	///     Frame number.
 	///
 	/// @param timestamp
-	///	Presentation timestamp, in milliseconds.
+	///     Presentation timestamp, in milliseconds.
 	///
 	EncodedVideoFrame(boost::uint8_t* data, boost::uint32_t size,
 			unsigned int frameNum,
@@ -292,7 +289,7 @@ public:
 	std::auto_ptr<EncodedExtraData> extradata;
 };
 
-/// The MediaParser class provides cursor-based access to encoded media frames 
+/// The MediaParser class provides cursor-based access to encoded %media frames 
 //
 /// Cursor-based access allow seeking as close as possible to a specified time
 /// and fetching frames from there on, sequentially.
