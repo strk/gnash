@@ -28,6 +28,10 @@
 namespace gnash {
 namespace media {
 
+/// Audio decoder for the speex codec 
+//
+/// This class will use the speex resampler if available
+///
 class AudioDecoderSpeex : public AudioDecoder
 {
 public:
