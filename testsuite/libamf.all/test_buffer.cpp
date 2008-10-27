@@ -338,7 +338,7 @@ test_find()
 
     const char *sub = "fgh";
     Network::byte_t *ptr2 = const_cast<Network::byte_t *>(reinterpret_cast<const Network::byte_t *>(sub));
-    fptr = buf1.find(ptr2, 3);
+    fptr = std::search(buf1.begin(), buf1.end(), sub, sub+3);
     if (fptr == (ptr1 + 5)) {
          runtest.pass ("Buffer::find(Network::byte_t *, size_t)");
     } else {

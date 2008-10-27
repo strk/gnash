@@ -506,18 +506,6 @@ Buffer::operator==(Buffer &buf)
      return false;
 }
 
-Network::byte_t *
-Buffer::find(Network::byte_t *b, size_t size)
-{
-//    GNASH_REPORT_FUNCTION;
-    for (size_t i=0; i< _nbytes; i++) {
-	if (memcmp((_data.get() + i), b, size) == 0) {
-	    return _data.get() + i;
-	}
-    }
-    return 0;
-}
-
 /// \brief Drop a byte without resizing.
 ///		This will remove the byte from the Buffer, and then
 ///		move the remaining data to be in the correct
