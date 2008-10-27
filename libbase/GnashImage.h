@@ -60,7 +60,11 @@ enum ImageType
 };
 
 
-/// Base class for different types of images
+/// Base class for different types of bitmaps
+//
+/// @todo document layout of the image, like pixel data
+///       order in the raw array (rows or columns first?)
+///
 class DSOEXPORT GnashImage
 {
 public:
