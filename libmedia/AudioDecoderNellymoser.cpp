@@ -801,7 +801,8 @@ void AudioDecoderNellymoser::setup(AudioInfo& info)
 		                "non-nellymoser codec");
 }
 
-float* AudioDecoderNellymoser::decode(boost::uint8_t* in_buf, boost::uint32_t inputSize, boost::uint32_t* outputSize)
+float*
+AudioDecoderNellymoser::decode(boost::uint8_t* in_buf, boost::uint32_t inputSize, boost::uint32_t* outputSize)
 {
         size_t out_buf_size = (inputSize / NELLY_BLOCK_LEN) * 256;
 	float* out_buf = new float[out_buf_size];
@@ -821,7 +822,10 @@ float* AudioDecoderNellymoser::decode(boost::uint8_t* in_buf, boost::uint32_t in
 	return out_buf;	
 }
 
-boost::uint8_t* AudioDecoderNellymoser::decode(boost::uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize, boost::uint32_t& decodedBytes, bool /*parse*/)
+boost::uint8_t*
+AudioDecoderNellymoser::decode(boost::uint8_t* input,
+        boost::uint32_t inputSize, boost::uint32_t& outputSize,
+        boost::uint32_t& decodedBytes, bool /*parse*/)
 {
 
 	float float_buf[256];

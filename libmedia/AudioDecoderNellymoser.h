@@ -61,20 +61,21 @@
 
 // Forward declarations
 namespace gnash {
-	namespace media {
-		class AudioInfo;
-	}
+    namespace media {
+        class AudioInfo;
+    }
 }
 
 
 typedef struct nelly_handle_struct {
-	float state[64];
+    float state[64];
 } nelly_handle;
 
 namespace gnash {
 namespace media {
 
 /// Audio decoding using internal Nellymoser decoder.
+//
 /// TODO: as ffmpeg now has Nellymoser support (maintained
 /// by people who know what they're doing, I hope), do
 /// we need this?
@@ -85,42 +86,50 @@ public:
     /// This is needed by gstreamer still. TODO: drop.
     AudioDecoderNellymoser();
 
-	/// @param info
-	/// 	AudioInfo class with all the info needed to decode
-	///     the sound correctly. Throws a MediaException on fatal
-	///     error.
-	AudioDecoderNellymoser(AudioInfo& info);
+    /// @param info
+    ///     AudioInfo class with all the info needed to decode
+    ///     the sound correctly. Throws a MediaException on fatal
+    ///     error.
+    AudioDecoderNellymoser(AudioInfo& info);
 
-	/// @param info
-	/// 	SoundInfo class with all the info needed to decode
-	///     the sound correctly. Throws a MediaException on fatal
-	///      error.
-	AudioDecoderNellymoser(SoundInfo& info);
+    /// @param info
+    ///     SoundInfo class with all the info needed to decode
+    ///     the sound correctly. Throws a MediaException on fatal
+    ///      error.
+    /// 
+    /// @deprecated use the AudioInfo based constructor
+    ///
+    AudioDecoderNellymoser(SoundInfo& info);
 
     ~AudioDecoderNellymoser();
 
-	boost::uint8_t* decode(boost::uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize, boost::uint32_t& decodedBytes, bool parse);
-	
-	/// @return a new[]-allocated pointer to decoded data in floats.
-	float* decode(boost::uint8_t* in_buf, boost::uint32_t inputSize, boost::uint32_t* outputSize);
-
+    // See dox in AudioDecoder.h
+    boost::uint8_t* decode(boost::uint8_t* input,
+        boost::uint32_t inputSize, boost::uint32_t& outputSize,
+        boost::uint32_t& decodedBytes, bool parse);
+    
 private:
 
-	void setup(AudioInfo& info);
-	void setup(SoundInfo& info);
+    /// @return a new[]-allocated pointer to decoded data in floats.
+    float* decode(boost::uint8_t* in_buf, boost::uint32_t inputSize,
+            boost::uint32_t* outputSize);
 
-	// The handle used by the decoder
-	nelly_handle* _nh;
 
-	// samplerate
-	boost::uint16_t _sampleRate;
+    void setup(AudioInfo& info);
+    void setup(SoundInfo& info);
 
-	// stereo
-	bool _stereo;
+    // The handle used by the decoder
+    nelly_handle* _nh;
+
+    // samplerate
+    boost::uint16_t _sampleRate;
+
+    // stereo
+    bool _stereo;
 };
-	
+    
 } // gnash.media namespace 
 } // gnash namespace
 
 #endif // __AUDIODECODERNELLYMOSER_H__
-	
+    

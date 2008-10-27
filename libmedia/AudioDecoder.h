@@ -64,9 +64,11 @@ public:
 	/// @return a pointer to the decoded data, or NULL if decoding fails.
 	///     The caller owns the decoded data, which was allocated with new [].
 	///
-	/// TODO: return a gnash::Buffer
+	/// @todo return a SimpleBuffer by auto_ptr
 	///
-	virtual boost::uint8_t* decode(boost::uint8_t* /*input*/, boost::uint32_t /*inputSize*/, boost::uint32_t& /*outputSize*/, boost::uint32_t& /*decodedData*/, bool /*parse*/) { return NULL; }
+	virtual boost::uint8_t* decode(boost::uint8_t* input,
+        boost::uint32_t inputSize, boost::uint32_t& outputSize,
+        boost::uint32_t& decodedData, bool parse);
 
 	/// Decodes an EncodedAudioFrame and returns a pointer to the decoded data
 	//
@@ -79,15 +81,21 @@ public:
 	/// @return a pointer to the decoded data, or NULL if decoding fails.
 	///     The caller owns the decoded data, which was allocated with new [].
 	///
-	/// TODO: return a gnash::Buffer
+	/// @todo return a SimpleBuffer by auto_ptr
 	///
-	virtual boost::uint8_t* decode(const EncodedAudioFrame& /*input*/,
-	                               boost::uint32_t& /*outputSize*/)
-	{
-		return NULL;
-	}
+	virtual boost::uint8_t* decode(const EncodedAudioFrame& input,
+	                               boost::uint32_t& outputSize);
 
 };
+
+inline boost::uint8_t*
+AudioDecoder::decode(boost::uint8_t*, boost::uint32_t, boost::uint32_t&,
+        boost::uint32_t&, bool)
+{ return NULL; }
+
+inline boost::uint8_t*
+AudioDecoder::decode(const EncodedAudioFrame&, boost::uint32_t&)
+{ return NULL; }
 	
 } // gnash.media namespace 
 } // gnash namespace
